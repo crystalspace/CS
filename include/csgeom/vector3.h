@@ -311,6 +311,12 @@ public:
     *this *= invlen;
   }
 
+  /// Returns the distance between two points
+  inline float Distance(const csVector3& v)
+  {
+	return Norm(csVector3(*this - v));
+  }
+
   /// Query if the vector is zero
   inline bool IsZero (float precision = SMALL_EPSILON) const
   { 

@@ -58,6 +58,11 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define OCEAN_NP_WID	40.0f
 #define OCEAN_NP_LEN	40.0f
 
+#define CELL_WID		20.0f
+#define CELL_LEN		20.0f
+
+#define MAX_OCEAN_DISTANCE 200.0f
+
 CS_IMPLEMENT_PLUGIN
 
 using namespace CS::Plugins::WaterMesh;
@@ -92,8 +97,6 @@ csWaterMeshObject::csWaterMeshObject (csWaterMeshObjectFactory* factory) :
   	(factory->object_reg, "crystalspace.shared.stringset");
 
   variableContext.AttachNew (new csShaderVariableContext);
-  if(factory->isOcean())
-	farPatchVariableContext.AttachNew (new csShaderVariableContext);
 
   factory->AddMeshObject(this);
 }
@@ -121,48 +124,35 @@ bool csWaterMeshObject::SetMaterialWrapper (iMaterialWrapper* mat)
 }
 
 void csWaterMeshObject::SetupBufferHolder ()
-{
-  if (bufferHolder == 0)
-    bufferHolder.AttachNew (new csRenderBufferHolder);
+{	
+		if (bufferHolder == 0)
+			bufferHolder.AttachNew (new csRenderBufferHolder);
 
-  // When creating buffers we basically have two ways. Either
-  // we can create the buffer immediatelly and supply it in the context.
-  // Or else we create an accessor for the buffer so that the
-  // shader/renderer can fetch the buffer later. The first approach
-  // is best in case of buffers that are almost always needed. For
-  // example, the vertex positions are certainly needed in all cases.
-  // The second approach is best in case of buffers that are only
-  // needed in some situations. For example, normals and colors may
-  // only be needed by some shaders. So delaying creation avoids
-  // the creation of potentially unneeded buffers there.
+		// When creating buffers we basically have two ways. Either
+		// we can create the buffer immediatelly and supply it in the context.
+		// Or else we create an accessor for the buffer so that the
+		// shader/renderer can fetch the buffer later. The first approach
+		// is best in case of buffers that are almost always needed. For
+		// example, the vertex positions are certainly needed in all cases.
+		// The second approach is best in case of buffers that are only
+		// needed in some situations. For example, normals and colors may
+		// only be needed by some shaders. So delaying creation avoids
+		// the creation of potentially unneeded buffers there.
 
-  // Indices are fetched directly from the factory.
-  bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, factory->index_buffer);
+		// Indices are fetched directly from the factory.
+		bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, factory->index_buffer);
 
-  // Vertices are fetched from the factory.
-  bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, vertex_buffer);
+		// Vertices are fetched from the factory.
+		bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, vertex_buffer);
 
-  // Texels are fetched from the factory.
-  bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, factory->texel_buffer);
+		// Texels are fetched from the factory.
+		bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, factory->texel_buffer);
 
-  // Normals are fetched from the factory but we use an accessor
-  // for those because they are not always needed.
-  // Colors are fetched from the object because we need to add the mesh
-  // base color to the static colors in the factory.
-  bufferHolder->SetAccessor (myRenderBufferAccessor, CS_BUFFER_NORMAL_MASK | CS_BUFFER_COLOR_MASK);
-
-  if(factory->isOcean())
-  {
-	if(farPatchBufferHolder == 0)
-		farPatchBufferHolder.AttachNew(new csRenderBufferHolder);
-	
-	farPatchBufferHolder->SetRenderBuffer(CS_BUFFER_INDEX, factory->far_index_buffer);
-	farPatchBufferHolder->SetRenderBuffer(CS_BUFFER_POSITION, factory->far_vertex_buffer);
-	farPatchBufferHolder->SetRenderBuffer(CS_BUFFER_TEXCOORD0, factory->far_texel_buffer);
-	//Far patch colors and normals shouldn't change..
-	farPatchBufferHolder->SetRenderBuffer(CS_BUFFER_NORMAL, factory->far_normal_buffer);
-	farPatchBufferHolder->SetRenderBuffer(CS_BUFFER_COLOR, factory->far_color_buffer);
-  }
+		// Normals are fetched from the factory but we use an accessor
+		// for those because they are not always needed.
+		// Colors are fetched from the object because we need to add the mesh
+		// base color to the static colors in the factory.
+		bufferHolder->SetAccessor (myRenderBufferAccessor, CS_BUFFER_NORMAL_MASK | CS_BUFFER_COLOR_MASK);
 }
 
 void csWaterMeshObject::SetupVertexBuffer()
@@ -186,10 +176,17 @@ void csWaterMeshObject::SetupObject ()
   {
     initialized = true;
 
-	// Make sure the factory is ok and his its buffers.
+	// Make sure the factory is ok and has its buffers.
 	factory->SetupFactory ();
 	
-	if(vertsChanged)
+	if(factory->isOcean())
+	{
+		for(int i = 0; i < NUM_LOD_LEVELS; i++)
+		{
+			factory->cells[i].SetupBufferHolder();
+		}
+	}
+	else if(vertsChanged)
 	{
 		verts.DeleteAll();
 		norms.DeleteAll();
@@ -202,9 +199,9 @@ void csWaterMeshObject::SetupObject ()
 		SetupVertexBuffer ();
 			
 		vertsChanged = false;
+
+	    SetupBufferHolder ();
 	}
-	
-    SetupBufferHolder ();
   }
 
   if(factory->murkChanged)
@@ -213,23 +210,8 @@ void csWaterMeshObject::SetupObject ()
 	murkVar->SetType(csShaderVariable::FLOAT);
 	murkVar->SetValue(factory->waterAlpha);
 	
-	if(factory->isOcean())
-	{
-		murkVar = farPatchVariableContext->GetVariableAdd(strings->Request("murkiness"));
-		murkVar->SetType(csShaderVariable::FLOAT);
-		murkVar->SetValue(factory->waterAlpha);
-	}
-	
 	factory->murkChanged = false;	
   }
-
-	/*
-		<shadervar name="amps" type="vector3">0.1, 0.03, 0.05</shadervar>
-		<shadervar name="kxs" type="vector3">1.4, -1.1, 0.5</shadervar>
-		<shadervar name="kys" type="vector3">1.6, 0.7, -2.5</shadervar>
-		<shadervar name="freqs" type="vector3">2.0, 1.7, 1.6</shadervar>
-		<shadervar name="phases" type="vector3">0.0, 1.0, 1.41</shadervar>
-	*/
 
   if(factory->amplitudes_changed)
   {
@@ -270,6 +252,100 @@ void csWaterMeshObject::SetupObject ()
 
 	factory->directions_changed = false;
   }
+
+}
+
+void csWaterMeshObject::AddNode(csOceanNode start, float dist)
+{
+	int useCell;
+	if(dist < CELL_WID)
+		useCell = 4;
+	else if(dist < (CELL_WID * 2))
+		useCell = 3;
+	else if(dist < (CELL_WID * 3))
+		useCell = 2;
+	else if(dist < (CELL_WID * 4))
+		useCell = 1;
+	else
+		useCell = 0;
+	
+	
+	// csTransform trans;
+	// trans.Translate(csVector3(start.gc.x, 0, start.gc.y));
+	// 
+	// bool rmCreated;
+	// renderMeshes.Push(rmHolder.GetUnusedMesh (rmCreated,
+	// 		rview->GetCurrentFrameNumber ()));
+	// 
+	// renderMeshes[i]->mixmode = MixMode;
+	// renderMeshes[i]->clip_portal = clip_portal;
+	// renderMeshes[i]->clip_plane = clip_plane;
+	// renderMeshes[i]->clip_z_plane = clip_z_plane;
+	// renderMeshes[i]->do_mirror = camera->IsMirrored ();
+	// renderMeshes[i]->meshtype = CS_MESHTYPE_TRIANGLES;
+	// renderMeshes[i]->indexstart = 0;
+	// renderMeshes[i]->indexend = factory->cells[useCell].GetNumIndexes();
+	// renderMeshes[i]->material = material;		
+	// renderMeshes[i]->worldspace_origin = wo;
+	// 
+	// renderMeshes[i]->geometryInstance = (void*)factory;
+	// 
+	// if (rmCreated)
+	// {
+	// 	renderMeshes[i]->buffers = factory->cells[useCell].bufferHolder;
+	// 	renderMeshes[i]->variablecontext = variableContext;
+	// }
+	// renderMeshes[i]->object2world = o2world * trans;
+	// 
+	// //update shader variable
+	//   	o2wtVar = variableContext->GetVariableAdd(strings->Request("o2w transform"));
+	//   	o2wtVar->SetType(csShaderVariable::MATRIX);
+	//   	o2wtVar->SetValue(renderMeshes[i]->object2world);
+	// 
+	// trans.Translate(csVector3(0, 0, CELL_WID));
+}
+
+void csWaterMeshObject::DrawFromNode(csOceanNode start, const csVector3 camPos)
+{
+	float distFromCam = start.GetCenter().Distance(camPos);
+	if(distFromCam > MAX_OCEAN_DISTANCE)
+		return;
+	else
+	{
+		AddNode(start, distFromCam);
+		DrawRightFromNode(start, camPos);
+		DrawLeftFromNode(start, camPos);
+		
+		DrawRightFromNode(start.GetUp(), camPos);
+		DrawLeftFromNode(start.GetUp(), camPos);
+		
+		DrawRightFromNode(start.GetDown(), camPos);
+		DrawLeftFromNode(start.GetDown(), camPos);
+	}
+}
+
+void csWaterMeshObject::DrawRightFromNode(csOceanNode start, const csVector3 camPos)
+{
+	float distFromCam = start.GetCenter().Distance(camPos);
+	if(distFromCam > MAX_OCEAN_DISTANCE)
+		return;
+	else
+	{
+		AddNode(start, distFromCam);
+		DrawRightFromNode(start.GetRight(), camPos);
+	}
+}
+
+void csWaterMeshObject::DrawLeftFromNode(csOceanNode start, const csVector3 camPos)
+{
+	float distFromCam = start.GetCenter().Distance(camPos);
+	if(distFromCam > MAX_OCEAN_DISTANCE)
+		return;
+	else
+	{
+		AddNode(start, distFromCam);
+		DrawLeftFromNode(start.GetLeft(), camPos);
+	}	
 }
 
 /*
@@ -292,7 +368,7 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
 
 //  float camY = camera->GetTransform().GetOrigin().y;
   csReversibleTransform trans;
-  float camY = camera->GetTransform().GetOrigin().y;
+  //float camY = camera->GetTransform().GetOrigin().y;
   if(factory->isOcean())	
   {	
 	// csOrthoTransform ot = camera->GetTransform();
@@ -303,9 +379,8 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
 	// camXZ.Normalize();
 	// trans.RotateThis(csVector3(0, 1, 0), -acos(camXZ * csVector3(0, 0, 1)));
   
-	float camX = camera->GetTransform().GetOrigin().x;
-	float camZ = camera->GetTransform().GetOrigin().z;
-	trans.Translate(csVector3(camX, 0, camZ));
+	// trans.Translate(csVector3(camX, 0, camZ));
+	trans.Identity();
   }
   else
   {
@@ -319,7 +394,7 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
 
   const csReversibleTransform o2wt = movable->GetFullTransform ();
   const csVector3& wo = o2wt.GetOrigin ();
-	
+
   csReversibleTransform o2world (o2wt);
   //o2world.SetO2T(o2world.GetO2T());
 
@@ -344,135 +419,110 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
   csDirtyAccessArray<csRenderMesh*>& renderMeshes =
     meshesHolder.GetUnusedData (meshesCreated, currentFrame);
 
-  if(renderMeshes.GetSize() == 0)
-  {
- 	bool rmCreated;
-  	renderMeshes.Push(rmHolder.GetUnusedMesh (rmCreated, currentFrame));
+	csShaderVariable *o2wtVar;
 
-  	renderMeshes[0]->mixmode = MixMode;
-  	renderMeshes[0]->clip_portal = clip_portal;
-	renderMeshes[0]->clip_plane = clip_plane;
-	renderMeshes[0]->clip_z_plane = clip_z_plane;
-	renderMeshes[0]->do_mirror = camera->IsMirrored ();
-	renderMeshes[0]->meshtype = CS_MESHTYPE_TRIANGLES;
-	renderMeshes[0]->indexstart = 0;
-	renderMeshes[0]->indexend = factory->numTris * 3;
-	renderMeshes[0]->material = material;		
-  	renderMeshes[0]->worldspace_origin = wo;
-
-    renderMeshes[0]->geometryInstance = (void*)factory;
-
-  	if (rmCreated)
-	  {
-	    renderMeshes[0]->buffers = bufferHolder;
-	    renderMeshes[0]->variablecontext = variableContext;
-	  }
-  }
-
-  renderMeshes[0]->object2world = o2world * trans;
-
-  //update shader variable
-  csShaderVariable *o2wtVar = variableContext->GetVariableAdd(strings->Request("o2w transform"));
-  o2wtVar->SetType(csShaderVariable::MATRIX);
-  o2wtVar->SetValue(renderMeshes[0]->object2world);
-
-  if(factory->isOcean())
-  {
-	/* TODO: Calculate required voodoo to get mesh to conform to what's left of the 
-		y = 0 plane in the view frustum... should require some nifty inverse projective
-		transformation....
-	*/
-	/*
-	csOrthoTransform invCam = camera->GetTransform();
-	
-	csMatrix3 invCamMat = invCam.GetO2T();
-	csMatrix3 fpTransMat (invCamMat);
-	fpTransMat.m21 = fpTransMat.m23 = 0;
-	fpTransMat.m22 = 1;
-	
-	csOrthoTransform fpTrans;
-	fpTrans.SetO2T(fpTransMat);
-	fpTrans.SetOrigin(wo);
-	*/
-
-	// float e = n * tanAlph;
-	// 
-	// float DminE = (d - e);
-	// float FminN = (f - n);
-	// 
-	// printf("n: %f\n", n);
-	// printf("halfDminE: %f\n", halfDminE);
-	// printf("halfFminN: %f\n", halfFminN);
-	// csMatrix3 tf (n, 0, halfDminE, 0, 1, 0, 0, 0, halfFminN);
-	// csVector3 tfv (halfDminE, 0, halfFminN);
-	
-	csPlane3* fp = camera->GetFarPlane();
-	float f;
-	if(fp)
-		f = fp->DD;
-	else
-		f = 500.0f;
-		
-	float tanAlph = tan((camera->GetFOVAngle() * PI) / 360);
-	float d = f * tanAlph;
-	
-	CS::Math::Matrix4 fpFirstTransMat (1, 0, 1, -1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-	CS::Math::Matrix4 fpSecondTransMat (d, 0, 0, 0, 0, 1, 0, 0, 0, 0, f, 0, 0, 0, 0, 1);
-	CS::Math::Matrix4 fpTransMat = fpFirstTransMat * fpSecondTransMat;
-	csTransform fpTrans = fpTransMat.GetTransform();
-	CS::Math::Matrix4 testMat (fpTrans);	
-
-	printf("testMat: |%.2f\t%.2f\t%.2f\t%.2f\t|\n", testMat.Row(0).x, testMat.Row(0).y, testMat.Row(0).z, testMat.Row(0).w);
-	printf("testMat: |%.2f\t%.2f\t%.2f\t%.2f\t|\n", testMat.Row(1).x, testMat.Row(1).y, testMat.Row(1).z, testMat.Row(1).w);
-	printf("testMat: |%.2f\t%.2f\t%.2f\t%.2f\t|\n", testMat.Row(2).x, testMat.Row(2).y, testMat.Row(2).z, testMat.Row(2).w);
-	printf("testMat: |%.2f\t%.2f\t%.2f\t%.2f\t|\n", testMat.Row(3).x, testMat.Row(3).y, testMat.Row(3).z, testMat.Row(3).w);
-	
-	
-	
-	csVector3 test = fpTrans * csVector3(-1.0, 0.0, 1.0);
-	printf("Vertex: <%.2f, %.2f, %.2f, %.2f> ===> <%.2f, %.2f, %.2f, %.2f>\n",-1.0, 0.0, 1.0, 1.0, test.x, test.y, test.z, 1.0);
-	// test = testMat.Row2();
-	// printf("fpTransMat: <%f, %f, %f, %f>\n", test.x, test.y, test.z, test.w);
-	// test = testMat.Row3();
-	// printf("fpTransMat: <%f, %f, %f, %f>\n", test.x, test.y, test.z, test.w);
-	// test = testMat.Row4();
-	// printf("fpTransMat: <%f, %f, %f, %f>\n", test.x, test.y, test.z, test.w);
-	// 
-	// test = csVector4(1.0, 0.0, -1.0, 1.0) * fpTrans;
-	// printf("Vertex: <%f, %f, %f> => <%f, %f, %f>\n", 1.0, 0.0, -1.0, test.x, test.y, test.z);
-	// test = csVector4(-1.0, 0.0, 1.0, 1.0) * fpTrans;
-	// printf("Vertex: <%f, %f, %f> => <%f, %f, %f>\n", -1.0, 0.0, 1.0, test.x, test.y, test.z);
-	// test = csVector4(1.0, 0.0, 1.0, 1.0) * fpTrans;
-	// printf("Vertex: <%f, %f, %f> => <%f, %f, %f>\n", 1.0, 0.0, 1.0, test.x, test.y, test.z);
-	// printf("\n");
-	bool fpCreated;
-	if(renderMeshes.GetSize() == 1)
+	if(factory->isOcean())
 	{
-		renderMeshes.Push(rmHolder.GetUnusedMesh (fpCreated,
-		rview->GetCurrentFrameNumber ()));
+		csOrthoTransform c2ot = rview->GetCamera ()->GetTransform ();
+	  	c2ot /= movable->GetFullTransform ();
 
-		renderMeshes[1]->mixmode = MixMode;
-		renderMeshes[1]->clip_portal = clip_portal;
-		renderMeshes[1]->clip_plane = clip_plane;
-		renderMeshes[1]->clip_z_plane = clip_z_plane;
-		renderMeshes[1]->do_mirror = camera->IsMirrored ();
-		renderMeshes[1]->meshtype = CS_MESHTYPE_TRIANGLES;
-		renderMeshes[1]->indexstart = 0;
-		renderMeshes[1]->indexend = factory->far_tris.GetSize() * 3;
-		renderMeshes[1]->material = material;		
-		renderMeshes[1]->worldspace_origin = wo;
+		csPlane3 planes[10];
+		//uint32 out_mask;
 
-		renderMeshes[1]->geometryInstance = (void*)factory;
-
-		if (fpCreated)
+		CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext (),
+		      c2ot, planes, frustum_mask);
+		
+		csVector3 camPos = camera->GetTransform().GetOrigin();
+		
+		int camXB = (int)floor(camPos.x);
+		int camZB = (int)floor(camPos.z);
+		
+		float nearX = camXB - (camXB % 10);
+		float nearZ = camZB - (camZB % 10);
+		
+		renderMeshes.DeleteAll();
+		
+		csOceanNode start (csVector2(nearX, nearZ), CELL_LEN, CELL_WID);
+		
+		//DrawFromNode(start);
+		
+		for(uint i = 0; i < 2; i++)
 		{
-			renderMeshes[1]->buffers = farPatchBufferHolder;
-			renderMeshes[1]->variablecontext = farPatchVariableContext;
+			bool rmCreated;
+			renderMeshes.Push(rmHolder.GetUnusedMesh (rmCreated,
+					rview->GetCurrentFrameNumber ()));
+
+			renderMeshes[i]->mixmode = MixMode;
+			renderMeshes[i]->clip_portal = clip_portal;
+			renderMeshes[i]->clip_plane = clip_plane;
+			renderMeshes[i]->clip_z_plane = clip_z_plane;
+			renderMeshes[i]->do_mirror = camera->IsMirrored ();
+			renderMeshes[i]->meshtype = CS_MESHTYPE_TRIANGLES;
+			renderMeshes[i]->indexstart = 0;
+			renderMeshes[i]->indexend = factory->cells[4-i].GetNumIndexes();
+			renderMeshes[i]->material = material;		
+			renderMeshes[i]->worldspace_origin = wo;
+
+			renderMeshes[i]->geometryInstance = (void*)factory;
+
+			renderMeshes[i]->buffers = factory->cells[4].bufferHolder;
+			
+			//Clone shader variable to provide each mesh with its own o2wt 			
+			csRef<csShaderVariableContext> newVarCtxt;
+			newVarCtxt.AttachNew (new csShaderVariableContext);
+				
+			csRefArray<csShaderVariable> vars = variableContext->GetShaderVariables();
+			for(uint j = 0; j < vars.GetSize(); j++)
+			{
+				newVarCtxt->AddVariable(vars[j]);
+			}
+
+			renderMeshes[i]->variablecontext = newVarCtxt;
+			renderMeshes[i]->object2world = o2world * trans;
+			
+			//update mesh-specific shader variable
+		  	o2wtVar = renderMeshes[i]->variablecontext->GetVariableAdd(strings->Request("o2w transform"));
+		  	o2wtVar->SetType(csShaderVariable::MATRIX);
+		  	o2wtVar->SetValue(renderMeshes[i]->object2world);
+			
+			trans.Translate(csVector3(0, 0, CELL_WID));
 		}
 	}
-	renderMeshes[1]->object2world = o2world * fpTrans * trans;
-  }
+	else
+	{
+  		if(renderMeshes.GetSize() == 0)
+		{
+		 	bool rmCreated;
+		  	renderMeshes.Push(rmHolder.GetUnusedMesh (rmCreated, currentFrame));
 
+		  	renderMeshes[0]->mixmode = MixMode;
+		  	renderMeshes[0]->clip_portal = clip_portal;
+			renderMeshes[0]->clip_plane = clip_plane;
+			renderMeshes[0]->clip_z_plane = clip_z_plane;
+			renderMeshes[0]->do_mirror = camera->IsMirrored ();
+			renderMeshes[0]->meshtype = CS_MESHTYPE_TRIANGLES;
+			renderMeshes[0]->indexstart = 0;
+			renderMeshes[0]->indexend = factory->numTris * 3;
+			renderMeshes[0]->material = material;		
+		  	renderMeshes[0]->worldspace_origin = wo;
+
+		    renderMeshes[0]->geometryInstance = (void*)factory;
+
+		  	if (rmCreated)
+			  {
+			    renderMeshes[0]->buffers = bufferHolder;
+			    renderMeshes[0]->variablecontext = farPatchVariableContext;
+			  }
+		}
+
+		  renderMeshes[0]->object2world = o2world * trans;
+
+		  //update shader variable
+		  o2wtVar = variableContext->GetVariableAdd(strings->Request("o2w transform"));
+		  o2wtVar->SetType(csShaderVariable::MATRIX);
+		  o2wtVar->SetValue(renderMeshes[0]->object2world);
+	}
+	
   //update shader variable
   // o2wtVar = farPatchVariableContext->GetVariableAdd(strings->Request("o2w transform"));
   // o2wtVar->SetType(csShaderVariable::MATRIX);
@@ -574,13 +624,6 @@ void csWaterMeshObject::SetNormalMap(iTextureWrapper *map)
 	nMapVar = variableContext->GetVariableAdd(strings->Request("texture normal"));
 	nMapVar->SetType(csShaderVariable::TEXTURE);
 	nMapVar->SetValue(nMap);
-	
-	if(factory->isOcean())
-	{
-		csShaderVariable *nMapFP = farPatchVariableContext->GetVariableAdd(strings->Request("texture normal"));
-		nMapFP->SetType(csShaderVariable::TEXTURE);
-		nMapFP->SetValue(nMap);
-	}
 }
 
 iTextureWrapper* csWaterMeshObject::GetNormalMap()
@@ -591,6 +634,9 @@ iTextureWrapper* csWaterMeshObject::GetNormalMap()
 void csWaterMeshObject::PreGetBuffer (csRenderBufferHolder *holder, 
                                       csRenderBufferName buffer)
 {
+  if(factory->isOcean())
+	return;
+	
   if (buffer == CS_BUFFER_COLOR)
   {
     if (mesh_colors_dirty_flag)
@@ -658,7 +704,7 @@ csWaterMeshObjectFactory::csWaterMeshObjectFactory (
   mesh_normals_dirty_flag = true;
   mesh_triangle_dirty_flag = true;
 
-  mesh_far_patch_dirty_flag = true;
+  mesh_cells_dirty_flag = true;
 
   changedVerts = false;
 
@@ -699,6 +745,12 @@ void csWaterMeshObjectFactory::RemoveMeshObject (csWaterMeshObject* meshObj)
 
 void csWaterMeshObjectFactory::CalculateBBoxRadius ()
 {
+  if(isOcean())
+  {
+	object_bbox.SetSize(csVector3(OCEAN_BBOX_RADIUS, OCEAN_BBOX_RADIUS, OCEAN_BBOX_RADIUS));
+	return;
+  }
+
   object_bbox_valid = true;
   csVector3& v0 = verts[0];
   object_bbox.StartBoundingBox (v0);
@@ -717,9 +769,6 @@ void csWaterMeshObjectFactory::CalculateBBoxRadius ()
     float sqradius = csSquaredDist::PointPoint (center, v);
     if (sqradius > max_sqradius) max_sqradius = sqradius;
   }
-
-  if(isOcean())
-	object_bbox.SetSize(csVector3(OCEAN_BBOX_RADIUS, OCEAN_BBOX_RADIUS, OCEAN_BBOX_RADIUS));
 	  
   radius = csQsqrt (max_sqradius);
 }
@@ -774,83 +823,65 @@ void csWaterMeshObjectFactory::SetupFactory ()
     initialized = true;
     object_bbox_valid = false;
 	size_changed = false;
-
-	verts.DeleteAll();
-	norms.DeleteAll();
-	cols.DeleteAll();
-	texs.DeleteAll();
-	tris.DeleteAll();
-
-	float offx, offz;
-	offx = offz = 0.0;
-	if(type == WATER_TYPE_OCEAN)
-	{
-		offx = (wid * gran) / 2;
-		offz = (len * gran) / 2;
-	}
+	
+	if(isOcean()) //make cells
+	{	
+		cells.DeleteAll();
+			
+		cells.Push(csOceanCell(CELL_LEN, CELL_WID, LOD_LEVEL_1));
+		cells.Push(csOceanCell(CELL_LEN, CELL_WID, LOD_LEVEL_2));
+		cells.Push(csOceanCell(CELL_LEN, CELL_WID, LOD_LEVEL_3));
+		cells.Push(csOceanCell(CELL_LEN, CELL_WID, LOD_LEVEL_4));
+		cells.Push(csOceanCell(CELL_LEN, CELL_WID, LOD_LEVEL_5));
 		
-	for(uint j = 0; j < len * gran; j++)
-	{
-		for(uint i = 0; i < wid * gran; i++)
+		for(uint i = 0; i < cells.GetSize(); i++)
 		{
-			verts.Push(csVector3 ((i / gran) - offx, 0, (j / gran) - offz));
-			norms.Push(csVector3 (0, 1, 0));
-			cols.Push(csColor (0.17,0.27,0.26));
-			texs.Push(csVector2((i / gran) / (1.5 * detail), (j / gran) / (1.5 * detail)));
+			cells[i].SetupVertices();
 		}
 	}
-	
-	for(uint j = 0; j < (len * gran) - 1; j++)
+	else
 	{
-		for(uint i = 0; i < (wid * gran) - 1; i++)
+		verts.DeleteAll();
+		norms.DeleteAll();
+		cols.DeleteAll();
+		texs.DeleteAll();
+		tris.DeleteAll();
+
+		float offx, offz;
+		offx = offz = 0.0;
+		if(type == WATER_TYPE_OCEAN)
 		{
-			tris.Push(csTriangle (j * (wid * gran) + i, 
-									(j + 1) * (wid * gran) + i, 
-									j * (wid * gran) + i + 1));
-			tris.Push(csTriangle (j * (wid * gran) + i + 1,
-									(j + 1) * (wid * gran) + i,
-									(j + 1) * (wid * gran) + i + 1));
+			offx = (wid * gran) / 2;
+			offz = (len * gran) / 2;
 		}
-	}
-	
-	if(isOcean()) //make far patch
-	{		
-		far_verts.DeleteAll();
-		far_norms.DeleteAll();
-		far_cols.DeleteAll();
-		far_texs.DeleteAll();
-		far_tris.DeleteAll();
 		
-		float fpatchH = len * gran;
-		float fpatchW = wid * gran;
-				
-		for(float j = 0; j < fpatchH; j+=1)
+		for(uint j = 0; j < len * gran; j++)
 		{
-			for(float i = 0; i < fpatchW; i+=1)
+			for(uint i = 0; i < wid * gran; i++)
 			{
-				far_verts.Push(csVector3(((j * 2) / fpatchW) - 1 , -0.5f , i / fpatchH));
-				far_norms.Push(csVector3 (0, 1, 0));
-				far_cols.Push(csColor (0.17,0.27,0.26));
-				far_texs.Push(csVector2((i / gran) / (0.1 * detail), (j / gran) / (0.1 * detail)));
+				verts.Push(csVector3 ((i / gran) - offx, 0, (j / gran) - offz));
+				norms.Push(csVector3 (0, 1, 0));
+				cols.Push(csColor (0.17,0.27,0.26));
+				texs.Push(csVector2((i / gran) / (1.5 * detail), (j / gran) / (1.5 * detail)));
+			}
+		}
+	
+		for(uint j = 0; j < (len * gran) - 1; j++)
+		{
+			for(uint i = 0; i < (wid * gran) - 1; i++)
+			{
+				tris.Push(csTriangle (j * (wid * gran) + i, 
+										(j + 1) * (wid * gran) + i, 
+										j * (wid * gran) + i + 1));
+				tris.Push(csTriangle (j * (wid * gran) + i + 1,
+										(j + 1) * (wid * gran) + i,
+										(j + 1) * (wid * gran) + i + 1));
 			}
 		}
 
-		for(uint j = 0; j < (fpatchH) - 1; j++)
-		{
-			for(uint i = 0; i < (fpatchW) - 1; i++)
-			{
-				far_tris.Push(csTriangle (j * (fpatchW) + i + 1, 
-										(j + 1) * (fpatchW) + i, 
-										(j * (fpatchW) + i)));
-				far_tris.Push(csTriangle ((j + 1) * (fpatchW) + i + 1,
-										(j + 1) * (fpatchW) + i,
-										(j * (fpatchW) + i + 1)));
-			}
-		}
+		numVerts = verts.GetSize();
+		numTris = tris.GetSize();
 	}
-	
-	numVerts = verts.GetSize();
-	numTris = tris.GetSize();
 	
 	for(uint i = 0; i < children.GetSize(); i++)
 	{
@@ -972,7 +1003,7 @@ void csWaterMeshObjectFactory::Invalidate ()
   mesh_normals_dirty_flag = true;
   mesh_triangle_dirty_flag = true;
 	
-  mesh_far_patch_dirty_flag = true;
+  mesh_cells_dirty_flag = true;
   
   color_nr++;
 
@@ -981,89 +1012,55 @@ void csWaterMeshObjectFactory::Invalidate ()
 
 void csWaterMeshObjectFactory::PrepareBuffers ()
 {
-  if (mesh_vertices_dirty_flag)
+  if(isOcean())
   {
-    mesh_vertices_dirty_flag = false;
-    if (!vertex_buffer)
-    {
-      // Create a buffer that doesn't copy the data.
-      vertex_buffer = csRenderBuffer::CreateRenderBuffer (
-        numVerts, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
-        3);
-    }
-    vertex_buffer->CopyInto (verts.GetArray(), numVerts);
-  }
-  if (mesh_texels_dirty_flag)
-  {
-    mesh_texels_dirty_flag = false;
-    if (!texel_buffer)
-    {
-      // Create a buffer that doesn't copy the data.
-      texel_buffer = csRenderBuffer::CreateRenderBuffer (
-        numVerts, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
-        2);
-    }
-    texel_buffer->CopyInto (texs.GetArray(), numVerts);
-  }
-  if (mesh_triangle_dirty_flag)
-  {
-    mesh_triangle_dirty_flag = false;
-    if (!index_buffer)
-      index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
-      numTris*3,
-      CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT,
-      0, numVerts-1);
-    index_buffer->CopyInto (tris.GetArray(), numTris*3);
-  }
-
-  if (mesh_far_patch_dirty_flag)
-  {
-    mesh_far_patch_dirty_flag = false;
-
-    if (!far_vertex_buffer)
-    {
-      // Create a buffer that doesn't copy the data.
-      far_vertex_buffer = csRenderBuffer::CreateRenderBuffer (
-        far_verts.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
-        3);
-    }
-    far_vertex_buffer->CopyInto (far_verts.GetArray(), far_verts.GetSize());
-
-    if (!far_texel_buffer)
-    {
-      // Create a buffer that doesn't copy the data.
-      far_texel_buffer = csRenderBuffer::CreateRenderBuffer (
-		far_verts.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
-        2);
-    }
-    far_texel_buffer->CopyInto (far_texs.GetArray(), far_verts.GetSize());
-
-    if (!far_index_buffer)
+	if (mesh_cells_dirty_flag)
 	{
-      far_index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
-      far_tris.GetSize()*3,
-      CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT,
-      0, far_verts.GetSize()-1);
-	}
-    far_index_buffer->CopyInto (far_tris.GetArray(), far_tris.GetSize()*3);
+	    mesh_cells_dirty_flag = false;
 
-    if (!far_normal_buffer)
-	{            
-	  // Create a buffer that doesn't copy the data.
-      far_normal_buffer = csRenderBuffer::CreateRenderBuffer (
-        far_norms.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
-        3);
+	    for(int i = 0; i < NUM_LOD_LEVELS; i++)
+		{
+			printf("Setting up buffers for cell with LOD level: %d\n", i);
+			cells[i].SetupBuffers();
+		}	
 	}
-    far_normal_buffer->CopyInto (far_norms.GetArray(), far_norms.GetSize());
-
-    if (!far_color_buffer)
-	{            
-	  // Create a buffer that doesn't copy the data.
-      far_color_buffer = csRenderBuffer::CreateRenderBuffer (
-        far_cols.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
-        3);
-	}
-    far_color_buffer->CopyInto (far_cols.GetArray(), far_cols.GetSize());
+  }
+  else
+  {	
+	  if (mesh_vertices_dirty_flag)
+	  {
+	    mesh_vertices_dirty_flag = false;
+	    if (!vertex_buffer)
+	    {
+	      // Create a buffer that doesn't copy the data.
+	      vertex_buffer = csRenderBuffer::CreateRenderBuffer (
+	        numVerts, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
+	        3);
+	    }
+	    vertex_buffer->CopyInto (verts.GetArray(), numVerts);
+	  }
+	  if (mesh_texels_dirty_flag)
+	  {
+	    mesh_texels_dirty_flag = false;
+	    if (!texel_buffer)
+	    {
+	      // Create a buffer that doesn't copy the data.
+	      texel_buffer = csRenderBuffer::CreateRenderBuffer (
+	        numVerts, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
+	        2);
+	    }
+	    texel_buffer->CopyInto (texs.GetArray(), numVerts);
+	  }
+	  if (mesh_triangle_dirty_flag)
+	  {
+	    mesh_triangle_dirty_flag = false;
+	    if (!index_buffer)
+	      index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
+	      numTris*3,
+	      CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT,
+	      0, numVerts-1);
+	    index_buffer->CopyInto (tris.GetArray(), numTris*3);
+	  }
   }
 }
 

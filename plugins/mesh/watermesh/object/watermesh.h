@@ -9,7 +9,7 @@
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+    Library General Public License for more details.`
 
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
@@ -32,6 +32,8 @@
 #include "ivideo/graph3d.h"
 #include "csutil/flags.h"
 #include "csutil/cscolor.h"
+
+#include "oceancell.h"
 
 struct iObjectRegistry;
 
@@ -144,6 +146,12 @@ private:
   void SetupObject ();
 
   void updateLocal();
+
+  void DrawFromNode(csOceanNode start, const csVector3 camPos);
+  void DrawLeftFromNode(csOceanNode start, const csVector3 camPos);
+  void DrawRightFromNode(csOceanNode start, const csVector3 camPos);
+
+  void AddNode(csOceanNode start, float dist);
 
 public:
   /// Constructor.
@@ -281,6 +289,9 @@ private:
 	csDirtyAccessArray<csColor>	far_cols;
 	csDirtyAccessArray<csTriangle> far_tris;
 	
+	//Ocean cells
+	csArray<csOceanCell> cells;
+	
 	int numVerts, numTris;
 
 
@@ -310,7 +321,7 @@ private:
   bool mesh_texels_dirty_flag;
   bool mesh_normals_dirty_flag;
   bool mesh_triangle_dirty_flag;
-  bool mesh_far_patch_dirty_flag;
+  bool mesh_cells_dirty_flag;
 
   // Admin.
   bool initialized;
