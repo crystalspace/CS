@@ -55,6 +55,7 @@ private:
 	csRef<iField3<float>>		m_arfCondWaterMixingRatios[2];		// qc
 	csRef<iField3<float>>		m_arfWaterVaporMixingRatios[2];		// qv
 	csRef<iField3<csVector3>>	m_arvForceField;
+	csRef<iField3<float>>		m_arfVelDivergence;
 	/**
 	Velocity is defined at the boundaries of each cell. Half-way index
 	notation is used in consequence. These fields are of size N + 1
@@ -69,7 +70,11 @@ private:
 	UINT						m_iGridSizeY;
 	UINT						m_iGridSizeZ;
 	float						m_fGridScale;						// dx
+
+	//Precomputed constants
 	float						m_fInvGridScale;					// 1 / dx
+	float						m_fKappa;							// _R / _cp
+	float						m_fAltitudeExponent;				// |_g| / (_R * _G)
 
 	//====================================================//
 	//            USER SPECIFIC VARIABLES				  //
@@ -104,16 +109,9 @@ private:
 	float						m_fInitWaterVaporMixingRatio;
 	//Global windspeed
 	csVector3					m_vWindSpeed;
+	//Absolute Height of the bottom grid face
+	float						m_fBaseAltitude;
 	//====================================================//
-	
-	//Interpolates the velocity (from boundaries)
-	inline const csVector3 GetVelocityOfCellCenter(const csRef<iField3<csVector3>>& rField, 
-												   const UINT x, const UINT y, const UINT z)
-	{
-		return 0.5f * csVector3(rField->GetValue(x, y, z).x + rField->GetValue(x + 1, y, z).x,
-								rField->GetValue(x, y, z).y + rField->GetValue(x, y + 1, z).y,
-								rField->GetValue(x, y, z).z + rField->GetValue(x, y, z + 1).z);
-	}
 
 	//Calculates the rotation of the velocity field u, and stores it in arvRotVelField
 	//O(n^3)
@@ -128,6 +126,21 @@ private:
 			}
 		}
 	}
+
+	//Calculates the divergence of the velocity field u, and stores it in arfVelDivergence
+	//O(n^3)
+	inline void ComputeDivergenceField()
+	{
+		for(UINT x = 0; x < m_iGridSizeX; ++x)
+		{
+			for(UINT y = 0; y < m_iGridSizeY; ++y)
+			{
+				for(UINT z = 0; z < m_iGridSizeZ; ++z)
+					m_arfVelDivergence->SetValue(CalcDivergence(m_arvVelocityField[m_iActualIndex], x, y, z, m_fGridScale), x, y, z);
+			}
+		}
+	}
+	
 	//Computes for each cell the buoyant and the vorticity confinement force
 	//O(n^3)
 	inline void ComputeForceField()
@@ -144,10 +157,40 @@ private:
 			}
 		}
 	}
+
+	//Calculates the saturation vapor mixing ratio, depending on T (temperature) and p (pressure)
+	inline const float ComputeSatVaporMixingRatioOnly(const float T, const float p) const
+	{
+		return (380.16f / p) * ::expf((17.67 * T) / (T + 243.5f));
+	}
+	//Calculates the Temperature depending on p and T (potential temperature)
+	inline const float ComputeTemperature(const float p, const float fPotTemp) const
+	{
+		return fPotTemp * ::powf(p / m_fRefPressure, m_fKappa);
+	}
+	//Calcuates the pressure depending on altitude (absolute height!)
+	inline const float ComputePressure(const float h) const
+	{
+		return m_fRefPressure * ::powf(1 - (h * m_fTempLapseRate / m_fRefTemperature), m_fAltitudeExponent);
+	}
+
+	//All-In-One computation of qs (saturation vapor mixing ratio), depending on height
+	//and potential temperature
+	inline const float ComputeSatVaporMixingRatio(const float fPotTemp, const float h) const
+	{
+		const float p = ComputePressure(h);
+		const float T = ComputeTemperature(p, fPotTemp);
+		return ComputeSatVaporMixingRatioOnly(T, p);
+	}
+
 	//Returns the vorticity confinement force of a certain parcel depending on rot(u), dx, _e
 	const csVector3 ComputeVorticityConfinement(const UINT x, const UINT y, const UINT z);
 	//Returns the buoyant force of a certain parcel depending on _g, qc, T, _Tp, _fqc
 	const csVector3 ComputeBuoyantForce(const UINT x, const UINT y, const UINT z);
+
+	//Updates qc and qv and T
+	//O(n^3)
+	void UpdateMixingRatiosAndPotentialTemp();
 
 	//Advects temperature, mixing ratios and velocity itself
 	//O(n^3)
@@ -157,8 +200,10 @@ private:
 	//O(n^3)
 	void AddAcceleratingForces();
 
-	//After this method was invoked all boundarycondition on u ar satisfied
+	//After this method was invoked all velocity boundarycondition on u ar satisfied
 	void SatisfyVelocityBoundaryCond();
+	//Updates boundaries of qc, qv and PotT
+	void SatisfyScalarBoundaryCond();
 
 	//Frees all reserved memory
 	inline void FreeReservedMemory()
@@ -170,6 +215,7 @@ private:
 		m_arvVelocityField[0].Invalidate(); m_arvVelocityField[1].Invalidate();
 		m_arvRotVelField.Invalidate();
 		m_arvForceField.Invalidate();
+		m_arfVelDivergence.Invalidate();
 	}
 
 	//For all userspecific values there are standard once too, which are set here!
@@ -189,6 +235,7 @@ private:
 		SetAmbientTemperature(290.f);
 		SetInitialCondWaterMixingRatio(0.0f);
 		SetInitialWaterVaporMixingRatio(0.8f);
+		SetBaseAltitude(0.f);
 	}
 
 	//swaps actualIndex and LastIndex
@@ -199,9 +246,10 @@ private:
 
 public:
 	csCloudsDynamics(iBase* pParent) : scfImplementationType(this, pParent), m_iLastIndex(1), m_iActualIndex(0),
-		m_iGridSizeX(0), m_iGridSizeY(0), m_iGridSizeZ(0)
+		m_iGridSizeX(0), m_iGridSizeY(0), m_iGridSizeZ(0), m_fSpecificHeatCapacity(1.f)
 	{
 		SetStandardValues();
+		UpdateAllDependParameters();
 	}
 	~csCloudsDynamics() {}
 
@@ -224,6 +272,14 @@ public:
 	virtual inline void SetInitialCondWaterMixingRatio(const float qc) {m_fInitCondWaterMixingRatio = qc;}
 	virtual inline void SetInitialWaterVaporMixingRatio(const float qv) {m_fInitWaterVaporMixingRatio = qv;}
 	virtual inline void SetGlobalWindSpeed(const csVector3& vWind) {m_vWindSpeed = vWind;}
+	virtual inline void SetBaseAltitude(const float H) {m_fBaseAltitude = H;}
+
+	//Updates all constant and precomputeted parameters according to the user specific values set!
+	virtual inline void UpdateAllDependParameters()
+	{
+		m_fKappa			= m_fIdealGasConstant / m_fSpecificHeatCapacity;
+		m_fAltitudeExponent	= m_vGravitationAcc.Norm() / (m_fTempLapseRate * m_fIdealGasConstant);
+	}
 
 	//Computes N steps of the entire simulation. If iStepCount == 0, then an entire timestep
 	//is calculated

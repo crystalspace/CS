@@ -179,6 +179,13 @@ struct iCloudsDynamics : public virtual iBase
 	virtual inline void SetInitialCondWaterMixingRatio(const float qc) = 0;
 	virtual inline void SetInitialWaterVaporMixingRatio(const float qv) = 0;
 	virtual inline void SetGlobalWindSpeed(const csVector3& vWind) = 0;
+	virtual inline void SetBaseAltitude(const float H) = 0;
+
+	/**
+	Updates all constant and precomputeted parameters according to the user specific values set!
+	Has to be called whenever one value has been changed!
+	*/
+	virtual inline void UpdateAllDependParameters() = 0;
 
 	/**
 	Does n computation steps. The overall calculations are split into several

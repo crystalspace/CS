@@ -55,6 +55,8 @@ void csCloudsDynamics::SetGridSize(const UINT x, const UINT y, const UINT z)
 	m_arvRotVelField->SetSize(m_iGridSizeX, m_iGridSizeY, m_iGridSizeZ);
 	m_arvForceField.AttachNew(new csField3<csVector3>(this));
 	m_arvForceField->SetSize(m_iGridSizeX, m_iGridSizeY, m_iGridSizeZ);
+	m_arfVelDivergence.AttachNew(new csField3<float>(this));
+	m_arfVelDivergence->SetSize(m_iGridSizeX, m_iGridSizeY, m_iGridSizeZ);
 
 	m_iActualIndex	= 0;
 	m_iLastIndex	= 1;
@@ -118,8 +120,11 @@ void csCloudsDynamics::AdvectAllQuantities()
 				const csVector3 vVel = GetVelocityOfCellCenter(m_arvVelocityField[m_iLastIndex], x, y, z);
 				const csVector3 vPos = Clamp(csVector3(x, y, z) - m_fTimeStep * m_fInvGridScale * vVel, m_iGridSizeX, m_iGridSizeY, m_iGridSizeZ);
 				//Even if vPos is on boundary, the interpolation works fine!
-				m_arfPotTemperature[m_iActualIndex]->SetValue(GetInterpolatedValue(m_arfPotTemperature[m_iLastIndex], vPos),
-					static_cast<UINT>(vPos.x), static_cast<UINT>(vPos.y), static_cast<UINT>(vPos.z));
+				m_arfPotTemperature[m_iActualIndex]->SetValue(GetInterpolatedValue(m_arfPotTemperature[m_iLastIndex], vPos), x, y, z);
+				m_arfCondWaterMixingRatios[m_iActualIndex]->SetValue(GetInterpolatedValue(m_arfCondWaterMixingRatios[m_iLastIndex], vPos), x, y, z);
+				m_arfWaterVaporMixingRatios[m_iActualIndex]->SetValue(GetInterpolatedValue(m_arfWaterVaporMixingRatios[m_iLastIndex], vPos), x, y, z);
+				//Velocity-Field advection
+				m_arvVelocityField[m_iActualIndex]->SetValue(GetInterpolatedVelocity(m_arvVelocityField[m_iLastIndex], vPos), x, y, z);
 			}
 		}
 	}
@@ -198,6 +203,48 @@ void csCloudsDynamics::SatisfyVelocityBoundaryCond()
 }
 
 //----------------------------------------------------------//
+
+void csCloudsDynamics::UpdateMixingRatiosAndPotentialTemp()
+{
+	for(UINT x = 0; x < m_iGridSizeX; ++x)
+	{
+		for(UINT y = 0; y < m_iGridSizeY; ++y)
+		{
+			const float fHeight = y * m_fGridScale + m_fBaseAltitude;
+			for(UINT z = 0; z < m_iGridSizeZ; ++z)
+			{
+				const float p		= ComputePressure(fHeight);
+				const float fPi		= ::powf(p / m_fRefPressure, m_fKappa);
+				const float T		= m_arfPotTemperature[m_iLastIndex]->GetValue(x, y, z) * fPi;
+
+				//First update mixing ratios
+				const float qvs		= ComputeSatVaporMixingRatioOnly(T, p);
+				const float qv		= m_arfWaterVaporMixingRatios[m_iActualIndex]->GetValue(x, y, z);
+				const float qc		= m_arfCondWaterMixingRatios[m_iActualIndex]->GetValue(x, y, z);
+				//Negative condensation-Rate
+				const float fmC		= qvs - qv < qc ? qvs - qv : qc;
+				m_arfWaterVaporMixingRatios[m_iActualIndex]->SetValue(qv + fmC, x, y, z);
+				m_arfWaterVaporMixingRatios[m_iActualIndex]->SetValue(qc - fmC, x, y, z);
+
+				//Now potential temperature!
+				const float fPotT	= m_arfPotTemperature[m_iActualIndex]->GetValue(x, y, z) + 
+									  m_fLatentHeat * (-fmC) / (m_fSpecificHeatCapacity * fPi);
+				m_arfPotTemperature[m_iActualIndex]->SetValue(fPotT, x, y, z);
+			}
+		}
+	}
+}
+
+//----------------------------------------------------------//
+
+void csCloudsDynamics::SatisfyScalarBoundaryCond()
+{
+	
+}
+
+//----------------------------------------------------------//
+
+//----------------------------------------------------------//
 //----------------------------------------------------------//
 
 const bool csCloudsDynamics::DoComputationSteps(const UINT iStepCount, const float fTime)
@@ -210,7 +257,10 @@ const bool csCloudsDynamics::DoComputationSteps(const UINT iStepCount, const flo
 	AddAcceleratingForces();
 	SatisfyVelocityBoundaryCond();
 
+	UpdateMixingRatiosAndPotentialTemp();
 
+	//Solving poisson-pressure equation
+	ComputeDivergenceField();
 
 	SwapFieldIndizes();
 	return true;

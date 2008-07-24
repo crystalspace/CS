@@ -31,6 +31,23 @@ the REAL position, but coordinates on the voxelgrid
 const float GetInterpolatedValue(const csRef<iField3<float>>& rSrc, const csVector3& vPos);
 const float GetInterpolatedValue(const csRef<iField3<csVector3>>& rSrc, const csVector3& vPos, const UINT iIndex);
 
+//Interpolates the velocity
+inline const csVector3 GetVelocityOfCellCenter(const csRef<iField3<csVector3>>& rField, 
+											   const UINT x, const UINT y, const UINT z)
+{
+	return 0.5f * csVector3(rField->GetValue(x, y, z).x + rField->GetValue(x + 1, y, z).x,
+							rField->GetValue(x, y, z).y + rField->GetValue(x, y + 1, z).y,
+							rField->GetValue(x, y, z).z + rField->GetValue(x, y, z + 1).z);
+}
+inline const csVector3 GetInterpolatedVelocity(const csRef<iField3<csVector3>>& rField, const csVector3& vPos)
+{
+	csVector3 vVel = csVector3();
+	vVel.x = GetInterpolatedValue(rField, csVector3(vPos.x, vPos.y - 0.5f, vPos.z - 0.5f), 0);
+	vVel.y = GetInterpolatedValue(rField, csVector3(vPos.x - 0.5f, vPos.y, vPos.z - 0.5f), 1);
+	vVel.z = GetInterpolatedValue(rField, csVector3(vPos.x - 0.5f, vPos.y - 0.5f, vPos.z), 2);
+	return vVel;
+}
+
 //------------------------------------------------------------------------------//
 
 template <typename T>
