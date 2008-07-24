@@ -195,6 +195,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	csRef<iDocumentNode> techniqueNode =
 	  shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
 	techniqueNode->SetValue ("technique");
+	CS::DocSystem::CloneAttributes (sourceTechNode, techniqueNode);
 	techNodes.Push (techniqueNode);
 	
         while (siblings->HasNext())
@@ -222,11 +223,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    CS::DocSystem::CloneNode (copyFrom, newNode);
 	  }
 	  
+	  Snippet* snippet = outerSnippets[g];
+	  
 	  csRef<iDocumentNode> passNode =
 	    techniqueNode->CreateNodeBefore (CS_NODE_ELEMENT);
 	  passNode->SetValue ("pass");
+	  CS::DocSystem::CloneAttributes (snippet->GetSourceNode(), passNode);
 	  
-	  Snippet* snippet = outerSnippets[g];
 	  csRefArray<iDocumentNode> passForwardedNodes =
 	    snippet->GetPassForwardedNodes();
 	  for (size_t n = 0; n < passForwardedNodes.GetSize(); n++)

@@ -167,7 +167,7 @@ namespace RenderManager
 
       for (size_t p = 0; p < numPasses; ++p)
       {
-        shader->ActivatePass (ticket, p);
+        if (!shader->ActivatePass (ticket, p)) continue;
 
         for (size_t m = firstMesh; m < lastMesh; ++m)
         {
@@ -175,7 +175,7 @@ namespace RenderManager
           context.svArrays.SetupSVStack (svStack, currentLayer, mesh.contextLocalId);
 
           csRenderMeshModes modes (*mesh.renderMesh);
-          shader->SetupPass (ticket, mesh.renderMesh, modes, svStack);
+          if (!shader->SetupPass (ticket, mesh.renderMesh, modes, svStack)) continue;
           modes.z_buf_mode = mesh.zmode;
 
           g3d->DrawMesh (mesh.renderMesh, modes, svStack);

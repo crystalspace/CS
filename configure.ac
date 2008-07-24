@@ -228,6 +228,8 @@ CS_CHECK_RTLD
 CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx], [CS_CREATE_TUPLE([-mmmx])])
 CS_CHECK_BUILD_FLAGS([for -msse flag], [cs_cv_prog_cc_msse], [CS_CREATE_TUPLE([-msse])])
 CS_CHECK_BUILD_FLAGS([for -msse2 flag], [cs_cv_prog_cc_msse2], [CS_CREATE_TUPLE([-msse2])])
+CS_CHECK_BUILD_FLAGS([for -mfpmath=sse flag], [cs_cv_prog_cc_mfpmath_sse],
+    [CS_CREATE_TUPLE([-mfpmath=sse])])
 
 AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],[+])])
@@ -264,9 +266,10 @@ case $cs_host_target in
              [$cs_cv_prog_cc_msse], [+])])
         AS_IF([test -n "$cs_cv_prog_cc_msse2"],
             [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
-             [$cs_cv_prog_cc_msse2], [+])
-	     CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
-	     ["-mfpmath=sse"], [+])])
+             [$cs_cv_prog_cc_msse2], [+])])
+        AS_IF([test -n "$cs_cv_prog_cc_mfpmath_sse"],
+            [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
+             [$cs_cv_prog_cc_mfpmath_sse], [+])])
         ;;
 esac
 case $cs_host_family in
@@ -1821,12 +1824,17 @@ CS_CHECK_BUILD([for _aligned_malloc], [cs_cv__aligned_malloc],
     [], [],
     [CS_HEADER_PROPERTY([CS_HAVE__ALIGNED_MALLOC])])
     
-CS_CHECK_BUILD([for sysinfo()], [cs_cv_sysinfo],
-    [AC_LANG_PROGRAM(
-	[[#include <sys/sysinfo.h>]],
-	[struct sysinfo x; sysinfo(&x);])],
-    [],[],
-    [CS_HEADER_PROPERTY([CS_HAVE_SYSINFO])])
+AC_CHECK_HEADERS([sys/sysinfo.h],
+    [CS_HEADER_PROPERTY([CS_HAVE_SYS_SYSINFO_H])
+    CS_CHECK_BUILD([for sysinfo()], [cs_cv_sysinfo],
+	[AC_LANG_PROGRAM(
+	    [[#include <sys/sysinfo.h>]],
+	    [struct sysinfo x; sysinfo(&x);])],
+	[],[],
+	[CS_HEADER_PROPERTY([CS_HAVE_SYSINFO])])
+    AC_CHECK_MEMBERS([struct sysinfo.totalram],
+        [CS_HEADER_PROPERTY([CS_HAVE_STRUCT_SYSINFO_TOTALRAM])], [],
+        [#include <sys/sysinfo.h>])])
    
 
 
@@ -2065,7 +2073,7 @@ AS_IF([test $cs_type_wchar_t = yes],
     AC_CHECK_FUNC([wcslen], [CS_HEADER_PROPERTY([CS_HAVE_WCSLEN])])
     AC_CHECK_FUNC([fputws], [CS_HEADER_PROPERTY([CS_HAVE_FPUTWS])])
     AC_CHECK_FUNC([fwide], [CS_HEADER_PROPERTY([CS_HAVE_FWIDE])])
-    AC_CHECK_FUNC([wcsrtombs], [CS_HEADER_PROPERTY([CS_HAVE_WCSRTOMBS])])
+    AC_CHECK_FUNC([wcsnrtombs], [CS_HEADER_PROPERTY([CS_HAVE_WCSNRTOMBS])])
     AC_CHECK_SIZEOF([wchar_t], []
 	[[#if HAVE_WCHAR_H
 	#include <wchar.h>

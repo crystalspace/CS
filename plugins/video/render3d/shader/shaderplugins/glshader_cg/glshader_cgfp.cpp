@@ -104,7 +104,7 @@ bool csShaderGLCGFP::Compile (iHierarchicalCache* cache, csRef<iString>* tag)
   
     ArgumentArray args;
     shaderPlug->GetProfileCompilerArgs ("fragment", shaderPlug->psProfile, 
-      false, args);
+      CS::PluginCommon::ShaderProgramPluginGL::Other, false, args);
     for (i = 0; i < compilerArgs.GetSize(); i++) 
       args.Push (compilerArgs[i]);
     args.Push (0);
@@ -172,8 +172,8 @@ bool csShaderGLCGFP::Compile (iHierarchicalCache* cache, csRef<iString>* tag)
       vpProf = shaderPlug->maxProfileVertex;
   
     ProfileLimitsPair limits;
-    limits.fp = ProfileLimits (programProfile);
-    limits.vp = ProfileLimits (vpProf);
+    limits.fp = ProfileLimits (shaderPlug->vendor, programProfile);
+    limits.vp = ProfileLimits (shaderPlug->vendor, vpProf);
     limits.GetCurrentLimits (shaderPlug->ext);
     cacheLimits = limits;
     WriteToCache (cache, limits.fp, limits.ToString());
@@ -202,7 +202,7 @@ bool csShaderGLCGFP::Precache (const ProfileLimits& limits,
     
     ArgumentArray args;
     shaderPlug->GetProfileCompilerArgs (GetProgramType(),
-      limits.profile, true, args);
+      limits.profile, limits.vendor, true, args);
     for (size_t i = 0; i < compilerArgs.GetSize(); i++) 
       args.Push (compilerArgs[i]);
   

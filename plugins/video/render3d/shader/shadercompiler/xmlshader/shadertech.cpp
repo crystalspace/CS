@@ -46,7 +46,7 @@ CS_LEAKGUARD_IMPLEMENT (csXMLShaderTech);
 /* Magic value for tech + pass cache files.
  * The most significant byte serves as a "version", increase when the
  * cache file format changes. */
-static const uint32 cacheFileMagic = 0x01747863;
+static const uint32 cacheFileMagic = 0x02747863;
 
 //---------------------------------------------------------------------------
 
@@ -489,6 +489,8 @@ bool csXMLShaderTech::ParseModes (ShaderPass* pass,
       pass->wmAlpha = !strcasecmp (nodeWM->GetAttributeValue ("a"), "true");
   }
   
+  pass->minLights = node->GetAttributeValueAsInt ("minlights");
+  
   return true;
 }
 
@@ -814,7 +816,11 @@ bool csXMLShaderTech::WritePass (ShaderPass* pass,
     if (cacheFile->Write ((char*)&diskZ, sizeof (diskZ))
 	!= sizeof (diskZ)) return false;
   }
-  
+  {
+    int32 diskMinLights = csLittleEndian::Int32 (pass->minLights);
+    if (cacheFile->Write ((char*)&diskMinLights, sizeof (diskMinLights))
+	!= sizeof (diskMinLights)) return false;
+  }
   return true;
 }
   
@@ -1023,6 +1029,12 @@ bool csXMLShaderTech::ReadPass (ShaderPass* pass,
 	!= sizeof (diskZ)) return false;
     pass->zMode = (csZBufMode)csLittleEndian::UInt32 (diskZ);
   }
+  {
+    int32 diskMinLights;
+    if (cacheFile->Read ((char*)&diskMinLights, sizeof (diskMinLights))
+	!= sizeof (diskMinLights)) return false;
+    pass->minLights = csLittleEndian::Int32 (diskMinLights);
+  }
   return true;
 }
   
@@ -1147,14 +1159,6 @@ csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
   size_t variant, iHierarchicalCache* cacheTo, CachedPlugin& cacheInfo,
   csString& tag)
 {
-  if (node->GetAttributeValue("plugin") == 0)
-  {
-    parent->compiler->Report (CS_REPORTER_SEVERITY_ERROR,
-      "No shader program plugin specified for <%s> in shader '%s'",
-      node->GetValue (), parent->GetName ());
-    return 0;
-  }
-
   csRef<iShaderProgram> program;
 
   program = cacheInfo.programPlugin->CreateProgram (cacheInfo.progType);
@@ -1200,7 +1204,6 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadProgramFromCache (
   csRef<iString> failReason;
   iShaderProgram::CacheLoadResult loadRes = prog->LoadFromCache (cache, &failReason,
     &progTag);
-  if (!progTag.IsValid()) return iShaderProgram::loadFail;
   if (loadRes == iShaderProgram::loadFail)
   {
     if (parent->compiler->do_verbose)
@@ -1211,7 +1214,7 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadProgramFromCache (
     return iShaderProgram::loadFail;
   }
   
-  tag = progTag->GetData();
+  if (progTag.IsValid()) tag = progTag->GetData();
 
   return loadRes;
 }
@@ -1455,7 +1458,6 @@ bool csXMLShaderTech::Load (iLoaderContext* ldr_context,
   while (it->HasNext ())
   {
     csRef<iDocumentNode> passNode = it->Next ();
-    passes[currentPassNr].owner = this;
     result &= LoadPass (passNode, &passes[currentPassNr++], variant, cacheFile, cacheTo);
   }
   
@@ -1539,7 +1541,6 @@ bool csXMLShaderTech::Precache (iDocumentNode* node, size_t variant,
   while (it->HasNext ())
   {
     csRef<iDocumentNode> passNode = it->Next ();
-    passes[currentPassNr].owner = this;
     if (!PrecachePass (passNode, &passes[currentPassNr++], variant, cacheFile, cacheTo))
     {
       return false;
@@ -1660,6 +1661,15 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   iGraphics3D* g3d = parent->g3d;
   ShaderPass* thispass = &passes[currentPass];
 
+  int lightCount = 0;
+  if (stack.GetSize() > parent->compiler->stringLightCount)
+  {
+    csShaderVariable* svLightCount = stack[parent->compiler->stringLightCount];
+    if (svLightCount != 0)
+      svLightCount->GetValue (lightCount);
+  }
+  if (lightCount < thispass->minLights) return false;
+  
   //first run the preprocessor
   if(thispass->vproc) thispass->vproc->SetupState (mesh, modes, stack);
 

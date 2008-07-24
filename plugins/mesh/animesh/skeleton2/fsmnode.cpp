@@ -103,11 +103,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
               // Blend
               currentState = STATE_BLENDING;
               blendTime = 0;
+              top.node->Play ();
             }
             else
             {
               // Switch
               currentAnimation = instructions.PopTop ();
+              currentAnimation.node->Play ();
 
               if (cb)
               {
@@ -150,6 +152,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     }
   }
 
+  void AnimationFifo::Stop ()
+  {
+    currentState = STATE_STOPPED;
+    currentAnimation.node = 0;
+    instructions.DeleteAll ();
+  }
 
 
   CS_LEAKGUARD_IMPLEMENT(FSMNodeFactory);
@@ -351,6 +359,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
         blendFifo.PushAnimation (stateList[newState].stateNode, true, 0, newState);
       }      
     }
+    else
+    {
+      currentState = newState;
+    }
   }
 
   CS::Animation::StateID FSMNode::GetCurrentState () const
@@ -365,9 +377,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     if (currentState != CS::Animation::InvalidStateID)
     {
-      isActive = true;
-      stateList[currentState].stateNode->Play ();
-    }    
+      blendFifo.PushAnimation (stateList[currentState].stateNode, true, 0, currentState);
+    }
+
+    isActive = true;
   }
 
   void FSMNode::Stop ()
@@ -376,7 +389,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       return;
 
     isActive = false;
-    stateList[currentState].stateNode->Stop ();
+    blendFifo.Stop ();
   }
 
   void FSMNode::SetPlaybackPosition (float time)

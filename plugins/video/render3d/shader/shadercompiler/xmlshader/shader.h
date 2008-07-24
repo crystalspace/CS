@@ -186,6 +186,7 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
     struct Technique
     {
       int priority;
+      int minLights;
       csRef<csWrappedDocumentNode> srcNode;
       
       csShaderConditionResolver* resolver;

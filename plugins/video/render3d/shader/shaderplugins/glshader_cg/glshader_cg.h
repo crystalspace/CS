@@ -110,6 +110,7 @@ public:
 
   void SplitArgsString (const char* str, ArgumentArray& args);
   void GetProfileCompilerArgs (const char* type, CGprofile profile, 
+    HardwareVendor vendor,
     bool noConfigArgs, ArgumentArray& args);
   static bool ProfileNeedsRouting (CGprofile profile)
   {

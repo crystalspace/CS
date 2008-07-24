@@ -761,6 +761,7 @@ const char* csConditionEvaluator::ProcessExpression (csExpression* expression,
       newOp.operation = opEqual;
       err = ResolveOperand (expression, newOp.left);
       if (err != 0) return err;
+      newOp.right.Clear();
       newOp.right.type = operandBoolean;
       newOp.right.boolVal = true;
     }
@@ -776,6 +777,7 @@ const char* csConditionEvaluator::ProcessExpression (csExpression* expression,
 	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.left.type),
 	  OperandTypeDescription (operandBoolean));
       }
+      newOp.right.Clear();
       newOp.right.type = operandBoolean;
       newOp.right.boolVal = false;
     }
@@ -898,6 +900,7 @@ const char* csConditionEvaluator::ProcessExpression (csExpression* expression,
         newOpL.right.type = operandBoolean;
         newOpL.right.boolVal = true;
 
+        newOp.left.Clear();
         newOp.left.type = operandOperation;
         newOp.left.operation = FindOptimizedCondition (newOpL);
       }
@@ -921,6 +924,7 @@ const char* csConditionEvaluator::ProcessExpression (csExpression* expression,
         newOpR.right.type = operandBoolean;
         newOpR.right.boolVal = true;
 
+        newOp.right.Clear();
         newOp.right.type = operandOperation;
         newOp.right.operation = FindOptimizedCondition (newOpR);
       }
@@ -948,6 +952,7 @@ const char* csConditionEvaluator::ProcessExpression (csExpression* expression,
         newOpL.right.type = operandBoolean;
         newOpL.right.boolVal = true;
 
+        newOp.left.Clear();
         newOp.left.type = operandOperation;
         newOp.left.operation = FindOptimizedCondition (newOpL);
       }
@@ -971,6 +976,7 @@ const char* csConditionEvaluator::ProcessExpression (csExpression* expression,
         newOpR.right.type = operandBoolean;
         newOpR.right.boolVal = true;
 
+        newOp.right.Clear();
         newOp.right.type = operandOperation;
         newOp.right.operation = FindOptimizedCondition (newOpR);
       }

@@ -199,6 +199,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     const char* GetName() const { return name; }
     bool IsCompound() const { return isCompound; }
+    iDocumentNode* GetSourceNode() const { return node; }
     
     csString GetCondition() const;
     
@@ -218,6 +219,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     const WeaverCompiler* compiler;
     const csStringHash& xmltokens;
     csString name;
+    csRef<iDocumentNode> node;
     csString condition;
     typedef csPDelArray<Technique> TechniqueArray;
     TechniqueArray techniques;
