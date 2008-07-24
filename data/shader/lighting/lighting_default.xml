@@ -22,7 +22,7 @@
   <alias name="apply_alpha" file="/shader/snippets/surface/alpha-premult.xml" />
   <alias name="lighting" file="/shader/snippets/lighting/lighting-ppl.xml" />
   
-  <technique priority="500">
+  <technique priority="500" minlights="6">
     <!-- 1 pass, 6 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
@@ -57,9 +57,9 @@
     </pass>
   </technique>
   
-  <technique priority="400">
+  <technique priority="400" minlights="4">
     <!-- 2 passes, 4+2 lights -->
-    <pass>
+    <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
 	<!-- First pass: blend with alpha -->
 	<mixmode>
@@ -83,7 +83,7 @@
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
     </pass>
-    <pass>
+    <pass minlights="5">
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
@@ -102,9 +102,9 @@
     </pass>
   </technique>
   
-  <technique priority="300">
+  <technique priority="300" minlights="3">
     <!-- 2 passes, 3+3 lights -->
-    <pass>
+    <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
 	<!-- First pass: blend with alpha -->
 	<mixmode>
@@ -128,7 +128,7 @@
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
     </pass>
-    <pass>
+    <pass minlights="4">
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
@@ -147,9 +147,9 @@
     </pass>
   </technique>
   
-  <technique priority="200">
+  <technique priority="200" minlights="2">
     <!-- 3 passes, 2+2+2 lights -->
-    <pass>
+    <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
 	<!-- First pass: blend with alpha -->
 	<mixmode>
@@ -173,7 +173,7 @@
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
     </pass>
-    <pass>
+    <pass minlights="3">
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
@@ -190,7 +190,7 @@
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
     </pass>
-    <pass>
+    <pass minlights="5">
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
@@ -209,9 +209,9 @@
     </pass>
   </technique>
   
-  <technique priority="100">
+  <technique priority="100" minlights="1">
     <!-- 6 passes, 1+1+1+1+1+1 lights -->
-    <pass>
+    <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
 	<!-- First pass: blend with alpha -->
 	<mixmode>
@@ -235,7 +235,7 @@
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
     </pass>
-    <pass>
+    <pass minlights="2">
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
@@ -252,7 +252,7 @@
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
     </pass>
-    <pass>
+    <pass minlights="3">
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
@@ -269,7 +269,7 @@
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
     </pass>
-    <pass>
+    <pass minlights="4">
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
@@ -286,7 +286,7 @@
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
     </pass>
-    <pass>
+    <pass minlights="5">
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
@@ -303,7 +303,7 @@
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
     </pass>
-    <pass>
+    <pass minlights="6">
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
@@ -321,6 +321,35 @@
       <connection from="maxLights" to="shared" />
     </pass>
   </technique>
+  
+  <!-- No lights (ie ambient only) technique -->
+  <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
+  <technique priority="50">
+    <pass>
+      <!-- First(only) pass: blend with alpha -->
+      <mixmode>
+	<blendop src="one" dst="srcalpha_inv" />
+	<alphatest>disable</alphatest>
+      </mixmode>
+      
+      <!-- Combiner to use for this particular pass.
+	   Techniques Referenced snippets must only utilize the same 
+	   combiner with compatible options specified. If a technique
+	   doesn't meet that requirement, the next one is tried.
+	   -->
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+      
+      <!-- The meat of the shader is actually in a snippet. to be shared more
+	   easily across all techniques -->
+      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
+      
+      <parameter id="lightOffset" type="int">0</parameter>
+      <parameter id="maxLights" type="int">0</parameter>
+      <connection from="lightOffset" to="shared" />
+      <connection from="maxLights" to="shared" />
+    </pass>
+  </technique>
+  <?endif?>
   
   <!-- If PPL is not available, try PVL -->
   <fallbackshader name="lighting_default_pvl" file="/shader/lighting/lighting_default_pvl.xml" />
