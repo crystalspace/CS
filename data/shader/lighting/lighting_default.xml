@@ -52,8 +52,10 @@
       
       <parameter id="lightOffset" type="int">0</parameter>
       <parameter id="maxLights" type="int">6</parameter>
+      <parameter id="minLights" type="int">6</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
   </technique>
   
@@ -80,8 +82,10 @@
       
       <parameter id="lightOffset" type="int">0</parameter>
       <parameter id="maxLights" type="int">4</parameter>
+      <parameter id="minLights" type="int">4</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
     <pass minlights="5">
       <!-- Later pass: blend with add -->
@@ -97,8 +101,10 @@
       
       <parameter id="lightOffset" type="int">4</parameter>
       <parameter id="maxLights" type="int">2</parameter>
+      <parameter id="minLights" type="int">5</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
   </technique>
   
@@ -125,8 +131,10 @@
       
       <parameter id="lightOffset" type="int">0</parameter>
       <parameter id="maxLights" type="int">3</parameter>
+      <parameter id="minLights" type="int">3</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
     <pass minlights="4">
       <!-- Later pass: blend with add -->
@@ -142,8 +150,10 @@
       
       <parameter id="lightOffset" type="int">3</parameter>
       <parameter id="maxLights" type="int">3</parameter>
+      <parameter id="minLights" type="int">4</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
   </technique>
   
@@ -170,8 +180,10 @@
       
       <parameter id="lightOffset" type="int">0</parameter>
       <parameter id="maxLights" type="int">2</parameter>
+      <parameter id="minLights" type="int">2</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
     <pass minlights="3">
       <!-- Later pass: blend with add -->
@@ -187,8 +199,10 @@
       
       <parameter id="lightOffset" type="int">2</parameter>
       <parameter id="maxLights" type="int">2</parameter>
+      <parameter id="minLights" type="int">3</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
     <pass minlights="5">
       <!-- Later pass: blend with add -->
@@ -204,8 +218,10 @@
       
       <parameter id="lightOffset" type="int">4</parameter>
       <parameter id="maxLights" type="int">2</parameter>
+      <parameter id="minLights" type="int">5</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
   </technique>
   
@@ -232,8 +248,10 @@
       
       <parameter id="lightOffset" type="int">0</parameter>
       <parameter id="maxLights" type="int">1</parameter>
+      <parameter id="minLights" type="int">1</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
     <pass minlights="2">
       <!-- Later pass: blend with add -->
@@ -249,8 +267,10 @@
       
       <parameter id="lightOffset" type="int">1</parameter>
       <parameter id="maxLights" type="int">1</parameter>
+      <parameter id="minLights" type="int">2</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
     <pass minlights="3">
       <!-- Later pass: blend with add -->
@@ -266,8 +286,10 @@
       
       <parameter id="lightOffset" type="int">2</parameter>
       <parameter id="maxLights" type="int">1</parameter>
+      <parameter id="minLights" type="int">3</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
     <pass minlights="4">
       <!-- Later pass: blend with add -->
@@ -283,8 +305,10 @@
       
       <parameter id="lightOffset" type="int">3</parameter>
       <parameter id="maxLights" type="int">1</parameter>
+      <parameter id="minLights" type="int">4</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
     <pass minlights="5">
       <!-- Later pass: blend with add -->
@@ -300,8 +324,10 @@
       
       <parameter id="lightOffset" type="int">4</parameter>
       <parameter id="maxLights" type="int">1</parameter>
+      <parameter id="minLights" type="int">5</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
     <pass minlights="6">
       <!-- Later pass: blend with add -->
@@ -317,8 +343,10 @@
       
       <parameter id="lightOffset" type="int">5</parameter>
       <parameter id="maxLights" type="int">1</parameter>
+      <parameter id="minLights" type="int">6</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
   </technique>
   
