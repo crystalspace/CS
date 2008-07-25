@@ -126,11 +126,18 @@ void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
 	
       if (!clip.distance.IsConstant())
       {
-	csVector4 v (GetParamVectorVal (stack, clip.distance,
-	  csVector4 (0, 0, 0, 0)));
-	float distVal = v[clip.distComp];
-	if (clip.distNeg) distVal = -distVal;
-	packDist[c/4][c%4] = distVal;
+	csVector4 v;
+	if (GetParamVectorVal (stack, clip.distance, &v))
+	{
+	  float distVal = v[clip.distComp];
+	  if (clip.distNeg) distVal = -distVal;
+	  packDist[c/4][c%4] = distVal;
+	}
+	else
+	{
+	  // Force clipping to have no effect
+	  packDist[c/4][c%4] = -FLT_MAX;
+	}
       }
       
       bool doClipping = false;
