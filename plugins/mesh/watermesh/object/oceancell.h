@@ -97,6 +97,9 @@ namespace WaterMesh
 		
 		csVector3 GetCenter() const;
 		
+		inline float GetLen() { return len; }
+		inline float GetWid() { return wid; }
+		
 		csOceanNode GetLeft() const;
 		csOceanNode GetRight() const;
 		csOceanNode GetUp() const;
@@ -107,8 +110,6 @@ namespace WaterMesh
 		float oHeight;
 		
 		csBox3 bbox;
-		
-		void CalculateBBox();
 	};
 	
 	typedef struct renderCell

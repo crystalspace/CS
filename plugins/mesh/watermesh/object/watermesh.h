@@ -148,11 +148,11 @@ private:
 
   void updateLocal();
 
-  void DrawFromNode(csOceanNode start, const csVector3 camPos);
-  void DrawLeftFromNode(csOceanNode start, const csVector3 camPos);
-  void DrawRightFromNode(csOceanNode start, const csVector3 camPos);
-  void DrawTopFromNode(csOceanNode start, const csVector3 camPos);
-  void DrawBottomFromNode(csOceanNode start, const csVector3 camPos);
+  void DrawFromNode(csOceanNode start, const csVector3 camPos, csPlane3 *planes, uint32 frustum_mask);
+  void DrawLeftFromNode(csOceanNode start, const csVector3 camPos, csPlane3 *planes, uint32 frustum_mask);
+  void DrawRightFromNode(csOceanNode start, const csVector3 camPos, csPlane3 *planes, uint32 frustum_mask);
+  void DrawTopFromNode(csOceanNode start, const csVector3 camPos, csPlane3 *planes, uint32 frustum_mask);
+  void DrawBottomFromNode(csOceanNode start, const csVector3 camPos, csPlane3 *planes, uint32 frustum_mask);
 
   void AddNode(csOceanNode start, float dist);
 

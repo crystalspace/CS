@@ -56,8 +56,8 @@ void csOceanCell::SetupVertices()
 				verts.Push(csVector3 ((i * wid / (wid * gran - 1)), oHeight, (j * len / (len * gran - 1))));
 				norms.Push(csVector3 (0, 1, 0));
 				cols.Push(csColor (0.17,0.27,0.26));
-				texs.Push(csVector2(i, j));
-				//texs.Push(csVector2((i * wid / (wid * gran - 1)) / 1.5, (j * len / (len * gran - 1)) / 1.5));
+				//texs.Push(csVector2(i, j));
+				texs.Push(csVector2((i * wid / (wid * gran - 1)) / 1.5, (j * len / (len * gran - 1)) / 1.5));
 			}
 		}
 
@@ -161,7 +161,7 @@ csOceanNode::csOceanNode(csVector2 pos, float len, float wid)
 	this->wid = wid;
 	oHeight = 0;
 	
-	CalculateBBox();
+	bbox = csBox3(gc.x, oHeight - 1.0, gc.y, gc.x + len, oHeight + 1.0, gc.y + wid);
 }
 
 csOceanNode::~csOceanNode()
@@ -192,9 +192,4 @@ csOceanNode csOceanNode::GetDown() const
 csVector3 csOceanNode::GetCenter() const
 {
 	return csVector3(gc.x + (len / 2), oHeight, gc.y + (wid / 2));
-}
-
-void csOceanNode::CalculateBBox()
-{
-	bbox = csBox3(gc.x, oHeight + EPSILON, gc.y, gc.x + len, oHeight - EPSILON, gc.y + wid);
 }

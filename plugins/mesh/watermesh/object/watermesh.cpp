@@ -276,71 +276,78 @@ void csWaterMeshObject::AddNode(csOceanNode start, float dist)
 	meshQueue.Push(nextCell);
 }
 
-void csWaterMeshObject::DrawFromNode(csOceanNode start, const csVector3 camPos)
+void csWaterMeshObject::DrawFromNode(csOceanNode start, const csVector3 camPos, csPlane3 *planes, uint32 frustum_mask)
 {
+	uint32 out_mask;
 	float distFromCam = start.GetCenter().Distance(camPos);
 	if(distFromCam > MAX_OCEAN_DISTANCE) //Check culling
 		return;
-	else
+	else if(csIntersect3::BoxFrustum (start.GetBBox(), planes, frustum_mask, out_mask))
 	{
 		AddNode(start, distFromCam);
-		DrawRightFromNode(start.GetRight(), camPos);
-		DrawLeftFromNode(start.GetLeft(), camPos);
-		DrawBottomFromNode(start.GetDown(), camPos);
-		DrawTopFromNode(start.GetUp(), camPos);
 	}
+	
+	DrawRightFromNode(start.GetRight(), camPos, planes, frustum_mask);
+	DrawLeftFromNode(start.GetLeft(), camPos, planes, frustum_mask);
+	DrawBottomFromNode(start.GetDown(), camPos, planes, frustum_mask);
+	DrawTopFromNode(start.GetUp(), camPos, planes, frustum_mask);
 }
 
-void csWaterMeshObject::DrawTopFromNode(csOceanNode start, const csVector3 camPos)
+void csWaterMeshObject::DrawTopFromNode(csOceanNode start, const csVector3 camPos, csPlane3 *planes, uint32 frustum_mask)
 {
+	uint32 out_mask;
 	float distFromCam = start.GetCenter().Distance(camPos);
 	if(distFromCam > MAX_OCEAN_DISTANCE) //Check culling
 		return;
-	else
+	else if(csIntersect3::BoxFrustum (start.GetBBox(), planes, frustum_mask, out_mask))
 	{
 		AddNode(start, distFromCam);
-		DrawRightFromNode(start.GetRight(), camPos);
-		DrawLeftFromNode(start.GetLeft(), camPos);
-		DrawTopFromNode(start.GetUp(), camPos);
 	}
+	
+	DrawRightFromNode(start.GetRight(), camPos, planes, frustum_mask);
+	DrawLeftFromNode(start.GetLeft(), camPos, planes, frustum_mask);
+	DrawTopFromNode(start.GetUp(), camPos, planes, frustum_mask);
 }
 
-void csWaterMeshObject::DrawBottomFromNode(csOceanNode start, const csVector3 camPos)
+void csWaterMeshObject::DrawBottomFromNode(csOceanNode start, const csVector3 camPos, csPlane3 *planes, uint32 frustum_mask)
 {
+	uint32 out_mask;
 	float distFromCam = start.GetCenter().Distance(camPos);
 	if(distFromCam > MAX_OCEAN_DISTANCE) //Check culling
 		return;
-	else
+	else if(csIntersect3::BoxFrustum (start.GetBBox(), planes, frustum_mask, out_mask))
 	{
 		AddNode(start, distFromCam);
-		DrawRightFromNode(start.GetRight(), camPos);
-		DrawLeftFromNode(start.GetLeft(), camPos);
-		DrawBottomFromNode(start.GetDown(), camPos);
 	}	
+	DrawRightFromNode(start.GetRight(), camPos, planes, frustum_mask);
+	DrawLeftFromNode(start.GetLeft(), camPos, planes, frustum_mask);
+	DrawBottomFromNode(start.GetDown(), camPos, planes, frustum_mask);
 }
 
-void csWaterMeshObject::DrawRightFromNode(csOceanNode start, const csVector3 camPos)
+void csWaterMeshObject::DrawRightFromNode(csOceanNode start, const csVector3 camPos, csPlane3 *planes, uint32 frustum_mask)
 {
+	uint32 out_mask;
 	float distFromCam = start.GetCenter().Distance(camPos);
 	if(distFromCam > MAX_OCEAN_DISTANCE) //Check culling
 		return;
-	else
+	else if(csIntersect3::BoxFrustum (start.GetBBox(), planes, frustum_mask, out_mask))
 	{
 		AddNode(start, distFromCam);
-		DrawRightFromNode(start.GetRight(), camPos);
 	}
+	DrawRightFromNode(start.GetRight(), camPos, planes, frustum_mask);
 }
 
-void csWaterMeshObject::DrawLeftFromNode(csOceanNode start, const csVector3 camPos)
+void csWaterMeshObject::DrawLeftFromNode(csOceanNode start, const csVector3 camPos, csPlane3 *planes, uint32 frustum_mask)
 {
+	uint32 out_mask;
 	float distFromCam = start.GetCenter().Distance(camPos);
 	if(distFromCam > MAX_OCEAN_DISTANCE) //Check culling
 		return;
-	else
+	else if(csIntersect3::BoxFrustum (start.GetBBox(), planes, frustum_mask, out_mask))
 	{
 		AddNode(start, distFromCam);
-		DrawLeftFromNode(start.GetLeft(), camPos);
 	}	
+	DrawLeftFromNode(start.GetLeft(), camPos, planes, frustum_mask);
 }
 
 /*
@@ -439,7 +446,7 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
 		
 		csOceanNode start (csVector2(nearX, nearZ), CELL_LEN, CELL_WID);
 		
-		DrawFromNode(start, camPos);
+		DrawFromNode(start, camPos, planes, frustum_mask);
 		
 		int i = 0;
 		while(!(meshQueue.IsEmpty()))
