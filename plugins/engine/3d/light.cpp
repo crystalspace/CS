@@ -194,7 +194,7 @@ float csLight::GetLuminanceAtSquaredDistance (float sqdist) const
       bright = 1;
       break;
     case CS_ATTN_LINEAR:
-      bright = 1 - sqrt (sqdist) / attenuationConstants.w;
+      bright = 1 - sqrt (sqdist) * attenuationConstants.w;
       break;
     case CS_ATTN_INVERSE:
       {
@@ -222,7 +222,7 @@ float csLight::GetBrightnessAtDistance (float d) const
     case CS_ATTN_NONE:      
       return 1;
     case CS_ATTN_LINEAR:    
-      return csClamp (1.0f - d / attenuationConstants.w, 1.0f, 0.0f);
+      return csClamp (1.0f - d * attenuationConstants.w, 1.0f, 0.0f);
     case CS_ATTN_INVERSE:
       if (d < SMALL_EPSILON) d = SMALL_EPSILON;
       return 1 / d;
