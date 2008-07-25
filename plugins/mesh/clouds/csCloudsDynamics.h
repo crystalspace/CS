@@ -22,6 +22,7 @@
 #include <csgeom/vector3.h>
 #include "imesh/clouds.h"
 #include "csCloudsUtils.h"
+#include "csCloudsStandards.h"
 
 /**
 Supervisor-class implementation:
@@ -37,7 +38,7 @@ The local coordinate system is equal to the one used as global with:
 */
 class csCloudsDynamics : public scfImplementation1<csCloudsDynamics, iCloudsDynamics>
 {
-	static const UINT			s_iTotalStepCount = 8;
+	static const UINT			s_iTotalStepCount = 11;
 private:
 	/**
 	From each field there are two instances, because each time-step all of
@@ -73,6 +74,8 @@ private:
 	UINT						m_iGridSizeY;
 	UINT						m_iGridSizeZ;
 	float						m_fGridScale;						// dx
+	UINT						m_iNewPressureField;
+	UINT						m_iOldPressureField;
 
 	UINT						m_iCurrentStep;
 
@@ -210,8 +213,12 @@ private:
 	void AddAcceleratingForces();
 
 	//Solves the poisson-pressure equation. Uses k iteration of a solver to do so
-	//O(k * n^3)
+	//O(k * n^3)    --> BottleNeck! k = ca. 40-80
 	void SolvePoissonPressureEquation(const UINT k);
+
+	//Subtracts from velocity field the gradient of the calculated pressure-field
+	//O(n^3)
+	void MakeVelocityFieldDivergenceFree();
 
 	//After this method was invoked all velocity boundarycondition on u ar satisfied
 	void SatisfyVelocityBoundaryCond();
@@ -251,6 +258,12 @@ private:
 		SetInitialCondWaterMixingRatio(0.0f);
 		SetInitialWaterVaporMixingRatio(0.8f);
 		SetBaseAltitude(0.f);
+
+		//Input-fields
+		m_arfInputTemperature.Invalidate();
+		m_arfInputTemperature.AttachNew(new csStdTemperatureInputField(this));
+		m_arfInputWaterVapor.Invalidate();
+		m_arfInputWaterVapor.AttachNew(new csStdWaterVaporInputField(this));
 	}
 
 	//swaps actualIndex and LastIndex
@@ -262,7 +275,7 @@ private:
 public:
 	csCloudsDynamics(iBase* pParent) : scfImplementationType(this, pParent), m_iLastIndex(1), m_iActualIndex(0),
 		m_iGridSizeX(0), m_iGridSizeY(0), m_iGridSizeZ(0), m_fSpecificHeatCapacity(1.f), m_fTimePassed(0.f),
-		m_iCurrentStep(0)
+		m_iCurrentStep(0), m_iNewPressureField(0), m_iOldPressureField(1)
 	{
 		SetStandardValues();
 		UpdateAllDependParameters();
@@ -293,12 +306,14 @@ public:
 	{
 		//Größen überprüfen
 		if(Field->GetSizeX() != m_iGridSizeX || Field->GetSizeY() != m_iGridSizeZ) return;
+		m_arfInputTemperature.Invalidate();
 		m_arfInputTemperature = Field;
 	}
 	virtual inline void SetWaterVaporBottomInputField(csRef<iField2<float>> Field)
 	{
 		//Größen überprüfen
 		if(Field->GetSizeX() != m_iGridSizeX || Field->GetSizeY() != m_iGridSizeZ) return;
+		m_arfInputWaterVapor.Invalidate();
 		m_arfInputWaterVapor = Field;
 	}
 

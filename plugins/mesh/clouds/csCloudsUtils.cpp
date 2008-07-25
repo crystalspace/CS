@@ -75,16 +75,20 @@ const float GetInterpolatedValue(const csRef<iField3<csVector3>>& rSrc, const cs
 
 //-----------------------------------------------------//
 
-void JacobiSolver(csRef<iField3<float>> rNew, const csRef<iField3<float>>& rOld)
+void JacobiSolver(csRef<iField3<float>> rNew, const csRef<iField3<float>>& rOld, 
+				  const csRef<iField3<float>>& rBField, const float fAlpha, const float fInvBeta)
 {
-	//First only update interrior of the region. Then the boundaries
-	for(UINT x = 1; x < rNew->GetSizeX() - 1; ++x)
+	for(UINT x = 0; x < rNew->GetSizeX(); ++x)
 	{
-		for(UINT y = 1; y < rNew->GetSizeY() - 1; ++y)
+		for(UINT y = 0; y < rNew->GetSizeY(); ++y)
 		{
-			for(UINT z = 1; z < rNew->GetSizeZ() - 1; ++z)
+			for(UINT z = 0; z < rNew->GetSizeZ(); ++z)
 			{
-				
+				const float fB		= fAlpha * rBField->GetValue(x, y, z);
+				const float fTemp	= rOld->GetValueClamp(x + 1, y, z) + rOld->GetValueClamp(x - 1, y, z) +
+									  rOld->GetValueClamp(x, y + 1, z) + rOld->GetValueClamp(x, y - 1, z) +
+									  rOld->GetValueClamp(x, y, z + 1) + rOld->GetValueClamp(x, y, z - 1);
+				rNew->SetValue((fTemp + fB) * fInvBeta, x, y, z);
 			}
 		}
 	}

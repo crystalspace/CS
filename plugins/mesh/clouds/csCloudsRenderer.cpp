@@ -16,4 +16,5 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-//#include "csCloudsRenderer.h"
+#include <cssysdef.h>
+#include "csCloudsRenderer.h"

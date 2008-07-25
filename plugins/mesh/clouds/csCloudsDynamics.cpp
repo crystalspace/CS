@@ -193,23 +193,19 @@ void csCloudsDynamics::SatisfyVelocityBoundaryCond()
 	}
 
 	//Bottom: no-slip (xz plane, y = 0)
-	for(UINT x = 1; x < m_iGridSizeX; ++x)
-	{
-		for(UINT z = 1; z < m_iGridSizeZ; ++z)
-		{
-			const csVector3 vCurr	= m_arvVelocityField[m_iActualIndex]->GetValue(x, 0, z);
-			const csVector3 vAbove  = m_arvVelocityField[m_iActualIndex]->GetValue(x, 1, z);
-			//Which one is correct?
-			//m_arvVelocityField[m_iActualIndex]->SetValue(csVector3(vCurr.x, -vAbove.y, vCurr.z), x, 0, z);
-			m_arvVelocityField[m_iActualIndex]->SetValue(csVector3(0.f, -vAbove.y, 0.f), x, 0, z);
-		}
-	}
-
 	//Top: free-slip (xz plane, y = MAX)
 	for(UINT x = 1; x < m_iGridSizeX; ++x)
 	{
 		for(UINT z = 1; z < m_iGridSizeZ; ++z)
 		{
+			//Bottom
+			const csVector3 vCurr	= m_arvVelocityField[m_iActualIndex]->GetValue(x, 0, z);
+			const csVector3 vAbove  = m_arvVelocityField[m_iActualIndex]->GetValue(x, 1, z);
+			//Which one is correct?
+			//m_arvVelocityField[m_iActualIndex]->SetValue(csVector3(vCurr.x, -vAbove.y, vCurr.z), x, 0, z);
+			m_arvVelocityField[m_iActualIndex]->SetValue(csVector3(0.f, -vAbove.y, 0.f), x, 0, z);
+
+			//Top
 			const csVector3 vBorder = m_arvVelocityField[m_iActualIndex]->GetValue(x, m_iGridSizeY, z);
 			const csVector3 vInner  = m_arvVelocityField[m_iActualIndex]->GetValue(x, m_iGridSizeY - 1, z);
 			m_arvVelocityField[m_iActualIndex]->SetValue(csVector3(vBorder.x, vInner.y, vBorder.z), x, m_iGridSizeY, z);
@@ -313,15 +309,38 @@ void csCloudsDynamics::SatisfyScalarBoundaryCond()
 
 //----------------------------------------------------------//
 
+//After this method was invoked, the best approximation to the solution
+//is found in m_arfPressureField[m_iNewPressureField]
 void csCloudsDynamics::SolvePoissonPressureEquation(const UINT k)
 {
-	UINT iNew = 0;
-	UINT iOld = 1;
+	static const float s_fInvBeta = 1.f / 6.f;
+	const float fGridScale2 = m_fGridScale * m_fGridScale;
 	for(UINT i = 0; i < k; ++i)
 	{
 		//Switch roles
-		iNew ^= iOld ^= iNew ^= iOld;
-		JacobiSolver(m_arfPressureField[iNew], m_arfPressureField[iOld]);
+		m_iNewPressureField ^= m_iOldPressureField ^= m_iNewPressureField ^= m_iOldPressureField;
+		JacobiSolver(m_arfPressureField[m_iNewPressureField], m_arfPressureField[m_iOldPressureField], 
+					 m_arfVelDivergence, fGridScale2, s_fInvBeta);
+	}
+}
+
+//----------------------------------------------------------//
+
+void csCloudsDynamics::MakeVelocityFieldDivergenceFree()
+{
+	//Only the innercells are updated! All boudaries are set seperatly!
+	for(UINT x = 1; x < m_iGridSizeX; ++x)
+	{
+		for(UINT y = 1; y < m_iGridSizeY; ++y)
+		{
+			for(UINT z = 1; z < m_iGridSizeZ; ++z)
+			{
+				const csVector3 vVel	= m_arvVelocityField[m_iActualIndex]->GetValue(x, y, z);
+				const csVector3 vGrad	= CalcGradient(m_arfPressureField[m_iNewPressureField], x, y, z, m_fGridScale);
+				//Ok this way?
+				m_arvVelocityField[m_iActualIndex]->SetValue(vVel - vGrad, x, y, z);
+			}
+		}
 	}
 }
 
@@ -334,7 +353,10 @@ only at the beginning of an entire timestep. The value passed there
 is used for the whole timestep!
 */
 const bool csCloudsDynamics::DoComputationSteps(const UINT iStepCount, const float fTime)
-{	
+{
+	//preconditions hold? --> initialized?
+	if(m_iGridSizeX <= 0 || m_iGridSizeY <= 0 || m_iGridSizeZ <= 0) return false;
+
 	int iStepsLeft = iStepCount == 0 ? s_iTotalStepCount - m_iCurrentStep : iStepCount;
 	while(iStepsLeft-- > 0)
 	{
@@ -349,14 +371,17 @@ const bool csCloudsDynamics::DoComputationSteps(const UINT iStepCount, const flo
 			case 1: ComputeRotationField(); break;
 			case 2: ComputeForceField(); break;
 			case 3: AddAcceleratingForces(); break;
-			case 4: SatisfyVelocityBoundaryCond(); break;
 
-			case 5: UpdateMixingRatiosAndPotentialTemp(); break;
-			case 6: SatisfyScalarBoundaryCond(); break;
+			case 4: UpdateMixingRatiosAndPotentialTemp(); break;
+			case 5: SatisfyScalarBoundaryCond(); break;
 
 			//Solving poisson-pressure equation
-			case 7: ComputeDivergenceField(); break;
+			case 6: ComputeDivergenceField(); break;
+			//60 iterations
+			case 7: SolvePoissonPressureEquation(30); break;
 			case 8: SolvePoissonPressureEquation(30); break;
+			case 9: MakeVelocityFieldDivergenceFree(); break;
+			case 10: SatisfyVelocityBoundaryCond(); break;
 		}
 	
 		if(++m_iCurrentStep >= s_iTotalStepCount)

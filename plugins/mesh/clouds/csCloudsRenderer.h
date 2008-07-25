@@ -22,16 +22,20 @@
 #include "imesh/clouds.h"
 
 //Cloud-Renderer class
-class csCloudsRenderer : public scfImplementation<csCloudsRenderer, iCloudsRenderer>
+class csCloudsRenderer : public scfImplementation1<csCloudsRenderer, iCloudsRenderer>
 {
 private:
 
 
 public:
-	csCloudsRenderer(iBase* pParent);
-	~csCloudsRenderer();
+	csCloudsRenderer(iBase* pParent) : scfImplementationType(this, pParent)
+	{
+	}
+	~csCloudsRenderer()
+	{
+	}
 
-	virtual const bool Render(const i3DScalarField<double>& aaaMixingRatios /*, const csMatrix& mTransformation */);
+	virtual const bool Render(const csRef<iField3<float>>& rCondWaterMixingRatios /*, const csMatrix& mTransformation */);
 };
 
 #endif // __CSCLOUDRENDERER_PLUGIN_H__

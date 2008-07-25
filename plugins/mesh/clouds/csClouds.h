@@ -21,16 +21,27 @@
 
 #include <csgeom/vector3.h>
 #include "imesh/clouds.h"
+#include "csCloudsDynamics.h"
+#include "csCloudsRenderer.h"
 
 //Supervisor-class implementation
 class csClouds : public scfImplementation1<csClouds, iClouds>
 {
 private:
-
+	csRef<iCloudsDynamics>			m_Dynamics;
+	csRef<iCloudsRenderer>			m_Renderer;
 
 public:
-	csClouds(iBase* pParent);
-	~csClouds();
+	csClouds(iBase* pParent) : scfImplementationType(this, pParent)
+	{
+		m_Dynamics.AttachNew(new csCloudsDynamics(this));
+		m_Renderer.AttachNew(new csCloudsRenderer(this));
+	}
+	~csClouds()
+	{
+		m_Dynamics.Invalidate();
+		m_Renderer.Invalidate();
+	}
 
 	virtual const bool DoTimeStep(const float fTime = 0.f);
 	virtual const bool DoAmortTimeStep(const float fTime = 0.f);

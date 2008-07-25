@@ -16,8 +16,8 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSCLOUDRENDERER_PLUGIN_H__
-#define __CSCLOUDRENDERER_PLUGIN_H__
+#ifndef __CSCLOUDUTILS_PLUGIN_H__
+#define __CSCLOUDUTILS_PLUGIN_H__
 
 #include "imesh/clouds.h"
 #include <csgeom/vector3.h>
@@ -32,7 +32,8 @@ const float GetInterpolatedValue(const csRef<iField3<float>>& rSrc, const csVect
 const float GetInterpolatedValue(const csRef<iField3<csVector3>>& rSrc, const csVector3& vPos, const UINT iIndex);
 
 //Implements the straightforward jacobi solver
-void JacobiSolver(csRef<iField3<float>> rNew, const csRef<iField3<float>>& rOld);
+void JacobiSolver(csRef<iField3<float>> rNew, const csRef<iField3<float>>& rOld, 
+				  const csRef<iField3<float>>& rBField, const float fAlpha, const float fInvBeta);
 
 //Interpolates the velocity
 inline const csVector3 GetVelocityOfCellCenter(const csRef<iField3<csVector3>>& rField, 
@@ -279,4 +280,4 @@ public:
 	}
 };
 
-#endif // __CSCLOUDRENDERER_PLUGIN_H__
+#endif // __CSCLOUDUTILS_PLUGIN_H__

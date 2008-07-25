@@ -82,11 +82,6 @@ struct iField2 : public virtual iBase
 	virtual const UINT GetSizeY() const = 0;
 
 	/**
-	Sets a value at position x, y
-	*/
-	virtual void SetValue(const T& Value, const UINT x, const UINT y) = 0;
-
-	/**
 	Accses operator and method. Returns the value of the scalarfield
 	at position P = (x, y)
 	*/
@@ -143,7 +138,7 @@ struct iCloudsRenderer : public virtual iBase
 	/**
 	Rendermethod. Renders the whole cloud scene.
 	*/
-	virtual const bool Render(const csRef<iField3<float>>& aaafMixingRatios /*, const csMatrix& mTransformation */) = 0;
+	virtual const bool Render(const csRef<iField3<float>>& rCondWaterMixingRatios /*, const csMatrix& mTransformation */) = 0;
 };
 
 //--------------------------------------------------------------------------------------------//
