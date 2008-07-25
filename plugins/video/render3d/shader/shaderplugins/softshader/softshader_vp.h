@@ -68,8 +68,8 @@ public:
   virtual bool Compile (iHierarchicalCache*, csRef<iString>*);
   
   virtual iShaderProgram::CacheLoadResult LoadFromCache (
-    iHierarchicalCache* cache, csRef<iString>* failReason = 0,
-    csRef<iString>* = 0)
+    iHierarchicalCache* cache, iDocumentNode* programNode,
+    csRef<iString>* failReason = 0, csRef<iString>* = 0)
   { return iShaderProgram::loadFail; }
   
   csPtr<iString> GetCacheTag () { return 0; }

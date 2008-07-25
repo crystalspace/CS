@@ -143,7 +143,8 @@ private:
   bool WritePass (ShaderPass* pass, const CachedPlugins& plugins,
     iFile* cacheFile);
   iShaderProgram::CacheLoadResult LoadPassFromCache (ShaderPass* pass,
-    size_t variant, iFile* cacheFile, iHierarchicalCache* cache);
+    iDocumentNode* node, size_t variant, iFile* cacheFile,
+    iHierarchicalCache* cache);
   bool ReadPass (ShaderPass* pass, iFile* cacheFile,
     CachedPlugins& plugins);
     
@@ -196,7 +197,8 @@ public:
   bool Load (iLoaderContext* ldr_context, iDocumentNode* node,
       iDocumentNode* parentSV, size_t variant, iHierarchicalCache* cacheTo);
   iShaderProgram::CacheLoadResult LoadFromCache (iLoaderContext* ldr_context,
-    iHierarchicalCache* cache, iDocumentNode* parentSV, size_t variant);
+    iDocumentNode* node, iHierarchicalCache* cache, iDocumentNode* parentSV,
+    size_t variant);
   bool Precache (iDocumentNode* node, size_t variant,
     iHierarchicalCache* cacheTo);
 

@@ -1026,7 +1026,8 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	  if (techCache.IsValid())
 	  {
 	    var.tech = new csXMLShaderTech (this);
-	    loadResult = var.tech->LoadFromCache (ldr_context, varCache, shaderRoot, ticket);
+	    loadResult = var.tech->LoadFromCache (ldr_context, tech.techNode,
+	      varCache, shaderRoot, ticket);
 	    if (compiler->do_verbose)
 	    {
 	      switch (loadResult)

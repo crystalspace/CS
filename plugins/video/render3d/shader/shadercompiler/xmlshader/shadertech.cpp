@@ -46,7 +46,7 @@ CS_LEAKGUARD_IMPLEMENT (csXMLShaderTech);
 /* Magic value for tech + pass cache files.
  * The most significant byte serves as a "version", increase when the
  * cache file format changes. */
-static const uint32 cacheFileMagic = 0x02747863;
+static const uint32 cacheFileMagic = 0x03747863;
 
 //---------------------------------------------------------------------------
 
@@ -726,10 +726,6 @@ bool csXMLShaderTech::ParseTextures (ShaderPassPerTag& pass,
 // Used to generate data written on disk!
 enum
 {
-  cacheFlagHasFP,
-  cacheFlagHasVP,
-  cacheFlagHasVProc,
-  
   cacheFlagWMR = 4,
   cacheFlagWMG,
   cacheFlagWMB,
@@ -751,10 +747,6 @@ bool csXMLShaderTech::WritePass (ShaderPass* pass,
   {
     uint32 cacheFlags = 0;
     
-    if (plugins.fp.available) cacheFlags |= 1 << cacheFlagHasFP;
-    if (plugins.vp.available) cacheFlags |= 1 << cacheFlagHasVP;
-    if (plugins.vproc.available) cacheFlags |= 1 << cacheFlagHasVProc;
-    
     if (pass->wmRed) cacheFlags |= 1 << cacheFlagWMR;
     if (pass->wmGreen) cacheFlags |= 1 << cacheFlagWMG;
     if (pass->wmBlue) cacheFlags |= 1 << cacheFlagWMB;
@@ -770,27 +762,6 @@ bool csXMLShaderTech::WritePass (ShaderPass* pass,
     if (cacheFile->Write ((char*)&diskFlags, sizeof (diskFlags))
 	!= sizeof (diskFlags)) return false;
   }
-  
-  if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, 
-      plugins.fp.progType))
-    return false;
-  if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, 
-      plugins.fp.pluginID))
-    return false;
-  
-  if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, 
-      plugins.vp.progType))
-    return false;
-  if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, 
-      plugins.vp.pluginID))
-    return false;
-  
-  if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, 
-      plugins.vproc.progType))
-    return false;
-  if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, 
-      plugins.vproc.pluginID))
-    return false;
   
   {
     uint32 diskMM = csLittleEndian::UInt32 (pass->mixMode);
@@ -905,12 +876,14 @@ bool csXMLShaderTech::WritePassPerTag (const ShaderPassPerTag& pass,
 }
   
 iShaderProgram::CacheLoadResult csXMLShaderTech::LoadPassFromCache (
-  ShaderPass* pass, size_t variant, iFile* cacheFile,
+  ShaderPass* pass, iDocumentNode* node, size_t variant, iFile* cacheFile,
   iHierarchicalCache* cache)
 {
   if (!cacheFile) return iShaderProgram::loadFail;
 
   CachedPlugins plugins;
+  GetProgramPlugins (node, plugins, variant);
+  
   if (!ReadPass (pass, cacheFile, plugins)) return iShaderProgram::loadFail;
   
   csString tagFP, tagVP, tagVPr;
@@ -969,10 +942,6 @@ bool csXMLShaderTech::ReadPass (ShaderPass* pass,
 	!= sizeof (diskFlags)) return false;
     uint32 cacheFlags = csLittleEndian::UInt32 (diskFlags);
   
-    plugins.fp.available = cacheFlags & (1 << cacheFlagHasFP);
-    plugins.vp.available = cacheFlags & (1 << cacheFlagHasVP);
-    plugins.vproc.available = cacheFlags & (1 << cacheFlagHasVProc);
-    
     pass->wmRed = cacheFlags & (1 << cacheFlagWMR);
     pass->wmGreen = cacheFlags & (1 << cacheFlagWMG);
     pass->wmBlue = cacheFlags & (1 << cacheFlagWMB);
@@ -984,21 +953,6 @@ bool csXMLShaderTech::ReadPass (ShaderPass* pass,
     
     pass->alphaMode.autoAlphaMode = cacheFlags & (1 << cacheFlagAlphaAuto);
   }
-  
-  plugins.fp.progType = CS::PluginCommon::ShaderCacheHelper::ReadString (
-    cacheFile);
-  plugins.fp.pluginID = CS::PluginCommon::ShaderCacheHelper::ReadString (
-    cacheFile);
-  
-  plugins.vp.progType = CS::PluginCommon::ShaderCacheHelper::ReadString (
-    cacheFile);
-  plugins.vp.pluginID = CS::PluginCommon::ShaderCacheHelper::ReadString (
-    cacheFile);
-  
-  plugins.vproc.progType = CS::PluginCommon::ShaderCacheHelper::ReadString (
-    cacheFile);
-  plugins.vproc.pluginID = CS::PluginCommon::ShaderCacheHelper::ReadString (
-    cacheFile);
   
   {
     uint32 diskMM;
@@ -1202,8 +1156,8 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadProgramFromCache (
   prog = plg->CreateProgram (cacheInfo.progType);
   csRef<iString> progTag;
   csRef<iString> failReason;
-  iShaderProgram::CacheLoadResult loadRes = prog->LoadFromCache (cache, &failReason,
-    &progTag);
+  iShaderProgram::CacheLoadResult loadRes = prog->LoadFromCache (cache, 
+    cacheInfo.programNode, &failReason, &progTag);
   if (loadRes == iShaderProgram::loadFail)
   {
     if (parent->compiler->do_verbose)
@@ -1552,8 +1506,8 @@ bool csXMLShaderTech::Precache (iDocumentNode* node, size_t variant,
 }
   
 iShaderProgram::CacheLoadResult csXMLShaderTech::LoadFromCache (
-  iLoaderContext* ldr_context, iHierarchicalCache* cache,
-  iDocumentNode* parentSV, size_t variant)
+  iLoaderContext* ldr_context, iDocumentNode* node, 
+  iHierarchicalCache* cache, iDocumentNode* parentSV, size_t variant)
 {
   csRef<iDataBuffer> cacheData (cache->ReadCache ("/passes"));
   if (!cacheData.IsValid()) return iShaderProgram::loadFail;
@@ -1582,12 +1536,24 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadFromCache (
   if (read != sizeof (diskPassNum))
     return iShaderProgram::loadFail;
   
+  size_t nodePassesCount = 0;
+  csRef<iDocumentNodeIterator> it = node->GetNodes (xmltokens.Request (
+    csXMLShaderCompiler::XMLTOKEN_PASS));
+  while(it->HasNext ())
+  {
+    it->Next ();
+    nodePassesCount++;
+  }
+  
   passesCount = csLittleEndian::Int32 (diskPassNum);
+  if (passesCount != nodePassesCount) return iShaderProgram::loadFail;
   passes = new ShaderPass[passesCount];
+  it = node->GetNodes (xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_PASS));
   for (uint p = 0; p < passesCount; p++)
   {
+    csRef<iDocumentNode> child = it->Next ();
     iShaderProgram::CacheLoadResult loadRes =
-      LoadPassFromCache (&passes[p], variant, &cacheFile, cache);
+      LoadPassFromCache (&passes[p], child, variant, &cacheFile, cache);
     if (loadRes != iShaderProgram::loadSuccessShaderValid)
       return loadRes;
   }
