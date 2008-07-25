@@ -41,6 +41,7 @@ struct iThreadTest : public virtual iBase
   virtual void Test3(int i, float f) = 0;
   virtual void Test4(csWeakRef<iThreadTest> myself) = 0;
   virtual void Test5(csRef<Data> stuff) = 0;
+  virtual void Test6() const = 0;
 };
 
 class csThreadTest : public ThreadedCallable<csThreadTest>,
@@ -51,13 +52,16 @@ public:
 
   csThreadTest(iObjectRegistry* objReg);
 
-  iObjectRegistry* GetObjectRegistry() { return objReg; }
+  iObjectRegistry* GetObjectRegistry() const { return objReg; }
 
-  THREADED_CALLABLE_DECL(csThreadTest, Test1)
-  THREADED_CALLABLE_DECL1(csThreadTest, Test2, bool, b)
-  THREADED_CALLABLE_DECL2(csThreadTest, Test3, int, in, float, flo)
-  THREADED_CALLABLE_DECL1(csThreadTest, Test4, csWeakRef<iThreadTest>, myself)
-  THREADED_CALLABLE_DECL1(csThreadTest, Test5, csRef<Data>, stuff)
+  THREADED_CALLABLE_DECL(csThreadTest, Test1, true)
+  THREADED_CALLABLE_DECL1(csThreadTest, Test2, bool, b, true)
+  THREADED_CALLABLE_DECL2(csThreadTest, Test3, int, in, float, flo, true)
+  THREADED_CALLABLE_DECL1(csThreadTest, Test4, csWeakRef<iThreadTest>, myself, true)
+  THREADED_CALLABLE_DECL1(csThreadTest, Test5, csRef<Data>, stuff, true)
+  THREADED_CALLABLE_DECL(csThreadTest, Test6Real, true)
+
+  void Test6() const;
 
 private:
   iObjectRegistry* objReg;

@@ -30,8 +30,7 @@ template<class T>
 class ThreadedCallable
 {
 public:
-  ThreadedCallable* GetThreadedCallable() { return this; }
-  virtual iObjectRegistry* GetObjectRegistry() = 0;
+  virtual iObjectRegistry* GetObjectRegistry() const = 0;
 
   void RunMethod(void (T::*method)(void))
   {
@@ -40,17 +39,18 @@ public:
   }
 
   template<typename A1>
-  void RunMethod1(void (T::*method)(A1), csArray<void const*> &args)
+  void RunMethod1(void (T::*method)(A1), void const** &args)
   {
       T* mySelf = (T*)this;
       A1* a1 = (A1*)args[1];
       (mySelf->*method)(*a1);
       TEventMemPool* mempool = (TEventMemPool*)args[0];
       delete mempool;
+      delete args;
   }
 
   template<typename A1, typename A2>
-  void RunMethod2(void (T::*method)(A1, A2), csArray<void const*> &args)
+  void RunMethod2(void (T::*method)(A1, A2), void const** &args)
   {
       T* mySelf = (T*)this;
       A2* a2 = (A2*)args[2];
@@ -58,10 +58,24 @@ public:
       (mySelf->*method)(*a1, *a2);
       TEventMemPool* mempool = (TEventMemPool*)args[0];
       delete mempool;
+      delete args;
+  }
+
+  template<typename A1, typename A2, typename A3>
+  void RunMethod3(void (T::*method)(A1, A2, A3), void const** &args)
+  {
+      T* mySelf = (T*)this;
+      A3* a3 = (A3*)args[3];
+      A2* a2 = (A2*)args[2];
+      A1* a1 = (A1*)args[1];
+      (mySelf->*method)(*a1, *a2, *a3);
+      TEventMemPool* mempool = (TEventMemPool*)args[0];
+      delete mempool;
+      delete args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10>
-  void RunMethod10(void (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10), csArray<void const*> &args)
+  void RunMethod10(void (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10), void const** &args)
   {
       T* mySelf = (T*)this;
       A10* a10 = (A10*)args[10];
@@ -77,6 +91,7 @@ public:
       (mySelf->*method)(*a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10);
       TEventMemPool* mempool = (TEventMemPool*)args[0];
       delete mempool;
+      delete args;
   }
 };
 
@@ -103,7 +118,7 @@ template<class T, typename A1>
 class ThreadEvent1 : public scfImplementation1<ThreadEvent1<T, A1>, iJob>
 {
 public:
-  ThreadEvent1(ThreadedCallable<T>* object, void (T::*method)(A1), csArray<void const*> args)
+  ThreadEvent1(ThreadedCallable<T>* &object, void (T::*method)(A1), void const** &args)
     : scfImplementationType(this), object(object), method(method), args(args)
   {
   }
@@ -116,14 +131,14 @@ public:
 private:
   ThreadedCallable<T>* object;
   void (T::*method)(A1);
-  csArray<void const*> args;
+  void const** args;
 };
 
 template<class T, typename A1, typename A2>
 class ThreadEvent2 : public scfImplementation1<ThreadEvent2<T, A1, A2>, iJob>
 {
 public:
-  ThreadEvent2(ThreadedCallable<T>* object, void (T::*method)(A1, A2), csArray<void const*> args)
+  ThreadEvent2(ThreadedCallable<T>* &object, void (T::*method)(A1, A2), void const** &args)
     : scfImplementationType(this), object(object), method(method), args(args)
   {
   }
@@ -136,14 +151,34 @@ public:
 private:
   ThreadedCallable<T>* object;
   void (T::*method)(A1, A2);
-  csArray<void const*> args;
+  void const** args;
+};
+
+template<class T, typename A1, typename A2, typename A3>
+class ThreadEvent3 : public scfImplementation1<ThreadEvent3<T, A1, A2, A3>, iJob>
+{
+public:
+  ThreadEvent3(ThreadedCallable<T>* &object, void (T::*method)(A1, A2, A3), void const** &args)
+    : scfImplementationType(this), object(object), method(method), args(args)
+  {
+  }
+
+  void Run()
+  {
+    object->RunMethod3<A1, A2, A3>(method, args);
+  }
+
+private:
+  ThreadedCallable<T>* object;
+  void (T::*method)(A1, A2, A3);
+  void const** args;
 };
 
 template<class T, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10>
 class ThreadEvent10 : public scfImplementation1<ThreadEvent10<T, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10>, iJob>
 {
 public:
-  ThreadEvent10(ThreadedCallable<T>* object, void (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10), csArray<void const*> args)
+  ThreadEvent10(ThreadedCallable<T>* &object, void (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10), void const** &args)
     : scfImplementationType(this), object(object), method(method), args(args)
   {
   }
@@ -156,7 +191,7 @@ public:
 private:
   ThreadedCallable<T>* object;
   void (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10);
-  csArray<void const*> args;
+  void const** args;
 };
 
 class TEventMemPool : public csMemoryPool

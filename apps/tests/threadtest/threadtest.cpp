@@ -109,6 +109,16 @@ THREADED_CALLABLE_IMPL1(csThreadTest, Test5, csRef<Data> stuff)
   }
 }
 
+THREADED_CALLABLE_IMPL(csThreadTest, Test6Real)
+{
+  printf("Test 6 passed!\n");
+}
+
+void csThreadTest::Test6() const
+{
+  Test6Real();
+}
+
 int main(int argc, char* argv[])
 {
   iObjectRegistry* objReg = csInitializer::CreateObjectRegistry();
@@ -143,6 +153,8 @@ int main(int argc, char* argv[])
 
   threadTest->Test5(dat);
   dat.Invalidate();
+
+  threadTest->Test6();
 
   getchar();
 
