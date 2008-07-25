@@ -157,15 +157,8 @@ AC_LANG_POP([C++])
 
 CS_CHECK_COMMON_LIBS
 
-AS_IF([test $ac_cv_lib_m_pow = yes || test $ac_cv_lib_m_cosf = yes],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lm], [+])])
-AS_IF([test $ac_cv_lib_mx_cosf = yes],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lmx], [+])])
 AS_IF([test $ac_cv_lib_dl_dlopen = yes],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-ldl], [+])
-    AC_CHECK_LIB([dl], [dladdr], [CS_HEADER_PROPERTY([CS_HAVE_DLADDR])])])
-AS_IF([test $ac_cv_lib_nsl_gethostbyname = yes],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lnsl], [+])])
+    [AC_CHECK_LIB([dl], [dladdr], [CS_HEADER_PROPERTY([CS_HAVE_DLADDR])])])
 
 AS_IF([test $ac_cv_lib_m_cosf != no || test $ac_cv_lib_mx_cosf != no],
     [CS_HEADER_PROPERTY([CS_HAVE_MATH_H_FLOAT_FUNCS])])
