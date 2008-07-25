@@ -37,14 +37,15 @@ AC_PREREQ([2.56])
 #	the default.  WITH-DESCRIPTION is the description to use for the
 #	--with[out]-python option. The literal string "use" (or "do not use")
 #	is prepended to WITH-DESCRIPTION. If omitted, WITH-DESCRIPTION defaults
-#	to "Python".  If EMITTER is provided, then CS_EMIT_BUILD_RESULT() is
-#	invoked with EMITTER in order to record the results in an output
-#	file. As a convenience, if EMITTER is the literal value "emit" or
-#	"yes", then CS_EMIT_BUILD_RESULT()'s default emitter will be used.
-#	When EMITTER is provided, the following properties are emitted to the
-#	output file: PYTHON (the actual interpreter), PYTHON.AVAILABLE ("yes"
-#	or "no"), PYTHON.CFLAGS, PYTHON.LFLAGS, PYTHON.VERSION,
-#	and PYTHON.MODULE_EXT.
+#	to "Python".  If EMITTER is provided, then CS_EMIT_BUILD_PROPERTY() and
+#	CS_EMIT_BUILD_RESULT() are invoked with EMITTER in order to record the
+#	results in an output file. As a convenience, if EMITTER is the literal
+#	value "emit" or "yes", then the default emitter of
+#	CS_EMIT_BUILD_PROPERTY() and CS_EMIT_BUILD_RESULT() will be used.  When
+#	EMITTER is provided, the following properties are emitted to the output
+#	file: PYTHON (the actual interpreter), PYTHON.AVAILABLE ("yes" or
+#	"no"), PYTHON.CFLAGS, PYTHON.LFLAGS, PYTHON.VERSION, and
+#	PYTHON.MODULE_EXT.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_PYTHON],
     [AC_REQUIRE([CS_CHECK_PTHREAD])
