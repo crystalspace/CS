@@ -6185,10 +6185,8 @@ cs_header_text="${cs_header_text}#define CS_COMPILER_NAME \"$cs_compiler_name_cx
 #------------------------------------------------------------------------------
 # Check for common tools.
 #------------------------------------------------------------------------------
-
-    # The default RANLIB in Jambase is wrong on some platforms, and is also
-    # unsuitable during cross-compilation, so we set the value unconditionally
-    # (sixth argument of CS_EMIT_BUILD_PROPERTY).
+# The default RANLIB in Jambase is wrong on some platforms, and is also
+    # unsuitable during cross-compilation, so value is set unconditionally.
     if test -n "$ac_tool_prefix"; then
   # Extract the first word of "${ac_tool_prefix}ranlib", so it can be a program name with args.
 set dummy ${ac_tool_prefix}ranlib; ac_word=$2
@@ -7278,7 +7276,6 @@ fi
   cs_jamconfig_text="${cs_jamconfig_text}APPLE_LIBTOOL ?= $cs_build_prop_val ;
 "
 fi
-
 
 { echo "$as_me:$LINENO: checking how to create a directory" >&5
 echo $ECHO_N "checking how to create a directory... $ECHO_C" >&6; }
@@ -10035,6 +10032,7 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
+
     { echo "$as_me:$LINENO: checking for pow in -lm" >&5
 echo $ECHO_N "checking for pow in -lm... $ECHO_C" >&6; }
 if test "${ac_cv_lib_m_pow+set}" = set; then
@@ -10167,6 +10165,17 @@ if test $ac_cv_lib_m_cosf = yes; then
   cs_cv_libm_libs=-lm
 fi
 
+    if test $ac_cv_lib_m_pow = yes || test $ac_cv_lib_m_cosf = yes; then
+  cs_build_prop_val="-lm"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
+"
+fi
+
+fi
+
+
 
 { echo "$as_me:$LINENO: checking for cosf in -lmx" >&5
 echo $ECHO_N "checking for cosf in -lmx... $ECHO_C" >&6; }
@@ -10238,6 +10247,17 @@ _ACEOF
 
 fi
 
+    if test $ac_cv_lib_mx_cosf = yes; then
+  cs_build_prop_val="-lmx"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
+"
+fi
+
+fi
+
+
     { echo "$as_me:$LINENO: checking for dlopen in -ldl" >&5
 echo $ECHO_N "checking for dlopen in -ldl... $ECHO_C" >&6; }
 if test "${ac_cv_lib_dl_dlopen+set}" = set; then
@@ -10304,6 +10324,17 @@ if test $ac_cv_lib_dl_dlopen = yes; then
 else
   cs_cv_libdl_libs=
 fi
+
+    if test $ac_cv_lib_dl_dlopen = yes; then
+  cs_build_prop_val="-ldl"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
+"
+fi
+
+fi
+
 
 
 { echo "$as_me:$LINENO: checking for gethostbyname in -lnsl" >&5
@@ -10376,6 +10407,17 @@ _ACEOF
 
 fi
 
+    if test $ac_cv_lib_nsl_gethostbyname = yes; then
+  cs_build_prop_val="-lnsl"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
+"
+fi
+
+fi
+
+
     ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -10383,35 +10425,9 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-if test $ac_cv_lib_m_pow = yes || test $ac_cv_lib_m_cosf = yes; then
-  cs_build_prop_val="-lm"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    	        if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
-"
-fi
-
-fi
-
-if test $ac_cv_lib_mx_cosf = yes; then
-  cs_build_prop_val="-lmx"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    	        if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
-"
-fi
-
-fi
 
 if test $ac_cv_lib_dl_dlopen = yes; then
-  cs_build_prop_val="-ldl"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    	        if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
-"
-fi
-
-    { echo "$as_me:$LINENO: checking for dladdr in -ldl" >&5
+  { echo "$as_me:$LINENO: checking for dladdr in -ldl" >&5
 echo $ECHO_N "checking for dladdr in -ldl... $ECHO_C" >&6; }
 if test "${ac_cv_lib_dl_dladdr+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -10474,16 +10490,6 @@ fi
 echo "${ECHO_T}$ac_cv_lib_dl_dladdr" >&6; }
 if test $ac_cv_lib_dl_dladdr = yes; then
   cs_header_text="${cs_header_text}#define CS_HAVE_DLADDR
-"
-fi
-
-fi
-
-if test $ac_cv_lib_nsl_gethostbyname = yes; then
-  cs_build_prop_val="-lnsl"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    	        if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
 "
 fi
 
