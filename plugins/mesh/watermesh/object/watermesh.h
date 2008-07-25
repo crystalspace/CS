@@ -66,6 +66,7 @@ private:
   // The render mesh holder is used by GetRenderMeshes() to supply
   // render meshes that can be returned by that function.
 	csFrameDataHolder<csDirtyAccessArray<csRenderMesh*> > meshesHolder;
+	csArray<csRenderCell> meshQueue;
 	csRenderMeshHolder rmHolder;
 
   // The standard render buffer holder. It takes care of giving
@@ -150,6 +151,8 @@ private:
   void DrawFromNode(csOceanNode start, const csVector3 camPos);
   void DrawLeftFromNode(csOceanNode start, const csVector3 camPos);
   void DrawRightFromNode(csOceanNode start, const csVector3 camPos);
+  void DrawTopFromNode(csOceanNode start, const csVector3 camPos);
+  void DrawBottomFromNode(csOceanNode start, const csVector3 camPos);
 
   void AddNode(csOceanNode start, float dist);
 

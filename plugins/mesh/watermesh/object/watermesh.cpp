@@ -269,65 +269,60 @@ void csWaterMeshObject::AddNode(csOceanNode start, float dist)
 	else
 		useCell = 0;
 	
+	csRenderCell nextCell;
+	nextCell.cell = useCell;
+	nextCell.pos = start.gc;
 	
-	// csTransform trans;
-	// trans.Translate(csVector3(start.gc.x, 0, start.gc.y));
-	// 
-	// bool rmCreated;
-	// renderMeshes.Push(rmHolder.GetUnusedMesh (rmCreated,
-	// 		rview->GetCurrentFrameNumber ()));
-	// 
-	// renderMeshes[i]->mixmode = MixMode;
-	// renderMeshes[i]->clip_portal = clip_portal;
-	// renderMeshes[i]->clip_plane = clip_plane;
-	// renderMeshes[i]->clip_z_plane = clip_z_plane;
-	// renderMeshes[i]->do_mirror = camera->IsMirrored ();
-	// renderMeshes[i]->meshtype = CS_MESHTYPE_TRIANGLES;
-	// renderMeshes[i]->indexstart = 0;
-	// renderMeshes[i]->indexend = factory->cells[useCell].GetNumIndexes();
-	// renderMeshes[i]->material = material;		
-	// renderMeshes[i]->worldspace_origin = wo;
-	// 
-	// renderMeshes[i]->geometryInstance = (void*)factory;
-	// 
-	// if (rmCreated)
-	// {
-	// 	renderMeshes[i]->buffers = factory->cells[useCell].bufferHolder;
-	// 	renderMeshes[i]->variablecontext = variableContext;
-	// }
-	// renderMeshes[i]->object2world = o2world * trans;
-	// 
-	// //update shader variable
-	//   	o2wtVar = variableContext->GetVariableAdd(strings->Request("o2w transform"));
-	//   	o2wtVar->SetType(csShaderVariable::MATRIX);
-	//   	o2wtVar->SetValue(renderMeshes[i]->object2world);
-	// 
-	// trans.Translate(csVector3(0, 0, CELL_WID));
+	meshQueue.Push(nextCell);
 }
 
 void csWaterMeshObject::DrawFromNode(csOceanNode start, const csVector3 camPos)
 {
 	float distFromCam = start.GetCenter().Distance(camPos);
-	if(distFromCam > MAX_OCEAN_DISTANCE)
+	if(distFromCam > MAX_OCEAN_DISTANCE) //Check culling
 		return;
 	else
 	{
 		AddNode(start, distFromCam);
-		DrawRightFromNode(start, camPos);
-		DrawLeftFromNode(start, camPos);
-		
-		DrawRightFromNode(start.GetUp(), camPos);
-		DrawLeftFromNode(start.GetUp(), camPos);
-		
-		DrawRightFromNode(start.GetDown(), camPos);
-		DrawLeftFromNode(start.GetDown(), camPos);
+		DrawRightFromNode(start.GetRight(), camPos);
+		DrawLeftFromNode(start.GetLeft(), camPos);
+		DrawBottomFromNode(start.GetDown(), camPos);
+		DrawTopFromNode(start.GetUp(), camPos);
 	}
+}
+
+void csWaterMeshObject::DrawTopFromNode(csOceanNode start, const csVector3 camPos)
+{
+	float distFromCam = start.GetCenter().Distance(camPos);
+	if(distFromCam > MAX_OCEAN_DISTANCE) //Check culling
+		return;
+	else
+	{
+		AddNode(start, distFromCam);
+		DrawRightFromNode(start.GetRight(), camPos);
+		DrawLeftFromNode(start.GetLeft(), camPos);
+		DrawTopFromNode(start.GetUp(), camPos);
+	}
+}
+
+void csWaterMeshObject::DrawBottomFromNode(csOceanNode start, const csVector3 camPos)
+{
+	float distFromCam = start.GetCenter().Distance(camPos);
+	if(distFromCam > MAX_OCEAN_DISTANCE) //Check culling
+		return;
+	else
+	{
+		AddNode(start, distFromCam);
+		DrawRightFromNode(start.GetRight(), camPos);
+		DrawLeftFromNode(start.GetLeft(), camPos);
+		DrawBottomFromNode(start.GetDown(), camPos);
+	}	
 }
 
 void csWaterMeshObject::DrawRightFromNode(csOceanNode start, const csVector3 camPos)
 {
 	float distFromCam = start.GetCenter().Distance(camPos);
-	if(distFromCam > MAX_OCEAN_DISTANCE)
+	if(distFromCam > MAX_OCEAN_DISTANCE) //Check culling
 		return;
 	else
 	{
@@ -339,7 +334,7 @@ void csWaterMeshObject::DrawRightFromNode(csOceanNode start, const csVector3 cam
 void csWaterMeshObject::DrawLeftFromNode(csOceanNode start, const csVector3 camPos)
 {
 	float distFromCam = start.GetCenter().Distance(camPos);
-	if(distFromCam > MAX_OCEAN_DISTANCE)
+	if(distFromCam > MAX_OCEAN_DISTANCE) //Check culling
 		return;
 	else
 	{
@@ -444,10 +439,15 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
 		
 		csOceanNode start (csVector2(nearX, nearZ), CELL_LEN, CELL_WID);
 		
-		//DrawFromNode(start);
+		DrawFromNode(start, camPos);
 		
-		for(uint i = 0; i < 2; i++)
+		int i = 0;
+		while(!(meshQueue.IsEmpty()))
 		{
+			csRenderCell nextCell = meshQueue.Pop();
+			trans.Identity();
+			trans.Translate(csVector3(nextCell.pos.x, 0.0, nextCell.pos.y));
+			
 			bool rmCreated;
 			renderMeshes.Push(rmHolder.GetUnusedMesh (rmCreated,
 					rview->GetCurrentFrameNumber ()));
@@ -459,13 +459,13 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
 			renderMeshes[i]->do_mirror = camera->IsMirrored ();
 			renderMeshes[i]->meshtype = CS_MESHTYPE_TRIANGLES;
 			renderMeshes[i]->indexstart = 0;
-			renderMeshes[i]->indexend = factory->cells[4-i].GetNumIndexes();
+			renderMeshes[i]->indexend = factory->cells[nextCell.cell].GetNumIndexes();
 			renderMeshes[i]->material = material;		
 			renderMeshes[i]->worldspace_origin = wo;
 
 			renderMeshes[i]->geometryInstance = (void*)factory;
 
-			renderMeshes[i]->buffers = factory->cells[4].bufferHolder;
+			renderMeshes[i]->buffers = factory->cells[nextCell.cell].bufferHolder;
 			
 			//Clone shader variable to provide each mesh with its own o2wt 			
 			csRef<csShaderVariableContext> newVarCtxt;
@@ -484,8 +484,8 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
 		  	o2wtVar = renderMeshes[i]->variablecontext->GetVariableAdd(strings->Request("o2w transform"));
 		  	o2wtVar->SetType(csShaderVariable::MATRIX);
 		  	o2wtVar->SetValue(renderMeshes[i]->object2world);
-			
-			trans.Translate(csVector3(0, 0, CELL_WID));
+		
+			i++;
 		}
 	}
 	else

@@ -110,6 +110,12 @@ namespace WaterMesh
 		
 		void CalculateBBox();
 	};
+	
+	typedef struct renderCell
+	{
+		int cell;
+		csVector2 pos;
+	} csRenderCell;
 }
 }
 }
