@@ -115,6 +115,11 @@ public:
     csString HexString() const;
     /// Returns an uppercase hex-string representing the raw digest data.
     csString HEXString() const;
+    
+    bool operator==(const Digest& other) const
+    { return memcmp (data, other.data, sizeof (data)) == 0; }
+    bool operator!=(const Digest& other) const
+    { return memcmp (data, other.data, sizeof (data)) != 0; }
   };
 
   /// Encode a string.
