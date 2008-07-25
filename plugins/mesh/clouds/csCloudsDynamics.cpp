@@ -380,6 +380,7 @@ const bool csCloudsDynamics::DoComputationSteps(const UINT iStepCount, const flo
 			//60 iterations
 			case 7: SolvePoissonPressureEquation(30); break;
 			case 8: SolvePoissonPressureEquation(30); break;
+			//Subtruction of the pressure gradient from velocity
 			case 9: MakeVelocityFieldDivergenceFree(); break;
 			case 10: SatisfyVelocityBoundaryCond(); break;
 		}
