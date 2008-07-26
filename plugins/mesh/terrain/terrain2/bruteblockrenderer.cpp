@@ -1211,7 +1211,7 @@ void csTerrainBruteBlockRenderer::OnMaterialMaskUpdate (iTerrainCell* cell,
 
   csRef<TerrainCellRData> data = (TerrainCellRData*)cell->GetRenderData ();
 
-  if (data)
+  if (data && materialPalette)
   {    
     // Iterate and build all the alpha-masks    
     for (size_t i = 0; i < materialPalette->GetSize (); ++i)
@@ -1641,7 +1641,7 @@ void csTerrainBruteBlockRenderer::SetupCellMMArrays (iTerrainCell* cell)
 
   csRef<TerrainCellRData> data = (TerrainCellRData*)cell->GetRenderData ();
 
-  if (data)
+  if (data && materialPalette)
   {
     size_t numMats = materialPalette->GetSize ();
 
