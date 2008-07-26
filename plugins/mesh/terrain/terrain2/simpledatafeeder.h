@@ -49,14 +49,17 @@ struct csTerrainSimpleDataFeederProperties
   virtual const char* GetParameterValue (const char* name);
   virtual csPtr<iTerrainCellFeederProperties> Clone ();
 
-  size_t GetAlphaMapCount() { return alphaMaps.GetSize(); }
+  virtual size_t GetAlphaMapCount() { return alphaMaps.GetSize(); }
 
-  const char* GetAlphaMapMaterial (size_t index)
+  virtual const char* GetAlphaMapMaterial (size_t index)
   { return alphaMaps[index].material; }
 
-  const char* GetAlphaMapSource (size_t index)
+  virtual const char* GetAlphaMapSource (size_t index)
   { return alphaMaps[index].alphaSource; }
-  const char* GetAlphaMapSource (const char* material);
+  virtual const char* GetAlphaMapSource (const char* material);
+
+  virtual void SetHeightmapSmooth (bool doSmooth);  
+  virtual bool GetHeightmapSmooth () const;
   
   csString heightmapSource, heightmapFormat, materialmapSource;
 
@@ -68,6 +71,8 @@ struct csTerrainSimpleDataFeederProperties
   csArray<AlphaPair> alphaMaps;
 
   float heightOffset;
+
+  bool smoothHeightmap;
 };
 
 class csTerrainSimpleDataFeeder :
