@@ -147,7 +147,7 @@ CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [$LDFLAGS], [+])
 
 
 #------------------------------------------------------------------------------
-# Check for typical required libraries (libm, libmx, libdl, libnsl).
+# Check for typical required libraries (libc, libm, libmx, libdl, libnsl).
 #------------------------------------------------------------------------------
 AC_LANG_PUSH([C++])
 AC_CHECK_HEADERS([cmath], [CS_HEADER_PROPERTY([CS_HAVE_CMATH_H])])

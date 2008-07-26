@@ -134,7 +134,7 @@ AC_DEFUN([CS_CHECK_COMMON_TOOLS_ICONS],
 
 #------------------------------------------------------------------------------
 # CS_CHECK_COMMON_LIBS([EMITTER])
-#       Check for typical required libraries (libm, libmx, libdl,
+#       Check for typical required libraries (libc, libm, libmx, libdl,
 #	libnsl). Results of the checks are recorded under build key
 #	"COMPILER.LFLAGS" via CS_EMIT_BUILD_PROPERTY() using the optional
 #	EMITTER. If EMITTER is omitted, then CS_EMIT_BUILD_PROPERTY()'s default
@@ -142,6 +142,10 @@ AC_DEFUN([CS_CHECK_COMMON_TOOLS_ICONS],
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_COMMON_LIBS],
     [AC_LANG_PUSH([C])
+
+    AC_CHECK_LIB([c], [fopen])
+    AS_IF([test $ac_cv_lib_c_fopen = yes],
+	[CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lc], [append],[],[$1])])
 
     AC_CHECK_LIB([m], [pow], [cs_cv_libm_libs=-lm], [cs_cv_libm_libs=])
     AC_CHECK_LIB([m], [cosf], [cs_cv_libm_libs=-lm])
