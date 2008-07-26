@@ -14013,21 +14013,22 @@ fi
 
 
     if test -n "$PYTHON" && test "$with_python" != no; then
-  { echo "$as_me:$LINENO: checking for python SDK" >&5
-echo $ECHO_N "checking for python SDK... $ECHO_C" >&6; }
-if test "${cs_cv_python_sdk+set}" = set; then
+  { echo "$as_me:$LINENO: checking Python version" >&5
+echo $ECHO_N "checking Python version... $ECHO_C" >&6; }
+if test "${cs_cv_pyver+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  cs_pyver=`{ (echo "$as_me:$LINENO: \$PYTHON -c 'import sys, string; \\
+  cs_cv_pyver=`{ (echo "$as_me:$LINENO: \$PYTHON -c 'import sys, string; \\
 		print string.join(map(str,sys.version_info[:2]),\".\")'") >&5
   ($PYTHON -c 'import sys, string; \
 		print string.join(map(str,sys.version_info[:2]),".")') 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }`
-	    cs_cv_pybase="python${cs_pyver}"
-
-	    cs_build_prop_val="$cs_pyver"
+fi
+{ echo "$as_me:$LINENO: result: $cs_cv_pyver" >&5
+echo "${ECHO_T}$cs_cv_pyver" >&6; }
+	cs_build_prop_val="$cs_cv_pyver"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}PYTHON.VERSION ?= $cs_build_prop_val ;
@@ -14035,6 +14036,12 @@ else
 fi
 
 
+	{ echo "$as_me:$LINENO: checking for python SDK" >&5
+echo $ECHO_N "checking for python SDK... $ECHO_C" >&6; }
+if test "${cs_cv_python_sdk+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cs_cv_pybase="python${cs_cv_pyver}"
 	    cs_cv_pybase_cflags=`{ (echo "$as_me:$LINENO: \$PYTHON -c \\
 		'import distutils.sysconfig; \\
 		print \"-I\" + distutils.sysconfig.get_python_inc()'") >&5
@@ -14107,7 +14114,7 @@ fi
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }`
 
-	    if test -n "$cs_pyver" &&
+	    if test -n "$cs_cv_pyver" &&
 		   test -n "$cs_cv_pybase_cflags" &&
 		   test -n "$cs_cv_pybase_lflags_base$cs_cv_pybase_sysprefix_lflags"; then
   cs_cv_python_sdk=yes
