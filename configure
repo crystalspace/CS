@@ -11853,6 +11853,8 @@ else
 fi
 
 
+
+
 #------------------------------------------------------------------------------
 # Check for SIMD flags
 #------------------------------------------------------------------------------
@@ -12497,11 +12499,10 @@ fi
 fi
 
 
-
 if test -n "$cs_cv_prog_cc_mmmx"; then
   if test "" != yes; then
-  { echo "$as_me:$LINENO: checking checking for mmintrin.h" >&5
-echo $ECHO_N "checking checking for mmintrin.h... $ECHO_C" >&6; }
+  { echo "$as_me:$LINENO: checking for mmintrin.h" >&5
+echo $ECHO_N "checking for mmintrin.h... $ECHO_C" >&6; }
 if test "${cs_cv_header_mmintrin_h+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -12652,8 +12653,8 @@ fi
 { echo "$as_me:$LINENO: result: $cs_cv_header_mmintrin_h" >&5
 echo "${ECHO_T}$cs_cv_header_mmintrin_h" >&6; }
 else
-  { echo "$as_me:$LINENO: checking checking for mmintrin.h" >&5
-echo $ECHO_N "checking checking for mmintrin.h... $ECHO_C" >&6; }
+  { echo "$as_me:$LINENO: checking for mmintrin.h" >&5
+echo $ECHO_N "checking for mmintrin.h... $ECHO_C" >&6; }
 	    ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -12819,6 +12820,8 @@ else
 fi
 
 fi
+
+
 
 
 #------------------------------------------------------------------------------
@@ -13084,6 +13087,7 @@ case $cs_host_family in
     esac
 cs_header_text="${cs_header_text}#define CS_PLATFORM_NAME \"$cs_host_os_normalized\"
 "
+
 
 
 #------------------------------------------------------------------------------
