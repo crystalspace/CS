@@ -219,10 +219,12 @@ CS_CHECK_RTLD
 #------------------------------------------------------------------------------
 # Check for SIMD flags
 #------------------------------------------------------------------------------
-
-CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx], [CS_CREATE_TUPLE([-mmmx])])
-CS_CHECK_BUILD_FLAGS([for -msse flag], [cs_cv_prog_cc_msse], [CS_CREATE_TUPLE([-msse])])
-CS_CHECK_BUILD_FLAGS([for -msse2 flag], [cs_cv_prog_cc_msse2], [CS_CREATE_TUPLE([-msse2])])
+CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx],
+    [CS_CREATE_TUPLE([-mmmx])])
+CS_CHECK_BUILD_FLAGS([for -msse flag], [cs_cv_prog_cc_msse],
+    [CS_CREATE_TUPLE([-msse])])
+CS_CHECK_BUILD_FLAGS([for -msse2 flag], [cs_cv_prog_cc_msse2],
+    [CS_CREATE_TUPLE([-msse2])])
 CS_CHECK_BUILD_FLAGS([for -mfpmath=sse flag], [cs_cv_prog_cc_mfpmath_sse],
     [CS_CREATE_TUPLE([-mfpmath=sse])])
 
