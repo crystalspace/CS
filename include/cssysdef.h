@@ -942,6 +942,10 @@ namespace CS
     #    else
       _asm int 3;
     #    endif
+    #  elif defined (CS_PROCESSOR_POWERPC)
+    // Source: http://cocoawithlove.com/2008/03/break-into-debugger.html
+      asm("li r0, 20\nsc\nnop\nli r0, 37\nli r4, 2\nsc\nnop\n"
+           : : : "memory","r0","r3","r4" );
     #  else
       static int x = 0; x /= x;
     #  endif
