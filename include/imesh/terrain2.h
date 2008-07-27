@@ -189,7 +189,7 @@ struct iTerrainCellRenderProperties : public virtual iShaderVariableContext
  */
 struct iTerrainCellFeederProperties : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainCellFeederProperties, 3, 0, 2);
+  SCF_INTERFACE (iTerrainCellFeederProperties, 3, 1, 0);
   
   /**
    * Set heightmap source.
@@ -247,6 +247,11 @@ struct iTerrainCellFeederProperties : public virtual iBase
   /// Get source of an alpha map
   virtual const char* GetAlphaMapSource (size_t index) = 0;
   virtual const char* GetAlphaMapSource (const char* material) = 0;
+  //@}
+
+  //@{
+  virtual void SetHeightmapSmooth (bool doSmooth) = 0;
+  virtual bool GetHeightmapSmooth () const = 0;
   //@}
 };
 
