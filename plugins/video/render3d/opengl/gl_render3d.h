@@ -290,6 +290,7 @@ private:
   CS::ShaderVarStringID string_point_scale;
   CS::ShaderVarStringID string_texture_diffuse;
   CS::ShaderVarStringID string_world2camera;
+  CS::ShaderVarStringID string_world2camera_inv;
 
   csConfigAccess config;
 

@@ -1006,6 +1006,7 @@ bool csGLGraphics3D::Open ()
   string_point_scale = strings->Request ("point scale");
   string_texture_diffuse = strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
   string_world2camera = strings->Request ("world2camera transform");
+  string_world2camera_inv = strings->Request ("world2camera transform inverse");
 
   /* @@@ All those default textures, better put them into the engine? */
 
@@ -1735,6 +1736,7 @@ void csGLGraphics3D::SetWorldToCamera (const csReversibleTransform& w2c)
   float m[16];
 
   shadermgr->GetVariableAdd (string_world2camera)->SetValue (w2c);
+  shadermgr->GetVariableAdd (string_world2camera_inv)->SetValue (w2c.GetInverse());
 
   makeGLMatrix (world2camera, m);
   statecache->SetMatrixMode (GL_MODELVIEW);
