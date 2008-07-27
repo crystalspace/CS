@@ -36,6 +36,7 @@ namespace lighter
     lighterProperties.directionalLMs = false;
     lighterProperties.numThreads = CS::Platform::GetProcessorCount();
     lighterProperties.saveBinaryBuffers = true;
+    lighterProperties.checkDupes = true;
 
     lmProperties.lmDensity = 4.0f;
     lmProperties.maxLightmapU = 1024;
@@ -63,6 +64,8 @@ namespace lighter
       lighterProperties.directionalLMs);
     lighterProperties.numThreads = cfgFile->GetInt ("lighter2.NumThreads", 
       lighterProperties.numThreads);
+    lighterProperties.checkDupes = cfgFile->GetBool ("lighter2.CheckDupes",
+      lighterProperties.checkDupes);
 
     lmProperties.lmDensity = cfgFile->GetFloat ("lighter2.lmDensity", 
       lmProperties.lmDensity);
