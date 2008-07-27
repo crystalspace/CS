@@ -2015,22 +2015,32 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* libnode,
         break;
       case XMLTOKEN_MESHFACT:
         {
-          csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (
-	    child->GetAttributeValue ("name"));
-	  if (t)
-	  {
-	    if (!LoadMeshObjectFactory (ldr_context, t, 0, child, 0, ssource))
-	    {
-	      // Error is already reported.
-	      return false;
-	    }
-	    else
-	    {
-	      AddToRegionOrCollection (ldr_context, t->QueryObject ());
-	    }
-	  }
-	}
-	break;
+          const char* meshfactname = child->GetAttributeValue ("name");
+          if(ldr_context->CheckDupes ())
+          {
+            iMeshFactoryWrapper* mfw = Engine->FindMeshFactory (meshfactname);
+            if(mfw)
+            {
+              AddToRegionOrCollection (ldr_context, mfw->QueryObject ());
+              break;
+            }
+          }
+
+          csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (meshfactname);
+          if (t)
+          {
+            if (!LoadMeshObjectFactory (ldr_context, t, 0, child, 0, ssource))
+            {
+              // Error is already reported.
+              return false;
+            }
+            else
+            {
+              AddToRegionOrCollection (ldr_context, t->QueryObject ());
+            }
+          }
+        }
+        break;
       case XMLTOKEN_PLUGINS:
 	if (!LoadPlugins (child))
 	  return false;
