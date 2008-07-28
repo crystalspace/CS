@@ -39646,6 +39646,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iTerrainCellFeederProperties_SetHeightmapSmooth(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainCellFeederProperties *arg1 = (iTerrainCellFeederProperties *) 0 ;
+  bool arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  bool val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellFeederProperties_SetHeightmapSmooth",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellFeederProperties, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellFeederProperties_SetHeightmapSmooth" "', argument " "1"" of type '" "iTerrainCellFeederProperties *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainCellFeederProperties * >(argp1);
+  ecode2 = SWIG_AsVal_bool(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iTerrainCellFeederProperties_SetHeightmapSmooth" "', argument " "2"" of type '" "bool""'");
+  } 
+  arg2 = static_cast< bool >(val2);
+  (arg1)->SetHeightmapSmooth(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTerrainCellFeederProperties_GetHeightmapSmooth(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTerrainCellFeederProperties *arg1 = (iTerrainCellFeederProperties *) 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainCellFeederProperties_GetHeightmapSmooth",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainCellFeederProperties, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainCellFeederProperties_GetHeightmapSmooth" "', argument " "1"" of type '" "iTerrainCellFeederProperties const *""'"); 
+  }
+  arg1 = reinterpret_cast< iTerrainCellFeederProperties * >(argp1);
+  result = (bool)((iTerrainCellFeederProperties const *)arg1)->GetHeightmapSmooth();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iTerrainCellFeederProperties_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -51216,6 +51268,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iTerrainCellFeederProperties_GetAlphaMapCount", _wrap_iTerrainCellFeederProperties_GetAlphaMapCount, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCellFeederProperties_GetAlphaMapMaterial", _wrap_iTerrainCellFeederProperties_GetAlphaMapMaterial, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCellFeederProperties_GetAlphaMapSource", _wrap_iTerrainCellFeederProperties_GetAlphaMapSource, METH_VARARGS, NULL},
+	 { (char *)"iTerrainCellFeederProperties_SetHeightmapSmooth", _wrap_iTerrainCellFeederProperties_SetHeightmapSmooth, METH_VARARGS, NULL},
+	 { (char *)"iTerrainCellFeederProperties_GetHeightmapSmooth", _wrap_iTerrainCellFeederProperties_GetHeightmapSmooth, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCellFeederProperties_scfGetVersion", _wrap_iTerrainCellFeederProperties_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iTerrainCellFeederProperties", _wrap_delete_iTerrainCellFeederProperties, METH_VARARGS, NULL},
 	 { (char *)"iTerrainCellFeederProperties_swigregister", iTerrainCellFeederProperties_swigregister, METH_VARARGS, NULL},
