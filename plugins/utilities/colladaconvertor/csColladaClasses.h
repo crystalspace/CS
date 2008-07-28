@@ -202,7 +202,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     csColladaAccessor* GetVertexAccessor() { return vertexAccessor; }
     csColladaAccessor* GetNormalAccessor() { return normalAccessor; }
 
-    bool WriteXML(iDocument* xmlDoc);
+    bool WriteXML(iDocumentNode* xmlDoc);
 
     /** \brief Process a COLLADA mesh node and construct a csColladaMesh object
     *

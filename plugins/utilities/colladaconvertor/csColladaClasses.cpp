@@ -737,7 +737,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     numberOfVertices++;
   }
 
-  bool csColladaMesh::WriteXML(iDocument* xmlDoc)
+  bool csColladaMesh::WriteXML(iDocumentNode* xmlDoc)
   { 
     if (parent->warningsOn)
     {
@@ -750,7 +750,15 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     int vertexArraySize = 0;
     //int normalArraySize = 0;
 
-    csRef<iDocumentNode> csTopNode = xmlDoc->GetRoot();
+    csRef<iDocumentNode> csTopNode = xmlDoc->GetNode("library");
+    if(!csTopNode)
+    {
+      csTopNode = xmlDoc->GetNode("world");
+      if(!csTopNode)
+      {
+        csTopNode = xmlDoc;
+      }
+    }    
 
     // Adding vertices to CS document
     vertexArray = GetVertices();
@@ -793,12 +801,12 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     }
 
     // create meshfact and plugin (top-level) nodes
-    csRef<iDocumentNode> meshFactNode = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    csRef<iDocumentNode> meshFactNode = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT);
     meshFactNode->SetValue("meshfact");
     meshFactNode->SetAttribute("name", GetName().GetData());
-    csRef<iDocumentNode> pluginNode = meshFactNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    csRef<iDocumentNode> pluginNode = meshFactNode->CreateNodeBefore(CS_NODE_ELEMENT);
     pluginNode->SetValue("plugin");
-    csRef<iDocumentNode> pluginContents = pluginNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+    csRef<iDocumentNode> pluginContents = pluginNode->CreateNodeBefore(CS_NODE_TEXT);
     pluginContents->SetValue(GetPluginType().GetData());
 
     if (parent->warningsOn)
@@ -841,7 +849,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       scfString formatter;
 
       // positions
-      currentCrystalVElement = currentCrystalParamsElement->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      currentCrystalVElement = currentCrystalParamsElement->CreateNodeBefore(CS_NODE_ELEMENT);
       currentCrystalVElement->SetValue("v");
       formatter.Format("%f", vertexArray[counter].x);
       currentCrystalVElement->SetAttribute(vertAccess->Get(0), formatter.GetData());
@@ -894,7 +902,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       currentTri = &tris[triCounter];
 
       // create a t element
-      csRef<iDocumentNode> currentTElement = currentCrystalParamsElement->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> currentTElement = currentCrystalParamsElement->CreateNodeBefore(CS_NODE_ELEMENT);
 
       if (!currentTElement.IsValid())
       {

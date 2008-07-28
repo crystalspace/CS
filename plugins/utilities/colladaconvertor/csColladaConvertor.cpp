@@ -584,7 +584,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
         mesh = new csColladaMesh(currentMeshElement, this);
 
-        mesh->WriteXML(csFile);
+        mesh->WriteXML(csTopNode);
 
         delete mesh;
       }
@@ -726,7 +726,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     {
       currentVisualSceneElement = visualSceneIterator->Next();
       const char* sceneName = currentVisualSceneElement->GetAttributeValue("name");
-      csRef<iDocumentNode> currentSectorElement = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> currentSectorElement = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT);
       currentSectorElement->SetValue("sector");
       currentSectorElement->SetAttribute("name", sceneName);
     }
