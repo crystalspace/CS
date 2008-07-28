@@ -86,7 +86,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     csRef<iDocumentNode> csTopNode;
 
     /// Whether or not the Crystal Space file has been loaded and is ready
-    bool csReady;
+    bool csOutputReady;
 
     /// The output file type.  Initially, this is set to CS_FILE_NONE.
     csColladaFileType outputFileType;

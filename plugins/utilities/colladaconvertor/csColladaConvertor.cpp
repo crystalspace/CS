@@ -71,17 +71,16 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
   {
     std::string filePath = str;
     size_t index = filePath.find(".", 0);
+
     if (index == std::string::npos)
     {
       Report(CS_REPORTER_SEVERITY_WARNING, "Warning:  No file extension detected on filename.  File is possibly not a COLLADA file.");
     }
-
     else
     {
       std::string ext = filePath.substr(index);
-      std::string expectedExt = ".dae";
 
-      if (!(ext == expectedExt))
+      if (ext != ".dae" && ext != ".DAE")
       {
         std::string warningMsg = "Warning:  File extension \'";
         warningMsg.append(ext);
@@ -105,7 +104,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     warningsOn(false),
     obj_reg(0),
     lastEffectId(-1),
-    csReady(false),
+    csOutputReady(false),
     outputFileType(CS_NO_FILE),
     colladaReady(false)      
   {
@@ -220,6 +219,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     }
 
     colladaElement = rootNode;
+    csOutputReady = false;
     colladaReady = true;
 
     return 0;
@@ -239,6 +239,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     }  
 
     colladaElement = rootNode;
+    csOutputReady = false;
     colladaReady = true;
 
     return 0;
@@ -249,12 +250,12 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
   const char* csColladaConvertor::Write(const char* filepath)
   {
     // sanity check
-    if (!csReady)
+    if (!csOutputReady)
     {
       if (warningsOn)
       {
         Report(CS_REPORTER_SEVERITY_WARNING,
-	    "Warning: Crystal Space document not ready for writing.");
+          "Warning: Crystal Space document not ready for writing.");
       }
 
       return "Crystal Space document not ready for writing";
@@ -396,7 +397,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       csTopNode = csFile->GetRoot()->GetNode("library");
     }
 
-    csReady = true;
+    csOutputReady = true;
     return true;
   }
 
@@ -412,17 +413,19 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
   const char* csColladaConvertor::Convert()
   {
-    if (!csReady)
+    if (!csOutputReady)
     {
-      if (warningsOn)
+      if (!InitializeCrystalSpaceDocument())
       {
-        Report(CS_REPORTER_SEVERITY_NOTIFY, "Crystal Space document not yet initialized.  Attempting to initialize...");
-        if (!InitializeCrystalSpaceDocument())
+        if (warningsOn)
         {
           Report(CS_REPORTER_SEVERITY_ERROR, "Error: Unable to initialize output document.");
-          return "Unable to initialize output document";
         }
-        else
+        return "Unable to initialize output document";
+      }
+      else
+      {
+        if (warningsOn)
         {
           Report(CS_REPORTER_SEVERITY_NOTIFY, "Success.");
         }
