@@ -48,7 +48,7 @@ namespace WaterMesh
 
 class csWaterMeshObjectFactory;
 
-#define WATER_SIZE	16
+#define WATER_SIZE  16
 #define WATER_VERTS (WATER_SIZE * WATER_SIZE)
 #define WATER_TRIS (2 * (WATER_SIZE - 1) * (WATER_SIZE - 1)) 
 
@@ -65,9 +65,9 @@ class csWaterMeshObject :
 private:
   // The render mesh holder is used by GetRenderMeshes() to supply
   // render meshes that can be returned by that function.
-	csFrameDataHolder<csDirtyAccessArray<csRenderMesh*> > meshesHolder;
-	csArray<csRenderCell> meshQueue;
-	csRenderMeshHolder rmHolder;
+  csFrameDataHolder<csDirtyAccessArray<csRenderMesh*> > meshesHolder;
+  csArray<csRenderCell> meshQueue;
+  csRenderMeshHolder rmHolder;
 
   // The standard render buffer holder. It takes care of giving
   // the renderer all required renderbuffers.
@@ -195,8 +195,8 @@ public:
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
     csVector3& isect, float *pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr, int* polygon_idx = 0,
-	iMaterialWrapper** material = 0);
+    csVector3& isect, float* pr, int* polygon_idx = 0,
+  iMaterialWrapper** material = 0);
   virtual void SetMeshWrapper (iMeshWrapper* lp)
   {
     logparent = lp;
@@ -230,7 +230,7 @@ public:
   {
   }
 
-  bool vertsChanged;	
+  bool vertsChanged;  
   void UpdateWater(iCamera *cam);
   /** @} */
 
@@ -251,7 +251,7 @@ public:
     }
     virtual ~RenderBufferAccessor () { }
     virtual void PreGetBuffer (csRenderBufferHolder* holder,
-    	csRenderBufferName buffer)
+      csRenderBufferName buffer)
     {
       if (parent) parent->PreGetBuffer (holder, buffer);
     }
@@ -278,24 +278,24 @@ class csWaterMeshObjectFactory :
 
 private:
   // The actual data.
-	//Near patch and local water
-	csDirtyAccessArray<csVector3> verts;
-	csDirtyAccessArray<csVector3> norms;
-	csDirtyAccessArray<csVector2> texs;
-	csDirtyAccessArray<csColor>	cols;
-	csDirtyAccessArray<csTriangle> tris;
-	
-	//Far patch for ocean water
-	csDirtyAccessArray<csVector3> far_verts;
-	csDirtyAccessArray<csVector3> far_norms;
-	csDirtyAccessArray<csVector2> far_texs;
-	csDirtyAccessArray<csColor>	far_cols;
-	csDirtyAccessArray<csTriangle> far_tris;
-	
-	//Ocean cells
-	csArray<csOceanCell> cells;
-	
-	int numVerts, numTris;
+  //Near patch and local water
+  csDirtyAccessArray<csVector3> verts;
+  csDirtyAccessArray<csVector3> norms;
+  csDirtyAccessArray<csVector2> texs;
+  csDirtyAccessArray<csColor>  cols;
+  csDirtyAccessArray<csTriangle> tris;
+  
+  //Far patch for ocean water
+  csDirtyAccessArray<csVector3> far_verts;
+  csDirtyAccessArray<csVector3> far_norms;
+  csDirtyAccessArray<csVector2> far_texs;
+  csDirtyAccessArray<csColor>  far_cols;
+  csDirtyAccessArray<csTriangle> far_tris;
+  
+  //Ocean cells
+  csArray<csOceanCell> cells;
+  
+  int numVerts, numTris;
 
 
 
@@ -337,19 +337,19 @@ private:
 
   waterMeshType type;
 
-	//Ocean Attributes
-		//Amplitudes
-		float amps[NUM_WAVE_FUNCS];
-	
-		//Frequencies
-		float freqs[NUM_WAVE_FUNCS];
-		
-		//Phases
-		float phases[NUM_WAVE_FUNCS];
-		
-		//Directional vectors
-		csVector2 k1, k2, k3;
-	
+  //Ocean Attributes
+    //Amplitudes
+    float amps[NUM_WAVE_FUNCS];
+  
+    //Frequencies
+    float freqs[NUM_WAVE_FUNCS];
+    
+    //Phases
+    float phases[NUM_WAVE_FUNCS];
+    
+    //Directional vectors
+    csVector2 k1, k2, k3;
+  
 
   // Buffers for the renderers.
   csRef<iRenderBuffer> vertex_buffer;
@@ -389,7 +389,7 @@ public:
   csRef<iMeshObjectType> water_type;
   csFlags flags;
 
-  bool changedVerts;	
+  bool changedVerts;  
 
   bool amplitudes_changed;
   bool frequencies_changed;
@@ -400,49 +400,49 @@ public:
 
   /// Constructor.
   csWaterMeshObjectFactory (iMeshObjectType *pParent,
-  	iObjectRegistry* object_reg);
+    iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csWaterMeshObjectFactory ();
 
   /**\name iWaterFactoryState implementation
    * @{ */
-   csVector3* GetVertices () { return vertices; }
-   csVector2* GetTexels () { return texels; }
-   csVector3* GetNormals () { return normals; }
-   csColor* GetColors () { return colors; }
-   csTriangle* GetTriangles () { return triangles; }
+  csVector3* GetVertices () { return vertices; }
+  csVector2* GetTexels () { return texels; }
+  csVector3* GetNormals () { return normals; }
+  csColor* GetColors () { return colors; }
+  csTriangle* GetTriangles () { return triangles; }
   void Invalidate ();
 
-	void SetLength(uint length);
-	uint GetLength() { return len; }
+  void SetLength(uint length);
+  uint GetLength() { return len; }
 
-	void SetWidth(uint width);
-	uint GetWidth() { return wid; }
-	
-	void SetGranularity(uint granularity);
-	uint GetGranularity() { return gran; }
-	
-	void SetMurkiness(float murk);
-	float GetMurkiness();
-	
-	 void SetWaterType(waterMeshType waterType);
-	
-	void SetAmplitudes(float amp1, float amp2, float amp3);	
-	void SetFrequencies(float freq1, float freq2, float freq3);	
-	void SetPhases(float phase1, float phase2, float phase3);	
-	void SetDirections(csVector2 dir1, csVector2 dir2, csVector2 dir3);
-	
-	 csRef<iTextureWrapper> MakeFresnelTex(int size);
-	
-	//Under the hood functions
-	csVector3 GetFrequencies() { return csVector3(freqs[0], freqs[1], freqs[2]); }
-	csVector3 GetPhases() { return csVector3(phases[0], phases[1], phases[2]); }
-	csVector3 GetDirsX() { return csVector3(k1.x, k2.x, k3.x); }
-	csVector3 GetDirsY() { return csVector3(k1.y, k2.y, k3.y); }
-	csVector3 GetAmplitudes() { return csVector3(amps[0], amps[1], amps[2]); }
-	inline bool isOcean() { return type == WATER_TYPE_OCEAN; }
-	
+  void SetWidth(uint width);
+  uint GetWidth() { return wid; }
+  
+  void SetGranularity(uint granularity);
+  uint GetGranularity() { return gran; }
+  
+  void SetMurkiness(float murk);
+  float GetMurkiness();
+  
+  void SetWaterType(waterMeshType waterType);
+  
+  void SetAmplitudes(float amp1, float amp2, float amp3);  
+  void SetFrequencies(float freq1, float freq2, float freq3);  
+  void SetPhases(float phase1, float phase2, float phase3);  
+  void SetDirections(csVector2 dir1, csVector2 dir2, csVector2 dir3);
+  
+  csRef<iTextureWrapper> MakeFresnelTex(int size);
+  
+  //Under the hood functions
+  csVector3 GetFrequencies() { return csVector3(freqs[0], freqs[1], freqs[2]); }
+  csVector3 GetPhases() { return csVector3(phases[0], phases[1], phases[2]); }
+  csVector3 GetDirsX() { return csVector3(k1.x, k2.x, k3.x); }
+  csVector3 GetDirsY() { return csVector3(k1.y, k2.y, k3.y); }
+  csVector3 GetAmplitudes() { return csVector3(amps[0], amps[1], amps[2]); }
+  inline bool isOcean() { return type == WATER_TYPE_OCEAN; }
+  
   /** @} */
 
   const csBox3& GetObjectBoundingBox ();
