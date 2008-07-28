@@ -8,9 +8,7 @@ load models.
 
 @menu
 * HOWTO Level Loading:: Loading a Level
-* XML File Format:: Format of Map File (@sc{xml})
 * XML Syntax Services:: @sc{xml} Syntax Services
-* Old Map File Format:: Old Format of Map File
 * Binary XML:: Binary @sc{xml}
 * Model Loading:: Loading @sc{3ds} and @sc{md2} Models
 @end menu
