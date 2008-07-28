@@ -37,6 +37,8 @@ namespace lighter
   void PhotonMap::AddPhoton(const csColor& color, const csVector3& dir,
                             const csVector3& pos)
   {
+    photons.Push(new Photon(color, dir, pos));
+    /*
     // check to see if we are the first photon to be added
     if (!root)
     {
@@ -85,14 +87,30 @@ namespace lighter
 
       direction = (direction + 1) % 3;
     }
+    */
   }
 
 
   csColor PhotonMap::SampleColor(const csVector3& pos,  float radius, 
                                  const csVector3& normal)
   {
-    csArray<Photon> nearest = NearestNeighbor(pos, radius, photonsPerSample);
-    csColor final;
+    CS::Utility::PriorityQueue<Photon> que;
+    csArray<Photon> nearest;
+    for (size_t num=0; num < photons.GetSize(); ++num)
+    {
+      csVector3 dist = pos - photons[num]->position;
+      photons[num]->distance = dist.SquaredNorm();
+      que.Insert(*photons[num]);
+    }
+
+    // remove as many element as it takes
+    while (nearest.GetSize() <= photonsPerSample && !que.IsEmpty())
+    {
+      nearest.Push(que.Pop());
+    }
+    
+    //csArray<Photon> nearest = NearestNeighbor(pos, radius, photonsPerSample);
+    csColor final(0,0,0);
 
     // loop through the nearest photons and based on their normal 
     // add their color to the final returned value
@@ -103,7 +121,7 @@ namespace lighter
 
       // Check to make sure the two vectors aren't radically different or 
       // possibly on the other side of a surface
-      if (!(app < 0))
+      if (!(app < .5))
       {
         // The wpc can be changed for filtering, default for now
         float wpc = 1.0;
@@ -117,10 +135,11 @@ namespace lighter
     if (nearest.GetSize() != 0)
     {
       // TODO: Need to lookup constant value of pi somewhere....
-      float area = radius / 3.14159;
-      final = final * area;
+      float area = (1.0 / (radius * radius * 3.14159));
+      final = final * area * (1.0 / nearest.GetSize());
     }
     return final;
+    
   }
 
   csArray<Photon> PhotonMap::NearestNeighbor(const csVector3& pos, 
@@ -144,7 +163,7 @@ namespace lighter
 
       if (totalDist < radSquared)
       {
-        Photon p = *current;
+        Photon p(current->color, current->direction, current->position);
         p.distance = totalDist;
         que.Insert(p);
       }
@@ -228,7 +247,7 @@ namespace lighter
 
   Photon::~Photon()
   {
-    if (left != 0) delete left;
-    if (right != 0) delete right;
+    //if (left != 0) delete left;
+    //if (right != 0) delete right;
   }
 }

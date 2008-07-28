@@ -127,6 +127,8 @@ namespace lighter
     // The root of the tree
     Photon *root;
 
+    csArray<Photon*> photons;
+
   };
 
 };

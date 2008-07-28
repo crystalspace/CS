@@ -358,7 +358,14 @@ namespace lighter
 
   void Lighter::BuildPhotonMap()
   {
-    lighter::GlobalIllumination lighting;
+    // check to see if we are doing GI
+    if (!globalConfig.GetLighterProperties().indirectLMs)
+    {
+      return;
+    }
+
+    lighter::GlobalIllumination 
+      lighting(globalConfig.GetIndirectProperties());
     // Starting from the lights
     SectorHash::GlobalIterator sectIt = 
       scene->GetSectors ().GetIterator ();
@@ -465,6 +472,12 @@ namespace lighter
 
   void Lighter::DoIndirectIllumination()
   {
+    // check to see if we are doing GI
+    if (!globalConfig.GetLighterProperties().indirectLMs)
+    {
+      return;
+    }
+
     // iterate over all sectors
     SectorHash::GlobalIterator sectIt = 
       scene->GetSectors().GetIterator();

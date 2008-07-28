@@ -1991,8 +1991,15 @@ namespace lighter
   }
 
   void Sector::EmitPhoton(const csVector3& pos, const csVector3& dir,
-                          const csColor& color, const csColor& power)
+                          const csColor& color, const csColor& power,
+                          const size_t& depth)
   {
+    // check depth, if its over a given limit then lets stop emitting
+    if (depth > 10)
+    {
+      return;
+    }
+
     // TODO: Need to expand on this for checks for portals
     lighter::HitPoint hit;
     hit.distance = FLT_MAX*0.9f;
@@ -2039,7 +2046,7 @@ namespace lighter
         // the surface it hits
         csColor newColor = color;
         csColor newPower = power;
-        EmitPhoton(hit.hitPoint, newDir, newColor, newPower);
+        EmitPhoton(hit.hitPoint, newDir, newColor, newPower, depth+1);
       }
     }
     

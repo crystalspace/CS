@@ -82,9 +82,11 @@ namespace lighter
     * /param dir - the direction we are tracing
     * /param color - the color of the photon
     * /param power - the power of the current photon
+    * /param depth - how deep this call currently is
     */
     void EmitPhoton(const csVector3& pos, const csVector3& dir,
-                    const csColor& color, const csColor& power);
+                    const csColor& color, const csColor& power,
+                    const size_t& depth = 0);
 
     // All objects in sector
     ObjectHash allObjects;

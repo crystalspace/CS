@@ -35,6 +35,9 @@ namespace lighter
   {
     finalGather = config.finalGather;
     numFinalGatherRays = config.numFinalGatherRays;
+    searchRadius = config.sampleDistance;
+    //searchRadius = 0.1f;
+    numPhotonsPerLight = config.numPhotons;
   }
 	
   void GlobalIllumination::ShadeIndirectLighting(Sector *sect)
@@ -69,7 +72,6 @@ namespace lighter
           // Iterate all elements
           for (size_t eidx = 0; eidx < numElements; ++eidx)
           {
-            //const float elArea = areas.GetElementArea (eidx);
             Primitive::ElementType elemType = prim.GetElementType (eidx);
 
             ElementProxy ep = prim.GetElement (eidx);
@@ -78,7 +80,6 @@ namespace lighter
             u += size_t (floorf (minUV.x));
             v += size_t (floorf (minUV.y));
 
-            //float pixelArea = (elArea*area2pixel);
             const float pixelAreaPart = 
               elemType == Primitive::ELEMENT_BORDER ? prim.ComputeElementFraction (eidx) : 
                                                       1.0f;
@@ -86,7 +87,6 @@ namespace lighter
             // Get the position, radius,and normal to pull from
             csVector3 pos = ep.primitive.ComputeElementCenter(ep.element);
             // TODO: Pull this attribute from an outside source
-            float radius = 1.0f;
             csVector3 normal = ep.primitive.ComputeNormal(pos);
 
             // Pull the color from the photon map
@@ -106,7 +106,8 @@ namespace lighter
                   lighter::HitPoint hit;
                   hit.distance = FLT_MAX*0.9f;
                   lighter::Ray ray;
-                  ray.direction = randVect.Get();
+                  ray.direction = randVect.Get() + normal;
+                  ray.direction.Normalize();
                   ray.origin = pos;
                   ray.minLength = 0.01f;
 
@@ -118,7 +119,7 @@ namespace lighter
                       csVector3 hNorm = 
                         hit.primitive->ComputeNormal(hit.hitPoint);
                       final += 
-                        sect->photonMap->SampleColor(hit.hitPoint, radius, hNorm);
+                        sect->photonMap->SampleColor(hit.hitPoint, searchRadius, hNorm);
                     }
                   }
                 }
@@ -127,24 +128,20 @@ namespace lighter
               }
               else
               {
-                c = sect->photonMap->SampleColor(pos, radius, normal);
+                c = sect->photonMap->SampleColor(pos, searchRadius, normal);
               }
             }
             
             normalLM->SetAddPixel (u, v, c * pixelAreaPart);
+            //normalLM->SetAddPixel (u, v, c);
           }
         }
       }
-    }
-
-    
+    }  
   }
 
   void GlobalIllumination::EmitPhotons(Sector *sect)
   {
-    // TODO: Pull from some other area
-    int photonsToEmitPerLight = 1000;
-
     // emit from the lights
     const LightRefArray& allNonPDLights = sect->allNonPDLights;
     for (size_t pdli = 0; pdli < allNonPDLights.GetSize(); ++pdli)
@@ -157,12 +154,14 @@ namespace lighter
 
       // send out photons in random directions since we only have point
       // lights at this point
-      for (size_t num = 0; num < photonsToEmitPerLight; ++num)
+      for (size_t num = 0; num < numPhotonsPerLight; ++num)
       {
         // generate new random direction vector
         dir = randVect.Get();
         sect->EmitPhoton(pos, dir, color, power);
       }
     }
+
+    int temp = 0;
   }
 }

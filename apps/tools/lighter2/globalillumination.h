@@ -78,6 +78,8 @@ namespace lighter
     csRandomVectorGen randVect;
     bool finalGather;
     int numFinalGatherRays;
+    float searchRadius;
+    int numPhotonsPerLight;
   };
 
 }

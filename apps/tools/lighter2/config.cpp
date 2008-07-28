@@ -47,12 +47,12 @@ namespace lighter
     diProperties.pointLightMultiplier = 1.0f;
     diProperties.areaLightMultiplier = 1.0f;
 		
-    indtLightProperties.numPhotons = 10000;
-    indtLightProperties.numPerSample = 25;
-    indtLightProperties.sampleDistance = 0.25f;
+    indtLightProperties.numPhotons = 200;
+    indtLightProperties.numPerSample = 30;
+    indtLightProperties.sampleDistance = 0.1f;
 
-    indtLightProperties.finalGather = false;
-    indtLightProperties.numFinalGatherRays = 8;
+    indtLightProperties.finalGather = true;
+    indtLightProperties.numFinalGatherRays = 30;
   }
 
   void Configuration::Initialize (iConfigFile* _cfgFile)
