@@ -126,15 +126,14 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
   {
     obj_reg = reg;
 
-
     // create our own document system, since we will be reading and
     // writing to the XML files
     docSys = new csTinyDocumentSystem();
 
     // get a pointer to the virtual file system
-    fileSys = csQueryRegistry<iVFS>(obj_reg);
+    fileSys = csQueryRegistryOrLoad<iVFS>(obj_reg, "crystalspace.kernel.vfs");
 
-    return true;
+    return fileSys.IsValid();
   }
 
   // =============== File Loading ===============
@@ -142,13 +141,6 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
   const char* csColladaConvertor::Load(const char *str)
   {
     csRef<iFile> filePtr;
-
-    if (!fileSys.IsValid())
-    {
-      Report(CS_REPORTER_SEVERITY_WARNING,
-	  "Unable to access file system.  File not loaded.");
-      return "Unable to access file system";
-    }
 
     // only do a consistency check for collada filename if warnings are on
     if (warningsOn)

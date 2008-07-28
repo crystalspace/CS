@@ -19,11 +19,8 @@
 #include <cssysdef.h>
 
 #include "cstool/initapp.h"
-
 #include "ivaria/collada.h"
 
-#define CS_REQUEST_COLLADA CS_REQUEST_PLUGIN("crystalspace.utilities.colladaconvertor", \
-                                             iColladaConvertor)
 #define COLLADA_VERSION "1.4"
 
 CS_IMPLEMENT_APPLICATION
@@ -37,9 +34,8 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  csInitializer::RequestPlugins(object_reg, CS_REQUEST_COLLADA, CS_REQUEST_END);
-
-  csRef<iColladaConvertor> collada = csQueryRegistry<iColladaConvertor>(object_reg);
+  csRef<iColladaConvertor> collada = csQueryRegistryOrLoad<iColladaConvertor>(object_reg,
+    "crystalspace.utilities.colladaconvertor");
   if(!collada)
   {
     printf("Collada plugin failed to load!\n");
@@ -61,34 +57,44 @@ int main(int argc, char** argv)
 
   printf("Collada %s to Crystal Space Convertor\n\n", COLLADA_VERSION);
 
-  for(size_t i=0; i<args.GetSize(); i++)
+  if(args[0].Compare("--help") || args[0].Compare("-help"))
   {
-    if(args[i].Compare("-library"))
+    printf("Options:\n");
+    printf("-library Export the following files as library files.\n");
+    printf("-map Export the following files as world files.\n\n");
+    printf("Usage: collada2cs(.exe) -map file1.dae file2.dae -library file3.dae file4.dae\n");
+  }
+  else
+  {
+    for(size_t i=0; i<args.GetSize(); i++)
     {
-      collada->SetOutputFiletype(CS_LIBRARY_FILE);
-    }
-    else if(args[i].Compare("-map"))
-    {
-      collada->SetOutputFiletype(CS_MAP_FILE);
-    }
-    else
-    {
-      printf("File %u of %u:\n", i+1, args.GetSize());
-      csString fileIn = "/this/";
-      fileIn.Append(args[i]);
-      csString fileOut = fileIn;
+      if(args[i].Compare("-library"))
+      {
+        collada->SetOutputFiletype(CS_LIBRARY_FILE);
+      }
+      else if(args[i].Compare("-map"))
+      {
+        collada->SetOutputFiletype(CS_MAP_FILE);
+      }
+      else
+      {
+        printf("File %u of %u:\n", i+1, args.GetSize());
+        csString fileIn = "/this/";
+        fileIn.Append(args[i]);
+        csString fileOut = fileIn;
 
-      fileOut.Truncate(fileOut.FindLast('.'));
-      fileOut.Append(".xml");
+        fileOut.Truncate(fileOut.FindLast('.'));
+        fileOut.Append(".xml");
 
-      printf("- Loading file: %s\n", args[i].GetData());
-      collada->Load(fileIn);
+        printf("- Loading file: %s\n", args[i].GetData());
+        collada->Load(fileIn);
 
-      printf("- Converting\n");
-      collada->Convert();
+        printf("- Converting\n");
+        collada->Convert();
 
-      printf("- Writing file: %s\n\n", fileOut.GetData());
-      collada->Write(fileOut);
+        printf("- Writing file: %s\n\n", fileOut.GetData());
+        collada->Write(fileOut);
+      }
     }
   }
 
