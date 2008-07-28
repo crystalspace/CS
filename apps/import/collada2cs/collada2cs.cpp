@@ -62,7 +62,8 @@ int main(int argc, char** argv)
     printf("Options:\n");
     printf("-library Export the following files as library files.\n");
     printf("-map Export the following files as world files.\n\n");
-    printf("Usage: collada2cs(.exe) -map file1.dae file2.dae -library file3.dae file4.dae\n");
+    printf("-out Output file path.\n");
+    printf("Usage: collada2cs(.exe) -map file1.dae file2.dae -library file3.dae -out out.xml file4.dae\n");
   }
   else
   {
@@ -76,15 +77,28 @@ int main(int argc, char** argv)
       {
         collada->SetOutputFiletype(CS_MAP_FILE);
       }
+      else if(args[i].Compare("-out"))
+      {
+        i++;
+        continue;
+      }
       else
       {
         printf("File %u of %u:\n", i+1, args.GetSize());
         csString fileIn = "/this/";
         fileIn.Append(args[i]);
-        csString fileOut = fileIn;
 
-        fileOut.Truncate(fileOut.FindLast('.'));
-        fileOut.Append(".xml");
+        csString fileOut;
+        if(i+2 < args.GetSize() && args[i+1].Compare("-out"))
+        {
+          fileOut = args[i+2].GetData();
+        }
+        else
+        {
+          fileOut = args[i].GetData();
+          fileOut.Truncate(fileOut.FindLast('.'));
+          fileOut.Append(".xml");
+        }
 
         printf("- Loading file: %s\n", args[i].GetData());
         collada->Load(fileIn);
@@ -93,7 +107,7 @@ int main(int argc, char** argv)
         collada->Convert();
 
         printf("- Writing file: %s\n\n", fileOut.GetData());
-        collada->Write(fileOut);
+        collada->Write(csString().Format("/this/%s", fileOut.GetData()));
       }
     }
   }
