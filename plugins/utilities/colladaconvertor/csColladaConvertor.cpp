@@ -43,7 +43,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
   SCF_IMPLEMENT_FACTORY(csColladaConvertor)
 
     // =============== Error Reporting and Handling Functions ===============
-    void csColladaConvertor::Report(int severity, const char* msg, ...)
+  void csColladaConvertor::Report(int severity, const char* msg, ...)
   {
     va_list argList;
     va_start(argList, msg);
@@ -430,7 +430,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       return "COLLADA file not loaded";
     }
 
-    // ConvertMaterials() needs to be called first, so that there actually *is* a materials
+    // ConvertEffects() needs to be called first, so that there actually *is* a materials
     // list from which to assign materials in ConvertGeometry()
     csRef<iDocumentNode> materialsNode = colladaElement->GetNode("library_materials");
     if (!materialsNode.IsValid())
@@ -441,14 +441,14 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
     if (warningsOn)
     {
-      Report(CS_REPORTER_SEVERITY_WARNING, "Beginning to convert materials");
+      Report(CS_REPORTER_SEVERITY_WARNING, "Beginning to convert effects.");
     }
 
-    ConvertMaterials(materialsNode);
+    ConvertEffects();
 
     if (warningsOn)
     {
-      Report(CS_REPORTER_SEVERITY_WARNING, "Done converting materials");
+      Report(CS_REPORTER_SEVERITY_WARNING, "Done converting effects.");
     }
 
     csRef<iDocumentNode> geoNode = colladaElement->GetNode("library_geometries");
@@ -619,106 +619,92 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     return returnValue;
   }
 
-  // ConvertEffects() will become the dominant function for use with COLLADA
-  // materials/effects conversion, but as of right now, it's broken.  ;)
-  bool csColladaConvertor::ConvertEffects(iDocumentNode *effectsSection)
+  // ConvertEffects() is the generic function for converting textures, materials, shaders
+  // and all related items.
+  bool csColladaConvertor::ConvertEffects()
   {
     Report(CS_REPORTER_SEVERITY_WARNING, "Warning: ConvertEffects() functionality not fully implemented.  Use at your own risk!");
 
-    csRef<iDocumentNodeIterator> effectsToProcess = effectsSection->GetNodes("effect");
-    csRef<iDocumentNode> currentEffect;
-
-    csColladaEffect* currentEffectObject;
-
-    while (effectsToProcess->HasNext())
+    // Convert textures
+    csRef<iDocumentNode> imagesNode = colladaElement->GetNode("library_images");
+    if(imagesNode.IsValid())
     {
-      currentEffect = effectsToProcess->Next();
-      currentEffectObject = new csColladaEffect(currentEffect, this);
+      csRef<iDocumentNode> texturesNode = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT);
+      texturesNode->SetValue("textures");
+      csRef<iDocumentNodeIterator> textureNodes = imagesNode->GetNodes("image");
+      while(textureNodes->HasNext())
+      {
+        csRef<iDocumentNode> texture = textureNodes->Next();
+        csRef<iDocumentNode> newTexture = texturesNode->CreateNodeBefore(CS_NODE_ELEMENT);
+        newTexture->SetValue("texture");
+        newTexture->SetAttribute("name", texture->GetAttributeValue("id"));
+
+        csRef<iDocumentNode> textureFile = newTexture->CreateNodeBefore(CS_NODE_ELEMENT);
+        textureFile->SetValue("file");
+
+        csRef<iDocumentNode> textureFileContents = textureFile->CreateNodeBefore(CS_NODE_TEXT);
+        textureFileContents->SetValue(texture->GetAttributeValue("id"));
+
+        // TODO: Alpha, Class.
+      }
     }
 
-    return true;
-  }
-
-  // Eventually, I think, ConvertMaterials() will become deprecated in favor
-  // of ConvertEffects, as this is more generalized.  However, for the sake
-  // of simplicity in the initial materials conversion, I added this function
-  // so that I didn't have to convert all of the shaders.
-  bool csColladaConvertor::ConvertMaterials(iDocumentNode *materialsSection)
-  {
-    Report(CS_REPORTER_SEVERITY_WARNING, "Warning: ConvertMaterials() functionality not fully implemented.  Use at your own risk!");
-
-    // get an iterator over all the <material> elements
-    csRef<iDocumentNodeIterator> materialsElements = materialsSection->GetNodes("material");
-    csRef<iDocumentNode> nextMaterialElement;
-    csColladaMaterial* nextMaterial;
-    csRef<iDocumentNode> effectNode;
-    csRef<iDocumentNode> libraryEffects = colladaElement->GetNode("library_effects");
-    csRef<iDocumentNodeIterator> effectIter;
-    csRef<iDocumentNode> materialsNode = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT);
-    materialsNode->SetValue("materials");
-
-    while (materialsElements->HasNext())
+    // Convert materials
+    csRef<iDocumentNode> materialsNode = colladaElement->GetNode("library_materials");
+    csRef<iDocumentNode> effectsNode = colladaElement->GetNode("library_effects");
+    if(materialsNode.IsValid() && effectsNode.IsValid())
     {
-      nextMaterialElement = materialsElements->Next();
-      nextMaterial = new csColladaMaterial(this);
-      nextMaterial->SetID(nextMaterialElement->GetAttributeValue("id"));
+      csRef<iDocumentNode> newMaterialsNode = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT);
+      newMaterialsNode->SetValue("materials");
 
-      scfString url = nextMaterialElement->GetNode("instance_effect")->GetAttributeValue("url");
+      csRef<iDocumentNodeIterator> materialNodes = materialsNode->GetNodes("material");
+      csRef<iDocumentNodeIterator> effectNodes = effectsNode->GetNodes("effect");
 
-      // chop off the '#'
-      if (url.GetAt(0) == '#')
+      while(materialNodes->HasNext() && effectNodes->HasNext())
       {
-        url.DeleteAt(0, 1);
-      }
+        csRef<iDocumentNode> material = materialNodes->Next();
+        csRef<iDocumentNode> effect = effectNodes->Next();
 
-      // now, find the same effect in the <library_effects> list
-      effectIter = libraryEffects->GetNodes("effect");
-      while (effectIter->HasNext())
-      {
-        effectNode = effectIter->Next();
-        scfString newUrl = effectNode->GetAttributeValue("id");
-        if (newUrl.Compare(url))
+        csRef<iDocumentNode> newMaterial = newMaterialsNode->CreateNodeBefore(CS_NODE_ELEMENT);
+        newMaterial->SetValue("material");
+        newMaterial->SetAttribute("name", material->GetAttributeValue("id"));
+
+        csColladaMaterial nextMaterial = csColladaMaterial(this);
+        nextMaterial.SetID(material->GetAttributeValue("id"));
+        //nextMaterial.SetInstanceEffect(effect); // Needs work.
+        materialsList.Push(nextMaterial);
+
+        // Common profile.
+        csRef<iDocumentNode> effectCommon = effect->GetNode("profile_COMMON");
+        if(effectCommon.IsValid())
         {
-          break;
+          csRef<iDocumentNode> surface;
+          csRef<iDocumentNodeIterator> newparams = effectCommon->GetNodes("newparam");
+          while(newparams->HasNext())
+          {
+            csRef<iDocumentNode> surface = newparams->Next()->GetNode("surface");
+            if(!surface)
+            {
+              continue;
+            }
+
+            if(surface->GetNode("init_from"))
+            {
+              csRef<iDocumentNode> texture = newMaterial->CreateNodeBefore(CS_NODE_ELEMENT);
+              texture->SetValue("texture");
+              csRef<iDocumentNode> textureContents = texture->CreateNodeBefore(CS_NODE_TEXT);
+              textureContents->SetValue(surface->GetNode("init_from")->GetContentsValue());
+            }
+          }
         }
+
+        // TODO: Shaders.
       }
 
-      nextMaterial->SetInstanceEffect(effectNode);
-      materialsList.Push(*nextMaterial);
-
-      csRef<iDocumentNode> newNode = materialsNode->CreateNodeBefore(CS_NODE_ELEMENT);
-      newNode->SetValue("material");
-      newNode->SetAttribute("name", nextMaterial->GetID());
-      csRef<iDocumentNode> colorNode = newNode->CreateNodeBefore(CS_NODE_ELEMENT);
-      colorNode->SetValue("color");
-      csRGBcolor diffuseColor = nextMaterial->GetInstanceEffect()->GetProfile("profile_COMMON")->GetDiffuseColor();
-
-      if (warningsOn)
-      {
-        Report(CS_REPORTER_SEVERITY_NOTIFY, "Outputting color: %d, %d, %d", diffuseColor.red, diffuseColor.green, diffuseColor.blue);
-      }
-
-      csString outputString;
-      outputString = outputString.Format("%d", diffuseColor.red);
-      colorNode->SetAttribute("red", outputString.GetData());
-      outputString = outputString.Format("%d", diffuseColor.green);
-      colorNode->SetAttribute("green", outputString.GetData());
-      outputString = outputString.Format("%d", diffuseColor.blue);
-      colorNode->SetAttribute("blue", outputString.GetData());
-
-
-      /*
-      csColladaEffectProfile* prof = nextMaterial->GetInstanceEffect()->GetProfile("profile_COMMON");
-      if (warningsOn)
-      {
-      Report(CS_REPORTER_SEVERITY_NOTIFY, "Profile name: %s", prof->GetName()->GetData()); 
-      }
-      */
-
-      //delete nextMaterial;
+      return true;
     }
 
-    return true;
+    return false;
   }
 
   bool csColladaConvertor::ConvertScene(iDocumentNode *camerasSection, iDocumentNode *lightsSection, iDocumentNode *visualScenesSection)

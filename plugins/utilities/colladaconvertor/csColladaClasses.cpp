@@ -327,12 +327,6 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       t.y = temp[1];
 
       toStore.Put(toStore.GetSize(), t);
-      //toStore.Push(t);
-    }
-
-    if (parent->warningsOn)
-    {
-      parent->Report(CS_REPORTER_SEVERITY_WARNING, "toStore[32]: (%f, %f)", toStore[32].x, toStore[32].y);
     }
 
     delete[] temp;
@@ -544,11 +538,10 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     }
 
     // we need to perform a sanity check, in the event someone forgot to 
-    // call ConvertMaterials(), otherwise we have the potential for a segfault
+    // call ConvertEffects(), otherwise we have the potential for a segfault
     if (parent->materialsList.IsEmpty())
     {
-      csRef<iDocumentNode> materialsNode = parent->GetColladaDocument()->GetRoot()->GetNode("library_materials");
-      parent->ConvertMaterials(materialsNode);
+      parent->ConvertEffects();
     }
 
     /* BEGIN POLYGONS PROCESSING - THIS NEEDS WORK*/
@@ -1287,14 +1280,6 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
       RetrieveOtherData();
 
-      if (parent->warningsOn)
-      {
-        if (textureOffset != -1)
-        {
-          parent->Report(CS_REPORTER_SEVERITY_WARNING, "Value of textures[32]: (%f, %f)", textures[32].x, textures[32].y);
-        }
-      }
-
       // let's make sure RestructureVertices works...
       if (parent->warningsOn)
       {
@@ -1592,7 +1577,6 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     {
       currentProfile = profilesToProcess->Next();
       currentProfileObject = new csColladaEffectProfile(currentProfile, parent);
-      //scfString* nameString = new scfString("profile_COMMON");
       currentProfileObject->SetName("profile_COMMON");
       profiles.Push((*currentProfileObject));
     }

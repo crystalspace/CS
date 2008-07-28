@@ -213,8 +213,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
     virtual const char* Convert();
     virtual bool ConvertGeometry(iDocumentNode *geometrySection);
-    virtual bool ConvertEffects(iDocumentNode *effectsSection);
-    virtual bool ConvertMaterials(iDocumentNode *materialsSection);
+    virtual bool ConvertEffects();
     virtual bool ConvertRiggingAnimation(iDocumentNode *riggingSection);
     virtual bool ConvertPhysics(iDocumentNode *physicsSection);
     virtual bool ConvertScene(iDocumentNode *camerasSection, iDocumentNode *lightsSection, iDocumentNode *visualScenesSection);
