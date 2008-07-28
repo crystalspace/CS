@@ -33,7 +33,7 @@ namespace lighter
   {
     //Setup defaults
     lighterProperties.doDirectLight = true;
-		lighterProperties.indirectLMs = false;
+    lighterProperties.indirectLMs = false;
     lighterProperties.directionalLMs = false;
     lighterProperties.numThreads = 1;
 
@@ -47,9 +47,9 @@ namespace lighter
     diProperties.pointLightMultiplier = 1.0f;
     diProperties.areaLightMultiplier = 1.0f;
 		
-    indtLightProperties.numPhotons = 200;
-    indtLightProperties.numPerSample = 30;
-    indtLightProperties.sampleDistance = 0.1f;
+    indtLightProperties.numPhotons = 10000;
+    indtLightProperties.numPerSample = 500;
+    indtLightProperties.sampleDistance = 1.5f;
 
     indtLightProperties.finalGather = true;
     indtLightProperties.numFinalGatherRays = 30;

@@ -80,6 +80,11 @@ namespace lighter
             u += size_t (floorf (minUV.x));
             v += size_t (floorf (minUV.y));
 
+            if (elemType == Primitive::ELEMENT_EMPTY)
+            {                     
+              continue;
+            }
+
             const float pixelAreaPart = 
               elemType == Primitive::ELEMENT_BORDER ? prim.ComputeElementFraction (eidx) : 
                                                       1.0f;

@@ -134,9 +134,8 @@ namespace lighter
     // Now as long as we have photons returned multiply by area / PI
     if (nearest.GetSize() != 0)
     {
-      // TODO: Need to lookup constant value of pi somewhere....
-      float area = (1.0 / (radius * radius * 3.14159));
-      final = final * area * (1.0 / nearest.GetSize());
+      float area = (1.0 / (radius * radius * PI));
+      final = final * area * (1.0 / (0.5f * nearest.GetSize()));
     }
     return final;
     
