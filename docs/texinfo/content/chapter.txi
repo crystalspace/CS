@@ -26,3 +26,4 @@
 @imports{content,mdl2spr.txi}
 @importss{content,sprites,3dsprite.txi}
 @imports{content,viewmesh.txi}
+@importss{content,mapformat,chapter.txi}
