@@ -1,6 +1,6 @@
 <!--
-  Copyright (C) 2007 by Frank Richter
-	    (C) 2007 by Jorrit Tyberghein
+  Copyright (C) 2008 by Frank Richter
+	    (C) 2008 by Jorrit Tyberghein
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -26,12 +26,17 @@
     <input file="/shader/snippets/worldToCameraInv.inp" private="yes" />
     
     <block location="cg:vertexMain">
-      float4 eyePosWorld = worldToCameraInv[3];
+      /* @@@ FIXME: inefficient! Using a shader expression
+         (matrix-column "world2camera transform inverse" 3) should be possible,
+	 too ... however, both gl3d and Cg plugin convert transforms into
+	 4x4 matrices in some bizarro way where the 4th column is different.
+       */
+      float4 eyePosWorld = mul (worldToCameraInv, float4 (0, 0, 0, 1));
       eyeDirectionWorld = (position - eyePosWorld).xyz;
     </block>
   
     <block location="cg:fragmentMain">
-      float4 eyePosWorld = worldToCameraInv[3];
+      float4 eyePosWorld = mul (worldToCameraInv, float4 (0, 0, 0, 1));
       eyeDirectionWorld = (position - eyePosWorld).xyz;
     </block>
   
