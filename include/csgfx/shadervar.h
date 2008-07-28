@@ -360,6 +360,27 @@ public:
     return false;
   }
 
+  /// Retrieve a CS::Math::Matrix4
+  bool GetValue (CS::Math::Matrix4& value)
+  {
+    if (accessor) 
+      accessor->PreGetValue (this);
+
+    if (Type == MATRIX)
+    {
+      value = *MatrixValuePtr;
+      return true;
+    }
+    else if (Type == TRANSFORM)
+    {
+      value = *TransformPtr;
+      return true;
+    }
+    
+    value = CS::Math::Matrix4();    
+    return false;
+  }
+
 
   /// Store an int
   bool SetValue (int value) 
