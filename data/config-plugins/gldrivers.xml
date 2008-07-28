@@ -560,11 +560,10 @@
       -->
     <rule description="NVidia: RECT texture extension apparently broken">
       <conditions fulfill="all">
-	<regexp	string="vendor" pattern="NVIDIA" />
-	<regexp string="platform" pattern="Win32" />
+        <regexp string="vendor" pattern="NVIDIA" />
       </conditions>
       <applicable>
-	<usecfg>disableRECTTextures</usecfg>
+	  <usecfg>disableRECTTextures</usecfg>
       </applicable>
     </rule>
 
