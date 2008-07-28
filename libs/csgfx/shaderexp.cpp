@@ -84,7 +84,10 @@ enum
 
   OP_FUNC_TIME,
   OP_FUNC_FRAME,
-
+  
+  OP_FUNC_MATRIX_COLUMN,
+  OP_FUNC_MATRIX_ROW,
+  
   // Pseudo-ops, special case weird stuff
   OP_PS_MAKE_VECTOR,
 
@@ -129,6 +132,8 @@ static const char* const opNames[OP_LAST] = {
   "MAX",
   "TIME",
   "FRAME",
+  "MATRIXCOLUMN",
+  "MATRIXROW",
   "!MAKEVECTOR",
   "!LIMIT",
   "!ATOM",
@@ -147,6 +152,7 @@ enum
   TYPE_VECTOR3,
   TYPE_VECTOR4,
   TYPE_VARIABLE, // a shader variable
+  TYPE_MATRIX,
 
   TYPE_LIMIT,
 
@@ -167,6 +173,7 @@ static const char* const typeNames[TYPE_LAST] = {
   "vec3",
   "vec4",
   "var",
+  "matrix",
   "!limit",
   "!oper",
   "!cons",
@@ -232,6 +239,9 @@ static const op_args_info optimize_arg_table[] =
 
   { 0, 0, false }, // OP_FUNC_TIME
   { 0, 0, false }, // OP_FUNC_FRAME
+  
+  { 2, 2, false }, // OP_FUNC_MATRIX_COLUMN
+  { 2, 2, false }, // OP_FUNC_MATRIX_ROW
 
   { 2, 4, false }, // OP_PS_MAKE_VECTOR
 
@@ -768,6 +778,12 @@ bool csShaderExpression::eval_variable(csShaderVariable * var, oper_arg & out)
     out.type = TYPE_VECTOR4;
     var->GetValue(out.vec4);
     break;
+    
+  case csShaderVariable::TRANSFORM:
+  case csShaderVariable::MATRIX:
+    out.type = TYPE_MATRIX;
+    var->GetValue(out.matrix);
+    break;
 
   default:
     EvalError ("Unknown type %d in shader variable, not usable in an expression.", 
@@ -873,6 +889,8 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg arg2, oper_
   case OP_FUNC_POW: return eval_pow(arg1, arg2, output);
   case OP_FUNC_MIN: return eval_min(arg1, arg2, output);
   case OP_FUNC_MAX: return eval_max(arg1, arg2, output);
+  case OP_FUNC_MATRIX_COLUMN: return eval_matrix_column(arg1, arg2, output);
+  case OP_FUNC_MATRIX_ROW: return eval_matrix_row(arg1, arg2, output);
   case OP_INT_SELT12: return eval_selt12(arg1, arg2, output);
   case OP_INT_SELT34: return eval_selt34(arg1, arg2, output);
 
@@ -1404,6 +1422,72 @@ bool csShaderExpression::eval_frame(oper_arg & output) const
   return true;
 }
 
+bool csShaderExpression::eval_matrix_column(const oper_arg & arg1, 
+                                            const oper_arg & arg2,
+  	                                    oper_arg & output) const
+{
+  if (arg1.type != TYPE_MATRIX)
+  {
+    EvalError ("Argument 1 to matrix-column is not a matrix.");
+
+    return false;
+  }
+
+  if (arg2.type != TYPE_NUMBER)
+  {
+    EvalError ("Argument 2 to matrix-column is not a number.");
+
+    return false;
+  }
+
+  int colIndex = int (arg2.num);
+  if ((colIndex < 0) || (colIndex > 3))
+  {
+    EvalError ("Argument 2 to matrix-column is not between 0 and 3 inclusive.");
+
+    return false;
+  }
+
+  output.type = TYPE_VECTOR4;
+  output.vec4 = arg1.matrix.Col (colIndex);
+
+  return true;
+  
+}
+  	
+bool csShaderExpression::eval_matrix_row (const oper_arg & arg1, 
+                                          const oper_arg & arg2,
+  	                                  oper_arg & output) const
+{
+  if (arg1.type != TYPE_MATRIX)
+  {
+    EvalError ("Argument 1 to matrix-row is not a matrix.");
+
+    return false;
+  }
+
+  if (arg2.type != TYPE_NUMBER)
+  {
+    EvalError ("Argument 2 to matrix-row is not a number.");
+
+    return false;
+  }
+
+  int rowIndex = int (arg2.num);
+  if ((rowIndex < 0) || (rowIndex > 3))
+  {
+    EvalError ("Argument 2 to matrix-row is not between 0 and 3 inclusive.");
+
+    return false;
+  }
+
+  output.type = TYPE_VECTOR4;
+  output.vec4 = arg1.matrix.Row (rowIndex);
+
+  return true;
+  
+}
+  	
 bool csShaderExpression::eval_selt12(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const 
 {
   if (arg1.type != TYPE_NUMBER || arg2.type != TYPE_NUMBER)
@@ -2312,6 +2396,8 @@ static const TokenTabEntry commonTokens[] = {
   {"floor", 5, OP_FUNC_FLOOR},
   {"frame", 5, OP_FUNC_FRAME},
   {"make-vector", 11, OP_PS_MAKE_VECTOR},
+  {"matrix-column", 13, OP_FUNC_MATRIX_COLUMN},
+  {"matrix-row", 10, OP_FUNC_MATRIX_ROW},
   {"max", 3, OP_FUNC_MAX},
   {"min", 3, OP_FUNC_MIN},
   {"norm", 4, OP_FUNC_NORMAL},
@@ -2361,6 +2447,7 @@ csStringID csShaderExpression::GetSexpTokenOp (const char* token)
 }
 
 static const TokenTabEntry xmlTypeTokens[] = {
+  {"matrix", 6, TYPE_MATRIX},
   {"num", 3, TYPE_NUMBER},
   {"var", 3, TYPE_VARIABLE},
   {"vec2", 4, TYPE_VECTOR2},
