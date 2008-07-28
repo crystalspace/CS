@@ -17,4 +17,5 @@ representations.
 @menu
 @end menu
 
+@importss{content,mapformat,buffers.txi}
 @importss{content,mapformat,xmlfmt.txi}
