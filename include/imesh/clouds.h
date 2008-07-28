@@ -150,13 +150,13 @@ is a 3d- scalar field containing all the condensed water mixing ratios.
 */
 struct iCloudsDynamics : public virtual iBase
 {
-	SCF_INTERFACE(iCloudsDynamics, 0, 5, 1);
+	SCF_INTERFACE(iCloudsDynamics, 0, 5, 2);
 
 	/**
 	This is the most importand initialisation method. It defines the dimensions
-	of the entire grid and MUST be called by the user!
+	of the entire grid. The standard after constructor was called is 10x10x10
 	*/
-	virtual inline void SetGridSize(const UINT x, const UINT y, const UINT z) = 0;
+	virtual inline const bool SetGridSize(const UINT x, const UINT y, const UINT z) = 0;
 
 	/**
 	Following methods are used to configure the entire dynamics simulation

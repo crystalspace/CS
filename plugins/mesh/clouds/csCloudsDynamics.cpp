@@ -24,8 +24,9 @@ SCF_IMPLEMENT_FACTORY(csCloudsDynamics)
 
 //----------------------------------------------------------//
 
-void csCloudsDynamics::SetGridSize(const UINT x, const UINT y, const UINT z)
+const bool csCloudsDynamics::SetGridSize(const UINT x, const UINT y, const UINT z)
 {
+	if(x <= 1 || y <= 1 || z <= 1) return false;
 	//Free already reserved fields
 	FreeReservedMemory();
 
@@ -92,6 +93,8 @@ void csCloudsDynamics::SetGridSize(const UINT x, const UINT y, const UINT z)
 	}
 	//Make boundary conditions hold
 	SatisfyScalarBoundaryCond();
+
+	return true;
 }
 
 //----------------------------------------------------------//

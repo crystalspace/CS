@@ -53,35 +53,35 @@ private:
 	Temperature, pressure and both mixing ratios are definded at the center
 	of each voxel. Indexing is therefore as always f(x, y, z)
 	*/
-	csRef<iField3<float>>		m_arfPotTemperature[2];				// T, potential temperature
-	csRef<iField3<float>>		m_arfCondWaterMixingRatios[2];		// qc
-	csRef<iField3<float>>		m_arfWaterVaporMixingRatios[2];		// qv
+	csRef<iField3<float>>		  m_arfPotTemperature[2];				    // T, potential temperature
+	csRef<iField3<float>>		  m_arfCondWaterMixingRatios[2];		// qc
+	csRef<iField3<float>>		  m_arfWaterVaporMixingRatios[2];		// qv
 	csRef<iField3<csVector3>>	m_arvForceField;
-	csRef<iField3<float>>		m_arfVelDivergence;
-	csRef<iField3<float>>		m_arfPressureField[2];				// p
+	csRef<iField3<float>>		  m_arfVelDivergence;
+	csRef<iField3<float>>		  m_arfPressureField[2];				    // p
 	/**
 	Velocity is defined at the boundaries of each cell. Half-way index
 	notation is used in consequence. These fields are of size N + 1
 	*/
-	csRef<iField3<csVector3>>	m_arvVelocityField[2];				// u
+	csRef<iField3<csVector3>>	m_arvVelocityField[2];				    // u
 
 	//This rotation-field is defined at Cell-Centers!
-	csRef<iField3<csVector3>>	m_arvRotVelField;					// rot(u)
+	csRef<iField3<csVector3>>	m_arvRotVelField;					        // rot(u)
 
 	float						m_fTimeStep;
 	float						m_fTimePassed;
 	UINT						m_iGridSizeX;
 	UINT						m_iGridSizeY;
 	UINT						m_iGridSizeZ;
-	float						m_fGridScale;						// dx
+	float						m_fGridScale;						    // dx
 	UINT						m_iNewPressureField;
 	UINT						m_iOldPressureField;
 
 	UINT						m_iCurrentStep;
 
 	//Precomputed constants
-	float						m_fInvGridScale;					// 1 / dx
-	float						m_fKappa;							// _R / _cp
+	float						m_fInvGridScale;					  // 1 / dx
+	float						m_fKappa;							      // _R / _cp
 	float						m_fAltitudeExponent;				// |_g| / (_R * _G)
 
 	//====================================================//
@@ -94,7 +94,7 @@ private:
 	//Scaling factor for condensed water in buoyant-force-calculaion
 	float						m_fCondWaterScaleFactor;			// _fqc
 	//Acceleration due to gravitation
-	csVector3					m_vGravitationAcc;					// _g
+	csVector3			  m_vGravitationAcc;					// _g
 	//Condensation-Rate
 	float						m_fCondensationRate;				// _C
 	//Preasure at sealevel
@@ -279,11 +279,12 @@ public:
 	{
 		SetStandardValues();
 		UpdateAllDependParameters();
+		SetGridSize(10, 10, 10);
 	}
 	~csCloudsDynamics() {}
 
-	//This method MUST be called at least once!
-	virtual inline void SetGridSize(const UINT x, const UINT y, const UINT z);
+	//Std grid size is 10x10x10
+	virtual inline const bool SetGridSize(const UINT x, const UINT y, const UINT z);
 
 	//Configuration-Setter
 	virtual inline void SetGridScale(const float dx) {m_fGridScale = dx; m_fInvGridScale = 1.f / dx;}
@@ -324,15 +325,19 @@ public:
 		m_fAltitudeExponent	= m_vGravitationAcc.Norm() / (m_fTempLapseRate * m_fIdealGasConstant);
 	}
 
-	//Computes N steps of the entire simulation. If iStepCount == 0, then an entire timestep
-	//is calculated
+	/**
+	Computes N steps of the entire simulation. If iStepCount == 0, then an entire timestep
+	is calculated
+	*/
 	virtual const bool DoComputationSteps(const UINT iStepCount, const float fTime = 0.f);
 
 	//Returns the simulation output!
 	virtual inline const csRef<iField3<float>>& GetCondWaterMixingRatios() const
 	{
-		//Always when an entire timestep was done, the acutal-index becomes the last-index
-		//So the lastindex fields are those of the LAST COMPLETLY DONE TIMESTEP!
+		/**
+		Always when an entire timestep was done, the acutal-index becomes the last-index
+		So the lastindex fields are those of the LAST COMPLETLY DONE TIMESTEP!
+		*/
 		return m_arfCondWaterMixingRatios[m_iLastIndex];
 	}
 };
