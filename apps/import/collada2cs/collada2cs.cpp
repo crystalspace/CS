@@ -61,9 +61,10 @@ int main(int argc, char** argv)
   {
     printf("Options:\n");
     printf("-library Export the following files as library files.\n");
-    printf("-map Export the following files as world files.\n\n");
+    printf("-map Export the following files as world files.\n");
     printf("-out Output file path.\n");
-    printf("Usage: collada2cs(.exe) -map file1.dae file2.dae -library file3.dae -out out.xml file4.dae\n");
+    printf("-[no]sectorscene Set if each scene is an entire sector. Else the top level objects in each scene are considered a sector.\n\n");
+    printf("Usage: collada2cs(.exe) -map -sectorscene file1.dae -nosectorscene file2.dae -library file3.dae -out out.xml file4.dae\n");
   }
   else
   {
@@ -81,6 +82,14 @@ int main(int argc, char** argv)
       {
         i++;
         continue;
+      }
+      else if(args[i].Compare("-sectorscene"))
+      {
+        collada->SetSectorScene(true);
+      }
+      else if(args[i].Compare("-nosectorscene"))
+      {
+        collada->SetSectorScene(false);
       }
       else
       {

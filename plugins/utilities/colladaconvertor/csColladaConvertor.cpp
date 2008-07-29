@@ -22,7 +22,6 @@
 #include "iutil/document.h"
 #include "csutil/xmltiny.h"
 #include "iutil/string.h"
-#include "csutil/hash.h"
 #include "csutil/scfstr.h"
 #include "csutil/scfstringarray.h"
 #include "csColladaConvertor.h"
@@ -68,6 +67,11 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     warningsOn = toggle;
   }
 
+  void csColladaConvertor::SetSectorScene(bool toggle)
+  {
+    sectorScene = toggle;
+  }
+
   void csColladaConvertor::CheckColladaFilenameValidity(const char* str)
   {
     std::string filePath = str;
@@ -107,7 +111,8 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     lastEffectId(-1),
     csOutputReady(false),
     outputFileType(CS_NO_FILE),
-    colladaReady(false)      
+    colladaReady(false),
+    sectorScene(false)
   {
   }
 
@@ -719,7 +724,6 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     }
 
     // Get camera IDs
-    csArray<csString> cameraIDs;
     if(camerasSection)
     {
       csRef<iDocumentNodeIterator> cameraNodes = camerasSection->GetNodes("camera");
@@ -730,7 +734,6 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     }
 
     // Get lights
-    csHash<csColladaLight, csString> lights;
     if(lightsSection)
     {
       csRef<iDocumentNodeIterator> lightNodes = lightsSection->GetNodes("light");
@@ -756,155 +759,195 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       }
     }
 
-    // For each scene (<visual_scene> node), the first level nodes will be converted to 
-    // a sector in crystal space.
-    csRef<iDocumentNodeIterator> visualSceneIterator = visualScenesSection->GetNodes("visual_scene");
-    csRef<iDocumentNode> currentVisualSceneElement;
-    while(visualSceneIterator->HasNext())
+    if(sectorScene)
     {
-      csRef<iDocumentNode> visualSceneElement = visualSceneIterator->Next();
-      csRef<iDocumentNodeIterator> sectors = visualSceneElement->GetNodes("node");
+      // Convert each scene (<visual_scene> node) into a sector.
+      csRef<iDocumentNodeIterator> sectors = visualScenesSection->GetNodes("visual_scene");
       while(sectors->HasNext())
       {
         csRef<iDocumentNode> sector = sectors->Next();
+        WriteSectorInfo(sector);
+      }
 
-        // Check that it really is a sector.
-        bool cameraTarget = false;
-        for(size_t i=0; i<cameraIDs.GetSize(); i++)
+      // Next, we'll convert the cameras
+      // A camera will convert to a start location in the world file
+      // A start location consists of: 
+      //   * A sector to start in.
+      //   * A position to start at.
+      //   * An up vector. (optional)
+      //   * A forward vector. (optional)
+
+      // For each camera.
+      for(size_t i=0; i<cameraIDs.GetSize(); i++)
+      {
+        // For each scene.
+        csRef<iDocumentNodeIterator> sectors = visualScenesSection->GetNodes("visual_scene");
+        while(sectors->HasNext())
         {
-          csString id = cameraIDs[i];
-          id.Truncate(id.FindLast('-'));
-          cameraTarget |= id.Append(".Target-node").Compare(sector->GetAttributeValue("id"));
-        }
-
-        if(sector->GetAttribute("name") && !cameraTarget)
-        {
-          // Write sector.
-          csRef<iDocumentNode> currentSectorElement = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT);
-          currentSectorElement->SetValue("sector");
-          currentSectorElement->SetAttribute("name", sector->GetAttributeValue("name"));
-
-          // Write children.
-          csRef<iDocumentNodeIterator> sectorNodes = sector->GetNodes("node");
-          while(sectorNodes->HasNext())
-          {
-            csRef<iDocumentNode> child = sectorNodes->Next();
-            // Write collision plugin.
-            // Write meshobj.
-            // Write portal.
-            // Write light.
-            if(child->GetNode("instance_light"))
-            {
-              csRef<iDocumentNode> newLight = currentSectorElement->CreateNodeBefore(CS_NODE_ELEMENT);
-              newLight->SetValue("light");
-              newLight->SetAttribute("name", child->GetAttributeValue("name"));
-
-              // Calculate centre.
-              csStringArray sectorPos;
-              csStringArray centerPos;
-
-              sectorPos.SplitString(sector->GetNode("matrix")->GetContentsValue(), " ");
-              centerPos.SplitString(child->GetNode("matrix")->GetContentsValue(), " ");
-
-              float x = atof(sectorPos[3]) + atof(centerPos[3]);
-              float y = atof(sectorPos[11]) + atof(centerPos[11]);
-              float z = atof(sectorPos[7]) + atof(centerPos[7]);
-
-              csRef<iDocumentNode> centreNode = newLight->CreateNodeBefore(CS_NODE_ELEMENT);
-              centreNode->SetValue("center");
-              centreNode->SetAttributeAsFloat("x", x);
-              centreNode->SetAttributeAsFloat("y", y);
-              centreNode->SetAttributeAsFloat("z", z);
-
-              // Write colour.
-              csString url = child->GetNode("instance_light")->GetAttributeValue("url");
-              csColladaLight light = lights.Get(url.Slice(1), csColladaLight());
-              csRef<iDocumentNode> lightColour = newLight->CreateNodeBefore(CS_NODE_ELEMENT);
-              lightColour->SetValue("color");
-              lightColour->SetAttributeAsFloat("red", light.colour.red);
-              lightColour->SetAttributeAsFloat("green", light.colour.green);
-              lightColour->SetAttributeAsFloat("blue", light.colour.blue);
-            }
-          }
+          csRef<iDocumentNode> sector = sectors->Next();
+          WriteCameraInfo(sector, i);
         }
       }
     }
-
-    // Next, we'll convert the cameras
-    // A camera will convert to a start location in the world file
-    // A start location consists of: 
-    //   * A sector to start in.
-    //   * A position to start at.
-    //   * An up vector. (optional)
-    //   * A forward vector. (optional)
-
-    // For each camera.
-    for(size_t i=0; i<cameraIDs.GetSize(); i++)
+    else
     {
-      // For each scene.
-      visualSceneIterator = visualScenesSection->GetNodes("visual_scene");
+      // For each scene (<visual_scene> node), the first level nodes will be converted to 
+      // a sector in crystal space.
+      csRef<iDocumentNodeIterator> visualSceneIterator = visualScenesSection->GetNodes("visual_scene");
       while(visualSceneIterator->HasNext())
       {
-        // For each sector;
         csRef<iDocumentNode> visualSceneElement = visualSceneIterator->Next();
         csRef<iDocumentNodeIterator> sectors = visualSceneElement->GetNodes("node");
         while(sectors->HasNext())
         {
           csRef<iDocumentNode> sector = sectors->Next();
+          WriteSectorInfo(sector);
+        }
+      }
 
-          // Not a sector if it's a camera target.
-          csString id = cameraIDs[i];
-          if(id.Append(".Target-node").Compare(sector->GetAttributeValue("id")))
+      // Next, we'll convert the cameras
+      // A camera will convert to a start location in the world file
+      // A start location consists of: 
+      //   * A sector to start in.
+      //   * A position to start at.
+      //   * An up vector. (optional)
+      //   * A forward vector. (optional)
+
+      // For each camera.
+      for(size_t i=0; i<cameraIDs.GetSize(); i++)
+      {
+        // For each scene.
+        visualSceneIterator = visualScenesSection->GetNodes("visual_scene");
+        while(visualSceneIterator->HasNext())
+        {
+          // For each sector;
+          csRef<iDocumentNode> visualSceneElement = visualSceneIterator->Next();
+          csRef<iDocumentNodeIterator> sectors = visualSceneElement->GetNodes("node");
+          while(sectors->HasNext())
           {
-            continue;
-          }
-
-          // For each node (possible camera).
-          csRef<iDocumentNodeIterator> nodes = sector->GetNodes("node");
-          while(nodes->HasNext())
-          {
-            csRef<iDocumentNode> node = nodes->Next();
-            if(node->GetNode("instance_camera"))
-            {
-              // Is it the right camera?
-              csString url = node->GetNode("instance_camera")->GetAttributeValue("url");
-              if(url.Slice(1).Compare(cameraIDs[i]))
-              {
-                // Create start node.
-                csRef<iDocumentNode> startNode = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT);
-                startNode->SetValue("start");
-                startNode->SetAttribute("name", node->GetAttributeValue("name"));
-                csRef<iDocumentNode> sectorNode = startNode->CreateNodeBefore(CS_NODE_ELEMENT);
-                sectorNode->SetValue("sector");
-                csRef<iDocumentNode> sectorNodeContents = sectorNode->CreateNodeBefore(CS_NODE_TEXT);
-                sectorNodeContents->SetValue(sector->GetAttributeValue("name"));
-
-                // Calculate position.
-                csStringArray sectorPos;
-                csStringArray cameraPos;
-
-                sectorPos.SplitString(sector->GetNode("matrix")->GetContentsValue(), " ");
-                cameraPos.SplitString(node->GetNode("matrix")->GetContentsValue(), " ");
-
-                float x = atof(sectorPos[3]) + atof(cameraPos[3]);
-                float y = atof(sectorPos[11]) + atof(cameraPos[11]);
-                float z = atof(sectorPos[7]) + atof(cameraPos[7]);
-
-                csRef<iDocumentNode> positionNode = startNode->CreateNodeBefore(CS_NODE_ELEMENT);
-                positionNode->SetValue("position");
-                positionNode->SetAttributeAsFloat("x", x);
-                positionNode->SetAttributeAsFloat("y", y);
-                positionNode->SetAttributeAsFloat("z", z);
-
-                // TODO: up and forward vectors.
-              }
-            }
+            csRef<iDocumentNode> sector = sectors->Next();
+            WriteCameraInfo(sector, i);
           }
         }
       }
     }
 
     return true;
+  }
+
+  void csColladaConvertor::WriteSectorInfo(iDocumentNode* sector)
+  {
+    // Check that it really is a sector.
+    bool cameraTarget = false;
+    for(size_t i=0; i<cameraIDs.GetSize(); i++)
+    {
+      csString id = cameraIDs[i];
+      id.Truncate(id.FindLast('-'));
+      cameraTarget |= id.Append(".Target-node").Compare(sector->GetAttributeValue("id"));
+    }
+
+    if(sector->GetAttribute("name") && !cameraTarget)
+    {
+      // Write sector.
+      csRef<iDocumentNode> currentSectorElement = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT);
+      currentSectorElement->SetValue("sector");
+      currentSectorElement->SetAttribute("name", sector->GetAttributeValue("name"));
+
+      // Write children.
+      csRef<iDocumentNodeIterator> sectorNodes = sector->GetNodes("node");
+      while(sectorNodes->HasNext())
+      {
+        csRef<iDocumentNode> child = sectorNodes->Next();
+        // Write collision plugin.
+        // Write meshobj.
+        // Write portal.
+        // Write light.
+        if(child->GetNode("instance_light"))
+        {
+          csRef<iDocumentNode> newLight = currentSectorElement->CreateNodeBefore(CS_NODE_ELEMENT);
+          newLight->SetValue("light");
+          newLight->SetAttribute("name", child->GetAttributeValue("name"));
+
+          // Calculate centre.
+          csStringArray sectorPos;
+          csStringArray centerPos;
+
+          sectorPos.SplitString(sector->GetNode("matrix")->GetContentsValue(), " ");
+          centerPos.SplitString(child->GetNode("matrix")->GetContentsValue(), " ");
+
+          float x = atof(sectorPos[3]) + atof(centerPos[3]);
+          float y = atof(sectorPos[11]) + atof(centerPos[11]);
+          float z = atof(sectorPos[7]) + atof(centerPos[7]);
+
+          csRef<iDocumentNode> centreNode = newLight->CreateNodeBefore(CS_NODE_ELEMENT);
+          centreNode->SetValue("center");
+          centreNode->SetAttributeAsFloat("x", x);
+          centreNode->SetAttributeAsFloat("y", y);
+          centreNode->SetAttributeAsFloat("z", z);
+
+          // Write colour.
+          csString url = child->GetNode("instance_light")->GetAttributeValue("url");
+          csColladaLight light = lights.Get(url.Slice(1), csColladaLight());
+          csRef<iDocumentNode> lightColour = newLight->CreateNodeBefore(CS_NODE_ELEMENT);
+          lightColour->SetValue("color");
+          lightColour->SetAttributeAsFloat("red", light.colour.red);
+          lightColour->SetAttributeAsFloat("green", light.colour.green);
+          lightColour->SetAttributeAsFloat("blue", light.colour.blue);
+        }
+      }
+    }
+  }
+
+  void csColladaConvertor::WriteCameraInfo(iDocumentNode* sector, size_t camera)
+  {
+    // Not a sector if it's a camera target.
+    csString id = cameraIDs[camera];
+    if(id.Append(".Target-node").Compare(sector->GetAttributeValue("id")))
+    {
+      return;
+    }
+
+    // For each node (possible camera).
+    csRef<iDocumentNodeIterator> nodes = sector->GetNodes("node");
+    while(nodes->HasNext())
+    {
+      csRef<iDocumentNode> node = nodes->Next();
+      if(node->GetNode("instance_camera"))
+      {
+        // Is it the right camera?
+        csString url = node->GetNode("instance_camera")->GetAttributeValue("url");
+        if(url.Slice(1).Compare(cameraIDs[camera]))
+        {
+          // Create start node.
+          csRef<iDocumentNode> startNode = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT);
+          startNode->SetValue("start");
+          startNode->SetAttribute("name", node->GetAttributeValue("name"));
+          csRef<iDocumentNode> sectorNode = startNode->CreateNodeBefore(CS_NODE_ELEMENT);
+          sectorNode->SetValue("sector");
+          csRef<iDocumentNode> sectorNodeContents = sectorNode->CreateNodeBefore(CS_NODE_TEXT);
+          sectorNodeContents->SetValue(sector->GetAttributeValue("name"));
+
+          // Calculate position.
+          csStringArray sectorPos;
+          csStringArray cameraPos;
+
+          sectorPos.SplitString(sector->GetNode("matrix")->GetContentsValue(), " ");
+          cameraPos.SplitString(node->GetNode("matrix")->GetContentsValue(), " ");
+
+          float x = atof(sectorPos[3]) + atof(cameraPos[3]);
+          float y = atof(sectorPos[11]) + atof(cameraPos[11]);
+          float z = atof(sectorPos[7]) + atof(cameraPos[7]);
+
+          csRef<iDocumentNode> positionNode = startNode->CreateNodeBefore(CS_NODE_ELEMENT);
+          positionNode->SetValue("position");
+          positionNode->SetAttributeAsFloat("x", x);
+          positionNode->SetAttributeAsFloat("y", y);
+          positionNode->SetAttributeAsFloat("z", z);
+
+          // TODO: up and forward vectors.
+        }
+      }
+    }
   }
 
   bool csColladaConvertor::ConvertRiggingAnimation(iDocumentNode *riggingSection)

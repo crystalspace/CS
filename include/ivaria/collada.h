@@ -272,6 +272,13 @@ struct iColladaConvertor : public virtual iBase
    */
   virtual void SetWarnings(bool toggle=false) = 0;
 
+  /**
+   * Set if each scene is an entire sector.
+   * Else the top level objects in each scene are considered a sector.
+   *
+   * @param toggle If true, each scene is considered a sector.
+   */
+  virtual void SetSectorScene(bool toggle) = 0;
 };
 
 #endif

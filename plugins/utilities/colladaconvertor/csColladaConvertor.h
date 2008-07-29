@@ -19,6 +19,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef	_CS_COLLADA_CONVERTOR_H_
 #define	_CS_COLLADA_CONVERTOR_H_
 
+#include "csutil/hash.h"
 #include "ivaria/collada.h"
 #include "iutil/comp.h"
 #include "iutil/vfs.h"
@@ -67,6 +68,9 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     /// Whether or not we have warnings turned on. Warnings are off by default.
     bool warningsOn;
 
+    /// Whether or not each scene is considered a sector.
+    bool sectorScene;
+
     /// A pointer to the object registry
     iObjectRegistry* obj_reg;
 
@@ -104,6 +108,16 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
     /// An array of materials referenced in the COLLADA document
     csArray<csColladaMaterial> materialsList;
+
+    /// Array of camera IDs.
+    csArray<csString> cameraIDs;
+
+    /// Hash of lights.
+    csHash<csColladaLight, csString> lights;
+
+    // =============== Internal Functions ===============
+    void WriteSectorInfo(iDocumentNode* sector);
+    void WriteCameraInfo(iDocumentNode* sector, size_t camera);
 
     // =============== Basic Utility Functions ===============
   public:
@@ -147,6 +161,14 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     * \notes Debug warnings are off by default.
     */
     void SetWarnings(bool toggle);
+
+    /**
+    * Set if each scene is an entire sector.
+    * Else the top level objects in each scene are considered a sector.
+    *
+    * \param toggle If true, each scene is considered a sector.
+    */
+    void SetSectorScene(bool toggle);
 
     /**
     * Checks for validity of the file name to see if it conforms to COLLADA standards.
