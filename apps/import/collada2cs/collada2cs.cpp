@@ -21,7 +21,7 @@
 #include "cstool/initapp.h"
 #include "ivaria/collada.h"
 
-#define COLLADA_VERSION "1.4"
+#define COLLADA_VERSION "1.4.1"
 
 CS_IMPLEMENT_APPLICATION
 
