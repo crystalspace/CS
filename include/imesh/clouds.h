@@ -26,44 +26,6 @@
 #include "csutil/ref.h"
 #include "csgeom/vector3.h"
 
-/**
-This APIs implementation is a supervisor-class, which takes 
-care and handles the overall cloud-simulation process on a higher
-level of abstraction.
-*/
-struct iClouds : public virtual iBase
-{
-	SCF_INTERFACE(iClouds, 0, 0, 1);
-
-	/**
-	Initialize is used to startup the cloud-system according to some configuration
-	variables. Such as grid-scale, grid size, ecc
-	*/
-
-	/**
-	Does a single timestep of size dTime for the cloud-dynamics-simulation
-	If dTime is not set, the time is measured automatically, in order to achive realtime-simulation
-	*/
-	virtual const bool DoTimeStep(const float fTime = 0.f) = 0;
-
-	/**
-	This method does an amortized time step: Means it doesn't do all the computations
-	which would be necessary to complete an entire time step. No, it only does some minor
-	calculations. For example 10 calls of this method would then be equal to one call
-	of DoTimeStep. This method is designed for real-time-use
-	dTime is used for the entire time-step. So if it varies between the single calls
-	of this method, only the first value is considered! 
-	If not set, the time is measured automatically, in order to achive realtime-simulation.
-	*/
-	virtual const bool DoAmortTimeStep(const float fTime = 0.f) = 0;
-
-	/**
-	This method starts the rendering process. All clouds are rendered at
-	the calculated positions and formations.
-	*/
-	virtual const bool RenderClouds(/* Transformationmatrix? */) = 0;
-};
-
 //--------------------------------------------------------------------------------------------//
 
 /**
@@ -122,6 +84,69 @@ struct iField3 : public virtual iBase
 	range, they are going to be clamped first!
 	*/
 	virtual const T GetValueClamp(const int x, const int y, const int z) const = 0;
+};
+
+//--------------------------------------------------------------------------------------------//
+//--------------------------------------------------------------------------------------------//
+
+/**
+This APIs implementation is a supervisor-class, which takes 
+care and handles the overall cloud-simulation process on a higher
+level of abstraction.
+*/
+struct iClouds : public virtual iBase
+{
+	SCF_INTERFACE(iClouds, 0, 5, 1);
+
+	/**
+	All of following Setters refer to the iCloudsDynamics instance.
+	*/
+  virtual inline const bool SetGridSize(const UINT x, const UINT y, const UINT z) = 0;
+	virtual inline void SetGridScale(const float dx) = 0;
+	virtual inline void SetCondensedWaterScaleFactor(const float fqc) = 0;
+	virtual inline void SetGravityAcceleration(const csVector3& vG) = 0;
+	virtual inline void SetVorticityConfinementForceEpsilon(const float e) = 0;
+	virtual inline void SetReferenceVirtPotTemperature(const float T) = 0;
+	virtual inline void SetTempLapseRate(const float G) = 0;
+	virtual inline void SetReferenceTemperature(const float T) = 0;
+	virtual inline void SetReferencePressure(const float p) = 0;
+	virtual inline void SetIdealGasConstant(const float R) = 0;
+	virtual inline void SetLatentHeat(const float L) = 0;
+	virtual inline void SetSpecificHeatCapacity(const float cp) = 0;
+	virtual inline void SetAmbientTemperature(const float T) = 0;
+	virtual inline void SetInitialCondWaterMixingRatio(const float qc) = 0;
+	virtual inline void SetInitialWaterVaporMixingRatio(const float qv) = 0;
+	virtual inline void SetGlobalWindSpeed(const csVector3& vWind) = 0;
+	virtual inline void SetBaseAltitude(const float H) = 0;
+	virtual inline void SetTemperaturBottomInputField(csRef<iField2<float>> Field) = 0;
+	virtual inline void SetWaterVaporBottomInputField(csRef<iField2<float>> Field) = 0;
+
+  /**
+	All of following Setters refer to the iCloudsRenderer instance.
+	*/
+
+	/**
+	Does a single timestep of size dTime for the cloud-dynamics-simulation
+	If dTime is not set, the time is measured automatically, in order to achive realtime-simulation
+	*/
+	virtual const bool DoTimeStep(const float fTime = 0.f) = 0;
+
+	/**
+	This method does an amortized time step: Means it doesn't do all the computations
+	which would be necessary to complete an entire time step. No, it only does some minor
+	calculations. For example 10 calls of this method would then be equal to one call
+	of DoTimeStep. This method is designed for real-time-use
+	dTime is used for the entire time-step. So if it varies between the single calls
+	of this method, only the first value is considered! 
+	If not set, the time is measured automatically, in order to achive realtime-simulation.
+	*/
+	virtual const bool DoAmortTimeStep(const float fTime = 0.f) = 0;
+
+	/**
+	This method starts the rendering process. All clouds are rendered at
+	the calculated positions and formations.
+	*/
+	virtual const bool RenderClouds(/* Transformationmatrix? */) = 0;
 };
 
 //--------------------------------------------------------------------------------------------//

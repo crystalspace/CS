@@ -36,6 +36,7 @@ public:
 	{
 		m_Dynamics.AttachNew(new csCloudsDynamics(this));
 		m_Renderer.AttachNew(new csCloudsRenderer(this));
+    
 	}
 	~csClouds()
 	{
@@ -43,6 +44,26 @@ public:
 		m_Renderer.Invalidate();
 	}
 
+  //All of following Setters refer to the csCloudsDynamics instance, and are delegated!
+  virtual inline const bool SetGridSize(const UINT x, const UINT y, const UINT z) {return m_Dynamics->SetGridSize(x, y, z);}
+  virtual inline void SetGridScale(const float dx) {return m_Dynamics->SetGridScale(dx);}
+	virtual inline void SetCondensedWaterScaleFactor(const float fqc) {return m_Dynamics->SetCondensedWaterScaleFactor(fqc);}
+	virtual inline void SetGravityAcceleration(const csVector3& vG) {return m_Dynamics->SetGravityAcceleration(vG);}
+	virtual inline void SetVorticityConfinementForceEpsilon(const float e) {return m_Dynamics->SetVorticityConfinementForceEpsilon(e);}
+	virtual inline void SetReferenceVirtPotTemperature(const float T) {return m_Dynamics->SetReferenceVirtPotTemperature(T);}
+	virtual inline void SetTempLapseRate(const float G) {return m_Dynamics->SetTempLapseRate(G);}
+	virtual inline void SetReferenceTemperature(const float T) {return m_Dynamics->SetReferenceTemperature(T);}
+	virtual inline void SetReferencePressure(const float p) {return m_Dynamics->SetReferencePressure(p);}
+	virtual inline void SetIdealGasConstant(const float R) {return m_Dynamics->SetIdealGasConstant(R);}
+	virtual inline void SetLatentHeat(const float L) {return m_Dynamics->SetLatentHeat(L);}
+	virtual inline void SetSpecificHeatCapacity(const float cp) {return m_Dynamics->SetSpecificHeatCapacity(cp);}
+	virtual inline void SetAmbientTemperature(const float T) {return m_Dynamics->SetAmbientTemperature(T);}
+	virtual inline void SetInitialCondWaterMixingRatio(const float qc) {return m_Dynamics->SetInitialCondWaterMixingRatio(qc);}
+	virtual inline void SetInitialWaterVaporMixingRatio(const float qv) {return m_Dynamics->SetInitialWaterVaporMixingRatio(qv);}
+	virtual inline void SetGlobalWindSpeed(const csVector3& vWind) {return m_Dynamics->SetGlobalWindSpeed(vWind);}
+	virtual inline void SetBaseAltitude(const float H) {return m_Dynamics->SetBaseAltitude(H);}
+	virtual inline void SetTemperaturBottomInputField(csRef<iField2<float>> Field) {return m_Dynamics->SetTemperaturBottomInputField(Field);}
+	virtual inline void SetWaterVaporBottomInputField(csRef<iField2<float>> Field) {return m_Dynamics->SetWaterVaporBottomInputField(Field);}
 	virtual const bool DoTimeStep(const float fTime = 0.f);
 	virtual const bool DoAmortTimeStep(const float fTime = 0.f);
 	virtual const bool RenderClouds();
