@@ -974,7 +974,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       while(sectorNodes->HasNext())
       {
         csRef<iDocumentNode> child = sectorNodes->Next();
-        // Write meshobj.
+
         // Write portal.
         size_t portalNum;
         bool isPortal = false;
@@ -992,6 +992,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
           newPortalSector->SetValue("sector");
           csRef<iDocumentNode> newPortalSectorContents = newPortalSector->CreateNodeBefore(CS_NODE_TEXT);
           newPortalSectorContents->SetValue(portalTargets[portalNum-1]);
+          continue;
         }
 
         // Write light.
@@ -1026,7 +1027,58 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
           lightColour->SetAttributeAsFloat("red", light.colour.red);
           lightColour->SetAttributeAsFloat("green", light.colour.green);
           lightColour->SetAttributeAsFloat("blue", light.colour.blue);
+          continue;
         }
+
+        // Check for camera, deal with it later.
+        if(child->GetNode("instance_camera"))
+        {
+          continue;
+        }
+
+         // Write genmesh meshobj (TODO: Other mesh types).
+        csRef<iDocumentNode> meshObj = currentSectorElement->CreateNodeBefore(CS_NODE_ELEMENT);
+        meshObj->SetValue("meshobj");
+        meshObj->SetAttribute("name", child->GetAttributeValue("name"));
+        csRef<iDocumentNode> plugin = meshObj->CreateNodeBefore(CS_NODE_ELEMENT);
+        plugin->SetValue("plugin");
+        plugin = plugin->CreateNodeBefore(CS_NODE_TEXT);
+        plugin->SetValue(CS_COLLADA_DEFAULT_MESH_PLUGIN_TYPE);
+
+        if(userProps.GetSize() != 0)
+        {
+          for(size_t i=0; i<userProps.GetSize(); i++)
+          {
+            if(csString(userProps[i]).Truncate(csString(userProps[i]).FindFirst('=')).Compare("NOSHADOWS"))
+            {
+              csRef<iDocumentNode> noshadows = meshObj->CreateNodeBefore(CS_NODE_ELEMENT);
+              noshadows->SetValue("noshadows");
+            }
+          }
+        }
+
+        csRef<iDocumentNode> params = meshObj->CreateNodeBefore(CS_NODE_ELEMENT);
+        params->SetValue("params");
+
+        // Position
+        csRef<iDocumentNode> move = meshObj->CreateNodeBefore(CS_NODE_ELEMENT);
+        move->SetValue("move");
+        move = move->CreateNodeBefore(CS_NODE_ELEMENT);
+        move->SetValue("v");
+
+        csStringArray sectorPos;
+        csStringArray meshobjPos;
+
+        sectorPos.SplitString(sector->GetNode("matrix")->GetContentsValue(), " ");
+        meshobjPos.SplitString(child->GetNode("matrix")->GetContentsValue(), " ");
+
+        float x = atof(sectorPos[3]) + atof(meshobjPos[3]);
+        float y = atof(sectorPos[11]) + atof(meshobjPos[11]);
+        float z = atof(sectorPos[7]) + atof(meshobjPos[7]);
+
+        move->SetAttributeAsFloat("x", x);
+        move->SetAttributeAsFloat("y", y);
+        move->SetAttributeAsFloat("z", z);
       }
     }
   }

@@ -35,8 +35,9 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
   class csColladaEffect;
 
-  /// The default type for mesh <plugin> tags
-#define CS_COLLADA_DEFAULT_MESH_PLUGIN_TYPE "crystalspace.mesh.loader.factory.genmesh"
+  /// The default type for meshfact <plugin> tags
+#define CS_COLLADA_DEFAULT_MESHFACT_PLUGIN_TYPE "crystalspace.mesh.loader.factory.genmesh"
+#define CS_COLLADA_DEFAULT_MESH_PLUGIN_TYPE "crystalspace.mesh.loader.genmesh"
 
   /** 
   * This class implements the iColladaConvertor interface.  It is used as a conversion utility
