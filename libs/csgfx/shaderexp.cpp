@@ -87,6 +87,7 @@ enum
   
   OP_FUNC_MATRIX_COLUMN,
   OP_FUNC_MATRIX_ROW,
+  OP_FUNC_MATRIX2GL,
   
   // Pseudo-ops, special case weird stuff
   OP_PS_MAKE_VECTOR,
@@ -134,6 +135,7 @@ static const char* const opNames[OP_LAST] = {
   "FRAME",
   "MATRIXCOLUMN",
   "MATRIXROW",
+  "MATRIX2GL",
   "!MAKEVECTOR",
   "!LIMIT",
   "!ATOM",
@@ -242,6 +244,7 @@ static const op_args_info optimize_arg_table[] =
   
   { 2, 2, false }, // OP_FUNC_MATRIX_COLUMN
   { 2, 2, false }, // OP_FUNC_MATRIX_ROW
+  { 1, 1, false }, // OP_FUNC_MATRIX2GL
 
   { 2, 4, false }, // OP_PS_MAKE_VECTOR
 
@@ -937,6 +940,7 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg & output)
   case OP_FUNC_VEC_LEN: return eval_vec_len(arg1, output);
   case OP_FUNC_NORMAL: return eval_normal(arg1, output);
   case OP_FUNC_FLOOR: return eval_floor(arg1, output);
+  case OP_FUNC_MATRIX2GL: return eval_matrix2gl(arg1, output);
 
   case OP_INT_LOAD: return eval_load(arg1, output);
 
@@ -1488,6 +1492,30 @@ bool csShaderExpression::eval_matrix_row (const oper_arg & arg1,
   
 }
   	
+bool csShaderExpression::eval_matrix2gl (const oper_arg & arg1, 
+                                          oper_arg & output) const
+{
+  if (arg1.type != TYPE_MATRIX)
+  {
+    EvalError ("Argument to matrix2gl is not a matrix.");
+
+    return false;
+  }
+
+  csVector4 matrix_o2t = arg1.matrix.Col4();
+  matrix_o2t.w = 0;
+  matrix_o2t = arg1.matrix.GetInverse() * matrix_o2t;
+
+  output.type = TYPE_MATRIX;
+  output.matrix = arg1.matrix;
+  output.matrix.m14 = -matrix_o2t.x;
+  output.matrix.m24 = -matrix_o2t.y;
+  output.matrix.m34 = -matrix_o2t.z;
+
+  return true;
+  
+}
+  	
 bool csShaderExpression::eval_selt12(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const 
 {
   if (arg1.type != TYPE_NUMBER || arg2.type != TYPE_NUMBER)
@@ -1634,7 +1662,7 @@ bool csShaderExpression::parse_sexp_form(const char *& text, cons * head) {
   CS_ASSERT(text[0] == '(');
   text++;
 
-  /* Function name first */
+  /* f first */
   const char * tmp = text;
   while (!isspace(*tmp))
     tmp++;
@@ -2314,6 +2342,10 @@ void csShaderExpression::print_result(const oper_arg & arg) const {
       csPrintf ("#<VECTOR4 (%f %f %f %f)>", arg.vec4.x, arg.vec4.y, arg.vec4.z, arg.vec4.w);
       break;
       
+    case TYPE_MATRIX:
+      csPrintf ("#<MATRIX (%s)>", arg.matrix.Description().GetData());
+      break;
+      
     case TYPE_VARIABLE:
       csPrintf ("#<VARIABLEREF \"%s\">", strset->Request (arg.var.id));
       break;
@@ -2359,24 +2391,25 @@ static csStringID GetTokenID (const TokenTabEntry* tokenTab,
     size_t m = (l+h) / 2;
     if (pos > tokenTab[m].tokenLen) return csInvalidStringID;
     const char* tabTok = tokenTab[m].token;
-    int d = tabTok[pos] - *p;
+    int d = *tabTok - *p;
     if (d == 0)
     {
       do
       {
-        pos++; p++;
-      } while (tabTok[pos] == *p);
+        pos++;
+      } while ((d = (tabTok[pos] - p[pos])) == 0);
       if (pos >= tokenLen)
         return tokenTab[m].id;
-      continue;
     }
-    else if (d < 0)
+    if (d < 0)
     {
       l = m+1;
+      pos = 0;
     }
     else
     {
       h = m;
+      pos = 0;
     }
   }
   return csInvalidStringID;
@@ -2398,6 +2431,7 @@ static const TokenTabEntry commonTokens[] = {
   {"make-vector", 11, OP_PS_MAKE_VECTOR},
   {"matrix-column", 13, OP_FUNC_MATRIX_COLUMN},
   {"matrix-row", 10, OP_FUNC_MATRIX_ROW},
+  {"matrix2gl", 9, OP_FUNC_MATRIX2GL},
   {"max", 3, OP_FUNC_MAX},
   {"min", 3, OP_FUNC_MIN},
   {"norm", 4, OP_FUNC_NORMAL},
