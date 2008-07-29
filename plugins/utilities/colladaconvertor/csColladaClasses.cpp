@@ -474,7 +474,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     {
       currentSourceElement = sourceElements->Next();
 
-      name = currentSourceElement->GetParent()->GetParent()->GetAttribute("id")->GetValue();
+      name = currentSourceElement->GetParent()->GetParent()->GetAttribute("name")->GetValue();
 
       csString newId = currentSourceElement->GetAttribute("id")->GetValue();
 
@@ -803,11 +803,11 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     // create meshfact and plugin (top-level) nodes
     csRef<iDocumentNode> meshFactNode = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT);
     meshFactNode->SetValue("meshfact");
-    meshFactNode->SetAttribute("name", GetName().GetData());
+    meshFactNode->SetAttribute("name", GetName());
     csRef<iDocumentNode> pluginNode = meshFactNode->CreateNodeBefore(CS_NODE_ELEMENT);
     pluginNode->SetValue("plugin");
     csRef<iDocumentNode> pluginContents = pluginNode->CreateNodeBefore(CS_NODE_TEXT);
-    pluginContents->SetValue(GetPluginType().GetData());
+    pluginContents->SetValue(GetPluginType());
 
     if (parent->warningsOn)
     {
