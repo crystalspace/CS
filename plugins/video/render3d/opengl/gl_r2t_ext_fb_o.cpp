@@ -381,7 +381,7 @@ void csGLRender2TextureEXTfbo::SetupProjection ()
   G3D->SetGlOrtho (true);
 }
 
-void csGLRender2TextureEXTfbo::SetupProjection (
+CS::Math::Matrix4 csGLRender2TextureEXTfbo::SetupProjection (
     const CS::Math::Matrix4& projectionMatrix)
 {
   GLRENDER3D_OUTPUT_LOCATION_MARKER;
@@ -390,9 +390,11 @@ void csGLRender2TextureEXTfbo::SetupProjection (
       0, -1, 0, 0,
       0, 0, 1, 0,
       0, 0, 0, 1);
+  CS::Math::Matrix4 actual = flipY * projectionMatrix;
   GLfloat matrixholder[16];
-  CS::PluginCommon::MakeGLMatrix4x4 (flipY * projectionMatrix, matrixholder);
+  CS::PluginCommon::MakeGLMatrix4x4 (actual, matrixholder);
   glLoadMatrixf (matrixholder);
+  return actual;
 }
 
 void csGLRender2TextureEXTfbo::FinishDraw ()

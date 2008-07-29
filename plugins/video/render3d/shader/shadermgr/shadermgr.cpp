@@ -243,6 +243,8 @@ void csShaderManager::AddDefaultVariables()
      shadermanagers, making it hard to find a good spot for these ... */
   GetVariableAdd (stringsSvName->Request ("world2camera transform"));
   GetVariableAdd (stringsSvName->Request ("world2camera transform inverse"));
+  GetVariableAdd (stringsSvName->Request ("projection transform"));
+  GetVariableAdd (stringsSvName->Request ("projection transform inverse"));
 }
 
 void csShaderManager::LoadDefaultVariables()

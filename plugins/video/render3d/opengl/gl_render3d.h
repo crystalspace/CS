@@ -291,6 +291,8 @@ private:
   CS::ShaderVarStringID string_texture_diffuse;
   CS::ShaderVarStringID string_world2camera;
   CS::ShaderVarStringID string_world2camera_inv;
+  CS::ShaderVarStringID string_projection;
+  CS::ShaderVarStringID string_projection_inv;
 
   csConfigAccess config;
 
