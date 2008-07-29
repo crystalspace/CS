@@ -120,7 +120,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  {
 	    if (graphPrios.IsSnippetPrioritySet (s)
 	      && allTechPrios.IsSnippetPrioritySet (s)
-	      && (graphPrios.GetSnippetPriority (s) >
+	      && (graphPrios.GetSnippetPriority (s) !=
 	        allTechPrios.GetSnippetPriority(s)))
 	    {
 	      skipTech = true;
