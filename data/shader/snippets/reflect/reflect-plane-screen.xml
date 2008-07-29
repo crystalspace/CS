@@ -111,7 +111,8 @@
 	  
 	  <block location="cg:variablemap">
 	    <variablemap destination="fragmentIn.projectedToWorld" type="expr">
-	      <sexp>(* (matrix2gl "world2camera transform inverse") (matrix2gl "projection transform inverse"))</sexp>
+	      <sexp>(* "world2camera transform" "projection transform inverse")</sexp>
+	      <!-- Huh. I would expect using "world2camera transform inverse" here. -->
 	    </variablemap>
 	  </block>
 	</input>
@@ -135,10 +136,7 @@
 	  float4 positionUnprojected = mul (projectedToWorld, positionProjected);
 	  positionUnprojected /= positionUnprojected.w;
 	  
-	  float distPlaneFromEye = length (positionW.xyz);
-	  float distRefrFromEye = length (positionUnprojected.xyz);
-	  
-	  mirroredPointDist = distRefrFromEye - distPlaneFromEye;
+	  mirroredPointDist = length (positionW.xyz - positionUnprojected.xyz);
 	  
 	  float perturbWeight = saturate (mirroredPointDist);
 	  tc.xy += perturb * perturbWeight;
