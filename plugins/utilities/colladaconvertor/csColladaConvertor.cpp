@@ -22,6 +22,7 @@
 #include "iutil/document.h"
 #include "csutil/xmltiny.h"
 #include "iutil/string.h"
+#include "csutil/hash.h"
 #include "csutil/scfstr.h"
 #include "csutil/scfstringarray.h"
 #include "csColladaConvertor.h"
@@ -728,6 +729,33 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       }
     }
 
+    // Get lights
+    csHash<csColladaLight, csString> lights;
+    if(lightsSection)
+    {
+      csRef<iDocumentNodeIterator> lightNodes = lightsSection->GetNodes("light");
+      while(lightNodes->HasNext())
+      {
+        csRef<iDocumentNode> lightNode = lightNodes->Next();
+        lightNode = lightNode->GetNode("technique_common");
+
+        // Point lights.
+        if(lightNode &&
+           lightNode->GetNode("point"))
+        {
+          csColladaLight light;
+
+          // TODO: Radius, attenuation, more?
+
+          csStringArray lightColour;
+          lightColour.SplitString(lightNode->GetNode("point")->GetNode("color")->GetContentsValue(), " ");
+          light.colour = csColor(atof(lightColour[0]), atof(lightColour[1]), atof(lightColour[2]));
+
+          lights.Put(lightNode->GetParent()->GetAttributeValue("id"), light);
+        }
+      }
+    }
+
     // For each scene (<visual_scene> node), the first level nodes will be converted to 
     // a sector in crystal space.
     csRef<iDocumentNodeIterator> visualSceneIterator = visualScenesSection->GetNodes("visual_scene");
@@ -751,9 +779,53 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
         if(sector->GetAttribute("name") && !cameraTarget)
         {
+          // Write sector.
           csRef<iDocumentNode> currentSectorElement = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT);
           currentSectorElement->SetValue("sector");
           currentSectorElement->SetAttribute("name", sector->GetAttributeValue("name"));
+
+          // Write children.
+          csRef<iDocumentNodeIterator> sectorNodes = sector->GetNodes("node");
+          while(sectorNodes->HasNext())
+          {
+            csRef<iDocumentNode> child = sectorNodes->Next();
+            // Write collision plugin.
+            // Write meshobj.
+            // Write portal.
+            // Write light.
+            if(child->GetNode("instance_light"))
+            {
+              csRef<iDocumentNode> newLight = currentSectorElement->CreateNodeBefore(CS_NODE_ELEMENT);
+              newLight->SetValue("light");
+              newLight->SetAttribute("name", child->GetAttributeValue("name"));
+
+              // Calculate centre.
+              csStringArray sectorPos;
+              csStringArray centerPos;
+
+              sectorPos.SplitString(sector->GetNode("matrix")->GetContentsValue(), " ");
+              centerPos.SplitString(child->GetNode("matrix")->GetContentsValue(), " ");
+
+              float x = atof(sectorPos[3]) + atof(centerPos[3]);
+              float y = atof(sectorPos[11]) + atof(centerPos[11]);
+              float z = atof(sectorPos[7]) + atof(centerPos[7]);
+
+              csRef<iDocumentNode> centreNode = newLight->CreateNodeBefore(CS_NODE_ELEMENT);
+              centreNode->SetValue("center");
+              centreNode->SetAttributeAsFloat("x", x);
+              centreNode->SetAttributeAsFloat("y", y);
+              centreNode->SetAttributeAsFloat("z", z);
+
+              // Write colour.
+              csString url = child->GetNode("instance_light")->GetAttributeValue("url");
+              csColladaLight light = lights.Get(url.Slice(1), csColladaLight());
+              csRef<iDocumentNode> lightColour = newLight->CreateNodeBefore(CS_NODE_ELEMENT);
+              lightColour->SetValue("color");
+              lightColour->SetAttributeAsFloat("red", light.colour.red);
+              lightColour->SetAttributeAsFloat("green", light.colour.green);
+              lightColour->SetAttributeAsFloat("blue", light.colour.blue);
+            }
+          }
         }
       }
     }
@@ -815,7 +887,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
                 cameraPos.SplitString(node->GetNode("matrix")->GetContentsValue(), " ");
 
                 float x = atof(sectorPos[3]) + atof(cameraPos[3]);
-                float y = atof(sectorPos[11]) - atof(cameraPos[11]);
+                float y = atof(sectorPos[11]) + atof(cameraPos[11]);
                 float z = atof(sectorPos[7]) + atof(cameraPos[7]);
 
                 csRef<iDocumentNode> positionNode = startNode->CreateNodeBefore(CS_NODE_ELEMENT);

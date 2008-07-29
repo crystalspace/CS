@@ -30,6 +30,7 @@
 #include "csgeom/triangulate3d.h"
 #include "csgeom/trimesh.h"
 #include "csgfx/rgbpixel.h"
+#include "csutil/cscolor.h"
 
 
 CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
@@ -342,6 +343,15 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     static csRGBcolor StringToColor(const char* toConvert);
 
   }; /* End of class csColladaMaterial */
+
+  struct csColladaLight
+  {
+    csColor colour;
+    csColladaLight()
+    {
+      colour = csColor(0.0f);
+    }
+  }; /* End of struct csColladaLight */
 
 } /* End of ColladaConvertor namespace */
 CS_PLUGIN_NAMESPACE_END(ColladaConvertor)
