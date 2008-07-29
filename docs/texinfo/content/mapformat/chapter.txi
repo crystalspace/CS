@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Map Format Reference
+@node Map Format Reference, , ViewMesh, Working with Engine Content
 @section Map Format Reference
 @cindex Map Format Reference
 
@@ -15,6 +15,8 @@ element names, structure, attributes etc. are the same in all possible
 representations.
 
 @menu
+* General Renderbuffers Format::
+* XML File Format:: Format of Map File (@sc{xml})
 @end menu
 
 @importss{content,mapformat,buffers.txi}
