@@ -531,17 +531,20 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
             if(csString(extra->GetAttributeValue("profile")).Compare("FCOLLADA"))
             {
               extra = extra->GetNode("user_properties");
+              csStringArray sectorProp;
               csStringArray userProp;
               userProp.SplitString(extra->GetContentsValue(), ";");
               for(size_t i=0; i<userProp.GetSize(); i++)
               {
-                csString prop = userProp[i];
-                if(prop.Truncate(prop.FindFirst('=')).LTrim().Compare("PORTAL"))
+                sectorProp.Push(csString(userProp[i]).Trim().Truncate('&'));
+                csString prop = sectorProp[i];
+                if(prop.Truncate(prop.FindFirst('=')).Compare("PORTAL"))
                 {
                   portalNames.Push(object->GetAttributeValue("name"));
                   portalTargets.Push(csString(userProp[i]).Slice(csString(userProp[i]).FindFirst('=')+1));
                 }
               }
+              sectorProps.Put(sector->GetAttributeValue("id"), sectorProp);
             }
           }
         }
@@ -946,7 +949,25 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       csRef<iDocumentNode> culler = currentSectorElement->CreateNodeBefore(CS_NODE_ELEMENT);
       culler->SetValue("cullerp");
       culler = culler->CreateNodeBefore(CS_NODE_TEXT);
-      culler->SetValue("crystalspace.culling.frustvis");
+      csStringArray userProps = sectorProps.Get(sector->GetAttributeValue("id"), csStringArray());
+      if(userProps.GetSize() != 0)
+      {
+        for(size_t i=0; i<userProps.GetSize(); i++)
+        {
+          if(csString(userProps[i]).Truncate(csString(userProps[i]).FindFirst('=')).Compare("CULLER"))
+          {
+            culler->SetValue(csString(userProps[i]).Slice(csString(userProps[i]).FindFirst('=')+1));
+          }
+          else
+          {
+            culler->SetValue("crystalspace.culling.frustvis");
+          }
+        }
+      }
+      else
+      {
+        culler->SetValue("crystalspace.culling.frustvis");
+      }
       
       // Write children.
       csRef<iDocumentNodeIterator> sectorNodes = sector->GetNodes("node");

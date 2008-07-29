@@ -115,9 +115,12 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     /// Hash of lights.
     csHash<csColladaLight, csString> lights;
 
-    /// Names of all portal objects.
+    /// Names and targets of all portal objects.
     csArray<csString> portalNames;
     csArray<csString> portalTargets;
+
+    /// User properties of each sector.
+    csHash<csStringArray, csString> sectorProps;
 
     // =============== Internal Functions ===============
     void WriteSectorInfo(iDocumentNode* sector);
