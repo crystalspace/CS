@@ -1432,9 +1432,11 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
   // =============== Auxiliary Class: csColladaEffectProfile ===============
 
-  csColladaEffectProfile::csColladaEffectProfile(iDocumentNode* profileElement, csColladaConvertor* parentObj)
+  csColladaEffectProfile::csColladaEffectProfile(iDocumentNode* profileElement, csColladaConvertor* parentObj,
+    iDocumentNode* matNode)
   {
     parent = parentObj;
+    materialNode = matNode;
     Process(profileElement);
   }
 
@@ -1455,6 +1457,25 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     csRef<iDocumentNode> nextTechnique;
     csRef<iDocumentNodeIterator> passesToProcess;
     csRef<iDocumentNode> nextPass;
+
+    // Parse 'newparams' nodes.
+    csRef<iDocumentNodeIterator> newparams = profileElement->GetNodes("newparam");
+    while(newparams->HasNext())
+    {
+      csRef<iDocumentNode> surface = newparams->Next()->GetNode("surface");
+      if(!surface)
+      {
+        continue;
+      }
+
+      if(surface->GetNode("init_from"))
+      {
+        csRef<iDocumentNode> texture = materialNode->CreateNodeBefore(CS_NODE_ELEMENT);
+        texture->SetValue("texture");
+        csRef<iDocumentNode> textureContents = texture->CreateNodeBefore(CS_NODE_TEXT);
+        textureContents->SetValue(surface->GetNode("init_from")->GetContentsValue());
+      }
+    }
 
     // grab the listing of techniques that need to be processed
     techniquesToProcess = profileElement->GetNodes("technique");
@@ -1479,7 +1500,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
       // set the ambient, specular, and diffuse colors
       csRef<iDocumentNode> colorElement = pbNode->GetNode("diffuse");
-      if (colorElement.IsValid())
+      if (colorElement.IsValid() && colorElement->GetNode("color"))
       {
         diffuseColor = csColladaMaterial::StringToColor(colorElement->GetNode("color")->GetContentsValue());
         if (parent->warningsOn)
@@ -1490,13 +1511,13 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
       colorElement = pbNode->GetNode("specular");
 
-      if (colorElement.IsValid())
+      if (colorElement.IsValid() && colorElement->GetNode("color"))
       {
         specularColor = csColladaMaterial::StringToColor(colorElement->GetNode("color")->GetValue());
       }
       colorElement = pbNode->GetNode("ambient");
 
-      if (colorElement.IsValid())
+      if (colorElement.IsValid() && colorElement->GetNode("color"))
       {
         ambientColor = csColladaMaterial::StringToColor(colorElement->GetNode("color")->GetValue());
       }
@@ -1528,9 +1549,11 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
   // =============== Auxiliary Class: csColladaEffect ===============
 
-  csColladaEffect::csColladaEffect(iDocumentNode* effectElement, csColladaConvertor* parentObj)
+  csColladaEffect::csColladaEffect(iDocumentNode* effectElement, csColladaConvertor* parentObj,
+    iDocumentNode* matNode)
   {
     parent = parentObj;
+    materialNode = matNode;
     Process(effectElement);
   }
 
@@ -1584,7 +1607,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     while (profilesToProcess->HasNext())
     {
       currentProfile = profilesToProcess->Next();
-      currentProfileObject = new csColladaEffectProfile(currentProfile, parent);
+      currentProfileObject = new csColladaEffectProfile(currentProfile, parent, materialNode);
       currentProfileObject->SetName("profile_COMMON");
       profiles.Push((*currentProfileObject));
     }
@@ -1638,12 +1661,17 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
   void csColladaMaterial::SetInstanceEffect(iDocumentNode *effectNode)
   {
-    instanceEffect = new csColladaEffect(effectNode, parent);
+    instanceEffect = new csColladaEffect(effectNode, parent, materialNode);
   }
 
   void csColladaMaterial::SetInstanceEffect(csColladaEffect *newInstEffect)
   {
     instanceEffect = newInstEffect;
+  }
+
+  void csColladaMaterial::SetMaterialNode(iDocumentNode* node)
+  {
+    materialNode = node;
   }
 
   bool csColladaMaterial::operator ==(const csColladaMaterial& comp)

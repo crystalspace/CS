@@ -673,38 +673,13 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
         csRef<iDocumentNode> newMaterial = newMaterialsNode->CreateNodeBefore(CS_NODE_ELEMENT);
         newMaterial->SetValue("material");
-        newMaterial->SetAttribute("name", material->GetAttributeValue("id"));
+        newMaterial->SetAttribute("name", material->GetAttributeValue("name"));
 
         csColladaMaterial nextMaterial = csColladaMaterial(this);
         nextMaterial.SetID(material->GetAttributeValue("id"));
-        //nextMaterial.SetInstanceEffect(effect); // Needs work.
+        nextMaterial.SetMaterialNode(newMaterial);
+        nextMaterial.SetInstanceEffect(effect);
         materialsList.Push(nextMaterial);
-
-        // Common profile.
-        csRef<iDocumentNode> effectCommon = effect->GetNode("profile_COMMON");
-        if(effectCommon.IsValid())
-        {
-          csRef<iDocumentNode> surface;
-          csRef<iDocumentNodeIterator> newparams = effectCommon->GetNodes("newparam");
-          while(newparams->HasNext())
-          {
-            csRef<iDocumentNode> surface = newparams->Next()->GetNode("surface");
-            if(!surface)
-            {
-              continue;
-            }
-
-            if(surface->GetNode("init_from"))
-            {
-              csRef<iDocumentNode> texture = newMaterial->CreateNodeBefore(CS_NODE_ELEMENT);
-              texture->SetValue("texture");
-              csRef<iDocumentNode> textureContents = texture->CreateNodeBefore(CS_NODE_TEXT);
-              textureContents->SetValue(surface->GetNode("init_from")->GetContentsValue());
-            }
-          }
-        }
-
-        // TODO: Shaders.
       }
 
       return true;
