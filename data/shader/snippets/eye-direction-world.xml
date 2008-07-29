@@ -23,20 +23,38 @@
   
     <input name="position" type="position4_world" />
     
-    <input file="/shader/snippets/worldToCameraInv.inp" private="yes" />
+    <input name="eyePosWorld" type="float4" default="complex" private="yes">
+      <block location="cg:vertexIn">
+	<uniform type="float4" name="eyePosWorld" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="float4" name="eyePosWorld" />
+      </block>
+      
+      <block location="cg:vertexMain">
+	eyePosWorld = vertexIn.eyePosWorld;
+      </block>
+      
+      <block location="cg:fragmentMain">
+	eyePosWorld = fragmentIn.eyePosWorld;
+      </block>
+      
+      <block location="cg:variablemap">
+	<variablemap destination="fragmentIn.eyePosWorld" type="expr">
+	  <sexp>(matrix-column (matrix2gl "world2camera transform inverse") 3)</sexp>
+	</variablemap>
+	<variablemap destination="vertexIn.eyePosWorld" type="expr">
+	  <sexp>(matrix-column (matrix2gl "world2camera transform inverse") 3)</sexp>
+	</variablemap>
+      </block>
+    </input>
     
     <block location="cg:vertexMain">
-      /* @@@ FIXME: inefficient! Using a shader expression
-         (matrix-column "world2camera transform inverse" 3) should be possible,
-	 too ... however, both gl3d and Cg plugin convert transforms into
-	 4x4 matrices in some bizarro way where the 4th column is different.
-       */
-      float4 eyePosWorld = mul (worldToCameraInv, float4 (0, 0, 0, 1));
       eyeDirectionWorld = (position - eyePosWorld).xyz;
     </block>
   
     <block location="cg:fragmentMain">
-      float4 eyePosWorld = mul (worldToCameraInv, float4 (0, 0, 0, 1));
       eyeDirectionWorld = (position - eyePosWorld).xyz;
     </block>
   
