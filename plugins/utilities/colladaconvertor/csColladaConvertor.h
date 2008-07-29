@@ -115,6 +115,10 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     /// Hash of lights.
     csHash<csColladaLight, csString> lights;
 
+    /// Names of all portal objects.
+    csArray<csString> portalNames;
+    csArray<csString> portalTargets;
+
     // =============== Internal Functions ===============
     void WriteSectorInfo(iDocumentNode* sector);
     void WriteCameraInfo(iDocumentNode* sector, size_t camera);

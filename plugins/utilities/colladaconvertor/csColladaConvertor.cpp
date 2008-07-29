@@ -501,6 +501,54 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
   bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
   {
+    // First collect the names of all portals.
+    csRef<iDocumentNode> libVisScenes = colladaElement->GetNode("library_visual_scenes");
+    csRef<iDocumentNode> libVisualScenes = colladaElement->GetNode("library_visual_scenes");
+    csRef<iDocumentNodeIterator> visualScenes = libVisualScenes->GetNodes("visual_scene");
+
+    csRef<iDocumentNodeIterator> sectors;
+    for(int i=0; (visualScenes->HasNext() && !sectorScene) || i<1; i++)
+    {
+      if(sectorScene)
+      {
+        sectors = visualScenes;
+      }
+      else
+      {
+        sectors = visualScenes->Next()->GetNodes("node");
+      }
+
+      while(sectors->HasNext())
+      {
+        csRef<iDocumentNode> sector = sectors->Next();
+        csRef<iDocumentNodeIterator> sectorObjects = sector->GetNodes("node");
+        while(sectorObjects->HasNext())
+        {
+          csRef<iDocumentNode> object = sectorObjects->Next();
+          if(object->GetNode("extra"))
+          {
+            csRef<iDocumentNode> extra = object->GetNode("extra")->GetNode("technique");
+            if(csString(extra->GetAttributeValue("profile")).Compare("FCOLLADA"))
+            {
+              extra = extra->GetNode("user_properties");
+              csStringArray userProp;
+              userProp.SplitString(extra->GetContentsValue(), ";");
+              for(size_t i=0; i<userProp.GetSize(); i++)
+              {
+                csString prop = userProp[i];
+                if(prop.Truncate(prop.FindFirst('=')).LTrim().Compare("PORTAL"))
+                {
+                  portalNames.Push(object->GetAttributeValue("name"));
+                  portalTargets.Push(csString(userProp[i]).Slice(csString(userProp[i]).FindFirst('=')+1));
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+
     csRef<iDocumentNodeIterator> geometryIterator;
 
     // get an iterator over all <geometry> elements
@@ -531,6 +579,18 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     {
       // retrieve next <geometry> element and store as currentGeometryElement
       currentGeometryElement = geometryIterator->Next();
+
+      // If this is a portal, skip it and continue.
+      bool skip = false;
+      for(size_t i=0; i<portalNames.GetSize() && !skip; i++)
+      {
+        skip = portalNames[i].Compare(currentGeometryElement->GetAttributeValue("name"));
+      }
+
+      if(skip)
+      {
+        continue;
+      }
 
       // get value of id attribute and store as currentGeometryID
       currentGeometryID = currentGeometryElement->GetAttribute("id");
@@ -715,9 +775,9 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
         csRef<iDocumentNode> effect = effectNodes->Next();
 
         bool nowrite = false;
-        for(size_t i=0; i<dummyMaterialIDs.GetSize(); i++)
+        for(size_t i=0; i<dummyMaterialIDs.GetSize() && !nowrite; i++)
         {
-          nowrite |= dummyMaterialIDs[i].Compare(material->GetAttributeValue("id"));
+          nowrite = dummyMaterialIDs[i].Compare(material->GetAttributeValue("id"));
         }
 
         if(nowrite)
@@ -882,14 +942,37 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       currentSectorElement->SetValue("sector");
       currentSectorElement->SetAttribute("name", sector->GetAttributeValue("name"));
 
+      // Culler (TODO: Support others).
+      csRef<iDocumentNode> culler = currentSectorElement->CreateNodeBefore(CS_NODE_ELEMENT);
+      culler->SetValue("cullerp");
+      culler = culler->CreateNodeBefore(CS_NODE_TEXT);
+      culler->SetValue("crystalspace.culling.frustvis");
+      
       // Write children.
       csRef<iDocumentNodeIterator> sectorNodes = sector->GetNodes("node");
       while(sectorNodes->HasNext())
       {
         csRef<iDocumentNode> child = sectorNodes->Next();
-        // Write collision plugin.
         // Write meshobj.
         // Write portal.
+        size_t portalNum;
+        bool isPortal = false;
+        for(portalNum=0; portalNum<portalNames.GetSize() && !isPortal; portalNum++)
+        {
+          isPortal = portalNames[portalNum].Compare(child->GetAttributeValue("name"));
+        }
+
+        if(isPortal)
+        {
+          csRef<iDocumentNode> newPortal = currentSectorElement->CreateNodeBefore(CS_NODE_ELEMENT);
+          newPortal->SetValue("portal");
+          newPortal->SetAttribute("name", child->GetAttributeValue("name"));
+          csRef<iDocumentNode> newPortalSector = newPortal->CreateNodeBefore(CS_NODE_ELEMENT);
+          newPortalSector->SetValue("sector");
+          csRef<iDocumentNode> newPortalSectorContents = newPortalSector->CreateNodeBefore(CS_NODE_TEXT);
+          newPortalSectorContents->SetValue(portalTargets[portalNum-1]);
+        }
+
         // Write light.
         if(child->GetNode("instance_light"))
         {
