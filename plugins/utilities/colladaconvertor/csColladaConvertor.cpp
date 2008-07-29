@@ -1057,8 +1057,39 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
           }
         }
 
+        // Params
         csRef<iDocumentNode> params = meshObj->CreateNodeBefore(CS_NODE_ELEMENT);
         params->SetValue("params");
+
+        // Link to mesh factory and material.
+        csRef<iDocumentNode> factory = params->CreateNodeBefore(CS_NODE_ELEMENT);
+        factory->SetValue("factory");
+        csRef<iDocumentNode> material = params->CreateNodeBefore(CS_NODE_ELEMENT);
+        material->SetValue("material");
+        csRef<iDocumentNode> factnode = child->GetNode("node")->GetNode("instance_geometry");
+
+        // Factory.
+        csString url = factnode->GetAttributeValue("url");
+        csRef<iDocumentNodeIterator> facts = colladaElement->GetNode("library_geometries")->GetNodes("geometry");
+        while(facts->HasNext())
+        {
+          csRef<iDocumentNode> fact = facts->Next();
+          if(csString(fact->GetAttributeValue("id")).Compare(url.Slice(1)))
+          {
+            factory = factory->CreateNodeBefore(CS_NODE_TEXT);
+            factory->SetValue(fact->GetAttributeValue("name"));
+            break;
+          }
+        }
+
+        // Material
+        csRef<iDocumentNode> matnode = factnode->GetNode("bind_material");
+        if(matnode.IsValid())
+        {
+          matnode = matnode->GetNode("technique_common")->GetNode("instance_material");
+          material = material->CreateNodeBefore(CS_NODE_TEXT);
+          material->SetValue(csString(matnode->GetAttributeValue("target")).Slice(1));          
+        }
 
         // Position
         csRef<iDocumentNode> move = meshObj->CreateNodeBefore(CS_NODE_ELEMENT);
