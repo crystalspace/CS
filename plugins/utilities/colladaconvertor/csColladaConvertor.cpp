@@ -501,7 +501,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
   bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
   {
-    // First collect the names of all portals.
+    // First collect the names of all portals and fill the meshprops hash.
     csRef<iDocumentNode> libVisScenes = colladaElement->GetNode("library_visual_scenes");
     csRef<iDocumentNode> libVisualScenes = colladaElement->GetNode("library_visual_scenes");
     csRef<iDocumentNodeIterator> visualScenes = libVisualScenes->GetNodes("visual_scene");
@@ -527,24 +527,28 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
           csRef<iDocumentNode> object = sectorObjects->Next();
           if(object->GetNode("extra"))
           {
-            csRef<iDocumentNode> extra = object->GetNode("extra")->GetNode("technique");
-            if(csString(extra->GetAttributeValue("profile")).Compare("FCOLLADA"))
+            csRef<iDocumentNodeIterator> techniques = object->GetNode("extra")->GetNodes("technique");
+            while(techniques->HasNext())
             {
-              extra = extra->GetNode("user_properties");
-              csStringArray sectorProp;
-              csStringArray userProp;
-              userProp.SplitString(extra->GetContentsValue(), ";");
-              for(size_t i=0; i<userProp.GetSize(); i++)
+              csRef<iDocumentNode> technique = techniques->Next();
+              if(csString(technique->GetAttributeValue("profile")).Compare("FCOLLADA"))
               {
-                sectorProp.Push(csString(userProp[i]).Trim().Truncate('&'));
-                csString prop = sectorProp[i];
-                if(prop.Truncate(prop.FindFirst('=')).Compare("PORTAL"))
+                technique = technique->GetNode("user_properties");
+                csStringArray meshProp;
+                csStringArray userProp;
+                userProp.SplitString(technique->GetContentsValue(), ";");
+                for(size_t i=0; i<userProp.GetSize(); i++)
                 {
-                  portalNames.Push(object->GetAttributeValue("name"));
-                  portalTargets.Push(csString(userProp[i]).Slice(csString(userProp[i]).FindFirst('=')+1));
+                  meshProp.Push(csString(userProp[i]).Trim().Truncate('&'));
+                  csString prop = meshProp[i];
+                  if(prop.Truncate(prop.FindFirst('=')).Compare("PORTAL"))
+                  {
+                    portalNames.Push(object->GetAttributeValue("name"));
+                    portalTargets.Push(csString(userProp[i]).Slice(csString(userProp[i]).FindFirst('=')+1));
+                  }
                 }
+                meshProps.Put(object->GetAttributeValue("name"), meshProp);
               }
-              sectorProps.Put(sector->GetAttributeValue("id"), sectorProp);
             }
           }
         }
@@ -651,7 +655,18 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
           return false;
         }
 
-        mesh = new csColladaMesh(currentMeshElement, this);
+        // Get meshfact type.
+        csString meshfactType = GetMeshFactType(csString(""));
+        csStringArray meshPropsArr = meshProps.Get(currentGeometryElement->GetAttributeValue("name"), csStringArray());
+        for(size_t j=0; j<meshPropsArr.GetSize(); j++)
+        {
+          if(csString(meshPropsArr[j]).Truncate(csString(meshPropsArr[j]).FindFirst('=')).Compare("MESH"))
+          {
+            meshfactType = GetMeshFactType(csString(meshPropsArr[j]).Slice(csString(meshPropsArr[j]).FindFirst('=')+1));
+          }
+        }
+
+        mesh = new csColladaMesh(currentMeshElement, this, meshfactType);
 
         mesh->WriteXML(csTopNode);
 
@@ -929,6 +944,28 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
   void csColladaConvertor::WriteSectorInfo(iDocumentNode* sector)
   {
+    // Get user props
+    if(sector->GetNode("extra"))
+    {
+      csRef<iDocumentNodeIterator> techniques = sector->GetNode("extra")->GetNodes("technique");
+      while(techniques->HasNext())
+      {
+        csRef<iDocumentNode> technique = techniques->Next();
+        if(csString(technique->GetAttributeValue("profile")).Compare("FCOLLADA"))
+        {
+          technique = technique->GetNode("user_properties");
+          csStringArray sectorProp;
+          csStringArray userProp;
+          userProp.SplitString(technique->GetContentsValue(), ";");
+          for(size_t i=0; i<userProp.GetSize(); i++)
+          {
+            sectorProp.Push(csString(userProp[i]).Trim().Truncate('&'));
+          }
+          sectorProps.Put(sector->GetAttributeValue("id"), sectorProp);
+        }
+      }
+    }
+
     // Check that it really is a sector.
     bool cameraTarget = false;
     for(size_t i=0; i<cameraIDs.GetSize(); i++)
@@ -958,10 +995,6 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
           {
             culler->SetValue(csString(userProps[i]).Slice(csString(userProps[i]).FindFirst('=')+1));
           }
-          else
-          {
-            culler->SetValue("crystalspace.culling.frustvis");
-          }
         }
       }
       else
@@ -973,21 +1006,21 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       csRef<iDocumentNodeIterator> sectorNodes = sector->GetNodes("node");
       while(sectorNodes->HasNext())
       {
-        csRef<iDocumentNode> child = sectorNodes->Next();
+        csRef<iDocumentNode> object = sectorNodes->Next();
 
         // Write portal.
         size_t portalNum;
         bool isPortal = false;
         for(portalNum=0; portalNum<portalNames.GetSize() && !isPortal; portalNum++)
         {
-          isPortal = portalNames[portalNum].Compare(child->GetAttributeValue("name"));
+          isPortal = portalNames[portalNum].Compare(object->GetAttributeValue("name"));
         }
 
         if(isPortal)
         {
           csRef<iDocumentNode> newPortal = currentSectorElement->CreateNodeBefore(CS_NODE_ELEMENT);
           newPortal->SetValue("portal");
-          newPortal->SetAttribute("name", child->GetAttributeValue("name"));
+          newPortal->SetAttribute("name", object->GetAttributeValue("name"));
           csRef<iDocumentNode> newPortalSector = newPortal->CreateNodeBefore(CS_NODE_ELEMENT);
           newPortalSector->SetValue("sector");
           csRef<iDocumentNode> newPortalSectorContents = newPortalSector->CreateNodeBefore(CS_NODE_TEXT);
@@ -997,7 +1030,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
             while(facts->HasNext())
             {
               csRef<iDocumentNode> fact = facts->Next();
-              if(csString(fact->GetAttributeValue("name")).Compare(child->GetAttributeValue("name")))
+              if(csString(fact->GetAttributeValue("name")).Compare(object->GetAttributeValue("name")))
               {
                 fact = fact->GetNode("mesh")->GetNode("source")->GetNode("float_array");
                 csStringArray vertices;
@@ -1024,18 +1057,18 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
         }
 
         // Write light.
-        if(child->GetNode("instance_light"))
+        if(object->GetNode("instance_light"))
         {
           csRef<iDocumentNode> newLight = currentSectorElement->CreateNodeBefore(CS_NODE_ELEMENT);
           newLight->SetValue("light");
-          newLight->SetAttribute("name", child->GetAttributeValue("name"));
+          newLight->SetAttribute("name", object->GetAttributeValue("name"));
 
           // Calculate centre.
           csStringArray sectorPos;
           csStringArray centerPos;
 
           sectorPos.SplitString(sector->GetNode("matrix")->GetContentsValue(), " ");
-          centerPos.SplitString(child->GetNode("matrix")->GetContentsValue(), " ");
+          centerPos.SplitString(object->GetNode("matrix")->GetContentsValue(), " ");
 
           float x = atof(sectorPos[3]) + atof(centerPos[3]);
           float y = atof(sectorPos[11]) + atof(centerPos[11]);
@@ -1048,7 +1081,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
           centreNode->SetAttributeAsFloat("z", z);
 
           // Write colour.
-          csString url = child->GetNode("instance_light")->GetAttributeValue("url");
+          csString url = object->GetNode("instance_light")->GetAttributeValue("url");
           csColladaLight light = lights.Get(url.Slice(1), csColladaLight());
           csRef<iDocumentNode> lightColour = newLight->CreateNodeBefore(CS_NODE_ELEMENT);
           lightColour->SetValue("color");
@@ -1059,7 +1092,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
         }
 
         // Check for camera, deal with it later.
-        if(child->GetNode("instance_camera"))
+        if(object->GetNode("instance_camera"))
         {
           continue;
         }
@@ -1067,23 +1100,29 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
          // Write genmesh meshobj (TODO: Other mesh types).
         csRef<iDocumentNode> meshObj = currentSectorElement->CreateNodeBefore(CS_NODE_ELEMENT);
         meshObj->SetValue("meshobj");
-        meshObj->SetAttribute("name", child->GetAttributeValue("name"));
+        meshObj->SetAttribute("name", object->GetAttributeValue("name"));
         csRef<iDocumentNode> plugin = meshObj->CreateNodeBefore(CS_NODE_ELEMENT);
         plugin->SetValue("plugin");
-        plugin = plugin->CreateNodeBefore(CS_NODE_TEXT);
-        plugin->SetValue(CS_COLLADA_DEFAULT_MESH_PLUGIN_TYPE);
 
-        if(userProps.GetSize() != 0)
+        csString meshType = GetMeshType(csString(""));
+        csStringArray mesh = meshProps.Get(object->GetAttributeValue("name"), csStringArray());
+        for(size_t j=0; j<mesh.GetSize(); j++)
         {
-          for(size_t i=0; i<userProps.GetSize(); i++)
+          if(csString(mesh[j]).Truncate(csString(mesh[j]).FindFirst('=')).Compare("MESH"))
           {
-            if(csString(userProps[i]).Truncate(csString(userProps[i]).FindFirst('=')).Compare("NOSHADOWS"))
-            {
-              csRef<iDocumentNode> noshadows = meshObj->CreateNodeBefore(CS_NODE_ELEMENT);
-              noshadows->SetValue("noshadows");
-            }
+            meshType = GetMeshType(csString(mesh[j]).Slice(csString(mesh[j]).FindFirst('=')+1));           
+            continue;
+          }
+
+          if(csString(mesh[j]).Truncate(csString(mesh[j]).FindFirst('=')).Compare("NOSHADOWS"))
+          {
+            csRef<iDocumentNode> noshadows = meshObj->CreateNodeBefore(CS_NODE_ELEMENT);
+            noshadows->SetValue("noshadows");
           }
         }
+
+        plugin = plugin->CreateNodeBefore(CS_NODE_TEXT);
+        plugin->SetValue(meshType);
 
         // Params
         csRef<iDocumentNode> params = meshObj->CreateNodeBefore(CS_NODE_ELEMENT);
@@ -1094,7 +1133,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
         factory->SetValue("factory");
         csRef<iDocumentNode> material = params->CreateNodeBefore(CS_NODE_ELEMENT);
         material->SetValue("material");
-        csRef<iDocumentNode> factnode = child->GetNode("node")->GetNode("instance_geometry");
+        csRef<iDocumentNode> factnode = object->GetNode("node")->GetNode("instance_geometry");
 
         // Factory.
         csString url = factnode->GetAttributeValue("url");
@@ -1129,7 +1168,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
         csStringArray meshobjPos;
 
         sectorPos.SplitString(sector->GetNode("matrix")->GetContentsValue(), " ");
-        meshobjPos.SplitString(child->GetNode("matrix")->GetContentsValue(), " ");
+        meshobjPos.SplitString(object->GetNode("matrix")->GetContentsValue(), " ");
 
         float x = atof(sectorPos[3]) + atof(meshobjPos[3]);
         float y = atof(sectorPos[11]) + atof(meshobjPos[11]);
@@ -1191,6 +1230,30 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
           // TODO: up and forward vectors.
         }
       }
+    }
+  }
+
+  csString csColladaConvertor::GetMeshFactType(csString name)
+  {
+    if(name.CompareNoCase("terrain2"))
+    {
+      return CS_COLLADA_TERRAIN2FACT_PLUGIN_TYPE;
+    }
+    else
+    {
+      return CS_COLLADA_GENMESHFACT_PLUGIN_TYPE;
+    }
+  }
+
+  csString csColladaConvertor::GetMeshType(csString name)
+  {
+    if(name.CompareNoCase("terrain2"))
+    {
+      return CS_COLLADA_TERRAIN2_PLUGIN_TYPE;
+    }
+    else
+    {
+      return CS_COLLADA_GENMESH_PLUGIN_TYPE;
     }
   }
 

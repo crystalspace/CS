@@ -35,9 +35,11 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
   class csColladaEffect;
 
-  /// The default type for meshfact <plugin> tags
-#define CS_COLLADA_DEFAULT_MESHFACT_PLUGIN_TYPE "crystalspace.mesh.loader.factory.genmesh"
-#define CS_COLLADA_DEFAULT_MESH_PLUGIN_TYPE "crystalspace.mesh.loader.genmesh"
+  /// The default type for mesh(fact) <plugin> tags
+#define CS_COLLADA_GENMESHFACT_PLUGIN_TYPE "crystalspace.mesh.loader.factory.genmesh"
+#define CS_COLLADA_GENMESH_PLUGIN_TYPE "crystalspace.mesh.loader.genmesh"
+#define CS_COLLADA_TERRAIN2FACT_PLUGIN_TYPE "crystalspace.mesh.loader.factory.terrain2"
+#define CS_COLLADA_TERRAIN2_PLUGIN_TYPE "ccrystalspace.mesh.loader.terrain2"
 
   /** 
   * This class implements the iColladaConvertor interface.  It is used as a conversion utility
@@ -123,9 +125,14 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     /// User properties of each sector.
     csHash<csStringArray, csString> sectorProps;
 
+    /// User properties of each mesh.
+    csHash<csStringArray, csString> meshProps;
+
     // =============== Internal Functions ===============
     void WriteSectorInfo(iDocumentNode* sector);
     void WriteCameraInfo(iDocumentNode* sector, size_t camera);
+    csString GetMeshFactType(csString name);
+    csString GetMeshType(csString name);
 
     // =============== Basic Utility Functions ===============
   public:

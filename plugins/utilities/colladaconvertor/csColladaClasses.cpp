@@ -158,10 +158,10 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
   // =============== Auxiliary Class: csColladaMesh ===============
 
-  csColladaMesh::csColladaMesh(iDocumentNode* element, csColladaConvertor* par)
+  csColladaMesh::csColladaMesh(iDocumentNode* element, csColladaConvertor* par, csString plugType)
   {
     meshElement = element;
-    pluginType = CS_COLLADA_DEFAULT_MESHFACT_PLUGIN_TYPE;
+    pluginType = plugType;
     numberOfVertices = 0;
     numVertexElements = 0;
     normalId = 0;

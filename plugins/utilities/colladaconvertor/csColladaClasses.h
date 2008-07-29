@@ -179,7 +179,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     void SetMaterialsPointer(csColladaMaterial* matPtr);
 
   public:
-    csColladaMesh(iDocumentNode* element, csColladaConvertor* parent);
+    csColladaMesh(iDocumentNode* element, csColladaConvertor* parent, csString plugType);
     ~csColladaMesh();
 
     const csArray<csVector3>& GetVertices() { return vertices; }
