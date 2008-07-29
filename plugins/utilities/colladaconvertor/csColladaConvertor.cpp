@@ -758,18 +758,22 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       }
     }
 
-    // next, we'll convert the cameras
-    // a camera will convert to a start location in the world file
-    // a start location requires 
-    //   * a sector to start in
-    //   * a position to start at
-    //   * an up vector
-    //   * a forward vector
+    // Next, we'll convert the cameras
+    // A camera will convert to a start location in the world file
+    // A start location consists of: 
+    //   * A sector to start in.
+    //   * A position to start at.
+    //   * An up vector. (optional)
+    //   * A forward vector. (optional)
+
+    // For each camera.
     for(size_t i=0; i<cameraIDs.GetSize(); i++)
     {
+      // For each scene.
       visualSceneIterator = visualScenesSection->GetNodes("visual_scene");
       while(visualSceneIterator->HasNext())
       {
+        // For each sector;
         csRef<iDocumentNode> visualSceneElement = visualSceneIterator->Next();
         csRef<iDocumentNodeIterator> sectors = visualSceneElement->GetNodes("node");
         while(sectors->HasNext())
@@ -783,15 +787,18 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
             continue;
           }
 
+          // For each node (possible camera).
           csRef<iDocumentNodeIterator> nodes = sector->GetNodes("node");
           while(nodes->HasNext())
           {
             csRef<iDocumentNode> node = nodes->Next();
             if(node->GetNode("instance_camera"))
             {
+              // Is it the right camera?
               csString url = node->GetNode("instance_camera")->GetAttributeValue("url");
               if(url.Slice(1).Compare(cameraIDs[i]))
               {
+                // Create start node.
                 csRef<iDocumentNode> startNode = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT);
                 startNode->SetValue("start");
                 startNode->SetAttribute("name", node->GetAttributeValue("name"));
@@ -800,6 +807,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
                 csRef<iDocumentNode> sectorNodeContents = sectorNode->CreateNodeBefore(CS_NODE_TEXT);
                 sectorNodeContents->SetValue(sector->GetAttributeValue("name"));
 
+                // Calculate position.
                 csStringArray sectorPos;
                 csStringArray cameraPos;
 
@@ -815,6 +823,8 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
                 positionNode->SetAttributeAsFloat("x", x);
                 positionNode->SetAttributeAsFloat("y", y);
                 positionNode->SetAttributeAsFloat("z", z);
+
+                // TODO: up and forward vectors.
               }
             }
           }
