@@ -783,7 +783,8 @@ bool csShaderExpression::eval_variable(csShaderVariable * var, oper_arg & out)
     break;
     
   case csShaderVariable::TRANSFORM:
-  case csShaderVariable::MATRIX:
+  case csShaderVariable::MATRIX3X3:
+  case csShaderVariable::MATRIX4X4:
     out.type = TYPE_MATRIX;
     var->GetValue(out.matrix);
     break;
@@ -830,6 +831,10 @@ bool csShaderExpression::eval_argument(const oper_arg & arg, csShaderVariable * 
 
   case TYPE_VECTOR4:
     out->SetValue(arg.vec4);
+    break;
+
+  case TYPE_MATRIX:
+    out->SetValue(arg.matrix);
     break;
 
   default:
@@ -1055,6 +1060,11 @@ bool csShaderExpression::eval_mul(const oper_arg & arg1, const oper_arg & arg2, 
     output.type = arg2.type;
     output.vec4 = arg2.vec4 * arg1.num;
 
+  } 
+  else if ((arg1.type == TYPE_MATRIX) && (arg2.type == TYPE_MATRIX))
+  {
+    output.type = TYPE_MATRIX;
+    output.matrix = arg1.matrix * arg2.matrix;
   } 
   else 
   {

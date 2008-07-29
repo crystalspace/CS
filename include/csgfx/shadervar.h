@@ -118,12 +118,15 @@ public:
     VECTOR3,
     /// Vector with 4 components
     VECTOR4,
-    /// Matrix
-    MATRIX,
+    /// 3x3 Matrix
+    MATRIX3X3,
+    MATRIX = MATRIX3X3,
     /// Transform
     TRANSFORM,
     /// Array
     ARRAY,
+    /// 4x4 Matrix
+    MATRIX4X4,
     
     /**
      * Color
@@ -366,7 +369,12 @@ public:
     if (accessor) 
       accessor->PreGetValue (this);
 
-    if (Type == MATRIX)
+    if (Type == MATRIX4X4)
+    {
+      value = *Matrix4ValuePtr;
+      return true;
+    }
+    else if (Type == MATRIX3X3)
     {
       value = *MatrixValuePtr;
       return true;
@@ -562,6 +570,17 @@ public:
     return true;
   }
 
+  /// Store a CS::Math::Matrix4
+  bool SetValue (const CS::Math::Matrix4& value)
+  {
+    if (Type != MATRIX4X4)
+      NewType (MATRIX4X4);
+
+    *Matrix4ValuePtr = value;
+        
+    return true;
+  }
+  
   void AddVariableToArray (csShaderVariable *variable)
   {
     if (Type == ARRAY) 
@@ -633,6 +652,7 @@ private:
 
     int Int;
     csMatrix3* MatrixValuePtr;
+    CS::Math::Matrix4* Matrix4ValuePtr;
     csReversibleTransform* TransformPtr;
     SvArrayType* ShaderVarArray;
   };
@@ -643,6 +663,8 @@ private:
   
   CS_DECLARE_STATIC_CLASSVAR (matrixAlloc, MatrixAlloc,
     csBlockAllocator<csMatrix3>)
+  CS_DECLARE_STATIC_CLASSVAR (matrix4Alloc, Matrix4Alloc,
+    csBlockAllocator<CS::Math::Matrix4>)
   CS_DECLARE_STATIC_CLASSVAR (transformAlloc, TransformAlloc,
     csBlockAllocator<csReversibleTransform>)
   CS_DECLARE_STATIC_CLASSVAR (arrayAlloc, ShaderVarArrayAlloc,
