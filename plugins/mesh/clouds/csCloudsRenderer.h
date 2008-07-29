@@ -35,7 +35,10 @@ public:
 	{
 	}
 
-	virtual const bool Render(const csRef<iField3<float>>& rCondWaterMixingRatios /*, const csMatrix& mTransformation */);
+	virtual const bool Render(const csRef<iField3<float>>& rCondWaterMixingRatios /*, const csMatrix& mTransformation */)
+	{
+		return true;
+	}
 };
 
 #endif // __CSCLOUDRENDERER_PLUGIN_H__

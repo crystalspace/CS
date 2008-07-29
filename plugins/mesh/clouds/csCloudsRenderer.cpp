@@ -18,3 +18,5 @@
 
 #include <cssysdef.h>
 #include "csCloudsRenderer.h"
+
+SCF_IMPLEMENT_FACTORY(csCloudsRenderer)

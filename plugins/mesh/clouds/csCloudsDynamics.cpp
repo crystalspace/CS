@@ -19,7 +19,6 @@
 #include <cssysdef.h>
 #include "csCloudsDynamics.h"
 
-CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY(csCloudsDynamics)
 
 //----------------------------------------------------------//
@@ -84,10 +83,10 @@ const bool csCloudsDynamics::SetGridSize(const UINT x, const UINT y, const UINT 
 					m_arfCondWaterMixingRatios[1]->SetValue(m_fInitCondWaterMixingRatio, x, y, z);
 					m_arfPressureField[0]->SetValue(0.f, x, y, z);
 					m_arfPressureField[1]->SetValue(0.f, x, y, z);
+					m_arvRotVelField->SetValue(csVector3(0.f, 0.f, 0.f), x, y, z);
 				}
 				m_arvVelocityField[0]->SetValue(csVector3(0.f, 0.f, 0.f), x, y, z);
 				m_arvVelocityField[1]->SetValue(csVector3(0.f, 0.f, 0.f), x, y, z);
-				m_arvRotVelField->SetValue(csVector3(0.f, 0.f, 0.f), x, y, z);
 			}
 		}
 	}

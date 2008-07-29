@@ -18,5 +18,6 @@
 
 #include <cssysdef.h>
 #include "csClouds.h"
-//#include "csCloudsDynamics.h"
-//#include "csCloudsRenderer.h"
+
+CS_IMPLEMENT_PLUGIN
+SCF_IMPLEMENT_FACTORY(csClouds)

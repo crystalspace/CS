@@ -17,7 +17,7 @@
         <implementation>csCloudsDynamics</implementation>
         <description>Dynamic simulation of clouds</description>
 	  <requires>
-		<class>crystalspace.mesh.cloud_field3</class>
+		<class>crystalspace.mesh.clouds_field3</class>
 	  </requires>
       </class>
       <class>

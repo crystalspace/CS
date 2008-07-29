@@ -44,9 +44,9 @@ public:
 		m_Renderer.Invalidate();
 	}
 
-  //All of following Setters refer to the csCloudsDynamics instance, and are delegated!
-  virtual inline const bool SetGridSize(const UINT x, const UINT y, const UINT z) {return m_Dynamics->SetGridSize(x, y, z);}
-  virtual inline void SetGridScale(const float dx) {return m_Dynamics->SetGridScale(dx);}
+	//All of following Setters refer to the csCloudsDynamics instance, and are delegated!
+	virtual inline const bool SetGridSize(const UINT x, const UINT y, const UINT z) {return m_Dynamics->SetGridSize(x, y, z);}
+	virtual inline void SetGridScale(const float dx) {return m_Dynamics->SetGridScale(dx);}
 	virtual inline void SetCondensedWaterScaleFactor(const float fqc) {return m_Dynamics->SetCondensedWaterScaleFactor(fqc);}
 	virtual inline void SetGravityAcceleration(const csVector3& vG) {return m_Dynamics->SetGravityAcceleration(vG);}
 	virtual inline void SetVorticityConfinementForceEpsilon(const float e) {return m_Dynamics->SetVorticityConfinementForceEpsilon(e);}
@@ -64,9 +64,11 @@ public:
 	virtual inline void SetBaseAltitude(const float H) {return m_Dynamics->SetBaseAltitude(H);}
 	virtual inline void SetTemperaturBottomInputField(csRef<iField2<float>> Field) {return m_Dynamics->SetTemperaturBottomInputField(Field);}
 	virtual inline void SetWaterVaporBottomInputField(csRef<iField2<float>> Field) {return m_Dynamics->SetWaterVaporBottomInputField(Field);}
-	virtual const bool DoTimeStep(const float fTime = 0.f);
-	virtual const bool DoAmortTimeStep(const float fTime = 0.f);
-	virtual const bool RenderClouds();
+
+	//DEBUG!
+	virtual const bool DoTimeStep(const float fTime = 0.f) {return m_Dynamics->DoComputationSteps(0, fTime);}
+	virtual const bool DoAmortTimeStep(const float fTime = 0.f) {return m_Dynamics->DoComputationSteps(0, fTime);}
+	virtual const bool RenderClouds() {return true;}
 };
 
 #endif // __CSCLOUD_PLUGIN_H__

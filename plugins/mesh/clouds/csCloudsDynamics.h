@@ -38,7 +38,7 @@ The local coordinate system is equal to the one used as global with:
 */
 class csCloudsDynamics : public scfImplementation1<csCloudsDynamics, iCloudsDynamics>
 {
-	static const UINT			s_iTotalStepCount = 11;
+	static const UINT s_iTotalStepCount = 11;
 private:
 	/**
 	From each field there are two instances, because each time-step all of
@@ -47,82 +47,82 @@ private:
 	and iLastIndex gives the other one. Both are either	0 or 1. 
 	At the end of each timestep those two are going to be swapped.
 	*/
-	UINT						m_iLastIndex;
-	UINT						m_iActualIndex;
+	UINT   m_iLastIndex;
+	UINT   m_iActualIndex;
 	/**
 	Temperature, pressure and both mixing ratios are definded at the center
 	of each voxel. Indexing is therefore as always f(x, y, z)
 	*/
-	csRef<iField3<float>>		  m_arfPotTemperature[2];				    // T, potential temperature
-	csRef<iField3<float>>		  m_arfCondWaterMixingRatios[2];		// qc
-	csRef<iField3<float>>		  m_arfWaterVaporMixingRatios[2];		// qv
-	csRef<iField3<csVector3>>	m_arvForceField;
-	csRef<iField3<float>>		  m_arfVelDivergence;
-	csRef<iField3<float>>		  m_arfPressureField[2];				    // p
+	csRef<iField3<float>>         m_arfPotTemperature[2];               // T, potential temperature
+	csRef<iField3<float>>         m_arfCondWaterMixingRatios[2];        // qc
+	csRef<iField3<float>>         m_arfWaterVaporMixingRatios[2];       // qv
+	csRef<iField3<csVector3>>     m_arvForceField;
+	csRef<iField3<float>>         m_arfVelDivergence;
+	csRef<iField3<float>>         m_arfPressureField[2];                // p
 	/**
 	Velocity is defined at the boundaries of each cell. Half-way index
 	notation is used in consequence. These fields are of size N + 1
 	*/
-	csRef<iField3<csVector3>>	m_arvVelocityField[2];				    // u
+	csRef<iField3<csVector3>>   m_arvVelocityField[2];                  // u
 
 	//This rotation-field is defined at Cell-Centers!
-	csRef<iField3<csVector3>>	m_arvRotVelField;					        // rot(u)
+	csRef<iField3<csVector3>>   m_arvRotVelField;                       // rot(u)
 
-	float						m_fTimeStep;
-	float						m_fTimePassed;
-	UINT						m_iGridSizeX;
-	UINT						m_iGridSizeY;
-	UINT						m_iGridSizeZ;
-	float						m_fGridScale;						    // dx
-	UINT						m_iNewPressureField;
-	UINT						m_iOldPressureField;
+	float                       m_fTimeStep;
+	float                       m_fTimePassed;
+	UINT                        m_iGridSizeX;
+	UINT                        m_iGridSizeY;
+	UINT                        m_iGridSizeZ;
+	float                       m_fGridScale;                           // dx
+	UINT                        m_iNewPressureField;
+	UINT                        m_iOldPressureField;
 
-	UINT						m_iCurrentStep;
+	UINT                        m_iCurrentStep;
 
 	//Precomputed constants
-	float						m_fInvGridScale;					  // 1 / dx
-	float						m_fKappa;							      // _R / _cp
-	float						m_fAltitudeExponent;				// |_g| / (_R * _G)
+	float                       m_fInvGridScale;                        // 1 / dx
+	float                       m_fKappa;                               // _R / _cp
+	float                       m_fAltitudeExponent;                    // |_g| / (_R * _G)
 
 	//====================================================//
 	//            USER SPECIFIC VARIABLES				  //
 	//====================================================//
 	//Epslion for the vorticityConfinement-Force calculaion
-	float						m_fVCEpsilon;						// _e
+	float                       m_fVCEpsilon;                       // _e
 	//Inverse of reference virtual potential temperature
-	float						m_fInvRefVirtPotTemp;				// _Tp
+	float                       m_fInvRefVirtPotTemp;               // _Tp
 	//Scaling factor for condensed water in buoyant-force-calculaion
-	float						m_fCondWaterScaleFactor;			// _fqc
+	float                       m_fCondWaterScaleFactor;            // _fqc
 	//Acceleration due to gravitation
-	csVector3			  m_vGravitationAcc;					// _g
+	csVector3                   m_vGravitationAcc;                  // _g
 	//Condensation-Rate
-	float						m_fCondensationRate;				// _C
+	float                       m_fCondensationRate;                // _C
 	//Preasure at sealevel
-	float						m_fRefPressure;						// _p0
+	float                       m_fRefPressure;                     // _p0
 	//Temperature Lapse rate
-	float						m_fTempLapseRate;					// _G
+	float                       m_fTempLapseRate;                   // _G
 	//Temperature at sea-level
-	float						m_fRefTemperature;					// _T0
+	float                       m_fRefTemperature;                  // _T0
 	//Latent heat of vaporization of water
-	float						m_fLatentHeat;						// _L
+	float                       m_fLatentHeat;                      // _L
 	//Ideal gas konstant for dry air
-	float						m_fIdealGasConstant;				// _R
+	float                       m_fIdealGasConstant;                // _R
 	//Specific heat capacity (dry air, constant pressure)
-	float						m_fSpecificHeatCapacity;			// _cp
+	float                       m_fSpecificHeatCapacity;            // _cp
 	//Ambient temperature
-	float						m_fAmbientTemperature;				// _TA
+	float                       m_fAmbientTemperature;              // _TA
 	//Initial-value for condensed water mixing ratio
-	float						m_fInitCondWaterMixingRatio;
+	float                       m_fInitCondWaterMixingRatio;
 	//Initial-value for water vapor mixing ratio
-	float						m_fInitWaterVaporMixingRatio;
+	float                       m_fInitWaterVaporMixingRatio;
 	//Global windspeed
-	csVector3					m_vWindSpeed;
+	csVector3                   m_vWindSpeed;
 	//Absolute Height of the bottom grid face
-	float						m_fBaseAltitude;
+	float                       m_fBaseAltitude;
 	//Bottom input field for Temperature
-	csRef<iField2<float>>		m_arfInputTemperature;
+	csRef<iField2<float>>       m_arfInputTemperature;
 	//Bottom input field for water vapor
-	csRef<iField2<float>>		m_arfInputWaterVapor;
+	csRef<iField2<float>>       m_arfInputWaterVapor;
 	//====================================================//
 
 	//Calculates the rotation of the velocity field u, and stores it in arvRotVelField
@@ -321,8 +321,8 @@ public:
 	//Updates all constant and precomputeted parameters according to the user specific values set!
 	virtual inline void UpdateAllDependParameters()
 	{
-		m_fKappa			= m_fIdealGasConstant / m_fSpecificHeatCapacity;
-		m_fAltitudeExponent	= m_vGravitationAcc.Norm() / (m_fTempLapseRate * m_fIdealGasConstant);
+		m_fKappa            = m_fIdealGasConstant / m_fSpecificHeatCapacity;
+		m_fAltitudeExponent = m_vGravitationAcc.Norm() / (m_fTempLapseRate * m_fIdealGasConstant);
 	}
 
 	/**
