@@ -27,7 +27,7 @@
       </class>
       <class>
         <name>crystalspace.mesh.clouds_field3</name>
-        <implementation>csField3<T></implementation>
+        <implementation>csField3</implementation>
         <description>Three dimensional field represented as discrete grid</description>
       </class>
     </classes>
