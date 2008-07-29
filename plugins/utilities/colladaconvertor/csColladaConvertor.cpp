@@ -992,6 +992,34 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
           newPortalSector->SetValue("sector");
           csRef<iDocumentNode> newPortalSectorContents = newPortalSector->CreateNodeBefore(CS_NODE_TEXT);
           newPortalSectorContents->SetValue(portalTargets[portalNum-1]);
+
+            csRef<iDocumentNodeIterator> facts = colladaElement->GetNode("library_geometries")->GetNodes("geometry");
+            while(facts->HasNext())
+            {
+              csRef<iDocumentNode> fact = facts->Next();
+              if(csString(fact->GetAttributeValue("name")).Compare(child->GetAttributeValue("name")))
+              {
+                fact = fact->GetNode("mesh")->GetNode("source")->GetNode("float_array");
+                csStringArray vertices;
+                vertices.SplitString(fact->GetContentsValue(), " ");
+
+                for(int i=0; i<12; i+=3)
+                {
+                  csRef<iDocumentNode> vertex = newPortal->CreateNodeBefore(CS_NODE_ELEMENT);
+                  vertex->SetValue("v");
+
+                  float x = atof(vertices[i]);
+                  float y = atof(vertices[i+1]);
+                  float z = atof(vertices[i+2]);
+
+                  vertex->SetAttributeAsFloat("x", x);
+                  vertex->SetAttributeAsFloat("y", y);
+                  vertex->SetAttributeAsFloat("z", z);
+                }
+                break;
+              }
+            }
+
           continue;
         }
 
