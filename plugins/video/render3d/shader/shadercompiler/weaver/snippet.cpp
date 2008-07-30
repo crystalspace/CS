@@ -1238,7 +1238,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   
   void TechniqueGraph::AddConnection (const Connection& conn)
   {
-    connections.Push (conn);
+    connections.PushSmart (conn);
     inTechniques.Delete (conn.to);
     outTechniques.Delete (conn.from);
     CS_ASSERT(conn.to != conn.from);
