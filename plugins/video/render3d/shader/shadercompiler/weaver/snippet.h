@@ -189,6 +189,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       virtual BasicIterator<const Block>* GetBlocks() const { return 0; }
       virtual BasicIterator<const Input>* GetInputs() const;
       virtual BasicIterator<const Output>* GetOutputs() const;
+      
+      BasicIterator<Snippet*>* GetSnippets();
+      BasicIterator<Snippet* const>* GetSnippets() const;
     };
     
     Snippet (const WeaverCompiler* compiler, iDocumentNode* node,
@@ -204,6 +207,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     csString GetCondition() const;
     
     BasicIterator<const Technique*>* GetTechniques() const;
+    BasicIterator<Technique*>* GetTechniques();
     
     Technique* LoadLibraryTechnique (
       iDocumentNode* node, const Technique::CombinerPlugin& combiner,
@@ -378,6 +382,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       void Merge (const GraphInfo& other);
     };
     void BuildSubGraphs (const Snippet* snip, csArray<GraphInfo>& graphs);
+    void FixupExplicitConnections (const Snippet* snip, csArray<GraphInfo>& graphs);
     void MapGraphInputsOutputs (GraphInfo& graphInfo, const Snippet* snip);
     void MapGraphInputsOutputs (csArray<GraphInfo>& graphs, 
       const Snippet* snip);

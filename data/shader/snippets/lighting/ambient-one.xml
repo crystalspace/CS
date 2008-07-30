@@ -20,12 +20,20 @@
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
     <block location="cg:vertexMain">
+      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
       ambient = float3(1);
+      <?else?>
+      ambient = float3(0);
+      <?endif?>
       ambient_attr_perfragment = false;
     </block>
       
     <block location="cg:fragmentMain">
+      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
       ambient = float3(1);
+      <?else?>
+      ambient = float3(0);
+      <?endif?>
       ambient_attr_perfragment = false;
     </block>
     

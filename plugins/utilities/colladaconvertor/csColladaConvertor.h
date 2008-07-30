@@ -19,6 +19,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef	_CS_COLLADA_CONVERTOR_H_
 #define	_CS_COLLADA_CONVERTOR_H_
 
+#include "csutil/hash.h"
 #include "ivaria/collada.h"
 #include "iutil/comp.h"
 #include "iutil/vfs.h"
@@ -34,8 +35,11 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
   class csColladaEffect;
 
-  /// The default type for mesh <plugin> tags
-#define CS_COLLADA_DEFAULT_MESH_PLUGIN_TYPE "crystalspace.mesh.loader.factory.genmesh"
+  /// The default type for mesh(fact) <plugin> tags
+#define CS_COLLADA_GENMESHFACT_PLUGIN_TYPE "crystalspace.mesh.loader.factory.genmesh"
+#define CS_COLLADA_GENMESH_PLUGIN_TYPE "crystalspace.mesh.loader.genmesh"
+#define CS_COLLADA_TERRAIN2FACT_PLUGIN_TYPE "crystalspace.mesh.loader.factory.terrain2"
+#define CS_COLLADA_TERRAIN2_PLUGIN_TYPE "ccrystalspace.mesh.loader.terrain2"
 
   /** 
   * This class implements the iColladaConvertor interface.  It is used as a conversion utility
@@ -67,6 +71,9 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     /// Whether or not we have warnings turned on. Warnings are off by default.
     bool warningsOn;
 
+    /// Whether or not each scene is considered a sector.
+    bool sectorScene;
+
     /// A pointer to the object registry
     iObjectRegistry* obj_reg;
 
@@ -86,7 +93,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     csRef<iDocumentNode> csTopNode;
 
     /// Whether or not the Crystal Space file has been loaded and is ready
-    bool csReady;
+    bool csOutputReady;
 
     /// The output file type.  Initially, this is set to CS_FILE_NONE.
     csColladaFileType outputFileType;
@@ -104,6 +111,28 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
     /// An array of materials referenced in the COLLADA document
     csArray<csColladaMaterial> materialsList;
+
+    /// Array of camera IDs.
+    csArray<csString> cameraIDs;
+
+    /// Hash of lights.
+    csHash<csColladaLight, csString> lights;
+
+    /// Names and targets of all portal objects.
+    csArray<csString> portalNames;
+    csArray<csString> portalTargets;
+
+    /// User properties of each sector.
+    csHash<csStringArray, csString> sectorProps;
+
+    /// User properties of each mesh.
+    csHash<csStringArray, csString> meshProps;
+
+    // =============== Internal Functions ===============
+    void WriteSectorInfo(iDocumentNode* sector);
+    void WriteCameraInfo(iDocumentNode* sector, size_t camera);
+    csString GetMeshFactType(csString name);
+    csString GetMeshType(csString name);
 
     // =============== Basic Utility Functions ===============
   public:
@@ -147,6 +176,14 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     * \notes Debug warnings are off by default.
     */
     void SetWarnings(bool toggle);
+
+    /**
+    * Set if each scene is an entire sector.
+    * Else the top level objects in each scene are considered a sector.
+    *
+    * \param toggle If true, each scene is considered a sector.
+    */
+    void SetSectorScene(bool toggle);
 
     /**
     * Checks for validity of the file name to see if it conforms to COLLADA standards.
@@ -213,8 +250,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
     virtual const char* Convert();
     virtual bool ConvertGeometry(iDocumentNode *geometrySection);
-    virtual bool ConvertEffects(iDocumentNode *effectsSection);
-    virtual bool ConvertMaterials(iDocumentNode *materialsSection);
+    virtual bool ConvertEffects();
     virtual bool ConvertRiggingAnimation(iDocumentNode *riggingSection);
     virtual bool ConvertPhysics(iDocumentNode *physicsSection);
     virtual bool ConvertScene(iDocumentNode *camerasSection, iDocumentNode *lightsSection, iDocumentNode *visualScenesSection);

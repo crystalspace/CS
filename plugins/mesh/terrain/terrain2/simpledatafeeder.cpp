@@ -79,6 +79,11 @@ bool csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
   mapReader.Load (data.data, width, height, data.pitch, cell->GetSize ().y, 
     properties->heightOffset);
 
+  if (properties->smoothHeightmap)
+  {
+    SmoothHeightmap (data.data, width, height, data.pitch);    
+  }
+
   cell->UnlockHeightData ();
   
   if (!properties->materialmapSource.IsEmpty ())
@@ -150,7 +155,7 @@ void csTerrainSimpleDataFeeder::SetParameter (const char* param, const char* val
 
 
 csTerrainSimpleDataFeederProperties::csTerrainSimpleDataFeederProperties ()
-  : scfImplementationType (this), heightOffset (0.0f)
+  : scfImplementationType (this), heightOffset (0.0f), smoothHeightmap (false)
 {
 }
 
@@ -161,7 +166,8 @@ csTerrainSimpleDataFeederProperties::csTerrainSimpleDataFeederProperties (
     heightmapFormat (other.heightmapFormat),
     materialmapSource (other.materialmapSource),
     alphaMaps (other.alphaMaps),
-    heightOffset (other.heightOffset)
+    heightOffset (other.heightOffset),
+    smoothHeightmap (other.smoothHeightmap)
 {
 }
 
@@ -217,9 +223,25 @@ void csTerrainSimpleDataFeederProperties::SetParameter (const char* param, const
   {
     heightOffset = atof (value);
   }
+  else if (strcasecmp (param, "smooth heightmap") == 0)
+  {
+    if (strcasecmp (value, "yes") == 0 ||
+        strcasecmp (value, "true") == 0)
+    {
+      smoothHeightmap = true;
+    }
+    if (strcasecmp (value, "no") == 0 ||
+        strcasecmp (value, "false") == 0)
+    {
+      smoothHeightmap = false;
+    }
+  }
 }
 
-size_t csTerrainSimpleDataFeederProperties::GetParameterCount() { return 4; }
+size_t csTerrainSimpleDataFeederProperties::GetParameterCount() 
+{ 
+  return 5; 
+}
 
 const char* csTerrainSimpleDataFeederProperties::GetParameterName (size_t index)
 {
@@ -229,6 +251,7 @@ const char* csTerrainSimpleDataFeederProperties::GetParameterName (size_t index)
     case 1: return "heightmap format";
     case 2: return "materialmap source";
     case 3: return "offset";
+    case 4: return "smooth heightmap";
     default: return 0;
   }
 }
@@ -258,6 +281,10 @@ const char* csTerrainSimpleDataFeederProperties::GetParameterValue (const char* 
     snprintf (scratch, sizeof (scratch), "%f", heightOffset);
     return scratch;
   }
+  else if (strcasecmp (name, "smooth heightmap") == 0)
+  {
+    return smoothHeightmap ? "yes" : "no";
+  }
   return 0;
 }
 
@@ -278,6 +305,16 @@ const char* csTerrainSimpleDataFeederProperties::GetAlphaMapSource (
     }
   }
   return 0;
+}
+
+void csTerrainSimpleDataFeederProperties::SetHeightmapSmooth (bool doSmooth)
+{
+  smoothHeightmap = doSmooth;
+}
+
+bool csTerrainSimpleDataFeederProperties::GetHeightmapSmooth () const
+{
+  return smoothHeightmap;
 }
 
 }

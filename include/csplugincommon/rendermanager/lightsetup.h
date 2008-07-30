@@ -551,7 +551,7 @@ namespace RenderManager
 	    for (uint s = 0; s < li.numSubLights; s++)
 	    {
 	      renderSublights[i] = &li;
-	      renderSublightNums[i] = li.subLights[i];
+	      renderSublightNums[i] = li.subLights[s];
 	      i++;
 	    }
 	  }

@@ -1411,11 +1411,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
         if (id == ShaderCombinerLoaderCg::XMLTOKEN_VARIABLEMAP)
         {
           const char* variable = node->GetAttributeValue ("variable");
-          if (!variable || !*variable) continue;
-          // For now only support 1 tag...
-          if (result.IsValid() 
-            && (strcmp (result->GetData(), variable) != 0)) return 0;
-          result.AttachNew (new scfString (variable));
+          const char* type = node->GetAttributeValue ("type");
+          if (variable && *variable)
+          {
+            // For now only support 1 tag...
+            if (result.IsValid() 
+              && (strcmp (result->GetData(), variable) != 0)) return 0;
+            result.AttachNew (new scfString (variable));
+          }
+          else if (type && ((strcmp (type, "expr") == 0)
+              || (strcmp (type, "expression") == 0)))
+          {
+            csString tagStr;
+            csRef<iDocumentNodeIterator> children = node->GetNodes();
+            while (children->HasNext())
+            {
+              csRef<iDocumentNode> child = children->Next();
+              if (child->GetType() == CS_NODE_COMMENT) continue;
+              tagStr.Append (CS::DocSystem::FlattenNode (child));
+            }
+            // For now only support 1 tag...
+            if (result.IsValid() 
+              && (strcmp (result->GetData(), tagStr) != 0)) return 0;
+            result.AttachNew (new scfString (tagStr));
+          }
         }
       }
     }

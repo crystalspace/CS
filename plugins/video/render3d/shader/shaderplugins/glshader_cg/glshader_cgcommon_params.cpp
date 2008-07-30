@@ -160,7 +160,7 @@ void csShaderGLCGCommon::SVtoCgMatrix3x3  (csShaderVariable* var, float* matrix)
 
 void csShaderGLCGCommon::SVtoCgMatrix4x4  (csShaderVariable* var, float* matrix)
 {
-  if (var->GetType () == csShaderVariable::MATRIX)
+  if (var->GetType () == csShaderVariable::MATRIX3X3)
   {
     csMatrix3 m;
     if (var->GetValue (m))
@@ -193,6 +193,14 @@ void csShaderGLCGCommon::SVtoCgMatrix4x4  (csShaderVariable* var, float* matrix)
 	matrix[idx*4+2] = v[2];
 	matrix[idx*4+3] = v[3];
       }
+    }
+  }
+  else if (var->GetType () == csShaderVariable::MATRIX4X4)
+  {
+    CS::Math::Matrix4 m;
+    if (var->GetValue (m))
+    {
+      CS::PluginCommon::MakeGLMatrix4x4 (m, matrix, true);
     }
   }
   else

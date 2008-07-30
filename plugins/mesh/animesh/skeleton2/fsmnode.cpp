@@ -265,8 +265,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
         StateTransitionInfo& info = it.Next (key);
 
         FSMNode::StateTransitionInfo& childInfo = newn->transitions.GetOrCreate (key);
-
-        childInfo.transitionNode = info.nodeFactory->CreateInstance (packet, skeleton);
+        
+        childInfo.transitionNode = info.nodeFactory ? 
+          info.nodeFactory->CreateInstance (packet, skeleton) : 0;
         childInfo.time1 = info.time1;
         childInfo.time2 = info.time2;
         childInfo.directSwitch = info.directSwitch;

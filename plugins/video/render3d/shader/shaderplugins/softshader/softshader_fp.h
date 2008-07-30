@@ -89,8 +89,8 @@ public:
   virtual void GetUsedShaderVars (csBitArray& bits) const;
   
   virtual iShaderProgram::CacheLoadResult LoadFromCache (
-    iHierarchicalCache* cache, csRef<iString>* failReason = 0,
-    csRef<iString>* = 0)
+    iHierarchicalCache* cache, iDocumentNode* programNode,
+    csRef<iString>* failReason = 0, csRef<iString>* = 0)
   { return iShaderProgram::loadFail; }
   
   csPtr<iString> GetCacheTag () { return 0; }

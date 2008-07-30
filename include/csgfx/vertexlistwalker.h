@@ -56,13 +56,21 @@ public:
     const Tbase* defaultComponents = 0) : currElement (0), 
     bufLock (buffer, CS_BUF_LOCK_READ), defaultComponents (defaultComponents)
   {
-    bufferComponents = buffer->GetComponentCount ();
+    bufferComponents = buffer ? buffer->GetComponentCount () : 0;
     components = (desiredComponents != 0) ? desiredComponents : 
       bufferComponents;
     CS_ASSERT (components <= maxComponents);
-    elements = buffer->GetElementCount();
-    compType = buffer->GetComponentType();
-    FetchCurrentElement();
+    if (buffer)
+    {
+      elements = buffer->GetElementCount();
+      compType = buffer->GetComponentType();
+      FetchCurrentElement();
+    }
+    else
+    {
+      elements = 0;
+      compType = (csRenderBufferComponentType)~0;
+    }
   }
 
   //@{

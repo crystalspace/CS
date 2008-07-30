@@ -126,11 +126,18 @@ void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
 	
       if (!clip.distance.IsConstant())
       {
-	csVector4 v (GetParamVectorVal (stack, clip.distance,
-	  csVector4 (0, 0, 0, 0)));
-	float distVal = v[clip.distComp];
-	if (clip.distNeg) distVal = -distVal;
-	packDist[c/4][c%4] = distVal;
+	csVector4 v;
+	if (GetParamVectorVal (stack, clip.distance, &v))
+	{
+	  float distVal = v[clip.distComp];
+	  if (clip.distNeg) distVal = -distVal;
+	  packDist[c/4][c%4] = distVal;
+	}
+	else
+	{
+	  // Force clipping to have no effect
+	  packDist[c/4][c%4] = -FLT_MAX;
+	}
       }
       
       bool doClipping = false;
@@ -705,6 +712,11 @@ bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache,
   if (cacheFile.Write ((char*)&diskMagic, sizeof (diskMagic))
       != sizeof (diskMagic)) return false;
   
+  csMD5::Digest nodeHash = csMD5::Encode (
+    CS::DocSystem::FlattenNode (programNode));
+  if (cacheFile.Write ((char*)&nodeHash, sizeof (nodeHash))
+      != sizeof (nodeHash)) return false;
+  
   csString objectCode (this->objectCode);
   if ((program != 0) && objectCode.IsEmpty())
     objectCode = cgGetProgramString (program, CG_COMPILED_PROGRAM);
@@ -784,8 +796,8 @@ struct CachedShaderWrapper
 };
 
 iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
-  iHierarchicalCache* cache, csRef<iString>* failReason,
-  csRef<iString>* tag)
+  iHierarchicalCache* cache, iDocumentNode* node,
+  csRef<iString>* failReason, csRef<iString>* tag)
 {
   if (!cache) return iShaderProgram::loadFail;
 
@@ -796,6 +808,10 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
       new scfString ("no cached programs found"));
     return iShaderProgram::loadFail;
   }
+  
+  if (!GetProgramNode (node)) return iShaderProgram::loadFail;
+  csMD5::Digest nodeHash = csMD5::Encode (
+    CS::DocSystem::FlattenNode (programNode));
   
   csArray<CachedShaderWrapper> cachedProgWrappers;
   for (size_t i = 0; i < allCachedPrograms->GetSize(); i++)
@@ -818,6 +834,11 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     
     wrapper.name = allCachedPrograms->Get (i);
     if (!wrapper.limits.FromString (wrapper.name)) continue;
+    
+    csMD5::Digest diskHash;
+    if (cacheFile->Read ((char*)&diskHash, sizeof (diskHash))
+	!= sizeof (diskHash)) continue;
+    if (diskHash != nodeHash) continue;
     
     cachedProgWrappers.Push (wrapper);
   }
@@ -1017,7 +1038,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
   return oneReadCorrectly ? iShaderProgram::loadSuccessShaderInvalid : iShaderProgram::loadFail;
 }
 
-static const uint32 cacheFileMagicCC = 0x02637063;
+static const uint32 cacheFileMagicCC = 0x03637063;
 
 bool csShaderGLCGCommon::TryLoadFromCompileCache (const char* source, 
                                                   const ProfileLimits& limits,

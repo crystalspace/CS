@@ -143,6 +143,12 @@ struct TerraFormerFeederProperties : public
 
   const char* GetAlphaMapSource (size_t index) { return 0; }
   const char* GetAlphaMapSource (const char* material) { return 0; }
+
+  virtual void SetHeightmapSmooth (bool doSmooth)
+  {}
+  virtual bool GetHeightmapSmooth () const
+  { return false; }
+
   
   csPtr<iTerrainCellFeederProperties> Clone ()
   {

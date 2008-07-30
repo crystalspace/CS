@@ -147,7 +147,7 @@ CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [$LDFLAGS], [+])
 
 
 #------------------------------------------------------------------------------
-# Check for typical required libraries (libm, libmx, libdl, libnsl).
+# Check for typical required libraries (libc, libm, libmx, libdl, libnsl).
 #------------------------------------------------------------------------------
 AC_LANG_PUSH([C++])
 AC_CHECK_HEADERS([cmath], [CS_HEADER_PROPERTY([CS_HAVE_CMATH_H])])
@@ -157,15 +157,8 @@ AC_LANG_POP([C++])
 
 CS_CHECK_COMMON_LIBS
 
-AS_IF([test $ac_cv_lib_m_pow = yes || test $ac_cv_lib_m_cosf = yes],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lm], [+])])
-AS_IF([test $ac_cv_lib_mx_cosf = yes],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lmx], [+])])
 AS_IF([test $ac_cv_lib_dl_dlopen = yes],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-ldl], [+])
-    AC_CHECK_LIB([dl], [dladdr], [CS_HEADER_PROPERTY([CS_HAVE_DLADDR])])])
-AS_IF([test $ac_cv_lib_nsl_gethostbyname = yes],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lnsl], [+])])
+    [AC_CHECK_LIB([dl], [dladdr], [CS_HEADER_PROPERTY([CS_HAVE_DLADDR])])])
 
 AS_IF([test $ac_cv_lib_m_cosf != no || test $ac_cv_lib_mx_cosf != no],
     [CS_HEADER_PROPERTY([CS_HAVE_MATH_H_FLOAT_FUNCS])])
@@ -221,28 +214,33 @@ AC_DEFUN([CS_CHECK_RTLD],
 
 CS_CHECK_RTLD
 
+
+
 #------------------------------------------------------------------------------
 # Check for SIMD flags
 #------------------------------------------------------------------------------
-
-CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx], [CS_CREATE_TUPLE([-mmmx])])
-CS_CHECK_BUILD_FLAGS([for -msse flag], [cs_cv_prog_cc_msse], [CS_CREATE_TUPLE([-msse])])
-CS_CHECK_BUILD_FLAGS([for -msse2 flag], [cs_cv_prog_cc_msse2], [CS_CREATE_TUPLE([-msse2])])
+CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx],
+    [CS_CREATE_TUPLE([-mmmx])])
+CS_CHECK_BUILD_FLAGS([for -msse flag], [cs_cv_prog_cc_msse],
+    [CS_CREATE_TUPLE([-msse])])
+CS_CHECK_BUILD_FLAGS([for -msse2 flag], [cs_cv_prog_cc_msse2],
+    [CS_CREATE_TUPLE([-msse2])])
 CS_CHECK_BUILD_FLAGS([for -mfpmath=sse flag], [cs_cv_prog_cc_mfpmath_sse],
     [CS_CREATE_TUPLE([-mfpmath=sse])])
 
 AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],[+])])
 
-
 AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
-    [CS_CHECK_BUILD([checking for mmintrin.h],
+    [CS_CHECK_BUILD([for mmintrin.h],
         [cs_cv_header_mmintrin_h],
         [AC_LANG_PROGRAM([[#include <mmintrin.h>]], [])],
         [CS_CREATE_TUPLE([$cs_cv_prog_cc_mmmx])],
         [C++],
         [CS_HEADER_PROPERTY([CS_SUPPORTS_MMX])
         CS_EMIT_BUILD_PROPERTY([CS_SUPPORTS_MMX], [yes])])])
+
+
 
 #------------------------------------------------------------------------------
 # Determine host platform.  Recognized platforms: Unix, Windows, Mac OS X.
@@ -282,6 +280,7 @@ case $cs_host_family in
     esac
 CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
     [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
+
 
 
 #------------------------------------------------------------------------------

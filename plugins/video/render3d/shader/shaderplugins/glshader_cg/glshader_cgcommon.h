@@ -185,6 +185,8 @@ protected:
     iHierarchicalCache* cache);
   bool WriteToCompileCache (const ProfileLimits& limits,
     iHierarchicalCache* cache);
+    
+  bool GetProgramNode (iDocumentNode* passProgNode);
 public:
   CS_LEAKGUARD_DECLARE (csShaderGLCGCommon);
 
@@ -231,8 +233,8 @@ public:
   { return unusedParams; }
   
   virtual iShaderProgram::CacheLoadResult LoadFromCache (
-    iHierarchicalCache* cache, csRef<iString>* failReason = 0,
-    csRef<iString>* = 0);
+    iHierarchicalCache* cache, iDocumentNode* programNode,
+    csRef<iString>* failReason = 0, csRef<iString>* = 0);
 };
 
 }

@@ -44,6 +44,8 @@ namespace lighter
       uint numThreads;
       // Save buffers as binary
       bool saveBinaryBuffers;
+      // Check for duplicate objects when loading map data.
+      bool checkDupes;
     };
 
     // Lightmap and lightmap layout properties

@@ -26763,59 +26763,6 @@ SWIGINTERN PyObject *csCommandEventData_swigregister(PyObject *SWIGUNUSEDPARM(se
   return SWIG_Py_Void();
 }
 
-SWIGINTERN PyObject *_wrap_iEvent_Name_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iEvent *arg1 = (iEvent *) 0 ;
-  csEventID *arg2 = (csEventID *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iEvent_Name_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iEvent, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iEvent_Name_set" "', argument " "1"" of type '" "iEvent *""'"); 
-  }
-  arg1 = reinterpret_cast< iEvent * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_CS__StringIDTCS__StringSetTag__General_t, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iEvent_Name_set" "', argument " "2"" of type '" "csEventID *""'"); 
-  }
-  arg2 = reinterpret_cast< csEventID * >(argp2);
-  if (arg1) (arg1)->Name = *arg2;
-  
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iEvent_Name_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iEvent *arg1 = (iEvent *) 0 ;
-  csEventID *result = 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iEvent_Name_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iEvent, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iEvent_Name_get" "', argument " "1"" of type '" "iEvent *""'"); 
-  }
-  arg1 = reinterpret_cast< iEvent * >(argp1);
-  result = (csEventID *)& ((arg1)->Name);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__StringIDTCS__StringSetTag__General_t, 0 |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_iEvent_GetName(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iEvent *arg1 = (iEvent *) 0 ;
@@ -58434,8 +58381,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"new_csCommandEventData", _wrap_new_csCommandEventData, METH_VARARGS, NULL},
 	 { (char *)"delete_csCommandEventData", _wrap_delete_csCommandEventData, METH_VARARGS, NULL},
 	 { (char *)"csCommandEventData_swigregister", csCommandEventData_swigregister, METH_VARARGS, NULL},
-	 { (char *)"iEvent_Name_set", _wrap_iEvent_Name_set, METH_VARARGS, NULL},
-	 { (char *)"iEvent_Name_get", _wrap_iEvent_Name_get, METH_VARARGS, NULL},
 	 { (char *)"iEvent_GetName", _wrap_iEvent_GetName, METH_VARARGS, NULL},
 	 { (char *)"iEvent_Time_set", _wrap_iEvent_Time_set, METH_VARARGS, NULL},
 	 { (char *)"iEvent_Time_get", _wrap_iEvent_Time_get, METH_VARARGS, NULL},

@@ -196,7 +196,7 @@ namespace CS
     {
       GLint _maxClipPlanes;
       glGetIntegerv (GL_MAX_CLIP_PLANES, &_maxClipPlanes);
-      maxPlanes = csMin (_maxClipPlanes, 6);
+      maxPlanes = csMin ((int)_maxClipPlanes, 6);
       // @@@ Lots of places assume max 6 planes
       
       csRef<iShaderVarStringSet> strings = 

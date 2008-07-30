@@ -76,7 +76,7 @@ manpage for more information.
 @subsubheading Configuring the Movie Recorder
 
 The movie recorder reads its configuration from
-@file{data/config/movierecorder.cfg} if it exists.  This lets you change the
+@file{data/config-plugins/movierecorder.cfg} if it exists.  This lets you change the
 recording and pause hotkeys, the filenames, and compression settings.  See the
 comments in the default @file{movierecorder.cfg} for a description of each
 item.

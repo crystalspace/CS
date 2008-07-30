@@ -120,7 +120,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  {
 	    if (graphPrios.IsSnippetPrioritySet (s)
 	      && allTechPrios.IsSnippetPrioritySet (s)
-	      && (graphPrios.GetSnippetPriority (s) >
+	      && (graphPrios.GetSnippetPriority (s) !=
 	        allTechPrios.GetSnippetPriority(s)))
 	    {
 	      skipTech = true;
@@ -479,6 +479,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	      CS_ASSERT(!linkFromName.IsEmpty());
 
               node.inputLinks.Put (inp.name, linkFromName);
+              
+	      // There's now a dependency on the node providing the input.
+	      TechniqueGraph::Connection conn;
+	      conn.from = sourceTech;
+	      conn.to = node.tech;
+	      conn.inputConnection = true;
+	      graph.AddConnection (conn);
 	    }
 	    else
 	    {
@@ -1430,7 +1437,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	      Node* checkNode = nodesToCheck.PopTop();
 	      if (checkNode->tech == 0) continue;
 	      deps.Empty();
-	      graph.GetDependants (checkNode->tech, deps);
+	      graph.GetDependants (checkNode->tech, deps, false);
 	      for (size_t d = 0; d < deps.GetSize(); d++)
 	      {
 		Node& dependentNode = GetNodeForTech (deps[d]);
