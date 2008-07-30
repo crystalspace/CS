@@ -8612,9 +8612,11 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *VECTOR2 = *cspacec::csShaderVariable_VECTOR2;
 *VECTOR3 = *cspacec::csShaderVariable_VECTOR3;
 *VECTOR4 = *cspacec::csShaderVariable_VECTOR4;
+*MATRIX3X3 = *cspacec::csShaderVariable_MATRIX3X3;
 *MATRIX = *cspacec::csShaderVariable_MATRIX;
 *TRANSFORM = *cspacec::csShaderVariable_TRANSFORM;
 *ARRAY = *cspacec::csShaderVariable_ARRAY;
+*MATRIX4X4 = *cspacec::csShaderVariable_MATRIX4X4;
 *COLOR = *cspacec::csShaderVariable_COLOR;
 sub new {
     my $pkg = shift;

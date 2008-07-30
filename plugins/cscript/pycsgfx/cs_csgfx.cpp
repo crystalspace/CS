@@ -6804,6 +6804,40 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csShaderVariable_SetValue__SWIG_14(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csShaderVariable *arg1 = (csShaderVariable *) 0 ;
+  CS::Math::Matrix4 *arg2 = 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csShaderVariable_SetValue",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariable, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariable_SetValue" "', argument " "1"" of type '" "csShaderVariable *""'"); 
+  }
+  arg1 = reinterpret_cast< csShaderVariable * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_CS__Math__Matrix4,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csShaderVariable_SetValue" "', argument " "2"" of type '" "CS::Math::Matrix4 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csShaderVariable_SetValue" "', argument " "2"" of type '" "CS::Math::Matrix4 const &""'"); 
+  }
+  arg2 = reinterpret_cast< CS::Math::Matrix4 * >(argp2);
+  result = (bool)(arg1)->SetValue((CS::Math::Matrix4 const &)*arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csShaderVariable_SetValue(PyObject *self, PyObject *args) {
   int argc;
   PyObject *argv[3];
@@ -6979,6 +7013,19 @@ SWIGINTERN PyObject *_wrap_csShaderVariable_SetValue(PyObject *self, PyObject *a
     int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csShaderVariable, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_CS__Math__Matrix4, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_csShaderVariable_SetValue__SWIG_14(self, args);
+      }
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csShaderVariable, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
       {
         int res = SWIG_AsVal_int(argv[1], NULL);
         _v = SWIG_CheckState(res);
@@ -7005,7 +7052,7 @@ SWIGINTERN PyObject *_wrap_csShaderVariable_SetValue(PyObject *self, PyObject *a
   }
   
 fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csShaderVariable_SetValue'.\n  Possible C/C++ prototypes are:\n    SetValue(int)\n    SetValue(float)\n    SetValue(csRGBpixel const &)\n    SetValue(iTextureHandle *)\n    SetValue(iTextureWrapper *)\n    SetValue(iRenderBuffer *)\n    SetValue(csVector2 const &)\n    SetValue(csVector3 const &)\n    SetValue(csColor const &)\n    SetValue(csColor4 const &)\n    SetValue(csVector4 const &)\n    SetValue(csQuaternion const &)\n    SetValue(csMatrix3 const &)\n    SetValue(csReversibleTransform const &)\n");
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csShaderVariable_SetValue'.\n  Possible C/C++ prototypes are:\n    SetValue(int)\n    SetValue(float)\n    SetValue(csRGBpixel const &)\n    SetValue(iTextureHandle *)\n    SetValue(iTextureWrapper *)\n    SetValue(iRenderBuffer *)\n    SetValue(csVector2 const &)\n    SetValue(csVector3 const &)\n    SetValue(csColor const &)\n    SetValue(csColor4 const &)\n    SetValue(csVector4 const &)\n    SetValue(csQuaternion const &)\n    SetValue(csMatrix3 const &)\n    SetValue(csReversibleTransform const &)\n    SetValue(CS::Math::Matrix4 const &)\n");
   return NULL;
 }
 
@@ -13436,9 +13483,11 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "csShaderVariable_VECTOR2",SWIG_From_int(static_cast< int >(csShaderVariable::VECTOR2)));
   SWIG_Python_SetConstant(d, "csShaderVariable_VECTOR3",SWIG_From_int(static_cast< int >(csShaderVariable::VECTOR3)));
   SWIG_Python_SetConstant(d, "csShaderVariable_VECTOR4",SWIG_From_int(static_cast< int >(csShaderVariable::VECTOR4)));
+  SWIG_Python_SetConstant(d, "csShaderVariable_MATRIX3X3",SWIG_From_int(static_cast< int >(csShaderVariable::MATRIX3X3)));
   SWIG_Python_SetConstant(d, "csShaderVariable_MATRIX",SWIG_From_int(static_cast< int >(csShaderVariable::MATRIX)));
   SWIG_Python_SetConstant(d, "csShaderVariable_TRANSFORM",SWIG_From_int(static_cast< int >(csShaderVariable::TRANSFORM)));
   SWIG_Python_SetConstant(d, "csShaderVariable_ARRAY",SWIG_From_int(static_cast< int >(csShaderVariable::ARRAY)));
+  SWIG_Python_SetConstant(d, "csShaderVariable_MATRIX4X4",SWIG_From_int(static_cast< int >(csShaderVariable::MATRIX4X4)));
   SWIG_Python_SetConstant(d, "csShaderVariable_COLOR",SWIG_From_int(static_cast< int >(csShaderVariable::COLOR)));
 }
 
