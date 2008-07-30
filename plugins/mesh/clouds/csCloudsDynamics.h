@@ -53,20 +53,20 @@ private:
 	Temperature, pressure and both mixing ratios are definded at the center
 	of each voxel. Indexing is therefore as always f(x, y, z)
 	*/
-	csRef<iField3<float>>         m_arfPotTemperature[2];               // T, potential temperature
-	csRef<iField3<float>>         m_arfCondWaterMixingRatios[2];        // qc
-	csRef<iField3<float>>         m_arfWaterVaporMixingRatios[2];       // qv
-	csRef<iField3<csVector3>>     m_arvForceField;
-	csRef<iField3<float>>         m_arfVelDivergence;
-	csRef<iField3<float>>         m_arfPressureField[2];                // p
+	csRef<csField3<float>>         m_arfPotTemperature[2];               // T, potential temperature
+	csRef<csField3<float>>         m_arfCondWaterMixingRatios[2];        // qc
+	csRef<csField3<float>>         m_arfWaterVaporMixingRatios[2];       // qv
+	csRef<csField3<csVector3>>     m_arvForceField;
+	csRef<csField3<float>>         m_arfVelDivergence;
+	csRef<csField3<float>>         m_arfPressureField[2];                // p
 	/**
 	Velocity is defined at the boundaries of each cell. Half-way index
 	notation is used in consequence. These fields are of size N + 1
 	*/
-	csRef<iField3<csVector3>>   m_arvVelocityField[2];                  // u
+	csRef<csField3<csVector3>>   m_arvVelocityField[2];                  // u
 
 	//This rotation-field is defined at Cell-Centers!
-	csRef<iField3<csVector3>>   m_arvRotVelField;                       // rot(u)
+	csRef<csField3<csVector3>>   m_arvRotVelField;                       // rot(u)
 
 	float                       m_fTimeStep;
 	float                       m_fTimePassed;
@@ -120,9 +120,9 @@ private:
 	//Absolute Height of the bottom grid face
 	float                       m_fBaseAltitude;
 	//Bottom input field for Temperature
-	csRef<iField2<float>>       m_arfInputTemperature;
+	csRef<iField2>              m_arfInputTemperature;
 	//Bottom input field for water vapor
-	csRef<iField2<float>>       m_arfInputWaterVapor;
+	csRef<iField2>              m_arfInputWaterVapor;
 	//====================================================//
 
 	//Calculates the rotation of the velocity field u, and stores it in arvRotVelField
@@ -279,11 +279,11 @@ public:
 	{
 		SetStandardValues();
 		UpdateAllDependParameters();
-		SetGridSize(10, 10, 10);
+		SetGridSize(16, 16, 16);
 	}
 	~csCloudsDynamics() {}
 
-	//Std grid size is 10x10x10
+	//Std grid size is 16x16x16
 	virtual inline const bool SetGridSize(const UINT x, const UINT y, const UINT z);
 
 	//Configuration-Setter
@@ -303,14 +303,14 @@ public:
 	virtual inline void SetInitialWaterVaporMixingRatio(const float qv) {m_fInitWaterVaporMixingRatio = qv;}
 	virtual inline void SetGlobalWindSpeed(const csVector3& vWind) {m_vWindSpeed = vWind;}
 	virtual inline void SetBaseAltitude(const float H) {m_fBaseAltitude = H;}
-	virtual inline void SetTemperaturBottomInputField(csRef<iField2<float>> Field)
+	virtual inline void SetTemperaturBottomInputField(csRef<iField2> Field)
 	{
 		//Größen überprüfen
 		if(Field->GetSizeX() != m_iGridSizeX || Field->GetSizeY() != m_iGridSizeZ) return;
 		m_arfInputTemperature.Invalidate();
 		m_arfInputTemperature = Field;
 	}
-	virtual inline void SetWaterVaporBottomInputField(csRef<iField2<float>> Field)
+	virtual inline void SetWaterVaporBottomInputField(csRef<iField2> Field)
 	{
 		//Größen überprüfen
 		if(Field->GetSizeX() != m_iGridSizeX || Field->GetSizeY() != m_iGridSizeZ) return;
@@ -325,6 +325,9 @@ public:
 		m_fAltitudeExponent = m_vGravitationAcc.Norm() / (m_fTempLapseRate * m_fIdealGasConstant);
 	}
 
+	//Getter
+	inline const UINT GetCurrentStep() const {return m_iCurrentStep;}
+
 	/**
 	Computes N steps of the entire simulation. If iStepCount == 0, then an entire timestep
 	is calculated
@@ -332,7 +335,7 @@ public:
 	virtual const bool DoComputationSteps(const UINT iStepCount, const float fTime = 0.f);
 
 	//Returns the simulation output!
-	virtual inline const csRef<iField3<float>>& GetCondWaterMixingRatios() const
+	virtual inline const csRef<csField3<float>>& GetCondWaterMixingRatios() const
 	{
 		/**
 		Always when an entire timestep was done, the acutal-index becomes the last-index

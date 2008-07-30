@@ -24,7 +24,7 @@
 
 //------------------------------------------------------------------------------//
 
-class csStdTemperatureInputField : public scfImplementation1<csStdTemperatureInputField, iField2<float>>
+class csStdTemperatureInputField : public scfImplementation1<csStdTemperatureInputField, iField2>
 {
 private:
 	//Variables are not needed for this implementation. The only reason they exists, is
@@ -68,7 +68,7 @@ public:
 
 //------------------------------------------------------------------------------//
 
-class csStdWaterVaporInputField : public scfImplementation1<csStdWaterVaporInputField, iField2<float>>
+class csStdWaterVaporInputField : public scfImplementation1<csStdWaterVaporInputField, iField2>
 {
 private:
 	//Variables are not needed for this implementation. The only reason they exists, is

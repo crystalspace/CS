@@ -29,10 +29,9 @@
 //--------------------------------------------------------------------------------------------//
 
 /**
-This class represents a 2 dimensional field (may scalar or vector!)
+This class represents a 2 dimensional float field
 (used for boundary conditions e.g.)
 */
-template <typename T>
 struct iField2 : public virtual iBase
 {
 	SCF_INTERFACE(iField2, 1, 0, 0);
@@ -47,43 +46,8 @@ struct iField2 : public virtual iBase
 	Accses operator and method. Returns the value of the scalarfield
 	at position P = (x, y)
 	*/
-	virtual const T operator () (const UINT x, const UINT y) const = 0;
-	virtual const T GetValue(const UINT x, const UINT y) const = 0;
-};
-
-/**
-This class represents a 3 dimensional field (may scalar or vector!)
-(used as input for the rendering algorithm e.g.)
-*/
-template <typename T>
-struct iField3 : public virtual iBase
-{
-	SCF_INTERFACE(iField3, 1, 0, 0);
-
-	/**
-	*/
-	virtual void SetSize(const UINT iSizeX, const UINT iSizeY, const UINT iSizeZ) = 0;
-	virtual const UINT GetSizeX() const = 0;
-	virtual const UINT GetSizeY() const = 0;
-	virtual const UINT GetSizeZ() const = 0;
-
-	/**
-	Sets a value at position x, y, z
-	*/
-	virtual void SetValue(const T& Value, const UINT x, const UINT y, const UINT z) = 0;
-
-	/**
-	Accses operator and method. Returns the value of the scalarfield
-	at position P = (x, y, z)
-	*/
-	virtual const T operator () (const UINT x, const UINT y, const UINT z) const = 0;
-	virtual const T GetValue(const UINT x, const UINT y, const UINT z) const = 0;
-
-	/**
-	Returns the value of the field at Position x, y, z. If x, y or z are not in
-	range, they are going to be clamped first!
-	*/
-	virtual const T GetValueClamp(const int x, const int y, const int z) const = 0;
+	virtual const float operator () (const UINT x, const UINT y) const = 0;
+	virtual const float GetValue(const UINT x, const UINT y) const = 0;
 };
 
 //--------------------------------------------------------------------------------------------//
@@ -96,12 +60,24 @@ level of abstraction.
 */
 struct iClouds : public virtual iBase
 {
-	SCF_INTERFACE(iClouds, 0, 5, 1);
+	SCF_INTERFACE(iClouds, 0, 6, 1);
+
+	/**
+	These setters configure the entire system:
+	TimeScaleFactor: The system measures the time which is taken to compute an
+	entire timestep and passes the value as next timestep-size scaled by this factor. 
+	(1.f means realtime)!
+	SkippingFrameCount: Count of frames which are skipped doing NO dynamic computation
+	pass. Means, if SkippingFrameCount is equal to N, then every N-th frame is done ONE
+	computation step.
+	*/
+	virtual inline void SetTimeScaleFactor(const float f) = 0;
+	virtual inline void SetSkippingFrameCount(const UINT i) = 0;
 
 	/**
 	All of following Setters refer to the iCloudsDynamics instance.
 	*/
-  virtual inline const bool SetGridSize(const UINT x, const UINT y, const UINT z) = 0;
+	virtual inline const bool SetGridSize(const UINT x, const UINT y, const UINT z) = 0;
 	virtual inline void SetGridScale(const float dx) = 0;
 	virtual inline void SetCondensedWaterScaleFactor(const float fqc) = 0;
 	virtual inline void SetGravityAcceleration(const csVector3& vG) = 0;
@@ -118,35 +94,13 @@ struct iClouds : public virtual iBase
 	virtual inline void SetInitialWaterVaporMixingRatio(const float qv) = 0;
 	virtual inline void SetGlobalWindSpeed(const csVector3& vWind) = 0;
 	virtual inline void SetBaseAltitude(const float H) = 0;
-	virtual inline void SetTemperaturBottomInputField(csRef<iField2<float>> Field) = 0;
-	virtual inline void SetWaterVaporBottomInputField(csRef<iField2<float>> Field) = 0;
+	virtual inline void SetTemperaturBottomInputField(csRef<iField2> Field) = 0;
+	virtual inline void SetWaterVaporBottomInputField(csRef<iField2> Field) = 0;
 
-  /**
+	/**
 	All of following Setters refer to the iCloudsRenderer instance.
 	*/
-
-	/**
-	Does a single timestep of size dTime for the cloud-dynamics-simulation
-	If dTime is not set, the time is measured automatically, in order to achive realtime-simulation
-	*/
-	virtual const bool DoTimeStep(const float fTime = 0.f) = 0;
-
-	/**
-	This method does an amortized time step: Means it doesn't do all the computations
-	which would be necessary to complete an entire time step. No, it only does some minor
-	calculations. For example 10 calls of this method would then be equal to one call
-	of DoTimeStep. This method is designed for real-time-use
-	dTime is used for the entire time-step. So if it varies between the single calls
-	of this method, only the first value is considered! 
-	If not set, the time is measured automatically, in order to achive realtime-simulation.
-	*/
-	virtual const bool DoAmortTimeStep(const float fTime = 0.f) = 0;
-
-	/**
-	This method starts the rendering process. All clouds are rendered at
-	the calculated positions and formations.
-	*/
-	virtual const bool RenderClouds(/* Transformationmatrix? */) = 0;
+	
 };
 
 //--------------------------------------------------------------------------------------------//
@@ -158,12 +112,8 @@ scalar field!
 */
 struct iCloudsRenderer : public virtual iBase
 {
-	SCF_INTERFACE(iCloudsRenderer, 0, 0, 1);
+	SCF_INTERFACE(iCloudsRenderer, 0, 0, 2);
 
-	/**
-	Rendermethod. Renders the whole cloud scene.
-	*/
-	virtual const bool Render(const csRef<iField3<float>>& rCondWaterMixingRatios /*, const csMatrix& mTransformation */) = 0;
 };
 
 //--------------------------------------------------------------------------------------------//
@@ -175,7 +125,7 @@ is a 3d- scalar field containing all the condensed water mixing ratios.
 */
 struct iCloudsDynamics : public virtual iBase
 {
-	SCF_INTERFACE(iCloudsDynamics, 0, 5, 2);
+	SCF_INTERFACE(iCloudsDynamics, 0, 6, 1);
 
 	/**
 	This is the most importand initialisation method. It defines the dimensions
@@ -202,27 +152,14 @@ struct iCloudsDynamics : public virtual iBase
 	virtual inline void SetInitialWaterVaporMixingRatio(const float qv) = 0;
 	virtual inline void SetGlobalWindSpeed(const csVector3& vWind) = 0;
 	virtual inline void SetBaseAltitude(const float H) = 0;
-	virtual inline void SetTemperaturBottomInputField(csRef<iField2<float>> Field) = 0;
-	virtual inline void SetWaterVaporBottomInputField(csRef<iField2<float>> Field) = 0;
+	virtual inline void SetTemperaturBottomInputField(csRef<iField2> Field) = 0;
+	virtual inline void SetWaterVaporBottomInputField(csRef<iField2> Field) = 0;
 
 	/**
 	Updates all constant and precomputeted parameters according to the user specific values set!
 	Has to be called whenever one value has been changed!
 	*/
 	virtual inline void UpdateAllDependParameters() = 0;
-
-	/**
-	Does n computation steps. The overall calculations are split into several
-	subtasks. This method computes n of those. If it gets a zero as input, it
-	performs all for an entire time-step
-	*/
-	virtual const bool DoComputationSteps(const UINT iStepCount, const float fTime = 0.) = 0;
-
-	/**
-	Returns the simulation-output. A scalarfield which contains all the condensed
-	water mixing ratios for the entire cloud-volume
-	*/
-	virtual inline const csRef<iField3<float>>& GetCondWaterMixingRatios() const = 0;
 };
 
 //--------------------------------------------------------------------------------------------//

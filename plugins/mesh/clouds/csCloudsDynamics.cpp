@@ -33,33 +33,33 @@ const bool csCloudsDynamics::SetGridSize(const UINT x, const UINT y, const UINT 
 	m_iGridSizeX = x;
 	m_iGridSizeY = y;
 	m_iGridSizeZ = z;
-	m_arfPotTemperature[0].AttachNew(new csField3<float>(this));
+	m_arfPotTemperature[0].AttachNew(new csField3<float>());
 	m_arfPotTemperature[0]->SetSize(m_iGridSizeX, m_iGridSizeY, m_iGridSizeZ);
-	m_arfPotTemperature[1].AttachNew(new csField3<float>(this));
+	m_arfPotTemperature[1].AttachNew(new csField3<float>());
 	m_arfPotTemperature[1]->SetSize(m_iGridSizeX, m_iGridSizeY, m_iGridSizeZ);
-	m_arfCondWaterMixingRatios[0].AttachNew(new csField3<float>(this));
+	m_arfCondWaterMixingRatios[0].AttachNew(new csField3<float>());
 	m_arfCondWaterMixingRatios[0]->SetSize(m_iGridSizeX, m_iGridSizeY, m_iGridSizeZ);
-	m_arfCondWaterMixingRatios[1].AttachNew(new csField3<float>(this));
+	m_arfCondWaterMixingRatios[1].AttachNew(new csField3<float>());
 	m_arfCondWaterMixingRatios[1]->SetSize(m_iGridSizeX, m_iGridSizeY, m_iGridSizeZ);
-	m_arfWaterVaporMixingRatios[0].AttachNew(new csField3<float>(this));
+	m_arfWaterVaporMixingRatios[0].AttachNew(new csField3<float>());
 	m_arfWaterVaporMixingRatios[0]->SetSize(m_iGridSizeX, m_iGridSizeY, m_iGridSizeZ);
-	m_arfWaterVaporMixingRatios[1].AttachNew(new csField3<float>(this));
+	m_arfWaterVaporMixingRatios[1].AttachNew(new csField3<float>());
 	m_arfWaterVaporMixingRatios[1]->SetSize(m_iGridSizeX, m_iGridSizeY, m_iGridSizeZ);
 	//Velocity field is bigger by one (because of definition!)
-	m_arvVelocityField[0].AttachNew(new csField3<csVector3>(this));
+	m_arvVelocityField[0].AttachNew(new csField3<csVector3>());
 	m_arvVelocityField[0]->SetSize(m_iGridSizeX + 1, m_iGridSizeY + 1, m_iGridSizeZ + 1);
-	m_arvVelocityField[1].AttachNew(new csField3<csVector3>(this));
+	m_arvVelocityField[1].AttachNew(new csField3<csVector3>());
 	m_arvVelocityField[1]->SetSize(m_iGridSizeX + 1, m_iGridSizeY + 1, m_iGridSizeZ + 1);
 	//Normal size
-	m_arvRotVelField.AttachNew(new csField3<csVector3>(this));
+	m_arvRotVelField.AttachNew(new csField3<csVector3>());
 	m_arvRotVelField->SetSize(m_iGridSizeX, m_iGridSizeY, m_iGridSizeZ);
-	m_arvForceField.AttachNew(new csField3<csVector3>(this));
+	m_arvForceField.AttachNew(new csField3<csVector3>());
 	m_arvForceField->SetSize(m_iGridSizeX, m_iGridSizeY, m_iGridSizeZ);
-	m_arfVelDivergence.AttachNew(new csField3<float>(this));
+	m_arfVelDivergence.AttachNew(new csField3<float>());
 	m_arfVelDivergence->SetSize(m_iGridSizeX, m_iGridSizeY, m_iGridSizeZ);
-	m_arfPressureField[0].AttachNew(new csField3<float>(this));
+	m_arfPressureField[0].AttachNew(new csField3<float>());
 	m_arfPressureField[0]->SetSize(m_iGridSizeX, m_iGridSizeY, m_iGridSizeZ);
-	m_arfPressureField[1].AttachNew(new csField3<float>(this));
+	m_arfPressureField[1].AttachNew(new csField3<float>());
 	m_arfPressureField[1]->SetSize(m_iGridSizeX, m_iGridSizeY, m_iGridSizeZ);
 
 	m_iActualIndex	= 0;
@@ -121,23 +121,26 @@ const csVector3 csCloudsDynamics::ComputeVorticityConfinement(const UINT x, cons
 
 void csCloudsDynamics::AdvectAllQuantities()
 {
-	//First we advect all quatities which are defined at cell center!
-	//Then the velocity
-	for(UINT x = 0; x <= m_iGridSizeX; ++x)
+	/**
+	First we advect all quatities which are defined at cell center!
+	Then the velocity.
+	NOTE: The boundaries of the velocity field aren't advected, because later on,
+	they will be overwritten to satisfy boundary-conditions
+	*/
+	for(UINT x = 0; x < m_iGridSizeX; ++x)
 	{
-		for(UINT y = 0; y <= m_iGridSizeY; ++y)
+		for(UINT y = 0; y < m_iGridSizeY; ++y)
 		{
-			for(UINT z = 0; z <= m_iGridSizeZ; ++z)
+			for(UINT z = 0; z < m_iGridSizeZ; ++z)
 			{
 				const csVector3 vVel = GetVelocityOfCellCenter(m_arvVelocityField[m_iLastIndex], x, y, z);
-				if(x < m_iGridSizeX && y < m_iGridSizeY && z < m_iGridSizeZ)
-				{
-					const csVector3 vPos = Clamp(csVector3(x, y, z) - m_fTimeStep * m_fInvGridScale * vVel, m_iGridSizeX, m_iGridSizeY, m_iGridSizeZ);
-					//Even if vPos is on boundary, the interpolation works fine!
-					m_arfPotTemperature[m_iActualIndex]->SetValue(GetInterpolatedValue(m_arfPotTemperature[m_iLastIndex], vPos), x, y, z);
-					m_arfCondWaterMixingRatios[m_iActualIndex]->SetValue(GetInterpolatedValue(m_arfCondWaterMixingRatios[m_iLastIndex], vPos), x, y, z);
-					m_arfWaterVaporMixingRatios[m_iActualIndex]->SetValue(GetInterpolatedValue(m_arfWaterVaporMixingRatios[m_iLastIndex], vPos), x, y, z);
-				}
+			
+				//Scalar-Field advection
+				const csVector3 vPos = Clamp(csVector3(x, y, z) - m_fTimeStep * m_fInvGridScale * vVel, m_iGridSizeX, m_iGridSizeY, m_iGridSizeZ);
+				//Even if vPos is on boundary, the interpolation works fine!
+				m_arfPotTemperature[m_iActualIndex]->SetValue(GetInterpolatedValue(m_arfPotTemperature[m_iLastIndex], vPos), x, y, z);
+				m_arfCondWaterMixingRatios[m_iActualIndex]->SetValue(GetInterpolatedValue(m_arfCondWaterMixingRatios[m_iLastIndex], vPos), x, y, z);
+				m_arfWaterVaporMixingRatios[m_iActualIndex]->SetValue(GetInterpolatedValue(m_arfWaterVaporMixingRatios[m_iLastIndex], vPos), x, y, z);
 				
 				//Velocity-Field advection
 				const csVector3 vPos2 = Clamp(csVector3(x + 0.5f, y + 0.5f, z + 0.5f) - m_fTimeStep * m_fInvGridScale * vVel, m_iGridSizeX + 1, m_iGridSizeY + 1, m_iGridSizeZ + 1);
@@ -357,7 +360,7 @@ is used for the whole timestep!
 const bool csCloudsDynamics::DoComputationSteps(const UINT iStepCount, const float fTime)
 {
 	//preconditions hold? --> initialized?
-	if(m_iGridSizeX <= 0 || m_iGridSizeY <= 0 || m_iGridSizeZ <= 0) return false;
+	//if(m_iGridSizeX <= 0 || m_iGridSizeY <= 0 || m_iGridSizeZ <= 0) return false;
 
 	int iStepsLeft = iStepCount == 0 ? s_iTotalStepCount - m_iCurrentStep : iStepCount;
 	while(iStepsLeft-- > 0)

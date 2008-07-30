@@ -20,6 +20,7 @@
 #define __CSCLOUDRENDERER_PLUGIN_H__
 
 #include "imesh/clouds.h"
+#include "csCloudsUtils.h"
 
 //Cloud-Renderer class
 class csCloudsRenderer : public scfImplementation1<csCloudsRenderer, iCloudsRenderer>
@@ -35,7 +36,7 @@ public:
 	{
 	}
 
-	virtual const bool Render(const csRef<iField3<float>>& rCondWaterMixingRatios /*, const csMatrix& mTransformation */)
+	virtual const bool Render(const csRef<csField3<float>>& rCondWaterMixingRatios /*, const csMatrix& mTransformation */)
 	{
 		return true;
 	}

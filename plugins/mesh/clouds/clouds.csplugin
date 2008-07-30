@@ -16,19 +16,11 @@
         <name>crystalspace.mesh.clouds_dynamics</name>
         <implementation>csCloudsDynamics</implementation>
         <description>Dynamic simulation of clouds</description>
-	  <requires>
-		<class>crystalspace.mesh.clouds_field3</class>
-	  </requires>
       </class>
       <class>
         <name>crystalspace.mesh.clouds_renderer</name>
         <implementation>csCloudsRenderer</implementation>
         <description>Cloud rendering using imposters for voxel volumes</description>
-      </class>
-      <class>
-        <name>crystalspace.mesh.clouds_field3</name>
-        <implementation>csField3</implementation>
-        <description>Three dimensional field represented as discrete grid</description>
       </class>
     </classes>
   </scf>

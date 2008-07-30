@@ -21,7 +21,7 @@
 
 //-----------------------------------------------------//
 
-const float GetInterpolatedValue(const csRef<iField3<float>>& rSrc, const csVector3& vPos)
+const float GetInterpolatedValue(const csRef<csField3<float>>& rSrc, const csVector3& vPos)
 {
 	const UINT x = static_cast<UINT>(vPos.x);
 	const UINT y = static_cast<UINT>(vPos.y);
@@ -48,7 +48,7 @@ const float GetInterpolatedValue(const csRef<iField3<float>>& rSrc, const csVect
 
 //-----------------------------------------------------//
 
-const float GetInterpolatedValue(const csRef<iField3<csVector3>>& rSrc, const csVector3& vPos, const UINT iIndex)
+const float GetInterpolatedValue(const csRef<csField3<csVector3>>& rSrc, const csVector3& vPos, const UINT iIndex)
 {
 	const UINT x = static_cast<UINT>(vPos.x);
 	const UINT y = static_cast<UINT>(vPos.y);
@@ -75,8 +75,8 @@ const float GetInterpolatedValue(const csRef<iField3<csVector3>>& rSrc, const cs
 
 //-----------------------------------------------------//
 
-void JacobiSolver(csRef<iField3<float>> rNew, const csRef<iField3<float>>& rOld, 
-				  const csRef<iField3<float>>& rBField, const float fAlpha, const float fInvBeta)
+void JacobiSolver(csRef<csField3<float>> rNew, const csRef<csField3<float>>& rOld, 
+				  const csRef<csField3<float>>& rBField, const float fAlpha, const float fInvBeta)
 {
 	for(UINT x = 0; x < rNew->GetSizeX(); ++x)
 	{

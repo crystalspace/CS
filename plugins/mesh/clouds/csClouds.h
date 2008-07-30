@@ -19,30 +19,68 @@
 #ifndef __CSCLOUD_PLUGIN_H__
 #define __CSCLOUD_PLUGIN_H__
 
+#include <iutil/objreg.h>
+#include <iutil/comp.h>
+#include <iutil/eventq.h>
+#include <iutil/virtclk.h>
+#include <csutil/measuretime.h>
 #include <csgeom/vector3.h>
+#include <csutil/csbaseeventh.h>
 #include "imesh/clouds.h"
 #include "csCloudsDynamics.h"
 #include "csCloudsRenderer.h"
 
 //Supervisor-class implementation
-class csClouds : public scfImplementation1<csClouds, iClouds>
+class csClouds : public scfImplementation3<csClouds, iClouds, iComponent, iEventHandler>
 {
 private:
-	csRef<iCloudsDynamics>			m_Dynamics;
-	csRef<iCloudsRenderer>			m_Renderer;
+	csRef<csCloudsDynamics>      m_Dynamics;
+	csRef<csCloudsRenderer>      m_Renderer;
+	iObjectRegistry*             m_pObjectRegistry;
+	csRef<iEventQueue>           m_pEventQueue;
+	csRef<iVirtualClock>         m_Clock;
+
+	UINT                         m_iStartTickCount;
+	UINT                         m_iFramesUntilNextStep;
+	float                        m_fTimeStep;
+
+	//Config-Vars
+	float                        m_fTimeScaleFactor;
+	UINT                         m_iSkippingFrameCount;
 
 public:
-	csClouds(iBase* pParent) : scfImplementationType(this, pParent)
+	csClouds(iBase* pParent) : scfImplementationType(this, pParent), m_iFramesUntilNextStep(0), m_fTimeStep(1.f)
 	{
-		m_Dynamics.AttachNew(new csCloudsDynamics(this));
-		m_Renderer.AttachNew(new csCloudsRenderer(this));
-    
+		m_fTimeScaleFactor       = 1.f;
+		m_iSkippingFrameCount    = 10;
 	}
 	~csClouds()
 	{
 		m_Dynamics.Invalidate();
 		m_Renderer.Invalidate();
+		m_pEventQueue->Unsubscribe(this, csevFrame(m_pObjectRegistry));
+		m_pEventQueue.Invalidate();
+		m_Clock.Invalidate();
 	}
+
+	//Initialisation method from iComponent
+	virtual bool Initialize(iObjectRegistry* pObjectReg)
+	{
+		m_Dynamics.AttachNew(new csCloudsDynamics(this));
+		m_Renderer.AttachNew(new csCloudsRenderer(this));
+		m_pObjectRegistry = pObjectReg;
+		//Getting Virtual Clock
+		m_Clock = csQueryRegistry<iVirtualClock>(m_pObjectRegistry);
+		m_iStartTickCount = m_Clock->GetCurrentTicks();
+		//Getting EventQueue
+		m_pEventQueue = csQueryRegistry<iEventQueue>(m_pObjectRegistry);
+		m_pEventQueue->RegisterListener(this, csevFrame(m_pObjectRegistry));
+		return true;
+	}
+
+	//Own setters
+	virtual inline void SetTimeScaleFactor(const float f) {m_fTimeScaleFactor = fabsf(f);}
+	virtual inline void SetSkippingFrameCount(const UINT i) {m_iSkippingFrameCount = i;}
 
 	//All of following Setters refer to the csCloudsDynamics instance, and are delegated!
 	virtual inline const bool SetGridSize(const UINT x, const UINT y, const UINT z) {return m_Dynamics->SetGridSize(x, y, z);}
@@ -62,13 +100,36 @@ public:
 	virtual inline void SetInitialWaterVaporMixingRatio(const float qv) {return m_Dynamics->SetInitialWaterVaporMixingRatio(qv);}
 	virtual inline void SetGlobalWindSpeed(const csVector3& vWind) {return m_Dynamics->SetGlobalWindSpeed(vWind);}
 	virtual inline void SetBaseAltitude(const float H) {return m_Dynamics->SetBaseAltitude(H);}
-	virtual inline void SetTemperaturBottomInputField(csRef<iField2<float>> Field) {return m_Dynamics->SetTemperaturBottomInputField(Field);}
-	virtual inline void SetWaterVaporBottomInputField(csRef<iField2<float>> Field) {return m_Dynamics->SetWaterVaporBottomInputField(Field);}
+	virtual inline void SetTemperaturBottomInputField(csRef<iField2> Field) {return m_Dynamics->SetTemperaturBottomInputField(Field);}
+	virtual inline void SetWaterVaporBottomInputField(csRef<iField2> Field) {return m_Dynamics->SetWaterVaporBottomInputField(Field);}
 
-	//DEBUG!
-	virtual const bool DoTimeStep(const float fTime = 0.f) {return m_Dynamics->DoComputationSteps(0, fTime);}
-	virtual const bool DoAmortTimeStep(const float fTime = 0.f) {return m_Dynamics->DoComputationSteps(0, fTime);}
-	virtual const bool RenderClouds() {return true;}
+	//All of following Setters refer to the csCloudsRenderer instance, and are delegated!
+
+	//EventHandler-Part
+	virtual bool HandleEvent(iEvent& rEvent)
+	{
+		if(m_iFramesUntilNextStep == 0)
+		{
+			if(m_Dynamics->GetCurrentStep() == 0)
+			{
+				//Measure Time
+				const UINT iEndTickCount = m_Clock->GetCurrentTicks();
+				m_fTimeStep = static_cast<float>(iEndTickCount - m_iStartTickCount) * 0.001f * m_fTimeScaleFactor;
+				m_iStartTickCount = iEndTickCount;
+				printf("Time for one simulation step: %.4f\n", m_fTimeStep);
+			}
+			//Do a step
+			//CS::MeasureTime Timer("DoComputationSteps");
+			m_Dynamics->DoComputationSteps(1, m_fTimeStep);
+
+			m_iFramesUntilNextStep = m_iSkippingFrameCount;
+		}
+		else --m_iFramesUntilNextStep;
+
+		return true;
+	}
+	CS_EVENTHANDLER_NAMES("crystalspace.mesh.clouds")
+	CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 #endif // __CSCLOUD_PLUGIN_H__
