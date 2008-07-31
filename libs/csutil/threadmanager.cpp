@@ -20,43 +20,70 @@
 #include "csutil/eventnames.h"
 #include "csutil/platform.h"
 #include "csutil/threadmanager.h"
+#include "iengine/engine.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 
-namespace CS
+csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationType(this),
+objectReg(objReg)
 {
-  namespace Utility
+  waiting = 0;
+  threadCount = CS::Platform::GetProcessorCount();
+
+  // If we can't detect, assume we have one.
+  if(threadCount == 0)
   {
-    csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationType(this),
-      objectReg(objReg)
+    threadCount = 1;
+  }
+
+  // Have 'processor count' extra processing threads.
+  threadQueue.AttachNew(new ThreadedJobQueue(threadCount));
+  listQueue.AttachNew(new ListAccessQueue());
+
+  eventQueue = csQueryRegistry<iEventQueue>(objectReg);
+  if(eventQueue)
+  {
+    ProcessPerFrame = csevFrame(objReg);
+    eventQueue->RegisterListener(this, ProcessPerFrame);
+  }
+}
+
+bool csThreadManager::HandleEvent(iEvent& Event)
+{
+  if(Event.Name == ProcessPerFrame)
+  {
+    Process();
+  }
+  return false;
+}
+
+void csThreadManager::Process(uint num)
+{
+  listQueue->ProcessQueue(num);
+
+  if(!engine.IsValid())
+  {
+    engine = csQueryRegistry<iEngine>(objectReg);
+    if(!engine.IsValid())
     {
-      uint count = CS::Platform::GetProcessorCount();
-
-      // If we can't detect, assume we have one.
-      if(count == 0)
-      {
-        count = 1;
-      }
-
-      // Have 'processor count' extra processing threads.
-      threadQueue.AttachNew(new ThreadedJobQueue(count));
-      listQueue.AttachNew(new ListAccessQueue());
-
-      eventQueue = csQueryRegistry<iEventQueue>(objectReg);
-      if(eventQueue)
-      {
-        ProcessQueue = csevFrame(objReg);
-        eventQueue->RegisterListener(this, ProcessQueue);
-      }
-    }
-
-    bool csThreadManager::HandleEvent(iEvent& Event)
-    {
-      if(Event.Name == ProcessQueue)
-      {
-        Process();
-      }
-      return false;
+      return;
     }
   }
+
+  if(!loader.IsValid())
+  {
+    loader = csQueryRegistry<iThreadedLoader>(objectReg);
+    if(!loader.IsValid())
+    {
+      return;
+    }
+  }
+  engine->SyncEngineLists(loader);
+}
+
+void csThreadManager::Wait(csRef<iThreadReturn> result)
+{
+  AtomicOperations::Increment(&waiting);
+  while(!result->IsFinished());
+  AtomicOperations::Decrement(&waiting);
 }

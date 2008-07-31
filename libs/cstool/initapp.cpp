@@ -165,7 +165,7 @@ iEventQueue* csInitializer::CreateEventQueue (iObjectRegistry* r)
 
 iThreadManager* csInitializer::CreateThreadManager (iObjectRegistry* r)
 {
-  csRef<iThreadManager> threadmgr = csPtr<iThreadManager> (new CS::Utility::csThreadManager (r));
+  csRef<iThreadManager> threadmgr = csPtr<iThreadManager> (new csThreadManager (r));
   r->Register (threadmgr, "iThreadManager");
   return threadmgr;
 }

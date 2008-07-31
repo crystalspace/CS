@@ -78,6 +78,7 @@ struct iSharedVariableList;
 struct iTextureHandle;
 struct iTextureList;
 struct iTextureWrapper;
+struct iThreadedLoader;
 
 struct iEngine;
 
@@ -175,7 +176,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine, 5, 0, 0);
+  SCF_INTERFACE(iEngine, 5, 1, 0);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -1348,6 +1349,15 @@ struct iEngine : public virtual iBase
    * settings.
    */
   virtual void ReloadRenderManager() = 0;
+  /** @} */
+
+  /**\name Loader List Sync
+   * @{ */
+  /**
+   * Set the default render manager.
+   * \remarks Also replaces the iRenderManager in the object registry.
+   */
+  virtual void SyncEngineLists(iThreadedLoader* loader) = 0;
   /** @} */
 };
 

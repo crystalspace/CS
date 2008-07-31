@@ -31,17 +31,20 @@ struct Data : public csRefCount
   double d[10000000];
   csWeakRefArray<iThreadTest> t;
   bool b;
-  unsigned long long reallyBig;  
+  unsigned long long reallyBig;
+  iObjectRegistry* objreg;
 };
 
 struct iThreadTest : public virtual iBase
 {
-  virtual void Test1() = 0;
-  virtual void Test2(bool b) = 0;
-  virtual void Test3(int i, float f) = 0;
-  virtual void Test4(csWeakRef<iThreadTest> myself) = 0;
-  virtual void Test5(csRef<Data> stuff) = 0;
-  virtual void Test6() const = 0;
+  THREADED_INTERFACE(Test1)
+  THREADED_INTERFACE1(Test2, bool b)
+  THREADED_INTERFACE2(Test3, int i, float f)
+  THREADED_INTERFACE1(Test4, csWeakRef<iThreadTest> myself)
+  virtual void Test5() const = 0;
+  THREADED_INTERFACE1(Test6, csRef<Data> stuff)
+  THREADED_INTERFACE(Test7)
+  virtual iObjectRegistry* GetObjectRegistry() const = 0;
 };
 
 class csThreadTest : public ThreadedCallable<csThreadTest>,
@@ -54,14 +57,16 @@ public:
 
   iObjectRegistry* GetObjectRegistry() const { return objReg; }
 
-  THREADED_CALLABLE_DECL(csThreadTest, Test1, true)
-  THREADED_CALLABLE_DECL1(csThreadTest, Test2, bool, b, true)
-  THREADED_CALLABLE_DECL2(csThreadTest, Test3, int, in, float, flo, true)
-  THREADED_CALLABLE_DECL1(csThreadTest, Test4, csWeakRef<iThreadTest>, myself, true)
-  THREADED_CALLABLE_DECL1(csThreadTest, Test5, csRef<Data>, stuff, true)
-  THREADED_CALLABLE_DECL(csThreadTest, Test6Real, true)
+  THREADED_CALLABLE_DECL(csThreadTest, Test1, csThreadReturn, true, false)
+  THREADED_CALLABLE_DECL1(csThreadTest, Test2, csThreadReturn, bool, b, true, false)
+  THREADED_CALLABLE_DECL2(csThreadTest, Test3, csThreadReturn, int, in, float, flo, true, false)
+  THREADED_CALLABLE_DECL1(csThreadTest, Test4, csThreadReturn, csWeakRef<iThreadTest>, myself, true, false)
+  THREADED_CALLABLE_DECL(csThreadTest, Test5Real, csThreadReturn, true, false)
+  THREADED_CALLABLE_DECL1(csThreadTest, Test6, csThreadReturn, csRef<Data>, stuff, true, true)
+  THREADED_CALLABLE_DECL(csThreadTest, Test7, csThreadReturn, true, true)
+  THREADED_CALLABLE_DECL1(csThreadTest, Test7Data, csThreadReturn, int, counter, true, false)
 
-  void Test6() const;
+  void Test5() const;
 
 private:
   iObjectRegistry* objReg;

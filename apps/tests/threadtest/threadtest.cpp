@@ -70,8 +70,28 @@ THREADED_CALLABLE_IMPL1(csThreadTest, Test4, csWeakRef<iThreadTest> myself)
   }
 }
 
-THREADED_CALLABLE_IMPL1(csThreadTest, Test5, csRef<Data> stuff)
+THREADED_CALLABLE_IMPL(csThreadTest, Test5Real)
 {
+  ret->MarkSuccessful();
+  ret->MarkFinished();
+}
+
+void csThreadTest::Test5() const
+{
+  csRef<iThreadReturn> ret = Test5Real();
+  if(ret->WasSuccessful())
+  {
+    printf("Test 5 passed!\n");
+  }
+  else
+  {
+    printf("Test 5 failed!\n");
+  }
+}
+
+THREADED_CALLABLE_IMPL1(csThreadTest, Test6, csRef<Data> stuff)
+{
+  csSleep(1000);
   bool passed = true;
 
   bool b = stuff->b;
@@ -80,7 +100,7 @@ THREADED_CALLABLE_IMPL1(csThreadTest, Test5, csRef<Data> stuff)
   unsigned long long reallyBig = stuff->reallyBig;
   csWeakRefArray<iThreadTest> t = stuff->t;
 
-  if(b && i == 42 && f == 3.14159f && reallyBig == 123456789012345)
+  if(b && i == 42 && f == 3.14159f && reallyBig == 123456789012345 && stuff->objreg == objReg)
   {
     int counter = 0;
     for(int x=0; x<10000000; x++)
@@ -92,7 +112,7 @@ THREADED_CALLABLE_IMPL1(csThreadTest, Test5, csRef<Data> stuff)
     csWeakRef<iThreadTest> t2 = t.Pop();
     passed &= (t1 == t2 && t1 == this &&
                t1->GetRefCount() == 1 &&
-               stuff->GetRefCount() == 2);
+               stuff->GetRefCount() == 5);
   }
   else
   {
@@ -101,22 +121,31 @@ THREADED_CALLABLE_IMPL1(csThreadTest, Test5, csRef<Data> stuff)
 
   if(passed)
   {
-    printf("Test 5 passed!\n");
+    printf("Test 6 passed!\n");
   }
   else
   {
-    printf("Test 5 failed!\n");
+    printf("Test 6 failed!\n");
   }
+  ret->MarkFinished();
 }
 
-THREADED_CALLABLE_IMPL(csThreadTest, Test6Real)
+THREADED_CALLABLE_IMPL(csThreadTest, Test7)
 {
-  printf("Test 6 passed!\n");
+  csSleep(1000);
+  Test7Data(1);
+  Test7Data(2);
+  Test7Data(3);
+  Test7Data(4);
+  Test7Data(5);
+  ret->MarkSuccessful();
+  ret->MarkFinished();
 }
 
-void csThreadTest::Test6() const
+THREADED_CALLABLE_IMPL1(csThreadTest, Test7Data, int counter)
 {
-  Test6Real();
+  printf("Test 7 Data %i of 5\n", counter);
+  csSleep(1000);
 }
 
 int main(int argc, char* argv[])
@@ -132,6 +161,7 @@ int main(int argc, char* argv[])
   threadTest->Test3(3, 0.1415f);
   csWeakRef<iThreadTest> test4 = threadTest;
   threadTest->Test4(test4);
+  threadTest->Test5();
 
   csRef<Data> dat;
   dat.AttachNew(new Data);
@@ -150,11 +180,15 @@ int main(int argc, char* argv[])
   csWeakRef<iThreadTest> test52 = threadTest;
   dat->t.Push(test52);
   dat->t.Push(test51);
+  dat->objreg = threadTest->GetObjectRegistry();
 
-  threadTest->Test5(dat);
-  dat.Invalidate();
+  threadTest->Test6(dat);
 
-  threadTest->Test6();
+  csRef<iThreadReturn> ret = threadTest->Test7();
+  if(ret->WasSuccessful())
+  {
+    printf("Test 7 passed!\n");
+  }
 
   getchar();
 
