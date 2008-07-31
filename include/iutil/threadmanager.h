@@ -34,6 +34,8 @@ struct iThreadReturn : public csRefCount
   virtual void SetResult(csRef<iBase> result) = 0;
 
   virtual void Copy(iThreadReturn* other) = 0;
+
+  virtual void Wait() = 0;
 };
 
 /**

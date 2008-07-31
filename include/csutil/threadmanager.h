@@ -85,7 +85,7 @@ public:
 class csThreadReturn : public iThreadReturn
 {
 public:
-  csThreadReturn()
+  csThreadReturn(iThreadManager* tm) : tm(tm)
   {
     finished = false;
     result = NULL;
@@ -108,10 +108,16 @@ public:
     finished = other->IsFinished();
   }
 
+  void Wait()
+  {
+    tm->Wait(this);
+  }
+
 private:
   bool finished;
   void* result;
   csRef<iBase> refResult;
+  csRef<iThreadManager> tm;
 };
 
 template<class T, typename A1>
@@ -249,7 +255,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, void (T::*metho
   TEventMemPool *mempool = new TEventMemPool; \
   args[0] = mempool; \
   csRef<iThreadReturn> ret; \
-  ret.AttachNew(new returnClass); \
+  ret.AttachNew(new returnClass(tm)); \
   args[1] = mempool->Store<csRef<iThreadReturn> >(ret); \
   QueueEvent<type, csRef<iThreadReturn> >(tm, (ThreadedCallable*)this, &type::function##TC, args, useThreadQueue); \
   if(wait) \
@@ -272,7 +278,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, void (T::*metho
   TEventMemPool *mempool = new TEventMemPool; \
   args[0] = mempool; \
   csRef<iThreadReturn> ret; \
-  ret.AttachNew(new returnClass); \
+  ret.AttachNew(new returnClass(tm)); \
   args[1] = mempool->Store<csRef<iThreadReturn> >(ret); \
   args[2] = mempool->Store<T1>((T1)A1); \
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
@@ -298,7 +304,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, void (T::*metho
   TEventMemPool *mempool = new TEventMemPool; \
   args[0] = mempool; \
   csRef<iThreadReturn> ret; \
-  ret.AttachNew(new returnClass); \
+  ret.AttachNew(new returnClass(tm)); \
   args[1] = mempool->Store<csRef<iThreadReturn> >(ret); \
   args[2] = mempool->Store<T1>((T1)A1); \
   args[3] = mempool->Store<T2>((T2)A2); \
@@ -325,7 +331,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, void (T::*metho
   TEventMemPool *mempool = new TEventMemPool; \
   args[0] = mempool; \
   csRef<iThreadReturn> ret; \
-  ret.AttachNew(new returnClass); \
+  ret.AttachNew(new returnClass(tm)); \
   args[1] = mempool->Store<csRef<iThreadReturn> >(ret); \
   args[2] = mempool->Store<T1>((T1)A1); \
   args[3] = mempool->Store<T2>((T2)A2); \
@@ -353,7 +359,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, void (T::*metho
   TEventMemPool *mempool = new TEventMemPool; \
   args[0] = mempool; \
   csRef<iThreadReturn> ret; \
-  ret.AttachNew(new returnClass); \
+  ret.AttachNew(new returnClass(tm)); \
   args[1] = mempool->Store<csRef<iThreadReturn> >(ret); \
   args[2] = mempool->Store<T1>((T1)A1); \
   args[3] = mempool->Store<T2>((T2)A2); \
@@ -382,7 +388,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, void (T::*metho
   TEventMemPool *mempool = new TEventMemPool; \
   args[0] = mempool; \
   csRef<iThreadReturn> ret; \
-  ret.AttachNew(new returnClass); \
+  ret.AttachNew(new returnClass(tm)); \
   args[1] = mempool->Store<csRef<iThreadReturn> >(ret); \
   args[2] = mempool->Store<T1>((T1)A1); \
   args[3] = mempool->Store<T2>((T2)A2); \
@@ -412,7 +418,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, void (T::*metho
   TEventMemPool *mempool = new TEventMemPool; \
   args[0] = mempool; \
   csRef<iThreadReturn> ret; \
-  ret.AttachNew(new returnClass); \
+  ret.AttachNew(new returnClass(tm)); \
   args[1] = mempool->Store<csRef<iThreadReturn> >(ret); \
   args[2] = mempool->Store<T1>((T1)A1); \
   args[3] = mempool->Store<T2>((T2)A2); \
@@ -443,7 +449,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, void (T::*metho
   TEventMemPool *mempool = new TEventMemPool; \
   args[0] = mempool; \
   csRef<iThreadReturn> ret; \
-  ret.AttachNew(new returnClass); \
+  ret.AttachNew(new returnClass(tm)); \
   args[1] = mempool->Store<csRef<iThreadReturn> >(ret); \
   args[2] = mempool->Store<T1>((T1)A1); \
   args[3] = mempool->Store<T2>((T2)A2); \
@@ -475,7 +481,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, void (T::*metho
   TEventMemPool *mempool = new TEventMemPool; \
   args[0] = mempool; \
   csRef<iThreadReturn> ret; \
-  ret.AttachNew(new returnClass); \
+  ret.AttachNew(new returnClass(tm)); \
   args[1] = mempool->Store<csRef<iThreadReturn> >(ret); \
   args[2] = mempool->Store<T1>((T1)A1); \
   args[3] = mempool->Store<T2>((T2)A2); \
@@ -508,7 +514,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, void (T::*metho
   TEventMemPool *mempool = new TEventMemPool; \
   args[0] = mempool; \
   csRef<iThreadReturn> ret; \
-  ret.AttachNew(new returnClass); \
+  ret.AttachNew(new returnClass(tm)); \
   args[1] = mempool->Store<csRef<iThreadReturn> >(ret); \
   args[2] = mempool->Store<T1>((T1)A1); \
   args[3] = mempool->Store<T2>((T2)A2); \
@@ -542,7 +548,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, void (T::*metho
   TEventMemPool *mempool = new TEventMemPool; \
   args[0] = mempool; \
   csRef<iThreadReturn> ret; \
-  ret.AttachNew(new returnClass); \
+  ret.AttachNew(new returnClass(tm)); \
   args[1] = mempool->Store<csRef<iThreadReturn> >(ret); \
   args[2] = mempool->Store<T1>((T1)A1); \
   args[3] = mempool->Store<T2>((T2)A2); \
@@ -577,7 +583,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, void (T::*metho
   TEventMemPool *mempool = new TEventMemPool; \
   args[0] = mempool; \
   csRef<iThreadReturn> ret; \
-  ret.AttachNew(new returnClass); \
+  ret.AttachNew(new returnClass(tm)); \
   args[1] = mempool->Store<csRef<iThreadReturn> >(ret); \
   args[2] = mempool->Store<T1>((T1)A1); \
   args[3] = mempool->Store<T2>((T2)A2); \
@@ -613,7 +619,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, void (T::*metho
   TEventMemPool *mempool = new TEventMemPool; \
   args[0] = mempool; \
   csRef<iThreadReturn> ret; \
-  ret.AttachNew(new returnClass); \
+  ret.AttachNew(new returnClass(tm)); \
   args[1] = mempool->Store<csRef<iThreadReturn> >(ret); \
   args[2] = mempool->Store<T1>((T1)A1); \
   args[3] = mempool->Store<T2>((T2)A2); \
@@ -650,7 +656,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, void (T::*metho
   TEventMemPool *mempool = new TEventMemPool; \
   args[0] = mempool; \
   csRef<iThreadReturn> ret; \
-  ret.AttachNew(new returnClass); \
+  ret.AttachNew(new returnClass(tm)); \
   args[1] = mempool->Store<csRef<iThreadReturn> >(ret); \
   args[2] = mempool->Store<T1>((T1)A1); \
   args[3] = mempool->Store<T2>((T2)A2); \
@@ -688,7 +694,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, void (T::*metho
   TEventMemPool *mempool = new TEventMemPool; \
   args[0] = mempool; \
   csRef<iThreadReturn> ret; \
-  ret.AttachNew(new returnClass); \
+  ret.AttachNew(new returnClass(tm)); \
   args[1] = mempool->Store<csRef<iThreadReturn> >(ret); \
   args[2] = mempool->Store<T1>((T1)A1); \
   args[3] = mempool->Store<T2>((T2)A2); \
@@ -727,7 +733,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, void (T::*metho
   TEventMemPool *mempool = new TEventMemPool; \
   args[0] = mempool; \
   csRef<iThreadReturn> ret; \
-  ret.AttachNew(new returnClass); \
+  ret.AttachNew(new returnClass(tm)); \
   args[1] = mempool->Store<csRef<iThreadReturn> >(ret); \
   args[2] = mempool->Store<T1>((T1)A1); \
   args[3] = mempool->Store<T2>((T2)A2); \

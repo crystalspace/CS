@@ -210,7 +210,7 @@ THREADED_CALLABLE_IMPL(csClassName, MethodName2)
 csClassName::MethodName()
 {
   csRef<iThreadReturn> ret = MethodName2();
-  tm->Wait(ret);
+  ret->Wait();
   if(ret->WasSuccessful())
   {
     csRef<iInterface> obj;
@@ -224,13 +224,13 @@ csClassName::MethodName()
 You may have noticed something new in the example above:
 
 @example
-tm->Wait(ret);
+ret->Wait();
 @end example
 
 The majority of the time you will want your method call to return immediately so you can continue onwards.
 At some point you might want to check and wait for your method to finish before continuing.
-The thread manager provides a simple way to do this. Call 'Wait(iThreadReturn *)', passing your iThreadReturn
-object to it and it will return once your method has finished executing.
+The thread manager provides a simple way to do this. Call 'Wait()', on your iThreadReturn and it will send
+a message to the thread manager and then wait until your method has finished executing, at which point it will return.
 
 @subheading Threaded Loading
 

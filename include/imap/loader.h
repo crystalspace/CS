@@ -157,7 +157,7 @@ struct csLoadResult
 class csLoaderReturn : public iThreadReturn
 {
 public:
-  csLoaderReturn()
+  csLoaderReturn(iThreadManager* tm) : tm(tm)
   {
     finished = false;
     success = false;
@@ -178,6 +178,11 @@ public:
     result = other->GetResultRefPtr();
     success = other->WasSuccessful();
     finished = other->IsFinished();
+  }
+
+  void Wait()
+  {
+    tm->Wait(this);
   }
 
 private:
@@ -201,6 +206,9 @@ private:
   * Note! Use scfQueryInterface on 'result' to detect what type was loaded.
   */
   csRef<iBase> result;
+
+  // Reference to the thread manager.
+  csRef<iThreadManager> tm;
 };
 
 struct iSectorLoaderIterator : public virtual iBase
