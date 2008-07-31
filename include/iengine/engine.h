@@ -176,7 +176,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine, 5, 1, 0);
+  SCF_INTERFACE(iEngine, 5, 2, 0);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -666,8 +666,8 @@ struct iEngine : public virtual iBase
    * or 0 on failure.
    */
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (iMeshFactoryWrapper* factory,
-  	const char* name, iSector* sector = 0,
-	const csVector3& pos = csVector3 (0, 0, 0)) = 0;
+  	const char* name, iSector* sector = 0, const csVector3& pos = csVector3 (0, 0, 0),
+    bool addToList = true) = 0;
 
   /**
    * Create a mesh wrapper for an existing mesh object.
@@ -682,8 +682,8 @@ struct iEngine : public virtual iBase
    * or 0 on failure.
    */
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (iMeshObject* meshobj,
-  	const char* name, iSector* sector = 0,
-	const csVector3& pos = csVector3 (0, 0, 0)) = 0;
+  	const char* name, iSector* sector = 0, const csVector3& pos = csVector3 (0, 0, 0),
+    bool addToList = true) = 0;
 
   /**
    * Create a mesh wrapper from a class id.
@@ -705,14 +705,14 @@ struct iEngine : public virtual iBase
    * or 0 on failure.
    */
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* classid,
-  	const char* name, iSector* sector = 0,
-	const csVector3& pos = csVector3 (0, 0, 0)) = 0;
+  	const char* name, iSector* sector = 0, const csVector3& pos = csVector3 (0, 0, 0),
+    bool addToList = true) = 0;
 
   /**
    * Create an uninitialized mesh wrapper
    * Assign to a csRef.
    */
-  virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* name) = 0;
+  virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* name, bool addToList = true) = 0;
 
   /**
    * Convenience function to create the thing containing the
@@ -844,7 +844,7 @@ struct iEngine : public virtual iBase
    * use DecRef().
    */
   virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* classId,
-  	const char* name) = 0;
+  	const char* name, bool addToList = true) = 0;
 
   /**
    * Create a mesh factory wrapper for an existing mesh factory
@@ -854,14 +854,16 @@ struct iEngine : public virtual iBase
    * \param name the engine name for the factory wrapper
    */
   virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (
-  	iMeshObjectFactory * factory, const char* name) = 0;
+  	iMeshObjectFactory * factory, const char* name,
+    bool addToList = true) = 0;
 
   /**
    * Create an uninitialized mesh factory wrapper
    * Assign to a csRef.
    * \param name the engine name for the factory wrapper
    */
-  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* name) = 0;
+  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* name,
+    bool addToList = true) = 0;
 
   /**
    * Convenience function to load a mesh factory from a given loader plugin.
@@ -872,7 +874,7 @@ struct iEngine : public virtual iBase
    */
   virtual csPtr<iMeshFactoryWrapper> LoadMeshFactory (
   	const char* name, const char* loaderClassId,
-	iDataBuffer* input) = 0;
+	iDataBuffer* input, bool addToList = true) = 0;
 
   /**
    * Find the given mesh factory. The name can be a normal

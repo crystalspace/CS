@@ -33,7 +33,10 @@
 #include "iengine/imposter.h"
 #include "iengine/lod.h"
 #include "iengine/mesh.h"
+#include "iengine/movable.h"
+#include "iengine/scenenode.h"
 #include "iengine/sharevar.h"
+#include "iengine/viscull.h"
 
 #include "igeom/trimesh.h"
 #include "igraphic/animimg.h"
@@ -277,47 +280,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iDocumentNode> meshfactnode = node->GetNode("meshfact");
     if(meshfactnode)
     {
-      csRef<iThreadReturn> meshFactRet = LoadMeshFactory(ldr_context, meshfactnode, override_name, 0, 0, ssource);
-      tm->Wait(meshFactRet);
-      ret->Copy(meshFactRet);
+      FindOrLoadMeshFactoryTC(ret, ldr_context, meshfactnode, override_name, 0, 0, ssource);
       return;
     }
-/*
+
     // Mesh Object
     csRef<iDocumentNode> meshobjnode = node->GetNode ("meshobj");
     if(meshobjnode)
     {
-      const char* meshobjname = override_name ? override_name :
-        meshobjnode->GetAttributeValue ("name");
-
-      if(ldr_context->CheckDupes())
-      {
-        iMeshWrapper* mw = Engine->FindMeshObject(meshobjname);
-        if(mw)
-        {
-          ldr_context->AddToCollection(mw->QueryObject());
-          loadResult->result = mw;
-          loadResult->success = true;
-          return;
-        }
-      }
-
-      csRef<iMeshWrapper> mw = Engine->CreateMeshWrapper (meshobjname);
-      if(LoadMeshObject(ldr_context, mw, 0, meshobjnode, ssource))
-      {
-        ldr_context->AddToCollection(mw->QueryObject());
-        loadResult->result = mw;
-        loadResult->success = true;
-        return;
-      }
-      else
-      {
-        // Error is already reported.
-        Engine->GetMeshes()->Remove(mw);
-        return;
-      }
+      FindOrLoadMeshObjectTC(ret, ldr_context, meshobjnode, override_name, 0, ssource);
+      return;
     }
-
+/*
     // World node.
     csRef<iDocumentNode> worldnode = node->GetNode ("world");
     if(worldnode)
@@ -436,32 +410,66 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     ret->MarkFinished(); 
   }
 
-  THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadMeshFactory, iLoaderContext* ldr_context,
-    iDocumentNode* meshfactnode, const char* override_name, iMeshFactoryWrapper* parent,
-    csReversibleTransform* transf, iStreamSource* ssource)
+  THREADED_CALLABLE_IMPL6(csThreadedLoader, FindOrLoadMeshFactory, csRef<iLoaderContext> ldr_context,
+    csRef<iDocumentNode> meshfactnode, const char* override_name, csRef<iMeshFactoryWrapper> parent,
+    csReversibleTransform* transf, csRef<iStreamSource> ssource)
   {
     const char* meshfactname = override_name ? override_name : meshfactnode->GetAttributeValue("name");
 
     if(ldr_context->CheckDupes())
     {
-      iMeshFactoryWrapper* mfw = Engine->FindMeshFactory(meshfactname);
+      csRef<iMeshFactoryWrapper> mfw = Engine->FindMeshFactory(meshfactname);
       if(mfw)
       {
         ldr_context->AddToCollection(mfw->QueryObject());
         ret->MarkSuccessful();
-        ret->SetResult(mfw);
+        ret->SetResult(csRef<iBase>(mfw));
+        ret->MarkFinished();
+        return;
       }
     }
 
-    csRef<iMeshFactoryWrapper> mfw = Engine->CreateMeshFactory(meshfactname);
+    csRef<iMeshFactoryWrapper> mfw = Engine->CreateMeshFactory(meshfactname, false);
     if(LoadMeshObjectFactory(ldr_context, mfw, parent, meshfactnode, transf, ssource))
     {
       ldr_context->AddToCollection(mfw->QueryObject());
+      loaderMeshFactories.Push(mfw);
       ret->MarkSuccessful();
       ret->SetResult(csRef<iBase>(mfw));
     }
 
     ret->MarkFinished();
+  }
+
+  THREADED_CALLABLE_IMPL5(csThreadedLoader, FindOrLoadMeshObject, csRef<iLoaderContext> ldr_context,
+    csRef<iDocumentNode> meshobjnode, const char* override_name, csRef<iMeshWrapper> parent,
+    csRef<iStreamSource> ssource)
+  {
+    const char* meshobjname = override_name ? override_name : meshobjnode->GetAttributeValue ("name");
+
+      if(ldr_context->CheckDupes())
+      {
+        csRef<iMeshWrapper> mw = Engine->FindMeshObject(meshobjname);
+        if(mw)
+        {
+          ldr_context->AddToCollection(mw->QueryObject());
+          ret->MarkSuccessful();
+          ret->SetResult(csRef<iBase>(mw));
+          ret->MarkFinished();
+          return;
+        }
+      }
+
+      csRef<iMeshWrapper> mw = Engine->CreateMeshWrapper(meshobjname, false);
+      if(LoadMeshObject(ldr_context, mw, parent, meshobjnode, ssource))
+      {
+        ldr_context->AddToCollection(mw->QueryObject());
+        loaderMeshes.Push(mw);
+        ret->MarkSuccessful();
+        ret->SetResult(csRef<iBase>(mw));
+      }
+
+      ret->MarkFinished();
   }
 
   bool csThreadedLoader::LoadShaderExpressions (iLoaderContext* ldr_context,
@@ -1105,8 +1113,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       case XMLTOKEN_MESHFACT:
         {
           csReversibleTransform child_transf;
-          csRef<iThreadReturn> ret = LoadMeshFactory(ldr_context, child, 0, stemp, &child_transf, ssource);
-          tm->Wait(ret);
+          csRef<iThreadReturn> ret = FindOrLoadMeshFactory(ldr_context, child, 0, stemp, &child_transf, ssource);
+          ret->Wait();
           if(!ret->WasSuccessful())
           {
             return false;
@@ -1286,6 +1294,363 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     stemp->GetMeshObjectFactory ()->GetFlags ().SetBool (CS_FACTORY_STATICSHAPE,
       staticshape);
+
+    return true;
+  }
+
+  bool csThreadedLoader::LoadMeshObject (iLoaderContext* ldr_context,
+    iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* node,
+    iStreamSource* ssource)
+  {
+    if (!Engine) return false;
+
+    csString priority;
+
+    iLoaderPlugin* plug = 0;
+    iBinaryLoaderPlugin* binplug = 0;
+    bool staticpos = false;
+    bool staticshape = false;
+    bool zbufSet = false;
+    bool prioSet = false;
+
+    csRef<iDocumentNodeIterator> prev_it;
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (true)
+    {
+      if (!it->HasNext ())
+      {
+        // Iterator has finished. Check if we still have to continue
+        // with the normal iterator first (non-defaults).
+        if (!prev_it) break;
+        it = prev_it;
+        prev_it = 0;
+        continue;
+      }
+
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      bool handled;
+      if (!HandleMeshParameter (ldr_context, mesh, parent, child, id,
+        handled, priority, false, staticpos, staticshape, zbufSet, prioSet,
+        false, ssource))
+        return false;
+      if (!handled) switch (id)
+      {
+      case XMLTOKEN_PORTAL:
+        {
+          iMeshWrapper* container_mesh = 0;
+          if (!ParsePortal (ldr_context, child, 0, 0, container_mesh, mesh))
+            return 0;
+        }
+        break;
+      case XMLTOKEN_PORTALS:
+        if (!ParsePortals (ldr_context, child, 0, mesh, ssource))
+          return 0;
+        break;
+      case XMLTOKEN_MESHREF:
+        {
+          csRef<iMeshWrapper> sp = LoadMeshObjectFromFactory (ldr_context,
+            child, ssource);
+          if (!sp)
+          {
+            // Error is already reported.
+            return false;
+          }
+          sp->QueryObject ()->SetName (child->GetAttributeValue ("name"));
+          sp->QuerySceneNode ()->SetParent (mesh->QuerySceneNode ());
+        }
+        break;
+      case XMLTOKEN_MESHOBJ:
+        {
+          csRef<iMeshWrapper> sp = Engine->CreateMeshWrapper (
+            child->GetAttributeValue ("name"));
+          if (!LoadMeshObject (ldr_context, sp, mesh, child, ssource))
+          {
+            // Error is already reported.
+            return false;
+          }
+          else
+          {
+            ldr_context->AddToCollection(sp->QueryObject ());
+          }
+          sp->QuerySceneNode ()->SetParent (mesh->QuerySceneNode ());
+        }
+        break;
+      case XMLTOKEN_LIGHT:
+        {
+          iLight * light = ParseStatlight (ldr_context, child);
+          if (light)
+          {
+            light->QuerySceneNode ()->SetParent (mesh->QuerySceneNode ());
+          }
+          else
+          {
+            return false;
+          }
+        }
+        break;
+      case XMLTOKEN_NULLMESH:
+        {
+          if (plug)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.load.plugin",
+              child, "Don't specify the plugin if you use <nullmesh>!");
+            return false;
+          }
+          if (mesh->GetMeshObject ())
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.mesh", child,
+              "Please don't use <params> in combination with <nullmesh>!");
+            return false;
+          }
+          csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
+            object_reg, "crystalspace.mesh.object.null", false);
+          if (!type)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.load.plugin",
+              child, "Could not find the nullmesh plugin!");
+            return false;
+          }
+          csRef<iMeshObjectFactory> fact = type->NewFactory ();
+          csRef<iMeshObject> mo = fact->NewInstance ();
+          mesh->SetMeshObject (mo);
+          mo->SetMeshWrapper (mesh);
+          csBox3 b;
+          if (!SyntaxService->ParseBox (child, b))
+            return false;
+          csRef<iNullMeshState> nullmesh = 
+            scfQueryInterface<iNullMeshState> (mo);
+          if (nullmesh)
+            nullmesh->SetBoundingBox (b);
+        }
+        break;
+
+      case XMLTOKEN_PARAMS:
+        if (!plug)
+        {
+          SyntaxService->ReportError (
+            "crystalspace.maploader.load.plugin",
+            child, "Could not load plugin!");
+          return false;
+        }
+        else
+        {
+          csRef<iBase> mo = plug->Parse (child, ssource, ldr_context,
+            mesh);
+          if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh, zbufSet, 
+            prioSet))
+            return false;	// Error already reported.
+        }
+        break;
+      case XMLTOKEN_FILE:
+        {
+          const char* fname = child->GetContentsValue ();
+          if (!fname)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.loadingfile",
+              child, "Specify a VFS filename with 'file'!");
+            return false;
+          }
+          csRef<iFile> buf = vfs->Open (fname, VFS_FILE_READ);
+          if (!buf)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.loadingfile",
+              child, "Error opening file '%s'!", fname);
+            return false;
+          }
+          csRef<iDocument> doc;
+          bool er = LoadStructuredDoc (fname, buf, doc);
+          if (!er)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.loadingfile",
+              child, "'%s' is not an XML file!", fname);
+            return false;
+          }
+          csRef<iDocumentNode> paramsnode = doc->GetRoot ()->GetNode ("params");
+          if (paramsnode)
+          {
+            if (!plug && !binplug)
+            {
+              SyntaxService->ReportError (
+                "crystalspace.maploader.load.plugin",
+                child, "Could not load plugin for mesh '%s'!",
+                mesh->QueryObject ()->GetName ());
+              return false;
+            }
+            csRef<iBase> mo;
+            if (plug)
+              mo = plug->Parse (paramsnode, ssource, ldr_context, mesh);
+            else
+            {
+              csRef<iDataBuffer> dbuf = vfs->ReadFile (fname);
+              mo = binplug->Parse (dbuf,
+                ssource, ldr_context, mesh);
+            }
+            if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh,
+              zbufSet, prioSet))
+              return false;	// Error already reported.
+            break;
+          }
+          csRef<iDocumentNode> meshobjnode = doc->GetRoot ()->GetNode (
+            "meshobj");
+          if (meshobjnode)
+          {
+            if (!LoadMeshObject (ldr_context, mesh, parent, meshobjnode,
+              ssource))
+              return false;
+            break;
+          }
+          csRef<iDocumentNode> meshfactnode = doc->GetRoot ()->GetNode (
+            "meshfact");
+          if (meshfactnode)
+          {
+            const char* meshfactname = meshfactnode->GetAttributeValue ("name");
+            // @@@ Handle regions correctly here???
+            csRef<iMeshFactoryWrapper> t = Engine->GetMeshFactories ()
+              ->FindByName (meshfactname);
+            if (!t)
+            {
+              t = Engine->CreateMeshFactory (meshfactname);
+              if (!t || !LoadMeshObjectFactory (ldr_context, t, 0,
+                meshfactnode, 0, ssource))
+              {
+                // Error is already reported.
+                return false;
+              }
+              else
+              {
+                ldr_context->AddToCollection(t->QueryObject ());
+              }
+            }
+            break;
+          }
+          SyntaxService->ReportError (
+            "crystalspace.maploader.load.plugin", child,
+            "File '%s' doesn't contain <params>, <meshobj>, nor <meshfact>!",
+            fname);
+          return false;
+        }
+        break;
+      case XMLTOKEN_PARAMSFILE:
+        if (!plug && !binplug)
+        {
+          SyntaxService->ReportError (
+            "crystalspace.maploader.load.plugin",
+            child, "Could not load plugin for mesh '%s'!",
+            mesh->QueryObject ()->GetName ());
+          return false;
+        }
+        else
+        {
+          const char* fname = child->GetContentsValue ();
+          if (!fname)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.loadingfile",
+              child, "Specify a VFS filename with 'paramsfile'!");
+            return false;
+          }
+          csRef<iFile> buf (vfs->Open (fname, VFS_FILE_READ));
+          if (!buf)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.loadingfile",
+              child, "Error opening file '%s'!", fname);
+            return false;
+          }
+          csRef<iBase> mo;
+          if (plug)
+            mo = LoadStructuredMap (ldr_context, plug, buf, mesh, fname,
+            ssource);
+          else
+          {
+            csRef<iDataBuffer> dbuf = vfs->ReadFile (fname);
+            mo = binplug->Parse (dbuf,
+              ssource, ldr_context, mesh);
+          }
+          if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh,
+            zbufSet, prioSet))
+            return false;	// Error already reported.
+        }
+        break;
+
+      case XMLTOKEN_TRIMESH:
+        {
+          if (!mesh->GetMeshObject ())
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.mesh",
+              child, "Please use 'params' before specifying 'trimesh'!");
+            return false;
+          }
+          iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
+          if (!objmodel)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.mesh", child,
+              "This mesh doesn't support setting of other 'trimesh'!");
+            return false;
+          }
+          if (!ParseTriMesh (child, objmodel))
+          {
+            // Error already reported.
+            return false;
+          }
+        }
+        break;
+
+      case XMLTOKEN_PLUGIN:
+        {
+          if (prev_it || plug || binplug)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.plugin",
+              child, "Please specify only one plugin!");
+            return false;
+          }
+
+          const char* plugname = child->GetContentsValue ();
+          if (!plugname)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.plugin",
+              child, "Specify a plugin name with 'plugin'!");
+            return false;
+          }
+          iDocumentNode* defaults = 0;
+          if (!loaded_plugins.FindPlugin (plugname, plug, binplug, defaults))
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.meshobj",
+              child, "Error loading plugin '%s'!", plugname);
+            return false;
+          }
+          if (defaults)
+          {
+            // Set aside current iterator and start a new one.
+            prev_it = it;
+            it = defaults->GetNodes ();
+          }
+        }
+        break;
+      default:
+        SyntaxService->ReportBadToken (child);
+        return false;
+      }
+    }
+
+    if (!priority.IsEmpty ())
+      mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+    mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICPOS, staticpos);
+    mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICSHAPE, staticshape);
 
     return true;
   }
@@ -1733,6 +2098,612 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return true;
   }
 
+  bool csThreadedLoader::HandleMeshObjectPluginResult (iBase* mo, iDocumentNode* child,
+    iMeshWrapper* mesh, bool keepZbuf, bool keepPrio)
+  {
+    csRef<iMeshObject> mo2 = scfQueryInterface<iMeshObject> (mo);
+    if (!mo2)
+    {
+      SyntaxService->ReportError (
+        "crystalspace.maploader.parse.mesh",
+        child, "Returned object does not implement iMeshObject!");
+      return false;
+    }
+    mesh->SetMeshObject (mo2);
+    mo2->SetMeshWrapper (mesh);
+    if (mo2->GetFactory () && mo2->GetFactory ()->GetMeshFactoryWrapper ())
+    {
+      iMeshFactoryWrapper* mfw = mo2->GetFactory ()->GetMeshFactoryWrapper ();
+      if (mfw)
+      {
+        mesh->SetFactory (mfw);
+        if (!keepZbuf) mesh->SetZBufMode (mfw->GetZBufMode ());
+        if (!keepPrio) mesh->SetRenderPriority (mfw->GetRenderPriority ());
+        mesh->GetFlags ().Set (mfw->GetFlags ().Get (),
+          mfw->GetFlags ().Get ());
+      }
+    }
+    return true;
+  }
+
+  // Return true if the matrix does not scale.
+  static bool TestOrthoMatrix (csMatrix3& m)
+  {
+    // Test if the matrix does not scale. Scaling meshes is illegal
+    // in CS (must be done through hardmove).
+    csVector3 v = m * csVector3 (1, 1, 1);
+    float norm = v.Norm ();
+    float desired_norm = 1.7320508f;
+    return ABS (norm-desired_norm) < 0.01f;
+  }
+
+  void csThreadedLoader::CollectAllChildren (iMeshWrapper* meshWrapper,
+    csRefArray<iMeshWrapper>& meshesArray)
+  {  
+    size_t lastMeshVisited = 0;
+    meshesArray.Push (meshWrapper);
+
+    while (lastMeshVisited < meshesArray.GetSize ())
+    {
+      // Get the children of the current mesh (ie 'mesh').
+      const csRef<iSceneNodeArray> ml = 
+        meshesArray[lastMeshVisited++]->QuerySceneNode ()->GetChildrenArray ();
+      size_t i;
+      for (i = 0; i < ml->GetSize(); i++)
+      {
+        iMeshWrapper* m = ml->Get(i)->QueryMesh ();
+        if (m)
+          meshesArray.Push (m);
+      }
+    }
+
+    return;
+  }
+
+  void csThreadedLoader::ClosedFlags (iMeshWrapper* mesh)
+  {
+    iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
+    csRef<iTriangleMeshIterator> it = objmodel->GetTriangleDataIterator ();
+    while (it->HasNext ())
+    {
+      csStringID id;
+      iTriangleMesh* trimesh = it->Next (id);
+      if (trimesh) trimesh->GetFlags ().Set (
+        CS_TRIMESH_CLOSED | CS_TRIMESH_NOTCLOSED, CS_TRIMESH_CLOSED);
+    }
+  }
+
+  void csThreadedLoader::ConvexFlags (iMeshWrapper* mesh)
+  {
+    iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
+    csRef<iTriangleMeshIterator> it = objmodel->GetTriangleDataIterator ();
+    while (it->HasNext ())
+    {
+      csStringID id;
+      iTriangleMesh* trimesh = it->Next (id);
+      if (trimesh) trimesh->GetFlags ().Set (
+        CS_TRIMESH_CONVEX | CS_TRIMESH_NOTCONVEX, CS_TRIMESH_CONVEX);
+    }
+  }
+
+  bool csThreadedLoader::HandleMeshParameter (iLoaderContext* ldr_context,
+    iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* child,
+    csStringID id, bool& handled, csString& priority,
+    bool do_portal_container, bool& staticpos, bool& staticshape,
+    bool& zmodeChanged, bool& prioChanged,
+    bool recursive, iStreamSource* ssource)
+  {
+#undef TEST_MISSING_MESH
+#define TEST_MISSING_MESH \
+  if (!mesh) \
+    { \
+    SyntaxService->ReportError ( \
+    "crystalspace.maploader.load.meshobject", \
+    child, do_portal_container ? "Specify at least one portal first!" : \
+    "First specify the parent factory with 'factory'!"); \
+    return false; \
+  }
+
+    handled = true;
+    switch (id)
+    {
+    case XMLTOKEN_STATICPOS:
+      if (!SyntaxService->ParseBool (child, staticpos, true))
+        return false;
+      break;
+    case XMLTOKEN_STATICSHAPE:
+      if (!SyntaxService->ParseBool (child, staticshape, true))
+        return false;
+      break;
+    case XMLTOKEN_MINRENDERDIST:
+      {
+        TEST_MISSING_MESH
+          csRef<iDocumentAttribute> attr;
+        if (attr = child->GetAttribute ("value"))
+        {
+          float dist = attr->GetValueAsFloat ();
+          mesh->SetMinimumRenderDistance (dist);
+        }
+        else if (attr = child->GetAttribute ("var"))
+        {
+          csString varname = attr->GetValue ();
+          iSharedVariable *var = Engine->GetVariableList()->FindByName (
+            varname);
+          if (!var)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.meshobject",
+              child, "Variable '%s' doesn't exist!", varname.GetData ());
+            return false;
+          }
+          mesh->SetMinimumRenderDistanceVar (var);
+        }
+        else
+        {
+          SyntaxService->ReportError (
+            "crystalspace.maploader.parse.meshobject",
+            child, "'value' or 'var' should be specified!");
+          return false;
+        }
+      }
+      break;
+    case XMLTOKEN_MAXRENDERDIST:
+      {
+        TEST_MISSING_MESH
+          csRef<iDocumentAttribute> attr;
+        if (attr = child->GetAttribute ("value"))
+        {
+          float dist = attr->GetValueAsFloat ();
+          mesh->SetMaximumRenderDistance (dist);
+        }
+        else if (attr = child->GetAttribute ("var"))
+        {
+          csString varname = attr->GetValue ();
+          iSharedVariable *var = Engine->GetVariableList()->FindByName (
+            varname);
+          if (!var)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.meshobject",
+              child, "Variable '%s' doesn't exist!", varname.GetData ());
+            return false;
+          }
+          mesh->SetMaximumRenderDistanceVar (var);
+        }
+        else
+        {
+          SyntaxService->ReportError (
+            "crystalspace.maploader.parse.meshobject",
+            child, "'value' or 'var' should be specified!");
+          return false;
+        }
+      }
+      break;
+    case XMLTOKEN_STATICLOD:
+      {
+        TEST_MISSING_MESH
+          iLODControl* lodctrl = mesh->CreateStaticLOD ();
+        if (!LoadLodControl (lodctrl, child))
+          return false;
+      }
+      break;
+    case XMLTOKEN_LODLEVEL:
+      {
+        TEST_MISSING_MESH
+          if (!parent)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.load.meshobject", child,
+              "Mesh must be part of a hierarchical mesh for <lodlevel>!");
+            return false;
+          }
+          if (!parent->GetStaticLOD ())
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.load.meshobject", child,
+              "Parent mesh must use <staticlod>!");
+            return false;
+          }
+          parent->AddMeshToStaticLOD (child->GetContentsValueAsInt (), mesh);
+      }
+      break;
+    case XMLTOKEN_LOD:
+      {
+        TEST_MISSING_MESH
+          if (!mesh->GetMeshObject ())
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.meshobject",
+              child, "Mesh object is missing!");
+            return false;
+          }
+          csRef<iLODControl> lodctrl (scfQueryInterface<iLODControl> (
+            mesh->GetMeshObject ()));
+          if (!lodctrl)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.meshobject",
+              child, "This mesh doesn't implement LOD control!");
+            return false;
+          }
+          if (!LoadLodControl (lodctrl, child))
+            return false;
+      }
+      break;
+    case XMLTOKEN_PRIORITY:
+      {
+        priority = child->GetContentsValue ();
+        long pri = Engine->GetRenderPriority (priority);
+        if (pri == 0)
+        {
+          SyntaxService->ReportError (
+            "crystalspace.maploader.parse.meshobject",
+            child, "Unknown render priority '%s'!", (const char*)priority);
+          return false;
+        }
+        if (recursive)
+          mesh->SetRenderPriorityRecursive (pri);
+        else
+          mesh->SetRenderPriority (pri);
+        prioChanged = true;
+      }
+      break;
+    case XMLTOKEN_ADDON:
+      TEST_MISSING_MESH
+        if (!LoadAddOn (ldr_context, child, mesh, false, ssource))
+          return false;
+      break;
+    case XMLTOKEN_META:
+      TEST_MISSING_MESH
+        if (!LoadAddOn (ldr_context, child, mesh, true, ssource))
+          return false;
+      break;
+    case XMLTOKEN_NOLIGHTING:
+      TEST_MISSING_MESH
+        if (recursive)
+          mesh->SetFlagsRecursive (CS_ENTITY_NOLIGHTING, CS_ENTITY_NOLIGHTING);
+        else
+          mesh->GetFlags ().Set (CS_ENTITY_NOLIGHTING, CS_ENTITY_NOLIGHTING);
+      break;
+    case XMLTOKEN_NOSHADOWS:
+      TEST_MISSING_MESH
+        if (recursive)
+          mesh->SetFlagsRecursive (CS_ENTITY_NOSHADOWS, CS_ENTITY_NOSHADOWS);
+        else
+          mesh->GetFlags ().Set (CS_ENTITY_NOSHADOWS, CS_ENTITY_NOSHADOWS);
+      break;
+    case XMLTOKEN_NOSHADOWCAST:
+      TEST_MISSING_MESH
+        if (recursive)
+          mesh->SetFlagsRecursive (CS_ENTITY_NOSHADOWCAST, CS_ENTITY_NOSHADOWCAST);
+        else
+          mesh->GetFlags ().Set (CS_ENTITY_NOSHADOWCAST, CS_ENTITY_NOSHADOWCAST);
+      break;
+    case XMLTOKEN_NOSHADOWRECEIVE:
+      TEST_MISSING_MESH
+        if (recursive)
+          mesh->SetFlagsRecursive (CS_ENTITY_NOSHADOWRECEIVE, CS_ENTITY_NOSHADOWRECEIVE);
+        else
+          mesh->GetFlags ().Set (CS_ENTITY_NOSHADOWRECEIVE, CS_ENTITY_NOSHADOWRECEIVE);
+      break;
+    case XMLTOKEN_NOCLIP:
+      TEST_MISSING_MESH
+        if (recursive)
+          mesh->SetFlagsRecursive (CS_ENTITY_NOCLIP, CS_ENTITY_NOCLIP);
+        else
+          mesh->GetFlags ().Set (CS_ENTITY_NOCLIP, CS_ENTITY_NOCLIP);
+      break;
+    case XMLTOKEN_NOHITBEAM:
+      TEST_MISSING_MESH
+        if (recursive)
+          mesh->SetFlagsRecursive (CS_ENTITY_NOHITBEAM, CS_ENTITY_NOHITBEAM);
+        else
+          mesh->GetFlags ().Set (CS_ENTITY_NOHITBEAM, CS_ENTITY_NOHITBEAM);
+      break;
+    case XMLTOKEN_INVISIBLEMESH:
+      TEST_MISSING_MESH
+        if (recursive)
+          mesh->SetFlagsRecursive (CS_ENTITY_INVISIBLEMESH,
+          CS_ENTITY_INVISIBLEMESH);
+        else
+          mesh->GetFlags ().Set (CS_ENTITY_INVISIBLEMESH,
+          CS_ENTITY_INVISIBLEMESH);
+      break;
+    case XMLTOKEN_INVISIBLE:
+      TEST_MISSING_MESH
+        if (recursive)
+          mesh->SetFlagsRecursive (CS_ENTITY_INVISIBLE, CS_ENTITY_INVISIBLE);
+        else
+          mesh->GetFlags ().Set (CS_ENTITY_INVISIBLE, CS_ENTITY_INVISIBLE);
+      break;
+    case XMLTOKEN_DETAIL:
+      TEST_MISSING_MESH
+        if (recursive)
+          mesh->SetFlagsRecursive (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
+        else
+          mesh->GetFlags ().Set (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
+      break;
+    case XMLTOKEN_STATICLIT:
+      TEST_MISSING_MESH
+        if (recursive)
+          mesh->SetFlagsRecursive (CS_ENTITY_STATICLIT, CS_ENTITY_STATICLIT);
+        else
+          mesh->GetFlags ().Set (CS_ENTITY_STATICLIT, CS_ENTITY_STATICLIT);
+      break;
+    case XMLTOKEN_LIMITEDSHADOWCAST:
+      TEST_MISSING_MESH
+        if (recursive)
+          mesh->SetFlagsRecursive (CS_ENTITY_LIMITEDSHADOWCAST,
+          CS_ENTITY_LIMITEDSHADOWCAST);
+        else
+          mesh->GetFlags ().Set (CS_ENTITY_LIMITEDSHADOWCAST,
+          CS_ENTITY_LIMITEDSHADOWCAST);
+      break;
+    case XMLTOKEN_ZFILL:
+      TEST_MISSING_MESH
+        if (priority.IsEmpty ()) priority = "wall";
+      if (recursive)
+      {
+        mesh->SetRenderPriorityRecursive (
+          Engine->GetRenderPriority (priority));
+        mesh->SetZBufModeRecursive (CS_ZBUF_FILL);
+      }
+      else
+      {
+        mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+        mesh->SetZBufMode (CS_ZBUF_FILL);
+      }
+      zmodeChanged = true;
+      break;
+    case XMLTOKEN_ZUSE:
+      TEST_MISSING_MESH
+        if (priority.IsEmpty ()) priority = "object";
+      if (recursive)
+      {
+        mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
+        mesh->SetZBufModeRecursive (CS_ZBUF_USE);
+      }
+      else
+      {
+        mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+        mesh->SetZBufMode (CS_ZBUF_USE);
+      }
+      zmodeChanged = true;
+      break;
+    case XMLTOKEN_ZNONE:
+      TEST_MISSING_MESH
+        if (priority.IsEmpty ()) priority = "sky";
+      if (recursive)
+      {
+        mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
+        mesh->SetZBufModeRecursive (CS_ZBUF_NONE);
+      }
+      else
+      {
+        mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+        mesh->SetZBufMode (CS_ZBUF_NONE);
+      }
+      zmodeChanged = true;
+      break;
+    case XMLTOKEN_ZTEST:
+      TEST_MISSING_MESH
+        if (priority.IsEmpty ()) priority = "alpha";
+      if (recursive)
+      {
+        mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
+        mesh->SetZBufModeRecursive (CS_ZBUF_TEST);
+      }
+      else
+      {
+        mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+        mesh->SetZBufMode (CS_ZBUF_TEST);
+      }
+      zmodeChanged = true;
+      break;
+    case XMLTOKEN_CAMERA:
+      TEST_MISSING_MESH
+        if (priority.IsEmpty ()) priority = "sky";
+      if (recursive)
+      {
+        mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
+        mesh->SetFlagsRecursive (CS_ENTITY_CAMERA, CS_ENTITY_CAMERA);
+      }
+      else
+      {
+        mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+        mesh->GetFlags ().Set (CS_ENTITY_CAMERA, CS_ENTITY_CAMERA);
+      }
+      break;
+    case XMLTOKEN_BADOCCLUDER:
+      TEST_MISSING_MESH
+        else
+      {
+        //Apply the flag CS_CULLER_HINT_BADOCCLUDER to all the meshes in 
+        //the meshes' hierarchy, starting from the 'mesh' mesh object.
+        csRefArray<iMeshWrapper> meshesArray;
+        CollectAllChildren (mesh, meshesArray);
+        size_t i, count = meshesArray.GetSize ();
+        for (i = 0; i < count; i++)
+        {
+          csRef<iVisibilityObject> visobj = 
+            scfQueryInterface<iVisibilityObject> (meshesArray[i]);
+          if (visobj)
+            visobj->GetCullerFlags ().Set (CS_CULLER_HINT_BADOCCLUDER);
+        }
+        }
+        break;
+    case XMLTOKEN_GOODOCCLUDER:
+      TEST_MISSING_MESH
+        else
+      {
+        //Apply the flag CS_CULLER_HINT_GOODOCCLUDER to all the meshes in 
+        //the meshes' hierarchy, starting from the 'mesh' mesh object.
+        csRefArray<iMeshWrapper> meshesArray;
+        CollectAllChildren (mesh, meshesArray);
+        size_t i, count = meshesArray.GetSize ();
+        for (i = 0; i < count; i++)
+        {
+          csRef<iVisibilityObject> visobj = 
+            scfQueryInterface<iVisibilityObject> (meshesArray[i]);
+          if (visobj)
+            visobj->GetCullerFlags ().Set (CS_CULLER_HINT_GOODOCCLUDER);
+        }
+        }
+        break;
+    case XMLTOKEN_CLOSED:
+      TEST_MISSING_MESH
+        else
+      {
+        if (recursive)//Test if recursion on children has been specified.
+        {
+          csRefArray<iMeshWrapper> meshesArray;
+          CollectAllChildren (mesh, meshesArray);
+          size_t i, count = meshesArray.GetSize ();
+          for (i = 0; i < count; i++)
+          {
+            ClosedFlags (meshesArray[i]);
+          }
+        }//if
+        else
+          ClosedFlags (mesh);
+        }
+        break;
+    case XMLTOKEN_CONVEX:
+      TEST_MISSING_MESH
+        else
+      {
+        //Test if recursion on children has been specified.
+        if (recursive)
+        {
+          csRefArray<iMeshWrapper> meshesArray;
+          CollectAllChildren (mesh, meshesArray);
+          size_t i, count = meshesArray.GetSize ();
+          for (i = 0; i < count; i++)
+          {
+            ConvexFlags (meshesArray[i]);
+          }
+        }
+        else
+          ConvexFlags (mesh);
+        }
+        break;
+    case XMLTOKEN_KEY:
+      TEST_MISSING_MESH
+        else
+      {
+        if (!ParseKey (child, mesh->QueryObject()))
+          return false;
+        }
+        break;
+    case XMLTOKEN_HARDMOVE:
+      TEST_MISSING_MESH
+        if (!mesh->GetMeshObject())
+        {
+          SyntaxService->ReportError (
+            "crystalspace.maploader.load.meshobject",
+            child, "Please specify the params of the meshobject first!");
+          return false;
+        }
+        else if (!mesh->GetMeshObject ()->SupportsHardTransform ())
+        {
+          SyntaxService->ReportError (
+            "crystalspace.maploader.parse.meshobject",
+            child, "This mesh object doesn't support 'hardmove'!");
+          return false;
+        }
+        else
+        {
+          csReversibleTransform tr;
+          csRef<iDocumentNode> matrix_node = child->GetNode ("matrix");
+          if (matrix_node)
+          {
+            csMatrix3 m;
+            if (!SyntaxService->ParseMatrix (matrix_node, m))
+              return false;
+            tr.SetT2O (m);
+          }
+          csRef<iDocumentNode> vector_node = child->GetNode ("v");
+          if (vector_node)
+          {
+            csVector3 v;
+            if (!SyntaxService->ParseVector (vector_node, v))
+              return false;
+            tr.SetOrigin (v);
+          }
+          mesh->HardTransform (tr);
+        }
+        break;
+    case XMLTOKEN_MOVE:
+      TEST_MISSING_MESH
+        else
+      {
+        mesh->GetMovable ()->SetTransform (csMatrix3 ());     // Identity
+        mesh->GetMovable ()->SetPosition (csVector3 (0));
+        csRef<iDocumentNode> matrix_node = child->GetNode ("matrix");
+        if (matrix_node)
+        {
+          csMatrix3 m;
+          if (!SyntaxService->ParseMatrix (matrix_node, m))
+            return false;
+          if (!TestOrthoMatrix (m))
+          {
+            ReportWarning (
+              "crystalspace.maploader.load.mesh",
+              child, "Scaling of mesh objects is not allowed in CS!");
+          }
+          mesh->GetMovable ()->SetTransform (m);
+        }
+        csRef<iDocumentNode> vector_node = child->GetNode ("v");
+        if (vector_node)
+        {
+          csVector3 v;
+          if (!SyntaxService->ParseVector (vector_node, v))
+            return false;
+          mesh->GetMovable ()->SetPosition (v);
+        }
+        mesh->GetMovable ()->UpdateMove ();
+        }
+        break;
+    case XMLTOKEN_BOX:
+      TEST_MISSING_MESH
+        else
+      {
+        csBox3 b;
+        if (!SyntaxService->ParseBox (child, b))
+          return false;
+        mesh->GetMeshObject ()->GetObjectModel ()->SetObjectBoundingBox (b);
+        }
+        break;
+    case XMLTOKEN_SHADERVAR:
+      TEST_MISSING_MESH
+      else
+      {
+        csRef<iShaderVariableContext> svc = 
+          scfQueryInterface<iShaderVariableContext> (mesh);
+        CS_ASSERT (svc.IsValid());
+        //create a new variable
+        const char* varname = child->GetAttributeValue ("name");
+        csRef<csShaderVariable> var;
+        var.AttachNew (new csShaderVariable (stringSetSvName->Request (varname)));
+        if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
+        {
+          SyntaxService->ReportError (
+            "crystalspace.maploader.load.meshobject", child,
+            "Error loading shader variable '%s' in mesh '%s'.", 
+            varname, mesh->QueryObject()->GetName());
+          break;
+        }
+        svc->AddVariable (var);
+      }
+      break;
+    default:
+      handled = false;
+      return true;
+    }
+    return true;
+#undef TEST_MISSING_MESH
+  }
+
   csPtr<iImage> csThreadedLoader::LoadImage (iDataBuffer* buf, const char* fname,
     int Format)
   {
@@ -1775,6 +2746,117 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     return csPtr<iImage> (image);
+  }
+
+  csRef<iMeshWrapper> csThreadedLoader::LoadMeshObjectFromFactory (
+    iLoaderContext* ldr_context, iDocumentNode* node,
+    iStreamSource* ssource)
+  {
+    if (!Engine) return 0;
+
+    csString priority;
+
+    csRef<iMeshWrapper> mesh;
+    bool staticpos = false;
+    bool staticshape = false;
+    bool zbufSet = false;
+    bool prioSet = false;
+
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      bool handled;
+      if (!HandleMeshParameter (ldr_context, mesh, 0, child, id,
+        handled, priority, false, staticpos, staticshape, zbufSet,
+        prioSet, true, ssource))
+        return 0;
+      if (!handled) switch (id)
+      {
+      case XMLTOKEN_FACTORY:
+        if (mesh)
+        {
+          SyntaxService->ReportError (
+            "crystalspace.maploader.load.meshobject",
+            child, "There is already a factory for this mesh!");
+          return 0;
+        }
+        else
+        {
+          iMeshFactoryWrapper* t = ldr_context->FindMeshFactory (
+            child->GetContentsValue ());
+          if (!t)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.load.meshobject",
+              child, "Can't find factory '%s'!", child->GetContentsValue ());
+            return 0;
+          }
+          mesh = t->CreateMeshWrapper ();
+          if (mesh)
+          {
+            ldr_context->AddToCollection(mesh->QueryObject ());
+            // Now also add the child mesh objects to the region.
+            const csRef<iSceneNodeArray> children = 
+              mesh->QuerySceneNode ()->GetChildrenArray ();
+            AddChildrenToCollection (ldr_context, children);
+          }
+        }
+        break;
+      default:
+        SyntaxService->ReportBadToken (child);
+        return 0;
+      }
+    }
+
+    if (!mesh)
+    {
+      SyntaxService->ReportError (
+        "crystalspace.maploader.load.meshobject",
+        node, "There is no 'factory' for this mesh!");
+      return 0;
+    }
+    if (priority.IsEmpty ()) priority = "object";
+    mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
+
+    //I had to put these ugly curly brackets. It's due to the uglier label
+    //below! 'children' and 'set' need an initialization indeed. Luca
+    {
+      csRefArray<iMeshWrapper> meshesArray;
+      CollectAllChildren (mesh, meshesArray);
+      size_t i, count = meshesArray.GetSize ();
+      for (i = 0; i < count; i++)
+      {
+        iMeshWrapper* mesh = meshesArray[i];
+        mesh->GetMeshObject ()->GetFlags ().SetBool (
+          CS_MESH_STATICPOS, staticpos);
+        mesh->GetMeshObject ()->GetFlags ().SetBool (
+          CS_MESH_STATICSHAPE, staticshape);
+      }
+    }
+
+    return mesh;
+  }
+
+  void csThreadedLoader::AddChildrenToCollection (iLoaderContext* ldr_context,
+    const iSceneNodeArray* children)
+  {
+    size_t i;
+    for (i = 0 ; i < children->GetSize(); i++)
+    {
+      iSceneNode* sn = children->Get(i);
+      iObject* obj = 0;
+      if (sn->QueryMesh ()) obj = sn->QueryMesh ()->QueryObject ();
+      else if (sn->QueryLight ()) obj = sn->QueryLight ()->QueryObject ();
+      //else if (sn->QueryCamera ()) obj = sn->QueryCamera ()->QueryObject ();
+      if (obj)
+        ldr_context->AddToCollection(obj);
+      const csRef<iSceneNodeArray> nodeChildren = sn->GetChildrenArray ();
+      AddChildrenToCollection (ldr_context, nodeChildren);
+    }
   }
 
   //-------------------------------------------------------------------------//

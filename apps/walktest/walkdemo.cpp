@@ -1056,7 +1056,7 @@ void OpenPortal (iThreadedLoader *LevelLoader, iView* view, char* lev)
     buf.Format ("/lev/%s", lev);
     Sys->myVFS->ChDir (buf);
     csRef<iThreadReturn> ret = LevelLoader->LoadMapFile ("world", false, collection, true);
-    Sys->tm->Wait(ret);
+    Sys->ret->Wait();
   }
 
   iMovable* tmov = thing->GetMovable ();

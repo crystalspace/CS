@@ -50,7 +50,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         csRef<iThreadedLoader> tldr = scfQueryInterface<iThreadedLoader>(loader);
         csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(object_reg);
         csRef<iThreadReturn> ret = tldr->LoadImage (filename, Format);
-        tm->Wait(ret);
+        ret->Wait();
         img = scfQueryInterface<iImage>(ret->GetResultRefPtr());
       }
       if (!img.IsValid())

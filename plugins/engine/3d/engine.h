@@ -378,18 +378,17 @@ public:
   //-- Mesh handling
 
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (iMeshFactoryWrapper* factory,
-  	const char* name, iSector* sector = 0,
-	const csVector3& pos = csVector3 (0, 0, 0));
+  	const char* name, iSector* sector = 0, const csVector3& pos = csVector3 (0, 0, 0),
+    bool addToList = true);
 
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (iMeshObject* meshobj,
-  	const char* name, iSector* sector = 0,
-	const csVector3& pos = csVector3 (0, 0, 0));
+  	const char* name, iSector* sector = 0, const csVector3& pos = csVector3 (0, 0, 0),
+    bool addToList = true);
 
-  virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* classid,
-  	const char* name, iSector* sector = 0,
-	const csVector3& pos = csVector3 (0, 0, 0));
+  virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* classid,	const char* name,
+    iSector* sector = 0, const csVector3& pos = csVector3 (0, 0, 0), bool addToList = true);
 
-  virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* name);
+  virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* name, bool addToList = true);
 
   virtual csPtr<iMeshWrapper> CreateSectorWallsMesh (iSector* sector,
       const char* name);
@@ -421,16 +420,16 @@ public:
   //-- Mesh factory handling
 
   virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* classId,
-  	const char* name);
+  	const char* name, bool addToList);
 
-  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (
-  	iMeshObjectFactory * factory, const char* name);
+  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (iMeshObjectFactory * factory,
+    const char* name, bool addToList);
 
-  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* name);
+  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* name,
+    bool addToList);
 
   virtual csPtr<iMeshFactoryWrapper> LoadMeshFactory (
-  	const char* name, const char* loaderClassId,
-	iDataBuffer* input);
+  	const char* name, const char* loaderClassId, iDataBuffer* input, bool addToList);
 
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name,
   	iCollection* collection = 0);

@@ -21,11 +21,18 @@
 #include "csqint.h"
 
 #include "csgeom/box.h"
+#include "csgeom/poly3d.h"
 #include "csgeom/trimesh.h"
 
+#include "csutil/csobject.h"
+#include "csutil/scfstr.h"
+
 #include "iengine/engine.h"
+#include "iengine/halo.h"
 #include "iengine/imposter.h"
 #include "iengine/material.h"
+#include "iengine/movable.h"
+#include "iengine/portalcontainer.h"
 #include "iengine/texture.h"
 #include "iengine/sharevar.h"
 
@@ -36,6 +43,7 @@
 #include "imap/ldrctxt.h"
 #include "imap/services.h"
 
+#include "imesh/object.h"
 #include "imesh/objmodel.h"
 
 #include "itexture/iproctex.h"
@@ -654,7 +662,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if (!filename.IsEmpty ())
     {
       csRef<iThreadReturn> ret = LoadImage (filename, Format);
-      tm->Wait(ret);
+      ret->Wait();
       csRef<iImage> image = scfQueryInterface<iImage>(ret->GetResultRefPtr());
       context.SetImage (image);
       if (image.IsValid() && type.IsEmpty ())
@@ -1031,6 +1039,647 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     return tex;
+  }
+
+  bool csThreadedLoader::ParsePortal (iLoaderContext* ldr_context,
+    iDocumentNode* node, iSector* sourceSector, const char* container_name,
+    iMeshWrapper*& container_mesh, iMeshWrapper* parent)
+  {
+    const char* name = node->GetAttributeValue ("name");
+    iSector* destSector = 0;
+    csPoly3D poly;
+
+    CS::Utility::PortalParameters params;
+    csRef<csRefCount> parseState;
+    scfString destSectorName;
+    params.destSector = &destSectorName;
+
+    // Array of keys we need to parse later.
+    csRefArray<iDocumentNode> key_nodes;
+
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      bool handled;
+      if (!SyntaxService->HandlePortalParameter (child, ldr_context,
+        parseState, params, handled))
+      {
+        return false;
+      }
+      if (!handled)
+      {
+        const char* value = child->GetValue ();
+        csStringID id = xmltokens.Request (value);
+        switch (id)
+        {
+        case XMLTOKEN_KEY:
+          key_nodes.Push (child);
+          break;
+        case XMLTOKEN_V:
+          {
+            csVector3 vec;
+            if (!SyntaxService->ParseVector (child, vec))
+              return false;
+            poly.AddVertex (vec);
+          }
+          break;
+        default:
+          SyntaxService->ReportBadToken (child);
+          return false;
+        }
+      }
+    }
+
+    iPortal* portal;
+    // If autoresolve is true we clear the sector since we want the callback
+    // to be used.
+    if (params.autoresolve)
+      destSector = 0;
+    else
+      destSector = ldr_context->FindSector (destSectorName.GetData ());
+    csRef<iMeshWrapper> mesh;
+    if (container_mesh)
+    {
+      mesh = container_mesh;
+      csRef<iPortalContainer> pc = 
+        scfQueryInterface<iPortalContainer> (mesh->GetMeshObject ());
+      CS_ASSERT (pc != 0);
+      portal = pc->CreatePortal (poly.GetVertices (),
+        (int)poly.GetVertexCount ());
+      portal->SetSector (destSector);
+    }
+    else if (parent)
+    {
+      CS_ASSERT (sourceSector == 0);
+      mesh = Engine->CreatePortal (
+        container_name ? container_name : name,
+        parent, destSector,
+        poly.GetVertices (), (int)poly.GetVertexCount (), portal);
+      ldr_context->AddToCollection(mesh->QueryObject ());
+    }
+    else
+    {
+      mesh = Engine->CreatePortal (
+        container_name ? container_name : name,
+        sourceSector, csVector3 (0), destSector,
+        poly.GetVertices (), (int)poly.GetVertexCount (), portal);
+      ldr_context->AddToCollection(mesh->QueryObject ());
+    }
+    container_mesh = mesh;
+    if (name)
+      portal->SetName (name);
+    if (!destSector)
+    {
+      // Create a callback to find the sector at runtime when the
+      // portal is first used.
+      csRef<csMissingSectorCallback> missing_cb;
+      missing_cb.AttachNew (new csMissingSectorCallback (
+        ldr_context, destSectorName.GetData (), params.autoresolve));
+      portal->SetMissingSectorCallback (missing_cb);
+    }
+
+    portal->GetFlags ().Set (params.flags);
+    if (params.mirror)
+    {
+      csPlane3 p = poly.ComputePlane ();
+      portal->SetWarp (csTransform::GetReflect (p));
+    }
+    else if (params.warp)
+    {
+      portal->SetWarp (params.m, params.before, params.after);
+    }
+    if (params.msv != -1)
+    {
+      portal->SetMaximumSectorVisit (params.msv);
+    }
+
+    size_t i;
+    for (i = 0 ; i < key_nodes.GetSize () ; i++)
+    {
+      if (!ParseKey (key_nodes[i], container_mesh->QueryObject()))
+        return false;
+    }
+
+    return true;
+  }
+
+  bool csThreadedLoader::ParsePortals (iLoaderContext* ldr_context,
+    iDocumentNode* node, iSector* sourceSector,
+    iMeshWrapper* parent, iStreamSource* ssource)
+  {
+    const char* container_name = node->GetAttributeValue ("name");
+    iMeshWrapper* container_mesh = 0;
+    csString priority;
+    bool staticpos = false;
+    bool staticshape = false;
+    bool zbufSet = false;
+    bool prioSet = false;
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      bool handled;
+      if (!HandleMeshParameter (ldr_context, container_mesh, parent, child, id,
+        handled, priority, true, staticpos, staticshape, zbufSet, prioSet,
+        false, ssource))
+        return false;
+      if (!handled) switch (id)
+      {
+      case XMLTOKEN_PORTAL:
+        if (!ParsePortal (ldr_context, child, sourceSector,
+          container_name, container_mesh, parent))
+          return false;
+        break;
+      default:
+        SyntaxService->ReportBadToken (child);
+        return false;
+      }
+    }
+
+    if (!priority.IsEmpty ())
+      container_mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+    container_mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICPOS,
+      staticpos);
+    container_mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICSHAPE,
+      staticshape);
+
+    return true;
+  }
+
+  iLight* csThreadedLoader::ParseStatlight (iLoaderContext* ldr_context,
+    iDocumentNode* node)
+  {
+    const char* lightname = node->GetAttributeValue ("name");
+
+    csVector3 pos;
+
+    csVector3 attenvec (0, 0, 0);
+    float spotfalloffInner = 1, spotfalloffOuter = 0;
+    csLightType type = CS_LIGHT_POINTLIGHT;
+    csFlags lightFlags;
+
+    bool use_light_transf = false;
+    bool use_light_transf_vector = false;
+    csReversibleTransform light_transf;
+
+    float distbright = 1;
+
+    float influenceRadius = 0;
+    bool influenceOverride = false;
+
+    csLightAttenuationMode attenuation = CS_ATTN_LINEAR;
+    float dist = 0;
+
+    csColor color;
+    csColor specular (0, 0, 0);
+    bool userSpecular = false;
+    csLightDynamicType dyn;
+    csRefArray<csShaderVariable> shader_variables;
+    struct csHaloDef
+    {
+      int type;
+      union
+      {
+        struct
+        {
+          float Intensity;
+          float Cross;
+        } cross;
+        struct
+        {
+          int Seed;
+          int NumSpokes;
+          float Roundness;
+        } nova;
+        struct
+        {
+          iMaterialWrapper* mat_center;
+          iMaterialWrapper* mat_spark1;
+          iMaterialWrapper* mat_spark2;
+          iMaterialWrapper* mat_spark3;
+          iMaterialWrapper* mat_spark4;
+          iMaterialWrapper* mat_spark5;
+        } flare;
+      };
+    } halo;
+
+    // This csObject will contain all key-value pairs as children
+    csObject Keys;
+
+    memset (&halo, 0, sizeof (halo));
+
+    // New format.
+    pos.x = pos.y = pos.z = 0;
+    color.red = color.green = color.blue = 1;
+    dyn = CS_LIGHT_DYNAMICTYPE_STATIC;
+
+    dist = 1;
+
+
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+      case XMLTOKEN_RADIUS:
+        {
+          dist = child->GetContentsValueAsFloat ();
+          csRef<iDocumentAttribute> attr;
+          if (attr = child->GetAttribute ("brightness"))
+          {
+            distbright = attr->GetValueAsFloat();
+          }
+        }
+        break;
+      case XMLTOKEN_CENTER:
+        if (!SyntaxService->ParseVector (child, pos))
+          return 0;
+        break;
+      case XMLTOKEN_COLOR:
+        if (!SyntaxService->ParseColor (child, color))
+          return 0;
+        break;
+      case XMLTOKEN_SPECULAR:
+        if (!SyntaxService->ParseColor (child, specular))
+          return 0;
+        userSpecular = true;
+        break;
+      case XMLTOKEN_DYNAMIC:
+        {
+          bool d;
+          if (!SyntaxService->ParseBool (child, d, true))
+            return 0;
+          if (d)
+            dyn = CS_LIGHT_DYNAMICTYPE_PSEUDO;
+          else
+            dyn = CS_LIGHT_DYNAMICTYPE_STATIC;
+        }
+        break;
+      case XMLTOKEN_KEY:
+        if (!ParseKey (child, &Keys))
+          return false;
+        break;
+      case XMLTOKEN_HALO:
+        {
+          const char* type;
+          csRef<iDocumentNode> typenode = child->GetNode ("type");
+          if (!typenode)
+          {
+            // Default halo, type 'cross' assumed.
+            type = "cross";
+          }
+          else
+          {
+            type = typenode->GetContentsValue ();
+          }
+
+          if (!strcasecmp (type, "cross"))
+          {
+            halo.type = 1;
+            halo.cross.Intensity = 2.0f;
+            halo.cross.Cross = 0.45f;
+            csRef<iDocumentNode> intnode = child->GetNode ("intensity");
+            if (intnode)
+            {
+              halo.cross.Intensity = intnode->GetContentsValueAsFloat ();
+            }
+            csRef<iDocumentNode> crossnode = child->GetNode ("cross");
+            if (crossnode)
+            {
+              halo.cross.Cross = crossnode->GetContentsValueAsFloat ();
+            }
+          }
+          else if (!strcasecmp (type, "nova"))
+          {
+            halo.type = 2;
+            halo.nova.Seed = 0;
+            halo.nova.NumSpokes = 100;
+            halo.nova.Roundness = 0.5;
+            csRef<iDocumentNode> seednode = child->GetNode ("seed");
+            if (seednode)
+            {
+              halo.nova.Seed = seednode->GetContentsValueAsInt ();
+            }
+            csRef<iDocumentNode> spokesnode = child->GetNode ("numspokes");
+            if (spokesnode)
+            {
+              halo.nova.NumSpokes = spokesnode->GetContentsValueAsInt ();
+            }
+            csRef<iDocumentNode> roundnode = child->GetNode ("roundness");
+            if (roundnode)
+            {
+              halo.nova.Roundness = roundnode->GetContentsValueAsFloat ();
+            }
+          }
+          else if (!strcasecmp (type, "flare"))
+          {
+            halo.type = 3;
+            iLoaderContext* lc = ldr_context;
+            csRef<iDocumentNode> matnode;
+
+            matnode = child->GetNode ("centermaterial");
+            halo.flare.mat_center = matnode ? lc->FindMaterial (
+              matnode->GetContentsValue ()) : 0;
+            if (!halo.flare.mat_center)
+            {
+              SyntaxService->ReportError (
+                "crystalspace.maploader.parse.light",
+                child, "Can't find material for flare!");
+              return 0;
+            }
+            matnode = child->GetNode ("spark1material");
+            halo.flare.mat_spark1 = matnode ? lc->FindMaterial (
+              matnode->GetContentsValue ()) : 0;
+            if (!halo.flare.mat_spark1)
+            {
+              SyntaxService->ReportError (
+                "crystalspace.maploader.parse.light",
+                child, "Can't find material for flare!");
+              return 0;
+            }
+            matnode = child->GetNode ("spark2material");
+            halo.flare.mat_spark2 = matnode ? lc->FindMaterial (
+              matnode->GetContentsValue ()) : 0;
+            if (!halo.flare.mat_spark2)
+            {
+              SyntaxService->ReportError (
+                "crystalspace.maploader.parse.light",
+                child, "Can't find material for flare!");
+              return 0;
+            }
+            matnode = child->GetNode ("spark3material");
+            halo.flare.mat_spark3 = matnode ? lc->FindMaterial (
+              matnode->GetContentsValue ()) : 0;
+            if (!halo.flare.mat_spark3)
+            {
+              SyntaxService->ReportError (
+                "crystalspace.maploader.parse.light",
+                child, "Can't find material for flare!");
+              return 0;
+            }
+            matnode = child->GetNode ("spark4material");
+            halo.flare.mat_spark4 = matnode ? lc->FindMaterial (
+              matnode->GetContentsValue ()) : 0;
+            if (!halo.flare.mat_spark4)
+            {
+              SyntaxService->ReportError (
+                "crystalspace.maploader.parse.light",
+                child, "Can't find material for flare!");
+              return 0;
+            }
+            matnode = child->GetNode ("spark5material");
+            halo.flare.mat_spark5 = matnode ? lc->FindMaterial (
+              matnode->GetContentsValue ()) : 0;
+            if (!halo.flare.mat_spark5)
+            {
+              SyntaxService->ReportError (
+                "crystalspace.maploader.parse.light",
+                child, "Can't find material for flare!");
+              return 0;
+            }
+          }
+          else
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.light",
+              child,
+              "Unknown halo type '%s'. Use 'cross', 'nova' or 'flare'!",
+              type);
+            return 0;
+          }
+        }
+        break;
+      case XMLTOKEN_ATTENUATION:
+        {
+          const char* att = child->GetContentsValue();
+          if (att)
+          {
+            if (!strcasecmp (att, "none"))
+              attenuation = CS_ATTN_NONE;
+            else if (!strcasecmp (att, "linear"))
+              attenuation = CS_ATTN_LINEAR;
+            else if (!strcasecmp (att, "inverse"))
+              attenuation = CS_ATTN_INVERSE;
+            else if (!strcasecmp (att, "realistic"))
+              attenuation = CS_ATTN_REALISTIC;
+            else if (!strcasecmp (att, "clq"))
+              attenuation = CS_ATTN_CLQ;
+            else
+            {
+              SyntaxService->ReportBadToken (child);
+              return 0;
+            }
+          }
+          else
+          {
+            attenuation = CS_ATTN_CLQ;
+          }
+
+          attenvec.x = child->GetAttributeValueAsFloat ("c");
+          attenvec.y = child->GetAttributeValueAsFloat ("l");
+          attenvec.z = child->GetAttributeValueAsFloat ("q");
+        }
+        break;
+      case XMLTOKEN_INFLUENCERADIUS:
+        {
+          influenceRadius = child->GetContentsValueAsFloat();
+          influenceOverride = true;
+        }
+        break;
+      case XMLTOKEN_ATTENUATIONVECTOR:
+        {
+          //@@@ should be scrapped in favor of specification via
+          // "attenuation".
+          if (!SyntaxService->ParseVector (child, attenvec))
+            return 0;
+          attenuation = CS_ATTN_CLQ;
+        }
+        break;
+      case XMLTOKEN_TYPE:
+        {
+          const char* t = child->GetContentsValue ();
+          if (t)
+          {
+            if (!strcasecmp (t, "point") || !strcasecmp (t, "pointlight"))
+              type = CS_LIGHT_POINTLIGHT;
+            else if (!strcasecmp (t, "directional"))
+              type = CS_LIGHT_DIRECTIONAL;
+            else if (!strcasecmp (t, "spot") || !strcasecmp (t, "spotlight"))
+              type = CS_LIGHT_SPOTLIGHT;
+            else
+            {
+              SyntaxService->ReportBadToken (child);
+              return 0;
+            }
+          }
+        }
+        break;
+      case XMLTOKEN_MOVE:
+        {
+          use_light_transf = true;
+          csRef<iDocumentNode> matrix_node = child->GetNode ("matrix");
+          if (matrix_node)
+          {
+            csMatrix3 m;
+            if (!SyntaxService->ParseMatrix (matrix_node, m))
+              return false;
+            light_transf.SetO2T (m);
+          }
+          csRef<iDocumentNode> vector_node = child->GetNode ("v");
+          if (vector_node)
+          {
+            csVector3 v;
+            if (!SyntaxService->ParseVector (vector_node, v))
+              return false;
+            use_light_transf_vector = true;
+            light_transf.SetO2TTranslation (v);
+          }
+        }
+        break;
+      case XMLTOKEN_DIRECTION:
+        SyntaxService->ReportError ("crystalspace.maploader.light", child,
+          "'direction' is no longer support for lights. Use 'move'!");
+        return 0;
+      case XMLTOKEN_SPOTLIGHTFALLOFF:
+        {
+          spotfalloffInner = child->GetAttributeValueAsFloat ("inner");
+          spotfalloffInner *= (PI/180);
+          spotfalloffInner = cosf(spotfalloffInner);
+          spotfalloffOuter = child->GetAttributeValueAsFloat ("outer");
+          spotfalloffOuter *= (PI/180);
+          spotfalloffOuter = cosf(spotfalloffOuter);
+        }
+        break;
+
+      case XMLTOKEN_SHADERVAR:
+        {
+          const char* varname = child->GetAttributeValue ("name");
+          csRef<csShaderVariable> var;
+          var.AttachNew (new csShaderVariable (stringSetSvName->Request (varname)));
+          if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.load.meshobject", child,
+              "Error loading shader variable '%s' in light '%s'.", 
+              varname, lightname);
+            break;
+          }
+          //svc->AddVariable (var);
+          shader_variables.Push(var);
+        }
+        break;
+      case XMLTOKEN_NOSHADOWS:
+        {
+          bool flag;
+          if (!SyntaxService->ParseBool (child, flag, true))
+            return false;
+          lightFlags.SetBool (CS_LIGHT_NOSHADOWS, flag);
+        }
+        break;
+      default:
+        SyntaxService->ReportBadToken (child);
+        return 0;
+      }
+    }
+
+    // implicit radius
+    if (dist == 0)
+    {
+      if (color.red > color.green && color.red > color.blue) dist = color.red;
+      else if (color.green > color.blue) dist = color.green;
+      else dist = color.blue;
+    }
+
+    csRef<iLight> l = Engine->CreateLight (lightname, pos,
+      dist, color, dyn);
+    ldr_context->AddToCollection(l->QueryObject ());
+    l->SetType (type);
+    l->GetFlags() = lightFlags;
+    l->SetSpotLightFalloff (spotfalloffInner, spotfalloffOuter);
+
+    for (size_t i = 0; i < shader_variables.GetSize (); i++)
+    {
+      l->GetSVContext()->AddVariable(shader_variables[i]);
+    }
+
+    if (userSpecular) l->SetSpecularColor (specular);
+
+    if (use_light_transf)
+    {
+      if (!use_light_transf_vector)
+        light_transf.SetOrigin (pos);
+      l->GetMovable ()->SetTransform (light_transf);
+      l->GetMovable ()->UpdateMove ();
+    }
+
+    switch (halo.type)
+    {
+    case 1:
+      l->CreateCrossHalo (halo.cross.Intensity,
+        halo.cross.Cross);
+      break;
+    case 2:
+      l->CreateNovaHalo (halo.nova.Seed, halo.nova.NumSpokes,
+        halo.nova.Roundness);
+      break;
+    case 3:
+      {
+        iMaterialWrapper* ifmc = halo.flare.mat_center;
+        iMaterialWrapper* ifm1 = halo.flare.mat_spark1;
+        iMaterialWrapper* ifm2 = halo.flare.mat_spark2;
+        iMaterialWrapper* ifm3 = halo.flare.mat_spark3;
+        iMaterialWrapper* ifm4 = halo.flare.mat_spark4;
+        iMaterialWrapper* ifm5 = halo.flare.mat_spark5;
+        iFlareHalo* flare = l->CreateFlareHalo ();
+        flare->AddComponent (0.0f, 1.2f, 1.2f, CS_FX_ADD, ifmc);
+        flare->AddComponent (0.3f, 0.1f, 0.1f, CS_FX_ADD, ifm3);
+        flare->AddComponent (0.6f, 0.4f, 0.4f, CS_FX_ADD, ifm4);
+        flare->AddComponent (0.8f, 0.05f, 0.05f, CS_FX_ADD, ifm5);
+        flare->AddComponent (1.0f, 0.7f, 0.7f, CS_FX_ADD, ifm1);
+        flare->AddComponent (1.3f, 0.1f, 0.1f, CS_FX_ADD, ifm3);
+        flare->AddComponent (1.5f, 0.3f, 0.3f, CS_FX_ADD, ifm4);
+        flare->AddComponent (1.8f, 0.1f, 0.1f, CS_FX_ADD, ifm5);
+        flare->AddComponent (2.0f, 0.5f, 0.5f, CS_FX_ADD, ifm2);
+        flare->AddComponent (2.1f, 0.15f, 0.15f, CS_FX_ADD, ifm3);
+        flare->AddComponent (2.5f, 0.2f, 0.2f, CS_FX_ADD, ifm3);
+        flare->AddComponent (2.8f, 0.4f, 0.4f, CS_FX_ADD, ifm4);
+        flare->AddComponent (3.0f, 3.0f, 3.0f, CS_FX_ADD, ifm1);
+        flare->AddComponent (3.1f, 0.05f, 0.05f, CS_FX_ADD, ifm5);
+        flare->AddComponent (3.3f, 0.15f, 0.15f, CS_FX_ADD, ifm2);
+      }
+      break;
+    }
+    l->SetAttenuationMode (attenuation);
+    if (attenuation == CS_ATTN_CLQ)
+    {
+      if (attenvec.IsZero())
+      {
+        //@@TODO:
+      }
+      else
+      {
+        l->SetAttenuationConstants (csVector4 (attenvec, 0));
+      }
+    }
+
+    if (influenceOverride) l->SetCutoffDistance (influenceRadius);
+    else l->SetCutoffDistance (dist);
+
+    // Move the key-value pairs from 'Keys' to the light object
+    l->QueryObject ()->ObjAddChildren (&Keys);
+    Keys.ObjRemoveAll ();
+
+    l->IncRef ();	// To make sure smart pointer doesn't release.
+    return l;
   }
 }
 CS_PLUGIN_NAMESPACE_END(csparser)

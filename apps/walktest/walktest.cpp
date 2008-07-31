@@ -851,7 +851,7 @@ void WalkTest::LoadLibraryData (iCollection* collection)
 {
   // Load the "standard" library
   csRef<iThreadReturn> ret = LevelLoader->LoadLibraryFile ("/lib/std/library", collection);
-  tm->Wait(ret);
+  ret->Wait();
   if(!ret->WasSuccessful())
   {
     Cleanup ();
@@ -1220,7 +1220,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       collection = Engine->CreateCollection (map->map_dir);
     }
     csRef<iThreadReturn> ret = LevelLoader->LoadMapFile ("world", false, collection, !do_collections, do_dupes);
-    tm->Wait(ret);
+    ret->Wait();
     if (!ret->WasSuccessful())
     {
       Report (CS_REPORTER_SEVERITY_ERROR, "Failing to load map!");

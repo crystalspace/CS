@@ -328,7 +328,7 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
   }
 
   csRef<iThreadReturn> ret = Sys->LevelLoader->LoadFile(filename);
-  Sys->tm->Wait(ret);
+  Sys->ret->Wait();
   if (!ret->WasSuccessful())
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -635,7 +635,7 @@ void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
       //Is not registered. We have to do it.
       textFileName = LookForTextureFileName(kp->GetValue());
       csRef<iThreadReturn> ret = loader->LoadTexture(matName, textFileName);
-      Sys->tm->Wait(ret);
+      Sys->ret->Wait();
       if(!ret->WasSuccessful())
       {
         csPrintf("Error loading %s texture!!",textFileName);

@@ -29,8 +29,10 @@
 
 #include "iengine/campos.h"
 #include "iengine/mesh.h"
+#include "iengine/portal.h"
 #include "iengine/sector.h"
 #include "iengine/sharevar.h"
+#include "imap/ldrctxt.h"
 #include "imap/loader.h"
 #include "iutil/comp.h"
 
@@ -47,6 +49,7 @@ struct iLODControl;
 struct iObject;
 struct iObjectModel;
 struct iObjectRegistry;
+struct iSceneNodeArray;
 struct iShaderVarStringSet;
 struct iStringSet;
 struct iSyntaxService;
@@ -302,15 +305,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         ProxyKeyColour keyColour;
       };
 
+      // Returns in the 'meshesArray' array all the meshes encountered walking through
+      // the hierarchy of meshes starting from 'meshWrapper'.
+      void CollectAllChildren (iMeshWrapper* meshWrapper, csRefArray<iMeshWrapper>&
+        meshesArray);
+
+      // Two useful private functions to set the CS_TRIMESH_CLOSED and
+      // CS_TRIMESH_CONVEX flags on a single mesh wrapper.
+      void ConvexFlags (iMeshWrapper* mesh);
+      void ClosedFlags (iMeshWrapper* mesh);
+
       // Load all proxy textures which are used.
       bool LoadProxyTextures(csSafeCopyArray<ProxyTexture> &proxyTextures,
         csWeakRefArray<iMaterialWrapper> &materialArray);
 
-      THREADED_CALLABLE_DECL6(csThreadedLoader, LoadMeshFactory,
-        csLoaderReturn, iLoaderContext*, ldr_context,
-        iDocumentNode*, meshfactnode, const char*, override_name,
-        iMeshFactoryWrapper*, parent, csReversibleTransform*, transf,
-        iStreamSource*, ssource, true, false);
+      THREADED_CALLABLE_DECL6(csThreadedLoader, FindOrLoadMeshFactory,
+        csLoaderReturn, csRef<iLoaderContext>, ldr_context,
+        csRef<iDocumentNode>, meshfactnode, const char*, override_name,
+        csRef<iMeshFactoryWrapper>, parent, csReversibleTransform*, transf,
+        csRef<iStreamSource>, ssource, true, false);
+
+      THREADED_CALLABLE_DECL5(csThreadedLoader, FindOrLoadMeshObject,
+        csLoaderReturn, csRef<iLoaderContext>, ldr_context, csRef<iDocumentNode>,
+        meshobjnode, const char*, override_name, csRef<iMeshWrapper>, parent,
+        csRef<iStreamSource>, ssource, true, false);
 
       bool LoadMapLibraryFile (const char* filename, iCollection* collection,
         bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource,
@@ -327,6 +345,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       bool LoadMeshObjectFactory(iLoaderContext* ldr_context, iMeshFactoryWrapper* meshFact,
         iMeshFactoryWrapper* parent, iDocumentNode* node, csReversibleTransform* transf = 0,
         iStreamSource* ssource = 0);
+
+      /**
+      * Handle various common mesh object parameters.
+      */
+      bool HandleMeshParameter (iLoaderContext* ldr_context,
+        iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* child,
+        csStringID id, bool& handled, csString& priority,
+        bool do_portal_container, bool& staticpos, bool& staticshape,
+        bool& zmodeChanged, bool& prioChanged,
+        bool recursive, iStreamSource* ssource);
+
+      /**
+      * Load the mesh object from the map file.
+      * The parent is not 0 if this mesh is going to be part of a hierarchical
+      * mesh.
+      */
+      bool LoadMeshObject(iLoaderContext* ldr_context, iMeshWrapper* mesh, iMeshWrapper* parent,
+        iDocumentNode* node, iStreamSource* ssource);
+
+      /**
+      * Load the mesh object from the map file.
+      * This version will parse FACTORY statement to directly create
+      * a mesh from a factory.
+      */
+      csRef<iMeshWrapper> LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
+        iDocumentNode* node, iStreamSource* ssource);
 
       /**
       * Load a library into given engine.
@@ -413,6 +457,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       */
       bool LoadStructuredDoc (const char* file, iDataBuffer* buf, csRef<iDocument>& doc);
 
+      /**
+      * Handle the result of a mesh object plugin loader.
+      */
+      bool HandleMeshObjectPluginResult (iBase* mo, iDocumentNode* child,
+        iMeshWrapper* mesh, bool keepZbuf, bool keepPrio);
+
       // Parse a 'trimesh' block.
       bool ParseTriMesh (iDocumentNode* node, iObjectModel* objmodel);
       bool ParseTriMeshChildBox (iDocumentNode* child, csRef<iTriangleMesh>& trimesh);
@@ -420,6 +470,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
       // Process the attributes of an <imposter> tag in a mesh specification.
       bool ParseImposterSettings(iImposter* mesh, iDocumentNode *node);
+
+      /**
+      * Parse a portal definition. 'container_name' is the name of the portal
+      * container to use. If 0 then the name of the portal itself will be
+      * used instead.
+      */
+      bool ParsePortal (iLoaderContext* ldr_context,
+        iDocumentNode* node, iSector* sourceSector, const char* container_name,
+        iMeshWrapper*& container_mesh, iMeshWrapper* parent);
+
+      /// Parse a portals definition.
+      bool ParsePortals (iLoaderContext* ldr_context,
+        iDocumentNode* node, iSector* sourceSector,
+        iMeshWrapper* parent, iStreamSource* ssource);
+
+      /// Parse a static light definition and add the light to the engine
+      iLight* ParseStatlight (iLoaderContext* ldr_context, iDocumentNode* node);
+
+      /**
+      * Add children to the collection.
+      */
+      void AddChildrenToCollection (iLoaderContext* ldr_context,
+        const iSceneNodeArray* children);
 
       // List of loaded plugins
       csLoadedPluginVector loaded_plugins;
@@ -437,6 +510,39 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       void ReportNotify2 (const char* id, const char* description, ...);
       void ReportWarning (const char* id, const char* description, ...);
       void ReportWarning (const char* id, iDocumentNode* node, const char* description, ...);
+  };
+
+  class csMissingSectorCallback : 
+    public scfImplementation1<csMissingSectorCallback, 
+    iPortalCallback>
+  {
+  public:
+    csRef<iLoaderContext> ldr_context;
+    csString sectorname;
+    bool autoresolve;
+
+    csMissingSectorCallback (iLoaderContext* ldr_context, const char* sector,
+      bool autoresolve) : scfImplementationType (this), ldr_context (ldr_context), 
+      sectorname (sector), autoresolve (autoresolve)
+    {
+    }
+    virtual ~csMissingSectorCallback ()
+    {
+    }
+
+    virtual bool Traverse (iPortal* portal, iBase* /*context*/)
+    {
+      iSector* sector = ldr_context->FindSector (sectorname);
+      if (!sector) return false;
+      portal->SetSector (sector);
+      // For efficiency reasons we deallocate the name here.
+      if (!autoresolve)
+      {
+        sectorname.Empty ();
+        portal->RemoveMissingSectorCallback (this);
+      }
+      return true;
+    }
   };
 
 }
