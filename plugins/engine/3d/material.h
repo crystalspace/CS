@@ -191,6 +191,7 @@ class csMaterialList : public scfImplementation1<csMaterialList,
 private:
   csRefArrayObject<iMaterialWrapper> list;
   csHash<iMaterialWrapper*, csString> mat_hash;
+  mutable CS::Threading::RecursiveMutex removeLock;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>

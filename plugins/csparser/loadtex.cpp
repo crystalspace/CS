@@ -68,7 +68,7 @@ static void ReportError (iObjectRegistry* object_reg,
   va_end (arg);
 }
 
-csPtr<iImage> csLoader::GenerateErrorTexture (int width, int height)
+csPtr<iImage> GenerateErrorTexture (int width, int height)
 {
   static const csRGBpixel colorTable[] = 
     {csRGBpixel (0,0,0,255), csRGBpixel (255,0,0,255),
@@ -914,7 +914,7 @@ csPtr<iBase> csMissingTextureLoader::Parse (iDocumentNode* node,
     }
   }
  
-  csRef<iImage> image = csLoader::GenerateErrorTexture (width, height);
+  csRef<iImage> image = GenerateErrorTexture (width, height);
 
 
   csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);

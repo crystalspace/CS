@@ -170,6 +170,7 @@ public:
   virtual iCameraPosition *FindByName (const char *Name) const;
 private:
   csRefArrayObject<iCameraPosition> positions;
+  mutable CS::Threading::RecursiveMutex removeLock;
 };
 
 /**
@@ -672,6 +673,12 @@ public:
 
   iMaterialWrapper* GetDefaultPortalMaterial () const
   { return defaultPortalMaterial; }
+
+  /**
+   * Sync engine lists with loader lists.
+   */
+  virtual void SyncEngineLists(iThreadedLoader* loader);
+
 private:
   // -- PRIVATE METHODS
 

@@ -578,6 +578,7 @@ class csSectorList : public scfImplementation1<csSectorList, iSectorList>
 private:
   csRefArrayObject<iSector> list;
   csHash<iSector*, csString> sectors_hash;
+  mutable CS::Threading::RecursiveMutex removeLock;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>

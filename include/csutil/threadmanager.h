@@ -78,7 +78,6 @@ public:
   csRef<ThreadedJobQueue> threadQueue;
   csRef<ListAccessQueue> listQueue;
   csEventID ProcessPerFrame;
-  csRef<iEventQueue> eventQueue;
   csRef<iThreadedLoader> loader;
   csRef<iEngine> engine;
 };
@@ -93,27 +92,26 @@ public:
   }
 
   bool IsFinished() { return finished; }
-
   bool WasSuccessful() { return true; }
-
-  void GetResult(void* result) { result = this->result; }
-
-  void GetResult(csRef<iBase>*) { return; }
+  void* GetResultPtr() { return result; }
+  csRef<iBase> GetResultRefPtr() { return refResult; }
 
   void MarkFinished() { finished = true; }
   void MarkSuccessful() { return; }
   void SetResult(void* result) { this->result = result; }
-  void SetResult(csRef<iBase> result) { return; }
+  void SetResult(csRef<iBase> result) { refResult = result; }
 
   void Copy(iThreadReturn* other)
   {
-    other->GetResult(result);
+    result = other->GetResultPtr();
+    refResult = other->GetResultRefPtr();
     finished = other->IsFinished();
   }
 
 private:
   bool finished;
   void* result;
+  csRef<iBase> refResult;
 };
 
 template<class T, typename A1>

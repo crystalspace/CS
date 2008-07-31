@@ -1298,6 +1298,7 @@ int csSectorList::Add (iSector *obj)
 
 bool csSectorList::Remove (iSector *obj)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   engine->FireRemoveSector (obj);
   FreeSector (obj);
   const char* name = obj->QueryObject ()->GetName ();
@@ -1309,6 +1310,7 @@ bool csSectorList::Remove (iSector *obj)
 
 bool csSectorList::Remove (int n)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   iSector* obj = list[n];
   FreeSector (obj);
   const char* name = obj->QueryObject ()->GetName ();
@@ -1320,6 +1322,7 @@ bool csSectorList::Remove (int n)
 
 void csSectorList::RemoveAll ()
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   size_t i;
   for (i = 0 ; i < list.GetSize () ; i++)
   {
@@ -1337,6 +1340,7 @@ int csSectorList::Find (iSector *obj) const
 
 iSector *csSectorList::FindByName (const char *Name) const
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return sectors_hash.Get (Name, 0);
 }
 

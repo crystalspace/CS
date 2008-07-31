@@ -229,16 +229,19 @@ int csTextureList::Add (iTextureWrapper *obj)
 
 bool csTextureList::Remove (iTextureWrapper *obj)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return this->Delete (obj);
 }
 
 bool csTextureList::Remove (int n)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return this->DeleteIndex (n);
 }
 
 void csTextureList::RemoveAll ()
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   this->DeleteAll ();
 }
 
@@ -249,5 +252,6 @@ int csTextureList::Find (iTextureWrapper *obj) const
 
 iTextureWrapper *csTextureList::FindByName (const char *Name) const
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return csRefArrayObject<iTextureWrapper>::FindByName (Name);
 }

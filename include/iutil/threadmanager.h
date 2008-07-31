@@ -25,8 +25,8 @@ struct iThreadReturn : public csRefCount
 {
   virtual bool IsFinished() = 0;
   virtual bool WasSuccessful() = 0;
-  virtual void GetResult(void* result) = 0;
-  virtual void GetResult(csRef<iBase>* result) = 0;
+  virtual void* GetResultPtr() = 0;
+  virtual csRef<iBase> GetResultRefPtr() = 0;
 
   virtual void MarkFinished() = 0;
   virtual void MarkSuccessful() = 0;

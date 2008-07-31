@@ -216,6 +216,7 @@ class csTextureList :
   public csRefArrayObject<iTextureWrapper>
 {
   csEngine* engine;
+  mutable CS::Threading::RecursiveMutex removeLock;
 public:
   /// Initialize the array
   csTextureList (csEngine* engine);

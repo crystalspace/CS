@@ -165,17 +165,17 @@ public:
 
   bool IsFinished() { return finished; }
   bool WasSuccessful() { return success; }
-  void GetResult(void* result) { return; }
-  void GetResult(csRef<iBase>* result) { result = &(this->result); }
+  void* GetResultPtr() { CS_ASSERT_MSG("csLoaderReturn does not implement a void* result", false); return NULL; }
+  csRef<iBase> GetResultRefPtr() { return result; }
 
   void MarkFinished() { finished = true; }
   void MarkSuccessful() { success = true; }
-  void SetResult(void* result) { return; }
+  void SetResult(void* result) { CS_ASSERT_MSG("csLoaderReturn does not implement a void* result", false); }
   void SetResult(csRef<iBase> result) { this->result = result; }
 
   void Copy(iThreadReturn* other)
   {
-    other->GetResult(result);
+    result = other->GetResultRefPtr();
     success = other->WasSuccessful();
     finished = other->IsFinished();
   }
@@ -203,6 +203,69 @@ private:
   csRef<iBase> result;
 };
 
+struct iSectorLoaderIterator : public virtual iBase
+{
+  SCF_INTERFACE (iSectorLoaderIterator, 1, 0, 0);
+
+  virtual iSector* Next() = 0;
+
+  virtual bool HasNext() const = 0;
+};
+
+struct iMeshFactLoaderIterator : public virtual iBase
+{
+  SCF_INTERFACE (iMeshFactLoaderIterator, 1, 0, 0);
+
+  virtual iMeshFactoryWrapper* Next() = 0;
+
+  virtual bool HasNext() const = 0;
+};
+
+struct iMeshLoaderIterator : public virtual iBase
+{
+  SCF_INTERFACE (iMeshLoaderIterator, 1, 0, 0);
+
+  virtual iMeshWrapper* Next() = 0;
+
+  virtual bool HasNext() const = 0;
+};
+
+struct iCamposLoaderIterator : public virtual iBase
+{
+  SCF_INTERFACE (iCamposLoaderIterator, 1, 0, 0);
+
+  virtual iCameraPosition* Next() = 0;
+
+  virtual bool HasNext() const = 0;
+};
+
+struct iTextureLoaderIterator : public virtual iBase
+{
+  SCF_INTERFACE (iTextureLoaderIterator, 1, 0, 0);
+
+  virtual iTextureWrapper* Next() = 0;
+
+  virtual bool HasNext() const = 0;
+};
+
+struct iMaterialLoaderIterator : public virtual iBase
+{
+  SCF_INTERFACE (iMaterialLoaderIterator, 1, 0, 0);
+
+  virtual iMaterialWrapper* Next() = 0;
+
+  virtual bool HasNext() const = 0;
+};
+
+struct iSharedVarLoaderIterator : public virtual iBase
+{
+  SCF_INTERFACE (iSharedVarLoaderIterator, 1, 0, 0);
+
+  virtual iSharedVariable* Next() = 0;
+
+  virtual bool HasNext() const = 0;
+};
+
 /**
 * This interface represents the threaded map loader methods.
 */
@@ -213,72 +276,37 @@ struct iThreadedLoader : public virtual iBase
  /**
   * Get the loader sector list.
   */
-  virtual csRefArray<iSector>* GetLoaderSectors() = 0;
+  virtual csPtr<iSectorLoaderIterator> GetLoaderSectors() = 0;
   
  /**
   * Get the loader mesh factory list.
   */
-  virtual csRefArray<iMeshFactoryWrapper>* GetLoaderMeshFactories() = 0;
+  virtual csPtr<iMeshFactLoaderIterator> GetLoaderMeshFactories() = 0;
   
  /**
   * Get the loader mesh sector list.
   */
-  virtual csRefArray<iMeshWrapper>* GetLoaderMeshes() = 0;
+  virtual csPtr<iMeshLoaderIterator> GetLoaderMeshes() = 0;
 
  /**
   * Get the loader camera list.
   */
-  virtual csRefArray<iCameraPosition>* GetLoaderCameraPositions() = 0;
+  virtual csPtr<iCamposLoaderIterator> GetLoaderCameraPositions() = 0;
   
  /**
   * Get the loader texture list.
   */
-  virtual csRefArray<iTextureWrapper>* GetLoaderTextures() = 0;
+  virtual csPtr<iTextureLoaderIterator> GetLoaderTextures() = 0;
   
  /**
   * Get the loader material list.
   */
-  virtual csRefArray<iMaterialWrapper>* GetLoaderMaterials() = 0;
+  virtual csPtr<iMaterialLoaderIterator> GetLoaderMaterials() = 0;
   
  /**
   * Get the loader shared variable list.
   */
-  virtual csRefArray<iSharedVariable>* GetLoaderSharedVariables() = 0;
-
- /**
-  * Unlock the loader sector list.
-  */
-  virtual void UnlockSectorList() = 0;
-  
- /**
-  * Unlock the loader mesh factory list.
-  */
-  virtual void UnlockMeshFactList() = 0;
-  
- /**
-  * Unlock the loader mesh list.
-  */
-  virtual void UnlockMeshList() = 0;
-  
- /**
-  * Unlock the loader camera position list.
-  */
-  virtual void UnlockCamposList() = 0;
-  
- /**
-  * Unlock the loader texture list.
-  */
-  virtual void UnlockTextureList() = 0;
-  
- /**
-  * Unlock the loader material list.
-  */
-  virtual void UnlockMaterialList() = 0;
-  
- /**
-  * Unlock the loader shared variable list.
-  */
-  virtual void UnlockSharedVarList() = 0;
+  virtual csPtr<iSharedVarLoaderIterator> GetLoaderSharedVariables() = 0;
 
  /**
   * Load an image file. The image will be loaded in the format requested by

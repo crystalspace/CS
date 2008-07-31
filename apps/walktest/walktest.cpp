@@ -758,18 +758,18 @@ void WalkTest::PrepareFrame (csTicks elapsed_time, csTicks /*current_time*/)
 
   int shift, ctrl;
   float speed = 1;
-  object_move_speed = .01;
+  object_move_speed = 0.01f;
 
   ctrl = kbd->GetKeyState (CSKEY_CTRL);
   shift = kbd->GetKeyState (CSKEY_SHIFT);
   if (ctrl)
   {
-    speed = .5;
+    speed = 0.5f;
   }
   if (shift)
   {
     speed = 2;
-    object_move_speed = 1.0;
+    object_move_speed = 1.0f;
   }
 
   float delta = float (elapsed_time) / 1000.0f;
@@ -850,7 +850,9 @@ void WalkTest::InitCollDet (iEngine* engine, iCollection* collection)
 void WalkTest::LoadLibraryData (iCollection* collection)
 {
   // Load the "standard" library
-  if (!LevelLoader->LoadLibraryFile ("/lib/std/library", collection))
+  csRef<iThreadReturn> ret = LevelLoader->LoadLibraryFile ("/lib/std/library", collection);
+  tm->Wait(ret);
+  if(!ret->WasSuccessful())
   {
     Cleanup ();
     exit (0);
@@ -1112,6 +1114,12 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // Open the startup console
   start_console ();
 
+  tm = csQueryRegistry<iThreadManager>(object_reg);
+  if(!tm)
+  {
+    return false;
+  }
+
   // Find the engine plugin and query the csEngine object from it...
   Engine = csQueryRegistry<iEngine> (object_reg);
   if (!Engine)
@@ -1122,7 +1130,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   Engine->SetSaveableFlag (doSave);
 
   // Find the level loader plugin
-  LevelLoader = csQueryRegistry<iLoader> (object_reg);
+  LevelLoader = csQueryRegistryOrLoad<iThreadedLoader>(object_reg, "crystalspace.level.loader.threaded");
   if (!LevelLoader)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No level loader plugin!");
@@ -1211,8 +1219,9 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     {
       collection = Engine->CreateCollection (map->map_dir);
     }
-    if (!LevelLoader->LoadMapFile ("world", false, collection, !do_collections,
-	      do_dupes))
+    csRef<iThreadReturn> ret = LevelLoader->LoadMapFile ("world", false, collection, !do_collections, do_dupes);
+    tm->Wait(ret);
+    if (!ret->WasSuccessful())
     {
       Report (CS_REPORTER_SEVERITY_ERROR, "Failing to load map!");
       return false;

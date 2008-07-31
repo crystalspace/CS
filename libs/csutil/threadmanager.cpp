@@ -40,7 +40,7 @@ objectReg(objReg)
   threadQueue.AttachNew(new ThreadedJobQueue(threadCount));
   listQueue.AttachNew(new ListAccessQueue());
 
-  eventQueue = csQueryRegistry<iEventQueue>(objectReg);
+  csRef<iEventQueue> eventQueue = csQueryRegistry<iEventQueue>(objectReg);
   if(eventQueue)
   {
     ProcessPerFrame = csevFrame(objReg);
@@ -59,26 +59,7 @@ bool csThreadManager::HandleEvent(iEvent& Event)
 
 void csThreadManager::Process(uint num)
 {
-  listQueue->ProcessQueue(num);
-
-  if(!engine.IsValid())
-  {
-    engine = csQueryRegistry<iEngine>(objectReg);
-    if(!engine.IsValid())
-    {
-      return;
-    }
-  }
-
-  if(!loader.IsValid())
-  {
-    loader = csQueryRegistry<iThreadedLoader>(objectReg);
-    if(!loader.IsValid())
-    {
-      return;
-    }
-  }
-  engine->SyncEngineLists(loader);
+  listQueue->ProcessQueue(num);  
 }
 
 void csThreadManager::Wait(csRef<iThreadReturn> result)

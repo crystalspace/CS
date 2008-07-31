@@ -41,6 +41,7 @@
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "imap/ldrctxt.h"
+#include "imap/loader.h"
 #include "imap/reader.h"
 #include "imesh/lighting.h"
 #include "imesh/thing.h"
@@ -218,16 +219,19 @@ int csCameraPositionList::Add (iCameraPosition *obj)
 
 bool csCameraPositionList::Remove (iCameraPosition *obj)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return positions.Delete (obj);
 }
 
 bool csCameraPositionList::Remove (int n)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return positions.DeleteIndex (n);
 }
 
 void csCameraPositionList::RemoveAll ()
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   positions.DeleteAll ();
 }
 
@@ -240,6 +244,7 @@ int csCameraPositionList::Find (
 iCameraPosition *csCameraPositionList::FindByName (
   const char *Name) const
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return positions.FindByName (Name);
 }
 
@@ -539,6 +544,57 @@ void csEngine::HandleImposters ()
   imposterUpdateQueue.Empty ();
 }
 
+void csEngine::SyncEngineLists(iThreadedLoader* loader)
+{
+  csRef<iSectorLoaderIterator> loaderSectors = loader->GetLoaderSectors();
+  while(loaderSectors->HasNext())
+  {
+    sectors.Add(loaderSectors->Next());
+  }
+  loaderSectors.Invalidate();
+
+  csRef<iMeshFactLoaderIterator> loaderMeshFactories = loader->GetLoaderMeshFactories();
+  while(loaderMeshFactories->HasNext())
+  {
+    meshFactories.Add(loaderMeshFactories->Next());
+  }
+  loaderMeshFactories.Invalidate();
+
+  csRef<iMeshLoaderIterator> loaderMeshes = loader->GetLoaderMeshes();
+  while(loaderMeshes->HasNext())
+  {
+    meshes.Add(loaderMeshes->Next());
+  }
+  loaderMeshes.Invalidate();
+
+  csRef<iCamposLoaderIterator> loaderCameraPositions = loader->GetLoaderCameraPositions();
+  while(loaderCameraPositions->HasNext())
+  {
+    cameraPositions.Add(loaderCameraPositions->Next());
+  }
+  loaderCameraPositions.Invalidate();
+
+  csRef<iTextureLoaderIterator> loaderTextures = loader->GetLoaderTextures();
+  while(loaderTextures->HasNext())
+  {
+    textures->Add(loaderTextures->Next());
+  }
+  loaderTextures.Invalidate();
+
+  csRef<iMaterialLoaderIterator> loaderMaterials = loader->GetLoaderMaterials();
+  while(loaderMaterials->HasNext())
+  {
+    materials->Add(loaderMaterials->Next());
+  }
+  loaderMaterials.Invalidate();
+
+  csRef<iSharedVarLoaderIterator> loaderSharedVariables = loader->GetLoaderSharedVariables();
+  while(loaderSharedVariables->HasNext())
+  {
+    sharedVariables->Add(loaderSharedVariables->Next());
+  }
+  loaderSharedVariables.Invalidate();
+}
 
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_FACTORY (csEngine)

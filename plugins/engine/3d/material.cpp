@@ -254,6 +254,7 @@ int csMaterialList::Add (iMaterialWrapper *obj)
 
 bool csMaterialList::Remove (iMaterialWrapper *obj)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
     mat_hash.Delete (name, obj);
@@ -263,6 +264,7 @@ bool csMaterialList::Remove (iMaterialWrapper *obj)
 
 bool csMaterialList::Remove (int n)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   iMaterialWrapper* obj = list[n];
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
@@ -273,6 +275,7 @@ bool csMaterialList::Remove (int n)
 
 void csMaterialList::RemoveAll ()
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   size_t i;
   for (i = 0 ; i < list.GetSize () ; i++)
     list[i]->QueryObject ()->RemoveNameChangeListener (listener);
@@ -287,5 +290,6 @@ int csMaterialList::Find (iMaterialWrapper *obj) const
 
 iMaterialWrapper *csMaterialList::FindByName (const char *Name) const
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return mat_hash.Get (Name, 0);
 }

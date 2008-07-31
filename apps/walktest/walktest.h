@@ -63,6 +63,7 @@ struct iKeyboardDriver;
 struct iVirtualClock;
 struct iGraphics3D;
 struct iGraphics2D;
+struct iThreadManager;
 
 // Several map modes.
 #define MAP_OFF 0
@@ -160,6 +161,7 @@ public:
   csRef<iPluginManager> plugin_mgr;
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
+  csRef<iThreadManager> tm;
 
   csRef<iEventNameRegistry> name_reg;
   csEventID CommandLineHelp;
@@ -315,7 +317,7 @@ public:
    */
   csRef<iEngine> Engine;
   /// The level loader
-  csRef<iLoader> LevelLoader;
+  csRef<iThreadedLoader> LevelLoader;
   ///
   csRef<iGraphics2D> myG2D;
   csRef<iGraphics3D> myG3D;

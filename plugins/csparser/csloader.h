@@ -494,7 +494,6 @@ public:
   	const char* description, ...)
 	CS_GNUC_PRINTF(4,5);
 
-  static csPtr<iImage> GenerateErrorTexture (int width, int height);
   csPtr<iImage> LoadImage (iDataBuffer* buf, const char* fname, int Format);
 
 private:

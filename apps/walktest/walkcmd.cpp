@@ -327,16 +327,16 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
     return;
   }
 
-  csLoadResult rc = Sys->LevelLoader->Load (filename);
-  if (!rc.success)
+  csRef<iThreadReturn> ret = Sys->LevelLoader->LoadFile(filename);
+  Sys->tm->Wait(ret);
+  if (!ret->WasSuccessful())
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
   	"There was an error reading model '%s'!", filename);
     return;
   }
 
-  csRef<iMeshFactoryWrapper> wrap = scfQueryInterface<iMeshFactoryWrapper> (
-  	rc.result);
+  csRef<iMeshFactoryWrapper> wrap = scfQueryInterface<iMeshFactoryWrapper> (ret->GetResultRefPtr());
   if (wrap)
     wrap->QueryObject ()->SetName (templatename);
 }
@@ -601,7 +601,7 @@ char* LookForTextureFileName(const char* value)
 
 
 void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
-					   iGraphics3D* /*MyG3D*/, iLoader* loader,
+					   iGraphics3D* /*MyG3D*/, iThreadedLoader* loader,
 					   iObjectRegistry* /*objReg*/)
 {
   iMaterialList* matList = Engine->GetMaterialList();
@@ -634,10 +634,13 @@ void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
     {
       //Is not registered. We have to do it.
       textFileName = LookForTextureFileName(kp->GetValue());
-      if(!loader->LoadTexture(matName,textFileName))
+      csRef<iThreadReturn> ret = loader->LoadTexture(matName, textFileName);
+      Sys->tm->Wait(ret);
+      if(!ret->WasSuccessful())
       {
         csPrintf("Error loading %s texture!!",textFileName);
       }
+
       //Material registered, let's go to another one
       delete [] matName;
       delete [] textFileName;
@@ -692,7 +695,7 @@ void BuildSprite(iSector * sector, iObjectIterator* it, csVector3 position)
 
 void BuildObject(iSector * sector,
 	iObjectIterator* it, iEngine* Engine,
-	csVector3 position, iGraphics3D* MyG3D, iLoader* loader,
+	csVector3 position, iGraphics3D* MyG3D, iThreadedLoader* loader,
 	iObjectRegistry* objReg)
 {
   csString factoryName;
@@ -1490,7 +1493,9 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
       Sys->Engine->DeleteAll ();
       Sys->Engine->SetVFSCacheManager ();
-      if (!Sys->LevelLoader->LoadMapFile ("world"))
+      csLoadResult res;
+      Sys->LevelLoader->LoadMapFile ("world", &res);
+      if (!res.success)
       {
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	  "Couldn't load level '%s'!", level);
@@ -1536,7 +1541,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       char level[300];
       csScanStr (arg, "%s", level);
-      void OpenPortal (iLoader*, iView* view, char* lev);
+      void OpenPortal (iThreadedLoader*, iView* view, char* lev);
       OpenPortal (Sys->LevelLoader, Sys->view, level);
     }
     else
