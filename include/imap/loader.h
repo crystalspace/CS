@@ -127,6 +127,9 @@ struct iMissingLoaderData : public virtual iBase
   virtual iLight* MissingLight (const char* name) = 0;
 };
 
+/**
+ * Return structure for the iLoader->Load() routines.
+ */
 struct csLoadResult
 {
   /// True if the object was loaded successfully.
@@ -149,8 +152,8 @@ struct csLoadResult
 };
 
 /**
-* Return structure for threaded loader functions.
-*/
+ * Return structure for threaded loader functions.
+ */
 class csLoaderReturn : public iThreadReturn
 {
 public:
