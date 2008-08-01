@@ -2078,18 +2078,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             return 0;
           }
           csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (meshname, false);
-          if (!LoadMeshObject (ldr_context, mesh, 0, child, ssource))
-          {
-            // Error is already reported.
-            return 0;
-          }
-          else
-          {
-            AddMeshToList(mesh);
-            ldr_context->AddToCollection(mesh->QueryObject ());
-          }
-          mesh->GetMovable ()->SetSector (sector);
-          mesh->GetMovable ()->UpdateMove ();
+          csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, 0, child, ssource, sector);
+          loadingObjects.Put(meshname, itr);
         }
         break;
       case XMLTOKEN_MESHLIB:
@@ -2113,13 +2103,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
               meshname, secname ? secname : "<noname>");
             return 0;
           }
-          if (!LoadMeshObject (ldr_context, mesh, 0, child, ssource))
-          {
-            // Error is already reported.
-            return 0;
-          }
-          mesh->GetMovable ()->GetSectors ()->Add (sector);
-          mesh->GetMovable ()->UpdateMove ();
+          csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, 0, child, ssource, sector);
+          loadingObjects.Put(meshname, itr);
         }
         break;
       case XMLTOKEN_LIGHT:

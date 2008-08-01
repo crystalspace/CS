@@ -28,7 +28,7 @@ csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationTyp
 objectReg(objReg)
 {
   waiting = 0;
-  threadCount = CS::Platform::GetProcessorCount()+1;
+  threadCount = CS::Platform::GetProcessorCount()*3;
 
   // If we can't detect, assume we have one.
   if(threadCount == 0)

@@ -3195,6 +3195,7 @@ public:
   virtual uint GetKeepFlags() const { return keepFlags; }
   virtual bool CurrentCollectionOnly() const { return searchCollectionOnly; }
   virtual void AddToCollection(iObject* obj);
+  bool GetVerbose() { return false; }
 };
 
 

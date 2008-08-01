@@ -150,19 +150,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   iMeshFactoryWrapper* csLoaderContext::FindMeshFactory(const char* name)
   {
-    CS::Threading::MutexScopedLock lock(loader->meshfactsLock);
-    iMeshFactoryWrapper* fact = NULL;
+    csRef<iMeshFactoryWrapper> fact;
+    csRef<iThreadReturn> itr = loader->loadingObjects.Get(name, NULL);
+    if(itr)
+    {
+      itr->Wait();
+      if(itr->WasSuccessful())
+      {
+        fact = scfQueryInterface<iMeshFactoryWrapper>(itr->GetResultRefPtr());
+        return fact;
+      }
+    }
 
+    CS::Threading::MutexScopedLock lock(loader->meshfactsLock);
     for(size_t i=0; i<loader->loaderMeshFactories.GetSize(); i++)
     {
       if(!strcmp(loader->loaderMeshFactories[i]->QueryObject()->GetName(), name))
       {
         fact = loader->loaderMeshFactories[i];
-        break;
+        return fact;
       }
     }
     
-    if(!fact && collection)
+    if(collection)
     {
       fact = Engine->FindMeshFactory(name, collection);
     }
@@ -187,19 +197,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   iMeshWrapper* csLoaderContext::FindMeshObject(const char* name)
   {
-    CS::Threading::MutexScopedLock lock(loader->meshesLock);
-    iMeshWrapper* mesh = NULL;
+    csRef<iMeshWrapper> mesh;
 
+    csRef<iThreadReturn> itr = loader->loadingObjects.Get(name, NULL);
+    if(itr.IsValid())
+    {
+      itr->Wait();
+      if(itr->WasSuccessful())
+      {
+        mesh = scfQueryInterface<iMeshWrapper>(itr->GetResultRefPtr());
+        return mesh;
+      }            
+    }
+
+    CS::Threading::MutexScopedLock lock(loader->meshesLock);
     for(size_t i=0; i<loader->loaderMeshes.GetSize(); i++)
     {
       if(!strcmp(loader->loaderMeshes[i]->QueryObject()->GetName(), name))
       {
         mesh = loader->loaderMeshes[i];
-        break;
+        return mesh;
       }
     }
     
-    if(!mesh && collection)
+    if(collection)
     {
       mesh = Engine->FindMeshObject(name, collection);
     }

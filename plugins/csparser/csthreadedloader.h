@@ -272,6 +272,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csRefArray<iMaterialWrapper> loaderMaterials;
       csRefArray<iSharedVariable> loaderSharedVariables;
 
+      csHash<csRef<iThreadReturn>, const char*> loadingObjects;
+
   private:
 
       void AddSectorToList(csRef<iSector> obj)
@@ -346,16 +348,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       bool LoadProxyTextures(csSafeCopyArray<ProxyTexture> &proxyTextures,
         csWeakRefArray<iMaterialWrapper> &materialArray);
 
-      THREADED_CALLABLE_DECL6(csThreadedLoader, FindOrLoadMeshFactory,
-        csLoaderReturn, csRef<iLoaderContext>, ldr_context,
-        csRef<iDocumentNode>, meshfactnode, const char*, override_name,
-        csRef<iMeshFactoryWrapper>, parent, csReversibleTransform*, transf,
-        csRef<iStreamSource>, ssource, true, false);
-
-      THREADED_CALLABLE_DECL5(csThreadedLoader, FindOrLoadMeshObject,
-        csLoaderReturn, csRef<iLoaderContext>, ldr_context, csRef<iDocumentNode>,
-        meshobjnode, const char*, override_name, csRef<iMeshWrapper>, parent,
-        csRef<iStreamSource>, ssource, true, false);
+      csRef<iThreadReturn> LoadMeshFactory(csRef<iLoaderContext> ldr_context,
+        csRef<iDocumentNode> meshfactnode, const char* override_name,
+        csRef<iMeshFactoryWrapper> parent, csReversibleTransform* transf,
+        csRef<iStreamSource> ssource);
 
       bool LoadMapLibraryFile (const char* filename, iCollection* collection,
         iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags = KEEP_ALL,
@@ -368,9 +364,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       * the relative transform (from MOVE keyword).
       * parent is not 0 if the factory is part of a hierarchical factory.
       */
-      bool LoadMeshObjectFactory(iLoaderContext* ldr_context, iMeshFactoryWrapper* meshFact,
-        iMeshFactoryWrapper* parent, iDocumentNode* node, csReversibleTransform* transf = 0,
-        iStreamSource* ssource = 0);
+      THREADED_CALLABLE_DECL6(csThreadedLoader, LoadMeshObjectFactory, csLoaderReturn,
+        csRef<iLoaderContext>, ldr_context, csRef<iMeshFactoryWrapper>, meshFact,
+        csRef<iMeshFactoryWrapper>, parent, csRef<iDocumentNode>, node,
+        csReversibleTransform*, transf, csRef<iStreamSource>, ssource, true, false);
 
       /**
       * Handle various common mesh object parameters.
@@ -387,8 +384,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       * The parent is not 0 if this mesh is going to be part of a hierarchical
       * mesh.
       */
-      bool LoadMeshObject(iLoaderContext* ldr_context, iMeshWrapper* mesh, iMeshWrapper* parent,
-        iDocumentNode* node, iStreamSource* ssource);
+      THREADED_CALLABLE_DECL6(csThreadedLoader, LoadMeshObject, csLoaderReturn,
+        csRef<iLoaderContext>, ldr_context, csRef<iMeshWrapper>, mesh, csRef<iMeshWrapper>, parent,
+        csRef<iDocumentNode>, node, csRef<iStreamSource>, ssource, csRef<iSector>, sector, true, false);
 
       /**
       * Load the mesh object from the map file.

@@ -176,8 +176,6 @@ public:
   void Copy(iThreadReturn* other)
   {
     result = other->GetResultRefPtr();
-    success = other->WasSuccessful();
-    finished = other->IsFinished();
   }
 
   void Wait()
