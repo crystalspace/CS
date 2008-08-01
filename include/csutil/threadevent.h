@@ -232,7 +232,7 @@ public:
   {
       T* mySelf = (T*)this;
       A11* a11 = (A11*)args[11];
-      A10* a10 = (A19*)args[10];
+      A10* a10 = (A10*)args[10];
       A9* a9 = (A9*)args[9];
       A8* a8 = (A8*)args[8];
       A7* a7 = (A7*)args[7];
@@ -242,7 +242,7 @@ public:
       A3* a3 = (A3*)args[3];
       A2* a2 = (A2*)args[2];
       A1* a1 = (A1*)args[1];
-      if((mySelf->*method)(result, *a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10, *a11))
+      if((mySelf->*method)(*a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10, *a11))
       {
         (*a1)->MarkSuccessful();
       }
@@ -268,7 +268,7 @@ public:
       A3* a3 = (A3*)args[3];
       A2* a2 = (A2*)args[2];
       A1* a1 = (A1*)args[1];
-      if((mySelf->*method)(result, *a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10, *a11, *a12))
+      if((mySelf->*method)(*a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10, *a11, *a12))
       {
         (*a1)->MarkSuccessful();
       }
@@ -295,7 +295,7 @@ public:
       A3* a3 = (A3*)args[3];
       A2* a2 = (A2*)args[2];
       A1* a1 = (A1*)args[1];
-      if((mySelf->*method)(result, *a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10, *a11, *a12, *a13))
+      if((mySelf->*method)(*a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10, *a11, *a12, *a13))
       {
         (*a1)->MarkSuccessful();
       }
@@ -323,7 +323,7 @@ public:
       A3* a3 = (A3*)args[3];
       A2* a2 = (A2*)args[2];
       A1* a1 = (A1*)args[1];
-      if((mySelf->*method)(result, *a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10, *a11, *a12, *a13, *a14))
+      if((mySelf->*method)(*a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10, *a11, *a12, *a13, *a14))
       {
         (*a1)->MarkSuccessful();
       }
@@ -352,7 +352,7 @@ public:
       A3* a3 = (A3*)args[3];
       A2* a2 = (A2*)args[2];
       A1* a1 = (A1*)args[1];
-      if((mySelf->*method)(result, *a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10, *a11, *a12, *a13, *a14, *a15))
+      if((mySelf->*method)(*a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10, *a11, *a12, *a13, *a14, *a15))
       {
         (*a1)->MarkSuccessful();
       }

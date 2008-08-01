@@ -30,12 +30,10 @@
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
   csLoaderContext::csLoaderContext (iObjectRegistry* object_reg, iEngine* Engine,
-    csThreadedLoader* loader, iCollection* collection, bool searchCollectionOnly,
-    bool checkDupes, iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose)
+    csThreadedLoader* loader, iCollection* collection, iMissingLoaderData* missingdata,
+    uint keepFlags, bool do_verbose)
     : scfImplementationType (this), object_reg(object_reg), Engine(Engine), loader(loader),
-    collection(collection), searchCollectionOnly(searchCollectionOnly),
-    checkDupes(checkDupes), missingdata(missingdata), keepFlags(keepFlags),
-    do_verbose(do_verbose)
+    collection(collection), missingdata(missingdata), keepFlags(keepFlags), do_verbose(do_verbose)
   {
   }
 
@@ -57,9 +55,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
     }
     
+    if(!s && collection)
+    {
+      s = Engine->FindSector(name, collection);
+    }
+
     if(!s)
     {
-      s = Engine->FindSector(name, searchCollectionOnly ? collection : 0);
+      s = Engine->FindSector(name);
     }
 
     if(!s && missingdata)
@@ -84,9 +87,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
     }
     
+    if(!mat && collection)
+    {
+      mat = Engine->FindMaterial(filename, collection);
+    }
+
     if(!mat)
     {
-      mat = Engine->FindMaterial(filename, searchCollectionOnly ? collection : 0);
+      mat = Engine->FindMaterial(filename);
     }
 
     if(!mat && missingdata)
@@ -116,9 +124,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
     }
     
+    if(!mat && collection)
+    {
+      mat = Engine->FindMaterial(filename, collection);
+    }
+
     if(!mat)
     {
-      mat = Engine->FindMaterial(name, searchCollectionOnly ? collection : 0);
+      mat = Engine->FindMaterial(filename);
     }
 
     if(!mat && missingdata)
@@ -149,9 +162,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
     }
     
+    if(!fact && collection)
+    {
+      fact = Engine->FindMeshFactory(name, collection);
+    }
+
     if(!fact)
     {
-      fact = Engine->FindMeshFactory(name, searchCollectionOnly ? collection : 0);
+      fact = Engine->FindMeshFactory(name);
     }
 
     if(!fact && missingdata)
@@ -181,9 +199,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
     }
     
+    if(!mesh && collection)
+    {
+      mesh = Engine->FindMeshObject(name, collection);
+    }
+
     if(!mesh)
     {
-      mesh = Engine->FindMeshObject(name, searchCollectionOnly ? collection : 0);
+      mesh = Engine->FindMeshObject(name);
     }
 
     if (!mesh && missingdata)
@@ -213,9 +236,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
     loader->sectorsLock.Unlock();
 
+    if(!light && collection)
+    {
+      csRef<iLightIterator> li = Engine->GetLightIterator(collection);
+
+      while(li->HasNext())
+      {
+        light = li->Next();
+        if(!strcmp(light->QueryObject()->GetName(), name))
+        {
+          break;
+        }
+      }
+    }
+
     if(!light)
     {
-      csRef<iLightIterator> li = Engine->GetLightIterator(searchCollectionOnly ? collection : 0);
+      csRef<iLightIterator> li = Engine->GetLightIterator();
 
       while(li->HasNext())
       {
@@ -252,7 +289,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     iShader* shader;
 
     // Always look up builtin shaders globally
-    if((!searchCollectionOnly || !collection) || (name && *name == '*'))
+    if(!collection || (name && *name == '*'))
     {
       shader = shaderMgr->GetShader(name);
       if(!shader && missingdata)
@@ -305,16 +342,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
     }
 
+    if(!result && collection)
+    {
+      result = collection->FindTexture(name);
+    }
+
     if(!result)
     {
-      if(collection && searchCollectionOnly)
-      {
-        result = collection->FindTexture(name);
-      }
-      else
-      {
-        result = Engine->GetTextureList()->FindByName (name);
-      }
+      result = Engine->GetTextureList()->FindByName (name);
     }
 
     if(!result && missingdata)
@@ -345,16 +380,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
     }
 
+    if(!result && collection)
+    {
+      result = collection->FindTexture(name);
+    }
+
     if(!result)
     {
-      if(collection && searchCollectionOnly)
-      {
-        result = collection->FindTexture(name);
-      }
-      else
-      {
-        result = Engine->GetTextureList()->FindByName(name);
-      }
+      result = Engine->GetTextureList()->FindByName (name);
     }
 
     if (!result && missingdata)

@@ -155,71 +155,71 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       return csPtr<iSharedVarLoaderIterator>(itr);
     }
 
-    THREADED_CALLABLE_DECL2(csThreadedLoader, LoadImage, csLoaderReturn, const char*, fname,
-      int, Format, true, false)
+    THREADED_CALLABLE_DECL3(csThreadedLoader, LoadImage, csLoaderReturn, const char*, fname,
+      int, Format, bool, do_verbose, true, false)
 
-    THREADED_CALLABLE_DECL2(csThreadedLoader, LoadImage, csLoaderReturn, iDataBuffer*, buf,
-      int, Format, true, false)
+    THREADED_CALLABLE_DECL3(csThreadedLoader, LoadImage, csLoaderReturn, iDataBuffer*, buf,
+      int, Format, bool, do_verbose, true, false)
 
-    THREADED_CALLABLE_DECL4(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, Filename,
-    int, Flags, csRef<iTextureManager>, texman, csRef<iImage>*, image, true, false)
+    THREADED_CALLABLE_DECL5(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, Filename,
+    int, Flags, csRef<iTextureManager>, texman, csRef<iImage>*, image, bool, do_verbose, true, false)
 
-    THREADED_CALLABLE_DECL4(csThreadedLoader, LoadTexture, csLoaderReturn, iDataBuffer*, buf,
-    int, Flags, iTextureManager*, texman, csRef<iImage>*, image, true, false)
+    THREADED_CALLABLE_DECL5(csThreadedLoader, LoadTexture, csLoaderReturn, iDataBuffer*, buf,
+    int, Flags, iTextureManager*, texman, csRef<iImage>*, image, bool, do_verbose, true, false)
 
-    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, Name,
+    THREADED_CALLABLE_DECL8(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, Name,
     iDataBuffer*, buf, int, Flags, iTextureManager*, texman, bool, reg, bool, create_material, bool,
-    free_image, true, false)
+    free_image, bool, do_verbose, true, false)
 
-    THREADED_CALLABLE_DECL9(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, Name,
+    THREADED_CALLABLE_DECL10(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, Name,
     const char*, FileName, int, Flags, iTextureManager*, texman, bool, reg, bool, create_material,
-    bool, free_image, iCollection*, Collection, uint, keepFlags, true, false)
+    bool, free_image, iCollection*, Collection, uint, keepFlags, bool, do_verbose, true, false)
 
-    THREADED_CALLABLE_DECL1(csThreadedLoader, LoadSoundSysData, csLoaderReturn, const char*, fname, true, false)
+    THREADED_CALLABLE_DECL2(csThreadedLoader, LoadSoundSysData, csLoaderReturn, const char*, fname,
+    bool, do_verbose, true, false)
 
-    THREADED_CALLABLE_DECL2(csThreadedLoader, LoadSoundStream, csLoaderReturn, const char*, fname,
-    int, mode3d, true, false)
+    THREADED_CALLABLE_DECL3(csThreadedLoader, LoadSoundStream, csLoaderReturn, const char*, fname,
+    int, mode3d, bool, do_verbose, true, false)
 
-    THREADED_CALLABLE_DECL2(csThreadedLoader, LoadSoundWrapper, csLoaderReturn, const char*, name,
-    const char*, fname, true, false)
+    THREADED_CALLABLE_DECL3(csThreadedLoader, LoadSoundWrapper, csLoaderReturn, const char*, name,
+    const char*, fname, bool, do_verbose, true, false)
 
-    THREADED_CALLABLE_DECL2(csThreadedLoader, LoadMeshObjectFactory, csLoaderReturn, const char*, fname,
-    iStreamSource*, ssource, true, false)
+    THREADED_CALLABLE_DECL3(csThreadedLoader, LoadMeshObjectFactory, csLoaderReturn, const char*, fname,
+    iStreamSource*, ssource, bool, do_verbose, true, false)
 
-    THREADED_CALLABLE_DECL2(csThreadedLoader, LoadMeshObject, csLoaderReturn, const char*, fname,
-    iStreamSource*, ssource, true, false)
+    THREADED_CALLABLE_DECL3(csThreadedLoader, LoadMeshObject, csLoaderReturn, const char*, fname,
+    iStreamSource*, ssource, bool, do_verbose, true, false)
 
-    THREADED_CALLABLE_DECL2(csThreadedLoader, LoadShader, csLoaderReturn, const char*, filename,
-    bool, registerShader, true, false)
+    THREADED_CALLABLE_DECL3(csThreadedLoader, LoadShader, csLoaderReturn, const char*, filename,
+    bool, registerShader, bool, do_verbose, true, false)
 
-    THREADED_CALLABLE_DECL8(csThreadedLoader, LoadMapFile, csLoaderReturn, const char*, filename,
-    bool, clearEngine, iCollection*, collection, bool, searchCollectionOnly, bool, checkDupes,
-    iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint, keepFlags, true, false)
-
-    THREADED_CALLABLE_DECL8(csThreadedLoader, LoadMap, csLoaderReturn, iDocumentNode*, world_node,
-    bool, clearEngine, iCollection*, collection, bool, searchCollectionOnly, bool, checkDupes,
-    iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint, keepFlags, true, false)
-
-    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadLibraryFile, csLoaderReturn, const char*, filename,
-    iCollection*, collection, bool, searchCollectionOnly, bool, checkDupes, iStreamSource*, ssource,
-    iMissingLoaderData*, missingdata, uint, keepFlags, true, false)
-
-    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadLibrary, csLoaderReturn, iDocumentNode*, lib_node,
-    iCollection*, collection, bool, searchCollectionOnly, bool, checkDupes, iStreamSource*, ssource,
-    iMissingLoaderData*, missingdata, uint, keepFlags, true, false)
-
-    THREADED_CALLABLE_DECL8(csThreadedLoader, LoadFile, csLoaderReturn, const char*, fname,
-    iCollection*, collection, bool, searchCollectionOnly, bool, checkDupes, iStreamSource*, ssource,
-    const char*, override_name, iMissingLoaderData*, missingdata, uint, keepFlags, true, false)
-
-    THREADED_CALLABLE_DECL8(csThreadedLoader, LoadBuffer, csLoaderReturn, iDataBuffer*, buffer,
-    iCollection*, collection, bool, searchCollectionOnly, bool, checkDupes, iStreamSource*, ssource,
-    const char*, override_name, iMissingLoaderData*, missingdata, uint, keepFlags, true, false)
-
-    THREADED_CALLABLE_DECL9(csThreadedLoader, LoadNode, csLoaderReturn, csRef<iDocumentNode>,
-    node, csRef<iCollection>, collection, bool, searchCollectionOnly, bool, checkDupes,
-    csRef<iStreamSource>, ssource, const char*, override_name, csRef<iMissingLoaderData>,
+    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadMapFile, csLoaderReturn, const char*, filename,
+    bool, clearEngine, iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*,
     missingdata, uint, keepFlags, bool, do_verbose, true, false)
+
+    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadMap, csLoaderReturn, iDocumentNode*, world_node,
+    bool, clearEngine, iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*,
+    missingdata, uint, keepFlags, bool, do_verbose, true, false)
+
+    THREADED_CALLABLE_DECL6(csThreadedLoader, LoadLibraryFile, csLoaderReturn, const char*, filename,
+    iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint,
+    keepFlags, bool, do_verbose, true, false)
+
+    THREADED_CALLABLE_DECL6(csThreadedLoader, LoadLibrary, csLoaderReturn, iDocumentNode*, lib_node,
+    iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint,
+    keepFlags, bool, do_verbose, true, false)
+
+    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadFile, csLoaderReturn, const char*, fname,
+    iCollection*, collection, iStreamSource*, ssource, const char*, override_name, iMissingLoaderData*,
+    missingdata, uint, keepFlags, bool, do_verbose, true, false)
+
+    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadBuffer, csLoaderReturn, iDataBuffer*, buffer,
+    iCollection*, collection, iStreamSource*, ssource, const char*, override_name, iMissingLoaderData*,
+    missingdata, uint, keepFlags, bool, do_verbose, true, false)
+
+    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadNode, csLoaderReturn, csRef<iDocumentNode>,
+    node, csRef<iCollection>, collection, csRef<iStreamSource>, ssource, const char*, override_name,
+    csRef<iMissingLoaderData>, missingdata, uint, keepFlags, bool, do_verbose, true, false)
 
   private:
       csRef<iEngine> Engine;
@@ -355,8 +355,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         csRef<iStreamSource>, ssource, true, false);
 
       bool LoadMapLibraryFile (const char* filename, iCollection* collection,
-        bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource,
-        iMissingLoaderData* missingdata, uint keepFlags = KEEP_ALL,
+        iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags = KEEP_ALL,
         bool loadProxyTex = true, bool do_verbose = false);
 
       /**
@@ -398,12 +397,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
       /// Load map from a memory buffer
       bool LoadMap (iLoaderContext* ldr_context, iDocumentNode* world_node,
-        iStreamSource* ssource, iMissingLoaderData* missingdata);
+        iStreamSource* ssource, iMissingLoaderData* missingdata, bool do_verbose);
 
-      bool Load (iDataBuffer* buffer, const char* fname,
-        iCollection* collection, bool searchCollectionOnly, bool checkDupes,
-        iStreamSource* ssource, const char* override_name,
-        iMissingLoaderData* missingdata, uint keepFlags = KEEP_ALL);
+      bool Load (iDataBuffer* buffer, const char* fname, iCollection* collection,
+        iStreamSource* ssource, const char* override_name, iMissingLoaderData* missingdata,
+        uint keepFlags = KEEP_ALL, bool do_verbose = false);
 
       /**
       * Load a library into given engine.
@@ -411,12 +409,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       * sounds and textures.
       */
       bool LoadLibrary(iLoaderContext* ldr_context, iDocumentNode* node,
-        iStreamSource* ssource, iMissingLoaderData* missingdata, bool loadProxyTex = true);
+        iStreamSource* ssource, iMissingLoaderData* missingdata, bool loadProxyTex = true,
+        bool do_verbose = false);
 
       bool LoadLibraryFromNode(iLoaderContext* ldr_context, iDocumentNode* child,
-        iStreamSource* ssource, iMissingLoaderData* missingdata, bool loadProxyTex = true);
+        iStreamSource* ssource, iMissingLoaderData* missingdata, bool loadProxyTex = true,
+        bool do_verbose = false);
 
-      csPtr<iImage> LoadImage (iDataBuffer* buf, const char* fname, int Format);
+      csPtr<iImage> LoadImage (iDataBuffer* buf, const char* fname, int Format, bool do_verbose);
 
       /**
       * Load a LOD control object.

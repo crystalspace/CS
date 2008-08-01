@@ -325,7 +325,8 @@ struct iThreadedLoader : public virtual iBase
   * \param Filename VFS path to the image file to load.
   * \param Format The format of the image.
   */
-  THREADED_INTERFACE2(LoadImage, const char* Filename, int Format = CS_IMGFMT_INVALID)
+  THREADED_INTERFACE3(LoadImage, const char* Filename, int Format = CS_IMGFMT_INVALID,
+    bool do_verbose = false)
 
  /**
   * Load an image file. The image will be loaded in the format requested by
@@ -334,7 +335,8 @@ struct iThreadedLoader : public virtual iBase
   * request an alternate format to override the above sequence.
   * This version reads the image from a data buffer.
   */
-  THREADED_INTERFACE2(LoadImage, iDataBuffer* buf, int Format = CS_IMGFMT_INVALID)
+  THREADED_INTERFACE3(LoadImage, iDataBuffer* buf, int Format = CS_IMGFMT_INVALID,
+  bool do_verbose = false)
 
   /**
   * Load an image as with LoadImage() and create a texture handle from it.
@@ -349,8 +351,8 @@ struct iThreadedLoader : public virtual iBase
   *   specified).
   * \param image Optionally returns a reference to the loaded image.
   */
-  THREADED_INTERFACE4(LoadTexture, const char* Filename, int Flags = CS_TEXTURE_3D, 
-  csRef<iTextureManager> tm = 0, csRef<iImage>* image = 0)
+  THREADED_INTERFACE5(LoadTexture, const char* Filename, int Flags = CS_TEXTURE_3D, 
+  csRef<iTextureManager> tm = 0, csRef<iImage>* image = 0, bool do_verbose = false)
 
   /**
   * Load an image as with LoadImage() and create a texture handle from it.
@@ -365,8 +367,8 @@ struct iThreadedLoader : public virtual iBase
   *   specified).
   * \param image Optionally returns a reference to the loaded image.
   */
-  THREADED_INTERFACE4(LoadTexture, iDataBuffer* buf, int Flags = CS_TEXTURE_3D,
-  iTextureManager *texman = 0, csRef<iImage>* image = 0)
+  THREADED_INTERFACE5(LoadTexture, iDataBuffer* buf, int Flags = CS_TEXTURE_3D,
+  iTextureManager *texman = 0, csRef<iImage>* image = 0, bool do_verbose = false)
 
   /**
   * Load a texture as with LoadTexture() above and register it with the
@@ -391,9 +393,9 @@ struct iThreadedLoader : public virtual iBase
   * will be removed immediatelly. This saves some memory. Set to false
   * if you want to keep it. free_image is ignored if reg is false.
   */
-  THREADED_INTERFACE7(LoadTexture, const char *Name, iDataBuffer* buf,
+  THREADED_INTERFACE8(LoadTexture, const char *Name, iDataBuffer* buf,
     int Flags = CS_TEXTURE_3D, iTextureManager *texman = 0, bool reg = true,
-    bool create_material = true, bool free_image = true)
+    bool create_material = true, bool free_image = true, bool do_verbose = false)
 
   //@{
   /**
@@ -421,14 +423,15 @@ struct iThreadedLoader : public virtual iBase
   * \param collection [optional] Collection to register the texture
   *   and material to.
   */
-  THREADED_INTERFACE9(LoadTexture, const char *Name, const char *FileName,
+  THREADED_INTERFACE10(LoadTexture, const char *Name, const char *FileName,
   int Flags = CS_TEXTURE_3D, iTextureManager *texman = 0, bool reg = true,
   bool create_material = true, bool free_image = true, iCollection* Collection = 0,
-  uint keepFlags = KEEP_ALL)
+  uint keepFlags = KEEP_ALL, bool do_verbose = false)
   //@}
 
   /// New Sound System: Load a sound file and return an iSndSysData object
-  THREADED_INTERFACE1(LoadSoundSysData, const char *fname)
+  THREADED_INTERFACE2(LoadSoundSysData, const char *fname,
+  bool do_verbose = false)
 
   /**
   * New Sound System: Load a sound file and create a stream from it.
@@ -436,7 +439,8 @@ struct iThreadedLoader : public virtual iBase
   * \param mode3d is one of CS_SND3D_DISABLE, CS_SND3D_RELATIVE, or
   * CS_SND3D_ABSOLUTE.
   */
-  THREADED_INTERFACE2(LoadSoundStream, const char *fname, int mode3d)
+  THREADED_INTERFACE3(LoadSoundStream, const char *fname, int mode3d,
+  bool do_verbose = false)
 
   /**
   * New Sound System: Load a sound file, create sound data and create a
@@ -444,7 +448,8 @@ struct iThreadedLoader : public virtual iBase
   * \param name of the sound.
   * \param fname is the VFS filename.
   */
-  THREADED_INTERFACE2(LoadSoundWrapper, const char *name, const char *fname)
+  THREADED_INTERFACE3(LoadSoundWrapper, const char *name, const char *fname,
+  bool do_verbose = false)
 
 
  /**
@@ -452,7 +457,8 @@ struct iThreadedLoader : public virtual iBase
   * \param fname is the VFS name of the file.
   * \param ssource is an optional stream source for faster loading.
   */
-  THREADED_INTERFACE2(LoadMeshObjectFactory, const char* fname, iStreamSource* ssource = 0)
+  THREADED_INTERFACE3(LoadMeshObjectFactory, const char* fname, iStreamSource* ssource = 0,
+  bool do_verbose = false)
 
  /**
   * Load a mesh object from a file.
@@ -460,13 +466,15 @@ struct iThreadedLoader : public virtual iBase
   * \param fname is the VFS name of the file.
   * \param ssource is an optional stream source for faster loading.
   */
-  THREADED_INTERFACE2(LoadMeshObject, const char* fname, iStreamSource* ssource = 0)
+  THREADED_INTERFACE3(LoadMeshObject, const char* fname, iStreamSource* ssource = 0,
+  bool do_verbose = false)
 
 
  /**
   * Load a shader from a file.
   */
-  THREADED_INTERFACE2(LoadShader, const char* filename, bool registerShader = true)
+  THREADED_INTERFACE3(LoadShader, const char* filename, bool registerShader = true,
+  bool do_verbose = false)
 
   //@}
   /**
@@ -506,9 +514,9 @@ struct iThreadedLoader : public virtual iBase
   * This argument is only used in conjunction with Collections, and overrides the value
   * of useProxyTextures in that case.
   */
-  THREADED_INTERFACE8(LoadMapFile, const char* filename, bool clearEngine = true,
-  iCollection* collection = 0, bool searchCollectionOnly = true, bool checkDupes = false,
-  iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL)
+  THREADED_INTERFACE7(LoadMapFile, const char* filename, bool clearEngine = true,
+  iCollection* collection = 0, iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0,
+  uint keepFlags = KEEP_ALL, bool do_verbose = false)
   //@}
   
   //@{
@@ -548,9 +556,9 @@ struct iThreadedLoader : public virtual iBase
   * This argument is only used in conjunction with Collections, and overrides the value
   * of useProxyTextures in that case.
   */
-  THREADED_INTERFACE8(LoadMap, iDocumentNode* world_node, bool clearEngine = true,
-  iCollection* collection = 0, bool searchCollectionOnly = true, bool checkDupes = false,
-  iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL)
+  THREADED_INTERFACE7(LoadMap, iDocumentNode* world_node, bool clearEngine = true,
+  iCollection* collection = 0, iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0,
+  uint keepFlags = KEEP_ALL, bool do_verbose = false)
   //@}
 
   //@{
@@ -576,9 +584,9 @@ struct iThreadedLoader : public virtual iBase
   * when you are loading from a shared library containing more resources than you
   * actually need (a world file loading from a shared library of textures for example).
   */
-  THREADED_INTERFACE7(LoadLibraryFile, const char* filename, iCollection* collection = 0,
-  bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
-  iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL)
+  THREADED_INTERFACE6(LoadLibraryFile, const char* filename, iCollection* collection = 0,
+  iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL,
+  bool do_verbose = false)
   //@}
 
   //@{
@@ -604,9 +612,9 @@ struct iThreadedLoader : public virtual iBase
   * when you are loading from a shared library containing more resources than you
   * actually need (a world file loading from a shared library of textures for example).
   */
-  THREADED_INTERFACE7(LoadLibrary, iDocumentNode* lib_node, iCollection* collection = 0,
-  bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
-  iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL)
+  THREADED_INTERFACE6(LoadLibrary, iDocumentNode* lib_node, iCollection* collection = 0,
+  iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL,
+  bool do_verbose = false)
   //@)
 
   //@{
@@ -656,9 +664,9 @@ struct iThreadedLoader : public virtual iBase
   * when you are loading from a shared library containing more resources than you
   * actually need (a world file loading from a shared library of textures for example).
   */
-  THREADED_INTERFACE8(LoadFile, const char* fname, iCollection* collection = 0,
-  bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
-  const char* override_name = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL)
+  THREADED_INTERFACE7(LoadFile, const char* fname, iCollection* collection = 0,
+  iStreamSource* ssource = 0, const char* override_name = 0, iMissingLoaderData* missingdata = 0,
+  uint keepFlags = KEEP_ALL, bool do_verbose = false)
   //@}
 
   //@{
@@ -708,9 +716,9 @@ struct iThreadedLoader : public virtual iBase
   * when you are loading from a shared library containing more resources than you
   * actually need (a world file loading from a shared library of textures for example).
   */
-  THREADED_INTERFACE8(LoadBuffer, iDataBuffer* buffer, iCollection* collection = 0,
-  bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
-  const char* override_name = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL)
+  THREADED_INTERFACE7(LoadBuffer, iDataBuffer* buffer, iCollection* collection = 0,
+  iStreamSource* ssource = 0, const char* override_name = 0, iMissingLoaderData* missingdata = 0,
+  uint keepFlags = KEEP_ALL, bool do_verbose = false)
   //@}
 
   //@{
@@ -758,10 +766,9 @@ struct iThreadedLoader : public virtual iBase
   * when you are loading from a shared library containing more resources than you
   * actually need (a world file loading from a shared library of textures for example).
   */
-  THREADED_INTERFACE9(LoadNode, csRef<iDocumentNode> node, csRef<iCollection> collection = 0,
-  bool searchCollectionOnly = true, bool checkDupes = false, csRef<iStreamSource> ssource = 0,
-  const char* override_name = 0, csRef<iMissingLoaderData> missingdata = 0, uint keepFlags = KEEP_ALL,
-  bool do_verbose = false)
+  THREADED_INTERFACE7(LoadNode, csRef<iDocumentNode> node, csRef<iCollection> collection = 0,
+  csRef<iStreamSource> ssource = 0, const char* override_name = 0, csRef<iMissingLoaderData> missingdata = 0,
+  uint keepFlags = KEEP_ALL, bool do_verbose = false)
   //@}
 };
 

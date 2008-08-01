@@ -34,7 +34,8 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
-  THREADED_CALLABLE_IMPL1(csThreadedLoader, LoadSoundSysData, const char* filename)
+  THREADED_CALLABLE_IMPL2(csThreadedLoader, LoadSoundSysData, const char* filename,
+    bool do_verbose)
   {
     if (!SndSysLoader)
     {
@@ -67,7 +68,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return true;
   }
 
-  THREADED_CALLABLE_IMPL2(csThreadedLoader, LoadSoundStream, const char* fname, int mode3d)
+  THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadSoundStream, const char* fname, int mode3d,
+    bool do_verbose)
   {
     if (!SndSysRenderer)
     {
@@ -75,7 +77,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-    if (!LoadSoundSysDataTC (itr, fname))
+    if (!LoadSoundSysDataTC (itr, fname, do_verbose))
     {
       return false;
     }
@@ -95,7 +97,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return true;
   }
 
-  THREADED_CALLABLE_IMPL2(csThreadedLoader, LoadSoundWrapper, const char* name, const char* fname)
+  THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadSoundWrapper, const char* name,
+    const char* fname, bool do_verbose)
   {
     if (!SndSysManager)
     {
@@ -104,7 +107,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     // load the sound handle
     csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-    if (!LoadSoundSysDataTC (itr, fname))
+    if (!LoadSoundSysDataTC (itr, fname, do_verbose))
     {
       return false;
     }

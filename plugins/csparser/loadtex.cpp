@@ -101,7 +101,7 @@ csPtr<iImage> GenerateErrorTexture (int width, int height)
 }
 
 csPtr<iImage> csThreadedLoader::LoadImage (iDataBuffer* buf, const char* fname,
-                                           int Format)
+                                           int Format, bool do_verbose)
 {
   if (!ImageLoader)
     return 0;
@@ -144,10 +144,10 @@ csPtr<iImage> csThreadedLoader::LoadImage (iDataBuffer* buf, const char* fname,
   return csPtr<iImage> (image);
 }
 
-THREADED_CALLABLE_IMPL2(csThreadedLoader, LoadImage, const char* fname, int Format)
+THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadImage, const char* fname, int Format, bool do_verbose)
 {
   csRef<iDataBuffer> buf = vfs->ReadFile (fname, false);
-  csRef<iImage> image = LoadImage (buf, fname, Format);
+  csRef<iImage> image = LoadImage (buf, fname, Format, do_verbose);
   if(image.IsValid())
   {
     ret->SetResult(csRef<iBase>(image));
@@ -156,9 +156,9 @@ THREADED_CALLABLE_IMPL2(csThreadedLoader, LoadImage, const char* fname, int Form
   return false;
 }
 
-THREADED_CALLABLE_IMPL2(csThreadedLoader, LoadImage, iDataBuffer* buf, int Format)
+THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadImage, iDataBuffer* buf, int Format, bool do_verbose)
 {
-  csRef<iImage> image = LoadImage (buf, 0, Format);
+  csRef<iImage> image = LoadImage (buf, 0, Format, do_verbose);
   if(image.IsValid())
   {
     ret->SetResult(csRef<iBase>(image));
@@ -167,8 +167,8 @@ THREADED_CALLABLE_IMPL2(csThreadedLoader, LoadImage, iDataBuffer* buf, int Forma
   return false;
 }
 
-THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadTexture, const char* fname,
-                        int Flags, csRef<iTextureManager> texman, csRef<iImage>* image)
+THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadTexture, const char* fname,
+  int Flags, csRef<iTextureManager> texman, csRef<iImage>* image, bool do_verbose)
 {
   if (!texman && g3d)
   {
@@ -186,7 +186,7 @@ THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadTexture, const char* fname,
   }
 
   csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-  LoadImageTC (itr, fname, Format);
+  LoadImageTC (itr, fname, Format, do_verbose);
   csRef<iImage> Image = scfQueryInterface<iImage>(itr->GetResultRefPtr());
   if (!Image)
   {
@@ -223,8 +223,8 @@ THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadTexture, const char* fname,
   return true;
 }
 
-THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadTexture, iDataBuffer* buf, int Flags,
-                        iTextureManager* texman, csRef<iImage>* image)
+THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadTexture, iDataBuffer* buf, int Flags,
+                        iTextureManager* texman, csRef<iImage>* image, bool do_verbose)
 {
   if (!texman && g3d)
   {
@@ -237,7 +237,7 @@ THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadTexture, iDataBuffer* buf, int Fla
   else
     Format = CS_IMGFMT_TRUECOLOR;
 
-  csRef<iImage> Image = LoadImage (buf, 0, Format);
+  csRef<iImage> Image = LoadImage (buf, 0, Format, do_verbose);
   if (!Image)
   {
     ReportWarning (
@@ -277,9 +277,9 @@ THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadTexture, iDataBuffer* buf, int Fla
   return true;
 }
 
-THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadTexture, const char* Name,
+THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadTexture, const char* Name,
                         iDataBuffer* buf, int Flags, iTextureManager* texman, bool reg, bool create_material,
-                        bool free_image)
+                        bool free_image, bool do_verbose)
 {
   if (!texman && g3d)
   {
@@ -288,7 +288,7 @@ THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadTexture, const char* Name,
 
   csRef<iImage> img;
   csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-  LoadTextureTC (itr, buf, Flags, texman, &img);
+  LoadTextureTC (itr, buf, Flags, texman, &img, do_verbose);
   if (!itr->WasSuccessful())
   {
     return false;
@@ -324,9 +324,9 @@ THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadTexture, const char* Name,
   return true;
 }
 
-THREADED_CALLABLE_IMPL9(csThreadedLoader, LoadTexture, const char* name,
+THREADED_CALLABLE_IMPL10(csThreadedLoader, LoadTexture, const char* name,
                         const char* FileName, int Flags, iTextureManager* texman, bool reg, bool create_material,
-                        bool free_image, iCollection* collection, uint keepFlags)
+                        bool free_image, iCollection* collection, uint keepFlags, bool do_verbose)
 {
   if (!texman && g3d)
   {
@@ -335,7 +335,7 @@ THREADED_CALLABLE_IMPL9(csThreadedLoader, LoadTexture, const char* name,
 
   csRef<iImage> img;
   csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-  LoadTextureTC (itr, name, Flags, texman, &img);
+  LoadTextureTC (itr, name, Flags, texman, &img, do_verbose);
   if (!itr->WasSuccessful())
   {
     return false;

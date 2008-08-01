@@ -133,6 +133,7 @@ public:
   virtual bool CurrentCollectionOnly() const { return searchCollectionOnly; }
   virtual uint GetKeepFlags() const { return keepFlags; }
   virtual void AddToCollection(iObject* obj);
+  virtual bool GetVerbose() { return false; }
 };
 
 

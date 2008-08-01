@@ -176,11 +176,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return eseqmgr;
   }
 
-  THREADED_CALLABLE_IMPL2(csThreadedLoader, LoadMeshObjectFactory, const char* fname,
-    iStreamSource* ssource)
+  THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadMeshObjectFactory, const char* fname,
+    iStreamSource* ssource, bool do_verbose)
   {
     csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-      new csLoaderContext (object_reg, Engine, this, 0, false, true, 0, KEEP_ALL, false));
+      new csLoaderContext (object_reg, Engine, this, 0, 0, KEEP_USED, do_verbose));
 
     csRef<iFile> databuff (vfs->Open (fname, VFS_FILE_READ));
 
@@ -227,13 +227,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return false;
   }
 
-  THREADED_CALLABLE_IMPL2(csThreadedLoader, LoadMeshObject, const char* fname,
-    iStreamSource* ssource)
+  THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadMeshObject, const char* fname,
+    iStreamSource* ssource, bool do_verbose)
   {
     csRef<iFile> databuff (vfs->Open (fname, VFS_FILE_READ));
     csRef<iMeshWrapper> mesh;
     csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-      new csLoaderContext (object_reg, Engine, this, 0, false, true, 0, KEEP_ALL, false));
+      new csLoaderContext (object_reg, Engine, this, 0, 0, KEEP_USED, do_verbose));
 
     if (!databuff || !databuff->GetSize ())
     {
@@ -277,8 +277,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return false;
   }
 
-  THREADED_CALLABLE_IMPL2(csThreadedLoader, LoadShader, const char* filename,
-    bool registerShader)
+  THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadShader, const char* filename,
+    bool registerShader, bool do_verbose)
   {
     csRef<iShaderManager> shaderMgr = csQueryRegistry<iShaderManager> (
       object_reg);
@@ -326,7 +326,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
 
     csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-      new csLoaderContext (object_reg, Engine, this, 0, true, true, 0, KEEP_USED, false));
+      new csLoaderContext (object_reg, Engine, this, 0, 0, KEEP_USED, do_verbose));
 
     csRef<iShader> shader = shcom->CompileShader (ldr_context, shaderNode);
     if (shader)
@@ -340,9 +340,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return false;
   }
 
-  THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadMapFile, const char* filename,
-    bool clearEngine, iCollection* collection, bool searchCollectionOnly, bool checkDupes,
-    iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags)
+  THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadMapFile, const char* filename,
+    bool clearEngine, iCollection* collection, iStreamSource* ssource,
+    iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose)
   {
     csRef<iFile> buf = vfs->Open (filename, VFS_FILE_READ);
 
@@ -379,8 +379,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         collection->Add(saverFile->QueryObject());
       }
 
-      return LoadMapTC (ret, world_node, clearEngine, collection, searchCollectionOnly,
-        checkDupes, ssource, missingdata, keepFlags);
+      return LoadMapTC (ret, world_node, clearEngine, collection, 
+        ssource, missingdata, keepFlags, do_verbose);
     }
     else
     {
@@ -390,9 +390,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return false;
   }
 
-  THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadMap, iDocumentNode* world_node,
-    bool clearEngine, iCollection* collection, bool searchCollectionOnly, bool checkDupes,
-    iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags)
+  THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadMap, iDocumentNode* world_node,
+    bool clearEngine, iCollection* collection, iStreamSource* ssource,
+    iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose)
   {
     if (clearEngine)
     {
@@ -400,34 +400,33 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       Engine->ResetWorldSpecificSettings();
     }
     csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-      new csLoaderContext (object_reg, Engine, this, collection, searchCollectionOnly,
-      checkDupes, missingdata, keepFlags, false));
+      new csLoaderContext (object_reg, Engine, this, collection,
+      missingdata, keepFlags, do_verbose));
 
-    return LoadMap (ldr_context, world_node, ssource, missingdata);
+    return LoadMap (ldr_context, world_node, ssource, missingdata, do_verbose);
   }
 
-  THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadLibraryFile, const char* filename,
-    iCollection* collection, bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource,
-    iMissingLoaderData* missingdata, uint keepFlags)
+  THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadLibraryFile, const char* filename,
+    iCollection* collection, iStreamSource* ssource, iMissingLoaderData* missingdata,
+    uint keepFlags, bool do_verbose)
   {
-    return LoadMapLibraryFile (filename, collection, searchCollectionOnly, checkDupes,
-      ssource, missingdata, keepFlags);
+    return LoadMapLibraryFile (filename, collection, ssource, missingdata, keepFlags, do_verbose);
   }
 
-  THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadLibrary, iDocumentNode* lib_node,
-    iCollection* collection, bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource,
-    iMissingLoaderData* missingdata, uint keepFlags)
+  THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadLibrary, iDocumentNode* lib_node,
+    iCollection* collection, iStreamSource* ssource, iMissingLoaderData* missingdata,
+    uint keepFlags, bool do_verbose)
   {
     csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext>
-      (new csLoaderContext (object_reg, Engine, this, collection, searchCollectionOnly, checkDupes,
-      missingdata, keepFlags, false));
+      (new csLoaderContext (object_reg, Engine, this, collection,
+      missingdata, keepFlags, do_verbose));
 
     return LoadLibrary (ldr_context, lib_node, ssource, missingdata, true);
   }
 
-  THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadFile, const char* fname,
-    iCollection* collection, bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource,
-    const char* override_name, iMissingLoaderData* missingdata, uint keepFlags)
+  THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadFile, const char* fname,
+    iCollection* collection, iStreamSource* ssource, const char* override_name,
+    iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose)
   {
     csRef<iDataBuffer> buf = vfs->ReadFile (fname);
 
@@ -437,26 +436,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       return false;
     }
 
-    return Load (buf, fname, collection, searchCollectionOnly, checkDupes, ssource,
-      override_name, missingdata, keepFlags);
+    return Load (buf, fname, collection, ssource, override_name, missingdata, keepFlags, do_verbose);
   }
 
-  THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadBuffer, iDataBuffer* buffer,
-    iCollection* collection, bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource,
-    const char* override_name, iMissingLoaderData* missingdata, uint keepFlags)
+  THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadBuffer, iDataBuffer* buffer,
+    iCollection* collection, iStreamSource* ssource, const char* override_name,
+    iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose)
   {
-    return Load(buffer, 0, collection, searchCollectionOnly, checkDupes, ssource,
-  	override_name, missingdata, keepFlags);
+    return Load(buffer, 0, collection, ssource, override_name, missingdata, keepFlags, do_verbose);
   }
 
-  THREADED_CALLABLE_IMPL9(csThreadedLoader, LoadNode, csRef<iDocumentNode> node,
-      csRef<iCollection> collection, bool searchCollectionOnly, bool checkDupes,
-      csRef<iStreamSource> ssource, const char* override_name,
+  THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadNode, csRef<iDocumentNode> node,
+      csRef<iCollection> collection, csRef<iStreamSource> ssource, const char* override_name,
       csRef<iMissingLoaderData> missingdata, uint keepFlags, bool do_verbose)
   {
     csRef<iLoaderContext> ldr_context;
     ldr_context.AttachNew(new csLoaderContext(object_reg, Engine, this, collection,
-      searchCollectionOnly, checkDupes, missingdata, keepFlags, do_verbose));
+      missingdata, keepFlags, do_verbose));
 
     // Mesh Factory
     csRef<iDocumentNode> meshfactnode = node->GetNode("meshfact");
@@ -476,7 +472,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iDocumentNode> worldnode = node->GetNode ("world");
     if(worldnode)
     {
-      return LoadMap (ldr_context, worldnode, ssource, missingdata);
+      return LoadMap (ldr_context, worldnode, ssource, missingdata, do_verbose);
     }
 
     // Library node.
@@ -492,7 +488,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     {
       const char* portalsname = override_name ? override_name :
         portalsnode->GetAttributeValue ("name");
-      if (ldr_context->CheckDupes () && portalsname)
+      if (portalsname)
       {
         csRef<iMeshWrapper> mw = Engine->FindMeshObject (portalsname);
         if (mw)
@@ -547,7 +543,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     {
       const char* meshobjname = override_name ? override_name :
         meshrefnode->GetAttributeValue ("name");
-      if (ldr_context->CheckDupes () && meshobjname)
+      if (meshobjname)
       {
         csRef<iMeshWrapper> mw = Engine->FindMeshObject (meshobjname);
         if (mw)
@@ -577,15 +573,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   {
     const char* meshfactname = override_name ? override_name : meshfactnode->GetAttributeValue("name");
 
-    if(ldr_context->CheckDupes())
+    csRef<iMeshFactoryWrapper> mfw = Engine->FindMeshFactory(meshfactname);
+    if(mfw)
     {
-      csRef<iMeshFactoryWrapper> mfw = Engine->FindMeshFactory(meshfactname);
-      if(mfw)
-      {
-        ldr_context->AddToCollection(mfw->QueryObject());
-        ret->SetResult(csRef<iBase>(mfw));
-        return true;
-      }
+      ldr_context->AddToCollection(mfw->QueryObject());
+      ret->SetResult(csRef<iBase>(mfw));
+      return true;
     }
 
     csRef<iMeshFactoryWrapper> mfw = Engine->CreateMeshFactory(meshfactname, false);
@@ -605,16 +598,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   {
     const char* meshobjname = override_name ? override_name : meshobjnode->GetAttributeValue ("name");
 
-      if(ldr_context->CheckDupes())
-      {
-        csRef<iMeshWrapper> mw = Engine->FindMeshObject(meshobjname);
-        if(mw)
-        {
-          ldr_context->AddToCollection(mw->QueryObject());
-          ret->SetResult(csRef<iBase>(mw));
-          return true;
-        }
-      }
+    csRef<iMeshWrapper> mw = Engine->FindMeshObject(meshobjname);
+    if(mw)
+    {
+      ldr_context->AddToCollection(mw->QueryObject());
+      ret->SetResult(csRef<iBase>(mw));
+      return true;
+    }
 
       csRef<iMeshWrapper> mw = Engine->CreateMeshWrapper(meshobjname, false);
       if(LoadMeshObject(ldr_context, mw, parent, meshobjnode, ssource))
@@ -669,7 +659,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   }
 
   bool csThreadedLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* world_node,
-    iStreamSource* ssource, iMissingLoaderData* missingdata)
+    iStreamSource* ssource, iMissingLoaderData* missingdata, bool do_verbose)
   {
     if (!Engine)
     {
@@ -730,10 +720,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             const char* filename = attr_file->GetValue ();
             LoadFile(filename, ldr_context->GetCollection (),
-              ldr_context->CurrentCollectionOnly (),
-              ldr_context->CheckDupes (),
               ssource, name, missingdata,
-              ldr_context->GetKeepFlags());
+              ldr_context->GetKeepFlags(),
+              ldr_context->GetVerbose());
           }
 
           FindOrLoadMeshFactory(ldr_context, child, 0, 0, 0, ssource);
@@ -826,19 +815,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   bool csThreadedLoader::LoadLibraryFromNode (iLoaderContext* ldr_context,
     iDocumentNode* child, iStreamSource* ssource, iMissingLoaderData* missingdata,
-    bool loadProxyTex)
+    bool loadProxyTex, bool do_verbose)
   {
     csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
-    const char* name = child->GetAttributeValue ("checkdupes");
-    bool dupes = ldr_context->CheckDupes ();
-    if (name)
-    {
-      if (!strcasecmp (name, "true") || !strcasecmp (name, "yes") ||
-        !strcasecmp (name, "1") || !strcasecmp (name, "on"))
-        dupes = true;
-      else
-        dupes = false;
-    }
 
     const char* file = child->GetAttributeValue ("file");
     if (file)
@@ -853,15 +832,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if (Engine->GetSaveableFlag ())
       {
         csRef<iLibraryReference> libraryRef;
-        libraryRef.AttachNew (new csLibraryReference (file, path, dupes));
+        libraryRef.AttachNew (new csLibraryReference (file, path, true));
         ldr_context->AddToCollection(libraryRef->QueryObject ());
       }
 
       bool rc;
 
       rc = LoadMapLibraryFile (file, ldr_context->GetCollection (),
-        ldr_context->CurrentCollectionOnly (), dupes, ssource,
-        missingdata, ldr_context->GetKeepFlags(), loadProxyTex);
+        ssource, missingdata, ldr_context->GetKeepFlags(), loadProxyTex, do_verbose);
 
       if (path)
       {
@@ -876,20 +854,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
         csRef<iLibraryReference> libraryRef;
         libraryRef.AttachNew (new csLibraryReference (
-          child->GetContentsValue (), 0, dupes));
+          child->GetContentsValue (), 0, true));
         ldr_context->AddToCollection (libraryRef->QueryObject ());
       }
 
       return LoadMapLibraryFile (child->GetContentsValue (), ldr_context->GetCollection (),
-        ldr_context->CurrentCollectionOnly (), ldr_context->CheckDupes (),
-        ssource, missingdata, ldr_context->GetKeepFlags(), loadProxyTex);
+        ssource, missingdata, ldr_context->GetKeepFlags(), loadProxyTex, do_verbose);
     }
     return true;
   }
 
   bool csThreadedLoader::LoadMapLibraryFile (const char* fname, iCollection* collection,
-    bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource,
-    iMissingLoaderData* missingdata, uint keepFlags, bool loadProxyTex, bool do_verbose)
+    iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags, bool loadProxyTex,
+    bool do_verbose)
   {
     csRef<iFile> buf = vfs->Open (fname, VFS_FILE_READ);
 
@@ -909,8 +886,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-      new csLoaderContext (object_reg, Engine, this, collection, searchCollectionOnly, checkDupes,
-      missingdata, keepFlags, do_verbose));
+      new csLoaderContext (object_reg, Engine, this, collection, missingdata,
+      keepFlags, do_verbose));
 
     csRef<iDocument> doc;
     bool er = LoadStructuredDoc (fname, buf, doc);
@@ -936,7 +913,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   }
 
   bool csThreadedLoader::LoadLibrary(iLoaderContext* ldr_context, iDocumentNode* node,
-    iStreamSource* ssource, iMissingLoaderData* missingdata, bool loadProxyTex)
+    iStreamSource* ssource, iMissingLoaderData* missingdata, bool loadProxyTex, bool do_verbose)
   {
     if (!Engine)
     {
@@ -3185,7 +3162,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           if (!snd)
           {
             csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csThreadReturn(threadman));
-            LoadSoundWrapperTC (ret, name, filename);
+            LoadSoundWrapperTC (ret, name, filename, false);
             snd = scfQueryInterface<iSndSysWrapper>(ret->GetResultRefPtr());
           }
           if (snd)
@@ -3650,10 +3627,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
   }
 
-  bool csThreadedLoader::Load (iDataBuffer* buffer, const char* fname,
-    iCollection* collection, bool searchCollectionOnly, bool checkDupes,
+  bool csThreadedLoader::Load (iDataBuffer* buffer, const char* fname, iCollection* collection,
     iStreamSource* ssource, const char* override_name, iMissingLoaderData* missingdata,
-    uint keepFlags)
+    uint keepFlags, bool do_verbose)
   {
     if (TestXML (buffer->GetData ()))
     {
@@ -3668,8 +3644,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
         csRef<iDocumentNode> node = doc->GetRoot ();
         csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-        LoadNodeTC(itr, node, collection, searchCollectionOnly, checkDupes,
-          ssource, override_name, missingdata, keepFlags, false);
+        LoadNodeTC(itr, node, collection, ssource, override_name, missingdata, keepFlags,
+          do_verbose);
         return itr->WasSuccessful();
       }
       else

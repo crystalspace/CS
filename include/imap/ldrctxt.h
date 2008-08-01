@@ -51,7 +51,7 @@ struct iObject;
  */
 struct iLoaderContext : public virtual iBase
 {
-  SCF_INTERFACE(iLoaderContext, 3, 1, 0);
+  SCF_INTERFACE(iLoaderContext, 3, 2, 0);
   /// Find a sector.
   virtual iSector* FindSector (const char* name) = 0;
   
@@ -127,6 +127,11 @@ struct iLoaderContext : public virtual iBase
    * Adds the object to the stored collection.
    */
   virtual void AddToCollection(iObject* obj) = 0;
+
+  /**
+   * Get the message verbosity.
+   */
+  virtual bool GetVerbose() = 0;
 };
 
 /** @} */

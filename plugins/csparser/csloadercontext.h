@@ -42,16 +42,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     iEngine* Engine;
     csThreadedLoader* loader;
     iCollection* collection;
-    bool searchCollectionOnly;
     csRef<iMissingLoaderData> missingdata;
-    bool checkDupes;
     uint keepFlags;
     bool do_verbose;
 
   public:
     csLoaderContext(iObjectRegistry* object_reg, iEngine* Engine, csThreadedLoader* loader,
-      iCollection* collection, bool searchCollectionOnly, bool checkDupes,
-      iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose);
+      iCollection* collection,iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose);
     virtual ~csLoaderContext ();
 
     virtual iSector* FindSector (const char* name);
@@ -65,11 +62,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
                                               const char *filename);
     virtual iLight* FindLight(const char *name);
     virtual iShader* FindShader(const char *name);
-    virtual bool CheckDupes() const { return checkDupes; }
+    virtual bool CheckDupes() const { return true; }
     virtual iCollection* GetCollection() const { return collection; }
-    virtual bool CurrentCollectionOnly() const { return searchCollectionOnly; }
+    virtual bool CurrentCollectionOnly() const { return false; }
     virtual uint GetKeepFlags() const { return keepFlags; }
     virtual void AddToCollection(iObject* obj);
+    virtual bool GetVerbose() { return do_verbose; }
 
     void ReportNotify (const char* description, ...);
   };
