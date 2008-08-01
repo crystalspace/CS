@@ -72,18 +72,15 @@ private:
   // The standard render buffer holder. It takes care of giving
   // the renderer all required renderbuffers.
   csRef<csRenderBufferHolder> bufferHolder;
-  csRef<csRenderBufferHolder> farPatchBufferHolder;
 
   // The shader variable context. Holds shader variables like the
   // object to world transform.
   csRef<csShaderVariableContext> variableContext;
-  csRef<csShaderVariableContext> farPatchVariableContext;
 
   // Since every mesh can have a different color we need to have
   // the color buffer here. But we will use the basic colors
   // from the factory.
   csRef<iRenderBuffer> color_buffer;
-  csRef<iRenderBuffer> far_patch_color_buffer;
 
   // Setup the bufferholder to get the buffers and accessors
   // for all types of data we need.
@@ -285,27 +282,10 @@ private:
   csDirtyAccessArray<csColor>  cols;
   csDirtyAccessArray<csTriangle> tris;
   
-  //Far patch for ocean water
-  csDirtyAccessArray<csVector3> far_verts;
-  csDirtyAccessArray<csVector3> far_norms;
-  csDirtyAccessArray<csVector2> far_texs;
-  csDirtyAccessArray<csColor>  far_cols;
-  csDirtyAccessArray<csTriangle> far_tris;
-  
   //Ocean cells
   csArray<csOceanCell> cells;
   
   int numVerts, numTris;
-
-
-
-/////// GET RID OF THESE //////////
-  csVector3 vertices[WATER_VERTS];
-  csVector3 normals[WATER_VERTS];
-  csVector2 texels[WATER_VERTS];
-  csColor colors[WATER_VERTS];
-  csTriangle triangles[WATER_TRIS];
-////////////////////////////////////
 
   //size vars
   uint len, wid;
@@ -357,12 +337,6 @@ private:
   csRef<iRenderBuffer> index_buffer;
   csRef<iRenderBuffer> normal_buffer;
 
-  csRef<iRenderBuffer> far_vertex_buffer;
-  csRef<iRenderBuffer> far_texel_buffer;
-  csRef<iRenderBuffer> far_index_buffer;
-  csRef<iRenderBuffer> far_normal_buffer;
-  csRef<iRenderBuffer> far_color_buffer;
-
   // Prepare the buffers (check if they are dirty).
   // Mesh objects will call this before rendering.
   void PrepareBuffers ();
@@ -407,11 +381,6 @@ public:
 
   /**\name iWaterFactoryState implementation
    * @{ */
-  csVector3* GetVertices () { return vertices; }
-  csVector2* GetTexels () { return texels; }
-  csVector3* GetNormals () { return normals; }
-  csColor* GetColors () { return colors; }
-  csTriangle* GetTriangles () { return triangles; }
   void Invalidate ();
 
   void SetLength(uint length);
@@ -433,6 +402,8 @@ public:
   void SetPhases(float phase1, float phase2, float phase3);  
   void SetDirections(csVector2 dir1, csVector2 dir2, csVector2 dir3);
   
+  inline bool isOcean() { return type == WATER_TYPE_OCEAN; }
+
   csRef<iTextureWrapper> MakeFresnelTex(int size);
   
   //Under the hood functions
@@ -441,7 +412,6 @@ public:
   csVector3 GetDirsX() { return csVector3(k1.x, k2.x, k3.x); }
   csVector3 GetDirsY() { return csVector3(k1.y, k2.y, k3.y); }
   csVector3 GetAmplitudes() { return csVector3(amps[0], amps[1], amps[2]); }
-  inline bool isOcean() { return type == WATER_TYPE_OCEAN; }
   
   /** @} */
 

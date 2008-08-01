@@ -504,7 +504,7 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
       if (rmCreated)
       {
         renderMeshes[0]->buffers = bufferHolder;
-        renderMeshes[0]->variablecontext = farPatchVariableContext;
+        renderMeshes[0]->variablecontext = variableContext;
       }
     }
 
@@ -813,7 +813,7 @@ void csWaterMeshObjectFactory::SetupFactory ()
   
     if(isOcean()) //make cells
     {  
-      cells.DeleteAll();
+	  cells.DeleteAll();
       
       cells.Push(csOceanCell(CELL_LEN, CELL_WID, LOD_LEVEL_1));
       cells.Push(csOceanCell(CELL_LEN, CELL_WID, LOD_LEVEL_2));

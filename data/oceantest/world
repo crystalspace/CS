@@ -1,0 +1,84 @@
+<?xml ?>
+<world>
+  <plugins>
+        <plugin name="waterFact">crystalspace.mesh.loader.factory.watermesh</plugin>
+        <plugin name="water">crystalspace.mesh.loader.watermesh</plugin>
+  </plugins>
+  <settings>
+  	<clearscreen>yes</clearscreen>
+  </settings>
+  
+  <shaders>
+    <shader>
+      <file>/shader/water/water.xml</file>
+    </shader>
+  </shaders>
+  
+  <textures>    
+    <texture name="normal map 1">
+      <file>/water/723-normal.jpg</file>
+    </texture>
+    
+    <texture name="normal map 2">
+      <file>/water/w_normalmap.png</file>
+    </texture>
+    
+    <texture name="normal map 3">
+      <file>/water/940-bump.jpg</file>
+    </texture>
+  </textures>
+  
+  <!-- Material like this necessary for proper ocean rendering -->
+  <materials>
+    <material name="oceanMat">
+      <shader type="standard">water</shader>
+      <shadervar name="texture normal" type="texture">normal map 2</shadervar>
+    </material>
+  </materials>
+
+  <meshfact name="oceantest">
+    <plugin>waterFact</plugin>
+    <params>
+	  <isocean>yes</isocean>
+    </params>
+  </meshfact>
+    
+  <sector name="room">
+    
+    <meshobj name="ocean">
+      <plugin>water</plugin>
+      <params>
+        <factory>oceantest</factory>
+        <material>oceanMat</material>
+      </params>
+    </meshobj>
+    
+    <light>
+    	<center x="1" y="3" z="1"/>
+    	<radius>10</radius>
+    	<color red="1" green="0" blue="0"/>
+    </light>
+    
+    <light>
+    	<center x="1" y="3" z="9"/>
+    	<radius>10</radius>
+    	<color red="0" green="0" blue="1"/>
+    </light>
+    
+    <light>
+    	<center x="19" y="3" z="1"/>
+    	<radius>10</radius>
+    	<color red="0" green="1" blue="0"/>
+    </light>
+    
+    <light>
+    	<center x="19" y="3" z="9"/>
+    	<radius>10</radius>
+    	<color red="1" green="1" blue="1"/>
+    </light>
+  </sector>
+  <start>
+  	<sector>room</sector>
+  	<position x="0" y="0" z="0" />
+  </start>
+</world>

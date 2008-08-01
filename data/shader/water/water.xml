@@ -27,7 +27,7 @@
 	</shadervars>
 
 	
-  <technique priority="250">
+  <technique priority="100">
     <pass>
       <mixmode><alpha/></mixmode>
       <buffer source="normal" destination="normal"/>
