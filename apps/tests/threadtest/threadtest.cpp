@@ -73,7 +73,6 @@ THREADED_CALLABLE_IMPL1(csThreadTest, Test4, csWeakRef<iThreadTest> myself)
 THREADED_CALLABLE_IMPL(csThreadTest, Test5Real)
 {
   ret->MarkSuccessful();
-  ret->MarkFinished();
 }
 
 void csThreadTest::Test5() const
@@ -127,7 +126,6 @@ THREADED_CALLABLE_IMPL1(csThreadTest, Test6, csRef<Data> stuff)
   {
     printf("Test 6 failed!\n");
   }
-  ret->MarkFinished();
 }
 
 THREADED_CALLABLE_IMPL(csThreadTest, Test7)
@@ -139,7 +137,6 @@ THREADED_CALLABLE_IMPL(csThreadTest, Test7)
   Test7Data(4);
   Test7Data(5);
   ret->MarkSuccessful();
-  ret->MarkFinished();
 }
 
 THREADED_CALLABLE_IMPL1(csThreadTest, Test7Data, int counter)

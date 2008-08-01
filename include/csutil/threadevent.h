@@ -38,6 +38,7 @@ public:
       T* mySelf = (T*)this;
       A1* a1 = (A1*)args[1];
       (mySelf->*method)(*a1);
+      (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
       delete mempool;
       delete args;
@@ -50,6 +51,7 @@ public:
       A2* a2 = (A2*)args[2];
       A1* a1 = (A1*)args[1];
       (mySelf->*method)(*a1, *a2);
+      (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
       delete mempool;
       delete args;
@@ -63,6 +65,7 @@ public:
       A2* a2 = (A2*)args[2];
       A1* a1 = (A1*)args[1];
       (mySelf->*method)(*a1, *a2, *a3);
+      (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
       delete mempool;
       delete args;
@@ -77,6 +80,7 @@ public:
       A2* a2 = (A2*)args[2];
       A1* a1 = (A1*)args[1];
       (mySelf->*method)(*a1, *a2, *a3, *a4);
+      (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
       delete mempool;
       delete args;
@@ -92,6 +96,7 @@ public:
       A2* a2 = (A2*)args[2];
       A1* a1 = (A1*)args[1];
       (mySelf->*method)(*a1, *a2, *a3, *a4, *a5);
+      (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
       delete mempool;
       delete args;
@@ -108,6 +113,7 @@ public:
       A2* a2 = (A2*)args[2];
       A1* a1 = (A1*)args[1];
       (mySelf->*method)(*a1, *a2, *a3, *a4, *a5, *a6);
+      (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
       delete mempool;
       delete args;
@@ -125,6 +131,7 @@ public:
       A2* a2 = (A2*)args[2];
       A1* a1 = (A1*)args[1];
       (mySelf->*method)(*a1, *a2, *a3, *a4, *a5, *a6, *a7);
+      (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
       delete mempool;
       delete args;
@@ -143,6 +150,7 @@ public:
       A2* a2 = (A2*)args[2];
       A1* a1 = (A1*)args[1];
       (mySelf->*method)(*a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8);
+      (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
       delete mempool;
       delete args;
@@ -162,6 +170,7 @@ public:
       A2* a2 = (A2*)args[2];
       A1* a1 = (A1*)args[1];
       (mySelf->*method)(*a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9);
+      (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
       delete mempool;
       delete args;
@@ -182,6 +191,7 @@ public:
       A2* a2 = (A2*)args[2];
       A1* a1 = (A1*)args[1];
       (mySelf->*method)(*a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10);
+      (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
       delete mempool;
       delete args;
@@ -203,6 +213,7 @@ public:
       A2* a2 = (A2*)args[2];
       A1* a1 = (A1*)args[1];
       (mySelf->*method)(result, *a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10, *a11);
+      (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
       delete mempool;
       delete args;
@@ -225,6 +236,7 @@ public:
       A2* a2 = (A2*)args[2];
       A1* a1 = (A1*)args[1];
       (mySelf->*method)(result, *a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10, *a11, *a12);
+      (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
       delete mempool;
       delete args;
@@ -248,6 +260,7 @@ public:
       A2* a2 = (A2*)args[2];
       A1* a1 = (A1*)args[1];
       (mySelf->*method)(result, *a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10, *a11, *a12, *a13);
+      (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
       delete mempool;
       delete args;
@@ -272,6 +285,7 @@ public:
       A2* a2 = (A2*)args[2];
       A1* a1 = (A1*)args[1];
       (mySelf->*method)(result, *a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10, *a11, *a12, *a13, *a14);
+      (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
       delete mempool;
       delete args;
@@ -297,6 +311,7 @@ public:
       A2* a2 = (A2*)args[2];
       A1* a1 = (A1*)args[1];
       (mySelf->*method)(result, *a1, *a2, *a3, *a4, *a5, *a6, *a7, *a8, *a9, *a10, *a11, *a12, *a13, *a14, *a15);
+      (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
       delete mempool;
       delete args;
