@@ -212,17 +212,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint,
     keepFlags, bool, do_verbose, true, false)
 
-    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadFile, csLoaderReturn, const char*, fname,
-    iCollection*, collection, iStreamSource*, ssource, const char*, override_name, iMissingLoaderData*,
-    missingdata, uint, keepFlags, bool, do_verbose, true, false)
+    THREADED_CALLABLE_DECL6(csThreadedLoader, LoadFile, csLoaderReturn, const char*, fname,
+    iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint,
+    keepFlags, bool, do_verbose, true, false)
 
-    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadBuffer, csLoaderReturn, iDataBuffer*, buffer,
-    iCollection*, collection, iStreamSource*, ssource, const char*, override_name, iMissingLoaderData*,
-    missingdata, uint, keepFlags, bool, do_verbose, true, false)
+    THREADED_CALLABLE_DECL6(csThreadedLoader, LoadBuffer, csLoaderReturn, iDataBuffer*, buffer,
+    iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint,
+    keepFlags, bool, do_verbose, true, false)
 
-    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadNode, csLoaderReturn, csRef<iDocumentNode>,
-    node, csRef<iCollection>, collection, csRef<iStreamSource>, ssource, const char*, override_name,
-    csRef<iMissingLoaderData>, missingdata, uint, keepFlags, bool, do_verbose, true, false)
+    THREADED_CALLABLE_DECL6(csThreadedLoader, LoadNode, csLoaderReturn, csRef<iDocumentNode>,
+    node, csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>,
+    missingdata, uint, keepFlags, bool, do_verbose, true, false)
 
   private:
       csRef<iEngine> Engine;
@@ -349,9 +349,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         csWeakRefArray<iMaterialWrapper> &materialArray);
 
       csRef<iThreadReturn> LoadMeshFactory(csRef<iLoaderContext> ldr_context,
-        csRef<iDocumentNode> meshfactnode, const char* override_name,
-        csRef<iMeshFactoryWrapper> parent, csReversibleTransform* transf,
-        csRef<iStreamSource> ssource);
+        csRef<iDocumentNode> meshfactnode, csRef<iMeshFactoryWrapper> parent,
+        csReversibleTransform* transf, csRef<iStreamSource> ssource);
 
       bool LoadMapLibraryFile (const char* filename, iCollection* collection,
         iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags = KEEP_ALL,
@@ -401,8 +400,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         iStreamSource* ssource, iMissingLoaderData* missingdata, bool do_verbose);
 
       bool Load (iDataBuffer* buffer, const char* fname, iCollection* collection,
-        iStreamSource* ssource, const char* override_name, iMissingLoaderData* missingdata,
-        uint keepFlags = KEEP_ALL, bool do_verbose = false);
+        iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags = KEEP_ALL,
+        bool do_verbose = false);
 
       /**
       * Load a library into given engine.

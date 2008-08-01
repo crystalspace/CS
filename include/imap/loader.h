@@ -652,9 +652,6 @@ struct iThreadedLoader : public virtual iBase
   * with the same name. Only use checkDupes == true if you know that your
   * objects have unique names accross all world files.
   * \param ssource is an optional stream source for faster loading.
-  * \param override_name if this is given the the name of the loaded object
-  * will be set to that. This only works in case of meshfact, meshobj, and
-  * 3ds or md2 model.
   * \param missingdata is an optional callback in case data is missing.
   * The application can then provide that missing data in some other way.
   * \param keepFlags Use these to define whether or not you wish to guarantee
@@ -662,9 +659,9 @@ struct iThreadedLoader : public virtual iBase
   * when you are loading from a shared library containing more resources than you
   * actually need (a world file loading from a shared library of textures for example).
   */
-  THREADED_INTERFACE7(LoadFile, const char* fname, iCollection* collection = 0,
-  iStreamSource* ssource = 0, const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-  uint keepFlags = KEEP_ALL, bool do_verbose = false)
+  THREADED_INTERFACE6(LoadFile, const char* fname, iCollection* collection = 0,
+  iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL,
+  bool do_verbose = false)
   //@}
 
   //@{
@@ -704,9 +701,6 @@ struct iThreadedLoader : public virtual iBase
   * with the same name. Only use checkDupes == true if you know that your
   * objects have unique names accross all world files.
   * \param ssource is an optional stream source for faster loading.
-  * \param override_name if this is given the the name of the loaded object
-  * will be set to that. This only works in case of meshfact, meshobj, and
-  * 3ds or md2 model.
   * \param missingdata is an optional callback in case data is missing.
   * The application can then provide that missing data in some other way.
   * \param keepFlags Use these to define whether or not you wish to guarantee
@@ -714,9 +708,9 @@ struct iThreadedLoader : public virtual iBase
   * when you are loading from a shared library containing more resources than you
   * actually need (a world file loading from a shared library of textures for example).
   */
-  THREADED_INTERFACE7(LoadBuffer, iDataBuffer* buffer, iCollection* collection = 0,
-  iStreamSource* ssource = 0, const char* override_name = 0, iMissingLoaderData* missingdata = 0,
-  uint keepFlags = KEEP_ALL, bool do_verbose = false)
+  THREADED_INTERFACE6(LoadBuffer, iDataBuffer* buffer, iCollection* collection = 0,
+  iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL,
+  bool do_verbose = false)
   //@}
 
   //@{
@@ -754,9 +748,6 @@ struct iThreadedLoader : public virtual iBase
   * with the same name. Only use checkDupes == true if you know that your
   * objects have unique names accross all world files.
   * \param ssource is an optional stream source for faster loading.
-  * \param override_name if this is given the the name of the loaded object
-  * will be set to that. This only works in case of meshfact, meshobj, and
-  * 3ds or md2 model.
   * \param missingdata is an optional callback in case data is missing.
   * The application can then provide that missing data in some other way.
   * \param keepFlags Use these to define whether or not you wish to guarantee
@@ -764,9 +755,9 @@ struct iThreadedLoader : public virtual iBase
   * when you are loading from a shared library containing more resources than you
   * actually need (a world file loading from a shared library of textures for example).
   */
-  THREADED_INTERFACE7(LoadNode, csRef<iDocumentNode> node, csRef<iCollection> collection = 0,
-  csRef<iStreamSource> ssource = 0, const char* override_name = 0, csRef<iMissingLoaderData> missingdata = 0,
-  uint keepFlags = KEEP_ALL, bool do_verbose = false)
+  THREADED_INTERFACE6(LoadNode, csRef<iDocumentNode> node, csRef<iCollection> collection = 0,
+  csRef<iStreamSource> ssource = 0, csRef<iMissingLoaderData> missingdata = 0, uint keepFlags = KEEP_ALL,
+  bool do_verbose = false)
   //@}
 };
 

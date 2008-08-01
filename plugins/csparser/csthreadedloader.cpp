@@ -423,9 +423,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return LoadLibrary (ldr_context, lib_node, ssource, missingdata, true);
   }
 
-  THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadFile, const char* fname,
-    iCollection* collection, iStreamSource* ssource, const char* override_name,
-    iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose)
+  THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadFile, const char* fname,
+    iCollection* collection, iStreamSource* ssource, iMissingLoaderData* missingdata,
+    uint keepFlags, bool do_verbose)
   {
     csRef<iDataBuffer> buf = vfs->ReadFile (fname);
 
@@ -435,18 +435,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       return false;
     }
 
-    return Load (buf, fname, collection, ssource, override_name, missingdata, keepFlags, do_verbose);
+    return Load (buf, fname, collection, ssource, missingdata, keepFlags, do_verbose);
   }
 
-  THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadBuffer, iDataBuffer* buffer,
-    iCollection* collection, iStreamSource* ssource, const char* override_name,
-    iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose)
+  THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadBuffer, iDataBuffer* buffer,
+    iCollection* collection, iStreamSource* ssource, iMissingLoaderData* missingdata,
+    uint keepFlags, bool do_verbose)
   {
-    return Load(buffer, 0, collection, ssource, override_name, missingdata, keepFlags, do_verbose);
+    return Load(buffer, 0, collection, ssource, missingdata, keepFlags, do_verbose);
   }
 
-  THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadNode, csRef<iDocumentNode> node,
-      csRef<iCollection> collection, csRef<iStreamSource> ssource, const char* override_name,
+  THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadNode, csRef<iDocumentNode> node,
+      csRef<iCollection> collection, csRef<iStreamSource> ssource,
       csRef<iMissingLoaderData> missingdata, uint keepFlags, bool do_verbose)
   {
     csRef<iLoaderContext> ldr_context;
@@ -457,7 +457,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iDocumentNode> meshfactnode = node->GetNode("meshfact");
     if(meshfactnode)
     {
-      const char* meshfactname = override_name ? override_name : meshfactnode->GetAttributeValue("name");
+      const char* meshfactname = meshfactnode->GetAttributeValue("name");
       csRef<iMeshFactoryWrapper> mfw = ldr_context->FindMeshFactory(meshfactname);
       if(mfw)
       {
@@ -465,7 +465,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
       else
       {
-        csRef<iThreadReturn> itr = LoadMeshFactory(ldr_context, meshfactnode, override_name, 0, 0, ssource);
+        csRef<iThreadReturn> itr = LoadMeshFactory(ldr_context, meshfactnode, 0, 0, ssource);
         itr->Wait();
         return itr->WasSuccessful();
       }
@@ -500,8 +500,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iDocumentNode> portalsnode = node->GetNode ("portals");
     if (portalsnode)
     {
-      const char* portalsname = override_name ? override_name :
-        portalsnode->GetAttributeValue ("name");
+      const char* portalsname = portalsnode->GetAttributeValue ("name");
       if (portalsname)
       {
         csRef<iMeshWrapper> mw = Engine->FindMeshObject (portalsname);
@@ -538,8 +537,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iDocumentNode> lightnode = node->GetNode ("light");
     if (lightnode)
     {
-      const char* lightname = override_name ? override_name :
-        lightnode->GetAttributeValue ("name");
+      const char* lightname = lightnode->GetAttributeValue ("name");
       csRef<iLight> light = ParseStatlight (ldr_context, lightnode);
       if (light)
       {
@@ -555,8 +553,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iDocumentNode> meshrefnode = node->GetNode ("meshref");
     if (meshrefnode)
     {
-      const char* meshobjname = override_name ? override_name :
-        meshrefnode->GetAttributeValue ("name");
+      const char* meshobjname = meshrefnode->GetAttributeValue ("name");
       if (meshobjname)
       {
         csRef<iMeshWrapper> mw = Engine->FindMeshObject (meshobjname);
@@ -582,9 +579,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   }
 
   csRef<iThreadReturn> csThreadedLoader::LoadMeshFactory(csRef<iLoaderContext> ldr_context,
-    csRef<iDocumentNode> meshfactnode, const char* override_name,
-    csRef<iMeshFactoryWrapper> parent, csReversibleTransform* transf,
-    csRef<iStreamSource> ssource)
+    csRef<iDocumentNode> meshfactnode, csRef<iMeshFactoryWrapper> parent,
+    csReversibleTransform* transf, csRef<iStreamSource> ssource)
   {
     const char* meshfactname = meshfactnode->GetAttributeValue("name");
     csRef<iMeshFactoryWrapper> mfw = Engine->CreateMeshFactory(meshfactname, false);
@@ -696,8 +692,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           {
             const char* filename = attr_file->GetValue ();
             LoadFile(filename, ldr_context->GetCollection (),
-              ssource, name, missingdata,
-              ldr_context->GetKeepFlags(),
+              ssource, missingdata, ldr_context->GetKeepFlags(),
               ldr_context->GetVerbose());
           }
 
@@ -708,7 +703,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
           else
           {
-            LoadMeshFactory(ldr_context, child, 0, 0, 0, ssource);
+            LoadMeshFactory(ldr_context, child, 0, 0, ssource);
           }
         }
         break;
@@ -1003,7 +998,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
           else
           {
-            LoadMeshFactory(ldr_context, child, 0, 0, 0, ssource);
+            LoadMeshFactory(ldr_context, child, 0, 0, ssource);
           }
         }
         break;
@@ -1439,7 +1434,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           else
           {
             csReversibleTransform child_transf;
-            csRef<iThreadReturn> ret = LoadMeshFactory(ldr_context, child, 0, stemp, &child_transf, ssource);
+            csRef<iThreadReturn> ret = LoadMeshFactory(ldr_context, child, stemp, &child_transf, ssource);
             ret->Wait();
             if(!ret->WasSuccessful())
             {
@@ -3758,8 +3753,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   }
 
   bool csThreadedLoader::Load (iDataBuffer* buffer, const char* fname, iCollection* collection,
-    iStreamSource* ssource, const char* override_name, iMissingLoaderData* missingdata,
-    uint keepFlags, bool do_verbose)
+    iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose)
   {
     if (TestXML (buffer->GetData ()))
     {
@@ -3774,8 +3768,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
         csRef<iDocumentNode> node = doc->GetRoot ();
         csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-        LoadNodeTC(itr, node, collection, ssource, override_name, missingdata, keepFlags,
-          do_verbose);
+        LoadNodeTC(itr, node, collection, ssource, missingdata, keepFlags, do_verbose);
         return itr->WasSuccessful();
       }
       else
@@ -3802,9 +3795,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           l = csLoadPlugin<iModelLoader> (plugin_mgr, plugin);
         if (l && l->IsRecognized (buffer))
         {
-          iMeshFactoryWrapper* ff = l->Load (
-            override_name ? override_name :
-            fname ? fname : "__model__", buffer);
+          iMeshFactoryWrapper* ff = l->Load (fname ? fname : "__model__", buffer);
           if(ff)
           {
             return true;
