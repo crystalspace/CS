@@ -69,7 +69,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   {
   public:
     csLoaderIterator(csRefArray<T>* objects, CS::Threading::Mutex* lock) :
-        scfImplementationType(this), objects(objects), lock(*lock), itr(objects->GetIterator())
+        scfImplementation1<csLoaderIterator<T, Interface>,
+                           Interface> (this),
+        lock(*lock), objects(objects), itr(objects->GetIterator())
         {
         }
 
@@ -100,6 +102,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
                                                      iComponent,
                                                      iEventHandler>
   {
+    typedef csThreadedLoader ThisType;
   public:
     csThreadedLoader(iBase *p);
     virtual ~csThreadedLoader();

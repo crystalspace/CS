@@ -581,7 +581,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       return true;
     }
 
-    csRef<iMeshFactoryWrapper> mfw = Engine->CreateMeshFactory(meshfactname, false);
+    mfw = Engine->CreateMeshFactory(meshfactname, false);
     if(LoadMeshObjectFactory(ldr_context, mfw, parent, meshfactnode, transf, ssource))
     {
       ldr_context->AddToCollection(mfw->QueryObject());
@@ -606,7 +606,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       return true;
     }
 
-      csRef<iMeshWrapper> mw = Engine->CreateMeshWrapper(meshobjname, false);
+      mw = Engine->CreateMeshWrapper(meshobjname, false);
       if(LoadMeshObject(ldr_context, mw, parent, meshobjnode, ssource))
       {
         ldr_context->AddToCollection(mw->QueryObject());

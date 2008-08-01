@@ -376,7 +376,7 @@ public:
 
   void Run()
   {
-    object->RunMethod1<A1>(method, args);
+    object->RunMethod1 (method, args);
   }
 
 private:
@@ -390,13 +390,14 @@ class ThreadEvent2 : public scfImplementation1<ThreadEvent2<T, A1, A2>, iJob>
 {
 public:
   ThreadEvent2(ThreadedCallable<T>* &object, bool (T::*method)(A1, A2), void const** &args)
-    : scfImplementationType(this), object(object), method(method), args(args)
+    : scfImplementation1<ThreadEvent2<T, A1, A2>, iJob> (this),
+      object(object), method(method), args(args)
   {
   }
 
   void Run()
   {
-    object->RunMethod2<A1, A2>(method, args);
+    object->RunMethod2 (method, args);
   }
 
 private:
@@ -410,13 +411,14 @@ class ThreadEvent3 : public scfImplementation1<ThreadEvent3<T, A1, A2, A3>, iJob
 {
 public:
   ThreadEvent3(ThreadedCallable<T>* &object, bool (T::*method)(A1, A2, A3), void const** &args)
-    : scfImplementationType(this), object(object), method(method), args(args)
+    : scfImplementation1<ThreadEvent3<T, A1, A2, A3>, iJob> (this),
+      object(object), method(method), args(args)
   {
   }
 
   void Run()
   {
-    object->RunMethod3<A1, A2, A3>(method, args);
+    object->RunMethod3 (method, args);
   }
 
 private:
@@ -430,13 +432,14 @@ class ThreadEvent4 : public scfImplementation1<ThreadEvent4<T, A1, A2, A3, A4>, 
 {
 public:
   ThreadEvent4(ThreadedCallable<T>* &object, bool (T::*method)(A1, A2, A3, A4), void const** &args)
-    : scfImplementationType(this), object(object), method(method), args(args)
+    : scfImplementation1<ThreadEvent4<T, A1, A2, A3, A4>, iJob> (this),
+      object(object), method(method), args(args)
   {
   }
 
   void Run()
   {
-    object->RunMethod4<A1, A2, A3, A4>(method, args);
+    object->RunMethod4 (method, args);
   }
 
 private:
@@ -450,13 +453,14 @@ class ThreadEvent5 : public scfImplementation1<ThreadEvent5<T, A1, A2, A3, A4, A
 {
 public:
   ThreadEvent5(ThreadedCallable<T>* &object, bool (T::*method)(A1, A2, A3, A4, A5), void const** &args)
-    : scfImplementationType(this), object(object), method(method), args(args)
+    : scfImplementation1<ThreadEvent5<T, A1, A2, A3, A4, A5>, iJob> (this),
+      object(object), method(method), args(args)
   {
   }
 
   void Run()
   {
-    object->RunMethod5<A1, A2, A3, A4, A5>(method, args);
+    object->RunMethod5 (method, args);
   }
 
 private:
@@ -470,13 +474,14 @@ class ThreadEvent6 : public scfImplementation1<ThreadEvent6<T, A1, A2, A3, A4, A
 {
 public:
   ThreadEvent6(ThreadedCallable<T>* &object, bool (T::*method)(A1, A2, A3, A4, A5, A6), void const** &args)
-    : scfImplementationType(this), object(object), method(method), args(args)
+    : scfImplementation1<ThreadEvent6<T, A1, A2, A3, A4, A5, A6>, iJob> (this),
+      object(object), method(method), args(args)
   {
   }
 
   void Run()
   {
-    object->RunMethod6<A1, A2, A3, A4, A5, A6>(method, args);
+    object->RunMethod6 (method, args);
   }
 
 private:
@@ -490,13 +495,14 @@ class ThreadEvent7 : public scfImplementation1<ThreadEvent7<T, A1, A2, A3, A4, A
 {
 public:
   ThreadEvent7(ThreadedCallable<T>* &object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7), void const** &args)
-    : scfImplementationType(this), object(object), method(method), args(args)
+    : scfImplementation1<ThreadEvent7<T, A1, A2, A3, A4, A5, A6, A7>, iJob> (this),
+      object(object), method(method), args(args)
   {
   }
 
   void Run()
   {
-    object->RunMethod7<A1, A2, A3, A4, A5, A6, A7>(method, args);
+    object->RunMethod7 (method, args);
   }
 
 private:
@@ -510,13 +516,14 @@ class ThreadEvent8 : public scfImplementation1<ThreadEvent8<T, A1, A2, A3, A4, A
 {
 public:
   ThreadEvent8(ThreadedCallable<T>* &object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8), void const** &args)
-    : scfImplementationType(this), object(object), method(method), args(args)
+    : scfImplementation1<ThreadEvent8<T, A1, A2, A3, A4, A5, A6, A7, A8>, iJob> (this),
+      object(object), method(method), args(args)
   {
   }
 
   void Run()
   {
-    object->RunMethod8<A1, A2, A3, A4, A5, A6, A7, A8>(method, args);
+    object->RunMethod8 (method, args);
   }
 
 private:
@@ -530,13 +537,14 @@ class ThreadEvent9 : public scfImplementation1<ThreadEvent9<T, A1, A2, A3, A4, A
 {
 public:
   ThreadEvent9(ThreadedCallable<T>* &object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9), void const** &args)
-    : scfImplementationType(this), object(object), method(method), args(args)
+    : scfImplementation1<ThreadEvent9<T, A1, A2, A3, A4, A5, A6, A7, A8, A9>, iJob>(this),
+      object(object), method(method), args(args)
   {
   }
 
   void Run()
   {
-    object->RunMethod9<A1, A2, A3, A4, A5, A6, A7, A8, A9>(method, args);
+    object->RunMethod9 (method, args);
   }
 
 private:
@@ -550,13 +558,14 @@ class ThreadEvent10 : public scfImplementation1<ThreadEvent10<T, A1, A2, A3, A4,
 {
 public:
   ThreadEvent10(ThreadedCallable<T>* &object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10), void const** &args)
-    : scfImplementationType(this), object(object), method(method), args(args)
+    : scfImplementation1<ThreadEvent10<T, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10>, iJob>(this),
+      object(object), method(method), args(args)
   {
   }
 
   void Run()
   {
-    object->RunMethod10<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10>(method, args);
+    object->RunMethod10 (method, args);
   }
 
 private:
@@ -570,13 +579,14 @@ class ThreadEvent11 : public scfImplementation1<ThreadEvent11<T, A1, A2, A3, A4,
 {
 public:
   ThreadEvent11(ThreadedCallable<T>* &object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11), void const** &args)
-    : scfImplementationType(this), object(object), method(method), args(args)
+    : scfImplementation1<ThreadEvent11<T, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11>, iJob> (this),
+      object(object), method(method), args(args)
   {
   }
 
   void Run()
   {
-    object->RunMethod11<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11>(method, args);
+    object->RunMethod11 (method, args);
   }
 
 private:
@@ -590,13 +600,14 @@ class ThreadEvent12 : public scfImplementation1<ThreadEvent12<T, A1, A2, A3, A4,
 {
 public:
   ThreadEvent12(ThreadedCallable<T>* &object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12), void const** &args)
-    : scfImplementationType(this), object(object), method(method), args(args)
+    : scfImplementation1<ThreadEvent12<T, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12>, iJob> (this),
+      object(object), method(method), args(args)
   {
   }
 
   void Run()
   {
-    object->RunMethod12<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12>(method, args);
+    object->RunMethod12 (method, args);
   }
 
 private:
@@ -610,13 +621,14 @@ class ThreadEvent13 : public scfImplementation1<ThreadEvent13<T, A1, A2, A3, A4,
 {
 public:
   ThreadEvent13(ThreadedCallable<T>* &object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13), void const** &args)
-    : scfImplementationType(this), object(object), method(method), args(args)
+    : scfImplementation1<ThreadEvent13<T, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13>, iJob> (this),
+      object(object), method(method), args(args)
   {
   }
 
   void Run()
   {
-    object->RunMethod13<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13>(method, args);
+    object->RunMethod13 (method, args);
   }
 
 private:
@@ -630,13 +642,14 @@ class ThreadEvent14 : public scfImplementation1<ThreadEvent14<T, A1, A2, A3, A4,
 {
 public:
   ThreadEvent14(ThreadedCallable<T>* &object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14), void const** &args)
-    : scfImplementationType(this), object(object), method(method), args(args)
+    : scfImplementation1<ThreadEvent14<T, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14>, iJob> (this),
+      object(object), method(method), args(args)
   {
   }
 
   void Run()
   {
-    object->RunMethod14<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14>(method, args);
+    object->RunMethod14 (method, args);
   }
 
 private:
@@ -650,13 +663,14 @@ class ThreadEvent15 : public scfImplementation1<ThreadEvent15<T, A1, A2, A3, A4,
 {
 public:
   ThreadEvent15(ThreadedCallable<T>* &object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15), void const** &args)
-    : scfImplementationType(this), object(object), method(method), args(args)
+    : scfImplementation1<ThreadEvent15<T, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15>, iJob> (this), 
+      object(object), method(method), args(args)
   {
   }
 
   void Run()
   {
-    object->RunMethod15<A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15>(method, args);
+    object->RunMethod15 (method, args);
   }
 
 private:
@@ -675,7 +689,7 @@ public:
   }
 
   template<typename T>
-  void const* Store(T& p)
+  void const* Store(const T& p)
   {
     T* ptr = new (this) T;
     *ptr = p;
