@@ -26,6 +26,8 @@
 #include "csutil/weakref.h"
 #include "iutil/job.h"
 
+class TEventMemPool;
+
 template<class T>
 class ThreadedCallable
 {
@@ -368,7 +370,7 @@ class ThreadEvent1 : public scfImplementation1<ThreadEvent1<T, A1>, iJob>
 {
 public:
   ThreadEvent1(ThreadedCallable<T>* &object, bool (T::*method)(A1), void const** &args)
-    : scfImplementationType(this), object(object), method(method), args(args)
+    : scfImplementation1<ThreadEvent1<T, A1>, iJob> (this), object(object), method(method), args(args)
   {
   }
 
