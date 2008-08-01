@@ -1219,7 +1219,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     {
       collection = Engine->CreateCollection (map->map_dir);
     }
-    csRef<iThreadReturn> ret = LevelLoader->LoadMapFile ("world", false, collection, !do_collections, do_dupes);
+    csRef<iThreadReturn> ret = LevelLoader->LoadMapFile ("world", false, collection);
     ret->Wait();
     if (do_collections)
     {
