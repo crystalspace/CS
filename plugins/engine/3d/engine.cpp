@@ -202,6 +202,14 @@ iCameraPosition *csCameraPositionList::NewCameraPosition (const char *name)
   return cp;
 }
 
+csPtr<iCameraPosition> csCameraPositionList::CreateCameraPosition (const char *name)
+{
+  csVector3 v (0);
+  csRef<csCameraPosition> cp;
+  cp.AttachNew (new csCameraPosition (this, name, "", v, v, v));
+  return csPtr<iCameraPosition>(cp);
+}
+
 int csCameraPositionList::GetCount () const
 {
   return (int)positions.GetSize ();
@@ -2908,12 +2916,20 @@ csPtr<iMeshWrapper> csEngine::CreateSectorWallsMesh (
   return csPtr<iMeshWrapper> (thing_wrap);
 }
 
-iSector *csEngine::CreateSector (const char *name)
+iSector *csEngine::CreateSector (const char *name, bool addToList)
 {
   csRef<iSector> sector;
   sector.AttachNew (new csSector (this));
   sector->QueryObject ()->SetName (name);
-  sectors.Add (sector);
+
+  if(addToList)
+  {
+    sectors.Add (sector);
+  }
+  else
+  {
+    sector->IncRef();
+  }
 
   FireNewSector (sector);
 

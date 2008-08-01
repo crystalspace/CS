@@ -243,6 +243,18 @@ iMaterialWrapper *csMaterialList::NewMaterial (iMaterial *material,
   return tm;
 }
 
+csPtr<iMaterialWrapper> csMaterialList::CreateMaterial (iMaterial* material,
+  	const char* name)
+{
+  csRef<iMaterialWrapper> tm;
+  tm.AttachNew (new csMaterialWrapper (this, material));
+  tm->QueryObject ()->SetName (name);
+  if (name)
+    mat_hash.Put (name, tm);
+  tm->QueryObject ()->AddNameChangeListener (listener);
+  return csPtr<iMaterialWrapper>(tm);
+}
+
 int csMaterialList::Add (iMaterialWrapper *obj)
 {
   const char* name = obj->QueryObject ()->GetName ();

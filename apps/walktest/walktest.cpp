@@ -1220,12 +1220,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       collection = Engine->CreateCollection (map->map_dir);
     }
     csRef<iThreadReturn> ret = LevelLoader->LoadMapFile ("world", false, collection, !do_collections, do_dupes);
-    ret->Wait();
-    if (!ret->WasSuccessful())
-    {
-      Report (CS_REPORTER_SEVERITY_ERROR, "Failing to load map!");
-      return false;
-    }
     if (do_collections)
     {
       // Set the cache manager based on current VFS dir.

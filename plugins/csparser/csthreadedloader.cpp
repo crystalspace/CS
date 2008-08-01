@@ -26,14 +26,16 @@
 #include "cstool/vfsdirchange.h"
 
 #include "csutil/eventnames.h"
+#include "csutil/scfstr.h"
 #include "csutil/threadmanager.h"
 #include "csutil/xmltiny.h"
 
-#include "iengine/engine.h"
 #include "iengine/imposter.h"
 #include "iengine/lod.h"
 #include "iengine/mesh.h"
+#include "iengine/meshgen.h"
 #include "iengine/movable.h"
+#include "iengine/portalcontainer.h"
 #include "iengine/scenenode.h"
 #include "iengine/sharevar.h"
 #include "iengine/viscull.h"
@@ -42,6 +44,7 @@
 #include "igraphic/animimg.h"
 #include "igraphic/imageio.h"
 
+#include "imap/modelload.h"
 #include "imap/saverfile.h"
 #include "imap/saverref.h"
 #include "imap/services.h"
@@ -50,17 +53,21 @@
 #include "imesh/objmodel.h"
 #include "imesh/nullmesh.h"
 
+#include "isndsys/ss_manager.h"
+
 #include "itexture/iproctex.h"
 
-#include "iutil/event.h"
-#include "iutil/eventq.h"
 #include "iutil/document.h"
 #include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include "iutil/stringarray.h"
 #include "iutil/vfs.h"
 
 #include "ivaria/keyval.h"
+#include "ivaria/terraform.h"
+
+#include "ivideo/material.h"
 
 #include "csthreadedloader.h"
 #include "csloadercontext.h"
@@ -76,6 +83,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   csThreadedLoader::~csThreadedLoader()
   {
+    listSync->StopRunning();
   }
 
   bool csThreadedLoader::Initialize(iObjectRegistry *objectreg)
@@ -86,8 +94,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iPluginManager> plugin_mgr = csQueryRegistry<iPluginManager>(object_reg);
     loaded_plugins.plugin_mgr = plugin_mgr;
 
-    tm = csQueryRegistry<iThreadManager>(object_reg);
-    if(!tm.IsValid())
+    threadman = csQueryRegistry<iThreadManager>(object_reg);
+    if(!threadman.IsValid())
     {
       return false;
     }
@@ -102,13 +110,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if(!vfs.IsValid())
     {
       return false;
-    }
-
-    csRef<iEventQueue> eventQueue = csQueryRegistry<iEventQueue>(object_reg);
-    if(eventQueue)
-    {
-      ProcessPerFrame = csevFrame(object_reg);
-      eventQueue->RegisterListener(this, ProcessPerFrame);
     }
 
     SyntaxService = csQueryRegistryOrLoad<iSyntaxService> (object_reg,
@@ -137,134 +138,300 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       return false;
     }
 
+    // Optional
+    SndSysManager = csQueryRegistryOrLoad<iSndSysManager> (object_reg,
+      "crystalspace.sndsys.manager", false);
+    SndSysLoader = csQueryRegistry<iSndSysLoader> (object_reg);
+    SndSysRenderer = csQueryRegistry<iSndSysRenderer> (object_reg);
+
+    listSync.AttachNew(new csThreadedListHandler(Engine, this));
+    listSyncThread.AttachNew(new Thread(listSync, true));
+
     return true;
   }
 
-  bool csThreadedLoader::HandleEvent(iEvent& Event)
+  iEngineSequenceManager* csThreadedLoader::GetEngineSequenceManager ()
   {
-    if(Event.Name == ProcessPerFrame)
+    if (!eseqmgr)
     {
-      Engine->SyncEngineLists(this);
+      eseqmgr = csQueryRegistryOrLoad<iEngineSequenceManager> (object_reg,
+        "crystalspace.utilities.sequence.engine");
+      if (!eseqmgr) return 0;
     }
-    return false;
-  }
-
-  THREADED_CALLABLE_IMPL2(csThreadedLoader, LoadImage, const char* fname, int Format)
-  {
-    csRef<iDataBuffer> buf = vfs->ReadFile (fname, false);
-    csRef<iImage> image = LoadImage (buf, fname, Format);
-    if(image.IsValid())
-    {
-      ret->SetResult(csRef<iBase>(image));
-      ret->MarkSuccessful();
-    }
-    ret->MarkFinished();
-  }
-
-  THREADED_CALLABLE_IMPL2(csThreadedLoader, LoadImage, iDataBuffer* buf,  int Format)
-  {
-    ret->MarkFinished();
-  }
-
-  THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadTexture, const char* Filename,
-    int Flags, csRef<iTextureManager> texman, csRef<iImage>* image)
-  {
-    ret->MarkFinished();
-  }
-
-  THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadTexture, iDataBuffer* buf, int Flags,
-    iTextureManager* texman, csRef<iImage>* image)
-  {
-    ret->MarkFinished();
-  }
-
-  THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadTexture, const char* Name,
-    iDataBuffer* buf, int Flags, iTextureManager* texman, bool reg, bool create_material,
-    bool free_image)
-  {
-    ret->MarkFinished();
-  }
-
-  THREADED_CALLABLE_IMPL9(csThreadedLoader, LoadTexture, const char* Name,
-    const char* FileName, int Flags, iTextureManager* texman, bool reg, bool create_material,
-    bool free_image, iCollection* Collection, uint keepFlags)
-  {
-    ret->MarkFinished();
-  }
-
-  THREADED_CALLABLE_IMPL1(csThreadedLoader, LoadSoundSysData, const char* fname)
-  {
-    ret->MarkFinished();
-  }
-
-  THREADED_CALLABLE_IMPL2(csThreadedLoader, LoadSoundStream, const char* fname, int mode3d)
-  {
-    ret->MarkFinished();
-  }
-
-  THREADED_CALLABLE_IMPL2(csThreadedLoader, LoadSoundWrapper, const char* name, const char* fname)
-  {
-    ret->MarkFinished();
+    return eseqmgr;
   }
 
   THREADED_CALLABLE_IMPL2(csThreadedLoader, LoadMeshObjectFactory, const char* fname,
     iStreamSource* ssource)
   {
-    ret->MarkFinished();
+    csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
+      new csLoaderContext (object_reg, Engine, 0, false, true, 0, KEEP_ALL, false));
+
+    csRef<iFile> databuff (vfs->Open (fname, VFS_FILE_READ));
+
+    if (!databuff || !databuff->GetSize ())
+    {
+      ReportError (
+        "crystalspace.maploader.parse.meshfactory",
+        "Could not open mesh object file '%s' on VFS!", fname);
+      return false;
+    }
+
+    csRef<iDocument> doc;
+    bool er = LoadStructuredDoc (fname, databuff, doc);
+    if (!er)
+    {
+      return false;
+    }
+
+    if (doc)
+    {
+      csRef<iDocumentNode> meshfactnode = doc->GetRoot ()->GetNode ("meshfact");
+      if (!meshfactnode)
+      {
+        ReportError (
+          "crystalspace.maploader.parse.map",
+          "File '%s' does not seem to contain a 'meshfact'!", fname);
+        return false;
+      }
+      csRef<iMeshFactoryWrapper> t = Engine->CreateMeshFactory (
+        meshfactnode->GetAttributeValue ("name"), false);
+      if (LoadMeshObjectFactory (ldr_context, t, 0, meshfactnode, 0, ssource))
+      {
+        ldr_context->AddToCollection(t->QueryObject ());
+        AddMeshFactToList(t);
+        ret->SetResult(csRef<iBase>(t));
+        return true;
+      }
+    }
+    else
+    {
+      ReportError ("crystalspace.maploader.parse.plugin",
+        "File does not appear to be a structured mesh factory (%s)!", fname);
+    }
+    return false;
   }
 
   THREADED_CALLABLE_IMPL2(csThreadedLoader, LoadMeshObject, const char* fname,
     iStreamSource* ssource)
   {
-    ret->MarkFinished();
+    csRef<iFile> databuff (vfs->Open (fname, VFS_FILE_READ));
+    csRef<iMeshWrapper> mesh;
+    csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
+      new csLoaderContext (object_reg, Engine, 0, false, true, 0, KEEP_ALL, false));
+
+    if (!databuff || !databuff->GetSize ())
+    {
+      ReportError (
+        "crystalspace.maploader.parse.meshobject",
+        "Could not open mesh object file '%s' on VFS!", fname);
+      return false;
+    }
+
+    csRef<iDocument> doc;
+    bool er = LoadStructuredDoc (fname, databuff, doc);
+    if (!er)
+    {
+      return false;
+    }
+
+    if (doc)
+    {
+      csRef<iDocumentNode> meshobjnode = doc->GetRoot ()->GetNode ("meshobj");
+      if (!meshobjnode)
+      {
+        ReportError (
+          "crystalspace.maploader.parse.map",
+          "File '%s' does not seem to contain a 'meshobj'!", fname);
+        return false;
+      }
+      mesh = Engine->CreateMeshWrapper (meshobjnode->GetAttributeValue ("name"), false);
+      if (LoadMeshObject (ldr_context, mesh, 0, meshobjnode, ssource))
+      {
+        ldr_context->AddToCollection(mesh->QueryObject ());
+        AddMeshToList(mesh);
+        ret->SetResult(csRef<iBase>(mesh));
+        return true;
+      }
+    }
+    else
+    {
+      ReportError ("crystalspace.maploader.parse.plugin",
+        "File does not appear to be a structured mesh object (%s)!", fname);
+    }
+    return false;
   }
 
   THREADED_CALLABLE_IMPL2(csThreadedLoader, LoadShader, const char* filename,
     bool registerShader)
   {
-    ret->MarkFinished();
+    csRef<iShaderManager> shaderMgr = csQueryRegistry<iShaderManager> (
+      object_reg);
+    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+
+    csVfsDirectoryChanger dirChanger (vfs);
+
+    csRef<iFile> shaderFile = vfs->Open (filename, VFS_FILE_READ);
+    if (!shaderFile)
+    {
+      ReportError ("crystalspace.maploader",
+        "Unable to open shader file '%s'!", filename);
+      return false;
+    }
+
+    csRef<iDocumentSystem> docsys = csQueryRegistry<iDocumentSystem> (
+      object_reg);
+    if (docsys == 0)
+      docsys.AttachNew (new csTinyDocumentSystem ());
+
+    csRef<iDocument> shaderDoc = docsys->CreateDocument ();
+    const char* err = shaderDoc->Parse (shaderFile, false);
+    if (err != 0)
+    {
+      ReportError ("crystalspace.maploader",
+        "Could not parse shader file '%s': %s",
+        filename, err);
+      return false;
+    }
+    csRef<iDocumentNode> shaderNode = shaderDoc->GetRoot ()->GetNode ("shader");
+    if (!shaderNode)
+    {
+      ReportError ("crystalspace.maploader",
+        "Shader file '%s' is not a valid shader XML file!", filename);
+      return false;
+    }
+
+    dirChanger.ChangeTo (filename);
+
+    const char* type = shaderNode->GetAttributeValue ("compiler");
+    if (type == 0)
+      type = shaderNode->GetAttributeValue ("type");
+    if (type == 0)
+      type = "xmlshader";
+    csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
+
+    csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
+      new csLoaderContext (object_reg, Engine, 0, true, true, 0, KEEP_USED, false));
+
+    csRef<iShader> shader = shcom->CompileShader (ldr_context, shaderNode);
+    if (shader)
+    {
+      shader->SetFileName (filename);
+      if (registerShader)
+        shaderMgr->RegisterShader (shader);
+      ret->SetResult(csRef<iBase>(shader));
+      return true;
+    }
+    return false;
   }
 
   THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadMapFile, const char* filename,
     bool clearEngine, iCollection* collection, bool searchCollectionOnly, bool checkDupes,
     iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags)
   {
-    ret->MarkFinished();
+    csRef<iFile> buf = vfs->Open (filename, VFS_FILE_READ);
+
+    if (!buf)
+    {
+      ReportError (
+        "crystalspace.maploader.parse.map",
+        "Could not open map file '%s' on VFS!", filename);
+      return false;
+    }
+
+    csRef<iDocument> doc;
+    bool er = LoadStructuredDoc (filename, buf, doc);
+    if (!er)
+    {
+      return false;
+    }
+
+    if (doc)
+    {
+      csRef<iDocumentNode> world_node = doc->GetRoot ()->GetNode ("world");
+      if (!world_node)
+      {
+        SyntaxService->ReportError (
+          "crystalspace.maploader.parse.expectedworld",
+          world_node, "Expected 'world' token!");
+        return false;
+      }
+
+      if (Engine->GetSaveableFlag () && collection)
+      {
+        csRef<iSaverFile> saverFile;
+        saverFile.AttachNew (new csSaverFile (filename, CS_SAVER_FILE_WORLD));
+        collection->Add(saverFile->QueryObject());
+      }
+
+      return LoadMapTC (ret, world_node, clearEngine, collection, searchCollectionOnly,
+        checkDupes, ssource, missingdata, keepFlags);
+    }
+    else
+    {
+      ReportError ("crystalspace.maploader.parse.plugin", 
+        "File does not appear to be a structured map file (%s)!", filename);
+    }
+    return false;
   }
 
   THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadMap, iDocumentNode* world_node,
     bool clearEngine, iCollection* collection, bool searchCollectionOnly, bool checkDupes,
     iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags)
   {
-    ret->MarkFinished();
+    if (clearEngine)
+    {
+      Engine->DeleteAll ();
+      Engine->ResetWorldSpecificSettings();
+    }
+    csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
+      new csLoaderContext (object_reg, Engine, collection, searchCollectionOnly,
+      checkDupes, missingdata, keepFlags, false));
+
+    return LoadMap (ldr_context, world_node, ssource, missingdata);
   }
 
   THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadLibraryFile, const char* filename,
     iCollection* collection, bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource,
     iMissingLoaderData* missingdata, uint keepFlags)
   {
-    ret->MarkFinished();
+    return LoadMapLibraryFile (filename, collection, searchCollectionOnly, checkDupes,
+      ssource, missingdata, keepFlags);
   }
 
   THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadLibrary, iDocumentNode* lib_node,
     iCollection* collection, bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource,
     iMissingLoaderData* missingdata, uint keepFlags)
   {
-    ret->MarkFinished();
+    csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext>
+      (new csLoaderContext (object_reg, Engine, collection, searchCollectionOnly, checkDupes,
+      missingdata, keepFlags, false));
+
+    return LoadLibrary (ldr_context, lib_node, ssource, missingdata, true);
   }
 
   THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadFile, const char* fname,
     iCollection* collection, bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource,
     const char* override_name, iMissingLoaderData* missingdata, uint keepFlags)
   {
-    ret->MarkFinished();
+    csRef<iDataBuffer> buf = vfs->ReadFile (fname);
+
+    if (!buf)
+    {
+      ReportError("crystalspace.maploader.parse", "Could not open map file '%s' on VFS!", fname);
+      return false;
+    }
+
+    return Load (buf, fname, collection, searchCollectionOnly, checkDupes, ssource,
+      override_name, missingdata, keepFlags);
   }
 
   THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadBuffer, iDataBuffer* buffer,
     iCollection* collection, bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource,
     const char* override_name, iMissingLoaderData* missingdata, uint keepFlags)
   {
-    ret->MarkFinished();
+    return Load(buffer, 0, collection, searchCollectionOnly, checkDupes, ssource,
+  	override_name, missingdata, keepFlags);
   }
 
   THREADED_CALLABLE_IMPL9(csThreadedLoader, LoadNode, csRef<iDocumentNode> node,
@@ -280,35 +447,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iDocumentNode> meshfactnode = node->GetNode("meshfact");
     if(meshfactnode)
     {
-      FindOrLoadMeshFactoryTC(ret, ldr_context, meshfactnode, override_name, 0, 0, ssource);
-      return;
+      return FindOrLoadMeshFactoryTC(ret, ldr_context, meshfactnode, override_name, 0, 0, ssource);
     }
 
     // Mesh Object
     csRef<iDocumentNode> meshobjnode = node->GetNode ("meshobj");
     if(meshobjnode)
     {
-      FindOrLoadMeshObjectTC(ret, ldr_context, meshobjnode, override_name, 0, ssource);
-      return;
+      return FindOrLoadMeshObjectTC(ret, ldr_context, meshobjnode, override_name, 0, ssource);
     }
-/*
+
     // World node.
     csRef<iDocumentNode> worldnode = node->GetNode ("world");
     if(worldnode)
     {
-      loadResult->success = LoadMap (ldr_context, worldnode, ssource, missingdata);
-      return;
+      return LoadMap (ldr_context, worldnode, ssource, missingdata);
     }
-*/
+
     // Library node.
     csRef<iDocumentNode> libnode = node->GetNode ("library");
     if (libnode)
     {
-      LoadLibrary(ldr_context, libnode, ssource, missingdata, true);
-      ret->MarkFinished();      
-      return;
+      return LoadLibrary(ldr_context, libnode, ssource, missingdata, true);
     }
-/*
+
     // Portals.
     csRef<iDocumentNode> portalsnode = node->GetNode ("portals");
     if (portalsnode)
@@ -317,7 +479,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         portalsnode->GetAttributeValue ("name");
       if (ldr_context->CheckDupes () && portalsname)
       {
-        iMeshWrapper* mw = Engine->FindMeshObject (portalsname);
+        csRef<iMeshWrapper> mw = Engine->FindMeshObject (portalsname);
         if (mw)
         {
           csRef<iPortalContainer> pc = 
@@ -325,30 +487,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           if (pc)
           {
             ldr_context->AddToCollection(mw->QueryObject());
-            loadResult->result = mw;
-            loadResult->success = true;
-            return;
+            ret->SetResult(csRef<iBase>(mw));
+            return true;
           }
         }
       }
       if (ParsePortals (ldr_context, portalsnode, 0, 0, ssource))
       {
-        iMeshWrapper* mw = 0;
+        csRef<iMeshWrapper> mw = 0;
         if (ldr_context->GetCollection())
           mw = ldr_context->GetCollection()->FindMeshObject(portalsname);
 
         if (mw)
         {
           mw->QueryObject()->SetName(portalsname);
-          loadResult->result = mw;
-          loadResult->success = true;
-          return;
+          ret->SetResult(csRef<iBase>(mw));
+          return true;
         }
       }
 
-      loadResult->result = 0;
-      loadResult->success = false;
-      return;
+      return false;
     }
 
     // Light.
@@ -357,18 +515,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     {
       const char* lightname = override_name ? override_name :
         lightnode->GetAttributeValue ("name");
-      iLight* light = ParseStatlight (ldr_context, lightnode);
+      csRef<iLight> light = ParseStatlight (ldr_context, lightnode);
       if (light)
       {
         light->QueryObject()->SetName(lightname);
-        loadResult->result = light;
-        loadResult->success = true;
-        return;
+        ret->SetResult(csRef<iBase>(light));
+        return true;
       }
 
-      loadResult->result = 0;
-      loadResult->success = false;
-      return;
+      return false;
     }
 
     // MeshRef
@@ -379,35 +534,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         meshrefnode->GetAttributeValue ("name");
       if (ldr_context->CheckDupes () && meshobjname)
       {
-        iMeshWrapper* mw = Engine->FindMeshObject (meshobjname);
+        csRef<iMeshWrapper> mw = Engine->FindMeshObject (meshobjname);
         if (mw)
         {
           ldr_context->AddToCollection(mw->QueryObject());
-          loadResult->result = mw;
-          loadResult->success = true;
-          return;
+          ret->SetResult(csRef<iBase>(mw));
+          return true;
         }
       }
-      csRef<iMeshWrapper> mesh = LoadMeshObjectFromFactory (ldr_context, meshrefnode, ssource);
-      if (mesh)
+      csRef<iMeshWrapper> mw = LoadMeshObjectFromFactory (ldr_context, meshrefnode, ssource);
+      if (mw)
       {
-        ldr_context->AddToCollection(mesh->QueryObject());
-        loadResult->result = mesh;
-        loadResult->success = true;
-        return;
-      }
-      else
-      {
-        // Error is already reported.
-        loadResult->result = 0;
-        loadResult->success = false;
-        return;
+        ldr_context->AddToCollection(mw->QueryObject());
+        ret->SetResult(csRef<iBase>(mw));
+        return true;
       }
     }
-*/
+
     ReportError("crystalspace.maploader.parse",
       "File doesn't seem to be a world, library, meshfact, meshobj, meshref, portals or light file!");
-    ret->MarkFinished(); 
+    return false;
   }
 
   THREADED_CALLABLE_IMPL6(csThreadedLoader, FindOrLoadMeshFactory, csRef<iLoaderContext> ldr_context,
@@ -422,10 +568,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if(mfw)
       {
         ldr_context->AddToCollection(mfw->QueryObject());
-        ret->MarkSuccessful();
         ret->SetResult(csRef<iBase>(mfw));
-        ret->MarkFinished();
-        return;
+        return true;
       }
     }
 
@@ -433,12 +577,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if(LoadMeshObjectFactory(ldr_context, mfw, parent, meshfactnode, transf, ssource))
     {
       ldr_context->AddToCollection(mfw->QueryObject());
-      loaderMeshFactories.Push(mfw);
-      ret->MarkSuccessful();
+      AddMeshFactToList(mfw);
       ret->SetResult(csRef<iBase>(mfw));
+      return true;
     }
-
-    ret->MarkFinished();
+    return false;
   }
 
   THREADED_CALLABLE_IMPL5(csThreadedLoader, FindOrLoadMeshObject, csRef<iLoaderContext> ldr_context,
@@ -453,10 +596,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         if(mw)
         {
           ldr_context->AddToCollection(mw->QueryObject());
-          ret->MarkSuccessful();
           ret->SetResult(csRef<iBase>(mw));
-          ret->MarkFinished();
-          return;
+          return true;
         }
       }
 
@@ -465,11 +606,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
         ldr_context->AddToCollection(mw->QueryObject());
         loaderMeshes.Push(mw);
-        ret->MarkSuccessful();
         ret->SetResult(csRef<iBase>(mw));
+        return true;
       }
-
-      ret->MarkFinished();
+      return false;
   }
 
   bool csThreadedLoader::LoadShaderExpressions (iLoaderContext* ldr_context,
@@ -510,6 +650,162 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       }
     }
+    return true;
+  }
+
+  bool csThreadedLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* world_node,
+    iStreamSource* ssource, iMissingLoaderData* missingdata)
+  {
+    if (!Engine)
+    {
+      SyntaxService->ReportError (
+        "crystalspace.maploader.parse",
+        world_node, "The engine plugin is missing!");
+      return false;
+    }
+
+    // Will be set to true if we find a <shader> section.
+    bool shader_given = false;
+
+    /// Points to proxy textures ready for processing.
+    csSafeCopyArray<ProxyTexture> proxyTextures;
+
+    /// Points to materials created by the current map loading.
+    csWeakRefArray<iMaterialWrapper> materialArray;
+
+    csRef<iDocumentNode> sequences;
+    csRef<iDocumentNode> triggers;
+
+    csRef<iDocumentNodeIterator> it = world_node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+      case XMLTOKEN_SHADEREXPRESSIONS:
+        if (!LoadShaderExpressions (ldr_context, child))
+          return false;
+        break;
+      case XMLTOKEN_SETTINGS:
+        if (!LoadSettings (child))
+          return false;
+        break;
+      case XMLTOKEN_RENDERPRIORITIES:
+        ReportWarning (
+          "crystalspace.maploader.parse.region",
+          world_node, "<renderpriorities> is no longer supported!");
+        break;
+      case XMLTOKEN_ADDON:
+        if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, false, ssource))
+          return false;
+        break;
+      case XMLTOKEN_META:
+        if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, true, ssource))
+          return false;
+        break;
+      case XMLTOKEN_MESHFACT:
+        {
+          csRef<iDocumentAttribute> attr_name = child->GetAttribute ("name");
+          const char* name = attr_name ? attr_name->GetValue () : 0;
+          csRef<iDocumentAttribute> attr_file = child->GetAttribute ("file");
+          if (attr_file)
+          {
+            const char* filename = attr_file->GetValue ();
+            LoadFile(filename, ldr_context->GetCollection (),
+              ldr_context->CurrentCollectionOnly (),
+              ldr_context->CheckDupes (),
+              ssource, name, missingdata,
+              ldr_context->GetKeepFlags());
+          }
+
+          FindOrLoadMeshFactory(ldr_context, child, 0, 0, 0, ssource);
+        }
+        break;
+      case XMLTOKEN_SECTOR:
+        if (!ParseSector (ldr_context, child, ssource))
+          return false;
+        break;
+      case XMLTOKEN_SEQUENCES:
+        // Defer sequence parsing to later.
+        sequences = child;
+        break;
+      case XMLTOKEN_TRIGGERS:
+        // Defer trigger parsing to later.
+        triggers = child;
+        break;
+      case XMLTOKEN_PLUGINS:
+        if (!LoadPlugins (child))
+          return false;
+        break;
+      case XMLTOKEN_TEXTURES:
+        if (!ParseTextureList (ldr_context, child, proxyTextures))
+          return false;
+        break;
+      case XMLTOKEN_MATERIALS:
+        if (!ParseMaterialList (ldr_context, child, materialArray))
+          return false;
+        break;
+      case  XMLTOKEN_VARIABLES:
+        if (!ParseVariableList (ldr_context, child))
+          return false;
+        break;
+      case XMLTOKEN_SOUNDS:
+        if (!LoadSounds (child))
+          return false;
+        break;
+      case XMLTOKEN_LIBRARY:
+        {
+          if (!LoadLibraryFromNode (ldr_context, child, ssource, missingdata,
+            false))
+            return false;
+          break;
+        }
+      case XMLTOKEN_START:
+        {
+          const char* name = child->GetAttributeValue ("name");
+          csRef<iCameraPosition> campos = Engine->GetCameraPositions ()->
+            CreateCameraPosition (name ? name : "Start");
+          AddCamposToList(campos);
+          ldr_context->AddToCollection(campos->QueryObject ());
+          if (!ParseStart (child, campos))
+            return false;
+          break;
+        }
+      case XMLTOKEN_KEY:
+        {
+          if (!ParseKey (child, Engine->QueryObject()))
+            return false;
+          break;
+        }
+      case XMLTOKEN_SHADERS:
+        shader_given = true;
+        ParseShaderList (ldr_context, child);
+        break;
+      default:
+        SyntaxService->ReportBadToken (child);
+        return false;
+      }
+    }
+
+    // Sequences and triggers are parsed at the end because
+    // all sectors and other objects need to be present.
+    if (sequences)
+      if (!LoadSequences (ldr_context, sequences))
+        return false;
+    if (triggers)
+      if (!LoadTriggers (ldr_context, triggers))
+        return false;
+
+    // Go through the list of proxy textures and load those needed.
+    if(ldr_context->GetKeepFlags() == KEEP_USED)
+    {
+      if(!LoadProxyTextures(proxyTextures, materialArray))
+        return false;
+    }
+
     return true;
   }
 
@@ -643,7 +939,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     csRef<iDocumentNode> sequences;
     csRef<iDocumentNode> triggers;
-/*
+
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
     while (it->HasNext ())
     {
@@ -730,8 +1026,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_MESHFACT:
         {
-          csLoadResult loadResult;
-          LoadMeshFactory(ldr_context, &loadResult, child, 0, 0, 0, ssource);
+          FindOrLoadMeshFactory(ldr_context, child, 0, 0, 0, ssource);
         }
         break;
       case XMLTOKEN_PLUGINS:
@@ -758,7 +1053,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if(!LoadProxyTextures(proxyTextures, materialArray))
         return false;
     }
-*/
+
     return true;
   }
 
@@ -2704,50 +2999,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 #undef TEST_MISSING_MESH
   }
 
-  csPtr<iImage> csThreadedLoader::LoadImage (iDataBuffer* buf, const char* fname,
-    int Format)
-  {
-    if (!ImageLoader)
-      return 0;
-
-    if (Format & CS_IMGFMT_INVALID)
-    {
-      if (Engine)
-        Format = Engine->GetTextureFormat ();
-      else if (g3d)
-        Format = g3d->GetTextureManager()->GetTextureFormat();
-      else
-        Format = CS_IMGFMT_TRUECOLOR;
-    }
-
-    if (!buf || !buf->GetSize ())
-    {
-      ReportWarning (
-        "crystalspace.maploader.parse.image",
-        "Could not open image file '%s' on VFS!", fname ? fname : "<unknown>");
-      return 0;
-    }
-
-    // we don't use csRef because we need to return an Increfed object later
-    csRef<iImage> image (ImageLoader->Load (buf, Format));
-    if (!image)
-    {
-      ReportWarning (
-        "crystalspace.maploader.parse.image",
-        "Could not load image '%s'. Unknown format!",
-        fname ? fname : "<unknown>");
-      return 0;
-    }
-
-    if (fname)
-    {
-      csRef<iDataBuffer> xname = vfs->ExpandPath (fname);
-      image->SetName (**xname);
-    }
-
-    return csPtr<iImage> (image);
-  }
-
   csRef<iMeshWrapper> csThreadedLoader::LoadMeshObjectFromFactory (
     iLoaderContext* ldr_context, iDocumentNode* node,
     iStreamSource* ssource)
@@ -2857,6 +3108,595 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       const csRef<iSceneNodeArray> nodeChildren = sn->GetChildrenArray ();
       AddChildrenToCollection (ldr_context, nodeChildren);
     }
+  }
+
+  bool csThreadedLoader::LoadSounds (iDocumentNode* node)
+  {
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+      case XMLTOKEN_SOUND:
+        {
+          const char* name = child->GetAttributeValue ("name");
+          const char* filename = name;
+          csRef<iDocumentNode> filenode = child->GetNode ("file");
+          if (filenode)
+          {
+            filename = filenode->GetContentsValue ();
+          }
+          else
+          {
+            const char* fname = child->GetAttributeValue ("file");
+            if (fname) filename = fname;
+          }
+          int mode3d = -1;
+          csRef<iDocumentAttribute> at = child->GetAttribute ("mode3d");
+          if (at)
+          {
+            ReportWarning (
+              "crystalspace.maploader.parse.sound",
+              child, "The 'mode3d' attribute is deprecated! Specify 2d/3d mode when playing sound.");
+            const char* v = at->GetValue ();
+            if (!strcasecmp ("disable", v))
+              mode3d = CS_SND3D_DISABLE;
+            else if (!strcasecmp ("relative", v))
+              mode3d = CS_SND3D_RELATIVE;
+            else if (!strcasecmp ("absolute", v))
+              mode3d = CS_SND3D_ABSOLUTE;
+            else
+            {
+              SyntaxService->ReportError (
+                "crystalspace.maploader.parse.sound", child,
+                "Use either 'disable', 'relative', or 'absolute' for mode3d attribute!");
+              return false;
+            }
+          }
+
+          // New sound system.
+          if (!SndSysLoader || !SndSysManager)
+          {
+            //SyntaxService->ReportError (
+            //"crystalspace.maploader.parse.sound", child,
+            //"New sound loader not loaded!");
+            return true;
+          }
+          csRef<iSndSysWrapper> snd = SndSysManager->FindSoundByName (name);
+          if (!snd)
+          {
+            csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csThreadReturn(threadman));
+            LoadSoundWrapperTC (ret, name, filename);
+            snd = scfQueryInterface<iSndSysWrapper>(ret->GetResultRefPtr());
+          }
+          if (snd)
+          {
+            csRef<iDocumentNodeIterator> it2 (child->GetNodes ());
+            while (it2->HasNext ())
+            {
+              csRef<iDocumentNode> child2 = it2->Next ();
+              if (child2->GetType () != CS_NODE_ELEMENT) continue;
+              switch (xmltokens.Request (child2->GetValue ()))
+              {
+              case XMLTOKEN_KEY:
+                {
+                  if (!ParseKey (child2, snd->QueryObject()))
+                    return false;
+                }
+                break;
+              }
+            }
+          }
+        }
+        break;
+      default:
+        SyntaxService->ReportBadToken (child);
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  bool csThreadedLoader::LoadPlugins (iDocumentNode* node)
+  {
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+      case XMLTOKEN_PLUGIN:
+        {
+          const char* plugin_name = child->GetAttributeValue ("name");
+          loaded_plugins.NewPlugin (plugin_name, child);
+          if (Engine->GetSaveableFlag ())
+          {
+            const char* plugin_id = loaded_plugins.FindPluginClassID (
+              plugin_name);
+            if (plugin_id)
+            {
+              csRef<iPluginReference> pluginref;
+              pluginref.AttachNew (new csPluginReference (plugin_name,
+                plugin_id));
+              object_reg->Register (pluginref,
+                csString ("_plugref_") + plugin_id);
+            }
+          }
+        }
+        break;
+
+      default:
+        SyntaxService->ReportBadToken (child);
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  bool csThreadedLoader::LoadSettings (iDocumentNode* node)
+  {
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+      case XMLTOKEN_FASTMESH:
+        ReportWarning (
+          "crystalspace.maploader.parse.xml",
+          "<fastmesh> is no longer needed.");
+        break;
+      case XMLTOKEN_CLEARZBUF:
+        {
+          bool yesno;
+          if (!SyntaxService->ParseBool (child, yesno, true))
+            return false;
+          Engine->SetClearZBuf (yesno);
+        }
+        break;
+      case XMLTOKEN_CLEARSCREEN:
+        {
+          bool yesno;
+          if (!SyntaxService->ParseBool (child, yesno, true))
+            return false;
+          Engine->SetClearScreen (yesno);
+        }
+        break;
+      case XMLTOKEN_MAXLIGHTMAPSIZE:
+        {
+          int max[2];
+          max[0] = child->GetAttributeValueAsInt ("horizontal");
+          max[1] = child->GetAttributeValueAsInt ("vertical");
+          if ( (max[0] > 0) && (max[1] > 0) )
+          {
+            Engine->SetMaxLightmapSize (max[0], max[1]);
+          }
+          else
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.settings",
+              child, "Bogus maximum lightmap size %dx%d", max[0], max[1]);
+            return false;
+          }
+        }
+        break;
+      case XMLTOKEN_AMBIENT:
+        {
+          csColor c;
+          if (!SyntaxService->ParseColor (child, c))
+            return false;
+          Engine->SetAmbientLight (c);
+        }
+        break;
+      default:
+        SyntaxService->ReportBadToken (child);
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  bool csThreadedLoader::LoadTriMeshInSector (iLoaderContext* ldr_context,
+    iMeshWrapper* mesh, iDocumentNode* node, iStreamSource* ssource)
+  {
+    iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
+    csRef<iTriangleMesh> trimesh;
+    csArray<csStringID> ids;
+
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+      case XMLTOKEN_ADDON:
+        if (!LoadAddOn (ldr_context, child, mesh, false, ssource))
+          return false;
+        break;
+      case XMLTOKEN_META:
+        if (!LoadAddOn (ldr_context, child, mesh, true, ssource))
+          return false;
+        break;
+      case XMLTOKEN_MOVE:
+        {
+          mesh->GetMovable ()->SetTransform (csMatrix3 ());     // Identity
+          mesh->GetMovable ()->SetPosition (csVector3 (0));
+          csRef<iDocumentNode> matrix_node = child->GetNode ("matrix");
+          if (matrix_node)
+          {
+            csMatrix3 m;
+            if (!SyntaxService->ParseMatrix (matrix_node, m))
+              return false;
+            if (!TestOrthoMatrix (m))
+            {
+              ReportWarning (
+                "crystalspace.maploader.load.mesh",
+                child, "Scaling of mesh objects is not allowed in CS!");
+            }
+            mesh->GetMovable ()->SetTransform (m);
+          }
+          csRef<iDocumentNode> vector_node = child->GetNode ("v");
+          if (vector_node)
+          {
+            csVector3 v;
+            if (!SyntaxService->ParseVector (vector_node, v))
+              return false;
+            mesh->GetMovable ()->SetPosition (v);
+          }
+          mesh->GetMovable ()->UpdateMove ();
+          break;
+        }
+      case XMLTOKEN_BOX:
+        if (!ParseTriMeshChildBox (child, trimesh))
+          return false;
+        break;
+      case XMLTOKEN_MESH:
+        if (!ParseTriMeshChildMesh (child, trimesh))
+          return false;
+        break;
+      case XMLTOKEN_ID:
+        ids.Push (stringSet->Request (child->GetContentsValue ()));
+        break;
+      default:
+        SyntaxService->ReportBadToken (child);
+        return false;
+      }
+    }
+
+    if (ids.GetSize () == 0)
+    {
+      SyntaxService->ReportError (
+        "crystalspace.maploader.parse.trimesh",
+        node, "No id's for this triangle mesh!");
+      return false;
+    }
+    if (!trimesh)
+    {
+      SyntaxService->ReportError (
+        "crystalspace.maploader.parse.sector.trimesh",
+        node, "Please specify either <mesh/> or <box/>!");
+      return false;
+    }
+
+    size_t i;
+    for (i = 0 ; i < ids.GetSize () ; i++)
+      objmodel->SetTriangleData (ids[i], trimesh);
+
+    csRef<iNullMeshState> nullmesh = scfQueryInterface<iNullMeshState> (
+      mesh->GetMeshObject ());
+    CS_ASSERT (nullmesh != 0);
+    csBox3 bbox;
+    csVector3* vt = trimesh->GetVertices ();
+    bbox.StartBoundingBox (vt[0]);
+    for (i = 1 ; i < trimesh->GetVertexCount () ; i++)
+    {
+      bbox.AddBoundingVertexSmart (vt[i]);
+    }
+    nullmesh->SetBoundingBox (bbox);
+
+    return true;
+  }
+
+  bool csThreadedLoader::LoadMeshGen (iLoaderContext* ldr_context,
+    iDocumentNode* node, iSector* sector)
+  {
+    const char* name = node->GetAttributeValue ("name");
+    iMeshGenerator* meshgen = sector->CreateMeshGenerator (name);
+    ldr_context->AddToCollection(meshgen->QueryObject ());
+
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+      case XMLTOKEN_GEOMETRY:
+        if (!LoadMeshGenGeometry (ldr_context, child, meshgen))
+          return false;
+        break;
+      case XMLTOKEN_MESHOBJ:
+        {
+          const char* meshname = child->GetContentsValue ();
+          iMeshList* meshes = sector->GetMeshes ();
+          iMeshWrapper* mesh = meshes->FindByName (meshname);
+          //iMeshWrapper* mesh = ldr_context->FindMeshObject (meshname);
+          if (!mesh)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.meshgen",
+              child, "Can't find mesh object '%s' for mesh generator!",
+              meshname);
+            return false;
+          }
+          meshgen->AddMesh (mesh);
+        }
+        break;
+      case XMLTOKEN_DENSITYSCALE:
+        {
+          float mindist = child->GetAttributeValueAsFloat ("mindist");
+          float maxdist = child->GetAttributeValueAsFloat ("maxdist");
+          float maxfactor = child->GetAttributeValueAsFloat ("maxfactor");
+          meshgen->SetDensityScale (mindist, maxdist, maxfactor);
+        }
+        break;
+      case XMLTOKEN_ALPHASCALE:
+        {
+          float mindist = child->GetAttributeValueAsFloat ("mindist");
+          float maxdist = child->GetAttributeValueAsFloat ("maxdist");
+          meshgen->SetAlphaScale (mindist, maxdist);
+        }
+        break;
+      case XMLTOKEN_NUMBLOCKS:
+        meshgen->SetBlockCount (child->GetContentsValueAsInt ());
+        break;
+      case XMLTOKEN_CELLDIM:
+        meshgen->SetCellCount (child->GetContentsValueAsInt ());
+        break;
+      case XMLTOKEN_SAMPLEBOX:
+        {
+          csBox3 b;
+          if (!SyntaxService->ParseBox (child, b))
+            return false;
+          meshgen->SetSampleBox (b);
+        }
+        break;
+      default:
+        SyntaxService->ReportBadToken (child);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  bool csThreadedLoader::LoadMeshGenGeometry (iLoaderContext* ldr_context,
+    iDocumentNode* node,
+    iMeshGenerator* meshgen)
+  {
+    iMeshGeneratorGeometry* geom = meshgen->CreateGeometry ();
+
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+      case XMLTOKEN_FACTORY:
+        {
+          const char* factname = child->GetAttributeValue ("name");
+          float maxdist = child->GetAttributeValueAsFloat ("maxdist");
+          iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+          if (!fact)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.meshgen",
+              child, "Can't find mesh factory '%s' for mesh generator!",
+              factname);
+            return false;
+          }
+          geom->AddFactory (fact, maxdist);
+        }
+        break;
+      case XMLTOKEN_POSITIONMAP:
+        {
+          const char* map_name = child->GetAttributeValue ("mapname");
+          csRef<iTerraFormer> map = csQueryRegistryTagInterface<iTerraFormer> 
+            (object_reg, map_name);
+          if (!map)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.meshgen",
+              child, "Can't find map position map terraformer '%s'!", map_name);
+            return false;
+          }
+
+          csVector2 min, max;
+          csRef<iDocumentNode> region_node = child->GetNode ("region");
+
+          SyntaxService->ParseVector (region_node->GetNode ("min"), min);
+          SyntaxService->ParseVector (region_node->GetNode ("max"), max);
+
+          float value = child->GetAttributeValueAsFloat ("value");
+
+          uint resx = child->GetAttributeValueAsInt ("resx");
+          uint resy = child->GetAttributeValueAsInt ("resy");
+
+          csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+            object_reg, "crystalspace.shared.stringset");
+
+          geom->AddPositionsFromMap (map, csBox2 (min.x, min.y, max.x, max.y), 
+            resx, resy, value, strings->Request ("heights"));
+        }
+        break;
+      case XMLTOKEN_DENSITYMAP:
+        {
+          const char* map_name = child->GetContentsValue ();
+          csRef<iTerraFormer> map_tf = csQueryRegistryTagInterface<iTerraFormer> 
+            (object_reg, map_name);
+          if (!map_tf)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.meshgen",
+              child, "Can't find map density map terraformer '%s'!", map_name);
+            return false;
+          }
+          float factor = child->GetAttributeValueAsFloat ("factor");
+          csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+            object_reg, "crystalspace.shared.stringset");
+          geom->SetDensityMap (map_tf, factor, strings->Request ("densitymap"));
+        }
+        break;
+      case XMLTOKEN_MATERIALFACTOR:
+        {
+          const char* matname = child->GetAttributeValue ("material");
+          if (!matname)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.meshgen",
+              child, "'material' attribute is missing!");
+            return false;
+          }
+          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+          if (!mat)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.meshgen",
+              child, "Can't find material '%s'!", matname);
+            return false;
+          }
+          float factor = child->GetAttributeValueAsFloat ("factor");
+          geom->AddDensityMaterialFactor (mat, factor);
+        }
+        break;
+      case XMLTOKEN_DEFAULTMATERIALFACTOR:
+        {
+          float factor = child->GetContentsValueAsFloat ();
+          geom->SetDefaultDensityMaterialFactor (factor);
+        }
+        break;
+      case XMLTOKEN_RADIUS:
+        geom->SetRadius (child->GetContentsValueAsFloat ());
+        break;
+      case XMLTOKEN_DENSITY:
+        geom->SetDensity (child->GetContentsValueAsFloat ());
+        break;
+      default:
+        SyntaxService->ReportBadToken (child);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  static bool TestXML (const char* b)
+  {
+    while (*b && isspace (*b)) b++;
+    if (*b != '<') return false;
+    b++;
+    if (*b == '?')
+    {
+      return (b[1] == 'x' && b[2] == 'm' && b[3] == 'l' && isspace (b[4]));
+    }
+    else if (*b == '!')
+    {
+      return (b[1] == '-' && b[2] == '-');
+    }
+    else
+    {
+      b++;
+      if (!isalpha (*b) && *b != '_')
+        return false;
+      b++;
+      while (isalnum (*b)) b++;
+      if (!isspace (*b) && *b != '>')
+        return false;
+      return true;
+    }
+  }
+
+  bool csThreadedLoader::Load (iDataBuffer* buffer, const char* fname,
+    iCollection* collection, bool searchCollectionOnly, bool checkDupes,
+    iStreamSource* ssource, const char* override_name, iMissingLoaderData* missingdata,
+    uint keepFlags)
+  {
+    if (TestXML (buffer->GetData ()))
+    {
+      csRef<iDocument> doc;
+      bool er = LoadStructuredDoc (fname, buffer, doc);
+      if (!er)
+      {
+        return false;
+      }
+
+      if (doc)
+      {
+        csRef<iDocumentNode> node = doc->GetRoot ();
+        csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
+        LoadNodeTC(itr, node, collection, searchCollectionOnly, checkDupes,
+          ssource, override_name, missingdata, keepFlags, false);
+        return itr->WasSuccessful();
+      }
+      else
+      {
+        ReportError ("crystalspace.maploader.parse",
+          fname
+          ? "File does not appear to be correct XML file (%s)!"
+          : "Buffer does not appear to be correct XML!", fname);
+        return false;
+      }
+    }
+    else
+    {
+      csRef<iPluginManager> plugin_mgr = csQueryRegistry<iPluginManager> (
+        object_reg);
+      csRef<iStringArray> model_loader_ids = iSCF::SCF->QueryClassList (
+        "crystalspace.mesh.loader.factory.");
+      for (size_t i = 0; i < model_loader_ids->GetSize(); i++)
+      {
+        const char* plugin = model_loader_ids->Get (i);
+        csRef<iModelLoader> l = csQueryPluginClass<iModelLoader> (plugin_mgr,
+          plugin);
+        if (!l)
+          l = csLoadPlugin<iModelLoader> (plugin_mgr, plugin);
+        if (l && l->IsRecognized (buffer))
+        {
+          iMeshFactoryWrapper* ff = l->Load (
+            override_name ? override_name :
+            fname ? fname : "__model__", buffer);
+          if(ff)
+          {
+            return true;
+          }
+        }
+      }
+      ReportError ("crystalspace.maploader.parse",
+        fname
+        ? "Model file not recognized (%s)!"
+        : "Model buffer not recognized!", fname);
+    }
+
+    return false;
   }
 
   //-------------------------------------------------------------------------//

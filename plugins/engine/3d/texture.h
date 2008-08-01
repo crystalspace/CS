@@ -223,13 +223,17 @@ public:
   virtual ~csTextureList ();
 
   /// Create a new texture.
-  iTextureWrapper *NewTexture (iImage *image);
+  virtual iTextureWrapper *NewTexture (iImage *image);
+
+  virtual csPtr<iTextureWrapper> CreateTexture (iImage *image);
 
   /**
    * Create a engine wrapper for a pre-prepared iTextureHandle
    * The handle will be IncRefed
    */
   virtual iTextureWrapper *NewTexture (iTextureHandle *ith);
+
+  virtual csPtr<iTextureWrapper> CreateTexture (iTextureHandle *ith);
 
   virtual int GetCount () const;
   virtual iTextureWrapper *Get (int n) const;

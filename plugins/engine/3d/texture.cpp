@@ -204,12 +204,27 @@ iTextureWrapper *csTextureList::NewTexture (iImage *image)
   return tm;
 }
 
+csPtr<iTextureWrapper> csTextureList::CreateTexture (iImage *image)
+{
+  csRef<iTextureWrapper> tm;
+  tm.AttachNew (new csTextureWrapper (engine, image));
+  return csPtr<iTextureWrapper>(tm);
+}
+
+
 iTextureWrapper *csTextureList::NewTexture (iTextureHandle *ith)
 {
   csRef<iTextureWrapper> tm;
   tm.AttachNew (new csTextureWrapper (engine, ith));
   Push (tm);
   return tm;
+}
+
+csPtr<iTextureWrapper> csTextureList::CreateTexture (iTextureHandle *ith)
+{
+  csRef<iTextureWrapper> tm;
+  tm.AttachNew (new csTextureWrapper (engine, ith));
+  return csPtr<iTextureWrapper>(tm);
 }
 
 int csTextureList::GetCount () const

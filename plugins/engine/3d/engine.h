@@ -160,6 +160,8 @@ public:
   virtual ~csCameraPositionList ();
   //-- iCameraPositionList
   virtual iCameraPosition* NewCameraPosition (const char* name);
+  virtual csPtr<iCameraPosition> CreateCameraPosition (const char* name);
+
   virtual int GetCount () const;
   virtual iCameraPosition *Get (int n) const;
   virtual int Add (iCameraPosition *obj);
@@ -360,7 +362,7 @@ public:
   
   //-- Sector handling
 
-  virtual iSector *CreateSector (const char *name);
+  virtual iSector *CreateSector (const char *name, bool addToList);
   virtual iSectorList* GetSectors ()
   { return &sectors; }
   virtual iSector* FindSector (const char* name,

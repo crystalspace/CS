@@ -200,7 +200,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       ReportNotify("Could not find shader '%s'.", name);
     }
 
-    return 0;
+    return shader;
   }
 
   iTextureWrapper* csLoaderContext::FindTexture(const char* name)

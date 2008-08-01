@@ -24,8 +24,12 @@
 #include "csgeom/poly3d.h"
 #include "csgeom/trimesh.h"
 
+#include "cstool/mapnode.h"
+#include "cstool/vfsdirchange.h"
+
 #include "csutil/csobject.h"
 #include "csutil/scfstr.h"
+#include "csutil/xmltiny.h"
 
 #include "iengine/engine.h"
 #include "iengine/halo.h"
@@ -52,6 +56,7 @@
 #include "iutil/vfs.h"
 
 #include "ivaria/reporter.h"
+
 #include "ivideo/material.h"
 
 #include "csthreadedloader.h"
@@ -621,10 +626,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       proxTex.img.AttachNew (new ProxyImage (loader, filename, object_reg));
       proxTex.always_animate = always_animate;
 
-      tex = Engine->GetTextureList()->NewTexture (proxTex.img);
+      tex = Engine->GetTextureList()->CreateTexture (proxTex.img);
       tex->SetTextureClass(context.GetClass());
       tex->SetFlags(context.GetFlags());
       tex->QueryObject()->SetName(txtname);
+      AddTextureToList(tex);
 
       proxTex.alphaType = csAlphaMode::alphaNone;
       if(overrideAlphaType)
@@ -675,7 +681,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         }
         else
         {
-          BuiltinImageTexLoader.AttachNew(new csImageTextureLoader (0));
+          csImageTextureLoader* itl = new csImageTextureLoader (0);
+          itl->Initialize (object_reg);
+          BuiltinImageTexLoader.AttachNew(itl);
           plugin = BuiltinImageTexLoader;
         }
       }
@@ -931,7 +939,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       flatSV->SetValue (col);
     }
 
-    iMaterialWrapper *mat;
+    csRef<iMaterialWrapper> mat;
 
     if (prefix)
     {
@@ -939,13 +947,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       strcpy (prefixedname, prefix);
       strcat (prefixedname, "_");
       strcat (prefixedname, matname);
-      mat = Engine->GetMaterialList ()->NewMaterial (material, prefixedname);
+      mat = Engine->GetMaterialList ()->CreateMaterial (material, prefixedname);
       delete [] prefixedname;
     }
     else
     {
-      mat = Engine->GetMaterialList ()->NewMaterial (material, matname);
+      mat = Engine->GetMaterialList ()->CreateMaterial (material, matname);
     }
+    AddMaterialToList(mat);
 
     size_t i;
     for (i=0; i<shaders.GetSize (); i++)
@@ -1680,6 +1689,575 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     l->IncRef ();	// To make sure smart pointer doesn't release.
     return l;
+  }
+
+  bool csThreadedLoader::ParseShaderList (iLoaderContext* ldr_context,
+    iDocumentNode* node)
+  {
+    csRef<iShaderManager> shaderMgr (
+      csQueryRegistry<iShaderManager> (object_reg));
+
+    if(!shaderMgr)
+    {
+      ReportNotify ("iShaderManager not found, ignoring shaders!");
+      return true;
+    }
+
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+      case XMLTOKEN_SHADER:
+        {
+          ParseShader (ldr_context, child, shaderMgr);
+        }
+        break;
+      }
+    }
+    return true;
+  }
+
+  bool csThreadedLoader::ParseShader (iLoaderContext* ldr_context,
+    iDocumentNode* node,
+    iShaderManager* shaderMgr)
+  {
+    // @@@ FIXME: unify with csTextSyntaxService::ParseShaderRef()?
+
+    /*csRef<iShader> shader (shaderMgr->CreateShader ());
+    //test if we have a childnode named file, if so load from file, else
+    //use inline loading
+    csRef<iDocumentNode> fileChild = child->GetNode ("file");
+    if (fileChild)
+    {
+    csRef<iDataBuffer> db = VFS->ReadFile (fileChild->GetContentsValue ());
+    shader->Load (db);
+    }
+    else
+    {
+    shader->Load (child);
+    }*/
+
+    csRef<iDocumentNode> shaderNode;
+    csRef<iDocumentNode> fileChild = node->GetNode ("file");
+
+    csRef<iVFS> vfs;
+    vfs = csQueryRegistry<iVFS> (object_reg);
+    csVfsDirectoryChanger dirChanger (vfs);
+
+    if (fileChild)
+    {
+      csString filename (fileChild->GetContentsValue ());
+      csRef<iFile> shaderFile = vfs->Open (filename, VFS_FILE_READ);
+
+      if(!shaderFile)
+      {
+        ReportWarning ("crystalspace.maploader",
+          "Unable to open shader file '%s'!", filename.GetData());
+        return false;
+      }
+
+      csRef<iDocumentSystem> docsys =
+        csQueryRegistry<iDocumentSystem> (object_reg);
+      if (docsys == 0)
+        docsys.AttachNew (new csTinyDocumentSystem ());
+      csRef<iDocument> shaderDoc = docsys->CreateDocument ();
+      const char* err = shaderDoc->Parse (shaderFile, false);
+      if (err != 0)
+      {
+        ReportWarning ("crystalspace.maploader",
+          "Could not parse shader file '%s': %s",
+          filename.GetData(), err);
+        return false;
+      }
+      shaderNode = shaderDoc->GetRoot ()->GetNode ("shader");
+      if (!shaderNode)
+      {
+        SyntaxService->ReportError ("crystalspace.maploader", node,
+          "Shader file '%s' is not a valid shader XML file!",
+          filename.GetData ());
+        return false;
+      }
+
+      dirChanger.ChangeTo (filename);
+    }
+    else
+    {
+      shaderNode = node->GetNode ("shader");
+      if (!shaderNode)
+      {
+        SyntaxService->ReportError ("crystalspace.maploader", node,
+          "'shader' or 'file' node is missing!");
+        return false;
+      }
+    }
+
+    csRef<iShader> shader = SyntaxService->ParseShader (ldr_context, shaderNode);
+    if (shader.IsValid())
+    {
+      ldr_context->AddToCollection(shader->QueryObject ());
+    }
+    return shader.IsValid();
+  }
+
+  bool csThreadedLoader::ParseVariableList (iLoaderContext* ldr_context,
+    iDocumentNode* node)
+  {
+    if (!Engine) return false;
+
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+      case XMLTOKEN_VARIABLE:
+        if (!ParseSharedVariable (ldr_context, child))
+          return false;
+        break;
+      default:
+        SyntaxService->ReportBadToken (child);
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  bool csThreadedLoader::ParseSharedVariable (iLoaderContext* ldr_context,
+    iDocumentNode* node)
+  {
+    csRef<iSharedVariable> v = Engine->GetVariableList()->New ();
+    v->SetName (node->GetAttributeValue ("name"));
+
+    if (v->GetName ())
+    {
+      csRef<iDocumentNode> colornode = node->GetNode ("color");
+      csRef<iDocumentNode> vectornode = node->GetNode ("v");
+      csRef<iDocumentAttribute> stringattr = node->GetAttribute ("string");
+      if (colornode)
+      {
+        csColor c;
+        if (!SyntaxService->ParseColor (colornode, c))
+          return false;
+        v->SetColor (c);
+      }
+      else if (vectornode)
+      {
+        csVector3 vec;
+        if (!SyntaxService->ParseVector (vectornode, vec))
+          return false;
+        v->SetVector (vec);
+      }
+      else if (stringattr)
+      {
+        v->SetString (stringattr->GetValue ());
+      }
+      else
+      {
+        v->Set (node->GetAttributeValueAsFloat ("value"));
+      }
+      loaderSharedVariables.Push(v);
+    }
+    else
+    {
+      SyntaxService->ReportError ("crystalspace.maploader",
+        node, "Variable tag does not have 'name' attribute.");
+      return false;
+    }
+
+    ldr_context->AddToCollection(v->QueryObject ());
+    return true;
+  }
+
+  bool csThreadedLoader::ParseStart (iDocumentNode* node, iCameraPosition* campos)
+  {
+    csString start_sector = "room";
+    csVector3 pos (0, 0, 0);
+    csVector3 up (0, 1, 0);
+    csVector3 forward (0, 0, 1);
+
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+      case XMLTOKEN_SECTOR:
+        start_sector = child->GetContentsValue ();
+        break;
+      case XMLTOKEN_POSITION:
+        if (!SyntaxService->ParseVector (child, pos))
+          return false;
+        break;
+      case XMLTOKEN_UP:
+        if (!SyntaxService->ParseVector (child, up))
+          return false;
+        break;
+      case XMLTOKEN_FORWARD:
+        if (!SyntaxService->ParseVector (child, forward))
+          return false;
+        break;
+      case XMLTOKEN_FARPLANE:
+        {
+          csPlane3 p;
+          p.A () = child->GetAttributeValueAsFloat ("a");
+          p.B () = child->GetAttributeValueAsFloat ("b");
+          p.C () = child->GetAttributeValueAsFloat ("c");
+          p.D () = child->GetAttributeValueAsFloat ("d");
+          campos->SetFarPlane (&p);
+        }
+        break;
+      default:
+        SyntaxService->ReportBadToken (child);
+        return false;
+      }
+    }
+
+    campos->Set (start_sector, pos, forward, up);
+    return true;
+  }
+
+  iSector* csThreadedLoader::ParseSector (iLoaderContext* ldr_context,
+    iDocumentNode* node, iStreamSource* ssource)
+  {
+    const char* secname = node->GetAttributeValue ("name");
+
+    bool do_culler = false;
+    csString culplugname;
+
+    iSector* sector = ldr_context->FindSector (secname);
+    if (sector == 0)
+    {
+      sector = Engine->CreateSector (secname, false);
+      AddSectorToList(sector);
+      ldr_context->AddToCollection(sector->QueryObject ());
+    }
+
+    csRef<iDocumentNode> culler_params;
+
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+      case XMLTOKEN_AMBIENT:
+        {
+          csColor c;
+          if (!SyntaxService->ParseColor (child, c))
+            return false;
+          sector->SetDynamicAmbientLight (c);
+        }
+        break;
+      case XMLTOKEN_MESHGEN:
+        if (!LoadMeshGen (ldr_context, child, sector))
+          return 0;
+        break;
+      case XMLTOKEN_ADDON:
+        if (!LoadAddOn (ldr_context, child, sector, false, ssource))
+          return 0;
+        break;
+      case XMLTOKEN_META:
+        if (!LoadAddOn (ldr_context, child, sector, true, ssource))
+          return 0;
+        break;
+      case XMLTOKEN_PORTAL:
+        {
+          iMeshWrapper* container_mesh = 0;
+          if (!ParsePortal (ldr_context, child, sector, 0, container_mesh, 0))
+            return 0;
+        }
+        break;
+      case XMLTOKEN_PORTALS:
+        if (!ParsePortals (ldr_context, child, sector, 0, ssource))
+          return 0;
+        break;
+      case XMLTOKEN_CULLERP:
+        {
+          const char* pluginname = child->GetAttributeValue ("plugin");
+          if (pluginname)
+          {
+            // New way to write cullerp.
+            culplugname = pluginname;
+            culler_params = child;	// Remember for later.
+          }
+          else
+          {
+            // Old way.
+            culplugname = child->GetContentsValue ();
+            culler_params = 0;
+          }
+          if (culplugname.IsEmpty ())
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.sector",
+              child,
+              "CULLERP expects the name of a visibility culling plugin!");
+            return 0;
+          }
+          else
+          {
+            do_culler = true;
+          }
+        }
+        break;
+      case XMLTOKEN_MESHREF:
+        {
+          const char* meshname = child->GetAttributeValue ("name");
+          if (!meshname)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.load.meshobject",
+              child, "'meshref' requires a name in sector '%s'!",
+              secname ? secname : "<noname>");
+            return 0;
+          }
+          csRef<iMeshWrapper> mesh = LoadMeshObjectFromFactory (ldr_context,
+            child, ssource);
+          if (!mesh)
+          {
+            // Error is already reported.
+            return 0;
+          }
+          mesh->QueryObject ()->SetName (meshname);
+          mesh->GetMovable ()->SetSector (sector);
+          mesh->GetMovable ()->UpdateMove ();
+          Engine->AddMeshAndChildren (mesh);
+        }
+        break;
+      case XMLTOKEN_TRIMESH:
+        {
+          const char* meshname = child->GetAttributeValue ("name");
+          if (!meshname)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.load.trimesh",
+              child, "'trimesh' requires a name in sector '%s'!",
+              secname ? secname : "<noname>");
+            return 0;
+          }
+          csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (
+            "crystalspace.mesh.object.null", meshname, 0, csVector3(0), false);
+          if (!LoadTriMeshInSector (ldr_context, mesh, child, ssource))
+          {
+            // Error is already reported.
+            return 0;
+          }
+          else
+          {
+            AddMeshToList(mesh);
+            ldr_context->AddToCollection(mesh->QueryObject ());
+          }
+          mesh->GetMovable ()->SetSector (sector);
+          mesh->GetMovable ()->UpdateMove ();
+        }
+        break;
+      case XMLTOKEN_MESHOBJ:
+        {
+          const char* meshname = child->GetAttributeValue ("name");
+          if (!meshname)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.load.meshobject",
+              child, "'meshobj' requires a name in sector '%s'!",
+              secname ? secname : "<noname>");
+            return 0;
+          }
+          csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (meshname, false);
+          if (!LoadMeshObject (ldr_context, mesh, 0, child, ssource))
+          {
+            // Error is already reported.
+            return 0;
+          }
+          else
+          {
+            AddMeshToList(mesh);
+            ldr_context->AddToCollection(mesh->QueryObject ());
+          }
+          mesh->GetMovable ()->SetSector (sector);
+          mesh->GetMovable ()->UpdateMove ();
+        }
+        break;
+      case XMLTOKEN_MESHLIB:
+        {
+          const char* meshname = child->GetAttributeValue ("name");
+          if (!meshname)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.load.meshobject",
+              child, "'meshlib' requires a name (sector '%s')!",
+              secname ? secname : "<noname>");
+            return 0;
+          }
+          iMeshWrapper* mesh = Engine->GetMeshes ()->FindByName (meshname);
+          if (!mesh)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.load.meshobject",
+              child,
+              "Could not find mesh object '%s' (sector '%s') for MESHLIB!",
+              meshname, secname ? secname : "<noname>");
+            return 0;
+          }
+          if (!LoadMeshObject (ldr_context, mesh, 0, child, ssource))
+          {
+            // Error is already reported.
+            return 0;
+          }
+          mesh->GetMovable ()->GetSectors ()->Add (sector);
+          mesh->GetMovable ()->UpdateMove ();
+        }
+        break;
+      case XMLTOKEN_LIGHT:
+        {
+          iLight* sl = ParseStatlight (ldr_context, child);
+          if (!sl) return 0;
+          sector->GetLights ()->Add (sl);
+          sl->DecRef ();
+        }
+        break;
+      case XMLTOKEN_NODE:
+        {
+          iMapNode *n = ParseNode (child, sector);
+          if (n)
+          {
+            n->DecRef ();
+          }
+          else
+          {
+            return 0;
+          }
+        }
+        break;
+      case XMLTOKEN_FOG:
+        {
+          csFog f;
+          f.color.red = child->GetAttributeValueAsFloat ("red");
+          f.color.green = child->GetAttributeValueAsFloat ("green");
+          f.color.blue = child->GetAttributeValueAsFloat ("blue");
+          f.density = child->GetAttributeValueAsFloat ("density");
+          f.start = child->GetAttributeValueAsFloat ("start");
+          f.end = child->GetAttributeValueAsFloat ("end");
+          csRef<iDocumentAttribute> mode_attr = child->GetAttribute ("mode");
+          if (mode_attr)
+          {
+            const char* str_mode = mode_attr->GetValue();
+            if (!strcmp(str_mode, "linear"))
+              f.mode = CS_FOG_MODE_LINEAR;
+            else if (!strcmp(str_mode, "exp"))
+              f.mode = CS_FOG_MODE_EXP;
+            else if (!strcmp(str_mode, "exp2"))
+              f.mode = CS_FOG_MODE_EXP2;
+            else
+              f.mode = CS_FOG_MODE_NONE;
+          }
+          else
+            f.mode = CS_FOG_MODE_CRYSTALSPACE;
+          sector->SetFog (f);
+        }
+        break;
+      case XMLTOKEN_KEY:
+        if (!ParseKey (child, sector->QueryObject()))
+          return 0;
+        break;
+      case XMLTOKEN_RENDERLOOP:
+        {
+          break;
+        }
+      default:
+        SyntaxService->ReportBadToken (child);
+        return 0;
+      }
+    }
+    if (do_culler)
+    {
+      bool rc = sector->SetVisibilityCullerPlugin (culplugname, culler_params);
+      if (!rc)
+      {
+        SyntaxService->ReportError (
+          "crystalspace.maploader.load.sector",
+          node, "Could not load visibility culler for sector '%s'!",
+          secname ? secname : "<noname>");
+        return 0;
+      }
+    }
+
+    return sector;
+  }
+
+  iMapNode* csThreadedLoader::ParseNode (iDocumentNode* node, iSector* sec)
+  {
+    iMapNode* pNode = (iMapNode*)(new csMapNode (
+      node->GetAttributeValue ("name")));
+    pNode->SetSector (sec);
+
+    csVector3 pos, v;
+
+    csRef<iDocumentNodeIterator> it = node->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+      case XMLTOKEN_ADDON:
+        SyntaxService->ReportError (
+          "crystalspace.maploader.parse.node",
+          child, "'addon' not yet supported in node!");
+        return 0;
+      case XMLTOKEN_META:
+        SyntaxService->ReportError (
+          "crystalspace.maploader.parse.node",
+          child, "'meta' not yet supported in node!");
+        return 0;
+      case XMLTOKEN_KEY:
+        if (!ParseKey (child, pNode->QueryObject()))
+          return false;
+        break;
+      case XMLTOKEN_POSITION:
+        if (!SyntaxService->ParseVector (child, pos))
+          return 0;
+        break;
+      case XMLTOKEN_XVECTOR:
+        if (!SyntaxService->ParseVector (child, v))
+          return 0;
+        pNode->SetXVector (v);
+        break;
+      case XMLTOKEN_YVECTOR:
+        if (!SyntaxService->ParseVector (child, v))
+          return 0;
+        pNode->SetYVector (v);
+        break;
+      case XMLTOKEN_ZVECTOR:
+        if (!SyntaxService->ParseVector (child, v))
+          return 0;
+        pNode->SetZVector (v);
+        break;
+      default:
+        SyntaxService->ReportBadToken (child);
+        return 0;
+      }
+    }
+
+    pNode->SetPosition (pos);
+
+    return pNode;
   }
 }
 CS_PLUGIN_NAMESPACE_END(csparser)

@@ -28,13 +28,18 @@
 #include "csutil/weakrefhash.h"
 
 #include "iengine/campos.h"
+#include "iengine/engine.h"
 #include "iengine/mesh.h"
 #include "iengine/portal.h"
 #include "iengine/sector.h"
 #include "iengine/sharevar.h"
 #include "imap/ldrctxt.h"
 #include "imap/loader.h"
+#include "isndsys/ss_loader.h"
+#include "isndsys/ss_manager.h"
+#include "isndsys/ss_renderer.h"
 #include "iutil/comp.h"
+#include "ivaria/engseq.h"
 
 #include "ldrplug.h"
 #include "proxyimage.h"
@@ -42,10 +47,10 @@
 class csReversibleTransform;
 struct iCollection;
 struct iDocumentNode;
-struct iEngine;
 struct iImageIO;
 struct iImposter;
 struct iLODControl;
+struct iMapNode;
 struct iObject;
 struct iObjectModel;
 struct iObjectRegistry;
@@ -88,19 +93,39 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     typename csRefArray<T>::Iterator itr;
   };
 
+  class csThreadedListHandler : public CS::Threading::Runnable
+  {
+  public:
+    csThreadedListHandler(csRef<iEngine> engine, csRef<iThreadedLoader> loader) :
+      engine(engine), loader(loader), running(true)
+    {
+    }
+
+    void Run()
+    {
+      while(running)
+      {
+        csSleep(10);
+        engine->SyncEngineLists(loader);
+      }
+    }
+
+    void StopRunning() { running = false; }
+
+  private:
+    bool running;
+    csRef<iEngine> engine;
+    csRef<iThreadedLoader> loader;
+  };
+
   class csThreadedLoader : public ThreadedCallable<csThreadedLoader>,
-                           public scfImplementation3<csThreadedLoader,
+                           public scfImplementation2<csThreadedLoader,
                                                      iThreadedLoader,
-                                                     iComponent,
-                                                     iEventHandler>
+                                                     iComponent>
   {
   public:
     csThreadedLoader(iBase *p);
     virtual ~csThreadedLoader();
-
-    bool HandleEvent(iEvent&);
-    CS_EVENTHANDLER_NAMES("crystalspace.level.loader.threaded")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
 
     virtual bool Initialize(iObjectRegistry *object_reg);
 
@@ -221,14 +246,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csRef<iGraphics3D> g3d;
       // Parser for common stuff like MixModes, vectors, matrices, ...
       csRef<iSyntaxService> SyntaxService;
+      // Object registry.
       iObjectRegistry *object_reg;
-      /// Shared string set
+      // Shared string set
       csRef<iStringSet> stringSet;
+      // Shader string set
       csRef<iShaderVarStringSet> stringSetSvName;
-      // image loader
+      // Image loader
       csRef<iImageIO> ImageLoader;
-      csRef<iThreadManager> tm;
-      csEventID ProcessPerFrame;
+      // Pointer to the engine sequencer (optional module).
+      csRef<iEngineSequenceManager> eseqmgr;
+      // Pointer to the global thread manager.
+      csRef<iThreadManager> threadman;
+      // Sound loader
+      csRef<iSndSysLoader> SndSysLoader;
+      // Sound manager
+      csRef<iSndSysManager> SndSysManager;
+      // Sound renderer
+      csRef<iSndSysRenderer> SndSysRenderer;
+      // List syncher.
+      csRef<CS::Threading::Thread> listSyncThread;
+      csRef<csThreadedListHandler> listSync;
 
       // Shared lists and locks.
       Mutex sectorsLock;
@@ -372,6 +410,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csRef<iMeshWrapper> LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
         iDocumentNode* node, iStreamSource* ssource);
 
+      /// Load map from a memory buffer
+      bool LoadMap (iLoaderContext* ldr_context, iDocumentNode* world_node,
+        iStreamSource* ssource, iMissingLoaderData* missingdata);
+
+      bool Load (iDataBuffer* buffer, const char* fname,
+        iCollection* collection, bool searchCollectionOnly, bool checkDupes,
+        iStreamSource* ssource, const char* override_name,
+        iMissingLoaderData* missingdata, uint keepFlags = KEEP_ALL);
+
       /**
       * Load a library into given engine.
       * A library is just a map file that contains just mesh factories,
@@ -399,6 +446,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
       bool LoadShaderExpressions (iLoaderContext* ldr_context,
         iDocumentNode* node);
+
+      /**
+      * Load the trimesh object from the map file.
+      */
+      bool LoadTriMeshInSector (iLoaderContext* ldr_context,
+        iMeshWrapper* mesh, iDocumentNode* node, iStreamSource* ssource);
+
+      /// Get the engine sequence manager (load it if not already present).
+      iEngineSequenceManager* GetEngineSequenceManager ();
+
+      /// Parse a shaderlist
+      bool ParseShaderList (iLoaderContext* ldr_context, iDocumentNode* node);
+      bool ParseShader (iLoaderContext* ldr_context, iDocumentNode* node,
+        iShaderManager* shaderMgr);
+
+      /// Parse a list of shared variables and add them each to the engine
+      bool ParseVariableList (iLoaderContext* ldr_context, iDocumentNode* node);
+      /// Process the attributes of one shared variable
+      bool ParseSharedVariable (iLoaderContext* ldr_context, iDocumentNode* node);
+
+      /// Parse a map node definition and add the node to the given sector
+      iMapNode* ParseNode (iDocumentNode* node, iSector* sec);
 
       /**
       * Parse a key/value pair.
@@ -458,6 +527,35 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       bool LoadStructuredDoc (const char* file, iDataBuffer* buf, csRef<iDocument>& doc);
 
       /**
+      * Load sounds from a SOUNDS(...) argument.
+      * This function is normally called automatically by the parser.
+      */
+      bool LoadSounds (iDocumentNode* node);
+
+      /**
+      * Load all the plugin descriptions from the map file
+      * (the plugins are not actually loaded yet).
+      */
+      bool LoadPlugins (iDocumentNode* node);
+
+      /**
+      * Load the settings section.
+      */
+      bool LoadSettings (iDocumentNode* node);
+
+      /**
+      * Load a mesh generator geometry.
+      */
+      bool LoadMeshGenGeometry (iLoaderContext* ldr_context,
+        iDocumentNode* node, iMeshGenerator* meshgen);
+
+      /**
+      * Load a mesh generator.
+      */
+      bool LoadMeshGen (iLoaderContext* ldr_context,
+        iDocumentNode* node, iSector* sector);
+
+      /**
       * Handle the result of a mesh object plugin loader.
       */
       bool HandleMeshObjectPluginResult (iBase* mo, iDocumentNode* child,
@@ -467,6 +565,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       bool ParseTriMesh (iDocumentNode* node, iObjectModel* objmodel);
       bool ParseTriMeshChildBox (iDocumentNode* child, csRef<iTriangleMesh>& trimesh);
       bool ParseTriMeshChildMesh (iDocumentNode* child, csRef<iTriangleMesh>& trimesh);
+
+      /// Parse a camera position.
+      bool ParseStart (iDocumentNode* node, iCameraPosition* campos);
+
+      /// Parse a sector definition and add the sector to the engine
+      iSector* ParseSector (iLoaderContext* ldr_context, iDocumentNode* node,
+        iStreamSource* ssource);
 
       // Process the attributes of an <imposter> tag in a mesh specification.
       bool ParseImposterSettings(iImposter* mesh, iDocumentNode *node);
@@ -487,6 +592,39 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
       /// Parse a static light definition and add the light to the engine
       iLight* ParseStatlight (iLoaderContext* ldr_context, iDocumentNode* node);
+
+      /// Find the named shared variable and verify its type if specified
+      iSharedVariable *FindSharedVariable(const char *colvar,
+        int verify_type );
+
+      /// Load a trigger.
+      iSequenceTrigger* LoadTrigger (iLoaderContext* ldr_context,
+        iDocumentNode* node);
+
+      /// Load a list of triggers.
+      bool LoadTriggers (iLoaderContext* ldr_context, iDocumentNode* node);
+
+      /// Create a sequence and make parameter bindings.
+      iSequenceWrapper* CreateSequence (iDocumentNode* node);
+
+      /// Load a sequence.
+      iSequenceWrapper* LoadSequence (iLoaderContext* ldr_context,
+        iDocumentNode* node);
+
+      /// Load a list of sequences.
+      bool LoadSequences (iLoaderContext* ldr_context, iDocumentNode* node);
+
+      /// Parse a parameter block for firing a sequence.
+      csPtr<iEngineSequenceParameters> CreateSequenceParameters (
+        iLoaderContext* ldr_context,
+        iSequenceWrapper* sequence, iDocumentNode* node,
+        const char* parenttype, const char* parentname, bool& error);
+
+      /// Resolve a parameter for a sequence operation.
+      csPtr<iParameterESM> ResolveOperationParameter (
+        iLoaderContext* ldr_context, iDocumentNode* opnode,
+        int partypeidx, const char* partype, const char* seqname,
+        iEngineSequenceParameters* base_params);
 
       /**
       * Add children to the collection.

@@ -583,7 +583,7 @@ struct iEngine : public virtual iBase
    * Create a empty sector with given name.
    * \param name the sector name
    */
-  virtual iSector *CreateSector (const char *name) = 0;
+  virtual iSector *CreateSector (const char *name, bool addToList = true) = 0;
 
   /// Get the list of sectors
   virtual iSectorList* GetSectors () = 0;

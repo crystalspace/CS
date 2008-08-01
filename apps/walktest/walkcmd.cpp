@@ -328,7 +328,7 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
   }
 
   csRef<iThreadReturn> ret = Sys->LevelLoader->LoadFile(filename);
-  Sys->ret->Wait();
+  ret->Wait();
   if (!ret->WasSuccessful())
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -635,7 +635,7 @@ void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
       //Is not registered. We have to do it.
       textFileName = LookForTextureFileName(kp->GetValue());
       csRef<iThreadReturn> ret = loader->LoadTexture(matName, textFileName);
-      Sys->ret->Wait();
+      ret->Wait();
       if(!ret->WasSuccessful())
       {
         csPrintf("Error loading %s texture!!",textFileName);
@@ -1493,9 +1493,9 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
       Sys->Engine->DeleteAll ();
       Sys->Engine->SetVFSCacheManager ();
-      csLoadResult res;
-      Sys->LevelLoader->LoadMapFile ("world", &res);
-      if (!res.success)
+      csRef<iThreadReturn> ret = Sys->LevelLoader->LoadMapFile ("world");
+      ret->Wait();
+      if (!ret->WasSuccessful())
       {
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	  "Couldn't load level '%s'!", level);
