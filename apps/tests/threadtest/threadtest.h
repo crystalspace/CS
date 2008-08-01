@@ -65,6 +65,7 @@ public:
   THREADED_CALLABLE_DECL1(csThreadTest, Test6, csThreadReturn, csRef<Data>, stuff, true, true)
   THREADED_CALLABLE_DECL(csThreadTest, Test7, csThreadReturn, true, true)
   THREADED_CALLABLE_DECL1(csThreadTest, Test7Data, csThreadReturn, int, counter, true, false)
+  THREADED_CALLABLE_DECL(csThreadTest, Test7RealData, csThreadReturn, true, true)
 
   void Test5() const;
 

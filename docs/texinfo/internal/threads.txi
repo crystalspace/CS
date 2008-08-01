@@ -193,8 +193,10 @@ This return object basically tells/gives you three things;
 @item The return data from that method call.
 @end itemize
 
-You set these values yourself using the provided 'ret' object interface in your method definition.
+You set the return data yourself using the provided 'ret' iThreadReturn object interface in your method definition.
 The return data is in the form of a csRef<iBase> or a void*. It is up to you which you choose to use.
+To indicate whether or not your function has succeeded, return a boolean value (true for success).
+Your return object will automatically be updated when your method has finished executing to mark that this is the case.
 
 An example of this:
 
@@ -203,7 +205,7 @@ THREADED_CALLABLE_IMPL(csClassName, MethodName2)
 {
   csRef<iInterface> obj = csPtr<iInterface>(new csImpl())
   ret->SetData(csRef<iBase>(obj));
-  ret->MarkSuccessful();
+  return true;
 }
 
 csClassName::MethodName()

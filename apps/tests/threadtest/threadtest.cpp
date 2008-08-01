@@ -31,6 +31,7 @@ csThreadTest::csThreadTest(iObjectRegistry* objReg) : scfImplementationType(this
 THREADED_CALLABLE_IMPL(csThreadTest, Test1)
 {
   printf("Test 1 passed!\n");
+  return true;
 }
 
 THREADED_CALLABLE_IMPL1(csThreadTest, Test2, bool b)
@@ -38,10 +39,12 @@ THREADED_CALLABLE_IMPL1(csThreadTest, Test2, bool b)
   if(!b)
   {
     printf("Test 2 passed!\n");
+    return true;
   }
   else
   {
     printf("Test 2 failed!\n");
+    return false;
   }
 }
 
@@ -50,10 +53,12 @@ THREADED_CALLABLE_IMPL2(csThreadTest, Test3, int i, float f)
   if(i == 3 && f == 0.1415f)
   {
     printf("Test 3 passed!\n");
+    return true;
   }
   else
   {
     printf("Test 3 failed!\n");
+    return false;
   }
 }
 
@@ -63,16 +68,18 @@ THREADED_CALLABLE_IMPL1(csThreadTest, Test4, csWeakRef<iThreadTest> myself)
   if(me == this)
   {
     printf("Test 4 passed!\n");
+    return true;
   }
   else
   {
     printf("Test 4 failed!\n");
+    return false;
   }
 }
 
 THREADED_CALLABLE_IMPL(csThreadTest, Test5Real)
 {
-  ret->MarkSuccessful();
+  return true;
 }
 
 void csThreadTest::Test5() const
@@ -121,10 +128,12 @@ THREADED_CALLABLE_IMPL1(csThreadTest, Test6, csRef<Data> stuff)
   if(passed)
   {
     printf("Test 6 passed!\n");
+    return true;
   }
   else
   {
     printf("Test 6 failed!\n");
+    return false;
   }
 }
 
@@ -136,13 +145,26 @@ THREADED_CALLABLE_IMPL(csThreadTest, Test7)
   Test7Data(3);
   Test7Data(4);
   Test7Data(5);
-  ret->MarkSuccessful();
+  Test7Data(6);
+  Test7Data(7);
+  Test7Data(8);
+  Test7Data(9);
+  Test7Data(10);
+  return true;
 }
 
 THREADED_CALLABLE_IMPL1(csThreadTest, Test7Data, int counter)
 {
-  printf("Test 7 Data %i of 5\n", counter);
   csSleep(1000);
+  printf("Test 7 Data %i of 10\n", counter);
+
+  return true;
+}
+
+THREADED_CALLABLE_IMPL(csThreadTest, Test7RealData)
+{
+  csSleep(500);
+  return true;
 }
 
 int main(int argc, char* argv[])
