@@ -1414,7 +1414,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
       case PARTYPE_LIGHT:
         {
-          iLight* l = Engine->FindLight (parname);
+          iLight* l = ldr_context->FindLight (parname);
           if (l) value = l;
         }
         break;

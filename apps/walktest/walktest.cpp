@@ -1220,6 +1220,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       collection = Engine->CreateCollection (map->map_dir);
     }
     csRef<iThreadReturn> ret = LevelLoader->LoadMapFile ("world", false, collection, !do_collections, do_dupes);
+    ret->Wait();
     if (do_collections)
     {
       // Set the cache manager based on current VFS dir.
@@ -1258,6 +1259,11 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
   // Look for the start sector in this map.
   bool camok = false;
+  if(Engine->GetCameraPositions ()->GetCount () == 0)
+  {
+    Engine->SyncEngineLists(LevelLoader);
+  }
+
   if (!camok && Engine->GetCameraPositions ()->GetCount () > 0)
   {
     iCameraPosition *cp = Engine->GetCameraPositions ()->Get (0);

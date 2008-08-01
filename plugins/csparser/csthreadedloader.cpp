@@ -30,6 +30,7 @@
 #include "csutil/threadmanager.h"
 #include "csutil/xmltiny.h"
 
+#include "iengine/engine.h"
 #include "iengine/imposter.h"
 #include "iengine/lod.h"
 #include "iengine/mesh.h"
@@ -57,6 +58,8 @@
 
 #include "itexture/iproctex.h"
 
+#include "iutil/event.h"
+#include "iutil/eventq.h"
 #include "iutil/document.h"
 #include "iutil/object.h"
 #include "iutil/objreg.h"
@@ -83,7 +86,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   csThreadedLoader::~csThreadedLoader()
   {
-    listSync->StopRunning();
   }
 
   bool csThreadedLoader::Initialize(iObjectRegistry *objectreg)
@@ -110,6 +112,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if(!vfs.IsValid())
     {
       return false;
+    }
+
+    csRef<iEventQueue> eventQueue = csQueryRegistry<iEventQueue>(object_reg);
+    if(eventQueue)
+    {
+      ProcessPerFrame = csevFrame(object_reg);
+      eventQueue->RegisterListener(this, ProcessPerFrame);
     }
 
     SyntaxService = csQueryRegistryOrLoad<iSyntaxService> (object_reg,
@@ -144,10 +153,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     SndSysLoader = csQueryRegistry<iSndSysLoader> (object_reg);
     SndSysRenderer = csQueryRegistry<iSndSysRenderer> (object_reg);
 
-    listSync.AttachNew(new csThreadedListHandler(Engine, this));
-    listSyncThread.AttachNew(new Thread(listSync, true));
-
     return true;
+  }
+
+  bool csThreadedLoader::HandleEvent(iEvent& Event)
+  {
+    if(Event.Name == ProcessPerFrame)
+    {
+      Engine->SyncEngineLists(this);
+    }
+    return false;
   }
 
   iEngineSequenceManager* csThreadedLoader::GetEngineSequenceManager ()
@@ -165,7 +180,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     iStreamSource* ssource)
   {
     csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-      new csLoaderContext (object_reg, Engine, 0, false, true, 0, KEEP_ALL, false));
+      new csLoaderContext (object_reg, Engine, this, 0, false, true, 0, KEEP_ALL, false));
 
     csRef<iFile> databuff (vfs->Open (fname, VFS_FILE_READ));
 
@@ -218,7 +233,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iFile> databuff (vfs->Open (fname, VFS_FILE_READ));
     csRef<iMeshWrapper> mesh;
     csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-      new csLoaderContext (object_reg, Engine, 0, false, true, 0, KEEP_ALL, false));
+      new csLoaderContext (object_reg, Engine, this, 0, false, true, 0, KEEP_ALL, false));
 
     if (!databuff || !databuff->GetSize ())
     {
@@ -311,7 +326,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
 
     csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-      new csLoaderContext (object_reg, Engine, 0, true, true, 0, KEEP_USED, false));
+      new csLoaderContext (object_reg, Engine, this, 0, true, true, 0, KEEP_USED, false));
 
     csRef<iShader> shader = shcom->CompileShader (ldr_context, shaderNode);
     if (shader)
@@ -385,7 +400,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       Engine->ResetWorldSpecificSettings();
     }
     csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-      new csLoaderContext (object_reg, Engine, collection, searchCollectionOnly,
+      new csLoaderContext (object_reg, Engine, this, collection, searchCollectionOnly,
       checkDupes, missingdata, keepFlags, false));
 
     return LoadMap (ldr_context, world_node, ssource, missingdata);
@@ -404,7 +419,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     iMissingLoaderData* missingdata, uint keepFlags)
   {
     csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext>
-      (new csLoaderContext (object_reg, Engine, collection, searchCollectionOnly, checkDupes,
+      (new csLoaderContext (object_reg, Engine, this, collection, searchCollectionOnly, checkDupes,
       missingdata, keepFlags, false));
 
     return LoadLibrary (ldr_context, lib_node, ssource, missingdata, true);
@@ -440,7 +455,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csRef<iMissingLoaderData> missingdata, uint keepFlags, bool do_verbose)
   {
     csRef<iLoaderContext> ldr_context;
-    ldr_context.AttachNew(new csLoaderContext(object_reg, Engine, collection,
+    ldr_context.AttachNew(new csLoaderContext(object_reg, Engine, this, collection,
       searchCollectionOnly, checkDupes, missingdata, keepFlags, do_verbose));
 
     // Mesh Factory
@@ -894,7 +909,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-      new csLoaderContext (object_reg, Engine, collection, searchCollectionOnly, checkDupes,
+      new csLoaderContext (object_reg, Engine, this, collection, searchCollectionOnly, checkDupes,
       missingdata, keepFlags, do_verbose));
 
     csRef<iDocument> doc;

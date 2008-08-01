@@ -23,6 +23,8 @@
 #include "csutil/scf_implementation.h"
 #include "imap/ldrctxt.h"
 
+#include "csthreadedloader.h"
+
 struct iCollection;
 struct iEngine;
 struct iMissingLoaderData;
@@ -30,7 +32,7 @@ struct iMissingLoaderData;
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
   /*
-  * Context class for loaders.
+  * Context class for the threaded loader.
   */
   class csLoaderContext : public scfImplementation1<csLoaderContext,
                                                     iLoaderContext>
@@ -38,6 +40,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   private:
     iObjectRegistry* object_reg;
     iEngine* Engine;
+    csThreadedLoader* loader;
     iCollection* collection;
     bool searchCollectionOnly;
     csRef<iMissingLoaderData> missingdata;
@@ -46,9 +49,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool do_verbose;
 
   public:
-    csLoaderContext(iObjectRegistry* object_reg, iEngine* Engine, iCollection* collection, bool searchCollectionOnly,
-                    bool checkDupes, iMissingLoaderData* missingdata, uint keepFlags,
-                    bool do_verbose);
+    csLoaderContext(iObjectRegistry* object_reg, iEngine* Engine, csThreadedLoader* loader,
+      iCollection* collection, bool searchCollectionOnly, bool checkDupes,
+      iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose);
     virtual ~csLoaderContext ();
 
     virtual iSector* FindSector (const char* name);

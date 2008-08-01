@@ -28,7 +28,6 @@
 #include "csutil/weakrefhash.h"
 
 #include "iengine/campos.h"
-#include "iengine/engine.h"
 #include "iengine/mesh.h"
 #include "iengine/portal.h"
 #include "iengine/sector.h"
@@ -47,6 +46,7 @@
 class csReversibleTransform;
 struct iCollection;
 struct iDocumentNode;
+struct iEngine;
 struct iImageIO;
 struct iImposter;
 struct iLODControl;
@@ -58,6 +58,7 @@ struct iSceneNodeArray;
 struct iShaderVarStringSet;
 struct iStringSet;
 struct iSyntaxService;
+struct iTriangleMesh;
 struct iVFS;
 
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
@@ -93,39 +94,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     typename csRefArray<T>::Iterator itr;
   };
 
-  class csThreadedListHandler : public CS::Threading::Runnable
-  {
-  public:
-    csThreadedListHandler(csRef<iEngine> engine, csRef<iThreadedLoader> loader) :
-      engine(engine), loader(loader), running(true)
-    {
-    }
-
-    void Run()
-    {
-      while(running)
-      {
-        csSleep(10);
-        engine->SyncEngineLists(loader);
-      }
-    }
-
-    void StopRunning() { running = false; }
-
-  private:
-    bool running;
-    csRef<iEngine> engine;
-    csRef<iThreadedLoader> loader;
-  };
-
   class csThreadedLoader : public ThreadedCallable<csThreadedLoader>,
-                           public scfImplementation2<csThreadedLoader,
+                           public scfImplementation3<csThreadedLoader,
                                                      iThreadedLoader,
-                                                     iComponent>
+                                                     iComponent,
+                                                     iEventHandler>
   {
   public:
     csThreadedLoader(iBase *p);
     virtual ~csThreadedLoader();
+
+    bool HandleEvent(iEvent&);
+    CS_EVENTHANDLER_NAMES("crystalspace.level.loader.threaded")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
 
     virtual bool Initialize(iObjectRegistry *object_reg);
 
@@ -264,9 +245,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csRef<iSndSysManager> SndSysManager;
       // Sound renderer
       csRef<iSndSysRenderer> SndSysRenderer;
-      // List syncher.
-      csRef<CS::Threading::Thread> listSyncThread;
-      csRef<csThreadedListHandler> listSync;
+      // Frame event.
+      csEventID ProcessPerFrame;
+
+  protected:
+
+    friend class csLoaderContext;
 
       // Shared lists and locks.
       Mutex sectorsLock;
@@ -284,6 +268,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csRefArray<iTextureWrapper> loaderTextures;
       csRefArray<iMaterialWrapper> loaderMaterials;
       csRefArray<iSharedVariable> loaderSharedVariables;
+
+  private:
 
       void AddSectorToList(csRef<iSector> obj)
       {
@@ -321,7 +307,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         loaderMaterials.Push(obj);
       }
 
-      void AddShareVarToList(csRef<iSharedVariable> obj)
+      void AddSharedVarToList(csRef<iSharedVariable> obj)
       {
         MutexScopedLock lock(sharedvarLock);
         loaderSharedVariables.Push(obj);

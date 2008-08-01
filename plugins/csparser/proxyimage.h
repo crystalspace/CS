@@ -19,6 +19,8 @@
 #ifndef __PROXYIMAGE_H__
 #define __PROXYIMAGE_H__
 
+#include "iutil/databuff.h"
+
 struct iBase;
 
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)

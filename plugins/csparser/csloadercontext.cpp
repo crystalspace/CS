@@ -30,9 +30,9 @@
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
   csLoaderContext::csLoaderContext (iObjectRegistry* object_reg, iEngine* Engine,
-    iCollection* collection, bool searchCollectionOnly, bool checkDupes,
-    iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose)
-    : scfImplementationType (this), object_reg(object_reg), Engine(Engine),
+    csThreadedLoader* loader, iCollection* collection, bool searchCollectionOnly,
+    bool checkDupes, iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose)
+    : scfImplementationType (this), object_reg(object_reg), Engine(Engine), loader(loader),
     collection(collection), searchCollectionOnly(searchCollectionOnly),
     checkDupes(checkDupes), missingdata(missingdata), keepFlags(keepFlags),
     do_verbose(do_verbose)
@@ -45,7 +45,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   iSector* csLoaderContext::FindSector(const char* name)
   {
-    iSector* s = Engine->FindSector(name, searchCollectionOnly ? collection : 0);
+    CS::Threading::MutexScopedLock lock(loader->sectorsLock);
+    iSector* s = NULL;
+
+    for(size_t i=0; i<loader->loaderSectors.GetSize(); i++)
+    {
+      if(!strcmp(loader->loaderSectors[i]->QueryObject()->GetName(), name))
+      {
+        s = loader->loaderSectors[i];
+        break;
+      }
+    }
+    
+    if(!s)
+    {
+      s = Engine->FindSector(name, searchCollectionOnly ? collection : 0);
+    }
 
     if(!s && missingdata)
     {
@@ -57,7 +72,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   iMaterialWrapper* csLoaderContext::FindMaterial(const char* filename)
   {
-    iMaterialWrapper* mat = Engine->FindMaterial(filename, searchCollectionOnly ? collection : 0);
+    CS::Threading::MutexScopedLock lock(loader->materialsLock);
+    iMaterialWrapper* mat = NULL;
+
+    for(size_t i=0; i<loader->loaderMaterials.GetSize(); i++)
+    {
+      if(!strcmp(loader->loaderMaterials[i]->QueryObject()->GetName(), filename))
+      {
+        mat = loader->loaderMaterials[i];
+        break;
+      }
+    }
+    
+    if(!mat)
+    {
+      mat = Engine->FindMaterial(filename, searchCollectionOnly ? collection : 0);
+    }
 
     if(!mat && missingdata)
     {
@@ -74,9 +104,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   iMaterialWrapper* csLoaderContext::FindNamedMaterial(const char* name, const char *filename)
   {
-    iMaterialWrapper* mat = Engine->FindMaterial(name, searchCollectionOnly ? collection : 0);
+    CS::Threading::MutexScopedLock lock(loader->materialsLock);
+    iMaterialWrapper* mat = NULL;
 
-    if(missingdata)
+    for(size_t i=0; i<loader->loaderMaterials.GetSize(); i++)
+    {
+      if(!strcmp(loader->loaderMaterials[i]->QueryObject()->GetName(), name))
+      {
+        mat = loader->loaderMaterials[i];
+        break;
+      }
+    }
+    
+    if(!mat)
+    {
+      mat = Engine->FindMaterial(name, searchCollectionOnly ? collection : 0);
+    }
+
+    if(!mat && missingdata)
     {
       mat = missingdata->MissingMaterial(name, filename);
     }
@@ -92,7 +137,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   iMeshFactoryWrapper* csLoaderContext::FindMeshFactory(const char* name)
   {
-    iMeshFactoryWrapper* fact = Engine->FindMeshFactory(name, searchCollectionOnly ? collection : 0);
+    CS::Threading::MutexScopedLock lock(loader->meshfactsLock);
+    iMeshFactoryWrapper* fact = NULL;
+
+    for(size_t i=0; i<loader->loaderMeshFactories.GetSize(); i++)
+    {
+      if(!strcmp(loader->loaderMeshFactories[i]->QueryObject()->GetName(), name))
+      {
+        fact = loader->loaderMeshFactories[i];
+        break;
+      }
+    }
+    
+    if(!fact)
+    {
+      fact = Engine->FindMeshFactory(name, searchCollectionOnly ? collection : 0);
+    }
 
     if(!fact && missingdata)
     {
@@ -109,7 +169,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   iMeshWrapper* csLoaderContext::FindMeshObject(const char* name)
   {
-    iMeshWrapper* mesh = Engine->FindMeshObject(name, searchCollectionOnly ? collection : 0);
+    CS::Threading::MutexScopedLock lock(loader->meshesLock);
+    iMeshWrapper* mesh = NULL;
+
+    for(size_t i=0; i<loader->loaderMeshes.GetSize(); i++)
+    {
+      if(!strcmp(loader->loaderMeshes[i]->QueryObject()->GetName(), name))
+      {
+        mesh = loader->loaderMeshes[i];
+        break;
+      }
+    }
+    
+    if(!mesh)
+    {
+      mesh = Engine->FindMeshObject(name, searchCollectionOnly ? collection : 0);
+    }
 
     if (!mesh && missingdata)
     {
@@ -126,20 +201,33 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   iLight* csLoaderContext::FindLight(const char *name)
   {
-    csRef<iLightIterator> li = Engine->GetLightIterator(searchCollectionOnly ? collection : 0);
-
-    iLight *light;
-
-    while(li->HasNext())
+    iLight *light = NULL;
+    loader->sectorsLock.Lock();
+    for (size_t i = 0; i < loader->loaderSectors.GetSize(); i++)
     {
-      light = li->Next();
-      if(!strcmp(light->QueryObject()->GetName(), name))
+      light = loader->loaderSectors[i]->GetLights ()->FindByName (name);
+      if (light)
       {
         break;
       }
     }
+    loader->sectorsLock.Unlock();
 
-    if(missingdata)
+    if(!light)
+    {
+      csRef<iLightIterator> li = Engine->GetLightIterator(searchCollectionOnly ? collection : 0);
+
+      while(li->HasNext())
+      {
+        light = li->Next();
+        if(!strcmp(light->QueryObject()->GetName(), name))
+        {
+          break;
+        }
+      }
+    }
+
+    if(!light && missingdata)
     {
       light = missingdata->MissingLight(name);
     }
@@ -205,14 +293,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   iTextureWrapper* csLoaderContext::FindTexture(const char* name)
   {
-    iTextureWrapper* result;
-    if(collection && searchCollectionOnly)
+    CS::Threading::MutexScopedLock lock(loader->texturesLock);
+    iTextureWrapper* result = NULL;
+
+    for(size_t i=0; i<loader->loaderTextures.GetSize(); i++)
     {
-      result = collection->FindTexture(name);
+      if(!strcmp(loader->loaderTextures[i]->QueryObject()->GetName(), name))
+      {
+        result = loader->loaderTextures[i];
+        break;
+      }
     }
-    else
+
+    if(!result)
     {
-      result = Engine->GetTextureList()->FindByName (name);
+      if(collection && searchCollectionOnly)
+      {
+        result = collection->FindTexture(name);
+      }
+      else
+      {
+        result = Engine->GetTextureList()->FindByName (name);
+      }
     }
 
     if(!result && missingdata)
@@ -231,14 +333,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   iTextureWrapper* csLoaderContext::FindNamedTexture (const char* name,
     const char *filename)
   {
-    iTextureWrapper* result;
-    if(collection && searchCollectionOnly)
+    CS::Threading::MutexScopedLock lock(loader->texturesLock);
+    iTextureWrapper* result = NULL;
+
+    for(size_t i=0; i<loader->loaderTextures.GetSize(); i++)
     {
-      result = collection->FindTexture(name);
+      if(!strcmp(loader->loaderTextures[i]->QueryObject()->GetName(), name))
+      {
+        result = loader->loaderTextures[i];
+        break;
+      }
     }
-    else
+
+    if(!result)
     {
-      result = Engine->GetTextureList()->FindByName(name);
+      if(collection && searchCollectionOnly)
+      {
+        result = collection->FindTexture(name);
+      }
+      else
+      {
+        result = Engine->GetTextureList()->FindByName(name);
+      }
     }
 
     if (!result && missingdata)
