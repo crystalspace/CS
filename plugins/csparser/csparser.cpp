@@ -1864,7 +1864,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
         v->Set (node->GetAttributeValueAsFloat ("value"));
       }
-      loaderSharedVariables.Push(v);
+      AddSharedVarToList(v);
     }
     else
     {
