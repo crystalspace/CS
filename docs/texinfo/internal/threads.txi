@@ -204,7 +204,6 @@ THREADED_CALLABLE_IMPL(csClassName, MethodName2)
   csRef<iInterface> obj = csPtr<iInterface>(new csImpl())
   ret->SetData(csRef<iBase>(obj));
   ret->MarkSuccessful();
-  ret->MarkFinished();
 }
 
 csClassName::MethodName()
