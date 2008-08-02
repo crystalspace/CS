@@ -108,7 +108,6 @@ THREADED_CALLABLE_IMPL1(csThreadTest, Test6, csRef<Data> stuff)
 
   if(b && i == 42 && f == 3.14159f && reallyBig == 123456789012345 && stuff->objreg == objReg)
   {
-    int counter = 0;
     for(int x=0; x<10000000; x++)
     {
       passed &= (stuff->d[x] == x/10);
@@ -170,7 +169,7 @@ THREADED_CALLABLE_IMPL(csThreadTest, Test7RealData)
 int main(int argc, char* argv[])
 {
   iObjectRegistry* objReg = csInitializer::CreateObjectRegistry();
-  iThreadManager* tm = csInitializer::CreateThreadManager(objReg);
+  csInitializer::CreateThreadManager(objReg);
 
   csRef<iThreadTest> threadTest;
   threadTest.AttachNew(new csThreadTest(objReg));

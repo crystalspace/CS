@@ -674,7 +674,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       case XMLTOKEN_MESHFACT:
         {
           csRef<iDocumentAttribute> attr_name = child->GetAttribute ("name");
-          const char* name = attr_name ? attr_name->GetValue () : 0;
           csRef<iDocumentAttribute> attr_file = child->GetAttribute ("file");
           if (attr_file)
           {

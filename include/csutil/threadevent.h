@@ -32,6 +32,9 @@ template<class T>
 class ThreadedCallable
 {
 public:
+  ThreadedCallable() {}
+  virtual ~ThreadedCallable() {}
+  
   virtual iObjectRegistry* GetObjectRegistry() const = 0;
 
   template<typename A1>
