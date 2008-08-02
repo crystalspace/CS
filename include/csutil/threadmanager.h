@@ -259,7 +259,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, bool (T::*metho
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
   args[1] = mempool->Store<csRef<iThreadReturn> >(ret); \
-  QueueEvent<type, csRef<iThreadReturn> >(tm, (ThreadedCallable*)this, &type::function##TC, args, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn> >(tm, (ThreadedCallable<type>*)this, &type::function##TC, args, useThreadQueue); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -285,7 +285,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, bool (T::*metho
   ret.AttachNew(new returnClass(tm)); \
   args[1] = mempool->Store<csRef<iThreadReturn> >(ret); \
   args[2] = mempool->Store<T1>((T1)A1); \
-  QueueEvent<type, csRef<iThreadReturn> , T1>(tm, (ThreadedCallable*)this, &type::function##TC, args, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn> , T1>(tm, (ThreadedCallable<type>*)this, &type::function##TC, args, useThreadQueue); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -369,7 +369,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, bool (T::*metho
   args[3] = mempool->Store<T2>((T2)A2); \
   args[4] = mempool->Store<T3>((T3)A3); \
   args[5] = mempool->Store<T4>((T4)A4); \
-  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4>(tm, (ThreadedCallable*)this, &type::function##TC, args, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4>(tm, (ThreadedCallable<type>*)this, &type::function##TC, args, useThreadQueue); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -529,7 +529,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, bool (T::*metho
   args[8] = mempool->Store<T7>((T7)A7); \
   args[9] = mempool->Store<T8>((T8)A8); \
   args[10] = mempool->Store<T9>((T9)A9); \
-  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9>(tm, (ThreadedCallable*)this, &type::function##TC, args, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9>(tm, (ThreadedCallable<type>*)this, &type::function##TC, args, useThreadQueue); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -600,7 +600,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, bool (T::*metho
   args[10] = mempool->Store<T9>((T9)A9); \
   args[11] = mempool->Store<T10>((T10)A10); \
   args[12] = mempool->Store<T11>((T11)A11); \
-  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(tm, (ThreadedCallable*)this, &type::function##TC, args, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(tm, (ThreadedCallable<type>*)this, &type::function##TC, args, useThreadQueue); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -637,7 +637,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, bool (T::*metho
   args[11] = mempool->Store<T10>((T10)A10); \
   args[12] = mempool->Store<T11>((T11)A11); \
   args[13] = mempool->Store<T12>((T12)A12); \
-  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(tm, (ThreadedCallable*)this, &type::function##TC, args, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(tm, (ThreadedCallable<type>*)this, &type::function##TC, args, useThreadQueue); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -675,7 +675,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, bool (T::*metho
   args[12] = mempool->Store<T11>((T11)A11); \
   args[13] = mempool->Store<T12>((T12)A12); \
   args[14] = mempool->Store<T13>((T13)A13); \
-  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(tm, (ThreadedCallable*)this, &type::function##TC, args, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(tm, (ThreadedCallable<type>*)this, &type::function##TC, args, useThreadQueue); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -714,7 +714,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, bool (T::*metho
   args[13] = mempool->Store<T12>((T12)A12); \
   args[14] = mempool->Store<T13>((T13)A13); \
   args[15] = mempool->Store<T14>((T14)A14); \
-  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(tm, (ThreadedCallable*)this, &type::function##TC, args, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(tm, (ThreadedCallable<type>*)this, &type::function##TC, args, useThreadQueue); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -754,7 +754,7 @@ void QueueEvent(iThreadManager* tm, ThreadedCallable<T>* object, bool (T::*metho
   args[14] = mempool->Store<T13>((T13)A13); \
   args[15] = mempool->Store<T14>((T14)A14); \
   args[16] = mempool->Store<T15>((T15)A15); \
-  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(tm, (ThreadedCallable*)this, &type::function##TC, args, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(tm, (ThreadedCallable<type>*)this, &type::function##TC, args, useThreadQueue); \
   if(wait) \
   { \
     ret->Wait(); \
