@@ -222,7 +222,7 @@ bool Simple::SetupModules ()
   if (!loader) return ReportError("Failed to locate Loader!");
 
   return true;
-}
+@}
 
 /*---------------*
  * Main function
