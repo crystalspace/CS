@@ -412,9 +412,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         iStreamSource* ssource, iMissingLoaderData* missingdata, bool loadProxyTex = true,
         bool do_verbose = false);
 
-      bool LoadLibraryFromNode(iLoaderContext* ldr_context, iDocumentNode* child,
-        iStreamSource* ssource, iMissingLoaderData* missingdata, bool loadProxyTex = true,
-        bool do_verbose = false);
+      THREADED_CALLABLE_DECL6(csThreadedLoader, LoadLibraryFromNode, csLoaderReturn,
+        csRef<iLoaderContext>, ldr_context, csRef<iDocumentNode>, child, csRef<iStreamSource>,
+        ssource, csRef<iMissingLoaderData>, missingdata, bool, loadProxyTex, bool, do_verbose,
+        true, false);
 
       csPtr<iImage> LoadImage (iDataBuffer* buf, const char* fname, int Format, bool do_verbose);
 

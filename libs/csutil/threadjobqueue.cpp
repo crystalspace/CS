@@ -257,5 +257,10 @@ namespace Threading
     }
   }
 
+  int32 ThreadedJobQueue::GetQueueCount()
+  {
+    return CS::Threading::AtomicOperations::Read(&outstandingJobs);
+  }
+
 }
 }

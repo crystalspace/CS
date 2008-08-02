@@ -64,7 +64,10 @@ void csThreadManager::Process(uint num)
 
 void csThreadManager::Wait(csRef<iThreadReturn> result)
 {
-  AtomicOperations::Increment(&waiting);
-  while(!result->IsFinished());
-  AtomicOperations::Decrement(&waiting);
+  if(!result->IsFinished())
+  {
+    AtomicOperations::Increment(&waiting);
+    while(!result->IsFinished());
+    AtomicOperations::Decrement(&waiting);
+  }
 }

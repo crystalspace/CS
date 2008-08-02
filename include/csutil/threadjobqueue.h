@@ -50,6 +50,7 @@ public:
   virtual void Unqueue (iJob* job, bool waitIfCurrent = true);
   virtual bool IsFinished ();
   virtual void Wait (iJob* job);
+  virtual int32 GetQueueCount();
 
   enum
   {

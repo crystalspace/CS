@@ -1747,7 +1747,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     csRef<iVFS> vfs;
     vfs = csQueryRegistry<iVFS> (object_reg);
-    csVfsDirectoryChanger dirChanger (vfs);
 
     if (fileChild)
     {
@@ -1782,8 +1781,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           filename.GetData ());
         return false;
       }
-
-      dirChanger.ChangeTo (filename);
     }
     else
     {

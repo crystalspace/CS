@@ -51,14 +51,16 @@ public:
   {
     if(useThreadQueue)
     {
-      CS::Threading::MutexScopedLock lock(queuePushLock);
-      if(waiting == threadCount-1)
+      queuePushLock.Lock();
+      if(waiting >= threadCount-1 || threadQueue->GetQueueCount() > threadCount)
       {
+        queuePushLock.Unlock();
         job->Run();
       }
       else
       {
         threadQueue->Enqueue(job);
+        queuePushLock.Unlock();
       }
     }
     else

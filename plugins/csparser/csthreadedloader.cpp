@@ -283,8 +283,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       object_reg);
     csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
 
-    csVfsDirectoryChanger dirChanger (vfs);
-
     csRef<iFile> shaderFile = vfs->Open (filename, VFS_FILE_READ);
     if (!shaderFile)
     {
@@ -314,8 +312,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         "Shader file '%s' is not a valid shader XML file!", filename);
       return false;
     }
-
-    dirChanger.ChangeTo (filename);
 
     const char* type = shaderNode->GetAttributeValue ("compiler");
     if (type == 0)
@@ -633,14 +629,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   bool csThreadedLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* world_node,
     iStreamSource* ssource, iMissingLoaderData* missingdata, bool do_verbose)
   {
-    if (!Engine)
-    {
-      SyntaxService->ReportError (
-        "crystalspace.maploader.parse",
-        world_node, "The engine plugin is missing!");
-      return false;
-    }
-
     // Will be set to true if we find a <shader> section.
     bool shader_given = false;
 
@@ -741,9 +729,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_LIBRARY:
         {
-          if (!LoadLibraryFromNode (ldr_context, child, ssource, missingdata,
-            false))
-            return false;
+          LoadLibraryFromNode (ldr_context, child, ssource, missingdata, false, false);
           break;
         }
       case XMLTOKEN_START:
@@ -792,8 +778,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return true;
   }
 
-  bool csThreadedLoader::LoadLibraryFromNode (iLoaderContext* ldr_context,
-    iDocumentNode* child, iStreamSource* ssource, iMissingLoaderData* missingdata,
+  THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadLibraryFromNode,
+    csRef<iLoaderContext> ldr_context, csRef<iDocumentNode> child,
+    csRef<iStreamSource> ssource, csRef<iMissingLoaderData> missingdata,
     bool loadProxyTex, bool do_verbose)
   {
     csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
@@ -850,7 +837,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iFile> buf = vfs->Open (fname, VFS_FILE_READ);
 
     if (!buf)
-    {
+    { 
       ReportError (
         "crystalspace.maploader.parse.library",
         "Could not open library file '%s' on VFS!", fname);
@@ -926,8 +913,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_LIBRARY:
         {
-          if (!LoadLibraryFromNode (ldr_context, child, ssource, missingdata))
-            return false;
+          LoadLibraryFromNode(ldr_context, child, ssource, missingdata, true, false);
           break;
         }
       case XMLTOKEN_ADDON:
@@ -2341,15 +2327,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     iBase* context, const char* fname, iStreamSource* ssource)
   {
     csRef<iDocument> doc;
-    csString filename (fname);
-    csVfsDirectoryChanger dirChanger (vfs);
-    size_t slashPos = filename.FindLast ('/');
-    if (slashPos != (size_t)-1)
-    {
-      dirChanger.ChangeTo (filename);
-      filename.DeleteAt (0, slashPos + 1);
-    }
-    bool er = LoadStructuredDoc (filename, buf, doc);
+    bool er = LoadStructuredDoc (fname, buf, doc);
     csRef<iBase> ret;
     if (er)
     {
