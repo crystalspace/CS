@@ -105,7 +105,7 @@ csTinyXmlNodeIterator::csTinyXmlNodeIterator (
   csTinyXmlNodeIterator::value = value ? StrDup (value) : 0;
 
   TiDocumentNodeChildren* node_children = 0;
-  if (parent && 
+  if (parent && parent->GetTiNode() &&
     ((parent->GetTiNode()->Type() == TiDocumentNode::ELEMENT)
       || (parent->GetTiNode()->Type() == TiDocumentNode::DOCUMENT)))
     node_children = parent->GetTiNodeChildren ();
