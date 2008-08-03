@@ -95,6 +95,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     { /* Speed hack for when being a member of CondOperation:
        * it's "initialization" will null this as well */ }
        
+    inline void Clear () { memset (this, 0, sizeof (*this)); }
+       
     bool operator== (const CondOperand& other) const
     {
       if (type != other.type) return false;

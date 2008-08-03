@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 1998-2008 by Jorrit Tyberghein
     Written by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -90,6 +90,13 @@
  */
 #ifndef CS_ATTRIBUTE_MALLOC
 # define CS_ATTRIBUTE_MALLOC
+#endif
+
+/**\def CS_ATTRIBUTE_INIT_PRIORITY()
+ * Namespace-level object initialization priority attribute.
+ */
+#ifndef CS_ATTRIBUTE_INIT_PRIORITY
+# define CS_ATTRIBUTE_INIT_PRIORITY(PRI)
 #endif
 
 // Set up deprecation macros
@@ -868,6 +875,10 @@ namespace CS
     #    else
       _asm int 3;
     #    endif
+    #  elif defined (CS_PROCESSOR_POWERPC)
+    // Source: http://cocoawithlove.com/2008/03/break-into-debugger.html
+      asm("li r0, 20\nsc\nnop\nli r0, 37\nli r4, 2\nsc\nnop\n"
+           : : : "memory","r0","r3","r4" );
     #  else
       static int x = 0; x /= x;
     #  endif

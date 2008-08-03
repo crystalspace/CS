@@ -1,5 +1,5 @@
 #==============================================================================
-# Copyright (C)2003-2006 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2003-2008 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -19,116 +19,150 @@
 AC_PREREQ([2.56])
 
 #------------------------------------------------------------------------------
-# CS_CHECK_COMMON_TOOLS_LINK
-#	Checks for common tools related to linking.
+# CS_CHECK_COMMON_TOOLS_LINK([EMITTER])
+#	Checks for common tools related to linking. Results of the checks are
+#	recorded with CS_EMIT_BUILD_PROPERTY() via the optional EMITTER. If
+#	EMITTER is omitted, then CS_EMIT_BUILD_PROPERTY()'s default emitter is
+#	employed.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_COMMON_TOOLS_LINK],
-    [
-    # The default RANLIB in Jambase is wrong on some platforms, and is also
-    # unsuitable during cross-compilation, so we set the value unconditionally
-    # (sixth argument of CS_EMIT_BUILD_PROPERTY).
+    [# The default RANLIB in Jambase is wrong on some platforms, and is also
+    # unsuitable during cross-compilation, so value is set unconditionally.
     AC_PROG_RANLIB
-    CS_EMIT_BUILD_PROPERTY([RANLIB], [$RANLIB], [], [], [], [Y])
+    CS_EMIT_BUILD_PROPERTY([RANLIB], [$RANLIB], [unconditional], [], [$1])
     
     CS_CHECK_TOOLS([DLLTOOL], [dlltool])
-    CS_EMIT_BUILD_PROPERTY([CMD.DLLTOOL], [$DLLTOOL])
+    CS_EMIT_BUILD_PROPERTY([CMD.DLLTOOL], [$DLLTOOL], [], [], [$1])
     
     CS_CHECK_TOOLS([DLLWRAP], [dllwrap])
     AS_IF([test "$cs_mno_cygwin" = "yes"],
       [DLLWRAP="$DLLWRAP --target i386-mingw32"])
-    CS_EMIT_BUILD_PROPERTY([CMD.DLLWRAP], [$DLLWRAP])
+    CS_EMIT_BUILD_PROPERTY([CMD.DLLWRAP], [$DLLWRAP], [], [], [$1])
     
     CS_CHECK_TOOLS([WINDRES], [windres])
-    CS_EMIT_BUILD_PROPERTY([CMD.WINDRES], [$WINDRES])
+    CS_EMIT_BUILD_PROPERTY([CMD.WINDRES], [$WINDRES], [], [], [$1])
     
     CS_CHECK_TOOLS([STRINGS], [strings])
-    CS_EMIT_BUILD_PROPERTY([CMD.STRINGS], [$STRINGS])
+    CS_EMIT_BUILD_PROPERTY([CMD.STRINGS], [$STRINGS], [], [], [$1])
 
     CS_CHECK_TOOLS([OBJCOPY], [objcopy])
-    CS_EMIT_BUILD_PROPERTY([CMD.OBJCOPY], [$OBJCOPY])
+    CS_EMIT_BUILD_PROPERTY([CMD.OBJCOPY], [$OBJCOPY], [], [], [$1])
     
     CS_CHECK_LIBTOOL
-    CS_EMIT_BUILD_PROPERTY([LIBTOOL], [$LIBTOOL])
-    CS_EMIT_BUILD_PROPERTY([APPLE_LIBTOOL], [$APPLE_LIBTOOL])
-    ])
+    CS_EMIT_BUILD_PROPERTY([LIBTOOL], [$LIBTOOL], [], [], [$1])
+    CS_EMIT_BUILD_PROPERTY([APPLE_LIBTOOL], [$APPLE_LIBTOOL], [], [], [$1])])
 
 
 #------------------------------------------------------------------------------
-# CS_CHECK_COMMON_TOOLS_BASIC
-#	Checks for basic tools for building things.
+# CS_CHECK_COMMON_TOOLS_BASIC([EMITTER])
+#	Checks for basic tools for building things. Results of the checks are
+#	recorded with CS_EMIT_BUILD_PROPERTY() via the optional EMITTER. If
+#	EMITTER is omitted, then CS_EMIT_BUILD_PROPERTY()'s default emitter is
+#	employed.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_COMMON_TOOLS_BASIC],
     [CS_CHECK_MKDIR
-    CS_EMIT_BUILD_PROPERTY([CMD.MKDIR], [$MKDIR])
-    CS_EMIT_BUILD_PROPERTY([CMD.MKDIRS], [$MKDIRS])
+    CS_EMIT_BUILD_PROPERTY([CMD.MKDIR], [$MKDIR], [], [], [$1])
+    CS_EMIT_BUILD_PROPERTY([CMD.MKDIRS], [$MKDIRS], [], [], [$1])
 
-    CS_CHECK_PROGS([INSTALL], [install])
-    CS_EMIT_BUILD_PROPERTY([INSTALL], [$INSTALL])
+    CS_CHECK_PROGS([INSTALL], [install], [], [], [$1])
+    CS_EMIT_BUILD_PROPERTY([INSTALL], [$INSTALL], [], [], [$1])
     AC_PROG_LN_S
-    CS_EMIT_BUILD_PROPERTY([LN_S], [$LN_S])])
+    CS_EMIT_BUILD_PROPERTY([LN_S], [$LN_S], [], [], [$1])])
 
 
 #------------------------------------------------------------------------------
-# CS_CHECK_COMMON_TOOLS_DOC_TEXINFO
-#	Checks for tools to generate documentation from texinfo files.
+# CS_CHECK_COMMON_TOOLS_DOC_TEXINFO([EMITTER])
+#	Checks for tools to generate documentation from texinfo files. Results
+#	of the checks are recorded with CS_EMIT_BUILD_PROPERTY() via the
+#	optional EMITTER. If EMITTER is omitted, then
+#	CS_EMIT_BUILD_PROPERTY()'s default emitter is employed.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_COMMON_TOOLS_DOC_TEXINFO],
     [CS_CHECK_PROGS([TEXI2DVI], [texi2dvi])
-    CS_EMIT_BUILD_PROPERTY([CMD.TEXI2DVI], [$TEXI2DVI])
+    CS_EMIT_BUILD_PROPERTY([CMD.TEXI2DVI], [$TEXI2DVI], [], [], [$1])
 
     CS_CHECK_PROGS([TEXI2PDF], [texi2pdf])
-    CS_EMIT_BUILD_PROPERTY([CMD.TEXI2PDF], [$TEXI2PDF])
+    CS_EMIT_BUILD_PROPERTY([CMD.TEXI2PDF], [$TEXI2PDF], [], [], [$1])
 
     CS_CHECK_PROGS([DVIPS], [dvips])
-    CS_EMIT_BUILD_PROPERTY([CMD.DVIPS], [$DVIPS])
+    CS_EMIT_BUILD_PROPERTY([CMD.DVIPS], [$DVIPS], [], [], [$1])
 
     CS_CHECK_PROGS([DVIPDF], [dvipdf])
-    CS_EMIT_BUILD_PROPERTY([CMD.DVIPDF], [$DVIPDF])
+    CS_EMIT_BUILD_PROPERTY([CMD.DVIPDF], [$DVIPDF], [], [], [$1])
 
     CS_CHECK_PROGS([MAKEINFO], [makeinfo])
-    CS_EMIT_BUILD_PROPERTY([CMD.MAKEINFO], [$MAKEINFO])])
+    CS_EMIT_BUILD_PROPERTY([CMD.MAKEINFO], [$MAKEINFO], [], [], [$1])])
 
 
 #------------------------------------------------------------------------------
-# CS_CHECK_COMMON_TOOLS_DOC_DOXYGEN
-#	Checks for tools to generate source documentation via doxygen.
+# CS_CHECK_COMMON_TOOLS_DOC_DOXYGEN([EMITTER])
+#	Checks for tools to generate source documentation via doxygen. Results
+#	of the checks are recorded with CS_EMIT_BUILD_PROPERTY() via the
+#	optional EMITTER. If EMITTER is omitted, then
+#	CS_EMIT_BUILD_PROPERTY()'s default emitter is employed.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_COMMON_TOOLS_DOC_DOXYGEN],
     [CS_CHECK_PROGS([DOXYGEN], [doxygen])
-    CS_EMIT_BUILD_PROPERTY([CMD.DOXYGEN], [$DOXYGEN])
+    CS_EMIT_BUILD_PROPERTY([CMD.DOXYGEN], [$DOXYGEN], [], [], [$1])
 
     CS_CHECK_TOOLS([DOT], [dot])
-    CS_EMIT_BUILD_PROPERTY([CMD.DOT], [$DOT])])
+    CS_EMIT_BUILD_PROPERTY([CMD.DOT], [$DOT], [], [], [$1])])
 
 
 #------------------------------------------------------------------------------
-# CS_CHECK_COMMON_TOOLS_ICONS
-#	Checks for tools required by the icon generation rules from icons.jam.
+# CS_CHECK_COMMON_TOOLS_ICONS([EMITTER])
+#	Checks for tools required by the icon generation rules from
+#	icons.jam. Results of the checks are recorded with
+#	CS_EMIT_BUILD_PROPERTY() via the optional EMITTER. If EMITTER is
+#	omitted, then CS_EMIT_BUILD_PROPERTY()'s default emitter is employed.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_COMMON_TOOLS_ICONS],
     [# rsvg: for svg to png conversion
     CS_CHECK_PROGS([RSVG], [rsvg])
-    CS_EMIT_BUILD_PROPERTY([CMD.RSVG], [$RSVG])
+    CS_EMIT_BUILD_PROPERTY([CMD.RSVG], [$RSVG], [], [], [$1])
 
     # icotool: for creating Win32 ICO files
     CS_CHECK_PROGS([ICOTOOL], [icotool])
-    CS_EMIT_BUILD_PROPERTY([CMD.ICOTOOL], [$ICOTOOL])
+    CS_EMIT_BUILD_PROPERTY([CMD.ICOTOOL], [$ICOTOOL], [], [], [$1])
 
     # convert: for various image manipulations from both the svg conversion and
     #  ICO creation.
     CS_CHECK_PROGS([CONVERT], [convert])
-    CS_EMIT_BUILD_PROPERTY([CMD.CONVERT], [$CONVERT])])
+    CS_EMIT_BUILD_PROPERTY([CMD.CONVERT], [$CONVERT], [], [], [$1])])
 
 
 #------------------------------------------------------------------------------
-# CS_CHECK_COMMON_LIBS
-#       Check for typical required libraries (libm, libmx, libdl, libnsl).
+# CS_CHECK_COMMON_LIBS([EMITTER])
+#       Check for typical required libraries (libc, libm, libmx, libdl,
+#	libnsl). Results of the checks are recorded under build key
+#	"COMPILER.LFLAGS" via CS_EMIT_BUILD_PROPERTY() using the optional
+#	EMITTER. If EMITTER is omitted, then CS_EMIT_BUILD_PROPERTY()'s default
+#	emitter is employed.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_COMMON_LIBS],
     [AC_LANG_PUSH([C])
+
+    AC_CHECK_LIB([c], [fopen])
+    AS_IF([test $ac_cv_lib_c_fopen = yes],
+	[CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lc], [append],[],[$1])])
+
     AC_CHECK_LIB([m], [pow], [cs_cv_libm_libs=-lm], [cs_cv_libm_libs=])
     AC_CHECK_LIB([m], [cosf], [cs_cv_libm_libs=-lm])
+    AS_IF([test $ac_cv_lib_m_pow = yes || test $ac_cv_lib_m_cosf = yes],
+	[CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lm], [append],[],[$1])])
+
     AC_CHECK_LIB([mx], [cosf])
+    AS_IF([test $ac_cv_lib_mx_cosf = yes],
+	[CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lmx], [append],[],[$1])])
+
     AC_CHECK_LIB([dl], [dlopen], [cs_cv_libdl_libs=-ldl], [cs_cv_libdl_libs=])
+    AS_IF([test $ac_cv_lib_dl_dlopen = yes],
+	[CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-ldl], [append],[],[$1])])
+
     AC_CHECK_LIB([nsl], [gethostbyname])
-    AC_LANG_POP([C])])
+    AS_IF([test $ac_cv_lib_nsl_gethostbyname = yes],
+	[CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lnsl], [append],[],[$1])])
+
+    AC_LANG_POP([C])
+])

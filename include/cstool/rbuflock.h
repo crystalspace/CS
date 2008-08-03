@@ -120,8 +120,7 @@ public:
   {
 #ifdef CS_DEBUG
     elements = buf ? buf->GetElementCount() : 0;
-#endif
-    CS_ASSERT (buffer != 0);
+#endif    
     lockBuf = 
       buffer ? ((T*)((uint8*)buffer->Lock (lock))) : (T*)-1;
   }

@@ -61,6 +61,7 @@ class ConditionTree
       branches[0] = 0;
       branches[1] = 0;
     }
+    
   };
 
   csFixedSizeAllocator<sizeof (Node), TempHeapAlloc> nodeAlloc;
@@ -84,15 +85,26 @@ class ConditionTree
   Variables cheapshotTrueVals;
   Variables cheapshotFalseVals;
   MyBitArrayTemp affectedSVs;
+  
+  struct CommitNode
+  {
+    Node* owner;
+    int branch;
+    Node* newNode;
+  };
+  typedef csArray<CommitNode> CommitArray;
+  csArray<CommitArray> commitArrays;
 
   void RecursiveAdd (csConditionID condition, Node* node, 
-    NodeStackEntry& newCurrent, MyBitArrayTemp& affectedSVs);
+    NodeStackEntry& newCurrent, MyBitArrayTemp& affectedSVs,
+    CommitArray& commitNodes);
   void ToResolver (iConditionResolver* resolver, Node* node,
     csConditionNode* parent);
 
   bool HasContainingCondition (Node* node, csConditionID containedCondition,
     csConditionID& condition, int& branch);
 
+  void ClearCommitArray (CommitArray& ca);
   void RecursiveFree (Node* node);
   
   csConditionEvaluator& evaluator;
@@ -118,6 +130,7 @@ public:
   void SwitchBranch ();
   void Ascend (int num);
   int GetBranch() const { return currentBranch; }
+  void Commit ();
 
   void ToResolver (iConditionResolver* resolver);
 
@@ -126,7 +139,8 @@ public:
 
 void ConditionTree::RecursiveAdd (csConditionID condition, Node* node, 
                                   NodeStackEntry& newCurrent, 
-                                  MyBitArrayTemp& affectedSVs)
+                                  MyBitArrayTemp& affectedSVs,
+                                  CommitArray& commitNodes)
 {
   /* Shortcut */
   if (node->condition == condition)
@@ -250,7 +264,12 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
 	    {
 	      nn->values = (b == 0) ? trueVals : falseVals;
 	    }
-	    node->branches[b] = nn;
+	    //node->branches[b] = nn;
+	    CommitNode commitNode;
+	    commitNode.owner = node;
+	    commitNode.branch = b;
+	    commitNode.newNode = nn;
+	    commitNodes.Push (commitNode);
 	    newCurrent.branches[b].Push (nn);
 	  }
 	} 
@@ -274,8 +293,10 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
 	newCurrent.branches[1].Push (node);
 	break;
       case Logic3::Uncertain:
-	RecursiveAdd (condition, node->branches[0], newCurrent, affectedSVs);
-	RecursiveAdd (condition, node->branches[1], newCurrent, affectedSVs);
+	RecursiveAdd (condition, node->branches[0], newCurrent, affectedSVs,
+	  commitNodes);
+	RecursiveAdd (condition, node->branches[1], newCurrent, affectedSVs,
+	  commitNodes);
 	break;
     }
   }
@@ -289,6 +310,7 @@ Logic3 ConditionTree::Descend (csConditionID condition)
   const NodeStackEntry& current = *(nodeStack[nodeStack.GetSize()-1]);
   NodeStackEntry* newCurrent = nodeStackEntryAlloc.Alloc();
   
+  CommitArray ca;
   const NodeArray& currentNodes = current.branches[currentBranch];
   if (conditionReserved)
   {
@@ -308,9 +330,10 @@ Logic3 ConditionTree::Descend (csConditionID condition)
     evaluator.GetUsedSVs (condition, affectedSVs);
     for (size_t i = 0; i < currentNodes.GetSize(); i++)
     {
-      RecursiveAdd (condition, currentNodes[i], *newCurrent, affectedSVs);
+      RecursiveAdd (condition, currentNodes[i], *newCurrent, affectedSVs, ca);
     }
   }
+  commitArrays.Push (ca);
     
   nodeStack.Push (newCurrent);
   branchStack.Push (currentBranch);
@@ -339,9 +362,29 @@ void ConditionTree::Ascend (int num)
     nodeStack.GetSize() > 1);
   while (num-- > 0)
   {
-    nodeStack.Pop();
+    NodeStackEntry* oldNodes = nodeStack.Pop();
+    nodeStackEntryAlloc.Free (oldNodes);
     currentBranch = branchStack.Pop();
+    
+    if (commitArrays.GetSize() > 0)
+    {
+      CommitArray ca (commitArrays.Pop ());
+      ClearCommitArray (ca);
+    }
   }
+}
+
+void ConditionTree::Commit ()
+{
+  for (size_t c = 0; c < commitArrays.GetSize(); c++)
+  {
+    CommitArray& ca = commitArrays[c];
+    for (size_t n = 0; n < ca.GetSize(); n++)
+    {
+      ca[n].owner->branches[ca[n].branch] = ca[n].newNode;
+    }
+  }
+  commitArrays.Empty();
 }
 
 void ConditionTree::ToResolver (iConditionResolver* resolver, 
@@ -385,6 +428,15 @@ bool ConditionTree::HasContainingCondition (Node* node,
     branch);
 }
   
+void ConditionTree::ClearCommitArray (CommitArray& ca)
+{
+  for (size_t n = 0; n < ca.GetSize(); n++)
+  {
+    ca[n].newNode->~Node();
+    nodeAlloc.Free (ca[n].newNode);
+  }
+}
+
 void ConditionTree::RecursiveFree (Node* node)
 {
   if (node == 0) return;
@@ -672,6 +724,13 @@ void csWrappedDocumentNode::CreateElseWrapper (NodeProcessingState* state,
   elseWrapper.child = new WrappedChild;
   elseWrapper.child->condition = oldCurrentWrapper.child->condition;
   elseWrapper.child->conditionValue = false;
+  
+  if (!oldCurrentWrapper.child->childNode.IsValid()
+      && (oldCurrentWrapper.child->childrenWrappers.GetSize() == 0))
+  {
+    state->currentWrapper.child->childrenWrappers.Delete (
+      oldCurrentWrapper.child);
+  }
 }
 
 template<typename ConditionEval>
@@ -1247,16 +1306,16 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      ParseCondition (newWrapper, space + 1, valLen - cmdLen - 1, 
 		node);
 
-              const csConditionID condition = newWrapper.child->condition;
-              Logic3 r = eval.Descend (condition);
+              csConditionID condition = newWrapper.child->condition;
               // If the parent condition is always false, so is this
               if ((((currentWrapper.child->condition == csCondAlwaysFalse)
                 && (currentWrapper.child->conditionValue == true))
                   || ((currentWrapper.child->condition == csCondAlwaysTrue)
                 && (currentWrapper.child->conditionValue == false))))
               {
-                r.state = Logic3::Lie;
+                condition = csCondAlwaysFalse;
               }
+              Logic3 r = eval.Descend (condition);
               if (r.state == Logic3::Truth)
                 newWrapper.child->condition = csCondAlwaysTrue;
               else if (r.state == Logic3::Lie)
@@ -1290,7 +1349,16 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
                 int ascendNum = globalState->ascendStack.Pop ();
                 eval.Ascend (ascendNum);
                 while (ascendNum-- > 0)
+                {
+                  WrapperStackEntry lastWrapper = currentWrapper;
 		  currentWrapper = wrapperStack.Pop ();
+		  if (!lastWrapper.child->childNode.IsValid()
+		      && (lastWrapper.child->childrenWrappers.GetSize() == 0))
+		  {
+		    currentWrapper.child->childrenWrappers.Delete (
+		      lastWrapper.child);
+		  }
+		}
               }
 	      handled = true;
 	    }
@@ -1361,21 +1429,21 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 		  node);
           
                 eval.SwitchBranch ();
-                const csConditionID condition = newWrapper.child->condition;
-                Logic3 r = eval.Descend (condition);
+                csConditionID condition = newWrapper.child->condition;
                 // If the parent condition is always false, so is this
                 if ((((currentWrapper.child->condition == csCondAlwaysFalse)
                   && (currentWrapper.child->conditionValue == true))
                     || ((currentWrapper.child->condition == csCondAlwaysTrue)
                   && (currentWrapper.child->conditionValue == false))))
                 {
-                  r.state = Logic3::Lie;
+                  condition = csCondAlwaysFalse;
                 }
-                globalState->ascendStack[globalState->ascendStack.GetSize()-1]++;
+                Logic3 r = eval.Descend (condition);
                 if (r.state == Logic3::Truth)
                   newWrapper.child->condition = csCondAlwaysTrue;
                 else if (r.state == Logic3::Lie)
                   newWrapper.child->condition = csCondAlwaysFalse;
+                globalState->ascendStack[globalState->ascendStack.GetSize()-1]++;
 
 		elseWrapper.child->childrenWrappers.Push (newWrapper.child);
 		wrapperStack.Push (currentWrapper);
@@ -1604,6 +1672,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
       || ((currentWrapper.child->condition == csCondAlwaysTrue)
         && (currentWrapper.child->conditionValue == false))))
   {
+    eval.Commit();
     WrappedChild* newWrapper = new WrappedChild;
     if (parseOpts & wdnfpoOnlyOneLevelConditions)
     {
@@ -2338,6 +2407,7 @@ struct EvalCondTree
   void SwitchBranch () { condTree.SwitchBranch (); }
   void Ascend (int num) { condTree.Ascend (num); }
   int GetBranch() const { return condTree.GetBranch(); }
+  void Commit() { condTree.Commit(); }
 };
 
 csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
@@ -2403,12 +2473,13 @@ struct EvalStatic
     CS_ASSERT(currentBranch == 0);
     currentBranch = 1;
   }
-  void Ascend (int num) 
+  void Ascend (int num)
   { 
     while (num-- > 0)
       branchStack.Pop ();
   }
   int GetBranch() const { return currentBranch; }
+  void Commit () {}
 };
 
 csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapperStatic (

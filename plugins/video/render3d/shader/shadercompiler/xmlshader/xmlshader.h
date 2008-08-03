@@ -107,6 +107,7 @@ public:
   csRef<iDocumentSystem> xmlDocSys;
   
   CS::ShaderVarStringID string_mixmode_alpha;
+  CS::ShaderVarStringID stringLightCount;
 
 #define CS_TOKEN_ITEM_FILE \
   "plugins/video/render3d/shader/shadercompiler/xmlshader/xmlshader.tok"

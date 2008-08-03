@@ -186,6 +186,7 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
     struct Technique
     {
       int priority;
+      int minLights;
       csRef<csWrappedDocumentNode> srcNode;
       
       csShaderConditionResolver* resolver;
@@ -248,6 +249,7 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
     if (tvc == 0) tvc = 1;
     size_t techVar = (ticket % (tvc+1))-1;
     size_t techAndVar = ticket / (tvc+1);
+    if (techVar >= techVariants.GetSize()) return 0;
     const csArray<ShaderTechVariant::Technique>& techniques =
       techVariants[techVar].techniques;
     return techniques[techAndVar % techniques.GetSize()]

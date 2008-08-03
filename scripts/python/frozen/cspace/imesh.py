@@ -1913,6 +1913,8 @@ class iTerrainCellFeederProperties(core.iBase):
     def GetAlphaMapCount(*args): return _imesh.iTerrainCellFeederProperties_GetAlphaMapCount(*args)
     def GetAlphaMapMaterial(*args): return _imesh.iTerrainCellFeederProperties_GetAlphaMapMaterial(*args)
     def GetAlphaMapSource(*args): return _imesh.iTerrainCellFeederProperties_GetAlphaMapSource(*args)
+    def SetHeightmapSmooth(*args): return _imesh.iTerrainCellFeederProperties_SetHeightmapSmooth(*args)
+    def GetHeightmapSmooth(*args): return _imesh.iTerrainCellFeederProperties_GetHeightmapSmooth(*args)
     scfGetVersion = staticmethod(_imesh.iTerrainCellFeederProperties_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainCellFeederProperties
     __del__ = lambda self : None;

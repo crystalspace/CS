@@ -414,7 +414,8 @@ public:
   
   void BeginDraw (int drawflags);
   void SetupProjection ();
-  void SetupProjection (const CS::Math::Matrix4& projectionMatrix);
+  CS::Math::Matrix4 SetupProjection (
+    const CS::Math::Matrix4& projectionMatrix);
   void FinishDraw ();
   void SetClipRect (const csRect& clipRect);
   void SetupClipPortalDrawing ();

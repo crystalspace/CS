@@ -1,6 +1,6 @@
 # qualify.m4                                                   -*- Autoconf -*-
 #==============================================================================
-# Copyright (C)2005 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2005,2008 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -40,7 +40,7 @@ AC_DEFUN([CS_SYMBOL_QUALIFIER],
 	    [AS_IF([test "$$2" = no],
 		[CS_BUILD_IFELSE(
 		    [AC_LANG_PROGRAM(
-			[cs_symbol_qualifier m4_default([$4],[void f()]);],
+			[m4_default([$4],[void f()]) cs_symbol_qualifier;],
 			[])],
 		    [], [$5], [$2='cs_symbol_qualifier'], [$2='no'])])])])
     AS_IF([test $$2 != no], [$6], [$7])])

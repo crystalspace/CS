@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node XML Syntax Services, Old Map File Format, XML File Format, Map Loader
+@node XML Syntax Services, Binary XML, HOWTO Level Loading, Map Loader
 @subsection @sc{xml} Syntax Services
 @cindex Syntax Services
 @cindex @code{iSyntaxService}

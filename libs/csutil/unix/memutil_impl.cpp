@@ -20,7 +20,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/csstring.h"
 #include "csutil/sysfunc.h"
 #include "../memutil.h"
-#if defined(CS_HAVE_SYSINFO)
+#if defined(CS_HAVE_SYS_SYSINFO_H)
 #include <sys/sysinfo.h>
 #endif
 
@@ -28,7 +28,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 static size_t query_sysinfo()
 {
   size_t n = 0;
-#if defined(CS_HAVE_SYSINFO)
+#if defined(CS_HAVE_SYSINFO) && defined(CS_HAVE_STRUCT_SYSINFO_TOTALRAM)
   struct sysinfo x;
   if (sysinfo(&x) == 0)
     n = x.totalram / 1024;

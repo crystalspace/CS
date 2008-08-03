@@ -240,13 +240,14 @@ void Simple::CreateRoom ()
 
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("brick");
   
+  /* Shader variables are identified by numeric IDs for performance reasons.
+   * The shader var string set translates string IDs to numeric IDs. */
+  csRef<iShaderVarStringSet> svStrings =
+    csQueryRegistryTagInterface<iShaderVarStringSet> (GetObjectRegistry(),
+      "crystalspace.shader.variablenameset");
+  
   // Add a normal map to the material.
   {
-    /* Shader variables are identified by numeric IDs for performance reasons.
-     * The shader var string set translates string IDs to numeric IDs. */
-    csRef<iShaderVarStringSet> svStrings =
-      csQueryRegistryTagInterface<iShaderVarStringSet> (GetObjectRegistry(),
-        "crystalspace.shader.variablenameset");
     // Load the normal map texture itself
     csRef<iTextureHandle> normalMap = loader->LoadTexture (
       "/lib/std/castle/brick1_n.jpg");
@@ -256,6 +257,12 @@ void Simple::CreateRoom ()
     csShaderVariable* svNormalMap =
       tm->GetMaterial()->GetVariableAdd (svStrings->Request ("tex normal"));
     svNormalMap->SetValue (normalMap);
+  }
+  // Set a specular reflection color.
+  {
+    csShaderVariable* svSpecColor =
+      tm->GetMaterial()->GetVariableAdd (svStrings->Request ("specular"));
+    svSpecColor->SetValue (csColor (0.8f));
   }
 
   // We create a new sector called "room".

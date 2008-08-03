@@ -27,6 +27,8 @@
 %rename(_SetSCFPointer) SetSCFPointer;
 %rename(_GetSCFPointer) GetSCFPointer;
 
+%ignore csEvent::Name;
+%ignore iEvent::Name;
 %ignore ::operator+;
 %ignore ::operator-;
 %ignore ::operator*;

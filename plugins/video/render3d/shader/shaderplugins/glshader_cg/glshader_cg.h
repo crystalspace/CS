@@ -31,6 +31,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/shader/shader.h"
 
 #include "glshader_cgcommon.h"
+#include "profile_limits.h"
 
 struct csGLExtensionManager;
 
@@ -50,13 +51,11 @@ private:
   const char* compiledProgram;
   bool doIgnoreErrors;
   
-  typedef csArray<ProfileLimits> ProfileLimitsArray;
-  ProfileLimitsArray precacheLimitsVP;
-  ProfileLimitsArray precacheLimitsFP;
-  void ParsePrecacheLimits (iConfigFile* config, const char* type,
-    ProfileLimitsArray& out);
-  bool Precache (csShaderGLCGCommon* prog, ProfileLimitsArray& limits,
-    iHierarchicalCache* cacheTo);
+  typedef csArray<ProfileLimitsPair> ProfileLimitsArray;
+  ProfileLimitsArray precacheLimits;
+  void ParsePrecacheLimits (iConfigFile* config, ProfileLimitsArray& out);
+  bool Precache (csShaderGLCGCommon* prog, ProfileLimits& limits,
+    const char* tag, iHierarchicalCache* cacheTo);
 public:
   CS_LEAKGUARD_DECLARE (csGLShader_CG);
   
@@ -93,9 +92,13 @@ public:
 
   virtual bool SupportType(const char* type);
 
-  bool Precache (const char* type, iShaderDestinationResolver* resolve, 
+  csPtr<iStringArray> QueryPrecacheTags (const char* type);
+  bool Precache (const char* type, const char* tag,
+    iBase* previous, 
     iDocumentNode* node, iHierarchicalCache* cacheTo,
     csRef<iBase>* outObj = 0);
+  csPtr<iString> SelectPrecacheTag (const char* type, iBase* previous,
+    iHierarchicalCache* cacheDir);
 
   bool Open();
   /** @} */
@@ -107,6 +110,7 @@ public:
 
   void SplitArgsString (const char* str, ArgumentArray& args);
   void GetProfileCompilerArgs (const char* type, CGprofile profile, 
+    HardwareVendor vendor,
     bool noConfigArgs, ArgumentArray& args);
   static bool ProfileNeedsRouting (CGprofile profile)
   {

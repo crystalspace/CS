@@ -215,11 +215,64 @@ bool csShaderGLCGCommon::Load (iShaderDestinationResolver* resolve,
     }
   }
 
-  cgResolve = scfQueryInterfaceSafe<iShaderDestinationResolverCG> (resolve);
+  cgResolve = scfQueryInterfaceSafe<iShaderProgramCG> (resolve);
   clips.ShrinkBestFit ();
   ClipsToVmap ();
 
   return true;
+}
+
+bool csShaderGLCGCommon::GetProgramNode (iDocumentNode* passProgNode)
+{
+  if(!passProgNode)
+    return false;
+
+  const char* progTypeNode = 0;
+  switch (programType)
+  {
+    case progVP: progTypeNode = "cgvp"; break;
+    case progFP: progTypeNode = "cgfp"; break;
+  }
+  csRef<iDocumentNode> variablesnode = passProgNode->GetNode (progTypeNode);
+  if(variablesnode)
+  {
+    csRef<iDocumentNodeIterator> it = variablesnode->GetNodes ();
+    while(it->HasNext())
+    {
+      csRef<iDocumentNode> child = it->Next();
+      if(child->GetType() != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = commonTokens.Request (value);
+      switch(id)
+      {
+	case XMLTOKEN_PROGRAM:
+	  {
+	    const char* filename = child->GetAttributeValue ("file");
+	    if (filename != 0)
+	    {
+	      programFileName = filename;
+    
+	      csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectReg);
+	      csRef<iFile> file = vfs->Open (filename, VFS_FILE_READ);
+	      if (!file.IsValid())
+	      {
+		synsrv->Report ("crystalspace.graphics3d.shader.common",
+		  CS_REPORTER_SEVERITY_WARNING, child,
+		  "Could not open '%s'", filename);
+		return false;
+	      }
+    
+	      programFile = file;
+	    }
+	    else
+	      programNode = child;
+	  }
+	  break;
+      }
+    }
+  }
+
+  return programNode.IsValid();
 }
 
 }

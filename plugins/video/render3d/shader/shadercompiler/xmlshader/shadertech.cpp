@@ -24,6 +24,7 @@
 #include "iutil/hiercache.h"
 #include "iutil/plugin.h"
 #include "iutil/string.h"
+#include "iutil/stringarray.h"
 #include "ivaria/reporter.h"
 #include "ivideo/rendermesh.h"
 #include "ivideo/material.h"
@@ -31,6 +32,7 @@
 #include "csgfx/renderbuffer.h"
 #include "csutil/csendian.h"
 #include "csutil/documenthelper.h"
+#include "csutil/stringarray.h"
 
 #include "shader.h"
 #include "shadertech.h"
@@ -44,7 +46,7 @@ CS_LEAKGUARD_IMPLEMENT (csXMLShaderTech);
 /* Magic value for tech + pass cache files.
  * The most significant byte serves as a "version", increase when the
  * cache file format changes. */
-static const uint32 cacheFileMagic = 0x01747863;
+static const uint32 cacheFileMagic = 0x03747863;
 
 //---------------------------------------------------------------------------
 
@@ -53,6 +55,9 @@ struct CachedPlugin
   bool available;
   csString pluginID;
   csString progType;
+  
+  csRef<iShaderProgramPlugin> programPlugin;
+  csRef<iDocumentNode> programNode;
   
   CachedPlugin() : available (false) {}
 };
@@ -99,31 +104,31 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
 
   CachedPlugins cachedPlugins;
 
-  csRef<iDocumentNode> programNode;
+  GetProgramPlugins (node, cachedPlugins, variant);
+
   csRef<iShaderProgram> program;
   // load fp
   /* This is done before VP loading b/c the VP could query for TU bindings
-   * which are currently handled by the FP. */
-  programNode = node->GetNode (xmltokens.Request (
-    csXMLShaderCompiler::XMLTOKEN_FP));
-
+  * which are currently handled by the FP. */
   bool result = true;
   bool setFailReason = true;
   
-  if (programNode)
+  csString tagFP, tagVP, tagVPr;
+  
+  if (cachedPlugins.fp.programNode)
   {
     csRef<iHierarchicalCache> fpCache;
     if (cacheTo) fpCache = cacheTo->GetRootedCache (csString().Format (
       "/pass%dfp", GetPassNumber (pass)));
-    program = LoadProgram (0, programNode, pass, variant, fpCache,
-      cachedPlugins.fp);
+    program = LoadProgram (0, cachedPlugins.fp.programNode, pass, 
+      variant, fpCache, cachedPlugins.fp, tagFP);
     if (program)
       pass->fp = program;
     else
     {
       if (do_verbose && setFailReason)
       {
-        SetFailReason ("fragment program failed to load");
+	SetFailReason ("fragment program failed to load");
 	setFailReason = false;
       }
       result = false;
@@ -135,16 +140,13 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
     resolveFP = scfQueryInterface<iShaderDestinationResolver> (pass->fp);
 
   //load vp
-  programNode = node->GetNode(xmltokens.Request (
-    csXMLShaderCompiler::XMLTOKEN_VP));
-
-  if (programNode)
+  if (cachedPlugins.vp.programNode)
   {
     csRef<iHierarchicalCache> vpCache;
     if (cacheTo) vpCache = cacheTo->GetRootedCache (csString().Format (
       "/pass%dvp", GetPassNumber (pass)));
-    program = LoadProgram (resolveFP, programNode, pass, variant, vpCache,
-      cachedPlugins.vp);
+    program = LoadProgram (resolveFP, cachedPlugins.vp.programNode, 
+      pass, variant, vpCache, cachedPlugins.vp, tagVP);
     if (program)
     {
       pass->vp = program;
@@ -153,7 +155,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
     {
       if (do_verbose && setFailReason)
       {
-        SetFailReason ("vertex program failed to load");
+	SetFailReason ("vertex program failed to load");
 	setFailReason = false;
       }
       result = false;
@@ -165,16 +167,13 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
     resolveVP = scfQueryInterface<iShaderDestinationResolver> (pass->vp);
 
   //load vproc
-  programNode = node->GetNode(xmltokens.Request (
-    csXMLShaderCompiler::XMLTOKEN_VPROC));
-
-  if (programNode)
+  if (cachedPlugins.vproc.programNode)
   {
     csRef<iHierarchicalCache> vprCache;
     if (cacheTo) vprCache = cacheTo->GetRootedCache (csString().Format (
       "/pass%dvpr", GetPassNumber (pass)));
-    program = LoadProgram (resolveFP, programNode, pass, variant, vprCache,
-      cachedPlugins.vproc);
+    program = LoadProgram (resolveFP, cachedPlugins.vproc.programNode,
+      pass, variant, vprCache, cachedPlugins.vproc, tagVPr);
     if (program)
     {
       pass->vproc = program;
@@ -183,7 +182,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
     {
       if (do_verbose && setFailReason)
       {
-        SetFailReason ("vertex preprocessor failed to load");
+	SetFailReason ("vertex preprocessor failed to load");
 	setFailReason = false;
       }
       result = false;
@@ -198,21 +197,144 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
     if (IsDestalphaMixmode (pass->mixMode) && !caps->DestinationAlpha)
     {
       if (do_verbose)
-        SetFailReason ("destination alpha not supported by renderer");
+	SetFailReason ("destination alpha not supported by renderer");
       return false;
     }
   }
 
-  //if we got this far, load buffermappings
-  if (result && !ParseBuffers (pass, node, hlp, resolveFP, resolveVP)) result = false;
-
-  //get texturemappings
-  if (result && !ParseTextures (pass, node, hlp, resolveFP)) result = false;
-  
   WritePass (pass, cachedPlugins, cacheFile);
 
+  //if we got this far, load buffermappings
+  if (result && !ParseBuffers (*pass, GetPassNumber (pass),
+    node, hlp, resolveFP, resolveVP)) result = false;
+
+  //get texturemappings
+  if (result && !ParseTextures (*pass, node, hlp, resolveFP)) result = false;
+  
+  csMemFile perTagFile;
+  WritePassPerTag (*pass, &perTagFile);
+  cacheTo->CacheData (perTagFile.GetData(), perTagFile.GetSize(),
+    csString().Format ("/pass%ddata/%s_%s_%s", GetPassNumber (pass),
+    tagFP.GetDataSafe(), tagVP.GetDataSafe(), tagVPr.GetDataSafe()));
+  
   return result;
 }
+
+struct PassActionPrecache
+{
+  PassActionPrecache (int passIndex, csXMLShaderTech* tech, size_t variant,
+    iHierarchicalCache* cacheTo, iDocumentNode* node,
+    csXMLShaderTech::LoadHelpers hlp) : passIndex (passIndex),
+    tech (tech), variant (variant), cacheTo (cacheTo), node (node),
+    hlp (hlp) {}
+  
+  bool Perform (const csStringArray& tags,
+    CachedPlugins& cachedPlugins)
+  {
+    csRef<iShaderProgram> program;
+    // load fp
+    /* This is done before VP loading b/c the VP could query for TU bindings
+    * which are currently handled by the FP. */
+    bool result = true;
+    bool setFailReason = true;
+    
+    csRef<iBase> fp;
+    if (cachedPlugins.fp.programNode)
+    {
+      csRef<iHierarchicalCache> fpCache;
+      if (cacheTo) fpCache = cacheTo->GetRootedCache (csString().Format (
+	"/pass%dfp", passIndex));
+      if (!tech->PrecacheProgram (0, cachedPlugins.fp.programNode, variant,
+          fpCache, cachedPlugins.fp, fp, tags[0]))
+      {
+	if (tech->do_verbose && setFailReason)
+	{
+	  tech->SetFailReason ("fragment program failed to precache");
+	  setFailReason = false;
+	}
+	result = false;
+      }
+    }
+  
+    csRef<iBase> vp;
+    //load vp
+    if (cachedPlugins.vp.programNode)
+    {
+      csRef<iHierarchicalCache> vpCache;
+      if (cacheTo) vpCache = cacheTo->GetRootedCache (csString().Format (
+	"/pass%dvp", passIndex));
+      if (!tech->PrecacheProgram (fp, cachedPlugins.vp.programNode, variant,
+          vpCache, cachedPlugins.vp, vp, tags[1]))
+      {
+	if (tech->do_verbose && setFailReason)
+	{
+	  tech->SetFailReason ("vertex program failed to precache");
+	  setFailReason = false;
+	}
+	result = false;
+      }
+    }
+  
+    csRef<iBase> vpr;
+    //load vproc
+    if (cachedPlugins.vproc.programNode)
+    {
+      csRef<iHierarchicalCache> vprCache;
+      if (cacheTo) vprCache = cacheTo->GetRootedCache (csString().Format (
+	"/pass%dvpr", passIndex));
+      if (!tech->PrecacheProgram (vp, cachedPlugins.vproc.programNode, variant,
+          vprCache, cachedPlugins.vproc, vpr, tags[2]))
+      {
+	if (tech->do_verbose && setFailReason)
+	{
+	  tech->SetFailReason ("vertex preprocessor failed to precache");
+	  setFailReason = false;
+	}
+	result = false;
+      }
+    }
+  
+    csRef<iShaderDestinationResolver> resolveFP;
+    if (fp) resolveFP = scfQueryInterface<iShaderDestinationResolver> (fp);
+    csRef<iShaderDestinationResolver> resolveVP;
+    if (vp) resolveVP = scfQueryInterface<iShaderDestinationResolver> (vp);
+    
+    csXMLShaderTech::ShaderPassPerTag passPerTag;
+    
+    //if we got this far, load buffermappings
+    if (result && !tech->ParseBuffers (passPerTag, passIndex,
+      node, hlp, resolveFP, resolveVP)) result = false;
+  
+    //get texturemappings
+    if (result && !tech->ParseTextures (passPerTag, node, hlp, resolveFP))
+      result = false;
+    
+    if (result)
+    {
+      csMemFile perTagFile;
+      tech->WritePassPerTag (passPerTag, &perTagFile);
+      cacheTo->CacheData (perTagFile.GetData(), perTagFile.GetSize(),
+	csString().Format ("/pass%ddata/%s_%s_%s", passIndex,
+	tags[0] ? tags[0] : "",
+	tags[1] ? tags[1] : "",
+	tags[2] ? tags[2] : ""));
+    }
+    
+    oneComboWorked |= result;
+  
+    return false;
+  }
+
+  bool oneComboWorked;
+private:
+  int passIndex;
+  csXMLShaderTech* tech;
+  size_t variant;
+  iHierarchicalCache* cacheTo;
+  iDocumentNode* node;
+  
+  csXMLShaderTech::LoadHelpers hlp;
+};
 
 bool csXMLShaderTech::PrecachePass (iDocumentNode *node, ShaderPass* pass, 
                                     size_t variant, iFile* cacheFile,
@@ -225,84 +347,70 @@ bool csXMLShaderTech::PrecachePass (iDocumentNode *node, ShaderPass* pass,
 
   CachedPlugins cachedPlugins;
 
-  csRef<iDocumentNode> programNode;
-  csRef<iShaderProgram> program;
-  // load fp
-  /* This is done before VP loading b/c the VP could query for TU bindings
-   * which are currently handled by the FP. */
-  programNode = node->GetNode (xmltokens.Request (
-    csXMLShaderCompiler::XMLTOKEN_FP));
-
-  csRef<iBase> fp;
-  if (programNode)
-  {
-    csRef<iHierarchicalCache> fpCache;
-    fpCache = cacheTo->GetRootedCache (csString().Format (
-      "/pass%dfp", GetPassNumber (pass)));
-    if (!PrecacheProgram (0, programNode, pass, variant, fpCache,
-      cachedPlugins.fp, fp))
-    {
-      if (do_verbose)
-        SetFailReason ("fragment program failed to precache");
-      return false;
-    }
-  }
-
-  csRef<iShaderDestinationResolver> resolveFP (
-    scfQueryInterfaceSafe<iShaderDestinationResolver> (fp));
-
-  //load vp
-  programNode = node->GetNode(xmltokens.Request (
-    csXMLShaderCompiler::XMLTOKEN_VP));
-
-  csRef<iBase> vp;
-  if (programNode)
-  {
-    csRef<iHierarchicalCache> vpCache;
-    vpCache = cacheTo->GetRootedCache (csString().Format (
-      "/pass%dvp", GetPassNumber (pass)));
-    if (!PrecacheProgram (resolveFP, programNode, pass, variant, vpCache,
-      cachedPlugins.vp, vp))
-    {
-      if (do_verbose)
-        SetFailReason ("vertex program failed to precache");
-      return false;
-    }
-  }
-
-  csRef<iShaderDestinationResolver> resolveVP (
-    scfQueryInterfaceSafe<iShaderDestinationResolver> (vp));
-
-  //load vproc
-  programNode = node->GetNode(xmltokens.Request (
-    csXMLShaderCompiler::XMLTOKEN_VPROC));
-
-  if (programNode)
-  {
-    csRef<iBase> vpr;
-    csRef<iHierarchicalCache> vprCache;
-    vprCache = cacheTo->GetRootedCache (csString().Format (
-      "/pass%dvpr", GetPassNumber (pass)));
-    if (!PrecacheProgram (resolveFP, programNode, pass, variant, vprCache,
-      cachedPlugins.vproc, vpr))
-    {
-      if (do_verbose)
-        SetFailReason ("vertex preprocessor failed to precache");
-      return false;
-    }
-  }
+  GetProgramPlugins (node, cachedPlugins, variant);
 
   if (!ParseModes (pass, node, hlp)) return false;
 
-  //if we got this far, load buffermappings
-  if (!ParseBuffers (pass, node, hlp, resolveFP, resolveVP)) return false;
-
-  //get texturemappings
-  if (!ParseTextures (pass, node, hlp, resolveFP)) return false;
-  
   WritePass (pass, cachedPlugins, cacheFile);
-
-  return true;
+  
+  PassActionPrecache passAction (GetPassNumber (pass), this, variant,
+    cacheTo, node, hlp);
+  LoadPassPrograms (node, passAction, variant, cachedPlugins);
+  
+  return passAction.oneComboWorked;
+}
+  
+template<typename PassAction>
+bool csXMLShaderTech::LoadPassPrograms (iDocumentNode* passNode, 
+                                        PassAction& action,
+                                        size_t variant,
+                                        CachedPlugins& cachedPlugins)
+{
+  csArray<csStringArray> tuples;
+  tuples.Push (csStringArray ());
+  
+  for (size_t i = 0; i < 3; i++)
+  {
+    CachedPlugin plugin;
+    switch (i)
+    {
+      case 0: plugin = cachedPlugins.fp; break;
+      case 1: plugin = cachedPlugins.vp; break;
+      case 2: plugin = cachedPlugins.vproc; break;
+    }
+    if (plugin.programNode == 0)
+    {
+      for (size_t j = 0; j < tuples.GetSize(); j++)
+      {
+        tuples[j].Push ("");
+      }
+      continue;
+    }
+  
+    csArray<csStringArray> newTuples;
+    
+    csRef<iStringArray> tags = plugin.programPlugin->QueryPrecacheTags (
+      plugin.progType);
+    for (size_t j = 0; j < tuples.GetSize(); j++)
+    {
+      csStringArray tupleStrs (tuples[j]);
+      for (size_t t = 0; t < tags->GetSize(); t++)
+      {
+        csStringArray newTupleStrs (tupleStrs);
+        newTupleStrs.Push (tags->Get (t));
+        newTuples.Push (newTupleStrs);
+      }
+    }
+    tuples = newTuples;
+  }
+  
+  for (size_t j = 0; j < tuples.GetSize(); j++)
+  {
+    const csStringArray& tupleStrs (tuples[j]);
+      
+    if (action.Perform (tupleStrs, cachedPlugins)) return true;
+  }
+  return false;
 }
 
 bool csXMLShaderTech::ParseModes (ShaderPass* pass,
@@ -381,10 +489,12 @@ bool csXMLShaderTech::ParseModes (ShaderPass* pass,
       pass->wmAlpha = !strcasecmp (nodeWM->GetAttributeValue ("a"), "true");
   }
   
+  pass->minLights = node->GetAttributeValueAsInt ("minlights");
+  
   return true;
 }
 
-bool csXMLShaderTech::ParseBuffers (ShaderPass* pass,
+bool csXMLShaderTech::ParseBuffers (ShaderPassPerTag& pass, int passNum,
                                     iDocumentNode* node, 
                                     LoadHelpers& h,
                                     iShaderDestinationResolver* resolveFP,
@@ -498,11 +608,11 @@ bool csXMLShaderTech::ParseBuffers (ShaderPass* pass,
 	  cname = source;
 
         CS::ShaderVarStringID varID = h.stringsSvName->Request (cname);
-        pass->custommapping_id.Push (varID);
+        pass.custommapping_id.Push (varID);
         //pass->bufferGeneric[pass->bufferCount] = CS_VATTRIB_IS_GENERIC (attrib);
 
-        pass->custommapping_attrib.Push (attrib);
-	pass->custommapping_buffer.Push (CS_BUFFER_NONE);
+        pass.custommapping_attrib.Push (attrib);
+	pass.custommapping_buffer.Push (CS_BUFFER_NONE);
       }
       else
       {
@@ -516,17 +626,17 @@ bool csXMLShaderTech::ParseBuffers (ShaderPass* pass,
         
 	if ((attrib >= CS_VATTRIB_SPECIFIC_FIRST)
 	  && (attrib <= CS_VATTRIB_SPECIFIC_LAST))
-	  pass->defaultMappings[attrib] = sourceName;
+	  pass.defaultMappings[attrib] = sourceName;
 	else
 	{
-	  pass->custommapping_attrib.Push (attrib);
-	  pass->custommapping_buffer.Push (sourceName);
-          pass->custommapping_id.Push (CS::InvalidShaderVarStringID);
+	  pass.custommapping_attrib.Push (attrib);
+	  pass.custommapping_buffer.Push (sourceName);
+          pass.custommapping_id.Push (CS::InvalidShaderVarStringID);
 	  /* Those buffers are mapped by default to some specific vattribs; 
 	   * since they are now to be mapped to some generic vattrib,
 	   * turn off the default map. */
 	  if (sourceName == CS_BUFFER_POSITION)
-	    pass->defaultMappings[CS_VATTRIB_POSITION] = CS_BUFFER_NONE;
+	    pass.defaultMappings[CS_VATTRIB_POSITION] = CS_BUFFER_NONE;
 	}
       }
     }
@@ -537,14 +647,14 @@ bool csXMLShaderTech::ParseBuffers (ShaderPass* pass,
       {
         parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
 	  "Shader '%s', pass %d: invalid buffer destination '%s'",
-	  parent->GetName (), GetPassNumber (pass), dest);
+	  parent->GetName (), passNum, dest);
       }
     }
   }
   return true;
 }
 
-bool csXMLShaderTech::ParseTextures (ShaderPass* pass,
+bool csXMLShaderTech::ParseTextures (ShaderPassPerTag& pass,
                                      iDocumentNode* node, 
                                      LoadHelpers& h,
                                      iShaderDestinationResolver* resolveFP)
@@ -607,7 +717,7 @@ bool csXMLShaderTech::ParseTextures (ShaderPass* pass,
       texMap.id = h.stringsSvName->Request (parser.GetShaderVarName ());
       parser.FillArrayWithIndices (texMap.indices);
       texMap.textureUnit = texUnit;
-      pass->textures.Push (texMap);
+      pass.textures.Push (texMap);
     }
   }
   return true;
@@ -616,10 +726,6 @@ bool csXMLShaderTech::ParseTextures (ShaderPass* pass,
 // Used to generate data written on disk!
 enum
 {
-  cacheFlagHasFP,
-  cacheFlagHasVP,
-  cacheFlagHasVProc,
-  
   cacheFlagWMR = 4,
   cacheFlagWMG,
   cacheFlagWMB,
@@ -640,9 +746,6 @@ bool csXMLShaderTech::WritePass (ShaderPass* pass,
 
   {
     uint32 cacheFlags = 0;
-    if (plugins.fp.available) cacheFlags |= 1 << cacheFlagHasFP;
-    if (plugins.vp.available) cacheFlags |= 1 << cacheFlagHasVP;
-    if (plugins.vproc.available) cacheFlags |= 1 << cacheFlagHasVProc;
     
     if (pass->wmRed) cacheFlags |= 1 << cacheFlagWMR;
     if (pass->wmGreen) cacheFlags |= 1 << cacheFlagWMG;
@@ -659,27 +762,6 @@ bool csXMLShaderTech::WritePass (ShaderPass* pass,
     if (cacheFile->Write ((char*)&diskFlags, sizeof (diskFlags))
 	!= sizeof (diskFlags)) return false;
   }
-  
-  if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, 
-      plugins.fp.progType))
-    return false;
-  if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, 
-      plugins.fp.pluginID))
-    return false;
-  
-  if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, 
-      plugins.vp.progType))
-    return false;
-  if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, 
-      plugins.vp.pluginID))
-    return false;
-  
-  if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, 
-      plugins.vproc.progType))
-    return false;
-  if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, 
-      plugins.vproc.pluginID))
-    return false;
   
   {
     uint32 diskMM = csLittleEndian::UInt32 (pass->mixMode);
@@ -705,71 +787,87 @@ bool csXMLShaderTech::WritePass (ShaderPass* pass,
     if (cacheFile->Write ((char*)&diskZ, sizeof (diskZ))
 	!= sizeof (diskZ)) return false;
   }
+  {
+    int32 diskMinLights = csLittleEndian::Int32 (pass->minLights);
+    if (cacheFile->Write ((char*)&diskMinLights, sizeof (diskMinLights))
+	!= sizeof (diskMinLights)) return false;
+  }
+  return true;
+}
+  
+bool csXMLShaderTech::WritePassPerTag (const ShaderPassPerTag& pass,
+                                       iFile* cacheFile)
+{
+  if (!cacheFile) return false;
+
+  uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
+  if (cacheFile->Write ((char*)&diskMagic, sizeof (diskMagic))
+      != sizeof (diskMagic)) return false;
+      
   for (int i = 0; i < CS_VATTRIB_SPECIFIC_NUM; i++)
   {
-    int32 diskMapping = csLittleEndian::Int32 (pass->defaultMappings[i]);
+    int32 diskMapping = csLittleEndian::Int32 (pass.defaultMappings[i]);
     if (cacheFile->Write ((char*)&diskMapping, sizeof (diskMapping))
 	!= sizeof (diskMapping)) return false;
   }
-  
   {
     uint32 diskNumBuffers = csLittleEndian::UInt32 (
-      (uint)pass->custommapping_buffer.GetSize());
+      (uint)pass.custommapping_buffer.GetSize());
     if (cacheFile->Write ((char*)&diskNumBuffers, sizeof (diskNumBuffers))
 	!= sizeof (diskNumBuffers)) return false;
   }
-  for (size_t i = 0; i < pass->custommapping_buffer.GetSize(); i++)
+  for (size_t i = 0; i < pass.custommapping_buffer.GetSize(); i++)
   {
-    int32 diskMapping = csLittleEndian::Int32 (pass->custommapping_buffer[i]);
+    int32 diskMapping = csLittleEndian::Int32 (pass.custommapping_buffer[i]);
     if (cacheFile->Write ((char*)&diskMapping, sizeof (diskMapping))
 	!= sizeof (diskMapping)) return false;
 	
-    int32 diskAttr = csLittleEndian::Int32 (pass->custommapping_attrib[i]);
+    int32 diskAttr = csLittleEndian::Int32 (pass.custommapping_attrib[i]);
     if (cacheFile->Write ((char*)&diskAttr, sizeof (diskAttr))
 	!= sizeof (diskAttr)) return false;
 	
     const char* svStr = parent->compiler->stringsSvName->Request (
-      pass->custommapping_id[i]);
+      pass.custommapping_id[i]);
     if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, svStr))
       return false;
   }
 
   {
     uint32 diskNumTextures = csLittleEndian::UInt32 (
-      (uint)pass->textures.GetSize());
+      (uint)pass.textures.GetSize());
     if (cacheFile->Write ((char*)&diskNumTextures, sizeof (diskNumTextures))
 	!= sizeof (diskNumTextures)) return false;
   }
-  for (size_t i = 0; i < pass->textures.GetSize(); i++)
+  for (size_t i = 0; i < pass.textures.GetSize(); i++)
   {
     const char* svStr = parent->compiler->stringsSvName->Request (
-      pass->textures[i].id);
+      pass.textures[i].id);
     if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, svStr))
       return false;
       
     uint32 diskNumIndices = csLittleEndian::UInt32 (
-      (uint)pass->textures[i].indices.GetSize());
+      (uint)pass.textures[i].indices.GetSize());
     if (cacheFile->Write ((char*)&diskNumIndices, sizeof (diskNumIndices))
 	!= sizeof (diskNumIndices)) return false;
-    for (size_t n = 0; n < pass->textures[i].indices.GetSize(); n++)
+    for (size_t n = 0; n < pass.textures[i].indices.GetSize(); n++)
     {
       uint32 diskIndex = csLittleEndian::UInt32 (
-	(uint)pass->textures[i].indices[n]);
+	(uint)pass.textures[i].indices[n]);
       if (cacheFile->Write ((char*)&diskIndex, sizeof (diskIndex))
 	  != sizeof (diskIndex)) return false;
     }
     
-    int32 diskTU = csLittleEndian::Int32 (pass->textures[i].textureUnit);
+    int32 diskTU = csLittleEndian::Int32 (pass.textures[i].textureUnit);
     if (cacheFile->Write ((char*)&diskTU, sizeof (diskTU))
 	!= sizeof (diskTU)) return false;
     
     int16 diskCompareFunc = csLittleEndian::Int16 (
-      pass->textures[i].texCompare.function);
+      pass.textures[i].texCompare.function);
     if (cacheFile->Write ((char*)&diskCompareFunc, sizeof (diskCompareFunc))
 	!= sizeof (diskCompareFunc)) return false;
     
     int16 diskCompareMode = csLittleEndian::Int16 (
-      pass->textures[i].texCompare.mode);
+      pass.textures[i].texCompare.mode);
     if (cacheFile->Write ((char*)&diskCompareMode, sizeof (diskCompareMode))
 	!= sizeof (diskCompareMode)) return false;
   }
@@ -778,13 +876,17 @@ bool csXMLShaderTech::WritePass (ShaderPass* pass,
 }
   
 iShaderProgram::CacheLoadResult csXMLShaderTech::LoadPassFromCache (
-  ShaderPass* pass, size_t variant, iFile* cacheFile,
+  ShaderPass* pass, iDocumentNode* node, size_t variant, iFile* cacheFile,
   iHierarchicalCache* cache)
 {
   if (!cacheFile) return iShaderProgram::loadFail;
 
   CachedPlugins plugins;
+  GetProgramPlugins (node, plugins, variant);
+  
   if (!ReadPass (pass, cacheFile, plugins)) return iShaderProgram::loadFail;
+  
+  csString tagFP, tagVP, tagVPr;
   
   iShaderProgram::CacheLoadResult loadRes;
   if (plugins.fp.available)
@@ -792,7 +894,8 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadPassFromCache (
     csRef<iHierarchicalCache> fpCache;
     if (cache) fpCache = cache->GetRootedCache (csString().Format (
       "/pass%dfp", GetPassNumber (pass)));
-    loadRes = LoadProgramFromCache (pass, variant, fpCache, plugins.fp, pass->fp);
+    loadRes = LoadProgramFromCache (0, variant, fpCache, plugins.fp,
+      pass->fp, tagFP);
     if (loadRes != iShaderProgram::loadSuccessShaderValid) return loadRes;
   }
   
@@ -801,7 +904,8 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadPassFromCache (
     csRef<iHierarchicalCache> vpCache;
     if (cache) vpCache = cache->GetRootedCache (csString().Format (
       "/pass%dvp", GetPassNumber (pass)));
-    loadRes = LoadProgramFromCache (pass, variant, vpCache, plugins.vp, pass->vp);
+    loadRes = LoadProgramFromCache (pass->fp, variant, vpCache, plugins.vp, pass->vp,
+      tagVP);
     if (loadRes != iShaderProgram::loadSuccessShaderValid) return loadRes;
   }
   
@@ -810,16 +914,25 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadPassFromCache (
     csRef<iHierarchicalCache> vprCache;
     if (cache) vprCache = cache->GetRootedCache (csString().Format (
       "/pass%dvpr", GetPassNumber (pass)));
-    loadRes = LoadProgramFromCache (pass, variant, vprCache, plugins.vproc, pass->vproc);
+    loadRes = LoadProgramFromCache (pass->vp, variant, vprCache, plugins.vproc,
+      pass->vproc, tagVPr);
     if (loadRes != iShaderProgram::loadSuccessShaderValid) return loadRes;
   }
+  
+  csRef<iDataBuffer> perTagData = cache->ReadCache (
+    csString().Format ("/pass%ddata/%s_%s_%s", GetPassNumber (pass),
+      tagFP.GetDataSafe(), tagVP.GetDataSafe(), tagVPr.GetDataSafe()));
+  if (!perTagData.IsValid()) return iShaderProgram::loadFail;
+  csMemFile perTagCacheFile (perTagData, true);
+  if (!ReadPassPerTag (*pass, &perTagCacheFile))
+    return iShaderProgram::loadFail;
   
   return iShaderProgram::loadSuccessShaderValid;
 }
 
 bool csXMLShaderTech::ReadPass (ShaderPass* pass, 
-                                 iFile* cacheFile, 
-                                 CachedPlugins& plugins)
+                                iFile* cacheFile, 
+                                CachedPlugins& plugins)
 {
   if (!cacheFile) return false;
 
@@ -829,10 +942,6 @@ bool csXMLShaderTech::ReadPass (ShaderPass* pass,
 	!= sizeof (diskFlags)) return false;
     uint32 cacheFlags = csLittleEndian::UInt32 (diskFlags);
   
-    plugins.fp.available = cacheFlags & (1 << cacheFlagHasFP);
-    plugins.vp.available = cacheFlags & (1 << cacheFlagHasVP);
-    plugins.vproc.available = cacheFlags & (1 << cacheFlagHasVProc);
-    
     pass->wmRed = cacheFlags & (1 << cacheFlagWMR);
     pass->wmGreen = cacheFlags & (1 << cacheFlagWMG);
     pass->wmBlue = cacheFlags & (1 << cacheFlagWMB);
@@ -845,21 +954,6 @@ bool csXMLShaderTech::ReadPass (ShaderPass* pass,
     pass->alphaMode.autoAlphaMode = cacheFlags & (1 << cacheFlagAlphaAuto);
   }
   
-  plugins.fp.progType = CS::PluginCommon::ShaderCacheHelper::ReadString (
-    cacheFile);
-  plugins.fp.pluginID = CS::PluginCommon::ShaderCacheHelper::ReadString (
-    cacheFile);
-  
-  plugins.vp.progType = CS::PluginCommon::ShaderCacheHelper::ReadString (
-    cacheFile);
-  plugins.vp.pluginID = CS::PluginCommon::ShaderCacheHelper::ReadString (
-    cacheFile);
-  
-  plugins.vproc.progType = CS::PluginCommon::ShaderCacheHelper::ReadString (
-    cacheFile);
-  plugins.vproc.pluginID = CS::PluginCommon::ShaderCacheHelper::ReadString (
-    cacheFile);
-  
   {
     uint32 diskMM;
     if (cacheFile->Read ((char*)&diskMM, sizeof (diskMM))
@@ -869,8 +963,11 @@ bool csXMLShaderTech::ReadPass (ShaderPass* pass,
   
   if (pass->alphaMode.autoAlphaMode)
   {
+    const char* svName =
+      CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+    if (!svName) return false;
     pass->alphaMode.autoModeTexture = parent->compiler->stringsSvName->Request (
-      CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile));
+      svName);
   }
   else
   {
@@ -886,12 +983,32 @@ bool csXMLShaderTech::ReadPass (ShaderPass* pass,
 	!= sizeof (diskZ)) return false;
     pass->zMode = (csZBufMode)csLittleEndian::UInt32 (diskZ);
   }
+  {
+    int32 diskMinLights;
+    if (cacheFile->Read ((char*)&diskMinLights, sizeof (diskMinLights))
+	!= sizeof (diskMinLights)) return false;
+    pass->minLights = csLittleEndian::Int32 (diskMinLights);
+  }
+  return true;
+}
+  
+bool csXMLShaderTech::ReadPassPerTag (ShaderPassPerTag& pass, 
+                                      iFile* cacheFile)
+{
+  if (!cacheFile) return false;
+
+  uint32 diskMagic;
+  if (cacheFile->Read ((char*)&diskMagic, sizeof (diskMagic))
+      != sizeof (diskMagic)) return false;
+  if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic)
+    return false;
+    
   for (int i = 0; i < CS_VATTRIB_SPECIFIC_NUM; i++)
   {
     int32 diskMapping;
     if (cacheFile->Read ((char*)&diskMapping, sizeof (diskMapping))
 	!= sizeof (diskMapping)) return false;
-    pass->defaultMappings[i] =
+    pass.defaultMappings[i] =
       (csRenderBufferName)csLittleEndian::Int32 (diskMapping);
   }
   
@@ -906,22 +1023,22 @@ bool csXMLShaderTech::ReadPass (ShaderPass* pass,
       int32 diskMapping;
       if (cacheFile->Read ((char*)&diskMapping, sizeof (diskMapping))
 	  != sizeof (diskMapping)) return false;
-      pass->custommapping_buffer.Push (
+      pass.custommapping_buffer.Push (
         (csRenderBufferName)csLittleEndian::Int32 (diskMapping));
 	  
       int32 diskAttr;
       if (cacheFile->Read ((char*)&diskAttr, sizeof (diskAttr))
 	  != sizeof (diskAttr)) return false;
-      pass->custommapping_attrib.Push (
+      pass.custommapping_attrib.Push (
         (csVertexAttrib)csLittleEndian::Int32 (diskAttr));
 
       const char* mappingStr = 
           CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
       if (mappingStr != 0)
-	pass->custommapping_id.Push (
+	pass.custommapping_id.Push (
 	  parent->compiler->stringsSvName->Request (mappingStr));
       else
-	pass->custommapping_id.Push (CS::InvalidShaderVarStringID);
+	pass.custommapping_id.Push (CS::InvalidShaderVarStringID);
     }
   }
 
@@ -967,7 +1084,7 @@ bool csXMLShaderTech::ReadPass (ShaderPass* pass,
       mapping.texCompare.mode = (CS::Graphics::TextureComparisonMode::Mode)
         csLittleEndian::Int16 (diskCompareMode);
       
-      pass->textures.Push (mapping);
+      pass.textures.Push (mapping);
     }
   }  
   return true;
@@ -993,67 +1110,34 @@ bool csXMLShaderCompiler::LoadSVBlock (iLoaderContext* ldr_context,
 
 csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
   iShaderDestinationResolver* resolve, iDocumentNode* node, ShaderPass* /*pass*/,
-  size_t variant, iHierarchicalCache* cacheTo, CachedPlugin& cacheInfo)
+  size_t variant, iHierarchicalCache* cacheTo, CachedPlugin& cacheInfo,
+  csString& tag)
 {
-  if (node->GetAttributeValue("plugin") == 0)
-  {
-    parent->compiler->Report (CS_REPORTER_SEVERITY_ERROR,
-      "No shader program plugin specified for <%s> in shader '%s'",
-      node->GetValue (), parent->GetName ());
-    return 0;
-  }
-
   csRef<iShaderProgram> program;
 
-  csStringFast<256> plugin ("crystalspace.graphics3d.shader.");
-  plugin.Append (node->GetAttributeValue("plugin"));
-  // @@@ Also check if 'plugin' is a full class ID
-
-  //load the plugin
-  csRef<iShaderProgramPlugin> plg;
-  plg = csLoadPluginCheck<iShaderProgramPlugin> (parent->compiler->objectreg,
-  	plugin, false);
-  if(!plg)
-  {
-    if (parent->compiler->do_verbose)
-      parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
-	  "Couldn't retrieve shader plugin '%s' for <%s> in shader '%s'",
-	  plugin.GetData(), node->GetValue (), parent->GetName ());
-    return 0;
-  }
-
-  const char* programType = node->GetAttributeValue("type");
-  if (programType == 0)
-    programType = node->GetValue ();
-  program = plg->CreateProgram (programType);
+  program = cacheInfo.programPlugin->CreateProgram (cacheInfo.progType);
   if (program == 0)
     return 0;
-  csRef<iDocumentNode> programNode;
-  if (node->GetAttributeValue ("file") != 0)
-    programNode = parent->LoadProgramFile (node->GetAttributeValue ("file"), 
-      variant);
-  else
-    programNode = node;
-  if (!program->Load (resolve, programNode))
+  if (!program->Load (resolve, cacheInfo.programNode))
     return 0;
 
   /* Even if compilation fails, for since we need to handle the case where a
       program is valid but not supported on the current HW in caching, 
       flag program as available */
   cacheInfo.available = true;
-  cacheInfo.pluginID = plugin;
-  cacheInfo.progType = programType;
   
-  if (!program->Compile (cacheTo))
+  csRef<iString> progTag;
+  if (!program->Compile (cacheTo, &progTag))
     return 0;
+  if (!progTag.IsValid()) return 0;
+  tag = progTag->GetData();
     
   return csPtr<iShaderProgram> (program);
 }
   
 iShaderProgram::CacheLoadResult csXMLShaderTech::LoadProgramFromCache (
-  ShaderPass* /*pass*/,
-  size_t variant, iHierarchicalCache* cache, const CachedPlugin& cacheInfo,
-  csRef<iShaderProgram>& prog)
+  iBase* previous, size_t variant, iHierarchicalCache* cache,
+  const CachedPlugin& cacheInfo, csRef<iShaderProgram>& prog, csString& tag)
 {
   //load the plugin
   csRef<iShaderProgramPlugin> plg;
@@ -1070,8 +1154,10 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadProgramFromCache (
   }
 
   prog = plg->CreateProgram (cacheInfo.progType);
+  csRef<iString> progTag;
   csRef<iString> failReason;
-  iShaderProgram::CacheLoadResult loadRes = prog->LoadFromCache (cache, &failReason);
+  iShaderProgram::CacheLoadResult loadRes = prog->LoadFromCache (cache, 
+    cacheInfo.programNode, &failReason, &progTag);
   if (loadRes == iShaderProgram::loadFail)
   {
     if (parent->compiler->do_verbose)
@@ -1081,21 +1167,63 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadProgramFromCache (
 	failReason.IsValid() ? failReason->GetData() : "no reason given");
     return iShaderProgram::loadFail;
   }
+  
+  if (progTag.IsValid()) tag = progTag->GetData();
 
   return loadRes;
 }
+
+bool csXMLShaderTech::PrecacheProgram (iBase* previous, iDocumentNode* node, 
+  size_t variant, iHierarchicalCache* cacheTo, 
+  CachedPlugin& cacheInfo, csRef<iBase>& object, const char* tag)
+{
+  return cacheInfo.programPlugin->Precache (cacheInfo.progType, tag, previous,
+    cacheInfo.programNode, cacheTo, &object);
+}
+
+void csXMLShaderTech::GetProgramPlugins (iDocumentNode *node,
+                                         CachedPlugins& cacheInfo,
+                                         size_t variant)
+{
+  {
+    csRef<iDocumentNode> programNodeFP;
+    programNodeFP = node->GetNode (xmltokens.Request (
+      csXMLShaderCompiler::XMLTOKEN_FP));
+      
+    if (programNodeFP)
+      GetProgramPlugin (programNodeFP, cacheInfo.fp, variant);
+  }
   
-bool csXMLShaderTech::PrecacheProgram (
-  iShaderDestinationResolver* resolve, iDocumentNode* node, ShaderPass* /*pass*/,
-  size_t variant, iHierarchicalCache* cacheTo, CachedPlugin& cacheInfo,
-  csRef<iBase>& object)
+  {
+    csRef<iDocumentNode> programNodeVP;
+    programNodeVP = node->GetNode(xmltokens.Request (
+      csXMLShaderCompiler::XMLTOKEN_VP));
+      
+    if (programNodeVP)
+      GetProgramPlugin (programNodeVP, cacheInfo.vp, variant);
+  }
+
+  {
+    csRef<iDocumentNode> programNodeVPr;
+    programNodeVPr = node->GetNode(xmltokens.Request (
+      csXMLShaderCompiler::XMLTOKEN_VPROC));
+      
+    if (programNodeVPr)
+      GetProgramPlugin (programNodeVPr, cacheInfo.vproc, variant);
+  }
+  
+}
+
+void csXMLShaderTech::GetProgramPlugin (iDocumentNode *node,
+                                        CachedPlugin& cacheInfo,
+                                        size_t variant)
 {
   if (node->GetAttributeValue("plugin") == 0)
   {
     parent->compiler->Report (CS_REPORTER_SEVERITY_ERROR,
       "No shader program plugin specified for <%s> in shader '%s'",
       node->GetValue (), parent->GetName ());
-    return false;
+    return;
   }
 
   csStringFast<256> plugin ("crystalspace.graphics3d.shader.");
@@ -1105,14 +1233,14 @@ bool csXMLShaderTech::PrecacheProgram (
   //load the plugin
   csRef<iShaderProgramPlugin> plg;
   plg = csLoadPluginCheck<iShaderProgramPlugin> (parent->compiler->objectreg,
-  	plugin, false);
+	plugin, false);
   if(!plg)
   {
     if (parent->compiler->do_verbose)
       parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
 	  "Couldn't retrieve shader plugin '%s' for <%s> in shader '%s'",
 	  plugin.GetData(), node->GetValue (), parent->GetName ());
-    return false;
+    return;
   }
 
   const char* programType = node->GetAttributeValue("type");
@@ -1124,18 +1252,17 @@ bool csXMLShaderTech::PrecacheProgram (
       variant);
   else
     programNode = node;
-    
-  if (!plg->Precache (programType, resolve, programNode, cacheTo,
-      &object))
-    return false;
-    
+
+  /* Even if compilation fails, for since we need to handle the case where a
+      program is valid but not supported on the current HW in caching, 
+      flag program as available */
   cacheInfo.available = true;
   cacheInfo.pluginID = plugin;
   cacheInfo.progType = programType;
-
-  return true;
+  cacheInfo.programPlugin = plg;
+  cacheInfo.programNode = programNode;
 }
-  
+
 bool csXMLShaderTech::LoadBoilerplate (iLoaderContext* ldr_context, 
                                        iDocumentNode* node,
                                        iDocumentNode* parentSV)
@@ -1285,7 +1412,6 @@ bool csXMLShaderTech::Load (iLoaderContext* ldr_context,
   while (it->HasNext ())
   {
     csRef<iDocumentNode> passNode = it->Next ();
-    passes[currentPassNr].owner = this;
     result &= LoadPass (passNode, &passes[currentPassNr++], variant, cacheFile, cacheTo);
   }
   
@@ -1369,7 +1495,6 @@ bool csXMLShaderTech::Precache (iDocumentNode* node, size_t variant,
   while (it->HasNext ())
   {
     csRef<iDocumentNode> passNode = it->Next ();
-    passes[currentPassNr].owner = this;
     if (!PrecachePass (passNode, &passes[currentPassNr++], variant, cacheFile, cacheTo))
     {
       return false;
@@ -1381,8 +1506,8 @@ bool csXMLShaderTech::Precache (iDocumentNode* node, size_t variant,
 }
   
 iShaderProgram::CacheLoadResult csXMLShaderTech::LoadFromCache (
-  iLoaderContext* ldr_context, iHierarchicalCache* cache,
-  iDocumentNode* parentSV, size_t variant)
+  iLoaderContext* ldr_context, iDocumentNode* node, 
+  iHierarchicalCache* cache, iDocumentNode* parentSV, size_t variant)
 {
   csRef<iDataBuffer> cacheData (cache->ReadCache ("/passes"));
   if (!cacheData.IsValid()) return iShaderProgram::loadFail;
@@ -1411,12 +1536,24 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadFromCache (
   if (read != sizeof (diskPassNum))
     return iShaderProgram::loadFail;
   
+  size_t nodePassesCount = 0;
+  csRef<iDocumentNodeIterator> it = node->GetNodes (xmltokens.Request (
+    csXMLShaderCompiler::XMLTOKEN_PASS));
+  while(it->HasNext ())
+  {
+    it->Next ();
+    nodePassesCount++;
+  }
+  
   passesCount = csLittleEndian::Int32 (diskPassNum);
+  if (passesCount != nodePassesCount) return iShaderProgram::loadFail;
   passes = new ShaderPass[passesCount];
+  it = node->GetNodes (xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_PASS));
   for (uint p = 0; p < passesCount; p++)
   {
+    csRef<iDocumentNode> child = it->Next ();
     iShaderProgram::CacheLoadResult loadRes =
-      LoadPassFromCache (&passes[p], variant, &cacheFile, cache);
+      LoadPassFromCache (&passes[p], child, variant, &cacheFile, cache);
     if (loadRes != iShaderProgram::loadSuccessShaderValid)
       return loadRes;
   }
@@ -1490,6 +1627,15 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   iGraphics3D* g3d = parent->g3d;
   ShaderPass* thispass = &passes[currentPass];
 
+  int lightCount = 0;
+  if (stack.GetSize() > parent->compiler->stringLightCount)
+  {
+    csShaderVariable* svLightCount = stack[parent->compiler->stringLightCount];
+    if (svLightCount != 0)
+      svLightCount->GetValue (lightCount);
+  }
+  if (lightCount < thispass->minLights) return false;
+  
   //first run the preprocessor
   if(thispass->vproc) thispass->vproc->SetupState (mesh, modes, stack);
 

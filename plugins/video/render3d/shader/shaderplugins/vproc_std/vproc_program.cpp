@@ -555,8 +555,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
   {
   }
 
-  bool csVProcStandardProgram::Compile (iHierarchicalCache*)
+  bool csVProcStandardProgram::Compile (iHierarchicalCache*, csRef<iString>* tag)
   {
+    tag->AttachNew (new scfString ("default"));
+  
     return true;
   }
 

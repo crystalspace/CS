@@ -24,9 +24,13 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
+#include "csutil/scfstr.h"
+#include "csutil/scfstringarray.h"
 #include "csutil/xmltiny.h"
 #include "iutil/comp.h"
+#include "iutil/hiercache.h"
 #include "iutil/plugin.h"
+#include "iutil/stringarray.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -219,6 +223,7 @@ static int GetProfileLevel (CGprofile profile)
 
 void csGLShader_CG::GetProfileCompilerArgs (const char* type, 
                                             CGprofile profile, 
+                                            HardwareVendor vendor,
                                             bool noConfigArgs,
                                             ArgumentArray& args)
 {
@@ -289,15 +294,18 @@ void csGLShader_CG::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-csPtr<iShaderProgram> csGLShader_CG::CreateProgram(const char* type)
+csPtr<iShaderProgram> csGLShader_CG::CreateProgram (const char* type)
 {
   Open();
   if (!enable) return 0;
   
   if (strcasecmp(type, "vp") == 0)
-    return csPtr<iShaderProgram>(new csShaderGLCGVP(this));
+    return csPtr<iShaderProgram> (new csShaderGLCGVP(this));
   else if (strcasecmp(type, "fp") == 0)
-    return csPtr<iShaderProgram>(new csShaderGLCGFP(this));
+  {
+    ProfileLimitsPair dummyLimits;
+    return csPtr<iShaderProgram> (new csShaderGLCGFP (this, dummyLimits));
+  }
   else
     return 0;
 }
@@ -327,12 +335,12 @@ static CGprofile ProfileUnrouted (CGprofile profile)
   }
 }
 
-void csGLShader_CG::ParsePrecacheLimits (iConfigFile* config, const char* type,
+void csGLShader_CG::ParsePrecacheLimits (iConfigFile* config, 
                                          ProfileLimitsArray& out)
 {
   csSet<csString> seenKeys;
   csRef<iConfigIterator> vertexPrecache = config->Enumerate (
-    csString().Format ("Video.OpenGL.Shader.Cg.Precache.%s.", type));
+    csString().Format ("Video.OpenGL.Shader.Cg.Precache."));
   while (vertexPrecache->HasNext())
   {
     vertexPrecache->Next();
@@ -341,21 +349,39 @@ void csGLShader_CG::ParsePrecacheLimits (iConfigFile* config, const char* type,
     if (dot != (size_t)-1) key.Truncate (dot);
     if (!seenKeys.Contains (key))
     {
+      ProfileLimitsPair newPair;
       const char* profile = config->GetStr (
-	csString().Format ("Video.OpenGL.Shader.Cg.Precache.%s.%s.Profile",
-	  type, key.GetData()), 0);
+	csString().Format ("Video.OpenGL.Shader.Cg.Precache.%s.Vertex.Profile",
+	  key.GetData()), 0);
       if (profile != 0)
       {
 	CGprofile profile_cg = cgGetProfile (profile);
 	if (profile_cg != CG_PROFILE_UNKNOWN)
 	{
-	  ProfileLimits limits (profile_cg);
-	  limits.ReadFromConfig (config, 
-	    csString().Format ("Video.OpenGL.Shader.Cg.Precache.%s.%s",
-	      type, key.GetData()));
-	  out.Push (limits);
+	  newPair.vp = ProfileLimits (
+	   Other, profile_cg);
+	  newPair.vp.GetCgDefaults();
+	  newPair.vp.ReadFromConfig (config, 
+	    csString().Format ("Video.OpenGL.Shader.Cg.Precache.%s.Vertex",
+	      key.GetData()));
 	}
       }
+      profile = config->GetStr (
+	csString().Format ("Video.OpenGL.Shader.Cg.Precache.%s.Fragment.Profile",
+	  key.GetData()), 0);
+      if (profile != 0)
+      {
+	CGprofile profile_cg = cgGetProfile (profile);
+	if (profile_cg != CG_PROFILE_UNKNOWN)
+	{
+	  newPair.fp = ProfileLimits (Other, profile_cg);
+	  newPair.fp.GetCgDefaults();
+	  newPair.fp.ReadFromConfig (config, 
+	    csString().Format ("Video.OpenGL.Shader.Cg.Precache.%s.Fragment",
+	      key.GetData()));
+	}
+      }
+      out.Push (newPair);
       seenKeys.AddNoTest (key);
     }
   }
@@ -372,8 +398,7 @@ bool csGLShader_CG::Open()
   
   csRef<iConfigManager> config (csQueryRegistry<iConfigManager> (object_reg));
 
-  ParsePrecacheLimits (config, "Vertex", precacheLimitsVP);
-  ParsePrecacheLimits (config, "Fragment", precacheLimitsFP);
+  ParsePrecacheLimits (config, precacheLimits);
   
   debugDump = config->GetBool ("Video.OpenGL.Shader.Cg.DebugDump", false);
   if (debugDump)
@@ -553,60 +578,140 @@ bool csGLShader_CG::IsRoutedProfileSupported (CGprofile profile)
   }
 }
 
-bool csGLShader_CG::Precache (const char* type, iShaderDestinationResolver* resolve,
+csPtr<iStringArray> csGLShader_CG::QueryPrecacheTags (const char* type)
+{
+  if (!Open()) return false;
+  
+  scfStringArray* tags = new scfStringArray;
+  for (size_t i = 0; i < precacheLimits.GetSize(); i++)
+  {
+    tags->Push (precacheLimits[i].ToString());
+  }
+  return csPtr<iStringArray> (tags);
+}
+
+bool csGLShader_CG::Precache (const char* type, const char* tag,
+                              iBase* previous,
                               iDocumentNode* node, iHierarchicalCache* cacheTo,
                               csRef<iBase>* outObj)
 {
   if (!Open()) return false;
-
+  
+  csRef<iShaderProgramCG> prevCG (scfQueryInterfaceSafe<iShaderProgramCG> (
+    previous));
+  csRef<iShaderDestinationResolver> resolve (
+    scfQueryInterfaceSafe<iShaderDestinationResolver> (previous));
+    
+  ProfileLimitsPair limits;
+  if (!limits.FromString (tag))
+    return false;
   csRef<csShaderGLCGCommon> prog;
-  ProfileLimitsArray* limits = 0;
-  if (strcasecmp(type, "vp") == 0)
+  bool result = false;
+  if (strcasecmp(type, "fp") == 0)
   {
-    limits = &precacheLimitsVP;
-    prog.AttachNew (new csShaderGLCGVP(this));
+    prog.AttachNew (new csShaderGLCGFP (this, limits));
+    /* Precache for 'tag' */
+    if (!prog->Load (resolve, node)) return false;
+    result = Precache (prog, limits.fp, tag, cacheTo);
   }
-  else if (strcasecmp(type, "fp") == 0)
+  else if (strcasecmp(type, "vp") == 0)
   {
-    limits = &precacheLimitsFP;
-    prog.AttachNew (new csShaderGLCGFP(this));
+    prog.AttachNew (new csShaderGLCGVP (this));
+    /* Get tag from prevCG */
+    if (prevCG.IsValid())
+    {
+      /* If previous tag and current tag match, precache */
+      csShaderGLCGFP* prevFP = static_cast<csShaderGLCGFP*> (
+        (iShaderProgramCG*)prevCG);
+      ProfileLimitsPair prevLimits = prevFP->cacheLimits;
+      if (limits != prevLimits) return false;
+    }
+    /* Precache for 'tag' */
+    if (!prog->Load (resolve, node)) return false;
+    result = Precache (prog, limits.vp, tag, cacheTo);
   }
   else
     return false;
-    
-  if (!prog->Load (resolve, node)) return false;
-  
-  bool result = Precache (prog, *limits, cacheTo);
-  if (outObj) *outObj = prog;
+
+  if (outObj && result) *outObj = prog;
   return result;
+
 }
 
 bool csGLShader_CG::Precache (csShaderGLCGCommon* prog, 
-                              ProfileLimitsArray& limits,
+                              ProfileLimits& limits,
+                              const char* tag,
                               iHierarchicalCache* cacheTo)
 {
   bool result = false;
-  
   CGprofile customProfile = prog->CustomProfile();
-  bool profileFound = false;
-  for (size_t i = 0; i < limits.GetSize(); i++)
-  {
-    if ((customProfile != CG_PROFILE_UNKNOWN)
-        && (limits[i].profile != customProfile))
-      // If a custom profile is set, filter precached profiles by that
-      continue;
-    result |= prog->Precache (limits[i], cacheTo);
-    profileFound = true;
-  }
-  if ((customProfile != CG_PROFILE_UNKNOWN) && !profileFound)
-  {
-    /* No profile in the precache list matches the custom one,
-     * compile with default Cg limits */
-    ProfileLimits defaultLimits (customProfile);
-    defaultLimits.GetCgDefaults();
-    result |= prog->Precache (defaultLimits, cacheTo);
-  }
+  if ((customProfile != CG_PROFILE_UNKNOWN)
+      && (limits.profile != customProfile))
+    return false;
+  result = prog->Precache (limits, tag, cacheTo);
   return result;
+}
+  
+csPtr<iString> csGLShader_CG::SelectPrecacheTag (const char* type, 
+                                                 iBase* previous,
+                                                 iHierarchicalCache* cacheDir)
+{
+  // @@@ TODO: Prolly good idea: check file magic
+  scfString* result = 0;
+  if (previous != 0)
+  {
+    csRef<iShaderProgramCG> prevCG (scfQueryInterfaceSafe<iShaderProgramCG> (
+      previous));
+    if (!prevCG.IsValid()) return 0;
+    
+    csShaderGLCGFP* prevFP = static_cast<csShaderGLCGFP*> (
+      (iShaderProgramCG*)prevCG);
+        
+    result = new scfString (prevFP->cacheLimits.ToString());
+  }
+  else
+  {
+    ProfileLimitsArray candidates;
+    csRef<iStringArray> availableTags = cacheDir->GetSubItems ("/");
+    for (size_t i = 0; i < availableTags->GetSize(); i++)
+    {
+      csString tag (availableTags->Get (i));
+      if (tag[tag.Length()-1] == '/')\
+	tag.Truncate (tag.Length()-1);
+	
+      ProfileLimitsPair cacheLimits;
+      if (!cacheLimits.FromString (tag)) continue;
+      
+      candidates.Push (cacheLimits);
+    }
+    candidates.Sort ();
+    
+    for (size_t i = candidates.GetSize(); i-- > 0;)
+    {
+      const ProfileLimitsPair& candidate = candidates[i];
+      
+      // TODO: compare vendors
+      bool supportVP = 
+	(ProfileNeedsRouting (candidate.vp.profile)
+	  && IsRoutedProfileSupported (candidate.vp.profile))
+	|| cgGLIsProfileSupported (candidate.vp.profile);
+      bool supportFP = 
+	(ProfileNeedsRouting (candidate.fp.profile)
+	  && IsRoutedProfileSupported (candidate.fp.profile))
+	|| cgGLIsProfileSupported (candidate.fp.profile);
+	
+      if (!supportVP || !supportFP) continue;
+      
+      ProfileLimitsPair currentLimits (candidate);
+      currentLimits.GetCurrentLimits (ext);
+      
+      if (candidate > currentLimits) continue;
+    
+      result = new scfString (candidate.ToString());
+      break;
+    }
+  }
+  return csPtr<iString> (result);
 }
 
 ////////////////////////////////////////////////////////////////////

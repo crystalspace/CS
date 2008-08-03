@@ -21,6 +21,8 @@
 
 #include "cg_common.h"
 
+#include "csplugincommon/opengl/shaderplugin.h"
+
 struct csGLExtensionManager;
 struct iFile;
 
@@ -29,6 +31,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 
   struct ProfileLimits
   {
+    CS::PluginCommon::ShaderProgramPluginGL::HardwareVendor vendor;
     CGprofile profile;
     uint MaxAddressRegs;
     uint MaxInstructions;
@@ -39,12 +42,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     uint NumTemps;
     uint NumTexInstructionSlots;
     
-    ProfileLimits (CGprofile profile);
+    ProfileLimits (
+      CS::PluginCommon::ShaderProgramPluginGL::HardwareVendor vendor,
+      CGprofile profile);
     
     void GetCurrentLimits (csGLExtensionManager* ext);
     void ReadFromConfig (iConfigFile* cfg, const char* prefix);
     void GetCgDefaults ();
     
+    bool FromString (const char* str);
     csString ToString () const;
     void ToCgOptions (ArgumentArray& args) const;
     
@@ -52,11 +58,61 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     bool Read (iFile* file);
     
     bool operator< (const ProfileLimits& other) const;
+    bool operator> (const ProfileLimits& other) const;
+    bool operator== (const ProfileLimits& other) const;
     bool operator>= (const ProfileLimits& other) const
     { return !operator< (other); }
   private:
     static uint glGetProgramInteger (csGLExtensionManager* ext,
       GLenum target, GLenum what);
+  };
+  
+  struct ProfileLimitsPair
+  {
+    ProfileLimits vp;
+    ProfileLimits fp;
+    
+    ProfileLimitsPair() :
+      vp (CS::PluginCommon::ShaderProgramPluginGL::Other,
+        CG_PROFILE_UNKNOWN),
+      fp (CS::PluginCommon::ShaderProgramPluginGL::Other,
+        CG_PROFILE_UNKNOWN) {}
+    ProfileLimitsPair (
+      CS::PluginCommon::ShaderProgramPluginGL::HardwareVendor vendorVP,
+      CGprofile profileVP,
+      CS::PluginCommon::ShaderProgramPluginGL::HardwareVendor vendorFP,
+      CGprofile profileFP) : vp (vendorVP, profileVP),
+        fp (vendorFP, profileFP) {}
+      
+    void GetCurrentLimits (csGLExtensionManager* ext)
+    {
+      vp.GetCurrentLimits (ext);
+      fp.GetCurrentLimits (ext);
+    }
+    
+    bool FromString (const char* str);
+    csString ToString () const;
+    
+    bool operator< (const ProfileLimitsPair& other) const
+    {
+      if (fp < other.fp) return true;
+      if (fp == other.fp) return false;
+      return vp < other.vp;
+    }
+    bool operator> (const ProfileLimitsPair& other) const
+    {
+      if (fp > other.fp) return true;
+      if (fp == other.fp) return false;
+      return vp > other.vp;
+    }
+    bool operator== (const ProfileLimitsPair& other) const
+    {
+      return (fp == other.fp) && (vp == other.vp);
+    }
+    bool operator!= (const ProfileLimitsPair& other) const
+    { return !operator== (other); }
+    bool operator>= (const ProfileLimitsPair& other) const
+    { return !operator< (other); }
   };
 
 }

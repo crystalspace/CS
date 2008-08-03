@@ -29,6 +29,7 @@
 #include "csplugincommon/shader/weavercombiner.h"
 #include "cstool/identstrings.h"
 #include "csutil/documenthelper.h"
+#include "csutil/fifo.h"
 #include "csutil/scopeddelete.h"
 
 #include "snippet.h"
@@ -60,6 +61,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
   //-------------------------------------------------------------------
   
+  template<class HashType>
+  class BasicIteratorImplHashValues :
+    public BasicIterator<typename HashType::ValueType>
+  {
+    typename HashType::GlobalIterator iter;
+    size_t total;
+  public:
+    BasicIteratorImplHashValues (HashType& hash) : iter (hash.GetIterator()),
+      total (hash.GetSize()) {}
+  
+    virtual bool HasNext()
+    { return iter.HasNext(); }
+    virtual typename HashType::ValueType& Next()
+    { return iter.Next(); }
+    virtual size_t GetTotal() const
+    { return total; }
+  };
+
+  //-------------------------------------------------------------------
+  
   csString Snippet::Technique::GetCondition() const
   {
     if (owner != 0) return owner->GetCondition();
@@ -71,7 +92,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   Snippet::Snippet (const WeaverCompiler* compiler, iDocumentNode* node, 
                     const char* name, const FileAliases& aliases,
                     const Snippet* parent) : compiler (compiler), 
-    xmltokens (compiler->xmltokens), name (name), 
+    xmltokens (compiler->xmltokens), name (name), node (node),
     isCompound (false), passForward (false), parent (parent)
   {
     bool okay = true;
@@ -147,6 +168,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   BasicIterator<const Snippet::Technique*>* Snippet::GetTechniques() const
   {
     return new BasicIteratorImplCopyValue<const Technique*, TechniqueArray> (
+      techniques);
+  }
+  
+  BasicIterator<Snippet::Technique*>* Snippet::GetTechniques()
+  {
+    return new BasicIteratorImplCopyValue<Technique*, TechniqueArray> (
       techniques);
   }
   
@@ -736,7 +763,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     newSnippet->condition = condition;
     tech.AddSnippet (id, newSnippet);
   }
-    
+  
+  namespace
+  {
+    struct TechSnippetPair
+    {
+      Snippet* snip;
+      Snippet::CompoundTechnique* tech;
+      
+      TechSnippetPair (Snippet* snip, Snippet::CompoundTechnique* tech)
+	: snip (snip), tech (tech) {}
+    };
+  }
+  
   void Snippet::HandleConnectionNode (CompoundTechnique& tech, 
                                       iDocumentNode* node)
   {
@@ -804,19 +843,61 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  "'explicit' node lacks 'to' attribute");
 	return;
       }
-      ExplicitConnectionsHash& explConn =
-        tech.GetExplicitConnections (newConn.to);
-      if (explConn.Contains (toId))
+      
+      csFIFO<TechSnippetPair> snippetsToAddTo;
+      snippetsToAddTo.Push (TechSnippetPair (newConn.to, &tech));
+      while (snippetsToAddTo.GetSize() > 0)
       {
-	compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-	  "An explicit input was already mapped to '%s'", toId);
-      }
-      else
-      {
-        ExplicitConnectionSource connSrc;
-        connSrc.from = newConn.from;
-        connSrc.outputName = fromId;
-        explConn.Put (toId, connSrc);
+        TechSnippetPair to = snippetsToAddTo.PopTop();
+        
+	if (to.snip->IsCompound())
+	{
+	  /* For compound snippets replicate the explicit connection
+	    targetting the contained connections. */
+	  CS::Utility::ScopedDelete<BasicIterator<Snippet::Technique*> > techIter (
+	    to.snip->GetTechniques());
+	  while (techIter->HasNext())
+	  {
+	    Snippet::Technique* tech = techIter->Next();
+	    if (tech->IsCompound ())
+	    {
+	      CompoundTechnique* compTech = static_cast<CompoundTechnique*> (
+	       tech);
+	      CS::Utility::ScopedDelete<BasicIterator<Snippet*> > snipIter (
+		compTech->GetSnippets());
+	      while (snipIter->HasNext())
+	      {
+	        Snippet* snip = snipIter->Next();
+	        snippetsToAddTo.Push (TechSnippetPair (snip, compTech));
+	      }
+	    }
+	  }
+	}
+	else
+	{
+	  ExplicitConnectionsHash& explConn =
+	    to.tech->GetExplicitConnections (to.snip);
+	  if (explConn.Contains (toId))
+	  {
+	    if (to.snip == newConn.to)
+	      compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
+		"An explicit input was already mapped to '%s'", toId);
+	  }
+	  else
+	  {
+	    ExplicitConnectionSource connSrc;
+	    connSrc.from = newConn.from;
+	    connSrc.outputName = fromId;
+	    explConn.Put (toId, connSrc);
+	    
+	    if (to.snip != newConn.to)
+	    {
+	      Connection newConn2 (newConn);
+	      newConn2.to = to.snip;
+              tech.AddConnection (newConn2);
+            }
+	  }
+	}
       }
     }
   }
@@ -1095,6 +1176,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     return 0;
   }
   
+  BasicIterator<Snippet*>* Snippet::CompoundTechnique::GetSnippets()
+  {
+    return new BasicIteratorImplHashValues<IdSnippetHash> (snippets);
+  }
+  
   //-------------------------------------------------------------------
   
   size_t SnippetNumbers::GetSnippetNumber (const Snippet* snip)
@@ -1152,7 +1238,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   
   void TechniqueGraph::AddConnection (const Connection& conn)
   {
-    connections.Push (conn);
+    connections.PushSmart (conn);
     inTechniques.Delete (conn.to);
     outTechniques.Delete (conn.from);
     CS_ASSERT(conn.to != conn.from);
@@ -1369,10 +1455,62 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    }
 	  }
 	}
-	// Transfer explicit connections
-	for (size_t g = 0; g < techGraphs.GetSize(); g++)
+	// Set priority for this snippet
+	if (snipNum != (size_t)~0)
 	{
-	  GraphInfo& graphInfo = techGraphs[g];
+	  int prio = tech->priority;
+	  for (size_t g = 0; g < techGraphs.GetSize(); g++)
+	    techGraphs[g].graph.GetSnippetPrios().SetSnippetPriority (snipNum, prio);
+	}
+        // Add all the graphs for the technique to the complete graph list
+        for (size_t g = 0; g < techGraphs.GetSize(); g++)
+          graphs.Push (techGraphs[g]);
+      }
+      else
+      {
+	GraphInfo graphInfo;
+	graphInfo.graph.AddTechnique (tech);
+	// Set priority for this snippet
+	if (snipNum != (size_t)~0)
+	{
+	  int prio = tech->priority;
+	  graphInfo.graph.GetSnippetPrios().SetSnippetPriority (snipNum, prio);
+	}
+	graphs.Push (graphInfo);
+      }
+    }
+    MapGraphInputsOutputs (graphs, snip);
+  }
+  
+  void TechniqueGraphBuilder::FixupExplicitConnections (const Snippet* snip, 
+    csArray<GraphInfo>& graphs)
+  {
+    CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique*> > techIter (
+      snip->GetTechniques());
+    size_t snipNum = (size_t)~0;
+    if (techIter->GetTotal() > 1)
+    {
+      snipNum = snipNums.GetSnippetNumber (snip);
+    }
+    while (techIter->HasNext())
+    {
+      const Snippet::Technique* tech = techIter->Next();
+      if (tech->IsCompound ())
+      {
+        const Snippet::CompoundTechnique* compTech =
+          static_cast<const Snippet::CompoundTechnique*> (tech);
+	// Each sub-snippet ...
+	Snippet::CompoundTechnique::IdSnippetHash::ConstGlobalIterator
+	  snippetIter = compTech->snippets.GetIterator();
+	while (snippetIter.HasNext())
+	{
+	  Snippet* snippet = snippetIter.Next ();
+	  FixupExplicitConnections (snippet, graphs);
+	}
+	// Transfer explicit connections
+	for (size_t g = 0; g < graphs.GetSize(); g++)
+	{
+	  GraphInfo& graphInfo = graphs[g];
 	  snippetIter.Reset();
 	  while (snippetIter.HasNext())
 	  {
@@ -1409,31 +1547,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    }
 	  }
 	}
-	// Set priority for this snippet
-	if (snipNum != (size_t)~0)
-	{
-	  int prio = tech->priority;
-	  for (size_t g = 0; g < techGraphs.GetSize(); g++)
-	    techGraphs[g].graph.GetSnippetPrios().SetSnippetPriority (snipNum, prio);
-	}
-        // Add all the graphs for the technique to the complete graph list
-        for (size_t g = 0; g < techGraphs.GetSize(); g++)
-          graphs.Push (techGraphs[g]);
-      }
-      else
-      {
-	GraphInfo graphInfo;
-	graphInfo.graph.AddTechnique (tech);
-	// Set priority for this snippet
-	if (snipNum != (size_t)~0)
-	{
-	  int prio = tech->priority;
-	  graphInfo.graph.GetSnippetPrios().SetSnippetPriority (snipNum, prio);
-	}
-	graphs.Push (graphInfo);
       }
     }
-    MapGraphInputsOutputs (graphs, snip);
   }
 
   void TechniqueGraphBuilder::MapGraphInputsOutputs (GraphInfo& graphInfo, 
@@ -1471,6 +1586,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   {
     csArray<GraphInfo> graphInfos;
     BuildSubGraphs (snip, graphInfos);
+    
+    FixupExplicitConnections (snip, graphInfos);
+    
     for (size_t g = 0; g < graphInfos.GetSize(); g++)
       graphs.Push (graphInfos[g].graph);
   }

@@ -43,7 +43,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
   SCF_IMPLEMENT_FACTORY(csColladaConvertor)
 
     // =============== Error Reporting and Handling Functions ===============
-    void csColladaConvertor::Report(int severity, const char* msg, ...)
+  void csColladaConvertor::Report(int severity, const char* msg, ...)
   {
     va_list argList;
     va_start(argList, msg);
@@ -67,21 +67,25 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     warningsOn = toggle;
   }
 
+  void csColladaConvertor::SetSectorScene(bool toggle)
+  {
+    sectorScene = toggle;
+  }
+
   void csColladaConvertor::CheckColladaFilenameValidity(const char* str)
   {
     std::string filePath = str;
     size_t index = filePath.find(".", 0);
+
     if (index == std::string::npos)
     {
       Report(CS_REPORTER_SEVERITY_WARNING, "Warning:  No file extension detected on filename.  File is possibly not a COLLADA file.");
     }
-
     else
     {
       std::string ext = filePath.substr(index);
-      std::string expectedExt = ".dae";
 
-      if (!(ext == expectedExt))
+      if (ext != ".dae" && ext != ".DAE")
       {
         std::string warningMsg = "Warning:  File extension \'";
         warningMsg.append(ext);
@@ -105,9 +109,10 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     warningsOn(false),
     obj_reg(0),
     lastEffectId(-1),
-    csReady(false),
+    csOutputReady(false),
     outputFileType(CS_NO_FILE),
-    colladaReady(false)      
+    colladaReady(false),
+    sectorScene(false)
   {
   }
 
@@ -127,15 +132,14 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
   {
     obj_reg = reg;
 
-
     // create our own document system, since we will be reading and
     // writing to the XML files
     docSys = new csTinyDocumentSystem();
 
     // get a pointer to the virtual file system
-    fileSys = csQueryRegistry<iVFS>(obj_reg);
+    fileSys = csQueryRegistryOrLoad<iVFS>(obj_reg, "crystalspace.kernel.vfs");
 
-    return true;
+    return fileSys.IsValid();
   }
 
   // =============== File Loading ===============
@@ -143,13 +147,6 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
   const char* csColladaConvertor::Load(const char *str)
   {
     csRef<iFile> filePtr;
-
-    if (!fileSys.IsValid())
-    {
-      Report(CS_REPORTER_SEVERITY_WARNING,
-	  "Unable to access file system.  File not loaded.");
-      return "Unable to access file system";
-    }
 
     // only do a consistency check for collada filename if warnings are on
     if (warningsOn)
@@ -220,6 +217,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     }
 
     colladaElement = rootNode;
+    csOutputReady = false;
     colladaReady = true;
 
     return 0;
@@ -239,6 +237,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     }  
 
     colladaElement = rootNode;
+    csOutputReady = false;
     colladaReady = true;
 
     return 0;
@@ -249,12 +248,12 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
   const char* csColladaConvertor::Write(const char* filepath)
   {
     // sanity check
-    if (!csReady)
+    if (!csOutputReady)
     {
       if (warningsOn)
       {
         Report(CS_REPORTER_SEVERITY_WARNING,
-	    "Warning: Crystal Space document not ready for writing.");
+          "Warning: Crystal Space document not ready for writing.");
       }
 
       return "Crystal Space document not ready for writing";
@@ -396,7 +395,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       csTopNode = csFile->GetRoot()->GetNode("library");
     }
 
-    csReady = true;
+    csOutputReady = true;
     return true;
   }
 
@@ -412,17 +411,19 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
   const char* csColladaConvertor::Convert()
   {
-    if (!csReady)
+    if (!csOutputReady)
     {
-      if (warningsOn)
+      if (!InitializeCrystalSpaceDocument())
       {
-        Report(CS_REPORTER_SEVERITY_NOTIFY, "Crystal Space document not yet initialized.  Attempting to initialize...");
-        if (!InitializeCrystalSpaceDocument())
+        if (warningsOn)
         {
           Report(CS_REPORTER_SEVERITY_ERROR, "Error: Unable to initialize output document.");
-          return "Unable to initialize output document";
         }
-        else
+        return "Unable to initialize output document";
+      }
+      else
+      {
+        if (warningsOn)
         {
           Report(CS_REPORTER_SEVERITY_NOTIFY, "Success.");
         }
@@ -435,7 +436,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       return "COLLADA file not loaded";
     }
 
-    // ConvertMaterials() needs to be called first, so that there actually *is* a materials
+    // ConvertEffects() needs to be called first, so that there actually *is* a materials
     // list from which to assign materials in ConvertGeometry()
     csRef<iDocumentNode> materialsNode = colladaElement->GetNode("library_materials");
     if (!materialsNode.IsValid())
@@ -446,14 +447,14 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
     if (warningsOn)
     {
-      Report(CS_REPORTER_SEVERITY_WARNING, "Beginning to convert materials");
+      Report(CS_REPORTER_SEVERITY_WARNING, "Beginning to convert effects.");
     }
 
-    ConvertMaterials(materialsNode);
+    ConvertEffects();
 
     if (warningsOn)
     {
-      Report(CS_REPORTER_SEVERITY_WARNING, "Done converting materials");
+      Report(CS_REPORTER_SEVERITY_WARNING, "Done converting effects.");
     }
 
     csRef<iDocumentNode> geoNode = colladaElement->GetNode("library_geometries");
@@ -500,6 +501,61 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
   bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
   {
+    // First collect the names of all portals and fill the meshprops hash.
+    csRef<iDocumentNode> libVisScenes = colladaElement->GetNode("library_visual_scenes");
+    csRef<iDocumentNode> libVisualScenes = colladaElement->GetNode("library_visual_scenes");
+    csRef<iDocumentNodeIterator> visualScenes = libVisualScenes->GetNodes("visual_scene");
+
+    csRef<iDocumentNodeIterator> sectors;
+    for(int i=0; (visualScenes->HasNext() && !sectorScene) || i<1; i++)
+    {
+      if(sectorScene)
+      {
+        sectors = visualScenes;
+      }
+      else
+      {
+        sectors = visualScenes->Next()->GetNodes("node");
+      }
+
+      while(sectors->HasNext())
+      {
+        csRef<iDocumentNode> sector = sectors->Next();
+        csRef<iDocumentNodeIterator> sectorObjects = sector->GetNodes("node");
+        while(sectorObjects->HasNext())
+        {
+          csRef<iDocumentNode> object = sectorObjects->Next();
+          if(object->GetNode("extra"))
+          {
+            csRef<iDocumentNodeIterator> techniques = object->GetNode("extra")->GetNodes("technique");
+            while(techniques->HasNext())
+            {
+              csRef<iDocumentNode> technique = techniques->Next();
+              if(csString(technique->GetAttributeValue("profile")).Compare("FCOLLADA"))
+              {
+                technique = technique->GetNode("user_properties");
+                csStringArray meshProp;
+                csStringArray userProp;
+                userProp.SplitString(technique->GetContentsValue(), ";");
+                for(size_t i=0; i<userProp.GetSize(); i++)
+                {
+                  meshProp.Push(csString(userProp[i]).Trim().Truncate('&'));
+                  csString prop = meshProp[i];
+                  if(prop.Truncate(prop.FindFirst('=')).Compare("PORTAL"))
+                  {
+                    portalNames.Push(object->GetAttributeValue("name"));
+                    portalTargets.Push(csString(userProp[i]).Slice(csString(userProp[i]).FindFirst('=')+1));
+                  }
+                }
+                meshProps.Put(object->GetAttributeValue("name"), meshProp);
+              }
+            }
+          }
+        }
+      }
+    }
+
+
     csRef<iDocumentNodeIterator> geometryIterator;
 
     // get an iterator over all <geometry> elements
@@ -530,6 +586,18 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     {
       // retrieve next <geometry> element and store as currentGeometryElement
       currentGeometryElement = geometryIterator->Next();
+
+      // If this is a portal, skip it and continue.
+      bool skip = false;
+      for(size_t i=0; i<portalNames.GetSize() && !skip; i++)
+      {
+        skip = portalNames[i].Compare(currentGeometryElement->GetAttributeValue("name"));
+      }
+
+      if(skip)
+      {
+        continue;
+      }
 
       // get value of id attribute and store as currentGeometryID
       currentGeometryID = currentGeometryElement->GetAttribute("id");
@@ -587,9 +655,20 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
           return false;
         }
 
-        mesh = new csColladaMesh(currentMeshElement, this);
+        // Get meshfact type.
+        csString meshfactType = GetMeshFactType(csString(""));
+        csStringArray meshPropsArr = meshProps.Get(currentGeometryElement->GetAttributeValue("name"), csStringArray());
+        for(size_t j=0; j<meshPropsArr.GetSize(); j++)
+        {
+          if(csString(meshPropsArr[j]).Truncate(csString(meshPropsArr[j]).FindFirst('=')).Compare("MESH"))
+          {
+            meshfactType = GetMeshFactType(csString(meshPropsArr[j]).Slice(csString(meshPropsArr[j]).FindFirst('=')+1));
+          }
+        }
 
-        mesh->WriteXML(csFile);
+        mesh = new csColladaMesh(currentMeshElement, this, meshfactType);
+
+        mesh->WriteXML(csTopNode);
 
         delete mesh;
       }
@@ -624,106 +703,121 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     return returnValue;
   }
 
-  // ConvertEffects() will become the dominant function for use with COLLADA
-  // materials/effects conversion, but as of right now, it's broken.  ;)
-  bool csColladaConvertor::ConvertEffects(iDocumentNode *effectsSection)
+  // ConvertEffects() is the generic function for converting textures, materials, shaders
+  // and all related items.
+  bool csColladaConvertor::ConvertEffects()
   {
     Report(CS_REPORTER_SEVERITY_WARNING, "Warning: ConvertEffects() functionality not fully implemented.  Use at your own risk!");
 
-    csRef<iDocumentNodeIterator> effectsToProcess = effectsSection->GetNodes("effect");
-    csRef<iDocumentNode> currentEffect;
-
-    csColladaEffect* currentEffectObject;
-
-    while (effectsToProcess->HasNext())
+    // Convert textures
+    csRef<iDocumentNode> imagesNode = colladaElement->GetNode("library_images");
+    if(imagesNode.IsValid())
     {
-      currentEffect = effectsToProcess->Next();
-      currentEffectObject = new csColladaEffect(currentEffect, this);
+      csRef<iDocumentNode> texturesNode = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT);
+      texturesNode->SetValue("textures");
+      csRef<iDocumentNodeIterator> textureNodes = imagesNode->GetNodes("image");
+      while(textureNodes->HasNext())
+      {
+        csRef<iDocumentNode> texture = textureNodes->Next();
+        csRef<iDocumentNode> newTexture = texturesNode->CreateNodeBefore(CS_NODE_ELEMENT);
+        newTexture->SetValue("texture");
+        newTexture->SetAttribute("name", texture->GetAttributeValue("id"));
+
+        csRef<iDocumentNode> textureFile = newTexture->CreateNodeBefore(CS_NODE_ELEMENT);
+        textureFile->SetValue("file");
+
+        csRef<iDocumentNode> textureFileContents = textureFile->CreateNodeBefore(CS_NODE_TEXT);
+        textureFileContents->SetValue(texture->GetAttributeValue("id"));
+
+        // TODO: Alpha, Class.
+      }
     }
 
-    return true;
-  }
+    // Get instance materials and make a list of those which are generated by the exporter.
+    // These are most likely connected to portals and other objects which have no material attached.
+    csRef<iDocumentNode> libVisualScenes = colladaElement->GetNode("library_visual_scenes");
+    csRef<iDocumentNodeIterator> visualScenes = libVisualScenes->GetNodes("visual_scene");
+    csArray<csString> dummyMaterialIDs;
 
-  // Eventually, I think, ConvertMaterials() will become deprecated in favor
-  // of ConvertEffects, as this is more generalized.  However, for the sake
-  // of simplicity in the initial materials conversion, I added this function
-  // so that I didn't have to convert all of the shaders.
-  bool csColladaConvertor::ConvertMaterials(iDocumentNode *materialsSection)
-  {
-    Report(CS_REPORTER_SEVERITY_WARNING, "Warning: ConvertMaterials() functionality not fully implemented.  Use at your own risk!");
-
-    // get an iterator over all the <material> elements
-    csRef<iDocumentNodeIterator> materialsElements = materialsSection->GetNodes("material");
-    csRef<iDocumentNode> nextMaterialElement;
-    csColladaMaterial* nextMaterial;
-    csRef<iDocumentNode> effectNode;
-    csRef<iDocumentNode> libraryEffects = colladaElement->GetNode("library_effects");
-    csRef<iDocumentNodeIterator> effectIter;
-    csRef<iDocumentNode> materialsNode = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT);
-    materialsNode->SetValue("materials");
-
-    while (materialsElements->HasNext())
+    csRef<iDocumentNodeIterator> sectors;
+    for(int i=0; (visualScenes->HasNext() && !sectorScene) || i<1; i++)
     {
-      nextMaterialElement = materialsElements->Next();
-      nextMaterial = new csColladaMaterial(this);
-      nextMaterial->SetID(nextMaterialElement->GetAttributeValue("id"));
-
-      scfString url = nextMaterialElement->GetNode("instance_effect")->GetAttributeValue("url");
-
-      // chop off the '#'
-      if (url.GetAt(0) == '#')
+      if(sectorScene)
       {
-        url.DeleteAt(0, 1);
+        sectors = visualScenes;
+      }
+      else
+      {
+        sectors = visualScenes->Next()->GetNodes("node");
       }
 
-      // now, find the same effect in the <library_effects> list
-      effectIter = libraryEffects->GetNodes("effect");
-      while (effectIter->HasNext())
+      while(sectors->HasNext())
       {
-        effectNode = effectIter->Next();
-        scfString newUrl = effectNode->GetAttributeValue("id");
-        if (newUrl.Compare(url))
+        csRef<iDocumentNode> sector = sectors->Next();
+        csRef<iDocumentNodeIterator> sectorObjects = sector->GetNodes("node");
+        while(sectorObjects->HasNext())
         {
-          break;
+          csRef<iDocumentNode> object = sectorObjects->Next();
+          if(object->GetNode("node") && object->GetNode("node")->GetNode("instance_geometry"))
+          {
+            object = object->GetNode("node")->GetNode("instance_geometry");
+            if(object->GetNode("bind_material") && object->GetNode("bind_material")->GetNode("technique_common"))
+            {
+              object = object->GetNode("bind_material")->GetNode("technique_common");
+              csString material("ColorMaterial");
+              if(object->GetNode("instance_material") &&
+                material.Compare(object->GetNode("instance_material")->GetAttributeValue("symbol")))
+              {
+                dummyMaterialIDs.Push(csString(object->GetNode("instance_material")->GetAttributeValue("target")).Slice(1));
+              }
+            }
+          }
         }
       }
-
-      nextMaterial->SetInstanceEffect(effectNode);
-      materialsList.Push(*nextMaterial);
-
-      csRef<iDocumentNode> newNode = materialsNode->CreateNodeBefore(CS_NODE_ELEMENT);
-      newNode->SetValue("material");
-      newNode->SetAttribute("name", nextMaterial->GetID());
-      csRef<iDocumentNode> colorNode = newNode->CreateNodeBefore(CS_NODE_ELEMENT);
-      colorNode->SetValue("color");
-      csRGBcolor diffuseColor = nextMaterial->GetInstanceEffect()->GetProfile("profile_COMMON")->GetDiffuseColor();
-
-      if (warningsOn)
-      {
-        Report(CS_REPORTER_SEVERITY_NOTIFY, "Outputting color: %d, %d, %d", diffuseColor.red, diffuseColor.green, diffuseColor.blue);
-      }
-
-      csString outputString;
-      outputString = outputString.Format("%d", diffuseColor.red);
-      colorNode->SetAttribute("red", outputString.GetData());
-      outputString = outputString.Format("%d", diffuseColor.green);
-      colorNode->SetAttribute("green", outputString.GetData());
-      outputString = outputString.Format("%d", diffuseColor.blue);
-      colorNode->SetAttribute("blue", outputString.GetData());
-
-
-      /*
-      csColladaEffectProfile* prof = nextMaterial->GetInstanceEffect()->GetProfile("profile_COMMON");
-      if (warningsOn)
-      {
-      Report(CS_REPORTER_SEVERITY_NOTIFY, "Profile name: %s", prof->GetName()->GetData()); 
-      }
-      */
-
-      //delete nextMaterial;
     }
 
-    return true;
+    // Convert materials
+    csRef<iDocumentNode> materialsNode = colladaElement->GetNode("library_materials");
+    csRef<iDocumentNode> effectsNode = colladaElement->GetNode("library_effects");
+    if(materialsNode.IsValid() && effectsNode.IsValid())
+    {
+      csRef<iDocumentNode> newMaterialsNode = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT);
+      newMaterialsNode->SetValue("materials");
+
+      csRef<iDocumentNodeIterator> materialNodes = materialsNode->GetNodes("material");
+      csRef<iDocumentNodeIterator> effectNodes = effectsNode->GetNodes("effect");
+
+      while(materialNodes->HasNext() && effectNodes->HasNext())
+      {
+        csRef<iDocumentNode> material = materialNodes->Next();
+        csRef<iDocumentNode> effect = effectNodes->Next();
+
+        bool nowrite = false;
+        for(size_t i=0; i<dummyMaterialIDs.GetSize() && !nowrite; i++)
+        {
+          nowrite = dummyMaterialIDs[i].Compare(material->GetAttributeValue("id"));
+        }
+
+        if(nowrite)
+        {
+          continue;
+        }
+
+        csRef<iDocumentNode> newMaterial = newMaterialsNode->CreateNodeBefore(CS_NODE_ELEMENT);
+        newMaterial->SetValue("material");
+        newMaterial->SetAttribute("name", material->GetAttributeValue("name"));
+
+        csColladaMaterial nextMaterial = csColladaMaterial(this);
+        nextMaterial.SetID(material->GetAttributeValue("id"));
+        nextMaterial.SetMaterialNode(newMaterial);
+        nextMaterial.SetInstanceEffect(effect);
+        materialsList.Push(nextMaterial);
+      }
+
+      return true;
+    }
+
+    return false;
   }
 
   bool csColladaConvertor::ConvertScene(iDocumentNode *camerasSection, iDocumentNode *lightsSection, iDocumentNode *visualScenesSection)
@@ -736,29 +830,431 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       return false;
     }
 
-    // first, let's convert the scenes
-    // each scene (<visual_scene> node) will be converted to 
-    // a sector in crystal space
-    csRef<iDocumentNodeIterator> visualSceneIterator = visualScenesSection->GetNodes("visual_scene");
-    csRef<iDocumentNode> currentVisualSceneElement;
-    while (visualSceneIterator->HasNext())
+    // Get camera IDs
+    if(camerasSection)
     {
-      currentVisualSceneElement = visualSceneIterator->Next();
-      const char* sceneName = currentVisualSceneElement->GetAttributeValue("name");
-      csRef<iDocumentNode> currentSectorElement = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      currentSectorElement->SetValue("sector");
-      currentSectorElement->SetAttribute("name", sceneName);
+      csRef<iDocumentNodeIterator> cameraNodes = camerasSection->GetNodes("camera");
+      while(cameraNodes->HasNext())
+      {
+        cameraIDs.Push(cameraNodes->Next()->GetAttributeValue("id"));
+      }
     }
 
-    // next, we'll convert the cameras
-    // a camera will convert to a start location in the world file
-    // a start location requires 
-    //   * a sector to start in
-    //   * a position to start at
-    //   * an up vector
-    //   * a forward vector
+    // Get lights
+    if(lightsSection)
+    {
+      csRef<iDocumentNodeIterator> lightNodes = lightsSection->GetNodes("light");
+      while(lightNodes->HasNext())
+      {
+        csRef<iDocumentNode> lightNode = lightNodes->Next();
+        lightNode = lightNode->GetNode("technique_common");
+
+        // Point lights.
+        if(lightNode &&
+           lightNode->GetNode("point"))
+        {
+          csColladaLight light;
+
+          // TODO: Radius, attenuation, more?
+
+          csStringArray lightColour;
+          lightColour.SplitString(lightNode->GetNode("point")->GetNode("color")->GetContentsValue(), " ");
+          light.colour = csColor(atof(lightColour[0]), atof(lightColour[1]), atof(lightColour[2]));
+
+          lights.Put(lightNode->GetParent()->GetAttributeValue("id"), light);
+        }
+      }
+    }
+
+    if(sectorScene)
+    {
+      // Convert each scene (<visual_scene> node) into a sector.
+      csRef<iDocumentNodeIterator> sectors = visualScenesSection->GetNodes("visual_scene");
+      while(sectors->HasNext())
+      {
+        csRef<iDocumentNode> sector = sectors->Next();
+        WriteSectorInfo(sector);
+      }
+
+      // Next, we'll convert the cameras
+      // A camera will convert to a start location in the world file
+      // A start location consists of: 
+      //   * A sector to start in.
+      //   * A position to start at.
+      //   * An up vector. (optional)
+      //   * A forward vector. (optional)
+
+      // For each camera.
+      for(size_t i=0; i<cameraIDs.GetSize(); i++)
+      {
+        // For each scene.
+        csRef<iDocumentNodeIterator> sectors = visualScenesSection->GetNodes("visual_scene");
+        while(sectors->HasNext())
+        {
+          csRef<iDocumentNode> sector = sectors->Next();
+          WriteCameraInfo(sector, i);
+        }
+      }
+    }
+    else
+    {
+      // For each scene (<visual_scene> node), the first level nodes will be converted to 
+      // a sector in crystal space.
+      csRef<iDocumentNodeIterator> visualSceneIterator = visualScenesSection->GetNodes("visual_scene");
+      while(visualSceneIterator->HasNext())
+      {
+        csRef<iDocumentNode> visualSceneElement = visualSceneIterator->Next();
+        csRef<iDocumentNodeIterator> sectors = visualSceneElement->GetNodes("node");
+        while(sectors->HasNext())
+        {
+          csRef<iDocumentNode> sector = sectors->Next();
+          WriteSectorInfo(sector);
+        }
+      }
+
+      // Next, we'll convert the cameras
+      // A camera will convert to a start location in the world file
+      // A start location consists of: 
+      //   * A sector to start in.
+      //   * A position to start at.
+      //   * An up vector. (optional)
+      //   * A forward vector. (optional)
+
+      // For each camera.
+      for(size_t i=0; i<cameraIDs.GetSize(); i++)
+      {
+        // For each scene.
+        visualSceneIterator = visualScenesSection->GetNodes("visual_scene");
+        while(visualSceneIterator->HasNext())
+        {
+          // For each sector;
+          csRef<iDocumentNode> visualSceneElement = visualSceneIterator->Next();
+          csRef<iDocumentNodeIterator> sectors = visualSceneElement->GetNodes("node");
+          while(sectors->HasNext())
+          {
+            csRef<iDocumentNode> sector = sectors->Next();
+            WriteCameraInfo(sector, i);
+          }
+        }
+      }
+    }
 
     return true;
+  }
+
+  void csColladaConvertor::WriteSectorInfo(iDocumentNode* sector)
+  {
+    // Get user props
+    if(sector->GetNode("extra"))
+    {
+      csRef<iDocumentNodeIterator> techniques = sector->GetNode("extra")->GetNodes("technique");
+      while(techniques->HasNext())
+      {
+        csRef<iDocumentNode> technique = techniques->Next();
+        if(csString(technique->GetAttributeValue("profile")).Compare("FCOLLADA"))
+        {
+          technique = technique->GetNode("user_properties");
+          csStringArray sectorProp;
+          csStringArray userProp;
+          userProp.SplitString(technique->GetContentsValue(), ";");
+          for(size_t i=0; i<userProp.GetSize(); i++)
+          {
+            sectorProp.Push(csString(userProp[i]).Trim().Truncate('&'));
+          }
+          sectorProps.Put(sector->GetAttributeValue("id"), sectorProp);
+        }
+      }
+    }
+
+    // Check that it really is a sector.
+    bool cameraTarget = false;
+    for(size_t i=0; i<cameraIDs.GetSize(); i++)
+    {
+      csString id = cameraIDs[i];
+      id.Truncate(id.FindLast('-'));
+      cameraTarget |= id.Append(".Target-node").Compare(sector->GetAttributeValue("id"));
+    }
+
+    if(sector->GetAttribute("name") && !cameraTarget)
+    {
+      // Write sector.
+      csRef<iDocumentNode> currentSectorElement = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT);
+      currentSectorElement->SetValue("sector");
+      currentSectorElement->SetAttribute("name", sector->GetAttributeValue("name"));
+
+      // Culler (TODO: Support others).
+      csRef<iDocumentNode> culler = currentSectorElement->CreateNodeBefore(CS_NODE_ELEMENT);
+      culler->SetValue("cullerp");
+      culler = culler->CreateNodeBefore(CS_NODE_TEXT);
+      csStringArray userProps = sectorProps.Get(sector->GetAttributeValue("id"), csStringArray());
+      if(userProps.GetSize() != 0)
+      {
+        for(size_t i=0; i<userProps.GetSize(); i++)
+        {
+          if(csString(userProps[i]).Truncate(csString(userProps[i]).FindFirst('=')).Compare("CULLER"))
+          {
+            culler->SetValue(csString(userProps[i]).Slice(csString(userProps[i]).FindFirst('=')+1));
+          }
+        }
+      }
+      else
+      {
+        culler->SetValue("crystalspace.culling.frustvis");
+      }
+      
+      // Write children.
+      csRef<iDocumentNodeIterator> sectorNodes = sector->GetNodes("node");
+      while(sectorNodes->HasNext())
+      {
+        csRef<iDocumentNode> object = sectorNodes->Next();
+
+        // Write portal.
+        size_t portalNum;
+        bool isPortal = false;
+        for(portalNum=0; portalNum<portalNames.GetSize() && !isPortal; portalNum++)
+        {
+          isPortal = portalNames[portalNum].Compare(object->GetAttributeValue("name"));
+        }
+
+        if(isPortal)
+        {
+          csRef<iDocumentNode> newPortal = currentSectorElement->CreateNodeBefore(CS_NODE_ELEMENT);
+          newPortal->SetValue("portal");
+          newPortal->SetAttribute("name", object->GetAttributeValue("name"));
+          csRef<iDocumentNode> newPortalSector = newPortal->CreateNodeBefore(CS_NODE_ELEMENT);
+          newPortalSector->SetValue("sector");
+          csRef<iDocumentNode> newPortalSectorContents = newPortalSector->CreateNodeBefore(CS_NODE_TEXT);
+          newPortalSectorContents->SetValue(portalTargets[portalNum-1]);
+
+            csRef<iDocumentNodeIterator> facts = colladaElement->GetNode("library_geometries")->GetNodes("geometry");
+            while(facts->HasNext())
+            {
+              csRef<iDocumentNode> fact = facts->Next();
+              if(csString(fact->GetAttributeValue("name")).Compare(object->GetAttributeValue("name")))
+              {
+                fact = fact->GetNode("mesh")->GetNode("source")->GetNode("float_array");
+                csStringArray vertices;
+                vertices.SplitString(fact->GetContentsValue(), " ");
+
+                for(int i=0; i<12; i+=3)
+                {
+                  csRef<iDocumentNode> vertex = newPortal->CreateNodeBefore(CS_NODE_ELEMENT);
+                  vertex->SetValue("v");
+
+                  float x = atof(vertices[i]);
+                  float y = atof(vertices[i+1]);
+                  float z = atof(vertices[i+2]);
+
+                  vertex->SetAttributeAsFloat("x", x);
+                  vertex->SetAttributeAsFloat("y", y);
+                  vertex->SetAttributeAsFloat("z", z);
+                }
+                break;
+              }
+            }
+
+          continue;
+        }
+
+        // Write light.
+        if(object->GetNode("instance_light"))
+        {
+          csRef<iDocumentNode> newLight = currentSectorElement->CreateNodeBefore(CS_NODE_ELEMENT);
+          newLight->SetValue("light");
+          newLight->SetAttribute("name", object->GetAttributeValue("name"));
+
+          // Calculate centre.
+          csStringArray sectorPos;
+          csStringArray centerPos;
+
+          sectorPos.SplitString(sector->GetNode("matrix")->GetContentsValue(), " ");
+          centerPos.SplitString(object->GetNode("matrix")->GetContentsValue(), " ");
+
+          float x = atof(sectorPos[3]) + atof(centerPos[3]);
+          float y = atof(sectorPos[11]) + atof(centerPos[11]);
+          float z = atof(sectorPos[7]) + atof(centerPos[7]);
+
+          csRef<iDocumentNode> centreNode = newLight->CreateNodeBefore(CS_NODE_ELEMENT);
+          centreNode->SetValue("center");
+          centreNode->SetAttributeAsFloat("x", x);
+          centreNode->SetAttributeAsFloat("y", y);
+          centreNode->SetAttributeAsFloat("z", z);
+
+          // Write colour.
+          csString url = object->GetNode("instance_light")->GetAttributeValue("url");
+          csColladaLight light = lights.Get(url.Slice(1), csColladaLight());
+          csRef<iDocumentNode> lightColour = newLight->CreateNodeBefore(CS_NODE_ELEMENT);
+          lightColour->SetValue("color");
+          lightColour->SetAttributeAsFloat("red", light.colour.red);
+          lightColour->SetAttributeAsFloat("green", light.colour.green);
+          lightColour->SetAttributeAsFloat("blue", light.colour.blue);
+          continue;
+        }
+
+        // Check for camera, deal with it later.
+        if(object->GetNode("instance_camera"))
+        {
+          continue;
+        }
+
+         // Write genmesh meshobj (TODO: Other mesh types).
+        csRef<iDocumentNode> meshObj = currentSectorElement->CreateNodeBefore(CS_NODE_ELEMENT);
+        meshObj->SetValue("meshobj");
+        meshObj->SetAttribute("name", object->GetAttributeValue("name"));
+        csRef<iDocumentNode> plugin = meshObj->CreateNodeBefore(CS_NODE_ELEMENT);
+        plugin->SetValue("plugin");
+
+        csString meshType = GetMeshType(csString(""));
+        csStringArray mesh = meshProps.Get(object->GetAttributeValue("name"), csStringArray());
+        for(size_t j=0; j<mesh.GetSize(); j++)
+        {
+          if(csString(mesh[j]).Truncate(csString(mesh[j]).FindFirst('=')).Compare("MESH"))
+          {
+            meshType = GetMeshType(csString(mesh[j]).Slice(csString(mesh[j]).FindFirst('=')+1));           
+            continue;
+          }
+
+          if(csString(mesh[j]).Truncate(csString(mesh[j]).FindFirst('=')).Compare("NOSHADOWS"))
+          {
+            csRef<iDocumentNode> noshadows = meshObj->CreateNodeBefore(CS_NODE_ELEMENT);
+            noshadows->SetValue("noshadows");
+          }
+        }
+
+        plugin = plugin->CreateNodeBefore(CS_NODE_TEXT);
+        plugin->SetValue(meshType);
+
+        // Params
+        csRef<iDocumentNode> params = meshObj->CreateNodeBefore(CS_NODE_ELEMENT);
+        params->SetValue("params");
+
+        // Link to mesh factory and material.
+        csRef<iDocumentNode> factory = params->CreateNodeBefore(CS_NODE_ELEMENT);
+        factory->SetValue("factory");
+        csRef<iDocumentNode> material = params->CreateNodeBefore(CS_NODE_ELEMENT);
+        material->SetValue("material");
+        csRef<iDocumentNode> factnode = object->GetNode("node")->GetNode("instance_geometry");
+
+        // Factory.
+        csString url = factnode->GetAttributeValue("url");
+        csRef<iDocumentNodeIterator> facts = colladaElement->GetNode("library_geometries")->GetNodes("geometry");
+        while(facts->HasNext())
+        {
+          csRef<iDocumentNode> fact = facts->Next();
+          if(csString(fact->GetAttributeValue("id")).Compare(url.Slice(1)))
+          {
+            factory = factory->CreateNodeBefore(CS_NODE_TEXT);
+            factory->SetValue(fact->GetAttributeValue("name"));
+            break;
+          }
+        }
+
+        // Material
+        csRef<iDocumentNode> matnode = factnode->GetNode("bind_material");
+        if(matnode.IsValid())
+        {
+          matnode = matnode->GetNode("technique_common")->GetNode("instance_material");
+          material = material->CreateNodeBefore(CS_NODE_TEXT);
+          material->SetValue(csString(matnode->GetAttributeValue("target")).Slice(1));          
+        }
+
+        // Position
+        csRef<iDocumentNode> move = meshObj->CreateNodeBefore(CS_NODE_ELEMENT);
+        move->SetValue("move");
+        move = move->CreateNodeBefore(CS_NODE_ELEMENT);
+        move->SetValue("v");
+
+        csStringArray sectorPos;
+        csStringArray meshobjPos;
+
+        sectorPos.SplitString(sector->GetNode("matrix")->GetContentsValue(), " ");
+        meshobjPos.SplitString(object->GetNode("matrix")->GetContentsValue(), " ");
+
+        float x = atof(sectorPos[3]) + atof(meshobjPos[3]);
+        float y = atof(sectorPos[11]) + atof(meshobjPos[11]);
+        float z = atof(sectorPos[7]) + atof(meshobjPos[7]);
+
+        move->SetAttributeAsFloat("x", x);
+        move->SetAttributeAsFloat("y", y);
+        move->SetAttributeAsFloat("z", z);
+      }
+    }
+  }
+
+  void csColladaConvertor::WriteCameraInfo(iDocumentNode* sector, size_t camera)
+  {
+    // Not a sector if it's a camera target.
+    csString id = cameraIDs[camera];
+    if(id.Append(".Target-node").Compare(sector->GetAttributeValue("id")))
+    {
+      return;
+    }
+
+    // For each node (possible camera).
+    csRef<iDocumentNodeIterator> nodes = sector->GetNodes("node");
+    while(nodes->HasNext())
+    {
+      csRef<iDocumentNode> node = nodes->Next();
+      if(node->GetNode("instance_camera"))
+      {
+        // Is it the right camera?
+        csString url = node->GetNode("instance_camera")->GetAttributeValue("url");
+        if(url.Slice(1).Compare(cameraIDs[camera]))
+        {
+          // Create start node.
+          csRef<iDocumentNode> startNode = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT);
+          startNode->SetValue("start");
+          startNode->SetAttribute("name", node->GetAttributeValue("name"));
+          csRef<iDocumentNode> sectorNode = startNode->CreateNodeBefore(CS_NODE_ELEMENT);
+          sectorNode->SetValue("sector");
+          csRef<iDocumentNode> sectorNodeContents = sectorNode->CreateNodeBefore(CS_NODE_TEXT);
+          sectorNodeContents->SetValue(sector->GetAttributeValue("name"));
+
+          // Calculate position.
+          csStringArray sectorPos;
+          csStringArray cameraPos;
+
+          sectorPos.SplitString(sector->GetNode("matrix")->GetContentsValue(), " ");
+          cameraPos.SplitString(node->GetNode("matrix")->GetContentsValue(), " ");
+
+          float x = atof(sectorPos[3]) + atof(cameraPos[3]);
+          float y = atof(sectorPos[11]) + atof(cameraPos[11]);
+          float z = atof(sectorPos[7]) + atof(cameraPos[7]);
+
+          csRef<iDocumentNode> positionNode = startNode->CreateNodeBefore(CS_NODE_ELEMENT);
+          positionNode->SetValue("position");
+          positionNode->SetAttributeAsFloat("x", x);
+          positionNode->SetAttributeAsFloat("y", y);
+          positionNode->SetAttributeAsFloat("z", z);
+
+          // TODO: up and forward vectors.
+        }
+      }
+    }
+  }
+
+  csString csColladaConvertor::GetMeshFactType(csString name)
+  {
+    if(name.CompareNoCase("terrain2"))
+    {
+      return CS_COLLADA_TERRAIN2FACT_PLUGIN_TYPE;
+    }
+    else
+    {
+      return CS_COLLADA_GENMESHFACT_PLUGIN_TYPE;
+    }
+  }
+
+  csString csColladaConvertor::GetMeshType(csString name)
+  {
+    if(name.CompareNoCase("terrain2"))
+    {
+      return CS_COLLADA_TERRAIN2_PLUGIN_TYPE;
+    }
+    else
+    {
+      return CS_COLLADA_GENMESH_PLUGIN_TYPE;
+    }
   }
 
   bool csColladaConvertor::ConvertRiggingAnimation(iDocumentNode *riggingSection)

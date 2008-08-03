@@ -187,7 +187,7 @@ void csGLRender2TextureFramebuf::BeginDraw (int drawflags)
     glTexParameteri (textarget, GL_TEXTURE_MIN_FILTER, oldMinFilt);
   }
   rt_onscreen = true;
-  G3D->statecache->SetCullFace (GL_FRONT);
+  G3D->statecache->SetCullFace (GL_BACK);
 }
 
 void csGLRender2TextureFramebuf::SetupProjection ()
@@ -196,12 +196,12 @@ void csGLRender2TextureFramebuf::SetupProjection ()
   G3D->SetGlOrtho (true);
 }
 
-void csGLRender2TextureFramebuf::SetupProjection (
+CS::Math::Matrix4 csGLRender2TextureFramebuf::SetupProjection (
     const CS::Math::Matrix4& projectionMatrix)
 {
   GLRENDER3D_OUTPUT_LOCATION_MARKER;
   
-  GLfloat matrixholder[16];
+  CS::Math::Matrix4 actual;
   bool needSubImage = (txt_w > viewportHelper.GetVPWidth()) 
     || (txt_h > viewportHelper.GetVPHeight());
     
@@ -211,7 +211,7 @@ void csGLRender2TextureFramebuf::SetupProjection (
     float scaleY = (float)viewportHelper.GetVPHeight() / (float)txt_h;
     CS::Math::Matrix4 flipYAndScale (
       CS::Math::Projections::Ortho (-1, (scaleX-0.5f)*2.0f, (scaleY-0.5f)*2.0f, -1, 1, -1));
-    CS::PluginCommon::MakeGLMatrix4x4 (flipYAndScale * projectionMatrix, matrixholder);
+    actual = flipYAndScale * projectionMatrix;
   }
   else
   {
@@ -220,9 +220,13 @@ void csGLRender2TextureFramebuf::SetupProjection (
 	0, -1, 0, 0,
 	0, 0, 1, 0,
 	0, 0, 0, 1);
-    CS::PluginCommon::MakeGLMatrix4x4 (flipY * projectionMatrix, matrixholder);
+    actual = flipY * projectionMatrix;
   }
+  GLfloat matrixholder[16];
+  CS::PluginCommon::MakeGLMatrix4x4 (actual, matrixholder);
   glLoadMatrixf (matrixholder);
+  
+  return actual;
 }
 
 GLenum csGLRender2TextureFramebuf::GetInternalFormat (

@@ -699,16 +699,19 @@ void csGLGraphics3D::SetupProjection ()
 {
   if (!needProjectionUpdate) return;
 
+  CS::Math::Matrix4 actualProjection;
+
   statecache->SetMatrixMode (GL_PROJECTION);
   if (explicitProjection)
   {
     if (currentAttachments != 0)
-      r2tbackend->SetupProjection (projectionMatrix);
+      actualProjection = r2tbackend->SetupProjection (projectionMatrix);
     else
     {
       GLfloat matrixholder[16];
       CS::PluginCommon::MakeGLMatrix4x4 (projectionMatrix, matrixholder);
       glLoadMatrixf (matrixholder);
+      actualProjection = projectionMatrix;
     }
   }
   else
@@ -729,7 +732,18 @@ void csGLGraphics3D::SetupProjection ()
     matrixholder[11] = 1.0/aspect;
     matrixholder[14] = -matrixholder[11];
     glMultMatrixf (matrixholder);
+    
+    glGetFloatv (GL_PROJECTION_MATRIX, matrixholder);
+    actualProjection = CS::Math::Matrix4 (
+      matrixholder[0], matrixholder[4], matrixholder[8], matrixholder[12],
+      matrixholder[1], matrixholder[5], matrixholder[9], matrixholder[13],
+      matrixholder[2], matrixholder[6], matrixholder[10], matrixholder[14],
+      matrixholder[3], matrixholder[7], matrixholder[11], matrixholder[15]);
   }
+  
+  shadermgr->GetVariableAdd (string_projection)->SetValue (actualProjection);
+  shadermgr->GetVariableAdd (string_projection_inv)->SetValue (
+    actualProjection.GetInverse());
   
   statecache->SetMatrixMode (GL_MODELVIEW);
   needProjectionUpdate = false;
@@ -1006,6 +1020,9 @@ bool csGLGraphics3D::Open ()
   string_point_scale = strings->Request ("point scale");
   string_texture_diffuse = strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
   string_world2camera = strings->Request ("world2camera transform");
+  string_world2camera_inv = strings->Request ("world2camera transform inverse");
+  string_projection = strings->Request ("projection transform");
+  string_projection_inv = strings->Request ("projection transform inverse");
 
   /* @@@ All those default textures, better put them into the engine? */
 
@@ -1735,6 +1752,7 @@ void csGLGraphics3D::SetWorldToCamera (const csReversibleTransform& w2c)
   float m[16];
 
   shadermgr->GetVariableAdd (string_world2camera)->SetValue (w2c);
+  shadermgr->GetVariableAdd (string_world2camera_inv)->SetValue (w2c.GetInverse());
 
   makeGLMatrix (world2camera, m);
   statecache->SetMatrixMode (GL_MODELVIEW);

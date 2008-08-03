@@ -215,7 +215,8 @@ namespace lighter
 
       // Pass it to the loader
       csLoadResult rc;
-      rc = globalLighter->loader->Load (sceneFiles[i].GetDocument()->GetRoot());
+      rc = globalLighter->loader->Load (sceneFiles[i].GetDocument()->GetRoot(), 0, false,
+        sceneFiles[i].sceneConfig.GetLighterProperties().checkDupes);
       if (!rc.success)
         return globalLighter->Report ("Error loading file 'world'!");
 

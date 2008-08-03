@@ -175,6 +175,8 @@ namespace RenderManager
        * purposes, a light can not be rendered completely at once).
        */
       uint numSubLights;
+      /// Sublight IDs
+      uint* subLights;
       /// Compatibility light settings
       LightSettings settings;
     };
@@ -188,6 +190,7 @@ namespace RenderManager
     {
       csArray<LightInfo> lightTypeScratch;
       csArray<LightInfo> putBackLights;
+      csMemoryPool sublightNumMem;
       
       /**
        * Do per-frame house keeping - \b MUST be called every frame/
@@ -259,7 +262,7 @@ namespace RenderManager
      */
     bool GetNextLight (const LightSettings& settings, bool skipStatic,
       LightInfo& out);
-      
+    
     /// Put earlier fetched lights back into the list
     void PutInFront (LightInfo* lights, size_t num);
   protected:
@@ -511,7 +514,8 @@ namespace RenderManager
 	  //size_t totalLayers = 0;
 	  while (firstLight < layerLights)
 	  {
-	    sortedLights.GetNextLight (skipStatic, renderLights[firstLight]);
+	    if (!sortedLights.GetNextLight (skipStatic, renderLights[firstLight]))
+	      break;
 	    size_t realNum = 1;
 	    LightSettings lightSettings;
 	    lightSettings = renderLights[firstLight].settings;
@@ -547,7 +551,7 @@ namespace RenderManager
 	    for (uint s = 0; s < li.numSubLights; s++)
 	    {
 	      renderSublights[i] = &li;
-	      renderSublightNums[i] = s;
+	      renderSublightNums[i] = li.subLights[s];
 	      i++;
 	    }
 	  }
@@ -591,7 +595,18 @@ namespace RenderManager
 	  totalLayers += thisPassLayers * shadows.GetLightLayerSpread();
 	}
 	layers.Ensure (layer, totalLayers, node);
-	sortedLights.PutInFront (renderLights + firstLight, remainingLights);
+	if (remainingLights > 0)
+	{
+	  renderSublights[firstLight]->subLights += renderSublightNums[firstLight];
+	  renderSublights[firstLight]->numSubLights -= renderSublightNums[firstLight];
+	  sortedLights.PutInFront (*(renderSublights + firstLight), 1);
+	  size_t l = firstLight + renderSublights[firstLight]->numSubLights;
+	  while (l < firstLight + remainingLights)
+	  {
+	    sortedLights.PutInFront (*(renderSublights + l), 1);
+	    l += renderSublights[l]->numSubLights;
+	  }
+	}
 	
 	csShaderVariableStack* localStacks =
 	  new csShaderVariableStack[shadows.GetLightLayerSpread()];
@@ -694,7 +709,7 @@ namespace RenderManager
 	      }
 	    }
 	    firstLight += thisNum;
-	    remainingLights -= thisNum;
+	    num -= thisNum;
 	  }
   
 	  totalLayers = neededLayers;
@@ -729,9 +744,9 @@ namespace RenderManager
     LightSetup (PersistentData& persist, iLightManager* lightmgr,
       SVArrayHolder& svArrays, const LayerConfigType& layerConfig,
       ShadowParamType& shadowParam)
-      : persist (persist), lightmgr (lightmgr), svArrays (svArrays),
-        allMaxLights (0), newLayers (layerConfig), shadowParam (shadowParam),
-	lastShader (0)
+      : lastShader (0), persist (persist), lightmgr (lightmgr),
+        svArrays (svArrays), allMaxLights (0), newLayers (layerConfig),
+        shadowParam (shadowParam)
     {
       // Sum up the number of lights we can possibly handle
       for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)

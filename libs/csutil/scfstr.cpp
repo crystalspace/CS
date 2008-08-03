@@ -21,6 +21,25 @@
 #include "csutil/ref.h"
 #include "csutil/scfstr.h"
 
+scfString::scfString ()
+  : scfImplementationType (this)
+{ }
+
+scfString::scfString (size_t iLength) 
+  : scfImplementationType (this), s(iLength)
+{ }
+
+scfString::scfString (const iString &copy) 
+  : iBase(), scfImplementationType (this), s(copy.GetData())
+{ }
+
+scfString::scfString (const char *copy) 
+  : scfImplementationType (this), s(copy)
+{ }
+
+scfString::~scfString ()
+{ }
+
 void scfString::SetCapacity (size_t NewSize)
 { s.SetCapacity (NewSize); }
 

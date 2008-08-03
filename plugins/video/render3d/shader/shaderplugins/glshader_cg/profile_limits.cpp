@@ -73,8 +73,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     LIMIT(NumTemps, MAX_PROGRAM_TEMPORARIES_ARB, 32) \
   PROFILE_END(FP40)
 
-  ProfileLimits::ProfileLimits (CGprofile profile)
-   : profile (profile), 
+  ProfileLimits::ProfileLimits (
+    CS::PluginCommon::ShaderProgramPluginGL::HardwareVendor vendor,
+    CGprofile profile)
+   : vendor (vendor), profile (profile), 
      MaxAddressRegs (0),
      MaxInstructions (0),
      MaxLocalParams (0),
@@ -139,6 +141,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   void ProfileLimits::ReadFromConfig (iConfigFile* cfg, const char* _prefix)
   {
     csString prefix (_prefix);
+    vendor = CS::PluginCommon::ShaderProgramPluginGL::VendorFromString (
+      cfg->GetStr (prefix + ".Vendor", "other"));
 #define READ(Limit) \
     Limit = cfg->GetInt (prefix + "." #Limit, 0)
     READ (MaxAddressRegs);
@@ -187,6 +191,65 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     limNumTexInstructionSlots
   };
 
+  bool ProfileLimits::FromString (const char* str)
+  {
+    csStringArray components;
+    components.SplitString (str, ".");
+    
+    if (components.GetSize() == 0) return false;
+    size_t i = 0;
+    profile = cgGetProfile (components[i++]);
+    if (profile == CG_PROFILE_UNKNOWN) return false;
+  
+    if (i >= components.GetSize()) return false;
+    vendor = CS::PluginCommon::ShaderProgramPluginGL::VendorFromString (
+      components[i++]);
+    if (vendor == CS::PluginCommon::ShaderProgramPluginGL::Invalid)
+      return false;
+    
+    uint usedLimits = 0;
+  
+#define PROFILE_BEGIN(PROFILE)  \
+  case CG_PROFILE_ ## PROFILE:  \
+    {
+#define PROFILE_END(PROFILE)    \
+    }                           \
+    break;
+#define LIMIT(Limit, glLimit, cgDefault)   \
+      usedLimits |= 1 << lim ## Limit;
+  
+    switch (profile)
+    {
+      PROFILES
+      default:
+        break;
+    }
+    
+#undef PROFILE_BEGIN
+#undef PROFILE_END
+#undef LIMIT
+
+#define EMIT(Limit) \
+  if (usedLimits & (1 << lim ## Limit)) \
+  { \
+    if (i >= components.GetSize()) return false; \
+    int v; \
+    char dummy; \
+    if (sscanf (components[i++], "%d%c", &v, &dummy) != 1) return false; \
+    Limit = v; \
+  }
+    EMIT (MaxInstructions);
+    EMIT (NumInstructionSlots);
+    EMIT (NumMathInstructionSlots);
+    EMIT (NumTexInstructionSlots);
+    EMIT (NumTemps);
+    EMIT (MaxLocalParams);
+    EMIT (MaxTexIndirections);
+    EMIT (MaxAddressRegs);
+#undef EMIT
+    return i == components.GetSize();
+  };
+  
   csString ProfileLimits::ToString () const
   {
     uint usedLimits = 0;
@@ -212,6 +275,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #undef LIMIT
 
     csString ret (cgGetProfileString (profile));
+    ret.AppendFmt (".%s",
+      CS::PluginCommon::ShaderProgramPluginGL::VendorToString (vendor));
 #define EMIT(Limit) if (usedLimits & (1 << lim ## Limit)) ret.AppendFmt (".%u", Limit);
     EMIT (MaxInstructions);
     EMIT (NumInstructionSlots);
@@ -251,6 +316,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     
   bool ProfileLimits::Write (iFile* file) const
   {
+    {
+      int32 diskVal = csLittleEndian::Int32 (vendor);
+      if (file->Write ((char*)&diskVal, sizeof (diskVal)) != sizeof (diskVal))
+        return false;
+    }
 #define WRITE(Limit) \
     { \
       uint32 diskVal = csLittleEndian::UInt32 (Limit); \
@@ -272,6 +342,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     
   bool ProfileLimits::Read (iFile* file)
   {
+    {
+      int32 diskVal;
+      if (file->Read ((char*)&diskVal, sizeof (diskVal)) != sizeof (diskVal))
+        return false;
+      vendor = (CS::PluginCommon::ShaderProgramPluginGL::HardwareVendor)
+        csLittleEndian::Int32 (diskVal);
+    }
 #define READ(Limit) \
     { \
       uint32 diskVal; \
@@ -320,6 +397,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     int p2 = GetProfileOrdering (other.profile);
     if (p1 < p2) return true;
     if (p1 > p2) return false;
+    
+    if (vendor < other.vendor) return true;
+    if (vendor > other.vendor) return false;
   
 #define COMPARE(Limit) \
     if (Limit < other.Limit) return true; \
@@ -332,9 +412,85 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     COMPARE (MaxLocalParams);
     COMPARE (MaxTexIndirections);
     COMPARE (MaxAddressRegs);
-#undef READ
+#undef COMPARE
     return false;
   }
+  
+  bool ProfileLimits::operator> (const ProfileLimits& other) const
+  {
+    int p1 = GetProfileOrdering (profile);
+    int p2 = GetProfileOrdering (other.profile);
+    if (p1 > p2) return true;
+    if (p1 < p2) return false;
+  
+    if (vendor > other.vendor) return true;
+    if (vendor < other.vendor) return false;
+  
+#define COMPARE(Limit) \
+    if (Limit > other.Limit) return true; \
+    if (Limit < other.Limit) return false;
+    COMPARE (MaxInstructions);
+    COMPARE (NumInstructionSlots);
+    COMPARE (NumMathInstructionSlots);
+    COMPARE (NumTexInstructionSlots);
+    COMPARE (NumTemps);
+    COMPARE (MaxLocalParams);
+    COMPARE (MaxTexIndirections);
+    COMPARE (MaxAddressRegs);
+#undef COMPARE
+    return false;
+  }
+  
+  bool ProfileLimits::operator== (const ProfileLimits& other) const
+  {
+    int p1 = GetProfileOrdering (profile);
+    int p2 = GetProfileOrdering (other.profile);
+    if (p1 != p2) return false;
+    
+    if (vendor != other.vendor) return false;
+  
+#define COMPARE(Limit) \
+    if (Limit != other.Limit) return false;
+    COMPARE (MaxInstructions);
+    COMPARE (NumInstructionSlots);
+    COMPARE (NumMathInstructionSlots);
+    COMPARE (NumTexInstructionSlots);
+    COMPARE (NumTemps);
+    COMPARE (MaxLocalParams);
+    COMPARE (MaxTexIndirections);
+    COMPARE (MaxAddressRegs);
+#undef COMPARE
+    return true;
+  }
+
+  //-------------------------------------------------------------------------
+
+  bool ProfileLimitsPair::FromString (const char* str)
+  {
+    csString tagFP (str);
+    csString tagVP;
+    {
+      size_t semicolon = tagFP.FindFirst (';');
+      if (semicolon == (size_t)-1) return false;
+      tagFP.SubString (tagVP, semicolon+1, tagFP.Length() - (semicolon+1));
+      tagFP.Truncate (semicolon);
+    }
+    
+    if (!vp.FromString (tagVP))
+      return false;
+    
+    if (!fp.FromString (tagFP))
+      return false;
+      
+    return true;
+  }
+  
+  csString ProfileLimitsPair::ToString () const
+  {
+    return csString().Format ("%s;%s",
+      fp.ToString().GetData(), vp.ToString().GetData());
+  }
+
 }
 CS_PLUGIN_NAMESPACE_END(GLShaderCg)
 

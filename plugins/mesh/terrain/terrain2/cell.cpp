@@ -65,6 +65,7 @@ csTerrainCell::csTerrainCell (csTerrainSystem* terrain, const char* name, int gr
 
 csTerrainCell::~csTerrainCell ()
 {
+  SetLoadState (NotLoaded);
 }
 
 iTerrainSystem* csTerrainCell::GetTerrain()
@@ -158,6 +159,8 @@ void csTerrainCell::SetLoadState(LoadState state)
       {
         case NotLoaded:
         {
+          terrain->FireUnloadCallbacks (this);
+
           heightmap.DeleteAll ();
           materialmap.DeleteAll ();
 
@@ -166,8 +169,6 @@ void csTerrainCell::SetLoadState(LoadState state)
           feederData = 0;
 
           loadState = NotLoaded;
-
-          terrain->FireUnloadCallbacks (this);
 
           break;
         }
@@ -537,7 +538,7 @@ csVector3 csTerrainCell::GetNormalDN (int x, int y) const
 
   float dfdy = 0;
   if (y - 1 >= 0 && y + 1 < gridHeight)
-    dfdy = (GetHeight (x, y + 1) - GetHeight (x, y - 1)) / 2*step_z; 
+    dfdy = (GetHeight (x, y + 1) - GetHeight (x, y - 1)) / (2*step_z); 
   else if (y - 1 >= 0)
     dfdy = (center - GetHeight (x, y - 1)) / step_z;
   else if (y + 1 < gridHeight)
@@ -545,7 +546,7 @@ csVector3 csTerrainCell::GetNormalDN (int x, int y) const
 
   float dfdx = 0;
   if (x - 1 >= 0 && x + 1 < gridWidth)
-    dfdx = (GetHeight (x + 1, y) - GetHeight (x - 1, y)) / 2*step_x; 
+    dfdx = (GetHeight (x + 1, y) - GetHeight (x - 1, y)) / (2*step_x); 
   else if (x - 1 >= 0)
     dfdx = (center - GetHeight (x - 1, y)) / step_x;
   else if (x + 1 < gridWidth)

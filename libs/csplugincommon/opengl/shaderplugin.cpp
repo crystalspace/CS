@@ -108,6 +108,43 @@ namespace CS
       isOpen = false;
     }
     
+    const char* ShaderProgramPluginGL::VendorToString (HardwareVendor vendor)
+    {
+      switch (vendor)
+      {
+        case Invalid: return 0;
+        case Other: return "other";
+        case ATI: return "ati";
+        case NVIDIA: return "nv";
+      }
+      CS_ASSERT_MSG("Forgot to add vendor string when adding vendor enum?",
+        false);
+      return 0;
+    }
+    
+    ShaderProgramPluginGL::HardwareVendor ShaderProgramPluginGL::VendorFromString (
+      const char* vendorStr)
+    {
+      if (vendorStr == 0) return Invalid;
+    
+      csString str (vendorStr);
+      str.Downcase();
+      
+      if (str == "ati")
+      {
+	return ATI;
+      }
+      else if ((str == "nvidia") || (str == "nv"))
+      {
+	return NVIDIA;
+      }
+      else if (str == "other")
+      {
+	return Other;
+      }
+      return Invalid;
+    }
+      
     uint ShaderProgramPluginGL::ParseVendorMask (const char* maskStr)
     {
       uint mask = 0;
@@ -131,17 +168,11 @@ namespace CS
         uint thisMask = 0;
         if (str == "*")
           thisMask = ~0;
-        else if (str == "ati")
+        else
         {
-          thisMask = 1 << ATI;
-        }
-        else if ((str == "nvidia") || (str == "nv"))
-        {
-          thisMask = 1 << NVIDIA;
-        }
-        else if (str == "other")
-        {
-          thisMask = 1 << Other;
+          HardwareVendor thisVendor = VendorFromString (str);
+          if (thisVendor != Invalid)
+            thisMask = 1 << thisVendor;
         }
         if (doNegate)
           mask &= ~thisMask;
@@ -165,7 +196,7 @@ namespace CS
     {
       GLint _maxClipPlanes;
       glGetIntegerv (GL_MAX_CLIP_PLANES, &_maxClipPlanes);
-      maxPlanes = csMin (_maxClipPlanes, 6);
+      maxPlanes = csMin ((int)_maxClipPlanes, 6);
       // @@@ Lots of places assume max 6 planes
       
       csRef<iShaderVarStringSet> strings = 

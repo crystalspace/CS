@@ -67,7 +67,7 @@ struct iShaderDestinationResolver : public virtual iBase
  */
 struct iShaderProgram : public virtual iBase
 {
-  SCF_INTERFACE(iShaderProgram, 4, 0, 0);
+  SCF_INTERFACE(iShaderProgram, 6, 0, 0);
   /// Sets this program to be the one used when rendering
   virtual void Activate() = 0;
 
@@ -97,7 +97,8 @@ struct iShaderProgram : public virtual iBase
    * \remark A program can expect that Compile() is only called once, and
    *   all calls after the first can fail.
    */
-  virtual bool Compile (iHierarchicalCache* cacheTo) = 0;
+  virtual bool Compile (iHierarchicalCache* cacheTo,
+    csRef<iString>* cacheTag = 0) = 0;
   
   /**
    * Request all shader variables used by a certain shader ticket.
@@ -121,7 +122,8 @@ struct iShaderProgram : public virtual iBase
   };
   /// Loads from a cache
   virtual CacheLoadResult LoadFromCache (iHierarchicalCache* cache,
-    csRef<iString>* failReason = 0) = 0;
+    iDocumentNode* programNode,
+    csRef<iString>* failReason = 0, csRef<iString>* cacheTag = 0) = 0;
 };
 
 /**
@@ -130,17 +132,18 @@ struct iShaderProgram : public virtual iBase
  */
 struct iShaderProgramPlugin : public virtual iBase
 {
-  SCF_INTERFACE(iShaderProgramPlugin,2,0,1);
+  SCF_INTERFACE(iShaderProgramPlugin,3,0,0);
   virtual csPtr<iShaderProgram> CreateProgram (const char* type) = 0;
   virtual bool SupportType (const char* type) = 0;
   
+  virtual csPtr<iStringArray> QueryPrecacheTags (const char* type) = 0;
   /**
    * Warm the given cache with the program specified in \a node.
    * \a outObj can return an object which exposes iShaderDestinationResolver.
    */
-  virtual bool Precache (const char* type, 
-    iShaderDestinationResolver* resolve, iDocumentNode* node, 
-    iHierarchicalCache* cacheTo,csRef<iBase>* outObj = 0) = 0;
+  virtual bool Precache (const char* type, const char* tag,
+    iBase* previous, iDocumentNode* node, 
+    iHierarchicalCache* cacheTo, csRef<iBase>* outObj = 0) = 0;
 };
 
 /** @} */

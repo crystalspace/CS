@@ -25,6 +25,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/ref.h"
 #include "csutil/scanstr.h"
 #include "csutil/scf.h"
+#include "csutil/scfstr.h"
 #include "csutil/stringreader.h"
 #include "iutil/document.h"
 #include "iutil/string.h"
@@ -34,6 +35,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/databuff.h"
 
 #include "glshader_cgvp.h"
+#include "glshader_cgfp.h"
 #include "glshader_cg.h"
 #include "profile_limits.h"
 
@@ -42,7 +44,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 
 CS_LEAKGUARD_IMPLEMENT (csShaderGLCGVP);
 
-bool csShaderGLCGVP::Compile (iHierarchicalCache* cache)
+bool csShaderGLCGVP::Compile (iHierarchicalCache* cache, csRef<iString>* tag)
 {
   if (!shaderPlug->enableVP) return false;
 
@@ -69,15 +71,31 @@ bool csShaderGLCGVP::Compile (iHierarchicalCache* cache)
   bool ret = DefaultLoadProgram (cgResolve, programStr, CG_GL_VERTEX, 
     shaderPlug->maxProfileVertex);
 
-  ProfileLimits limits (programProfile);
-  limits.GetCurrentLimits (shaderPlug->ext);
-  WriteToCache (cache, limits);
+  if (cgResolve.IsValid())
+  {
+    csShaderGLCGFP* prevFP = static_cast<csShaderGLCGFP*> (
+      (iShaderProgramCG*)cgResolve);
+  
+    ProfileLimits limits (shaderPlug->vendor, programProfile);
+    limits.GetCurrentLimits (shaderPlug->ext);
+    WriteToCache (cache, limits,
+      prevFP->cacheLimits.ToString() /* Inaccurate when VP has custom profile set */
+      );
+    tag->AttachNew (new scfString (prevFP->cacheLimits.ToString()));
+  }
+  else
+  {
+    ProfileLimits limits (shaderPlug->vendor, programProfile);
+    limits.GetCurrentLimits (shaderPlug->ext);
+    tag->AttachNew (new scfString (limits.ToString()));
+  }
+  
   cacheKeepNodes.DeleteAll ();
-
   return ret;
 }
 
 bool csShaderGLCGVP::Precache (const ProfileLimits& limits,
+                               const char* tag,
                                iHierarchicalCache* cache)
 {
   PrecacheClear();
@@ -96,7 +114,7 @@ bool csShaderGLCGVP::Precache (const ProfileLimits& limits,
     
     ArgumentArray args;
     shaderPlug->GetProfileCompilerArgs (GetProgramType(),
-      limits.profile, true, args);
+      limits.profile, limits.vendor, true, args);
     for (size_t i = 0; i < compilerArgs.GetSize(); i++) 
       args.Push (compilerArgs[i]);
   
@@ -125,7 +143,7 @@ bool csShaderGLCGVP::Precache (const ProfileLimits& limits,
       WriteToCompileCache (sourcePreproc, limits, cache);
   }
 
-  WriteToCache (cache, limits);
+  WriteToCache (cache, limits, tag);
 
   return ret;
 }

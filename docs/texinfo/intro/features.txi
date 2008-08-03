@@ -169,7 +169,7 @@ Unicode text output.
 
 @item
 @sc{xml}-based map format. @xref{XML File Format},
-@xref{Tutorial Simple Map}. @xref{Old Map File Format}.
+@xref{Tutorial Simple Map}.
 
 @item
 Scripting bindings (Python, Perl, Java). @xref{Scripting Languages}.

@@ -126,11 +126,18 @@ void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
 	
       if (!clip.distance.IsConstant())
       {
-	csVector4 v (GetParamVectorVal (stack, clip.distance,
-	  csVector4 (0, 0, 0, 0)));
-	float distVal = v[clip.distComp];
-	if (clip.distNeg) distVal = -distVal;
-	packDist[c/4][c%4] = distVal;
+	csVector4 v;
+	if (GetParamVectorVal (stack, clip.distance, &v))
+	{
+	  float distVal = v[clip.distComp];
+	  if (clip.distNeg) distVal = -distVal;
+	  packDist[c/4][c%4] = distVal;
+	}
+	else
+	{
+	  // Force clipping to have no effect
+	  packDist[c/4][c%4] = -FLT_MAX;
+	}
       }
       
       bool doClipping = false;
@@ -228,8 +235,7 @@ void csShaderGLCGCommon::PrecacheClear()
   objectCodeCachePath.Empty();
 }
 
-bool csShaderGLCGCommon::DefaultLoadProgram (
-  iShaderDestinationResolverCG* cgResolve,
+bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
   const char* programStr, CGGLenum type, CGprofile maxProfile, 
   uint flags, const ProfileLimits* customLimits)
 {
@@ -259,10 +265,12 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   augmentedProgramStr.Append (programStr);
   programStr = augmentedProgramStr;
   CGprofile profile = CG_PROFILE_UNKNOWN;
+  CS::PluginCommon::ShaderProgramPluginGL::HardwareVendor vendor;
 
   if (customLimits != 0)
   {
     profile = customLimits->profile;
+    vendor = customLimits->vendor;
   }
   else
   {
@@ -274,6 +282,8 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   
     if (maxProfile != CG_PROFILE_UNKNOWN)
       profile = csMin (profile, maxProfile);
+      
+    vendor = shaderPlug->vendor;
   }
 
   if (shaderPlug->doVerbose || shaderPlug->doVerbosePrecache)
@@ -285,7 +295,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
 
   ArgumentArray args;
   shaderPlug->GetProfileCompilerArgs (GetProgramType(), profile, 
-    flags & loadIgnoreConfigProgramOpts, args);
+    vendor, flags & loadIgnoreConfigProgramOpts, args);
   for (i = 0; i < compilerArgs.GetSize(); i++) 
     args.Push (compilerArgs[i]);
   /* Work around Cg 2.0 bug: it emits "OPTION ARB_position_invariant;"
@@ -303,7 +313,14 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
 	i++;
     }
   }
-  if (customLimits != 0) customLimits->ToCgOptions (args);
+  if (customLimits != 0)
+    customLimits->ToCgOptions (args);
+  else
+  {
+    ProfileLimits limits (shaderPlug->vendor, profile);
+    limits.GetCurrentLimits (shaderPlug->ext);
+    limits.ToCgOptions (args);
+  }
   args.Push (0);
  
   if (program)
@@ -398,7 +415,20 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
        
        @@@ This should be at least configurable
      */
-    result = numVaryings <= 16;
+    const int maxNumVaryings = 16;
+    if (numVaryings > maxNumVaryings)
+    {
+      if (shaderPlug->doVerbose || shaderPlug->doVerbosePrecache)
+      {
+	shaderPlug->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Discarding compiled program for having too much varyings "
+	  "(%d, limit is %d)",
+	  numVaryings, maxNumVaryings);
+      }
+      cgDestroyProgram (program);
+      program = 0;
+      result = false;
+    }
   }
   if (!result && !debugFN.IsEmpty())
   {
@@ -662,7 +692,7 @@ void csShaderGLCGCommon::WriteAdditionalDumpInfo (const char* description,
 /* Magic value for cg program files.
  * The most significant byte serves as a "version", increase when the
  * cache file format changes. */
-static const uint32 cacheFileMagic = 0x03706763;
+static const uint32 cacheFileMagic = 0x04706763;
 
 enum
 {
@@ -671,7 +701,8 @@ enum
 };
 
 bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache,
-                                       const ProfileLimits& limits)
+                                       const ProfileLimits& limits,
+                                       const char* tag)
 {
   if (!cache) return false;
 
@@ -681,13 +712,10 @@ bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache,
   if (cacheFile.Write ((char*)&diskMagic, sizeof (diskMagic))
       != sizeof (diskMagic)) return false;
   
-  {
-    uint32 diskProfile = csLittleEndian::UInt32 (limits.profile);
-    if (cacheFile.Write ((char*)&diskProfile, sizeof (diskProfile))
-	!= sizeof (diskProfile)) return false;
-  }
-  
-  if (!limits.Write (&cacheFile)) return false;
+  csMD5::Digest nodeHash = csMD5::Encode (
+    CS::DocSystem::FlattenNode (programNode));
+  if (cacheFile.Write ((char*)&nodeHash, sizeof (nodeHash))
+      != sizeof (nodeHash)) return false;
   
   csString objectCode (this->objectCode);
   if ((program != 0) && objectCode.IsEmpty())
@@ -750,7 +778,7 @@ bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache,
   }
   
   csString cacheName ("/");
-  cacheName += limits.ToString ();
+  cacheName += tag;
   return cache->CacheData (cacheFile.GetData(), cacheFile.GetSize(),
     cacheName);
 }
@@ -759,17 +787,17 @@ struct CachedShaderWrapper
 {
   csString name;
   csRef<iFile> cacheFile;
-  ProfileLimits limits;
+  ProfileLimitsPair limits;
   
-  CachedShaderWrapper (iFile* file, CGprofile profile) : cacheFile (file),
-    limits (profile) {}
+  CachedShaderWrapper (iFile* file) : cacheFile (file) {}
     
   bool operator< (const CachedShaderWrapper& other) const
   { return limits < other.limits; }
 };
 
 iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
-  iHierarchicalCache* cache, csRef<iString>* failReason)
+  iHierarchicalCache* cache, iDocumentNode* node,
+  csRef<iString>* failReason, csRef<iString>* tag)
 {
   if (!cache) return iShaderProgram::loadFail;
 
@@ -780,6 +808,10 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
       new scfString ("no cached programs found"));
     return iShaderProgram::loadFail;
   }
+  
+  if (!GetProgramNode (node)) return iShaderProgram::loadFail;
+  csMD5::Digest nodeHash = csMD5::Encode (
+    CS::DocSystem::FlattenNode (programNode));
   
   csArray<CachedShaderWrapper> cachedProgWrappers;
   for (size_t i = 0; i < allCachedPrograms->GetSize(); i++)
@@ -798,18 +830,15 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic)
       continue;
       
-    CGprofile profile;
-    {
-      uint32 diskProfile;
-      if (cacheFile->Read ((char*)&diskProfile, sizeof (diskProfile))
-	  != sizeof (diskProfile)) continue;
-      profile = (CGprofile)csLittleEndian::UInt32 (diskProfile);
-    }
-    
-    CachedShaderWrapper wrapper (cacheFile, profile);
-    if (!wrapper.limits.Read (cacheFile)) continue;
+    CachedShaderWrapper wrapper (cacheFile);
     
     wrapper.name = allCachedPrograms->Get (i);
+    if (!wrapper.limits.FromString (wrapper.name)) continue;
+    
+    csMD5::Digest diskHash;
+    if (cacheFile->Read ((char*)&diskHash, sizeof (diskHash))
+	!= sizeof (diskHash)) continue;
+    if (diskHash != nodeHash) continue;
     
     cachedProgWrappers.Push (wrapper);
   }
@@ -828,11 +857,13 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
   for (size_t i = cachedProgWrappers.GetSize(); i-- > 0;)
   {
     const CachedShaderWrapper& wrapper = cachedProgWrappers[i];
+    const ProfileLimits& limits =
+      (programType == progVP) ? wrapper.limits.vp : wrapper.limits.fp;
   
     bool profileSupported =
-      (shaderPlug->ProfileNeedsRouting (wrapper.limits.profile)
-        && shaderPlug->IsRoutedProfileSupported (wrapper.limits.profile))
-      || cgGLIsProfileSupported (wrapper.limits.profile);
+      (shaderPlug->ProfileNeedsRouting (limits.profile)
+        && shaderPlug->IsRoutedProfileSupported (limits.profile))
+      || cgGLIsProfileSupported (limits.profile);
     if (!profileSupported)
     {
       allReasons += wrapper.name;
@@ -840,9 +871,19 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
       continue;
     }
     
-    ProfileLimits currentLimits (wrapper.limits.profile);
+    ProfileLimits currentLimits (shaderPlug->vendor,
+      limits.profile);
     currentLimits.GetCurrentLimits (shaderPlug->ext);
-    bool limitsSupported = currentLimits >= wrapper.limits;
+    
+    if ((limits.vendor != currentLimits.vendor)
+        && (limits.vendor != CS::PluginCommon::ShaderProgramPluginGL::Other))
+    {
+      allReasons += wrapper.name;
+      allReasons += ": vendor mismatch; ";
+      continue;
+    }
+    
+    bool limitsSupported = currentLimits >= limits;
     if (!limitsSupported)
     {
       allReasons += wrapper.name;
@@ -926,7 +967,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
       CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
     if (objectCodeCachePath.IsEmpty()) continue;
     
-    if (!LoadObjectCodeFromCompileCache (wrapper.limits, cache))
+    if (!LoadObjectCodeFromCompileCache (limits, cache))
       continue;
     
     oneReadCorrectly = true;
@@ -940,7 +981,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     
     cgGetError(); // Clear error
     program = cgCreateProgram (shaderPlug->context, 
-      CG_OBJECT, objectCode, wrapper.limits.profile, 0, 0);
+      CG_OBJECT, objectCode, limits.profile, 0, 0);
     if (!program) continue;
     CGerror err = cgGetError();
     if (err != CG_NO_ERROR)
@@ -950,7 +991,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
 	"Cg error %s", errStr);
       continue;
     }
-    programProfile = wrapper.limits.profile;
+    programProfile = limits.profile;
     
     ClipsToVmap();
     GetParamsFromVmap();
@@ -986,6 +1027,8 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     
     if (shaderPlug->debugDump)
       DoDebugDump();
+      
+    tag->AttachNew (new scfString (wrapper.limits.ToString()));
     
     return iShaderProgram::loadSuccessShaderValid;
   }
@@ -995,7 +1038,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
   return oneReadCorrectly ? iShaderProgram::loadSuccessShaderInvalid : iShaderProgram::loadFail;
 }
 
-static const uint32 cacheFileMagicCC = 0x02637063;
+static const uint32 cacheFileMagicCC = 0x03637063;
 
 bool csShaderGLCGCommon::TryLoadFromCompileCache (const char* source, 
                                                   const ProfileLimits& limits,
@@ -1256,7 +1299,7 @@ bool csShaderGLCGCommon::WriteToCompileCache (const ProfileLimits& limits,
 
   ArgumentArray args;
   shaderPlug->GetProfileCompilerArgs (GetProgramType(),
-    limits.profile, false, args);
+    limits.profile, limits.vendor, false, args);
   for (size_t i = 0; i < compilerArgs.GetSize(); i++) 
     args.Push (compilerArgs[i]);
 

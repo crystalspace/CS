@@ -34,34 +34,25 @@ class csXMLShader;
 
 struct CachedPlugin;
 struct CachedPlugins;
+struct PassActionPrecache;
 
 class csXMLShaderTech
 {
 private:
   friend class csXMLShader;
-
-  struct ShaderPass : public CS::Memory::CustomAllocated
+  friend class PassActionPrecache;
+  
+  struct ShaderPassPerTag : public CS::Memory::CustomAllocated
   {
-    //mix and alpha mode
-    uint mixMode;
-    csAlphaMode alphaMode;
-    csZBufMode zMode;
-    bool overrideZmode;
-    bool flipCulling;
-    bool zoffset;
-
-    ShaderPass () : zoffset (false)
+    ShaderPassPerTag ()
     { 
-      mixMode = CS_FX_MESH;
-      overrideZmode = false;
-      flipCulling = false;
       //setup default mappings
       for (unsigned int i=0; i < CS_VATTRIB_SPECIFIC_NUM; i++)
         defaultMappings[i] = CS_BUFFER_NONE;
 
       defaultMappings[CS_VATTRIB_POSITION] = CS_BUFFER_POSITION;
     }
-
+    
     // buffer mappings
     // default mapping, index is csVertexAttrib (16 first), value is
     // csRenderBufferName
@@ -87,10 +78,30 @@ private:
     csRef<iShaderProgram> fp;
     csRef<iShaderProgram> vproc;
 
+  };
+
+  struct ShaderPass : public ShaderPassPerTag
+  {
+    //mix and alpha mode
+    uint mixMode;
+    csAlphaMode alphaMode;
+    csZBufMode zMode;
+    bool overrideZmode;
+    bool flipCulling;
+    bool zoffset;
+
+    ShaderPass () : zoffset (false), minLights (0)
+    { 
+      mixMode = CS_FX_MESH;
+      overrideZmode = false;
+      flipCulling = false;
+    }
+
     // writemasks
     bool wmRed, wmGreen, wmBlue, wmAlpha;
-
-    csXMLShaderTech* owner;
+    
+    /// Minimum light
+    int minLights;
   };
 
   //variable context
@@ -116,18 +127,30 @@ private:
     iFile* cacheFile, iHierarchicalCache* cacheTo);
   bool PrecachePass (iDocumentNode *node, ShaderPass* pass, size_t variant,
     iFile* cacheFile, iHierarchicalCache* cacheTo);
+    
+  template<typename PassAction>
+  bool LoadPassPrograms (iDocumentNode* passNode, PassAction& action,
+    size_t variant, CachedPlugins& cachedPlugins);
+    
   struct LoadHelpers;
   bool ParseModes (ShaderPass* pass, iDocumentNode* node, LoadHelpers& helpers);
-  bool ParseBuffers (ShaderPass* pass, iDocumentNode* node, LoadHelpers& helpers,
-    iShaderDestinationResolver* resolveFP,
+  bool ParseBuffers (ShaderPassPerTag& pass, int passNum, iDocumentNode* node, 
+    LoadHelpers& helpers, iShaderDestinationResolver* resolveFP,
     iShaderDestinationResolver* resolveVP);
-  bool ParseTextures (ShaderPass* pass, iDocumentNode* node, LoadHelpers& helpers,
-    iShaderDestinationResolver* resolveFP);
-  bool WritePass (ShaderPass* pass, const CachedPlugins& plugins, iFile* cacheFile);
+  bool ParseTextures (ShaderPassPerTag& pass, 
+    iDocumentNode* node, LoadHelpers& helpers, iShaderDestinationResolver* resolveFP);
+  
+  bool WritePass (ShaderPass* pass, const CachedPlugins& plugins,
+    iFile* cacheFile);
   iShaderProgram::CacheLoadResult LoadPassFromCache (ShaderPass* pass,
-    size_t variant, iFile* cacheFile, iHierarchicalCache* cache);
+    iDocumentNode* node, size_t variant, iFile* cacheFile,
+    iHierarchicalCache* cache);
   bool ReadPass (ShaderPass* pass, iFile* cacheFile,
     CachedPlugins& plugins);
+    
+  bool WritePassPerTag (const ShaderPassPerTag& pass, 
+    iFile* cacheFile);
+  bool ReadPassPerTag (ShaderPassPerTag& pass, iFile* cacheFile);
   
   bool LoadBoilerplate (iLoaderContext* ldr_context, iDocumentNode* node,
     iDocumentNode* parentSV);
@@ -137,14 +160,20 @@ private:
   // load a shaderprogram
   csPtr<iShaderProgram> LoadProgram (iShaderDestinationResolver* resolve,
   	iDocumentNode *node, ShaderPass* pass, size_t variant,
-        iHierarchicalCache* cacheTo, CachedPlugin& cacheInfo);
-  bool PrecacheProgram (iShaderDestinationResolver* resolve,
-  	iDocumentNode *node, ShaderPass* pass, size_t variant,
         iHierarchicalCache* cacheTo, CachedPlugin& cacheInfo,
-        csRef<iBase>& progObj);
-  iShaderProgram::CacheLoadResult LoadProgramFromCache (ShaderPass* pass, size_t variant,
-        iHierarchicalCache* cache, const CachedPlugin& cacheInfo,
-        csRef<iShaderProgram>& prog);
+        csString& tag);
+  bool PrecacheProgram (iBase* previous,
+  	iDocumentNode *node, size_t variant,
+        iHierarchicalCache* cacheTo, CachedPlugin& cacheInfo,
+        csRef<iBase>& progObj, const char* tag);
+  void GetProgramPlugins (iDocumentNode *node, CachedPlugins& cacheInfo,
+    size_t variant);
+  void GetProgramPlugin (iDocumentNode *node, CachedPlugin& cacheInfo,
+    size_t variant);
+  
+  iShaderProgram::CacheLoadResult LoadProgramFromCache (iBase* previous,
+    size_t variant, iHierarchicalCache* cache, const CachedPlugin& cacheInfo,
+    csRef<iShaderProgram>& prog, csString& tag);
   // Set reason for failure.
   void SetFailReason (const char* reason, ...) CS_GNUC_PRINTF (2, 3);
 
@@ -168,7 +197,8 @@ public:
   bool Load (iLoaderContext* ldr_context, iDocumentNode* node,
       iDocumentNode* parentSV, size_t variant, iHierarchicalCache* cacheTo);
   iShaderProgram::CacheLoadResult LoadFromCache (iLoaderContext* ldr_context,
-    iHierarchicalCache* cache, iDocumentNode* parentSV, size_t variant);
+    iDocumentNode* node, iHierarchicalCache* cache, iDocumentNode* parentSV,
+    size_t variant);
   bool Precache (iDocumentNode* node, size_t variant,
     iHierarchicalCache* cacheTo);
 

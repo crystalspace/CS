@@ -23,6 +23,7 @@
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
+#include "csutil/scfstr.h"
 #include "csutil/stringreader.h"
 #include "iutil/databuff.h"
 #include "iutil/document.h"
@@ -85,7 +86,7 @@ void csShaderGLCGFP::ResetState()
   csShaderGLCGCommon::ResetState();
 }
 
-bool csShaderGLCGFP::Compile (iHierarchicalCache* cache)
+bool csShaderGLCGFP::Compile (iHierarchicalCache* cache, csRef<iString>* tag)
 {
   if (!shaderPlug->enableFP) return false;
 
@@ -103,7 +104,7 @@ bool csShaderGLCGFP::Compile (iHierarchicalCache* cache)
   
     ArgumentArray args;
     shaderPlug->GetProfileCompilerArgs ("fragment", shaderPlug->psProfile, 
-      false, args);
+      CS::PluginCommon::ShaderProgramPluginGL::Other, false, args);
     for (i = 0; i < compilerArgs.GetSize(); i++) 
       args.Push (compilerArgs[i]);
     args.Push (0);
@@ -162,10 +163,22 @@ bool csShaderGLCGFP::Compile (iHierarchicalCache* cache)
     bool ret = TryCompile (shaderPlug->maxProfileFragment,
       loadLoadToGL | loadApplyVmap, 0);
   
-    ProfileLimits limits (programProfile);
+    /* Inaccurate when VP has custom profile set */
+    CGprofile vpProf = cgGLGetLatestProfile (CG_GL_VERTEX);
+    if (vpProf < CG_PROFILE_ARBVP1)
+      vpProf = CG_PROFILE_ARBVP1;
+    if ((shaderPlug->maxProfileVertex != CG_PROFILE_UNKNOWN)
+        && (vpProf > shaderPlug->maxProfileVertex))
+      vpProf = shaderPlug->maxProfileVertex;
+  
+    ProfileLimitsPair limits;
+    limits.fp = ProfileLimits (shaderPlug->vendor, programProfile);
+    limits.vp = ProfileLimits (shaderPlug->vendor, vpProf);
     limits.GetCurrentLimits (shaderPlug->ext);
-    WriteToCache (cache, limits);
+    cacheLimits = limits;
+    WriteToCache (cache, limits.fp, limits.ToString());
     cacheKeepNodes.DeleteAll ();
+    tag->AttachNew (new scfString (limits.ToString()));
     return ret;
   }
 
@@ -173,6 +186,7 @@ bool csShaderGLCGFP::Compile (iHierarchicalCache* cache)
 }
 
 bool csShaderGLCGFP::Precache (const ProfileLimits& limits, 
+                               const char* tag,
                                iHierarchicalCache* cache)
 {
   PrecacheClear();
@@ -188,7 +202,7 @@ bool csShaderGLCGFP::Precache (const ProfileLimits& limits,
     
     ArgumentArray args;
     shaderPlug->GetProfileCompilerArgs (GetProgramType(),
-      limits.profile, true, args);
+      limits.profile, limits.vendor, true, args);
     for (size_t i = 0; i < compilerArgs.GetSize(); i++) 
       args.Push (compilerArgs[i]);
   
@@ -215,7 +229,7 @@ bool csShaderGLCGFP::Precache (const ProfileLimits& limits,
       WriteToCompileCache (sourcePreproc, limits, cache);
   }
 
-  WriteToCache (cache, limits);
+  WriteToCache (cache, limits, tag);
   
   return ret;
 }
@@ -292,7 +306,6 @@ bool csShaderGLCGFP::TryCompile (CGprofile maxFrag, uint loadFlags,
       {
         // Test for that single variable failed ... pretend it's unused
         allNewUnusedParams.Add (testForUnused[offset]);
-        csPrintf ("marking UNUSED: %s\n", testForUnused[offset]);
         offset += step;
         step = maxSteps;
       }

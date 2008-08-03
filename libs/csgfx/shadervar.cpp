@@ -24,6 +24,8 @@
 
 CS_IMPLEMENT_STATIC_CLASSVAR (csShaderVariable, matrixAlloc, MatrixAlloc,
     csBlockAllocator<csMatrix3>, (1024));
+CS_IMPLEMENT_STATIC_CLASSVAR (csShaderVariable, matrix4Alloc, Matrix4Alloc,
+    csBlockAllocator<CS::Math::Matrix4>, (1024));
 CS_IMPLEMENT_STATIC_CLASSVAR (csShaderVariable, transformAlloc, TransformAlloc,
     csBlockAllocator<csReversibleTransform>, (1024));
 CS_IMPLEMENT_STATIC_CLASSVAR (csShaderVariable, arrayAlloc,
@@ -83,8 +85,12 @@ csShaderVariable::csShaderVariable (const csShaderVariable& other)
     Int = other.Int;
     break;
 
-  case MATRIX:    
+  case MATRIX3X3:
     MatrixValuePtr = MatrixAlloc()->Alloc (*other.MatrixValuePtr);
+    break;
+
+  case MATRIX4X4:
+    Matrix4ValuePtr = Matrix4Alloc()->Alloc ();
     break;
 
   case TRANSFORM:
@@ -127,8 +133,12 @@ csShaderVariable::~csShaderVariable ()
   case VECTOR4:
     break; //Nothing to deallocate      
 
-  case MATRIX:
+  case MATRIX3X3:
     MatrixAlloc()->Free (MatrixValuePtr);
+    break;
+
+  case MATRIX4X4:
+    Matrix4Alloc()->Free (Matrix4ValuePtr);
     break;
 
   case TRANSFORM:
@@ -197,8 +207,12 @@ csShaderVariable& csShaderVariable::operator= (const csShaderVariable& copyFrom)
   case VECTOR4:
     break; //Nothing to copy more than whats done above      
 
-  case MATRIX:
+  case MATRIX3X3:
     *MatrixValuePtr = *copyFrom.MatrixValuePtr;
+    break;
+
+  case MATRIX4X4:
+    *Matrix4ValuePtr = *copyFrom.Matrix4ValuePtr;
     break;
 
   case TRANSFORM:
@@ -245,8 +259,12 @@ void csShaderVariable::NewType (VariableType nt)
   case VECTOR4:
     break; //Nothing to deallocate      
   
-  case MATRIX:
+  case MATRIX3X3:
     MatrixAlloc()->Free (MatrixValuePtr);
+    break;
+  
+  case MATRIX4X4:
+    Matrix4Alloc()->Free (Matrix4ValuePtr);
     break;
   
   case TRANSFORM:
@@ -273,8 +291,12 @@ void csShaderVariable::NewType (VariableType nt)
   case VECTOR4:
     break; //Nothing to allocate      
 
-  case MATRIX:
+  case MATRIX3X3:
     MatrixValuePtr = MatrixAlloc()->Alloc ();
+    break;
+
+  case MATRIX4X4:
+    Matrix4ValuePtr = Matrix4Alloc()->Alloc ();
     break;
 
   case TRANSFORM:
