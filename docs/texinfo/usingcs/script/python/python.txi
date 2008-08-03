@@ -1,4 +1,4 @@
-@node Python Bindings, Perl Bindings, Scripting Languages
+@node Python Bindings, , Perl Bindings, Scripting Languages
 @subsection Python Bindings
 @cindex Python
 @cindex @code{csPython}
@@ -28,7 +28,7 @@ There is also a wiki with more documentation at the crystalspace web site @uref{
 * Basics::
 @end menu
 
-@node Configuration, Python Bindings, Scripting Languages
+@node Configuration, Embedding in a c++ application, Python Bindings, Python Bindings
 @subsubsection Configuration
 
 Once Crystal Space is built and optionally installed, you can use the Python
@@ -65,7 +65,7 @@ Space to locate its plugin modules and other resources.
 @end enumerate
 
 
-@node Embedding in a c++ application, Python Bindings, Scripting Languages
+@node Embedding in a c++ application, Python bindings as a stand alone module for python, Configuration, Python Bindings
 @subsubsection Embedding in a c++ application
 
 You can access Python from a C++ program by loading the @file{cspython}
@@ -74,7 +74,7 @@ Crystal Space plugin module and interacting with it via the @sc{scf}
 
 The @file{pysimp} example program (@file{CS/apps/pysimp}) illustrates how to do so. In addition to loading the @file{cspython} plugin, it loads and executes Python code from a sample script (which resides along with the other Python examples).
 
-@node Python bindings as a stand alone module for python, Python Bindings, Scripting Languages
+@node Python bindings as a stand alone module for python, General Information, Embedding in a c++ application, Python Bindings
 @subsubsection Python bindings as a stand alone module for python
 
 There are a number of examples illustrating how to @samp{import} the
@@ -91,7 +91,7 @@ source tree at @file{CS/scripts/python}. In particular, the @file{tutorial#.py}
 scripts should be of interest since they mirror the first several C++ tutorial
 programs (@pxref{Tutorial Simple}).
 
-@node General Information, Python Bindings, Scripting Languages
+@node General Information, Basics, Python bindings as a stand alone module for python, Python Bindings
 @subsubsection General Information
 
 CrystalSpace is a big library with an extensive api. There is currently no specific python api documentation, but it works like the c++ api with some key differences due to how the languages are used.
@@ -110,7 +110,7 @@ In general, you have to keep the following in mind when using cs python api:
 
 Check the next section for how to actually use the cs python api.
 
-@node Basics, Python Bindings, Scripting Languages
+@node Basics, , General Information, Python Bindings
 @subsubsection Basics
 
 This section instructs you on how "the crystal way" works from python. This is, how you can access interfaces, query object registry plugins, access engine lists and so on.
