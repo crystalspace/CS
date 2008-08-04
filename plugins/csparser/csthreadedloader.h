@@ -29,6 +29,7 @@
 
 #include "iengine/campos.h"
 #include "iengine/mesh.h"
+#include "iengine/movable.h"
 #include "iengine/portal.h"
 #include "iengine/sector.h"
 #include "iengine/sharevar.h"
@@ -386,6 +387,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       THREADED_CALLABLE_DECL6(csThreadedLoader, LoadMeshObject, csLoaderReturn,
         csRef<iLoaderContext>, ldr_context, csRef<iMeshWrapper>, mesh, csRef<iMeshWrapper>, parent,
         csRef<iDocumentNode>, node, csRef<iStreamSource>, ssource, csRef<iSector>, sector, true, false);
+
+      THREADED_CALLABLE_DECL2(csThreadedLoader, AddObjectToSector, csLoaderReturn,
+        csRef<iMovable>, movable, csRef<iSector>, sector, false, false);
 
       /**
       * Load the mesh object from the map file.

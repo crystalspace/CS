@@ -2042,8 +2042,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     if(sector && mesh->GetMovable ())
     {
-      mesh->GetMovable ()->SetSector (sector);
-      mesh->GetMovable ()->UpdateMove ();
+      AddObjectToSector(mesh->GetMovable (), sector);
     }
 
     ret->SetResult(csRef<iBase>(mesh));
@@ -2051,6 +2050,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     loadingObjects.Delete(node->GetAttributeValue("name"), ret);
 
     return true;
+  }
+
+  THREADED_CALLABLE_IMPL2(csThreadedLoader, AddObjectToSector, csRef<iMovable> movable,
+      csRef<iSector> sector)
+  {
+      movable->SetSector(sector);
+      movable->UpdateMove();
+      return true;
   }
 
   bool csThreadedLoader::LoadLodControl(iLODControl* lodctrl, iDocumentNode* node)
