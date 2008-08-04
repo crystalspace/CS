@@ -113,10 +113,6 @@ the REAL position, but coordinates on the voxelgrid
 const float GetInterpolatedValue(const csRef<csField3<float>>& rSrc, const csVector3& vPos);
 const float GetInterpolatedValue(const csRef<csField3<csVector3>>& rSrc, const csVector3& vPos, const UINT iIndex);
 
-//Implements the straightforward jacobi solver
-void JacobiSolver(csRef<csField3<float>> rNew, const csRef<csField3<float>>& rOld, 
-                  const csRef<csField3<float>>& rBField, const float fAlpha, const float fInvBeta);
-
 //Interpolates the velocity
 inline const csVector3 GetVelocityOfCellCenter(const csRef<csField3<csVector3>>& rField, 
                                                const UINT x, const UINT y, const UINT z)

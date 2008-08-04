@@ -79,23 +79,4 @@ const float GetInterpolatedValue(const csRef<csField3<csVector3>>& rSrc, const c
 
 //-----------------------------------------------------//
 
-void JacobiSolver(csRef<csField3<float>> rNew, const csRef<csField3<float>>& rOld, 
-                  const csRef<csField3<float>>& rBField, const float fAlpha, const float fInvBeta)
-{
-  for(UINT x = 0; x < rNew->GetSizeX(); ++x)
-  {
-    for(UINT y = 0; y < rNew->GetSizeY(); ++y)
-    {
-      for(UINT z = 0; z < rNew->GetSizeZ(); ++z)
-      {
-        const float fB		= fAlpha * rBField->GetValue(x, y, z);
-        const float fTemp	= rOld->GetValueClamp(x + 1, y, z) + rOld->GetValueClamp(x - 1, y, z) +
-                            rOld->GetValueClamp(x, y + 1, z) + rOld->GetValueClamp(x, y - 1, z) +
-                            rOld->GetValueClamp(x, y, z + 1) + rOld->GetValueClamp(x, y, z - 1);
-        rNew->SetValue((fTemp + fB) * fInvBeta, x, y, z);
-      }
-    }
-  }
-}
-
 //-----------------------------------------------------//

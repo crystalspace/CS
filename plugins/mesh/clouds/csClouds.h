@@ -102,6 +102,7 @@ public:
   virtual inline void SetBaseAltitude(const float H) {return m_Dynamics->SetBaseAltitude(H);}
   virtual inline void SetTemperaturBottomInputField(csRef<iField2> Field) {return m_Dynamics->SetTemperaturBottomInputField(Field);}
   virtual inline void SetWaterVaporBottomInputField(csRef<iField2> Field) {return m_Dynamics->SetWaterVaporBottomInputField(Field);}
+  virtual inline void SetIterationLimitPerInvokation(const UINT i) {return m_Dynamics->SetIterationLimitPerInvokation(i);}
 
   //All of following Setters refer to the csCloudsRenderer instance, and are delegated!
 
@@ -110,7 +111,7 @@ public:
   {
     if(m_iFramesUntilNextStep == 0)
     {
-      if(m_Dynamics->GetCurrentStep() == 0)
+      if(m_Dynamics->NewTimeStepStarted())
       {
         //Measure Time
         const UINT iEndTickCount = m_Clock->GetCurrentTicks();

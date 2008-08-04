@@ -38,7 +38,7 @@ The local coordinate system is equal to the one used as global with:
 */
 class csCloudsDynamics : public scfImplementation1<csCloudsDynamics, iCloudsDynamics>
 {
-  static const UINT s_iTotalStepCount = 11;
+  static const UINT s_iTotalStepCount = 10;
 private:
   /**
   From each field there are two instances, because each time-step all of
@@ -76,8 +76,26 @@ private:
   float                       m_fGridScale;                           // dx
   UINT                        m_iNewPressureField;
   UINT                        m_iOldPressureField;
+  bool                        m_bNewTimeStep;
 
+  //State variables for amortized computation
   UINT                        m_iCurrentStep;
+  /**
+  The user is able to specify the total number of iterations for each invokation
+  of the simulation each N frames. When iIterationsLeft reaches zero, the computation
+  is interreupted and the current state is saved. Afterwards the simulation is continued
+  from this certain point.
+  */
+  int                         m_iIterationsLeft;
+  UINT                        m_iIterationsPerInvokation;
+  UINT                        m_iPoissonSolverIterationsCount;
+  UINT                        m_iTempX;
+  UINT                        m_iTempY;
+  UINT                        m_iTempZ;
+  bool                        m_bRestore;
+  inline const bool LimitReached() {return --m_iIterationsLeft <= 0;}
+  inline void SaveState(const UINT x, const UINT y, const UINT z) {m_iTempX = x; m_iTempY = y; m_iTempZ = z; m_bRestore = true;}
+  inline void RestoreState(UINT* px, UINT* py, UINT* pz) {*px = m_iTempX; *py = m_iTempY; *pz = m_iTempZ; m_bRestore = false;}
 
   //Precomputed constants
   float                       m_fInvGridScale;                        // 1 / dx
@@ -134,7 +152,11 @@ private:
       for(UINT y = 0; y < m_iGridSizeY; ++y)
       {
         for(UINT z = 0; z < m_iGridSizeZ; ++z)
+        {
+          if(m_bRestore) RestoreState(&x, &y, &z);
+          if(LimitReached()) {SaveState(x, y, z); return;}
           m_arvRotVelField->SetValue(CalcRotation(m_arvVelocityField[m_iActualIndex], x, y, z, m_fGridScale), x, y, z);
+        }
       }
     }
   }
@@ -148,7 +170,11 @@ private:
       for(UINT y = 0; y < m_iGridSizeY; ++y)
       {
         for(UINT z = 0; z < m_iGridSizeZ; ++z)
+        {
+          if(m_bRestore) RestoreState(&x, &y, &z);
+          if(LimitReached()) {SaveState(x, y, z); return;}
           m_arfVelDivergence->SetValue(CalcDivergence(m_arvVelocityField[m_iActualIndex], x, y, z, m_fGridScale), x, y, z);
+        }
       }
     }
   }
@@ -163,6 +189,8 @@ private:
       {
         for(UINT z = 0; z < m_iGridSizeZ; ++z)
         {
+          if(m_bRestore) RestoreState(&x, &y, &z);
+          if(LimitReached()) {SaveState(x, y, z); return;}
           const csVector3 vForce = ComputeBuoyantForce(x, y, z) + ComputeVorticityConfinement(x, y, z);
           m_arvForceField->SetValue(vForce, x, y, z);
         }
@@ -199,6 +227,11 @@ private:
   const csVector3 ComputeVorticityConfinement(const UINT x, const UINT y, const UINT z);
   //Returns the buoyant force of a certain parcel depending on _g, qc, T, _Tp, _fqc
   const csVector3 ComputeBuoyantForce(const UINT x, const UINT y, const UINT z);
+
+  //Implements the straightforward jacobi solver
+  //O(n^3)
+  void JacobiSolver(csRef<csField3<float>> rNew, const csRef<csField3<float>>& rOld, 
+                    const csRef<csField3<float>>& rBField, const float fAlpha, const float fInvBeta);
 
   //Updates qc and qv and T
   //O(n^3)
@@ -248,16 +281,17 @@ private:
     SetGravityAcceleration(csVector3(0.f, -9.81f, 0.f));
     SetVorticityConfinementForceEpsilon(0.01f);
     SetReferenceVirtPotTemperature(290.f);
-    SetTempLapseRate(0.01f);									//10 K/km = 0.01 K/m
+    SetTempLapseRate(0.01f);                               //10 K/km = 0.01 K/m
     SetReferenceTemperature(290.f);
-    SetReferencePressure(101300.f);								//1.013 bar = 101300 N/m²
-    SetIdealGasConstant(287.f);									//287 J/(kg K)
-    SetLatentHeat(2.501f);										//2.501 J/kg
-    SetSpecificHeatCapacity(1005.f);							//1005 J/(kg K)
+    SetReferencePressure(101300.f);                        //1.013 bar = 101300 N/m²
+    SetIdealGasConstant(287.f);                            //287 J/(kg K)
+    SetLatentHeat(2.501f);                                 //2.501 J/kg
+    SetSpecificHeatCapacity(1005.f);                       //1005 J/(kg K)
     SetAmbientTemperature(290.f);
     SetInitialCondWaterMixingRatio(0.0f);
     SetInitialWaterVaporMixingRatio(0.8f);
     SetBaseAltitude(0.f);
+    SetIterationLimitPerInvokation(3000);
 
     //Input-fields
     m_arfInputTemperature.Invalidate();
@@ -275,7 +309,8 @@ private:
 public:
   csCloudsDynamics(iBase* pParent) : scfImplementationType(this, pParent), m_iLastIndex(1), m_iActualIndex(0),
     m_iGridSizeX(0), m_iGridSizeY(0), m_iGridSizeZ(0), m_fSpecificHeatCapacity(1.f), m_fTimePassed(0.f),
-    m_iCurrentStep(0), m_iNewPressureField(0), m_iOldPressureField(1)
+    m_iCurrentStep(0), m_iNewPressureField(0), m_iOldPressureField(1), m_bRestore(false),
+    m_iPoissonSolverIterationsCount(0), m_bNewTimeStep(true)
   {
     SetStandardValues();
     UpdateAllDependParameters();
@@ -303,6 +338,7 @@ public:
   virtual inline void SetInitialWaterVaporMixingRatio(const float qv) {m_fInitWaterVaporMixingRatio = qv;}
   virtual inline void SetGlobalWindSpeed(const csVector3& vWind) {m_vWindSpeed = vWind;}
   virtual inline void SetBaseAltitude(const float H) {m_fBaseAltitude = H;}
+  virtual inline void SetIterationLimitPerInvokation(const UINT i) {m_iIterationsPerInvokation = i;}
   virtual inline void SetTemperaturBottomInputField(csRef<iField2> Field)
   {
     //Größen überprüfen
@@ -327,6 +363,7 @@ public:
 
   //Getter
   inline const UINT GetCurrentStep() const {return m_iCurrentStep;}
+  inline const bool NewTimeStepStarted() const {return m_bNewTimeStep;}
 
   /**
   Computes N steps of the entire simulation. If iStepCount == 0, then an entire timestep

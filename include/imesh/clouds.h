@@ -96,6 +96,7 @@ struct iClouds : public virtual iBase
   virtual inline void SetBaseAltitude(const float H) = 0;
   virtual inline void SetTemperaturBottomInputField(csRef<iField2> Field) = 0;
   virtual inline void SetWaterVaporBottomInputField(csRef<iField2> Field) = 0;
+  virtual inline void SetIterationLimitPerInvokation(const UINT i) = 0;
 
   /**
   All of following Setters refer to the iCloudsRenderer instance.
@@ -154,6 +155,7 @@ struct iCloudsDynamics : public virtual iBase
   virtual inline void SetBaseAltitude(const float H) = 0;
   virtual inline void SetTemperaturBottomInputField(csRef<iField2> Field) = 0;
   virtual inline void SetWaterVaporBottomInputField(csRef<iField2> Field) = 0;
+  virtual inline void SetIterationLimitPerInvokation(const UINT i) = 0;
 
   /**
   Updates all constant and precomputeted parameters according to the user specific values set!

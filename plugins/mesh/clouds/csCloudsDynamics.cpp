@@ -133,8 +133,10 @@ void csCloudsDynamics::AdvectAllQuantities()
     {
       for(UINT z = 0; z < m_iGridSizeZ; ++z)
       {
-        const csVector3 vVel = GetVelocityOfCellCenter(m_arvVelocityField[m_iLastIndex], x, y, z);
+        if(m_bRestore) RestoreState(&x, &y, &z);
+        if(LimitReached()) {SaveState(x, y, z); return;}
 
+        const csVector3 vVel = GetVelocityOfCellCenter(m_arvVelocityField[m_iLastIndex], x, y, z);
         //Scalar-Field advection
         const csVector3 vPos = Clamp(csVector3(x, y, z) - m_fTimeStep * m_fInvGridScale * vVel, m_iGridSizeX, m_iGridSizeY, m_iGridSizeZ);
         //Even if vPos is on boundary, the interpolation works fine!
@@ -162,6 +164,9 @@ void csCloudsDynamics::AddAcceleratingForces()
     {
       for(UINT z = 1; z < m_iGridSizeZ; ++z)
       {
+        if(m_bRestore) RestoreState(&x, &y, &z);
+        if(LimitReached()) {SaveState(x, y, z); return;}
+
         const float f1 = m_arvForceField->GetValue(x, y, z).x + m_arvForceField->GetValue(x - 1, y, z).x;
         const float f2 = m_arvForceField->GetValue(x, y, z).y + m_arvForceField->GetValue(x, y - 1, z).y;
         const float f3 = m_arvForceField->GetValue(x, y, z).z + m_arvForceField->GetValue(x, y, z - 1).z;
@@ -216,6 +221,9 @@ void csCloudsDynamics::SatisfyVelocityBoundaryCond()
       m_arvVelocityField[m_iActualIndex]->SetValue(csVector3(vBorder.x, vInner.y, vBorder.z), x, m_iGridSizeY, z);
     }
   }
+
+  //After this method, the step should be increased, but the computation should terminate!
+  m_iIterationsLeft = 1;
 }
 
 //----------------------------------------------------------//
@@ -227,9 +235,16 @@ void csCloudsDynamics::UpdateMixingRatiosAndPotentialTemp()
   {
     for(UINT y = 1; y < m_iGridSizeY - 1; ++y)
     {
-      const float fHeight = y * m_fGridScale + m_fBaseAltitude;
+      float fHeight = y * m_fGridScale + m_fBaseAltitude;
       for(UINT z = 1; z < m_iGridSizeZ - 1; ++z)
       {
+        if(m_bRestore)
+        {
+          RestoreState(&x, &y, &z);
+          fHeight = y * m_fGridScale + m_fBaseAltitude;
+        }
+        if(LimitReached()) {SaveState(x, y, z); return;}
+
         const float p		= ComputePressure(fHeight);
         const float fPi		= ::powf(p / m_fRefPressure, m_fKappa);
         const float T		= m_arfPotTemperature[m_iLastIndex]->GetValue(x, y, z) * fPi;
@@ -310,6 +325,9 @@ void csCloudsDynamics::SatisfyScalarBoundaryCond()
       m_arfWaterVaporMixingRatios[m_iActualIndex]->SetValue(m_arfInputWaterVapor->GetValue(x, z), x, 0, z);
     }
   }
+
+  //After this method, the step should be increased, but the computation should terminate!
+  m_iIterationsLeft = 1;
 }
 
 //----------------------------------------------------------//
@@ -322,12 +340,36 @@ void csCloudsDynamics::SolvePoissonPressureEquation(const UINT k)
 {
   static const float s_fInvBeta = 1.f / 6.f;
   const float fGridScale2 = m_fGridScale * m_fGridScale;
-  for(UINT i = 0; i < k; ++i)
+  for(; m_iPoissonSolverIterationsCount < k; ++m_iPoissonSolverIterationsCount)
   {
     //Switch roles
     m_iNewPressureField ^= m_iOldPressureField ^= m_iNewPressureField ^= m_iOldPressureField;
     JacobiSolver(m_arfPressureField[m_iNewPressureField], m_arfPressureField[m_iOldPressureField], 
                  m_arfVelDivergence, fGridScale2, s_fInvBeta);
+  }
+}
+
+//----------------------------------------------------------//
+
+void csCloudsDynamics::JacobiSolver(csRef<csField3<float>> rNew, const csRef<csField3<float>>& rOld, 
+                                    const csRef<csField3<float>>& rBField, const float fAlpha, const float fInvBeta)
+{
+  for(UINT x = 0; x < rNew->GetSizeX(); ++x)
+  {
+    for(UINT y = 0; y < rNew->GetSizeY(); ++y)
+    {
+      for(UINT z = 0; z < rNew->GetSizeZ(); ++z)
+      {
+        if(m_bRestore) RestoreState(&x, &y, &z);
+        if(LimitReached()) {SaveState(x, y, z); return;}
+
+        const float fB		= fAlpha * rBField->GetValue(x, y, z);
+        const float fTemp	= rOld->GetValueClamp(x + 1, y, z) + rOld->GetValueClamp(x - 1, y, z) +
+                            rOld->GetValueClamp(x, y + 1, z) + rOld->GetValueClamp(x, y - 1, z) +
+                            rOld->GetValueClamp(x, y, z + 1) + rOld->GetValueClamp(x, y, z - 1);
+        rNew->SetValue((fTemp + fB) * fInvBeta, x, y, z);
+      }
+    }
   }
 }
 
@@ -342,6 +384,9 @@ void csCloudsDynamics::MakeVelocityFieldDivergenceFree()
     {
       for(UINT z = 1; z < m_iGridSizeZ; ++z)
       {
+        if(m_bRestore) RestoreState(&x, &y, &z);
+        if(LimitReached()) {SaveState(x, y, z); return;}
+
         const csVector3 vVel	= m_arvVelocityField[m_iActualIndex]->GetValue(x, y, z);
         const csVector3 vGrad	= CalcGradient(m_arfPressureField[m_iNewPressureField], x, y, z, m_fGridScale);
         //Ok this way?
@@ -364,8 +409,8 @@ const bool csCloudsDynamics::DoComputationSteps(const UINT iStepCount, const flo
   //preconditions hold? --> initialized?
   //if(m_iGridSizeX <= 0 || m_iGridSizeY <= 0 || m_iGridSizeZ <= 0) return false;
 
-  int iStepsLeft = iStepCount == 0 ? s_iTotalStepCount - m_iCurrentStep : iStepCount;
-  while(iStepsLeft-- > 0)
+  m_iIterationsLeft = m_iIterationsPerInvokation;
+  while(true)
   {
     switch(m_iCurrentStep)
     {
@@ -385,19 +430,22 @@ const bool csCloudsDynamics::DoComputationSteps(const UINT iStepCount, const flo
     //Solving poisson-pressure equation
     case 6: ComputeDivergenceField(); break;
     //60 iterations
-    case 7: SolvePoissonPressureEquation(30); break;
-    case 8: SolvePoissonPressureEquation(30); break;
+    case 7: SolvePoissonPressureEquation(60); break;
     //Subtruction of the pressure gradient from velocity
-    case 9: MakeVelocityFieldDivergenceFree(); break;
-    case 10: SatisfyVelocityBoundaryCond(); break;
+    case 8: MakeVelocityFieldDivergenceFree(); break;
+    case 9: SatisfyVelocityBoundaryCond(); break;
     }
 
+    if(m_iIterationsLeft <= 0) break;
     if(++m_iCurrentStep >= s_iTotalStepCount)
     {
+      m_iPoissonSolverIterationsCount = 0;
       m_iCurrentStep = 0;
+      m_bNewTimeStep = true;
       m_fTimePassed += m_fTimeStep;
       SwapFieldIndizes();
     }
+    else m_bNewTimeStep = false;
   }
 
   return true;
