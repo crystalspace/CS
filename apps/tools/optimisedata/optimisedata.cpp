@@ -85,7 +85,15 @@ void OptimiseData::CollectData(csString in)
             csString mapName = files->Get(i);
             mapName.Truncate(mapName.FindLast("/"));
             mapInPaths.Push(mapName);
-            mapNames.Push(mapName.Slice(mapName.FindLast("/")));
+            if(mapName.FindLast("/") != (size_t)-1)
+            {
+                mapName = mapName.Slice(mapName.FindLast("/"));
+            }
+            if(mapName.FindLast("\\") != (size_t)-1)
+            {
+                mapName = mapName.Slice(mapName.FindLast("\\"));
+            }
+            mapNames.Push(mapName);
             maps.Push(top);
           }
           else
@@ -146,7 +154,7 @@ void OptimiseData::SortData()
     bool first = true;
 
     csRefArray<iDocumentNode> tempMats;
-    while(submeshes->HasNext())
+    while((first && params->GetNode("material")) || submeshes->HasNext())
     {
       csString materialName;
       if(first && params->GetNode("material"))
@@ -154,7 +162,7 @@ void OptimiseData::SortData()
         materialName = params->GetNode("material")->GetContentsValue();
         first = false;
       }
-      else
+      else if(submeshes->HasNext())
       {
         materialName = submeshes->Next()->GetNode("material")->GetContentsValue();
       }
@@ -280,6 +288,7 @@ void OptimiseData::SortData()
     world->RemoveNodes(world->GetNodes("textures"));
     world->RemoveNodes(world->GetNodes("materials"));
     world->RemoveNodes(world->GetNodes("meshfact"));
+    world->RemoveNodes(world->GetNodes("library"));
 
     // Check dependencies.
     csRef<iDocumentNodeIterator> sectors = world->GetNodes("sector");
