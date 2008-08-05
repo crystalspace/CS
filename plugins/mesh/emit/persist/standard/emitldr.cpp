@@ -34,6 +34,7 @@
 #include "iengine/material.h"
 #include "iutil/vfs.h"
 #include "csutil/csstring.h"
+#include "iutil/stringarray.h"
 #include "iutil/object.h"
 #include "iutil/document.h"
 #include "iutil/objreg.h"
@@ -97,7 +98,7 @@ bool csEmitFactoryLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csEmitFactoryLoader::Parse (iDocumentNode* /*node*/,
 	iStreamSource*, iLoaderContext*, iBase* /* context */,
-  csArray<const char*>* failed)
+  iStringArray* failed)
 {
   csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
   	object_reg, "crystalspace.mesh.object.emit");
@@ -345,7 +346,7 @@ csRef<iEmitGen3D> csEmitLoader::ParseEmit (iDocumentNode* node,
 
 csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 			    iStreamSource*, iLoaderContext* ldr_context,
-			    iBase*, csArray<const char*>* failedMeshFacts)
+			    iBase*, iStringArray* failedMeshFacts)
 {
   csRef<iEmitGen3D> emit;
   csRef<iMeshObject> mesh;

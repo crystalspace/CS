@@ -30,6 +30,7 @@
 #include "iutil/document.h"
 #include "iutil/plugin.h"
 #include "iutil/object.h"
+#include "iutil/stringarray.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -680,7 +681,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
 
   csPtr<iBase> ParticlesFactoryLoader::Parse (iDocumentNode* node,
     iStreamSource* ssource, iLoaderContext* ldr_context, iBase* context,
-    csArray<const char*>* failed)
+    iStringArray* failed)
   {
     csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
   	objectRegistry, "crystalspace.mesh.object.particles", false);
@@ -755,7 +756,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
 
   csPtr<iBase> ParticlesObjectLoader::Parse (iDocumentNode* node,
     iStreamSource* ssource, iLoaderContext* ldr_context, iBase* context,
-    csArray<const char*>* failedMeshFacts)
+    iStringArray* failedMeshFacts)
   {
     
     csRef<iMeshObject> meshObj;

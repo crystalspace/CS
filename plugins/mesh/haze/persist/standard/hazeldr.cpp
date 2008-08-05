@@ -40,6 +40,7 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/stringarray.h"
 #include "imap/ldrctxt.h"
 #include "ivaria/reporter.h"
 
@@ -150,7 +151,7 @@ static iHazeHull* ParseHull (csStringHash& xmltokens, iReporter*,
 
 csPtr<iBase> csHazeFactoryLoader::Parse (iDocumentNode* node,
 	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */,
-  csArray<const char*>* failed)
+  iStringArray* failed)
 {
   csVector3 a;
 
@@ -365,7 +366,7 @@ bool csHazeLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 			    iStreamSource*, iLoaderContext* ldr_context,
-			    iBase*, csArray<const char*>* failedMeshFacts)
+			    iBase*, iStringArray* failedMeshFacts)
 {
   csRef<iMeshObject> mesh;
   csRef<iHazeFactoryState> hazefactorystate;

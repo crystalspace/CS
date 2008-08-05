@@ -812,7 +812,7 @@ csPtr<iBase> csImageTextureLoader::Parse (iDocumentNode* /*node*/,
 					  iStreamSource*,
 					  iLoaderContext* /*ldr_context*/, 	
 					  iBase* context,
-            csArray<const char*>* failedMeshFacts)
+            iStringArray* failedMeshFacts)
 {
   if (!context) return 0;
   csRef<iTextureLoaderContext> ctx = csPtr<iTextureLoaderContext>
@@ -860,7 +860,7 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
 					    iStreamSource*,
 					    iLoaderContext* /*ldr_context*/,
 					    iBase* context,
-              csArray<const char*>* failedMeshFacts)
+              iStringArray* failedMeshFacts)
 {
   int w = 64, h = 64, depth = 6;
   csColor color (1.0f, 1.0f, 1.0f);
@@ -943,7 +943,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 					    iStreamSource*,
 					    iLoaderContext* /*ldr_context*/,
 					    iBase* context,
-              csArray<const char*>* failedMeshFacts)
+              iStringArray* failedMeshFacts)
 {
   if (!context) return 0;
   csRef<iTextureLoaderContext> ctx = csPtr<iTextureLoaderContext>
@@ -1092,7 +1092,7 @@ csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node,
 				       iStreamSource*,
 				       iLoaderContext* /*ldr_context*/,
 				       iBase* context,
-               csArray<const char*>* failedMeshFacts)
+               iStringArray* failedMeshFacts)
 {
   if (!context) return 0;
   csRef<iTextureLoaderContext> ctx = csPtr<iTextureLoaderContext>
@@ -1180,7 +1180,7 @@ csPtr<iBase> csMissingTextureLoader::Parse (iDocumentNode* node,
                                             iStreamSource*,
                                             iLoaderContext* /*ldr_context*/,
                                             iBase* context,
-                                            csArray<const char*>* failedMeshFacts)
+                                            iStringArray* failedMeshFacts)
 {
   int width = 64, height = 64;
   csRef<iTextureLoaderContext> ctx;

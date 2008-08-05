@@ -138,7 +138,7 @@ bool csPhysicsLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csPhysicsLoader::Parse (iDocumentNode* node,
 		iStreamSource*, iLoaderContext* /*ldr_context*/,
-		iBase* /*context*/, csArray<const char*>* failed)
+		iBase* /*context*/, iStringArray* failed)
 {
   engine = csQueryRegistry<iEngine> (object_reg);
   CS_ASSERT (engine != 0);

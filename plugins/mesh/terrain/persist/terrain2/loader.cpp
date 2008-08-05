@@ -35,6 +35,7 @@
 #include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include "iutil/stringarray.h"
 
 #include "loader.h"
 
@@ -71,7 +72,7 @@ bool csTerrain2FactoryLoader::Initialize (iObjectRegistry* objreg)
 
 csPtr<iBase> csTerrain2FactoryLoader::Parse (iDocumentNode* node,
   iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/,
-  csArray<const char*>* failed)
+  iStringArray* failed)
 {
   csRef<iPluginManager> pluginManager = csQueryRegistry<iPluginManager> (object_reg);
 
@@ -465,7 +466,7 @@ bool csTerrain2ObjectLoader::Initialize (iObjectRegistry* objreg)
 
 csPtr<iBase> csTerrain2ObjectLoader::Parse (iDocumentNode* node, 
   iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/,
-  csArray<const char*>* failedMeshFacts)
+  iStringArray* failedMeshFacts)
 {
   csRef<iMeshObject> mesh;
   csRef<iTerrainSystem> terrain;

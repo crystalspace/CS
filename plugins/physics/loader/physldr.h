@@ -46,7 +46,7 @@ public:
   /// Parse the physics node and setup the environment
   virtual csPtr<iBase> Parse (iDocumentNode *node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context,
-    csArray<const char*>* failed);
+    iStringArray* failed);
   /// Parse the system specific sub section
   virtual bool ParseSystem (iDocumentNode *node, iDynamicSystem* system);
   /// Parse the body specific sub section

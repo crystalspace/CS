@@ -94,7 +94,7 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
-  	iBase* context, csArray<const char*>* failed = 0) = 0;
+  	iBase* context, iStringArray* failed = 0) = 0;
 };  
 
 /// Image texture loader pseudo-plugin
@@ -106,7 +106,7 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
-  	iBase* context, csArray<const char*>* failed = 0);
+  	iBase* context, iStringArray* failed = 0);
 };
 
 /// Checkerboard texture loader pseudo-plugin
@@ -118,7 +118,7 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
-  	iBase* context, csArray<const char*>* failed = 0);
+  	iBase* context, iStringArray* failed = 0);
 };
 
 /// Error-texture loader pseudo-plugin
@@ -130,7 +130,7 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context,
-    iBase* context, csArray<const char*>* failed = 0);
+    iBase* context, iStringArray* failed = 0);
 };
 
 /// Cubemap texture loader pseudo-plugin
@@ -146,7 +146,7 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
-    	iBase* context, csArray<const char*>* failed = 0);
+    	iBase* context, iStringArray* failed = 0);
 };
 
 /// 3D texture loader pseudo-plugin
@@ -162,7 +162,7 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
-	iBase* context, csArray<const char*>* failed = 0);
+	iBase* context, iStringArray* failed = 0);
 };
 
 }

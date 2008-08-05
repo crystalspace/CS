@@ -317,6 +317,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         loadingTextures.Delete(name);
       }
 
+      // List of textures that we know failed to load.
+      // This is used by the meshobj loader plugin to determine
+      // if it should continue waiting or just fail.
+      csRef<iStringArray> failedTextures;
+
       // Loading material objects.
       csArray<const char*> loadingMaterials;
       RecursiveMutex loadingMaterialsLock;
@@ -374,7 +379,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       // List of meshfacts that we know failed to load.
       // This is used by the meshobj loader plugin to determine
       // if it should continue waiting or just fail.
-      csArray<const char*> failedMeshFacts;
+      csRef<iStringArray> failedMeshFacts;
 
   private:
 

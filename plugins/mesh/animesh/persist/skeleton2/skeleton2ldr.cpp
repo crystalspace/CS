@@ -43,7 +43,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
 
   csPtr<iBase> SkeletonLoader::Parse (iDocumentNode* node,
     iStreamSource* ssource, iLoaderContext* ldr_context,
-    iBase* context, csArray<const char*>* failed)
+    iBase* context, iStringArray* failed)
   {
     static const char* msgid = "crystalspace.skeletonloader";
 

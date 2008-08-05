@@ -24,6 +24,7 @@
 #include "imap/services.h"
 #include "imesh/animesh.h"
 #include "imesh/object.h"
+#include "iutil/stringarray.h"
 #include "iutil/document.h"
 #include "iutil/plugin.h"
 #include "ivaria/reporter.h"
@@ -53,7 +54,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 
   csPtr<iBase> AnimeshFactoryLoader::Parse (iDocumentNode* node,
     iStreamSource* ssource, iLoaderContext* ldr_context,
-    iBase* context, csArray<const char*>* failed)
+    iBase* context, iStringArray* failed)
   {
     csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
       object_reg, "crystalspace.mesh.object.animesh", false);
@@ -366,7 +367,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 
   csPtr<iBase> AnimeshObjectLoader::Parse (iDocumentNode* node,
     iStreamSource* ssource, iLoaderContext* ldr_context,
-    iBase* context, csArray<const char*>* failedMeshFacts)
+    iBase* context, iStringArray* failedMeshFacts)
   {
     static const char* msgid = "crystalspace.animeshloader";
 

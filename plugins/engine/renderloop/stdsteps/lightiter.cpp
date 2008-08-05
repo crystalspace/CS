@@ -82,7 +82,7 @@ csPtr<iBase> csLightIterRSLoader::Parse (iDocumentNode* node,
 				       iStreamSource*,
 				       iLoaderContext* /*ldr_context*/,      
 				       iBase* /*context*/,
-               csArray<const char*>* failed)
+               iStringArray* failed)
 {
   csRef<iLightIterRenderStep> step;
   step.AttachNew (new csLightIterRenderStep (object_reg));

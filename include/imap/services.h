@@ -95,7 +95,7 @@ namespace CS
  */
 struct iSyntaxService : public virtual iBase
 {
-  SCF_INTERFACE (iSyntaxService, 2, 1, 4);
+  SCF_INTERFACE (iSyntaxService, 2, 2, 0);
   
   /**\name Parse reporting helpers
    * @{ */
@@ -311,7 +311,8 @@ struct iSyntaxService : public virtual iBase
    * Parse a shader variable declaration
    */
   virtual bool ParseShaderVar (iLoaderContext* ldr_context,
-      iDocumentNode* node, csShaderVariable& var) = 0;
+      iDocumentNode* node, csShaderVariable& var,
+      iStringArray* failedTextures = 0) = 0;
   /**
    * Parse a shader variable expression. Returns an acessor that can be set
    * on a shader variable. The accessor subsequently evaluates the expression.

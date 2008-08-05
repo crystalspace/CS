@@ -940,7 +940,7 @@ csPtr<iBase> csStencil2ShadowLoader::Parse (iDocumentNode* node,
                                             iStreamSource*,
 					    iLoaderContext* /*ldr_context*/,
                                             iBase* /*context*/,
-                                            csArray<const char*>* failed)
+                                            iStringArray* failed)
 {
   csRef<iPluginManager> plugin_mgr (
     csQueryRegistry<iPluginManager> (object_reg));

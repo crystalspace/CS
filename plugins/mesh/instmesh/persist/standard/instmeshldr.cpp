@@ -42,6 +42,7 @@
 #include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include "iutil/stringarray.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
@@ -143,7 +144,7 @@ static void AppendOrSetData (iInstancingFactoryState* factory,
 
 csPtr<iBase> csInstFactoryLoader::Parse (iDocumentNode* node,
 	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */,
-  csArray<const char*>* failed)
+  iStringArray* failed)
 {
   csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
   	object_reg, "crystalspace.mesh.object.instmesh", false);
@@ -547,7 +548,7 @@ bool csInstMeshLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csInstMeshLoader::Parse (iDocumentNode* node,
 	iStreamSource*, iLoaderContext* ldr_context, iBase*,
-  csArray<const char*>* failedMeshFacts)
+  iStringArray* failedMeshFacts)
 {
   csRef<iMeshObject> mesh;
   csRef<iInstancingMeshState> meshstate;

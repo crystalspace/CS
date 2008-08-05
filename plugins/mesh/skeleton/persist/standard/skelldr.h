@@ -48,7 +48,7 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context,
-    csArray<const char*>* failed);
+    iStringArray* failed);
 
   const char *ParseBone (iDocumentNode* node, 
     iSkeletonFactory *skel_fact, iSkeletonBoneFactory *parent_bone);

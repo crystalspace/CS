@@ -39,6 +39,7 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/stringarray.h"
 #include "imap/ldrctxt.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -160,7 +161,7 @@ bool csSprite2DFactoryLoader::ParseAnim (iDocumentNode* node,
 
 csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
 	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */,
-  csArray<const char*>* failed)
+  iStringArray* failed)
 {
   csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
   	object_reg, "crystalspace.mesh.object.sprite.2d", false);
@@ -351,7 +352,7 @@ bool csSprite2DLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
 				iStreamSource*, iLoaderContext* ldr_context,
-				iBase*, csArray<const char*>* failedMeshFacts)
+				iBase*, iStringArray* failedMeshFacts)
 {
   csRef<iMeshObject> mesh;
   csRef<iSprite2DState> spr2dLook;

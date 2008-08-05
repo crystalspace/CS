@@ -47,6 +47,7 @@
 #include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include "iutil/stringarray.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
@@ -304,7 +305,7 @@ static void AppendOrSetData (iGeneralFactoryState* factory,
 
 csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */,
-  csArray<const char*>* failed)
+  iStringArray* failed)
 {
   csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
   	object_reg, "crystalspace.mesh.object.genmesh", false);
@@ -1209,7 +1210,7 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
 
 csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	iStreamSource*, iLoaderContext* ldr_context, iBase* context,
-  csArray<const char*>* failedMeshFacts)
+  iStringArray* failedMeshFacts)
 {
   csRef<iMeshObject> mesh;
   csRef<iGeneralMeshState> meshstate;

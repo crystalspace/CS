@@ -41,7 +41,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
     //-- iLoaderPlugin
     virtual csPtr<iBase> Parse (iDocumentNode* node,
       iStreamSource* ssource, iLoaderContext* ldr_context,
-      iBase* context, csArray<const char*>* failed);
+      iBase* context, iStringArray* failed);
 
     bool ParseMorphTarget (iDocumentNode* child,
       iAnimatedMeshFactory* amfact);
@@ -91,7 +91,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
     //-- iLoaderPlugin
     virtual csPtr<iBase> Parse (iDocumentNode* node,
       iStreamSource* ssource, iLoaderContext* ldr_context,
-      iBase* context, csArray<const char*>* failedMeshFacts);
+      iBase* context, iStringArray* failedMeshFacts);
 
     //-- iComponent
     virtual bool Initialize (iObjectRegistry*);

@@ -43,6 +43,7 @@
 #include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include "iutil/stringarray.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
@@ -115,7 +116,7 @@ bool csSprite3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
 				       iStreamSource*, iLoaderContext* ldr_context, 
-				       iBase* context, csArray<const char*>* failed)
+				       iBase* context, iStringArray* failed)
 {
   csRef<iPluginManager> plugin_mgr (csQueryRegistry<iPluginManager>
     (object_reg));
@@ -500,7 +501,7 @@ bool csSprite3DLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 	iStreamSource*, iLoaderContext* ldr_context, iBase*,
-  csArray<const char*>* failedMeshFacts)
+  iStringArray* failedMeshFacts)
 {
   csRef<iMeshObject> mesh;
   csRef<iSprite3DState> spr3dLook;

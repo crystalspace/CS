@@ -73,7 +73,7 @@ csPtr<iBase> csGenericRSLoader::Parse (iDocumentNode* node,
 				       iStreamSource*,
 				       iLoaderContext* ldr_context,
 				       iBase* /*context*/,
-               csArray<const char*>* failed)
+               iStringArray* failed)
 {
   csRef<iGenericRenderStep> step;
   step.AttachNew (new csGenericRenderStep (object_reg));

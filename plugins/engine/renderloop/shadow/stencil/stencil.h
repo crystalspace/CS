@@ -220,7 +220,7 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context,
-    iBase* context, csArray<const char*>* failed);
+    iBase* context, iStringArray* failed);
 };
 
 #endif // __CS_STENCIL_H

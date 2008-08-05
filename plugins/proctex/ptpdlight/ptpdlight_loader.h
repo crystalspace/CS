@@ -99,7 +99,7 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
-  	iBase* context, csArray<const char*>* failedMeshFacts);
+  	iBase* context, iStringArray* failedMeshFacts);
 
   // PT update "scheduler"
   bool UpdatePT (ProctexPDLight* texture, csTicks time)

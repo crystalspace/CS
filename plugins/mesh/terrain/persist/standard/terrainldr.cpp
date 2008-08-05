@@ -35,6 +35,7 @@
 #include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include "iutil/stringarray.h"
 #include "iutil/vfs.h"
 #include "ivaria/terraform.h"
 
@@ -83,7 +84,7 @@ bool csTerrainFactoryLoader::Initialize (iObjectRegistry* objreg)
 
 csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
   iStreamSource*, iLoaderContext* /*ldr_context*/, iBase* /*context*/,
-  csArray<const char*>* failed)
+  iStringArray* failed)
 {
   csRef<iPluginManager> plugin_mgr = 
     csQueryRegistry<iPluginManager> (object_reg);
@@ -268,7 +269,7 @@ bool csTerrainObjectLoader::Initialize (iObjectRegistry* objreg)
 
 csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node, 
   iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/,
-  csArray<const char*>* failedMeshFacts)
+  iStringArray* failedMeshFacts)
 {
   csRef<iMeshObject> mesh;
   csRef<iTerrainObjectState> state;

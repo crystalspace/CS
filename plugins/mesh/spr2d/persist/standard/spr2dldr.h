@@ -61,7 +61,7 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context,
-    csArray<const char*>* failed);
+    iStringArray* failed);
 };
 
 /**
@@ -116,7 +116,7 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context,
-    csArray<const char*>* failedMeshFacts);
+    iStringArray* failedMeshFacts);
 };
 
 /**

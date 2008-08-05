@@ -53,6 +53,7 @@
 #include "itexture/iproctex.h"
 
 #include "iutil/object.h"
+#include "iutil/stringarray.h"
 #include "iutil/vfs.h"
 
 #include "ivaria/reporter.h"
@@ -380,15 +381,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
       case XMLTOKEN_TEXTURE:
         if (!ParseTexture (ldr_context, child, proxyTextures))
+        {
+          failedTextures->Push(child->GetAttributeValue("name"));
           return false;
+        }
         break;
       case XMLTOKEN_CUBEMAP:
         if (!ParseCubemap (ldr_context, child))
+        {
+          failedTextures->Push(child->GetAttributeValue("name"));
           return false;
+        }
         break;
       case XMLTOKEN_TEXTURE3D:
         if (!ParseTexture3D (ldr_context, child))
+        {
+          failedTextures->Push(child->GetAttributeValue("name"));
           return false;
+        }
         break;
       default:
         SyntaxService->ReportBadToken (child);
@@ -763,7 +773,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if (plugin)
     {
       csRef<iBase> b = plugin->Parse (ParamsNode,
-        0/*ssource*/, ldr_context, static_cast<iBase*> (&context), &failedMeshFacts);
+        0/*ssource*/, ldr_context, static_cast<iBase*> (&context), failedMeshFacts);
       if (b) tex = scfQueryInterface<iTextureWrapper> (b);
     }
 
@@ -777,7 +787,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csRef<iLoaderPlugin> BuiltinErrorTexLoader;
       BuiltinErrorTexLoader.AttachNew(new csMissingTextureLoader (0));
       csRef<iBase> b = BuiltinErrorTexLoader->Parse (ParamsNode,
-        0, ldr_context, static_cast<iBase*> (&context), &failedMeshFacts);
+        0, ldr_context, static_cast<iBase*> (&context), failedMeshFacts);
       if (!b.IsValid())
       {
         static bool noMissingWarned = false;
@@ -946,7 +956,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           csRef<csShaderVariable> var;
           var.AttachNew (new csShaderVariable);
 
-          if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
+          if (!SyntaxService->ParseShaderVar (ldr_context, child, *var, failedTextures))
           {
             break;
           }
@@ -1607,7 +1617,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           const char* varname = child->GetAttributeValue ("name");
           csRef<csShaderVariable> var;
           var.AttachNew (new csShaderVariable (stringSetSvName->Request (varname)));
-          if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
+          if (!SyntaxService->ParseShaderVar (ldr_context, child, *var, failedTextures))
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.load.meshobject", child,

@@ -38,6 +38,7 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/stringarray.h"
 #include "imap/services.h"
 #include "imap/ldrctxt.h"
 #include "csgeom/vector2.h"
@@ -217,7 +218,7 @@ bool csNullFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
 
 csPtr<iBase> csNullFactoryLoader::Parse (iDocumentNode* node,
 	iStreamSource*, iLoaderContext* /*ldr_context*/, iBase* /*context*/,
-  csArray<const char*>* failed)
+  iStringArray* failed)
 {
   csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
   	object_reg, "crystalspace.mesh.object.null", false);
@@ -349,7 +350,7 @@ bool csNullMeshLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csNullMeshLoader::Parse (iDocumentNode* node,
 	iStreamSource*, iLoaderContext* ldr_context, iBase*,
-  csArray<const char*>* failedMeshFacts)
+  iStringArray* failedMeshFacts)
 {
   csRef<iMeshObject> mesh;
   csRef<iNullMeshState> state;

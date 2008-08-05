@@ -98,7 +98,7 @@ csPtr<iBase> csShadowmapRSLoader::Parse (iDocumentNode* node,
 				       iStreamSource*,
 				       iLoaderContext* ldr_context,      
 				       iBase*,
-               csArray<const char*>* failed)
+               iStringArray* failed)
 {
   csShadowmapRenderStep* newstep = 
     new csShadowmapRenderStep (object_reg);

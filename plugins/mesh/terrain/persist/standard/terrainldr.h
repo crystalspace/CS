@@ -54,7 +54,7 @@ public:
   /// Parse the given node block and build the terrain factory
   csPtr<iBase> Parse (iDocumentNode *node,
     iStreamSource*, iLoaderContext *ldr_context,
-    iBase* context, csArray<const char*>* failed);	
+    iBase* context, iStringArray* failed);	
 };
 
 /**
@@ -111,7 +111,7 @@ public:
   /// Parse the given block to create a new Terrain object
   csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context,
-    iBase *context, csArray<const char*>* failedMeshFacts);
+    iBase *context, iStringArray* failedMeshFacts);
 };
 
 /**

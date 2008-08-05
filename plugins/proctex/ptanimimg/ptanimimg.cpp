@@ -67,7 +67,7 @@ bool csAnimateProctexLoader::Initialize(iObjectRegistry *object_reg)
 
 csPtr<iBase> csAnimateProctexLoader::Parse (iDocumentNode* node, 
 					    iStreamSource*, iLoaderContext* /*ldr_context*/,
-  					    iBase* context, csArray<const char*>* failed)
+  					    iBase* context, iStringArray* failed)
 {
   csRef<iTextureLoaderContext> ctx;
   if (context)

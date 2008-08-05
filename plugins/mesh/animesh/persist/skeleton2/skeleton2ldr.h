@@ -41,7 +41,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
     //-- iLoaderPlugin
     virtual csPtr<iBase> Parse (iDocumentNode* node,
       iStreamSource* ssource, iLoaderContext* ldr_context,
-      iBase* context, csArray<const char*>* failed);
+      iBase* context, iStringArray* failed);
 
     //-- iComponent
     virtual bool Initialize (iObjectRegistry*);

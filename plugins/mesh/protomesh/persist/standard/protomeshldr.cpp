@@ -38,6 +38,7 @@
 #include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include "iutil/stringarray.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
@@ -76,7 +77,7 @@ csPtr<iBase> csProtoFactoryLoader::Parse (iDocumentNode* node,
                                           iStreamSource*, 
                                           iLoaderContext* /*ldr_context*/, 
                                           iBase* /* context */,
-                                          csArray<const char*>* failed)
+                                          iStringArray* failed)
 {
   csRef<iPluginManager> plugin_mgr = 
     csQueryRegistry<iPluginManager> (object_reg);
@@ -283,7 +284,7 @@ bool csProtoMeshLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csProtoMeshLoader::Parse (iDocumentNode* node,
 	iStreamSource*, iLoaderContext* ldr_context, iBase*,
-  csArray<const char*>* failedMeshFacts)
+  iStringArray* failedMeshFacts)
 {
   csRef<iMeshObject> mesh;
   csRef<iProtoMeshState> meshstate;

@@ -38,6 +38,7 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/stringarray.h"
 #include "imap/ldrctxt.h"
 #include "ivaria/reporter.h"
 
@@ -95,7 +96,7 @@ bool csLightningFactoryLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csLightningFactoryLoader::Parse (iDocumentNode* node,
   iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */,
-  csArray<const char*>* failed)
+  iStringArray* failed)
 {
   csVector3 a;
 
@@ -318,7 +319,7 @@ bool csLightningLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csLightningLoader::Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase*,
-    csArray<const char*>* failedMeshFacts)
+    iStringArray* failedMeshFacts)
 {
   csRef<iMeshObject> mesh;
   csRef<iLightningFactoryState> LightningFactoryState;

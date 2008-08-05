@@ -1221,6 +1221,11 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     }
     csRef<iThreadReturn> ret = LevelLoader->LoadMapFile ("world", false, collection);
     ret->Wait();
+
+    csTicks mid_time = csGetTicks ();
+    csPrintf ("Level load time: %g seconds\n",
+      float (mid_time-start_time) / 1000.0); fflush (stdout);
+
     if (do_collections)
     {
       // Set the cache manager based on current VFS dir.

@@ -1204,7 +1204,7 @@ Nag to Jorrit about this feature if you want it.");
 csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
 			     iStreamSource*,
 			     iLoaderContext* ldr_context, iBase* context,
-           csArray<const char*>* failedMeshFacts)
+           iStringArray* failedMeshFacts)
 {
   synldr->Report ("crystalspace.thingloader.parse",
 		CS_REPORTER_SEVERITY_WARNING,
@@ -1287,7 +1287,7 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
 
 csPtr<iBase> csThingFactoryLoader::Parse (iDocumentNode* node,
   iStreamSource*, iLoaderContext* ldr_context, iBase*,
-  csArray<const char*>* failed)
+  iStringArray* failed)
 {
   synldr->Report ("crystalspace.thingloader.parse",
 		CS_REPORTER_SEVERITY_WARNING,
