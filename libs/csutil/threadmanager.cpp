@@ -56,7 +56,7 @@ bool csThreadManager::HandleEvent(iEvent& Event)
 {
   if(Event.Name == ProcessPerFrame || Event.Name == ProcessWhileWait)
   {
-    Process();
+    Process(10);
   }
   return false;
 }
@@ -77,6 +77,7 @@ void csThreadManager::Wait(csRef<iThreadReturn> result)
       {
         csRef<iEvent> evt = eventQueue->CreateBroadcastEvent(ProcessWhileWait);
         eventQueue->Dispatch(*evt);
+        csSleep(1);
       }
     }
     AtomicOperations::Decrement(&waiting);
