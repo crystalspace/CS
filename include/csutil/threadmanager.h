@@ -23,13 +23,13 @@
 #include "csutil/objreg.h"
 #include "csutil/threadevent.h"
 #include "csutil/threadjobqueue.h"
+#include "iengine/engine.h"
 #include "imap/loader.h"
 #include "iutil/eventh.h"
+#include "iutil/eventq.h"
 #include "iutil/threadmanager.h"
 
-struct iEngine;
 struct iEvent;
-struct iEventQueue;
 
 using namespace CS::Threading;
 

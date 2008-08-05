@@ -19,6 +19,8 @@
 #ifndef __CS_IUTIL_THREADMANAGER_H__
 #define __CS_IUTIL_THREADMANAGER_H__
 
+#include "csutil/refcount.h"
+
 struct iJob;
 
 struct iThreadReturn : public csRefCount

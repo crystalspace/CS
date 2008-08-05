@@ -22,7 +22,6 @@
 #include "csutil/threadmanager.h"
 #include "iengine/engine.h"
 #include "iutil/event.h"
-#include "iutil/eventq.h"
 
 ThreadID csThreadManager::tid = Implementation::GetCurrentThreadId();
 
