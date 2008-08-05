@@ -496,7 +496,6 @@ public:
 
   /// Load all the graphics libraries needed
   virtual void LoadLibraryData (iCollection* collection);
-  virtual bool Inititalize2DTextures ();
   virtual bool Create2DSprites ();
 
   ///
@@ -621,12 +620,9 @@ public:
         {
           if(!parent->spritesLoaded)
           {
-            if(parent->Inititalize2DTextures())
+            if(parent->Create2DSprites())
             {
-              if(parent->Create2DSprites())
-              {
-                parent->spritesLoaded = true;
-              }
+              parent->spritesLoaded = true;
             }
           }
 

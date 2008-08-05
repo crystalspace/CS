@@ -335,8 +335,7 @@ THREADED_CALLABLE_IMPL10(csThreadedLoader, LoadTexture, const char* name,
 
   csRef<iImage> img;
   csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-  LoadTextureTC (itr, name, Flags, texman, &img, do_verbose);
-  if (!itr->WasSuccessful())
+  if (!LoadTextureTC (itr, FileName, Flags, texman, &img, do_verbose))
   {
     return false;
   }

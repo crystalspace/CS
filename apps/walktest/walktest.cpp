@@ -851,7 +851,9 @@ void WalkTest::InitCollDet (iEngine* engine, iCollection* collection)
 void WalkTest::LoadLibraryData (iCollection* collection)
 {
   // Load the "standard" library
-  csRef<iThreadReturn> ret = LevelLoader->LoadLibraryFile ("/lib/std/library", collection);
+  csRef<iThreadReturn> ret = LevelLoader->LoadTexture ("cslogo2",
+    "/lib/std/cslogo2.png", CS_TEXTURE_2D, 0, true, true,
+    true, collection);
   ret->Wait();
   if(!ret->WasSuccessful())
   {
@@ -859,20 +861,6 @@ void WalkTest::LoadLibraryData (iCollection* collection)
     exit (0);
   }
 }
-
-bool WalkTest::Inititalize2DTextures ()
-{
-  // Find the Crystal Space logo and set the renderer Flag to for_2d, to allow
-  // the use in the 2D part.
-  iTextureWrapper *texh = Engine->GetTextureList ()->FindByName ("cslogo2");
-  if (texh)
-  {
-    texh->SetFlags (CS_TEXTURE_2D);
-    return true;
-  }
-  return false;
-}
-
 
 bool WalkTest::Create2DSprites ()
 {
