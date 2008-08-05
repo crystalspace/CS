@@ -82,7 +82,7 @@ csPtWaterLoader::csPtWaterLoader(iBase *p) :
 
 csPtr<iBase> csPtWaterLoader::Parse (iDocumentNode* /*node*/, 
 				    iStreamSource*, iLoaderContext* /*ldr_context*/,
-  				    iBase* context)
+  				    iBase* context, csArray<const char*>* failed)
 {
   /*
     Going through the plugin manager to retrieve the texture type

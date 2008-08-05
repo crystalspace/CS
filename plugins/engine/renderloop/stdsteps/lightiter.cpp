@@ -81,7 +81,8 @@ bool csLightIterRSLoader::Initialize (iObjectRegistry* object_reg)
 csPtr<iBase> csLightIterRSLoader::Parse (iDocumentNode* node, 
 				       iStreamSource*,
 				       iLoaderContext* /*ldr_context*/,      
-				       iBase* /*context*/)
+				       iBase* /*context*/,
+               csArray<const char*>* failed)
 {
   csRef<iLightIterRenderStep> step;
   step.AttachNew (new csLightIterRenderStep (object_reg));

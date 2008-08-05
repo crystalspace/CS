@@ -326,7 +326,7 @@ Nag to Jorrit about this feature if you want it.");
 
 csPtr<iBase> csBezierLoader::Parse (iDocumentNode* node,
 			     iStreamSource*, iLoaderContext* ldr_context,
-			     iBase*)
+			     iBase*, csArray<const char*>* failedMeshFacts)
 {
   csRef<iMeshObjectType> type  = csLoadPluginCheck<iMeshObjectType> (
   	object_reg, "crystalspace.mesh.object.bezier", false);

@@ -36,7 +36,7 @@ struct iStreamSource;
  */
 struct iLoaderPlugin : public virtual iBase
 {
-  SCF_INTERFACE(iLoaderPlugin, 2,0,0);
+  SCF_INTERFACE(iLoaderPlugin, 3, 0, 0);
   /**
    * Parse a given document node and return a new object for it.
    * \param node The node to parse.
@@ -46,10 +46,12 @@ struct iLoaderPlugin : public virtual iBase
    *   You can use this to find meshes/materials/...
    * \param context The context in which we are loading (can be the mesh
    *   wrapper for meshes for example).
+   * \param failedMeshFacts An array containing the names of all meshfacts
+   *   that failed to load.
    */
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource* ssource, iLoaderContext* ldr_context,
-  	iBase* context) = 0;
+  	iBase* context, csArray<const char*>* failed = 0) = 0;
 };
 
 /**

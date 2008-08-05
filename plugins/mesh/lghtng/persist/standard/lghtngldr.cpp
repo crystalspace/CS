@@ -94,8 +94,8 @@ bool csLightningFactoryLoader::Initialize (iObjectRegistry* object_reg)
 
 
 csPtr<iBase> csLightningFactoryLoader::Parse (iDocumentNode* node,
-        iStreamSource*, iLoaderContext* ldr_context,
-        iBase* /* context */)
+  iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */,
+  csArray<const char*>* failed)
 {
   csVector3 a;
 
@@ -317,7 +317,8 @@ bool csLightningLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csLightningLoader::Parse (iDocumentNode* node,
-    iStreamSource*, iLoaderContext* ldr_context, iBase*)
+    iStreamSource*, iLoaderContext* ldr_context, iBase*,
+    csArray<const char*>* failedMeshFacts)
 {
   csRef<iMeshObject> mesh;
   csRef<iLightningFactoryState> LightningFactoryState;
@@ -337,13 +338,41 @@ csPtr<iBase> csLightningLoader::Parse (iDocumentNode* node,
           const char* factname = child->GetContentsValue ();
           iMeshFactoryWrapper* fact =
               ldr_context->FindMeshFactory (factname);
-          if (!fact)
+
+          if(failedMeshFacts)
+          {
+            // Check for failed meshfact load.
+            int i = 0;
+            while(!fact)
+            {
+              if(failedMeshFacts->GetSize() != 0 &&
+                !strcmp(failedMeshFacts->Get(i), factname))
+              {
+                synldr->ReportError (
+                  "crystalspace.lightningloader.parse.badfactory",
+                  child, "Could not find factory '%s'!", factname);
+                return 0;
+              }
+
+              if(i >= (int)(failedMeshFacts->GetSize()-1))
+              {
+                fact = ldr_context->FindMeshFactory (factname);
+                i = 0;
+              }
+              else
+              {
+                i++;
+              }
+            }
+          }
+          else if(!fact)
           {
             synldr->ReportError (
-                "crystalspace.lightningloader.parse.badfactory",
-                child, "Could not find factory '%s'!", factname);
+              "crystalspace.lightningloader.parse.badfactory",
+              child, "Could not find factory '%s'!", factname);
             return 0;
           }
+
           mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           Lightningstate = scfQueryInterface<iLightningState> (mesh);
 	  if (!Lightningstate)

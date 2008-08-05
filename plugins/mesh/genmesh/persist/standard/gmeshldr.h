@@ -70,7 +70,8 @@ public:
 
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
-    iStreamSource*, iLoaderContext* ldr_context, iBase* context);
+    iStreamSource*, iLoaderContext* ldr_context, iBase* context,
+    csArray<const char*>* failed);
 
   bool ParseRenderBuffer (iDocumentNode *node, iGeneralFactoryState* state);
 };
@@ -139,7 +140,8 @@ public:
 
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
-    iStreamSource*, iLoaderContext* ldr_context, iBase* context);
+    iStreamSource*, iLoaderContext* ldr_context, iBase* context,
+    csArray<const char*>* failedMeshFacts);
   /// Parse a render buffer node
   bool ParseRenderBuffer (iDocumentNode *node, iGeneralMeshState* state, 
     iGeneralFactoryState* factstate);

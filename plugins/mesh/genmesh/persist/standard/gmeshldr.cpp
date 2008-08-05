@@ -303,7 +303,8 @@ static void AppendOrSetData (iGeneralFactoryState* factory,
 }
 
 csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
-	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */)
+	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */,
+  csArray<const char*>* failed)
 {
   csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
   	object_reg, "crystalspace.mesh.object.genmesh", false);
@@ -1207,7 +1208,8 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
   }
 
 csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
-	iStreamSource*, iLoaderContext* ldr_context, iBase*)
+	iStreamSource*, iLoaderContext* ldr_context, iBase* context,
+  csArray<const char*>* failedMeshFacts)
 {
   csRef<iMeshObject> mesh;
   csRef<iGeneralMeshState> meshstate;
@@ -1264,14 +1266,42 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_FACTORY:
 	{
 	  const char* factname = child->GetContentsValue ();
-	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
-	  if (!fact)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.genmeshloader.parse.unknownfactory",
-		child, "Couldn't find factory '%s'!", factname);
-	    return 0;
-	  }
+    iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+
+    if(failedMeshFacts)
+    {
+      // Check for failed meshfact load.
+      int i = 0;
+      while(!fact)
+      {
+        if(failedMeshFacts->GetSize() != 0 &&
+          !strcmp(failedMeshFacts->Get(i), factname))
+        {
+          synldr->ReportError (
+            "crystalspace.genmeshloader.parse.unknownfactory",
+            child, "Couldn't find factory '%s'!", factname);
+          return 0;
+        }
+
+        if(i >= (int)(failedMeshFacts->GetSize()-1))
+        {
+          fact = ldr_context->FindMeshFactory (factname);
+          i = 0;
+        }
+        else
+        {
+          i++;
+        }
+      }
+    }
+    else if(!fact)
+    {
+      synldr->ReportError (
+        "crystalspace.genmeshloader.parse.unknownfactory",
+        child, "Couldn't find factory '%s'!", factname);
+      return 0;
+    }
+
 	  factstate =  
 	    scfQueryInterface<iGeneralFactoryState> (fact->GetMeshObjectFactory());
 	  if (!factstate)

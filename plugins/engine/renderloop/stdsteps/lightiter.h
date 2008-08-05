@@ -66,7 +66,7 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node, 
     iStreamSource*, iLoaderContext* ldr_context, 	
-    iBase* context);
+    iBase* context, csArray<const char*>* failed);
 };
 
 class csLightIterRenderStepFactory :

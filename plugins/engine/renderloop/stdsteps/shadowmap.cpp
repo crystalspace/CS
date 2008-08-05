@@ -97,7 +97,8 @@ bool csShadowmapRSLoader::Initialize (iObjectRegistry* object_reg)
 csPtr<iBase> csShadowmapRSLoader::Parse (iDocumentNode* node, 
 				       iStreamSource*,
 				       iLoaderContext* ldr_context,      
-				       iBase*)
+				       iBase*,
+               csArray<const char*>* failed)
 {
   csShadowmapRenderStep* newstep = 
     new csShadowmapRenderStep (object_reg);

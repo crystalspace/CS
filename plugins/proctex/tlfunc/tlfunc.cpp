@@ -71,7 +71,8 @@ bool csFuncTexLoader::Initialize(iObjectRegistry *object_reg)
 csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node, 
 				     iStreamSource*,
 				     iLoaderContext* /*ldr_context*/,
-				     iBase* context)
+				     iBase* context,
+             csArray<const char*>* failed)
 {
   csRef<iSyntaxService> synldr = 
     csQueryRegistry<iSyntaxService> (object_reg);

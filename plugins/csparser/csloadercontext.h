@@ -45,6 +45,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iMissingLoaderData> missingdata;
     uint keepFlags;
     bool do_verbose;
+    CS::Threading::Mutex collectionLock;
 
   public:
     csLoaderContext(iObjectRegistry* object_reg, iEngine* Engine, csThreadedLoader* loader,

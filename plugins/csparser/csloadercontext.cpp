@@ -75,17 +75,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   iMaterialWrapper* csLoaderContext::FindMaterial(const char* filename)
   {
-    CS::Threading::MutexScopedLock lock(loader->materialsLock);
     iMaterialWrapper* mat = NULL;
 
+    while(loader->FindLoadingMaterial(filename))
+    {
+      csSleep(10);
+    }
+
+    loader->materialsLock.Lock();
     for(size_t i=0; i<loader->loaderMaterials.GetSize(); i++)
     {
       if(!strcmp(loader->loaderMaterials[i]->QueryObject()->GetName(), filename))
       {
         mat = loader->loaderMaterials[i];
-        break;
+        loader->materialsLock.Unlock();
+        return mat;
       }
     }
+    loader->materialsLock.Unlock();
     
     if(!mat && collection)
     {
@@ -112,17 +119,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   iMaterialWrapper* csLoaderContext::FindNamedMaterial(const char* name, const char *filename)
   {
-    CS::Threading::MutexScopedLock lock(loader->materialsLock);
     iMaterialWrapper* mat = NULL;
 
+    while(loader->FindLoadingMaterial(filename))
+    {
+      csSleep(10);
+    }
+
+    loader->materialsLock.Lock();
     for(size_t i=0; i<loader->loaderMaterials.GetSize(); i++)
     {
       if(!strcmp(loader->loaderMaterials[i]->QueryObject()->GetName(), name))
       {
         mat = loader->loaderMaterials[i];
-        break;
+        loader->materialsLock.Unlock();
+        return mat;
       }
     }
+    loader->materialsLock.Unlock();
     
     if(!mat && collection)
     {
@@ -151,26 +165,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   iMeshFactoryWrapper* csLoaderContext::FindMeshFactory(const char* name)
   {
     csRef<iMeshFactoryWrapper> fact;
-    csRef<iThreadReturn> itr = loader->loadingObjects.Get(name, NULL);
-    if(itr)
+    
+    while(loader->FindLoadingMeshFact(name))
     {
-      itr->Wait();
-      if(itr->WasSuccessful())
-      {
-        fact = scfQueryInterface<iMeshFactoryWrapper>(itr->GetResultRefPtr());
-        return fact;
-      }
+      csSleep(10);
     }
 
-    CS::Threading::MutexScopedLock lock(loader->meshfactsLock);
+    loader->meshfactsLock.Lock();
     for(size_t i=0; i<loader->loaderMeshFactories.GetSize(); i++)
     {
       if(!strcmp(loader->loaderMeshFactories[i]->QueryObject()->GetName(), name))
       {
         fact = loader->loaderMeshFactories[i];
+        loader->meshfactsLock.Unlock();
         return fact;
       }
     }
+    loader->meshfactsLock.Unlock();
     
     if(collection)
     {
@@ -351,17 +362,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   iTextureWrapper* csLoaderContext::FindTexture(const char* name)
   {
-    CS::Threading::MutexScopedLock lock(loader->texturesLock);
     iTextureWrapper* result = NULL;
 
+    while(loader->FindLoadingTexture(name))
+    {
+      csSleep(10);
+    }
+
+    loader->texturesLock.Lock();
     for(size_t i=0; i<loader->loaderTextures.GetSize(); i++)
     {
       if(!strcmp(loader->loaderTextures[i]->QueryObject()->GetName(), name))
       {
         result = loader->loaderTextures[i];
-        break;
+        loader->texturesLock.Unlock();
+        return result;
       }
     }
+    loader->texturesLock.Unlock();
 
     if(!result && collection)
     {
@@ -389,17 +407,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   iTextureWrapper* csLoaderContext::FindNamedTexture (const char* name,
     const char *filename)
   {
-    CS::Threading::MutexScopedLock lock(loader->texturesLock);
     iTextureWrapper* result = NULL;
 
+    while(loader->FindLoadingTexture(name))
+    {
+      csSleep(10);
+    }
+
+    loader->texturesLock.Lock();
     for(size_t i=0; i<loader->loaderTextures.GetSize(); i++)
     {
       if(!strcmp(loader->loaderTextures[i]->QueryObject()->GetName(), name))
       {
         result = loader->loaderTextures[i];
-        break;
+        loader->texturesLock.Unlock();
+        return result;
       }
     }
+    loader->texturesLock.Unlock();
 
     if(!result && collection)
     {
@@ -428,6 +453,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   {
     if(collection)
     {
+      CS::Threading::MutexScopedLock lock(collectionLock);
       collection->Add(obj);
     }
   }

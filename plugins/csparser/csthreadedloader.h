@@ -265,6 +265,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       Mutex materialsLock;
       Mutex sharedvarLock;
 
+      // Final objects.
       csRefArray<iSector> loaderSectors;
       csRefArray<iMeshFactoryWrapper> loaderMeshFactories;
       csRefArray<iMeshWrapper> loaderMeshes;
@@ -273,7 +274,107 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csRefArray<iMaterialWrapper> loaderMaterials;
       csRefArray<iSharedVariable> loaderSharedVariables;
 
+      // General loading objects.
       csHash<csRef<iThreadReturn>, const char*> loadingObjects;
+      Mutex loadingObjectsLock;
+
+      void AddLoadingObject(const char* name, csRef<iThreadReturn> itr)
+      {
+        MutexScopedLock lock(loadingObjectsLock);
+        loadingObjects.Put(name, itr);
+      }
+
+      void RemoveLoadingObject(const char* name, csRef<iThreadReturn> itr)
+      {
+        MutexScopedLock lock(loadingObjectsLock);
+        loadingObjects.Delete(name, itr);
+      }
+
+      // Loading texture objects.
+      csArray<const char*> loadingTextures;
+      RecursiveMutex loadingTexturesLock;
+
+      bool AddLoadingTexture(const char* name)
+      {
+        RecursiveMutexScopedLock lock(loadingTexturesLock);
+        if(!FindLoadingTexture(name))
+        {
+          loadingTextures.Push(name);
+          return true;
+        }
+        return false;
+      }
+
+      bool FindLoadingTexture(const char* name)
+      {
+        RecursiveMutexScopedLock lock(loadingTexturesLock);
+        return loadingTextures.Find(name) != csArrayItemNotFound;
+      }
+
+      void RemoveLoadingTexture(const char* name)
+      {
+        RecursiveMutexScopedLock lock(loadingTexturesLock);
+        loadingTextures.Delete(name);
+      }
+
+      // Loading material objects.
+      csArray<const char*> loadingMaterials;
+      RecursiveMutex loadingMaterialsLock;
+
+      bool AddLoadingMaterial(const char* name)
+      {
+        RecursiveMutexScopedLock lock(loadingMaterialsLock);
+        if(!FindLoadingMaterial(name))
+        {
+          loadingMaterials.Push(name);
+          return true;
+        }
+        return false;
+      }
+
+      bool FindLoadingMaterial(const char* name)
+      {
+        RecursiveMutexScopedLock lock(loadingMaterialsLock);
+        return loadingMaterials.Find(name) != csArrayItemNotFound;
+      }
+
+      void RemoveLoadingMaterial(const char* name)
+      {
+        RecursiveMutexScopedLock lock(loadingMaterialsLock);
+        loadingMaterials.Delete(name);
+      }
+
+      // Loading meshfact objects.
+      csArray<const char*> loadingMeshFacts;
+      RecursiveMutex loadingMeshFactsLock;
+
+      bool AddLoadingMeshFact(const char* name)
+      {
+        RecursiveMutexScopedLock lock(loadingMeshFactsLock);
+        if(!FindLoadingMeshFact(name))
+        {
+          return true;
+          loadingMeshFacts.Push(name);
+        }
+        return false;
+      }
+
+      bool FindLoadingMeshFact(const char* name)
+      {
+        RecursiveMutexScopedLock lock(loadingMeshFactsLock);
+        return loadingMeshFacts.Find(name) != csArrayItemNotFound;
+      }
+
+      void RemoveLoadingMeshFact(const char* name)
+      {
+        RecursiveMutexScopedLock lock(loadingMeshFactsLock);
+        loadingMeshFacts.Delete(name);
+      }
+
+      // List of meshfacts that we know failed to load.
+      // This is used by the meshobj loader plugin to determine
+      // if it should continue waiting or just fail.
+      csArray<const char*> failedMeshFacts;
 
   private:
 
@@ -349,9 +450,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       bool LoadProxyTextures(csSafeCopyArray<ProxyTexture> &proxyTextures,
         csWeakRefArray<iMaterialWrapper> &materialArray);
 
-      csRef<iThreadReturn> LoadMeshFactory(csRef<iLoaderContext> ldr_context,
-        csRef<iDocumentNode> meshfactnode, csRef<iMeshFactoryWrapper> parent,
-        csReversibleTransform* transf, csRef<iStreamSource> ssource);
+      bool FindOrLoadMeshFactory(iLoaderContext* ldr_context,
+        iDocumentNode* meshfactnode, iMeshFactoryWrapper* parent,
+        csReversibleTransform* transf, iStreamSource* ssource);
 
       bool LoadMapLibraryFile (const char* filename, iCollection* collection,
         iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags = KEEP_ALL,
@@ -364,10 +465,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       * the relative transform (from MOVE keyword).
       * parent is not 0 if the factory is part of a hierarchical factory.
       */
-      THREADED_CALLABLE_DECL6(csThreadedLoader, LoadMeshObjectFactory, csLoaderReturn,
-        csRef<iLoaderContext>, ldr_context, csRef<iMeshFactoryWrapper>, meshFact,
-        csRef<iMeshFactoryWrapper>, parent, csRef<iDocumentNode>, node,
-        csReversibleTransform*, transf, csRef<iStreamSource>, ssource, true, false);
+      bool LoadMeshObjectFactory(iLoaderContext* ldr_context, iMeshFactoryWrapper* meshFact,
+        iMeshFactoryWrapper* parent, iDocumentNode* node, csReversibleTransform* transf,
+        iStreamSource* ssource);
 
       /**
       * Handle various common mesh object parameters.
@@ -479,7 +579,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         csWeakRefArray<iMaterialWrapper> &materialArray, const char* prefix = 0);
 
       /// Parse a texture definition and add the texture to the engine
-      iTextureWrapper* ParseTexture (iLoaderContext* ldr_context,
+      bool ParseTexture (iLoaderContext* ldr_context,
         iDocumentNode* node, csSafeCopyArray<ProxyTexture> &proxyTextures);
 
       /// Parse a Cubemap texture definition and add the texture to the engine
@@ -490,10 +590,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       iTextureWrapper* ParseTexture3D (iLoaderContext* ldr_context,
         iDocumentNode* node);
 
-      /// Parse a proc texture definition and add the texture to the engine
-      //iTextureWrapper* ParseProcTex (iDocumentNode* node);
       /// Parse a material definition and add the material to the engine
-      iMaterialWrapper* ParseMaterial (iLoaderContext* ldr_context,
+      bool ParseMaterial (iLoaderContext* ldr_context,
         iDocumentNode* node, csWeakRefArray<iMaterialWrapper> &materialArray,
         const char* prefix = 0);
 

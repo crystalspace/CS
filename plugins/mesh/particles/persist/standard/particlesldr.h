@@ -72,7 +72,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     //-- iLoaderPlugin
     virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource* ssource, iLoaderContext* ldr_context,
-  	iBase* context);
+  	iBase* context, csArray<const char*>* failed);
   };
 
   class ParticlesObjectLoader : public ParticlesBaseLoader
@@ -86,7 +86,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     //-- iLoaderPlugin
     virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource* ssource, iLoaderContext* ldr_context,
-  	iBase* context);
+  	iBase* context, csArray<const char*>* failedMeshFacts);
   };
 
 

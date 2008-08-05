@@ -679,7 +679,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
 
 
   csPtr<iBase> ParticlesFactoryLoader::Parse (iDocumentNode* node,
-    iStreamSource* ssource, iLoaderContext* ldr_context, iBase* context)
+    iStreamSource* ssource, iLoaderContext* ldr_context, iBase* context,
+    csArray<const char*>* failed)
   {
     csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
   	objectRegistry, "crystalspace.mesh.object.particles", false);
@@ -753,7 +754,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
   }
 
   csPtr<iBase> ParticlesObjectLoader::Parse (iDocumentNode* node,
-    iStreamSource* ssource, iLoaderContext* ldr_context, iBase* context)
+    iStreamSource* ssource, iLoaderContext* ldr_context, iBase* context,
+    csArray<const char*>* failedMeshFacts)
   {
     
     csRef<iMeshObject> meshObj;
@@ -771,13 +773,37 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
       case XMLTOKEN_FACTORY:
         {
           const char* factname = child->GetContentsValue ();
-	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+          iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
 
-          if (!fact)
+          if(failedMeshFacts)
+          {
+            // Check for failed meshfact load.
+            int i = 0;
+            while(!fact)
+            {
+              if(failedMeshFacts->GetSize() != 0 &&
+                !strcmp(failedMeshFacts->Get(i), factname))
+              {
+                synldr->ReportError ("crystalspace.particleloader.parsesystem",
+                  child, "Could not find factory '%s'!", factname);
+                return 0;
+              }
+
+              if(i >= (int)(failedMeshFacts->GetSize()-1))
+              {
+                fact = ldr_context->FindMeshFactory (factname);
+                i = 0;
+              }
+              else
+              {
+                i++;
+              }
+            }
+          }
+          else if(!fact)
           {
             synldr->ReportError ("crystalspace.particleloader.parsesystem",
               child, "Could not find factory '%s'!", factname);
-
             return 0;
           }
 
