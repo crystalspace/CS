@@ -1,4 +1,3 @@
-<?xml ?>
 <world>
     <plugins>
         <plugin name="null">crystalspace.mesh.loader.null</plugin>
@@ -7,487 +6,113 @@
         <plugin name="particles">crystalspace.mesh.loader.particles</plugin>
         <plugin name="particlesfact">crystalspace.mesh.loader.factory.particles</plugin>
     </plugins>
-    <shaders>
-        <shader>
-            <file>/shader/parallaxAtt/parallaxAtt.xml</file>
-        </shader>
-        <shader>
-            <file>/shader/ambient.xml</file>
-        </shader>
-        <shader>
-            <file>/shader/std_lighting.xml</file>
-        </shader>
-    </shaders>
-    <textures>
-        <texture name="castle-detail1_d.jpg">
-            <file>/lib/std/castle/castle-detail1_d.jpg</file>
-        </texture>
-        <texture name="BUMPcastle-detail1_h.jpg">
-            <file>/lib/std/castle/castle-detail1_h.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="BUMPcastle-detail1_n.jpg">
-            <file>/lib/std/castle/castle-detail1_n.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="wall-stone_2_d.jpg">
-            <file>/lib/std/castle/wall-stone_2_d.jpg</file>
-        </texture>
-        <texture name="wall-stone2_2_d.jpg">
-            <file>/lib/std/castle/wall-stone2_2_d.jpg</file>
-        </texture>
-        <texture name="BUMPcobblestone_h.jpg">
-            <file>/lib/std/castle/cobblestone_h.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="BUMPcobblestone_n.jpg">
-            <file>/lib/std/castle/cobblestone_n.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="BUMPwall-stone2_h.jpg">
-            <file>/lib/std/castle/wall-stone2_h.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="BUMPwall-stone2_n.jpg">
-            <file>/lib/std/castle/wall-stone2_n.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="fire1.png">
-            <file>/lib/std/castle/fire1.png</file>
-        </texture>
-        <texture name="wood_barrel2_d.jpg">
-            <file>/lib/std/castle/wood_barrel2_d.jpg</file>
-        </texture>
-        <texture name="BUMPwood_barrel_h.jpg">
-            <file>/lib/std/castle/wood_barrel_h.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="BUMPwood_barrel_n.png">
-            <file>/lib/std/castle/wood_barrel_n.png</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="wood_d.jpg">
-            <file>/lib/std/castle/wood_d.jpg</file>
-        </texture>
-        <texture name="BUMPwood2_h.jpg">
-            <file>/lib/std/castle/wood2_h.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="BUMPwood2_n.jpg">
-            <file>/lib/std/castle/wood2_n.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="castle-metal_d.jpg">
-            <file>/lib/std/castle/castle-metal_d.jpg</file>
-        </texture>
-        <texture name="BUMPmetal_pipes1_h.jpg">
-            <file>/lib/std/castle/metal_pipes1_h.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="BUMPmetal_pipes1_n.png">
-            <file>/lib/std/castle/metal_pipes1_n.png</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="castle-detail3_d.jpg">
-            <file>/lib/std/castle/castle-detail3_d.jpg</file>
-        </texture>
-        <texture name="BUMPcastle-detail3_h.jpg">
-            <file>/lib/std/castle/castle-detail3_h.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="BUMPcastle-detail3_n.jpg">
-            <file>/lib/std/castle/castle-detail3_n.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="wood.jpg">
-            <file>/lib/std/castle/wood.jpg</file>
-        </texture>
-        <texture name="BUMPwood_h.jpg">
-            <file>/lib/std/castle/wood_h.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="BUMPwood_n.jpg">
-            <file>/lib/std/castle/wood_n.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="concrete_floor4_3.jpg">
-            <file>/lib/std/castle/concrete_floor4_3.jpg</file>
-        </texture>
-        <texture name="BUMPconcrete_floor4_3_h.jpg">
-            <file>/lib/std/castle/concrete_floor4_3_h.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="BUMPconcrete_floor4_3_n.jpg">
-            <file>/lib/std/castle/concrete_floor4_3_n.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="castle-detail2_d.jpg">
-            <file>/lib/std/castle/castle-detail2_d.jpg</file>
-        </texture>
-        <texture name="BUMPcastle-detail2_h.jpg">
-            <file>/lib/std/castle/castle-detail2_h.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="BUMPcastle-detail2_n.jpg">
-            <file>/lib/std/castle/castle-detail2_n.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="brick1_d.jpg">
-            <file>/lib/std/castle/brick1_d.jpg</file>
-        </texture>
-        <texture name="BUMPbrick1_h.png">
-            <file>/lib/std/castle/brick1_h.png</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="BUMPbrick1_n.jpg">
-            <file>/lib/std/castle/brick1_n.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="wood_barrel_d.jpg">
-            <file>/lib/std/castle/wood_barrel_d.jpg</file>
-        </texture>
-        <texture name="concrete_floor6_d.jpg">
-            <file>/lib/std/castle/concrete_floor6_d.jpg</file>
-        </texture>
-        <texture name="BUMPconcrete_floor6_h.jpg">
-            <file>/lib/std/castle/concrete_floor6_h.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="BUMPconcrete_floor6_n.jpg">
-            <file>/lib/std/castle/concrete_floor6_n.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="powder.jpg">
-            <file>/lib/std/castle/powder.jpg</file>
-        </texture>
-        <texture name="BUMPpowder_h.jpg">
-            <file>/lib/std/castle/powder_h.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="BUMPpowder_n.jpg">
-            <file>/lib/std/castle/powder_n.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="castle-brick3_d.jpg">
-            <file>/lib/std/castle/castle-brick3_d.jpg</file>
-        </texture>
-        <texture name="castle-window_d.jpg">
-            <file>/lib/std/castle/castle-window_d.jpg</file>
-        </texture>
-        <texture name="BUMPcastle-brick1_h.jpg">
-            <file>/lib/std/castle/castle-brick1_h.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="BUMPcastle-brick1_n.jpg">
-            <file>/lib/std/castle/castle-brick1_n.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="BUMPcastle-window-h.jpg">
-            <file>/lib/std/castle/castle-window-h.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="BUMPcastle-window-n.png">
-            <file>/lib/std/castle/castle-window-n.png</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="castle_ray.png">
-            <file>/lib/std/castle/castle_ray.png</file>
-        </texture>
-        <texture name="credits.jpg">
-            <file>/lib/std/castle/credits.jpg</file>
-        </texture>
-        <texture name="BUMPcredits_h.jpg">
-            <file>/lib/std/castle/credits_h.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="BUMPcredits_n.jpg">
-            <file>/lib/std/castle/credits_n.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="crystal.png">
-            <file>/lib/std/castle/crystal.png</file>
-        </texture>
-        <texture name="BUMPcrystal_h.jpg">
-            <file>/lib/std/castle/crystal_h.jpg</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="BUMPcrystal_n.png">
-            <file>/lib/std/castle/crystal_n.png</file>
-            <class>normalmap</class>
-        </texture>
-        <texture name="CS-flag.png">
-            <file>/lib/std/castle/CS-flag.png</file>
-        </texture>
-        <texture name="star.png">
-            <file>/lib/std/castle/star.png</file>
-        </texture>
-        <texture name="marble_blue.jpg">
-            <file>/lib/std/castle/marble_blue.jpg</file>
-        </texture>
-        <texture name="lightmap_interior_Cube.012_0">
-            <file>lightmaps/lightmap_interior_Cube.012_0.png</file>
-            <class>lightmap</class>
-        </texture>
-    </textures>
-    <materials>
-        <material name="parallaxAtt_detail1-parallaxcastle-detail1_d.jpg">
-            <texture>castle-detail1_d.jpg</texture>
-            <shader type="diffuse">parallaxAtt</shader>
-            <shader type="ambient">ambient</shader>
-            <shadervar type="texture" name="tex normal">BUMPcastle-detail1_n.jpg</shadervar>
-            <shadervar type="texture" name="tex height">BUMPcastle-detail1_h.jpg</shadervar>
-            <shadervar type="vector4" name="specular">1,1,1,1</shadervar>
-        </material>
-        <material name="parallaxAtt_wall-stone-parallaxwall-stone_2_d.jpg">
-            <texture>wall-stone_2_d.jpg</texture>
-            <shader type="diffuse">parallaxAtt</shader>
-            <shader type="ambient">ambient</shader>
-            <shadervar type="texture" name="tex normal">BUMPcobblestone_n.jpg</shadervar>
-            <shadervar type="texture" name="tex height">BUMPcobblestone_h.jpg</shadervar>
-            <shadervar type="vector4" name="specular">0.1,0.1,0.1,0.1</shadervar>
-        </material>
-        <material name="parallaxAtt_wall-stone2-parallawall-stone2_2_d.jpg">
-            <texture>wall-stone2_2_d.jpg</texture>
-            <shader type="diffuse">parallaxAtt</shader>
-            <shader type="ambient">ambient</shader>
-            <shadervar type="texture" name="tex normal">BUMPwall-stone2_n.jpg</shadervar>
-            <shadervar type="texture" name="tex height">BUMPwall-stone2_h.jpg</shadervar>
-            <shadervar type="vector4" name="specular">0.1,0.1,0.1,0.1</shadervar>
-        </material>
-        <material name="std_lighting_explo_firefire1.png">
-            <texture>fire1.png</texture>
-            <shader type="diffuse">std_lighting</shader>
-            <shader type="ambient">*null</shader>
-        </material>
-        <material name="parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg">
-            <texture>wood_barrel2_d.jpg</texture>
-            <shader type="diffuse">parallaxAtt</shader>
-            <shader type="ambient">ambient</shader>
-            <shadervar type="texture" name="tex normal">BUMPwood_barrel_n.png</shadervar>
-            <shadervar type="texture" name="tex height">BUMPwood_barrel_h.jpg</shadervar>
-            <shadervar type="vector4" name="specular">0.3,0.3,0.3,0.3</shadervar>
-        </material>
-        <material name="parallaxAtt_wood2-parallaxwood_d.jpg">
-            <texture>wood_d.jpg</texture>
-            <shader type="diffuse">parallaxAtt</shader>
-            <shader type="ambient">ambient</shader>
-            <shadervar type="texture" name="tex normal">BUMPwood2_n.jpg</shadervar>
-            <shadervar type="texture" name="tex height">BUMPwood2_h.jpg</shadervar>
-            <shadervar type="vector4" name="specular">0.1,0.1,0.1,0.1</shadervar>
-        </material>
-        <material name="parallaxAtt_plain_metal-parallacastle-metal_d.jpg">
-            <texture>castle-metal_d.jpg</texture>
-            <shader type="diffuse">parallaxAtt</shader>
-            <shader type="ambient">ambient</shader>
-            <shadervar type="texture" name="tex normal">BUMPmetal_pipes1_n.png</shadervar>
-            <shadervar type="texture" name="tex height">BUMPmetal_pipes1_h.jpg</shadervar>
-            <shadervar type="vector4" name="specular">1,1,1,1</shadervar>
-        </material>
-        <material name="parallaxAtt_detail3-parallaxcastle-detail3_d.jpg">
-            <texture>castle-detail3_d.jpg</texture>
-            <shader type="diffuse">parallaxAtt</shader>
-            <shader type="ambient">ambient</shader>
-            <shadervar type="texture" name="tex normal">BUMPcastle-detail3_n.jpg</shadervar>
-            <shadervar type="texture" name="tex height">BUMPcastle-detail3_h.jpg</shadervar>
-            <shadervar type="vector4" name="specular">0.2,0.2,0.2,0.2</shadervar>
-        </material>
-        <material name="parallaxAtt_wood_parallaxwood.png">
-            <texture>wood.jpg</texture>
-            <shader type="diffuse">parallaxAtt</shader>
-            <shader type="ambient">ambient</shader>
-            <shadervar type="texture" name="tex normal">BUMPwood_n.jpg</shadervar>
-            <shadervar type="texture" name="tex height">BUMPwood_h.jpg</shadervar>
-            <shadervar type="vector4" name="specular">0.1,0.1,0.1,0.2</shadervar>
-        </material>
-        <material name="parallaxAtt_concrete4_3-parallaconcrete_floor4_3.png">
-            <texture>concrete_floor4_3.jpg</texture>
-            <shader type="diffuse">parallaxAtt</shader>
-            <shader type="ambient">ambient</shader>
-            <shadervar type="texture" name="tex normal">BUMPconcrete_floor4_3_n.jpg</shadervar>
-            <shadervar type="texture" name="tex height">BUMPconcrete_floor4_3_h.jpg</shadervar>
-            <shadervar type="vector4" name="specular">0.1,0.1,0.1,0.1</shadervar>
-        </material>
-        <material name="parallaxAtt_detail2-parallaxcastle-detail2_d.jpg">
-            <texture>castle-detail2_d.jpg</texture>
-            <shader type="diffuse">parallaxAtt</shader>
-            <shader type="ambient">ambient</shader>
-            <shadervar type="texture" name="tex normal">BUMPcastle-detail2_n.jpg</shadervar>
-            <shadervar type="texture" name="tex height">BUMPcastle-detail2_h.jpg</shadervar>
-        </material>
-        <material name="parallaxAtt_brick1-parallaxbrick1_d.jpg">
-            <texture>brick1_d.jpg</texture>
-            <shader type="diffuse">parallaxAtt</shader>
-            <shader type="ambient">ambient</shader>
-            <shadervar type="texture" name="tex normal">BUMPbrick1_n.jpg</shadervar>
-            <shadervar type="texture" name="tex height">BUMPbrick1_h.png</shadervar>
-            <shadervar type="vector4" name="specular">0.13,0.15,0.17,0.1</shadervar>
-        </material>
-        <material name="parallaxAtt_barrel-parallaxwood_barrel_d.jpg">
-            <texture>wood_barrel_d.jpg</texture>
-            <shader type="diffuse">parallaxAtt</shader>
-            <shader type="ambient">ambient</shader>
-            <shadervar type="texture" name="tex normal">BUMPwood_barrel_n.png</shadervar>
-            <shadervar type="texture" name="tex height">BUMPwood_barrel_h.jpg</shadervar>
-            <shadervar type="vector4" name="specular">0.5,0.5,0.5,0.5</shadervar>
-        </material>
-        <material name="parallaxAtt_concrete6-parallaxconcrete_floor6_d.jpg">
-            <texture>concrete_floor6_d.jpg</texture>
-            <shader type="diffuse">parallaxAtt</shader>
-            <shader type="ambient">ambient</shader>
-            <shadervar type="texture" name="tex normal">BUMPconcrete_floor6_n.jpg</shadervar>
-            <shadervar type="texture" name="tex height">BUMPconcrete_floor6_h.jpg</shadervar>
-            <shadervar type="vector4" name="specular">0.1,0.1,0.1,0.1</shadervar>
-        </material>
-        <material name="parallaxAtt_powder-parallaxpowder.png">
-            <texture>powder.jpg</texture>
-            <shader type="diffuse">parallaxAtt</shader>
-            <shader type="ambient">ambient</shader>
-            <shadervar type="texture" name="tex normal">BUMPpowder_n.jpg</shadervar>
-            <shadervar type="texture" name="tex height">BUMPpowder_h.jpg</shadervar>
-        </material>
-        <material name="parallaxAtt_brick3-parallaxcastle-brick3_d.jpg">
-            <texture>castle-brick3_d.jpg</texture>
-            <shader type="diffuse">parallaxAtt</shader>
-            <shader type="ambient">ambient</shader>
-            <shadervar type="texture" name="tex normal">BUMPcastle-brick1_n.jpg</shadervar>
-            <shadervar type="texture" name="tex height">BUMPcastle-brick1_h.jpg</shadervar>
-            <shadervar type="vector4" name="specular">0.3,0.3,0.3,0.3</shadervar>
-        </material>
-        <material name="parallaxAtt_window-parallaxcastle-window_d.jpg">
-            <texture>castle-window_d.jpg</texture>
-            <shader type="diffuse">parallaxAtt</shader>
-            <shader type="ambient">ambient</shader>
-            <shadervar type="texture" name="tex normal">BUMPcastle-window-n.png</shadervar>
-            <shadervar type="texture" name="tex height">BUMPcastle-window-h.jpg</shadervar>
-            <shadervar type="vector4" name="specular">1,1,1,1</shadervar>
-        </material>
-        <material name="std_lighting_rayscastle_ray.png">
-            <texture>castle_ray.png</texture>
-            <shader type="diffuse">std_lighting</shader>
-            <shader type="ambient">*null</shader>
-        </material>
-        <material name="parallaxAtt_creditscredits.jpg">
-            <texture>credits.jpg</texture>
-            <shader type="diffuse">parallaxAtt</shader>
-            <shader type="ambient">ambient</shader>
-            <shadervar type="texture" name="tex normal">BUMPcredits_n.jpg</shadervar>
-            <shadervar type="texture" name="tex height">BUMPcredits_h.jpg</shadervar>
-            <shadervar type="vector4" name="specular">1,1,1,1</shadervar>
-        </material>
-        <material name="parallaxAtt_crystalcrystal.png">
-            <texture>crystal.png</texture>
-            <shader type="diffuse">parallaxAtt</shader>
-            <shader type="ambient">ambient</shader>
-            <shadervar type="texture" name="tex normal">BUMPcrystal_n.png</shadervar>
-            <shadervar type="texture" name="tex height">BUMPcrystal_h.jpg</shadervar>
-            <shadervar type="vector4" name="specular">1,1,1,1</shadervar>
-        </material>
-        <material name="std_lighting_flagCS-flag.png">
-            <texture>CS-flag.png</texture>
-            <shader type="diffuse">std_lighting</shader>
-            <shader type="ambient">*null</shader>
-        </material>
-        <material name="std_lighting_starstar.png">
-            <texture>star.png</texture>
-            <shader type="standard">std_lighting</shader>
-            <shader type="ambient">*null</shader>
-        </material>
-        <material name="parallaxAtt_marble-parallaxmarble_blue.jpg">
-            <texture>marble_blue.jpg</texture>
-            <shader type="diffuse">parallaxAtt</shader>
-            <shader type="ambient">ambient</shader>
-            <shadervar type="texture" name="tex normal">BUMPcrystal_n.png</shadervar>
-            <shadervar type="texture" name="tex height">BUMPcrystal_h.jpg</shadervar>
-            <shadervar type="vector4" name="specular">1,1,1,1</shadervar>
-        </material>
-    </materials>
+    <library>factories/genCube.meshfact</library>
+    <library>factories/genMesh.002.meshfact</library>
+    <library>factories/parttorch.041.meshfact</library>
+    <library>factories/parttorch.030.meshfact</library>
+    <library>factories/genCylinder.003.meshfact</library>
+    <library>factories/genCube.007.meshfact</library>
+    <library>factories/genCylinder.026.meshfact</library>
+    <library>factories/genCube.491.meshfact</library>
+    <library>factories/genCube.493.meshfact</library>
+    <library>factories/genCube.496.meshfact</library>
+    <library>factories/genbment2_tables.001.meshfact</library>
+    <library>factories/genMesh.001.meshfact</library>
+    <library>factories/genMesh.meshfact</library>
+    <library>factories/parttorch.008.meshfact</library>
+    <library>factories/parttorch.003.meshfact</library>
+    <library>factories/genCube.009.meshfact</library>
+    <library>factories/genCylinder.014.meshfact</library>
+    <library>factories/genbase-floor00.meshfact</library>
+    <library>factories/genbase-stair-wall.meshfact</library>
+    <library>factories/genbase-stairs.001.meshfact</library>
+    <library>factories/parttorch.042.meshfact</library>
+    <library>factories/parttorch.016.meshfact</library>
+    <library>factories/genCylinder.002.meshfact</library>
+    <library>factories/genCylinder.018.meshfact</library>
+    <library>factories/genbasement-walls.014.meshfact</library>
+    <library>factories/genbasement-walls.007.meshfact</library>
+    <library>factories/genCube.219.meshfact</library>
+    <library>factories/genbasement-walls.004.meshfact</library>
+    <library>factories/parttorch.043.meshfact</library>
+    <library>factories/parttorch.024.meshfact</library>
+    <library>factories/genSphere.001.meshfact</library>
+    <library>factories/genSphere.meshfact</library>
+    <library>factories/genbment2_tables.002.meshfact</library>
+    <library>factories/genbment2_tables.003.meshfact</library>
+    <library>factories/genbment2_tables.004.meshfact</library>
+    <library>factories/genCylinder.022.meshfact</library>
+    <library>factories/genbment2-candleholders.meshfact</library>
+    <library>factories/genCube.016.meshfact</library>
+    <library>factories/genSphere.006.meshfact</library>
+    <library>factories/genbment2_tables.meshfact</library>
+    <library>factories/genbment2-floor.meshfact</library>
+    <library>factories/genbment2-walls.meshfact</library>
+    <library>factories/parttorch.meshfact</library>
+    <library>factories/parttorch.033.meshfact</library>
+    <library>factories/genCube.505.meshfact</library>
+    <library>factories/genCube.013.meshfact</library>
+    <library>factories/genCube.004.meshfact</library>
+    <library>factories/genCylinder.233.meshfact</library>
+    <library>factories/genCylinder.211.meshfact</library>
+    <library>factories/genCube.356.meshfact</library>
+    <library>factories/genCube.358.meshfact</library>
+    <library>factories/genCylinder.219.meshfact</library>
+    <library>factories/genCylinder.220.meshfact</library>
+    <library>factories/genCube.010.meshfact</library>
+    <library>factories/genCylinder.224.meshfact</library>
+    <library>factories/genbasement-walls.008.meshfact</library>
+    <library>factories/genbasement-walls.013.meshfact</library>
+    <library>factories/genGRAB IT.meshfact</library>
+    <library>factories/parttorch.032.meshfact</library>
+    <library>factories/genCylinder.235.meshfact</library>
+    <library>factories/genbasement-walls.019.meshfact</library>
+    <library>factories/genbasement-walls.020.meshfact</library>
+    <library>factories/genbasement-walls.021.meshfact</library>
+    <library>factories/parttorch.004.meshfact</library>
+    <library>factories/parttorch.039.meshfact</library>
+    <library>factories/genCube.006.meshfact</library>
+    <library>factories/genCube.003.meshfact</library>
+    <library>factories/genCube.002.meshfact</library>
+    <library>factories/genCube.005.meshfact</library>
+    <library>factories/genCube.508.meshfact</library>
+    <library>factories/genCube.520.meshfact</library>
+    <library>factories/genCylinder.027.meshfact</library>
+    <library>factories/genbment_arras-pole.003.meshfact</library>
+    <library>factories/genCube.027.meshfact</library>
+    <library>factories/genPlane.003.meshfact</library>
+    <library>factories/genCube.517.meshfact</library>
+    <library>factories/genCube.518.meshfact</library>
+    <library>factories/parttorch.040.meshfact</library>
+    <library>factories/parttorch.001.meshfact</library>
+    <library>factories/genCube.012.meshfact</library>
+    <library>factories/thingCube.549.meshfact</library>
+    <library>factories/genCube.550.meshfact</library>
+    <library>factories/genLine01.002.meshfact</library>
+    <library>factories/genCube.551.meshfact</library>
+    <library>factories/genCube.552.meshfact</library>
+    <library>factories/genCube.553.meshfact</library>
+    <library>factories/genCylinder.004.meshfact</library>
+    <library>factories/genCube.554.meshfact</library>
+    <library>factories/genbasement-walls.003.meshfact</library>
+    <library>factories/genCube.556.meshfact</library>
+    <library>factories/genCylinder.010.meshfact</library>
+    <library>factories/partCube.001.meshfact</library>
+    <library>factories/partCube.011.meshfact</library>
+    <library>factories/parttorch.006.meshfact</library>
+    <library>factories/parttorch.005.meshfact</library>
+    <library>factories/parttorch.034.meshfact</library>
+    <library>factories/genCylinder.006.meshfact</library>
+    <library>factories/gencastle_front_wall.003.meshfact</library>
+    <library>factories/genCylinder.001.meshfact</library>
+    <library>factories/genCube.542.meshfact</library>
+    <library>factories/genCube.546.meshfact</library>
+    <library>factories/genCylinder.009.meshfact</library>
     <sounds />
     <settings>
         <clearscreen>no</clearscreen>
         <clearzbuf>yes</clearzbuf>
     </settings>
-    <library>factories/genCube</library>
-    <library>factories/genMesh.002</library>
-    <library>factories/genCylinder.003</library>
-    <library>factories/genCube.007</library>
-    <library>factories/genCylinder.026</library>
-    <library>factories/genCube.491</library>
-    <library>factories/genCube.493</library>
-    <library>factories/genCube.496</library>
-    <library>factories/genbment2_tables.001</library>
-    <library>factories/genMesh.001</library>
-    <library>factories/genMesh</library>
-    <library>factories/genCube.009</library>
-    <library>factories/genCylinder.014</library>
-    <library>factories/genbase-floor00</library>
-    <library>factories/genbase-stair-wall</library>
-    <library>factories/genbase-stairs.001</library>
-    <library>factories/genCylinder.002</library>
-    <library>factories/genCylinder.018</library>
-    <library>factories/genbasement-walls.014</library>
-    <library>factories/genbasement-walls.007</library>
-    <library>factories/genCube.219</library>
-    <library>factories/genbasement-walls.004</library>
-    <library>factories/genSphere.001</library>
-    <library>factories/genSphere</library>
-    <library>factories/genbment2_tables.002</library>
-    <library>factories/genbment2_tables.003</library>
-    <library>factories/genbment2_tables.004</library>
-    <library>factories/genCylinder.022</library>
-    <library>factories/genbment2-candleholders</library>
-    <library>factories/genCube.016</library>
-    <library>factories/genSphere.006</library>
-    <library>factories/genbment2_tables</library>
-    <library>factories/genbment2-floor</library>
-    <library>factories/genbment2-walls</library>
-    <library>factories/genCube.505</library>
-    <library>factories/genCube.013</library>
-    <library>factories/genCube.004</library>
-    <library>factories/genCylinder.233</library>
-    <library>factories/genCylinder.211</library>
-    <library>factories/genCube.356</library>
-    <library>factories/genCube.358</library>
-    <library>factories/genCylinder.219</library>
-    <library>factories/genCylinder.220</library>
-    <library>factories/genCube.010</library>
-    <library>factories/genCylinder.224</library>
-    <library>factories/genbasement-walls.008</library>
-    <library>factories/genbasement-walls.013</library>
-    <library>factories/genGRAB IT</library>
-    <library>factories/genCylinder.235</library>
-    <library>factories/genbasement-walls.019</library>
-    <library>factories/genbasement-walls.020</library>
-    <library>factories/genbasement-walls.021</library>
-    <library>factories/genCube.006</library>
-    <library>factories/genCube.003</library>
-    <library>factories/genCube.002</library>
-    <library>factories/genCube.005</library>
-    <library>factories/genCube.508</library>
-    <library>factories/genCube.520</library>
-    <library>factories/genCylinder.027</library>
-    <library>factories/genbment_arras-pole.003</library>
-    <library>factories/genCube.027</library>
-    <library>factories/genPlane.003</library>
-    <library>factories/genCube.517</library>
-    <library>factories/genCube.518</library>
-    <library>factories/genCube.012</library>
-    <library>factories/thingCube.549</library>
-    <library>factories/genCube.550</library>
-    <library>factories/genLine01.002</library>
-    <library>factories/genCube.551</library>
-    <library>factories/genCube.552</library>
-    <library>factories/genCube.553</library>
-    <library>factories/genCylinder.004</library>
-    <library>factories/genCube.554</library>
-    <library>factories/genbasement-walls.003</library>
-    <library>factories/genCube.556</library>
-    <library>factories/genCylinder.010</library>
-    <library>factories/genCylinder.006</library>
-    <library>factories/gencastle_front_wall.003</library>
-    <library>factories/genCylinder.001</library>
-    <library>factories/genCube.542</library>
-    <library>factories/genCube.546</library>
-    <library>factories/genCylinder.009</library>
     <triggers>
         <trigger name="LaIpoLamp.014_t">
             <sectorvis sector="basement-dungeon" />
@@ -566,92 +191,6 @@
             <fire sequence="LaIpoLamp.028" />
         </trigger>
     </triggers>
-    <addon>
-        <plugin>crystalspace.renderloop.loop.loader</plugin>
-        <paramsfile>/shader/std_rloop_diffuse.xml</paramsfile>
-    </addon>
-    <meshfact name="parttorch.041">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <priority>transp</priority>
-        <ztest />
-        <params>
-            <material>std_lighting_explo_firefire1.png</material>
-            <renderorientation>camface approx</renderorientation>
-            <rotationmode>none</rotationmode>
-            <sortmode>none</sortmode>
-            <integrationmode>linear</integrationmode>
-            <particlesize y="0.159999996424" x="0.159999996424" />
-            <transformmode>local</transformmode>
-            <emitter type="sphere">
-                <enabled>yes</enabled>
-                <uniformvelocity>yes</uniformvelocity>
-                <emissionrate>8</emissionrate>
-                <radius>0.0706334</radius>
-                <position y="0" x="0" z="0" />
-                <initialvelocity y="0" x="0" z="0" />
-                <mass max="1.0" min="1.0" />
-                <initialttl max="2" min="1.5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="force">
-                <acceleration y="0.3" x="0" z="0" />
-                <force y="0.1" x="0" z="0" />
-                <randomacceleration>1.0</randomacceleration>
-            </effector>
-            <effector type="lincolor">
-                <color blue="0.16" green="0.5" red="0.9" time="1" />
-                <color blue="0.16" green="0.5" red="0.9" time="0.9" />
-                <color blue="0.144" green="0.45" red="0.81" time="0.8" />
-                <color blue="0.128" green="0.4" red="0.72" time="0.6" />
-                <color blue="0.096" green="0.3" red="0.54" time="0.5" />
-                <color blue="0.064" green="0.2" red="0.36" time="0.4" />
-                <color blue="0.032" green="0.1" red="0.18" time="0.3" />
-                <color blue="0.0" green="0.0" red="0.0" time="0.1" />
-                <color blue="0.0" green="0.0" red="0.0" time="0" />
-            </effector>
-        </params>
-    </meshfact>
-    <meshfact name="parttorch.030">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <priority>transp</priority>
-        <ztest />
-        <params>
-            <material>std_lighting_explo_firefire1.png</material>
-            <renderorientation>camface approx</renderorientation>
-            <rotationmode>none</rotationmode>
-            <sortmode>none</sortmode>
-            <integrationmode>linear</integrationmode>
-            <particlesize y="0.159999996424" x="0.159999996424" />
-            <transformmode>local</transformmode>
-            <emitter type="sphere">
-                <enabled>yes</enabled>
-                <uniformvelocity>yes</uniformvelocity>
-                <emissionrate>8</emissionrate>
-                <radius>0.0706334</radius>
-                <position y="0" x="0" z="0" />
-                <initialvelocity y="0" x="0" z="0" />
-                <mass max="1.0" min="1.0" />
-                <initialttl max="2" min="1.5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="force">
-                <acceleration y="0.3" x="0" z="0" />
-                <force y="0.1" x="0" z="0" />
-                <randomacceleration>1.0</randomacceleration>
-            </effector>
-            <effector type="lincolor">
-                <color blue="0.16" green="0.5" red="0.9" time="1" />
-                <color blue="0.16" green="0.5" red="0.9" time="0.9" />
-                <color blue="0.144" green="0.45" red="0.81" time="0.8" />
-                <color blue="0.128" green="0.4" red="0.72" time="0.6" />
-                <color blue="0.096" green="0.3" red="0.54" time="0.5" />
-                <color blue="0.064" green="0.2" red="0.36" time="0.4" />
-                <color blue="0.032" green="0.1" red="0.18" time="0.3" />
-                <color blue="0.0" green="0.0" red="0.0" time="0.1" />
-                <color blue="0.0" green="0.0" red="0.0" time="0" />
-            </effector>
-        </params>
-    </meshfact>
     <sector name="basement-dungeon">
         <portals name="Plane.001">
             <portal>
@@ -676,7 +215,6 @@
                 </matrix>
             </hardmove>
         </portals>
-        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="Cube.582">
@@ -950,88 +488,6 @@
             </move>
         </meshobj>
     </sector>
-    <meshfact name="parttorch.008">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <priority>transp</priority>
-        <ztest />
-        <params>
-            <material>std_lighting_explo_firefire1.png</material>
-            <renderorientation>camface approx</renderorientation>
-            <rotationmode>none</rotationmode>
-            <sortmode>none</sortmode>
-            <integrationmode>linear</integrationmode>
-            <particlesize y="0.159999996424" x="0.159999996424" />
-            <transformmode>local</transformmode>
-            <emitter type="sphere">
-                <enabled>yes</enabled>
-                <uniformvelocity>yes</uniformvelocity>
-                <emissionrate>8</emissionrate>
-                <radius>0.0706334</radius>
-                <position y="0" x="0" z="0" />
-                <initialvelocity y="0" x="0" z="0" />
-                <mass max="1.0" min="1.0" />
-                <initialttl max="2" min="1.5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="force">
-                <acceleration y="0.3" x="0" z="0" />
-                <force y="0.1" x="0" z="0" />
-                <randomacceleration>1.0</randomacceleration>
-            </effector>
-            <effector type="lincolor">
-                <color blue="0.16" green="0.5" red="0.9" time="1" />
-                <color blue="0.16" green="0.5" red="0.9" time="0.9" />
-                <color blue="0.144" green="0.45" red="0.81" time="0.8" />
-                <color blue="0.128" green="0.4" red="0.72" time="0.6" />
-                <color blue="0.096" green="0.3" red="0.54" time="0.5" />
-                <color blue="0.064" green="0.2" red="0.36" time="0.4" />
-                <color blue="0.032" green="0.1" red="0.18" time="0.3" />
-                <color blue="0.0" green="0.0" red="0.0" time="0.1" />
-                <color blue="0.0" green="0.0" red="0.0" time="0" />
-            </effector>
-        </params>
-    </meshfact>
-    <meshfact name="parttorch.003">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <priority>transp</priority>
-        <ztest />
-        <params>
-            <material>std_lighting_explo_firefire1.png</material>
-            <renderorientation>camface approx</renderorientation>
-            <rotationmode>none</rotationmode>
-            <sortmode>none</sortmode>
-            <integrationmode>linear</integrationmode>
-            <particlesize y="0.159999996424" x="0.159999996424" />
-            <transformmode>local</transformmode>
-            <emitter type="sphere">
-                <enabled>yes</enabled>
-                <uniformvelocity>yes</uniformvelocity>
-                <emissionrate>8</emissionrate>
-                <radius>0.0706334</radius>
-                <position y="0" x="0" z="0" />
-                <initialvelocity y="0" x="0" z="0" />
-                <mass max="1.0" min="1.0" />
-                <initialttl max="2" min="1.5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="force">
-                <acceleration y="0.3" x="0" z="0" />
-                <force y="0.1" x="0" z="0" />
-                <randomacceleration>1.0</randomacceleration>
-            </effector>
-            <effector type="lincolor">
-                <color blue="0.16" green="0.5" red="0.9" time="1" />
-                <color blue="0.16" green="0.5" red="0.9" time="0.9" />
-                <color blue="0.144" green="0.45" red="0.81" time="0.8" />
-                <color blue="0.128" green="0.4" red="0.72" time="0.6" />
-                <color blue="0.096" green="0.3" red="0.54" time="0.5" />
-                <color blue="0.064" green="0.2" red="0.36" time="0.4" />
-                <color blue="0.032" green="0.1" red="0.18" time="0.3" />
-                <color blue="0.0" green="0.0" red="0.0" time="0.1" />
-                <color blue="0.0" green="0.0" red="0.0" time="0" />
-            </effector>
-        </params>
-    </meshfact>
     <sector name="basement00">
         <portals name="portal-int-bment00">
             <portal>
@@ -1067,7 +523,6 @@
                 </matrix>
             </hardmove>
         </portals>
-        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.011">
@@ -1213,88 +668,6 @@
             </move>
         </meshobj>
     </sector>
-    <meshfact name="parttorch.042">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <priority>transp</priority>
-        <ztest />
-        <params>
-            <material>std_lighting_explo_firefire1.png</material>
-            <renderorientation>camface approx</renderorientation>
-            <rotationmode>none</rotationmode>
-            <sortmode>none</sortmode>
-            <integrationmode>linear</integrationmode>
-            <particlesize y="0.159999996424" x="0.159999996424" />
-            <transformmode>local</transformmode>
-            <emitter type="sphere">
-                <enabled>yes</enabled>
-                <uniformvelocity>yes</uniformvelocity>
-                <emissionrate>8</emissionrate>
-                <radius>0.0706334</radius>
-                <position y="0" x="0" z="0" />
-                <initialvelocity y="0" x="0" z="0" />
-                <mass max="1.0" min="1.0" />
-                <initialttl max="2" min="1.5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="force">
-                <acceleration y="0.3" x="0" z="0" />
-                <force y="0.1" x="0" z="0" />
-                <randomacceleration>1.0</randomacceleration>
-            </effector>
-            <effector type="lincolor">
-                <color blue="0.16" green="0.5" red="0.9" time="1" />
-                <color blue="0.16" green="0.5" red="0.9" time="0.9" />
-                <color blue="0.144" green="0.45" red="0.81" time="0.8" />
-                <color blue="0.128" green="0.4" red="0.72" time="0.6" />
-                <color blue="0.096" green="0.3" red="0.54" time="0.5" />
-                <color blue="0.064" green="0.2" red="0.36" time="0.4" />
-                <color blue="0.032" green="0.1" red="0.18" time="0.3" />
-                <color blue="0.0" green="0.0" red="0.0" time="0.1" />
-                <color blue="0.0" green="0.0" red="0.0" time="0" />
-            </effector>
-        </params>
-    </meshfact>
-    <meshfact name="parttorch.016">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <priority>transp</priority>
-        <ztest />
-        <params>
-            <material>std_lighting_explo_firefire1.png</material>
-            <renderorientation>camface approx</renderorientation>
-            <rotationmode>none</rotationmode>
-            <sortmode>none</sortmode>
-            <integrationmode>linear</integrationmode>
-            <particlesize y="0.159999996424" x="0.159999996424" />
-            <transformmode>local</transformmode>
-            <emitter type="sphere">
-                <enabled>yes</enabled>
-                <uniformvelocity>yes</uniformvelocity>
-                <emissionrate>8</emissionrate>
-                <radius>0.0706334</radius>
-                <position y="0" x="0" z="0" />
-                <initialvelocity y="0" x="0" z="0" />
-                <mass max="1.0" min="1.0" />
-                <initialttl max="2" min="1.5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="force">
-                <acceleration y="0.3" x="0" z="0" />
-                <force y="0.1" x="0" z="0" />
-                <randomacceleration>1.0</randomacceleration>
-            </effector>
-            <effector type="lincolor">
-                <color blue="0.16" green="0.5" red="0.9" time="1" />
-                <color blue="0.16" green="0.5" red="0.9" time="0.9" />
-                <color blue="0.144" green="0.45" red="0.81" time="0.8" />
-                <color blue="0.128" green="0.4" red="0.72" time="0.6" />
-                <color blue="0.096" green="0.3" red="0.54" time="0.5" />
-                <color blue="0.064" green="0.2" red="0.36" time="0.4" />
-                <color blue="0.032" green="0.1" red="0.18" time="0.3" />
-                <color blue="0.0" green="0.0" red="0.0" time="0.1" />
-                <color blue="0.0" green="0.0" red="0.0" time="0" />
-            </effector>
-        </params>
-    </meshfact>
     <sector name="basement01">
         <portals name="Plane.006">
             <portal>
@@ -1348,7 +721,6 @@
                 </matrix>
             </hardmove>
         </portals>
-        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.013">
@@ -1564,88 +936,6 @@
             </move>
         </meshobj>
     </sector>
-    <meshfact name="parttorch.043">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <priority>transp</priority>
-        <ztest />
-        <params>
-            <material>std_lighting_explo_firefire1.png</material>
-            <renderorientation>camface approx</renderorientation>
-            <rotationmode>none</rotationmode>
-            <sortmode>none</sortmode>
-            <integrationmode>linear</integrationmode>
-            <particlesize y="0.159999996424" x="0.159999996424" />
-            <transformmode>local</transformmode>
-            <emitter type="sphere">
-                <enabled>yes</enabled>
-                <uniformvelocity>yes</uniformvelocity>
-                <emissionrate>8</emissionrate>
-                <radius>0.0706334</radius>
-                <position y="0" x="0" z="0" />
-                <initialvelocity y="0" x="0" z="0" />
-                <mass max="1.0" min="1.0" />
-                <initialttl max="2" min="1.5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="force">
-                <acceleration y="0.3" x="0" z="0" />
-                <force y="0.1" x="0" z="0" />
-                <randomacceleration>1.0</randomacceleration>
-            </effector>
-            <effector type="lincolor">
-                <color blue="0.16" green="0.5" red="0.9" time="1" />
-                <color blue="0.16" green="0.5" red="0.9" time="0.9" />
-                <color blue="0.144" green="0.45" red="0.81" time="0.8" />
-                <color blue="0.128" green="0.4" red="0.72" time="0.6" />
-                <color blue="0.096" green="0.3" red="0.54" time="0.5" />
-                <color blue="0.064" green="0.2" red="0.36" time="0.4" />
-                <color blue="0.032" green="0.1" red="0.18" time="0.3" />
-                <color blue="0.0" green="0.0" red="0.0" time="0.1" />
-                <color blue="0.0" green="0.0" red="0.0" time="0" />
-            </effector>
-        </params>
-    </meshfact>
-    <meshfact name="parttorch.024">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <priority>transp</priority>
-        <ztest />
-        <params>
-            <material>std_lighting_explo_firefire1.png</material>
-            <renderorientation>camface approx</renderorientation>
-            <rotationmode>none</rotationmode>
-            <sortmode>none</sortmode>
-            <integrationmode>linear</integrationmode>
-            <particlesize y="0.159999996424" x="0.159999996424" />
-            <transformmode>local</transformmode>
-            <emitter type="sphere">
-                <enabled>yes</enabled>
-                <uniformvelocity>yes</uniformvelocity>
-                <emissionrate>8</emissionrate>
-                <radius>0.0706334</radius>
-                <position y="0" x="0" z="0" />
-                <initialvelocity y="0" x="0" z="0" />
-                <mass max="1.0" min="1.0" />
-                <initialttl max="2" min="1.5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="force">
-                <acceleration y="0.3" x="0" z="0" />
-                <force y="0.1" x="0" z="0" />
-                <randomacceleration>1.0</randomacceleration>
-            </effector>
-            <effector type="lincolor">
-                <color blue="0.16" green="0.5" red="0.9" time="1" />
-                <color blue="0.16" green="0.5" red="0.9" time="0.9" />
-                <color blue="0.144" green="0.45" red="0.81" time="0.8" />
-                <color blue="0.128" green="0.4" red="0.72" time="0.6" />
-                <color blue="0.096" green="0.3" red="0.54" time="0.5" />
-                <color blue="0.064" green="0.2" red="0.36" time="0.4" />
-                <color blue="0.032" green="0.1" red="0.18" time="0.3" />
-                <color blue="0.0" green="0.0" red="0.0" time="0.1" />
-                <color blue="0.0" green="0.0" red="0.0" time="0" />
-            </effector>
-        </params>
-    </meshfact>
     <sector name="basement02">
         <portals name="portal-2-1">
             <portal>
@@ -1664,7 +954,6 @@
                 </matrix>
             </hardmove>
         </portals>
-        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.006">
@@ -2116,88 +1405,6 @@
             <attenuation>linear</attenuation>
         </light>
     </sector>
-    <meshfact name="parttorch">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <priority>transp</priority>
-        <ztest />
-        <params>
-            <material>std_lighting_explo_firefire1.png</material>
-            <renderorientation>camface approx</renderorientation>
-            <rotationmode>none</rotationmode>
-            <sortmode>none</sortmode>
-            <integrationmode>linear</integrationmode>
-            <particlesize y="0.159999996424" x="0.159999996424" />
-            <transformmode>local</transformmode>
-            <emitter type="sphere">
-                <enabled>yes</enabled>
-                <uniformvelocity>yes</uniformvelocity>
-                <emissionrate>8</emissionrate>
-                <radius>0.0706334</radius>
-                <position y="0" x="0" z="0" />
-                <initialvelocity y="0" x="0" z="0" />
-                <mass max="1.0" min="1.0" />
-                <initialttl max="2" min="1.5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="force">
-                <acceleration y="0.3" x="0" z="0" />
-                <force y="0.1" x="0" z="0" />
-                <randomacceleration>1.0</randomacceleration>
-            </effector>
-            <effector type="lincolor">
-                <color blue="0.16" green="0.5" red="0.9" time="1" />
-                <color blue="0.16" green="0.5" red="0.9" time="0.9" />
-                <color blue="0.144" green="0.45" red="0.81" time="0.8" />
-                <color blue="0.128" green="0.4" red="0.72" time="0.6" />
-                <color blue="0.096" green="0.3" red="0.54" time="0.5" />
-                <color blue="0.064" green="0.2" red="0.36" time="0.4" />
-                <color blue="0.032" green="0.1" red="0.18" time="0.3" />
-                <color blue="0.0" green="0.0" red="0.0" time="0.1" />
-                <color blue="0.0" green="0.0" red="0.0" time="0" />
-            </effector>
-        </params>
-    </meshfact>
-    <meshfact name="parttorch.033">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <priority>transp</priority>
-        <ztest />
-        <params>
-            <material>std_lighting_explo_firefire1.png</material>
-            <renderorientation>camface approx</renderorientation>
-            <rotationmode>none</rotationmode>
-            <sortmode>none</sortmode>
-            <integrationmode>linear</integrationmode>
-            <particlesize y="0.159999996424" x="0.159999996424" />
-            <transformmode>local</transformmode>
-            <emitter type="sphere">
-                <enabled>yes</enabled>
-                <uniformvelocity>yes</uniformvelocity>
-                <emissionrate>8</emissionrate>
-                <radius>0.0706334</radius>
-                <position y="0" x="0" z="0" />
-                <initialvelocity y="0" x="0" z="0" />
-                <mass max="1.0" min="1.0" />
-                <initialttl max="2" min="1.5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="force">
-                <acceleration y="0.3" x="0" z="0" />
-                <force y="0.1" x="0" z="0" />
-                <randomacceleration>1.0</randomacceleration>
-            </effector>
-            <effector type="lincolor">
-                <color blue="0.16" green="0.5" red="0.9" time="1" />
-                <color blue="0.16" green="0.5" red="0.9" time="0.9" />
-                <color blue="0.144" green="0.45" red="0.81" time="0.8" />
-                <color blue="0.128" green="0.4" red="0.72" time="0.6" />
-                <color blue="0.096" green="0.3" red="0.54" time="0.5" />
-                <color blue="0.064" green="0.2" red="0.36" time="0.4" />
-                <color blue="0.032" green="0.1" red="0.18" time="0.3" />
-                <color blue="0.0" green="0.0" red="0.0" time="0.1" />
-                <color blue="0.0" green="0.0" red="0.0" time="0" />
-            </effector>
-        </params>
-    </meshfact>
     <sector name="basement03">
         <portals name="basement-walls.006">
             <portal>
@@ -2251,7 +1458,6 @@
                 </matrix>
             </hardmove>
         </portals>
-        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.001">
@@ -2611,47 +1817,6 @@
             </move>
         </meshobj>
     </sector>
-    <meshfact name="parttorch.032">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <priority>transp</priority>
-        <ztest />
-        <params>
-            <material>std_lighting_explo_firefire1.png</material>
-            <renderorientation>camface approx</renderorientation>
-            <rotationmode>none</rotationmode>
-            <sortmode>none</sortmode>
-            <integrationmode>linear</integrationmode>
-            <particlesize y="0.159999996424" x="0.159999996424" />
-            <transformmode>local</transformmode>
-            <emitter type="sphere">
-                <enabled>yes</enabled>
-                <uniformvelocity>yes</uniformvelocity>
-                <emissionrate>8</emissionrate>
-                <radius>0.0706334</radius>
-                <position y="0" x="0" z="0" />
-                <initialvelocity y="0" x="0" z="0" />
-                <mass max="1.0" min="1.0" />
-                <initialttl max="2" min="1.5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="force">
-                <acceleration y="0.3" x="0" z="0" />
-                <force y="0.1" x="0" z="0" />
-                <randomacceleration>1.0</randomacceleration>
-            </effector>
-            <effector type="lincolor">
-                <color blue="0.16" green="0.5" red="0.9" time="1" />
-                <color blue="0.16" green="0.5" red="0.9" time="0.9" />
-                <color blue="0.144" green="0.45" red="0.81" time="0.8" />
-                <color blue="0.128" green="0.4" red="0.72" time="0.6" />
-                <color blue="0.096" green="0.3" red="0.54" time="0.5" />
-                <color blue="0.064" green="0.2" red="0.36" time="0.4" />
-                <color blue="0.032" green="0.1" red="0.18" time="0.3" />
-                <color blue="0.0" green="0.0" red="0.0" time="0.1" />
-                <color blue="0.0" green="0.0" red="0.0" time="0" />
-            </effector>
-        </params>
-    </meshfact>
     <sector name="basement04">
         <portals name="Plane.007">
             <portal>
@@ -2670,7 +1835,6 @@
                 </matrix>
             </hardmove>
         </portals>
-        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.010">
@@ -2741,88 +1905,6 @@
             </move>
         </meshobj>
     </sector>
-    <meshfact name="parttorch.004">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <priority>transp</priority>
-        <ztest />
-        <params>
-            <material>std_lighting_explo_firefire1.png</material>
-            <renderorientation>camface approx</renderorientation>
-            <rotationmode>none</rotationmode>
-            <sortmode>none</sortmode>
-            <integrationmode>linear</integrationmode>
-            <particlesize y="0.159999996424" x="0.159999996424" />
-            <transformmode>local</transformmode>
-            <emitter type="sphere">
-                <enabled>yes</enabled>
-                <uniformvelocity>yes</uniformvelocity>
-                <emissionrate>8</emissionrate>
-                <radius>0.0706334</radius>
-                <position y="0" x="0" z="0" />
-                <initialvelocity y="0" x="0" z="0" />
-                <mass max="1.0" min="1.0" />
-                <initialttl max="2" min="1.5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="force">
-                <acceleration y="0.3" x="0" z="0" />
-                <force y="0.1" x="0" z="0" />
-                <randomacceleration>1.0</randomacceleration>
-            </effector>
-            <effector type="lincolor">
-                <color blue="0.16" green="0.5" red="0.9" time="1" />
-                <color blue="0.16" green="0.5" red="0.9" time="0.9" />
-                <color blue="0.144" green="0.45" red="0.81" time="0.8" />
-                <color blue="0.128" green="0.4" red="0.72" time="0.6" />
-                <color blue="0.096" green="0.3" red="0.54" time="0.5" />
-                <color blue="0.064" green="0.2" red="0.36" time="0.4" />
-                <color blue="0.032" green="0.1" red="0.18" time="0.3" />
-                <color blue="0.0" green="0.0" red="0.0" time="0.1" />
-                <color blue="0.0" green="0.0" red="0.0" time="0" />
-            </effector>
-        </params>
-    </meshfact>
-    <meshfact name="parttorch.039">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <priority>transp</priority>
-        <ztest />
-        <params>
-            <material>std_lighting_explo_firefire1.png</material>
-            <renderorientation>camface approx</renderorientation>
-            <rotationmode>none</rotationmode>
-            <sortmode>none</sortmode>
-            <integrationmode>linear</integrationmode>
-            <particlesize y="0.159999996424" x="0.159999996424" />
-            <transformmode>local</transformmode>
-            <emitter type="sphere">
-                <enabled>yes</enabled>
-                <uniformvelocity>yes</uniformvelocity>
-                <emissionrate>8</emissionrate>
-                <radius>0.0706334</radius>
-                <position y="0" x="0" z="0" />
-                <initialvelocity y="0" x="0" z="0" />
-                <mass max="1.0" min="1.0" />
-                <initialttl max="2" min="1.5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="force">
-                <acceleration y="0.3" x="0" z="0" />
-                <force y="0.1" x="0" z="0" />
-                <randomacceleration>1.0</randomacceleration>
-            </effector>
-            <effector type="lincolor">
-                <color blue="0.16" green="0.5" red="0.9" time="1" />
-                <color blue="0.16" green="0.5" red="0.9" time="0.9" />
-                <color blue="0.144" green="0.45" red="0.81" time="0.8" />
-                <color blue="0.128" green="0.4" red="0.72" time="0.6" />
-                <color blue="0.096" green="0.3" red="0.54" time="0.5" />
-                <color blue="0.064" green="0.2" red="0.36" time="0.4" />
-                <color blue="0.032" green="0.1" red="0.18" time="0.3" />
-                <color blue="0.0" green="0.0" red="0.0" time="0.1" />
-                <color blue="0.0" green="0.0" red="0.0" time="0" />
-            </effector>
-        </params>
-    </meshfact>
     <sector name="dining-hall">
         <portals name="Cube.020">
             <portal>
@@ -2840,8 +1922,8 @@
                     <scale y="1" x="1" z="1" />
                 </matrix>
             </hardmove>
-        </portals>
-        <renderloop>std_rloop_diffuse</renderloop>
+        </portals><![CDATA[>
+        ]]>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.002">
@@ -3482,88 +2564,6 @@
             </move>
         </meshobj>
     </sector>
-    <meshfact name="parttorch.040">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <priority>transp</priority>
-        <ztest />
-        <params>
-            <material>std_lighting_explo_firefire1.png</material>
-            <renderorientation>camface approx</renderorientation>
-            <rotationmode>none</rotationmode>
-            <sortmode>none</sortmode>
-            <integrationmode>linear</integrationmode>
-            <particlesize y="0.159999996424" x="0.159999996424" />
-            <transformmode>local</transformmode>
-            <emitter type="sphere">
-                <enabled>yes</enabled>
-                <uniformvelocity>yes</uniformvelocity>
-                <emissionrate>8</emissionrate>
-                <radius>0.0706334</radius>
-                <position y="0" x="0" z="0" />
-                <initialvelocity y="0" x="0" z="0" />
-                <mass max="1.0" min="1.0" />
-                <initialttl max="2" min="1.5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="force">
-                <acceleration y="0.3" x="0" z="0" />
-                <force y="0.1" x="0" z="0" />
-                <randomacceleration>1.0</randomacceleration>
-            </effector>
-            <effector type="lincolor">
-                <color blue="0.16" green="0.5" red="0.9" time="1" />
-                <color blue="0.16" green="0.5" red="0.9" time="0.9" />
-                <color blue="0.144" green="0.45" red="0.81" time="0.8" />
-                <color blue="0.128" green="0.4" red="0.72" time="0.6" />
-                <color blue="0.096" green="0.3" red="0.54" time="0.5" />
-                <color blue="0.064" green="0.2" red="0.36" time="0.4" />
-                <color blue="0.032" green="0.1" red="0.18" time="0.3" />
-                <color blue="0.0" green="0.0" red="0.0" time="0.1" />
-                <color blue="0.0" green="0.0" red="0.0" time="0" />
-            </effector>
-        </params>
-    </meshfact>
-    <meshfact name="parttorch.001">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <priority>transp</priority>
-        <ztest />
-        <params>
-            <material>std_lighting_explo_firefire1.png</material>
-            <renderorientation>camface approx</renderorientation>
-            <rotationmode>none</rotationmode>
-            <sortmode>none</sortmode>
-            <integrationmode>linear</integrationmode>
-            <particlesize y="0.159999996424" x="0.159999996424" />
-            <transformmode>local</transformmode>
-            <emitter type="sphere">
-                <enabled>yes</enabled>
-                <uniformvelocity>yes</uniformvelocity>
-                <emissionrate>8</emissionrate>
-                <radius>0.0706334</radius>
-                <position y="0" x="0" z="0" />
-                <initialvelocity y="0" x="0" z="0" />
-                <mass max="1.0" min="1.0" />
-                <initialttl max="2" min="1.5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="force">
-                <acceleration y="0.3" x="0" z="0" />
-                <force y="0.1" x="0" z="0" />
-                <randomacceleration>1.0</randomacceleration>
-            </effector>
-            <effector type="lincolor">
-                <color blue="0.16" green="0.5" red="0.9" time="1" />
-                <color blue="0.16" green="0.5" red="0.9" time="0.9" />
-                <color blue="0.144" green="0.45" red="0.81" time="0.8" />
-                <color blue="0.128" green="0.4" red="0.72" time="0.6" />
-                <color blue="0.096" green="0.3" red="0.54" time="0.5" />
-                <color blue="0.064" green="0.2" red="0.36" time="0.4" />
-                <color blue="0.032" green="0.1" red="0.18" time="0.3" />
-                <color blue="0.0" green="0.0" red="0.0" time="0.1" />
-                <color blue="0.0" green="0.0" red="0.0" time="0" />
-            </effector>
-        </params>
-    </meshfact>
     <sector name="interior">
         <portals name="Cube.026">
             <portal>
@@ -3636,7 +2636,6 @@
                 </matrix>
             </hardmove>
         </portals>
-        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.015">
@@ -3693,7 +2692,6 @@
                 </mixmode>
                 <submesh name="parallaxAtt_crystalcrystal.png_0">
                     <material>parallaxAtt_crystalcrystal.png</material>
-                    <shadervar name="tex lightmap" type="texture">lightmap_interior_Cube.012_0</shadervar>
                 </submesh>
             </params>
             <ztest />
@@ -3865,86 +2863,6 @@
             <key name="particles_force" value="0,0.2,0" />
         </meshobj>
     </sector>
-    <meshfact name="partCube.001">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <priority>transp</priority>
-        <zfill />
-        <params>
-            <material>std_lighting_starstar.png</material>
-            <renderorientation>camface approx</renderorientation>
-            <rotationmode>none</rotationmode>
-            <sortmode>none</sortmode>
-            <integrationmode>linear</integrationmode>
-            <particlesize y="0.159999996424" x="0.159999996424" />
-            <transformmode>local</transformmode>
-            <emitter type="sphere">
-                <enabled>yes</enabled>
-                <uniformvelocity>yes</uniformvelocity>
-                <emissionrate>20</emissionrate>
-                <radius>17.0856</radius>
-                <position y="0" x="0" z="0" />
-                <initialvelocity y="0" x="0" z="1" />
-                <mass max="1.0" min="1.0" />
-                <initialttl max="5" min="5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="force">
-                <acceleration y="0" x="0.3" z="0" />
-                <force y="0.0" x="0.5" z="0.0" />
-            </effector>
-            <effector type="lincolor">
-                <color blue="1.0" green="1.0" red="1.0" time="1" />
-                <color blue="1.0" green="1.0" red="1.0" time="0.9" />
-                <color blue="0.9" green="0.9" red="0.9" time="0.8" />
-                <color blue="0.8" green="0.8" red="0.8" time="0.6" />
-                <color blue="0.6" green="0.6" red="0.6" time="0.5" />
-                <color blue="0.4" green="0.4" red="0.4" time="0.4" />
-                <color blue="0.2" green="0.2" red="0.2" time="0.3" />
-                <color blue="0.0" green="0.0" red="0.0" time="0.1" />
-                <color blue="0.0" green="0.0" red="0.0" time="0" />
-            </effector>
-        </params>
-    </meshfact>
-    <meshfact name="partCube.011">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <priority>transp</priority>
-        <zfill />
-        <params>
-            <material>std_lighting_starstar.png</material>
-            <renderorientation>camface approx</renderorientation>
-            <rotationmode>none</rotationmode>
-            <sortmode>none</sortmode>
-            <integrationmode>linear</integrationmode>
-            <particlesize y="0.0399999991059" x="0.0399999991059" />
-            <transformmode>local</transformmode>
-            <emitter type="sphere">
-                <enabled>yes</enabled>
-                <uniformvelocity>yes</uniformvelocity>
-                <emissionrate>20</emissionrate>
-                <radius>11.3904</radius>
-                <position y="0" x="0" z="0" />
-                <initialvelocity y="0" x="0" z="1" />
-                <mass max="1.0" min="1.0" />
-                <initialttl max="5" min="5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="force">
-                <acceleration y="0" x="0.3" z="0" />
-                <force y="0.0" x="0.5" z="0.0" />
-            </effector>
-            <effector type="lincolor">
-                <color blue="1.0" green="1.0" red="1.0" time="1" />
-                <color blue="1.0" green="1.0" red="1.0" time="0.9" />
-                <color blue="0.9" green="0.9" red="0.9" time="0.8" />
-                <color blue="0.8" green="0.8" red="0.8" time="0.6" />
-                <color blue="0.6" green="0.6" red="0.6" time="0.5" />
-                <color blue="0.4" green="0.4" red="0.4" time="0.4" />
-                <color blue="0.2" green="0.2" red="0.2" time="0.3" />
-                <color blue="0.0" green="0.0" red="0.0" time="0.1" />
-                <color blue="0.0" green="0.0" red="0.0" time="0" />
-            </effector>
-        </params>
-    </meshfact>
     <sector name="space">
         <ambient blue="1" green="1" red="1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
@@ -3984,129 +2902,6 @@
             </move>
         </meshobj>
     </sector>
-    <meshfact name="parttorch.006">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <priority>transp</priority>
-        <ztest />
-        <params>
-            <material>std_lighting_explo_firefire1.png</material>
-            <renderorientation>camface approx</renderorientation>
-            <rotationmode>none</rotationmode>
-            <sortmode>none</sortmode>
-            <integrationmode>linear</integrationmode>
-            <particlesize y="0.159999996424" x="0.159999996424" />
-            <transformmode>local</transformmode>
-            <emitter type="sphere">
-                <enabled>yes</enabled>
-                <uniformvelocity>yes</uniformvelocity>
-                <emissionrate>8</emissionrate>
-                <radius>0.0706334</radius>
-                <position y="0" x="0" z="0" />
-                <initialvelocity y="0" x="0" z="0" />
-                <mass max="1.0" min="1.0" />
-                <initialttl max="2" min="1.5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="force">
-                <acceleration y="0.3" x="0" z="0" />
-                <force y="0.1" x="0" z="0" />
-                <randomacceleration>1.0</randomacceleration>
-            </effector>
-            <effector type="lincolor">
-                <color blue="0.16" green="0.5" red="0.9" time="1" />
-                <color blue="0.16" green="0.5" red="0.9" time="0.9" />
-                <color blue="0.144" green="0.45" red="0.81" time="0.8" />
-                <color blue="0.128" green="0.4" red="0.72" time="0.6" />
-                <color blue="0.096" green="0.3" red="0.54" time="0.5" />
-                <color blue="0.064" green="0.2" red="0.36" time="0.4" />
-                <color blue="0.032" green="0.1" red="0.18" time="0.3" />
-                <color blue="0.0" green="0.0" red="0.0" time="0.1" />
-                <color blue="0.0" green="0.0" red="0.0" time="0" />
-            </effector>
-        </params>
-    </meshfact>
-    <meshfact name="parttorch.005">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <priority>transp</priority>
-        <ztest />
-        <params>
-            <material>std_lighting_explo_firefire1.png</material>
-            <renderorientation>camface approx</renderorientation>
-            <rotationmode>none</rotationmode>
-            <sortmode>none</sortmode>
-            <integrationmode>linear</integrationmode>
-            <particlesize y="0.159999996424" x="0.159999996424" />
-            <transformmode>local</transformmode>
-            <emitter type="sphere">
-                <enabled>yes</enabled>
-                <uniformvelocity>yes</uniformvelocity>
-                <emissionrate>8</emissionrate>
-                <radius>0.0706334</radius>
-                <position y="0" x="0" z="0" />
-                <initialvelocity y="0" x="0" z="0" />
-                <mass max="1.0" min="1.0" />
-                <initialttl max="2" min="1.5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="force">
-                <acceleration y="0.3" x="0" z="0" />
-                <force y="0.1" x="0" z="0" />
-                <randomacceleration>1.0</randomacceleration>
-            </effector>
-            <effector type="lincolor">
-                <color blue="0.16" green="0.5" red="0.9" time="1" />
-                <color blue="0.16" green="0.5" red="0.9" time="0.9" />
-                <color blue="0.144" green="0.45" red="0.81" time="0.8" />
-                <color blue="0.128" green="0.4" red="0.72" time="0.6" />
-                <color blue="0.096" green="0.3" red="0.54" time="0.5" />
-                <color blue="0.064" green="0.2" red="0.36" time="0.4" />
-                <color blue="0.032" green="0.1" red="0.18" time="0.3" />
-                <color blue="0.0" green="0.0" red="0.0" time="0.1" />
-                <color blue="0.0" green="0.0" red="0.0" time="0" />
-            </effector>
-        </params>
-    </meshfact>
-    <meshfact name="parttorch.034">
-        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-        <priority>transp</priority>
-        <ztest />
-        <params>
-            <material>std_lighting_explo_firefire1.png</material>
-            <renderorientation>camface approx</renderorientation>
-            <rotationmode>none</rotationmode>
-            <sortmode>none</sortmode>
-            <integrationmode>linear</integrationmode>
-            <particlesize y="0.159999996424" x="0.159999996424" />
-            <transformmode>local</transformmode>
-            <emitter type="sphere">
-                <enabled>yes</enabled>
-                <uniformvelocity>yes</uniformvelocity>
-                <emissionrate>8</emissionrate>
-                <radius>0.0706334</radius>
-                <position y="0" x="0" z="0" />
-                <initialvelocity y="0" x="0" z="0" />
-                <mass max="1.0" min="1.0" />
-                <initialttl max="2" min="1.5" />
-                <placement>volume</placement>
-            </emitter>
-            <effector type="force">
-                <acceleration y="0.3" x="0" z="0" />
-                <force y="0.1" x="0" z="0" />
-                <randomacceleration>1.0</randomacceleration>
-            </effector>
-            <effector type="lincolor">
-                <color blue="0.16" green="0.5" red="0.9" time="1" />
-                <color blue="0.16" green="0.5" red="0.9" time="0.9" />
-                <color blue="0.144" green="0.45" red="0.81" time="0.8" />
-                <color blue="0.128" green="0.4" red="0.72" time="0.6" />
-                <color blue="0.096" green="0.3" red="0.54" time="0.5" />
-                <color blue="0.064" green="0.2" red="0.36" time="0.4" />
-                <color blue="0.032" green="0.1" red="0.18" time="0.3" />
-                <color blue="0.0" green="0.0" red="0.0" time="0.1" />
-                <color blue="0.0" green="0.0" red="0.0" time="0" />
-            </effector>
-        </params>
-    </meshfact>
     <sector name="throne-room">
         <portals name="portal_throne-int">
             <portal>
@@ -4126,7 +2921,6 @@
                 </matrix>
             </hardmove>
         </portals>
-        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.009">

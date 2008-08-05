@@ -1,0 +1,55 @@
+<library>
+    <textures>
+        <texture name="fire1.png">
+            <file>/lib/std/castle/fire1.png</file>
+        </texture>
+    </textures>
+    <materials>
+        <material name="std_lighting_explo_firefire1.png">
+            <texture>fire1.png</texture>
+            <shader type="diffuse">std_lighting</shader>
+            <shader type="ambient">*null</shader>
+        </material>
+    </materials>
+    <meshfact name="parttorch.008">
+        <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+        <priority>transp</priority>
+        <ztest />
+        <params>
+            <material>std_lighting_explo_firefire1.png</material>
+            <renderorientation>camface approx</renderorientation>
+            <rotationmode>none</rotationmode>
+            <sortmode>none</sortmode>
+            <integrationmode>linear</integrationmode>
+            <particlesize y="0.159999996424" x="0.159999996424" />
+            <transformmode>local</transformmode>
+            <emitter type="sphere">
+                <enabled>yes</enabled>
+                <uniformvelocity>yes</uniformvelocity>
+                <emissionrate>8</emissionrate>
+                <radius>0.0706334</radius>
+                <position y="0" x="0" z="0" />
+                <initialvelocity y="0" x="0" z="0" />
+                <mass max="1.0" min="1.0" />
+                <initialttl max="2" min="1.5" />
+                <placement>volume</placement>
+            </emitter>
+            <effector type="force">
+                <acceleration y="0.3" x="0" z="0" />
+                <force y="0.1" x="0" z="0" />
+                <randomacceleration>1.0</randomacceleration>
+            </effector>
+            <effector type="lincolor">
+                <color blue="0.16" green="0.5" red="0.9" time="1" />
+                <color blue="0.16" green="0.5" red="0.9" time="0.9" />
+                <color blue="0.144" green="0.45" red="0.81" time="0.8" />
+                <color blue="0.128" green="0.4" red="0.72" time="0.6" />
+                <color blue="0.096" green="0.3" red="0.54" time="0.5" />
+                <color blue="0.064" green="0.2" red="0.36" time="0.4" />
+                <color blue="0.032" green="0.1" red="0.18" time="0.3" />
+                <color blue="0.0" green="0.0" red="0.0" time="0.1" />
+                <color blue="0.0" green="0.0" red="0.0" time="0" />
+            </effector>
+        </params>
+    </meshfact>
+</library>
