@@ -32,6 +32,7 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/memfile.h"
 #include "csutil/randomgen.h"
+#include "csutil/scfarray.h"
 
 #include "iengine/camera.h"
 #include "iengine/engine.h"
@@ -89,7 +90,7 @@ void csSpriteFrame::SetName (char const* n)
 //--------------------------------------------------------------------------
 
 csSpriteAction2::csSpriteAction2() : scfImplementationType (this), 
-  frames (8, 8), delays (8, 8)
+  frames (8), delays (8)
 {
   SetReverseAction (false);
 }
@@ -153,8 +154,8 @@ void csSprite3DMeshObjectFactory::Report (int severity, const char* msg, ...)
 
 csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (
 	iMeshObjectType* pParent, iObjectRegistry* object_reg) :
-  scfImplementationType (this, pParent), texels (8, 8), vertices (8, 8), 
-  normals (8, 8)
+  scfImplementationType (this, pParent), texels (8), vertices (8), 
+  normals (8)
 {
   csSprite3DMeshObjectType* type = static_cast<csSprite3DMeshObjectType*> (
       pParent);
@@ -1227,9 +1228,13 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n,
 
   if (factory->light_mgr)
   {
-    const csArray<iLightSectorInfluence*>& relevant_lights = factory->light_mgr
-    	->GetRelevantLights (logparent, -1, false);
-    UpdateLighting (relevant_lights, movable);
+    csSafeCopyArray<csLightInfluence> lightInfluences;
+    scfArrayWrap<iLightInfluenceArray, csSafeCopyArray<csLightInfluence> > 
+      relevantLights (lightInfluences); //Yes, know, its on the stack...
+
+    factory->light_mgr->GetRelevantLights (logparent, &relevantLights, -1);
+
+    UpdateLighting (lightInfluences, movable);
   }
 
   n = 1;
@@ -1504,7 +1509,7 @@ csVector3* csSprite3DMeshObject::GetObjectVerts (csSpriteFrame* fr)
 }
 
 void csSprite3DMeshObject::UpdateLighting (
-    const csArray<iLightSectorInfluence*>& lights,
+    const csSafeCopyArray<csLightInfluence>& lights,
     iMovable* movable)
 {
   // Make sure that the color array is initialized.
@@ -1583,7 +1588,7 @@ void csSprite3DMeshObject::UpdateLightingRandom ()
 }
 
 void csSprite3DMeshObject::UpdateLightingFast (
-    const csArray<iLightSectorInfluence*>& lights, iMovable* movable)
+    const csSafeCopyArray<csLightInfluence>& lights, iMovable* movable)
 {
   int light_num, j;
 
@@ -1632,7 +1637,10 @@ void csSprite3DMeshObject::UpdateLightingFast (
   int num_lights = (int)lights.GetSize ();
   for (light_num = 0 ; light_num < num_lights ; light_num++)
   {
-    iLight* li = lights[light_num]->GetLight ();
+    iLight* li = lights[light_num].light;
+    if (!li)
+      continue;
+
     light_color = li->GetColor ()
     	* (256. / CS_NORMAL_LIGHT_LEVEL);
     sq_light_radius = csSquare (li->GetCutoffDistance ());
@@ -1708,7 +1716,7 @@ void csSprite3DMeshObject::UpdateLightingFast (
 }
 
 void csSprite3DMeshObject::UpdateLightingLQ (
-    const csArray<iLightSectorInfluence*>& lights, iMovable* movable)
+  const csSafeCopyArray<csLightInfluence>& lights, iMovable* movable)
 {
   int i, j;
 
@@ -1738,7 +1746,10 @@ void csSprite3DMeshObject::UpdateLightingLQ (
   int num_lights = (int)lights.GetSize ();
   for (i = 0 ; i < num_lights ; i++)
   {
-    iLight* li = lights[i]->GetLight ();
+    iLight* li = lights[i].light;
+    if (!li)
+      continue;
+
     // Compute light position in object coordinates
     csVector3 wor_light_pos = li->GetMovable ()->GetFullPosition ();
     float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_center);
@@ -1791,7 +1802,7 @@ void csSprite3DMeshObject::UpdateLightingLQ (
 }
 
 void csSprite3DMeshObject::UpdateLightingHQ (
-    const csArray<iLightSectorInfluence*>& lights, iMovable* movable)
+    const csSafeCopyArray<csLightInfluence>& lights, iMovable* movable)
 {
   int i, j;
 
@@ -1824,7 +1835,10 @@ void csSprite3DMeshObject::UpdateLightingHQ (
   int num_lights = (int)lights.GetSize ();
   for (i = 0 ; i < num_lights ; i++)
   {
-    iLight* li = lights[i]->GetLight ();
+    iLight* li = lights[i].light;
+    if (!li)
+      continue;
+
     csColor light_color = li->GetColor ()
     	* (256. / CS_NORMAL_LIGHT_LEVEL);
     float sq_light_radius = csSquare (li->GetCutoffDistance ());

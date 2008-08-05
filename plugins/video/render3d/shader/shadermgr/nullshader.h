@@ -57,32 +57,42 @@ public:
   void SetFileName (const char* /*filename*/) {  }
 
   virtual size_t GetTicket (const CS::Graphics::RenderMeshModes&, 
-    const iShaderVarStack*) { return 0; }
+    const csShaderVariableStack&) { return 0; }
+  virtual size_t GetTicket (const CS::Graphics::RenderMeshModes& modes,
+    csShaderVariable** stacks)
+  {
+    return 0;
+  }
 
   virtual size_t GetNumberOfPasses (size_t) { return 0; }
   virtual bool ActivatePass (size_t, size_t) { return false; }
   virtual bool SetupPass (size_t, const CS::Graphics::RenderMesh*,
-    CS::Graphics::RenderMeshModes&, const iShaderVarStack*)
+    CS::Graphics::RenderMeshModes&, const csShaderVariableStack&)
   { return false; }
   virtual bool TeardownPass (size_t)
   { return false; }
   virtual bool DeactivatePass (size_t) { return false; }
   virtual const csShaderMetadata& GetMetadata (size_t) const
   { return allShaderMeta; }
+  virtual const csShaderMetadata& GetMetadata () const
+  { return allShaderMeta; }
+  virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits) const
+  { }
+  void PushShaderVariables (csShaderVariableStack&, size_t) const { }
 
   /**\name iShaderVariableContext implementation
    * @{ */
   void AddVariable (csShaderVariable *) { }
-  csShaderVariable* GetVariable (csStringID) const { return 0; }
+  csShaderVariable* GetVariable (CS::ShaderVarStringID) const { return 0; }
   const csRefArray<csShaderVariable>& GetShaderVariables () const
   { return dummySVs; }
-  void PushVariables (iShaderVarStack*) const { }
-
+  void PushVariables (csShaderVariableStack&) const { }
+  
   bool IsEmpty() const { return true; }
   void ReplaceVariable (csShaderVariable*) {}
   void Clear () { }
   bool RemoveVariable (csShaderVariable*) { return false; }
-  bool RemoveVariable (csStringID) { return false; }
+  bool RemoveVariable (CS::ShaderVarStringID) { return false; }
   /** @} */
 
   /**\name iSelfDestruct implementation

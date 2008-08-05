@@ -33,6 +33,7 @@
 #include "csutil/stringarray.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
+#include "csutil/stringarray.h"
 #include "iutil/cmdline.h"
 #include "iutil/eventq.h"
 #include "csutil/event.h"
@@ -46,7 +47,10 @@
 
 extern "C"
 {
-  #include "swigpyruntime.h"
+  /* *Must* be pointy include. The right file (generated when swig is present,
+     shipped copy otherwise) is determined by include paths specified via
+     the compiler command line. */
+  #include <swigpyruntime.h>
 }
 
 CS_IMPLEMENT_PLUGIN

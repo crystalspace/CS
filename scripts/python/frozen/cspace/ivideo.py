@@ -207,6 +207,7 @@ CSDRAW_2DGRAPHICS = _ivideo.CSDRAW_2DGRAPHICS
 CSDRAW_3DGRAPHICS = _ivideo.CSDRAW_3DGRAPHICS
 CSDRAW_CLEARZBUFFER = _ivideo.CSDRAW_CLEARZBUFFER
 CSDRAW_CLEARSCREEN = _ivideo.CSDRAW_CLEARSCREEN
+CSDRAW_NOCLIPCLEAR = _ivideo.CSDRAW_NOCLIPCLEAR
 CS_CLIPPER_NONE = _ivideo.CS_CLIPPER_NONE
 CS_CLIPPER_OPTIONAL = _ivideo.CS_CLIPPER_OPTIONAL
 CS_CLIPPER_TOPLEVEL = _ivideo.CS_CLIPPER_TOPLEVEL
@@ -223,8 +224,10 @@ CS_ZBUF_MESH = _ivideo.CS_ZBUF_MESH
 CS_ZBUF_MESH2 = _ivideo.CS_ZBUF_MESH2
 CS_VATTRIB_SPECIFIC_FIRST = _ivideo.CS_VATTRIB_SPECIFIC_FIRST
 CS_VATTRIB_SPECIFIC_LAST = _ivideo.CS_VATTRIB_SPECIFIC_LAST
+CS_VATTRIB_SPECIFIC_NUM = _ivideo.CS_VATTRIB_SPECIFIC_NUM
 CS_VATTRIB_GENERIC_FIRST = _ivideo.CS_VATTRIB_GENERIC_FIRST
 CS_VATTRIB_GENERIC_LAST = _ivideo.CS_VATTRIB_GENERIC_LAST
+CS_VATTRIB_GENERIC_NUM = _ivideo.CS_VATTRIB_GENERIC_NUM
 CS_VATTRIB_UNUSED = _ivideo.CS_VATTRIB_UNUSED
 CS_VATTRIB_INVALID = _ivideo.CS_VATTRIB_INVALID
 CS_VATTRIB_POSITION = _ivideo.CS_VATTRIB_POSITION
@@ -374,6 +377,7 @@ class csSimpleRenderMesh(object):
     z_buf_mode = _swig_property(_ivideo.csSimpleRenderMesh_z_buf_mode_get, _ivideo.csSimpleRenderMesh_z_buf_mode_set)
     mixmode = _swig_property(_ivideo.csSimpleRenderMesh_mixmode_get, _ivideo.csSimpleRenderMesh_mixmode_set)
     object2world = _swig_property(_ivideo.csSimpleRenderMesh_object2world_get, _ivideo.csSimpleRenderMesh_object2world_set)
+    renderBuffers = _swig_property(_ivideo.csSimpleRenderMesh_renderBuffers_get, _ivideo.csSimpleRenderMesh_renderBuffers_set)
     def __init__(self, *args): 
         this = _ivideo.new_csSimpleRenderMesh(*args)
         try: self.this.append(this)
@@ -387,6 +391,24 @@ csSimpleRenderMesh_swigregister(csSimpleRenderMesh)
 rtaDepth = _ivideo.rtaDepth
 rtaColor0 = _ivideo.rtaColor0
 rtaNumAttachments = _ivideo.rtaNumAttachments
+class TextureComparisonMode(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    compareNone = _ivideo.TextureComparisonMode_compareNone
+    compareR = _ivideo.TextureComparisonMode_compareR
+    mode = _swig_property(_ivideo.TextureComparisonMode_mode_get, _ivideo.TextureComparisonMode_mode_set)
+    funcLEqual = _ivideo.TextureComparisonMode_funcLEqual
+    funcGEqual = _ivideo.TextureComparisonMode_funcGEqual
+    function = _swig_property(_ivideo.TextureComparisonMode_function_get, _ivideo.TextureComparisonMode_function_set)
+    def __init__(self, *args): 
+        this = _ivideo.new_TextureComparisonMode(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _ivideo.delete_TextureComparisonMode
+    __del__ = lambda self : None;
+TextureComparisonMode_swigregister = _ivideo.TextureComparisonMode_swigregister
+TextureComparisonMode_swigregister(TextureComparisonMode)
+
 class iGraphics3D(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
@@ -444,6 +466,9 @@ class iGraphics3D(core.iBase):
     def PerformExtension(*args): return _ivideo.iGraphics3D_PerformExtension(*args)
     def GetWorldToCamera(*args): return _ivideo.iGraphics3D_GetWorldToCamera(*args)
     def GetCurrentDrawFlags(*args): return _ivideo.iGraphics3D_GetCurrentDrawFlags(*args)
+    def GetProjectionMatrix(*args): return _ivideo.iGraphics3D_GetProjectionMatrix(*args)
+    def SetProjectionMatrix(*args): return _ivideo.iGraphics3D_SetProjectionMatrix(*args)
+    def SetTextureComparisonModes(*args): return _ivideo.iGraphics3D_SetTextureComparisonModes(*args)
     scfGetVersion = staticmethod(_ivideo.iGraphics3D_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iGraphics3D
     __del__ = lambda self : None;
@@ -504,6 +529,7 @@ class RenderMeshModes(object):
     renderPrio = _swig_property(_ivideo.RenderMeshModes_renderPrio_get, _ivideo.RenderMeshModes_renderPrio_set)
     cullMode = _swig_property(_ivideo.RenderMeshModes_cullMode_get, _ivideo.RenderMeshModes_cullMode_set)
     alphaType = _swig_property(_ivideo.RenderMeshModes_alphaType_get, _ivideo.RenderMeshModes_alphaType_set)
+    zoffset = _swig_property(_ivideo.RenderMeshModes_zoffset_get, _ivideo.RenderMeshModes_zoffset_set)
     buffers = _swig_property(_ivideo.RenderMeshModes_buffers_get, _ivideo.RenderMeshModes_buffers_set)
 RenderMeshModes_swigregister = _ivideo.RenderMeshModes_swigregister
 RenderMeshModes_swigregister(RenderMeshModes)
@@ -537,10 +563,10 @@ class CoreRenderMesh(object):
     clip_z_plane = _swig_property(_ivideo.CoreRenderMesh_clip_z_plane_get, _ivideo.CoreRenderMesh_clip_z_plane_set)
     do_mirror = _swig_property(_ivideo.CoreRenderMesh_do_mirror_get, _ivideo.CoreRenderMesh_do_mirror_set)
     meshtype = _swig_property(_ivideo.CoreRenderMesh_meshtype_get, _ivideo.CoreRenderMesh_meshtype_set)
-    indexstart = _swig_property(_ivideo.CoreRenderMesh_indexstart_get, _ivideo.CoreRenderMesh_indexstart_set)
-    indexend = _swig_property(_ivideo.CoreRenderMesh_indexend_get, _ivideo.CoreRenderMesh_indexend_set)
     multiRanges = _swig_property(_ivideo.CoreRenderMesh_multiRanges_get, _ivideo.CoreRenderMesh_multiRanges_set)
     rangesNum = _swig_property(_ivideo.CoreRenderMesh_rangesNum_get, _ivideo.CoreRenderMesh_rangesNum_set)
+    indexstart = _swig_property(_ivideo.CoreRenderMesh_indexstart_get, _ivideo.CoreRenderMesh_indexstart_set)
+    indexend = _swig_property(_ivideo.CoreRenderMesh_indexend_get, _ivideo.CoreRenderMesh_indexend_set)
     material = _swig_property(_ivideo.CoreRenderMesh_material_get, _ivideo.CoreRenderMesh_material_set)
     object2world = _swig_property(_ivideo.CoreRenderMesh_object2world_get, _ivideo.CoreRenderMesh_object2world_set)
 CoreRenderMesh_swigregister = _ivideo.CoreRenderMesh_swigregister
@@ -662,15 +688,25 @@ iHalo_swigregister = _ivideo.iHalo_swigregister
 iHalo_swigregister(iHalo)
 iHalo_scfGetVersion = _ivideo.iHalo_scfGetVersion
 
-class iShaderVarStack(csgfx.csShaderVariableArrayChangeAll):
+class csShaderVariableStack(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    __swig_destroy__ = _ivideo.delete_iShaderVarStack
+    def __init__(self, *args): 
+        this = _ivideo.new_csShaderVariableStack(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _ivideo.delete_csShaderVariableStack
     __del__ = lambda self : None;
-iShaderVarStack_swigregister = _ivideo.iShaderVarStack_swigregister
-iShaderVarStack_swigregister(iShaderVarStack)
+    def Setup(*args): return _ivideo.csShaderVariableStack_Setup(*args)
+    def MakeOwnArray(*args): return _ivideo.csShaderVariableStack_MakeOwnArray(*args)
+    def GetSize(*args): return _ivideo.csShaderVariableStack_GetSize(*args)
+    def Clear(*args): return _ivideo.csShaderVariableStack_Clear(*args)
+    def MergeFront(*args): return _ivideo.csShaderVariableStack_MergeFront(*args)
+    def MergeBack(*args): return _ivideo.csShaderVariableStack_MergeBack(*args)
+csShaderVariableStack_swigregister = _ivideo.csShaderVariableStack_swigregister
+csShaderVariableStack_swigregister(csShaderVariableStack)
 
+csGetShaderVariableFromStack = _ivideo.csGetShaderVariableFromStack
 class iShaderVariableContext(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
@@ -689,7 +725,6 @@ class iShaderVariableContext(core.iBase):
     __del__ = lambda self : None;
 iShaderVariableContext_swigregister = _ivideo.iShaderVariableContext_swigregister
 iShaderVariableContext_swigregister(iShaderVariableContext)
-csGetShaderVariableFromStack = _ivideo.csGetShaderVariableFromStack
 iShaderVariableContext_scfGetVersion = _ivideo.iShaderVariableContext_scfGetVersion
 
 TagNeutral = _ivideo.TagNeutral
@@ -716,6 +751,8 @@ class iShaderManager(iShaderVariableContext):
     def GetTags(*args): return _ivideo.iShaderManager_GetTags(*args)
     def SetActiveLights(*args): return _ivideo.iShaderManager_SetActiveLights(*args)
     def GetActiveLights(*args): return _ivideo.iShaderManager_GetActiveLights(*args)
+    def GetSVNameStringset(*args): return _ivideo.iShaderManager_GetSVNameStringset(*args)
+    def GetShaderCache(*args): return _ivideo.iShaderManager_GetShaderCache(*args)
     scfGetVersion = staticmethod(_ivideo.iShaderManager_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iShaderManager
     __del__ = lambda self : None;
@@ -750,7 +787,9 @@ class iShader(iShaderVariableContext):
     def SetupPass(*args): return _ivideo.iShader_SetupPass(*args)
     def TeardownPass(*args): return _ivideo.iShader_TeardownPass(*args)
     def DeactivatePass(*args): return _ivideo.iShader_DeactivatePass(*args)
+    def GetUsedShaderVars(*args): return _ivideo.iShader_GetUsedShaderVars(*args)
     def GetMetadata(*args): return _ivideo.iShader_GetMetadata(*args)
+    def PushShaderVariables(*args): return _ivideo.iShader_PushShaderVariables(*args)
     scfGetVersion = staticmethod(_ivideo.iShader_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iShader
     __del__ = lambda self : None;
@@ -778,6 +817,7 @@ class iShaderCompiler(core.iBase):
     def ValidateTemplate(*args): return _ivideo.iShaderCompiler_ValidateTemplate(*args)
     def IsTemplateToCompiler(*args): return _ivideo.iShaderCompiler_IsTemplateToCompiler(*args)
     def GetPriorities(*args): return _ivideo.iShaderCompiler_GetPriorities(*args)
+    def PrecacheShader(*args): return _ivideo.iShaderCompiler_PrecacheShader(*args)
     __swig_destroy__ = _ivideo.delete_iShaderCompiler
     __del__ = lambda self : None;
 iShaderCompiler_swigregister = _ivideo.iShaderCompiler_swigregister
@@ -892,6 +932,9 @@ class iTextureHandle(core.iBase):
     natureIndirect = _ivideo.iTextureHandle_natureIndirect
     natureDirect = _ivideo.iTextureHandle_natureDirect
     def GetBufferNature(*args): return _ivideo.iTextureHandle_GetBufferNature(*args)
+    def SetMipmapLimits(*args): return _ivideo.iTextureHandle_SetMipmapLimits(*args)
+    def GetMipmapLimits(*args): return _ivideo.iTextureHandle_GetMipmapLimits(*args)
+    def Readback(*args): return _ivideo.iTextureHandle_Readback(*args)
     scfGetVersion = staticmethod(_ivideo.iTextureHandle_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iTextureHandle
     __del__ = lambda self : None;
@@ -957,6 +1000,7 @@ class iMaterial(iShaderVariableContext):
     def GetShader(*args): return _ivideo.iMaterial_GetShader(*args)
     def GetShaders(*args): return _ivideo.iMaterial_GetShaders(*args)
     def GetTexture(*args): return _ivideo.iMaterial_GetTexture(*args)
+    def GetFirstShader(*args): return _ivideo.iMaterial_GetFirstShader(*args)
     scfGetVersion = staticmethod(_ivideo.iMaterial_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iMaterial
     __del__ = lambda self : None;

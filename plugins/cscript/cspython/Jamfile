@@ -22,7 +22,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   
   # Hack to get header output dir before "." in includes
   save_HDRS = $(HDRS) ;
-  HDRS = [ on $(swigruntime) GetVar LOCATE ] $(HDRS) ;
+  HDRS = [ on $(swigruntime) GetVar LOCATE ] $(SEARCH_SOURCE) $(HDRS) ;
   Description cspython : "Python plugin" ;
   Plugin cspython : cspython.h cspython.cpp pytocs.h pytocs.cpp ;
   LinkWith cspython : crystalspace ;

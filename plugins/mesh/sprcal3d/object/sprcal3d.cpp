@@ -35,6 +35,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/randomgen.h"
 #include "csutil/hash.h"
 #include "csutil/sysfunc.h"
+#include "csutil/scfarray.h"
 #include "cstool/rbuflock.h"
 
 #include "ivideo/graph3d.h"
@@ -869,9 +870,6 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
 //      "Error creating model instance");
 //    return;
 //  }
-  
-  strings = csQueryRegistryTagInterface<iStringSet> (object_reg, 
-    "crystalspace.shared.stringset");
   G3D = csQueryRegistry<iGraphics3D> (object_reg);
 
   // set the material set of the whole model
@@ -1061,11 +1059,11 @@ void csSpriteCal3DMeshObject::SetUserData(void *data)
 }
 
 void csSpriteCal3DMeshObject::UpdateLightingSubmesh (
-    const csArray<iLightSectorInfluence*>& lights, 
-    iMovable* movable,
-    CalRenderer *pCalRenderer,
-    int mesh, int submesh, float *meshNormals,
-    csColor* colors)
+  const csSafeCopyArray<csLightInfluence>& lights, 
+  iMovable* movable,
+  CalRenderer *pCalRenderer,
+  int mesh, int submesh, float *meshNormals,
+  csColor* colors)
 {
   int vertCount;
   vertCount = pCalRenderer->getVertexCount();
@@ -1086,7 +1084,10 @@ void csSpriteCal3DMeshObject::UpdateLightingSubmesh (
   // Update Lighting for all relevant lights
   for (size_t l = 0; l < num_lights; l++)
   {
-    iLight* li = lights[l]->GetLight ();
+    iLight* li = lights[l].light;
+    if (!li)
+      continue;
+
     // Compute light position in object coordinates
     // @@@ Can be optimized a bit. E.g. store obj_light_pos so it can be
     //  reused by submesh lighting.
@@ -2336,11 +2337,14 @@ void csSpriteCal3DMeshObject::MeshAccessor::PreGetBuffer
       {
         render->selectMeshSubmesh (meshIndex, submesh);
 
-        const csArray<iLightSectorInfluence*>& relevant_lights =
-        meshobj->factory->light_mgr->GetRelevantLights (
-          meshobj->logparent, -1, false);
+        csSafeCopyArray<csLightInfluence> lightInfluences;
+        scfArrayWrap<iLightInfluenceArray, csSafeCopyArray<csLightInfluence> > 
+          relevantLights (lightInfluences); //Yes, know, its on the stack...
 
-        meshobj->UpdateLightingSubmesh (relevant_lights, 
+        meshobj->factory->light_mgr->GetRelevantLights (
+          meshobj->logparent, &relevantLights, -1);
+
+        meshobj->UpdateLightingSubmesh (lightInfluences, 
                     movable,
                     render,
                     mesh,

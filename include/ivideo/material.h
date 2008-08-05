@@ -56,7 +56,7 @@ struct csRGBpixel;
  */
 struct iMaterial : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE (iMaterial, 2, 2, 0);
+  SCF_INTERFACE (iMaterial, 2, 2, 1);
 
   /**
    * Associate a shader with a shader type
@@ -81,7 +81,13 @@ struct iMaterial : public virtual iShaderVariableContext
   /**
    * Get a texture from the material.
    */
-  virtual iTextureHandle* GetTexture (csStringID name) = 0;
+  virtual iTextureHandle* GetTexture (CS::ShaderVarStringID name) = 0;
+
+  /**
+   * Get shader for the first type from \a types that as a shader attached.
+   */
+  virtual iShader* GetFirstShader (const csStringID* types,
+    size_t numTypes) = 0;
 };
 
 /** @} */

@@ -25,7 +25,9 @@
  */
 
 #include "csextern.h"
+#include "csgfx/shadervararrayhelper.h"
 #include "csutil/array.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/leakguard.h"
 #include "csutil/ref.h"
 #include "csutil/scf_implementation.h"
@@ -73,7 +75,7 @@ protected:
 protected:
   iObjectRegistry* objectReg;
   csRef<iSyntaxService> synsrv;
-  csRef<iStringSet> strings;
+  csRef<iShaderVarStringSet> stringsSvName;
 
 public:
   /**
@@ -82,42 +84,54 @@ public:
   enum ProgramParamType
   {
     ParamInvalid    = 0,
-    ParamFloat	    = 0x0001,
-    ParamVector2    = 0x0002,
-    ParamVector3    = 0x0004,
-    ParamVector4    = 0x0008,
-    ParamMatrix	    = 0x0010,
-    ParamTransform  = 0x0020,
-    ParamArray      = 0x0040,
-    ParamShaderExp  = 0x0080,
+    ParamInt	    = 0x0001,
+    ParamFloat	    = 0x0002,
+    ParamVector2    = 0x0004,
+    ParamVector3    = 0x0008,
+    ParamVector4    = 0x0010,
+    ParamMatrix	    = 0x0020,
+    ParamTransform  = 0x0040,
+    ParamArray      = 0x0080,
+    ParamShaderExp  = 0x0100,
     
-    ParamVector     = ParamFloat | ParamVector2 | ParamVector3 | ParamVector4
+    ParamVector     = ParamInt | ParamFloat | ParamVector2 | ParamVector3 | ParamVector4
   };
 
   /**
    * Program parameter, either a SV reference or a const value 
    */
-  struct ProgramParam
+  struct CS_CRYSTALSPACE_EXPORT ProgramParam
   {
     bool valid;
     
     // Name of SV to use (if any)
-    csStringID name;
+    CS::ShaderVarStringID name;
+    csDirtyAccessArray<size_t, csArrayElementHandler<size_t>,
+      CS::Memory::LocalBufferAllocator<size_t, 2,
+	CS::Memory::AllocatorMalloc, true> > indices;
     // Reference to const value shadervar
     csRef<csShaderVariable> var;
 
-    ProgramParam() : valid (false), name(csInvalidStringID) { }
+    ProgramParam() : valid (false), name (CS::InvalidShaderVarStringID) { }
     /// Returns whether this parameter 
-    bool IsConstant() const { return valid && var.IsValid(); }
+    bool IsConstant() const
+    { return valid && var.IsValid() && (var->GetAccessor() == 0); }
+    
+    //@{
+    /// Set to a constant value
+    void SetValue (float val);
+    void SetValue (const csVector4& val);
+    //@}
   };
 
   class CS_CRYSTALSPACE_EXPORT ProgramParamParser
   {
     iSyntaxService* synsrv;
-    iStringSet* stringsSvName;
+    iShaderVarStringSet* stringsSvName;
   public:
-    ProgramParamParser (iSyntaxService* synsrv, iStringSet* stringsSvName) :
-        synsrv (synsrv), stringsSvName (stringsSvName) {}
+    ProgramParamParser (iSyntaxService* synsrv,
+      iShaderVarStringSet* stringsSvName) : synsrv (synsrv),
+      stringsSvName (stringsSvName) {}
 
     /**
      * Parse program parameter node.
@@ -138,7 +152,7 @@ protected:
   bool ParseProgramParam (iDocumentNode* node,
     ProgramParam& param, uint types = ~0)
   {
-    ProgramParamParser parser (synsrv, strings);
+    ProgramParamParser parser (synsrv, stringsSvName);
     return parser.ParseProgramParam (node, param, types);
   }
 
@@ -150,7 +164,7 @@ protected:
     ProgramParam mappingParam;
     intptr_t userVal;
 
-    VariableMapEntry (csStringID s, const char* d) : 
+    VariableMapEntry (CS::ShaderVarStringID s, const char* d) :
       csShaderVarMapping (s, d)
     { 
       userVal = 0;
@@ -166,7 +180,24 @@ protected:
     }
   };
   /// Variable mappings
-  csArray<VariableMapEntry> variablemap;
+  csSafeCopyArray<VariableMapEntry> variablemap;
+
+  void TryAddUsedShaderVarName (CS::ShaderVarStringID name, csBitArray& bits) const
+  {
+    if (name != CS::InvalidShaderVarStringID)
+    {
+      if (bits.GetSize() > name) bits.SetBit (name);
+    }
+  }
+  void TryAddUsedShaderVarProgramParam (const ProgramParam& param, 
+    csBitArray& bits) const
+  {
+    if (param.valid)
+    {
+      TryAddUsedShaderVarName (param.name, bits);
+    }
+  }
+  void GetUsedShaderVarsFromVariableMappings (csBitArray& bits) const;
 
   /// Program description
   csString description;
@@ -197,60 +228,86 @@ protected:
   /// Dump variable mapping
   void DumpVariableMappings (csString& output);
 
+  /**
+   * Resolve the SV of a ProgramParam
+   */
+  inline csShaderVariable* GetParamSV (const csShaderVariableStack& stack, 
+    const ProgramParam &param)
+  {
+    csShaderVariable* var = 0;
+  
+    var = csGetShaderVariableFromStack (stack, param.name);
+    if (var)
+      var = CS::Graphics::ShaderVarArrayHelper::GetArrayItem (var,
+        param.indices.GetArray(), param.indices.GetSize(),
+        CS::Graphics::ShaderVarArrayHelper::maFail);
+    if (!var)
+      var = param.var;
+  
+    return var;
+  }
   //@{
   /**
    * Query the value of a ProgramParam variable by reading the constant or
    * resolving the shader variable.
    */
-  inline csVector4 GetParamVectorVal (const iShaderVarStack* stacks, 
+  inline bool GetParamVectorVal (const csShaderVariableStack& stack, 
+    const ProgramParam &param, csVector4* result)
+  {
+    csShaderVariable* var (GetParamSV (stack, param));
+    
+    // If var is null now we have no const nor any passed value, ignore it
+    if (!var)
+      return false;
+  
+    var->GetValue (*result);
+    return true;
+  }
+  inline csVector4 GetParamVectorVal (const csShaderVariableStack& stack, 
     const ProgramParam &param, const csVector4& defVal)
   {
-    csRef<csShaderVariable> var;
-  
-    var = csGetShaderVariableFromStack (stacks, param.name);
-    if (!var.IsValid ())
-      var = param.var;
-  
-    // If var is null now we have no const nor any passed value, ignore it
-    if (!var.IsValid ())
-      return defVal;
-  
     csVector4 v;
-    var->GetValue (v);
+    if (!GetParamVectorVal (stack, param, &v)) return defVal;
     return v;
   }
-  inline csReversibleTransform GetParamTransformVal (const iShaderVarStack* stacks, 
+  
+  inline bool GetParamTransformVal (const csShaderVariableStack& stack, 
+    const ProgramParam &param, csReversibleTransform* result)
+  {
+    csShaderVariable* var (GetParamSV (stack, param));
+    
+    // If var is null now we have no const nor any passed value, ignore it
+    if (!var)
+      return false;
+  
+    var->GetValue (*result);
+    return true;
+  }
+  inline csReversibleTransform GetParamTransformVal (const csShaderVariableStack& stack, 
     const ProgramParam &param, const csReversibleTransform& defVal)
   {
-    csRef<csShaderVariable> var;
-  
-    var = csGetShaderVariableFromStack (stacks, param.name);
-    if (!var.IsValid ())
-      var = param.var;
-  
-    // If var is null now we have no const nor any passed value, ignore it
-    if (!var.IsValid ())
-      return defVal;
-  
     csReversibleTransform t;
-    var->GetValue (t);
+    if (!GetParamTransformVal (stack, param, &t)) return defVal;
     return t;
   }
-  inline float GetParamFloatVal (const iShaderVarStack* stacks, 
+  
+  inline bool GetParamFloatVal (const csShaderVariableStack& stack, 
+    const ProgramParam &param, float* result)
+  {
+    csShaderVariable* var (GetParamSV (stack, param));
+    
+    // If var is null now we have no const nor any passed value, ignore it
+    if (!var)
+      return false;
+  
+    var->GetValue (*result);
+    return true;
+  }
+  inline float GetParamFloatVal (const csShaderVariableStack& stack, 
     const ProgramParam &param, float defVal)
   {
-    csRef<csShaderVariable> var;
-  
-    var = csGetShaderVariableFromStack (stacks, param.name);
-    if (!var.IsValid ())
-      var = param.var;
-  
-    // If var is null now we have no const nor any passed value, ignore it
-    if (!var.IsValid ())
-      return defVal;
-  
     float f;
-    var->GetValue (f);
+    if (!GetParamFloatVal (stack, param, &f)) return defVal;
     return f;
   }
   //@}
@@ -265,6 +322,8 @@ public:
 
   virtual csVertexAttrib ResolveBufferDestination (const char* /*binding*/)
   { return CS_VATTRIB_INVALID; }
+
+  virtual void GetUsedShaderVars (csBitArray& bits) const;
 };
 
 /** @} */

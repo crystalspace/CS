@@ -65,6 +65,7 @@ csTerrainCell::csTerrainCell (csTerrainSystem* terrain, const char* name, int gr
 
 csTerrainCell::~csTerrainCell ()
 {
+  SetLoadState (NotLoaded);
 }
 
 iTerrainSystem* csTerrainCell::GetTerrain()
@@ -158,6 +159,8 @@ void csTerrainCell::SetLoadState(LoadState state)
       {
         case NotLoaded:
         {
+          terrain->FireUnloadCallbacks (this);
+
           heightmap.DeleteAll ();
           materialmap.DeleteAll ();
 
@@ -166,8 +169,6 @@ void csTerrainCell::SetLoadState(LoadState state)
           feederData = 0;
 
           loadState = NotLoaded;
-
-          terrain->FireUnloadCallbacks (this);
 
           break;
         }
@@ -194,6 +195,11 @@ csBox3 csTerrainCell::GetBBox () const
 const char* csTerrainCell::GetName () const
 {
   return name.GetData ();
+}
+
+void csTerrainCell::SetName (const char* name)
+{
+  this->name = name;
 }
 
 iTerrainCellRenderProperties* csTerrainCell::GetRenderProperties () const
@@ -526,13 +532,13 @@ csVector3 csTerrainCell::GetBinormal (const csVector2& pos) const
   return Lerp (n1, n2, yfrac).Unit ();
 }
 
-csVector3 csTerrainCell::GetNormal (int x, int y) const
+csVector3 csTerrainCell::GetNormalDN (int x, int y) const
 {
   float center = GetHeight (x, y);
 
   float dfdy = 0;
   if (y - 1 >= 0 && y + 1 < gridHeight)
-    dfdy = (GetHeight (x, y + 1) - GetHeight (x, y - 1)) / 2*step_z; 
+    dfdy = (GetHeight (x, y + 1) - GetHeight (x, y - 1)) / (2*step_z); 
   else if (y - 1 >= 0)
     dfdy = (center - GetHeight (x, y - 1)) / step_z;
   else if (y + 1 < gridHeight)
@@ -540,13 +546,18 @@ csVector3 csTerrainCell::GetNormal (int x, int y) const
 
   float dfdx = 0;
   if (x - 1 >= 0 && x + 1 < gridWidth)
-    dfdx = (GetHeight (x + 1, y) - GetHeight (x - 1, y)) / 2*step_x; 
+    dfdx = (GetHeight (x + 1, y) - GetHeight (x - 1, y)) / (2*step_x); 
   else if (x - 1 >= 0)
     dfdx = (center - GetHeight (x - 1, y)) / step_x;
   else if (x + 1 < gridWidth)
     dfdx = (GetHeight (x + 1, y) - center) / step_x;
 
-  return csVector3 (dfdx, 1, dfdy);
+  return csVector3 (-dfdx, 1, dfdy);
+}
+
+csVector3 csTerrainCell::GetNormal (int x, int y) const
+{
+  return GetNormalDN (x, y).Unit ();
 }
 
 csVector3 csTerrainCell::GetNormal (const csVector2& pos) const
@@ -556,8 +567,8 @@ csVector3 csTerrainCell::GetNormal (const csVector2& pos) const
 
   LerpHelper (pos, x1, x2, xfrac, y1, y2, yfrac);
 
-  csVector3 n1 = Lerp (GetNormal (x1, y1), GetNormal (x2, y1), xfrac);
-  csVector3 n2 = Lerp (GetNormal (x1, y2), GetNormal (x2, y2), xfrac);
+  csVector3 n1 = Lerp (GetNormalDN (x1, y1), GetNormalDN (x2, y1), xfrac);
+  csVector3 n2 = Lerp (GetNormalDN (x1, y2), GetNormalDN (x2, y2), xfrac);
 
   return Lerp (n1, n2, yfrac).Unit ();
 }

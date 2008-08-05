@@ -212,33 +212,15 @@ struct iColladaConvertor : public virtual iBase
    * \brief Converts the effects (COLLADA FX) section of the COLLADA file
    * 
    * This converts the COLLADA FX portion of the COLLADA file to Crystal
-   * Space format.  Specifically, it converts all <effect> elements to 
-   * Crystal Space materials and shaders.  Currently, only <profile_COMMON>
-   * is supported, but support for <profile_GLSL> and <profile_CG> are coming.
-   *
-   * @param effectsSection A pointer to the <library_effects> element,
-   *        in the COLLADA document.
+   * Space format.  Specifically, it converts the <library_images> elements
+   * to textures and all <effect> elements to Crystal Space materials and shaders.
+   * Currently, only <profile_COMMON> is supported, but support for <profile_GLSL>
+   * and <profile_CG> are coming.
    *
    * @returns true on success, false otherwise
    */
-  virtual bool ConvertEffects(iDocumentNode *effectsSection) = 0;
-  
-  /**
-   * Converts the materials section of the COLLADA file.
-   * 
-   * This converts the <library_materials> section of the COLLADA file to
-   * Crystal Space format.  Note that it depends on the FX section already
-   * having been converted to work properly.
-   *
-   * @param materialsSection A pointer to the iDocumentNode representing the 
-   *        <library_materials> element of the COLLADA document.
-   *
-   * @returns true on success, false otherwise
-   *
-   * @sa ConvertEffects(iDocumentNode *effectsSection)
-   */
-  virtual bool ConvertMaterials(iDocumentNode *materialsSection) = 0;
-  
+  virtual bool ConvertEffects() = 0;
+
   /**
    * Converts the scene section of the COLLADA file.
    * 
@@ -290,6 +272,13 @@ struct iColladaConvertor : public virtual iBase
    */
   virtual void SetWarnings(bool toggle=false) = 0;
 
+  /**
+   * Set if each scene is an entire sector.
+   * Else the top level objects in each scene are considered a sector.
+   *
+   * @param toggle If true, each scene is considered a sector.
+   */
+  virtual void SetSectorScene(bool toggle) = 0;
 };
 
 #endif

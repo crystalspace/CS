@@ -30,6 +30,7 @@
 #include "csgeom/triangulate3d.h"
 #include "csgeom/trimesh.h"
 #include "csgfx/rgbpixel.h"
+#include "csutil/cscolor.h"
 
 
 CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
@@ -178,7 +179,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     void SetMaterialsPointer(csColladaMaterial* matPtr);
 
   public:
-    csColladaMesh(iDocumentNode* element, csColladaConvertor* parent);
+    csColladaMesh(iDocumentNode* element, csColladaConvertor* parent, csString plugType);
     ~csColladaMesh();
 
     const csArray<csVector3>& GetVertices() { return vertices; }
@@ -202,7 +203,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     csColladaAccessor* GetVertexAccessor() { return vertexAccessor; }
     csColladaAccessor* GetNormalAccessor() { return normalAccessor; }
 
-    bool WriteXML(iDocument* xmlDoc);
+    bool WriteXML(iDocumentNode* xmlDoc);
 
     /** \brief Process a COLLADA mesh node and construct a csColladaMesh object
     *
@@ -271,12 +272,14 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
   private:
     csColladaEffectProfileType profileType;
     csRef<iDocumentNode> element;
+    csRef<iDocumentNode> materialNode;
     csColladaConvertor* parent;
     csRGBcolor diffuseColor, specularColor, ambientColor;
     csString name;
 
   public:
-    csColladaEffectProfile(iDocumentNode* profileElement, csColladaConvertor* parentObj);
+    csColladaEffectProfile(iDocumentNode* profileElement, csColladaConvertor* parentObj,
+      iDocumentNode* matNode);
     csColladaEffectProfile(const csColladaEffectProfile& copy);
 
     bool Process(iDocumentNode* profileElement);
@@ -303,10 +306,11 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     csArray<csColladaEffectProfile> profiles;
     csRef<iDocumentNode> element;
     csColladaConvertor* parent;
+    csRef<iDocumentNode> materialNode;
     csString id;
 
   public:
-    csColladaEffect(iDocumentNode* effectElement, csColladaConvertor* parentObj);
+    csColladaEffect(iDocumentNode* effectElement, csColladaConvertor* parentObj, iDocumentNode* matNode);
     csColladaEffect(const csColladaEffect& copy);
     bool Process(iDocumentNode* effectElement);
 
@@ -325,6 +329,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     csString id;
     csColladaEffect* instanceEffect;
     csColladaConvertor *parent;
+    csRef<iDocumentNode> materialNode;
 
   public:
     csColladaMaterial(csColladaConvertor *parentEl);
@@ -333,6 +338,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     void SetID(const char* newId);
     void SetInstanceEffect(iDocumentNode* effectNode);
     void SetInstanceEffect(csColladaEffect *newInstEffect);
+    void SetMaterialNode(iDocumentNode* node);
 
     csString GetID() { return id; }
     csColladaEffect* GetInstanceEffect() { return instanceEffect; }
@@ -342,6 +348,15 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     static csRGBcolor StringToColor(const char* toConvert);
 
   }; /* End of class csColladaMaterial */
+
+  struct csColladaLight
+  {
+    csColor colour;
+    csColladaLight()
+    {
+      colour = csColor(0.0f);
+    }
+  }; /* End of struct csColladaLight */
 
 } /* End of ColladaConvertor namespace */
 CS_PLUGIN_NAMESPACE_END(ColladaConvertor)

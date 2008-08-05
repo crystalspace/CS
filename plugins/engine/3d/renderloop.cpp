@@ -36,7 +36,6 @@
 
 #include "csgfx/rgbpixel.h"
 #include "plugins/engine/3d/engine.h"
-#include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/sector.h"
 #include "csutil/xmltiny.h"
 #include "cstool/rviewclipper.h"
@@ -69,19 +68,19 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s, iMeshWrapper* mesh)
 
     // Needed so halos are correctly recognized as "visible".
     csRef<iClipper2D> oldClipper = rview->GetGraphics3D()->GetClipper();
-    int oldClipType = rview->GetGraphics3D()->GetClipType();
-
-    csRef<iShaderVarStack> varStack = shadermanager->GetShaderVariableStack ();
+    int oldClipType = rview->GetGraphics3D()->GetClipType();    
 
     s->IncRecLevel ();
     s->PrepareDraw (rview);
     csSector* cs = (csSector*)s;
     cs->SetSingleMesh (mesh);
 
+    csShaderVariableStack& stack = shadermanager->GetShaderVariableStack ();
     size_t i;
     for (i = 0; i < steps.GetSize (); i++)
     {
-      steps[i]->Perform (rview, s, varStack);
+      stack.Clear ();
+      steps[i]->Perform (rview, s, stack);
     }
     s->DecRecLevel ();
     cs->SetSingleMesh (0);
@@ -93,7 +92,7 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s, iMeshWrapper* mesh)
     for (i = lights->GetCount (); i-- > 0;)
       // Tell the engine to try to add this light into the halo queue
       engine->AddHalo (rview->GetCamera(), 
-        ((csLight*)lights->Get ((int)i))->GetPrivateObject ());
+        ((csLight*)lights->Get ((int)i))->GetPrivateObject ());    
   }
 }
 

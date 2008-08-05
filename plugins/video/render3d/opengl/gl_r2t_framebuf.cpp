@@ -19,9 +19,11 @@
 
 #include "cssysdef.h"
 
+#include "csgeom/projections.h"
 #include "csgfx/bakekeycolor.h"
 #include "csgfx/imagememory.h"
 #include "csgfx/packrgb.h"
+#include "csplugincommon/opengl/glhelper.h"
 
 #include "gl_render3d.h"
 #include "gl_txtmgr.h"
@@ -35,11 +37,12 @@ bool csGLRender2TextureFramebuf::SetRenderTarget (iTextureHandle* handle,
 						  int subtexture,
 						  csRenderTargetAttachment attachment)
 {
-  RTAttachment* target;
+  RTAttachment<>* target;
   switch (attachment)
   {
   case rtaColor0:
     target = &colorTarget;
+    rt_onscreen = !persistent;
     break;
   case rtaDepth:
     // @@@ FIXME: Perhaps investigate how to draw to the depth buffer
@@ -55,7 +58,7 @@ bool csGLRender2TextureFramebuf::SetRenderTarget (iTextureHandle* handle,
   if (!targetsSet)
   {
     txt_w = targetW; txt_h = targetH;
-    viewportHelper.Set2DViewport (G3D, txt_w, txt_h);
+    viewportHelper.Set2DViewport (G3D, txt_w, txt_h, true);
     targetsSet = true;
   }
   else
@@ -119,7 +122,7 @@ bool csGLRender2TextureFramebuf::CanSetRenderTarget (const char* format,
 iTextureHandle* csGLRender2TextureFramebuf::GetRenderTarget (csRenderTargetAttachment attachment,
                                                              int* subtexture) const
 {
-  const RTAttachment* target = 0;
+  const RTAttachment<>* target = 0;
   switch (attachment)
   {
   case rtaDepth:
@@ -184,13 +187,46 @@ void csGLRender2TextureFramebuf::BeginDraw (int drawflags)
     glTexParameteri (textarget, GL_TEXTURE_MIN_FILTER, oldMinFilt);
   }
   rt_onscreen = true;
-  G3D->statecache->SetCullFace (GL_FRONT);
+  G3D->statecache->SetCullFace (GL_BACK);
 }
 
 void csGLRender2TextureFramebuf::SetupProjection ()
 {
   GLRENDER3D_OUTPUT_LOCATION_MARKER;
   G3D->SetGlOrtho (true);
+}
+
+CS::Math::Matrix4 csGLRender2TextureFramebuf::SetupProjection (
+    const CS::Math::Matrix4& projectionMatrix)
+{
+  GLRENDER3D_OUTPUT_LOCATION_MARKER;
+  
+  CS::Math::Matrix4 actual;
+  bool needSubImage = (txt_w > viewportHelper.GetVPWidth()) 
+    || (txt_h > viewportHelper.GetVPHeight());
+    
+  if (needSubImage)
+  {
+    float scaleX = (float)viewportHelper.GetVPWidth() / (float)txt_w;
+    float scaleY = (float)viewportHelper.GetVPHeight() / (float)txt_h;
+    CS::Math::Matrix4 flipYAndScale (
+      CS::Math::Projections::Ortho (-1, (scaleX-0.5f)*2.0f, (scaleY-0.5f)*2.0f, -1, 1, -1));
+    actual = flipYAndScale * projectionMatrix;
+  }
+  else
+  {
+    CS::Math::Matrix4 flipY (
+	1, 0, 0, 0,
+	0, -1, 0, 0,
+	0, 0, 1, 0,
+	0, 0, 0, 1);
+    actual = flipY * projectionMatrix;
+  }
+  GLfloat matrixholder[16];
+  CS::PluginCommon::MakeGLMatrix4x4 (actual, matrixholder);
+  glLoadMatrixf (matrixholder);
+  
+  return actual;
 }
 
 GLenum csGLRender2TextureFramebuf::GetInternalFormat (
@@ -350,7 +386,73 @@ GLenum csGLRender2TextureFramebuf::GetInternalFormatDepth (
   }
 }
 
-void csGLRender2TextureFramebuf::GrabFramebuffer (const RTAttachment& target,
+GLenum csGLRender2TextureFramebuf::GetBaseFormat (
+  InternalFormatClass fmtClass, csGLBasicTextureHandle* tex)
+{
+  GLenum textarget = tex->GetGLTextureTarget();
+  GLenum glInternalFormat;
+  glGetTexLevelParameteriv ((textarget == GL_TEXTURE_CUBE_MAP) 
+      ? GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB : textarget, 
+    0, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&glInternalFormat);
+
+  switch (fmtClass)
+  {
+  default:
+  case ifColor:
+    return GetBaseFormatColor (glInternalFormat);
+  case ifDepth:
+    return GetBaseFormatDepth (glInternalFormat);
+  }
+}
+
+GLenum csGLRender2TextureFramebuf::GetBaseFormatColor (
+  GLenum texInternalFormat)
+{
+  switch (texInternalFormat)
+  {
+  case GL_RGB4:
+  case GL_RGB5:
+  case GL_RGB8:
+  case GL_RGB10:
+  case GL_RGB12:
+  case GL_RGB16:
+  case GL_RGB16F_ARB:
+  case GL_RGB32F_ARB:
+  default:
+    return GL_RGB;
+    break;
+  case GL_RGBA2:
+  case GL_RGBA4:
+  case GL_RGB5_A1:
+  case GL_RGBA8:
+  case GL_RGB10_A2:
+  case GL_RGBA12:
+  case GL_RGBA16:
+  case GL_RGBA16F_ARB:
+  case GL_RGBA32F_ARB:
+    return GL_RGBA;
+    break;
+  }
+}
+
+GLenum csGLRender2TextureFramebuf::GetBaseFormatDepth (
+  GLenum texInternalFormat)
+{
+  switch (texInternalFormat)
+  {
+  case GL_DEPTH_COMPONENT16:
+  case GL_DEPTH_COMPONENT24:
+  case GL_DEPTH_COMPONENT32:
+  default:
+    return GL_DEPTH_COMPONENT;
+    break;
+  case GL_DEPTH24_STENCIL8_EXT:
+    return GL_DEPTH_STENCIL_NV;
+    break;
+  }
+}
+
+void csGLRender2TextureFramebuf::GrabFramebuffer (const RTAttachment<>& target,
 						  InternalFormatClass fmtClass)
 {
   csGLBasicTextureHandle* tex_mm = 
@@ -386,56 +488,81 @@ void csGLRender2TextureFramebuf::GrabFramebuffer (const RTAttachment& target,
     bool handle_subtexture = (textarget == GL_TEXTURE_CUBE_MAP);
     /* Reportedly, some drivers crash if using CopyTexImage on a texture
       * size larger than the framebuffer. Use CopyTexSubImage then. */
-    bool needSubImage = (txt_w > viewportHelper.GetOriginalFramebufferWidth()) 
-      || (txt_h > viewportHelper.GetOriginalFramebufferHeight());
+    bool needSubImage = (txt_w > viewportHelper.GetVPWidth()) 
+      || (txt_h > viewportHelper.GetVPHeight());
     // Texture was not used as a render target before.
     // Make some necessary adjustments.
-    if (!tex_mm->IsWasRenderTarget())
+    if (needSubImage)
     {
-      internalFormat = GetInternalFormat (fmtClass, tex_mm);
-
-      tex_mm->SetupAutoMipping();
-      tex_mm->SetWasRenderTarget (true);
-      tex_mm->texFormat = iTextureHandle::RGBA8888;
-      if (needSubImage)
+      if (!tex_mm->IsWasRenderTarget())
       {
+	internalFormat = GetInternalFormat (fmtClass, tex_mm);
+	GLenum baseFormat = GetBaseFormat (fmtClass, tex_mm);
+  
+	tex_mm->SetupAutoMipping();
+	tex_mm->SetWasRenderTarget (true);
+	tex_mm->texFormat = iTextureHandle::RGBA8888;
 	// Gah. Turn target texture to required storage.
 	if (handle_subtexture)
 	{
 	  for (int i = 0; i < 6; i++)
 	    glTexImage2D (
 	      GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, internalFormat, 
-	      txt_w, txt_h,0, internalFormat, GL_UNSIGNED_BYTE, 0);
+	      txt_w, txt_h,0, baseFormat, GL_UNSIGNED_BYTE, 0);
 	}
 	else
 	  glTexImage2D (textarget, 0, internalFormat, txt_w, txt_h, 
-	    0, internalFormat, GL_UNSIGNED_BYTE, 0);
+	    0, baseFormat, GL_UNSIGNED_BYTE, 0);
       }
-    }
-    if (needSubImage)
-    {
+      int orgX = viewportHelper.GetVPOfsX();
+      int orgY = viewportHelper.GetOriginalFramebufferHeight()
+	- (viewportHelper.GetVPOfsY() 
+	  + csMin (txt_h, viewportHelper.GetVPHeight()));
+    
       if (handle_subtexture)
 	glCopyTexSubImage2D (
 	  GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + target.subtexture,
-	  0, 0, 0, 0, 0, 
-	  csMin (txt_w, viewportHelper.GetOriginalFramebufferWidth()), 
-	  csMin (txt_h, viewportHelper.GetOriginalFramebufferHeight()));
+	  0, 0, 0, orgX, orgY, 
+	  csMin (txt_w, viewportHelper.GetVPWidth()), 
+	  csMin (txt_h, viewportHelper.GetVPHeight()));
       else
-	glCopyTexSubImage2D (textarget, 0, 0, 0, 0, 0, 
-	  csMin (txt_w, viewportHelper.GetOriginalFramebufferWidth()),
-	  csMin (txt_h, viewportHelper.GetOriginalFramebufferHeight()));
+	glCopyTexSubImage2D (textarget, 0, 0, 0, orgX, orgY, 
+	  csMin (txt_w, viewportHelper.GetVPWidth()),
+	  csMin (txt_h, viewportHelper.GetVPHeight()));
     }
     else
     {
-      if (internalFormat == 0)
+      int orgX = viewportHelper.GetVPOfsX();
+      int orgY = viewportHelper.GetOriginalFramebufferHeight()
+	- (viewportHelper.GetVPOfsY() + txt_h);
+    
+      if (!tex_mm->IsWasRenderTarget())
+      {
+	internalFormat = GetInternalFormat (fmtClass, tex_mm);
+  
+	tex_mm->SetupAutoMipping();
+	tex_mm->SetWasRenderTarget (true);
+	tex_mm->texFormat = iTextureHandle::RGBA8888;
+	if (handle_subtexture)
+	  glCopyTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + target.subtexture, 
+	    0, internalFormat, orgX, orgY, txt_w, txt_h, 0);
+	else
+	  glCopyTexImage2D (textarget, 0, internalFormat,
+	    orgX, orgY, txt_w, txt_h, 0);
+      }
+      else
+      {
 	glGetTexLevelParameteriv ((textarget == GL_TEXTURE_CUBE_MAP) 
 	    ? GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB : textarget, 
 	  0, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&internalFormat);
-      if (handle_subtexture)
-	glCopyTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + target.subtexture, 
-	  0, internalFormat, 0, 0, txt_w, txt_h, 0);
-      else
-	glCopyTexImage2D (textarget, 0, internalFormat, 0, 0, txt_w, txt_h, 0);
+	
+	if (handle_subtexture)
+	  glCopyTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + target.subtexture, 
+	    0, 0, 0, orgX, orgY, txt_w, txt_h);
+	else
+	  glCopyTexSubImage2D (textarget, 0,
+	    0, 0, orgX, orgY, txt_w, txt_h);
+      }
     }
     tex_mm->RegenerateMipmaps();
   }

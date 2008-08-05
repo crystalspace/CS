@@ -1,6 +1,6 @@
 /*
     Copyright (C) 1998-2001 by Jorrit Tyberghein
-              (C) 2004 by Marten Svanfeldt
+              (C) 2004-2008 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,7 +20,6 @@
 #include "cssysdef.h"
 #include "csqint.h"
 #include "csqsqrt.h"
-#include "csgeom/kdtree.h"
 #include "csutil/csppulse.h"
 #include "csutil/csstring.h"
 #include "cstool/csview.h"
@@ -39,60 +38,13 @@
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
 
+#include "plugins/engine/3d/camera.h"
 #include "plugins/engine/3d/engine.h"
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/material.h"
-#include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/meshgen.h"
 #include "plugins/engine/3d/meshobj.h"
-
-//---------------------------------------------------------------------------
-csSectorLightList::csSectorLightList ()
-{
-  sector = 0;
-  kdtree = new csKDTree ();
-}
-
-csSectorLightList::~csSectorLightList ()
-{
-  RemoveAll ();
-  delete kdtree;
-}
-
-void csSectorLightList::PrepareLight (iLight* item)
-{
-  csLight* clight = ((csLight*)item)->GetPrivateObject ();
-  csLightList::PrepareLight (item);
-
-  clight->SetSector ((iSector*)sector);
-
-  const csVector3& center = item->GetCenter ();
-  float radius = item->GetCutoffDistance ();
-  csBox3 lightbox (center - csVector3 (radius), center + csVector3 (radius));
-  csKDTreeChild* childnode = kdtree->AddObject (lightbox, (void*)item);
-
-  clight->SetChildNode (childnode);
-  if (sector->use_lightculling)
-  {
-    sector->RegisterLightToCuller (clight);
-  }
-
-}
-
-void csSectorLightList::FreeLight (iLight* item)
-{
-
-  csLight* clight = ((csLight*)item)->GetPrivateObject ();
-  clight->SetSector (0);
-  kdtree->RemoveObject (clight->GetChildNode ());
-
-  csLightList::FreeLight (item);
-  if (sector->use_lightculling)
-  {
-    sector->UnregisterLightToCuller (clight);
-  }
-}
 
 //--------------------------------------------------------------------------
 
@@ -115,35 +67,78 @@ void csSectorMeshList::FreeMesh (iMeshWrapper* item)
   csMeshList::FreeMesh (item);
 }
 
+//--------------------------------------------------------------------------
+
+
+csSectorLightList::csSectorLightList (csSector* isect)
+  : sector (isect)
+{
+}
+
+csSectorLightList::~csSectorLightList ()
+{
+  RemoveAll ();
+}
+
+void csSectorLightList::PrepareLight (iLight* item)
+{
+  csLight* clight = static_cast<csLight*> (item);
+  csLightList::PrepareLight (item);
+
+  clight->SetSector (sector);
+
+  lightTree.AddObject (clight);
+}
+
+void csSectorLightList::FreeLight (iLight* item)
+{
+  csLight* clight = static_cast<csLight*> (item);
+  clight->SetSector (0); 
+  lightTree.RemoveObject (clight);
+}
+
+void csSectorLightList::UpdateLightBounds (csLight* light, const csBox3& oldBox)
+{
+  lightTree.MoveObject (light, oldBox);
+}
+
 //---------------------------------------------------------------------------
 
 csSector::csSector (csEngine *engine) :
-  scfImplementationType (this), engine (engine)
+  scfImplementationType (this), lights (this), engine (engine)
 {
   drawBusy = 0;
   dynamicAmbientLightColor.Set (0,0,0);
   dynamicAmbientLightVersion = (uint)~0;
   meshes.SetSector (this);
   //portal_containers.SetSector (this);
-  lights.SetSector (this);
   currentVisibilityNumber = 0;
   renderloop = 0;
-  use_lightculling = false;
+
   single_mesh = 0;
-  relevant_lights_dirty = true;
 
   SetupSVNames();
   svDynamicAmbient.AttachNew (new csShaderVariable (SVNames().dynamicAmbient));
   svDynamicAmbient->SetValue (dynamicAmbientLightColor);
   AddVariable (svDynamicAmbient);
+  svLightAmbient.AttachNew (new csShaderVariable (SVNames().lightAmbient));
+  svLightAmbient->SetType (csShaderVariable::VECTOR3);
+  {
+    csRef<iShaderVariableAccessor> sva;
+    sva.AttachNew (new LightAmbientAccessor (this));
+    svLightAmbient->SetAccessor (sva);
+  }
+  AddVariable (svLightAmbient);
   svFogColor.AttachNew (new csShaderVariable (SVNames().fogColor));
   AddVariable (svFogColor);
   svFogMode.AttachNew (new csShaderVariable (SVNames().fogMode));
   AddVariable (svFogMode);
-  svFogStart.AttachNew (new csShaderVariable (SVNames().fogStart));
-  AddVariable (svFogStart);
-  svFogEnd.AttachNew (new csShaderVariable (SVNames().fogEnd));
-  AddVariable (svFogEnd);
+  svFogFadeStart.AttachNew (new csShaderVariable (SVNames().fogFadeStart));
+  AddVariable (svFogFadeStart);
+  svFogFadeEnd.AttachNew (new csShaderVariable (SVNames().fogFadeEnd));
+  AddVariable (svFogFadeEnd);
+  svFogLimit.AttachNew (new csShaderVariable (SVNames().fogLimit));
+  AddVariable (svFogLimit);
   svFogDensity.AttachNew (new csShaderVariable (SVNames().fogDensity));
   AddVariable (svFogDensity);
   UpdateFogSVs();
@@ -151,74 +146,12 @@ csSector::csSector (csEngine *engine) :
 
 csSector::~csSector ()
 {
-  CleanupLSI ();
   lights.RemoveAll ();
 }
 
 void csSector::SelfDestruct ()
 {
   engine->GetSectors ()->Remove ((iSector*)this);
-}
-
-void csSector::RegisterLightToCuller (csLight* light)
-{
-  light->UseAsCullingObject ();
-  csRef<iVisibilityObject> vo = 
-        scfQueryInterface<iVisibilityObject> (light);
-  culler->RegisterVisObject (vo);
-}
-
-void csSector::UnregisterLightToCuller (csLight* light)
-{
-  csRef<iVisibilityObject> vo = 
-        scfQueryInterface<iVisibilityObject> (light);
-  culler->UnregisterVisObject (vo);
-  light->StopUsingAsCullingObject ();
-}
-
-void csSector::SetLightCulling (bool enable)
-{
-  if (enable == use_lightculling) return;
-  use_lightculling = enable;
-  int i;
-  if (use_lightculling)
-  {
-    for (i = 0; i < lights.GetCount (); i++)
-    {
-      iLight* l = lights.Get (i);
-      csLight* clight = ((csLight*)l)->GetPrivateObject ();
-      RegisterLightToCuller (clight);
-    }
-  }
-  else
-  {
-    for (i = 0; i < lights.GetCount (); i++)
-    {
-      iLight* l = lights.Get (i);
-      csLight* clight = ((csLight*)l)->GetPrivateObject ();
-      UnregisterLightToCuller (clight);
-    }
-  }
-}
-
-void csSector::AddLightVisibleCallback (iLightVisibleCallback* cb)
-{
-  lightVisibleCallbackList.Push (cb);
-}
-
-void csSector::RemoveLightVisibleCallback (iLightVisibleCallback* cb)
-{
-  lightVisibleCallbackList.Delete (cb);
-}
-
-void csSector::FireLightVisibleCallbacks (iLight* light)
-{
-  size_t i = lightVisibleCallbackList.GetSize ();
-  while (i > 0)
-  {
-    i--;
-    lightVisibleCallbackList[i]->LightVisible ((iSector*)this, light);
-  }
 }
 
 void csSector::UnlinkObjects ()
@@ -362,9 +295,10 @@ void csSector::PrecacheDraw ()
 
   // @@@ Ideally we would want to disable visibility culling
   // here so that all objects are visible.
-  g3d->BeginDraw (CSDRAW_3DGRAPHICS);
+  /*g3d->BeginDraw (CSDRAW_3DGRAPHICS);
   view->Draw ();
-  g3d->FinishDraw ();
+  g3d->FinishDraw ();*/
+  engine->renderManager->RenderView (view);
 }
 
 //----------------------------------------------------------------------
@@ -372,16 +306,6 @@ void csSector::PrecacheDraw ()
 bool csSector::SetVisibilityCullerPlugin (const char *plugname,
 	iDocumentNode* culler_params)
 {
-  if (use_lightculling)
-  {
-    int i;
-    for (i = 0; i < lights.GetCount (); i++)
-    {
-      iLight* l = lights.Get (i);
-      csLight* clight = ((csLight*)l)->GetPrivateObject ();
-      UnregisterLightToCuller (clight);
-    }
-  }
 
   culler = 0;
 
@@ -416,15 +340,7 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
     m->GetMovable ()->UpdateMove ();
     RegisterEntireMeshToCuller (m);
   }
-  if (use_lightculling)
-  {
-    for (i = 0; i < lights.GetCount (); i++)
-    {
-      iLight* l = lights.Get (i);
-      csLight* clight = ((csLight*)l)->GetPrivateObject ();
-      RegisterLightToCuller (clight);
-    }
-  }
+
   return true;
 }
 
@@ -645,6 +561,146 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
   return holder.meshList;
 }
 
+void csSector::MarkMeshAndChildrenVisible (iMeshWrapper* mesh,
+					   iRenderView* rview,
+					   uint32 frustum_mask,
+					   bool doFade, float fade)
+{
+  csMeshWrapper* cmesh = (csMeshWrapper*)mesh;
+  ObjectVisible (cmesh, rview, frustum_mask, doFade, fade);
+  size_t i;
+  const csRefArray<iSceneNode>& children = cmesh->GetChildren ();
+  for (i = 0 ; i < children.GetSize () ; i++)
+  {
+    iMeshWrapper* child = children[i]->QueryMesh ();
+    // @@@ Traverse too in case there are lights/cameras?
+    if (child)
+      MarkMeshAndChildrenVisible (child, rview, frustum_mask, doFade, fade);
+  }
+}
+
+void csSector::ObjectVisible (csMeshWrapper* cmesh, iRenderView* rview,
+			      uint32 frustum_mask,
+			      bool doFade = false, float fade = 1.0f)
+{
+  csStaticLODMesh* static_lod = cmesh->GetStaticLODMesh ();
+  bool mm = cmesh->DoMinMaxRange ();
+  float distance = 0;
+  if (static_lod || mm)
+    distance = csQsqrt (cmesh->GetSquaredDistance (rview));
+
+  if (mm)
+  {
+    if (distance < cmesh->csMeshWrapper::GetMinimumRenderDistance ())
+      return;
+    if (distance > cmesh->csMeshWrapper::GetMaximumRenderDistance ())
+      return;
+  }
+
+  if (doFade)
+    cmesh->SetLODFade (fade);
+  else
+    cmesh->UnsetLODFade ();
+
+  if (static_lod)
+  {
+    float lod = static_lod->GetLODValue (distance);
+    csArray<iMeshWrapper*>* meshes1;
+    csArray<iMeshWrapper*>* meshes2;
+    float lodFade;
+    bool hasFade = static_lod->GetMeshesForLODFaded (lod,
+      meshes1, meshes2, lodFade);
+    size_t i;
+    if (meshes1 != 0)
+    {
+      for (i = 0 ; i < meshes1->GetSize () ; i++)
+	MarkMeshAndChildrenVisible ((*meshes1)[i], rview, frustum_mask,
+	  hasFade, fade*lodFade);
+    }
+    if (meshes2 != 0)
+    {
+      for (i = 0 ; i < meshes2->GetSize () ; i++)
+	MarkMeshAndChildrenVisible ((*meshes2)[i], rview, frustum_mask,
+	  hasFade, fade*(1.0f-lodFade));
+    }
+  }
+
+  csSectorVisibleRenderMeshes visMesh;
+  visMesh.imesh = cmesh;
+  int num;
+  csRenderMesh** meshes = cmesh->GetRenderMeshes (num, rview, frustum_mask);
+  CS_ASSERT(!((num != 0) && (meshes == 0)));
+#ifdef CS_DEBUG
+  for (int i = 0 ; i < num ; i++)
+    meshes[i]->db_mesh_name = cmesh->GetName ();
+#endif
+  visMesh.num = num;
+  visMesh.rmeshes = meshes;
+  renderMeshesScratch.Push (visMesh);
+
+  if (num > 0)
+  {
+    // get extra render meshes
+    size_t numExtra = 0;
+    csRenderMesh** extraMeshes = cmesh->GetExtraRenderMeshes (numExtra, rview,
+					  frustum_mask);
+    CS_ASSERT(!((numExtra != 0) && (extraMeshes == 0)));
+    visMesh.num = numExtra;
+    visMesh.rmeshes = extraMeshes;
+  }
+}
+
+csSectorVisibleRenderMeshes* csSector::GetVisibleRenderMeshes (int& num,
+						 iMeshWrapper* mesh,
+						 iRenderView *rview,
+						 uint32 frustum_mask)
+{
+  csMeshWrapper* cmesh = (csMeshWrapper*)mesh;
+  csStaticLODMesh* static_lod = cmesh->GetStaticLODMesh ();
+  bool mm = cmesh->DoMinMaxRange ();
+  if (!static_lod && !mm)
+  {
+    csRenderMesh** meshes = cmesh->GetRenderMeshes (num, rview, frustum_mask);
+    CS_ASSERT(!((num != 0) && (meshes == 0)));
+  #ifdef CS_DEBUG
+    for (int i = 0 ; i < num ; i++)
+      meshes[i]->db_mesh_name = cmesh->GetName ();
+  #endif
+
+    oneVisibleMesh[0].imesh = mesh;
+    oneVisibleMesh[0].num = num;
+    oneVisibleMesh[0].rmeshes = meshes;
+
+    size_t numExtra = 0;
+    csRenderMesh** extraMeshes = 0;
+    if (num > 0)
+    {
+      extraMeshes = cmesh->GetExtraRenderMeshes (numExtra, rview,
+				    frustum_mask);
+      CS_ASSERT(!((numExtra != 0) && (extraMeshes == 0)));
+    }
+  
+    if (numExtra == 0)
+    {
+      num = 1;
+      return oneVisibleMesh;
+    }
+    
+    oneVisibleMesh[1].imesh = mesh;
+    oneVisibleMesh[1].num = numExtra;
+    oneVisibleMesh[1].rmeshes = extraMeshes;
+
+    num = 2;
+    return oneVisibleMesh;
+  }
+
+  renderMeshesScratch.Empty();
+
+  ObjectVisible (cmesh, rview, frustum_mask);
+
+  num = renderMeshesScratch.GetSize();
+  return renderMeshesScratch.GetArray();
+}
 
 csSectorHitBeamResult csSector::HitBeamPortals (
   const csVector3 &start,
@@ -838,7 +894,8 @@ void csSector::PrepareDraw (iRenderView *rview)
 
   // Make sure the visibility culler is loaded.
   GetVisibilityCuller ();
-  csRenderView* csrview = (csRenderView*)rview;
+  CS::RenderManager::RenderView* csrview =
+    (CS::RenderManager::RenderView*)rview;
   csrview->SetThisSector ((iSector*)this);
 
   size_t i = sectorCallbackList.GetSize ();
@@ -1109,53 +1166,6 @@ void csSector::CalculateSectorBBox (csBox3 &bbox, bool do_meshes) const
   }
 }
 
-void csSector::CleanupLSI ()
-{
-  csLightSectorInfluences::GlobalIterator it = influences.GetIterator ();
-  while (it.HasNext ())
-  {
-    csLightSectorInfluence* inf = it.Next ();
-    ((csLight*)inf->light)->RemoveLSI (inf);
-  }
-  influences.Empty ();
-  relevant_lights_dirty = true;
-}
-
-void csSector::AddLSI (csLightSectorInfluence* inf)
-{
-  influences.Add (inf);
-  relevant_lights_dirty = true;
-}
-
-void csSector::RemoveLSI (csLightSectorInfluence* inf)
-{
-  influences.Delete (inf);
-  relevant_lights_dirty = true;
-}
-
-const csArray<iLightSectorInfluence*>& csSector::GetRelevantLights (
-  	int maxLights, bool desireSorting)
-{
-  if (relevant_lights_dirty)
-  {
-    if (maxLights != -1)
-      relevant_lights.SetSize (maxLights);
-    relevant_lights.Empty ();
-    csLightSectorInfluences::GlobalIterator it = influences.GetIterator ();
-    size_t cnt = 0;
-    while (it.HasNext ())
-    {
-      csLightSectorInfluence* inf = it.Next ();
-      relevant_lights.Push (inf);
-      cnt++;
-      if (maxLights != -1 && cnt >= (size_t)maxLights)
-	break;
-    }
-
-    relevant_lights_dirty = false;
-  }
-  return relevant_lights;
-}
 
 //---------------------------------------------------------------------------
 
@@ -1203,30 +1213,50 @@ void csSector::UpdateFogSVs ()
 {
   svFogColor->SetValue (fog.color);
   svFogMode->SetValue (int (fog.mode));
-  svFogStart->SetValue (fog.start);
-  svFogEnd->SetValue (fog.end);
+  svFogFadeStart->SetValue (fog.start);
+  svFogFadeEnd->SetValue (fog.end);
+  svFogLimit->SetValue (fog.limit);
   svFogDensity->SetValue (fog.density);
 }
 
 void csSector::SetupSVNames()
 {
-  if (SVNames().dynamicAmbient == csInvalidStringID)
+  if ((CS::ShaderVarStringID)(SVNames().dynamicAmbient) == CS::InvalidShaderVarStringID)
   {
-    SVNames().dynamicAmbient = CS::ShaderVarName (engine->globalStringSet,
+    SVNames().dynamicAmbient = CS::ShaderVarName (engine->svNameStringSet,
       "dynamic ambient");
-    SVNames().fogColor = CS::ShaderVarName (engine->globalStringSet,
+    SVNames().lightAmbient = CS::ShaderVarName (engine->svNameStringSet,
+      "light ambient");
+    SVNames().fogColor = CS::ShaderVarName (engine->svNameStringSet,
       "fog color");
-    SVNames().fogMode = CS::ShaderVarName (engine->globalStringSet,
+    SVNames().fogMode = CS::ShaderVarName (engine->svNameStringSet,
       "fog mode");
-    SVNames().fogStart = CS::ShaderVarName (engine->globalStringSet,
-      "fog start");
-    SVNames().fogEnd = CS::ShaderVarName (engine->globalStringSet,
-      "fog end");
-    SVNames().fogDensity = CS::ShaderVarName (engine->globalStringSet,
+    SVNames().fogFadeStart = CS::ShaderVarName (engine->svNameStringSet,
+      "fog fade start");
+    SVNames().fogFadeEnd = CS::ShaderVarName (engine->svNameStringSet,
+      "fog fade end");
+    SVNames().fogLimit = CS::ShaderVarName (engine->svNameStringSet,
+      "fog limit");
+    SVNames().fogDensity = CS::ShaderVarName (engine->svNameStringSet,
       "fog density");
   }
 }
 
+void csSector::UpdateLightBounds (csLight* light, 
+                                  const csBox3& oldBox)
+{
+  lights.UpdateLightBounds (light, oldBox);
+}
+
+//---------------------------------------------------------------------------
+
+void csSector::LightAmbientAccessor::PreGetValue (csShaderVariable* sv)
+{
+  csColor engineAmbient;
+  sector->engine->csEngine::GetAmbientLight (engineAmbient);
+  sv->SetValue (sector->dynamicAmbientLightColor + engineAmbient);
+}
+    
 //---------------------------------------------------------------------------
 
 
@@ -1309,3 +1339,4 @@ iSector *csSectorList::FindByName (const char *Name) const
 {
   return sectors_hash.Get (Name, 0);
 }
+

@@ -12,8 +12,14 @@
 %include "imesh/gmeshskel2.h"
 
 %include "imesh/animesh.h"
+TYPEMAP_ARGOUT_PTR(csQuaternion)
+TYPEMAP_ARGOUT_PTR(csVector3)
+APPLY_TYPEMAP_ARGOUT_PTR(csQuaternion,csQuaternion& rot)
+APPLY_TYPEMAP_ARGOUT_PTR(csVector3,csVector3& offset)
 %include "imesh/skeleton2.h"
 %include "imesh/skeleton2anim.h"
+%clear csVector3& offset;
+%clear csQuaternion& rot;
 
 struct csSprite2DVertex;
 %ignore iSprite2DState::GetVertices;

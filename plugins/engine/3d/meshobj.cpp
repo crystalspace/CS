@@ -21,6 +21,7 @@
 #include "cstool/rviewclipper.h"
 #include "imesh/objmodel.h"
 #include "igeom/clip2d.h"
+#include "plugins/engine/3d/camera.h"
 #include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/meshobj.h"
 #include "plugins/engine/3d/meshfact.h"
@@ -32,8 +33,11 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/rendermesh.h"
 
+#include "reflectomotron3000.h"
 
 CS_LEAKGUARD_IMPLEMENT (csMeshWrapper);
+
+using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
 
 // ---------------------------------------------------------------------------
 
@@ -154,10 +158,6 @@ csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj)
   min_render_dist = -1000000000.0f;
   max_render_dist = 1000000000.0f;
 
-  relevant_lights_valid = false;
-  relevant_lights_max = 8;
-  relevant_lights_flags.SetAll (CS_LIGHTINGUPDATE_SORTRELEVANCE);
-
   last_camera = 0;
   last_frame_number = 0;
 
@@ -166,6 +166,8 @@ csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj)
   sv_creation_time.AttachNew(new csShaderVariable(engine->id_creation_time));
   sv_creation_time->SetValue((float)engine->virtualClock->GetCurrentTicks() / 1000.0f);
   GetSVContext()->AddVariable(sv_creation_time);
+
+  SetDefaultEnvironmentTexture ();
 }
 
 void csMeshWrapper::SelfDestruct ()
@@ -289,7 +291,6 @@ csMeshWrapper::~csMeshWrapper ()
 
 void csMeshWrapper::UpdateMove ()
 {
-  relevant_lights_valid = false;
 }
 
 bool csMeshWrapper::SomeParentHasStaticLOD () const
@@ -441,151 +442,6 @@ void csMeshWrapper::SetRenderPriority (CS::Graphics::RenderPriority rp)
   }
 }
 
-void csMeshWrapper::SetLightingUpdate (int flags, int num_lights)
-{
-  relevant_lights_flags.SetAll (flags);
-  relevant_lights_max = num_lights;
-  relevant_lights_valid = false;
-}
-
-LSIAndDist csMeshWrapper::relevant_lights_cache[MAX_INF_LIGHTS];
-
-static int compare_light (const void *p1, const void *p2)
-{
-  LSIAndDist *sp1 = (LSIAndDist *)p1;
-  LSIAndDist *sp2 = (LSIAndDist *)p2;
-  float z1 = sp1->influence;
-  float z2 = sp2->influence;
-  if (z1 < z2)
-    return 1;
-  else if (z1 > z2)
-    return -1;
-  return 0;
-}
-
-const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights 
-(
-    	int maxLights, bool desireSorting)
-{
-  bool always_update = relevant_lights_flags.Check (
-  	CS_LIGHTINGUPDATE_ALWAYSUPDATE);
-  if (!always_update)
-  {
-    // Check if updating is needed.
-    if (relevant_lights_valid)
-    {
-      // Object didn't move. Now check lights (moved or destroyed).
-      bool relevant = true;
-      size_t i;
-      for (i = 0 ; i < relevant_lights.GetSize () ; i++)
-      {
-	if (!relevant_lights_ref[i].lsi)
-	{
-	  relevant = false;	// Light was removed!
-	  break;
-	}
-        iLightSectorInfluence* l = relevant_lights[i];
-	if (l->GetLight ()->GetLightNumber ()
-	    != relevant_lights_ref[i].light_nr)
-	{
-	  relevant = false;	// Light was removed!
-	  break;
-	}
-      }
-
-      if (relevant)
-        return relevant_lights;
-    }
-  }
-
-  relevant_lights.Empty ();
-  relevant_lights_ref.Empty ();
-
-  const iSectorList *movable_sectors = movable.GetSectors ();
-  if (movable_sectors->GetCount () > 0 && relevant_lights_max > 0)
-  {
-    csBox3 box;
-    GetFullBBox (box);
-
-    if (relevant_lights_max > relevant_lights.GetSize ())
-      relevant_lights.SetSize (relevant_lights_max);
-
-    iSector *sect = movable_sectors->Get (0);
-    csVector3 pos = movable.GetFullPosition ();
-    csSector* cssect = (csSector*)sect;
-    const csLightSectorInfluences& lsi = cssect->GetLSI ();
-
-    // Because calculating the intensity for a light is expensive
-    // we only calculate it if there is a chance we might need sorting.
-    size_t lsi_size = lsi.GetSize ();
-    bool certainly_no_sorting = (!desireSorting)
-    	&& lsi_size < relevant_lights_max
-	&& (maxLights == -1 || lsi_size < (size_t)maxLights);
-
-    csLightSectorInfluences::GlobalIterator it = lsi.GetIterator ();
-    size_t cnt = 0;
-    while (it.HasNext () && cnt < MAX_INF_LIGHTS)
-    {
-      csLightSectorInfluence* inf = it.Next ();
-      const csVector3& center = inf->GetFrustum ()->GetOrigin ();
-      iLight* li = inf->GetLight ();
-      float sqrad = li->GetCutoffDistance ();
-      sqrad *= sqrad;
-      if (csIntersect3::BoxSphere (box, center, sqrad))
-      {
-	// Object is in influence sphere of light.
-	if (csIntersect3::BoxFrustum (box, inf->GetFrustum ()))
-	{
-	  relevant_lights_cache[cnt].lsi = inf;
-	  if (!certainly_no_sorting)
-	  {
-	    float sqdist = csSquaredDist::PointPoint (pos, center);
-#if 0
-	    // Use negative squared distance because the compare function excepts
-	    // high values for lights with a lot of influence.
-	    relevant_lights_cache[cnt].influence = -sqdist;
-#else
-	    relevant_lights_cache[cnt].influence = ((csLight*)li)
-	  	  ->GetLuminanceAtSquaredDistance (sqdist);
-#endif
-	  }
-	  cnt++;
-        }
-      }
-    }
-    if (desireSorting || cnt > relevant_lights_max
-    	|| (maxLights != -1 && int (cnt) > maxLights))
-    {
-      qsort (
-        relevant_lights_cache,
-        cnt,
-        sizeof (LSIAndDist),
-        compare_light);
-    }
-    if (cnt > relevant_lights_max) cnt = relevant_lights_max;
-    if (maxLights != -1 && int (cnt) > maxLights) cnt = maxLights;
-    relevant_lights.SetSize (cnt);
-    relevant_lights_ref.SetSize (cnt);
-    size_t i;
-    for (i = 0 ; i < cnt ; i++)
-    {
-      relevant_lights[i] = relevant_lights_cache[i].lsi;
-    }
-    if (!always_update)
-    {
-      // Update our ref list.
-      for (i = 0 ; i < cnt ; i++)
-      {
-        relevant_lights_ref[i].lsi = relevant_lights[i];
-        relevant_lights_ref[i].light_nr = relevant_lights[i]->GetLight ()
-	  ->GetLightNumber ();
-      }
-    }
-  }
-  relevant_lights_valid = true;
-  return relevant_lights;
-}
-
 csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview, 
 					       uint32 frustum_mask)
 {
@@ -627,7 +483,8 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
 
   if (flags.Check (CS_ENTITY_NOCLIP))
   {
-    csRenderView* csrview = (csRenderView*)rview;
+    CS::RenderManager::RenderView* csrview =
+      (CS::RenderManager::RenderView*)rview;
     csRenderContext* ctxt = csrview->GetCsRenderContext ();
 
     if (last_frame_number == rview->GetCurrentFrameNumber () &&
@@ -668,7 +525,8 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
   	old_ctxt != 0 ? 0 : frustum_mask);
   if (old_ctxt)
   {
-    csRenderView* csrview = (csRenderView*)rview;
+    CS::RenderManager::RenderView* csrview =
+      (CS::RenderManager::RenderView*)rview;
     csrview->SetCsRenderContext (old_ctxt);
   }
   return rmeshes;
@@ -696,7 +554,8 @@ CS::Graphics::RenderMesh** csMeshWrapper::GetExtraRenderMeshes (size_t& num,
 
   if (flags.Check (CS_ENTITY_NOCLIP))
   {
-    csRenderView* csrview = (csRenderView*)rview;
+    CS::RenderManager::RenderView* csrview =
+      (CS::RenderManager::RenderView*)rview;
     csRenderContext* ctxt = csrview->GetCsRenderContext ();
 
     if (last_frame_number == rview->GetCurrentFrameNumber () &&
@@ -984,6 +843,19 @@ void csMeshWrapper::SetLODFade (float fade)
 void csMeshWrapper::UnsetLODFade ()
 {
   GetSVContext()->RemoveVariable (engine->id_lod_fade);
+}
+
+void csMeshWrapper::SetDefaultEnvironmentTexture ()
+{
+  csRef<csShaderVariable> svTexEnvironment;
+  svTexEnvironment.AttachNew (new csShaderVariable (engine->svTexEnvironmentName));
+  svTexEnvironment->SetType (csShaderVariable::TEXTURE);
+
+  csRef<iShaderVariableAccessor> accessor;
+  accessor.AttachNew (new EnvTex::Accessor (this));
+  svTexEnvironment->SetAccessor (accessor);
+
+  GetSVContext()->AddVariable(svTexEnvironment);
 }
 
 csHitBeamResult csMeshWrapper::HitBeamOutline (

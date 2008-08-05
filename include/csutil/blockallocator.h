@@ -25,7 +25,7 @@
  */
 
 #include "csutil/fixedsizeallocator.h"
-
+#include "csutil/metautils.h"
 #include "csutil/custom_new_disable.h"
 
 /**\addtogroup util_memory
@@ -105,6 +105,23 @@ public:
 };
 
 /**
+ * 
+ */
+template<typename T>
+struct csBlockAllocatorSizeObject
+{
+  static const unsigned int value = sizeof(T);
+};
+
+/**
+ * 
+ */
+template<typename T, unsigned int Alignment>
+struct csBlockAllocatorSizeObjectAlign
+{
+  static const unsigned int value = CS::Meta::AlignSize<T, Alignment>::value;
+};
+/**
  * This class implements a memory allocator which can efficiently allocate
  * objects that all have the same size. It has no memory overhead per
  * allocation (unless the objects are smaller than sizeof(void*) bytes) and is
@@ -121,17 +138,23 @@ public:
  * \sa csMemoryPool
  */
 template <class T,
-  class Allocator = CS::Memory::AllocatorMalloc, 
-  class ObjectDispose = csBlockAllocatorDisposeDelete<T> >
-class csBlockAllocator : public csFixedSizeAllocator<sizeof (T), Allocator>
+  typename Allocator = CS::Memory::AllocatorMalloc, 
+  typename ObjectDispose = csBlockAllocatorDisposeDelete<T>,
+  typename SizeComputer = csBlockAllocatorSizeObject<T>
+>
+class csBlockAllocator : 
+  public csFixedSizeAllocator<
+    SizeComputer::value,
+    Allocator>
 {
 public:
-  typedef csBlockAllocator<T, Allocator> ThisType;
+  typedef csBlockAllocator<T, Allocator, ObjectDispose, SizeComputer> ThisType;
   typedef T ValueType;
   typedef Allocator AllocatorType;
 
 protected:
-  typedef csFixedSizeAllocator<sizeof (T), Allocator> superclass;
+  typedef csFixedSizeAllocator<SizeComputer::value, Allocator> superclass;
+
 private:
   void* Alloc (size_t /*n*/) { return 0; }                       // Illegal
   void* Alloc (void* /*p*/, size_t /*newSize*/) { return 0; }   // Illegal
@@ -147,7 +170,7 @@ public:
    *   elements, though allocated, will remain unused (until you add more
    *   elements).
    *
-   * \remarks If use use csBlockAllocator as a convenient and lightweight
+   * \remarks If you use csBlockAllocator as a convenient and lightweight
    *   garbage collection facility (for which it is well-suited), and expect it
    *   to dispose of allocated objects when the pool itself is destroyed, then
    *   set \c warn_unfreed to false. On the other hand, if you use
@@ -158,6 +181,9 @@ public:
    */
   csBlockAllocator(size_t nelem = 32) : superclass (nelem)
   {
+#ifdef CS_MEMORY_TRACKER
+    superclass::blocks.SetMemTrackerInfo (typeid(*this).name());
+#endif
   }
 
   /**
@@ -170,11 +196,22 @@ public:
   }
 
   /**
-   * Destroy all objects allocated by the pool.
+   * Destroy all objects allocated by the pool without releasing the memory.
    * \remarks All pointers returned by Alloc() are invalidated. It is safe to
    *   perform new allocations from the pool after invoking Empty().
    */
-  void Empty()
+  void Empty ()
+  {
+    ObjectDispose dispose (*this, true);
+    FreeAll (dispose);
+  }
+
+  /**
+   * Destroy all objects allocated by the pool and release the memory.
+   * \remarks All pointers returned by Alloc() are invalidated. It is safe to
+   *   perform new allocations from the pool after invoking DeleteAll().
+   */
+  void DeleteAll ()
   {
     ObjectDispose dispose (*this, true);
     DisposeAll (dispose);
@@ -207,6 +244,16 @@ public:
   T* Alloc (A1& a1, A2& a2, A3& a3)
   {
     return new (superclass::Alloc()) T (a1, a2, a3);
+  }
+
+  /**
+   * Allocate a new object. 
+   * The one-argument constructor of \a T is invoked. 
+   */
+  template<typename A1>
+  T* Alloc (A1& a1)
+  {
+    return new (superclass::Alloc()) T (a1);
   }
 
   /**

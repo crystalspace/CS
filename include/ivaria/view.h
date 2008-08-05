@@ -25,12 +25,14 @@
  */
 
 #include "csutil/scf_interface.h"
+#include "cstool/meshfilter.h"
 
 struct iCamera;
+struct iClipper2D;
 struct iEngine;
 struct iGraphics3D;
-struct iClipper2D;
 struct iMeshWrapper;
+struct iPerspectiveCamera;
 
 /**
  * The iView class encapsulates the top-level Crystal Space
@@ -48,7 +50,7 @@ struct iMeshWrapper;
  */
 struct iView : public virtual iBase
 {
-  SCF_INTERFACE(iView, 2,0,0);
+  SCF_INTERFACE(iView, 2,0,1);
   /// Get engine handle.
   virtual iEngine* GetEngine () = 0;
   /// Set engine handle.
@@ -58,6 +60,11 @@ struct iView : public virtual iBase
   virtual iCamera* GetCamera () = 0;
   /// Set current camera.
   virtual void SetCamera (iCamera* c) = 0;
+
+  /// Get current perspective camera.
+  virtual iPerspectiveCamera* GetPerspectiveCamera () = 0;
+  /// Set current perspective camera.
+  virtual void SetPerspectiveCamera (iPerspectiveCamera* c) = 0;
 
   /// Get Context
   virtual iGraphics3D* GetContext () = 0;
@@ -99,6 +106,8 @@ struct iView : public virtual iBase
    * then you can disable this.
    */
   virtual void SetAutoResize (bool state) = 0;
+
+  virtual CS::Utility::MeshFilter& GetMeshFilter () = 0;
 };
 
 #endif // __CS_IVARIA_VIEW_H__

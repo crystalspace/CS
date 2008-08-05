@@ -50,16 +50,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
     bool ParseSkeleton (iDocumentNode* node);
     bool ParseBone (iDocumentNode* node, iSkeletonFactory2* factory, BoneID parent);
 
-    bool ParseAnimPacket (iDocumentNode* node);
+    bool ParseAnimPacket (iDocumentNode* node);    
+    iSkeletonAnimation2* ParseAnimation (iDocumentNode* node, 
+      iSkeletonAnimPacketFactory2* packet);
+
     csPtr<iSkeletonAnimNodeFactory2> ParseAnimTreeNode (iDocumentNode* node,
       iSkeletonAnimPacketFactory2* packet);
-    iSkeletonAnimationFactory2* ParseAnimation (iDocumentNode* node, 
+
+    csPtr<iSkeletonAnimNodeFactory2> ParseAnimationNode (iDocumentNode* node,
       iSkeletonAnimPacketFactory2* packet);
-
-    //csRef<iSkeletonAnimationNodeFactory2> ParseAnimTree (iDocumentNode* node);
-
-    //csPtr<iSkeletonAnimationNodeFactory2> ParseaAnimTreeNode (iDocumentNode* node);
-    //bool ParseAnimation (iDocumentNode* node, iSkeletonAnimationFactory2* fact);
+    csPtr<iSkeletonAnimNodeFactory2> ParseBlendNode (iDocumentNode* node,
+      iSkeletonAnimPacketFactory2* packet);
+    csPtr<iSkeletonAnimNodeFactory2> ParsePriorityNode (iDocumentNode* node,
+      iSkeletonAnimPacketFactory2* packet);
+    csPtr<iSkeletonAnimNodeFactory2> ParseRandomNode (iDocumentNode* node,
+      iSkeletonAnimPacketFactory2* packet);
+    csPtr<iSkeletonAnimNodeFactory2> ParseFSMNode (iDocumentNode* node,
+      iSkeletonAnimPacketFactory2* packet);
 
     iObjectRegistry* object_reg;
     csRef<iSyntaxService> synldr;

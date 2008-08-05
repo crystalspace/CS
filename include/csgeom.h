@@ -22,6 +22,7 @@
  * subdirectory of the top Crystal Space include directory.
  */
 #include "cssysdef.h"
+#include "csgeom/aabbtree.h"
 #include "csgeom/box.h"
 #include "csgeom/bsptree.h"
 #include "csgeom/chainhull2d.h"
@@ -49,6 +50,7 @@
 #include "csgeom/polyclip.h"
 #include "csgeom/polyidx.h"
 #include "csgeom/polypool.h"
+#include "csgeom/projections.h"
 #include "csgeom/quaternion.h"
 #include "csgeom/segment.h"
 #include "csgeom/solidspace.h"

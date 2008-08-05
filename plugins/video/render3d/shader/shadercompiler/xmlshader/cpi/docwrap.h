@@ -83,11 +83,18 @@ struct iConditionResolver
     CondOperation& operation) = 0;
 };
 
+struct iWrappedDocumentNode : public virtual iBase
+{
+  SCF_INTERFACE (iWrappedDocumentNode, 0, 0, 1);
+};
+
 /**
  * Wrapper around a document node, supporting conditionals.
  */
 class csWrappedDocumentNode : 
-  public scfImplementationExt0<csWrappedDocumentNode, csDocumentNodeReadOnly>
+  public scfImplementationExt1<csWrappedDocumentNode,
+                               csDocumentNodeReadOnly,
+                               iWrappedDocumentNode>
 {
   friend class csWrappedDocumentNodeIterator;
   friend struct WrapperStackEntry;
@@ -97,7 +104,6 @@ class csWrappedDocumentNode :
   csRef<iDocumentNode> wrappedNode;
   csWeakRef<csWrappedDocumentNode> parent;
   iConditionResolver* resolver;
-  iObjectRegistry* objreg;
   csString contents;
   csWrappedDocumentNodeFactory* shared;
 
@@ -192,10 +198,13 @@ protected:
       this->~GlobalProcessingState();
       TempHeap::Free (this);
     }
-
+    
     csHash<Template, TempString<>, TempHeapAlloc> templates;
     csArray<int, csArrayElementHandler<int>, TempHeapAlloc> ascendStack;
     csSet<TempString<>, TempHeapAlloc> defines;
+    
+    csRef<iVFS> vfs;
+    csHash<csRef<iDocumentNode>, TempString<>, TempHeapAlloc> includesCache;
   };
   csRef<GlobalProcessingState> globalState;
 
@@ -206,20 +215,20 @@ protected:
     WrapperStackEntry& elseWrapper);
   template<typename ConditionEval>
   void ProcessInclude (ConditionEval& eval, const TempString<>& filename, 
-    NodeProcessingState* state, iDocumentNode* node);
+    NodeProcessingState* state, iDocumentNode* node, uint parseOptions);
   /**
    * Process a node when a Template or Generate is active.
    * Returns 'true' if the node was handled.
    */
   template<typename ConditionEval>
   bool ProcessTemplate (ConditionEval& eval, iDocumentNode* templNode, 
-    NodeProcessingState* state);
+    NodeProcessingState* state, uint parseOptions);
   bool InvokeTemplate (Template* templ, const Template::Params& params,
     Template::Nodes& templatedNodes);
   template<typename ConditionEval>
   bool InvokeTemplate (ConditionEval& eval, const char* name, 
     iDocumentNode* node, NodeProcessingState* state, 
-    const Template::Params& params);
+    const Template::Params& params, uint parseOptions);
   /// Validate that a 'Template' was properly matched by an 'Endtemplate'
   void ValidateTemplateEnd (iDocumentNode* node, 
     NodeProcessingState* state);
@@ -252,12 +261,13 @@ protected:
 
   template<typename ConditionEval>
   void ProcessSingleWrappedNode (ConditionEval& eval, 
-    NodeProcessingState* state, iDocumentNode* wrappedNode);
+    NodeProcessingState* state, iDocumentNode* wrappedNode,
+    uint parseOptions);
   template<typename ConditionEval>
   void ProcessWrappedNode (ConditionEval& eval, NodeProcessingState* state,
-  	iDocumentNode* wrappedNode);
+    iDocumentNode* wrappedNode, uint parseOptions);
   template<typename ConditionEval>
-  void ProcessWrappedNode (ConditionEval& eval);
+  void ProcessWrappedNode (ConditionEval& eval, uint parseOptions);
   void Report (int severity, iDocumentNode* node, const char* msg, ...);
   
   static void AppendNodeText (WrapperWalker& walker, csString& text);
@@ -268,7 +278,32 @@ protected:
     iDocumentNode* wrappedNode,
     iConditionResolver* resolver,
     csWrappedDocumentNodeFactory* shared, 
-    GlobalProcessingState* globalState);
+    GlobalProcessingState* globalState,
+    uint parseOptions);
+  csWrappedDocumentNode (csWrappedDocumentNode* parent,
+    iDocumentNode* wrappedNode,
+    csWrappedDocumentNodeFactory* shared);
+  csWrappedDocumentNode (csWrappedDocumentNode* parent,
+    iConditionResolver* resolver,
+    csWrappedDocumentNodeFactory* shared);
+    
+  class ForeignNodeStorage;
+  class ForeignNodeReader;
+  
+  bool StoreToCache (iFile* cacheFile, ForeignNodeStorage& foreignNodes,
+    const ConditionsWriter& condWriter);
+  bool StoreWrappedChildren (iFile* file, 
+    ForeignNodeStorage& foreignNodes,
+    const csPDelArray<WrappedChild>& children,
+    const ConditionsWriter& condWriter);
+  void CollectUsedConditions (const csPDelArray<WrappedChild>& children,
+    ConditionsWriter& condWrite);
+  bool ReadFromCache (iFile* cacheFile, ForeignNodeReader& foreignNodes,
+    const ConditionsReader& condReader);
+  bool ReadWrappedChildren (iFile* file, 
+    ForeignNodeReader& foreignNodes,
+    csPDelArray<WrappedChild>& children,
+    const ConditionsReader& condReader);
 public:
   CS_LEAKGUARD_DECLARE(csWrappedDocumentNode);
 
@@ -294,6 +329,10 @@ public:
   virtual float GetAttributeValueAsFloat (const char* name);
   virtual bool GetAttributeValueAsBool (const char* name, 
     bool defaultvalue = false);
+    
+  bool ReadFromCache (iFile* cacheFile, const ConditionsReader& condReader);
+  bool StoreToCache (iFile* cacheFile, const ConditionsWriter& condWriter);
+  void CollectUsedConditions (ConditionsWriter& condWrite);
 };
 
 class csTextNodeWrapper : 
@@ -344,6 +383,13 @@ public:
   size_t GetEndPosition () { return walker.GetEndPosition (); }
 };
 
+enum
+{
+  wdnfpoExpandTemplates = 1,
+  wdnfpoHandleConditions = 2,
+  wdnfpoOnlyOneLevelConditions = 4
+};
+
 class csWrappedDocumentNodeFactory
 {
   friend class csWrappedDocumentNode;
@@ -353,6 +399,7 @@ class csWrappedDocumentNodeFactory
   csTextNodeWrapper::Pool textWrapperPool;
   csWrappedDocumentNodeIterator::Pool iterPool;
   csReplacerDocumentNodeFactory replacerFactory;
+  iObjectRegistry* objreg;
 
   csStringHash pitokens;
 #define CS_TOKEN_ITEM_FILE \
@@ -397,9 +444,14 @@ public:
    */
   csWrappedDocumentNode* CreateWrapper (iDocumentNode* wrappedNode,
     iConditionResolver* resolver, csConditionEvaluator& evaluator, 
-    const csRefArray<iDocumentNode>& extraNodes, csString* dumpOut);
+    const csRefArray<iDocumentNode>& extraNodes, csString* dumpOut,
+    uint parseOptions);
   csWrappedDocumentNode* CreateWrapperStatic (iDocumentNode* wrappedNode,
     iConditionResolver* resolver, csString* dumpOut);
+    
+  csWrappedDocumentNode* CreateWrapperFromCache (iFile* cacheFile,
+    iConditionResolver* resolver, csConditionEvaluator& evaluator,
+    const ConditionsReader& condReader);
 };
 
 }

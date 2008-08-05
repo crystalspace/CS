@@ -73,8 +73,8 @@ public:
 
   // event handler stuff
   virtual bool HandleEvent(iEvent & ev);
-  CS_EVENTHANDLER_NAMES ("crystalspace.decals")
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
+
+  CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.decals")
   CS_DECLARE_EVENT_SHORTCUTS;
   
 private:

@@ -44,6 +44,7 @@
 #include "csplugincommon/renderstep/basesteptype.h"
 #include "csplugincommon/renderstep/parserenderstep.h"
 #include "csplugincommon/script/scriptcommon.h"
+#include "csplugincommon/shader/shadercachehelper.h"
 #include "csplugincommon/shader/shaderplugin.h"
 #include "csplugincommon/shader/shaderprogram.h"
 #include "csplugincommon/shader/weavercombiner.h"

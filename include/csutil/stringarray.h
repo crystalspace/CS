@@ -49,22 +49,32 @@ public:
   }
 };
 
+namespace CS
+{
+namespace Utility
+{
 /**
  * An array of strings. This array will properly make copies of the strings
  * and later delete those copies via delete[].
  */
-class csStringArray : public csArray<const char*, csStringArrayElementHandler>
+ 
+template <class Allocator = CS::Memory::AllocatorMalloc,
+          class CapacityHandler = csArrayCapacityFixedGrow<16> >
+class StringArray :
+  public csArray<const char*, csStringArrayElementHandler, Allocator,
+                 CapacityHandler>
 {
 private:
-  typedef csArray<const char*, csStringArrayElementHandler> superclass;
+  typedef csArray<const char*, csStringArrayElementHandler, Allocator,
+                  CapacityHandler> superclass;
 
 public:
   /**
    * Initialize object to hold initially \c limit elements, and increase
    * storage by \c threshold each time the upper bound is exceeded.
    */
-  csStringArray (size_t limit = 0, size_t threshold = 0)
-  	: superclass(limit, threshold)
+  StringArray (size_t limit = 0, const CapacityHandler& ch = CapacityHandler())
+  	: superclass(limit, ch)
   {
   }
 
@@ -147,11 +157,11 @@ public:
    */
   char* Pop ()
   {
-    CS_ASSERT (GetSize () > 0);
-    size_t l = GetSize () - 1;
-    char* ret = (char*)Get (l);
-    InitRegion (l, 1);
-    SetSize (l);
+    CS_ASSERT (this->GetSize () > 0);
+    size_t l = this->GetSize () - 1;
+    char* ret = (char*)this->Get (l);
+    this->InitRegion (l, 1);
+    this->SetSize (l);
     return ret;
   }
 
@@ -163,8 +173,8 @@ public:
    */
   size_t Find (const char* str) const
   {
-    for (size_t i = 0; i < GetSize (); i++)
-      if (! strcmp (Get (i), str))
+    for (size_t i = 0; i < this->GetSize (); i++)
+      if (! strcmp (this->Get (i), str))
         return i;
     return (size_t)-1;
   }
@@ -177,8 +187,8 @@ public:
    */
   size_t FindCaseInsensitive (const char* str) const
   {
-    for (size_t i = 0; i < GetSize (); i++)
-      if (!csStrCaseCmp (Get (i), str))
+    for (size_t i = 0; i < this->GetSize (); i++)
+      if (!csStrCaseCmp (this->Get (i), str))
         return i;
     return (size_t)-1;
   }
@@ -247,7 +257,7 @@ public:
         }
         if (newString)
         {
-          Push (currentString);
+          this->Push (currentString);
           currentString.Empty();
           num++;
           lastDelim = *p;
@@ -261,8 +271,22 @@ public:
       p++;
     }
 
-    Push (currentString);
+    this->Push (currentString);
     return num + 1;
+  }
+};
+} // namespace Utility
+} // namespace CS
+
+class csStringArray : 
+  public CS::Utility::StringArray<CS::Memory::AllocatorMalloc,
+                                  csArrayCapacityDefault>
+{
+public:
+  csStringArray (size_t limit = 0, size_t threshold = 0)
+  	: CS::Utility::StringArray<CS::Memory::AllocatorMalloc, 
+  	                           csArrayCapacityDefault> (limit, threshold)
+  {
   }
 };
 

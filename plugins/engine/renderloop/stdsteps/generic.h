@@ -105,6 +105,7 @@ private:
   bool portalTraversal;
   csZBufMode zmode;
   csRef<iStringSet> strings;
+  csRef<iShaderVarStringSet> stringsSvName;
   csWeakRef<iShaderManager> shaderManager;
   iObjectRegistry *objreg;
   csRef<iShader> defShader;
@@ -124,19 +125,20 @@ private:
   /* @@@ Ugly. */
   csArray<csStringID> disableDefaultTypes;
 
-  static csStringID fogplane_name;
-  static csStringID string_object2world;
-  static csStringID light_0_type;
-  static csStringID light_ambient;
+  static CS::ShaderVarStringID fogplane_name;
+  static CS::ShaderVarStringID string_object2world;
+  static CS::ShaderVarStringID string_object2worldInv;
+  static CS::ShaderVarStringID light_0_type;
+  static CS::ShaderVarStringID light_ambient;
 
 public:
   csGenericRenderStep (iObjectRegistry* object_reg);
   virtual ~csGenericRenderStep ();
 
   virtual void Perform (iRenderView* rview, iSector* sector,
-    iShaderVarStack* stacks);
+    csShaderVariableStack& stack);
   virtual void Perform (iRenderView* rview, iSector* sector,
-    iLight* light, iShaderVarStack* stacks);
+    iLight* light, csShaderVariableStack& stack);
 
   virtual void SetShaderType (const char* type);
   virtual const char* GetShaderType ();
@@ -160,7 +162,7 @@ public:
   inline void RenderMeshes (iRenderView* rview,
   	iGraphics3D* g3d, const ShaderVarPusher& Pusher,
 	size_t ticket, meshInfo* meshContext,
-	csRenderMesh** meshes, size_t num, iShaderVarStack* stacks);
+	csRenderMesh** meshes, size_t num, csShaderVariableStack& stack);
 
   /// Enables/disables z offset and z mode as needed
   inline void ToggleStepSettings (iGraphics3D* g3d, bool settings);

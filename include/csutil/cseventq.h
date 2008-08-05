@@ -238,16 +238,19 @@ public:
    * the handling of the Process event and the handling of the FinalProcess 
    * event").
    */
-  struct iTypedFrameEventDispatcher : public iEventHandler 
+  struct TypedFrameEventDispatcher
+    : public scfImplementation1<TypedFrameEventDispatcher, 
+                                iEventHandler> 
   {
   protected:
     csWeakRef<csEventQueue> parent;
     csEventID sendEvent;
   public:
-    iTypedFrameEventDispatcher () 
+    TypedFrameEventDispatcher (csEventID sendEvent) : 
+      scfImplementationType(this), sendEvent (sendEvent)
     {
     }
-    virtual ~iTypedFrameEventDispatcher ()
+    virtual ~TypedFrameEventDispatcher ()
     {
     }
     CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
@@ -259,63 +262,55 @@ public:
   };
 
   class PreProcessFrameEventDispatcher 
-    : public scfImplementation2<PreProcessFrameEventDispatcher, 
-                                csEventQueue::iTypedFrameEventDispatcher, 
-                                scfFakeInterface<iEventHandler> > 
+    : public scfImplementationExt0<PreProcessFrameEventDispatcher, 
+                                   TypedFrameEventDispatcher> 
   {
   public:
     PreProcessFrameEventDispatcher (csEventQueue* parent) 
-      : scfImplementationType (this)
+      : scfImplementationType (this, parent->PreProcess)
     {
-      iTypedFrameEventDispatcher::parent = parent;
-      sendEvent = parent->PreProcess;
+      this->parent = parent;
     }
-    CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.frame.preprocess")
+    CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.deprecated.preprocess")
   };
   
   class ProcessFrameEventDispatcher 
-    : public scfImplementation2<ProcessFrameEventDispatcher, 
-                                csEventQueue::iTypedFrameEventDispatcher, 
-                                scfFakeInterface<iEventHandler> > 
+    : public scfImplementationExt0<ProcessFrameEventDispatcher, 
+                                   TypedFrameEventDispatcher> 
   {
   public:
     ProcessFrameEventDispatcher (csEventQueue* parent) 
-      : scfImplementationType (this)
+      : scfImplementationType (this, parent->ProcessEvent)
     {
-      iTypedFrameEventDispatcher::parent = parent;
-      sendEvent = parent->ProcessEvent;
+      this->parent = parent;
     }
-    CS_EVENTHANDLER_PHASE_3D("crystalspace.frame.process")
+    CS_EVENTHANDLER_PHASE_3D("crystalspace.deprecated.process")
   };
 
   class PostProcessFrameEventDispatcher 
-    : public scfImplementation2<PostProcessFrameEventDispatcher, 
-                                csEventQueue::iTypedFrameEventDispatcher, 
-                                scfFakeInterface<iEventHandler> > 
+    : public scfImplementationExt0<PostProcessFrameEventDispatcher, 
+                                   TypedFrameEventDispatcher> 
   {
   public:
     PostProcessFrameEventDispatcher (csEventQueue* parent) 
-      : scfImplementationType (this)
+      : scfImplementationType (this, parent->PostProcess)
     {
-      iTypedFrameEventDispatcher::parent = parent;
-      sendEvent = parent->PostProcess;
+      this->parent = parent;
     }
-    CS_EVENTHANDLER_PHASE_2D("crystalspace.frame.postprocess")
+    CS_EVENTHANDLER_PHASE_2D("crystalspace.deprecated.postprocess")
   };
   
   class FinalProcessFrameEventDispatcher 
-    : public scfImplementation2<FinalProcessFrameEventDispatcher, 
-                                csEventQueue::iTypedFrameEventDispatcher, 
-                                scfFakeInterface<iEventHandler> > 
+    : public scfImplementationExt0<FinalProcessFrameEventDispatcher, 
+                                   TypedFrameEventDispatcher> 
   {
   public:
     FinalProcessFrameEventDispatcher (csEventQueue* parent) 
-      : scfImplementationType (this)
+      : scfImplementationType (this, parent->FinalProcess)
     {
-      iTypedFrameEventDispatcher::parent = parent;
-      sendEvent = parent->FinalProcess;
+      this->parent = parent;
     }
-    CS_EVENTHANDLER_PHASE_FRAME("crystalspace.frame.finalprocess")
+    CS_EVENTHANDLER_PHASE_FRAME("crystalspace.deprecated.finalprocess")
   };
 };
 

@@ -19,7 +19,7 @@
 #ifndef __CS_IPATH_H__
 #define __CS_IPATH_H__
 
-#include "csutil/scf_interface.h"
+#include "csutil/scf_implementation.h"
 
 /**\file 
  * 3D path interfaces
@@ -29,6 +29,7 @@
  * @{ */
 
 class csVector3;
+struct iObject;
 
 /**
  * A path in 3D.
@@ -38,7 +39,7 @@ class csVector3;
  */
 struct iPath : public virtual iBase
 {
-  SCF_INTERFACE(iPath, 2, 0, 0);
+  SCF_INTERFACE(iPath, 3, 0, 0);
   /**
    * Return the number of points defining the path.  Calling this
    * GetPointCount as in the real classes causes MANY ambiguous
@@ -93,6 +94,9 @@ struct iPath : public virtual iBase
 
   /// Get the interpolated forward vector.
   virtual void GetInterpolatedForward (csVector3& pos) = 0;
+
+  /// Get the iObject for this path.
+  virtual iObject* QueryObject () = 0;
 };
 
 

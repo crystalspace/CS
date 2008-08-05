@@ -1436,7 +1436,8 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
   {
     attrStart = nodesFile->GetPos();
     attrCount = nodeData->atNum();
-    nodesFile->Write ((char*)&attrCount, sizeof(uint32));
+    uint32 diskAttrCount = csLittleEndian::UInt32 (attrCount); 
+    nodesFile->Write ((char*)&diskAttrCount, sizeof(uint32));
     nodesFile->Write ((char*)startsScratch, sizeof(uint32) * attrCount);
   }
 
@@ -1446,7 +1447,8 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
   {
     childStart = nodesFile->GetPos();
     childCount = nodeData->ctNum();
-    nodesFile->Write ((char*)&childCount, sizeof(uint32));
+    uint32 diskChildCount = csLittleEndian::UInt32 (childCount);
+    nodesFile->Write ((char*)&diskChildCount, sizeof(uint32));
     nodesFile->Write ((char*)startsScratch, sizeof(uint32) * childCount);
   }
 
@@ -1534,6 +1536,8 @@ void csBinaryDocument::FreeBdNode (csBdNode* node)
   nodeAlloc->Free (node);
 }
 
+#include "csutil/custom_new_disable.h"
+
 csBinaryDocNode* csBinaryDocument::GetPoolNode (csBdNode* ptr,
     csBinaryDocNode* parent)
 {
@@ -1547,6 +1551,8 @@ csBinaryDocAttribute* csBinaryDocument::GetPoolAttr (csBdAttr* ptr,
 {
   return new (attrPool) csBinaryDocAttribute (ptr, owner);
 }
+
+#include "csutil/custom_new_enable.h"
 
 csBinaryDocNode* csBinaryDocument::GetRootNode ()
 {
