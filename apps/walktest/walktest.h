@@ -312,6 +312,9 @@ public:
   csColor fs_shadevert_topcol;
   csColor fs_shadevert_botcol;
 
+  // True if we've loaded all the 2d textures and sprites.
+  bool spritesLoaded;
+
   /**
    * The main engine interface
    */
@@ -493,8 +496,8 @@ public:
 
   /// Load all the graphics libraries needed
   virtual void LoadLibraryData (iCollection* collection);
-  virtual void Inititalize2DTextures ();
-  virtual void Create2DSprites ();
+  virtual bool Inititalize2DTextures ();
+  virtual bool Create2DSprites ();
 
   ///
   bool WalkHandleEvent (iEvent &Event);
@@ -615,7 +618,18 @@ public:
       virtual bool HandleEvent (iEvent& ev)
       {
         if (parent && (ev.Name == parent->Frame))
-        {      
+        {
+          if(!parent->spritesLoaded)
+          {
+            if(parent->Inititalize2DTextures())
+            {
+              if(parent->Create2DSprites())
+              {
+                parent->spritesLoaded = true;
+              }
+            }
+          }
+
           parent->FinishFrame ();
 
           return true;

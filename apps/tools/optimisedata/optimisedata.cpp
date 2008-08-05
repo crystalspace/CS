@@ -317,23 +317,40 @@ void OptimiseData::SortData()
       }
     }
 
-    // Add meshfact libs after the plugins.
+    // Add meshfact libs after the plugins and shaders.
     csRef<iDocumentNodeIterator> nodes = world->GetNodes();
-    csRef<iDocumentNode> first;
+    csRef<iDocumentNode> node;
+    csRef<iDocumentNode> after;
+    bool pushed = false;
     while(nodes->HasNext())
     {
-      first = nodes->Next();
-      if(!strcmp(first->GetValue(), "plugins"))
+      if(!pushed)
       {
-        first = nodes->Next();
-        break;
+        node = nodes->Next();
       }
+      else
+      {
+        node = after;
+        pushed = false;
+      }
+
+      if(!strcmp(node->GetValue(), "plugins") || !strcmp(node->GetValue(), "shaders"))
+      {
+        after = nodes->Next();
+        pushed = true;
+      }
+    }
+
+    if(!after.IsValid())
+    {
+      nodes = world->GetNodes();
+      after = nodes->HasNext() ? nodes->Next() : 0;
     }
     
 
     for(size_t j=0; j<libsNeeded.GetSize(); j++)
     {
-      csRef<iDocumentNode> lib = world->CreateNodeBefore(CS_NODE_ELEMENT, first);
+      csRef<iDocumentNode> lib = world->CreateNodeBefore(CS_NODE_ELEMENT, after);
       lib->SetValue("library");
       lib = lib->CreateNodeBefore(CS_NODE_TEXT);
       lib->SetValue("factories/" + libsNeeded[j] + ".meshfact");

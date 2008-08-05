@@ -119,6 +119,7 @@ WalkTest::WalkTest () :
   num_maps = 0;
   cache_map = 0;
   doSave = false;
+  spritesLoaded = false;
 }
 
 WalkTest::~WalkTest ()
@@ -859,17 +860,21 @@ void WalkTest::LoadLibraryData (iCollection* collection)
   }
 }
 
-void WalkTest::Inititalize2DTextures ()
+bool WalkTest::Inititalize2DTextures ()
 {
   // Find the Crystal Space logo and set the renderer Flag to for_2d, to allow
   // the use in the 2D part.
   iTextureWrapper *texh = Engine->GetTextureList ()->FindByName ("cslogo2");
   if (texh)
+  {
     texh->SetFlags (CS_TEXTURE_2D);
+    return true;
+  }
+  return false;
 }
 
 
-void WalkTest::Create2DSprites ()
+bool WalkTest::Create2DSprites ()
 {
   iTextureWrapper *texh;
   iTextureHandle* phTex;
@@ -882,8 +887,10 @@ void WalkTest::Create2DSprites ()
     if (phTex)
     {
       cslogo = new csSimplePixmap (phTex);
+      return true;
     }
   }
+  return false;
 }
 
 static bool WalkEventHandler (iEvent& ev)
@@ -1222,10 +1229,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     csRef<iThreadReturn> ret = LevelLoader->LoadMapFile ("world", false, collection);
     ret->Wait();
 
-    csTicks mid_time = csGetTicks ();
-    csPrintf ("Level load time: %g seconds\n",
-      float (mid_time-start_time) / 1000.0); fflush (stdout);
-
     if (do_collections)
     {
       // Set the cache manager based on current VFS dir.
@@ -1237,7 +1240,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   if (do_collections)
     collection = Engine->CreateCollection ("libdata");
   LoadLibraryData (collection);
-  Inititalize2DTextures ();
   ParseKeyCmds ();
 
   // Prepare the engine. This will calculate all lighting and

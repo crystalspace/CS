@@ -840,8 +840,16 @@ csPtr<iBase> csImageTextureLoader::Parse (iDocumentNode* /*node*/,
     return 0;
   }
 
-  csRef<iTextureWrapper> TexWrapper =
-	Engine->GetTextureList ()->NewTexture(TexHandle);
+  csRef<iTextureWrapper> TexWrapper;
+  csRef<iThreadedLoader> itl = csQueryRegistry<iThreadedLoader>(object_reg);
+  if(itl.IsValid())
+  {
+    TexWrapper = Engine->GetTextureList ()->CreateTexture(TexHandle);
+  }
+  else
+  {
+    TexWrapper = Engine->GetTextureList ()->NewTexture(TexHandle);
+  }
   TexWrapper->SetImageFile(ctx->GetImage());
 
   return csPtr<iBase> (TexWrapper);
@@ -920,8 +928,16 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
     return 0;
   }
 
-  csRef<iTextureWrapper> TexWrapper =
-	Engine->GetTextureList ()->NewTexture(TexHandle);
+  csRef<iTextureWrapper> TexWrapper;
+  csRef<iThreadedLoader> itl = csQueryRegistry<iThreadedLoader>(object_reg);
+  if(itl.IsValid())
+  {
+    TexWrapper = Engine->GetTextureList ()->CreateTexture(TexHandle);
+  }
+  else
+  {
+    TexWrapper = Engine->GetTextureList ()->NewTexture(TexHandle);
+  }
   TexWrapper->SetImageFile (Image);
 
   return csPtr<iBase> (TexWrapper);
@@ -1071,8 +1087,16 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
     return 0;
   }
 
-  csRef<iTextureWrapper> TexWrapper =
-	Engine->GetTextureList ()->NewTexture(TexHandle);
+  csRef<iTextureWrapper> TexWrapper;
+	csRef<iThreadedLoader> itl = csQueryRegistry<iThreadedLoader>(object_reg);
+  if(itl.IsValid())
+  {
+    TexWrapper = Engine->GetTextureList ()->CreateTexture(TexHandle);
+  }
+  else
+  {
+    TexWrapper = Engine->GetTextureList ()->NewTexture(TexHandle);
+  }
   TexWrapper->SetImageFile (cube);
 
   return csPtr<iBase> (TexWrapper);
@@ -1161,8 +1185,16 @@ csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node,
     return 0;
   }
 
-  csRef<iTextureWrapper> TexWrapper =
-	Engine->GetTextureList ()->NewTexture(TexHandle);
+  csRef<iTextureWrapper> TexWrapper;
+	csRef<iThreadedLoader> itl = csQueryRegistry<iThreadedLoader>(object_reg);
+  if(itl.IsValid())
+  {
+    TexWrapper = Engine->GetTextureList ()->CreateTexture(TexHandle);
+  }
+  else
+  {
+    TexWrapper = Engine->GetTextureList ()->NewTexture(TexHandle);
+  }
   TexWrapper->SetImageFile (vol);
 
   return csPtr<iBase> (TexWrapper);
@@ -1223,8 +1255,16 @@ csPtr<iBase> csMissingTextureLoader::Parse (iDocumentNode* node,
     return 0;
   }
 
-  csRef<iTextureWrapper> TexWrapper =
-    Engine->GetTextureList ()->NewTexture(TexHandle);
+  csRef<iTextureWrapper> TexWrapper ;
+  csRef<iThreadedLoader> itl = csQueryRegistry<iThreadedLoader>(object_reg);
+  if(itl.IsValid())
+  {
+    TexWrapper = Engine->GetTextureList ()->CreateTexture(TexHandle);
+  }
+  else
+  {
+    TexWrapper = Engine->GetTextureList ()->NewTexture(TexHandle);
+  }
   TexWrapper->SetImageFile (image);
 
   return csPtr<iBase> (TexWrapper);
