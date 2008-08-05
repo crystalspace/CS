@@ -22,24 +22,51 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "imesh/clouds.h"
 #include "csCloudsUtils.h"
 
+//#include <csgeom/matrix4.h>
+
 //Cloud-Renderer class
 class csCloudsRenderer : public scfImplementation1<csCloudsRenderer, iCloudsRenderer>
 {
 private:
+  csVector3                     m_vLightDir;
+  CS::Math::Matrix4             m_mTransform;
+  float                         m_fGridScale;
 
-
+  void SetStandardValues()
+  {
+    SetGridScale(1.f);
+    //Identity!p
+    SetTransformationMatrix(CS::Math::Matrix4(1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f));
+    SetLightDirection(csVector3(0.f, -1.f, 0.f));
+  }
 public:
   csCloudsRenderer(iBase* pParent) : scfImplementationType(this, pParent)
   {
+    SetStandardValues();
   }
   ~csCloudsRenderer()
   {
   }
 
-  virtual const bool Render(const csRef<csField3<float>>& rCondWaterMixingRatios /*, const csMatrix& mTransformation */)
-  {
-    return true;
-  }
+  /**
+  Setter for the user, to control every major aspect of cloud rendering
+  */
+  virtual inline void SetGridScale(const float dx) {m_fGridScale = dx;}
+  virtual inline void SetTransformationMatrix(const CS::Math::Matrix4& mTransform) {m_mTransform = mTransform;}
+  virtual inline void SetLightDirection(const csVector3& vLightDir) {m_vLightDir = vLightDir;}
+
+
+  /**
+  This method is called everytime when the dynamic part completed one timestep.
+  It renders the CloudwaterMixingRatioField viewed from lightdirection --> OLV
+  */
+  const bool RenderOLV(const csRef<csField3<float>>& rCondWaterMixingRatios);
+
+  /**
+  This Method is called every frame. It simply renders the clouds from view direction
+  using the OLV as base for computing the illumination
+  */
+  const bool Render();
 };
 
 #endif // __CSCLOUDRENDERER_PLUGIN_H__

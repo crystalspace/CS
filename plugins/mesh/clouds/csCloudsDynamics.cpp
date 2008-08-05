@@ -346,6 +346,7 @@ void csCloudsDynamics::SolvePoissonPressureEquation(const UINT k)
     m_iNewPressureField ^= m_iOldPressureField ^= m_iNewPressureField ^= m_iOldPressureField;
     JacobiSolver(m_arfPressureField[m_iNewPressureField], m_arfPressureField[m_iOldPressureField], 
                  m_arfVelDivergence, fGridScale2, s_fInvBeta);
+    if(m_iIterationsLeft <= 0) return;
   }
 }
 
@@ -404,12 +405,13 @@ fTime is taken only if the current simulation step is zero. Means
 only at the beginning of an entire timestep. The value passed there
 is used for the whole timestep!
 */
-const bool csCloudsDynamics::DoComputationSteps(const UINT iStepCount, const float fTime)
+const bool csCloudsDynamics::DoComputation(const UINT iIterationsCount, const float fTime)
 {
   //preconditions hold? --> initialized?
   //if(m_iGridSizeX <= 0 || m_iGridSizeY <= 0 || m_iGridSizeZ <= 0) return false;
 
-  m_iIterationsLeft = m_iIterationsPerInvokation;
+  m_bNewTimeStep    = false;
+  m_iIterationsLeft = iIterationsCount;
   while(true)
   {
     switch(m_iCurrentStep)
@@ -445,7 +447,6 @@ const bool csCloudsDynamics::DoComputationSteps(const UINT iStepCount, const flo
       m_fTimePassed += m_fTimeStep;
       SwapFieldIndizes();
     }
-    else m_bNewTimeStep = false;
   }
 
   return true;

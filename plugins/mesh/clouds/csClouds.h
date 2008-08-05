@@ -45,6 +45,7 @@ private:
   float                        m_fTimeStep;
 
   //Config-Vars
+  UINT                         m_iIterationsPerInvocation;
   float                        m_fTimeScaleFactor;
   UINT                         m_iSkippingFrameCount;
 
@@ -79,6 +80,7 @@ public:
   }
 
   //Own setters
+  virtual inline void SetIterationLimitPerInvocation(const UINT i) {m_iIterationsPerInvocation = i;}
   virtual inline void SetTimeScaleFactor(const float f) {m_fTimeScaleFactor = fabsf(f);}
   virtual inline void SetSkippingFrameCount(const UINT i) {m_iSkippingFrameCount = i;}
 
@@ -102,33 +104,11 @@ public:
   virtual inline void SetBaseAltitude(const float H) {return m_Dynamics->SetBaseAltitude(H);}
   virtual inline void SetTemperaturBottomInputField(csRef<iField2> Field) {return m_Dynamics->SetTemperaturBottomInputField(Field);}
   virtual inline void SetWaterVaporBottomInputField(csRef<iField2> Field) {return m_Dynamics->SetWaterVaporBottomInputField(Field);}
-  virtual inline void SetIterationLimitPerInvokation(const UINT i) {return m_Dynamics->SetIterationLimitPerInvokation(i);}
 
   //All of following Setters refer to the csCloudsRenderer instance, and are delegated!
 
   //EventHandler-Part
-  virtual bool HandleEvent(iEvent& rEvent)
-  {
-    if(m_iFramesUntilNextStep == 0)
-    {
-      if(m_Dynamics->NewTimeStepStarted())
-      {
-        //Measure Time
-        const UINT iEndTickCount = m_Clock->GetCurrentTicks();
-        m_fTimeStep = static_cast<float>(iEndTickCount - m_iStartTickCount) * 0.001f * m_fTimeScaleFactor;
-        m_iStartTickCount = iEndTickCount;
-        printf("Time for one simulation step: %.4f\n", m_fTimeStep);
-      }
-      //Do a step
-      //CS::MeasureTime Timer("DoComputationSteps");
-      m_Dynamics->DoComputationSteps(1, m_fTimeStep);
-
-      m_iFramesUntilNextStep = m_iSkippingFrameCount;
-    }
-    else --m_iFramesUntilNextStep;
-
-    return true;
-  }
+  virtual bool HandleEvent(iEvent& rEvent);
   CS_EVENTHANDLER_NAMES("crystalspace.mesh.clouds");
   CS_EVENTHANDLER_NIL_CONSTRAINTS;
 };

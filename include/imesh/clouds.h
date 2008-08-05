@@ -25,6 +25,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/array.h"
 #include "csutil/ref.h"
 #include "csgeom/vector3.h"
+#include "csgeom/matrix4.h"
 
 //--------------------------------------------------------------------------------------------//
 
@@ -70,9 +71,12 @@ struct iClouds : public virtual iBase
   SkippingFrameCount: Count of frames which are skipped doing NO dynamic computation
   pass. Means, if SkippingFrameCount is equal to N, then every N-th frame is done ONE
   computation step.
+  IterationLimitPerInvocation: For the dynamicsimulation. Each invocation of DoComputation
+  there is passed a limit for the iterations to be done. This limit can be set here.
   */
   virtual inline void SetTimeScaleFactor(const float f) = 0;
-  virtual inline void SetSkippingFrameCount(const UINT i) = 0;
+  virtual inline void SetSkippingFrameCount(const UINT i) = 0;                //Tuning parameter
+  virtual inline void SetIterationLimitPerInvocation(const UINT i) = 0;       //Tuning parameter
 
   /**
   All of following Setters refer to the iCloudsDynamics instance.
@@ -96,7 +100,6 @@ struct iClouds : public virtual iBase
   virtual inline void SetBaseAltitude(const float H) = 0;
   virtual inline void SetTemperaturBottomInputField(csRef<iField2> Field) = 0;
   virtual inline void SetWaterVaporBottomInputField(csRef<iField2> Field) = 0;
-  virtual inline void SetIterationLimitPerInvokation(const UINT i) = 0;
 
   /**
   All of following Setters refer to the iCloudsRenderer instance.
@@ -115,6 +118,12 @@ struct iCloudsRenderer : public virtual iBase
 {
   SCF_INTERFACE(iCloudsRenderer, 0, 0, 2);
 
+  /**
+  All following methods are used to configure the entire rendering process
+  */
+  virtual inline void SetGridScale(const float dx) = 0;
+  virtual inline void SetTransformationMatrix(const CS::Math::Matrix4& mTransform) = 0;
+  virtual inline void SetLightDirection(const csVector3& vLightDir) = 0;
 };
 
 //--------------------------------------------------------------------------------------------//
@@ -155,7 +164,6 @@ struct iCloudsDynamics : public virtual iBase
   virtual inline void SetBaseAltitude(const float H) = 0;
   virtual inline void SetTemperaturBottomInputField(csRef<iField2> Field) = 0;
   virtual inline void SetWaterVaporBottomInputField(csRef<iField2> Field) = 0;
-  virtual inline void SetIterationLimitPerInvokation(const UINT i) = 0;
 
   /**
   Updates all constant and precomputeted parameters according to the user specific values set!

@@ -21,3 +21,30 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY(csClouds)
+
+//-----------------------------------------------------------//
+
+bool csClouds::HandleEvent(iEvent& rEvent)
+{
+  if(m_iFramesUntilNextStep == 0)
+  {
+    if(m_Dynamics->NewTimeStepStarted())
+    {
+      //Measure Time
+      const UINT iEndTickCount = m_Clock->GetCurrentTicks();
+      m_fTimeStep = static_cast<float>(iEndTickCount - m_iStartTickCount) * 0.001f * m_fTimeScaleFactor;
+      m_iStartTickCount = iEndTickCount;
+      printf("Time for one simulation step: %.4f\n", m_fTimeStep);
+    }
+    //Do a step
+    //CS::MeasureTime Timer("DoComputationSteps");
+    m_Dynamics->DoComputation(m_iIterationsPerInvocation, m_fTimeStep);
+
+    m_iFramesUntilNextStep = m_iSkippingFrameCount;
+  }
+  else --m_iFramesUntilNextStep;
+
+  return true;
+}
+
+//-----------------------------------------------------------//

@@ -81,13 +81,12 @@ private:
   //State variables for amortized computation
   UINT                        m_iCurrentStep;
   /**
-  The user is able to specify the total number of iterations for each invokation
+  The user is able to specify the total number of iterations for each invocation
   of the simulation each N frames. When iIterationsLeft reaches zero, the computation
   is interreupted and the current state is saved. Afterwards the simulation is continued
   from this certain point.
   */
   int                         m_iIterationsLeft;
-  UINT                        m_iIterationsPerInvokation;
   UINT                        m_iPoissonSolverIterationsCount;
   UINT                        m_iTempX;
   UINT                        m_iTempY;
@@ -291,7 +290,6 @@ private:
     SetInitialCondWaterMixingRatio(0.0f);
     SetInitialWaterVaporMixingRatio(0.8f);
     SetBaseAltitude(0.f);
-    SetIterationLimitPerInvokation(3000);
 
     //Input-fields
     m_arfInputTemperature.Invalidate();
@@ -338,7 +336,6 @@ public:
   virtual inline void SetInitialWaterVaporMixingRatio(const float qv) {m_fInitWaterVaporMixingRatio = qv;}
   virtual inline void SetGlobalWindSpeed(const csVector3& vWind) {m_vWindSpeed = vWind;}
   virtual inline void SetBaseAltitude(const float H) {m_fBaseAltitude = H;}
-  virtual inline void SetIterationLimitPerInvokation(const UINT i) {m_iIterationsPerInvokation = i;}
   virtual inline void SetTemperaturBottomInputField(csRef<iField2> Field)
   {
     //Größen überprüfen
@@ -366,13 +363,12 @@ public:
   inline const bool NewTimeStepStarted() const {return m_bNewTimeStep;}
 
   /**
-  Computes N steps of the entire simulation. If iStepCount == 0, then an entire timestep
-  is calculated
+  Does approximatly N iterations of the entire simulation.
   */
-  virtual const bool DoComputationSteps(const UINT iStepCount, const float fTime = 0.f);
+  const bool DoComputation(const UINT iIterationsCount, const float fTime = 0.f);
 
   //Returns the simulation output!
-  virtual inline const csRef<csField3<float>>& GetCondWaterMixingRatios() const
+  inline const csRef<csField3<float>>& GetCondWaterMixingRatios() const
   {
     /**
     Always when an entire timestep was done, the acutal-index becomes the last-index
