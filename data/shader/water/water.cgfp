@@ -26,6 +26,9 @@ float fresnel(float3 view, float3 normal)
     return saturate(R0 + (1.0-R0) * pow(1.0-dot(view, normal), 5.0));
 }
 
+// Water color
+const float3 watCol = float3(0.05, 0.15, 0.4);
+
 //---------------------------------------------------------------------------------
 //Shader entry
 //---------------------------------------------------------------------------------
@@ -59,7 +62,7 @@ float4 main (vert2frag IN,
 	float4 reflection = IN.Color + specular;
 	
 	float fresnelFactor = fresnel(tsCamVec, N);
-    return float4(reflection.rgb, 1) * fresnelFactor;
+    return float4(reflection.rgb, 1) * fresnelFactor + float4(watCol.rgb, 1) * (1 - fresnelFactor);
 //	return float4(IN.CamVec.xyz, 1);
 }
 

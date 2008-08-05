@@ -257,13 +257,13 @@ void csWaterMeshObject::SetupObject ()
 void csWaterMeshObject::AddNode(csOceanNode start, float dist)
 {
   int useCell;
-  if(dist < CELL_WID)
+  if(dist < (CELL_WID * 2))
     useCell = 4;
-  else if(dist < (CELL_WID * 2))
-    useCell = 3;
   else if(dist < (CELL_WID * 3))
-    useCell = 2;
+    useCell = 3;
   else if(dist < (CELL_WID * 4))
+    useCell = 2;
+  else if(dist < (CELL_WID * 5))
     useCell = 1;
   else
     useCell = 0;

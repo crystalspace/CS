@@ -35,7 +35,7 @@ float2 WaveDisp(float2 k, float amp, float2 pos, float freq, float phase, float 
 	return normk * amp * sin(dot(k, pos) - (freq * time) + phase);
 }
 
-//Wave displacement z
+//Wave displacement y
 float WaveDispVert(float2 k, float amp, float2 pos, float freq, float phase, float time)
 {
 	return amp * cos(dot(k, pos) - (freq * time) + phase);
