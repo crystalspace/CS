@@ -686,17 +686,28 @@ class TEventMemPool : public csMemoryPool
 {
 public:
 
-  void const* Store(char const* p)
-  {
-    return (void const*)csMemoryPool::Store(p);
-  }
-
   template<typename T>
-  void const* Store(const T& p)
+  void const* Store(T& p)
   {
     T* ptr = new (this) T;
     *ptr = p;
     return (void const*)ptr;
+  }
+
+  template<>
+  void const* Store<const char*>(const char*& p)
+  {
+    if(!p)
+    {
+      return 0;
+    }
+
+    char* ptr = (char*)Alloc(strlen(p) + 1);
+    strcpy(ptr, p);
+
+    char** ptrPtr = new (this) char*;
+    *ptrPtr = ptr;
+    return (void const*)ptrPtr;
   }
 };
 

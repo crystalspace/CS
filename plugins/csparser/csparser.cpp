@@ -2210,18 +2210,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
     if (do_culler)
     {
-      bool rc = sector->SetVisibilityCullerPlugin (culplugname, culler_params);
-      if (!rc)
-      {
-        SyntaxService->ReportError (
-          "crystalspace.maploader.load.sector",
-          node, "Could not load visibility culler for sector '%s'!",
-          secname ? secname : "<noname>");
-        return 0;
-      }
+      SetSectorVisibilityCuller(sector, culplugname.GetData(), culler_params);
     }
 
     return sector;
+  }
+
+  THREADED_CALLABLE_IMPL3(csThreadedLoader, SetSectorVisibilityCuller,
+    csRef<iSector> sector, const char* culplugname, csRef<iDocumentNode> culler_params)
+  {
+    bool rc = sector->SetVisibilityCullerPlugin (culplugname, culler_params);
+    if (!rc)
+    {
+      SyntaxService->ReportError (
+        "crystalspace.maploader.load.sector",
+        culler_params, "Could not load visibility culler for sector '%s'!",
+        sector->QueryObject()->GetName() ? sector->QueryObject()->GetName()
+        : "<noname>");
+      return false;
+    }
+    return true;
   }
 
   iMapNode* csThreadedLoader::ParseNode (iDocumentNode* node, iSector* sec)

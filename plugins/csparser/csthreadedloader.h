@@ -667,6 +667,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       iSector* ParseSector (iLoaderContext* ldr_context, iDocumentNode* node,
         iStreamSource* ssource);
 
+      THREADED_CALLABLE_DECL3(csThreadedLoader, SetSectorVisibilityCuller, csLoaderReturn,
+        csRef<iSector>, sector, const char*, culplugname, csRef<iDocumentNode>, culler_params,
+        false, false)
+
       // Process the attributes of an <imposter> tag in a mesh specification.
       bool ParseImposterSettings(iImposter* mesh, iDocumentNode *node);
 

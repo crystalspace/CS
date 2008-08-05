@@ -65,11 +65,20 @@ public:
     }
     else
     {
-      listQueue->Enqueue(job);
+      if(tid == CS::Threading::Implementation::GetCurrentThreadId())
+      {
+        job->Run();
+      }
+      else
+      {
+        listQueue->Enqueue(job);
+      }
     }
   }
 
   private:
+
+  static ThreadID tid;
 
   int32 waiting;
   int32 threadCount;
@@ -80,8 +89,10 @@ public:
   csRef<ThreadedJobQueue> threadQueue;
   csRef<ListAccessQueue> listQueue;
   csEventID ProcessPerFrame;
+  csEventID ProcessWhileWait;
   csRef<iThreadedLoader> loader;
   csRef<iEngine> engine;
+  csRef<iEventQueue> eventQueue;
 };
 
 class csThreadReturn : public iThreadReturn

@@ -103,9 +103,9 @@ This is rather straightforward as shown;
 
 struct iThreadTest : public virtual iBase
 {
-  THREADED_INTERFACE(Test1)
-  THREADED_INTERFACE1(Test2, bool b)
-  THREADED_INTERFACE2(Test3, int i, float f)
+  THREADED_INTERFACE(Test1);
+  THREADED_INTERFACE1(Test2, bool b);
+  THREADED_INTERFACE2(Test3, int i, float f);
 }
 @end example
 
@@ -133,7 +133,6 @@ It takes multiple parameters:
 @item All of the next parameters except the last two are the type followed by the name of the variables that will be passed.
 @item The penultimate parameter is a boolean value which determines if the method call is dispatched to the main thread(false) or a non-main thread(true).
 @item The final parameter is a boolean value which determines whether or not the method will return immediately (false), or if it will wait until the call is finished(true).
-Obviously if you are calling from the main thread and you set the last two booleans to true, the program will deadlock. So don't do this.
 @end itemize
 
 @example
