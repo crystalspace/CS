@@ -324,7 +324,7 @@ struct iThreadedLoader : public virtual iBase
   * \param Format The format of the image.
   */
   THREADED_INTERFACE3(LoadImage, const char* Filename, int Format = CS_IMGFMT_INVALID,
-    bool do_verbose = false)
+    bool do_verbose = false);
 
  /**
   * Load an image file. The image will be loaded in the format requested by
@@ -334,7 +334,7 @@ struct iThreadedLoader : public virtual iBase
   * This version reads the image from a data buffer.
   */
   THREADED_INTERFACE3(LoadImage, iDataBuffer* buf, int Format = CS_IMGFMT_INVALID,
-  bool do_verbose = false)
+  bool do_verbose = false);
 
   /**
   * Load an image as with LoadImage() and create a texture handle from it.
@@ -350,7 +350,7 @@ struct iThreadedLoader : public virtual iBase
   * \param image Optionally returns a reference to the loaded image.
   */
   THREADED_INTERFACE5(LoadTexture, const char* Filename, int Flags = CS_TEXTURE_3D, 
-  csRef<iTextureManager> tm = 0, csRef<iImage>* image = 0, bool do_verbose = false)
+  csRef<iTextureManager> tm = 0, csRef<iImage>* image = 0, bool do_verbose = false);
 
   /**
   * Load an image as with LoadImage() and create a texture handle from it.
@@ -366,7 +366,7 @@ struct iThreadedLoader : public virtual iBase
   * \param image Optionally returns a reference to the loaded image.
   */
   THREADED_INTERFACE5(LoadTexture, iDataBuffer* buf, int Flags = CS_TEXTURE_3D,
-  iTextureManager *texman = 0, csRef<iImage>* image = 0, bool do_verbose = false)
+  iTextureManager *texman = 0, csRef<iImage>* image = 0, bool do_verbose = false);
 
   /**
   * Load a texture as with LoadTexture() above and register it with the
@@ -393,7 +393,7 @@ struct iThreadedLoader : public virtual iBase
   */
   THREADED_INTERFACE8(LoadTexture, const char *Name, iDataBuffer* buf,
     int Flags = CS_TEXTURE_3D, iTextureManager *texman = 0, bool reg = true,
-    bool create_material = true, bool free_image = true, bool do_verbose = false)
+    bool create_material = true, bool free_image = true, bool do_verbose = false);
 
   //@{
   /**
@@ -424,12 +424,12 @@ struct iThreadedLoader : public virtual iBase
   THREADED_INTERFACE10(LoadTexture, const char *Name, const char *FileName,
   int Flags = CS_TEXTURE_3D, iTextureManager *texman = 0, bool reg = true,
   bool create_material = true, bool free_image = true, iCollection* Collection = 0,
-  uint keepFlags = KEEP_ALL, bool do_verbose = false)
+  uint keepFlags = KEEP_ALL, bool do_verbose = false);
   //@}
 
   /// New Sound System: Load a sound file and return an iSndSysData object
   THREADED_INTERFACE2(LoadSoundSysData, const char *fname,
-  bool do_verbose = false)
+  bool do_verbose = false);
 
   /**
   * New Sound System: Load a sound file and create a stream from it.
@@ -438,7 +438,7 @@ struct iThreadedLoader : public virtual iBase
   * CS_SND3D_ABSOLUTE.
   */
   THREADED_INTERFACE3(LoadSoundStream, const char *fname, int mode3d,
-  bool do_verbose = false)
+  bool do_verbose = false);
 
   /**
   * New Sound System: Load a sound file, create sound data and create a
@@ -447,7 +447,7 @@ struct iThreadedLoader : public virtual iBase
   * \param fname is the VFS filename.
   */
   THREADED_INTERFACE3(LoadSoundWrapper, const char *name, const char *fname,
-  bool do_verbose = false)
+  bool do_verbose = false);
 
 
  /**
@@ -456,7 +456,7 @@ struct iThreadedLoader : public virtual iBase
   * \param ssource is an optional stream source for faster loading.
   */
   THREADED_INTERFACE3(LoadMeshObjectFactory, const char* fname, iStreamSource* ssource = 0,
-  bool do_verbose = false)
+  bool do_verbose = false);
 
  /**
   * Load a mesh object from a file.
@@ -465,14 +465,14 @@ struct iThreadedLoader : public virtual iBase
   * \param ssource is an optional stream source for faster loading.
   */
   THREADED_INTERFACE3(LoadMeshObject, const char* fname, iStreamSource* ssource = 0,
-  bool do_verbose = false)
+  bool do_verbose = false);
 
 
  /**
   * Load a shader from a file.
   */
   THREADED_INTERFACE3(LoadShader, const char* filename, bool registerShader = true,
-  bool do_verbose = false)
+  bool do_verbose = false);
 
   //@}
   /**
@@ -514,7 +514,7 @@ struct iThreadedLoader : public virtual iBase
   */
   THREADED_INTERFACE7(LoadMapFile, const char* filename, bool clearEngine = true,
   iCollection* collection = 0, iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0,
-  uint keepFlags = KEEP_ALL, bool do_verbose = false)
+  uint keepFlags = KEEP_ALL, bool do_verbose = false);
   //@}
   
   //@{
@@ -556,7 +556,7 @@ struct iThreadedLoader : public virtual iBase
   */
   THREADED_INTERFACE7(LoadMap, iDocumentNode* world_node, bool clearEngine = true,
   iCollection* collection = 0, iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0,
-  uint keepFlags = KEEP_ALL, bool do_verbose = false)
+  uint keepFlags = KEEP_ALL, bool do_verbose = false);
   //@}
 
   //@{
@@ -584,7 +584,7 @@ struct iThreadedLoader : public virtual iBase
   */
   THREADED_INTERFACE6(LoadLibraryFile, const char* filename, iCollection* collection = 0,
   iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL,
-  bool do_verbose = false)
+  bool do_verbose = false);
   //@}
 
   //@{
@@ -612,7 +612,7 @@ struct iThreadedLoader : public virtual iBase
   */
   THREADED_INTERFACE6(LoadLibrary, iDocumentNode* lib_node, iCollection* collection = 0,
   iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL,
-  bool do_verbose = false)
+  bool do_verbose = false);
   //@)
 
   //@{
@@ -661,7 +661,7 @@ struct iThreadedLoader : public virtual iBase
   */
   THREADED_INTERFACE6(LoadFile, const char* fname, iCollection* collection = 0,
   iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL,
-  bool do_verbose = false)
+  bool do_verbose = false);
   //@}
 
   //@{
@@ -710,7 +710,7 @@ struct iThreadedLoader : public virtual iBase
   */
   THREADED_INTERFACE6(LoadBuffer, iDataBuffer* buffer, iCollection* collection = 0,
   iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL,
-  bool do_verbose = false)
+  bool do_verbose = false);
   //@}
 
   //@{
@@ -757,7 +757,7 @@ struct iThreadedLoader : public virtual iBase
   */
   THREADED_INTERFACE6(LoadNode, csRef<iDocumentNode> node, csRef<iCollection> collection = 0,
   csRef<iStreamSource> ssource = 0, csRef<iMissingLoaderData> missingdata = 0, uint keepFlags = KEEP_ALL,
-  bool do_verbose = false)
+  bool do_verbose = false);
   //@}
 };
 
