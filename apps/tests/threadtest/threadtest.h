@@ -31,19 +31,19 @@ struct Data : public csRefCount
   double d[10000000];
   csWeakRefArray<iThreadTest> t;
   bool b;
-  unsigned long long reallyBig;
+  uint64 reallyBig;
   iObjectRegistry* objreg;
 };
 
 struct iThreadTest : public virtual iBase
 {
-  THREADED_INTERFACE(Test1)
-  THREADED_INTERFACE1(Test2, bool b)
-  THREADED_INTERFACE2(Test3, int i, float f)
-  THREADED_INTERFACE1(Test4, csWeakRef<iThreadTest> myself)
+  THREADED_INTERFACE(Test1);
+  THREADED_INTERFACE1(Test2, bool b);
+  THREADED_INTERFACE2(Test3, int i, float f);
+  THREADED_INTERFACE1(Test4, csWeakRef<iThreadTest> myself);
   virtual void Test5() const = 0;
-  THREADED_INTERFACE1(Test6, csRef<Data> stuff)
-  THREADED_INTERFACE(Test7)
+  THREADED_INTERFACE1(Test6, csRef<Data> stuff);
+  THREADED_INTERFACE(Test7);
   virtual iObjectRegistry* GetObjectRegistry() const = 0;
 };
 
