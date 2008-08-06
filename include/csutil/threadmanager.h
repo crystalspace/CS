@@ -80,6 +80,11 @@ public:
 
   static ThreadID tid;
 
+  inline bool IsMainThread()
+  {
+    return tid == CS::Threading::Implementation::GetCurrentThreadId();
+  }
+
   int32 waiting;
   int32 threadCount;
 

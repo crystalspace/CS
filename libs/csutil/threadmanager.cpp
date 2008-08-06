@@ -72,7 +72,7 @@ void csThreadManager::Wait(csRef<iThreadReturn> result)
     AtomicOperations::Increment(&waiting);
     while(!result->IsFinished())
     {
-      if(tid == CS::Threading::Implementation::GetCurrentThreadId())
+      if(IsMainThread())
       {
         csRef<iEvent> evt = eventQueue->CreateBroadcastEvent(ProcessWhileWait);
         eventQueue->Dispatch(*evt);
