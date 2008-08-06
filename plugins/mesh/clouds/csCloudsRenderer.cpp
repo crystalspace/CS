@@ -20,3 +20,98 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csCloudsRenderer.h"
 
 SCF_IMPLEMENT_FACTORY(csCloudsRenderer)
+
+//-------------------------------------------------------//
+
+const bool csCloudsRenderer::RenderOLV(const csRef<csField3<float>>& rCondWaterMixingRatios)
+{
+  //First save the mixingratios into a 3D-Texture
+
+  //Then fit bounding-box in Lightdirection. Compute Rotationsmatrix such that vLightDir equals Z-Axis
+  //Used Coord system: left-hand
+  m_vZAxis = -m_vLightDir;
+  m_vZAxis.Normalize();
+  csVector3 vLinIndepVec;
+  if(m_vZAxis != csVector3(0.f, 1.f, 0.f) && m_vZAxis != csVector3(0.f, -1.f, 0.f)) vLinIndepVec = csVector3(0.f, 1.f, 0.f);
+  else vLinIndepVec = csVector3(-1.f, 0.f, 0.f);
+  m_vYAxis.Cross(vLinIndepVec, m_vZAxis);
+  m_vXAxis.Cross(m_vZAxis, m_vYAxis);
+  //Rotationmatrix
+  m_mOLVRotation  = csMatrix3(m_vXAxis.x, m_vYAxis.x, m_vZAxis.x,
+                              m_vXAxis.y, m_vYAxis.y, m_vZAxis.y,
+                              m_vXAxis.z, m_vYAxis.z, m_vZAxis.z);
+  //For rotationmatrices is Inversion == Transpose valid!
+  m_mInvOLVRotation = m_mOLVRotation;
+  m_mInvOLVRotation.Transpose();
+
+  //Compute Boundingbox for qc-volume
+  const float fSizeXHalf = rCondWaterMixingRatios->GetSizeX() * m_fGridScale * 0.5f;
+  const float fSizeYHalf = rCondWaterMixingRatios->GetSizeY() * m_fGridScale * 0.5f;
+  const float fSizeZHalf = rCondWaterMixingRatios->GetSizeZ() * m_fGridScale * 0.5f;
+  //Center of the box is the Origin
+  csVector3 avQcBox[8]   = {csVector3(fSizeXHalf, -fSizeYHalf, -fSizeZHalf),    // front, bottom, right
+                            csVector3(fSizeXHalf, fSizeYHalf, -fSizeZHalf),     // front, top, right
+                            csVector3(-fSizeXHalf, fSizeYHalf, -fSizeZHalf),    // front, top, left
+                            csVector3(-fSizeXHalf, -fSizeYHalf, -fSizeZHalf),   // front, bottom, left
+                            csVector3(fSizeXHalf, -fSizeYHalf, fSizeZHalf),     // back, bottom, right
+                            csVector3(fSizeXHalf, fSizeYHalf, fSizeZHalf),      // back, top, right
+                            csVector3(-fSizeXHalf, fSizeYHalf, fSizeZHalf),     // back, top, left
+                            csVector3(-fSizeXHalf, -fSizeYHalf, fSizeZHalf)};   // back, bottom, left
+  //Transform Box into OLV space
+  csVector3 vBBMin;
+  csVector3 vBBMax;
+  csVector3 avTransBox[8];
+  for(UINT i = 0; i < 8; ++i)
+  {
+    avTransBox[i] = m_mInvOLVRotation * avQcBox[i];
+    //Searching for transformed OBB
+    if(i == 0) vBBMax = vBBMin = avTransBox[i];
+    else
+    {
+      vBBMin = VectorMin(avTransBox[i], vBBMin);
+      vBBMax = VectorMax(avTransBox[i], vBBMax);
+    }
+  }
+  //Transform back the front xyPlane of the BB
+  //Sorted CW, and CCW from light position
+  m_avBaseSlice[0] = m_mOLVRotation * csVector3(vBBMin.x, vBBMin.y, vBBMin.z);    //Bottom, Left
+  m_avBaseSlice[1] = m_mOLVRotation * csVector3(vBBMin.x, vBBMax.y, vBBMin.z);    //Top, Left
+  m_avBaseSlice[2] = m_mOLVRotation * csVector3(vBBMax.x, vBBMax.y, vBBMin.z);    //Top, Right
+  m_avBaseSlice[3] = m_mOLVRotation * csVector3(vBBMax.x, vBBMin.y, vBBMin.z);    //Bottom, Right
+
+  //Spacing Vector between each slice (from Back to Front!)
+  const UINT iOLVSizeX = rCondWaterMixingRatios->GetSizeX() / 2;
+  const UINT iOLVSizeY = rCondWaterMixingRatios->GetSizeY() / 2;
+  const UINT iOLVSizeZ = rCondWaterMixingRatios->GetSizeZ() / 2;
+  const csVector3 vDelta = ((vBBMax.z - vBBMin.z) / static_cast<float>(iOLVSizeZ)) * m_vZAxis;
+
+  //Resultion == Slice count
+  //Rendering from front to back (reference: lightdirection)
+  for(int i = iOLVSizeZ; i >= 0; --i)
+  {
+    //m_avBaseSlice[0] + vDelta * i;
+
+  }
+
+  return true;
+}
+
+//-------------------------------------------------------//
+
+const bool csCloudsRenderer::CreateImpostor(const csVector3& vCameraPosition)
+{
+
+  return true;
+}
+
+//-------------------------------------------------------//
+
+const bool csCloudsRenderer::Render(const csVector3& vCameraPosition)
+{
+
+  return true;
+}
+
+//-------------------------------------------------------//
+
+//-------------------------------------------------------//

@@ -122,7 +122,7 @@ struct iCloudsRenderer : public virtual iBase
   All following methods are used to configure the entire rendering process
   */
   virtual inline void SetGridScale(const float dx) = 0;
-  virtual inline void SetTransformationMatrix(const CS::Math::Matrix4& mTransform) = 0;
+  virtual inline void SetCloudPosition(const csVector3& vPosition) = 0;
   virtual inline void SetLightDirection(const csVector3& vLightDir) = 0;
 };
 

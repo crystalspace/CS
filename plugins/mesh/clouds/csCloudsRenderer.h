@@ -22,21 +22,42 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "imesh/clouds.h"
 #include "csCloudsUtils.h"
 
-//#include <csgeom/matrix4.h>
+#include <csgeom/matrix3.h>
+#include <csgeom/vector3.h>
 
 //Cloud-Renderer class
 class csCloudsRenderer : public scfImplementation1<csCloudsRenderer, iCloudsRenderer>
 {
 private:
   csVector3                     m_vLightDir;
-  CS::Math::Matrix4             m_mTransform;
+  csVector3                     m_vPosition;
   float                         m_fGridScale;
+
+  //OLV coord system
+  csVector3                     m_vXAxis;
+  csVector3                     m_vYAxis;
+  csVector3                     m_vZAxis;
+  csMatrix3                     m_mOLVRotation;
+  csMatrix3                     m_mInvOLVRotation;
+  csVector3                     m_avBaseSlice[4];    //This is the slice which is farthest away from the lightsource
+
+
+  //=======================================================//
+  //Helpermethods
+
+  inline const csVector3 VectorMin(const csVector3& a, const csVector3& b)
+  {
+    return csVector3(a.x < b.x ? a.x : b.x, a.y < b.y ? a.y : b.y, a.z < b.z ? a.z : b.z);
+  }
+  inline const csVector3 VectorMax(const csVector3& a, const csVector3& b)
+  {
+    return csVector3(a.x > b.x ? a.x : b.x, a.y > b.y ? a.y : b.y, a.z > b.z ? a.z : b.z);
+  }
 
   void SetStandardValues()
   {
     SetGridScale(1.f);
-    //Identity!p
-    SetTransformationMatrix(CS::Math::Matrix4(1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f));
+    SetCloudPosition(csVector3(0.f, 0.f, 0.f));
     SetLightDirection(csVector3(0.f, -1.f, 0.f));
   }
 public:
@@ -49,10 +70,12 @@ public:
   }
 
   /**
-  Setter for the user, to control every major aspect of cloud rendering
+  Setter for the user, to control every major aspect of cloud rendering.
+  No rotation may be set for the cloud volume. This simplifies some calculations, and
+  isn't really needed as feature.
   */
   virtual inline void SetGridScale(const float dx) {m_fGridScale = dx;}
-  virtual inline void SetTransformationMatrix(const CS::Math::Matrix4& mTransform) {m_mTransform = mTransform;}
+  virtual inline void SetCloudPosition(const csVector3& vPosition) {m_vPosition = vPosition;}
   virtual inline void SetLightDirection(const csVector3& vLightDir) {m_vLightDir = vLightDir;}
 
 
@@ -63,10 +86,15 @@ public:
   const bool RenderOLV(const csRef<csField3<float>>& rCondWaterMixingRatios);
 
   /**
-  This Method is called every frame. It simply renders the clouds from view direction
-  using the OLV as base for computing the illumination
+  This Method is called every frame. It simply renders the clouds impostor from view direction
   */
-  const bool Render();
+  const bool Render(const csVector3& vCameraPosition);
+
+  /**
+  This Method is called every time, when the impostor is needed to be updated. Means, everytime
+  when the looking-at-angle has changed too much, or when a new OLV was made
+  */
+  const bool CreateImpostor(const csVector3& vCameraPosition);
 };
 
 #endif // __CSCLOUDRENDERER_PLUGIN_H__
