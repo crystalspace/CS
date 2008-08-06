@@ -423,7 +423,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     if(!AddLoadingTexture(txtname))
     {
-      iTextureWrapper* m = ldr_context->FindTexture (txtname);
+      t = ldr_context->FindTexture (txtname);
       if (t)
       {
         ldr_context->AddToCollection(t->QueryObject ());
@@ -858,7 +858,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     if(!AddLoadingMaterial(matname))
     {
-      iMaterialWrapper* m = ldr_context->FindMaterial (matname);
+      m = ldr_context->FindMaterial (matname);
       if(m)
       {
         ldr_context->AddToCollection(m->QueryObject ());
