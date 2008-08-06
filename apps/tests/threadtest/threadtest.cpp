@@ -156,6 +156,7 @@ THREADED_CALLABLE_IMPL1(csThreadTest, Test7Data, int counter)
 {
   csSleep(1000);
   printf("Test 7 Data %i of 10\n", counter);
+  Test7RealData();
 
   return true;
 }
