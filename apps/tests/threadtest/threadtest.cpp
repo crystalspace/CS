@@ -106,7 +106,7 @@ THREADED_CALLABLE_IMPL1(csThreadTest, Test6, csRef<Data> stuff)
   unsigned long long reallyBig = stuff->reallyBig;
   csWeakRefArray<iThreadTest> t = stuff->t;
 
-  if(b && i == 42 && f == 3.14159f && reallyBig == 123456789012345 && stuff->objreg == objReg)
+  if(b && i == 42 && f == 3.14159f && reallyBig == CONST_UINT64(123456789012345) && stuff->objreg == objReg)
   {
     for(int x=0; x<10000000; x++)
     {
@@ -189,7 +189,7 @@ int main(int argc, char* argv[])
   dat->i = 42;
   dat->f = 3.14159f;
   dat->b = true;
-  dat->reallyBig = 123456789012345; 
+  dat->reallyBig = CONST_UINT64(123456789012345); 
 
   for(int i=0; i<10000000; i++)
   {
