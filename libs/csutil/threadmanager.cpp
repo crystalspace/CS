@@ -19,11 +19,12 @@
 #include "cssysdef.h"
 #include "csutil/eventnames.h"
 #include "csutil/platform.h"
+#include "csutil/sysfunc.h"
 #include "csutil/threadmanager.h"
 #include "iengine/engine.h"
 #include "iutil/event.h"
 
-ThreadID csThreadManager::tid = Implementation::GetCurrentThreadId();
+ThreadID csThreadManager::tid = Thread::GetThreadID();
 
 csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationType(this),
 objectReg(objReg)

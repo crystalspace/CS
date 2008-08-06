@@ -65,7 +65,7 @@ public:
     }
     else
     {
-      if(tid == CS::Threading::Implementation::GetCurrentThreadId())
+      if(IsMainThread())
       {
         job->Run();
       }
@@ -82,7 +82,7 @@ public:
 
   inline bool IsMainThread()
   {
-    return tid == CS::Threading::Implementation::GetCurrentThreadId();
+    return tid == Thread::GetThreadID();
   }
 
   int32 waiting;

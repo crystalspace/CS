@@ -693,22 +693,22 @@ public:
     *ptr = p;
     return (void const*)ptr;
   }
-
-  template<>
-  void const* Store<const char*>(const char*& p)
-  {
-    if(!p)
-    {
-      return 0;
-    }
-
-    char* ptr = (char*)Alloc(strlen(p) + 1);
-    strcpy(ptr, p);
-
-    char** ptrPtr = new (this) char*;
-    *ptrPtr = ptr;
-    return (void const*)ptrPtr;
-  }
 };
+
+template<>
+void const* TEventMemPool::Store<const char*>(const char*& p)
+{
+  if(!p)
+  {
+    return 0;
+  }
+
+  char* ptr = (char*)Alloc(strlen(p) + 1);
+  strcpy(ptr, p);
+
+  char** ptrPtr = new (this) char*;
+  *ptrPtr = ptr;
+  return (void const*)ptrPtr;
+}
 
 #endif // __CS_CSUTIL_THREADEVENT_H__
