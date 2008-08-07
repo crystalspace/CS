@@ -961,8 +961,8 @@ public:
     if (root.p)
     {
       size_t i;
-      for (i = count; i > 0; i--)
-        ElementHandler::Destroy (root.p + (i-1));
+      for (i = 0 ; i < count ; i++)
+        ElementHandler::Destroy (root.p + i);
       root.Free (root.p);
       root.p = 0;
       capacity.c = count = 0;
