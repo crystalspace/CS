@@ -96,7 +96,7 @@ csEventQueue::~csEventQueue ()
     EventPool->Free();
     EventPool = e;
   }
-  csEventTree::DeleteRootNode (EventTree); // Magic!
+  RemoveAllListeners();
   EventTree = 0;
 }
 
