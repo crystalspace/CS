@@ -979,7 +979,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (
             child->GetAttributeValue ("name"), false);
           csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, 0, child, ssource, 0);
-          AddLoadingObject(child->GetAttributeValue("name"), itr);
+          AddLoadingMeshObject(child->GetAttributeValue("name"), itr);
         }
         break;
       case XMLTOKEN_MESHFACT:
@@ -1622,7 +1622,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         handled, priority, false, staticpos, staticshape, zbufSet, prioSet,
         false, ssource))
       {
-        RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+        RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
         return false;
       }
 
@@ -1633,7 +1633,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           iMeshWrapper* container_mesh = 0;
           if (!ParsePortal (ldr_context, child, 0, 0, container_mesh, mesh))
           {
-            RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
             return 0;
           }
         }
@@ -1641,7 +1641,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       case XMLTOKEN_PORTALS:
         if (!ParsePortals (ldr_context, child, 0, mesh, ssource))
         {
-          RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+          RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
           return 0;
         }
         break;
@@ -1652,7 +1652,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           if (!sp)
           {
             // Error is already reported.
-            RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
             return false;
           }
           sp->QueryObject ()->SetName (child->GetAttributeValue ("name"));
@@ -1663,7 +1663,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           csRef<iMeshWrapper> sp = Engine->CreateMeshWrapper(child->GetAttributeValue ("name"), false);
           csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, sp, mesh, child, ssource, 0);
-          loadingObjects.Put(child->GetAttributeValue("name"), itr);
+          AddLoadingMeshObject(child->GetAttributeValue("name"), itr);
         }
         break;
       case XMLTOKEN_LIGHT:
@@ -1675,7 +1675,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
           else
           {
-            RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
             return false;
           }
         }
@@ -1687,7 +1687,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.load.plugin",
               child, "Don't specify the plugin if you use <nullmesh>!");
-            RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
             return false;
           }
           if (mesh->GetMeshObject ())
@@ -1695,7 +1695,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.mesh", child,
               "Please don't use <params> in combination with <nullmesh>!");
-            RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
             return false;
           }
           csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
@@ -1705,7 +1705,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.load.plugin",
               child, "Could not find the nullmesh plugin!");
-            RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
             return false;
           }
           csRef<iMeshObjectFactory> fact = type->NewFactory ();
@@ -1715,7 +1715,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           csBox3 b;
           if (!SyntaxService->ParseBox (child, b))
           {
-            RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
             return false;
           }
           csRef<iNullMeshState> nullmesh = 
@@ -1731,7 +1731,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           SyntaxService->ReportError (
             "crystalspace.maploader.load.plugin",
             child, "Could not load plugin!");
-          RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+          RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
           return false;
         }
         else
@@ -1741,7 +1741,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh, zbufSet, 
             prioSet))
           {
-            RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
             return false;	// Error already reported.
           }
         }
@@ -1754,7 +1754,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.loadingfile",
               child, "Specify a VFS filename with 'file'!");
-            RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
             return false;
           }
           csRef<iFile> buf = vfs->Open (fname, VFS_FILE_READ);
@@ -1763,7 +1763,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.loadingfile",
               child, "Error opening file '%s'!", fname);
-            RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
             return false;
           }
           csRef<iDocument> doc;
@@ -1773,7 +1773,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.loadingfile",
               child, "'%s' is not an XML file!", fname);
-            RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
             return false;
           }
           csRef<iDocumentNode> paramsnode = doc->GetRoot ()->GetNode ("params");
@@ -1785,7 +1785,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
                 "crystalspace.maploader.load.plugin",
                 child, "Could not load plugin for mesh '%s'!",
                 mesh->QueryObject ()->GetName ());
-              RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+              RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
               return false;
             }
             csRef<iBase> mo;
@@ -1800,7 +1800,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh,
               zbufSet, prioSet))
             {
-              RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+              RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
               return false;	// Error already reported.
             }
             break;
@@ -1810,7 +1810,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           if (meshobjnode)
           {
             csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, parent, meshobjnode, ssource, 0);
-            loadingObjects.Put(child->GetAttributeValue("name"), itr);
+            AddLoadingMeshObject(child->GetAttributeValue("name"), itr);
             break;
           }
           csRef<iDocumentNode> meshfactnode = doc->GetRoot ()->GetNode (
@@ -1828,7 +1828,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
                 meshfactnode, 0, ssource))
               {
                 // Error is already reported.
-                RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+                RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
                 return false;
               }
               else
@@ -1843,7 +1843,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             "crystalspace.maploader.load.plugin", child,
             "File '%s' doesn't contain <params>, <meshobj>, nor <meshfact>!",
             fname);
-          RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+          RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
           return false;
         }
         break;
@@ -1854,7 +1854,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             "crystalspace.maploader.load.plugin",
             child, "Could not load plugin for mesh '%s'!",
             mesh->QueryObject ()->GetName ());
-          RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+          RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
           return false;
         }
         else
@@ -1865,7 +1865,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.loadingfile",
               child, "Specify a VFS filename with 'paramsfile'!");
-            RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
             return false;
           }
           csRef<iFile> buf (vfs->Open (fname, VFS_FILE_READ));
@@ -1874,7 +1874,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.loadingfile",
               child, "Error opening file '%s'!", fname);
-            RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
             return false;
           }
           csRef<iBase> mo;
@@ -1900,7 +1900,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.mesh",
               child, "Please use 'params' before specifying 'trimesh'!");
-            RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
             return false;
           }
           iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
@@ -1909,13 +1909,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.mesh", child,
               "This mesh doesn't support setting of other 'trimesh'!");
-            RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
             return false;
           }
           if (!ParseTriMesh (child, objmodel))
           {
             // Error already reported.
-            RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
             return false;
           }
         }
@@ -1928,7 +1928,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.plugin",
               child, "Please specify only one plugin!");
-            RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
             return false;
           }
 
@@ -1938,7 +1938,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.plugin",
               child, "Specify a plugin name with 'plugin'!");
-            RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
             return false;
           }
           iDocumentNode* defaults = 0;
@@ -1947,7 +1947,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.meshobj",
               child, "Error loading plugin '%s'!", plugname);
-            RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
             return false;
           }
           if (defaults)
@@ -1961,7 +1961,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       default:
         {
           SyntaxService->ReportBadToken (child);
-          RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+          RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
           return false;
         }
       }
@@ -1986,7 +1986,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     ret->SetResult(csRef<iBase>(mesh));
 
-    RemoveLoadingObject(node->GetAttributeValue("name"), ret);
+    RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
 
     return true;
   }

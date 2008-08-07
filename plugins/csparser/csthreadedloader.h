@@ -39,6 +39,7 @@
 #include "isndsys/ss_manager.h"
 #include "isndsys/ss_renderer.h"
 #include "iutil/comp.h"
+#include "iutil/object.h"
 #include "ivaria/engseq.h"
 
 #include "ldrplug.h"
@@ -52,7 +53,6 @@ struct iImageIO;
 struct iImposter;
 struct iLODControl;
 struct iMapNode;
-struct iObject;
 struct iObjectModel;
 struct iObjectRegistry;
 struct iSceneNodeArray;
@@ -275,19 +275,36 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csRefArray<iSharedVariable> loaderSharedVariables;
 
       // General loading objects.
-      csHash<csRef<iThreadReturn>, const char*> loadingObjects;
-      Mutex loadingObjectsLock;
+      csHash<csRef<iThreadReturn>, const char*> loadingMeshObjects;
+      RecursiveMutex loadingMeshObjectsLock;
 
-      void AddLoadingObject(const char* name, csRef<iThreadReturn> itr)
+      void AddLoadingMeshObject(const char* name, csRef<iThreadReturn> itr)
       {
-        MutexScopedLock lock(loadingObjectsLock);
-        loadingObjects.Put(name, itr);
+        RecursiveMutexScopedLock lock(loadingMeshObjectsLock);
+        if(!FindLoadedMeshObject(name))
+        {
+          loadingMeshObjects.Put(name, itr);
+        }
       }
 
-      void RemoveLoadingObject(const char* name, csRef<iThreadReturn> itr)
+      bool FindLoadedMeshObject(const char* name)
       {
-        MutexScopedLock lock(loadingObjectsLock);
-        loadingObjects.Delete(name, itr);
+        RecursiveMutexScopedLock lock(loadingMeshObjectsLock);
+        for(size_t i=0; i<loaderMeshes.GetSize(); i++)
+        {
+          if(csString(name).Compare(loaderMeshes[i]->QueryObject()->GetName()))
+          {
+            return true;
+          }
+        }
+
+        return false;
+      }
+
+      void RemoveLoadingMeshObject(const char* name, csRef<iThreadReturn> itr)
+      {
+        RecursiveMutexScopedLock lock(loadingMeshObjectsLock);
+        loadingMeshObjects.Delete(name, itr);
       }
 
       // Loading texture objects.
@@ -387,6 +404,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
         MutexScopedLock lock(sectorsLock);
         loaderSectors.Push(obj);
+        obj->DecRef(); // Compensate for CreateSector IncRef().
       }
 
       void AddMeshFactToList(csRef<iMeshFactoryWrapper> obj)

@@ -39,7 +39,6 @@ class CS_CRYSTALSPACE_EXPORT csThreadManager : public scfImplementation2<csThrea
 {
 public:
   csThreadManager(iObjectRegistry* objReg);
-  ~csThreadManager();
 
   bool HandleEvent(iEvent&);
   CS_EVENTHANDLER_NAMES("crystalspace.threadmanager")
@@ -64,7 +63,7 @@ public:
   inline bool RunNow(bool useThreadQueue)
   {
     return (IsMainThread() && !useThreadQueue) ||
-      (useThreadQueue && (waiting >= threadCount-1 || threadQueue->GetQueueCount() > threadCount));
+      (useThreadQueue && (waiting >= threadCount-1 || threadQueue->GetQueueCount() > 2*threadCount-1));
   }
 
   private:

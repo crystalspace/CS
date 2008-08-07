@@ -2119,7 +2119,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
           csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (meshname, false);
           csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, 0, child, ssource, sector);
-          AddLoadingObject(meshname, itr);
+          AddLoadingMeshObject(meshname, itr);
         }
         break;
       case XMLTOKEN_MESHLIB:
@@ -2144,7 +2144,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             return 0;
           }
           csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, 0, child, ssource, sector);
-          AddLoadingObject(meshname, itr);
+          AddLoadingMeshObject(meshname, itr);
         }
         break;
       case XMLTOKEN_LIGHT:

@@ -210,7 +210,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   {
     csRef<iMeshWrapper> mesh;
 
-    csRef<iThreadReturn> itr = loader->loadingObjects.Get(name, NULL);
+    csRef<iThreadReturn> itr = loader->loadingMeshObjects.Get(name, NULL);
     if(itr.IsValid())
     {
       itr->Wait();
