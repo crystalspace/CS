@@ -769,14 +769,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     // Sequences and triggers are parsed at the end because
     // all sectors and other objects need to be present.
-    csTicks start = csGetTicks();
     if (sequences)
       if (!LoadSequences (ldr_context, sequences))
         return false;
     if (triggers)
       if (!LoadTriggers (ldr_context, triggers))
         return false;
-    printf("SeqTrig took: %uus\n", csGetTicks() - start);
 
     // Go through the list of proxy textures and load those needed.
     if(ldr_context->GetKeepFlags() == KEEP_USED)
