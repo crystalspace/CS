@@ -212,5 +212,7 @@ int main(int argc, char* argv[])
 
   getchar();
 
+  objReg->Clear();
+
   return 0;
 }

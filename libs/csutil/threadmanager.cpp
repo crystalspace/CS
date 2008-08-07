@@ -26,10 +26,11 @@
 
 ThreadID csThreadManager::tid = Thread::GetThreadID();
 
-csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationType(this),
-objectReg(objReg)
+csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationType(this), 
+  objectReg(objReg)
 {
   waiting = 0;
+  waitingTime = 0;
   threadCount = CS::Platform::GetProcessorCount()*4; // Find a better way to calculate.
 
   // If we can't detect, assume we have one.
@@ -42,14 +43,19 @@ objectReg(objReg)
   threadQueue.AttachNew(new ThreadedJobQueue(threadCount));
   listQueue.AttachNew(new ListAccessQueue());
 
-  eventQueue = csQueryRegistry<iEventQueue>(objectReg);
-  if(eventQueue)
+  csRef<iEventQueue> eQ = csQueryRegistry<iEventQueue>(objectReg);
+  if(eventQueue = eQ)
   {
     ProcessPerFrame = csevFrame(objReg);
     ProcessWhileWait = csevThreadWait(objReg);
     eventQueue->RegisterListener(this, ProcessPerFrame);
     eventQueue->RegisterListener(this, ProcessWhileWait);
   }
+}
+
+csThreadManager::~csThreadManager()
+{
+  printf("Total wait time: %u\n", waitingTime);
 }
 
 bool csThreadManager::HandleEvent(iEvent& Event)
@@ -68,6 +74,7 @@ void csThreadManager::Process(uint num)
 
 void csThreadManager::Wait(csRef<iThreadReturn> result)
 {
+  csTicks start = csGetTicks();
   if(!result->IsFinished())
   {
     AtomicOperations::Increment(&waiting);
@@ -82,4 +89,5 @@ void csThreadManager::Wait(csRef<iThreadReturn> result)
     }
     AtomicOperations::Decrement(&waiting);
   }
+  waitingTime += (csGetTicks() - start);
 }

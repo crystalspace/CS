@@ -48,6 +48,7 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a1->Invalidate();
       delete mempool;
       delete args;
   }
@@ -64,6 +65,7 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a1->Invalidate();
       delete mempool;
       delete args;
   }
@@ -81,6 +83,7 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a1->Invalidate();
       delete mempool;
       delete args;
   }
@@ -99,6 +102,7 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a1->Invalidate();
       delete mempool;
       delete args;
   }
@@ -118,6 +122,7 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a1->Invalidate();
       delete mempool;
       delete args;
   }
@@ -138,6 +143,7 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a1->Invalidate();
       delete mempool;
       delete args;
   }
@@ -159,6 +165,7 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a1->Invalidate();
       delete mempool;
       delete args;
   }
@@ -181,6 +188,7 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a1->Invalidate();
       delete mempool;
       delete args;
   }
@@ -204,6 +212,7 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a1->Invalidate();
       delete mempool;
       delete args;
   }
@@ -228,6 +237,7 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a1->Invalidate();
       delete mempool;
       delete args;
   }
@@ -253,6 +263,7 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a1->Invalidate();
       delete mempool;
       delete args;
   }
@@ -279,6 +290,7 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a1->Invalidate();
       delete mempool;
       delete args;
   }
@@ -306,6 +318,7 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a1->Invalidate();
       delete mempool;
       delete args;
   }
@@ -334,6 +347,7 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a1->Invalidate();
       delete mempool;
       delete args;
   }
@@ -363,6 +377,7 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a1->Invalidate();
       delete mempool;
       delete args;
   }

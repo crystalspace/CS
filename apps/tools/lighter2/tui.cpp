@@ -35,8 +35,9 @@ namespace lighter
   {
   }
 
-  void TUI::Initialize ()
+  void TUI::Initialize (iObjectRegistry* objReg)
   {
+    object_reg = objReg;
     simpleMode = globalLighter->configMgr->GetBool ("lighter2.simpletui", false);
   }
 
@@ -99,8 +100,8 @@ namespace lighter
     CS_ANSI_FW CS_ANSI_BW "D" CS_ANSI_RST " "
   };
 
-  bool TUI::Report (iReporter* reporter, int severity, const char* msgId,
-    const char* description)
+  THREADED_CALLABLE_IMPL4(TUI, Report, iReporter* reporter, int severity,
+    const char* msgId, const char* description)
   {
     csStringArray descrSplit;
     descrSplit.SplitString (description, "\n");
