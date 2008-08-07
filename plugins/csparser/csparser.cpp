@@ -2151,7 +2151,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           iLight* sl = ParseStatlight (ldr_context, child);
           if (!sl) return 0;
-          sector->GetLights ()->Add (sl);
+          sector->AddLight (sl);
           sl->DecRef ();
         }
         break;

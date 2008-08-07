@@ -750,6 +750,18 @@ csSectorHitBeamResult csSector::HitBeam (
   return rc;
 }
 
+THREADED_CALLABLE_IMPL1(csSector, SetSectorCallback, csRef<iSectorCallback> cb)
+{
+  sectorCallbackList.Push(cb);
+  return true;
+}
+
+THREADED_CALLABLE_IMPL1(csSector, RemoveSectorCallback, csRef<iSectorCallback> cb)
+{
+  sectorCallbackList.Delete(cb);
+  return true;
+}
+
 int csSector::IntersectSegment (
   const csVector3 &start,
   const csVector3 &end,
@@ -1115,6 +1127,17 @@ void csSector::RealCheckFrustum (iFrustumView *lview)
   culler->CastShadows (lview);
 
   drawBusy--;
+}
+
+iObjectRegistry* csSector::GetObjectRegistry() const
+{
+  return engine->objectRegistry;
+}
+
+THREADED_CALLABLE_IMPL1(csSector, AddLight, csRef<iLight> light)
+{
+  GetLights()->Add(light);
+  return true;
 }
 
 void csSector::ShineLightsInt (csProgressPulse *pulse)

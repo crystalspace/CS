@@ -32,6 +32,7 @@
 #include "csutil/nobjvec.h"
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/threadmanager.h"
 #include "iutil/selfdestruct.h"
 #include "iengine/portalcontainer.h"
 #include "iengine/sector.h"
@@ -115,9 +116,10 @@ private:
 class csSector : public scfImplementationExt3<csSector, 
                                               csObject,
                                               iSector,
-					      iSelfDestruct,
+					                                    iSelfDestruct,
                                               scfFakeInterface<iShaderVariableContext> >,
-                 public CS::ShaderVariableContextImpl
+                 public CS::ShaderVariableContextImpl,
+                 public ThreadedCallable<csSector>
 {
   // Friends
   friend class csEngine;
@@ -218,6 +220,9 @@ public:
   virtual iLightList* GetLights ()
   { return &lights; }
 
+  THREADED_CALLABLE_DECL1(csSector, AddLight, csThreadReturn,
+    csRef<iLight>, light, false, false);
+
   virtual void ShineLights ()
   { ShineLightsInt ((csProgressPulse*)0); }
   
@@ -261,11 +266,11 @@ public:
 
   /**\name Callbacks
    * @{ */
-  virtual void SetSectorCallback (iSectorCallback* cb)
-  { sectorCallbackList.Push (cb); }
+  THREADED_CALLABLE_DECL1(csSector, SetSectorCallback, csThreadReturn,
+    csRef<iSectorCallback>, cb, false, false)
 
-  virtual void RemoveSectorCallback (iSectorCallback* cb)
-  { sectorCallbackList.Delete (cb); }
+  THREADED_CALLABLE_DECL1(csSector, RemoveSectorCallback, csThreadReturn,
+    csRef<iSectorCallback>, cb, false, false)
 
   virtual int GetSectorCallbackCount () const 
   { return (int) sectorCallbackList.GetSize (); }
@@ -472,6 +477,9 @@ private:
 
   /// Engine handle.
   csEngine* engine;
+
+  /// Required by ThreadedCallable
+  iObjectRegistry* GetObjectRegistry() const;
 
   /// Optional renderloop.
   iRenderLoop* renderloop;

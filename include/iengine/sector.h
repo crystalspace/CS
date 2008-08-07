@@ -36,6 +36,8 @@
 #include "csgeom/vector3.h"
 #include "csgeom/aabbtree.h"
 
+#include "iutil/threadmanager.h"
+
 struct iMeshWrapper;
 struct iMeshGenerator;
 struct iMeshList;
@@ -344,6 +346,11 @@ struct iSector : public virtual iBase
    */
   virtual iLightList* GetLights () = 0;
 
+  /**
+   * Add a light to the light lists in the main thread.
+   */
+  THREADED_INTERFACE1(AddLight, csRef<iLight> light);
+
   /// Calculate lighting for all objects in this sector
   virtual void ShineLights () = 0;
   /// Version of ShineLights() which only affects one mesh object.
@@ -448,12 +455,12 @@ struct iSector : public virtual iBase
    * Set the sector callback. This will call IncRef() on the callback
    * So make sure you call DecRef() to release your own reference.
    */
-  virtual void SetSectorCallback (iSectorCallback* cb) = 0;
+  THREADED_INTERFACE1(SetSectorCallback, csRef<iSectorCallback> cb);
 
   /**
    * Remove a sector callback.
    */
-  virtual void RemoveSectorCallback (iSectorCallback* cb) = 0;
+  THREADED_INTERFACE1(RemoveSectorCallback, csRef<iSectorCallback> cb);
 
   /// Get the number of sector callbacks.
   virtual int GetSectorCallbackCount () const = 0;
