@@ -47,7 +47,7 @@ public:
   void Process(uint num = 1);
   void Wait(csRef<iThreadReturn> ret);
 
-  void PushToQueue(bool useThreadQueue, iJob* job)
+  inline void PushToQueue(bool useThreadQueue, iJob* job)
   {
     if(useThreadQueue)
     {

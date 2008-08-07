@@ -691,8 +691,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iLoaderPlugin> BuiltinImageTexLoader;
     if (!filename.IsEmpty ())
     {
-      csRef<iThreadReturn> ret = LoadImage (filename, Format, false);
-      ret->Wait();
+      csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
+      LoadImageTC (ret, filename, Format, false);
       csRef<iImage> image = scfQueryInterface<iImage>(ret->GetResultRefPtr());
       context.SetImage (image);
       if (image.IsValid() && type.IsEmpty ())
