@@ -191,7 +191,7 @@ public:
   csHash<csHandlerID, csHandlerID> instantiation; 
   struct KnownEventHandler
   {
-    csRef<iEventHandler> handler;
+    iEventHandler* handler;
     int refcount;
 
     KnownEventHandler (iEventHandler* handler) : handler (handler),
