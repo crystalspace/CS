@@ -26,6 +26,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/scf.h"
 #include "csutil/stringarray.h"
 #include "csutil/sysfunc.h"
+#include "csutil/threadmanager.h"
 #include "csutil/util.h"
 
 #include "iutil/cfgmgr.h"
@@ -319,7 +320,7 @@ void csReporterListener::WriteLine (int severity, const char* msgID,
   }
 }
 
-bool csReporterListener::Report (iReporter*, int severity,
+THREADED_CALLABLE_IMPL4(csReporterListener, Report, iReporter*, int severity,
   const char* msgID, const char* description)
 {
   if (dest_alert[severity] && nativewm)

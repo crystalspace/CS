@@ -19,11 +19,13 @@
 #ifndef __CS_IVARIA_REPORTER_H__
 #define __CS_IVARIA_REPORTER_H__
 
+#include "iutil/objreg.h"
+#include "iutil/threadmanager.h"
+
 #include "csutil/ansicommand.h"
 #include "csutil/scf_interface.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
-#include "iutil/objreg.h"
 
 /**\file
  * Reporter interface.
@@ -90,8 +92,8 @@ struct iReporterListener : public virtual iBase
    * then the report is considered handled and the reporter will not
    * add it anymore.
    */
-  virtual bool Report (iReporter* reporter, int severity, const char* msgId,
-  	const char* description) = 0;
+  THREADED_INTERFACE4(Report, iReporter* reporter, int severity, const char* msgId,
+  	const char* description);
 };
 
 /**
