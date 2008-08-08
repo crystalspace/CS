@@ -10,6 +10,7 @@
 #include "#PROJECTNAME#.h"
 #include <csutil/ref.h>
 #include <csutil/csbaseeventh.h>
+#include <csutil/commonhandlers.h>
 #include <cstool/csapplicationframework.h>
 #include <iengine/engine.h>
 #include <ivideo/graph3d.h>
@@ -27,20 +28,18 @@ private:
    * A reference to the 3D engine plugin.
    */
   csRef<iEngine> engine;
+  
+  /**
+   * A reference to the frame printer.
+   */
+  csRef<FramePrinter> printer;
 
   /**
    * Set up everything that needs to be rendered on screen.  This routine is
-   * called from the event handler in response to a cscmdProcess broadcast
-   * message.
+   * called from the event handler in response to a csevFrame event.
    */
-  virtual void ProcessFrame();
-
-  /**
-   * Finally, render the screen.  This routine is called from the event handler
-   * in response to a cscmdFinalProcess broadcast message.
-   */
-  virtual void FinishFrame();
-
+  virtual void Frame();
+  
   /**
    * Handle keyboard events, such as key presses and releases.  This routine is
    * called from the event handler in response to a csevKeyboard event.
@@ -79,12 +78,11 @@ public:
    */
   virtual bool Application();
   
-  // Declare the name of this event handler.
-  CS_EVENTHANDLER_NAMES("application.#PROJECTNAME#")
-      
-  /* Declare that we're not terribly interested in having events
-     delivered to us before or after other modules, plugins, etc. */
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
+  /* Declare the name by which this class is identified to the event scheduler.
+   * Declare that we want to receive the frame event in the "LOGIC" phase,
+   * and that we're not terribly interested in having other events
+   * delivered to us before or after other modules, plugins, etc. */
+  CS_EVENTHANDLER_PHASE_LOGIC("application.#PROJECTNAME#")    
 };
 
 #endif // __app#PROJECTNAME#_h

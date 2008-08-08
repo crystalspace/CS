@@ -26,18 +26,12 @@ App#PROJECTNAMECAP#::~App#PROJECTNAMECAP#()
 {
 }
 
-void App#PROJECTNAMECAP#::ProcessFrame()
+void App#PROJECTNAMECAP#::Frame()
 {
   if (g3d->BeginDraw(engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS))
   {
     // Draw frame.
   }
-}
-
-void App#PROJECTNAMECAP#::FinishFrame()
-{
-  g3d->FinishDraw();
-  g3d->Print(0);
 }
 
 bool App#PROJECTNAMECAP#::OnKeyboard(iEvent& ev)
@@ -107,6 +101,7 @@ bool App#PROJECTNAMECAP#::OnInitialize(int argc, char* argv[])
 
 void App#PROJECTNAMECAP#::OnExit()
 {
+  printer.Invalidate();
 }
 
 bool App#PROJECTNAMECAP#::Application()
@@ -129,6 +124,8 @@ bool App#PROJECTNAMECAP#::Application()
   engine = csQueryRegistry<iEngine> (r);
   if (!engine)
     return ReportError("Failed to locate 3D engine!");
+    
+  printer.AttachNew(new FramePrinter(GetObjectRegistry()));
 
   // Start the default run/event loop.  This will return only when some code,
   // such as OnKeyboard(), has asked the run loop to terminate.
