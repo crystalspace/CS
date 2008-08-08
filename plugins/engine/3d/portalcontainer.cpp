@@ -1135,7 +1135,7 @@ private:
 public:
   PerspectiveOutlet2D3D (iCamera* cam, csPoly2D& dest2D, csPoly3D& dest3D,
     int viewWidth, int viewHeight)
-    : PerspectiveOutlet2D (cam->GetProjectionMatrix(), dest2D, 0, 0),
+    : PerspectiveOutlet2D (cam->GetProjectionMatrix(), dest2D, viewWidth, viewHeight),
     dest3D (dest3D), cam (cam), viewWidth (viewWidth), viewHeight (viewHeight) { }
 
   void MakeEmpty () 
@@ -1165,7 +1165,7 @@ public:
     destPx.SetVertexCount (dest.GetVertexCount());
     for (size_t p = 0; p < dest.GetVertexCount(); p++)
     {
-      destPx[p].Set (dest[p].x * viewWidth, dest[p].y * viewHeight);
+      destPx[p].Set (dest[p].x, dest[p].y);
     }
     uint8 clipRes = clipper->Clip (
       destPx.GetVertices(), destPx.GetVertexCount(), clipOut, outNum,
@@ -1181,7 +1181,7 @@ public:
     float iw = 1.0f/viewWidth, ih = 1.0f/viewHeight;
     for (size_t i = 0 ; i < outNum; i++)
     {
-      dest.AddVertex (csVector2 (clipOut[i].x * iw, clipOut[i].y * ih));
+      dest.AddVertex (csVector2 (clipOut[i].x, clipOut[i].y));
       switch (clipOutStatus[i].Type)
       {
 	case CS_VERTEX_ORIGINAL:
