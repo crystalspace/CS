@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2006 by Kapoulkine Arseny
-                2007 by Marten Svanfeldt
+                2007-2008 by Marten Svanfeldt
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -44,6 +44,7 @@ csTerrainCell::csTerrainCell (csTerrainSystem* terrain, const char* name, int gr
   : scfImplementationType (this), 
   terrain (terrain), name (name), materialMapWidth (materialMapWidth), 
   materialMapHeight (materialMapHeight), position (position), size (size),
+  minHeight (0), maxHeight (0),
   renderProperties (renderProperties), collisionProperties (collisionProperties),
   feederProperties (feederProperties), loadState (NotLoaded),
   lruTicks (0)
@@ -61,6 +62,10 @@ csTerrainCell::csTerrainCell (csTerrainSystem* terrain, const char* name, int gr
   
   step_x = size.x / (this->gridWidth - 1);
   step_z = size.z / (this->gridHeight - 1);
+
+  const csVector3 size01 = size * 0.1f;
+  boundingBox.Set (position.x - size01.x, minHeight - size01.y, position.y - size01.z,
+    position.x + size.x + size01.x, maxHeight + size01.y, position.y + size.z + size01.z);
 }
 
 csTerrainCell::~csTerrainCell ()
@@ -185,11 +190,12 @@ void csTerrainCell::SetLoadState(LoadState state)
 
 csBox3 csTerrainCell::GetBBox () const
 {
+  /*const csVector3 size01 = size * 0.1f;
   csBox3 box;
-  box.Set (position.x, 0, position.y,
-    position.x + size.x, size.y, position.y + size.z);
+  box.Set (position.x - size01.x, minHeight - size01.y, position.y - size01.z,
+    position.x + size.x + size01.x, maxHeight + size01.y, position.y + size.z + size01.z);*/
 
-  return box;
+  return boundingBox;
 }
 
 const char* csTerrainCell::GetName () const
@@ -253,6 +259,21 @@ csLockedHeightData csTerrainCell::LockHeightData (const csRect& rectangle)
 void csTerrainCell::UnlockHeightData ()
 {
   Touch();
+
+  minHeight = FLT_MAX;
+  maxHeight = -FLT_MAX;
+
+  for (size_t i = 0; i < heightmap.GetSize (); ++i)
+  {
+    minHeight = csMin (minHeight, heightmap[i]);
+    maxHeight = csMax (maxHeight, heightmap[i]);
+  }
+
+  const csVector3 size01 = size * 0.1f;
+  boundingBox.Set (position.x - size01.x, minHeight - size01.y, position.y - size01.z,
+    position.x + size.x + size01.x, maxHeight + size01.y, position.y + size.z + size01.z);
+
+  terrain->CellSizeUpdate (this);
 
   terrain->FireHeightUpdateCallbacks (this, lockedHeightRect);
 }
