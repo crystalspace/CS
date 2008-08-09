@@ -335,18 +335,16 @@ namespace RenderManager
     }
 
     void ComputeVector2BoundingBox (const csVector2* verts, size_t count,
-                                    csBox2& box, int w, int h)
+                                    csBox2& box)
     {
       if (count == 0)
       {
         box.StartBoundingBox ();
         return;
       }
-      box.StartBoundingBox (
-        csVector2 ((verts[0].x+1) * w/2, (verts[0].y+1) * h/2));
+      box.StartBoundingBox (verts[0]);
       for (size_t i = 1; i < count; i++)
-        box.AddBoundingVertexSmart (
-          csVector2 ((verts[i].x+1) * w/2, (verts[i].y+1) * h/2));
+        box.AddBoundingVertexSmart (verts[i]);
     }
 
     void SetupWarp (iCamera* inewcam, iMovable* movable, iPortal* portal)
@@ -412,7 +410,7 @@ namespace RenderManager
 
       // Setup a bounding box, in screen-space
       csBox2 screenBox;
-      ComputeVector2BoundingBox (portalVerts2d, count, screenBox, screenW, screenH);
+      ComputeVector2BoundingBox (portalVerts2d, count, screenBox);
 
       // Obtain a texture handle for the portal to render to
       int sb_minX = int (screenBox.MinX());
@@ -451,6 +449,7 @@ namespace RenderManager
 		  0, 2.0f/(yb-yt), 0, -(0.5f*(yt+yb))/(yb-yt),
 		  0, 0, 1, 0,
 		  0, 0, 0, 1);
+
 	newCam->SetProjectionMatrix (inewcam->GetProjectionMatrix() * projShift);
       }
       /* Visible cracks can occur on portal borders when the geometry
