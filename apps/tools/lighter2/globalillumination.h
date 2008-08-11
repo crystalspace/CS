@@ -76,6 +76,7 @@ namespace lighter
 
   private:
     csRandomVectorGen randVect;
+    csRandomFloatGen randFloat;
     bool finalGather;
     int numFinalGatherRays;
     float searchRadius;

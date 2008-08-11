@@ -87,7 +87,7 @@ namespace lighter
     *                 will be not be added
     */
     csColor SampleColor(const csVector3& pos,  float radius, 
-                        const csVector3& normal);
+                        const csVector3& normal, const csVector3& dir = csVector3());
 
    /**
    * NearestNeighbor
@@ -103,20 +103,6 @@ namespace lighter
    csArray<Photon> NearestNeighbor(const csVector3& pos, float radius, 
                                          int number);
 
-   /**
-   * In Range
-   * A basic sphere plane intersection test to check if the search area
-   * needs to search both the left and right sides of the tree.
-   * /param tar - the position of the plane 
-   * /param pos - the position of the requested search area
-   * /param distance - the distance the search radius extends
-   * /param direction - the direction that the plane faces
-   * /return true if both branches need to be searched or false if no
-   *         intersection with the plane
-   */
-   static bool InRange(const csVector3& tar, const csVector3& pos, 
-                       const float& distance, const int& direction);
-
   private:
     // helper function to delete the tree
     void DeleteNodes(Photon *p);
@@ -126,8 +112,6 @@ namespace lighter
 
     // The root of the tree
     Photon *root;
-
-    csArray<Photon*> photons;
 
   };
 

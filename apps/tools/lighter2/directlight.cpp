@@ -422,7 +422,7 @@ namespace lighter
           c = (this->*lmElementShader) (sector, ep, masterSampler);
           
 
-          //normalLM->SetAddPixel (u, v, c * pixelAreaPart);
+          normalLM->SetAddPixel (u, v, c * pixelAreaPart);
 
           // Shade PD lights
           for (size_t pdli = 0; pdli < PDLights.GetSize (); ++pdli)

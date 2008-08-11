@@ -103,7 +103,7 @@ namespace lighter
               if (finalGather)
               {
                 // average over the number of FG rays
-                csColor final;
+                csColor final(0,0,0);
                 for (size_t num = 0; num < numFinalGatherRays; ++num)
                 {
                   // Todo:: Need to change this so we don't sample vectors
@@ -111,8 +111,12 @@ namespace lighter
                   lighter::HitPoint hit;
                   hit.distance = FLT_MAX*0.9f;
                   lighter::Ray ray;
-                  ray.direction = randVect.Get() + normal;
-                  ray.direction.Normalize();
+                  csVector3 newDir = randVect.Get();
+                  if (newDir*normal < 0.0)
+                  {
+                    newDir = newDir*-1.0;
+                  }
+                  ray.direction = newDir;
                   ray.origin = pos;
                   ray.minLength = 0.01f;
 
@@ -121,11 +125,24 @@ namespace lighter
                   {
                     if (hit.primitive)
                     {
+                      csVector3 dirToSrc = csVector3(-ray.direction.x, 
+                        -ray.direction.y, -ray.direction.z);
                       csVector3 hNorm = 
                         hit.primitive->ComputeNormal(hit.hitPoint);
                       final += 
-                        sect->photonMap->SampleColor(hit.hitPoint, searchRadius, hNorm);
+                        sect->photonMap->SampleColor(hit.hitPoint, 
+                        searchRadius, hNorm, dirToSrc);
                     }
+                    else
+                    {
+                      final += sect->photonMap->SampleColor(pos, searchRadius, normal);
+                    }
+                  }
+                  else
+                  {
+                    final += sect->photonMap->SampleColor(pos, searchRadius, normal);
+                    //c = sect->photonMap->SampleColor(pos, searchRadius, normal);
+                    //break;
                   }
                 }
                 // average the color

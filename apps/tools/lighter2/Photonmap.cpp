@@ -37,8 +37,8 @@ namespace lighter
   void PhotonMap::AddPhoton(const csColor& color, const csVector3& dir,
                             const csVector3& pos)
   {
-    photons.Push(new Photon(color, dir, pos));
-    /*
+    //photons.Push(new Photon(color, dir, pos));
+    
     // check to see if we are the first photon to be added
     if (!root)
     {
@@ -49,7 +49,7 @@ namespace lighter
 
     // lets find the node we should be attached to
     Photon *current = root;
-    int direction = 1;
+    int direction = 0;
     while (current)
     {
       // check the left branch
@@ -64,7 +64,7 @@ namespace lighter
         else
         {
           current->left = new Photon(color, dir, pos);
-          current->left->planeDir = direction;
+          current->left->planeDir = (direction + 1) % 3;
           return;
         }
       }
@@ -80,36 +80,37 @@ namespace lighter
         else
         {
            current->right = new Photon(color, dir, pos);
-           current->right->planeDir = direction;
+           current->right->planeDir = (direction + 1) % 3;
            return;
         }
       }
 
       direction = (direction + 1) % 3;
     }
-    */
+    
   }
 
 
   csColor PhotonMap::SampleColor(const csVector3& pos,  float radius, 
-                                 const csVector3& normal)
+                                 const csVector3& normal, const csVector3& dir)
   {
-    CS::Utility::PriorityQueue<Photon> que;
-    csArray<Photon> nearest;
+    //CS::Utility::PriorityQueue<Photon> que;
+    //csArray<Photon> nearest;
+    /*
     for (size_t num=0; num < photons.GetSize(); ++num)
     {
       csVector3 dist = pos - photons[num]->position;
       photons[num]->distance = dist.SquaredNorm();
       que.Insert(*photons[num]);
-    }
+    } 
 
     // remove as many element as it takes
     while (nearest.GetSize() <= photonsPerSample && !que.IsEmpty())
     {
       nearest.Push(que.Pop());
     }
-    
-    //csArray<Photon> nearest = NearestNeighbor(pos, radius, photonsPerSample);
+    */
+    csArray<Photon> nearest = NearestNeighbor(pos, radius, photonsPerSample);
     csColor final(0,0,0);
 
     // loop through the nearest photons and based on their normal 
@@ -121,7 +122,7 @@ namespace lighter
 
       // Check to make sure the two vectors aren't radically different or 
       // possibly on the other side of a surface
-      if (!(app < .5))
+      if (!(app < 0.0))
       {
         // The wpc can be changed for filtering, default for now
         float wpc = 1.0;
@@ -135,7 +136,8 @@ namespace lighter
     if (nearest.GetSize() != 0)
     {
       float area = (1.0 / (radius * radius * PI));
-      final = final * area * (1.0 / (0.5f * nearest.GetSize()));
+      //final = final * area * (1.0 / (0.5f * nearest.GetSize()));
+      final = final * area * (1.0 / (1.0f * photonsPerSample));
     }
     return final;
     
@@ -169,25 +171,32 @@ namespace lighter
 
       // check to see if we hit the intersection plane, if we do then
       // we need to add both sides of the tree to the parent tree.
-      if (InRange(current->position, pos, radius, current->planeDir)
-        && current->right
-        && current->left)
+      float tDistance = current->position[current->planeDir] - pos[current->planeDir];
+      float tDisSq = tDistance * tDistance;
+      float cdir = current->position[current->planeDir];
+      float cdir2 = pos[current->planeDir];
+      if (cdir2 < cdir)
       {
-        parents.Push(current->right);
-        parents.Push(current->left);
+        if (current->left)
+        {
+          parents.Push(current->left);
+        }
+        if (tDisSq < radSquared && current->right)
+        {
+          parents.Push(current->right);
+        }
       }
-      // else if we need check if its on the right or left
-      else if (pos[current->planeDir] <= 
-        current->position[current->planeDir] 
-        && current->left)
+      else
       {
-        // add just the left
-        parents.Push(current->left);
-      }
-      // at this point it has to be on the right so just add the right
-      else if (current->right)
-      {
-        parents.Push(current->right);
+        if (current->right)
+        {
+          parents.Push(current->right);
+        }
+
+        if (tDisSq < radSquared && current->left)
+        {
+          parents.Push(current->left);
+        }
       }
     }
 
@@ -197,35 +206,6 @@ namespace lighter
       finalOut.Push(que.Pop());
     }
     return finalOut;
-  }
-
-  bool PhotonMap::InRange(const csVector3& tar, const csVector3& pos, 
-                          const float& distance, const int& direction)
-  {
-    // get the points distance relative to the plane
-    csVector3 dist = pos - tar;
-    csVector3 normal;
-
-    // based on the direction set the normal
-    if (direction == DIRX)
-    {
-      normal = csVector3(1, 0, 0);
-    }
-    else if (direction == DIRY)
-    {
-      normal = csVector3(0, 1, 0);
-    }
-    else
-    {
-      normal = csVector3(0, 0, 1);
-    }
-
-    // now take the dot product of the normal and the point 
-    // for total the total distance to the plane
-    float tDist = dist.x*normal.x + dist.y*normal.y + dist.z*normal.z;
-    
-    // check to see if that distance is less than the search distance
-    return distance > tDist;
   }
 
   bool Photon::operator < (const Photon& right) const

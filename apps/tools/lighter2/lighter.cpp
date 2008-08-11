@@ -481,11 +481,14 @@ namespace lighter
     // iterate over all sectors
     SectorHash::GlobalIterator sectIt = 
       scene->GetSectors().GetIterator();
+    const float progressStep = 1.0f / scene->GetSectors ().GetSize();
+
     while (sectIt.HasNext())
     {
       csRef<Sector> sect = sectIt.Next();
+
       ObjectHash::GlobalIterator gitr = sect->allObjects.GetIterator();
-      lighter::GlobalIllumination lighting;
+      lighter::GlobalIllumination lighting(globalConfig.GetIndirectProperties());
       lighting.ShadeIndirectLighting(sect);
     }
   }
