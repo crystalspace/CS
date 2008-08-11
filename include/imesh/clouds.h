@@ -116,7 +116,7 @@ scalar field!
 */
 struct iCloudsRenderer : public virtual iBase
 {
-  SCF_INTERFACE(iCloudsRenderer, 0, 0, 2);
+  SCF_INTERFACE(iCloudsRenderer, 0, 1, 1);
 
   /**
   All following methods are used to configure the entire rendering process
@@ -170,6 +170,29 @@ struct iCloudsDynamics : public virtual iBase
   Has to be called whenever one value has been changed!
   */
   virtual inline void UpdateAllDependParameters() = 0;
+};
+
+//--------------------------------------------------------------------------------------------//
+
+/**
+This class takes care of an entire cloud field. It's instance is registred in object
+registry and all clouds should be added and removed through this one.
+*/
+struct iCloudSystem : public virtual iBase
+{
+  SCF_INTERFACE(iCloudSystem, 0, 0, 1);
+
+  /**
+  Some getter which provide various information about the field
+  */
+  virtual inline const UINT GetCloudCount() const = 0;
+  virtual inline csRef<iClouds> GetCloud(const UINT i) const = 0;
+
+  /**
+  Add and remove clouds from the field
+  */
+  virtual csRef<iClouds> AddCloud() = 0;
+  virtual const bool RemoveCloud(csRef<iClouds> pCloud) = 0;
 };
 
 //--------------------------------------------------------------------------------------------//

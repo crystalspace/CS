@@ -3,6 +3,14 @@
 <plugin>
   <scf>
     <classes>
+	<class>
+        <name>crystalspace.mesh.cloudsystem</name>
+        <implementation>csCloudSystem</implementation>
+        <description>Represents a field of many clouds</description>
+	  <requires>
+		<class>crystalspace.mesh.clouds</class>
+	  </requires>
+      </class>
       <class>
         <name>crystalspace.mesh.clouds</name>
         <implementation>csClouds</implementation>
