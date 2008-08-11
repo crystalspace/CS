@@ -84,6 +84,9 @@ bool csTerrainFactoryLoader::Initialize (iObjectRegistry* objreg)
 csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
   iStreamSource*, iLoaderContext* /*ldr_context*/, iBase* /*context*/)
 {
+  synldr->Report ("crystalspace.terrainloader.parse",
+		CS_REPORTER_SEVERITY_WARNING,
+		node, "Terrain objects are deprecated! Please use terrain2 instead!");
   csRef<iPluginManager> plugin_mgr = 
     csQueryRegistry<iPluginManager> (object_reg);
 
@@ -268,6 +271,9 @@ bool csTerrainObjectLoader::Initialize (iObjectRegistry* objreg)
 csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node, 
   iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/)
 {
+  synldr->Report ("crystalspace.terrainloader.parse",
+		CS_REPORTER_SEVERITY_WARNING,
+		node, "Terrain objects are deprecated! Please use terrain2 instead!");
   csRef<iMeshObject> mesh;
   csRef<iTerrainObjectState> state;
   bool palette_set = false;

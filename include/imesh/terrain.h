@@ -40,8 +40,13 @@ class csTransform;
 
 /**
  * This will override the settings for material in the parent
+ *
+ * \deprecated Deprecated in 1.3. iTerrainObjectState is deprecated.
+ * Use iTerrainSystem instead.
  */
-struct iTerrainObjectState : public virtual iBase
+struct
+  CS_DEPRECATED_TYPE_MSG ("iTerrainObjectState is deprecated. Use iTerrainSystem instead.")
+  iTerrainObjectState : public virtual iBase
 {
   SCF_INTERFACE (iTerrainObjectState, 1, 0, 0);
 
@@ -172,8 +177,13 @@ struct iTerrainObjectState : public virtual iBase
  * Allows the setting of a set of generic terrain parameters outside
  * any specific algorithm.  It is up to the algorithm to determine the
  * best use of the information provided in the interface.
+ *
+ * \deprecated Deprecated in 1.3. iTerrainFactoryState is deprecated.
+ * Use iTerrainFactory instead.
  */
-struct iTerrainFactoryState : public virtual iBase
+struct
+  CS_DEPRECATED_TYPE_MSG ("iTerrainFactoryState is deprecated. Use iTerrainFactory instead.")
+  iTerrainFactoryState : public virtual iBase
 {
   SCF_INTERFACE (iTerrainFactoryState, 1, 0, 0);
 
