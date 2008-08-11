@@ -72,6 +72,7 @@ public:
   }
   ~csCloudsRenderer()
   {
+    delete[] m_OLVTexture;
   }
 
   /**
