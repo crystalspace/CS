@@ -26,6 +26,34 @@ SCF_IMPLEMENT_FACTORY(csCloudsRenderer)
 const bool csCloudsRenderer::RenderOLV(const csRef<csField3<float>>& rCondWaterMixingRatios)
 {
   //First save the mixingratios into a 3D-Texture
+  delete[] m_OLVTexture;
+  m_OLVTexture = new csImageVolumeMaker;
+  unsigned long* pdwBuffer = new unsigned long[rCondWaterMixingRatios->GetSizeX() * rCondWaterMixingRatios->GetSizeY()];
+  //Now add slice per slice
+  for(UINT z = 0; z < rCondWaterMixingRatios->GetSizeZ(); ++z)
+  {
+    //convert mixing ratios into a color and save it into a buffer
+    UINT iIndex = 0;
+    for(UINT x = 0; x < rCondWaterMixingRatios->GetSizeX(); ++x)
+    {
+      for(UINT y = 0; y < rCondWaterMixingRatios->GetSizeY(); ++y)
+      {
+        const float fValue = rCondWaterMixingRatios->GetValue(x, y, z);
+        const unsigned char ucA = static_cast<unsigned char>(fValue < 0.f ? 0.f : fValue > 1.f ? 1.f : fValue * 255.f);
+        const unsigned char ucR = 0xFF;
+        const unsigned char ucG = 0xFF;
+        const unsigned char ucB = 0xFF;
+        pdwBuffer[iIndex++] = static_cast<unsigned long>(ucR) | 
+                              static_cast<unsigned long>(ucG << 8) | 
+                              static_cast<unsigned long>(ucB << 16) | 
+                              static_cast<unsigned long>(ucA << 24);
+      }
+    }
+    //Create current slice and add it to the 3D-Texture
+    csImageMemory TempImage(rCondWaterMixingRatios->GetSizeX(), rCondWaterMixingRatios->GetSizeY(), pdwBuffer, false);
+    m_OLVTexture->AddImage(&TempImage);
+  }
+  delete[] pdwBuffer;
 
   //Then fit bounding-box in Lightdirection. Compute Rotationsmatrix such that vLightDir equals Z-Axis
   //Used Coord system: left-hand

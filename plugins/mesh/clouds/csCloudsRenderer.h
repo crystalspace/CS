@@ -24,6 +24,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <csgeom/matrix3.h>
 #include <csgeom/vector3.h>
+#include <csgfx/imagevolumemaker.h>
+#include <csgfx/imagememory.h>
 
 //Cloud-Renderer class
 class csCloudsRenderer : public scfImplementation1<csCloudsRenderer, iCloudsRenderer>
@@ -32,6 +34,9 @@ private:
   csVector3                     m_vLightDir;
   csVector3                     m_vPosition;
   float                         m_fGridScale;
+
+  //OLV 3D-Texture
+  csImageVolumeMaker*           m_OLVTexture;
 
   //OLV coord system
   csVector3                     m_vXAxis;
@@ -61,7 +66,7 @@ private:
     SetLightDirection(csVector3(0.f, -1.f, 0.f));
   }
 public:
-  csCloudsRenderer(iBase* pParent) : scfImplementationType(this, pParent)
+  csCloudsRenderer(iBase* pParent) : scfImplementationType(this, pParent), m_OLVTexture(NULL)
   {
     SetStandardValues();
   }
