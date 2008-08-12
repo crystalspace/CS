@@ -75,6 +75,9 @@ public:
     delete[] m_OLVTexture;
   }
 
+  //Getter
+  virtual inline const UINT GetSliceCount() const {return m_OLVTexture->GetDepth();}
+
   /**
   Setter for the user, to control every major aspect of cloud rendering.
   No rotation may be set for the cloud volume. This simplifies some calculations, and

@@ -104,6 +104,7 @@ struct iClouds : public virtual iBase
   /**
   All of following Setters refer to the iCloudsRenderer instance.
   */
+  virtual inline const UINT GetSliceCount() const = 0;
 
 };
 
@@ -117,6 +118,11 @@ scalar field!
 struct iCloudsRenderer : public virtual iBase
 {
   SCF_INTERFACE(iCloudsRenderer, 0, 1, 1);
+
+  /**
+  Some usful getter
+  */
+  virtual inline const UINT GetSliceCount() const = 0;
 
   /**
   All following methods are used to configure the entire rendering process

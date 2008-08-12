@@ -21,6 +21,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <iutil/objreg.h>
 #include <iutil/comp.h>
+#include <csutil/array.h>
+
+#include "csClouds.h"
 #include "imesh/clouds.h"
 
 //Supervisor-class implementation
@@ -45,10 +48,16 @@ public:
 
   virtual csRef<iClouds> AddCloud()
   {
-    return m_Clouds[m_iCloudCount++];
+    csRef<iClouds> NewCloud;
+    NewCloud.AttachNew(new csClouds(this));
+    m_Clouds.Push(NewCloud);
+    ++m_iCloudCount;
+    return NewCloud;
   }
   virtual const bool RemoveCloud(csRef<iClouds> pCloud)
   {
+    m_Clouds.Delete(pCloud);
+    --m_iCloudCount;
     return true;
   }
 };

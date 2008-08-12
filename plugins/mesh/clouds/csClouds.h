@@ -105,7 +105,8 @@ public:
   virtual inline void SetTemperaturBottomInputField(csRef<iField2> Field) {return m_Dynamics->SetTemperaturBottomInputField(Field);}
   virtual inline void SetWaterVaporBottomInputField(csRef<iField2> Field) {return m_Dynamics->SetWaterVaporBottomInputField(Field);}
 
-  //All of following Setters refer to the csCloudsRenderer instance, and are delegated!
+  //All of following Setters and Getters refer to the csCloudsRenderer instance, and are delegated!
+  virtual inline const UINT GetSliceCount() const {return m_Renderer->GetSliceCount();}
 
   //EventHandler-Part
   virtual bool HandleEvent(iEvent& rEvent);
