@@ -619,6 +619,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     /// Parse a renderloop.
     iRenderLoop* ParseRenderLoop (iDocumentNode* node, bool& set);
 
+    /// Parse a addon.
+    THREADED_CALLABLE_DECL5(csThreadedLoader, ParseAddOn, csLoaderReturn,
+      csRef<iLoaderPlugin>, plugin, csRef<iDocumentNode>, node, csRef<iStreamSource>, ssource,
+      csRef<iLoaderContext>, ldr_context, csRef<iBase>, context, false, true);
+
+    /// Parse a addon (binary plugin).
+    THREADED_CALLABLE_DECL5(csThreadedLoader, ParseAddOnBinary, csLoaderReturn,
+      csRef<iBinaryLoaderPlugin>, plugin, csRef<iDataBuffer>, dbuf, csRef<iStreamSource>,
+      ssource, csRef<iLoaderContext>, ldr_context, csRef<iBase>, context, false, true);
+
     /**
     * Try loading the file as a structured document.
     * \return True if the documented loaded and appears to be a map file,

@@ -2115,8 +2115,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           "crystalspace.maploader.load.plugin",
           node, "'defaults' section is ignored for addons!");
       }
-      csRef<iBase> rc = plug->Parse (node, ssource, ldr_context, context, failedMeshFacts);
-      if (!rc) return false;
+
+      csRef<iBase> rc;
+      if(plug->IsThreadSafe())
+      {
+        csRef<iThreadReturn> itr;
+        ParseAddOnTC(itr, plug, node, ssource, ldr_context, context);
+        if(!itr->WasSuccessful())
+        {
+          return false;
+        }
+        rc = itr->GetResultRefPtr();
+      }
+      else
+      {
+        csRef<iThreadReturn> itr = ParseAddOn(plug, node, ssource, ldr_context, context);
+        if(!itr->WasSuccessful())
+        {
+          return false;
+        }
+        rc = itr->GetResultRefPtr();
+      }
 
       if (Engine->GetSaveableFlag ())
       {
@@ -2151,10 +2170,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
           else
           {
-            csRef<iBase> rc = plug->Parse (child, ssource, ldr_context,
-              context, failedMeshFacts);
-
-            if (!rc) return false;
+            csRef<iBase> rc;
+            if(plug->IsThreadSafe())
+            {
+              csRef<iThreadReturn> itr;
+              ParseAddOnTC(itr, plug, node, ssource, ldr_context, context);
+              if(!itr->WasSuccessful())
+              {
+                return false;
+              }
+              rc = itr->GetResultRefPtr();
+            }
+            else
+            {
+              csRef<iThreadReturn> itr = ParseAddOn(plug, node, ssource, ldr_context, context);
+              if(!itr->WasSuccessful())
+              {
+                return false;
+              }
+              rc = itr->GetResultRefPtr();
+            }
 
             if (Engine->GetSaveableFlag ())
             {
@@ -2193,24 +2228,39 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
                 child, "Error opening file '%s'!", fname);
               return false;
             }
-            bool rc;
+
             csRef<iBase> ret;
-            if (plug)
+            if(plug)
             {
-              ret = LoadStructuredMap (ldr_context,
-                plug, buf, 0, fname, ssource);
-              rc = (ret != 0);
+              ret = LoadStructuredMap (ldr_context, plug, buf, 0, fname, ssource);
+              if(!ret.IsValid())
+              {
+                return false;
+              }
             }
             else
             {
               csRef<iDataBuffer> dbuf = vfs->ReadFile (fname);
-              ret = binplug->Parse (dbuf,
-                ssource, ldr_context, 0);
-              rc = (ret != 0);
+              if(binplug->IsThreadSafe())
+              {
+                csRef<iThreadReturn> itr;
+                ParseAddOnBinaryTC(itr, binplug, dbuf, ssource, ldr_context, 0);
+                if(!itr->WasSuccessful())
+                {
+                  return false;
+                }
+                ret = itr->GetResultRefPtr();
+              }
+              else
+              {
+                csRef<iThreadReturn> itr = ParseAddOnBinary(binplug, dbuf, ssource, ldr_context, 0);
+                if(!itr->WasSuccessful())
+                {
+                  return false;
+                }
+                ret = itr->GetResultRefPtr();
+              }
             }
-
-            if (!rc)
-              return false;
 
             if (Engine->GetSaveableFlag ())
             {
@@ -2288,7 +2338,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         }
         else
         {
-          ret = plug->Parse (paramsnode, ssource, ldr_context, context, failedMeshFacts);
+          if(plug->IsThreadSafe())
+          {
+            csRef<iThreadReturn> itr;
+            ParseAddOnTC(itr, plug, paramsnode, ssource, ldr_context, context);
+            if(!itr->WasSuccessful())
+            {
+              return false;
+            }
+            ret = itr->GetResultRefPtr();
+          }
+          else
+          {
+            csRef<iThreadReturn> itr = ParseAddOn(plug, paramsnode, ssource, ldr_context, context);
+            if(!itr->WasSuccessful())
+            {
+              return false;
+            }
+            ret = itr->GetResultRefPtr();
+          }
         }
       }
       else

@@ -95,6 +95,8 @@ public:
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
   	iBase* context, iStringArray* failed = 0) = 0;
+
+  virtual bool IsThreadSafe() { return true; }
 };  
 
 /// Image texture loader pseudo-plugin
@@ -107,6 +109,8 @@ public:
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
   	iBase* context, iStringArray* failed = 0);
+
+  virtual bool IsThreadSafe() { return true; }
 };
 
 /// Checkerboard texture loader pseudo-plugin
@@ -119,6 +123,8 @@ public:
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
   	iBase* context, iStringArray* failed = 0);
+
+  virtual bool IsThreadSafe() { return true; }
 };
 
 /// Error-texture loader pseudo-plugin
@@ -131,6 +137,8 @@ public:
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context,
     iBase* context, iStringArray* failed = 0);
+
+  virtual bool IsThreadSafe() { return true; }
 };
 
 /// Cubemap texture loader pseudo-plugin
@@ -147,6 +155,8 @@ public:
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
     	iBase* context, iStringArray* failed = 0);
+
+  virtual bool IsThreadSafe() { return true; }
 };
 
 /// 3D texture loader pseudo-plugin
@@ -163,6 +173,8 @@ public:
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
 	iBase* context, iStringArray* failed = 0);
+
+  virtual bool IsThreadSafe() { return true; }
 };
 
 }

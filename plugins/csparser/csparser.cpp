@@ -2314,6 +2314,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return 0;
   }
 
+  THREADED_CALLABLE_IMPL5(csThreadedLoader, ParseAddOn, csRef<iLoaderPlugin> plugin,
+    csRef<iDocumentNode> node, csRef<iStreamSource> ssource, csRef<iLoaderContext> ldr_context,
+    csRef<iBase> context)
+  {
+    csRef<iBase> base = plugin->Parse(node, ssource, ldr_context, context, failedMeshFacts);
+    ret->SetResult(base);
+    return base.IsValid();    
+  }
+
+  THREADED_CALLABLE_IMPL5(csThreadedLoader, ParseAddOnBinary, csRef<iBinaryLoaderPlugin> plugin,
+    csRef<iDataBuffer> dbuf, csRef<iStreamSource> ssource, csRef<iLoaderContext> ldr_context,
+    csRef<iBase> context)
+  {
+    csRef<iBase> base = plugin->Parse(dbuf, ssource, ldr_context, context, failedMeshFacts);
+    ret->SetResult(base);
+    return base.IsValid(); 
+  }
+
   THREADED_CALLABLE_IMPL3(csThreadedLoader, SetSectorVisibilityCuller,
     csRef<iSector> sector, const char* culplugname, csRef<iDocumentNode> culler_params)
   {

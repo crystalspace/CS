@@ -46,12 +46,14 @@ struct iLoaderPlugin : public virtual iBase
    *   You can use this to find meshes/materials/...
    * \param context The context in which we are loading (can be the mesh
    *   wrapper for meshes for example).
-   * \param failedMeshFacts An array containing the names of all meshfacts
+   * \param failed An array containing the names of all objects
    *   that failed to load.
    */
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource* ssource, iLoaderContext* ldr_context,
   	iBase* context, iStringArray* failed = 0) = 0;
+
+  virtual bool IsThreadSafe() = 0;
 };
 
 /**
@@ -69,10 +71,14 @@ struct iBinaryLoaderPlugin : public virtual iBase
    *   You can use this to find meshes/materials/...
    * \param context The context in which we are loading (can be the mesh
    *   wrapper for meshes for example).
+   * \param failed An array containing the names of all objects
+   *   that failed to load.
    */
   virtual csPtr<iBase> Parse (iDataBuffer* data,
   	iStreamSource* ssource, iLoaderContext* ldr_context,
-  	iBase* context) = 0;
+  	iBase* context, iStringArray* failed = 0) = 0;
+
+  virtual bool IsThreadSafe() = 0;
 };
 
 /** @} */
