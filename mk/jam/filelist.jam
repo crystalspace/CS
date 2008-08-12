@@ -48,8 +48,7 @@ rule DoFileListEntry
 {
     local target destdir srcdir listfile ;
     dir = [ ConcatDirs $(2) ] ;
-    #target = $(1:BSR=$(dir):G=filelist) ;
-    target = $(1:G=filelist) ;
+    target = $(1:G=filelist!$(SUBDIR:J=!)) ;
     
     listfile = $(4:S=.txt) ;
     MakeLocate $(listfile) : [ ConcatDirs $(BUILDTOP) out lists ] ;
@@ -112,3 +111,4 @@ actions WriteFileListEntry2
   echo "$(>):$(DESTNAME)" >> $(<)
 }
 
+Help filelists : "Generate file lists for packages" ;
