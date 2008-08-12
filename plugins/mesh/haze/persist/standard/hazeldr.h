@@ -59,6 +59,8 @@ public:
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context,
     iStringArray* failed);
+
+  virtual bool IsThreadSafe() { return true; }
 };
 
 /**
@@ -110,6 +112,8 @@ public:
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context,
     iStringArray* failedMeshFacts);
+
+  virtual bool IsThreadSafe() { return true; }
 };
 
 /**

@@ -73,6 +73,8 @@ public:
     iStreamSource*, iLoaderContext* ldr_context, iBase* context,
     iStringArray* failed);
 
+  virtual bool IsThreadSafe() { return true; }
+
   bool ParseRenderBuffer (iDocumentNode *node, iGeneralFactoryState* state);
 };
 
@@ -142,6 +144,9 @@ public:
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context,
     iStringArray* failedMeshFacts);
+
+  virtual bool IsThreadSafe() { return true; }
+
   /// Parse a render buffer node
   bool ParseRenderBuffer (iDocumentNode *node, iGeneralMeshState* state, 
     iGeneralFactoryState* factstate);

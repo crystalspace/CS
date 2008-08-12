@@ -47,6 +47,9 @@ public:
   virtual csPtr<iBase> Parse (iDocumentNode *node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context,
     iStringArray* failed);
+
+  virtual bool IsThreadSafe() { return true; }
+
   /// Parse the system specific sub section
   virtual bool ParseSystem (iDocumentNode *node, iDynamicSystem* system);
   /// Parse the body specific sub section

@@ -43,6 +43,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
       iStreamSource* ssource, iLoaderContext* ldr_context,
       iBase* context, iStringArray* failed);
 
+    virtual bool IsThreadSafe() { return true; }
+
     bool ParseMorphTarget (iDocumentNode* child,
       iAnimatedMeshFactory* amfact);
 
@@ -92,6 +94,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
     virtual csPtr<iBase> Parse (iDocumentNode* node,
       iStreamSource* ssource, iLoaderContext* ldr_context,
       iBase* context, iStringArray* failedMeshFacts);
+
+    virtual bool IsThreadSafe() { return true; }
 
     //-- iComponent
     virtual bool Initialize (iObjectRegistry*);

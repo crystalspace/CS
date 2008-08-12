@@ -221,6 +221,8 @@ public:
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context,
     iBase* context, iStringArray* failed);
+
+  virtual bool IsThreadSafe() { return true; }
 };
 
 #endif // __CS_STENCIL_H

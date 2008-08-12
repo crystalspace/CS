@@ -101,6 +101,8 @@ public:
   	iStreamSource*, iLoaderContext* ldr_context,
   	iBase* context, iStringArray* failedMeshFacts);
 
+  virtual bool IsThreadSafe() { return true; }
+
   // PT update "scheduler"
   bool UpdatePT (ProctexPDLight* texture, csTicks time)
   { return sched.UpdatePT (texture, time); }

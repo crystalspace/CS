@@ -50,6 +50,8 @@ public:
     iStreamSource*, iLoaderContext* ldr_context, iBase* context,
     iStringArray* failed);
 
+  virtual bool IsThreadSafe() { return true; }
+
   const char *ParseBone (iDocumentNode* node, 
     iSkeletonFactory *skel_fact, iSkeletonBoneFactory *parent_bone);
 

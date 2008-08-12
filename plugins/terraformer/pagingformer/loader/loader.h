@@ -49,6 +49,8 @@ public:
     iStreamSource*, iLoaderContext* ldr_context, iBase* context,
     iStringArray* failed);
 
+  virtual bool IsThreadSafe() { return true; }
+
   csRef<iSyntaxService> synldr;
   csRef<iDataBuffer> GetDataBuffer (iDocumentNode* child);
 private:
