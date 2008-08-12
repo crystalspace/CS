@@ -23,8 +23,8 @@ float4 main (vertex2fragment IN,
                   uniform sampler2D TexSpecular,
 			uniform sampler2D TexAttn) : COLOR
 {
-	float3 normEye = IN.EyeVec.xyz;
-	float3 normLight = IN.LightDir.xyz;
+	float3 normEye = normalize(IN.EyeVec.xyz);
+	float3 normLight = normalize(IN.LightDir.xyz);
  
 	float selfOcclusion = saturate(normLight.z*5);
  
@@ -53,7 +53,6 @@ float4 main (vertex2fragment IN,
 	float bump = dot(normLight, normBumpNormal);
       <?if vars."specular" || vars."tex specular" ?>
 		float specCoef = pow(saturate(dot(normalize(normEye + normLight), normBumpNormal)), 32) * (bumpNormal.w+1)/2;
-	//debug (specCoef);
 	<?endif?>
 	float4 outCol = saturate(lightcolor*bump.xxxx);
  
@@ -62,7 +61,6 @@ float4 main (vertex2fragment IN,
             float4 result = saturate(outCol*diffuseCol + specCoef*lightcolor*specColour);
 	<?else?>
         <?if vars."specular" ?>
-	    //debug (specular);
 		float4 result = saturate(outCol*diffuseCol + specCoef*lightcolor*specular);
 	  <?else?>
 		float4 result = saturate(outCol*diffuseCol);
