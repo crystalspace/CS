@@ -181,8 +181,9 @@ public:
   virtual void DecRecLevel ()
   { drawBusy--; }
 
-  virtual void SetRenderLoop (iRenderLoop* rl)
-  { renderloop = rl; }
+  THREADED_CALLABLE_DECL1(csSector, SetRenderLoop, csThreadReturn,
+    iRenderLoop*, rl, false, false);
+
   virtual iRenderLoop* GetRenderLoop ()
   { return renderloop; }
   /** @} */

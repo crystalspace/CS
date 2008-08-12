@@ -282,7 +282,7 @@ struct iSector : public virtual iBase
    * Set the renderloop to use for this sector. If this is not set then
    * the default engine renderloop will be used.
    */
-  virtual void SetRenderLoop (iRenderLoop* rl) = 0;
+  THREADED_INTERFACE1(SetRenderLoop, iRenderLoop* rl);
 
   /**
    * Get the renderloop for this sector. If this returns 0 then it

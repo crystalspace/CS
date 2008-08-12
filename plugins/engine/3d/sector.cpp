@@ -844,6 +844,12 @@ int csSector::IntersectSegment (
   return best_p;
 }
 
+THREADED_CALLABLE_IMPL1(csSector, SetRenderLoop, iRenderLoop* rl)
+{
+  renderloop = rl;
+  return true;
+}
+
 iSector *csSector::FollowSegment (
   csReversibleTransform &t,
   csVector3 &new_position,
