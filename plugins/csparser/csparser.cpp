@@ -1789,8 +1789,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iDocumentNode> shaderNode;
     csRef<iDocumentNode> fileChild = node->GetNode ("file");
 
-    csRef<iVFS> vfs;
-    vfs = csQueryRegistry<iVFS> (object_reg);
+    csVfsDirectoryChanger dirChanger (vfs);
 
     if (fileChild)
     {
@@ -1825,6 +1824,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           filename.GetData ());
         return false;
       }
+
+      dirChanger.ChangeTo (filename);
     }
     else
     {

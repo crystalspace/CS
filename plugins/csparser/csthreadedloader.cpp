@@ -317,6 +317,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       return false;
     }
 
+    csVfsDirectoryChanger dirChanger (vfs);
+    dirChanger.ChangeTo (filename);
+
     const char* type = shaderNode->GetAttributeValue ("compiler");
     if (type == 0)
       type = shaderNode->GetAttributeValue ("type");
@@ -2322,7 +2325,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     iBase* context, const char* fname, iStreamSource* ssource)
   {
     csRef<iDocument> doc;
-    bool er = LoadStructuredDoc (fname, buf, doc);
+    csString filename (fname);
+    csVfsDirectoryChanger dirChanger (vfs);
+    size_t slashPos = filename.FindLast ('/');
+    if (slashPos != (size_t)-1)
+    {
+      dirChanger.ChangeTo (filename);
+      filename.DeleteAt (0, slashPos + 1);
+    }
+    bool er = LoadStructuredDoc (filename, buf, doc);
     csRef<iBase> ret;
     if (er)
     {
