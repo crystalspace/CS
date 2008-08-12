@@ -37,6 +37,7 @@
 #include "iengine/material.h"
 #include "iengine/movable.h"
 #include "iengine/portalcontainer.h"
+#include "iengine/renderloop.h"
 #include "iengine/texture.h"
 #include "iengine/sharevar.h"
 
@@ -2201,8 +2202,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_RENDERLOOP:
         {
-          break;
+          bool set;
+          iRenderLoop* loop = ParseRenderLoop (child, set);
+          if (!loop)
+          {
+            return false;
+          }
+          if (set)
+          {
+            sector->SetRenderLoop (loop);
+          }
         }
+        break;
       default:
         SyntaxService->ReportBadToken (child);
         return 0;
@@ -2214,6 +2225,93 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     return sector;
+  }
+
+  iRenderLoop* csThreadedLoader::ParseRenderLoop (iDocumentNode* node, bool& set)
+  {
+    set = true;
+    const char* varname = node->GetAttributeValue ("variable");
+    if (varname)
+    {
+      iSharedVariableList* vl = Engine->GetVariableList ();
+      iSharedVariable* var = vl->FindByName (varname);
+      csRef<iDocumentNode> default_node;
+      csRef<iDocumentNodeIterator> it = node->GetNodes ();
+      iRenderLoop* loop = 0;
+      while (it->HasNext ())
+      {
+        csRef<iDocumentNode> child = it->Next ();
+        if (child->GetType () != CS_NODE_ELEMENT) continue;
+        const char* value = child->GetValue ();
+        csStringID id = xmltokens.Request (value);
+        switch (id)
+        {
+        case XMLTOKEN_CONDITION:
+          if (var && var->GetString ())
+          {
+            csString value = child->GetAttributeValue ("value");
+            if (value == var->GetString ())
+            {
+              loop = Engine->GetRenderLoopManager ()->Retrieve (
+                child->GetContentsValue ());
+            }
+          }
+          break;
+        case XMLTOKEN_DEFAULT:
+          default_node = child;
+          break;
+        default:
+          SyntaxService->ReportBadToken (child);
+          return 0;
+        }
+      }
+      if (!loop && default_node)
+      {
+        loop = Engine->GetRenderLoopManager ()->Retrieve (
+          default_node->GetContentsValue ());
+        if (!loop)
+        {
+          SyntaxService->Report ("crystalspace.maploader.parse.settings",
+            CS_REPORTER_SEVERITY_ERROR,
+            node, "No suitable renderloop found!");
+          return 0;
+        }
+      }
+      if (!loop)
+      {
+        loop = Engine->GetCurrentDefaultRenderloop ();
+        set = false;
+      }
+
+      return loop;
+    }
+    else
+    {
+      const char* loopName = node->GetContentsValue ();
+      if (loopName)
+      {
+        iRenderLoop* loop = Engine->GetRenderLoopManager()->Retrieve (loopName);
+        if (!loop)
+        {
+          SyntaxService->Report ("crystalspace.maploader.parse.settings",
+            CS_REPORTER_SEVERITY_ERROR,
+            node, "Render loop '%s' not found",
+            loopName);
+          return 0;
+        }
+        return loop;
+      }
+      else
+      {
+        SyntaxService->Report (
+          "crystalspace.maploader.parse.settings",
+          CS_REPORTER_SEVERITY_ERROR,
+          node, "Expected render loop name: %s",
+          loopName);
+        return 0;
+      }
+    }
+    return 0;
   }
 
   THREADED_CALLABLE_IMPL3(csThreadedLoader, SetSectorVisibilityCuller,

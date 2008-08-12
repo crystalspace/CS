@@ -616,6 +616,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       iDocumentNode* node, csWeakRefArray<iMaterialWrapper> &materialArray,
       const char* prefix = 0);
 
+    /// Parse a renderloop.
+    iRenderLoop* ParseRenderLoop (iDocumentNode* node, bool& set);
+
     /**
     * Try loading the file as a structured document.
     * \return True if the documented loaded and appears to be a map file,

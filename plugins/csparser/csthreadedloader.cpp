@@ -3341,6 +3341,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           Engine->SetAmbientLight (c);
         }
         break;
+      case XMLTOKEN_RENDERLOOP:
+        {
+          bool set;
+          iRenderLoop* loop = ParseRenderLoop (child, set);
+          if (!loop)
+          {
+            return false;
+          }
+          if (set)
+          {
+            Engine->SetCurrentDefaultRenderloop (loop);
+          }
+        }
+        break;
       default:
         SyntaxService->ReportBadToken (child);
         return false;
