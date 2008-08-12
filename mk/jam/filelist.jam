@@ -70,6 +70,13 @@ rule FileListEntriesData
     Depends filelists : [ DoFileListEntries $(<) : $(2) : $(3) ] ;
 }
 
+##  FileListEntriesData app : list
+rule FileListEntryApplications
+{
+    Depends filelists :
+      [ SystemDoFileListEntryApplications $(1) : $(2) ] ;
+}
+
 #----------------------------------------------------------------------------
 
 rule WriteFileListEntry
@@ -87,8 +94,7 @@ rule WriteFileListEntry
     destname = $(4:G=) ;
   }
   DESTNAME on $(listfile_gristed) = $(destname) ;
-  LOCATE on $(srcfile) = $(SUBDIR) ;
-  #SEARCH on $(srcfile) = $(SUBDIR) ;
+  LOCATE on $(srcfile) = [ on $(srcfile) GetVar SEARCH ] ;
   if $($(listfile)_CREATED) != "yes"
   {
     WriteFileListEntry1 $(listfile_gristed) : $(srcfile) ;

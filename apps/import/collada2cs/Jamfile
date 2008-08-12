@@ -7,3 +7,4 @@ Application collada2cs
 	: console
 ;
 LinkWith collada2cs : crystalspace ;
+FileListEntryApplications collada2cs : app-tool ;

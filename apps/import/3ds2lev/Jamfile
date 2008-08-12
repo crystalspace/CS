@@ -10,6 +10,7 @@ Application 3ds2lev
 ;
 LinkWith 3ds2lev : crystalspace ;
 ExternalLibs 3ds2lev :  3DS ;
+FileListEntryApplications 3ds2lev : app-tool ;
 
 }
 

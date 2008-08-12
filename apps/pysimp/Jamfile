@@ -6,4 +6,5 @@ if $(PYTHON.AVAILABLE) = yes
   Application pysimp : [ Wildcard *.cpp *.h ] : noinstall ;
   LinkWith pysimp : crystalspace ;
   ExternalLibs pysimp : PYTHON ;
+  FileListEntryApplications pysimp : app-demo ;
 }

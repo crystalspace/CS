@@ -8,4 +8,5 @@ Application ceguitest :
 CFlags ceguitest : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
 LinkWith ceguitest : crystalspace ;
 ExternalLibs ceguitest : CEGUI ;
+FileListEntryApplications ceguitest : app-demo ;
 }

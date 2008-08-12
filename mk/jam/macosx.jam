@@ -133,6 +133,20 @@ rule SystemInstallApplication
     }
 }
 
+rule SystemDoFileListEntryApplications
+{
+  SEARCH on $(<) = $(BUILDTOP) ;
+  local entries = [ DoFileListEntries $(<) : : $(2) ] ;
+  if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
+  {
+    local debugfile = $($(<)_DEBUGFILE) ;
+    entries += [ DoFileListEntries $(debugfile) : : debug-$(2) ] ;
+  }
+  return $(entries) ;
+}
+
+
+
 # SystemInstallPlugin target : subdirs : options
 #    Apply appropriate rule to install the plugin based upon the options.
 rule SystemInstallPlugin
