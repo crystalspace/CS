@@ -246,7 +246,7 @@ private:
   uint32 onetest_framenr;	// We test for this frame.
   iSequenceWrapper* fire_sequence;
   csRef<iEngineSequenceParameters> params;
-  csEngineSequenceManager* eseqmgr;
+  csRef<csEngineSequenceManager> eseqmgr;
   csTicks fire_delay;
   uint32 framenr;
   // Sequence created by TestConditions().
