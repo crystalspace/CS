@@ -78,6 +78,8 @@ public:
     return dataFeeder;
   }
 
+  void CellSizeUpdate (csTerrainCell* cell);
+
   // ------------ iTerrainSystem implementation ------------
   virtual iTerrainCell* GetCell (const char* name, bool loadData = false);
   virtual iTerrainCell* GetCell (const csVector2& pos, bool loadData = false);

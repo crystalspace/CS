@@ -9,3 +9,4 @@ Application genmeshify
 Includes processor.h : $(SUBDIR)/processor.tok ;
 MsvcExtraFile genmeshify : $(SUBDIR)/processor.tok ;
 LinkWith genmeshify  : crystalspace ;
+FileListEntryApplications genmeshify : app-tool ;

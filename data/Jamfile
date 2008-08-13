@@ -1,16 +1,26 @@
 SubDir TOP data ;
 
-InstallData
+RUNTIME_DATA = 
   castle-tex.zip
   fancycon.zip
   standard.zip
+  ttf-dejavu.zip
+  ttf-vera.zip
+  unifont.zip ;
+DEMO_DATA =
   startme.zip
   teapot.zip
   kwartz.zip
-  ttf-dejavu.zip
-  ttf-vera.zip
-  unifont.zip 
+  water.zip
+  ;
+
+InstallData
+  $(DEMO_DATA)
+  $(RUNTIME_DATA)
   : data ;
+
+FileListEntriesData $(DEMO_DATA) : : data-demo ;
+FileListEntriesData $(RUNTIME_DATA) : : data-runtime ;
 
 maps =
   isomap
@@ -25,8 +35,13 @@ for map in $(maps)
 {
   local files =
     [ Wildcard $(map) : *.lib *.jpg *.png *.map *.tga *.dds *.spr world ] ;
+  local lmfiles =
+    [ Wildcard $(map) lightmaps : *.png ] ;
   InstallData $(files) : data maps $(map) ;
-  InstallData [ Wildcard $(map) lightmaps : *.png ] : data maps $(map) lightmaps ;
+  InstallData $(lmfiles) : data maps $(map) lightmaps ;
+
+  FileListEntriesData $(files) : maps $(map) : data-demo ;
+  FileListEntriesData $(lmfiles) : maps $(map) lightmaps : data-demo ;
 }
 
 SubInclude TOP data castle ;

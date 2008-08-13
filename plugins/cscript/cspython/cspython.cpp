@@ -47,10 +47,15 @@
 
 extern "C"
 {
+#if defined(CS_COMPILER_MSVC)
+  // MSVC will always use the shipped copy.
+  #include "swigpyruntime.h"
+#else
   /* *Must* be pointy include. The right file (generated when swig is present,
      shipped copy otherwise) is determined by include paths specified via
      the compiler command line. */
   #include <swigpyruntime.h>
+#endif
 }
 
 CS_IMPLEMENT_PLUGIN

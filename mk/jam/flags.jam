@@ -79,6 +79,10 @@ rule LFlags
   NEEDLIBS on $($(target)_TARGET) =
     [ RemoveDupFlags [ on $($(target)_TARGET) GetVar NEEDLIBS ] $(flags) ] ;
   $(target).LFLAGS = [ RemoveDupFlags $($(target).LFLAGS) $(flags) ] ;
+  if ! [ IsElem noexternal : $(3) ]
+  {
+    $(target).LFLAGS.EXTERNAL = [ RemoveDupFlags $($(target).LFLAGS.EXTERNAL) $(flags) ] ;
+  }
 
   UnitTestLFlags $(target) : $(flags) : $(options) ;
 }
@@ -131,38 +135,19 @@ rule ExtraObjects
   Clean clean : $(>) ;
 }
 
-##  RelayLibs target : indentifier : relaylibs
-##    Link external libraries identified by 'identifier' with 'target' with
-##    the help of "relaytool". This tool provides a wrapper object file that
-##    dynamically loads the requested library at runtime. The client code can
-##    check if a library is actually available and react gracefully if not.
-##    This is much more end-user friendly than a refusal by the application to
-##    start due to a missing dependency.
-##    From the external dependency identified by 'identifier' the individual
-##    libraries specified in 'relaylibs' will be dynamically loaded. For each
-##    library 'foo' a symbol 'libfoo_is_present' will be provided.
-rule RelayLibs
+##  RelayLFlags lflags : relaylibs
+##    Get LFLAGS for relay-linking libraries. See RelayLibs for
+##    more information.
+rule RelayLFlags
 {
   if ! $(CMD.RELAYTOOL)
   {
-    # Create fake libwhatever_is_present() symbols
-    local stubfile = [ DoObjectGrist $(>).fake_stub.c ] ;
-    MakeLocate $(stubfile) : $(LOCATE_TARGET) ;
-    WHATEVER on $(stubfile) = $(3) ;
-    WriteRelayLibStub $(stubfile) ;
-    Clean $(<)clean : $(stubfile) ;
-    
-    local stub_object = [ CompileObjects $(stubfile) ] ;
-    MakeLocate $(stub_object) : $(LOCATE_TARGET) ;
-    Depends $($(<)_TARGET) : $(stub_object) ;
-    Clean $(<)clean : $(stub_object) ;
-    EXTRAOBJECTS on $($(<)_TARGET) += $(stub_object) ;
-    
-    ExternalLibs $(<) : $(>) ;
+    return $(1) ;
   }
   else
   {
-    local relayparamslist = "--relay $(3)" ;
+    local relayparamslist = "--relay $(2)" ;
+    local lflags = $(1) ;
     local relayparam = $(relayparamslist[1]) ;
     local r ;
     for r in $(relayparamslist[2-])
@@ -175,15 +160,61 @@ rule RelayLibs
     {
       cflags = "$(cflags) $(c)" ;
     }
-    local extlib ;
-    for extlib in $(>)
-    {
-      CFlags $(<) : $($(extlib).CFLAGS) ;
-      LFlags $(<) : 
-        "`CFLAGS=\"$(cflags)\" $(CMD.RELAYTOOL) --out-dir $(LOCATE_TARGET) $(relayparam) $($(extlib).LFLAGS)`" ; 
-      
-      $(<).EXTERNALLIBS += $(extlib) ;
-    }
+    local extlib result_lflags ;
+    result_lflags +=  
+      "`CFLAGS=\"$(cflags)\" $(CMD.RELAYTOOL) --out-dir $(LOCATE_TARGET) $(relayparam) $(lflags)`"  ; 
+    return $(result_lflags) ;
+  }
+}
+
+##  RelayObjs target : relaylibs : identifier
+rule RelayObjs
+{
+  if ! $(CMD.RELAYTOOL)
+  {
+    # Create fake libwhatever_is_present() symbols
+    local stubfile = [ DoObjectGrist $(3).fake_stub.c ] ;
+    MakeLocate $(stubfile) : $(LOCATE_TARGET) ;
+    WHATEVER on $(stubfile) = $(2) ;
+    WriteRelayLibStub $(stubfile) ;
+    Clean $(<)clean : $(stubfile) ;
+    
+    local stub_object = [ CompileObjects $(stubfile) ] ;
+    MakeLocate $(stub_object) : $(LOCATE_TARGET) ;
+    Depends $($(<)_TARGET) : $(stub_object) ;
+    Clean $(<)clean : $(stub_object) ;
+    #EXTRAOBJECTS on $($(<)_TARGET) += $(stub_object) ;
+    
+    return $(stub_object) ;
+  }
+  else
+  {
+    return ;
+  }
+}
+
+##  RelayLibs target : identifier : relaylibs
+##    Link external libraries identified by 'identifier' with 'target' with
+##    the help of "relaytool". This tool provides a wrapper object file that
+##    dynamically loads the requested library at runtime. The client code can
+##    check if a library is actually available and react gracefully if not.
+##    This is much more end-user friendly than a refusal by the application to
+##    start due to a missing dependency.
+##    From the external dependency identified by 'identifier' the individual
+##    libraries specified in 'relaylibs' will be dynamically loaded. For each
+##    library 'foo' a symbol 'libfoo_is_present' will be provided.
+rule RelayLibs
+{
+  local extlib ;
+  for extlib in $(>)
+  {
+    ExtraObjects $(<) : [ RelayObjs $(<) : $(3) : $(2) ] ;
+    CFlags $(<) : $($(extlib).CFLAGS) ;
+    LFlags $(<) : [ RelayLFlags $($(extlib).LFLAGS) : $(3) ] ;
+    
+    $(<).EXTERNALLIBS += $(extlib) ;
+    $(<).RELAYDEPS += $(extlib) ;
+    $(<).RELAYLIBS.$(extlib) = $(3) ;
   }
 }
 

@@ -4,3 +4,6 @@ InstallData world [ Wildcard *.txt ] : data maps castle ;
 InstallData [ Wildcard factories : thing* gen* ] : data maps castle factories ;
 InstallData [ Wildcard lightmaps : *.png ] : data maps castle lightmaps ;
 
+FileListEntriesData world [ Wildcard *.txt ] : maps castle : data-demo ;
+FileListEntriesData [ Wildcard factories : thing* gen* ] : maps castle factories : data-demo ;
+FileListEntriesData [ Wildcard lightmaps : *.png ] : maps castle lightmaps : data-demo ;

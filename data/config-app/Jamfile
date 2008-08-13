@@ -1,4 +1,5 @@
 SubDir TOP data config-app ;
 
 InstallData [ Wildcard *.cfg *.key *.xml ] : data config-app ;
+FileListEntriesData [ Wildcard *.cfg *.key *.xml ] : config-app : data-demo ;
 
