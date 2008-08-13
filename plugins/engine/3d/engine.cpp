@@ -871,12 +871,9 @@ void csEngine::DeleteAllForce ()
   cameraPositions.RemoveAll ();
 
   defaultPortalMaterial.Invalidate ();
-  delete materials;
-  materials = new csMaterialList ();
-  delete textures;
-  textures = new csTextureList (this);
-  delete sharedVariables;
-  sharedVariables = new csSharedVariableList();
+  materials->RemoveAll();
+  textures->RemoveAll();
+  sharedVariables->RemoveAll();
 
   if (shaderManager)
   {
