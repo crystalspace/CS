@@ -96,7 +96,7 @@
     </settings>
     <start>
         <sector>room</sector>
-        <position x="0" y="200" z="0" />
+        <position x="0" y="11" z="-40" />
         <forward x="0" y="0" z="1" />
         <up x="0" y="1" z="0" />
     </start>
