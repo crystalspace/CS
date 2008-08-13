@@ -1,3 +1,10 @@
+<cgfp>
+<variablemap variable="position" destination="lightPos" />
+<variablemap variable="color" destination="lightCol" />
+<variablemap variable="shine" destination="shininess" />
+<variablemap variable="murkiness" destination="waterAlpha" />
+<program>
+<![CDATA[
 
 //---------------------------------------------------------------------------------
 //Input
@@ -69,3 +76,7 @@ float4 main (vert2frag IN,
 //---------------------------------------------------------------------------------
 //end
 //---------------------------------------------------------------------------------
+
+]]>
+</program>
+</cgfp>
