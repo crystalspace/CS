@@ -70,11 +70,18 @@ rule FileListEntriesData
     Depends filelists : [ DoFileListEntries $(<) : $(2) : $(3) ] ;
 }
 
-##  FileListEntriesData app : list
+##  FileListEntryApplications app : list
 rule FileListEntryApplications
 {
     Depends filelists :
       [ SystemDoFileListEntryApplications $(1) : $(2) ] ;
+}
+
+##  FileListEntriesData app : list
+rule FileListEntryPlugin
+{
+    Depends filelists :
+      [ SystemDoFileListEntryPlugin $(1) : $(2) ] ;
 }
 
 #----------------------------------------------------------------------------
