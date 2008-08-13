@@ -55,6 +55,7 @@ rule DoFileListEntry
     
     SEARCH on $(target) = [ on $(1) GetVar SEARCH ] ;
     Always $(target) ;
+    NoCare $(target) ;
     WriteFileListEntry $(listfile) : $(target) : $(dir) : $(1) ;
     Depends $(listfile) : $(target) ;
     
@@ -77,7 +78,7 @@ rule FileListEntryApplications
       [ SystemDoFileListEntryApplications $(1) : $(2) ] ;
 }
 
-##  FileListEntriesData app : list
+##  FileListEntryPlugin plugin : list
 rule FileListEntryPlugin
 {
     Depends filelists :
