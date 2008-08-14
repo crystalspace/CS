@@ -31,6 +31,7 @@
 #include "iutil/eventh.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
+#include "iutil/systemopenmanager.h"
 #include "isndsys/ss_driver.h"
 #include "isndsys/ss_data.h"
 #include "isndsys/ss_stream.h"
@@ -93,6 +94,13 @@ csSndSysRendererSoftware::~csSndSysRendererSoftware()
     csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (m_pObjectRegistry);
     if (q)
       CS::RemoveWeakListener (q, weakEventHandler);
+  }
+  if (weakOpenEventHandler)
+  {
+    csRef<iSystemOpenManager> sysOpen (
+      csQueryRegistry<iSystemOpenManager> (m_pObjectRegistry));
+    if (sysOpen)
+      sysOpen->RemoveWeakListener (weakOpenEventHandler);
   }
 
   delete[] m_pSampleBuffer;
@@ -332,9 +340,12 @@ bool csSndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
   evSystemClose = csevSystemClose(m_pObjectRegistry);
   evFrame = csevFrame(m_pObjectRegistry);
   if (q != 0) {
-    csEventID subEvents[] = { evSystemOpen, evSystemClose, evFrame, CS_EVENTLIST_END };
+    csEventID subEvents[] = { evFrame, CS_EVENTLIST_END };
     CS::RegisterWeakListener(q, this, subEvents, weakEventHandler);
   }
+  csRef<iSystemOpenManager> sysOpen (
+    csQueryRegistry<iSystemOpenManager> (m_pObjectRegistry));
+  sysOpen->RegisterWeak (this, weakOpenEventHandler);
 
   return true;
 }
