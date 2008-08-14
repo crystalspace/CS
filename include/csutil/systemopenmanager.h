@@ -31,7 +31,7 @@ namespace CS
 {
   namespace Base
   {
-    class SystemOpenManager :
+    class CS_CRYSTALSPACE_EXPORT SystemOpenManager :
       public scfImplementation2<SystemOpenManager,
                                 iSystemOpenManager,
                                 iEventHandler>
