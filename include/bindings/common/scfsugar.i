@@ -57,7 +57,7 @@
                         bool init = true, bool report = true)
   {
     return csWrapPtr (iface, iface_ver, csPtr<iBase> (self->LoadPlugin (id,
-                                init,report)));
+                                init,report)->GetResultRefPtr()));
   }
   csWrapPtr QueryPlugin(const char *id, const char *iface, int iface_ver)
   {
