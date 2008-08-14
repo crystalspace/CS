@@ -12429,6 +12429,163 @@ fi
 { echo "$as_me:$LINENO: result: $cs_cv_prog_cc_msse2_ok" >&5
 echo "${ECHO_T}$cs_cv_prog_cc_msse2_ok" >&6; }
 
+{ echo "$as_me:$LINENO: checking for -mfpmath=sse flag" >&5
+echo $ECHO_N "checking for -mfpmath=sse flag... $ECHO_C" >&6; }
+if test "${cs_cv_prog_cc_mfpmath_sse_ok+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "`echo @-mfpmath=sse@@ | sed 'y% %#%'`"; then
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @-mfpmath=sse@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cc_mfpmath_sse=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+		cs_cv_prog_cc_mfpmath_sse_ok="$cs_cv_prog_cc_mfpmath_sse"
+else
+  cs_cv_prog_cc_mfpmath_sse=''
+		cs_cv_prog_cc_mfpmath_sse_ok=no
+fi
+
+else
+  cs_cv_prog_cc_mfpmath_sse=''
+            cs_cv_prog_cc_mfpmath_sse_ok=no
+fi
+
+fi
+{ echo "$as_me:$LINENO: result: $cs_cv_prog_cc_mfpmath_sse_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cc_mfpmath_sse_ok" >&6; }
+
 
 if test -n "$cs_cv_prog_cc_mmmx"; then
   cs_build_prop_val="$cs_cv_prog_cc_mmmx"
@@ -13002,7 +13159,10 @@ fi
 "
 fi
 
-	     cs_build_prop_val=""-mfpmath=sse""
+fi
+
+        if test -n "$cs_cv_prog_cc_mfpmath_sse"; then
+  cs_build_prop_val="$cs_cv_prog_cc_mfpmath_sse"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
@@ -79164,9 +79324,9 @@ if test $ac_cv_func_fwide = yes; then
 "
 fi
 
-    { echo "$as_me:$LINENO: checking for wcsrtombs" >&5
-echo $ECHO_N "checking for wcsrtombs... $ECHO_C" >&6; }
-if test "${ac_cv_func_wcsrtombs+set}" = set; then
+    { echo "$as_me:$LINENO: checking for wcsnrtombs" >&5
+echo $ECHO_N "checking for wcsnrtombs... $ECHO_C" >&6; }
+if test "${ac_cv_func_wcsnrtombs+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   cat >conftest.$ac_ext <<_ACEOF
@@ -79175,12 +79335,12 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-/* Define wcsrtombs to an innocuous variant, in case <limits.h> declares wcsrtombs.
+/* Define wcsnrtombs to an innocuous variant, in case <limits.h> declares wcsnrtombs.
    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-#define wcsrtombs innocuous_wcsrtombs
+#define wcsnrtombs innocuous_wcsnrtombs
 
 /* System header to define __stub macros and hopefully few prototypes,
-    which can conflict with char wcsrtombs (); below.
+    which can conflict with char wcsnrtombs (); below.
     Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
     <limits.h> exists even on freestanding compilers.  */
 
@@ -79190,7 +79350,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 # include <assert.h>
 #endif
 
-#undef wcsrtombs
+#undef wcsnrtombs
 
 /* Override any GCC internal prototype to avoid an error.
    Use char because int might match the return type of a GCC
@@ -79198,18 +79358,18 @@ cat >>conftest.$ac_ext <<_ACEOF
 #ifdef __cplusplus
 extern "C"
 #endif
-char wcsrtombs ();
+char wcsnrtombs ();
 /* The GNU C library defines this for functions which it implements
     to always fail with ENOSYS.  Some functions are actually named
     something starting with __ and the normal name is an alias.  */
-#if defined __stub_wcsrtombs || defined __stub___wcsrtombs
+#if defined __stub_wcsnrtombs || defined __stub___wcsnrtombs
 choke me
 #endif
 
 int
 main ()
 {
-return wcsrtombs ();
+return wcsnrtombs ();
   ;
   return 0;
 }
@@ -79232,21 +79392,21 @@ eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
 	 test ! -s conftest.err
        } && test -s conftest$ac_exeext &&
        $as_test_x conftest$ac_exeext; then
-  ac_cv_func_wcsrtombs=yes
+  ac_cv_func_wcsnrtombs=yes
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-	ac_cv_func_wcsrtombs=no
+	ac_cv_func_wcsnrtombs=no
 fi
 
 rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
       conftest$ac_exeext conftest.$ac_ext
 fi
-{ echo "$as_me:$LINENO: result: $ac_cv_func_wcsrtombs" >&5
-echo "${ECHO_T}$ac_cv_func_wcsrtombs" >&6; }
-if test $ac_cv_func_wcsrtombs = yes; then
-  cs_header_text="${cs_header_text}#define CS_HAVE_WCSRTOMBS
+{ echo "$as_me:$LINENO: result: $ac_cv_func_wcsnrtombs" >&5
+echo "${ECHO_T}$ac_cv_func_wcsnrtombs" >&6; }
+if test $ac_cv_func_wcsnrtombs = yes; then
+  cs_header_text="${cs_header_text}#define CS_HAVE_WCSNRTOMBS
 "
 fi
 
