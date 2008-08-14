@@ -23,6 +23,8 @@
 #include "iutil/systemopenmanager.h"
 #include "csutil/scf_implementation.h"
 
+struct iObjectRegistry;
+
 /**\file
  * Manager for system open events.
  */
