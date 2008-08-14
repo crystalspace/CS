@@ -29,7 +29,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/cfgacc.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
-#include "csutil/eventhandlers.h"
 #include "iengine/engine.h"
 #include "imesh/objmodel.h"
 #include "imesh/object.h"
@@ -255,7 +254,7 @@ bool csODEDynamics::Initialize (iObjectRegistry* object_reg)
   if (!clock)
     return false;
 
-  Frame = csevFrame (object_reg);
+  PreProcess = csevPreProcess (object_reg);
 
   // Set up message handlers
   csConfigAccess cfg (object_reg, "/config/odedynam.cfg");
@@ -555,7 +554,7 @@ void csODEDynamics::EnableEventProcessing (bool enable)
       scfiEventHandler = csPtr<EventHandler> (new EventHandler (this));
     csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
     if (q)
-      q->RegisterListener (scfiEventHandler, Frame);
+      q->RegisterListener (scfiEventHandler, PreProcess);
   }
   else if (!enable && process_events)
   {
@@ -573,7 +572,7 @@ void csODEDynamics::EnableEventProcessing (bool enable)
 
 bool csODEDynamics::HandleEvent (iEvent& Event)
 {
-  if (Event.Name == Frame)
+  if (Event.Name == PreProcess)
   {
     float stepsize = steptime;
     float elapsed_time = ((float)clock->GetElapsedTicks ())/1000.0;

@@ -37,7 +37,6 @@ class csVector3;
 class csSphere;
 
 struct iFrustumView;
-struct iMaterialWrapper;
 struct iMeshWrapper;
 struct iMovable;
 struct iObject;
@@ -282,30 +281,14 @@ struct iPortal : public virtual iBase
   /// Get the specified missing sector callback.
   virtual iPortalCallback* GetMissingSectorCallback (int idx) const = 0;
 
-  /**
-   * Set the filter texture
-   * \deprecated Deprecated in 1.3. Use portal materials.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use portal materials.")
+  /// Set the filter texture
   virtual void SetFilter (iTextureHandle* ft) = 0;
-  /**
-   * Get the filter texture
-   * \deprecated Deprecated in 1.3. Use portal materials.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use portal materials.")
+  /// Get the filter texture
   virtual iTextureHandle* GetTextureFilter () const = 0;
 
-  /**
-   * Set a color filter (instead of the texture).
-   * \deprecated Deprecated in 1.3. Use portal materials.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use portal materials.")
+  /// Set a color filter (instead of the texture).
   virtual void SetFilter (float r, float g, float b) = 0;
-  /**
-   * Get the current color filter
-   * \deprecated Deprecated in 1.3. Use portal materials.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use portal materials.")
+  /// Get the current color filter
   virtual void GetColorFilter (float &r, float &g, float &b) const = 0;
 
   //---- space warping ------------------------------------------------------
@@ -395,10 +378,6 @@ struct iPortal : public virtual iBase
    */
   virtual size_t GetVerticesCount () const = 0;
 
-  /// Set portal material.
-  virtual iMaterialWrapper* GetMaterial() const = 0;
-  /// Get portal material.
-  virtual void SetMaterial (iMaterialWrapper* mat) = 0;
 };
 
 /** @} */

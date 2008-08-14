@@ -79,11 +79,6 @@ bool csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
   mapReader.Load (data.data, width, height, data.pitch, cell->GetSize ().y, 
     properties->heightOffset);
 
-  if (properties->smoothHeightmap)
-  {
-    SmoothHeightmap (data.data, width, height, data.pitch);    
-  }
-
   cell->UnlockHeightData ();
   
   if (!properties->materialmapSource.IsEmpty ())
@@ -155,7 +150,7 @@ void csTerrainSimpleDataFeeder::SetParameter (const char* param, const char* val
 
 
 csTerrainSimpleDataFeederProperties::csTerrainSimpleDataFeederProperties ()
-  : scfImplementationType (this), heightOffset (0.0f), smoothHeightmap (false)
+  : scfImplementationType (this), heightOffset (0.0f)
 {
 }
 
@@ -166,8 +161,7 @@ csTerrainSimpleDataFeederProperties::csTerrainSimpleDataFeederProperties (
     heightmapFormat (other.heightmapFormat),
     materialmapSource (other.materialmapSource),
     alphaMaps (other.alphaMaps),
-    heightOffset (other.heightOffset),
-    smoothHeightmap (other.smoothHeightmap)
+    heightOffset (other.heightOffset)
 {
 }
 
@@ -223,98 +217,11 @@ void csTerrainSimpleDataFeederProperties::SetParameter (const char* param, const
   {
     heightOffset = atof (value);
   }
-  else if (strcasecmp (param, "smooth heightmap") == 0)
-  {
-    if (strcasecmp (value, "yes") == 0 ||
-        strcasecmp (value, "true") == 0)
-    {
-      smoothHeightmap = true;
-    }
-    if (strcasecmp (value, "no") == 0 ||
-        strcasecmp (value, "false") == 0)
-    {
-      smoothHeightmap = false;
-    }
-  }
-}
-
-size_t csTerrainSimpleDataFeederProperties::GetParameterCount() 
-{ 
-  return 5; 
-}
-
-const char* csTerrainSimpleDataFeederProperties::GetParameterName (size_t index)
-{
-  switch (index)
-  {
-    case 0: return "heightmap source";
-    case 1: return "heightmap format";
-    case 2: return "materialmap source";
-    case 3: return "offset";
-    case 4: return "smooth heightmap";
-    default: return 0;
-  }
-}
-
-const char* csTerrainSimpleDataFeederProperties::GetParameterValue (size_t index)
-{ return GetParameterValue (GetParameterName (index)); }
-
-const char* csTerrainSimpleDataFeederProperties::GetParameterValue (const char* name)
-{
-  // @@@ Not nice
-  static char scratch[32];
-
-  if (strcasecmp (name, "heightmap source") == 0)
-  {
-    return heightmapSource;
-  }
-  else if (strcasecmp (name, "heightmap format") == 0)
-  {
-    return heightmapFormat;
-  }
-  else if (strcasecmp (name, "materialmap source") == 0)
-  {
-    return materialmapSource;
-  }
-  else if (strcasecmp (name, "offset") == 0)
-  {
-    snprintf (scratch, sizeof (scratch), "%f", heightOffset);
-    return scratch;
-  }
-  else if (strcasecmp (name, "smooth heightmap") == 0)
-  {
-    return smoothHeightmap ? "yes" : "no";
-  }
-  return 0;
 }
 
 csPtr<iTerrainCellFeederProperties> csTerrainSimpleDataFeederProperties::Clone ()
 {
   return csPtr<iTerrainCellFeederProperties> (new csTerrainSimpleDataFeederProperties (*this));
-}
-  
-const char* csTerrainSimpleDataFeederProperties::GetAlphaMapSource (
-  const char* material)
-{
-  if (material == 0) return 0;
-  for (size_t i = 0; i < alphaMaps.GetSize (); ++i)
-  {
-    if (alphaMaps[i].material == material)
-    {
-      return alphaMaps[i].alphaSource;
-    }
-  }
-  return 0;
-}
-
-void csTerrainSimpleDataFeederProperties::SetHeightmapSmooth (bool doSmooth)
-{
-  smoothHeightmap = doSmooth;
-}
-
-bool csTerrainSimpleDataFeederProperties::GetHeightmapSmooth () const
-{
-  return smoothHeightmap;
 }
 
 }

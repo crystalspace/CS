@@ -301,7 +301,7 @@ public:
 
   csRefArray<csPolygonRenderer> polyRenderers;
 
-  static CS::ShaderVarStringID texLightmapName;
+  static csStringID texLightmapName;
 
   class LightmapTexAccessor : 
     public scfImplementation1<LightmapTexAccessor,
@@ -1030,7 +1030,7 @@ public:
   csWeakRef<iGraphics3D> G3D;
   /// An object pool for lightpatches.
   csLightPatchPool* lightpatch_pool;
-  csRef<iShaderVarStringSet> stringsetSvName;
+  csRef<iStringSet> stringset;
   csRef<iShaderManager> shadermgr;
 
   /**

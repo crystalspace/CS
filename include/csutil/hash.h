@@ -28,11 +28,119 @@
 #include "csutil/comparator.h"
 #include "csutil/util.h"
 #include "csutil/tuple.h"
-#include "csutil/hashcomputer.h"
 
 /**\addtogroup util_containers
  * @{ */
 
+/**
+ * Compute a hash key for a null-terminated string.
+ * <p>
+ * Note that these keys are non-unique; some dissimilar strings may generate
+ * the same key. For unique keys, see csStringSet.
+ */
+CS_CRYSTALSPACE_EXPORT CS_PURE_METHOD
+unsigned int csHashCompute (char const*);
+
+/**
+ * Compute a hash key for a string of a given length.
+ * <p>
+ * Note that these keys are non-unique; some dissimilar strings may generate
+ * the same key. For unique keys, see csStringSet.
+ */
+CS_CRYSTALSPACE_EXPORT CS_PURE_METHOD
+unsigned int csHashCompute (char const*, size_t length);
+
+/**
+ * Template for hash value computing.
+ * Expects that T has a method 'uint GetHash() const'.
+ */
+template <class T>
+class csHashComputer
+{
+public:
+  /// Compute a hash value for \a key.
+  static uint ComputeHash (const T& key)
+  {
+    return key.GetHash();
+  }
+};
+
+/**
+ * Template for hash value computing, suitable for integral types and types 
+ * that can be casted to such.
+ */
+template <class T>
+class csHashComputerIntegral
+{
+public:
+  /// Compute a hash value for \a key.
+  static uint ComputeHash (const T& key)
+  {
+    return (uintptr_t)key;
+  }
+};
+
+//@{
+/**
+ * csHashComputer<> specialization for an integral type.
+ */
+template<>
+class csHashComputer<void*> : public csHashComputerIntegral<void*> {};
+  
+template<>
+class csHashComputer<int> : public csHashComputerIntegral<int> {}; 
+template<>
+class csHashComputer<unsigned int> : 
+  public csHashComputerIntegral<unsigned int> {}; 
+    
+template<>
+class csHashComputer<long> : public csHashComputerIntegral<long> {}; 
+template<>
+class csHashComputer<unsigned long> : 
+  public csHashComputerIntegral<unsigned long> {}; 
+
+#if (CS_LONG_SIZE < 8)    
+template<>
+class csHashComputer<longlong> : 
+  public csHashComputerIntegral<longlong> {}; 
+template<>
+class csHashComputer<ulonglong> : 
+  public csHashComputerIntegral<ulonglong> {}; 
+#endif
+    
+template<>
+class csHashComputer<float>
+{
+public:
+  /// Compute a hash value for \a key.
+  static uint ComputeHash (float key)
+  {
+    union
+    {
+      float f;
+      uint u;
+    } float2uint;
+    float2uint.f = key;
+    return float2uint.u;
+  }
+};
+template<>
+class csHashComputer<double>
+{
+public:
+  /// Compute a hash value for \a key.
+  static uint ComputeHash (double key)
+  {
+    union
+    {
+      double f;
+      uint u;
+    } double2uint;
+    double2uint.f = key;
+    return double2uint.u;
+  }
+};
+//@}
 
 /**
  * A helper template to use pointers as keys for hashes.
@@ -78,6 +186,50 @@ public:
   { return ptr; }
   csConstPtrKey& operator = (csConstPtrKey const& other)
   { ptr = other.ptr; return *this; }
+};
+
+/**
+ * Template that can be used as a base class for hash computers for 
+ * string types (must support cast to const char*).
+ * Example:
+ * \code
+ * template<> class csHashComputer<MyString> : 
+ *   public csHashComputerString<MyString> {};
+ * \endcode
+ */
+template <class T>
+class csHashComputerString
+{
+public:
+  static uint ComputeHash (const T& key)
+  {
+    return csHashCompute ((const char*)key);
+  }
+};
+
+/**
+ * csHashComputer<> specialization for strings that uses csHashCompute().
+ */
+template<>
+class csHashComputer<const char*> : public csHashComputerString<const char*> {};
+
+/**
+ * Template that can be used as a base class for hash computers for POD 
+ * structs.
+ * Example:
+ * \code
+ * template<> class csHashComputer<MyStruct> : 
+ *   public csHashComputerStruct<MyStruct> {};
+ * \endcode
+ */
+template <class T>
+class csHashComputerStruct
+{
+public:
+  static uint ComputeHash (const T& key)
+  {
+    return csHashCompute ((char*)&key, sizeof (T));
+  }
 };
 
 template <class T, class K, 
@@ -136,8 +288,8 @@ public:
 
 protected:
   typedef CS::Container::HashElement<T, K> Element;
-  typedef csArray<Element, ArrayElementHandler,
-    ArrayMemoryAlloc, csArrayCapacityDefault> ElementArray;
+  typedef csArray<Element,
+    ArrayElementHandler, ArrayMemoryAlloc> ElementArray;
   csArray<ElementArray, csArrayElementHandler<ElementArray>,
     ArrayMemoryAlloc> Elements;
 
@@ -371,7 +523,7 @@ public:
   }
 
   /**
-   * h["key"] shorthand notation for h.GetElementPointer ("key")
+   * h["key"] shorthand notation for h.GetElementPoint ("key")
    */
   T* operator[] (const K& key)
   {
@@ -699,7 +851,7 @@ public:
     void Seek ()
     {
       while ((element < size) && 
-        (csComparator<K, K>::Compare (hash->Elements[bucket][element].GetKey(), 
+        (csComparator<K, K>::Compare (hash->Elements[bucket][element].key, 
 	key) != 0))
           element++;
     }
@@ -743,7 +895,7 @@ public:
     /// Get the next element's value.
     const T& Next ()
     {
-      const T &ret = hash->Elements[bucket][element].GetValue();
+      const T &ret = hash->Elements[bucket][element].value;
       element++;
       Seek ();
       return ret;

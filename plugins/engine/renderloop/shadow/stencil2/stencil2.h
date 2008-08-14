@@ -137,8 +137,6 @@ private:
   csStringID base_id;
   csStringID shadows_id;
 
-  csRef<iShaderVarStringSet> svNameStringset;
-
   bool enableShadows;
   csRefArray<iLightRenderStep> steps;
 
@@ -173,9 +171,9 @@ public:
   csStringID GetShadowsID () const { return shadows_id; }
 
   void Perform (iRenderView* rview, iSector* sector,
-    csShaderVariableStack& stack);
+    iShaderVarStack* stacks);
   void Perform (iRenderView* rview, iSector* sector, iLight* light,
-    csShaderVariableStack& stack);
+    iShaderVarStack* stacks);
 
   virtual size_t AddStep (iRenderStep* step);
   virtual bool DeleteStep (iRenderStep* step);

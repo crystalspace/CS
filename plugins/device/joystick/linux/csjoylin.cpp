@@ -28,7 +28,6 @@
 #include "csutil/csstring.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
-#include "csutil/eventhandlers.h"
 
 #include "csjoylin.h"
 
@@ -73,7 +72,7 @@ bool csLinuxJoystick::Initialize (iObjectRegistry *oreg)
 #define CS_MAX_LINUX_JOYSTICK_AXES CS_MAX_JOYSTICK_AXES
 bool csLinuxJoystick::HandleEvent (iEvent& ev)
 {
-  if (ev.Name != Frame)
+  if (ev.Name != PreProcess)
     return false;
 
   struct js_event js;
@@ -203,11 +202,11 @@ bool csLinuxJoystick::Init ()
     }
 
     // hook into eventqueue
-    Frame = csevFrame (object_reg);
+    PreProcess = csevPreProcess (object_reg);
     csRef<iEventQueue> eq (csQueryRegistry<iEventQueue> (object_reg));
     if (eq != 0)
     {
-      eq->RegisterListener (static_cast<iEventHandler*> (this), Frame);
+      eq->RegisterListener (static_cast<iEventHandler*> (this), PreProcess);
       EventOutlet = eq->CreateEventOutlet (static_cast<iEventPlug*> (this));
       bHooked = true;
     }

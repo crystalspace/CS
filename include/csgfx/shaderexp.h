@@ -29,7 +29,6 @@
 #include "csutil/array.h"
 #include "csutil/leakguard.h"
 #include "csgeom/vector4.h"
-#include "csgfx/shadervarnameparser.h"
 #include "ivideo/shader/shader.h"
 
 struct iObjectRegistry;
@@ -51,15 +50,10 @@ public:
   { 
     uint8 type;
     
-    struct SvVarValue
-    {
-      CS::StringIDValue id;
-      size_t* indices;
-    };
     union 
     {
       float num;
-      SvVarValue var;
+      csStringID var;
       
       // Illegal outside of a cons cell
       int oper;
@@ -70,7 +64,6 @@ public:
     };
     
     csVector4 vec4;
-    CS::Math::Matrix4 matrix;
   };
 
   struct oper 
@@ -85,11 +78,9 @@ public:
 private:
   iObjectRegistry * obj_reg;
   /// Variables used for evaluation
-  csShaderVariableStack* stack;
+  csRef<iShaderVarStack> stacks;
   /// String set for producing String IDs
-  csRef<iShaderVarStringSet> strset;
-  /// Storage for SV sub-indices
-  csMemoryPool svIndicesScratch;
+  csRef<iStringSet> strset;
   /// Compiled array of opcodes for evaluation
   oper_array opcodes;
   /**
@@ -187,12 +178,6 @@ private:
   /// Frame function
   bool eval_frame(oper_arg & output) const;
 
-  bool eval_matrix_column (const oper_arg & arg1, const oper_arg & arg2,
-  	oper_arg & output) const;
-  bool eval_matrix_row (const oper_arg & arg1, const oper_arg & arg2,
-  	oper_arg & output) const;
-  bool eval_matrix2gl (const oper_arg & arg1, oper_arg & output) const;
-  	
   /// Internal set vector element 1 and 2
   bool eval_selt12(const oper_arg & arg1, const oper_arg & arg2,
   	oper_arg & output) const;
@@ -216,19 +201,17 @@ private:
   /// Dump the result of an operation
   void print_result(const oper_arg &) const;
 
-  /*inline*/static const char * GetTypeName (unsigned int id)/* const*/;
+  /*inline*/static const char * GetTypeName (csStringID id)/* const*/;
   /*{
     return xmltypes.Request(id);
   }*/
-  static const char* GetOperName (unsigned int id);
+  static const char* GetOperName (csStringID id);
   static csStringID GetCommonTokenOp (const char* token);
   static csStringID GetXmlTokenOp (const char* token);
   static csStringID GetSexpTokenOp (const char* token);
   static csStringID GetXmlType (const char* token);
 
-  /// Helper to allocate a number of SV sub-indices from the mem pool
-  size_t* AllocSVIndices (const CS::Graphics::ShaderVarNameParser& parser);
-  csShaderVariable* ResolveVar (const oper_arg::SvVarValue& var);
+  csShaderVariable* ResolveVar (csStringID name);
 
   mutable csString errorMsg;
   void ParseError (const char* message, ...) const;
@@ -244,7 +227,8 @@ public:
    * Evaluate this expression into a variable.
    * It will use the symbol table it was initialized with.
    */
-  bool Evaluate(csShaderVariable *, csShaderVariableStack& stacks);
+  bool Evaluate(csShaderVariable *, csShaderVarStack& stacks);
+  bool Evaluate(csShaderVariable *, iShaderVarStack* stacks);
   //@}
 
   /// Retrieve the error message if the evaluation or parsing failed.

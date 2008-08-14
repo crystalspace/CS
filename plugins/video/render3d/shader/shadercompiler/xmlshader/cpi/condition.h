@@ -20,16 +20,11 @@
 #ifndef __CS_CONDITION_H__
 #define __CS_CONDITION_H__
 
-#include "ivideo/rndbuf.h"
 #include "csutil/csstring.h"
 #include "csutil/strhash.h"
-#include "csutil/sysfunc.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
-  /* @@@ NOTE! Enums are written to disk (shader cache). If you change value 
-     make sure you also change cacheFileMagic in shader.cpp! */
-
   /**
    * Possible operations for a node in the internal expression
    * representation.
@@ -75,18 +70,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
   struct CondOperand
   {
     OperandType type;
-    struct ShaderVarLocator
-    {
-      CS::StringIDValue svName;
-      size_t* indices;
-      csRenderBufferName bufferName;
-    };
     union
     {
       int intVal;
       float floatVal;
       bool boolVal;
-      ShaderVarLocator svLocation;
+      csStringID svName;
       csConditionID operation;
     };
     CondOperand ()
@@ -94,27 +83,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     CondOperand (int /* justToHaveADifferentSignature*/) 
     { /* Speed hack for when being a member of CondOperation:
        * it's "initialization" will null this as well */ }
-       
-    inline void Clear () { memset (this, 0, sizeof (*this)); }
-       
-    bool operator== (const CondOperand& other) const
-    {
-      if (type != other.type) return false;
-      if (type >= operandSV)
-      {
-        if (svLocation.svName != other.svLocation.svName) return false;
-        if ((svLocation.indices != 0) != (other.svLocation.indices != 0)) return false;
-        if (svLocation.indices == 0) return true;
-        size_t n1 = *svLocation.indices;
-        size_t n2 = *other.svLocation.indices;
-        if (n1 != n2) return false;
-        return memcmp (svLocation.indices+1, other.svLocation.indices+1, n1 * sizeof (size_t)) == 0;
-      }
-      else
-      {
-        return memcmp (this, &other, sizeof (CondOperand)) == 0;
-      }
-    }
   };
 
   /// An operation.
@@ -161,30 +129,9 @@ class csHashComputer<NS_XMLSHADER::CondOperation>
     const NS_XMLSHADER::CondOperand& right)
   {
     NS_XMLSHADER::CondOperation tempOp;
-    uint leftIndexHash = 0, rightIndexHash = 0;
     tempOp.operation = operation;
     tempOp.left = left;
-    if (tempOp.left.type >= NS_XMLSHADER::operandSV)
-    {
-      if (tempOp.left.svLocation.indices != 0)
-      {
-        leftIndexHash = csHashCompute (
-          (char*)(tempOp.left.svLocation.indices + 1),
-          *tempOp.left.svLocation.indices * sizeof (size_t));
-      }
-      tempOp.left.svLocation.indices = (size_t*)leftIndexHash;
-    }
     tempOp.right = right;
-    if (tempOp.right.type >= NS_XMLSHADER::operandSV)
-    {
-      if (tempOp.right.svLocation.indices != 0)
-      {
-        rightIndexHash = csHashCompute (
-          (char*)(tempOp.right.svLocation.indices + 1),
-          *tempOp.right.svLocation.indices * sizeof (size_t));
-      }
-      tempOp.right.svLocation.indices = (size_t*)rightIndexHash;
-    }
     return csHashCompute ((char*)&tempOp, sizeof (tempOp));
   }
 public:
@@ -209,14 +156,17 @@ public:
   {
     if (op1.operation == op2.operation)
     {
-      bool result;
-      result = (op1.left == op2.left)
-	&& (op1.right == op2.right);
+      bool result = (memcmp (&op1.left, &op2.left, 
+          sizeof (NS_XMLSHADER::CondOperand)) == 0) 
+        && (memcmp (&op1.right, &op2.right, 
+          sizeof (NS_XMLSHADER::CondOperand)) == 0);
       if (NS_XMLSHADER::IsOpCommutative (op1.operation))
       {
         result = result 
-	  || ((op1.left == op2.right)
-	    && (op1.right == op2.left));
+	  || ((memcmp (&op1.left, &op2.right, 
+            sizeof (NS_XMLSHADER::CondOperand)) == 0)
+	  && (memcmp (&op1.right, &op2.left, 
+            sizeof (NS_XMLSHADER::CondOperand)) == 0));
       }
       if (result) return 0;
       // @@@ Hm, just some order...

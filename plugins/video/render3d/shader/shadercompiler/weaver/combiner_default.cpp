@@ -25,15 +25,12 @@
 #include "csutil/scfstr.h"
 
 #include "combiner_default.h"
-#include "synth.h"
 #include "weaver.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
-  CombinerDefault::CombinerDefault (const WeaverCompiler* compiler,
-                                    ShaderVarNodesHelper& shaderVarNodes) : 
-    scfImplementationType (this), compiler (compiler),
-    xmltokens (compiler->xmltokens), shaderVarNodes (shaderVarNodes)
+  CombinerDefault::CombinerDefault (WeaverCompiler* compiler) : 
+    scfImplementationType (this), compiler (compiler), xmltokens (compiler->xmltokens)
   {
   }
   
@@ -60,15 +57,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       while (nodes->HasNext())
       {
         passNodes.Push (nodes->Next());
-      }
-    }
-    else if (strcmp (location, "shadervars") == 0)
-    {
-      csRef<iDocumentNodeIterator> nodes = blockNode->GetNodes();
-      while (nodes->HasNext())
-      {
-        csRef<iDocumentNode> child = nodes->Next();
-        shaderVarNodes.AddNode (child);
       }
     }
   }

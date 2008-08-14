@@ -614,7 +614,7 @@ bool csGLShaderFFP::TryMergeTexFuncs (mtexlayer::TexFunc& newTF,
   return false;
 }
 
-bool csGLShaderFFP::Compile (iHierarchicalCache*, csRef<iString>* tag)
+bool csGLShaderFFP::Compile ()
 {
   shaderPlug->Open ();
   ext = shaderPlug->ext;
@@ -666,17 +666,8 @@ bool csGLShaderFFP::Compile (iHierarchicalCache*, csRef<iString>* tag)
     return false;
 
   validProgram = true;
-  tag->AttachNew (new scfString ("default"));
 
   return true;
-}
-
-void csGLShaderFFP::GetUsedShaderVars (csBitArray& bits) const
-{
-  TryAddUsedShaderVarProgramParam (fog.density, bits);
-  TryAddUsedShaderVarProgramParam (fog.start, bits);
-  TryAddUsedShaderVarProgramParam (fog.end, bits);
-  TryAddUsedShaderVarProgramParam (fog.color, bits);
 }
 
 void csGLShaderFFP::ActivateTexFunc (const mtexlayer::TexFunc& tf, 
@@ -764,19 +755,19 @@ static const csVector4 defVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 void csGLShaderFFP::SetupState (const CS::Graphics::RenderMesh* /*mesh*/, 
                                 CS::Graphics::RenderMeshModes& /*modes*/,
-                                const csShaderVariableStack& stack)
+                                const iShaderVarStack* stacks)
 {
   if (fog.mode != CS_FOG_MODE_NONE)
   {
-    csVector4 fc = GetParamVectorVal (stack, fog.color, defVector);
+    csVector4 fc = GetParamVectorVal (stacks, fog.color, defVector);
     glFogfv (GL_FOG_COLOR, (float*)&fc.x);
 
     switch (fog.mode)
     {
       case CS_FOG_MODE_LINEAR:
 	{
-          float start = GetParamFloatVal (stack, fog.start, 0.0f);
-          float end = GetParamFloatVal (stack, fog.end, 0.0f);
+          float start = GetParamFloatVal (stacks, fog.start, 0.0f);
+          float end = GetParamFloatVal (stacks, fog.end, 0.0f);
 
           end = (end == start) ? start + 0.001f : end;
 
@@ -789,14 +780,14 @@ void csGLShaderFFP::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
 	{
 	  glFogi (GL_FOG_MODE, GL_EXP);
 	  glFogf (GL_FOG_DENSITY, 
-	    GetParamFloatVal (stack, fog.density, 0.0f));
+	    GetParamFloatVal (stacks, fog.density, 0.0f));
 	}
 	break;
       case CS_FOG_MODE_EXP2:
 	{
 	  glFogi (GL_FOG_MODE, GL_EXP2);
 	  glFogf (GL_FOG_DENSITY, 
-	    GetParamFloatVal (stack, fog.density, 0.0f));
+	    GetParamFloatVal (stacks, fog.density, 0.0f));
 	}
 	break;
       default:

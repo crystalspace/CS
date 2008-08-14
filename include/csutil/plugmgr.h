@@ -65,14 +65,11 @@ private:
   /**
    * This is a superset of csPDelArray that can find by pointer a plugin.
    */
-  class CS_CRYSTALSPACE_EXPORT csPluginsVector :
-    public csPDelArray<csPlugin, CS::Container::ArrayAllocDefault,
-                       csArrayCapacityFixedGrow<8> >
+  class CS_CRYSTALSPACE_EXPORT csPluginsVector : public csPDelArray<csPlugin>
   {
   public:
     /// Create the vector
-    csPluginsVector (int l) : csPDelArray<csPlugin, CS::Container::ArrayAllocDefault,
-      csArrayCapacityFixedGrow<8> > (l) {}
+    csPluginsVector (int l, int d) : csPDelArray<csPlugin> (l, d) {}
     /// Find a plugin by its address
     static int CompareAddress (csPlugin* const& Item, iComponent* const& Key)
     { return Item->Plugin == Key ? 0 : 1; }
@@ -112,8 +109,7 @@ private:
   csPluginsVector Plugins;
 
   // List of all options for all plug-in modules.
-  csPDelArray<csPluginOption, CS::Container::ArrayAllocDefault,
-    csArrayCapacityFixedGrow<16> > OptionList;
+  csPDelArray<csPluginOption> OptionList;
 
 public:
   /// Initialize plugin manager.

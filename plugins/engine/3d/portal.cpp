@@ -21,7 +21,6 @@
 #include "csgeom/plane3.h"
 #include "csgeom/poly2d.h"
 #include "csgeom/polyclip.h"
-#include "csplugincommon/rendermanager/renderview.h"
 #include "iengine/camera.h"
 #include "iengine/fview.h"
 #include "iengine/light.h"
@@ -32,9 +31,7 @@
 #include "ivideo/texture.h"
 #include "plugins/engine/3d/portal.h"
 #include "plugins/engine/3d/portalcontainer.h"
-
-CS_PLUGIN_NAMESPACE_BEGIN(Engine)
-{
+#include "plugins/engine/3d/rview.h"
 
 typedef csDirtyAccessArray<csVector3> portal_VectorArray;
 CS_IMPLEMENT_STATIC_VAR (GetStaticVectorArray, portal_VectorArray,())
@@ -434,8 +431,7 @@ bool csPortal::Draw (
 
   if (!new_clipper.GetVertexCount ()) return false;
 
-  CS::RenderManager::RenderView* csrview =
-    (CS::RenderManager::RenderView*)rview;
+  csRenderView* csrview = (csRenderView*)rview;
   csRenderContext *old_ctxt = csrview->GetCsRenderContext ();
   iCamera *icam = old_ctxt->icamera;
   csPolygonClipper new_view ((csPoly2D*)&new_clipper,
@@ -686,5 +682,3 @@ iPortalCallback *csPortal::GetMissingSectorCallback (int idx) const
   return sector_cb_vector[idx];
 }
 
-}
-CS_PLUGIN_NAMESPACE_END(Engine)

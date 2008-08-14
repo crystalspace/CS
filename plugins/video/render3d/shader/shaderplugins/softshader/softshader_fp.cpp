@@ -121,39 +121,26 @@ static inline int FactorToShift (float f)
 
 void csSoftShader_FP::SetupState (const csRenderMesh* /*mesh*/,
 				  csRenderMeshModes& /*modes*/,
-				  const csShaderVariableStack& stack)
+				  const iShaderVarStack* stacks)
 {
-  csVector4 v = GetParamVectorVal (stack, flatColor, csVector4 (1));
+  csVector4 v = GetParamVectorVal (stacks, flatColor, csVector4 (1));
   shaderPlug->scanlineRenderer->SetFlatColor (v);
 
   shaderPlug->scanlineRenderer->SetShift (
-    FactorToShift (GetParamFloatVal (stack, cfactor, 1.0f)),
-    FactorToShift (GetParamFloatVal (stack, afactor, 1.0f)));
+    FactorToShift (GetParamFloatVal (stacks, cfactor, 1.0f)),
+    FactorToShift (GetParamFloatVal (stacks, afactor, 1.0f)));
   shaderPlug->scanlineRenderer->SetColorSum (colorSum);
   shaderPlug->scanlineRenderer->SetDoConstColor (doConstColor);
   if (doConstColor)
   {
-    v = GetParamVectorVal (stack, constColor, csVector4 (1));
+    v = GetParamVectorVal (stacks, constColor, csVector4 (1));
     shaderPlug->scanlineRenderer->SetConstColor (v);
   }
 }
 
-bool csSoftShader_FP::Compile (iHierarchicalCache*, csRef<iString>* tag)
+bool csSoftShader_FP::Compile()
 {
-  tag->AttachNew (new scfString ("default"));
-  
   return true;
-}
-
-void csSoftShader_FP::GetUsedShaderVars (csBitArray& bits) const
-{
-  TryAddUsedShaderVarProgramParam (flatColor, bits);
-  TryAddUsedShaderVarProgramParam (cfactor, bits);
-  TryAddUsedShaderVarProgramParam (afactor, bits);
-  if (doConstColor)
-  {
-    TryAddUsedShaderVarProgramParam (constColor, bits);
-  }
 }
 
 }

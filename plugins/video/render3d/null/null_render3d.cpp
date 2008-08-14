@@ -20,7 +20,6 @@
 #include "csqint.h"
 
 #include "csgeom/plane3.h"
-#include "csgeom/projections.h"
 #include "csgfx/imagememory.h"
 #include "csgfx/textureformatstrings.h"
 #include "cstool/initapp.h"
@@ -47,8 +46,7 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csNullGraphics3D)
 
 csNullGraphics3D::csNullGraphics3D (iBase *iParent) : 
-  scfImplementationType (this, iParent), explicitProjection (false), 
-  needMatrixUpdate (true)
+  scfImplementationType (this, iParent)
 {
   scfiEventHandler = 0;
 
@@ -92,8 +90,13 @@ bool csNullGraphics3D::Initialize (iObjectRegistry* objreg)
 
   bugplug = csQueryRegistry<iBugPlug> (object_reg);
 
-  strings = csQueryRegistryTagInterface<iShaderVarStringSet> (
-    object_reg, "crystalspace.shader.variablenameset");
+  strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.renderer.stringset");
+  if (!strings)
+  { 
+    strings = csPtr<iStringSet> (new csScfStringSet ());
+    object_reg->Register (strings, "crystalspace.renderer.stringset");
+  }
 
   csRef<iPluginManager> plugin_mgr = 
   	csQueryRegistry<iPluginManager> (object_reg);
@@ -409,7 +412,7 @@ void csNullGraphics3D::SetTextureState (int*, iTextureHandle**, int)
 
 void csNullGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& /*modes*/,
-    const csShaderVariableStack& /*stacks*/)
+    const iShaderVarStack* /*stacks*/)
 {
   if (bugplug)
   {
@@ -468,15 +471,5 @@ void csNullGraphics3D::DisableZOffset ()
 void csNullGraphics3D::SetShadowState (int /*state*/)
 {
  return;
-}
-
-void csNullGraphics3D::ComputeProjectionMatrix()
-{
-  if (!needMatrixUpdate) return;
-  
-  projectionMatrix = CS::Math::Projections::CSPerspective (
-      w, h, cx, cy, 1.0f/a);
-  
-  needMatrixUpdate = false;
 }
 

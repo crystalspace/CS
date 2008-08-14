@@ -23,7 +23,6 @@
 #include "imap/services.h"
 #include "iutil/comp.h"
 #include "iutil/dbghelp.h"
-#include "ivideo/shader/shader.h"
 #include "csutil/csstring.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/strhash.h"
@@ -53,7 +52,7 @@ protected:
   csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE "plugins/csparser/services/syntxldr.tok"
 #include "cstool/tokenlist.h"
-  csRef<iShaderVarStringSet> strings;
+  csRef<iStringSet> strings;
 
   void ReportV (const char* msgid, int severity, 
 	iDocumentNode* errornode, const char* msg, va_list arg);
@@ -163,8 +162,6 @@ public:
   virtual csRef<iDataBuffer> StoreRenderBuffer (iRenderBuffer* rbuf);
 
   virtual csRef<iShader> ParseShaderRef (iLoaderContext* ldr_context,
-      iDocumentNode* node);
-  virtual csRef<iShader> ParseShader (iLoaderContext* ldr_context,
       iDocumentNode* node);
 
   virtual void ReportError (const char* msgid, iDocumentNode* errornode,

@@ -13,14 +13,14 @@ VFS.Mount.cdrom = $(CS_CDROM)$/
 VFS.Mount.tmp = $(CS_TMP)$/
 
 ; Configuration repository
-VFS.Mount.config = $(CS_DATADIR)$/config-app$/, $(CS_DATADIR)$/config-plugins$/
+VFS.Mount.config = $(CS_CONFIGDIR)$/
 VFS.Mount.data = $(CS_DATADIR)$/
 
 ; Miscellaneous resources.
 VFS.Mount.varia = $(CS_DATADIR)$/varia$/
 VFS.Mount.scripts = $(CS_SHAREDIR)$/bindings$/
 
-VFS.Mount.shader = $(CS_DATADIR)$/shader$/,$(CS_DATADIR)$/shader-old$/
+VFS.Mount.shader = $(CS_DATADIR)$/shader$/
 ; The Unifont
 VFS.Mount.fonts/unifont = $(CS_DATADIR)$/unifont.zip
 ; The TTF font library

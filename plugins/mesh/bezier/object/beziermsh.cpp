@@ -113,7 +113,7 @@ csStringID csBezierMesh::color_name = csInvalidStringID;
 csStringID csBezierMesh::index_name = csInvalidStringID;
 
 csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
-  scfImplementationType (this, parent), curves (4)
+  scfImplementationType (this, parent), curves (4, 16)
 {
   static_data = new csBezierMeshStatic (
   	thing_type, (iBezierFactoryState*)this);

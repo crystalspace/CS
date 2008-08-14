@@ -293,7 +293,7 @@ csFreeType2Font::csFreeType2Font (csFreeType2Server* server,
 				  char* fontid,
 				  csFt2FaceWrapper* face, 
 				  float iSize) :
-  scfImplementationType (this), DeleteCallbacks (4)
+  scfImplementationType (this), DeleteCallbacks (4, 4)
 {
   name = strchr (fontid, ':') + 1;
   csFreeType2Font::fontid = fontid;

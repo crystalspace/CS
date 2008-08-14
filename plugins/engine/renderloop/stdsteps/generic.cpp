@@ -152,10 +152,10 @@ csPtr<iRenderStep> csGenericRenderStepFactory::Create ()
 
 //---------------------------------------------------------------------------
 
-CS::ShaderVarStringID csGenericRenderStep::fogplane_name;
-CS::ShaderVarStringID csGenericRenderStep::string_object2world;
-CS::ShaderVarStringID csGenericRenderStep::string_object2worldInv;
-CS::ShaderVarStringID csGenericRenderStep::light_ambient;
+csStringID csGenericRenderStep::fogplane_name;
+csStringID csGenericRenderStep::string_object2world;
+csStringID csGenericRenderStep::light_0_type;
+csStringID csGenericRenderStep::light_ambient;
 
 csGenericRenderStep::csGenericRenderStep (
   iObjectRegistry* object_reg) :
@@ -165,8 +165,6 @@ csGenericRenderStep::csGenericRenderStep (
 
   strings = csQueryRegistryTagInterface<iStringSet> 
     (object_reg, "crystalspace.shared.stringset");
-  stringsSvName = csQueryRegistryTagInterface<iShaderVarStringSet> 
-    (object_reg, "crystalspace.shader.variablenameset");
   shaderManager = csQueryRegistry<iShaderManager> (object_reg);
 
   shadertype = 0;
@@ -174,10 +172,10 @@ csGenericRenderStep::csGenericRenderStep (
   portalTraversal = false;
   zmode = CS_ZBUF_USE;
   currentSettings = false;
-  fogplane_name = stringsSvName->Request ("fogplane");
-  string_object2world = stringsSvName->Request ("object2world transform");
-  string_object2worldInv = stringsSvName->Request ("object2world transform inverse");
-  light_ambient = stringsSvName->Request ("light ambient");
+  fogplane_name = strings->Request ("fogplane");
+  string_object2world = strings->Request ("object2world transform");
+  light_0_type = strings->Request ("light 0 type");
+  light_ambient = strings->Request ("light ambient");
 
   visible_meshes_index = 0;
 }
@@ -201,17 +199,19 @@ struct ShaderVarPusher
   ShaderVarPusher () : sectorContext (0), light (0), mesh (0), meshContext (0),
     shader (0)
   { }
-  void PushVariables (csShaderVariableStack& stack) const
+  void PushVariables (iShaderVarStack* stacks) const
   {
     if (sectorContext)
-      sectorContext->PushVariables (stack);
+      sectorContext->PushVariables (stacks);
+    if (light)
+      light->GetSVContext()->PushVariables (stacks);
     if (mesh->variablecontext)
-      mesh->variablecontext->PushVariables (stack);
+      mesh->variablecontext->PushVariables (stacks);
     if (meshContext)
-      meshContext->PushVariables (stack);
-    shader->PushVariables (stack);
+      meshContext->PushVariables (stacks);
+    shader->PushVariables (stacks);
     if (mesh->material)
-      mesh->material->GetMaterial()->PushVariables (stack);
+      mesh->material->GetMaterial()->PushVariables (stacks);
   }
 };
 
@@ -221,7 +221,7 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
 					meshInfo* meshContexts,
                                         csRenderMesh** meshes, 
                                         size_t num,
-                                        csShaderVariableStack& _stack)
+                                        iShaderVarStack* stacks)
 {
   if (num == 0) return;
   ToggleStepSettings (g3d, true);
@@ -231,8 +231,6 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
   }
   csRef<csShaderVariable> svO2W = 
     shadervars.Top ().GetVariable(string_object2world);
-  csRef<csShaderVariable> svO2WI = 
-    shadervars.Top ().GetVariable(string_object2worldInv);
 
   ShaderVarPusher pusher (Pusher);
   iShader* shader = pusher.shader;
@@ -257,19 +255,17 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
       if ((!portalTraversal) && mesh->portal != 0) continue;
 
       svO2W->SetValue (mesh->object2world);
-      svO2WI->SetValue (mesh->object2world.GetInverse());
 
       pusher.meshContext = meshContext;
       pusher.mesh = mesh;
 
-      csShaderVariableStack stack (_stack);
-      stack.MakeOwnArray();
-      shaderManager->PushVariables (stack);
-      shadervars.Top ().PushVariables (stack);
-      pusher.PushVariables (stack);
+      stacks->Empty ();
+      shaderManager->PushVariables (stacks);
+      shadervars.Top ().PushVariables (stacks);
+      pusher.PushVariables (stacks);
 
       csRenderMeshModes modes (*mesh);
-      shader->SetupPass (ticket, mesh, modes, stack);
+      shader->SetupPass (ticket, mesh, modes, stacks);
 
       if (meshContexts[j].noclip && !noclip)
       {
@@ -291,7 +287,7 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
 	old_clipper = 0;
       }
       
-      g3d->DrawMesh (mesh, modes, stack);
+      g3d->DrawMesh (mesh, modes, stacks);
       shader->TeardownPass (ticket);
       
     }
@@ -307,9 +303,9 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
 }
 
 void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
-  csShaderVariableStack& stack)
+  iShaderVarStack* stacks)
 {
-  Perform (rview, sector, 0, stack);
+  Perform (rview, sector, 0, stacks);
 }
 
 void csGenericRenderStep::ToggleStepSettings (iGraphics3D* g3d, 
@@ -319,7 +315,14 @@ void csGenericRenderStep::ToggleStepSettings (iGraphics3D* g3d,
   {
     if (settings)
     {
+      if (zOffset)
+	g3d->EnableZOffset ();
       g3d->SetZMode (zmode);
+    }
+    else
+    {
+      if (zOffset)
+	g3d->DisableZOffset ();
     }
     currentSettings = settings;
   }
@@ -328,7 +331,7 @@ void csGenericRenderStep::ToggleStepSettings (iGraphics3D* g3d,
 class ShaderTicketHelper
 {
 private:
-  csShaderVariableStack stack;
+  iShaderVarStack* stacks;
   const csArray<csShaderVariableContext>& shadervars;
   size_t shadervars_idx;
   //csShaderVariableContext& shadervars;
@@ -345,12 +348,11 @@ private:
   }
 
 public:
-  ShaderTicketHelper (csShaderVariableStack& _stack,
+  ShaderTicketHelper (iShaderVarStack* stacks,
     const csArray<csShaderVariableContext>& sv,
-    size_t sv_idx) : stack (_stack), shadervars (sv), shadervars_idx (sv_idx),
+    size_t sv_idx) : stacks (stacks), shadervars (sv), shadervars_idx (sv_idx),
       lastMat (0), lastShader (0), lastMeshContext (0), lastSectorContext (0)
   {
-    stack.MakeOwnArray();
     Reset ();
   }
 
@@ -372,11 +374,12 @@ public:
     size_t newTicket = matShadMeshTicket;
     if (!materialShaderOnly || (matShadMeshTicket == (size_t)~0))
     {
-      shadervars[shadervars_idx].PushVariables (stack);
-      pusher.PushVariables (stack);
+      stacks->Empty ();
+      shadervars[shadervars_idx].PushVariables (stacks);
+      pusher.PushVariables (stacks);
 
       csRenderMeshModes modes (*pusher.mesh);
-      newTicket = pusher.shader->GetTicket (modes, stack);
+      newTicket = pusher.shader->GetTicket (modes, stacks);
     }
     if (materialShaderOnly) matShadMeshTicket = newTicket;
     return newTicket;
@@ -385,7 +388,7 @@ public:
 
 void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 				   iLight* light,
-                                   csShaderVariableStack& stack)
+                                   iShaderVarStack* stacks)
 {
   iGraphics3D* g3d = rview->GetGraphics3D();
 
@@ -439,9 +442,14 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 
   shadervars.Push (csShaderVariableContext ());
   shadervars.Top ().GetVariableAdd (string_object2world);
-  shadervars.Top ().GetVariableAdd (string_object2worldInv);
 
   csRef<csShaderVariable> sv;
+  if (light)
+  {
+    sv = shadervars.Top ().GetVariableAdd (light_0_type);
+    sv->SetValue (light->GetType());
+  }
+
   sv = shadervars.Top ().GetVariableAdd (light_ambient);
   iEngine* engine = rview->GetEngine ();
   csColor ambient;
@@ -471,7 +479,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   ShaderVarPusher pusher;
   pusher.sectorContext = sector->GetSVContext();
   pusher.light = light;
-  ShaderTicketHelper ticketHelper (stack, shadervars, shadervars.GetSize ()-1);
+  ShaderTicketHelper ticketHelper (stacks, shadervars, shadervars.GetSize ()-1);
   const csReversibleTransform& camt = rview->GetCamera ()->GetTransform ();
 
   csLightType light_type;
@@ -531,7 +539,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
           g3d->SetWorldToCamera (camt.GetInverse ());
 	  RenderMeshes (rview, g3d, pusher, currentTicket,
 	  	sameShaderMeshInfo + lastidx,
-		sameShaderMeshes+lastidx, numSSM, stack);
+		sameShaderMeshes+lastidx, numSSM, stacks);
           shader = 0;
 	}
         numSSM = 0;
@@ -540,6 +548,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       if (portalTraversal)
       {
         ToggleStepSettings (g3d, false);
+        stacks->Empty ();
         mesh->portal->Draw (rview);
       }
 
@@ -596,7 +605,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
           g3d->SetWorldToCamera (camt.GetInverse ());
           RenderMeshes (rview, g3d, pusher, currentTicket,
 	  	sameShaderMeshInfo + lastidx, 
-		sameShaderMeshes + lastidx, numSSM, stack);
+		sameShaderMeshes + lastidx, numSSM, stacks);
 	}
 	lastidx = n;
         shader = meshShader;
@@ -616,7 +625,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       g3d->SetWorldToCamera (camt.GetInverse ());
       RenderMeshes (rview, g3d, pusher, currentTicket,
       	sameShaderMeshInfo + lastidx,
-        sameShaderMeshes + lastidx, numSSM, stack);
+        sameShaderMeshes + lastidx, numSSM, stacks);
     }
   }
 

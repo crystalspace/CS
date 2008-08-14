@@ -26,27 +26,14 @@
 
 #include "csextern.h"
 #include "csutil/csstring.h"
+#include "csutil/refcount.h"
 
-// Avoid using csRefCount, which uses the ref tracker, which in turn uses csCallStack
 /// Call stack.
-class CS_CRYSTALSPACE_EXPORT csCallStack
+class CS_CRYSTALSPACE_EXPORT csCallStack : public csRefCount
 {
 protected:
-  int ref_count;
-
   virtual ~csCallStack() {}
 public:
-  csCallStack () : ref_count (1) { }
-
-  void IncRef () { ref_count++; }
-  void DecRef ()
-  {
-    ref_count--;
-    if (ref_count <= 0)
-      Free ();
-  }
-  int GetRefCount () const { return ref_count; }
-
   /**
    * Release the memory for this call stack.
    */

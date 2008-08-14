@@ -108,7 +108,7 @@ void csSprite2DMeshObject::SetupObject ()
 static csVector3 cam;
 
 void csSprite2DMeshObject::UpdateLighting (
-    const csSafeCopyArray<csLightInfluence>& lights,
+    const csArray<iLightSectorInfluence*>& lights,
     const csVector3& pos)
 {
   if (!lighting) return;
@@ -127,10 +127,7 @@ void csSprite2DMeshObject::UpdateLighting (
   int num_lights = (int)lights.GetSize ();
   for (i = 0; i < num_lights; i++)
   {
-    iLight* li = lights[i].light;
-    if (!li)
-      continue;
-
+    iLight* li = lights[i]->GetLight ();
     csColor light_color = li->GetColor ()
     	* (256. / CS_NORMAL_LIGHT_LEVEL);
     float sq_light_radius = csSquare (li->GetCutoffDistance ());
@@ -155,7 +152,7 @@ void csSprite2DMeshObject::UpdateLighting (
 }
 
 void csSprite2DMeshObject::UpdateLighting (
-    const csSafeCopyArray<csLightInfluence>& lights,
+    const csArray<iLightSectorInfluence*>& lights,
     iMovable* movable, csVector3 offset)
 {
   if (!lighting) return;
@@ -184,13 +181,9 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
 
   if (factory->light_mgr)
   {
-    csSafeCopyArray<csLightInfluence> lightInfluences;
-    scfArrayWrap<iLightInfluenceArray, csSafeCopyArray<csLightInfluence> > 
-      relevantLights (lightInfluences); //Yes, know, its on the stack...
-
-    factory->light_mgr->GetRelevantLights (logparent, &relevantLights, -1);
-    
-    UpdateLighting (lightInfluences, movable, offset);
+    const csArray<iLightSectorInfluence*>& relevant_lights = factory->light_mgr
+    	->GetRelevantLights (logparent, -1, false);
+    UpdateLighting (relevant_lights, movable, offset);
   }
 
   csReversibleTransform temp = camera->GetTransform ();
@@ -409,7 +402,7 @@ void csSprite2DMeshObject::NextFrame (csTicks current_time,
 }
 
 void csSprite2DMeshObject::UpdateLighting (
-	const csSafeCopyArray<csLightInfluence>& lights,
+	const csArray<iLightSectorInfluence*>& lights,
 	const csReversibleTransform& transform)
 {
   csVector3 new_pos = transform.This2Other (part_pos);
@@ -697,6 +690,8 @@ csSprite2DMeshObjectFactory::csSprite2DMeshObjectFactory (iMeshObjectType* pPare
 {
   light_mgr = csQueryRegistry<iLightManager> (object_reg);
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 }
 
 csSprite2DMeshObjectFactory::~csSprite2DMeshObjectFactory ()

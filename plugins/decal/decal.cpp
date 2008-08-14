@@ -33,7 +33,6 @@
 #include "csgfx/renderbuffer.h"
 #include "csgfx/shadervarcontext.h"
 #include "csutil/event.h"
-#include "csutil/eventhandlers.h"
 #include "cstool/collider.h"
 
 #include "decalmanager.h"

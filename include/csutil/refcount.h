@@ -54,17 +54,11 @@ protected:
   }
 
 public:
-  //@{
   /// Initialize object and set reference to 1.
   csRefCount () : ref_count (1) 
   {
     csRefTrackerAccess::TrackConstruction (this);
   }
-  csRefCount (const csRefCount& other) : ref_count (1) 
-  {
-    csRefTrackerAccess::TrackConstruction (this);
-  }
-  //@}
 
   /// Increase the number of references to this object.
   void IncRef () 
@@ -115,17 +109,11 @@ namespace CS
       }
 
     public:
-      //@{
       /// Initialize object and set reference to 1.
       FastRefCount () : ref_count (1) 
       {
         csRefTrackerAccess::TrackConstruction (this);
       }
-      FastRefCount (const FastRefCount& other) : ref_count (1) 
-      {
-        csRefTrackerAccess::TrackConstruction (this);
-      }
-      //@}
 
       /// Increase the number of references to this object.
       void IncRef () 

@@ -40,11 +40,10 @@ class csSaver : public scfImplementation2<csSaver, iSaver, iComponent>
   csRef<iEngine> engine;
   csRef<iSyntaxService> synldr;
   csRef<iStringSet> strings;
-  csRef<iShaderVarStringSet> stringsSvName;
   csRef<iPluginManager> plugin_mgr;
   csHash<csString, csString> plugins;
   csRef<iDocumentNode> before;
-  iCollection* collection;
+  iRegion* curRegion;
   int fileType;
   
   void InitializePluginsHash ();
@@ -90,11 +89,11 @@ public:
   virtual csRef<iString> SaveMapFile();
   virtual bool SaveMapFile(const char *filename);
   virtual bool SaveMapFile(csRef<iDocumentNode> &root);
-  virtual bool SaveAllCollections();
-  virtual bool SaveCollectionFile(iCollection* collection, const char* filename,
+  virtual bool SaveAllRegions();
+  virtual bool SaveRegionFile(iRegion* region, const char* filename,
     int filetype);
-  virtual csRef<iString> SaveCollection(iCollection* collection, int filetype);
-  virtual bool SaveCollection(iCollection* collection, int filetype,
+  virtual csRef<iString> SaveRegion(iRegion* region, int filetype);
+  virtual bool SaveRegion(iRegion* region, int filetype,
     csRef<iDocumentNode>& root);
 };
 

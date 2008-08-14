@@ -67,33 +67,6 @@ void csTerrainCellCollisionProperties::SetParameter (const char* name,
     collidable = !strcmp (value, "true");
 }
 
-size_t csTerrainCellCollisionProperties::GetParameterCount()
-{
-  return 1;
-}
-
-const char* csTerrainCellCollisionProperties::GetParameterName (size_t index)
-{
-  switch (index)
-  {
-    case 0: return "collideable";
-    default: return 0;
-  }
-}
-
-const char* csTerrainCellCollisionProperties::GetParameterValue (size_t index)
-{
-  return GetParameterValue (GetParameterName (index));
-}
-
-const char* csTerrainCellCollisionProperties::GetParameterValue (const char* name)
-{
-  if (strcmp (name, "collideable") == 0)
-    return collidable ? "true" : "false";
-  else
-    return 0;
-}
-
 csPtr<iTerrainCellCollisionProperties> csTerrainCellCollisionProperties::Clone ()
 {
   return csPtr<iTerrainCellCollisionProperties> (

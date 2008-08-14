@@ -378,10 +378,9 @@ private:
 class TrDocumentAttributeSet
 {
 public:
-  csArray<TrDocumentAttribute, csArrayElementHandler<TrDocumentAttribute>,
-    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<4> > set;
+  csArray<TrDocumentAttribute> set;
 
-  TrDocumentAttributeSet() : set (0) { }
+  TrDocumentAttributeSet() : set (0, 4) { }
   size_t Find (const char * name) const;
   size_t FindExact (const char * reg_name) const;
 };

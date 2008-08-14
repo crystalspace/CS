@@ -78,7 +78,7 @@ private:
   csWeakRef<iSkeleton> skeleton;
 
   csRef<csGenmeshSkelAnimationControlFactory> factory;
-  CS::ShaderVarStringID bones_name;
+  csStringID bones_name;
   iMeshObject *mesh_obj;
   csArray<csReversibleTransform> in_trs;
   csArray<int> used_bones;

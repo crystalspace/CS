@@ -31,8 +31,6 @@
 // For Clear()
 #include "csutil/deprecated_warn_off.h"
 
-namespace CS
-{
 /**
  * The string set is a collection of unique strings. Each string has an ID
  * number. The most important operation is to request a string, which means to
@@ -41,23 +39,20 @@ namespace CS
  * performance characteristics of simple numeric comparisons.  Rather than
  * performing string comparisons, you instead compare the numeric string ID's.
  */
-
-template<typename IF>
-class ScfStringSet : public scfImplementation1<ScfStringSet<IF>, IF>
+class CS_CRYSTALSPACE_EXPORT csScfStringSet : 
+  public scfImplementation1<csScfStringSet, iStringSet>
 {
 private:
-  Utility::StringSet<typename IF::TagType> set;
-  typedef StringID<typename IF::TagType> StringIDType;
+  csStringSet set;
 
-  typedef scfImplementation1<ScfStringSet<IF>, IF> scfImplementationType_;
 public:
   /// Constructor.
-  ScfStringSet (size_t size = 23) 
-    : scfImplementationType_ (this), set(size)
+  csScfStringSet (size_t size = 23) 
+    : scfImplementationType (this), set(size)
   { }
 
   /// Destructor.
-  virtual ~ScfStringSet()
+  virtual ~csScfStringSet()
   { }
 
   /**
@@ -66,7 +61,7 @@ public:
    * \remarks Creates a new ID if the string is not yet present in the set,
    *   else returns the previously assigned ID.
    */
-  virtual StringIDType Request(const char* s)
+  virtual csStringID Request(const char* s)
   { return set.Request(s); }
 
   /**
@@ -74,7 +69,7 @@ public:
    * \return Null if the string has not been requested (yet), else the string
    *   corresponding to the ID.
    */
-  virtual const char* Request(StringIDType id) const
+  virtual const char* Request(csStringID id) const
   { return set.Request(id); }
 
   /**
@@ -88,7 +83,7 @@ public:
    * \remarks This is rigidly equivalent to
    *   <tt>return Request(id) != NULL</tt>, but more idomatic.
    */
-  virtual bool Contains(StringIDType id) const
+  virtual bool Contains(csStringID id) const
   { return set.Contains(id); }
 
   /**
@@ -102,7 +97,7 @@ public:
    * Remove a string with the specified ID.
    * \return True if a matching string was in thet set; else false.
    */
-  virtual bool Delete(StringIDType id)
+  virtual bool Delete(csStringID id)
   { return set.Delete(id); }
 
   /**
@@ -130,9 +125,6 @@ public:
   virtual bool IsEmpty() const
   { return set.IsEmpty(); }
 };
-} // namespace CS
-
-typedef CS::ScfStringSet<iStringSet> csScfStringSet;
 
 #include "csutil/deprecated_warn_on.h"
 

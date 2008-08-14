@@ -28,15 +28,6 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
 
-#ifdef CS_COMPILER_MSVC
-#pragma warning(push)
-/* Apparently, whatever return type MSVC sees first for GetIndex() below is
-   taken as "the" return type, at least when it comes to return value precision
-   checking: sometimes there is a lot of warning spam that assigning size_t to
-   <something else> may lose precision. */
-#pragma warning(disable:4267)
-#endif
-
 namespace CS
 {
   
@@ -517,9 +508,5 @@ public:
     }
   };
 } // namespace CS
-
-#ifdef CS_COMPILER_MSVC
-#pragma warning(pop)
-#endif
 
 #endif // __CS_TRIANGLESTREAM_H__

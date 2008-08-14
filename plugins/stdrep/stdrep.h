@@ -96,7 +96,7 @@ private:
   bool append;  // If data should be appended to debug file instead of new    
   static csString DefaultDebugFilename();
   csString stdoutTmp;
-  csEventID Frame;
+  csEventID PostProcess;
 
   void WriteLine (int severity, const char* msgID, const char* line);
 public:
@@ -152,7 +152,8 @@ public:
     {
       return parent ? parent->HandleEvent (ev) : false;
     }
-    CS_EVENTHANDLER_PHASE_2D("crystalspace.utilities.reporter")
+    CS_EVENTHANDLER_NAMES("crystalspace.utilities.reporter")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   };
   csRef<EventHandler> eventHandler;
 };

@@ -100,8 +100,6 @@ public:
    */
   virtual const char* GetData() const;
 
-  /// Make file empty.
-  void Empty();
 protected:
   csRef<iDataBuffer> buffer;
   size_t size;

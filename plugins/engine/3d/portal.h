@@ -28,13 +28,9 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/sphere.h"
 #include "csutil/scf_implementation.h"
-#include "iengine/material.h"
 #include "iengine/sector.h"
 #include "iengine/portal.h"
 #include "ivideo/texture.h"
-
-CS_PLUGIN_NAMESPACE_BEGIN(Engine)
-{
 
 class csPortalContainer;
 
@@ -68,7 +64,6 @@ private:
   /// Name.
   char* name;
 
-  csRef<iMaterialWrapper> material;
 public:
   /// Set of flags
   csFlags flags;
@@ -306,13 +301,7 @@ public:
    */
   virtual void CheckFrustum (iFrustumView* lview,
   	const csReversibleTransform& t, int alpha);
-  
-  virtual iMaterialWrapper* GetMaterial() const { return material; };
-  virtual void SetMaterial (iMaterialWrapper* mat) { material = mat; }
 };
-
-}
-CS_PLUGIN_NAMESPACE_END(Engine)
 
 #endif // __CS_ENGINE_PORTAL_H__
 

@@ -35,6 +35,7 @@
 #include "ivideo/shader/shader.h"
 
 class csEngine;
+class csRenderView;
 class csRenderLoop;
 
 class csRenderLoop : public scfImplementationExt3<csRenderLoop,

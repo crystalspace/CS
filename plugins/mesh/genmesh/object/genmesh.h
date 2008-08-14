@@ -36,7 +36,6 @@
 #include "csutil/refarr.h"
 #include "csutil/parray.h"
 #include "csutil/pooledscfclass.h"
-#include "csutil/scfarray.h"
 #include "csutil/weakref.h"
 #include "iengine/light.h"
 #include "iengine/lightmgr.h"
@@ -104,7 +103,7 @@ public:
 
   void AddVariable (csShaderVariable *variable)
   { }
-  csShaderVariable* GetVariable (CS::ShaderVarStringID name) const
+  csShaderVariable* GetVariable (csStringID name) const
   { 
     csShaderVariable* sv = context1->GetVariable (name); 
     if (sv == 0)
@@ -115,10 +114,10 @@ public:
   { 
     return context1->GetShaderVariables();
   }
-  void PushVariables (csShaderVariableStack& stack) const
+  void PushVariables (iShaderVarStack* stacks) const
   { 
-    context2->PushVariables (stack);
-    context1->PushVariables (stack);
+    context2->PushVariables (stacks);
+    context1->PushVariables (stacks);
   }
 
   bool IsEmpty () const { return context1->IsEmpty() && context2->IsEmpty(); }
@@ -126,7 +125,7 @@ public:
   void ReplaceVariable (csShaderVariable *variable) { }
   void Clear () { }
   bool RemoveVariable  (csShaderVariable *) { return false; }
-  bool RemoveVariable  (CS::ShaderVarStringID) { return false; }
+  bool RemoveVariable  (csStringID) { return false; }
 };
 
 /**
@@ -160,7 +159,7 @@ private:
   void UpdateSubMeshProxies () const;
 
   csUserRenderBufferManager userBuffers;
-  csArray<CS::ShaderVarStringID> user_buffer_names;
+  csArray<csStringID> user_buffer_names;
 
   csGenmeshMeshObjectFactory* factory;
   iMeshWrapper* logparent;
@@ -204,7 +203,7 @@ private:
   csSet<csPtrKey<iLight> > affecting_lights;
   // In case we are not using the iLightingInfo system then we
   // GetRenderMeshes() will updated the following array:
-  csSafeCopyArray<csLightInfluence> relevant_lights;
+  csArray<iLightSectorInfluence*> relevant_lights;
 
   // If the following flag is dirty then some of the affecting lights
   // has changed and we need to recalculate.
@@ -246,7 +245,7 @@ private:
    * Update lighting using the iLightingInfo system.
    */
   void UpdateLighting (
-      const csSafeCopyArray<csLightInfluence>& lights, iMovable* movable);
+      const csArray<iLightSectorInfluence*>& lights, iMovable* movable);
 
 public:
   /// Constructor.
@@ -454,7 +453,7 @@ public:
   bool do_fullbright;
 
   csWeakRef<iGraphics3D> g3d;
-  csRef<iShaderVarStringSet> svstrings;
+  csRef<iStringSet> strings;
 
   struct KnownBuffers
   {
@@ -469,7 +468,7 @@ public:
   KnownBuffers knownBuffers;
     
   csUserRenderBufferManager userBuffers;
-  csArray<CS::ShaderVarStringID> user_buffer_names;
+  csArray<csStringID> user_buffer_names;
    
   struct LegacyBuffers
   {
@@ -615,12 +614,12 @@ public:
   /**
    * Get the string ID's for the anonymous buffers
    */
-  const csArray<CS::ShaderVarStringID>& GetUserBufferNames ()
+  const csArray<csStringID>& GetUserBufferNames ()
   { return user_buffer_names; }
   const csUserRenderBufferManager& GetUserBuffers()
   { return userBuffers; }
-  iShaderVarStringSet* GetSVStrings()
-  { return svstrings; }
+  iStringSet* GetStrings()
+  { return strings; }
 
   void ClearSubMeshes ();
   void AddSubMesh (unsigned int *triangles,

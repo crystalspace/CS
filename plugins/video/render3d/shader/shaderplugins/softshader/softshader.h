@@ -26,8 +26,6 @@
 #include "csplugincommon/softshader/defaultshader.h"
 #include "csplugincommon/softshader/renderinterface.h"
 #include "csplugincommon/shader/shaderplugin.h"
-#include "csutil/scfstr.h"
-#include "csutil/scfstringarray.h"
 
 #include "scanline_base.h"
 
@@ -60,17 +58,6 @@ public:
   virtual bool SupportType(const char* type);
 
   virtual void Open();
-
-  csPtr<iStringArray> QueryPrecacheTags (const char* type)
-  {
-    scfStringArray* tags = new scfStringArray;
-    tags->Push ("default");
-    return csPtr<iStringArray> (tags);
-  }  
-  bool Precache (const char* type, const char* tag,
-    iBase* previous, 
-    iDocumentNode* node, iHierarchicalCache* cacheTo,
-    csRef<iBase>* outObj = 0) { return false; }
   /** @} */
 
   /**\name iComponent implementation

@@ -138,15 +138,6 @@ class CSMutableArrayHelper:
   # We do not implement __delitem__ because we cannot delete items.
 %}
 
-// iutil/event.h
-// the property doesnt work well by itself otherwise.
-%extend iEvent
-{
-  %pythoncode %{
-  Name = property(GetName)
-  %}
-}
-
 // csutil/hash.h
 %extend csHash
 {

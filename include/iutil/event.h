@@ -45,7 +45,7 @@
 /// Maximal number of joysticks supported
 #define CS_MAX_JOYSTICK_COUNT	16
 /// Maximal number of joystick buttons supported
-#define CS_MAX_JOYSTICK_BUTTONS	32
+#define CS_MAX_JOYSTICK_BUTTONS	10
 /// Maximal number of joystick axes supported
 #define CS_MAX_JOYSTICK_AXES    8
 /* Architecturally, AXES can go as high as 32 (limited by the uint32 change mask). */

@@ -216,9 +216,7 @@ class csPrintfFormatter
     }
   };
   csArray<FormatSpec> formatSpecs;
-  csArray<FmtParam,
-    csArrayElementHandler<FmtParam>,
-    CS::Memory::AllocatorAlign<sizeof(FmtParam)> > params;
+  csArray<FmtParam> params;
   Treader& reader;
 
   struct SpecParseState

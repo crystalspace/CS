@@ -27,7 +27,7 @@
 
 namespace CS
 {
-namespace Geometry
+namespace Geom
 {
 	typedef csDirtyAccessArray< csVector3 > csContour3;
 
@@ -78,7 +78,7 @@ namespace Geometry
 
 	}; /* End class Triangulate3D */
 
-} // namespace Geometry
+} // namespace Geom
 } // namespace CS
 
 #endif // __CS_GEOM_TRIANGULATE_3D_H_

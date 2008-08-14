@@ -29,18 +29,6 @@
 namespace CS
 {
   /**
-   * Animation-related types  
-   */
-  namespace Animation
-  {}
-
-  /**
-   * Container classes
-   */
-  namespace Container
-  {}
-
-  /**
    * Debugging utilities and helpers
    */
   namespace Debug
@@ -63,12 +51,6 @@ namespace CS
    * Geometry and mesh related classes.
    */
   namespace Geometry
-  {}
-
-  /**
-   * Graphics and rendering related classes.
-   */
-  namespace Graphics
   {}
 
   /**
@@ -105,36 +87,6 @@ namespace CS
    * Common code shared among a number of plugins
    */
   namespace PluginCommon
-  {
-    /**
-     * Common code shared among plugins using OpenGL
-     */
-    namespace GL
-    {}
-  
-    /**
-     * Common code for shader caching
-     */
-    namespace ShaderCacheHelper
-    {}
-    
-    /**
-     * Common code for plugins implementing shader weaver combiners
-     */
-    namespace ShaderWeaver
-    {}
-  }
-
-  /**
-   * Classes for render manager plugin implementation
-   */
-  namespace RenderManager
-  {}
-
-  /**
-   * Sound system classes
-   */
-  namespace SndSys
   {}
 
   /**

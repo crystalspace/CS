@@ -107,4 +107,3 @@
   #endif
 %enddef
 
-#undef new

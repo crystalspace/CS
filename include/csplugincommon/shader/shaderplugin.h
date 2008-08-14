@@ -28,8 +28,6 @@
 
 #include "ivideo/shader/shader.h"
 
-struct iString;
-
 /**\addtogroup plugincommon
  * @{ */
 
@@ -37,11 +35,11 @@ struct iString;
 struct csShaderVarMapping
 {
   /// Shader variable name
-  CS::ShaderVarStringID name;
+  csStringID name;
   /// Destination
   csString destination;
-  csShaderVarMapping (CS::ShaderVarStringID n, const char* d) : name(n),
-    destination(d) {}
+  csShaderVarMapping (csStringID n, const char* d)
+    : name(n), destination(d) {}
 };
 
 
@@ -67,7 +65,7 @@ struct iShaderDestinationResolver : public virtual iBase
  */
 struct iShaderProgram : public virtual iBase
 {
-  SCF_INTERFACE(iShaderProgram, 6, 0, 0);
+  SCF_INTERFACE(iShaderProgram, 2, 1, 0);
   /// Sets this program to be the one used when rendering
   virtual void Activate() = 0;
 
@@ -77,7 +75,7 @@ struct iShaderProgram : public virtual iBase
   /// Setup states needed for proper operation of the shaderprogram
   virtual void SetupState (const CS::Graphics::RenderMesh* mesh, 
                            CS::Graphics::RenderMeshModes& modes,
-                           const csShaderVariableStack& stack) = 0;
+                           const iShaderVarStack* stacks) = 0;
 
   /// Reset states to original
   virtual void ResetState () = 0;
@@ -90,40 +88,8 @@ struct iShaderProgram : public virtual iBase
   virtual bool Load (iShaderDestinationResolver* resolve, const char* program, 
     csArray<csShaderVarMapping>& mappings) = 0;
 
-  /**
-   * Compile a program.
-   * If \a cacheTo is given, the shader program can store the compiled
-   * program so it can later be restored using LoadFromCache().
-   * \remark A program can expect that Compile() is only called once, and
-   *   all calls after the first can fail.
-   */
-  virtual bool Compile (iHierarchicalCache* cacheTo,
-    csRef<iString>* cacheTag = 0) = 0;
-  
-  /**
-   * Request all shader variables used by a certain shader ticket.
-   * \param ticket The ticket for which to retrieve the information.
-   * \param bits Bit array with one bit for each shader variable set; if a 
-   *   shader variable is used, the bit corresponding to the name of the
-   *   variable is note set. Please note: first, the array passed in must 
-   *   initially have enough bits for all possible shader variables, it will 
-   *   not be resized - thus a good size would be the number of strings in the
-   *   shader variable string set. Second, bits corresponding to unused
-   *   shader variables will not be reset. It is the responsibility of the 
-   *   caller to do so.
-   */
-  virtual void GetUsedShaderVars (csBitArray& bits) const = 0;
-  
-  enum CacheLoadResult
-  {
-    loadFail,
-    loadSuccessShaderInvalid,
-    loadSuccessShaderValid
-  };
-  /// Loads from a cache
-  virtual CacheLoadResult LoadFromCache (iHierarchicalCache* cache,
-    iDocumentNode* programNode,
-    csRef<iString>* failReason = 0, csRef<iString>* cacheTag = 0) = 0;
+  /// Compile a program
+  virtual bool Compile () = 0;
 };
 
 /**
@@ -132,18 +98,9 @@ struct iShaderProgram : public virtual iBase
  */
 struct iShaderProgramPlugin : public virtual iBase
 {
-  SCF_INTERFACE(iShaderProgramPlugin,3,0,0);
-  virtual csPtr<iShaderProgram> CreateProgram (const char* type) = 0;
-  virtual bool SupportType (const char* type) = 0;
-  
-  virtual csPtr<iStringArray> QueryPrecacheTags (const char* type) = 0;
-  /**
-   * Warm the given cache with the program specified in \a node.
-   * \a outObj can return an object which exposes iShaderDestinationResolver.
-   */
-  virtual bool Precache (const char* type, const char* tag,
-    iBase* previous, iDocumentNode* node, 
-    iHierarchicalCache* cacheTo, csRef<iBase>* outObj = 0) = 0;
+  SCF_INTERFACE(iShaderProgramPlugin,2,0,0);
+  virtual csPtr<iShaderProgram> CreateProgram(const char* type) = 0;
+  virtual bool SupportType(const char* type) = 0;
 };
 
 /** @} */

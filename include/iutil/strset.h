@@ -26,64 +26,14 @@
  * @{ */
 #include "csutil/scf_interface.h"
 
-namespace CS
-{
-  /// Type for the actual value of a string ID
-  typedef unsigned int StringIDValue;
-
-  /**
-   * An identifier for a string. This identifier is equivalent to the contents
-   * of a string: If two strings have the same content, they have get the same
-   * identifier. If they have different content, they get different identifiers.
-   *
-   * String IDs have a "tag" which identifies for what the string ID is used.
-   * They also protect against mixing string IDs used for different purposes.
-   */
-  template<typename Tag>
-  struct StringID
-  {
-  protected:
-    StringIDValue id;
-    
-  public:
-    StringID() {}
-    StringID (const StringID& other) : id (other.id) {}
-    StringID (StringIDValue id) : id (id) {}
-    
-    // Detect attempts to mix string IDs with different tags
-    template<typename Tag2>
-    CS_DEPRECATED_METHOD_MSG("Mixing string IDs with different tags may "
-      "indicate an error. Explicit construct if really needed")
-    StringID (const StringID<Tag2>& other) : id ((StringIDValue)other) {}
-    
-    StringID& operator=(const StringID& other)
-    {
-      id = other.id;
-      return *this;
-    }
-    
-    // Detect attempts to mix string IDs with different tags
-    template<typename Tag2>
-    CS_DEPRECATED_METHOD_MSG("Mixing string IDs with different tags may "
-      "indicate an error. Explicit construct if really needed")
-    StringID& operator=(const StringID<Tag2>& other)
-    {
-      id = (StringIDValue)other;
-      return *this;
-    }
-    
-    operator StringIDValue() const { return id; }
-    
-    unsigned int GetHash() const { return id; }
-  };
-  
-  /// An \e invalid csStringID.
-  template<typename Tag>
-  struct InvalidStringID : public StringID<Tag>
-  {
-    InvalidStringID() { this->id = (StringIDValue)~0; }
-  };
-} // namespace CS
+/**
+ * An identifier for a string. This identifier is equivalent to the contents
+ * of a string: If two strings have the same content, they have get the same
+ * identifier. If they have different content, they get different identifiers.
+ */
+typedef unsigned long csStringID;
+/// An \e invalid csStringID.
+csStringID const csInvalidStringID = (csStringID) ~0;
 
 
 /**
@@ -110,26 +60,23 @@ namespace CS
  * \sa csStringHash
  * \sa csStringSet
  */
-template<typename Tag>
-struct iStringSetBase : public virtual iBase
+struct iStringSet : public virtual iBase
 {
-  typedef Tag TagType;
-
-  //SCF_INTERFACE(iStringSet, 2,0,0);
+  SCF_INTERFACE(iStringSet, 2,0,0);
   /**
    * Request the numeric ID for the given string.
    * \return The ID of the string.
    * \remarks Creates a new ID if the string is not yet present in the set,
    *   else returns the previously assigned ID.
    */
-  virtual CS::StringID<Tag> Request(const char*) = 0;
+  virtual csStringID Request(const char*) = 0;
 
   /**
    * Request the string corresponding to the given ID.
    * \return Null if the string * has not been requested (yet), else the string
    *   corresponding to the ID.
    */
-  virtual const char* Request(CS::StringID<Tag>) const = 0;
+  virtual const char* Request(csStringID) const = 0;
 
   /**
    * Check if the set contains a particular string.
@@ -141,7 +88,7 @@ struct iStringSetBase : public virtual iBase
    * \remarks This is rigidly equivalent to
    *   <tt>return Request(id) != NULL</tt>, but more idiomatic.
    */
-  virtual bool Contains(CS::StringID<Tag>) const = 0;
+  virtual bool Contains(csStringID) const = 0;
 
   /**
    * Remove specified string.
@@ -153,7 +100,7 @@ struct iStringSetBase : public virtual iBase
    * Remove a string with the specified ID.
    * \return True if a matching string was in the set; else false.
    */
-  virtual bool Delete(CS::StringID<Tag>) = 0;
+  virtual bool Delete(csStringID) = 0;
 
   /**
    * Remove all stored strings. When new strings are registered again, new
@@ -178,33 +125,6 @@ struct iStringSetBase : public virtual iBase
    */
   virtual bool IsEmpty() const = 0;
 };
-
-#define CS_ISTRINGSSET_SCF_VERSION(Class)   SCF_INTERFACE(Class, 2, 0, 0)
-
-namespace CS
-{
-  namespace StringSetTag
-  {
-    struct General;
-  } // namespace StringSetTag
-} // namespace CS
-
-#if defined(SWIG)
-// Templated classes must be declared before we actually use
-// them, so we have to declare the following here.
-%template(iGeneralStringSetBase) iStringSetBase<CS::StringSetTag::General>;
-#endif
-
-/// General string ID string set
-struct iStringSet : public iStringSetBase<CS::StringSetTag::General>
-{
-  CS_ISTRINGSSET_SCF_VERSION(iStringSet);
-};
-
-/// General string ID
-typedef CS::StringID<CS::StringSetTag::General> csStringID;
-/// Invalid string ID
-csStringID const csInvalidStringID = CS::InvalidStringID<CS::StringSetTag::General> ();
 
 /** @} */
 

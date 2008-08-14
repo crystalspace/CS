@@ -65,6 +65,9 @@ private:
   // Layers of multitexturing
   struct mtexlayer
   {
+    // texture to use
+    csRef<iTextureHandle> texturehandle;
+
     struct TexFunc
     {
       // Argument sources
@@ -147,7 +150,7 @@ public:
   /// Setup states needed for proper operation of the shader
   virtual void SetupState (const CS::Graphics::RenderMesh* mesh,
     CS::Graphics::RenderMeshModes& modes,
-    const csShaderVariableStack& stack);
+    const iShaderVarStack* stacks);
 
   /// Reset states to original
   virtual void ResetState ();
@@ -161,17 +164,10 @@ public:
   { return false; }
 
   /// Compile a program
-  virtual bool Compile (iHierarchicalCache*, csRef<iString>*);
+  virtual bool Compile ();
 
   virtual int ResolveTU (const char* binding)
   { return layerNames.Get (binding, -1); }
-
-  virtual void GetUsedShaderVars (csBitArray& bits) const;
-  
-  virtual iShaderProgram::CacheLoadResult LoadFromCache (
-    iHierarchicalCache* cache, iDocumentNode* programNode,
-    csRef<iString>* failReason = 0, csRef<iString>* = 0)
-  { return iShaderProgram::loadFail; }
 };
 
 

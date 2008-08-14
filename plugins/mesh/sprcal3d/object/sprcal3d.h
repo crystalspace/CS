@@ -498,6 +498,7 @@ private:
     void UpdatePosition (float delta, CalModel*);
   };
 
+  csRef<iStringSet> strings;
   csWeakRef<iGraphics3D> G3D;
 
   /* The deal with meshes, submeshes and attached meshes:
@@ -557,7 +558,7 @@ private:
 
   void InitSubmeshLighting (int mesh, int submesh, CalRenderer *pCalRenderer,
     iMovable* movable, csColor* colors);
-  void UpdateLightingSubmesh (const csSafeCopyArray<csLightInfluence>& lights,
+  void UpdateLightingSubmesh (const csArray<iLightSectorInfluence*>& lights,
       iMovable*, CalRenderer*, int mesh, int submesh, float* have_normals,
       csColor* colors);
 

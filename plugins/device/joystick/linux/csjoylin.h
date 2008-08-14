@@ -66,7 +66,7 @@ private:
   bool Close ();
   void Report (int severity, const char* msg, ...);
 
-  csEventID Frame;
+  csEventID PreProcess;
 
  public:
   csLinuxJoystick (iBase *parent);
@@ -79,7 +79,8 @@ private:
   { return CSEVTYPE_Joystick; }
   virtual unsigned QueryEventPriority (unsigned) { return 110; }
 
-  CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.device.joystick")
+  CS_EVENTHANDLER_NAMES("crystalspace.device.joystick")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 }

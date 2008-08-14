@@ -52,7 +52,7 @@ public:
 
   virtual void SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
     CS::Graphics::RenderMeshModes& /*modes*/,
-    const csShaderVariableStack& /*stacks*/) {}
+    const iShaderVarStack* /*stacks*/) {}
 
   virtual void ResetState () {}
 
@@ -65,14 +65,7 @@ public:
   { return false; }
 
   /// Compile a program
-  virtual bool Compile (iHierarchicalCache*, csRef<iString>*);
-  
-  virtual iShaderProgram::CacheLoadResult LoadFromCache (
-    iHierarchicalCache* cache, iDocumentNode* programNode,
-    csRef<iString>* failReason = 0, csRef<iString>* = 0)
-  { return iShaderProgram::loadFail; }
-  
-  csPtr<iString> GetCacheTag () { return 0; }
+  virtual bool Compile();
 };
 
 

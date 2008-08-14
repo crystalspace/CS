@@ -128,36 +128,22 @@ public:
   float texture_filter_anisotropy;
   /// Whether bilinear filtering should be used (0 = no, 1 = yes, 2 = trilinear)
   int rstate_bilinearmap;
-  
-  struct
-  {
-    /**
-    * Whether to prevent uploading of NPOTS textures to a generic compressed 
-    * format (causes crashes on some drivers).
-    */
-    bool disableRECTTextureCompression;
-    /**
-    * Whether to enable uploading of NPOTS textures as 2D textures.
-    * Some ATI hardware (Radeon 9500+) has a "hidden" feature where you can 
-    * specify NPOTS textures as 2D textures. (Normally they would have to be 
-    * POTS.) 
-    */
-    bool enableNonPowerOfTwo2DTextures;
-  
-    /// Some drivers seem to ignore glGenerateMipmap calls
-    bool disableGenerateMipmap;
-    
-    /**
-     * Workaround a bug in NV OpenGL (169.12): when using GENERATE_MIPMAPS
-     * the max lod level isn't generated but is black.
-     * Solution: set max LOD level to desired level plus one.
-     */
-    bool generateMipMapsExcessOne;
-  } tweaks;
-    
+  /**
+   * Whether to prevent uploading of NPOTS textures to a generic compressed 
+   * format (causes crashes on some drivers).
+   */
+  bool disableRECTTextureCompression;
+  /**
+   * Whether to enable uploading of NPOTS textures as 2D textures.
+   * Some ATI hardware (Radeon 9500+) has a "hidden" feature where you can 
+   * specify NPOTS textures as 2D textures. (Normally they would have to be 
+   * POTS.) 
+   */
+  bool enableNonPowerOfTwo2DTextures;
+
   bool hasPBO;
-  
-  TextureReadbackSimple::Pool simpleTextureReadbacks;
+  /// Some drivers seem to ignore glGenerateMipmap calls
+  bool disableGenerateMipmap;
 
   csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,

@@ -148,7 +148,7 @@ private:
   int qsiter;
   bool fastobjects;
 
-  csEventID Frame;
+  csEventID PreProcess;
 public:
   csODEDynamics (iBase* parent);
   virtual ~csODEDynamics ();
@@ -228,7 +228,8 @@ public:
     virtual ~EventHandler () { }
     virtual bool HandleEvent (iEvent& ev)
     { return parent ? parent->HandleEvent (ev) : false; }
-    CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.dynamics.ode")
+    CS_EVENTHANDLER_NAMES("crystalspace.dynamics.ode")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   };
   csRef<EventHandler> scfiEventHandler;
 };

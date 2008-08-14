@@ -1,0 +1,282 @@
+/*
+    Copyright (C) 2000-2006 by Jorrit Tyberghein
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+#include "cssysdef.h"
+#include "csutil/sysfunc.h"
+#include "csutil/array.h"
+#include "plugins/engine/3d/region.h"
+#include "plugins/engine/3d/engine.h"
+#include "iengine/sector.h"
+#include "iengine/campos.h"
+#include "iengine/texture.h"
+#include "iengine/material.h"
+#include "iengine/engine.h"
+#include "iengine/mesh.h"
+
+//---------------------------------------------------------------------------
+
+
+csRegion::csRegion (csEngine *e) 
+  : scfImplementationType (this), engine (e)
+{
+}
+
+csRegion::~csRegion ()
+{
+  Clear ();
+}
+
+// If you enable this then after deleting a region it will
+// print out which objects were not removed and their ref count.
+#define REGION_CHECK
+
+void csRegion::DeleteAll ()
+{
+  // First we need to copy the objects to a vector to avoid
+  // messing up the iterator while we are deleting them.
+  csArray<iObject*> copy (1024, 256);
+  csRef<iObjectIterator> iter = GetIterator ();
+  while (iter->HasNext ())
+  {
+    iObject *o = iter->Next ();
+    copy.Push (o);
+  }
+
+  size_t total = copy.GetSize ();
+
+  // Now we iterate over all objects in the 'copy' vector and
+  // delete them. This will release them as csObject children
+  // from this region parent.
+  size_t i;
+
+#ifdef REGION_CHECK
+  struct rcStruct { csString n; csWeakRef<iBase> weakb; };
+  rcStruct* rc = new rcStruct[total];
+#endif
+
+  // The first loop is the most general one where we just use
+  // engine->RemoveObject().
+  for (i = 0; i < copy.GetSize (); i++)
+  {
+    iBase* b = (iBase*)copy[i];
+#ifdef REGION_CHECK
+    rc[i].weakb = b;
+    rc[i].n = copy[i]->GetName ();
+#endif
+    if (engine->RemoveObject (b))
+    {
+      copy[i] = 0;
+      total--;
+    }
+  }
+
+#ifdef REGION_CHECK
+  for (i = 0 ; i < copy.GetSize () ; i++)
+    if (rc[i].weakb != 0)
+      printf ("Not Deleted %p '%s' ref=%d\n",
+	  (iBase*)rc[i].weakb, (const char*)rc[i].n,
+	  rc[i].weakb->GetRefCount ());
+  fflush (stdout);
+  delete[] rc;
+#endif
+
+  if (!total) return;
+
+  if (total > 0)
+  {
+    // Sanity check. There should be no more
+    // non-0 references in the copy array now.
+    for (i = 0; i < copy.GetSize (); i++)
+      if (copy[i])
+      {
+        iObject *o = copy[i];
+        engine->ReportBug ("There is still an object in the array after "
+          "deleting region contents!\nObject name is '%s'", o->GetName ());
+      }
+    CS_ASSERT (false);
+  }
+}
+
+bool csRegion::PrepareTextures ()
+{
+  csRef<iObjectIterator> iter;
+  iTextureManager *txtmgr = engine->G3D->GetTextureManager ();
+
+  // First register all textures to the texture manager.
+  iter = GetIterator ();
+  while (iter->HasNext ())
+  {
+    csRef<iTextureWrapper> csth (scfQueryInterface<iTextureWrapper> (
+        iter->Next ()));
+    if (csth)
+    {
+      if (!csth->GetTextureHandle ()) csth->Register (txtmgr);
+      if (!csth->KeepImage ()) csth->SetImageFile (0);
+    }
+  }
+
+  return true;
+}
+
+bool csRegion::ShineLights ()
+{
+  engine->ShineLights (this);
+  return true;
+}
+
+bool csRegion::Prepare ()
+{
+  if (!PrepareTextures ()) return false;
+  if (!ShineLights ()) return false;
+  return true;
+}
+
+iObject *csRegion::QueryObject ()
+{
+  return this;
+}
+
+void csRegion::Clear ()
+{
+  ObjRemoveAll ();
+}
+
+
+iSector *csRegion::FindSector (const char *iName)
+{
+  csRef<iSector> sector (CS::GetNamedChildObject<iSector> (
+      this, iName));
+  return sector;	// DecRef is ok here.
+}
+
+iMeshWrapper *csRegion::FindMeshObject (const char *Name)
+{
+  char const* p = strchr (Name, ':');
+  if (p)
+  {
+    char* cname = csStrNew (Name);
+    char* p2 = strchr (cname, ':');
+    *p2 = 0;
+    csRef<iMeshWrapper> m = CS::GetNamedChildObject<iMeshWrapper> (
+        this, cname);
+    delete[] cname;
+    if (m)
+    {
+      return m->FindChildByName (p+1);
+    }
+    return 0;
+  }
+  else
+  {
+    csRef<iMeshWrapper> m = CS::GetNamedChildObject<iMeshWrapper> (
+        this, Name);
+    return m;	// DecRef is ok here.
+  }
+}
+
+iMeshFactoryWrapper *csRegion::FindMeshFactory (const char *iName)
+{
+  csRef<iMeshFactoryWrapper> mf (
+    CS::GetNamedChildObject<iMeshFactoryWrapper> (this, iName));
+  return mf;	// DecRef is ok here.
+}
+
+iTextureWrapper *csRegion::FindTexture (const char *iName)
+{
+  csRef<iTextureWrapper> t (CS::GetNamedChildObject<iTextureWrapper> (
+      this, iName));
+  return t;	// DecRef is ok here.
+}
+
+iMaterialWrapper *csRegion::FindMaterial (const char *iName)
+{
+  csRef<iMaterialWrapper> m (CS::GetNamedChildObject<iMaterialWrapper> (
+      this, iName));
+  return m;	// DecRef is ok here.
+}
+
+iShader *csRegion::FindShader (const char *iName)
+{
+  csRef<iShader> s (CS::GetNamedChildObject<iShader> (
+      this, iName));
+  return s;	// DecRef is ok here.
+}
+
+iCameraPosition *csRegion::FindCameraPosition (const char *iName)
+{
+  csRef<iCameraPosition> cp (CS::GetNamedChildObject<iCameraPosition> (
+      this, iName));
+  return cp;	// DecRef is ok here.
+}
+
+bool csRegion::IsInRegion (iObject *iobj)
+{
+  return iobj->GetObjectParent () == this;
+}
+
+
+// ---------------------------------------------------------------------------
+
+csRegionList::csRegionList () 
+  : scfImplementationType (this),
+  regionList (16, 16)
+{
+}
+
+csRegionList::~csRegionList()
+{
+}
+
+int csRegionList::GetCount () const
+{
+  return (int)regionList.GetSize ();
+}
+
+iRegion *csRegionList::Get (int n) const
+{
+  return regionList.Get (n);
+}
+
+int csRegionList::Add (iRegion *obj)
+{
+  return (int)regionList.Push (obj);
+}
+
+bool csRegionList::Remove (iRegion *obj)
+{
+  return regionList.Delete (obj);
+}
+
+bool csRegionList::Remove (int n)
+{
+  return regionList.DeleteIndex (n);
+}
+
+void csRegionList::RemoveAll ()
+{
+  regionList.DeleteAll ();
+}
+
+int csRegionList::Find (iRegion *obj) const
+{
+  return (int)regionList.Find (obj);
+}
+
+iRegion *csRegionList::FindByName (const char *Name) const
+{
+  return regionList.FindByName (Name);
+}

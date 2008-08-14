@@ -60,15 +60,10 @@ public:
  * This array properly initializes new elements in the array to 0 (the NULL
  * pointer).
  */
-template <class T,
-          class MemoryAllocator = CS::Container::ArrayAllocDefault,
-          class CapacityHandler = csArrayCapacityFixedGrow<16> >
-class csPDelArray : 
-  public csArray<T*, csPDelArrayElementHandler<T*>, MemoryAllocator,
-                 CapacityHandler>
+template <class T>
+class csPDelArray : public csArray<T*, csPDelArrayElementHandler<T*> >
 {
-  typedef csArray<T*, csPDelArrayElementHandler<T*>, MemoryAllocator,
-    CapacityHandler> superclass;
+  typedef csArray<T*, csPDelArrayElementHandler<T*> > superclass;
 
 private:
   csPDelArray (const csPDelArray&);            // Illegal; unimplemented.
@@ -79,9 +74,8 @@ public:
    * Initialize object to hold initially 'ilimit' elements, and increase
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
-  csPDelArray (size_t ilimit = 0,
-    const CapacityHandler& ch = CapacityHandler()) :
-    superclass (ilimit, ch) {}
+  csPDelArray (int ilimit = 0, int ithreshold = 0) :
+    csArray<T*, csPDelArrayElementHandler<T*> > (ilimit, ithreshold) {}
 
   /**
    * Get and clear the element 'n' from vector. This spot in the array
@@ -125,7 +119,7 @@ public:
    */
   void SetSize (size_t n)
   {
-    superclass::SetSize (n, 0);
+    superclass::SetSize (0);
   }
 
   /**

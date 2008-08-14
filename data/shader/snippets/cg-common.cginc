@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2006-2008 by Frank Richter
+  Copyright (C) 2006 by Frank Richter
 	    (C) 2006 by Jorrit Tyberghein
 	    (C) 2006 by Marten Svanfeldt
 
@@ -22,21 +22,6 @@
 #ifndef __CG_COMMON_CG_INC__
 #define __CG_COMMON_CG_INC__
 
-//
-// WORKAROUNDS
-//
-
-/* 'half' texture functions result in an "error C5201: invalid internal
-   function declaration" on non-NV */
-#if !defined(PROFILE_FP30) && !defined(PROFILE_FP40) && !defined(PROFILE_GP4FP)
-#define h4tex2D   tex2D
-#endif
-
-//
-// TOOL FUNCTIONS
-//
-
-// EyeVec - eye to vertex
 float2 ComputeParallaxOffset (sampler2D TexHeight, float2 OriginalCoord, 
 			      float3 EyeVec, float OffsetScale)
 {

@@ -43,9 +43,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
       iStreamSource* ssource, iLoaderContext* ldr_context,
       iBase* context);
 
-    bool ParseMorphTarget (iDocumentNode* child,
-      iAnimatedMeshFactory* amfact);
-
     //-- iComponent
     virtual bool Initialize (iObjectRegistry*);
 

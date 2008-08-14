@@ -32,7 +32,6 @@
 
 #include "csgeom/csrect.h"
 #include "csgeom/math.h"
-#include "csgeom/matrix4.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 #include "csgeom/segment.h"
@@ -1134,21 +1133,6 @@ public:
    */
   bool ProjectBox (const csTransform& trans, float fov, float sx, float sy,
   	csBox2& sbox, float& min_z, float& max_z) const;
- 
-  /**
-   * Project this box to a 2D bounding box given the view point
-   * transformation and also the projection matrix. 
-   * The transform should transform from world
-   * to camera space (using Other2This). The minimum and maximum z
-   * are also calculated. If the bounding box is behind the camera
-   * then the 'sbox' will not be calculated (min_z and max_z are
-   * still calculated) and the function will return false.
-   * If the camera is inside the transformed box then this function will
-   * return true and a conservative screen space bounding box is returned.
-   */
-  bool ProjectBox (const csTransform& trans, const CS::Math::Matrix4& proj,
-  	csBox2& sbox, float& min_z, float& max_z, int screenWidth,
-  	int screenHeight) const;
 
   /**
    * Project this box to the 2D outline given the view point

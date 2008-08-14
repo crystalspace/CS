@@ -80,7 +80,7 @@ bool csShaderGLPS1_Common::Load (iShaderDestinationResolver*,
 }
 
 
-bool csShaderGLPS1_Common::Compile (iHierarchicalCache*, csRef<iString>* tag)
+bool csShaderGLPS1_Common::Compile ()
 {
   
   for (size_t i = 0; i < variablemap.GetSize (); i++)
@@ -108,18 +108,7 @@ bool csShaderGLPS1_Common::Compile (iHierarchicalCache*, csRef<iString>* tag)
 
   variablemap.DeleteAll();
 
-  tag->AttachNew (new scfString ("default"));
-  
   return LoadProgramStringToGL();
-}
-
-
-void csShaderGLPS1_Common::GetUsedShaderVars (csBitArray& bits) const
-{
-  for (size_t c = 0; c < MAX_CONST_REGS; c++)
-  {
-    TryAddUsedShaderVarProgramParam (constantRegs[c], bits);
-  }
 }
 
 }

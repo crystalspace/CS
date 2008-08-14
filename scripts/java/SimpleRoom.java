@@ -27,7 +27,6 @@ class GlobRefs
     public iVirtualClock vc;
     public iLoader loader;
     public iEngine engine;
-    public FramePrinter printer;
     private static GlobRefs instance = null;
 
     public static GlobRefs Get()
@@ -47,7 +46,6 @@ class GlobRefs
         kbd = (iKeyboardDriver) objreg.Get (iKeyboardDriver.class);
         loader = (iLoader) objreg.Get (iLoader.class);
         engine = (iEngine) objreg.Get (iEngine.class);
-        printer = new FramePrinter (objreg);
     }
 };
 
@@ -82,7 +80,8 @@ class EventHandler extends csJEventHandler
     protected csView view;
     protected iKeyboardDriver kbd;
     protected iVirtualClock vc;
-    protected long evFrame;
+    protected long evPreProcess;
+    protected long evFinalProcess;
 
     public EventHandler (csView v)
     {
@@ -91,7 +90,8 @@ class EventHandler extends csJEventHandler
 	vc = r.vc;
         kbd = r.kbd;
         view = v;
-        evFrame = CS.csevFrame (CS.getTheObjectRegistry());
+        evPreProcess = CS.csevPreProcess (CS.getTheObjectRegistry());
+        evFinalProcess = CS.csevFinalProcess (CS.getTheObjectRegistry());
     }
 
     protected void SetupFrame ()
@@ -125,6 +125,12 @@ class EventHandler extends csJEventHandler
         view.Draw();
     }
 
+    protected void FinishFrame ()
+    {
+        myG3D.FinishDraw();
+        myG3D.Print(null);
+    }
+
     public boolean HandleEvent (iEvent ev)
     {
         if (CS.CS_IS_KEYBOARD_EVENT (CS.getTheObjectRegistry(), ev) &&
@@ -141,8 +147,10 @@ class EventHandler extends csJEventHandler
                 return true;
             }
         }
-        else if (ev.getName() == evFrame)
+        else if (ev.getName() == evPreProcess)
             SetupFrame();
+        else if (ev.getName() == evFinalProcess)
+            FinishFrame();
         return true;
     }
 };
@@ -257,7 +265,8 @@ class SimpleRoom extends CS
 	    System.out.println("Setting up event handlers...");
 	    EventHandler eventHandler = new EventHandler(view);
 	    long events[] = {
-	      CS.csevFrame (CS.getTheObjectRegistry()),
+	      CS.csevPreProcess (CS.getTheObjectRegistry()),
+	      CS.csevFinalProcess (CS.getTheObjectRegistry()),
 	      CS.csevKeyboardEvent (CS.getTheObjectRegistry()), 
 	      -1 /* CS.CS_EVENTLIST_END */
 	    };
@@ -267,8 +276,6 @@ class SimpleRoom extends CS
 
 	    System.out.println("Starting the main runloop...");
 	    csDefaultRunLoop(object_reg);
-            
-            GlobRefs.Get().printer = null;
 	}
 	catch(Exception e)
 	{

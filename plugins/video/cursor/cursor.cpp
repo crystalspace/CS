@@ -24,7 +24,6 @@
 #include "csutil/stringarray.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
-#include "csutil/eventhandlers.h"
 #include "csutil/scfstr.h"
 #include "csgfx/imagememory.h"
 #include "iutil/objreg.h"
@@ -68,7 +67,7 @@ bool csCursor::Initialize (iObjectRegistry *objreg)
   // Get event queue
   eventq = csQueryRegistry<iEventQueue> (reg);
   if (!eventq) return false;
-  csEventID events[3] = { csevFrame(reg), csevMouseEvent(reg), 
+  csEventID events[3] = { csevPostProcess(reg), csevMouseEvent(reg), 
 			  CS_EVENTLIST_END };
   CS::RegisterWeakListener (eventq, this, events, weakEventHandler);
 
@@ -194,7 +193,7 @@ bool csCursor::HandleEvent (iEvent &ev)
 
   if (!useOS)
   {
-    if (ev.Name == csevFrame(reg))
+    if (ev.Name == csevPostProcess(reg))
     {
       CursorInfo* ci = cursors.Get (current.GetData(), 0);
       if (!ci)

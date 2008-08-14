@@ -36,14 +36,15 @@
       </block>
     </input>
     
-    <block location="cg:vertexToFragment">
-      <varying type="direction_object" name="eyeDirectionObj" />
-    </block>
-    
     <block location="cg:vertexMain">
       eyeDirectionObj = float3 (position - ModelViewIT[3]);
     </block>
     
+    <block location="cg:fragmentMain">
+      // @@@ Hm, use V2F?
+      eyeDirectionObj = float3 (0, 0, 0);
+    </block>
+  
     <output name="eyeDirectionObj" type="direction_object" />
   </technique>
 </snippet>

@@ -28,12 +28,10 @@
  * \addtogroup gfx3d
  * @{ */
 
-#include "csgfx/textureformatstrings.h"
 #include "csutil/scf_interface.h"
 #include "cstypes.h"
 #include "ivideo/graph3d.h"
 
-struct iDataBuffer;
 struct iGraphics2D;
 struct iGraphics3D;
 
@@ -52,7 +50,7 @@ struct iGraphics3D;
  */
 struct iTextureHandle : public virtual iBase
 {
-  SCF_INTERFACE(iTextureHandle, 4,0,5);
+  SCF_INTERFACE(iTextureHandle, 4,0,3);
   /// Retrieve the flags set for this texture
   virtual int GetFlags () const = 0;
 
@@ -91,10 +89,10 @@ struct iTextureHandle : public virtual iBase
   // CHANGED TO ADD SUPPORT FOR CUBEMAPS AND 3D TEXTURES
   // done by Phil Aumayr (phil@rarebyte.com)
   enum //CS_DEPRECATED_TYPE
-  { 
-    CS_TEX_IMG_1D = 0, 
-    CS_TEX_IMG_2D, 
-    CS_TEX_IMG_3D, 
+  {
+    CS_TEX_IMG_1D = 0,
+    CS_TEX_IMG_2D,
+    CS_TEX_IMG_3D,
     CS_TEX_IMG_CUBEMAP,
     CS_TEX_IMG_RECT
   };
@@ -289,19 +287,6 @@ struct iTextureHandle : public virtual iBase
     natureDirect = 1
   };
   virtual BlitBufferNature GetBufferNature (uint8* buf) = 0;
-  
-  /// Set the highest and lowest used mipmap for this texture.
-  virtual void SetMipmapLimits (int maxMip, int minMip = 0) = 0;
-  /// Get the highest and lowest used mipmap for this texture.
-  virtual void GetMipmapLimits (int& maxMip, int& minMip) = 0;
-  
-  /**
-   * Read back the data of the texture in the given format.
-   * \remarks To facilitate asynchronous transfers it's better to access
-   *   the actual data in a delayed fashion.
-   */
-  virtual csPtr<iDataBuffer> Readback (
-    const CS::StructuredTextureFormat& format, int mip = 0) = 0;
 };
 
 /** @} */

@@ -81,7 +81,7 @@ public:
   csRef<iGraphics3D> g3d;
   iTextureHandle *context;
   csRefArray<iTextureHandle> depth_textures;
-  CS::ShaderVarStringID depth_cubemap_name;
+  csStringID depth_cubemap_name;
   csRef<iTextureHandle> depth_cubemap;
 
 private:
@@ -92,7 +92,10 @@ private:
   csRef<iShader> defShader;
 
   csDirtyAccessArray<csRenderMesh*> render_meshes;
-  csDirtyAccessArray<iMeshWrapper*> mesh_wrappers;  
+  csDirtyAccessArray<iMeshWrapper*> mesh_wrappers;
+
+  csStringID bones_name;
+  csStringID shader_name;
 
   DrawSettings settings;
 
@@ -104,7 +107,7 @@ public:
   virtual ~csShadowmapRenderStep ();
 
   virtual void Perform (iRenderView* rview, iSector* sector,
-    csShaderVariableStack& stack);
+    iShaderVarStack* stacks);
 
   DrawSettings& GetSettings () { return settings; }
   void SetDefaultShader (iShader* shader)

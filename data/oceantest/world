@@ -9,7 +9,6 @@
     <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
     <plugin name="waterFact">crystalspace.mesh.loader.factory.watermesh</plugin>
     <plugin name="water">crystalspace.mesh.loader.watermesh</plugin>
-    <plugin name="combiner">crystalspace.graphics3d.shader.combiner.glcg</plugin>
   </plugins>
   <settings>
   	<clearscreen>yes</clearscreen>
@@ -17,7 +16,7 @@
   
   <shaders>
     <shader>
-      <file>/shader/water/water-old.xml</file>
+      <file>/shader/water/water.xml</file>
     </shader>
   </shaders>
   
@@ -61,7 +60,7 @@
   <materials>
     <material name="oceanMat">
       <shader type="standard">water</shader>
-      <shadervar name="tex normal" type="texture">normal map 2</shadervar>
+      <shadervar name="texture normal" type="texture">normal map 2</shadervar>
     </material>
     
     <material name="clouds">

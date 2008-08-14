@@ -58,7 +58,7 @@ public:
 
     TexMatrixOp (float def)
     { 
-      param.var.AttachNew (new csShaderVariable (CS::InvalidShaderVarStringID));
+      param.var.AttachNew (new csShaderVariable (csInvalidStringID));
       param.var->SetValue (def);
     }
   };
@@ -97,9 +97,9 @@ private:
 
   csGLStateCache* statecache;  
 
-  CS::ShaderVarStringID ambientvar;
-  CS::ShaderVarStringID string_world2camera;
-  CS::ShaderVarStringID string_object2world;
+  csStringID ambientvar;
+  csStringID string_world2camera;
+  csStringID string_object2world;
   csArray<LightingEntry> lights;
   bool do_lighting;
   GLenum colorMaterial;
@@ -118,17 +118,15 @@ private:
     ProgramParam constcolor;
     csArray<TexMatrixOp> texMatrixOps;
     
-    CS::ShaderVarStringID fogplane;
-    CS::ShaderVarStringID fogdensity;
+    csStringID fogplane;
+    csStringID fogdensity;
 
-    layerentry () : texgen(TEXGEN_NONE), 
-      fogplane (CS::InvalidShaderVarStringID),
-      fogdensity (CS::InvalidShaderVarStringID) {}
+    layerentry () : texgen(TEXGEN_NONE) {}
   };
 
   csArray<layerentry> layers;
 
-  CS::ShaderVarStringID primcolvar;
+  csStringID primcolvar;
 
   bool validProgram;
 
@@ -156,7 +154,7 @@ public:
   /// Setup states needed for proper operation of the shader
   virtual void SetupState (const CS::Graphics::RenderMesh* mesh,
     CS::Graphics::RenderMeshModes& modes,
-    const csShaderVariableStack& stack);
+    const iShaderVarStack* stacks);
 
   /// Reset states to original
   virtual void ResetState ();
@@ -170,14 +168,7 @@ public:
   { return false; }
 
   /// Compile a program
-  virtual bool Compile (iHierarchicalCache*, csRef<iString>*);
-
-  virtual void GetUsedShaderVars (csBitArray& bits) const;
-  
-  virtual iShaderProgram::CacheLoadResult LoadFromCache (
-    iHierarchicalCache* cache, iDocumentNode* programNode,
-    csRef<iString>* failReason = 0, csRef<iString>* = 0)
-  { return iShaderProgram::loadFail; }
+  virtual bool Compile();
 };
 
 

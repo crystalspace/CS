@@ -28,7 +28,6 @@
 #include "csgeom/plane3.h"
 #include "csgeom/poly2d.h"
 #include "csgeom/polyclip.h"
-#include "csgeom/projections.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/tri.h"
 #include "csgfx/textureformatstrings.h"
@@ -142,8 +141,8 @@ bool csSoftwareGraphics3DCommon::Initialize (iObjectRegistry* p)
     q->RegisterListener (scfiEventHandler, events);
   }
 
-  strings = csQueryRegistryTagInterface<iShaderVarStringSet> (
-    object_reg, "crystalspace.shader.variablenameset");
+  strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
   string_world2camera = strings->Request ("world2camera transform");
   string_indices = strings->Request ("indices");
 
@@ -288,8 +287,8 @@ void csSoftwareGraphics3DCommon::SetDimensions (int nwidth, int nheight)
   display_height = nheight;
   width = nwidth;
   height = nheight;
-  oldPersp.persp_center_x = width/2;
-  oldPersp.persp_center_y = height/2;
+  persp_center_x = width/2;
+  persp_center_y = height/2;
 
   delete [] smaller_buffer;
   smaller_buffer = 0;
@@ -488,17 +487,6 @@ void csSoftwareGraphics3DCommon::SetupClipper()
   clipperDirty = false;
 }
 
-void csSoftwareGraphics3DCommon::ComputeProjectionMatrix()
-{
-  if (!needMatrixUpdate) return;
-  
-  projectionMatrix = CS::Math::Projections::CSPerspective (
-      width, height, oldPersp.persp_center_x, oldPersp.persp_center_y, 
-      1.0f/oldPersp.aspect);
-  
-  needMatrixUpdate = false;
-}
-
 #define CSDRAW_MASK2D3D	  (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS)
 
 bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
@@ -510,7 +498,6 @@ bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
   if ((G2D->GetWidth() != display_width) ||
       (G2D->GetHeight() != display_height))
     SetDimensions (G2D->GetWidth(), G2D->GetHeight());
-  ComputeProjectionMatrix();
 
   // if 2D graphics is not locked, lock it
   if ((DrawFlags & CSDRAW_MASK2D3D) && (!(DrawMode & CSDRAW_MASK2D3D)))
@@ -935,19 +922,18 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
       0.0f, -1.0f, 0.0f,
       0.0f, 0.0f, 1.0f));
     camtrans.SetO2TTranslation (csVector3 (
-      float (oldPersp.persp_center_x), 
-      float (GetHeight() - oldPersp.persp_center_y), -oldPersp.aspect));
+      float (persp_center_x), 
+      float (GetHeight() - persp_center_y), -aspect));
 
     SetWorldToCamera (camtrans.GetInverse ());
   }
 
   rmesh.object2world = mesh.object2world;
 
-  csShaderVariableStack stack;
-  stack.Setup (strings->GetSize ());
-
-  shadermgr->PushVariables (stack);
-  scrapContext.PushVariables (stack);
+  csRef<iShaderVarStack> stacks;
+  stacks.AttachNew (new scfArray<iShaderVarStack>);
+  shadermgr->PushVariables (stacks);
+  scrapContext.PushVariables (stacks);
 
   if (mesh.alphaType.autoAlphaMode)
   {
@@ -956,7 +942,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
     iTextureHandle* tex = 0;
 
     csShaderVariable* texVar =
-      csGetShaderVariableFromStack (stack, mesh.alphaType.autoModeTexture);
+      csGetShaderVariableFromStack (stacks, mesh.alphaType.autoModeTexture);
 
     if (texVar)
       texVar->GetValue (tex);
@@ -974,7 +960,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
   }
 
   SetZMode (mesh.z_buf_mode);
-  DrawMesh (&rmesh, rmesh, stack);
+  DrawMesh (&rmesh, rmesh, stacks);
 }
 
 static csZBufMode GetZModePass2 (csZBufMode mode)
@@ -1036,7 +1022,7 @@ static iRenderBuffer* ColorFixup (iRenderBuffer* srcBuffer,
 
 void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     const csRenderMeshModes& modes,
-    const csShaderVariableStack& stack)
+    const iShaderVarStack* stacks)
 {
   if (DrawMode == 0) return;
 
@@ -1093,7 +1079,7 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
 
   if (!indexbuf)
   {
-    csShaderVariable* indexBufSV = csGetShaderVariableFromStack (stack, string_indices);
+    csShaderVariable* indexBufSV = csGetShaderVariableFromStack (stacks, string_indices);
     CS_ASSERT (indexBufSV != 0);
     indexBufSV->GetValue (indexbuf);
   }

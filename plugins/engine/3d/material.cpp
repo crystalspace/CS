@@ -33,9 +33,9 @@ CS_IMPLEMENT_STATIC_CLASSVAR_REF(csMaterial, svNames, SVNames,
 
 void csMaterial::SetupSVNames()
 {
-  if ((CS::ShaderVarStringID)(SVNames().diffuseTex) == CS::InvalidShaderVarStringID)
+  if (SVNames().diffuseTex == csInvalidStringID)
   {
-    SVNames().diffuseTex = CS::ShaderVarName (engine->svNameStringSet,
+    SVNames().diffuseTex = CS::ShaderVarName (engine->globalStringSet,
       CS_MATERIAL_TEXTURE_DIFFUSE);
   }
 }
@@ -61,7 +61,7 @@ csMaterial::~csMaterial ()
 {
 }
 
-csShaderVariable* csMaterial::GetVar (CS::ShaderVarStringID name, bool create)
+csShaderVariable* csMaterial::GetVar (csStringID name, bool create)
 {
   csRef<csShaderVariable> var = 
     CS::ShaderVariableContextImpl::GetVariable (name);
@@ -79,14 +79,14 @@ void csMaterial::SetTextureWrapper (iTextureWrapper *tex)
 }
 
 
-iTextureWrapper* csMaterial::GetTextureWrapper (CS::ShaderVarStringID name)
+iTextureWrapper* csMaterial::GetTextureWrapper (csStringID name)
 {
   iTextureWrapper* tex;
   GetVar (name)->GetValue (tex);
   return tex;
 }
 
-void csMaterial::SetTextureWrapper (CS::ShaderVarStringID name, iTextureWrapper* tex)
+void csMaterial::SetTextureWrapper (csStringID name, iTextureWrapper* tex)
 {
   csShaderVariable* var = GetVar (name, true);
   var->SetValue (tex);
@@ -104,18 +104,6 @@ iShader* csMaterial::GetShader(csStringID type)
   return shaders.Get (type, (iShader*)0);
 }
 
-iShader* csMaterial::GetFirstShader (const csStringID* types,
-                                     size_t numTypes)
-{
-  iShader* s = 0;
-  for (size_t i = 0; i < numTypes; i++)
-  {
-    s = shaders.Get (types[i], (iShader*)0);
-    if (s != 0) break;
-  }
-  return s;
-}
-
 iTextureHandle *csMaterial::GetTexture ()
 {
   iTextureWrapper* tex;
@@ -124,7 +112,7 @@ iTextureHandle *csMaterial::GetTexture ()
   else return 0;
 }
 
-iTextureHandle* csMaterial::GetTexture (CS::ShaderVarStringID name)
+iTextureHandle* csMaterial::GetTexture (csStringID name)
 {
   iTextureWrapper* tex;
   csShaderVariable* var = GetVar (name);

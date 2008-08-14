@@ -66,25 +66,25 @@
     }
 
   static const char * StaticHandlerName() {return "crystalspace.cspython";};
-  static const csHandlerID StaticID(csRef<iEventHandlerRegistry> &reg) 
+  CS_CONST_METHOD static const csHandlerID StaticID(csRef<iEventHandlerRegistry> &reg) 
   { return reg->GetGenericID(StaticHandlerName()); }			;
-  virtual const char * GenericName() const		
+  CS_CONST_METHOD virtual const char * GenericName() const		
   { return StaticHandlerName(); }					;
-  virtual csHandlerID GenericID(csRef<iEventHandlerRegistry> &reg) const 
+  CS_CONST_METHOD virtual csHandlerID GenericID(csRef<iEventHandlerRegistry> &reg) const 
   { return StaticID(reg); };
 
 
-  virtual const csHandlerID * GenericPrec (		
+  CS_CONST_METHOD virtual const csHandlerID * GenericPrec (		
     csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &, 	
     csEventID) const { return 0; }	
-  virtual const csHandlerID * GenericSucc (		
+  CS_CONST_METHOD virtual const csHandlerID * GenericSucc (		
     csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &, 	
     csEventID) const { return 0; }
 
-  virtual const csHandlerID * InstancePrec (		
+  CS_CONST_METHOD virtual const csHandlerID * InstancePrec (		
       csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2, 	
     csEventID e) const { return GenericPrec(r1, r2, e); } 
-  virtual const csHandlerID * InstanceSucc (		
+  CS_CONST_METHOD virtual const csHandlerID * InstanceSucc (		
     csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2, 	
     csEventID e) const { return GenericSucc(r1, r2, e); }
 
@@ -137,8 +137,7 @@
 
   def csevCommandLineHelp(reg):
     csEventNameRegistry.GetID(reg, "crystalspace.application.commandlinehelp")
-  
-  csInvalidStringID = ~0 # we want stringids as unsigned long
+    
   CS_EVENTLIST_END = csInvalidStringID
 %}
 

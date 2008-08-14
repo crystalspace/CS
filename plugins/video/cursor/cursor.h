@@ -154,7 +154,8 @@ public:
   /// Switches from the current cursor to the specified cursor
   virtual bool SwitchCursor (const char *);
 
-  CS_EVENTHANDLER_PHASE_2D("crystalspace.graphics.cursor")
+  CS_EVENTHANDLER_NAMES("crystalspace.graphics.cursor")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
 #endif // __CS_VIDEO_CURSOR_H__

@@ -27,7 +27,6 @@
 #include "iutil/comp.h"
 #include "iutil/strset.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/shader/shader.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 {
@@ -95,7 +94,7 @@ public:
     return emptyPalette;
   }
 
-  inline iShaderVarStringSet* GetStringSet ()
+  inline iStringSet* GetStringSet ()
   {
     return stringSet;
   }
@@ -113,7 +112,7 @@ private:
 
   iObjectRegistry* objectRegistry;
   csRef<iGraphics3D> graph3d;
-  csRef<iShaderVarStringSet> stringSet;
+  csRef<iStringSet> stringSet;
 
   const csTerrainMaterialPalette* materialPalette;
   csTerrainMaterialPalette emptyPalette;  

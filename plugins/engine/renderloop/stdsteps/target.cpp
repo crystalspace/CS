@@ -178,7 +178,7 @@ csTargetRenderStep::~csTargetRenderStep ()
 }
 
 void csTargetRenderStep::Perform (iRenderView* rview, iSector* sector,
-  csShaderVariableStack& stack)
+  iShaderVarStack* stacks)
 {
   iGraphics3D* g3d = rview->GetGraphics3D();
 
@@ -201,7 +201,7 @@ void csTargetRenderStep::Perform (iRenderView* rview, iSector* sector,
   g3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER);
   for (size_t i = 0; i < steps.GetSize (); i++)
   {
-    steps[i]->Perform (rview, sector, stack);
+    steps[i]->Perform (rview, sector, stacks);
   }
   
   if (tex != 0)

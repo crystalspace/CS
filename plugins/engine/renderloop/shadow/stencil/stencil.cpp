@@ -376,7 +376,7 @@ void csStencilShadowCacheEntry::UpdateBuffers ()
 //---------------------------------------------------------------------------
 
 csStencilShadowStep::csStencilShadowStep (csStencilShadowType* type) :  
-  scfImplementationType (this), shadowMeshes (0)
+  scfImplementationType (this), shadowMeshes (0, 128)
 {
   csStencilShadowStep::type = type;
   enableShadows = false;
@@ -414,9 +414,6 @@ bool csStencilShadowStep::Initialize (iObjectRegistry* objreg)
     (object_reg, "crystalspace.shared.stringset");
   base_id = strings->Request ("base");
   shadows_id = strings->Request ("shadows");
-
-  svNameStringset = csQueryRegistryTagInterface<iShaderVarStringSet>
-    (object_reg, "crystalspace.shader.variablenameset");
   return true;
 }
 
@@ -464,13 +461,13 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
   // but just in case, no need to draw if no edges are drawn
   if (edge_start < index_range) 
   {
-    csShaderVariableStack stack;
-    stack.Setup (svNameStringset->GetSize ());
+    csRef<iShaderVarStack> stacks;
+    stacks.AttachNew (new scfArray<iShaderVarStack>);
 
     shadowCacheEntry->UpdateBuffers ();
-    shmgr->PushVariables (stack);
-    shader->SetupPass (shaderTicket, &rmesh, modes, stack);
-    rmesh.variablecontext->PushVariables (stack);
+    shmgr->PushVariables (stacks);
+    shader->SetupPass (shaderTicket, &rmesh, modes, stacks);
+    rmesh.variablecontext->PushVariables (stacks);
     if (shadowCacheEntry->ShadowCaps())
     {
       rmesh.indexstart = 0;
@@ -479,39 +476,39 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
         @@@ Try to get rid of drawing the mesh twice
        */
       g3d->SetShadowState (CS_SHADOW_VOLUME_FAIL1);
-      g3d->DrawMesh (&rmesh, modes, stack);
+      g3d->DrawMesh (&rmesh, modes, stacks);
       g3d->SetShadowState (CS_SHADOW_VOLUME_FAIL2);
-      g3d->DrawMesh (&rmesh, modes, stack);
+      g3d->DrawMesh (&rmesh, modes, stacks);
     }
     else 
     {
       rmesh.indexstart = edge_start;
       rmesh.indexend = index_range;
       g3d->SetShadowState (CS_SHADOW_VOLUME_PASS1);
-      g3d->DrawMesh (&rmesh, rmesh, stack);
+      g3d->DrawMesh (&rmesh, rmesh, stacks);
       g3d->SetShadowState (CS_SHADOW_VOLUME_PASS2);
-      g3d->DrawMesh (&rmesh, rmesh, stack);
+      g3d->DrawMesh (&rmesh, rmesh, stacks);
     }
     shader->TeardownPass (shaderTicket);
   }
 }
 
 void csStencilShadowStep::Perform (iRenderView* /*rview*/, iSector* /*sector*/,
-  csShaderVariableStack& /*stacks*/)
+  iShaderVarStack* /*stacks*/)
 {
   /// TODO: Report error (no light)
   return;
 }
 
 void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
-	iLight* light, csShaderVariableStack& stack)
+	iLight* light, iShaderVarStack* stacks)
 {
   iShader* shadow;
   if (!enableShadows || ((shadow = type->GetShadow ()) == 0))
   {
     for (size_t i = 0; i < steps.GetSize (); i++)
     {
-      steps[i]->Perform (rview, sector, light, stack);
+      steps[i]->Perform (rview, sector, light, stacks);
     }
     return;
   }
@@ -599,7 +596,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
     float maxRadius;
     csRenderMeshModes modes;
     modes.z_buf_mode = CS_ZBUF_TEST;
-    size_t shaderTicket = shadow->GetTicket (modes, stack);
+    size_t shaderTicket = shadow->GetTicket (modes, stacks);
     for (size_t p = 0; p < shadow->GetNumberOfPasses (shaderTicket); p ++) 
     {
       shadow->ActivatePass (shaderTicket, p);
@@ -649,7 +646,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
 
   for (size_t i = 0; i < steps.GetSize (); i++)
   {
-    steps[i]->Perform (rview, sector, light, stack);
+    steps[i]->Perform (rview, sector, light, stacks);
   }
 
   g3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);

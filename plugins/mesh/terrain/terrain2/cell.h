@@ -60,7 +60,6 @@ public:
   virtual iTerrainSystem* GetTerrain ();
 
   virtual const char* GetName () const;
-  virtual void SetName (const char* name);
 
   virtual iTerrainCellRenderProperties* GetRenderProperties () const;
   virtual iTerrainCellCollisionProperties* GetCollisionProperties () const;
@@ -116,7 +115,6 @@ public:
   virtual csVector3 GetBinormal (int x, int y) const;
   virtual csVector3 GetBinormal (const csVector2& pos) const;
 
-  inline csVector3 GetNormalDN (int x, int y) const;
   virtual csVector3 GetNormal (int x, int y) const;
   virtual csVector3 GetNormal (const csVector2& pos) const;
 

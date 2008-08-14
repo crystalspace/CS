@@ -53,7 +53,7 @@ private:
   /// Shader associated with material
   csHash<csRef<iShader>, csStringID> shaders;
   csEngine* engine;
-  csShaderVariable* GetVar (CS::ShaderVarStringID name, bool create = false);
+  csShaderVariable* GetVar (csStringID name, bool create = false);
 
   struct SVNamesHolder
   {
@@ -90,10 +90,10 @@ public:
   void SetTextureWrapper (iTextureWrapper* tex);
 
   /// Set a texture (pass 0 to set no texture)
-  void SetTextureWrapper (CS::ShaderVarStringID name, iTextureWrapper* tex);
+  void SetTextureWrapper (csStringID name, iTextureWrapper* tex);
 
   /// Get a texture (if none 0 is returned)
-  iTextureWrapper* GetTextureWrapper (CS::ShaderVarStringID name);
+  iTextureWrapper* GetTextureWrapper (csStringID name);
 
   /**\name iMaterial implementation
    * @{ */
@@ -111,10 +111,7 @@ public:
   /**
    * Get a texture from the material.
    */
-  virtual iTextureHandle *GetTexture (CS::ShaderVarStringID name);
-
-  virtual iShader* GetFirstShader (const csStringID* types,
-    size_t numTypes);
+  virtual iTextureHandle *GetTexture (csStringID name);
 
   /** @} */
 

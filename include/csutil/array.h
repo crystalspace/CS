@@ -25,14 +25,9 @@
  * Generic Array Template
  */
 
-#include "csutil/custom_new_disable.h"
-#include <algorithm>
-#include "csutil/custom_new_enable.h"
-
 #include "csutil/allocator.h"
 #include "csutil/comparator.h"
 #include "csutil/customallocated.h"
-#include "csutil/util.h"
 
 #include "csutil/custom_new_disable.h"
 
@@ -337,53 +332,16 @@ public:
 // Alias for csArrayCapacityLinear<csArrayThresholdVariable> to keep
 // SWIG generated Java classes (and thus filenames) short enough for Windows.
 // Note that a typedef wont work because SWIG would expand it.
-struct csArrayCapacityVariableGrow :
+struct csArrayCapacityDefault :
   public csArrayCapacityLinear<csArrayThresholdVariable>
 {
-  csArrayCapacityVariableGrow () :
+  csArrayCapacityDefault () :
     csArrayCapacityLinear<csArrayThresholdVariable> () {}
-  csArrayCapacityVariableGrow (const csArrayThresholdVariable& threshold) :
+  csArrayCapacityDefault (const csArrayThresholdVariable& threshold) :
     csArrayCapacityLinear<csArrayThresholdVariable> (threshold) {}
-  csArrayCapacityVariableGrow (const size_t x) :
+  csArrayCapacityDefault (const size_t x) :
     csArrayCapacityLinear<csArrayThresholdVariable> (x) {}
 } ;
-// @@@ Deprecate? Name is non-descriptive/misleading
-typedef csArrayCapacityVariableGrow csArrayCapacityDefault;
-
-/**
- * Shortcut for an array capacity handler with a compile-time fixed rate of 
- * growth
- */
-template<int N>
-struct csArrayCapacityFixedGrow :
-  public csArrayCapacityLinear<csArrayThresholdFixed<N> >
-{
-  csArrayCapacityFixedGrow () :
-    csArrayCapacityLinear<csArrayThresholdFixed<N> > () {}
-};
-
-namespace CS
-{
-  namespace Container
-  {
-    typedef CS::Memory::AllocatorMalloc ArrayAllocDefault;
-    typedef csArrayCapacityFixedGrow<16> ArrayCapacityDefault;
-    
-    template<int MaxGrow = 1 << 20>
-    struct ArrayCapacityExponential
-    {
-      bool IsCapacityExcessive (size_t capacity, size_t count) const
-      {
-	return size_t (csFindNearestPowerOf2 (count)) < (capacity/2);
-      }
-      size_t GetCapacity (size_t count) const
-      {
-        size_t newCap = csFindNearestPowerOf2 (count);
-	return newCap < MaxGrow ? newCap : MaxGrow;
-      }
-    };
-  } // namespace Container
-} // namespace CS
 
 /**
  * This value is returned whenever an array item could not be located or does
@@ -401,8 +359,8 @@ const size_t csArrayItemNotFound = (size_t)-1;
  */
 template <class T,
 	class ElementHandler = csArrayElementHandler<T>,
-        class MemoryAllocator = CS::Container::ArrayAllocDefault,
-        class CapacityHandler = CS::Container::ArrayCapacityDefault>
+        class MemoryAllocator = CS::Memory::AllocatorMalloc,
+        class CapacityHandler = csArrayCapacityDefault>
 class csArray : public CS::Memory::CustomAllocated
 {
 public:
@@ -936,24 +894,6 @@ public:
   }
 
   /**
-   * Sort array using a binary predicate
-   */
-  template<typename Pred>
-  void Sort (Pred& pred)
-  {
-    std::sort (root.p, root.p + GetSize (), pred);
-  }
-
-  /**
-   * Sort array using a binary predicate and a stable sorting algorithm
-   */
-  template<typename Pred>
-  void SortStable (Pred& pred)
-  {
-    std::stable_sort (root.p, root.p + GetSize (), pred);
-  }
-
-  /**
    * Clear entire array, releasing all allocated memory.
    */
   void DeleteAll ()
@@ -1211,74 +1151,6 @@ public:
     const csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& array;
   };
 
-  /** Reverse iterator for the Array<> class */
-  class ReverseIterator
-  {
-  public:
-    /** Copy constructor. */
-    ReverseIterator(ReverseIterator const& r) :
-      currentelem(r.currentelem), array(r.array) {}
-
-    /** Assignment operator. */
-    ReverseIterator& operator=(ReverseIterator const& r)
-    { currentelem = r.currentelem; array = r.array; return *this; }
-
-    /** Returns true if the next Next() call will return an element */
-    bool HasNext() const
-    { return currentelem > 0 && currentelem <= array.GetSize (); }
-
-    /** Returns the next element in the array. */
-    T& Next()
-    { return array.Get(--currentelem); }
-
-    /** Reset the array to the first element */
-    void Reset()
-    { currentelem = array.GetSize (); }
-
-  protected:
-    ReverseIterator(csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& newarray)
-	: currentelem(newarray.GetSize ()), array(newarray) {}
-    friend class csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>;
-
-  private:
-    size_t currentelem;
-    csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& array;
-  };
-
-  /** Reverse iterator for the Array<> class */
-  class ReverseConstIterator
-  {
-  public:
-    /** Copy constructor. */
-    ReverseConstIterator(ReverseConstIterator const& r) :
-      currentelem(r.currentelem), array(r.array) {}
-
-    /** Assignment operator. */
-    ReverseConstIterator& operator=(ReverseConstIterator const& r)
-    { currentelem = r.currentelem; array = r.array; return *this; }
-
-    /** Returns true if the next Next() call will return an element */
-    bool HasNext() const
-    { return currentelem > 0 && currentelem <= array.GetSize (); }
-
-    /** Returns the next element in the array. */
-    const T& Next()
-    { return array.Get(--currentelem); }
-
-    /** Reset the array to the first element */
-    void Reset()
-    { currentelem = array.GetSize (); }
-
-  protected:
-    ReverseConstIterator(const csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& newarray)
-      : currentelem(newarray.GetSize ()), array(newarray) {}
-    friend class csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>;
-
-  private:
-    size_t currentelem;
-    const csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& array;
-  };
-
   /** Returns an Iterator which traverses the array. */
   Iterator GetIterator()
   { return Iterator(*this); }
@@ -1286,14 +1158,6 @@ public:
   /** Returns an Iterator which traverses the array. */
   ConstIterator GetIterator() const
   { return ConstIterator(*this); }
-
-  /** Returns an ReverseIterator which traverses the array in reverse direction. */
-  ReverseIterator GetReverseIterator()
-  { return ReverseIterator(*this); }
-
-  /** Returns an Iterator which traverses the array. */
-  ReverseConstIterator GetReverseIterator() const
-  { return ReverseConstIterator(*this); }
   
   /// Check if this array has the exact same contents as \a other.
   bool operator== (const csArray& other) const
@@ -1318,23 +1182,18 @@ public:
  * safe-copy in case of reallocation of the array. Useful for weak
  * references.
  */
-template <class T, 
-          class Allocator = CS::Memory::AllocatorMalloc,
-          class CapacityHandler = CS::Container::ArrayCapacityDefault>
+template <class T>
 class csSafeCopyArray
 	: public csArray<T,
-		csArraySafeCopyElementHandler<T>,
-		Allocator, CapacityHandler>
+		csArraySafeCopyElementHandler<T> >
 {
 public:
   /**
    * Initialize object to hold initially \c limit elements, and increase
    * storage by \c threshold each time the upper bound is exceeded.
    */
-  csSafeCopyArray (size_t limit = 0,
-    const CapacityHandler& ch = CapacityHandler())
-  	: csArray<T, csArraySafeCopyElementHandler<T>, Allocator, 
-  	          CapacityHandler> (limit, ch)
+  csSafeCopyArray (size_t limit = 0, size_t threshold = 0)
+  	: csArray<T, csArraySafeCopyElementHandler<T> > (limit, threshold)
   {
   }
 };

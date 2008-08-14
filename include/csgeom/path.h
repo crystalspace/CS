@@ -32,7 +32,6 @@
 #include "csgeom/spline.h"
 #include "csgeom/vector3.h"
 #include "csutil/scf_implementation.h"
-#include "csutil/csobject.h"
 
 #include "igeom/path.h"
 
@@ -42,7 +41,7 @@
  * This is particularly useful in combination with
  * csReversibleTransform::LookAt().
  */
-class csPath : public scfImplementationExt1<csPath, csObject, iPath>
+class csPath : public scfImplementation1<csPath, iPath>
 {
 protected:
   csCatmullRomSpline spline;
@@ -73,7 +72,8 @@ private:
 public:
 
   /// Create a path with p points.
-  csPath (int p) : scfImplementationType(this), spline (9, p) {};
+  csPath (int p) : scfImplementationType(this), spline (9, p)
+  { }
 
   /// Destroy the path.
   virtual ~csPath ()
@@ -83,12 +83,6 @@ public:
   virtual int Length ()
   {
     return spline.GetPointCount();
-  }
-
-  // Get the iObject for this path.
-  virtual iObject* QueryObject ()
-  { 
-    return this; 
   }
 
   /// Calculate internal values for this spline given some time value.

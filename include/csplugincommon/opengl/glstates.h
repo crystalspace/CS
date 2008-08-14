@@ -518,24 +518,6 @@ public:
   // Pixel storage
   GLint pixelUnpackAlignment;
   bool pixelUnpackSwapBytes;
-  
-  // Color clamp control
-  enum
-  {
-    clampVertex = 0, clampFragment = 1, clampRead = 2,
-    clampCount
-  };
-  GLenum clampState[clampCount];
-  static int GLClampTargetToCacheIndex (GLenum target)
-  {
-    switch (target)
-    {
-    case GL_CLAMP_VERTEX_COLOR_ARB:         return clampVertex;
-    case GL_CLAMP_FRAGMENT_COLOR_ARB:         return clampFragment;
-    case GL_CLAMP_READ_COLOR_ARB:         return clampRead;
-    default: return -1;      
-    }
-  }
 
   // Standardized caches
   DECLARE_CACHED_BOOL (GL_DEPTH_TEST)
@@ -629,10 +611,6 @@ public:
     parameter_tvbo.Setup (numTexCoords);
     
     memset (activeBufferID, 0, sizeof (activeBufferID));
-    
-    clampState[clampVertex] = GL_TRUE;
-    clampState[clampFragment] = GL_FIXED_ONLY_ARB;
-    clampState[clampRead] = GL_FIXED_ONLY_ARB;
   }
 
   /** 
@@ -793,29 +771,6 @@ public:
       }
     }
 
-    memset (currentBufferID, 0, sizeof (currentBufferID));
-    {
-      static const GLenum localIndexToGLBufferBinding[boCount] =
-      { GL_ELEMENT_ARRAY_BUFFER_BINDING_ARB, GL_ARRAY_BUFFER_BINDING_ARB, 
-	GL_PIXEL_PACK_BUFFER_BINDING_ARB, GL_PIXEL_UNPACK_BUFFER_BINDING_ARB };
-
-      enum { extVBO = 1, extPBO = 2 };
-      static const GLenum requiredExt[boCount] =
-      { extVBO, extVBO, extPBO, extPBO };
-      
-      int boExt = 0;
-      if (extmgr->CS_GL_ARB_vertex_buffer_object) boExt |= extVBO;
-      if (extmgr->CS_GL_ARB_pixel_buffer_object) boExt |= extPBO;
-      for (int b = 0; b < boCount; b++)
-      {
-	if (requiredExt[b] & boExt)
-	{
-	  glGetIntegerv (localIndexToGLBufferBinding[b], 
-	    (GLint*)&currentBufferID[b]);
-	}
-      }
-    }
-
     glGetIntegerv (GL_VERTEX_ARRAY_SIZE, (GLint*)&parameter_vsize);
     glGetIntegerv (GL_VERTEX_ARRAY_STRIDE, (GLint*)&parameter_vstride);
     glGetIntegerv (GL_VERTEX_ARRAY_TYPE, (GLint*)&parameter_vtype);
@@ -864,17 +819,6 @@ public:
     GLint v;
     glGetIntegerv (GL_UNPACK_SWAP_BYTES, &v);
     pixelUnpackSwapBytes = v != 0;
-    
-    if (extmgr->CS_GL_ARB_color_buffer_float)
-    {
-      GLint clampState;
-      glGetIntegerv (GL_CLAMP_VERTEX_COLOR_ARB, &clampState);
-      this->clampState[clampVertex] = (GLenum)clampState;
-      glGetIntegerv (GL_CLAMP_FRAGMENT_COLOR_ARB, &clampState);
-      this->clampState[clampFragment] = (GLenum)clampState;
-      glGetIntegerv (GL_CLAMP_READ_COLOR_ARB, &clampState);
-      this->clampState[clampRead] = (GLenum)clampState;
-    }
   }
 };
 
@@ -1150,32 +1094,11 @@ public:
   { return currentContext->pixelUnpackSwapBytes; }
   void SetPixelUnpackSwapBytes (GLint swap)
   {
-    bool swapAsbool = (swap != 0);
-    if (swapAsbool != currentContext->pixelUnpackSwapBytes)
+    if (swap != currentContext->pixelUnpackSwapBytes)
     {
       glPixelStorei (GL_UNPACK_SWAP_BYTES, (GLint)swap);
-      currentContext->pixelUnpackSwapBytes = swapAsbool;
+      currentContext->pixelUnpackSwapBytes = swap;
     }
-  }
-  /** @} */
-  
-  /**\name Clamp control
-   * @{ */
-  void SetClampColor (GLenum target, GLenum clamp)
-  {
-    int index = csGLStateCacheContext::GLClampTargetToCacheIndex (target);
-    CS_ASSERT (index >= 0);
-    if (clamp != currentContext->clampState[index])
-    {
-      extmgr->glClampColorARB (target, clamp);
-      currentContext->clampState[index] = clamp;
-    }
-  }
-  GLenum GetClampColor (GLenum target) const
-  {
-    int index = csGLStateCacheContext::GLClampTargetToCacheIndex (target);
-    CS_ASSERT (index >= 0);
-    return currentContext->clampState[index];
   }
   /** @} */
   

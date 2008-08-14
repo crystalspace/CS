@@ -28,18 +28,13 @@
 
 class csMatrix3;
 class csVector3;
+class csLight;
 class csFrustumView;
 struct csFog;
 struct iGraphics3D;
 struct iGraphics2D;
 struct iSector;
 struct iClipper2D;
-
-CS_PLUGIN_NAMESPACE_BEGIN(Engine)
-{
-  class csLight;
-}
-CS_PLUGIN_NAMESPACE_END(Engine)
 
 /**
  * This class is a csFrustum especially used for the lighting calculations.
@@ -145,8 +140,7 @@ class csShadowBlock : public scfImplementation1<csShadowBlock,
 
 private:
   csShadowBlock* next, * prev;
-  csRefArray<csShadowFrustum, CS::Container::ArrayAllocDefault,
-    csArrayCapacityFixedGrow<30> > shadows;
+  csRefArray<csShadowFrustum> shadows;
   uint32 shadow_region;
   csBox3 bbox;  // The bbox (in light space) for all shadows in this block.
   bool bbox_valid;  // If true bbox is valid.
@@ -155,7 +149,8 @@ private:
 
 public:
   /// Create a new empty list.
-  csShadowBlock (uint32 region = (uint32)~0, int max_shadows = 30);
+  csShadowBlock (uint32 region = (uint32)~0, int max_shadows = 30,
+    int delta = 30);
 
   /// Destroy the list and release all shadow references.
   virtual ~csShadowBlock ();

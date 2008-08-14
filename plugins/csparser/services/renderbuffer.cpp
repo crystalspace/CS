@@ -370,8 +370,6 @@ bool csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node, iRenderBuffer*
     return false;
   }
 
-  bool normalized = node->GetAttributeValueAsBool ("normalized", false);
-
   bool indexBuf = false;
   {
     const char* index = node->GetAttributeValue("indices");
@@ -402,8 +400,7 @@ bool csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node, iRenderBuffer*
     csDirtyAccessArray<int> buf;
     err = BufferParser<vhInt>::Parse (node, componentNum, buf);
 
-    if (buffer->GetComponentType () !=
-      (normalized ? CS_BUFCOMP_INT_NORM : CS_BUFCOMP_INT))
+    if (buffer->GetComponentType () != CS_BUFCOMP_INT)
     {
       ReportError (msgid, node, "component type %s does not match expected %s",
         componentType, "int");
@@ -428,8 +425,7 @@ bool csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node, iRenderBuffer*
     csDirtyAccessArray<uint> buf;
     err = BufferParser<vhInt>::Parse (node, componentNum, buf);
     
-    if (buffer->GetComponentType () !=
-      (normalized ? CS_BUFCOMP_UNSIGNED_INT_NORM : CS_BUFCOMP_UNSIGNED_INT))
+    if (buffer->GetComponentType () != CS_BUFCOMP_UNSIGNED_INT)
     {
       ReportError (msgid, node, "component type %s does not match expected %s",
         componentType, "uint");
@@ -453,8 +449,7 @@ bool csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node, iRenderBuffer*
     csDirtyAccessArray<char> buf;
     err = BufferParser<vhInt>::Parse (node, componentNum, buf);
     
-    if (buffer->GetComponentType () !=
-      (normalized ? CS_BUFCOMP_BYTE_NORM : CS_BUFCOMP_BYTE))
+    if (buffer->GetComponentType () != CS_BUFCOMP_BYTE)
     {
       ReportError (msgid, node, "component type %s does not match expected %s",
         componentType, "byte");
@@ -478,8 +473,7 @@ bool csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node, iRenderBuffer*
     csDirtyAccessArray<unsigned char> buf;
     err = BufferParser<vhInt>::Parse (node, componentNum, buf);
     
-    if (buffer->GetComponentType () !=
-      (normalized ? CS_BUFCOMP_UNSIGNED_BYTE_NORM : CS_BUFCOMP_UNSIGNED_BYTE))
+    if (buffer->GetComponentType () != CS_BUFCOMP_UNSIGNED_BYTE)
     {
       ReportError (msgid, node, "component type %s does not match expected %s",
         componentType, "ubyte");
@@ -503,8 +497,7 @@ bool csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node, iRenderBuffer*
     csDirtyAccessArray<short> buf;
     err = BufferParser<vhInt>::Parse (node, componentNum, buf);
     
-    if (buffer->GetComponentType () !=
-      (normalized ? CS_BUFCOMP_SHORT_NORM : CS_BUFCOMP_SHORT))
+    if (buffer->GetComponentType () != CS_BUFCOMP_SHORT)
     {
       ReportError (msgid, node, "component type %s does not match expected %s",
         componentType, "short");
@@ -528,8 +521,7 @@ bool csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node, iRenderBuffer*
     csDirtyAccessArray<unsigned short> buf;
     err = BufferParser<vhInt>::Parse (node, componentNum, buf);
     
-    if (buffer->GetComponentType () != 
-      (normalized ? CS_BUFCOMP_UNSIGNED_SHORT_NORM : CS_BUFCOMP_UNSIGNED_SHORT))
+    if (buffer->GetComponentType () != CS_BUFCOMP_UNSIGNED_SHORT)
     {
       ReportError (msgid, node, "component type %s does not match expected %s",
         componentType, "ushort");

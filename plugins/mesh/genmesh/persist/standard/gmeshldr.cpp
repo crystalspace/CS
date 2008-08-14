@@ -25,7 +25,6 @@
 #include "csgeom/vector2.h"
 #include "csgeom/vector4.h"
 #include "csgeom/sphere.h"
-#include "csgfx/renderbuffer.h"
 #include "cstool/primitives.h"
 #include "csutil/cscolor.h"
 #include "csutil/dirtyaccessarray.h"
@@ -914,37 +913,66 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     if (!gfact) return false;
     if (!meshfact) return false;
 
-    // Write render buffers
+    //Write NumVt Tag
+    csRef<iDocumentNode> numvtNode = 
+      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    numvtNode->SetValue("numvt");
+    numvtNode->CreateNodeBefore(CS_NODE_TEXT, 0)
+      ->SetValueAsInt(gfact->GetVertexCount());
+
+    //Write NumTri Tag
+    bool writeTriangles = gfact->GetSubMeshCount() == 0;
+    if (writeTriangles)
     {
-      iRenderBuffer* posBuffer = gfact->GetRenderBuffer (CS_BUFFER_POSITION);
-      if (!posBuffer) return false;
-      csRef<iDocumentNode> rbufNode = 
-        paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-      rbufNode->SetValue ("renderbuffer");
-      rbufNode->SetAttribute ("name", "position");
-      /* Disabled checking on this buffer b/c no vertex count is available
-       * when loading it */
-      rbufNode->SetAttribute ("checkelementcount", "no");
-      synldr->WriteRenderBuffer (rbufNode, posBuffer);
+      csRef<iDocumentNode> numtriNode = 
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      numtriNode->SetValue("numtri");
+      numtriNode->CreateNodeBefore(CS_NODE_TEXT, 0)
+        ->SetValueAsInt(gfact->GetTriangleCount());
     }
-    
-    int rbufCount = gfact->GetRenderBufferCount ();
-    for (int i = 0; i < rbufCount; ++i)
+
+    int i;
+    //Write Vertex Tags
+    for (i=0; i<gfact->GetVertexCount(); i++)
     {
-      csRef<iString> name = gfact->GetRenderBufferName (i);
-      csRenderBufferName bufName =
-        csRenderBuffer::GetBufferNameFromDescr (name->GetData());
-      if (bufName == CS_BUFFER_POSITION)
-        continue;
-      
-      csRef<iDocumentNode> rbufNode = 
-        paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-      rbufNode->SetValue ("renderbuffer");
-      rbufNode->SetAttribute ("name", name->GetData ());
-      csRef<iRenderBuffer> buffer = gfact->GetRenderBuffer (i);
-      synldr->WriteRenderBuffer (rbufNode, buffer);
+      csRef<iDocumentNode> triaNode = 
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      triaNode->SetValue("v");
+      csVector3 vertex = gfact->GetVertices()[i];
+      csVector2 texel = gfact->GetTexels()[i];
+      synldr->WriteVector(triaNode, vertex);
+      triaNode->SetAttributeAsFloat("u", texel.x);
+      triaNode->SetAttributeAsFloat("v", texel.y);
     }
-    
+
+    //Write Color Tags
+    if (!gfact->IsLighting())
+    {
+      for (i=0; i<gfact->GetVertexCount(); i++)
+      {
+        csRef<iDocumentNode> colorNode = 
+          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        colorNode->SetValue("color");
+        csColor4 color = gfact->GetColors()[i];
+        synldr->WriteColor(colorNode, color);
+      }
+    }
+
+    //Write Triangle Tags
+    if (writeTriangles)
+    {
+      for (i=0; i<gfact->GetTriangleCount(); i++)
+      {
+        csRef<iDocumentNode> triaNode = 
+          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        triaNode->SetValue("t");
+        csTriangle tria = gfact->GetTriangles()[i];
+        triaNode->SetAttributeAsInt("v1", tria.a);
+        triaNode->SetAttributeAsInt("v2", tria.b);
+        triaNode->SetAttributeAsInt("v3", tria.c);
+      }
+    }
+
     //Writedown DefaultColor tag
     csColor col = gfact->GetColor();
     if (col.red != 0 || col.green != 0 || col.blue != 0)
@@ -1018,19 +1046,47 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
       //Write Autonormals Tag
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("autonormals");
     }
+    else
+    {
+      //Write Normal Tags
+      for (i=0; i<gfact->GetVertexCount(); i++)
+      {
+        csRef<iDocumentNode> normalNode = 
+          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        normalNode->SetValue("n");
+        csVector3 normal = gfact->GetNormals()[i];
+        synldr->WriteVector(normalNode, normal);
+      }
+    }
 
     //TBD: Writedown box tag
 
     // Write submeshes
-    size_t smc = gfact->GetSubMeshCount();
-    for (size_t s = 0; s < smc; s++)
+    if (!writeTriangles)
     {
-      csRef<iDocumentNode> submeshNode = 
-	paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      submeshNode->SetValue("submesh");
+      size_t smc = gfact->GetSubMeshCount();
+      for (size_t s = 0; s < smc; s++)
+      {
+        csRef<iDocumentNode> submeshNode = 
+          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        submeshNode->SetValue("submesh");
 
-      iGeneralMeshSubMesh* submesh = gfact->GetSubMesh (s);
-      WriteSubMesh (submesh, submeshNode);
+        iGeneralMeshSubMesh* submesh = gfact->GetSubMesh (s);
+        WriteSubMesh (submesh, submeshNode);
+      }
+    }
+
+    // Write render buffers
+    int rbufCount = gfact->GetRenderBufferCount ();
+    for (i = 0; i < rbufCount; ++i)
+    {
+      csRef<iDocumentNode> rbufNode = 
+        paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+      rbufNode->SetValue ("renderbuffer");
+      csRef<iString> name = gfact->GetRenderBufferName (i);
+      rbufNode->SetAttribute ("name", name->GetData ());
+      csRef<iRenderBuffer> buffer = gfact->GetRenderBuffer (i);
+      synldr->WriteRenderBuffer (rbufNode, buffer);
     }
   }
   return true;

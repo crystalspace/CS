@@ -24,7 +24,6 @@
 #include "ivideo/graph3d.h"
 #include "csgfx/renderbuffer.h"
 
-#include "camera.h"
 #include "material.h"
 #include "impmesh.h"
 #include "sector.h"
@@ -223,7 +222,7 @@ csRenderMesh** csImposterMesh::GetRenderMesh(iRenderView *rview)
   {
     //Initialize mesh
     mesh->meshtype = CS_MESHTYPE_TRIANGLES;
-//    mesh->flipCulling = false;
+    mesh->flipCulling = false;
     mesh->do_mirror = rview->GetCamera ()->IsMirrored ();
     mesh->object2world = csReversibleTransform ();
     mesh->worldspace_origin = csVector3 (0,0,0);

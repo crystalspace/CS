@@ -21,7 +21,6 @@
 
 #include "csutil/scf.h"
 #include "iutil/strset.h"
-#include "ivideo/shader/shader.h"
 
 /**\file
  * Material interfaces
@@ -110,7 +109,7 @@ struct iMaterialEngine : public virtual iBase
   /**
    * Get a texture by name.
    */
-  virtual iTextureWrapper* GetTextureWrapper (CS::ShaderVarStringID name) = 0;
+    virtual iTextureWrapper* GetTextureWrapper (csStringID name) = 0;
 
   /**
    * Visit all textures.

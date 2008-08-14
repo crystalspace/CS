@@ -120,6 +120,8 @@ class iLoader(core.iBase):
     def LoadLibraryFile(*args): return _imap.iLoader_LoadLibraryFile(*args)
     def LoadLibrary(*args): return _imap.iLoader_LoadLibrary(*args)
     def Load(*args): return _imap.iLoader_Load(*args)
+    def SetAutoRegions(*args): return _imap.iLoader_SetAutoRegions(*args)
+    def GetAutoRegions(*args): return _imap.iLoader_GetAutoRegions(*args)
     scfGetVersion = staticmethod(_imap.iLoader_scfGetVersion)
     __swig_destroy__ = _imap.delete_iLoader
     __del__ = lambda self : None;
@@ -156,9 +158,9 @@ class iSaver(core.iBase):
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SaveMapFile(*args): return _imap.iSaver_SaveMapFile(*args)
-    def SaveAllCollections(*args): return _imap.iSaver_SaveAllCollections(*args)
-    def SaveCollectionFile(*args): return _imap.iSaver_SaveCollectionFile(*args)
-    def SaveCollection(*args): return _imap.iSaver_SaveCollection(*args)
+    def SaveAllRegions(*args): return _imap.iSaver_SaveAllRegions(*args)
+    def SaveRegionFile(*args): return _imap.iSaver_SaveRegionFile(*args)
+    def SaveRegion(*args): return _imap.iSaver_SaveRegion(*args)
     def SavePortal(*args): return _imap.iSaver_SavePortal(*args)
     __swig_destroy__ = _imap.delete_iSaver
     __del__ = lambda self : None;

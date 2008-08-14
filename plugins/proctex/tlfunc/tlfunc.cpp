@@ -182,29 +182,26 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
 
     if (exprNode)
     {
-      csRef<iShaderVarStringSet> strings =
-        csQueryRegistryTagInterface<iShaderVarStringSet> (
-	 object_reg, "crystalspace.shader.variablenameset");
+      csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+	object_reg, "crystalspace.shared.stringset");
 
       csShaderExpression expr (object_reg);
       
       csRef<iShaderVariableContext> context;
-      context.AttachNew (new csShaderVariableContext);
+      context.AttachNew (new csShaderVariableContext ());
       csRef<csShaderVariable> currentPos;
       currentPos.AttachNew (new csShaderVariable (
 	    strings->Request ("position")));
       context->AddVariable (currentPos);
-
+      
+      csRef<iShaderVarStack> stacks;
+      stacks.AttachNew (new scfArray<iShaderVarStack>);
+      context->PushVariables (stacks);
 
       if (expr.Parse (exprNode))
       {
-        csShaderVariableStack stack;
-        stack.Setup (strings->GetSize ());
-        
-        context->PushVariables (stack);
-
 	csRef<csShaderVariable> result;
-	result.AttachNew (new csShaderVariable (CS::InvalidShaderVarStringID));
+	result.AttachNew (new csShaderVariable (csInvalidStringID));
 	result->SetType (csShaderVariable::VECTOR4);
 	for (int y = 0; y < h; y++)
 	{
@@ -213,7 +210,7 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
 	  for (int x = 0; x < w; x++)
 	  {
 	    currentPos->SetValue (csVector2 ((float)x / (float)w, fY));
-	    if (expr.Evaluate (result, stack))
+	    if (expr.Evaluate (result, stacks))
 	    {
 	      csVector4 v;
 	      result->GetValue (v);

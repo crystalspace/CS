@@ -168,6 +168,10 @@ protected:
   int width;
   /// pseudo height of display.
   int height;
+  /// Perspective center X.
+  int persp_center_x;
+  /// Perspective center X.
+  int persp_center_y;
   /// The pixel format of display
   csPixelFormat pfmt;
   bool pixelBGR;
@@ -195,21 +199,10 @@ protected:
   csRef<iRenderBuffer> scrapColors;
   csShaderVariableContext scrapContext;
 
-  struct OldPersp
-  {
-    /// Perspective center X.
-    int persp_center_x;
-    /// Perspective center X.
-    int persp_center_y;
-    /// Current aspect ratio for perspective correction.
-    float aspect;
-    /// Current inverse aspect ratio for perspective correction.
-    float inv_aspect;
-  };
-  OldPersp oldPersp;
-  
-  CS::Math::Matrix4 projectionMatrix;
-  bool explicitProjection, needMatrixUpdate;
+  /// Current aspect ratio for perspective correction.
+  float aspect;
+  /// Current inverse aspect ratio for perspective correction.
+  float inv_aspect;
 
   /// Mipmap selection coefficient (normal == 1.0)
   float mipmap_coef;
@@ -220,9 +213,9 @@ protected:
   /// DrawFlags on last BeginDraw ()
   int DrawMode;
 
-  csRef<iShaderVarStringSet> strings;
-  CS::ShaderVarStringID string_world2camera;
-  CS::ShaderVarStringID string_indices;
+  csRef<iStringSet> strings;
+  csStringID string_world2camera;
+  csStringID string_indices;
 
   csRef<iShaderManager> shadermgr;
 
@@ -282,8 +275,7 @@ protected:
   void SetupSpecifica();
   void FlushSmallBufferToScreen();
   void SetupClipper();
-  void ComputeProjectionMatrix();
-  public:
+public:
   /// Report
   void Report (int severity, const char* msg, ...);
 
@@ -325,7 +317,7 @@ protected:
    */
   virtual bool Initialize (iObjectRegistry*);
 
-  iShaderVarStringSet* GetStrings () const { return strings; }
+  iStringSet* GetStrings () const { return strings; }
 
   /**
    * Open or close our interface.
@@ -390,37 +382,26 @@ protected:
   /// Set center of projection.
   virtual void SetPerspectiveCenter (int x, int y)
   {
-    oldPersp.persp_center_x = x;
-    oldPersp.persp_center_y = y;
+    persp_center_x = x;
+    persp_center_y = y;
   }
   /// Get center of projection.
   virtual void GetPerspectiveCenter (int& x, int& y) const
   {
-    x = oldPersp.persp_center_x;
-    y = oldPersp.persp_center_y;
+    x = persp_center_x;
+    y = persp_center_y;
   }
   /// Set perspective aspect.
   virtual void SetPerspectiveAspect (float aspect)
   {
-    oldPersp.aspect = aspect;
-    oldPersp.inv_aspect = 1./aspect;
+    this->aspect = aspect;
+    inv_aspect = 1./aspect;
   }
   /// Get perspective aspect.
   virtual float GetPerspectiveAspect () const
   {
-    return oldPersp.aspect;
+    return aspect;
   }
-  const CS::Math::Matrix4& GetProjectionMatrix()
-  {
-    if (!explicitProjection && needMatrixUpdate) ComputeProjectionMatrix();
-    return projectionMatrix;
-  }
-  void SetProjectionMatrix (const CS::Math::Matrix4& m)
-  {
-    projectionMatrix = m;
-    explicitProjection = true;
-  }
-  
   virtual void SetWorldToCamera (const csReversibleTransform& w2c)
   {
     this->w2c = w2c;
@@ -582,30 +563,17 @@ protected:
   virtual void SetTextureState (int* units, iTextureHandle** textures,
   	int count)
   {
-    if (!textures)
+    int i;
+    for (i = 0 ; i < count ; i++)
     {
-      for (int i = 0 ; i < count ; i++)
-      {
-	int unit = units[i];
-	DeactivateTexture (unit);
-      }
-    }
-    else
-    {
-      for (int i = 0 ; i < count ; i++)
-      {
-	int unit = units[i];
-	iTextureHandle* txt = textures[i];
-	if (txt)
-	  ActivateTexture (txt, unit);
-	else
-	  DeactivateTexture (unit);
-      }
+      int unit = units[i];
+      iTextureHandle* txt = textures[i];
+      if (txt)
+        ActivateTexture (txt, unit);
+      else
+        DeactivateTexture (unit);
     }
   }
-  
-  void SetTextureComparisonModes (int*, CS::Graphics::TextureComparisonMode*,
-    int) {}
 
   /// Deactivate a texture
   void DeactivateTexture (int unit = 0)
@@ -663,7 +631,7 @@ protected:
   /// Drawroutine. Only way to draw stuff
   virtual void DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,
-    const csShaderVariableStack& stack);
+    const iShaderVarStack* stacks);
   void DrawSimpleMesh (const csSimpleRenderMesh &mesh, uint flags = 0);
 
   bool PerformExtension (char const* /*command*/, ...) { return false; }

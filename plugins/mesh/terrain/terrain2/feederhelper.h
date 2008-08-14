@@ -63,9 +63,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
     csRef<iVFS> vfs;
     iObjectRegistry* objReg;
   };
-
-  void SmoothHeightmap (float* heightBuffer, size_t width, size_t height, 
-    size_t pitch);
   
 }
 CS_PLUGIN_NAMESPACE_END(Terrain2)

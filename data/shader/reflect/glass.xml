@@ -57,8 +57,8 @@
       <connection from="lighting" to="mod_light_surf" />
       <connection from="mod_light_surf" to="lerp" /-->
 	    
-      <connection from="normalmap" to="refraction" />
       <connection from="normalmap" to="reflection" />
+      <connection from="normalmap" to="refraction" />
       <connection from="normalmap" to="fresnel" />
       <connection from="refraction" to="refraction_cubemap" />
       <connection from="refraction_cubemap" to="lerp_reflect_refract" />

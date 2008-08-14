@@ -31,7 +31,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   
     virtual bool HasNext() = 0;
     virtual T& Next() = 0;
-    virtual size_t GetTotal() const = 0;
   };
   
   template<typename T, class ArrayType>
@@ -46,24 +45,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     { return pos < array.GetSize(); }
     virtual T& Next()
     { return array[pos++]; }
-    virtual size_t GetTotal() const
-    { return array.GetSize(); }
-  };
-  
-  template<typename T, class ArrayType>
-  class BasicIteratorImplNonConst : public BasicIterator<T>
-  {
-    ArrayType& array;
-    size_t pos;
-  public:
-    BasicIteratorImplNonConst (ArrayType& array) : array (array), pos (0) {}
-  
-    virtual bool HasNext()
-    { return pos < array.GetSize(); }
-    virtual T& Next()
-    { return array[pos++]; }
-    virtual size_t GetTotal() const
-    { return array.GetSize(); }
   };
 }
 CS_PLUGIN_NAMESPACE_END(ShaderWeaver)

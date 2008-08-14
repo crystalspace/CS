@@ -63,7 +63,7 @@ csGLBasicTextureHandle::csGLBasicTextureHandle (int width,
       (G3D->ext->CS_GL_ARB_texture_rectangle
       || G3D->ext->CS_GL_EXT_texture_rectangle
       || G3D->ext->CS_GL_NV_texture_rectangle
-      || txtmgr->tweaks.enableNonPowerOfTwo2DTextures
+      || txtmgr->enableNonPowerOfTwo2DTextures
       || G3D->ext->CS_GL_ARB_texture_non_power_of_two)
       // Certain additional texture flags, unless we have ARB_tnpot
       && (((flags & npotsNeededFlags) == npotsNeededFlags) 
@@ -75,7 +75,7 @@ csGLBasicTextureHandle::csGLBasicTextureHandle (int width,
     {
       flags &= ~CS_TEXTURE_NPOTS;
     }
-    else if (!txtmgr->tweaks.enableNonPowerOfTwo2DTextures
+    else if (!txtmgr->enableNonPowerOfTwo2DTextures
       && !G3D->ext->CS_GL_ARB_texture_non_power_of_two)
       /* Note that 'enableNonPowerOfTwo2DTextures' is the flag for ATI's
        * support of non-POT _2D_ textures; that is, the textures, being
@@ -114,10 +114,6 @@ csGLBasicTextureHandle::~csGLBasicTextureHandle()
   Clear ();
   txtmgr->MarkTexturesDirty ();
   if (pbo != 0) txtmgr->G3D->ext->glDeleteBuffersARB (1, &pbo);
-  if (IsInFBO() && (G3D->GetR2TBackend() != 0))
-  {
-    G3D->GetR2TBackend()->CleanupFBOs();
-  }
 }
 
 bool csGLBasicTextureHandle::SynthesizeUploadData (
@@ -382,23 +378,12 @@ void csGLBasicTextureHandle::SetupAutoMipping()
   // Set up mipmap generation
   if ((!(texFlags.Get() & CS_TEXTURE_NOMIPMAPS))
     && (!G3D->ext->CS_GL_EXT_framebuffer_object 
-      || txtmgr->tweaks.disableGenerateMipmap))
+      || txtmgr->disableGenerateMipmap))
   {
-    GLenum textarget = GetGLTextureTarget();
     if (G3D->ext->CS_GL_SGIS_generate_mipmap)
-    {
-      glTexParameteri (textarget, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
-      if (G3D->ext->CS_GL_SGIS_texture_lod
-          && txtmgr->tweaks.generateMipMapsExcessOne)
-      {
-        texFlags.SetBool (flagExcessMaxMip, true);
-	GLint maxLevel;
-	glGetTexParameteriv (textarget, GL_TEXTURE_MAX_LEVEL_SGIS, &maxLevel);
-	glTexParameteri (textarget, GL_TEXTURE_MAX_LEVEL_SGIS, maxLevel+1);
-      }
-    }
+      glTexParameteri (GetGLTextureTarget(), GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
     else
-      glTexParameteri (textarget, GL_TEXTURE_MIN_FILTER,
+      glTexParameteri  (GetGLTextureTarget(), GL_TEXTURE_MIN_FILTER,
 	txtmgr->rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
   }
 }
@@ -407,7 +392,7 @@ void csGLBasicTextureHandle::RegenerateMipmaps()
 {
   if ((!(texFlags.Get() & CS_TEXTURE_NOMIPMAPS))
     && G3D->ext->CS_GL_EXT_framebuffer_object
-    && !txtmgr->tweaks.disableGenerateMipmap)
+    && !txtmgr->disableGenerateMipmap)
   {
     G3D->ActivateTexture (this);
     G3D->ext->glGenerateMipmapEXT (GetGLTextureTarget());
@@ -650,47 +635,6 @@ GLuint csGLBasicTextureHandle::GetHandle ()
   Precache ();
   return Handle;
 }
-  
-void csGLBasicTextureHandle::ChangeTextureCompareMode (
-  const CS::Graphics::TextureComparisonMode& mode)
-{
-  if (!G3D->ext->CS_GL_ARB_shadow) return;
-
-  GLenum textarget = GetGLTextureTarget();
-  csGLGraphics3D::statecache->SetTexture (textarget, GetHandle ());
-  
-  if (mode.mode != texCompare.mode)
-  {
-    GLint compareMode = GL_NONE;
-    switch (mode.mode)
-    {
-      case CS::Graphics::TextureComparisonMode::compareNone:
-	//compareMode = GL_NONE;
-	break;
-      case CS::Graphics::TextureComparisonMode::compareR:
-	compareMode = GL_COMPARE_R_TO_TEXTURE;
-	break;
-    }
-    glTexParameteri (textarget, GL_TEXTURE_COMPARE_MODE, compareMode);
-    texCompare.mode = mode.mode;
-  }
-  if (mode.mode
-    && (mode.function != texCompare.function))
-  {
-    GLint compareFunc = GL_LEQUAL;
-    switch (mode.function)
-    {
-      case CS::Graphics::TextureComparisonMode::funcLEqual:
-	//compareFunc = GL_LEQUAL;
-	break;
-      case CS::Graphics::TextureComparisonMode::funcGEqual:
-	compareFunc = GL_GEQUAL;
-	break;
-    }
-    glTexParameteri (textarget, GL_TEXTURE_COMPARE_FUNC, compareFunc);
-    texCompare.function = mode.function;
-  }
-}
 
 GLenum csGLBasicTextureHandle::GetGLTextureTarget() const
 {
@@ -775,7 +719,6 @@ void csGLBasicTextureHandle::ApplyBlitBuffer (uint8* buf)
   {
     ApplyBlitBufferGeneric (buf);
   }
-  RegenerateMipmaps();
 }
 
 iTextureHandle::BlitBufferNature csGLBasicTextureHandle::GetBufferNature (uint8* buf)
@@ -897,77 +840,6 @@ void csGLBasicTextureHandle::ApplyBlitBufferPBO (uint8* buf)
     csGLGraphics3D::statecache->SetBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, 0, true);
   }
 }
-  
-void csGLBasicTextureHandle::SetMipmapLimits (int maxMip, int minMip)
-{
-  if (G3D->ext->CS_GL_SGIS_texture_lod)
-  {
-    GLenum textarget = GetGLTextureTarget();
-    csGLGraphics3D::statecache->SetTexture (textarget, GetHandle ());
-    if (texFlags.Check (flagExcessMaxMip))
-      maxMip++;
-    glTexParameteri (textarget, GL_TEXTURE_BASE_LEVEL_SGIS, minMip);
-    glTexParameteri (textarget, GL_TEXTURE_MAX_LEVEL_SGIS, maxMip);
-  }
-}
-
-void csGLBasicTextureHandle::GetMipmapLimits (int& maxMip, int& minMip)
-{
-  if (G3D->ext->CS_GL_SGIS_texture_lod)
-  {
-    GLenum textarget = GetGLTextureTarget();
-    csGLGraphics3D::statecache->SetTexture (textarget, GetHandle ());
-    GLint baseLevel, maxLevel;
-    glGetTexParameteriv (textarget, GL_TEXTURE_BASE_LEVEL_SGIS, &baseLevel);
-    glGetTexParameteriv (textarget, GL_TEXTURE_MAX_LEVEL_SGIS, &maxLevel);
-    minMip = baseLevel;
-    maxMip = maxLevel;
-    if (texFlags.Check (flagExcessMaxMip))
-      maxMip--;
-  }
-  else
-  {
-    maxMip = 1000;
-    minMip = 0;
-  }
-}
-  
-#include "csutil/custom_new_disable.h"
-
-csPtr<iDataBuffer> csGLBasicTextureHandle::Readback (
-  const CS::StructuredTextureFormat& format, int mip)
-{
-  if (format.GetFormat() == CS::StructuredTextureFormat::Special)
-    return 0;
-  
-  if ((mip > 0) && (texFlags.Get() & CS_TEXTURE_NOMIPMAPS)) return 0;
-
-  TextureStorageFormat glFormat;
-  TextureSourceFormat sourceFormat;
-  if (!txtmgr->DetermineGLFormat (format, glFormat, sourceFormat))
-    return 0;
-
-  int s = 0;
-  for (int i = 0; i < format.GetComponentCount(); i++)
-    s += format.GetComponentSize (i);
-  
-  int w = csMax (actual_width >> mip, 1);
-  int h = csMax (actual_height >> mip, 1);
-  int d = csMax (actual_d >> mip, 1);
-  size_t byteSize = w * h * d * ((s+7)/8);
-  void* data = cs_malloc (byteSize);
-
-  GLenum textarget = GetGLTextureTarget();
-  csGLGraphics3D::statecache->SetTexture (textarget, GetHandle ());
-  glGetTexImage (textarget, mip, sourceFormat.format, sourceFormat.type, data);
-  
-  csRef<iDataBuffer> db;
-  db.AttachNew (new (txtmgr->simpleTextureReadbacks) TextureReadbackSimple (
-    data, byteSize));
-  return csPtr<iDataBuffer> (db);
-}
-
-#include "csutil/custom_new_enable.h"
 
 csPtr<iImage> csGLBasicTextureHandle::Dump ()
 {
@@ -979,25 +851,25 @@ csPtr<iImage> csGLBasicTextureHandle::Dump ()
   csGLGraphics3D::statecache->SetTexture (textarget, GetHandle ());
   if (textarget == GL_TEXTURE_3D) return 0; // @@@ Not supported yet
 
-  GLenum useTarget = (textarget == GL_TEXTURE_CUBE_MAP) 
-      ? GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB : textarget;
-  glGetTexLevelParameteriv (useTarget, 0, GL_TEXTURE_WIDTH, &tw);
-  glGetTexLevelParameteriv (useTarget, 0, GL_TEXTURE_HEIGHT, &th);
+  glGetTexLevelParameteriv (textarget, 0, GL_TEXTURE_WIDTH, &tw);
+  glGetTexLevelParameteriv (textarget, 0, GL_TEXTURE_HEIGHT, &th);
 
   GLint depthSize;
-  glGetTexLevelParameteriv (useTarget, 0, GL_TEXTURE_DEPTH_SIZE, &depthSize);
+  glGetTexLevelParameteriv ((textarget == GL_TEXTURE_CUBE_MAP) 
+      ? GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB : textarget, 
+      0, GL_TEXTURE_DEPTH_SIZE, &depthSize);
   
   uint8* data = new uint8[tw * th * 4];
   
   if (depthSize > 0)
   {
     // Depth texture
-    glGetTexImage (useTarget, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, data);
+    glGetTexImage (textarget, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, data);
   }
   else
   {
     // Color texture
-    glGetTexImage (useTarget, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glGetTexImage (textarget, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
   }
   csImageMemory* lmimg = 
       new csImageMemory (tw, th,

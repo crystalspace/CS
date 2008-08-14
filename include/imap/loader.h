@@ -27,6 +27,7 @@
  * @{ */
 #include "csutil/scf_interface.h"
 
+#include "iengine/region.h"
 #include "igraphic/image.h"
 #include "ivideo/txtmgr.h"
 #include "imap/streamsource.h"
@@ -149,7 +150,7 @@ struct csLoadResult
 */
 struct iLoader : public virtual iBase
 {
-  SCF_INTERFACE (iLoader, 5, 0, 0);
+  SCF_INTERFACE (iLoader, 4, 0, 0);
 
   /////////////////////////// Generic ///////////////////////////
 
@@ -303,6 +304,21 @@ struct iLoader : public virtual iBase
     const char *FileName, int Flags = CS_TEXTURE_3D, iTextureManager *tm = 0,
     bool reg = true, bool create_material = true, bool free_image = true,
     iCollection* Collection = 0, uint keepFlags = KEEP_ALL) = 0;
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual iTextureWrapper* LoadTexture (const char *Name,
+    const char *FileName, int Flags, iTextureManager *tm,
+    bool reg, bool create_material, bool free_image,
+    iRegion* region) = 0;
+  /* Hack to ensure source compatibility when a 0 collection/region is used.
+   * Remove with region variant. */
+  CS_FORCEINLINE iTextureWrapper* LoadTexture (const char *Name,
+    const char *FileName, int Flags, iTextureManager *tm,
+    bool reg, bool create_material, bool free_image,
+    int dummy)
+  { 
+    return LoadTexture (Name, FileName, Flags, tm, reg, create_material,
+      free_image, (iCollection*)0); 
+  }
   //@}
 
   //@}
@@ -347,6 +363,21 @@ struct iLoader : public virtual iBase
     iCollection* collection = 0, bool curRegOnly = true,
     bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual bool LoadMapFile (const char* filename, bool clearEngine,
+    iRegion* region, bool curRegOnly = true,
+    bool checkDupes = false, iStreamSource* ssource = 0,
+    iMissingLoaderData* missingdata = 0) = 0;
+  /* Hack to ensure source compatibility when a 0 collection/region is used.
+   * Remove with region variant. */
+  CS_FORCEINLINE bool LoadMapFile (const char* filename, bool clearEngine,
+    int dummy, bool curRegOnly = true,
+    bool checkDupes = false, iStreamSource* ssource = 0,
+    iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL)
+  { 
+    return LoadMapFile (filename, clearEngine, (iCollection*)0, curRegOnly,
+			checkDupes, ssource, missingdata, keepFlags); 
+  }
   //@}
   
   //@{
@@ -390,6 +421,21 @@ struct iLoader : public virtual iBase
     iCollection* collection = 0, bool curRegOnly = true,
     bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual bool LoadMap (iDocumentNode* world_node, bool clearEngine,
+    iRegion* region, bool curRegOnly = true,
+    bool checkDupes = false, iStreamSource* ssource = 0,
+    iMissingLoaderData* missingdata = 0) = 0;
+  /* Hack to ensure source compatibility when a 0 collection/region is used.
+   * Remove with region variant. */
+  CS_FORCEINLINE bool LoadMap (iDocumentNode* world_node, bool clearEngine,
+    int dummy, bool curRegOnly = true,
+    bool checkDupes = false, iStreamSource* ssource = 0,
+    iMissingLoaderData* missingdata = 0)
+  { 
+    return LoadMap (world_node, clearEngine, (iCollection*)0, curRegOnly,
+		    checkDupes, ssource, missingdata);
+  }
   //@}
 
   //@{
@@ -418,6 +464,19 @@ struct iLoader : public virtual iBase
   virtual bool LoadLibraryFile (const char* filename, iCollection* collection = 0,
     bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual bool LoadLibraryFile (const char* filename, iRegion* region,
+    bool searchregionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    iMissingLoaderData* missingdata = 0) = 0;
+  /* Hack to ensure source compatibility when a 0 collection/region is used.
+   * Remove with region variant. */
+  CS_FORCEINLINE bool LoadLibraryFile (const char* filename, int dummy,
+    bool searchregionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    iMissingLoaderData* missingdata = 0)
+  { 
+    return LoadLibraryFile (filename, (iCollection*)0, searchregionOnly, 
+			    checkDupes, ssource, missingdata);
+  }
   //@}
 
   //@{
@@ -446,6 +505,19 @@ struct iLoader : public virtual iBase
   virtual bool LoadLibrary (iDocumentNode* lib_node, iCollection* collection = 0,
     bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL) = 0;
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual bool LoadLibrary (iDocumentNode* lib_node, iRegion* region,
+    bool searchRegionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    iMissingLoaderData* missingdata = 0) = 0;
+  /* Hack to ensure source compatibility when a 0 collection/region is used.
+   * Remove with region variant. */
+  CS_FORCEINLINE bool LoadLibrary (iDocumentNode* lib_node, int dummy,
+    bool searchRegionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    iMissingLoaderData* missingdata = 0)
+  { 
+    return LoadLibrary (lib_node, (iCollection*)0, searchRegionOnly, 
+			checkDupes, ssource, missingdata); 
+  }
   //@)
 
   //@{
@@ -499,6 +571,19 @@ struct iLoader : public virtual iBase
     bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
     uint keepFlags = KEEP_ALL) = 0;
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual csLoadResult Load (const char* fname, iRegion* region,
+    bool searchRegionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0) = 0;
+  /* Hack to ensure source compatibility when a 0 collection/region is used.
+   * Remove with region variant. */
+  CS_FORCEINLINE csLoadResult Load (const char* fname, int dummy,
+    bool searchRegionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0)
+  { 
+    return Load (fname, (iCollection*)0, searchRegionOnly, checkDupes, ssource,
+		 override_name, missingdata);
+  }
   //@}
 
   //@{
@@ -552,6 +637,19 @@ struct iLoader : public virtual iBase
     bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
     uint keepFlags = KEEP_ALL) = 0;
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual csLoadResult Load (iDataBuffer* buffer, iRegion* region,
+    bool searchRegionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0) = 0;
+  /* Hack to ensure source compatibility when a 0 collection/region is used.
+   * Remove with region variant. */
+  CS_FORCEINLINE csLoadResult Load (iDataBuffer* buffer, int dummy,
+    bool searchRegionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0)
+  { 
+    return Load (buffer, (iCollection*)0, searchRegionOnly, checkDupes,
+		 ssource, override_name, missingdata); 
+  }
   //@}
 
   //@{
@@ -604,7 +702,64 @@ struct iLoader : public virtual iBase
     bool searchCollectionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
     const char* override_name = 0, iMissingLoaderData* missingdata = 0,
     uint keepFlags = KEEP_ALL) = 0;
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+  virtual csLoadResult Load (iDocumentNode* node, iRegion* region,
+    bool searchRegionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0) = 0;
+  /* Hack to ensure source compatibility when a 0 collection/region is used.
+   * Remove with region variant. */
+  CS_FORCEINLINE csLoadResult Load (iDocumentNode* node, int dummy,
+    bool searchRegionOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0)
+  { 
+    return Load (node, (iCollection*)0, searchRegionOnly, checkDupes, ssource,
+		 override_name, missingdata);
+  }
   //@}
+
+  /**
+  * Load a file.
+  * \deprecated Deprecated in 1.3. Use the iLoader::Load() that returns
+  * a csLoadResult object instead.
+  */
+  CS_DEPRECATED_METHOD_MSG("Use iLoader::Load() returning csLoadResult instead")
+    virtual bool Load (const char* fname, iBase*& result, iRegion* region = 0,
+    bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0) = 0;
+
+  /**
+  * Load a file.
+  * \deprecated Deprecated in 1.3. Use the iLoader::Load() that returns
+  * a csLoadResult object instead.
+  */
+  CS_DEPRECATED_METHOD_MSG("Use iLoader::Load() returning csLoadResult instead")
+    virtual bool Load (iDataBuffer* buffer, iBase*& result, iRegion* region = 0,
+    bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0) = 0;
+
+  /**
+  * Load a node.
+  * \deprecated Deprecated in 1.3. Use the iLoader::Load() that returns
+  * a csLoadResult object instead.
+  */
+  CS_DEPRECATED_METHOD_MSG("Use iLoader::Load() returning csLoadResult instead")
+    virtual bool Load (iDocumentNode* node, iBase*& result, iRegion* region = 0,
+    bool curRegOnly = true, bool checkDupes = false, iStreamSource* ssource = 0,
+    const char* override_name = 0, iMissingLoaderData* missingdata = 0) = 0;
+
+  /**
+  * Set whether to load each file into a separate region.
+  * \deprecated Deprecated in 1.3. Use the iCollections instead.
+  */
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+    virtual void SetAutoRegions (bool autoRegions) = 0;
+
+  /**
+  * Get whether to load each file into a separate region.
+  * \deprecated Deprecated in 1.3. Use the iCollections instead.
+  */
+  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
+    virtual bool GetAutoRegions () = 0;
 };
 
 /** @} */

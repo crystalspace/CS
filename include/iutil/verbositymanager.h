@@ -46,13 +46,13 @@
  */
 struct iVerbosityManager : public virtual iBase
 {
-  SCF_INTERFACE(iVerbosityManager, 3,0,0);
+  SCF_INTERFACE(iVerbosityManager, 2,1,0);
   /**
    * Parse additional verbosity flags.
    * \remarks See csVerbosityParser::Parse() for detailed information
    *   regarding the interpretation of \a flags.
    */
-  virtual void Parse(char const* flags) = 0;
+  void Parse(char const* flags);
 
   /**
    * Check if verbosity should be enabled for a particular flag.

@@ -473,11 +473,12 @@ public:
     { }
     virtual bool HandleEvent (iEvent& e) 
     { return parent ? parent->HandleEvent(e) : false; }
-    CS_EVENTHANDLER_PHASE_2D("crystalspace.utilities.sequence.engine")
+    CS_EVENTHANDLER_NAMES("crystalspace.utilities.sequence.engine")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   };
   csRef<EventHandler> eventHandler;
 
-  csEventID Frame;
+  csEventID PostProcess;
   csEventID MouseEvent;
 };
 

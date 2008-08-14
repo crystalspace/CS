@@ -28,9 +28,7 @@
 
 #include "csutil/ref.h"
 #include "csutil/scf_implementation.h"
-#include "csutil/set.h"
 #include "igeom/clip2d.h"
-#include "iengine/mesh.h"
 #include "ivaria/view.h"
 
 class csBox2;
@@ -67,7 +65,6 @@ private:
   /// State of the automatic resizing
   bool AutoResize;
 
-  CS::Utility::MeshFilter meshFilter;
 public:
   /// Constructor.
   csView (iEngine *iEngine, iGraphics3D* ig3d);
@@ -83,11 +80,6 @@ public:
   virtual iCamera* GetCamera ();
   /// Set current camera.
   virtual void SetCamera (iCamera* c);
-
-    /// Get current perspective camera.
-  virtual iPerspectiveCamera* GetPerspectiveCamera ();
-  /// Set current perspective camera.
-  virtual void SetPerspectiveCamera (iPerspectiveCamera* c);
 
   /// Get Context
   virtual iGraphics3D* GetContext ();
@@ -112,12 +104,6 @@ public:
   virtual iClipper2D* GetClipper ();
   /// Draw 3D world as seen from the camera.
   virtual void Draw (iMeshWrapper* mesh = 0);
-
-
-  virtual CS::Utility::MeshFilter& GetMeshFilter ()
-  {
-    return meshFilter;
-  }
 };
 
 #endif // __CS_CSVIEW_H__

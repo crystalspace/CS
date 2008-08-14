@@ -87,14 +87,7 @@ csPtr<iBase> csTerrain2FactoryLoader::Parse (iDocumentNode* node,
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
 
-  //DefaultCellValues defaults;
-  csRef<iTerrainFactoryCell> defaultCell (factory->GetDefaultCell());
-  defaultCell->SetSize (csVector3 (128.0f, 32.0f, 128.0f));
-  defaultCell->SetGridWidth (128);
-  defaultCell->SetGridHeight (128);
-  defaultCell->SetMaterialMapWidth (128);
-  defaultCell->SetMaterialMapHeight (128);
-  defaultCell->SetMaterialPersistent (false);
+  DefaultCellValues defaults;
 
   while (it->HasNext ())
   {
@@ -170,14 +163,14 @@ csPtr<iBase> csTerrain2FactoryLoader::Parse (iDocumentNode* node,
           {
           case XMLTOKEN_CELLDEFAULT:
             {
-              if (!ParseCell (child2, ldr_context, factory, defaultCell))
+              if (!ParseDefaultCell (child2, ldr_context, defaults))
                 return 0;
 
               break;
             }
           case XMLTOKEN_CELL:
             {
-              if (!ParseCell (child2, ldr_context, factory))
+              if (!ParseCell (child2, ldr_context, factory, defaults))
                 return 0;
 
               break;
@@ -221,8 +214,7 @@ csPtr<iBase> csTerrain2FactoryLoader::Parse (iDocumentNode* node,
   return csPtr<iBase> (meshFactory);
 }
 
-template<typename IProp>
-bool csTerrain2FactoryLoader::ParseParams (IProp* props, 
+bool csTerrain2FactoryLoader::ParseParams (csArray<ParamPair>& pairs, 
                                            iDocumentNode* node)
 {
   csRef<iDocumentNodeIterator> it2 = node->GetNodes ();
@@ -241,9 +233,11 @@ bool csTerrain2FactoryLoader::ParseParams (IProp* props,
     {
     case XMLTOKEN_PARAM:
       {
-        const char* name = child2->GetAttributeValue ("name");
-        const char* value = child2->GetContentsValue ();
-	props->SetParameter (name, value ? value : "");
+        ParamPair p;
+        p.name = child2->GetAttributeValue ("name");
+        p.value = child2->GetContentsValue ();
+
+        pairs.Push (p);
         break;
       }
     default:
@@ -257,8 +251,9 @@ bool csTerrain2FactoryLoader::ParseParams (IProp* props,
   return true;
 }
 
-bool csTerrain2FactoryLoader::ParseRenderParams (iTerrainCellRenderProperties* props,
-						 iLoaderContext* ldr_context,
+bool csTerrain2FactoryLoader::ParseRenderParams (csArray<ParamPair>& pairs, 
+                                                 csRefArray<csShaderVariable>& svs,
+                                                 iLoaderContext* ldr_context,
                                                  iDocumentNode* node)
 {
   csRef<iDocumentNodeIterator> it2 = node->GetNodes ();
@@ -275,19 +270,21 @@ bool csTerrain2FactoryLoader::ParseRenderParams (iTerrainCellRenderProperties* p
 
     switch (id)
     {
+    case XMLTOKEN_PARAM:
+      {
+        ParamPair p;
+        p.name = child2->GetAttributeValue ("name");
+        p.value = child2->GetContentsValue ();
+
+        pairs.Push (p);
+        break;
+      }
     case XMLTOKEN_SHADERVAR:
       {
         csRef<csShaderVariable> sv;
         sv.AttachNew (new csShaderVariable);
         if (!synldr->ParseShaderVar (ldr_context, child2, *sv)) return false;
-	props->AddVariable (sv);
-        break;
-      }
-    case XMLTOKEN_PARAM:
-      {
-        const char* name = child2->GetAttributeValue ("name");
-        const char* value = child2->GetContentsValue ();
-	props->SetParameter (name, value ? value : "");
+        svs.Push (sv);
         break;
       }
     default:
@@ -301,8 +298,8 @@ bool csTerrain2FactoryLoader::ParseRenderParams (iTerrainCellRenderProperties* p
   return true;
 }
 
-bool csTerrain2FactoryLoader::ParseFeederParams (iTerrainCellFeederProperties* props,
-						 iDocumentNode* node)
+bool csTerrain2FactoryLoader::ParseFeederParams (ParamPairArray& pairs, 
+  ParamPairArray& alphaMaps, iDocumentNode* node)
 {
   csRef<iDocumentNodeIterator> it2 = node->GetNodes ();
 
@@ -320,16 +317,20 @@ bool csTerrain2FactoryLoader::ParseFeederParams (iTerrainCellFeederProperties* p
     {
     case XMLTOKEN_PARAM:
       {
-        const char* name = child2->GetAttributeValue ("name");
-        const char* value = child2->GetContentsValue ();
-	props->SetParameter (name, value ? value : "");
+        ParamPair p;
+        p.name = child2->GetAttributeValue ("name");
+        p.value = child2->GetContentsValue ();
+
+        pairs.Push (p);
         break;
       }
     case XMLTOKEN_ALPHAMAP:
       {
-        const char* name = child2->GetAttributeValue ("material");
-        const char* value = child2->GetContentsValue ();
-	props->AddAlphaMap (name, value);
+        ParamPair p;
+        p.name = child2->GetAttributeValue ("material");
+        p.value = child2->GetContentsValue ();
+
+        alphaMaps.Push (p);
 	break;
       }
     default:
@@ -344,11 +345,21 @@ bool csTerrain2FactoryLoader::ParseFeederParams (iTerrainCellFeederProperties* p
 }
 
 bool csTerrain2FactoryLoader::ParseCell (iDocumentNode *node, 
-  iLoaderContext *ldr_ctx, iTerrainFactory *fact,
-  iTerrainFactoryCell* _cell)
+  iLoaderContext *ldr_ctx, iTerrainFactory *fact, const DefaultCellValues& defaults)
 {
-  csRef<iTerrainFactoryCell> cell (_cell);
-  if (!cell.IsValid()) cell = fact->AddCell ();
+  ParamPairArray renderParams, collParams, feederParams, alphaMaps;
+  csRefArray<csShaderVariable> svs;
+
+  csString name;
+  csVector3 size = defaults.size;
+  csVector2 position (0,0);
+  
+  unsigned int gridWidth = defaults.gridWidth, gridHeight = defaults.gridHeight;
+  unsigned int materialmapWidth = defaults.materialmapWidth, 
+    materialmapHeight = defaults.materialmapHeight;
+
+  bool materialmapPersist = defaults.materialmapPersist;
+  csRef<iMaterialWrapper> baseMaterial = defaults.baseMaterial;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -363,34 +374,26 @@ bool csTerrain2FactoryLoader::ParseCell (iDocumentNode *node,
     switch (id)
     {
     case XMLTOKEN_NAME:
-      cell->SetName (child->GetContentsValue ());
+      name = child->GetContentsValue ();
       break;
     case XMLTOKEN_SIZE:
-      {
-	csVector3 size;
-	synldr->ParseVector (child, size);
-	cell->SetSize (size);
-      }
+      synldr->ParseVector (child, size);
       break;
     case XMLTOKEN_POSITION:
-      {
-	csVector2 position;
-	synldr->ParseVector (child, position);
-	cell->SetPosition (position);
-      }
+      synldr->ParseVector (child, position);
       break;
     case XMLTOKEN_GRIDSIZE:
-      cell->SetGridWidth (child->GetAttributeValueAsInt ("width"));
-      cell->SetGridHeight (child->GetAttributeValueAsInt ("height"));
+      gridWidth = child->GetAttributeValueAsInt ("width");
+      gridHeight = child->GetAttributeValueAsInt ("height");
       break;
     case XMLTOKEN_MATERIALMAPSIZE:
-      cell->SetMaterialMapWidth (child->GetAttributeValueAsInt ("width"));
-      cell->SetMaterialMapHeight (child->GetAttributeValueAsInt ("height"));
+      materialmapWidth = child->GetAttributeValueAsInt ("width");
+      materialmapHeight = child->GetAttributeValueAsInt ("height");
       break;
     case XMLTOKEN_BASEMATERIAL:
       {
         const char* matname = child->GetContentsValue ();
-        csRef<iMaterialWrapper> baseMaterial = ldr_ctx->FindMaterial (matname);
+        baseMaterial = ldr_ctx->FindMaterial (matname);
         
         if (!baseMaterial)
         {
@@ -399,33 +402,28 @@ bool csTerrain2FactoryLoader::ParseCell (iDocumentNode *node,
             child, "Couldn't find material '%s'!", matname);
           return false;
         }
-	cell->SetBaseMaterial (baseMaterial);
         break;
       }
     case XMLTOKEN_MATERIALMAPPERSISTENT:
-      {
-	bool materialmapPersist;
-	synldr->ParseBool (child, materialmapPersist, false);
-	cell->SetMaterialPersistent (materialmapPersist);
-      }
+      synldr->ParseBool (child, materialmapPersist, false);
       break;
     case XMLTOKEN_RENDERPROPERTIES:
       {
-	if (!ParseRenderParams (cell->GetRenderProperties(), ldr_ctx, child))
+        if (!ParseRenderParams (renderParams, svs, ldr_ctx, child))
           return false;
 
         break;
       }
     case XMLTOKEN_COLLIDERPROPERTIES:
       {
-	if (!ParseParams (cell->GetCollisionProperties(), child))
+        if (!ParseParams (collParams, child))
           return false;
 
         break;
       }
     case XMLTOKEN_FEEDERPROPERTIES:
       {
-	if (!ParseFeederParams (cell->GetFeederProperties(), child))
+        if (!ParseFeederParams (feederParams, alphaMaps, child))
           return false;
 
         break;
@@ -437,6 +435,145 @@ bool csTerrain2FactoryLoader::ParseCell (iDocumentNode *node,
       }
     }
   }
+
+  // Time to build the cell
+  iTerrainFactoryCell* cell = fact->AddCell (name.GetDataSafe (), gridWidth, gridHeight, 
+    materialmapWidth, materialmapHeight, materialmapPersist, position, size);
+  
+  cell->SetBaseMaterial (baseMaterial);
+
+  iTerrainCellRenderProperties* renderProperties = cell->GetRenderProperties ();
+  for (size_t i = 0; i < defaults.renderParams.GetSize (); ++i)
+  {
+    renderProperties->SetParameter (defaults.renderParams[i].name.GetDataSafe (), 
+      defaults.renderParams[i].value.GetDataSafe ());
+  }
+  for (size_t i = 0; i < defaults.svs.GetSize(); ++i)
+  {
+    renderProperties->AddVariable (defaults.svs[i]);
+  }
+  for (size_t i = 0; i < renderParams.GetSize (); ++i)
+  {
+    renderProperties->SetParameter (renderParams[i].name.GetDataSafe (), 
+      renderParams[i].value.GetDataSafe ());
+  }
+  for (size_t i = 0; i < svs.GetSize(); ++i)
+  {
+    renderProperties->AddVariable (svs[i]);
+  }
+
+  iTerrainCellCollisionProperties* colliderProperties = cell->GetCollisionProperties ();
+  for (size_t i = 0; i < defaults.collParams.GetSize (); ++i)
+  {
+    colliderProperties->SetParameter (defaults.collParams[i].name.GetDataSafe (), 
+      defaults.collParams[i].value.GetDataSafe ());
+  }
+  for (size_t i = 0; i < collParams.GetSize (); ++i)
+  {
+    colliderProperties->SetParameter (collParams[i].name.GetDataSafe (), 
+      collParams[i].value.GetDataSafe ());
+  }
+
+  iTerrainCellFeederProperties* feederProperties = cell->GetFeederProperties ();
+  for (size_t i = 0; i < defaults.feederParams.GetSize (); ++i)
+  {
+    feederProperties->SetParameter (defaults.feederParams[i].name.GetDataSafe (), 
+      defaults.feederParams[i].value.GetDataSafe ());
+  }
+  for (size_t i = 0; i < feederParams.GetSize (); ++i)
+  {
+    feederProperties->SetParameter (feederParams[i].name.GetDataSafe (), 
+      feederParams[i].value.GetDataSafe ());
+  }
+  for (size_t i = 0; i < defaults.alphaMaps.GetSize (); ++i)
+  {
+    feederProperties->AddAlphaMap (defaults.alphaMaps[i].name.GetDataSafe (),
+      defaults.alphaMaps[i].value.GetDataSafe ());
+  }
+  for (size_t i = 0; i < alphaMaps.GetSize (); ++i)
+  {
+    feederProperties->AddAlphaMap (alphaMaps[i].name.GetDataSafe (),
+      alphaMaps[i].value.GetDataSafe ());
+  }
+
+  return true;
+}
+
+bool csTerrain2FactoryLoader::ParseDefaultCell (iDocumentNode* node, 
+  iLoaderContext* ldr_ctx, DefaultCellValues& defaults)
+{
+  
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+
+    if (child->GetType () != CS_NODE_ELEMENT) 
+      continue;
+
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {    
+    case XMLTOKEN_SIZE:
+      synldr->ParseVector (child, defaults.size);
+      break;
+    case XMLTOKEN_GRIDSIZE:
+      defaults.gridWidth = child->GetAttributeValueAsInt ("width");
+      defaults.gridHeight = child->GetAttributeValueAsInt ("height");
+      break;
+    case XMLTOKEN_MATERIALMAPSIZE:
+      defaults.materialmapWidth = child->GetAttributeValueAsInt ("width");
+      defaults.materialmapHeight = child->GetAttributeValueAsInt ("height");
+      break;
+    case XMLTOKEN_BASEMATERIAL:
+      {
+        const char* matname = child->GetContentsValue ();
+        defaults.baseMaterial = ldr_ctx->FindMaterial (matname);
+
+        if (!defaults.baseMaterial)
+        {
+          synldr->ReportError (
+            "crystalspace.terrain.object.loader.basematerial",
+            child, "Couldn't find material '%s'!", matname);
+          return false;
+        }
+        break;
+      }
+    case XMLTOKEN_MATERIALMAPPERSISTENT:
+      synldr->ParseBool (child, defaults.materialmapPersist, false);
+      break;
+    case XMLTOKEN_RENDERPROPERTIES:
+      {
+        if (!ParseRenderParams (defaults.renderParams, defaults.svs, 
+            ldr_ctx, child))
+          return false;
+
+        break;
+      }
+    case XMLTOKEN_COLLIDERPROPERTIES:
+      {
+        if (!ParseParams (defaults.collParams, child))
+          return false;
+
+        break;
+      }
+    case XMLTOKEN_FEEDERPROPERTIES:
+      {
+        if (!ParseFeederParams (defaults.feederParams, defaults.alphaMaps, child))
+          return false;
+
+        break;
+      }
+    default:
+      {
+        synldr->ReportBadToken (child);
+        return false;
+      }
+    }
+  }
+
+  
 
   return true;
 }
@@ -537,245 +674,12 @@ csPtr<iBase> csTerrain2ObjectLoader::Parse (iDocumentNode* node,
         terrain->SetMaterialPalette (pal);
         break;
       }
-      case XMLTOKEN_CELLS:
-	{
-	  csRef<iDocumentNodeIterator> it2 = child->GetNodes ();
-
-	  while (it2->HasNext ())
-	  {
-	    csRef<iDocumentNode> child2 = it2->Next ();
-
-	    if (child2->GetType () != CS_NODE_ELEMENT) 
-	      continue;
-
-	    const char* value = child2->GetValue ();
-	    csStringID id = xmltokens.Request (value);
-
-	    switch (id)
-	    {
-	    case XMLTOKEN_CELL:
-	      {
-		if (!ParseCell (child2, ldr_context, terrain))
-		  return 0;
-
-		break;
-	      }
-	    default:
-	      {
-		synldr->ReportBadToken (child2);
-		return 0;
-	      }
-	    }
-	  }
-
-	  break;
-	}
       default:
         synldr->ReportBadToken (child);
     }
   }
 
   return csPtr<iBase>(mesh);
-}
-
-bool csTerrain2ObjectLoader::ParseCell (iDocumentNode* node, 
-					iLoaderContext* ldr_ctx,
-					iTerrainSystem* terrain)
-{
-  csRef<iDocumentNode> nameNode = node->GetNode ("name");
-  if (!nameNode.IsValid())
-  {
-    synldr->ReportError (
-      "crystalspace.terrain.object.loader.cell",
-      node, "<cell> without name");
-    return false;
-  }
-
-  const char* cellName = nameNode->GetContentsValue();
-  if (cellName == 0)
-  {
-    synldr->ReportError (
-      "crystalspace.terrain.object.loader.cell",
-      node, "Empty cell name");
-    return false;
-  }
-
-  iTerrainCell* cell = terrain->GetCell (cellName);
-  if (cell == 0)
-  {
-    synldr->ReportError (
-      "crystalspace.terrain.object.loader.cell",
-      node, "Invalid cell name '%s'", cellName);
-    return false;
-  }
-
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext ())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-
-    if (child->GetType () != CS_NODE_ELEMENT) 
-      continue;
-
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-    case XMLTOKEN_NAME:
-      // Skip
-      break;
-    case XMLTOKEN_RENDERPROPERTIES:
-      {
-	if (!ParseRenderParams (cell->GetRenderProperties(), ldr_ctx, child))
-          return false;
-
-        break;
-      }
-    case XMLTOKEN_COLLIDERPROPERTIES:
-      {
-	if (!ParseParams (cell->GetCollisionProperties(), child))
-          return false;
-
-        break;
-      }
-    case XMLTOKEN_FEEDERPROPERTIES:
-      {
-	if (!ParseFeederParams (cell->GetFeederProperties(), child))
-          return false;
-
-        break;
-      }
-    default:
-      {
-        synldr->ReportBadToken (child);
-        return false;
-      }
-    }
-  }
-
-  return true;
-}
-
-template<typename IProp>
-bool csTerrain2ObjectLoader::ParseParams (IProp* props, 
-					  iDocumentNode* node)
-{
-  csRef<iDocumentNodeIterator> it2 = node->GetNodes ();
-
-  while (it2->HasNext ())
-  {
-    csRef<iDocumentNode> child2 = it2->Next ();
-
-    if (child2->GetType () != CS_NODE_ELEMENT) 
-      continue;
-
-    const char* value = child2->GetValue ();
-    csStringID id = xmltokens.Request (value);
-
-    switch (id)
-    {
-    case XMLTOKEN_PARAM:
-      {
-        const char* name = child2->GetAttributeValue ("name");
-        const char* value = child2->GetContentsValue ();
-	props->SetParameter (name, value ? value : "");
-        break;
-      }
-    default:
-      {
-        synldr->ReportBadToken (child2);
-        return false;
-      }
-    }
-  }    
-
-  return true;
-}
-
-bool csTerrain2ObjectLoader::ParseRenderParams (iTerrainCellRenderProperties* props,
-						iLoaderContext* ldr_context,
-						iDocumentNode* node)
-{
-  csRef<iDocumentNodeIterator> it2 = node->GetNodes ();
-
-  while (it2->HasNext ())
-  {
-    csRef<iDocumentNode> child2 = it2->Next ();
-
-    if (child2->GetType () != CS_NODE_ELEMENT) 
-      continue;
-
-    const char* value = child2->GetValue ();
-    csStringID id = xmltokens.Request (value);
-
-    switch (id)
-    {
-    case XMLTOKEN_SHADERVAR:
-      {
-        csRef<csShaderVariable> sv;
-        sv.AttachNew (new csShaderVariable);
-        if (!synldr->ParseShaderVar (ldr_context, child2, *sv)) return false;
-	props->AddVariable (sv);
-        break;
-      }
-    case XMLTOKEN_PARAM:
-      {
-        const char* name = child2->GetAttributeValue ("name");
-        const char* value = child2->GetContentsValue ();
-	props->SetParameter (name, value ? value : "");
-        break;
-      }
-    default:
-      {
-        synldr->ReportBadToken (child2);
-        return false;
-      }
-    }
-  }    
-
-  return true;
-}
-
-bool csTerrain2ObjectLoader::ParseFeederParams (iTerrainCellFeederProperties* props,
-						iDocumentNode* node)
-{
-  csRef<iDocumentNodeIterator> it2 = node->GetNodes ();
-
-  while (it2->HasNext ())
-  {
-    csRef<iDocumentNode> child2 = it2->Next ();
-
-    if (child2->GetType () != CS_NODE_ELEMENT) 
-      continue;
-
-    const char* value = child2->GetValue ();
-    csStringID id = xmltokens.Request (value);
-
-    switch (id)
-    {
-    case XMLTOKEN_PARAM:
-      {
-        const char* name = child2->GetAttributeValue ("name");
-        const char* value = child2->GetContentsValue ();
-	props->SetParameter (name, value ? value : "");
-        break;
-      }
-    case XMLTOKEN_ALPHAMAP:
-      {
-        const char* name = child2->GetAttributeValue ("material");
-        const char* value = child2->GetContentsValue ();
-	props->AddAlphaMap (name, value);
-	break;
-      }
-    default:
-      {
-        synldr->ReportBadToken (child2);
-        return false;
-      }
-    }
-  }    
-
-  return true;
 }
 
 }

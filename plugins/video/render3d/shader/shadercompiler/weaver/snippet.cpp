@@ -29,7 +29,6 @@
 #include "csplugincommon/shader/weavercombiner.h"
 #include "cstool/identstrings.h"
 #include "csutil/documenthelper.h"
-#include "csutil/fifo.h"
 #include "csutil/scopeddelete.h"
 
 #include "snippet.h"
@@ -55,52 +54,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       storage = array[pos++]; 
       return storage;
     }
-    virtual size_t GetTotal() const
-    { return array.GetSize(); }
   };
 
   //-------------------------------------------------------------------
-  
-  template<class HashType>
-  class BasicIteratorImplHashValues :
-    public BasicIterator<typename HashType::ValueType>
-  {
-    typename HashType::GlobalIterator iter;
-    size_t total;
-  public:
-    BasicIteratorImplHashValues (HashType& hash) : iter (hash.GetIterator()),
-      total (hash.GetSize()) {}
-  
-    virtual bool HasNext()
-    { return iter.HasNext(); }
-    virtual typename HashType::ValueType& Next()
-    { return iter.Next(); }
-    virtual size_t GetTotal() const
-    { return total; }
-  };
 
-  //-------------------------------------------------------------------
-  
-  csString Snippet::Technique::GetCondition() const
-  {
-    if (owner != 0) return owner->GetCondition();
-    return (char*)0;
-  }
-      
-  //-------------------------------------------------------------------
-
-  Snippet::Snippet (const WeaverCompiler* compiler, iDocumentNode* node, 
-                    const char* name, const FileAliases& aliases,
-                    const Snippet* parent) : compiler (compiler), 
-    xmltokens (compiler->xmltokens), name (name), node (node),
-    isCompound (false), passForward (false), parent (parent)
+  Snippet::Snippet (WeaverCompiler* compiler, iDocumentNode* node, 
+                    const char* name, bool topLevel) : compiler (compiler), 
+    xmltokens (compiler->xmltokens), name (name), isCompound (false)
   {
     bool okay = true;
-    if (parent == 0)
+    if (topLevel)
     {
       isCompound = true;
-      passForward = true;
-      LoadCompoundTechnique (node, aliases);
+      LoadCompoundTechnique (node);
     }
     else
     {
@@ -125,17 +91,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       if (okay)
       {
 	if (!isCompound)
-	  LoadAtomTechniques (node, aliases);
+	  LoadAtomTechniques (node);
 	else
 	{
-	  LoadCompoundTechniques (node, aliases, parent == 0);
+	  LoadCompoundTechniques (node, topLevel);
 	}
       }
     }
   }
   
-  Snippet::Snippet (const WeaverCompiler* compiler, const char* name) : compiler (compiler), 
-    xmltokens (compiler->xmltokens), name (name), isCompound (false), parent (0)
+  Snippet::Snippet (WeaverCompiler* compiler, const char* name) : compiler (compiler), 
+    xmltokens (compiler->xmltokens), name (name), isCompound (false)
   {
   }
 
@@ -143,58 +109,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   {
   }
   
-  csString Snippet::GetCondition() const
-  {
-    if (condition.IsEmpty())
-    {
-      if (parent == 0)
-        return csString();
-      else
-        return parent->GetCondition();
-    }
-    else
-    {
-      csString cond;
-      if (parent != 0)
-      {
-        cond = parent->GetCondition();;
-        if (!cond.IsEmpty()) cond += " && ";
-      }
-      cond.AppendFmt ("(%s)", condition.GetData());
-      return cond;
-    }
-  }
-      
   BasicIterator<const Snippet::Technique*>* Snippet::GetTechniques() const
   {
     return new BasicIteratorImplCopyValue<const Technique*, TechniqueArray> (
       techniques);
   }
   
-  BasicIterator<Snippet::Technique*>* Snippet::GetTechniques()
+  Snippet::Technique* Snippet::LoadLibraryTechnique (WeaverCompiler* compiler, 
+    iDocumentNode* node, const Technique::CombinerPlugin& combiner) const
   {
-    return new BasicIteratorImplCopyValue<Technique*, TechniqueArray> (
-      techniques);
-  }
-  
-  Snippet::Technique* Snippet::LoadLibraryTechnique (/*WeaverCompiler* compiler, */
-    iDocumentNode* node, const Technique::CombinerPlugin& combiner,
-    bool markAsCoercion) const
-  {
-    FileAliases aliases;
     Snippet::AtomTechnique* technique = 
-      ParseAtomTechnique (node, true, aliases, combiner.name);
+      ParseAtomTechnique (compiler, node, true, combiner.name);
     technique->combiner = combiner;
-    if (markAsCoercion)
-    {
-      CS::Utility::ScopedDelete<BasicIterator<Snippet::Technique::Output> > 
-	outputIt (technique->GetOutputs());
-      while (outputIt->HasNext())
-      {
-        Snippet::Technique::Output& outp = outputIt->Next();
-	outp.coercionOutput = true;
-      }
-    }
     return technique;
   }
   
@@ -203,7 +129,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   {
     csString hashStr;
     hashStr.Format ("__passthrough_%s_%s__", varName, type);
-    AtomTechnique* newTech = new AtomTechnique (0, "(passthrough)", 
+    AtomTechnique* newTech = new AtomTechnique ("(passthrough)", 
       csMD5::Encode (hashStr));
     
     {
@@ -221,46 +147,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     return newTech;
   }
-    
-  bool Snippet::ParseAliasNode (const WeaverCompiler* compiler,
-                                iDocumentNode* child, 
-                                FileAliases& aliases)
-  {
-    const char* aliasName = child->GetAttributeValue ("name");
-    if (aliasName == 0)
-    {
-      compiler->synldr->ReportBadToken (child);
-      return false;
-    }
-    const char* aliasFile = child->GetAttributeValue ("file");
-    if (aliasFile == 0)
-    {
-      compiler->synldr->ReportBadToken (child);
-      return false;
-    }
-    
-    bool isWeak = child->GetAttributeValueAsBool ("weak");
-    if (!isWeak || !aliases.Contains (aliasName))
-      aliases.PutUnique (aliasName, aliasFile);
-    return true;
-  }
   
-  void Snippet::LoadAtomTechniques (iDocumentNode* node,
-                                    const FileAliases& _aliases)
+  void Snippet::LoadAtomTechniques (iDocumentNode* node)
   {
-    FileAliases aliases (_aliases);
-    // Aliases
-    {
-      csRef<iDocumentNodeIterator> nodes = node->GetNodes ("alias");
-      while (nodes->HasNext ())
-      {
-	csRef<iDocumentNode> child = nodes->Next ();
-	if (child->GetType() != CS_NODE_ELEMENT) continue;
-	
-	ParseAliasNode (compiler, child, aliases);
-      }
-    }
-
     csRef<iDocumentNodeIterator> nodes = node->GetNodes ();
     while (nodes->HasNext ())
     {
@@ -272,7 +161,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       {
         case WeaverCompiler::XMLTOKEN_TECHNIQUE:
           {
-            LoadAtomTechnique (child, aliases);
+            LoadAtomTechnique (child);
           }
           break;
         default:
@@ -281,36 +170,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
   }
   
-  void Snippet::LoadAtomTechnique (iDocumentNode* node, 
-                                   const FileAliases& aliases)
+  void Snippet::LoadAtomTechnique (iDocumentNode* node)
   {
-    AtomTechnique* newTech = ParseAtomTechnique (node, false, aliases);
+    AtomTechnique* newTech = ParseAtomTechnique (compiler, node, false);
     if (newTech != 0)
       techniques.InsertSorted (newTech, &CompareTechnique);
   }
   
   Snippet::AtomTechnique* Snippet::ParseAtomTechnique (
-    iDocumentNode* node, bool canOmitCombiner,
-    const FileAliases& _aliases, const char* defaultCombinerName) const
+    WeaverCompiler* compiler, iDocumentNode* node, bool canOmitCombiner,
+    const char* defaultCombinerName) const
   {
-    FileAliases aliases (_aliases);
-    AtomTechnique newTech (this, GetName(),
+    AtomTechnique newTech (GetName(),
       csMD5::Encode (CS::DocSystem::FlattenNode (node)));
     
     newTech.priority = node->GetAttributeValueAsInt ("priority");
     
-    // Aliases
-    {
-      csRef<iDocumentNodeIterator> nodes = node->GetNodes ("alias");
-      while (nodes->HasNext ())
-      {
-	csRef<iDocumentNode> child = nodes->Next ();
-	if (child->GetType() != CS_NODE_ELEMENT) continue;
-	
-	ParseAliasNode (compiler, child, aliases);
-      }
-    }
-
     // Combiner nodes
     {
       bool hasCombiner = false;
@@ -352,8 +227,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	if (child->GetType() != CS_NODE_ELEMENT) continue;
 	
 	Technique::Input newInput;
-        if (!ParseInput (child, newInput, aliases, defaultCombinerName))
-          return 0;	
+        if (!ParseInput (child, newInput, defaultCombinerName)) return 0;	
 	newTech.AddInput (newInput);
       }
     }
@@ -372,7 +246,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       }
       
       csArray<Technique::Block> newBlocks;
-      if (!ReadBlocks (compiler, node, newBlocks, aliases, defaultCombinerName))
+      if (!ReadBlocks (compiler, node, newBlocks, defaultCombinerName))
         return 0;
       for (size_t b = 0; b < newBlocks.GetSize(); b++)
         newTech.AddBlock (newBlocks[b]);
@@ -403,8 +277,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
 
   bool Snippet::ParseInput (iDocumentNode* child, 
-                            Technique::Input& newInput,
-                            const FileAliases& aliases,
+                            Technique::Input& newInput, 
                             const char* defaultCombinerName) const
   {
     const char* condition = child->GetAttributeValue ("condition");
@@ -415,7 +288,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       newInput.noMerge = true;
 
     csRef<iDocumentNode> inputNode = GetNodeOrFromFile (child, "input",
-      compiler, aliases);
+      compiler);
     if (!inputNode.IsValid()) return false;
 
     newInput.node = inputNode;
@@ -440,7 +313,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       {
         newInput.defaultType = Technique::Input::Complex;
         if (!ReadBlocks (compiler, inputNode, newInput.complexBlocks, 
-            aliases, defaultCombinerName))
+            defaultCombinerName))
 	  return 0;
       }
       else if (strcmp (def, "value") == 0)
@@ -534,10 +407,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
   }
 
-  bool Snippet::ReadBlocks (const WeaverCompiler* compiler, 
-                            iDocumentNode* node, 
+  bool Snippet::ReadBlocks (WeaverCompiler* compiler, iDocumentNode* node, 
 		            csArray<Technique::Block>& blocks,
-		            const FileAliases& aliases,
                             const char* defaultCombinerName)
   {
     csRef<iDocumentNodeIterator> nodes = node->GetNodes ("block");
@@ -566,7 +437,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         newBlock.combinerName = defaultCombinerName;
         newBlock.location = location;
       }
-      newBlock.node = GetNodeOrFromFile (child, "block", compiler, aliases);
+      newBlock.node = GetNodeOrFromFile (child, "block", compiler);
       if (!newBlock.node) return false;
       
       blocks.Push (newBlock);
@@ -575,17 +446,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   csRef<iDocumentNode> Snippet::GetNodeOrFromFile (iDocumentNode* node,
-    const char* rootName, const WeaverCompiler* compiler,
-    const FileAliases& aliases, csString* outFilename)
+      const char* rootName, WeaverCompiler* compiler,
+      csString* outFilename)
   {
-    const char* filename = 0;
-    const char* filenameAlias = node->GetAttributeValue ("filealias");
-    if (filenameAlias != 0)
-    {
-      filename = aliases.Get (filenameAlias, (const char*)0);
-    }
-    else
-      filename = node->GetAttributeValue ("file");
+    const char* filename = node->GetAttributeValue ("file");
     if (filename != 0)
     {
       csRef<iDocumentNode> rootNode = 
@@ -613,24 +477,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     return v;
   }
   
-  void Snippet::LoadCompoundTechniques (iDocumentNode* node, 
-                                        const FileAliases& _aliases,
-                                        bool topLevel)
+  void Snippet::LoadCompoundTechniques (iDocumentNode* node, bool topLevel)
   {
-    FileAliases aliases (_aliases);
-  
-    // Aliases
-    {
-      csRef<iDocumentNodeIterator> nodes = node->GetNodes ("alias");
-      while (nodes->HasNext ())
-      {
-	csRef<iDocumentNode> child = nodes->Next ();
-	if (child->GetType() != CS_NODE_ELEMENT) continue;
-	
-	ParseAliasNode (compiler, child, aliases);
-      }
-    }
-
     csRef<iDocumentNodeIterator> nodes = node->GetNodes ();
     while (nodes->HasNext ())
     {
@@ -642,10 +490,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       {
         case WeaverCompiler::XMLTOKEN_TECHNIQUE:
           {
-            LoadCompoundTechnique (child, aliases);
+            LoadCompoundTechnique (child);
           }
-          break;
-        case WeaverCompiler::XMLTOKEN_ALIAS:
           break;
         default:
           compiler->synldr->ReportBadToken (child);
@@ -653,37 +499,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
   }
   
-  void Snippet::LoadCompoundTechnique (iDocumentNode* node, 
-                                       const FileAliases& _aliases)
+  void Snippet::LoadCompoundTechnique (iDocumentNode* node)
   {
-    FileAliases aliases (_aliases);
+    CompoundTechnique* newTech = new CompoundTechnique (GetName());
   
-    // Aliases
-    {
-      csRef<iDocumentNodeIterator> nodes = node->GetNodes ("alias");
-      while (nodes->HasNext ())
-      {
-	csRef<iDocumentNode> child = nodes->Next ();
-	if (child->GetType() != CS_NODE_ELEMENT) continue;
-	
-	ParseAliasNode (compiler, child, aliases);
-      }
-    }
-
-    CompoundTechnique* newTech = new CompoundTechnique (this,
-      GetName());
-  
-    newTech->priority = node->GetAttributeValueAsInt ("priority");
-    
     csRef<iDocumentNodeIterator> nodes = node->GetNodes ();
     while (nodes->HasNext ())
     {
       csRef<iDocumentNode> child = nodes->Next ();
-      if (child->GetType() != CS_NODE_ELEMENT)
-      {
-        if (passForward) passForwardedNodes.Push (child);
-        continue;
-      }
+      if (child->GetType() != CS_NODE_ELEMENT) continue;
       
       csStringID id = xmltokens.Request (child->GetValue());
       switch (id)
@@ -695,7 +519,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
           break;
         case WeaverCompiler::XMLTOKEN_SNIPPET:
           {
-            HandleSnippetNode (*newTech, child, aliases);
+            HandleSnippetNode (*newTech, child);
           }
           break;
 	case WeaverCompiler::XMLTOKEN_CONNECTION:
@@ -705,21 +529,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  break;
         case WeaverCompiler::XMLTOKEN_PARAMETER:
           {
-            HandleParameterNode (*newTech, child, aliases);
+            HandleParameterNode (*newTech, child);
           }
-          break;
-        case WeaverCompiler::XMLTOKEN_VARYING:
-          {
-            HandleVaryingNode (*newTech, child, aliases);
-          }
-          break;
-        case WeaverCompiler::XMLTOKEN_ALIAS:
           break;
         default:
-          if (passForward)
-            passForwardedNodes.Push (child);
-          else
-            compiler->synldr->ReportBadToken (child);
+          compiler->synldr->ReportBadToken (child);
       }
     }
     
@@ -727,8 +541,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   void Snippet::HandleSnippetNode (CompoundTechnique& tech,
-                                   iDocumentNode* node,
-                                   const FileAliases& aliases)
+                                   iDocumentNode* node)
   {
     const char* id = node->GetAttributeValue ("id");
     
@@ -745,11 +558,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	return;
     }
     
-    const char* condition = node->GetAttributeValue ("condition");
-    
     csString filename;
     csRef<iDocumentNode> snippetNode = GetNodeOrFromFile (node, "snippet",
-      compiler, aliases, &filename);
+      compiler, &filename);
     if (!snippetNode.IsValid()) return;
       
     csString snippetName;
@@ -759,23 +570,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
     snippetName += id ? id : filename.GetData();
     Snippet* newSnippet = new Snippet (compiler, snippetNode, 
-      snippetName, aliases, this);
-    newSnippet->condition = condition;
+      snippetName);
     tech.AddSnippet (id, newSnippet);
   }
-  
-  namespace
-  {
-    struct TechSnippetPair
-    {
-      Snippet* snip;
-      Snippet::CompoundTechnique* tech;
-      
-      TechSnippetPair (Snippet* snip, Snippet::CompoundTechnique* tech)
-	: snip (snip), tech (tech) {}
-    };
-  }
-  
+    
   void Snippet::HandleConnectionNode (CompoundTechnique& tech, 
                                       iDocumentNode* node)
   {
@@ -815,91 +613,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  return;
       }
     }
-    
     tech.AddConnection (newConn);
-    
-    csRef<iDocumentNodeIterator> nodes = node->GetNodes();
-    while (nodes->HasNext())
-    {
-      csRef<iDocumentNode> child = nodes->Next();
-      if (child->GetType() != CS_NODE_ELEMENT) continue;
-      if (strcmp (child->GetValue(), "explicit") != 0)
-      {
-	compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-	  "Expected 'explicit' node");
-	return;
-      }
-      const char* fromId = child->GetAttributeValue ("from");
-      if (fromId == 0)
-      {
-	compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-	  "'explicit' node lacks 'from' attribute");
-	return;
-      }
-      const char* toId = child->GetAttributeValue ("to");
-      if (toId == 0)
-      {
-	compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-	  "'explicit' node lacks 'to' attribute");
-	return;
-      }
-      
-      csFIFO<TechSnippetPair> snippetsToAddTo;
-      snippetsToAddTo.Push (TechSnippetPair (newConn.to, &tech));
-      while (snippetsToAddTo.GetSize() > 0)
-      {
-        TechSnippetPair to = snippetsToAddTo.PopTop();
-        
-	if (to.snip->IsCompound())
-	{
-	  /* For compound snippets replicate the explicit connection
-	    targetting the contained connections. */
-	  CS::Utility::ScopedDelete<BasicIterator<Snippet::Technique*> > techIter (
-	    to.snip->GetTechniques());
-	  while (techIter->HasNext())
-	  {
-	    Snippet::Technique* tech = techIter->Next();
-	    if (tech->IsCompound ())
-	    {
-	      CompoundTechnique* compTech = static_cast<CompoundTechnique*> (
-	       tech);
-	      CS::Utility::ScopedDelete<BasicIterator<Snippet*> > snipIter (
-		compTech->GetSnippets());
-	      while (snipIter->HasNext())
-	      {
-	        Snippet* snip = snipIter->Next();
-	        snippetsToAddTo.Push (TechSnippetPair (snip, compTech));
-	      }
-	    }
-	  }
-	}
-	else
-	{
-	  ExplicitConnectionsHash& explConn =
-	    to.tech->GetExplicitConnections (to.snip);
-	  if (explConn.Contains (toId))
-	  {
-	    if (to.snip == newConn.to)
-	      compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-		"An explicit input was already mapped to '%s'", toId);
-	  }
-	  else
-	  {
-	    ExplicitConnectionSource connSrc;
-	    connSrc.from = newConn.from;
-	    connSrc.outputName = fromId;
-	    explConn.Put (toId, connSrc);
-	    
-	    if (to.snip != newConn.to)
-	    {
-	      Connection newConn2 (newConn);
-	      newConn2.to = to.snip;
-              tech.AddConnection (newConn2);
-            }
-	  }
-	}
-      }
-    }
   }
     
   void Snippet::HandleCombinerNode (CompoundTechnique& tech, 
@@ -940,8 +654,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   CS_IDENT_STRING_LIST_END(SVTypes)
   
   void Snippet::HandleParameterNode (CompoundTechnique& tech, 
-				     iDocumentNode* node,
-                                     const FileAliases& aliases)
+				     iDocumentNode* node)
   {
     if (tech.combiner.classId.IsEmpty())
     {
@@ -965,7 +678,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
 
     csShaderProgram::ProgramParamParser paramParser (compiler->synldr,
-      compiler->svstrings);
+      compiler->strings);
     csShaderProgram::ProgramParam param;
     if (!paramParser.ParseProgramParam (node, param, 
       csShaderProgram::ParamVector | csShaderProgram::ParamShaderExp)) return;
@@ -1000,32 +713,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     {
       int numComps = 0;
       csShaderVariable::VariableType svType = param.var->GetType ();
-      const char* typeStr = "float";
       switch (svType)
       {
-	case csShaderVariable::INT:
-	  numComps = 1; 
-	  typeStr = "int";
-	  break;
-	case csShaderVariable::FLOAT:   numComps = 1; break;
-	case csShaderVariable::VECTOR2: numComps = 2; break;
-	case csShaderVariable::VECTOR3: numComps = 3; break;
-	case csShaderVariable::VECTOR4: numComps = 4; break;
-	default:
-	  // Should not happen really, but who knows...
-	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
+        case csShaderVariable::INT:
+        case csShaderVariable::FLOAT:   numComps = 1; break;
+        case csShaderVariable::VECTOR2: numComps = 2; break;
+        case csShaderVariable::VECTOR3: numComps = 3; break;
+        case csShaderVariable::VECTOR4: numComps = 4; break;
+        default:
+          // Should not happen really, but who knows...
+          compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
 	    "Constant parameter of unsupported type %s", 
-	    SVTypes.StringForIdent (svType));
-	  return;
+            SVTypes.StringForIdent (svType));
+          return;
       }
-      weaverType = node->GetAttributeValue ("weavertype");
-      if (weaverType.IsEmpty())
-      {
-	if (numComps > 1)
-	  weaverType.Format ("%s%d", typeStr, numComps);
-	else
-	  weaverType = typeStr;
-      }
+      if (numComps > 1)
+        weaverType.Format ("float%d", numComps);
+      else
+        weaverType = "float";
 
       csVector4 v;
       param.var->GetValue (v);
@@ -1042,7 +747,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         return;
       }
       combinerLoader->GenerateSVInputBlocks (techNode, "c", 
-        compiler->svstrings->Request (param.name), weaverType, "output", id);
+        compiler->strings->Request (param.name), weaverType, "output", id);
     }
 
     {
@@ -1053,86 +758,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       outputNode->SetAttribute ("name", "output");
     }
     
-    HandleSnippetNode (tech, snippetNode, aliases);
-  }
-  
-  void Snippet::HandleVaryingNode (CompoundTechnique& tech, 
-				   iDocumentNode* node,
-                                   const FileAliases& aliases)
-  {
-    if (tech.combiner.classId.IsEmpty())
-    {
-      compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	"Need a combiner to use <varying>");
-      return;
-    }
-
-    const char* id = node->GetAttributeValue ("id");
-    if (!id || !*id)
-    {
-	compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	  "Varyings must have an 'id' attribute");
-	return;
-    }
-    if (tech.GetSnippet (id) != 0)
-    {
-	compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	  "Duplicate snippet id '%s'", id);
-	return;
-    }
-
-    csRef<WeaverCommon::iCombinerLoader> combinerLoader = 
-      csLoadPluginCheck<WeaverCommon::iCombinerLoader> (compiler->objectreg,
-        tech.combiner.classId);
-    if (!combinerLoader.IsValid())
-    {
-      // Don't complain, will happen later anyway
-      return;
-    }
-    
-    const char* source = node->GetAttributeValue ("source");
-    if (!source || !*source)
-    {
-      compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	"Varyings must have a 'source' attribute");
-      return;
-    }
-
-    csRef<iDocumentNode> snippetNode = 
-      compiler->CreateAutoNode (CS_NODE_ELEMENT);
-    snippetNode->SetValue ("snippet");
-    snippetNode->SetAttribute ("id", id);
-    csRef<iDocumentNode> techNode = 
-      snippetNode->CreateNodeBefore (CS_NODE_ELEMENT);
-    techNode->SetValue ("technique");
-    {
-      csRef<iDocumentNode> combinerNode = 
-        techNode->CreateNodeBefore (CS_NODE_ELEMENT);
-      combinerNode->SetValue ("combiner");
-      combinerNode->SetAttribute ("name", "c");
-      combinerNode->SetAttribute ("plugin", tech.combiner.classId);
-    }
-    
-    csString weaverType;
-    weaverType = node->GetAttributeValue ("weavertype");
-    if (weaverType.IsEmpty())
-    {
-      compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	"Need a 'weavertype' attribute for varyings");
-      return;
-    }
-    combinerLoader->GenerateBufferInputBlocks (techNode, "c", 
-      source, weaverType, "output", id);
-
-    {
-      csRef<iDocumentNode> outputNode = 
-        techNode->CreateNodeBefore (CS_NODE_ELEMENT);
-      outputNode->SetValue ("output");
-      outputNode->SetAttribute ("type", weaverType);
-      outputNode->SetAttribute ("name", "output");
-    }
-    
-    HandleSnippetNode (tech, snippetNode, aliases);
+    HandleSnippetNode (tech, snippetNode);
   }
   
   //-------------------------------------------------------------------
@@ -1176,40 +802,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     return 0;
   }
   
-  BasicIterator<Snippet*>* Snippet::CompoundTechnique::GetSnippets()
-  {
-    return new BasicIteratorImplHashValues<IdSnippetHash> (snippets);
-  }
-  
-  //-------------------------------------------------------------------
-  
-  size_t SnippetNumbers::GetSnippetNumber (const Snippet* snip)
-  {
-    if (snippetNums.Contains (snip->GetName()))
-      return snippetNums.Get (snip->GetName(), (size_t)~0);
-    size_t newNum = currentNum++;
-    snippetNums.Put (snip->GetName(), newNum);
-    return newNum;
-  }
-  
-  //-------------------------------------------------------------------
-  
-  void SnippetTechPriorities::Merge (const SnippetTechPriorities& other)
-  {
-    if (prios.GetSize() < other.prios.GetSize())
-      prios.SetSize (other.prios.GetSize(), INT_MIN);
-    for (size_t s = 0; s < other.prios.GetSize(); s++)
-    {
-      int otherPrio = other.prios[s];
-      if (otherPrio == INT_MIN) continue;
-      if (prios[s] != INT_MIN)
-      {
-        CS_ASSERT(prios[s] == otherPrio);
-      }
-      prios[s] = otherPrio;
-    }
-  }
-  
   //-------------------------------------------------------------------
   
   void TechniqueGraph::AddTechnique (const Snippet::Technique* tech)
@@ -1238,10 +830,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   
   void TechniqueGraph::AddConnection (const Connection& conn)
   {
-    connections.PushSmart (conn);
+    connections.Push (conn);
     inTechniques.Delete (conn.to);
     outTechniques.Delete (conn.from);
-    CS_ASSERT(conn.to != conn.from);
   }
 
   void TechniqueGraph::RemoveConnection (const Connection& conn)
@@ -1256,16 +847,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       AddTechnique (other.techniques[t]);
     for (size_t c = 0; c < other.connections.GetSize(); c++)
       AddConnection (other.connections[c]);
-    ExplicitConnectionsHashHash::ConstGlobalIterator otherExplicitIt (
-      other.explicitConnections.GetIterator());
-    while (otherExplicitIt.HasNext())
-    {
-      csConstPtrKey<Snippet::Technique> key;
-      const ExplicitConnectionsHash& val = otherExplicitIt.Next (key);
-      explicitConnections.Put (key, val);
-    }
-    
-    snipPrios.Merge (other.snipPrios);
   }
   
   void TechniqueGraph::GetDependencies (const Snippet::Technique* tech, 
@@ -1276,7 +857,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     {
       const Connection& conn = connections[c];
       if ((conn.to == tech) && (!addedDeps.Contains (conn.from))
-        && (!strongOnly || !conn.inputConnection))
+        && (!strongOnly || !conn.weak))
       {
         deps.Push (conn.from);
         addedDeps.AddNoTest (conn.from);
@@ -1292,37 +873,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     {
       const Connection& conn = connections[c];
       if ((conn.from == tech) && (!addedDeps.Contains (conn.to))
-        && (!strongOnly || !conn.inputConnection))
+        && (!strongOnly || !conn.weak))
       {
         deps.Push (conn.to);
         addedDeps.AddNoTest (conn.to);
       }
-    }
-  }
-    
-  bool TechniqueGraph::IsDependencyOf (const Snippet::Technique* tech,
-    const Snippet::Technique* dependentOf) const
-  {
-    csArray<const Snippet::Technique*> deps;
-    GetDependencies (dependentOf, deps);
-    for (size_t i = 0; i < deps.GetSize(); i++)
-    {
-      if (deps[i] == tech) return true;
-      if (IsDependencyOf (tech, deps[i])) return true;
-    }
-    return false;
-  }
-    
-  void TechniqueGraph::SwitchTechs (const Snippet::Technique* oldTech,
-                                    const Snippet::Technique* newTech,
-                                    bool inputsOnly)
-  {
-    for (size_t c = 0; c < connections.GetSize(); c++)
-    {
-      Connection& conn = connections[c];
-      if (inputsOnly && !conn.inputConnection) continue;
-      if (conn.from == oldTech) conn.from = newTech;
-      if (conn.to == oldTech) conn.to = newTech;
     }
   }
 
@@ -1358,11 +913,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   {
     CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique*> > techIter (
       snip->GetTechniques());
-    size_t snipNum = (size_t)~0;
-    if (techIter->GetTotal() > 1)
-    {
-      snipNum = snipNums.GetSnippetNumber (snip);
-    }
     while (techIter->HasNext())
     {
       const Snippet::Technique* tech = techIter->Next();
@@ -1391,37 +941,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	     * the technique into each. */
 	    for (size_t g = 0; g < newGraphs.GetSize(); g++)
 	    {
-	      SnippetTechPriorities& newGraphPrios =
-	        newGraphs[g].graph.GetSnippetPrios();
 	      for (size_t g2 = 0; g2 < techGraphs.GetSize(); g2++)
 	      {
-	        /* Conserve variations: don't merge a graph if one of the
-	           contained snippets has a higher priority than the graph
-	           to merge into */
-	        bool skipTech = false;
-	        const SnippetTechPriorities& graphPrios =
-	          techGraphs[g2].graph.GetSnippetPrios();
-		for (size_t s = 0; s < snipNums.GetAllSnippetsCount(); s++)
-		{
-		  if (newGraphPrios.IsSnippetPrioritySet (s)
-		    && graphPrios.IsSnippetPrioritySet (s)
-		    && (newGraphPrios.GetSnippetPriority (s) <
-		      graphPrios.GetSnippetPriority(s)))
-		  {
-		    skipTech = true;
-		    break;
-		  }
-		}
-		if (skipTech) continue;
-		for (size_t s = 0; s < snipNums.GetAllSnippetsCount(); s++)
-		{
-		  if (graphPrios.IsSnippetPrioritySet (s))
-		  {
-		    newGraphPrios.SetSnippetPriority (s, 
-		      graphPrios.GetSnippetPriority (s));
-		  }
-		}
-		
 		GraphInfo graphMerged (techGraphs[g2]);
 		graphMerged.Merge (newGraphs[g]);
 		graphs2.Push (graphMerged);
@@ -1455,13 +976,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    }
 	  }
 	}
-	// Set priority for this snippet
-	if (snipNum != (size_t)~0)
-	{
-	  int prio = tech->priority;
-	  for (size_t g = 0; g < techGraphs.GetSize(); g++)
-	    techGraphs[g].graph.GetSnippetPrios().SetSnippetPriority (snipNum, prio);
-	}
         // Add all the graphs for the technique to the complete graph list
         for (size_t g = 0; g < techGraphs.GetSize(); g++)
           graphs.Push (techGraphs[g]);
@@ -1470,85 +984,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       {
 	GraphInfo graphInfo;
 	graphInfo.graph.AddTechnique (tech);
-	// Set priority for this snippet
-	if (snipNum != (size_t)~0)
-	{
-	  int prio = tech->priority;
-	  graphInfo.graph.GetSnippetPrios().SetSnippetPriority (snipNum, prio);
-	}
 	graphs.Push (graphInfo);
       }
     }
     MapGraphInputsOutputs (graphs, snip);
-  }
-  
-  void TechniqueGraphBuilder::FixupExplicitConnections (const Snippet* snip, 
-    csArray<GraphInfo>& graphs)
-  {
-    CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique*> > techIter (
-      snip->GetTechniques());
-    size_t snipNum = (size_t)~0;
-    if (techIter->GetTotal() > 1)
-    {
-      snipNum = snipNums.GetSnippetNumber (snip);
-    }
-    while (techIter->HasNext())
-    {
-      const Snippet::Technique* tech = techIter->Next();
-      if (tech->IsCompound ())
-      {
-        const Snippet::CompoundTechnique* compTech =
-          static_cast<const Snippet::CompoundTechnique*> (tech);
-	// Each sub-snippet ...
-	Snippet::CompoundTechnique::IdSnippetHash::ConstGlobalIterator
-	  snippetIter = compTech->snippets.GetIterator();
-	while (snippetIter.HasNext())
-	{
-	  Snippet* snippet = snippetIter.Next ();
-	  FixupExplicitConnections (snippet, graphs);
-	}
-	// Transfer explicit connections
-	for (size_t g = 0; g < graphs.GetSize(); g++)
-	{
-	  GraphInfo& graphInfo = graphs[g];
-	  snippetIter.Reset();
-	  while (snippetIter.HasNext())
-	  {
-	    Snippet* toSnippet = snippetIter.Next ();
-	    const Snippet::ExplicitConnectionsHash* explicitConns =
-	      compTech->GetExplicitConnections (toSnippet);
-	    if (!explicitConns) continue;
-	    
-	    TechniqueGraph::ExplicitConnectionsHash newExplicitConns;
-	    SnippetToTechMap::Iterator toIt = 
-	      graphInfo.snippetToTechIn.GetIterator (toSnippet);
-	    while (toIt.HasNext())
-	    {
-	      const Snippet::Technique* toTech = toIt.Next();
-	      Snippet::ExplicitConnectionsHash::ConstGlobalIterator
-	        explicitConnIt = explicitConns->GetIterator ();
-	      while (explicitConnIt.HasNext())
-	      {
-		csString dest;
-		const Snippet::ExplicitConnectionSource& source = 
-		  explicitConnIt.Next (dest);
-		TechniqueGraph::ExplicitConnectionSource newSource;
-		SnippetToTechMap::Iterator fromIt = 
-		  graphInfo.snippetToTechOut.GetIterator (source.from);
-		while (fromIt.HasNext())
-		{
-		  newSource.from = fromIt.Next();
-		  newSource.outputName = source.outputName;
-		  newExplicitConns.Put (dest, newSource);
-		}
-		graphInfo.graph.GetExplicitConnections (toTech) =
-		  newExplicitConns;
-	      }
-	    }
-	  }
-	}
-      }
-    }
   }
 
   void TechniqueGraphBuilder::MapGraphInputsOutputs (GraphInfo& graphInfo, 
@@ -1559,7 +998,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       graphInfo.graph.GetInputTechniques (inTechs);
       for (size_t t = 0; t < inTechs.GetSize(); t++)
       {
-        graphInfo.snippetToTechIn.Put (snip, inTechs[t]);
+        graphInfo.snippetToTechIn.PutUnique (snip, inTechs[t]);
       }
     }
     {
@@ -1567,7 +1006,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       graphInfo.graph.GetOutputTechniques (outTechs);
       for (size_t t = 0; t < outTechs.GetSize(); t++)
       {
-        graphInfo.snippetToTechOut.Put (snip, outTechs[t]);
+        graphInfo.snippetToTechOut.PutUnique (snip, outTechs[t]);
       }
     }
   }
@@ -1586,9 +1025,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   {
     csArray<GraphInfo> graphInfos;
     BuildSubGraphs (snip, graphInfos);
-    
-    FixupExplicitConnections (snip, graphInfos);
-    
     for (size_t g = 0; g < graphInfos.GetSize(); g++)
       graphs.Push (graphInfos[g].graph);
   }

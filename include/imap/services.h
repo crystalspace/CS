@@ -95,7 +95,7 @@ namespace CS
  */
 struct iSyntaxService : public virtual iBase
 {
-  SCF_INTERFACE (iSyntaxService, 2, 1, 4);
+  SCF_INTERFACE (iSyntaxService, 2, 1, 3);
   
   /**\name Parse reporting helpers
    * @{ */
@@ -437,14 +437,6 @@ struct iSyntaxService : public virtual iBase
    * Parse a user render buffer.
    */
   virtual bool ParseRenderBuffer (iDocumentNode* node, iRenderBuffer* buffer) = 0;
-
-  /**
-   * Parse a <tt>&lt;<i>shader</i>&gt;<tt> node (as found in shader XML files
-   * or possibly world files. 
-   */
-  virtual csRef<iShader> ParseShader (iLoaderContext* ldr_context,
-      iDocumentNode* node) = 0;
-
 };
 
 /** @} */

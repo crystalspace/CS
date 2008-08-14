@@ -521,19 +521,6 @@ public:
       & (((csBitArrayStorageType)1) << GetOffset(pos))) != 0;
   }
 
-  /**
-   * Returns true if the bit at position \a pos is true.
-   * The difference to IsBitSet() is that this methods accepts positions
-   * outside the bit array (returns \c false) instead of throwing an
-   * assertion in that case.
-   */
-  bool IsBitSetTolerant (size_t pos) const
-  {
-    if (pos >= mNumBits) return false;
-    return (GetStore()[GetIndex(pos)] 
-      & (((csBitArrayStorageType)1) << GetOffset(pos))) != 0;
-  }
-  
   /// Checks whether at least one of \a count bits is set starting at \a pos.
   bool AreSomeBitsSet (size_t pos, size_t count) const
   {

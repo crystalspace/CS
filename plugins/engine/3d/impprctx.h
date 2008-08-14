@@ -48,9 +48,7 @@ private:
 
   //cached csStringID values
   static csStringID stringid_standard;
-  static CS::ShaderVarStringID stringid_light_ambient;
-
-  csRef<iShaderVarStringSet> svStringSet;
+  static csStringID stringid_light_ambient;
 
   void SetImposterReady (bool r);
 

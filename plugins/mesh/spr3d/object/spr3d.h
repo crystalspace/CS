@@ -242,10 +242,8 @@ public:
 private:
   csString name;
   bool reverse_action;
-  csArray<csSpriteFrame*, csArrayElementHandler<csSpriteFrame*>,
-    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<8> > frames;
-  csArray<int, csArrayElementHandler<int>,
-    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<8> > delays;
+  csArray<csSpriteFrame*> frames;
+  csArray<int> delays;
   csArray<float> displacements;
 };
 
@@ -368,14 +366,11 @@ private:
   /// The base mesh is also the texture alignment mesh.
   csTriangleMesh* texel_mesh;
   /// The array of texels
-  csPDelArray<csPoly2D, 
-    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<8> > texels;
+  csPDelArray<csPoly2D> texels;
   /// The vertices
-  csPDelArray<csPoly3D, 
-    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<8> > vertices;
+  csPDelArray<csPoly3D> vertices;
   /// The normals
-  csPDelArray<csPoly3D, 
-    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<8> > normals;
+  csPDelArray<csPoly3D> normals;
 
   csFlags flags;
 
@@ -1088,7 +1083,7 @@ private:
   /**
    * Update the lighting on this sprite.
    */
-  void UpdateLighting (const csSafeCopyArray<csLightInfluence>& lights,
+  void UpdateLighting (const csArray<iLightSectorInfluence*>& lights,
       iMovable* movable);
 
   /**
@@ -1096,7 +1091,7 @@ private:
    * the distance between the light and every vertex.
    * This version can use tweening of the normals and vertices
    */
-  void UpdateLightingHQ (const csSafeCopyArray<csLightInfluence>& lights,
+  void UpdateLightingHQ (const csArray<iLightSectorInfluence*>& lights,
       iMovable* movable);
 
   /**
@@ -1104,7 +1099,7 @@ private:
    * calculates the distance once (from the center of the sprite.)
    * This method can use tweening of the normals.
    */
-  void UpdateLightingLQ (const csSafeCopyArray<csLightInfluence>& lights,
+  void UpdateLightingLQ (const csArray<iLightSectorInfluence*>& lights,
       iMovable* movable);
 
   /**
@@ -1112,7 +1107,7 @@ private:
    * calculates the distance once (from the center of the sprite.)
    * This version can NOT use any tweening.
    */
-  void UpdateLightingFast (const csSafeCopyArray<csLightInfluence>& lights,
+  void UpdateLightingFast (const csArray<iLightSectorInfluence*>& lights,
       iMovable* movable);
 
   /**

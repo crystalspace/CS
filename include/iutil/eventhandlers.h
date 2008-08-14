@@ -64,9 +64,9 @@ struct iEventHandlerRegistry : public virtual iBase
    * This should only ever be done to reference generic 
    * (non-instantiated) handler names or single-instance handlers.
    */	
-  virtual csHandlerID GetGenericID (const char*) = 0;
-  virtual csHandlerID GetGenericPreBoundID (csHandlerID) = 0;
-  virtual csHandlerID GetGenericPostBoundID (csHandlerID) = 0;
+  virtual CS_CONST_METHOD csHandlerID GetGenericID (const char*) = 0;
+  virtual CS_CONST_METHOD csHandlerID GetGenericPreBoundID (csHandlerID) = 0;
+  virtual CS_CONST_METHOD csHandlerID GetGenericPostBoundID (csHandlerID) = 0;
   /**
    * Get the csHandlerID for a specified event handler, which provides
    * its own name via the iEventHandler::GetInstanceName() method.
@@ -101,26 +101,26 @@ struct iEventHandlerRegistry : public virtual iBase
    * (will be NULL if csHandlerID is a generic name, i.e.,
    * if (!csEventHandlerRegistry->IsInstance(id)).
    */
-  virtual iEventHandler *GetHandler (csHandlerID id) = 0;
+  virtual CS_CONST_METHOD iEventHandler *GetHandler (csHandlerID id) = 0;
   /**
    * returns true if instanceid is a handler instance,
    * genericid is a generic instance, and instanceid is an
    * instance of genericid in particular.
    */
-  virtual bool const IsInstanceOf (csHandlerID instanceid, 
+  virtual CS_CONST_METHOD bool const IsInstanceOf (csHandlerID instanceid, 
     csHandlerID genericid) = 0;
   /**
    * returns true if id is a handler instance (i.e., not a generic name).
    */
-  virtual bool const IsInstance (csHandlerID id) = 0;
+  virtual CS_CONST_METHOD bool const IsInstance (csHandlerID id) = 0;
   /**
    * Returns the csHandleID for the generic name for instance name id.
    */
-  virtual csHandlerID const GetGeneric (csHandlerID id) = 0;
+  virtual CS_CONST_METHOD csHandlerID const GetGeneric (csHandlerID id) = 0;
   /**
    * Returns the string name for a csHandlerID.
    */
-  virtual const char *GetString (csHandlerID id) = 0;
+  virtual CS_CONST_METHOD const char *GetString (csHandlerID id) = 0;
 }; 
 
 /** @} */

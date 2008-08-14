@@ -419,6 +419,11 @@ public:
       CS_DBGHELP_TXTDUMP | CS_DBGHELP_BENCHMARK;
   }
 
+  virtual csPtr<iString> UnitTest ()
+  {
+    return 0;
+  }
+
   virtual csPtr<iString> StateTest ()
   {
     scfString* rc = new scfString ();

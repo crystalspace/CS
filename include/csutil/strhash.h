@@ -28,10 +28,6 @@
  * String-to-ID hash table.
  */
  
-namespace CS
-{
-namespace Utility
-{
 /**
  * A string-to-ID hash table.  Useful when you need to work with strings but
  * want the performance characteristics of simple numeric comparisons.
@@ -39,41 +35,27 @@ namespace Utility
  * comparing strings.  You can fetch a string's ID via Request().
  * \sa csStringSet
  */
-template<typename Tag>
-class StringHash
+class CS_CRYSTALSPACE_EXPORT csStringHash
 {
 private:
-  typedef csHash<StringID<Tag>, char const*> HashType;
+  typedef csHash<csStringID, char const*> HashType;
   HashType registry;
   csMemoryPool pool;
 
-public:
-  typedef typename HashType::ConstGlobalIterator GlobalIterator;
+  void Copy(csStringHash const&);
 
-private:
-  void Copy(StringHash const& h)
-  {
-    if (&h != this)
-    {
-      GlobalIterator it(h.GetIterator());
-      while (it.HasNext())
-      {
-	char const* s;
-	StringID<Tag> id = it.Next(s);
-	this->Register(s, id);
-      }
-    }
-  }
+public:
+  typedef HashType::ConstGlobalIterator GlobalIterator;
 
 public:
   /// Constructor.
-  StringHash (size_t size = 23) : registry (size) {}
+  csStringHash (size_t size = 23);
   /// Copy constructor.
-  StringHash (StringHash const& h) { Copy(h); }
+  csStringHash (csStringHash const& h) { Copy(h); }
   /// Destructor.
-  ~StringHash () { Empty(); }
+  ~csStringHash ();
   /// Assignment operator.
-  StringHash& operator=(StringHash const& h) { Copy(h); return *this; }
+  csStringHash& operator=(csStringHash const& h) { Copy(h); return *this; }
 
   /**
    * Register a string with an ID.
@@ -84,7 +66,7 @@ public:
    *   ID will be replaced with the one specified here. If you would like the
    *   convenience of having the ID assigned automatically, then consider using
    *   csStringSet, instead.
-   * 
+   * <p>
    * \remarks If you do not care about the ID, but instead simply want to use
    *   the hash as a string \e set which merely records if a string is present,
    *   then you can omit \c id. To find out if a string is contained in the
@@ -94,22 +76,14 @@ public:
    *   for a good alternative to csStringSet when you do not require its extra
    *   bulk.
    */
-  const char* Register (const char* s, StringID<Tag> id = 0)
-  {
-    char const* t = pool.Store(s);
-    registry.PutUnique(t, id);
-    return t;
-  }
+  const char* Register (const char* s, csStringID id = 0);
 
   /**
    * Request the ID for the given string.
    * \return The string's ID or csInvalidStringID if the string has not yet
    *   been registered.
    */
-  StringID<Tag> Request (const char* s) const
-  {
-    return registry.Get(s, CS::InvalidStringID<Tag> ());
-  }
+  csStringID Request (const char* s) const;
 
   /**
    * Request the string for a given ID.
@@ -121,18 +95,7 @@ public:
    *   frequently, then instead consider using csStringSet or csStringHashReversible,
    *   in which reverse lookups are optimized.
    */
-  const char* Request (StringID<Tag> id) const
-  {
-    GlobalIterator it(GetIterator());
-    while (it.HasNext())
-    {
-      char const* s;
-      StringID<Tag> const x = it.Next(s);
-      if (x == id)
-	return s;
-    }
-    return 0;
-  }
+  const char* Request (csStringID id) const;
 
   /**
    * Check if the hash contains a particular string.
@@ -140,7 +103,7 @@ public:
    *   <tt>return Request(s) != csInvalidStringID</tt>.
    */
   bool Contains(char const* s) const
-  { return Request(s) != InvalidStringID<Tag> (); }
+  { return Request(s) != csInvalidStringID; }
 
   /**
    * Check if the hash contains a string with a particular ID.
@@ -150,17 +113,14 @@ public:
    *   frequently, then instead consider using csStringSet, in which such
    *   checks are optimized.
    */
-  bool Contains(StringID<Tag> id) const
+  bool Contains(csStringID id) const
   { return Request(id) != 0; }
 
   /**
    * Remove specified string.
    * \return True if a matching string was in thet set; else false.
    */
-  bool Delete(char const* s)
-  {
-    return registry.DeleteAll(s);
-  }
+  bool Delete(char const* s);
 
   /**
    * Remove a string with the specified ID.
@@ -168,20 +128,12 @@ public:
    * \remarks If more than one string is associated with the ID, then one is
    *   removed (but specifically which one is unspecified).
    */
-  bool Delete(StringID<Tag> id)
-  {
-    char const* s = Request(id);
-    return s != 0 ? Delete(s) : false;
-  }
+  bool Delete(csStringID id);
 
   /**
    * Remove all stored strings.
    */
-  void Empty ()
-  {
-    registry.Empty();
-    pool.Empty();
-  }
+  void Empty ();
 
   /**
    * Delete all stored strings.
@@ -211,9 +163,5 @@ public:
   GlobalIterator GetIterator () const
   { return registry.GetIterator(); }
 };
-} // namespace Utility
-} // namespace CS
-
-typedef CS::Utility::StringHash<CS::StringSetTag::General> csStringHash;
 
 #endif // __CS_STRHASH_H__

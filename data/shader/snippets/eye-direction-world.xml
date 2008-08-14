@@ -1,6 +1,6 @@
 <!--
-  Copyright (C) 2008 by Frank Richter
-	    (C) 2008 by Jorrit Tyberghein
+  Copyright (C) 2007 by Frank Richter
+	    (C) 2007 by Jorrit Tyberghein
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -23,38 +23,26 @@
   
     <input name="position" type="position4_world" />
     
-    <input name="eyePosWorld" type="float4" default="complex" private="yes">
+    <input name="ModelViewIT" type="float4x4" default="complex">
       <block location="cg:vertexIn">
-	<uniform type="float4" name="eyePosWorld" />
-      </block>
-      
-      <block location="cg:fragmentIn">
-	<uniform type="float4" name="eyePosWorld" />
+	<uniform type="float4x4" name="ModelViewIT" 
+	  binding="state.matrix.modelview.invtrans" />
       </block>
       
       <block location="cg:vertexMain">
-	eyePosWorld = vertexIn.eyePosWorld;
-      </block>
-      
-      <block location="cg:fragmentMain">
-	eyePosWorld = fragmentIn.eyePosWorld;
-      </block>
-      
-      <block location="cg:variablemap">
-	<variablemap destination="fragmentIn.eyePosWorld" type="expr">
-	  <sexp>(matrix-column (matrix2gl "world2camera transform inverse") 3)</sexp>
-	</variablemap>
-	<variablemap destination="vertexIn.eyePosWorld" type="expr">
-	  <sexp>(matrix-column (matrix2gl "world2camera transform inverse") 3)</sexp>
-	</variablemap>
+	ModelViewIT = vertexIn.ModelViewIT;
       </block>
     </input>
     
-    <block location="cg:vertexMain">
-      eyeDirectionWorld = (position - eyePosWorld).xyz;
+    <input file="/shader/snippets/objectToWorld.inp" private="yes" />
+    
+    <block location="cg:vertexToFragment">
+      <varying type="direction_world" name="eyeDirectionWorld" />
     </block>
-  
-    <block location="cg:fragmentMain">
+    
+    <block location="cg:vertexMain">
+      float4 eyePosObject = ModelViewIT[3];
+      float4 eyePosWorld = mul (objectToWorld, eyePosObject);
       eyeDirectionWorld = (position - eyePosWorld).xyz;
     </block>
   

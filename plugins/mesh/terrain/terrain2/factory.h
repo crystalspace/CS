@@ -45,16 +45,8 @@ public:
     iTerrainCellRenderProperties* renderProp,
     iTerrainCellCollisionProperties* collisionProp,
     iTerrainCellFeederProperties* feederProp);
-  csTerrainFactoryCell (const csTerrainFactoryCell& copyFrom);
 
   csPtr<csTerrainCell> CreateCell (csTerrainSystem* terrain);
-
-  void SetRenderProperties (iTerrainCellRenderProperties* p)
-  { rendererProperties = p; }
-  void SetCollisionProperties (iTerrainCellCollisionProperties* p)
-  { colliderProperties = p; }
-  void SetFeederProperties (iTerrainCellFeederProperties* p)
-  { feederProperties = p; }
 
   // ------------ iTerrainFactoryCell implementation ------------
   virtual iTerrainCellRenderProperties* GetRenderProperties () const;
@@ -63,31 +55,6 @@ public:
 
   virtual void SetBaseMaterial (iMaterialWrapper* material);
 
-  virtual const char* GetName() { return name; }
-  virtual void SetName (const char* name) { this->name = name; }
-
-  virtual int GetGridWidth () const { return gridWidth; }
-  virtual int GetGridHeight () const { return gridHeight; }
-
-  virtual const csVector2& GetPosition () const { return position; }
-  virtual const csVector3& GetSize () const { return size; }
-
-  virtual int GetMaterialMapWidth () const { return materialMapWidth; }
-  virtual int GetMaterialMapHeight () const { return materialMapHeight; }
-
-  virtual iMaterialWrapper* GetBaseMaterial () const { return baseMaterial; }
-  virtual bool GetMaterialPersistent() const { return materialMapPersistent; }
-
-  virtual void SetGridWidth (int w) { gridWidth = w; }
-  virtual void SetGridHeight (int h) { gridHeight = h; }
-
-  virtual void SetPosition (const csVector2& pos) { position = pos; }
-  virtual void SetSize (const csVector3& size) { this->size = size; }
-
-  virtual void SetMaterialMapWidth (int w) { materialMapWidth = w; }
-  virtual void SetMaterialMapHeight (int h) { materialMapHeight = h; }
-
-  virtual void SetMaterialPersistent (bool flag) { materialMapPersistent = flag; }
 private:
   csString name;
   csVector2 position;
@@ -133,24 +100,10 @@ public:
   virtual void SetCollider (iTerrainCollider* collider);
   virtual void SetFeeder (iTerrainDataFeeder* feeder);
 
-  virtual iTerrainRenderer* GetRenderer () { return renderer; }
-  virtual iTerrainCollider* GetCollider () { return collider; }
-  virtual iTerrainDataFeeder* GetFeeder () { return dataFeeder; }
-
-  virtual size_t GetMaxLoadedCells () { return maxLoadedCells; }
-
-  virtual size_t GetCellCount () { return cells.GetSize(); }
-  virtual iTerrainFactoryCell* GetCell (size_t index) { return cells[index]; }
-  virtual iTerrainFactoryCell* GetCell (const char* name);
-
-  /// Get pseudo-cell with default settings for all cells
-  virtual iTerrainFactoryCell* GetDefaultCell () { return &defaultCell; }
-
   virtual iTerrainFactoryCell* AddCell (const char* name, 
     int gridWidth, int gridHeight, int materialMapWidth,
     int materialMapHeight, bool materialMapPersistent,
     const csVector2& position, const csVector3& size);
-  virtual iTerrainFactoryCell* AddCell ();
 
   virtual void SetMaxLoadedCells (size_t value);
   virtual void SetVirtualViewDistance (float distance);
@@ -162,7 +115,6 @@ private:
   csRef<iTerrainDataFeeder> dataFeeder;
   csRef<iMeshObjectType> type;
 
-  csTerrainFactoryCell defaultCell;
   csRefArray<csTerrainFactoryCell> cells;
 
   iMeshFactoryWrapper* logParent;

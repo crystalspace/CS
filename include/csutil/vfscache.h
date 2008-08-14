@@ -48,7 +48,7 @@ private:
 
   void CacheName (csStringFast<512>& buf, const char* type, const char* scope,
   	uint32 id);
-  void RecursiveDelete (const char* fn);
+
 public:
   /**
    * Construct the cache manager with the given directory.

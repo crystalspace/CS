@@ -215,11 +215,10 @@ public:
 class VfsArchiveCache : public CS::Memory::CustomAllocated
 {
 private:
-  csPDelArray<VfsArchive, CS::Container::ArrayAllocDefault,
-    csArrayCapacityFixedGrow<8> > array;
+  csPDelArray<VfsArchive> array;
 
 public:
-  VfsArchiveCache () : array (8)
+  VfsArchiveCache () : array (8, 8)
   {
   }
   virtual ~VfsArchiveCache ()
@@ -1642,51 +1641,55 @@ bool csVFS::AddLink (const char *VirtualPath, const char *RealPath)
 
 char *csVFS::_ExpandPath (const char *Path, bool IsDir) const
 {
-  csStringFast<VFS_MAX_PATH_LEN> outname;
-  size_t inp = 0, namelen = strlen (Path);
+  char outname [VFS_MAX_PATH_LEN + 1];
+  size_t inp = 0, outp = 0, namelen = strlen (Path);
 
   // Copy 'Path' to 'outname', processing FS macros during the way
-  while (inp < namelen)
+  while ((outp < sizeof (outname) - 1) && (inp < namelen))
   {
     // Get next path component
-    csStringFast<VFS_MAX_PATH_LEN> tmp;
+    char tmp [VFS_MAX_PATH_LEN + 1];
+    size_t ptmp = 0;
     while ((inp < namelen) && (Path [inp] != VFS_PATH_SEPARATOR))
-      tmp << Path [inp++];
+      tmp [ptmp++] = Path [inp++];
+    tmp [ptmp] = 0;
 
     // If this is the very first component, append it to cwd
-    if (!tmp.IsEmpty() && (outname.Length() == 0))
+    if ((ptmp > 0) && (outp == 0))
     {
-      outname = GetCwd ();
+      strcpy (outname, GetCwd ());
+      outp = strlen (outname);
     } /* endif */
 
     // Check if path component is ".."
-    if (tmp == "..")
+    if (strcmp (tmp, "..") == 0)
     {
-      size_t outp = outname.Length();
       // Skip back all '/' we encounter
       while ((outp > 0) && (outname [outp - 1] == VFS_PATH_SEPARATOR))
         outp--;
       // Skip back until we find another '/'
       while ((outp > 0) && (outname [outp - 1] != VFS_PATH_SEPARATOR))
         outp--;
-      outname.Truncate (outp);
     }
     // Check if path component is "."
-    else if (tmp == ".")
+    else if (strcmp (tmp, ".") == 0)
     {
       // do nothing
     }
     // Check if path component is "~"
-    else if (tmp == "~")
+    else if (strcmp (tmp, "~") == 0)
     {
       // Strip entire output path; start from scratch
-      outname = "/~/";
+      strcpy (outname, "/~/");
+      outp = 3;
     }
     else
     {
-      outname += tmp;
+      size_t sl = strlen (tmp);
+      memcpy (&outname [outp], tmp, sl);
+      outp += sl;
       if (IsDir || (inp < namelen))
-        outname << VFS_PATH_SEPARATOR;
+        outname [outp++] = VFS_PATH_SEPARATOR;
     } /* endif */
 
     // Skip all '/' in source path
@@ -1695,7 +1698,10 @@ char *csVFS::_ExpandPath (const char *Path, bool IsDir) const
   } /* endwhile */
 
   // Allocate a new string and return it
-  return CS::StrDup (outname);
+  char *ret = (char*)cs_malloc (outp + 1);
+  memcpy (ret, outname, outp);
+  ret [outp] = 0;
+  return ret;
 }
 
 csPtr<iDataBuffer> csVFS::ExpandPath (const char *Path, bool IsDir) const

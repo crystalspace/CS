@@ -28,8 +28,6 @@
 #include <dirent.h>
 #include <stdarg.h>
 
-#include "sanity.inc"
-
 #ifndef F_OK
 #  define F_OK 0
 #endif

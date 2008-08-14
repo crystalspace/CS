@@ -68,8 +68,7 @@ public:
   // Size of this font
   float fontSize;
   // The list of delete callbacks
-  csRefArray<iFontDeleteNotify, CS::Container::ArrayAllocDefault,
-    csArrayCapacityFixedGrow<4> > DeleteCallbacks;
+  csRefArray<iFontDeleteNotify> DeleteCallbacks;
   /*
     @@@ Somewhat ugly. The glyph metrics will be stored twice, in the font and
     the font cache itself.

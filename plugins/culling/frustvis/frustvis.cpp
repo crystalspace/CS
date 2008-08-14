@@ -64,12 +64,12 @@ class csFrustVisObjIt :
   public scfImplementation1<csFrustVisObjIt, iVisibilityObjectIterator>
 {
 private:
-  csFrustumVis::VistestObjectsArray* vector;
+  csArray<iVisibilityObject*>* vector;
   size_t position;
   bool* vistest_objects_inuse;
 
 public:
-  csFrustVisObjIt (csFrustumVis::VistestObjectsArray* vector,
+  csFrustVisObjIt (csArray<iVisibilityObject*>* vector,
     bool* vistest_objects_inuse) :
     scfImplementationType(this)
   {
@@ -149,8 +149,8 @@ public:
 
 csFrustumVis::csFrustumVis (iBase *iParent) :
   scfImplementationType (this, iParent),
-  vistest_objects (256),
-  visobj_vector (256),
+  vistest_objects (256, 256),
+  visobj_vector (256, 256),
   update_queue (151, 59)
 {
   object_reg = 0;
@@ -489,7 +489,7 @@ void csFrustumVis::FrustTest_Traverse (csKDTree* treenode,
 }
 
 bool csFrustumVis::VisTest (iRenderView* rview, 
-                            iVisibilityCullerListener* viscallback, int, int)
+                            iVisibilityCullerListener* viscallback)
 {
   // We update the objects before testing the callback so that
   // we can use this VisTest() call to make sure the objects in the
@@ -525,7 +525,7 @@ struct FrustTestPlanes_Front2BackData
 {
 
   uint32 current_vistest_nr;
-  csFrustumVis::VistestObjectsArray* vistest_objects;
+  csArray<iVisibilityObject*>* vistest_objects;
 
   // During VisTest() we use the current frustum as five planes.
   // Associated with this frustum we also have a clip mask which
@@ -595,12 +595,12 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (csPlane3* planes,
   UpdateObjects ();
   current_vistest_nr++;
 
-  VistestObjectsArray* v;
+  csArray<iVisibilityObject*>* v;
   if (vistest_objects_inuse)
   {
     // Vector is already in use by another iterator. Allocate a new vector
     // here.
-    v = new VistestObjectsArray ();
+    v = new csArray<iVisibilityObject*> ();
   }
   else
   {
@@ -645,7 +645,7 @@ struct FrustTestBox_Front2BackData
 {
   uint32 current_vistest_nr;
   csBox3 box;
-  csFrustumVis::VistestObjectsArray* vistest_objects;
+  csArray<iVisibilityObject*>* vistest_objects;
 };
 
 static bool FrustTestBox_Front2Back (csKDTree* treenode, void* userdata,
@@ -695,12 +695,12 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csBox3& box)
   UpdateObjects ();
   current_vistest_nr++;
 
-  VistestObjectsArray* v;
+  csArray<iVisibilityObject*>* v;
   if (vistest_objects_inuse)
   {
     // Vector is already in use by another iterator. Allocate a new vector
     // here.
-    v = new VistestObjectsArray ();
+    v = new csArray<iVisibilityObject*> ();
   }
   else
   {
@@ -727,7 +727,7 @@ struct FrustTestSphere_Front2BackData
   uint32 current_vistest_nr;
   csVector3 pos;
   float sqradius;
-  csFrustumVis::VistestObjectsArray* vistest_objects;
+  csArray<iVisibilityObject*>* vistest_objects;
 
   iVisibilityCullerListener* viscallback;
 };
@@ -788,12 +788,12 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csSphere& sphere)
   UpdateObjects ();
   current_vistest_nr++;
 
-  VistestObjectsArray* v;
+  csArray<iVisibilityObject*>* v;
   if (vistest_objects_inuse)
   {
     // Vector is already in use by another iterator. Allocate a new vector
     // here.
-    v = new VistestObjectsArray ();
+    v = new csArray<iVisibilityObject*> ();
   }
   else
   {
@@ -840,7 +840,7 @@ struct IntersectSegment_Front2BackData
   float r;
   iMeshWrapper* mesh;
   int polygon_idx;
-  csFrustumVis::VistestObjectsArray* vector;	// If not-null we need all objects.
+  csArray<iVisibilityObject*>* vector;	// If not-null we need all objects.
   bool accurate;
 };
 
@@ -1038,7 +1038,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::IntersectSegment (
   data.r = 10000000000.;
   data.mesh = 0;
   data.polygon_idx = -1;
-  data.vector = new VistestObjectsArray ();
+  data.vector = new csArray<iVisibilityObject*> ();
   data.accurate = accurate;
   kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
 
@@ -1053,7 +1053,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::IntersectSegmentSloppy (
   current_vistest_nr++;
   IntersectSegment_Front2BackData data;
   data.seg.Set (start, end);
-  data.vector = new VistestObjectsArray ();
+  data.vector = new csArray<iVisibilityObject*> ();
   kdtree->Front2Back (start, IntersectSegmentSloppy_Front2Back,
   	(void*)&data, 0);
 

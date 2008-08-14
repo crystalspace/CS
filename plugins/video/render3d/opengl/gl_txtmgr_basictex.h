@@ -28,14 +28,12 @@
 #endif
 
 #include "csutil/leakguard.h"
-#include "csutil/pooledscfclass.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/weakref.h"
 
 #include "igraphic/image.h"
-#include "iutil/databuff.h"
 #include "ivideo/texture.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
@@ -91,30 +89,6 @@ struct csGLUploadData
 
 struct csGLTextureClassSettings;
 
-class TextureReadbackSimple :
-  public scfImplementationPooled<scfImplementation1<TextureReadbackSimple,
-                                                    iDataBuffer> >
-{
-  typedef scfImplementationPooled<scfImplementation1<TextureReadbackSimple,
-                                                    iDataBuffer> > SuperClass;
-
-  void* data;
-  size_t size;
-public:
-  TextureReadbackSimple (void* data, size_t size) : SuperClass (this),
-    data (data), size (size) {}
-  ~TextureReadbackSimple()
-  {
-    cs_free (data);
-  }
-  
-  char* GetData () const { return (char*)data; }
-  int8* GetInt8 () { return (int8*)data; }
-  size_t GetSize () const { return size; }
-  uint8* GetUint8 () { return (uint8*)data; }
-  char* operator * () const { return (char*)data; }
-};
-
 // For GetTextureTarget ()
 #include "csutil/deprecated_warn_off.h"
 
@@ -139,16 +113,12 @@ protected:
     flagPrepared = 1 << 30,
     flagForeignHandle = 1 << 29,
     flagWasRenderTarget = 1 << 28,
-    flagExcessMaxMip = 1 << 27,
 
     // Flags below are used by csGLTextureHandle
     /// Does it have a keycolor?
-    flagTransp = 1 << 26,
+    flagTransp = 1 << 27,
     /// Is the color valid?
-    flagTranspSet = 1 << 25,
-    
-    /// Special flag to mark this texture is used in an FBO
-    flagInFBO = 1 << 24,
+    flagTranspSet = 1 << 26,
 
     flagLast,
     /// Mask to get only the "public" flags
@@ -210,8 +180,6 @@ protected:
   /// Upload the texture to GL.
   void Load ();
   void Unload ();
-  
-  CS::Graphics::TextureComparisonMode texCompare;
 public:
   /// The dimensions which were requested upon texture creation
   int orig_width, orig_height, orig_d;
@@ -230,9 +198,6 @@ public:
   {
     texFlags.SetBool (flagWasRenderTarget, b);
   }
-  
-  bool IsInFBO() const { return texFlags.Check (flagInFBO); }
-  void SetInFBO (bool b) { texFlags.SetBool (flagInFBO, b); }
 
   /// Create a texture with given dimensions
   csGLBasicTextureHandle (int width, int height, int depth,
@@ -347,8 +312,6 @@ public:
   void UpdateTexture ();
 
   GLuint GetHandle ();
-  void ChangeTextureCompareMode (
-    const CS::Graphics::TextureComparisonMode& mode);
 
   /**
    * Return the texture target for this texture (e.g. GL_TEXTURE_2D)
@@ -381,11 +344,6 @@ public:
   void ApplyBlitBuffer (uint8* buf);
   BlitBufferNature GetBufferNature (uint8* buf);
 
-  void SetMipmapLimits (int maxMip, int minMip = 0);
-  void GetMipmapLimits (int& maxMip, int& minMip);
-  
-  csPtr<iDataBuffer> Readback (const CS::StructuredTextureFormat&, int);
-  
   /// Dump the contents onto an image.
   csPtr<iImage> Dump ();
 };

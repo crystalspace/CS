@@ -755,7 +755,7 @@ private:
   csRef<iVirtualClock> vc;
   csRefArray<csSkeletonFactory> factories;
   csRefArray<iSkeleton> skeletons;
-  csEventID Frame;
+  csEventID PreProcess;
   bool manual_updates;
 public:
   csSkeletonGraveyard (iBase*);
@@ -788,7 +788,8 @@ public:
       return parent->HandleEvent (ev);
     }
 
-    CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.skeleton.graveyard")
+    CS_EVENTHANDLER_NAMES("crystalspace.skeleton.graveyard")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   };
   csRef<csSkelEventHandler> evhandler;
 };

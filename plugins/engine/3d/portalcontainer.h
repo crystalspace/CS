@@ -35,9 +35,6 @@
 class csMeshWrapper;
 class csMovable;
 
-CS_PLUGIN_NAMESPACE_BEGIN(Engine)
-{
-
 /**
  * A helper class for iTriangleMesh implementations used by csPortalContainer.
  */
@@ -124,7 +121,7 @@ private:
 
   csRef<iShaderManager> shader_man;
   csRef<iShader> fog_shader;
-  CS::ShaderVarStringID fogplane_name, fogdensity_name, fogcolor_name;
+  csStringID fogplane_name, fogdensity_name, fogcolor_name;
 
   // World space data. movable_nr is used to detect if it needs to be
   // recalculated.
@@ -141,9 +138,9 @@ private:
   // Drawing stuff...
   bool ClipToPlane (int portal_idx, csPlane3 *portal_plane,
 	const csVector3 &v_w2c, csVector3 * &pverts, int &num_verts);
-  /*bool DoPerspective (csVector3 *source, int num_verts,
+  bool DoPerspective (csVector3 *source, int num_verts,
 	csPoly2D *dest, bool mirror, int fov,
-	float shift_x, float shift_y, const csPlane3& plane_cam);*/
+	float shift_x, float shift_y, const csPlane3& plane_cam);
   void DrawOnePortal (csPortal* po, const csPoly2D& poly,
 	const csReversibleTransform& movtrans, iRenderView *rview,
 	const csPlane3& camera_plane);
@@ -156,8 +153,6 @@ private:
   bool ExtraVisTest (iRenderView* rview, csReversibleTransform& tr_o2c,
   	csVector3& camera_origin);
 
-  void GetBoundingSpheres (iRenderView* rview, csReversibleTransform* tr_o2c, 
-    csVector3* camera_origin, csSphere& world_sphere, csSphere& cam_sphere);
 protected:
   /**
    * Destructor.  This is private in order to force clients to use DecRef()
@@ -229,15 +224,6 @@ public:
     ShapeChanged ();
   }
   virtual void GetRadius (float& radius, csVector3& center);
-  
-  void ComputeScreenPolygons (iRenderView* rview,
-    csVector2* verts2D, csVector3* verts3D, size_t vertsSize, size_t* numVerts,
-    int viewWidth, int viewHeight);
-  
-  size_t GetTotalVertexCount () const;
 };
-
-}
-CS_PLUGIN_NAMESPACE_END(Engine)
 
 #endif // __CS_PORTALCONTAINER_H__

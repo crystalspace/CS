@@ -25,8 +25,6 @@
 
 #include "csextern.h"
 
-#include "ivideo/shader/shader.h"
-
 #include "csutil/scf.h"
 #include "csutil/strset.h"
 
@@ -41,7 +39,7 @@ struct iUserRenderBufferIterator : public virtual iBase
   /// Whether a next buffer is available.
   virtual bool HasNext() = 0;
   /// Get name of next buffer and optionally the buffer.
-  virtual CS::ShaderVarStringID Next (csRef<iRenderBuffer>* buf = 0) = 0;
+  virtual csStringID Next (csRef<iRenderBuffer>* buf = 0) = 0;
   /// Rewind to beginning.
   virtual void Reset() = 0;
 };
@@ -55,17 +53,17 @@ class CS_CRYSTALSPACE_EXPORT csUserRenderBufferManager
   struct userbuffer
   {
     csRef<iRenderBuffer> buf;
-    CS::ShaderVarStringID name;
+    csStringID name;
   };
-  class UserBufArrayCmp : public csArrayCmp<userbuffer, CS::ShaderVarStringID>
+  class UserBufArrayCmp : public csArrayCmp<userbuffer, csStringID>
   {
-    static int BufKeyCompare (userbuffer const& b, CS::ShaderVarStringID const& k)
+    static int BufKeyCompare (userbuffer const& b, csStringID const& k)
     { 
       return b.name - k;
     }
   public:
-    UserBufArrayCmp (CS::ShaderVarStringID key) : 
-      csArrayCmp<userbuffer, CS::ShaderVarStringID> (key, &BufKeyCompare)
+    UserBufArrayCmp (csStringID key) : 
+      csArrayCmp<userbuffer, csStringID> (key, &BufKeyCompare)
     {
     }
   };
@@ -74,17 +72,17 @@ class CS_CRYSTALSPACE_EXPORT csUserRenderBufferManager
   csArray<userbuffer> userBuffers;
 public:
   /// Retrieve a buffer.
-  iRenderBuffer* GetRenderBuffer (CS::ShaderVarStringID name) const;
+  iRenderBuffer* GetRenderBuffer (csStringID name) const;
   /**
    * Add a buffer. Returns false if a buffer of the same name was already 
    * added.
    */
-  bool AddRenderBuffer (CS::ShaderVarStringID name, iRenderBuffer* buffer);
+  bool AddRenderBuffer (csStringID name, iRenderBuffer* buffer);
   /**
    * Remove a buffer. Returns false if no buffer of the specified name was 
    * added.
    */
-  bool RemoveRenderBuffer (CS::ShaderVarStringID name);
+  bool RemoveRenderBuffer (csStringID name);
 
   csRef<iUserRenderBufferIterator> GetBuffers() const;
 };

@@ -22,7 +22,6 @@
 
 #include "iutil/selfdestruct.h"
 #include "ivideo/shader/shader.h"
-#include "ivideo/shader/xmlshader.h"
 #include "imap/ldrctxt.h"
 
 #include "csutil/bitarray.h"
@@ -30,18 +29,16 @@
 #include "csutil/dirtyaccessarray.h"
 
 #include "snippet.h"
-#include "synth.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
 
 class WeaverCompiler;
 
-class WeaverShader : public scfImplementationExt3<WeaverShader,
+class WeaverShader : public scfImplementationExt2<WeaverShader,
 						  csObject,
 						  iShader,
-						  iSelfDestruct,
-						  iXMLShader>
+						  iSelfDestruct>
 {
   csRef<WeaverCompiler> compiler;
   csRef<iShaderManager> shadermgr;
@@ -58,9 +55,8 @@ class WeaverShader : public scfImplementationExt3<WeaverShader,
   };
 
   // Scan all techniques in the document.
-  void Parse (iDocumentNode* templ,
-    csArray<TechniqueKeeper>& techniquesTmp, int forcepriority,
-    FileAliases& aliases);
+  void ScanForTechniques (iDocumentNode* templ,
+    csArray<TechniqueKeeper>& techniquesTmp, int forcepriority);
   
   static int CompareTechniqueKeeper (TechniqueKeeper const&,
 				     TechniqueKeeper const&);
@@ -72,22 +68,6 @@ class WeaverShader : public scfImplementationExt3<WeaverShader,
 protected:
   void InternalRemove() { SelfDestruct(); }
 
-  bool GeneratePasses (iDocumentNode* passgenNode,
-    const FileAliases& aliases, 
-    Synthesizer::DocNodeArray& nonPassNodes,
-    csArray<Synthesizer::DocNodeArray>& prePassNodes,
-    csPDelArray<Snippet>& passSnippets);
-
-  csRef<iDocument> LoadTechsFromDoc (const csArray<TechniqueKeeper>& techniques,
-    const FileAliases& aliases, iDocumentNode* docSource,
-    const char* cacheID, const char* cacheTag, iFile* cacheFile,
-    bool& cacheState);
-  csRef<iDocument> LoadTechsFromCache (iFile* cacheFile,
-    const char* cacheFailReason);
-  
-  csRef<iDocument> DoSynthesis (iDocumentNode* source,
-    iHierarchicalCache* cacheTo, int forcepriority,
-    bool noCacheRead);
 public:
   CS_LEAKGUARD_DECLARE (WeaverShader);
 
@@ -95,8 +75,7 @@ public:
   virtual ~WeaverShader();
   
   bool Load (iLoaderContext* ldr_context, iDocumentNode* source,
-    int forcepriority);
-  bool Precache (iDocumentNode* source, iHierarchicalCache* cacheTo);
+      int forcepriority);
 
   virtual iObject* QueryObject () 
   { return static_cast<iObject*> (static_cast<csObject*> (this)); }
@@ -105,9 +84,9 @@ public:
   virtual void SetFileName (const char* fn) { filename = fn; }
 
   virtual size_t GetTicket (const CS::Graphics::RenderMeshModes& modes,
-      const csShaderVariableStack& stack)
+      const iShaderVarStack* stacks)
   {
-    return realShader->GetTicket (modes, stack);
+    return realShader->GetTicket (modes, stacks);
   }
 
   virtual size_t GetNumberOfPasses (size_t ticket)
@@ -122,9 +101,9 @@ public:
 
   virtual bool SetupPass (size_t ticket, const CS::Graphics::RenderMesh *mesh,
     CS::Graphics::RenderMeshModes& modes,
-    const csShaderVariableStack& stack)
+    const iShaderVarStack* stacks)
   { 
-    return realShader->SetupPass (ticket, mesh, modes, stack);
+    return realShader->SetupPass (ticket, mesh, modes, stacks);
   }
 
   virtual bool TeardownPass (size_t ticket)
@@ -142,21 +121,6 @@ public:
     return realShader->GetMetadata (ticket);
   }
 
-  virtual const csShaderMetadata& GetMetadata () const
-  {
-    return realShader->GetMetadata ();
-  }
-
-  virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits) const
-  {
-    realShader->GetUsedShaderVars (ticket, bits);
-  }
-  
-  void PushShaderVariables (csShaderVariableStack& s, size_t t) const
-  {
-    realShader->PushShaderVariables (s, t);
-  }
-
   friend class csXMLShaderCompiler;
 
   /**\name iSelfDestruct implementation
@@ -171,7 +135,7 @@ public:
     realShader->AddVariable (variable);
   }
 
-  csShaderVariable* GetVariable (CS::ShaderVarStringID name) const
+  csShaderVariable* GetVariable (csStringID name) const
   { 
     return realShader->GetVariable (name);
   }
@@ -181,9 +145,9 @@ public:
     return realShader->GetShaderVariables ();
   }
 
-  void PushVariables (csShaderVariableStack& stack) const
+  void PushVariables (iShaderVarStack* stacks) const
   { 
-    realShader->PushVariables (stack);
+    realShader->PushVariables (stacks);
   }
 
   bool IsEmpty() const
@@ -203,21 +167,9 @@ public:
   {
     return realShader->RemoveVariable (variable);
   }
-  bool RemoveVariable (CS::ShaderVarStringID name)
+  bool RemoveVariable (csStringID name)
   {
     return realShader->RemoveVariable (name);
-  }
-  /** @} */
-
-  /**\name iXMLShader implementation
-   * @{ */
-  iDocumentNode* GetShaderSource ()
-  { 
-    csRef<iXMLShader> wrappedShader = scfQueryInterfaceSafe<iXMLShader> (
-      realShader);
-    if (wrappedShader.IsValid())
-      return wrappedShader->GetShaderSource();
-    return 0; 
   }
   /** @} */
 

@@ -65,24 +65,24 @@ struct iEventNameRegistry : public virtual iBase
    * Get the csEventID for an event name string 
    * (e.g., "crystalspace.input.keyboard.down").
    */
-  virtual csEventID GetID (const char* name) = 0;
+  virtual CS_CONST_METHOD csEventID GetID (const char* name) = 0;
 
   /**
    * Get the name represented by a csEventID.
    */
-  virtual const char* GetString (const csEventID id) = 0;
+  virtual CS_CONST_METHOD const char* GetString (const csEventID id) = 0;
   /**
    * Get the csEventID of the parent of the current event
    * (e.g., the parent of "crystalspace.input.mouse" is "crystalspace.input").
    */
-  virtual csEventID GetParentID (const csEventID id) = 0;
+  virtual CS_CONST_METHOD csEventID GetParentID (const csEventID id) = 0;
   /**
    * Determine whether the name of the first csEventID is an immediate child
    * of the name of the second csEventID (e.g., "crysalspace.input.mouse" is
    * an immediate child of "crystalspace.input" but not of "crystalspace" or
    * of "").
    */
-  virtual bool IsImmediateChildOf (const csEventID child, 
+  virtual CS_CONST_METHOD bool IsImmediateChildOf (const csEventID child, 
 						   const csEventID parent) = 0;
   /**
    * Determine whether the name of the first csEventID is equivalent to or
@@ -91,7 +91,7 @@ struct iEventNameRegistry : public virtual iBase
    * "crystalspace.input", "crystalspace", and "", but not of 
    * "crystalspace.input.mouse.2").
    */
-  virtual bool IsKindOf (const csEventID child, 
+  virtual CS_CONST_METHOD bool IsKindOf (const csEventID child, 
     const csEventID parent) = 0;
 
 };

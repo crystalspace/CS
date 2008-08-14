@@ -30,7 +30,6 @@
 #include "csutil/weakref.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
-#include "csutil/eventhandlers.h"
 #include "iutil/objreg.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -1851,12 +1850,12 @@ bool csEngineSequenceManager::Initialize (iObjectRegistry *r)
 {
   object_reg = r;
   eventHandler.AttachNew (new EventHandler (this));
-  Frame = csevFrame (object_reg);
+  PostProcess = csevPostProcess (object_reg);
   MouseEvent = csevMouseEvent (object_reg);
   csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
   {
-    csEventID events[3] = { Frame, MouseEvent, CS_EVENTLIST_END };
+    csEventID events[3] = { PostProcess, MouseEvent, CS_EVENTLIST_END };
     q->RegisterListener (eventHandler, events);
   }
 
@@ -1891,7 +1890,7 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
 {
   // Engine sequence manager must be post because frame must
   // be rendered and this must be fired BEFORE sequence manager. @@@ HACKY
-  if (event.Name == Frame)
+  if (event.Name == PostProcess)
   {
     global_framenr++;
 

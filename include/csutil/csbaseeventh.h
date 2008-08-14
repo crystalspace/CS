@@ -87,39 +87,39 @@ protected:
       if (!parent) return false;
       return parent->HandleEvent (event);
     }
-    virtual const char *GenericName() const 
+    CS_CONST_METHOD virtual const char *GenericName() const 
     { 
       if (!parent) return "application"; 
       return parent->GenericName();
     }
-    virtual csHandlerID GenericID(
+    CS_CONST_METHOD virtual csHandlerID GenericID(
       csRef<iEventHandlerRegistry>& reg) const 
     { 
       if (!parent) return CS_HANDLER_INVALID;
       return parent->GenericID (reg);
     }
-    virtual const csHandlerID *GenericPrec (
+    CS_CONST_METHOD virtual const csHandlerID *GenericPrec (
       csRef<iEventHandlerRegistry>& hreg, csRef<iEventNameRegistry>& nreg, 
       csEventID id) const 
     { 
       if (!parent) return 0; 
       return parent->GenericPrec (hreg, nreg, id);
     }
-    virtual const csHandlerID *GenericSucc (
+    CS_CONST_METHOD virtual const csHandlerID *GenericSucc (
       csRef<iEventHandlerRegistry>& hreg, csRef<iEventNameRegistry>& nreg, 
       csEventID id) const 
     { 
       if (!parent) return 0; 
       return parent->GenericSucc (hreg, nreg, id);
     }
-    virtual const csHandlerID *InstancePrec (
+    CS_CONST_METHOD virtual const csHandlerID *InstancePrec (
       csRef<iEventHandlerRegistry>& hreg, csRef<iEventNameRegistry>& nreg, 
       csEventID id) const 
     { 
       if (!parent) return 0; 
       return parent->InstancePrec (hreg, nreg, id);
     }
-    virtual const csHandlerID *InstanceSucc(
+    CS_CONST_METHOD virtual const csHandlerID *InstanceSucc(
       csRef<iEventHandlerRegistry>& hreg, csRef<iEventNameRegistry>& nreg, 
       csEventID id) const 
     { 
@@ -222,10 +222,10 @@ protected:
    * event handler as anything besides "application" for purposes of
    * event subscription scheduling.
    */
-  virtual const char *GenericName() const 
+  CS_CONST_METHOD virtual const char *GenericName() const 
   { return "application"; }
   
-  virtual csHandlerID GenericID (
+  CS_CONST_METHOD virtual csHandlerID GenericID (
     csRef<iEventHandlerRegistry>& reg) const 
   { 
     return reg->GetGenericID (GenericName ()); 
@@ -235,7 +235,7 @@ protected:
    * Override this if you want to force some modules to always handle some 
    * events before csBaseEventHandler.
    */
-  virtual const csHandlerID *GenericPrec (
+  CS_CONST_METHOD virtual const csHandlerID *GenericPrec (
     csRef<iEventHandlerRegistry>&, csRef<iEventNameRegistry>&, 
     csEventID) const 
   { return 0; }
@@ -244,7 +244,7 @@ protected:
    * Override this if you want to force some modules to always handle some 
    * events after csBaseEventHandler.
    */
-  virtual const csHandlerID *GenericSucc (
+  CS_CONST_METHOD virtual const csHandlerID *GenericSucc (
     csRef<iEventHandlerRegistry>&, csRef<iEventNameRegistry>&, 
     csEventID) const 
   { return 0; }
@@ -253,7 +253,7 @@ protected:
    * Override this if you want to force some modules to always handle some 
    * events before this instance of csBaseEventHandler.
    */
-  virtual const csHandlerID *InstancePrec (
+  CS_CONST_METHOD virtual const csHandlerID *InstancePrec (
     csRef<iEventHandlerRegistry>&, csRef<iEventNameRegistry>&, 
     csEventID) const 
   { return 0; }
@@ -262,7 +262,7 @@ protected:
    * Override this if you want to force some modules to always handle some 
    * events before this instance of csBaseEventHandler.
    */
-  virtual const csHandlerID *InstanceSucc (
+  CS_CONST_METHOD virtual const csHandlerID *InstanceSucc (
     csRef<iEventHandlerRegistry>&, csRef<iEventNameRegistry>&, 
     csEventID) const 
   { return 0; }

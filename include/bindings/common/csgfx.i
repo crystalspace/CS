@@ -1,5 +1,3 @@
-%template(iShaderVarStringSetBase) iStringSetBase<CS::StringSetTag::ShaderVar>;
-
 %rename(asRGBcolor) csRGBpixel::operator csRGBcolor;
 %include "csgfx/rgbpixel.h"
 %ignore ShaderVarName;

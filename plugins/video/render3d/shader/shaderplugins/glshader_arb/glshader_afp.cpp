@@ -60,7 +60,7 @@ void csShaderGLAFP::Deactivate()
 
 void csShaderGLAFP::SetupState (const CS::Graphics::RenderMesh* /*mesh*/, 
                                 CS::Graphics::RenderMeshModes& /*modes*/,
-	                        const csShaderVariableStack& stack)
+	                        const iShaderVarStack* stacks)
 {
   size_t i;
   const csGLExtensionManager* ext = shaderPlug->ext;
@@ -71,7 +71,7 @@ void csShaderGLAFP::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
   {
     VariableMapEntry& mapping = variablemap[i];
 
-    var = csGetShaderVariableFromStack (stack, mapping.name);
+    var = csGetShaderVariableFromStack (stacks, mapping.name);
     if (!var.IsValid ())
       var = mapping.mappingParam.var;
 
@@ -307,7 +307,7 @@ bool csShaderGLAFP::Load(iShaderDestinationResolver*, iDocumentNode* program)
   return true;
 }
 
-bool csShaderGLAFP::Compile (iHierarchicalCache*, csRef<iString>* tag)
+bool csShaderGLAFP::Compile()
 {
   shaderPlug->Open ();
 
@@ -328,7 +328,6 @@ bool csShaderGLAFP::Compile (iHierarchicalCache*, csRef<iString>* tag)
   }
 
   variablemap.ShrinkBestFit();
-  tag->AttachNew (new scfString ("default"));
 
   return LoadProgramStringToGL ();
 }

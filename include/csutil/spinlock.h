@@ -82,13 +82,15 @@ namespace CS
 	    break;
 	  }
 	  if ((++spins & spinsPerYield) == 0) {
-    #if defined(CS_PLATFORM_UNIX)
+    #if defined (__SVR4) && defined (__sun) /* solaris */
+	    thr_yield();
+    #elif defined(linux) || defined(CS_PLATFORM_MACOSX)
 	    sched_yield();
     #elif defined(CS_PLATFORM_WIN32)
 	    SleepEx (0, FALSE);
     #else  /* no-op yield on unknown systems */
 	    ;
-    #endif /* CS_PLATFORM_UNIX, CS_PLATFORM_WIN32 */
+    #endif /* solaris, linux, CS_PLATFORM_MACOSX, CS_PLATFORM_WIN32 */
 	  }
 	}
       }

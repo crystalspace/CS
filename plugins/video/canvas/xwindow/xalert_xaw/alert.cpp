@@ -64,8 +64,8 @@ default_exit_action(Widget w, XEvent* /*event*/, String* /*params*/,
 }
 
 static XtActionsRec actions_list[] = {
-    {(char*)"exit", exit_action},
-    {(char*)"default-exit", default_exit_action},
+    {"exit", exit_action},
+    {"default-exit", default_exit_action},
 };
 
 static const char* top_trans =

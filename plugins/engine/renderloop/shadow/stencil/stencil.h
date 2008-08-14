@@ -128,7 +128,6 @@ private:
   csWeakRef<iGraphics3D> g3d;
   csWeakRef<iShaderManager> shmgr;
   csRef<csStencilShadowType> type;
-  csRef<iShaderVarStringSet> svNameStringset;
 
   // ID's for the triangle mesh system.
   csStringID base_id;
@@ -137,9 +136,7 @@ private:
   bool enableShadows;
   csRefArray<iLightRenderStep> steps;
 
-  csArray<iMeshWrapper*, csArrayElementHandler<iMeshWrapper*>,
-    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<128> >
-    shadowMeshes;
+  csArray<iMeshWrapper*> shadowMeshes;
   csHash< csRef<csStencilShadowCacheEntry>, csPtrKey<iMeshWrapper> > 
     shadowcache;
 
@@ -158,9 +155,9 @@ public:
   csStringID GetShadowsID () const { return shadows_id; }
   
   void Perform (iRenderView* rview, iSector* sector,
-    csShaderVariableStack& stack);
+    iShaderVarStack* stacks);
   void Perform (iRenderView* rview, iSector* sector, iLight* light,
-    csShaderVariableStack& stack);
+    iShaderVarStack* stacks);
 
   virtual size_t AddStep (iRenderStep* step);
   virtual bool DeleteStep (iRenderStep* step);

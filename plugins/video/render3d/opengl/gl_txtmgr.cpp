@@ -39,7 +39,7 @@ static const csGLTextureClassSettings defaultSettings =
 csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
         csGLGraphics3D *iG3D) : 
-  scfImplementationType (this), textures (16), compactTextures (false)
+  scfImplementationType (this), textures (16, 16), compactTextures (false)
 {
   csGLTextureManager::object_reg = object_reg;
 
@@ -56,9 +56,6 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
 
   G3D->ext->InitGL_ARB_pixel_buffer_object();
   hasPBO = G3D->ext->CS_GL_ARB_pixel_buffer_object;
-  
-  G3D->ext->InitGL_SGIS_texture_lod();
-  G3D->ext->InitGL_ARB_shadow ();
 
 #define CS_GL_TEXTURE_FORMAT(fmt)					    \
   textureFormats.Put (#fmt, TextureFormat (fmt, true));		
@@ -115,14 +112,12 @@ void csGLTextureManager::read_config (iConfigFile *config)
     ("Video.OpenGL.TextureDownsample", 0);
   texture_filter_anisotropy = config->GetFloat
     ("Video.OpenGL.TextureFilterAnisotropy", 1.0);
-  tweaks.disableRECTTextureCompression = config->GetBool
+  disableRECTTextureCompression = config->GetBool
     ("Video.OpenGL.DisableRECTTextureCompression", false);
-  tweaks.enableNonPowerOfTwo2DTextures = config->GetBool
+  enableNonPowerOfTwo2DTextures = config->GetBool
     ("Video.OpenGL.EnableNonPowerOfTwo2DTextures", false);
-  tweaks.disableGenerateMipmap = config->GetBool
+  disableGenerateMipmap = config->GetBool
     ("Video.OpenGL.DisableGenerateMipmap", false);
-  tweaks.generateMipMapsExcessOne = config->GetBool
-    ("Video.OpenGL.GenerateOneExcessMipMap", false);
   
   const char* filterModeStr = config->GetStr (
     "Video.OpenGL.TextureFilter", "trilinear");

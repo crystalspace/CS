@@ -142,12 +142,12 @@ public:
 
 int csThing:: last_thing_id = 0;
 
-CS::ShaderVarStringID csThingStatic::texLightmapName = CS::InvalidShaderVarStringID;
+csStringID csThingStatic::texLightmapName = csInvalidStringID;
 
 csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
   scfImplementationType (this, parent),
   last_range (0, -1),
-  static_polygons (32)
+  static_polygons (32, 64)
 {
   csThingStatic::thing_type = thing_type;
   static_polygons.SetThingType (thing_type);
@@ -175,9 +175,9 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
 
   r3d = csQueryRegistry<iGraphics3D> (thing_type->object_reg);
 
-  if ((texLightmapName == CS::InvalidShaderVarStringID))
+  if ((texLightmapName == csInvalidStringID))
   {
-    texLightmapName = thing_type->stringsetSvName->Request ("tex lightmap");
+    texLightmapName = thing_type->stringset->Request ("tex lightmap");
   }
 }
 
@@ -1498,7 +1498,7 @@ bool csThingStatic::IsPolygonTransparent (int polygon_idx)
 bool csThingStatic::AddPolygonRenderBuffer (int polygon_idx, const char* name,
                                             iRenderBuffer* buffer)
 {
-  CS::ShaderVarStringID nameID = thing_type->stringsetSvName->Request (name);
+  csStringID nameID = thing_type->stringset->Request (name);
   iRenderBuffer* Template;
   if ((Template = polyBufferTemplates.GetRenderBuffer (nameID)) != 0)
   {
@@ -1608,7 +1608,7 @@ void csThingStatic::LightmapTexAccessor::PreGetValue (csShaderVariable *variable
 
 csThing::csThing (iBase *parent, csThingStatic* static_data) :
   scfImplementationType (this, parent),
-  polygons(32)
+  polygons(32, 64)
 {
   csThing::static_data = static_data;
   polygons.SetThingType (static_data->thing_type);
@@ -2899,8 +2899,8 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
     Notify ("Lightmapping enabled=%d", (int)csThing::lightmap_enabled);
   }
 
-  stringsetSvName = csQueryRegistryTagInterface<iShaderVarStringSet> (
-    object_reg, "crystalspace.shader.variablenameset");
+  stringset = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
   shadermgr = csQueryRegistry<iShaderManager> (object_reg);
 

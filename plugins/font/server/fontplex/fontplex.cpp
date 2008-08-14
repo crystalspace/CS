@@ -40,7 +40,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FontPlex)
 
 //---------------------------------------------------------------------------
 
-csFontLoadOrderEntry::csFontLoadOrderEntry (const ServersArray& servers, 
+csFontLoadOrderEntry::csFontLoadOrderEntry (csRefArray<iFontServer> servers, 
 					    const char* fontName, float scale,
                                             bool fallback) : servers (servers),
                                               fallback (fallback), loaded (false), 
@@ -351,7 +351,7 @@ void csFontServerMultiplexer::ParseFontLoaderOrder (
       csRef<iFontServer> fs = ResolveFontServer (newserver);
       if (fs)
       {
-        csFontLoadOrderEntry::ServersArray a (1);
+        csRefArray<iFontServer> a (1, 1);
         a.Push (fs);
 	order.PushSmart (csFontLoadOrderEntry (a, fontName, scale, fallback));
       }

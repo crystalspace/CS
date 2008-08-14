@@ -540,7 +540,7 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
 			      csGlyphMetrics* gMetrics,
 			      iDataBuffer* bitmap, csBitmapMetrics* bMetrics,
 			      iDataBuffer* alpha, csBitmapMetrics* aMetrics) 
-			      : scfImplementationType (this), DeleteCallbacks (4)
+			      : scfImplementationType (this), DeleteCallbacks (4, 4)
 {
   Parent = parent;
   Parent->NotifyCreate (this);

@@ -66,7 +66,7 @@ public:
     classUnknown,
     /// A formatting sequence was found.
     classFormat,
-    /// A screen or line clear sequence was found.
+    /// A screen clear sequence was found.
     classClear,
     /// A cursor movement sequence was found.
     classCursor

@@ -20,7 +20,11 @@
 #include "cssysdef.h"
 #include <ctype.h>
 
+// For builtin shader consts:
+#include "iengine/light.h"
+#include "iengine/sector.h"
 #include "imap/services.h"
+#include "iutil/document.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
 #include "iutil/verbositymanager.h"
@@ -28,9 +32,6 @@
 #include "ivaria/reporter.h"
 
 #include "csutil/cfgacc.h"
-#include "csutil/csendian.h"
-#include "csutil/memfile.h"
-#include "csutil/parasiticdatabuffer.h"
 #include "csutil/xmltiny.h"
 
 #include "weaver.h"
@@ -57,7 +58,7 @@ WeaverCompiler::~WeaverCompiler()
 {
 }
 
-void WeaverCompiler::Report (int severity, const char* msg, ...) const
+void WeaverCompiler::Report (int severity, const char* msg, ...)
 {
   va_list args;
   va_start (args, msg);
@@ -67,7 +68,7 @@ void WeaverCompiler::Report (int severity, const char* msg, ...) const
 }
 
 void WeaverCompiler::Report (int severity, iDocumentNode* node, 
-			     const char* msg, ...) const
+			     const char* msg, ...)
 {
   va_list args;
   va_start (args, msg);
@@ -80,9 +81,8 @@ void WeaverCompiler::Report (int severity, iDocumentNode* node,
 }
 
 csPtr<iDocumentNode> WeaverCompiler::LoadDocumentFromFile (
-  const char* filename, iDocumentNode* node) const
+  const char* filename, iDocumentNode* node)
 {
-  // @@@ TODO: Make thread safe
   csRef<iFile> file = vfs->Open (filename, VFS_FILE_READ);
   if (!file)
   {
@@ -92,7 +92,8 @@ csPtr<iDocumentNode> WeaverCompiler::LoadDocumentFromFile (
   }
   csRef<iDocumentSystem> docsys (
     csQueryRegistry<iDocumentSystem> (objectreg));
-  if (docsys == 0) docsys = xmlDocSys;
+  if (docsys == 0)
+    docsys.AttachNew (new csTinyDocumentSystem ());
 
   csRef<iDocument> doc = docsys->CreateDocument ();
   const char* err = doc->Parse (file);
@@ -106,12 +107,13 @@ csPtr<iDocumentNode> WeaverCompiler::LoadDocumentFromFile (
   return csPtr<iDocumentNode> (doc->GetRoot ());
 }
 
-csRef<iDocumentNode> WeaverCompiler::CreateAutoNode (csDocumentNodeType type) const
+csRef<iDocumentNode> WeaverCompiler::CreateAutoNode (csDocumentNodeType type)
 {
-  // @@@ TODO: Mutex for thread safety
+  if (!autoDocSys.IsValid())
+    autoDocSys.AttachNew (new csTinyDocumentSystem);
   if (!autoDocRoot.IsValid ())
   {
-    csRef<iDocument> autoDoc = xmlDocSys->CreateDocument ();
+    csRef<iDocument> autoDoc = autoDocSys->CreateDocument ();
     csRef<iDocumentNode> root = autoDoc->CreateRoot ();
     autoDocRoot = root->CreateNodeBefore (CS_NODE_ELEMENT);
     autoDocRoot->SetValue ("(auto)");
@@ -133,8 +135,6 @@ bool WeaverCompiler::Initialize (iObjectRegistry* object_reg)
 
   strings = csQueryRegistryTagInterface<iStringSet> (
     object_reg, "crystalspace.shared.stringset");
-  svstrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
-    object_reg, "crystalspace.shader.variablenameset");
 
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
   vfs = csQueryRegistry<iVFS> (object_reg);
@@ -143,10 +143,6 @@ bool WeaverCompiler::Initialize (iObjectRegistry* object_reg)
     "crystalspace.syntax.loader.service.text");
   if (!synldr)
     return false;
-  
-  binDocSys = csLoadPluginCheck<iDocumentSystem> (plugin_mgr,
-    "crystalspace.documentsystem.binary");
-  xmlDocSys.AttachNew (new csTinyDocumentSystem);
   
   csRef<iVerbosityManager> verbosemgr (
     csQueryRegistry<iVerbosityManager> (object_reg));
@@ -166,29 +162,26 @@ csPtr<iShader> WeaverCompiler::CompileShader (
     	iLoaderContext* ldr_context, iDocumentNode *templ,
 	int forcepriority)
 {
-  const char* shaderName = templ->GetAttributeValue ("name");
-  csRef<WeaverShader> shader;
-
   csTicks startTime = 0, endTime = 0;
   // Create a shader. The actual loading happens later.
+  csRef<WeaverShader> shader;
   if (do_verbose) startTime = csGetTicks();
   shader.AttachNew (new WeaverShader (this));
   bool loadRet = shader->Load (ldr_context, templ, forcepriority);
-  autoDocRoot.Invalidate ();
+  autoDocRoot .Invalidate ();
   if (!loadRet)
     return 0;
-  if (do_verbose) 
+  if (do_verbose) endTime = csGetTicks();
+  shader->SetName (templ->GetAttributeValue ("name"));
+  //shader->SetDescription (templ->GetAttributeValue ("description"));
+  if (do_verbose)
   {
-    endTime = csGetTicks();
-  
     csString str;
     //shader->DumpStats (str);
     Report(CS_REPORTER_SEVERITY_NOTIFY, 
-      "Shader %s: %s weaved in %u ms", shaderName, str.GetData (),
+      "Shader %s: %s weaved in %u ms", shader->GetName (), str.GetData (),
       endTime - startTime);
   }
-  shader->SetName (shaderName);
-  //shader->SetDescription (templ->GetAttributeValue ("description"));
 
   csRef<iDocumentNodeIterator> tagIt = templ->GetNodes ("key");
   while (tagIt->HasNext ())
@@ -266,34 +259,6 @@ bool WeaverCompiler::IsTemplateToCompiler(iDocumentNode *templ)
   if (!templ->GetNodes()->HasNext()) return false;
 
   //Ok, passed check. We will try to validate it
-  return true;
-}
-
-bool WeaverCompiler::PrecacheShader (iDocumentNode* templ,
-                                     iHierarchicalCache* cache)
-{
-  const char* shaderName = templ->GetAttributeValue ("name");
-  csRef<WeaverShader> shader;
-
-  csTicks startTime = 0, endTime = 0;
-  // Create a shader. The actual loading happens later.
-  if (do_verbose) startTime = csGetTicks();
-  shader.AttachNew (new WeaverShader (this));
-  bool loadRet = shader->Precache (templ, cache);
-  autoDocRoot.Invalidate ();
-  if (!loadRet)
-    return false;
-  if (do_verbose) 
-  {
-    endTime = csGetTicks();
-  
-    csString str;
-    //shader->DumpStats (str);
-    Report(CS_REPORTER_SEVERITY_NOTIFY, 
-      "Shader %s: %s weaved in %u ms", shaderName, str.GetData (),
-      endTime - startTime);
-  }
-
   return true;
 }
 

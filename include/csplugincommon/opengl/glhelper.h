@@ -25,7 +25,6 @@
  */
 
 #include "csgeom/matrix3.h"
-#include "csgeom/matrix4.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 
@@ -136,41 +135,6 @@ namespace CS
       matrix[col*2+row*2] = m.m33;
     }
 
-    /// Make an OpenGL matrix from a CS matrix
-    static inline void MakeGLMatrix4x4 (const CS::Math::Matrix4& m, float matrix[16], 
-				        bool rowMajor = false)
-    {
-      int row, col;
-      if (rowMajor)
-      {
-	col = 1; row = 4;
-      }
-      else
-      {
-	col = 4; row = 1;
-      }
-    
-      matrix[col*0+row*0] = m.m11;
-      matrix[col*0+row*1] = m.m21;
-      matrix[col*0+row*2] = m.m31;
-      matrix[col*0+row*3] = m.m41;
-    
-      matrix[col*1+row*0] = m.m12;
-      matrix[col*1+row*1] = m.m22;
-      matrix[col*1+row*2] = m.m32;
-      matrix[col*1+row*3] = m.m42;
-    
-      matrix[col*2+row*0] = m.m13;
-      matrix[col*2+row*1] = m.m23;
-      matrix[col*2+row*2] = m.m33;
-      matrix[col*2+row*3] = m.m43;
-    
-      matrix[col*3+row*0] = m.m14;
-      matrix[col*3+row*1] = m.m24;
-      matrix[col*3+row*2] = m.m34;
-      matrix[col*3+row*3] = m.m44;
-    }
-    
   } // namespace PluginCommon
 } // namespace CS
 

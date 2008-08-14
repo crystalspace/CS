@@ -71,14 +71,14 @@ void csCameraPosition::Set (
 
 bool csCameraPosition::Load (iCamera *camera, iEngine *e)
 {
-  // First get the collection for this camera position.
-  csRef<iCollection> this_collection;
+  // First get the region for this camera position.
+  csRef<iRegion> this_region;
   if (GetObjectParent () != 0)
   {
-    this_collection = scfQueryInterface<iCollection> (GetObjectParent ());
+    this_region = scfQueryInterface<iRegion> (GetObjectParent ());
   }
 
-  iSector *room = e->FindSector (sector, this_collection);
+  iSector *room = e->FindSector (sector, this_region);
   if (!room)
     room = e->FindSector (sector);	// Try globally.
   if (!room) return false;

@@ -234,8 +234,6 @@ class iView(core.iBase):
     def SetEngine(*args): return _ivaria.iView_SetEngine(*args)
     def GetCamera(*args): return _ivaria.iView_GetCamera(*args)
     def SetCamera(*args): return _ivaria.iView_SetCamera(*args)
-    def GetPerspectiveCamera(*args): return _ivaria.iView_GetPerspectiveCamera(*args)
-    def SetPerspectiveCamera(*args): return _ivaria.iView_SetPerspectiveCamera(*args)
     def GetContext(*args): return _ivaria.iView_GetContext(*args)
     def SetContext(*args): return _ivaria.iView_SetContext(*args)
     def SetRectangle(*args): return _ivaria.iView_SetRectangle(*args)
@@ -246,7 +244,6 @@ class iView(core.iBase):
     def GetClipper(*args): return _ivaria.iView_GetClipper(*args)
     def Draw(*args): return _ivaria.iView_Draw(*args)
     def SetAutoResize(*args): return _ivaria.iView_SetAutoResize(*args)
-    def GetMeshFilter(*args): return _ivaria.iView_GetMeshFilter(*args)
     scfGetVersion = staticmethod(_ivaria.iView_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iView
     __del__ = lambda self : None;

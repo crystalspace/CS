@@ -25,12 +25,7 @@
 #include "iengine/halo.h"
 #include "ivideo/halo.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(Engine)
-{
-  class csLight;
-}
-CS_PLUGIN_NAMESPACE_END(Engine)
-
+class csLight;
 class csEngine;
 struct iCamera;
 struct iMaterialWrapper;
@@ -212,7 +207,7 @@ class csLightHalo
 {
 public:
   /// The light this halo is attached to
-  CS_PLUGIN_NAMESPACE_NAME(Engine)::csLight *Light;
+  csLight *Light;
 
   /// Halo handle as returned by 3D rasterizer
   iHalo *Handle;
@@ -221,7 +216,7 @@ public:
   csTicks LastTime;
 
   /// Create an light halo object
-  csLightHalo (CS_PLUGIN_NAMESPACE_NAME(Engine)::csLight *iLight, iHalo *iHandle);
+  csLightHalo (csLight *iLight, iHalo *iHandle);
 
   /// Destroy the light halo object
   virtual ~csLightHalo ();
@@ -267,8 +262,7 @@ public:
    * create. pass light, and flareHalo, the halosize is the size that
    * halos have on the screen - it is used to scale the flare.
    */
-  csLightFlareHalo(CS_PLUGIN_NAMESPACE_NAME(Engine)::csLight *light, 
-    csFlareHalo *halo, int iHaloSize);
+  csLightFlareHalo(csLight *light, csFlareHalo *halo, int iHaloSize);
   /// remove
   virtual ~csLightFlareHalo();
 

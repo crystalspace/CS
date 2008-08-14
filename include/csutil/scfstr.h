@@ -39,19 +39,28 @@ class CS_CRYSTALSPACE_EXPORT scfString :
 public:
 
   /// Create an empty scfString object
-  scfString ();
+  scfString ()
+    : scfImplementationType (this)
+  { }
 
   /// Create an scfString object and reserve space for iLength characters
-  scfString (size_t iLength);
+  scfString (size_t iLength) 
+    : scfImplementationType (this), s(iLength)
+  { }
 
   /// Copy constructor
-  scfString (const iString &copy);
+  scfString (const iString &copy) 
+    : iBase(), scfImplementationType (this), s(copy.GetData())
+  { }
 
   /// Yet another copy constructor
-  scfString (const char *copy);
+  scfString (const char *copy) 
+    : scfImplementationType (this), s(copy)
+  { }
 
   /// Destroy a scfString object
-  virtual ~scfString ();
+  virtual ~scfString ()
+  { }
 
   /// Get the pointer to the internal csString.
   const csString& GetCsString () const { return s; }

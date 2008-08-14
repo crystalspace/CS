@@ -47,10 +47,6 @@ public:
   virtual void SetCollidable (bool value);
   
   virtual void SetParameter (const char* name, const char* value);
-  virtual size_t GetParameterCount();
-  virtual const char* GetParameterName (size_t index);
-  virtual const char* GetParameterValue (size_t index);
-  virtual const char* GetParameterValue (const char* name);
 
   virtual csPtr<iTerrainCellCollisionProperties> Clone ();
 };

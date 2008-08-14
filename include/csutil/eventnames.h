@@ -75,15 +75,15 @@ class CS_CRYSTALSPACE_EXPORT csEventNameRegistry :
 
   /**\name iEventNameRegistry implementation
    * @{ */
-  csEventID GetID (const char* name);
+  CS_CONST_METHOD csEventID GetID (const char* name);
 
-  const char * GetString (const csEventID id);
-  static const char * GetString (iObjectRegistry *object_reg, 
+  CS_CONST_METHOD const char * GetString (const csEventID id);
+  static CS_CONST_METHOD const char * GetString (iObjectRegistry *object_reg, 
 						 csEventID id);
-  csEventID GetParentID (const csEventID id);
-  bool IsImmediateChildOf (const csEventID child, 
+  CS_CONST_METHOD csEventID GetParentID (const csEventID id);
+  CS_CONST_METHOD bool IsImmediateChildOf (const csEventID child, 
 					   const csEventID parent);
-  bool IsKindOf (const csEventID child, 
+  CS_CONST_METHOD bool IsKindOf (const csEventID child, 
 				 const csEventID parent);
   /** @} */
 
@@ -186,7 +186,7 @@ class CS_CRYSTALSPACE_EXPORT csEventNameRegistry :
 #define csevMouseEvent(reg)	      \
   (csEventNameRegistry::GetID((reg), "crystalspace.input.mouse"))
 
-static inline csEventID csevMouse (
+static inline CS_CONST_METHOD csEventID csevMouse (
   iEventNameRegistry *name_reg, uint x)
 {
   csString name ("crystalspace.input.mouse.");
@@ -194,13 +194,13 @@ static inline csEventID csevMouse (
   return name_reg->GetID(name);
 }
 
-static inline csEventID csevMouse(
+static inline CS_CONST_METHOD csEventID csevMouse(
   iObjectRegistry *object_reg, uint x) 
 {
   return csevMouse(csEventNameRegistry::GetRegistry(object_reg), x);
 }
 
-static inline csEventID csevMouseOp(
+static inline CS_CONST_METHOD csEventID csevMouseOp(
   iEventNameRegistry *name_reg, uint x, const csString &y)
 {
   csString name ("crystalspace.input.mouse.");
@@ -210,7 +210,7 @@ static inline csEventID csevMouseOp(
   return name_reg->GetID(name);
 }
 
-static inline csEventID csevMouseOp(
+static inline CS_CONST_METHOD csEventID csevMouseOp(
   iObjectRegistry *object_reg, uint x, const csString &y) 
 {
   return csevMouseOp(csEventNameRegistry::GetRegistry(object_reg), x, y);
@@ -260,7 +260,7 @@ static inline csEventID csevMouseOp(
 #define csevJoystickEvent(reg)	      \
   (csEventNameRegistry::GetID((reg), "crystalspace.input.joystick"))
 
-static inline csEventID csevJoystick (
+static inline CS_CONST_METHOD csEventID csevJoystick (
   iEventNameRegistry *name_reg, uint x) 
 {
   char buffer[64];
@@ -269,13 +269,13 @@ static inline csEventID csevJoystick (
   return name_reg->GetID(buffer);
 }
 
-static inline csEventID csevJoystick (
+static inline CS_CONST_METHOD csEventID csevJoystick (
   iObjectRegistry *object_reg, uint x)
 {
   return csevJoystick(csEventNameRegistry::GetRegistry(object_reg), x);
 }
 
-static inline csEventID csevJoystickOp (
+static inline CS_CONST_METHOD csEventID csevJoystickOp (
   iEventNameRegistry *name_reg, uint x, const csString &y) 
 {
   csString name ("crystalspace.input.joystick.");
@@ -285,7 +285,7 @@ static inline csEventID csevJoystickOp (
   return name_reg->GetID(name);
 }
 
-static inline csEventID csevJoystickOp (
+static inline CS_CONST_METHOD csEventID csevJoystickOp (
   iObjectRegistry *object_reg, uint x, const csString &y)
 {
   return csevJoystickOp (csEventNameRegistry::GetRegistry(object_reg), x, y);
@@ -400,10 +400,10 @@ static inline csEventID csevJoystickOp (
 struct iGraphics2D;
 
 CS_CRYSTALSPACE_EXPORT
-csEventID csevCanvasOp (csRef<iEventNameRegistry>& reg, 
+CS_CONST_METHOD csEventID csevCanvasOp (csRef<iEventNameRegistry>& reg, 
 					const iGraphics2D* g2d, 
 					const csString &y);
-static inline csEventID csevCanvasOp (
+static inline CS_CONST_METHOD csEventID csevCanvasOp (
   iObjectRegistry *object_reg, const iGraphics2D* g2d, const csString &y)
 {
   csRef<iEventNameRegistry> name_reg = csEventNameRegistry::GetRegistry (object_reg);

@@ -437,14 +437,11 @@ bool csStencil2ShadowStep::Initialize (iObjectRegistry* objreg)
   base_id = strings->Request ("base");
   shadows_id = strings->Request ("shadows");
 
-  svNameStringset = csQueryRegistryTagInterface<iShaderVarStringSet>
-    (object_reg, "crystalspace.shader.variablenameset");
-
   return true;
 }
 
 void csStencil2ShadowStep::Perform (iRenderView* /*rview*/, iSector* /*sector*/,
-                                    csShaderVariableStack& /*stacks*/)
+                                    iShaderVarStack* /*stacks*/)
 {
   /// TODO: Report error (no light)
   return;
@@ -634,26 +631,26 @@ void csStencil2ShadowStep::DrawShadow(
 
   cache_entry->UpdateBuffers();
 
-  csShaderVariableStack stack;
-  stack.Setup (svNameStringset->GetSize ());
+  csRef<iShaderVarStack> stacks;
+  stacks.AttachNew (new scfArray<iShaderVarStack>);
 
-  shmgr->PushVariables (stack);
+  shmgr->PushVariables (stacks);
   g3d->SetWorldToCamera (camera->GetTransform ().GetInverse ());
-  shader->SetupPass (shaderTicket, &rmesh, rmesh, stack);
+  shader->SetupPass (shaderTicket, &rmesh, rmesh, stacks);
 
   switch (method)
   {
   case Z_PASS:
     g3d->SetShadowState (CS_SHADOW_VOLUME_PASS1);
-    g3d->DrawMesh (&rmesh, rmesh, stack);
+    g3d->DrawMesh (&rmesh, rmesh, stacks);
     g3d->SetShadowState (CS_SHADOW_VOLUME_PASS2);
-    g3d->DrawMesh (&rmesh, rmesh, stack);
+    g3d->DrawMesh (&rmesh, rmesh, stacks);
     break;
   case Z_FAIL:
     g3d->SetShadowState (CS_SHADOW_VOLUME_FAIL1);
-    g3d->DrawMesh (&rmesh, rmesh, stack);
+    g3d->DrawMesh (&rmesh, rmesh, stacks);
     g3d->SetShadowState (CS_SHADOW_VOLUME_FAIL2);
-    g3d->DrawMesh (&rmesh, rmesh, stack);
+    g3d->DrawMesh (&rmesh, rmesh, stacks);
     break;
   }
 
@@ -661,14 +658,14 @@ void csStencil2ShadowStep::DrawShadow(
 }
 
 void csStencil2ShadowStep::Perform (iRenderView* rview, iSector* sector,
-                                    iLight* light, csShaderVariableStack& stack)
+                                    iLight* light, iShaderVarStack* stacks)
 {
   iShader* shadow;
   if (!enableShadows || ((shadow = type->GetShadow ()) == 0))
   {
     for (size_t i = 0; i < steps.GetSize (); i++)
     {
-      steps[i]->Perform (rview, sector, light, stack);
+      steps[i]->Perform (rview, sector, light, stacks);
     }
     return;
   }
@@ -685,7 +682,7 @@ void csStencil2ShadowStep::Perform (iRenderView* rview, iSector* sector,
     g3d->SetShadowState (CS_SHADOW_VOLUME_BEGIN);
     csRenderMeshModes modes;
     modes.z_buf_mode = CS_ZBUF_TEST;
-    size_t shaderTicket = shadow->GetTicket (modes, stack);
+    size_t shaderTicket = shadow->GetTicket (modes, stacks);
     for (size_t p = 0; p < shadow->GetNumberOfPasses (shaderTicket); p ++) 
     {
       shadow->ActivatePass (shaderTicket, p);
@@ -771,7 +768,7 @@ void csStencil2ShadowStep::Perform (iRenderView* rview, iSector* sector,
 
     for (size_t i = 0; i < steps.GetSize (); i++)
     {
-      steps[i]->Perform (rview, sector, light, stack);
+      steps[i]->Perform (rview, sector, light, stacks);
     }
 
     g3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);

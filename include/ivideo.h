@@ -35,7 +35,6 @@
 #include "ivideo/rendermesh.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
-#include "ivideo/shader/xmlshader.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
 #endif /* __IVIDEO_H__ */

@@ -56,21 +56,13 @@ public:
     const Tbase* defaultComponents = 0) : currElement (0), 
     bufLock (buffer, CS_BUF_LOCK_READ), defaultComponents (defaultComponents)
   {
-    bufferComponents = buffer ? buffer->GetComponentCount () : 0;
+    bufferComponents = buffer->GetComponentCount ();
     components = (desiredComponents != 0) ? desiredComponents : 
       bufferComponents;
     CS_ASSERT (components <= maxComponents);
-    if (buffer)
-    {
-      elements = buffer->GetElementCount();
-      compType = buffer->GetComponentType();
-      FetchCurrentElement();
-    }
-    else
-    {
-      elements = 0;
-      compType = (csRenderBufferComponentType)~0;
-    }
+    elements = buffer->GetElementCount();
+    compType = buffer->GetComponentType();
+    FetchCurrentElement();
   }
 
   //@{
@@ -161,13 +153,13 @@ private:
         double orgVal = double (*(C*)data);
         if (Signed)
         {
-          orgVal = (orgVal + (-range - 1)) / double ((int64)range*2+1);
-          newComp = Tbase (-1.0 + orgVal * 2.0);
+          orgVal = (orgVal + (-range - 1)) / double (range*2+1);
+          newComp = -1.0 + orgVal * 2.0;
         }
         else
         {
           orgVal = orgVal / double (range);
-          newComp = Tbase (orgVal);
+          newComp = orgVal;
         }
       }
       else

@@ -30,7 +30,7 @@ namespace CS
   /**
    * Swap two elements
    */
-  template <typename T>
+  template <class T>
   CS_FORCEINLINE_TEMPLATEMETHOD void Swap (T& a, T& b)
   {
     T tmp = a;
@@ -48,7 +48,7 @@ namespace CS
    * ForEach (anArray.GetIterator (), OurFunctor ());
    * \endcode
    */
-  template <typename T, typename Fn>
+  template <class T, class Fn>
   CS_FORCEINLINE_TEMPLATEMETHOD Fn& ForEach (T it, Fn& Func)
   {
     while (it.HasNext ())
@@ -62,7 +62,7 @@ namespace CS
    * Iterate over all elements in the list and perform operation
    * given by Func.
    */
-  template <typename T, typename Fn>
+  template <class T, class Fn>
   CS_FORCEINLINE_TEMPLATEMETHOD Fn& ForEach (T* start, T* end, Fn& Func)
   {
     while (start != end)
@@ -77,40 +77,12 @@ namespace CS
    * Iterate over all elements in the iterator and perform operation
    * given by Func.
    */
-  template <typename T, typename Fn, typename P>
+  template <class T, class Fn, class P>
   CS_FORCEINLINE_TEMPLATEMETHOD Fn& ForEach (T it, Fn& Func, P& p)
   {
     while (it.HasNext ())
     {
       Func (it.Next (), p);
-    }
-    return Func;
-  }
-
-  /**
-   * Iterate over all elements in the iterator and perform operation
-   * given by Func.
-   */
-  template <typename T, typename Fn, typename P1, typename P2>
-  CS_FORCEINLINE_TEMPLATEMETHOD Fn& ForEach (T it, Fn& Func, P1& p1, P2& p2)
-  {
-    while (it.HasNext ())
-    {
-      Func (it.Next (), p1, p2);
-    }
-    return Func;
-  }
-
-  /**
-   * Iterate over all elements in the iterator and perform operation
-   * given by Func.
-   */
-  template <typename T, typename Fn, typename P1, typename P2, typename P3>
-  CS_FORCEINLINE_TEMPLATEMETHOD Fn& ForEach (T it, Fn& Func, P1& p1, P2& p2, P3& p3)
-  {
-    while (it.HasNext ())
-    {
-      Func (it.Next (), p1, p2, p3);
     }
     return Func;
   }

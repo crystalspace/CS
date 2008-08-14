@@ -32,7 +32,6 @@
 #include "csutil/refarr.h"
 #include "csutil/sysfunc.h"
 #include "csutil/scf_implementation.h"
-#include "csutil/scfarray.h"
 #include "csutil/weakref.h"
 #include "iengine/lightmgr.h"
 #include "iengine/mesh.h"
