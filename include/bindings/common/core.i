@@ -645,15 +645,6 @@ SET_HELPER(csStringID)
 %ignore csArray<csPluginRequest>::operator[];
 %template(csPluginRequestArray) csArray<csPluginRequest>;
 
-%include "igeom/clip2d.h"
-%include "igeom/path.h"
-%template(scfPath) scfImplementation1<csPath,iPath >;
-#ifndef CS_SWIG_PUBLISH_IGENERAL_FACTORY_STATE_ARRAYS
-%ignore iTriangleMesh::GetTriangles;
-%ignore iTriangleMesh::GetVertices;
-#endif
-%include "igeom/trimesh.h"
-
 %ignore iReporter::ReportV;
 %ignore csReporterHelper::ReportV;
 %include "ivaria/reporter.h"
@@ -759,6 +750,20 @@ template <class T, class K = unsigned int,
   ITERATOR_FUNCTIONS(iPluginIterator)
 }
 
+%template(scfObject) scfImplementation1<csObject,iObject >;
+%include "csutil/csobject.h"
+
+%include "igeom/clip2d.h"
+%include "igeom/path.h"
+
+%template(scfPath) scfImplementationExt1<csPath,csObject,iPath >;
+#ifndef CS_SWIG_PUBLISH_IGENERAL_FACTORY_STATE_ARRAYS
+%ignore iTriangleMesh::GetTriangles;
+%ignore iTriangleMesh::GetVertices;
+#endif
+%include "igeom/trimesh.h"
+
+
 %include "iutil/csinput.h"
 %include "iutil/cfgfile.h"
 %include "iutil/cfgmgr.h"
@@ -805,8 +810,6 @@ BUFFER_RW_FUNCTIONS(iDataBuffer,GetData,GetSize,
 %include "igraphic/animimg.h"
 %include "itexture/iproctex.h"
 
-%template(pycsObject) scfImplementation1<csObject,iObject >;
-%include "csutil/csobject.h"
 %ignore iBase::~iBase(); // We replace iBase dtor with one that calls DecRef().
 			 // Swig already knows not to delete an SCF pointer.
 

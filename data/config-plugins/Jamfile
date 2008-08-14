@@ -1,0 +1,4 @@
+SubDir TOP data config-plugins ;
+
+InstallData [ Wildcard *.cfg *.key *.xml ] : data config-plugins ;
+

@@ -202,7 +202,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     SkeletonFactory* factory;
     csRef<iSkeletonAnimPacket2> animationPacket;
     bool cachedTransformsDirty;
-    unsigned int version;
+    unsigned int version, versionLastReset;
   };
 
 }
