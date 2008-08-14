@@ -55,6 +55,7 @@ struct iPluginManager;
 struct iVirtualClock;
 struct iCommandLineParser;
 struct iConfigManager;
+struct iSystemOpenManager;
 struct iVerbosityManager;
 
 /**\name Plugin request macros
@@ -244,7 +245,7 @@ public:
 
   /**
    * Create and, if needed, register the verbosity manager. It is used by a 
-   * lot of plugins to control diagnostoc output while running.
+   * lot of plugins to control diagnostic output while running.
    */
   static iVerbosityManager* CreateVerbosityManager (iObjectRegistry*);
 
@@ -273,6 +274,13 @@ public:
    * \endcode
    */
   static bool CreateStringSet (iObjectRegistry*);
+
+  /**
+   * Create the global system open manager sets and it them with the registry.
+   * Must be called after CreateEventQueue() and is most sensibly called
+   * before RequestPlugins().
+   */
+  static iSystemOpenManager* CreateSystemOpenManager (iObjectRegistry*);
 
   /**
    * Setup the config manager. If you have no config file then you can still
