@@ -58,7 +58,7 @@ struct iThreadManager : public virtual iBase
   virtual void Process(uint num = 1) = 0;
   virtual void PushToQueue(bool useThreadQueue, iJob* job) = 0;
   virtual void Wait(csRef<iThreadReturn> result) = 0;
-  virtual inline bool RunNow(bool useThreadQueue) = 0;
+  virtual bool RunNow(bool useThreadQueue) = 0;
 };
 
 // Interface macros
