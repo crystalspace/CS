@@ -19,12 +19,14 @@
 #ifndef __CS_CSUTIL_THREADMANAGER_H__
 #define __CS_CSUTIL_THREADMANAGER_H__
 
+#include "csutil/eventhandlers.h"
 #include "csutil/listaccessqueue.h"
 #include "csutil/objreg.h"
 #include "csutil/threadevent.h"
 #include "csutil/threadjobqueue.h"
 #include "iengine/engine.h"
 #include "imap/loader.h"
+#include "iutil/event.h"
 #include "iutil/eventh.h"
 #include "iutil/eventq.h"
 #include "iutil/threadmanager.h"
@@ -33,16 +35,12 @@ struct iEvent;
 
 using namespace CS::Threading;
 
-class CS_CRYSTALSPACE_EXPORT csThreadManager : public scfImplementation2<csThreadManager,
-  iThreadManager,
-  iEventHandler>
+class CS_CRYSTALSPACE_EXPORT csThreadManager : public scfImplementation1<csThreadManager,
+  iThreadManager>
 {
 public:
   csThreadManager(iObjectRegistry* objReg);
-
-  bool HandleEvent(iEvent&);
-  CS_EVENTHANDLER_NAMES("crystalspace.threadmanager")
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
+  virtual ~csThreadManager();
 
   void Process(uint num = 1);
   void Wait(csRef<iThreadReturn> ret);
@@ -66,7 +64,11 @@ public:
       (useThreadQueue && (waiting >= threadCount-1 || threadQueue->GetQueueCount() > 2*threadCount-1));
   }
 
-  private:
+protected:
+  csEventID ProcessPerFrame;
+  csEventID ProcessWhileWait;
+
+private:
 
   static ThreadID tid;
 
@@ -83,12 +85,40 @@ public:
   iObjectRegistry* objectReg;
   csRef<ThreadedJobQueue> threadQueue;
   csRef<ListAccessQueue> listQueue;
-  csEventID ProcessPerFrame;
-  csEventID ProcessWhileWait;
   csRef<iThreadedLoader> loader;
   csRef<iEngine> engine;
-  iEventQueue* eventQueue;
+  csRef<iEventQueue> eventQueue;
   csTicks waitingTime;
+
+  class TMEventHandler : public scfImplementation1<TMEventHandler, 
+      iEventHandler>
+  {
+  public:
+    TMEventHandler(csThreadManager* parent) :
+        scfImplementationType (this), parent (parent)
+    {
+    }
+    
+    virtual ~TMEventHandler()
+    {
+    }
+
+    bool HandleEvent(iEvent& Event)
+    {
+      if(Event.Name == parent->ProcessPerFrame ||
+         Event.Name == parent->ProcessWhileWait)
+      {
+        parent->Process(10);
+      }
+      return false;
+    }
+
+    CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.threadmanager")
+
+  private:
+    csThreadManager* parent;
+  };
+  csRef<iEventHandler> tMEventHandler;
 };
 
 class csThreadReturn : public iThreadReturn

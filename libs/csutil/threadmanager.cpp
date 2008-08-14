@@ -17,12 +17,10 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/eventnames.h"
 #include "csutil/platform.h"
 #include "csutil/sysfunc.h"
 #include "csutil/threadmanager.h"
 #include "iengine/engine.h"
-#include "iutil/event.h"
 
 ThreadID csThreadManager::tid = Thread::GetThreadID();
 
@@ -42,23 +40,22 @@ csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationTyp
   threadQueue.AttachNew(new ThreadedJobQueue(threadCount));
   listQueue.AttachNew(new ListAccessQueue());
 
-  csRef<iEventQueue> eQ = csQueryRegistry<iEventQueue>(objectReg);
-  if(eventQueue = eQ)
+  // Event handler.
+  tMEventHandler.AttachNew(new TMEventHandler(this));
+
+  eventQueue = csQueryRegistry<iEventQueue>(objectReg);
+  if(eventQueue.IsValid())
   {
     ProcessPerFrame = csevFrame(objReg);
     ProcessWhileWait = csevThreadWait(objReg);
-    eventQueue->RegisterListener(this, ProcessPerFrame);
-    eventQueue->RegisterListener(this, ProcessWhileWait);
+    eventQueue->RegisterListener(tMEventHandler, ProcessPerFrame);
+    eventQueue->RegisterListener(tMEventHandler, ProcessWhileWait);
   }
 }
 
-bool csThreadManager::HandleEvent(iEvent& Event)
+csThreadManager::~csThreadManager()
 {
-  if(Event.Name == ProcessPerFrame || Event.Name == ProcessWhileWait)
-  {
-    Process(10);
-  }
-  return false;
+  eventQueue->RemoveListener(tMEventHandler);
 }
 
 void csThreadManager::Process(uint num)
