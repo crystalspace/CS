@@ -7,13 +7,16 @@ Recurse InstallHeader : .h .i .inc .fun .tok ;
 
 rule FilelistEntryHeader
 {
-  FileListEntriesData $(1) : $(2) : headers ;
+  if "$(2)" != "" || $(1) != "csconfig.h"
+  { 
+    local file_gristed = $(1:G=$(2:J=!)) ;
+    FileListEntriesData $(file_gristed) : $(2) : headers ;
+  }
 }
 Recurse FilelistEntryHeader : .h .i .inc .fun .tok ;
-if [ Property build : standalone ]
 {
   local SUBDIR = [ ConcatDirs $(BUILDTOP) include ] ; # Temporary for Recurse.
-  Recurse FilelistEntryHeader : .h ;
+  FileListEntriesData csconfig.h : : headers-platform ;
 }
 
 #------------------------------------------------------------------------------
