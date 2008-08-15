@@ -2311,6 +2311,21 @@ CS_CHECK_STD_SPECIAL_FLOAT([isnormal])
 
 
 #------------------------------------------------------------------------------
+# Check if strtof() is available.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([for strtof], [cs_cv_strtof],
+    [AC_LANG_PROGRAM(
+	[[#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+	#endif
+	#include <stdlib.h>]],
+	[strtof (0, 0)])],
+    [], [],
+    [CS_HEADER_PROPERTY([CS_HAVE_STRTOF])])
+
+
+
+#------------------------------------------------------------------------------
 # Determine if plugin meta-information should be embedded directly into plugin
 # modules or if it should exist in stand-alone .csplugin files.
 #------------------------------------------------------------------------------
