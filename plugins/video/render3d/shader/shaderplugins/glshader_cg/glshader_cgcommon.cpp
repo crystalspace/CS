@@ -194,7 +194,7 @@ void csShaderGLCGCommon::SVtoCgMatrix3x3  (csShaderVariable* var, float* matrix)
     csMatrix3 m;
     if (var->GetValue (m))
     {
-      CS::PluginCommon::MakeGLMatrix3x3 (m, matrix);
+      CS::PluginCommon::MakeGLMatrix3x3 (m, matrix, true);
     }
   }
   else if (var->GetType () == csShaderVariable::TRANSFORM)
@@ -202,7 +202,7 @@ void csShaderGLCGCommon::SVtoCgMatrix3x3  (csShaderVariable* var, float* matrix)
     csReversibleTransform t;
     if (var->GetValue (t))
     {
-      CS::PluginCommon::MakeGLMatrix3x3 (t.GetO2T(), matrix);
+      CS::PluginCommon::MakeGLMatrix3x3 (t.GetO2T(), matrix, true);
     }
   }
   else if (var->GetType () == csShaderVariable::ARRAY)
@@ -237,7 +237,7 @@ void csShaderGLCGCommon::SVtoCgMatrix4x4  (csShaderVariable* var, float* matrix)
     csMatrix3 m;
     if (var->GetValue (m))
     {
-      makeGLMatrix (m, matrix);
+      makeGLMatrix (m, matrix, true);
     }
   }
   else if (var->GetType () == csShaderVariable::TRANSFORM)
@@ -245,7 +245,7 @@ void csShaderGLCGCommon::SVtoCgMatrix4x4  (csShaderVariable* var, float* matrix)
     csReversibleTransform t;
     if (var->GetValue (t))
     {
-      makeGLMatrix (t, matrix);
+      makeGLMatrix (t, matrix, true);
     }
   }
   else if (var->GetType () == csShaderVariable::ARRAY)

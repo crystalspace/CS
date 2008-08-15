@@ -125,6 +125,7 @@ iFrustumView_swigregister = _iengine.iFrustumView_swigregister
 iFrustumView_swigregister(iFrustumView)
 iFrustumView_scfGetVersion = _iengine.iFrustumView_scfGetVersion
 
+CS_LIGHT_NOSHADOWS = _iengine.CS_LIGHT_NOSHADOWS
 CS_LIGHT_ACTIVEHALO = _iengine.CS_LIGHT_ACTIVEHALO
 CS_LIGHT_DYNAMICTYPE_STATIC = _iengine.CS_LIGHT_DYNAMICTYPE_STATIC
 CS_LIGHT_DYNAMICTYPE_PSEUDO = _iengine.CS_LIGHT_DYNAMICTYPE_PSEUDO
@@ -198,6 +199,8 @@ class iLight(core.iBase):
     def RemoveAffectedLightingInfo(*args): return _iengine.iLight_RemoveAffectedLightingInfo(*args)
     def Setup(*args): return _iengine.iLight_Setup(*args)
     def GetSVContext(*args): return _iengine.iLight_GetSVContext(*args)
+    def GetLocalBBox(*args): return _iengine.iLight_GetLocalBBox(*args)
+    def GetWorldBBox(*args): return _iengine.iLight_GetWorldBBox(*args)
     scfGetVersion = staticmethod(_iengine.iLight_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iLight
     __del__ = lambda self : None;
@@ -396,6 +399,7 @@ class iSector(core.iBase):
     def RemoveLightVisibleCallback(*args): return _iengine.iSector_RemoveLightVisibleCallback(*args)
     def GetSVContext(*args): return _iengine.iSector_GetSVContext(*args)
     def PrecacheDraw(*args): return _iengine.iSector_PrecacheDraw(*args)
+    def CallSectorCallbacks(*args): return _iengine.iSector_CallSectorCallbacks(*args)
     scfGetVersion = staticmethod(_iengine.iSector_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iSector
     __del__ = lambda self : None;
@@ -588,9 +592,12 @@ class iEngine(core.iBase):
     def GetCurrentDefaultRenderloop(*args): return _iengine.iEngine_GetCurrentDefaultRenderloop(*args)
     def SetCurrentDefaultRenderloop(*args): return _iengine.iEngine_SetCurrentDefaultRenderloop(*args)
     def GetCurrentFrameNumber(*args): return _iengine.iEngine_GetCurrentFrameNumber(*args)
+    def UpdateNewFrame(*args): return _iengine.iEngine_UpdateNewFrame(*args)
     def SetSaveableFlag(*args): return _iengine.iEngine_SetSaveableFlag(*args)
     def GetSaveableFlag(*args): return _iengine.iEngine_GetSaveableFlag(*args)
     def CreateLoaderContext(*args): return _iengine.iEngine_CreateLoaderContext(*args)
+    def SetDefaultKeepImage(*args): return _iengine.iEngine_SetDefaultKeepImage(*args)
+    def GetDefaultKeepImage(*args): return _iengine.iEngine_GetDefaultKeepImage(*args)
     def GetNearbyObjects(*args): return _iengine.iEngine_GetNearbyObjects(*args)
     def GetVisibleObjects(*args): return _iengine.iEngine_GetVisibleObjects(*args)
     def GetVisibleMeshes(*args): return _iengine.iEngine_GetVisibleMeshes(*args)
@@ -602,8 +609,12 @@ class iEngine(core.iBase):
     def RemoveDelayedRemoves(*args): return _iengine.iEngine_RemoveDelayedRemoves(*args)
     def DeleteAll(*args): return _iengine.iEngine_DeleteAll(*args)
     def ResetWorldSpecificSettings(*args): return _iengine.iEngine_ResetWorldSpecificSettings(*args)
-    def SetDefaultKeepImage(*args): return _iengine.iEngine_SetDefaultKeepImage(*args)
-    def GetDefaultKeepImage(*args): return _iengine.iEngine_GetDefaultKeepImage(*args)
+    def FireStartFrame(*args): return _iengine.iEngine_FireStartFrame(*args)
+    def CreatePerspectiveCamera(*args): return _iengine.iEngine_CreatePerspectiveCamera(*args)
+    def CreateCustomMatrixCamera(*args): return _iengine.iEngine_CreateCustomMatrixCamera(*args)
+    def GetRenderManager(*args): return _iengine.iEngine_GetRenderManager(*args)
+    def SetRenderManager(*args): return _iengine.iEngine_SetRenderManager(*args)
+    def ReloadRenderManager(*args): return _iengine.iEngine_ReloadRenderManager(*args)
     scfGetVersion = staticmethod(_iengine.iEngine_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iEngine
     __del__ = lambda self : None;
@@ -669,12 +680,45 @@ class iCamera(core.iBase):
     def GetOnlyPortals(*args): return _iengine.iCamera_GetOnlyPortals(*args)
     def AddCameraSectorListener(*args): return _iengine.iCamera_AddCameraSectorListener(*args)
     def RemoveCameraSectorListener(*args): return _iengine.iCamera_RemoveCameraSectorListener(*args)
+    def GetProjectionMatrix(*args): return _iengine.iCamera_GetProjectionMatrix(*args)
+    def GetVisibleVolume(*args): return _iengine.iCamera_GetVisibleVolume(*args)
+    def SetViewportSize(*args): return _iengine.iCamera_SetViewportSize(*args)
+    def GetInvProjectionMatrix(*args): return _iengine.iCamera_GetInvProjectionMatrix(*args)
     scfGetVersion = staticmethod(_iengine.iCamera_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iCamera
     __del__ = lambda self : None;
 iCamera_swigregister = _iengine.iCamera_swigregister
 iCamera_swigregister(iCamera)
 iCamera_scfGetVersion = _iengine.iCamera_scfGetVersion
+
+class iPerspectiveCamera(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetCamera(*args): return _iengine.iPerspectiveCamera_GetCamera(*args)
+    def GetFOV(*args): return _iengine.iPerspectiveCamera_GetFOV(*args)
+    def GetInvFOV(*args): return _iengine.iPerspectiveCamera_GetInvFOV(*args)
+    def GetFOVAngle(*args): return _iengine.iPerspectiveCamera_GetFOVAngle(*args)
+    def SetFOV(*args): return _iengine.iPerspectiveCamera_SetFOV(*args)
+    def SetFOVAngle(*args): return _iengine.iPerspectiveCamera_SetFOVAngle(*args)
+    def GetShiftX(*args): return _iengine.iPerspectiveCamera_GetShiftX(*args)
+    def GetShiftY(*args): return _iengine.iPerspectiveCamera_GetShiftY(*args)
+    def SetPerspectiveCenter(*args): return _iengine.iPerspectiveCamera_SetPerspectiveCenter(*args)
+    __swig_destroy__ = _iengine.delete_iPerspectiveCamera
+    __del__ = lambda self : None;
+iPerspectiveCamera_swigregister = _iengine.iPerspectiveCamera_swigregister
+iPerspectiveCamera_swigregister(iPerspectiveCamera)
+
+class iCustomMatrixCamera(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetCamera(*args): return _iengine.iCustomMatrixCamera_GetCamera(*args)
+    def SetProjectionMatrix(*args): return _iengine.iCustomMatrixCamera_SetProjectionMatrix(*args)
+    __swig_destroy__ = _iengine.delete_iCustomMatrixCamera
+    __del__ = lambda self : None;
+iCustomMatrixCamera_swigregister = _iengine.iCustomMatrixCamera_swigregister
+iCustomMatrixCamera_swigregister(iCustomMatrixCamera)
 
 class iCameraPosition(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -901,11 +945,15 @@ iSceneNode_scfGetVersion = _iengine.iSceneNode_scfGetVersion
 CS_ENTITY_DETAIL = _iengine.CS_ENTITY_DETAIL
 CS_ENTITY_CAMERA = _iengine.CS_ENTITY_CAMERA
 CS_ENTITY_INVISIBLEMESH = _iengine.CS_ENTITY_INVISIBLEMESH
+CS_ENTITY_NOSHADOWCAST = _iengine.CS_ENTITY_NOSHADOWCAST
 CS_ENTITY_NOSHADOWS = _iengine.CS_ENTITY_NOSHADOWS
 CS_ENTITY_NOLIGHTING = _iengine.CS_ENTITY_NOLIGHTING
 CS_ENTITY_NOHITBEAM = _iengine.CS_ENTITY_NOHITBEAM
 CS_ENTITY_NOCLIP = _iengine.CS_ENTITY_NOCLIP
 CS_ENTITY_NODECAL = _iengine.CS_ENTITY_NODECAL
+CS_ENTITY_STATICLIT = _iengine.CS_ENTITY_STATICLIT
+CS_ENTITY_NOSHADOWRECEIVE = _iengine.CS_ENTITY_NOSHADOWRECEIVE
+CS_ENTITY_LIMITEDSHADOWCAST = _iengine.CS_ENTITY_LIMITEDSHADOWCAST
 CS_LIGHTINGUPDATE_SORTRELEVANCE = _iengine.CS_LIGHTINGUPDATE_SORTRELEVANCE
 CS_LIGHTINGUPDATE_ALWAYSUPDATE = _iengine.CS_LIGHTINGUPDATE_ALWAYSUPDATE
 class iMeshDrawCallback(core.iBase):
@@ -1005,6 +1053,7 @@ class iMeshWrapper(core.iBase):
     def AddMeshToStaticLOD(*args): return _iengine.iMeshWrapper_AddMeshToStaticLOD(*args)
     def RemoveMeshFromStaticLOD(*args): return _iengine.iMeshWrapper_RemoveMeshFromStaticLOD(*args)
     def GetSVContext(*args): return _iengine.iMeshWrapper_GetSVContext(*args)
+    def GetRenderMeshes(*args): return _iengine.iMeshWrapper_GetRenderMeshes(*args)
     def AddExtraRenderMesh(*args): return _iengine.iMeshWrapper_AddExtraRenderMesh(*args)
     def GetExtraRenderMesh(*args): return _iengine.iMeshWrapper_GetExtraRenderMesh(*args)
     def GetExtraRenderMeshCount(*args): return _iengine.iMeshWrapper_GetExtraRenderMeshCount(*args)
@@ -1336,6 +1385,8 @@ class iPortal(core.iBase):
     def CheckFrustum(*args): return _iengine.iPortal_CheckFrustum(*args)
     def HitBeamPortals(*args): return _iengine.iPortal_HitBeamPortals(*args)
     def GetVerticesCount(*args): return _iengine.iPortal_GetVerticesCount(*args)
+    def GetMaterial(*args): return _iengine.iPortal_GetMaterial(*args)
+    def SetMaterial(*args): return _iengine.iPortal_SetMaterial(*args)
     scfGetVersion = staticmethod(_iengine.iPortal_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iPortal
     __del__ = lambda self : None;
@@ -1352,6 +1403,8 @@ class iPortalContainer(core.iBase):
     def CreatePortal(*args): return _iengine.iPortalContainer_CreatePortal(*args)
     def RemovePortal(*args): return _iengine.iPortalContainer_RemovePortal(*args)
     def Draw(*args): return _iengine.iPortalContainer_Draw(*args)
+    def ComputeScreenPolygons(*args): return _iengine.iPortalContainer_ComputeScreenPolygons(*args)
+    def GetTotalVertexCount(*args): return _iengine.iPortalContainer_GetTotalVertexCount(*args)
     scfGetVersion = staticmethod(_iengine.iPortalContainer_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iPortalContainer
     __del__ = lambda self : None;
@@ -1403,6 +1456,46 @@ class iRenderLoopManager(core.iBase):
 iRenderLoopManager_swigregister = _iengine.iRenderLoopManager_swigregister
 iRenderLoopManager_swigregister(iRenderLoopManager)
 iRenderLoopManager_scfGetVersion = _iengine.iRenderLoopManager_scfGetVersion
+
+class iRenderManager(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def RenderView(*args): return _iengine.iRenderManager_RenderView(*args)
+    scfGetVersion = staticmethod(_iengine.iRenderManager_scfGetVersion)
+    __swig_destroy__ = _iengine.delete_iRenderManager
+    __del__ = lambda self : None;
+iRenderManager_swigregister = _iengine.iRenderManager_swigregister
+iRenderManager_swigregister(iRenderManager)
+iRenderManager_scfGetVersion = _iengine.iRenderManager_scfGetVersion
+
+class iRenderManagerTargets(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    updateOnce = _iengine.iRenderManagerTargets_updateOnce
+    def RegisterRenderTarget(*args): return _iengine.iRenderManagerTargets_RegisterRenderTarget(*args)
+    def UnregisterRenderTarget(*args): return _iengine.iRenderManagerTargets_UnregisterRenderTarget(*args)
+    scfGetVersion = staticmethod(_iengine.iRenderManagerTargets_scfGetVersion)
+    __swig_destroy__ = _iengine.delete_iRenderManagerTargets
+    __del__ = lambda self : None;
+iRenderManagerTargets_swigregister = _iengine.iRenderManagerTargets_swigregister
+iRenderManagerTargets_swigregister(iRenderManagerTargets)
+iRenderManagerTargets_scfGetVersion = _iengine.iRenderManagerTargets_scfGetVersion
+
+class iRenderManagerPostEffects(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def ClearLayers(*args): return _iengine.iRenderManagerPostEffects_ClearLayers(*args)
+    def AddLayersFromDocument(*args): return _iengine.iRenderManagerPostEffects_AddLayersFromDocument(*args)
+    def AddLayersFromFile(*args): return _iengine.iRenderManagerPostEffects_AddLayersFromFile(*args)
+    scfGetVersion = staticmethod(_iengine.iRenderManagerPostEffects_scfGetVersion)
+    __swig_destroy__ = _iengine.delete_iRenderManagerPostEffects
+    __del__ = lambda self : None;
+iRenderManagerPostEffects_swigregister = _iengine.iRenderManagerPostEffects_swigregister
+iRenderManagerPostEffects_swigregister(iRenderManagerPostEffects)
+iRenderManagerPostEffects_scfGetVersion = _iengine.iRenderManagerPostEffects_scfGetVersion
 
 class iSwigCollectionArray(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
