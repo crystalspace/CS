@@ -1,80 +1,61 @@
-<shader compiler="xmlshader" name="water">
-	
-	<!----
-		These are the wave properties as outlined in section 4.1 in this paper by
-		Jerry Tessendorf, presented in 2004, which uses ideas from Fournier and 
-		Reeves' paper from Siggraph '86 Proceedings:
-
-		http://www.finelightvisualtechnology.com/docs/coursenotes2004.pdf
-		http://www.iro.umontreal.ca/~poulin/fournier/papers/p75-fournier.pdf
-	
-		TODO: Move from Gerstner waves to a statistical model representation using
-		Fast Fourier Transforms as described in section 4.3 of Tessendorf's paper.
-	--->
-	
-	<shadervars>
-		<shadervar name="position" type="vector4">-1.0, -1.0, -1.0, 0.0</shadervar>
-		<shadervar name="color" type="vector4">0.9, 0.9, 0.9, 1.0</shadervar>
-		<shadervar name="shine" type="float">1.0</shadervar>
-		<shadervar name="murkiness" type="float">0.3</shadervar>
-		
-		<!-- Wave properties -->
-		
-		<shadervar name="time" type="expression">
-	      <sexp>(* "standard time" 1)</sexp>
-	    </shadervar>
-	    
-	</shadervars>
-
-	
+<!--<shader compiler="shaderweaver" name="simpleweaver1">
   <technique priority="100">
     <pass>
-      <mixmode><alpha/></mixmode>
-      <buffer source="normal" destination="normal"/>
-	  <buffer source="color" destination="color" />
-	  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
-	
-      <vp plugin="glcg" name="Water Vertices">
-		<cgvp>
-			<variablemap variable="time" destination="time" />
-			
-			<?if vars."freqs" && vars."kxs" && vars."kys" && vars."amps" && vars."phases"?>
-			<!-- The wave amplitudes -->
-			<variablemap variable="amps" destination="amps" />
-			
-			<!-- The "kxs" and "kys" are the X and Z components of the 2D directional 
-			vectors of the waves. It is possible to grab these values from a time 
-			dependent function of the vertex's position, but it generates visually 
-			pleasing effects even if they are hardcoded. -->
-			<variablemap variable="kxs" destination="kxs" />
-			<variablemap variable="kys" destination="kys" />
-			
-			<!-- The wave frequencies -->
-			<variablemap variable="freqs" destination="freqs" />
-			
-			<!-- The wave phases -->
-			<variablemap variable="phases" destination="phases" />
-			
-			<variablemap variable="o2w transform" destination="o2w" />
-			
-			<program file="/shader/water/ocean.cgvp"/>
-			<?else ?>
-			<program file="/shader/water/water.cgvp"/>
-			<?endif ?>
-		</cgvp>
-      </vp>	
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 
-	  <texture destination="TexNormal" name="texture normal" />
-      <fp plugin="glcg" name="Water pixels">
-		<cgfp>
-			<variablemap variable="position" destination="lightPos" />
-			<variablemap variable="color" destination="lightCol" />
-			<variablemap variable="shine" destination="shininess" />
-			<variablemap variable="murkiness" destination="waterAlpha" />
-			
-			<program file="/shader/water/water.cgfp"/>
-		</cgfp>
-      </fp>
+      <snippet id="position" file="/shader/snippets/position.xml" />
+      <snippet id="surface" file="/shader/snippets/surface/surface-classic.xml" />
+    </pass>
+  </technique>
+</shader> -->
+
+<shader compiler="shaderweaver" name="water" lights="4">
+  <technique priority="100">
+    <pass>
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+
+      <snippet id="position" file="/shader/snippets/position.xml" />
+      <snippet id="surface" file="/shader/snippets/surface/surface-classic.xml" />
+      
+      <snippet id="lighting" file="/shader/snippets/lighting/lighting-ppl.xml" />
+      <snippet id="apply_lighting" file="/shader/snippets/lighting/apply-lighting.xml" />
+      
+      <connection from="position" to="lighting" />
+      <connection from="surface" to="apply_lighting">
+	<explicit from="surfaceColor" to="surfaceDiffuse" />
+      </connection>
+      <connection from="lighting" to="apply_lighting">
+	<explicit from="diffuseColor" to="lightDiffuse" />
+      </connection>
+      
+      <parameter id="lightOffset" type="int">0</parameter>
+      <parameter id="maxLights" type="int">4</parameter>
+      <connection from="lightOffset" to="apply_lighting" />
+      <connection from="maxLights" to="apply_lighting" />
+     
+      <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
+      
+      <connection from="position" to="normalmap" />
+      <connection from="normalmap" to="lighting" />
+
+      <snippet id="reflection" file="/shader/snippets/reflect/reflect-env-world.xml" />
+      <snippet id="reflection_cubemap" file="/shader/snippets/surface/envmap-cube.xml" />
+      <snippet id="fresnel" file="/shader/snippets/reflect/fresnel.xml" />
+      <snippet id="lerp_reflect_surface" file="/shader/snippets/lerp.xml" />
+
+      <connection from="position" to="reflection" />
+      <connection from="position" to="fresnel" />
+      <connection from="normalmap" to="reflection" />
+      <connection from="normalmap" to="fresnel" />
+      <connection from="reflection" to="reflection_cubemap" />
+      <connection from="reflection_cubemap" to="lerp_reflect_surface">
+	<explicit from="envColor" to="b" />
+      </connection>
+      <connection from="fresnel" to="lerp_reflect_surface" />
+      <connection from="apply_lighting" to="lerp_reflect_surface">
+	<explicit from="result" to="a" />
+      </connection>
+
     </pass>
   </technique>
 </shader>
