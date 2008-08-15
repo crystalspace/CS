@@ -25,6 +25,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <math.h>
 #include <ctype.h>
 
+#include "csutil/scanstr.h"
 #include "csutil/scfarray.h"
 #include "csutil/sysfunc.h"
 
@@ -1740,7 +1741,7 @@ bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const c
     {
       float v1, v2;
 
-      if (sscanf(val_str, "%f,%f", &v1, &v2) < 2)
+      if (csScanStr (val_str, "%f,%f", &v1, &v2) < 2)
       {
         ParseError ("Couldn't parse vector2: %s.", val_str);
 
@@ -1755,7 +1756,7 @@ bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const c
     {
       float v1, v2, v3;
 
-      if (sscanf(val_str, "%f,%f,%f", &v1, &v2, &v3) < 3)
+      if (csScanStr (val_str, "%f,%f,%f", &v1, &v2, &v3) < 3)
       {
         ParseError ("Couldn't parse vector3: %s.", val_str);
 
@@ -1770,7 +1771,7 @@ bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const c
     {
       float v1, v2, v3, v4;
 
-      if (sscanf(val_str, "%f,%f,%f,%f", &v1, &v2, &v3, &v4) < 4)
+      if (csScanStr (val_str, "%f,%f,%f,%f", &v1, &v2, &v3, &v4) < 4)
       {
         ParseError ("Couldn't parse vector4: %s.", val_str);
 

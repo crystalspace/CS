@@ -22,6 +22,7 @@
 #include "csutil/sysfunc.h"
 #include "csutil/scf.h"
 #include "csutil/util.h"
+#include "csutil/scanstr.h"
 #include "csutil/scfstr.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/array.h"
@@ -3264,7 +3265,7 @@ bool csDynaVis::DebugCommand (const char* cmd)
     else if (!strcmp (cmd+9, "--"))
       debug_origin_z -= 10.0;
     else
-      sscanf (cmd+9, "%f", &debug_origin_z);
+      csScanStr (cmd+9, "%f", &debug_origin_z);
   }
   else if (!strcmp (cmd, "clear_stats"))
   {

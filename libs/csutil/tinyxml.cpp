@@ -26,6 +26,7 @@ distribution.
 #include <ctype.h>
 #include "tinyxml.h"
 #include "csutil/scfstr.h"
+#include "csutil/stringconv.h"
 
 #include "iutil/vfs.h"
 
@@ -890,7 +891,7 @@ int TiDocumentAttribute::IntValue() const
 
 double  TiDocumentAttribute::DoubleValue() const
 {
-  return atof (value);
+  return CS::Utility::strtof (value);
 }
 
 const char* TiXmlComment::Print( PrintState& print, int depth ) const

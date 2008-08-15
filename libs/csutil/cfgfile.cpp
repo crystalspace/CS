@@ -24,6 +24,7 @@
 #include "csutil/scf_implementation.h"
 #include "csutil/scfstringarray.h"
 #include "csutil/snprintf.h"
+#include "csutil/stringconv.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
 #include "iutil/cmdline.h"
@@ -186,7 +187,7 @@ int csConfigNode::GetInt() const
 
 float csConfigNode::GetFloat() const
 {
-  return (Data ? (float) atof(Data) : 0.0f);
+  return (Data ? (float) CS::Utility::strtof(Data) : 0.0f);
 }
 
 bool csConfigNode::GetBool() const

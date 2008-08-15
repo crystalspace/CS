@@ -24,6 +24,7 @@
 #include "csutil/csuctransform.h"
 #include "csutil/util.h"
 #include "csutil/set.h"
+#include "csutil/scanstr.h"
 #include "iutil/databuff.h"
 #include "iutil/eventh.h"
 #include "iutil/objreg.h"
@@ -341,7 +342,7 @@ void csFontServerMultiplexer::ParseFontLoaderOrder (
     }
 
     float scale;
-    if ((fontScale.IsEmpty()) || (sscanf (fontScale, "%f", &scale) <= 0))
+    if ((fontScale.IsEmpty()) || (csScanStr (fontScale, "%f", &scale) <= 0))
     {
       scale = 1.0f;
     }

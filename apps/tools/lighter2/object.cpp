@@ -134,7 +134,7 @@ namespace lighter
         if (vLMScale)
         {
           float s=0;
-          if (sscanf (vLMScale, "%f", &s) == 1)
+          if (csScanStr (vLMScale, "%f", &s) == 1)
           {
             lmScale = s;
           }

@@ -23,7 +23,9 @@
 #include "csutil/cscolor.h"
 #include "csutil/common_handlers.h"
 #include "csutil/event.h"
+#include "csutil/scanstr.h"
 #include "csutil/scfstr.h"
+#include "csutil/stringconv.h"
 #include "imesh/object.h"
 #include "iutil/eventq.h"
 #include "iutil/object.h"
@@ -434,12 +436,12 @@ void ViewMesh::HandleCommandLine()
     LoadSprite(meshfilename);
   }
 
-  if (roomSize) roomsize = atof(roomSize);
+  if (roomSize) roomsize = CS::Utility::strtof(roomSize);
 
   if (scaleTxt != 0)
   {
     float newScale;
-    sscanf (scaleTxt, "%f", &newScale);
+    csScanStr (scaleTxt, "%f", &newScale);
     ScaleSprite(newScale);
   }
 
@@ -1546,7 +1548,7 @@ bool ViewMesh::SetRotX (const CEGUI::EventArgs& e)
   if (!text.c_str()) return false;
 
   float f;
-  if (sscanf(text.c_str(),"%f", &f) != 1) return false;
+  if (csScanStr(text.c_str(),"%f", &f) != 1) return false;
 
   if (selectedCal3dSocket && selectedCal3dSocket->GetMeshWrapper())
   {
@@ -1599,7 +1601,7 @@ bool ViewMesh::SetRotY (const CEGUI::EventArgs& e)
   if (!text.c_str()) return false;
 
   float f;
-  if (sscanf(text.c_str(),"%f", &f) != 1) return false;
+  if (csScanStr(text.c_str(),"%f", &f) != 1) return false;
 
   if (selectedCal3dSocket && selectedCal3dSocket->GetMeshWrapper())
   {
@@ -1652,7 +1654,7 @@ bool ViewMesh::SetRotZ (const CEGUI::EventArgs& e)
   if (!text.c_str()) return false;
 
   float f;
-  if (sscanf(text.c_str(),"%f", &f) != 1) return false;
+  if (csScanStr(text.c_str(),"%f", &f) != 1) return false;
 
   if (selectedCal3dSocket && selectedCal3dSocket->GetMeshWrapper())
   {
@@ -1918,7 +1920,7 @@ bool ViewMesh::SetScaleSprite (const CEGUI::EventArgs& e)
   if (text.empty()) return false;
 
   float f;
-  if (sscanf(text.c_str(),"%f", &f) != 1) return false;
+  if (csScanStr(text.c_str(),"%f", &f) != 1) return false;
 
   ScaleSprite(f);
   return true;
@@ -1952,14 +1954,14 @@ bool ViewMesh::BlendButton (const CEGUI::EventArgs& e)
 
   if (! Sweight.empty())
   {
-    if(sscanf(Sweight.c_str(), "%f", &weight) != 1) weight = 1;
+    if(csScanStr(Sweight.c_str(), "%f", &weight) != 1) weight = 1;
   }
 
   component = winMgr->getWindow("Tab4/DelayInput");
   CEGUI::String Sdelay = component->getProperty("Text");
   if (! Sdelay.empty())
   {
-    if(sscanf(Sdelay.c_str(), "%f", &delay) != 1) delay = 1;
+    if(csScanStr(Sdelay.c_str(), "%f", &delay) != 1) delay = 1;
   }
 
   int target =
@@ -1984,7 +1986,7 @@ bool ViewMesh::ClearButton (const CEGUI::EventArgs& e)
 
   if (! Sweight.empty())
   {
-    if(sscanf(Sweight.c_str(), "%f", &weight) != 1) weight = 1;
+    if(csScanStr(Sweight.c_str(), "%f", &weight) != 1) weight = 1;
   }
 
   int target =

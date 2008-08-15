@@ -29,6 +29,7 @@
 #include "csutil/objreg.h"
 #include "csutil/refarr.h"
 #include "csutil/blockallocator.h"
+#include "csutil/stringconv.h"
 #include "iengine.h"
 #include "imesh/terrain2.h"
 #include "ivideo/rendermesh.h"
@@ -124,9 +125,9 @@ public:
     else if (strcmp (name, "min steps") == 0)
       SetMinSteps (atoi (value));
     else if (strcmp (name, "lod splitcoeff") == 0)
-      SetLODSplitCoeff (atof (value));
+      SetLODSplitCoeff (CS::Utility::strtof (value));
     else if (strcmp (name, "splat distance") == 0)
-      SetSplatDistance (atof (value));
+      SetSplatDistance (CS::Utility::strtof (value));
 
   }
 

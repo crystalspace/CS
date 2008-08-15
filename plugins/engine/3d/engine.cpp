@@ -28,6 +28,7 @@
 #include "csutil/databuf.h"
 #include "csutil/scf.h"
 #include "csutil/scfstrset.h"
+#include "csutil/scanstr.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
 #include "csutil/vfscache.h"
@@ -1224,7 +1225,7 @@ void csEngine::ShineLights (iBase *base, iProgressMeter *meter)
       if (input) *input++ = 0;
 
       float xf;
-      sscanf (endkw, "%f", &xf);
+      csScanStr (endkw, "%f", &xf);
 
       int xi = int (xf + ((xf < 0) ? -0.5 : + 0.5));
 

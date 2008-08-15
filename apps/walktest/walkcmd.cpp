@@ -31,6 +31,7 @@
 #include "csutil/csstring.h"
 #include "csutil/flags.h"
 #include "csutil/scanstr.h"
+#include "csutil/stringconv.h"
 #include "csutil/util.h"
 #include "iengine/camera.h"
 #include "iengine/light.h"
@@ -549,7 +550,7 @@ double ParseScaleFactor(iObjectIterator* it)
   double sf;
   csString scaleValue = LookForKeyValue(it,"scalefactor");
 
-  sf = atof(scaleValue);
+  sf = CS::Utility::strtof(scaleValue);
   return sf;
 }
 
@@ -879,7 +880,7 @@ void WalkTest::ActivateObject (iObject* src)
 
 float safe_atof (const char* arg)
 {
-  if (arg) return atof (arg);
+  if (arg) return CS::Utility::strtof (arg);
   else return 1;
 }
 

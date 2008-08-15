@@ -34,6 +34,7 @@
 #include <lib3ds/vector.h>
 
 #include "csutil/scfstr.h"
+#include "csutil/stringconv.h"
 #include "csutil/sysfunc.h"
 
 #include "levelwriter.h"
@@ -229,9 +230,9 @@ int main (int argc, char * argv[])
         case 'R':
 	  if (n+3<argc)
 	  {
-	    xrelocate = atof(argv[++n]);
-	    yrelocate = atof(argv[++n]);
-	    zrelocate = atof(argv[++n]);
+	    xrelocate = CS::Utility::strtof(argv[++n]);
+	    yrelocate = CS::Utility::strtof(argv[++n]);
+	    zrelocate = CS::Utility::strtof(argv[++n]);
 	  }
 	  else
 	  {
@@ -242,9 +243,9 @@ int main (int argc, char * argv[])
         case 'S':
 	  if (n+3<argc)
 	  {
-	    xscale = atof(argv[++n]);
-	    yscale = atof(argv[++n]);
-	    zscale = atof(argv[++n]);
+	    xscale = CS::Utility::strtof(argv[++n]);
+	    yscale = CS::Utility::strtof(argv[++n]);
+	    zscale = CS::Utility::strtof(argv[++n]);
 	  }
    	  else
 	  {
