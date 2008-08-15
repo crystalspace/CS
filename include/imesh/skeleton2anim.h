@@ -467,6 +467,17 @@ struct iSkeletonAnimationNodeFactory2 : public iSkeletonAnimNodeFactory2
    * playing from the beginning. 
    */
   virtual bool GetAutomaticReset () const = 0;
+
+  /**
+   * Set if animation should automatically stop when finishing.
+   */
+  virtual void SetAutomaticStop (bool enabed) = 0;
+
+  /**
+   * Get if animation should automatically stop when finishing.
+   */
+  virtual bool GetAutomaticStop () const = 0;
+
 };
 
 /**
@@ -728,6 +739,29 @@ struct iSkeletonFSMNodeFactory2 : public iSkeletonAnimNodeFactory2
    * Remove all states.
    */
   virtual void ClearStates () = 0;
+
+  /**
+   * Set a node (sub-tree) to use when transitioning between two states.
+   * The sub-tree should not be cyclic or a deadlock of the FSM will happen.
+   *
+   * \param fromState the originating state in the transition
+   * \param toState the target state in the transition
+   * \param fact node factory to use for the transition animation
+   */
+  virtual void SetStateTransition (CS::Animation::StateID fromState, 
+    CS::Animation::StateID toState, iSkeletonAnimNodeFactory2* fact) = 0;
+
+  /**
+   * Set the transition cross-fade times.
+   * 
+   * \param fromState the originating state in the transition
+   * \param toState the target state in the transition
+   * \param time1 first cross-fade time, before transition animation (if any)
+   * \param time2 second cross-fade time, after transition animation if any is 
+   * in use (otherwise ignored)
+   */
+  virtual void SetTransitionCrossfade (CS::Animation::StateID fromState, 
+    CS::Animation::StateID toState, float time1, float time2) = 0;
 };
 
 

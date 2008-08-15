@@ -18,8 +18,8 @@
 -->
 <include>
 
-<?CgUseSharedCond primaryColor "!vars.\"tex lightmap\".texture" ?>
-<?CgUseSharedCond primaryColorV2F "!vars.\"tex lightmap\".texture"?>
+<?CgUseSharedCond primaryColor "!vars.\"tex lightmap\".texture && !vars.\"static color\".buffer" ?>
+<?CgUseSharedCond primaryColorV2F "!vars.\"tex lightmap\".texture && !vars.\"static color\".buffer" ?>
 
 <?Template LightingClassic_Code?>
 #ifndef __CS_SHADER_LIGHT_CLASSIC_CG__
@@ -28,6 +28,7 @@
 struct Vert_LightingClassic
 {
   varying float2 texCoordLM;
+  varying float3 staticPVLColor;
 };
 Vert_LightingClassic lightingClassicVert;
 
@@ -42,12 +43,16 @@ struct LightingClassic
 {
 <?if vars."tex lightmap".texture ?>
   float2 texCoordLM;
+<?elsif vars."static color".buffer ?>
+  float3 staticPVLColor;
 <?endif?>
 
   void SetupVert ()
   {
   <?if vars."tex lightmap".texture ?>
     texCoordLM = lightingClassicVert.texCoordLM;
+  <?elsif vars."static color".buffer ?>
+    staticPVLColor = lightingClassicVert.staticPVLColor;
   <?endif?>
   }
   
@@ -69,6 +74,8 @@ struct LightingClassic
     /*float grid_x = (frac (texCoordLM.x * 1024) &lt; 0.02) ? 0 : 1;
     float grid_y = (frac (texCoordLM.y * 1024) &lt; 0.02) ? 0 : 1;
     light_diffuse = light_diffuse * grid_x * grid_y;*/
+  <?elsif vars."static color".buffer ?>
+    light_diffuse = staticPVLColor;
   <?else?>
     light_diffuse = primaryColor.rgb;
   <?endif?>
@@ -87,6 +94,9 @@ struct LightingClassic
       <texture name="tex lightmap" destination="lightingClassicFrag.lightmap" />
       <buffer source="texture coordinate lightmap" 
 	destination="lightingClassicVert.texCoordLM" />
+  <?elsif vars."static color".buffer ?>
+      <buffer source="static color" 
+	destination="lightingClassicVert.staticPVLColor" />
     <?endif?>
   <?Endtemplate?>
   <?AddToList PassMappings Pass_LightingClassic ?>

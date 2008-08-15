@@ -16,6 +16,7 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
 <include>
+<?Include /shader/snippets/cg-common.cginc?>
 <![CDATA[
 
 #ifndef __SHADOWFUNCS_CG_INC__
@@ -31,7 +32,7 @@
 struct ShadowClipper
 {
   bool IsClipped (float2 shadowMapCoordsProjUnscaled,
-                  float2 shadowMapCoordsProj,
+                  float3 shadowMapCoordsProj,
                   float4 shadowMapCoords)
   {
   ]]>
@@ -40,7 +41,7 @@ struct ShadowClipper
     bool2 compResLT = shadowMapCoordsProjUnscaled.xy < float2 (-1);
     bool2 compResBR = shadowMapCoordsProjUnscaled.xy >= float2 (1);
     return (compResLT.x || compResLT.y || compResBR.x || compResBR.y
-      || (shadowMapCoords.z > shadowMapCoords.w));
+      || (shadowMapCoordsProj.z > 0));
   ]]>
   <?else?>
   <![CDATA[
@@ -65,7 +66,7 @@ struct ShadowClipper
   
   half ClipAttenuated (half factor,
                        float2 shadowMapCoordsProjUnscaled,
-                       float2 shadowMapCoordsProj,
+                       float3 shadowMapCoordsProj,
                        float4 shadowMapCoords)
   {
   ]]>
@@ -74,7 +75,7 @@ struct ShadowClipper
     float2 compResLT = shadowMapCoordsProjUnscaled.xy >= float2 (-1);
     float2 compResBR = shadowMapCoordsProjUnscaled.xy < float2 (1);
     factor *= compResLT.x*compResLT.y*compResBR.x*compResBR.y;
-    factor *= (shadowMapCoords.z <= shadowMapCoords.w);
+    factor *= (shadowMapCoordsProj.z <= 0);
   ]]>
   <?else?>
   <![CDATA[

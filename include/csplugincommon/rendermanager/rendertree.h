@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDERTREE_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDERTREE_H__
 
+/**\file
+ * Render tree
+ */
+
 #include "iengine/camera.h"
 #include "csplugincommon/rendermanager/standardtreetraits.h"
 #include "csutil/dirtyaccessarray.h"
@@ -34,14 +38,122 @@ namespace CS
 namespace RenderManager
 {
   class PostEffectManager;
+  
+  /**
+   * Helper class containing stuff which doesn't require any of the template
+   * parameters to RenderTree
+   */
+  class CS_CRYSTALSPACE_EXPORT RenderTreeBase
+  {
+  public:
+   struct CS_CRYSTALSPACE_EXPORT DebugPersistent
+    {
+      DebugPersistent ();
+      
+      uint RegisterDebugFlag (const char* string);
+      uint QueryDebugFlag (const char* string);
+    
+      bool IsDebugFlagEnabled (uint flag);
+      void EnableDebugFlag (uint flag, bool state);
+    protected:
+      uint nextDebugId;
+      csHash<uint, csString> debugIdMappings;
+      csHash<csArray<uint>, uint> debugIdChildren;
+      csBitArray debugFlags;
+    };
+  
+  protected:
+    struct DebugTexture
+    {
+      csRef<iTextureHandle> texh;
+      float aspect;
+    };
+    csArray<DebugTexture> debugTextures;
+  public:
+    //@{
+    /**\name Debugging helpers: debugging textures
+     */
+    /**
+     * Add a texture to be rendered at the bottom of the view the next frame.
+     */
+    void AddDebugTexture (iTextureHandle* tex, float aspect = 1.0f);
+    /**
+     * Render out debug textures. To be called by the rendermanager at the end
+     * of rendering a view.
+     */
+    void RenderDebugTextures (iGraphics3D* g3d);
+    //@}
+  
+    //@{
+    /**\name Debugging helpers: line drawing
+     */
+    /// Add debug line (world space)
+    void AddDebugLine3D (const csVector3& v1, const csVector3& v2,
+                         const csColor& color1, const csColor& color2);
+    /**
+     * Add debug line (arbitrary space, transformed to world space with 
+     * \a toWorldSpace)
+     */
+    void AddDebugLine3DTF (const csVector3& v1, const csVector3& v2,
+                           const csTransform& toWorldSpace,
+                           const csColor& color1, const csColor& color2);
+    /**
+     * Add lines to visualize a bounding box (in arbitrary space, transformed 
+     * to world space with \a toWorldSpace)
+     */
+    void AddDebugBBox (const csBox3& box,
+                       const csTransform& toWorldSpace,
+                       const csColor& col);
+    /**
+     * Add lines to visualize a plane (in arbitrary space, transformed 
+     * to world space with \a toWorldSpace)
+     */
+    void AddDebugPlane (const csPlane3& _plane,
+                        const csTransform& toWorldSpace,
+                        const csColor& col,
+                        const csVector3& linesOrg = csVector3 (0));
+    /**
+     * Visualize camera clip planes for the given view.
+     */
+    void AddDebugClipPlanes (RenderView* view);
+    /**
+     * Render out debug lines. To be called by the rendermanager at the end
+     * of rendering a view.
+     */
+    void DrawDebugLines (iGraphics3D* g3d, RenderView* view);
+
+    struct DebugLines
+    {
+      csDirtyAccessArray<csVector3> verts;
+      csDirtyAccessArray<csVector4> colors;
+    };
+    /// Get all current debug lines. Useful to conserve the current lines
+    const DebugLines& GetDebugLines () const { return debugLines; }
+    /**
+     * Set all current debug lines. Useful to e.g. set conserved lines from an
+     * earlier frame.
+     */
+    void SetDebugLines (const DebugLines& lines) { debugLines = lines; }
+    //@}
+    
+  protected:
+    DebugLines debugLines;
+  };
 
   /**
    * RenderTree is the main data-structure for the rendermanagers.
    * It contains the entire setup of meshes and where to render those meshes,
    * as well as basic operations regarding those meshes.
+   *
+   * The \a TreeTraits template argument specifies additional data stored with
+   * meshes, contexts and others in the tree. See the subclasses in
+   * RenderTreeStandardTraits for a list of what can be customized.
+   * To provide custom traits, create a class and either provide a new, custom
+   * type for a trait or typedef in the respective type from
+   * RenderTreeStandardTraits.
    */
   template<typename TreeTraits = RenderTreeStandardTraits>
-  class RenderTree
+  class RenderTree : public RenderTreeBase
   {
   public:
     //---- Forward declarations
@@ -63,10 +175,17 @@ namespace RenderManager
 
 
     /**
-     * Persistent data for the tree, needs to be stored between frames by the RM
+     * Data used by the render tree that needs to persist over multiple frames.
+     * Render managers must store an instance of this class and provide
+     * it to the render tree upon instantiation.
      */
     struct PersistentData
     {
+      /**
+       * Initialize data. Fetches various required values from objects in
+       * the object registry. Must be called when the render manager plugin is 
+       * initialized.
+       */
       void Initialize (iShaderManager* shmgr)
       {
         svObjectToWorldName = 
@@ -91,6 +210,8 @@ namespace RenderManager
     
       RenderView::Pool renderViewPool;
       csRenderMeshHolder rmHolder;
+      
+      DebugPersistent debugPersist;
     };
 
     /**
@@ -106,15 +227,24 @@ namespace RenderManager
       struct SingleMesh : 
         public CS::Meta::EBOptHelper<typename TreeTraitsType::MeshExtraDataType>
       {
+        /// Originating mesh wrapper
         iMeshWrapper* meshWrapper;
+        /// Render mesh
         csRenderMesh* renderMesh;
+        /// Mesh Z buffer mode
         csZBufMode zmode;
+        /// Mesh object wrapper shader variables
         iShaderVariableContext* meshObjSVs;
+        /// Mesh object to world transformation
         csRef<csShaderVariable> svObjectToWorld;
+        /// Mesh object to world inverse transformation
         csRef<csShaderVariable> svObjectToWorldInv;
+        /// Bounding box (world space)
         csBox3 bbox;
+        /// Mesh flags
         csFlags meshFlags;
 
+        /// "Local ID" in the context; used for array indexing
         size_t contextLocalId;
       };
 
@@ -141,59 +271,73 @@ namespace RenderManager
     };
 
     /**
-     * 
+     * A single context node, Groups meshes which should be rendered from the
+     * same view to the same target.
      */
     struct ContextNode : public CS::Meta::EBOptHelper<typename TreeTraits::ContextNodeExtraDataType>
     {
       /**
-       * 
+       * Information for a portal
        */
       struct PortalHolder
       {
       #ifdef CS_DEBUG
+        /// Debugging: name of mesh
         const char* db_mesh_name;
       #endif
+        /// Portal container interface
         iPortalContainer* portalContainer;
+        /// Originating mesh wrapper
         iMeshWrapper* meshWrapper;
       };
 
       //-- Types
       typedef RealTreeType TreeType;
 
-      // Owner
+      /// Owner of context node
       TreeType& owner;
 
-      // Target data
+      /// View rendered to
       csRef<RenderView> renderView;
+      /// A single render target
       struct TargetTexture
       {
+        /// Texture handle
         iTextureHandle* texHandle;
+        /// Subtexture
         int subtexture;
 
         TargetTexture() : texHandle (0), subtexture (0) {}
       };
+      /// All render targets to be used when rendering the context node
       TargetTexture renderTargets[rtaNumAttachments];
+      /// Camera transformation
       csReversibleTransform cameraTransform;
+      /// Flags for iGraphics3D::BeginDraw()
       int drawFlags;
+      /// Sector to render
       iSector* sector;
+      /// Context-specific shader variables
       csRef<iShaderVariableContext> shadervars;
       
+      /// Post processing effects to apply after rendering the context
       csRef<PostEffectManager> postEffects;
 
-      // A sub-tree of mesh nodes
+      /// Sub-tree of mesh nodes
       MeshNodeTreeType meshNodes;
 
-      // All portals within context
+      /// All portals within context
       csArray<PortalHolder> allPortals;
 
-      // The SVs themselves
+      /// The SVs themselves
       SVArrayHolder svArrays;
 
-      // Arrays of per-mesh shader and ticket info
+      /// Arrays of per-mesh shader
       csDirtyAccessArray<iShader*> shaderArray;
+      /// Arrays of per-mesh ticket info
       csArray<size_t> ticketArray;
 
-      // Total number of render meshes within the context, just for statistics
+      /// Total number of render meshes within the context
       size_t totalRenderMeshes;
       
       ContextNode(TreeType& owner) 
@@ -241,6 +385,7 @@ namespace RenderManager
 	totalRenderMeshes++;
       }
 
+      /// Add a new render layer after \a layer
       void InsertLayer (size_t after)
       {
         const size_t layerCount = shaderArray.GetSize() / totalRenderMeshes;
@@ -255,6 +400,10 @@ namespace RenderManager
         svArrays.InsertLayer (after, after);
       }
 
+      /**
+       * Copy the shader for mesh \a meshId from layer \a fromLayer to layer
+       * \a toLayer.
+       */
       void CopyLayerShader (size_t meshId, size_t fromLayer, size_t toLayer)
       {
         const size_t fromLayerOffset = fromLayer * totalRenderMeshes;
@@ -263,6 +412,9 @@ namespace RenderManager
           shaderArray[fromLayerOffset + meshId];
       }
       
+      /**
+       * Get the dimension of the render target set for this context.
+       */
       bool GetTargetDimensions (int& renderW, int& renderH)
       {
 	for (int a = 0; a < rtaNumAttachments; a++)
@@ -273,6 +425,15 @@ namespace RenderManager
 	      renderW, renderH);
 	    return true;
 	  }
+        }
+        if (renderView.IsValid())
+        {
+          iGraphics3D* g3d = renderView->GetGraphics3D();
+          if (g3d)
+          {
+            renderW = g3d->GetWidth();
+            renderH = g3d->GetHeight();
+          }
         }
         return false;
       }
@@ -367,142 +528,50 @@ namespace RenderManager
       meshNode->owner.meshNodes.Delete (meshNode->key);
       persistentData.meshNodeAllocator.Free (meshNode);
     }
-    
-    
-    
-    void AddDebugTexture (iTextureHandle* tex, float aspect = 1.0f)
-    {
-      DebugTexture dt;
-      dt.texh = tex;
-      dt.aspect = aspect;
-      debugTextures.Push (dt);
-    }
-    void RenderDebugTextures (iGraphics3D* g3d)
-    {
-      if (debugTextures.GetSize() == 0) return;
-    
-      g3d->BeginDraw (CSDRAW_2DGRAPHICS);
-      int scrWidth = g3d->GetWidth();
-      int scrHeight = g3d->GetHeight();
-      
-      int desired_height = scrHeight / 6;
-      int total_width = (int)ceilf (debugTextures[0].aspect * desired_height);
-      
-      for (size_t i = 1; i < debugTextures.GetSize(); i++)
-      {
-        total_width += (int)ceilf (debugTextures[i].aspect * desired_height) + 16;
-      }
-      float scale = 1.0f;
-      if (total_width > scrWidth)
-        scale = (float)scrWidth/(float)total_width;
-      
-      float left = 0;
-      const float top = scrHeight - desired_height * scale;
-      const float bottom = scrHeight;
-      
-      csVector3 coords[4];
-      csVector2 tcs[4];
-      tcs[0].Set (0, 0);
-      tcs[1].Set (1, 0);
-      tcs[2].Set (1, 1);
-      tcs[3].Set (0, 1);
-      
-      csSimpleRenderMesh mesh;
-      mesh.alphaType.alphaType = csAlphaMode::alphaNone;
-      mesh.meshtype = CS_MESHTYPE_QUADS;
-      mesh.vertexCount = 4;
-      mesh.vertices = coords;
-      mesh.texcoords = tcs;
-      for (size_t i = 0; i < debugTextures.GetSize(); i++)
-      {
-        const float right = left + debugTextures[i].aspect * desired_height * scale;
-        coords[0].Set (left, top, 0);
-        coords[1].Set (right, top, 0);
-        coords[2].Set (right, bottom, 0);
-        coords[3].Set (left, bottom, 0);
-        
-        mesh.texture = debugTextures[i].texh;
-        g3d->DrawSimpleMesh (mesh, csSimpleMeshScreenspace);
-        
-        left = right + 16;
-      }
-      g3d->FinishDraw ();
-    }
-    
-    
-    struct DebugLines
-    {
-      csDirtyAccessArray<csVector3> verts;
-      csDirtyAccessArray<csVector4> colors;
-    };
-    /// Add debug line (world space)
-    void AddDebugLine3D (const csVector3& v1, const csVector3& v2,
-                         const csColor& color1, const csColor& color2)
-    {
-      debugLines.verts.Push (v1);
-      debugLines.verts.Push (v2);
-      debugLines.colors.Push (
-        csVector4 (color1.red, color1.green, color1.blue));
-      debugLines.colors.Push (
-        csVector4 (color2.red, color2.green, color2.blue));
-    }
-    void AddDebugBBox (const csBox3& box,
-                       const csTransform& toWorldSpace,
-                       const csColor& col)
-    {
-      static const int numEdges = 12;
-      static const int edges[numEdges] =
-      {
-        CS_BOX_EDGE_xyz_Xyz,
-        CS_BOX_EDGE_xyz_xYz,
-        CS_BOX_EDGE_Xyz_XYz,
-        CS_BOX_EDGE_xYz_XYz,
-        
-        CS_BOX_EDGE_xyZ_XyZ,
-        CS_BOX_EDGE_xyZ_xYZ,
-        CS_BOX_EDGE_XyZ_XYZ,
-        CS_BOX_EDGE_xYZ_XYZ,
-        
-        CS_BOX_EDGE_xyz_xyZ,
-        CS_BOX_EDGE_xYz_xYZ,
-        CS_BOX_EDGE_Xyz_XyZ,
-        CS_BOX_EDGE_XYz_XYZ
-      };
-      for (int e = 0; e < numEdges; e++)
-      {
-        csSegment3 edge (box.GetEdge (edges[e]));
-        AddDebugLine3D (toWorldSpace.Other2This (edge.Start()),
-          toWorldSpace.Other2This (edge.End()),
-          col, col);
-      }
-    }
 
-    void DrawDebugLines (iGraphics3D* g3d, RenderView* view)
-    {
-      if (debugLines.verts.GetSize() == 0) return;
-      
-      g3d->SetProjectionMatrix (view->GetCamera()->GetProjectionMatrix());
-      g3d->SetClipper (0, CS_CLIPPER_TOPLEVEL);
-      // [res] WTF - why does that not work, but in mesh.object2world it does?
-      //g3d->SetWorldToCamera (view->GetCamera()->GetTransform().GetInverse());
-      
-      g3d->BeginDraw (CSDRAW_3DGRAPHICS);
-      
-      csSimpleRenderMesh mesh;
-      mesh.alphaType.alphaType = csAlphaMode::alphaNone;
-      mesh.meshtype = CS_MESHTYPE_LINES;
-      mesh.vertexCount = debugLines.verts.GetSize();
-      mesh.vertices = debugLines.verts.GetArray();
-      mesh.colors = debugLines.colors.GetArray();
-      mesh.object2world = view->GetCamera()->GetTransform().GetInverse();
-      g3d->DrawSimpleMesh (mesh);
-      g3d->FinishDraw ();
-    }
-    
-    const DebugLines& GetDebugLines () const { return debugLines; }
-    void SetDebugLines (const DebugLines& lines) { debugLines = lines; }
-    
 
+    /**\name Debugging helpers: toggling of debugging features
+     * @{ */
+    /**
+     * Register a debug flag, returns a numeric ID.
+     * \remark Flag names are hierarchical. The hierarchy levels are
+     *   separated by dots. If a flag is set or unset, all flags below in the
+     *   hierarchy are set or unset as well.
+     */
+    uint RegisterDebugFlag (const char* string)
+    { return persistentData.debugPersist.RegisterDebugFlag (string); }
+    /**
+     * Query whether a debug flag was registered and return its ID or
+     * (uint)-1 if not registered.
+     */
+    uint QueryDebugFlag (const char* string)
+    { return persistentData.debugPersist.QueryDebugFlag (string); }
+    
+    /// Check whether a debug flag is enabled
+    bool IsDebugFlagEnabled (uint flag)
+    { return persistentData.debugPersist.IsDebugFlagEnabled (flag); }
+    /**
+     * Enable or disable a debug flag.
+     * \remark Flag names are hierarchical. The hierarchy levels are
+     *   separated by dots. If a flag is set or unset, all flags below in the
+     *   hierarchy are set or unset as well.
+     */
+    void EnableDebugFlag (uint flag, bool state)
+    { persistentData.debugPersist.EnableDebugFlag (flag, state); }
+    /**
+     * Enable or disable a debug flag.
+     * \remark Flag names are hierarchical. The hierarchy levels are
+     *   separated by dots. If a flag is set or unset, all flags below in the
+     *   hierarchy are set or unset as well.
+     */
+    void EnableDebugFlag (const char* flagStr, bool state)
+    {
+      uint flag = RegisterDebugFlag (flag);
+      EnableDebugFlag (flag, state); 
+    }
+    /** @} */
+    
+    
     PersistentData& GetPersistentData()
     {
       return persistentData;
@@ -515,14 +584,6 @@ namespace RenderManager
   protected:    
     PersistentData&         persistentData;
     ContextNodeArrayType    contexts; 
-    
-    struct DebugTexture
-    {
-      csRef<iTextureHandle> texh;
-      float aspect;
-    };
-    csArray<DebugTexture> debugTextures;
-    DebugLines debugLines;
   };
 
 }

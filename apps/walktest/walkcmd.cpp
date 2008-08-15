@@ -917,7 +917,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  farplane");
     CONPRI("Lights:");
     CONPRI("  addlight dellight dellights addstlight delstlight");
-    CONPRI("  clrlights setlight relight");
+    CONPRI("  clrlights setlight");
     CONPRI("Views:");
     CONPRI("  split_view unsplit_view toggle_view");
     CONPRI("Movement:");
@@ -2220,7 +2220,6 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
     ll->Add (light);
-    Sys->view->GetEngine ()->ForceRelight (light);
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Static light added.");
   }
   else if (!csStrCaseCmp (cmd, "dellight"))
@@ -2272,16 +2271,6 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
     }
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "All dynamic lights deleted.");
-  }
-  else if (!csStrCaseCmp (cmd, "relight"))
-  {
-    csRef<iConsoleOutput> console = csQueryRegistry<iConsoleOutput> (Sys->object_reg);
-    if(console.IsValid())
-    {
-      csTextProgressMeter* meter = new csTextProgressMeter(console);
-      Sys->Engine->ForceRelight (0, meter);
-      delete meter;
-    }
   }
   else if (!csStrCaseCmp (cmd, "snd_play"))
   {

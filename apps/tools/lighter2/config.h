@@ -42,6 +42,10 @@ namespace lighter
       bool directionalLMs;
       // Number of threads to use for multicore parts
       uint numThreads;
+      // Save buffers as binary
+      bool saveBinaryBuffers;
+      // Check for duplicate objects when loading map data.
+      bool checkDupes;
     };
 
     // Lightmap and lightmap layout properties
@@ -62,6 +66,13 @@ namespace lighter
 
       // Whether to store PD light maps as grayscale maps.
       bool grayPDMaps;
+    };
+    
+    // Terrain lighting properties
+    struct TerrainProperties
+    {
+      // Max lightmap sizes
+      uint maxLightmapU, maxLightmapV;
     };
 
     // Direct light (direct illumination) calculation settings
@@ -111,6 +122,11 @@ namespace lighter
       return lmProperties;
     }
 
+    const TerrainProperties& GetTerrainProperties () const
+    {
+      return terrainProperties;
+    }
+
     const DIProperties& GetDIProperties () const
     {
       return diProperties;
@@ -125,6 +141,7 @@ namespace lighter
     // Properties
     LighterProperties     lighterProperties;
     LightmapProperties    lmProperties;
+    TerrainProperties     terrainProperties;
     DIProperties          diProperties;
     DebugProperties       debugProperties;
   };

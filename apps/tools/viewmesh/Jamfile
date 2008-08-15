@@ -13,4 +13,5 @@ if $(CEGUI.AVAILABLE) = "yes"
     CFlags viewmesh : [ FDefines CS_HAVE_CAL3D ] ;
     ExternalLibs viewmesh : CAL3D ;
   }
+  FileListEntryApplications viewmesh : app-tool ;
 }

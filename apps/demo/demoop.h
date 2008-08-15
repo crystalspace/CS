@@ -27,7 +27,7 @@
 #include "ivaria/sequence.h"
 
 class Demo;
-class csNamedPath;
+class csPath;
 struct iGraphics3D;
 struct iGraphics2D;
 struct iCamera;
@@ -137,7 +137,7 @@ class AttachOp : public StandardOp
 {
 private:
   iMeshWrapper* mesh;
-  csNamedPath* path;
+  csPath* path;
 
 public:
   AttachOp (const char* meshName, const char* pathName);
@@ -151,7 +151,7 @@ class PathOp : public StandardOp
 {
 private:
   iMeshWrapper* mesh;
-  csNamedPath* path;
+  csPath* path;
   csTicks total_path_time;
 
 public:

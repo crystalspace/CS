@@ -89,7 +89,7 @@ struct ShadowShadowMapDepth : ShadowShadowMap
       (shadowMapCoordsProj.xy) * shadowMapUnscale.xy + shadowMapUnscale.zw;
     
     ShadowClipper clipper;
-    if (clipper.IsClipped (shadowMapCoordsProjUnscaled, shadowMapCoordsProj.xy,
+    if (clipper.IsClipped (shadowMapCoordsProjUnscaled, shadowMapCoordsProj.xyz,
         shadowMapCoords))
       return clipper.ClippedFactor ();
   

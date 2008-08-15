@@ -44,13 +44,15 @@ namespace lighter
       occlUnoccluded,
       occlPartial
     };
-    OcclusionState Occlusion (const Primitive* ignorePrim = 0);
-    OcclusionState Occlusion (HitIgnoreCallback* ignoreCB);
+    OcclusionState Occlusion (const Object* ignoreObject,
+      const Primitive* ignorePrim = 0);
+    OcclusionState Occlusion (const Object* ignoreObject,
+      HitIgnoreCallback* ignoreCB);
 
     
     csColor GetFilterColor ();
 
-    void CollectHits (HitPointCallback* hitCB, HitIgnoreCallback* ignoreCB);
+    //void CollectHits (HitPointCallback* hitCB, HitIgnoreCallback* ignoreCB);
 
     void AddSegment (KDTree* tree, const csVector3& start, const csVector3& end);
     void AddSegment (KDTree* tree, const csVector3& start, const csVector3& dir, float maxL);

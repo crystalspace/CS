@@ -30,7 +30,7 @@ AppMazing::~AppMazing()
 {
 }
 
-void AppMazing::ProcessFrame()
+void AppMazing::Frame()
 {
   csTicks elapsed_time = vc->GetElapsedTicks ();
   game.Handle (elapsed_time);
@@ -40,12 +40,6 @@ void AppMazing::ProcessFrame()
     return;
 
   view->Draw ();
-}
-
-void AppMazing::FinishFrame()
-{
-  g3d->FinishDraw();
-  g3d->Print(0);
 }
 
 bool AppMazing::OnKeyboard(iEvent& ev)
@@ -116,6 +110,7 @@ bool AppMazing::OnInitialize(int /*argc*/, char* /*argv*/[])
 
 void AppMazing::OnExit()
 {
+  printer.Invalidate ();
 }
 
 bool AppMazing::Application()
@@ -166,6 +161,8 @@ bool AppMazing::Application()
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, 0));
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
+  printer.AttachNew (new FramePrinter (object_reg));
 
   // Start the default run/event loop.  This will return only when some code,
   // such as OnKeyboard(), has asked the run loop to terminate.

@@ -17,7 +17,8 @@
 -->
 <snippet type="compound">
   <technique priority="100">
-    <snippet id="ambientOcclusion" file="/shader/snippets/lighting/ambient-ao.xml" />
+    <snippet id="ambientOcclusion" file="/shader/snippets/lighting/ambient-ao.xml"
+	     condition='(vars."pass number".int == 0) &amp;&amp; (vars."pass do_ambient")' />
     
     <snippet id="ambient_simple">
       <technique priority="100">
@@ -50,7 +51,7 @@
 	</input>
 	
 	<block location="cg:vertexMain">
-	  <?if vars."pass do_ambient" ?>
+	  <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
 	  ambient = combinedAmbient*occlusionFactor;
 	  <?else?>
 	  ambient = float3(0);
@@ -59,7 +60,7 @@
 	</block>
 	  
 	<block location="cg:fragmentMain">
-	  <?if vars."pass do_ambient" ?>
+	  <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
 	  ambient = combinedAmbient*occlusionFactor;
 	  <?else?>
 	  ambient = float3(0);

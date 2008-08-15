@@ -28,8 +28,28 @@
 namespace lighter
 {
 
+  csPtr<iRenderBuffer> WrapBuffer (iRenderBuffer* buffer, 
+                                   const char* suffix,
+                                   const char* basename)
+  {
+    csRef<iRenderBuffer> newBuffer;
+    if (globalConfig.GetLighterProperties().saveBinaryBuffers)
+    {
+      csString newFn;
+      newFn.Format ("bindata/%s_%s", basename, suffix);
+      CS::RenderBufferPersistent* persistBuf =
+        new CS::RenderBufferPersistent (buffer);
+      persistBuf->SetFileName (newFn);
+      newBuffer.AttachNew (persistBuf);
+    }
+    else
+      newBuffer = buffer;
+    return csPtr<iRenderBuffer> (newBuffer);
+  }
+
   ObjectFactory::ObjectFactory (const Configuration& config)
     : lightPerVertex (false), noModify (false), hasTangents (false),
+    noSelfShadow (false),
     lmScale (config.GetLMProperties ().lmDensity),
     factoryWrapper (0)
   {
@@ -104,6 +124,12 @@ namespace lighter
         if (vVertexlight != 0)
           lightPerVertex = (strcmp (vVertexlight, "yes") == 0);
 
+        const char* vNoSelfShadow = kvp->GetValue ("noselfshadow");
+        if (vNoSelfShadow != 0)
+        {
+          noSelfShadow = (strcmp (vNoSelfShadow, "yes") == 0);
+	}
+
         const char* vLMScale = kvp->GetValue ("lmscale");
         if (vLMScale)
         {
@@ -162,12 +188,30 @@ namespace lighter
     }
   }
 
+  csString ObjectFactory::GetFileName() const
+  {
+    csString filename (factoryName);
+    filename.ReplaceAll ("\\", "_");
+    filename.ReplaceAll ("/", "_"); 
+    filename.ReplaceAll (" ", "_"); 
+    filename.ReplaceAll (".", "_"); 
+    return filename;
+  }
+  
+  csPtr<iRenderBuffer> ObjectFactory::WrapBuffer (iRenderBuffer* buffer, 
+                                                  const char* suffix)
+  {
+    return lighter::WrapBuffer (buffer, suffix, GetFileName());
+  }
+  
   //-------------------------------------------------------------------------
 
   Object::Object (ObjectFactory* fact)
     : lightPerVertex (fact->lightPerVertex), sector (0), litColors (0), 
       litColorsPD (0), factory (fact)
   {
+    if (factory->noSelfShadow)
+      objFlags.Set (OBJECT_FLAG_NOSELFSHADOW);
   }
   
   Object::~Object ()
@@ -339,6 +383,13 @@ namespace lighter
         scfQueryInterface<iKeyValuePair> (obj);
       if (kvp.IsValid() && (strcmp (kvp->GetKey(), "lighter2") == 0))
       {
+        const char* vNoSelfShadow = kvp->GetValue ("noselfshadow");
+        if (vNoSelfShadow != 0)
+        {
+          objFlags.SetBool (OBJECT_FLAG_NOSELFSHADOW,
+            strcmp (vNoSelfShadow, "yes") == 0);
+	}
+
         if (!factory->lightPerVertex)
         {
           /* Disallow "disabling" of per-vertex lighting in an object when
@@ -590,4 +641,11 @@ namespace lighter
     filename.ReplaceAll (".", "_"); 
     return filename;
   }
+  
+  csPtr<iRenderBuffer> Object::WrapBuffer (iRenderBuffer* buffer, 
+                                           const char* suffix)
+  {
+    return lighter::WrapBuffer (buffer, suffix, GetFileName());
+  }
+
 }

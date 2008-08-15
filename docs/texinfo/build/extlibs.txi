@@ -78,11 +78,11 @@ location:
 
 @noindent
 @ifnottex
-@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-win32libs-1.3_003.exe}
+@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-win32libs-1.3_004.exe}
 @end ifnottex
 @iftex
 @code{http://www.crystalspace3d.org/downloads/cs-win32libs/}@*
-@code{cs-win32libs-1.3_003.exe}
+@code{cs-win32libs-1.3_004.exe}
 @end iftex
 
 @subheading zlib
@@ -187,7 +187,7 @@ can get the latest version at:
 @cindex Libraries, @sc{cg}
 @cindex CG library
 
-@emph{Version:} 1.5 recommended
+@emph{Version:} 2.0 minimum
 
 Many Crystal Space shaders require the @sc{cg} library from nVidia.
 Crystal Space depends on the @sc{cg} library with version number at least
@@ -216,7 +216,7 @@ in order to use the library with Crystal Space.
 @cindex Libraries, Bullet
 @cindex Physics library
 
-@emph{Version:} 1.9f recommended
+@emph{Version:} 2.69 minimum
 
 Crystal Space can also provide physics through Bullet. You can get
 the required version at:
@@ -279,10 +279,11 @@ install}) or unpack it into the directory @file{CS/libs/libmng*}.  In general,
 if you have permission to do so, it is best to install the library.
 
 @subheading @sc{caca} Colour AsCii Art Library
+
+@emph{Version:} at least 0.99beta13 required
+
 This library is used for 2D rendering in text mode.  This is optional and only
 needed for fun. libcaca can be downloaded from:
-
-@emph{Version:} at least 0.99beta12 required
 
 @noindent
 @uref{http://sam.zoy.org/libcaca/}

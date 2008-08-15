@@ -181,6 +181,9 @@ public:
    */
   csBlockAllocator(size_t nelem = 32) : superclass (nelem)
   {
+#ifdef CS_MEMORY_TRACKER
+    superclass::blocks.SetMemTrackerInfo (typeid(*this).name());
+#endif
   }
 
   /**

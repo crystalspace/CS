@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_SVTRAVERSE_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_SVTRAVERSE_H__
 
+/**\file
+ * Traversal of shader variables used in a render tree
+ */
+
 #include "csplugincommon/rendermanager/operations.h"
 #include "csutil/bitarray.h"
 
@@ -26,18 +30,27 @@ namespace CS
 {
 namespace RenderManager
 {
-
+  /**
+   * Traverser for all meshes in a tree, returning the set of used
+   * shader variables for each mesh.
+   *
+   * Usage: together with ForEachMeshNode(). A functor must be provided
+   * in \a Fn which implements void operator() (RenderTree::MeshNode* node,
+   * size_t layer, RenderTree::MeshNode::SingleMesh& mesh, csBitArray names).
+   * The \a names bit array will have a bit set for each shader variable name
+   * used by the given mesh.
+   */
   template<typename RenderTree, typename Fn>
-  class TraverseUsedSVs
+  class TraverseUsedSVSets
   {
   public:
-    TraverseUsedSVs (Fn& fn, size_t maxNumSVs)
+    TraverseUsedSVSets (Fn& fn, size_t maxNumSVs)
       : fn (fn)
     {
       names.SetSize (maxNumSVs);
     }
 
-    void operator() (const typename RenderTree::MeshNode* node)
+    void operator() (typename RenderTree::MeshNode* node)
     {
       typename RenderTree::ContextNode& context = node->owner;
       
@@ -51,7 +64,7 @@ namespace RenderManager
         
         for (size_t m = 0; m < node->meshes.GetSize (); ++m)
         {
-          const typename RenderTree::MeshNode::SingleMesh& mesh = node->meshes.Get (m);
+          typename RenderTree::MeshNode::SingleMesh& mesh = node->meshes.Get (m);
           iShader* shader = context.shaderArray[mesh.contextLocalId+layerOffset];
 
           // Skip meshes without shader (for current layer)
@@ -66,26 +79,8 @@ namespace RenderManager
             shader->GetUsedShaderVars (ticket, names);
             lastShader = shader;
           }
-
-          csShaderVariableStack varStack;
-          context.svArrays.SetupSVStack (varStack, layer, mesh.contextLocalId);
-
-          size_t lastName = csMin (names.GetSize(), varStack.GetSize());
-
-          csBitArray::SetBitIterator it = names.GetSetBitIterator ();
-          while (it.HasNext ())
-          {
-            size_t name = it.Next ();
-            if (name >= lastName)
-              break;
-
-            CS::ShaderVarStringID varName ((CS::StringIDValue)name);
-
-            csShaderVariable* sv = varStack[name];
-            if (sv != 0) 
-              fn (varName, sv);
-          }
           
+          fn (node, layer, mesh, names);
         }
       }
     }
@@ -93,6 +88,67 @@ namespace RenderManager
   private:
     Fn& fn;
     csBitArray names;
+  };
+
+  /**
+   * Traverser for all meshes in a tree, calling the callback for each SV
+   * used by each mesh.
+   *
+   * Usage: together with ForEachMeshNode(). A functor must be provided
+   * in \a Fn which implements void operator() (CS::ShaderVarStringID varName,
+   * csShaderVariable* sv). The functor will be called for each shader
+   * variable used in the traversed context.
+   */
+  template<typename RenderTree, typename Fn>
+  class TraverseUsedSVs
+  {
+  public:
+    TraverseUsedSVs (Fn& fn, size_t maxNumSVs)
+      : proxy (fn), traverseSets (proxy, maxNumSVs)
+    {
+    }
+
+    void operator() (typename RenderTree::MeshNode* node)
+    {
+      traverseSets.operator() (node);
+    }
+
+  private:
+    struct TraverseSVsProxy
+    {
+      Fn& fn;
+      
+      TraverseSVsProxy (Fn& fn) : fn (fn) { }
+  
+      void operator() (const typename RenderTree::MeshNode* node,
+                       size_t layer,
+                       const typename RenderTree::MeshNode::SingleMesh& mesh,
+                       const csBitArray& names)
+      {
+	typename RenderTree::ContextNode& context = node->owner;
+
+	csShaderVariableStack varStack;
+	context.svArrays.SetupSVStack (varStack, layer, mesh.contextLocalId);
+  
+	size_t lastName = csMin (names.GetSize(), varStack.GetSize());
+  
+	csBitArray::SetBitIterator it = names.GetSetBitIterator ();
+	while (it.HasNext ())
+	{
+	  size_t name = it.Next ();
+	  if (name >= lastName)
+	    break;
+  
+	  CS::ShaderVarStringID varName ((CS::StringIDValue)name);
+  
+	  csShaderVariable* sv = varStack[name];
+	  if (sv != 0) 
+	    fn (varName, sv);
+	}
+      }
+    };
+    TraverseSVsProxy proxy;
+    TraverseUsedSVSets<RenderTree, TraverseSVsProxy> traverseSets;
   };
 
 }

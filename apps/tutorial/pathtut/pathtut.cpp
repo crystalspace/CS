@@ -68,22 +68,11 @@ void PathTut::SetupFrame ()
   view->Draw ();
 }
 
-void PathTut::FinishFrame ()
-{
-  g3d->FinishDraw ();
-  g3d->Print (0);
-}
-
 bool PathTut::HandleEvent (iEvent& ev)
 {
-  if (ev.Name == csevProcess (object_reg))
+  if (ev.Name == Frame)
   {
     pathtut->SetupFrame ();
-    return true;
-  }
-  else if (ev.Name == csevFinalProcess (object_reg))
-  {
-    pathtut->FinishFrame ();
     return true;
   }
   else if ((ev.Name == csevKeyboardDown (object_reg)) && 
@@ -127,8 +116,7 @@ bool PathTut::Initialize (int argc, const char* const argv[])
     return false;
   }
 
-  Process = csevProcess (object_reg);
-  FinalProcess = csevFinalProcess (object_reg);
+  Frame = csevFrame (object_reg);
   KeyboardDown = csevKeyboardDown (object_reg);
 
   if (!csInitializer::SetupEventHandler (object_reg, PathTutEventHandler))
@@ -257,6 +245,8 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
+  printer.AttachNew (new FramePrinter (object_reg));
+
   // Load a texture for our sprite.
   iTextureWrapper* txt = loader->LoadTexture ("spark",
   	"/lib/std/spark.png");
@@ -306,6 +296,11 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   sprite->SetRenderPriority (engine->GetObjectRenderPriority ());
 
   return true;
+}
+
+void PathTut::Shutdown ()
+{
+  printer.Invalidate ();
 }
 
 void PathTut::Animate (csTicks elapsedTime)
@@ -398,6 +393,8 @@ int main (int argc, char* argv[])
 
   if (pathtut->Initialize (argc, argv))
     pathtut->Start ();
+
+  pathtut->Shutdown ();
 
   delete pathtut;
   pathtut = 0;

@@ -118,12 +118,15 @@ public:
     VECTOR3,
     /// Vector with 4 components
     VECTOR4,
-    /// Matrix
-    MATRIX,
+    /// 3x3 Matrix
+    MATRIX3X3,
+    MATRIX = MATRIX3X3,
     /// Transform
     TRANSFORM,
     /// Array
     ARRAY,
+    /// 4x4 Matrix
+    MATRIX4X4,
     
     /**
      * Color
@@ -180,6 +183,12 @@ public:
   /// Get the name of the variable
   CS::ShaderVarStringID GetName () const
   { return Name; }
+
+  /// Get the accessor
+  iShaderVariableAccessor* GetAccessor () const
+  {
+    return accessor;
+  }
 
   /// Get the extra accessor data
   intptr_t GetAccessorData () const
@@ -354,6 +363,32 @@ public:
     return false;
   }
 
+  /// Retrieve a CS::Math::Matrix4
+  bool GetValue (CS::Math::Matrix4& value)
+  {
+    if (accessor) 
+      accessor->PreGetValue (this);
+
+    if (Type == MATRIX4X4)
+    {
+      value = *Matrix4ValuePtr;
+      return true;
+    }
+    else if (Type == MATRIX3X3)
+    {
+      value = *MatrixValuePtr;
+      return true;
+    }
+    else if (Type == TRANSFORM)
+    {
+      value = *TransformPtr;
+      return true;
+    }
+    
+    value = CS::Math::Matrix4();    
+    return false;
+  }
+
 
   /// Store an int
   bool SetValue (int value) 
@@ -395,8 +430,15 @@ public:
   bool SetValue (iTextureHandle* value)
   {    
     if (Type != TEXTURE)
+    {
       NewType (TEXTURE);
-
+      texture.WrapValue = 0;
+    }
+    else
+    {
+      if (texture.HandValue)
+	texture.HandValue->DecRef();
+    }
     texture.HandValue = value;
     
     if (value)
@@ -408,8 +450,16 @@ public:
   bool SetValue (iTextureWrapper* value)
   {    
     if (Type != TEXTURE)
+    {
       NewType (TEXTURE);
-
+      texture.HandValue = 0;
+    }
+    else
+    {
+      if (texture.WrapValue)
+	texture.WrapValue->DecRef();
+    }
+    
     texture.WrapValue = value;
     
     if (value)
@@ -422,7 +472,11 @@ public:
   {    
     if (Type != RENDERBUFFER)
       NewType (RENDERBUFFER);
-
+    else
+    {
+      if (RenderBuffer)
+	RenderBuffer ->DecRef();
+    }
     RenderBuffer = value;
     
     if (value)
@@ -459,6 +513,17 @@ public:
       NewType (VECTOR3);
 
     VectorValue.Set (value.red, value.green, value.blue, 1.0f);
+    Int = (int)value.red;
+    return true; 
+  }
+
+  /// Store a csColor4
+  bool SetValue (const csColor4& value)
+  { 
+    if (Type != VECTOR4)
+      NewType (VECTOR4);
+
+    VectorValue.Set (value.red, value.green, value.blue, value.alpha);
     Int = (int)value.red;
     return true; 
   }
@@ -505,6 +570,17 @@ public:
     return true;
   }
 
+  /// Store a CS::Math::Matrix4
+  bool SetValue (const CS::Math::Matrix4& value)
+  {
+    if (Type != MATRIX4X4)
+      NewType (MATRIX4X4);
+
+    *Matrix4ValuePtr = value;
+        
+    return true;
+  }
+  
   void AddVariableToArray (csShaderVariable *variable)
   {
     if (Type == ARRAY) 
@@ -576,6 +652,7 @@ private:
 
     int Int;
     csMatrix3* MatrixValuePtr;
+    CS::Math::Matrix4* Matrix4ValuePtr;
     csReversibleTransform* TransformPtr;
     SvArrayType* ShaderVarArray;
   };
@@ -586,6 +663,8 @@ private:
   
   CS_DECLARE_STATIC_CLASSVAR (matrixAlloc, MatrixAlloc,
     csBlockAllocator<csMatrix3>)
+  CS_DECLARE_STATIC_CLASSVAR (matrix4Alloc, Matrix4Alloc,
+    csBlockAllocator<CS::Math::Matrix4>)
   CS_DECLARE_STATIC_CLASSVAR (transformAlloc, TransformAlloc,
     csBlockAllocator<csReversibleTransform>)
   CS_DECLARE_STATIC_CLASSVAR (arrayAlloc, ShaderVarArrayAlloc,
