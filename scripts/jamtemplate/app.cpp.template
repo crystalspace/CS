@@ -14,7 +14,7 @@ static csVector3 GetConfigVector (csConfigAccess& config,
         const char* key, const char* def)
 {
   csVector3 v;
-  sscanf (config->GetStr (key, def), "%f,%f,%f", &v.x, &v.y, &v.z);
+  csScanStr (config->GetStr (key, def), "%f,%f,%f", &v.x, &v.y, &v.z);
   return v;
 }
 

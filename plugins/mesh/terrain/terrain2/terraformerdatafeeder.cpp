@@ -23,6 +23,7 @@
 #include "csgfx/imagemanipulate.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/refarr.h"
+#include "csutil/scanstr.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "igraphic/image.h"
@@ -74,7 +75,7 @@ struct TerraFormerFeederProperties : public
     {
       float x = 0, y = 0;
 
-      sscanf (value, "%f %f", &x, &y);
+      csScanStr (value, "%f %f", &x, &y);
 
       samplerRegion.SetMin (0, x);
       samplerRegion.SetMin (1, y);
@@ -83,7 +84,7 @@ struct TerraFormerFeederProperties : public
     {
       float x = 1.0f, y = 1.0f;
 
-      sscanf (value, "%f %f", &x, &y);
+      csScanStr (value, "%f %f", &x, &y);
 
       samplerRegion.SetMax (0, x);
       samplerRegion.SetMax (1, y);
