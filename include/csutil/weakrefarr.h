@@ -37,16 +37,20 @@
 /**
  * An array of weak references.
  */
-template <class T>
-class csWeakRefArray : public csSafeCopyArray<csWeakRef<T> >
+template <class T, 
+          class Allocator = CS::Memory::AllocatorMalloc,
+          class CapacityHandler = CS::Container::ArrayCapacityDefault>
+class csWeakRefArray :
+  public csSafeCopyArray<csWeakRef<T>, Allocator, CapacityHandler>
 {
 public:
   /**
    * Initialize object to hold initially 'ilimit' elements, and increase
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
-  csWeakRefArray (int ilimit = 0, int ithreshold = 0)
-  	: csSafeCopyArray<csWeakRef<T> > (ilimit, ithreshold)
+  csWeakRefArray (int ilimit = 0,
+    const CapacityHandler& ch = CapacityHandler())
+  	: csSafeCopyArray<csWeakRef<T>, Allocator, CapacityHandler> (ilimit, ch)
   {
   }
 

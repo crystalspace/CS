@@ -196,7 +196,7 @@ namespace CS
       typename _PurgeCondition = ResourceCache::PurgeConditionAfterTime<_TimeType> >
     class GenericResourceCache
     {
-    public:
+    public:      
       typedef T CachedType;
       typedef _TimeType TimeType;
       typedef _ResourceSorting ResourceSorting;
@@ -296,7 +296,7 @@ namespace CS
 	  RBTraverser (csBlockAllocator<Element>& elementAlloc) :
 	    elementAlloc (elementAlloc) {}
 	  
-	  void Process (Element* el)
+	  void operator() (Element* el)
 	  {
 	    elementAlloc.Free (el);
 	  }
@@ -361,7 +361,7 @@ namespace CS
 	SearchDataTraverser (T* entry, Element*& ret) 
 	  : entry (entry), ret (ret) {}
 	
-        bool Process (Element* el)
+        bool operator() (Element* el)
 	{
 	  if (&(el->data) == entry)
 	  {

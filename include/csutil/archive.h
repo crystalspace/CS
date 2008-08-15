@@ -90,10 +90,12 @@ private:
 
   /// A vector of ArchiveEntries
   class CS_CRYSTALSPACE_EXPORT ArchiveEntryVector
-  	: public csPDelArray<ArchiveEntry>
+  	: public csPDelArray<ArchiveEntry, CS::Container::ArrayAllocDefault,
+  	                     csArrayCapacityFixedGrow<256> >
   {
   public:
-    ArchiveEntryVector () : csPDelArray<ArchiveEntry> (256, 256) {}
+    ArchiveEntryVector () : csPDelArray<ArchiveEntry, 
+      CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<256> > (256) {}
     static int Compare (ArchiveEntry* const& Item1, ArchiveEntry* const& Item2)
     { return strcmp (Item1->filename, Item2->filename); }
     static int CompareKey (ArchiveEntry* const& Item, char const* const& Key)

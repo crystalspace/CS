@@ -183,7 +183,10 @@ class csDynaVis :
 {
 public:
   // List of objects to iterate over (after VisTest()).
-  csArray<iVisibilityObject*> vistest_objects;
+  typedef csArray<iVisibilityObject*, csArrayElementHandler<iVisibilityObject*>,
+    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<256> >
+    VistestObjectsArray;
+  VistestObjectsArray vistest_objects;
   bool vistest_objects_inuse;	// If true the vector is in use.
 
 private:
@@ -199,22 +202,26 @@ private:
   // those go off to infinity.
   csBox3 kdtree_box;
   csTiledCoverageBuffer* tcovbuf;
-  csArray<csVisibilityObjectWrapper*> visobj_vector;
+  csArray<csVisibilityObjectWrapper*,
+    csArrayElementHandler<csVisibilityObjectWrapper*>,
+    CS::Container::ArrayAllocDefault, 
+    csArrayCapacityFixedGrow<256> > visobj_vector;
   csObjectModelManager* model_mgr;
   csWriteQueue* write_queue;
 
   // List of occluders that were used this frame.
-  csArray<csOccluderInfo> occluder_info;
+  csArray<csOccluderInfo, csArrayElementHandler<csOccluderInfo>,
+    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<128> > occluder_info;
 
   int scr_width, scr_height;	// Screen dimensions.
   int reduce_buf;
-  float fov, sx, sy;
+  CS::Math::Matrix4 camProj;
   csReversibleTransform cam_trans;	// Cache of the camera transform.
 
   uint32 current_vistest_nr;
 
   // For Debug_Dump(g3d): keep the last original camera.
-  iCamera* debug_camera;
+  csRef<iCamera> debug_camera;
   float debug_lx, debug_rx, debug_ty, debug_by;	// Frustum.
 
   // Count the number of objects marked as visible.
@@ -326,7 +333,7 @@ public:
   virtual void RegisterVisObject (iVisibilityObject* visobj);
   virtual void UnregisterVisObject (iVisibilityObject* visobj);
   virtual bool VisTest (iRenderView* rview, 
-    iVisibilityCullerListener *viscallback);
+    iVisibilityCullerListener *viscallback, int w = 0, int h = 0);
   virtual void PrecacheCulling () { VisTest ((iRenderView*)0, 0); }
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csBox3& box);
   virtual csPtr<iVisibilityObjectIterator> VisTest (const csSphere& sphere);

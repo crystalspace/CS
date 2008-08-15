@@ -29,7 +29,7 @@
 #include "plugins/engine/3d/halo.h"
 #include "plugins/engine/3d/halogen.h"
 
-
+using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
 
 // The speed at which halo brightens/vanishes in milliseconds per frame
 #define HALO_FRAME_TIME 20

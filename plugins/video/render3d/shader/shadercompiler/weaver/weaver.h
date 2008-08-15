@@ -66,11 +66,11 @@ public:
   virtual csPtr<iShaderPriorityList> GetPriorities (
 		  iDocumentNode* templ);
 
-  void Report (int severity, const char* msg, ...);
-  void Report (int severity, iDocumentNode* node, const char* msg, ...);
+  void Report (int severity, const char* msg, ...) const;
+  void Report (int severity, iDocumentNode* node, const char* msg, ...) const;
 
   csPtr<iDocumentNode> LoadDocumentFromFile (const char* filename,
-    iDocumentNode* node);
+    iDocumentNode* node) const;
 public:
   bool do_verbose;
   bool doDumpWeaved;
@@ -78,9 +78,13 @@ public:
   /// XML Token and management
   csStringHash xmltokens;
 
+  csRef<iDocumentSystem> binDocSys;
+  csRef<iDocumentSystem> xmlDocSys;
+
   //Standard vars
   iObjectRegistry* objectreg;
   csRef<iStringSet> strings;
+  csRef<iShaderVarStringSet> svstrings;
   csWeakRef<iGraphics3D> g3d;
   csRef<iSyntaxService> synldr;
   csRef<iVFS> vfs;
@@ -92,9 +96,8 @@ public:
   /* When loading a snippet, sometimes document nodes have to be created.
      These are created from this "auto document".
    */
-  csRef<iDocumentSystem> autoDocSys;
-  csRef<iDocumentNode> autoDocRoot;
-  csRef<iDocumentNode> CreateAutoNode (csDocumentNodeType type);
+  mutable csRef<iDocumentNode> autoDocRoot;
+  csRef<iDocumentNode> CreateAutoNode (csDocumentNodeType type) const;
 };
 
 }

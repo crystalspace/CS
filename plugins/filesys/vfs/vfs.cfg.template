@@ -20,7 +20,7 @@ VFS.Mount.data = $(CS_DATADIR)$/
 VFS.Mount.varia = $(CS_DATADIR)$/varia$/
 VFS.Mount.scripts = $(CS_SHAREDIR)$/bindings$/
 
-VFS.Mount.shader = $(CS_DATADIR)$/shader$/
+VFS.Mount.shader = $(CS_DATADIR)$/shader$/,$(CS_DATADIR)$/shader-old$/
 ; The Unifont
 VFS.Mount.fonts/unifont = $(CS_DATADIR)$/unifont.zip
 ; The TTF font library

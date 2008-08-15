@@ -53,7 +53,7 @@ const GLenum fontFilterMode = /*GL_LINEAR*/GL_NEAREST;
 //---------------------------------------------------------------------------
 
 csGLFontCache::csGLFontCache (csGraphics2DGLCommon* G2D) : 
-  cacheDataAlloc (512), verts2d (256, 256), texcoords (256, 256)
+  cacheDataAlloc (512), verts2d (256), texcoords (256)
 {
   csGLFontCache::G2D = G2D;
   statecache = G2D->statecache;

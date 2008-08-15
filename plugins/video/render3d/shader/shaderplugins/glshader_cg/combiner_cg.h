@@ -67,6 +67,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       const char* locationPrefix, const char* svName, 
       const char* outputType, const char* outputName, 
       const char* uniqueTag);
+    void GenerateBufferInputBlocks (iDocumentNode* node,
+      const char* locationPrefix, const char* bufName, 
+      const char* outputType, const char* outputName, 
+      const char* uniqueTag);
     /** @} */
   
     /**\name iComponent implementation
@@ -171,7 +175,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     csArray<Snippet> snippets;
     Snippet currentSnippet;
     csRefArray<iDocumentNode> variableMaps;
-    csString outputAssign;
+    csString outputAssign[rtaNumAttachments];
     csRefArray<iDocumentNode> definitions;
     csSet<csString> globalIDs;
     csString globals;
@@ -198,7 +202,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
         
     void AddGlobal (const char* name, const char* type,
           const char* annotation = 0);
-    void SetOutput (const char* name, const char* annotation = 0);
+    void SetOutput (csRenderTargetAttachment target,
+      const char* name, const char* annotation = 0);
     
     csPtr<WeaverCommon::iCoerceChainIterator> QueryCoerceChain (
       const char* fromType, const char* toType);
@@ -216,7 +221,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   
     void AppendProgramInput (const csRefArray<iDocumentNode>& nodes, 
       DocNodeCgAppender& appender);
+    void AppendProgramInput_V2FHead (const Snippet& snippet, 
+      DocNodeCgAppender& appender);
     void AppendProgramInput_V2FDecl (const Snippet& snippet, 
+      DocNodeCgAppender& appender);
+    void AppendProgramInput_V2FLocals (const Snippet& snippet, 
       DocNodeCgAppender& appender);
     void AppendProgramInput_V2FVP (const Snippet& snippet, 
       DocNodeCgAppender& appender);
@@ -230,6 +239,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     const char* MakeComment (const char* s);
     void AppendSnippetMap (const csHash<csString, csString>& map, 
       DocNodeCgAppender& appender);
+      
+    void SplitOffArrayCount (csString& name, int& count);
     
     class DocNodeCgAppender
     {

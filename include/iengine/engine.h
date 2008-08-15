@@ -44,6 +44,7 @@ struct iCamera;
 struct iCameraPosition;
 struct iCameraPositionList;
 struct iClipper2D;
+struct iCustomMatrixCamera;
 struct iDataBuffer;
 struct iFrustumView;
 struct iLight;
@@ -63,12 +64,14 @@ struct iMeshWrapperIterator;
 struct iObject;
 struct iObjectIterator;
 struct iObjectWatcher;
+struct iPerspectiveCamera;
 struct iPortal;
 struct iProgressMeter;
 struct iRegion;
 struct iRegionList;
 struct iRenderLoop;
 struct iRenderLoopManager;
+struct iRenderManager;
 struct iRenderView;
 struct iSector;
 struct iSectorIterator;
@@ -174,7 +177,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine, 4, 0, 0);
+  SCF_INTERFACE(iEngine, 4, 0, 3);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -999,6 +1002,7 @@ struct iEngine : public virtual iBase
    * Create a new camera.
    * Assign to a csRef.
    */
+  CS_DEPRECATED_METHOD_MSG("Use CreatePerspectiveCamera instead")
   virtual csPtr<iCamera> CreateCamera () = 0;
 
   /**
@@ -1237,6 +1241,10 @@ struct iEngine : public virtual iBase
    */
   virtual uint GetCurrentFrameNumber () const = 0;
 
+  /**
+   * Update the engine and animations etc for a new frame
+   */
+  virtual void UpdateNewFrame () = 0;
   /** @} */
   
   /**\name Saving/loading
@@ -1268,6 +1276,17 @@ struct iEngine : public virtual iBase
    */
   virtual csPtr<iLoaderContext> CreateLoaderContext (
   	iBase* base = 0, bool curRegOnly = true) = 0;
+
+  /**
+   * Set the default value for the "keep image" flag of texture wrappers.
+   */
+  virtual void SetDefaultKeepImage (bool enable) = 0;
+
+  /**
+   * Get the default value for the "keep image" flag of texture wrappers 
+    *(default OFF).
+   */
+  virtual bool GetDefaultKeepImage () = 0;
 
   /** @} */
   
@@ -1398,20 +1417,41 @@ struct iEngine : public virtual iBase
   
   /** @} */
 
-  /**\name Saving/loading
+  /// Fire all frame callbacks
+  virtual void FireStartFrame (iRenderView* rview) = 0;
+  
+  /**\name Camera handling
    * @{ */
 
   /**
-   * Set the default value for the "keep image" flag of texture wrappers.
+   * Create a new perspective projection camera.
    */
-  virtual void SetDefaultKeepImage (bool enable) = 0;
+  virtual csPtr<iPerspectiveCamera> CreatePerspectiveCamera () = 0;
 
   /**
-   * Get the default value for the "keep image" flag of texture wrappers 
-    *(default OFF).
+   * Create a new custom projection camera.
+   * \param copyFrom If given, the new camera's initial tranform, settings 
+   *   and projection matrix are copied from that camera.
    */
-  virtual bool GetDefaultKeepImage () = 0;
+  virtual csPtr<iCustomMatrixCamera> CreateCustomMatrixCamera (
+    iCamera* copyFrom = 0) = 0;
+  /** @} */
 
+  /**\name Render manager
+   * @{ */
+  /// Get the default render manager
+  virtual iRenderManager* GetRenderManager () = 0;
+  /**
+   * Set the default render manager.
+   * \remarks Also replaces the iRenderManager in the object registry.
+   */
+  virtual void SetRenderManager (iRenderManager*) = 0;
+  
+  /**
+   * Reload the default render manager given the current configuration
+   * settings.
+   */
+  virtual void ReloadRenderManager() = 0;
   /** @} */
 };
 

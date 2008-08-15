@@ -42,6 +42,7 @@
 #include "iengine/sector.h"
 #include "iengine/sharevar.h"
 #include "iengine/scenenode.h"
+#include "iengine/rendermanager.h"
 #include "iengine/campos.h"
 #include "igeom/clip2d.h"
 #include "igraphic/imageio.h"
@@ -944,6 +945,15 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  varlist var setvar setvarv setvarc loadmap saveworld");
 
 #   undef CONPRI
+  }
+  else if (!csStrCaseCmp (cmd, "cleareffects"))
+  {
+    iRenderManager *rm = Sys->view->GetEngine ()->GetRenderManager();
+    csRef<iRenderManagerPostEffects> pe = scfQueryInterface<iRenderManagerPostEffects>(rm);
+    if (pe)
+    {
+      pe->ClearLayers();
+    }
   }
   else if (!csStrCaseCmp (cmd, "coordsave"))
   {

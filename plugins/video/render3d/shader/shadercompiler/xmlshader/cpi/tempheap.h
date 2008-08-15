@@ -25,6 +25,30 @@
 #include "csutil/ref.h"
 #include "csutil/refcount.h"
 
+#define DECLARE_STATIC_CLASSVAR_DIRECT(getterFunc,Type,Kill, InitParam)   \
+enum { _##getterFunc##StorageUnits = (sizeof (Type) + sizeof (void*) - 1)/sizeof (void*) };   \
+static void* _##getterFunc##Store[_##getterFunc##StorageUnits];\
+static void getterFunc##Init()                                 \
+{                                                              \
+  new (_##getterFunc##Store) Type InitParam;                   \
+  csStaticVarCleanup (Kill);                                   \
+}                                                              \
+static CS_FORCEINLINE_TEMPLATEMETHOD Type& getterFunc()                       \
+{                                                              \
+  union                                                        \
+  {                                                            \
+    void* p;                                                   \
+    Type* x;                                                   \
+  } pun;                                                       \
+  pun.p = _##getterFunc##Store;                                \
+  return *(pun.x);                                             \
+}                                                              \
+static void getterFunc ## _kill ();
+
+#define IMPLEMENT_STATIC_CLASSVAR_DIRECT(Class,getterFunc) \
+void* Class::_##getterFunc##Store[Class::_##getterFunc##StorageUnits];
+
+
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
   /**
@@ -42,43 +66,45 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
    */
   class TempHeap
   {
-    class HeapRefCounted : public csRefCount, public CS::Memory::Heap
-    { };
-
-    CS_DECLARE_STATIC_CLASSVAR (theHeap,
-      TheHeap, csRef<HeapRefCounted>);
-
-    static inline HeapRefCounted* GetHeapPtr()
+    static int refcount;
+    DECLARE_STATIC_CLASSVAR_DIRECT(TheHeap,CS::Memory::Heap,HeapKill,);
+    
+    static void HeapKill()
     {
-      csRef<HeapRefCounted>* hr = TheHeap();
-      if (!hr->IsValid()) hr->AttachNew (new HeapRefCounted);
-      return *hr;
+      if (--refcount == 0)
+        TheHeap().~Heap();
     }
   public:
+    static void Init()
+    {
+      TheHeapInit();
+    }
+  
     TempHeap()
     {
-      GetHeapPtr()->IncRef();
+      refcount++;
     }
     ~TempHeap()
     {
-      GetHeapPtr()->DecRef();
+      if (--refcount == 0)
+        TheHeap().~Heap();
     }
-
+  
     static void* Alloc (const size_t n)
     {
-      return GetHeapPtr()->Alloc (n);
+      return TheHeap().Alloc (n);
     }
     static void Free (void* p)
     {
-      GetHeapPtr()->Free (p);
+      TheHeap().Free (p);
     }
     static void* Realloc (void* p, size_t newSize)
     {
-      return GetHeapPtr()->Realloc (p, newSize);
+      return TheHeap().Realloc (p, newSize);
     }
     static void Trim ()
     {
-      GetHeapPtr()->Trim ();
+      TheHeap().Trim ();
     }
   };
 

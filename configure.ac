@@ -282,6 +282,26 @@ CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
 
 
 #------------------------------------------------------------------------------
+# Check for SIMD flags
+#------------------------------------------------------------------------------
+
+CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx], 
+    [CS_CREATE_TUPLE([-mmmx])])
+AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],[+])])
+
+
+AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
+    [CS_CHECK_BUILD([checking for mmintrin.h],
+        [cs_cv_header_mmintrin_h],
+        [AC_LANG_PROGRAM([[#include <mmintrin.h>]], [])],
+        [CS_CREATE_TUPLE([$cs_cv_prog_cc_mmmx])],
+        [C++],
+        [CS_HEADER_PROPERTY([CS_SUPPORTS_MMX])
+        CS_EMIT_BUILD_PROPERTY([CS_SUPPORTS_MMX], [yes])])])
+
+
+#------------------------------------------------------------------------------
 # Check if Perl SDK is installed and which compiler and linker flags are
 # required to embed Perl.  Also determine if the glue file can be created with
 # ExtUtils::Embed or if it must be created manually.
@@ -653,7 +673,30 @@ CS_EMIT_BUILD_FLAGS([how to disable function inlining],
 #------------------------------------------------------------------------------
 # Check how to declare symbol visibility.
 #------------------------------------------------------------------------------
+<<<<<<< .working
 CS_VISIBILITY_FLAG_INLINES_HIDDEN(
+=======
+CS_CHECK_BUILD_FLAGS([for inline visibility flag],
+    [cs_cv_prog_cxx_visibility_inlines_hidden],
+    [CS_CREATE_TUPLE([-fvisibility-inlines-hidden])],[C++])
+
+AS_IF([test -n "$cs_cv_prog_cxx_visibility_inlines_hidden"],
+    [# The test below can be uncommented and adjusted once a non-buggy gcc 
+    # version is found.
+    #CS_CHECK_PROG_VERSION([g++], [$CXX --version], [4.1], [9.9|.9],
+    #   [cs_cv_gxx_version_buggy=no],
+    #   [cs_cv_gxx_version_buggy=yes])
+    AC_CACHE_CHECK([if $cs_cv_prog_cxx_visibility_inlines_hidden is buggy],
+	[cs_cv_prog_cxx_visibility_inlines_hidden_buggy],
+	[AS_IF([test $ac_compiler_gnu = yes],
+	    [AS_IF([test $host_cpu = x86_64 || test x$cs_host_macosx = xyes], 
+		[cs_cv_prog_cxx_visibility_inlines_hidden_buggy=yes],
+		[cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])],
+	    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])])],
+    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])
+
+AS_IF([test $cs_cv_prog_cxx_visibility_inlines_hidden_buggy != yes],
+>>>>>>> .merge-right.r28046
     [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS],
 	[$cs_prog_cxx_visibility_inlines_hidden], [+])])
 

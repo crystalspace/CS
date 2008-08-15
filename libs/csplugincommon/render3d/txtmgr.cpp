@@ -126,12 +126,13 @@ const char* csTextureHandle::GetTextureClass ()
 
 csTextureManager::csTextureManager (iObjectRegistry* object_reg,
 	iGraphics2D *iG2D)
-  : scfImplementationType (this), textures (16, 16), object_reg (object_reg)
+  : scfImplementationType (this), textures (16), object_reg (object_reg)
 {
   pfmt = *iG2D->GetPixelFormat ();
 
-  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
-    object_reg, "crystalspace.shared.stringset");
+  csRef<iShaderVarStringSet> strings = 
+    csQueryRegistryTagInterface<iShaderVarStringSet> (
+      object_reg, "crystalspace.shader.variablenameset");
   CS_ASSERT(strings != 0);
   nameDiffuseTexture = strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
 }

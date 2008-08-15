@@ -20,6 +20,7 @@
 #include "csutil/strset.h"
 #include "csutil/util.h"
 
+/*
 csStringSet::csStringSet (size_t size) :
   registry(size), reverse(size), next_id(0)
 {
@@ -91,3 +92,4 @@ void csStringSet::Empty ()
   registry.Empty();
   reverse.Empty();
 }
+*/

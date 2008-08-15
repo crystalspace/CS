@@ -79,6 +79,8 @@ public:
 
   /// Compile a program
   virtual bool Compile();
+
+  virtual void GetUsedShaderVars (csBitArray& bits) const;
 };
 
 }

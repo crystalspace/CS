@@ -481,21 +481,24 @@ namespace lighter
     genMesh->SetManualColors (true);
     genMesh->SetLighting (false);
     genMesh->RemoveRenderBuffer ("color");
+    genMesh->RemoveRenderBuffer ("static color");
     genMesh->RemoveRenderBuffer ("texture coordinate lightmap");
     for (int i = 1; i < 4; i++)
     {
       csString name;
       name.Format ("color dir %d", i);
       genMesh->RemoveRenderBuffer (name);
+      name.Format ("static color dir %d", i);
+      genMesh->RemoveRenderBuffer (name);
     }
 
    // Still may need to fix up submesh materials...
     CS::ShaderVarName lightmapName[4] =
     { 
-      CS::ShaderVarName (globalLighter->strings, "tex lightmap"),
-      CS::ShaderVarName (globalLighter->strings, "tex lightmap dir 1"),
-      CS::ShaderVarName (globalLighter->strings, "tex lightmap dir 2"),
-      CS::ShaderVarName (globalLighter->strings, "tex lightmap dir 3")
+      CS::ShaderVarName (globalLighter->svStrings, "tex lightmap"),
+      CS::ShaderVarName (globalLighter->svStrings, "tex lightmap dir 1"),
+      CS::ShaderVarName (globalLighter->svStrings, "tex lightmap dir 2"),
+      CS::ShaderVarName (globalLighter->svStrings, "tex lightmap dir 3")
     };
     int numLMs = globalConfig.GetLighterProperties().directionalLMs ? 4 : 1;
 
@@ -605,7 +608,7 @@ namespace lighter
   void Object_Genmesh::SaveMeshPostLighting (Scene* scene)
   {
     static const char* bufferNames[] = 
-    { "color", "lit color dir 1", "lit color dir 2", "lit color dir 3" };
+    { "static color", "static color dir 1", "static color dir 2", "static color dir 3" };
     const int numBufs = 
       (globalConfig.GetLighterProperties().directionalLMs) ? 4 : 1;
 
@@ -746,7 +749,7 @@ namespace lighter
           else
             svName.Format ("tex lightmap dir %d", i);
           csShaderVariable* sv = svc->GetVariable (
-            globalLighter->strings->Request (svName));
+            globalLighter->svStrings->Request (svName));
           if (sv != 0)
           {
             iTextureWrapper* tex;

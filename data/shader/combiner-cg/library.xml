@@ -35,6 +35,16 @@
     </block>
   </coercion>
 
+  <coercion from="rgba" to="rgb" cost="1">
+    <block location="fragmentMain">
+      output = input.rgb;
+    </block>
+    
+    <block location="vertexMain">
+      output = input.rgb;
+    </block>
+  </coercion>
+  
   <coercion from="float" to="rgb" cost="0">
     <block location="fragmentMain">
       output = float3 (input);

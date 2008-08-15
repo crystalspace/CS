@@ -287,7 +287,7 @@ Rules for color calculation:
 */
 
 void csGenmeshMeshObject::UpdateLighting (
-    const csArray<iLightSectorInfluence*>& lights,
+    const csSafeCopyArray<csLightInfluence>& lights,
     iMovable* movable)
 {
   int i;
@@ -391,7 +391,7 @@ void csGenmeshMeshObject::UpdateLighting (
       int num_lights = (int)lights.GetSize ();
       for (int l = 0 ; l < num_lights ; l++)
       {
-        iLight* li = lights[l]->GetLight ();
+        iLight* li = lights[l].light;
         li->AddAffectedLightingInfo (this);
         affecting_lights.Add (li);
         UpdateLightingOne (trans, li);

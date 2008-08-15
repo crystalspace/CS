@@ -21,6 +21,7 @@
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
     <input name="inputColor" type="rgba" />
+    <input file="/shader/snippets/primaryColor.inp" private="yes"/>
     
     <input name="mixModeAlpha" type="float" default="complex" private="yes">
       <block location="cg:variablemap">

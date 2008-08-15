@@ -48,12 +48,15 @@
  * the types used for this implement QueryObject() to get the iObject
  * that has GetName().
  */
-template <class T>
-class csRefArrayObject : public csRefArray<T>
+template <class T, 
+          class Allocator = CS::Container::ArrayAllocDefault,
+          class CapacityHandler = CS::Container::ArrayCapacityDefault>
+class csRefArrayObject : public csRefArray<T, Allocator, CapacityHandler>
 {
 public:
-  csRefArrayObject (int ilimit = 0, int ithreshold = 0)
-  	: csRefArray<T> (ilimit, ithreshold)
+  csRefArrayObject (int ilimit = 0,
+    const CapacityHandler& ch = CapacityHandler())
+  	: csRefArray<T, Allocator, CapacityHandler> (ilimit, ch)
   {
   }
 

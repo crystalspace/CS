@@ -92,6 +92,7 @@ namespace Threading
     template<typename LockType>
     bool Wait (LockType& lock, csTicks timeout = 0)
     {      
+      CS_ASSERT_MSG("Lock must be held before entering Condition::Wait", lock.IsLocked ());
       return ConditionBase::Wait (lock, timeout);
     }
   };

@@ -76,17 +76,13 @@
     <!-- In PS1.x you can't use the same texcoords for multiple TUs,
 	 so the glow coordinates have to be copied in tbe VP. -->
     <block location="cg:vertexToFragment">
-      float2 texcoordGlow;
-    </block>
-    
-    <block location="cg:vertexMain">
-      vertexToFragment.texcoordGlow = texCoord;
+      <varying type="texcoord2" name="texcoordGlow" />
     </block>
     
     <block location="cg:fragmentMain">
       surfaceWithGlow = surfaceColor;
       <?if vars."tex glow".texture ?>
-	surfaceWithGlow.rgb += tex2D (texGlow, vertexToFragment.texcoordGlow);
+	surfaceWithGlow.rgb += tex2D (texGlow, texcoordGlow);
       <?endif?>
     </block>
     

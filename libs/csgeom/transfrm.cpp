@@ -22,6 +22,7 @@
 #include "csqsqrt.h"
 
 #include "csgeom/matrix3.h"
+#include "csgeom/box.h"
 #include "csgeom/plane3.h"
 #include "csgeom/sphere.h"
 #include "csgeom/transfrm.h"
@@ -132,6 +133,46 @@ csSphere csTransform::Other2This (const csSphere &s) const
   return news;
 }
 
+csBox3 csTransform::Other2This (const csBox3& box) const
+{
+  if (m_o2t.IsIdentity())
+  {
+    csBox3 newBox (box);
+    newBox.SetCenter (Other2This (box.GetCenter()));
+    return newBox;
+  }
+  else
+  {  
+    const csVector3 minA = box.Min ();
+    const csVector3 maxA = box.Max ();
+
+    csVector3 minB (-v_o2t);
+    csVector3 maxB (-v_o2t);
+
+    for (size_t i = 0; i < 3; ++i)
+    {
+      const csVector3 row = m_o2t.Row (i);
+      for (size_t j = 0; j < 3; ++j)
+      {
+        float a = row[j] * minA[j];
+        float b = row[j] * maxA[j];
+        if (a < b)
+        {
+          minB[i] += a;
+          maxB[i] += b;
+        }
+        else
+        {
+          minB[i] += b;
+          maxB[i] += a;
+        }
+      }
+    }
+
+    return csBox3 (minB, maxB);
+  }
+}
+
 csVector3 operator * (const csVector3 &v, const csTransform &t)
 {
   return t.Other2This (v);
@@ -194,6 +235,22 @@ csSphere &operator*= (csSphere &p, const csTransform &t)
   return p;
 }
 
+csBox3 operator * (const csBox3 &p, const csTransform &t)
+{
+  return t.Other2This (p);
+}
+
+csBox3 operator * (const csTransform &t, const csBox3 &p)
+{
+  return t.Other2This (p);
+}
+
+csBox3 &operator*= (csBox3 &p, const csTransform &t)
+{
+  p = t.Other2This(p);
+  return p;
+}
+
 csMatrix3 operator * (const csMatrix3 &m, const csTransform &t)
 {
   return m * t.m_o2t;
@@ -251,6 +308,46 @@ csSphere csReversibleTransform::This2Other (const csSphere &s) const
   return news;
 }
 
+csBox3 csReversibleTransform::This2Other (const csBox3 &box) const
+{
+  if (m_t2o.IsIdentity())
+  {
+    csBox3 newBox (box);
+    newBox.SetCenter (This2Other (box.GetCenter()));
+    return newBox;
+  }
+  else
+  {
+    const csVector3 minA = box.Min ();
+    const csVector3 maxA = box.Max ();
+
+    csVector3 minB (v_o2t);
+    csVector3 maxB (v_o2t);
+
+    for (size_t i = 0; i < 3; ++i)
+    {
+      const csVector3 row = m_t2o.Row (i);
+      for (size_t j = 0; j < 3; ++j)
+      {
+        float a = row[j] * minA[j];
+        float b = row[j] * maxA[j];
+        if (a < b)
+        {
+          minB[i] += a;
+          maxB[i] += b;
+        }
+        else
+        {
+          minB[i] += b;
+          maxB[i] += a;
+        }
+      }
+    }
+
+    return csBox3 (minB, maxB);
+  }
+}
+
 csVector3 operator/ (const csVector3 &v, const csReversibleTransform &t)
 {
   return t.This2Other (v);
@@ -268,6 +365,11 @@ csPlane3 operator/ (const csPlane3 &p, const csReversibleTransform &t)
 }
 
 csSphere operator/ (const csSphere &p, const csReversibleTransform &t)
+{
+  return t.This2Other (p);
+}
+
+csBox3 operator/ (const csBox3 &p, const csReversibleTransform &t)
 {
   return t.This2Other (p);
 }

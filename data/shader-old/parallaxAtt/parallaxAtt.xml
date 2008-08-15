@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<shader type="xmlshader" name="parallaxAtt" lights="1">
+  <technique priority="150">
+    <!--?include /shader/snippets/projection-pass.inc ?-->
+    <pass>
+      <mixmode>
+        <srcalphaadd />
+      </mixmode>
+      <buffer source="normal" destination="normal" />
+      <buffer source="tangent" destination="texture coordinate 1" />
+      <buffer source="binormal" destination="texture coordinate 2" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <vp plugin="glcg" file="/shader/parallaxAtt/parallaxAtt.cgvp" />
+      <texture destination="TexNormal" name="tex normal" />
+      <texture destination="TexNormalCompressed" name="tex normal compressed" />
+      <texture destination="TexDiffuse" name="tex diffuse" />
+      <texture destination="TexHeight" name="tex height" />
+      <texture destination="TexSpecular" name="tex specular" />
+	  <texture destination="TexAttn" name="light attenuationtex[0]" />
+	<fp plugin="glcg">
+	  <cgfp>
+	    <?Include /shader/parallaxAtt/parallaxAtt.cgfp ?>
+	  </cgfp>
+	</fp>
+    </pass>
+  </technique>
+  <technique priority="130">
+    <!-- This is a two pass technique if there are not sufficient
+         texture units to do technique 150 -->
+	  <!--?include /shader/snippets/projection-pass.inc ?-->
+	  <pass>
+		  <writemask r="false" g="false" b="false" a="true" />
+		  <mixmode>
+			  <copy />
+		  </mixmode>
+		  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+		  <buffer source="texture coordinate 1" destination="texture coordinate 1" />
+		  <vp plugin="glcg" file="/shader/parallaxAtt/attenuation.cgvp" />
+		  <texture destination="unit 0" name="light attenuationtex[0]" />
+		  <texture destination="unit 1" name="light attenuationtex[0]" />
+		  <fp plugin="glfixed">
+			  <fixedfp>
+				  <layer>
+					  <alphasource num="0" source="texture" modifier="alpha" />
+					  <alphaoperation operation="replace" />
+				  </layer>
+				  <layer>
+					  <alphasource num="0" source="texture" modifier="alpha" />
+					  <alphasource num="1" source="previous layer" modifier="alpha" />
+					  <alphaoperation operation="modulate" scale="2"/>
+				  </layer>
+			  </fixedfp>
+		  </fp>
+	  </pass>
+	  <pass>
+		  <mixmode>
+			  <destalphaadd />
+		  </mixmode>
+		  <buffer source="normal" destination="normal" />
+		  <buffer source="tangent" destination="texture coordinate 1" />
+		  <buffer source="binormal" destination="texture coordinate 2" />
+		  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+		  <vp plugin="glcg" file="/shader/parallaxAtt/parallax.cgvp" />
+		  <texture destination="TexNormal" name="tex normal" />
+              <texture destination="TexNormalCompressed" name="tex normal compressed" />
+		  <texture destination="TexDiffuse" name="tex diffuse" />
+		  <texture destination="TexHeight" name="tex height" />
+              <texture destination="TexSpecular" name="tex specular" />
+		  <fp plugin="glcg">
+			  <cgfp>
+				  <?Include /shader/parallaxAtt/parallax.cgfp ?>
+			  </cgfp>
+		  </fp>
+	  </pass>
+  </technique>
+
+  <technique priority="100">
+    <pass>
+      <mixmode>
+        <add />
+      </mixmode>
+      <buffer source="normal" destination="normal" />
+      <buffer source="tangent" destination="texture coordinate 1" />
+      <buffer source="binormal" destination="texture coordinate 2" />
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <vp plugin="glarb" file="/shader/parallaxAtt/parallaxAtt.avp" />
+      <texture destination="unit 0" name="tex normal" />
+      <texture destination="unit 1" name="tex diffuse" />
+      <texture destination="unit 2" name="tex height" />
+      <fp plugin="glarb" file="/shader/parallaxAtt/parallaxAtt.afp" />
+    </pass>
+  </technique>
+  
+  <fallbackshader name="light_spec_bumpmap" file="/shader/specular/light_spec_bumpmap.xml" />
+</shader>
+
