@@ -22,6 +22,7 @@
 #include "csutil/csstring.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
+#include "csutil/eventhandlers.h"
 #include "csutil/util.h"
 #include "csutil/win32/win32.h"
 #include "csutil/win32/wintools.h"
@@ -78,7 +79,7 @@ void csWindowsJoystick::LoadAxes(joystate& j, const joydata& jdata)
 
 bool csWindowsJoystick::HandleEvent (iEvent& ev)
 {
-  if (ev.Name != PreProcess)
+  if (ev.Name != Frame)
     return false;
 
   for (size_t i = 0; i < joystick.GetSize (); i++)
@@ -314,13 +315,13 @@ bool csWindowsJoystick::Init ()
     }
 
     // hook into eventqueue
-    PreProcess = csevPreProcess (object_reg);
+    Frame = csevFrame (object_reg);
     if (njoys > 0)
     {
       eq = csQueryRegistry<iEventQueue> (object_reg);
       if (eq)
       {
-	eq->RegisterListener (this, PreProcess);
+	eq->RegisterListener (this, Frame);
 	EventOutlet = eq->CreateEventOutlet (this);
       }
     }

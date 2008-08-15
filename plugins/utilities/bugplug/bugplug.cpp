@@ -57,7 +57,6 @@
 #include "iengine/material.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
-#include "iengine/region.h"
 #include "iengine/rview.h"
 #include "iengine/sector.h"
 #include "iengine/viscull.h"
@@ -202,6 +201,13 @@ csBugPlug::~csBugPlug ()
       RemoveWeakListener (q, weakEventHandler);
   }
 
+  if (logicEventHandler)
+  {
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
+    if (q)
+      q->RemoveListener (logicEventHandler);
+  }
+
   delete shadow;
 
   if (do_profiler_log)
@@ -229,8 +235,7 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
   if (q != 0)
   {
     csEventID esub[] = { 
-      PreProcess,   // TODO: this goes away (needs 2nd handler)
-      Frame,        // this replaces the above!
+      Frame,
       KeyboardEvent,
       MouseEvent,
       SystemOpen,
@@ -238,6 +243,16 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
       CS_EVENTLIST_END 
     };
     RegisterWeakListener (q, this, esub, weakEventHandler);
+  }
+
+  if (!logicEventHandler)
+  {
+    logicEventHandler.AttachNew (new LogicEventHandler (this));
+  }
+  if (q != 0)
+  {
+    csEventID events[2] = { Frame, CS_EVENTLIST_END };
+    q->RegisterListener (logicEventHandler, events);
   }
 
   stringSet = csQueryRegistryTagInterface<iStringSet> (object_reg,
@@ -2603,8 +2618,6 @@ bool csBugPlug::HandleEvent (iEvent& event)
     return EatKey (event);
   else if (CS_IS_MOUSE_EVENT(object_reg, event))
     return EatMouse (event);
-  else if (event.Name == PreProcess)
-    return HandleStartFrame (event);
   else if (event.Name == Frame)
     return HandleFrame (event);
   else if (event.Name == SystemOpen)
@@ -2705,11 +2718,7 @@ void csBugPlug::OneSector (iCamera* camera)
 void csBugPlug::CleanDebugSector ()
 {
   if (!debug_sector.sector) return;
-  iRegion* db_region = Engine->CreateRegion ("__BugPlug_region__");
-  db_region->DeleteAll ();
-
-  iRegionList* reglist = Engine->GetRegions ();
-  reglist->Remove (db_region);
+  Engine->RemoveCollection ("__BugPlug_region__");
 
   delete debug_sector.view;
 
@@ -2726,9 +2735,9 @@ void csBugPlug::SetupDebugSector ()
     return;
   }
 
-  iRegion* db_region = Engine->CreateRegion ("__BugPlug_region__");
+  iCollection* db_collection = Engine->CreateCollection ("__BugPlug_collection__");
   debug_sector.sector = Engine->CreateSector ("__BugPlug_sector__");
-  db_region->QueryObject ()->ObjAdd (debug_sector.sector->QueryObject ());
+  db_collection->Add (debug_sector.sector->QueryObject ());
 
   debug_sector.view = new csView (Engine, G3D);
   int w3d = G3D->GetWidth ();

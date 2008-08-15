@@ -212,11 +212,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
 
   class AnimeshObject :
-    public scfImplementationExt3<AnimeshObject,
+    public scfImplementationExt2<AnimeshObject,
                                  csObjectModel,
                                  iAnimatedMesh,
-                                 iMeshObject,
-                                 iRenderBufferAccessor>
+                                 iMeshObject>
   {
   public:
     AnimeshObject (AnimeshObjectFactory* factory);
@@ -284,7 +283,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     virtual void GetRadius (float& radius, csVector3& center);
 
     //-- iRenderBufferAccessor
-    virtual void PreGetBuffer (csRenderBufferHolder* holder, 
+    void PreGetBuffer (csRenderBufferHolder* holder, 
       csRenderBufferName buffer);
 
     //
@@ -298,7 +297,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     void SkinTangentAndBinormal ();
     void SkinAll ();
 
+    template<bool SkinVerts, bool SkinNormals, bool SkinTB>
+    void Skin ();
+
+    void MorphVertices ();
+
     void PreskinLF ();
+
+    class RenderBufferAccessor :
+      public scfImplementation1<RenderBufferAccessor, 
+                                iRenderBufferAccessor>
+    {
+    public:
+      RenderBufferAccessor (AnimeshObject* meshObject)
+        : scfImplementationType (this), meshObject (meshObject)
+      {}
+
+      void PreGetBuffer (csRenderBufferHolder* holder, 
+	csRenderBufferName buffer)
+      { meshObject->PreGetBuffer (holder, buffer); }
+      
+      AnimeshObject* meshObject;
+    };
 
     class Submesh : 
       public scfImplementation1<Submesh, 
@@ -358,6 +378,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csRef<iRenderBuffer> skinnedNormals;
     csRef<iRenderBuffer> skinnedTangents;
     csRef<iRenderBuffer> skinnedBinormals;
+
+    csRef<iRenderBuffer> postMorphVertices;
 
     csArray<float> morphTargetWeights;
 

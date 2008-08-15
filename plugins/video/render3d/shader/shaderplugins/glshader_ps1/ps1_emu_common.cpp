@@ -80,7 +80,7 @@ bool csShaderGLPS1_Common::Load (iShaderDestinationResolver*,
 }
 
 
-bool csShaderGLPS1_Common::Compile ()
+bool csShaderGLPS1_Common::Compile (iHierarchicalCache*, csRef<iString>* tag)
 {
   
   for (size_t i = 0; i < variablemap.GetSize (); i++)
@@ -108,6 +108,8 @@ bool csShaderGLPS1_Common::Compile ()
 
   variablemap.DeleteAll();
 
+  tag->AttachNew (new scfString ("default"));
+  
   return LoadProgramStringToGL();
 }
 

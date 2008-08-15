@@ -36,6 +36,7 @@
 #include "csutil/weakref.h"
 #include "csutil/weakrefarr.h"
 #include "csutil/eventnames.h"
+#include "csutil/eventhandlers.h"
 #include "iengine/campos.h"
 #include "iengine/engine.h"
 #include "iengine/renderloop.h"
@@ -59,9 +60,8 @@
 #include "plugins/engine/3d/halo.h"
 #include "plugins/engine/3d/meshobj.h"
 #include "plugins/engine/3d/meshfact.h"
-#include "plugins/engine/3d/region.h"
 #include "plugins/engine/3d/renderloop.h"
-#include "plugins/engine/3d/rview.h"
+#include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/sharevar.h"
 
 #include "reflectomotron3000.h"
@@ -77,8 +77,6 @@ class csLightPatchPool;
 class csMaterialList;
 class csMeshWrapper;
 class csPolygon3D;
-class csRegion;
-class csRenderView;
 class csSector;
 class csSectorList;
 class csTextureList;
@@ -89,7 +87,6 @@ struct iLight;
 struct iMaterialWrapper;
 struct iObjectRegistry;
 struct iProgressMeter;
-struct iRegion;
 
 /**
  * Iterator to iterate over all static lights in the engine.
@@ -102,7 +99,6 @@ class csLightIt : public scfImplementation1<csLightIt,
 {
 public:
   /// Construct an iterator and initialize to start.
-  csLightIt (csEngine*, iRegion* region);
   csLightIt (csEngine*, iCollection* collection = 0);
 
   virtual ~csLightIt ();
@@ -121,8 +117,6 @@ public:
 private:
   // The engine for this iterator.
   csEngine* engine;
-  // The region we are iterating in (optional).
-  iRegion* region;
   // The collection we are iterating in (optional).
   iCollection* collection;
   // Current sector index.
@@ -248,10 +242,7 @@ public:
   virtual void PrepareTextures ();
   virtual void PrepareMeshes ();
 
-  virtual void ForceRelight (iRegion* region = 0,
-  	iProgressMeter* meter = 0);
-  virtual void ForceRelight (iLight* light, iRegion* region = 0);
-  virtual void ShineLights (iBase* base = 0, 
+  virtual void ShineLights (iCollection* base = 0, 
     iProgressMeter* meter = 0);
 
   virtual void SetLightingCacheMode (int mode)
@@ -328,10 +319,6 @@ public:
   	iTextureWrapper* texture);
   virtual iMaterialList* GetMaterialList () const;
   virtual iMaterialWrapper* FindMaterial (const char* name,
-  	iBase* base = 0);
-  virtual iMaterialWrapper* FindMaterialRegion (const char* name,
-  	iRegion* region);
-  virtual iMaterialWrapper* FindMaterialCollection (const char* name,
   	iCollection* collection = 0);
 
   //-- Texture handling
@@ -343,10 +330,6 @@ public:
   virtual int GetTextureFormat () const;
   virtual iTextureList* GetTextureList () const;
   virtual iTextureWrapper* FindTexture (const char* name,
-  	iBase* base = 0);
-  virtual iTextureWrapper* FindTextureRegion (const char* name,
-  	iRegion* region);
-  virtual iTextureWrapper* FindTextureCollection (const char* name,
   	iCollection* collection = 0);
   
   //-- Light handling
@@ -358,26 +341,7 @@ public:
     const;
   virtual iLight* FindLightID (const char* light_id) const;
 
-  virtual csPtr<iLightIterator> GetLightIterator (iBase* base = 0)
-  {
-    csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
-    if(region)
-    {
-      return GetLightIteratorRegion(region);
-    }
-    else
-    {
-      csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
-      return GetLightIteratorCollection(collection);
-    }
-  }
-
-  virtual csPtr<iLightIterator> GetLightIteratorRegion (iRegion* region)
-  {
-    return csPtr<iLightIterator> (new csLightIt (this, region));
-  }
-
-  virtual csPtr<iLightIterator> GetLightIteratorCollection (iCollection* collection = 0)
+  virtual csPtr<iLightIterator> GetLightIterator (iCollection* collection = 0)
   {
     return csPtr<iLightIterator> (new csLightIt (this, collection));
   }
@@ -399,10 +363,6 @@ public:
   virtual iSectorList* GetSectors ()
   { return &sectors; }
   virtual iSector* FindSector (const char* name,
-  	iBase* base);
-  virtual iSector* FindSectorRegion (const char* name,
-  	iRegion* region);
-  virtual iSector* FindSectorCollection (const char* name,
   	iCollection* collection);
   virtual csPtr<iSectorIterator> GetNearbySectors (iSector* sector,
   	const csVector3& pos, float radius);
@@ -453,12 +413,6 @@ public:
   { return &meshes; }
 
   virtual iMeshWrapper* FindMeshObject (const char* name,
-  	iBase* base = 0);
-
-  virtual iMeshWrapper* FindMeshObjectRegion (const char* name,
-  	iRegion* region);
-
-  virtual iMeshWrapper* FindMeshObjectCollection (const char* name,
   	iCollection* collection = 0);
 
   virtual void WantToDie (iMeshWrapper* mesh);
@@ -478,22 +432,10 @@ public:
 	iDataBuffer* input);
 
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name,
-  	iBase* base = 0);
-
-  virtual iMeshFactoryWrapper* FindMeshFactoryRegion (const char* name,
-  	iRegion* region);
-
-  virtual iMeshFactoryWrapper* FindMeshFactoryCollection (const char* name,
   	iCollection* collection = 0);
 
   virtual iMeshFactoryList* GetMeshFactories ()
   { return &meshFactories; }
-
-  //-- Region handling
-  
-  virtual iRegion* CreateRegion (const char* name);
-  
-  virtual iRegionList* GetRegions ();
 
   // -- Collection handling
 
@@ -516,12 +458,6 @@ public:
   virtual csPtr<iCustomMatrixCamera> CreateCustomMatrixCamera (iCamera* copyFrom = 0);
 
   virtual iCameraPosition* FindCameraPosition (const char* name,
-    iBase* base = 0);
-
-  virtual iCameraPosition* FindCameraPositionRegion (const char* name,
-  	iRegion* region);
-
-  virtual iCameraPosition* FindCameraPositionCollection (const char* name,
   	iCollection* collection = 0);
 
   virtual iCameraPositionList* GetCameraPositions ()
@@ -573,9 +509,7 @@ public:
   virtual iRenderView* GetTopLevelClipper () const
   { return (iRenderView*)topLevelClipper; }
 
-  virtual void PrecacheDraw (iBase* base = 0);
-  virtual void PrecacheDrawCollection (iCollection* collection = 0);
-  virtual void PrecacheDrawRegion (iRegion* region);
+  virtual void PrecacheDraw (iCollection* collection = 0);
   virtual void Draw (iCamera* c, iClipper2D* clipper, iMeshWrapper* mesh = 0);
 
   virtual void SetContext (iTextureHandle* ctxt);
@@ -603,7 +537,7 @@ public:
   { return worldSaveable; }
   
   virtual csPtr<iLoaderContext> CreateLoaderContext (
-  	iBase* base = 0, bool curRegOnly = true);
+  	iCollection* collection = 0, bool searchCollectionOnly = true);
   
   virtual void SetDefaultKeepImage (bool enable) 
   { defaultKeepImage = enable; }
@@ -651,8 +585,7 @@ public:
   // -- iEventHandler
   bool HandleEvent (iEvent &Event);
 
-  CS_EVENTHANDLER_NAMES("crystalspace.engine.3d")
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
+  CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.engine.3d")
 
   // -- iDebugHelper
   
@@ -759,7 +692,8 @@ private:
   /**
    * Setup for starting a Draw or DrawFunc.
    */
-  void StartDraw (iCamera* c, iClipper2D* view, csRenderView& rview);
+  void StartDraw (iCamera* c, iClipper2D* view,
+    CS::RenderManager::RenderView& rview);
 
   /**
    * Controll animation and delete meshes that want to die.
@@ -832,7 +766,6 @@ private:
    * this forces the search to be global. In this case 'global' will be set
    * to true.
    */
-  const char* SplitRegionName(const char* name, iRegion*& region, bool& global);
   const char* SplitCollectionName(const char* name, iCollection*& collection, bool& global);
 
   // Precache a single mesh
@@ -917,8 +850,7 @@ private:
   // -- PRIVATE MEMBERS
 
   /// Pool from which to allocate render views.
-  csRenderView::Pool rviewPool;
-  CS::RenderManager::RenderView::Pool rmRviewPool;
+  CS::RenderManager::RenderView::Pool rviewPool;
 
   // -- Object lists
   /**
@@ -955,8 +887,6 @@ private:
   csSharedVariableList* sharedVariables;
   /// List of halos (csHaloInformation).
   csPDelArray<csLightHalo> halos;
-  /// The list of all regions currently loaded.
-  csRegionList regions;
   /// The hash of all collections currently existing.
   csHash<csRef<iCollection>, csString> collections;
 
@@ -1018,7 +948,7 @@ private:
   /**
    * The top-level clipper we are currently using for drawing.
    */
-  csRenderView* topLevelClipper;
+  CS::RenderManager::RenderView* topLevelClipper;
     
   /// Flag set when window requires resizing.
   bool resize;

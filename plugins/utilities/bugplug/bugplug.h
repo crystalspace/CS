@@ -50,7 +50,6 @@ struct iMeshWrapper;
 struct iObjectRegistry;
 struct iObjectRegistry;
 struct iPluginManager;
-struct iRegion;
 struct iSector;
 struct iTextureManager;
 struct iThingFactoryState;
@@ -511,11 +510,11 @@ public:
   bool ExecCommand (const char* command);
 
   CS_EVENTHANDLER_NAMES("crystalspace.bugplug")
-  CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
+  virtual const csHandlerID * GenericPrec(
     csRef<iEventHandlerRegistry>&, 
     csRef<iEventNameRegistry>&,
     csEventID) const;
-  CS_CONST_METHOD virtual const csHandlerID * GenericSucc(
+  virtual const csHandlerID * GenericSucc(
     csRef<iEventHandlerRegistry>&, 
     csRef<iEventNameRegistry>&,
     csEventID) const;
@@ -525,6 +524,33 @@ public:
 
   private:
     bool display_time;
+
+    /**
+    * Embedded iEventHandler interface that handles frame events in the
+    * logic phase.
+    */
+    class LogicEventHandler : 
+      public scfImplementation1<LogicEventHandler, 
+      iEventHandler>
+    {
+    private:
+      csWeakRef<csBugPlug> parent;
+    public:
+      LogicEventHandler (csBugPlug* parent) :
+          scfImplementationType (this), parent (parent) { }
+      virtual ~LogicEventHandler () { }
+      virtual bool HandleEvent (iEvent& ev)
+      {
+        if (parent && (ev.Name == parent->Frame))
+        {      
+          return parent->HandleStartFrame (ev);
+        }
+
+        return false;
+      }
+      CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.bugplug.frame.logic")
+    };
+    csRef<LogicEventHandler> logicEventHandler;
 };
 
 }

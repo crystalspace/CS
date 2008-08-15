@@ -775,6 +775,7 @@ void csGLBasicTextureHandle::ApplyBlitBuffer (uint8* buf)
   {
     ApplyBlitBufferGeneric (buf);
   }
+  RegenerateMipmaps();
 }
 
 iTextureHandle::BlitBufferNature csGLBasicTextureHandle::GetBufferNature (uint8* buf)
@@ -931,6 +932,8 @@ void csGLBasicTextureHandle::GetMipmapLimits (int& maxMip, int& minMip)
   }
 }
   
+#include "csutil/custom_new_disable.h"
+
 csPtr<iDataBuffer> csGLBasicTextureHandle::Readback (
   const CS::StructuredTextureFormat& format, int mip)
 {
@@ -964,6 +967,8 @@ csPtr<iDataBuffer> csGLBasicTextureHandle::Readback (
   return csPtr<iDataBuffer> (db);
 }
 
+#include "csutil/custom_new_enable.h"
+
 csPtr<iImage> csGLBasicTextureHandle::Dump ()
 {
   // @@@ hmm... or just return an empty image?
@@ -974,25 +979,25 @@ csPtr<iImage> csGLBasicTextureHandle::Dump ()
   csGLGraphics3D::statecache->SetTexture (textarget, GetHandle ());
   if (textarget == GL_TEXTURE_3D) return 0; // @@@ Not supported yet
 
-  glGetTexLevelParameteriv (textarget, 0, GL_TEXTURE_WIDTH, &tw);
-  glGetTexLevelParameteriv (textarget, 0, GL_TEXTURE_HEIGHT, &th);
+  GLenum useTarget = (textarget == GL_TEXTURE_CUBE_MAP) 
+      ? GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB : textarget;
+  glGetTexLevelParameteriv (useTarget, 0, GL_TEXTURE_WIDTH, &tw);
+  glGetTexLevelParameteriv (useTarget, 0, GL_TEXTURE_HEIGHT, &th);
 
   GLint depthSize;
-  glGetTexLevelParameteriv ((textarget == GL_TEXTURE_CUBE_MAP) 
-      ? GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB : textarget, 
-      0, GL_TEXTURE_DEPTH_SIZE, &depthSize);
+  glGetTexLevelParameteriv (useTarget, 0, GL_TEXTURE_DEPTH_SIZE, &depthSize);
   
   uint8* data = new uint8[tw * th * 4];
   
   if (depthSize > 0)
   {
     // Depth texture
-    glGetTexImage (textarget, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, data);
+    glGetTexImage (useTarget, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, data);
   }
   else
   {
     // Color texture
-    glGetTexImage (textarget, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glGetTexImage (useTarget, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
   }
   csImageMemory* lmimg = 
       new csImageMemory (tw, th,

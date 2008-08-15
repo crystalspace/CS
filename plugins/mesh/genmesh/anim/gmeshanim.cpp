@@ -932,25 +932,11 @@ csGenmeshAnimationControlType::csGenmeshAnimationControlType (
 
 csGenmeshAnimationControlType::~csGenmeshAnimationControlType ()
 {
-  if (weakEventHandler)
-  {
-    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
-    if (q)
-      CS::RemoveWeakListener (q, weakEventHandler);
-  }
 }
 
 bool csGenmeshAnimationControlType::Initialize (iObjectRegistry* object_reg)
 {
   this->object_reg = object_reg;
-  Frame = csevFrame (object_reg);
-  PreProcess = csevPreProcess (object_reg);
-  csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
-  // \todo It looks like @csGenmeshAnimationControlType doesn't actually handle any events.  So why does it register an event listener?
-  if (q != 0) {
-    csEventID events[] = { Frame, PreProcess, CS_EVENTLIST_END };
-    CS::RegisterWeakListener (q, this, events, weakEventHandler);
-  }
   return true;
 }
 
@@ -961,15 +947,3 @@ csPtr<iGenMeshAnimationControlFactory> csGenmeshAnimationControlType::
   	(this, object_reg);
   return csPtr<iGenMeshAnimationControlFactory> (ctrl);
 }
-
-bool csGenmeshAnimationControlType::HandleEvent (iEvent& /*ev*/)
-{
-#if 0
-  else if (event.Name == PreProcess)
-  {
-    return HandleStartFrame (event);
-  }
-#endif
-  return false;
-}
-

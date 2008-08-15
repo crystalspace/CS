@@ -269,5 +269,33 @@ bool WeaverCompiler::IsTemplateToCompiler(iDocumentNode *templ)
   return true;
 }
 
+bool WeaverCompiler::PrecacheShader (iDocumentNode* templ,
+                                     iHierarchicalCache* cache)
+{
+  const char* shaderName = templ->GetAttributeValue ("name");
+  csRef<WeaverShader> shader;
+
+  csTicks startTime = 0, endTime = 0;
+  // Create a shader. The actual loading happens later.
+  if (do_verbose) startTime = csGetTicks();
+  shader.AttachNew (new WeaverShader (this));
+  bool loadRet = shader->Precache (templ, cache);
+  autoDocRoot.Invalidate ();
+  if (!loadRet)
+    return false;
+  if (do_verbose) 
+  {
+    endTime = csGetTicks();
+  
+    csString str;
+    //shader->DumpStats (str);
+    Report(CS_REPORTER_SEVERITY_NOTIFY, 
+      "Shader %s: %s weaved in %u ms", shaderName, str.GetData (),
+      endTime - startTime);
+  }
+
+  return true;
+}
+
 }
 CS_PLUGIN_NAMESPACE_END(ShaderWeaver)

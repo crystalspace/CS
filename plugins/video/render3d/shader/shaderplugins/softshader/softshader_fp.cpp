@@ -138,8 +138,10 @@ void csSoftShader_FP::SetupState (const csRenderMesh* /*mesh*/,
   }
 }
 
-bool csSoftShader_FP::Compile()
+bool csSoftShader_FP::Compile (iHierarchicalCache*, csRef<iString>* tag)
 {
+  tag->AttachNew (new scfString ("default"));
+  
   return true;
 }
 

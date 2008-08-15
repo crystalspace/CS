@@ -120,7 +120,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  {
 	    if (graphPrios.IsSnippetPrioritySet (s)
 	      && allTechPrios.IsSnippetPrioritySet (s)
-	      && (graphPrios.GetSnippetPriority (s) >
+	      && (graphPrios.GetSnippetPriority (s) !=
 	        allTechPrios.GetSnippetPriority(s)))
 	    {
 	      skipTech = true;
@@ -195,6 +195,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	csRef<iDocumentNode> techniqueNode =
 	  shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
 	techniqueNode->SetValue ("technique");
+	CS::DocSystem::CloneAttributes (sourceTechNode, techniqueNode);
 	techNodes.Push (techniqueNode);
 	
         while (siblings->HasNext())
@@ -222,11 +223,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    CS::DocSystem::CloneNode (copyFrom, newNode);
 	  }
 	  
+	  Snippet* snippet = outerSnippets[g];
+	  
 	  csRef<iDocumentNode> passNode =
 	    techniqueNode->CreateNodeBefore (CS_NODE_ELEMENT);
 	  passNode->SetValue ("pass");
+	  CS::DocSystem::CloneAttributes (snippet->GetSourceNode(), passNode);
 	  
-	  Snippet* snippet = outerSnippets[g];
 	  csRefArray<iDocumentNode> passForwardedNodes =
 	    snippet->GetPassForwardedNodes();
 	  for (size_t n = 0; n < passForwardedNodes.GetSize(); n++)
@@ -476,6 +479,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	      CS_ASSERT(!linkFromName.IsEmpty());
 
               node.inputLinks.Put (inp.name, linkFromName);
+              
+	      // There's now a dependency on the node providing the input.
+	      TechniqueGraph::Connection conn;
+	      conn.from = sourceTech;
+	      conn.to = node.tech;
+	      conn.inputConnection = true;
+	      graph.AddConnection (conn);
 	    }
 	    else
 	    {
@@ -615,26 +625,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
             {
               /* Synthesize <?if?>/<?endif?> nodes around block 
                  contents */
-              DocumentNodeContainer* container = 
-                new DocumentNodeContainer (block.node->GetParent ());
-              container->AddAttributesOf (block.node);
-              container->SetValue (block.node->GetValue ());
-              csRef<iDocumentNode> piNode;
               csString conditionStr;
               conditionStr.AppendFmt ("(%s)", emitted.conditions[0].GetData());
               for (size_t c = 1; c < emitted.conditions.GetSize(); c++)
                 conditionStr.AppendFmt (" || (%s)", 
                   emitted.conditions[c].GetData());
-              csString conditionPI;
-              conditionPI.Format ("if %s", conditionStr.GetData());
-              piNode.AttachNew (new DocumentNodePI (container, 
-                conditionPI));
-              container->AddChild (piNode);
-              container->AddChildrenOf (block.node);
-              piNode.AttachNew (new DocumentNodePI (container, 
-                "endif"));
-              container->AddChild (piNode);
-              node.AttachNew (container);
+              node = EncloseInCondition (block.node, conditionStr);
             }
             else
               node = block.node;
@@ -675,6 +671,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         const char* snippetAnnotate = GetAnnotation ("snippet \"%s<%d>\"\n\n%s",
           node.tech->snippetName, node.tech->priority,
           node.annotation.GetData());
+        csString nodeCondition (node.tech->GetCondition());
         defaultCombiner->BeginSnippet (snippetAnnotate);
         combiner->BeginSnippet (snippetAnnotate);
        
@@ -747,7 +744,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	      GetCombiner (combiner, *comb, node.tech->GetCombiner(),
 	      block.combinerName));
 	    if (theCombiner.IsValid())
-	      theCombiner->WriteBlock (block.location, block.node);
+	    {
+	      csRef<iDocumentNode> node;
+	      if (!nodeCondition.IsEmpty())
+	        node = EncloseInCondition (block.node, nodeCondition);
+	      else
+		node = block.node;
+	      theCombiner->WriteBlock (block.location, node);
+	    }
 	  }
 	}
 	
@@ -1002,7 +1006,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       while (outputIt->HasNext())
       {
 	const Snippet::Technique::Output& outp = outputIt->Next();
-	if (usedOutputs.Contains (&outp)) continue;
 	if (outp.name != src->outputName) continue;
 	nodeAnnotation.Append (
 	  GetAnnotation (" trying explicit %s %s of %s: ",
@@ -1122,6 +1125,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       }
     }
     return tag;
+  }
+      
+  csPtr<iDocumentNode> Synthesizer::SynthesizeTechnique::EncloseInCondition (
+    iDocumentNode* node, const char* condition) const
+  {
+    DocumentNodeContainer* container = 
+      new DocumentNodeContainer (node->GetParent ());
+    container->AddAttributesOf (node);
+    container->SetValue (node->GetValue ());
+    csRef<iDocumentNode> piNode;
+    csString conditionPI;
+    conditionPI.Format ("if %s", condition);
+    piNode.AttachNew (new DocumentNodePI (container, 
+      conditionPI));
+    container->AddChild (piNode);
+    container->AddChildrenOf (node);
+    piNode.AttachNew (new DocumentNodePI (container, 
+      "endif"));
+    container->AddChild (piNode);
+    
+    return csPtr<iDocumentNode> (container);
   }
 
   //-------------------------------------------------------------------------
@@ -1413,7 +1437,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	      Node* checkNode = nodesToCheck.PopTop();
 	      if (checkNode->tech == 0) continue;
 	      deps.Empty();
-	      graph.GetDependants (checkNode->tech, deps);
+	      graph.GetDependants (checkNode->tech, deps, false);
 	      for (size_t d = 0; d < deps.GetSize(); d++)
 	      {
 		Node& dependentNode = GetNodeForTech (deps[d]);

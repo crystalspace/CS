@@ -3658,25 +3658,25 @@ object->GetChild instead\n");
     }
 
   static const char * StaticHandlerName() {return "crystalspace.cspython";};
-  CS_CONST_METHOD static const csHandlerID StaticID(csRef<iEventHandlerRegistry> &reg) 
+  static const csHandlerID StaticID(csRef<iEventHandlerRegistry> &reg) 
   { return reg->GetGenericID(StaticHandlerName()); }			;
-  CS_CONST_METHOD virtual const char * GenericName() const		
+  virtual const char * GenericName() const		
   { return StaticHandlerName(); }					;
-  CS_CONST_METHOD virtual csHandlerID GenericID(csRef<iEventHandlerRegistry> &reg) const 
+  virtual csHandlerID GenericID(csRef<iEventHandlerRegistry> &reg) const 
   { return StaticID(reg); };
 
 
-  CS_CONST_METHOD virtual const csHandlerID * GenericPrec (		
+  virtual const csHandlerID * GenericPrec (		
     csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &, 	
     csEventID) const { return 0; }	
-  CS_CONST_METHOD virtual const csHandlerID * GenericSucc (		
+  virtual const csHandlerID * GenericSucc (		
     csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &, 	
     csEventID) const { return 0; }
 
-  CS_CONST_METHOD virtual const csHandlerID * InstancePrec (		
+  virtual const csHandlerID * InstancePrec (		
       csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2, 	
     csEventID e) const { return GenericPrec(r1, r2, e); } 
-  CS_CONST_METHOD virtual const csHandlerID * InstanceSucc (		
+  virtual const csHandlerID * InstanceSucc (		
     csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2, 	
     csEventID e) const { return GenericSucc(r1, r2, e); }
 
@@ -12067,40 +12067,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iDebugHelper_UnitTest(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iDebugHelper *arg1 = (iDebugHelper *) 0 ;
-  SwigValueWrapper<csPtr<iString > > result;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iDebugHelper_UnitTest",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iDebugHelper, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDebugHelper_UnitTest" "', argument " "1"" of type '" "iDebugHelper *""'"); 
-  }
-  arg1 = reinterpret_cast< iDebugHelper * >(argp1);
-  result = (arg1)->UnitTest();
-  {
-    /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
-    csRef<iString> ref((csPtr<iString>&)result); /* explicit cast */
-    
-    if (!ref.IsValid())
-    {
-      Py_INCREF(Py_None);
-      return Py_None;
-    }
-    ref->IncRef();
-    resultobj = SWIG_NewPointerObj((void *)(iString *)ref, SWIGTYPE_p_iString, 1);
-    /*@SWIG@*/
-  }
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_iDebugHelper_StateTest(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iDebugHelper *arg1 = (iDebugHelper *) 0 ;
@@ -17332,7 +17298,7 @@ SWIGINTERN PyObject *csStringIDSet_swigregister(PyObject *SWIGUNUSEDPARM(self), 
   return SWIG_Py_Void();
 }
 
-SWIGINTERN PyObject *_wrap_new_csRefCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_new_csRefCount__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csRefCount *result = 0 ;
   
@@ -17341,6 +17307,59 @@ SWIGINTERN PyObject *_wrap_new_csRefCount(PyObject *SWIGUNUSEDPARM(self), PyObje
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csRefCount, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_csRefCount__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csRefCount *arg1 = 0 ;
+  csRefCount *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"new_csRefCount",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csRefCount,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_csRefCount" "', argument " "1"" of type '" "csRefCount const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_csRefCount" "', argument " "1"" of type '" "csRefCount const &""'"); 
+  }
+  arg1 = reinterpret_cast< csRefCount * >(argp1);
+  result = (csRefCount *)new csRefCount((csRefCount const &)*arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csRefCount, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_csRefCount(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[2];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 1); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 0) {
+    return _wrap_new_csRefCount__SWIG_0(self, args);
+  }
+  if (argc == 1) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csRefCount, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_new_csRefCount__SWIG_1(self, args);
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'new_csRefCount'.\n  Possible C/C++ prototypes are:\n    csRefCount()\n    csRefCount(csRefCount const &)\n");
   return NULL;
 }
 
@@ -26743,59 +26762,6 @@ SWIGINTERN PyObject *csCommandEventData_swigregister(PyObject *SWIGUNUSEDPARM(se
   SWIG_TypeNewClientData(SWIGTYPE_p_csCommandEventData, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
-
-SWIGINTERN PyObject *_wrap_iEvent_Name_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iEvent *arg1 = (iEvent *) 0 ;
-  csEventID *arg2 = (csEventID *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iEvent_Name_set",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iEvent, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iEvent_Name_set" "', argument " "1"" of type '" "iEvent *""'"); 
-  }
-  arg1 = reinterpret_cast< iEvent * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_CS__StringIDTCS__StringSetTag__General_t, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iEvent_Name_set" "', argument " "2"" of type '" "csEventID *""'"); 
-  }
-  arg2 = reinterpret_cast< csEventID * >(argp2);
-  if (arg1) (arg1)->Name = *arg2;
-  
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iEvent_Name_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iEvent *arg1 = (iEvent *) 0 ;
-  csEventID *result = 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iEvent_Name_get",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iEvent, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iEvent_Name_get" "', argument " "1"" of type '" "iEvent *""'"); 
-  }
-  arg1 = reinterpret_cast< iEvent * >(argp1);
-  result = (csEventID *)& ((arg1)->Name);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__StringIDTCS__StringSetTag__General_t, 0 |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
 
 SWIGINTERN PyObject *_wrap_iEvent_GetName(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
@@ -58023,7 +57989,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"scfRegisterStaticClasses", _wrap_scfRegisterStaticClasses, METH_VARARGS, NULL},
 	 { (char *)"scfRegisterStaticFactoryFunc", _wrap_scfRegisterStaticFactoryFunc, METH_VARARGS, NULL},
 	 { (char *)"iDebugHelper_GetSupportedTests", _wrap_iDebugHelper_GetSupportedTests, METH_VARARGS, NULL},
-	 { (char *)"iDebugHelper_UnitTest", _wrap_iDebugHelper_UnitTest, METH_VARARGS, NULL},
 	 { (char *)"iDebugHelper_StateTest", _wrap_iDebugHelper_StateTest, METH_VARARGS, NULL},
 	 { (char *)"iDebugHelper_Benchmark", _wrap_iDebugHelper_Benchmark, METH_VARARGS, NULL},
 	 { (char *)"iDebugHelper_Dump", _wrap_iDebugHelper_Dump, METH_VARARGS, NULL},
@@ -58416,8 +58381,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"new_csCommandEventData", _wrap_new_csCommandEventData, METH_VARARGS, NULL},
 	 { (char *)"delete_csCommandEventData", _wrap_delete_csCommandEventData, METH_VARARGS, NULL},
 	 { (char *)"csCommandEventData_swigregister", csCommandEventData_swigregister, METH_VARARGS, NULL},
-	 { (char *)"iEvent_Name_set", _wrap_iEvent_Name_set, METH_VARARGS, NULL},
-	 { (char *)"iEvent_Name_get", _wrap_iEvent_Name_get, METH_VARARGS, NULL},
 	 { (char *)"iEvent_GetName", _wrap_iEvent_GetName, METH_VARARGS, NULL},
 	 { (char *)"iEvent_Time_set", _wrap_iEvent_Time_set, METH_VARARGS, NULL},
 	 { (char *)"iEvent_Time_get", _wrap_iEvent_Time_get, METH_VARARGS, NULL},

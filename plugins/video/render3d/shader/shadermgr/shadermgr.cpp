@@ -25,10 +25,11 @@
 #include "cstypes.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
+#include "csutil/eventhandlers.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
-#include "csutil/vfscache.h"
+#include "csutil/vfshiercache.h"
 #include "csutil/xmltiny.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
@@ -76,8 +77,8 @@ csShaderManager::csShaderManager(iBase* parent) :
   scfImplementationType (this, parent), shaderVarStack (0,0)
 {
   seqnumber = 0;
-  eventSucc[0] = CS_HANDLERLIST_END;
-  eventSucc[1] = CS_HANDLERLIST_END;
+  //eventSucc[0] = CS_HANDLERLIST_END;
+  //eventSucc[1] = CS_HANDLERLIST_END;
   
   InitTokenTable (xmltokens);
 }
@@ -116,18 +117,18 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   else
     do_verbose = false;
 
-  PreProcess = csevPreProcess(objectreg);
+  Frame = csevFrame(objectreg);
   SystemOpen = csevSystemOpen(objectreg);
   SystemClose = csevSystemClose(objectreg);
 
   csRef<iEventHandlerRegistry> handlerReg = 
     csQueryRegistry<iEventHandlerRegistry> (objectreg);
-  eventSucc[0] = handlerReg->GetGenericID ("crystalspace.graphics3d");
+  //eventSucc[0] = handlerReg->GetGenericID ("crystalspace.graphics3d");
 
   csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (objectreg);
   if (q)
   {
-    csEventID events[] = { PreProcess, SystemOpen, SystemClose, 
+    csEventID events[] = { Frame, SystemOpen, SystemClose, 
 			    CS_EVENTLIST_END };
     RegisterWeakListener (q, this, events, weakEventHandler);
   }
@@ -225,8 +226,10 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   sv_time->SetValue (0.0f);
   
   if (config->GetBool ("Video.ShaderManager.EnableShaderCache", false))
-    shaderCache.AttachNew (new csVfsCacheManager (objectreg,
+  {
+    shaderCache.AttachNew (new CS::Utility::VfsHierarchicalCache (objectreg,
        "/tmp/shadercache"));
+  }
 
   return true;
 }
@@ -234,6 +237,14 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
 void csShaderManager::AddDefaultVariables()
 {
   AddVariable (sv_time);
+  
+  /* @@@ The renderer would be a better place, however, the shadermanager
+     clears all SVs in Open(), but renderer Open() is called before the
+     shadermanagers, making it hard to find a good spot for these ... */
+  GetVariableAdd (stringsSvName->Request ("world2camera transform"));
+  GetVariableAdd (stringsSvName->Request ("world2camera transform inverse"));
+  GetVariableAdd (stringsSvName->Request ("projection transform"));
+  GetVariableAdd (stringsSvName->Request ("projection transform inverse"));
 }
 
 void csShaderManager::LoadDefaultVariables()
@@ -340,7 +351,7 @@ void csShaderManager::UnregisterShaderVariableAcessors ()
 
 bool csShaderManager::HandleEvent(iEvent& event)
 {
-  if (event.Name == PreProcess)
+  if (event.Name == Frame)
   {
     UpdateStandardVariables();
     return false;

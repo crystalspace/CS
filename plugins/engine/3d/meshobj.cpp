@@ -21,6 +21,7 @@
 #include "cstool/rviewclipper.h"
 #include "imesh/objmodel.h"
 #include "igeom/clip2d.h"
+#include "plugins/engine/3d/camera.h"
 #include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/meshobj.h"
 #include "plugins/engine/3d/meshfact.h"
@@ -482,7 +483,8 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
 
   if (flags.Check (CS_ENTITY_NOCLIP))
   {
-    csRenderView* csrview = (csRenderView*)rview;
+    CS::RenderManager::RenderView* csrview =
+      (CS::RenderManager::RenderView*)rview;
     csRenderContext* ctxt = csrview->GetCsRenderContext ();
 
     if (last_frame_number == rview->GetCurrentFrameNumber () &&
@@ -523,7 +525,8 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
   	old_ctxt != 0 ? 0 : frustum_mask);
   if (old_ctxt)
   {
-    csRenderView* csrview = (csRenderView*)rview;
+    CS::RenderManager::RenderView* csrview =
+      (CS::RenderManager::RenderView*)rview;
     csrview->SetCsRenderContext (old_ctxt);
   }
   return rmeshes;
@@ -551,7 +554,8 @@ CS::Graphics::RenderMesh** csMeshWrapper::GetExtraRenderMeshes (size_t& num,
 
   if (flags.Check (CS_ENTITY_NOCLIP))
   {
-    csRenderView* csrview = (csRenderView*)rview;
+    CS::RenderManager::RenderView* csrview =
+      (CS::RenderManager::RenderView*)rview;
     csRenderContext* ctxt = csrview->GetCsRenderContext ();
 
     if (last_frame_number == rview->GetCurrentFrameNumber () &&

@@ -17,7 +17,6 @@
 */
 
 #include "cssysdef.h"
-#include "decalmanager.h"
 #include "decal.h"
 #include "decaltemplate.h"
 #include "iutil/objreg.h"
@@ -35,6 +34,8 @@
 #include "csgfx/shadervarcontext.h"
 #include "iutil/eventq.h"
 #include "csutil/event.h"
+#include "csutil/eventhandlers.h"
+#include "decalmanager.h"
 
 CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY(csDecalManager)
@@ -70,7 +71,7 @@ bool csDecalManager::Initialize(iObjectRegistry * objectReg)
   CS_INITIALIZE_EVENT_SHORTCUTS (objectReg);
   csRef<iEventQueue> q(csQueryRegistry<iEventQueue> (objectReg));
   if (q)
-    CS::RegisterWeakListener(q, this, PreProcess, weakEventHandler);
+    CS::RegisterWeakListener(q, this, Frame, weakEventHandler);
   return true;
 }
 
@@ -166,7 +167,7 @@ iDecal * csDecalManager::GetDecal(size_t idx) const
 
 bool csDecalManager::HandleEvent(iEvent & ev)
 {
-  if (ev.Name != PreProcess)
+  if (ev.Name != Frame)
     return false;
 
   csTicks elapsed = vc->GetElapsedTicks();

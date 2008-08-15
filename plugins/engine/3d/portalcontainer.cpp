@@ -29,7 +29,6 @@
 #include "iengine/camera.h"
 #include "iutil/objreg.h"
 #include "plugins/engine/3d/portalcontainer.h"
-#include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/meshobj.h"
 #include "plugins/engine/3d/engine.h"
 #include "cstool/rviewclipper.h"
@@ -430,6 +429,7 @@ class PerspectiveOutlet2D
 protected:
   CS::Math::Matrix4 camProj;
   csPoly2D& dest;
+  float iw, ih;
   
   static void Perspective (const csVector3& v, csVector2& p,
     const CS::Math::Matrix4& camProj)
@@ -438,15 +438,38 @@ protected:
     p.x = v_proj.x / v_proj.w;
     p.y = v_proj.y / v_proj.w;
   }
+  static void PerspectiveScreen (const csVector3& v, csVector2& p,
+    const CS::Math::Matrix4& camProj, float iw, float ih)
+  {
+    csVector4 v_proj (camProj * csVector4 (v, 1));
+    p.x = (v_proj.x / v_proj.w + 1.0f) / iw;
+    p.y = (v_proj.y / v_proj.w + 1.0f) / ih;
+  }
+
 public:
   PerspectiveOutlet2D (const CS::Math::Matrix4& camProj,
-    csPoly2D& dest) : camProj (camProj), dest (dest) {}
+    csPoly2D& dest, int viewWidth, int viewHeight)
+    : camProj (camProj), dest (dest)
+  {
+    if (viewWidth > 0 && viewHeight > 0)
+    {
+      iw = 2.0f/viewWidth;
+      ih = 2.0f/viewHeight;
+    }
+    else
+    {
+      iw = ih = 0.0f;
+    }
+  }
 
   void MakeEmpty () { dest.MakeEmpty(); }
   void Add (const csVector3 &v)
   {
     csVector2 p;
-    Perspective (v, p, camProj);
+    if (iw != 0.0f)
+      PerspectiveScreen (v, p, camProj, iw, ih);
+    else
+      Perspective (v, p, camProj);
     dest.AddVertex (p);
   }
   void AddVertex (float x, float y)
@@ -456,7 +479,10 @@ public:
   const csVector2* GetLast() { return dest.GetLast(); }
   void Perspective (const csVector3& v, csVector2& p)
   {
-    Perspective (v, p, camProj);
+    if (iw != 0.0f)
+      PerspectiveScreen (v, p, camProj, iw, ih);
+    else
+      Perspective (v, p, camProj);
   }
   bool ClipAgainst (iClipper2D* clipper)
   {
@@ -919,7 +945,8 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* /*movable*/,
 
   // Setup clip and far plane.
   csPlane3 portal_plane, *pportal_plane;
-  bool do_portal_plane = ((csRenderView*)rview)->GetClipPlane (portal_plane);
+  bool do_portal_plane =
+    ((CS::RenderManager::RenderView*)rview)->GetClipPlane (portal_plane);
   if (do_portal_plane)
     pportal_plane = &portal_plane;
   else
@@ -932,7 +959,12 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* /*movable*/,
     meshwrapper->GetCsMovable ().GetFullTransform ();
 
   csPoly2D poly;
-  PerspectiveOutlet2D outlet (camera->GetProjectionMatrix(), poly);
+  int viewWidth = rview->GetGraphics3D ()->GetWidth();
+  int viewHeight = rview->GetGraphics3D ()->GetHeight();
+  float iw = 2.0f/viewWidth;
+  float ih = 2.0f/viewHeight;
+  PerspectiveOutlet2D outlet (camera->GetProjectionMatrix(), poly, viewWidth, viewHeight);
+
   size_t i;
   if (clip_plane || clip_portal || clip_z_plane || do_portal_plane || farplane)
   {
@@ -969,7 +1001,9 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* /*movable*/,
       int j;
       outlet.MakeEmpty ();
       for (j = 0 ; j < num_vertices ; j++)
-         outlet.Add (camera_vertices[vt[j]]);
+      {
+        outlet.Add (camera_vertices[vt[j]]);
+      }
       DrawOnePortal (portals[i], poly, movtrans, rview, camera_planes[i]);
     }
   }
@@ -1085,6 +1119,7 @@ public:
 
 class PerspectiveOutlet2D3D : public PerspectiveOutlet2D
 {
+private:
   csPoly3D& dest3D;
   iCamera* cam;
   int viewWidth, viewHeight;
@@ -1100,8 +1135,8 @@ class PerspectiveOutlet2D3D : public PerspectiveOutlet2D
 public:
   PerspectiveOutlet2D3D (iCamera* cam, csPoly2D& dest2D, csPoly3D& dest3D,
     int viewWidth, int viewHeight)
-    : PerspectiveOutlet2D (cam->GetProjectionMatrix(), dest2D),
-    dest3D (dest3D), cam (cam), viewWidth (viewWidth), viewHeight (viewWidth) {}
+    : PerspectiveOutlet2D (cam->GetProjectionMatrix(), dest2D, viewWidth, viewHeight),
+    dest3D (dest3D), cam (cam), viewWidth (viewWidth), viewHeight (viewHeight) { }
 
   void MakeEmpty () 
   { 
@@ -1130,7 +1165,7 @@ public:
     destPx.SetVertexCount (dest.GetVertexCount());
     for (size_t p = 0; p < dest.GetVertexCount(); p++)
     {
-      destPx[p].Set (dest[p].x * viewWidth, dest[p].y * viewHeight);
+      destPx[p].Set (dest[p].x, dest[p].y);
     }
     uint8 clipRes = clipper->Clip (
       destPx.GetVertices(), destPx.GetVertexCount(), clipOut, outNum,
@@ -1146,7 +1181,7 @@ public:
     float iw = 1.0f/viewWidth, ih = 1.0f/viewHeight;
     for (size_t i = 0 ; i < outNum; i++)
     {
-      dest.AddVertex (csVector2 (clipOut[i].x * iw, clipOut[i].y * ih));
+      dest.AddVertex (csVector2 (clipOut[i].x, clipOut[i].y));
       switch (clipOutStatus[i].Type)
       {
 	case CS_VERTEX_ORIGINAL:
@@ -1240,7 +1275,8 @@ void csPortalContainer::ComputeScreenPolygons (iRenderView* rview,
 
   // Setup clip and far plane.
   csPlane3 portal_plane, *pportal_plane;
-  bool do_portal_plane = ((csRenderView*)rview)->GetClipPlane (portal_plane);
+  bool do_portal_plane =
+    ((CS::RenderManager::RenderView*)rview)->GetClipPlane (portal_plane);
   if (do_portal_plane)
     pportal_plane = &portal_plane;
   else

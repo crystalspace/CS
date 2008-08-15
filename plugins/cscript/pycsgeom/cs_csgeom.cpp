@@ -17670,6 +17670,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csPlane3_Inverse(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csPlane3 *arg1 = (csPlane3 *) 0 ;
+  csPlane3 result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csPlane3_Inverse",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csPlane3, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPlane3_Inverse" "', argument " "1"" of type '" "csPlane3 const *""'"); 
+  }
+  arg1 = reinterpret_cast< csPlane3 * >(argp1);
+  result = ((csPlane3 const *)arg1)->Inverse();
+  resultobj = SWIG_NewPointerObj((new csPlane3(static_cast< const csPlane3& >(result))), SWIGTYPE_p_csPlane3, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csPlane3_Normalize(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csPlane3 *arg1 = (csPlane3 *) 0 ;
@@ -17713,7 +17735,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csPlane3_ProjectOnto(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csPlane3_ProjectOnto__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csPlane3 *arg1 = (csPlane3 *) 0 ;
   csVector3 *arg2 = 0 ;
@@ -17743,6 +17765,83 @@ SWIGINTERN PyObject *_wrap_csPlane3_ProjectOnto(PyObject *SWIGUNUSEDPARM(self), 
   resultobj = SWIG_NewPointerObj((new csVector3(static_cast< const csVector3& >(result))), SWIGTYPE_p_csVector3, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csPlane3_ProjectOnto__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csPlane3 *arg1 = (csPlane3 *) 0 ;
+  csVector3 *arg2 = 0 ;
+  csVector3 result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csPlane3_ProjectOnto",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csPlane3, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csPlane3_ProjectOnto" "', argument " "1"" of type '" "csPlane3 const *""'"); 
+  }
+  arg1 = reinterpret_cast< csPlane3 * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csPlane3_ProjectOnto" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csPlane3_ProjectOnto" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 * >(argp2);
+  result = ((csPlane3 const *)arg1)->ProjectOnto((csVector3 const &)*arg2);
+  resultobj = SWIG_NewPointerObj((new csVector3(static_cast< const csVector3& >(result))), SWIGTYPE_p_csVector3, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csPlane3_ProjectOnto(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[3];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csPlane3, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csVector3, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_csPlane3_ProjectOnto__SWIG_0(self, args);
+      }
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csPlane3, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csVector3, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_csPlane3_ProjectOnto__SWIG_1(self, args);
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csPlane3_ProjectOnto'.\n  Possible C/C++ prototypes are:\n    ProjectOnto(csVector3 const &)\n    ProjectOnto(csVector3 const &)\n");
   return NULL;
 }
 
@@ -48168,6 +48267,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csPlane3_Classify", _wrap_csPlane3_Classify, METH_VARARGS, NULL},
 	 { (char *)"csPlane3_Distance", _wrap_csPlane3_Distance, METH_VARARGS, NULL},
 	 { (char *)"csPlane3_Invert", _wrap_csPlane3_Invert, METH_VARARGS, NULL},
+	 { (char *)"csPlane3_Inverse", _wrap_csPlane3_Inverse, METH_VARARGS, NULL},
 	 { (char *)"csPlane3_Normalize", _wrap_csPlane3_Normalize, METH_VARARGS, NULL},
 	 { (char *)"csPlane3_FindPoint", _wrap_csPlane3_FindPoint, METH_VARARGS, NULL},
 	 { (char *)"csPlane3_ProjectOnto", _wrap_csPlane3_ProjectOnto, METH_VARARGS, NULL},

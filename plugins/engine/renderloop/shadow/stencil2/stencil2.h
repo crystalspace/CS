@@ -137,7 +137,7 @@ private:
   csStringID base_id;
   csStringID shadows_id;
 
-  csRef<iStringSet> svNameStringset;
+  csRef<iShaderVarStringSet> svNameStringset;
 
   bool enableShadows;
   csRefArray<iLightRenderStep> steps;

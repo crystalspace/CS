@@ -59,6 +59,8 @@ struct ThreadedFeederData : public csRefCount
   csArray<csString> alphaMapsSources;
   csRefArray<iImage> alphaMaps;
 
+  bool smoothHeightmap;
+
   unsigned int gridWidth, gridHeight, materialMapWidth, materialMapHeight;
   size_t materialMapCount;
 
@@ -89,6 +91,10 @@ public:
     mapReader.Load (h_data, data->gridWidth, data->gridHeight, data->gridWidth, 
       data->heightScale, data->heightOffset);
 
+    if (data->smoothHeightmap)
+    {
+      SmoothHeightmap (h_data, data->gridWidth, data->gridHeight, data->gridWidth);
+    }
 
     csRef<iImage> material = loader->LoadImage (
 	data->materialmapSource.GetDataSafe (), CS_IMGFMT_PALETTED8);
@@ -192,6 +198,7 @@ bool csTerrainThreadedDataFeeder::PreLoad (iTerrainCell* cell)
   data->materialMapCount = cell->GetTerrain ()->GetMaterialPalette ().GetSize ();
   data->heightScale = cell->GetSize ().y;
   data->heightOffset = properties->heightOffset;
+  data->smoothHeightmap = properties->smoothHeightmap;
   
   for (size_t i = 0; i < properties->alphaMaps.GetSize (); ++i)
   {

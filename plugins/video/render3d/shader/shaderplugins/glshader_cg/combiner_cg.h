@@ -174,6 +174,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     size_t uniqueCounter;
     csArray<Snippet> snippets;
     Snippet currentSnippet;
+    csRefArray<iDocumentNode> vertexCompilerArgs;
+    csRefArray<iDocumentNode> fragmentCompilerArgs; 
     csRefArray<iDocumentNode> variableMaps;
     csString outputAssign[rtaNumAttachments];
     csRefArray<iDocumentNode> definitions;
@@ -218,12 +220,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       iDocumentNode* blockNodes);
   private:
     class DocNodeCgAppender;
+    class V2FAutoSematicsHelper;
   
     void AppendProgramInput (const csRefArray<iDocumentNode>& nodes, 
       DocNodeCgAppender& appender);
     void AppendProgramInput_V2FHead (const Snippet& snippet, 
       DocNodeCgAppender& appender);
     void AppendProgramInput_V2FDecl (const Snippet& snippet, 
+      const V2FAutoSematicsHelper& semanticsHelper,
       DocNodeCgAppender& appender);
     void AppendProgramInput_V2FLocals (const Snippet& snippet, 
       DocNodeCgAppender& appender);

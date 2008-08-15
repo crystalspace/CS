@@ -18,7 +18,11 @@
 
 #include "cssysdef.h"
 #include "animation.h"
+
 #include "nodes.h"
+#include "blendnode.h"
+#include "fsmnode.h"
+#include "othernodes.h"
 
 #include "csgeom/math.h"
 
@@ -26,6 +30,8 @@ using namespace CS::Animation;
 
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
+  CS_LEAKGUARD_IMPLEMENT(AnimationPacketFactory);
+  
   AnimationPacketFactory::AnimationPacketFactory ()
     : scfImplementationType (this)
   {
@@ -123,6 +129,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
 
 
+  CS_LEAKGUARD_IMPLEMENT(AnimationPacket);
 
   AnimationPacket::AnimationPacket (AnimationPacketFactory* factory)
     : scfImplementationType (this), factory (factory)
@@ -140,6 +147,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   }
   
 
+
+  CS_LEAKGUARD_IMPLEMENT(Animation);
 
   Animation::Animation (const char* name)
     : scfImplementationType (this), name (name), duration (0)

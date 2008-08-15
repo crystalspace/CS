@@ -71,10 +71,16 @@ public:
   virtual csPtr<iShaderPriorityList> GetPriorities (
 		  iDocumentNode* templ);
 
+  bool PrecacheShader(iDocumentNode*, iHierarchicalCache*);
+  
   void Report (int severity, const char* msg, ...);
 
   bool LoadSVBlock (iLoaderContext* ldr_context,
       iDocumentNode *node, iShaderVariableContext *context);
+  
+  csPtr<iDocumentNode> ReadNodeFromBuf (iDataBuffer* buf);
+  csPtr<iDataBuffer> WriteNodeToBuf (iDocument* doc);
+  csPtr<iDocument> CreateCachingDoc ();
 public:
   bool do_verbose;
   bool doDumpXML;
@@ -101,6 +107,7 @@ public:
   csRef<iDocumentSystem> xmlDocSys;
   
   CS::ShaderVarStringID string_mixmode_alpha;
+  CS::ShaderVarStringID stringLightCount;
 
 #define CS_TOKEN_ITEM_FILE \
   "plugins/video/render3d/shader/shadercompiler/xmlshader/xmlshader.tok"
