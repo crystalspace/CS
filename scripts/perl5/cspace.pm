@@ -1565,6 +1565,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *CreateConfigManager = *cspacec::csInitializer_CreateConfigManager;
 *CreateInputDrivers = *cspacec::csInitializer_CreateInputDrivers;
 *CreateStringSet = *cspacec::csInitializer_CreateStringSet;
+*CreateSystemOpenManager = *cspacec::csInitializer_CreateSystemOpenManager;
 *SetupConfigManager = *cspacec::csInitializer_SetupConfigManager;
 *SetupVFS = *cspacec::csInitializer_SetupVFS;
 *_RequestPlugins = *cspacec::csInitializer__RequestPlugins;
