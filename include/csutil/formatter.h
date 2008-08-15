@@ -30,6 +30,8 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/util.h"
 
+#include <locale.h>
+
 // MinGW uses MS CRT, but it can't grok long double.  VC doesn't have long
 // double and CRT printf() doesn't know %Lf, %Lg, or %Le.
 #if defined(__MINGW32__) || defined(CS_COMPILER_MSVC)
