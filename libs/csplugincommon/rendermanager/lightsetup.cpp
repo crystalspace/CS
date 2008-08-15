@@ -30,6 +30,8 @@ namespace RenderManager
   {
     persist.lightTypeScratch.Empty();
     persist.lightTypeScratch.SetMinimalCapacity (numLights);
+    persist.sublightNumMem.Empty();
+    persist.putBackLights.Empty();
   }
     
   void LightingSorter::AddLight (const csLightInfluence& influence,
@@ -43,6 +45,10 @@ namespace RenderManager
     iltp.isStatic =
       influence.dynamicType != CS_LIGHT_DYNAMICTYPE_DYNAMIC;
     iltp.numSubLights = numSubLights;
+    iltp.subLights =
+      (uint*)persist.sublightNumMem.Alloc (numSubLights * sizeof (uint));
+    for (uint l = 0; l < numSubLights; l++)
+      iltp.subLights[l] = l;
     persist.lightTypeScratch.Push (iltp);
   }
     

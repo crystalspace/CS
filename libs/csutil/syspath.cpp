@@ -20,17 +20,9 @@
 #include "csutil/csstring.h"
 #include "csutil/syspath.h"
 
-void csPathsList::Entry::FixSeparators()
-{
-  if (CS_PATH_SEPARATOR == '/') return;
+csPathsList::csPathsList () : paths (4) {}
 
-  size_t p = 0;
-  while ((p = path.FindFirst ('/', p)) != (size_t)-1)
-  {
-    path[p] = CS_PATH_SEPARATOR;
-    p++;
-  }
-}
+csPathsList::csPathsList (csPathsList const& o) : paths(o.paths) {}
 
 csPathsList::csPathsList (const char* pathList, bool expand)
 {
@@ -67,6 +59,23 @@ csPathsList::csPathsList (const char* const pathList[], bool expanded)
     else
       AddUnique (*pp);
     pp++;
+  }
+}
+
+csPathsList::~csPathsList() {}
+
+csPathsList& csPathsList::operator= (csPathsList const& o)
+{ if (&o != this) paths = o.paths; return *this; }
+
+void csPathsList::Entry::FixSeparators()
+{
+  if (CS_PATH_SEPARATOR == '/') return;
+
+  size_t p = 0;
+  while ((p = path.FindFirst ('/', p)) != (size_t)-1)
+  {
+    path[p] = CS_PATH_SEPARATOR;
+    p++;
   }
 }
 
@@ -119,6 +128,9 @@ size_t csPathsList::AddUniqueExpanded (const Entry& path,
   return AddUniqueExpanded (path.path, path.scanRecursive, path.type, overrideRecursive);
 }
 
+void csPathsList::DeleteIndex (size_t index)
+{ paths.DeleteIndex (index); }
+
 csPathsList operator* (const csPathsList& left, const csPathsList& right)
 {
   csPathsList paths;
@@ -145,6 +157,34 @@ csPathsList operator* (const csPathsList& left, const csPathsList& right)
 
   return paths;
 }
+
+csPathsList csPathsList::operator*= (const csPathsList& right)
+{ return (*this = *this * right); }
+
+csPathsList operator* (const csPathsList& left, const char* right)
+{ return left * csPathsList::Entry (right, 0); }
+
+csPathsList operator* (const csPathsList::Entry& left, const csPathsList& right)
+{
+  csPathsList newPaths;
+  newPaths.paths.Push (left);
+  return newPaths * right;
+}
+
+csPathsList operator* (const char* left, const csPathsList& right)
+{ return csPathsList::Entry (left, 0) * right; }
+
+csPathsList operator* (const csPathsList& left, const csPathsList::Entry& right)
+{
+  csPathsList newPaths;
+  newPaths.paths.Push (right);
+  return left * newPaths;
+}
+
+csPathsList csPathsList::operator*= (const csPathsList::Entry& right)
+{ return (*this = *this * right); }
+csPathsList csPathsList::operator*= (const char* right)
+{ return (*this = *this * right); }
 
 //---------------------------------------------------------------------------
 

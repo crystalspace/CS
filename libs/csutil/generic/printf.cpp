@@ -21,6 +21,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include "cssysdef.h"
+#include "csgeom/math.h"
 #include "csutil/ansiparse.h"
 #include "csutil/csstring.h"
 #include "csutil/csuctransform.h"
@@ -46,43 +47,61 @@ static int cs_fputsn (FILE* file, const char* str, size_t len)
   int n = 0;
   const wchar_t* wcsPtr = wstr;
 #if defined(CS_HAVE_FPUTWS) && defined(CS_HAVE_FWIDE) \
-  && defined(CS_HAVE_WCSRTOMBS)
+  && defined(CS_HAVE_WCSNRTOMBS)
   if (fwide (file, 0) > 0)
   {
     return fputws (wstr, file);
   }
   else
   {
-    mbstate_t mbs;
+    size_t numwcs = wcslen (wstr);
+    const wchar_t* wcsEnd = wcsPtr + numwcs;
+    mbstate_t oldstate, mbs;
     memset (&mbs, 0, sizeof (mbs));
     char mbstr[64];
     size_t mbslen;
-    while (wcsPtr != 0)
+    while (numwcs > 0)
     {
       memset (mbstr, 0, sizeof (mbstr));
-      mbslen = wcsrtombs (mbstr, &wcsPtr, sizeof (mbstr) - 1, &mbs);
+      memcpy (&oldstate, &mbs, sizeof (mbs));
+      mbslen = wcsnrtombs (mbstr, &wcsPtr, numwcs, sizeof (mbstr) - 1, &mbs);
       if (mbslen == (size_t)-1)
       {
 	if (errno == EILSEQ)
 	{
-	  // Catch char that couldn't be encoded, print ? instead
-	  if (fputs (mbstr, file) == EOF) return EOF;
-	  if (fputc ('?', file) == EOF) return EOF;
-	  if (CS_UC_IS_HIGH_SURROGATE (*wcsPtr))
-	  {
-	    wcsPtr++;
-	    if (CS_UC_IS_LOW_SURROGATE (*wcsPtr))
+	  /* At least on OS/X wcsPtr is not updated in case of a conversion
+	     error, so kludge around it */
+	  if (mbstr[0] == 0)
+          {
+	    // Catch char that couldn't be encoded, print ? instead
+	    if (fputc ('?', file) == EOF) return EOF;
+	    if (CS_UC_IS_HIGH_SURROGATE (*wcsPtr))
+	    {
 	      wcsPtr++;
-	  }
+	      if (CS_UC_IS_LOW_SURROGATE (*wcsPtr))
+	        wcsPtr++;
+	    }
+	    else
+	      wcsPtr++;
+      	    numwcs = wcsEnd - wcsPtr;
+          }
 	  else
-	    wcsPtr++;
+          {
+	    // Try converting only a substring
+	    numwcs = csMin (numwcs-1, strlen (mbstr));
+	    memcpy (&mbs, &oldstate, sizeof (mbs));
+	  }
 	  continue;
 	}
 	break;
       }
-      if (fputs (mbstr, file) == EOF) return EOF;
+      else
+      {
+	if (fputs (mbstr, file) == EOF) return EOF;
+	numwcs = (wcsPtr == 0) ? 0 : wcsEnd - wcsPtr;
+      }
     }
-    if (wcsPtr == 0) return (int)len;
+    return (int)len;
   }
 #endif
   // Use a cheap Wide-to-ASCII conversion.

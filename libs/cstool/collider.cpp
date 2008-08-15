@@ -34,7 +34,6 @@
 #include "iengine/movable.h"
 #include "iengine/portal.h"
 #include "iengine/portalcontainer.h"
-#include "iengine/region.h"
 #include "iengine/sector.h"
 #include "iengine/viscull.h"
 #include "iengine/scenenode.h"
@@ -311,20 +310,6 @@ void csColliderHelper::InitializeCollisionWrappers (iCollideSystem* colsys,
   {
     iMeshWrapper* sp = meshes->Get (i);
     if (collection && !collection->IsParentOf(sp->QueryObject ())) continue;
-    InitializeCollisionWrapper (colsys, sp);
-  }
-}
-
-void csColliderHelper::InitializeCollisionWrappers (iCollideSystem* colsys,
-  	iEngine* engine, iRegion* region)
-{
-  // Initialize all mesh objects for collision detection.
-  int i;
-  iMeshList* meshes = engine->GetMeshes ();
-  for (i = 0 ; i < meshes->GetCount () ; i++)
-  {
-    iMeshWrapper* sp = meshes->Get (i);
-    if (region && !region->IsInRegion (sp->QueryObject ())) continue;
     InitializeCollisionWrapper (colsys, sp);
   }
 }
