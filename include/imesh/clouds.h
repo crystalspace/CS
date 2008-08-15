@@ -26,6 +26,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/ref.h"
 #include "csgeom/vector3.h"
 #include "csgeom/matrix4.h"
+#include "ivideo/texture.h"
 
 //--------------------------------------------------------------------------------------------//
 
@@ -61,7 +62,7 @@ level of abstraction.
 */
 struct iClouds : public virtual iBase
 {
-  SCF_INTERFACE(iClouds, 0, 6, 1);
+  SCF_INTERFACE(iClouds, 0, 6, 5);
 
   /**
   These setters configure the entire system:
@@ -104,8 +105,17 @@ struct iClouds : public virtual iBase
   /**
   All of following Setters refer to the iCloudsRenderer instance.
   */
-  virtual inline const UINT GetSliceCount() const = 0;
-
+  virtual inline void SetRenderGridScale(const float dx) = 0;
+  virtual inline void SetCloudPosition(const csVector3& vPosition) = 0;
+  virtual inline void SetLightDirection(const csVector3& vLightDir) = 0;
+  virtual inline void SetImpostorValidityAngle(const float fAngle) = 0;
+  //Getter of iCloudsRenderer
+  virtual inline const UINT GetOLVSliceCount() const = 0;
+  virtual inline const UINT GetOLVWidth() const = 0;
+  virtual inline const UINT GetOLVHeight() const = 0;
+  virtual inline const CS::Math::Matrix4 GetOLVProjectionMatrix() const = 0;
+  virtual inline const CS::Math::Matrix4 GetOLVCameraMatrix() const = 0;
+  virtual inline iTextureHandle* GetOLVTexture() const = 0;
 };
 
 //--------------------------------------------------------------------------------------------//
@@ -117,12 +127,17 @@ scalar field!
 */
 struct iCloudsRenderer : public virtual iBase
 {
-  SCF_INTERFACE(iCloudsRenderer, 0, 1, 1);
+  SCF_INTERFACE(iCloudsRenderer, 0, 3, 1);
 
   /**
   Some usful getter
   */
-  virtual inline const UINT GetSliceCount() const = 0;
+  virtual inline const UINT GetOLVSliceCount() const = 0;
+  virtual inline const UINT GetOLVWidth() const = 0;
+  virtual inline const UINT GetOLVHeight() const = 0;
+  virtual inline const CS::Math::Matrix4 GetOLVProjectionMatrix() const = 0;
+  virtual inline const CS::Math::Matrix4 GetOLVCameraMatrix() const = 0;
+  virtual inline iTextureHandle* GetOLVTexture() const = 0;
 
   /**
   All following methods are used to configure the entire rendering process
@@ -130,6 +145,7 @@ struct iCloudsRenderer : public virtual iBase
   virtual inline void SetGridScale(const float dx) = 0;
   virtual inline void SetCloudPosition(const csVector3& vPosition) = 0;
   virtual inline void SetLightDirection(const csVector3& vLightDir) = 0;
+  virtual inline void SetImpostorValidityAngle(const float fAngle) = 0;
 };
 
 //--------------------------------------------------------------------------------------------//
@@ -193,15 +209,12 @@ struct iCloudSystem : public virtual iBase
   */
   virtual inline const UINT GetCloudCount() const = 0;
   virtual inline const iClouds* GetCloud(const UINT i) const = 0;
-  //virtual inline const csRef<iClouds>& GetCloud(const UINT i) const = 0;
 
   /**
   Add and remove clouds from the field
   */
   virtual iClouds* AddCloud() = 0;
-  //virtual csRef<iClouds> AddCloud() = 0;
   virtual const bool RemoveCloud(iClouds* pCloud) = 0;
-  //virtual const bool RemoveCloud(const csRef<iClouds>& pCloud) = 0;
   virtual const bool RemoveCloud(const UINT iIndex) = 0;
   virtual inline const bool RemoveAllClouds() = 0;
 };

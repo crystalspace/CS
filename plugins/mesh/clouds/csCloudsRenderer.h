@@ -26,6 +26,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <csgeom/vector3.h>
 #include <csgfx/imagevolumemaker.h>
 #include <csgfx/imagememory.h>
+#include <ivideo/texture.h>
 
 //Cloud-Renderer class
 class csCloudsRenderer : public scfImplementation1<csCloudsRenderer, iCloudsRenderer>
@@ -35,8 +36,14 @@ private:
   csVector3                     m_vPosition;
   float                         m_fGridScale;
 
-  //OLV 3D-Texture
-  csImageVolumeMaker*           m_OLVTexture;
+  //Condensed water mixing ratios texture
+  bool                          m_bNewOLVTexture;
+  csRef<csImageVolumeMaker>     m_pQcTexture;
+  //OLV texture
+  UINT                          m_iOLVTexWidth;
+  UINT                          m_iOLVTexHeight;
+  UINT                          m_iOLVTexDepth;
+  csRef<iTextureHandle>         m_pOLVTexture;
 
   //OLV coord system
   csVector3                     m_vXAxis;
@@ -45,10 +52,63 @@ private:
   csMatrix3                     m_mOLVRotation;
   csMatrix3                     m_mInvOLVRotation;
   csVector3                     m_avBaseSlice[4];    //This is the slice which is farthest away from the lightsource
+  CS::Math::Matrix4             m_mOLVCameraMatrix;
+  CS::Math::Matrix4             m_mOLVProjectionMatrix;
 
+  //Impostor properties
+  csVector3                     m_vImpostorDirection;
+  float                         m_fImpostorValidityAngleCos;
 
   //=======================================================//
   //Helpermethods
+
+  //Returns a parallelprojection matrix
+  inline const CS::Math::Matrix4 ParallelProjection(const float fWidth, const float fHeight, const float fNear, const float fFar)
+  {
+    const float fValue = 1.f / (fFar - fNear);
+    return CS::Math::Matrix4( 2.f / fWidth, 0.0f,           0.0f,             0.0f,
+	                            0.0f,         2.f / fHeight,  0.0f,             0.0f,
+	                            0.0f,         0.0f,           fValue,           0.0f,
+                              0.0f,         0.0f,           -fValue * fNear,  1.0f);
+  }
+
+  //Returns a cameramatrix
+  inline const CS::Math::Matrix4 CameraMatrix(const csVector3& vPos, const csVector3& vDir, const csVector3& vUp)
+  {
+    const csVector3 vRef   = vUp / vUp.Norm();
+    const csVector3 vZAxis = vDir / vDir.Norm();
+    const csVector3 vXAxis = vRef % vZAxis;
+    const csVector3 vYAxis = vZAxis % vXAxis;
+
+    return CS::Math::Matrix4(1.f, 0.f, 0.f, 0.f,
+                             0.f, 1.f, 0.f, 0.f,
+                             0.f, 0.f, 1.f, 0.f,
+                             -vPos.x, -vPos.y, -vPos.z, 1.f) *
+           CS::Math::Matrix4(vXAxis.x, vYAxis.x, vZAxis.x, 0.0f,
+  	                         vXAxis.y, vYAxis.y, vZAxis.y, 0.0f,
+			                       vXAxis.z, vYAxis.z, vZAxis.z, 0.0f,
+				                     0.0f,     0.0f,     0.0f,     1.0f);
+  }
+
+  /**
+  Checks if the impostor is still valid. Means if the eyedirection changed too much, or if there is
+  a new OLV texture
+  */
+  inline const bool ImpostorStillValid(const csVector3& vCameraPosition)
+  {
+    if(m_bNewOLVTexture)
+    {
+      m_bNewOLVTexture = false;
+      return false;
+    }
+    else
+    {
+      csVector3 vCurrDir = m_vPosition - vCameraPosition;
+      vCurrDir.Normalize();
+      if(1.f - (m_vImpostorDirection * vCurrDir) < m_fImpostorValidityAngleCos) return true;
+      else return false;
+    }
+  }
 
   inline const csVector3 VectorMin(const csVector3& a, const csVector3& b)
   {
@@ -64,19 +124,25 @@ private:
     SetGridScale(1.f);
     SetCloudPosition(csVector3(0.f, 0.f, 0.f));
     SetLightDirection(csVector3(0.f, -1.f, 0.f));
+    SetImpostorValidityAngle(0.087266f);                    // equal to 5°
   }
 public:
-  csCloudsRenderer(iBase* pParent) : scfImplementationType(this, pParent), m_OLVTexture(NULL)
+  csCloudsRenderer(iBase* pParent) : scfImplementationType(this, pParent), m_bNewOLVTexture(false)
   {
     SetStandardValues();
   }
   ~csCloudsRenderer()
   {
-    delete[] m_OLVTexture;
+    m_pQcTexture.Invalidate();
   }
 
   //Getter
-  virtual inline const UINT GetSliceCount() const {return m_OLVTexture->GetDepth();}
+  virtual inline const UINT GetOLVSliceCount() const {return m_iOLVTexDepth;}
+  virtual inline const UINT GetOLVWidth() const {return m_iOLVTexWidth;}
+  virtual inline const UINT GetOLVHeight() const {return m_iOLVTexHeight;}
+  virtual inline const CS::Math::Matrix4 GetOLVProjectionMatrix() const {return m_mOLVProjectionMatrix;}
+  virtual inline const CS::Math::Matrix4 GetOLVCameraMatrix() const {return m_mOLVCameraMatrix;}
+  virtual inline iTextureHandle* GetOLVTexture() const {return m_pOLVTexture;}
 
   /**
   Setter for the user, to control every major aspect of cloud rendering.
@@ -86,6 +152,7 @@ public:
   virtual inline void SetGridScale(const float dx) {m_fGridScale = dx;}
   virtual inline void SetCloudPosition(const csVector3& vPosition) {m_vPosition = vPosition;}
   virtual inline void SetLightDirection(const csVector3& vLightDir) {m_vLightDir = vLightDir;}
+  virtual inline void SetImpostorValidityAngle(const float fAngle) {m_fImpostorValidityAngleCos = cosf(fAngle);}
 
 
   /**

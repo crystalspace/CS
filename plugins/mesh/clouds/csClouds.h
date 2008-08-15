@@ -122,7 +122,16 @@ public:
   virtual inline void SetWaterVaporBottomInputField(csRef<iField2> Field) {return m_Dynamics->SetWaterVaporBottomInputField(Field);}
 
   //All of following Setters and Getters refer to the csCloudsRenderer instance, and are delegated!
-  virtual inline const UINT GetSliceCount() const {return m_Renderer->GetSliceCount();}
+  virtual inline const UINT GetOLVSliceCount() const {return m_Renderer->GetOLVSliceCount();}
+  virtual inline const UINT GetOLVWidth() const {return m_Renderer->GetOLVWidth();}
+  virtual inline const UINT GetOLVHeight() const {return m_Renderer->GetOLVHeight();}
+  virtual inline iTextureHandle* GetOLVTexture() const {return m_Renderer->GetOLVTexture();}
+  virtual inline const CS::Math::Matrix4 GetOLVProjectionMatrix() const {return m_Renderer->GetOLVProjectionMatrix();}
+  virtual inline const CS::Math::Matrix4 GetOLVCameraMatrix() const {return m_Renderer->GetOLVCameraMatrix();}
+  virtual inline void SetRenderGridScale(const float dx) {return m_Renderer->SetGridScale(dx);}
+  virtual inline void SetCloudPosition(const csVector3& vPosition) {return m_Renderer->SetCloudPosition(vPosition);}
+  virtual inline void SetLightDirection(const csVector3& vLightDir) {return m_Renderer->SetLightDirection(vLightDir);}
+  virtual inline void SetImpostorValidityAngle(const float fAngle) {return m_Renderer->SetImpostorValidityAngle(fAngle);}
 
   //EventHandler-Part
   virtual bool HandleEvent(iEvent& rEvent);

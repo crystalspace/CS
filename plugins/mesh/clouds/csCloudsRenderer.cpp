@@ -26,8 +26,8 @@ SCF_IMPLEMENT_FACTORY(csCloudsRenderer)
 const bool csCloudsRenderer::RenderOLV(const csRef<csField3<float>>& rCondWaterMixingRatios)
 {
   //First save the mixingratios into a 3D-Texture
-  delete[] m_OLVTexture;
-  m_OLVTexture = new csImageVolumeMaker;
+  m_pQcTexture.Invalidate();
+  m_pQcTexture.AttachNew(new csImageVolumeMaker);
   unsigned long* pdwBuffer = new unsigned long[rCondWaterMixingRatios->GetSizeX() * rCondWaterMixingRatios->GetSizeY()];
   //Now add slice per slice
   for(UINT z = 0; z < rCondWaterMixingRatios->GetSizeZ(); ++z)
@@ -51,7 +51,7 @@ const bool csCloudsRenderer::RenderOLV(const csRef<csField3<float>>& rCondWaterM
     }
     //Create current slice and add it to the 3D-Texture
     csImageMemory TempImage(rCondWaterMixingRatios->GetSizeX(), rCondWaterMixingRatios->GetSizeY(), pdwBuffer, false);
-    m_OLVTexture->AddImage(&TempImage);
+    m_pQcTexture->AddImage(&TempImage);
   }
   delete[] pdwBuffer;
 
@@ -108,19 +108,29 @@ const bool csCloudsRenderer::RenderOLV(const csRef<csField3<float>>& rCondWaterM
   m_avBaseSlice[3] = m_mOLVRotation * csVector3(vBBMax.x, vBBMin.y, vBBMin.z);    //Bottom, Right
 
   //Spacing Vector between each slice (from Back to Front!)
-  const UINT iOLVSizeX = rCondWaterMixingRatios->GetSizeX() / 2;
-  const UINT iOLVSizeY = rCondWaterMixingRatios->GetSizeY() / 2;
-  const UINT iOLVSizeZ = rCondWaterMixingRatios->GetSizeZ() / 2;
-  const csVector3 vDelta = ((vBBMax.z - vBBMin.z) / static_cast<float>(iOLVSizeZ)) * m_vZAxis;
+  m_iOLVTexWidth  = rCondWaterMixingRatios->GetSizeX() / 2;
+  m_iOLVTexHeight = rCondWaterMixingRatios->GetSizeY() / 2;
+  m_iOLVTexDepth  = rCondWaterMixingRatios->GetSizeZ() / 2;
+  const csVector3 vDelta = ((vBBMax.z - vBBMin.z) / static_cast<float>(m_iOLVTexDepth)) * m_vZAxis;
+
+  //Create empty OLV texture
+  m_pOLVTexture.Invalidate();
+  //CreateTexture
+
+  //Create OLV-transformation matrices
+  m_mOLVProjectionMatrix = ParallelProjection(vBBMax.x - vBBMin.x, vBBMax.y - vBBMin.y, 0.f, vBBMax.z - vBBMin.z);
+  const csVector3 vCameraPos = m_mOLVRotation * csVector3((vBBMin.x + vBBMax.x) * 0.5f, (vBBMin.y + vBBMax.y) * 0.5f, vBBMax.z);
+  m_mOLVCameraMatrix = CameraMatrix(vCameraPos, m_vLightDir, vLinIndepVec);
 
   //Resultion == Slice count
   //Rendering from front to back (reference: lightdirection)
-  for(int i = iOLVSizeZ; i >= 0; --i)
+  for(int i = m_iOLVTexDepth; i >= 0; --i)
   {
     //m_avBaseSlice[0] + vDelta * i;
 
   }
 
+  m_bNewOLVTexture = true;
   return true;
 }
 
@@ -128,6 +138,8 @@ const bool csCloudsRenderer::RenderOLV(const csRef<csField3<float>>& rCondWaterM
 
 const bool csCloudsRenderer::CreateImpostor(const csVector3& vCameraPosition)
 {
+  m_vImpostorDirection = m_vPosition - vCameraPosition;
+  m_vImpostorDirection.Normalize();
 
   return true;
 }
@@ -136,6 +148,7 @@ const bool csCloudsRenderer::CreateImpostor(const csVector3& vCameraPosition)
 
 const bool csCloudsRenderer::Render(const csVector3& vCameraPosition)
 {
+  if(!ImpostorStillValid(vCameraPosition)) CreateImpostor(vCameraPosition);
 
   return true;
 }
