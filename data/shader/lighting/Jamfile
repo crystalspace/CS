@@ -1,4 +1,0 @@
-SubDir TOP data shader lighting ;
-
-InstallData [ Wildcard *.cginc *.cscg *.inc *.xml ] : data shader lighting ;
-FileListEntriesData [ Wildcard *.cginc *.cscg *.inc *.xml ] : data shader lighting : data-runtime ;

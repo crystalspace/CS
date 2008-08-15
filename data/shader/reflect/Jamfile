@@ -1,4 +1,0 @@
-SubDir TOP data shader reflect ;
-
-InstallData [ Wildcard *.xml ] : data shader reflect ;
-FileListEntriesData [ Wildcard *.xml ] : shader reflect : data-runtime ;
