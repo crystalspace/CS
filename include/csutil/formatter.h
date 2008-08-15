@@ -30,6 +30,8 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/util.h"
 
+#include <locale.h>
+
 // MinGW uses MS CRT, but it can't grok long double.  VC doesn't have long
 // double and CRT printf() doesn't know %Lf, %Lg, or %Le.
 #if defined(__MINGW32__) || defined(CS_COMPILER_MSVC)
@@ -936,6 +938,14 @@ class csPrintfFormatter
   void OutputFloat (Twriter& writer, const FormatSpec& currentFormat,
     const T& value, const char* type)
   {
+    struct lconv *locale_data;
+    const char *decimal_point;
+    int decimal_point_len;
+    
+    locale_data = localeconv ();
+    decimal_point = locale_data->decimal_point;
+    decimal_point_len = strlen (decimal_point);
+    
     char flags[5] = "";
     if (currentFormat.plusSign)
       strcat (flags, "+");
@@ -966,7 +976,17 @@ class csPrintfFormatter
 
     char* p = formattedStr;
     while (*p != 0)
-      writer.Put (*p++);
+    {
+      char c = *p++;
+      // Convert locale decimal to '.'
+      if (c == decimal_point[0])
+      {
+        writer.Put ('.');
+        p += decimal_point_len - 1;
+      }
+      else
+        writer.Put (c);
+    }
   }
 
   /**

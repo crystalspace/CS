@@ -696,6 +696,7 @@ class csInitializer(object):
     CreateConfigManager = staticmethod(_core.csInitializer_CreateConfigManager)
     CreateInputDrivers = staticmethod(_core.csInitializer_CreateInputDrivers)
     CreateStringSet = staticmethod(_core.csInitializer_CreateStringSet)
+    CreateSystemOpenManager = staticmethod(_core.csInitializer_CreateSystemOpenManager)
     SetupConfigManager = staticmethod(_core.csInitializer_SetupConfigManager)
     SetupVFS = staticmethod(_core.csInitializer_SetupVFS)
     _RequestPlugins = staticmethod(_core.csInitializer__RequestPlugins)
@@ -723,6 +724,7 @@ csInitializer_CreateVerbosityManager = _core.csInitializer_CreateVerbosityManage
 csInitializer_CreateConfigManager = _core.csInitializer_CreateConfigManager
 csInitializer_CreateInputDrivers = _core.csInitializer_CreateInputDrivers
 csInitializer_CreateStringSet = _core.csInitializer_CreateStringSet
+csInitializer_CreateSystemOpenManager = _core.csInitializer_CreateSystemOpenManager
 csInitializer_SetupConfigManager = _core.csInitializer_SetupConfigManager
 csInitializer_SetupVFS = _core.csInitializer_SetupVFS
 csInitializer__RequestPlugins = _core.csInitializer__RequestPlugins
