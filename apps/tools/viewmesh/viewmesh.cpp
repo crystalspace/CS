@@ -24,6 +24,7 @@
 #include "csutil/common_handlers.h"
 #include "csutil/event.h"
 #include "csutil/scfstr.h"
+#include "csutil/stringconv.h"
 #include "imesh/object.h"
 #include "iutil/eventq.h"
 #include "iutil/object.h"
@@ -428,7 +429,7 @@ void ViewMesh::HandleCommandLine()
     LoadSprite(meshfilename);
   }
 
-  if (roomSize) roomsize = atof(roomSize);
+  if (roomSize) roomsize = CS::Utility::strtof(roomSize);
 
   if (scaleTxt != 0)
   {

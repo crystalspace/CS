@@ -29,6 +29,7 @@
 #include "csutil/archive.h"
 #include "csutil/csstring.h"
 #include "csutil/memfile.h"
+#include "csutil/stringconv.h"
 #include "csutil/xmltiny.h"
 #include "iutil/cmdline.h"
 #include "iutil/databuff.h"
@@ -229,7 +230,7 @@ void MD32spr::Main()
   }
 
   if (cmdline->GetOption("scale")) {
-    scaleFactor = atof(cmdline->GetOption("scale"));
+    scaleFactor = CS::Utility::strtof(cmdline->GetOption("scale"));
   }
 
   fileName = (char *) cs_malloc(sizeof(char) * name.Length() + 1);

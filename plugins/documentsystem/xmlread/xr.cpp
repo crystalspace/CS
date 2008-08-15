@@ -26,6 +26,7 @@ distribution.
 #include <ctype.h>
 #include "xr.h"
 #include "csutil/scfstr.h"
+#include "csutil/stringconv.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLRead)
 {
@@ -290,7 +291,7 @@ const int TrDocumentAttribute::IntValue() const
 const double  TrDocumentAttribute::DoubleValue() const
 {
   value[vallen] = 0;
-  return atof (value);
+  return CS::Utility::strtof (value);
 }
 
 TrXmlDeclaration::TrXmlDeclaration( const char * _version,

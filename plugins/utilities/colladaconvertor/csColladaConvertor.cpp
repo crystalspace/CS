@@ -24,6 +24,7 @@
 #include "iutil/string.h"
 #include "csutil/scfstr.h"
 #include "csutil/scfstringarray.h"
+#include "csutil/stringconv.h"
 #include "csColladaConvertor.h"
 #include "csColladaClasses.h"
 
@@ -859,7 +860,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
           csStringArray lightColour;
           lightColour.SplitString(lightNode->GetNode("point")->GetNode("color")->GetContentsValue(), " ");
-          light.colour = csColor(atof(lightColour[0]), atof(lightColour[1]), atof(lightColour[2]));
+          light.colour = csColor(CS::Utility::strtof(lightColour[0]), CS::Utility::strtof(lightColour[1]), CS::Utility::strtof(lightColour[2]));
 
           lights.Put(lightNode->GetParent()->GetAttributeValue("id"), light);
         }
@@ -1041,9 +1042,9 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
                   csRef<iDocumentNode> vertex = newPortal->CreateNodeBefore(CS_NODE_ELEMENT);
                   vertex->SetValue("v");
 
-                  float x = atof(vertices[i]);
-                  float y = atof(vertices[i+1]);
-                  float z = atof(vertices[i+2]);
+                  float x = CS::Utility::strtof(vertices[i]);
+                  float y = CS::Utility::strtof(vertices[i+1]);
+                  float z = CS::Utility::strtof(vertices[i+2]);
 
                   vertex->SetAttributeAsFloat("x", x);
                   vertex->SetAttributeAsFloat("y", y);
@@ -1070,9 +1071,9 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
           sectorPos.SplitString(sector->GetNode("matrix")->GetContentsValue(), " ");
           centerPos.SplitString(object->GetNode("matrix")->GetContentsValue(), " ");
 
-          float x = atof(sectorPos[3]) + atof(centerPos[3]);
-          float y = atof(sectorPos[11]) + atof(centerPos[11]);
-          float z = atof(sectorPos[7]) + atof(centerPos[7]);
+          float x = CS::Utility::strtof(sectorPos[3]) + CS::Utility::strtof(centerPos[3]);
+          float y = CS::Utility::strtof(sectorPos[11]) + CS::Utility::strtof(centerPos[11]);
+          float z = CS::Utility::strtof(sectorPos[7]) + CS::Utility::strtof(centerPos[7]);
 
           csRef<iDocumentNode> centreNode = newLight->CreateNodeBefore(CS_NODE_ELEMENT);
           centreNode->SetValue("center");
@@ -1170,9 +1171,9 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
         sectorPos.SplitString(sector->GetNode("matrix")->GetContentsValue(), " ");
         meshobjPos.SplitString(object->GetNode("matrix")->GetContentsValue(), " ");
 
-        float x = atof(sectorPos[3]) + atof(meshobjPos[3]);
-        float y = atof(sectorPos[11]) + atof(meshobjPos[11]);
-        float z = atof(sectorPos[7]) + atof(meshobjPos[7]);
+        float x = CS::Utility::strtof(sectorPos[3]) + CS::Utility::strtof(meshobjPos[3]);
+        float y = CS::Utility::strtof(sectorPos[11]) + CS::Utility::strtof(meshobjPos[11]);
+        float z = CS::Utility::strtof(sectorPos[7]) + CS::Utility::strtof(meshobjPos[7]);
 
         move->SetAttributeAsFloat("x", x);
         move->SetAttributeAsFloat("y", y);
@@ -1217,9 +1218,9 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
           sectorPos.SplitString(sector->GetNode("matrix")->GetContentsValue(), " ");
           cameraPos.SplitString(node->GetNode("matrix")->GetContentsValue(), " ");
 
-          float x = atof(sectorPos[3]) + atof(cameraPos[3]);
-          float y = atof(sectorPos[11]) + atof(cameraPos[11]);
-          float z = atof(sectorPos[7]) + atof(cameraPos[7]);
+          float x = CS::Utility::strtof(sectorPos[3]) + CS::Utility::strtof(cameraPos[3]);
+          float y = CS::Utility::strtof(sectorPos[11]) + CS::Utility::strtof(cameraPos[11]);
+          float z = CS::Utility::strtof(sectorPos[7]) + CS::Utility::strtof(cameraPos[7]);
 
           csRef<iDocumentNode> positionNode = startNode->CreateNodeBefore(CS_NODE_ELEMENT);
           positionNode->SetValue("position");
