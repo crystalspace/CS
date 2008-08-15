@@ -290,14 +290,20 @@ protected:
   class ForeignNodeStorage;
   class ForeignNodeReader;
   
-  bool StoreToCache (iFile* cacheFile, ForeignNodeStorage& foreignNodes);
+  bool StoreToCache (iFile* cacheFile, ForeignNodeStorage& foreignNodes,
+    const ConditionsWriter& condWriter);
   bool StoreWrappedChildren (iFile* file, 
     ForeignNodeStorage& foreignNodes,
-    const csPDelArray<WrappedChild>& children);
-  bool ReadFromCache (iFile* cacheFile, ForeignNodeReader& foreignNodes);
+    const csPDelArray<WrappedChild>& children,
+    const ConditionsWriter& condWriter);
+  void CollectUsedConditions (const csPDelArray<WrappedChild>& children,
+    ConditionsWriter& condWrite);
+  bool ReadFromCache (iFile* cacheFile, ForeignNodeReader& foreignNodes,
+    const ConditionsReader& condReader);
   bool ReadWrappedChildren (iFile* file, 
     ForeignNodeReader& foreignNodes,
-    csPDelArray<WrappedChild>& children);
+    csPDelArray<WrappedChild>& children,
+    const ConditionsReader& condReader);
 public:
   CS_LEAKGUARD_DECLARE(csWrappedDocumentNode);
 
@@ -324,8 +330,9 @@ public:
   virtual bool GetAttributeValueAsBool (const char* name, 
     bool defaultvalue = false);
     
-  bool ReadFromCache (iFile* cacheFile);
-  bool StoreToCache (iFile* cacheFile);
+  bool ReadFromCache (iFile* cacheFile, const ConditionsReader& condReader);
+  bool StoreToCache (iFile* cacheFile, const ConditionsWriter& condWriter);
+  void CollectUsedConditions (ConditionsWriter& condWrite);
 };
 
 class csTextNodeWrapper : 
@@ -436,7 +443,8 @@ public:
     iConditionResolver* resolver, csString* dumpOut);
     
   csWrappedDocumentNode* CreateWrapperFromCache (iFile* cacheFile,
-    iConditionResolver* resolver, csConditionEvaluator& evaluator);
+    iConditionResolver* resolver, csConditionEvaluator& evaluator,
+    const ConditionsReader& condReader);
 };
 
 }

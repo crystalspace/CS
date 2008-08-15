@@ -96,9 +96,13 @@ class csShaderConditionResolver : public iConditionResolver
   void DumpConditionNode (csString& out, csConditionNode* node, int level);
   size_t GetVariant (csConditionNode* node);
   
-  bool ReadNode (iFile* cacheFile, csConditionNode* parent,
-    csConditionNode*& node);
-  bool WriteNode (iFile* cacheFile, csConditionNode* node);
+  void CollectUsedConditions (csConditionNode* node,
+    ConditionsWriter& condWrite);
+
+  bool ReadNode (iFile* cacheFile, const ConditionsReader& condRead,
+    csConditionNode* parent, csConditionNode*& node);
+  bool WriteNode (iFile* cacheFile, csConditionNode* node,
+    const ConditionsWriter& condWrite);
 public:
   csConditionEvaluator& evaluator;
 
@@ -124,10 +128,11 @@ public:
   { return nextVariant; }
   void DumpConditionTree (csString& out);
   
-  uint GetConditionsVersion();
+  bool ReadFromCache (iFile* cacheFile, ConditionsReader& condReader);
+  bool WriteToCache (iFile* cacheFile, ConditionsWriter& condWriter);
   
-  bool ReadFromCache (iFile* cacheFile);
-  bool WriteToCache (iFile* cacheFile);
+  void CollectUsedConditions (ConditionsWriter& condWrite)
+  { CollectUsedConditions (rootNode, condWrite); }
 };
 
 class csXMLShader : public scfImplementationExt3<csXMLShader,
@@ -207,13 +212,11 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
     }
   };
   csArray<ShaderTechVariant> techVariants;
-  csConditionEvaluator* sharedEvaluator;
-  size_t cachedEvaluatorConditionNum;
+  csRef<csConditionEvaluator> sharedEvaluator;
   csRef<iCacheManager> shaderCache;
   bool readFromCache;
   csString cacheTag;
   csString cacheType;
-  csString cacheScope_evaluator;
   csString cacheScope_tech;
 
   /// Shader we fall back to if none of the techs validate

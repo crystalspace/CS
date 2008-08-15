@@ -41,8 +41,6 @@
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
 
-static const int assumeConstFlag = 0x80000000;
-
 CS_LEAKGUARD_IMPLEMENT (csShaderGLCGCommon);
 
 csShaderGLCGCommon::csShaderGLCGCommon (csGLShader_CG* shaderPlug, 
@@ -71,7 +69,7 @@ csShaderGLCGCommon::~csShaderGLCGCommon ()
       ShaderParameter* param =
 	reinterpret_cast<ShaderParameter*> (mapping.userVal);
       
-      shaderPlug->paramAlloc.Free (param);
+      FreeShaderParam (param);
     }
     delete assumedConstParams;
   }
@@ -83,14 +81,18 @@ csShaderGLCGCommon::~csShaderGLCGCommon ()
     ShaderParameter* param =
       reinterpret_cast<ShaderParameter*> (mapping.userVal);
     
-    shaderPlug->paramAlloc.Free (param);
+    FreeShaderParam (param);
   }
 }
 
 void csShaderGLCGCommon::Activate()
 {
   cgGLEnableProfile (programProfile);
-  if (!cgGLIsProgramLoaded (program)) cgGLLoadProgram (program);
+  if (!cgGLIsProgramLoaded (program))
+  {
+    cgGLLoadProgram (program);
+    PostCompileVmapProcess ();
+  }
   cgGLBindProgram (program);
 }
 
@@ -99,11 +101,16 @@ void csShaderGLCGCommon::Deactivate()
   cgGLDisableProfile (programProfile);
 }
 
-void csShaderGLCGCommon::SetParameterValue (ShaderParameter* sparam,
+template<typename Setter>
+void csShaderGLCGCommon::SetParameterValue (const Setter& setter,
+                                            ShaderParameter* sparam,
                                             csShaderVariable* var)
 {
+  if (sparam == 0) return;
+    
   CGparameter param = sparam->param;
   CGtype paramType = sparam->paramType;
+  uint slot = sparam->baseSlot;
   
   switch (paramType)
   {
@@ -111,157 +118,67 @@ void csShaderGLCGCommon::SetParameterValue (ShaderParameter* sparam,
       {
 	int i;
 	if (var->GetValue (i))
-	  cgGLSetParameter1f (param, i);
+	  setter.Parameter1i (slot, param, i);
       }
+      break;
     case CG_FLOAT:
       {
 	float f;
 	if (var->GetValue (f))
-	  cgGLSetParameter1f (param, f);
+	  setter.Parameter1f (slot, param, f);
       }
+      break;
     case CG_FLOAT2:
       {
 	csVector2 v;
 	if (var->GetValue (v))
-	  cgGLSetParameter2f (param, v.x, v.y);
+	  setter.Parameter2fv (slot, param, &v.x);
       }
       break;
     case CG_FLOAT3:
       {
 	csVector3 v;
 	if (var->GetValue (v))
-	  cgGLSetParameter3f (param, v.x, v.y, v.z);
+	  setter.Parameter3fv (slot, param, &v.x);
       }
       break;
     case CG_FLOAT4:
       {
 	csVector4 v;
 	if (var->GetValue (v))
-	  cgGLSetParameter4f (param, v.x, v.y, v.z, v.w);
+	  setter.Parameter4fv (slot, param, &v.x);
+      }
+      break;
+    case CG_FLOAT3x3:
+      {
+	float matrix[9];
+	SVtoCgMatrix3x3 (var, matrix);
+        setter.MatrixParameter3x3 (slot, param, matrix);
       }
       break;
     case CG_FLOAT4x4:
       {
 	float matrix[16];
 	SVtoCgMatrix4x4 (var, matrix);
-	cgGLSetMatrixParameterfc (param, matrix);
+	setter.MatrixParameter4x4 (slot, param, matrix);
       }
       break;
     case CG_ARRAY:
       {
-	CGtype innerType = sparam->arrayInnerType;
 	if (var->GetArraySize () == 0) 
 	  break;
-
-	uint numElements = csMin ((uint)cgGetArraySize (param, 0), 
-				  sparam->arraySize);
-
+	  
+	size_t numElements = csMin (sparam->arrayItems.GetSize(),
+				    var->GetArraySize ());
 	if (numElements == 0) 
 	  break;
-
-	const csShaderVariable *cvar = var->GetArrayElement (0);
-	if (cvar == 0)
-	  break;
-	
-	CS_ALLOC_STACK_ARRAY (float, tmpArr, numElements * 16);
-	uint idx = 0;
-
-	switch (innerType)
+	  
+	for (size_t idx = 0; idx < numElements; idx++)
 	{
-	  case CG_FLOAT:
-	    {
-	      float f;
-	      for (idx = 0; idx < numElements; idx++)
-	      {
-		csShaderVariable *element =
-		  var->GetArrayElement (idx);
-		if (element != 0 && element->GetValue (f))
-		  tmpArr[idx] = f;
-	      }
-	      cgGLSetParameterArray1f (param, 0, numElements, tmpArr);
-	    }
-	    break;
-	  case CG_FLOAT2:
-	    {
-	      csVector2 v;
-	      for (idx = 0; idx < numElements; idx++)
-	      {
-		csShaderVariable *element =
-		  var->GetArrayElement (idx);
-		if (element != 0 && element->GetValue (v))
-		{
-		  tmpArr[2*idx+0] = v.x;
-		  tmpArr[2*idx+1] = v.y;
-		}
-	      }
-	      cgGLSetParameterArray2f (param, 0, numElements, tmpArr);
-	    }
-	    break;
-	  case CG_FLOAT3:
-	    {
-	      csVector3 v;
-	      for (idx = 0; idx < numElements; idx++)
-	      {
-		csShaderVariable *element =
-		  var->GetArrayElement (idx);
-		if (element != 0 && element->GetValue (v))
-		{
-		  tmpArr[3*idx+0] = v.x;
-		  tmpArr[3*idx+1] = v.y;
-		  tmpArr[3*idx+2] = v.z;
-		}
-	      }
-	      cgGLSetParameterArray3f (param, 0, numElements, tmpArr);
-	    }
-	    break;
-	  case CG_FLOAT4:
-	    {
-	      csVector4 v;
-	      for (idx = 0; idx < numElements; idx++)
-	      {
-		csShaderVariable *element =
-		  var->GetArrayElement (idx);
-		if (element != 0 && element->GetValue (v))
-		{
-		  tmpArr[4*idx+0] = v.x;
-		  tmpArr[4*idx+1] = v.y;
-		  tmpArr[4*idx+2] = v.z;
-		  tmpArr[4*idx+3] = v.w;
-		}
-	      }
-	      cgGLSetParameterArray4f (param, 0, numElements, tmpArr);
-	    }
-	    break;
-	  case CG_FLOAT3x3:
-	    {
-	      for (idx = 0; idx < numElements; idx++)
-	      {
-		csShaderVariable *element =
-		  var->GetArrayElement (idx);
-		if (element != 0)
-		{
-		  SVtoCgMatrix3x3 (element, &tmpArr[9*idx]);
-		}
-	      }
-	      cgGLSetMatrixParameterArrayfc (param, 0, numElements, tmpArr);
-	    }
-	    break;
-	  case CG_FLOAT4x4:
-	    {
-	      for (idx = 0; idx < numElements; idx++)
-	      {
-		csShaderVariable *element =
-		  var->GetArrayElement (idx);
-		if (element != 0)
-		{
-		  SVtoCgMatrix4x4 (element, &tmpArr[16*idx]);
-		}
-	      }
-	      cgGLSetMatrixParameterArrayfc (param, 0, numElements, tmpArr);
-	    }
-	    break;
-	  default:
-	    CS_ASSERT_MSG("Don't support CG param type (yet)", false);
+	  csShaderVariable *element =
+	    var->GetArrayElement (idx);
+	  if (element != 0)
+	    SetParameterValue (setter, sparam->arrayItems[idx], element);
 	}
       }
       break;
@@ -357,17 +274,16 @@ void csShaderGLCGCommon::SVtoCgMatrix4x4  (csShaderVariable* var, float* matrix)
   }
 }
 
-void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
-                                     CS::Graphics::RenderMeshModes& /*modes*/,
-                                     const csShaderVariableStack& stack)
+template<typename Array, typename ParamSetter>
+void csShaderGLCGCommon::ApplyVariableMapArray (const Array& array,
+                                                const ParamSetter& setter,
+                                                const csShaderVariableStack& stack)
 {
-  size_t i;
   csRef<csShaderVariable> var;
-
-  // set variables
-  for(i = 0; i < variablemap.GetSize (); ++i)
+  
+  for(size_t i = 0; i < array.GetSize (); ++i)
   {
-    VariableMapEntry& mapping = variablemap[i];
+    const VariableMapEntry& mapping = array[i];
     
     var = GetParamSV (stack, mapping.mappingParam);
     // If var is null now we have no const nor any passed value, ignore it
@@ -376,14 +292,155 @@ void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
 
     ShaderParameter* param =
       reinterpret_cast<ShaderParameter*> (mapping.userVal);
-    SetParameterValue (param, var);
+    SetParameterValue (setter, param, var);
+  }
+}
+
+struct SetterCg
+{
+  void Parameter1i (uint slot, CGparameter param, int v) const
+  { cgSetParameter1i (param, v); }
+  void Parameter1f (uint slot, CGparameter param, float v) const
+  { cgSetParameter1f (param, v); }
+  void Parameter2fv (uint slot, CGparameter param, float* v) const
+  { cgSetParameter2fv (param, v); }
+  void Parameter3fv (uint slot, CGparameter param, float* v) const
+  { cgSetParameter3fv (param, v); }
+  void Parameter4fv (uint slot, CGparameter param, float* v) const
+  { cgSetParameter4fv (param, v); }
+  void MatrixParameter3x3 (uint slot, CGparameter param, float* v) const
+  { cgGLSetMatrixParameterfc (param, v); }
+  void MatrixParameter4x4 (uint slot, CGparameter param, float* v) const
+  { cgGLSetMatrixParameterfc (param, v); }
+};
+
+template<GLenum Target, bool GP4Prog>
+struct SetterARB : public SetterCg
+{
+  csGLExtensionManager* ext;
+
+  SetterARB (csGLExtensionManager* ext) : ext (ext) {}
+
+  void Parameter1i (uint slot, CGparameter param, int v) const
+  {
+    if (slot == (uint)~0)
+      SetterCg::Parameter1i (slot, param, v);
+    else if (GP4Prog)
+      ext->glProgramLocalParameterI4iNV (Target, slot, v, 0, 0, 0);
+    else
+      ext->glProgramLocalParameter4fARB (Target, slot, v, 0, 0, 0);
+  }
+  void Parameter1f (uint slot, CGparameter param, float v) const
+  {
+    if (slot == (uint)~0)
+      SetterCg::Parameter1f (slot, param, v);
+    else
+      ext->glProgramLocalParameter4fARB (Target, slot, v, 0, 0, 0);
+  }
+  void Parameter2fv (uint slot, CGparameter param, float* v) const
+  {
+    if (slot == (uint)~0)
+      SetterCg::Parameter2fv (slot, param, v);
+    else
+      ext->glProgramLocalParameter4fARB (Target, slot, v[0], v[1], 0, 0);
+  }
+  void Parameter3fv (uint slot, CGparameter param, float* v) const
+  {
+    if (slot == (uint)~0)
+      SetterCg::Parameter3fv (slot, param, v);
+    else
+      ext->glProgramLocalParameter4fARB (Target, slot, v[0], v[1], v[2], 0);
+  }
+  void Parameter4fv (uint slot, CGparameter param, float* v) const
+  {
+    if (slot == (uint)~0)
+      SetterCg::Parameter4fv (slot, param, v);
+    else
+      ext->glProgramLocalParameter4fvARB (Target, slot, v);
+  }
+  void MatrixParameter3x3 (uint slot, CGparameter param, float* v) const
+  {
+    if (slot == (uint)~0)
+      SetterCg::MatrixParameter4x4 (slot, param, v);
+    else
+    {
+      float m4x4[16];
+      m4x4[0] = v[0]; m4x4[1] = v[1]; m4x4[2] = v[2]; m4x4[3] = 0;
+      m4x4[4] = v[3]; m4x4[5] = v[4]; m4x4[6] = v[5]; m4x4[7] = 0;
+      m4x4[8] = v[6]; m4x4[9] = v[7]; m4x4[10] = v[8]; m4x4[11] = 0;
+      m4x4[12] = 0; m4x4[13] = 0; m4x4[14] = 0; m4x4[15] = 1;
+    
+      if (ext->CS_GL_EXT_gpu_program_parameters)
+        ext->glProgramLocalParameters4fvEXT (Target, slot, 4, m4x4);
+      else
+      {
+	for (int i = 0; i < 4; i++)
+	  ext->glProgramLocalParameter4fvARB (Target, slot+i, m4x4+i*4);
+      }
+    }
+  }
+  void MatrixParameter4x4 (uint slot, CGparameter param, float* v) const
+  {
+    if (slot == (uint)~0)
+      SetterCg::MatrixParameter4x4 (slot, param, v);
+    else
+    {
+      if (ext->CS_GL_EXT_gpu_program_parameters)
+        ext->glProgramLocalParameters4fvEXT (Target, slot, 4, v);
+      else
+      {
+	for (int i = 0; i < 4; i++)
+	  ext->glProgramLocalParameter4fvARB (Target, slot+i, v+i*4);
+      }
+    }
+  }
+};
+
+void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
+                                     CS::Graphics::RenderMeshModes& /*modes*/,
+                                     const csShaderVariableStack& stack)
+{
+  // set variables
+  if ((programType == progVP) && (programProfile >= CG_PROFILE_ARBVP1))
+  {
+    if (programProfile >= CG_PROFILE_GPU_VP)
+    {
+      SetterARB<GL_VERTEX_PROGRAM_ARB, true> setter (shaderPlug->ext);
+      ApplyVariableMapArray (variablemap, setter, stack);
+    }
+    else
+    {
+      SetterARB<GL_VERTEX_PROGRAM_ARB, false> setter (shaderPlug->ext);
+      ApplyVariableMapArray (variablemap, setter, stack);
+    }
+  }
+  else if ((programType == progFP) && (programProfile >= CG_PROFILE_ARBFP1))
+  {
+    if (programProfile >= CG_PROFILE_GPU_FP)
+    {
+      SetterARB<GL_FRAGMENT_PROGRAM_ARB, true> setter (shaderPlug->ext);
+      ApplyVariableMapArray (variablemap, setter, stack);
+    }
+    else
+    {
+      SetterARB<GL_FRAGMENT_PROGRAM_ARB, false> setter (shaderPlug->ext);
+      ApplyVariableMapArray (variablemap, setter, stack);
+    }
+  }
+  else
+  {
+    SetterCg setter;
+    ApplyVariableMapArray (variablemap, setter, stack);
   }
   
   /* "Assumed constant" parameters are set here b/c all needed shader 
    * vars are available */
   if (assumedConstParams != 0)
   {
-    for(i = 0; i < assumedConstParams->GetSize (); ++i)
+    csRef<csShaderVariable> var;
+  
+    SetterCg setter;
+    for(size_t i = 0; i < assumedConstParams->GetSize (); ++i)
     {
       VariableMapEntry& mapping = assumedConstParams->Get (i);
       
@@ -394,14 +451,15 @@ void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
   
       ShaderParameter* param =
 	reinterpret_cast<ShaderParameter*> (mapping.userVal);
-      SetParameterValue (param, var);
+      SetParameterValue (setter, param, var);
       cgSetParameterVariability (param->param, CG_LITERAL);
-      shaderPlug->paramAlloc.Free (param);
+      FreeShaderParam (param);
     }
     delete assumedConstParams; assumedConstParams = 0;
     cgCompileProgram (program);
     if (shaderPlug->debugDump)
       DoDebugDump();
+    PostCompileVmapProcess ();
   }
 }
 
@@ -429,6 +487,101 @@ void csShaderGLCGCommon::EnsureDumpFile()
     debugFN = filename;
     vfs->DeleteFile (debugFN);
   }
+}
+
+void csShaderGLCGCommon::FreeShaderParam (ShaderParameter* sparam)
+{
+  if (sparam == 0) return;
+  for (size_t i = 0; i < sparam->arrayItems.GetSize(); i++)
+  {
+    FreeShaderParam (sparam->arrayItems[i]);
+  }
+  shaderPlug->paramAlloc.Free (sparam);
+}
+
+void csShaderGLCGCommon::FillShaderParam (ShaderParameter* sparam, 
+                                          CGparameter param)
+{
+  sparam->param = param;
+  sparam->paramType = cgGetParameterType (param);
+  if (sparam->paramType == CG_ARRAY)
+  {
+    size_t arraySize = cgGetArraySize (param, 0);
+    for (size_t i = arraySize; i-- > 0; )
+    {
+      CGparameter element = cgGetArrayParameter (param, int (i));
+      ShaderParameter* newsparam = shaderPlug->paramAlloc.Alloc();
+      FillShaderParam (newsparam, element);
+      sparam->arrayItems.Put (i, newsparam);
+    }
+  }
+}
+
+void csShaderGLCGCommon::GetShaderParamSlot (ShaderParameter* sparam)
+{
+  if (cgGetParameterType (sparam->param) != CG_ARRAY)
+  {
+    CGresource rsc = cgGetParameterResource (sparam->param);
+    if ((rsc == CG_C) || (rsc == CG_GLSL_UNIFORM))
+    {
+      sparam->baseSlot = cgGetParameterResourceIndex (sparam->param);
+    }
+  }
+  for (size_t i = 0; i < sparam->arrayItems.GetSize(); i++)
+  {
+    if (sparam->arrayItems[i] != 0)
+      GetShaderParamSlot (sparam->arrayItems[i]);
+  }
+}
+
+void csShaderGLCGCommon::PostCompileVmapProcess ()
+{
+  for(size_t i = 0; i < variablemap.GetSize (); )
+  {
+    VariableMapEntry& mapping = variablemap[i];
+    ShaderParameter* sparam =
+      reinterpret_cast<ShaderParameter*> (mapping.userVal);
+    
+    if (!PostCompileVmapProcess (sparam))
+    {
+      variablemap.DeleteIndex (i);
+      FreeShaderParam (sparam);
+      continue;
+    }
+    
+    GetShaderParamSlot (sparam);
+    ++i;
+  }
+}
+
+bool csShaderGLCGCommon::PostCompileVmapProcess (ShaderParameter* sparam)
+{
+  CGparameter param = sparam->param;
+  if (sparam->paramType == CG_ARRAY)
+  {
+    bool ret = false;
+    for (size_t i = sparam->arrayItems.GetSize(); i-- > 0; )
+    {
+      if (!PostCompileVmapProcess (sparam->arrayItems[i]))
+      {
+        if (i == sparam->arrayItems.GetSize()-1)
+          sparam->arrayItems.Truncate (i);
+        else
+        {
+          FreeShaderParam (sparam->arrayItems[i]);
+          sparam->arrayItems[i] = 0;
+        }
+      }
+      else
+      {
+        ret |= true;
+      }
+    }
+    if (ret) sparam->arrayItems.ShrinkBestFit();
+    return ret;
+  }
+  else
+    return cgIsParameterReferenced (param);
 }
 
 bool csShaderGLCGCommon::DefaultLoadProgram (
@@ -519,28 +672,25 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
 
   if (flags & loadApplyVmap)
   {
+    SetterCg setter;
+  
     i = 0;
     while (i < variablemap.GetSize ())
     {
       // Get the Cg parameter
       CGparameter param = cgGetNamedParameter (program, 
 	variablemap[i].destination);
-  
-      if (!param ||
-	  (cgGetParameterType (param) != CG_ARRAY && !cgIsParameterReferenced (param)))
-      {
-	variablemap.DeleteIndex (i);
-	continue;
-      }
       ShaderParameter* sparam =
 	reinterpret_cast<ShaderParameter*> (variablemap[i].userVal);
-      sparam->param = param;
-      sparam->paramType = cgGetParameterType (param);
-      if (sparam->paramType == CG_ARRAY)
+  
+      if (!param /*||
+	  (cgGetParameterType (param) != CG_ARRAY && !cgIsParameterReferenced (param))*/)
       {
-        sparam->arrayInnerType = cgGetArrayType (param);
-        sparam->arraySize = cgGetArraySize (param, 0);
+	variablemap.DeleteIndex (i);
+	FreeShaderParam (sparam);
+	continue;
       }
+      FillShaderParam (sparam, param);
       bool assumeConst = sparam->assumeConstant;
       if (assumeConst)
       {
@@ -555,10 +705,10 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
       {
 	csShaderVariable* var = variablemap[i].mappingParam.var;
 	if (var != 0)
-	  SetParameterValue (sparam, var);
+	  SetParameterValue (setter, sparam, var);
 	cgSetParameterVariability (param, CG_LITERAL);
 	variablemap.DeleteIndex (i);
-	shaderPlug->paramAlloc.Free (sparam);
+	FreeShaderParam (sparam);
 	continue;
       }
       i++;
@@ -567,15 +717,15 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
     variablemap.ShrinkBestFit();
   }
 
-  if (assumedConstParams == 0)
-  {
-    if (flags & loadIgnoreErrors) shaderPlug->SetIgnoreErrors (true);
-    cgCompileProgram (program);
-    if (flags & loadIgnoreErrors)
-      shaderPlug->SetIgnoreErrors (false);
-    else
-      shaderPlug->PrintAnyListing();
-  }
+  if (flags & loadIgnoreErrors) shaderPlug->SetIgnoreErrors (true);
+  cgCompileProgram (program);
+  if (flags & loadIgnoreErrors)
+    shaderPlug->SetIgnoreErrors (false);
+  else
+    shaderPlug->PrintAnyListing();
+  
+  if (flags & loadApplyVmap)
+    PostCompileVmapProcess ();
 
   if (flags & loadLoadToGL)
   {
@@ -752,7 +902,7 @@ bool csShaderGLCGCommon::Load (iShaderDestinationResolver* resolve,
   csRef<iShaderManager> shadermgr = 
   	csQueryRegistry<iShaderManager> (shaderPlug->object_reg);
 
-  const char* progTypeNode;
+  const char* progTypeNode = 0;
   switch (programType)
   {
     case progVP: progTypeNode = "cgvp"; break;

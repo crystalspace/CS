@@ -47,13 +47,16 @@ class csGLShader_CG;
   {
     bool assumeConstant;
     CGparameter param;
+    uint baseSlot;
     CGtype paramType;
-    CGtype arrayInnerType;
-    uint arraySize;
+    csArray<ShaderParameter*> arrayItems;
     
     ShaderParameter() : assumeConstant (false), param (0),
-      paramType ((CGtype)0), arrayInnerType ((CGtype)0), arraySize (0) {}
+      baseSlot ((uint)~0),
+      paramType ((CGtype)0) {}
   };
+  
+  class ParamValueCache;
 
 class csShaderGLCGCommon : public scfImplementationExt1<csShaderGLCGCommon,
                                                         csShaderProgram,
@@ -88,6 +91,12 @@ protected:
   csString debugFN;
   void EnsureDumpFile();
 
+  void FreeShaderParam (ShaderParameter* sparam);
+  void FillShaderParam (ShaderParameter* sparam, CGparameter param);
+  void GetShaderParamSlot (ShaderParameter* sparam);
+  void PostCompileVmapProcess ();
+  bool PostCompileVmapProcess (ShaderParameter* sparam);
+
   enum
   {
     loadPrecompiled = 1,
@@ -110,10 +119,16 @@ protected:
     return 0;
   }
   void CollectUnusedParameters (csSet<csString>& unusedParams);
-  void SetParameterValue (ShaderParameter* sparam, csShaderVariable* var);
+  template<typename Setter>
+  void SetParameterValue (const Setter& setter,
+    ShaderParameter* sparam, csShaderVariable* var);
   
   void SVtoCgMatrix3x3 (csShaderVariable* var, float* matrix);
   void SVtoCgMatrix4x4 (csShaderVariable* var, float* matrix);
+
+  template<typename Array, typename ParamSetter>
+  void ApplyVariableMapArray (const Array& array, const ParamSetter& setter,
+    const csShaderVariableStack& stack);
 public:
   CS_LEAKGUARD_DECLARE (csShaderGLCGCommon);
 

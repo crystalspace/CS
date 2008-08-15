@@ -2429,10 +2429,10 @@ struct LightCollectPoint
     : lightArray (lightArray), pos (pos)
   {}
 
-  void operator() (const csSectorLightList::LightAABBTree::Node* node)
+  bool operator() (const csSectorLightList::LightAABBTree::Node* node)
   {
     if (!node->GetBBox ().In (pos))
-      return;
+      return true;
 
     for (size_t i = 0; i < node->GetObjectCount (); ++i)
     {
@@ -2445,6 +2445,7 @@ struct LightCollectPoint
         lightArray->AddLight (light, sqdist);
       }
     }
+    return false;
   }
 
   csLightArray* lightArray;
@@ -2471,10 +2472,10 @@ struct LightCollectBox
     : lightArray (lightArray), box (box)
   {}
 
-  void operator() (const csSectorLightList::LightAABBTree::Node* node)
+  bool operator() (const csSectorLightList::LightAABBTree::Node* node)
   {
     if (!node->GetBBox ().TestIntersect (box))
-      return;
+      return true;
 
     for (size_t i = 0; i < node->GetObjectCount (); ++i)
     {
@@ -2487,6 +2488,7 @@ struct LightCollectBox
         lightArray->AddLight (light, sqdist);
       }
     }
+    return true;
   }
 
   csLightArray* lightArray;

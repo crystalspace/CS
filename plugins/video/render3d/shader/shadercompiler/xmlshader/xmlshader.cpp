@@ -122,6 +122,9 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
   doDumpValues = config->GetBool ("Video.XMLShader.DumpPossibleValues");
   debugInstrProcessing = 
     config->GetBool ("Video.XMLShader.DebugInstructionProcessing");
+    
+  sharedEvaluator.AttachNew (new csConditionEvaluator (stringsSvName,
+    condConstants));
 
   return true;
 }

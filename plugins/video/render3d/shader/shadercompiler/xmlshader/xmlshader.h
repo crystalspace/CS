@@ -95,6 +95,8 @@ public:
   /// Condition constants
   csConditionConstants condConstants;
   
+  csRef<csConditionEvaluator> sharedEvaluator;
+  
   csRef<iDocumentSystem> binDocSys;
   csRef<iDocumentSystem> xmlDocSys;
   

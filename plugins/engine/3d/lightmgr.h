@@ -19,6 +19,7 @@
 #ifndef __CS_CSENGINE_LIGHTMGR_H__
 #define __CS_CSENGINE_LIGHTMGR_H__
 
+#include "csutil/fixedsizeallocator.h"
 #include "csutil/scf_implementation.h"
 #include "iengine/lightmgr.h"
 
@@ -29,7 +30,13 @@ class csLightManager : public scfImplementation1<csLightManager,
                                                  iLightManager>
 {
 private:
-
+  bool tempInfluencesUsed;
+  typedef csDirtyAccessArray<csLightInfluence,
+    csArrayElementHandler<csLightInfluence>,
+    CS::Memory::LocalBufferAllocator<csLightInfluence, 16, 
+      CS::Memory::AllocatorMalloc, true> >
+  TempInfluences;
+  TempInfluences tempInfluences;
 public:
   csLightManager ();
   virtual ~csLightManager ();

@@ -72,7 +72,7 @@
     </block>
     
     <block location="cg:fragmentMain">
-      <?if vars."tex diffuse".texture?>
+      <?if vars."tex specular".texture?>
         specularColor = tex2D (texSpecular, texCoord).rgb;
 	specularColor_attr_perfragment = true;
       <?else?>
