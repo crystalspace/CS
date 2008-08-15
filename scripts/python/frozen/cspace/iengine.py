@@ -282,9 +282,9 @@ iLightIterator_scfGetVersion = _iengine.iLightIterator_scfGetVersion
 
 CS_FOG_MODE_NONE = _iengine.CS_FOG_MODE_NONE
 CS_FOG_MODE_LINEAR = _iengine.CS_FOG_MODE_LINEAR
+CS_FOG_MODE_CRYSTALSPACE = _iengine.CS_FOG_MODE_CRYSTALSPACE
 CS_FOG_MODE_EXP = _iengine.CS_FOG_MODE_EXP
 CS_FOG_MODE_EXP2 = _iengine.CS_FOG_MODE_EXP2
-CS_FOG_MODE_CRYSTALSPACE = _iengine.CS_FOG_MODE_CRYSTALSPACE
 class csFog(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
@@ -292,6 +292,7 @@ class csFog(object):
     color = _swig_property(_iengine.csFog_color_get, _iengine.csFog_color_set)
     start = _swig_property(_iengine.csFog_start_get, _iengine.csFog_start_set)
     end = _swig_property(_iengine.csFog_end_get, _iengine.csFog_end_set)
+    limit = _swig_property(_iengine.csFog_limit_get, _iengine.csFog_limit_set)
     mode = _swig_property(_iengine.csFog_mode_get, _iengine.csFog_mode_set)
     def __init__(self, *args): 
         this = _iengine.new_csFog(*args)
@@ -349,6 +350,21 @@ class csSectorHitBeamResult(object):
 csSectorHitBeamResult_swigregister = _iengine.csSectorHitBeamResult_swigregister
 csSectorHitBeamResult_swigregister(csSectorHitBeamResult)
 
+class csSectorVisibleRenderMeshes(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    imesh = _swig_property(_iengine.csSectorVisibleRenderMeshes_imesh_get, _iengine.csSectorVisibleRenderMeshes_imesh_set)
+    num = _swig_property(_iengine.csSectorVisibleRenderMeshes_num_get, _iengine.csSectorVisibleRenderMeshes_num_set)
+    rmeshes = _swig_property(_iengine.csSectorVisibleRenderMeshes_rmeshes_get, _iengine.csSectorVisibleRenderMeshes_rmeshes_set)
+    def __init__(self, *args): 
+        this = _iengine.new_csSectorVisibleRenderMeshes(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _iengine.delete_csSectorVisibleRenderMeshes
+    __del__ = lambda self : None;
+csSectorVisibleRenderMeshes_swigregister = _iengine.csSectorVisibleRenderMeshes_swigregister
+csSectorVisibleRenderMeshes_swigregister(csSectorVisibleRenderMeshes)
+
 class iSector(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
@@ -400,6 +416,7 @@ class iSector(core.iBase):
     def GetSVContext(*args): return _iengine.iSector_GetSVContext(*args)
     def PrecacheDraw(*args): return _iengine.iSector_PrecacheDraw(*args)
     def CallSectorCallbacks(*args): return _iengine.iSector_CallSectorCallbacks(*args)
+    def GetVisibleRenderMeshes(*args): return _iengine.iSector_GetVisibleRenderMeshes(*args)
     scfGetVersion = staticmethod(_iengine.iSector_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iSector
     __del__ = lambda self : None;
@@ -487,7 +504,6 @@ class iEngine(core.iBase):
     def Prepare(*args): return _iengine.iEngine_Prepare(*args)
     def PrepareTextures(*args): return _iengine.iEngine_PrepareTextures(*args)
     def PrepareMeshes(*args): return _iengine.iEngine_PrepareMeshes(*args)
-    def ForceRelight(*args): return _iengine.iEngine_ForceRelight(*args)
     def ShineLights(*args): return _iengine.iEngine_ShineLights(*args)
     def SetLightingCacheMode(*args): return _iengine.iEngine_SetLightingCacheMode(*args)
     def GetLightingCacheMode(*args): return _iengine.iEngine_GetLightingCacheMode(*args)
@@ -513,21 +529,15 @@ class iEngine(core.iBase):
     def CreateMaterial(*args): return _iengine.iEngine_CreateMaterial(*args)
     def GetMaterialList(*args): return _iengine.iEngine_GetMaterialList(*args)
     def FindMaterial(*args): return _iengine.iEngine_FindMaterial(*args)
-    def FindMaterialRegion(*args): return _iengine.iEngine_FindMaterialRegion(*args)
-    def FindMaterialCollection(*args): return _iengine.iEngine_FindMaterialCollection(*args)
     def CreateTexture(*args): return _iengine.iEngine_CreateTexture(*args)
     def CreateBlackTexture(*args): return _iengine.iEngine_CreateBlackTexture(*args)
     def GetTextureFormat(*args): return _iengine.iEngine_GetTextureFormat(*args)
     def GetTextureList(*args): return _iengine.iEngine_GetTextureList(*args)
     def FindTexture(*args): return _iengine.iEngine_FindTexture(*args)
-    def FindTextureRegion(*args): return _iengine.iEngine_FindTextureRegion(*args)
-    def FindTextureCollection(*args): return _iengine.iEngine_FindTextureCollection(*args)
     def CreateLight(*args): return _iengine.iEngine_CreateLight(*args)
     def FindLight(*args): return _iengine.iEngine_FindLight(*args)
     def FindLightID(*args): return _iengine.iEngine_FindLightID(*args)
     def GetLightIterator(*args): return _iengine.iEngine_GetLightIterator(*args)
-    def GetLightIteratorRegion(*args): return _iengine.iEngine_GetLightIteratorRegion(*args)
-    def GetLightIteratorCollection(*args): return _iengine.iEngine_GetLightIteratorCollection(*args)
     def RemoveLight(*args): return _iengine.iEngine_RemoveLight(*args)
     def SetAmbientLight(*args): return _iengine.iEngine_SetAmbientLight(*args)
     def GetAmbientLight(*args): return _iengine.iEngine_GetAmbientLight(*args)
@@ -536,8 +546,6 @@ class iEngine(core.iBase):
     def CreateSector(*args): return _iengine.iEngine_CreateSector(*args)
     def GetSectors(*args): return _iengine.iEngine_GetSectors(*args)
     def FindSector(*args): return _iengine.iEngine_FindSector(*args)
-    def FindSectorRegion(*args): return _iengine.iEngine_FindSectorRegion(*args)
-    def FindSectorCollection(*args): return _iengine.iEngine_FindSectorCollection(*args)
     def GetNearbySectors(*args): return _iengine.iEngine_GetNearbySectors(*args)
     def AddEngineFrameCallback(*args): return _iengine.iEngine_AddEngineFrameCallback(*args)
     def RemoveEngineFrameCallback(*args): return _iengine.iEngine_RemoveEngineFrameCallback(*args)
@@ -551,17 +559,11 @@ class iEngine(core.iBase):
     def GetNearbyMeshes(*args): return _iengine.iEngine_GetNearbyMeshes(*args)
     def GetMeshes(*args): return _iengine.iEngine_GetMeshes(*args)
     def FindMeshObject(*args): return _iengine.iEngine_FindMeshObject(*args)
-    def FindMeshObjectRegion(*args): return _iengine.iEngine_FindMeshObjectRegion(*args)
-    def FindMeshObjectCollection(*args): return _iengine.iEngine_FindMeshObjectCollection(*args)
     def WantToDie(*args): return _iengine.iEngine_WantToDie(*args)
     def CreateMeshFactory(*args): return _iengine.iEngine_CreateMeshFactory(*args)
     def LoadMeshFactory(*args): return _iengine.iEngine_LoadMeshFactory(*args)
     def FindMeshFactory(*args): return _iengine.iEngine_FindMeshFactory(*args)
-    def FindMeshFactoryRegion(*args): return _iengine.iEngine_FindMeshFactoryRegion(*args)
-    def FindMeshFactoryCollection(*args): return _iengine.iEngine_FindMeshFactoryCollection(*args)
     def GetMeshFactories(*args): return _iengine.iEngine_GetMeshFactories(*args)
-    def CreateRegion(*args): return _iengine.iEngine_CreateRegion(*args)
-    def GetRegions(*args): return _iengine.iEngine_GetRegions(*args)
     def CreateCollection(*args): return _iengine.iEngine_CreateCollection(*args)
     def GetCollection(*args): return _iengine.iEngine_GetCollection(*args)
     def GetCollections(*args): return _iengine.iEngine_GetCollections(*args)
@@ -569,8 +571,6 @@ class iEngine(core.iBase):
     def RemoveAllCollections(*args): return _iengine.iEngine_RemoveAllCollections(*args)
     def CreateCamera(*args): return _iengine.iEngine_CreateCamera(*args)
     def FindCameraPosition(*args): return _iengine.iEngine_FindCameraPosition(*args)
-    def FindCameraPositionRegion(*args): return _iengine.iEngine_FindCameraPositionRegion(*args)
-    def FindCameraPositionCollection(*args): return _iengine.iEngine_FindCameraPositionCollection(*args)
     def GetCameraPositions(*args): return _iengine.iEngine_GetCameraPositions(*args)
     def CreatePortal(*args): return _iengine.iEngine_CreatePortal(*args)
     def CreatePortalContainer(*args): return _iengine.iEngine_CreatePortalContainer(*args)
@@ -583,8 +583,6 @@ class iEngine(core.iBase):
     def GetBeginDrawFlags(*args): return _iengine.iEngine_GetBeginDrawFlags(*args)
     def GetTopLevelClipper(*args): return _iengine.iEngine_GetTopLevelClipper(*args)
     def PrecacheDraw(*args): return _iengine.iEngine_PrecacheDraw(*args)
-    def PrecacheDrawCollection(*args): return _iengine.iEngine_PrecacheDrawCollection(*args)
-    def PrecacheDrawRegion(*args): return _iengine.iEngine_PrecacheDrawRegion(*args)
     def Draw(*args): return _iengine.iEngine_Draw(*args)
     def SetContext(*args): return _iengine.iEngine_SetContext(*args)
     def GetContext(*args): return _iengine.iEngine_GetContext(*args)
@@ -1212,56 +1210,6 @@ class iMovable(core.iBase):
 iMovable_swigregister = _iengine.iMovable_swigregister
 iMovable_swigregister(iMovable)
 iMovable_scfGetVersion = _iengine.iMovable_scfGetVersion
-
-class iRegion(core.iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def QueryObject(*args): return _iengine.iRegion_QueryObject(*args)
-    def Add(*args): return _iengine.iRegion_Add(*args)
-    def Remove(*args): return _iengine.iRegion_Remove(*args)
-    def Clear(*args): return _iengine.iRegion_Clear(*args)
-    def DeleteAll(*args): return _iengine.iRegion_DeleteAll(*args)
-    def PrepareTextures(*args): return _iengine.iRegion_PrepareTextures(*args)
-    def ShineLights(*args): return _iengine.iRegion_ShineLights(*args)
-    def Prepare(*args): return _iengine.iRegion_Prepare(*args)
-    def FindSector(*args): return _iengine.iRegion_FindSector(*args)
-    def FindMeshObject(*args): return _iengine.iRegion_FindMeshObject(*args)
-    def FindMeshFactory(*args): return _iengine.iRegion_FindMeshFactory(*args)
-    def FindTexture(*args): return _iengine.iRegion_FindTexture(*args)
-    def FindMaterial(*args): return _iengine.iRegion_FindMaterial(*args)
-    def FindShader(*args): return _iengine.iRegion_FindShader(*args)
-    def FindCameraPosition(*args): return _iengine.iRegion_FindCameraPosition(*args)
-    def IsInRegion(*args): return _iengine.iRegion_IsInRegion(*args)
-    __swig_destroy__ = _iengine.delete_iRegion
-    __del__ = lambda self : None;
-iRegion_swigregister = _iengine.iRegion_swigregister
-iRegion_swigregister(iRegion)
-
-class iRegionList(core.iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def GetCount(*args): return _iengine.iRegionList_GetCount(*args)
-    def Get(*args): return _iengine.iRegionList_Get(*args)
-    def Add(*args): return _iengine.iRegionList_Add(*args)
-    def Remove(*args): return _iengine.iRegionList_Remove(*args)
-    def RemoveAll(*args): return _iengine.iRegionList_RemoveAll(*args)
-    def Find(*args): return _iengine.iRegionList_Find(*args)
-    def FindByName(*args): return _iengine.iRegionList_FindByName(*args)
-    def __delitem__(*args): return _iengine.iRegionList___delitem__(*args)
-    def __len__(*args): return _iengine.iRegionList___len__(*args)
-    def append(*args): return _iengine.iRegionList_append(*args)
-    def content_iterator(self):
-            for idx in xrange(len(self)):
-                    yield self.__getitem__(idx)
-    def __iter__(self): return self.content_iterator()  
-    def __getitem__(*args): return _iengine.iRegionList___getitem__(*args)
-    def __contains__(*args): return _iengine.iRegionList___contains__(*args)
-    __swig_destroy__ = _iengine.delete_iRegionList
-    __del__ = lambda self : None;
-iRegionList_swigregister = _iengine.iRegionList_swigregister
-iRegionList_swigregister(iRegionList)
 
 class iVisibilityObjectIterator(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')

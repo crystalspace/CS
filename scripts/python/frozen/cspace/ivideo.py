@@ -207,6 +207,7 @@ CSDRAW_2DGRAPHICS = _ivideo.CSDRAW_2DGRAPHICS
 CSDRAW_3DGRAPHICS = _ivideo.CSDRAW_3DGRAPHICS
 CSDRAW_CLEARZBUFFER = _ivideo.CSDRAW_CLEARZBUFFER
 CSDRAW_CLEARSCREEN = _ivideo.CSDRAW_CLEARSCREEN
+CSDRAW_NOCLIPCLEAR = _ivideo.CSDRAW_NOCLIPCLEAR
 CS_CLIPPER_NONE = _ivideo.CS_CLIPPER_NONE
 CS_CLIPPER_OPTIONAL = _ivideo.CS_CLIPPER_OPTIONAL
 CS_CLIPPER_TOPLEVEL = _ivideo.CS_CLIPPER_TOPLEVEL
@@ -816,6 +817,7 @@ class iShaderCompiler(core.iBase):
     def ValidateTemplate(*args): return _ivideo.iShaderCompiler_ValidateTemplate(*args)
     def IsTemplateToCompiler(*args): return _ivideo.iShaderCompiler_IsTemplateToCompiler(*args)
     def GetPriorities(*args): return _ivideo.iShaderCompiler_GetPriorities(*args)
+    def PrecacheShader(*args): return _ivideo.iShaderCompiler_PrecacheShader(*args)
     __swig_destroy__ = _ivideo.delete_iShaderCompiler
     __del__ = lambda self : None;
 iShaderCompiler_swigregister = _ivideo.iShaderCompiler_swigregister

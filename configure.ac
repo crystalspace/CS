@@ -147,7 +147,7 @@ CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [$LDFLAGS], [+])
 
 
 #------------------------------------------------------------------------------
-# Check for typical required libraries (libm, libmx, libdl, libnsl).
+# Check for typical required libraries (libc, libm, libmx, libdl, libnsl).
 #------------------------------------------------------------------------------
 AC_LANG_PUSH([C++])
 AC_CHECK_HEADERS([cmath], [CS_HEADER_PROPERTY([CS_HAVE_CMATH_H])])
@@ -157,15 +157,8 @@ AC_LANG_POP([C++])
 
 CS_CHECK_COMMON_LIBS
 
-AS_IF([test $ac_cv_lib_m_pow = yes || test $ac_cv_lib_m_cosf = yes],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lm], [+])])
-AS_IF([test $ac_cv_lib_mx_cosf = yes],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lmx], [+])])
 AS_IF([test $ac_cv_lib_dl_dlopen = yes],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-ldl], [+])
-    AC_CHECK_LIB([dl], [dladdr], [CS_HEADER_PROPERTY([CS_HAVE_DLADDR])])])
-AS_IF([test $ac_cv_lib_nsl_gethostbyname = yes],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lnsl], [+])])
+    [AC_CHECK_LIB([dl], [dladdr], [CS_HEADER_PROPERTY([CS_HAVE_DLADDR])])])
 
 AS_IF([test $ac_cv_lib_m_cosf != no || test $ac_cv_lib_mx_cosf != no],
     [CS_HEADER_PROPERTY([CS_HAVE_MATH_H_FLOAT_FUNCS])])
@@ -221,26 +214,33 @@ AC_DEFUN([CS_CHECK_RTLD],
 
 CS_CHECK_RTLD
 
+
+
 #------------------------------------------------------------------------------
 # Check for SIMD flags
 #------------------------------------------------------------------------------
-
-CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx], [CS_CREATE_TUPLE([-mmmx])])
-CS_CHECK_BUILD_FLAGS([for -msse flag], [cs_cv_prog_cc_msse], [CS_CREATE_TUPLE([-msse])])
-CS_CHECK_BUILD_FLAGS([for -msse2 flag], [cs_cv_prog_cc_msse2], [CS_CREATE_TUPLE([-msse2])])
+CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx],
+    [CS_CREATE_TUPLE([-mmmx])])
+CS_CHECK_BUILD_FLAGS([for -msse flag], [cs_cv_prog_cc_msse],
+    [CS_CREATE_TUPLE([-msse])])
+CS_CHECK_BUILD_FLAGS([for -msse2 flag], [cs_cv_prog_cc_msse2],
+    [CS_CREATE_TUPLE([-msse2])])
+CS_CHECK_BUILD_FLAGS([for -mfpmath=sse flag], [cs_cv_prog_cc_mfpmath_sse],
+    [CS_CREATE_TUPLE([-mfpmath=sse])])
 
 AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],[+])])
 
-
 AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
-    [CS_CHECK_BUILD([checking for mmintrin.h],
+    [CS_CHECK_BUILD([for mmintrin.h],
         [cs_cv_header_mmintrin_h],
         [AC_LANG_PROGRAM([[#include <mmintrin.h>]], [])],
         [CS_CREATE_TUPLE([$cs_cv_prog_cc_mmmx])],
         [C++],
         [CS_HEADER_PROPERTY([CS_SUPPORTS_MMX])
         CS_EMIT_BUILD_PROPERTY([CS_SUPPORTS_MMX], [yes])])])
+
+
 
 #------------------------------------------------------------------------------
 # Determine host platform.  Recognized platforms: Unix, Windows, Mac OS X.
@@ -264,9 +264,10 @@ case $cs_host_target in
              [$cs_cv_prog_cc_msse], [+])])
         AS_IF([test -n "$cs_cv_prog_cc_msse2"],
             [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
-             [$cs_cv_prog_cc_msse2], [+])
-	     CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
-	     ["-mfpmath=sse"], [+])])
+             [$cs_cv_prog_cc_msse2], [+])])
+        AS_IF([test -n "$cs_cv_prog_cc_mfpmath_sse"],
+            [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
+             [$cs_cv_prog_cc_mfpmath_sse], [+])])
         ;;
 esac
 case $cs_host_family in
@@ -280,25 +281,6 @@ case $cs_host_family in
 CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
     [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
 
-
-#------------------------------------------------------------------------------
-# Check for SIMD flags
-#------------------------------------------------------------------------------
-
-CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx], 
-    [CS_CREATE_TUPLE([-mmmx])])
-AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],[+])])
-
-
-AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
-    [CS_CHECK_BUILD([checking for mmintrin.h],
-        [cs_cv_header_mmintrin_h],
-        [AC_LANG_PROGRAM([[#include <mmintrin.h>]], [])],
-        [CS_CREATE_TUPLE([$cs_cv_prog_cc_mmmx])],
-        [C++],
-        [CS_HEADER_PROPERTY([CS_SUPPORTS_MMX])
-        CS_EMIT_BUILD_PROPERTY([CS_SUPPORTS_MMX], [yes])])])
 
 
 #------------------------------------------------------------------------------
@@ -1677,7 +1659,8 @@ AC_DEFUN([CS_CHECK_LIBCG],
     AS_IF([test $cs_cv_libCg = yes],
 	[CS_CHECK_BUILD([if Cg is sufficiently recent], [cs_cv_libCg_recent],
 	    [AC_LANG_PROGRAM(
-	    	[[#include <Cg/cg.h>]], [cgSetErrorHandler(0,0);])],
+	    	[[#include <Cg/cg.h>]], [cgSetErrorHandler(0,0);
+	    	CGprofile profile = CG_PROFILE_GPU_VP])],
 	    [], [C++], [], [], [],
 	    [$cs_cv_libCg_cflags],
 	    [$cs_cv_libCg_lflags],
@@ -1840,12 +1823,17 @@ CS_CHECK_BUILD([for _aligned_malloc], [cs_cv__aligned_malloc],
     [], [],
     [CS_HEADER_PROPERTY([CS_HAVE__ALIGNED_MALLOC])])
     
-CS_CHECK_BUILD([for sysinfo()], [cs_cv_sysinfo],
-    [AC_LANG_PROGRAM(
-	[[#include <sys/sysinfo.h>]],
-	[struct sysinfo x; sysinfo(&x);])],
-    [],[],
-    [CS_HEADER_PROPERTY([CS_HAVE_SYSINFO])])
+AC_CHECK_HEADERS([sys/sysinfo.h],
+    [CS_HEADER_PROPERTY([CS_HAVE_SYS_SYSINFO_H])
+    CS_CHECK_BUILD([for sysinfo()], [cs_cv_sysinfo],
+	[AC_LANG_PROGRAM(
+	    [[#include <sys/sysinfo.h>]],
+	    [struct sysinfo x; sysinfo(&x);])],
+	[],[],
+	[CS_HEADER_PROPERTY([CS_HAVE_SYSINFO])])
+    AC_CHECK_MEMBERS([struct sysinfo.totalram],
+        [CS_HEADER_PROPERTY([CS_HAVE_STRUCT_SYSINFO_TOTALRAM])], [],
+        [#include <sys/sysinfo.h>])])
    
 
 
@@ -2084,7 +2072,7 @@ AS_IF([test $cs_type_wchar_t = yes],
     AC_CHECK_FUNC([wcslen], [CS_HEADER_PROPERTY([CS_HAVE_WCSLEN])])
     AC_CHECK_FUNC([fputws], [CS_HEADER_PROPERTY([CS_HAVE_FPUTWS])])
     AC_CHECK_FUNC([fwide], [CS_HEADER_PROPERTY([CS_HAVE_FWIDE])])
-    AC_CHECK_FUNC([wcsrtombs], [CS_HEADER_PROPERTY([CS_HAVE_WCSRTOMBS])])
+    AC_CHECK_FUNC([wcsnrtombs], [CS_HEADER_PROPERTY([CS_HAVE_WCSNRTOMBS])])
     AC_CHECK_SIZEOF([wchar_t], []
 	[[#if HAVE_WCHAR_H
 	#include <wchar.h>
@@ -2210,38 +2198,26 @@ CS_SYMBOL_QUALIFIER([how to declare deprecation],
 
 
 #------------------------------------------------------------------------------
-# Check how to declare functions and types perfectly constant (not affected by
-# any global state and always returning the same value for the same input).
-#------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([how to declare const function],
-    [cs_cv_prog_cxx_declare_const],
-    [__attribute__((const))], [], [C++],
-    [CS_HEADER_PROPERTY([CS_CONST_METHOD],
-	[$cs_cv_prog_cxx_declare_const])])
-
-
-
-#------------------------------------------------------------------------------
-# Check how to declare functions and types pure (not affected by any global
-# state).
-#------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([how to declare pure function],
-    [cs_cv_prog_cxx_declare_pure],
-    [__attribute__((pure))], [], [C++],
-    [CS_HEADER_PROPERTY([CS_PURE_METHOD],
-	[$cs_cv_prog_cxx_declare_pure])])
-
-
-
-#------------------------------------------------------------------------------
 # Check if the "malloc" attribute is available.
 #------------------------------------------------------------------------------
 CS_SYMBOL_QUALIFIER([how to declare allocation function],
     [cs_cv_prog_c_attr_malloc],
-    [__attribute__((malloc))], [], [C])
-AS_IF([test $cs_cv_prog_c_attr_malloc != no],
+    [__attribute__((malloc))], [], [C],
     [CS_HEADER_PROPERTY([CS_ATTRIBUTE_MALLOC],
 	[$cs_cv_prog_c_attr_malloc])])
+
+
+
+#------------------------------------------------------------------------------
+# Check if the "init_priority" attribute is available.
+#------------------------------------------------------------------------------
+CS_SYMBOL_QUALIFIER([how to declare object initialization priority],
+    [cs_cv_prog_cxx_attr_init_priority],
+    [__attribute__((init_priority(PRI)))],
+    [[#define PRI 1010
+    class X{}; X x]], [C++],
+    [CS_HEADER_PROPERTY([CS_ATTRIBUTE_INIT_PRIORITY(PRI)],
+	[$cs_cv_prog_cxx_attr_init_priority])])
 
 
 
@@ -2331,6 +2307,21 @@ CS_CHECK_STD_SPECIAL_FLOAT([isnan])
 CS_CHECK_SPECIAL_FLOAT([isnormal])
 CS_CHECK_SPECIAL_FLOAT([normalf])
 CS_CHECK_STD_SPECIAL_FLOAT([isnormal])
+
+
+
+#------------------------------------------------------------------------------
+# Check if strtof() is available.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([for strtof], [cs_cv_strtof],
+    [AC_LANG_PROGRAM(
+	[[#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+	#endif
+	#include <stdlib.h>]],
+	[strtof (0, 0)])],
+    [], [],
+    [CS_HEADER_PROPERTY([CS_HAVE_STRTOF])])
 
 
 

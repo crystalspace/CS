@@ -447,7 +447,6 @@ class iDebugHelper(iBase):
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetSupportedTests(*args): return _core.iDebugHelper_GetSupportedTests(*args)
-    def UnitTest(*args): return _core.iDebugHelper_UnitTest(*args)
     def StateTest(*args): return _core.iDebugHelper_StateTest(*args)
     def Benchmark(*args): return _core.iDebugHelper_Benchmark(*args)
     def Dump(*args): return _core.iDebugHelper_Dump(*args)
@@ -1160,7 +1159,6 @@ class iEvent(iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    Name = _swig_property(_core.iEvent_Name_get, _core.iEvent_Name_set)
     def GetName(*args): return _core.iEvent_GetName(*args)
     Time = _swig_property(_core.iEvent_Time_get, _core.iEvent_Time_set)
     Broadcast = _swig_property(_core.iEvent_Broadcast_get, _core.iEvent_Broadcast_set)
@@ -1196,6 +1194,8 @@ class iEvent(iBase):
     scfGetVersion = staticmethod(_core.iEvent_scfGetVersion)
     __swig_destroy__ = _core.delete_iEvent
     __del__ = lambda self : None;
+    Name = property(GetName)
+
 iEvent_swigregister = _core.iEvent_swigregister
 iEvent_swigregister(iEvent)
 iEvent_scfGetVersion = _core.iEvent_scfGetVersion

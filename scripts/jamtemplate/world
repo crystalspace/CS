@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<world>
+  <addon/>
+
+  <!-- This section specifies needed plugins to load, and gives them
+       a short identifier for later usage. -->
+  <plugins>
+    <plugin name='genmesh'>crystalspace.mesh.loader.genmesh</plugin>
+    <plugin name='genmeshfact'>crystalspace.mesh.loader.factory.genmesh</plugin>
+  </plugins>
+
+  <shaders/>
+
+  <textures>
+    <!--
+        This texture is just an example. Until you correct it, a default
+        texture provided by Crystal Space will be used (RVB checkerboard)
+    -->
+    <texture name="IntentionallyNotFound">
+      <file>/appdata/defaultmap/textures/inexistentfile.jpg</file>
+    </texture>
+  </textures>
+
+  <materials>
+    <!-- Simple materials based on colors, which don't need textures -->
+    <material name="red">
+      <color red="1" green="0" blue="0" />
+    </material>
+    <material name="green">
+      <color red="0" green="1" blue="0" />
+    </material>
+    <material name="blue">
+      <color red="0" green="0" blue="1" />
+    </material>
+
+    <!-- Example material using texture file defined above -->
+    <material name="SomeMaterialName">
+      <texture>IntentionallyNotFound</texture>
+    </material>
+
+  </materials>
+
+  <sounds/>
+
+  <library>factories/genCube</library>
+  <triggers/>
+  <sector name='Scene'>
+    <cullerp plugin='crystalspace.culling.frustvis'/>
+    <light name='Lamp.001'>
+      <center y='3.91767' x='4.52981' z='5.71327'/>
+      <color blue='1.0' green='0.370982319117' red='0.620215713978'/>
+      <radius brightness='1.0'>20.0</radius>
+    </light>
+    <light name='Lamp'>
+      <center y='4.0401' x='-4.97871' z='-5.63165'/>
+      <color blue='0.311641007662' green='0.323509275913' red='0.810107886791'/>
+      <radius brightness='1.0'>20.0</radius>
+    </light>
+    <meshobj name='Cube'>
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>genCube</factory>
+        <material>SomeMaterialName</material>
+      </params>
+      <zuse/>
+      <move>
+        <v y='0' x='0' z='0'/>
+      </move>
+    </meshobj>
+  </sector>
+
+  <sequences/>
+
+  <!-- Start position are usually created in Blender by adding a 'Camera' -->
+  <start name='Camera'>
+    <sector>Scene</sector>
+    <position y='1' x='0' z='0'/>
+    <up y='1' x='0' z='0'/>
+    <forward y='0' x='-1' z='0'/>
+  </start>
+
+
+    <!-- You can embed your own kvp (key-value pairs) in a map,
+         then retrieve and use them from code. See the API documentation
+         for iKeyValuePair/csKeyValuePair.
+    -->
+    <!-- <key name="blah" value="bleh" /> -->
+
+</world>
