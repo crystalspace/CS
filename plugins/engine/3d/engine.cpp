@@ -1874,8 +1874,7 @@ const char* csEngine::SplitCollectionName(const char* name, iCollection*& collec
 
   csString collectionPart (name, p - name);
   collection = GetCollection (collectionPart);
-  if (!collection) return 0;
-  return p+1;
+  return p;
 }
 
 iMaterialWrapper* csEngine::FindMaterial(const char* name,

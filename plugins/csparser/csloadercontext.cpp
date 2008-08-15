@@ -94,7 +94,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
     loader->materialsLock.Unlock();
     
-    if(!mat && collection)
+    if(collection)
     {
       mat = Engine->FindMaterial(filename, collection);
     }
