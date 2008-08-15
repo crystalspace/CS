@@ -186,19 +186,24 @@ registry and all clouds should be added and removed through this one.
 */
 struct iCloudSystem : public virtual iBase
 {
-  SCF_INTERFACE(iCloudSystem, 0, 0, 1);
+  SCF_INTERFACE(iCloudSystem, 0, 2, 3);
 
   /**
   Some getter which provide various information about the field
   */
   virtual inline const UINT GetCloudCount() const = 0;
-  virtual inline csRef<iClouds> GetCloud(const UINT i) const = 0;
+  virtual inline const iClouds* GetCloud(const UINT i) const = 0;
+  //virtual inline const csRef<iClouds>& GetCloud(const UINT i) const = 0;
 
   /**
   Add and remove clouds from the field
   */
-  virtual csRef<iClouds> AddCloud() = 0;
-  virtual const bool RemoveCloud(csRef<iClouds> pCloud) = 0;
+  virtual iClouds* AddCloud() = 0;
+  //virtual csRef<iClouds> AddCloud() = 0;
+  virtual const bool RemoveCloud(iClouds* pCloud) = 0;
+  //virtual const bool RemoveCloud(const csRef<iClouds>& pCloud) = 0;
+  virtual const bool RemoveCloud(const UINT iIndex) = 0;
+  virtual inline const bool RemoveAllClouds() = 0;
 };
 
 //--------------------------------------------------------------------------------------------//

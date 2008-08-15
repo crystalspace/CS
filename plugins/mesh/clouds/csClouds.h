@@ -31,9 +31,11 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csCloudsRenderer.h"
 
 //Supervisor-class implementation
-class csClouds : public scfImplementation3<csClouds, iClouds, iComponent, iEventHandler>
+class csClouds : public scfImplementation2<csClouds, iClouds, iEventHandler>
 {
 private:
+  bool                         m_bActive;
+
   csRef<csCloudsDynamics>      m_Dynamics;
   csRef<csCloudsRenderer>      m_Renderer;
   iObjectRegistry*             m_pObjectRegistry;
@@ -50,23 +52,35 @@ private:
   UINT                         m_iSkippingFrameCount;
 
 public:
-  csClouds(iBase* pParent) : scfImplementationType(this, pParent), m_iFramesUntilNextStep(0), m_fTimeStep(1.f)
+  csClouds(iBase* pParent) 
+    : scfImplementationType(this, pParent), m_iFramesUntilNextStep(0), m_fTimeStep(1.f), m_bActive(false)
   {
     m_fTimeScaleFactor       = 1.f;
     m_iSkippingFrameCount    = 10;
   }
   ~csClouds()
   {
-    m_Dynamics.Invalidate();
-    m_Renderer.Invalidate();
-    m_pEventQueue->Unsubscribe(this, csevFrame(m_pObjectRegistry));
-    m_pEventQueue.Invalidate();
-    m_Clock.Invalidate();
+    Exit();
   }
 
-  //Initialisation method from iComponent
-  virtual bool Initialize(iObjectRegistry* pObjectReg)
+  //Own Exit method, called by csCloudSystem
+  inline const bool Exit()
   {
+    if(!m_bActive) return true;
+    m_bActive = false;
+
+    m_Dynamics.Invalidate();
+    m_Renderer.Invalidate();
+    m_pEventQueue->RemoveListener(this);
+    m_pEventQueue.Invalidate();
+    m_Clock.Invalidate();
+    return true;
+  }
+
+  //Own Init method, called by csCloudSystem
+  inline const bool Init(iObjectRegistry* pObjectReg)
+  {
+    Exit();
     m_Dynamics.AttachNew(new csCloudsDynamics(this));
     m_Renderer.AttachNew(new csCloudsRenderer(this));
     m_pObjectRegistry = pObjectReg;
@@ -76,6 +90,8 @@ public:
     //Getting EventQueue
     m_pEventQueue = csQueryRegistry<iEventQueue>(m_pObjectRegistry);
     m_pEventQueue->RegisterListener(this, csevFrame(m_pObjectRegistry));
+
+    m_bActive = true;
     return true;
   }
 

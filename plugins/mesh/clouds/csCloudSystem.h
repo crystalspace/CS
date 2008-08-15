@@ -21,43 +21,58 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <iutil/objreg.h>
 #include <iutil/comp.h>
-#include <csutil/array.h>
+#include <csutil/refarr.h>
 
 #include "csClouds.h"
 #include "imesh/clouds.h"
 
 //Supervisor-class implementation
-class csCloudSystem : public scfImplementation1<csCloudSystem, iCloudSystem>
+class csCloudSystem : public scfImplementation2<csCloudSystem, iCloudSystem, iComponent>
 {
 private:
-  UINT                              m_iCloudCount;
-  csArray<csRef<iClouds>>           m_Clouds;
+  csRefArray<iClouds>               m_ppClouds;
+  iObjectRegistry*                  m_pObjectReg;
 
 public:
   csCloudSystem(iBase* pParent) : scfImplementationType(this, pParent)
   {
-
   }
   ~csCloudSystem()
   {
-
+    RemoveAllClouds();
   }
 
-  virtual inline const UINT GetCloudCount() const {return m_iCloudCount;}
-  virtual inline csRef<iClouds> GetCloud(const UINT i) const {return m_Clouds[i];}
-
-  virtual csRef<iClouds> AddCloud()
+  //Initialisation method from iComponent
+  virtual bool Initialize(iObjectRegistry* pObjectReg)
   {
-    csRef<iClouds> NewCloud;
-    NewCloud.AttachNew(new csClouds(this));
-    m_Clouds.Push(NewCloud);
-    ++m_iCloudCount;
-    return NewCloud;
+    m_pObjectReg = pObjectReg;
+    return true;
   }
-  virtual const bool RemoveCloud(csRef<iClouds> pCloud)
+
+  virtual inline const UINT GetCloudCount() const {return static_cast<UINT>(m_ppClouds.GetSize());}
+  virtual inline const iClouds* GetCloud(const UINT i) const {return m_ppClouds.Get(i);}
+
+  virtual inline iClouds* AddCloud()
   {
-    m_Clouds.Delete(pCloud);
-    --m_iCloudCount;
+    csRef<csClouds> pNewCloud;
+    pNewCloud.AttachNew(new csClouds(this));
+    pNewCloud->Init(m_pObjectReg);
+    m_ppClouds.Push(pNewCloud);
+    return pNewCloud;
+  }
+  virtual inline const bool RemoveCloud(iClouds* pCloud)
+  {
+    static_cast<csClouds*>(pCloud)->Exit();
+    return m_ppClouds.Delete(pCloud);
+  }
+  virtual inline const bool RemoveCloud(const UINT iIndex)
+  {
+    return RemoveCloud(m_ppClouds.Get(iIndex));
+  }
+
+  virtual inline const bool RemoveAllClouds()
+  {
+    m_ppClouds.DeleteAll();
     return true;
   }
 };
