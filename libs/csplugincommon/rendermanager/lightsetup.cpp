@@ -29,7 +29,7 @@ namespace RenderManager
     : persist (persist)
   {
     persist.lightTypeScratch.Empty();
-    persist.lightTypeScratch.SetCapacity (numLights);
+    persist.lightTypeScratch.SetMinimalCapacity (numLights);
   }
     
   void LightingSorter::AddLight (const csLightInfluence& influence,
@@ -38,10 +38,10 @@ namespace RenderManager
   {
     LightInfo iltp;
     iltp.light = influence.light;
-    iltp.settings.type = influence.light->GetType();
-    iltp.settings.lightFlags = influence.light->GetFlags() & lightFlagsMask;
+    iltp.settings.type = influence.type;
+    iltp.settings.lightFlags = influence.flags & lightFlagsMask;
     iltp.isStatic =
-      influence.light->GetDynamicType() != CS_LIGHT_DYNAMICTYPE_DYNAMIC;
+      influence.dynamicType != CS_LIGHT_DYNAMICTYPE_DYNAMIC;
     iltp.numSubLights = numSubLights;
     persist.lightTypeScratch.Push (iltp);
   }
@@ -159,7 +159,6 @@ namespace RenderManager
     if (dstVar == 0) dstVar = CreateTempSV (name);
     if ((dstVar->GetType() != csShaderVariable::UNKNOWN)
 	  && (dstVar->GetType() != csShaderVariable::ARRAY)) return true;
-    dstVar->SetArraySize (csMax (index+1, dstVar->GetArraySize()));
     dstVar->SetArrayElement (index, sv);
     return true;
   }
