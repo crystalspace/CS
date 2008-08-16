@@ -51,6 +51,7 @@
 #include "iutil/string.h"
 #include "iutil/stringarray.h"
 #include "iutil/strset.h"
+#include "iutil/systemopenmanager.h"
 #include "iutil/timer.h"
 #include "iutil/verbositymanager.h"
 #include "iutil/vfs.h"
