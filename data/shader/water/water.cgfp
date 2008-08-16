@@ -1,10 +1,3 @@
-<cgfp>
-<variablemap variable="position" destination="lightPos" />
-<variablemap variable="color" destination="lightCol" />
-<variablemap variable="shine" destination="shininess" />
-<variablemap variable="murkiness" destination="waterAlpha" />
-<program>
-<![CDATA[
 
 //---------------------------------------------------------------------------------
 //Input
@@ -46,7 +39,7 @@ float4 main (vert2frag IN,
 			 uniform float shininess,
 			 uniform float waterAlpha,
 			 uniform sampler2D TexNormal) : COLOR        
-{       
+{     
     float3 N = normalize(tex2D(TexNormal, IN.TexCoord2.xy).xyz 
 						- tex2D(TexNormal, IN.TexCoord3.xy).xyz);
 	
@@ -76,7 +69,3 @@ float4 main (vert2frag IN,
 //---------------------------------------------------------------------------------
 //end
 //---------------------------------------------------------------------------------
-
-]]>
-</program>
-</cgfp>

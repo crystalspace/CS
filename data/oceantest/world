@@ -17,7 +17,7 @@
   
   <shaders>
     <shader>
-      <file>/shader/water/water-old.xml</file>
+      <file>/shader/water/water.xml</file>
     </shader>
   </shaders>
   
