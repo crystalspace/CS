@@ -55,6 +55,7 @@ rule DoFileListEntry
     
     SEARCH on $(target) = [ on $(1) GetVar SEARCH ] ;
     Always $(target) ;
+    NoCare $(target) ;
     WriteFileListEntry $(listfile) : $(target) : $(dir) : $(1) ;
     Depends $(listfile) : $(target) ;
     
@@ -70,11 +71,18 @@ rule FileListEntriesData
     Depends filelists : [ DoFileListEntries $(<) : $(2) : $(3) ] ;
 }
 
-##  FileListEntriesData app : list
+##  FileListEntryApplications app : list
 rule FileListEntryApplications
 {
     Depends filelists :
       [ SystemDoFileListEntryApplications $(1) : $(2) ] ;
+}
+
+##  FileListEntryPlugin plugin : list
+rule FileListEntryPlugin
+{
+    Depends filelists :
+      [ SystemDoFileListEntryPlugin $(1) : $(2) ] ;
 }
 
 #----------------------------------------------------------------------------
@@ -84,15 +92,16 @@ rule WriteFileListEntry
   local listfile = $(1) ;
   local srcfile = $(2) ;
   
-  local listfile_gristed = $(listfile:G=$(srcfile:G=)) ;
-  MakeLocate $(listfile_gristed) : [ on $(listfile) GetVar LOCATE ] ;
-  Always $(listfile_gristed) ;
-  
   local destname = $(4:D=$(3):G=) ;
   if $(destname) = ""
   {
     destname = $(4:G=) ;
   }
+  
+  local listfile_gristed = $(listfile:G=$(destname)) ;
+  MakeLocate $(listfile_gristed) : [ on $(listfile) GetVar LOCATE ] ;
+  Always $(listfile_gristed) ;
+  
   DESTNAME on $(listfile_gristed) = $(destname) ;
   LOCATE on $(srcfile) = [ on $(srcfile) GetVar SEARCH ] ;
   if $($(listfile)_CREATED) != "yes"

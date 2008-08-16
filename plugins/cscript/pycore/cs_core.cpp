@@ -2691,39 +2691,40 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_iStringArray swig_types[213]
 #define SWIGTYPE_p_iStringSet swig_types[214]
 #define SWIGTYPE_p_iStringSetBaseTCS__StringSetTag__General_t swig_types[215]
-#define SWIGTYPE_p_iTextureFactory swig_types[216]
-#define SWIGTYPE_p_iTriangleMesh swig_types[217]
-#define SWIGTYPE_p_iVFS swig_types[218]
-#define SWIGTYPE_p_iVerbosityManager swig_types[219]
-#define SWIGTYPE_p_iVirtualClock swig_types[220]
-#define SWIGTYPE_p_int swig_types[221]
-#define SWIGTYPE_p_int16_t swig_types[222]
-#define SWIGTYPE_p_int64_t swig_types[223]
-#define SWIGTYPE_p_int8_t swig_types[224]
-#define SWIGTYPE_p_intptr_t swig_types[225]
-#define SWIGTYPE_p_long_long swig_types[226]
-#define SWIGTYPE_p_p_char swig_types[227]
-#define SWIGTYPE_p_p_csImageIOFileFormatDescription swig_types[228]
-#define SWIGTYPE_p_p_void swig_types[229]
-#define SWIGTYPE_p_scfImplementation1T_csPyEventHandler_iEventHandler_t swig_types[230]
-#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[231]
-#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[232]
-#define SWIGTYPE_p_scfImplementation1TcsPyEventPlug_iEventPlug_t swig_types[233]
-#define SWIGTYPE_p_scfImplementationExt1TcsPath_csObject_iPath_t swig_types[234]
-#define SWIGTYPE_p_scfInterfaceMetadata swig_types[235]
-#define SWIGTYPE_p_scfInterfaceMetadataList swig_types[236]
-#define SWIGTYPE_p_size_t swig_types[237]
-#define SWIGTYPE_p_uint16_t swig_types[238]
-#define SWIGTYPE_p_uint32_t swig_types[239]
-#define SWIGTYPE_p_uint64_t swig_types[240]
-#define SWIGTYPE_p_unsigned_char swig_types[241]
-#define SWIGTYPE_p_unsigned_int swig_types[242]
-#define SWIGTYPE_p_unsigned_long swig_types[243]
-#define SWIGTYPE_p_unsigned_long_long swig_types[244]
-#define SWIGTYPE_p_utf32_char swig_types[245]
-#define SWIGTYPE_p_void swig_types[246]
-static swig_type_info *swig_types[248];
-static swig_module_info swig_module = {swig_types, 247, 0, 0, 0, 0};
+#define SWIGTYPE_p_iSystemOpenManager swig_types[216]
+#define SWIGTYPE_p_iTextureFactory swig_types[217]
+#define SWIGTYPE_p_iTriangleMesh swig_types[218]
+#define SWIGTYPE_p_iVFS swig_types[219]
+#define SWIGTYPE_p_iVerbosityManager swig_types[220]
+#define SWIGTYPE_p_iVirtualClock swig_types[221]
+#define SWIGTYPE_p_int swig_types[222]
+#define SWIGTYPE_p_int16_t swig_types[223]
+#define SWIGTYPE_p_int64_t swig_types[224]
+#define SWIGTYPE_p_int8_t swig_types[225]
+#define SWIGTYPE_p_intptr_t swig_types[226]
+#define SWIGTYPE_p_long_long swig_types[227]
+#define SWIGTYPE_p_p_char swig_types[228]
+#define SWIGTYPE_p_p_csImageIOFileFormatDescription swig_types[229]
+#define SWIGTYPE_p_p_void swig_types[230]
+#define SWIGTYPE_p_scfImplementation1T_csPyEventHandler_iEventHandler_t swig_types[231]
+#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[232]
+#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[233]
+#define SWIGTYPE_p_scfImplementation1TcsPyEventPlug_iEventPlug_t swig_types[234]
+#define SWIGTYPE_p_scfImplementationExt1TcsPath_csObject_iPath_t swig_types[235]
+#define SWIGTYPE_p_scfInterfaceMetadata swig_types[236]
+#define SWIGTYPE_p_scfInterfaceMetadataList swig_types[237]
+#define SWIGTYPE_p_size_t swig_types[238]
+#define SWIGTYPE_p_uint16_t swig_types[239]
+#define SWIGTYPE_p_uint32_t swig_types[240]
+#define SWIGTYPE_p_uint64_t swig_types[241]
+#define SWIGTYPE_p_unsigned_char swig_types[242]
+#define SWIGTYPE_p_unsigned_int swig_types[243]
+#define SWIGTYPE_p_unsigned_long swig_types[244]
+#define SWIGTYPE_p_unsigned_long_long swig_types[245]
+#define SWIGTYPE_p_utf32_char swig_types[246]
+#define SWIGTYPE_p_void swig_types[247]
+static swig_type_info *swig_types[249];
+static swig_module_info swig_module = {swig_types, 248, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -18528,6 +18529,28 @@ SWIGINTERN PyObject *_wrap_csInitializer_CreateStringSet(PyObject *SWIGUNUSEDPAR
   arg1 = reinterpret_cast< iObjectRegistry * >(argp1);
   result = (bool)csInitializer::CreateStringSet(arg1);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csInitializer_CreateSystemOpenManager(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iObjectRegistry *arg1 = (iObjectRegistry *) 0 ;
+  iSystemOpenManager *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csInitializer_CreateSystemOpenManager",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iObjectRegistry, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csInitializer_CreateSystemOpenManager" "', argument " "1"" of type '" "iObjectRegistry *""'"); 
+  }
+  arg1 = reinterpret_cast< iObjectRegistry * >(argp1);
+  result = (iSystemOpenManager *)csInitializer::CreateSystemOpenManager(arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iSystemOpenManager, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -58139,6 +58162,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csInitializer_CreateConfigManager", _wrap_csInitializer_CreateConfigManager, METH_VARARGS, NULL},
 	 { (char *)"csInitializer_CreateInputDrivers", _wrap_csInitializer_CreateInputDrivers, METH_VARARGS, NULL},
 	 { (char *)"csInitializer_CreateStringSet", _wrap_csInitializer_CreateStringSet, METH_VARARGS, NULL},
+	 { (char *)"csInitializer_CreateSystemOpenManager", _wrap_csInitializer_CreateSystemOpenManager, METH_VARARGS, NULL},
 	 { (char *)"csInitializer_SetupConfigManager", _wrap_csInitializer_SetupConfigManager, METH_VARARGS, NULL},
 	 { (char *)"csInitializer_SetupVFS", _wrap_csInitializer_SetupVFS, METH_VARARGS, NULL},
 	 { (char *)"csInitializer__RequestPlugins", _wrap_csInitializer__RequestPlugins, METH_VARARGS, NULL},
@@ -59748,6 +59772,7 @@ static swig_type_info _swigt__p_iSCF = {"_p_iSCF", "iSCF *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iStringArray = {"_p_iStringArray", "iStringArray *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iStringSet = {"_p_iStringSet", "iStringSet *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iStringSetBaseTCS__StringSetTag__General_t = {"_p_iStringSetBaseTCS__StringSetTag__General_t", "iStringSetBase<CS::StringSetTag::General > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_iSystemOpenManager = {"_p_iSystemOpenManager", "iSystemOpenManager *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iTextureFactory = {"_p_iTextureFactory", "iTextureFactory *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iTriangleMesh = {"_p_iTriangleMesh", "iTriangleMesh *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iVFS = {"_p_iVFS", "iVFS *", 0, 0, (void*)0, 0};
@@ -59997,6 +60022,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_iStringArray,
   &_swigt__p_iStringSet,
   &_swigt__p_iStringSetBaseTCS__StringSetTag__General_t,
+  &_swigt__p_iSystemOpenManager,
   &_swigt__p_iTextureFactory,
   &_swigt__p_iTriangleMesh,
   &_swigt__p_iVFS,
@@ -60246,6 +60272,7 @@ static swig_cast_info _swigc__p_iSCF[] = {  {&_swigt__p_iSCF, 0, 0, 0},{0, 0, 0,
 static swig_cast_info _swigc__p_iStringArray[] = {  {&_swigt__p_iStringArray, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iStringSet[] = {  {&_swigt__p_iStringSet, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iStringSetBaseTCS__StringSetTag__General_t[] = {  {&_swigt__p_iStringSetBaseTCS__StringSetTag__General_t, 0, 0, 0},  {&_swigt__p_iStringSet, _p_iStringSetTo_p_iStringSetBaseTCS__StringSetTag__General_t, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iSystemOpenManager[] = {  {&_swigt__p_iSystemOpenManager, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iTextureFactory[] = {  {&_swigt__p_iTextureFactory, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iTriangleMesh[] = {  {&_swigt__p_iTriangleMesh, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iVFS[] = {  {&_swigt__p_iVFS, 0, 0, 0},{0, 0, 0, 0}};
@@ -60495,6 +60522,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_iStringArray,
   _swigc__p_iStringSet,
   _swigc__p_iStringSetBaseTCS__StringSetTag__General_t,
+  _swigc__p_iSystemOpenManager,
   _swigc__p_iTextureFactory,
   _swigc__p_iTriangleMesh,
   _swigc__p_iVFS,

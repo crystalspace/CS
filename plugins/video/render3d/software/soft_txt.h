@@ -291,6 +291,13 @@ public:
       iString* fail_reason = 0);
   virtual csPtr<iTextureHandle> CreateTexture (int w, int h,
       csImageType imagetype, const char* format, int flags,
+      iString* fail_reason = 0)
+  {
+    return csSoftwareTextureManager::CreateTexture (w, h, 1, imagetype, format,
+      flags, fail_reason);
+  }
+  virtual csPtr<iTextureHandle> CreateTexture (int w, int h, int d,
+      csImageType imagetype, const char* format, int flags,
       iString* fail_reason = 0);
 
   virtual csPtr<iSuperLightmap> CreateSuperLightmap (int width,

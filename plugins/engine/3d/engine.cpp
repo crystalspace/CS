@@ -28,6 +28,7 @@
 #include "csutil/databuf.h"
 #include "csutil/scf.h"
 #include "csutil/scfstrset.h"
+#include "csutil/scanstr.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
 #include "csutil/vfscache.h"
@@ -807,12 +808,9 @@ void csEngine::DeleteAllForce ()
   cameraPositions.RemoveAll ();
 
   defaultPortalMaterial.Invalidate ();
-  delete materials;
-  materials = new csMaterialList ();
-  delete textures;
-  textures = new csTextureList (this);
-  delete sharedVariables;
-  sharedVariables = new csSharedVariableList();
+  materials->RemoveAll();
+  textures->RemoveAll();
+  sharedVariables->RemoveAll();
 
   if (shaderManager)
   {
@@ -1213,7 +1211,7 @@ void csEngine::ShineLights (iCollection *collection, iProgressMeter *meter)
       if (input) *input++ = 0;
 
       float xf;
-      sscanf (endkw, "%f", &xf);
+      csScanStr (endkw, "%f", &xf);
 
       int xi = int (xf + ((xf < 0) ? -0.5 : + 0.5));
 

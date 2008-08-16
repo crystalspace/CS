@@ -23,6 +23,7 @@
 #include "csgfx/imagemanipulate.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/refarr.h"
+#include "csutil/stringconv.h"
 
 #include "iengine/material.h"
 #include "igraphic/image.h"
@@ -221,7 +222,7 @@ void csTerrainSimpleDataFeederProperties::SetParameter (const char* param, const
   }
   else if (strcasecmp (param, "offset") == 0)
   {
-    heightOffset = atof (value);
+    heightOffset = CS::Utility::strtof (value);
   }
   else if (strcasecmp (param, "smooth heightmap") == 0)
   {

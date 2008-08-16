@@ -42,7 +42,7 @@ protected:
   /// If true then the current render target has been put on screen.
   bool rt_onscreen;
   /// Render target dimensions
-  int txt_w, txt_h;
+  int txt_w, txt_h, txt_d;
   R2TViewportHelper viewportHelper;
 
   enum InternalFormatClass { ifColor, ifDepth };

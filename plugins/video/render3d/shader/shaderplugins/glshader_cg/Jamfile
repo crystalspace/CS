@@ -3,7 +3,7 @@ SubDir TOP plugins video render3d shader shaderplugins glshader_cg ;
 if $(CG.AVAILABLE) = "yes" && $(GL.AVAILABLE) = "yes"
 {
   Description glshader_cg : "CG shader" ;
-  Plugin glshader_cg : [ Wildcard *.cpp *.h ] ;
+  Plugin glshader_cg : [ Wildcard *.cpp *.h ] : nodefaultfilelist ;
   Includes glshader_cg.h : $(SUBDIR)/glshader_cg.tok ;
   Includes combiner_cg.h : $(SUBDIR)/combiner_cg.tok ;
   MsvcExtraFile glshader_cg : $(SUBDIR)/glshader_cg.tok ;
@@ -11,4 +11,5 @@ if $(CG.AVAILABLE) = "yes" && $(GL.AVAILABLE) = "yes"
   LinkWith glshader_cg : crystalspace crystalspace_opengl ;
   ExternalLibs glshader_cg : CG GL ;
   CompileGroups glshader_cg : shaders renderers renderall openglrenderer ;
+  FileListEntryPlugin glshader_cg : plugin-cg ;
 }

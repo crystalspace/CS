@@ -22,6 +22,7 @@
 #include "iutil/document.h"
 #include "csutil/pooledscfclass.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/scanstr.h"
 #include "xr.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLRead)
@@ -85,7 +86,7 @@ public:
   {
     const char* val = attr->Value ();
     float f;
-    sscanf (val, "%f", &f);
+    csScanStr (val, "%f", &f);
     return f;
   }
   virtual bool GetValueAsBool ()

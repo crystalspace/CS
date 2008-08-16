@@ -107,6 +107,13 @@ csPortalContainer::csPortalContainer (iEngine* engine,
 	iObjectRegistry *object_reg) :
 	scfImplementationType (this, engine)
 {
+  prepared = false;
+  data_nr = 0;
+  movable_nr = -1;
+  movable_identity = false;
+
+  meshwrapper = 0;
+
   csRef<csPortalContainerTriMeshHelper> trimesh;
   trimesh.AttachNew (new csPortalContainerTriMeshHelper (0));
   trimesh->SetPortalContainer (this);
@@ -118,13 +125,6 @@ csPortalContainer::csPortalContainer (iEngine* engine,
   trimesh.AttachNew (new csPortalContainerTriMeshHelper (CS_PORTAL_VISCULL));
   trimesh->SetPortalContainer (this);
   SetTriangleData (e->viscull_id, trimesh);
-
-  prepared = false;
-  data_nr = 0;
-  movable_nr = -1;
-  movable_identity = false;
-
-  meshwrapper = 0;
 
   shader_man = csQueryRegistry<iShaderManager> (object_reg);
   fog_shader = shader_man->GetShader ("std_lighting_portal");

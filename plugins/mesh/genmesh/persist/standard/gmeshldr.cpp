@@ -32,6 +32,7 @@
 #include "csutil/refarr.h"
 #include "csutil/scanstr.h"
 #include "csutil/sysfunc.h"
+#include "csutil/stringconv.h"
 #include "csutil/stringreader.h"
 
 #include "iengine/engine.h"
@@ -230,7 +231,7 @@ static bool GetFloat (char*& p, float& f)
   while (*p && !isspace (*p)) p++;
   char old = *p;
   *p = 0;
-  f = atof (start);
+  f = CS::Utility::strtof (start);
   *p = old;
   return true;
 }
