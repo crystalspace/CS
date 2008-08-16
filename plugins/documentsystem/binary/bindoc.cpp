@@ -1431,7 +1431,7 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
   CS_ALLOC_STACK_ARRAY(uint32, startsScratch, scratchSize);
   
   size_t attrStart = 0;
-  uint32 attrCount;
+  uint32 attrCount = 0;
   if (nodeData->flags & BD_NODE_HAS_ATTR)
   {
     attrStart = nodesFile->GetPos();
@@ -1442,7 +1442,7 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
   }
 
   size_t childStart = 0;
-  uint32 childCount;
+  uint32 childCount = 0;
   if (nodeData->flags & BD_NODE_HAS_CHILDREN)
   {
     childStart = nodesFile->GetPos();
