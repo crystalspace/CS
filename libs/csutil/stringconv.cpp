@@ -29,7 +29,7 @@ static float my_strtof (const char* s, const char** fail_pos)
 #ifdef CS_HAVE_STRTOF
   v = strtof (s, &fp);
 #else
-  v = (float)strtof (s, &fp);
+  v = (float)strtod (s, &fp);
 #endif
   if (fail_pos) *fail_pos = fp;
   return v;

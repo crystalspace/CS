@@ -10601,10 +10601,10 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *RegisterTexture = *cspacec::iTextureManager_RegisterTexture;
-*CreateTexture = *cspacec::iTextureManager_CreateTexture;
 *GetTextureFormat = *cspacec::iTextureManager_GetTextureFormat;
 *CreateSuperLightmap = *cspacec::iTextureManager_CreateSuperLightmap;
 *GetMaxTextureSize = *cspacec::iTextureManager_GetMaxTextureSize;
+*CreateTexture = *cspacec::iTextureManager_CreateTexture;
 *scfGetVersion = *cspacec::iTextureManager_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
