@@ -16224,6 +16224,43 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csShaderVariableStack_assign(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csShaderVariableStack *arg1 = (csShaderVariableStack *) 0 ;
+  csShaderVariableStack *arg2 = 0 ;
+  csShaderVariableStack *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csShaderVariableStack_assign",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariableStack, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableStack_assign" "', argument " "1"" of type '" "csShaderVariableStack *""'"); 
+  }
+  arg1 = reinterpret_cast< csShaderVariableStack * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csShaderVariableStack,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csShaderVariableStack_assign" "', argument " "2"" of type '" "csShaderVariableStack const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csShaderVariableStack_assign" "', argument " "2"" of type '" "csShaderVariableStack const &""'"); 
+  }
+  arg2 = reinterpret_cast< csShaderVariableStack * >(argp2);
+  {
+    csShaderVariableStack &_result_ref = (arg1)->operator =((csShaderVariableStack const &)*arg2);
+    result = (csShaderVariableStack *) &_result_ref;
+  }
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csShaderVariableStack, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csShaderVariableStack_Setup__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csShaderVariableStack *arg1 = (csShaderVariableStack *) 0 ;
@@ -24562,6 +24599,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iHalo_swigregister", iHalo_swigregister, METH_VARARGS, NULL},
 	 { (char *)"new_csShaderVariableStack", _wrap_new_csShaderVariableStack, METH_VARARGS, NULL},
 	 { (char *)"delete_csShaderVariableStack", _wrap_delete_csShaderVariableStack, METH_VARARGS, NULL},
+	 { (char *)"csShaderVariableStack_assign", _wrap_csShaderVariableStack_assign, METH_VARARGS, NULL},
 	 { (char *)"csShaderVariableStack_Setup", _wrap_csShaderVariableStack_Setup, METH_VARARGS, NULL},
 	 { (char *)"csShaderVariableStack_MakeOwnArray", _wrap_csShaderVariableStack_MakeOwnArray, METH_VARARGS, NULL},
 	 { (char *)"csShaderVariableStack_GetSize", _wrap_csShaderVariableStack_GetSize, METH_VARARGS, NULL},
