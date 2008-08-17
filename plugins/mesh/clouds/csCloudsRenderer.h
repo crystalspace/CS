@@ -27,15 +27,21 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <csgfx/imagevolumemaker.h>
 #include <csgfx/imagememory.h>
 #include <ivideo/texture.h>
+#include <ivideo/txtmgr.h>
+#include <iutil/objreg.h>
+#include <ivideo/graph3d.h>
 
 //Cloud-Renderer class
 class csCloudsRenderer : public scfImplementation1<csCloudsRenderer, iCloudsRenderer>
 {
 private:
+  iObjectRegistry*              m_pObjectRegistry;
   csVector3                     m_vLightDir;
   csVector3                     m_vPosition;
   float                         m_fGridScale;
 
+  //2D-Impostor texture
+  csRef<iTextureHandle>         m_pImpostor;
   //Condensed water mixing ratios texture
   bool                          m_bNewOLVTexture;
   csRef<csImageVolumeMaker>     m_pQcTexture;
@@ -135,6 +141,9 @@ public:
   {
     m_pQcTexture.Invalidate();
   }
+
+  //Own setter (not contained in interface) (called from csClouds)
+  inline void SetObjectRegistry(iObjectRegistry* pObjectReg) {m_pObjectRegistry = pObjectReg;}
 
   //Getter
   virtual inline const UINT GetOLVSliceCount() const {return m_iOLVTexDepth;}

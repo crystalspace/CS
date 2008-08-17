@@ -115,7 +115,9 @@ const bool csCloudsRenderer::RenderOLV(const csRef<csField3<float>>& rCondWaterM
 
   //Create empty OLV texture
   m_pOLVTexture.Invalidate();
-  //CreateTexture
+  csRef<iGraphics3D> pGraphics3D = csQueryRegistry<iGraphics3D>(m_pObjectRegistry);
+  csRef<iTextureManager> pTextureManager = pGraphics3D->GetTextureManager();
+  m_pOLVTexture = pTextureManager->CreateTexture(m_iOLVTexWidth, m_iOLVTexHeight, /*m_iOLVTexDepth,*/ csimg3D, "", NULL);
 
   //Create OLV-transformation matrices
   m_mOLVProjectionMatrix = ParallelProjection(vBBMax.x - vBBMin.x, vBBMax.y - vBBMin.y, 0.f, vBBMax.z - vBBMin.z);
@@ -140,6 +142,12 @@ const bool csCloudsRenderer::CreateImpostor(const csVector3& vCameraPosition)
 {
   m_vImpostorDirection = m_vPosition - vCameraPosition;
   m_vImpostorDirection.Normalize();
+
+  //Create empty impostor texture
+  /*m_pImpostor.Invalidate();
+  csRef<iGraphics3D> pGraphics3D = csQueryRegistry<iGraphics3D>(m_pObjectRegistry);
+  csRef<iTextureManager> pTextureManager = pGraphics3D->GetTextureManager();
+  m_pImpostor = pTextureManager->CreateTexture(m_iOLVTexWidth * 2, m_iOLVTexHeight * 2, csimg2D, "", NULL);*/
 
   return true;
 }

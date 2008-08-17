@@ -84,6 +84,7 @@ public:
     m_Dynamics.AttachNew(new csCloudsDynamics(this));
     m_Renderer.AttachNew(new csCloudsRenderer(this));
     m_pObjectRegistry = pObjectReg;
+    m_Renderer->SetObjectRegistry(m_pObjectRegistry);
     //Getting Virtual Clock
     m_Clock = csQueryRegistry<iVirtualClock>(m_pObjectRegistry);
     m_iStartTickCount = m_Clock->GetCurrentTicks();
