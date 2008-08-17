@@ -262,6 +262,11 @@ bool csTerrainSystem::CollideTriangles (const csVector3* vertices,
 
     if (csIntersect3::BoxSphere (box, sphere.GetCenter (), sphere.GetRadius ()))
     {
+      if (cells[i]->GetLoadState () != csTerrainCell::Loaded)
+      {
+        cells[i]->SetLoadState (csTerrainCell::Loaded);
+      }
+
       if (cells[i]->CollideTriangles (vertices, tri_count, indices, radius,
           trans, oneHit, pairs) && oneHit)
         return true;
