@@ -45,7 +45,7 @@
 #include "csgfx/imagememory.h"
 
 csStringID csImposterProcTex::stringid_standard = csInvalidStringID;
-csStringID csImposterProcTex::stringid_light_ambient = csInvalidStringID;
+CS::ShaderVarStringID csImposterProcTex::stringid_light_ambient = CS::InvalidShaderVarStringID;
 
 csImposterProcTex::csImposterProcTex  (csEngine* engine,  
   csImposterMesh *parent) : scfImplementationType(this)
@@ -65,11 +65,16 @@ csImposterProcTex::csImposterProcTex  (csEngine* engine,
   tex->GetTextureHandle ()->SetAlphaType (csAlphaMode::alphaBinary);
   thisImage = 0;
 
+  svStringSet = csQueryRegistryTagInterface<iShaderVarStringSet> (
+    engine->objectRegistry, "crystalspace.shader.variablenameset");
   if (stringid_standard == csInvalidStringID)
   {
-    csRef<iStringSet> stringSet = engine->globalStringSet;
-    stringid_standard = stringSet->Request("standard");
-    stringid_light_ambient = stringSet->Request("light ambient");
+    /*
+    csRef<iStringSet> stringSet = csQueryRegistryTagInterface<iStringSet> (
+      engine->objectRegistry, "crystalspace.stringset.shared");
+    stringid_standard = stringSet->Request("standard");*/
+    stringid_standard = svStringSet->Request ("standard");
+    stringid_light_ambient = svStringSet->Request("light ambient");
   }
 
   clip = new csBoxClipper (0, 0, w, h);
@@ -171,12 +176,15 @@ void csImposterProcTex::RenderToTexture (iRenderView *rview, iSector *s)
   csRenderMesh** rendermeshes = meshobj->GetRenderMeshes (num, rview, 
     originalmesh->GetMovable (), ~0);
 
+  csShaderVariableStack& sva = shadermanager->GetShaderVariableStack ();
+  sva.Setup (svStringSet->GetSize ());
+
   //draw them, as the view, engine and renderloops do
   for (int i = 0; i < num; i++)
   {
     csRenderMesh* rendermesh = rendermeshes[i];
     csRenderMeshModes mode (*rendermesh);
-    iShaderVarStack *sva = shadermanager->GetShaderVariableStack ();
+    sva.Clear ();
 
     iMaterial* hdl = rendermesh->material->GetMaterial ();
     iShader* meshShader = hdl->GetShader (stringid_standard);

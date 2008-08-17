@@ -55,6 +55,7 @@ struct iPluginManager;
 struct iVirtualClock;
 struct iCommandLineParser;
 struct iConfigManager;
+struct iSystemOpenManager;
 struct iVerbosityManager;
 
 /**\name Plugin request macros
@@ -244,7 +245,7 @@ public:
 
   /**
    * Create and, if needed, register the verbosity manager. It is used by a 
-   * lot of plugins to control diagnostoc output while running.
+   * lot of plugins to control diagnostic output while running.
    */
   static iVerbosityManager* CreateVerbosityManager (iObjectRegistry*);
 
@@ -264,15 +265,30 @@ public:
   static bool CreateInputDrivers (iObjectRegistry*);
 
   /**
-   * Create the global shared string set and register it with the registry.
-   * This can be used if multiple, distinct modules want to share string IDs.
+   * Create the global shared string sets and register them with the registry.
+   * The first can be used if multiple, distinct modules want to share string IDs.
    * The set can be requested with:
    * \code
    * csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
    *   object_reg, "crystalspace.shared.stringset");
    * \endcode
+   *
+   * The second string set is used for shader variable names and can be
+   * requested by:
+   * \code
+   * csRef<iShaderVarStringSet> strings =
+   *   csQueryRegistryTagInterface<iShaderVarStringSet> (
+   *     objectRegistry, "crystalspace.shader.variablenameset");
+   * \endcode
    */
   static bool CreateStringSet (iObjectRegistry*);
+
+  /**
+   * Create the global system open manager sets and it them with the registry.
+   * Must be called after CreateEventQueue() and is most sensibly called
+   * before RequestPlugins().
+   */
+  static iSystemOpenManager* CreateSystemOpenManager (iObjectRegistry*);
 
   /**
    * Setup the config manager. If you have no config file then you can still

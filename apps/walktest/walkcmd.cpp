@@ -31,6 +31,7 @@
 #include "csutil/csstring.h"
 #include "csutil/flags.h"
 #include "csutil/scanstr.h"
+#include "csutil/stringconv.h"
 #include "csutil/util.h"
 #include "iengine/camera.h"
 #include "iengine/light.h"
@@ -42,6 +43,7 @@
 #include "iengine/sector.h"
 #include "iengine/sharevar.h"
 #include "iengine/scenenode.h"
+#include "iengine/rendermanager.h"
 #include "iengine/campos.h"
 #include "igeom/clip2d.h"
 #include "igraphic/imageio.h"
@@ -62,6 +64,10 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
+
+#include "imesh/animesh.h"
+#include "imesh/skeleton2.h"
+#include "imesh/skeleton2anim.h"
 
 #include "bot.h"
 #include "command.h"
@@ -545,7 +551,7 @@ double ParseScaleFactor(iObjectIterator* it)
   double sf;
   csString scaleValue = LookForKeyValue(it,"scalefactor");
 
-  sf = atof(scaleValue);
+  sf = CS::Utility::strtof(scaleValue);
   return sf;
 }
 
@@ -875,7 +881,7 @@ void WalkTest::ActivateObject (iObject* src)
 
 float safe_atof (const char* arg)
 {
-  if (arg) return atof (arg);
+  if (arg) return CS::Utility::strtof (arg);
   else return 1;
 }
 
@@ -912,7 +918,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  farplane");
     CONPRI("Lights:");
     CONPRI("  addlight dellight dellights addstlight delstlight");
-    CONPRI("  clrlights setlight relight");
+    CONPRI("  clrlights setlight");
     CONPRI("Views:");
     CONPRI("  split_view unsplit_view toggle_view");
     CONPRI("Movement:");
@@ -940,6 +946,15 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  varlist var setvar setvarv setvarc loadmap saveworld");
 
 #   undef CONPRI
+  }
+  else if (!csStrCaseCmp (cmd, "cleareffects"))
+  {
+    iRenderManager *rm = Sys->view->GetEngine ()->GetRenderManager();
+    csRef<iRenderManagerPostEffects> pe = scfQueryInterface<iRenderManagerPostEffects>(rm);
+    if (pe)
+    {
+      pe->ClearLayers();
+    }
   }
   else if (!csStrCaseCmp (cmd, "coordsave"))
   {
@@ -2206,7 +2221,6 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
     ll->Add (light);
-    Sys->view->GetEngine ()->ForceRelight (light);
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Static light added.");
   }
   else if (!csStrCaseCmp (cmd, "dellight"))
@@ -2258,16 +2272,6 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
     }
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "All dynamic lights deleted.");
-  }
-  else if (!csStrCaseCmp (cmd, "relight"))
-  {
-    csRef<iConsoleOutput> console = csQueryRegistry<iConsoleOutput> (Sys->object_reg);
-    if(console.IsValid())
-    {
-      csTextProgressMeter* meter = new csTextProgressMeter(console);
-      Sys->Engine->ForceRelight (0, meter);
-      delete meter;
-    }
   }
   else if (!csStrCaseCmp (cmd, "snd_play"))
   {
@@ -2500,6 +2504,54 @@ bool CommandHandler (const char *cmd, const char *arg)
       if (!success)
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, 
         "bugplug failed to execute '%s'", arg);
+    }
+  }
+  else if (!csStrCaseCmp (cmd, "sk2"))
+  {
+    if (!arg)
+      return true;
+
+    //sk2 mesh,node,play/stop
+    char meshName[64];
+    char nodeName[64];
+    char action[64];
+    int index = 0;
+    csScanStr (arg, "%s,%s,%s,%d", meshName, nodeName, action, &index);
+
+    // Get the data
+    csRef<iMeshWrapper> mesh = Sys->Engine->FindMeshObject (meshName);   
+    csRef<iAnimatedMesh> animesh = scfQueryInterfaceSafe<iAnimatedMesh> (mesh->GetMeshObject ());
+    
+    if (!animesh)
+      return true;
+  
+    csRef<iSkeleton2> skel = animesh->GetSkeleton ();
+    if (!skel)
+      return true;
+
+    csRef<iSkeletonAnimNode2> node = skel->GetAnimationPacket ()->GetAnimationRoot ();
+    if (!node)
+      return true;
+
+    node = node->FindNode (nodeName);
+    if (!node)
+      return true;
+
+    if (!csStrCaseCmp (action, "play"))
+    {
+      node->Play ();
+    }
+    else if (!csStrCaseCmp (action, "stop"))
+    {
+      node->Stop ();
+    }
+    else if (!csStrCaseCmp (action, "state"))
+    {
+      csRef<iSkeletonFSMNode2> fsm = scfQueryInterfaceSafe<iSkeletonFSMNode2> (node);
+      if (!fsm)
+        return true;
+
+      fsm->SwitchToState (index);
     }
   }
   else

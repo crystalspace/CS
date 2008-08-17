@@ -38,7 +38,7 @@ GRISTMETA ?= pluginmeta ;
 rule Plugin
 {
   # check options
-  CheckOptions noinstall independent nohelp notest : $(3) : $(<) ;
+  CheckOptions noinstall independent nohelp notest nodefaultfilelist : $(3) : $(<) ;
 
   local metafile ;
   metafile = [ FAppendSuffix $(<) : $(SUFMETA) ] ;
@@ -115,12 +115,19 @@ rule Plugin
   if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
   {
     local debugfile = [ SplitDebugInfo $(target) ] ;
+    $(target)_DEBUGFILE = $(debugfile) ;
     cleanextra += $(debugfile) ;
     if ! [ IsElem noinstall : $(3) ]
     {
       NoCare $(debugfile) ;
       Depends install_plugin : [ DoInstall $(debugfile) : $(plugindir) : $(INSTALL_DATA) ] ;
     }
+  }
+
+  # Create file list entry
+  if ! [ IsElem nodefaultfilelist : $(3) ]
+  {
+    FileListEntryPlugin $(<) : plugin ;
   }
 
   CFlags $(<) : $(PLUGIN.CFLAGS) ;

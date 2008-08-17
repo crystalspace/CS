@@ -148,6 +148,9 @@ namespace CS
       bool SingleAllocation = false>
     class LocalBufferAllocator : public ExcessAllocator
     {
+    #ifdef CS_DEBUG
+      void* startThis;
+    #endif
       static const size_t localSize = N * sizeof (T);
       static const uint8 freePattern = 0xfa;
       static const uint8 newlyAllocatedSalt = 0xac;
@@ -163,6 +166,9 @@ namespace CS
         }
         else
           localBuf[localSize] = 0;
+      #ifdef CS_DEBUG
+        startThis = this;
+      #endif
       }
       LocalBufferAllocator (const ExcessAllocator& xalloc) : 
         ExcessAllocator (xalloc)
@@ -175,9 +181,13 @@ namespace CS
         }
         else
           localBuf[localSize] = 0;
+      #ifdef CS_DEBUG
+        startThis = this;
+      #endif
       }
       T* Alloc (size_t allocSize)
       {
+        CS_ASSERT(startThis == this);
         if (SingleAllocation)
         {
       #ifdef CS_DEBUG
@@ -227,6 +237,7 @@ namespace CS
     
       void Free (T* mem)
       {
+        CS_ASSERT(startThis == this);
         if (SingleAllocation)
         {
           if (mem != (T*)localBuf)
@@ -269,6 +280,7 @@ namespace CS
       // in the old array that are initialized.
       void* Realloc (void* p, size_t newSize)
       {
+        CS_ASSERT(startThis == this);
         if (p == 0) return Alloc (newSize);
         if (p == localBuf)
         {

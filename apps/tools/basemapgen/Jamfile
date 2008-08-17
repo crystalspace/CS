@@ -3,6 +3,7 @@ SubDir TOP apps tools basemapgen ;
 Description basemapgen : "Terrain basemap generator" ;
 Application basemapgen : [ Wildcard *.cpp *.h ] : console ;
 LinkWith basemapgen : crystalspace ;
+FileListEntryApplications basemapgen : app-tool ;
 
 if [ Property build : projgen_version ] != 6
 {
@@ -19,6 +20,7 @@ LinkWith basemapgen_static : crystalspace ;
 
 BASEMAPGEN.PLUGINLIST =
   bindoc
+  bruteblock
   csbmpimg
   csddsimg
   csgifimg
@@ -28,6 +30,11 @@ BASEMAPGEN.PLUGINLIST =
   imgplex
   null2d
   null3d
+  simpleformer
+  simpleformerldr
+  terrainldr
+  terrain2
+  terrain2ldr
   xmltiny
   ;
 
@@ -45,5 +52,6 @@ if $(PNG.AVAILABLE) = "yes"
 }
 
 LinkStaticPlugins basemapgen_static : $(BASEMAPGEN.PLUGINLIST) ;
+FileListEntryApplications basemapgen_static : app-tool-static ;
 SubVariant ;
 }

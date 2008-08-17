@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgfx/shadervar.h"
 #include "cstool/initapp.h"
 #include "csutil/ansicommand.h"
 #include "csutil/cfgacc.h"
@@ -34,6 +35,7 @@
 #include "csutil/plugmgr.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/scfstrset.h"
+#include "csutil/systemopenmanager.h"
 #include "csutil/verbosity.h"
 #include "csutil/virtclk.h"
 
@@ -119,6 +121,7 @@ iObjectRegistry* csInitializer::CreateEnvironment (
           CreateConfigManager(r) &&
           CreateInputDrivers(r) &&
 	  CreateStringSet (r) &&
+	  CreateSystemOpenManager (r) &&
           csPlatformStartup(r))
         reg = r;
       else
@@ -179,8 +182,11 @@ bool csInitializer::CreateInputDrivers (iObjectRegistry* r)
 bool csInitializer::CreateStringSet (iObjectRegistry* r)
 {
   csRef<iStringSet> strings;
-  strings.AttachNew (new csScfStringSet ());
+  strings.AttachNew (new csScfStringSet);
   r->Register (strings, "crystalspace.shared.stringset");
+  csRef<iShaderVarStringSet> svStrings;
+  svStrings.AttachNew (new CS::ScfStringSet<iShaderVarStringSet> );
+  r->Register (svStrings, "crystalspace.shader.variablenameset");
   return true;
 }
 
@@ -230,6 +236,14 @@ iConfigManager* csInitializer::CreateConfigManager (iObjectRegistry* r)
     new csConfigManager (cfg, true));
   r->Register (Config, "iConfigManager");
   return Config;
+}
+
+iSystemOpenManager* csInitializer::CreateSystemOpenManager (iObjectRegistry* r)
+{
+  csRef<iSystemOpenManager> mgr;
+  mgr.AttachNew (new CS::Base::SystemOpenManager (r));
+  r->Register (mgr, "iSystemOpenManager");
+  return mgr;
 }
 
 static void SetupPluginLoadErrVerbosity(iObjectRegistry* r)

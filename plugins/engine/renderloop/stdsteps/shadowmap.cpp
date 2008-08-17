@@ -187,11 +187,9 @@ csShadowmapRenderStep::csShadowmapRenderStep (
   scfImplementationType (this)
 {
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
-  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
-    (object_reg, "crystalspace.shared.stringset");
+  csRef<iShaderVarStringSet> strings = csQueryRegistryTagInterface<iShaderVarStringSet> 
+    (object_reg, "crystalspace.shader.variablenameset");
   csShadowmapRenderStep::object_reg = object_reg;
-  bones_name = strings->Request("bones");
-  shader_name = strings->Request("distance_animated");
   depth_cubemap_name = strings->Request("cubemap depth");
   engine = csQueryRegistry<iEngine> (object_reg);
   context = 0;
@@ -246,7 +244,7 @@ csShadowmapRenderStep::~csShadowmapRenderStep ()
 }
 
 void csShadowmapRenderStep::Perform (iRenderView* rview, iSector* sector,
-  iShaderVarStack* stacks)
+  csShaderVariableStack& stack)
 {
   csOrthoTransform old_transform = rview->GetCamera()->GetTransform();;
   context = engine->GetContext();
@@ -368,18 +366,18 @@ void csShadowmapRenderStep::Perform (iRenderView* rview, iSector* sector,
 	{
 	  continue;
 	}
-	size_t ticket = shader->GetTicket (modes, stacks);
+	size_t ticket = shader->GetTicket (modes, stack);
 	for (size_t p = 0; p < shader->GetNumberOfPasses (ticket); p ++) 
 	{
 	  shader->ActivatePass (ticket, p);
-	  stacks->Empty ();
-	  mesh_wrappers[i]->GetSVContext ()->PushVariables (stacks);
-	  rmesh->variablecontext->PushVariables (stacks);
-	  shaderMgr->PushVariables (stacks);
-	  shader->PushVariables (stacks);
+	  stack.Clear ();
+	  mesh_wrappers[i]->GetSVContext ()->PushVariables (stack);
+	  rmesh->variablecontext->PushVariables (stack);
+	  shaderMgr->PushVariables (stack);
+	  shader->PushVariables (stack);
 	  g3d->SetWorldToCamera (rview->GetCamera()->GetTransform ().GetInverse ());
-	  shader->SetupPass (ticket, rmesh, modes, stacks);
-	  g3d->DrawMesh (rmesh, modes, stacks);
+	  shader->SetupPass (ticket, rmesh, modes, stack);
+	  g3d->DrawMesh (rmesh, modes, stack);
 	  shader->TeardownPass (ticket);
 	  shader->DeactivatePass (ticket);
         }

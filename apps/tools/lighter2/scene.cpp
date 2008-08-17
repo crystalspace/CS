@@ -23,6 +23,7 @@
 #include "kdtree.h"
 #include "statistics.h"
 #include "object_genmesh.h"
+#include "object_terrain2.h"
 
 using namespace CS;
 
@@ -155,7 +156,7 @@ namespace lighter
       }
 
       // Try to extract the "level name" from the given path
-      const size_t maxPartLen = sceneFiles[i].directory.Length();
+      const size_t maxPartLen = sceneFiles[i].directory.Length()+1;
       CS_ALLOC_STACK_ARRAY(char, pathDir, maxPartLen);
       CS_ALLOC_STACK_ARRAY(char, pathFile, maxPartLen);
       csSplitPath (sceneFiles[i].directory, pathDir, maxPartLen,
@@ -214,7 +215,8 @@ namespace lighter
 
       // Pass it to the loader
       csLoadResult rc;
-      rc = globalLighter->loader->Load (sceneFiles[i].GetDocument()->GetRoot());
+      rc = globalLighter->loader->Load (sceneFiles[i].GetDocument()->GetRoot(), 0, false,
+        sceneFiles[i].sceneConfig.GetLighterProperties().checkDupes);
       if (!rc.success)
         return globalLighter->Report ("Error loading file 'world'!");
 
@@ -591,17 +593,21 @@ namespace lighter
     if (pdLights == 0)
     {
       pdLights = new LightmapPtrDelArray;
-      for (size_t i = 0; i < lightmaps.GetSize(); i++)
-      {
-        Lightmap* lm = new Lightmap (lightmaps[i]->GetWidth(), 
-          lightmaps[i]->GetHeight());
-        lm->Grow (lightmaps[i]->GetWidth(), 
-          lightmaps[i]->GetHeight());
-        pdLights->Push (lm);
-      }
+      pdLights->SetSize (lightmaps.GetSize ());
+ 
       pdLightmaps.Put (light, pdLights);
     }
-    return pdLights->Get (realLmNum);
+
+    Lightmap* lm = pdLights->Get (realLmNum);
+    if (!lm)
+    {
+      lm = new Lightmap (lightmaps[realLmNum]->GetWidth(), 
+        lightmaps[realLmNum]->GetHeight());
+      lm->Grow (lightmaps[realLmNum]->GetWidth(), 
+        lightmaps[realLmNum]->GetHeight());
+      pdLights->Get (realLmNum) = lm;
+    }
+    return lm;
   }
 
   csArray<LightmapPtrDelArray*> Scene::GetAllLightmaps ()
@@ -997,6 +1003,11 @@ namespace lighter
       // Genmesh
       radFact.AttachNew (new ObjectFactory_Genmesh (fileInfo->sceneConfig));
     }
+    else if (!strcasecmp (type, "crystalspace.mesh.object.terrain2"))
+    {
+      // Terrain2
+      radFact.AttachNew (new ObjectFactory_Terrain2 (fileInfo->sceneConfig));
+    }
     else
       return mpNotAGenMesh;
     radFact->ParseFactory (factory);
@@ -1031,7 +1042,7 @@ namespace lighter
     csRef<iShaderVariableContext> matSVC = 
       scfQueryInterface<iShaderVariableContext> (material->GetMaterial());
     csRef<csShaderVariable> svTex =
-      matSVC->GetVariable (globalLighter->strings->Request ("tex diffuse"));
+      matSVC->GetVariable (globalLighter->svStrings->Request ("tex diffuse"));
     if (svTex.IsValid())
     {
       iTextureWrapper* texwrap = 0;
@@ -1497,7 +1508,7 @@ namespace lighter
         
       // ...and add current one
       iShaderVariableContext* meshSVs = meshwrap->GetSVContext ();
-      CS::ShaderVarName lightmapName (globalLighter->strings, "tex lightmap");
+      CS::ShaderVarName lightmapName (globalLighter->svStrings, "tex lightmap");
       csRef<csShaderVariable> lightmapSV = meshSVs->GetVariable (lightmapName);
       if (lightmapSV.IsValid())
       {
@@ -1615,9 +1626,13 @@ namespace lighter
       {
         csPtrKey<Light> key;
         LightmapPtrDelArray* lm = pdlIt.Next(key);
-        if (lm->Get (i)->IsNull (
-          globalConfig.GetLMProperties().blackThreshold,
-          globalConfig.GetLMProperties().grayPDMaps)) continue;
+        if (!lm->Get (i) || 
+            lm->Get (i)->IsNull (
+              globalConfig.GetLMProperties().blackThreshold,
+              globalConfig.GetLMProperties().grayPDMaps))
+        {
+          continue;
+        }
 
         csString lmID (key->GetLightID ().HexString());
         csString textureFilename;
@@ -1895,23 +1910,23 @@ namespace lighter
     return mf.GetAllData ();
   }
     
-  iRegion* Scene::GetRegion (iObject* obj)
+  iCollection* Scene::GetCollection (iObject* obj)
   {
-    iRegionList* regions = globalLighter->engine->GetRegions ();
-    for (int i = 0; i < regions->GetCount(); i++)
+    csRef<iCollectionArray> collections = globalLighter->engine->GetCollections ();
+    for (size_t i = 0; i < collections->GetSize(); i++)
     {
-      iRegion* reg = regions->Get (i);
-      if (reg->IsInRegion (obj)) return reg;
+      iCollection* collection = collections->Get (i);
+      if (collection->IsParentOf (obj)) return collection;
     }
     return 0;
   }
   
   bool Scene::IsObjectFromBaseDir (iObject* obj, const char* baseDir)
   {
-    iRegion* reg = GetRegion (obj);
-    if (reg == 0) return true;
+    iCollection* collection = GetCollection (obj);
+    if (collection == 0) return true;
     
-    csRef<iSaverFile> saverFile (CS::GetChildObject<iSaverFile> (reg->QueryObject()));
+    csRef<iSaverFile> saverFile (CS::GetChildObject<iSaverFile> (collection->QueryObject()));
     if (saverFile.IsValid()) return true;
     
     return strncmp (saverFile->GetFile(), baseDir, strlen (baseDir)) == 0;

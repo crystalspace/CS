@@ -85,6 +85,8 @@ void Simple::Frame ()
   csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
   csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
   c->SetTransform (ot);
+
+  rm->RenderView (view);
 }
 
 bool Simple::OnKeyboard(iEvent& ev)
@@ -210,6 +212,7 @@ bool Simple::SetupModules ()
   // Let the engine prepare all lightmaps for use and also free all images 
   // that were loaded for the texture manager.
   engine->Prepare ();
+  rm = engine->GetRenderManager();
 
   // these are used store the current orientation of the camera
   rotY = rotX = 0;
@@ -221,7 +224,7 @@ bool Simple::SetupModules ()
   // We use some other "helper" event handlers to handle 
   // pushing our work into the 3D engine and rendering it
   // to the screen.
-  drawer.AttachNew(new FrameBegin3DDraw (GetObjectRegistry (), view));
+  //drawer.AttachNew(new FrameBegin3DDraw (GetObjectRegistry (), view));
   printer.AttachNew(new FramePrinter (GetObjectRegistry ()));
 
   return true;
@@ -232,10 +235,35 @@ void Simple::CreateRoom ()
   // Load the texture from the standard library.  This is located in
   // CS/data/standard.zip and mounted as /lib/std using the Virtual
   // File System (VFS) plugin.
-  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-    ReportError("Error loading 'stone4' texture!");
+  if (!loader->LoadTexture ("brick", "/lib/std/castle/brick1_d.jpg"))
+    ReportError("Error loading 'brick1_d' texture!");
 
-  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
+  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("brick");
+  
+  /* Shader variables are identified by numeric IDs for performance reasons.
+   * The shader var string set translates string IDs to numeric IDs. */
+  csRef<iShaderVarStringSet> svStrings =
+    csQueryRegistryTagInterface<iShaderVarStringSet> (GetObjectRegistry(),
+      "crystalspace.shader.variablenameset");
+  
+  // Add a normal map to the material.
+  {
+    // Load the normal map texture itself
+    csRef<iTextureHandle> normalMap = loader->LoadTexture (
+      "/lib/std/castle/brick1_n.jpg");
+    // Set this to avoid compression - makes for better quality here
+    normalMap->SetTextureClass ("normalmap");
+    // The normal map is attached to the material through a shader variable.
+    csShaderVariable* svNormalMap =
+      tm->GetMaterial()->GetVariableAdd (svStrings->Request ("tex normal"));
+    svNormalMap->SetValue (normalMap);
+  }
+  // Set a specular reflection color.
+  {
+    csShaderVariable* svSpecColor =
+      tm->GetMaterial()->GetVariableAdd (svStrings->Request ("specular"));
+    svSpecColor->SetValue (csColor (0.8f));
+  }
 
   // We create a new sector called "room".
   room = engine->CreateSector ("room");
@@ -263,13 +291,13 @@ void Simple::CreateRoom ()
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();
 
-  light = engine->CreateLight(0, csVector3(-3, 5, 0), 10, csColor(1, 0, 0));
+  light = engine->CreateLight(0, csVector3(-3, 5, 0), 10, csColor(2, 0, 0));
   ll->Add (light);
 
-  light = engine->CreateLight(0, csVector3(3, 5,  0), 10, csColor(0, 0, 1));
+  light = engine->CreateLight(0, csVector3(3, 5,  0), 10, csColor(0, 0, 2));
   ll->Add (light);
 
-  light = engine->CreateLight(0, csVector3(0, 5, -3), 10, csColor(0, 1, 0));
+  light = engine->CreateLight(0, csVector3(0, 5, -3), 10, csColor(0, 2, 0));
   ll->Add (light);
 }
 

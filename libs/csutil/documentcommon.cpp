@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "csutil/documentcommon.h"
 #include "csutil/documenthelper.h"
+#include "csutil/scanstr.h"
 
 using namespace CS;
 
@@ -97,7 +98,7 @@ float csDocumentNodeCommon::GetContentsValueAsFloat ()
   const char* v = GetContentsValue ();
   if (!v) return 0;
   float val = 0.0;
-  sscanf (v, "%f", &val);
+  csScanStr (v, "%f", &val);
   return val;
 }
 
@@ -160,7 +161,7 @@ float csDocumentAttributeCommon::GetValueAsFloat ()
   const char* v = GetValue ();
   if (!v) return 0;
   float val = 0;
-  sscanf (v, "%f", &val);
+  csScanStr (v, "%f", &val);
   return val;
 }
 

@@ -304,6 +304,7 @@ typedef unsigned char uint8;
 %apply float * INOUT { float & iG };
 %apply float * INOUT { float & iB };
 
+
 %include "cstypes.h"
 
 %define CS_WRAP_PTR_IMPLEMENT(PtrName)
@@ -483,9 +484,11 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csArray::GetExtend;
 %ignore csArray::GetIndex;
 %ignore csArray::GetIterator;
+%ignore csArray::GetReverseIterator;
 %ignore csArray::InitRegion;
 %ignore csArray::InsertSorted;
 %ignore csArray::Iterator;
+%ignore csArray::ReverseIterator;
 %ignore csArray::Length;
 %ignore csArray::PushSmart;
 %ignore csArray::Section;
@@ -497,7 +500,6 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csArray::TransferTo;
 %ignore csArray::operator=;
 %ignore csArray::operator[];
-%ignore csArray::Iterator;
 /* The following is a bit ugly but otherwise there is no way pass the
    necessary directives to swig between template declarations.        */
 template <typename Threshold = csArrayThresholdVariable>
@@ -572,12 +574,15 @@ void SetCoreSCFPointer(iSCF *scf_pointer)
 
 %include "csutil/flags.h"
 
-%ignore csStringSet::GlobalIterator;
-%ignore csStringSet::GetIterator;
-DEPRECATED_METHOD(csStringSet,Clear,Empty);
+%ignore CS::Utility::StringSet::GlobalIterator;
+%ignore CS::Utility::StringSet::GetIterator;
+%ignore CS::Utility::GetIterator;
 DEPRECATED_METHOD(iStringArray,Length,GetSize);
 DEPRECATED_METHOD(iStringArray,DeleteAll,Empty);
+/* %apply unsigned long { csStringID }; */
+%include "iutil/strset.h"
 %include "csutil/strset.h"
+DEPRECATED_METHOD(CS::Utility::StringSet,Clear,Empty);
 %ignore csSet::GlobalIterator;
 %ignore csSet::GetIterator;
 %include "csutil/set.h"
@@ -627,10 +632,11 @@ SET_HELPER(csStringID)
 %ignore csArray<csPluginRequest>::GetExtend;
 %ignore csArray<csPluginRequest>::GetIndex;
 %ignore csArray<csPluginRequest>::GetIterator;
+%ignore csArray<csPluginRequest>::GetReverseIterator;
 %ignore csArray<csPluginRequest>::InitRegion;
 %ignore csArray<csPluginRequest>::InsertSorted;
 %ignore csArray<csPluginRequest>::Iterator;
-%ignore csArray<csPluginRequest>::Iterator;
+%ignore csArray<csPluginRequest>::ReverseIterator;
 %ignore csArray<csPluginRequest>::PushSmart;
 %ignore csArray<csPluginRequest>::Put;
 %ignore csArray<csPluginRequest>::Section;
@@ -645,15 +651,6 @@ SET_HELPER(csStringID)
 %ignore csArray<csPluginRequest>::operator[];
 %template(csPluginRequestArray) csArray<csPluginRequest>;
 
-%include "igeom/clip2d.h"
-%include "igeom/path.h"
-%template(scfPath) scfImplementation1<csPath,iPath >;
-#ifndef CS_SWIG_PUBLISH_IGENERAL_FACTORY_STATE_ARRAYS
-%ignore iTriangleMesh::GetTriangles;
-%ignore iTriangleMesh::GetVertices;
-#endif
-%include "igeom/trimesh.h"
-
 %ignore iReporter::ReportV;
 %ignore csReporterHelper::ReportV;
 %include "ivaria/reporter.h"
@@ -667,7 +664,6 @@ SET_HELPER(csStringID)
 {
   ITERATOR_FUNCTIONS(iObjectIterator)
 }
-%include "iutil/strset.h"
 %ignore CS_QUERY_REGISTRY_TAG_is_deprecated;
 %include "iutil/objreg.h"
 %include "iutil/virtclk.h"
@@ -759,6 +755,20 @@ template <class T, class K = unsigned int,
   ITERATOR_FUNCTIONS(iPluginIterator)
 }
 
+%template(scfObject) scfImplementation1<csObject,iObject >;
+%include "csutil/csobject.h"
+
+%include "igeom/clip2d.h"
+%include "igeom/path.h"
+
+%template(scfPath) scfImplementationExt1<csPath,csObject,iPath >;
+#ifndef CS_SWIG_PUBLISH_IGENERAL_FACTORY_STATE_ARRAYS
+%ignore iTriangleMesh::GetTriangles;
+%ignore iTriangleMesh::GetVertices;
+#endif
+%include "igeom/trimesh.h"
+
+
 %include "iutil/csinput.h"
 %include "iutil/cfgfile.h"
 %include "iutil/cfgmgr.h"
@@ -805,8 +815,6 @@ BUFFER_RW_FUNCTIONS(iDataBuffer,GetData,GetSize,
 %include "igraphic/animimg.h"
 %include "itexture/iproctex.h"
 
-%template(pycsObject) scfImplementation1<csObject,iObject >;
-%include "csutil/csobject.h"
 %ignore iBase::~iBase(); // We replace iBase dtor with one that calls DecRef().
 			 // Swig already knows not to delete an SCF pointer.
 

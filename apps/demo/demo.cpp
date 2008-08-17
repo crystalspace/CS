@@ -35,6 +35,7 @@
 #include "csutil/csevent.h"
 #include "csutil/stringarray.h"
 #include "csutil/sysfunc.h"
+#include "csutil/common_handlers.h"
 
 #include "iengine/camera.h"
 #include "iengine/engine.h"
@@ -109,14 +110,9 @@ void Cleanup ()
 
 static bool DemoEventHandler (iEvent& ev)
 {
-  if (ev.Name == System->Process)
+  if (ev.Name == System->Frame)
   {
     System->SetupFrame ();
-    return true;
-  }
-  else if (ev.Name == System->FinalProcess)
-  {
-    System->FinishFrame ();
     return true;
   }
   else
@@ -208,15 +204,13 @@ bool Demo::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  Process = csevProcess (object_reg);
-  FinalProcess = csevFinalProcess (object_reg);
+  Frame = csevFrame (object_reg);
   KeyboardDown = csevKeyboardDown (object_reg);
   MouseDown = csevMouseDown (object_reg, 0);
   MouseMove = csevMouseMove (object_reg, 0);
 
   csEventID events[] = {
-    Process,
-    FinalProcess,
+    Frame,
     KeyboardDown,
     MouseDown,
     MouseMove,
@@ -340,6 +334,8 @@ bool Demo::Initialize (int argc, const char* const argv[],
   col_yellow = myG2D->FindRGB (255, 255, 0);
   col_cyan = myG2D->FindRGB (0, 255, 255);
   col_green = myG2D->FindRGB (0, 255, 0);
+
+  printer.AttachNew (new FramePrinter (object_reg));
 
   return true;
 }
@@ -520,7 +516,7 @@ void Demo::SetupFrame ()
   {
     csTicks debug_time;
     csTicks start, total;
-    csNamedPath* np = seqmgr->GetSelectedPath (map_selpath, start, total);
+    csPath* np = seqmgr->GetSelectedPath (map_selpath, start, total);
     if (np)
     {
       float r = np->GetTime (map_selpoint);
@@ -534,7 +530,7 @@ void Demo::SetupFrame ()
 
   if (map_enabled == MAP_EDIT_FORWARD)
   {
-    csNamedPath* np = seqmgr->GetSelectedPath (map_selpath);
+    csPath* np = seqmgr->GetSelectedPath (map_selpath);
     if (np)
     {
       float r = np->GetTime (map_selpoint);
@@ -608,12 +604,6 @@ void Demo::SetupFrame ()
   }
 }
 
-void Demo::FinishFrame ()
-{
-  myG3D->FinishDraw ();
-  myG3D->Print (0);
-}
-
 void Demo::DrawEditInfo ()
 {
   int fw, fh;
@@ -623,7 +613,7 @@ void Demo::DrawEditInfo ()
   myG2D->DrawBox (dim+5, 0, myG2D->GetWidth ()-dim-5,
   	myG2D->GetHeight (), col_white);
   csTicks start, total;
-  csNamedPath* np = seqmgr->GetSelectedPath (map_selpath, start, total);
+  csPath* np = seqmgr->GetSelectedPath (map_selpath, start, total);
   if (np)
   {
     int ww = dim+10;
@@ -710,7 +700,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
       //==============================
       // Handle keys in path_edit_forward mode.
       //==============================
-      csNamedPath* np = seqmgr->GetSelectedPath (map_selpath);
+      csPath* np = seqmgr->GetSelectedPath (map_selpath);
       if (np)
       {
         float dx = map_br.x - map_tl.x;
@@ -898,7 +888,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
       //==============================
       // Handle keys in path editing mode.
       //==============================
-      csNamedPath* np = seqmgr->GetSelectedPath (map_selpath);
+      csPath* np = seqmgr->GetSelectedPath (map_selpath);
       float dx = map_br.x - map_tl.x;
       float dy = map_br.y - map_tl.y;
       float speed;
@@ -1292,7 +1282,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
       csVector3 vw = view->GetCamera ()->GetTransform ().This2Other (v);
       if (map_enabled == MAP_EDIT_FORWARD)
       {
-        csNamedPath* np = seqmgr->GetSelectedPath (map_selpath);
+        csPath* np = seqmgr->GetSelectedPath (map_selpath);
 	if (np)
 	{
 	  vw -= view->GetCamera ()->GetTransform ().GetOrigin ();

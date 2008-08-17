@@ -28,6 +28,7 @@
 #include "csutil/databuf.h"
 #include "csutil/scf.h"
 #include "csutil/scfstrset.h"
+#include "csutil/scanstr.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
 #include "csutil/vfscache.h"
@@ -74,10 +75,11 @@
 #include "plugins/engine/3d/meshobj.h"
 #include "plugins/engine/3d/objwatch.h"
 #include "plugins/engine/3d/portalcontainer.h"
-#include "plugins/engine/3d/region.h"
 #include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/texture.h"
 #include "plugins/engine/3d/meshgen.h"
+
+using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
 
 CS_IMPLEMENT_PLUGIN
 
@@ -367,21 +369,11 @@ private:
 
 //---------------------------------------------------------------------------
 
-csLightIt::csLightIt (csEngine *e, iRegion *r) :
-  scfImplementationType (this),
-  engine(e),
-  region(r)
-{
-  collection = NULL;
-  Reset ();
-}
-
 csLightIt::csLightIt (csEngine *e, iCollection *c) :
   scfImplementationType (this),
   engine(e),
   collection(c)
 {
-  region = NULL;
   Reset ();
 }
 
@@ -392,15 +384,7 @@ csLightIt::~csLightIt ()
 bool csLightIt::NextSector ()
 {
   sectorIndex++;
-  if(region)
-  {
-    while(sectorIndex < engine->sectors.GetCount () &&
-      	  !region->IsInRegion(GetLastSector()->QueryObject()))
-    {
-      sectorIndex++;
-    }
-  }
-  else if(collection)
+  if(collection)
   {
     while(sectorIndex < engine->sectors.GetCount() &&
       	  !collection->IsParentOf(GetLastSector()->QueryObject()))
@@ -518,8 +502,9 @@ void csEngine::AddImposterToUpdateQueue (csImposterProcTex* imptex,
   {
     // We don't yet have this camera in our queue. Make a clone of
     // the renderview and camera.
-    csRenderView* copy_rview = 
-      new (rviewPool) csRenderView (*(csRenderView*)rview);
+    CS::RenderManager::RenderView* copy_rview = 
+      new (rviewPool) CS::RenderManager::RenderView (
+        *(CS::RenderManager::RenderView*)rview);
     csImposterUpdateQueue qu;
     qu.rview.AttachNew (copy_rview);
     imposterUpdateQueue.Put (camnr, qu);
@@ -561,6 +546,7 @@ SCF_IMPLEMENT_FACTORY (csEngine)
 
 csEngine::csEngine (iBase *iParent) :
   scfImplementationType (this, iParent), objectRegistry (0),
+  envTexHolder (this),
   frameWidth (0), frameHeight (0), 
   lightAmbientRed (CS_DEFAULT_LIGHT_LEVEL),
   lightAmbientGreen (CS_DEFAULT_LIGHT_LEVEL),
@@ -610,6 +596,10 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
 
   globalStringSet = csQueryRegistryTagInterface<iStringSet> (
       objectRegistry, "crystalspace.shared.stringset");
+
+  svNameStringSet = csQueryRegistryTagInterface<iShaderVarStringSet> (
+    objectRegistry, "crystalspace.shader.variablenameset");
+
   colldet_id = globalStringSet->Request ("colldet");
   viscull_id = globalStringSet->Request ("viscull");
   base_id = globalStringSet->Request ("base");
@@ -673,7 +663,7 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
 
     csRef<csImposterEventHandler> imphandler;
     imphandler.AttachNew (new csImposterEventHandler (this));
-    q->RegisterListener (imphandler, csevPreProcess (objectRegistry));
+    q->RegisterListener (imphandler, csevFrame (objectRegistry));
   }
 
   csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
@@ -694,31 +684,25 @@ bool csEngine::HandleEvent (iEvent &Event)
 {
   if (Event.Name == SystemOpen)
   {
-  if (G3D)
-  {
-    id_creation_time = globalStringSet->Request("mesh creation time");
-    id_lod_fade = globalStringSet->Request("lod fade");
+    if (G3D)
+    {
+      maxAspectRatio = 4096;
+      frameWidth = G3D->GetWidth ();
+      frameHeight = G3D->GetHeight ();
+    }
+    else
+    {
+      maxAspectRatio = 4096;
+      frameWidth = 640;
+      frameHeight = 480;
+    }
 
-    maxAspectRatio = 4096;
-    frameWidth = G3D->GetWidth ();
-    frameHeight = G3D->GetHeight ();
-  }
-  else
-  {
-    maxAspectRatio = 4096;
-    frameWidth = 640;
-    frameHeight = 480;
-  }
+    if (PerspectiveImpl::GetDefaultFOV () == 0)
+      PerspectiveImpl::SetDefaultFOV (frameHeight/(float)frameWidth, 1.0f);
 
-  if (csCamera::GetDefaultFOV () == 0)
-    csCamera::SetDefaultFOV (frameHeight, frameWidth);
+    StartEngine ();
 
-  // Allow context resizing since we handle CanvasResize(G2D)
-  if (G2D) G2D->AllowResize (true);
-
-  StartEngine ();
-
-  return true;
+    return true;
   }
   else if (Event.Name == SystemClose)
   {
@@ -755,6 +739,56 @@ iMeshObjectType* csEngine::GetThingType ()
 
   return (iMeshObjectType*)thingMeshType;
 }
+  
+void csEngine::SetRenderManager (iRenderManager* newRM)
+{
+  if (newRM == 0) return;
+
+  if (renderManager.IsValid())
+    objectRegistry->Unregister (renderManager, "iRenderManager");
+  renderManager = newRM;
+  
+  objectRegistry->Register (renderManager, "iRenderManager");
+}
+
+void csEngine::ReloadRenderManager (csConfigAccess& cfg)
+{
+  const char fallbackRM[] = "crystalspace.rendermanager.rlcompat";
+  const char* defaultRM = cfg->GetStr ("Engine.RenderManager.Default", 0);
+  if (defaultRM == 0)
+  {
+    Warn ("No default render manager given, using '%s'", fallbackRM);
+    defaultRM = fallbackRM;
+  }
+  csRef<iRenderManager> newRM = csLoadPlugin<iRenderManager> (objectRegistry,
+    defaultRM);
+  if (!newRM)
+    Error ("No rendermanager set!");
+  else
+  {
+    csEngine::SetRenderManager (newRM);
+  }
+}
+
+void csEngine::ReloadRenderManager ()
+{
+  csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
+  ReloadRenderManager (cfg);
+}
+
+csShaderVariable* csEngine::GetLightAttenuationTextureSV()
+{
+  if (!lightAttenuationTexture)
+  {
+    lightAttenuationTexture.AttachNew (new csShaderVariable (
+      lightSvNames.GetLightSVId (csLightShaderVarCache::lightAttenuationTex)));
+    lightAttenuationTexture->SetType (csShaderVariable::TEXTURE);
+    csRef<LightAttenuationTextureAccessor> accessor;
+    accessor.AttachNew (new LightAttenuationTextureAccessor (this));
+    lightAttenuationTexture->SetAccessor (accessor);
+  }
+  return lightAttenuationTexture;
+}
 
 void csEngine::DeleteAllForce ()
 {
@@ -773,12 +807,10 @@ void csEngine::DeleteAllForce ()
   sectors.RemoveAll ();
   cameraPositions.RemoveAll ();
 
-  delete materials;
-  materials = new csMaterialList ();
-  delete textures;
-  textures = new csTextureList (this);
-  delete sharedVariables;
-  sharedVariables = new csSharedVariableList();
+  defaultPortalMaterial.Invalidate ();
+  materials->RemoveAll();
+  textures->RemoveAll();
+  sharedVariables->RemoveAll();
 
   if (shaderManager)
   {
@@ -796,14 +828,15 @@ void csEngine::DeleteAllForce ()
 
   currentRenderContext = 0;
 
-  // Clear all regions.
-  regions.RemoveAll ();
-
   // Clear all render priorities.
   ClearRenderPriorities ();
 
   // remove objects
   QueryObject ()->ObjRemoveAll ();
+
+  envTexHolder.Clear ();
+  
+  lightAttenuationTexture.Invalidate ();
 }
 
 void csEngine::DeleteAll ()
@@ -840,6 +873,15 @@ void csEngine::DeleteAll ()
     csRef<iShader> portal_shader = LoadShader (docsys, shaderPath);
     if (!portal_shader.IsValid())
       Warn ("Default shader %s not available", shaderPath);
+      
+    csRef<csMaterial> portalMat;
+    portalMat.AttachNew (new csMaterial (this));
+    // FIXME: hardcoded shader type; prolly move to render manager
+    portalMat->SetShader (globalStringSet->Request ("standard"),
+      portal_shader);
+    csRef<iMaterialWrapper> portalMaterialWrapper;
+    portalMaterialWrapper = materials->NewMaterial (portalMat, 0);
+    defaultPortalMaterial = portalMaterialWrapper;
 
     // Now, try to load the user-specified default render loop.
     const char* configLoop = cfg->GetStr ("Engine.RenderLoop.Default", 0);
@@ -869,6 +911,8 @@ void csEngine::DeleteAll ()
     // Register it.
     renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, 
       defaultRenderLoop);
+
+    csEngine::ReloadRenderManager();
   }
 }
 
@@ -1030,59 +1074,6 @@ bool csEngine::Prepare (iProgressMeter *meter)
   return true;
 }
 
-void csEngine::ForceRelight (iRegion* region, iProgressMeter *meter)
-{
-  int old_lightmapCacheMode = lightmapCacheMode;
-  lightmapCacheMode &= ~CS_ENGINE_CACHE_READ;
-  lightmapCacheMode &= ~CS_ENGINE_CACHE_NOUPDATE;
-  ShineLights (region, meter);
-  lightmapCacheMode = old_lightmapCacheMode;
-}
-
-void csEngine::ForceRelight (iLight* light, iRegion* region)
-{
-  int sn;
-  int num_meshes = meshes.GetCount ();
-
-  for (sn = 0; sn < num_meshes; sn++)
-  {
-    iMeshWrapper *s = meshes.Get (sn);
-    if (s->GetMovable ()->GetSectors ()->GetCount () <= 0)
-      continue;	// No sectors, don't process lighting.
-    if (!region || region->IsInRegion (s->QueryObject ()))
-    {
-      iLightingInfo* linfo = s->GetLightingInfo ();
-      if (linfo)
-      {
-	// Do not clear!
-        linfo->InitializeDefault (false);
-      }
-    }
-  }
-
-  ((csLight*)light)->GetPrivateObject ()->CalculateLighting ();
-
-  iCacheManager* cm = GetCacheManager ();
-  for (sn = 0 ; sn < num_meshes ; sn++)
-  {
-    iMeshWrapper *s = meshes.Get (sn);
-    if (s->GetMovable ()->GetSectors ()->GetCount () <= 0)
-      continue;	// No sectors, don't process lighting.
-    if (!region || region->IsInRegion (s->QueryObject ()))
-    {
-      iLightingInfo* linfo = s->GetLightingInfo ();
-      if (linfo)
-      {
-	if (lightmapCacheMode & CS_ENGINE_CACHE_WRITE)
-          linfo->WriteToCache (cm);
-        linfo->PrepareLighting ();
-      }
-    }
-  }
-
-  cm->Flush ();
-}
-
 void csEngine::RemoveLight (iLight* light)
 {
   int sn;
@@ -1152,7 +1143,7 @@ void csEngine::AddMeshAndChildren (iMeshWrapper* mesh)
   }
 }
 
-void csEngine::ShineLights (iBase *base, iProgressMeter *meter)
+void csEngine::ShineLights (iCollection *collection, iProgressMeter *meter)
 {
   // If we have to read from the cache then we check if the 'precalc_info'
   // file exists on the VFS. If not then we cannot use the cache.
@@ -1173,10 +1164,6 @@ void csEngine::ShineLights (iBase *base, iProgressMeter *meter)
     float cosinus_factor;
     int lightmap_size;
   };
-
-  // Compat for collections.
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
-  csRef<iCollection> col (scfQueryInterfaceSafe<iCollection>(base));
 
   PrecalcInfo current;
   memset (&current, 0, sizeof (current));
@@ -1224,7 +1211,7 @@ void csEngine::ShineLights (iBase *base, iProgressMeter *meter)
       if (input) *input++ = 0;
 
       float xf;
-      sscanf (endkw, "%f", &xf);
+      csScanStr (endkw, "%f", &xf);
 
       int xi = int (xf + ((xf < 0) ? -0.5 : + 0.5));
 
@@ -1286,7 +1273,7 @@ void csEngine::ShineLights (iBase *base, iProgressMeter *meter)
     Report ("Recalculation of lightmaps forced.");
   }
 
-  csRef<iLightIterator> lit = GetLightIterator (base);
+  csRef<iLightIterator> lit = GetLightIterator (collection);
 
   // Count number of lights to process.
   iLight *l;
@@ -1321,8 +1308,7 @@ void csEngine::ShineLights (iBase *base, iProgressMeter *meter)
     if (s->GetMovable ()->GetSectors ()->GetCount () <= 0 &&
 	s->QuerySceneNode ()->GetParent () == 0)
       continue;	// No sectors and no parent mesh, don't process lighting.
-    if ((!region || region->IsInRegion (s->QueryObject ())) &&
-        (!col || col->IsParentOf (s->QueryObject ())))
+    if (!collection || collection->IsParentOf (s->QueryObject ()))
     {
       iLightingInfo* linfo = s->GetLightingInfo ();
       if (linfo)
@@ -1408,8 +1394,7 @@ void csEngine::ShineLights (iBase *base, iProgressMeter *meter)
     if (s->GetMovable ()->GetSectors ()->GetCount () <= 0 &&
 	s->QuerySceneNode ()->GetParent () == 0)
       continue;	// No sectors or parent mesh, don't process lighting.
-    if ((!region || region->IsInRegion (s->QueryObject ())) &&
-        (!col || col->IsParentOf (s->QueryObject ())))
+    if (!collection || collection->IsParentOf (s->QueryObject ()))
     {
       iLightingInfo* linfo = s->GetLightingInfo ();
       if (linfo)
@@ -1437,6 +1422,21 @@ bool csEngine::CheckConsistency ()
 void csEngine::StartEngine ()
 {
   DeleteAll ();
+  id_creation_time = svNameStringSet->Request("mesh creation time");
+  svTexEnvironmentName = svNameStringSet->Request("tex environment");
+  id_lod_fade = svNameStringSet->Request("lod fade");
+
+  lightSvNames.SetStrings (svNameStringSet);
+  /* Generate light SV IDs - that way, space for them will be reserved
+   * when shader stacks are set up */
+  for (int p = 0; p < csLightShaderVarCache::_lightCount; p++)
+  {
+    lightSvNames.GetLightSVId (csLightShaderVarCache::LightProperty (p));
+  }
+  for (int p = 0; p < csLightShaderVarCache::_varCount; p++)
+  {
+    lightSvNames.GetDefaultSVId (csLightShaderVarCache::DefaultSV (p));
+  }
 }
 
 void csEngine::PrecacheMesh (iMeshWrapper* s, iRenderView* rview)
@@ -1456,21 +1456,7 @@ void csEngine::PrecacheMesh (iMeshWrapper* s, iRenderView* rview)
   }
 }
 
-void csEngine::PrecacheDraw (iBase* base)
-{
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
-  if(region)
-  {
-    PrecacheDrawRegion(region);
-  }
-  else
-  {
-    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
-    PrecacheDrawCollection(collection);
-  }
-}
-
-void csEngine::PrecacheDrawCollection (iCollection* collection)
+void csEngine::PrecacheDraw (iCollection* collection)
 {
   currentFrameNumber++;
 
@@ -1479,7 +1465,7 @@ void csEngine::PrecacheDrawCollection (iCollection* collection)
   view.AttachNew (new csBoxClipper (0.0, 0.0, float (G3D->GetWidth ()),
     float (G3D->GetHeight ())));
 
-  csRenderView rview (c, view, G3D, G2D);
+  CS::RenderManager::RenderView rview (c, view, G3D, G2D);
   StartDraw (c, view, rview);
 
   int sn;
@@ -1509,46 +1495,8 @@ void csEngine::PrecacheDrawCollection (iCollection* collection)
   }
 }
 
-void csEngine::PrecacheDrawRegion (iRegion* region)
-{
-  currentFrameNumber++;
-
-  csRef<iCamera> c = CreateCamera ();
-  csRef<iClipper2D> view;
-  view.AttachNew (new csBoxClipper (0.0, 0.0, float (G3D->GetWidth ()),
-  	float (G3D->GetHeight ())));
-
-  csRenderView rview (c, view, G3D, G2D);
-  StartDraw (c, view, rview);
-
-  int sn;
-  for (sn = 0; sn < meshes.GetCount (); sn++)
-  {
-    iMeshWrapper *s = meshes.Get (sn);
-    if (!region || region->IsInRegion (s->QueryObject ()))
-      PrecacheMesh (s, &rview);
-  }
-
-  for (sn = 0 ; sn < sectors.GetCount () ; sn++)
-  {
-    iSector* s = sectors.Get (sn);
-    if (!region || region->IsInRegion (s->QueryObject ()))
-      s->PrecacheDraw ();
-  }
-
-  size_t i;
-  for (i = 0 ; i < textures->GetSize () ; i++)
-  {
-    iTextureWrapper* txt = textures->Get ((int)i);
-    if (txt->GetTextureHandle ())
-      if (!region || region->IsInRegion (txt->QueryObject ()))
-      {
-	txt->GetTextureHandle ()->Precache ();
-      }
-  }
-}
-
-void csEngine::StartDraw (iCamera *c, iClipper2D* /*view*/, csRenderView &rview)
+void csEngine::StartDraw (iCamera *c, iClipper2D* /*view*/,
+                          CS::RenderManager::RenderView &rview)
 {
   rview.SetEngine (this);
   rview.SetOriginalCamera (c);
@@ -1565,6 +1513,8 @@ void csEngine::StartDraw (iCamera *c, iClipper2D* /*view*/, csRenderView &rview)
   rview.GetClipPlane ().Set (0, 0, -1, 0);
 
   // Calculate frustum for screen dimensions (at z=1).
+  c->SetViewportSize (rview.GetGraphics3D()->GetWidth(),
+    rview.GetGraphics3D()->GetHeight());
   float leftx = -c->GetShiftX () * c->GetInvFOV ();
   float rightx = (frameWidth - c->GetShiftX ()) * c->GetInvFOV ();
   float topy = -c->GetShiftY () * c->GetInvFOV ();
@@ -1580,24 +1530,31 @@ void csEngine::Draw (iCamera *c, iClipper2D *view, iMeshWrapper* mesh)
     bugplug->ResetCounter ("Sector Count");
 
   currentFrameNumber++;
+  c->SetViewportSize (frameWidth, frameHeight);
   ControlMeshes ();
-  csRef<csRenderView> rview;
-  rview.AttachNew (new (rviewPool) csRenderView (c, view, G3D, G2D));
+  csRef<CS::RenderManager::RenderView> rview;
+  rview.AttachNew (new (rviewPool) CS::RenderManager::RenderView (c, view,
+    G3D, G2D));
   StartDraw (c, view, *rview);
 
   // First initialize G3D with the right clipper.
   G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);  // We are at top-level.
   G3D->ResetNearPlane ();
-  G3D->SetPerspectiveAspect (c->GetFOV ());
+  G3D->SetProjectionMatrix (c->GetProjectionMatrix ());
 
   FireStartFrame (rview);
 
   iSector *s = c->GetSector ();
   if (s) 
   {
+    csShaderVariableStack& varStack = shaderManager->GetShaderVariableStack ();
+    varStack.Setup (shaderManager->GetSVNameStringset ()->GetSize ());
+
     iRenderLoop* rl = s->GetRenderLoop ();
     if (!rl) rl = defaultRenderLoop;
     rl->Draw (rview, s, mesh);
+
+    varStack.Setup (0);
   }
 
   // draw all halos on the screen
@@ -1838,87 +1795,32 @@ void csEngine::ControlMeshes ()
   }
 }
 
-char* csEngine::SplitRegionName(const char* name, iRegion*& region,
-	bool& global)
-{
-  region = 0;
-  global = false;
-
-  char* p = (char*)strchr (name, '/');
-  if (!p) return (char*)name;
-  if (*name == '*' && *(name+1) == '/')
-  {
-    global = true;
-    return p+1;
-  }
-
-  *p = 0;
-  region = regions.FindByName (name);
-  *p = '/';
-  if (!region) return 0;
-  return p+1;
-}
-
-char* csEngine::SplitCollectionName(const char* name, iCollection*& collection,
+const char* csEngine::SplitCollectionName(const char* name, iCollection*& collection,
 	bool& global)
 {
   collection = 0;
   global = false;
 
-  char* p = (char*)strchr (name, '/');
-  if (!p) return (char*)name;
+  const char* p = strchr (name, '/');
+  if (!p) return name;
   if (*name == '*' && *(name+1) == '/')
   {
     global = true;
     return p+1;
   }
 
-  *p = 0;
-  collection = GetCollection(name);
-  *p = '/';
+  csString collectionPart (name, p - name);
+  collection = GetCollection (collectionPart);
   if (!collection) return 0;
   return p+1;
 }
 
-iMaterialWrapper* csEngine::FindMaterial (const char* name,
-	iBase* base)
-{
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
-  if(region)
-  {
-    return FindMaterialRegion(name, region);
-  }
-  else
-  {
-    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
-    return FindMaterialCollection(name, collection);
-  }
-}
-
-iMaterialWrapper* csEngine::FindMaterialRegion(const char* name,
-	iRegion* reg)
-{
-  iRegion* region;
-  bool global;
-  char* n = SplitRegionName (name, region, global);
-  if (!n) return 0;
-
-  iMaterialWrapper* mat;
-  if (region)
-    mat = region->FindMaterial (n);
-  else if (!global && reg)
-    mat = reg->FindMaterial (n);
-  else
-    mat = GetMaterialList ()->FindByName (n);
-  return mat;
-}
-
-iMaterialWrapper* csEngine::FindMaterialCollection(const char* name,
+iMaterialWrapper* csEngine::FindMaterial(const char* name,
 	iCollection* col)
 {
   iCollection* collection;
   bool global;
-  char* n = SplitCollectionName (name, collection, global);
+  const char* n = SplitCollectionName (name, collection, global);
   if (!n) return 0;
 
   iMaterialWrapper* mat;
@@ -1932,44 +1834,11 @@ iMaterialWrapper* csEngine::FindMaterialCollection(const char* name,
 }
 
 iTextureWrapper* csEngine::FindTexture (const char* name,
-	iBase* base)
-{
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
-  if(region)
-  {
-    return FindTextureRegion(name, region);
-  }
-  else
-  {
-    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
-    return FindTextureCollection(name, collection);
-  }
-}
-
-iTextureWrapper* csEngine::FindTextureRegion (const char* name,
-	iRegion* reg)
-{
-  iRegion* region;
-  bool global;
-  char* n = SplitRegionName (name, region, global);
-  if (!n) return 0;
-
-  iTextureWrapper* txt;
-  if (region)
-    txt = region->FindTexture (n);
-  else if (!global && reg)
-    txt = reg->FindTexture (n);
-  else
-    txt = GetTextureList ()->FindByName (n);
-  return txt;
-}
-
-iTextureWrapper* csEngine::FindTextureCollection (const char* name,
 	iCollection* col)
 {
-  iRegion* collection;
+  iCollection* collection;
   bool global;
-  char* n = SplitRegionName (name, collection, global);
+  const char* n = SplitCollectionName (name, collection, global);
   if (!n) return 0;
 
   iTextureWrapper* txt;
@@ -1982,45 +1851,12 @@ iTextureWrapper* csEngine::FindTextureCollection (const char* name,
   return txt;
 }
 
-iSector* csEngine::FindSector(const char* name,
-	iBase* base)
-{
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
-  if(region)
-  {
-    return FindSectorRegion(name, region);
-  }
-  else
-  {
-    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
-    return FindSectorCollection(name, collection);
-  }
-}
-
-iSector* csEngine::FindSectorRegion (const char* name,
-	iRegion* reg)
-{
-  iRegion* region;
-  bool global;
-  char* n = SplitRegionName (name, region, global);
-  if (!n) return 0;
-
-  iSector* sect;
-  if (region)
-    sect = region->FindSector (n);
-  else if (!global && reg)
-    sect = reg->FindSector (n);
-  else
-    sect = GetSectors ()->FindByName (n);
-  return sect;
-}
-
-iSector* csEngine::FindSectorCollection (const char* name,
+iSector* csEngine::FindSector (const char* name,
                                iCollection* col = 0)
 {
   iCollection* collection;
   bool global;
-  char* n = SplitCollectionName (name, collection, global);
+  const char* n = SplitCollectionName (name, collection, global);
   if (!n) return 0;
 
   csRef<iSector> sect;
@@ -2034,44 +1870,11 @@ iSector* csEngine::FindSectorCollection (const char* name,
 }
 
 iMeshWrapper* csEngine::FindMeshObject (const char* name,
-	iBase* base)
-{
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
-  if(region)
-  {
-    return FindMeshObjectRegion(name, region);
-  }
-  else
-  {
-    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
-    return FindMeshObjectCollection(name, collection);
-  }
-}
-
-iMeshWrapper* csEngine::FindMeshObjectRegion (const char* name,
-	iRegion* reg)
-{
-  iRegion* region;
-  bool global;
-  char* n = SplitRegionName (name, region, global);
-  if (!n) return 0;
-
-  iMeshWrapper* mesh;
-  if (region)
-    mesh = region->FindMeshObject (n);
-  else if (!global && reg)
-    mesh = reg->FindMeshObject (n);
-  else
-    mesh = GetMeshes ()->FindByName (n);
-  return mesh;
-}
-
-iMeshWrapper* csEngine::FindMeshObjectCollection (const char* name,
 	iCollection* col)
 {
   iCollection* collection;
   bool global;
-  char* n = SplitCollectionName(name, collection, global);
+  const char* n = SplitCollectionName(name, collection, global);
   if (!n) return 0;
 
   iMeshWrapper* mesh;
@@ -2085,44 +1888,11 @@ iMeshWrapper* csEngine::FindMeshObjectCollection (const char* name,
 }
 
 iMeshFactoryWrapper* csEngine::FindMeshFactory (const char* name,
-	iBase* base)
-{
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
-  if(region)
-  {
-    return FindMeshFactoryRegion(name, region);
-  }
-  else
-  {
-    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
-    return FindMeshFactoryCollection(name, collection);
-  }
-}
-
-iMeshFactoryWrapper* csEngine::FindMeshFactoryRegion (const char* name,
-	iRegion* reg)
-{
-  iRegion* region;
-  bool global;
-  char* n = SplitRegionName (name, region, global);
-  if (!n) return 0;
-
-  iMeshFactoryWrapper* fact;
-  if (region)
-    fact = region->FindMeshFactory (n);
-  else if (!global && reg)
-    fact = reg->FindMeshFactory (n);
-  else
-    fact = GetMeshFactories ()->FindByName (n);
-  return fact;
-}
-
-iMeshFactoryWrapper* csEngine::FindMeshFactoryCollection (const char* name,
 	iCollection* col)
 {
   iCollection* collection;
   bool global;
-  char* n = SplitCollectionName (name, collection, global);
+  const char* n = SplitCollectionName (name, collection, global);
   if (!n) return 0;
 
   iMeshFactoryWrapper* fact;
@@ -2136,44 +1906,11 @@ iMeshFactoryWrapper* csEngine::FindMeshFactoryCollection (const char* name,
 }
 
 iCameraPosition* csEngine::FindCameraPosition (const char* name,
-	iBase* base)
-{
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion>(base));
-  if(region)
-  {
-    return FindCameraPositionRegion(name, region);
-  }
-  else
-  {
-    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection>(base));
-    return FindCameraPositionCollection(name, collection);
-  }
-}
-
-iCameraPosition* csEngine::FindCameraPositionRegion (const char* name,
-	iRegion* reg)
-{
-  iRegion* region;
-  bool global;
-  char* n = SplitRegionName (name, region, global);
-  if (!n) return 0;
-
-  iCameraPosition* campos;
-  if (region)
-    campos = region->FindCameraPosition (n);
-  else if (!global && reg)
-    campos = reg->FindCameraPosition (n);
-  else
-    campos = GetCameraPositions ()->FindByName (n);
-  return campos;
-}
-
-iCameraPosition* csEngine::FindCameraPositionCollection (const char* name,
 	iCollection* col)
 {
   iCollection* collection;
   bool global;
-  char* n = SplitCollectionName (name, collection, global);
+  const char* n = SplitCollectionName (name, collection, global);
   if (!n) return 0;
 
   iCameraPosition* campos;
@@ -2291,51 +2028,6 @@ static int compare_light (const void *p1, const void *p2)
 // in csEngine so that it will be freed later.
 static csLightArray *light_array = 0;
 
-static bool FindLightPos_Front2Back (csKDTree* treenode,
-	void* userdata, uint32 cur_timestamp, uint32&)
-{
-  csVector3 pos = *(csVector3*)userdata;
-
-  const csBox3& node_bbox = treenode->GetNodeBBox ();
-
-  // In the first part of this test we are going to test if the
-  // position is inside the node. If not then we don't need to continue.
-  if (!node_bbox.In (pos))
-  {
-    return false;
-  }
-
-  treenode->Distribute ();
-
-  int num_objects;
-  csKDTreeChild** objects;
-  num_objects = treenode->GetObjectCount ();
-  objects = treenode->GetObjects ();
-
-  int i;
-  for (i = 0 ; i < num_objects ; i++)
-  {
-    if (objects[i]->timestamp != cur_timestamp)
-    {
-      objects[i]->timestamp = cur_timestamp;
-      // First test the bounding box of the object.
-      const csBox3& obj_bbox = objects[i]->GetBBox ();
-
-      if (obj_bbox.In (pos))
-      {
-        iLight* light = (iLight*)objects[i]->GetObject ();
-	float sqdist = csSquaredDist::PointPoint (pos,
-		light->GetMovable ()->GetFullPosition ());
-	if (sqdist < csSquare(light->GetCutoffDistance ()))
-	{
-	  light_array->AddLight (light, sqdist);
-	}
-      }
-    }
-  }
-  return true;
-}
-
 static bool FindLightBox_Front2Back (csKDTree* treenode,
 	void* userdata, uint32 cur_timestamp, uint32&)
 {
@@ -2382,6 +2074,92 @@ static bool FindLightBox_Front2Back (csKDTree* treenode,
   return true;
 }
 
+struct LightCollectPoint
+{
+  LightCollectPoint (csLightArray* lightArray, const csVector3& pos)
+    : lightArray (lightArray), pos (pos)
+  {}
+
+  bool operator() (const csSectorLightList::LightAABBTree::Node* node)
+  {
+    if (!node->GetBBox ().In (pos))
+      return true;
+
+    for (size_t i = 0; i < node->GetObjectCount (); ++i)
+    {
+      csLight* light = node->GetLeafData (i);
+      
+      float sqdist = csSquaredDist::PointPoint (pos,
+        light->GetMovable ()->GetFullPosition ());
+      if (sqdist < csSquare(light->GetCutoffDistance ()))
+      {
+        lightArray->AddLight (light, sqdist);
+      }
+    }
+    return false;
+  }
+
+  csLightArray* lightArray;
+  const csVector3& pos;
+};
+
+struct LightCollectInnerPoint
+{
+  LightCollectInnerPoint (const csVector3& pos)
+    : pos (pos)
+  {}
+
+  bool operator() (const csSectorLightList::LightAABBTree::Node* node)
+  {
+    return node->GetBBox ().In (pos);
+  }
+
+  const csVector3& pos;
+};
+
+struct LightCollectBox
+{
+  LightCollectBox (csLightArray* lightArray, const csBox3& box)
+    : lightArray (lightArray), box (box)
+  {}
+
+  bool operator() (const csSectorLightList::LightAABBTree::Node* node)
+  {
+    if (!node->GetBBox ().TestIntersect (box))
+      return true;
+
+    for (size_t i = 0; i < node->GetObjectCount (); ++i)
+    {
+      csLight* light = node->GetLeafData (i);
+      csVector3 light_pos = light->GetMovable ()->GetFullPosition ();
+      csBox3 b (box.Min () - light_pos, box.Max () - light_pos);
+      float sqdist = b.SquaredOriginDist ();
+      if (sqdist < csSquare (light->GetCutoffDistance ()))
+      {
+        lightArray->AddLight (light, sqdist);
+      }
+    }
+    return true;
+  }
+
+  csLightArray* lightArray;
+  const csBox3& box;
+};
+
+struct LightCollectInnerBox
+{
+  LightCollectInnerBox (const csBox3& box)
+    : box (box)
+  {}
+
+  bool operator() (const csSectorLightList::LightAABBTree::Node* node)
+  {
+    return node->GetBBox ().TestIntersect (box);
+  }
+
+  const csBox3& box;
+};
+
 
 int csEngine::GetNearbyLights (
   iSector *sector,
@@ -2399,10 +2177,11 @@ int csEngine::GetNearbyLights (
   }
 
   light_array->Reset ();
-
-  csKDTree* kdtree = ((csSector*)sector)->GetLightKDTree ();
-  csVector3 position = pos;
-  kdtree->Front2Back (pos, FindLightPos_Front2Back, &position, 0);
+  
+  const csSectorLightList::LightAABBTree& tree = (static_cast<csSector*> (sector))->GetLightAABBTree ();
+  LightCollectPoint collector (light_array, pos);
+  LightCollectInnerPoint inner (pos);
+  tree.TraverseOut (inner, collector, pos);
 
   if (light_array->num_lights <= max_num_lights)
   {
@@ -2445,9 +2224,10 @@ int csEngine::GetNearbyLights (
 
   light_array->Reset ();
 
-  csKDTree* kdtree = ((csSector*)sector)->GetLightKDTree ();
-  csBox3 bbox = box;
-  kdtree->Front2Back (box.Min (), FindLightBox_Front2Back, &bbox, 0);
+  const csSectorLightList::LightAABBTree& tree = (static_cast<csSector*> (sector))->GetLightAABBTree ();
+  LightCollectBox collector (light_array, box);
+  LightCollectInnerBox inner (box);
+  tree.Traverse (inner, collector);
 
   if (light_array->num_lights <= max_num_lights)
   {
@@ -2958,20 +2738,6 @@ int csEngine::GetTextureFormat () const
   return txtmgr->GetTextureFormat ();
 }
 
-iRegion* csEngine::CreateRegion (const char *name)
-{
-  iRegion* region = regions.FindByName (name);
-  if (!region)
-  {
-    csRegion *r = new csRegion (this);
-    region = r;
-    r->SetName (name);
-    regions.Add (region);
-    r->DecRef ();
-  }
-  return region;
-}
-
 iTextureWrapper *csEngine::CreateTexture (
   const char *name,
   const char *iFileName,
@@ -3208,12 +2974,6 @@ iSharedVariableList *csEngine::GetVariableList () const
   return GetVariables();
 }
 
-
-iRegionList *csEngine::GetRegions ()
-{
-  return &regions;
-}
-
 iCollection* csEngine::GetCollection(const char *name) const
 {
   return collections.Get(name, NULL);
@@ -3229,7 +2989,25 @@ csPtr<iCollectionArray> csEngine::GetCollections()
 
 csPtr<iCamera> csEngine::CreateCamera ()
 {
-  return csPtr<iCamera> (new csCamera (frameWidth, frameHeight));
+  csCameraPerspective* cam = new csCameraPerspective ();
+  return csPtr<iCamera> ((iCamera*)cam);
+}
+
+csPtr<iPerspectiveCamera> csEngine::CreatePerspectiveCamera ()
+{
+  csCameraPerspective* cam = new csCameraPerspective ();
+  return csPtr<iPerspectiveCamera> (cam);
+}
+
+csPtr<iCustomMatrixCamera> csEngine::CreateCustomMatrixCamera (
+  iCamera* copyFrom)
+{
+  csCameraCustomMatrix* cam;
+  if (copyFrom)
+    cam = new csCameraCustomMatrix (static_cast<csCameraBase*> (copyFrom));
+  else
+    cam = new csCameraCustomMatrix ();
+  return csPtr<iCustomMatrixCamera> (cam);
 }
 
 csPtr<iLight> csEngine::CreateLight (
@@ -3317,14 +3095,9 @@ private:
   bool searchCollectionOnly;
   uint keepFlags;
 
-  iRegion* region;
-  bool curRegOnly;
-
 public:
-  EngineLoaderContext (csEngine* Engine, iBase* regionOrCollection, bool curRegOnly);
+  EngineLoaderContext (csEngine* Engine, iCollection* collection, bool searchCollectionOnly);
 
-  void InitRegion(iRegion* region, bool colRegOnly);
-  void InitCollection(iCollection* collection, bool colRegOnly);
   virtual ~EngineLoaderContext ();
 
   virtual iSector* FindSector (const char* name);
@@ -3339,8 +3112,6 @@ public:
   virtual iLight* FindLight (const char *name);
   virtual iShader* FindShader (const char* name);
   virtual bool CheckDupes () const { return false; }
-  virtual iRegion* GetRegion () const { return region; }
-  virtual bool CurrentRegionOnly () const { return curRegOnly; }
   virtual iCollection* GetCollection () const { return collection; }
   virtual uint GetKeepFlags() const { return keepFlags; }
   virtual bool CurrentCollectionOnly() const { return searchCollectionOnly; }
@@ -3348,35 +3119,10 @@ public:
 
 
 EngineLoaderContext::EngineLoaderContext (csEngine* Engine,
-	iBase* regionOrCollection, bool colRegOnly)
-  : scfImplementationType (this), Engine (Engine), keepFlags (0)
+	iCollection *collection, bool searchCollectionOnly)
+  : scfImplementationType (this), Engine (Engine), collection(collection),
+    searchCollectionOnly(searchCollectionOnly), keepFlags (0)
 {
-  csRef<iRegion> region (scfQueryInterfaceSafe<iRegion> (regionOrCollection));
-  if(region)
-  {
-    InitRegion(region, colRegOnly); 
-  }
-  else
-  {
-    csRef<iCollection> collection (scfQueryInterfaceSafe<iCollection> (regionOrCollection));
-    InitCollection(collection, colRegOnly); 
-  }
-}
-
-void EngineLoaderContext::InitRegion(iRegion* region, bool curRegOnly)
-{
-  EngineLoaderContext::region = region;
-  EngineLoaderContext::curRegOnly = curRegOnly;
-  EngineLoaderContext::collection = NULL;  
-  EngineLoaderContext::searchCollectionOnly = false; 
-}
-
-void EngineLoaderContext::InitCollection(iCollection *collection, bool searchCollectionOnly)
-{
-  EngineLoaderContext::collection = collection;
-  EngineLoaderContext::searchCollectionOnly = searchCollectionOnly;
-  EngineLoaderContext::region = NULL;
-  EngineLoaderContext::curRegOnly = false;
 }
 
 EngineLoaderContext::~EngineLoaderContext ()
@@ -3385,93 +3131,44 @@ EngineLoaderContext::~EngineLoaderContext ()
 
 iSector* EngineLoaderContext::FindSector (const char* name)
 {
-  if(region)
-  {
-    return Engine->FindSector (name, curRegOnly ? region : 0);
-  }
-  else
-  {
-    return Engine->FindSector (name, searchCollectionOnly ? collection : 0);
-  }
+   return Engine->FindSector (name, searchCollectionOnly ? collection : 0);
 }
 
 iMaterialWrapper* EngineLoaderContext::FindMaterial (const char* name)
 {
-  if(region)
-  {
-    return Engine->FindMaterial (name, curRegOnly ? region : 0);
-  }
-  else
-  {
-    return Engine->FindMaterial (name, searchCollectionOnly ? collection : 0);
-  }
+  return Engine->FindMaterial (name, searchCollectionOnly ? collection : 0);
 }
 
 iMaterialWrapper* EngineLoaderContext::FindNamedMaterial (const char* name,
                                                           const char* /*filename*/)
 {
-  if(region)
-  {
-    return Engine->FindMaterial (name, curRegOnly ? region : 0);
-  }
-  else
-  {
-    return Engine->FindMaterial (name, searchCollectionOnly ? collection : 0);
-  }
+  return Engine->FindMaterial (name, searchCollectionOnly ? collection : 0);
 }
 
 iMeshFactoryWrapper* EngineLoaderContext::FindMeshFactory (const char* name)
 {
-  if(region)
-  {
-    return Engine->FindMeshFactory (name, curRegOnly ? region : 0);
-  }
-  else
-  {
-    return Engine->FindMeshFactory (name, searchCollectionOnly ? collection : 0);
-  }
+  return Engine->FindMeshFactory (name, searchCollectionOnly ? collection : 0);
 }
 
 iMeshWrapper* EngineLoaderContext::FindMeshObject (const char* name)
 {
-  if(region)
-  {
-    return Engine->FindMeshObject (name, curRegOnly ? region : 0);
-  }
-  else
-  {
-    return Engine->FindMeshObject (name, searchCollectionOnly ? collection : 0);
-  }
+  return Engine->FindMeshObject (name, searchCollectionOnly ? collection : 0);
 }
 
 iTextureWrapper* EngineLoaderContext::FindTexture (const char* name)
 {
-  if(region)
-  {
-    return Engine->FindTexture (name, curRegOnly ? region : 0);
-  }
-  else
-  {
-    return Engine->FindTexture (name, searchCollectionOnly ? collection : 0);
-  }
+  return Engine->FindTexture (name, searchCollectionOnly ? collection : 0);
 }
 
 iTextureWrapper* EngineLoaderContext::FindNamedTexture (const char* name,
                                                         const char* /*filename*/)
 {
-  if(region)
-  {
-    return Engine->FindTexture (name, curRegOnly ? region : 0);
-  }
-  else
-  {
-    return Engine->FindTexture (name, searchCollectionOnly ? collection : 0);
-  }
+  return Engine->FindTexture (name, searchCollectionOnly ? collection : 0);
 }
 
 iShader* EngineLoaderContext::FindShader (const char* name)
 {
-  if(((!curRegOnly || !region) && (!searchCollectionOnly || !collection))
+  if((!searchCollectionOnly || !collection)
     || (name && *name == '*')) // Always look up builtin shaders globally
     return Engine->shaderManager->GetShader (name);
 
@@ -3490,27 +3187,13 @@ iShader* EngineLoaderContext::FindShader (const char* name)
         return s;
       }
     }
-    else if(region->IsInRegion (s->QueryObject ())
-      && !strcmp (name, s->QueryObject ()->GetName ()))
-    {
-      return s;
-    }
   }
   return 0;
 }
 
 iLight* EngineLoaderContext::FindLight(const char *name)
 {
-  csRef<iLightIterator> li;
-  
-  if(region)
-  {
-    li = Engine->GetLightIterator(curRegOnly ? region : 0);
-  }
-  else
-  {
-    li = Engine->GetLightIterator(searchCollectionOnly ? collection : 0);
-  }
+  csRef<iLightIterator> li = Engine->GetLightIterator(searchCollectionOnly ? collection : 0);
 
   iLight *light;
 
@@ -3525,11 +3208,11 @@ iLight* EngineLoaderContext::FindLight(const char *name)
 
 //------------------------------------------------------------------------
 
-csPtr<iLoaderContext> csEngine::CreateLoaderContext (iBase* base,
-	bool colRegOnly)
+csPtr<iLoaderContext> csEngine::CreateLoaderContext (iCollection* collection,
+	bool searchCollectionOnly)
 {
-  return csPtr<iLoaderContext> (new EngineLoaderContext (this, base,
-  	colRegOnly));
+  return csPtr<iLoaderContext> (new EngineLoaderContext (this, collection,
+  	searchCollectionOnly));
 }
 
 //------------------------------------------------------------------------
@@ -3958,7 +3641,7 @@ bool csEngine::SetOption (int id, csVariant *value)
   switch (id)
   {
     case 0:
-      csCamera::SetDefaultFOV (value->GetLong (), G3D->GetWidth ());
+      PerspectiveImpl::SetDefaultFOV ((float)value->GetLong (), G3D->GetWidth ());
       break;
     case 1:
       if (value->GetBool ())
@@ -3982,7 +3665,7 @@ bool csEngine::GetOption (int id, csVariant *value)
   switch (id)
   {
     case 0:
-      value->SetLong (csCamera::GetDefaultFOV ());
+      value->SetLong ((long)PerspectiveImpl::GetDefaultFOV ());
       break;
     case 1:
       value->SetBool (csEngine::lightmapCacheMode == CS_ENGINE_CACHE_WRITE);

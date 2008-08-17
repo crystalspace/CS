@@ -380,13 +380,10 @@ bool csGraphics2DSDL::Open()
   pfmt.complete ();
   Clear(0);
 
-  csEventID PreProcess = csevPreProcess (object_reg);
-  csEventID PostProcess = csevPostProcess (object_reg);
-
   csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
   if (q != 0)
   {
-    csEventID events[] = { PreProcess, PostProcess, CS_EVENTLIST_END };
+    csEventID events[] = { csevFrame (object_reg), CS_EVENTLIST_END };
     // csGraphics2D::Initialize already setup weakEventHandler using
     // RegisterWeakListener so we use plain RegisterListener here.
     q->RegisterListener (weakEventHandler, events);

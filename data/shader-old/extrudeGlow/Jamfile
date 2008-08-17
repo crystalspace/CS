@@ -1,0 +1,5 @@
+SubDir TOP data shader-old extrudeGlow ;
+
+InstallData [ Wildcard *.afp *.avp *.cgfp *.cgvp *.xml ] :
+  data shader-old extrudeGlow ;
+FileListEntriesData [ Wildcard *.afp *.avp *.cgfp *.cgvp *.xml ] : data shader-old extrudeGlow : data-runtime ;

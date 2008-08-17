@@ -1,0 +1,10 @@
+<params>
+    <factory>Suzanne.001</factory>
+    <material>asphalt.jpg</material>
+    <mixmode>
+        <copy />
+    </mixmode>
+    <submesh name="0">
+        <material>asphalt.jpg</material>
+    </submesh>
+</params>

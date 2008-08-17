@@ -25,6 +25,7 @@
 #include "csutil/hash.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
+#include "csutil/eventhandlers.h"
 #include "csutil/scf_implementation.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
@@ -67,8 +68,7 @@ public:
 
   virtual bool HandleEvent (iEvent& event);
 
-  CS_EVENTHANDLER_NAMES("crystalspace.proctex")
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
+  CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.proctex")
 
 public:
   virtual void PushTexture (csProcTexture* txt)
@@ -90,7 +90,7 @@ bool csProcTexEventHandler::HandleEvent (iEvent& event)
   current_time = vc->GetCurrentTicks ();
   csSet<csPtrKey<csProcTexture> > keep_tex;
   (void) event; // unused except for this assert so silence the warning
-  CS_ASSERT(event.Name == csevPreProcess(object_reg));
+  CS_ASSERT(event.Name == csevFrame(object_reg));
   {
     {
       csSet<csPtrKey<csProcTexture> >::GlobalIterator it = textures.GetIterator();
@@ -155,7 +155,7 @@ iEventHandler* csProcTexture::SetupProcEventHandler (
   csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
   {
-    q->RegisterListener (proceh, csevPreProcess(object_reg));
+    q->RegisterListener (proceh, csevFrame(object_reg));
     object_reg->Register (proceh, "crystalspace.proctex.eventhandler");
   }
   return proceh;

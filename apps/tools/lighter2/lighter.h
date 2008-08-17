@@ -63,8 +63,9 @@ namespace lighter
     csRef<iCommandLineParser> cmdLine;
     csRef<iConfigManager> configMgr;
     iObjectRegistry *objectRegistry;
-    csRef<iStringSet> strings;
+    csRef<iShaderVarStringSet> svStrings;
     csRef<iJobQueue> jobManager;
+    csRef<iSyntaxService> syntaxService;
 
     SwapManager* swapManager;
     RayDebugHelper rayDebug;
@@ -98,7 +99,7 @@ namespace lighter
     void LoadConfiguration ();
 
     // Print command line help
-    void CommandLineHelp () const;    
+    void CommandLineHelp (bool expert) const;
 
     Scene *scene;
 

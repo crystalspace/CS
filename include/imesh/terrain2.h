@@ -91,7 +91,7 @@ typedef csRefArray<iMaterialWrapper> csTerrainMaterialPalette;
  */
 struct iTerrainCellCollisionProperties : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainCellCollisionProperties, 2, 0, 0);
+  SCF_INTERFACE (iTerrainCellCollisionProperties, 2, 0, 1);
 
   /**
    * Get collidable flag (if it is not set, the cell does not collide with
@@ -120,6 +120,18 @@ struct iTerrainCellCollisionProperties : public virtual iBase
    * Get a copy of the properties object
    */
   virtual csPtr<iTerrainCellCollisionProperties> Clone () = 0;
+
+  /// Get number of parameters this object has set
+  virtual size_t GetParameterCount() = 0;
+
+  /// Get name of a parameter
+  virtual const char* GetParameterName (size_t index) = 0;
+
+  //@{
+  /// Get value of a parameter
+  virtual const char* GetParameterValue (size_t index) = 0;
+  virtual const char* GetParameterValue (const char* name) = 0;
+  //@}
 };
 
 /**
@@ -130,7 +142,7 @@ struct iTerrainCellCollisionProperties : public virtual iBase
  */
 struct iTerrainCellRenderProperties : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE (iTerrainCellRenderProperties, 2, 0, 0);
+  SCF_INTERFACE (iTerrainCellRenderProperties, 2, 0, 1);
 
   /**
    * Get visibility flag (if it is not set, the cell does not get rendered)
@@ -158,6 +170,18 @@ struct iTerrainCellRenderProperties : public virtual iShaderVariableContext
    * Get a copy of the properties object
    */
   virtual csPtr<iTerrainCellRenderProperties> Clone () = 0;
+
+  /// Get number of parameters this object has set
+  virtual size_t GetParameterCount() = 0;
+
+  /// Get name of a parameter
+  virtual const char* GetParameterName (size_t index) = 0;
+
+  //@{
+  /// Get value of a parameter
+  virtual const char* GetParameterValue (size_t index) = 0;
+  virtual const char* GetParameterValue (const char* name) = 0;
+  //@}
 };
 
 /**
@@ -165,7 +189,7 @@ struct iTerrainCellRenderProperties : public virtual iShaderVariableContext
  */
 struct iTerrainCellFeederProperties : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainCellFeederProperties, 3, 0, 0);
+  SCF_INTERFACE (iTerrainCellFeederProperties, 3, 1, 0);
   
   /**
    * Set heightmap source.
@@ -199,6 +223,36 @@ struct iTerrainCellFeederProperties : public virtual iBase
    * Get a copy of the properties object
    */
   virtual csPtr<iTerrainCellFeederProperties> Clone () = 0;
+
+  /// Get number of parameters this object has set
+  virtual size_t GetParameterCount() = 0;
+
+  /// Get name of a parameter
+  virtual const char* GetParameterName (size_t index) = 0;
+
+  //@{
+  /// Get value of a parameter
+  virtual const char* GetParameterValue (size_t index) = 0;
+  virtual const char* GetParameterValue (const char* name) = 0;
+  //@}
+
+
+  /// Get number of alpha maps this object has set
+  virtual size_t GetAlphaMapCount() = 0;
+
+  /// Get material of an alpha map
+  virtual const char* GetAlphaMapMaterial (size_t index) = 0;
+
+  //@{
+  /// Get source of an alpha map
+  virtual const char* GetAlphaMapSource (size_t index) = 0;
+  virtual const char* GetAlphaMapSource (const char* material) = 0;
+  //@}
+
+  //@{
+  virtual void SetHeightmapSmooth (bool doSmooth) = 0;
+  virtual bool GetHeightmapSmooth () const = 0;
+  //@}
 };
 
 /**
@@ -789,7 +843,7 @@ struct iTerrainSystem : public virtual iBase
  */
 struct iTerrainCell : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainCell, 3, 0, 0);
+  SCF_INTERFACE (iTerrainCell, 3, 0, 1);
 
   /// Enumeration that specifies current cell state
   enum LoadState
@@ -1177,12 +1231,21 @@ struct iTerrainCell : public virtual iBase
 
   /// Set feeder-specific data. Only to be used by feeder plugin.
   virtual void SetFeederData (csRefCount* data) = 0;
+
+  /**
+   * Set name of this cell.
+   * \warning The cell name is used to map object cells to factory cells.
+   *   Changing the name of a cell does not change any existing mappings,
+   *   however, it will take effect when saving the mesh. If that is done
+   *   careless changing of cell names can confuse the mapping of cells.
+   */
+  virtual void SetName (const char* name) = 0;
 };
 
 /// Factory representation of a cell
 struct iTerrainFactoryCell : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainFactoryCell, 1, 0 ,0);
+  SCF_INTERFACE (iTerrainFactoryCell, 1, 0 ,1);
 
   /**
    * Get cell rendering properties. Returns pointer to a renderer-specific
@@ -1214,12 +1277,124 @@ struct iTerrainFactoryCell : public virtual iBase
    * \param material material handle of base material
    */
   virtual void SetBaseMaterial (iMaterialWrapper* material) = 0;
+
+  /// Get name of this cell
+  virtual const char* GetName() = 0;
+
+  /// Set name of this cell
+  virtual void SetName (const char* name) = 0;
+
+  /**
+   * Get grid width. It is the width of an array of height data.
+   * You can expect it to be 2^n + 1.
+   *
+   * \return grid width
+   */
+  virtual int GetGridWidth () const = 0;
+  
+  /**
+   * Get grid height. It is the height of an array of height data.
+   * You can expect it to be 2^n + 1 (note: it is equal to grid width)
+   *
+   * \return grid height
+   */
+  virtual int GetGridHeight () const = 0;
+
+  /**
+   * Get cell position (in object space). X and Y components specify the
+   * offsets along X and Z axes, respectively.
+   *
+   * \return cell position
+   */
+  virtual const csVector2& GetPosition () const = 0;
+  
+  /**
+   * Get cell size (in object space). X and Y components specify the
+   * sizes along X and Z axes, respectively. Z component specifies height
+   * scale (warning: it is used only at loading stage, after that all scales
+   * are in object space).
+   *
+   * \return cell size
+   */
+  virtual const csVector3& GetSize () const = 0;
+
+  /**
+   * Get material map width (essentially a width of both material array and
+   * material masks, if any).
+   *
+   * \return material map width
+   */
+  virtual int GetMaterialMapWidth () const = 0;
+  
+  /**
+   * Get material map height (essentially a height of both material array and
+   * material masks, if any).
+   *
+   * \return material map height
+   */
+  virtual int GetMaterialMapHeight () const = 0;
+
+  /**
+   * Get base material for the cell
+   */
+  virtual iMaterialWrapper* GetBaseMaterial () const = 0;
+
+  /**
+   * Get material persistent flag. If it is true, material data is stored in
+   * the cell (that makes updating material data faster and makes material data
+   * lock read/write, but it means larger memory overhead)
+   */
+  virtual bool GetMaterialPersistent() const = 0;
+
+  /**
+   * Set grid width. It will be changed to match the grid
+   * width requirements`- it will be 2^n + 1.
+   */
+  virtual void SetGridWidth (int w) = 0;
+  
+  /**
+   * Set grid height. It will be changed to match the grid
+   * width requirements`- equal to grid width.
+   */
+  virtual void SetGridHeight (int h) = 0;
+
+  /**
+   * Set cell position (in object space). X and Y components specify the
+   * offsets along X and Z axes, respectively.
+   */
+  virtual void SetPosition (const csVector2& pos) = 0;
+  
+  /**
+   * Set cell size (in object space). X and Y components specify the
+   * sizes along X and Z axes, respectively. Z component specifies height
+   * scale (warning: it is used only at loading stage, after that all scales
+   * are in object space).
+   */
+  virtual void SetSize (const csVector3& size) = 0;
+
+  /**
+   * Set material map width (essentially a width of both material array and
+   * material masks, if any).
+   */
+  virtual void SetMaterialMapWidth (int w) = 0;
+  
+  /**
+   * Set material map height (essentially a height of both material array and
+   * material masks, if any).
+   */
+  virtual void SetMaterialMapHeight (int h) = 0;
+
+  /**
+   * Set material persistent flag. 
+   * \sa GetMaterialPersistent
+   */
+  virtual void SetMaterialPersistent (bool flag) = 0;
 };
 
 /// Provides an interface for creating terrain system
 struct iTerrainFactory : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainFactory, 2, 0, 0);
+  SCF_INTERFACE (iTerrainFactory, 2, 0, 2);
 
   /**
    * Set desired renderer (there is a single renderer for the whole terrain)
@@ -1288,6 +1463,49 @@ struct iTerrainFactory : public virtual iBase
    * \param mode new automatic preload flag
    */
   virtual void SetAutoPreLoad (bool mode) = 0;
+
+
+  /**
+   * Get renderer for the whole terrain
+   */
+  virtual iTerrainRenderer* GetRenderer () = 0;
+  
+  /**
+   * Get collider for the whole terrain
+   */
+  virtual iTerrainCollider* GetCollider () = 0;
+
+  /**
+   * Set feeder for the whole terrain
+   */
+  virtual iTerrainDataFeeder* GetFeeder () = 0;
+
+  /**
+   * Get maximum number of loaded cells.
+   * \param number maximum number of loaded cells
+   */
+  virtual size_t GetMaxLoadedCells () = 0;
+
+  /// Get number of cells in this factory
+  virtual size_t GetCellCount () = 0;
+
+  /// Get a cell in this factory
+  virtual iTerrainFactoryCell* GetCell (size_t index) = 0;
+
+  /// Get pseudo-cell with default settings for all cells
+  virtual iTerrainFactoryCell* GetDefaultCell () = 0;
+
+  /**
+   * Add cell to the terrain
+   *
+   * \return added cell
+   * \rem If you change the renderer, collider or feeder after adding cells
+   * you might get into trouble.
+   */
+  virtual iTerrainFactoryCell* AddCell () = 0;
+
+  /// Get a cell in this factory by name
+  virtual iTerrainFactoryCell* GetCell (const char* name) = 0;
 };
 
 

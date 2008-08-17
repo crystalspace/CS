@@ -20,6 +20,7 @@
 #include <string.h>
 #include "csutil/sysfunc.h"
 #include "csutil/event.h"
+#include "csutil/eventhandlers.h"
 #include "sequence.h"
 #include "iutil/objreg.h"
 #include "iutil/event.h"
@@ -203,7 +204,7 @@ bool csSequenceManager::Initialize (iObjectRegistry *r)
   CS_INITIALIZE_EVENT_SHORTCUTS (object_reg);
   csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
-    CS::RegisterWeakListener (q, this, FinalProcess, weakEventHandler);
+    CS::RegisterWeakListener (q, this, Frame, weakEventHandler);
   return true;
 }
 
@@ -211,8 +212,7 @@ bool csSequenceManager::HandleEvent (iEvent &event)
 {
   // Sequence manager must be final because engine sequence manager
   // must come first. @@@ HACKY
-  // \todo : convert this to a subscription ordering constraint
-  if (event.Name != FinalProcess)
+  if (event.Name != Frame)
     return false;
 
   if (!suspended)

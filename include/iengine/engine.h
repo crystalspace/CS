@@ -44,6 +44,7 @@ struct iCamera;
 struct iCameraPosition;
 struct iCameraPositionList;
 struct iClipper2D;
+struct iCustomMatrixCamera;
 struct iDataBuffer;
 struct iFrustumView;
 struct iLight;
@@ -63,12 +64,12 @@ struct iMeshWrapperIterator;
 struct iObject;
 struct iObjectIterator;
 struct iObjectWatcher;
+struct iPerspectiveCamera;
 struct iPortal;
 struct iProgressMeter;
-struct iRegion;
-struct iRegionList;
 struct iRenderLoop;
 struct iRenderLoopManager;
+struct iRenderManager;
 struct iRenderView;
 struct iSector;
 struct iSectorIterator;
@@ -174,7 +175,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine, 4, 0, 0);
+  SCF_INTERFACE(iEngine, 5, 0, 0);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -218,48 +219,16 @@ struct iEngine : public virtual iBase
   virtual void PrepareMeshes () = 0;
 
   /**
-   * Force a relight of all lighting. It is better to call this instead
-   * of calling engine->Prepare() again as engine->Prepare() will also do
-   * other stuff (like registering textures). Warning! This function can
-   * be very slow (depending on the number of lights and objects in the
-   * world). The optional region can be given to limit calculation to
-   * objects in the region.
-   * <p>
-   * The current flags set with SetLightingCacheMode() controls if the
-   * lightmaps will be cached or not.
-   * \param region only relight objects in this region 
-   * (will relight every object in the engine by default)
-   * \param meter If supplied, the meter object will be called back
-   * periodically to report the progress of engine lighting calculation.
-   */
-  virtual void ForceRelight (iRegion* region = 0,
-  	iProgressMeter* meter = 0) = 0;
-
-  /**
-   * Force a relight for the given light. This is useful to update the
-   * lightmaps after a static or pseudo-dynamic light has been added (don't
-   * use this for dynamic lights). If there are a lot of objects this function
-   * can be slow. The optional region can be given to limit calculation to
-   * objects in the region.
-   * <p>
-   * The current flags set with SetLightingCacheMode() controls if the
-   * lightmaps will be cached or not.
-   * \param light The newly added light to shine
-   * \param region If supplied, only affect objects in this region
-   */
-  virtual void ForceRelight (iLight* light, iRegion* region = 0) = 0;
-
-  /**
    * Calculate all lighting information. Normally you shouldn't call
    * this function directly, because it will be called by Prepare().
-   * If the optional 'region' parameter is given then only lights will
+   * If the optional 'collection' parameter is given then only lights will
    * be recalculated for the given region.
    * \param region If supplied, only calculate lighting for lights and objects
    * in the given region.
    * \param meter If supplied, the meter object will be called back
    * periodically to report the progress of engine lighting calculation.
    */
-  virtual void ShineLights (iBase* base = 0,
+  virtual void ShineLights (iCollection* base = 0,
   	iProgressMeter* meter = 0) = 0;
 
   /**
@@ -440,13 +409,6 @@ struct iEngine : public virtual iBase
    */
 
   virtual iMaterialWrapper* FindMaterial (const char* name,
-  	iBase* base = 0) = 0;
-
-  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
-  virtual iMaterialWrapper* FindMaterialRegion (const char* name,
-  	iRegion* region) = 0;
-
-  virtual iMaterialWrapper* FindMaterialCollection (const char* name,
   	iCollection* collection = 0) = 0;
 
   /** @} */
@@ -508,13 +470,6 @@ struct iEngine : public virtual iBase
    * \param collection if specified, search only this collection (also see note above)
    */
   virtual iTextureWrapper* FindTexture (const char* name,
-  	iBase* base = 0) = 0;
-
-  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
-  virtual iTextureWrapper* FindTextureRegion (const char* name,
-  	iRegion* region) = 0;
-
-  virtual iTextureWrapper* FindTextureCollection (const char* name,
   	iCollection* collection = 0) = 0;
 
   /** @} */
@@ -566,10 +521,7 @@ struct iEngine : public virtual iBase
    * \param collection only iterate over the lights in this collection
    * (otherwise iterate over all lights)
    */
-  virtual csPtr<iLightIterator> GetLightIterator (iBase* base = 0) = 0;
-  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
-  virtual csPtr<iLightIterator> GetLightIteratorRegion (iRegion* region) = 0;
-  virtual csPtr<iLightIterator> GetLightIteratorCollection (iCollection* collection = 0) = 0;
+  virtual csPtr<iLightIterator> GetLightIterator (iCollection* collection = 0) = 0;
 
   /**
    * Remove a light and update all lightmaps. This function only works
@@ -648,11 +600,6 @@ struct iEngine : public virtual iBase
    * \param collection if specified, search only this collection (also see note above)
    */
   virtual iSector* FindSector (const char* name,
-  	iBase* base = 0) = 0;
-  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
-  virtual iSector* FindSectorRegion (const char* name,
-  	iRegion* region) = 0;
-  virtual iSector* FindSectorCollection (const char* name,
   	iCollection* collection = 0) = 0;
 
   /**
@@ -866,15 +813,7 @@ struct iEngine : public virtual iBase
    * \param name the engine name of the desired mesh
    * \param collection if specified, search only this collection (also see note above)
    */
-
   virtual iMeshWrapper* FindMeshObject (const char* name,
-  	iBase* base = 0) = 0;
-
-  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
-  virtual iMeshWrapper* FindMeshObjectRegion (const char* name,
-  	iRegion* region) = 0;
-
-  virtual iMeshWrapper* FindMeshObjectCollection (const char* name,
   	iCollection* collection = 0) = 0;
 
   /**
@@ -947,13 +886,6 @@ struct iEngine : public virtual iBase
    * \param collection if specified, search only this collection (also see note above)
    */
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name,
-  	iBase* base = 0) = 0;
-
-  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
-  virtual iMeshFactoryWrapper* FindMeshFactoryRegion (const char* name,
-  	iRegion* region) = 0;
-
-  virtual iMeshFactoryWrapper* FindMeshFactoryCollection (const char* name,
   	iCollection* collection = 0) = 0;
 
   /// Get the list of mesh factories
@@ -961,20 +893,6 @@ struct iEngine : public virtual iBase
 
   /** @} */
   
-  /**\name Region handling
-   * @{ */
-  
-  /**
-   * Create a new region and add it to the region list.
-   * If the region already exists then this function will just
-   * return the pointer to that region.
-   * \param name the engine name for the region
-   * \remarks Can be removed with RemoveObject().
-   */
-  virtual iRegion* CreateRegion (const char* name) = 0;
-  /// Get the list of all regions
-  virtual iRegionList* GetRegions () = 0;
-
   /**\name Collection handling
    * @{ */
 
@@ -999,6 +917,7 @@ struct iEngine : public virtual iBase
    * Create a new camera.
    * Assign to a csRef.
    */
+  CS_DEPRECATED_METHOD_MSG("Use CreatePerspectiveCamera instead")
   virtual csPtr<iCamera> CreateCamera () = 0;
 
   /**
@@ -1013,15 +932,7 @@ struct iEngine : public virtual iBase
    * \param name the engine name of the desired camera position
    * \param collection if specified, search only this collection (also see note above)
    */
-
   virtual iCameraPosition* FindCameraPosition (const char* name,
-    iBase* base = 0) = 0;
-
-  CS_DEPRECATED_METHOD_MSG("Regions are deprecated. Use Collections instead.")
-  virtual iCameraPosition* FindCameraPositionRegion (const char* name,
-  	iRegion* region) = 0;
-
-  virtual iCameraPosition* FindCameraPositionCollection (const char* name,
   	iCollection* collection = 0) = 0;
 
   /// Get the list of camera positions.
@@ -1169,18 +1080,7 @@ struct iEngine : public virtual iBase
    * \param collection is an optional collection. If given then only objects
    *        in that collection will be precached.
    */
-  virtual void PrecacheDraw (iBase* base = 0) = 0;
-  virtual void PrecacheDrawCollection (iCollection* collection = 0) = 0;
-
-  /**
-   * This function precaches all meshes by calling GetRenderMeshes()
-   * on them. By doing this the level will run smoother if you walk
-   * through it because all meshes will have had a chance to update
-   * caches and stuff.
-   * \param region is an optional region. If given then only objects
-   *        in that region will be precached.
-   */
-  virtual void PrecacheDrawRegion (iRegion* region) = 0;
+  virtual void PrecacheDraw (iCollection* collection = 0) = 0;
 
   /**
    * Draw the 3D world given a camera and a clipper. Note that
@@ -1237,6 +1137,10 @@ struct iEngine : public virtual iBase
    */
   virtual uint GetCurrentFrameNumber () const = 0;
 
+  /**
+   * Update the engine and animations etc for a new frame
+   */
+  virtual void UpdateNewFrame () = 0;
   /** @} */
   
   /**\name Saving/loading
@@ -1261,13 +1165,24 @@ struct iEngine : public virtual iBase
   /**
    * Create a loader context that you can give to loader plugins.
    * It will basically allow loader plugins to find materials.
-   * \param base optional loader region or collection
-   * \param curRegOnly if region is valid and and curRegOnly is true 
-   * then only that region will be searched. 
+   * \param collection optional loader collection
+   * \param searchCollectionOnly if collection is valid and searchCollectionOnly is true 
+   * then only that collection will be searched. 
    * Assign to a csRef.
    */
   virtual csPtr<iLoaderContext> CreateLoaderContext (
-  	iBase* base = 0, bool curRegOnly = true) = 0;
+  	iCollection* collection = 0, bool searchCollectionOnly = true) = 0;
+
+  /**
+   * Set the default value for the "keep image" flag of texture wrappers.
+   */
+  virtual void SetDefaultKeepImage (bool enable) = 0;
+
+  /**
+   * Get the default value for the "keep image" flag of texture wrappers 
+    *(default OFF).
+   */
+  virtual bool GetDefaultKeepImage () = 0;
 
   /** @} */
   
@@ -1355,7 +1270,7 @@ struct iEngine : public virtual iBase
    * This will not clear the object but it will remove all references
    * to that object that the engine itself keeps. This function works
    * for: iCameraPosition, iLight, iMaterialWrapper, 
-   * iMeshFactoryWrapper,iMeshWrapper, iRegion, iSector and iTextureWrapper.
+   * iMeshFactoryWrapper,iMeshWrapper, iSector and iTextureWrapper.
    * Note that the object is only removed if the resulting ref count will
    * become zero. So basically this function only releases the references
    * that the engine holds.
@@ -1398,20 +1313,41 @@ struct iEngine : public virtual iBase
   
   /** @} */
 
-  /**\name Saving/loading
+  /// Fire all frame callbacks
+  virtual void FireStartFrame (iRenderView* rview) = 0;
+  
+  /**\name Camera handling
    * @{ */
 
   /**
-   * Set the default value for the "keep image" flag of texture wrappers.
+   * Create a new perspective projection camera.
    */
-  virtual void SetDefaultKeepImage (bool enable) = 0;
+  virtual csPtr<iPerspectiveCamera> CreatePerspectiveCamera () = 0;
 
   /**
-   * Get the default value for the "keep image" flag of texture wrappers 
-    *(default OFF).
+   * Create a new custom projection camera.
+   * \param copyFrom If given, the new camera's initial tranform, settings 
+   *   and projection matrix are copied from that camera.
    */
-  virtual bool GetDefaultKeepImage () = 0;
+  virtual csPtr<iCustomMatrixCamera> CreateCustomMatrixCamera (
+    iCamera* copyFrom = 0) = 0;
+  /** @} */
 
+  /**\name Render manager
+   * @{ */
+  /// Get the default render manager
+  virtual iRenderManager* GetRenderManager () = 0;
+  /**
+   * Set the default render manager.
+   * \remarks Also replaces the iRenderManager in the object registry.
+   */
+  virtual void SetRenderManager (iRenderManager*) = 0;
+  
+  /**
+   * Reload the default render manager given the current configuration
+   * settings.
+   */
+  virtual void ReloadRenderManager() = 0;
   /** @} */
 };
 

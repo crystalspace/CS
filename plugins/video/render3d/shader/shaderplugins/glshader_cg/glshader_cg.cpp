@@ -24,15 +24,22 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
+#include "csutil/scfstr.h"
+#include "csutil/scfstringarray.h"
+#include "csutil/xmltiny.h"
 #include "iutil/comp.h"
+#include "iutil/hiercache.h"
 #include "iutil/plugin.h"
+#include "iutil/stringarray.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
+
 #include "glshader_cgvp.h"
 #include "glshader_cgfp.h"
 #include "glshader_cg.h"
+#include "profile_limits.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -50,10 +57,8 @@ csGLShader_CG::csGLShader_CG (iBase* parent) :
   cgSetErrorHandler (ErrorHandlerObjReg, 0);
 
   enable = false;
-  isOpen = false;
   debugDump = false;
   dumpDir = 0;
-  ext = 0;
 }
 
 csGLShader_CG::~csGLShader_CG()
@@ -67,6 +72,7 @@ void csGLShader_CG::ErrorHandler (CGcontext context, CGerror error,
 				  void* appData)
 {
   csGLShader_CG* This = reinterpret_cast<csGLShader_CG*> (appData);
+  if (This->doIgnoreErrors) return;
 
   bool doVerbose;
   csRef<iVerbosityManager> verbosemgr (
@@ -174,6 +180,8 @@ void csGLShader_CG::SplitArgsString (const char* str, ArgumentArray& args)
           break;
         }
         // else fall through
+      case '\r':
+      case '\n':
       case ' ':
         if (!quote)
         {
@@ -215,16 +223,21 @@ static int GetProfileLevel (CGprofile profile)
 
 void csGLShader_CG::GetProfileCompilerArgs (const char* type, 
                                             CGprofile profile, 
+                                            HardwareVendor vendor,
+                                            bool noConfigArgs,
                                             ArgumentArray& args)
 {
   csString profileStr (cgGetProfileString (profile));
-  csConfigAccess cfg (object_reg);
-  csString key ("Video.OpenGL.Shader.Cg.CompilerOptions");
-  SplitArgsString (cfg->GetStr (key), args);
-  key << "." << type;
-  SplitArgsString (cfg->GetStr (key), args);
-  key << "." << profileStr;
-  SplitArgsString (cfg->GetStr (key), args);
+  if (!noConfigArgs)
+  {
+    csConfigAccess cfg (object_reg);
+    csString key ("Video.OpenGL.Shader.Cg.CompilerOptions");
+    SplitArgsString (cfg->GetStr (key), args);
+    key << "." << type;
+    SplitArgsString (cfg->GetStr (key), args);
+    key << "." << profileStr;
+    SplitArgsString (cfg->GetStr (key), args);
+  }
 
   profileStr.Upcase();
   csString profileMacroArg ("-DPROFILE_");
@@ -240,6 +253,20 @@ void csGLShader_CG::GetProfileCompilerArgs (const char* type,
   typeStr.Upcase();
   typeStr = "-DPROGRAM_TYPE_" + typeStr;
   args.Push (typeStr);
+  
+  if (vendor != Invalid)
+  {
+    csString vendorStr;
+    switch (vendor)
+    {
+      case ATI:     vendorStr = "ATI"; break;
+      case NVIDIA:  vendorStr = "NVIDIA"; break;
+      case Other:   vendorStr = "OTHER"; break;
+      default:      CS_ASSERT(false);
+    }
+    vendorStr = "-DVENDOR_" + vendorStr;
+    args.Push (vendorStr);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -267,14 +294,18 @@ void csGLShader_CG::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-csPtr<iShaderProgram> csGLShader_CG::CreateProgram(const char* type)
+csPtr<iShaderProgram> csGLShader_CG::CreateProgram (const char* type)
 {
-  if (!Open())
-    return 0;
+  Open();
+  if (!enable) return 0;
+  
   if (strcasecmp(type, "vp") == 0)
-    return csPtr<iShaderProgram>(new csShaderGLCGVP(this));
+    return csPtr<iShaderProgram> (new csShaderGLCGVP(this));
   else if (strcasecmp(type, "fp") == 0)
-    return csPtr<iShaderProgram>(new csShaderGLCGFP(this));
+  {
+    ProfileLimitsPair dummyLimits;
+    return csPtr<iShaderProgram> (new csShaderGLCGFP (this, dummyLimits));
+  }
   else
     return 0;
 }
@@ -304,30 +335,90 @@ static CGprofile ProfileUnrouted (CGprofile profile)
   }
 }
 
+void csGLShader_CG::ParsePrecacheLimits (iConfigFile* config, 
+                                         ProfileLimitsArray& out)
+{
+  csSet<csString> seenKeys;
+  csRef<iConfigIterator> vertexPrecache = config->Enumerate (
+    csString().Format ("Video.OpenGL.Shader.Cg.Precache."));
+  while (vertexPrecache->HasNext())
+  {
+    vertexPrecache->Next();
+    csString key (vertexPrecache->GetKey (true));
+    size_t dot = key.FindFirst ('.');
+    if (dot != (size_t)-1) key.Truncate (dot);
+    if (!seenKeys.Contains (key))
+    {
+      ProfileLimitsPair newPair;
+      const char* profile = config->GetStr (
+	csString().Format ("Video.OpenGL.Shader.Cg.Precache.%s.Vertex.Profile",
+	  key.GetData()), 0);
+      if (profile != 0)
+      {
+	CGprofile profile_cg = cgGetProfile (profile);
+	if (profile_cg != CG_PROFILE_UNKNOWN)
+	{
+	  newPair.vp = ProfileLimits (
+	   Other, profile_cg);
+	  newPair.vp.GetCgDefaults();
+	  newPair.vp.ReadFromConfig (config, 
+	    csString().Format ("Video.OpenGL.Shader.Cg.Precache.%s.Vertex",
+	      key.GetData()));
+	}
+      }
+      profile = config->GetStr (
+	csString().Format ("Video.OpenGL.Shader.Cg.Precache.%s.Fragment.Profile",
+	  key.GetData()), 0);
+      if (profile != 0)
+      {
+	CGprofile profile_cg = cgGetProfile (profile);
+	if (profile_cg != CG_PROFILE_UNKNOWN)
+	{
+	  newPair.fp = ProfileLimits (Other, profile_cg);
+	  newPair.fp.GetCgDefaults();
+	  newPair.fp.ReadFromConfig (config, 
+	    csString().Format ("Video.OpenGL.Shader.Cg.Precache.%s.Fragment",
+	      key.GetData()));
+	}
+      }
+      out.Push (newPair);
+      seenKeys.AddNoTest (key);
+    }
+  }
+  /* Dirty trick: put highest profile last; most likely to compile; in the
+     case of VPs means bindings are correct.
+   */
+  out.Sort();
+}
+
 bool csGLShader_CG::Open()
 {
   if (isOpen) return true;
   if (!object_reg) return false;
+  
+  csRef<iConfigManager> config (csQueryRegistry<iConfigManager> (object_reg));
 
+  ParsePrecacheLimits (config, precacheLimits);
+  
+  debugDump = config->GetBool ("Video.OpenGL.Shader.Cg.DebugDump", false);
+  if (debugDump)
+    dumpDir = CS::StrDup (config->GetStr ("Video.OpenGL.Shader.Cg.DebugDumpDir",
+    "/tmp/cgdump/"));
+    
+  cgSetAutoCompile (context, CG_COMPILE_MANUAL);
+  
   cgSetErrorHandler (ErrorHandler, this);
 
-  csRef<iGraphics3D> r = csQueryRegistry<iGraphics3D> (object_reg);
+  if (!CS::PluginCommon::ShaderProgramPluginGL::Open ())
+    return true;
 
-  csRef<iFactory> f = scfQueryInterface<iFactory> (r);
-  if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 
-	f->QueryClassID ()) == 0)
-    enable = true;
-  else
-    return false;
+  enable = true;
 
-  csRef<iConfigManager> config(csQueryRegistry<iConfigManager> (object_reg));
-
-  r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
-  if (ext == 0)
-  {
-    enable = false;
-    return false;
-  }
+  ext->InitGL_ARB_color_buffer_float();
+  ext->InitGL_ARB_vertex_program();
+  ext->InitGL_ARB_fragment_program();
+  ext->InitGL_NV_gpu_program4();
+  ext->InitGL_EXT_gpu_program_parameters();
 
   enableVP = config->GetBool ("Video.OpenGL.Shader.Cg.Enable.Vertex", true);
   enableFP = config->GetBool ("Video.OpenGL.Shader.Cg.Enable.Fragment", true);
@@ -394,10 +485,8 @@ bool csGLShader_CG::Open()
           "Fragment program support disabled by user");
   }
 
-  debugDump = config->GetBool ("Video.OpenGL.Shader.Cg.DebugDump", false);
-  if (debugDump)
-    dumpDir = CS::StrDup (config->GetStr ("Video.OpenGL.Shader.Cg.DebugDumpDir",
-    "/tmp/cgdump/"));
+  cgGLSetDebugMode (config->GetBool ("Video.OpenGL.Shader.Cg.CgDebugMode",
+    false));
  
   // Determining what profile to use:
   //  Start off with the highest supported profile.
@@ -469,7 +558,6 @@ bool csGLShader_CG::Open()
     }
   }
 
-  isOpen = true;
   return true;
 }
 
@@ -490,18 +578,157 @@ bool csGLShader_CG::IsRoutedProfileSupported (CGprofile profile)
   }
 }
 
+csPtr<iStringArray> csGLShader_CG::QueryPrecacheTags (const char* type)
+{
+  if (!Open()) return false;
+  
+  scfStringArray* tags = new scfStringArray;
+  for (size_t i = 0; i < precacheLimits.GetSize(); i++)
+  {
+    tags->Push (precacheLimits[i].ToString());
+  }
+  return csPtr<iStringArray> (tags);
+}
+
+bool csGLShader_CG::Precache (const char* type, const char* tag,
+                              iBase* previous,
+                              iDocumentNode* node, iHierarchicalCache* cacheTo,
+                              csRef<iBase>* outObj)
+{
+  if (!Open()) return false;
+  
+  csRef<iShaderProgramCG> prevCG (scfQueryInterfaceSafe<iShaderProgramCG> (
+    previous));
+  csRef<iShaderDestinationResolver> resolve (
+    scfQueryInterfaceSafe<iShaderDestinationResolver> (previous));
+    
+  ProfileLimitsPair limits;
+  if (!limits.FromString (tag))
+    return false;
+  csRef<csShaderGLCGCommon> prog;
+  bool result = false;
+  if (strcasecmp(type, "fp") == 0)
+  {
+    prog.AttachNew (new csShaderGLCGFP (this, limits));
+    /* Precache for 'tag' */
+    if (!prog->Load (resolve, node)) return false;
+    result = Precache (prog, limits.fp, tag, cacheTo);
+  }
+  else if (strcasecmp(type, "vp") == 0)
+  {
+    prog.AttachNew (new csShaderGLCGVP (this));
+    /* Get tag from prevCG */
+    if (prevCG.IsValid())
+    {
+      /* If previous tag and current tag match, precache */
+      csShaderGLCGFP* prevFP = static_cast<csShaderGLCGFP*> (
+        (iShaderProgramCG*)prevCG);
+      ProfileLimitsPair prevLimits = prevFP->cacheLimits;
+      if (limits != prevLimits) return false;
+    }
+    /* Precache for 'tag' */
+    if (!prog->Load (resolve, node)) return false;
+    result = Precache (prog, limits.vp, tag, cacheTo);
+  }
+  else
+    return false;
+
+  if (outObj && result) *outObj = prog;
+  return result;
+
+}
+
+bool csGLShader_CG::Precache (csShaderGLCGCommon* prog, 
+                              ProfileLimits& limits,
+                              const char* tag,
+                              iHierarchicalCache* cacheTo)
+{
+  bool result = false;
+  CGprofile customProfile = prog->CustomProfile();
+  if ((customProfile != CG_PROFILE_UNKNOWN)
+      && (limits.profile != customProfile))
+    return false;
+  result = prog->Precache (limits, tag, cacheTo);
+  return result;
+}
+  
+csPtr<iString> csGLShader_CG::SelectPrecacheTag (const char* type, 
+                                                 iBase* previous,
+                                                 iHierarchicalCache* cacheDir)
+{
+  // @@@ TODO: Prolly good idea: check file magic
+  scfString* result = 0;
+  if (previous != 0)
+  {
+    csRef<iShaderProgramCG> prevCG (scfQueryInterfaceSafe<iShaderProgramCG> (
+      previous));
+    if (!prevCG.IsValid()) return 0;
+    
+    csShaderGLCGFP* prevFP = static_cast<csShaderGLCGFP*> (
+      (iShaderProgramCG*)prevCG);
+        
+    result = new scfString (prevFP->cacheLimits.ToString());
+  }
+  else
+  {
+    ProfileLimitsArray candidates;
+    csRef<iStringArray> availableTags = cacheDir->GetSubItems ("/");
+    for (size_t i = 0; i < availableTags->GetSize(); i++)
+    {
+      csString tag (availableTags->Get (i));
+      if (tag[tag.Length()-1] == '/')\
+	tag.Truncate (tag.Length()-1);
+	
+      ProfileLimitsPair cacheLimits;
+      if (!cacheLimits.FromString (tag)) continue;
+      
+      candidates.Push (cacheLimits);
+    }
+    candidates.Sort ();
+    
+    for (size_t i = candidates.GetSize(); i-- > 0;)
+    {
+      const ProfileLimitsPair& candidate = candidates[i];
+      
+      // TODO: compare vendors
+      bool supportVP = 
+	(ProfileNeedsRouting (candidate.vp.profile)
+	  && IsRoutedProfileSupported (candidate.vp.profile))
+	|| cgGLIsProfileSupported (candidate.vp.profile);
+      bool supportFP = 
+	(ProfileNeedsRouting (candidate.fp.profile)
+	  && IsRoutedProfileSupported (candidate.fp.profile))
+	|| cgGLIsProfileSupported (candidate.fp.profile);
+	
+      if (!supportVP || !supportFP) continue;
+      
+      ProfileLimitsPair currentLimits (candidate);
+      currentLimits.GetCurrentLimits (ext);
+      
+      if (candidate > currentLimits) continue;
+    
+      result = new scfString (candidate.ToString());
+      break;
+    }
+  }
+  return csPtr<iString> (result);
+}
+
 ////////////////////////////////////////////////////////////////////
 //                          iComponent
 ////////////////////////////////////////////////////////////////////
 bool csGLShader_CG::Initialize(iObjectRegistry* reg)
 {
-  object_reg = reg;
-  csRef<iVerbosityManager> verbosemgr (
-    csQueryRegistry<iVerbosityManager> (object_reg));
-  if (verbosemgr) 
-    doVerbose = verbosemgr->Enabled ("renderer.shader");
-  else
-    doVerbose = false;
+  if (!CS::PluginCommon::ShaderProgramPluginGL::Initialize (reg))
+    return false;
+    
+  csRef<iPluginManager> plugin_mgr = 
+    csQueryRegistry<iPluginManager> (object_reg);
+
+  binDocSys = csLoadPluginCheck<iDocumentSystem> (plugin_mgr,
+    "crystalspace.documentsystem.binary");
+  xmlDocSys.AttachNew (new csTinyDocumentSystem);
+  
   return true;
 }
 

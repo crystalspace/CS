@@ -25,7 +25,9 @@
 #include "csplugincommon/softshader/texture.h"
 #include "csutil/blockallocator.h"
 #include "csutil/hashr.h"
+#include "csutil/pooledscfclass.h"
 #include "igraphic/image.h"
+#include "iutil/databuff.h"
 #include "ivideo/graph2d.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
@@ -89,6 +91,26 @@ public:
   }
 };
 
+class DataBufferPooled :
+  public scfImplementationPooled<scfImplementation1<DataBufferPooled,
+                                                    iDataBuffer> >
+{
+  typedef scfImplementationPooled<scfImplementation1<DataBufferPooled,
+    iDataBuffer> > SuperClass;
+
+  csRef<csSoftwareTextureHandle> texh;
+  csSoftwareTexture* texData;
+public:
+  DataBufferPooled (csSoftwareTextureHandle* texh, csSoftwareTexture* texData);
+  ~DataBufferPooled();
+  
+  char* GetData () const;
+  int8* GetInt8 () { return (int8*)DataBufferPooled::GetData(); }
+  size_t GetSize () const;
+  uint8* GetUint8 () { return (uint8*)DataBufferPooled::GetInt8(); }
+  char* operator * () const { return DataBufferPooled::GetData(); }
+};
+
 // For GetTextureTarget ()
 #include "csutil/deprecated_warn_off.h"
 
@@ -101,6 +123,7 @@ class csSoftwareTextureHandle : public csTextureHandle
 protected:
   friend class csSoftwareGraphics3DCommon;
   friend class csSoftwareTexture;
+  friend class DataBufferPooled;
 
   /// If true then PrepareInt() has done its job.
   bool prepared;
@@ -201,6 +224,12 @@ public:
     size_t& pitch, TextureBlitDataFormat format, uint bufFlags);
   void ApplyBlitBuffer (uint8* buf);
   BlitBufferNature GetBufferNature (uint8* buf) { return natureDirect; }
+
+  void SetMipmapLimits (int maxMip, int minMip = 0) {}
+  void GetMipmapLimits (int& maxMip, int& minMip) { maxMip = 3; minMip = 0; }
+  
+  csPtr<iDataBuffer> Readback (const CS::StructuredTextureFormat& format,
+    int mip = 0);
 };
 
 #include "csutil/deprecated_warn_on.h"
@@ -223,6 +252,9 @@ public:
   int sharpen_mipmaps;
   /// Debug mipmapping?
   bool debugMipmaps;
+  
+  CS::StructuredTextureFormat fmtABGR8;
+  DataBufferPooled::Pool buffersPool;
 
   ///
   csSoftwareTextureManager (iObjectRegistry *object_reg,
@@ -258,6 +290,13 @@ public:
   virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags,
       iString* fail_reason = 0);
   virtual csPtr<iTextureHandle> CreateTexture (int w, int h,
+      csImageType imagetype, const char* format, int flags,
+      iString* fail_reason = 0)
+  {
+    return csSoftwareTextureManager::CreateTexture (w, h, 1, imagetype, format,
+      flags, fail_reason);
+  }
+  virtual csPtr<iTextureHandle> CreateTexture (int w, int h, int d,
       csImageType imagetype, const char* format, int flags,
       iString* fail_reason = 0);
 

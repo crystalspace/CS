@@ -172,7 +172,7 @@ bool CsBench::SetupMaterials ()
   }
   material = engine->GetMaterialList ()->FindByName ("stone");
   csShaderVariable* normalSV = 
-    material->GetMaterial()->GetVariableAdd (strings->Request ("tex normal"));
+    material->GetMaterial()->GetVariableAdd (stringsSvName->Request ("tex normal"));
   iTextureWrapper* stoneDot3 = 
     engine->GetTextureList()->FindByName ("stone_normal");
   stoneDot3->SetTextureClass ("normalmap");
@@ -330,6 +330,9 @@ bool CsBench::Initialize (int argc, const char* const argv[],
   strings = csQueryRegistryTagInterface<iStringSet> 
     (object_reg, "crystalspace.shared.stringset");
   if (!strings) return ReportError ("No string set!");
+  stringsSvName = csQueryRegistryTagInterface<iShaderVarStringSet> 
+    (object_reg, "crystalspace.shader.variablenameset");
+  if (!stringsSvName) return ReportError ("No string set!");
 
   iGraphics2D* g2d = g3d->GetDriver2D ();
   iNativeWindow* nw = g2d->GetNativeWindow ();
@@ -493,7 +496,7 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
       csRef<iMaterial> matinput = engine->CreateBaseMaterial (
 	engine->GetTextureList ()->FindByName ("stone"));
       csShaderVariable* normalSV = 
-	matinput->GetVariableAdd (strings->Request ("tex normal"));
+	matinput->GetVariableAdd (stringsSvName->Request ("tex normal"));
       normalSV->SetValue (engine->GetTextureList()->FindByName (
       	"stone_normal"));
       matinput->SetShader (shadertype, shader);

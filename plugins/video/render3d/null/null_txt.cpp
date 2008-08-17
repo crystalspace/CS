@@ -109,13 +109,13 @@ csPtr<iTextureHandle> csTextureManagerNull::RegisterTexture (iImage* image,
   return csPtr<iTextureHandle> (txt);
 }
 
-csPtr<iTextureHandle> csTextureManagerNull::CreateTexture (int w, int h,
+csPtr<iTextureHandle> csTextureManagerNull::CreateTexture (int w, int h, int d,
       csImageType imagetype, const char* format, int flags,
       iString* fail_reason)
 {
   (void)imagetype;
   (void)format;
-  csTextureHandleNull *txt = new csTextureHandleNull (this, w, h, 1, flags);
+  csTextureHandleNull *txt = new csTextureHandleNull (this, w, h, d, flags);
   textures.Push (txt);
   return csPtr<iTextureHandle> (txt);
 }

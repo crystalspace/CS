@@ -53,6 +53,8 @@ csTerrainSystem::csTerrainSystem (iMeshObjectFactory* factory,
 
 csTerrainSystem::~csTerrainSystem ()
 {
+  cells.Empty();
+  renderer->DisconnectTerrain (this);
 }
 
 void csTerrainSystem::AddCell (csTerrainCell* cell)
@@ -67,6 +69,8 @@ void csTerrainSystem::AddCell (csTerrainCell* cell)
   }
 
   boundingbox += cell->GetBBox ();
+
+  ShapeChanged ();
 }
 
 void csTerrainSystem::FireLoadCallbacks (csTerrainCell* cell)
@@ -101,6 +105,12 @@ void csTerrainSystem::FireHeightUpdateCallbacks (csTerrainCell* cell,
     heightDataCallbacks[i]->OnHeightUpdate (cell, rectangle);
   }
 }
+
+void csTerrainSystem::CellSizeUpdate (csTerrainCell* cell)
+{
+  ComputeBBox ();
+}
+
 
 iTerrainCell* csTerrainSystem::GetCell (const char* name, bool loadData)
 {
@@ -578,6 +588,20 @@ void csTerrainSystem::InvalidateMaterialHandles ()
 csColliderType csTerrainSystem::GetColliderType ()
 {
   return CS_TERRAIN_COLLIDER;
+}
+
+void csTerrainSystem::ComputeBBox ()
+{
+  boundingbox.Empty ();
+  boundingbox.StartBoundingBox ();
+  bbStarted = true;
+
+  for (size_t i = 0; i < cells.GetSize (); ++i)
+  {
+    boundingbox += cells[i]->GetBBox ();
+  }
+
+  ShapeChanged ();
 }
 
 }

@@ -158,10 +158,10 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
   // =============== Auxiliary Class: csColladaMesh ===============
 
-  csColladaMesh::csColladaMesh(iDocumentNode* element, csColladaConvertor* par)
+  csColladaMesh::csColladaMesh(iDocumentNode* element, csColladaConvertor* par, csString plugType)
   {
     meshElement = element;
-    pluginType = CS_COLLADA_DEFAULT_MESH_PLUGIN_TYPE;
+    pluginType = plugType;
     numberOfVertices = 0;
     numVertexElements = 0;
     normalId = 0;
@@ -327,12 +327,6 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       t.y = temp[1];
 
       toStore.Put(toStore.GetSize(), t);
-      //toStore.Push(t);
-    }
-
-    if (parent->warningsOn)
-    {
-      parent->Report(CS_REPORTER_SEVERITY_WARNING, "toStore[32]: (%f, %f)", toStore[32].x, toStore[32].y);
     }
 
     delete[] temp;
@@ -480,7 +474,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     {
       currentSourceElement = sourceElements->Next();
 
-      name = currentSourceElement->GetParent()->GetParent()->GetAttribute("id")->GetValue();
+      name = currentSourceElement->GetParent()->GetParent()->GetAttribute("name")->GetValue();
 
       csString newId = currentSourceElement->GetAttribute("id")->GetValue();
 
@@ -544,11 +538,10 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     }
 
     // we need to perform a sanity check, in the event someone forgot to 
-    // call ConvertMaterials(), otherwise we have the potential for a segfault
+    // call ConvertEffects(), otherwise we have the potential for a segfault
     if (parent->materialsList.IsEmpty())
     {
-      csRef<iDocumentNode> materialsNode = parent->GetColladaDocument()->GetRoot()->GetNode("library_materials");
-      parent->ConvertMaterials(materialsNode);
+      parent->ConvertEffects();
     }
 
     /* BEGIN POLYGONS PROCESSING - THIS NEEDS WORK*/
@@ -744,7 +737,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     numberOfVertices++;
   }
 
-  bool csColladaMesh::WriteXML(iDocument* xmlDoc)
+  bool csColladaMesh::WriteXML(iDocumentNode* xmlDoc)
   { 
     if (parent->warningsOn)
     {
@@ -757,7 +750,15 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     int vertexArraySize = 0;
     //int normalArraySize = 0;
 
-    csRef<iDocumentNode> csTopNode = xmlDoc->GetRoot();
+    csRef<iDocumentNode> csTopNode = xmlDoc->GetNode("library");
+    if(!csTopNode)
+    {
+      csTopNode = xmlDoc->GetNode("world");
+      if(!csTopNode)
+      {
+        csTopNode = xmlDoc;
+      }
+    }    
 
     // Adding vertices to CS document
     vertexArray = GetVertices();
@@ -800,13 +801,13 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     }
 
     // create meshfact and plugin (top-level) nodes
-    csRef<iDocumentNode> meshFactNode = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    csRef<iDocumentNode> meshFactNode = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT);
     meshFactNode->SetValue("meshfact");
-    meshFactNode->SetAttribute("name", GetName().GetData());
-    csRef<iDocumentNode> pluginNode = meshFactNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    meshFactNode->SetAttribute("name", GetName());
+    csRef<iDocumentNode> pluginNode = meshFactNode->CreateNodeBefore(CS_NODE_ELEMENT);
     pluginNode->SetValue("plugin");
-    csRef<iDocumentNode> pluginContents = pluginNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-    pluginContents->SetValue(GetPluginType().GetData());
+    csRef<iDocumentNode> pluginContents = pluginNode->CreateNodeBefore(CS_NODE_TEXT);
+    pluginContents->SetValue(GetPluginType());
 
     if (parent->warningsOn)
     {
@@ -848,7 +849,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       scfString formatter;
 
       // positions
-      currentCrystalVElement = currentCrystalParamsElement->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      currentCrystalVElement = currentCrystalParamsElement->CreateNodeBefore(CS_NODE_ELEMENT);
       currentCrystalVElement->SetValue("v");
       formatter.Format("%f", vertexArray[counter].x);
       currentCrystalVElement->SetAttribute(vertAccess->Get(0), formatter.GetData());
@@ -901,7 +902,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       currentTri = &tris[triCounter];
 
       // create a t element
-      csRef<iDocumentNode> currentTElement = currentCrystalParamsElement->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      csRef<iDocumentNode> currentTElement = currentCrystalParamsElement->CreateNodeBefore(CS_NODE_ELEMENT);
 
       if (!currentTElement.IsValid())
       {
@@ -1052,7 +1053,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     int counter = 0;
     while (counter < polyCount)
     {
-      CS::Geom::csContour3 polygonalContour;
+      CS::Geometry::csContour3 polygonalContour;
       int numVertsInPoly = vCountElement[counter];
       int vertIndex = 0;
       while (vertIndex < numVertsInPoly)
@@ -1079,7 +1080,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     //csRef<iDocumentNode> nextPolygon;
     csRef<iDocumentNode> nextPolyPElement;
     csRef<iDocumentNodeIterator> polyPIterator;
-    CS::Geom::csContour3 polygonalContour;
+    CS::Geometry::csContour3 polygonalContour;
     int tempVertIndex;
     csArray<int> vertexIndexArrayPolys;
 
@@ -1287,14 +1288,6 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
       RetrieveOtherData();
 
-      if (parent->warningsOn)
-      {
-        if (textureOffset != -1)
-        {
-          parent->Report(CS_REPORTER_SEVERITY_WARNING, "Value of textures[32]: (%f, %f)", textures[32].x, textures[32].y);
-        }
-      }
-
       // let's make sure RestructureVertices works...
       if (parent->warningsOn)
       {
@@ -1439,9 +1432,11 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
   // =============== Auxiliary Class: csColladaEffectProfile ===============
 
-  csColladaEffectProfile::csColladaEffectProfile(iDocumentNode* profileElement, csColladaConvertor* parentObj)
+  csColladaEffectProfile::csColladaEffectProfile(iDocumentNode* profileElement, csColladaConvertor* parentObj,
+    iDocumentNode* matNode)
   {
     parent = parentObj;
+    materialNode = matNode;
     Process(profileElement);
   }
 
@@ -1462,6 +1457,25 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     csRef<iDocumentNode> nextTechnique;
     csRef<iDocumentNodeIterator> passesToProcess;
     csRef<iDocumentNode> nextPass;
+
+    // Parse 'newparams' nodes.
+    csRef<iDocumentNodeIterator> newparams = profileElement->GetNodes("newparam");
+    while(newparams->HasNext())
+    {
+      csRef<iDocumentNode> surface = newparams->Next()->GetNode("surface");
+      if(!surface)
+      {
+        continue;
+      }
+
+      if(surface->GetNode("init_from"))
+      {
+        csRef<iDocumentNode> texture = materialNode->CreateNodeBefore(CS_NODE_ELEMENT);
+        texture->SetValue("texture");
+        csRef<iDocumentNode> textureContents = texture->CreateNodeBefore(CS_NODE_TEXT);
+        textureContents->SetValue(surface->GetNode("init_from")->GetContentsValue());
+      }
+    }
 
     // grab the listing of techniques that need to be processed
     techniquesToProcess = profileElement->GetNodes("technique");
@@ -1486,7 +1500,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
       // set the ambient, specular, and diffuse colors
       csRef<iDocumentNode> colorElement = pbNode->GetNode("diffuse");
-      if (colorElement.IsValid())
+      if (colorElement.IsValid() && colorElement->GetNode("color"))
       {
         diffuseColor = csColladaMaterial::StringToColor(colorElement->GetNode("color")->GetContentsValue());
         if (parent->warningsOn)
@@ -1497,13 +1511,13 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
       colorElement = pbNode->GetNode("specular");
 
-      if (colorElement.IsValid())
+      if (colorElement.IsValid() && colorElement->GetNode("color"))
       {
         specularColor = csColladaMaterial::StringToColor(colorElement->GetNode("color")->GetValue());
       }
       colorElement = pbNode->GetNode("ambient");
 
-      if (colorElement.IsValid())
+      if (colorElement.IsValid() && colorElement->GetNode("color"))
       {
         ambientColor = csColladaMaterial::StringToColor(colorElement->GetNode("color")->GetValue());
       }
@@ -1535,9 +1549,11 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
   // =============== Auxiliary Class: csColladaEffect ===============
 
-  csColladaEffect::csColladaEffect(iDocumentNode* effectElement, csColladaConvertor* parentObj)
+  csColladaEffect::csColladaEffect(iDocumentNode* effectElement, csColladaConvertor* parentObj,
+    iDocumentNode* matNode)
   {
     parent = parentObj;
+    materialNode = matNode;
     Process(effectElement);
   }
 
@@ -1591,8 +1607,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     while (profilesToProcess->HasNext())
     {
       currentProfile = profilesToProcess->Next();
-      currentProfileObject = new csColladaEffectProfile(currentProfile, parent);
-      //scfString* nameString = new scfString("profile_COMMON");
+      currentProfileObject = new csColladaEffectProfile(currentProfile, parent, materialNode);
       currentProfileObject->SetName("profile_COMMON");
       profiles.Push((*currentProfileObject));
     }
@@ -1646,12 +1661,17 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
   void csColladaMaterial::SetInstanceEffect(iDocumentNode *effectNode)
   {
-    instanceEffect = new csColladaEffect(effectNode, parent);
+    instanceEffect = new csColladaEffect(effectNode, parent, materialNode);
   }
 
   void csColladaMaterial::SetInstanceEffect(csColladaEffect *newInstEffect)
   {
     instanceEffect = newInstEffect;
+  }
+
+  void csColladaMaterial::SetMaterialNode(iDocumentNode* node)
+  {
+    materialNode = node;
   }
 
   bool csColladaMaterial::operator ==(const csColladaMaterial& comp)

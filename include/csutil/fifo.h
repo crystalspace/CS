@@ -31,7 +31,8 @@
  * a single array.
  */
 template <class T, class ElementHandler = csArrayElementHandler<T>,
-  class MemoryAllocator = CS::Memory::AllocatorMalloc>
+  class MemoryAllocator = CS::Container::ArrayAllocDefault,
+  class CapacityHandler = csArrayCapacityFixedGrow<16> >
 class csFIFO
 {
 public:
@@ -41,14 +42,15 @@ public:
   typedef MemoryAllocator AllocatorType;
 
 private:
-  csArray<T, ElementHandler, MemoryAllocator> a1, a2;
+  csArray<T, ElementHandler, MemoryAllocator, CapacityHandler> a1, a2;
 public:
   /**
    * Construct the FIFO. See csArray<> documentation for meaning of
    * parameters.
    */
-  csFIFO (size_t icapacity = 0, size_t ithreshold = 0) 
-    :  a1 (icapacity, ithreshold), a2 (icapacity, ithreshold) { }
+  csFIFO (size_t icapacity = 0,
+    const CapacityHandler& ch = CapacityHandler()) 
+    :  a1 (icapacity, ch), a2 (icapacity, ch) { }
 
   /**
    * Return and remove the first element.
@@ -63,9 +65,28 @@ public:
       {
 	a2.Push (a1[n]);
       }
-      a1.Empty();
+      a1.Empty ();
     }
-    return a2.Pop();
+    return a2.Pop ();
+  }
+
+  /**
+   * Return the first element
+   */
+  T& Top ()
+  {
+    CS_ASSERT ((a1.GetSize () > 0) || (a2.GetSize () > 0));
+
+    if (a2.GetSize () == 0)
+    {
+      size_t n = a1.GetSize ();
+      while (n-- > 0)
+      {
+        a2.Push (a1[n]);
+      }
+      a1.Empty ();
+    }
+    return a2.Top ();
   }
 
   /**
@@ -77,7 +98,7 @@ public:
   }
 
   /// Return the number of elements in the FIFO.
-  size_t GetSize()
+  size_t GetSize() const
   {
     return a1.GetSize() + a2.GetSize();
   }
@@ -87,7 +108,7 @@ public:
    * \deprecated Use GetSize() instead.
    */
   CS_DEPRECATED_METHOD_MSG("Use GetSize() instead.")
-  size_t Length()
+  size_t Length() const
   {
     return GetSize();
   }

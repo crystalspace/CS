@@ -24,6 +24,7 @@
 #include "csutil/util.h"
 #include "xriface.h"
 #include "xrpriv.h"
+#include "csutil/scanstr.h"
 #include "csutil/scfstr.h"
 #include "iutil/vfs.h"
 #include "iutil/string.h"
@@ -319,7 +320,7 @@ float csXmlReadNode::GetContentsValueAsFloat ()
   const char* v = GetContentsValue ();
   if (!v) return 0;
   float val = 0.0;
-  sscanf (v, "%f", &val);
+  csScanStr (v, "%f", &val);
   return val;
 }
 
@@ -380,7 +381,7 @@ float csXmlReadNode::GetAttributeValueAsFloat (const char* name)
   TrDocumentAttribute* a = GetAttributeInternal (name);
   if (!a) return 0;
   float f;
-  sscanf (a->Value (), "%f", &f);
+  csScanStr (a->Value (), "%f", &f);
   return f;
 }
 

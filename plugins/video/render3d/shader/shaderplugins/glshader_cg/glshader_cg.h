@@ -20,59 +20,66 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __GLSHADER_CG_H__
 #define __GLSHADER_CG_H__
 
+#include "cg_common.h"
+
+#include "csplugincommon/opengl/shaderplugin.h"
 #include "csplugincommon/shader/shaderplugin.h"
-#include "csutil/dirtyaccessarray.h"
+#include "csutil/blockallocator.h"
 #include "csutil/leakguard.h"
 
 #include "iutil/comp.h"
 #include "ivideo/shader/shader.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <Cg/cg.h>
-/* WIN32 is used in an "#if" inside <cgGL.h>, however, it is sometimes defined
-* without value. */
-#ifdef WIN32
-#undef WIN32
-#define WIN32 1
-#endif 
-#include <Cg/cgGL.h>
+#include "glshader_cgcommon.h"
+#include "profile_limits.h"
 
 struct csGLExtensionManager;
 
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
 
-typedef csDirtyAccessArray<const char*, csStringArrayElementHandler>
-  ArgumentArray;
-
-class csGLShader_CG : public scfImplementation2<csGLShader_CG, 
-						iShaderProgramPlugin,
-					        iComponent>
+class csGLShader_CG :
+  public scfImplementationExt1<csGLShader_CG, 
+			       CS::PluginCommon::ShaderProgramPluginGL,
+			       iComponent>
 {
 private:
   static void ErrorHandler (CGcontext context, CGerror err, void* appdata);
   static void ErrorHandlerObjReg (CGcontext context, CGerror err, void* appdata);
 
   bool enable;
-  bool isOpen;
   const char* compiledProgram;
+  bool doIgnoreErrors;
   
-  void PrintCgListing (const char* listing);
+  typedef csArray<ProfileLimitsPair> ProfileLimitsArray;
+  ProfileLimitsArray precacheLimits;
+  void ParsePrecacheLimits (iConfigFile* config, ProfileLimitsArray& out);
+  bool Precache (csShaderGLCGCommon* prog, ProfileLimits& limits,
+    const char* tag, iHierarchicalCache* cacheTo);
 public:
   CS_LEAKGUARD_DECLARE (csGLShader_CG);
+  
+  using CS::PluginCommon::ShaderProgramPluginGL::ext;
+  using CS::PluginCommon::ShaderProgramPluginGL::statecache;
+  using CS::PluginCommon::ShaderProgramPluginGL::doVerbose;
+  using CS::PluginCommon::ShaderProgramPluginGL::doVerbosePrecache;
+  using CS::PluginCommon::ShaderProgramPluginGL::object_reg;
+  using CS::PluginCommon::ShaderProgramPluginGL::vendor;
 
-  iObjectRegistry* object_reg;
   CGcontext context;
   csRef<iShaderProgramPlugin> psplg;
   CGprofile psProfile;
-  csGLExtensionManager* ext;
   bool debugDump;
   char* dumpDir;
-  bool doVerbose;
 
   bool enableVP, enableFP;
   CGprofile maxProfileVertex;
   CGprofile maxProfileFragment;
+  
+  csBlockAllocator<ShaderParameter> paramAlloc;
+  
+  csRef<iDocumentSystem> binDocSys;
+  csRef<iDocumentSystem> xmlDocSys;
 
   csGLShader_CG (iBase *parent);
   virtual ~csGLShader_CG ();
@@ -85,6 +92,14 @@ public:
 
   virtual bool SupportType(const char* type);
 
+  csPtr<iStringArray> QueryPrecacheTags (const char* type);
+  bool Precache (const char* type, const char* tag,
+    iBase* previous, 
+    iDocumentNode* node, iHierarchicalCache* cacheTo,
+    csRef<iBase>* outObj = 0);
+  csPtr<iString> SelectPrecacheTag (const char* type, iBase* previous,
+    iHierarchicalCache* cacheDir);
+
   bool Open();
   /** @} */
 
@@ -95,7 +110,8 @@ public:
 
   void SplitArgsString (const char* str, ArgumentArray& args);
   void GetProfileCompilerArgs (const char* type, CGprofile profile, 
-    ArgumentArray& args);
+    HardwareVendor vendor,
+    bool noConfigArgs, ArgumentArray& args);
   static bool ProfileNeedsRouting (CGprofile profile)
   {
     return (profile >= CG_PROFILE_PS_1_1) && (profile <= CG_PROFILE_PS_1_3);
@@ -104,6 +120,16 @@ public:
   
   void SetCompiledSource (const char* prog)
   { compiledProgram = prog; }
+  void SetIgnoreErrors (bool doIgnore) { doIgnoreErrors = doIgnore; }
+  void PrintCgListing (const char* listing);
+  void PrintAnyListing ()
+  {
+    const char* listing = cgGetLastListing (context);
+    if (listing && *listing && doVerbose)
+    {
+      PrintCgListing (listing);
+    }
+  }
 };
 
 }

@@ -42,6 +42,12 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "btBulletDynamicsCommon.h"
 #include "btBulletCollisionCommon.h"
 
+// Bullet includes.
+#include "btBulletDynamicsCommon.h"
+#include "btBulletCollisionCommon.h"
+
+#include "csutil/custom_new_enable.h"
+
 #include "bullet.h"
 
 #define COLLISION_THRESHOLD 0.01
@@ -109,6 +115,8 @@ static csRef<iTriangleMesh> FindColdetTriangleMesh(iMeshWrapper* mesh,
 }
 
 
+#include "csutil/custom_new_disable.h"
+
 static btTriangleIndexVertexArray* GenerateTriMeshData (iMeshWrapper* mesh,
 	int*& indices, btVector3*& vertices,
 	csStringID base_id, csStringID colldet_id)
@@ -146,6 +154,8 @@ static btTriangleIndexVertexArray* GenerateTriMeshData (iMeshWrapper* mesh,
 	vt_num, (btScalar*) &vertices[0].x (), vertexStride);
   return indexVertexArrays;
 }
+
+#include "csutil/custom_new_disable.h"
 
 //---------------------------------------------------------------------------
 
@@ -489,16 +499,12 @@ void csBulletDynamicsSystem::CheckCollisions ()
     btCollisionObject* obB = static_cast<btCollisionObject*>(contactManifold->getBody1());
     if (contactManifold->getNumContacts())
     {
-      if (!obA->isStaticOrKinematicObject())
-      {
         csBulletRigidBody *cs_obA = (csBulletRigidBody*)obA->getUserPointer();
-        CheckCollision(*cs_obA, obB, *contactManifold);
-      }
-      if (!obB->isStaticOrKinematicObject())
-      {
+        if (cs_obA)
+          CheckCollision(*cs_obA, obB, *contactManifold);
         csBulletRigidBody *cs_obB = (csBulletRigidBody*)obB->getUserPointer();
-        CheckCollision(*cs_obB, obA, *contactManifold);
-      }
+        if (cs_obB)
+          CheckCollision(*cs_obB, obA, *contactManifold);
     }
   }
 }
@@ -737,19 +743,23 @@ bool csBulletRigidBody::Disable (void)
   /*SetAngularVelocity(csVector3(0));
   SetLinearVelocity(csVector3(0));
   body->setInterpolationWorldTransform(body->getWorldTransform());*/
-  body->setActivationState(ISLAND_SLEEPING);
+  if (body)
+    body->setActivationState(ISLAND_SLEEPING);
   return false;
 }
 
 bool csBulletRigidBody::Enable (void)
 {
-  body->setActivationState(ACTIVE_TAG);
+  if (body)
+    body->setActivationState(ACTIVE_TAG);
   return true;
 }
 
 bool csBulletRigidBody::IsEnabled (void)
 {
-  return body->isActive();
+  if (body)
+    return body->isActive();
+  return 0;
 }
 
 csRef<iBodyGroup> csBulletRigidBody::GetGroup (void)
@@ -1051,13 +1061,15 @@ void csBulletRigidBody::AdjustTotalMass (float /*targetmass*/)
 
 void csBulletRigidBody::AddForce (const csVector3& force)
 {
-  body->applyForce (btVector3 (force.x, force.y, force.z),
+  if (body)
+    body->applyForce (btVector3 (force.x, force.y, force.z),
       btVector3 (0, 0, 0));
 }
 
 void csBulletRigidBody::AddTorque (const csVector3& force)
 {
-  body->applyTorque (btVector3 (force.x, force.y, force.z));
+  if (body)
+    body->applyTorque (btVector3 (force.x, force.y, force.z));
 }
 
 void csBulletRigidBody::AddRelForce (const csVector3& /*force*/)

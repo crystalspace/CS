@@ -29,6 +29,7 @@
 
 #include "csextern.h"
 
+#include "csgeom/matrix4.h"
 #include "csgeom/vector3.h"
 
 class csString;
@@ -186,6 +187,9 @@ public:
    * This will basically reverse the result of Classify().
    */
   inline void Invert () { norm = -norm;  DD = -DD; }
+  
+  /// Return the same plane with inverted direction
+  inline csPlane3 Inverse() const { csPlane3 p (*this); p.Invert(); return p; }
 
   /**
    * Normalizes the plane equation so that 'norm' is a unit vector.
@@ -201,9 +205,18 @@ public:
    */
   csVector3 FindPoint () const;
 
-	/** Project a point onto this plane
-	  */
-	csVector3 ProjectOnto(const csVector3& p);
+  //@{
+  /** 
+   * Project a point onto this plane
+   */
+  csVector3 ProjectOnto(const csVector3& p);
+  csVector3 ProjectOnto (const csVector3& p) const
+  {
+    // @@@ Kludge - needed since ProjectOnto() modifies the plane
+    csPlane3 thisNonConst (*this);
+    return thisNonConst.ProjectOnto (p);
+  }
+  //@}
 
   /**
    * Calculate two orthogonal points on the plane given by
@@ -244,6 +257,19 @@ public:
 
   /// Return a textual representation of the plane in the form "aa,bb,cc,dd".
   csString Description() const;
+  
+  /**
+   * Transform plane by the given matrix. For a correct result, \a m_inv_t
+   * must be the transposed inverse of the matrix by which you want to
+   * actually transform.
+   */
+  inline friend csPlane3 operator* (const CS::Math::Matrix4& m_inv_t,
+                                    const csPlane3& p)
+  {
+    csVector4 v (p.norm, p.DD);
+    v = m_inv_t * v;
+    return csPlane3 (v.x, v.y, v.z, v.w);
+  }
 };
 
 /** @} */

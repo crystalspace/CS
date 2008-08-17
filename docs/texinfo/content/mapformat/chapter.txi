@@ -1,0 +1,23 @@
+@c -*-texinfo-*-
+@node Map Format Reference, , ViewMesh, Working with Engine Content
+@section Map Format Reference
+@cindex Map Format Reference
+
+This section contains descriptions of the map format used by Crystal Space.
+
+Note that, despite the word ``map'' in the title, large parts also apply to
+the mesh factory, mesh object and library file formats.
+
+The format here is basically described in terms of @sc{xml}, but keep in mind
+that Crystal Space internally abstracts the representation and also provides
+a binary on-disk representation of maps (@pxref{Binary XML}) -- however,
+element names, structure, attributes etc. are the same in all possible
+representations.
+
+@menu
+* General Renderbuffers Format::
+* XML File Format:: Format of Map File (@sc{xml})
+@end menu
+
+@importss{content,mapformat,buffers.txi}
+@importss{content,mapformat,xmlfmt.txi}

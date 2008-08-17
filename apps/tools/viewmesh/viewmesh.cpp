@@ -23,7 +23,9 @@
 #include "csutil/cscolor.h"
 #include "csutil/common_handlers.h"
 #include "csutil/event.h"
+#include "csutil/scanstr.h"
 #include "csutil/scfstr.h"
+#include "csutil/stringconv.h"
 #include "imesh/object.h"
 #include "iutil/eventq.h"
 #include "iutil/object.h"
@@ -88,7 +90,7 @@ ViewMesh::~ViewMesh ()
 #endif
 }
 
-void ViewMesh::ProcessFrame()
+void ViewMesh::Frame()
 {
   csTicks elapsed_time = vc->GetElapsedTicks ();
   float speed = (elapsed_time / 1000.0) * (0.06 * 20);
@@ -234,12 +236,6 @@ void ViewMesh::ProcessFrame()
     return;
 
   cegui->Render();
-}
-
-void ViewMesh::FinishFrame ()
-{
-  g3d->FinishDraw ();
-  g3d->Print (0);
 }
 
 void ViewMesh::ResetCamera()
@@ -434,12 +430,12 @@ void ViewMesh::HandleCommandLine()
     LoadSprite(meshfilename);
   }
 
-  if (roomSize) roomsize = atof(roomSize);
+  if (roomSize) roomsize = CS::Utility::strtof(roomSize);
 
   if (scaleTxt != 0)
   {
     float newScale;
-    sscanf (scaleTxt, "%f", &newScale);
+    csScanStr (scaleTxt, "%f", &newScale);
     ScaleSprite(newScale);
   }
 
@@ -449,7 +445,7 @@ void ViewMesh::LoadTexture(const char* file, const char* name)
 {
   if (file && name)
   {
-    iTextureWrapper* txt = loader->LoadTexture (name, file, CS_TEXTURE_3D, 0, true, true, true, region);
+    iTextureWrapper* txt = loader->LoadTexture (name, file, CS_TEXTURE_3D, 0, true, true, true, collection);
     if (txt == 0)
     {
       ReportError("Cannot load texture '%s' from file '%s'.\n", name, file);
@@ -461,7 +457,7 @@ void ViewMesh::LoadTexture(const char* file, const char* name)
 
 void ViewMesh::LoadLibrary(const char* file)
 {
-  loader->LoadLibraryFile(file, region);
+  loader->LoadLibraryFile(file, collection);
 }
 
 bool ViewMesh::OnInitialize(int /*argc*/, char* /*argv*/ [])
@@ -497,6 +493,7 @@ bool ViewMesh::OnInitialize(int /*argc*/, char* /*argv*/ [])
 
 void ViewMesh::OnExit()
 {
+  printer.Invalidate ();
 }
 
 bool ViewMesh::Application()
@@ -534,7 +531,7 @@ bool ViewMesh::Application()
 
   engine->SetLightingCacheMode (0);
 
-  region = engine->CreateRegion ("viewmesh_region");
+  collection = engine->CreateCollection ("viewmesh_region");
   reloadFilename = "";
 
   csRef<iCommandLineParser> cmdline =
@@ -578,6 +575,8 @@ bool ViewMesh::Application()
 
   x = g3d->GetDriver2D ()->GetWidth ();
   y = g3d->GetDriver2D ()->GetHeight ();
+
+  printer.AttachNew (new FramePrinter (object_reg));
 
   Run();
 
@@ -953,7 +952,7 @@ void ViewMesh::LoadSprite (const char* filename)
 
   printf ("Loading model '%s' from vfs dir '%s'\n",
 		  filename, vfs->GetCwd ()); fflush (stdout);
-  csLoadResult rc = loader->Load (filename, region, false, true);
+  csLoadResult rc = loader->Load (filename, collection, false, true);
 
   if (!rc.success)
     return;
@@ -967,7 +966,7 @@ void ViewMesh::LoadSprite (const char* filename)
     for (i = 0 ; i < factories->GetCount () ; i++)
     {
       iMeshFactoryWrapper* f = factories->Get (i);
-      if (region->IsInRegion (f->QueryObject ()))
+      if (collection->IsParentOf (f->QueryObject ()))
       {
         wrap = f;
         break;
@@ -1127,8 +1126,8 @@ void ViewMesh::AttachMesh (const char* file)
     }
   }
 
-  iRegion* region = engine->CreateRegion ("viewmesh_region");
-  csLoadResult rc = loader->Load (file, region, false, true);
+  iCollection* collection = engine->CreateCollection ("viewmesh_region");
+  csLoadResult rc = loader->Load (file, collection, false, true);
 
   if (!rc.success)
     return;
@@ -1142,7 +1141,7 @@ void ViewMesh::AttachMesh (const char* file)
     for (i = 0 ; i < factories->GetCount () ; i++)
     {
       iMeshFactoryWrapper* f = factories->Get (i);
-      if (region->IsInRegion (f->QueryObject ()))
+      if (collection->IsParentOf (f->QueryObject ()))
       {
         factory = f;
         break;
@@ -1546,7 +1545,7 @@ bool ViewMesh::SetRotX (const CEGUI::EventArgs& e)
   if (!text.c_str()) return false;
 
   float f;
-  if (sscanf(text.c_str(),"%f", &f) != 1) return false;
+  if (csScanStr(text.c_str(),"%f", &f) != 1) return false;
 
   if (selectedCal3dSocket && selectedCal3dSocket->GetMeshWrapper())
   {
@@ -1599,7 +1598,7 @@ bool ViewMesh::SetRotY (const CEGUI::EventArgs& e)
   if (!text.c_str()) return false;
 
   float f;
-  if (sscanf(text.c_str(),"%f", &f) != 1) return false;
+  if (csScanStr(text.c_str(),"%f", &f) != 1) return false;
 
   if (selectedCal3dSocket && selectedCal3dSocket->GetMeshWrapper())
   {
@@ -1652,7 +1651,7 @@ bool ViewMesh::SetRotZ (const CEGUI::EventArgs& e)
   if (!text.c_str()) return false;
 
   float f;
-  if (sscanf(text.c_str(),"%f", &f) != 1) return false;
+  if (csScanStr(text.c_str(),"%f", &f) != 1) return false;
 
   if (selectedCal3dSocket && selectedCal3dSocket->GetMeshWrapper())
   {
@@ -1918,7 +1917,7 @@ bool ViewMesh::SetScaleSprite (const CEGUI::EventArgs& e)
   if (text.empty()) return false;
 
   float f;
-  if (sscanf(text.c_str(),"%f", &f) != 1) return false;
+  if (csScanStr(text.c_str(),"%f", &f) != 1) return false;
 
   ScaleSprite(f);
   return true;
@@ -1952,14 +1951,14 @@ bool ViewMesh::BlendButton (const CEGUI::EventArgs& e)
 
   if (! Sweight.empty())
   {
-    if(sscanf(Sweight.c_str(), "%f", &weight) != 1) weight = 1;
+    if(csScanStr(Sweight.c_str(), "%f", &weight) != 1) weight = 1;
   }
 
   component = winMgr->getWindow("Tab4/DelayInput");
   CEGUI::String Sdelay = component->getProperty("Text");
   if (! Sdelay.empty())
   {
-    if(sscanf(Sdelay.c_str(), "%f", &delay) != 1) delay = 1;
+    if(csScanStr(Sdelay.c_str(), "%f", &delay) != 1) delay = 1;
   }
 
   int target =
@@ -1984,7 +1983,7 @@ bool ViewMesh::ClearButton (const CEGUI::EventArgs& e)
 
   if (! Sweight.empty())
   {
-    if(sscanf(Sweight.c_str(), "%f", &weight) != 1) weight = 1;
+    if(csScanStr(Sweight.c_str(), "%f", &weight) != 1) weight = 1;
   }
 
   int target =
@@ -2007,7 +2006,7 @@ bool ViewMesh::ReloadButton (const CEGUI::EventArgs& e)
   if (reloadFilename == "")
       return true;
 
-  region->DeleteAll();
+  collection->ReleaseAllObjects();
   LoadSprite(reloadFilename);
 
   return true;

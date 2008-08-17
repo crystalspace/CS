@@ -75,7 +75,7 @@ const uint tuFlags = csGLStateCache::activateMatrix
 
 void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/, 
                                 csRenderMeshModes& /*modes*/,
-				const iShaderVarStack* stacks)
+				const csShaderVariableStack& stack)
 {
   size_t i;
 
@@ -94,44 +94,44 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
 
       LightingEntry& entry = lights[i];
 
-      v = GetParamVectorVal (stacks, entry.params[gllpPosition], zero);
+      v = GetParamVectorVal (stack, entry.params[gllpPosition], zero);
       glLightfv (glLight, GL_POSITION, (float*)&v);
 
-      v = GetParamVectorVal (stacks, entry.params[gllpDiffuse], zero);
+      v = GetParamVectorVal (stack, entry.params[gllpDiffuse], zero);
       glLightfv (glLight, GL_DIFFUSE, (float*)&v);
 
-      v = GetParamVectorVal (stacks, entry.params[gllpSpecular], zero);
+      v = GetParamVectorVal (stack, entry.params[gllpSpecular], zero);
       glLightfv (glLight, GL_SPECULAR, (float*)&v);
 
-      v = GetParamVectorVal (stacks, entry.params[gllpAmbient], zero);
+      v = GetParamVectorVal (stack, entry.params[gllpAmbient], zero);
       glLightfv (glLight, GL_AMBIENT, (float*)&v);
 
-      v = GetParamVectorVal (stacks, entry.params[gllpAttenuation], 
+      v = GetParamVectorVal (stack, entry.params[gllpAttenuation], 
 	csVector4 (1, 0, 0, 0));
       glLightf (glLight, GL_CONSTANT_ATTENUATION, v.x);
       glLightf (glLight, GL_LINEAR_ATTENUATION, v.y);
       glLightf (glLight, GL_QUADRATIC_ATTENUATION, v.z);
 
-      float f = GetParamFloatVal (stacks, entry.params[gllpSpotCutoff],
+      float f = GetParamFloatVal (stack, entry.params[gllpSpotCutoff],
 	1.0f);
       glLightf (glLight, GL_SPOT_CUTOFF, f);
 
-      v = GetParamVectorVal (stacks, entry.params[gllpDirection], zero);
+      v = GetParamVectorVal (stack, entry.params[gllpDirection], zero);
       glLightfv (glLight, GL_SPOT_DIRECTION, (float*)&v);
     }
 
-    v = GetParamVectorVal (stacks, matAmbient, one);
+    v = GetParamVectorVal (stack, matAmbient, one);
     glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, (float*)&v);
-    v = GetParamVectorVal (stacks, matDiffuse, one);
+    v = GetParamVectorVal (stack, matDiffuse, one);
     glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, (float*)&v);
-    v = GetParamVectorVal (stacks, matEmission, zero);
+    v = GetParamVectorVal (stack, matEmission, zero);
     glMaterialfv (GL_FRONT_AND_BACK, GL_EMISSION, (float*)&v);
-    v = GetParamVectorVal (stacks, matSpecular, zero);
+    v = GetParamVectorVal (stack, matSpecular, zero);
     glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, (float*)&v);
-    float f = GetParamFloatVal (stacks, matSpecularExp, 0);
+    float f = GetParamFloatVal (stack, matSpecularExp, 0.0f);
     glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, f);
 
-    var = csGetShaderVariableFromStack (stacks, ambientvar);
+    var = csGetShaderVariableFromStack (stack, ambientvar);
     if (var)
       var->GetValue (v);
     else
@@ -153,12 +153,12 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
     statecache->Enable_GL_LIGHTING ();
   }
   
-  glPointSize (GetParamFloatVal (stacks, pointSize, 1.0f));
+  glPointSize (GetParamFloatVal (stack, pointSize, 1.0f));
   if (ext->CS_GL_ARB_point_parameters)
   {
     csVector4 v;
     const csVector4 defAtten (0, 1, 0, 0);
-    v = GetParamVectorVal (stacks, pointAttenuation, defAtten);
+    v = GetParamVectorVal (stack, pointAttenuation, defAtten);
     ext->glPointParameterfvARB (GL_POINT_DISTANCE_ATTENUATION_ARB, (float*)&v);
   }
 
@@ -197,7 +197,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
         glTexGenfv(GL_R, GL_EYE_PLANE, SR);
         glTexGenfv(GL_Q, GL_EYE_PLANE, SQ);
 
-        float f = GetParamFloatVal (stacks, entry.params[gllpSpotCutoff], 45.0f);
+        float f = GetParamFloatVal (stack, entry.params[gllpSpotCutoff], 45.0f);
         float xmin, xmax, ymin, ymax, zNear, zFar, aspect;
         //???????
         aspect = 1;
@@ -211,7 +211,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
 		//????????
 
         csReversibleTransform def_transform;
-        csReversibleTransform t = GetParamTransformVal (stacks, entry.params[gllpTransform], def_transform);
+        csReversibleTransform t = GetParamTransformVal (stack, entry.params[gllpTransform], def_transform);
         const csMatrix3 &orientation = t.GetT2O();
 
         static float mAutoTextureMatrix[16];
@@ -248,7 +248,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
         LightingEntry& entry = lights[0];
         csVector4 v;
 
-        csShaderVariable* sv = csGetShaderVariableFromStack (stacks, string_object2world);
+        csShaderVariable* sv = csGetShaderVariableFromStack (stack, string_object2world);
         if (!sv) continue;
 
         csReversibleTransform t;
@@ -271,18 +271,18 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
         glScalef(0.5f, 0.5f, 0.5f);
 
         const csVector4 null (0);
-        v = GetParamVectorVal (stacks, entry.params[gllpAttenuation], null);
+        v = GetParamVectorVal (stack, entry.params[gllpAttenuation], null);
         float one_over_radius = 1/v.x;
         glScalef(one_over_radius, one_over_radius, one_over_radius);
 
-        v = GetParamVectorVal (stacks, entry.params[gllpPosition], null);
+        v = GetParamVectorVal (stack, entry.params[gllpPosition], null);
         csVector3 lp = t.Other2This(csVector3(v.x, v.y, v.z));
         glTranslatef(-lp.x, -lp.y, -lp.z);
     }
     else if (layers[i].texgen == TEXGEN_REFLECT_CUBE)
     {
 
-      csShaderVariable* sv = csGetShaderVariableFromStack (stacks, string_world2camera);
+      csShaderVariable* sv = csGetShaderVariableFromStack (stack, string_world2camera);
       if (!sv) continue;
 
       //setup for environmental cubemapping
@@ -369,8 +369,8 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
       csRef<csShaderVariable> planeVar;
       csRef<csShaderVariable> densityVar;
 
-      planeVar = csGetShaderVariableFromStack (stacks, layers[i].fogplane);
-      densityVar = csGetShaderVariableFromStack (stacks, layers[i].fogdensity);
+      planeVar = csGetShaderVariableFromStack (stack, layers[i].fogplane);
+      densityVar = csGetShaderVariableFromStack (stack, layers[i].fogdensity);
 
       if (planeVar && densityVar)
       {
@@ -465,7 +465,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
 
         csRef<csShaderVariable> var;
 
-        var = csGetShaderVariableFromStack (stacks, op.param.name);
+        var = csGetShaderVariableFromStack (stack, op.param.name);
         if (!var.IsValid ())
           var = op.param.var;
 
@@ -528,7 +528,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
 
     if (layers[i].constcolor.valid)
     {
-      csVector4 v = GetParamVectorVal (stacks, layers[i].constcolor, 
+      csVector4 v = GetParamVectorVal (stack, layers[i].constcolor, 
 	csVector4 (0));
 
       glTexEnvfv (GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, 
@@ -542,7 +542,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
     statecache->ActivateTU (tuFlags);
   }
 
-  var = csGetShaderVariableFromStack (stacks, primcolvar);
+  var = csGetShaderVariableFromStack (stack, primcolvar);
   if (var)
   {
     csVector4 col;
@@ -750,10 +750,10 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
     return false;
 
   do_lighting = false;
-  ambientvar = csInvalidStringID;
-  primcolvar = csInvalidStringID;
-  string_world2camera = strings->Request ("world2camera transform");
-  string_object2world = strings->Request ("object2world transform");
+  ambientvar = CS::InvalidShaderVarStringID;
+  primcolvar = CS::InvalidShaderVarStringID;
+  string_world2camera = stringsSvName->Request ("world2camera transform");
+  string_object2world = stringsSvName->Request ("object2world transform");
 
   csRef<iShaderManager> shadermgr = 
   	csQueryRegistry<iShaderManager> (objectReg);
@@ -785,8 +785,8 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
 	      if (!entry.params[i].valid && (defaultParamNames[i] != propNone))
 	      {
 		entry.params[i].name = 
-		  shaderPlug->lsvCache.GetLightSVId (entry.lightnum,
-		  defaultParamNames[i]);
+		  shaderPlug->lsvCache.GetLightSVId (defaultParamNames[i]);
+		entry.params[i].indices.Push (entry.lightnum);
 		entry.params[i].valid = true;
 	      }
 	    }
@@ -796,7 +796,7 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
           {
             const char* str;
             if ((str = child->GetContentsValue ()) != 0)
-              primcolvar = strings->Request (str);
+              primcolvar = stringsSvName->Request (str);
           }
           break;
         case XMLTOKEN_CONSTANTCOLOR:
@@ -819,9 +819,9 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
           {
             const char* str;
             if ((str = child->GetAttributeValue("color")))
-              ambientvar = strings->Request (str);
+              ambientvar = stringsSvName->Request (str);
             else
-              ambientvar = strings->Request ("light ambient");
+              ambientvar = stringsSvName->Request ("light ambient");
           
             do_lighting = true;
           }
@@ -873,14 +873,14 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
                 layers[layer].texgen = TEXGEN_FOG;
 
                 if ((str = child->GetAttributeValue("plane")))
-                  layers[layer].fogplane = strings->Request (str);
+                  layers[layer].fogplane = stringsSvName->Request (str);
                 else
-                  layers[layer].fogplane = strings->Request ("fogplane");
+                  layers[layer].fogplane = stringsSvName->Request ("fogplane");
 
                 if ((str = child->GetAttributeValue("density")))
-                  layers[layer].fogdensity = strings->Request (str);
+                  layers[layer].fogdensity = stringsSvName->Request (str);
                 else
-                  layers[layer].fogdensity = strings->Request ("fog density");
+                  layers[layer].fogdensity = stringsSvName->Request ("fog density");
               }
 	      else
 	      {
@@ -1006,7 +1006,7 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
   return true;
 }
 
-bool csGLShaderFVP::Compile()
+bool csGLShaderFVP::Compile (iHierarchicalCache*, csRef<iString>* tag)
 {
   shaderPlug->Open ();
   ext = shaderPlug->ext;
@@ -1031,5 +1031,46 @@ bool csGLShaderFVP::Compile()
   csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (objectReg);
   g2d->PerformExtension ("getstatecache", &statecache);
 
+  tag->AttachNew (new scfString ("default"));
+  
   return true;
 }
+
+void csGLShaderFVP::GetUsedShaderVars (csBitArray& bits) const
+{
+  // FIXME: not necessarily used ...
+  TryAddUsedShaderVarName (ambientvar, bits);
+  // FIXME: not necessarily used ...
+  TryAddUsedShaderVarName (string_world2camera, bits);
+  // FIXME: not necessarily used ...
+  TryAddUsedShaderVarName (string_object2world, bits);
+
+  TryAddUsedShaderVarName (primcolvar, bits);
+
+  for (size_t l = 0; l < lights.GetSize(); l++)
+  {
+    for (size_t p = 0; p < gllpCount; p++)
+    {
+      TryAddUsedShaderVarProgramParam (lights[l].params[p], bits);
+    }
+  }
+
+  TryAddUsedShaderVarProgramParam (matAmbient, bits);
+  TryAddUsedShaderVarProgramParam (matDiffuse, bits);
+  TryAddUsedShaderVarProgramParam (matEmission, bits);
+  TryAddUsedShaderVarProgramParam (matSpecular, bits);
+  TryAddUsedShaderVarProgramParam (matSpecularExp, bits);
+
+  for (size_t l = 0; l < layers.GetSize(); l++)
+  {
+    TryAddUsedShaderVarProgramParam (layers[l].constcolor, bits);
+    TryAddUsedShaderVarName (layers[l].fogdensity, bits);
+    TryAddUsedShaderVarName (layers[l].fogplane, bits);
+
+    for (size_t o = 0; o < layers[l].texMatrixOps.GetSize(); o++)
+    {
+      TryAddUsedShaderVarProgramParam (layers[l].texMatrixOps[o].param, bits);
+    }
+  }
+}
+

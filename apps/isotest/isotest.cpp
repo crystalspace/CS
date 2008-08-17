@@ -16,55 +16,15 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "cssysdef.h"
 #include "isotest.h"
-#include "cstool/csview.h"
-#include "cstool/initapp.h"
-#include "csutil/cmdhelp.h"
-#include "csutil/cscolor.h"
-#include "csutil/event.h"
-#include "csutil/sysfunc.h"
-#include "iengine/camera.h"
-#include "iengine/campos.h"
-#include "iengine/engine.h"
-#include "iengine/light.h"
-#include "iengine/material.h"
-#include "iengine/mesh.h"
-#include "iengine/movable.h"
-#include "iengine/sector.h"
-#include "iengine/texture.h"
-#include "igraphic/imageio.h"
-#include "imap/loader.h"
-#include "imesh/object.h"
-#include "imesh/sprite3d.h"
-#include "imesh/skeleton.h"
-#include "iutil/csinput.h"
-#include "iutil/event.h"
-#include "iutil/eventq.h"
-#include "iutil/objreg.h"
-#include "iutil/vfs.h"
-#include "iutil/virtclk.h"
-#include "ivaria/reporter.h"
-#include "ivaria/stdrep.h"
-#include "ivideo/fontserv.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/material.h"
-#include "ivideo/texture.h"
-#include "ivideo/txtmgr.h"
-#include "imesh/genmesh.h"
-#include "imesh/gmeshskel2.h"
 
 CS_IMPLEMENT_APPLICATION
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 
-// The global pointer to isotest
-IsoTest *isotest;
-
-IsoTest::IsoTest (iObjectRegistry* object_reg)
+IsoTest::IsoTest ()
 {
-  IsoTest::object_reg = object_reg;
+  SetApplicationName ("CrystalSpace.IsoTest");
 
   current_view = 0;
   views[0].SetOrigOffset (csVector3 (-4, 4, -4)); // true isometric perspective.
@@ -79,7 +39,7 @@ IsoTest::~IsoTest ()
 {
 }
 
-void IsoTest::SetupFrame ()
+void IsoTest::Frame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -147,7 +107,7 @@ void IsoTest::SetupFrame ()
     csRef<iGeneralMeshState> spstate (
       scfQueryInterface<iGeneralMeshState> (actor->GetMeshObject ()));
     csRef<iGenMeshSkeletonControlState> animcontrol (
-       
+
       scfQueryInterface<iGenMeshSkeletonControlState> (spstate->GetAnimationControl ()));
     iSkeleton* skeleton = animcontrol->GetSkeleton ();
     if(actor_is_walking && !moved)
@@ -177,14 +137,9 @@ void IsoTest::SetupFrame ()
   // Move the light.
   actor_light->SetCenter (actor_pos+csVector3 (0, 2, -1));
 
-  CameraIsoLookat(view->GetCamera(), views[current_view], actor_pos); 
-  
-  // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
-    return;
+  CameraIsoLookat(view->GetCamera(), views[current_view], actor_pos);
 
-  // Tell the camera to render into the frame buffer.
-  view->Draw ();
+  rm->RenderView (view);
 
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS))
     return;
@@ -213,46 +168,37 @@ void IsoTest::SetupFrame ()
     "   tab key: cycle through camera presets");
 }
 
-void IsoTest::FinishFrame ()
+bool IsoTest::OnKeyboard(iEvent& ev)
 {
-  g3d->FinishDraw ();
-  g3d->Print (0);
-}
-
-bool IsoTest::HandleEvent (iEvent& ev)
-{
-  if (ev.Name == Process)
+  // We got a keyboard event.
+  csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
+  if (eventtype == csKeyEventTypeDown)
   {
-    isotest->SetupFrame ();
-    return true;
-  }
-  else if (ev.Name == FinalProcess)
-  {
-    isotest->FinishFrame ();
-    return true;
-  }
-  else if (ev.Name == KeyboardDown)
-  {
-    utf32_char c = csKeyEventHelper::GetCookedCode (&ev);
-    if (c == CSKEY_ESC)
+    // The user pressed a key (as opposed to releasing it).
+    utf32_char code = csKeyEventHelper::GetCookedCode(&ev);
+    if (code == CSKEY_ESC)
     {
-      csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
-      if (q)
-	q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
-      return true;
+      // The user pressed escape to exit the application.
+      // The proper way to quit a Crystal Space application
+      // is by broadcasting a csevQuit event. That will cause the
+      // main runloop to stop. To do that we get the event queue from
+      // the object registry and then post the event.
+      csRef<iEventQueue> q = 
+        csQueryRegistry<iEventQueue> (GetObjectRegistry());
+      if (q.IsValid()) q->GetEventOutlet()->Broadcast(
+        csevQuit(GetObjectRegistry()));
     }
-    else if (c == CSKEY_TAB)
+    else if (code == CSKEY_TAB)
     {
       current_view++;
       if (current_view >= 4) current_view = 0;
     }
   }
-
   return false;
 }
 
 void IsoTest::CameraIsoLookat(csRef<iCamera> cam, const IsoView& isoview,
-    const csVector3& lookat)
+                              const csVector3& lookat)
 {
   // Let the camera look at the actor.
   // so the camera is set to look at 'actor_pos'
@@ -260,6 +206,7 @@ void IsoTest::CameraIsoLookat(csRef<iCamera> cam, const IsoView& isoview,
   //int isofactor = 100; // 99.2% isometric (=GetFovAngle()/180.0)
   int isofactor = 200; // 99.6% isometric (=GetFovAngle()/180.0)
 
+  cam->SetViewportSize (g3d->GetWidth(), g3d->GetHeight());
   // set center and lookat
   csOrthoTransform& cam_trans = cam->GetTransform ();
   cam_trans.SetOrigin (lookat + float(isofactor)*isoview.camera_offset);
@@ -286,30 +233,130 @@ void IsoTest::SetupIsoView(IsoView& isoview)
   isoview.camera_offset = (r*isoview.original_offset)*isoview.distance;
 }
 
-bool IsoTest::IsoTestEventHandler (iEvent& ev)
+bool IsoTest::OnInitialize(int /*argc*/, char* /*argv*/ [])
 {
-  if (isotest)
-    return isotest->HandleEvent (ev);
-  else
-    return false;
+  // RequestPlugins() will load all plugins we specify. In addition
+  // it will also check if there are plugins that need to be loaded
+  // from the config system (both the application config and CS or
+  // global configs). In addition it also supports specifying plugins
+  // on the commandline.
+  if (!csInitializer::RequestPlugins(GetObjectRegistry(),
+    CS_REQUEST_VFS,
+    CS_REQUEST_OPENGL3D,
+    CS_REQUEST_ENGINE,
+    CS_REQUEST_PLUGIN("crystalspace.font.server.multiplexer", iFontServer),
+    "crystalspace.font.server.freetype2", "iFontServer.1", 
+    scfInterfaceTraits<iFontServer>::GetID(), 
+    scfInterfaceTraits<iFontServer>::GetVersion(),
+    "crystalspace.font.server.default", "iFontServer.2", 
+    scfInterfaceTraits<iFontServer>::GetID(), 
+    scfInterfaceTraits<iFontServer>::GetVersion(),
+    CS_REQUEST_FONTSERVER,
+    CS_REQUEST_IMAGELOADER,
+    CS_REQUEST_LEVELLOADER,
+    CS_REQUEST_REPORTER,
+    CS_REQUEST_REPORTERLISTENER,
+    CS_REQUEST_END))
+    return ReportError("Failed to initialize plugins!");
+
+  // "Warm up" the event handler so it can interact with the world
+  csBaseEventHandler::Initialize(GetObjectRegistry());
+
+  // Now we need to register the event handler for our application.
+  // Crystal Space is fully event-driven. Everything (except for this
+  // initialization) happens in an event.
+  // Rather than simply handling all events, we subscribe to the
+  // particular events we're interested in.
+  csEventID events[] = {
+    csevFrame (GetObjectRegistry()),
+    csevKeyboardEvent (GetObjectRegistry()),
+    CS_EVENTLIST_END
+  };
+  if (!RegisterQueue(GetObjectRegistry(), events))
+    return ReportError("Failed to set up event handler!");
+
+  // Report success
+  return true;
+}
+
+void IsoTest::OnExit()
+{
+  // Shut down the event handlers we spawned earlier.
+  drawer.Invalidate();
+  printer.Invalidate();
+}
+
+bool IsoTest::Application()
+{
+  // Open the main system. This will open all the previously loaded plug-ins.
+  // i.e. all windows will be opened.
+  if (!OpenApplication(GetObjectRegistry()))
+    return ReportError("Error opening system!");
+
+  if (SetupModules())
+  {
+    // This calls the default runloop. This will basically just keep
+    // broadcasting process events to keep the game going.
+    Run();
+  }
+
+  return true;
+}
+
+bool IsoTest::SetupModules ()
+{
+  // Now get the pointer to various modules we need. We fetch them
+  // from the object registry. The RequestPlugins() call we did earlier
+  // registered all loaded plugins with the object registry.
+  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
+  if (!g3d) return ReportError("Failed to locate 3D renderer!");
+
+  engine = csQueryRegistry<iEngine> (GetObjectRegistry());
+  if (!engine) return ReportError("Failed to locate 3D engine!");
+
+  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
+  if (!vc) return ReportError("Failed to locate Virtual Clock!");
+
+  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry());
+  if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
+
+  loader = csQueryRegistry<iLoader> (GetObjectRegistry());
+  if (!loader) return ReportError("Failed to locate Loader!");
+
+  // We need a View to the virtual world.
+  view.AttachNew(new csView (engine, g3d));
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  // We use the full window to draw the world.
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
+  font = g3d->GetDriver2D ()->GetFontServer()->LoadFont
+    ("/fonts/ttf/Vera.ttf", 10);
+  if(!font) // fallback
+    font = g3d->GetDriver2D ()->GetFontServer()->LoadFont(CSFONT_LARGE);
+
+  if (!LoadMap ()) return false;
+  if (!CreateActor ()) return false;
+  engine->Prepare ();
+  rm = engine->GetRenderManager();
+
+  // We use some other "helper" event handlers to handle 
+  // pushing our work into the 3D engine and rendering it
+  // to the screen.
+  //drawer.AttachNew(new FrameBegin3DDraw (GetObjectRegistry (), view));
+  printer.AttachNew(new FramePrinter (GetObjectRegistry ()));
+
+  return true;
 }
 
 bool IsoTest::LoadMap ()
 {
-  // First disable the lighting cache. Our map uses stencil
-  // lighting.
-  engine->SetLightingCacheMode (0);
-
   // Set VFS current directory to the level we want to load.
   csRef<iVFS> VFS (csQueryRegistry<iVFS> (object_reg));
   VFS->ChDir ("/lev/isomap");
   // Load the level file which is called 'world'.
   if (!loader->LoadMapFile ("world"))
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.isotest",
-    	"Couldn't load level!");
-    return false;
+    return ReportError ("Couldn't load level!");
   }
 
   // Find the starting position in this level.
@@ -329,10 +376,7 @@ bool IsoTest::LoadMap ()
   }
   if (!room)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.isotest",
-      	"Can't find a valid starting position!");
-    return false;
+    return ReportError ("Can't find a valid starting position!");
   }
 
   view->GetCamera ()->SetSector (room);
@@ -360,10 +404,7 @@ bool IsoTest::CreateActor ()
   vfs->ChDir ("/lib/kwartz");
   if (!loader->LoadLibraryFile ("kwartz.lib"))
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.isotest",
-        "Error loading kwartz!");
-    return false;
+    return ReportError ("Error loading kwartz!");
   }
   vfs->PopDir ();
 
@@ -379,7 +420,7 @@ bool IsoTest::CreateActor ()
   csRef<iGeneralMeshState> spstate (
     scfQueryInterface<iGeneralMeshState> (actor->GetMeshObject ()));
   csRef<iGenMeshSkeletonControlState> animcontrol (
-     
+
     scfQueryInterface<iGenMeshSkeletonControlState> (spstate->GetAnimationControl ()));
   iSkeleton* skel = animcontrol->GetSkeleton ();
   skel->StopAll();
@@ -393,149 +434,17 @@ bool IsoTest::CreateActor ()
   return true;
 }
 
-bool IsoTest::Initialize ()
-{
-  if (!csInitializer::RequestPlugins (object_reg,
-  	CS_REQUEST_VFS,
-	CS_REQUEST_OPENGL3D,
-	CS_REQUEST_ENGINE,
-	CS_REQUEST_PLUGIN("crystalspace.font.server.multiplexer", iFontServer),
-	"crystalspace.font.server.freetype2", "iFontServer.1", 
-	  scfInterfaceTraits<iFontServer>::GetID(), 
-	  scfInterfaceTraits<iFontServer>::GetVersion(),
-	"crystalspace.font.server.default", "iFontServer.2", 
-	  scfInterfaceTraits<iFontServer>::GetID(), 
-	  scfInterfaceTraits<iFontServer>::GetVersion(),
-	CS_REQUEST_FONTSERVER,
-	CS_REQUEST_IMAGELOADER,
-	CS_REQUEST_LEVELLOADER,
-	CS_REQUEST_REPORTER,
-	CS_REQUEST_REPORTERLISTENER,
-	CS_REQUEST_END))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.isotest",
-	"Can't initialize plugins!");
-    return false;
-  }
-
-  Process = csevProcess (object_reg);
-  FinalProcess = csevFinalProcess (object_reg);
-  KeyboardDown = csevKeyboardDown (object_reg);
-
-  const csEventID evs[] = {
-    Process,
-    FinalProcess,
-    KeyboardDown,
-    CS_EVENTLIST_END
-  };
-  if (!csInitializer::SetupEventHandler (object_reg, IsoTestEventHandler, evs))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.isotest",
-	"Can't initialize event handler!");
-    return false;
-  }
-
-  // Check for commandline help.
-  if (csCommandLineHelper::CheckHelp (object_reg))
-  {
-    csCommandLineHelper::Help (object_reg);
-    return false;
-  }
-
-  // The virtual clock.
-  vc = csQueryRegistry<iVirtualClock> (object_reg);
-  if (!vc)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.isotest",
-	"Can't find the virtual clock!");
-    return false;
-  }
-
-  // Find the pointer to engine plugin
-  engine = csQueryRegistry<iEngine> (object_reg);
-  if (!engine)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.isotest",
-	"No iEngine plugin!");
-    return false;
-  }
-
-  loader = csQueryRegistry<iLoader> (object_reg);
-  if (!loader)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.isotest",
-    	"No iLoader plugin!");
-    return false;
-  }
-
-  g3d = csQueryRegistry<iGraphics3D> (object_reg);
-  if (!g3d)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.isotest",
-    	"No iGraphics3D plugin!");
-    return false;
-  }
-
-  kbd = csQueryRegistry<iKeyboardDriver> (object_reg);
-  if (!kbd)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.isotest",
-    	"No iKeyboardDriver plugin!");
-    return false;
-  }
-
-  // Open the main system. This will open all the previously loaded plug-ins.
-  if (!csInitializer::OpenApplication (object_reg))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.isotest",
-    	"Error opening system!");
-    return false;
-  }
-
-  view = csPtr<iView> (new csView (engine, g3d));
-  iGraphics2D* g2d = g3d->GetDriver2D ();
-  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
-
-  font = g3d->GetDriver2D ()->GetFontServer()->LoadFont
-    ("/fonts/ttf/Vera.ttf", 10);
-  if(!font) // fallback
-    font = g3d->GetDriver2D ()->GetFontServer()->LoadFont(CSFONT_LARGE);
-
-  if (!LoadMap ()) return false;
-  if (!CreateActor ()) return false;
-  engine->Prepare ();
-
-  return true;
-}
-
-void IsoTest::Start ()
-{
-  csDefaultRunLoop (object_reg);
-}
-
-/*---------------------------------------------------------------------*
- * Main function
- *---------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*
+* Main function
+*-------------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
-  if (!object_reg) return -1;
-  isotest = new IsoTest (object_reg);
-
-  if (isotest->Initialize ())
-    isotest->Start ();
-
-  delete isotest;
-  isotest = 0;
-
-  csInitializer::DestroyApplication (object_reg);
-  return 0;
+  /* Runs the application. 
+  *
+  * csApplicationRunner<> is a small wrapper to support "restartable" 
+  * applications (ie where CS needs to be completely shut down and loaded 
+  * again). Simple1 does not use that functionality itself, however, it
+  * allows you to later use "Simple.Restart();" and it'll just work.
+  */
+  return csApplicationRunner<IsoTest>::Run (argc, argv);
 }

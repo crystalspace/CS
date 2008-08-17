@@ -37,6 +37,7 @@
 #include "igraphic/image.h"
 
 #include "csutil/event.h"
+#include "csutil/eventhandlers.h"
 #include "csutil/csstring.h"
 #include "csgfx/imagemanipulate.h"
 
@@ -79,11 +80,25 @@ csMovieRecorder::~csMovieRecorder ()
 {
   Stop();
     
-  if (eventHandler)
+  if (keyEventHandler)
   {
     csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q)
-      q->RemoveListener (eventHandler);
+      q->RemoveListener (keyEventHandler);
+  }
+
+  if (logicEventHandler)
+  {
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
+    if (q)
+      q->RemoveListener (logicEventHandler);
+  }
+
+  if (frameEventHandler)
+  {
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
+    if (q)
+      q->RemoveListener (frameEventHandler);
   }
 
   if (virtualClock)
@@ -103,20 +118,35 @@ bool csMovieRecorder::Initialize (iObjectRegistry* iobject_reg)
 
   // We need to receive keyboard events for our hotkeys, and the nothing
   // event for the actual movie recording.
-  if (!eventHandler)
+  if (!keyEventHandler)
   {
-    eventHandler.AttachNew (new EventHandler (this));
+    keyEventHandler.AttachNew (new KeyEventHandler (this));
   }
   csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
   {
-    csEventID events[4] = { KeyboardEvent,
-			    PreProcess,
-			    PostProcess,
-			    CS_EVENTLIST_END };
-    /* DOME : This is a prime example of an application for event ordering;
-       we want to capture csevKeyboardEvent early, and catch the frame event absolutely last. */
-    q->RegisterListener (eventHandler, events);
+    csEventID events[2] = { KeyboardEvent, CS_EVENTLIST_END };
+    q->RegisterListener (keyEventHandler, events);
+  }
+
+  if (!logicEventHandler)
+  {
+    logicEventHandler.AttachNew (new LogicEventHandler (this));
+  }
+  if (q != 0)
+  {
+    csEventID events[2] = { Frame, CS_EVENTLIST_END };
+    q->RegisterListener (logicEventHandler, events);
+  }
+
+  if (!frameEventHandler)
+  {
+    frameEventHandler.AttachNew (new FrameEventHandler (this));
+  }
+  if (q != 0)
+  {
+    csEventID events[2] = { Frame, CS_EVENTLIST_END };
+    q->RegisterListener (frameEventHandler, events);
   }
 
   // Unregister the normal virtual clock and register our own
@@ -175,23 +205,6 @@ void csMovieRecorder::SetupPlugin()
     "/tmp/crystal000.nuv"));
 
   initialized = true;
-}
-
-bool csMovieRecorder::HandleEvent (iEvent &event)
-{
-  if (CS_IS_KEYBOARD_EVENT(object_reg, event))
-  {
-    return EatKey (event);
-  }
-  else if (event.Name == PreProcess)
-  {
-    return HandleStartFrame (event);
-  }
-  else if (event.Name == PostProcess)
-  {
-    return HandleEndFrame (event);
-  }
-  return false;
 }
 
 bool csMovieRecorder::EatKey (iEvent& event)

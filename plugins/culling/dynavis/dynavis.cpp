@@ -22,6 +22,7 @@
 #include "csutil/sysfunc.h"
 #include "csutil/scf.h"
 #include "csutil/util.h"
+#include "csutil/scanstr.h"
 #include "csutil/scfstr.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/array.h"
@@ -75,12 +76,12 @@ class csDynVisObjIt :
   public scfImplementation1<csDynVisObjIt, iVisibilityObjectIterator>
 {
 private:
-  csArray<iVisibilityObject*>* vector;
+  csDynaVis::VistestObjectsArray* vector;
   size_t position;
   bool* vistest_objects_inuse;
 
 public:
-  csDynVisObjIt (csArray<iVisibilityObject*>* vector,
+  csDynVisObjIt (csDynaVis::VistestObjectsArray* vector,
     bool* vistest_objects_inuse) :
     scfImplementationType (this)
   {
@@ -198,10 +199,10 @@ int csDynaVis::badoccluder_maxsweepcount = 50;
 
 csDynaVis::csDynaVis (iBase *iParent) :
   scfImplementationType (this, iParent),
-  vistest_objects (256, 256),
+  vistest_objects (256),
   visobj_wrappers (1000),
-  visobj_vector (256, 256),
-  occluder_info (128, 128),
+  visobj_vector (256),
+  occluder_info (128),
   update_queue (151, 59)
 {
   object_reg = 0;
@@ -533,32 +534,23 @@ void csDynaVis::UpdateObject (csVisibilityObjectWrapper* visobj_wrap)
 namespace
 {
 
+void Perspective (const csVector3& v, csVector2& p,
+  const CS::Math::Matrix4& proj, int screenWidth, int screenHeight)
+{
+  csVector4 v_proj (proj * csVector4 (v, 1));
+  float inv_w = 1.0f/v_proj.w;
+  p.x = (v_proj.x * inv_w + 1) * screenWidth/2;
+  p.y = (v_proj.y * inv_w + 1) * screenHeight/2;
+}
+
 // Version to cope with z <= 0. This is wrong but it in the places where
 // it is used below the result is acceptable because it generates a
 // conservative result (i.e. a box or outline that is bigger then reality).
-void PerspectiveWrong (const csVector3& v, csVector2& p, float fov,
-    	float sx, float sy)
+void PerspectiveWrong (const csVector3& v, csVector2& p,
+  const CS::Math::Matrix4& proj, int screenWidth, int screenHeight)
 {
-  float iz = fov * 10;
-  p.x = v.x * iz + sx;
-  p.y = v.y * iz + sy;
-}
-
-void InvPerspective (const csVector2& p, float z, csVector3& v,
-	float fov, float sx, float sy)
-{
-  float iz = z / fov;
-  v.x = (p.x - sx) * iz;
-  v.y = (p.y - sy) * iz;
-  v.z = z;
-}
-
-void Perspective (const csVector3& v, csVector2& p,
-	float fov, float sx, float sy)
-{
-  float iz = fov / v.z;
-  p.x = v.x * iz + sx;
-  p.y = v.y * iz + sy;
+  csVector3 v_new (v.x, v.y, 0.1f);
+  Perspective (v_new, p, proj, screenWidth, screenHeight);
 }
 
 bool PrintObjects (csKDTree* treenode, void*, uint32, uint32&)
@@ -669,8 +661,8 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
     if (node_bbox.ProjectBoxAndOutline (cam_trans, fov, sx, sy, sbox,
     	outline, min_depth, max_depth))
 #else
-    if (node_bbox.ProjectBox (cam_trans, fov, sx, sy, sbox,
-    	min_depth, max_depth))
+    if (node_bbox.ProjectBox (cam_trans, camProj, sbox, min_depth, max_depth,
+      scr_width, scr_height))
 #endif
     {
 #     ifdef CS_DEBUG
@@ -866,7 +858,7 @@ void csDynaVis::UpdateCoverageBufferTri (csVisibilityObjectWrapper* obj)
   {
     (*tr_cam)[i] = trans.Other2This (verts[i]);
     if ((*tr_cam)[i].z > 0.1)
-      Perspective ((*tr_cam)[i], (*tr_verts)[i], fov, sx, sy);
+      Perspective ((*tr_cam)[i], (*tr_verts)[i], camProj, scr_width, scr_height);
   }
 
 # ifdef CS_DEBUG
@@ -971,7 +963,7 @@ void csDynaVis::UpdateCoverageBufferTri (csVisibilityObjectWrapper* obj)
       {
         const csVector3& v = back[j];
 	if (v.z > max_depth) max_depth = v.z;
-        Perspective (v, verts2d[j], fov, sx, sy);
+        Perspective (v, verts2d[j], camProj, scr_width, scr_height);
       }
 
       int mod = tcovbuf->InsertPolygon (verts2d, (int)num_verts, max_depth,
@@ -1063,7 +1055,7 @@ void csDynaVis::UpdateCoverageBufferOutline (csVisibilityObjectWrapper* obj)
   // Then insert the outline.
   csBox2Int occluder_box;
   int modified = tcovbuf->InsertOutline (
-  	trans, fov, sx, sy, verts, vertex_count,
+  	trans, camProj, verts, vertex_count,
   	outline_info.outline_verts,
   	(int*)outline_info.outline_edges, outline_info.num_outline_edges,
 	do_cull_outline_splatting,
@@ -1096,7 +1088,7 @@ void csDynaVis::UpdateCoverageBufferOutline (csVisibilityObjectWrapper* obj)
       if (outline_info.outline_verts[j])
       {
         csVector3 cam = trans.Other2This (verts[j]);
-        csPrintf ("  V%d: (%g,%g,%g / %g,%g,%g)\n",
+        csPrintf ("  V%zu: (%g,%g,%g / %g,%g,%g)\n",
 	  j,
 	  //tr_verts[j].x, tr_verts[j].y,
 	  verts[j].x, verts[j].y, verts[j].z,
@@ -1107,7 +1099,7 @@ void csDynaVis::UpdateCoverageBufferOutline (csVisibilityObjectWrapper* obj)
     {
       int vt1 = outline_info.outline_edges[j*2+0];
       int vt2 = outline_info.outline_edges[j*2+1];
-      csPrintf ("  E%d: %d-%d\n", j, vt1, vt2);
+      csPrintf ("  E%zu: %d-%d\n", j, vt1, vt2);
     }
 
     csRef<iString> str = tcovbuf->Dump ();
@@ -1221,9 +1213,9 @@ void csDynaVis::TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
     min_depth = v.z;
     max_depth = v.z;
     if (v.z < .1)
-      PerspectiveWrong (v, v2d, fov, sx, sy);
+      PerspectiveWrong (v, v2d, camProj, scr_width, scr_height);
     else
-      Perspective (v, v2d, fov, sx, sy);
+      Perspective (v, v2d, camProj, scr_width, scr_height);
     sbox.StartBoundingBox (v2d);
     int i;
     for (i = 1 ; i < 3 ; i++)
@@ -1232,9 +1224,9 @@ void csDynaVis::TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
       if (min_depth > v.z) min_depth = v.z;
       else if (max_depth < v.z) max_depth = v.z;
       if (v.z < .1)
-        PerspectiveWrong (v, v2d, fov, sx, sy);
+        PerspectiveWrong (v, v2d, camProj, scr_width, scr_height);
       else
-        Perspective (v, v2d, fov, sx, sy);
+        Perspective (v, v2d, camProj, scr_width, scr_height);
       sbox.AddBoundingVertexSmart (v2d);
     }
   }
@@ -1456,13 +1448,14 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     }
     const csOBB& obb = obj->model->GetOBB ();
     frozen_obb.Copy (obb, trans);
-    sbox_rc = frozen_obb.ProjectOBB (fov, sx, sy, sbox, min_depth, max_depth);
+    sbox_rc = frozen_obb.ProjectOBB (camProj, sbox, min_depth, max_depth,
+      scr_width, scr_height);
   }
   else
   {
     // No OBB, so use AABB instead.
-    sbox_rc = obj_bbox.ProjectBox (cam_trans, fov, sx, sy, sbox,
-		min_depth, max_depth);
+    sbox_rc = obj_bbox.ProjectBox (cam_trans, camProj, sbox,
+		min_depth, max_depth, scr_width, scr_height);
   }
   if (!sbox_rc || sbox.MaxX () <= 0 || sbox.MaxY () <= 0 ||
         sbox.MinX () >= scr_width || sbox.MinY () >= scr_height)
@@ -1487,7 +1480,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       if (cam_center.z >= .1)
       {
 	csVector2 sbox_center;
-	Perspective (cam_center, sbox_center, fov, sx, sy);
+	Perspective (cam_center, sbox_center, camProj, scr_width, scr_height);
 	rc = tcovbuf->TestPoint (sbox_center, cam_center.z);
 	if (rc)
 	{
@@ -1606,7 +1599,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	  if (v.z >= .1)
 	  {
 	    csVector2 p;
-	    Perspective (v, p, fov, sx, sy);
+	    Perspective (v, p, camProj, scr_width, scr_height);
 	    bool test = tcovbuf->TestPoint (p, v.z);
 	    if (test)
 	    {
@@ -1625,7 +1618,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	  if (v.z >= .1)
 	  {
 	    csVector2 p;
-	    Perspective (v, p, fov, sx, sy);
+	    Perspective (v, p, camProj, scr_width, scr_height);
 	    bool test = tcovbuf->TestPoint (p, v.z);
 	    if (test)
 	    {
@@ -1749,7 +1742,8 @@ static bool Dummy_Front2Back (csKDTree* treenode, void*,
 }
 
 bool csDynaVis::VisTest (iRenderView* rview, 
-			 iVisibilityCullerListener* viscallback)
+			 iVisibilityCullerListener* viscallback, 
+			 int renderW, int renderH)
 {
   // We update the objects before testing the callback so that
   // we can use this VisTest() call to make sure the objects in the
@@ -1778,17 +1772,7 @@ bool csDynaVis::VisTest (iRenderView* rview,
   debug_by = by;
 
   iCamera* camera = rview->GetCamera ();
-  fov = float (camera->GetFOV ());
-  sx = camera->GetShiftX ();
-  sy = camera->GetShiftY ();
-  int rb = reduce_buf;
-  while (rb)
-  {
-    fov /= 2.0f;
-    sx /= 2.0f;
-    sy /= 2.0f;
-    rb >>= 1;
-  }
+  camProj = camera->GetProjectionMatrix();
   csVector3 old_camera_pos = cam_trans.GetOrigin ();
   cam_trans = camera->GetTransform ();
   float sqdist = csSquaredDist::PointPoint (old_camera_pos,
@@ -1834,6 +1818,13 @@ bool csDynaVis::VisTest (iRenderView* rview,
   }
 
   // Initialize the coverage buffer to all empty.
+  int old_scr_w = scr_width, old_scr_h = scr_height;
+  if ((renderW != 0) && (renderH != 0))
+  {
+    scr_width = renderW;
+    scr_height = renderH;
+  }
+  tcovbuf->SetSize (scr_width, scr_height);
   tcovbuf->Initialize ();
 
   // Initialize the write queue to empty.
@@ -1846,6 +1837,7 @@ bool csDynaVis::VisTest (iRenderView* rview,
   // so that all is marked invisible and rendering goes faster.
   if (bugplug && bugplug->CheckDebugSector ())
   {
+    scr_width = old_scr_w; scr_height = old_scr_h;
     return true;
   }
 
@@ -1865,7 +1857,7 @@ bool csDynaVis::VisTest (iRenderView* rview,
     {
       iClipper2D* clipper = rview->GetClipper ();
       tcovbuf->InsertPolygonInverted (clipper->GetClipPoly (),
-    	  clipper->GetVertexCount (), .01f);
+    	clipper->GetVertexCount (), .01f);
     }
   }
 
@@ -1920,6 +1912,7 @@ bool csDynaVis::VisTest (iRenderView* rview,
 
   do_state_dump = false;
 
+  scr_width = old_scr_w; scr_height = old_scr_h;
   return true;
 }
 
@@ -1929,7 +1922,7 @@ struct VisTestPlanes_Front2BackData
 {
   uint32 current_vistest_nr;
   uint32 current_visnr;
-  csArray<iVisibilityObject*>* vistest_objects;
+  csDynaVis::VistestObjectsArray* vistest_objects;
 
   // During VisTest() we use the current frustum as five planes.
   // Associated with this frustum we also have a clip mask which
@@ -2002,12 +1995,12 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (csPlane3* planes,
   UpdateObjects ();
   current_vistest_nr++;
 
-  csArray<iVisibilityObject*>* v;
+  VistestObjectsArray* v;
   if (vistest_objects_inuse)
   {
     // Vector is already in use by another iterator. Allocate a new vector
     // here.
-    v = new csArray<iVisibilityObject*> (256, 256);
+    v = new VistestObjectsArray (256);
   }
   else
   {
@@ -2052,7 +2045,7 @@ struct VisTestBox_Front2BackData
 {
   uint32 current_vistestnr;
   csBox3 box;
-  csArray<iVisibilityObject*>* vistest_objects;
+  csDynaVis::VistestObjectsArray* vistest_objects;
 };
 
 static bool VisTestBox_Front2Back (csKDTree* treenode, void* userdata,
@@ -2103,12 +2096,12 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csBox3& box)
   UpdateObjects ();
   current_vistest_nr++;
 
-  csArray<iVisibilityObject*>* v;
+  VistestObjectsArray* v;
   if (vistest_objects_inuse)
   {
     // Vector is already in use by another iterator. Allocate a new vector
     // here.
-    v = new csArray<iVisibilityObject*> ();
+    v = new VistestObjectsArray ();
   }
   else
   {
@@ -2135,7 +2128,7 @@ struct VisTestSphere_Front2BackData
   uint32 current_vistestnr;
   csVector3 pos;
   float sqradius;
-  csArray<iVisibilityObject*>* vistest_objects;
+  csDynaVis::VistestObjectsArray* vistest_objects;
 
   iVisibilityCullerListener* viscallback;
 };
@@ -2196,12 +2189,12 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csSphere& sphere)
   UpdateObjects ();
   current_vistest_nr++;
 
-  csArray<iVisibilityObject*>* v;
+  VistestObjectsArray* v;
   if (vistest_objects_inuse)
   {
     // Vector is already in use by another iterator. Allocate a new vector
     // here.
-    v = new csArray<iVisibilityObject*> ();
+    v = new VistestObjectsArray ();
   }
   else
   {
@@ -2247,7 +2240,7 @@ struct IntersectSegment_Front2BackData
   float r;
   iMeshWrapper* mesh;
   int polygon_idx;
-  csArray<iVisibilityObject*>* vector;	// If not-null we need all objects.
+  csDynaVis::VistestObjectsArray* vector;	// If not-null we need all objects.
   bool accurate;
 };
 
@@ -2448,7 +2441,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::IntersectSegment (
   data.r = 10000000000.;
   data.mesh = 0;
   data.polygon_idx = -1;
-  data.vector = new csArray<iVisibilityObject*> ();
+  data.vector = new csDynaVis::VistestObjectsArray ();
   data.accurate = accurate;
   kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
 
@@ -2463,7 +2456,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::IntersectSegmentSloppy (
   current_vistest_nr++;
   IntersectSegment_Front2BackData data;
   data.seg.Set (start, end);
-  data.vector = new csArray<iVisibilityObject*> ();
+  data.vector = new csDynaVis::VistestObjectsArray ();
   kdtree->Front2Back (start, IntersectSegmentSloppy_Front2Back,
   	(void*)&data, 0);
 
@@ -2762,7 +2755,7 @@ void csDynaVis::Dump (iGraphics3D* g3d)
       csVector3 trans_origin = trans.Other2This (
     	  debug_camera->GetTransform ().GetOrigin ());
       csVector2 to;
-      Perspective (trans_origin, to, fov, sx, sy);
+      Perspective (trans_origin, to, camProj, scr_width, scr_height);
       g2d->DrawLine (to.x-3,  to.y-3, to.x+3,  to.y+3, col_cam);
       g2d->DrawLine (to.x+3,  to.y-3, to.x-3,  to.y+3, col_cam);
       g2d->DrawLine (to.x,    to.y,   to.x+30, to.y,   col_cam);
@@ -2847,8 +2840,8 @@ void csDynaVis::Dump (iGraphics3D* g3d)
 	      csVector3 camv2 = trans.Other2This (verts[vt2]);
 	      if (camv2.z <= 0.0) continue;
 	      csVector2 tr_vert1, tr_vert2;
-	      Perspective (camv1, tr_vert1, fov, sx, sy);
-	      Perspective (camv2, tr_vert2, fov, sx, sy);
+	      Perspective (camv1, tr_vert1, camProj, scr_width, scr_height);
+	      Perspective (camv2, tr_vert2, camProj, scr_width, scr_height);
 	      g2d->DrawLine (tr_vert1.x,  g2d->GetHeight ()-tr_vert1.y,
 	    	  tr_vert2.x,  g2d->GetHeight ()-tr_vert2.y, col_bgtext);
 	    }
@@ -3264,7 +3257,7 @@ bool csDynaVis::DebugCommand (const char* cmd)
     else if (!strcmp (cmd+9, "--"))
       debug_origin_z -= 10.0;
     else
-      sscanf (cmd+9, "%f", &debug_origin_z);
+      csScanStr (cmd+9, "%f", &debug_origin_z);
   }
   else if (!strcmp (cmd, "clear_stats"))
   {

@@ -54,29 +54,6 @@ public:
     iStreamSource*, iLoaderContext *ldr_context,
     iBase* context);	
 private:
-  struct ParamPair
-  {
-    csString name, value;
-  };
-
-  typedef csArray<ParamPair> ParamPairArray;
-
-  struct DefaultCellValues
-  {
-    DefaultCellValues ()
-      : size (128.0f, 32.0f, 128.0f), gridWidth (128), gridHeight (128),
-      materialmapWidth (128), materialmapHeight (128), materialmapPersist (false)
-    {}
-
-    ParamPairArray renderParams, collParams, feederParams;
-    ParamPairArray alphaMaps;
-    csRefArray<csShaderVariable> svs;
-    csVector3 size;
-    unsigned int gridWidth, gridHeight, materialmapWidth, materialmapHeight;
-    bool materialmapPersist;
-    csRef<iMaterialWrapper> baseMaterial;
-  };
-
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
   csRef<iReporter> reporter;
@@ -87,17 +64,15 @@ private:
 #undef CS_TOKEN_ITEM_FILE 
 
   bool ParseCell (iDocumentNode* node, iLoaderContext* ldr_ctx,
-    iTerrainFactory* fact, const DefaultCellValues& defaults);
+    iTerrainFactory* fact, iTerrainFactoryCell* cell = 0);
 
-  bool ParseDefaultCell (iDocumentNode* node, iLoaderContext* ldr_ctx,
-    DefaultCellValues& defaults);
+  template<typename IProp>
+  bool ParseParams (IProp* props, iDocumentNode* node);
 
-  bool ParseParams (ParamPairArray& pairs, iDocumentNode* node);
-
-  bool ParseFeederParams (ParamPairArray& pairs, ParamPairArray& alphaMaps,
+  bool ParseFeederParams (iTerrainCellFeederProperties* props,
     iDocumentNode* node);
 
-  bool ParseRenderParams (ParamPairArray& pairs, csRefArray<csShaderVariable>& svs,
+  bool ParseRenderParams (iTerrainCellRenderProperties* props,
     iLoaderContext* ldr_context, iDocumentNode* node);
 };
 
@@ -119,6 +94,17 @@ private:
 #include "cstool/tokenlist.h"
 #undef CS_TOKEN_ITEM_FILE 
 
+  bool ParseCell (iDocumentNode* node, iLoaderContext* ldr_ctx,
+    iTerrainSystem* terrain);
+
+  template<typename IProp>
+  bool ParseParams (IProp* props, iDocumentNode* node);
+
+  bool ParseFeederParams (iTerrainCellFeederProperties* props,
+    iDocumentNode* node);
+
+  bool ParseRenderParams (iTerrainCellRenderProperties* props,
+    iLoaderContext* ldr_context, iDocumentNode* node);
 public:
   /// Constructor
   csTerrain2ObjectLoader (iBase*);

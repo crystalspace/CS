@@ -1,0 +1,5 @@
+SubDir TOP data shader-old parallax ;
+
+InstallData [ Wildcard *.afp *.avp *.cgfp *.cgvp *.xml ] :
+  data shader-old parallax ;
+FileListEntriesData [ Wildcard *.afp *.avp *.cgfp *.cgvp *.xml ] : shader-old parallax : data-runtime ;

@@ -246,7 +246,7 @@ int csPlexDocument::Changeable ()
 }
 
 csDocumentSystemMultiplexer::csDocumentSystemMultiplexer(iBase* parent) : 
-  scfImplementationType (this, parent), autolist (0, 1)
+  scfImplementationType (this, parent), autolist (0)
 {
 }
 

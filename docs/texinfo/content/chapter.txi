@@ -14,6 +14,7 @@
 * mdl2spr:: Quake Model Converter (@code{mdl2spr})
 * 3D Sprites::
 * ViewMesh:: Previewing Models (@code{viewmesh})
+* Map Format Reference::
 @end menu
 
 @imports{content,levbuilding.txi}
@@ -26,3 +27,4 @@
 @imports{content,mdl2spr.txi}
 @importss{content,sprites,3dsprite.txi}
 @imports{content,viewmesh.txi}
+@importss{content,mapformat,chapter.txi}

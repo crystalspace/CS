@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 1998-2008 by Jorrit Tyberghein
     Written by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -90,6 +90,13 @@
  */
 #ifndef CS_ATTRIBUTE_MALLOC
 # define CS_ATTRIBUTE_MALLOC
+#endif
+
+/**\def CS_ATTRIBUTE_INIT_PRIORITY()
+ * Namespace-level object initialization priority attribute.
+ */
+#ifndef CS_ATTRIBUTE_INIT_PRIORITY
+# define CS_ATTRIBUTE_INIT_PRIORITY(PRI)
 #endif
 
 // Set up deprecation macros
@@ -769,83 +776,16 @@ extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptcalloc_checking (
 #  endif
 #endif
 
-#if defined(CS_EXTENSIVE_MEMDEBUG)
-CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n)
-{ 
-#ifdef CS_CHECKING_ALLOCATIONS
-  return ptmalloc_checking (n);
-#else
-  return ptmalloc_located (n);
-#endif
-}
-
-CS_FORCEINLINE void cs_free (void* p)
-{ 
-#ifdef CS_CHECKING_ALLOCATIONS
-  ptfree_checking (p);
-#else
-  ptfree_located (p);
-#endif
-}
-
-CS_FORCEINLINE void* cs_realloc (void* p, size_t n)
-{ 
-#ifdef CS_CHECKING_ALLOCATIONS
-  return ptrealloc_checking (p, n);
-#else
-  return ptrealloc_located (p, n);
-#endif
-}
-
-CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_calloc (size_t n, size_t s)
-{ 
-#ifdef CS_CHECKING_ALLOCATIONS
-  return ptcalloc_checking (n, s); 
-#else
-  return ptcalloc_located (n, s); 
-#endif
-}
-
-#else // defined(CS_EXTENSIVE_MEMDEBUG)
 /**\name Default Crystal Space memory allocation
  * Always the same memory allocation functions as internally used by 
  * Crystal Space.
  */
 //@{
-CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n)
-{ 
-#ifdef CS_DEBUG
-  return ptmalloc_sentinel (n);
-#else
-  return ptmalloc (n);
-#endif
-}
-CS_FORCEINLINE void cs_free (void* p)
-{ 
-#ifdef CS_DEBUG
-  ptfree_sentinel (p);
-#else
-  ptfree (p);
-#endif
-}
-CS_FORCEINLINE void* cs_realloc (void* p, size_t n)
-{ 
-#ifdef CS_DEBUG
-  return ptrealloc_sentinel (p, n);
-#else
-  return ptrealloc (p, n);
-#endif
-}
-CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_calloc (size_t n, size_t s)
-{ 
-#ifdef CS_DEBUG
-  return ptcalloc_sentinel (n, s); 
-#else
-  return ptcalloc (n, s); 
-#endif
-}
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n);
+extern CS_CRYSTALSPACE_EXPORT void cs_free (void* p);
+extern CS_CRYSTALSPACE_EXPORT void* cs_realloc (void* p, size_t n);
+extern CS_CRYSTALSPACE_EXPORT void* cs_calloc (size_t n, size_t s);
 //@}
-#endif
 
 #else // CS_NO_PTMALLOC
 CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n)
@@ -935,6 +875,10 @@ namespace CS
     #    else
       _asm int 3;
     #    endif
+    #  elif defined (CS_PROCESSOR_POWERPC)
+    // Source: http://cocoawithlove.com/2008/03/break-into-debugger.html
+      asm("li r0, 20\nsc\nnop\nli r0, 37\nli r4, 2\nsc\nnop\n"
+           : : : "memory","r0","r3","r4" );
     #  else
       static int x = 0; x /= x;
     #  endif
@@ -986,37 +930,6 @@ namespace CS
 /**\def CS_ASSERT_MSG(msg, expr)
  * Same as #CS_ASSERT(expr), but additionally prints \a msg to <tt>stderr</tt>.
  */
-
-/**\def CS_CONST_METHOD
- * Use the CS_CONST_METHOD macro in front of method declarations to
- * indicate that they are "constant", i.e., they only look at the
- * values of their parameters and have no side effects.  This allows 
- * the compiler to perform certain optimizations, e.g., eliminating
- * repeated calls with the same arguments.  This is a very strong
- * assertion; if any argument is a pointer, you probably want to use
- * #CS_PURE_METHOD instead.  
- *
- * \todo Is there an MSVC equivalent for gcc's __attribute__((const))?
- */
-#if !defined(CS_CONST_METHOD) || defined(DOXYGEN_RUN)
-#define CS_CONST_METHOD
-#endif
-
-/**\def CS_PURE_METHOD
- * Use the CS_PURE_METHOD macro in front of method declarations to
- * indicate that they are "pure", i.e., they look at their arguments
- * and at global memory but do not have any side effects.  
- * Basically, if the function doesn't change the values of
- * any non-local variables and doesn't perform any output or other
- * tampering with the environment, it is "pure".  This allows the
- * compiler to perform certain optimizations, e.g., eliminating
- * repeated calls with the same arguments.
- *
- * \todo Is there an MSVC equivalent for gcc's __attribute__((pure)) ?
- */
-#if !defined(CS_PURE_METHOD) || defined(DOXYGEN_RUN)
-#define CS_PURE_METHOD
-#endif
 
 // Check if the csosdefs.h defined either CS_LITTLE_ENDIAN or CS_BIG_ENDIAN
 #if !defined (CS_LITTLE_ENDIAN) && !defined (CS_BIG_ENDIAN)
@@ -1092,6 +1005,8 @@ namespace CS
 #if defined(CS_COMPILER_MSVC)
   #define CS_ALIGNED_MEMBER(Member, Align)				\
     __declspec(align(Align)) Member
+  #define CS_ALIGNED_STRUCT(Kind, Align)	                        \
+    __declspec(align(Align)) Kind
 #elif defined(CS_COMPILER_GCC)
   /**
    * Macro to align a class member (or local variable) to a specific byte
@@ -1106,9 +1021,23 @@ namespace CS
    * \endcode
    */
   #define CS_ALIGNED_MEMBER(Member, Align)				\
-    Member __attribute((aligned(Align)))
+    Member __attribute__((aligned(Align)))
+  /**
+   * Macro to declare a struct aligned to a specific byte boundary.
+   *
+   * Example:
+   * \code
+   * CS_STRUCT_ALIGN(struct, 16) MyStruct
+   * {
+   *   int x;
+   * };
+   * \endcode
+   */
+  #define CS_ALIGNED_STRUCT(Kind, Align)	                        \
+    Kind __attribute__((aligned(Align)))
 #else
   #define CS_ALIGNED_MEMBER(Member, Align)	Member
+  #define CS_ALIGNED_STRUCT(Kind, Align)	        Kind
 #endif
 
 // Macro used to define static implicit pointer conversion function.

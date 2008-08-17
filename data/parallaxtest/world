@@ -43,6 +43,9 @@
         <shader>
             <file>/shader/parallax/parallax.xml</file>
         </shader>
+        <shader>
+            <file>/shader/reflect/glass.xml</file>
+        </shader>      
     </shaders>
     <textures>
         <texture name="walls.jpg">
@@ -61,39 +64,12 @@
         <texture name="boxh.jpg">
             <file>boxh.jpg</file>
         </texture>
-        <texture name="lightmap_Scene_Cube_0">
-            <file>lightmaps/lightmap_Scene_Cube_0.png</file>
-            <class>lightmap</class>
-        </texture>
-        <texture name="lightmap_Scene_Cube_1">
-            <file>lightmaps/lightmap_Scene_Cube_1.png</file>
-            <class>lightmap</class>
-        </texture>
-        <texture name="lightmap_Scene_Cube_2">
-            <file>lightmaps/lightmap_Scene_Cube_2.png</file>
-            <class>lightmap</class>
-        </texture>
-        <texture name="lightmap_Scene_Cube_3">
-            <file>lightmaps/lightmap_Scene_Cube_3.png</file>
-            <class>lightmap</class>
-        </texture>
-        <texture name="lightmap_Scene_Cube.001_0">
-            <file>lightmaps/lightmap_Scene_Cube.001_0.png</file>
-            <class>lightmap</class>
-        </texture>
-        <texture name="lightmap_Scene_Cube.001_1">
-            <file>lightmaps/lightmap_Scene_Cube.001_1.png</file>
-            <class>lightmap</class>
-        </texture>
-        <texture name="lightmap_Scene_Cube.002_0">
-            <file>lightmaps/lightmap_Scene_Cube.002_0.png</file>
-            <class>lightmap</class>
-        </texture>
-        <texture name="lightmap_Scene_Cube.002_1">
-            <file>lightmaps/lightmap_Scene_Cube.002_1.png</file>
-            <class>lightmap</class>
+        <texture name="bricks_n.png">
+            <file>/lev/stenciltest/bricks_n.png</file>
+            <class>normalmap</class>
         </texture>
     </textures>
+    <library>lightmaps.cslib</library>
     <materials>
         <material name="walls.jpg">
             <texture>walls.jpg</texture>
@@ -123,6 +99,15 @@
         <sector>Scene</sector>
         <position x="0.00333691" y="-0.00952018" z="-0.00766289" />
     </start>
+    <library>/lib/teapot/teapot.lib</library>
+    <materials>
+        <material name="Teapot_reflect">
+            <texture>xygyw.tga</texture>
+            <shader type="standard">glass</shader>
+            <shadervar name="refraction index" type="float">1.1</shadervar>
+            <shadervar name="tex normal" type="texture">bricks_n.png</shadervar>
+        </material>
+    </materials>
     <meshfact name="factory_Scene_Cube">
         <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
         <params>
@@ -182,84 +167,48 @@
                 <material>floor.jpg</material>
                 <indexbuffer components="1" type="uint" indices="yes">
                     <e c0="0" />
-                    <e c0="1" />
-                    <e c0="2" />
-                    <e c0="0" />
                     <e c0="2" />
                     <e c0="3" />
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
                 </indexbuffer>
             </submesh>
             <submesh name="walls.jpg_0">
                 <material>walls.jpg</material>
                 <indexbuffer components="1" type="uint" indices="yes">
-                    <e c0="4" />
-                    <e c0="5" />
-                    <e c0="6" />
-                    <e c0="4" />
-                    <e c0="6" />
-                    <e c0="7" />
-                    <e c0="8" />
-                    <e c0="9" />
-                    <e c0="10" />
-                    <e c0="8" />
-                    <e c0="10" />
-                    <e c0="11" />
-                    <e c0="12" />
-                    <e c0="13" />
-                    <e c0="14" />
-                    <e c0="12" />
-                    <e c0="14" />
-                    <e c0="15" />
-                </indexbuffer>
-            </submesh>
-            <submesh name="walls.jpg_2">
-                <material>walls.jpg</material>
-                <indexbuffer components="1" type="uint" indices="yes">
-                    <e c0="20" />
-                    <e c0="21" />
-                    <e c0="22" />
                     <e c0="20" />
                     <e c0="22" />
                     <e c0="23" />
-                </indexbuffer>
-            </submesh>
-            <submesh name="walls.jpg_3">
-                <material>walls.jpg</material>
-                <indexbuffer components="1" type="uint" indices="yes">
-                    <e c0="16" />
-                    <e c0="17" />
-                    <e c0="18" />
+                    <e c0="20" />
+                    <e c0="21" />
+                    <e c0="22" />
+                    <e c0="12" />
+                    <e c0="14" />
+                    <e c0="15" />
+                    <e c0="12" />
+                    <e c0="13" />
+                    <e c0="14" />
+                    <e c0="4" />
+                    <e c0="6" />
+                    <e c0="7" />
+                    <e c0="4" />
+                    <e c0="5" />
+                    <e c0="6" />
                     <e c0="16" />
                     <e c0="18" />
                     <e c0="19" />
+                    <e c0="16" />
+                    <e c0="17" />
+                    <e c0="18" />
+                    <e c0="8" />
+                    <e c0="10" />
+                    <e c0="11" />
+                    <e c0="8" />
+                    <e c0="9" />
+                    <e c0="10" />
                 </indexbuffer>
             </submesh>
-            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
-                <e c0="0.015625" c1="0.5" />
-                <e c0="0.5" c1="0.5" />
-                <e c0="0.5" c1="0.015625" />
-                <e c0="0.015625" c1="0.015625" />
-                <e c0="0.539063" c1="0.5" />
-                <e c0="0.78125" c1="0.5" />
-                <e c0="0.78125" c1="0.015625" />
-                <e c0="0.539063" c1="0.015625" />
-                <e c0="0.0078125" c1="0.5" />
-                <e c0="0.25" c1="0.5" />
-                <e c0="0.25" c1="0.015625" />
-                <e c0="0.0078125" c1="0.015625" />
-                <e c0="0.515625" c1="0.015625" />
-                <e c0="0.273438" c1="0.015625" />
-                <e c0="0.273438" c1="0.5" />
-                <e c0="0.515625" c1="0.5" />
-                <e c0="0.015625" c1="0.5" />
-                <e c0="0.5" c1="0.5" />
-                <e c0="0.5" c1="0.015625" />
-                <e c0="0.015625" c1="0.015625" />
-                <e c0="0.015625" c1="0.5" />
-                <e c0="0.5" c1="0.5" />
-                <e c0="0.5" c1="0.015625" />
-                <e c0="0.015625" c1="0.015625" />
-            </renderbuffer>
         </params>
     </meshfact>
     <meshfact name="factory_Scene_Cube.001">
@@ -320,80 +269,44 @@
             <submesh name="box.jpg_0">
                 <material>box.jpg</material>
                 <indexbuffer components="1" type="uint" indices="yes">
-                    <e c0="0" />
-                    <e c0="1" />
-                    <e c0="2" />
-                    <e c0="0" />
-                    <e c0="2" />
-                    <e c0="3" />
-                </indexbuffer>
-            </submesh>
-            <submesh name="box.jpg_0">
-                <material>box.jpg</material>
-                <indexbuffer components="1" type="uint" indices="yes">
-                    <e c0="4" />
-                    <e c0="5" />
-                    <e c0="6" />
                     <e c0="4" />
                     <e c0="6" />
                     <e c0="7" />
-                    <e c0="8" />
-                    <e c0="9" />
-                    <e c0="10" />
+                    <e c0="4" />
+                    <e c0="5" />
+                    <e c0="6" />
                     <e c0="8" />
                     <e c0="10" />
                     <e c0="11" />
-                    <e c0="12" />
-                    <e c0="13" />
-                    <e c0="14" />
+                    <e c0="8" />
+                    <e c0="9" />
+                    <e c0="10" />
                     <e c0="12" />
                     <e c0="14" />
                     <e c0="15" />
-                    <e c0="16" />
-                    <e c0="17" />
-                    <e c0="18" />
+                    <e c0="12" />
+                    <e c0="13" />
+                    <e c0="14" />
                     <e c0="16" />
                     <e c0="18" />
                     <e c0="19" />
-                </indexbuffer>
-            </submesh>
-            <submesh name="box.jpg_1">
-                <material>box.jpg</material>
-                <indexbuffer components="1" type="uint" indices="yes">
-                    <e c0="20" />
-                    <e c0="21" />
-                    <e c0="22" />
+                    <e c0="16" />
+                    <e c0="17" />
+                    <e c0="18" />
                     <e c0="20" />
                     <e c0="22" />
                     <e c0="23" />
+                    <e c0="20" />
+                    <e c0="21" />
+                    <e c0="22" />
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
                 </indexbuffer>
             </submesh>
-            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
-                <e c0="0.25" c1="0.015625" />
-                <e c0="0.25" c1="0.5" />
-                <e c0="0.0078125" c1="0.5" />
-                <e c0="0.0078125" c1="0.015625" />
-                <e c0="0.515625" c1="0.015625" />
-                <e c0="0.515625" c1="0.5" />
-                <e c0="0.273438" c1="0.5" />
-                <e c0="0.273438" c1="0.015625" />
-                <e c0="0.78125" c1="0.015625" />
-                <e c0="0.78125" c1="0.5" />
-                <e c0="0.539063" c1="0.5" />
-                <e c0="0.539063" c1="0.015625" />
-                <e c0="0.148438" c1="0.78125" />
-                <e c0="0.148438" c1="0.546875" />
-                <e c0="0.265625" c1="0.546875" />
-                <e c0="0.265625" c1="0.78125" />
-                <e c0="0.125" c1="0.546875" />
-                <e c0="0.125" c1="0.78125" />
-                <e c0="0.0078125" c1="0.78125" />
-                <e c0="0.0078125" c1="0.546875" />
-                <e c0="0.5" c1="0.015625" />
-                <e c0="0.5" c1="0.5" />
-                <e c0="0.015625" c1="0.5" />
-                <e c0="0.015625" c1="0.015625" />
-            </renderbuffer>
         </params>
     </meshfact>
     <meshfact name="factory_Scene_Cube.002">
@@ -454,82 +367,69 @@
             <submesh name="box_spec.jpg_0">
                 <material>box_spec.jpg</material>
                 <indexbuffer components="1" type="uint" indices="yes">
-                    <e c0="4" />
-                    <e c0="5" />
-                    <e c0="6" />
-                    <e c0="4" />
-                    <e c0="6" />
-                    <e c0="7" />
-                    <e c0="8" />
-                    <e c0="9" />
-                    <e c0="10" />
                     <e c0="8" />
                     <e c0="10" />
                     <e c0="11" />
-                    <e c0="12" />
-                    <e c0="13" />
-                    <e c0="14" />
+                    <e c0="8" />
+                    <e c0="9" />
+                    <e c0="10" />
                     <e c0="12" />
                     <e c0="14" />
                     <e c0="15" />
-                    <e c0="16" />
-                    <e c0="17" />
-                    <e c0="18" />
+                    <e c0="12" />
+                    <e c0="13" />
+                    <e c0="14" />
                     <e c0="16" />
                     <e c0="18" />
                     <e c0="19" />
-                    <e c0="20" />
-                    <e c0="21" />
-                    <e c0="22" />
+                    <e c0="16" />
+                    <e c0="17" />
+                    <e c0="18" />
                     <e c0="20" />
                     <e c0="22" />
                     <e c0="23" />
-                </indexbuffer>
-            </submesh>
-            <submesh name="box_spec.jpg_1">
-                <material>box_spec.jpg</material>
-                <indexbuffer components="1" type="uint" indices="yes">
-                    <e c0="0" />
-                    <e c0="1" />
-                    <e c0="2" />
+                    <e c0="20" />
+                    <e c0="21" />
+                    <e c0="22" />
                     <e c0="0" />
                     <e c0="2" />
                     <e c0="3" />
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                    <e c0="4" />
+                    <e c0="6" />
+                    <e c0="7" />
+                    <e c0="4" />
+                    <e c0="5" />
+                    <e c0="6" />
                 </indexbuffer>
             </submesh>
-            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
-                <e c0="0.5" c1="0.125" />
-                <e c0="0.5" c1="0.5" />
-                <e c0="0.125" c1="0.5" />
-                <e c0="0.125" c1="0.125" />
-                <e c0="0.25" c1="0.0625" />
-                <e c0="0.25" c1="0.25" />
-                <e c0="0.0625" c1="0.25" />
-                <e c0="0.0625" c1="0.0625" />
-                <e c0="0.25" c1="0.4375" />
-                <e c0="0.25" c1="0.625" />
-                <e c0="0.0625" c1="0.625" />
-                <e c0="0.0625" c1="0.4375" />
-                <e c0="0.625" c1="0.0625" />
-                <e c0="0.625" c1="0.25" />
-                <e c0="0.4375" c1="0.25" />
-                <e c0="0.4375" c1="0.0625" />
-                <e c0="0.8125" c1="0.125" />
-                <e c0="0.8125" c1="0.0625" />
-                <e c0="0.875" c1="0.0625" />
-                <e c0="0.875" c1="0.125" />
-                <e c0="0.125" c1="0.8125" />
-                <e c0="0.125" c1="0.875" />
-                <e c0="0.0625" c1="0.875" />
-                <e c0="0.0625" c1="0.8125" />
-            </renderbuffer>
         </params>
     </meshfact>
     <sector name="Scene">
+        <meshobj name="teapot1">
+            <zuse />
+            <plugin>crystalspace.mesh.loader.genmesh</plugin>
+            <params>
+                <factory>Teapot</factory>
+                <lighting>no</lighting>
+                <color red="0" green="0" blue="0" />
+                <manualcolors />
+                <material>Teapot_reflect</material>
+                <mixmode>
+                    <copy />
+                </mixmode>
+            </params>
+            <move>
+                <v x="0" y="-2.10426" z="1" />
+            </move>
+        </meshobj>
         <meshobj name="Cube">
             <plugin>crystalspace.mesh.loader.genmesh</plugin>
             <params>
                 <factory>factory_Scene_Cube</factory>
+                <lighting>no</lighting>
                 <color red="1" green="1" blue="1" />
                 <manualcolors />
                 <mixmode>
@@ -537,20 +437,38 @@
                 </mixmode>
                 <submesh name="floor.jpg_1">
                     <material>floor.jpg</material>
-                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube_1</shadervar>
+                    <shadervar name="tex lightmap" type="texture">lightmaps_0_png</shadervar>
                 </submesh>
                 <submesh name="walls.jpg_0">
                     <material>walls.jpg</material>
-                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube_0</shadervar>
+                    <shadervar name="tex lightmap" type="texture">lightmaps_0_png</shadervar>
                 </submesh>
-                <submesh name="walls.jpg_2">
-                    <material>walls.jpg</material>
-                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube_2</shadervar>
-                </submesh>
-                <submesh name="walls.jpg_3">
-                    <material>walls.jpg</material>
-                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube_3</shadervar>
-                </submesh>
+                <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                    <e c0="0.261271" c1="0.332479" />
+                    <e c0="0.261271" c1="0.0190834" />
+                    <e c0="0.480917" c1="0.0190834" />
+                    <e c0="0.480917" c1="0.332479" />
+                    <e c0="0.632164" c1="0.332479" />
+                    <e c0="0.632164" c1="0.0190834" />
+                    <e c0="0.500648" c1="0.0190834" />
+                    <e c0="0.500648" c1="0.332479" />
+                    <e c0="0.944664" c1="0.0190834" />
+                    <e c0="0.944664" c1="0.238729" />
+                    <e c0="0.813148" c1="0.238729" />
+                    <e c0="0.813148" c1="0.0190834" />
+                    <e c0="0.788414" c1="0.0190834" />
+                    <e c0="0.788414" c1="0.332479" />
+                    <e c0="0.656898" c1="0.332479" />
+                    <e c0="0.656898" c1="0.0190834" />
+                    <e c0="0.944664" c1="0.480917" />
+                    <e c0="0.944664" c1="0.261271" />
+                    <e c0="0.813148" c1="0.261271" />
+                    <e c0="0.813148" c1="0.480917" />
+                    <e c0="0.238729" c1="0.0190834" />
+                    <e c0="0.0190834" c1="0.0190834" />
+                    <e c0="0.0190834" c1="0.332479" />
+                    <e c0="0.238729" c1="0.332479" />
+                </renderbuffer>
             </params>
             <zuse />
             <move>
@@ -561,6 +479,7 @@
             <plugin>crystalspace.mesh.loader.genmesh</plugin>
             <params>
                 <factory>factory_Scene_Cube.001</factory>
+                <lighting>no</lighting>
                 <color red="1" green="1" blue="1" />
                 <manualcolors />
                 <mixmode>
@@ -568,16 +487,34 @@
                 </mixmode>
                 <submesh name="box.jpg_0">
                     <material>box.jpg</material>
-                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube.001_0</shadervar>
+                    <shadervar name="tex lightmap" type="texture">lightmaps_0_png</shadervar>
                 </submesh>
-                <submesh name="box.jpg_0">
-                    <material>box.jpg</material>
-                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube.001_0</shadervar>
-                </submesh>
-                <submesh name="box.jpg_1">
-                    <material>box.jpg</material>
-                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube.001_1</shadervar>
-                </submesh>
+                <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                    <e c0="0.738086" c1="0.347851" />
+                    <e c0="0.707226" c1="0.347851" />
+                    <e c0="0.707226" c1="0.378711" />
+                    <e c0="0.738086" c1="0.378711" />
+                    <e c0="0.652539" c1="0.488086" />
+                    <e c0="0.652539" c1="0.457226" />
+                    <e c0="0.683399" c1="0.457226" />
+                    <e c0="0.683399" c1="0.488086" />
+                    <e c0="0.0119138" c1="0.402539" />
+                    <e c0="0.0427737" c1="0.402539" />
+                    <e c0="0.0427737" c1="0.433399" />
+                    <e c0="0.0119138" c1="0.433399" />
+                    <e c0="0.652539" c1="0.433399" />
+                    <e c0="0.683399" c1="0.433399" />
+                    <e c0="0.683399" c1="0.402539" />
+                    <e c0="0.652539" c1="0.402539" />
+                    <e c0="0.0666013" c1="0.378711" />
+                    <e c0="0.0666013" c1="0.347851" />
+                    <e c0="0.0974612" c1="0.347851" />
+                    <e c0="0.0974612" c1="0.378711" />
+                    <e c0="0.566601" c1="0.347851" />
+                    <e c0="0.566601" c1="0.378711" />
+                    <e c0="0.597461" c1="0.378711" />
+                    <e c0="0.597461" c1="0.347851" />
+                </renderbuffer>
             </params>
             <zuse />
             <move>
@@ -588,6 +525,7 @@
             <plugin>crystalspace.mesh.loader.genmesh</plugin>
             <params>
                 <factory>factory_Scene_Cube.002</factory>
+                <lighting>no</lighting>
                 <color red="1" green="1" blue="1" />
                 <manualcolors />
                 <mixmode>
@@ -595,12 +533,34 @@
                 </mixmode>
                 <submesh name="box_spec.jpg_0">
                     <material>box_spec.jpg</material>
-                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube.002_0</shadervar>
+                    <shadervar name="tex lightmap" type="texture">lightmaps_0_png</shadervar>
                 </submesh>
-                <submesh name="box_spec.jpg_1">
-                    <material>box_spec.jpg</material>
-                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube.002_1</shadervar>
-                </submesh>
+                <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                    <e c0="0.0427737" c1="0.347851" />
+                    <e c0="0.0119138" c1="0.347851" />
+                    <e c0="0.0119138" c1="0.378711" />
+                    <e c0="0.0427737" c1="0.378711" />
+                    <e c0="0.0666013" c1="0.433399" />
+                    <e c0="0.0666013" c1="0.402539" />
+                    <e c0="0.0974612" c1="0.402539" />
+                    <e c0="0.0974612" c1="0.433399" />
+                    <e c0="0.0119138" c1="0.457226" />
+                    <e c0="0.0427737" c1="0.457226" />
+                    <e c0="0.0427737" c1="0.488086" />
+                    <e c0="0.0119138" c1="0.488086" />
+                    <e c0="0.652539" c1="0.347851" />
+                    <e c0="0.652539" c1="0.378711" />
+                    <e c0="0.683399" c1="0.378711" />
+                    <e c0="0.683399" c1="0.347851" />
+                    <e c0="0.707226" c1="0.433399" />
+                    <e c0="0.738086" c1="0.433399" />
+                    <e c0="0.738086" c1="0.402539" />
+                    <e c0="0.707226" c1="0.402539" />
+                    <e c0="0.707226" c1="0.488086" />
+                    <e c0="0.707226" c1="0.457226" />
+                    <e c0="0.738086" c1="0.457226" />
+                    <e c0="0.738086" c1="0.488086" />
+                </renderbuffer>
             </params>
             <zuse />
             <move>

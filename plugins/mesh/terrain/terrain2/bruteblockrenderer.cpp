@@ -29,6 +29,7 @@
 #include "csutil/objreg.h"
 #include "csutil/refarr.h"
 #include "csutil/blockallocator.h"
+#include "csutil/stringconv.h"
 #include "iengine.h"
 #include "imesh/terrain2.h"
 #include "ivideo/rendermesh.h"
@@ -42,7 +43,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 SCF_IMPLEMENT_FACTORY (csTerrainBruteBlockRenderer)
 
 // File-static data
-static csStringID textureLodDistanceID = csInvalidStringID;
+static CS::ShaderVarStringID textureLodDistanceID = CS::InvalidShaderVarStringID;
 
 //-- Per cell properties class
 class TerrainBBCellRenderProperties :
@@ -124,10 +125,59 @@ public:
     else if (strcmp (name, "min steps") == 0)
       SetMinSteps (atoi (value));
     else if (strcmp (name, "lod splitcoeff") == 0)
-      SetLODSplitCoeff (atof (value));
+      SetLODSplitCoeff (CS::Utility::strtof (value));
     else if (strcmp (name, "splat distance") == 0)
-      SetSplatDistance (atof (value));
+      SetSplatDistance (CS::Utility::strtof (value));
 
+  }
+
+  virtual size_t GetParameterCount() { return 5; }
+
+  virtual const char* GetParameterName (size_t index)
+  {
+    switch (index)
+    {
+      case 0: return "visible";
+      case 1: return "block resolution";
+      case 2: return "min steps";
+      case 3: return "lod splitcoeff";
+      case 4: return "splat distance";
+      default: return 0;
+    }
+  }
+
+  virtual const char* GetParameterValue (size_t index)
+  {
+    return GetParameterValue (GetParameterName (index));
+  }
+  virtual const char* GetParameterValue (const char* name)
+  {
+    // @@@ Not nice
+    static char scratch[32];
+    if (strcmp (name, "visible") == 0)
+      return visible ? "true" : "false";
+    else if (strcmp (name, "block resolution") == 0)
+    {
+      snprintf (scratch, sizeof (scratch), "%u", (uint)blockResolution);
+      return scratch;
+    }
+    else if (strcmp (name, "min steps") == 0)
+    {
+      snprintf (scratch, sizeof (scratch), "%u", (uint)minSteps);
+      return scratch;
+    }
+    else if (strcmp (name, "lod splitcoeff") == 0)
+    {
+      snprintf (scratch, sizeof (scratch), "%f", splitDistanceCoeff);
+      return scratch;
+    }
+    else if (strcmp (name, "splat distance") == 0)
+    {
+      snprintf (scratch, sizeof (scratch), "%f", splatDistance);
+      return scratch;
+    }
+    else
+      return 0;
   }
 
   virtual csPtr<iTerrainCellRenderProperties> Clone ()
@@ -459,7 +509,7 @@ void TerrainBlock::SetupGeometry ()
         
         //@@Optimize this!
         *normalData++ = renderData->cell->GetNormal (
-          (int)(x*stepSize), (int)(y*stepSize)).Unit ();
+          (int)(x*stepSize), (int)(y*stepSize));
 
         if (height < minHeight)
           minHeight = height;
@@ -975,7 +1025,7 @@ TerrainCellRData::TerrainCellRData (iTerrainCell* cell,
 
   svAccessor.AttachNew (new TerrainBBSVAccessor (properties));
 
-  if (textureLodDistanceID == csInvalidStringID)
+  if (textureLodDistanceID == CS::InvalidShaderVarStringID)
   {
     textureLodDistanceID = renderer->GetStringSet ()->Request ("texture lod distance");
   }
@@ -1162,7 +1212,7 @@ void csTerrainBruteBlockRenderer::OnMaterialMaskUpdate (iTerrainCell* cell,
 
   csRef<TerrainCellRData> data = (TerrainCellRData*)cell->GetRenderData ();
 
-  if (data)
+  if (data && materialPalette)
   {    
     // Iterate and build all the alpha-masks    
     for (size_t i = 0; i < materialPalette->GetSize (); ++i)
@@ -1419,8 +1469,8 @@ bool csTerrainBruteBlockRenderer::Initialize (iObjectRegistry* objectReg)
 {
   objectRegistry = objectReg;
   graph3d = csQueryRegistry<iGraphics3D> (objectReg);
-  stringSet = csQueryRegistryTagInterface<iStringSet> (objectReg,
-    "crystalspace.shared.stringset");
+  stringSet = csQueryRegistryTagInterface<iShaderVarStringSet> (objectReg,
+    "crystalspace.shader.variablenameset");
 
   // Error getting globals
   if (!graph3d || !stringSet)
@@ -1592,7 +1642,7 @@ void csTerrainBruteBlockRenderer::SetupCellMMArrays (iTerrainCell* cell)
 
   csRef<TerrainCellRData> data = (TerrainCellRData*)cell->GetRenderData ();
 
-  if (data)
+  if (data && materialPalette)
   {
     size_t numMats = materialPalette->GetSize ();
 

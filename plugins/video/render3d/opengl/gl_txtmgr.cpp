@@ -39,7 +39,7 @@ static const csGLTextureClassSettings defaultSettings =
 csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
         csGLGraphics3D *iG3D) : 
-  scfImplementationType (this), textures (16, 16), compactTextures (false)
+  scfImplementationType (this), textures (16), compactTextures (false)
 {
   csGLTextureManager::object_reg = object_reg;
 
@@ -56,6 +56,9 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
 
   G3D->ext->InitGL_ARB_pixel_buffer_object();
   hasPBO = G3D->ext->CS_GL_ARB_pixel_buffer_object;
+  
+  G3D->ext->InitGL_SGIS_texture_lod();
+  G3D->ext->InitGL_ARB_shadow ();
 
 #define CS_GL_TEXTURE_FORMAT(fmt)					    \
   textureFormats.Put (#fmt, TextureFormat (fmt, true));		
@@ -112,12 +115,14 @@ void csGLTextureManager::read_config (iConfigFile *config)
     ("Video.OpenGL.TextureDownsample", 0);
   texture_filter_anisotropy = config->GetFloat
     ("Video.OpenGL.TextureFilterAnisotropy", 1.0);
-  disableRECTTextureCompression = config->GetBool
+  tweaks.disableRECTTextureCompression = config->GetBool
     ("Video.OpenGL.DisableRECTTextureCompression", false);
-  enableNonPowerOfTwo2DTextures = config->GetBool
+  tweaks.enableNonPowerOfTwo2DTextures = config->GetBool
     ("Video.OpenGL.EnableNonPowerOfTwo2DTextures", false);
-  disableGenerateMipmap = config->GetBool
+  tweaks.disableGenerateMipmap = config->GetBool
     ("Video.OpenGL.DisableGenerateMipmap", false);
+  tweaks.generateMipMapsExcessOne = config->GetBool
+    ("Video.OpenGL.GenerateOneExcessMipMap", false);
   
   const char* filterModeStr = config->GetStr (
     "Video.OpenGL.TextureFilter", "trilinear");
@@ -296,7 +301,27 @@ void csGLTextureManager::UnsetTexture (GLenum target, GLuint texture)
       statecache->SetTexture (target, 0);
   }
 }
-    
+
+bool csGLTextureManager::ImageTypeSupported (csImageType imagetype,
+                                             iString* fail_reason)
+{
+  if ((imagetype == csimgCube)
+      && !G3D->ext->CS_GL_ARB_texture_cube_map)
+  {
+    if (fail_reason) fail_reason->Replace (
+      "Cubemap textures are not supported!");
+    return false;
+  }
+  if ((imagetype == csimg3D)
+      && !G3D->ext->CS_GL_EXT_texture3D)
+  {
+    if (fail_reason) fail_reason->Replace (
+      "3D textures are not supported!");
+    return false;
+  }
+  return true;
+}
+
 csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImage *image,
 	int flags, iString* fail_reason)
 {
@@ -307,20 +332,8 @@ csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImage *image,
     return 0;
   }
 
-  if ((image->GetImageType() == csimgCube)
-      && !G3D->ext->CS_GL_ARB_texture_cube_map)
-  {
-    if (fail_reason) fail_reason->Replace (
-      "Cubemap images are not supported!");
+  if (!ImageTypeSupported (image->GetImageType(), fail_reason))
     return 0;
-  }
-  if ((image->GetImageType() == csimg3D)
-      && !G3D->ext->CS_GL_EXT_texture3D)
-  {
-    if (fail_reason) fail_reason->Replace (
-      "3D images are not supported!");
-    return 0;
-  }
 
   csGLTextureHandle *txt = new csGLTextureHandle (image, flags, G3D);
   CompactTextures ();
@@ -328,7 +341,7 @@ csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImage *image,
   return csPtr<iTextureHandle> (txt);
 }
 
-csPtr<iTextureHandle> csGLTextureManager::CreateTexture (int w, int h,
+csPtr<iTextureHandle> csGLTextureManager::CreateTexture (int w, int h, int d,
       csImageType imagetype, const char* format, int flags,
       iString* fail_reason)
 {
@@ -345,9 +358,12 @@ csPtr<iTextureHandle> csGLTextureManager::CreateTexture (int w, int h,
          is specified, an "argb" format (CS notation for GL_BGR(A)) could be
          substituted instead. Or does the driver handle that automatically?
    */
+   
+  if (!ImageTypeSupported (imagetype, fail_reason))
+    return 0;
 
   csGLBasicTextureHandle *txt = new csGLBasicTextureHandle (
-      w, h, 1, imagetype, flags, G3D);
+      w, h, d, imagetype, flags, G3D);
 
   if (!txt->SynthesizeUploadData (texFormat, fail_reason))
   {

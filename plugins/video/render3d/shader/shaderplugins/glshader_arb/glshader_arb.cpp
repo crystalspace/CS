@@ -42,7 +42,7 @@ CS_LEAKGUARD_IMPLEMENT (csGLShader_ARB);
 SCF_IMPLEMENT_FACTORY (csGLShader_ARB)
 
 csGLShader_ARB::csGLShader_ARB(iBase* parent) : 
-  scfImplementationType (this, parent)
+  scfImplementationType (this, parent), ext (0)
 {
   enable = false;
   isOpen = false;
@@ -102,7 +102,7 @@ bool csGLShader_ARB::Initialize(iObjectRegistry* reg)
 
   csRef<iGraphics3D> r = csQueryRegistry<iGraphics3D> (object_reg);
 
-  csRef<iFactory> f = scfQueryInterface<iFactory> (r);
+  csRef<iFactory> f = scfQueryInterfaceSafe<iFactory> (r);
   if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 
       f->QueryClassID ()) == 0)
     enable = true;

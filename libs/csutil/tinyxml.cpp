@@ -26,6 +26,7 @@ distribution.
 #include <ctype.h>
 #include "tinyxml.h"
 #include "csutil/scfstr.h"
+#include "csutil/stringconv.h"
 
 #include "iutil/vfs.h"
 
@@ -717,6 +718,7 @@ TiDocument::TiDocument() :
   //  ignoreWhiteSpace = true;
   SetType (DOCUMENT);
   parse.document = this;
+  parse.document = this;
 }
 
 TiDocument::TiDocument( const char * documentName ) :
@@ -729,6 +731,7 @@ TiDocument::TiDocument( const char * documentName ) :
   value = documentName;
   errorId = TIXML_NO_ERROR;
   SetType (DOCUMENT);
+  parse.document = this;
   parse.document = this;
 }
 
@@ -890,7 +893,7 @@ int TiDocumentAttribute::IntValue() const
 
 double  TiDocumentAttribute::DoubleValue() const
 {
-  return atof (value);
+  return CS::Utility::strtof (value);
 }
 
 const char* TiXmlComment::Print( PrintState& print, int depth ) const

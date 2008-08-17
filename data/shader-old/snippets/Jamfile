@@ -1,0 +1,5 @@
+SubDir TOP data shader-old snippets ;
+
+InstallData [ Wildcard *.cginc *.cscg *.inc *.xml *.inp ] : data shader-old snippets ;
+FileListEntriesData [ Wildcard *.cginc *.cscg *.inc *.xml *.inp ] : shader-old snippets : data-runtime ;
+

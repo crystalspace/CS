@@ -1,0 +1,4 @@
+SubDir TOP data shader-old fog ;
+
+InstallData [ Wildcard *.cginc *.cscg *.inc *.xml ] : data shader-old fog ;
+FileListEntriesData [ Wildcard *.cginc *.cscg *.inc *.xml ] : shader-old fog : data-runtime ;

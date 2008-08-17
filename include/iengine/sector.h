@@ -28,10 +28,13 @@
  * \addtogroup engine3d
  * @{ */
 
+#include "ivideo/rendermesh.h"
+
 #include "csutil/cscolor.h"
 #include "csutil/scf.h"
 #include "csutil/set.h"
 #include "csgeom/vector3.h"
+#include "csgeom/aabbtree.h"
 
 struct iMeshWrapper;
 struct iMeshGenerator;
@@ -39,7 +42,6 @@ struct iMeshList;
 struct iLightList;
 struct iLight;
 struct iVisibilityCuller;
-struct iLightSectorInfluence;
 
 struct iObject;
 
@@ -56,13 +58,14 @@ class csRenderMeshList;
 class csReversibleTransform;
 class csVector3;
 
+
 enum csFogMode
 {
   CS_FOG_MODE_NONE = 0,
   CS_FOG_MODE_LINEAR,
-  CS_FOG_MODE_EXP,
-  CS_FOG_MODE_EXP2,
-  CS_FOG_MODE_CRYSTALSPACE
+  CS_FOG_MODE_CRYSTALSPACE,
+  CS_FOG_MODE_EXP, // Not implemented
+  CS_FOG_MODE_EXP2 // Not implemented
 };
 
 /**
@@ -70,18 +73,20 @@ enum csFogMode
  */
 struct csFog
 {
-  /// Density (for CS_FOG_MODE_EXP, CS_FOG_MODE_EXP2, CS_FOG_MODE_CRYSTALSPACE)
+  /// Density (for CS_FOG_MODE_LINEAR, CS_FOG_MODE_EXP, CS_FOG_MODE_EXP2, CS_FOG_MODE_CRYSTALSPACE)
   float density;
   /// Color
-  csColor color;
+  csColor4 color;
   /// Fog fade start distance (for CS_FOG_MODE_LINEAR).
   float start;
   /// Fog fade end distance (for CS_FOG_MODE_LINEAR).
   float end;
+  /// The limit after which the fog is no longer shown (for rings of fog) (for CS_FOG_MODE_LINEAR).
+  float limit;
   /// Fog mode.
   csFogMode mode;
 
-  csFog() : density (0), color (0, 0, 0), start (0), end (0), 
+  csFog() : density (0), color (0, 0, 0, 1.0f), start (0), end (0), limit (0),
     mode (CS_FOG_MODE_NONE) {}
 };
 
@@ -163,6 +168,19 @@ struct csSectorHitBeamResult
 };
 
 /**
+ * Container for render meshes for one mesh wrapper
+ */
+struct csSectorVisibleRenderMeshes
+{
+  /// The mesh wrapper which is the source of the render meshes
+  iMeshWrapper* imesh;
+  /// Number of render meshes
+  int num;
+  /// Render meshes
+  csRenderMesh** rmeshes;
+};
+
+/**
  * The iSector interface is used to work with "sectors". A "sector"
  * is an empty region of space that can contain other objects (mesh
  * objects). A sector itself does not represent geometry but only
@@ -187,7 +205,7 @@ struct csSectorHitBeamResult
  */
 struct iSector : public virtual iBase
 {
-  SCF_INTERFACE(iSector,2,2,0);
+  SCF_INTERFACE(iSector,2,3,1);
   /// Get the iObject for this sector.
   virtual iObject *QueryObject () = 0;
 
@@ -476,6 +494,17 @@ struct iSector : public virtual iBase
    * with this sector visible. This will speed up later rendering.
    */
   virtual void PrecacheDraw () = 0;
+
+  /**
+   * Call all the sector callback functions
+   */
+  virtual void CallSectorCallbacks (iRenderView* rview) = 0;
+
+  /**
+   * Get the render meshes for a specific mesh wrapper. Also processes LOD.
+   */
+  virtual csSectorVisibleRenderMeshes* GetVisibleRenderMeshes (int& num,
+    iMeshWrapper* mesh, iRenderView *rview, uint32 frustum_mask) = 0;
 };
 
 

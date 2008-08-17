@@ -230,7 +230,7 @@ void WalkTest::Help ()
   csPrintf ("  -exec=<script>     execute given script at startup\n");
   csPrintf ("  -[no]colldet       collision detection system (default '%scolldet')\n", collider_actor.HasCD () ? "" : "no");
   csPrintf ("  -[no]logo          draw logo (default '%slogo')\n", do_logo ? "" : "no");
-  csPrintf ("  -regions           load every map in a separate region (default off)\n");
+  csPrintf ("  -collections       load every map in a separate collection (default off)\n");
   csPrintf ("  -dupes             check for duplicate objects in multiple maps (default off)\n");
   csPrintf ("  -noprecache        after loading don't precache to speed up rendering\n");
   csPrintf ("  -bots              allow random generation of bots\n");
@@ -557,9 +557,11 @@ void WalkTest::DrawFullScreenFX3D (csTicks /*elapsed_time*/,
 void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
 {
   // Tell Gfx3D we're going to display 3D things
+  /*
   if (!Gfx3D->BeginDraw (Engine->GetBeginDrawFlags () | drawflags
   	| CSDRAW_3DGRAPHICS))
     return;
+    */
 
   // Apply lighting BEFORE the very first frame
   size_t i;
@@ -584,16 +586,23 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
   if (!do_covtree_dump)
   {
     if (split == -1)
-      view->Draw ();
+      //view->Draw ();
+      Engine->GetRenderManager()->RenderView (view);
     else 
     {	
-      views[0]->Draw();
-      views[1]->Draw();
+      iRenderManager* rm = Engine->GetRenderManager();
+      rm->RenderView (views[0]);
+      rm->RenderView (views[1]);
     }
   }
 
   // no need to clear screen anymore
   drawflags = 0;
+
+  // Tell Gfx3D we're going to display 3D things
+  if (!Gfx3D->BeginDraw (/*Engine->GetBeginDrawFlags () |*/ drawflags
+  	| CSDRAW_3DGRAPHICS))
+    return;
 
   // Display the 3D parts of the console
   if (myConsole)
@@ -816,20 +825,32 @@ void start_console ()
 
 void WalkTest::EndEngine ()
 {
-  //  delete view; view = 0;
+  if (e3DEventHandler)
+  {
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
+    if (q)
+      q->RemoveListener (e3DEventHandler);
+  }
+
+  if (frameEventHandler)
+  {
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
+    if (q)
+      q->RemoveListener (frameEventHandler);
+  }
 }
 
-void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
+void WalkTest::InitCollDet (iEngine* engine, iCollection* collection)
 {
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Computing OBBs ...");
   csColliderHelper::InitializeCollisionWrappers (collide_system,
-    	engine, region);
+    	engine, collection);
 }
 
-void WalkTest::LoadLibraryData (iRegion* region)
+void WalkTest::LoadLibraryData (iCollection* collection)
 {
   // Load the "standard" library
-  if (!LevelLoader->LoadLibraryFile ("/lib/std/library", region))
+  if (!LevelLoader->LoadLibraryFile ("/lib/std/library", collection))
   {
     Cleanup ();
     exit (0);
@@ -868,17 +889,7 @@ static bool WalkEventHandler (iEvent& ev)
   if (!Sys)
     return false;
 
-  if (ev.Name == Sys->Process)
-  {
-    Sys->SetupFrame ();
-    return true;
-  }
-  else if (ev.Name == Sys->FinalProcess)
-  {
-    Sys->FinishFrame ();
-    return true;
-  }
-  else if (ev.Name == Sys->CommandLineHelp)
+  if (ev.Name == Sys->CommandLineHelp)
   {
     Sys->Help ();
     return true;
@@ -956,10 +967,32 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     return false;
   }
 
+  CS_INITIALIZE_FRAME_EVENT_SHORTCUTS (object_reg);
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
+
+  if (!e3DEventHandler)
+  {
+    e3DEventHandler.AttachNew (new E3DEventHandler (this));
+  }
+  if (q != 0)
+  {
+    csEventID events[2] = { Frame, CS_EVENTLIST_END };
+    q->RegisterListener (e3DEventHandler, events);
+  }
+
+  if (!frameEventHandler)
+  {
+    frameEventHandler.AttachNew (new FrameEventHandler (this));
+  }
+  if (q != 0)
+  {
+    csEventID events[2] = { Frame, CS_EVENTLIST_END };
+    q->RegisterListener (frameEventHandler, events);
+  }
+
+
   //Must have before help is called
   name_reg = csEventNameRegistry::GetRegistry (object_reg);
-  Process = csevProcess (name_reg);
-  FinalProcess = csevFinalProcess (name_reg);
   CommandLineHelp = csevCommandLineHelp (name_reg);
   
 
@@ -1136,17 +1169,17 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading multiple maps '%s', ...",
       first_map->map_dir);
 
-  // Check if we have to load every separate map in a separate region.
+  // Check if we have to load every separate map in a separate collection.
   csRef<iCommandLineParser> cmdline = 
       csQueryRegistry<iCommandLineParser> (object_reg);
-  bool do_regions = false;
-  if (cmdline->GetOption ("regions"))
-    do_regions = true;
+  bool do_collections = false;
+  if (cmdline->GetOption ("collections"))
+    do_collections = true;
   bool do_dupes = false;
   if (cmdline->GetOption ("dupes"))
     do_dupes = true;
     
-  if ((!do_regions) && cache_map != 0)
+  if ((!do_collections) && cache_map != 0)
   {
     // Then we set the current directory right.
     if (!SetMapDir (cache_map->map_dir))
@@ -1173,39 +1206,34 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     if (num_maps > 1)
       Report (CS_REPORTER_SEVERITY_NOTIFY, "  Loading map '%s'",
 	      map->map_dir);
-    iRegion* region = 0;
-    if (do_regions)
+    iCollection* collection = 0;
+    if (do_collections)
     {
-      region = Engine->CreateRegion (map->map_dir);
+      collection = Engine->CreateCollection (map->map_dir);
     }
-    if (!LevelLoader->LoadMapFile ("world", false, region, !do_regions,
+    if (!LevelLoader->LoadMapFile ("world", false, collection, !do_collections,
 	      do_dupes))
     {
       Report (CS_REPORTER_SEVERITY_ERROR, "Failing to load map!");
       return false;
     }
-    if (do_regions)
+    if (do_collections)
     {
       // Set the cache manager based on current VFS dir.
       Engine->SetVFSCacheManager ();
-      region->Prepare ();
     }
   }
 
-  iRegion* region = 0;
-  if (do_regions)
-    region = Engine->CreateRegion ("libdata");
-  LoadLibraryData (region);
-  if (do_regions)
-  {
-    region->Prepare ();
-  }
+  iCollection* collection = 0;
+  if (do_collections)
+    collection = Engine->CreateCollection ("libdata");
+  LoadLibraryData (collection);
   Inititalize2DTextures ();
   ParseKeyCmds ();
 
   // Prepare the engine. This will calculate all lighting and
   // prepare the lightmaps for the 3D rasterizer.
-  if (!do_regions)
+  if (!do_collections)
   {
     csTextProgressMeter* meter = new csTextProgressMeter (myConsole);
     Engine->Prepare (meter);

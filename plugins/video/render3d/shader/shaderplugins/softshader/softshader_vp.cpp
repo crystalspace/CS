@@ -23,6 +23,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
+#include "csutil/scfstr.h"
 #include "iutil/document.h"
 #include "iutil/string.h"
 #include "iutil/vfs.h"
@@ -69,8 +70,10 @@ bool csSoftShader_VP::Load (iShaderDestinationResolver*,
   return true;
 }
 
-bool csSoftShader_VP::Compile()
+bool csSoftShader_VP::Compile (iHierarchicalCache*, csRef<iString>* tag)
 {
+  tag->AttachNew (new scfString ("default"));
+  
   // @@@ FIXME: Implement me.
   return true;
 }

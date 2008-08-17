@@ -290,11 +290,15 @@ cat <<EOF >>"$outfile"
 
     /* build function jumptable */
     while (functions[i++]) ptrs[i - 1] = dlsym( handle, functions[i - 1] );
-    
-    void* symptr;
 EOF
 
-    if [ "$variables" != "" ]; then echo "    /* now fixup the global offset table for variable imports */" >>"$outfile"; fi
+    if [ "$variables" != "" ]; then 
+	cat <<EOF >>"$outfile"
+    
+    /* now fixup the global offset table for variable imports */
+    void* symptr;
+EOF
+	fi
     for s in $variables; do
         echo "    symptr = dlsym(handle, \"$s\");" >>"$outfile"
         echo "    FIXUP_GOT_RELOC( $s, symptr );" >>"$outfile"

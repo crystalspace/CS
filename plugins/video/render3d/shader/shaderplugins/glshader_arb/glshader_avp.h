@@ -72,7 +72,7 @@ public:
   /// Setup states needed for proper operation of the shader
   virtual void SetupState (const CS::Graphics::RenderMesh* mesh,
     CS::Graphics::RenderMeshModes& modes,
-    const iShaderVarStack* stacks);
+    const csShaderVariableStack& stack);
 
   /// Reset states to original
   virtual void ResetState ();
@@ -88,7 +88,12 @@ public:
     csArray<csShaderVarMapping> &);
 
   /// Compile a program
-  virtual bool Compile();
+  virtual bool Compile (iHierarchicalCache*, csRef<iString>*);
+  
+  virtual iShaderProgram::CacheLoadResult LoadFromCache (
+    iHierarchicalCache* cache, iDocumentNode* programNode,
+    csRef<iString>* failReason = 0, csRef<iString>* = 0)
+  { return iShaderProgram::loadFail; }
 };
 
 

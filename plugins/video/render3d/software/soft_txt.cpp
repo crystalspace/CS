@@ -86,6 +86,28 @@ void csSoftwareTexture::ImageToBitmap (iImage *Image)
   }
 }
 
+//---------------------------------------------------------------------------
+
+DataBufferPooled::DataBufferPooled (csSoftwareTextureHandle* texh, 
+                                    csSoftwareTexture* texData)
+ : SuperClass (this), texh (texh), texData (texData) {}
+
+DataBufferPooled::~DataBufferPooled()
+{
+  csRef<csSoftwareTextureManager> texmanKeepalive (texh->texman);
+  texh.Invalidate();
+}
+
+char* DataBufferPooled::GetData () const
+{
+  return (char*)texData->bitmap;
+}
+
+size_t DataBufferPooled::GetSize () const
+{
+  return texData->w * texData->h * 4;
+}
+
 //----------------------------------------------- csSoftwareTextureHandle ---//
 
 csSoftwareTextureHandle::csSoftwareTextureHandle (
@@ -335,13 +357,30 @@ void csSoftwareTextureHandle::ApplyBlitBuffer (uint8* buf)
     cs_free (buf);
   }
 }
+  
+#include "csutil/custom_new_disable.h"
+
+csPtr<iDataBuffer> csSoftwareTextureHandle::Readback (
+  const CS::StructuredTextureFormat& format, int mip)
+{
+  if (format != texman->fmtABGR8) return 0;
+  if ((mip < 0) || (mip > 3)) return 0;
+  
+  csRef<iDataBuffer> db;
+  db.AttachNew (new (texman->buffersPool) DataBufferPooled (this,
+    tex[mip]));
+  return csPtr<iDataBuffer> (db);
+}
+
+#include "csutil/custom_new_enable.h"
 
 //----------------------------------------------- csSoftwareTextureManager ---//
 
 csSoftwareTextureManager::csSoftwareTextureManager (
   iObjectRegistry *object_reg,
   csSoftwareGraphics3DCommon *iG3D, iConfigFile *config)
-  : csTextureManager (object_reg, iG3D->GetDriver2D())
+  : csTextureManager (object_reg, iG3D->GetDriver2D()),
+    fmtABGR8 (CS::TextureFormatStrings::ConvertStructured ("abgr8"))
 {
   read_config (config);
   G3D = iG3D;
@@ -401,7 +440,7 @@ csPtr<iTextureHandle> csSoftwareTextureManager::RegisterTexture (iImage* image,
 }
 
 csPtr<iTextureHandle> csSoftwareTextureManager::CreateTexture (int w, int h,
-      csImageType imagetype, const char* format, int flags,
+      int d, csImageType imagetype, const char* format, int flags,
       iString* fail_reason)
 {
   CS::StructuredTextureFormat texFormat (

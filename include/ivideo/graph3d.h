@@ -31,6 +31,7 @@
  
 #include "csutil/scf.h"
 
+#include "csgeom/matrix4.h"
 #include "csgeom/transfrm.h"
 #include "csutil/flags.h"
 #include "csutil/strset.h"
@@ -44,7 +45,6 @@ struct iRenderBuffer;
 struct iRendererLightmap;
 struct iShader;
 struct iShaderVariableContext;
-struct iShaderVarStack;
 struct iTextureHandle;
 struct iTextureManager;
 
@@ -64,6 +64,7 @@ namespace CS
   } // namespace Graphics
 } // namespace CS
 class csRenderBufferHolder;
+class csShaderVariableStack;
 
 
 /**\name iGraphics3D::BeginDraw() flags
@@ -76,6 +77,8 @@ class csRenderBufferHolder;
 #define CSDRAW_CLEARZBUFFER 0x00000010
 /// Clear frame buffer ?
 #define CSDRAW_CLEARSCREEN  0x00000020
+/// Ignore clipping rectangle when clearing?
+#define CSDRAW_NOCLIPCLEAR  0x00000040
 /** @} */
 
 /**\name Type of clipper (for iGraphics3D::SetClipper())
@@ -146,8 +149,12 @@ enum csZBufMode
 // \todo Document me!
 #define CS_VATTRIB_SPECIFIC_FIRST    0
 #define CS_VATTRIB_SPECIFIC_LAST    15
+#define CS_VATTRIB_SPECIFIC_NUM     \
+  (CS_VATTRIB_SPECIFIC_LAST - CS_VATTRIB_SPECIFIC_FIRST + 1)
 #define CS_VATTRIB_GENERIC_FIRST   100
 #define CS_VATTRIB_GENERIC_LAST    (CS_VATTRIB_GENERIC_FIRST + 15)
+#define CS_VATTRIB_GENERIC_NUM     \
+  (CS_VATTRIB_GENERIC_LAST - CS_VATTRIB_GENERIC_FIRST + 1)
 
 #define CS_VATTRIB_IS_GENERIC(va)   \
   ((va >= CS_VATTRIB_GENERIC_FIRST) && (va <=CS_VATTRIB_GENERIC_LAST))
@@ -465,8 +472,11 @@ struct csAlphaMode
   {
     /// Alpha mode to use when autoAlphaMode is \p false
     AlphaType alphaType;
-    /// Texture to retrieve the alpha mode from when autoAlphaMode is \p true
-    csStringID autoModeTexture;
+    /** 
+     * String ID for texture to retrieve the alpha mode from when autoAlphaMode
+     * is \p true
+     */
+    CS::StringIDValue autoModeTexture;
   };
 };
 /** @} */
@@ -706,6 +716,8 @@ struct csSimpleRenderMesh
    *  effect, too.
    */
   csReversibleTransform object2world;
+  /// (Optional) Buffer holder with all vertex buffers.
+  csRef<csRenderBufferHolder> renderBuffers;
 
   csSimpleRenderMesh () : indexCount(0), indices(0), texcoords(0), colors(0), 
     texture (0), shader (0), dynDomain (0), z_buf_mode (CS_ZBUF_NONE), 
@@ -731,6 +743,30 @@ enum csRenderTargetAttachment
   rtaNumAttachments
 };
 
+namespace CS
+{
+  namespace Graphics
+  {
+    struct TextureComparisonMode
+    {
+      enum Mode
+      {
+        compareNone,
+        compareR
+      };
+      Mode mode;
+      enum Function
+      {
+        funcLEqual,
+        funcGEqual
+      };
+      Function function;
+      
+      TextureComparisonMode() : mode (compareNone), function (funcLEqual) {}
+    };
+  } // namespace Graphics
+} // namespace CS
+
 /**
  * This is the standard 3D graphics interface.
  * All 3D graphics rasterizer servers for Crystal Space should implement this
@@ -747,7 +783,7 @@ enum csRenderTargetAttachment
  */
 struct iGraphics3D : public virtual iBase
 {
-  SCF_INTERFACE(iGraphics3D, 3, 0, 0);
+  SCF_INTERFACE(iGraphics3D, 3, 0, 2);
   
   /// Open the 3D graphics display.
   virtual bool Open () = 0;
@@ -794,6 +830,7 @@ struct iGraphics3D : public virtual iBase
    *   space, i.e. y=0 is at the bottom of the viewport, y=GetHeight() at the 
    *   top.
    */
+  CS_DEPRECATED_METHOD_MSG("Use explicit projection matrix instead")
   virtual void SetPerspectiveCenter (int x, int y) = 0;
 
   /**
@@ -802,14 +839,17 @@ struct iGraphics3D : public virtual iBase
    *   space, i.e. y=0 is at the bottom of the viewport, y=GetHeight() at the 
    *   top.
    */
+  CS_DEPRECATED_METHOD_MSG("Use explicit projection matrix instead")
   virtual void GetPerspectiveCenter (int& x, int& y) const = 0;
 
   /**
    * Set aspect ratio for perspective projection.
    */
+  CS_DEPRECATED_METHOD_MSG("Use explicit projection matrix instead")
   virtual void SetPerspectiveAspect (float aspect) = 0;
 
   /// Get aspect ratio.
+  CS_DEPRECATED_METHOD_MSG("Use explicit projection matrix instead")
   virtual float GetPerspectiveAspect () const = 0;
  
   /**
@@ -891,7 +931,7 @@ struct iGraphics3D : public virtual iBase
   /// Drawroutine. Only way to draw stuff
   virtual void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
                          const CS::Graphics::RenderMeshModes& modes,
-                         const iShaderVarStack* stacks) = 0;
+                         const csShaderVariableStack& stack) = 0;
   /**
   * Draw a csSimpleRenderMesh on the screen.
   * Simple render meshes are intended for cases where setting up
@@ -955,7 +995,8 @@ struct iGraphics3D : public virtual iBase
 
   /**
   * Activate or deactivate all given textures depending on the value
-  * of 'textures' for that unit (i.e. deactivate if 0).
+  * of the entry of \a textures for that unit (i.e. deactivate if 0). 
+  * If \a textures itself is 0 all specified units are deactivated.
   */
   virtual void SetTextureState (int* units, iTextureHandle** textures,
     int count) = 0;
@@ -1024,10 +1065,16 @@ struct iGraphics3D : public virtual iBase
   /// Get the z buffer write/test mode
   virtual csZBufMode GetZMode () = 0;
 
-  /// Enables offsetting of Z values
+  /**
+   * \deprecated Deprecated in 1.3.
+   */
+  CS_DEPRECATED_METHOD_MSG("Nonfunctional. Use RenderMeshModes::zoffset instead")
   virtual void EnableZOffset () = 0;
 
-  /// Disables offsetting of Z values
+  /**
+   * \deprecated Deprecated in 1.3.
+   */
+  CS_DEPRECATED_METHOD_MSG("Nonfunctional. Use RenderMeshModes::zoffset instead")
   virtual void DisableZOffset () = 0;
 
   /// Controls shadow drawing
@@ -1098,6 +1145,19 @@ struct iGraphics3D : public virtual iBase
    * Get the current drawflags
    */
   virtual int GetCurrentDrawFlags() const = 0;
+  
+  virtual const CS::Math::Matrix4& GetProjectionMatrix() = 0;
+  /**
+   * Set the projection matrix to use.
+   */
+  virtual void SetProjectionMatrix (const CS::Math::Matrix4& m) = 0;
+
+  /**
+   * Set the texture comparison modes for the given texture units.
+   */
+  virtual void SetTextureComparisonModes (int* units, 
+    CS::Graphics::TextureComparisonMode* texCompare,
+    int count) = 0;
 };
 
 /** @} */

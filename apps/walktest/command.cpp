@@ -183,10 +183,10 @@ bool csCommandProcessor::change_float (const char* arg, float* value, const char
     if ((*arg == '+' || *arg == '-') && *(arg+1) == *arg)
     {
       float dv;
-      sscanf (arg+1, "%f", &dv);
+      csScanStr (arg+1, "%f", &dv);
       g = *value+dv;
     }
-    else sscanf (arg, "%f", &g);
+    else csScanStr (arg, "%f", &g);
     if (g < min || g > max) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"Bad value for %s (%f <= value <= %f)!", what, min, max);
     else

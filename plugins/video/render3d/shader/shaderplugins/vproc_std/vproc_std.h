@@ -22,6 +22,8 @@
 #include "iutil/comp.h"
 #include "csplugincommon/shader/shaderplugin.h"
 #include "csutil/leakguard.h"
+#include "csutil/scfstr.h"
+#include "csutil/scfstringarray.h"
 #include "iengine/light.h"
 
 struct iVertexLightCalculator;
@@ -49,6 +51,17 @@ public:
   virtual bool SupportType(const char* type);
 
   void Open();
+
+  csPtr<iStringArray> QueryPrecacheTags (const char* type)
+  {
+    scfStringArray* tags = new scfStringArray;
+    tags->Push ("default");
+    return csPtr<iStringArray> (tags);
+  }  
+  bool Precache (const char* type, const char* tag,
+    iBase* previous, 
+    iDocumentNode* node, iHierarchicalCache* cacheTo,
+    csRef<iBase>* outObj = 0) { return false; }
   /** @} */
 
   /**\name iComponent implementation
@@ -58,8 +71,8 @@ public:
 
   iObjectRegistry *objreg;
   csRef<iShaderManager> shaderManager;
-  csStringID string_object2world;
-  csStringID string_world2camera;
+  CS::ShaderVarStringID string_object2world;
+  CS::ShaderVarStringID string_world2camera;
   csLightShaderVarCache lsvCache;
 private:
   bool isOpen;

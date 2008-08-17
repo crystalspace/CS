@@ -86,6 +86,8 @@ private:
   bool FormatSupported (GLenum srcFormat, GLenum srcType);
 
   void CompactTextures ();
+  
+  bool ImageTypeSupported (csImageType imagetype, iString* fail_reason);
 public:
   /* Format tables - maps component sizes to GL sizes.
    * A lot of source formats have the same 'type' bit only differ in 'format'.
@@ -128,22 +130,36 @@ public:
   float texture_filter_anisotropy;
   /// Whether bilinear filtering should be used (0 = no, 1 = yes, 2 = trilinear)
   int rstate_bilinearmap;
-  /**
-   * Whether to prevent uploading of NPOTS textures to a generic compressed 
-   * format (causes crashes on some drivers).
-   */
-  bool disableRECTTextureCompression;
-  /**
-   * Whether to enable uploading of NPOTS textures as 2D textures.
-   * Some ATI hardware (Radeon 9500+) has a "hidden" feature where you can 
-   * specify NPOTS textures as 2D textures. (Normally they would have to be 
-   * POTS.) 
-   */
-  bool enableNonPowerOfTwo2DTextures;
-
+  
+  struct
+  {
+    /**
+    * Whether to prevent uploading of NPOTS textures to a generic compressed 
+    * format (causes crashes on some drivers).
+    */
+    bool disableRECTTextureCompression;
+    /**
+    * Whether to enable uploading of NPOTS textures as 2D textures.
+    * Some ATI hardware (Radeon 9500+) has a "hidden" feature where you can 
+    * specify NPOTS textures as 2D textures. (Normally they would have to be 
+    * POTS.) 
+    */
+    bool enableNonPowerOfTwo2DTextures;
+  
+    /// Some drivers seem to ignore glGenerateMipmap calls
+    bool disableGenerateMipmap;
+    
+    /**
+     * Workaround a bug in NV OpenGL (169.12): when using GENERATE_MIPMAPS
+     * the max lod level isn't generated but is black.
+     * Solution: set max LOD level to desired level plus one.
+     */
+    bool generateMipMapsExcessOne;
+  } tweaks;
+    
   bool hasPBO;
-  /// Some drivers seem to ignore glGenerateMipmap calls
-  bool disableGenerateMipmap;
+  
+  TextureReadbackSimple::Pool simpleTextureReadbacks;
 
   csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
@@ -182,6 +198,13 @@ public:
   virtual csPtr<iTextureHandle> RegisterTexture (iImage *image, int flags,
       iString* fail_reason = 0);
   virtual csPtr<iTextureHandle> CreateTexture (int w, int h,
+      csImageType imagetype, const char* format, int flags,
+      iString* fail_reason = 0)
+  {
+    return csGLTextureManager::CreateTexture (w, h, 1, imagetype, format,
+      flags, fail_reason);
+  }
+  virtual csPtr<iTextureHandle> CreateTexture (int w, int h, int d,
       csImageType imagetype, const char* format, int flags,
       iString* fail_reason = 0);
   void MarkTexturesDirty () { compactTextures = true; }

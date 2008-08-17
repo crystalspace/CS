@@ -23,6 +23,7 @@
 #include "csutil/util.h"
 #include "csutil/xmltiny.h"
 #include "csutil/scfstr.h"
+#include "csutil/scanstr.h"
 #include "xmltinyp.h"
 #include "iutil/vfs.h"
 #include "iutil/string.h"
@@ -105,7 +106,7 @@ csTinyXmlNodeIterator::csTinyXmlNodeIterator (
   csTinyXmlNodeIterator::value = value ? StrDup (value) : 0;
 
   TiDocumentNodeChildren* node_children = 0;
-  if (parent && 
+  if (parent && parent->GetTiNode() &&
     ((parent->GetTiNode()->Type() == TiDocumentNode::ELEMENT)
       || (parent->GetTiNode()->Type() == TiDocumentNode::DOCUMENT)))
     node_children = parent->GetTiNodeChildren ();
@@ -166,7 +167,7 @@ csTinyXmlNode::csTinyXmlNode (csTinyXmlDocument* doc)
 
 csTinyXmlNode::~csTinyXmlNode ()
 {
-  if (node->Type () == TiDocumentNode::ELEMENT)
+  if (node && node->Type () == TiDocumentNode::ELEMENT)
   {
     static_cast<TiXmlElement*> ((TiDocumentNode*)node)->ShrinkAttributes ();
   }
@@ -243,7 +244,7 @@ csRef<iDocumentNodeIterator> csTinyXmlNode::GetNodes (const char* value)
 
 csRef<iDocumentNode> csTinyXmlNode::GetNode (const char* value)
 {
-  if ((node->Type() != TiDocumentNode::ELEMENT)
+  if (!node || (node->Type() != TiDocumentNode::ELEMENT)
     && (node->Type() != TiDocumentNode::DOCUMENT)) return 0;
   TiDocumentNodeChildren* node_children = GetTiNodeChildren ();
   csRef<iDocumentNode> child;
@@ -423,7 +424,7 @@ float csTinyXmlNode::GetContentsValueAsFloat ()
   const char* v = GetContentsValue ();
   if (!v) return 0;
   float val = 0.0;
-  sscanf (v, "%f", &val);
+  csScanStr (v, "%f", &val);
   return val;
 }
 
@@ -481,7 +482,7 @@ float csTinyXmlNode::GetAttributeValueAsFloat (const char* name)
   TiDocumentAttribute* a = GetAttributeInternal (name);
   if (!a) return 0;
   float f;
-  sscanf (a->Value (), "%f", &f);
+  csScanStr (a->Value (), "%f", &f);
   return f;
 }
 

@@ -37,6 +37,10 @@ namespace lighter
     CS::Memory::AlignedFree (this->nodeList);
   }
 
+  KDTreeBuilder::KDTreeBuilder ()
+    : boxAllocator (1024), nodeAllocator (1024)
+  {}
+
   KDTree* KDTreeBuilder::BuildTree (ObjectHash::GlobalIterator& objects,
                                     Statistics::Progress& progress)
   {
@@ -59,8 +63,8 @@ namespace lighter
     KDTree* tree = SetupRealTree (rootNode);
     
     //Clean up some memory
-    boxAllocator.Empty ();
-    nodeAllocator.Empty ();
+    boxAllocator.DeleteAll ();
+    nodeAllocator.DeleteAll ();
 
     progress.SetProgress (1);
     return tree;

@@ -27,6 +27,8 @@
 %rename(_SetSCFPointer) SetSCFPointer;
 %rename(_GetSCFPointer) GetSCFPointer;
 
+%ignore csEvent::Name;
+%ignore iEvent::Name;
 %ignore ::operator+;
 %ignore ::operator-;
 %ignore ::operator*;
@@ -45,6 +47,9 @@
 
 // iutil/databuff.h
 %rename(asString) iDataBuffer::operator * () const;
+
+// csutil/strset.h
+%ignore csInvalidStringID;
 
 // ivaria/script.h
 %rename(SetFloat) iScriptObject::Set (const char *, float);
@@ -122,6 +127,29 @@ CSMutableArrayHelper = core.CSMutableArrayHelper
   ref->IncRef();
   $result = SWIG_NewPointerObj((void *)(type *)ref, name, 1);
 %enddef
+
+%typemap(directorin) CS::StringID "$input = PyLong_FromUnsignedLong((unsigned long)$1_name);"
+
+%typemap(directorout) CS::StringID
+{
+    $result = ($1_type)PyLong_AsUnsignedLong($input);
+}
+
+%typemap(out) CS::StringID
+{
+    $1_type stringid = $1;
+    $result = PyLong_FromUnsignedLong((unsigned long)stringid);
+}
+
+%typemap(in) CS::StringID
+{
+    $1 = ($1_type)PyLong_AsUnsignedLong($input);
+}
+
+%typemap(typecheck) CS::StringID
+{
+  $1 = (PyLong_Check($input) || PyInt_Check($input));
+}
 
 #undef TYPEMAP_OUT_csRef
 %define TYPEMAP_OUT_csRef(T)

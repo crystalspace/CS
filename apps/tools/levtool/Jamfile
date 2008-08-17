@@ -9,3 +9,4 @@ Application levtool
 Includes fixpolymesh.h : $(SUBDIR)/fixpolymesh.tok ;
 MsvcExtraFile levtool : $(SUBDIR)/fixpolymesh.tok ;
 LinkWith levtool : crystalspace ;
+FileListEntryApplications levtool : app-tool ;

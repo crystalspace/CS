@@ -159,7 +159,7 @@ public:
 
 class scfSharedLibrary;
 
-static class csStringSet* libraryNames = 0; 
+static csStringSet* libraryNames = 0; 
 static char const* get_library_name(csStringID s)
 { return s != csInvalidStringID ? libraryNames->Request(s) : "{none}"; }
 
@@ -360,7 +360,7 @@ class scfClassRegistry : public csPDelArray<scfFactory>
 {
   typedef csPDelArray<scfFactory> superclass;
 public:
-  scfClassRegistry () : superclass(16, 16) {}
+  scfClassRegistry () : superclass(16) {}
   static int CompareClass (scfFactory* const& Item, char const* const& key)
   { return strcmp (Item->ClassID, key); }
   size_t FindClass(char const* name, bool assume_sorted = false) const
@@ -379,7 +379,7 @@ public:
 //----------------------------------------- Class factory implementation ----//
 
 #ifdef CS_REF_TRACKER
-static class csStringHash* classIDs = 0; 
+static csStringHash* classIDs = 0; 
 #endif
 
 scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
@@ -1243,7 +1243,7 @@ bool csSCF::ClassRegistered (const char *iClassID)
 char const* csSCF::GetInterfaceName (scfInterfaceID i) const
 {
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
-  return InterfaceRegistry.Request(i);
+  return InterfaceRegistry.Request (i);
 }
 
 scfInterfaceID csSCF::GetInterfaceID (const char *iInterface)

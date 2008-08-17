@@ -44,13 +44,15 @@ namespace lighter
       occlUnoccluded,
       occlPartial
     };
-    OcclusionState Occlusion (const Primitive* ignorePrim = 0);
-    OcclusionState Occlusion (HitIgnoreCallback* ignoreCB);
+    OcclusionState Occlusion (const Object* ignoreObject,
+      const Primitive* ignorePrim = 0);
+    OcclusionState Occlusion (const Object* ignoreObject,
+      HitIgnoreCallback* ignoreCB);
 
     
     csColor GetFilterColor ();
 
-    void CollectHits (HitPointCallback* hitCB, HitIgnoreCallback* ignoreCB);
+    //void CollectHits (HitPointCallback* hitCB, HitIgnoreCallback* ignoreCB);
 
     void AddSegment (KDTree* tree, const csVector3& start, const csVector3& end);
     void AddSegment (KDTree* tree, const csVector3& start, const csVector3& dir, float maxL);
@@ -90,7 +92,7 @@ namespace lighter
   };
 
   typedef float(*LightAttenuationFunc)(float squaredDistance, 
-    const csVector3& constants);
+    const csVector4& constants);
 
   /// Baseclass for lights
   class Light : public csRefCount
@@ -122,7 +124,7 @@ namespace lighter
     virtual csVector3 GetLightSamplePosition (float u1, float u2) = 0;
 
     // Properties
-    void SetAttenuation (csLightAttenuationMode mode, const csVector3& constants);
+    void SetAttenuation (csLightAttenuationMode mode, const csVector4& constants);
 
     // Getters/setters
     
@@ -219,7 +221,7 @@ namespace lighter
 
     // Atteunation related
     csLightAttenuationMode attenuationMode;
-    csVector3 attenuationConsts;
+    csVector4 attenuationConsts;
     LightAttenuationFunc attenuationFunc;
 
     // Common properties

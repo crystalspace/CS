@@ -171,3 +171,10 @@ csPtr<iDataBuffer> csMemFile::GetAllData (bool nullterm)
   }
 }
 
+void csMemFile::Empty()
+{
+  buffer.Invalidate();
+  size = 0;
+  cursor = 0;
+  copyOnWrite = true;
+}

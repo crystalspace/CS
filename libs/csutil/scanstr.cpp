@@ -23,6 +23,8 @@
 #include <stdlib.h>
 #include "csutil/scanstr.h"
 
+#include "csutil/stringconv.h"
+
 #define CS_WHITE " \t\n\r\f"
 
 int csScanStr (const char* in, const char* format, ...)
@@ -108,8 +110,9 @@ int csScanStr (const char* in, const char* format, ...)
 	  in += strspn (in, CS_WHITE);
 	  if (*in)
 	  {
-	    *a = atof (in);
-	    in += strspn (in, "0123456789.eE+-");
+	    const char* end;
+	    *a = CS::Utility::strtof (in, &end);
+	    in = end;
 	    in += strspn (in, CS_WHITE);
 	    num++;
 	  }
@@ -127,8 +130,9 @@ int csScanStr (const char* in, const char* format, ...)
 	  while ((*in >= '0' && *in <= '9') || *in == '.' || *in == '+' ||
 	    *in == '-' || *in == 'e' || *in == 'E')
 	  {
-	    list[i++] = atof (in);
-	    in += strspn (in, "0123456789.eE+-");
+	    const char* end;
+	    list[i++] = CS::Utility::strtof (in, &end);
+	    in = end;
 	    in += strspn (in, CS_WHITE);
 	    if (*in != ',') break;
 	    in++;
