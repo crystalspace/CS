@@ -175,6 +175,9 @@ struct iSprite2DFactoryState : public virtual iBase
 {
   SCF_INTERFACE (iSprite2DFactoryState, 1, 0, 0);
 
+  /// Get the vertex array.
+  virtual iColoredVertices* GetVertices () = 0;
+
   /**
    * Set true if this sprite needs lighting (default).
    * Otherwise the given colors are used.
@@ -223,6 +226,7 @@ struct iSprite2DState : public iSprite2DFactoryState
 
   /// Get the vertex array.
   virtual iColoredVertices* GetVertices () = 0;
+
   /**
    * Set vertices to form a regular n-polygon around (0,0),
    * optionally also set u,v to corresponding coordinates in a texture.
