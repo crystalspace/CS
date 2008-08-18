@@ -455,7 +455,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
     factnode->SetAnimation (anim);
 
     // Properties..
-    bool isCyclic, reset;
+    bool isCyclic, reset, autostop;
     if (synldr->ParseBoolAttribute (node, "cyclic", isCyclic, true, false))
     {
       factnode->SetCyclic (isCyclic);
@@ -464,6 +464,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
     if (synldr->ParseBoolAttribute (node, "autoreset", reset, false, false))
     {
       factnode->SetAutomaticReset (reset);
+    }
+
+    if (synldr->ParseBoolAttribute (node, "autostop", autostop, true, false))
+    {
+      factnode->SetAutomaticStop (autostop);
     }
 
     if (node->GetAttribute ("speed"))
