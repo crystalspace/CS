@@ -22693,6 +22693,28 @@ SWIGINTERN PyObject *iSprite2DUVAnimation_swigregister(PyObject *SWIGUNUSEDPARM(
   return SWIG_Py_Void();
 }
 
+SWIGINTERN PyObject *_wrap_iSprite2DFactoryState_GetVertices(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSprite2DFactoryState *arg1 = (iSprite2DFactoryState *) 0 ;
+  iColoredVertices *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DFactoryState_GetVertices",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DFactoryState, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DFactoryState_GetVertices" "', argument " "1"" of type '" "iSprite2DFactoryState *""'"); 
+  }
+  arg1 = reinterpret_cast< iSprite2DFactoryState * >(argp1);
+  result = (iColoredVertices *)(arg1)->GetVertices();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iColoredVertices, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iSprite2DFactoryState_SetLighting(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iSprite2DFactoryState *arg1 = (iSprite2DFactoryState *) 0 ;
@@ -50819,6 +50841,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSprite2DUVAnimation_RemoveFrame", _wrap_iSprite2DUVAnimation_RemoveFrame, METH_VARARGS, NULL},
 	 { (char *)"delete_iSprite2DUVAnimation", _wrap_delete_iSprite2DUVAnimation, METH_VARARGS, NULL},
 	 { (char *)"iSprite2DUVAnimation_swigregister", iSprite2DUVAnimation_swigregister, METH_VARARGS, NULL},
+	 { (char *)"iSprite2DFactoryState_GetVertices", _wrap_iSprite2DFactoryState_GetVertices, METH_VARARGS, NULL},
 	 { (char *)"iSprite2DFactoryState_SetLighting", _wrap_iSprite2DFactoryState_SetLighting, METH_VARARGS, NULL},
 	 { (char *)"iSprite2DFactoryState_HasLighting", _wrap_iSprite2DFactoryState_HasLighting, METH_VARARGS, NULL},
 	 { (char *)"iSprite2DFactoryState_GetUVAnimationCount", _wrap_iSprite2DFactoryState_GetUVAnimationCount, METH_VARARGS, NULL},
