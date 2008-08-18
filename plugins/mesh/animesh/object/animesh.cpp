@@ -799,15 +799,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         sm->svContexts.Push (svContext);
       }
 
+      csRef<RenderBufferAccessor> rba;
+      rba.AttachNew (new RenderBufferAccessor (this));
       for (size_t j = 0; j < fsm->bufferHolders.GetSize (); ++j)
       {
         csRef<csRenderBufferHolder> bufferHolder;
-        bufferHolder.AttachNew (new csRenderBufferHolder (*fsm->bufferHolders[i]));        
+        bufferHolder.AttachNew (new csRenderBufferHolder (*fsm->bufferHolders[i]));
 
         // Setup the accessor to this mesh
-        bufferHolder->SetAccessor (this, 
+        bufferHolder->SetAccessor (rba, 
           CS_BUFFER_POSITION_MASK | CS_BUFFER_NORMAL_MASK | 
-          CS_BUFFER_TANGENT_MASK | CS_BUFFER_BINORMAL_MASK);          
+          CS_BUFFER_TANGENT_MASK | CS_BUFFER_BINORMAL_MASK);
 
         sm->bufferHolders.Push (bufferHolder);
       }
