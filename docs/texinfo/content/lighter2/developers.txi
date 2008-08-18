@@ -40,4 +40,34 @@ Enable per-vertex lighting.
 Values: floating point values
 
 Control lightmap density.
+
+@item indirectlight
+Values: @samp{yes}, @samp{no}
+
+Enables Global Illumination.
+
+@item numphotons
+Values: unsigned integer values
+
+Control the number of photons emitted per light.
+
+@item photonspersample
+Values: unsigned integer values
+
+Control the number of photons sampled per density sample.
+
+@item sampledistance
+Values: floating point values
+
+Control the radius of the density sample for global illumination.
+
+@item finalgather
+Values: @samp{yes}, @samp{no}
+
+Enables the Final Gather option of the Global Illumination estimate.
+
+@item numfgrays
+Values: unsigned integer values
+
+Control the number of final gather samples.
 @end table

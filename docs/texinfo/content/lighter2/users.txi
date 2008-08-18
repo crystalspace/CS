@@ -223,7 +223,7 @@ surfaces are still considered coplanar.
 This options turns on and off the global illumination computation.
 
 @itemize @bullet
-@item Can be set globally: @code(indirectlight)
+@item Can be set globally: @code{indirectlight}
 @end itemize
 
 @subsubheading Photons per Sample
@@ -234,7 +234,7 @@ color. The number of photons is represented by the photons per sample.
 Generally larger numbers are more accurate.
 
 @itemize @bullet
-@item Can be set globally: @code(photonspersample)
+@item Can be set globally: @code{photonspersample}
 @end itemize
 
 @subsubheading Number of Photons
@@ -244,7 +244,7 @@ lights. The number of photons emitted per light is controlled by this
 number.
 
 @itemize @bullet
-@item Can be set globally: @code(numphotons)
+@item Can be set globally: @code{numphotons}
 @end itemize
 
 @subsubheading Sample Distance
@@ -256,7 +256,7 @@ number more photons are sampled which decreases the speed of the global
 illumination calculations.
 
 @itemize @bullet
-@item Can be set globally: @code(sampledistance)
+@item Can be set globally: @code{sampledistance}
 @end itemize
 
 @subsubheading Final Gather
@@ -267,7 +267,7 @@ doing a local calculation, it tests the surfaces around it to approximate
 the amount of reflected light that should come its way.
 
 @itemize @bullet
-@item Can be set globally: @code(finalgather)
+@item Can be set globally: @code{finalgather}
 @end itemize
 
 @subsubheading Number of Final Gather Rays
@@ -277,6 +277,6 @@ light being reflected towards this surface. The higher the number the
 more accurate the estimate becomes.
 
 @itemize @bullet
-@item Can be set globally: @code(numfgrays)
+@item Can be set globally: @code{numfgrays}
 @end itemize
 
