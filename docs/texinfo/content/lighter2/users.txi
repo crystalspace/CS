@@ -144,13 +144,23 @@ Global illumination is achieved through photon mapping and is done after
 the direct lighting process. During global illumination photons are emitted
 from lights and stored per sector. Photon density samples are taken at all 
 points on the lightmap. Through global illumination a more realistic look 
-is achieved due to global illumination approximating indirect
-illumination as is demonstrated below.
+is achieved from approximating indirect illumination as is demonstrated 
+below.
 
 @pictures{content,lighter2,gidemo}
 
-Notice specifically how the dark areas have been filled in with a bounced
-light. 
+Notice specifically how the dark areas have been filled in with an indirect
+light. The global illumination process works by emitting photons from the
+lights and storing  the photons in a kdtree based photon map inside each
+sector. A density calculation takes place in order to approximate the
+average energy from the photons for every element in the lightmap. During
+the density sampling only the N closest photons are used over a
+predetermined size both paramters of which can be set by the user.
+
+Due to the nature of global illumination it allows you to use less lights
+in a scene because light tends to fill into areas more naturally. As a
+result, levels that used direct lighting previously will often times be
+brighter.
 
 @subheading Final Gather
 
