@@ -138,6 +138,32 @@ will always override an option set in a configuration file, and a
 user-specified configuration file will always override options from
 @file{lighter2.cfg}.
 
+@heading Global Illumination
+
+Global illumination is achieved through photon mapping and is done after
+the direct lighting process. During global illumination photons are emitted
+from lights and stored per sector. Photon density samples are taken at all 
+points on the lightmap. Through global illumination a more realistic look 
+is achieved due to global illumination approximating indirect
+illumination as is demonstrated below.
+
+@pictures{content,lighter2,gidemo}
+
+Notice specifically how the dark areas have been filled in with a bounced
+light. 
+
+@subheading Final Gather
+
+Final gather is an extra step to the GI computations that increases the
+accuracy of the final solution. Instead of taking a local approximation
+final gather sends out rays in a hemispherical pattern and samples those
+positions to try to determine the amount of reflected light that would
+reach that location. The trade off is that it increases run time by a 
+large amount. A sample of final gather can be seen below.
+
+@pictures(content,lighter2,fgdemo)
+
+
 @heading List of Options
 
 @subheading Lightmap Density
@@ -191,3 +217,66 @@ surfaces are still considered coplanar.
 @itemize @bullet
 @item Can be set globally: @code{normalstolerance}.
 @end itemize
+
+@subsubheading Global Illumination
+
+This options turns on and off the global illumination computation.
+
+@itemize @bullet
+@item Can be set globally: @code(indirectlight)
+@end itemize
+
+@subsubheading Photons per Sample
+
+When areas inside a sector are queried for a density calculation 
+only a small number of photons are considered to provide the final
+color. The number of photons is represented by the photons per sample.
+Generally larger numbers are more accurate.
+
+@itemize @bullet
+@item Can be set globally: @code(photonspersample)
+@end itemize
+
+@subsubheading Number of Photons
+
+When computing global illumination a number of photons are emitted from
+lights. The number of photons emitted per light is controlled by this
+number.
+
+@itemize @bullet
+@item Can be set globally: @code(numphotons)
+@end itemize
+
+@subsubheading Sample Distance
+
+During the density sample of Global Illumination only photons within a
+certain distance are considered. This cuts down on the number of photons
+actually tested within the kdtree based photon map. By increasing this
+number more photons are sampled which decreases the speed of the global
+illumination calculations.
+
+@itemize @bullet
+@item Can be set globally: @code(sampledistance)
+@end itemize
+
+@subsubheading Final Gather
+
+The final gather option increases the accuracy of global illumination
+estimate at the cost of more density samples taking place. Instead of 
+doing a local calculation, it tests the surfaces around it to approximate
+the amount of reflected light that should come its way.
+
+@itemize @bullet
+@item Can be set globally: @code(finalgather)
+@end itemize
+
+@subsubheading Number of Final Gather Rays
+
+The final gather rays are used to reach an approximate on the amount of
+light being reflected towards this surface. The higher the number the
+more accurate the estimate becomes.
+
+@itemize @bullet
+@item Can be set globally: @code(numfgrays)
+@end itemize
+
