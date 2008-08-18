@@ -9,7 +9,6 @@
     <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
     <plugin name="waterFact">crystalspace.mesh.loader.factory.watermesh</plugin>
     <plugin name="water">crystalspace.mesh.loader.watermesh</plugin>
-    <plugin name="combiner">crystalspace.graphics3d.shader.combiner.glcg</plugin>
   </plugins>
   <settings>
   	<clearscreen>yes</clearscreen>
