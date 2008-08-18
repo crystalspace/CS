@@ -94,22 +94,6 @@ namespace lighter
   csColor PhotonMap::SampleColor(const csVector3& pos,  float radius, 
                                  const csVector3& normal, const csVector3& dir)
   {
-    //CS::Utility::PriorityQueue<Photon> que;
-    //csArray<Photon> nearest;
-    /*
-    for (size_t num=0; num < photons.GetSize(); ++num)
-    {
-      csVector3 dist = pos - photons[num]->position;
-      photons[num]->distance = dist.SquaredNorm();
-      que.Insert(*photons[num]);
-    } 
-
-    // remove as many element as it takes
-    while (nearest.GetSize() <= photonsPerSample && !que.IsEmpty())
-    {
-      nearest.Push(que.Pop());
-    }
-    */
     csArray<Photon> nearest = NearestNeighbor(pos, radius, photonsPerSample);
     csColor final(0,0,0);
 

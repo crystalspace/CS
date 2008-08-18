@@ -15,16 +15,6 @@
 
 namespace lighter
 {
-  GIRunnable::GIRunnable(Sector *sect)
-  {
-    sector = sect;
-  }
-
-  void GIRunnable::Run()
-  {
-    //GlobalIllumination gi;
-    //gi.ShadeIndirectLighting(sector);
-  }
 
   GlobalIllumination::GlobalIllumination()
   {
@@ -40,10 +30,41 @@ namespace lighter
     numPhotonsPerLight = config.numPhotons;
   }
 	
-  void GlobalIllumination::ShadeIndirectLighting(Sector *sect)
+  void GlobalIllumination::ShadeIndirectLighting(Sector *sect, 
+    Statistics::Progress& progress)
   {
+    progress.SetProgress(0);
+    size_t totalElements = 0;
     ObjectHash::GlobalIterator gitr = sect->allObjects.GetIterator();
+    // Sum up the objects for progress calculations
+    while (gitr.HasNext ())
+    {
+      csRef<Object> obj = gitr.Next ();
 
+      if (!obj->GetFlags ().Check (OBJECT_FLAG_NOLIGHT))
+      {
+        if (obj->lightPerVertex)
+          totalElements += obj->GetVertexData().positions.GetSize();
+        else
+        {
+          csArray<PrimitiveArray>& submeshArray = obj->GetPrimitives ();
+          for (size_t submesh = 0; submesh < submeshArray.GetSize (); ++submesh)
+          {
+            PrimitiveArray& primArray = submeshArray[submesh];
+
+            for (size_t pidx = 0; pidx < primArray.GetSize (); ++pidx)
+            {
+              Primitive& prim = primArray[pidx];
+              totalElements += prim.GetElementCount();
+            }
+          }
+        }
+      }
+    }
+
+    // Now do the calculations
+    ProgressState progressState(progress, totalElements);
+    gitr.Reset();
     while (gitr.HasNext())
     {
       csRef<Object> obj = gitr.Next();
@@ -81,7 +102,8 @@ namespace lighter
             v += size_t (floorf (minUV.y));
 
             if (elemType == Primitive::ELEMENT_EMPTY)
-            {                     
+            {     
+              progressState.Advance();
               continue;
             }
 
@@ -106,11 +128,12 @@ namespace lighter
                 csColor final(0,0,0);
                 for (size_t num = 0; num < numFinalGatherRays; ++num)
                 {
-                  // Todo:: Need to change this so we don't sample vectors
-                  // that will point to the current surface we are on
                   lighter::HitPoint hit;
                   hit.distance = FLT_MAX*0.9f;
                   lighter::Ray ray;
+
+                  // create a new directional vector that faces towards the
+                  // direction of the normal
                   csVector3 newDir = randVect.Get();
                   if (newDir*normal < 0.0)
                   {
@@ -133,16 +156,10 @@ namespace lighter
                         sect->photonMap->SampleColor(hit.hitPoint, 
                         searchRadius, hNorm, dirToSrc);
                     }
-                    else
-                    {
-                      final += sect->photonMap->SampleColor(pos, searchRadius, normal);
-                    }
                   }
                   else
                   {
                     final += sect->photonMap->SampleColor(pos, searchRadius, normal);
-                    //c = sect->photonMap->SampleColor(pos, searchRadius, normal);
-                    //break;
                   }
                 }
                 // average the color
@@ -153,13 +170,13 @@ namespace lighter
                 c = sect->photonMap->SampleColor(pos, searchRadius, normal);
               }
             }
-            
+            progressState.Advance();
             normalLM->SetAddPixel (u, v, c * pixelAreaPart);
-            //normalLM->SetAddPixel (u, v, c);
           }
         }
       }
-    }  
+    }
+    progress.SetProgress(1);
   }
 
   void GlobalIllumination::EmitPhotons(Sector *sect)

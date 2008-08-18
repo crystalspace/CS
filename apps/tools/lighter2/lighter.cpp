@@ -58,6 +58,7 @@ namespace lighter
           progSaveFinish (0, 1, &progSaveMeshesMain),
         progBuildKDTree ("Building KD-Tree", 10, &progInitializeMain),
       progDirectLighting ("Direct lighting", 60),
+      progIndirectLighting ("Indirect lighting", 80),
       progPostproc ("Postprocessing lightmaps", 10),
         progPostprocSector (0, 50, &progPostproc),
         progPostprocLM (0, 50, &progPostproc),
@@ -472,6 +473,7 @@ namespace lighter
 
   void Lighter::DoIndirectIllumination()
   {
+    progIndirectLighting.SetProgress(0);
     // check to see if we are doing GI
     if (!globalConfig.GetLighterProperties().indirectLMs)
     {
@@ -486,11 +488,14 @@ namespace lighter
     while (sectIt.HasNext())
     {
       csRef<Sector> sect = sectIt.Next();
-
+      Statistics::Progress* lightProg =
+        progIndirectLighting.CreateProgress(progressStep);
       ObjectHash::GlobalIterator gitr = sect->allObjects.GetIterator();
       lighter::GlobalIllumination lighting(globalConfig.GetIndirectProperties());
-      lighting.ShadeIndirectLighting(sect);
+      lighting.ShadeIndirectLighting(sect, *lightProg);
+      delete lightProg;
     }
+    progIndirectLighting.SetProgress(1);
   }
 
   void Lighter::PostprocessLightmaps ()
@@ -622,7 +627,7 @@ namespace lighter
     csPrintf ("  Calculate direct lighting using per lumel/vertex sampling\n");
     csPrintf ("   Default: True\n");
 
-    csPrintf (" --[no]indirectlight\n");
+    csPrintf (" --indirectlight\n");
     csPrintf ("  Calculates indirect lighting using photon mapping\n");
     csPrintf ("    Default: False\n");
 
@@ -656,15 +661,15 @@ namespace lighter
 
     csPrintf (" --numphotons=<number>\n");
     csPrintf ("  Sets the number of photons to emit from the lights\n");
-    csPrintf ("   Default: 10000\n");
+    csPrintf ("   Default: 500\n");
 
     csPrintf (" --photonspersample=<number>\n");
     csPrintf ("  Sets the number of photons to sample for density calculations\n");
-    csPrintf ("   Default: 25\n");
+    csPrintf ("   Default: 50\n");
     
     csPrintf (" --sampledistance=<threshold>\n");
     csPrintf ("  Sets the max distance to search for photons when sampling\n");
-    csPrintf ("   Default: 0.25\n");
+    csPrintf ("   Default: 1.0\n");
 
     csPrintf (" --finalGather\n");
     csPrintf ("  Turns on final gather for indirect lighting calculations\n");
@@ -672,7 +677,7 @@ namespace lighter
 
     csPrintf (" --numfgrays=<number>\n");
     csPrintf ("  Sets the number of Final Gather rays to average from\n");
-    csPrintf ("   Default: 8\n");
+    csPrintf ("   Default: 30\n");
 
     csPrintf ("\n");
   }

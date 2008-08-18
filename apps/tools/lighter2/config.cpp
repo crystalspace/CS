@@ -51,8 +51,8 @@ namespace lighter
     indtLightProperties.numPerSample = 50;
     indtLightProperties.sampleDistance = 1.0f;
 
-    indtLightProperties.finalGather = false;
-    indtLightProperties.numFinalGatherRays = 15;
+    indtLightProperties.finalGather = true;
+    indtLightProperties.numFinalGatherRays = 30;
   }
 
   void Configuration::Initialize (iConfigFile* _cfgFile)
@@ -102,7 +102,7 @@ namespace lighter
 
     indtLightProperties.finalGather = cfgFile->GetBool("lighter2.finalGather",
       indtLightProperties.finalGather);
-    indtLightProperties.numFinalGatherRays = cfgFile->GetBool("lighter2.numFGRays",
+    indtLightProperties.numFinalGatherRays = cfgFile->GetInt("lighter2.numFGRays",
       indtLightProperties.numFinalGatherRays);
   }
 }

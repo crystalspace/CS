@@ -24,26 +24,6 @@
 
 namespace lighter
 {
-  class GIRunnable : public CS::Threading::Runnable
-  {
-  public:
-    /**
-    * Default Constructor
-    * Computes the lightmaps for the given sector.
-    * /param sect - the sector to compute
-    */
-    GIRunnable(Sector *sect);
-	
-    /**
-    * Run
-    * Implemented function from Runnable for CS threading. This function
-    * does the actual work.
-    */
-    void Run();
-
-  private:
-    Sector *sector;
-  };
 	
   class GlobalIllumination : private CS::NonCopyable
   {
@@ -65,8 +45,10 @@ namespace lighter
     * Shade Indirect Lighting
     * Shades the sector for indirect lighting using photon maps
     * /param sect - the sector to shade for 
+    * /param progress - the progress we are making in calculations
     */
-    void ShadeIndirectLighting(Sector *sect);
+    void ShadeIndirectLighting(Sector *sect, 
+                               Statistics::Progress& progress);
 
     /**
     * EmitPhotons
@@ -81,6 +63,30 @@ namespace lighter
     int numFinalGatherRays;
     float searchRadius;
     int numPhotonsPerLight;
+
+    class ProgressState
+    {
+      Statistics::Progress& progress;
+      size_t updateFreq;
+      size_t u;
+      float progressStep;
+
+    public:
+      ProgressState (Statistics::Progress& progress, size_t total) : 
+        progress (progress), 
+        updateFreq (progress.GetUpdateFrequency (total)), u (updateFreq),
+        progressStep (float (updateFreq) / total) {}
+
+      CS_FORCEINLINE void Advance ()
+      {
+        if (--u == 0)
+        {
+          progress.IncProgress (progressStep);
+          u = updateFreq;
+          globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE);
+        }
+      }
+    };
   };
 
 }
