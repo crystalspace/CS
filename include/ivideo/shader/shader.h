@@ -153,6 +153,17 @@ public:
     ownArray = false;
   }
 
+  /// Initialize stack with external storage taken from another stack
+  void Setup (const csShaderVariableStack& stack)
+  {
+    if (ownArray)
+      cs_free (varArray);
+
+    varArray = stack.varArray;
+    size = stack.size;
+    ownArray = false;
+  }
+
   /// Make a local copy if the array was preallocated.
   void MakeOwnArray ()
   {
