@@ -99,6 +99,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       : BaseNodeSingle (owner), manualCbInstall (false)
     {}
 
+    virtual ~BaseNodeChildren ()
+    {}
+
     void AddAnimationCallback (iSkeletonAnimCallback2* callback);
     void RemoveAnimationCallback (iSkeletonAnimCallback2* callback);
 
@@ -115,6 +118,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     {
     public:
       InnerCallback (BaseNodeChildren* parent);
+
+      virtual ~InnerCallback () {}
 
       //-- iSkeletonAnimCallback2
       virtual void AnimationFinished (iSkeletonAnimNode2* node);
