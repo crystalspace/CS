@@ -176,9 +176,6 @@ public:
   iColoredVertices* GetVertices ();
   csColoredVertices* GetCsVertices ();
 
-  void SetBlaa (int x) { }
-  int GetBlaa () const { return 0; }
-
   void SetUseFactoryVertices (bool ufv);
   bool GetUseFactoryVertices () const;
 

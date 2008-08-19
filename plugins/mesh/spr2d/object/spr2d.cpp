@@ -79,19 +79,11 @@ iColoredVertices* csSprite2DMeshObject::GetVertices ()
     return factory->GetVertices ();
   return scfVertices;
 }
-csSprite2DMeshObject::csColoredVertices* csSprite2DMeshObject::GetCsVertices ()
+csColoredVertices* csSprite2DMeshObject::GetCsVertices ()
 {
   if (vertices.GetSize () < 1)
     return factory->GetCsVertices ();
   return &vertices;
-}
-void csSprite2DMeshObject::SetUseFactoryVertices (bool ufv)
-{
-  use_fact_verts = ufv;
-}
-bool csSprite2DMeshObject::GetUseFactoryVertices () const
-{
-  return use_fact_verts;
 }
 
 void csSprite2DMeshObject::SetupObject ()
