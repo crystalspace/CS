@@ -297,6 +297,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     void SkinTangentAndBinormal ();
     void SkinAll ();
 
+    template<bool SkinVerts, bool SkinNormals, bool SkinTB>
+    void Skin ();
+
+    void MorphVertices ();
+
     void PreskinLF ();
 
     class RenderBufferAccessor :
@@ -373,6 +378,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csRef<iRenderBuffer> skinnedNormals;
     csRef<iRenderBuffer> skinnedTangents;
     csRef<iRenderBuffer> skinnedBinormals;
+
+    csRef<iRenderBuffer> postMorphVertices;
 
     csArray<float> morphTargetWeights;
 

@@ -466,6 +466,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     skinVertexVersion (~0), skinNormalVersion (~0), skinTangentVersion (~0), skinBinormalVersion (~0),
     skinVertexLF (false), skinNormalLF (false), skinTangentLF (false), skinBinormalLF (false)
   {
+    postMorphVertices = factory->vertexBuffer;
     SetupSubmeshes ();
 
     if (factory->skeletonFactory)
@@ -600,6 +601,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       }
     }
 
+    MorphVertices ();
     PreskinLF ();
 
     num = (int)renderMeshList.GetSize ();
@@ -749,7 +751,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         csShaderVariable* sv;
         
         sv = svContext->GetVariableAdd (svNameVertexUnskinned);
-        sv->SetValue (factory->vertexBuffer);
+        sv->SetValue (postMorphVertices);
 
         if (factory->normalBuffer)
         {
@@ -915,7 +917,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       {
         if (!skeleton)
         {
-          holder->SetRenderBuffer (CS_BUFFER_POSITION, factory->vertexBuffer);
+          holder->SetRenderBuffer (CS_BUFFER_POSITION, postMorphVertices);
           return;
         }
 
