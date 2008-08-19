@@ -89203,7 +89203,7 @@ fi
 { echo "$as_me:$LINENO: checking whether to build shared libraries" >&5
 echo $ECHO_N "checking whether to build shared libraries... $ECHO_C" >&6; }
 case $host_os in
-    mingw*|cygwin*|linux*) enable_shared_default=yes ;;
+    cygwin*|linux*) enable_shared_default=yes ;;
     *) enable_shared_default=no ;;
 esac
 # Check whether --enable-shared was given.
