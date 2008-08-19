@@ -545,7 +545,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       frustum_mask, clip_portal, clip_plane, clip_z_plane);
 
     const csReversibleTransform o2wt = movable->GetFullTransform ();
-    const csVector3& wo = o2wt.GetOrigin ();
+    //const csVector3& wo = o2wt.GetOrigin ();
     
     
     // Fetch the material
@@ -877,7 +877,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         csRef<csShaderVariable> sv;
         for (size_t bi = 0, k = 0; bi < remap.boneRemappingTable.GetSize (); ++bi, k+=2)
         {
-          unsigned int realBi = remap.boneRemappingTable[bi];
+          //unsigned int realBi = remap.boneRemappingTable[bi];
 
           // bi is the "virtual" bone index, realBi the real one
           const csVector3& v = lastSkeletonState->GetVector (i);

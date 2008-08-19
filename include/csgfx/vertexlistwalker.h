@@ -162,12 +162,12 @@ private:
         if (Signed)
         {
           orgVal = (orgVal + (-range - 1)) / double ((int64)range*2+1);
-          newComp = -1.0 + orgVal * 2.0;
+          newComp = Tbase (-1.0 + orgVal * 2.0);
         }
         else
         {
           orgVal = orgVal / double (range);
-          newComp = orgVal;
+          newComp = Tbase (orgVal);
         }
       }
       else

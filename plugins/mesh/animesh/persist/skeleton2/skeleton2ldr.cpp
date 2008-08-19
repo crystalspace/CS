@@ -483,7 +483,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
   csPtr<iSkeletonAnimNodeFactory2> SkeletonLoader::ParseBlendNode (
     iDocumentNode* node, iSkeletonAnimPacketFactory2* packet)
   {
-    static const char* msgid = "crystalspace.skeletonloader.parseblendnode";
+    //static const char* msgid = "crystalspace.skeletonloader.parseblendnode";
 
     csRef<iSkeletonBlendNodeFactory2> factnode;
 
@@ -545,7 +545,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
   csPtr<iSkeletonAnimNodeFactory2> SkeletonLoader::ParsePriorityNode (
     iDocumentNode* node, iSkeletonAnimPacketFactory2* packet)
   {
-    static const char* msgid = "crystalspace.skeletonloader.parseprioritynode";
+    //static const char* msgid = "crystalspace.skeletonloader.parseprioritynode";
 
     csRef<iSkeletonPriorityNodeFactory2> factnode;
 
@@ -569,7 +569,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
           int prio = 1;
           if (child->GetAttribute ("priority"))
           {
-            prio = child->GetAttributeValueAsFloat ("priority");
+            prio = child->GetAttributeValueAsInt ("priority");
           }
 
           factnode->AddNode (childFact, prio);
@@ -587,7 +587,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
   csPtr<iSkeletonAnimNodeFactory2> SkeletonLoader::ParseRandomNode (
     iDocumentNode* node, iSkeletonAnimPacketFactory2* packet)
   {
-    static const char* msgid = "crystalspace.skeletonloader.parserandomnode";
+    //static const char* msgid = "crystalspace.skeletonloader.parserandomnode";
 
     csRef<iSkeletonRandomNodeFactory2> factnode;
 
