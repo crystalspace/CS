@@ -2466,7 +2466,7 @@ AS_IF([test $enable_leak_guard = yes],
 #------------------------------------------------------------------------------
 AC_MSG_CHECKING([whether to build shared libraries])
 case $host_os in
-    mingw*|cygwin*|linux*) enable_shared_default=yes ;;
+    cygwin*|linux*) enable_shared_default=yes ;;
     *) enable_shared_default=no ;;
 esac
 AC_ARG_ENABLE([shared], [AC_HELP_STRING([--enable-shared],
