@@ -55,6 +55,8 @@ class csSprite2DMeshObjectFactory;
 
 #include "csutil/deprecated_warn_off.h"
 
+typedef csDirtyAccessArray<csSprite2DVertex> csColoredVertices;
+
 /**
  * Sprite 2D version of mesh object.
  */
@@ -134,7 +136,6 @@ private:
   csBox2 bbox_2d;
   csFlags flags;
 
-  typedef csDirtyAccessArray<csSprite2DVertex> csColoredVertices;
   /**
    * Array of 3D vertices.
    */
@@ -172,7 +173,15 @@ public:
   virtual ~csSprite2DMeshObject ();
 
   /// Get the vertex array.
-  iColoredVertices* GetVertices () { return scfVertices; }
+  iColoredVertices* GetVertices ();
+  csColoredVertices* GetCsVertices ();
+
+  void SetBlaa (int x) { }
+  int GetBlaa () const { return 0; }
+
+  void SetUseFactoryVertices (bool ufv);
+  bool GetUseFactoryVertices () const;
+
   /**
    * Set vertices to form a regular n-polygon around (0,0),
    * optionally also set u,v to corresponding coordinates in a texture.
@@ -324,6 +333,13 @@ private:
    */
   bool lighting;
   csFlags flags;
+  int ax;
+
+  /**
+   * Array of 3D vertices.
+   */
+  csColoredVertices vertices;
+  csRef<iColoredVertices> scfVertices;
 
 public:
   CS_LEAKGUARD_DECLARE (csSprite2DMeshObjectFactory);
@@ -334,10 +350,17 @@ public:
 public:
   /// Constructor.
   csSprite2DMeshObjectFactory (iMeshObjectType* pParent,
-  	iObjectRegistry* object_reg);
+    iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csSprite2DMeshObjectFactory ();
+
+  /// Get the vertex array.
+  iColoredVertices* GetVertices () { return scfVertices; }
+  csColoredVertices* GetCsVertices () { return &vertices; }
+
+  void SetBlaa (int x) { ax = x; }
+  int GetBlaa () const { return ax; }
 
   /// Has this sprite lighting?
   bool HasLighting () const { return lighting; }

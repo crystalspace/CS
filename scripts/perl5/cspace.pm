@@ -16045,6 +16045,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::iBase cspace );
 %OWNER = ();
 %ITERATORS = ();
+*GetVertices = *cspacec::iSprite2DFactoryState_GetVertices;
 *SetLighting = *cspacec::iSprite2DFactoryState_SetLighting;
 *HasLighting = *cspacec::iSprite2DFactoryState_HasLighting;
 *GetUVAnimationCount = *cspacec::iSprite2DFactoryState_GetUVAnimationCount;

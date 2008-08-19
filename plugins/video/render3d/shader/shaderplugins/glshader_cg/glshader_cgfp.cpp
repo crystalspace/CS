@@ -96,7 +96,7 @@ bool csShaderGLCGFP::Compile (iHierarchicalCache* cache, csRef<iString>* tag)
   // (psplg will be 0 if wrapping isn't wanted)
   if (shaderPlug->psplg)
   {
-  csRef<iDataBuffer> programBuffer = GetProgramData();
+    csRef<iDataBuffer> programBuffer = GetProgramData();
     if (!programBuffer.IsValid())
       return false;
     csString programStr;

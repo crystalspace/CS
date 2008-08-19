@@ -562,6 +562,7 @@ void* ptcalloc_checking (size_t n, size_t s)
   return ptcalloc_debug<true, true> (n, s);
 }
 
+#ifndef CS_NO_PTMALLOC
 #if defined(CS_EXTENSIVE_MEMDEBUG)
 void* cs_malloc (size_t n)
 { 
@@ -632,6 +633,17 @@ CS_ATTRIBUTE_MALLOC void* cs_calloc (size_t n, size_t s)
   return ptmalloc_::ptcalloc (n, s); 
 #endif
 }
+#endif
+
+#else // CS_NO_PTMALLOC
+CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n)
+{ return malloc (n); }
+void cs_free (void* p)
+{ free (p); }
+void* cs_realloc (void* p, size_t n)
+{ return realloc (p, n); }
+CS_ATTRIBUTE_MALLOC void* cs_calloc (size_t n, size_t s)
+{ return calloc (n, s); }
 #endif
 
 

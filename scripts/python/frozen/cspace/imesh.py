@@ -1214,6 +1214,7 @@ class iSprite2DFactoryState(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
+    def GetVertices(*args): return _imesh.iSprite2DFactoryState_GetVertices(*args)
     def SetLighting(*args): return _imesh.iSprite2DFactoryState_SetLighting(*args)
     def HasLighting(*args): return _imesh.iSprite2DFactoryState_HasLighting(*args)
     def GetUVAnimationCount(*args): return _imesh.iSprite2DFactoryState_GetUVAnimationCount(*args)
