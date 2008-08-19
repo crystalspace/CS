@@ -18,11 +18,139 @@
 
 #include "cssysdef.h"
 
+#include "csgeom/math.h"
+
 #include "fsmnode.h"
 
 
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
+  AnimationFifo::AnimationFifo (AnimationFifoCb* cb)
+    : currentState (STATE_STOPPED), cb (cb)
+  {}
+
+  void AnimationFifo::PushAnimation (iSkeletonAnimNode2* node, bool directSwitch,
+    float blendInTime, size_t cbData)
+  {
+    AnimationInstruction newInstr = {node, cbData, blendInTime, directSwitch};    
+    instructions.Push (newInstr);
+
+    if (currentState == STATE_STOPPED)
+    {
+      currentState = STATE_PLAYING;
+    }
+  }
+
+  void AnimationFifo::BlendState (csSkeletalState2* state, float baseWeight /* = 1.0f */)
+  {
+    switch (currentState)
+    {
+    case STATE_STOPPED:
+      break;
+    case STATE_PLAYING:
+      {
+        currentAnimation.node->BlendState (state, baseWeight);        
+      }
+      break;    
+    case STATE_BLENDING:
+      {
+        if (instructions.GetSize () > 0)
+        {
+          AnimationInstruction& top = instructions.Top ();
+
+          const float blendAmount = csClamp (blendTime / top.blendInTime, 1.0f, 0.0f);
+          currentAnimation.node->BlendState (state, baseWeight * (1 - blendAmount));
+          top.node->BlendState (state, baseWeight * blendAmount);
+        }        
+        else
+        {
+          currentAnimation.node->BlendState (state, baseWeight);
+        }       
+      }
+      break;    
+    }
+  }
+
+  void AnimationFifo::TickAnimation (float dt)
+  {
+    switch (currentState)
+    {
+    case STATE_STOPPED:
+      break;
+    case STATE_PLAYING:
+      {
+        if (instructions.GetSize () > 0)
+        {
+          AnimationInstruction& top = instructions.Top ();
+
+          if (top.directSwitch || 
+            currentAnimation.node->GetPlaybackPosition() + dt + top.blendInTime >
+            currentAnimation.node->GetDuration ())
+          {
+            if (top.blendInTime > 0.0f)
+            {
+              // Blend
+              currentState = STATE_BLENDING;
+              blendTime = 0;
+            }
+            else
+            {
+              // Switch
+              currentAnimation = instructions.PopTop ();
+
+              if (cb)
+              {
+                cb->NewAnimation (currentAnimation.cbData);
+              }
+            }
+          }
+        }        
+
+        currentAnimation.node->TickAnimation (dt);        
+      }
+      break;    
+    case STATE_BLENDING:
+      {
+        AnimationInstruction& top = instructions.Top ();
+
+        if (blendTime + dt > top.blendInTime)
+        {
+          // Blend over, finalize switch
+          currentAnimation.node->TickAnimation (dt);
+
+          currentAnimation = instructions.PopTop ();
+          if (cb)
+          {
+            cb->NewAnimation (currentAnimation.cbData);
+          }
+
+          currentAnimation.node->TickAnimation (dt);
+
+          currentState = STATE_PLAYING;
+        }
+        else
+        {
+          // Tick both
+          currentAnimation.node->TickAnimation (dt);
+          top.node->TickAnimation (dt);
+        }
+      }
+      break;
+    }
+  }
+
+
+  template <>
+  class csHashComputer<FSMNodeFactory::StateTransitionKey>
+  {
+  public:
+    /// Compute a hash value for \a key.
+    static uint ComputeHash (const FSMNodeFactory::StateTransitionKey& key)
+    {
+      return (key.fromState ^ key.toState) ^ 0xABCDEF98;
+    }
+  };
+
 
   CS_LEAKGUARD_IMPLEMENT(FSMNodeFactory);
 
@@ -118,6 +246,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       newn->stateList.Push (newState);
     }
 
+    // Setup all the transitions
+    {
+      csHash<StateTransitionInfo, StateTransitionKey>::GlobalIterator it = 
+        transitions.GetIterator ();
+
+      while (it.HasNext ())
+      {
+        StateTransitionKey key;
+        StateTransitionInfo& info = it.Next (key);
+
+        FSMNode::StateTransitionInfo& childInfo = newn->transitions.GetOrCreate (key);
+
+        childInfo.transitionNode = info.nodeFactory->CreateInstance (packet, skeleton);
+        childInfo.time1 = info.time1;
+        childInfo.time2 = info.time2;
+        childInfo.directSwitch = info.directSwitch;
+      }
+    }
+
     return csPtr<iSkeletonAnimNode2> (newn);
   }
 
@@ -146,27 +293,64 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return 0;
   }
 
+  void FSMNodeFactory::SetStateTransition (CS::Animation::StateID fromState, 
+    CS::Animation::StateID toState, iSkeletonAnimNodeFactory2* fact)
+  {
+    StateTransitionKey key = {fromState, toState};
+    StateTransitionInfo& info = transitions.GetOrCreate (key);
+    
+    info.nodeFactory = fact;
+  }
+
+  void FSMNodeFactory::SetTransitionCrossfade (CS::Animation::StateID fromState, 
+    CS::Animation::StateID toState, float time1, float time2)
+  {
+    StateTransitionKey key = {fromState, toState};
+    StateTransitionInfo& info = transitions.GetOrCreate (key);
+
+    info.time1 = time1;
+    info.time2 = time2;
+  }
+
+
+  //----------------------------------------
 
   CS_LEAKGUARD_IMPLEMENT(FSMNode);
 
   FSMNode::FSMNode (FSMNodeFactory* factory)
     : scfImplementationType (this), BaseNodeSingle (this), factory (factory),
-    currentState (factory->startState), isActive (false), playbackSpeed (1.0f)
+    currentState (factory->startState), isActive (false), playbackSpeed (1.0f),
+    blendFifo (this)
   {}
 
   void FSMNode::SwitchToState (CS::Animation::StateID newState)
   {
+    CS_ASSERT(newState < stateList.GetSize ());
+
     if (isActive)
     {
-      stateList[currentState].stateNode->Stop ();
+      FSMNodeFactory::StateTransitionKey key = {currentState, newState};
+      StateTransitionInfo* info = transitions.GetElementPointer (key);
 
-      if (newState != CS::Animation::InvalidStateID)
+      if (info)
       {
-        stateList[newState].stateNode->Play ();
+        // Not a direct transition
+        if (info->transitionNode)
+        {
+          // Use transition animation
+          blendFifo.PushAnimation (info->transitionNode, info->directSwitch, info->time1);
+          blendFifo.PushAnimation (stateList[newState].stateNode, false, info->time2, newState);
+        }
+        else
+        {          
+          blendFifo.PushAnimation (stateList[newState].stateNode, info->directSwitch, info->time1, newState);
+        }        
       }
+      else
+      {
+        blendFifo.PushAnimation (stateList[newState].stateNode, true, 0, newState);
+      }      
     }
-
-    currentState = newState;
   }
 
   CS::Animation::StateID FSMNode::GetCurrentState () const
@@ -225,7 +409,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     if (!isActive)
       return;
 
-    stateList[currentState].stateNode->BlendState (state, baseWeight);
+    blendFifo.BlendState (state, baseWeight);
   }
 
   void FSMNode::TickAnimation (float dt)
@@ -233,7 +417,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     if (!isActive)
       return;
 
-    stateList[currentState].stateNode->TickAnimation (dt * playbackSpeed);
+    blendFifo.TickAnimation (dt * playbackSpeed);
   }
 
   bool FSMNode::IsActive () const
@@ -276,6 +460,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     BaseNodeSingle::AddAnimationCallback (callback);
   }
 
-
+  void FSMNode::NewAnimation (size_t data)
+  {
+    if (data != CS::Animation::InvalidStateID)
+    {
+      currentState = data;
+    }
+  }
 }
 CS_PLUGIN_NAMESPACE_END(Skeleton2)

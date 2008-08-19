@@ -63,9 +63,28 @@ public:
       {
 	a2.Push (a1[n]);
       }
-      a1.Empty();
+      a1.Empty ();
     }
-    return a2.Pop();
+    return a2.Pop ();
+  }
+
+  /**
+   * Return the first element
+   */
+  T& Top ()
+  {
+    CS_ASSERT ((a1.GetSize () > 0) || (a2.GetSize () > 0));
+
+    if (a2.GetSize () == 0)
+    {
+      size_t n = a1.GetSize ();
+      while (n-- > 0)
+      {
+        a2.Push (a1[n]);
+      }
+      a1.Empty ();
+    }
+    return a2.Top ();
   }
 
   /**
