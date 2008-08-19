@@ -706,10 +706,6 @@ public:
            CS_DBGHELP_GFXDUMP |
            CS_DBGHELP_TXTDUMP;
   }
-  virtual csPtr<iString> UnitTest ()
-  {
-    return 0;
-  }
   virtual csPtr<iString> StateTest ()
   {
     return 0;

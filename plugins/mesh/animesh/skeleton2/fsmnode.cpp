@@ -163,7 +163,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   {
     State newState;
 
-    return stateList.Push (newState);    
+    return (CS::Animation::StateID)stateList.Push (newState);    
   }
 
   void FSMNodeFactory::SetStateNode (CS::Animation::StateID id, 
@@ -201,7 +201,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     {
       if (stateList[i].name == name)
       {
-        return i;
+        return (CS::Animation::StateID)i;
       }
     }
 
@@ -464,7 +464,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   {
     if (data != CS::Animation::InvalidStateID)
     {
-      currentState = data;
+      currentState = (CS::Animation::StateID)data;
     }
   }
 }

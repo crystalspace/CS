@@ -1094,10 +1094,11 @@ public:
   { return currentContext->pixelUnpackSwapBytes; }
   void SetPixelUnpackSwapBytes (GLint swap)
   {
-    if (swap != currentContext->pixelUnpackSwapBytes)
+    bool swapAsbool = (swap != 0);
+    if (swapAsbool != currentContext->pixelUnpackSwapBytes)
     {
       glPixelStorei (GL_UNPACK_SWAP_BYTES, (GLint)swap);
-      currentContext->pixelUnpackSwapBytes = swap;
+      currentContext->pixelUnpackSwapBytes = swapAsbool;
     }
   }
   /** @} */
