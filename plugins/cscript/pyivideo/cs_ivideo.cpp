@@ -16330,6 +16330,39 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csShaderVariableStack_Setup__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csShaderVariableStack *arg1 = (csShaderVariableStack *) 0 ;
+  csShaderVariableStack *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csShaderVariableStack_Setup",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariableStack, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableStack_Setup" "', argument " "1"" of type '" "csShaderVariableStack *""'"); 
+  }
+  arg1 = reinterpret_cast< csShaderVariableStack * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csShaderVariableStack,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csShaderVariableStack_Setup" "', argument " "2"" of type '" "csShaderVariableStack const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csShaderVariableStack_Setup" "', argument " "2"" of type '" "csShaderVariableStack const &""'"); 
+  }
+  arg2 = reinterpret_cast< csShaderVariableStack * >(argp2);
+  (arg1)->Setup((csShaderVariableStack const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csShaderVariableStack_Setup(PyObject *self, PyObject *args) {
   int argc;
   PyObject *argv[4];
@@ -16339,6 +16372,19 @@ SWIGINTERN PyObject *_wrap_csShaderVariableStack_Setup(PyObject *self, PyObject 
   argc = PyObject_Length(args);
   for (ii = 0; (ii < argc) && (ii < 3); ii++) {
     argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csShaderVariableStack, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csShaderVariableStack, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_csShaderVariableStack_Setup__SWIG_2(self, args);
+      }
+    }
   }
   if (argc == 2) {
     int _v;
@@ -16377,7 +16423,7 @@ SWIGINTERN PyObject *_wrap_csShaderVariableStack_Setup(PyObject *self, PyObject 
   }
   
 fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csShaderVariableStack_Setup'.\n  Possible C/C++ prototypes are:\n    Setup(size_t)\n    Setup(csShaderVariable **,size_t)\n");
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csShaderVariableStack_Setup'.\n  Possible C/C++ prototypes are:\n    Setup(size_t)\n    Setup(csShaderVariable **,size_t)\n    Setup(csShaderVariableStack const &)\n");
   return NULL;
 }
 
