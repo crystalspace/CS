@@ -24,6 +24,10 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
+  CS_LEAKGUARD_IMPLEMENT(BaseNodeSingle);
+
+  CS_LEAKGUARD_IMPLEMENT(BaseFactoryChildren);
+  CS_LEAKGUARD_IMPLEMENT(BaseNodeChildren);
 
   void BaseNodeChildren::AddAnimationCallback (iSkeletonAnimCallback2* callback)
   {
@@ -121,6 +125,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
 
 
+  CS_LEAKGUARD_IMPLEMENT(AnimationNodeFactory);
+
   AnimationNodeFactory::AnimationNodeFactory (const char* name)
     : scfImplementationType (this), name (name), cyclic (false),
     automaticReset (false), automaticStop (true), playbackSpeed (1.0f), 
@@ -198,6 +204,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       return 0;
   }
 
+
+  CS_LEAKGUARD_IMPLEMENT(AnimationNode);
 
   AnimationNode::AnimationNode (AnimationNodeFactory* factory)
     : scfImplementationType (this), BaseNodeSingle (this), factory (factory), 

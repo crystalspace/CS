@@ -24,6 +24,8 @@
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 {
 
+  CS_LEAKGUARD_IMPLEMENT(FSMNodeFactory);
+
   FSMNodeFactory::FSMNodeFactory (const char* name)
     : scfImplementationType (this), name (name), 
     startState (CS::Animation::InvalidStateID)
@@ -144,6 +146,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     return 0;
   }
 
+
+  CS_LEAKGUARD_IMPLEMENT(FSMNode);
 
   FSMNode::FSMNode (FSMNodeFactory* factory)
     : scfImplementationType (this), BaseNodeSingle (this), factory (factory),

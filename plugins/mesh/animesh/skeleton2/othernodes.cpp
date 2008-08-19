@@ -30,6 +30,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   CS_IMPLEMENT_STATIC_VAR(GetFGen, csRandomFloatGen, ());
 
 
+  CS_LEAKGUARD_IMPLEMENT(PriorityNodeFactory);
+
   PriorityNodeFactory::PriorityNodeFactory (const char* name)
     : scfImplementationType (this), name (name)
   {
@@ -97,6 +99,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
     return 0;
   }
+  
+  
+  CS_LEAKGUARD_IMPLEMENT(PriorityNode);
 
   PriorityNode::PriorityNode (PriorityNodeFactory* factory)
     : scfImplementationType (this), factory (factory),
@@ -313,6 +318,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
   //----------------------------------------
 
+  CS_LEAKGUARD_IMPLEMENT(RandomNodeFactory);
+
   RandomNodeFactory::RandomNodeFactory (const char* name)
   : scfImplementationType (this), name (name), autoSwitch (true)
   {}
@@ -410,6 +417,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       accumProbabilityList[i] /= sum;
     }
   }
+
+  
+  CS_LEAKGUARD_IMPLEMENT(RandomNode);
 
   RandomNode::RandomNode (RandomNodeFactory* factory)
   : scfImplementationType (this), BaseNodeChildren (this), factory (factory), 

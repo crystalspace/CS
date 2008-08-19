@@ -22,6 +22,7 @@
 #include "csutil/scf_implementation.h"
 #include "imesh/skeleton2.h"
 #include "imesh/skeleton2anim.h"
+#include "csutil/leakguard.h"
 #include "csutil/refarr.h"
 #include "csutil/csstring.h"
 
@@ -36,6 +37,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     public BaseFactoryChildren
   {
   public:
+    CS_LEAKGUARD_DECLARE(PriorityNodeFactory);
+  
     PriorityNodeFactory (const char* name);
 
     //-- iSkeletonPriorityNodeFactory2
@@ -65,6 +68,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     public BaseNodeChildren
   {
   public:
+    CS_LEAKGUARD_DECLARE(PriorityNode);
+  
     PriorityNode (PriorityNodeFactory* factory);
 
     //-- iSkeletonPriorityNode2
@@ -104,6 +109,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     public BaseFactoryChildren
   {
   public:
+    CS_LEAKGUARD_DECLARE(RandomNodeFactory);
+  
     RandomNodeFactory (const char* name);
 
     //-- iSkeletonPriorityNodeFactory2
@@ -139,6 +146,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     public BaseNodeChildren
   {
   public:
+    CS_LEAKGUARD_DECLARE(RandomNode);
+  
     RandomNode (RandomNodeFactory* factory);
 
     //-- iSkeletonPriorityNode2
