@@ -75,11 +75,6 @@
   //#define LIGHTMAP_DEBUG
 #endif
 
-CS_IMPLEMENT_PLUGIN
-
-CS_PLUGIN_NAMESPACE_BEGIN(Thing)
-{
-
 CS_LEAKGUARD_IMPLEMENT (csThingStatic);
 CS_LEAKGUARD_IMPLEMENT (csThing);
 
@@ -3045,7 +3040,3 @@ bool csThingObjectType::GetOptionDescription (
   return true;
 }
 
-//---------------------------------------------------------------------------
-
-}
-CS_PLUGIN_NAMESPACE_END(Thing)

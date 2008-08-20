@@ -42,7 +42,6 @@
 #include "imap/services.h"
 #include "imap/writer.h"
 #include "imesh/object.h"
-#include "imesh/thing.h"
 #include "itexture/ifire.h"
 #include "itexture/iproctex.h"
 #include "itexture/itexfact.h"
@@ -1308,21 +1307,6 @@ bool csSaver::SaveSettings (iDocumentNode* node)
     engine->GetDefaultClearZBuf ());
   synldr->WriteBool(settingsNode,"clearscreen",engine->GetClearScreen (),
     engine->GetDefaultClearScreen ());  
-
-  csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
-  	object_reg, "crystalspace.mesh.object.thing");
-  if (!type) return false;
-  csRef<iThingEnvironment> te = 
-    scfQueryInterface<iThingEnvironment> (type);
-  int cellsize = te->GetLightmapCellSize ();
-  csRef<iDocumentNode> lghtmapcellNode = CreateNode(settingsNode, "lightmapcellsize");
-  lghtmapcellNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(cellsize);
-
-  int max[2];
-  engine->GetMaxLightmapSize(max[0], max[1]);
-  csRef<iDocumentNode> maxlghtmapNode = CreateNode(settingsNode, "maxlightmapsize");
-  maxlghtmapNode->SetAttributeAsInt ("horizontal", max[0]);
-  maxlghtmapNode->SetAttributeAsInt ("vertical"  , max[1]);
 
   csRef<iDocumentNode> ambientNode = CreateNode(settingsNode, "ambient");
   csColor c;

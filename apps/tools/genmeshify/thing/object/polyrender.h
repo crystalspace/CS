@@ -32,9 +32,6 @@
 
 class csShaderVariableContext;
 
-CS_PLUGIN_NAMESPACE_BEGIN(Thing)
-{
-
 class csThingObjectType;
 class csThing;
 
@@ -273,8 +270,5 @@ public:
     iUserRenderBufferIterator* extraBuffers);
 
 };
-
-}
-CS_PLUGIN_NAMESPACE_END(Thing)
 
 #endif // __CS_POLYRENDER_H__

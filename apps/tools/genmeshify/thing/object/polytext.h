@@ -41,9 +41,6 @@ class csVector2;
 class csColor;
 class csFrustumContext;
 
-CS_PLUGIN_NAMESPACE_BEGIN(Thing)
-{
-
 struct csLightingPolyTexQueue;
 class csPolygon3D;
 class csPolygon3DStatic;
@@ -381,9 +378,6 @@ public:
   /// Query log2 (cell size)
   int GetLightCellShift ();
 };
-
-}
-CS_PLUGIN_NAMESPACE_END(Thing)
 
 #endif // __CS_POLYTEXT_H__
 

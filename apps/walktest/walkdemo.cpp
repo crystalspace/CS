@@ -41,7 +41,6 @@
 #include "imesh/object.h"
 #include "imesh/partsys.h"
 #include "imesh/sprite3d.h"
-#include "imesh/thing.h"
 #include "isndsys.h"
 #include "ivaria/collider.h"
 #include "ivaria/engseq.h"
@@ -847,6 +846,7 @@ void AttachRandomLight (iLight* light)
 
 static csPtr<iMeshWrapper> CreateMeshWrapper (const char* name)
 {
+#if 0
   csRef<iMeshObjectType> ThingType = csLoadPluginCheck<iMeshObjectType> (
   	Sys->object_reg, "crystalspace.mesh.object.thing");
   if (!ThingType)
@@ -858,11 +858,14 @@ static csPtr<iMeshWrapper> CreateMeshWrapper (const char* name)
   csRef<iMeshWrapper> mesh_wrap =
   	Sys->Engine->CreateMeshWrapper (mesh_obj, name);
   return csPtr<iMeshWrapper> (mesh_wrap);
+#endif
+  return 0;
 }
 
 static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
     	iMaterialWrapper* tm, int& portalPoly)
 {
+#if 0
   csRef<iMeshWrapper> thing = CreateMeshWrapper (name);
   csRef<iThingFactoryState> thing_fact_state = 
     scfQueryInterface<iThingFactoryState> (
@@ -1029,10 +1032,13 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
   linfo->PrepareLighting ();
 
   return csPtr<iMeshWrapper> (thing);
+#endif
+  return 0;
 }
 
 void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
 {
+#if 0
   iSector* room = view->GetCamera ()->GetSector ();
   csVector3 pos = view->GetCamera ()->GetTransform ().This2Other (
   	csVector3 (0, 0, 1));
@@ -1124,5 +1130,6 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
 
   if (!collectionExists)
     Sys->InitCollDet (Sys->Engine, collection);
+#endif
 }
 

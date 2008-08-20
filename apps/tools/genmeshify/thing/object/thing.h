@@ -44,7 +44,7 @@
 #include "iengine/shadcast.h"
 #include "imesh/lighting.h"
 #include "imesh/object.h"
-#include "imesh/thing.h"
+#include "../thing.h"
 #include "iutil/comp.h"
 #include "iutil/dbghelp.h"
 #include "iutil/eventh.h"
@@ -66,9 +66,6 @@ struct iMovable;
 struct iFrustumView;
 struct iMaterialWrapper;
 struct iPolygonBuffer;
-
-CS_PLUGIN_NAMESPACE_BEGIN(Thing)
-{
 
 class csThing;
 class csThingStatic;
@@ -1115,8 +1112,5 @@ public:
   virtual bool DebugCommand (const char* cmd);
   /** @} */
 };
-
-}
-CS_PLUGIN_NAMESPACE_END(Thing)
 
 #endif // __CS_THING_H__

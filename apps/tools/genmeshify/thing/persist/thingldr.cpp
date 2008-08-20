@@ -40,7 +40,7 @@
 #include "imap/loader.h"
 #include "imap/services.h"
 #include "imesh/object.h"
-#include "imesh/thing.h"
+#include "../thing.h"
 #include "iutil/comp.h"
 #include "iutil/document.h"
 #include "iutil/eventh.h"
@@ -52,14 +52,10 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
 #include "ivideo/texture.h"
+#include "../object/thing.h"
 
 
 #include "thingldr.h"
-
-CS_IMPLEMENT_PLUGIN
-
-CS_PLUGIN_NAMESPACE_BEGIN(ThingLoader)
-{
 
 enum
 {
@@ -106,6 +102,24 @@ SCF_IMPLEMENT_FACTORY (csThingLoader)
 SCF_IMPLEMENT_FACTORY (csThingFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csThingSaver)
 SCF_IMPLEMENT_FACTORY (csThingFactorySaver)
+
+static csRef<iMeshObjectType> GetThing (iObjectRegistry* object_reg)
+{
+  csRef<iMeshObjectType> thing_type;
+  thing_type = csQueryRegistryTagInterface<iMeshObjectType> (object_reg, "genmeshify.thing");
+  if (!thing_type)
+  {
+    thing_type.AttachNew (new csThingObjectType (0));
+    csRef<iComponent> comp = scfQueryInterface<iComponent> (thing_type);
+    if (!comp->Initialize (object_reg))
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "genmeshify", "Can't initialize thing mesh object!");
+      return 0;
+    }
+    object_reg->Register (thing_type, "genmeshify.thing");
+  }
+  return thing_type;
+}
 
 //---------------------------------------------------------------------------
 
@@ -418,17 +432,7 @@ bool csThingLoader::ParsePoly3d (
   poly_delete = false;
   iMaterialWrapper* mat = 0;
 
-  if (!thing_type)
-  {
-    csRef<iPluginManager> plugin_mgr =
-    	csQueryRegistry<iPluginManager> (object_reg);
-    CS_ASSERT (plugin_mgr != 0);
-    thing_type = csQueryPluginClass<iMeshObjectType> (plugin_mgr,
-  	  "crystalspace.mesh.object.thing" );
-    if (!thing_type)
-      thing_type = csLoadPlugin<iMeshObjectType> (plugin_mgr,
-    	  "crystalspace.mesh.object.thing");
-  }
+  if (!thing_type) thing_type = GetThing (object_reg);
 
   CS_ASSERT (thing_type != 0);
   csRef<iThingEnvironment> te = scfQueryInterface<iThingEnvironment> (
@@ -1132,7 +1136,7 @@ Nag to Jorrit about this feature if you want it.");
         CHECK_TOPLEVEL("replacematerial");
         CHECK_OBJECTONLY("replacematerial");
 	{
-	  int idx = (int)info.replace_materials.Push (RepMaterial ());
+	  int idx = (int)info.replace_materials.Push (LdrRepMaterial ());
 	  info.replace_materials[idx].oldmat = csStrNew (
 		child->GetAttributeValue ("old"));
 	  info.replace_materials[idx].newmat = csStrNew (
@@ -1212,22 +1216,7 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
   info.load_factory = false;
   info.global_factory = false;
 
-  csRef<iPluginManager> plugin_mgr = 
-    csQueryRegistry<iPluginManager> (object_reg);
-  info.type = csQueryPluginClass<iMeshObjectType> (plugin_mgr,
-  	"crystalspace.mesh.object.thing");
-  if (!info.type)
-  {
-    info.type = csLoadPlugin<iMeshObjectType> (plugin_mgr, 
-      "crystalspace.mesh.object.thing");
-  }
-  if (!info.type)
-  {
-    synldr->ReportError (
-		"crystalspace.thingloader.setup.objecttype",
-		node, "Could not load the thing mesh object plugin!");
-    return 0;
-  }
+  if (!info.type) info.type = GetThing (object_reg);
   csRef<iThingEnvironment> te = 
     scfQueryInterface<iThingEnvironment> (info.type);
   csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
@@ -1253,7 +1242,7 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
     size_t i;
     for (i = 0 ; i < info.replace_materials.GetSize () ; i++)
     {
-      RepMaterial& rm = info.replace_materials[i];
+      LdrRepMaterial& rm = info.replace_materials[i];
       iMaterialWrapper* old_mat = ldr_context->FindMaterial (rm.oldmat);
       if (!old_mat)
       {
@@ -1295,22 +1284,7 @@ csPtr<iBase> csThingFactoryLoader::Parse (iDocumentNode* node,
   info.load_factory = true;
   info.global_factory = false;
 
-  csRef<iPluginManager> plugin_mgr (
-    csQueryRegistry<iPluginManager> (object_reg));
-  info.type = csQueryPluginClass<iMeshObjectType> (plugin_mgr,
-  	"crystalspace.mesh.object.thing");
-  if (!info.type)
-  {
-    info.type = csLoadPlugin<iMeshObjectType> (plugin_mgr, 
-      "crystalspace.mesh.object.thing");
-  }
-  if (!info.type)
-  {
-    synldr->ReportError (
-		"crystalspace.thingloader.setup.objecttype",
-		node, "Could not load the thing mesh object plugin!");
-    return 0;
-  }
+  if (!info.type) info.type = GetThing (object_reg);
   csRef<iThingEnvironment> te = 
     scfQueryInterface<iThingEnvironment> (info.type);
   csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
@@ -1480,5 +1454,3 @@ bool csThingSaver::WriteFactory (iBase* obj, iDocumentNode* parent)
   return true;
 }
 
-}
-CS_PLUGIN_NAMESPACE_END(ThingLoader)
