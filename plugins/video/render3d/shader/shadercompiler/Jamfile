@@ -7,7 +7,7 @@ Description shadercompiler : "shader compiler" ;
 Plugin shadercompiler :
 	[ Wildcard xmlshader : *.cpp *.h ]
 	[ Wildcard xmlshader cpi : *.cpp *.h ]
-	[ Wildcard shaderweaver : *.cpp *.h ]
+	[ Wildcard weaver : *.cpp *.h ]
 	;
 
 LinkWith shadercompiler : crystalspace ;
