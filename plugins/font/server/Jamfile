@@ -1,5 +1,13 @@
 SubDir TOP plugins font server ;
 
-SubInclude TOP plugins font server csfont ;
-SubInclude TOP plugins font server fontplex ;
+#SubInclude TOP plugins font server csfont ;
+#SubInclude TOP plugins font server fontplex ;
 SubInclude TOP plugins font server freefnt2 ;
+
+Description csfont : "default font server" ;
+Plugin csfont :
+	[ Wildcard csfont : *.cpp *.h ]
+	[ Wildcard fontplex : *.cpp *.h ] 
+	;
+LinkWith csfont : crystalspace ;
+CompileGroups csfont : fontservers ;
