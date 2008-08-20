@@ -48,13 +48,15 @@ csTerrainSystem::csTerrainSystem (iMeshObjectFactory* factory,
     virtualViewDistance (2.0f), maxLoadedCells (~0), autoPreload (false),
     bbStarted (false)
 {
-  renderer->ConnectTerrain (this);
+  if (renderer)
+    renderer->ConnectTerrain (this);
 }
 
 csTerrainSystem::~csTerrainSystem ()
 {
   cells.Empty();
-  renderer->DisconnectTerrain (this);
+  if (renderer)
+    renderer->DisconnectTerrain (this);
 }
 
 void csTerrainSystem::AddCell (csTerrainCell* cell)
@@ -472,6 +474,12 @@ iMeshObjectFactory* csTerrainSystem::GetFactory () const
 csRenderMesh** csTerrainSystem::GetRenderMeshes (int& num, iRenderView* rview, 
     iMovable* movable, uint32 frustum_mask)
 {
+  if (!renderer)
+  {
+    num = 0;
+    return 0;
+  }
+
   csArray<iTerrainCell*> neededCells;
   
   csOrthoTransform c2ot = rview->GetCamera ()->GetTransform ();
