@@ -313,7 +313,10 @@ struct iSequenceWrapper : public virtual iBase
    * \param polygon is a parameter that represents a polygon on which the
    * material should be set.
    * \param mat is a parameter that represents the material to set.
+   * \deprecated Deprecated in 1.3. Thing objects are deprecated and this
+   * function only works on things.
    */
+  CS_DEPRECATED_METHOD_MSG("Deprecated since thing objects are deprecated.")
   virtual void AddOperationSetPolygonMaterial (csTicks time,
   		  iParameterESM* polygon, iParameterESM* mat) = 0;
 

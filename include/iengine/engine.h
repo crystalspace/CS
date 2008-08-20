@@ -311,22 +311,33 @@ struct iEngine : public virtual iBase
    * this are not lit.  
    * \param w lightmap width 
    * \param h lightmap height
+   * \deprecated Deprecated in 1.3 since thing meshes are deprecated.
    */
+  CS_DEPRECATED_METHOD_MSG("Since thing meshes are deprecated SetMaxLightmapSize() is too.")
   virtual void SetMaxLightmapSize (int w, int h) = 0;
 
-  /** Retrieve maximum lightmap size.
+  /**\
+   * Retrieve maximum lightmap size.
    * \param w lightmap width
    * \param h lightmap height
+   * \deprecated Deprecated in 1.3 since thing meshes are deprecated.
   */
+  CS_DEPRECATED_METHOD_MSG("Since thing meshes are deprecated GetMaxLightmapSize() is too.")
   virtual void GetMaxLightmapSize (int& w, int& h) = 0;
 
   /** Retrieve default maximum lightmap size.  
    * \param w lightmap width
    * \param h lightmap height
+   * \deprecated Deprecated in 1.3 since thing meshes are deprecated.
   */
+  CS_DEPRECATED_METHOD_MSG("Since thing meshes are deprecated GetDefaultMaxLightmapSize() is too.")
   virtual void GetDefaultMaxLightmapSize (int& w, int& h) = 0;
 
-  /// Get the maximum aspect ratio for lightmaps.
+  /**
+   * Get the maximum aspect ratio for lightmaps.
+   * \deprecated Deprecated in 1.3 since thing meshes are deprecated.
+   */
+  CS_DEPRECATED_METHOD_MSG("Since thing meshes are deprecated GetMaxLightmapAspectRatio() is too.")
   virtual int GetMaxLightmapAspectRatio () const = 0;
   
   /** @} */
