@@ -37,8 +37,6 @@
 #include "csgfx/packrgb.h"
 #include "csutil/databuf.h"
 
-CS_IMPLEMENT_PLUGIN
-
 CS_PLUGIN_NAMESPACE_BEGIN(TGAImageIO)
 {
 

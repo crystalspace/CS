@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!-- csimg.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphic.image.io.bmp</name>
+        <implementation>csBMPImageIO</implementation>
+        <description>CrystalSpace BMP image format I/O plugin</description>
+      </class>
+      <class>
+        <name>crystalspace.graphic.image.io.dds</name>
+        <implementation>csDDSImageIO</implementation>
+        <description>DDS image format I/O plugin</description>
+      </class>
+      <class>
+        <name>crystalspace.graphic.image.io.gif</name>
+        <implementation>csGIFImageIO</implementation>
+        <description>CrystalSpace GIF image format I/O plugin</description>
+      </class>
+      <class>
+        <name>crystalspace.graphic.image.io.multiplexer</name>
+        <implementation>csImageIOMultiplexer</implementation>
+        <description>Image file format multiplexer plug-in.</description>
+      </class>
+      <class>
+        <name>crystalspace.graphic.image.io.tga</name>
+        <implementation>csTGAImageIO</implementation>
+        <description>CrystalSpace TGA image format I/O plugin</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

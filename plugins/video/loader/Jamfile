@@ -1,11 +1,34 @@
 SubDir TOP plugins video loader ;
 
-SubInclude TOP plugins video loader bmp ;
-SubInclude TOP plugins video loader dds ;
-SubInclude TOP plugins video loader gif ;
+#SubInclude TOP plugins video loader bmp ;
+#SubInclude TOP plugins video loader dds ;
+#SubInclude TOP plugins video loader gif ;
 SubInclude TOP plugins video loader jng ;
 SubInclude TOP plugins video loader jpg ;
-SubInclude TOP plugins video loader mplex ;
+#SubInclude TOP plugins video loader mplex ;
 SubInclude TOP plugins video loader png ;
 SubInclude TOP plugins video loader svg ;
-SubInclude TOP plugins video loader tga ;
+#SubInclude TOP plugins video loader tga ;
+
+Description csimg : "image loader" ;
+
+DDS_IMAGELIB_REJECT =
+  [ Wildcard [ ConcatDirs dds ImageLib ] : Load*.* ]
+  [ Wildcard [ ConcatDirs dds ImageLib ] : CodeBook4MMX*.* ]
+  [ ConcatDirs dds ImageLib Usage.cpp ]
+  ;
+DDS_IMAGELIB_SOURCES = 
+  [ Filter [ Wildcard [ ConcatDirs dds ImageLib ] : *.cpp *.h ] : $(DDS_IMAGELIB_REJECT) ] ;
+Plugin csimg :
+	[ Wildcard *.cpp ]
+	[ Wildcard bmp : *.cpp *.h ]
+	[ Wildcard dds : *.cpp *.h ]
+	$(DDS_IMAGELIB_SOURCES)
+	[ Wildcard gif : *.cpp *.h ]
+	[ Wildcard mplex : *.cpp *.h ]
+	[ Wildcard tga : *.cpp *.h ]
+;
+LinkWith csimg : crystalspace ;
+
+CompileGroups csimg :  imageloaders ;
+

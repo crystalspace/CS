@@ -28,8 +28,6 @@
 
 #define DDS_MIME "image/dds"
 
-CS_IMPLEMENT_PLUGIN
-
 CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
 {
 
