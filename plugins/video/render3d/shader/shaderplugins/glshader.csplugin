@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!-- glshader_arb.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics3d.shader.glarb</name>
+        <implementation>csGLShader_ARB</implementation>
+        <description>OpenGL specific shaderprogram provider for Graphics3D</description>
+      </class>
+      <class>
+        <name>crystalspace.graphics3d.shader.glfixed</name>
+        <implementation>csGLShader_FIXED</implementation>
+        <description>OpenGL fixed function shader provider for Render3D</description>
+      </class>
+      <class>
+        <name>crystalspace.graphics3d.shader.glps1</name>
+        <implementation>csGLShader_PS1</implementation>
+		<description>OpenGL specific shaderprogram provider for Graphics3D which compiles PS 1.x programs into OpenGL equivalents</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
