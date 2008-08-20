@@ -524,6 +524,33 @@ public:
 
   private:
     bool display_time;
+
+    /**
+    * Embedded iEventHandler interface that handles frame events in the
+    * logic phase.
+    */
+    class LogicEventHandler : 
+      public scfImplementation1<LogicEventHandler, 
+      iEventHandler>
+    {
+    private:
+      csWeakRef<csBugPlug> parent;
+    public:
+      LogicEventHandler (csBugPlug* parent) :
+          scfImplementationType (this), parent (parent) { }
+      virtual ~LogicEventHandler () { }
+      virtual bool HandleEvent (iEvent& ev)
+      {
+        if (parent && (ev.Name == parent->Frame))
+        {      
+          return parent->HandleStartFrame (ev);
+        }
+
+        return false;
+      }
+      CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.bugplug.frame.logic")
+    };
+    csRef<LogicEventHandler> logicEventHandler;
 };
 
 }

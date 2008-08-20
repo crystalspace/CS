@@ -34,6 +34,7 @@
 #include "csutil/weakref.h"
 #include "csutil/weakrefarr.h"
 #include "csutil/eventnames.h"
+#include "csutil/eventhandlers.h"
 #include "iengine/campos.h"
 #include "iengine/engine.h"
 #include "iengine/renderloop.h"
@@ -632,8 +633,7 @@ public:
   // -- iEventHandler
   bool HandleEvent (iEvent &Event);
 
-  CS_EVENTHANDLER_NAMES("crystalspace.engine.3d")
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
+  CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.engine.3d")
 
   // -- iDebugHelper
   

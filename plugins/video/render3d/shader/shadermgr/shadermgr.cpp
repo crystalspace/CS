@@ -26,6 +26,8 @@
 #include "csutil/objreg.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
+#include "csutil/eventhandlers.h"
+#include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/callstack.h"
@@ -73,8 +75,8 @@ csShaderManager::csShaderManager(iBase* parent) :
 {
   shaderVarStack.AttachNew (new scfArray<iShaderVarStack>);
   seqnumber = 0;
-  eventSucc[0] = CS_HANDLERLIST_END;
-  eventSucc[1] = CS_HANDLERLIST_END;
+  //eventSucc[0] = CS_HANDLERLIST_END;
+  //eventSucc[1] = CS_HANDLERLIST_END;
 }
 
 csShaderManager::~csShaderManager()
@@ -111,18 +113,18 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   else
     do_verbose = false;
 
-  PreProcess = csevPreProcess(objectreg);
+  Frame = csevFrame(objectreg);
   SystemOpen = csevSystemOpen(objectreg);
   SystemClose = csevSystemClose(objectreg);
 
   csRef<iEventHandlerRegistry> handlerReg = 
     csQueryRegistry<iEventHandlerRegistry> (objectreg);
-  eventSucc[0] = handlerReg->GetGenericID ("crystalspace.graphics3d");
+  //eventSucc[0] = handlerReg->GetGenericID ("crystalspace.graphics3d");
 
   csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (objectreg);
   if (q)
   {
-    csEventID events[] = { PreProcess, SystemOpen, SystemClose, 
+    csEventID events[] = { Frame, SystemOpen, SystemClose, 
 			    CS_EVENTLIST_END };
     RegisterWeakListener (q, this, events, weakEventHandler);
   }
@@ -254,7 +256,7 @@ void csShaderManager::UnregisterShaderVariableAcessors ()
 
 bool csShaderManager::HandleEvent(iEvent& event)
 {
-  if (event.Name == PreProcess)
+  if (event.Name == Frame)
   {
     UpdateStandardVariables();
     return false;

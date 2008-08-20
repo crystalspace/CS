@@ -816,7 +816,19 @@ void start_console ()
 
 void WalkTest::EndEngine ()
 {
-  //  delete view; view = 0;
+  if (e3DEventHandler)
+  {
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
+    if (q)
+      q->RemoveListener (e3DEventHandler);
+  }
+
+  if (frameEventHandler)
+  {
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
+    if (q)
+      q->RemoveListener (frameEventHandler);
+  }
 }
 
 void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
@@ -868,17 +880,7 @@ static bool WalkEventHandler (iEvent& ev)
   if (!Sys)
     return false;
 
-  if (ev.Name == Sys->Process)
-  {
-    Sys->SetupFrame ();
-    return true;
-  }
-  else if (ev.Name == Sys->FinalProcess)
-  {
-    Sys->FinishFrame ();
-    return true;
-  }
-  else if (ev.Name == Sys->CommandLineHelp)
+  if (ev.Name == Sys->CommandLineHelp)
   {
     Sys->Help ();
     return true;
@@ -956,10 +958,32 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     return false;
   }
 
+  CS_INITIALIZE_FRAME_EVENT_SHORTCUTS (object_reg);
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
+
+  if (!e3DEventHandler)
+  {
+    e3DEventHandler.AttachNew (new E3DEventHandler (this));
+  }
+  if (q != 0)
+  {
+    csEventID events[2] = { Frame, CS_EVENTLIST_END };
+    q->RegisterListener (e3DEventHandler, events);
+  }
+
+  if (!frameEventHandler)
+  {
+    frameEventHandler.AttachNew (new FrameEventHandler (this));
+  }
+  if (q != 0)
+  {
+    csEventID events[2] = { Frame, CS_EVENTLIST_END };
+    q->RegisterListener (frameEventHandler, events);
+  }
+
+
   //Must have before help is called
   name_reg = csEventNameRegistry::GetRegistry (object_reg);
-  Process = csevProcess (name_reg);
-  FinalProcess = csevFinalProcess (name_reg);
   CommandLineHelp = csevCommandLineHelp (name_reg);
   
 

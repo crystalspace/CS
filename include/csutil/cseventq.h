@@ -270,7 +270,7 @@ public:
       iTypedFrameEventDispatcher::parent = parent;
       sendEvent = parent->PreProcess;
     }
-    CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.frame.preprocess")
+    CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.deprecated.preprocess")
   };
   
   class ProcessFrameEventDispatcher 
@@ -285,7 +285,7 @@ public:
       iTypedFrameEventDispatcher::parent = parent;
       sendEvent = parent->ProcessEvent;
     }
-    CS_EVENTHANDLER_PHASE_3D("crystalspace.frame.process")
+    CS_EVENTHANDLER_PHASE_3D("crystalspace.deprecated.process")
   };
 
   class PostProcessFrameEventDispatcher 
@@ -300,7 +300,7 @@ public:
       iTypedFrameEventDispatcher::parent = parent;
       sendEvent = parent->PostProcess;
     }
-    CS_EVENTHANDLER_PHASE_2D("crystalspace.frame.postprocess")
+    CS_EVENTHANDLER_PHASE_2D("crystalspace.deprecated.postprocess")
   };
   
   class FinalProcessFrameEventDispatcher 
@@ -315,7 +315,7 @@ public:
       iTypedFrameEventDispatcher::parent = parent;
       sendEvent = parent->FinalProcess;
     }
-    CS_EVENTHANDLER_PHASE_FRAME("crystalspace.frame.finalprocess")
+    CS_EVENTHANDLER_PHASE_FRAME("crystalspace.deprecated.finalprocess")
   };
 };
 

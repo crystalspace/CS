@@ -674,7 +674,7 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
 
     csRef<csImposterEventHandler> imphandler;
     imphandler.AttachNew (new csImposterEventHandler (this));
-    q->RegisterListener (imphandler, csevPreProcess (objectRegistry));
+    q->RegisterListener (imphandler, csevFrame (objectRegistry));
   }
 
   csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
