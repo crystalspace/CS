@@ -1,4 +1,18 @@
 SubDir TOP plugins mesh spr3d ;
 
-SubInclude TOP plugins mesh spr3d object ;
-SubInclude TOP plugins mesh spr3d persist ;
+#SubInclude TOP plugins mesh spr3d object ;
+#SubInclude TOP plugins mesh spr3d persist ;
+
+Description spr3d : "3D Sprite mesh object plugin" ;
+
+Plugin spr3d
+	: [ Wildcard object : *.cpp *.h ]
+	[ Wildcard [ ConcatDirs persist binary ] : *.cpp *.h ]
+	[ Wildcard [ ConcatDirs persist spr3md2 ] : *.cpp *.h ]
+	[ Wildcard [ ConcatDirs persist standard ] : *.cpp *.h ]
+;
+LinkWith spr3d : crystalspace ;
+
+CompileGroups spr3d :  meshes ;
+
+

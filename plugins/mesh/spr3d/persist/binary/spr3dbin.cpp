@@ -52,8 +52,6 @@
 
 #include "spr3dbin.h"
 
-CS_IMPLEMENT_PLUGIN
-
 using namespace CS::Plugins::Spr3dBin;
 
 /**

@@ -60,8 +60,6 @@
 
 #include <ctype.h>
 
-CS_IMPLEMENT_PLUGIN
-
 struct csVertexTexel
 {
   int vt;

@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!-- spr3d.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.sprite.3d</name>
+        <implementation>csSprite3DMeshObjectType</implementation>
+        <description>Crystal Space Sprite3D Mesh Type</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.loader.factory.sprite.3d.binary</name>
+        <implementation>csSprite3DBinFactoryLoader</implementation>
+        <description>Crystal Space Sprite3DBin Mesh Factory Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.factory.sprite.3d.binary</name>
+        <implementation>csSprite3DBinFactorySaver</implementation>
+        <description>Crystal Space Sprite3DBin Mesh Factory Saver</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.loader.factory.sprite.3d.md2</name>
+        <implementation>csSprite3DMD2FactoryLoader</implementation>
+        <description>Crystal Space Sprite3D MD2 Mesh Factory Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.loader.factory.sprite.3d</name>
+        <implementation>csSprite3DFactoryLoader</implementation>
+        <description>Crystal Space Sprite3D Mesh Factory Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.loader.sprite.3d</name>
+        <implementation>csSprite3DLoader</implementation>
+        <description>Crystal Space Sprite3D Mesh Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.factory.sprite.3d</name>
+        <implementation>csSprite3DFactorySaver</implementation>
+        <description>Crystal Space Sprite3D Mesh Factory Saver</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.sprite.3d</name>
+        <implementation>csSprite3DSaver</implementation>
+        <description>Crystal Space Sprite3D Mesh Saver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
