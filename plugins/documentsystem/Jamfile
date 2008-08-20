@@ -1,6 +1,19 @@
 SubDir TOP plugins documentsystem ;
 
-SubInclude TOP plugins documentsystem binary ;
-SubInclude TOP plugins documentsystem dsplex ;
-SubInclude TOP plugins documentsystem xmlread ;
-SubInclude TOP plugins documentsystem xmltiny ;
+#SubInclude TOP plugins documentsystem binary ;
+#SubInclude TOP plugins documentsystem dsplex ;
+#SubInclude TOP plugins documentsystem xmlread ;
+#SubInclude TOP plugins documentsystem xmltiny ;
+
+Description docsys : "document system" ;
+
+Plugin docsys :
+	[ Wildcard *.cpp ]
+	[ Wildcard binary : *.cpp *.h ]
+	[ Wildcard dsplex : *.cpp *.h ]
+	[ Wildcard xmlread : *.cpp *.h ]
+	[ Wildcard xmltiny : *.cpp *.h ]
+;
+LinkWith docsys : crystalspace ;
+
+
