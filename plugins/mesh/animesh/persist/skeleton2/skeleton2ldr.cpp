@@ -29,8 +29,6 @@
 
 #include "skeleton2ldr.h"
 
-CS_IMPLEMENT_PLUGIN
-
 CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
 {
   SCF_IMPLEMENT_FACTORY(SkeletonLoader);

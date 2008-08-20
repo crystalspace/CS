@@ -1,5 +1,16 @@
 SubDir TOP plugins mesh animesh ;
 
-SubInclude TOP plugins mesh animesh object ;
-SubInclude TOP plugins mesh animesh persist ;
-SubInclude TOP plugins mesh animesh skeleton2 ;
+#SubInclude TOP plugins mesh animesh object ;
+#SubInclude TOP plugins mesh animesh persist ;
+#SubInclude TOP plugins mesh animesh skeleton2 ;
+
+Description animesh : "Animated mesh object plugin" ;
+Plugin animesh :
+	[ Wildcard object : *.cpp *.h ]
+	[ Wildcard persist skeleton2 : *.cpp *.h ]
+	[ Wildcard persist standard : *.cpp *.h ]
+	[ Wildcard skeleton2 : *.cpp *.h ]
+	;
+LinkWith animesh : crystalspace ;
+CompileGroups animesh : meshes ;
+

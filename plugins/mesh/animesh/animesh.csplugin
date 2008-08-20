@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!-- animesh.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.animesh</name>
+        <implementation>AnimeshObjectType</implementation>
+        <description>Crystal Space Animated Mesh Type</description>
+      </class>
+      <class>
+        <name>crystalspace.skeletalanimation.loader</name>
+        <implementation>SkeletonLoader</implementation>
+        <description>Crystal Space Skeletal animation loader plugin</description>
+      </class>    
+      <class>
+        <name>crystalspace.mesh.loader.factory.animesh</name>
+        <implementation>AnimeshFactoryLoader</implementation>
+        <description>Crystal Space Animated Mesh Factory Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.loader.animesh</name>
+        <implementation>AnimeshObjectLoader</implementation>
+        <description>Crystal Space Animated Mesh Mesh Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.factory.animesh</name>
+        <implementation>AnimeshFactorySaver</implementation>
+        <description>Crystal Space Animated Mesh Factory Saver</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.animesh</name>
+        <implementation>AnimeshObjectSaver</implementation>
+        <description>Crystal Space Animated Mesh Mesh Saver</description>
+      </class>
+      <class>
+        <name>crystalspace.skeletalanimation</name>
+        <implementation>SkeletonSystem</implementation>
+        <description>Crystal Space Skeletal animation plugin</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
