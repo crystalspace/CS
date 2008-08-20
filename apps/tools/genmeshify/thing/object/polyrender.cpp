@@ -31,9 +31,6 @@
 #include "polyrender.h"
 #include "thing.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(Thing)
-{
-
 CS_LEAKGUARD_IMPLEMENT (csPolygonRenderer);
 
 csPolygonRenderer::csPolygonRenderer (csThingObjectType* parent) : csRefCount(),
@@ -653,5 +650,3 @@ void csPolygonRenderer::BufferAccessor::PreGetBuffer (
     renderer->PreGetBuffer (holder, buffer);
 }
 
-}
-CS_PLUGIN_NAMESPACE_END(Thing)

@@ -405,13 +405,13 @@ The plugin section is purely for convenience later. Normally when creating
 mesh objects you have to specify the @sc{scf} class name of the loader
 which will parse the @sc{xml} data for that mesh object. This is a long
 name. The plugin section allows you to define shorter names for those
-plugins. Here is an example where names are defined for the thing,
+plugins. Here is an example where names are defined for the genmesh,
 spr3d, and spr3dfact plugins:
 
 @example
 <plugins>
-    <plugin name="thing">
-        crystalspace.mesh.loader.thing
+    <plugin name="genmesh">
+        crystalspace.mesh.loader.genmesh
     </plugin>
     <plugin name="spr3dFact">
         crystalspace.mesh.loader.factory.sprite.3d
@@ -460,11 +460,6 @@ every object will also get ambient lighting. Ambient lighting is global to
 the engine (at least static ambient lighting). You can set the ambient
 for a level in the settings block. Default ambient is 0.078 for all color
 components.
-
-With @samp{fastmesh} you can control at which point Crystal Space will use
-@samp{CS_THING_FASTMESH} for a thing. This is a faster routine (in principle)
-but at this moment it only seems to pay off for objects with a high
-number of polygons. The default is 500.
 
 @subsubheading Start Location Section
 @cindex start location (Map File)
@@ -591,18 +586,6 @@ that are all on the same plane. Here is an example of both:
         <v>18</v>
     </params>
 </addon>
-
-<addon>
-    <plugin>crystalspace.mesh.loader.thing.plane</plugin>
-    <params>
-        <name>floor_plane</name>
-        <orig x="-20" y="-1" z="20" />
-        <first x="-19" y="-1" z="20" />
-        <firstlen>5</firstlen>
-        <second x="-20" y="-1" z="19" />
-        <secondlen>5</secondlen>
-    </params>
-</addon>
 @end example
 
 I will only explain the second example here as bezier curves are likely
@@ -610,14 +593,6 @@ to change in the not-too-distant future. Important in both examples is
 that the part inside the @samp{params} block is parsed by the addon itself.
 It is also possible to specify the parameters of a plugin in another
 @sc{xml} file in which case you can use @samp{paramsfile}.
-
-The plane addon that is used above defines a horizontal texture plane at
-location @emph{y} equal to @samp{-1}. The dimension of the texture on
-that plane will be 5x5 units. This means that in the space of a 5x5 unit
-block the texture will be shown exactly one time. If the polygons are bigger
-then that then tiling will be used. When you define @samp{thing} mesh objects
-you can use this plane if the polygon happens to be at @emph{y} equal to
-@samp{-1}.
 
 @subsubheading Mesh Factory Section
 @cindex mesh factories (Map File)
@@ -686,33 +661,10 @@ Here is an example sector:
 @example
 <sector name="room">
   <meshobj name="walls">
-    <plugin>crystalspace.mesh.loader.thing</plugin>
+    <plugin>crystalspace.mesh.loader.genmesh</plugin>
     <zfill />
     <params>
-      <v x="-10" y="-1" z="10"/> <v x="10" y="-1" z="10"/>
-      <v x="-10" y="-1" z="-10"/> <v x="10" y="-1" z="-10"/>
-      <v x="-10" y="4" z="10"/> <v x="10" y="4" z="10"/>
-      <v x="-10" y="4" z="-10"/> <v x="10" y="4" z="-10"/>
-      <material>wood</material>
-      <texlen>4</texlen>
-      <p name="up">
-        <v>6</v> <v>7</v> <v>5</v> <v>4</v>
-      </p>
-      <p name="down">
-        <v>3</v> <v>2</v> <v>0</v> <v>1</v>
-      </p>
-      <p name="back">
-        <v>7</v> <v>6</v> <v>2</v> <v>3</v>
-      </p>
-      <p name="front">
-        <v>4</v> <v>5</v> <v>1</v> <v>0</v>
-      </p>
-      <p name="left">
-        <v>6</v> <v>4</v> <v>0</v> <v>2</v>
-      </p>
-      <p name="right">
-        <v>5</v> <v>7</v> <v>3</v> <v>1</v>
-      </p>
+      @dots{}
     </params>
   </meshobj>
   <light>
@@ -726,7 +678,7 @@ Here is an example sector:
 In the above example we create a sector called @samp{room} which contains
 one mesh object (the outer walls of the sector) and one light. Any type
 of mesh object can be placed in a sector. In this example we use the
-@samp{thing} mesh object.
+@samp{genmesh} mesh object.
 
 There are some other things you can specify in a sector. By default a
 sector will use the @samp{frustvis} visibility culler. This visibility culler

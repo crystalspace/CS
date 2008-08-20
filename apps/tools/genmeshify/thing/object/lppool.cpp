@@ -22,9 +22,6 @@
 #include "polygon.h"
 #include "iengine/shadows.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(Thing)
-{
-
 csLightPatch::csLightPatch ()
 {
   next = prev = 0;
@@ -59,5 +56,3 @@ void csLightPatch::Initialize (int n)
   num_vertices = n;
 }
 
-}
-CS_PLUGIN_NAMESPACE_END(Thing)

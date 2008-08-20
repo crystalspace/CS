@@ -46,9 +46,6 @@
 #include "lppool.h"
 #include "thing.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(Thing)
-{
-
 // This is a static vector array which is adapted to the
 // right size everytime it is used. In the beginning it means
 // that this array will grow a lot but finally it will
@@ -612,8 +609,8 @@ bool csPolygon3DStatic::Finish (iBase* thing_logparent)
         polygon_data.tmapping->GetLitWidth ());
     int lmh = csLightMap::CalcLightMapHeight (
         polygon_data.tmapping->GetLitHeight ());
-    int max_lmw, max_lmh;
-    thing_static->thing_type->engine->GetMaxLightmapSize (max_lmw, max_lmh);
+    int max_lmw = 256, max_lmh = 256;
+    //@@@thing_static->thing_type->engine->GetMaxLightmapSize (max_lmw, max_lmh);
     if ((lmw > max_lmw) || (lmh > max_lmh))
     {
       const char* mname = 0;
@@ -1579,5 +1576,3 @@ bool csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
     return false;
 }
 
-}
-CS_PLUGIN_NAMESPACE_END(Thing)

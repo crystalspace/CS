@@ -36,15 +36,12 @@ struct iThingFactoryState;
 struct iMeshObject;
 struct iMeshObjectType;
 
-CS_PLUGIN_NAMESPACE_BEGIN(ThingLoader)
-{
-
-struct RepMaterial
+struct LdrRepMaterial
 {
   char* oldmat;
   char* newmat;
-  RepMaterial () : oldmat (0), newmat (0) { }
-  ~RepMaterial () { delete[] oldmat; delete[] newmat; }
+  LdrRepMaterial () : oldmat (0), newmat (0) { }
+  ~LdrRepMaterial () { delete[] oldmat; delete[] newmat; }
 };
 
 /**
@@ -62,7 +59,7 @@ public:
   float default_texlen;
   bool load_factory;	// If true we are loading a factory.
   bool global_factory;	// We are using a global factory ('factory' or 'clone').
-  csArray<RepMaterial> replace_materials;
+  csArray<LdrRepMaterial> replace_materials;
 
   ThingLoadInfo () : default_material (0), default_texlen (1) {}
 };
@@ -213,7 +210,5 @@ public:
   };
 };
 
-}
-CS_PLUGIN_NAMESPACE_END(ThingLoader)
 
 #endif // __CS_THINGLDR_H__

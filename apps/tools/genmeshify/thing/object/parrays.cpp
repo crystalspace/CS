@@ -22,9 +22,6 @@
 #include "polygon.h"
 #include "thing.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(Thing)
-{
-
 //-----------------------------------------------+ csPolygonStaticArray +----//
 csPolygonStaticArray::~csPolygonStaticArray ()
 {
@@ -53,5 +50,3 @@ int csPolygonStaticArray::CompareKey (csPolygon3DStatic* const& Item,
   return name ? strcmp (name, Key) : -1;
 }
 
-}
-CS_PLUGIN_NAMESPACE_END(Thing)

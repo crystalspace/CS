@@ -24,9 +24,6 @@
 #include "csutil/array.h"
 #include "polygon.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(Thing)
-{
-
 class csThingObjectType;
 
 /**
@@ -110,8 +107,5 @@ public:
     csPolygonArray::thing_type = thing_type;
   }
 };
-
-}
-CS_PLUGIN_NAMESPACE_END(Thing)
 
 #endif // __CS_PARRAYS_H__

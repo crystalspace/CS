@@ -205,7 +205,7 @@ struct iEngineSequenceParameters : public virtual iBase
  */
 struct iSequenceWrapper : public virtual iBase
 {
-  SCF_INTERFACE (iSequenceWrapper, 1, 0, 0);
+  SCF_INTERFACE (iSequenceWrapper, 2, 0, 0);
   /**
    * Query iObject that is implemented by the sequence manager.
    */
@@ -306,16 +306,6 @@ struct iSequenceWrapper : public virtual iBase
    */
   virtual void AddOperationSetMaterial (csTicks time, iParameterESM* mesh,
 		  iParameterESM* mat) = 0;
-
-  /**
-   * Operation: set a material on a polygon.
-   * \param time is the relative time at which this operation will fire.
-   * \param polygon is a parameter that represents a polygon on which the
-   * material should be set.
-   * \param mat is a parameter that represents the material to set.
-   */
-  virtual void AddOperationSetPolygonMaterial (csTicks time,
-  		  iParameterESM* polygon, iParameterESM* mat) = 0;
 
   /**
    * Operation: set a light color.

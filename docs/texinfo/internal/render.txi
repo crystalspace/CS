@@ -106,11 +106,11 @@ The engine decides when to render an object, the object decides on how
 to render itself. Finally the 3D renderer will process the actual rendering
 operations done by the mesh object.
 
-The @samp{thing} mesh object type supports portals. When such a thing containing
-a portal is rendered the destination sector will be rendered recursively.
-This means that rendering of the current sector will be temporarily
-suspended while first the destination sector through that portal is rendered.
-Going through a portal results in the current @samp{iRenderView}
+The @samp{portalmesh} mesh object type supports portals. When such a portal is
+rendered the destination sector will be rendered recursively. This means
+that rendering of the current sector will be temporarily suspended while
+first the destination sector through that portal is rendered. Going through
+a portal results in the current @samp{iRenderView}
 instance to get a new clipper (a smaller clipper usually). Objects can use
 that clipper to decide if they want to be rendered or not. In some special
 cases a portal can also transform space (like a mirror). In that case the
