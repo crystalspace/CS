@@ -224,11 +224,9 @@ namespace RenderManager
             case CS_LIGHT_DIRECTIONAL:
               numFrustums = 1;
               {
-		lightProject = CS::Math::Matrix4 (
-		  1.0f/lightCutoff, 0, 0, 0,
-		  0, 1.0f/lightCutoff, 0, 0,
-		  0, 0, -1, 0,
-		  0, 0, 0, -1);
+		lightProject = CS::Math::Projections::Ortho (
+		  lightCutoff, -lightCutoff, lightCutoff, -lightCutoff,
+		  -lightCutoff, -lightNear);
 	      }
               break;
             case CS_LIGHT_POINTLIGHT:
