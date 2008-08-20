@@ -46,8 +46,6 @@
 // depend on any specific XML parser.
 #include "csutil/xmltiny.h"
 
-CS_IMPLEMENT_PLUGIN
-
 CS_PLUGIN_NAMESPACE_BEGIN(SyntaxService)
 {
 

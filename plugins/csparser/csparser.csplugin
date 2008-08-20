@@ -52,6 +52,19 @@
           <class>crystalspace.level.loader</class>
         </requires>
       </class>
+      <class>
+        <name>crystalspace.syntax.loader.service.text</name>
+        <implementation>csTextSyntaxService</implementation>
+        <description>Crystal Space loader services for textual CS syntax</description>
+      </class>
+      <class>
+        <name>crystalspace.level.saver</name>
+        <implementation>csSaver</implementation>
+        <description>Level and library file saver</description>
+        <requires>
+          <class>crystalspace.kernel.</class>
+        </requires>
+      </class>
     </classes>
   </scf>
 </plugin>
