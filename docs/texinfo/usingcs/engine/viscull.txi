@@ -98,14 +98,14 @@ more detail here because this document is related to visibility. A 2D sprite
 is a general polygon which always faces the camera. Both are considered
 detail objects (more on that later).
 
-@subsubheading Things
-@cindex Visibility of Things
-@cindex Things, Visibility
+@subsubheading GenMeshes
+@cindex Visibility of GenMeshes
+@cindex GenMeshes, Visibility
 
-Things are general objects used to define the basic geometry in a level.
+GenMeshes are general objects used to define the basic geometry in a level.
 They can move and rotate but in general their most important use is to define
 level geometry (i.e. walls, floor, ceiling, a painting on the wall, a staircase,
-a chair, etc.). Small and detailed things will be tagged as detail
+a chair, etc.). Small and detailed genmeshes will be tagged as detail
 objects.
 
 @subsubheading Curved Surfaces
@@ -131,7 +131,7 @@ also be used to cull objects that are on the terrain.
 
 In this subsection we go deeper into the structure of a sector.
 A very common case to use sectors is to define a sector with one
-thing which is convex and makes up the outer hull of the sector. Sectors
+GenMesh which is convex and makes up the outer hull of the sector. Sectors
 don't have to be defined like this but this is very common. You can then
 make a maze like structure with convex rooms connected to other convex
 rooms with portals. Non-convex attributes of the rooms can be added
@@ -163,7 +163,7 @@ many small polygons or triangles) to be included in the processor
 intensive visibility calculations. So we mark them as detail and
 we process them on a higher level for visibility (mostly by treating
 their bounding box instead of the object itself). Curved surfaces,
-sprites, and some things are all detail objects.
+sprites, and some genmeshes are all detail objects.
 
 @item
 @emph{Culling Objects}

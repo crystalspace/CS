@@ -175,7 +175,7 @@ shaders, like @samp{object2 world transform}.
 @item Rendermesh - This context is also not accessible by the user.  It 
 contains shader variables provided by mesh objects.  Usually these are 
 buffers with geometry, but in some special cases also textures (e.g. the 
-Thing mesh provides lightmaps, the terrain mesh splatting masks).
+GenMesh mesh provides lightmaps, the terrain mesh splatting masks).
 @item Mesh object wrapper - Shader variables can be attached to mesh objects 
 in order to realize per-mesh effects.  E.g. you can write a ``colorize'' 
 shader that renders a surface with a given tint and then attach shader 
