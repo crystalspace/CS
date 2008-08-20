@@ -223,6 +223,10 @@ namespace RenderManager
       return QueryUnusedTexture (width, height, dummyW, dummyH);
     }
 
+    /// Return format of textures created by a cache
+    const char* GetFormat() const { return format; }
+    /// Return flags of textures created by a cache
+    int GetFlags() const { return textureFlags; }
   private:
     csRef<iGraphics3D> g3d;
 
