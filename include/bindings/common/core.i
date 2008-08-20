@@ -304,6 +304,7 @@ typedef unsigned char uint8;
 %apply float * INOUT { float & iG };
 %apply float * INOUT { float & iB };
 
+
 %include "cstypes.h"
 
 %define CS_WRAP_PTR_IMPLEMENT(PtrName)

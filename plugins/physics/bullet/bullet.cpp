@@ -42,6 +42,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "btBulletDynamicsCommon.h"
 #include "btBulletCollisionCommon.h"
 
+#include "csutil/custom_new_enable.h"
+
 #include "bullet.h"
 
 #define COLLISION_THRESHOLD 0.01
@@ -109,6 +111,8 @@ static csRef<iTriangleMesh> FindColdetTriangleMesh(iMeshWrapper* mesh,
 }
 
 
+#include "csutil/custom_new_disable.h"
+
 static btTriangleIndexVertexArray* GenerateTriMeshData (iMeshWrapper* mesh,
 	int*& indices, btVector3*& vertices,
 	csStringID base_id, csStringID colldet_id)
@@ -146,6 +150,8 @@ static btTriangleIndexVertexArray* GenerateTriMeshData (iMeshWrapper* mesh,
 	vt_num, (btScalar*) &vertices[0].x (), vertexStride);
   return indexVertexArrays;
 }
+
+#include "csutil/custom_new_disable.h"
 
 //---------------------------------------------------------------------------
 

@@ -1536,6 +1536,8 @@ void csBinaryDocument::FreeBdNode (csBdNode* node)
   nodeAlloc->Free (node);
 }
 
+#include "csutil/custom_new_disable.h"
+
 csBinaryDocNode* csBinaryDocument::GetPoolNode (csBdNode* ptr,
     csBinaryDocNode* parent)
 {
@@ -1549,6 +1551,8 @@ csBinaryDocAttribute* csBinaryDocument::GetPoolAttr (csBdAttr* ptr,
 {
   return new (attrPool) csBinaryDocAttribute (ptr, owner);
 }
+
+#include "csutil/custom_new_enable.h"
 
 csBinaryDocNode* csBinaryDocument::GetRootNode ()
 {
