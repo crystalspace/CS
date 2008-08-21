@@ -854,29 +854,7 @@ int csThingStatic::IntersectSegmentIndex (
   csVector3 &isect,
   float *pr)
 {
-  size_t i;
-  float r, best_r = 2000000000.;
-  csVector3 cur_isect;
-  int best_p = -1;
-
-  // @@@ This routine is not very optimal. Especially for things
-  // with large number of polygons.
-  for (i = 0; i < static_polygons.GetSize (); i++)
-  {
-    csPolygon3DStatic *p = static_polygons.Get (i);
-    if (p->IntersectSegment (start, end, cur_isect, &r))
-    {
-      if (r < best_r)
-      {
-        best_r = r;
-        best_p = (int)i;
-        isect = cur_isect;
-      }
-    }
-  }
-
-  if (pr) *pr = best_r;
-  return best_p;
+  return 0;
 }
 
 csPtr<csThingStatic> csThingStatic::CloneStatic ()
@@ -997,71 +975,11 @@ void csThingStatic::GetRadius (float &rad, csVector3 &cent)
   cent = b.GetCenter ();
 }
 
-void csThingStatic::FillRenderMeshes (csThing* instance,
-        csDirtyAccessArray<csRenderMesh*>& rmeshes,
-        const csArray<RepMaterial>& repMaterials,
-        uint mixmode)
+void csThingStatic::FillRenderMeshes (csThing*,
+        csDirtyAccessArray<csRenderMesh*>&,
+        const csArray<RepMaterial>&,
+        uint)
 {
-  for (size_t i = 0; i < (litPolys.GetSize () + unlitPolys.GetSize ()); i++)
-  {
-    const csStaticPolyGroup& pg =
-      (i < litPolys.GetSize ()) ? *(litPolys[i]) :
-        *(unlitPolys[i - litPolys.GetSize ()]) ;
-    csRenderMesh* rm = thing_type->blk_rendermesh.Alloc();
-
-    csRef<csPolygonRenderer> polyRenderer;
-    if (polyRenderers.GetSize () <= i)
-    {
-      polyRenderer.AttachNew (new csPolygonRenderer (thing_type));
-      polyRenderers.Push (polyRenderer);
-
-      size_t j;
-      for (j = 0; j< pg.polys.GetSize (); j++)
-      {
-        polyRenderer->AddPolygon (pg.polys[j],
-	  &static_polygons[pg.polys[j]]->polygon_data,
-          static_polygons[pg.polys[j]]->polyBuffers.GetBuffers());
-      }
-    }
-    else
-      polyRenderer = polyRenderers[i];
-
-    rm->mixmode = mixmode;
-    iMaterialWrapper* material = pg.material;
-    for (size_t m = 0; m < repMaterials.GetSize (); m++)
-    {
-      if (repMaterials[m].old_mat == material)
-      {
-        material = repMaterials[m].new_mat;
-        break;
-      }
-    }
-    rm->material = material;
-    CS_ASSERT (material != 0);
-    rm->meshtype = CS_MESHTYPE_TRIANGLES;
-    rm->variablecontext.AttachNew (new csShaderVariableContext ());
-    csRef<csShaderVariable> sv (
-      csPtr<csShaderVariable> (new csShaderVariable (texLightmapName)));
-    rm->variablecontext->AddVariable (sv);
-    
-    csRef<iShaderVariableAccessor> sva;
-    sva.AttachNew (new LightmapTexAccessor (instance, i));
-    sv->SetAccessor (sva);
-
-    /*rm->variablecontext->GetVariable (static_data->texLightmapName)->
-      SetValue (i < litPolys.GetSize () ? litPolys[i]->SLM->GetTexture() : 0);*/
-
-    polyRenderer->PrepareRenderMesh (*rm);
-  
-    csRef<csRenderBufferHolder> bufferHolder;
-    bufferHolder.AttachNew (new csRenderBufferHolder);
-
-    polyRenderer->SetupBufferHolder (instance, bufferHolder,
-      (i < litPolys.GetSize ()));
-    rm->buffers = bufferHolder;
-
-    rmeshes.Push (rm);
-  }
 }
 
 int csThingStatic::FindPolygonByName (const char* name)
@@ -1974,63 +1892,22 @@ void csThing::InvalidateThing ()
   static_data->InvalidateShape ();
 }
 
-void csThing::BuildDecal(const csVector3* pos, float decalRadius,
-    iDecalBuilder* decalBuilder)
+void csThing::BuildDecal(const csVector3*, float,
+    iDecalBuilder*)
 {
-  size_t i;
-  csPoly3D poly;
-
-  // @@@ This routine is not very optimal. Especially for things
-  // with large number of polygons.
-  for (i = 0; i < static_data->static_polygons.GetSize (); i++)
-  {
-    csPolygon3DStatic *p = static_data->static_polygons.Get (i);
-    if (p->InSphere(*pos, decalRadius))
-    {
-      poly.SetVertexCount(0);
-      for (int a=0; a<p->GetVertexCount(); ++a)
-        poly.AddVertex(p->Vobj(a));
-
-      decalBuilder->AddStaticPoly(poly); 
-    }
-  }
 }
 
-bool csThing::HitBeamOutline (const csVector3& start,
-  const csVector3& end, csVector3& isect, float* pr)
+bool csThing::HitBeamOutline (const csVector3&,
+  const csVector3&, csVector3&, float*)
 {
-  size_t i;
-
-  // @@@ This routine is not very optimal. Especially for things
-  // with large number of polygons.
-  for (i = 0; i < static_data->static_polygons.GetSize (); i++)
-  {
-    csPolygon3DStatic *p = static_data->static_polygons.Get (i);
-    if (p->IntersectSegment (start, end, isect, pr))
-    {
-      return true;
-    }
-  }
-
   return false;
 }
 
-bool csThing::HitBeamObject (const csVector3& start,
-  const csVector3& end, csVector3& isect, float *pr, int* polygon_idx,
-  iMaterialWrapper** material)
+bool csThing::HitBeamObject (const csVector3&,
+  const csVector3&, csVector3&, float*, int*,
+  iMaterialWrapper**)
 {
-  int idx = static_data->IntersectSegmentIndex (start, end, isect, pr);
-  if (material && idx != -1)
-  {
-    iMaterialWrapper* mat = static_data->static_polygons[idx]
-    	->GetMaterialWrapper ();
-    iMaterialWrapper* mat2 = FindRealMaterial (mat);
-    if (mat2) mat = mat2;
-    *material = mat;
-  }
-  if (polygon_idx) *polygon_idx = idx;
-  if (idx == -1) return false;
-  return true;
+  return false;
 }
 
 struct MatPol
@@ -2070,47 +1947,8 @@ void csThing::InvalidateMaterialHandles ()
 // and also more correct in that a convex 3D object has no internal
 // shadowing while a convex outline may have no correspondance to internal
 // shadows.
-void csThing::AppendShadows (
-  iMovable* movable,
-  iShadowBlockList *shadows,
-  const csVector3 &origin)
+void csThing::AppendShadows (iMovable*, iShadowBlockList*, const csVector3&)
 {
-  PrepareSomethingOrOther ();
-  //@@@ Ok?
-  cached_movable = movable;
-  WorUpdate ();
-
-  iShadowBlock *list = shadows->NewShadowBlock (
-      (int)polygons.GetSize ());
-  csFrustum *frust;
-  size_t i;
-  int j;
-  csPolygon3DStatic *sp;
-  csPolygon3D *p;
-  bool cw = true;                   //@@@ Use mirroring parameter here!
-  for (i = 0; i < static_data->static_polygons.GetSize (); i++)
-  {
-    sp = static_data->static_polygons.Get (i);
-    p = &polygons.Get (i);
-
-    //if (p->GetPlane ()->VisibleFromPoint (origin) != cw) continue;
-    const csPlane3& world_plane = GetPolygonWorldPlaneNoCheck ((int)i);
-    float clas = world_plane.Classify (origin);
-    if (ABS (clas) < EPSILON) continue;
-    if ((clas <= 0) != cw) continue;
-
-    csPlane3 pl = world_plane;
-    pl.DD += origin * pl.norm;
-    pl.Invert ();
-    frust = list->AddShadow (
-        origin,
-        (void *)p,
-        sp->GetVertexCount (),
-        pl);
-    int* p_vt_idx = sp->GetVertexIndices ();
-    for (j = 0; j < sp->GetVertexCount (); j++)
-      frust->GetVertex (j).Set (Vwor (p_vt_idx[j]) - origin);
-  }
 }
 
 void csThing::GetBoundingBox (iMovable *movable, csBox3 &box)
@@ -2268,83 +2106,8 @@ void TriMeshHelper::ForceCleanup ()
 
 //----------------------------------------------------------------------
 
-void csThing::CastShadows (iMovable* movable, iFrustumView *lview)
+void csThing::CastShadows (iMovable*, iFrustumView*)
 {
-  PrepareSomethingOrOther ();
-  //@@@ Ok?
-  cached_movable = movable;
-  WorUpdate ();
-  bool ident;
-  csReversibleTransform o2c;
-  if (cached_movable->IsFullTransformIdentity ())
-  {
-    ident = true;
-  }
-  else
-  {
-    ident = false;
-    o2c = cached_movable->GetFullTransform ();
-  }
-
-  csMatrix3 m_world2tex;
-  csVector3 v_world2tex;
-
-  size_t i;
-
-  iFrustumViewUserdata* fvud = lview->GetUserdata ();
-  iLightingProcessInfo* lpi = (iLightingProcessInfo*)fvud;
-  bool dyn = lpi->IsDynamic ();
-
-  csRef<csLightingPolyTexQueue> lptq;
-  if (!dyn)
-  {
-    csRef<iLightingProcessData> lpd = lpi->QueryUserdata (
-        scfInterfaceTraits<csLightingPolyTexQueue>::GetID (),
-        scfInterfaceTraits<csLightingPolyTexQueue>::GetVersion());
-    lptq = (csLightingPolyTexQueue*)(iLightingProcessData*)lpd;
-    if (!lptq)
-    {
-      lptq = csPtr<csLightingPolyTexQueue> (new csLightingPolyTexQueue (
-          lpi->GetLight ()));
-      lpi->AttachUserdata (lptq);
-    }
-  }
-
-  bool affect = false;
-  for (i = 0; i < polygons.GetSize (); i++)
-  {
-    csPolygon3D* poly = GetPolygon3D ((int)i);
-    csPolygon3DStatic* spoly = static_data->GetPolygon3DStatic ((int)i);
-    const csPlane3& world_plane = GetPolygonWorldPlaneNoCheck ((int)i);
-    if (dyn)
-    {
-      if (poly->CalculateLightingDynamic (lview, movable, world_plane, spoly))
-        affect = true;
-    }
-    else
-    {
-      if (ident)
-      {
-        poly->GetStaticPoly ()->MappingGetTextureSpace (m_world2tex,
-                v_world2tex);
-      }
-      else
-      {
-        csMatrix3 m_obj2tex;
-        csVector3 v_obj2tex;
-        poly->GetStaticPoly ()->MappingGetTextureSpace (m_obj2tex,
-                v_obj2tex);
-        csPolyTexture* lmi = poly->GetPolyTexture ();
-        lmi->ObjectToWorld (m_obj2tex, v_obj2tex,
-                o2c, m_world2tex, v_world2tex);
-      }
-      if (poly->CalculateLightingStatic (lview, movable, lptq, true,
-                m_world2tex, v_world2tex, world_plane, spoly))
-        affect = true;
-    }
-  }
-  if (affect)
-    lpi->GetLight ()->AddAffectedLightingInfo ((iLightingInfo*)this);
 }
 
 void csThing::InitializeDefault (bool clear)
@@ -2507,74 +2270,9 @@ void csThing::PrepareForUse ()
   }
 }
 
-csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
-                                         iMovable* movable, uint32 frustum_mask)
+csRenderMesh **csThing::GetRenderMeshes (int&, iRenderView*, iMovable*, uint32)
 {
-  PrepareSomethingOrOther ();
-
-  iCamera *icam = rview->GetCamera ();
-
-  // Only get the transformation if this thing can move.
-  bool can_move = false;
-  if (movable && cfg_moving != CS_THING_MOVE_NEVER)
-  {
-    can_move = true;
-  }
-
-  //@@@ Ok?
-  cached_movable = movable;
-  WorUpdate ();
-
-  const csBox3& b = static_data->GetBoundingBox ();
-
-  csSphere sphere;
-  sphere.SetCenter (b.GetCenter ());
-  sphere.SetRadius (static_data->obj_radius);
-
-  size_t i;
-
-  int clip_portal, clip_plane, clip_z_plane;
-  CS::RenderViewClipper::CalculateClipSettings (rview->GetRenderContext (),
-      frustum_mask, clip_portal, clip_plane, clip_z_plane);
-
-  const uint currentFrame = rview->GetCurrentFrameNumber ();
-  bool meshesCreated;
-  csDirtyAccessArray<csRenderMesh*>& renderMeshes =
-    meshesHolder.GetUnusedData (meshesCreated, currentFrame);
-
-  if (renderMeshes.GetSize () == 0)
-  {
-    PrepareRenderMeshes (renderMeshes);
-  }
-
-  const csVector3& wo = movable->GetFullPosition ();
-  const csReversibleTransform& t = movable->GetFullTransform ();
-
-  for (i = 0; i < renderMeshes.GetSize (); i++)
-  {
-    csRenderMesh* rm = renderMeshes[i];
-    rm->worldspace_origin = wo;
-    rm->clip_portal = clip_portal;
-    rm->clip_plane = clip_plane;
-    rm->clip_z_plane = clip_z_plane;
-    rm->do_mirror = icam->IsMirrored ();
-    rm->mixmode = mixmode;
-    rm->object2world = t;
-
-    // Jorrit: Moved the code below to PrepareRenderMeshes().
-    //rm->variablecontext->GetVariable (static_data->texLightmapName)->
-      //SetValue (i < litPolys.GetSize () ? litPolys[i]->SLM->GetTexture() : 0);
-  }
-
-  //UpdateDirtyLMs (); // @@@ Here?
-
-  num = (int)renderMeshes.GetSize ();
-  for (i = 0; i < materials_to_visit.GetSize (); i++)
-  {
-    materials_to_visit[i]->Visit ();
-  }
-
-  return renderMeshes.GetArray ();
+  return 0;
 }
 
 void csThing::PrepareLMs ()
