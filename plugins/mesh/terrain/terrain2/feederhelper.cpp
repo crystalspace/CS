@@ -297,6 +297,64 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
     return false;
   }
 
+  void SmoothHeightmap (float* heightBuffer, size_t width, size_t height, 
+    size_t pitch)
+  {
+    // We need a temporary buffer for smoothing into
+    float* tempBuffer = (float*)cs_malloc(width * height * sizeof(float));
+    
+    for (size_t passes = 0; passes < 2; ++passes)
+    {
+      // Smooth into tempBuffer
+
+      // Copy first and last row
+      for (size_t col = 0; col < width; ++col)
+      {
+        tempBuffer[0*width + col] = heightBuffer[0*pitch + col];
+        tempBuffer[(height - 1)*width + col] = heightBuffer[(height - 1)*pitch + col];
+      }
+
+      // Handle interior
+      for (size_t row = 1; row < height - 1; ++row)
+      {
+        // First column
+        tempBuffer[row*width + 0] = heightBuffer[row*pitch + 0];
+
+        // Rest
+        for (size_t col = 1; col < width - 1; ++col)
+        {
+          float result = 0;
+          
+          result = 0.25f * heightBuffer[row*pitch + col - 1] +
+                   0.50f * heightBuffer[row*pitch + col + 0] +
+                   0.25f * heightBuffer[row*pitch + col + 1];
+
+          tempBuffer[row*width + col] = result;
+        }
+
+        // Last column
+        tempBuffer[row*width + width - 1] = heightBuffer[row*pitch + width - 1];
+      }
+      
+      // Smooth back into the height buffer
+      for (size_t row = 1; row < height - 1; ++row)
+      {
+        // Interior
+        for (size_t col = 1; col < width - 1; ++col)
+        {
+          float result = 0;
+
+          result = 0.25f * tempBuffer[(row - 1)*width + col] +
+                   0.50f * tempBuffer[(row + 0)*width + col] +
+                   0.25f * tempBuffer[(row + 1)*width + col];
+
+          heightBuffer[row*pitch + col] = result;
+        }      
+      }
+    }
+
+    cs_free (tempBuffer);
+  }
 
 }
 CS_PLUGIN_NAMESPACE_END(Terrain2)

@@ -87,6 +87,7 @@ rule Application
   if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
   {
     local debugfile = [ SplitDebugInfo $(target) : $(APPLICATION_SUFFIX) ] ;
+    $(target)_DEBUGFILE = $(debugfile) ;
     cleanextra += $(debugfile) ;
     if ! [ IsElem noinstall : $(3) ]
     {

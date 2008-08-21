@@ -104,8 +104,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   CS_LEAKGUARD_IMPLEMENT(PriorityNode);
 
   PriorityNode::PriorityNode (PriorityNodeFactory* factory)
-    : scfImplementationType (this), factory (factory),
-    BaseNodeChildren (this), playbackSpeed (1.0f)
+    : scfImplementationType (this), BaseNodeChildren (this), 
+    playbackSpeed (1.0f), factory (factory)
   {
     if (factory)
     {
@@ -208,7 +208,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
 
       subNodes[indexList[i]]->BlendState (locState, 1.0f);
 
-      for (size_t b = 0; b < locState->GetBoneCount (); ++b)
+      for (BoneID b = 0; b < locState->GetBoneCount (); ++b)
       {
         if (locState->IsBoneUsed (b))
         {
@@ -220,7 +220,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       }
     }
 
-    for (size_t b = 0; b < totalState->GetBoneCount (); ++b)
+    for (BoneID b = 0; b < totalState->GetBoneCount (); ++b)
     {
       if (totalState->IsBoneUsed (b))
       {
@@ -422,8 +422,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   CS_LEAKGUARD_IMPLEMENT(RandomNode);
 
   RandomNode::RandomNode (RandomNodeFactory* factory)
-  : scfImplementationType (this), BaseNodeChildren (this), factory (factory), 
-  currentNode (0), active (false), playbackSpeed (1.0f)
+    : scfImplementationType (this), BaseNodeChildren (this), currentNode (0), 
+    active (false), playbackSpeed (1.0f), factory (factory)
   {
     // Need CB for possible automatic switch
     InstallInnerCb (true);
@@ -576,7 +576,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   {
     if (node == subNodes[currentNode] && !isPlaying)
     {
-      active == false;
+      active = false;
       FireStateChangeCb (false);
     }
   }

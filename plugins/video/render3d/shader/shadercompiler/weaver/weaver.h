@@ -65,6 +65,8 @@ public:
   /// Get a list of priorities for a given shader.
   virtual csPtr<iShaderPriorityList> GetPriorities (
 		  iDocumentNode* templ);
+		  
+  bool PrecacheShader(iDocumentNode*, iHierarchicalCache*);
 
   void Report (int severity, const char* msg, ...) const;
   void Report (int severity, iDocumentNode* node, const char* msg, ...) const;

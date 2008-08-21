@@ -59,6 +59,8 @@ private:
 
   csRef<iRenderManager> rm;
 
+  csRef<FramePrinter> printer;
+
   /// A pointer to the sector the camera will be in.
   iSector* room;
 
@@ -74,16 +76,11 @@ private:
 
   /**
    * Setup everything that needs to be rendered on screen. This routine
-   * is called from the event handler in response to a csevProcess
+   * is called from the event handler in response to a csevFrame
    * broadcast message.
    */
-  void ProcessFrame ();
+  void Frame ();
     
-  /**
-   * Finally render the screen. This routine is called from the event
-   * handler in response to a csevFinalProcess broadcast message.
-   */
-  void FinishFrame ();
     
   /// Here we will load our world from a map file.
   bool LoadMap ();

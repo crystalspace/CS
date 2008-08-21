@@ -164,6 +164,15 @@ read the paragraph ``When to Use Per-vertex Lighting''.
   enabled for a factory it can't be disabled for objects of that factory.
 @end itemize
 
+@subheading Disable self shadows
+
+Disables casting of shadows from an object onto itself.
+
+@itemize @bullet
+@item Can be set on mesh factories.
+@item Can be set on mesh objects.
+@end itemize
+
 @subheading Advanced Options
 
 @subsubheading Black Threshold

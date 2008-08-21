@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDERTREE_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDERTREE_H__
 
+/**\file
+ * Render tree
+ */
+
 #include "iengine/camera.h"
 #include "csplugincommon/rendermanager/standardtreetraits.h"
 #include "csutil/dirtyaccessarray.h"
@@ -35,13 +39,14 @@ namespace RenderManager
 {
   class PostEffectManager;
   
-  /* Helper class containing stuff which doesn't require any of the template
+  /**
+   * Helper class containing stuff which doesn't require any of the template
    * parameters to RenderTree
    */
   class CS_CRYSTALSPACE_EXPORT RenderTreeBase
   {
   public:
-    struct CS_CRYSTALSPACE_EXPORT DebugPersistent
+   struct CS_CRYSTALSPACE_EXPORT DebugPersistent
     {
       DebugPersistent ();
       
@@ -139,6 +144,13 @@ namespace RenderManager
    * RenderTree is the main data-structure for the rendermanagers.
    * It contains the entire setup of meshes and where to render those meshes,
    * as well as basic operations regarding those meshes.
+   *
+   * The \a TreeTraits template argument specifies additional data stored with
+   * meshes, contexts and others in the tree. See the subclasses in
+   * RenderTreeStandardTraits for a list of what can be customized.
+   * To provide custom traits, create a class and either provide a new, custom
+   * type for a trait or typedef in the respective type from
+   * RenderTreeStandardTraits.
    */
   template<typename TreeTraits = RenderTreeStandardTraits>
   class RenderTree : public RenderTreeBase
@@ -163,10 +175,17 @@ namespace RenderManager
 
 
     /**
-     * Persistent data for the tree, needs to be stored between frames by the RM
+     * Data used by the render tree that needs to persist over multiple frames.
+     * Render managers must store an instance of this class and provide
+     * it to the render tree upon instantiation.
      */
     struct PersistentData
     {
+      /**
+       * Initialize data. Fetches various required values from objects in
+       * the object registry. Must be called when the render manager plugin is 
+       * initialized.
+       */
       void Initialize (iShaderManager* shmgr)
       {
         svObjectToWorldName = 
@@ -208,15 +227,24 @@ namespace RenderManager
       struct SingleMesh : 
         public CS::Meta::EBOptHelper<typename TreeTraitsType::MeshExtraDataType>
       {
+        /// Originating mesh wrapper
         iMeshWrapper* meshWrapper;
+        /// Render mesh
         csRenderMesh* renderMesh;
+        /// Mesh Z buffer mode
         csZBufMode zmode;
+        /// Mesh object wrapper shader variables
         iShaderVariableContext* meshObjSVs;
+        /// Mesh object to world transformation
         csRef<csShaderVariable> svObjectToWorld;
+        /// Mesh object to world inverse transformation
         csRef<csShaderVariable> svObjectToWorldInv;
+        /// Bounding box (world space)
         csBox3 bbox;
+        /// Mesh flags
         csFlags meshFlags;
 
+        /// "Local ID" in the context; used for array indexing
         size_t contextLocalId;
       };
 
@@ -243,59 +271,75 @@ namespace RenderManager
     };
 
     /**
-     * 
+     * A single context node, Groups meshes which should be rendered from the
+     * same view to the same target.
+     *
+     * Create instances of this structure by using RenderTree::CreateContext.
      */
     struct ContextNode : public CS::Meta::EBOptHelper<typename TreeTraits::ContextNodeExtraDataType>
     {
       /**
-       * 
+       * Information for a portal
        */
       struct PortalHolder
       {
       #ifdef CS_DEBUG
+        /// Debugging: name of mesh
         const char* db_mesh_name;
       #endif
+        /// Portal container interface
         iPortalContainer* portalContainer;
+        /// Originating mesh wrapper
         iMeshWrapper* meshWrapper;
       };
 
       //-- Types
       typedef RealTreeType TreeType;
 
-      // Owner
+      /// Owner of context node
       TreeType& owner;
 
-      // Target data
+      /// View rendered to
       csRef<RenderView> renderView;
+      /// A single render target
       struct TargetTexture
       {
+        /// Texture handle
         iTextureHandle* texHandle;
+        /// Subtexture
         int subtexture;
 
         TargetTexture() : texHandle (0), subtexture (0) {}
       };
+      /// All render targets to be used when rendering the context node
       TargetTexture renderTargets[rtaNumAttachments];
+      /// Camera transformation
       csReversibleTransform cameraTransform;
+      /// Flags for iGraphics3D::BeginDraw()
       int drawFlags;
+      /// Sector to render
       iSector* sector;
+      /// Context-specific shader variables
       csRef<iShaderVariableContext> shadervars;
       
+      /// Post processing effects to apply after rendering the context
       csRef<PostEffectManager> postEffects;
 
-      // A sub-tree of mesh nodes
+      /// Sub-tree of mesh nodes
       MeshNodeTreeType meshNodes;
 
-      // All portals within context
+      /// All portals within context
       csArray<PortalHolder> allPortals;
 
-      // The SVs themselves
+      /// The SVs themselves
       SVArrayHolder svArrays;
 
-      // Arrays of per-mesh shader and ticket info
+      /// Arrays of per-mesh shader
       csDirtyAccessArray<iShader*> shaderArray;
+      /// Arrays of per-mesh ticket info
       csArray<size_t> ticketArray;
 
-      // Total number of render meshes within the context, just for statistics
+      /// Total number of render meshes within the context
       size_t totalRenderMeshes;
       
       ContextNode(TreeType& owner) 
@@ -343,6 +387,7 @@ namespace RenderManager
 	totalRenderMeshes++;
       }
 
+      /// Add a new render layer after \a layer
       void InsertLayer (size_t after)
       {
         const size_t layerCount = shaderArray.GetSize() / totalRenderMeshes;
@@ -357,6 +402,10 @@ namespace RenderManager
         svArrays.InsertLayer (after, after);
       }
 
+      /**
+       * Copy the shader for mesh \a meshId from layer \a fromLayer to layer
+       * \a toLayer.
+       */
       void CopyLayerShader (size_t meshId, size_t fromLayer, size_t toLayer)
       {
         const size_t fromLayerOffset = fromLayer * totalRenderMeshes;
@@ -365,6 +414,9 @@ namespace RenderManager
           shaderArray[fromLayerOffset + meshId];
       }
       
+      /**
+       * Get the dimension of the render target set for this context.
+       */
       bool GetTargetDimensions (int& renderW, int& renderH)
       {
 	for (int a = 0; a < rtaNumAttachments; a++)
@@ -375,6 +427,15 @@ namespace RenderManager
 	      renderW, renderH);
 	    return true;
 	  }
+        }
+        if (renderView.IsValid())
+        {
+          iGraphics3D* g3d = renderView->GetGraphics3D();
+          if (g3d)
+          {
+            renderW = g3d->GetWidth();
+            renderH = g3d->GetHeight();
+          }
         }
         return false;
       }
@@ -471,9 +532,8 @@ namespace RenderManager
     }
 
 
-    //@{
     /**\name Debugging helpers: toggling of debugging features
-     */
+     * @{ */
     /**
      * Register a debug flag, returns a numeric ID.
      * \remark Flag names are hierarchical. The hierarchy levels are
@@ -492,7 +552,6 @@ namespace RenderManager
     /// Check whether a debug flag is enabled
     bool IsDebugFlagEnabled (uint flag)
     { return persistentData.debugPersist.IsDebugFlagEnabled (flag); }
-    //@{
     /**
      * Enable or disable a debug flag.
      * \remark Flag names are hierarchical. The hierarchy levels are
@@ -501,13 +560,18 @@ namespace RenderManager
      */
     void EnableDebugFlag (uint flag, bool state)
     { persistentData.debugPersist.EnableDebugFlag (flag, state); }
+    /**
+     * Enable or disable a debug flag.
+     * \remark Flag names are hierarchical. The hierarchy levels are
+     *   separated by dots. If a flag is set or unset, all flags below in the
+     *   hierarchy are set or unset as well.
+     */
     void EnableDebugFlag (const char* flagStr, bool state)
     {
       uint flag = RegisterDebugFlag (flag);
       EnableDebugFlag (flag, state); 
     }
-    //@}
-    //@}
+    /** @} */
     
     
     PersistentData& GetPersistentData()

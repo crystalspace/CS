@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_STANDARDSOTER_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_STANDARDSOTER_H__
 
+/**\file
+ * Standard rendermesh sorter
+ */
+
 #include "csplugincommon/rendermanager/operations.h"
 
 #include "ivideo/rendermesh.h"
@@ -33,6 +37,19 @@ namespace RenderManager
    * Standard rendermesh sorter.
    * Sorts mesh nodes depending on their render priority, either 
    * back2front/front2back or based on material and factories.
+   *
+   * Usage: with mesh node iteration.
+   * SetupCameraLocation () must be called with the current camera location.
+   * Sorting is typically done after visibility culling and portal
+   * setup. Example:
+   * \code
+   * // Sort the mesh lists  
+   * {
+   *   StandardMeshSorter<RenderTree> mySorter (renderView->GetEngine ());
+   *   mySorter.SetupCameraLocation (rview->GetCamera ()->GetTransform ().GetOrigin ());
+   *   ForEachMeshNode (context, mySorter);
+   * }
+   * \endcode
    */
   template<typename Tree>
   class StandardMeshSorter    

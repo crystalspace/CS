@@ -1,0 +1,105 @@
+@c -*-texinfo-*-
+@node General Renderbuffers Format, XML File Format, Map Format Reference, Map Format Reference
+@subsection General Renderbuffers Format
+@cindex General Renderbuffers Format, Renderbuffers
+
+Meshes often require specification of a large amount of data for e.g. mesh
+positions, texture coordinates or triangle indices. Crystal Space has a
+general format for storing such bulk data, giving a unified syntax for
+different types of mesh objects allowing storing both in an @sc{xml}-based
+format or a compact binary format.
+
+@subheading Buffer @sc{xml} format
+
+@subsubheading Top element
+
+The top element has no fixed name; rather, it differs from mesh object to
+mesh object. However, all top buffer elements have a common set of attributes.
+
+@table @code
+@item file
+Specifies a file name for an external file with the buffer data in a binary
+representation (see below). If set, all other attributes are ignored.
+
+@item type
+Required: attribute identifying the type of the contained data in memory.
+Possible values:
+@samp{int} (or short @samp{i}) - signed 32 bit integer,
+@samp{uint} (@samp{ui}) - unsigned 32 bit integer,
+@samp{byte} (@samp{b}) - signed 8 bit integer,
+@samp{ubyte} (@samp{ub}) - unsigned 8 bit integer,
+@samp{short} (@samp{s}) - signed 16 bit integer,
+@samp{ushort} (@samp{us}) - unsigned 16 bit integer,
+@samp{float} (@samp{f}) - 32 bit IEEE 754 floating point value,
+@samp{double} (@samp{d}) - 64 bit IEEE 754 floating point value.
+
+@item components
+Required: number of components per element in the buffer.
+
+@item normalized
+Optional: specifies whether the buffer contains normalized data in case of
+(unsigned) integer data. Normalized means the values are normnalized to
+floats in the range of [0;1] (unsigned values) resp. [-1;1] (signed values)
+when used. Unnormalized data is not changed.
+
+@item indices
+Optional: specifies whether the buffer is an index buffer. Index buffers are
+handled differently internally and thus must be designated as such. They have
+the restriction that they can have at most one component, can not contain
+float data and can not be normalized.
+
+@end table
+
+Note that some meshes may specify additional attributes in buffer elements.
+
+@subsubheading Buffer element specification
+
+Each element in the buffer is specified as an @sc{xml} element under the top
+element, with the individual components being specified in element attributes.
+
+The @sc{xml} elements have the name @samp{element} or short @samp{e}.
+
+The attribute names for the individual components are @samp{c0} for the first
+component, @samp{c1} for the second component and so on.
+
+@subheading Buffer binary format
+
+Overall, a binary buffer file contains a header with information about the
+structure of the file (essentially what you would specify in the top element
+attributes in the @sc{xml} format) followed by the raw buffer data. Index and
+general buffers have a similar but slightly different format. All values
+are stored in little endian byte order.
+
+@subsubheading General buffer header
+
+@table @code
+@item uint16 magic
+Magic word identifying a file as a general buffer file. Must be @code{0x6272}.
+@item uint8 componentType
+The type of components stored in the buffer. The values are the same as in the
+@code{csRenderBufferComponentType} enum.
+@item uint8 componentCount
+Number of components in per element in the buffer.
+@item uint32 elementCount
+Number of elements in the buffer.
+@end table
+
+@subsubheading Index buffer header
+
+@table @code
+@item uint16 magic
+Magic word identifying a file as a general buffer file. Must be @code{0x6269}.
+@item uint8 componentType
+The type of components stored in the buffer. The values are the same as in the
+@code{csRenderBufferComponentType} enum. Can not be a floating point or
+normalized type.
+@item uint8 componentCount
+Number of components in per element in the buffer. Must be 1.
+@item uint32 elementCount
+Number of elements in the buffer.
+@item uint32 rangeStart
+Value of the smallest element in the buffer.
+@item uint32 rangeEnd
+Value of the largest element in the buffer.
+@end table
+

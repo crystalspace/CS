@@ -147,22 +147,22 @@ m4_define([CS_VCHK_PATCOUNT], [m4_len(m4_bpatsubst(CS_VCHK_PATTERNLIST([$1]), [[
 # ** CS_VCHK_EXTRACTVERSION(EXTRACT_CALL, MIN_VERSION, PATTERN, PRGPREFIX, COMPARISION) **
 # ****************************************************************************************
 m4_define([CS_VCHK_EXTRACTVERSION],
-[cs_prog_$4_is_version=
+[cs_cv_prog_$4_is_version=
 cs_prog_$4_min_version=
 cs_prog_$4_is_suffix=
 cs_prog_$4_min_suffix=
 cs_prog_$4_is_suffix_done=
 cs_prog_$4_min_suffix_done=
 CS_VCHK_CYCLEOPT([$3], [], 
-[test -z $cs_prog_$4_is_version && cs_prog_$4_is_version=`$1 | sed 'CS_VCHK_SEDEXPRALL([i])'`
-test -n "$cs_prog_$4_is_version" && test -z $cs_prog_$4_is_suffix_done  && { cs_prog_$4_is_suffix_done=yes ; cs_prog_$4_is_suffix=j ; }
+[test -z $cs_cv_prog_$4_is_version && cs_cv_prog_$4_is_version=`$1 | sed 'CS_VCHK_SEDEXPRALL([i])'`
+test -n "$cs_cv_prog_$4_is_version" && test -z $cs_prog_$4_is_suffix_done  && { cs_prog_$4_is_suffix_done=yes ; cs_prog_$4_is_suffix=j ; }
 ])
 CS_VCHK_CYCLEOPT([$3], , 
 [test -z $cs_prog_$4_min_version && cs_prog_$4_min_version=`echo $2 | sed 'CS_VCHK_SEDEXPRALL([i])'`
 test -n "$cs_prog_$4_min_version" && test -z $cs_prog_$4_min_suffix_done  && { cs_prog_$4_min_suffix_done=yes ; cs_prog_$4_min_suffix=j ; }
 ])
 CS_VCHK_RUNTH([CS_VCHK_PATCOUNT([$3])],
-    [cs_prog_$4_is_ver_[]i=`echo ${cs_prog_$4_is_version}${cs_prog_$4_is_suffix} | sed 'CS_VCHK_SEDEXPRNTH([CS_VCHK_RMALL([$3])], [i])'`
+    [cs_prog_$4_is_ver_[]i=`echo ${cs_cv_prog_$4_is_version}${cs_prog_$4_is_suffix} | sed 'CS_VCHK_SEDEXPRNTH([CS_VCHK_RMALL([$3])], [i])'`
 ])
 CS_VCHK_RUNTH([CS_VCHK_PATCOUNT([$3])],
     [cs_prog_$4_min_ver_[]i=`echo $cs_prog_$4_min_version${cs_prog_$4_min_suffix} | sed 'CS_VCHK_SEDEXPRNTH([CS_VCHK_RMALL([$3])], [i])'`
@@ -177,14 +177,9 @@ test -z "$AS_TR_SH([cs_cv_prog_$4_version_$2_ok])" \
     || AS_TR_SH([cs_cv_prog_$4_version_$2_ok])=yes ; }
 ])
 AS_IF([test -z "$AS_TR_SH([cs_cv_prog_$4_version_$2_ok])"], [AS_TR_SH([cs_cv_prog_$4_version_$2_ok])=yes])
-AS_IF([test "$AS_TR_SH([cs_cv_prog_$4_version_$2_ok])" = yes],
-    [AS_TR_SH([cs_prog_$4_version_ok])=yes],
-    [AS_TR_SH([cs_prog_$4_version_ok])=no])
 AS_TR_SH([cs_cv_prog_$4_version_$2_ok_annotated])="$AS_TR_SH([cs_cv_prog_$4_version_$2_ok])"
-AS_IF([test -n "$cs_prog_$4_is_version"],
-    [AS_TR_SH([cs_cv_prog_$4_version_$2_ok_annotated])="$AS_TR_SH([cs_cv_prog_$4_version_$2_ok_annotated]) (version $cs_prog_$4_is_version)"
-    AS_TR_SH([cs_prog_$4_version])="$AS_TR_SH([cs_prog_$4_is_version])"],
-    [AS_TR_SH([cs_prog_$4_version])=''])
+AS_IF([test -n "$cs_cv_prog_$4_is_version"],
+    [AS_TR_SH([cs_cv_prog_$4_version_$2_ok_annotated])="$AS_TR_SH([cs_cv_prog_$4_version_$2_ok_annotated]) (version $cs_cv_prog_$4_is_version)"])
 ])
 
 ##############################################################################
@@ -222,4 +217,10 @@ AC_DEFUN([CS_CHECK_PROG_VERSION],
     [AS_TR_SH([cs_cv_prog_$1_version_$3_ok_annotated])],
     [CS_VCHK_EXTRACTVERSION([$2], [$3], [$4], AS_TR_SH([$1]),
 	m4_default([$7],[>=]))])
-AS_IF([test "$AS_TR_SH([cs_cv_prog_$1_version_$3_ok])" = yes], [$5], [$6])])
+AS_IF([test "$AS_TR_SH([cs_cv_prog_$1_version_$3_ok])" = yes],
+    [AS_TR_SH([cs_prog_$1_version_ok])=yes
+    AS_TR_SH([cs_prog_$1_version])="$AS_TR_SH([cs_cv_prog_$1_is_version])"
+    $5],
+    [AS_TR_SH([cs_prog_$1_version_ok])=no
+    AS_TR_SH([cs_prog_$1_version])=''
+    $6])])

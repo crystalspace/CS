@@ -26,6 +26,14 @@
 #include "csplugincommon/opengl/glenum_identstrs.h"
 #include "csplugincommon/opengl/glhelper.h"
 
+//#define FBO_DEBUG
+
+#ifdef FBO_DEBUG
+  #define FBO_PRINTF csPrintf
+#else
+  #define FBO_PRINTF while(0) csPrintf
+#endif
+
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
 
@@ -60,6 +68,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 	currentFB != (GLint)framebuffer);
   #endif
 
+      FBO_PRINTF ("Freeing FBO %u\n", framebuffer);
       ext->glDeleteFramebuffersEXT (1, &framebuffer);
       framebuffer = 0;
     }
@@ -142,7 +151,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
   void FBOWrapper::Bind ()
   {
     if (framebuffer == 0)
+    {
       ext->glGenFramebuffersEXT (1, &framebuffer);
+      FBO_PRINTF ("Created FBO %u\n", framebuffer);
+    }
     ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer);
   #ifdef CS_DEBUG
     boundFBO = framebuffer;
@@ -369,7 +381,7 @@ void csGLRender2TextureEXTfbo::SetupProjection ()
   G3D->SetGlOrtho (true);
 }
 
-void csGLRender2TextureEXTfbo::SetupProjection (
+CS::Math::Matrix4 csGLRender2TextureEXTfbo::SetupProjection (
     const CS::Math::Matrix4& projectionMatrix)
 {
   GLRENDER3D_OUTPUT_LOCATION_MARKER;
@@ -378,9 +390,11 @@ void csGLRender2TextureEXTfbo::SetupProjection (
       0, -1, 0, 0,
       0, 0, 1, 0,
       0, 0, 0, 1);
+  CS::Math::Matrix4 actual = flipY * projectionMatrix;
   GLfloat matrixholder[16];
-  CS::PluginCommon::MakeGLMatrix4x4 (flipY * projectionMatrix, matrixholder);
+  CS::PluginCommon::MakeGLMatrix4x4 (actual, matrixholder);
   glLoadMatrixf (matrixholder);
+  return actual;
 }
 
 void csGLRender2TextureEXTfbo::FinishDraw ()

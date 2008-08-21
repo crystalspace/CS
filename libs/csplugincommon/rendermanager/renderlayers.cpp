@@ -89,6 +89,9 @@ namespace CS
 	      case XMLTOKEN_NODRAW:
 	        settings.nodraw = true;
 	        break;
+	      case XMLTOKEN_SPECULARONLY:
+	        settings.specularOnly = true;
+	        break;
 	      default:
 	        synldr->ReportBadToken (child);
 	        return false;

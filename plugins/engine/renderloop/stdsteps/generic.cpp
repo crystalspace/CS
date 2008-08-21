@@ -263,7 +263,7 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
       pusher.mesh = mesh;
 
       csShaderVariableStack stack (_stack);
-      stack.MakeOwnArray();
+      stack.Setup (shaderManager->GetShaderVariableStack ());
       shaderManager->PushVariables (stack);
       shadervars.Top ().PushVariables (stack);
       pusher.PushVariables (stack);

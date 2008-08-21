@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_VISCULL_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_VISCULL_H__
 
+/**\file
+ * Render manager visibility culling
+ */
+
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/renderview.h"
 #include "iengine/viscull.h"
@@ -52,7 +56,7 @@ namespace RenderManager
         CS::Utility::MeshFilter* filter)
         : scfImplementation1<ViscullCallback, iVisibilityCullerListener> (this), 
         context (context), currentRenderView (currentRenderView),
-        filter (filter)
+	sector (currentRenderView->GetThisSector()), filter (filter)
       {}
 
 
@@ -61,52 +65,56 @@ namespace RenderManager
       {
         if (!(filter && filter->IsMeshFiltered (imesh)))
         {
-          // Todo: Handle static lod & draw distance
-          csZBufMode zmode = imesh->GetZBufMode ();
-          CS::Graphics::RenderPriority renderPrio = imesh->GetRenderPriority ();
-
           // Get the meshes
           int numMeshes;
-          csRenderMesh** meshList = imesh->GetRenderMeshes (numMeshes, currentRenderView, frustum_mask);
-#ifdef CS_DEBUG
-          const char* const db_mesh_name = imesh->QueryObject()->GetName();
-#endif
+          csSectorVisibleRenderMeshes* meshList = sector->GetVisibleRenderMeshes (
+	    numMeshes,
+	    imesh, currentRenderView, frustum_mask);
 
-          typename RenderTreeType::MeshNode::SingleMesh sm;
-          sm.meshWrapper = imesh;
-          sm.meshObjSVs = imesh->GetSVContext();
-          sm.zmode = zmode;
-          sm.bbox = imesh->GetWorldBoundingBox(); // @@@ Use RM bbox
-          sm.meshFlags = imesh->GetFlags();
-          
-          // Add it to the appropriate meshnode
-          for (int i = 0; i < numMeshes; ++i)
+          for (int m = 0; m < numMeshes; ++m)
           {
-            csRenderMesh* rm = meshList[i];
-#ifdef CS_DEBUG
-            rm->db_mesh_name = db_mesh_name;
-#endif
-
-            if (rm->portal)
-            {
-#ifdef CS_DEBUG
-              typename ContextNodeType::PortalHolder h = {db_mesh_name, rm->portal, imesh};
-#else
-              typename ContextNodeType::PortalHolder h = {rm->portal, imesh};
-#endif
-              context.allPortals.Push (h);              
-            }
-            else
-            {
-              context.AddRenderMesh (rm, renderPrio, sm);
-            }
-          }
-        }
+	    // Todo: Handle static lod & draw distance
+	    csZBufMode zmode = meshList[m].imesh->GetZBufMode ();
+	    CS::Graphics::RenderPriority renderPrio =
+	      meshList[m].imesh->GetRenderPriority ();
+  
+  #ifdef CS_DEBUG
+	    const char* const db_mesh_name = meshList[m].imesh->QueryObject()->GetName();
+  #endif
+	    typename RenderTreeType::MeshNode::SingleMesh sm;
+	    sm.meshWrapper = meshList[m].imesh;
+	    sm.meshObjSVs = meshList[m].imesh->GetSVContext();
+	    sm.zmode = zmode;
+	    sm.bbox = meshList[m].imesh->GetWorldBoundingBox(); // @@@ Use RM bbox
+	    sm.meshFlags = meshList[m].imesh->GetFlags();
+	    
+	    // Add it to the appropriate meshnode
+	    for (int i = 0; i < meshList[m].num; ++i)
+	    {
+	      csRenderMesh* rm = meshList[m].rmeshes[i];
+  
+	      if (rm->portal)
+	      {
+  #ifdef CS_DEBUG
+		typename ContextNodeType::PortalHolder h = {db_mesh_name, rm->portal, imesh};
+  #else
+		typename ContextNodeType::PortalHolder h = {rm->portal, imesh};
+  #endif
+		context.allPortals.Push (h);              
+	      }
+	      else
+	      {
+		context.AddRenderMesh (rm, renderPrio, sm);
+	      }
+	    }
+	  }
+	}
       }
 
     private:      
       ContextNodeType& context;
       RenderView* currentRenderView;
+      iSector* sector;
       CS::Utility::MeshFilter* filter;
     };
   }
@@ -114,6 +122,19 @@ namespace RenderManager
   /**
    * Use the given renderview and visibility culler to perform a culling step,
    * add all found meshes to the given context.
+   *
+   * Usually the first thing done with a view and context. Example:
+   * \code
+   * // Renderview+sector setup
+   * renderView->SetThisSector (sector);
+   * sector->CallSectorCallbacks (renderView);
+   * // Make sure the clip-planes are ok
+   * CS::RenderViewClipper::SetupClipPlanes (renderView->GetRenderContext ());
+   * 
+   * // Do the culling
+   * iVisibilityCuller* culler = sector->GetVisibilityCuller ();
+   * Viscull<RenderTree> (context, renderView, culler);
+   * \endcode
    */
   template<typename RenderTree>
   bool Viscull (typename RenderTree::ContextNode& context, RenderView* rw, 

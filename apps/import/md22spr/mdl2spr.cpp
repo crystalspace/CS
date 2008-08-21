@@ -26,6 +26,7 @@
 
 #include "m2s_mdl.h"
 #include "igraphic/imageio.h"
+#include "csutil/stringconv.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -98,7 +99,7 @@ static float get_float(int& n, int argc, const char* const* argv)
   }
   else
   {
-    f = (float)atof(argv[n]);
+    f = (float)CS::Utility::strtof(argv[n]);
     if (f == 0)
     {
       csFPrintf(stderr, "Unable to convert %s to float value\n", argv[n]);

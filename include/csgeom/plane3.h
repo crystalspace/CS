@@ -187,6 +187,9 @@ public:
    * This will basically reverse the result of Classify().
    */
   inline void Invert () { norm = -norm;  DD = -DD; }
+  
+  /// Return the same plane with inverted direction
+  inline csPlane3 Inverse() const { csPlane3 p (*this); p.Invert(); return p; }
 
   /**
    * Normalizes the plane equation so that 'norm' is a unit vector.

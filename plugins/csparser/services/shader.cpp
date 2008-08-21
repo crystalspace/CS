@@ -30,6 +30,7 @@
 #include "csgfx/shaderexpaccessor.h"
 #include "csgfx/shadervar.h"
 #include "cstool/vfsdirchange.h"
+#include "csutil/scanstr.h"
 #include "csutil/xmltiny.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(SyntaxService)
@@ -76,7 +77,7 @@ bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
       {
         const char* def = node->GetContentsValue ();
         csVector2 v (0.0f, 0.0f);
-        sscanf (def, "%f,%f", &v.x, &v.y);
+        csScanStr (def, "%f,%f", &v.x, &v.y);
         var.SetValue (v);
       }
       break;
@@ -84,7 +85,7 @@ bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
       {
         const char* def = node->GetContentsValue ();
         csVector3 v (0);
-        sscanf (def, "%f,%f,%f", &v.x, &v.y, &v.z);
+        csScanStr (def, "%f,%f,%f", &v.x, &v.y, &v.z);
         var.SetValue (v);
       }
       break;
@@ -92,7 +93,7 @@ bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
       {
         const char* def = node->GetContentsValue ();
         csVector4 v (0);
-        sscanf (def, "%f,%f,%f,%f", &v.x, &v.y, &v.z, &v.w);
+        csScanStr (def, "%f,%f,%f,%f", &v.x, &v.y, &v.z, &v.w);
         var.SetValue (v);
       }
       break;

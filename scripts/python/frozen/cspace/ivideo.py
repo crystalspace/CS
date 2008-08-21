@@ -207,6 +207,7 @@ CSDRAW_2DGRAPHICS = _ivideo.CSDRAW_2DGRAPHICS
 CSDRAW_3DGRAPHICS = _ivideo.CSDRAW_3DGRAPHICS
 CSDRAW_CLEARZBUFFER = _ivideo.CSDRAW_CLEARZBUFFER
 CSDRAW_CLEARSCREEN = _ivideo.CSDRAW_CLEARSCREEN
+CSDRAW_NOCLIPCLEAR = _ivideo.CSDRAW_NOCLIPCLEAR
 CS_CLIPPER_NONE = _ivideo.CS_CLIPPER_NONE
 CS_CLIPPER_OPTIONAL = _ivideo.CS_CLIPPER_OPTIONAL
 CS_CLIPPER_TOPLEVEL = _ivideo.CS_CLIPPER_TOPLEVEL
@@ -696,6 +697,7 @@ class csShaderVariableStack(object):
         except: self.this = this
     __swig_destroy__ = _ivideo.delete_csShaderVariableStack
     __del__ = lambda self : None;
+    def assign(*args): return _ivideo.csShaderVariableStack_assign(*args)
     def Setup(*args): return _ivideo.csShaderVariableStack_Setup(*args)
     def MakeOwnArray(*args): return _ivideo.csShaderVariableStack_MakeOwnArray(*args)
     def GetSize(*args): return _ivideo.csShaderVariableStack_GetSize(*args)
@@ -816,6 +818,7 @@ class iShaderCompiler(core.iBase):
     def ValidateTemplate(*args): return _ivideo.iShaderCompiler_ValidateTemplate(*args)
     def IsTemplateToCompiler(*args): return _ivideo.iShaderCompiler_IsTemplateToCompiler(*args)
     def GetPriorities(*args): return _ivideo.iShaderCompiler_GetPriorities(*args)
+    def PrecacheShader(*args): return _ivideo.iShaderCompiler_PrecacheShader(*args)
     __swig_destroy__ = _ivideo.delete_iShaderCompiler
     __del__ = lambda self : None;
 iShaderCompiler_swigregister = _ivideo.iShaderCompiler_swigregister
@@ -977,10 +980,10 @@ class iTextureManager(core.iBase):
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def RegisterTexture(*args): return _ivideo.iTextureManager_RegisterTexture(*args)
-    def CreateTexture(*args): return _ivideo.iTextureManager_CreateTexture(*args)
     def GetTextureFormat(*args): return _ivideo.iTextureManager_GetTextureFormat(*args)
     def CreateSuperLightmap(*args): return _ivideo.iTextureManager_CreateSuperLightmap(*args)
     def GetMaxTextureSize(*args): return _ivideo.iTextureManager_GetMaxTextureSize(*args)
+    def CreateTexture(*args): return _ivideo.iTextureManager_CreateTexture(*args)
     scfGetVersion = staticmethod(_ivideo.iTextureManager_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iTextureManager
     __del__ = lambda self : None;

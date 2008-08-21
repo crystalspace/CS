@@ -483,7 +483,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
   csPtr<iSkeletonAnimNodeFactory2> SkeletonLoader::ParseBlendNode (
     iDocumentNode* node, iSkeletonAnimPacketFactory2* packet)
   {
-    static const char* msgid = "crystalspace.skeletonloader.parseblendnode";
+    //static const char* msgid = "crystalspace.skeletonloader.parseblendnode";
 
     csRef<iSkeletonBlendNodeFactory2> factnode;
 
@@ -545,7 +545,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
   csPtr<iSkeletonAnimNodeFactory2> SkeletonLoader::ParsePriorityNode (
     iDocumentNode* node, iSkeletonAnimPacketFactory2* packet)
   {
-    static const char* msgid = "crystalspace.skeletonloader.parseprioritynode";
+    //static const char* msgid = "crystalspace.skeletonloader.parseprioritynode";
 
     csRef<iSkeletonPriorityNodeFactory2> factnode;
 
@@ -569,7 +569,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
           int prio = 1;
           if (child->GetAttribute ("priority"))
           {
-            prio = child->GetAttributeValueAsFloat ("priority");
+            prio = child->GetAttributeValueAsInt ("priority");
           }
 
           factnode->AddNode (childFact, prio);
@@ -587,7 +587,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
   csPtr<iSkeletonAnimNodeFactory2> SkeletonLoader::ParseRandomNode (
     iDocumentNode* node, iSkeletonAnimPacketFactory2* packet)
   {
-    static const char* msgid = "crystalspace.skeletonloader.parserandomnode";
+    //static const char* msgid = "crystalspace.skeletonloader.parserandomnode";
 
     csRef<iSkeletonRandomNodeFactory2> factnode;
 
@@ -674,6 +674,45 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
               return 0;
             }       
           };
+        }
+        break;
+      case XMLTOKEN_TRANSITION:
+        {
+          const char* fromStateName = child->GetAttributeValue ("from");
+          const char* toStateName = child->GetAttributeValue ("to");
+
+          CS::Animation::StateID fromState = factnode->FindState (fromStateName);
+          CS::Animation::StateID toState = factnode->FindState (toStateName);
+
+          if (fromState == CS::Animation::InvalidStateID)
+          {
+            synldr->ReportError (msgid, child, 
+              "Invalid from state %s", fromStateName);
+          }
+
+          if (toState == CS::Animation::InvalidStateID)
+          {
+            synldr->ReportError (msgid, child, 
+              "Invalid to state %s", toStateName);
+          }
+
+          csRef<iDocumentNode> nodedoc = child->GetNode (
+            xmltokens.Request (XMLTOKEN_NODE));
+          if (nodedoc)
+          {
+            csRef<iSkeletonAnimNodeFactory2> node =
+              ParseAnimTreeNode (nodedoc, packet);
+
+            factnode->SetStateTransition (fromState, toState, node);
+          }
+
+          const float time1 = child->GetAttributeValueAsFloat ("time1");
+          const float time2 = child->GetAttributeValueAsFloat ("time2");
+
+          if(time1 > 0.0f || time2 > 0.0f)
+          {
+            factnode->SetTransitionCrossfade (fromState, toState, time1, time2);
+          }
         }
         break;
       default:

@@ -20,9 +20,6 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input name="ambient" type="rgb" default="value" defval="0">
-      <attribute name="perfragment" type="bool" defval="false" />
-    </input>
     <input name="lightDiffuse" type="rgb" default="value" defval="1">
       <attribute name="perfragment" type="bool" defval="false" />
     </input>
@@ -33,6 +30,9 @@
       <attribute name="perfragment" type="bool" defval="true" />
     </input>
     <input name="surfaceSpecular" type="rgb" default="value" defval="0">
+      <attribute name="perfragment" type="bool" defval="false" />
+    </input>
+    <input name="ambient" type="rgb" default="value" defval="0">
       <attribute name="perfragment" type="bool" defval="false" />
     </input>
       

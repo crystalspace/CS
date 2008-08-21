@@ -79,13 +79,15 @@ protected:
     csPDelArray<Snippet>& passSnippets);
 
   csRef<iDocument> LoadTechsFromDoc (const csArray<TechniqueKeeper>& techniques,
-    const FileAliases& aliases,
-    iLoaderContext* ldr_context, iDocumentNode* docSource,
+    const FileAliases& aliases, iDocumentNode* docSource,
     const char* cacheID, const char* cacheTag, iFile* cacheFile,
     bool& cacheState);
-  csRef<iDocument> LoadTechsFromCache (iLoaderContext* ldr_context, iFile* cacheFile,
+  csRef<iDocument> LoadTechsFromCache (iFile* cacheFile,
     const char* cacheFailReason);
-      
+  
+  csRef<iDocument> DoSynthesis (iDocumentNode* source,
+    iHierarchicalCache* cacheTo, int forcepriority,
+    bool noCacheRead);
 public:
   CS_LEAKGUARD_DECLARE (WeaverShader);
 
@@ -94,6 +96,7 @@ public:
   
   bool Load (iLoaderContext* ldr_context, iDocumentNode* source,
     int forcepriority);
+  bool Precache (iDocumentNode* source, iHierarchicalCache* cacheTo);
 
   virtual iObject* QueryObject () 
   { return static_cast<iObject*> (static_cast<csObject*> (this)); }

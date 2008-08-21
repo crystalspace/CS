@@ -20,11 +20,9 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input file="/shader/snippets/texCoord.inp"	
-      condition='vars."tex diffuse".texture' />
+    <input file="/shader/snippets/texCoord.inp"	/>
     
-    <input name="texDiffuse" type="tex2d" default="complex"
-	condition='vars."tex diffuse".texture'>
+    <input name="texDiffuse" type="tex2d" default="complex">
       <block location="pass">
 	<texture name="tex diffuse" destination="fragmentIn.texDiffuse" />
       </block>
@@ -38,48 +36,14 @@
       </block>
     </input>
     
-    <input name="flatColor" type="rgba" default="complex">
-      <block location="cg:variablemap">
-        <variablemap variable="mat flatcolor" 
-	  destination="fragmentIn.flatColor" />
-        <variablemap variable="mat flatcolor" 
-	  destination="vertexIn.flatColor" />
-      </block>
-      
-      <block location="cg:fragmentIn">
-	<uniform type="rgba" name="flatColor" />
-      </block>
-      
-      <block location="cg:vertexIn">
-	<uniform type="rgba" name="flatColor" />
-      </block>
-      
-      <block location="cg:fragmentMain">
-	flatColor = fragmentIn.flatColor;
-      </block>
-
-      <block location="cg:vertexMain">
-	flatColor = vertexIn.flatColor;
-      </block>
-    </input>
-      
     <block location="cg:vertexMain">
-      surfaceColor = flatColor;
-      <?if vars."tex diffuse".texture?>
-        surfaceColor_attr_perfragment = true;
-      <?else?>
-        surfaceColor_attr_perfragment = false;
-      <?endif?>
+      surfaceColor = float4(0);
+      surfaceColor_attr_perfragment = true;
     </block>
     
     <block location="cg:fragmentMain">
-      <?if vars."tex diffuse".texture?>
-	surfaceColor = tex2D (texDiffuse, texCoord);
-	surfaceColor_attr_perfragment = true;
-      <?else?>
-	surfaceColor = flatColor;
-	surfaceColor_attr_perfragment = false;
-      <?endif?>
+      surfaceColor = tex2D (texDiffuse, texCoord);
+      surfaceColor_attr_perfragment = true;
     </block>
     
     <output name="surfaceColor" type="rgba">

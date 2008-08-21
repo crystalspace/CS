@@ -55,10 +55,8 @@ namespace lighter
 
     for (size_t i = 0; i < allLights.GetSize (); ++i)
     {
-      if (!affectingLights.IsBitSet (i)) continue;
-
-      float rndValues[2];
-      lightSampler.GetNext (rndValues);
+      if (!affectingLights.IsBitSet (i)) 
+        continue;
 
       res += ShadeLight (allLights[i], obj, point, normal, lightSampler);
     }
@@ -80,7 +78,8 @@ namespace lighter
     lightSampler.GetNext (rndValues);
 
     size_t lightIdx = (size_t) floorf (allLights.GetSize () * rndValues[2]);
-    if (!affectingLights.IsBitSet (lightIdx)) return csColor (0);
+    if (!affectingLights.IsBitSet (lightIdx)) 
+      return csColor (0);
 
     return ShadeLight (allLights[lightIdx], obj, point, normal, sampler) * 
       allLights.GetSize ();
@@ -114,6 +113,14 @@ namespace lighter
         defElementQuadrantConstants, clippedElementQuadrantConstants);
       ElementQuadrantConstants = clippedElementQuadrantConstants;
     }
+    
+#ifdef DUMP_NORMALS
+    {
+      const csVector3 normal = ComputeElementNormal (element, elementC);
+      const csVector3 normalBiased = normal*0.5f + csVector3 (0.5f);
+      return csColor (normalBiased.x, normalBiased.y, normalBiased.z);
+    }
+#endif
 
     for (size_t qi = 0; qi < 4; ++qi)
     {
@@ -147,7 +154,9 @@ namespace lighter
     csColor res (0);
     for (size_t i = 0; i < allLights.GetSize (); ++i)
     {
-      if (!lighting.affectingLights.IsBitSet (i)) continue;
+      if (!lighting.affectingLights.IsBitSet (i)) 
+        continue;
+
       res += lighting.ShadeLight (allLights[i], obj, point,
         normal, lightSampler, shadowIgnorePrimitive, fullIgnore);
     }
@@ -173,7 +182,9 @@ namespace lighter
     lightSampler.GetNext (rndValues);
     size_t lightIdx = (size_t) floorf (allLights.GetSize () * rndValues[2]);
 
-    if (!lighting.affectingLights.IsBitSet (lightIdx)) return csColor (0);
+    if (!lighting.affectingLights.IsBitSet (lightIdx)) 
+      return csColor (0);
+
     return lighting.ShadeLight (allLights[lightIdx], obj, point,
       normal, sampler, shadowIgnorePrimitive, fullIgnore);
   }
@@ -245,6 +256,8 @@ namespace lighter
     VisibilityTester visTester (light, obj);
     float lightPdf, cosineTerm = 0;
     csVector3 lightVec;
+    const Object* ignObj = obj->GetFlags().Check (OBJECT_FLAG_NOSELFSHADOW)
+      ? obj : 0;
 
     const bool isDelta = true; //light->IsDeltaLight (); no support for area lights yet
 
@@ -263,11 +276,11 @@ namespace lighter
       {
         DirectLightingBorderIgnoreCb icb (shadowIgnorePrimitive, -lightVec,
           point);
-        occlusion = visTester.Occlusion (&icb);
+        occlusion = visTester.Occlusion (ignObj, &icb);
       }
       else
       {
-        occlusion = visTester.Occlusion (shadowIgnorePrimitive);
+        occlusion = visTester.Occlusion (ignObj, shadowIgnorePrimitive);
       }
       if (occlusion == VisibilityTester::occlOccluded)
         return csColor (0, 0, 0);
@@ -393,6 +406,8 @@ namespace lighter
         }
 
         csVector2 minUV = prim.GetMinUV ();
+        const size_t uOffs = size_t (floorf (minUV.x));
+        const size_t vOffs = size_t (floorf (minUV.y));
 
         // Iterate all elements
         for (size_t eidx = 0; eidx < numElements; ++eidx)
@@ -400,18 +415,18 @@ namespace lighter
           //const float elArea = areas.GetElementArea (eidx);
           Primitive::ElementType elemType = prim.GetElementType (eidx);
 
-          ElementProxy ep = prim.GetElement (eidx);
-          size_t u, v;
-          prim.GetElementUV (eidx, u, v);
-          u += size_t (floorf (minUV.x));
-          v += size_t (floorf (minUV.y));
-
           if (elemType == Primitive::ELEMENT_EMPTY)
           {                        
             progress.Advance ();
             continue;
           }
 
+          ElementProxy ep = prim.GetElement (eidx);
+          size_t u, v;
+          prim.GetElementUV (eidx, u, v);
+          u += uOffs;
+          v += vOffs;
+          
           //float pixelArea = (elArea*area2pixel);
           const float pixelAreaPart = 
             elemType == Primitive::ELEMENT_BORDER ? prim.ComputeElementFraction (eidx) : 
@@ -419,8 +434,7 @@ namespace lighter
 
           // Shade non-PD lights
           csColor c;        
-          c = (this->*lmElementShader) (sector, ep, masterSampler);
-          
+          c = (this->*lmElementShader) (sector, ep, masterSampler);          
 
           normalLM->SetAddPixel (u, v, c * pixelAreaPart);
 
@@ -466,11 +480,13 @@ namespace lighter
 
     for (size_t i = 0; i < vdata.positions.GetSize (); ++i)
     {
-      const csVector3& pos = vdata.positions[i];
-      const csVector3& normal = ComputeVertexNormal (obj, i);
-
       csColor& c = litColors->Get (i);
-
+      const csVector3& normal = ComputeVertexNormal (obj, i);
+#ifdef DUMP_NORMALS
+      const csVector3 normalBiased = normal*0.5f + csVector3 (0.5f);
+      c = csColor (normalBiased.x, normalBiased.y, normalBiased.z);
+#else
+      const csVector3& pos = vdata.positions[i];
       c = (this->*pvlPointShader) (sector, obj, pos, normal, masterSampler);
 
       // Shade PD lights
@@ -481,6 +497,7 @@ namespace lighter
         pdlColors->Get (i) += UniformShadeOneLight (sector, obj, pos, normal, pdl,
           masterSampler);
       }
+#endif
       progress.Advance ();
     }
 

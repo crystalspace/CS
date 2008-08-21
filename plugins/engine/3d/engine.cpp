@@ -28,6 +28,7 @@
 #include "csutil/databuf.h"
 #include "csutil/scf.h"
 #include "csutil/scfstrset.h"
+#include "csutil/scanstr.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
 #include "csutil/vfscache.h"
@@ -501,8 +502,9 @@ void csEngine::AddImposterToUpdateQueue (csImposterProcTex* imptex,
   {
     // We don't yet have this camera in our queue. Make a clone of
     // the renderview and camera.
-    csRenderView* copy_rview = 
-      new (rviewPool) csRenderView (*(csRenderView*)rview);
+    CS::RenderManager::RenderView* copy_rview = 
+      new (rviewPool) CS::RenderManager::RenderView (
+        *(CS::RenderManager::RenderView*)rview);
     csImposterUpdateQueue qu;
     qu.rview.AttachNew (copy_rview);
     imposterUpdateQueue.Put (camnr, qu);
@@ -661,7 +663,7 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
 
     csRef<csImposterEventHandler> imphandler;
     imphandler.AttachNew (new csImposterEventHandler (this));
-    q->RegisterListener (imphandler, csevPreProcess (objectRegistry));
+    q->RegisterListener (imphandler, csevFrame (objectRegistry));
   }
 
   csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
@@ -806,12 +808,9 @@ void csEngine::DeleteAllForce ()
   cameraPositions.RemoveAll ();
 
   defaultPortalMaterial.Invalidate ();
-  delete materials;
-  materials = new csMaterialList ();
-  delete textures;
-  textures = new csTextureList (this);
-  delete sharedVariables;
-  sharedVariables = new csSharedVariableList();
+  materials->RemoveAll();
+  textures->RemoveAll();
+  sharedVariables->RemoveAll();
 
   if (shaderManager)
   {
@@ -1212,7 +1211,7 @@ void csEngine::ShineLights (iCollection *collection, iProgressMeter *meter)
       if (input) *input++ = 0;
 
       float xf;
-      sscanf (endkw, "%f", &xf);
+      csScanStr (endkw, "%f", &xf);
 
       int xi = int (xf + ((xf < 0) ? -0.5 : + 0.5));
 
@@ -1466,7 +1465,7 @@ void csEngine::PrecacheDraw (iCollection* collection)
   view.AttachNew (new csBoxClipper (0.0, 0.0, float (G3D->GetWidth ()),
     float (G3D->GetHeight ())));
 
-  csRenderView rview (c, view, G3D, G2D);
+  CS::RenderManager::RenderView rview (c, view, G3D, G2D);
   StartDraw (c, view, rview);
 
   int sn;
@@ -1496,7 +1495,8 @@ void csEngine::PrecacheDraw (iCollection* collection)
   }
 }
 
-void csEngine::StartDraw (iCamera *c, iClipper2D* /*view*/, csRenderView &rview)
+void csEngine::StartDraw (iCamera *c, iClipper2D* /*view*/,
+                          CS::RenderManager::RenderView &rview)
 {
   rview.SetEngine (this);
   rview.SetOriginalCamera (c);
@@ -1513,6 +1513,8 @@ void csEngine::StartDraw (iCamera *c, iClipper2D* /*view*/, csRenderView &rview)
   rview.GetClipPlane ().Set (0, 0, -1, 0);
 
   // Calculate frustum for screen dimensions (at z=1).
+  c->SetViewportSize (rview.GetGraphics3D()->GetWidth(),
+    rview.GetGraphics3D()->GetHeight());
   float leftx = -c->GetShiftX () * c->GetInvFOV ();
   float rightx = (frameWidth - c->GetShiftX ()) * c->GetInvFOV ();
   float topy = -c->GetShiftY () * c->GetInvFOV ();
@@ -1530,8 +1532,9 @@ void csEngine::Draw (iCamera *c, iClipper2D *view, iMeshWrapper* mesh)
   currentFrameNumber++;
   c->SetViewportSize (frameWidth, frameHeight);
   ControlMeshes ();
-  csRef<csRenderView> rview;
-  rview.AttachNew (new (rviewPool) csRenderView (c, view, G3D, G2D));
+  csRef<CS::RenderManager::RenderView> rview;
+  rview.AttachNew (new (rviewPool) CS::RenderManager::RenderView (c, view,
+    G3D, G2D));
   StartDraw (c, view, *rview);
 
   // First initialize G3D with the right clipper.

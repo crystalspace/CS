@@ -36,6 +36,7 @@
 #include "csutil/weakref.h"
 #include "csutil/weakrefarr.h"
 #include "csutil/eventnames.h"
+#include "csutil/eventhandlers.h"
 #include "iengine/campos.h"
 #include "iengine/engine.h"
 #include "iengine/renderloop.h"
@@ -60,7 +61,7 @@
 #include "plugins/engine/3d/meshobj.h"
 #include "plugins/engine/3d/meshfact.h"
 #include "plugins/engine/3d/renderloop.h"
-#include "plugins/engine/3d/rview.h"
+#include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/sharevar.h"
 
 #include "reflectomotron3000.h"
@@ -76,7 +77,6 @@ class csLightPatchPool;
 class csMaterialList;
 class csMeshWrapper;
 class csPolygon3D;
-class csRenderView;
 class csSector;
 class csSectorList;
 class csTextureList;
@@ -585,8 +585,7 @@ public:
   // -- iEventHandler
   bool HandleEvent (iEvent &Event);
 
-  CS_EVENTHANDLER_NAMES("crystalspace.engine.3d")
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
+  CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.engine.3d")
 
   // -- iDebugHelper
   
@@ -693,7 +692,8 @@ private:
   /**
    * Setup for starting a Draw or DrawFunc.
    */
-  void StartDraw (iCamera* c, iClipper2D* view, csRenderView& rview);
+  void StartDraw (iCamera* c, iClipper2D* view,
+    CS::RenderManager::RenderView& rview);
 
   /**
    * Controll animation and delete meshes that want to die.
@@ -850,8 +850,7 @@ private:
   // -- PRIVATE MEMBERS
 
   /// Pool from which to allocate render views.
-  csRenderView::Pool rviewPool;
-  CS::RenderManager::RenderView::Pool rmRviewPool;
+  CS::RenderManager::RenderView::Pool rviewPool;
 
   // -- Object lists
   /**
@@ -949,7 +948,7 @@ private:
   /**
    * The top-level clipper we are currently using for drawing.
    */
-  csRenderView* topLevelClipper;
+  CS::RenderManager::RenderView* topLevelClipper;
     
   /// Flag set when window requires resizing.
   bool resize;

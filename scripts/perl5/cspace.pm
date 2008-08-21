@@ -936,7 +936,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *GetSupportedTests = *cspacec::iDebugHelper_GetSupportedTests;
-*UnitTest = *cspacec::iDebugHelper_UnitTest;
 *StateTest = *cspacec::iDebugHelper_StateTest;
 *Benchmark = *cspacec::iDebugHelper_Benchmark;
 *Dump = *cspacec::iDebugHelper_Dump;
@@ -1566,6 +1565,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *CreateConfigManager = *cspacec::csInitializer_CreateConfigManager;
 *CreateInputDrivers = *cspacec::csInitializer_CreateInputDrivers;
 *CreateStringSet = *cspacec::csInitializer_CreateStringSet;
+*CreateSystemOpenManager = *cspacec::csInitializer_CreateSystemOpenManager;
 *SetupConfigManager = *cspacec::csInitializer_SetupConfigManager;
 *SetupVFS = *cspacec::csInitializer_SetupVFS;
 *_RequestPlugins = *cspacec::csInitializer__RequestPlugins;
@@ -8613,9 +8613,11 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *VECTOR2 = *cspacec::csShaderVariable_VECTOR2;
 *VECTOR3 = *cspacec::csShaderVariable_VECTOR3;
 *VECTOR4 = *cspacec::csShaderVariable_VECTOR4;
+*MATRIX3X3 = *cspacec::csShaderVariable_MATRIX3X3;
 *MATRIX = *cspacec::csShaderVariable_MATRIX;
 *TRANSFORM = *cspacec::csShaderVariable_TRANSFORM;
 *ARRAY = *cspacec::csShaderVariable_ARRAY;
+*MATRIX4X4 = *cspacec::csShaderVariable_MATRIX4X4;
 *COLOR = *cspacec::csShaderVariable_COLOR;
 sub new {
     my $pkg = shift;
@@ -8639,6 +8641,7 @@ sub DESTROY {
 *SetAccessor = *cspacec::csShaderVariable_SetAccessor;
 *SetName = *cspacec::csShaderVariable_SetName;
 *GetName = *cspacec::csShaderVariable_GetName;
+*GetAccessor = *cspacec::csShaderVariable_GetAccessor;
 *GetAccessorData = *cspacec::csShaderVariable_GetAccessorData;
 *GetValue = *cspacec::csShaderVariable_GetValue;
 *SetValue = *cspacec::csShaderVariable_SetValue;
@@ -10309,6 +10312,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *ValidateTemplate = *cspacec::iShaderCompiler_ValidateTemplate;
 *IsTemplateToCompiler = *cspacec::iShaderCompiler_IsTemplateToCompiler;
 *GetPriorities = *cspacec::iShaderCompiler_GetPriorities;
+*PrecacheShader = *cspacec::iShaderCompiler_PrecacheShader;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -10597,10 +10601,10 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *RegisterTexture = *cspacec::iTextureManager_RegisterTexture;
-*CreateTexture = *cspacec::iTextureManager_CreateTexture;
 *GetTextureFormat = *cspacec::iTextureManager_GetTextureFormat;
 *CreateSuperLightmap = *cspacec::iTextureManager_CreateSuperLightmap;
 *GetMaxTextureSize = *cspacec::iTextureManager_GetMaxTextureSize;
+*CreateTexture = *cspacec::iTextureManager_CreateTexture;
 *scfGetVersion = *cspacec::iTextureManager_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -11717,6 +11721,7 @@ sub new {
 *Classify = *cspacec::csPlane3_Classify;
 *Distance = *cspacec::csPlane3_Distance;
 *Invert = *cspacec::csPlane3_Invert;
+*Inverse = *cspacec::csPlane3_Inverse;
 *Normalize = *cspacec::csPlane3_Normalize;
 *FindPoint = *cspacec::csPlane3_FindPoint;
 *ProjectOnto = *cspacec::csPlane3_ProjectOnto;
@@ -15697,6 +15702,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetStartState = *cspacec::iSkeletonFSMNodeFactory2_GetStartState;
 *GetStateCount = *cspacec::iSkeletonFSMNodeFactory2_GetStateCount;
 *ClearStates = *cspacec::iSkeletonFSMNodeFactory2_ClearStates;
+*SetStateTransition = *cspacec::iSkeletonFSMNodeFactory2_SetStateTransition;
+*SetTransitionCrossfade = *cspacec::iSkeletonFSMNodeFactory2_SetTransitionCrossfade;
 *scfGetVersion = *cspacec::iSkeletonFSMNodeFactory2_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -16038,6 +16045,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::iBase cspace );
 %OWNER = ();
 %ITERATORS = ();
+*GetVertices = *cspacec::iSprite2DFactoryState_GetVertices;
 *SetLighting = *cspacec::iSprite2DFactoryState_SetLighting;
 *HasLighting = *cspacec::iSprite2DFactoryState_HasLighting;
 *GetUVAnimationCount = *cspacec::iSprite2DFactoryState_GetUVAnimationCount;
@@ -17306,6 +17314,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetCollidable = *cspacec::iTerrainCellCollisionProperties_SetCollidable;
 *SetParameter = *cspacec::iTerrainCellCollisionProperties_SetParameter;
 *Clone = *cspacec::iTerrainCellCollisionProperties_Clone;
+*GetParameterCount = *cspacec::iTerrainCellCollisionProperties_GetParameterCount;
+*GetParameterName = *cspacec::iTerrainCellCollisionProperties_GetParameterName;
+*GetParameterValue = *cspacec::iTerrainCellCollisionProperties_GetParameterValue;
 *scfGetVersion = *cspacec::iTerrainCellCollisionProperties_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -17342,6 +17353,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetVisible = *cspacec::iTerrainCellRenderProperties_SetVisible;
 *SetParameter = *cspacec::iTerrainCellRenderProperties_SetParameter;
 *Clone = *cspacec::iTerrainCellRenderProperties_Clone;
+*GetParameterCount = *cspacec::iTerrainCellRenderProperties_GetParameterCount;
+*GetParameterName = *cspacec::iTerrainCellRenderProperties_GetParameterName;
+*GetParameterValue = *cspacec::iTerrainCellRenderProperties_GetParameterValue;
 *scfGetVersion = *cspacec::iTerrainCellRenderProperties_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -17380,6 +17394,14 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *AddAlphaMap = *cspacec::iTerrainCellFeederProperties_AddAlphaMap;
 *SetParameter = *cspacec::iTerrainCellFeederProperties_SetParameter;
 *Clone = *cspacec::iTerrainCellFeederProperties_Clone;
+*GetParameterCount = *cspacec::iTerrainCellFeederProperties_GetParameterCount;
+*GetParameterName = *cspacec::iTerrainCellFeederProperties_GetParameterName;
+*GetParameterValue = *cspacec::iTerrainCellFeederProperties_GetParameterValue;
+*GetAlphaMapCount = *cspacec::iTerrainCellFeederProperties_GetAlphaMapCount;
+*GetAlphaMapMaterial = *cspacec::iTerrainCellFeederProperties_GetAlphaMapMaterial;
+*GetAlphaMapSource = *cspacec::iTerrainCellFeederProperties_GetAlphaMapSource;
+*SetHeightmapSmooth = *cspacec::iTerrainCellFeederProperties_SetHeightmapSmooth;
+*GetHeightmapSmooth = *cspacec::iTerrainCellFeederProperties_GetHeightmapSmooth;
 *scfGetVersion = *cspacec::iTerrainCellFeederProperties_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -17732,6 +17754,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetCollisionData = *cspacec::iTerrainCell_SetCollisionData;
 *GetFeederData = *cspacec::iTerrainCell_GetFeederData;
 *SetFeederData = *cspacec::iTerrainCell_SetFeederData;
+*SetName = *cspacec::iTerrainCell_SetName;
 *scfGetVersion = *cspacec::iTerrainCell_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -17768,6 +17791,23 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetCollisionProperties = *cspacec::iTerrainFactoryCell_GetCollisionProperties;
 *GetFeederProperties = *cspacec::iTerrainFactoryCell_GetFeederProperties;
 *SetBaseMaterial = *cspacec::iTerrainFactoryCell_SetBaseMaterial;
+*GetName = *cspacec::iTerrainFactoryCell_GetName;
+*SetName = *cspacec::iTerrainFactoryCell_SetName;
+*GetGridWidth = *cspacec::iTerrainFactoryCell_GetGridWidth;
+*GetGridHeight = *cspacec::iTerrainFactoryCell_GetGridHeight;
+*GetPosition = *cspacec::iTerrainFactoryCell_GetPosition;
+*GetSize = *cspacec::iTerrainFactoryCell_GetSize;
+*GetMaterialMapWidth = *cspacec::iTerrainFactoryCell_GetMaterialMapWidth;
+*GetMaterialMapHeight = *cspacec::iTerrainFactoryCell_GetMaterialMapHeight;
+*GetBaseMaterial = *cspacec::iTerrainFactoryCell_GetBaseMaterial;
+*GetMaterialPersistent = *cspacec::iTerrainFactoryCell_GetMaterialPersistent;
+*SetGridWidth = *cspacec::iTerrainFactoryCell_SetGridWidth;
+*SetGridHeight = *cspacec::iTerrainFactoryCell_SetGridHeight;
+*SetPosition = *cspacec::iTerrainFactoryCell_SetPosition;
+*SetSize = *cspacec::iTerrainFactoryCell_SetSize;
+*SetMaterialMapWidth = *cspacec::iTerrainFactoryCell_SetMaterialMapWidth;
+*SetMaterialMapHeight = *cspacec::iTerrainFactoryCell_SetMaterialMapHeight;
+*SetMaterialPersistent = *cspacec::iTerrainFactoryCell_SetMaterialPersistent;
 *scfGetVersion = *cspacec::iTerrainFactoryCell_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -17803,10 +17843,17 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetRenderer = *cspacec::iTerrainFactory_SetRenderer;
 *SetCollider = *cspacec::iTerrainFactory_SetCollider;
 *SetFeeder = *cspacec::iTerrainFactory_SetFeeder;
-*AddCell = *cspacec::iTerrainFactory_AddCell;
 *SetMaxLoadedCells = *cspacec::iTerrainFactory_SetMaxLoadedCells;
 *SetVirtualViewDistance = *cspacec::iTerrainFactory_SetVirtualViewDistance;
 *SetAutoPreLoad = *cspacec::iTerrainFactory_SetAutoPreLoad;
+*GetRenderer = *cspacec::iTerrainFactory_GetRenderer;
+*GetCollider = *cspacec::iTerrainFactory_GetCollider;
+*GetFeeder = *cspacec::iTerrainFactory_GetFeeder;
+*GetMaxLoadedCells = *cspacec::iTerrainFactory_GetMaxLoadedCells;
+*GetCellCount = *cspacec::iTerrainFactory_GetCellCount;
+*GetDefaultCell = *cspacec::iTerrainFactory_GetDefaultCell;
+*AddCell = *cspacec::iTerrainFactory_AddCell;
+*GetCell = *cspacec::iTerrainFactory_GetCell;
 *scfGetVersion = *cspacec::iTerrainFactory_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -19115,6 +19162,49 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csSectorVisibleRenderMeshes ##############
+
+package cspace::csSectorVisibleRenderMeshes;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_imesh_get = *cspacec::csSectorVisibleRenderMeshes_imesh_get;
+*swig_imesh_set = *cspacec::csSectorVisibleRenderMeshes_imesh_set;
+*swig_num_get = *cspacec::csSectorVisibleRenderMeshes_num_get;
+*swig_num_set = *cspacec::csSectorVisibleRenderMeshes_num_set;
+*swig_rmeshes_get = *cspacec::csSectorVisibleRenderMeshes_rmeshes_get;
+*swig_rmeshes_set = *cspacec::csSectorVisibleRenderMeshes_rmeshes_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csSectorVisibleRenderMeshes(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csSectorVisibleRenderMeshes($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iSector ##############
 
 package cspace::iSector;
@@ -19169,6 +19259,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetSVContext = *cspacec::iSector_GetSVContext;
 *PrecacheDraw = *cspacec::iSector_PrecacheDraw;
 *CallSectorCallbacks = *cspacec::iSector_CallSectorCallbacks;
+*GetVisibleRenderMeshes = *cspacec::iSector_GetVisibleRenderMeshes;
 *scfGetVersion = *cspacec::iSector_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -22543,6 +22634,7 @@ sub CSDRAW_2DGRAPHICS () { $cspacec::CSDRAW_2DGRAPHICS }
 sub CSDRAW_3DGRAPHICS () { $cspacec::CSDRAW_3DGRAPHICS }
 sub CSDRAW_CLEARZBUFFER () { $cspacec::CSDRAW_CLEARZBUFFER }
 sub CSDRAW_CLEARSCREEN () { $cspacec::CSDRAW_CLEARSCREEN }
+sub CSDRAW_NOCLIPCLEAR () { $cspacec::CSDRAW_NOCLIPCLEAR }
 sub CS_CLIPPER_NONE () { $cspacec::CS_CLIPPER_NONE }
 sub CS_CLIPPER_OPTIONAL () { $cspacec::CS_CLIPPER_OPTIONAL }
 sub CS_CLIPPER_TOPLEVEL () { $cspacec::CS_CLIPPER_TOPLEVEL }

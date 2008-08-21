@@ -213,6 +213,8 @@ namespace lighter
   class KDTreeBuilder
   {
   public:
+    KDTreeBuilder ();
+
     /*
     Take an object iterator and build a kd-tree from that
     */

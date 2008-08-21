@@ -80,7 +80,7 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     
     // @@@ FIXME: Needing such a high bias scale seems ridiculous!
     bias = (1.0/32768.0);
-    bias *= 1 + (gradient*gradient*256);
+    //bias *= 1 + (gradient*gradient*256);
   }
   
   half GetVisibility()
@@ -89,10 +89,10 @@ struct ShadowShadowMapDepth : ShadowShadowMap
       (shadowMapCoordsProj.xy) * shadowMapUnscale.xy + shadowMapUnscale.zw;
     
     ShadowClipper clipper;
-    if (clipper.IsClipped (shadowMapCoordsProjUnscaled, shadowMapCoordsProj,
+    if (clipper.IsClipped (shadowMapCoordsProjUnscaled, shadowMapCoordsProj.xyz,
         shadowMapCoords))
       return clipper.ClippedFactor ();
-  
+
     float3 shadowMapCoordsBiased = (float3(0.5)*shadowMapCoordsProj.xyz) + float3(0.5);
     // Depth to compare against
     float compareDepth = (1-shadowMapCoordsBiased.z) - bias;

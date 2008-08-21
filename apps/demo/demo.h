@@ -44,6 +44,7 @@ struct iVFS;
 struct iEvent;
 class DemoSequenceManager;
 class csTransform;
+class FramePrinter;
 
 class Demo
 {
@@ -59,9 +60,9 @@ public:
   iObjectRegistry* object_reg;
   csRef<iVirtualClock> vc;
   csRef<iLoader> loader;
+  csRef<FramePrinter> printer;
 
-  csEventID Process;
-  csEventID FinalProcess;
+  csEventID Frame;
   csEventID KeyboardDown;
   csEventID MouseDown;
   csEventID MouseMove;
@@ -96,7 +97,6 @@ public:
   bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
   void SetupFrame ();
-  void FinishFrame ();
   bool DemoHandleEvent (iEvent &Event);
 
   void ShowMessage (const char* msg, ...);

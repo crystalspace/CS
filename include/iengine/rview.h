@@ -41,7 +41,6 @@ struct iSector;
 struct csFog;
 
 class csBox3;
-class csRenderView;
 class csReversibleTransform;
 class csSphere;
 class csVector3;
@@ -190,9 +189,7 @@ struct iRenderView : public virtual iBase
   virtual iGraphics3D* GetGraphics3D () = 0;
   /**
    * Get the frustum.
-   * \deprecated Deprecated in 1.3. Use visible volume from camera
    */
-  CS_DEPRECATED_METHOD_MSG("Use visible volume from camera")
   virtual void GetFrustum (float& lx, float& rx, float& ty, float& by) = 0;
 
   //-----------------------------------------------------------------

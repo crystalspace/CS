@@ -34,7 +34,9 @@ namespace lighter
     //Setup defaults
     lighterProperties.doDirectLight = true;
     lighterProperties.directionalLMs = false;
-    lighterProperties.numThreads = 1;
+    lighterProperties.numThreads = CS::Platform::GetProcessorCount();
+    lighterProperties.saveBinaryBuffers = true;
+    lighterProperties.checkDupes = true;
 
     lmProperties.lmDensity = 4.0f;
     lmProperties.maxLightmapU = 1024;
@@ -42,6 +44,9 @@ namespace lighter
     lmProperties.blackThreshold = lightValueEpsilon;
     lmProperties.normalsTolerance = 1.0f * (PI / 180.0f);
     lmProperties.grayPDMaps = true;
+    
+    terrainProperties.maxLightmapU = lmProperties.maxLightmapU;
+    terrainProperties.maxLightmapV = lmProperties.maxLightmapV;
 
     diProperties.pointLightMultiplier = 1.0f;
     diProperties.areaLightMultiplier = 1.0f;
@@ -59,6 +64,8 @@ namespace lighter
       lighterProperties.directionalLMs);
     lighterProperties.numThreads = cfgFile->GetInt ("lighter2.NumThreads", 
       lighterProperties.numThreads);
+    lighterProperties.checkDupes = cfgFile->GetBool ("lighter2.CheckDupes",
+      lighterProperties.checkDupes);
 
     lmProperties.lmDensity = cfgFile->GetFloat ("lighter2.lmDensity", 
       lmProperties.lmDensity);
@@ -66,11 +73,18 @@ namespace lighter
       lmProperties.maxLightmapU);
     lmProperties.maxLightmapV = cfgFile->GetInt ("lighter2.maxLightmapV", 
       lmProperties.maxLightmapV);
+    lighterProperties.saveBinaryBuffers = cfgFile->GetBool ("lighter2.binary",
+      lighterProperties.saveBinaryBuffers);
    
     lmProperties.blackThreshold = cfgFile->GetFloat ("lighter2.blackThreshold", 
       lmProperties.blackThreshold);
     lmProperties.blackThreshold = csMax (lmProperties.blackThreshold,
       lightValueEpsilon); // Values lower than the LM precision don't make sense
+      
+    terrainProperties.maxLightmapU = cfgFile->GetInt ("lighter2.maxTerrainLightmapU", 
+      lmProperties.maxLightmapU);
+    terrainProperties.maxLightmapV = cfgFile->GetInt ("lighter2.maxTerrainLightmapV", 
+      lmProperties.maxLightmapV);
 
     float normalsToleranceAngle = cfgFile->GetFloat ("lighter2.normalsTolerance", 
       1.0f);

@@ -20,6 +20,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDERVIEW_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDERVIEW_H__
 
+/**\file
+ * Standard iRenderView implementation
+ */
+
 #include "csutil/pooledscfclass.h"
 #include "csutil/scf_implementation.h"
 #include "iengine/engine.h"
@@ -58,28 +62,37 @@ namespace RenderManager
     /// The 2D graphics subsystem used for drawing.
     iGraphics2D* g2d;
     /**
-    * A copy to the original base camera before space warping.
-    */
+     * A copy to the original base camera before space warping.
+     */
     iCamera* original_camera;
 
     /// The view frustum as defined at z=1.
     float leftx, rightx, topy, boty;
 
     /**
-    * Update the frustum of the current context to the current clipper.
-    */
+     * Update the frustum of the current context to the current clipper.
+     */
     void UpdateFrustum ();
+    /**
+     * Update the frustum of the current context to a frustum clipping outside
+     * \a box.
+     */
+    void SetFrustumFromBox (const csBox2& box);
+    
+    /// Dimensions of the view being rendered to
+    int viewWidth, viewHeight;
 
+    /// Mesh filter for this view
     CS::Utility::MeshFilter meshFilter;
   public:
-    ///
+    /// Construct.
     RenderView ();
-    ///
+    /// Construct.
     RenderView (iCamera* c);
-    ///
+    /// Construct.
     RenderView (iCamera* c, iClipper2D* v, iGraphics3D* ig3d,
       iGraphics2D* ig2d);
-    ///
+    /// Construct.
     RenderView (iView* v);
     /// Copy constructor.
     RenderView (const RenderView& other);
@@ -101,43 +114,43 @@ namespace RenderManager
     void SetCsRenderContext (csRenderContext* c) { ctxt = c; }
 
     /**
-    * Create a new render context. This is typically used
-    * when going through a portal. Note that you should remember
-    * the old render context if you want to restore it later.
-    * The render context will get all the values from the current context
-    * (with SCF references properly incremented).
-    */
+     * Create a new render context. This is typically used
+     * when going through a portal. Note that you should remember
+     * the old render context if you want to restore it later.
+     * The render context will get all the values from the current context
+     * (with SCF references properly incremented).
+     */
     void CreateRenderContext ();
     /**
-    * Restore a render context. Use this to restore a previously overwritten
-    * render context. This function will take care of properly cleaning
-    * up the current render context.
-    */
+     * Restore a render context. Use this to restore a previously overwritten
+     * render context. This function will take care of properly cleaning
+     * up the current render context.
+     */
     void RestoreRenderContext ();
 
     /**
-    * Create a new camera in the current render context. This function
-    * will create a new camera based on the current one. The new camera
-    * reference is returned.
-    */
+     * Create a new camera in the current render context. This function
+     * will create a new camera based on the current one. The new camera
+     * reference is returned.
+     */
     iCamera* CreateNewCamera ();
 
     /**
-    * Set the previous sector.
-    */
+     * Set the previous sector.
+     */
     void SetPreviousSector (iSector* s) { ctxt->previous_sector = s; }
     /**
-    * Set the current sector.
-    */
+     * Set the current sector.
+     */
     void SetThisSector (iSector* s) { ctxt->this_sector = s; }
 
     /**
-    * Get render recursion level.
-    */
+     * Get render recursion level.
+     */
     int GetRenderRecursionLevel () const { return ctxt->draw_rec_level; }
     /**
-    * Set render recursion level.
-    */
+     * Set render recursion level.
+     */
     void SetRenderRecursionLevel (int rec)
     {
       ctxt->draw_rec_level = rec;
@@ -152,20 +165,20 @@ namespace RenderManager
     /// Set the view frustum at z=1.
     void SetFrustum (float lx, float rx, float ty, float by);
 
-    ///
+    /// Whether to enable clipping to the clip plane.
     void UseClipPlane (bool u) { ctxt->do_clip_plane = u; }
-    ///
+    /// Whether to enable clipping to the frustum.
     void UseClipFrustum (bool u) { ctxt->do_clip_frustum = u; }
     /**
-    * Set the 3D clip plane that should be used to clip all geometry.
-    */
+     * Set the 3D clip plane that should be used to clip all geometry.
+     */
     void SetClipPlane (const csPlane3& p) { ctxt->clip_plane = p; }
     /**
-    * Get the 3D clip plane that should be used to clip all geometry.
-    * If this function returns false then this plane is invalid and should
-    * not be used. Otherwise it must be used to clip the object before
-    * drawing.
-    */
+     * Get the 3D clip plane that should be used to clip all geometry.
+     * If this function returns false then this plane is invalid and should
+     * not be used. Otherwise it must be used to clip the object before
+     * drawing.
+     */
     bool GetClipPlane (csPlane3& pl) const
     {
       pl = ctxt->clip_plane;
@@ -182,11 +195,11 @@ namespace RenderManager
       return ctxt->clip_plane;
     }
     /**
-    * If true then we have to clip all objects to the portal frustum
-    * (returned with GetClipper()). Normally this is not needed but
-    * some portals require this. If GetClipPlane() returns true then the
-    * value of this function is also implied to be true.
-    */
+     * If true then we have to clip all objects to the portal frustum
+     * (returned with GetClipper()). Normally this is not needed but
+     * some portals require this. If GetClipPlane() returns true then the
+     * value of this function is also implied to be true.
+     */
     bool IsClipperRequired () const { return ctxt->do_clip_frustum; }
 
     /**
@@ -196,20 +209,20 @@ namespace RenderManager
     */
     csFogInfo* GetFirstFogInfo () { return ctxt->fog_info; }
     /**
-    * Set the first fog info.
-    */
+     * Set the first fog info.
+     */
     void SetFirstFogInfo (csFogInfo* fi)
     {
       ctxt->fog_info = fi;
       ctxt->added_fog_info = true;
     }
     /**
-    * Return true if fog info has been added.
-    */
+     * Return true if fog info has been added.
+     */
     bool AddedFogInfo () const { return ctxt->added_fog_info; }
     /**
-    * Reset fog info.
-    */
+     * Reset fog info.
+     */
     void ResetFogInfo () { ctxt->added_fog_info = false; }
 
     /// Get the current render context.
@@ -229,6 +242,16 @@ namespace RenderManager
       ty = topy;
       by = boty;
     }
+    
+    /// Get the width of the view rendered to
+    int GetViewWidth() const { return viewWidth; }
+    /// Get the height of the view rendered to
+    int GetViewHeight() const { return viewHeight; }
+    /**
+     * Set the dimensions of the view rendered to. Needed for pixel-bases 
+     * computations.
+     */
+    void SetViewDimensions (int w, int h) { viewWidth = w; viewHeight = h; }
 
     //-----------------------------------------------------------------
     // The following functions operate on the current render context.
@@ -258,8 +281,10 @@ namespace RenderManager
     /// Get the number of the current frame.
     virtual uint GetCurrentFrameNumber () const;
 
+    /// Destroy a render context created with CreateRenderContext ().
     virtual void DestroyRenderContext (csRenderContext* context);
 
+    /// Get the mesh fikter for this view.
     CS::Utility::MeshFilter& GetMeshFilter () { return meshFilter; }
   };
 

@@ -25,6 +25,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <math.h>
 #include <ctype.h>
 
+#include "csutil/scanstr.h"
 #include "csutil/scfarray.h"
 #include "csutil/sysfunc.h"
 
@@ -84,7 +85,11 @@ enum
 
   OP_FUNC_TIME,
   OP_FUNC_FRAME,
-
+  
+  OP_FUNC_MATRIX_COLUMN,
+  OP_FUNC_MATRIX_ROW,
+  OP_FUNC_MATRIX2GL,
+  
   // Pseudo-ops, special case weird stuff
   OP_PS_MAKE_VECTOR,
 
@@ -129,6 +134,9 @@ static const char* const opNames[OP_LAST] = {
   "MAX",
   "TIME",
   "FRAME",
+  "MATRIXCOLUMN",
+  "MATRIXROW",
+  "MATRIX2GL",
   "!MAKEVECTOR",
   "!LIMIT",
   "!ATOM",
@@ -147,6 +155,7 @@ enum
   TYPE_VECTOR3,
   TYPE_VECTOR4,
   TYPE_VARIABLE, // a shader variable
+  TYPE_MATRIX,
 
   TYPE_LIMIT,
 
@@ -167,6 +176,7 @@ static const char* const typeNames[TYPE_LAST] = {
   "vec3",
   "vec4",
   "var",
+  "matrix",
   "!limit",
   "!oper",
   "!cons",
@@ -232,6 +242,10 @@ static const op_args_info optimize_arg_table[] =
 
   { 0, 0, false }, // OP_FUNC_TIME
   { 0, 0, false }, // OP_FUNC_FRAME
+  
+  { 2, 2, false }, // OP_FUNC_MATRIX_COLUMN
+  { 2, 2, false }, // OP_FUNC_MATRIX_ROW
+  { 1, 1, false }, // OP_FUNC_MATRIX2GL
 
   { 2, 4, false }, // OP_PS_MAKE_VECTOR
 
@@ -768,6 +782,13 @@ bool csShaderExpression::eval_variable(csShaderVariable * var, oper_arg & out)
     out.type = TYPE_VECTOR4;
     var->GetValue(out.vec4);
     break;
+    
+  case csShaderVariable::TRANSFORM:
+  case csShaderVariable::MATRIX3X3:
+  case csShaderVariable::MATRIX4X4:
+    out.type = TYPE_MATRIX;
+    var->GetValue(out.matrix);
+    break;
 
   default:
     EvalError ("Unknown type %d in shader variable, not usable in an expression.", 
@@ -811,6 +832,10 @@ bool csShaderExpression::eval_argument(const oper_arg & arg, csShaderVariable * 
 
   case TYPE_VECTOR4:
     out->SetValue(arg.vec4);
+    break;
+
+  case TYPE_MATRIX:
+    out->SetValue(arg.matrix);
     break;
 
   default:
@@ -873,6 +898,8 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg arg2, oper_
   case OP_FUNC_POW: return eval_pow(arg1, arg2, output);
   case OP_FUNC_MIN: return eval_min(arg1, arg2, output);
   case OP_FUNC_MAX: return eval_max(arg1, arg2, output);
+  case OP_FUNC_MATRIX_COLUMN: return eval_matrix_column(arg1, arg2, output);
+  case OP_FUNC_MATRIX_ROW: return eval_matrix_row(arg1, arg2, output);
   case OP_INT_SELT12: return eval_selt12(arg1, arg2, output);
   case OP_INT_SELT34: return eval_selt34(arg1, arg2, output);
 
@@ -919,6 +946,7 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg & output)
   case OP_FUNC_VEC_LEN: return eval_vec_len(arg1, output);
   case OP_FUNC_NORMAL: return eval_normal(arg1, output);
   case OP_FUNC_FLOOR: return eval_floor(arg1, output);
+  case OP_FUNC_MATRIX2GL: return eval_matrix2gl(arg1, output);
 
   case OP_INT_LOAD: return eval_load(arg1, output);
 
@@ -1033,6 +1061,11 @@ bool csShaderExpression::eval_mul(const oper_arg & arg1, const oper_arg & arg2, 
     output.type = arg2.type;
     output.vec4 = arg2.vec4 * arg1.num;
 
+  } 
+  else if ((arg1.type == TYPE_MATRIX) && (arg2.type == TYPE_MATRIX))
+  {
+    output.type = TYPE_MATRIX;
+    output.matrix = arg1.matrix * arg2.matrix;
   } 
   else 
   {
@@ -1404,6 +1437,96 @@ bool csShaderExpression::eval_frame(oper_arg & output) const
   return true;
 }
 
+bool csShaderExpression::eval_matrix_column(const oper_arg & arg1, 
+                                            const oper_arg & arg2,
+  	                                    oper_arg & output) const
+{
+  if (arg1.type != TYPE_MATRIX)
+  {
+    EvalError ("Argument 1 to matrix-column is not a matrix.");
+
+    return false;
+  }
+
+  if (arg2.type != TYPE_NUMBER)
+  {
+    EvalError ("Argument 2 to matrix-column is not a number.");
+
+    return false;
+  }
+
+  int colIndex = int (arg2.num);
+  if ((colIndex < 0) || (colIndex > 3))
+  {
+    EvalError ("Argument 2 to matrix-column is not between 0 and 3 inclusive.");
+
+    return false;
+  }
+
+  output.type = TYPE_VECTOR4;
+  output.vec4 = arg1.matrix.Col (colIndex);
+
+  return true;
+  
+}
+  	
+bool csShaderExpression::eval_matrix_row (const oper_arg & arg1, 
+                                          const oper_arg & arg2,
+  	                                  oper_arg & output) const
+{
+  if (arg1.type != TYPE_MATRIX)
+  {
+    EvalError ("Argument 1 to matrix-row is not a matrix.");
+
+    return false;
+  }
+
+  if (arg2.type != TYPE_NUMBER)
+  {
+    EvalError ("Argument 2 to matrix-row is not a number.");
+
+    return false;
+  }
+
+  int rowIndex = int (arg2.num);
+  if ((rowIndex < 0) || (rowIndex > 3))
+  {
+    EvalError ("Argument 2 to matrix-row is not between 0 and 3 inclusive.");
+
+    return false;
+  }
+
+  output.type = TYPE_VECTOR4;
+  output.vec4 = arg1.matrix.Row (rowIndex);
+
+  return true;
+  
+}
+  	
+bool csShaderExpression::eval_matrix2gl (const oper_arg & arg1, 
+                                          oper_arg & output) const
+{
+  if (arg1.type != TYPE_MATRIX)
+  {
+    EvalError ("Argument to matrix2gl is not a matrix.");
+
+    return false;
+  }
+
+  csVector4 matrix_o2t = arg1.matrix.Col4();
+  matrix_o2t.w = 0;
+  matrix_o2t = arg1.matrix.GetInverse() * matrix_o2t;
+
+  output.type = TYPE_MATRIX;
+  output.matrix = arg1.matrix;
+  output.matrix.m14 = -matrix_o2t.x;
+  output.matrix.m24 = -matrix_o2t.y;
+  output.matrix.m34 = -matrix_o2t.z;
+
+  return true;
+  
+}
+  	
 bool csShaderExpression::eval_selt12(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const 
 {
   if (arg1.type != TYPE_NUMBER || arg2.type != TYPE_NUMBER)
@@ -1550,7 +1673,7 @@ bool csShaderExpression::parse_sexp_form(const char *& text, cons * head) {
   CS_ASSERT(text[0] == '(');
   text++;
 
-  /* Function name first */
+  /* f first */
   const char * tmp = text;
   while (!isspace(*tmp))
     tmp++;
@@ -1757,7 +1880,7 @@ bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const c
     {
       float v1, v2;
 
-      if (sscanf(val_str, "%f,%f", &v1, &v2) < 2)
+      if (csScanStr (val_str, "%f,%f", &v1, &v2) < 2)
       {
         ParseError ("Couldn't parse vector2: %s.", val_str);
 
@@ -1772,7 +1895,7 @@ bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const c
     {
       float v1, v2, v3;
 
-      if (sscanf(val_str, "%f,%f,%f", &v1, &v2, &v3) < 3)
+      if (csScanStr (val_str, "%f,%f,%f", &v1, &v2, &v3) < 3)
       {
         ParseError ("Couldn't parse vector3: %s.", val_str);
 
@@ -1787,7 +1910,7 @@ bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const c
     {
       float v1, v2, v3, v4;
 
-      if (sscanf(val_str, "%f,%f,%f,%f", &v1, &v2, &v3, &v4) < 4)
+      if (csScanStr (val_str, "%f,%f,%f,%f", &v1, &v2, &v3, &v4) < 4)
       {
         ParseError ("Couldn't parse vector4: %s.", val_str);
 
@@ -2230,6 +2353,10 @@ void csShaderExpression::print_result(const oper_arg & arg) const {
       csPrintf ("#<VECTOR4 (%f %f %f %f)>", arg.vec4.x, arg.vec4.y, arg.vec4.z, arg.vec4.w);
       break;
       
+    case TYPE_MATRIX:
+      csPrintf ("#<MATRIX (%s)>", arg.matrix.Description().GetData());
+      break;
+      
     case TYPE_VARIABLE:
       csPrintf ("#<VARIABLEREF \"%s\">", strset->Request (arg.var.id));
       break;
@@ -2275,24 +2402,25 @@ static csStringID GetTokenID (const TokenTabEntry* tokenTab,
     size_t m = (l+h) / 2;
     if (pos > tokenTab[m].tokenLen) return csInvalidStringID;
     const char* tabTok = tokenTab[m].token;
-    int d = tabTok[pos] - *p;
+    int d = *tabTok - *p;
     if (d == 0)
     {
       do
       {
-        pos++; p++;
-      } while (tabTok[pos] == *p);
+        pos++;
+      } while ((d = (tabTok[pos] - p[pos])) == 0);
       if (pos >= tokenLen)
         return tokenTab[m].id;
-      continue;
     }
-    else if (d < 0)
+    if (d < 0)
     {
       l = m+1;
+      pos = 0;
     }
     else
     {
       h = m;
+      pos = 0;
     }
   }
   return csInvalidStringID;
@@ -2312,6 +2440,9 @@ static const TokenTabEntry commonTokens[] = {
   {"floor", 5, OP_FUNC_FLOOR},
   {"frame", 5, OP_FUNC_FRAME},
   {"make-vector", 11, OP_PS_MAKE_VECTOR},
+  {"matrix-column", 13, OP_FUNC_MATRIX_COLUMN},
+  {"matrix-row", 10, OP_FUNC_MATRIX_ROW},
+  {"matrix2gl", 9, OP_FUNC_MATRIX2GL},
   {"max", 3, OP_FUNC_MAX},
   {"min", 3, OP_FUNC_MIN},
   {"norm", 4, OP_FUNC_NORMAL},
@@ -2361,6 +2492,7 @@ csStringID csShaderExpression::GetSexpTokenOp (const char* token)
 }
 
 static const TokenTabEntry xmlTypeTokens[] = {
+  {"matrix", 6, TYPE_MATRIX},
   {"num", 3, TYPE_NUMBER},
   {"var", 3, TYPE_VARIABLE},
   {"vec2", 4, TYPE_VECTOR2},

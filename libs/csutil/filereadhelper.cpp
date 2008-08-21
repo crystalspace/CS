@@ -21,6 +21,7 @@
 #include "cssysdef.h"
 #include <ctype.h>
 #include "csutil/filereadhelper.h"
+#include "csutil/scanstr.h"
 #include "iutil/databuff.h"
 
 #define IMPLEMENT_READ_INT(name,type)					\
@@ -115,7 +116,7 @@ float csFileReadHelper::ReadTextFloat ()
   size_t Position = file->GetPos();
   if (!GetString (buf, sizeof (buf), true)) return false;
     
-  if (sscanf (buf, "%f%n", &Value, &Length) != 1)
+  if (csScanStr (buf, "%f%n", &Value, &Length) != 1)
   {
     file->SetPos (file->GetSize ());
     return 0;

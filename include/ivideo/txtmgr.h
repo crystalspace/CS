@@ -166,7 +166,7 @@ struct iSuperLightmap : public virtual iBase
  */
 struct iTextureManager : public virtual iBase
 {
-  SCF_INTERFACE(iTextureManager, 3,2,0);
+  SCF_INTERFACE(iTextureManager, 3,2,1);
   /**
    * Register a texture. The given input image is IncRef'd and DecRef'ed
    * later when no longer needed. If you want to keep the input image
@@ -239,6 +239,27 @@ struct iTextureManager : public virtual iBase
    * Request maximum texture dimensions.
    */
   virtual void GetMaxTextureSize (int& w, int& h, int& aspect) = 0;
+
+  /**
+   * Create a new texture with the given texture format.
+   * 
+   * \param w Horizontal size of the texture.
+   * \param h Vertical size of the texture.
+   * \param d Depth size of the texture (for 3D textures).
+   * \param imagetype Type of the image.
+   * \param format A texture format string.
+   * \param flags Contains one or several of CS_TEXTURE_XXX flags OR'ed
+   *  together. They define the mode texture is going to be used in.
+   * \param fail_reason An optional string which will be filled with
+   *  the reason for failure if there was a failure.
+   * \return A new texture handle or 0 if the texture couldn't be
+   *  created for some reason. The reason will be put in the optional
+   *  \a fail_reason parameter.
+   * \sa \ref TextureFormatStrings 
+   */
+  virtual csPtr<iTextureHandle> CreateTexture (int w, int h, int d,
+      csImageType imagetype, const char* format, int flags,
+      iString* fail_reason = 0) = 0;
 };
 
 /** @} */

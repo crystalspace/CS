@@ -31,93 +31,61 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   typedef csVertexListWalker<float, csVector3> MorphTargetOffsetsWalker;
   
 #include "csutil/custom_new_disable.h"
-
-  void AnimeshObject::SkinVertices ()
+  void AnimeshObject::MorphVertices ()
   {
-    if (!skeleton)
-      return;
-
-    // @@Better checks/handling...
-    CS_ASSERT (skinnedVertices->GetElementCount () >= factory->vertexCount);
-    
-    // Setup some local data
-    csVertexListWalker<float, csVector3> srcVerts (factory->vertexBuffer);
-    csRenderBufferLock<csVector3> dstVerts (skinnedVertices);
-    csSkeletalState2* skeletonState = lastSkeletonState;
-
     bool hasMorphing = false;
     for (size_t i = 0; i < morphTargetWeights.GetSize(); i++)
     {
       if (morphTargetWeights[i] != 0)
       {
-	hasMorphing = true;
-	break;
+        hasMorphing = true;
+        break;
       }
     }
-    size_t numMorphTargets = hasMorphing ? morphTargetWeights.GetSize() : 0;
-    CS_ALLOC_STACK_ARRAY(uint8, morphWalkersRaw,
+
+    if (!hasMorphing)
+    {
+      postMorphVertices = factory->vertexBuffer;
+      return;
+    }
+
+    // Setup the morph target VB
+    if (!postMorphVertices || postMorphVertices == factory->vertexBuffer)
+    {
+      postMorphVertices = csRenderBuffer::CreateRenderBuffer (factory->GetVertexCountP (),
+        CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+    }
+
+    const size_t numMorphTargets =  morphTargetWeights.GetSize();
+    CS_ALLOC_STACK_ARRAY(uint8, morphWalkersRaw, 
       numMorphTargets * sizeof (MorphTargetOffsetsWalker));
+
     MorphTargetOffsetsWalker* morphWalkers =
       (MorphTargetOffsetsWalker*)(void*)morphWalkersRaw;
+
     for (size_t m = 0; m < numMorphTargets; m++)
     {
       new (morphWalkers + m) MorphTargetOffsetsWalker (
-	factory->morphTargets[m]->offsets);
+        factory->morphTargets[m]->offsets);
     }
 
-    csAnimatedMeshBoneInfluence* influence = factory->boneInfluences.GetArray ();
+    csVertexListWalker<float, csVector3> srcVerts (factory->vertexBuffer);
+    csRenderBufferLock<csVector3> dstVerts (postMorphVertices);
 
-    for (size_t i = 0; i < factory->vertexCount; ++i)
+    for (size_t i = 0; i < factory->GetVertexCountP (); ++i)
     {
-      // Accumulate data for the vertex
-      int numInfluences = 0;
+      csVector3 morphedVert = *srcVerts;
 
-      csDualQuaternion dq (csQuaternion (0,0,0,0), csQuaternion (0,0,0,0)); 
-      csQuaternion pivot;   
-
-      for (size_t j = 0; j < 4; ++j, ++influence) // @@SOLVE 4
-      {
-        if (influence->influenceWeight > 0)
-        {
-          numInfluences++;
-
-          csDualQuaternion inflQuat (
-            skeletonState->GetQuaternion (influence->bone),
-            skeletonState->GetVector (influence->bone));
-
-          if (numInfluences == 1)
-          {
-            pivot = inflQuat.real;
-          }
-          else if (inflQuat.real.Dot (pivot) < 0.0f)
-          {
-            inflQuat *= -1.0f;
-          }
-
-          dq += inflQuat * influence->influenceWeight;
-        }
-      }
-
-      csVector3 srcVert = *srcVerts;
       for (size_t m = 0; m < numMorphTargets; m++)
       {
-	MorphTargetOffsetsWalker& walk = morphWalkers[m];
-	srcVert += (*walk) * morphTargetWeights[m];
-	++walk;
+        MorphTargetOffsetsWalker& walk = morphWalkers[m];
+        morphedVert += (*walk) * morphTargetWeights[m];
+        ++walk;
       }
-      
-      if (numInfluences == 0)
-      {
-        dstVerts[i] = srcVert;
-      }
-      else
-      {
-        dq = dq.Unit ();
 
-        dstVerts[i] = dq.TransformPoint (srcVert);
-      }  
+      dstVerts[i] = morphedVert;
 
-      ++srcVerts;      
+      ++srcVerts;
     }
 
     for (size_t m = 0; m < numMorphTargets; m++)
@@ -128,220 +96,31 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
 #include "csutil/custom_new_enable.h"
 
-
-  void AnimeshObject::SkinNormals ()
+  template<bool SkinV, bool SkinN, bool SkinTB>
+  void AnimeshObject::Skin ()
   {
     if (!skeleton)
       return;
 
     // @@Better checks/handling...
-    CS_ASSERT (skinnedNormals->GetElementCount () >= factory->vertexCount);
-
-    // Setup some local data
-    csVertexListWalker<float, csVector3> srcNormals (factory->normalBuffer);
-    csRenderBufferLock<csVector3> dstNormals (skinnedNormals);
-    csSkeletalState2* skeletonState = lastSkeletonState;    
-
-    csAnimatedMeshBoneInfluence* influence = factory->boneInfluences.GetArray ();
-
-    for (size_t i = 0; i < factory->vertexCount; ++i)
+    if (SkinV)
     {
-      // Accumulate data for the vertex
-      int numInfluences = 0;
-
-      csDualQuaternion dq (csQuaternion (0,0,0,0), csQuaternion (0,0,0,0)); 
-      csQuaternion pivot;   
-
-      for (size_t j = 0; j < 4; ++j, ++influence) // @@SOLVE 4
-      {
-        if (influence->influenceWeight > 0)
-        {
-          numInfluences++;
-
-          csDualQuaternion inflQuat (
-            skeletonState->GetQuaternion (influence->bone),
-            skeletonState->GetVector (influence->bone));
-
-          if (numInfluences == 1)
-          {
-            pivot = inflQuat.real;
-          }
-          else if (inflQuat.real.Dot (pivot) < 0.0f)
-          {
-            inflQuat *= -1.0f;
-          }
-
-          dq += inflQuat * influence->influenceWeight;
-        }
-      }
-
-      if (numInfluences == 0)
-      {
-        dstNormals[i] = *srcNormals;
-      }
-      else
-      {
-        dq = dq.Unit ();
-
-        dstNormals[i] = dq.Transform (*srcNormals);
-      }  
-
-      ++srcNormals;      
+      CS_ASSERT (skinnedVertices->GetElementCount () >= factory->vertexCount);
     }
-  }
 
-
-  void AnimeshObject::SkinVerticesAndNormals ()
-  {
-    if (!skeleton)
-      return;
-
-    // @@Better checks/handling...
-    CS_ASSERT (skinnedVertices->GetElementCount () >= factory->vertexCount);
-    CS_ASSERT (skinnedNormals->GetElementCount () >= factory->vertexCount);
-
-
-    // Setup some local data
-    csVertexListWalker<float, csVector3> srcVerts (factory->vertexBuffer);
-    csRenderBufferLock<csVector3> dstVerts (skinnedVertices);
-    csVertexListWalker<float, csVector3> srcNormals (factory->normalBuffer);
-    csRenderBufferLock<csVector3> dstNormals (skinnedNormals);
-
-    csSkeletalState2* skeletonState = lastSkeletonState;    
-
-    csAnimatedMeshBoneInfluence* influence = factory->boneInfluences.GetArray ();
-
-    for (size_t i = 0; i < factory->vertexCount; ++i)
+    if (SkinN)
     {
-      // Accumulate data for the vertex
-      int numInfluences = 0;
-
-      csDualQuaternion dq (csQuaternion (0,0,0,0), csQuaternion (0,0,0,0)); 
-      csQuaternion pivot;   
-
-      for (size_t j = 0; j < 4; ++j, ++influence) // @@SOLVE 4
-      {
-        if (influence->influenceWeight > 0)
-        {
-          numInfluences++;
-
-          csDualQuaternion inflQuat (
-            skeletonState->GetQuaternion (influence->bone),
-            skeletonState->GetVector (influence->bone));
-
-          if (numInfluences == 1)
-          {
-            pivot = inflQuat.real;
-          }
-          else if (inflQuat.real.Dot (pivot) < 0.0f)
-          {
-            inflQuat *= -1.0f;
-          }
-
-          dq += inflQuat * influence->influenceWeight;
-        }
-      }
-
-      if (numInfluences == 0)
-      {
-        dstVerts[i] = *srcVerts;
-        dstNormals[i] = *srcNormals;
-      }
-      else
-      {
-        dq = dq.Unit ();
-
-        dstVerts[i] = dq.TransformPoint (*srcVerts);        
-        dstNormals[i] = dq.Transform (*srcNormals);
-      }  
-
-      ++srcVerts;
-      ++srcNormals;
+      CS_ASSERT (skinnedNormals->GetElementCount () >= factory->vertexCount);
     }
-  }
-
-  void AnimeshObject::SkinTangentAndBinormal ()
-  {
-    if (!skeleton)
-      return;
-
-    // @@Better checks/handling...
-    CS_ASSERT (skinnedTangents->GetElementCount () >= factory->vertexCount);
-    CS_ASSERT (skinnedBinormals->GetElementCount () >= factory->vertexCount);
-
-
-    // Setup some local data
-    csVertexListWalker<float, csVector3> srcTangents (factory->tangentBuffer);
-    csRenderBufferLock<csVector3> dstTangents (skinnedTangents);
-    csVertexListWalker<float, csVector3> srcBinormals (factory->binormalBuffer);
-    csRenderBufferLock<csVector3> dstBinormals (skinnedBinormals);
-
-    csSkeletalState2* skeletonState = lastSkeletonState;    
-
-    csAnimatedMeshBoneInfluence* influence = factory->boneInfluences.GetArray ();
-
-    for (size_t i = 0; i < factory->vertexCount; ++i)
+    
+    if (SkinTB)
     {
-      // Accumulate data for the vertex
-      int numInfluences = 0;
-
-      csDualQuaternion dq (csQuaternion (0,0,0,0), csQuaternion (0,0,0,0)); 
-      csQuaternion pivot;   
-
-      for (size_t j = 0; j < 4; ++j, ++influence) // @@SOLVE 4
-      {
-        if (influence->influenceWeight > 0)
-        {
-          numInfluences++;
-
-          csDualQuaternion inflQuat (
-            skeletonState->GetQuaternion (influence->bone),
-            skeletonState->GetVector (influence->bone));
-
-          if (numInfluences == 1)
-          {
-            pivot = inflQuat.real;
-          }
-          else if (inflQuat.real.Dot (pivot) < 0.0f)
-          {
-            inflQuat *= -1.0f;
-          }
-
-          dq += inflQuat * influence->influenceWeight;
-        }
-      }
-
-      if (numInfluences == 0)
-      {
-        dstTangents[i] = *srcTangents;
-        dstBinormals[i] = *srcBinormals;
-      }
-      else
-      {
-        dq = dq.Unit ();
-
-        dstTangents[i] = dq.Transform (*srcTangents);        
-        dstBinormals[i] = dq.Transform (*srcBinormals);
-      }  
-
-      ++srcTangents;
-      ++srcBinormals;
-    }
-  }
-
-  void AnimeshObject::SkinAll ()
-  {
-    if (!skeleton)
-      return;
-
-    // @@Better checks/handling...
-    CS_ASSERT (skinnedVertices->GetElementCount () >= factory->vertexCount);
-    CS_ASSERT (skinnedNormals->GetElementCount () >= factory->vertexCount);
-    CS_ASSERT (skinnedTangents->GetElementCount () >= factory->vertexCount);
-    CS_ASSERT (skinnedBinormals->GetElementCount () >= factory->vertexCount);
+      CS_ASSERT (skinnedTangents->GetElementCount () >= factory->vertexCount);
+      CS_ASSERT (skinnedBinormals->GetElementCount () >= factory->vertexCount);
+    }    
 
     // Setup some local data
-    csVertexListWalker<float, csVector3> srcVerts (factory->vertexBuffer);
+    csVertexListWalker<float, csVector3> srcVerts (postMorphVertices);
     csRenderBufferLock<csVector3> dstVerts (skinnedVertices);
     csVertexListWalker<float, csVector3> srcNormals (factory->normalBuffer);
     csRenderBufferLock<csVector3> dstNormals (skinnedNormals);
@@ -388,19 +167,41 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
       if (numInfluences == 0)
       {
-        dstVerts[i] = *srcVerts;
-        dstNormals[i] = *srcNormals;
-        dstTangents[i] = *srcTangents;
-        dstBinormals[i] = *srcBinormals;
+        if (SkinV)
+        {
+          dstVerts[i] = *srcVerts;
+        }
+
+        if (SkinN)
+        {
+          dstNormals[i] = *srcNormals;
+        }        
+
+        if (SkinTB)
+        {
+          dstTangents[i] = *srcTangents;
+          dstBinormals[i] = *srcBinormals;
+        }        
       }
       else
       {
         dq = dq.Unit ();
 
-        dstVerts[i] = dq.TransformPoint (*srcVerts);
-        dstNormals[i] = dq.Transform (*srcNormals);
-        dstTangents[i] = dq.Transform (*srcTangents);        
-        dstBinormals[i] = dq.Transform (*srcBinormals);
+        if (SkinV)
+        {
+          dstVerts[i] = dq.TransformPoint (*srcVerts);
+        }
+
+        if (SkinN)
+        {
+          dstNormals[i] = dq.Transform (*srcNormals);
+        }
+
+        if (SkinTB)
+        {
+          dstTangents[i] = dq.Transform (*srcTangents);
+          dstBinormals[i] = dq.Transform (*srcBinormals);
+        }       
       }
 
       ++srcVerts;
@@ -408,6 +209,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       ++srcTangents;
       ++srcBinormals;
     }
+  }
+
+
+  void AnimeshObject::SkinVertices ()
+  {
+    Skin<true, false, false> ();
+  }
+
+  void AnimeshObject::SkinNormals ()
+  {
+    Skin<false, true, false> ();
+  }
+
+  void AnimeshObject::SkinVerticesAndNormals ()
+  {
+    Skin<true, true, false> ();
+  }
+
+  void AnimeshObject::SkinTangentAndBinormal ()
+  {
+    Skin<false, false, true> ();
+  }
+
+  void AnimeshObject::SkinAll ()
+  {
+    Skin<true, true, true> ();
   }
 
 }

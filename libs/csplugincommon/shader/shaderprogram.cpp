@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 
 #include "csutil/databuf.h"
+#include "csutil/scanstr.h"
 #include "csutil/util.h"
 #include "csutil/xmltiny.h"
 #include "csgfx/shaderexp.h"
@@ -31,8 +32,23 @@
 
 #include "csplugincommon/shader/shaderprogram.h"
 
-CS_LEAKGUARD_IMPLEMENT (csShaderProgram);
+void csShaderProgram::ProgramParam::SetValue (float val)
+{
+  var.AttachNew (new csShaderVariable (CS::InvalidShaderVarStringID));
+  var->SetValue (val);
+  valid = true;
+}
 
+void csShaderProgram::ProgramParam::SetValue (const csVector4& val)
+{
+  var.AttachNew (new csShaderVariable (CS::InvalidShaderVarStringID));
+  var->SetValue (val);
+  valid = true;
+}
+
+//---------------------------------------------------------------------------
+
+CS_LEAKGUARD_IMPLEMENT (csShaderProgram);
 
 csShaderProgram::csShaderProgram (iObjectRegistry* objectReg)
   : scfImplementationType (this)
@@ -203,7 +219,7 @@ bool csShaderProgram::ProgramParamParser::ParseProgramParam (
 	    "Node has no contents");
 	  return false;
 	}
-	if (sscanf (value, "%f,%f", &x, &y) != 2)
+	if (csScanStr (value, "%f,%f", &x, &y) != 2)
 	{
 	  synsrv->Report ("crystalspace.graphics3d.shader.common",
 	    CS_REPORTER_SEVERITY_WARNING,
@@ -226,7 +242,7 @@ bool csShaderProgram::ProgramParamParser::ParseProgramParam (
 	    "Node has no contents");
 	  return false;
 	}
-	if (sscanf (value, "%f,%f,%f", &x, &y, &z) != 3)
+	if (csScanStr (value, "%f,%f,%f", &x, &y, &z) != 3)
 	{
 	  synsrv->Report ("crystalspace.graphics3d.shader.common",
 	    CS_REPORTER_SEVERITY_WARNING,
@@ -249,7 +265,7 @@ bool csShaderProgram::ProgramParamParser::ParseProgramParam (
 	    "Node has no contents");
 	  return false;
 	}
-	if (sscanf (value, "%f,%f,%f,%f", &x, &y, &z, &w) != 4)
+	if (csScanStr (value, "%f,%f,%f,%f", &x, &y, &z, &w) != 4)
 	{
 	  synsrv->Report ("crystalspace.graphics3d.shader.common",
 	    CS_REPORTER_SEVERITY_WARNING,

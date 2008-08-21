@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_HDRHELPER_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_HDRHELPER_H__
 
+/**\file
+ * HDR rendering helper
+ */
+
 #include "iutil/objreg.h"
 #include "imap/loader.h"
 
@@ -48,28 +52,31 @@ namespace CS
       enum Quality
       {
         /**
-         * Use 8-bit integers: fastest, but can look very, very bad. Use only
-         * when desperate
+         * Use 8-bit integers: fastest, supported by all hardware, but can 
+         * look very, very bad if no care is taken. Recommended when maximum
+         * compatibility is needed.
          */
         qualInt8,
         /**
          * Use 10-bit integers: faster and usually looking good enough;
-         * range is still rather limited.
+         * range is still rather limited; not supported on all hardware.
          */
         qualInt10,
         /**
          * Use 16-bit integers: fast and usually good enough;
-         * range is still limited.
+         * range is still limited; not supported on all hardware.
          */
         qualInt16,
         /**
          * Use 16-bit floats: slower than integers, but wider range.
          * Use if you should run into color precision issues with integer.
+         * Hardware support is limited on older hardware.
          */
         qualFloat16,
         /**
          * Use 32-bit floats: slowest, but also highest range and precision.
          * However, rarely needed.
+         * Hardware support is limited on older hardware.
          */
         qualFloat32
       };
@@ -79,8 +86,10 @@ namespace CS
        * textures.
        * \param objectReg Pointer to the object registry.
        * \param quality Quality of the intermediate textures rendered to.
-       * \param colorRange Range of colors for integer texture qualities.
+       * \param colorRange Fixed range of colors for integer texture qualities.
        *   Typical values are 16 for qualInt16 and 4 for qualInt8.
+       *   When a HDR exposure control is used this range may change
+       *   dynamically.
        * \return Whether the setup succeeded.
        * \remarks By default a simple linear tone mapping to the screen
        *   color space is used. This can be changed with SetMappingShader().
@@ -88,6 +97,7 @@ namespace CS
       bool Setup (iObjectRegistry* objectReg, 
         Quality quality, int colorRange);
 
+      /// Get the post processing effects manager which applies HDR tone mapping.
       PostEffectManager& GetHDRPostEffects() { return postEffects; }
 
       /// Set the shader used for tonemapping the final image.
@@ -115,6 +125,10 @@ namespace CS
       iConfigFile* config;
       csString prefix;
     public:
+      /**
+       * Set configuration to obtain the settings from. \a prefix is the prefix
+       * used for reading keys, should not end in a dot (<tt>.</tt>).
+       */
       HDRSettings (iConfigFile* config, const char* prefix);
       
       /// Whether HDR rendering should be enabled

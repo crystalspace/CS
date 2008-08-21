@@ -21,6 +21,7 @@
 
 #include "csgfx/renderbuffer.h"
 #include "csutil/csendian.h"
+#include "csutil/scanstr.h"
 #include "ivideo/rendermesh.h"
 
 #include "condeval.h"
@@ -504,7 +505,7 @@ const char* csConditionEvaluator::ResolveExpValue (const csExpressionToken& valu
     if (isFloat)
     {
       char dummy;
-      if (sscanf (number, "%f%c", &operand.floatVal, &dummy) != 1)
+      if (csScanStr (number, "%f%c", &operand.floatVal, &dummy) != 1)
       {
 	return SetLastError ("Malformed float value: '%s'",
 	  number.GetData());
@@ -761,6 +762,7 @@ const char* csConditionEvaluator::ProcessExpression (csExpression* expression,
       newOp.operation = opEqual;
       err = ResolveOperand (expression, newOp.left);
       if (err != 0) return err;
+      newOp.right.Clear();
       newOp.right.type = operandBoolean;
       newOp.right.boolVal = true;
     }
@@ -776,6 +778,7 @@ const char* csConditionEvaluator::ProcessExpression (csExpression* expression,
 	  csExpressionToken::Extractor (t).Get (), OperandTypeDescription (newOp.left.type),
 	  OperandTypeDescription (operandBoolean));
       }
+      newOp.right.Clear();
       newOp.right.type = operandBoolean;
       newOp.right.boolVal = false;
     }
@@ -898,6 +901,7 @@ const char* csConditionEvaluator::ProcessExpression (csExpression* expression,
         newOpL.right.type = operandBoolean;
         newOpL.right.boolVal = true;
 
+        newOp.left.Clear();
         newOp.left.type = operandOperation;
         newOp.left.operation = FindOptimizedCondition (newOpL);
       }
@@ -921,6 +925,7 @@ const char* csConditionEvaluator::ProcessExpression (csExpression* expression,
         newOpR.right.type = operandBoolean;
         newOpR.right.boolVal = true;
 
+        newOp.right.Clear();
         newOp.right.type = operandOperation;
         newOp.right.operation = FindOptimizedCondition (newOpR);
       }
@@ -948,6 +953,7 @@ const char* csConditionEvaluator::ProcessExpression (csExpression* expression,
         newOpL.right.type = operandBoolean;
         newOpL.right.boolVal = true;
 
+        newOp.left.Clear();
         newOp.left.type = operandOperation;
         newOp.left.operation = FindOptimizedCondition (newOpL);
       }
@@ -971,6 +977,7 @@ const char* csConditionEvaluator::ProcessExpression (csExpression* expression,
         newOpR.right.type = operandBoolean;
         newOpR.right.boolVal = true;
 
+        newOp.right.Clear();
         newOp.right.type = operandOperation;
         newOp.right.operation = FindOptimizedCondition (newOpR);
       }
@@ -1037,6 +1044,25 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
   condResult.Set (condition, result);
 
   return result;
+}
+
+void csConditionEvaluator::ForceConditionResults (const csBitArray& condResults)
+{
+  /* Hack: it can happen that while evaluating a shader, new conditions 
+   * are added (notably when a shader source is retrieved from an
+   * external source). Make sure the cache is large enough.
+   */
+  if (condChecked.GetSize() < GetNumConditions ())
+  {
+    condChecked.SetSize (GetNumConditions ());
+    condResult.SetSize (GetNumConditions ());
+  }
+
+  for (size_t i = 0; i < condResults.GetSize(); i++)
+  {
+    condChecked.Set (i, true);
+    condResult.Set (i, condResults[i]);
+  }
 }
 
 csConditionEvaluator::EvaluatorShadervar::BoolType 
@@ -1748,7 +1774,8 @@ ConditionsReader::ConditionsReader (csConditionEvaluator& evaluator,
   
   savedConds.SetPos (savedConds.GetSize() - sizeof (uint32));
   uint32 numCondsLE;
-  savedConds.Read ((char*)&numCondsLE, sizeof (numCondsLE));
+  if (savedConds.Read ((char*)&numCondsLE, sizeof (numCondsLE))
+    != sizeof (sizeof (numCondsLE))) return;
   numCondsLE = csLittleEndian::UInt32 (numCondsLE);
   savedConds.SetPos (0);
   
@@ -1758,7 +1785,8 @@ ConditionsReader::ConditionsReader (csConditionEvaluator& evaluator,
   for (uint32 currentID = 0; currentID < numCondsLE; currentID++)
   {
     CondOperation newCond;
-    ReadCondition (&savedConds, stringStore, newCond);
+    if (!ReadCondition (&savedConds, stringStore, newCond))
+      return;
     diskIDToCond.Put (currentID,
       evaluator.FindOptimizedCondition (newCond));
   }
@@ -1887,7 +1915,7 @@ bool ConditionsReader::ReadCondOperand (iFile* cacheFile,
 csConditionID ConditionsReader::GetConditionID (uint32 diskID) const
 {
   const csConditionID* cond = diskIDToCond.GetElementPointer (diskID);
-  CS_ASSERT(cond != 0);
+  if (cond == 0) return (csConditionID)~0;
   return *cond;
 }
 

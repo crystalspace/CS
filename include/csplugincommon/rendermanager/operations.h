@@ -19,6 +19,11 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_OPERATIONS_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_OPERATIONS_H__
 
+/**\file
+ * Generic operations to combine actions with iterations over sets of some
+ * data.
+ */
+
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csutil/set.h"
 #include "csutil/compositefunctor.h"

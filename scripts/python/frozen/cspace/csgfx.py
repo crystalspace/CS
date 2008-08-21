@@ -168,9 +168,11 @@ class csShaderVariable(core.csRefCount):
     VECTOR2 = _csgfx.csShaderVariable_VECTOR2
     VECTOR3 = _csgfx.csShaderVariable_VECTOR3
     VECTOR4 = _csgfx.csShaderVariable_VECTOR4
+    MATRIX3X3 = _csgfx.csShaderVariable_MATRIX3X3
     MATRIX = _csgfx.csShaderVariable_MATRIX
     TRANSFORM = _csgfx.csShaderVariable_TRANSFORM
     ARRAY = _csgfx.csShaderVariable_ARRAY
+    MATRIX4X4 = _csgfx.csShaderVariable_MATRIX4X4
     COLOR = _csgfx.csShaderVariable_COLOR
     def __init__(self, *args): 
         this = _csgfx.new_csShaderVariable(*args)
@@ -184,6 +186,7 @@ class csShaderVariable(core.csRefCount):
     def SetAccessor(*args): return _csgfx.csShaderVariable_SetAccessor(*args)
     def SetName(*args): return _csgfx.csShaderVariable_SetName(*args)
     def GetName(*args): return _csgfx.csShaderVariable_GetName(*args)
+    def GetAccessor(*args): return _csgfx.csShaderVariable_GetAccessor(*args)
     def GetAccessorData(*args): return _csgfx.csShaderVariable_GetAccessorData(*args)
     def SetValue(*args): return _csgfx.csShaderVariable_SetValue(*args)
     def AddVariableToArray(*args): return _csgfx.csShaderVariable_AddVariableToArray(*args)

@@ -1,6 +1,6 @@
 # checkpython.m4                                               -*- Autoconf -*-
 #==============================================================================
-# Copyright (C)2003,2004 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2003-2008 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -37,14 +37,15 @@ AC_PREREQ([2.56])
 #	the default.  WITH-DESCRIPTION is the description to use for the
 #	--with[out]-python option. The literal string "use" (or "do not use")
 #	is prepended to WITH-DESCRIPTION. If omitted, WITH-DESCRIPTION defaults
-#	to "Python".  If EMITTER is provided, then CS_EMIT_BUILD_RESULT() is
-#	invoked with EMITTER in order to record the results in an output
-#	file. As a convenience, if EMITTER is the literal value "emit" or
-#	"yes", then CS_EMIT_BUILD_RESULT()'s default emitter will be used.
-#	When EMITTER is provided, the following properties are emitted to the
-#	output file: PYTHON (the actual interpreter), PYTHON.AVAILABLE ("yes"
-#	or "no"), PYTHON.CFLAGS, PYTHON.LFLAGS, PYTHON.VERSION,
-#	and PYTHON.MODULE_EXT.
+#	to "Python".  If EMITTER is provided, then CS_EMIT_BUILD_PROPERTY() and
+#	CS_EMIT_BUILD_RESULT() are invoked with EMITTER in order to record the
+#	results in an output file. As a convenience, if EMITTER is the literal
+#	value "emit" or "yes", then the default emitter of
+#	CS_EMIT_BUILD_PROPERTY() and CS_EMIT_BUILD_RESULT() will be used.  When
+#	EMITTER is provided, the following properties are emitted to the output
+#	file: PYTHON (the actual interpreter), PYTHON.AVAILABLE ("yes" or
+#	"no"), PYTHON.CFLAGS, PYTHON.LFLAGS, PYTHON.VERSION, and
+#	PYTHON.MODULE_EXT.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_PYTHON],
     [AC_REQUIRE([CS_CHECK_PTHREAD])
@@ -62,14 +63,14 @@ AC_DEFUN([CS_CHECK_PYTHON],
     CS_EMIT_BUILD_PROPERTY([PYTHON],[$PYTHON],[],[],CS_EMITTER_OPTIONAL([$1]))
 
     AS_IF([test -n "$PYTHON" && test "$with_python" != no],
-	[AC_CACHE_CHECK([for python SDK], [cs_cv_python_sdk],
-	    [cs_pyver=`AC_RUN_LOG([$PYTHON -c 'import sys, string; \
-		print string.join(map(str,sys.version_info[[:2]]),".")'])`
-	    cs_cv_pybase="python${cs_pyver}"
+	[AC_CACHE_CHECK([Python version], [cs_cv_pyver],
+	    [cs_cv_pyver=`AC_RUN_LOG([$PYTHON -c 'import sys, string; \
+		print string.join(map(str,sys.version_info[[:2]]),".")'])`])
+	CS_EMIT_BUILD_PROPERTY([PYTHON.VERSION], [$cs_cv_pyver], [], [],
+	    CS_EMITTER_OPTIONAL([$1]))
 
-	    CS_EMIT_BUILD_PROPERTY([PYTHON.VERSION],[$cs_pyver],[],[],
-		CS_EMITTER_OPTIONAL([$1]))
-
+	AC_CACHE_CHECK([for python SDK], [cs_cv_python_sdk],
+	    [cs_cv_pybase="python${cs_cv_pyver}"
 	    cs_cv_pybase_cflags=CS_RUN_PATH_NORMALIZE([$PYTHON -c \
 		'import distutils.sysconfig; \
 		print "-I" + distutils.sysconfig.get_python_inc()'])
@@ -104,7 +105,7 @@ AC_DEFUN([CS_CHECK_PYTHON],
 		'import distutils.sysconfig; \
 		print (distutils.sysconfig.get_config_var("SO") or "")'])`
 
-	    AS_IF([test -n "$cs_pyver" &&
+	    AS_IF([test -n "$cs_cv_pyver" &&
 		   test -n "$cs_cv_pybase_cflags" &&
 		   test -n "$cs_cv_pybase_lflags_base$cs_cv_pybase_sysprefix_lflags"],
 		[cs_cv_python_sdk=yes], [cs_cv_python_sdk=no])])

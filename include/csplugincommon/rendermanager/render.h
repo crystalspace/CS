@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDER_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDER_H__
 
+/**\file
+ * Context rendering
+ */
+
 #include "csplugincommon/rendermanager/posteffects.h"
 #include "csplugincommon/rendermanager/operations.h"
 #include "csplugincommon/rendermanager/rendertree.h"
@@ -163,7 +167,7 @@ namespace RenderManager
 
       for (size_t p = 0; p < numPasses; ++p)
       {
-        shader->ActivatePass (ticket, p);
+        if (!shader->ActivatePass (ticket, p)) continue;
 
         for (size_t m = firstMesh; m < lastMesh; ++m)
         {
@@ -171,7 +175,7 @@ namespace RenderManager
           context.svArrays.SetupSVStack (svStack, currentLayer, mesh.contextLocalId);
 
           csRenderMeshModes modes (*mesh.renderMesh);
-          shader->SetupPass (ticket, mesh.renderMesh, modes, svStack);
+          if (!shader->SetupPass (ticket, mesh.renderMesh, modes, svStack)) continue;
           modes.z_buf_mode = mesh.zmode;
 
           g3d->DrawMesh (mesh.renderMesh, modes, svStack);
@@ -197,6 +201,21 @@ namespace RenderManager
   /**
    * Renderer for multiple contexts, grouping them by render target and
    * rendering all layers of each context to same target.
+   *
+   * Usage: with reverse iteration over all contexts.
+   * Usually used in the final step before post processing effects are
+   * applied. Example:
+   * \code
+   * // ... contexts setup etc. ...
+   *
+   * {
+   *   SimpleTreeRenderer<RenderTree> render (renderView->GetGraphics3D (),
+   *     shaderManager);
+   *   ForEachContextReverse (renderTree, render);
+   * }
+   *
+   * // ... apply post processing ...
+   * \endcode
    */
   template<typename RenderTree>
   class SimpleTreeRenderer

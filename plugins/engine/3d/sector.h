@@ -151,6 +151,9 @@ public:
 
   virtual csRenderMeshList* GetVisibleMeshes (iRenderView *);
 
+  virtual csSectorVisibleRenderMeshes* GetVisibleRenderMeshes (int& num,
+    iMeshWrapper* mesh, iRenderView *rview, uint32 frustum_mask);
+
   virtual const csSet<csPtrKey<iMeshWrapper> >& GetPortalMeshes () const
   { return portalMeshes; }
 
@@ -503,6 +506,15 @@ private:
 
   csArray<visibleMeshCacheHolder> visibleMeshCache;
   csPDelArray<csRenderMeshList> usedMeshLists;
+
+  // These are used by GetVisibleRenderMeshes
+  csSectorVisibleRenderMeshes oneVisibleMesh[2];
+  csDirtyAccessArray<csSectorVisibleRenderMeshes> renderMeshesScratch;
+  void MarkMeshAndChildrenVisible (iMeshWrapper* mesh, 
+    iRenderView* rview, uint32 frustum_mask,
+    bool doFade = false, float fade = 1.0f);
+  void ObjectVisible (csMeshWrapper* cmesh, iRenderView* rview, 
+    uint32 frustum_mask, bool doFade, float fade);
 
   /**
    * Visibilty number for last VisTest call

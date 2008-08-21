@@ -1604,6 +1604,8 @@ void csGenmeshMeshObjectFactory::CalculateNormals (bool compress)
   }
   autonormals = true;
   autonormals_compress = compress;
+
+  legacyBuffers.mesh_normals_dirty_flag = true;
 }
 
 void csGenmeshMeshObjectFactory::GenerateCapsule (float l, float r, uint sides)
@@ -1872,6 +1874,7 @@ bool csGenmeshMeshObjectFactory::RemoveRenderBuffer (csRenderBufferName name)
 
 iRenderBuffer* csGenmeshMeshObjectFactory::GetRenderBuffer (int index)
 {
+  UpdateFromLegacyBuffers();
   CS::ShaderVarStringID bufID = user_buffer_names[index];
   return userBuffers.GetRenderBuffer (bufID);
 }
@@ -1885,6 +1888,7 @@ csRef<iString> csGenmeshMeshObjectFactory::GetRenderBufferName (int index) const
 
 iRenderBuffer* csGenmeshMeshObjectFactory::GetRenderBuffer (const char* name)
 {
+  UpdateFromLegacyBuffers();
   CS::ShaderVarStringID bufID = svstrings->Request (name);
   iRenderBuffer* buf = userBuffers.GetRenderBuffer (bufID);
   if (buf != 0) return buf;
@@ -1907,6 +1911,7 @@ iRenderBuffer* csGenmeshMeshObjectFactory::GetRenderBuffer (csRenderBufferName n
   const char* nameStr = csRenderBuffer::GetDescrFromBufferName (name);
   if (nameStr == 0) return 0;
 
+  UpdateFromLegacyBuffers();
   CS::ShaderVarStringID bufID = svstrings->Request (nameStr);
   iRenderBuffer* buf = userBuffers.GetRenderBuffer (bufID);
   if (buf != 0) return buf;

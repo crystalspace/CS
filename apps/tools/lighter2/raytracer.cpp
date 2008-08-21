@@ -132,6 +132,10 @@ namespace lighter
         ray.ignorePrimitive->GetPlane () == prim->primPointer->GetPlane ())
         continue;
 
+      if ((ray.ignoreObject != 0)
+	  && prim->primPointer->GetObject() == ray.ignoreObject)
+        continue;
+
       haveHit = IntersectPrimitiveRay (*prim, ray, thisHit);
       if (haveHit)
       {
@@ -285,6 +289,23 @@ namespace lighter
     HitPoint& hit, HitIgnoreCallback* ignoreCB)
   {
     HitCallbackNone hitCB;
+    if (ignoreCB)
+    {
+      IgnoreCallbackObj ignCB (ignoreCB);
+      return TraceFunction<true> (tree, ray, hit, hitCB, ignCB);
+    }
+    else
+    {
+      IgnoreCallbackNone ignCB;
+      return TraceFunction<true> (tree, ray, hit, hitCB, ignCB);
+    }
+  }
+    
+  bool Raytracer::TraceAnyHit (const KDTree* tree, const Ray &ray, 
+    HitPointCallback* hitCallback, HitIgnoreCallback* ignoreCB)
+  {
+    HitCallbackObj hitCB (hitCallback);
+    HitPoint hit;
     if (ignoreCB)
     {
       IgnoreCallbackObj ignCB (ignoreCB);

@@ -131,8 +131,27 @@ public:
     // Setup shaders and tickets
     SetupStandardTicket (context, shaderManager,
       lightSetup.GetPostLightingLayers());
+  
+    {
+      RMShadowedPSSM::AutoReflectRefractType fxRR (
+        rmanager->reflectRefractPersistent, *this);
+      typedef TraverseUsedSVSets<RenderTreeType,
+        RMShadowedPSSM::AutoReflectRefractType> SVTraverseType;
+      SVTraverseType svTraverser
+        (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+      // And do the iteration
+      ForEachMeshNode (context, svTraverser);
+    }
   }
 
+
+  // Called by RMShadowedPSSM::AutoReflectRefractType
+  void operator() (typename RenderTreeType::ContextNode& context)
+  {
+    typename PortalSetupType::ContextSetupData portalData (&context);
+
+    operator() (context, portalData);
+  }
 
 private:
   RMShadowedPSSM* rmanager;
@@ -157,14 +176,24 @@ bool RMShadowedPSSM::RenderView (iView* view)
   rview.AttachNew (new (treePersistent.renderViewPool) 
     CS::RenderManager::RenderView(view));
 #include "csutil/custom_new_enable.h"
-  view->GetCamera()->SetViewportSize (rview->GetGraphics3D()->GetWidth(),
-    rview->GetGraphics3D()->GetHeight());
+  iCamera* c = view->GetCamera ();
+  iGraphics3D* G3D = rview->GetGraphics3D ();
+  int frameWidth = G3D->GetWidth ();
+  int frameHeight = G3D->GetHeight ();
+  c->SetViewportSize (frameWidth, frameHeight);
   view->GetEngine ()->UpdateNewFrame ();  
   view->GetEngine ()->FireStartFrame (rview);
+
+  float leftx = -c->GetShiftX () * c->GetInvFOV ();
+  float rightx = (frameWidth - c->GetShiftX ()) * c->GetInvFOV ();
+  float topy = -c->GetShiftY () * c->GetInvFOV ();
+  float boty = (frameHeight - c->GetShiftY ()) * c->GetInvFOV ();
+  rview->SetFrustum (leftx, rightx, topy, boty);
 
   contextsScannedForTargets.Empty ();
   portalPersistent.UpdateNewFrame ();
   lightPersistent.UpdateNewFrame ();
+  reflectRefractPersistent.UpdateNewFrame ();
 
   iSector* startSector = rview->GetThisSector ();
 
@@ -328,6 +357,8 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   portalPersistent.Initialize (shaderManager, g3d);
   lightPersistent.shadowPersist.SetConfigPrefix ("RenderManager.ShadowPSSM");
   lightPersistent.Initialize (objectReg, treePersistent.debugPersist);
+  reflectRefractPersistent.Initialize (objectReg, treePersistent.debugPersist,
+    &postEffects);
   
   return true;
 }

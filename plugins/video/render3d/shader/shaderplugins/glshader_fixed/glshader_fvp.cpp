@@ -128,7 +128,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
     glMaterialfv (GL_FRONT_AND_BACK, GL_EMISSION, (float*)&v);
     v = GetParamVectorVal (stack, matSpecular, zero);
     glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, (float*)&v);
-    float f = GetParamFloatVal (stack, matSpecularExp, 0);
+    float f = GetParamFloatVal (stack, matSpecularExp, 0.0f);
     glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, f);
 
     var = csGetShaderVariableFromStack (stack, ambientvar);
@@ -1006,7 +1006,7 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
   return true;
 }
 
-bool csGLShaderFVP::Compile()
+bool csGLShaderFVP::Compile (iHierarchicalCache*, csRef<iString>* tag)
 {
   shaderPlug->Open ();
   ext = shaderPlug->ext;
@@ -1031,6 +1031,8 @@ bool csGLShaderFVP::Compile()
   csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (objectReg);
   g2d->PerformExtension ("getstatecache", &statecache);
 
+  tag->AttachNew (new scfString ("default"));
+  
   return true;
 }
 

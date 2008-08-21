@@ -22,6 +22,7 @@
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "csutil/event.h"
+#include "csutil/eventhandlers.h"
 #include "xwindow.h"
 #include "csgeom/csrect.h"
 #include "csutil/callstack.h"
@@ -361,7 +362,7 @@ bool csXWindow::Open ()
     scfiEventHandler.AttachNew (new EventHandler (this));
   csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0) {
-    csEventID events[3] = { csevPreProcess(name_reg), 
+    csEventID events[3] = { csevFrame(name_reg), 
 			    csevCommandLineHelp(name_reg), 
 			    CS_EVENTLIST_END };
     q->RegisterListener (scfiEventHandler, events);

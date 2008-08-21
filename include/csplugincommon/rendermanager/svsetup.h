@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_SVSETUP_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_SVSETUP_H__
 
+/**\file
+ * Standard shader variable setup
+ */
+
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/operations.h"
 
@@ -31,7 +35,19 @@ namespace RenderManager
 
   /**
    * Standard shader variable stack setup functor.
+   * Sets up mesh-specific SVs for the object to world and inverse transform,
+   * SVs from the layer, material, rendermesh and mesh wrapper.
    * Assumes that the contextLocalId in each mesh is set.
+   *
+   * Usage: with iteration over each mesh. Usually after SetupStandardSVs. 
+   * Example:
+   * \code
+   * {
+   *   StandardSVSetup<RenderTree, RenderLayers> svSetup (
+   *     context.svArrays, layerConfig);
+   *   ForEachMeshNode (context, svSetup);
+   * }
+   * \endcode
    */
   template<typename RenderTree, typename LayerConfigType>
   class StandardSVSetup
@@ -44,6 +60,7 @@ namespace RenderManager
     {
     }  
 
+    /// Operator doing main work
     void operator() (typename RenderTree::MeshNode* node)
     {
       csShaderVariableStack localStack;
@@ -95,6 +112,7 @@ namespace RenderManager
    * Standard shader variable stack setup functor for setting up shader variables
    * from given shader and ticket arrays.
    * Assumes that the contextLocalId in each mesh is set.
+   * Usually done through SetupStandardTicket().
    */
   template<typename RenderTree, typename LayerConfigType>
   class ShaderSVSetup
@@ -156,7 +174,15 @@ namespace RenderManager
 
 
   /**
-   * 
+   * Setup standard shader variables.
+   * Allocates space in the context's SV array holder and prefills that with
+   * the shader variables from the shader manager, the context and the sector.
+   *
+   * Usage: has to be done after mesh numbering. Usually done before mesh
+   * SV setup. Example:
+   * \code
+   * SetupStandardSVs (context, layerConfig, shaderManager, sector);
+   * \endcode
    */
   template<typename ContextNode, typename LayerConfigType>
   void SetupStandardSVs (ContextNode& context, LayerConfigType& layerConfig,

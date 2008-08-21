@@ -25,6 +25,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/ref.h"
 #include "csutil/scanstr.h"
 #include "csutil/scf.h"
+#include "csutil/scfstr.h"
 #include "csutil/stringreader.h"
 #include "iutil/document.h"
 #include "iutil/string.h"
@@ -34,14 +35,16 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/databuff.h"
 
 #include "glshader_cgvp.h"
+#include "glshader_cgfp.h"
 #include "glshader_cg.h"
+#include "profile_limits.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
 
 CS_LEAKGUARD_IMPLEMENT (csShaderGLCGVP);
 
-bool csShaderGLCGVP::Compile ()
+bool csShaderGLCGVP::Compile (iHierarchicalCache* cache, csRef<iString>* tag)
 {
   if (!shaderPlug->enableVP) return false;
 
@@ -65,11 +68,84 @@ bool csShaderGLCGVP::Compile ()
   if (progProf < CG_PROFILE_ARBVP1)
     cg_profile = "arbvp1";
   
-  if (!DefaultLoadProgram (cgResolve, programStr, CG_GL_VERTEX, 
-      shaderPlug->maxProfileVertex))
-    return false;
+  bool ret = DefaultLoadProgram (cgResolve, programStr, CG_GL_VERTEX, 
+    shaderPlug->maxProfileVertex);
 
-  return true;
+  if (cgResolve.IsValid())
+  {
+    csShaderGLCGFP* prevFP = static_cast<csShaderGLCGFP*> (
+      (iShaderProgramCG*)cgResolve);
+  
+    ProfileLimits limits (shaderPlug->vendor, programProfile);
+    limits.GetCurrentLimits (shaderPlug->ext);
+    WriteToCache (cache, limits,
+      prevFP->cacheLimits.ToString() /* Inaccurate when VP has custom profile set */
+      );
+    tag->AttachNew (new scfString (prevFP->cacheLimits.ToString()));
+  }
+  else
+  {
+    ProfileLimits limits (shaderPlug->vendor, programProfile);
+    limits.GetCurrentLimits (shaderPlug->ext);
+    tag->AttachNew (new scfString (limits.ToString()));
+  }
+  
+  cacheKeepNodes.DeleteAll ();
+  return ret;
+}
+
+bool csShaderGLCGVP::Precache (const ProfileLimits& limits,
+                               const char* tag,
+                               iHierarchicalCache* cache)
+{
+  PrecacheClear();
+
+  csRef<iDataBuffer> programBuffer = GetProgramData();
+  if (!programBuffer.IsValid())
+    return false;
+  csString programStr;
+  programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
+
+  bool needBuild = true;
+  csString sourcePreproc;
+  {
+    csString programStr;
+    programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
+    
+    ArgumentArray args;
+    shaderPlug->GetProfileCompilerArgs (GetProgramType(),
+      limits.profile, limits.vendor, true, args);
+    for (size_t i = 0; i < compilerArgs.GetSize(); i++) 
+      args.Push (compilerArgs[i]);
+  
+    // Get preprocessed result of pristine source
+    sourcePreproc = GetPreprocessedProgram (programStr, args);
+    if (!sourcePreproc.IsEmpty ())
+    {
+      // Check preprocessed source against cache
+      if (TryLoadFromCompileCache (sourcePreproc, limits, cache))
+        needBuild = false;
+    }
+  }
+  
+  bool ret;
+  if (needBuild)
+    ret = DefaultLoadProgram (cgResolve, programStr, CG_GL_VERTEX, 
+      CG_PROFILE_UNKNOWN,
+      loadApplyVmap | loadIgnoreConfigProgramOpts | loadFlagUnusedV2FForInit,
+      &limits);
+  else
+    ret = true;
+
+  // Store program against preprocessed source in cache
+  {
+    if (needBuild && !sourcePreproc.IsEmpty ())
+      WriteToCompileCache (sourcePreproc, limits, cache);
+  }
+
+  WriteToCache (cache, limits, tag);
+
+  return ret;
 }
 
 csVertexAttrib csShaderGLCGVP::ResolveBufferDestination (const char* binding)

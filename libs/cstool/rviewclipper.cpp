@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "csgeom/sphere.h"
+#include "igeom/clip2d.h"
 #include "cstool/rviewclipper.h"
 #include "ivideo/graph3d.h"
 #include "iengine/rview.h"
@@ -270,22 +271,30 @@ namespace CS
       const csReversibleTransform& tr_o2c,
       csPlane3* planes, uint32& frustum_mask)
   {
-    csMatrix3 t2o = tr_o2c.GetT2O();
-    csVector3 o2tmult = tr_o2c.GetO2T () * tr_o2c.GetO2TTranslation ();
-    uint32 camMask;
-    const csPlane3* frust = ctxt->icamera->GetVisibleVolume (camMask);
+    //const csMatrix3& t2o = tr_o2c.GetT2O();
+    //csVector3 o2tmult = tr_o2c.GetO2T () * tr_o2c.GetO2TTranslation ();
+    const csPlane3* frust = ctxt->frustum;
     frustum_mask = 0;
     uint i;
-    for (i = 0; (1U << i) <= camMask; i++)
+    for (i = 0; i < 5; i++)
     {
-      if (!(camMask & (1 << i))) continue;
       frustum_mask |= (1 << i);
       planes[i] = tr_o2c.This2Other (frust[i]);
     }
+    
     csPlane3 pznear = ctxt->clip_plane;
     pznear.Invert ();
     planes[i] = tr_o2c.This2Other (pznear);
     frustum_mask |= (1 << i);
+    i++;
+    
+    csPlane3 *far_plane = ctxt->icamera->GetFarPlane (); 
+    if (far_plane) 
+    { 
+      csPlane3 fp = *far_plane; 
+      planes[i] = tr_o2c.This2Other (fp); 
+      frustum_mask |= (1 << i);
+    }
   }
 
   void RenderViewClipper::SetupClipPlanes (csRenderContext* ctxt)

@@ -133,6 +133,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	const Snippet::Technique::CombinerPlugin& combTech,
 	const Snippet::Technique::Input& input);
 	
+      csPtr<iDocumentNode> EncloseInCondition (iDocumentNode* node,
+        const char* condition) const;
+	
       bool operator() (ShaderVarNodesHelper& shaderVarNodes, 
         iDocumentNode* errorNode, const Snippet* snippet,
         const TechniqueGraph& graph);

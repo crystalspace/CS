@@ -21,6 +21,7 @@
 #include "csutil/csstring.h"
 #include "csutil/util.h"
 #include "csutil/scfstringarray.h"
+#include "csutil/scanstr.h"
 #include "csutil/sysfunc.h"
 #include "csutil/win32/registrycfg.h"
 
@@ -301,7 +302,7 @@ float csWin32RegistryConfig::RegToFloat (DWORD type, Block_O_Mem& data, float De
   switch (type)
   {
   case REG_SZ:
-    n = sscanf ((char*)data.data, "%f", &v);
+    n = csScanStr ((char*)data.data, "%f", &v);
     return (n != 0) ? v : Def;
     break;
   case REG_DWORD:

@@ -264,9 +264,9 @@ void ComputeLight (LightSpace lightSpace, Light light,
   
   float lightDist = lightSpace.GetLightDistance();
   half attn;
-  float attnRadius = lightAttenuationVec.w;
-  if (attnRadius > 0)
-    attn = Attenuation_Linear (lightDist, 1 / attnRadius);
+  float invAttnRadius = lightAttenuationVec.w;
+  if (invAttnRadius > 0)
+    attn = Attenuation_Linear (lightDist, invAttnRadius);
   else
     attn = Attenuation_CLQ (lightDist, lightAttenuationVec.xyz);
   

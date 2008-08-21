@@ -37,8 +37,8 @@
 #include "csutil/strset.h"
 #include "csutil/noncopyable.h"
 
-struct iCacheManager;
 struct iDocumentNode;
+struct iHierarchicalCache;
 struct iLight;
 struct iObject;
 struct iLoaderContext;
@@ -100,6 +100,30 @@ public:
       cs_free (varArray);
   }
 
+  /**
+   * Copies from another stack.
+   * If the other stack was created from a preallocated array, the stack
+   * points to that same array after the assignment. If the other stack used 
+   * internal storage the new stack will allocate it's own internal array and 
+   * copy over the contents.
+   */
+  csShaderVariableStack& operator= (const csShaderVariableStack& other)
+  {
+    if (other.ownArray)
+    {
+      Setup (size);
+      memcpy (varArray, other.varArray, size * sizeof (csShaderVariable*));
+    }
+    else
+    {
+      if (ownArray)
+	cs_free (varArray);
+      ownArray = false;
+      varArray = other.varArray;
+    }
+    return *this;
+  }
+  
   /// Initialize stack internal storage
   void Setup (size_t size)
   {
@@ -126,6 +150,17 @@ public:
 
     varArray = stack;
     csShaderVariableStack::size = size;
+    ownArray = false;
+  }
+
+  /// Initialize stack with external storage taken from another stack
+  void Setup (const csShaderVariableStack& stack)
+  {
+    if (ownArray)
+      cs_free (varArray);
+
+    varArray = stack.varArray;
+    size = stack.size;
     ownArray = false;
   }
 
@@ -301,7 +336,7 @@ enum csShaderTagPresence
  */
 struct iShaderManager : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE (iShaderManager, 2, 1, 1);
+  SCF_INTERFACE (iShaderManager, 3, 0, 1);
   /**
    * Register a shader to the shadermanager.
    * Compiler should register all shaders
@@ -384,7 +419,8 @@ struct iShaderManager : public virtual iShaderVariableContext
    */
   virtual iShaderVarStringSet* GetSVNameStringset () const = 0;
   
-  virtual iCacheManager* GetShaderCache() = 0;
+  /// Get the cache for storing precompiled shader data
+  virtual iHierarchicalCache* GetShaderCache() = 0;
 };
 
 /**
@@ -514,7 +550,7 @@ struct iShaderPriorityList : public virtual iBase
  */
 struct iShaderCompiler : public virtual iBase
 {
-  SCF_INTERFACE (iShaderCompiler, 0,0,1);
+  SCF_INTERFACE (iShaderCompiler, 0,0,2);
   /// Get a name identifying this compiler
   virtual const char* GetName() = 0;
 
@@ -543,6 +579,9 @@ struct iShaderCompiler : public virtual iBase
    */
   virtual csPtr<iShaderPriorityList> GetPriorities (
 		  iDocumentNode* templ) = 0;
+		  
+  virtual bool PrecacheShader (iDocumentNode* node,
+    iHierarchicalCache* cacheTo) = 0;
 };
 
 #endif // __CS_IVIDEO_SHADER_H__

@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_POSTEFFECTS_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_POSTEFFECTS_H__
 
+/**\file
+ * Post processing effects manager
+ */
+
 #include "csgfx/shadervarcontext.h"
 #include "csutil/array.h"
 #include "csutil/dirtyaccessarray.h"
@@ -42,16 +46,69 @@ namespace CS
 namespace RenderManager
 {
   /**
-   * Helper for "simple" post effects usage in render manager.
+   * Helper for post processing effects usage in render managers.
    * Provides a simple way to render the screen to a texture and then use
    * a number of full screen passes with settable shader to get the desired
    * effect.
+   *
+   * To use post processing effects, rendering of the main context has to be
+   * redirected to a target managed by the post processing manager. After
+   * drawing the scene another call applies the effects.
+   * Example:
+   * \code
+   * // Set up post processing manager for the given view
+   * postEffects.SetupView (renderView);
+   *
+   * // Set up start context,
+   * RenderTreeType::ContextNode* startContext = renderTree.CreateContext (renderView);
+   * // render to a target for later postprocessing
+   * startContext->renderTargets[rtaColor0].texHandle = postEffects.GetScreenTarget ();
+   *
+   * // ... draw stuff ...
+   *
+   * // Apply post processing effects
+   * postEffects.DrawPostEffects ();
+   * \endcode
+   *
+   * Post processing setups are a graph of effects (with nodes called "layers"
+   * for historic reasons). Each node has one output and multiple inputs.
+   * Inputs can be the output of another node or the render of the current
+   * scene.
+   *
+   * Post processing setups are usually read from an external source
+   * by using PostEffectLayersParser.
+   * Example:
+   * \code
+   * const char* effectsFile = cfg->GetStr ("MyRenderManager.Effects", 0);
+   * if (effectsFile)
+   * {
+   *   PostEffectLayersParser postEffectsParser (objectReg);
+   *   postEffectsParser.AddLayersFromFile (effectsFile, postEffects);
+   * }
+   * \endcode
+   * A setup is not required to use a post processing manager. If no setup is
+   * provided the scene will just be drawn to the screen.
+   *
+   * Post processing managers can be "chained" which means the output of a
+   * manager serves as the input of the following, "chained" post processing
+   * manager instead of the normal rendered scene. Notably, using HDR exposure
+   * effects involved chaining an post processing manager for HDR to a
+   * another post processing manager. Example:
+   * \code
+   * hdr.Setup (...);
+   * // Chain HDR post processing effects to normal effects
+   * postEffects.SetChainedOutput (hdr.GetHDRPostEffects());
+   * // Just use postEffects as usual, chained effects are applied transparently
+   * \endcode
    */
   class CS_CRYSTALSPACE_EXPORT PostEffectManager :
     public CS::Memory::CustomAllocatedDerived<csRefCount>
   {
   public:
     class Layer;
+    /**
+     * Options for a postprocessing layer
+     */
     struct LayerOptions
     {
       /// Generate mipmaps for this layer
@@ -114,14 +171,20 @@ namespace RenderManager
     public:
       /// Get the shader variables for this layer.
       iShaderVariableContext* GetSVContext() { return svContext; }
+      /// Get inputs to this layer
       const csArray<LayerInputMap>& GetInputs() { return inputs; }
-      int GetOutTextureNum () const { return outTextureNum; }
       
+      /// Get layer options
       const LayerOptions& GetOptions() const { return options; }
+      /// Set layer options
       void SetOptions (const LayerOptions& opt) { options = opt; }
 
+      /// Get layer shader
       void SetShader (iShader* shader) { effectShader = shader; }
+      /// Set layer shader
       iShader* GetShader () const { return effectShader; }
+      /// @@@ Document me?
+      int GetOutTextureNum () const { return outTextureNum; }
     };
   
     PostEffectManager ();
@@ -203,6 +266,12 @@ namespace RenderManager
     void SetChainedOutput (PostEffectManager& nextEffects)
     { SetChainedOutput (&nextEffects); }
     //@}
+    
+    /**
+     * Returns whether the screen space is flipped in Y direction. This usually
+     * happens when rendering to a texture due post effects.
+     */
+    bool ScreenSpaceYFlipped ();
   private:
     uint frameNum;
     csRef<iGraphics3D> graphics3D;
@@ -304,6 +373,7 @@ namespace RenderManager
     { return buckets[GetBucketIndex (options)]; }
   };
   
+  // @@@ TODO: give a simple example
   /// Helper to parse post processing effect configurations.
   class CS_CRYSTALSPACE_EXPORT PostEffectLayersParser
   {
@@ -327,7 +397,7 @@ namespace RenderManager
   
     /// Parse from a document node,
     bool AddLayersFromDocument (iDocumentNode* node, PostEffectManager& effects);
-    /// Parse from file. Document node must be "posteffect"
+    /// Parse from XML file. Document root node must be "posteffect"
     bool AddLayersFromFile (const char* filename, PostEffectManager& effects);
   };
 

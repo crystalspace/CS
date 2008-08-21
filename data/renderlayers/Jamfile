@@ -1,0 +1,4 @@
+SubDir TOP data renderlayers ;
+
+InstallData [ Wildcard *.xml ] : data renderlayers ;
+FileListEntriesData [ Wildcard *.xml ] : renderlayers : data-runtime ;
