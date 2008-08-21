@@ -18,7 +18,9 @@
 
 #include "common.h"
 
+#include "csutil/custom_new_disable.h"
 #include <algorithm>
+#include "csutil/custom_new_enable.h"
 
 #include "lighter.h"
 #include "lightmap.h"

@@ -21,7 +21,9 @@
 #include "primitive.h"
 #include "object.h"
 
+#include "csutil/custom_new_disable.h"
 #include <algorithm>
+#include "csutil/custom_new_enable.h"
 
 namespace lighter
 {
