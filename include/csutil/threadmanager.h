@@ -85,8 +85,6 @@ private:
   iObjectRegistry* objectReg;
   csRef<ThreadedJobQueue> threadQueue;
   csRef<ListAccessQueue> listQueue;
-  csRef<iThreadedLoader> loader;
-  csRef<iEngine> engine;
   csRef<iEventQueue> eventQueue;
   csTicks waitingTime;
 
