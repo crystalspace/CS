@@ -4,7 +4,7 @@ InstallData world [ Wildcard *.png *.dds ] : data maps flarge ;
 InstallData [ Wildcard factories : thing* ] : data maps flarge factories ;
 InstallData [ Wildcard lightmaps : *.png ] : data maps flarge lightmaps ;
 
-FileListEntriesData world [ Wildcard *.png *.dds ] : maps flarge : data-demo ;
-FileListEntriesData [ Wildcard factories : thing* ] : maps flarge factories : data-demo ;
-FileListEntriesData [ Wildcard lightmaps : *.png ] : maps flarge lightmaps : data-demo ;
+FileListEntriesData world [ Wildcard *.png *.dds ] : flarge : data-demo-maps ;
+FileListEntriesData [ Wildcard factories : thing* ] : flarge factories : data-demo-maps ;
+FileListEntriesData [ Wildcard lightmaps : *.png ] : flarge lightmaps : data-demo-maps ;
 
