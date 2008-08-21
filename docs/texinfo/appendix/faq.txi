@@ -233,7 +233,7 @@ There is a tutorial on this subject at:
 @noindent
 @uref{http://www.cs.indiana.edu/~joellis/CSIntro.html}
 
-@strong{A3}: For maps and objects using either @samp{genmesh} or @samp{thing}
+@strong{A3}: For maps and objects using @samp{genmesh}
 you can also use 3dsMax.  There is a 3dsMax exporter plugin
 included with Crystal Space (@file{CS/scripts/max}) with associated
 documentation which works very well.  This script is made and used by the 
@@ -388,7 +388,7 @@ space coordinate system is used with (0,0) in the top-left corner.
 
 @item
 @strong{Q}: Why can't I get the
-@code{iThingState} / @code{iSprite3DState} / @dots{} from my mesh wrapper?  I
+@code{iGeneralMeshState} / @code{iSprite3DState} / @dots{} from my mesh wrapper?  I
 do @code{scfQueryInterface} from the mesh and it returns @samp{0}.
 
 @strong{A}: A common error is to try to query the state interface for
@@ -408,8 +408,8 @@ make it easier for you to keep track of references.  They will automatically
 @code{DecRef()} when they are ready.  Here is an example of their usage:
 
 @example
-csRef<iThingState> st =
-  scfQueryInterface<iThingState> (mesh->GetMeshObject());
+csRef<iGeneralMeshState> st =
+  scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject());
 if (st)
 @{
   st->blabla @dots{};
@@ -417,7 +417,7 @@ if (st)
 @end example
 
 You can use the @samp{st} variable just like you would use the normal
-@code{iThingState} reference. The only difference with code that doesn't use
+@code{iGeneralMeshState} reference. The only difference with code that doesn't use
 smart pointers is that you don't have to take care of calling
 @code{DecRef}.  @xref{Smart Pointers}.
 
@@ -448,21 +448,6 @@ Note that you should invoke the method @code{engine->GetBeginDrawFlags()} in
 your call to @code{g3d->BeginDraw()} to ensure that this Z-buffer clearing will
 actually work (in fact you should @emph{always} use
 @code{GetBeginDrawFlags()}).
-
-@item
-@strong{Q}: I'm using a @samp{thing} mesh object and some of the polygons
-are rendered completely wrong.
-
-@strong{A1}: Polygons in Crystal Space must be convex (meaning that every
-line between two random vertices of the polygon is fully contained in
-the polygon).
-
-@strong{A2}: The vertices of the polygon must all be on the same plane.
-For a triangle that is automatically the case.
-
-@strong{A3}: If you specify texture coordinates using @samp{uv} on three
-of the polygon vertices then those three texture coordinates must be
-different.
 
 @item
 @strong{Q}: I'm trying to use some plugin but it says that it cannot find it

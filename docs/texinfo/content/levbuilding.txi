@@ -163,7 +163,7 @@ object in a map file:
 
 @example
 <meshobj name="complexWall">
-  <plugin>thing</plugin>
+  <plugin>genmesh</plugin>
   <params>
     @dots{}
   </params>
@@ -185,7 +185,7 @@ And this is an example of how you can disable the occlusion mesh for an object:
 
 @example
 <meshobj name="wallSegment">
-  <plugin>thing</plugin>
+  <plugin>genmesh</plugin>
   <params>
     @dots{}
   </params>
@@ -243,22 +243,10 @@ Space supports many mesh objects but the most important ones are:
 
 @itemize @bullet
 @item
-@code{thing}: A polygon mesh object that supports multiple
-materials and lightmapped, vertex based, or stencil based lighting. It is not
-easy to animate them internally so they are usually used for static
-objects. If you use lightmaps then these also will not be updated if the
-object moves, so that is another consideration. @samp{thing} objects are
-heavy-weight (use more memory than many other mesh types).  Their main
-advantage is that they support lightmaps which means that they can cast and
-receive shadows even if they only have a few polygons.  In contrast, an object
-that only supports vertex lighting can not have shadows on a single polygon or
-triangle (except if stencil-based lighting is used) (@pxref{MeshObject Thing}).
-
-@item
-@code{genmesh}: A triangle mesh object with a single
-material. It only supports vertex- or stencil-based lighting and it is also
-not designed for internal animation (although it is possible to do so).
-Genmeshes are very efficient with regards to memory usage and rendering speed
+@code{genmesh}: A triangle mesh object with support for multiple
+materials. They are useful for static geometry mostly but you can easily
+move them around as well. Genmeshes are very efficient with regards to
+memory usage and rendering speed
 (@pxref{MeshObject Genmesh}).
 
 @item
@@ -276,21 +264,14 @@ Here are some guidelines on using and choosing these meshes:
 
 @itemize @bullet
 @item
-For static geometry, @samp{thing} or @samp{genmesh} objects are ideal.
-@samp{genmesh} typically is used for high-detail objects that only need a
-single material (every triangle can use other parts of the texture) and where
-there is no need for detailed shadows on the individual triangles (usually a
-@samp{genmesh} object is either small or highly detailed so that shadows are
-accurately represented using vertex lighting only). @samp{thing} is used in
-case you want large objects that have little detail but require detailed
-lighting.
+For static geometry, @samp{genmesh} objects are ideal.
 
 @item
 If you plan on using stencil lighting only, then it is probably best to
 use mostly @samp{genmesh} objects.
 
 @item
-For moving objects you can also use @samp{thing} or @samp{genmesh} as long
+For moving objects you can also use @samp{genmesh} as long
 as there is no need to change the object's appearance (i.e. no internal
 animation is required). You have to be aware of lighting problems mentioned
 above, though.
@@ -310,20 +291,12 @@ shape). This corresponds with the @samp{CS_MESH_STATICSHAPE} and
 Game actors and creatures should use @samp{sprite3d} or @samp{sprcal3d}.
 @end itemize
 
-One important note when using @samp{thing} meshes: it is @emph{very} important
-to try to use quads instead of triangles. This is because lightmaps are
-rectangular. If you have a wall made out of two triangles then you will have
-two full square lightmaps (one for every triangle) which is a waste given
-that half of these lightmaps will be unused. If you use a single quad
-polygon for the wall then only one lightmap will be used. Lightmaps can be
-big so this really can make a huge difference on performance.
-
 @subsubheading Assisting the Renderer
 
 When considering on how to design your objects you should keep in mind
 what the renderer prefers. For the renderer a @dfn{mesh} is defined
 as a polygon or triangle mesh with a single material and/or shader. So, if
-you are using a @samp{thing} mesh that uses multiple materials then this is
+you are using a @samp{genmesh} mesh that uses multiple materials then this is
 actually a set of different meshes for the renderer. To avoid confusion we
 will call the single-material mesh that the renderer uses a @dfn{render-mesh}.
 

@@ -192,54 +192,9 @@ to a new file and add that file to conni_out.zip. For the model to work in Walkt
   </materials>
   <sector name="room">
     <meshobj name="walls">
-      <plugin>crystalspace.mesh.loader.thing</plugin>
+      <plugin>crystalspace.mesh.loader.genmesh</plugin>
       <params>
-	<v x="-10" y="-1" z="10" />
-	<v x="10" y="-1" z="10" />
-	<v x="-10" y="-1" z="-10" />
-	<v x="10" y="-1" z="-10" />
-	<v x="-10" y="4" z="10" />
-	<v x="10" y="4" z="10" />
-	<v x="-10" y="4" z="-10" />
-	<v x="10" y="4" z="-10" />
-	<material>wood</material>
-	<texlen>4</texlen>
-	<p name="up">
-	  <v>6</v>
-	  <v>7</v>
-	  <v>5</v>
-	  <v>4</v>
-	</p>
-	<p name="down">
-	  <v>3</v>
-	  <v>2</v>
-	  <v>0</v>
-	  <v>1</v>
-	</p>
-	<p name="back">
-	  <v>7</v>
-	  <v>6</v>
-	  <v>2</v>
-	  <v>3</v>
-	</p>
-	<p name="front">
-	  <v>4</v>
-	  <v>5</v>
-	  <v>1</v>
-	  <v>0</v>
-	</p>
-	<p name="left">
-	  <v>6</v>
-	  <v>4</v>
-	  <v>0</v>
-	  <v>2</v>
-	</p>
-	<p name="right">
-	  <v>5</v>
-	  <v>7</v>
-	  <v>3</v>
-	  <v>1</v>
-	</p>
+        @dots{}
       </params>
       <zfill />
     </meshobj>

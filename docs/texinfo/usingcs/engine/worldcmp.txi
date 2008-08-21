@@ -36,10 +36,9 @@ Mesh object factories are objects that can be used to create mesh objects
 that inherit characteristics from their mesh factory. Basically a mesh
 object factory is like a blue-print for creating a mesh object. Mesh
 factories can also be hierarchical like mesh objects. In most cases
-(i.e. like genmesh (@pxref{MeshObject Genmesh} and thing
-(@pxref{MeshObject Thing})) the factory defines the actual geometry of
-an object. You can then create multiple mesh objects from those factories.
-They will all share the same geometry.
+(i.e. like genmesh (@pxref{MeshObject Genmesh}) the factory defines the
+actual geometry of an object. You can then create multiple mesh objects
+from those factories.  They will all share the same geometry.
 
 @subsubheading Mesh Objects
 @cindex mesh object

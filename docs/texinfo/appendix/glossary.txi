@@ -76,7 +76,7 @@ A mesh object represents geometry in Crystal Space.  The Crystal Space engine
 is very modular.  The engine itself does not know how to render.  It only
 knows about mesh objects.  Every mesh object is responsible for rendering
 what it represents (using the 3D renderer).  Crystal Space supports several
-mesh objects: things, 3D sprites, 2D sprites, particle systems, haze,
+mesh objects: genmeshes, 3D sprites, 2D sprites, particle systems, haze,
 terrain engine, @dots{}
 
 @item Object Registry
@@ -115,13 +115,16 @@ plugin.  So the plugin manager is an important object.  See also
 @code{csInitializer::CreateEnvironment()}.
 
 @item Portal
-A Portal is one of the polygons of a thing mesh object which will not be
-texture mapped (unless it has a semi-transparent texture).  Instead another
-sector (visible through that portal) will be drawn.  A portal may
-even point back into the sector in which it is contained.  This is
-useful for portals which act as mirrors.  A more general form of a mirror
-is a space warping portal.  This way a portal can go to any place in the
-world.
+A Portal is a special kind of polygons which will not be
+texture mapped.  Instead another sector (visible through that portal)
+will be drawn.  A portal may even point back into the sector in which it
+is contained.  This is useful for portals which act as mirrors.  A
+more general form of a mirror is a space warping portal.  This way a
+portal can go to any place in the world.
+There are heavy and light portals. A light portal is for simple cases
+where the portal doesn't transform space or has any special flags. In that
+case the contents of the portal is simply rendered on screen. With heavy
+portals the contents of the portal is rendered on a separate texture.
 
 @item Procedural Texture
 A procedural texture is a special texture that has a 3D renderer
@@ -169,7 +172,7 @@ Screen space is perspective corrected camera space.
 @item Sector
 A sector is simply a container of geometry.  It contains several mesh objects
 which will represent the geometry of the sector.  A common mesh object is
-the thing mesh object which is usually used to put walls around a sector
+the genmesh mesh object which is usually used to put walls around a sector
 (that way the sector represents a room).  Other mesh objects like 3d sprites
 can be used for actors.
 
@@ -184,7 +187,7 @@ Two-dimensional (u,v) coordinate-system corresponding to some point on a
 texture.  Texture space is given by a transformation matrix and vector going
 from object space to texture space.
 
-@item Thing Mesh Object
+@item GenMesh Mesh Object
 A mesh object which is often used to represent walls of a sector but can
 in general be used to represent many more kinds of objects.
 
