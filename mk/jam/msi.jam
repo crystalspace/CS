@@ -29,7 +29,7 @@ LIGHTFLAGS = -ext WixUIExtension -cultures:en-us -ss -sval ;
 LOCATE.MSI ?= $(BUILDTOP)/out/msi ;
 LOCATE.MSI.TEMP ?= $(BUILDTOP)/out/msi/temp ;
 
-# MSIMergeModule id : filelist : version
+# MSIMergeModule id : filelist : version [: subdir]
 rule MSIMergeModule
 {
   local target = $(1) ;
@@ -39,6 +39,7 @@ rule MSIMergeModule
   MakeLocate $(mod_src) : $(LOCATE.MSI.TEMP) ;
   VERSION on $(mod_src) = $(3) ;
   ID on $(mod_src) = $(target) ;
+  SUBDIR on $(mod_src) = $(4) ;
   Depends $(mod_src) : $(filelistfile) ;
   GenerateMSMSource $(mod_src) : $(filelistfile) ;
   Clean mergemodulesclean : $(mod_src) ;
@@ -63,7 +64,9 @@ rule MSIMergeModule
 
 actions together GenerateMSMSource 
 {
-  $(CMD.GENMSM) -o $(<) --id $(ID) --version $(VERSION) $(>)
+  $(CMD.GENMSM) -o $(<) --id $(ID) --version $(VERSION) \
+    --subdirmap=$(SUBDIR) \
+    $(>)
 }
 
 actions CompileWXS
