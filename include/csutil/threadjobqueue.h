@@ -49,6 +49,7 @@ public:
   virtual void PullAndRun (iJob* job);
   virtual void Unqueue (iJob* job, bool waitIfCurrent = true);
   virtual bool IsFinished ();
+  virtual void Wait (iJob* job);
 
   enum
   {
@@ -96,7 +97,9 @@ private:
   ThreadState* allThreadState[MAX_WORKER_THREADS];
   ThreadGroup allThreads;
   Mutex threadStateMutex;
-  Mutex jobFinishMutex;
+  // Condition to detect a finished job in any of the running threads
+  Mutex jobFinishedMutex;
+  Condition jobFinished;
 
   size_t numWorkerThreads;
   bool shutdownQueue;

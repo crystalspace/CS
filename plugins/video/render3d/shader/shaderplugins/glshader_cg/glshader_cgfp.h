@@ -44,7 +44,7 @@ public:
   CS_LEAKGUARD_DECLARE (csShaderGLCGFP);
 
   csShaderGLCGFP (csGLShader_CG* shaderPlug) : 
-    csShaderGLCGCommon (shaderPlug, "cgfp") { }
+    csShaderGLCGCommon (shaderPlug, progFP) { }
 
   /// Sets this program to be the one used when rendering
   virtual void Activate ();
@@ -55,7 +55,7 @@ public:
   /// Setup states needed for proper operation of the shader
   virtual void SetupState (const CS::Graphics::RenderMesh* mesh,
     CS::Graphics::RenderMeshModes& modes,
-    const iShaderVarStack* stacks);
+    const csShaderVariableStack& stack);
 
   /// Reset states to original
   virtual void ResetState ();
@@ -65,7 +65,16 @@ public:
 
   virtual int ResolveTU (const char* binding);
 
-  virtual const char* GetProgramType() { return "fragment"; }
+  virtual void GetUsedShaderVars (csBitArray& bits) const
+  {
+    if (pswrap.IsValid())
+    {
+      pswrap->GetUsedShaderVars (bits);
+      return;
+    }
+
+    csShaderGLCGCommon::GetUsedShaderVars (bits);
+  }
 };
 
 }

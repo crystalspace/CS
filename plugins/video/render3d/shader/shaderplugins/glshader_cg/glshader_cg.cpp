@@ -44,10 +44,10 @@ CS_LEAKGUARD_IMPLEMENT (csGLShader_CG);
 SCF_IMPLEMENT_FACTORY (csGLShader_CG)
 
 csGLShader_CG::csGLShader_CG (iBase* parent) : 
-  scfImplementationType (this, parent)
+  scfImplementationType (this, parent), compiledProgram (0)
 {
   context = cgCreateContext ();
-  cgSetErrorHandler (ErrorHandler, 0);
+  cgSetErrorHandler (ErrorHandlerObjReg, 0);
 
   enable = false;
   isOpen = false;
@@ -60,28 +60,91 @@ csGLShader_CG::~csGLShader_CG()
 {
   cs_free (dumpDir);
   cgDestroyContext (context);
+  cgSetErrorHandler (ErrorHandlerObjReg, object_reg);
 }
 
 void csGLShader_CG::ErrorHandler (CGcontext context, CGerror error, 
 				  void* appData)
 {
-  iObjectRegistry* object_reg = (iObjectRegistry*)appData;
+  csGLShader_CG* This = reinterpret_cast<csGLShader_CG*> (appData);
+  if (This->doIgnoreErrors) return;
+
   bool doVerbose;
   csRef<iVerbosityManager> verbosemgr (
-    csQueryRegistry<iVerbosityManager> (object_reg));
+    csQueryRegistry<iVerbosityManager> (This->object_reg));
   if (verbosemgr) 
     doVerbose = verbosemgr->Enabled ("renderer.shader");
   else
     doVerbose = false;
   if (!doVerbose) return;
 
-  csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+  csReport (This->object_reg, CS_REPORTER_SEVERITY_WARNING,
     "crystalspace.graphics3d.shader.glcg",
     "%s", cgGetErrorString (error));
   if (error == CG_COMPILER_ERROR)
   {
     const char* listing = cgGetLastListing (context);
-    if (listing && *listing)
+    This->PrintCgListing (listing);
+  }
+}
+
+void csGLShader_CG::ErrorHandlerObjReg (CGcontext context, CGerror error, 
+				        void* appData)
+{
+  iObjectRegistry* object_reg = reinterpret_cast<iObjectRegistry*> (appData);
+
+  if (object_reg)
+  {
+    bool doVerbose;
+    csRef<iVerbosityManager> verbosemgr (
+      csQueryRegistry<iVerbosityManager> (object_reg));
+    if (verbosemgr) 
+      doVerbose = verbosemgr->Enabled ("renderer.shader");
+    else
+      doVerbose = false;
+    if (!doVerbose) return;
+  }
+
+  csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+    "crystalspace.graphics3d.shader.glcg",
+    "%s", cgGetErrorString (error));
+}
+
+void csGLShader_CG::PrintCgListing (const char* listing)
+{
+  if (listing && *listing)
+  {
+    if (compiledProgram != 0)
+    {
+      /* There is a listing - we split up up the source and parse the 
+       * listing string in order to be able to write out the source lines
+       * causing errors. */
+      csStringArray sourceSplit;
+      sourceSplit.SplitString (compiledProgram, "\n");
+      csStringArray listingSplit;
+      listingSplit.SplitString (listing, "\n");
+      
+      for (size_t l = 0; l < listingSplit.GetSize(); l++)
+      {
+        const char* listingLine = listingSplit[l];
+        if (!listingLine || !*listingLine) continue;
+        
+	csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+	  "crystalspace.graphics3d.shader.glcg",
+	  "%s", listingLine);
+	  
+	while (*listingLine && (*listingLine == ' ')) listingLine++;
+	uint lineNum = 0;
+	if (sscanf (listingLine, "(%u)", &lineNum) == 1)
+	{
+	  if ((lineNum > 0) && (lineNum <= sourceSplit.GetSize()))
+	    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+	      "crystalspace.graphics3d.shader.glcg",
+	      "%s", sourceSplit[lineNum-1]);
+	}
+      }
+    }
+    else
     {
       csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
 	"crystalspace.graphics3d.shader.glcg",
@@ -247,7 +310,7 @@ bool csGLShader_CG::Open()
   if (isOpen) return true;
   if (!object_reg) return false;
 
-  cgSetErrorHandler (ErrorHandler, object_reg);
+  cgSetErrorHandler (ErrorHandler, this);
 
   csRef<iGraphics3D> r = csQueryRegistry<iGraphics3D> (object_reg);
 
@@ -266,6 +329,11 @@ bool csGLShader_CG::Open()
     enable = false;
     return false;
   }
+  
+  ext->InitGL_ARB_vertex_program();
+  ext->InitGL_ARB_fragment_program();
+  ext->InitGL_NV_gpu_program4();
+  ext->InitGL_EXT_gpu_program_parameters();
 
   enableVP = config->GetBool ("Video.OpenGL.Shader.Cg.Enable.Vertex", true);
   enableFP = config->GetBool ("Video.OpenGL.Shader.Cg.Enable.Fragment", true);
@@ -336,6 +404,10 @@ bool csGLShader_CG::Open()
   if (debugDump)
     dumpDir = CS::StrDup (config->GetStr ("Video.OpenGL.Shader.Cg.DebugDumpDir",
     "/tmp/cgdump/"));
+    
+  cgSetAutoCompile (context, CG_COMPILE_MANUAL);
+  cgGLSetDebugMode (config->GetBool ("Video.OpenGL.Shader.Cg.CgDebugMode",
+    false));
  
   // Determining what profile to use:
   //  Start off with the highest supported profile.

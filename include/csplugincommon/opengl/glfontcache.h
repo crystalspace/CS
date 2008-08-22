@@ -123,8 +123,10 @@ class CS_CSPLUGINCOMMON_GL_EXPORT csGLFontCache : public csFontCache
   size_t numFloats;
   size_t maxFloats;
   bool tcaEnabled, vaEnabled, caEnabled;
-  csDirtyAccessArray<float> verts2d;
-  csDirtyAccessArray<float> texcoords;
+  csDirtyAccessArray<float, csArrayElementHandler<float>,
+    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<256> > verts2d;
+  csDirtyAccessArray<float, csArrayElementHandler<float>,
+    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<256> > texcoords;
 
   TextJob& GetJob (int fg, int bg, GLuint texture, GLuint mirrorTexture, 
     size_t bgOffset);

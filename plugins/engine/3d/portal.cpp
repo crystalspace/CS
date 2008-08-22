@@ -33,6 +33,9 @@
 #include "plugins/engine/3d/portalcontainer.h"
 #include "plugins/engine/3d/rview.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
+{
+
 typedef csDirtyAccessArray<csVector3> portal_VectorArray;
 CS_IMPLEMENT_STATIC_VAR (GetStaticVectorArray, portal_VectorArray,())
 
@@ -682,3 +685,5 @@ iPortalCallback *csPortal::GetMissingSectorCallback (int idx) const
   return sector_cb_vector[idx];
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(Engine)

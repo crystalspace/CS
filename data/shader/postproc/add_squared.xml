@@ -1,0 +1,35 @@
+<shader compiler="xmlshader" name="postproc_add_squared">
+   <shadervars>
+      <shadervar name="hdr scale" type="vector4">1,1,0,0</shadervar>
+      <shadervar name="scale" type="vector2">1,1</shadervar>
+   </shadervars>
+  <technique priority="200">
+    <pass>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <buffer source="texture coordinate 1" destination="texture coordinate 1" />
+      <!-- vp plugin="glfixed" / -->
+      <texture destination="Texture1" name="tex diffuse" />
+      <texture destination="Texture2" name="tex diffuse 2" />
+      <fp plugin="glcg">
+	<cgfp>
+	  <variablemap variable="hdr scale" destination="hdrScale" />
+	  <variablemap variable="scale" destination="scale" />
+	  <program>
+	    <![CDATA[
+
+	    float4 main (in float2 TexCoord1 : TEXCOORD0, in float2 TexCoord2 : TEXCOORD1,
+		      uniform sampler2D Texture1, uniform sampler2D Texture2,
+		      uniform float4 hdrScale, uniform float2 scale) : COLOR
+	    {
+		    float4 a = tex2D (Texture1, TexCoord1)*scale.x;
+		    float4 b = (tex2D (Texture2, TexCoord2)*hdrScale.x+hdrScale.z)*scale.y;
+		    return a+(b*b*hdrScale.y+hdrScale.w);
+	    }
+
+	    ]]>
+	  </program>
+	</cgfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>

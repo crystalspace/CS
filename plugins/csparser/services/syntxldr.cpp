@@ -17,6 +17,9 @@
 */
 
 #include "cssysdef.h"
+
+#include "syntxldr.h"
+
 #include <stdarg.h>
 #include <ctype.h>
 #include <limits.h>
@@ -26,11 +29,7 @@
 #include "csgeom/plane3.h"
 #include "csgeom/vector2.h"
 #include "csgfx/gradient.h"
-#include "csgfx/shaderexp.h"
-#include "csgfx/shaderexpaccessor.h"
-#include "csgfx/shadervar.h"
 #include "cstool/keyval.h"
-#include "cstool/vfsdirchange.h"
 #include "csutil/cscolor.h"
 #include "csutil/scfstr.h"
 
@@ -42,9 +41,6 @@
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "ivideo/material.h"
-#include "ivideo/shader/shader.h"
-
-#include "syntxldr.h"
 
 // Only used for unit-testing. The parser does not otherwise
 // depend on any specific XML parser.
@@ -80,8 +76,8 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
 
   InitTokenTable (xmltokens);
 
-  strings = csQueryRegistryTagInterface<iStringSet> (
-    object_reg, "crystalspace.shared.stringset");
+  strings = csQueryRegistryTagInterface<iShaderVarStringSet> (
+    object_reg, "crystalspace.shader.variablenameset");
 
   return true;
 }
@@ -1083,255 +1079,6 @@ bool csTextSyntaxService::WriteGradient (iDocumentNode* node,
   return true;
 }
 
-bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
-    	iDocumentNode* node, csShaderVariable& var)
-{
-  const char *name = node->GetAttributeValue("name");
-  if (name != 0)
-  {
-    var.SetName (strings->Request (name));
-  }
-  const char *type = node->GetAttributeValue("type");
-  if (!type)
-  {
-    Report (
-      "crystalspace.syntax.shadervariable",
-      CS_REPORTER_SEVERITY_WARNING,
-      node,
-      "Invalid shadervar type specified.");
-    return false;
-  }
-  csStringID idtype = xmltokens.Request (type);
-  switch (idtype)
-  {
-    case XMLTOKEN_INTEGER:
-      var.SetValue (node->GetContentsValueAsInt ());
-      break;
-    case XMLTOKEN_FLOAT:
-      var.SetValue (node->GetContentsValueAsFloat ());
-      break;
-    case XMLTOKEN_VECTOR2:
-      {
-        const char* def = node->GetContentsValue ();
-        csVector2 v (0.0f, 0.0f);
-        sscanf (def, "%f,%f", &v.x, &v.y);
-        var.SetValue (v);
-      }
-      break;
-    case XMLTOKEN_VECTOR3:
-      {
-        const char* def = node->GetContentsValue ();
-        csVector3 v (0);
-        sscanf (def, "%f,%f,%f", &v.x, &v.y, &v.z);
-        var.SetValue (v);
-      }
-      break;
-    case XMLTOKEN_VECTOR4:
-      {
-        const char* def = node->GetContentsValue ();
-        csVector4 v (0);
-        sscanf (def, "%f,%f,%f,%f", &v.x, &v.y, &v.z, &v.w);
-        var.SetValue (v);
-      }
-      break;
-    case XMLTOKEN_TEXTURE:
-      {
-	csRef<iTextureWrapper> tex;
-        // @@@ This should be done in a better way...
-	//  @@@ E.g. lazy retrieval of the texture with an accessor?
-        const char* texname = node->GetContentsValue ();
-        tex = ldr_context->FindTexture (texname);
-        if (!tex)
-	{
-          Report (
-              "crystalspace.syntax.shadervariable",
-              CS_REPORTER_SEVERITY_WARNING,
-              node,
-              "Texture '%s' not found.", texname);
-        }
-        var.SetValue (tex);
-      }
-      break;
-    case XMLTOKEN_LIBEXPR:
-      {
-	const char* exprname = node->GetAttributeValue ("exprname");
-	if (!exprname)
-	{
-	  Report ("crystalspace.syntax.shadervariable.expression",
-		CS_REPORTER_SEVERITY_ERROR,
-		node, "'exprname' attribute missing for shader expression!");
-	  return false;
-	}
-	csRef<iShaderManager> shmgr = csQueryRegistry<iShaderManager> (
-		object_reg);
-	if (shmgr)
-	{
-          iShaderVariableAccessor* acc = shmgr->GetShaderVariableAccessor (
-	    exprname);
-	  if (!acc)
-	  {
-	    Report ("crystalspace.syntax.shadervariable.expression",
-		  CS_REPORTER_SEVERITY_ERROR,
-		  node, "Can't find expression with name %s!", exprname);
-	    return false;
-	  }
-	  var.SetAccessor (acc);
-	}
-      }
-      break;
-    case XMLTOKEN_EXPR:
-    case XMLTOKEN_EXPRESSION:
-      {
-	csRef<iShaderVariableAccessor> acc = ParseShaderVarExpr (node);
-	if (!acc.IsValid())
-	  return false;
-	var.SetAccessor (acc);
-      }
-      break;
-    case XMLTOKEN_ARRAY:
-      {
-        csRef<iDocumentNodeIterator> varNodes = node->GetNodes ("shadervar");
-
-        int varCount = 0;
-        while (varNodes->HasNext ()) 
-        {
-          varCount++;
-          varNodes->Next ();
-        }
-
-        var.SetType (csShaderVariable::ARRAY);
-        var.SetArraySize (varCount);
-
-        varCount = 0;
-        varNodes = node->GetNodes ("shadervar");
-        while (varNodes->HasNext ()) 
-        {
-          csRef<iDocumentNode> varNode = varNodes->Next ();
-          csRef<csShaderVariable> elementVar = 
-            csPtr<csShaderVariable> (new csShaderVariable (csInvalidStringID));
-          var.SetArrayElement (varCount, elementVar);
-          ParseShaderVar (ldr_context, varNode, *elementVar);
-          varCount++;
-        }
-      }
-      break;
-    default:
-      Report (
-        "crystalspace.syntax.shadervariable",
-        CS_REPORTER_SEVERITY_WARNING,
-        node,
-	"Invalid shadervar type '%s'.", type);
-      return false;
-  }
-
-  return true;
-}
-
-csRef<iShaderVariableAccessor> csTextSyntaxService::ParseShaderVarExpr (
-  iDocumentNode* node)
-{
-  csRef<iDocumentNode> exprNode;
-  csRef<iDocumentNodeIterator> nodeIt = node->GetNodes();
-  while (nodeIt->HasNext())
-  {
-    csRef<iDocumentNode> child = nodeIt->Next();
-    if (child->GetType() != CS_NODE_ELEMENT) continue;
-    exprNode = child;
-    break;
-  }
-
-  if (!exprNode)
-  {
-    Report ("crystalspace.syntax.shadervariable.expression",
-      CS_REPORTER_SEVERITY_WARNING,
-      node, "Can't find expression node");
-    return 0;
-  }
-
-  csShaderExpression* expression = new csShaderExpression (object_reg);
-  if (!expression->Parse (exprNode))
-  {
-    Report ("crystalspace.syntax.shadervariable.expression",
-      CS_REPORTER_SEVERITY_WARNING,
-      node, "Error parsing expression: %s", expression->GetError());
-    delete expression;
-    return 0;
-  }
-  csRef<csShaderVariable> var;
-  var.AttachNew (new csShaderVariable (csInvalidStringID));
-  csRef<csShaderExpressionAccessor> acc;
-  acc.AttachNew (new csShaderExpressionAccessor (object_reg, expression));
-  return acc;
-}
-
-bool csTextSyntaxService::WriteShaderVar (iDocumentNode* node,
-					  csShaderVariable& var)
-{
-  const char* name = strings->Request (var.GetName ());
-  if (name != 0) node->SetAttribute ("name", name);
-  switch (var.GetType ())
-  {
-    case csShaderVariable::INT:
-      {
-        node->SetAttribute ("type", "integer");
-        int val;
-        var.GetValue (val);
-        node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValueAsInt (val);
-      }
-      break;
-    case csShaderVariable::FLOAT:
-      {
-        node->SetAttribute ("type", "float");
-        float val;
-        var.GetValue (val);
-        node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValueAsFloat (val);
-      }
-      break;
-    case csShaderVariable::VECTOR2:
-      {
-        node->SetAttribute ("type", "vector2");
-        csString val;
-        csVector2 vec;
-        var.GetValue (vec);
-        val.Format ("%f,%f", vec.x, vec.y);
-        node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val);
-      }
-      break;
-    case csShaderVariable::VECTOR3:
-      {
-        node->SetAttribute ("type", "vector3");
-        csString val;
-        csVector3 vec;
-        var.GetValue (vec);
-        val.Format ("%f,%f,%f", vec.x, vec.y, vec.z);
-        node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val);
-      }
-      break;
-    case csShaderVariable::VECTOR4:
-      {
-        node->SetAttribute ("type", "vector4");
-        csString val;
-        csVector4 vec;
-        var.GetValue (vec);
-        val.Format ("%f,%f,%f,%f", vec.x, vec.y, vec.z, vec.w);
-        node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val);
-      }
-      break;
-    case csShaderVariable::TEXTURE:
-      {
-        node->SetAttribute ("type", "texture");
-        iTextureWrapper* val;
-        var.GetValue (val);
-        if (val)
-          node->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue (val->QueryObject ()->GetName ());
-      }
-      break;
-    default:
-      break;
-  };
-  return true;
-}
-
 bool csTextSyntaxService::ParseAlphaMode (iDocumentNode* node, 
 					  iStringSet* strings,
 					  csAlphaMode& alphaMode, 
@@ -1570,85 +1317,6 @@ bool csTextSyntaxService::WriteKey (iDocumentNode *node, iKeyValuePair *keyvalue
     node->SetAttribute (name, keyvalue->GetValue (name));
   }
   return true;
-}
-
-csRef<iShader> csTextSyntaxService::ParseShaderRef (
-    iLoaderContext* ldr_context, iDocumentNode* node)
-{
-  // @@@ FIXME: unify with csLoader::ParseShader()?
-  static const char* msgid = "crystalspace.syntax.shaderref";
-
-  const char* shaderName = node->GetAttributeValue ("name");
-  if (shaderName == 0)
-  {
-    ReportError (msgid, node, "no 'name' attribute");
-    return 0;
-  }
-
-  csRef<iShaderManager> shmgr = csQueryRegistry<iShaderManager> (object_reg);
-  csRef<iShader> shader = shmgr->GetShader (shaderName);
-  if (shader.IsValid()) return shader;
-
-  const char* shaderFileName = node->GetAttributeValue ("file");
-  if (shaderFileName != 0)
-  {
-    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
-    csVfsDirectoryChanger dirChanger (vfs);
-    csString filename (shaderFileName);
-    csRef<iFile> shaderFile = vfs->Open (filename, VFS_FILE_READ);
-
-    if(!shaderFile)
-    {
-      Report (msgid, CS_REPORTER_SEVERITY_WARNING, node,
-	"Unable to open shader file '%s'!", shaderFileName);
-      return 0;
-    }
-
-    csRef<iDocumentSystem> docsys =
-      csQueryRegistry<iDocumentSystem> (object_reg);
-    if (docsys == 0)
-      docsys.AttachNew (new csTinyDocumentSystem ());
-    csRef<iDocument> shaderDoc = docsys->CreateDocument ();
-    const char* err = shaderDoc->Parse (shaderFile, false);
-    if (err != 0)
-    {
-      Report (msgid, CS_REPORTER_SEVERITY_WARNING, node,
-	"Could not parse shader file '%s': %s",
-	shaderFileName, err);
-      return 0;
-    }
-    csRef<iDocumentNode> shaderNode = 
-      shaderDoc->GetRoot ()->GetNode ("shader");
-    dirChanger.ChangeTo (filename);
-
-    const char* type = shaderNode->GetAttributeValue ("compiler");
-    if (type == 0)
-      type = shaderNode->GetAttributeValue ("type");
-    if (type == 0)
-    {
-      ReportError (msgid, shaderNode,
-	"%s: 'compiler' attribute is missing!", shaderFileName);
-      return 0;
-    }
-    csRef<iShaderCompiler> shcom = shmgr->GetCompiler (type);
-    if (!shcom.IsValid()) 
-    {
-      ReportError (msgid, shaderNode,
-        "Could not get shader compiler '%s'", type);
-      return false;
-    }
-    shader = shcom->CompileShader (ldr_context, shaderNode);
-    if (shader && (strcmp (shader->QueryObject()->GetName(), shaderName) == 0))
-    {
-      shader->SetFileName (shaderFileName);
-      shmgr->RegisterShader (shader);
-    }
-    else 
-      return 0;
-    return shader;
-  }
-
-  return 0;
 }
 
 void csTextSyntaxService::ReportError (const char* msgid,

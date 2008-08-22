@@ -65,7 +65,7 @@ namespace lighter
     csRef<iCommandLineParser> cmdLine;
     csRef<iConfigManager> configMgr;
     iObjectRegistry *objectRegistry;
-    csRef<iStringSet> strings;
+    csRef<iShaderVarStringSet> svStrings;
     csRef<iJobQueue> jobManager;
 
     SwapManager* swapManager;

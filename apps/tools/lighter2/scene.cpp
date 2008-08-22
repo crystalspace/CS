@@ -1031,7 +1031,7 @@ namespace lighter
     csRef<iShaderVariableContext> matSVC = 
       scfQueryInterface<iShaderVariableContext> (material->GetMaterial());
     csRef<csShaderVariable> svTex =
-      matSVC->GetVariable (globalLighter->strings->Request ("tex diffuse"));
+      matSVC->GetVariable (globalLighter->svStrings->Request ("tex diffuse"));
     if (svTex.IsValid())
     {
       iTextureWrapper* texwrap = 0;
@@ -1497,7 +1497,7 @@ namespace lighter
         
       // ...and add current one
       iShaderVariableContext* meshSVs = meshwrap->GetSVContext ();
-      CS::ShaderVarName lightmapName (globalLighter->strings, "tex lightmap");
+      CS::ShaderVarName lightmapName (globalLighter->svStrings, "tex lightmap");
       csRef<csShaderVariable> lightmapSV = meshSVs->GetVariable (lightmapName);
       if (lightmapSV.IsValid())
       {

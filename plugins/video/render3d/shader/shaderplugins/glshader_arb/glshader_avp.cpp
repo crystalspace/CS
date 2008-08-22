@@ -58,7 +58,7 @@ void csShaderGLAVP::Deactivate()
 
 void csShaderGLAVP::SetupState (const CS::Graphics::RenderMesh* /*mesh*/, 
                                 CS::Graphics::RenderMeshModes& /*modes*/,
-	                        const iShaderVarStack* stacks)
+	                        const csShaderVariableStack& stack)
 {
   size_t i;
   const csGLExtensionManager* ext = shaderPlug->ext;
@@ -69,7 +69,7 @@ void csShaderGLAVP::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
   {
     VariableMapEntry& mapping = variablemap[i];
 
-    var = csGetShaderVariableFromStack (stacks, mapping.name);
+    var = csGetShaderVariableFromStack (stack, mapping.name);
     if (!var.IsValid ())
       var = mapping.mappingParam.var;
 
@@ -306,9 +306,6 @@ bool csShaderGLAVP::Load (iShaderDestinationResolver*, iDocumentNode* program)
 {
   if(!program)
     return false;
-
-  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
-    shaderPlug->object_reg, "crystalspace.shared.stringset");
 
   csRef<iDocumentNode> variablesnode = program->GetNode("arbvp");
   if (variablesnode)

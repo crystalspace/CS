@@ -100,7 +100,7 @@ struct iVisibilityCullerListener : public virtual iBase
  */
 struct iVisibilityCuller : public virtual iBase
 {
-  SCF_INTERFACE (iVisibilityCuller, 2, 0, 0);
+  SCF_INTERFACE (iVisibilityCuller, 3, 0, 0);
 
   /**
    * Setup all data for this visibility culler. This needs
@@ -125,7 +125,8 @@ struct iVisibilityCuller : public virtual iBase
    * all objects are visible.
    */
   virtual bool VisTest (iRenderView* irview, 
-    iVisibilityCullerListener* viscallback) = 0;
+    iVisibilityCullerListener* viscallback,
+    int renderWidth = 0, int renderHeight = 0) = 0;
   /**
    * Precache visibility culling. This can be useful in case you want
    * to ensure that render speed doesn't get any hickups as soon as a portal

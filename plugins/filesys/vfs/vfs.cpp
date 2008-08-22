@@ -215,10 +215,11 @@ public:
 class VfsArchiveCache : public CS::Memory::CustomAllocated
 {
 private:
-  csPDelArray<VfsArchive> array;
+  csPDelArray<VfsArchive, CS::Container::ArrayAllocDefault,
+    csArrayCapacityFixedGrow<8> > array;
 
 public:
-  VfsArchiveCache () : array (8, 8)
+  VfsArchiveCache () : array (8)
   {
   }
   virtual ~VfsArchiveCache ()
@@ -933,10 +934,11 @@ csPtr<iDataBuffer> ArchiveFile::GetAllData (bool nullterm)
   {
     // However, a null-terminated buffer is requested,
     // but this one isn't yet - copy data, append null
+    char* data = (char*)Node->vfs->heap->Alloc (Size+1); 
     CS::DataBuffer<VfsHeap>* dbuf =
-      new CS::DataBuffer<VfsHeap> (Size+1, Node->vfs->heap);
+      new CS::DataBuffer<VfsHeap> (data, Size, true, Node->vfs->heap);
     memcpy (dbuf->GetData(), databuf->GetData(), Size);
-    dbuf->GetData()[Size] = 0;
+    data[Size] = 0;
     databuf.AttachNew (dbuf);
 
     buffernt = nullterm;

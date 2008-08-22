@@ -30,6 +30,7 @@
 #include "ivaria/reporter.h"
 
 #include "csutil/cfgacc.h"
+#include "csutil/xmltiny.h"
 
 #include "cpi/docwrap.h"
 #include "shader.h"
@@ -49,6 +50,15 @@ SCF_IMPLEMENT_FACTORY (csXMLShaderCompiler)
 csXMLShaderCompiler::csXMLShaderCompiler(iBase* parent) : 
   scfImplementationType (this, parent), debugInstrProcessing (false)
 {
+  static bool staticInited = false;
+  if (!staticInited)
+  {
+    TempHeap::Init();
+    Variables::Init();
+    
+    staticInited = true;
+  }
+
   wrapperFact = 0;
   InitTokenTable (xmltokens);
 
@@ -84,8 +94,8 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
 
   strings = csQueryRegistryTagInterface<iStringSet> (
     object_reg, "crystalspace.shared.stringset");
-  
-  string_mixmode_alpha = strings->Request ("mixmode alpha");
+  stringsSvName = csQueryRegistryTagInterface<iShaderVarStringSet> (
+    object_reg, "crystalspace.shader.variablenameset");
 
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
   vfs = csQueryRegistry<iVFS> (object_reg);
@@ -102,12 +112,19 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
   else
     do_verbose = false;
     
+  binDocSys = csLoadPluginCheck<iDocumentSystem> (plugin_mgr,
+    "crystalspace.documentsystem.binary");
+  xmlDocSys.AttachNew (new csTinyDocumentSystem);
+  
   csConfigAccess config (object_reg);
   doDumpXML = config->GetBool ("Video.XMLShader.DumpVariantXML");
   doDumpConds = config->GetBool ("Video.XMLShader.DumpConditions");
   doDumpValues = config->GetBool ("Video.XMLShader.DumpPossibleValues");
   debugInstrProcessing = 
     config->GetBool ("Video.XMLShader.DebugInstructionProcessing");
+    
+  sharedEvaluator.AttachNew (new csConditionEvaluator (stringsSvName,
+    condConstants));
 
   return true;
 }

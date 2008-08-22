@@ -30,15 +30,17 @@ ShaderVariableContextImpl::~ShaderVariableContextImpl ()
 
 namespace
 {
-class SvVarArrayCmp : public csArrayCmp<csShaderVariable*, csStringID>
+class SvVarArrayCmp : public csArrayCmp<csShaderVariable*, 
+                                        CS::ShaderVarStringID>
 {
-  static int SvKeyCompare (csShaderVariable* const& r, csStringID const& k)
+  static int SvKeyCompare (csShaderVariable* const& r,
+			   CS::ShaderVarStringID const& k)
   { 
     return r->GetName() - k;
   }
 public:
-  SvVarArrayCmp (csStringID key) : 
-    csArrayCmp<csShaderVariable*, csStringID> (key, SvKeyCompare)
+  SvVarArrayCmp (CS::ShaderVarStringID key) : 
+    csArrayCmp<csShaderVariable*, CS::ShaderVarStringID> (key, SvKeyCompare)
   {
   }
 };
@@ -59,7 +61,7 @@ void ShaderVariableContextImpl::AddVariable (csShaderVariable *variable)
 }
 
 csShaderVariable* ShaderVariableContextImpl::GetVariable (
-  csStringID name) const 
+  ShaderVarStringID name) const 
 {
   size_t index = variables.FindSortedKey (SvVarArrayCmp (name));
   if (index != csArrayItemNotFound)
@@ -68,14 +70,16 @@ csShaderVariable* ShaderVariableContextImpl::GetVariable (
 }
 
 void ShaderVariableContextImpl::PushVariables (
-  iShaderVarStack* stacks) const
+  csShaderVariableStack& stack) const
 {
   for (size_t i=0; i<variables.GetSize (); ++i)
   {
-    csStringID name = variables[i]->GetName ();
-    if (stacks->GetSize () <= (size_t)name)
-      stacks->SetSize (name+1, 0);
-    stacks->Put (name, variables[i]);
+    ShaderVarStringID name = variables[i]->GetName ();
+    if (name >= stack.GetSize ())
+      /* Not really an error: can happen if new shader vars are created
+       * after the stack was set up */
+      return;
+    stack[name] = variables[i];
   }
 }
 
@@ -94,7 +98,7 @@ bool ShaderVariableContextImpl::RemoveVariable (csShaderVariable* variable)
   return variables.Delete (variable);
 }
 
-bool ShaderVariableContextImpl::RemoveVariable (csStringID name)
+bool ShaderVariableContextImpl::RemoveVariable (ShaderVarStringID name)
 {
   size_t index = variables.FindSortedKey (SvVarArrayCmp (name));
   if (index != csArrayItemNotFound)

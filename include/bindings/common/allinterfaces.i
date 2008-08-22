@@ -43,6 +43,9 @@
   INTERFACE_APPLY(iProcTexture)
   INTERFACE_APPLY(iRenderLoop)
   INTERFACE_APPLY(iRenderLoopManager)
+  INTERFACE_APPLY(iRenderManager)
+  INTERFACE_APPLY(iRenderManagerPostEffects)
+  INTERFACE_APPLY(iRenderManagerTargets)
   INTERFACE_APPLY(iSceneNode)
   INTERFACE_APPLY(iSceneNodeArray)
   INTERFACE_APPLY(iSector)
@@ -96,13 +99,18 @@
   INTERFACE_APPLY(iSkeletonSocketFactory)
   INTERFACE_APPLY(iSkeletonManager2)
   INTERFACE_APPLY(iSkeletonFactory2)
+  INTERFACE_APPLY(iSkeletonFSMNode2)
+  INTERFACE_APPLY(iSkeletonFSMNodeFactory2)
   INTERFACE_APPLY(iSkeleton2)
   INTERFACE_APPLY(iSkeletonAnimPacketFactory2)
   INTERFACE_APPLY(iSkeletonAnimPacket2)
   INTERFACE_APPLY(iSkeletonAnimNodeFactory2)
   INTERFACE_APPLY(iSkeletonAnimNode2)
-  INTERFACE_APPLY(iSkeletonAnimationFactory2)
   INTERFACE_APPLY(iSkeletonAnimation2)
+  INTERFACE_APPLY(iSkeletonAnimationNode2)
+  INTERFACE_APPLY(iSkeletonAnimationNodeFactory2)
+  INTERFACE_APPLY(iSkeletonPriorityNode2)
+  INTERFACE_APPLY(iSkeletonPriorityNodeFactory2)
   INTERFACE_APPLY(iSkeletonBlendNodeFactory2)
   INTERFACE_APPLY(iSkeletonBlendNode2)
   INTERFACE_APPLY(iSprite2DState)
@@ -246,7 +254,9 @@
 
 #define CSTOOL_APPLY_FOR_EACH_INTERFACE
 
-#define CSGFX_APPLY_FOR_EACH_INTERFACE
+%define CSGFX_APPLY_FOR_EACH_INTERFACE
+  INTERFACE_APPLY(iShaderVarStringSet)
+%enddef
 
 
 %define APPLY_FOR_ALL_INTERFACES

@@ -46,5 +46,6 @@ namespace Utility
     return true;
   }
 
+  void SimpleJobQueue::Wait (iJob*) { }
 }
 }

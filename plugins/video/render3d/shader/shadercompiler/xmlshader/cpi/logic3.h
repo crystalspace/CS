@@ -37,6 +37,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     Logic3 () : state (Uncertain) {}
     Logic3 (State state) : state (state) {}
     Logic3 (bool b) : state (b ? Truth : Lie) {}
+    
+    const char* ToString() const
+    {
+      switch (state)
+      {
+        case Lie: return "Lie";
+        case Truth: return "Truth";
+        case Uncertain: return "Uncertain";
+      }
+      return "WTF?";
+    }
 
     Logic3 operator! ()
     {

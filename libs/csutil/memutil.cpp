@@ -18,6 +18,7 @@
 
 #include "csutil/platform.h"
 #include "memutil.h"
+#include "memutil.h"
 
 namespace CS {
   namespace Platform {

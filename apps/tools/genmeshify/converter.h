@@ -27,7 +27,7 @@ namespace genmeshify
   class Converter
   {
     App* app;
-    csStringID idTexLightmap;
+    CS::ShaderVarStringID idTexLightmap;
     csRef<iLoaderContext> context;
     csRef<iRegion> region;
 

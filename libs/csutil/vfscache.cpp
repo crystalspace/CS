@@ -21,6 +21,7 @@
 #include "csutil/vfscache.h"
 #include "iutil/databuff.h"
 #include "iutil/objreg.h"
+#include "iutil/stringarray.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 
@@ -60,6 +61,23 @@ void csVfsCacheManager::CacheName (csStringFast<512>& buf, const char* type,
     buf.Format ("%s/%s/%" PRIu32 , type, scope, id);
 }
 
+void csVfsCacheManager::RecursiveDelete (const char* fn)
+{
+  csRef<iStringArray> files;
+  files = GetVFS()->FindFiles (fn);
+  for (size_t i = 0; i < files->GetSize(); i++)
+  {
+    const char* entry = files->Get (i);
+    if (entry[strlen(entry)-1] == '/')
+    {
+      RecursiveDelete (entry);
+    }
+    else
+      GetVFS()->DeleteFile (entry);
+  }
+  GetVFS()->DeleteFile (fn);
+}
+
 void csVfsCacheManager::SetCurrentType (const char* type)
 {
   current_type = type;
@@ -77,6 +95,38 @@ bool csVfsCacheManager::CacheData (const void* data, size_t size,
   csStringFast<512> buf;
   GetVFS ()->PushDir ();
   GetVFS ()->ChDir (vfsdir);
+  
+  csString typeDir;
+  typeDir.Format ("%s/", type);
+  if (scope == 0)
+  {
+    if (GetVFS()->Exists (typeDir))
+      RecursiveDelete (typeDir);
+  }
+  else
+  {
+    if (GetVFS()->Exists (type) && !GetVFS()->Exists (typeDir))
+      GetVFS()->DeleteFile (type);
+    csString scopeDir;
+    scopeDir.Format ("%s/%s/", type, scope);
+    if (id == (uint32)~0)
+    {
+      if (GetVFS()->Exists (scopeDir))
+	RecursiveDelete (scopeDir);
+    }
+    else
+    {
+      csString scopeFN;
+      scopeFN.Format ("%s/%s", type, scope);
+      if (GetVFS()->Exists (scopeFN) && !GetVFS()->Exists (scopeDir))
+	GetVFS()->DeleteFile (scopeFN);
+      csString idDir;
+      idDir.Format ("%s/%s/%" PRIu32 "/", type, scope, id);
+      if (GetVFS()->Exists (idDir))
+	RecursiveDelete (idDir);
+    }
+  }
+  
   CacheName (buf, type ? type : current_type.GetData(),
   	scope ? scope : current_scope.GetData(), id);
   csRef<iFile> cf = GetVFS ()->Open (buf, VFS_FILE_WRITE);
@@ -86,7 +136,7 @@ bool csVfsCacheManager::CacheData (const void* data, size_t size,
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.vfscachemgr.createfile",
-	"Could not create file '%s' in VFS dir '%s'\n", buf.GetData(), vfsdir);
+	"Could not create file '%s' in VFS dir '%s'", buf.GetData(), vfsdir);
     return false;
   }
 
@@ -95,7 +145,7 @@ bool csVfsCacheManager::CacheData (const void* data, size_t size,
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.vfscachemgr.writefile",
-	"Could not write file '%s' in VFS dir '%s'\n", buf.GetData(), vfsdir);
+	"Could not write file '%s' in VFS dir '%s'", buf.GetData(), vfsdir);
     return false;
   }
 

@@ -147,7 +147,7 @@
       <center x="500000" y="866030" z="0" />
       <radius>0</radius>
       <color red="0.85903" green="0.80995" blue="0.70420" />
-      <influenceradius>10000000</influenceradius>
+      <influenceradius>20000000</influenceradius>
       <attenuation>realistic</attenuation>
     </light>
 

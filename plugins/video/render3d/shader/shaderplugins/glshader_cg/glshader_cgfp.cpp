@@ -23,6 +23,7 @@
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
+#include "csutil/stringreader.h"
 #include "iutil/databuff.h"
 #include "iutil/document.h"
 #include "iutil/string.h"
@@ -61,15 +62,15 @@ void csShaderGLCGFP::Deactivate()
 
 void csShaderGLCGFP::SetupState (const CS::Graphics::RenderMesh* mesh,
                                  CS::Graphics::RenderMeshModes& modes,
-                                 const iShaderVarStack* stacks)
+                                 const csShaderVariableStack& stack)
 {
   if (pswrap)
   {
-    pswrap->SetupState (mesh, modes, stacks);
+    pswrap->SetupState (mesh, modes, stack);
     return;
   } 
 
-  csShaderGLCGCommon::SetupState (mesh, modes, stacks);
+  csShaderGLCGCommon::SetupState (mesh, modes, stack);
 }
 
 void csShaderGLCGFP::ResetState()
@@ -154,14 +155,63 @@ bool csShaderGLCGFP::Compile ()
   }
   else
   {
+    csStringArray testForUnused;
+    csStringReader lines (programStr);
+    while (lines.HasMoreLines())
+    {
+      csString line;
+      lines.GetLine (line);
+      if (line.StartsWith ("//@@UNUSED? "))
+      {
+        line.DeleteAt (0, 12);
+        testForUnused.Push (line);
+      }
+    }
+  
+    if (testForUnused.GetSize() > 0)
+    {
+      /* A list of unused variables to test for has been given. Test piecemeal
+       * which variables are really unused */
+      csSet<csString> allNewUnusedParams;
+      size_t step = 8;
+      size_t offset = 0;
+      while (offset < testForUnused.GetSize())
+      {
+        unusedParams.DeleteAll();
+        for (size_t i = 0; i < offset; i++)
+          unusedParams.Add (testForUnused[i]);
+        for (size_t i = offset+step; i < testForUnused.GetSize(); i++)
+          unusedParams.Add (testForUnused[i]);
+	if (DefaultLoadProgram (0, programStr, CG_GL_FRAGMENT, 
+	  shaderPlug->maxProfileFragment, loadIgnoreErrors))
+	{
+	  csSet<csString> newUnusedParams;
+	  CollectUnusedParameters (newUnusedParams);
+	  for (size_t i = 0; i < step; i++)
+	  {
+	    if (offset+i >= testForUnused.GetSize()) break;
+	    const char* s = testForUnused[offset+i];
+	    if (newUnusedParams.Contains (s))
+	      allNewUnusedParams.Add (s);
+	  }
+	}
+        
+        offset += step;
+      }
+      unusedParams = allNewUnusedParams;
+    }
+    else
+    {
+      unusedParams.DeleteAll();
+    }
     if (!DefaultLoadProgram (0, programStr, CG_GL_FRAGMENT, 
-      shaderPlug->maxProfileFragment, false, false))
+      shaderPlug->maxProfileFragment, loadLoadToGL))
       return false;
     /* Compile twice to be able to filter out unused vertex2fragment stuff on 
      * pass 2.
      * @@@ FIXME: two passes are not always needed.
      */
-    CollectUnusedParameters ();
+    CollectUnusedParameters (unusedParams);
     return DefaultLoadProgram (this, programStr, CG_GL_FRAGMENT, 
       shaderPlug->maxProfileFragment);
   }

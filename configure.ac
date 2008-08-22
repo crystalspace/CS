@@ -13,7 +13,7 @@ AC_PREREQ([2.56])
 #	Keep this value synchronized with CS/include/csver.h,
 #	CS/docs/texinfo/version.txi, and CS/mk/autoconf/crystal.m4.
 #------------------------------------------------------------------------------
-m4_define([cs_version_number], [1.3])
+m4_define([cs_version_number], [1.9])
 
 
 
@@ -221,7 +221,26 @@ AC_DEFUN([CS_CHECK_RTLD],
 
 CS_CHECK_RTLD
 
+#------------------------------------------------------------------------------
+# Check for SIMD flags
+#------------------------------------------------------------------------------
 
+CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx], [CS_CREATE_TUPLE([-mmmx])])
+CS_CHECK_BUILD_FLAGS([for -msse flag], [cs_cv_prog_cc_msse], [CS_CREATE_TUPLE([-msse])])
+CS_CHECK_BUILD_FLAGS([for -msse2 flag], [cs_cv_prog_cc_msse2], [CS_CREATE_TUPLE([-msse2])])
+
+AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],[+])])
+
+
+AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
+    [CS_CHECK_BUILD([checking for mmintrin.h],
+        [cs_cv_header_mmintrin_h],
+        [AC_LANG_PROGRAM([[#include <mmintrin.h>]], [])],
+        [CS_CREATE_TUPLE([$cs_cv_prog_cc_mmmx])],
+        [C++],
+        [CS_HEADER_PROPERTY([CS_SUPPORTS_MMX])
+        CS_EMIT_BUILD_PROPERTY([CS_SUPPORTS_MMX], [yes])])])
 
 #------------------------------------------------------------------------------
 # Determine host platform.  Recognized platforms: Unix, Windows, Mac OS X.
@@ -240,6 +259,14 @@ case $cs_host_target in
         CS_EMIT_BUILD_PROPERTY([COREAUDIO.LFLAGS],
 	    [-framework CoreAudio -framework AudioToolbox])
         CS_HEADER_PROPERTY([CS_PLATFORM_MACOSX])
+        AS_IF([test -n "$cs_cv_prog_cc_msse"],
+            [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
+             [$cs_cv_prog_cc_msse], [+])])
+        AS_IF([test -n "$cs_cv_prog_cc_msse2"],
+            [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
+             [$cs_cv_prog_cc_msse2], [+])
+	     CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
+	     ["-mfpmath=sse"], [+])])
         ;;
 esac
 case $cs_host_family in
@@ -252,7 +279,6 @@ case $cs_host_family in
     esac
 CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
     [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
-
 
 
 #------------------------------------------------------------------------------
@@ -1331,10 +1357,21 @@ CS_CHECK_LIB_WITH([bullet],
       btSequentialImpulseConstraintSolver* s;
       btDefaultCollisionConfiguration* c;
       btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)])],
-    [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libbullet], [BULLET])], [],
+    [], [C++], [], [],
     [], [], [-lbulletdynamics -lbulletcollision -lbulletmath],
     [bulletdynamics])
 
+AS_IF([test $cs_cv_libbullet = yes],
+    [CS_CHECK_BUILD([if bullet is sufficiently recent (>=2.68)], [cs_cv_bullet_recent],
+	[AC_LANG_PROGRAM(
+	    [[#include "btBulletDynamicsCommon.h"]],
+	    [btManifoldPoint *p = new btManifoldPoint();
+             p->m_appliedImpulse;])],
+	[], [C++],
+	[CS_EMIT_BUILD_RESULT([cs_cv_bullet_recent], [BULLET])], [], [],
+	[$cs_cv_libbullet_cflags],
+	[$cs_cv_libbullet_lflags],
+	[$cs_cv_libbullet_libs])])
 
 
 #------------------------------------------------------------------------------
@@ -1631,7 +1668,7 @@ AC_DEFUN([CS_CHECK_LIBCG],
     	[AC_LANG_PROGRAM(
     	    [[#include <Cg/cg.h>]],
 	   [CGcontext c = cgCreateContext();])],
-    	[], [], [], [],
+    	[], [C++], [], [],
     	[$cs_cv_libm_cflags $cs_cv_sys_pthread_cflags], 
     	[$cs_cv_libm_lflags $cs_cv_sys_pthread_lflags], 
     	[$cs_cv_libm_libs   $cs_cv_sys_pthread_libs],
@@ -1641,7 +1678,7 @@ AC_DEFUN([CS_CHECK_LIBCG],
 	[CS_CHECK_BUILD([if Cg is sufficiently recent], [cs_cv_libCg_recent],
 	    [AC_LANG_PROGRAM(
 	    	[[#include <Cg/cg.h>]], [cgSetErrorHandler(0,0);])],
-	    [], [], [], [], [],
+	    [], [C++], [], [], [],
 	    [$cs_cv_libCg_cflags],
 	    [$cs_cv_libCg_lflags],
 	    [$cs_cv_libCg_libs])],

@@ -24,6 +24,7 @@
 #include "gl_r2t_ext_fb_o.h"
 
 #include "csplugincommon/opengl/glenum_identstrs.h"
+#include "csplugincommon/opengl/glhelper.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
@@ -41,31 +42,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
   void RenderBufferWrapper::Free()
   {
     ext->glDeleteRenderbuffersEXT (1, &buffer);
-  }
-
-  //-------------------------------------------------------------------------
-
-  static unsigned int HashCompute (char const* s, size_t n, uint startHash)
-  {
-    unsigned int h = startHash;
-    const char* end = s + n;
-    for(const char* c = s; c != end; ++c)
-      h = ((h << 5) + h) + *c;
-
-    return h;
-  }
-
-  void R2TAttachmentGroup::ComputeHash()
-  {
-    hash = 0;
-    for (int a = 0; a < rtaNumAttachments; a++)
-    {
-      hash = HashCompute ((char const*)(attachments + a), 
-	sizeof (csGLRender2TextureBackend::RTAttachment), hash);
-    }
-  #ifdef CS_DEBUG
-    hashComputed = true;
-  #endif
   }
 
   //-------------------------------------------------------------------------
@@ -97,17 +73,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
   {
     CS_ASSERT(boundFBO == framebuffer);
 
-    const R2TAttachmentGroup& attachments = this->attachments;
+    const R2TAttachmentGroup<>& attachments = this->attachments;
     // Bind textures
     static const GLenum fbAttachments[rtaNumAttachments] = 
     {
       GL_DEPTH_ATTACHMENT_EXT, GL_COLOR_ATTACHMENT0_EXT
     };
+    initialAttachments = 0;
     for (int a = 0; a < rtaNumAttachments; a++)
     {
-      const csGLRender2TextureBackend::RTAttachment& attachment =
+      const WRTAG::RTA& attachment =
 	attachments.GetAttachment (csRenderTargetAttachment(a));
       if (!attachment.IsValid()) continue;
+      
+      initialAttachments |= 1 << a;
 
       csGLBasicTextureHandle* tex_mm = static_cast<csGLBasicTextureHandle*> (
 	attachment.texture->GetPrivateObject ());
@@ -284,6 +263,7 @@ bool csGLRender2TextureEXTfbo::SetRenderTarget (iTextureHandle* handle,
   // @@@ Here, some initial validity checks could be made (e.g. dimension)
   currentAttachments.GetAttachment (attachment).Set (handle, persistent, 
     subtexture);
+  tex_mm->SetInFBO (true);
   return true;
 }
 
@@ -291,7 +271,7 @@ void csGLRender2TextureEXTfbo::UnsetRenderTargets ()
 {
   for (int a = 0; a < rtaNumAttachments; a++)
   {
-    const csGLRender2TextureBackend::RTAttachment& attachment =
+    const WRTAG::RTA& attachment =
 	currentAttachments.GetAttachment (csRenderTargetAttachment(a));
     if (!attachment.IsValid()) continue;
 
@@ -352,7 +332,7 @@ bool csGLRender2TextureEXTfbo::CanSetRenderTarget (const char* format,
 iTextureHandle* csGLRender2TextureEXTfbo::GetRenderTarget (csRenderTargetAttachment attachment,
                                                            int* subtexture) const
 {
-  const csGLRender2TextureBackend::RTAttachment& rtAttachment =
+  const WRTAG::RTA& rtAttachment =
     currentAttachments.GetAttachment (attachment);
   if (subtexture) *subtexture = rtAttachment.subtexture;
   return rtAttachment.texture;
@@ -389,6 +369,20 @@ void csGLRender2TextureEXTfbo::SetupProjection ()
   G3D->SetGlOrtho (true);
 }
 
+void csGLRender2TextureEXTfbo::SetupProjection (
+    const CS::Math::Matrix4& projectionMatrix)
+{
+  GLRENDER3D_OUTPUT_LOCATION_MARKER;
+  CS::Math::Matrix4 flipY (
+      1, 0, 0, 0,
+      0, -1, 0, 0,
+      0, 0, 1, 0,
+      0, 0, 0, 1);
+  GLfloat matrixholder[16];
+  CS::PluginCommon::MakeGLMatrix4x4 (flipY * projectionMatrix, matrixholder);
+  glLoadMatrixf (matrixholder);
+}
+
 void csGLRender2TextureEXTfbo::FinishDraw ()
 {
   GLRENDER3D_OUTPUT_LOCATION_MARKER;
@@ -420,6 +414,13 @@ void csGLRender2TextureEXTfbo::NextFrame()
   fboCache.AdvanceTime (frameNum);
   depthRBCache.AdvanceTime (frameNum);
   stencilRBCache.AdvanceTime (frameNum);
+  
+  fboCache.agedPurgeInterval = 60;
+}
+
+void csGLRender2TextureEXTfbo::CleanupFBOs()
+{
+  fboCache.agedPurgeInterval = 0;
 }
 
 void csGLRender2TextureEXTfbo::GetDepthStencilRBs (const Dimensions& fbSize, 
@@ -473,7 +474,7 @@ void csGLRender2TextureEXTfbo::GetDepthStencilRBs (const Dimensions& fbSize,
   }
 }
 
-void csGLRender2TextureEXTfbo::RegenerateTargetMipmaps (const RTAttachment& target)
+void csGLRender2TextureEXTfbo::RegenerateTargetMipmaps (const WRTAG::RTA& target)
 {
   if (!target.texture) return;
 
@@ -491,6 +492,26 @@ void csGLRender2TextureEXTfbo::SelectCurrentFBO ()
 
   currentAttachments.ComputeHash();
   currentFBO = fboCache.Query (currentAttachments, true);
+  
+  // Weak refs may got zeroed
+  if (currentFBO != 0)
+  {
+    const R2TAttachmentGroup<>& fboRTAG = currentFBO->attachments;
+    for (int a = 0; a < rtaNumAttachments; a++)
+    {
+      const RRTAG::RTA& attachment =
+	currentAttachments.GetAttachment (csRenderTargetAttachment(a));
+      const WRTAG::RTA& fboAttachment =
+	fboRTAG.GetAttachment (csRenderTargetAttachment(a));
+      if (attachment.IsValid() && !fboAttachment.IsValid())
+      {
+        fboCache.RemoveActive (currentFBO);
+        currentFBO = 0;
+        break;
+      }
+    }
+  }
+  
   if (currentFBO == 0)
   {
     // @@@ We can prolly get away with FB dimensions entirely
@@ -498,7 +519,7 @@ void csGLRender2TextureEXTfbo::SelectCurrentFBO ()
 
     for (int a = 0; a < rtaNumAttachments; a++)
     {
-      const csGLRender2TextureBackend::RTAttachment& attachment =
+      const WRTAG::RTA& attachment =
 	currentAttachments.GetAttachment (csRenderTargetAttachment(a));
       if (!attachment.IsValid()) continue;
 

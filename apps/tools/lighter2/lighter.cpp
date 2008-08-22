@@ -118,7 +118,7 @@ namespace lighter
       if(maxSwapSize)
       {
         // Convert physical memory to megabytes, and use 3/4 of memory as the limit.
-        maxSwapSize /= (1024/0.75f);
+        maxSwapSize /= size_t (1024/0.75f);
       }
       else
       {
@@ -205,9 +205,9 @@ namespace lighter
     vfs = csQueryRegistry<iVFS> (objectRegistry);
     if (!vfs) return Report ("No iVFS!");
 
-    strings = csQueryRegistryTagInterface<iStringSet> (
-      objectRegistry, "crystalspace.shared.stringset");
-    if (!strings) return Report ("No shared string set!");
+    svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
+      objectRegistry, "crystalspace.shader.variablenameset");
+    if (!svStrings) return Report ("No SV names string set!");
 
     // Open the systems
     if (!csInitializer::OpenApplication (objectRegistry))

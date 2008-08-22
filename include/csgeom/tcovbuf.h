@@ -514,6 +514,7 @@ private:
    */
   bool DrawPolygon (csVector2* verts, size_t num_verts, csBox2Int& bbox);
 
+  //@{
   /**
    * Draw an outline on the coverage buffer.
    * Returns false if outline is outside screen.
@@ -525,6 +526,12 @@ private:
   	bool* used_verts,
   	int* edges, size_t num_edges, csBox2Int& bbox,
 	float& max_depth, bool splat_outline);
+  bool DrawOutline (const csReversibleTransform& trans,
+  	const CS::Math::Matrix4& projection, 
+  	csVector3* verts, size_t num_verts, bool* used_verts,
+  	int* edges, size_t num_edges, csBox2Int& bbox,
+	float& max_depth, bool splat_outline);
+  //@}
 
   /**
    * Find a given tile.
@@ -554,6 +561,13 @@ public:
 
   /// Setup coverage buffer for given size.
   void Setup (int w, int h);
+  
+  void SetSize (int w, int h)
+  {
+    if ((w > width_po2) || (h > height_64)) Setup (w, h);
+    width = w;
+    height = h;
+  }
 
   /// Initialize the coverage buffer to empty.
   void Initialize ();
@@ -609,6 +623,7 @@ public:
    */
   int InsertPolygonNoDepth (csVector2* verts, size_t num_verts);
 
+  //@{
   /**
    * Insert an outline in the coverage buffer.
    * It will update the screen buffer. 'bbox' will contain the screen
@@ -627,6 +642,12 @@ public:
   	bool* used_verts,
   	int* edges, size_t num_edges, bool splat_outline,
 	csBox2Int& modified_bbox);
+  int InsertOutline (const csReversibleTransform& trans,
+  	const CS::Math::Matrix4& projection, 
+  	csVector3* verts, size_t num_verts, bool* used_verts,
+  	int* edges, size_t num_edges, bool splat_outline,
+	csBox2Int& modified_bbox);
+  //@}
 
   /**
    * Prepare data for TestRectangle. If this returns false you have

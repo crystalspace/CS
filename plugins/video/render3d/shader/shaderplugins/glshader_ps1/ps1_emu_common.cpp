@@ -111,5 +111,14 @@ bool csShaderGLPS1_Common::Compile ()
   return LoadProgramStringToGL();
 }
 
+
+void csShaderGLPS1_Common::GetUsedShaderVars (csBitArray& bits) const
+{
+  for (size_t c = 0; c < MAX_CONST_REGS; c++)
+  {
+    TryAddUsedShaderVarProgramParam (constantRegs[c], bits);
+  }
+}
+
 }
 CS_PLUGIN_NAMESPACE_END(GLShaderPS1)

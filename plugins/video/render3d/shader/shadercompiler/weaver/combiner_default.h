@@ -28,17 +28,20 @@
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
   class WeaverCompiler;
+  class ShaderVarNodesHelper;
 
   class CombinerDefault : 
     public scfImplementation1<CombinerDefault,
 			      CS::PluginCommon::ShaderWeaver::iCombiner>
   {
-    WeaverCompiler* compiler;
+    const WeaverCompiler* compiler;
   
-    csStringHash& xmltokens;
+    const csStringHash& xmltokens;
     csRefArray<iDocumentNode> passNodes;
+    ShaderVarNodesHelper& shaderVarNodes;
   public:
-    CombinerDefault (WeaverCompiler* compiler);
+    CombinerDefault (const WeaverCompiler* compiler,
+      ShaderVarNodesHelper& shaderVarNodes);
     
     void BeginSnippet (const char* annotation);
     void AddInput (const char* name, const char* type) {}
@@ -57,7 +60,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     bool EndSnippet ();
     void AddGlobal (const char* name, const char* type, 
       const char* annotation) {}
-    void SetOutput (const char* name, const char* annotation) {}
+    void SetOutput (csRenderTargetAttachment,
+      const char* name, const char* annotation) {}
     csPtr<CS::PluginCommon::ShaderWeaver::iCoerceChainIterator> 
       QueryCoerceChain (const char* fromType, const char* toType) { return 0; }
     uint CoerceCost (const char* fromType, const char* toType);

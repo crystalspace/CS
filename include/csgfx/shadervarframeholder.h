@@ -56,7 +56,7 @@ public:
    *   single frame.
    */
   csRef<csShaderVariable> GetFrameUniqueSV (uint framenr,
-    csStringID name);
+    CS::ShaderVarStringID name);
 };
 
 #endif // __CS_CSGFX_SHADERVARFRAMEHOLDER_H__

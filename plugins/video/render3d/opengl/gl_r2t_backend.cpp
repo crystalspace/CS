@@ -23,6 +23,7 @@
 #include "ivideo/graph3d.h"
 
 #include "gl_r2t_backend.h"
+#include "gl_render3d.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
@@ -38,37 +39,34 @@ csGLRender2TextureBackend::~csGLRender2TextureBackend()
 
   //-------------------------------------------------------------------------
 
-  bool csGLRender2TextureBackend::RTAttachment::operator!= (
-    const RTAttachment& other) const
-  {
-    if (texture != other.texture) return true;
-    if (subtexture != other.subtexture) return true;
-    if (persistent != other.persistent) return true;
-
-    return false;
-  }
-
-  //-------------------------------------------------------------------------
-
-void R2TViewportHelper::Set2DViewport (iGraphics3D* G3D, int txt_w, int txt_h)
+void R2TViewportHelper::Set2DViewport (iGraphics3D* G3D, int txt_w, int txt_h,
+                                       bool keepOldVP)
 {
+  GLRENDER3D_OUTPUT_LOCATION_MARKER;
+
   iGraphics2D* g2d = G3D->GetDriver2D();
     
   g2d->GetFramebufferDimensions (framebufW, framebufH);
   g2d->GetViewport (vp_old_l, vp_old_t, vp_old_w, vp_old_h);
 
-  g2d->SetViewport (0, framebufH - txt_h, txt_w, txt_h);
+  int vpW = keepOldVP ? csMin (txt_w, vp_old_w) : txt_w;
+  int vpH = keepOldVP ? csMin (txt_h, vp_old_h) : txt_h;
+  vpOfsX = keepOldVP ? vp_old_l : 0;
+  vpOfsY = keepOldVP ? (vp_old_t + vp_old_h - vpH) : framebufH - vpH;
+  g2d->SetViewport (vpOfsX, vpOfsY, vpW, vpH);
   g2d->GetClipRect (rt_old_minx, rt_old_miny, 
     rt_old_maxx, rt_old_maxy);
   if ((rt_old_minx != 0) || (rt_old_miny != 0)
-    || (rt_old_maxx != txt_w) || (rt_old_maxy != txt_h))
+    || (rt_old_maxx != vpW) || (rt_old_maxy != vpH))
   {
-    g2d->SetClipRect (0, 0, txt_w, txt_h);
+    g2d->SetClipRect (0, 0, vpW, vpH);
   }
 }
 
 void R2TViewportHelper::Reset2DViewport (iGraphics3D* G3D)
 {
+  GLRENDER3D_OUTPUT_LOCATION_MARKER;
+  
   iGraphics2D* g2d = G3D->GetDriver2D();
     
   g2d->SetViewport (vp_old_l, vp_old_t, vp_old_w, vp_old_h);
