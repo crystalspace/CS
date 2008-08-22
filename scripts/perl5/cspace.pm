@@ -22822,11 +22822,6 @@ bless $Primitives_quadTable, cspace::csVector2;
   sub CS_VEC_TILT_UP	{ new cspace::csVector3 (-1,  0,  0) }
   sub CS_VEC_TILT_DOWN	{ new cspace::csVector3 ( 1,  0,  0) }
 
-  sub CS_POLYRANGE {		new cspace::csPolygonRange ($_[0], $_[1]) }
-  sub CS_POLYRANGE_SINGLE {	new cspace::csPolygonRange ($_[0]) }
-  sub CS_POLYRANGE_LAST {	new cspace::csPolygonRange (-1, -1) }
-  sub CS_POLYRANGE_ALL {	new cspace::csPolygonRange (0, 2000000000) }
-
   sub CSKEY_SHIFT	{ CSKEY_SHIFT_NUM (csKeyModifierNumAny ()) }
   sub CSKEY_SHIFT_LEFT	{ CSKEY_SHIFT_NUM (csKeyModifierNumLeft ()) }
   sub CSKEY_SHIFT_RIGHT	{ CSKEY_SHIFT_NUM (csKeyModifierNumRight ()) }

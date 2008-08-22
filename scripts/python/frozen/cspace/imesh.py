@@ -2356,7 +2356,5 @@ iParticleBuiltinEffectorFactory_swigregister = _imesh.iParticleBuiltinEffectorFa
 iParticleBuiltinEffectorFactory_swigregister(iParticleBuiltinEffectorFactory)
 iParticleBuiltinEffectorFactory_scfGetVersion = _imesh.iParticleBuiltinEffectorFactory_scfGetVersion
 
-CS_POLYRANGE_LAST = csPolygonRange (-1, -1)
-
 
 
