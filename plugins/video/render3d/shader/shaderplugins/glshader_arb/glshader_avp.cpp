@@ -337,7 +337,7 @@ bool csShaderGLAVP::Load (iShaderDestinationResolver*, const char* program,
   return true;
 }
 
-bool csShaderGLAVP::Compile()
+bool csShaderGLAVP::Compile (iHierarchicalCache*)
 {
   shaderPlug->Open ();
 

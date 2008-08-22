@@ -30,6 +30,13 @@ namespace CS
 
     static char* Demangle (const char* symbol)
     {
+    #if defined(CS_COMPILER_GCC)
+      /* Workaround: sometimes symbols are tried to be demangled which are
+       * not method or function names; occasionally, libstdc++ chokes on
+       * these. So don't try to demangle these */
+      if ((symbol[0] != '_') || (symbol[1] != 'Z'))
+        return strdup (symbol);
+    #endif
     #ifdef CS_HAVE_ABI_CXA_DEMANGLE
       {
         int status;

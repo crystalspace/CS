@@ -437,7 +437,7 @@ bool csStencil2ShadowStep::Initialize (iObjectRegistry* objreg)
   base_id = strings->Request ("base");
   shadows_id = strings->Request ("shadows");
 
-  svNameStringset = csQueryRegistryTagInterface<iStringSet>
+  svNameStringset = csQueryRegistryTagInterface<iShaderVarStringSet>
     (object_reg, "crystalspace.shader.variablenameset");
 
   return true;

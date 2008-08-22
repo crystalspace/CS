@@ -28,7 +28,6 @@
 #include "csutil/scanstr.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
-#include "iengine/region.h"
 #include "iengine/texture.h"
 #include "igraphic/animimg.h"
 #include "imap/ldrctxt.h"
@@ -143,7 +142,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       iTextureWrapper* t = Engine->FindTexture (txtname);
       if (t)
       {
-        AddToRegionOrCollection (ldr_context, t->QueryObject ());
+        AddToCollection (ldr_context, t->QueryObject ());
         return t;
       }
     }
@@ -330,7 +329,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     // Proxy texture loading if the loader isn't specified
     // and we don't need to load them immediately.
     if(txtname && type.IsEmpty() && ldr_context->GetKeepFlags() == KEEP_USED &&
-       !ldr_context->GetRegion())
+       !ldr_context->GetCollection())
     {
       if (filename.IsEmpty())
       {
@@ -366,7 +365,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
 
       proxTex.textureWrapper = tex;
-      AddToRegionOrCollection (ldr_context, proxTex.textureWrapper->QueryObject());
+      AddToCollection (ldr_context, proxTex.textureWrapper->QueryObject());
       proxyTextures.Push(proxTex);
 
       return tex;
@@ -527,7 +526,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csRef<iProcTexture> ipt = scfQueryInterface<iProcTexture> (tex);
       if (ipt)
         ipt->SetAlwaysAnimate (always_animate);
-      AddToRegionOrCollection (ldr_context, tex->QueryObject ());
+      AddToCollection (ldr_context, tex->QueryObject ());
 
       size_t i;
       for (i = 0 ; i < key_nodes.GetSize () ; i++)
@@ -555,7 +554,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       iMaterialWrapper* m = Engine->FindMaterial (matname);
       if (m)
       {
-        AddToRegionOrCollection (ldr_context, m->QueryObject ());
+        AddToCollection (ldr_context, m->QueryObject ());
         return m;
       }
     }
@@ -700,7 +699,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if (!ParseKey (key_nodes[i], mat->QueryObject()))
         return 0;
     }
-    AddToRegionOrCollection (ldr_context, mat->QueryObject ());
+    AddToCollection (ldr_context, mat->QueryObject ());
 
     materialArray.Push(mat);
 
@@ -736,7 +735,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if (tex)
     {
       tex->QueryObject ()->SetName (txtname);
-      AddToRegionOrCollection (ldr_context, tex->QueryObject ());
+      AddToCollection (ldr_context, tex->QueryObject ());
       iTextureManager* tm = G3D ? G3D->GetTextureManager() : 0;
       if (tm) tex->Register (tm);
     }
@@ -772,7 +771,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if (tex)
     {
       tex->QueryObject ()->SetName (txtname);
-      AddToRegionOrCollection (ldr_context, tex->QueryObject ());
+      AddToCollection (ldr_context, tex->QueryObject ());
       iTextureManager* tm = G3D ? G3D->GetTextureManager() : 0;
       if (tm) tex->Register (tm);
     }

@@ -65,7 +65,7 @@ private:
   csRef<iStringSet> strings;
   csRef<iShaderVarStringSet> stringsSvName;
   csRef<iEventHandler> weakEventHandler;
-  csRef<iCacheManager> shaderCache;
+  csRef<iHierarchicalCache> shaderCache;
 
   bool do_verbose;
 
@@ -183,7 +183,7 @@ public:
     return stringsSvName;
   }
   
-  iCacheManager* GetShaderCache()
+  iHierarchicalCache* GetShaderCache()
   { return shaderCache; }
   /** @} */
 
@@ -199,12 +199,12 @@ public:
 
   CS_EVENTHANDLER_NAMES("crystalspace.graphics3d.shadermgr")
   
-  CS_CONST_METHOD virtual const csHandlerID * GenericPrec (
+  virtual const csHandlerID * GenericPrec (
     csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,
     csEventID) const { return 0; }
   
   csHandlerID eventSucc[2];
-  CS_CONST_METHOD virtual const csHandlerID * GenericSucc (
+  virtual const csHandlerID * GenericSucc (
     csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,
     csEventID) const 
   { 

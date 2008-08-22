@@ -35,6 +35,9 @@ struct Frag_FogSector
 {
   uniform sampler2D fogTex;
   uniform float4 fogColor;
+  uniform float fogFadeEnd;
+  uniform float fogFadeStart;
+  uniform float fogLimit;
 };
 Frag_FogSector fogSectorFrag;
 
@@ -42,12 +45,13 @@ struct FogSector
 {
 <?if vars."fog density".float &gt; 0 ?>
   float2 fogTC;
+  float4 eyePos;
 <?endif?>
 
   void SetupVert()
   {
   <?if vars."fog density".float &gt; 0 ?>
-    float4 eyePos = mul (fogSectorVert.ModelView, fogSectorVert.Position);
+    eyePos = mul (fogSectorVert.ModelView, fogSectorVert.Position);
     fogTC.x = dot (eyePos, fogSectorVert.fogPlaneS);
     fogTC.y = dot (eyePos, fogSectorVert.fogPlaneT);
   <?endif?>
@@ -65,17 +69,31 @@ struct FogSector
   float GetIntensity()
   {
     float intens = 0;
+    float distance = 0;
   <?if vars."fog density".float &gt; 0 ?>
-    intens = tex2D (fogSectorFrag.fogTex, fogTC).a;
+    distance = length(eyePos);
+    /* CS_FOG_MODE_LINEAR */
+    <?if vars."fog mode".int == 1 ?>
+      if(distance >= fogSectorFrag.fogFadeEnd && (fogSectorFrag.fogLimit > distance || fogSectorFrag.fogFadeEnd >= fogSectorFrag.fogLimit))
+        intens = tex2D (fogSectorFrag.fogTex, fogTC).a;
+      else if(distance >= fogSectorFrag.fogFadeStart && fogSectorFrag.fogFadeEnd > distance)
+        intens = tex2D (fogSectorFrag.fogTex, fogTC).a *
+                       (fogSectorFrag.fogFadeEnd - distance) /
+                       (fogSectorFrag.fogFadeEnd - fogSectorFrag.fogFadeStart);
+    <?endif?>
+    /* CS_FOG_MODE_CRYSTALSPACE */
+    <?if vars."fog mode".int == 2 ?>
+      intens = tex2D (fogSectorFrag.fogTex, fogTC).a;
+    <?endif?>
   <?endif?>
     return intens;
   }
   
-  float3 GetColor()
+  float4 GetColor()
   {
-    float3 fogcol = float3(0,0,0);
+    float4 fogcol = float4(0,0,0,1.0f);
   <?if vars."fog density".float &gt; 0 ?>
-    fogcol = fogSectorFrag.fogColor.rgb;
+    fogcol = fogSectorFrag.fogColor;
   <?endif?>
     return fogcol;
   }
@@ -98,6 +116,9 @@ struct FogSector
   <?Template VariableMap_SectorFog ?>
     <?if vars."fog density".float &gt; 0 ?>
       <variablemap variable="fog color" destination="fogSectorFrag.fogColor" />
+      <variablemap variable="fog fade start" destination="fogSectorFrag.fogFadeStart" />
+      <variablemap variable="fog fade end" destination="fogSectorFrag.fogFadeEnd" />
+      <variablemap variable="fog limit" destination="fogSectorFrag.fogLimit" />
       <!-- See the glshader_fixed plugin source for a detailed explanation 
 	   of the formular below. -->
       <?if vars."fogplane".z &gt; 0 ?>

@@ -22,6 +22,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "cg_common.h"
 
+#include "csplugincommon/opengl/shaderplugin.h"
 #include "csplugincommon/shader/shaderplugin.h"
 #include "csutil/blockallocator.h"
 #include "csutil/leakguard.h"
@@ -36,35 +37,40 @@ struct csGLExtensionManager;
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
 
-class csGLShader_CG : public scfImplementation2<csGLShader_CG, 
-						iShaderProgramPlugin,
-					        iComponent>
+class csGLShader_CG :
+  public scfImplementationExt1<csGLShader_CG, 
+			       CS::PluginCommon::ShaderProgramPluginGL,
+			       iComponent>
 {
 private:
   static void ErrorHandler (CGcontext context, CGerror err, void* appdata);
   static void ErrorHandlerObjReg (CGcontext context, CGerror err, void* appdata);
 
   bool enable;
-  bool isOpen;
   const char* compiledProgram;
   bool doIgnoreErrors;
 public:
   CS_LEAKGUARD_DECLARE (csGLShader_CG);
+  
+  using CS::PluginCommon::ShaderProgramPluginGL::ext;
+  using CS::PluginCommon::ShaderProgramPluginGL::doVerbose;
+  using CS::PluginCommon::ShaderProgramPluginGL::object_reg;
+  using CS::PluginCommon::ShaderProgramPluginGL::vendor;
 
-  iObjectRegistry* object_reg;
   CGcontext context;
   csRef<iShaderProgramPlugin> psplg;
   CGprofile psProfile;
-  csGLExtensionManager* ext;
   bool debugDump;
   char* dumpDir;
-  bool doVerbose;
 
   bool enableVP, enableFP;
   CGprofile maxProfileVertex;
   CGprofile maxProfileFragment;
   
   csBlockAllocator<ShaderParameter> paramAlloc;
+  
+  csRef<iDocumentSystem> binDocSys;
+  csRef<iDocumentSystem> xmlDocSys;
 
   csGLShader_CG (iBase *parent);
   virtual ~csGLShader_CG ();

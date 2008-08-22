@@ -272,20 +272,28 @@ namespace CS
   {
     csMatrix3 t2o = tr_o2c.GetT2O();
     csVector3 o2tmult = tr_o2c.GetO2T () * tr_o2c.GetO2TTranslation ();
-    uint32 camMask;
-    const csPlane3* frust = ctxt->icamera->GetVisibleVolume (camMask);
+    const csPlane3* frust = ctxt->frustum;
     frustum_mask = 0;
     uint i;
-    for (i = 0; (1 << i) <= camMask; i++)
+    for (i = 0; i < 5; i++)
     {
-      if (!(camMask & (1 << i))) continue;
       frustum_mask |= (1 << i);
-      planes[i].Set (tr_o2c.GetT2O() * frust[i].norm, -frust[i].norm*o2tmult);
+      planes[i] = tr_o2c.This2Other (frust[i]);
     }
+    
     csPlane3 pznear = ctxt->clip_plane;
     pznear.Invert ();
     planes[i] = tr_o2c.This2Other (pznear);
     frustum_mask |= (1 << i);
+    i++;
+    
+    csPlane3 *far_plane = ctxt->icamera->GetFarPlane (); 
+    if (far_plane) 
+    { 
+      csPlane3 fp = *far_plane; 
+      planes[i] = tr_o2c.This2Other (fp); 
+      frustum_mask |= (1 << i);
+    }
   }
 
   void RenderViewClipper::SetupClipPlanes (csRenderContext* ctxt)

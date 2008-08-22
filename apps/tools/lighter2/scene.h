@@ -315,7 +315,7 @@ namespace lighter
       PropagateLight (light, lightFrustum, state);
     }
     
-    iRegion* GetRegion (iObject* obj);
+    iCollection* GetCollection (iObject* obj);
     bool IsObjectFromBaseDir (iObject* obj, const char* baseDir);
     bool IsFilenameFromBaseDir (const char* filename, const char* baseDir);
 

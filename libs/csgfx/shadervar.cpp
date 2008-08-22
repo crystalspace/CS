@@ -31,8 +31,8 @@ CS_IMPLEMENT_STATIC_CLASSVAR (csShaderVariable, arrayAlloc,
 
 
 csShaderVariable::csShaderVariable () :
-  csRefCount (), Name (csInvalidStringID), Type (UNKNOWN), VectorValue (0),
-  accessorData (0)
+  csRefCount (), Name (CS::InvalidShaderVarStringID), Type (UNKNOWN),
+  VectorValue (0), accessorData (0)
 {
   // Zero out the data as good as we can
   Int = 0;
@@ -58,7 +58,7 @@ csShaderVariable::csShaderVariable (const csShaderVariable& other)
   {
   case UNKNOWN:
     break;
-  case INT:      
+  case INT:
   case FLOAT:
     Int = other.Int;
     break;
@@ -77,8 +77,8 @@ csShaderVariable::csShaderVariable (const csShaderVariable& other)
       RenderBuffer->IncRef ();
     break;
 
-  case VECTOR2:      
-  case VECTOR3:      
+  case VECTOR2:
+  case VECTOR3:
   case VECTOR4:
     Int = other.Int;
     break;
@@ -122,8 +122,8 @@ csShaderVariable::~csShaderVariable ()
       RenderBuffer->DecRef ();
     break;
 
-  case VECTOR2:      
-  case VECTOR3:      
+  case VECTOR2:
+  case VECTOR3:
   case VECTOR4:
     break; //Nothing to deallocate      
 
@@ -152,6 +152,7 @@ csShaderVariable& csShaderVariable::operator= (const csShaderVariable& copyFrom)
   accessor = copyFrom.accessor;  
   accessorData = copyFrom.accessorData;
 
+  VariableType oldType = Type;
   NewType (copyFrom.Type);
 
   // Handle payload
@@ -161,11 +162,17 @@ csShaderVariable& csShaderVariable::operator= (const csShaderVariable& copyFrom)
     break;
 
   case INT:      
-  case FLOAT:
     Int = copyFrom.Int;
     break; 
 
   case TEXTURE:
+    if (oldType == TEXTURE)
+    {
+      if (texture.HandValue)
+	texture.HandValue->DecRef ();
+      if (texture.WrapValue)
+	texture.WrapValue->DecRef ();
+    }
     texture = copyFrom.texture;
     if (texture.HandValue)
       texture.HandValue->IncRef ();
@@ -174,26 +181,31 @@ csShaderVariable& csShaderVariable::operator= (const csShaderVariable& copyFrom)
     break;
 
   case RENDERBUFFER:
+    if (oldType == RENDERBUFFER)
+    {
+      if (RenderBuffer)
+	RenderBuffer->DecRef ();
+    }
     RenderBuffer = copyFrom.RenderBuffer;
     if (RenderBuffer)
       RenderBuffer->IncRef ();
     break;
 
-  case VECTOR2:      
-  case VECTOR3:      
+  case FLOAT:
+  case VECTOR2:
+  case VECTOR3:
   case VECTOR4:
     break; //Nothing to copy more than whats done above      
 
   case MATRIX:
-    MatrixValuePtr = MatrixAlloc()->Alloc (*copyFrom.MatrixValuePtr);
+    *MatrixValuePtr = *copyFrom.MatrixValuePtr;
     break;
 
   case TRANSFORM:
-    TransformPtr = TransformAlloc()->Alloc (*copyFrom.TransformPtr);
+    *TransformPtr = *copyFrom.TransformPtr;
     break;
 
   case ARRAY:
-    ShaderVarArray = ShaderVarArrayAlloc()->Alloc ();
     *ShaderVarArray = *copyFrom.ShaderVarArray;
     break;
 
@@ -211,8 +223,8 @@ void csShaderVariable::NewType (VariableType nt)
 
   switch (Type)
   {
-  case UNKNOWN:     
-  case INT:      
+  case UNKNOWN:
+  case INT:
   case FLOAT:
     break; //Nothing to deallocate
 
@@ -234,15 +246,15 @@ void csShaderVariable::NewType (VariableType nt)
     break; //Nothing to deallocate      
   
   case MATRIX:
-    delete MatrixValuePtr;
+    MatrixAlloc()->Free (MatrixValuePtr);
     break;
   
   case TRANSFORM:
-    delete TransformPtr;
+    TransformAlloc()->Free (TransformPtr);
     break;
 
   case ARRAY:
-    delete ShaderVarArray;
+    ShaderVarArrayAlloc()->Free (ShaderVarArray);
     break;
 
   default:
@@ -251,11 +263,11 @@ void csShaderVariable::NewType (VariableType nt)
 
   switch (nt)
   {
-  case UNKNOWN:     
   case INT:      
-  case FLOAT:
-  case TEXTURE:    
+  case TEXTURE:
   case RENDERBUFFER:
+  case UNKNOWN:     
+  case FLOAT:
   case VECTOR2:      
   case VECTOR3:      
   case VECTOR4:

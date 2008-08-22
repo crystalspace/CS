@@ -19,9 +19,9 @@
 
 #include "cssysdef.h"
 #include "imap/services.h"
-#include "iutil/cache.h"
 #include "iutil/databuff.h"
 #include "iutil/document.h"
+#include "iutil/hiercache.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 
@@ -386,7 +386,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     CS::PluginCommon::ShaderCacheHelper::ShaderDocHasher hasher (
       compiler->objectreg, source);
     
-    iCacheManager* shaderCache = shadermgr->GetShaderCache();
+    iHierarchicalCache* shaderCache = shadermgr->GetShaderCache();
     csString shaderName (source->GetAttributeValue ("name"));
     csString cacheID_base;
     csString cacheID_header;
@@ -407,7 +407,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       useShaderCache = false;
       csRef<iFile> cacheFile;
       csRef<iDataBuffer> cacheData;
-      cacheData = shaderCache->ReadCache (shaderName, cacheID_header, ~0);
+      cacheData = shaderCache->ReadCache (csString().Format ("/%s/%s",
+        shaderName.GetData(), cacheID_header.GetData()));
       if (cacheData.IsValid())
       {
 	cacheFile.AttachNew (new csMemFile (cacheData, true));
@@ -462,7 +463,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	{
 	  csRef<iDataBuffer> allCacheData = cacheFile->GetAllData();
 	  shaderCache->CacheData (allCacheData->GetData(),
-	    allCacheData->GetSize(), shaderName, cacheID_header, ~0);
+	    allCacheData->GetSize(), 
+	    csString().Format ("/%s/%s",
+              shaderName.GetData(), cacheID_header.GetData()));
 	}
       }
     }
@@ -470,7 +473,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     csRef<iDocument> synthShader;
     csRef<iDataBuffer> cacheData;
     if (useShaderCache)
-      cacheData = shaderCache->ReadCache (shaderName, cacheID_tech, ~0);
+      cacheData = shaderCache->ReadCache (csString().Format ("/%s/%s",
+        shaderName.GetData(), cacheID_tech.GetData()));
     if (cacheData.IsValid())
     {
       csMemFile cacheFile (cacheData, true);
@@ -495,8 +499,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       {
 	csRef<iDataBuffer> allCacheData = cacheFile.GetAllData();
 	shaderCache->CacheData (allCacheData->GetData(),
-	  allCacheData->GetSize(), shaderName, cacheID_tech,
-	  ~0);
+	  allCacheData->GetSize(), 
+	  csString().Format ("/%s/%s",
+            shaderName.GetData(), cacheID_tech.GetData()));
       }
     }
     CS_ASSERT (synthShader.IsValid());

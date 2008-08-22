@@ -37,6 +37,10 @@ namespace lighter
     CS::Memory::AlignedFree (this->nodeList);
   }
 
+  KDTreeBuilder::KDTreeBuilder ()
+    : boxAllocator (1024), nodeAllocator (1024)
+  {}
+
   KDTree* KDTreeBuilder::BuildTree (ObjectHash::GlobalIterator& objects,
                                     Statistics::Progress& progress)
   {

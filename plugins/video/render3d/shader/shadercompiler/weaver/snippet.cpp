@@ -181,7 +181,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       compiler->synldr->ReportBadToken (child);
       return false;
     }
-    aliases.PutUnique (aliasName, aliasFile);
+    
+    bool isWeak = child->GetAttributeValueAsBool ("weak");
+    if (!isWeak || !aliases.Contains (aliasName))
+      aliases.PutUnique (aliasName, aliasFile);
     return true;
   }
   
@@ -885,25 +888,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       const char* typeStr = "float";
       switch (svType)
       {
-        case csShaderVariable::INT:
-          numComps = 1; 
-          typeStr = "int";
-          break;
-        case csShaderVariable::FLOAT:   numComps = 1; break;
-        case csShaderVariable::VECTOR2: numComps = 2; break;
-        case csShaderVariable::VECTOR3: numComps = 3; break;
-        case csShaderVariable::VECTOR4: numComps = 4; break;
-        default:
-          // Should not happen really, but who knows...
-          compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
+	case csShaderVariable::INT:
+	  numComps = 1; 
+	  typeStr = "int";
+	  break;
+	case csShaderVariable::FLOAT:   numComps = 1; break;
+	case csShaderVariable::VECTOR2: numComps = 2; break;
+	case csShaderVariable::VECTOR3: numComps = 3; break;
+	case csShaderVariable::VECTOR4: numComps = 4; break;
+	default:
+	  // Should not happen really, but who knows...
+	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
 	    "Constant parameter of unsupported type %s", 
-            SVTypes.StringForIdent (svType));
-          return;
+	    SVTypes.StringForIdent (svType));
+	  return;
       }
-      if (numComps > 1)
-        weaverType.Format ("%s%d", typeStr, numComps);
-      else
-        weaverType = typeStr;
+      weaverType = node->GetAttributeValue ("weavertype");
+      if (weaverType.IsEmpty())
+      {
+	if (numComps > 1)
+	  weaverType.Format ("%s%d", typeStr, numComps);
+	else
+	  weaverType = typeStr;
+      }
 
       csVector4 v;
       param.var->GetValue (v);

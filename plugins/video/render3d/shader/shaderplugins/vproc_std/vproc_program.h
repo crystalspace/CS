@@ -67,9 +67,12 @@ public:
 
 
   /// Compile a program
-  virtual bool Compile();
+  virtual bool Compile (iHierarchicalCache*);
 
   virtual void GetUsedShaderVars (csBitArray& bits) const;
+  
+  virtual bool LoadFromCache (iHierarchicalCache* cache,
+    csRef<iString>* failReason = 0) { return false; }
 private:
   csVProc_Std *shaderPlugin;
 

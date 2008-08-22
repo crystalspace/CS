@@ -75,6 +75,10 @@ public:
 
   bool LoadSVBlock (iLoaderContext* ldr_context,
       iDocumentNode *node, iShaderVariableContext *context);
+  
+  csPtr<iDocumentNode> ReadNodeFromBuf (iDataBuffer* buf);
+  csPtr<iDataBuffer> WriteNodeToBuf (iDocument* doc);
+  csPtr<iDocument> CreateCachingDoc ();
 public:
   bool do_verbose;
   bool doDumpXML;

@@ -59,20 +59,20 @@ public:
    * This should only ever be done to reference generic 
    * (non-instantiated) handler names or single-instance handlers.
    */	
-  CS_CONST_METHOD csHandlerID GetGenericID (const char*);
-  static CS_CONST_METHOD csHandlerID GetGenericID (iObjectRegistry *reg, 
+  csHandlerID GetGenericID (const char*);
+  static csHandlerID GetGenericID (iObjectRegistry *reg, 
     const char* name) 
   {
     return GetRegistry (reg)->GetGenericID (name);
   }
-  CS_CONST_METHOD csHandlerID GetGenericPreBoundID (csHandlerID);
-  static CS_CONST_METHOD csHandlerID GetGenericPreBoundID (
+  csHandlerID GetGenericPreBoundID (csHandlerID);
+  static csHandlerID GetGenericPreBoundID (
     iObjectRegistry *reg, csHandlerID id) 
   {
     return GetRegistry (reg)->GetGenericPreBoundID (id);
   }
-  CS_CONST_METHOD csHandlerID GetGenericPostBoundID (csHandlerID);
-  static CS_CONST_METHOD csHandlerID GetGenericPostBoundID (
+  csHandlerID GetGenericPostBoundID (csHandlerID);
+  static csHandlerID GetGenericPostBoundID (
     iObjectRegistry *reg, csHandlerID id) 
   {
     return GetRegistry (reg)->GetGenericPostBoundID (id);
@@ -83,14 +83,14 @@ public:
    * its own name via the iEventHandler::GetInstanceName() method.
    */
   csHandlerID GetID (iEventHandler *);
-  static CS_CONST_METHOD csHandlerID GetID (iObjectRegistry *reg, 
+  static csHandlerID GetID (iObjectRegistry *reg, 
     iEventHandler *h) 
   {
     return GetRegistry (reg)->GetID (h);
   }
 
   csHandlerID RegisterID (iEventHandler *);
-  static CS_CONST_METHOD csHandlerID RegisterID (iObjectRegistry *reg, 
+  static csHandlerID RegisterID (iObjectRegistry *reg, 
     iEventHandler *h) 
   {
     return GetRegistry (reg)->RegisterID (h);
@@ -103,7 +103,7 @@ public:
    * bookkeeping magic.
    */
   csHandlerID GetID (const char*);
-  static CS_CONST_METHOD csHandlerID GetID (iObjectRegistry *reg,
+  static csHandlerID GetID (iObjectRegistry *reg,
 					    const char* name)
   {
     return GetRegistry (reg)->GetID (name);
@@ -113,7 +113,7 @@ public:
    * Used when an iEventHandler is desroyed to remove our reference.
    */
   void ReleaseID (csHandlerID id);
-  static CS_CONST_METHOD void ReleaseID (iObjectRegistry *reg, 
+  static void ReleaseID (iObjectRegistry *reg, 
     csHandlerID id)
   {
     GetRegistry (reg)->ReleaseID (id);
@@ -122,7 +122,7 @@ public:
    * Used when an iEventHandler is destroyed to remove our reference.
    */
   void ReleaseID (iEventHandler *);
-  static CS_CONST_METHOD void ReleaseID (iObjectRegistry *reg, 
+  static void ReleaseID (iObjectRegistry *reg, 
     iEventHandler *h) 
   {
     GetRegistry (reg)->ReleaseID (h);
@@ -132,8 +132,8 @@ public:
    * (will be 0 if csHandlerID is a generic name, i.e.,
    * if (!csEventHandlerRegistry->IsInstance(id)).
    */
-  CS_CONST_METHOD iEventHandler* GetHandler (csHandlerID id);
-  static inline CS_CONST_METHOD iEventHandler* GetHandler (
+  iEventHandler* GetHandler (csHandlerID id);
+  static inline iEventHandler* GetHandler (
     iObjectRegistry *reg, csHandlerID id) 
   {
     return GetRegistry (reg)->GetHandler (id);
@@ -144,9 +144,9 @@ public:
    * genericid is a generic instance, and instanceid is an
    * instance of genericid in particular.
    */
-  CS_CONST_METHOD bool const IsInstanceOf (csHandlerID instanceid, 
+  bool const IsInstanceOf (csHandlerID instanceid, 
     csHandlerID genericid);
-  static inline CS_CONST_METHOD bool IsInstanceOf (iObjectRegistry *reg, 
+  static inline bool IsInstanceOf (iObjectRegistry *reg, 
     csHandlerID instanceid, csHandlerID genericid) 
   {
     return GetRegistry (reg)->IsInstanceOf (instanceid, genericid);
@@ -155,8 +155,8 @@ public:
   /**
    * returns true if id is a handler instance (i.e., not a generic name).
    */
-  CS_CONST_METHOD bool const IsInstance (csHandlerID id);
-  static inline CS_CONST_METHOD bool IsInstance (iObjectRegistry *reg, 
+  bool const IsInstance (csHandlerID id);
+  static inline bool IsInstance (iObjectRegistry *reg, 
     csHandlerID id) 
   {
     return GetRegistry (reg)->IsInstance (id);
@@ -165,8 +165,8 @@ public:
   /**
    * Returns the csHandleID for the generic name for instance name id.
    */
-  CS_CONST_METHOD csHandlerID const GetGeneric (csHandlerID id);
-  static inline CS_CONST_METHOD csHandlerID GetGeneric (iObjectRegistry *reg, 
+  csHandlerID const GetGeneric (csHandlerID id);
+  static inline csHandlerID GetGeneric (iObjectRegistry *reg, 
     csHandlerID id) 
   {
     return GetRegistry (reg)->GetGeneric (id);
@@ -175,8 +175,8 @@ public:
   /**
    * Returns the string name for a csHandlerID.
    */
-  CS_CONST_METHOD const char* GetString (csHandlerID id);
-  static inline CS_CONST_METHOD const char* GetString (
+  const char* GetString (csHandlerID id);
+  static inline const char* GetString (
     iObjectRegistry *reg, csHandlerID id) 
   {
     return GetRegistry (reg)->GetString (id);
@@ -230,11 +230,11 @@ class FrameSignpost_Logic3D
   FrameSignpost_Logic3D () : scfImplementationType (this) { }
  public:
   CS_EVENTHANDLER_NAMES("crystalspace.signpost.logic3d")
-  CS_CONST_METHOD virtual const csHandlerID * GenericPrec
+  virtual const csHandlerID * GenericPrec
     (csRef<iEventHandlerRegistry> &,
      csRef<iEventNameRegistry> &,
      csEventID) const;
-  CS_CONST_METHOD virtual const csHandlerID * GenericSucc
+  virtual const csHandlerID * GenericSucc
     (csRef<iEventHandlerRegistry> &r1,
      csRef<iEventNameRegistry> &r2,
      csEventID e) const;
@@ -249,11 +249,11 @@ class FrameSignpost_3D2D
   FrameSignpost_3D2D () : scfImplementationType (this) { }
  public:
   CS_EVENTHANDLER_NAMES("crystalspace.signpost.3d2d")
-  CS_CONST_METHOD virtual const csHandlerID * GenericPrec
+  virtual const csHandlerID * GenericPrec
     (csRef<iEventHandlerRegistry> &,
      csRef<iEventNameRegistry> &,
      csEventID) const;
-  CS_CONST_METHOD virtual const csHandlerID * GenericSucc
+  virtual const csHandlerID * GenericSucc
     (csRef<iEventHandlerRegistry> &r1,
      csRef<iEventNameRegistry> &r2,
      csEventID e) const;
@@ -268,11 +268,11 @@ class FrameSignpost_2DConsole
   FrameSignpost_2DConsole () : scfImplementationType (this) { }
  public:
   CS_EVENTHANDLER_NAMES("crystalspace.signpost.2dconsole")
-  CS_CONST_METHOD virtual const csHandlerID * GenericPrec
+  virtual const csHandlerID * GenericPrec
     (csRef<iEventHandlerRegistry> &,
      csRef<iEventNameRegistry> &,
      csEventID) const;
-  CS_CONST_METHOD virtual const csHandlerID * GenericSucc
+  virtual const csHandlerID * GenericSucc
     (csRef<iEventHandlerRegistry> &r1,
      csRef<iEventNameRegistry> &r2,
      csEventID e) const;
@@ -287,11 +287,11 @@ class FrameSignpost_ConsoleDebug
   FrameSignpost_ConsoleDebug () : scfImplementationType (this) { }
  public:
   CS_EVENTHANDLER_NAMES("crystalspace.signpost.consoledebug")
-  CS_CONST_METHOD virtual const csHandlerID * GenericPrec
+  virtual const csHandlerID * GenericPrec
     (csRef<iEventHandlerRegistry> &,
      csRef<iEventNameRegistry> &,
      csEventID) const;
-  CS_CONST_METHOD virtual const csHandlerID * GenericSucc
+  virtual const csHandlerID * GenericSucc
     (csRef<iEventHandlerRegistry> &r1,
      csRef<iEventNameRegistry> &r2,
      csEventID e) const;
@@ -306,11 +306,11 @@ class FrameSignpost_DebugFrame
   FrameSignpost_DebugFrame () : scfImplementationType (this) { }
  public:
   CS_EVENTHANDLER_NAMES("crystalspace.signpost.debugframe")
-  CS_CONST_METHOD virtual const csHandlerID * GenericPrec
+  virtual const csHandlerID * GenericPrec
     (csRef<iEventHandlerRegistry> &,
      csRef<iEventNameRegistry> &,
      csEventID) const;
-  CS_CONST_METHOD virtual const csHandlerID * GenericSucc
+  virtual const csHandlerID * GenericSucc
     (csRef<iEventHandlerRegistry> &r1,
      csRef<iEventNameRegistry> &r2,
      csEventID e) const;
@@ -325,12 +325,12 @@ class FrameSignpost_DebugFrame
 #define CS_EVENTHANDLER_PHASE_LOGIC(x)					\
 CS_EVENTHANDLER_NAMES(x)						\
 CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS				\
-CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
+virtual const csHandlerID * GenericPrec			\
 (csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,		\
  csEventID) const {							\
   return 0;								\
 }									\
-CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
+virtual const csHandlerID * GenericSucc			\
 (csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
  csEventID event) const {						\
   if (event != csevFrame(r2))						\
@@ -355,7 +355,7 @@ CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
 #define CS_EVENTHANDLER_PHASE_3D(x)					\
 CS_EVENTHANDLER_NAMES(x)						\
 CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS				\
-CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
+virtual const csHandlerID * GenericPrec			\
 (csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
  csEventID event) const {						\
   if (event != csevFrame(r2))						\
@@ -366,7 +366,7 @@ CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
   };									\
   return precConstraint;						\
 }									\
-CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
+virtual const csHandlerID * GenericSucc			\
 (csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
  csEventID event) const {						\
   if (event != csevFrame(r2))						\
@@ -390,7 +390,7 @@ CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
 #define CS_EVENTHANDLER_PHASE_2D(x)					\
 CS_EVENTHANDLER_NAMES(x)						\
 CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS				\
-CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
+virtual const csHandlerID * GenericPrec			\
 (csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
  csEventID event) const {						\
   if (event != csevFrame(r2))						\
@@ -402,7 +402,7 @@ CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
   };									\
   return precConstraint;						\
 }									\
-CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
+virtual const csHandlerID * GenericSucc			\
 (csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
  csEventID event) const {						\
   if (event != csevFrame(r2))						\
@@ -425,7 +425,7 @@ CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
 #define CS_EVENTHANDLER_PHASE_CONSOLE(x)				\
 CS_EVENTHANDLER_NAMES(x)						\
 CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS				\
-CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
+virtual const csHandlerID * GenericPrec			\
 (csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
  csEventID event) const {						\
   if (event != csevFrame(r2))						\
@@ -438,7 +438,7 @@ CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
   };									\
   return precConstraint;						\
 }									\
-CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
+virtual const csHandlerID * GenericSucc			\
 (csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
  csEventID event) const {						\
   if (event != csevFrame(r2))						\
@@ -460,7 +460,7 @@ CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
 #define CS_EVENTHANDLER_PHASE_DEBUG(x)					\
 CS_EVENTHANDLER_NAMES(x)						\
 CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS				\
-CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
+virtual const csHandlerID * GenericPrec			\
 (csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
  csEventID event) const {						\
   if (event != csevFrame(r2))						\
@@ -474,7 +474,7 @@ CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
   };									\
   return precConstraint;						\
 }									\
-CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
+virtual const csHandlerID * GenericSucc			\
 (csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
  csEventID event) const {						\
   if (event != csevFrame(r2))						\
@@ -494,7 +494,7 @@ CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
 #define CS_EVENTHANDLER_PHASE_FRAME(x)					\
 CS_EVENTHANDLER_NAMES(x)						\
 CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS				\
-CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
+virtual const csHandlerID * GenericPrec			\
 (csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,	\
  csEventID event) const {						\
   if (event != csevFrame(r2))						\
@@ -509,7 +509,7 @@ CS_CONST_METHOD virtual const csHandlerID * GenericPrec			\
   };									\
   return precConstraint;						\
 }									\
-CS_CONST_METHOD virtual const csHandlerID * GenericSucc			\
+virtual const csHandlerID * GenericSucc			\
 (csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,		\
  csEventID) const {							\
   return 0;								\

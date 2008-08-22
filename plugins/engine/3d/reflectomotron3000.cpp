@@ -24,6 +24,7 @@
 
 #include "cstool/csview.h"
 
+#include "camera.h"
 #include "engine.h"
 #include "meshobj.h"
 #include "reflectomotron3000.h"

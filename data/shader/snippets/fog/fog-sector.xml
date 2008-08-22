@@ -30,7 +30,10 @@
 
     <block location="cg:fragmentIn">
       <uniform type="tex2d" name="fogTex" />
-      <uniform type="rgb" name="fogColor" />
+      <uniform type="rgba" name="fogColor" />
+      <uniform type="float" name="fogFadeEnd" />
+      <uniform type="float" name="fogFadeStart" />
+      <uniform type="float" name="fogLimit" />
     </block>
     
     <block location="cg:vertexToFragment">
@@ -49,6 +52,9 @@
     <block location="cg:variablemap">
       <?if vars."fog density".float &gt; 0 ?>
 	<variablemap variable="fog color" destination="fragmentIn.fogColor" />
+      <variablemap variable="fog fade start" destination="fragmentIn.fogFadeStart" />
+      <variablemap variable="fog fade end" destination="fragmentIn.fogFadeEnd" />
+      <variablemap variable="fog limit" destination="fragmentIn.fogLimit" />
 	<!-- See the glshader_fixed plugin source for a detailed explanation 
 	     of the formular below. -->
 	<?if vars."fogplane".z &gt; 0 ?>
@@ -91,8 +97,19 @@
     <block location="cg:fragmentMain">
       foggedColor = litColor;
       <?if vars."fog density".float &gt; 0 ?>
-	foggedColor.rgb = lerp (litColor.rgb, fragmentIn.fogColor, 
-	  tex2D (fragmentIn.fogTex, vertexToFragment.fogTC).a);
+        float intensity = tex2D (fragmentIn.fogTex, vertexToFragment.fogTC).a;
+        float distance = length(eyePos);
+        /* CS_FOG_MODE_LINEAR */
+        <?if vars."fog mode".int == consts.CS_FOG_MODE_LINEAR ?>
+          if(distance >= fragmentIn.fogFadeEnd && (fragmentIn.fogLimit > distance || fragmentIn.fogFadeEnd >= fragmentIn.fogLimit))
+            foggedColor = lerp (litColor, fragmentIn.fogColor, intensity);
+          else if(distance >= fragmentIn.fogFadeStart && fragmentIn.fogFadeEnd > distance)
+            foggedColor = lerp (litColor, fragmentIn.fogColor, intensity *
+                                (fragmentIn.fogFadeEnd - distance) /
+                                (fragmentIn.fogFadeEnd - fragmentIn.fogFadeStart));
+        <?elsif vars."fog mode".int == consts.CS_FOG_MODE_CRYSTALSPACE ?>
+          foggedColor = lerp (litColor, fragmentIn.fogColor, intensity);
+        <?endif?>
       <?endif?>
     </block>
     

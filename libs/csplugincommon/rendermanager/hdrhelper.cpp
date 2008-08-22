@@ -26,6 +26,71 @@ namespace CS
 {
   namespace RenderManager
   {
+    bool HDRHelper::Setup (iObjectRegistry* objectReg, 
+      Quality quality, int colorRange)
+    {
+      postEffects.Initialize (objectReg);
+
+      const char* textureFmt;
+      switch (quality)
+      {
+	/* @@@ QUESTION: With or without alpha? Some shader may want destination
+	  * alpha. But without is prolly faster, and post proc shaders are less
+	  * likely to need it. So perhaps allow different formats in one post
+	  * effect manager ... */
+	case qualInt8:    textureFmt = "argb8"; break;
+	case qualInt10:   textureFmt = "rgb10"; break;
+	case qualInt16:   textureFmt = "rgb16"; break;
+	case qualFloat16: textureFmt = "bgr16_f"; break;
+	case qualFloat32: textureFmt = "bgr32_f"; break;
+	default: return false;
+      }
+      postEffects.SetIntermediateTargetFormat (textureFmt);
+      
+      csRef<iShaderManager> shaderManager =
+	csQueryRegistry<iShaderManager> (objectReg);
+      if (!shaderManager) return false;
+      csRef<iShaderVarStringSet> svNameStringSet = 
+	csQueryRegistryTagInterface<iShaderVarStringSet> (objectReg,
+	  "crystalspace.shader.variablenameset");
+      if (!svNameStringSet) return false;
+	  
+      csShaderVariable* svHdrScale =
+	shaderManager->GetVariableAdd (svNameStringSet->Request (
+	  "hdr scale"));
+      if ((quality == qualInt8) || (quality == qualInt16))
+	svHdrScale->SetValue (csVector4 (colorRange, 1.0f/colorRange, 0, 0));
+      else
+	svHdrScale->SetValue (csVector4 (1, 1, 0, 0));
+	
+      csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
+      if (!loader) return false;
+      csRef<iShader> map =
+	loader->LoadShader ("/shader/postproc/hdr/default-map.xml");
+      if (!map) return false;
+      measureLayer = postEffects.GetLastLayer();
+      mappingLayer = postEffects.AddLayer (map);
+    
+      return true;
+    }
+
+    void HDRHelper::SetMappingShader (iShader* shader)
+    {
+      mappingLayer->SetShader (shader);
+    }
+
+    iShader* HDRHelper::GetMappingShader ()
+    {
+      return mappingLayer->GetShader();
+    }
+
+    iShaderVariableContext* HDRHelper::GetMapppingShaderVarContext()
+    {
+      return mappingLayer->GetSVContext();
+    }
+
+    //-----------------------------------------------------------------------
+
     HDRSettings::HDRSettings (iConfigFile* config, const char* prefix)
       : config (config), prefix (prefix) {}
     

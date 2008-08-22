@@ -455,7 +455,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
     factnode->SetAnimation (anim);
 
     // Properties..
-    bool isCyclic, reset;
+    bool isCyclic, reset, autostop;
     if (synldr->ParseBoolAttribute (node, "cyclic", isCyclic, true, false))
     {
       factnode->SetCyclic (isCyclic);
@@ -464,6 +464,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
     if (synldr->ParseBoolAttribute (node, "autoreset", reset, false, false))
     {
       factnode->SetAutomaticReset (reset);
+    }
+
+    if (synldr->ParseBoolAttribute (node, "autostop", autostop, true, false))
+    {
+      factnode->SetAutomaticStop (autostop);
     }
 
     if (node->GetAttribute ("speed"))
@@ -669,6 +674,45 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
               return 0;
             }       
           };
+        }
+        break;
+      case XMLTOKEN_TRANSITION:
+        {
+          const char* fromStateName = child->GetAttributeValue ("from");
+          const char* toStateName = child->GetAttributeValue ("to");
+
+          CS::Animation::StateID fromState = factnode->FindState (fromStateName);
+          CS::Animation::StateID toState = factnode->FindState (toStateName);
+
+          if (fromState == CS::Animation::InvalidStateID)
+          {
+            synldr->ReportError (msgid, child, 
+              "Invalid from state %s", fromStateName);
+          }
+
+          if (toState == CS::Animation::InvalidStateID)
+          {
+            synldr->ReportError (msgid, child, 
+              "Invalid to state %s", toStateName);
+          }
+
+          csRef<iDocumentNode> nodedoc = child->GetNode (
+            xmltokens.Request (XMLTOKEN_NODE));
+          if (nodedoc)
+          {
+            csRef<iSkeletonAnimNodeFactory2> node =
+              ParseAnimTreeNode (nodedoc, packet);
+
+            factnode->SetStateTransition (fromState, toState, node);
+          }
+
+          const float time1 = child->GetAttributeValueAsFloat ("time1");
+          const float time2 = child->GetAttributeValueAsFloat ("time2");
+
+          if(time1 > 0.0f || time2 > 0.0f)
+          {
+            factnode->SetTransitionCrossfade (fromState, toState, time1, time2);
+          }
         }
         break;
       default:

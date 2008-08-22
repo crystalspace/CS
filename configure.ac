@@ -282,26 +282,6 @@ CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
 
 
 #------------------------------------------------------------------------------
-# Check for SIMD flags
-#------------------------------------------------------------------------------
-
-CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx], 
-    [CS_CREATE_TUPLE([-mmmx])])
-AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],[+])])
-
-
-AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
-    [CS_CHECK_BUILD([checking for mmintrin.h],
-        [cs_cv_header_mmintrin_h],
-        [AC_LANG_PROGRAM([[#include <mmintrin.h>]], [])],
-        [CS_CREATE_TUPLE([$cs_cv_prog_cc_mmmx])],
-        [C++],
-        [CS_HEADER_PROPERTY([CS_SUPPORTS_MMX])
-        CS_EMIT_BUILD_PROPERTY([CS_SUPPORTS_MMX], [yes])])])
-
-
-#------------------------------------------------------------------------------
 # Check if Perl SDK is installed and which compiler and linker flags are
 # required to embed Perl.  Also determine if the glue file can be created with
 # ExtUtils::Embed or if it must be created manually.
@@ -2206,32 +2186,6 @@ CS_SYMBOL_QUALIFIER([how to declare deprecation],
     [__attribute__((deprecated))], [], [C++],
     [CS_HEADER_PROPERTY([CS_ATTRIBUTE_DEPRECATED],
 	[$cs_cv_prog_cxx_declare_deprecated])])
-
-
-
-#------------------------------------------------------------------------------
-# Check how to declare functions and types perfectly constant (not affected by
-# any global state and always returning the same value for the same input).
-#------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([how to declare const function],
-    [cs_cv_prog_cxx_declare_const],
-    [__attribute__((const))], [], [C++],
-    [CS_HEADER_PROPERTY([CS_CONST_METHOD],
-	[$cs_cv_prog_cxx_declare_const])])
-
-
-
-#------------------------------------------------------------------------------
-# Check how to declare functions and types pure (not affected by any global
-# state).
-#------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([how to declare pure function],
-    [cs_cv_prog_cxx_declare_pure],
-    [__attribute__((pure))], [], [C++],
-    [CS_HEADER_PROPERTY([CS_PURE_METHOD],
-	[$cs_cv_prog_cxx_declare_pure])])
-
-
 
 #------------------------------------------------------------------------------
 # Check if the "malloc" attribute is available.

@@ -4,7 +4,7 @@
 <variablemap variable="light position world[0]" destination="LightPosW" />
 <variablemap variable="light diffuse[0]" destination="LightColor" />
 <variablemap variable="light attenuation[0]" destination="Attenuation" />
-<variablemap variable="object2world transform" destination="obj2world" />
+<variablemap variable="object2world transform inverse" destination="obj2worldInv" />
 
 <program>
 <![CDATA[
@@ -32,14 +32,14 @@ vertex2fragment main (app2vertex IN,
 	     */
 	uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
 	uniform float4x4 ModelViewProj : state.matrix.mvp,
-	uniform float4x4 obj2world,
+	uniform float4x4 obj2worldInv,
 	uniform float4 LightPosW,
 	uniform float3 LightColor,
 	uniform float4 Attenuation)
 {
 	vertex2fragment OUT;
 	
-	float4 objLight = mul(LightPosW, obj2world);
+	float4 objLight = mul(obj2worldInv, LightPosW);
 	objLight.xyz -= IN.Position.xyz;
 	
 	float3x3 obj2tang;

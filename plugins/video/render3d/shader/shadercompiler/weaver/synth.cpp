@@ -1002,7 +1002,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       while (outputIt->HasNext())
       {
 	const Snippet::Technique::Output& outp = outputIt->Next();
-	if (usedOutputs.Contains (&outp)) continue;
 	if (outp.name != src->outputName) continue;
 	nodeAnnotation.Append (
 	  GetAnnotation (" trying explicit %s %s of %s: ",

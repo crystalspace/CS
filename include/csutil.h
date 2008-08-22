@@ -156,6 +156,7 @@
 #include "csutil/util.h"
 #include "csutil/verbosity.h"
 #include "csutil/vfscache.h"
+#include "csutil/vfshiercache.h"
 #include "csutil/vfsplat.h"
 #include "csutil/virtclk.h"
 #include "csutil/weakref.h"

@@ -28,6 +28,8 @@
 
 #include "ivideo/shader/shader.h"
 
+struct iString;
+
 /**\addtogroup plugincommon
  * @{ */
 
@@ -65,7 +67,7 @@ struct iShaderDestinationResolver : public virtual iBase
  */
 struct iShaderProgram : public virtual iBase
 {
-  SCF_INTERFACE(iShaderProgram, 2, 2, 0);
+  SCF_INTERFACE(iShaderProgram, 3, 0, 0);
   /// Sets this program to be the one used when rendering
   virtual void Activate() = 0;
 
@@ -88,8 +90,14 @@ struct iShaderProgram : public virtual iBase
   virtual bool Load (iShaderDestinationResolver* resolve, const char* program, 
     csArray<csShaderVarMapping>& mappings) = 0;
 
-  /// Compile a program
-  virtual bool Compile () = 0;
+  /**
+   * Compile a program.
+   * If \a cacheTo is given, the shader program can store the compiled
+   * program so it can later be restored using LoadFromCache().
+   * \remark A program can expect that Compile() is only called once, and
+   *   all calls after the first can fail.
+   */
+  virtual bool Compile (iHierarchicalCache* cacheTo) = 0;
   
   /**
    * Request all shader variables used by a certain shader ticket.
@@ -104,6 +112,10 @@ struct iShaderProgram : public virtual iBase
    *   caller to do so.
    */
   virtual void GetUsedShaderVars (csBitArray& bits) const = 0;
+  
+  /// Loads from a cache
+  virtual bool LoadFromCache (iHierarchicalCache* cache,
+    csRef<iString>* failReason = 0) = 0;
 };
 
 /**

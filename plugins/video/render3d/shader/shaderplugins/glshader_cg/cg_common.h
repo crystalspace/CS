@@ -20,6 +20,7 @@
 #define __CG_COMMON_H__
 
 #include "csutil/dirtyaccessarray.h"
+#include "csutil/stringarray.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Cg/cg.h>

@@ -15,10 +15,22 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
-<block>
-  <!-- SHADOW MAPPING -->
-  <!-- Shadow map -->
-  <!--uniform type="tex2d" name="lightShadowMap[8]" /-->
-  <!-- Transformation from light space to shadow map space -->
-  <!--uniform type="float4x4" name="lightShadowMapProject[8]" /-->
-</block>
+<snippet>
+  <technique priority="100">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <block location="cg:vertexMain">
+      result = float4(0, 0, 0, 1);
+      result_attr_perfragment = false;
+    </block>
+      
+    <block location="cg:fragmentMain">
+      result = float4(0, 0, 0, 1);
+      result_attr_perfragment = false;
+    </block>
+    
+    <output name="result" type="rgba">
+      <attribute name="perfragment" type="bool" />
+    </output>
+  </technique>
+</snippet>

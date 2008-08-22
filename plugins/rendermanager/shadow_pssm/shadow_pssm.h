@@ -19,6 +19,8 @@
 #ifndef __CS_RM_UNSHADOWED_H__
 #define __CS_RM_UNSHADOWED_H__
 
+#include "csplugincommon/rendermanager/autofx_reflrefr.h"
+#include "csplugincommon/rendermanager/debugcommon.h"
 #include "csplugincommon/rendermanager/hdrexposure.h"
 #include "csplugincommon/rendermanager/shadow_pssm.h"
 #include "csutil/scf_implementation.h"
@@ -35,13 +37,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
   public:
     typedef CS::RenderManager::ShadowPSSMExtraMeshData MeshExtraDataType;
   };
+  
+  typedef CS::RenderManager::RenderTree<RenderTreeTraits> RenderTreeType;
 
   class RMShadowedPSSM : public scfImplementation5<RMShadowedPSSM, 
                                                  iRenderManager, 
                                                  iRenderManagerTargets,
                                                  iRenderManagerPostEffects,
                                                  iComponent,
-                                                 iDebugHelper>
+                                                 scfFakeInterface<iDebugHelper> >,
+                         public CS::RenderManager::RMDebugCommon<RenderTreeType>
   {
   public:
     RMShadowedPSSM (iBase* parent);
@@ -84,19 +89,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
       return false;
     }
     
-    /**\name iDebugHelper implementation
-     * @{ */
-    csTicks Benchmark (int num_iterations) { return 0; }
-    bool DebugCommand (const char *cmd);
-    void Dump (iGraphics3D *g3d) {}
-    csPtr<iString> Dump () { return 0; }
-    int GetSupportedTests () const { return 0; }
-    csPtr<iString> StateTest () { return  0; }
-    csPtr<iString> UnitTest () { return  0; }
-    /** @} */
-
-    typedef CS::RenderManager::RenderTree<RenderTreeTraits> RenderTreeType;
-
     typedef StandardContextSetup<RenderTreeType, 
       CS::RenderManager::MultipleRenderLayer> ContextSetupType;
 
@@ -112,6 +104,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
       CS::RenderManager::MultipleRenderLayer,
       ShadowType> LightSetupType;
 
+    typedef CS::RenderManager::AutoFX_ReflectRefract<RenderTreeType, 
+      ContextSetupType> AutoReflectRefractType;
+
   public:
     iObjectRegistry* objectReg;
 
@@ -121,8 +116,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
     RenderTreeType::PersistentData treePersistent;
     PortalSetupType::PersistentData portalPersistent;
     LightSetupType::PersistentData lightPersistent;
+    AutoReflectRefractType::PersistentData reflectRefractPersistent;
 
     CS::RenderManager::PostEffectManager       postEffects;
+    CS::RenderManager::HDRHelper hdr;
     CS::RenderManager::HDRExposureLinear hdrExposure;
     bool doHDRExposure;
 
@@ -137,16 +134,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
     TargetManagerType targets;
     csSet<RenderTreeType::ContextNode*> contextsScannedForTargets;
     
-    bool wantDebugLockLines;
-    RenderTreeType::DebugLines* lockedDebugLines;
+    uint dbgFlagClipPlanes;
   };  
 
 }
 CS_PLUGIN_NAMESPACE_END(RMShadowedPSSM)
 
 template<>
-class csHashComputer<CS_PLUGIN_NAMESPACE_NAME(RMShadowedPSSM)::RMShadowedPSSM::RenderTreeType::ContextNode*> : 
-  public csHashComputerIntegral<CS_PLUGIN_NAMESPACE_NAME(RMShadowedPSSM)::RMShadowedPSSM::RenderTreeType::ContextNode*> 
+class csHashComputer<CS_PLUGIN_NAMESPACE_NAME(RMShadowedPSSM)::RenderTreeType::ContextNode*> : 
+  public csHashComputerIntegral<CS_PLUGIN_NAMESPACE_NAME(RMShadowedPSSM)::RenderTreeType::ContextNode*> 
 {};
 
 #endif // __CS_RM_UNSHADOWED_H__

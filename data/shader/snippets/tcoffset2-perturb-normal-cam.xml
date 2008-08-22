@@ -1,0 +1,63 @@
+<!--
+  Copyright (C) 2008 by Frank Richter
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet type="compound">
+  <technique priority="100">
+    <snippet id="tangent_normal_kill_z">
+      <technique priority="100">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+	
+	<input name="N" type="normal_tangent" />
+	
+	<block location="cg:fragmentMain">
+	  result = N;
+	  result.z = 0;
+	</block>
+	
+	<block location="cg:vertexMain">
+	  result = N;
+	  result.z = 0;
+	</block>
+	
+	<output name="result" type="direction_tangent" />
+      </technique>
+    </snippet>
+    
+    <snippet id="actual_perturb">
+      <technique priority="100">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+	
+	<input name="perturbScaleXlate" type="float4" default="value" defval="1,1,0,0" />
+	<input name="N" type="direction_camera" />
+	  
+	<block location="cg:fragmentMain">
+	  result = N.xy * perturbScaleXlate.xy + perturbScaleXlate.zw;
+	</block>
+    
+	<block location="cg:vertexMain">
+	  result = N.xy * perturbScaleXlate.xy + perturbScaleXlate.zw;
+	</block>
+	
+	<output name="result" type="float2" />
+      </technique>
+    </snippet>
+    
+    <connection from="tangent_normal_kill_z" to="actual_perturb">
+      <explicit from="result" to="N" />
+    </connection>
+  </technique>
+</snippet>

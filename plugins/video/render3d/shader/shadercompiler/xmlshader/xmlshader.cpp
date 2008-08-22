@@ -96,6 +96,8 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
     object_reg, "crystalspace.shared.stringset");
   stringsSvName = csQueryRegistryTagInterface<iShaderVarStringSet> (
     object_reg, "crystalspace.shader.variablenameset");
+  
+  string_mixmode_alpha = stringsSvName->Request ("mixmode alpha");
 
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
   vfs = csQueryRegistry<iVFS> (object_reg);
@@ -268,6 +270,71 @@ bool csXMLShaderCompiler::IsTemplateToCompiler(iDocumentNode *templ)
 
   //Ok, passed check. We will try to validate it
   return true;
+}
+  
+csPtr<iDocumentNode> csXMLShaderCompiler::ReadNodeFromBuf (iDataBuffer* buf)
+{
+  csRef<iDocument> boilerplate;
+  csRef<iDocumentSystem> docsys = binDocSys;
+  if (docsys.IsValid())
+  {
+    boilerplate = docsys->CreateDocument ();
+    const char* err = boilerplate->Parse (buf);
+    if (err != 0)
+    {
+      if (do_verbose)
+	Report (CS_REPORTER_SEVERITY_ERROR, 
+	  "Couldn't read document: %s", err);
+    }
+  }
+  if (!boilerplate.IsValid())
+  {
+    docsys = xmlDocSys;
+    if (docsys.IsValid())
+    {
+      boilerplate = docsys->CreateDocument ();
+      const char* err = boilerplate->Parse (buf);
+      if (err != 0)
+      {
+      if (do_verbose)
+	Report (CS_REPORTER_SEVERITY_ERROR, 
+	  "Couldn't read document: %s", err);
+      }
+    }
+  }
+  if (!boilerplate.IsValid()) return 0;
+  
+  csRef<iDocumentNode> root = boilerplate->GetRoot();
+  if (!root.IsValid()) return 0;
+  
+  csRef<iDocumentNodeIterator> it = root->GetNodes();
+  if (!it->HasNext()) return 0;
+  csRef<iDocumentNode> firstNode = it->Next();
+  if (it->HasNext()) return 0;
+  
+  return csPtr<iDocumentNode> (firstNode);
+}
+
+csPtr<iDataBuffer> csXMLShaderCompiler::WriteNodeToBuf (iDocument* doc)
+{
+  csMemFile docFile;
+  const char* err = doc->Write (&docFile);
+  if (err != 0)
+  {
+    if (do_verbose)
+      Report (CS_REPORTER_SEVERITY_WARNING,
+	  "Couldn't write document: %s", err);
+    return 0;
+  }
+  return docFile.GetAllData (false);
+}
+  
+csPtr<iDocument> csXMLShaderCompiler::CreateCachingDoc ()
+{
+  csRef<iDocumentSystem> docsys = binDocSys;
+  if (!docsys.IsValid()) docsys = xmlDocSys;
+  
+  return csPtr<iDocument> (docsys->CreateDocument());
 }
 
 }

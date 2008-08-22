@@ -340,47 +340,45 @@ void csCameraCustomMatrix::UpdateInvMatrix ()
   invMatrixDirty = false;
 }
 
-static csVector3 xyz (const csVector4 v)
-{
-  return csVector3 (v[0], v[1], v[2]);
-}
-
 const csPlane3* csCameraCustomMatrix::GetVisibleVolume (uint32& mask)
 {
   if (clipPlanesDirty)
   {
-    UpdateInvMatrix();
-    
-    const float A = 1.0f;
-    const csVector3 nbl (xyz (invMatrix * csVector4 (-A, -A, 1, -A)));
-    const csVector3 nbr (xyz (invMatrix * csVector4 ( A, -A, 1, -A)));
-    const csVector3 ntr (xyz (invMatrix * csVector4 ( A,  A, 1, -A)));
-    const csVector3 ntl (xyz (invMatrix * csVector4 (-A,  A, 1, -A)));
-    const csVector3 fbl (xyz (invMatrix * csVector4 (-A, -A, 1,  A)));
-    const csVector3 fbr (xyz (invMatrix * csVector4 ( A, -A, 1,  A)));
-    const csVector3 ftr (xyz (invMatrix * csVector4 ( A,  A, 1,  A)));
-    const csVector3 ftl (xyz (invMatrix * csVector4 (-A,  A, 1,  A)));
+    CS::Math::Matrix4 invMatrix_inv_t = matrix.GetTranspose();
       
     int n = 0;
     csPlane3 p;
     // Back plane
-    p = csPlane3 (nbl, nbr, ntr);
-    if (!p.GetNormal().IsZero()) clipPlanes[n++] = p;
+    p.Set (0, 0, 1, 1);
+    clipPlanes[n] = invMatrix_inv_t * p;
+    clipPlanes[n].Normalize();
+    n++;
     // Far plane
-    p = csPlane3 (fbl, fbr, ftr);
-    if (!p.GetNormal().IsZero()) clipPlanes[n++] = p;
+    p.Set (0, 0, -1, 1);
+    clipPlanes[n] = invMatrix_inv_t * p;
+    clipPlanes[n].Normalize();
+    n++;
     // Left plane
-    p = csPlane3 (nbl, fbl, ntl);
-    if (!p.GetNormal().IsZero()) clipPlanes[n++] = p;
+    p.Set (1, 0, 0, 1);
+    clipPlanes[n] = invMatrix_inv_t * p;
+    clipPlanes[n].Normalize();
+    n++;
     // Right plane
-    p = csPlane3 (nbr, nbl, fbr);
-    if (!p.GetNormal().IsZero()) clipPlanes[n++] = p;
+    p.Set (-1, 0, 0, 1);
+    clipPlanes[n] = invMatrix_inv_t * p;
+    clipPlanes[n].Normalize();
+    n++;
     // Bottom plane
-    p = csPlane3 (nbl, nbr, fbl);
-    if (!p.GetNormal().IsZero()) clipPlanes[n++] = p;
+    p.Set (0, 1, 0, 1);
+    clipPlanes[n] = invMatrix_inv_t * p;
+    clipPlanes[n].Normalize();
+    n++;
     // Top plane
-    p = csPlane3 (ntl, ftl, ntr);
-    if (!p.GetNormal().IsZero()) clipPlanes[n++] = p;
+    p.Set (0, -1, 0, 1);
+    clipPlanes[n] = invMatrix_inv_t * p;
+    clipPlanes[n].Normalize();
+    n++;
+    
     clipPlanesMask = (1 << n) - 1;
     
     clipPlanesDirty = false;

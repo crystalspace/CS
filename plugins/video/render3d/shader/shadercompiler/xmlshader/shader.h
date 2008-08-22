@@ -182,7 +182,7 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
     struct Technique
     {
       int priority;
-      csRef<iDocumentNode> srcNode;
+      csRef<csWrappedDocumentNode> srcNode;
       
       csShaderConditionResolver* resolver;
       csRef<iDocumentNode> techNode;
@@ -213,10 +213,8 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
   };
   csArray<ShaderTechVariant> techVariants;
   csRef<csConditionEvaluator> sharedEvaluator;
-  csRef<iCacheManager> shaderCache;
-  bool readFromCache;
+  csRef<iHierarchicalCache> shaderCache;
   csString cacheTag;
-  csString cacheType;
   csString cacheScope_tech;
 
   /// Shader we fall back to if none of the techs validate
@@ -268,6 +266,11 @@ protected:
   void InternalRemove() { SelfDestruct(); }
 
   void Load (iDocumentNode* source);
+  
+  bool LoadTechniqueFromCache (ShaderTechVariant::Technique& tech,
+    iHierarchicalCache* cache);
+  void LoadTechnique (ShaderTechVariant::Technique& tech,
+    iHierarchicalCache* cacheTo, size_t dbgTechNum);
 public:
   CS_LEAKGUARD_DECLARE (csXMLShader);
 
@@ -297,7 +300,7 @@ public:
     if (IsFallbackTicket (ticket))
       return GetFallbackShader()->GetNumberOfPasses (GetFallbackTicket (ticket));
     csXMLShaderTech* tech = TechForTicket (ticket);
-    return tech->GetNumberOfPasses ();
+    return tech ? tech->GetNumberOfPasses () : 0;
   }
 
   /// Activate a pass for rendering
@@ -477,7 +480,7 @@ public:
   csRef<iDocumentNode> LoadProgramFile (const char* filename, size_t variant);
 public:
   //Holders
-  csXMLShaderCompiler* compiler;
+  csRef<csXMLShaderCompiler> compiler;
   csWeakRef<iGraphics3D> g3d;
   csWeakRef<iShaderManager> shadermgr;
   char* filename;

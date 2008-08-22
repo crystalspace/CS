@@ -36,7 +36,6 @@
 #include "iengine/portal.h"
 #include "iengine/portalcontainer.h"
 #include "iengine/texture.h"
-#include "iengine/region.h"
 #include "imap/ldrctxt.h"
 #include "imap/loader.h"
 #include "imap/services.h"
@@ -825,8 +824,8 @@ bool csThingLoader::ParsePoly3d (
       csRef<iMeshWrapper> portal_mesh = engine->CreatePortal (
       	pc_name, mesh, destSector,
       	portal_verts, cnt, portal);
-      if (ldr_context->GetRegion ())
-	ldr_context->GetRegion ()->QueryObject ()->ObjAdd (
+      if (ldr_context->GetCollection ())
+	ldr_context->GetCollection ()->QueryObject ()->ObjAdd (
 		portal_mesh->QueryObject ());
       delete[] portal_verts;
 

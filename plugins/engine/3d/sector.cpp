@@ -38,10 +38,10 @@
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
 
+#include "plugins/engine/3d/camera.h"
 #include "plugins/engine/3d/engine.h"
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/material.h"
-#include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/meshgen.h"
 #include "plugins/engine/3d/meshobj.h"
@@ -133,10 +133,12 @@ csSector::csSector (csEngine *engine) :
   AddVariable (svFogColor);
   svFogMode.AttachNew (new csShaderVariable (SVNames().fogMode));
   AddVariable (svFogMode);
-  svFogStart.AttachNew (new csShaderVariable (SVNames().fogStart));
-  AddVariable (svFogStart);
-  svFogEnd.AttachNew (new csShaderVariable (SVNames().fogEnd));
-  AddVariable (svFogEnd);
+  svFogFadeStart.AttachNew (new csShaderVariable (SVNames().fogFadeStart));
+  AddVariable (svFogFadeStart);
+  svFogFadeEnd.AttachNew (new csShaderVariable (SVNames().fogFadeEnd));
+  AddVariable (svFogFadeEnd);
+  svFogLimit.AttachNew (new csShaderVariable (SVNames().fogLimit));
+  AddVariable (svFogLimit);
   svFogDensity.AttachNew (new csShaderVariable (SVNames().fogDensity));
   AddVariable (svFogDensity);
   UpdateFogSVs();
@@ -559,6 +561,146 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
   return holder.meshList;
 }
 
+void csSector::MarkMeshAndChildrenVisible (iMeshWrapper* mesh,
+					   iRenderView* rview,
+					   uint32 frustum_mask,
+					   bool doFade, float fade)
+{
+  csMeshWrapper* cmesh = (csMeshWrapper*)mesh;
+  ObjectVisible (cmesh, rview, frustum_mask, doFade, fade);
+  size_t i;
+  const csRefArray<iSceneNode>& children = cmesh->GetChildren ();
+  for (i = 0 ; i < children.GetSize () ; i++)
+  {
+    iMeshWrapper* child = children[i]->QueryMesh ();
+    // @@@ Traverse too in case there are lights/cameras?
+    if (child)
+      MarkMeshAndChildrenVisible (child, rview, frustum_mask, doFade, fade);
+  }
+}
+
+void csSector::ObjectVisible (csMeshWrapper* cmesh, iRenderView* rview,
+			      uint32 frustum_mask,
+			      bool doFade = false, float fade = 1.0f)
+{
+  csStaticLODMesh* static_lod = cmesh->GetStaticLODMesh ();
+  bool mm = cmesh->DoMinMaxRange ();
+  float distance = 0;
+  if (static_lod || mm)
+    distance = csQsqrt (cmesh->GetSquaredDistance (rview));
+
+  if (mm)
+  {
+    if (distance < cmesh->csMeshWrapper::GetMinimumRenderDistance ())
+      return;
+    if (distance > cmesh->csMeshWrapper::GetMaximumRenderDistance ())
+      return;
+  }
+
+  if (doFade)
+    cmesh->SetLODFade (fade);
+  else
+    cmesh->UnsetLODFade ();
+
+  if (static_lod)
+  {
+    float lod = static_lod->GetLODValue (distance);
+    csArray<iMeshWrapper*>* meshes1;
+    csArray<iMeshWrapper*>* meshes2;
+    float lodFade;
+    bool hasFade = static_lod->GetMeshesForLODFaded (lod,
+      meshes1, meshes2, lodFade);
+    size_t i;
+    if (meshes1 != 0)
+    {
+      for (i = 0 ; i < meshes1->GetSize () ; i++)
+	MarkMeshAndChildrenVisible ((*meshes1)[i], rview, frustum_mask,
+	  hasFade, fade*lodFade);
+    }
+    if (meshes2 != 0)
+    {
+      for (i = 0 ; i < meshes2->GetSize () ; i++)
+	MarkMeshAndChildrenVisible ((*meshes2)[i], rview, frustum_mask,
+	  hasFade, fade*(1.0f-lodFade));
+    }
+  }
+
+  csSectorVisibleRenderMeshes visMesh;
+  visMesh.imesh = cmesh;
+  int num;
+  csRenderMesh** meshes = cmesh->GetRenderMeshes (num, rview, frustum_mask);
+  CS_ASSERT(!((num != 0) && (meshes == 0)));
+#ifdef CS_DEBUG
+  for (int i = 0 ; i < num ; i++)
+    meshes[i]->db_mesh_name = cmesh->GetName ();
+#endif
+  visMesh.num = num;
+  visMesh.rmeshes = meshes;
+  renderMeshesScratch.Push (visMesh);
+
+  if (num > 0)
+  {
+    // get extra render meshes
+    size_t numExtra = 0;
+    csRenderMesh** extraMeshes = cmesh->GetExtraRenderMeshes (numExtra, rview,
+					  frustum_mask);
+    CS_ASSERT(!((numExtra != 0) && (extraMeshes == 0)));
+    visMesh.num = numExtra;
+    visMesh.rmeshes = extraMeshes;
+  }
+}
+
+csSectorVisibleRenderMeshes* csSector::GetVisibleRenderMeshes (int& num,
+						 iMeshWrapper* mesh,
+						 iRenderView *rview,
+						 uint32 frustum_mask)
+{
+  csMeshWrapper* cmesh = (csMeshWrapper*)mesh;
+  csStaticLODMesh* static_lod = cmesh->GetStaticLODMesh ();
+  bool mm = cmesh->DoMinMaxRange ();
+  if (!static_lod && !mm)
+  {
+    csRenderMesh** meshes = cmesh->GetRenderMeshes (num, rview, frustum_mask);
+    CS_ASSERT(!((num != 0) && (meshes == 0)));
+  #ifdef CS_DEBUG
+    for (int i = 0 ; i < num ; i++)
+      meshes[i]->db_mesh_name = cmesh->GetName ();
+  #endif
+
+    oneVisibleMesh[0].imesh = mesh;
+    oneVisibleMesh[0].num = num;
+    oneVisibleMesh[0].rmeshes = meshes;
+
+    size_t numExtra = 0;
+    csRenderMesh** extraMeshes = 0;
+    if (num > 0)
+    {
+      extraMeshes = cmesh->GetExtraRenderMeshes (numExtra, rview,
+				    frustum_mask);
+      CS_ASSERT(!((numExtra != 0) && (extraMeshes == 0)));
+    }
+  
+    if (numExtra == 0)
+    {
+      num = 1;
+      return oneVisibleMesh;
+    }
+    
+    oneVisibleMesh[0].imesh = mesh;
+    oneVisibleMesh[0].num = numExtra;
+    oneVisibleMesh[0].rmeshes = extraMeshes;
+
+    num = 2;
+    return oneVisibleMesh;
+  }
+
+  renderMeshesScratch.Empty();
+
+  ObjectVisible (cmesh, rview, frustum_mask);
+
+  num = renderMeshesScratch.GetSize();
+  return renderMeshesScratch.GetArray();
+}
 
 csSectorHitBeamResult csSector::HitBeamPortals (
   const csVector3 &start,
@@ -752,7 +894,8 @@ void csSector::PrepareDraw (iRenderView *rview)
 
   // Make sure the visibility culler is loaded.
   GetVisibilityCuller ();
-  csRenderView* csrview = (csRenderView*)rview;
+  CS::RenderManager::RenderView* csrview =
+    (CS::RenderManager::RenderView*)rview;
   csrview->SetThisSector ((iSector*)this);
 
   size_t i = sectorCallbackList.GetSize ();
@@ -1070,8 +1213,9 @@ void csSector::UpdateFogSVs ()
 {
   svFogColor->SetValue (fog.color);
   svFogMode->SetValue (int (fog.mode));
-  svFogStart->SetValue (fog.start);
-  svFogEnd->SetValue (fog.end);
+  svFogFadeStart->SetValue (fog.start);
+  svFogFadeEnd->SetValue (fog.end);
+  svFogLimit->SetValue (fog.limit);
   svFogDensity->SetValue (fog.density);
 }
 
@@ -1087,10 +1231,12 @@ void csSector::SetupSVNames()
       "fog color");
     SVNames().fogMode = CS::ShaderVarName (engine->svNameStringSet,
       "fog mode");
-    SVNames().fogStart = CS::ShaderVarName (engine->svNameStringSet,
-      "fog start");
-    SVNames().fogEnd = CS::ShaderVarName (engine->svNameStringSet,
-      "fog end");
+    SVNames().fogFadeStart = CS::ShaderVarName (engine->svNameStringSet,
+      "fog fade start");
+    SVNames().fogFadeEnd = CS::ShaderVarName (engine->svNameStringSet,
+      "fog fade end");
+    SVNames().fogLimit = CS::ShaderVarName (engine->svNameStringSet,
+      "fog limit");
     SVNames().fogDensity = CS::ShaderVarName (engine->svNameStringSet,
       "fog density");
   }

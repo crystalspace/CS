@@ -159,7 +159,7 @@ namespace RenderManager
           CS::Utility::ResourceCache::PurgeConditionAfterTime<uint> (10000)),
         boxClipperCache (CS::Utility::ResourceCache::ReuseConditionFlagged (),
           CS::Utility::ResourceCache::PurgeConditionAfterTime<uint> (10000)),
-        texCache (csimg2D, "rgb8", 
+        texCache (csimg2D, "rgb8", // @@@ FIXME: Use same format as main view ...
           CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP,
           "target", TextureCache::tcachePowerOfTwo)
       {
@@ -259,6 +259,7 @@ namespace RenderManager
             rview->SetPreviousSector (rview->GetThisSector ());
             rview->SetThisSector (portal->GetSector ());
             csPolygonClipper newView (portalVerts2d, count);
+	    rview->SetViewDimensions (screenW, screenH);
             rview->SetClipper (&newView);
 
 	    if (portalFlags.Check (CS_PORTAL_WARP))
@@ -390,7 +391,7 @@ namespace RenderManager
 	    newRenderView->SetLastPortal (portal);
             newRenderView->SetPreviousSector (rview->GetThisSector ());
             newRenderView->SetThisSector (portal->GetSector ());
-            //newRenderView->SetViewport (real_w, real_h);
+	    newRenderView->SetViewDimensions (real_w, real_h);
 	    csBox2 clipBox (0, real_h - txt_h, txt_w, real_h);
             csRef<iClipper2D> newView;
             /* @@@ Consider PolyClipper?

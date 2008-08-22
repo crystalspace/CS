@@ -119,6 +119,9 @@ namespace RenderManager
       
       const LayerOptions& GetOptions() const { return options; }
       void SetOptions (const LayerOptions& opt) { options = opt; }
+
+      void SetShader (iShader* shader) { effectShader = shader; }
+      iShader* GetShader () const { return effectShader; }
     };
   
     PostEffectManager ();
@@ -130,9 +133,15 @@ namespace RenderManager
     /// Set the texture format for the intermediate textures used.
     void SetIntermediateTargetFormat (const char* textureFmt);
 
-    /// Set up post processing manager for a view
-    void SetupView (iView* view);
-    void SetupView (uint width, uint height);
+    //@{
+    /**
+     * Set up post processing manager for a view.
+     * \returns Whether the manager has changed. If \c true some values,
+     *   such as the screen texture, must be reobtained from the manager.
+     */
+    bool SetupView (iView* view);
+    bool SetupView (uint width, uint height);
+    //@}
 
     /// Get the texture to render a scene to for post processing.
     iTextureHandle* GetScreenTarget ();
@@ -166,12 +175,40 @@ namespace RenderManager
     /// Get the output texture of a layer.
     iTextureHandle* GetLayerOutput (const Layer* layer);
     
-    /// Set the render target used to ultimatively render to.
+    /**
+     * Set the render target used to ultimatively render to.
+     * Setting this on a post effects manager in a chain effectively sets
+     * the output target of the last chain member.
+     */
     void SetEffectsOutputTarget (iTextureHandle* tex)
-    { target = tex; }
+    {
+      if (chainedEffects)
+	chainedEffects->SetEffectsOutputTarget (tex);
+      else
+	target = tex;
+    }
     /// Get the render target used to ultimatively render to.
     iTextureHandle* GetEffectsOutputTarget () const
-    { return target; }
+    {
+      if (chainedEffects) return chainedEffects->GetEffectsOutputTarget ();
+      return target;
+    }
+
+    //@{
+    /**
+     * Chain another post effects manager to the this one. The output of
+     * this manager is automatically used as input to the next.
+     */
+    void SetChainedOutput (PostEffectManager* nextEffects);
+    void SetChainedOutput (PostEffectManager& nextEffects)
+    { SetChainedOutput (&nextEffects); }
+    //@}
+    
+    /**
+     * Returns whether the screen space is flipped in Y direction. This usually
+     * happens when rendering to a texture due post effects.
+     */
+    bool ScreenSpaceYFlipped ();
   private:
     uint frameNum;
     csRef<iGraphics3D> graphics3D;
@@ -179,6 +216,7 @@ namespace RenderManager
     bool keepAllIntermediates;
     csRef<iRenderBuffer> indices;
     csRef<iTextureHandle> target;
+    PostEffectManager* chainedEffects;
 
     csSimpleRenderMesh fullscreenQuad;
     void SetupScreenQuad ();

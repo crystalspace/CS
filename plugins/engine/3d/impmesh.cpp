@@ -24,6 +24,7 @@
 #include "ivideo/graph3d.h"
 #include "csgfx/renderbuffer.h"
 
+#include "camera.h"
 #include "material.h"
 #include "impmesh.h"
 #include "sector.h"

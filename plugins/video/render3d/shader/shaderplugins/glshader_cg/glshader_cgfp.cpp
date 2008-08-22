@@ -26,6 +26,7 @@
 #include "csutil/stringreader.h"
 #include "iutil/databuff.h"
 #include "iutil/document.h"
+#include "iutil/hiercache.h"
 #include "iutil/string.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
@@ -83,7 +84,7 @@ void csShaderGLCGFP::ResetState()
   csShaderGLCGCommon::ResetState();
 }
 
-bool csShaderGLCGFP::Compile ()
+bool csShaderGLCGFP::Compile (iHierarchicalCache* cache)
 {
   if (!shaderPlug->enableFP) return false;
 
@@ -140,10 +141,12 @@ bool csShaderGLCGFP::Compile ()
       }
     }
 
+    csRef<iHierarchicalCache> ps1cache;
     if (pswrap->Load (0, cgGetProgramString (program, CG_COMPILED_PROGRAM), 
       mappings))
     {
-      bool ret = pswrap->Compile ();
+      if (cache != 0) ps1cache = cache->GetRootedCache ("/ps1/");
+      bool ret = pswrap->Compile (ps1cache);
       if (shaderPlug->debugDump)
         DoDebugDump();
       return ret;
@@ -212,8 +215,11 @@ bool csShaderGLCGFP::Compile ()
      * @@@ FIXME: two passes are not always needed.
      */
     CollectUnusedParameters (unusedParams);
-    return DefaultLoadProgram (this, programStr, CG_GL_FRAGMENT, 
+    bool ret = DefaultLoadProgram (this, programStr, CG_GL_FRAGMENT, 
       shaderPlug->maxProfileFragment);
+      
+    WriteToCache (cache);
+    return ret;
   }
 
   return true;
@@ -227,8 +233,10 @@ int csShaderGLCGFP::ResolveTU (const char* binding)
     CGparameter parameter = cgGetNamedParameter (program, binding);
     if (parameter)
     {
-      if ((cgGetParameterBaseResource (parameter) == CG_TEXUNIT0) ||
-	(cgGetParameterBaseResource (parameter) == CG_TEX0))
+      CGresource baseRes = cgGetParameterBaseResource (parameter);
+      if (((baseRes == CG_TEXUNIT0) || (baseRes == CG_TEX0))
+          && (cgIsParameterUsed (parameter, program)
+            || cgIsParameterReferenced (parameter)))
       {
 	newTU = cgGetParameterResourceIndex (parameter);
       }

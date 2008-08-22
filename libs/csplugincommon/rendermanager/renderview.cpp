@@ -35,7 +35,8 @@ RenderView::RenderView () :
   engine(0),
   g3d(0),
   g2d(0),
-  original_camera(0)
+  original_camera(0),
+  viewWidth (0), viewHeight (0)
 {
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
@@ -47,7 +48,8 @@ RenderView::RenderView (iCamera *c) :
   engine(0),
   g3d(0),
   g2d(0),
-  original_camera(c)
+  original_camera(c),
+  viewWidth (0), viewHeight (0)
 {
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
@@ -66,6 +68,14 @@ RenderView::RenderView (iCamera *c, iClipper2D *v, iGraphics3D *ig3d, iGraphics2
   memset (ctxt, 0, sizeof (csRenderContext));
   ctxt->icamera = c;
   ctxt->iview = v;
+  if (g3d)
+  {
+    viewWidth = g3d->GetWidth(); viewHeight = g3d->GetHeight();
+  }
+  else
+  {
+    viewWidth = 0; viewHeight = 0;
+  }
   if (v)
   {
     UpdateFrustum ();
@@ -82,6 +92,15 @@ RenderView::RenderView (iView* v) :
   g2d = g3d->GetDriver2D ();
   original_camera = v->GetCamera ();
 
+  if (g3d)
+  {
+    viewWidth = g3d->GetWidth(); viewHeight = g3d->GetHeight();
+  }
+  else
+  {
+    viewWidth = 0; viewHeight = 0;
+  }
+  
   iClipper2D* clipper = v->GetClipper ();
 
   ctxt = new csRenderContext ();
@@ -98,7 +117,8 @@ RenderView::RenderView (iView* v) :
 }
 
 RenderView::RenderView (const RenderView& other) :
-  scfPooledImplementationType (this)
+  scfPooledImplementationType (this), viewWidth (other.viewWidth),
+  viewHeight (other.viewHeight)
 {
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
@@ -164,31 +184,60 @@ void RenderView::UpdateFrustum ()
 {
   size_t i;
   csBox2 bbox;
-  csRef<iPerspectiveCamera> pcam (scfQueryInterfaceSafe<iPerspectiveCamera> (
-    ctxt->icamera));
-  if (!pcam) return;
-  csVector2 shift (pcam->GetShiftX (), pcam->GetShiftY ());
-  float inv_fov = pcam->GetInvFOV ();
   iClipper2D* clip = ctxt->iview;
   csVector2 *poly = clip->GetClipPoly ();
-  bbox.StartBoundingBox ((poly[0] - shift) * inv_fov);
+  bbox.StartBoundingBox (poly[0]);
   for (i = 1; i < clip->GetVertexCount (); i++)
-    bbox.AddBoundingVertexSmart ((poly[i] - shift) * inv_fov);
+    bbox.AddBoundingVertexSmart (poly[i]);
 
+  SetFrustumFromBox (bbox);
+}
+
+void RenderView::SetFrustumFromBox (const csBox2& box)
+{
+  float iw = 2.0f/viewWidth;
+  float ih = 2.0f/viewHeight;
+  float lx_n = csClamp (box.MinX() * iw - 1.0f, 1.0f, -1.0f);
+  float rx_n = csClamp (box.MaxX() * iw - 1.0f, 1.0f, -1.0f);
+  float ty_n = csClamp (box.MinY() * ih - 1.0f, 1.0f, -1.0f);
+  float by_n = csClamp (box.MaxY() * ih - 1.0f, 1.0f, -1.0f);
+  
+  CS::Math::Matrix4 invMatrix_inv_t =
+    ctxt->icamera->GetProjectionMatrix().GetTranspose();
+    
+  int n = 0;
   csPlane3 *frustum = ctxt->frustum;
-  csVector3 v1 (bbox.MinX (), bbox.MinY (), 1);
-  csVector3 v2 (bbox.MaxX (), bbox.MinY (), 1);
-  frustum[0].Set (v1 % v2, 0);
-  frustum[0].norm.Normalize ();
-
-  csVector3 v3 (bbox.MaxX (), bbox.MaxY (), 1);
-  frustum[1].Set (v2 % v3, 0);
-  frustum[1].norm.Normalize ();
-  v2.Set (bbox.MinX (), bbox.MaxY (), 1);
-  frustum[2].Set (v3 % v2, 0);
-  frustum[2].norm.Normalize ();
-  frustum[3].Set (v2 % v1, 0);
-  frustum[3].norm.Normalize ();
+  csPlane3 p;
+  // Back plane
+  p.Set (0, 0, -1, 1);
+  frustum[n] = invMatrix_inv_t * p;
+  frustum[n].Normalize();
+  n++;
+  // Far plane
+  /*p.Set (0, 0, -1, 1);
+  clipPlanes[n] = invMatrix_inv_t * p;
+  clipPlanes[n].Normalize();
+  n++;*/
+  // Left plane
+  p.Set (1, 0, 0, -lx_n);
+  frustum[n] = invMatrix_inv_t * p;
+  frustum[n].Normalize();
+  n++;
+  // Right plane
+  p.Set (-1, 0, 0, rx_n);
+  frustum[n] = invMatrix_inv_t * p;
+  frustum[n].Normalize();
+  n++;
+  // Bottom plane
+  p.Set (0, -1, 0, by_n);
+  frustum[n] = invMatrix_inv_t * p;
+  frustum[n].Normalize();
+  n++;
+  // Top plane
+  p.Set (0, 1, 0, -ty_n);
+  frustum[n] = invMatrix_inv_t * p;
+  frustum[n].Normalize();
+  n++;
 }
 
 void RenderView::SetFrustum (float lx, float rx, float ty, float by)
@@ -197,21 +246,8 @@ void RenderView::SetFrustum (float lx, float rx, float ty, float by)
   rightx = rx;
   topy = ty;
   boty = by;
-
-  csPlane3 *frustum = ctxt->frustum;
-  csVector3 v1 (leftx, topy, 1);
-  csVector3 v2 (rightx, topy, 1);
-  frustum[0].Set (v1 % v2, 0);
-  frustum[0].norm.Normalize ();
-
-  csVector3 v3 (rightx, boty, 1);
-  frustum[1].Set (v2 % v3, 0);
-  frustum[1].norm.Normalize ();
-  v2.Set (leftx, boty, 1);
-  frustum[2].Set (v3 % v2, 0);
-  frustum[2].norm.Normalize ();
-  frustum[3].Set (v2 % v1, 0);
-  frustum[3].norm.Normalize ();
+  
+  SetFrustumFromBox (csBox2 (lx, ty, rx, by));
 }
 
 void RenderView::CreateRenderContext ()

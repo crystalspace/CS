@@ -260,6 +260,7 @@ void IsoTest::CameraIsoLookat(csRef<iCamera> cam, const IsoView& isoview,
   //int isofactor = 100; // 99.2% isometric (=GetFovAngle()/180.0)
   int isofactor = 200; // 99.6% isometric (=GetFovAngle()/180.0)
 
+  cam->SetViewportSize (g3d->GetWidth(), g3d->GetHeight());
   // set center and lookat
   csOrthoTransform& cam_trans = cam->GetTransform ();
   cam_trans.SetOrigin (lookat + float(isofactor)*isoview.camera_offset);

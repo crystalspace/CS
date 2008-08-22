@@ -29,7 +29,6 @@
 #include "iengine/camera.h"
 #include "iutil/objreg.h"
 #include "plugins/engine/3d/portalcontainer.h"
-#include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/meshobj.h"
 #include "plugins/engine/3d/engine.h"
 #include "cstool/rviewclipper.h"
@@ -919,7 +918,8 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* /*movable*/,
 
   // Setup clip and far plane.
   csPlane3 portal_plane, *pportal_plane;
-  bool do_portal_plane = ((csRenderView*)rview)->GetClipPlane (portal_plane);
+  bool do_portal_plane =
+    ((CS::RenderManager::RenderView*)rview)->GetClipPlane (portal_plane);
   if (do_portal_plane)
     pportal_plane = &portal_plane;
   else
@@ -1240,7 +1240,8 @@ void csPortalContainer::ComputeScreenPolygons (iRenderView* rview,
 
   // Setup clip and far plane.
   csPlane3 portal_plane, *pportal_plane;
-  bool do_portal_plane = ((csRenderView*)rview)->GetClipPlane (portal_plane);
+  bool do_portal_plane =
+    ((CS::RenderManager::RenderView*)rview)->GetClipPlane (portal_plane);
   if (do_portal_plane)
     pportal_plane = &portal_plane;
   else

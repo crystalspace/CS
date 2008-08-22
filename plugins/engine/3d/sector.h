@@ -151,6 +151,9 @@ public:
 
   virtual csRenderMeshList* GetVisibleMeshes (iRenderView *);
 
+  virtual csSectorVisibleRenderMeshes* GetVisibleRenderMeshes (int& num,
+    iMeshWrapper* mesh, iRenderView *rview, uint32 frustum_mask);
+
   virtual const csSet<csPtrKey<iMeshWrapper> >& GetPortalMeshes () const
   { return portalMeshes; }
 
@@ -194,7 +197,7 @@ public:
   {
     fog.mode = CS_FOG_MODE_CRYSTALSPACE;
     fog.density = density;
-    fog.color = color;
+    fog.color.Set(color);
     UpdateFogSVs ();
   }
   virtual void SetFog (const csFog& fog)
@@ -504,6 +507,15 @@ private:
   csArray<visibleMeshCacheHolder> visibleMeshCache;
   csPDelArray<csRenderMeshList> usedMeshLists;
 
+  // These are used by GetVisibleRenderMeshes
+  csSectorVisibleRenderMeshes oneVisibleMesh[2];
+  csDirtyAccessArray<csSectorVisibleRenderMeshes> renderMeshesScratch;
+  void MarkMeshAndChildrenVisible (iMeshWrapper* mesh, 
+    iRenderView* rview, uint32 frustum_mask,
+    bool doFade = false, float fade = 1.0f);
+  void ObjectVisible (csMeshWrapper* cmesh, iRenderView* rview, 
+    uint32 frustum_mask, bool doFade, float fade);
+
   /**
    * Visibilty number for last VisTest call
    */
@@ -530,8 +542,9 @@ private:
     CS::ShaderVarName lightAmbient;
     CS::ShaderVarName fogColor;
     CS::ShaderVarName fogMode;
-    CS::ShaderVarName fogStart;
-    CS::ShaderVarName fogEnd;
+    CS::ShaderVarName fogFadeStart;
+    CS::ShaderVarName fogFadeEnd;
+    CS::ShaderVarName fogLimit;
     CS::ShaderVarName fogDensity;
   };
   CS_DECLARE_STATIC_CLASSVAR_REF(svNames, SVNames, SVNamesHolder);
@@ -539,8 +552,9 @@ private:
   csRef<csShaderVariable> svLightAmbient;
   csRef<csShaderVariable> svFogColor;
   csRef<csShaderVariable> svFogMode;
-  csRef<csShaderVariable> svFogStart;
-  csRef<csShaderVariable> svFogEnd;
+  csRef<csShaderVariable> svFogFadeStart;
+  csRef<csShaderVariable> svFogFadeEnd;
+  csRef<csShaderVariable> svFogLimit;
   csRef<csShaderVariable> svFogDensity;
   
   class LightAmbientAccessor :

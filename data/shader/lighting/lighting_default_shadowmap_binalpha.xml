@@ -19,7 +19,7 @@
 -->
 <shader compiler="shaderweaver" name="lighting_default_shadowmap_binalpha" lights="6">
   <alias name="ambient" file="/shader/snippets/lighting/ambient-static.xml" />
-  <alias name="apply_alpha" file="/shader/snippets/surface/alpha-alpha-nochange.xml" />
+  <alias name="apply_alpha" file="/shader/snippets/surface/alpha-nochange.xml" />
   <alias name="lighting" file="/shader/snippets/lighting/lighting-ppl-shadowmap.xml" />
   <alias name="shadow" file="/shader/snippets/shadow/shadow-depth.xml" />
   
@@ -30,7 +30,7 @@
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
       <!-- First pass: blend with alpha -->
 	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
+	  <blendop src="one" dst="zero" />
 	  <alphatest>enable</alphatest>
 	</mixmode>
       <?else?>
@@ -65,7 +65,7 @@
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
 	<!-- First pass: blend with alpha -->
 	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
+	  <blendop src="one" dst="zero" />
 	  <alphatest>enable</alphatest>
 	</mixmode>
       <?else?>
@@ -110,7 +110,7 @@
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
       <!-- First pass: blend with alpha -->
 	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
+	  <blendop src="one" dst="zero" />
 	  <alphatest>enable</alphatest>
 	</mixmode>
       <?else?>
@@ -217,7 +217,7 @@
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
 	<!-- First pass: blend with alpha -->
 	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
+	  <blendop src="one" dst="zero" />
 	  <alphatest>enable</alphatest>
 	</mixmode>
       <?else?>

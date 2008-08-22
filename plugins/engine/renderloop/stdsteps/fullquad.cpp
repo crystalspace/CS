@@ -226,7 +226,8 @@ csFullScreenQuadRenderStep::csFullScreenQuadRenderStep (
 {
   csRef<iGraphics3D> g3d = 
     csQueryRegistry<iGraphics3D> (object_reg);
-  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
+  csRef<iShaderVarStringSet> strings =
+    csQueryRegistryTagInterface<iShaderVarStringSet> 
     (object_reg, "crystalspace.shader.variablenameset");
   csFullScreenQuadRenderStep::object_reg = object_reg;
 

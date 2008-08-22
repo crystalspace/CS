@@ -558,6 +558,10 @@ namespace lighter
 
       for (size_t lmI = 0; lmI < lightmaps.GetSize (); ++lmI)
       {
+        // Might have empty lightmap entries for non-created lightmaps
+        if (!lightmaps[lmI])
+          continue;
+
         lightmaps[lmI]->FixupLightmap (*(lmMasks[lmI % realNumLMs]));
         if (--u == 0)
         {

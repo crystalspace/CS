@@ -181,6 +181,12 @@ public:
   CS::ShaderVarStringID GetName () const
   { return Name; }
 
+  /// Get the accessor
+  iShaderVariableAccessor* GetAccessor () const
+  {
+    return accessor;
+  }
+
   /// Get the extra accessor data
   intptr_t GetAccessorData () const
   {
@@ -395,8 +401,15 @@ public:
   bool SetValue (iTextureHandle* value)
   {    
     if (Type != TEXTURE)
+    {
       NewType (TEXTURE);
-
+      texture.WrapValue = 0;
+    }
+    else
+    {
+      if (texture.HandValue)
+	texture.HandValue->DecRef();
+    }
     texture.HandValue = value;
     
     if (value)
@@ -408,8 +421,16 @@ public:
   bool SetValue (iTextureWrapper* value)
   {    
     if (Type != TEXTURE)
+    {
       NewType (TEXTURE);
-
+      texture.HandValue = 0;
+    }
+    else
+    {
+      if (texture.WrapValue)
+	texture.WrapValue->DecRef();
+    }
+    
     texture.WrapValue = value;
     
     if (value)
@@ -422,7 +443,11 @@ public:
   {    
     if (Type != RENDERBUFFER)
       NewType (RENDERBUFFER);
-
+    else
+    {
+      if (RenderBuffer)
+	RenderBuffer ->DecRef();
+    }
     RenderBuffer = value;
     
     if (value)
@@ -459,6 +484,17 @@ public:
       NewType (VECTOR3);
 
     VectorValue.Set (value.red, value.green, value.blue, 1.0f);
+    Int = (int)value.red;
+    return true; 
+  }
+
+  /// Store a csColor4
+  bool SetValue (const csColor4& value)
+  { 
+    if (Type != VECTOR4)
+      NewType (VECTOR4);
+
+    VectorValue.Set (value.red, value.green, value.blue, value.alpha);
     Int = (int)value.red;
     return true; 
   }

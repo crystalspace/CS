@@ -932,6 +932,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     {
       destNodes = &variableMaps;
     }
+    else if (strcmp (location, "clips") == 0)
+    {
+      // Cheat a bit: they go to the same parent node anyway
+      destNodes = &variableMaps;
+    }
+    else if (strcmp (location, "vertexCompilerArgs") == 0)
+    {
+      destNodes = &vertexCompilerArgs;
+    }
+    else if (strcmp (location, "fragmentCompilerArgs") == 0)
+    {
+      destNodes = &fragmentCompilerArgs;
+    }
     else if (strcmp (location, "vertexToFragment") == 0)
     {
       destNodes = &currentSnippet.vert2frag;
@@ -1047,6 +1060,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       csRef<iDocumentNode> entryValue = entryNode->CreateNodeBefore (CS_NODE_TEXT);
       entryValue->SetValue ("vertexMain");
       
+      for (size_t n = 0; n < vertexCompilerArgs.GetSize(); n++)
+      {
+        csRef<iDocumentNode> newArgNode = 
+          cgvpNode->CreateNodeBefore (CS_NODE_ELEMENT);
+        newArgNode->SetValue ("compilerargs");
+        
+        csRef<iDocumentNode> newNode = 
+          newArgNode->CreateNodeBefore (vertexCompilerArgs[n]->GetType());
+        CS::DocSystem::CloneNode (vertexCompilerArgs[n], newNode);
+      }
+      
       for (size_t n = 0; n < variableMaps.GetSize(); n++)
       {
         csRef<iDocumentNode> newNode = 
@@ -1133,6 +1157,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       entryNode->SetValue ("entry");
       csRef<iDocumentNode> entryValue = entryNode->CreateNodeBefore (CS_NODE_TEXT);
       entryValue->SetValue ("fragmentMain");
+      
+      for (size_t n = 0; n < fragmentCompilerArgs.GetSize(); n++)
+      {
+        csRef<iDocumentNode> newNode = 
+          cgfpNode->CreateNodeBefore (fragmentCompilerArgs[n]->GetType());
+        CS::DocSystem::CloneNode (fragmentCompilerArgs[n], newNode);
+      }
       
       for (size_t n = 0; n < variableMaps.GetSize(); n++)
       {

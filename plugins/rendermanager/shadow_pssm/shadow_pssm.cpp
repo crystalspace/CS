@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2007 by Marten Svanfeldt
+	      (C) 2008 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -77,6 +78,9 @@ public:
     sector->CallSectorCallbacks (rview);
     // Make sure the clip-planes are ok
     CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext ());
+    
+    if (context.owner.IsDebugFlagEnabled (rmanager->dbgFlagClipPlanes))
+      context.owner.AddDebugClipPlanes (rview);
 
     // Do the culling
     iVisibilityCuller* culler = sector->GetVisibilityCuller ();
@@ -127,8 +131,27 @@ public:
     // Setup shaders and tickets
     SetupStandardTicket (context, shaderManager,
       lightSetup.GetPostLightingLayers());
+  
+    {
+      RMShadowedPSSM::AutoReflectRefractType fxRR (
+        rmanager->reflectRefractPersistent, *this);
+      typedef TraverseUsedSVSets<RenderTreeType,
+        RMShadowedPSSM::AutoReflectRefractType> SVTraverseType;
+      SVTraverseType svTraverser
+        (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+      // And do the iteration
+      ForEachMeshNode (context, svTraverser);
+    }
   }
 
+
+  // Called by RMShadowedPSSM::AutoReflectRefractType
+  void operator() (typename RenderTreeType::ContextNode& context)
+  {
+    typename PortalSetupType::ContextSetupData portalData (&context);
+
+    operator() (context, portalData);
+  }
 
 private:
   RMShadowedPSSM* rmanager;
@@ -139,9 +162,9 @@ private:
 
 
 RMShadowedPSSM::RMShadowedPSSM (iBase* parent)
-  : scfImplementationType (this, parent), doHDRExposure (false), targets (*this),
-    wantDebugLockLines (false), lockedDebugLines (0)
+  : scfImplementationType (this, parent), doHDRExposure (false), targets (*this)
 {
+  SetTreePersistent (treePersistent);
 }
 
 bool RMShadowedPSSM::RenderView (iView* view)
@@ -161,6 +184,7 @@ bool RMShadowedPSSM::RenderView (iView* view)
   contextsScannedForTargets.Empty ();
   portalPersistent.UpdateNewFrame ();
   lightPersistent.UpdateNewFrame ();
+  reflectRefractPersistent.UpdateNewFrame ();
 
   iSector* startSector = rview->GetThisSector ();
 
@@ -209,18 +233,9 @@ bool RMShadowedPSSM::RenderView (iView* view)
   postEffects.DrawPostEffects ();
   
   
-  if (doHDRExposure) hdrExposure.ApplyExposure (postEffects);
+  if (doHDRExposure) hdrExposure.ApplyExposure ();
   
-  if (wantDebugLockLines)
-  {
-    lockedDebugLines =
-      new RenderTreeType::DebugLines (renderTree.GetDebugLines());
-    wantDebugLockLines = false;
-  }
-  else if (lockedDebugLines)
-    renderTree.SetDebugLines (*lockedDebugLines);
-  renderTree.DrawDebugLines (rview->GetGraphics3D (), rview);
-  //renderTree.RenderDebugTextures (rview->GetGraphics3D ());
+  DebugFrameRender (rview, renderTree);
 
   return true;
 }
@@ -254,27 +269,6 @@ bool RMShadowedPSSM::HandleTarget (RenderTreeType& renderTree,
 
   return true;
 }
-
-bool RMShadowedPSSM::DebugCommand (const char *cmd)
-{
-  if (strcmp (cmd, "toggle_debug_lines_lock") == 0)
-  {
-    csPrintf ("%p got toggle_debug_lines_lock: ", this);
-    if (lockedDebugLines)
-    {
-      delete lockedDebugLines; lockedDebugLines = 0;
-      csPrintf ("unlocked\n");
-    }
-    else
-    {
-      wantDebugLockLines = !wantDebugLockLines;
-      csPrintf ("%slocked\n", wantDebugLockLines ? "" : "un");
-    }
-    return true;
-  }
-  return false;
-}
-
 
 bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
 {
@@ -326,6 +320,8 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   
   csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectReg);
   treePersistent.Initialize (shaderManager);
+  dbgFlagClipPlanes =
+    treePersistent.debugPersist.RegisterDebugFlag ("draw.clipplanes.view");
   postEffects.Initialize (objectReg);
   
   const char* effectsFile = cfg->GetStr ("RenderManager.ShadowPSSM.Effects", 0);
@@ -340,19 +336,20 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   {
     doHDRExposure = true;
     
-    HDRHelper hdr;
     hdr.Setup (objectReg, 
       hdrSettings.GetQuality(), 
-      hdrSettings.GetColorRange(), 
-      postEffects, !doHDRExposure);
+      hdrSettings.GetColorRange());
+    postEffects.SetChainedOutput (hdr.GetHDRPostEffects());
   
     // @@@ Make configurable, too
-    hdrExposure.Initialize (objectReg, postEffects);
+    hdrExposure.Initialize (objectReg, hdr);
   }
   
   portalPersistent.Initialize (shaderManager, g3d);
   lightPersistent.shadowPersist.SetConfigPrefix ("RenderManager.ShadowPSSM");
-  lightPersistent.Initialize (objectReg);
+  lightPersistent.Initialize (objectReg, treePersistent.debugPersist);
+  reflectRefractPersistent.Initialize (objectReg, treePersistent.debugPersist,
+    &postEffects);
   
   return true;
 }

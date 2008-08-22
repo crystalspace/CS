@@ -89,22 +89,7 @@
   <coercion from="position4_world" to="position4_camera" cost="4">
     <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
 	 verbatim -->
-    <input name="ModelView" type="float4x4" default="complex"
-	private="yes">
-      <block location="vertexIn">
-	<uniform type="float4x4" name="ModelView" binding="state.matrix.modelview" />
-      </block>
-      <block location="fragmentIn">
-	<uniform type="float4x4" name="ModelView" binding="state.matrix.modelview" />
-      </block>
-      
-      <block location="vertexMain">
-	ModelView = vertexIn.ModelView;
-      </block>
-      <block location="fragmentMain">
-	ModelView = fragmentIn.ModelView;
-      </block>
-    </input>
+    <input file="/shader/combiner-cg/ModelView.inp" private="yes" />
     
     <block location="vertexMain">
       output = mul (ModelView, input);
@@ -142,18 +127,13 @@
   <coercion from="direction_world" to="direction_camera" cost="3">
     <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
 	 verbatim -->
-    <input name="ModelView" type="float4x4" default="complex"
-	private="yes">
-      <block location="vertexIn">
-	<uniform type="float4x4" name="ModelView" binding="state.matrix.modelview" />
-      </block>
-      
-      <block location="vertexMain">
-	ModelView = vertexIn.ModelView;
-      </block>
-    </input>
+    <input file="/shader/combiner-cg/ModelView.inp" private="yes" />
     
     <block location="vertexMain">
+      output = mul (ModelView, float4 (input, 0)).xyz;
+    </block>
+    
+    <block location="fragmentMain">
       output = mul (ModelView, float4 (input, 0)).xyz;
     </block>
   </coercion>
@@ -175,6 +155,46 @@
     
     <block location="vertexMain">
       output = mul (ModelViewIT, float4 (input, 0)).xyz;
+    </block>
+  </coercion>
+  
+  <coercion from="direction_tangent" to="direction_object" cost="3">
+    <input file="/shader/combiner-cg/Normal.inp" private="yes" />
+    <input file="/shader/combiner-cg/Tangent.inp" private="yes" />
+    <input file="/shader/combiner-cg/Bitangent.inp" private="yes" />
+    
+    <block location="vertexMain">
+      float3x3 obj2tang;
+      obj2tang[0] = Tangent;
+      obj2tang[1] = Bitangent;
+      obj2tang[2] = Normal;
+      /* NOTE: This assumes the Normal/Tangent/Bitangent are orthonormal.
+      Only then we the transposed matrix is conveniently equal to the
+      inverse. Lastly, multiplying with the matrix on theright is the same
+      as multiplying with the transpose on the left. */
+      output = mul (input, obj2tang);
+    </block>
+    
+    <block location="fragmentMain">
+      float3x3 obj2tang;
+      obj2tang[0] = Tangent;
+      obj2tang[1] = Bitangent;
+      obj2tang[2] = Normal;
+      output = mul (input, obj2tang);
+    </block>
+  </coercion>
+  
+  <coercion from="direction_object" to="direction_camera" cost="3">
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input file="/shader/combiner-cg/ModelView.inp" private="yes" />
+    
+    <block location="vertexMain">
+      output = mul (ModelView, float4 (input, 0)).xyz;
+    </block>
+    
+    <block location="fragmentMain">
+      output = mul (ModelView, float4 (input, 0)).xyz;
     </block>
   </coercion>
   
@@ -281,24 +301,7 @@
   <coercion from="normal_object" to="normal_camera" cost="3">
     <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
 	 verbatim -->
-    <input name="ModelView" type="float4x4" default="complex"
-	private="yes">
-      <block location="vertexIn">
-	<uniform type="float4x4" name="ModelView" binding="state.matrix.modelview" />
-      </block>
-      
-      <block location="fragmentIn">
-	<uniform type="float4x4" name="ModelView" binding="state.matrix.modelview" />
-      </block>
-      
-      <block location="vertexMain">
-	ModelView = vertexIn.ModelView;
-      </block>
-      
-      <block location="fragmentMain">
-	ModelView = fragmentIn.ModelView;
-      </block>
-    </input>
+    <input file="/shader/combiner-cg/ModelView.inp" private="yes" />
     
     <block location="vertexMain">
       output = mul (ModelView, float4 (input, 0)).xyz;
