@@ -7572,19 +7572,19 @@
   <!--extension name="GLX_ARB_framebuffer_sRGB" type="GLX">
     <token name="GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB" value="0x20B2" />
   </extension-->
-  <extension name="WGL_ARB_framebuffer_sRGB" type="GLX">
+  <extension name="WGL_ARB_framebuffer_sRGB" type="WGL">
     <token name="WGL_FRAMEBUFFER_SRGB_CAPABLE_ARB" value="0x20A9" />
   </extension>
   <extension name="GL_ARB_draw_instanced" type="GL">
     <function name="glDrawArraysInstancedARB" return="GLvoid" pointer="false">
       <arg name="mode" type="GLenum" const="false" pointer="false" />
       <arg name="first" type="GLint" const="false" pointer="false" />
-      <arg name="count" type="GLsize" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
       <arg name="primcount" type="GLsizei" const="false" pointer="false" />
     </function>
     <function name="glDrawElementsInstancedARB" return="GLvoid" pointer="false">
       <arg name="mode" type="GLenum" const="false" pointer="false" />
-      <arg name="count" type="GLsize" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
       <arg name="type" type="GLenum" const="false" pointer="false" />
       <arg name="indices" type="GLvoid" const="true" pointer="true" />
       <arg name="primcount" type="GLsizei" const="false" pointer="false" />
