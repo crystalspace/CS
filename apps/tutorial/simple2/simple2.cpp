@@ -32,7 +32,7 @@ Simple::~Simple ()
 {
 }
 
-void Simple::ProcessFrame ()
+void Simple::Frame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -95,13 +95,6 @@ void Simple::ProcessFrame ()
   view->Draw ();
 }
 
-void Simple::FinishFrame ()
-{
-  // Just tell the 3D renderer that everything has been rendered.
-  g3d->FinishDraw ();
-  g3d->Print (0);
-}
-
 bool Simple::OnKeyboard(iEvent& ev)
 {
   // We got a keyboard event.
@@ -158,6 +151,7 @@ bool Simple::OnInitialize(int /*argc*/, char* /*argv*/ [])
 
 void Simple::OnExit()
 {
+  printer.Invalidate ();
 }
 
 bool Simple::Application()
@@ -223,6 +217,8 @@ bool Simple::SetupModules()
   // Now we need to position the camera in our world.
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
+
+  printer.AttachNew (new FramePrinter (object_reg));
 
   return true;
 }

@@ -35,6 +35,7 @@ struct iObjectRegistry;
 struct iEvent;
 struct iSector;
 struct iView;
+class FramePrinter;
 
 class Simple : public wxFrame
 {
@@ -47,6 +48,7 @@ private:
   csRef<iVirtualClock> vc;
   csRef<iView> view;
   iSector* room;
+  csRef<FramePrinter> printer;
 
   float rotY;
   float rotX;
@@ -54,7 +56,6 @@ private:
   static bool SimpleEventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);
   void SetupFrame ();
-  void FinishFrame ();
 
   CS_DECLARE_EVENT_SHORTCUTS;
   csEventID MouseDown;
@@ -70,6 +71,7 @@ public:
   void PushFrame ();
   void OnIconize(wxIconizeEvent& event);
   void OnShow(wxShowEvent& event);
+  void Shutdown () { printer.Invalidate (); }
 
   DECLARE_EVENT_TABLE()
 };

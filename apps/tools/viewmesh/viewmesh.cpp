@@ -90,7 +90,7 @@ ViewMesh::~ViewMesh ()
 #endif
 }
 
-void ViewMesh::ProcessFrame()
+void ViewMesh::Frame()
 {
   csTicks elapsed_time = vc->GetElapsedTicks ();
   float speed = (elapsed_time / 1000.0) * (0.06 * 20);
@@ -236,12 +236,6 @@ void ViewMesh::ProcessFrame()
     return;
 
   cegui->Render();
-}
-
-void ViewMesh::FinishFrame ()
-{
-  g3d->FinishDraw ();
-  g3d->Print (0);
 }
 
 void ViewMesh::ResetCamera()
@@ -499,6 +493,7 @@ bool ViewMesh::OnInitialize(int /*argc*/, char* /*argv*/ [])
 
 void ViewMesh::OnExit()
 {
+  printer.Invalidate ();
 }
 
 bool ViewMesh::Application()
@@ -580,6 +575,8 @@ bool ViewMesh::Application()
 
   x = g3d->GetDriver2D ()->GetWidth ();
   y = g3d->GetDriver2D ()->GetHeight ();
+
+  printer.AttachNew (new FramePrinter (object_reg));
 
   Run();
 

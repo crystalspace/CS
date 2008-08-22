@@ -28,6 +28,7 @@
 #include "csutil/cmdhelp.h"
 #include "csutil/cscolor.h"
 #include "csutil/event.h"
+#include "csutil/common_handlers.h"
 #include "csutil/sysfunc.h"
 #include "iengine/camera.h"
 #include "iengine/engine.h"
@@ -196,12 +197,6 @@ void csWaterDemo::SetupFrame ()
     stop=false;
 }
 
-void csWaterDemo::FinishFrame ()
-{
-  r3d->FinishDraw();
-  r3d->Print (0);
-}
-
 bool csWaterDemo::HandleEvent (iEvent& ev)
 {
   if (ev.Name == FocusGained)
@@ -219,14 +214,9 @@ bool csWaterDemo::HandleEvent (iEvent& ev)
     CS_ASSERT(hasfocus == false);
     r3d->GetDriver2D()->SetMouseCursor (csmcArrow);
   }
-  else if (ev.Name == Process)
+  else if (ev.Name == Frame)
   {
     waterdemo->SetupFrame ();
-    return true;
-  }
-  else if (ev.Name == FinalProcess)
-  {
-    waterdemo->FinishFrame ();
     return true;
   }
   else if (ev.Name == KeyboardDown)
@@ -310,8 +300,7 @@ bool csWaterDemo::Initialize ()
 
   FocusGained = csevFocusGained (object_reg);
   FocusLost = csevFocusLost (object_reg);
-  Process = csevProcess (object_reg);
-  FinalProcess = csevFinalProcess (object_reg);
+  Frame = csevFrame (object_reg);
   KeyboardDown = csevKeyboardDown (object_reg);
 
   if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
@@ -622,6 +611,8 @@ bool csWaterDemo::Initialize ()
   int w = r3d->GetDriver2D ()->GetWidth()/2;
   int h = r3d->GetDriver2D ()->GetHeight()/2;
   r3d->GetDriver2D ()->SetMousePosition (w, h);
+
+  printer.AttachNew (new FramePrinter (object_reg));
 
   return true;
 }
