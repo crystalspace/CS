@@ -1,0 +1,11 @@
+SubDir TOP scripts msi ;
+
+# @@@ Not quite the same ...
+MSM_VERSION ?= $(PACKAGE_VERSION) ;
+
+# Architecture-independent
+MSIMergeModule CS.doc : doc-manual doc-api : $(MSM_VERSION) : doc-manual:manual doc-api:api ;
+MSIMergeModule CS.data : data-demo data-demo-maps data-runtime data-tool : $(MSM_VERSION) ;
+MSIMergeModule CS.include : headers : $(MSM_VERSION) ;
+MSIMergeModule CS.vfs : vfs : $(MSM_VERSION) ;
+
