@@ -73,8 +73,6 @@ CSLIGHT.PLUGINLIST =
   stdrep
   bruteblock
   terrainldr
-  thing
-  thingldr
   xmlread
   xmlshader
   ;
