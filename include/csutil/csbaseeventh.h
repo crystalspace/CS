@@ -64,10 +64,10 @@ protected:
   iObjectRegistry *object_registry;
   csHandlerID self;
   csEventID FrameEvent;
-  csEventID PreProcess;
-  csEventID Process;
-  csEventID PostProcess;
-  csEventID FinalProcess;
+  CS_DEPRECATED_VAR(csEventID PreProcess);
+  CS_DEPRECATED_VAR(csEventID Process);
+  CS_DEPRECATED_VAR(csEventID PostProcess);
+  CS_DEPRECATED_VAR(csEventID FinalProcess);
 
   /**
    * Actual iEventHandler implementation.
@@ -312,16 +312,16 @@ protected:
   virtual void Frame ();
 
   /// Invoked by the handler during a pre-process frame broadcast event.
-  virtual void PreProcessFrame ();
+  CS_DEPRECATED_METHOD virtual void PreProcessFrame ();
 
   /// Invoked by the handler during a process frame broadcast event.
-  virtual void ProcessFrame ();
+  CS_DEPRECATED_METHOD virtual void ProcessFrame ();
 
   /// Invoked by the handler during a post-process frame broadcast event.
-  virtual void PostProcessFrame ();
+  CS_DEPRECATED_METHOD virtual void PostProcessFrame ();
 
   /// Invoked by the handler during a finish frame broadcast event.
-  virtual void FinishFrame ();
+  CS_DEPRECATED_METHOD virtual void FinishFrame ();
 };
 
 /** @} */

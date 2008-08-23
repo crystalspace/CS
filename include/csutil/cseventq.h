@@ -221,10 +221,12 @@ public:
   virtual bool IsEmpty () { return evqHead == evqTail; }
 
   csEventID Frame;
-  csEventID PreProcess;
-  csEventID ProcessEvent;
-  csEventID PostProcess;
-  csEventID FinalProcess;
+  CS_DEPRECATED_VAR(csEventID PreProcess);
+  CS_DEPRECATED_VAR(csEventID ProcessEvent);
+  CS_DEPRECATED_VAR(csEventID PostProcess);
+  CS_DEPRECATED_VAR(csEventID FinalProcess);
+
+#include "csutil/deprecated_warn_off.h"
 
   /**
    * As a transitional measure, the csevPreProcess, csevProcess,

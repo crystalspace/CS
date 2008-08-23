@@ -468,15 +468,19 @@ static inline csEventID csevCanvasOp (
  * Should be replaced with subscriptions to csevFrame with subscription 
  * ordering.
  */
-CS_CRYSTALSPACE_EXPORT csEventID csevPreProcess(iObjectRegistry *reg);
-CS_CRYSTALSPACE_EXPORT csEventID csevPreProcess(iEventNameRegistry *reg);
+CS_CRYSTALSPACE_EXPORT CS_DEPRECATED_METHOD 
+  csEventID csevPreProcess(iObjectRegistry *reg);
+CS_CRYSTALSPACE_EXPORT CS_DEPRECATED_METHOD 
+  csEventID csevPreProcess(iEventNameRegistry *reg);
 
 /**
  * Broadcasted every frame.
  * This event will go away soon, replaced by csevFrame.
  */
-CS_CRYSTALSPACE_EXPORT csEventID csevProcess(iObjectRegistry *reg);
-CS_CRYSTALSPACE_EXPORT csEventID csevProcess(iEventNameRegistry *reg);
+CS_CRYSTALSPACE_EXPORT CS_DEPRECATED_METHOD 
+  csEventID csevProcess(iObjectRegistry *reg);
+CS_CRYSTALSPACE_EXPORT CS_DEPRECATED_METHOD 
+  csEventID csevProcess(iEventNameRegistry *reg);
 
 /**
  * Broadcasted after csevProcess on every frame.
@@ -485,8 +489,10 @@ CS_CRYSTALSPACE_EXPORT csEventID csevProcess(iEventNameRegistry *reg);
  * Should be replaced with subscriptions to csevFrame with subscription 
  * ordering.
  */
-CS_CRYSTALSPACE_EXPORT csEventID csevPostProcess(iObjectRegistry *reg);
-CS_CRYSTALSPACE_EXPORT csEventID csevPostProcess(iEventNameRegistry *reg);
+CS_CRYSTALSPACE_EXPORT CS_DEPRECATED_METHOD
+  csEventID csevPostProcess(iObjectRegistry *reg);
+CS_CRYSTALSPACE_EXPORT CS_DEPRECATED_METHOD 
+  csEventID csevPostProcess(iEventNameRegistry *reg);
 
 /**
  * Broadcasted after csevPostProcess on every frame.
@@ -495,8 +501,10 @@ CS_CRYSTALSPACE_EXPORT csEventID csevPostProcess(iEventNameRegistry *reg);
  * Should be replaced with subscriptions to csevFrame with subscription 
  * ordering.
  */
-CS_CRYSTALSPACE_EXPORT csEventID csevFinalProcess(iObjectRegistry *reg);
-CS_CRYSTALSPACE_EXPORT csEventID csevFinalProcess(iEventNameRegistry *reg);
+CS_CRYSTALSPACE_EXPORT CS_DEPRECATED_METHOD 
+  csEventID csevFinalProcess(iObjectRegistry *reg);
+CS_CRYSTALSPACE_EXPORT CS_DEPRECATED_METHOD 
+  csEventID csevFinalProcess(iEventNameRegistry *reg);
 
 /** @} */
 
