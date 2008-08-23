@@ -185,20 +185,7 @@ static bool SimpleEventHandler (iEvent& ev)
 {
   if (simple)
   {
-    if (ev.Name == csevProcess(simple->object_reg))
-    {
-      simple->SetupFrame ();
-      return true;
-    }
-    else if (ev.Name == csevFinalProcess(simple->object_reg))
-    {
-      simple->FinishFrame ();
-      return true;
-    }
-    else
-    {
-      return simple->HandleEvent (ev);
-    }
+    return simple->HandleEvent (ev);
   }
   else
     return false;
@@ -223,8 +210,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  Process = csevProcess (object_reg);
-  FinalProcess = csevFinalProcess (object_reg);
+  Frame = csevFrame (object_reg);
   KeyboardDown = csevKeyboardDown (object_reg);
 
   if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
@@ -398,12 +384,19 @@ bool Simple::Initialize ()
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
+  printer.AttachNew (new FramePrinter (object_reg));
+
   return true;
 }
 
 bool Simple::HandleEvent (iEvent& Event)
 {
-  if ((Event.Name == csevKeyboardDown(object_reg)) && 
+  if (Event.Name == Frame)
+  {
+    DrawFrame ();
+    return true;
+  }
+  else if ((Event.Name == csevKeyboardDown(object_reg)) && 
     (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
   {
     csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
@@ -421,7 +414,7 @@ bool Simple::HandleEvent (iEvent& Event)
   return false;
 }
 
-void Simple::SetupFrame ()
+void Simple::DrawFrame ()
 {
   // First get elapsed time from the system driver.
   csTicks elapsed_time, current_time;
@@ -454,12 +447,9 @@ void Simple::SetupFrame ()
 
   // Tell the camera to render into the frame buffer.
   view->Draw ();
-}
 
-void Simple::FinishFrame ()
-{
   g3d->FinishDraw ();
-  
+
   g3d->BeginDraw(CSDRAW_2DGRAPHICS);
   int fontHeight = font->GetTextHeight();
   int y = g3d->GetDriver2D()->GetHeight() - fontHeight;
@@ -472,13 +462,16 @@ void Simple::FinishFrame ()
     csString().Format ("current target: %s",
     ProcTexture->GetCurrentTarget()));
   g3d->FinishDraw ();
-  
-  g3d->Print (0);
 }
 
 void Simple::Start ()
 {
   csDefaultRunLoop(object_reg);
+}
+
+void Simple::Stop ()
+{
+  printer.Invalidate ();
 }
 
 /*---------------------------------------------------------------------*
@@ -498,6 +491,7 @@ int main (int argc, char* argv[])
   if (simple->Initialize ())
     simple->Start ();
 
+  simple->Stop ();
   delete simple; simple = 0;
 
   csInitializer::DestroyApplication (object_reg);

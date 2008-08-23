@@ -31,9 +31,8 @@ public:
   csRef<iGraphics3D> myG3D;
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
+  csRef<FramePrinter> printer;
 
-  csEventID Process;
-  csEventID FinalProcess;
   csEventID KeyboardDown;
 
 public:
@@ -41,11 +40,11 @@ public:
   ~PySimple ();
 
   bool OnInitialize (int argc, char* argv[]);
+  void OnExit ();
   bool Application ();
   void OnCommandLineHelp ();
 
-  void ProcessFrame ();
-  void FinishFrame ();
+  void Frame ();
   bool OnKeyboard (iEvent&);
 };
 

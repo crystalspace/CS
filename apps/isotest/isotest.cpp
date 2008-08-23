@@ -23,6 +23,7 @@
 #include "csutil/cmdhelp.h"
 #include "csutil/cscolor.h"
 #include "csutil/event.h"
+#include "csutil/common_handlers.h"
 #include "csutil/sysfunc.h"
 #include "iengine/camera.h"
 #include "iengine/campos.h"
@@ -79,7 +80,7 @@ IsoTest::~IsoTest ()
 {
 }
 
-void IsoTest::SetupFrame ()
+void IsoTest::DrawFrame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -213,22 +214,11 @@ void IsoTest::SetupFrame ()
     "   tab key: cycle through camera presets");
 }
 
-void IsoTest::FinishFrame ()
-{
-  g3d->FinishDraw ();
-  g3d->Print (0);
-}
-
 bool IsoTest::HandleEvent (iEvent& ev)
 {
-  if (ev.Name == Process)
+  if (ev.Name == Frame)
   {
-    isotest->SetupFrame ();
-    return true;
-  }
-  else if (ev.Name == FinalProcess)
-  {
-    isotest->FinishFrame ();
+    isotest->DrawFrame ();
     return true;
   }
   else if (ev.Name == KeyboardDown)
@@ -419,13 +409,11 @@ bool IsoTest::Initialize ()
     return false;
   }
 
-  Process = csevProcess (object_reg);
-  FinalProcess = csevFinalProcess (object_reg);
+  Frame = csevFrame (object_reg);
   KeyboardDown = csevKeyboardDown (object_reg);
 
   const csEventID evs[] = {
-    Process,
-    FinalProcess,
+    Frame,
     KeyboardDown,
     CS_EVENTLIST_END
   };
@@ -513,12 +501,19 @@ bool IsoTest::Initialize ()
   if (!CreateActor ()) return false;
   engine->Prepare ();
 
+  printer.AttachNew (new FramePrinter (object_reg));
+
   return true;
 }
 
 void IsoTest::Start ()
 {
   csDefaultRunLoop (object_reg);
+}
+
+void IsoTest::Stop()
+{
+  printer.Invalidate();
 }
 
 /*---------------------------------------------------------------------*
@@ -532,6 +527,8 @@ int main (int argc, char* argv[])
 
   if (isotest->Initialize ())
     isotest->Start ();
+
+  isotest->Stop ();
 
   delete isotest;
   isotest = 0;

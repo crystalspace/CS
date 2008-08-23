@@ -56,14 +56,17 @@ bool PySimple::OnInitialize (int /*argc*/, char* /*argv*/[])
     csevAllEvents (GetObjectRegistry())))
     return ReportError("Failed to set up event handler!");
 
-  Process = csevProcess (GetObjectRegistry());
-  FinalProcess = csevFinalProcess (GetObjectRegistry());
   KeyboardDown = csevKeyboardDown (GetObjectRegistry());
 
   return true;
 }
 
-bool PySimple::Application()
+void PySimple::OnExit ()
+{
+  printer.Invalidate ();
+}
+
+bool PySimple::Application ()
 {
   vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
 
@@ -159,6 +162,8 @@ bool PySimple::Application()
   iGraphics2D* g2d = myG3D->GetDriver2D ();
   view->SetRectangle (2, 2, g2d->GetWidth () - 4, g2d->GetHeight () - 4);
 
+  printer.AttachNew (new FramePrinter (GetObjectRegistry ()));
+
   Run ();
 
   return true;
@@ -176,7 +181,7 @@ void PySimple::OnCommandLineHelp ()
 	   "by PYTHONPATH).\n\n");
 }
 
-void PySimple::ProcessFrame ()
+void PySimple::Frame ()
 {
   csTicks elapsed_time, current_time;
   elapsed_time = vc->GetElapsedTicks ();
@@ -203,14 +208,6 @@ void PySimple::ProcessFrame ()
 
   if (view)
     view->Draw ();
-}
-
-void PySimple::FinishFrame ()
-{
-  // Drawing code ends here.
-  myG3D->FinishDraw ();
-  // Print the final output.
-  myG3D->Print (0);
 }
 
 bool PySimple::OnKeyboard (iEvent& Event)

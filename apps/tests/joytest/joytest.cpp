@@ -24,6 +24,7 @@
 #include "csutil/cmdhelp.h"
 #include "csutil/cscolor.h"
 #include "csutil/event.h"
+#include "csutil/common_handlers.h"
 #include "csutil/sysfunc.h"
 #include "iengine/camera.h"
 #include "iengine/engine.h"
@@ -73,7 +74,7 @@ Simple::~Simple ()
 {
 }
 
-void Simple::SetupFrame ()
+void Simple::DrawFrame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -118,23 +119,12 @@ void Simple::SetupFrame ()
   view->Draw ();
 }
 
-void Simple::FinishFrame ()
-{
-  g3d->FinishDraw ();
-  g3d->Print (0);
-}
-
 bool Simple::HandleEvent (iEvent& ev)
 {
 
-  if (ev.Name == Process)
+  if (ev.Name == Frame)
   {
-    simple->SetupFrame ();
-    return true;
-  }
-  else if (ev.Name == FinalProcess)
-  {
-    simple->FinishFrame ();
+    simple->DrawFrame ();
     return true;
   }
   else if ((ev.Name == KeyboardDown) &&
@@ -176,13 +166,11 @@ bool Simple::Initialize ()
     return false;
   }
 
-  Process = csevProcess (object_reg);
-  FinalProcess = csevFinalProcess (object_reg);
+  Frame = csevFrame (object_reg);
   KeyboardDown = csevKeyboardDown (object_reg);
 
   csEventID events[] = {
-    Process,
-    FinalProcess,
+    Frame,
     KeyboardDown,
     CS_EVENTLIST_END
   };
@@ -382,12 +370,19 @@ bool Simple::Initialize ()
   sprite->SetZBufMode (CS_ZBUF_USE);
   sprite->SetRenderPriority (engine->GetObjectRenderPriority ());
 
+  printer.AttachNew (new FramePrinter (object_reg));
+
   return true;
 }
 
 void Simple::Start ()
 {
   csDefaultRunLoop (object_reg);
+}
+
+void Simple::Stop ()
+{
+  printer.Invalidate ();
 }
 
 /*---------------------------------------------------------------------*
@@ -400,6 +395,7 @@ int main (int argc, char* argv[])
   simple = new Simple (object_reg);
   if (simple->Initialize ())
     simple->Start ();
+  simple->Stop ();
   delete simple;
   simple = 0;
 

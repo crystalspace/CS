@@ -59,8 +59,7 @@ class Simple
 {
 public:
   iObjectRegistry* object_reg;
-  csEventID Process;
-  csEventID FinalProcess;
+  csEventID Frame;
   csEventID KeyboardDown;
 
 private:
@@ -75,6 +74,7 @@ private:
   csRef<iMeshWrapper> genmesh;
   csRef<iGeneralFactoryState> factstate;
   csRef<iFont> font;
+  csRef<FramePrinter> printer;
 
   void CreatePolygon (iGeneralFactoryState *th, int v1, int v2, int v3, int v4);
 
@@ -92,9 +92,9 @@ public:
 
   bool Initialize ();
   void Start ();
+  void Stop ();
   bool HandleEvent (iEvent&);
-  void SetupFrame ();
-  void FinishFrame ();
+  void DrawFrame ();
 };
 
 #endif // __SIMPLEPT_H__

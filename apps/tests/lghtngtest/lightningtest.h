@@ -33,6 +33,8 @@ struct iEvent;
 struct iSector;
 struct iView;
 
+class FramePrinter;
+
 class Simple
 {
 private:
@@ -45,15 +47,14 @@ private:
   csRef<iView> view;
   csRef<iPluginManager> PluginManager;
   iSector* room;
+  csRef<FramePrinter> printer;
 
-  csEventID Process;
-  csEventID FinalProcess;
+  csEventID Frame;
   csEventID KeyboardDown;
 
   static bool SimpleEventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);
-  void SetupFrame ();
-  void FinishFrame ();
+  void DrawFrame ();
 
 public:
   Simple (iObjectRegistry* object_reg);
@@ -61,6 +62,7 @@ public:
 
   bool Initialize ();
   void Start ();
+  void Stop ();
 };
 
 #endif // __LIGHTNINGTEST_H__

@@ -37,6 +37,7 @@ struct iMeshWrapper;
 struct iLight;
 struct iCamera;
 struct iFont;
+class FramePrinter;
 
 /**
  * Capture an isometric camera viewpoint.
@@ -75,9 +76,9 @@ private:
   iMeshWrapper* plane;
   csRef<iLight> actor_light;
   csRef<iFont> font;
+  csRef<FramePrinter> printer;
 
-  csEventID Process;
-  csEventID FinalProcess;
+  csEventID Frame;
   csEventID KeyboardDown;
 
   int current_view;
@@ -87,8 +88,7 @@ private:
 
   static bool IsoTestEventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);
-  void SetupFrame ();
-  void FinishFrame ();
+  void DrawFrame ();
 
   bool CreateActor ();
   bool LoadMap ();
@@ -105,6 +105,7 @@ public:
 
   bool Initialize ();
   void Start ();
+  void Stop ();
 };
 
 #endif // __ISOTEST_H__

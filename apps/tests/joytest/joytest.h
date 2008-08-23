@@ -33,12 +33,13 @@ struct iEvent;
 struct iSector;
 struct iView;
 
+class FramePrinter;
+
 class Simple
 {
 private:
   iObjectRegistry* object_reg;
-  csEventID Process;
-  csEventID FinalProcess;
+  csEventID Frame;
   csEventID KeyboardDown;
 
   csRef<iEngine> engine;
@@ -49,18 +50,19 @@ private:
   csRef<iVirtualClock> vc;
   csRef<iView> view;
   iSector* room;
+  csRef<FramePrinter> printer;
 
   static bool SimpleEventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);
-  void SetupFrame ();
-  void FinishFrame ();
-
+  void DrawFrame ();
+  
 public:
   Simple (iObjectRegistry* object_reg);
   ~Simple ();
 
   bool Initialize ();
   void Start ();
+  void Stop ();
 };
 
 #endif // __SIMPLE2_H__

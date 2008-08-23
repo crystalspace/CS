@@ -27,8 +27,7 @@ class Simple
 private:
   iObjectRegistry* object_reg;
 
-  csEventID Process;
-  csEventID FinalProcess;
+  csEventID Frame;
   csEventID KeyboardDown;
 
   csRef<iEngine> engine;
@@ -39,6 +38,7 @@ private:
   iSector* room;
   csRef<iView> view;
   csRef<iCollideSystem> cdsys;
+  csRef<FramePrinter> printer;
 
   csRef<iMeshWrapper> parent_sprite;
   float rot1_direction;
@@ -50,8 +50,7 @@ private:
 
   static bool SimpleEventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);
-  void SetupFrame ();
-  void FinishFrame ();
+  void DrawFrame ();
   iCollider* InitCollider (iMeshWrapper* mesh);
 
 public:
@@ -60,6 +59,7 @@ public:
 
   bool Initialize (iObjectRegistry* object_reg);
   void Start ();
+  void Stop ();
 };
 
 #endif // __SIMPCD_H__

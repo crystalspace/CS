@@ -38,7 +38,7 @@ Simple::~Simple ()
 {
 }
 
-void Simple::SetupFrame ()
+void Simple::DrawFrame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -116,22 +116,11 @@ void Simple::SetupFrame ()
   view->Draw ();
 }
 
-void Simple::FinishFrame ()
-{
-  g3d->FinishDraw ();
-  g3d->Print (0);
-}
-
 bool Simple::HandleEvent (iEvent& ev)
 {
-  if (ev.Name == csevProcess (object_reg))
+  if (ev.Name == Frame)
   {
-    simple->SetupFrame ();
-    return true;
-  }
-  else if (ev.Name == csevFinalProcess (object_reg))
-  {
-    simple->FinishFrame ();
+    simple->DrawFrame ();
     return true;
   }
   else if ((ev.Name == csevKeyboardDown (object_reg)) && 
@@ -194,8 +183,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
     return false;
   }
 
-  Process = csevProcess (object_reg);
-  FinalProcess = csevFinalProcess (object_reg);
+  Frame = csevFrame (object_reg);
   KeyboardDown = csevKeyboardDown (object_reg);
 
   if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
@@ -404,12 +392,19 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
   sprite2_col = InitCollider (sprite2);
   if (!sprite2_col) return false;
 
+  printer.AttachNew (new FramePrinter (object_reg));
+
   return true;
 }
 
 void Simple::Start ()
 {
   csDefaultRunLoop (object_reg);
+}
+
+void Simple::Stop ()
+{
+  printer.Invalidate ();
 }
 
 /*---------------------------------------------------------------------*
@@ -425,6 +420,7 @@ int main (int argc, char* argv[])
   if (simple->Initialize (object_reg))
     simple->Start ();
 
+  simple->Stop ();
   delete simple;
   simple = 0;
 
