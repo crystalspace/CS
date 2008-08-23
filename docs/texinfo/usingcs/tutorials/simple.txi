@@ -101,9 +101,9 @@ private:
   csRef<iGraphics3D> g3d;
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
-
-  void ProcessFrame ();
-  void FinishFrame ();
+  csRef<iRenderManager> rm;
+  
+  csRef<FramePrinter> printer;
 
 public:
   Simple ();
@@ -113,9 +113,12 @@ public:
   bool OnInitialize (int argc, char* argv[]);
 
   bool Application ();
+  
+  void Frame ();
+  
+  bool SetupModules ();
 
-  CS_EVENTHANDLER_NAMES("application.simple1")
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
+  CS_EVENTHANDLER_PHASE_LOGIC("application.simple1")
 @};
 
 #endif // __SIMPLE1_H__
@@ -132,12 +135,11 @@ Note that we use smart pointers (@code{csRef<>}) for several of those
 references. That makes it easier to manage reference counting. We let
 the smart pointer take care of this for us.
 
-The event handler macros are used because our tutorial application also
+The event handler macro is used because our tutorial application also
 needs to be an event handler (it inherits from @code{csBaseEventHandler} for
-that). The two macros indicate the name of this event handler and also the
-desired priority mechanism. In this case we use
-@code{CS_EVENTHANDLER_NIL_CONSTRAINTS} which means that we don't care about
-the order in which our events arrive (relative to other modules in CS).
+that). The macro indicates the name of this event handler and specifies that
+the application wants to handle the frame event in the first (or 'logic')
+phase.
 
 In the source file @file{simple.cpp} we place the following:
 
@@ -155,11 +157,7 @@ Simple::~Simple ()
 @{
 @}
 
-void Simple::ProcessFrame ()
-@{
-@}
-
-void Simple::FinishFrame ()
+void Simple::Frame ()
 @{
 @}
 
@@ -178,7 +176,12 @@ bool Simple::OnInitialize(int argc, char* argv[])
     return ReportError("Failed to initialize plugins!");
 
   csBaseEventHandler::Initialize(GetObjectRegistry());
-  if (!RegisterQueue(GetObjectRegistry(), csevAllEvents(GetObjectRegistry())))
+  csEventID events[] = @{
+    csevFrame (GetObjectRegistry()),
+    csevKeyboardEvent (GetObjectRegistry()),
+    CS_EVENTLIST_END
+  @};
+  if (!RegisterQueue(GetObjectRegistry(), events))
     return ReportError("Failed to set up event handler!");
 
   return true;
@@ -193,6 +196,16 @@ bool Simple::Application()
   if (!OpenApplication(GetObjectRegistry()))
     return ReportError("Error opening system!");
 
+  if (SetupModules())
+  @{
+    Run();
+  @}
+
+  return true;
+@}
+
+bool Simple::SetupModules ()
+@{
   g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
   if (!g3d) return ReportError("Failed to locate 3D renderer!");
 
@@ -207,8 +220,6 @@ bool Simple::Application()
 
   loader = csQueryRegistry<iLoader> (GetObjectRegistry());
   if (!loader) return ReportError("Failed to locate Loader!");
-
-  Run();
 
   return true;
 @}
@@ -241,10 +252,6 @@ for that window with command-line options (@samp{-video} and @samp{-mode}
 command-line options).
 
 @item
-It will give command-line help when you use the @samp{-help} command-line
-option.
-
-@item
 It has the following plugins initialized and ready to use: engine, 3D
 renderer, canvas, reporter, reporter listener, font server, image loader,
 map loader, and @sc{vfs}.
@@ -273,7 +280,7 @@ listening to the event queue.  One of the plugins that listens for this is
 the 3D renderer which will then open its window (or enable graphics
 on a non-windowing operating system).
 
-After that, we query the object registry to locate all the
+After that, we call @code{Simple::SetupModules()} to locate all the
 common objects that we will need later, and store references to them
 in our main class. Because we use @code{csRef<>} or smart pointers,
 we don't have to worry about invoking @code{IncRef()} and @code{DecRef()}
@@ -345,9 +352,7 @@ sector and a function @code{CreateRoom()} to the @samp{Simple} class
 header file:
 
 @example
-@dots{}
-struct iSector;
-@dots{}
+
 class Simple
 @{
 private:
@@ -363,7 +368,7 @@ Now add these chunks of code (texture manager, room, lights) to
 @file{simple.cpp}:
 
 @example
-bool Simple::Application ()
+bool Simple::SetupModules ()
 @{
   @dots{}
   // First disable the lighting cache. Our app is simple enough
@@ -374,19 +379,30 @@ bool Simple::Application ()
   rotY = rotX = 0;
   @dots{}
   CreateRoom ()
+  
+  engine->Prepare ();
+  rm = engine->GetRenderManager();
   @dots{}
 @}
 @dots{}
 void Simple::CreateRoom ()
 @{
-  // Load the texture from the standard library.  This is located in
-  // CS/data/standard.zip and mounted as /lib/std using the Virtual
-  // File System (VFS) plugin.
-  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-    ReportError("Error loading 'stone4' texture!");
+  if (!loader->LoadTexture ("brick", "/lib/std/castle/brick1_d.jpg"))
+    ReportError("Error loading 'brick1_d' texture!");
 
-  iMaterialWrapper* tm =
-    engine->GetMaterialList ()->FindByName ("stone");
+  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("brick");
+  
+  @{
+    csRef<iShaderVarStringSet> svStrings =
+      csQueryRegistryTagInterface<iShaderVarStringSet> (GetObjectRegistry(),
+        "crystalspace.shader.variablenameset");
+    csRef<iTextureHandle> normalMap = loader->LoadTexture (
+      "/lib/std/castle/brick1_n.jpg");
+    normalMap->SetTextureClass ("normalmap");
+    csShaderVariable* svNormalMap =
+      tm->GetMaterial()->GetVariableAdd (svStrings->Request ("tex normal"));
+    svNormalMap->SetValue (normalMap);
+  @}
 
   room = engine->CreateSector ("room");
 
@@ -421,22 +437,19 @@ void Simple::CreateRoom ()
   light = engine->CreateLight (0, csVector3 (0, 5, -3), 10,
         csColor (0, 1, 0));
   ll->Add (light);
-
-  engine->Prepare ();
 @}
 @end example
 
 This extra code first loads a texture with @code{LoadTexture()}.
 The first parameter is the name of the texture as it will be known in the
 engine; and the second is the
-actual filename on the @sc{vfs} volume (@pxref{VFS}).  Note, if you don't have
-the @file{stone4.gif} texture you can use another one.  The only requirement
-is that it must have sizes which are a power of 2 (e.g. 64x64); note that
-Crystal Space will scale them automatically if this requirement is not met
-but this can
-reduce quality. This function returns a @samp{iTextureWrapper} which we
+actual filename on the @sc{vfs} volume (@pxref{VFS}). This function returns
+a @samp{iTextureWrapper} which we
 don't use.  Instead we use the @samp{iMaterialWrapper} which is created
 automatically by @code{LoadTexture()}.
+
+The next block of code shows how to add a normal map to the texture we just
+loaded.
 
 Then, we create our room with @code{CreateSector()}.  This room will initially
 be empty.  A room in Crystal Space is represented by @samp{iSector} which is
@@ -555,16 +568,15 @@ private:
   @dots{}
   csRef<iView> view;
   @dots{}
-  void ProcessFrame ();
-  void FinishFrame ();
+  void Frame ();
   @dots{}
 @end example
 
 Then, edit @file{simple.cpp} and make the following changes at the end of
-our @code{Application()} function:
+our @code{SetupModules()} function:
 
 @example
-bool Simple::Application ()
+bool Simple::SetupModules ()
 @{
   @dots{}
   view.AttachNew(new csView (engine, g3d));
@@ -573,6 +585,8 @@ bool Simple::Application ()
   @dots{}
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
+  
+  printer.AttachNew (new FramePrinter (GetObjectRegistry ()));
 
   return true;
 @}
@@ -599,59 +613,20 @@ Crystal Space is event driven so the actual drawing needs to be triggered
 by the event handler. Add the following code somewhere in the source file:
 
 @example
-void Simple::ProcessFrame ()
+void Simple::Frame ()
 @{
-  // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw(
-    engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS))
-    return;
-
-  // Tell the camera to render into the frame buffer.
-  view->Draw ();
-@}
-
-void Simple::FinishFrame ()
-@{
-  g3d->FinishDraw ();
-  g3d->Print (0);
+  rm->RenderView (view);
 @}
 @end example
 
 Drawing the screen is done in two steps. First there is the part that
-is done in @code{ProcessFrame()}. Here, we will actually fill the display.
+is done in @code{Frame()}. Here, we will actually fill the display.
 In this case we let the engine do most of that work by calling
-@code{view->Draw()}. But, in principle, you can do any kind of drawing here.
+@code{rm->RenderView (view)}. But, in principle, you can do any kind of
+drawing here.
 
-In @code{ProcessFrame()} we first have to indicate to the 3D rasterizer that
-we want to start drawing 3D graphics.  This call makes sure that the
-needed buffers are set up and
-performs all necessary initialization. The engine often needs extra settings
-for this as well so you @emph{must} call @code{engine->GetBeginDrawFlags()} to
-get these flags and bitwise-or them with the ones that you want.
-
-The second part is in @code{FinishFrame()} where we actually dump the
-frame to the screen. The reason this is split is that other components
-(plugins) in Crystal Space may choose to listen to events and draw additional
-things on top of the 3D view rendered in @code{ProcessFrame()}. When a frame
-needs to be rendered, the Crystal Space framework will send four messages:
-
-@itemize @bullet
-@item
-@samp{csevPreProcess} is sent first. This allows plugins to preprocess
-things before drawing can happen.
-
-@item
-@samp{csevProcess} follows. In this pass the application will render.
-
-@item
-@samp{csevPostProcess} is after that. This is the pass that can be used
-by external components to render on top of the view rendered by the
-application.
-
-@item
-@samp{csevFinalProcess} is last. In this pass the application will display
-the frame on screen.
-@end itemize
+The @code{FramePrinter} instance we created earlier will take care of updating
+the display.
 
 Compile and run this example.  For the first time you should see something: A
 solid wall.  Congratulations, you have created your first almost useful
@@ -666,10 +641,10 @@ Crystal Space application.
 Staring at that solid wall gets a bit boring after some time.  The problem is
 that we can't move the camera to change our view point.  Let's add some code
 to do exactly this.  Edit @file{simple.cpp} again and change
-@file{ProcessFrame()} as follows:
+@file{Frame()} as follows:
 
 @example
-void Simple::ProcessFrame ()
+void Simple::Frame ()
 @{
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();

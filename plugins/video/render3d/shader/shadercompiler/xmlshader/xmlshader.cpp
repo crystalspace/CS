@@ -98,6 +98,7 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
     object_reg, "crystalspace.shader.variablenameset");
   
   string_mixmode_alpha = stringsSvName->Request ("mixmode alpha");
+  stringLightCount = stringsSvName->Request ("light count");
 
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
   vfs = csQueryRegistry<iVFS> (object_reg);
@@ -168,6 +169,34 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (
 
   csRef<iShader> ishader (shader);
   return csPtr<iShader> (ishader);
+}
+  
+bool csXMLShaderCompiler::PrecacheShader(iDocumentNode* templ,
+                                         iHierarchicalCache* cache)
+{
+  if (!templ) return 0;
+
+  if (!ValidateTemplate (templ))
+    return 0;
+  
+  csTicks startTime = 0, endTime = 0;
+  // Create a shader. The actual loading happens later.
+  csRef<csXMLShader> shader;
+  if (do_verbose) startTime = csGetTicks();
+  shader.AttachNew (new csXMLShader (this));
+  shader->SetName (templ->GetAttributeValue ("name"));
+  bool result = shader->Precache (templ, cache);
+  if (do_verbose) endTime = csGetTicks();
+  if (do_verbose)
+  {
+    csString str;
+    shader->DumpStats (str);
+    Report(CS_REPORTER_SEVERITY_NOTIFY, 
+      "Shader %s: %s, %u ms", shader->GetName (), str.GetData (),
+      endTime - startTime);
+  }
+  
+  return result;
 }
 
 class csShaderPriorityList : public scfImplementation1<csShaderPriorityList, 

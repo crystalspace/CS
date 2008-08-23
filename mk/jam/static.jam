@@ -208,7 +208,25 @@ rule LinkStaticPlugins
   optplugins = $(3) ;
   package = $(4) ;
   
-  local target_link_with target_lflags ;
+  local target_link_with target_lflags lflags_target relayobjs ;
+  if ( $(BUILD_SHARED_LIBS) = "yes" ) && ( $(TRUE_STATIC_PLUGINS) != "yes" )
+  {
+    local plugin_lib_name ;
+    if $(package)
+    {
+      plugin_lib_name = $(target)_plugins_$(package) ;
+    }
+    else
+    {
+      plugin_lib_name = $(target)_plugins ;
+    }
+    
+    lflags_target = $(plugin_lib_name) ;
+  }
+  else
+  {
+    lflags_target = $(target) ;
+  }
   
   if $(package)
   {
@@ -242,6 +260,17 @@ rule LinkStaticPlugins
       }
       CFlags $(target) : $(STATICPLUGIN.$(p).CFLAGS) ;
       lflags = [ MergeRemovingDups $(lflags) : $(STATICPLUGIN.$(p).LFLAGS) ] ;
+      
+      local relaydeps = $(STATICPLUGIN.$(p).RELAYDEPS) ;
+      for relaydep in $(relaydeps)
+      {
+        CFlags $(target) : $(STATICPLUGIN.$(p).RELAYCFLAGS.$(relaydep)) ;
+        lflags = [ MergeRemovingDups $(lflags) : 
+          [ RelayLFlags $(STATICPLUGIN.$(p).RELAYLFLAGS.$(relaydep)) :
+            $(STATICPLUGIN.$(p).RELAYLIBS.$(relaydep)) ] ] ;
+        relayobjs += [ RelayObjs $(lflags_target) :
+            $(STATICPLUGIN.$(p).RELAYLIBS.$(relaydep)) : $(relaydep) ] ;
+      }
     }
     target_lflags = $(lflags) ;
   }
@@ -275,30 +304,23 @@ rule LinkStaticPlugins
   # This is done to be more LGPL-friendly.
   if ( $(BUILD_SHARED_LIBS) = "yes" ) && ( $(TRUE_STATIC_PLUGINS) != "yes" )
   {
-    local plugin_lib_name appglue libglue ;
-    if $(package)
-    {
-      plugin_lib_name = $(target)_plugins_$(package) ;
-    }
-    else
-    {
-      plugin_lib_name = $(target)_plugins ;
-    }
-    
-    libglue = [ BuildStaticGlueFile $(target) : $(plugin_lib_name) 
+    local libglue appglue ;
+    libglue = [ BuildStaticGlueFile $(target) : $(lflags_target) 
       : $(package) : lib ] ;
-    Library $(plugin_lib_name) : $(libglue) $(staticobject) : 
+    Library $(lflags_target) : $(libglue) $(staticobject) 
+      $(relayobjs) : 
       noinstall notest independent nohelp shared ;
-    LibDepends $(plugin_lib_name) : $(target_link_with) ;
-    LFlags $(plugin_lib_name) : $(target_lflags) ;
+    LibDepends $(lflags_target) : $(target_link_with) ;
+    LFlags $(lflags_target) : $(target_lflags) ;
     # We need to get the external libs for the plugin lib; but they have to be 
     # specified after LinkStaticPlugins
-    $(target).PROPAGATE_EXTERNALLIBS += $(plugin_lib_name) ;
+    $(target).PROPAGATE_EXTERNALLIBS += $(lflags_target) ;
     
-    appglue = [ BuildStaticGlueFile $(target) : $(plugin_lib_name) 
+    appglue = [ BuildStaticGlueFile $(target) : $(lflags_target) 
       : $(package) : app ] ;
     ExtraObjects $(target) : $(appglue) : inheritcflags ;
-    LinkWith $(target) : $(plugin_lib_name) ;
+    LinkWith $(target) : $(lflags_target) ;
+    LFlags $(target) : $(target_lflags) ;
   }
   else
   {
@@ -421,7 +443,7 @@ rule WriteDependencies
     cflags += $($(l).CFLAGS) ;
     lflags = [ MergeRemovingDups $(lflags) : [ Filter $($(l).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ] ;
   }
-  lflags = [ MergeRemovingDups $(lflags) : [ Filter $($(plugin).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ] ;
+  lflags = [ MergeRemovingDups $(lflags) : [ Filter $($(plugin).LFLAGS.EXTERNAL) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ] ;
   CFLAGS on $(depfile_gristed) = "$(cflags)" ;
   LFLAGS on $(depfile_gristed) = "$(lflags)" ;
   
@@ -434,7 +456,23 @@ rule WriteDependencies
   {
     WriteDepFlags2 $(depfile_gristed) : $(plugin) ;
   }
+  
   Depends $(depfile) : $(depfile_gristed) ;
+  
+  RELAYDEPS on $(depfile_gristed) = "$($(plugin).RELAYDEPS)" ;
+  WriteRelayDeps $(depfile_gristed) : $(plugin) ;
+  for relaydep in $($(plugin).RELAYDEPS)
+  {
+    local depfile_gristed2 = $(depfile_gristed:G=$(plugin).$(relaydep)) ;
+    MakeLocate $(depfile_gristed2) : [ on $(depfile) GetVar LOCATE ] ;
+    Depends $(depfile) : $(depfile_gristed2) ;
+    
+    RELAYDEP on $(depfile_gristed2) = $(relaydep) ;
+    RELAYCFLAGS on $(depfile_gristed2) = "$($(relaydep).CFLAGS)" ;
+    RELAYLFLAGS on $(depfile_gristed2) = "$($(relaydep).LFLAGS)" ;
+    RELAYLIBS on $(depfile_gristed2) = "$($(plugin).RELAYLIBS.$(relaydep))" ;
+    WriteRelayDepFlags $(depfile_gristed2) : $(plugin) ;
+  }
 }
 
 actions WriteDepFlags1 
@@ -452,6 +490,22 @@ actions WriteDepFlags2
 STATICPLUGINS.AVAILABLE += $(>) ;
 STATICPLUGIN.$(>).CFLAGS = $(CFLAGS) ;
 STATICPLUGIN.$(>).LFLAGS = $(LFLAGS) ;
+EOT
+}
+
+actions WriteRelayDeps
+{
+  cat << EOT >> $(<)
+STATICPLUGIN.$(>).RELAYDEPS = $(RELAYDEPS) ;
+EOT
+}
+
+actions WriteRelayDepFlags
+{
+  cat << EOT >> $(<)
+STATICPLUGIN.$(>).RELAYLIBS.$(RELAYDEP) = $(RELAYLIBS) ;
+STATICPLUGIN.$(>).RELAYCFLAGS.$(RELAYDEP) = $(RELAYCFLAGS) ;
+STATICPLUGIN.$(>).RELAYLFLAGS.$(RELAYDEP) = $(RELAYLFLAGS) ;
 EOT
 }
 

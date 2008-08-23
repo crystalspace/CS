@@ -195,8 +195,7 @@ public:
   virtual void DestroySequenceOperations (uint sequence_id);
   virtual uint GetUniqueID () { sequence_id++; return sequence_id; }
 
-  CS_EVENTHANDLER_NAMES("crystalspace.sequence")
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
+  CS_EVENTHANDLER_PHASE_FRAME("crystalspace.sequence")
 
   CS_DECLARE_EVENT_SHORTCUTS;
 };

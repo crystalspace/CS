@@ -171,10 +171,19 @@ bool RMUnshadowed::RenderView (iView* view)
   rview.AttachNew (new (treePersistent.renderViewPool) 
     CS::RenderManager::RenderView(view));
 #include "csutil/custom_new_enable.h"
-  view->GetCamera()->SetViewportSize (rview->GetGraphics3D()->GetWidth(),
-    rview->GetGraphics3D()->GetHeight());
+  iCamera* c = view->GetCamera ();
+  iGraphics3D* G3D = rview->GetGraphics3D ();
+  int frameWidth = G3D->GetWidth ();
+  int frameHeight = G3D->GetHeight ();
+  c->SetViewportSize (frameWidth, frameHeight);
   view->GetEngine ()->UpdateNewFrame ();  
   view->GetEngine ()->FireStartFrame (rview);
+
+  float leftx = -c->GetShiftX () * c->GetInvFOV ();
+  float rightx = (frameWidth - c->GetShiftX ()) * c->GetInvFOV ();
+  float topy = -c->GetShiftY () * c->GetInvFOV ();
+  float boty = (frameHeight - c->GetShiftY ()) * c->GetInvFOV ();
+  rview->SetFrustum (leftx, rightx, topy, boty);
 
   contextsScannedForTargets.Empty ();
   portalPersistent.UpdateNewFrame ();

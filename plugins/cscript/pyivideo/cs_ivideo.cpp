@@ -16224,6 +16224,43 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csShaderVariableStack_assign(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csShaderVariableStack *arg1 = (csShaderVariableStack *) 0 ;
+  csShaderVariableStack *arg2 = 0 ;
+  csShaderVariableStack *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csShaderVariableStack_assign",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariableStack, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableStack_assign" "', argument " "1"" of type '" "csShaderVariableStack *""'"); 
+  }
+  arg1 = reinterpret_cast< csShaderVariableStack * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csShaderVariableStack,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csShaderVariableStack_assign" "', argument " "2"" of type '" "csShaderVariableStack const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csShaderVariableStack_assign" "', argument " "2"" of type '" "csShaderVariableStack const &""'"); 
+  }
+  arg2 = reinterpret_cast< csShaderVariableStack * >(argp2);
+  {
+    csShaderVariableStack &_result_ref = (arg1)->operator =((csShaderVariableStack const &)*arg2);
+    result = (csShaderVariableStack *) &_result_ref;
+  }
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csShaderVariableStack, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csShaderVariableStack_Setup__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csShaderVariableStack *arg1 = (csShaderVariableStack *) 0 ;
@@ -16293,6 +16330,39 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csShaderVariableStack_Setup__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csShaderVariableStack *arg1 = (csShaderVariableStack *) 0 ;
+  csShaderVariableStack *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csShaderVariableStack_Setup",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariableStack, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableStack_Setup" "', argument " "1"" of type '" "csShaderVariableStack *""'"); 
+  }
+  arg1 = reinterpret_cast< csShaderVariableStack * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csShaderVariableStack,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csShaderVariableStack_Setup" "', argument " "2"" of type '" "csShaderVariableStack const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csShaderVariableStack_Setup" "', argument " "2"" of type '" "csShaderVariableStack const &""'"); 
+  }
+  arg2 = reinterpret_cast< csShaderVariableStack * >(argp2);
+  (arg1)->Setup((csShaderVariableStack const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csShaderVariableStack_Setup(PyObject *self, PyObject *args) {
   int argc;
   PyObject *argv[4];
@@ -16302,6 +16372,19 @@ SWIGINTERN PyObject *_wrap_csShaderVariableStack_Setup(PyObject *self, PyObject 
   argc = PyObject_Length(args);
   for (ii = 0; (ii < argc) && (ii < 3); ii++) {
     argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_csShaderVariableStack, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csShaderVariableStack, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_csShaderVariableStack_Setup__SWIG_2(self, args);
+      }
+    }
   }
   if (argc == 2) {
     int _v;
@@ -16340,7 +16423,7 @@ SWIGINTERN PyObject *_wrap_csShaderVariableStack_Setup(PyObject *self, PyObject 
   }
   
 fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csShaderVariableStack_Setup'.\n  Possible C/C++ prototypes are:\n    Setup(size_t)\n    Setup(csShaderVariable **,size_t)\n");
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csShaderVariableStack_Setup'.\n  Possible C/C++ prototypes are:\n    Setup(size_t)\n    Setup(csShaderVariable **,size_t)\n    Setup(csShaderVariableStack const &)\n");
   return NULL;
 }
 
@@ -18695,6 +18778,46 @@ SWIGINTERN PyObject *_wrap_iShaderCompiler_GetPriorities(PyObject *SWIGUNUSEDPAR
   arg2 = reinterpret_cast< iDocumentNode * >(argp2);
   result = (arg1)->GetPriorities(arg2);
   resultobj = SWIG_NewPointerObj((new csPtr<iShaderPriorityList >(static_cast< const csPtr<iShaderPriorityList >& >(result))), SWIGTYPE_p_csPtrTiShaderPriorityList_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShaderCompiler_PrecacheShader(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShaderCompiler *arg1 = (iShaderCompiler *) 0 ;
+  iDocumentNode *arg2 = (iDocumentNode *) 0 ;
+  iHierarchicalCache *arg3 = (iHierarchicalCache *) 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShaderCompiler_PrecacheShader",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderCompiler, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderCompiler_PrecacheShader" "', argument " "1"" of type '" "iShaderCompiler *""'"); 
+  }
+  arg1 = reinterpret_cast< iShaderCompiler * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iDocumentNode, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderCompiler_PrecacheShader" "', argument " "2"" of type '" "iDocumentNode *""'"); 
+  }
+  arg2 = reinterpret_cast< iDocumentNode * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_iHierarchicalCache, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iShaderCompiler_PrecacheShader" "', argument " "3"" of type '" "iHierarchicalCache *""'"); 
+  }
+  arg3 = reinterpret_cast< iHierarchicalCache * >(argp3);
+  result = (bool)(arg1)->PrecacheShader(arg2,arg3);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
   return NULL;
@@ -23326,102 +23449,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iTextureManager_CreateTexture(PyObject *self, PyObject *args) {
-  int argc;
-  PyObject *argv[8];
-  int ii;
-  
-  if (!PyTuple_Check(args)) SWIG_fail;
-  argc = PyObject_Length(args);
-  for (ii = 0; (ii < argc) && (ii < 7); ii++) {
-    argv[ii] = PyTuple_GET_ITEM(args,ii);
-  }
-  if (argc == 6) {
-    int _v;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTextureManager, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      {
-        int res = SWIG_AsVal_int(argv[1], NULL);
-        _v = SWIG_CheckState(res);
-      }
-      if (_v) {
-        {
-          int res = SWIG_AsVal_int(argv[2], NULL);
-          _v = SWIG_CheckState(res);
-        }
-        if (_v) {
-          {
-            int res = SWIG_AsVal_int(argv[3], NULL);
-            _v = SWIG_CheckState(res);
-          }
-          if (_v) {
-            int res = SWIG_AsCharPtrAndSize(argv[4], 0, NULL, 0);
-            _v = SWIG_CheckState(res);
-            if (_v) {
-              {
-                int res = SWIG_AsVal_int(argv[5], NULL);
-                _v = SWIG_CheckState(res);
-              }
-              if (_v) {
-                return _wrap_iTextureManager_CreateTexture__SWIG_1(self, args);
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  if (argc == 7) {
-    int _v;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTextureManager, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      {
-        int res = SWIG_AsVal_int(argv[1], NULL);
-        _v = SWIG_CheckState(res);
-      }
-      if (_v) {
-        {
-          int res = SWIG_AsVal_int(argv[2], NULL);
-          _v = SWIG_CheckState(res);
-        }
-        if (_v) {
-          {
-            int res = SWIG_AsVal_int(argv[3], NULL);
-            _v = SWIG_CheckState(res);
-          }
-          if (_v) {
-            int res = SWIG_AsCharPtrAndSize(argv[4], 0, NULL, 0);
-            _v = SWIG_CheckState(res);
-            if (_v) {
-              {
-                int res = SWIG_AsVal_int(argv[5], NULL);
-                _v = SWIG_CheckState(res);
-              }
-              if (_v) {
-                {
-                  _v = PyString_Check(argv[6]);
-                }
-                if (_v) {
-                  return _wrap_iTextureManager_CreateTexture__SWIG_0(self, args);
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  
-fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iTextureManager_CreateTexture'.\n  Possible C/C++ prototypes are:\n    CreateTexture(int,int,csImageType,char const *,int,iString *)\n    CreateTexture(int,int,csImageType,char const *,int)\n");
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_iTextureManager_GetTextureFormat(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iTextureManager *arg1 = (iTextureManager *) 0 ;
@@ -23533,6 +23560,386 @@ SWIGINTERN PyObject *_wrap_iTextureManager_GetMaxTextureSize(PyObject *SWIGUNUSE
   }
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTextureManager_CreateTexture__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTextureManager *arg1 = (iTextureManager *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  int arg4 ;
+  csImageType arg5 ;
+  char *arg6 = (char *) 0 ;
+  int arg7 ;
+  iString *arg8 = (iString *) 0 ;
+  SwigValueWrapper<csPtr<iTextureHandle > > result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  int val5 ;
+  int ecode5 = 0 ;
+  int res6 ;
+  char *buf6 = 0 ;
+  int alloc6 = 0 ;
+  int val7 ;
+  int ecode7 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTextureManager_CreateTexture",8,8,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTextureManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTextureManager_CreateTexture" "', argument " "1"" of type '" "iTextureManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iTextureManager * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iTextureManager_CreateTexture" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iTextureManager_CreateTexture" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iTextureManager_CreateTexture" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = static_cast< int >(val4);
+  ecode5 = SWIG_AsVal_int(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iTextureManager_CreateTexture" "', argument " "5"" of type '" "csImageType""'");
+  } 
+  arg5 = static_cast< csImageType >(val5);
+  res6 = SWIG_AsCharPtrAndSize(obj5, &buf6, NULL, &alloc6);
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "iTextureManager_CreateTexture" "', argument " "6"" of type '" "char const *""'");
+  }
+  arg6 = reinterpret_cast< char * >(buf6);
+  ecode7 = SWIG_AsVal_int(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iTextureManager_CreateTexture" "', argument " "7"" of type '" "int""'");
+  } 
+  arg7 = static_cast< int >(val7);
+  {
+    arg8 = new scfString (PyString_AsString(obj7));
+  }
+  result = (arg1)->CreateTexture(arg2,arg3,arg4,arg5,(char const *)arg6,arg7,arg8);
+  {
+    /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
+    csRef<iTextureHandle> ref((csPtr<iTextureHandle>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iTextureHandle *)ref, SWIGTYPE_p_iTextureHandle, 1);
+    /*@SWIG@*/
+  }
+  if (alloc6 == SWIG_NEWOBJ) delete[] buf6;
+  {
+    delete arg8;
+  }
+  return resultobj;
+fail:
+  if (alloc6 == SWIG_NEWOBJ) delete[] buf6;
+  {
+    delete arg8;
+  }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTextureManager_CreateTexture__SWIG_3(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iTextureManager *arg1 = (iTextureManager *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  int arg4 ;
+  csImageType arg5 ;
+  char *arg6 = (char *) 0 ;
+  int arg7 ;
+  SwigValueWrapper<csPtr<iTextureHandle > > result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  int val5 ;
+  int ecode5 = 0 ;
+  int res6 ;
+  char *buf6 = 0 ;
+  int alloc6 = 0 ;
+  int val7 ;
+  int ecode7 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iTextureManager_CreateTexture",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTextureManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTextureManager_CreateTexture" "', argument " "1"" of type '" "iTextureManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iTextureManager * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iTextureManager_CreateTexture" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iTextureManager_CreateTexture" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iTextureManager_CreateTexture" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = static_cast< int >(val4);
+  ecode5 = SWIG_AsVal_int(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iTextureManager_CreateTexture" "', argument " "5"" of type '" "csImageType""'");
+  } 
+  arg5 = static_cast< csImageType >(val5);
+  res6 = SWIG_AsCharPtrAndSize(obj5, &buf6, NULL, &alloc6);
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "iTextureManager_CreateTexture" "', argument " "6"" of type '" "char const *""'");
+  }
+  arg6 = reinterpret_cast< char * >(buf6);
+  ecode7 = SWIG_AsVal_int(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iTextureManager_CreateTexture" "', argument " "7"" of type '" "int""'");
+  } 
+  arg7 = static_cast< int >(val7);
+  result = (arg1)->CreateTexture(arg2,arg3,arg4,arg5,(char const *)arg6,arg7);
+  {
+    /*@SWIG:TYPEMAP_OUT_csRef_BODY@*/
+    csRef<iTextureHandle> ref((csPtr<iTextureHandle>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iTextureHandle *)ref, SWIGTYPE_p_iTextureHandle, 1);
+    /*@SWIG@*/
+  }
+  if (alloc6 == SWIG_NEWOBJ) delete[] buf6;
+  return resultobj;
+fail:
+  if (alloc6 == SWIG_NEWOBJ) delete[] buf6;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iTextureManager_CreateTexture(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[9];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 8); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 6) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTextureManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_int(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          {
+            int res = SWIG_AsVal_int(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            int res = SWIG_AsCharPtrAndSize(argv[4], 0, NULL, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              {
+                int res = SWIG_AsVal_int(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                return _wrap_iTextureManager_CreateTexture__SWIG_1(self, args);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 7) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTextureManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_int(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          {
+            int res = SWIG_AsVal_int(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            {
+              int res = SWIG_AsVal_int(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              int res = SWIG_AsCharPtrAndSize(argv[5], 0, NULL, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_int(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  return _wrap_iTextureManager_CreateTexture__SWIG_3(self, args);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 7) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTextureManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_int(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          {
+            int res = SWIG_AsVal_int(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            int res = SWIG_AsCharPtrAndSize(argv[4], 0, NULL, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              {
+                int res = SWIG_AsVal_int(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                {
+                  _v = PyString_Check(argv[6]);
+                }
+                if (_v) {
+                  return _wrap_iTextureManager_CreateTexture__SWIG_0(self, args);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 8) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTextureManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_int(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          {
+            int res = SWIG_AsVal_int(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            {
+              int res = SWIG_AsVal_int(argv[4], NULL);
+              _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              int res = SWIG_AsCharPtrAndSize(argv[5], 0, NULL, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_int(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  {
+                    _v = PyString_Check(argv[7]);
+                  }
+                  if (_v) {
+                    return _wrap_iTextureManager_CreateTexture__SWIG_2(self, args);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iTextureManager_CreateTexture'.\n  Possible C/C++ prototypes are:\n    CreateTexture(int,int,csImageType,char const *,int,iString *)\n    CreateTexture(int,int,csImageType,char const *,int)\n    CreateTexture(int,int,int,csImageType,char const *,int,iString *)\n    CreateTexture(int,int,int,csImageType,char const *,int)\n");
   return NULL;
 }
 
@@ -24238,6 +24645,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iHalo_swigregister", iHalo_swigregister, METH_VARARGS, NULL},
 	 { (char *)"new_csShaderVariableStack", _wrap_new_csShaderVariableStack, METH_VARARGS, NULL},
 	 { (char *)"delete_csShaderVariableStack", _wrap_delete_csShaderVariableStack, METH_VARARGS, NULL},
+	 { (char *)"csShaderVariableStack_assign", _wrap_csShaderVariableStack_assign, METH_VARARGS, NULL},
 	 { (char *)"csShaderVariableStack_Setup", _wrap_csShaderVariableStack_Setup, METH_VARARGS, NULL},
 	 { (char *)"csShaderVariableStack_MakeOwnArray", _wrap_csShaderVariableStack_MakeOwnArray, METH_VARARGS, NULL},
 	 { (char *)"csShaderVariableStack_GetSize", _wrap_csShaderVariableStack_GetSize, METH_VARARGS, NULL},
@@ -24311,6 +24719,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iShaderCompiler_ValidateTemplate", _wrap_iShaderCompiler_ValidateTemplate, METH_VARARGS, NULL},
 	 { (char *)"iShaderCompiler_IsTemplateToCompiler", _wrap_iShaderCompiler_IsTemplateToCompiler, METH_VARARGS, NULL},
 	 { (char *)"iShaderCompiler_GetPriorities", _wrap_iShaderCompiler_GetPriorities, METH_VARARGS, NULL},
+	 { (char *)"iShaderCompiler_PrecacheShader", _wrap_iShaderCompiler_PrecacheShader, METH_VARARGS, NULL},
 	 { (char *)"delete_iShaderCompiler", _wrap_delete_iShaderCompiler, METH_VARARGS, NULL},
 	 { (char *)"iShaderCompiler_swigregister", iShaderCompiler_swigregister, METH_VARARGS, NULL},
 	 { (char *)"new_csRefShaderStringIDHash", _wrap_new_csRefShaderStringIDHash, METH_VARARGS, NULL},
@@ -24395,10 +24804,10 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"delete_iSuperLightmap", _wrap_delete_iSuperLightmap, METH_VARARGS, NULL},
 	 { (char *)"iSuperLightmap_swigregister", iSuperLightmap_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iTextureManager_RegisterTexture", _wrap_iTextureManager_RegisterTexture, METH_VARARGS, NULL},
-	 { (char *)"iTextureManager_CreateTexture", _wrap_iTextureManager_CreateTexture, METH_VARARGS, NULL},
 	 { (char *)"iTextureManager_GetTextureFormat", _wrap_iTextureManager_GetTextureFormat, METH_VARARGS, NULL},
 	 { (char *)"iTextureManager_CreateSuperLightmap", _wrap_iTextureManager_CreateSuperLightmap, METH_VARARGS, NULL},
 	 { (char *)"iTextureManager_GetMaxTextureSize", _wrap_iTextureManager_GetMaxTextureSize, METH_VARARGS, NULL},
+	 { (char *)"iTextureManager_CreateTexture", _wrap_iTextureManager_CreateTexture, METH_VARARGS, NULL},
 	 { (char *)"iTextureManager_scfGetVersion", _wrap_iTextureManager_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iTextureManager", _wrap_delete_iTextureManager, METH_VARARGS, NULL},
 	 { (char *)"iTextureManager_swigregister", iTextureManager_swigregister, METH_VARARGS, NULL},

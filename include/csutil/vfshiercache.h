@@ -42,10 +42,12 @@ namespace CS
       public scfImplementation1<VfsHierarchicalCache, iHierarchicalCache>
     {
     private:
-      iObjectRegistry* object_reg;
+      csRef<VfsHierarchicalCache> parent;
       csString vfsdir;
       csRef<iVFS> vfs;
       
+      VfsHierarchicalCache (VfsHierarchicalCache* parentCache, const char* vfsdir);
+    
       /// Makes sure all parts of \a path are directories
       void EnsureDirectories (const char* path);
       /// Makes sure the last part of \a path is not a directory
@@ -70,6 +72,7 @@ namespace CS
       virtual void Flush ();
       virtual csPtr<iHierarchicalCache> GetRootedCache (const char* base);
       virtual csPtr<iStringArray> GetSubItems (const char* path);
+      virtual iHierarchicalCache* GetTopCache();
       /** @} */
     };
   } // namespace Utility

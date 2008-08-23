@@ -103,6 +103,9 @@ class csShaderConditionResolver : public iConditionResolver
     csConditionNode* parent, csConditionNode*& node);
   bool WriteNode (iFile* cacheFile, csConditionNode* node,
     const ConditionsWriter& condWrite);
+    
+  bool SetVariantRecursive (size_t variant, csConditionNode* node,
+    csBitArray& conditionResults);
 public:
   csConditionEvaluator& evaluator;
 
@@ -126,6 +129,7 @@ public:
   size_t GetVariant ();
   size_t GetVariantCount () const
   { return nextVariant; }
+  void SetVariant (size_t variant);
   void DumpConditionTree (csString& out);
   
   bool ReadFromCache (iFile* cacheFile, ConditionsReader& condReader);
@@ -182,6 +186,7 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
     struct Technique
     {
       int priority;
+      int minLights;
       csRef<csWrappedDocumentNode> srcNode;
       
       csShaderConditionResolver* resolver;
@@ -244,6 +249,7 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
     if (tvc == 0) tvc = 1;
     size_t techVar = (ticket % (tvc+1))-1;
     size_t techAndVar = ticket / (tvc+1);
+    if (techVar >= techVariants.GetSize()) return 0;
     const csArray<ShaderTechVariant::Technique>& techniques =
       techVariants[techVar].techniques;
     return techniques[techAndVar % techniques.GetSize()]
@@ -265,7 +271,10 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
 protected:
   void InternalRemove() { SelfDestruct(); }
 
-  void Load (iDocumentNode* source);
+  void Load (iDocumentNode* source, bool noCacheRead);
+    
+  void PrepareTechVar (ShaderTechVariant& techVar,
+    int forcepriority);
   
   bool LoadTechniqueFromCache (ShaderTechVariant::Technique& tech,
     iHierarchicalCache* cache);
@@ -277,7 +286,10 @@ public:
   csXMLShader (csXMLShaderCompiler* compiler,
       iLoaderContext* ldr_context, iDocumentNode* source,
       int forcepriority);
+  csXMLShader (csXMLShaderCompiler* compiler);
   virtual ~csXMLShader();
+  
+  bool Precache (iDocumentNode* source, iHierarchicalCache* cacheTo);
 
   virtual iObject* QueryObject () 
   { return (iObject*)(csObject*)this; }

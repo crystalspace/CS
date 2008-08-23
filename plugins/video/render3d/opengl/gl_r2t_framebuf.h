@@ -42,7 +42,7 @@ protected:
   /// If true then the current render target has been put on screen.
   bool rt_onscreen;
   /// Render target dimensions
-  int txt_w, txt_h;
+  int txt_w, txt_h, txt_d;
   R2TViewportHelper viewportHelper;
 
   enum InternalFormatClass { ifColor, ifDepth };
@@ -81,7 +81,8 @@ public:
 
   virtual void BeginDraw (int drawflags);
   virtual void SetupProjection ();
-  virtual void SetupProjection (const CS::Math::Matrix4& projectionMatrix);
+  virtual CS::Math::Matrix4 SetupProjection (
+    const CS::Math::Matrix4& projectionMatrix);
   virtual void FinishDraw ();
   virtual void SetClipRect (const csRect& clipRect);
   virtual void SetupClipPortalDrawing ();

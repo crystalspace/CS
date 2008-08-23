@@ -152,8 +152,6 @@ public:
   		iSharedVariable* var, const csColor& c);
   virtual void AddOperationSetMaterial (csTicks time, iParameterESM* mesh,
 		iParameterESM* mat);
-  virtual void AddOperationSetPolygonMaterial (csTicks time,
-  		iParameterESM* polygon, iParameterESM* mat);
   virtual void AddOperationSetLight (csTicks time, iParameterESM* light,
 		  const csColor& color);
   virtual void AddOperationFadeLight (csTicks time, iParameterESM* light,
@@ -473,12 +471,11 @@ public:
     { }
     virtual bool HandleEvent (iEvent& e) 
     { return parent ? parent->HandleEvent(e) : false; }
-    CS_EVENTHANDLER_NAMES("crystalspace.utilities.sequence.engine")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
+    CS_EVENTHANDLER_PHASE_2D("crystalspace.utilities.sequence.engine")
   };
   csRef<EventHandler> eventHandler;
 
-  csEventID PostProcess;
+  csEventID Frame;
   csEventID MouseEvent;
 };
 

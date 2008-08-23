@@ -160,7 +160,7 @@ void csShaderGLCGCommon::SVtoCgMatrix3x3  (csShaderVariable* var, float* matrix)
 
 void csShaderGLCGCommon::SVtoCgMatrix4x4  (csShaderVariable* var, float* matrix)
 {
-  if (var->GetType () == csShaderVariable::MATRIX)
+  if (var->GetType () == csShaderVariable::MATRIX3X3)
   {
     csMatrix3 m;
     if (var->GetValue (m))
@@ -193,6 +193,14 @@ void csShaderGLCGCommon::SVtoCgMatrix4x4  (csShaderVariable* var, float* matrix)
 	matrix[idx*4+2] = v[2];
 	matrix[idx*4+3] = v[3];
       }
+    }
+  }
+  else if (var->GetType () == csShaderVariable::MATRIX4X4)
+  {
+    CS::Math::Matrix4 m;
+    if (var->GetValue (m))
+    {
+      CS::PluginCommon::MakeGLMatrix4x4 (m, matrix, true);
     }
   }
   else
@@ -364,34 +372,6 @@ void csShaderGLCGCommon::ApplyVariableMapArrays (const csShaderVariableStack& st
     ApplyVariableMapArray (variablemap, setter, stack);
   }
   
-  /* "Assumed constant" parameters are set here b/c all needed shader 
-   * vars are available */
-  if (assumedConstParams != 0)
-  {
-    csRef<csShaderVariable> var;
-  
-    SetterCg setter;
-    for(size_t i = 0; i < assumedConstParams->GetSize (); ++i)
-    {
-      VariableMapEntry& mapping = assumedConstParams->Get (i);
-      
-      var = GetParamSV (stack, mapping.mappingParam);
-      // If var is null now we have no const nor any passed value, ignore it
-      if (!var.IsValid ())
-	continue;
-  
-      ShaderParameter* param =
-	reinterpret_cast<ShaderParameter*> (mapping.userVal);
-      SetParameterValue (setter, param, var);
-      cgSetParameterVariability (param->param, CG_LITERAL);
-      FreeShaderParam (param);
-    }
-    delete assumedConstParams; assumedConstParams = 0;
-    cgCompileProgram (program);
-    if (shaderPlug->debugDump)
-      DoDebugDump();
-    PostCompileVmapProcess ();
-  }
 }
 
 void csShaderGLCGCommon::SetParameterValueCg (ShaderParameter* sparam,
@@ -446,7 +426,7 @@ void csShaderGLCGCommon::GetShaderParamSlot (ShaderParameter* sparam)
   }
 }
 
-void csShaderGLCGCommon::ApplyVmap()
+void csShaderGLCGCommon::GetParamsFromVmap()
 {
   size_t i = 0;
   while (i < variablemap.GetSize ())
@@ -466,16 +446,8 @@ void csShaderGLCGCommon::ApplyVmap()
     }
     FillShaderParam (sparam, param);
     bool assumeConst = sparam->assumeConstant;
-    if (assumeConst)
-    {
-      if (assumedConstParams == 0)
-	assumedConstParams = new csSafeCopyArray<VariableMapEntry>;
-      assumedConstParams->Push (variablemap[i]);
-      variablemap.DeleteIndex (i);
-      continue;
-    }
     // Mark constants as to be folded in
-    if (variablemap[i].mappingParam.IsConstant())
+    if (assumeConst || variablemap[i].mappingParam.IsConstant())
     {
       csShaderVariable* var = variablemap[i].mappingParam.var;
       if (var != 0)
@@ -491,7 +463,7 @@ void csShaderGLCGCommon::ApplyVmap()
   variablemap.ShrinkBestFit();
 }
 
-void csShaderGLCGCommon::PostCompileVmapProcess ()
+void csShaderGLCGCommon::GetPostCompileParamProps ()
 {
   for(size_t i = 0; i < variablemap.GetSize (); )
   {
@@ -499,7 +471,7 @@ void csShaderGLCGCommon::PostCompileVmapProcess ()
     ShaderParameter* sparam =
       reinterpret_cast<ShaderParameter*> (mapping.userVal);
     
-    if (!PostCompileVmapProcess (sparam))
+    if (!GetPostCompileParamProps (sparam))
     {
       variablemap.DeleteIndex (i);
       FreeShaderParam (sparam);
@@ -511,7 +483,7 @@ void csShaderGLCGCommon::PostCompileVmapProcess ()
   }
 }
 
-bool csShaderGLCGCommon::PostCompileVmapProcess (ShaderParameter* sparam)
+bool csShaderGLCGCommon::GetPostCompileParamProps (ShaderParameter* sparam)
 {
   CGparameter param = sparam->param;
   if (sparam->paramType == CG_ARRAY)
@@ -519,7 +491,7 @@ bool csShaderGLCGCommon::PostCompileVmapProcess (ShaderParameter* sparam)
     bool ret = false;
     for (size_t i = sparam->arrayItems.GetSize(); i-- > 0; )
     {
-      if (!PostCompileVmapProcess (sparam->arrayItems[i]))
+      if (!GetPostCompileParamProps (sparam->arrayItems[i]))
       {
         if (i == sparam->arrayItems.GetSize()-1)
           sparam->arrayItems.Truncate (i);

@@ -22,6 +22,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
+#include "csutil/eventhandlers.h"
 #include "csutil/scf.h"
 #include "csutil/stringarray.h"
 #include "csutil/sysfunc.h"
@@ -142,14 +143,14 @@ bool csReporterListener::Initialize (iObjectRegistry* r)
   object_reg = r;
   SetDefaults ();
 
-  PostProcess = csevPostProcess (object_reg);
+  Frame = csevFrame (object_reg);
   if (!eventHandler)
   {
     eventHandler.AttachNew (new EventHandler (this));
   }
   csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
-    q->RegisterListener (eventHandler, PostProcess);
+    q->RegisterListener (eventHandler, Frame);
 
   csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (r);
   if (cfg)
@@ -342,7 +343,7 @@ bool csReporterListener::Report (iReporter*, int severity,
 
 bool csReporterListener::HandleEvent (iEvent& event)
 {
-  if (event.Name == PostProcess)
+  if (event.Name == Frame)
   {
     CS::Threading::RecursiveMutexScopedLock lock (mutex);
     size_t l = messages.GetSize ();

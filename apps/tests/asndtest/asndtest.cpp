@@ -49,10 +49,23 @@ void ASndTest::CreateWorld ()
 
   // Create and prepare the world
   world = engine->CreateSector ("room");
-  csRef<iMeshWrapper> walls ( engine->CreateSectorWallsMesh (world, "walls"));
-  iMeshObject* walls_object = walls->GetMeshObject ();
-  iMeshObjectFactory* walls_factory = walls_object->GetFactory();
-  csRef<iThingFactoryState> walls_state = scfQueryInterface<iThingFactoryState> (walls_factory);
+
+  // First we make a primitive for our geometry.
+  using namespace CS::Geometry;
+  DensityTextureMapper mapper (0.3f);
+  TesselatedBox box (csVector3 (-40, 0, 0), csVector3 (40, 10, 40));
+  box.SetLevel (3);
+  box.SetMapper (&mapper);
+  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+  // Now we make a factory and a mesh at once.
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+      engine, world, "walls", "walls_factory", &box);
+
+  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
+    iGeneralMeshState> (walls->GetMeshObject ());
+  mesh_state->SetShadowReceiving (true);
+  walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   // Prepare lighting
   csRef<iLight> light;
@@ -107,27 +120,22 @@ void ASndTest::CreateWorld ()
   csRef<iSndSysSource> sndsource;
   csRef<iSndSysSource3D> sndsource3d;
 
-  // Create the room
-  walls_state->AddInsideBox( csVector3 (-40, 0,  0), csVector3 ( 40, 10, 40));
-  walls_state->SetPolygonMaterial (CS_POLYRANGE_ALL, tm);
-  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_ALL, 3);
-
   // Add some quick lighting
-  light = engine->CreateLight (0, csVector3 (-30, 5, 10), 20, csColor (0.22, 0.2, 0.25));
+  light = engine->CreateLight (0, csVector3 (-30, 5, 10), 20, csColor (0.22f, 0.2f, 0.25f));
   ll->Add (light);
-  light = engine->CreateLight (0, csVector3 (-30, 5, 30), 20, csColor (0.22, 0.2, 0.25));
+  light = engine->CreateLight (0, csVector3 (-30, 5, 30), 20, csColor (0.22f, 0.2f, 0.25f));
   ll->Add (light);
-  light = engine->CreateLight (0, csVector3 (-10, 5, 10), 20, csColor (0.22, 0.2, 0.25));
+  light = engine->CreateLight (0, csVector3 (-10, 5, 10), 20, csColor (0.22f, 0.2f, 0.25f));
   ll->Add (light);
-  light = engine->CreateLight (0, csVector3 (-10, 5, 30), 20, csColor (0.22, 0.2, 0.25));
+  light = engine->CreateLight (0, csVector3 (-10, 5, 30), 20, csColor (0.22f, 0.2f, 0.25f));
   ll->Add (light);
-  light = engine->CreateLight (0, csVector3 ( 10, 5, 30), 20, csColor (0.22, 0.2, 0.25));
+  light = engine->CreateLight (0, csVector3 ( 10, 5, 30), 20, csColor (0.22f, 0.2f, 0.25f));
   ll->Add (light);
-  light = engine->CreateLight (0, csVector3 ( 10, 5, 10), 20, csColor (0.22, 0.2, 0.25));
+  light = engine->CreateLight (0, csVector3 ( 10, 5, 10), 20, csColor (0.22f, 0.2f, 0.25f));
   ll->Add (light);
-  light = engine->CreateLight (0, csVector3 ( 30, 5, 30), 20, csColor (0.22, 0.2, 0.25));
+  light = engine->CreateLight (0, csVector3 ( 30, 5, 30), 20, csColor (0.22f, 0.2f, 0.25f));
   ll->Add (light);
-  light = engine->CreateLight (0, csVector3 ( 30, 5, 10), 20, csColor (0.22, 0.2, 0.25));
+  light = engine->CreateLight (0, csVector3 ( 30, 5, 10), 20, csColor (0.22f, 0.2f, 0.25f));
   ll->Add (light);
 
   // Create a small sound source
@@ -218,7 +226,7 @@ void ASndTest::CreateWorld ()
   engine->Prepare ();
 }
 
-void ASndTest::ProcessFrame ()
+void ASndTest::Frame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -285,12 +293,6 @@ void ASndTest::ProcessFrame ()
   view->Draw ();
 }
 
-void ASndTest::FinishFrame ()
-{
-  g3d->FinishDraw ();
-  g3d->Print (0);
-}
-
 bool ASndTest::OnKeyboard(iEvent& ev)
 {
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
@@ -331,6 +333,7 @@ bool ASndTest::OnInitialize(int argc, char* argv[])
 
 void ASndTest::OnExit()
 {
+  printer.Invalidate ();
 }
 
 bool ASndTest::Application()
@@ -362,7 +365,7 @@ bool ASndTest::Application()
   sndloader = csQueryRegistry<iSndSysLoader> (GetObjectRegistry());
   if (!sndloader) return ReportError("Failed to locate Sound loader!");
 
-engine->SetLightingCacheMode (0);
+  engine->SetLightingCacheMode (0);
 
   CreateWorld ();
 
@@ -372,6 +375,8 @@ engine->SetLightingCacheMode (0);
 
   view->GetCamera ()->SetSector (world);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (10, 5, 10));
+
+  printer.AttachNew (new FramePrinter (object_reg));
 
   Run();
 

@@ -22,6 +22,7 @@
 #include "csutil/csuctransform.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
+#include "csutil/eventhandlers.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
@@ -146,12 +147,11 @@ public:
   bool HandleKeyMessage (HWND hWnd, UINT message,
     WPARAM wParam, LPARAM lParam);
 
-  CS_EVENTHANDLER_NAMES ("crystalspace.win32")
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
+  CS_EVENTHANDLER_PHASE_LOGIC ("crystalspace.win32")
 };
 
 //static Win32Assistant* GLOBAL_ASSISTANT = 0;
-static csRefArray<Win32Assistant> assistants;
+static csRefArray<Win32Assistant,CS::Memory::AllocatorMallocPlatform> assistants;
 
 static void ToLower (csString& s)
 {
@@ -523,7 +523,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
   csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (registry));
   CS_ASSERT (q != 0);
   csEventID events[] = {
-    csevPreProcess (registry),
+    csevFrame (registry),
     csevSystemOpen (registry),
     csevSystemClose (registry),
     csevCommandLineHelp (registry),
@@ -630,7 +630,7 @@ iEventOutlet* Win32Assistant::GetEventOutlet()
 
 bool Win32Assistant::HandleEvent (iEvent& e)
 {
-  if (e.Name == PreProcess)
+  if (e.Name == Frame)
   {
     if(use_own_message_loop)
     {

@@ -27,7 +27,6 @@
 #include "imesh/genmesh.h"
 #include "imesh/object.h"
 #include "imesh/sprite3d.h"
-#include "imesh/thing.h"
 #include "iutil/document.h"
 #include "iutil/object.h"
 #include "iutil/objreg.h"
@@ -214,8 +213,6 @@ namespace Utility
 	return true;
       if (ProbeSpr3dFactory (container, fact, obj->GetName()))
 	return true;
-      if (ProbeThingFactory (container, fact, obj->GetName()))
-	return true;
       return false;
     }
 
@@ -305,159 +302,11 @@ namespace Utility
       return true;
     }
 
-// For Thing stuff
-#include "csutil/deprecated_warn_off.h"
-
-    bool Glue::ProbeThingFactory (ImportKit::Container& container, 
-			          iMeshFactoryWrapper* fact, const char* name)
-    {
-      csRef<iThingFactoryState> thingfact = 
-	scfQueryInterface<iThingFactoryState> (fact->GetMeshObjectFactory());
-      if (!thingfact ) return false;
-
-      ImportKit::Container::Model newModel;
-      if (HandleThingFactory (newModel, thingfact))
-      {
-        newModel.name = csStrNewW (name);
-        container.models.Push (newModel);
-        return true;
-      }
-      return false;
-    }
-
-    bool Glue::HandleThingFactory (ImportKit::Container::Model& newModel,
-                                   iThingFactoryState* thingfact)
-    {
-      csHash<GluedModel, size_t> models;
-      size_t totalVert = 0, totalTri = 0;
-
-      for (int i = 0; i < thingfact->GetPolygonCount(); i++)
-      {
-	size_t mat = 
-	  material2texture.Get (thingfact->GetPolygonMaterial (i), (size_t)-1);
-	GluedModel* model = models.GetElementPointer (mat);
-	if (!model)
-	{
-	  models.Put (mat, GluedModel ());
-	  model = models.GetElementPointer (mat);
-	}
-
-	csMatrix3 tm;
-	csVector3 tv;
-	thingfact->GetPolygonTextureMapping (i, tm, tv);
-	csTransform object2texture (tm, tv);
-
-	int pvc = thingfact->GetPolygonVertexCount (i);
-	uint vo = (uint)model->allVertices.GetSize ();
-	for (int v = 0; v < pvc; v++)
-	{
-	  totalVert++;
-	  const csVector3& vertex = thingfact->GetPolygonVertex (i, v);
-	  model->allVertices.Push (vertex);
-	  csVector3 t = object2texture.Other2This (vertex);
-	  model->allTCs.Push (csVector2 (t.x, t.y));
-	  if (v >= 2)
-	  {
-	    totalTri++;
-	    csTriangle tri;
-	    tri.a = vo;
-	    tri.b = vo + v - 1;
-	    tri.c = vo + v;
-	    model->tris.Push (tri);
-	  }
-	  model->allNormals.Push (
-	    -thingfact->GetPolygonObjectPlane (i).Normal());
-	}
-      }
-
-      GluedModel* model = glueModelPool.Alloc();
-      model->allVertices.SetCapacity (totalVert);
-      model->allNormals.SetCapacity (totalVert);
-      model->allTCs.SetCapacity (totalVert);
-      model->tris.SetCapacity (totalTri);
-
-      csHash<GluedModel, size_t>::GlobalIterator it (models.GetIterator ());
-      while (it.HasNext())
-      {
-	size_t mat;
-	const GluedModel& partModel = it.Next (mat);
-	uint vo = (uint)model->allVertices.GetSize ();
-	size_t vc = partModel.allVertices.GetSize ();
-
-	model->allVertices.SetSize (vo + vc);
-	model->allNormals.SetSize (vo + vc);
-	model->allTCs.SetSize (vo + vc);
-	memcpy (model->allVertices.GetArray() + vo,
-	  partModel.allVertices.GetArray(), vc * sizeof(csVector3));
-	memcpy (model->allNormals.GetArray() + vo,
-	  partModel.allNormals.GetArray(), vc * sizeof(csVector3));
-	memcpy (model->allTCs.GetArray() + vo,
-	  partModel.allTCs.GetArray(), vc * sizeof(csVector2));
-
-	size_t to = model->tris.GetSize ();
-	for (size_t t = 0; t < partModel.tris.GetSize (); t++)
-	{
-	  csTriangle tri;
-	  tri.a = partModel.tris[t].a + vo;
-	  tri.b = partModel.tris[t].b + vo;
-	  tri.c = partModel.tris[t].c + vo;
-	  model->tris.Push (tri);
-	}
-
-	ImportKit::Container::Model::Mesh newMesh;
-
-	newMesh.vertexCount = (uint)vc;
-	newMesh.verts = (float*)(model->allVertices.GetArray()+vo);
-	newMesh.texcoords = (float*)(model->allTCs.GetArray()+vo);
-	newMesh.normals = (float*)(model->allNormals.GetArray()+vo);
-	newMesh.triCount = model->tris.GetSize ()+to;
-	newMesh.tris = (uint*)(model->tris.GetArray()+to);
-	newMesh.material = mat;
-
-	newModel.meshes.Push (newMesh);
-      }
-
-      newModel.glueModel = model;
-      
-      return true;
-    }
-
-#include "csutil/deprecated_warn_on.h"
-
     bool Glue::ProbeMeshObject (ImportKit::Container& container, 
 			        iObject* obj)
     {
-      csRef<iMeshWrapper> wrap = 
-	scfQueryInterface<iMeshWrapper> (obj);
-      if (!wrap) return false;
-      if (ProbeThingObject (container, wrap, obj->GetName()))
-	return true;
       return false;
     }
-
-// For Thing stuff
-#include "csutil/deprecated_warn_off.h"
-
-    bool Glue::ProbeThingObject (ImportKit::Container& container, 
-			         iMeshWrapper* wrap, const char* name)
-    {
-      csRef<iThingFactoryState> thingfact = 
-	scfQueryInterface<iThingFactoryState> (
-        wrap->GetFactory ()->GetMeshObjectFactory());
-      if (!thingfact ) return false;
-
-      ImportKit::Container::Model newModel;
-      if (HandleThingFactory (newModel, thingfact))
-      {
-        newModel.name = csStrNewW (name);
-        newModel.type = ImportKit::Container::Model::Object;
-        container.models.Push (newModel);
-        return true;
-      }
-      return false;
-    }
-
-#include "csutil/deprecated_warn_on.h"
 
   } // namespace Implementation
 

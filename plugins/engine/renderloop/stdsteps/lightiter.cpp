@@ -178,7 +178,7 @@ void csLightIterRenderStep::Init ()
 }
 
 void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
-  csShaderVariableStack& _stack)
+  csShaderVariableStack& stack)
 {
   Init ();
   
@@ -211,8 +211,6 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
 
     const csVector3 lightPos = light->GetMovable ()->GetFullPosition ();
 
-    csShaderVariableStack stack (_stack);
-    stack.MakeOwnArray();
     lsvHelper.MergeAsArrayItems (stack,
       light->GetSVContext()->GetShaderVariables (), 0);
 

@@ -53,7 +53,6 @@ struct iShader;
 struct iShaderVariableAccessor;
 struct iString;
 struct iStringSet;
-struct iThingFactoryState;
 
 /**\name Texture transformation description
  * @{ */

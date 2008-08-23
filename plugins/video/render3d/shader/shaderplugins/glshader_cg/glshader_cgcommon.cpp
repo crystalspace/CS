@@ -21,15 +21,32 @@
 #include "cssysdef.h"
 
 #include "csplugincommon/opengl/glextmanager.h"
+#include "csplugincommon/opengl/glstates.h"
 #include "csplugincommon/shader/shadercachehelper.h"
 #include "csutil/csendian.h"
 #include "csutil/documenthelper.h"
 #include "csutil/memfile.h"
+#include "csutil/scfstr.h"
 #include "iutil/hiercache.h"
+#include "iutil/stringarray.h"
 #include "ivaria/reporter.h"
 
 #include "glshader_cg.h"
 #include "glshader_cgcommon.h"
+#include "profile_limits.h"
+
+// Enabling this preprocesses Cg sources with boost::Wave
+//#define PREPROCESS_WITH_WAVE
+
+#ifdef PREPROCESS_WITH_WAVE
+#include <string>
+#include <vector>
+
+#include <boost/wave.hpp>
+
+#include <boost/wave/cpplexer/cpp_lex_token.hpp>
+#include <boost/wave/cpplexer/cpp_lex_iterator.hpp>
+#endif
 
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
@@ -38,8 +55,7 @@ CS_LEAKGUARD_IMPLEMENT (csShaderGLCGCommon);
 
 csShaderGLCGCommon::csShaderGLCGCommon (csGLShader_CG* shaderPlug, 
 					ProgramType type) :
-  scfImplementationType (this, shaderPlug->object_reg), programType (type),
-  assumedConstParams (0)
+  scfImplementationType (this, shaderPlug->object_reg), programType (type)
 {
   validProgram = true;
   this->shaderPlug = shaderPlug;
@@ -53,20 +69,6 @@ csShaderGLCGCommon::~csShaderGLCGCommon ()
   if (program)
     cgDestroyProgram (program);
     
-  if (assumedConstParams != 0)
-  {
-    for(size_t i = 0; i < assumedConstParams->GetSize (); ++i)
-    {
-      VariableMapEntry& mapping = assumedConstParams->Get (i);
-      
-      ShaderParameter* param =
-	reinterpret_cast<ShaderParameter*> (mapping.userVal);
-      
-      FreeShaderParam (param);
-    }
-    delete assumedConstParams;
-  }
-
   for(size_t i = 0; i < variablemap.GetSize (); ++i)
   {
     VariableMapEntry& mapping = variablemap[i];
@@ -81,17 +83,29 @@ csShaderGLCGCommon::~csShaderGLCGCommon ()
 void csShaderGLCGCommon::Activate()
 {
   cgGLEnableProfile (programProfile);
+  #if 0
   if (!cgGLIsProgramLoaded (program))
   {
     cgGLLoadProgram (program);
     PostCompileVmapProcess ();
   }
+  #endif
   cgGLBindProgram (program);
+  
+  if (shaderPlug->ext->CS_GL_ARB_color_buffer_float)
+  {
+    shaderPlug->statecache->SetClampColor (GL_CLAMP_VERTEX_COLOR_ARB, GL_FALSE);
+  }
 }
 
 void csShaderGLCGCommon::Deactivate()
 {
   cgGLDisableProfile (programProfile);
+
+  if (shaderPlug->ext->CS_GL_ARB_color_buffer_float)
+  {
+    shaderPlug->statecache->SetClampColor (GL_CLAMP_VERTEX_COLOR_ARB, GL_TRUE);
+  }
 }
 
 void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
@@ -112,11 +126,18 @@ void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
 	
       if (!clip.distance.IsConstant())
       {
-	csVector4 v (GetParamVectorVal (stack, clip.distance,
-	  csVector4 (0, 0, 0, 0)));
-	float distVal = v[clip.distComp];
-	if (clip.distNeg) distVal = -distVal;
-	packDist[c/4][c%4] = distVal;
+	csVector4 v;
+	if (GetParamVectorVal (stack, clip.distance, &v))
+	{
+	  float distVal = v[clip.distComp];
+	  if (clip.distNeg) distVal = -distVal;
+	  packDist[c/4][c%4] = distVal;
+	}
+	else
+	{
+	  // Force clipping to have no effect
+	  packDist[c/4][c%4] = -FLT_MAX;
+	}
       }
       
       bool doClipping = false;
@@ -203,10 +224,20 @@ void csShaderGLCGCommon::EnsureDumpFile()
   }
 }
 
-bool csShaderGLCGCommon::DefaultLoadProgram (
-  iShaderDestinationResolverCG* cgResolve,
+void csShaderGLCGCommon::PrecacheClear()
+{
+  if (program != 0)
+  {
+    cgDestroyProgram (program);
+    program = 0;
+  }
+  objectCode.Empty();
+  objectCodeCachePath.Empty();
+}
+
+bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
   const char* programStr, CGGLenum type, CGprofile maxProfile, 
-  uint flags)
+  uint flags, const ProfileLimits* customLimits)
 {
   if (!programStr || !*programStr) return false;
 
@@ -225,23 +256,37 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
       param.GetData());
   }
   
+  if (flags & loadFlagUnusedV2FForInit)
+    augmentedProgramStr.Append ("#define _INITIALIZE_UNUSED_V2F\n");
+  
   OutputClipPreamble (augmentedProgramStr);
   WriteClipApplications (augmentedProgramStr);
   
   augmentedProgramStr.Append (programStr);
   programStr = augmentedProgramStr;
   CGprofile profile = CG_PROFILE_UNKNOWN;
+  CS::PluginCommon::ShaderProgramPluginGL::HardwareVendor vendor;
 
-  if (!cg_profile.IsEmpty())
-    profile = cgGetProfile (cg_profile);
+  if (customLimits != 0)
+  {
+    profile = customLimits->profile;
+    vendor = customLimits->vendor;
+  }
+  else
+  {
+    if (!cg_profile.IsEmpty())
+      profile = cgGetProfile (cg_profile);
+  
+    if(profile == CG_PROFILE_UNKNOWN)
+      profile = cgGLGetLatestProfile (type);
+  
+    if (maxProfile != CG_PROFILE_UNKNOWN)
+      profile = csMin (profile, maxProfile);
+      
+    vendor = shaderPlug->vendor;
+  }
 
-  if(profile == CG_PROFILE_UNKNOWN)
-    profile = cgGLGetLatestProfile (type);
-
-  if (maxProfile != CG_PROFILE_UNKNOWN)
-    profile = csMin (profile, maxProfile);
-
-  if (shaderPlug->doVerbose)
+  if (shaderPlug->doVerbose || shaderPlug->doVerbosePrecache)
   {
     shaderPlug->Report (CS_REPORTER_SEVERITY_NOTIFY,
       "Cg %s program '%s': using profile %s[%d]", GetProgramType(),
@@ -249,7 +294,8 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   }
 
   ArgumentArray args;
-  shaderPlug->GetProfileCompilerArgs (GetProgramType(), profile, args);
+  shaderPlug->GetProfileCompilerArgs (GetProgramType(), profile, 
+    vendor, flags & loadIgnoreConfigProgramOpts, args);
   for (i = 0; i < compilerArgs.GetSize(); i++) 
     args.Push (compilerArgs[i]);
   /* Work around Cg 2.0 bug: it emits "OPTION ARB_position_invariant;"
@@ -266,6 +312,14 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
       else
 	i++;
     }
+  }
+  if (customLimits != 0)
+    customLimits->ToCgOptions (args);
+  else
+  {
+    ProfileLimits limits (shaderPlug->vendor, profile);
+    limits.GetCurrentLimits (shaderPlug->ext);
+    limits.ToCgOptions (args);
   }
   args.Push (0);
  
@@ -293,7 +347,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
   programProfile = cgGetProgramProfile (program);
 
   if (flags & loadApplyVmap)
-    ApplyVmap();
+    GetParamsFromVmap();
 
   if (flags & loadIgnoreErrors) shaderPlug->SetIgnoreErrors (true);
   cgCompileProgram (program);
@@ -303,7 +357,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
     shaderPlug->PrintAnyListing();
   
   if (flags & loadApplyVmap)
-    PostCompileVmapProcess ();
+    GetPostCompileParamProps ();
 
   if (flags & loadLoadToGL)
   {
@@ -313,16 +367,17 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
     if ((cgGetError() != CG_NO_ERROR)
       || !cgGLIsProgramLoaded (program)) 
     {
-      //if (shaderPlug->debugDump)
-	//DoDebugDump();
+      if (shaderPlug->debugDump)
+	DoDebugDump();
 
       if (shaderPlug->doVerbose
 	  && ((type == CG_GL_VERTEX) && (profile >= CG_PROFILE_ARBVP1))
 	    || ((type == CG_GL_FRAGMENT) && (profile >= CG_PROFILE_ARBFP1)))
       {
-	const char* err = (char*)glGetString (GL_PROGRAM_ERROR_STRING_ARB);
-	shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING,
-	  "OpenGL error string: %s", err);
+	csString err = (char*)glGetString (GL_PROGRAM_ERROR_STRING_ARB);
+	if (!err.IsEmpty())
+	  shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING,
+	    "OpenGL error string: %s", err.GetData());
       }
 
       shaderPlug->SetCompiledSource (0);
@@ -360,13 +415,155 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
        
        @@@ This should be at least configurable
      */
-    result = numVaryings <= 16;
+    const int maxNumVaryings = 16;
+    if (numVaryings > maxNumVaryings)
+    {
+      if (shaderPlug->doVerbose || shaderPlug->doVerbosePrecache)
+      {
+	shaderPlug->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Discarding compiled program for having too much varyings "
+	  "(%d, limit is %d)",
+	  numVaryings, maxNumVaryings);
+      }
+      cgDestroyProgram (program);
+      program = 0;
+      result = false;
+    }
   }
   if (!result && !debugFN.IsEmpty())
   {
     csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectReg);
     vfs->DeleteFile (debugFN);
   }
+  return result;
+}
+
+csString csShaderGLCGCommon::GetPreprocessedProgram (const char* programStr, 
+  const ArgumentArray& args)
+{
+  csString augmentedProgramStr;
+  const csSet<csString>* unusedParams = &this->unusedParams;
+  if (cgResolve != 0)
+  {
+    unusedParams = &cgResolve->GetUnusedParameters ();
+  }
+  csSet<csString>::GlobalIterator unusedIt (unusedParams->GetIterator());
+  while (unusedIt.HasNext())
+  {
+    const csString& param = unusedIt.Next ();
+    augmentedProgramStr.AppendFmt ("#define %s\n",
+      param.GetData());
+  }
+  
+  OutputClipPreamble (augmentedProgramStr);
+  WriteClipApplications (augmentedProgramStr);
+  
+  augmentedProgramStr.Append (programStr);
+  
+  csString result;
+  
+  csStringArray macros;
+  for (size_t i = 0; i < args.GetSize(); i++)
+  {
+    const char* s = args[i];
+    if (s && (strlen (s) > 2) && (s[0] == '-') && (s[1] == 'D'))
+      macros.Push (s + 2);
+  }
+  
+#ifdef PREPROCESS_WITH_WAVE
+  /* This code is mostly stolen^Wadapted from the boost::Wave quickstart
+      example */
+
+  // current file position is saved for exception handling
+  boost::wave::util::file_position_type current_position;
+
+  try
+  {
+      //  The template boost::wave::cpplexer::lex_token<> is the token type to be 
+      //  used by the Wave library.
+      typedef boost::wave::cpplexer::lex_token<> token_type;
+    
+      //  The template boost::wave::cpplexer::lex_iterator<> is the lexer type to
+      //  be used by the Wave library.
+      typedef boost::wave::cpplexer::lex_iterator<token_type> lex_iterator_type;
+	
+      //  This is the resulting context type to use. The first template parameter
+      //  should match the iterator type to be used during construction of the
+      //  corresponding context object (see below).
+      typedef boost::wave::context<std::string::iterator, lex_iterator_type>
+	  context_type;
+	  
+      // To work around Wave warning w/ missing newline at EOF
+      std::string instring (augmentedProgramStr);
+      instring.append ("\n");
+
+      // The preprocessor iterator shouldn't be constructed directly. It is 
+      // to be generated through a wave::context<> object. This wave:context<> 
+      // object is to be used additionally to initialize and define different 
+      // parameters of the actual preprocessing.
+      //
+      // The preprocessing of the input stream is done on the fly behind the 
+      // scenes during iteration over the context_type::iterator_type stream.
+      context_type ctx (instring.begin(), instring.end(), "*buffer*");
+      
+      for (size_t i = 0; i < macros.GetSize(); i++)
+      {
+        ctx.add_macro_definition (macros[i], false);
+      }
+
+      // analyze the input file
+      context_type::iterator_type first = ctx.begin();
+      context_type::iterator_type last = ctx.end();
+	
+      while (first != last)
+      {
+	  current_position = (*first).get_position();
+	  result << (*first).get_value().c_str();
+	  ++first;
+      }
+  }
+  catch (boost::wave::cpp_exception const& e)
+  {
+      // some preprocessing error
+      std::cerr 
+	  << e.file_name() << "(" << e.line_no() << "): "
+	  << e.description() << std::endl;
+      if (e.get_severity() >= boost::wave::util::severity_error)
+	result = (char*)0;
+  }
+  catch (std::exception const& e)
+  {
+      // use last recognized token to retrieve the error position
+      std::cerr 
+	  << current_position.get_file() 
+	  << "(" << current_position.get_line() << "): "
+	  << "exception caught: " << e.what()
+	  << std::endl;
+      result = (char*)0;
+  }
+  catch (...)
+  {
+      // use last recognized token to retrieve the error position
+      std::cerr 
+	  << current_position.get_file() 
+	  << "(" << current_position.get_line() << "): "
+	  << "unexpected exception caught." << std::endl;
+      result = (char*)0;
+  }
+#endif
+  
+  if (result.IsEmpty())
+  {
+    /* "Fake" preprocessing: since the output is only used for hashing,
+       return a result that is different for each source/macros combination. */
+       
+    for (size_t i = 0; i < macros.GetSize(); i++)
+    {
+      result.AppendFmt ("// @@MACRO %s\n", macros[i]);
+    }
+    result += augmentedProgramStr;
+  }
+  
   return result;
 }
 
@@ -492,17 +689,22 @@ void csShaderGLCGCommon::WriteAdditionalDumpInfo (const char* description,
   }
 }
 
-/* Magic value for cpg program files.
+/* Magic value for cg program files.
  * The most significant byte serves as a "version", increase when the
  * cache file format changes. */
-static const uint32 cacheFileMagic = 0x00716763;
+static const uint32 cacheFileMagic = 0x04706763;
 
-bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache)
+enum
+{
+  cpsValid = 0x6b726f77,
+  cpsInvalid = 0x6b723062
+};
+
+bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache,
+                                       const ProfileLimits& limits,
+                                       const char* tag)
 {
   if (!cache) return false;
-
-  csRefArray<iDocumentNode> cacheKeepNodes (this->cacheKeepNodes);
-  this->cacheKeepNodes.DeleteAll ();
 
   csMemFile cacheFile;
   
@@ -510,131 +712,415 @@ bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache)
   if (cacheFile.Write ((char*)&diskMagic, sizeof (diskMagic))
       != sizeof (diskMagic)) return false;
   
-  CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile, description);
+  csRef<iDataBuffer> programBuffer = GetProgramData();
+  csMD5::Digest progHash = csMD5::Encode (
+    programBuffer->GetData(), programBuffer->GetSize());
+  if (cacheFile.Write ((char*)&progHash, sizeof (progHash))
+      != sizeof (progHash)) return false;
   
-  csRef<iDocumentSystem> docsys = shaderPlug->binDocSys;
-  if (!docsys.IsValid()) docsys = shaderPlug->xmlDocSys;
-  csRef<iDocument> doc = docsys->CreateDocument();
-  csRef<iDocumentNode> root = doc->CreateRoot();
-  for (size_t i = 0; i < cacheKeepNodes.GetSize(); i++)
+  csString objectCode (this->objectCode);
+  if ((program != 0) && objectCode.IsEmpty())
+    objectCode = cgGetProgramString (program, CG_COMPILED_PROGRAM);
+  /*const char* object;
+  if ((program == 0)
+    || ((object = cgGetProgramString (program, CG_COMPILED_PROGRAM)) == 0)
+    || (*object == 0))*/
+  if ((program == 0) || objectCode.IsEmpty())
   {
-    csRef<iDocumentNode> newNode = root->CreateNodeBefore (
-      cacheKeepNodes[i]->GetType());
-    CS::DocSystem::CloneNode (cacheKeepNodes[i], newNode);
+    uint32 diskState = csLittleEndian::UInt32 (cpsInvalid);
+    if (cacheFile.Write ((char*)&diskState, sizeof (diskState))
+	!= sizeof (diskState)) return false;
   }
-  
+  else
   {
-    csMemFile docFile;
-    const char* err = doc->Write (&docFile);
-    if (err != 0)
     {
-      csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
-	"crystalspace.graphics3d.shader.glcg",
-	"Error writing document: %s", err);
+      uint32 diskState = csLittleEndian::UInt32 (cpsValid);
+      if (cacheFile.Write ((char*)&diskState, sizeof (diskState))
+	  != sizeof (diskState)) return false;
     }
-    csRef<iDataBuffer> docBuf = docFile.GetAllData (false);
-    if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (&cacheFile,
-        docBuf))
-      return false;
-  }
-  
-  {
-    uint32 diskProfile = csLittleEndian::UInt32 (programProfile);
-    if (cacheFile.Write ((char*)&diskProfile, sizeof (diskProfile))
-	!= sizeof (diskProfile)) return false;
-  }
-  
-  const char* object = cgGetProgramString (program, CG_COMPILED_PROGRAM);
-  CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile, object);
-  
-  return cache->CacheData (cacheFile.GetData(), cacheFile.GetSize(),
-    "/cg");
-}
-
-bool csShaderGLCGCommon::LoadFromCache (iHierarchicalCache* cache,
-                                        csRef<iString>* failReason)
-{
-  if (!cache) return false;
-
-  csRef<iDataBuffer> cacheBuf = cache->ReadCache ("/cg");
-  if (!cacheBuf.IsValid()) return false;
-
-  csMemFile cacheFile (cacheBuf, true);
-  
-  uint32 diskMagic;
-  if (cacheFile.Read ((char*)&diskMagic, sizeof (diskMagic))
-      != sizeof (diskMagic)) return false;
-  if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic)
-    return false;
     
-  description = CS::PluginCommon::ShaderCacheHelper::ReadString (&cacheFile);
-  
-  csRef<iDataBuffer> docBuf =
-    CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (&cacheFile);
-  if (!docBuf.IsValid()) return false;
-  
-  csRef<iDocument> doc;
-  if (shaderPlug->binDocSys.IsValid())
-  {
-    doc = shaderPlug->binDocSys->CreateDocument ();
-    const char* err = doc->Parse (docBuf);
-    if (err != 0)
+    CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile, description);
+    
+    csRef<iDocumentSystem> docsys = shaderPlug->binDocSys;
+    if (!docsys.IsValid()) docsys = shaderPlug->xmlDocSys;
+    csRef<iDocument> doc = docsys->CreateDocument();
+    csRef<iDocumentNode> root = doc->CreateRoot();
+    for (size_t i = 0; i < cacheKeepNodes.GetSize(); i++)
     {
-      csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
-	"crystalspace.graphics3d.shader.glcg",
-	"Error reading document: %s", err);
+      csRef<iDocumentNode> newNode = root->CreateNodeBefore (
+	cacheKeepNodes[i]->GetType());
+      CS::DocSystem::CloneNode (cacheKeepNodes[i], newNode);
     }
-  }
-  if (!doc.IsValid() && shaderPlug->xmlDocSys.IsValid())
-  {
-    doc = shaderPlug->xmlDocSys->CreateDocument ();
-    const char* err = doc->Parse (docBuf);
-    if (err != 0)
+    
     {
-      csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
-	"crystalspace.graphics3d.shader.glcg",
-	"Error reading document: %s", err);
-    }
-  }
-  if (!doc.IsValid()) return false;
-  
-  csRef<iDocumentNode> root = doc->GetRoot();
-  if (!root.IsValid()) return false;
-  csRef<iDocumentNodeIterator> nodes = root->GetNodes();
-  while(nodes->HasNext())
-  {
-    csRef<iDocumentNode> child = nodes->Next();
-    if(child->GetType() != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch(id)
-    {
-      case XMLTOKEN_VARIABLEMAP:
-	if (!ParseVmap (child))
-	  return false;
-	break;
-      case XMLTOKEN_CLIP:
-	if (!ParseClip (child))
-	  return false;
-	break;
-      default:
+      csMemFile docFile;
+      const char* err = doc->Write (&docFile);
+      if (err != 0)
+      {
+	csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
+	  "crystalspace.graphics3d.shader.glcg",
+	  "Error writing document: %s", err);
+      }
+      csRef<iDataBuffer> docBuf = docFile.GetAllData (false);
+      if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (&cacheFile,
+	  docBuf))
 	return false;
     }
+    
+    if (objectCodeCachePath.IsEmpty())
+    {
+      if (!WriteToCompileCache (limits, cache))
+        return false;
+    }
+    
+    CS_ASSERT(!objectCodeCachePath.IsEmpty());
+    CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile,
+      objectCodeCachePath);
   }
   
+  csString cacheName ("/");
+  cacheName += tag;
+  return cache->CacheData (cacheFile.GetData(), cacheFile.GetSize(),
+    cacheName);
+}
+
+struct CachedShaderWrapper
+{
+  csString name;
+  csRef<iFile> cacheFile;
+  ProfileLimitsPair limits;
+  
+  CachedShaderWrapper (iFile* file) : cacheFile (file) {}
+    
+  bool operator< (const CachedShaderWrapper& other) const
+  { return limits < other.limits; }
+};
+
+iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
+  iHierarchicalCache* cache, iDocumentNode* node,
+  csRef<iString>* failReason, csRef<iString>* tag)
+{
+  if (!cache) return iShaderProgram::loadFail;
+
+  csRef<iStringArray> allCachedPrograms = cache->GetSubItems ("/");
+  if (!allCachedPrograms.IsValid())
   {
-    uint32 diskProfile;
-    if (cacheFile.Read ((char*)&diskProfile, sizeof (diskProfile))
-	!= sizeof (diskProfile)) return false;
-    programProfile = (CGprofile)csLittleEndian::UInt32 (diskProfile);
+    if (failReason) failReason->AttachNew (
+      new scfString ("no cached programs found"));
+    return iShaderProgram::loadFail;
+  }
+  
+  if (!GetProgramNode (node)) return iShaderProgram::loadFail;
+  csRef<iDataBuffer> programBuffer = GetProgramData();
+  csMD5::Digest progHash = csMD5::Encode (
+    programBuffer->GetData(), programBuffer->GetSize());
+  
+  csArray<CachedShaderWrapper> cachedProgWrappers;
+  for (size_t i = 0; i < allCachedPrograms->GetSize(); i++)
+  {
+    csString cachePath ("/");
+    cachePath.Append (allCachedPrograms->Get (i));
+    csRef<iDataBuffer> cacheBuf = cache->ReadCache (cachePath);
+    if (!cacheBuf.IsValid()) continue;
+    
+    csRef<iFile> cacheFile;
+    cacheFile.AttachNew (new csMemFile (cacheBuf, true));
+  
+    uint32 diskMagic;
+    if (cacheFile->Read ((char*)&diskMagic, sizeof (diskMagic))
+	!= sizeof (diskMagic)) continue;
+    if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic)
+      continue;
+      
+    CachedShaderWrapper wrapper (cacheFile);
+    
+    wrapper.name = allCachedPrograms->Get (i);
+    if (!wrapper.limits.FromString (wrapper.name)) continue;
+    
+    csMD5::Digest diskHash;
+    if (cacheFile->Read ((char*)&diskHash, sizeof (diskHash))
+	!= sizeof (diskHash)) continue;
+    if (diskHash != progHash) continue;
+    
+    cachedProgWrappers.Push (wrapper);
+  }
+  
+  if (cachedProgWrappers.GetSize() == 0)
+  {
+    if (failReason) failReason->AttachNew (
+      new scfString ("all cached programs failed to read"));
+    return iShaderProgram::loadFail;
+  }
+  
+  cachedProgWrappers.Sort ();
+
+  csString allReasons;
+  bool oneReadCorrectly = false;
+  for (size_t i = cachedProgWrappers.GetSize(); i-- > 0;)
+  {
+    const CachedShaderWrapper& wrapper = cachedProgWrappers[i];
+    const ProfileLimits& limits =
+      (programType == progVP) ? wrapper.limits.vp : wrapper.limits.fp;
+  
+    bool profileSupported =
+      (shaderPlug->ProfileNeedsRouting (limits.profile)
+        && shaderPlug->IsRoutedProfileSupported (limits.profile))
+      || cgGLIsProfileSupported (limits.profile);
+    if (!profileSupported)
+    {
+      allReasons += wrapper.name;
+      allReasons += ": Profile unsupported; ";
+      continue;
+    }
+    
+    ProfileLimits currentLimits (shaderPlug->vendor,
+      limits.profile);
+    currentLimits.GetCurrentLimits (shaderPlug->ext);
+    
+    if ((limits.vendor != currentLimits.vendor)
+        && (limits.vendor != CS::PluginCommon::ShaderProgramPluginGL::Other))
+    {
+      allReasons += wrapper.name;
+      allReasons += ": vendor mismatch; ";
+      continue;
+    }
+    
+    bool limitsSupported = currentLimits >= limits;
+    if (!limitsSupported)
+    {
+      allReasons += wrapper.name;
+      allReasons += ": Limits exceeded; ";
+      continue;
+    }
+    
+    iFile* cacheFile = wrapper.cacheFile;
+    
+    {
+      uint32 diskState;
+      if (cacheFile->Read ((char*)&diskState, sizeof (diskState))
+	  != sizeof (diskState)) continue;
+      if (csLittleEndian::UInt32 (diskState) != cpsValid)
+      {
+        oneReadCorrectly = true;
+        continue;
+      }
+    }
+  
+    
+    description = CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+    
+    csRef<iDataBuffer> docBuf =
+      CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
+    if (!docBuf.IsValid()) continue;
+    
+    csRef<iDocument> doc;
+    if (shaderPlug->binDocSys.IsValid())
+    {
+      doc = shaderPlug->binDocSys->CreateDocument ();
+      const char* err = doc->Parse (docBuf);
+      if (err != 0)
+      {
+	csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
+	  "crystalspace.graphics3d.shader.glcg",
+	  "Error reading document: %s", err);
+      }
+    }
+    if (!doc.IsValid() && shaderPlug->xmlDocSys.IsValid())
+    {
+      doc = shaderPlug->xmlDocSys->CreateDocument ();
+      const char* err = doc->Parse (docBuf);
+      if (err != 0)
+      {
+	csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
+	  "crystalspace.graphics3d.shader.glcg",
+	  "Error reading document: %s", err);
+      }
+    }
+    if (!doc.IsValid()) continue;
+    
+    csRef<iDocumentNode> root = doc->GetRoot();
+    if (!root.IsValid()) continue;
+    
+    bool breakFail = false;
+    csRef<iDocumentNodeIterator> nodes = root->GetNodes();
+    while(nodes->HasNext() && !breakFail)
+    {
+      csRef<iDocumentNode> child = nodes->Next();
+      if(child->GetType() != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch(id)
+      {
+	case XMLTOKEN_VARIABLEMAP:
+	  if (!ParseVmap (child))
+	    breakFail = true;
+	  break;
+	case XMLTOKEN_CLIP:
+	  if (!ParseClip (child))
+	    breakFail = true;
+	  break;
+	default:
+	  breakFail = true;
+      }
+    }
+    if (breakFail) continue;
+    
+    objectCodeCachePath =
+      CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+    if (objectCodeCachePath.IsEmpty()) continue;
+    
+    if (!LoadObjectCodeFromCompileCache (limits, cache))
+      continue;
+    
+    oneReadCorrectly = true;
+    if (program)
+    {
+      cgDestroyProgram (program);
+      program = 0;
+    }
+    
+    if (objectCode.IsEmpty()) continue;
+    
+    cgGetError(); // Clear error
+    program = cgCreateProgram (shaderPlug->context, 
+      CG_OBJECT, objectCode, limits.profile, 0, 0);
+    if (!program) continue;
+    CGerror err = cgGetError();
+    if (err != CG_NO_ERROR)
+    {
+      const char* errStr = cgGetErrorString (err);
+      shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING,
+	"Cg error %s", errStr);
+      continue;
+    }
+    programProfile = limits.profile;
+    
+    ClipsToVmap();
+    GetParamsFromVmap();
+    
+    cgGetError(); // Clear error
+    cgGLLoadProgram (program);
+    shaderPlug->PrintAnyListing();
+    err = cgGetError();
+    if ((err != CG_NO_ERROR)
+      || !cgGLIsProgramLoaded (program)) 
+    {
+      //if (shaderPlug->debugDump)
+	//DoDebugDump();
+	
+      const char* errStr = cgGetErrorString (err);
+      shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING,
+	"Cg error %s", errStr);
+  
+      if (shaderPlug->doVerbose
+	  && ((programType == progVP) && (programProfile >= CG_PROFILE_ARBVP1))
+	    || ((programType == progFP) && (programProfile >= CG_PROFILE_ARBFP1)))
+      {
+	const char* err = (char*)glGetString (GL_PROGRAM_ERROR_STRING_ARB);
+	shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING,
+	  "OpenGL error string: %s", err);
+      }
+  
+      shaderPlug->SetCompiledSource (0);
+      continue;
+    }
+    
+    GetPostCompileParamProps ();
+    
+    if (shaderPlug->debugDump)
+      DoDebugDump();
+      
+    tag->AttachNew (new scfString (wrapper.limits.ToString()));
+    
+    return iShaderProgram::loadSuccessShaderValid;
+  }
+  
+  if (failReason) failReason->AttachNew (
+    new scfString (allReasons));
+  return oneReadCorrectly ? iShaderProgram::loadSuccessShaderInvalid : iShaderProgram::loadFail;
+}
+
+static const uint32 cacheFileMagicCC = 0x03637063;
+
+bool csShaderGLCGCommon::TryLoadFromCompileCache (const char* source, 
+                                                  const ProfileLimits& limits,
+                                                  iHierarchicalCache* cache)
+{
+  csString objectCodeCachePath;
+  
+  iHierarchicalCache* rootCache = cache->GetTopCache();
+  csMD5::Digest sourceMD5 = csMD5::Encode (source);
+  csString cachePath;
+  cachePath.Format ("/CgProgCache/%s/%s",
+    sourceMD5.HexString().GetData(), limits.ToString().GetData());
+  csRef<iHierarchicalCache> progCache = rootCache->GetRootedCache (cachePath);
+  
+  csRef<iFile> foundFile;
+  csRef<iStringArray> cachedVersions = progCache->GetSubItems ("/");
+  for (size_t i = 0; i < cachedVersions->GetSize(); i++)
+  {
+    csString cachePath2 ("/");
+    cachePath2.Append (cachedVersions->Get (i));
+    csRef<iDataBuffer> cacheBuf = progCache->ReadCache (cachePath2);
+    if (!cacheBuf.IsValid()) continue;
+    
+    csRef<iFile> cacheFile;
+    cacheFile.AttachNew (new csMemFile (cacheBuf, true));
+  
+    uint32 diskMagic;
+    if (cacheFile->Read ((char*)&diskMagic, sizeof (diskMagic))
+	!= sizeof (diskMagic)) continue;
+    if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagicCC)
+      continue;
+    
+    csString cachedSource =
+      CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+      
+    if (cachedSource == source)
+    {
+      foundFile = cacheFile;
+      objectCodeCachePath.Format ("/%s/%s/%s",
+        sourceMD5.HexString().GetData(), limits.ToString().GetData(),
+        cachedVersions->Get (i));
+      break;
+    }
+  }
+  
+  if (!foundFile.IsValid()) return false;
+  
+  {
+    uint32 diskState;
+    if (foundFile->Read ((char*)&diskState, sizeof (diskState))
+	!= sizeof (diskState)) return false;
+    if (csLittleEndian::UInt32 (diskState) != cpsValid)
+    {
+      if (program) cgDestroyProgram (program);
+      program = 0;
+      return true;
+    }
   }
   
   objectCode =
-    CS::PluginCommon::ShaderCacheHelper::ReadString (&cacheFile);
+    CS::PluginCommon::ShaderCacheHelper::ReadString (foundFile);
   if (objectCode.IsEmpty()) return false;
   
+  unusedParams.DeleteAll();
+  {
+    csString p;
+    while (!(p = CS::PluginCommon::ShaderCacheHelper::ReadString (foundFile))
+      .IsEmpty())
+    {
+      unusedParams.Add (p);
+    }
+  }
+
+  if (program)
+  {
+    cgDestroyProgram (program);
+  }
+  cgGetError(); // Clear error
   program = cgCreateProgram (shaderPlug->context, 
-    CG_OBJECT, objectCode, programProfile, 0, 0);
+    CG_OBJECT, objectCode, limits.profile, 0, 0);
   if (!program) return false;
   CGerror err = cgGetError();
   if (err != CG_NO_ERROR)
@@ -645,43 +1131,249 @@ bool csShaderGLCGCommon::LoadFromCache (iHierarchicalCache* cache,
     return false;
   }
   
-  ClipsToVmap();
-  ApplyVmap();
-  
-  cgGetError(); // Clear error
-  cgGLLoadProgram (program);
-  shaderPlug->PrintAnyListing();
-  err = cgGetError();
-  if ((err != CG_NO_ERROR)
-    || !cgGLIsProgramLoaded (program)) 
-  {
-    //if (shaderPlug->debugDump)
-      //DoDebugDump();
-      
-    const char* errStr = cgGetErrorString (err);
-    shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING,
-      "Cg error %s", errStr);
-
-    if (shaderPlug->doVerbose
-	&& ((programType == progVP) && (programProfile >= CG_PROFILE_ARBVP1))
-	  || ((programType == progFP) && (programProfile >= CG_PROFILE_ARBFP1)))
-    {
-      const char* err = (char*)glGetString (GL_PROGRAM_ERROR_STRING_ARB);
-      shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING,
-	"OpenGL error string: %s", err);
-    }
-
-    shaderPlug->SetCompiledSource (0);
-    return false;
-  }
-  
-  PostCompileVmapProcess ();
-  
-  if (shaderPlug->debugDump)
-    DoDebugDump();
+  this->objectCodeCachePath = objectCodeCachePath;
   
   return true;
 }
 
+bool csShaderGLCGCommon::LoadObjectCodeFromCompileCache (
+  const ProfileLimits& limits, iHierarchicalCache* cache)
+{
+  CS_ASSERT(!objectCodeCachePath.IsEmpty());
+
+  iHierarchicalCache* rootCache = cache->GetTopCache();
+  csRef<iHierarchicalCache> progCache =
+    rootCache->GetRootedCache ("/CgProgCache");
+  
+  csRef<iDataBuffer> cacheBuf = progCache->ReadCache (objectCodeCachePath);
+  if (!cacheBuf.IsValid()) return false;
+    
+  csRef<iFile> cacheFile;
+  cacheFile.AttachNew (new csMemFile (cacheBuf, true));
+  
+  uint32 diskMagic;
+  if (cacheFile->Read ((char*)&diskMagic, sizeof (diskMagic))
+      != sizeof (diskMagic)) return false;
+  if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagicCC)
+    return false;
+    
+  CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+  
+  if (!cacheFile.IsValid()) return false;
+  
+  {
+    uint32 diskState;
+    if (cacheFile->Read ((char*)&diskState, sizeof (diskState))
+	!= sizeof (diskState)) return false;
+    if (csLittleEndian::UInt32 (diskState) != cpsValid)
+    {
+      objectCode.Empty();
+      return true;
+    }
+  }
+  
+  objectCode =
+    CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+    
+  unusedParams.DeleteAll();
+  {
+    csString p;
+    while (!(p = CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile))
+      .IsEmpty())
+    {
+      unusedParams.Add (p);
+    }
+  }
+  
+  return true;
+}
+
+bool csShaderGLCGCommon::WriteToCompileCache (const char* source,
+                                              const ProfileLimits& limits,
+                                              iHierarchicalCache* cache)
+{
+  CS_ASSERT(objectCodeCachePath.IsEmpty());
+
+  iHierarchicalCache* rootCache = cache->GetTopCache();
+  csMD5::Digest sourceMD5 = csMD5::Encode (source);
+  csString cachePath;
+  cachePath.Format ("/CgProgCache/%s/%s",
+    sourceMD5.HexString().GetData(), limits.ToString().GetData());
+  csRef<iHierarchicalCache> progCache = rootCache->GetRootedCache (cachePath);
+  
+  csString subItem;
+  csRef<iStringArray> cachedVersions = progCache->GetSubItems ("/");
+  for (size_t i = 0; i < cachedVersions->GetSize(); i++)
+  {
+    csString cachePath2 ("/");
+    cachePath2.Append (cachedVersions->Get (i));
+    csRef<iDataBuffer> cacheBuf = progCache->ReadCache (cachePath2);
+    if (!cacheBuf.IsValid()) continue;
+    
+    csRef<iFile> cacheFile;
+    cacheFile.AttachNew (new csMemFile (cacheBuf, true));
+  
+    uint32 diskMagic;
+    if (cacheFile->Read ((char*)&diskMagic, sizeof (diskMagic))
+	!= sizeof (diskMagic)) continue;
+    if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagicCC)
+      continue;
+    
+    csString cachedSource =
+      CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+      
+    if (cachedSource == source)
+    {
+      subItem = cachePath2;
+      break;
+    }
+  }
+  
+  if (subItem.IsEmpty())
+  {
+    uint n = 0;
+    csRef<iDataBuffer> item;
+    do
+    {
+      subItem.Format ("/%u", n++);
+      item = progCache->ReadCache (subItem);
+    }
+    while (item.IsValid());
+  }
+  
+  csMemFile cacheFile;
+  
+  uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagicCC);
+  if (cacheFile.Write ((char*)&diskMagic, sizeof (diskMagic))
+      != sizeof (diskMagic)) return false;
+  
+  if (!CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile, source))
+    return false;
+  
+  const char* object;
+  if ((program == 0)
+    || ((object = cgGetProgramString (program, CG_COMPILED_PROGRAM)) == 0)
+    || (*object == 0))
+  {
+    uint32 diskState = csLittleEndian::UInt32 (cpsInvalid);
+    if (cacheFile.Write ((char*)&diskState, sizeof (diskState))
+	!= sizeof (diskState)) return false;
+  }
+  else
+  {
+    {
+      uint32 diskState = csLittleEndian::UInt32 (cpsValid);
+      if (cacheFile.Write ((char*)&diskState, sizeof (diskState))
+	  != sizeof (diskState)) return false;
+    }
+    
+    if (!CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile, object))
+      return false;
+    
+    csSet<csString>::GlobalIterator iter (unusedParams.GetIterator());
+    while (iter.HasNext())
+    {
+      const csString& s = iter.Next();
+      if (!CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile, s))
+	return false;
+    }
+
+    if (!CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile, 0))
+      return false;
+  }
+    
+  if (!progCache->CacheData (cacheFile.GetData(), cacheFile.GetSize(),
+      subItem))
+    return false;
+    
+  objectCodeCachePath.Format ("/%s/%s%s",
+    sourceMD5.HexString().GetData(), limits.ToString().GetData(),
+    subItem.GetData());
+  
+  return true;
+}
+    
+bool csShaderGLCGCommon::WriteToCompileCache (const ProfileLimits& limits,
+                                              iHierarchicalCache* cache)
+{
+  CS_ASSERT(objectCodeCachePath.IsEmpty());
+  csString source;
+
+  ArgumentArray args;
+  shaderPlug->GetProfileCompilerArgs (GetProgramType(),
+    limits.profile, limits.vendor, false, args);
+  for (size_t i = 0; i < compilerArgs.GetSize(); i++) 
+    args.Push (compilerArgs[i]);
+
+  // Get preprocessed result of pristine source
+  source = GetPreprocessedProgram (
+    cgGetProgramString (program, CG_PROGRAM_SOURCE), args);
+      
+  iHierarchicalCache* rootCache = cache->GetTopCache();
+  csRef<iHierarchicalCache> progCache = rootCache->GetRootedCache ("/CgProgCache");
+  csMD5::Digest sourceMD5 = csMD5::Encode (source);
+  
+  csString cachePath;
+  uint n = 0;
+  csRef<iDataBuffer> item;
+  do
+  {
+    cachePath.Format ("/%s/%s/%u",
+      sourceMD5.HexString().GetData(), limits.ToString().GetData(),
+      n++);
+    item = progCache->ReadCache (cachePath);
+  }
+  while (item.IsValid());
+  
+  csMemFile cacheFile;
+  
+  uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagicCC);
+  if (cacheFile.Write ((char*)&diskMagic, sizeof (diskMagic))
+      != sizeof (diskMagic)) return false;
+  
+  if (!CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile, source))
+    return false;
+  
+  const char* object;
+  if ((program == 0)
+    || ((object = cgGetProgramString (program, CG_COMPILED_PROGRAM)) == 0)
+    || (*object == 0))
+  {
+    uint32 diskState = csLittleEndian::UInt32 (cpsInvalid);
+    if (cacheFile.Write ((char*)&diskState, sizeof (diskState))
+	!= sizeof (diskState)) return false;
+  }
+  else
+  {
+    {
+      uint32 diskState = csLittleEndian::UInt32 (cpsValid);
+      if (cacheFile.Write ((char*)&diskState, sizeof (diskState))
+	  != sizeof (diskState)) return false;
+    }
+    
+    if (!CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile, object))
+      return false;
+  
+    csSet<csString>::GlobalIterator iter (unusedParams.GetIterator());
+    while (iter.HasNext())
+    {
+      const csString& s = iter.Next();
+      if (!CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile, s))
+	return false;
+    }
+
+    if (!CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile, 0))
+      return false;
+  }
+    
+  if (!progCache->CacheData (cacheFile.GetData(), cacheFile.GetSize(),
+      cachePath))
+    return false;
+    
+  objectCodeCachePath = cachePath;
+  
+  return true;
+}
+    
 }
 CS_PLUGIN_NAMESPACE_END(GLShaderCg)

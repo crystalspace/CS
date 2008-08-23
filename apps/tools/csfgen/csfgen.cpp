@@ -37,8 +37,8 @@ CS_IMPLEMENT_APPLICATION
 
 static iObjectRegistry* object_reg;
 
-char *programversion = "0.2.0";
-char *programname;
+static char const* programversion = "0.2.0";
+static char const *programname;
 
 static struct option long_options[] =
 {

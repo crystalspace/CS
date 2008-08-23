@@ -130,8 +130,6 @@
   INTERFACE_APPLY(iTerrainFactory)
   INTERFACE_APPLY(iTerrainFactoryState)
   INTERFACE_APPLY(iTerrainObjectState)
-  INTERFACE_APPLY(iThingState)
-  INTERFACE_APPLY(iThingFactoryState)
   INTERFACE_APPLY(iObjectModel)
   INTERFACE_APPLY(iObjectModelListener)
   INTERFACE_APPLY(iTriangleMeshIterator)

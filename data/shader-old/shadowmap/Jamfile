@@ -1,3 +1,0 @@
-SubDir TOP data shader-old shadowmap ;
-
-InstallData [ Wildcard *.cgfp *.cgvp *.xml ] : data shader-old shadowmap ;

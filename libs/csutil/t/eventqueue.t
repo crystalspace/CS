@@ -113,7 +113,6 @@ public:
   CPPUNIT_TEST_SUITE (csEventQueueTest);
     CPPUNIT_TEST (testSmokeTest);
     CPPUNIT_TEST (testPhaseHandlers);
-    CPPUNIT_TEST (testFrameSubEvents);
     CPPUNIT_TEST (testMixedHandlers);
   CPPUNIT_TEST_SUITE_END ();
 };
@@ -220,55 +219,6 @@ void csEventQueueTest::testPhaseHandlers ()
   message += handlers->Front()->GetData();
   CPPUNIT_ASSERT_MESSAGE (message,
 	handlers->Front ()->Compare ("Frame"));
-  handlers->PopFront ();
-
-  CPPUNIT_ASSERT_MESSAGE ("List not empty", handlers->IsEmpty());
-}
-
-/**
- * Make sure PreProcess/Process/PostProcess/FinalProcess dispatch in order.
- */
-void csEventQueueTest::testFrameSubEvents ()
-{
-  csEventQueue *queue = new csEventQueue (objreg);
-
-  iEventHandler *h1 = new HandlerOther (objreg, "PreProcess");
-  iEventHandler *h2 = new HandlerOther (objreg, "Process");
-  iEventHandler *h3 = new HandlerOther (objreg, "PostProcess");
-  iEventHandler *h4 = new HandlerOther (objreg, "FinalProcess");
-
-  queue->RegisterListener (h3, csevPostProcess (objreg));
-  queue->RegisterListener (h1, csevPreProcess (objreg));
-  queue->RegisterListener (h2, csevProcess (objreg));
-  queue->RegisterListener (h4, csevFinalProcess (objreg));
-
-  handlers = new csList<csString *> ();
-  queue->Process ();
-
-  CPPUNIT_ASSERT_MESSAGE ("List is empty", !handlers->IsEmpty());
-
-  std::string message ("Expected PreProcess, got ");
-  message += handlers->Front()->GetData();
-  CPPUNIT_ASSERT_MESSAGE (message,
-	handlers->Front ()->Compare ("PreProcess"));
-  handlers->PopFront ();
-
-  message = "Expected Process, got ";
-  message += handlers->Front()->GetData();
-  CPPUNIT_ASSERT_MESSAGE (message,
-	handlers->Front ()->Compare ("Process"));
-  handlers->PopFront ();
-
-  message = "Expected PostProcess, got ";
-  message += handlers->Front()->GetData();
-  CPPUNIT_ASSERT_MESSAGE (message,
-	handlers->Front ()->Compare ("PostProcess"));
-  handlers->PopFront ();
-
-  message = "Expected FinalProcess, got ";
-  message += handlers->Front()->GetData();
-  CPPUNIT_ASSERT_MESSAGE (message,
-	handlers->Front ()->Compare ("FinalProcess"));
   handlers->PopFront ();
 
   CPPUNIT_ASSERT_MESSAGE ("List not empty", handlers->IsEmpty());

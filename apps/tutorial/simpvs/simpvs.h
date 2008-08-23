@@ -33,21 +33,19 @@ private:
   csRef<iVFS> vfs;
   csRef<iView> view;
   csRef<iCEGUI> cegui;
+  csRef<FramePrinter> printer;
 
   iSector* room;
 
   csString mode;
 
-  bool HandleEvent (iEvent& ev);
-  void SetupFrame ();
-  void FinishFrame ();
+  void Frame ();
   
   void SaveVideoPreference();
   
   bool Setup ();
+  void OnExit ();
   
-  csEventID Process;
-  csEventID FinalProcess;
   csEventID KeyboardDown;
   csEventID Quit;
   
@@ -65,8 +63,9 @@ public:
   bool OnInitialize (int argc, char* argv[]);
   bool Application ();
 
-  CS_EVENTHANDLER_NAMES("crystalspace.simpvs")
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
+  bool OnKeyboard (iEvent&);
+
+  CS_EVENTHANDLER_PHASE_3D("crystalspace.simpvs")
 };
 
 #endif // __SIMPVS_H__

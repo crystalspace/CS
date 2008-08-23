@@ -81,8 +81,7 @@ Level of Detail @sc{lod}. @xref{Level of Detail}.
 Various types of mesh objects: bezier curves, polygonal lightmapped
 objects, triangle meshes, haze mesh (bit like volumetric light),
 @dots{}.
-@xref{MeshObject}. @xref{MeshObject Thing},
-@xref{HOWTO Create Thing}. @xref{MeshObject Genmesh}.
+@xref{MeshObject}.  @xref{MeshObject Genmesh}.
 @xref{HOWTO Create Genmesh}.
 
 @item
@@ -169,7 +168,7 @@ Unicode text output.
 
 @item
 @sc{xml}-based map format. @xref{XML File Format},
-@xref{Tutorial Simple Map}. @xref{Old Map File Format}.
+@xref{Tutorial Simple Map}.
 
 @item
 Scripting bindings (Python, Perl, Java). @xref{Scripting Languages}.

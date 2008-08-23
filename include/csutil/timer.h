@@ -51,7 +51,7 @@ private:
     int time_left;
   };
   iObjectRegistry* object_reg;
-  csEventID FinalProcess;
+  csEventID Frame;
   csArray<timerevent> timerevents;
   iEventHandler* handler;
   csRef<iVirtualClock> vc;

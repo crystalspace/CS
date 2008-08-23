@@ -78,12 +78,14 @@ public:
     csArray<csShaderVarMapping> &);
 
   /// Compile a program
-  virtual bool Compile (iHierarchicalCache*);
+  virtual bool Compile (iHierarchicalCache*, csRef<iString>*);
 
   virtual void GetUsedShaderVars (csBitArray& bits) const;
   
-  virtual bool LoadFromCache (iHierarchicalCache* cache,
-    csRef<iString>* failReason = 0) { return false; }
+  virtual iShaderProgram::CacheLoadResult LoadFromCache (
+    iHierarchicalCache* cache, iDocumentNode* programNode,
+    csRef<iString>* failReason = 0, csRef<iString>* = 0)
+  { return iShaderProgram::loadFail; }
 };
 
 }

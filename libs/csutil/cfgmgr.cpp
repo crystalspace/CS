@@ -23,6 +23,7 @@
 #include "csutil/scf_implementation.h"
 #include "csutil/scfstringarray.h"
 #include "csutil/strhash.h"
+#include "csutil/stringconv.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
 
@@ -201,7 +202,7 @@ public:
   }
   virtual float GetFloat() const
   {
-    return currentValue ? atof (currentValue) : 0.0f;
+    return currentValue ? CS::Utility::strtof (currentValue) : 0.0f;
   }
   virtual const char *GetStr() const
   {

@@ -28,6 +28,7 @@
 
 #include "csplugincommon/shader/shadercachehelper.h"
 #include "csutil/csendian.h"
+#include "csutil/cspmeter.h"
 #include "csutil/documenthelper.h"
 #include "csutil/parasiticdatabuffer.h"
 #include "csutil/scfarray.h"
@@ -220,6 +221,38 @@ size_t csShaderConditionResolver::GetVariant ()
   }
 }
 
+bool csShaderConditionResolver::SetVariantRecursive (size_t variant, 
+                                                     csConditionNode* node, 
+                                                     csBitArray& conditionResults)
+{
+  if (node->variant != csArrayItemNotFound)
+  {
+    return node->variant == variant;
+  }
+
+  if (SetVariantRecursive (variant, node->trueNode, conditionResults))
+  {
+    conditionResults.SetBit (node->condition);
+    return true;
+  }
+  else if (SetVariantRecursive (variant, node->falseNode, conditionResults))
+    return true;
+  else
+    return false;
+}
+
+void csShaderConditionResolver::SetVariant (size_t variant)
+{
+  if (rootNode == 0) return;
+
+  csBitArray conditionResults (evaluator.GetNumConditions());
+  if (SetVariantRecursive (variant, rootNode->trueNode, conditionResults))
+    conditionResults.SetBit (rootNode->condition);
+  else
+    SetVariantRecursive (variant, rootNode->falseNode, conditionResults);
+  evaluator.ForceConditionResults (conditionResults);
+}
+
 void csShaderConditionResolver::DumpConditionTree (csString& out)
 {
   if (rootNode == 0)
@@ -410,7 +443,30 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
   CS_ASSERT (shadermgr); // Should be present - loads us, after all
   
   vfsStartDir = CS::StrDup (compiler->vfs->GetCwd ());
-  Load (source);
+  shaderCache = shadermgr->GetShaderCache();
+  Load (source, false);
+}
+
+csXMLShader::csXMLShader (csXMLShaderCompiler* compiler)
+  : scfImplementationType (this), techsResolver (0),
+    sharedEvaluator (compiler->sharedEvaluator),
+    fallbackTried (false)
+{
+  InitTokenTable (xmltokens);
+
+  csXMLShader::ldr_context = ldr_context;
+
+  activeTech = 0;
+  filename = 0;
+  csXMLShader::compiler = compiler;
+  g3d = compiler->g3d;
+  csXMLShader::forcepriority = forcepriority;
+  useFallbackContext = false;
+  
+  shadermgr = csQueryRegistry<iShaderManager> (compiler->objectreg);
+  CS_ASSERT (shadermgr); // Should be present - loads us, after all
+  
+  vfsStartDir = CS::StrDup (compiler->vfs->GetCwd ());
 }
 
 csXMLShader::~csXMLShader ()
@@ -431,14 +487,13 @@ csXMLShader::~csXMLShader ()
  * cache file format changes. */
 static const uint32 cacheFileMagic = 0x06737863;
 
-void csXMLShader::Load (iDocumentNode* source)
+void csXMLShader::Load (iDocumentNode* source, bool noCacheRead)
 {
   techsResolver = new csShaderConditionResolver (*sharedEvaluator);
   
   CS::PluginCommon::ShaderCacheHelper::ShaderDocHasher hasher (
     compiler->objectreg, source);
   
-  shaderCache = shadermgr->GetShaderCache();
   csString cacheType = source->GetAttributeValue ("name");
   cacheTag = source->GetAttributeValue ("_cachetag");
   csString cacheID_header;
@@ -457,18 +512,21 @@ void csXMLShader::Load (iDocumentNode* source)
     csString().Format ("/%s", cacheType.GetData()));
   bool cacheValid = (shaderCache != 0) && !cacheType.IsEmpty()
     && !cacheID_header.IsEmpty();
-  bool useShaderCache = cacheValid;
+  if (!cacheValid) shaderCache.Invalidate();
+  bool readFromCache = cacheValid && !noCacheRead;
   
   csRef<iFile> cacheFile;
-  if (useShaderCache)
+  if (cacheValid)
   {
-    useShaderCache = false;
     csRef<iDataBuffer> cacheData;
-    cacheData = shaderCache->ReadCache (csString().Format ("/%s", cacheID_header.GetData()));
+    if (readFromCache)
+      cacheData = shaderCache->ReadCache (csString().Format ("/%s", cacheID_header.GetData()));
     if (cacheData.IsValid())
     {
       cacheFile.AttachNew (new csMemFile (cacheData, true));
     }
+    else
+      readFromCache = false;
     if (cacheFile.IsValid())
     {
       do
@@ -488,11 +546,11 @@ void csXMLShader::Load (iDocumentNode* source)
 	  CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
 	if (!hashStream.IsValid()) break;
 	
-	useShaderCache = hasher.ValidateHashStream (hashStream);
+	readFromCache = hasher.ValidateHashStream (hashStream);
       }
       while (false);
     }
-    if (!useShaderCache)
+    if (!readFromCache)
     {
       // Getting from cache failed, so prep for writing to cache
       cacheFile.AttachNew (new csMemFile ());
@@ -509,31 +567,31 @@ void csXMLShader::Load (iDocumentNode* source)
   }
   
   ConditionsReader* condReader = 0;
-  if (useShaderCache)
+  if (readFromCache)
   {
     do
     {
-      useShaderCache = false;
+      readFromCache = false;
       csRef<iDataBuffer> conditionsBuf =
         CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
       if (!conditionsBuf.IsValid()) break;;
       condReader = new ConditionsReader (*sharedEvaluator, conditionsBuf);
-      useShaderCache = true;
+      readFromCache = true;
     }
     while (false);
   
-    if (useShaderCache)
+    if (readFromCache)
     {
       // Read condition tree from cache
-      useShaderCache = techsResolver->ReadFromCache (cacheFile, *condReader);
+      readFromCache = techsResolver->ReadFromCache (cacheFile, *condReader);
     }
     
-    if (useShaderCache)
+    if (readFromCache)
     {
       csRef<iDocumentNode> wrappedNode;
       wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapperFromCache (
 	cacheFile, techsResolver, techsResolver->evaluator, *condReader));
-      useShaderCache = wrappedNode.IsValid ();
+      readFromCache = wrappedNode.IsValid ();
       shaderRoot = wrappedNode;
       
       if (compiler->doDumpConds)
@@ -554,7 +612,7 @@ void csXMLShader::Load (iDocumentNode* source)
     }
   }
   
-  if (!useShaderCache)
+  if (!readFromCache)
   {
     csRefArray<iDocumentNode> extraNodes;
     csRef<csWrappedDocumentNode> wrappedNode;
@@ -564,7 +622,8 @@ void csXMLShader::Load (iDocumentNode* source)
       tree.SetGrowsBy (0);
       wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
 	techsResolver, techsResolver->evaluator, extraNodes, &tree, 
-	wdnfpoOnlyOneLevelConditions | wdnfpoExpandTemplates));
+	wdnfpoHandleConditions | wdnfpoOnlyOneLevelConditions
+	| wdnfpoExpandTemplates));
       techsResolver->DumpConditionTree (tree);
       csString filename;
       filename.Format ("/tmp/shader/cond_%s_techs.txt",
@@ -574,7 +633,8 @@ void csXMLShader::Load (iDocumentNode* source)
     else
       wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
         techsResolver, techsResolver->evaluator, extraNodes, 0,
-        wdnfpoOnlyOneLevelConditions | wdnfpoExpandTemplates));
+        wdnfpoHandleConditions | wdnfpoOnlyOneLevelConditions
+        | wdnfpoExpandTemplates));
     shaderRoot = wrappedNode;
     
     if (cacheValid)
@@ -602,7 +662,6 @@ void csXMLShader::Load (iDocumentNode* source)
       }
     }
   }
-  if (!useShaderCache) shaderCache.Invalidate ();
   
   //Load global shadervars block
   csRef<iDocumentNode> varNode = shaderRoot->GetNode(
@@ -612,6 +671,142 @@ void csXMLShader::Load (iDocumentNode* source)
     ParseGlobalSVs (ldr_context, varNode);
     
   delete condReader;
+}
+  
+bool csXMLShader::Precache (iDocumentNode* source, iHierarchicalCache* cacheTo)
+{
+  shaderCache = cacheTo;
+  Load (source, true);
+  if (!shaderCache.IsValid()) return false;
+  
+  bool result = true;
+  size_t tvc = techsResolver->GetVariantCount();
+  if (tvc == 0) tvc = 1;
+  
+  size_t totalTechs = 0;
+  
+  for (size_t tvi = 0; tvi < tvc; tvi++)
+  {
+    techsResolver->SetVariant (tvi);
+    ShaderTechVariant& techVar = techVariants.GetExtend (tvi);
+    PrepareTechVar (techVar, -1);
+    
+    for (size_t t = 0; t < techVar.techniques.GetSize(); t++)
+    {
+      ShaderTechVariant::Technique& tech = techVar.techniques[t];
+      tech.resolver = new csShaderConditionResolver (*sharedEvaluator);
+      tech.resolver->SetVariant (t);
+      
+      csRef<iHierarchicalCache> techCache;
+      techCache = shaderCache->GetRootedCache (
+	csString().Format ("/%s/%zu/%zu", cacheScope_tech.GetData(), tvi, t));
+	
+      LoadTechnique (tech, techCache, tvi);
+	
+      if (compiler->do_verbose)
+	compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Shader '%s'<%zu>: priority %d: %zu variations",
+	  GetName(), tvi, tech.priority, tech.resolver->GetVariantCount());
+	  
+      totalTechs += tech.resolver->GetVariantCount();
+    }
+  }
+  
+  size_t techsHandled = 0;
+  csTicks startTime = csGetTicks();
+  csTextProgressMeter* progress = 0;
+  for (size_t tvi = 0; tvi < tvc; tvi++)
+  {
+    techsResolver->SetVariant (tvi);
+    ShaderTechVariant& techVar = techVariants[tvi];
+    for (size_t t = 0; t < techVar.techniques.GetSize(); t++)
+    {
+      ShaderTechVariant::Technique& tech = techVar.techniques[t];
+      
+      csRef<iHierarchicalCache> techCache;
+      techCache = shaderCache->GetRootedCache (
+	csString().Format ("/%s/%zu/%zu", cacheScope_tech.GetData(), tvi, t));
+	
+      size_t vc = tech.resolver->GetVariantCount();
+      for (size_t vi = 0; vi < vc; vi++)
+      {
+        tech.resolver->SetVariant (vi);
+      
+	ShaderVariant var;
+	size_t ticket = ((vi*techVar.techniques.GetSize() + t) * (tvc+1) + (tvi+1));
+    
+	if (compiler->doDumpXML)
+	{
+	  csRef<iDocumentSystem> docsys;
+	  docsys.AttachNew (new csTinyDocumentSystem);
+	  csRef<iDocument> newdoc = docsys->CreateDocument();
+	  CS::DocSystem::CloneNode (tech.techNode, newdoc->CreateRoot());
+	  newdoc->Write (compiler->vfs, csString().Format ("/tmp/shader/%s_%zu_%zu.xml",
+	    GetName(), tvi, vi));
+	}
+  
+	csRef<iHierarchicalCache> varCache;
+	varCache = techCache->GetRootedCache (
+	  csString().Format ("/%zu", vi));
+	
+	// So external files are found correctly
+	csVfsDirectoryChanger dirChange (compiler->vfs);
+	dirChange.ChangeTo (vfsStartDir);
+      
+	var.tech = new csXMLShaderTech (this);
+	bool result = var.tech->Precache (tech.techNode, ticket, varCache);
+	delete var.tech;
+	if (!result)
+	{
+	  if (compiler->do_verbose)
+	  {
+	    compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	      "Shader '%s'<%zu/%zu>: Technique with priority %d fails. Reason: %s.",
+	      GetName(), tvi, vi, tech.priority, var.tech->GetFailReason());
+	  }
+	  result = false;
+	}
+	techsHandled++;
+	if (progress)
+	  progress->Step (1);
+	else if (csGetTicks() - startTime > 1000)
+	{
+	  progress = new csTextProgressMeter (0, totalTechs);
+	  progress->Step (techsHandled);
+	}
+      }
+    }
+  }
+  
+  /* If the "fallback" node lacks a 'file' attribute it's probably an inline
+   * shader, precache as well */
+  csRef<iDocumentNodeIterator> fallbackNodes = source->GetNodes ("fallbackshader");
+  while (fallbackNodes->HasNext())
+  {
+    csRef<iDocumentNode> fallbackNode (fallbackNodes->Next());
+      
+    // So external files are found correctly
+    csVfsDirectoryChanger chdir (compiler->vfs);
+    chdir.ChangeTo (vfsStartDir);
+  
+    const char* fileStr = fallbackNode->GetAttributeValue ("file");
+    if (fileStr == 0)
+    {
+      const char* type = fallbackNode->GetAttributeValue ("compiler");
+      if (type == 0)
+	type = fallbackNode->GetAttributeValue ("type");
+      if (type != 0)
+      {
+	csRef<iShaderCompiler> shcom = shadermgr->GetCompiler (type);
+	if (shcom.IsValid()) 
+	{
+	  result &= shcom->PrecacheShader (fallbackNode, cacheTo);
+	}
+      }
+    }
+  }
+  delete progress;
+  return result;
 }
 
 void csXMLShader::SelfDestruct ()
@@ -751,6 +946,14 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
   csConditionEvaluator::ScopedEvaluation scope (*sharedEvaluator);
   techsResolver->SetEvalParams (&modes, &stack);
   
+  int lightCount = 0;
+  if (stack.GetSize() > compiler->stringLightCount)
+  {
+    csShaderVariable* svLightCount = stack[compiler->stringLightCount];
+    if (svLightCount != 0)
+      svLightCount->GetValue (lightCount);
+  }
+  
   size_t tvc = techsResolver->GetVariantCount();
   if (tvc == 0) tvc = 1;
   
@@ -759,41 +962,19 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
   {
     // Get the techniques variant
     ShaderTechVariant& techVar = techVariants.GetExtend (tvi);
-    
-    if (!techVar.prepared)
-    {
-      csArray<TechniqueKeeper> techniquesTmp;
-      ScanForTechniques (shaderRoot, techniquesTmp, forcepriority);
-
-      /* Find a suitable technique
-       * (Note that a wrapper is created for each technique node individually,
-       * not the whole shader) */
-      csArray<TechniqueKeeper>::Iterator techIt = techniquesTmp.GetIterator ();
-      while (techIt.HasNext ())
-      {
-	const TechniqueKeeper& tk = techIt.Next();
-	ShaderTechVariant::Technique newTech;
-	newTech.priority = tk.priority;
-	csRef<iWrappedDocumentNode> wrappedNode =
-	  scfQueryInterface<iWrappedDocumentNode> (tk.node);
-	newTech.srcNode = static_cast<csWrappedDocumentNode*> (
-	  (iWrappedDocumentNode*)wrappedNode);
-	
-	techVar.techniques.Push (newTech);
-      }
-    }
+    PrepareTechVar (techVar, forcepriority);
     
     csXMLShaderTech* usedTech = 0;
     for (size_t t = 0; t < techVar.techniques.GetSize(); t++)
     {
       ShaderTechVariant::Technique& tech = techVar.techniques[t];
+      if (lightCount < tech.minLights) continue;
       
       csRef<iHierarchicalCache> techCache;
       if (shaderCache)
       {
-	uint cacheID = (t * (tvc)) + tvi;
 	techCache = shaderCache->GetRootedCache (
-	  csString().Format ("/%s/%u", cacheScope_tech.GetData(), cacheID));
+	  csString().Format ("/%s/%zu/%zu", cacheScope_tech.GetData(), tvi, t));
       }
       if (tech.resolver == 0)
       {
@@ -815,13 +996,18 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
       
       tech.resolver->SetEvalParams (&modes, &stack);
   
-      //csPrintf ("shader = %s\nsharedEvaluator->GetNumConditions() = %zu\n", cacheType.GetData(),
-        //sharedEvaluator->GetNumConditions());
       size_t vi = tech.resolver->GetVariant ();
       if (vi != csArrayItemNotFound)
       {
 	ShaderVariant& var = tech.variants.GetExtend (vi);
 	ticket = ((vi*techVar.techniques.GetSize() + t) * (tvc+1) + (tvi+1));
+	
+	csRef<iHierarchicalCache> varCache;
+	if (techCache)
+	{
+	  varCache = techCache->GetRootedCache (
+	    csString().Format ("/%zu", vi));
+	}
     
 	if (!var.prepared)
 	{
@@ -835,30 +1021,48 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	      GetName(), tvi, vi));
 	  }
     
+          iShaderProgram::CacheLoadResult loadResult = iShaderProgram::loadFail;
 	  var.tech = 0;
 	  if (techCache.IsValid())
 	  {
 	    var.tech = new csXMLShaderTech (this);
-	    if (var.tech->LoadFromCache (ldr_context, techCache, shaderRoot, ticket))
+	    loadResult = var.tech->LoadFromCache (ldr_context, tech.techNode,
+	      varCache, shaderRoot, ticket);
+	    if (compiler->do_verbose)
 	    {
-	      if (compiler->do_verbose)
-		compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-		  "Shader '%s'<%zu/%zu>: Technique with priority %d succeeds (from cache)!",
-		  GetName(), tvi, vi, tech.priority);
-	    }
-	    else
-	    {
-	      if (compiler->do_verbose)
+	      switch (loadResult)
 	      {
-		compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-		  "Shader '%s'<%zu/%zu>: Technique with priority %d fails (from cache). Reason: %s.",
-		  GetName(), tvi, vi, tech.priority, var.tech->GetFailReason());
+	        case iShaderProgram::loadFail:
+	          {
+		    compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
+		      "Shader '%s'<%zu/%zu>: Technique with priority %d fails (from cache). Reason: %s.",
+		      GetName(), tvi, vi, tech.priority, var.tech->GetFailReason());
+	          }
+	          break;
+	        case iShaderProgram::loadSuccessShaderInvalid:
+	          {
+		    compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
+		      "Shader '%s'<%zu/%zu>: Technique with priority %d succeeds (from cache) but shader is invalid.",
+		      GetName(), tvi, vi, tech.priority);
+	          }
+	          break;
+	        case iShaderProgram::loadSuccessShaderValid:
+	          {
+		    compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
+		      "Shader '%s'<%zu/%zu>: Technique with priority %d succeeds (from cache).",
+		      GetName(), tvi, vi, tech.priority);
+	          }
+	          break;
 	      }
+	    }
+	    if (loadResult != iShaderProgram::loadSuccessShaderValid)
+	    {
 	      delete var.tech; var.tech = 0;
 	    }
 	  }
 	
-          if (var.tech == 0)
+          if ((var.tech == 0)
+            && (loadResult == iShaderProgram::loadFail))
           {
 	    // So external files are found correctly
 	    csVfsDirectoryChanger dirChange (compiler->vfs);
@@ -866,7 +1070,7 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	  
 	    var.tech = new csXMLShaderTech (this);
 	    if (var.tech->Load (ldr_context, tech.techNode, shaderRoot, ticket,
-	      techCache))
+	      varCache))
 	    {
 	      if (compiler->do_verbose)
 		compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -925,6 +1129,34 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
   techsResolver->SetEvalParams (0, 0);
   
   return ticket;
+}
+
+void csXMLShader::PrepareTechVar (ShaderTechVariant& techVar,
+                                  int forcepriority)
+{
+  if (!techVar.prepared)
+  {
+    csArray<TechniqueKeeper> techniquesTmp;
+    ScanForTechniques (shaderRoot, techniquesTmp, forcepriority);
+
+    /* Find a suitable technique
+      * (Note that a wrapper is created for each technique node individually,
+      * not the whole shader) */
+    csArray<TechniqueKeeper>::Iterator techIt = techniquesTmp.GetIterator ();
+    while (techIt.HasNext ())
+    {
+      const TechniqueKeeper& tk = techIt.Next();
+      ShaderTechVariant::Technique newTech;
+      newTech.priority = tk.priority;
+      newTech.minLights = tk.node->GetAttributeValueAsInt ("minlights");
+      csRef<iWrappedDocumentNode> wrappedNode =
+	scfQueryInterface<iWrappedDocumentNode> (tk.node);
+      newTech.srcNode = static_cast<csWrappedDocumentNode*> (
+	(iWrappedDocumentNode*)wrappedNode);
+      
+      techVar.techniques.Push (newTech);
+    }
+  }
 }
   
 bool csXMLShader::LoadTechniqueFromCache (ShaderTechVariant::Technique& tech,

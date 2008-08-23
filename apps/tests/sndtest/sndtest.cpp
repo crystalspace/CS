@@ -72,7 +72,7 @@ bool SndTest::OnInitialize(int /*argc*/, char* /*argv*/ [])
   return true;
 }
 
-void SndTest::ProcessFrame ()
+void SndTest::Frame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -91,13 +91,6 @@ void SndTest::ProcessFrame ()
 
   // Tell the camera to render into the frame buffer.
   view->Draw ();
-}
-
-void SndTest::FinishFrame ()
-{
-  // Just tell the 3D renderer that everything has been rendered.
-  g3d->FinishDraw ();
-  g3d->Print (0);
 }
 
 bool SndTest::OnKeyboard(iEvent& ev)
@@ -212,6 +205,7 @@ bool SndTest::LoadSound ()
 
 void SndTest::OnExit()
 {
+  printer.Invalidate ();
 }
 
 bool SndTest::Application()
@@ -266,6 +260,8 @@ bool SndTest::Application()
   // Now we need to position the camera in our world.
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, 0));
+
+  printer.AttachNew (new FramePrinter (object_reg));
 
   // Create the model.
   if (!CreateSprites ())

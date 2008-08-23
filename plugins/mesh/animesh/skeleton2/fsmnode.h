@@ -51,6 +51,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
     void BlendState (csSkeletalState2* state, float baseWeight = 1.0f);
     void TickAnimation (float dt);
 
+    void Stop ();
+
   private:
     struct AnimationInstruction
     {
@@ -132,7 +134,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       {}
 
       csRef<iSkeletonAnimNodeFactory2> nodeFactory;
-      float time1, time2, directSwitch;
+      float time1, time2;
+      bool directSwitch;
     };
 
   private:

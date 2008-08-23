@@ -40,14 +40,14 @@ private:
   csRef<iVirtualClock> vc;
   csRef<iSndSysRenderer> sndrenderer;
   csRef<iSndSysLoader> sndloader;
+  csRef<FramePrinter> printer;
 
   iSector* world;
   void CreateWorld ();
 
   csRef<iView> view;
   float rotYaw;
-  void ProcessFrame ();
-  void FinishFrame ();
+  void Frame ();
 
   csRef<iSndSysSource3D> movingsound;
   csRef<iSndSysSource3DDoppler> movingsounddoppler;

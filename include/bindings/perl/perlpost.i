@@ -302,16 +302,6 @@
 %}
 
 /****************************************************************************
- * CS_POLYRANGE replacements.
- ****************************************************************************/
-%perlcode %{
-  sub CS_POLYRANGE {		new cspace::csPolygonRange ($_[0], $_[1]) }
-  sub CS_POLYRANGE_SINGLE {	new cspace::csPolygonRange ($_[0]) }
-  sub CS_POLYRANGE_LAST {	new cspace::csPolygonRange (-1, -1) }
-  sub CS_POLYRANGE_ALL {	new cspace::csPolygonRange (0, 2000000000) }
-%}
-
-/****************************************************************************
  * CSKEY_SHIFT/CTRL/ALT replacements.
  ****************************************************************************/
 %perlcode %{

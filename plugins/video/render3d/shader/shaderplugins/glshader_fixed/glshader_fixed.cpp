@@ -187,13 +187,13 @@ bool csGLShader_FIXED::Initialize(iObjectRegistry* reg)
 
   csRef<iGraphics3D> r = csQueryRegistry<iGraphics3D> (object_reg);
 
-  csRef<iFactory> f = scfQueryInterface<iFactory> (r);
+  csRef<iFactory> f = scfQueryInterfaceSafe<iFactory> (r);
   if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 
       f->QueryClassID ()) == 0)
     enable = true;
 
   ext = 0;
-  r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
+  if (r) r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
 
   return true;
 }

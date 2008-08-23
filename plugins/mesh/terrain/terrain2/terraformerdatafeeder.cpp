@@ -23,6 +23,7 @@
 #include "csgfx/imagemanipulate.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/refarr.h"
+#include "csutil/scanstr.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "igraphic/image.h"
@@ -74,7 +75,7 @@ struct TerraFormerFeederProperties : public
     {
       float x = 0, y = 0;
 
-      sscanf (value, "%f %f", &x, &y);
+      csScanStr (value, "%f %f", &x, &y);
 
       samplerRegion.SetMin (0, x);
       samplerRegion.SetMin (1, y);
@@ -83,13 +84,73 @@ struct TerraFormerFeederProperties : public
     {
       float x = 1.0f, y = 1.0f;
 
-      sscanf (value, "%f %f", &x, &y);
+      csScanStr (value, "%f %f", &x, &y);
 
       samplerRegion.SetMax (0, x);
       samplerRegion.SetMax (1, y);
     }
   }
 
+  size_t GetParameterCount() { return 3; }
+
+  const char* GetParameterName (size_t index)
+  {
+    switch (index)
+    {
+      case 0: return "terraformer";
+      case 1: return "sampleregion min";
+      case 2: return "sampleregion max";
+      default: return 0;
+    }
+  }
+
+  const char* GetParameterValue (size_t index)
+  { return GetParameterValue (GetParameterName (index)); }
+
+  const char* GetParameterValue (const char* name)
+  {
+    // @@@ Not nice
+    static char scratch[32];
+
+    if (strcasecmp (name, "terraformer") == 0)
+    {
+      csRef<iObjectRegistryIterator> it (objectReg->Get());
+      while (it->HasNext())
+      {
+	iBase* obj = it->Next();
+	if (obj == (iBase*)terraFormer)
+	  return it->GetCurrentTag();
+      }
+      return 0;
+    }
+    else if (strcasecmp (name, "sampleregion min") == 0)
+    {
+      snprintf (scratch, sizeof (scratch), "%f %f",
+	samplerRegion.MinX(), samplerRegion.MinY());
+      return scratch;
+    }
+    else if (strcasecmp (name, "sampleregion max") == 0)
+    {
+      snprintf (scratch, sizeof (scratch), "%f %f",
+	samplerRegion.MaxX(), samplerRegion.MaxY());
+      return scratch;
+    }
+    return 0;
+  }
+
+  size_t GetAlphaMapCount() { return 0; }
+
+  const char* GetAlphaMapMaterial (size_t index) { return 0; }
+
+  const char* GetAlphaMapSource (size_t index) { return 0; }
+  const char* GetAlphaMapSource (const char* material) { return 0; }
+
+  virtual void SetHeightmapSmooth (bool doSmooth)
+  {}
+  virtual bool GetHeightmapSmooth () const
+  { return false; }
+
+  
   csPtr<iTerrainCellFeederProperties> Clone ()
   {
     return csPtr<iTerrainCellFeederProperties> (

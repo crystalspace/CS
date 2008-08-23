@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_DEBUGCOMMON_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_DEBUGCOMMON_H__
 
+/**\file
+ * Common debug helpers in render manager plugins.
+ */
+
 #include "iutil/dbghelp.h"
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/renderview.h"
@@ -37,6 +41,9 @@ namespace CS
       
       virtual bool HasDebugLockLines() = 0;
       virtual void DeleteDebugLockLines() = 0;
+      /* Only the final derived render manager knows the exact class containing
+         RenderTreeBase::DebugPersistent (and can instantiate it), hence this
+         indirection */
       virtual RenderTreeBase::DebugPersistent& GetDebugPersistent() = 0;
     public:
       RMDebugCommonBase();
@@ -49,7 +56,6 @@ namespace CS
       csPtr<iString> Dump () { return 0; }
       int GetSupportedTests () const { return 0; }
       csPtr<iString> StateTest () { return  0; }
-      csPtr<iString> UnitTest () { return  0; }
       /** @} */
     };
     
@@ -58,6 +64,10 @@ namespace CS
      * Provides an implementation of iDebugHelper. Thus deriving classes should
      * add <tt>scfFakeInterface<iDebugHelper></tt> to their SCF implementation
      * base class.
+     *
+     * The derived render manager implementation must provide an instance
+     * of RenderTreeBase::DebugPersistent and call
+     * SetTreePersistent() with that instance.
      *
      * At the end of view rendering, \c DebugFrameRender() should be called.
      */
@@ -80,9 +90,11 @@ namespace CS
       RMDebugCommon() : treePersist (0), lockedDebugLines (0) {}
       ~RMDebugCommon() { delete lockedDebugLines; }
 
+      /// Set persistent data needed by debug helpers.
       void SetTreePersistent (typename 	RenderTreeType::PersistentData& treePersist)
       { this->treePersist = &treePersist; }
     
+      /// Render debug information/displays.
       void DebugFrameRender (CS::RenderManager::RenderView* rview,
                              RenderTreeType& renderTree)
       {

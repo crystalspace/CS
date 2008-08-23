@@ -30,6 +30,7 @@
 #include "csutil/weakref.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
+#include "csutil/eventhandlers.h"
 #include "iutil/objreg.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -48,7 +49,6 @@
 #include "iengine/material.h"
 #include "iengine/sharevar.h"
 #include "imesh/object.h"
-#include "imesh/thing.h"
 #include "engseq.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -300,15 +300,12 @@ class OpSetMaterial : public OpStandard
 {
 private:
   csRef<iParameterESM> meshpar;
-  csRef<iParameterESM> polygonpar;
   csRef<iParameterESM> materialpar;
   csRef<iMeshWrapper> mesh;
-  csRef<iPolygonHandle> polygon;
   csRef<iMaterialWrapper> material;
 
 public:
-  OpSetMaterial (iParameterESM* meshpar, iParameterESM* polygonpar,
-  	iParameterESM* materialpar)
+  OpSetMaterial (iParameterESM* meshpar, iParameterESM* materialpar)
   {
     if (meshpar)
     {
@@ -316,13 +313,6 @@ public:
         mesh = scfQueryInterface<iMeshWrapper> (meshpar->GetValue ());
       else
         OpSetMaterial::meshpar = meshpar;
-    }
-    if (polygonpar)
-    {
-      if (polygonpar->IsConstant ())
-        polygon = scfQueryInterface<iPolygonHandle> (polygonpar->GetValue ());
-      else
-        OpSetMaterial::polygonpar = polygonpar;
     }
     if (materialpar->IsConstant ())
       material = scfQueryInterface<iMaterialWrapper> (
@@ -336,28 +326,11 @@ public:
     if (materialpar)
       material = scfQueryInterface<iMaterialWrapper> (
       	materialpar->GetValue (params));
-    if (polygon || polygonpar)
-    {
-      if (polygonpar)
-        polygon = 
-		scfQueryInterface<iPolygonHandle> (polygonpar->GetValue (params));
-      int poly_idx = polygon->GetIndex ();
-      iThingFactoryState* tfs = polygon->GetThingFactoryState ();
-      if (tfs)
-      {
-	tfs->SetPolygonMaterial (CS_POLYRANGE_SINGLE (poly_idx), material);
-      }
-      if (polygonpar)
-        polygon = 0;
-    }
-    else
-    {
-      if (meshpar)
-        mesh = scfQueryInterface<iMeshWrapper> (meshpar->GetValue (params));
-      mesh->GetMeshObject ()->SetMaterialWrapper (material);
-      if (meshpar)
-        mesh = 0;
-    }
+    if (meshpar)
+      mesh = scfQueryInterface<iMeshWrapper> (meshpar->GetValue (params));
+    mesh->GetMeshObject ()->SetMaterialWrapper (material);
+    if (meshpar)
+      mesh = 0;
     if (materialpar)
       material = 0;
   }
@@ -1241,18 +1214,10 @@ void csSequenceWrapper::AddOperationSetVariable (csTicks time,
   op->DecRef ();
 }
 
-void csSequenceWrapper::AddOperationSetPolygonMaterial (csTicks time,
-	iParameterESM* polygon, iParameterESM* material)
-{
-  OpSetMaterial* op = new OpSetMaterial (0, polygon, material);
-  sequence->AddOperation (time, op, 0, sequence_id);
-  op->DecRef ();
-}
-
 void csSequenceWrapper::AddOperationSetMaterial (csTicks time,
 	iParameterESM* mesh, iParameterESM* material)
 {
-  OpSetMaterial* op = new OpSetMaterial (mesh, 0, material);
+  OpSetMaterial* op = new OpSetMaterial (mesh, material);
   sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
@@ -1850,12 +1815,12 @@ bool csEngineSequenceManager::Initialize (iObjectRegistry *r)
 {
   object_reg = r;
   eventHandler.AttachNew (new EventHandler (this));
-  PostProcess = csevPostProcess (object_reg);
+  Frame = csevFrame (object_reg);
   MouseEvent = csevMouseEvent (object_reg);
   csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
   {
-    csEventID events[3] = { PostProcess, MouseEvent, CS_EVENTLIST_END };
+    csEventID events[3] = { Frame, MouseEvent, CS_EVENTLIST_END };
     q->RegisterListener (eventHandler, events);
   }
 
@@ -1890,7 +1855,7 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
 {
   // Engine sequence manager must be post because frame must
   // be rendered and this must be fired BEFORE sequence manager. @@@ HACKY
-  if (event.Name == PostProcess)
+  if (event.Name == Frame)
   {
     global_framenr++;
 

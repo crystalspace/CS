@@ -1,0 +1,10 @@
+SubDir TOP apps import collada2cs ;
+
+Description collada2cs : "Collada to CS importer" ;
+
+Application collada2cs 
+	: [ Wildcard *.cpp *.h ]
+	: console
+;
+LinkWith collada2cs : crystalspace ;
+FileListEntryApplications collada2cs : app-tool ;

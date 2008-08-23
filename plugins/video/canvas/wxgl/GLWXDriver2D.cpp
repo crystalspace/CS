@@ -18,6 +18,8 @@
 
 #include "cssysdef.h"
 
+#include "csutil/custom_new_disable.h"
+
 // For compilers that support precompilation, includes "wx.h".
 #include "wx/wxprec.h"
 
@@ -28,6 +30,8 @@
 #ifndef WX_PRECOMP
 #include "wx/wx.h"
 #endif
+
+#include "csutil/custom_new_enable.h"
 
 #include "csutil/cfgacc.h"
 #include "csutil/csinput.h"
@@ -815,3 +819,4 @@ void csGLCanvas::OnKeyUp( wxKeyEvent& event )
 {
   EmitKeyEvent(event, false);
 }
+

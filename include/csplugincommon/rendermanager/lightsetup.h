@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_LIGHTSETUP_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_LIGHTSETUP_H__
 
+/**\file
+ * Light selection and setup.
+ */
+
 #include "iengine/lightmgr.h"
 #include "iutil/object.h"
 #include "iutil/objreg.h"
@@ -35,16 +39,31 @@ namespace CS
 {
 namespace RenderManager
 {
+  /**
+   * Helper to duplicate render layers.
+   * Used when meshes have to be rendered multiple times but with the
+   * properties of a specific render layer. A duplicate of a layer is called
+   * a "subLayer".
+   */
   template<typename RenderTree, typename LayerConfigType,
     typename NewLayersType>
   class LayerHelper
   {
   public:
+    /**
+     * Data used by the helper that needs to persist over multiple frames.
+     * Users of LayerHelper must store an instance of this class and provide
+     * it to the helper upon instantiation. 
+     */
     struct PersistentData
     {
       csArray<size_t> newLayerIndices;
       csArray<size_t> newLayerCounts;
       
+      /**
+       * Do per-frame house keeping - \b MUST be called every frame/
+       * RenderView() execution.
+       */
       void UpdateNewFrame()
       {
         newLayerIndices.DeleteAll();
@@ -52,6 +71,12 @@ namespace RenderManager
       }
     };
 
+    /**
+     * Construct. \a layerConfig is the source layer setup, \a newLayers will
+     * be manipulated as layers get duplicated. It needs to provide a method
+     * 'InsertLayer (size_t after, size_t oldLayer)' which inserts a copy of
+     * layer \c oldLayer after the new layer \a after. \sa PostLightingLayers
+     */
     LayerHelper (PersistentData& persist, 
       const LayerConfigType& layerConfig,
       NewLayersType& newLayers) : persist (persist), 
@@ -66,16 +91,23 @@ namespace RenderManager
       }
     }
 
+    /// Get the 'new' index of \a layer, \a sublayer.
     size_t GetNewLayerIndex (size_t layer, size_t subLayer) const
     {
       return persist.newLayerIndices[layer] + subLayer;
     }
 
+    /// Get the amount of sublayers \a layer posseses.
     size_t GetSubLayerCount (size_t layer) const
     {
       return persist.newLayerCounts[layer];
     }
 
+    /**
+     * Make sure \a layer has at least \a neededSubLayers sublayers.
+     * \a node is needed to duplicate stored per-layer data in the assocuated
+     * context.
+     */
     void Ensure (size_t layer, size_t neededSubLayers,
                  typename RenderTree::MeshNode* node)
     {
@@ -103,45 +135,90 @@ namespace RenderManager
     NewLayersType& newLayers;
   };
   
+  /**
+   * Compatibility light settings: if two lights have equal compatibility 
+   * light settings they can be rendered in one pass; if not, they require
+   * different passes.
+   */
   struct LightSettings
   {
+    /// Light type
     csLightType type;
+    /// Light flags
     csFlags lightFlags;
     
+    /// Test compatibility light settings equality
     bool operator== (const LightSettings& other) const
     { return (type == other.type) && (lightFlags == other.lightFlags); }
+    /// Test compatibility light settings inequality
     bool operator!= (const LightSettings& other) const
     { return (type != other.type) || (lightFlags != other.lightFlags); }
   };
 
+  /**
+   * Lighting sorter. Sorts lights in a way that lights with compatible
+   * settings appear after one another.
+   */
   class CS_CRYSTALSPACE_EXPORT LightingSorter
   {
     size_t lightLimit;
   public:
+    /// Information associated with a light
     struct LightInfo
     {
+      /// Pointer to light
       iLight* light;
+      /// Whether light is static
       bool isStatic;
+      /**
+       * Number of required sublights ("virtual" lights when, for technical
+       * purposes, a light can not be rendered completely at once).
+       */
       uint numSubLights;
+      /// Sublight IDs
+      uint* subLights;
+      /// Compatibility light settings
       LightSettings settings;
     };
     
+    /**
+     * Data used by the helper that needs to persist over multiple frames.
+     * Users of LightingSorter must store an instance of this class and provide
+     * it to the helper upon instantiation. 
+     */
     struct PersistentData
     {
       csArray<LightInfo> lightTypeScratch;
       csArray<LightInfo> putBackLights;
+      csMemoryPool sublightNumMem;
       
+      /**
+       * Do per-frame house keeping - \b MUST be called every frame/
+       * RenderView() execution.
+       */
       void UpdateNewFrame()
       {
         lightTypeScratch.DeleteAll();
       }
     };
 
+    /**
+     * Construct. \a numLights is a hint about the expected number of lighta 
+     * added.
+     */
     LightingSorter (PersistentData& persist, size_t numLights);
     
+    /**
+     * Add a light to the sorter. \a influence specifies information about
+     * the light to add, \a numSubLights specifies as how many "virtual" lights
+     * a light should be treated, \a lightFlagsMask specifies a mask that is
+     * applied to the light flags before comparing them for light compatibility
+     * purposes.
+     */
     void AddLight (const csLightInfluence& influence,
       uint numSubLights, const csFlags& lightFlagsMask);
 
+    /// Query how many lights are in this sorter.
     size_t GetSize (bool skipStatic)
     {
       csArray<LightInfo>& putBackLights = persist.putBackLights;
@@ -171,15 +248,21 @@ namespace RenderManager
       }
       return n;
     }
+    /// Set the maximum number of lights to keep in the sorter.
     void SetLightsLimit (size_t limit)
     {
       lightLimit = csMin (persist.lightTypeScratch.GetSize(), limit);
     }
 
+    /// Get the next light, optionally skipping static lights.
     bool GetNextLight (bool skipStatic, LightInfo& out);
+    /**
+     * Get the next light if compatible to \a settings, optionally skipping 
+     * static lights.
+     */
     bool GetNextLight (const LightSettings& settings, bool skipStatic,
       LightInfo& out);
-      
+    
     /// Put earlier fetched lights back into the list
     void PutInFront (LightInfo* lights, size_t num);
   protected:
@@ -192,6 +275,11 @@ namespace RenderManager
   class CS_CRYSTALSPACE_EXPORT LightingVariablesHelper
   {
   public:
+    /**
+     * Data used by the helper that needs to persist over multiple frames.
+     * Users of LightingVariablesHelper must store an instance of this class 
+     * and provide it to the helper upon instantiation. 
+     */
     struct PersistentData
     {
       csShaderVarBlockAlloc<csBlockAllocatorDisposeLeaky<csShaderVariable> >
@@ -202,12 +290,17 @@ namespace RenderManager
       
       PersistentData() : svAlloc (32*1024) {}
       
+      /**
+       * Do per-frame house keeping - \b MUST be called every frame/
+       * RenderView() execution.
+       */
       void UpdateNewFrame ()
       {
 	svKeeper.Empty();
       }
     };
     
+    /// Construct
     LightingVariablesHelper (PersistentData& persist) : persist (persist) {}
     
     /**
@@ -243,22 +336,35 @@ namespace RenderManager
     PersistentData& persist;
   };
 
+  /// Shadow handler for "no" shadows
   template<typename RenderTree, typename LayerConfigType>
   class ShadowNone
   {
   public:
+    /// Shadowing-specific data persistently stored for every light
     struct CachedLightData
     {
+      /// Number of virtual lights needed for this light
       uint GetSublightNum() const { return 1; }
+      /// Once per frame setup for light
       void SetupFrame (RenderTree&, ShadowNone&, iLight*) {}
+      /// Clear data needed for one frame after rendering
       void ClearFrameData() {}
     };
+    /**
+     * Data used by the shadow handler that needs to persist over multiple frames.
+     */
     struct PersistentData
     {
+      /**
+       * Called every frame/RenderView() execution, use for housekeeping.
+       */
       void UpdateNewFrame () {}
+      /// Called upon plugin initialization
       void Initialize (iObjectRegistry*,
         RenderTreeBase::DebugPersistent&) {}
     };
+    /// Shadow method specific parameters
     struct ShadowParameters {};
 
     ShadowNone() {}
@@ -267,6 +373,7 @@ namespace RenderManager
       typename RenderTree::MeshNode* node, 
       ShadowParameters&) { }
 
+    /// Set up shadowing for a mesh/light combination
     template<typename _CachedLightData>
     uint HandleOneLight (typename RenderTree::MeshNode::SingleMesh& singleMesh,
                          iLight* light, _CachedLightData& lightData,
@@ -274,7 +381,12 @@ namespace RenderManager
                          uint lightNum, uint sublight)
     { return 0; }
     
+    /**
+     * Return whether, at the end of light setup, there should be another pass
+     * over every light
+     */
     static bool NeedFinalHandleLight() { return false; }
+    /// Final pass, called for each lights
     void FinalHandleLight (iLight*, CachedLightData&) { }
     
     /**
@@ -283,14 +395,32 @@ namespace RenderManager
      */
     csFlags GetLightFlagsMask () const { return csFlags (CS_LIGHT_NOSHADOWS); }
     
+    /// Return up to how many layers shadows for a light may need.
     size_t GetLightLayerSpread() const { return 1; }
   };
 
   /**
    * For each mesh determine the array of affecting lights and generate shader
    * vars for it.
+   *
+   * Usage: together with iteration over each mesh node.
    * Must be done after shader and shader SV (usually SetupStandardShader())
    * and before ticket setup.
+   * Example:
+   * \code
+   * RenderManager::LightSetupType::ShadowParamType shadowParam;
+   * RenderManager::LightSetupType lightSetup (
+   *   rmanager->lightPersistent, rmanager->lightManager,
+   *   context.svArrays, layerConfig, shadowParam);
+   * ForEachMeshNode (context, lightSetup);
+   * \endcode
+   *
+   * The template parameter \a RenderTree gives the render tree type.
+   * The parameter \a LayerConfigType gives a class that is used for providing
+   * the rendering layer setup. \a ShadowHandler is an optional class that
+   * provides shadow handling for each mesh/light combination (default to
+   * no shadows).
+   *
    */
   template<typename RenderTree, typename LayerConfigType,
     typename ShadowHandler = ShadowNone<RenderTree, LayerConfigType> >
@@ -300,11 +430,17 @@ namespace RenderManager
     class PostLightingLayers;
   
   protected:
+    /// Data persistently stored for every light
     struct CachedLightData : public ShadowHandler::CachedLightData 
     {
       const csRefArray<csShaderVariable>* shaderVars;
     };
     
+    /** 
+     * Set up lighting for a mesh/light combination
+     * Given the lights affecting the mesh it sets up the light shader vars
+     * in the render layers according to the layers configuration.
+     */
     template<typename _ShadowHandler>
     size_t HandleLights (_ShadowHandler& shadows,
       LightingSorter& sortedLights,
@@ -366,7 +502,7 @@ namespace RenderManager
 	  Applied limitations:
 	  - Sublights are not considered for the 'maximum lights' limit.
 	  - Sublights *are* considered for the 'maximum passes' limit.
-	  - If not all sublights of a light can't be drawn in the limits,
+	  - If not all sublights of a light can be drawn in the limits,
 	    skip the light.
 	 */
 	  
@@ -378,7 +514,8 @@ namespace RenderManager
 	  //size_t totalLayers = 0;
 	  while (firstLight < layerLights)
 	  {
-	    sortedLights.GetNextLight (skipStatic, renderLights[firstLight]);
+	    if (!sortedLights.GetNextLight (skipStatic, renderLights[firstLight]))
+	      break;
 	    size_t realNum = 1;
 	    LightSettings lightSettings;
 	    lightSettings = renderLights[firstLight].settings;
@@ -399,7 +536,6 @@ namespace RenderManager
 	    firstLight += realNum;
 	    remainingLights -= realNum;
 	  }
-	  sortedLights.PutInFront (renderLights + firstLight, remainingLights);
 	  remainingLights = firstLight;
 	}
 	
@@ -415,7 +551,7 @@ namespace RenderManager
 	    for (uint s = 0; s < li.numSubLights; s++)
 	    {
 	      renderSublights[i] = &li;
-	      renderSublightNums[i] = s;
+	      renderSublightNums[i] = li.subLights[s];
 	      i++;
 	    }
 	  }
@@ -459,6 +595,18 @@ namespace RenderManager
 	  totalLayers += thisPassLayers * shadows.GetLightLayerSpread();
 	}
 	layers.Ensure (layer, totalLayers, node);
+	if (remainingLights > 0)
+	{
+	  renderSublights[firstLight]->subLights += renderSublightNums[firstLight];
+	  renderSublights[firstLight]->numSubLights -= renderSublightNums[firstLight];
+	  sortedLights.PutInFront (*(renderSublights + firstLight), 1);
+	  size_t l = firstLight + renderSublights[firstLight]->numSubLights;
+	  while (l < firstLight + remainingLights)
+	  {
+	    sortedLights.PutInFront (*(renderSublights + l), 1);
+	    l += renderSublights[l]->numSubLights;
+	  }
+	}
 	
 	csShaderVariableStack* localStacks =
 	  new csShaderVariableStack[shadows.GetLightLayerSpread()];
@@ -561,7 +709,7 @@ namespace RenderManager
 	      }
 	    }
 	    firstLight += thisNum;
-	    remainingLights -= thisNum;
+	    num -= thisNum;
 	  }
   
 	  totalLayers = neededLayers;
@@ -590,11 +738,15 @@ namespace RenderManager
     typedef csArray<iShader*> ShaderArrayType;
     typedef typename ShadowHandler::ShadowParameters ShadowParamType;
 
+    /**
+     * Construct.
+     */
     LightSetup (PersistentData& persist, iLightManager* lightmgr,
       SVArrayHolder& svArrays, const LayerConfigType& layerConfig,
       ShadowParamType& shadowParam)
-      : persist (persist), lightmgr (lightmgr), svArrays (svArrays),
-        allMaxLights (0), newLayers (layerConfig), shadowParam (shadowParam)
+      : lastShader (0), persist (persist), lightmgr (lightmgr),
+        svArrays (svArrays), allMaxLights (0), newLayers (layerConfig),
+        shadowParam (shadowParam)
     {
       // Sum up the number of lights we can possibly handle
       for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
@@ -605,6 +757,11 @@ namespace RenderManager
       }
     }
 
+    /** 
+     * Set up lighting for a mesh combination
+     * Selects the lights affecting the mesh and sets up the light shader vars
+     * in the render layers according to the layers configuration.
+     */
     void operator() (typename RenderTree::MeshNode* node)
     {
       // The original layers
@@ -766,11 +923,20 @@ namespace RenderManager
       }
     };
     
+    /**
+     * Return the render layers, adjusted for possible additional layers needed
+     * by lighting/shadowing
+     */
     const PostLightingLayers& GetPostLightingLayers () const
     {
       return newLayers;
     }
 
+    /**
+     * Data used by the light setup helper that needs to persist over multiple frames.
+     * Users of LightSetup must store an instance of this class and provide
+     * it to the helper upon instantiation. 
+     */
     struct PersistentData
     {
       typename ShadowHandler::PersistentData shadowPersist;
@@ -789,6 +955,11 @@ namespace RenderManager
         if (lcb.IsValid()) lcb->parent = 0;
       }
       
+        /**
+         * Initialize helper. Fetches various required values from objects in
+         * the object registry. Must be called when the RenderManager plugin 
+         * is initialized.
+         */
       void Initialize (iObjectRegistry* objReg,
                        RenderTreeBase::DebugPersistent& dbgPersist)
       {
@@ -804,6 +975,11 @@ namespace RenderManager
 	  csLightShaderVarCache::lightDiffuse)));
 	diffuseBlack->SetValue (csVector4 (0, 0, 0, 0));
       }
+      
+      /**
+       * Do per-frame house keeping - \b MUST be called every frame/
+       * RenderView() execution.
+       */
       void UpdateNewFrame ()
       {
         shadowPersist.UpdateNewFrame();

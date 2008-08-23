@@ -28,6 +28,7 @@
 #include "csutil/cmdhelp.h"
 #include "csutil/cmdline.h"
 #include "csutil/csbaseeventh.h"
+#include "csutil/common_handlers.h"
 #include "csutil/evoutlet.h"
 #include "csutil/plugmgr.h"
 #include "csutil/virtclk.h"
@@ -78,6 +79,7 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   csString renderLoop;
   iSector* room;
   int x,y;
+  csRef<FramePrinter> printer;
 
   CEGUI::Window* form;
   CEGUI::Window* stddlg;
@@ -112,8 +114,7 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   bool OnMouseUp (iEvent&);
   bool OnMouseMove (iEvent&);
 
-  void ProcessFrame ();
-  void FinishFrame ();
+  void Frame ();
 
   static void Help ();
   void HandleCommandLine();

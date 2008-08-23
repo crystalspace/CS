@@ -40,11 +40,17 @@ private:
   csGLStateCache* statecache;
 
   csRef<iShaderProgram> pswrap;
+  
+  bool TryCompile (CGprofile maxFrag,
+    uint loadFlags, const ProfileLimits* limits);
 public:
+  ProfileLimitsPair cacheLimits;
+  
   CS_LEAKGUARD_DECLARE (csShaderGLCGFP);
 
-  csShaderGLCGFP (csGLShader_CG* shaderPlug) : 
-    csShaderGLCGCommon (shaderPlug, progFP) { }
+  csShaderGLCGFP (csGLShader_CG* shaderPlug,
+    const ProfileLimitsPair& cacheLimits) : 
+    csShaderGLCGCommon (shaderPlug, progFP), cacheLimits (cacheLimits) { }
 
   /// Sets this program to be the one used when rendering
   virtual void Activate ();
@@ -61,7 +67,10 @@ public:
   virtual void ResetState ();
 
   /// Compile a program
-  virtual bool Compile (iHierarchicalCache* cache);
+  virtual bool Compile (iHierarchicalCache* cache, csRef<iString>*);
+  
+  bool Precache (const ProfileLimits& limits,
+    const char* tag, iHierarchicalCache* cache);
 
   virtual int ResolveTU (const char* binding);
 

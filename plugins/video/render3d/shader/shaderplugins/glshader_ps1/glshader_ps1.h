@@ -22,6 +22,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/comp.h"
 #include "csplugincommon/shader/shaderplugin.h"
 #include "ivideo/shader/shader.h"
+#include "csutil/scfstr.h"
+#include "csutil/scfstringarray.h"
 
 struct csGLExtensionManager;
 class csGLStateCache;
@@ -55,6 +57,17 @@ public:
   virtual csPtr<iShaderProgram> CreateProgram(const char* type) ;
 
   virtual bool SupportType(const char* type);
+
+  csPtr<iStringArray> QueryPrecacheTags (const char* type)
+  {
+    scfStringArray* tags = new scfStringArray;
+    tags->Push ("default");
+    return csPtr<iStringArray> (tags);
+  }  
+  bool Precache (const char* type, const char* tag,
+    iBase* previous, 
+    iDocumentNode* node, iHierarchicalCache* cacheTo,
+    csRef<iBase>* outObj = 0) { return false; }
 
   void Open();
   /** @} */

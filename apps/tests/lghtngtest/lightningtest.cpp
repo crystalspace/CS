@@ -16,257 +16,259 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-
-#include "cssysdef.h"
-#include "csutil/sysfunc.h"
-#include "iutil/vfs.h"
-#include "csutil/cscolor.h"
-#include "cstool/csview.h"
-#include "cstool/genmeshbuilder.h"
-#include "cstool/initapp.h"
 #include "lightningtest.h"
-#include "iutil/eventq.h"
-#include "iutil/event.h"
-#include "iutil/objreg.h"
-#include "iutil/csinput.h"
-#include "iutil/virtclk.h"
-#include "iengine/sector.h"
-#include "iengine/engine.h"
-#include "iengine/camera.h"
-#include "iengine/light.h"
-#include "iengine/texture.h"
-#include "iengine/mesh.h"
-#include "iengine/movable.h"
-#include "iengine/material.h"
-#include "imesh/object.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/txtmgr.h"
-#include "ivideo/texture.h"
-#include "ivideo/material.h"
-#include "ivideo/fontserv.h"
-#include "igraphic/imageio.h"
-#include "imap/loader.h"
-#include "ivaria/reporter.h"
-#include "ivaria/stdrep.h"
-#include "csutil/cmdhelp.h"
-#include "csutil/event.h"
-
-#include "imesh/lghtng.h"
-#include "iutil/plugin.h"
-
-
 
 CS_IMPLEMENT_APPLICATION
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 
-// The global pointer to simple
-Simple *simple;
-
-Simple::Simple (iObjectRegistry* object_reg)
+Simple::Simple ()
 {
-  Simple::object_reg = object_reg;
+  SetApplicationName ("CrystalSpace.LightningTest");
 }
 
 Simple::~Simple ()
 {
 }
 
-void Simple::SetupFrame ()
+void Simple::Frame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
-
   // Now rotate the camera according to keyboard state
-  float speed = (elapsed_time / 1000.0) * (0.03 * 20);
+  float speed = (elapsed_time / 1000.0) * (0.06 * 20);
 
   iCamera* c = view->GetCamera();
-  if (kbd->GetKeyState (CSKEY_RIGHT))
-    c->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
-  if (kbd->GetKeyState (CSKEY_LEFT))
-    c->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
-  if (kbd->GetKeyState (CSKEY_PGUP))
-    c->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
-  if (kbd->GetKeyState (CSKEY_PGDN))
-    c->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
-  if (kbd->GetKeyState (CSKEY_UP))
-    c->Move (CS_VEC_FORWARD * 4 * speed);
-  if (kbd->GetKeyState (CSKEY_DOWN))
-    c->Move (CS_VEC_BACKWARD * 4 * speed);
 
-  // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
-    return;
+  if (kbd->GetKeyState (CSKEY_SHIFT))
+  {
+    // If the user is holding down shift, the arrow keys will cause
+    // the camera to strafe up, down, left or right from it's
+    // current position.
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      c->Move (CS_VEC_RIGHT * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_LEFT))
+      c->Move (CS_VEC_LEFT * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_UP))
+      c->Move (CS_VEC_UP * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_DOWN))
+      c->Move (CS_VEC_DOWN * 4 * speed);
+  }
+  else
+  {
+    // left and right cause the camera to rotate on the global Y
+    // axis; page up and page down cause the camera to rotate on the
+    // _camera's_ X axis (more on this in a second) and up and down
+    // arrows cause the camera to go forwards and backwards.
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      rotY += speed;
+    if (kbd->GetKeyState (CSKEY_LEFT))
+      rotY -= speed;
+    if (kbd->GetKeyState (CSKEY_PGUP))
+      rotX += speed;
+    if (kbd->GetKeyState (CSKEY_PGDN))
+      rotX -= speed;
+    if (kbd->GetKeyState (CSKEY_UP))
+      c->Move (CS_VEC_FORWARD * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_DOWN))
+      c->Move (CS_VEC_BACKWARD * 4 * speed);
+  }
 
-  // Tell the camera to render into the frame buffer.
-  view->Draw ();
+  // We now assign a new rotation transformation to the camera.  You
+  // can think of the rotation this way: starting from the zero
+  // position, you first rotate "rotY" radians on your Y axis to get
+  // the first rotation.  From there you rotate "rotX" radians on the
+  // your X axis to get the final rotation.  We multiply the
+  // individual rotations on each axis together to get a single
+  // rotation matrix.  The rotations are applied in right to left
+  // order .
+  csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
+  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
+  c->SetTransform (ot);
+
+  rm->RenderView (view);
 }
 
-void Simple::FinishFrame ()
+bool Simple::OnKeyboard(iEvent& ev)
 {
-  g3d->FinishDraw ();
-  g3d->Print (0);
-}
-
-bool Simple::HandleEvent (iEvent& ev)
-{
-  if (ev.Name == Process)
+  // We got a keyboard event.
+  csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
+  if (eventtype == csKeyEventTypeDown)
   {
-    simple->SetupFrame ();
-    return true;
+    // The user pressed a key (as opposed to releasing it).
+    utf32_char code = csKeyEventHelper::GetCookedCode(&ev);
+    if (code == CSKEY_ESC)
+    {
+      // The user pressed escape to exit the application.
+      // The proper way to quit a Crystal Space application
+      // is by broadcasting a csevQuit event. That will cause the
+      // main runloop to stop. To do that we get the event queue from
+      // the object registry and then post the event.
+      csRef<iEventQueue> q = 
+        csQueryRegistry<iEventQueue> (GetObjectRegistry());
+      if (q.IsValid()) q->GetEventOutlet()->Broadcast(
+        csevQuit(GetObjectRegistry()));
+    }
   }
-  else if (ev.Name == FinalProcess)
-  {
-    simple->FinishFrame ();
-    return true;
-  }
-  else if ((ev.Name == KeyboardDown) &&
-	   (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
-  {
-    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
-    if (q) q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
-    return true;
-  }
-
   return false;
 }
 
-bool Simple::SimpleEventHandler (iEvent& ev)
+bool Simple::OnInitialize(int /*argc*/, char* /*argv*/ [])
 {
-  if (simple)
-    return simple->HandleEvent (ev);
-  else
-    return false;
+  // RequestPlugins() will load all plugins we specify. In addition
+  // it will also check if there are plugins that need to be loaded
+  // from the config system (both the application config and CS or
+  // global configs). In addition it also supports specifying plugins
+  // on the commandline.
+  if (!csInitializer::RequestPlugins(GetObjectRegistry(),
+    CS_REQUEST_VFS,
+    CS_REQUEST_OPENGL3D,
+    CS_REQUEST_ENGINE,
+    CS_REQUEST_FONTSERVER,
+    CS_REQUEST_IMAGELOADER,
+    CS_REQUEST_LEVELLOADER,
+    CS_REQUEST_REPORTER,
+    CS_REQUEST_REPORTERLISTENER,
+    CS_REQUEST_PLUGIN("crystalspace.mesh.object.lightning", iLightningState),
+    CS_REQUEST_END))
+    return ReportError("Failed to initialize plugins!");
+
+  // "Warm up" the event handler so it can interact with the world
+  csBaseEventHandler::Initialize(GetObjectRegistry());
+
+  // Now we need to register the event handler for our application.
+  // Crystal Space is fully event-driven. Everything (except for this
+  // initialization) happens in an event.
+  // Rather than simply handling all events, we subscribe to the
+  // particular events we're interested in.
+  csEventID events[] = {
+    csevFrame (GetObjectRegistry()),
+    csevKeyboardEvent (GetObjectRegistry()),
+    CS_EVENTLIST_END
+  };
+  if (!RegisterQueue(GetObjectRegistry(), events))
+    return ReportError("Failed to set up event handler!");
+
+  // Report success
+  return true;
 }
 
-bool Simple::Initialize ()
+void Simple::OnExit()
 {
-  if (!csInitializer::RequestPlugins (object_reg,
-  	CS_REQUEST_VFS,
-	CS_REQUEST_OPENGL3D,
-	CS_REQUEST_ENGINE,
-	CS_REQUEST_FONTSERVER,
-	CS_REQUEST_IMAGELOADER,
-	CS_REQUEST_LEVELLOADER,
-	CS_REQUEST_REPORTER,
-	CS_REQUEST_REPORTERLISTENER,
-    CS_REQUEST_PLUGIN("crystalspace.mesh.object.lightning", iLightningState),
-	CS_REQUEST_END))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.lightningtest",
-	"Can't initialize plugins!");
-    return false;
-  }
+  // Shut down the event handlers we spawned earlier.
+  drawer.Invalidate();
+  printer.Invalidate();
+}
 
-  Process = csevProcess (object_reg);
-  FinalProcess = csevFinalProcess (object_reg);
-  KeyboardDown = csevKeyboardDown (object_reg);
-
-  if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.lightningtest",
-	"Can't initialize event handler!");
-    return false;
-  }
-
-  // Check for commandline help.
-  if (csCommandLineHelper::CheckHelp (object_reg))
-  {
-    csCommandLineHelper::Help (object_reg);
-    return false;
-  }
-
-  // The virtual clock.
-  vc = csQueryRegistry<iVirtualClock> (object_reg);
-  if (vc == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.lightningtest",
-	"Can't find the virtual clock!");
-    return false;
-  }
-
-  // Find the pointer to engine plugin
-  engine = csQueryRegistry<iEngine> (object_reg);
-  if (engine == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.lightningtest",
-	"No iEngine plugin!");
-    return false;
-  }
-
-  loader = csQueryRegistry<iLoader> (object_reg);
-  if (loader == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.lightningtest",
-    	"No iLoader plugin!");
-    return false;
-  }
-
-  g3d = csQueryRegistry<iGraphics3D> (object_reg);
-  if (g3d == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.lightningtest",
-    	"No iGraphics3D plugin!");
-    return false;
-  }
-
-  kbd = csQueryRegistry<iKeyboardDriver> (object_reg);
-  if (kbd == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.lightningtest",
-    	"No iKeyboardDriver plugin!");
-    return false;
-  }
-
+bool Simple::Application()
+{
   // Open the main system. This will open all the previously loaded plug-ins.
-  if (!csInitializer::OpenApplication (object_reg))
+  // i.e. all windows will be opened.
+  if (!OpenApplication(GetObjectRegistry()))
+    return ReportError("Error opening system!");
+
+  if (SetupModules())
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.lightningtest",
-    	"Error opening system!");
-    return false;
+    // This calls the default runloop. This will basically just keep
+    // broadcasting process events to keep the game going.
+    Run();
   }
 
-  PluginManager = csQueryRegistry<iPluginManager> (object_reg);
-  if (!PluginManager)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.lightningtest",
-    	"No iPluginManager plugin!");
-    return false;
-  }
+  return true;
+}
+
+bool Simple::SetupModules ()
+{
+  // Now get the pointer to various modules we need. We fetch them
+  // from the object registry. The RequestPlugins() call we did earlier
+  // registered all loaded plugins with the object registry.
+  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
+  if (!g3d) return ReportError("Failed to locate 3D renderer!");
+
+  engine = csQueryRegistry<iEngine> (GetObjectRegistry());
+  if (!engine) return ReportError("Failed to locate 3D engine!");
+
+  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
+  if (!vc) return ReportError("Failed to locate Virtual Clock!");
+
+  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry());
+  if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
+
+  loader = csQueryRegistry<iLoader> (GetObjectRegistry());
+  if (!loader) return ReportError("Failed to locate Loader!");
+
+  plgmgr = csQueryRegistry<iPluginManager> (object_reg);
+  if (!plgmgr) return ReportError("Failed to locate Plugin Manager");
+
+  // We need a View to the virtual world.
+  view.AttachNew(new csView (engine, g3d));
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  // We use the full window to draw the world.
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
   engine->SetLightingCacheMode (0);
 
-  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
+  // Here we create our world.
+  CreateRoom();
+
+  // Let the engine prepare all lightmaps for use and also free all images 
+  // that were loaded for the texture manager.
+  engine->Prepare ();
+  rm = engine->GetRenderManager();
+
+  // these are used store the current orientation of the camera
+  rotY = rotX = 0;
+
+  // Now we need to position the camera in our world.
+  view->GetCamera ()->SetSector (room);
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
+
+  // We use some other "helper" event handlers to handle 
+  // pushing our work into the 3D engine and rendering it
+  // to the screen.
+  //drawer.AttachNew(new FrameBegin3DDraw (GetObjectRegistry (), view));
+  printer.AttachNew(new FramePrinter (GetObjectRegistry ()));
+
+  return true;
+}
+
+void Simple::CreateRoom ()
+{
+  // Load the texture from the standard library.  This is located in
+  // CS/data/standard.zip and mounted as /lib/std using the Virtual
+  // File System (VFS) plugin.
+  if (!loader->LoadTexture ("brick", "/lib/std/castle/brick1_d.jpg"))
+    ReportError("Error loading 'brick1_d' texture!");
+
+  if (!loader->LoadTexture("energy", "/lib/std/energy.jpg"))
+    ReportError("Error loading 'energy' texture!");
+
+  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("brick");
+
+  // Add a normal map to the material.
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.lightningtest",
-    	"Error loading 'stone4' texture!");
-    return false;
+    /* Shader variables are identified by numeric IDs for performance reasons.
+    * The shader var string set translates string IDs to numeric IDs. */
+    csRef<iShaderVarStringSet> svStrings =
+      csQueryRegistryTagInterface<iShaderVarStringSet> (GetObjectRegistry(),
+      "crystalspace.shader.variablenameset");
+    // Load the normal map texture itself
+    csRef<iTextureHandle> normalMap = loader->LoadTexture (
+      "/lib/std/castle/brick1_n.jpg");
+    // Set this to avoid compression - makes for better quality here
+    normalMap->SetTextureClass ("normalmap");
+    // The normal map is attached to the material through a shader variable.
+    csShaderVariable* svNormalMap =
+      tm->GetMaterial()->GetVariableAdd (svStrings->Request ("tex normal"));
+    svNormalMap->SetValue (normalMap);
   }
 
-  if (!loader->LoadTexture ("energy", "/lib/std/energy.jpg"))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.lightningtest",
-    	"Error loading 'stone4' texture!");
-    return false;
-  }
-
-  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
-
+  // We create a new sector called "room".
   room = engine->CreateSector ("room");
+
+  // Creating the walls for our room.
 
   // First we make a primitive for our geometry.
   using namespace CS::Geometry;
@@ -278,31 +280,28 @@ bool Simple::Initialize ()
 
   // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
-      engine, room, "walls", "walls_factory", &box);
+    engine, room, "walls", "walls_factory", &box);
 
   csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
     iGeneralMeshState> (walls->GetMeshObject ());
   mesh_state->SetShadowReceiving (true);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
+  // Now we need light to see something.
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();
 
-  light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10,
-  	csColor (1, 0, 0));
+  light = engine->CreateLight(0, csVector3(-3, 5, 0), 10, csColor(2, 0, 0));
   ll->Add (light);
 
-  light = engine->CreateLight (0, csVector3 (3, 5,  0), 10,
-  	csColor (0, 0, 1));
+  light = engine->CreateLight(0, csVector3(3, 5,  0), 10, csColor(0, 0, 2));
   ll->Add (light);
 
-  light = engine->CreateLight (0, csVector3 (0, 5, -3), 10,
-  	csColor (0, 1, 0));
+  light = engine->CreateLight(0, csVector3(0, 5, -3), 10, csColor(0, 2, 0));
   ll->Add (light);
 
- 
-  csRef<iMeshObjectType> type = csLoadPlugin<iMeshObjectType> (PluginManager,
-  	"crystalspace.mesh.object.lightning");
+  csRef<iMeshObjectType> type = csLoadPlugin<iMeshObjectType> (plgmgr,
+    "crystalspace.mesh.object.lightning");
 
   /// Lightning 1
   csRef<iMeshObjectFactory> LightningObjectFactory1 = type->NewFactory();
@@ -335,7 +334,7 @@ bool Simple::Initialize ()
   LightningFactoryState2->SetWildness(0.06f);
   LightningFactoryState2->SetUpdateInterval(50);
   LightningFactoryState2->SetDirectional(csVector3(0, 1, 0));  
-                       
+
   csRef<iMeshObject> mesh2 = LightningObjectFactory2->NewInstance();    
   csRef<iMeshWrapper> mw2 = engine->CreateMeshWrapper(mesh2, "lightning2", room, csVector3(0, 3, 4));
   mw2->SetRenderPriority (engine->GetRenderPriority ("alpha"));
@@ -358,37 +357,19 @@ bool Simple::Initialize ()
   csRef<iMeshObject> mesh3 = LightningObjectFactory3->NewInstance();    
   csRef<iMeshWrapper> mw3 = engine->CreateMeshWrapper(mesh3, "lightning3", room, csVector3(2, 3, 4));
   mw3->SetRenderPriority (engine->GetRenderPriority ("alpha"));
-
-  engine->Prepare ();
-
-  view = csPtr<iView> (new csView (engine, g3d));
-  view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
-  iGraphics2D* g2d = g3d->GetDriver2D ();
-  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
-
-  return true;
 }
 
-void Simple::Start ()
-{
-  csDefaultRunLoop (object_reg);
-}
-
-/*---------------------------------------------------------------------*
- * Main function
- *---------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------*
+* Main function
+*-------------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
-
-  simple = new Simple (object_reg);
-  if (simple->Initialize ())
-    simple->Start ();
-  delete simple;
-  simple = 0;
-
-  csInitializer::DestroyApplication (object_reg);
-  return 0;
+  /* Runs the application. 
+  *
+  * csApplicationRunner<> is a small wrapper to support "restartable" 
+  * applications (ie where CS needs to be completely shut down and loaded 
+  * again). Simple1 does not use that functionality itself, however, it
+  * allows you to later use "Simple.Restart();" and it'll just work.
+  */
+  return csApplicationRunner<Simple>::Run (argc, argv);
 }
-

@@ -20,6 +20,8 @@
 #ifndef __CONVERTER_H__
 #define __CONVERTER_H__
 
+#include "thing/thing.h"
+
 namespace genmeshify
 {
   class App;

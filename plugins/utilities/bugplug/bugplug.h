@@ -52,7 +52,6 @@ struct iObjectRegistry;
 struct iPluginManager;
 struct iSector;
 struct iTextureManager;
-struct iThingFactoryState;
 struct iVFS;
 struct iVirtualClock;
 struct iVisibilityCuller;
@@ -135,7 +134,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BugPlug)
 #define DEBUGCMD_SHADOWDEBUG	1046	// Toggle shadow debugging
 #define DEBUGCMD_DEBUGCMD   	1047	// Send a debug command to a plugin
 #define DEBUGCMD_MEMORYDUMP   	1048	// Memory dump
-#define DEBUGCMD_UNPREPARE   	1049	// Unprepare all things
+//#define DEBUGCMD_UNPREPARE   	1049	// Unprepare all things
 #define DEBUGCMD_COLORSECTORS  	1050	// Give all sectors a different color
 #define DEBUGCMD_SWITCHCULLER  	1051	// Switch to culler
 #define DEBUGCMD_SELECTMESH  	1052	// Select a mesh by name
@@ -279,7 +278,6 @@ private:
   void Dump (int indent, iMeshWrapper* mesh);
   void Dump (iMeshFactoryWrapper* meshfact);
   void Dump (iCamera* c);
-  void Dump (iThingFactoryState* fact, int polyidx);
   void Dump (int indent, const csMatrix3& m, char const* name);
   void Dump (int indent, const csVector3& v, char const* name);
   void Dump (int indent, const csVector2& v, char const* name);
@@ -524,6 +522,33 @@ public:
 
   private:
     bool display_time;
+
+    /**
+    * Embedded iEventHandler interface that handles frame events in the
+    * logic phase.
+    */
+    class LogicEventHandler : 
+      public scfImplementation1<LogicEventHandler, 
+      iEventHandler>
+    {
+    private:
+      csWeakRef<csBugPlug> parent;
+    public:
+      LogicEventHandler (csBugPlug* parent) :
+          scfImplementationType (this), parent (parent) { }
+      virtual ~LogicEventHandler () { }
+      virtual bool HandleEvent (iEvent& ev)
+      {
+        if (parent && (ev.Name == parent->Frame))
+        {      
+          return parent->HandleStartFrame (ev);
+        }
+
+        return false;
+      }
+      CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.bugplug.frame.logic")
+    };
+    csRef<LogicEventHandler> logicEventHandler;
 };
 
 }

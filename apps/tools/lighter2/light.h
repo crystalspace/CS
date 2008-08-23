@@ -44,8 +44,10 @@ namespace lighter
       occlUnoccluded,
       occlPartial
     };
-    OcclusionState Occlusion (const Primitive* ignorePrim = 0);
-    OcclusionState Occlusion (HitIgnoreCallback* ignoreCB);
+    OcclusionState Occlusion (const Object* ignoreObject,
+      const Primitive* ignorePrim = 0);
+    OcclusionState Occlusion (const Object* ignoreObject,
+      HitIgnoreCallback* ignoreCB);
 
     
     csColor GetFilterColor ();

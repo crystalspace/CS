@@ -24,7 +24,7 @@ object options respectively a @samp{meshfact} node for mesh factory options.
 
 Here, @samp{name="lighter2"} is used by @code{lighter2} to identify keys 
 containing options.  @samp{editoronly="yes"} instructs the engine to discard
-the key-value-pait during normal execution in order to conserve memory (since
+the key-value-pair during normal execution in order to conserve memory (since
 the @code{lighter2}-specific settings are simply not needed).  The actual
 options are specified by a number of @samp{@emph{option}=@emph{value}} pairs.
 
@@ -41,33 +41,9 @@ Values: floating point values
 
 Control lightmap density.
 
-@item indirectlight
+@item noselfshadow
 Values: @samp{yes}, @samp{no}
 
-Enables Global Illumination.
+Disables casting of shadows from an object onto itself.
 
-@item numphotons
-Values: unsigned integer values
-
-Control the number of photons emitted per light.
-
-@item photonspersample
-Values: unsigned integer values
-
-Control the number of photons sampled per density sample.
-
-@item sampledistance
-Values: floating point values
-
-Control the radius of the density sample for global illumination.
-
-@item finalgather
-Values: @samp{yes}, @samp{no}
-
-Enables the Final Gather option of the Global Illumination estimate.
-
-@item numfgrays
-Values: unsigned integer values
-
-Control the number of final gather samples.
 @end table

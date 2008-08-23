@@ -21,6 +21,7 @@
 #include "csgeom/math3d.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
+#include "csutil/eventhandlers.h"
 #include "csutil/util.h"
 #include "imap/services.h"
 #include "iutil/object.h"
@@ -1401,11 +1402,11 @@ bool csSkeletonGraveyard::Initialize (iObjectRegistry* object_reg)
 {
   this->object_reg = object_reg;
   vc = csQueryRegistry<iVirtualClock> (object_reg);
-  PreProcess = csevPreProcess (object_reg);
+  Frame = csevFrame (object_reg);
   csRef<iEventQueue> eq (csQueryRegistry<iEventQueue> (object_reg));
   if (eq == 0) return false;
   evhandler.AttachNew (new csSkelEventHandler (this));
-  eq->RegisterListener (evhandler, PreProcess);
+  eq->RegisterListener (evhandler, Frame);
 
   return true;
 }
@@ -1449,7 +1450,7 @@ void csSkeletonGraveyard::Update (csTicks time)
 }
 bool csSkeletonGraveyard::HandleEvent (iEvent& ev)
 {
-  if (ev.Name == PreProcess && !manual_updates)
+  if (ev.Name == Frame && !manual_updates)
   {
     Update (vc->GetCurrentTicks ());
     return true;

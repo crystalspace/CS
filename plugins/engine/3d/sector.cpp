@@ -686,9 +686,9 @@ csSectorVisibleRenderMeshes* csSector::GetVisibleRenderMeshes (int& num,
       return oneVisibleMesh;
     }
     
-    oneVisibleMesh[0].imesh = mesh;
-    oneVisibleMesh[0].num = numExtra;
-    oneVisibleMesh[0].rmeshes = extraMeshes;
+    oneVisibleMesh[1].imesh = mesh;
+    oneVisibleMesh[1].num = numExtra;
+    oneVisibleMesh[1].rmeshes = extraMeshes;
 
     num = 2;
     return oneVisibleMesh;

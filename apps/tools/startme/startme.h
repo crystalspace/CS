@@ -119,6 +119,8 @@ private:
   csArray<int> star_queue;
   float star_fade1, star_fade2, star_maxage;
 
+  csRef<FramePrinter> printer;
+
   virtual bool OnKeyboard (iEvent&);
   virtual bool OnMouseDown (iEvent &event);
 
@@ -127,13 +129,7 @@ private:
    * is called from the event handler in response to a cscmdProcess
    * broadcast message.
    */
-  void ProcessFrame ();
-
-  /**
-   * Finally render the screen. This routine is called from the event
-   * handler in response to a cscmdFinalProcess broadcast message.
-   */
-  void FinishFrame ();
+  void Frame ();
 
   /// Here we will create our little, simple world.
   void CreateRoom ();

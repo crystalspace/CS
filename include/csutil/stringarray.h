@@ -51,7 +51,7 @@ public:
 
 namespace CS
 {
-namespace Utilities
+namespace Utility
 {
 /**
  * An array of strings. This array will properly make copies of the strings
@@ -275,17 +275,17 @@ public:
     return num + 1;
   }
 };
+} // namespace Utility
 } // namespace CS
-} // namespace Utilities
 
 class csStringArray : 
-  public CS::Utilities::StringArray<CS::Memory::AllocatorMalloc,
-                                    csArrayCapacityDefault>
+  public CS::Utility::StringArray<CS::Memory::AllocatorMalloc,
+                                  csArrayCapacityDefault>
 {
 public:
   csStringArray (size_t limit = 0, size_t threshold = 0)
-  	: CS::Utilities::StringArray<CS::Memory::AllocatorMalloc, 
-  	                             csArrayCapacityDefault> (limit, threshold)
+  	: CS::Utility::StringArray<CS::Memory::AllocatorMalloc, 
+  	                           csArrayCapacityDefault> (limit, threshold)
   {
   }
 };

@@ -212,21 +212,30 @@
 	    
 	    shadow.Init (l, shadowMapCoords[l], lightDir[l].w);
 	    
+	    float3 lightDiffuse = lightProps.colorDiffuse[i];
+	    #if 0
+	    // Force light color. Can be useful when  debugginh point
+	    // light shadow frustums.
+	    if (i == 0)
+	      lightDiffuse = float3 (1, 1, 0);
+	    else if (i == 1)
+	      lightDiffuse = float3 (0, 1, 1);
+	    else if (i == 2)
+	      lightDiffuse = float3 (1, 0, 1);
+	    else if (i == 3)
+	      lightDiffuse = float3 (1, 0, 0);
+	    else if (i == 4)
+	      lightDiffuse = float3 (0, 1, 0);
+	    else if (i == 5)
+	      lightDiffuse = float3 (0, 0, 1);
+	    #endif
+	    
 	    Light light = GetCurrentLight (lightSpace, i, normal);
 	    float4 lightAttenuationVec = lightProps.attenuationVec[i];
 	    float3 d, s;
 	    ComputeLight (lightSpace, light, myEyeToSurf, normal, 32,
-	      lightProps.colorDiffuse[i], lightProps.colorSpecular[i],
+	      lightDiffuse, lightProps.colorSpecular[i],
 	      lightAttenuationVec, shadow.GetVisibility(), d, s);
-	    
-	  #if 0
-	    if (i == 3)
-	      d*= float3 (1, 0, 0);
-            else if (i == 4)
-	      d*= float3 (0, 1, 0);
-	    else if (i == 5)
-	      d*= float3 (0, 0, 1);
-	  #endif
 	    
 	    diffuseColor += d;
 	    specularColor += s;

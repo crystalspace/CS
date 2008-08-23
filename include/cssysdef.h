@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 1998-2008 by Jorrit Tyberghein
     Written by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -90,6 +90,13 @@
  */
 #ifndef CS_ATTRIBUTE_MALLOC
 # define CS_ATTRIBUTE_MALLOC
+#endif
+
+/**\def CS_ATTRIBUTE_INIT_PRIORITY()
+ * Namespace-level object initialization priority attribute.
+ */
+#ifndef CS_ATTRIBUTE_INIT_PRIORITY
+# define CS_ATTRIBUTE_INIT_PRIORITY(PRI)
 #endif
 
 // Set up deprecation macros
@@ -769,94 +776,17 @@ extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptcalloc_checking (
 #  endif
 #endif
 
-#if defined(CS_EXTENSIVE_MEMDEBUG)
-CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n)
-{ 
-#ifdef CS_CHECKING_ALLOCATIONS
-  return ptmalloc_checking (n);
-#else
-  return ptmalloc_located (n);
-#endif
-}
+#endif // CS_NO_PTMALLOC
 
-CS_FORCEINLINE void cs_free (void* p)
-{ 
-#ifdef CS_CHECKING_ALLOCATIONS
-  ptfree_checking (p);
-#else
-  ptfree_located (p);
-#endif
-}
-
-CS_FORCEINLINE void* cs_realloc (void* p, size_t n)
-{ 
-#ifdef CS_CHECKING_ALLOCATIONS
-  return ptrealloc_checking (p, n);
-#else
-  return ptrealloc_located (p, n);
-#endif
-}
-
-CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_calloc (size_t n, size_t s)
-{ 
-#ifdef CS_CHECKING_ALLOCATIONS
-  return ptcalloc_checking (n, s); 
-#else
-  return ptcalloc_located (n, s); 
-#endif
-}
-
-#else // defined(CS_EXTENSIVE_MEMDEBUG)
 /**\name Default Crystal Space memory allocation
  * Always the same memory allocation functions as internally used by 
  * Crystal Space.
  */
 //@{
-CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n)
-{ 
-#ifdef CS_DEBUG
-  return ptmalloc_sentinel (n);
-#else
-  return ptmalloc (n);
-#endif
-}
-CS_FORCEINLINE void cs_free (void* p)
-{ 
-#ifdef CS_DEBUG
-  ptfree_sentinel (p);
-#else
-  ptfree (p);
-#endif
-}
-CS_FORCEINLINE void* cs_realloc (void* p, size_t n)
-{ 
-#ifdef CS_DEBUG
-  return ptrealloc_sentinel (p, n);
-#else
-  return ptrealloc (p, n);
-#endif
-}
-CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_calloc (size_t n, size_t s)
-{ 
-#ifdef CS_DEBUG
-  return ptcalloc_sentinel (n, s); 
-#else
-  return ptcalloc (n, s); 
-#endif
-}
-//@}
-#endif
-
-#else // CS_NO_PTMALLOC
-CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n)
-{ return malloc (n); }
-CS_FORCEINLINE void cs_free (void* p)
-{ free (p); }
-CS_FORCEINLINE void* cs_realloc (void* p, size_t n)
-{ return realloc (p, n); }
-CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_calloc (size_t n, size_t s)
-{ return calloc (n, s); }
-#endif // CS_NO_PTMALLOC
+extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n);
+extern CS_CRYSTALSPACE_EXPORT void cs_free (void* p);
+extern CS_CRYSTALSPACE_EXPORT void* cs_realloc (void* p, size_t n);
+extern CS_CRYSTALSPACE_EXPORT void* cs_calloc (size_t n, size_t s);
 //@}
 
 #ifdef CS_USE_CUSTOM_ISDIR
@@ -935,6 +865,10 @@ namespace CS
     #    else
       _asm int 3;
     #    endif
+    #  elif defined (CS_PROCESSOR_POWERPC)
+    // Source: http://cocoawithlove.com/2008/03/break-into-debugger.html
+      asm("li r0, 20\nsc\nnop\nli r0, 37\nli r4, 2\nsc\nnop\n"
+           : : : "memory","r0","r3","r4" );
     #  else
       static int x = 0; x /= x;
     #  endif

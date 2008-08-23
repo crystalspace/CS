@@ -3,6 +3,7 @@ SubDir TOP apps tools vsh ;
 Description vsh : "Virtual Shell tool" ;
 Application vsh : [ Wildcard *.cpp *.h ] : console ;
 LinkWith vsh : crystalspace ;
+FileListEntryApplications vsh : app-tool ;
 
 if [ Property build : projgen_version ] != 6 && $(ZLIB.AVAILABLE) = yes
 {
@@ -15,5 +16,6 @@ CFlags vsh_static : [ FDefines CS_STATIC_LINKED ] ;
 MsvcDefine vsh_static : CS_STATIC_LINKED ;
 LinkWith vsh_static : crystalspace ;
 LinkStaticPlugins vsh_static : vfs ;
+FileListEntryApplications vsh_static : app-tool-static ;
 SubVariant ;
 }

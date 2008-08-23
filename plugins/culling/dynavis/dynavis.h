@@ -57,7 +57,6 @@ struct iBugPlug;
 struct iMeshWrapper;
 struct iShadowCaster;
 struct iShadowReceiver;
-struct iThingState;
 
 #define VIEWMODE_STATS 0
 #define VIEWMODE_STATSOVERLAY 1

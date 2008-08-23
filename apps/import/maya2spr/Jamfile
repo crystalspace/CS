@@ -7,4 +7,5 @@ Application maya2spr
 	: console
 ;
 LinkWith maya2spr : crystalspace ;
+FileListEntryApplications maya2spr : app-tool ;
 

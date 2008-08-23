@@ -25,6 +25,7 @@
 #include "binarytree.h"
 
 #include "csgeom/tri.h"
+#include "csutil/stringconv.h"
 
 void DAGNode::PrintStats(FILE *s,int level) 
 {
@@ -128,13 +129,13 @@ bool NodeTransform::LoadTransformAttr(MayaInputFile& file,csVector3& vec)
     return false;
   }
   file.GetToken(tok);
-  vec.x = atof(tok);
+  vec.x = CS::Utility::strtof(tok);
 
   file.GetToken(tok);
-  vec.y = atof(tok);
+  vec.y = CS::Utility::strtof(tok);
 
   file.GetToken(tok);
-  vec.z = -atof(tok);
+  vec.z = -CS::Utility::strtof(tok);
 
   file.GetToken(tok);
   if (tok != ";")

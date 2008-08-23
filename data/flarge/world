@@ -4379,7 +4379,20 @@
     </meshfact>
     <meshfact name="seagull">
         <plugin>spr2dFact</plugin>
-        <params />
+        <params>
+          <v x="-4" y="0.5" />
+          <v x="1" y="0.5" />
+          <v x="1" y="-0.5" />
+          <v x="-4" y="-0.5" />
+          <uv u="0" v="0" />
+          <uv u="1" v="0" />
+          <uv u="1" v="1" />
+          <uv u="0" v="1" />
+          <color red="1" green="1" blue="1" />
+          <color red="1" green="1" blue="1" />
+          <color red="1" green="1" blue="1" />
+          <color red="1" green="1" blue="1" />
+        </params>
     </meshfact>
     <meshfact name="factory_room_walls">
         <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
@@ -12938,20 +12951,8 @@
             <plugin>spr2d</plugin>
             <!--priority>alpha</priority-->
             <params>
-                <factory>billboard</factory>
-                <v x="-1" y="0.5" />
-                <v x="1" y="0.5" />
-                <v x="1" y="-0.5" />
-                <v x="-1" y="-0.5" />
-                <uv u="0" v="0" />
-                <uv u="1" v="0" />
-                <uv u="1" v="1" />
-                <uv u="0" v="1" />
+                <factory>seagull</factory>
                 <lighting>no</lighting>
-                <color red="1" green="1" blue="1" />
-                <color red="1" green="1" blue="1" />
-                <color red="1" green="1" blue="1" />
-                <color red="1" green="1" blue="1" />
                 <material>seagull</material>
             </params>
             <move>

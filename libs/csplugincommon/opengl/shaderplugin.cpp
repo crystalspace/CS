@@ -37,8 +37,8 @@ namespace CS
   {
   
     ShaderProgramPluginGL::ShaderProgramPluginGL (iBase* parent)
-     : scfImplementationType (this, parent), isOpen (false), object_reg (0),
-       ext (0), doVerbose (false)
+     : scfImplementationType (this, parent), vendor (Invalid), isOpen (false),
+       object_reg (0), ext (0), doVerbose (false)
     {
     }
   
@@ -49,9 +49,12 @@ namespace CS
       csRef<iVerbosityManager> verbosemgr (
 	csQueryRegistry<iVerbosityManager> (object_reg));
       if (verbosemgr) 
+      {
 	doVerbose = verbosemgr->Enabled ("renderer.shader");
+	doVerbosePrecache = verbosemgr->Enabled ("renderer.shader.precache");
+      }
       else
-	doVerbose = false;
+	doVerbose = doVerbosePrecache = false;
 	
       return true;
     }
@@ -59,27 +62,34 @@ namespace CS
     bool ShaderProgramPluginGL::Open()
     {
       if (isOpen) return true;
+      isOpen = true;
       
       csRef<iGraphics3D> r = csQueryRegistry<iGraphics3D> (object_reg);
     
       // Sanity check
-      csRef<iFactory> f = scfQueryInterface<iFactory> (r);
-      if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 
+      csRef<iFactory> f = scfQueryInterfaceSafe<iFactory> (r);
+      if (f == 0 || strcmp ("crystalspace.graphics3d.opengl", 
 	    f->QueryClassID ()) != 0)
 	return false;
     
-      r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
-      if (ext == 0)
+      ext = 0;
+      statecache = 0;
+      if (r)
+      {
+	r->GetDriver2D()->PerformExtension ("getstatecache", &statecache);
+	r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
+      }
+      if ((ext == 0) || (statecache == 0))
 	return false;
 	
       csString vendorStr ((const char*)glGetString (GL_VENDOR));
       vendorStr.Downcase();
-      if (vendorStr.FindFirst ("nvidia") != (size_t)-1)
+      if (vendorStr.FindStr ("nvidia") != (size_t)-1)
       {
         vendor = NVIDIA;
       }
-      else if ((vendorStr.FindFirst ("ati") != (size_t)-1)
-          || (vendorStr.FindFirst ("amd") != (size_t)-1))
+      else if ((vendorStr.FindStr ("ati") != (size_t)-1)
+          || (vendorStr.FindStr ("amd") != (size_t)-1))
       {
         vendor = ATI;
       }
@@ -90,7 +100,6 @@ namespace CS
       
       clipPlanes.Initialize (object_reg);
       
-      isOpen = true;
       return true;
     }
     
@@ -99,6 +108,43 @@ namespace CS
       isOpen = false;
     }
     
+    const char* ShaderProgramPluginGL::VendorToString (HardwareVendor vendor)
+    {
+      switch (vendor)
+      {
+        case Invalid: return 0;
+        case Other: return "other";
+        case ATI: return "ati";
+        case NVIDIA: return "nv";
+      }
+      CS_ASSERT_MSG("Forgot to add vendor string when adding vendor enum?",
+        false);
+      return 0;
+    }
+    
+    ShaderProgramPluginGL::HardwareVendor ShaderProgramPluginGL::VendorFromString (
+      const char* vendorStr)
+    {
+      if (vendorStr == 0) return Invalid;
+    
+      csString str (vendorStr);
+      str.Downcase();
+      
+      if (str == "ati")
+      {
+	return ATI;
+      }
+      else if ((str == "nvidia") || (str == "nv"))
+      {
+	return NVIDIA;
+      }
+      else if (str == "other")
+      {
+	return Other;
+      }
+      return Invalid;
+    }
+      
     uint ShaderProgramPluginGL::ParseVendorMask (const char* maskStr)
     {
       uint mask = 0;
@@ -122,17 +168,11 @@ namespace CS
         uint thisMask = 0;
         if (str == "*")
           thisMask = ~0;
-        else if (str == "ati")
+        else
         {
-          thisMask = 1 << ATI;
-        }
-        else if ((str == "nvidia") || (str == "nv"))
-        {
-          thisMask = 1 << NVIDIA;
-        }
-        else if (str == "other")
-        {
-          thisMask = 1 << Other;
+          HardwareVendor thisVendor = VendorFromString (str);
+          if (thisVendor != Invalid)
+            thisMask = 1 << thisVendor;
         }
         if (doNegate)
           mask &= ~thisMask;
@@ -156,7 +196,7 @@ namespace CS
     {
       GLint _maxClipPlanes;
       glGetIntegerv (GL_MAX_CLIP_PLANES, &_maxClipPlanes);
-      maxPlanes = csMin (_maxClipPlanes, 6);
+      maxPlanes = csMin ((int)_maxClipPlanes, 6);
       // @@@ Lots of places assume max 6 planes
       
       csRef<iShaderVarStringSet> strings = 

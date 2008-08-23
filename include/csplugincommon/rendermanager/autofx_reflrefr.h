@@ -19,6 +19,10 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_AUTOFX_REFLREFR_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_AUTOFX_REFLREFR_H__
 
+/**\file
+ * Automatic reflection/refraction textures.
+ */
+
 #include "csplugincommon/rendermanager/posteffects.h"
 
 namespace CS
@@ -27,14 +31,67 @@ namespace CS
   {
 
     /**
-     * Class for automatic plane reflection/refraction textures.
+     * Render manager helper for automatic plane reflection/refraction
+     * textures.
      *
-     * Usage: Functor for TraverseUsedSVSets
+     * When some shader used in a render tree context uses a planar
+     * reflection texture (SV name <tt>tex plane reflect</tt>),
+     * refraction texture (<tt>tex plane refract</tt>) or matching
+     * depth textures (<tt>tex plane reflect depth</tt>,
+     * <tt>tex plane refract depth</tt>) new contexts are set up to render
+     * the scene with the appropriate settings to textures.
+     *
+     * The reflection/refraction is planar. The reflection texture will contain
+     * the scene from the context's view, but mirrored at and clipped to the 
+     * reflection plane (everything "above" the reflecting planar surface).
+     * The refraction texture will contain the scene from the context's view, 
+     * but clipped to the reflection plane (everything "below" the reflecting 
+     * planar surface).
+     *
+     * The reflection plane can be specified in object space of a mesh object
+     * by attach an SV <tt>plane reflection</tt> to it. If no such SV is
+     * attached, a reflection plane is computed from the object space bounding
+     * box: the plane's origin is the origin of the mesh, the plane's normal
+     * points into the positive direction of the smallest dimension of the
+     * bounding box.
+     *
+     * Usage: Functor for TraverseUsedSVSets. Application must happen after 
+     * shader and ticket setup (e.g. SetupStandardTicket()).
+     * Example:
+     * \code
+     * // Define type using rendermanager-dependent render tree and context setup
+     * typedef CS::RenderManager::AutoFX_ReflectRefract<RenderTreeType, 
+     *   ContextSetupType> AutoReflectRefractType;
+     *
+     * // Instantiate helper in rendering
+     * RenderManagerType::AutoReflectRefractType fxRR (
+     *   rmanager->reflectRefractPersistent, *this);
+     * // Set up a traverser for the sets of shader vars used over each mesh
+     * typedef TraverseUsedSVSets<RenderTreeType,
+     *   RenderManagerType::AutoReflectRefractType> SVTraverseType;
+     * SVTraverseType svTraverser
+     *   (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+     * // Do the actual traversal.
+     * ForEachMeshNode (context, svTraverser);
+     * \endcode
+     *
+     * The template parameter \a RenderTree gives the render tree type.
+     * The parameter \a ContextSetup gives a class used to set up the contexts
+     * for the reflection/refraction rendering. It must provide an
+     * implementation of operator() (RenderTree::ContextNode&).
+     *
+     * Automatic reflections and refractions have a number of configuration
+     * settings; see \c data/config-plugins/engine.cfg.
      */
     template<typename RenderTree, typename ContextSetup>
     class AutoFX_ReflectRefract
     {
     public:
+      /**
+       * Data used by the helper that needs to persist over multiple frames.
+       * Render managers must store an instance of this class and provide
+       * it to the helper upon instantiation.
+       */
       struct PersistentData
       {
         CS::ShaderVarStringID svTexPlaneRefl;
@@ -84,6 +141,7 @@ namespace CS
         
         uint dbgReflRefrTex;
         
+        /// Construct helper
         PersistentData() :
           currentFrame (0),
 	  texCache (csimg2D, "rgb8",  // @@@ FIXME: Use same format as main view ...
@@ -98,7 +156,14 @@ namespace CS
 	    CS::Utility::ResourceCache::ReuseIfOnlyOneRef ())
 	{
 	}
-        
+	
+        /**
+         * Initialize helper. Fetches various required values from objects in
+         * the object registry and reads configuration settings. Must be called
+         * when the RenderManager plugin is initialized.
+         * \a postEffects must be the post effects manager used by the render
+         * manager, if any, or 0.
+         */
 	void Initialize (iObjectRegistry* objReg,
 			 RenderTreeBase::DebugPersistent& dbgPersist,
 			 PostEffectManager* postEffects)
@@ -140,6 +205,10 @@ namespace CS
 	  texCacheDepth.SetG3D (g3d);
 	}
       
+        /**
+         * Do per-frame house keeping - \b MUST be called every frame/
+         * RenderView() execution.
+         */
 	void UpdateNewFrame ()
 	{
 	  csTicks currentTicks = csGetTicks ();
@@ -180,6 +249,11 @@ namespace CS
         contextFunction (contextFunction)
       {}
     
+      /**
+       * Operator doing the actual work. If one of the reflection or refraction
+       * textures is detected in the set of shader vars used (\a names) by
+       * \a mesh textures are set up.
+       */
       void operator() (typename RenderTree::MeshNode* node,
                        size_t layer,
                        typename RenderTree::MeshNode::SingleMesh& mesh,
@@ -469,12 +543,12 @@ namespace CS
 	    if (usesReflTex)
 	    {
 	      tex = 
-	        persist.texCache.QueryUnusedTexture (txt_w_refl, txt_h_refl, 0);
+	        persist.texCache.QueryUnusedTexture (txt_w_refl, txt_h_refl);
 	    }
 	    if (usesReflDepthTex)
 	    {
 	      texDepth = 
-	        persist.texCacheDepth.QueryUnusedTexture (txt_w_refl, txt_h_refl, 0);
+	        persist.texCacheDepth.QueryUnusedTexture (txt_w_refl, txt_h_refl);
 	    }
 	    
 	    // Set up context for reflection, clipped to plane
@@ -553,12 +627,12 @@ namespace CS
 	    if (usesRefrTex)
 	    {
 	      tex = 
-	        persist.texCache.QueryUnusedTexture (txt_w_refr, txt_h_refr, 0);
+	        persist.texCache.QueryUnusedTexture (txt_w_refr, txt_h_refr);
 	    }
 	    if (usesRefrDepthTex)
 	    {
 	      texDepth = 
-	        persist.texCacheDepth.QueryUnusedTexture (txt_w_refr, txt_h_refr, 0);
+	        persist.texCacheDepth.QueryUnusedTexture (txt_w_refr, txt_h_refr);
 	    }
 	    
 	    // Set up context for reflection, clipped to plane

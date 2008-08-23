@@ -201,10 +201,10 @@ void RenderView::SetFrustumFromBox (const csBox2& box)
   float rx_n = csClamp (box.MaxX() * iw - 1.0f, 1.0f, -1.0f);
   float ty_n = csClamp (box.MinY() * ih - 1.0f, 1.0f, -1.0f);
   float by_n = csClamp (box.MaxY() * ih - 1.0f, 1.0f, -1.0f);
-  
+ 
   CS::Math::Matrix4 invMatrix_inv_t =
     ctxt->icamera->GetProjectionMatrix().GetTranspose();
-    
+
   int n = 0;
   csPlane3 *frustum = ctxt->frustum;
   csPlane3 p;
@@ -212,6 +212,7 @@ void RenderView::SetFrustumFromBox (const csBox2& box)
   p.Set (0, 0, -1, 1);
   frustum[n] = invMatrix_inv_t * p;
   frustum[n].Normalize();
+
   n++;
   // Far plane
   /*p.Set (0, 0, -1, 1);
@@ -246,8 +247,8 @@ void RenderView::SetFrustum (float lx, float rx, float ty, float by)
   rightx = rx;
   topy = ty;
   boty = by;
-  
-  SetFrustumFromBox (csBox2 (lx, ty, rx, by));
+ 
+  //SetFrustumFromBox (csBox2 (lx, ty, rx, by));
 }
 
 void RenderView::CreateRenderContext ()

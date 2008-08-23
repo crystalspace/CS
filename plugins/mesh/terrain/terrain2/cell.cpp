@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2006 by Kapoulkine Arseny
-                2007 by Marten Svanfeldt
+                2007-2008 by Marten Svanfeldt
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -44,6 +44,7 @@ csTerrainCell::csTerrainCell (csTerrainSystem* terrain, const char* name, int gr
   : scfImplementationType (this), 
   terrain (terrain), name (name), materialMapWidth (materialMapWidth), 
   materialMapHeight (materialMapHeight), position (position), size (size),
+  minHeight (0), maxHeight (0),
   renderProperties (renderProperties), collisionProperties (collisionProperties),
   feederProperties (feederProperties), loadState (NotLoaded),
   lruTicks (0)
@@ -61,10 +62,15 @@ csTerrainCell::csTerrainCell (csTerrainSystem* terrain, const char* name, int gr
   
   step_x = size.x / (this->gridWidth - 1);
   step_z = size.z / (this->gridHeight - 1);
+
+  const csVector3 size01 = size * 0.1f;
+  boundingBox.Set (position.x - size01.x, minHeight - size01.y, position.y - size01.z,
+    position.x + size.x + size01.x, maxHeight + size01.y, position.y + size.z + size01.z);
 }
 
 csTerrainCell::~csTerrainCell ()
 {
+  SetLoadState (NotLoaded);
 }
 
 iTerrainSystem* csTerrainCell::GetTerrain()
@@ -158,6 +164,8 @@ void csTerrainCell::SetLoadState(LoadState state)
       {
         case NotLoaded:
         {
+          terrain->FireUnloadCallbacks (this);
+
           heightmap.DeleteAll ();
           materialmap.DeleteAll ();
 
@@ -166,8 +174,6 @@ void csTerrainCell::SetLoadState(LoadState state)
           feederData = 0;
 
           loadState = NotLoaded;
-
-          terrain->FireUnloadCallbacks (this);
 
           break;
         }
@@ -184,16 +190,22 @@ void csTerrainCell::SetLoadState(LoadState state)
 
 csBox3 csTerrainCell::GetBBox () const
 {
+  /*const csVector3 size01 = size * 0.1f;
   csBox3 box;
-  box.Set (position.x, 0, position.y,
-    position.x + size.x, size.y, position.y + size.z);
+  box.Set (position.x - size01.x, minHeight - size01.y, position.y - size01.z,
+    position.x + size.x + size01.x, maxHeight + size01.y, position.y + size.z + size01.z);*/
 
-  return box;
+  return boundingBox;
 }
 
 const char* csTerrainCell::GetName () const
 {
   return name.GetData ();
+}
+
+void csTerrainCell::SetName (const char* name)
+{
+  this->name = name;
 }
 
 iTerrainCellRenderProperties* csTerrainCell::GetRenderProperties () const
@@ -247,6 +259,21 @@ csLockedHeightData csTerrainCell::LockHeightData (const csRect& rectangle)
 void csTerrainCell::UnlockHeightData ()
 {
   Touch();
+
+  minHeight = FLT_MAX;
+  maxHeight = -FLT_MAX;
+
+  for (size_t i = 0; i < heightmap.GetSize (); ++i)
+  {
+    minHeight = csMin (minHeight, heightmap[i]);
+    maxHeight = csMax (maxHeight, heightmap[i]);
+  }
+
+  const csVector3 size01 = size * 0.1f;
+  boundingBox.Set (position.x - size01.x, minHeight - size01.y, position.y - size01.z,
+    position.x + size.x + size01.x, maxHeight + size01.y, position.y + size.z + size01.z);
+
+  terrain->CellSizeUpdate (this);
 
   terrain->FireHeightUpdateCallbacks (this, lockedHeightRect);
 }
@@ -526,13 +553,13 @@ csVector3 csTerrainCell::GetBinormal (const csVector2& pos) const
   return Lerp (n1, n2, yfrac).Unit ();
 }
 
-csVector3 csTerrainCell::GetNormal (int x, int y) const
+csVector3 csTerrainCell::GetNormalDN (int x, int y) const
 {
   float center = GetHeight (x, y);
 
   float dfdy = 0;
   if (y - 1 >= 0 && y + 1 < gridHeight)
-    dfdy = (GetHeight (x, y + 1) - GetHeight (x, y - 1)) / 2*step_z; 
+    dfdy = (GetHeight (x, y + 1) - GetHeight (x, y - 1)) / (2*step_z); 
   else if (y - 1 >= 0)
     dfdy = (center - GetHeight (x, y - 1)) / step_z;
   else if (y + 1 < gridHeight)
@@ -540,13 +567,18 @@ csVector3 csTerrainCell::GetNormal (int x, int y) const
 
   float dfdx = 0;
   if (x - 1 >= 0 && x + 1 < gridWidth)
-    dfdx = (GetHeight (x + 1, y) - GetHeight (x - 1, y)) / 2*step_x; 
+    dfdx = (GetHeight (x + 1, y) - GetHeight (x - 1, y)) / (2*step_x); 
   else if (x - 1 >= 0)
     dfdx = (center - GetHeight (x - 1, y)) / step_x;
   else if (x + 1 < gridWidth)
     dfdx = (GetHeight (x + 1, y) - center) / step_x;
 
-  return csVector3 (dfdx, 1, dfdy);
+  return csVector3 (-dfdx, 1, dfdy);
+}
+
+csVector3 csTerrainCell::GetNormal (int x, int y) const
+{
+  return GetNormalDN (x, y).Unit ();
 }
 
 csVector3 csTerrainCell::GetNormal (const csVector2& pos) const
@@ -556,8 +588,8 @@ csVector3 csTerrainCell::GetNormal (const csVector2& pos) const
 
   LerpHelper (pos, x1, x2, xfrac, y1, y2, yfrac);
 
-  csVector3 n1 = Lerp (GetNormal (x1, y1), GetNormal (x2, y1), xfrac);
-  csVector3 n2 = Lerp (GetNormal (x1, y2), GetNormal (x2, y2), xfrac);
+  csVector3 n1 = Lerp (GetNormalDN (x1, y1), GetNormalDN (x2, y1), xfrac);
+  csVector3 n2 = Lerp (GetNormalDN (x1, y2), GetNormalDN (x2, y2), xfrac);
 
   return Lerp (n1, n2, yfrac).Unit ();
 }

@@ -1214,6 +1214,7 @@ class iSprite2DFactoryState(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
+    def GetVertices(*args): return _imesh.iSprite2DFactoryState_GetVertices(*args)
     def SetLighting(*args): return _imesh.iSprite2DFactoryState_SetLighting(*args)
     def HasLighting(*args): return _imesh.iSprite2DFactoryState_HasLighting(*args)
     def GetUVAnimationCount(*args): return _imesh.iSprite2DFactoryState_GetUVAnimationCount(*args)
@@ -1602,137 +1603,6 @@ iMeshObjectType_swigregister = _imesh.iMeshObjectType_swigregister
 iMeshObjectType_swigregister(iMeshObjectType)
 iMeshObjectType_scfGetVersion = _imesh.iMeshObjectType_scfGetVersion
 
-class csPolygonRange(object):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    __repr__ = _swig_repr
-    start = _swig_property(_imesh.csPolygonRange_start_get, _imesh.csPolygonRange_start_set)
-    end = _swig_property(_imesh.csPolygonRange_end_get, _imesh.csPolygonRange_end_set)
-    def __init__(self, *args): 
-        this = _imesh.new_csPolygonRange(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    def Set(*args): return _imesh.csPolygonRange_Set(*args)
-    __swig_destroy__ = _imesh.delete_csPolygonRange
-    __del__ = lambda self : None;
-csPolygonRange_swigregister = _imesh.csPolygonRange_swigregister
-csPolygonRange_swigregister(csPolygonRange)
-
-CS_POLY_LIGHTING = _imesh.CS_POLY_LIGHTING
-CS_POLY_COLLDET = _imesh.CS_POLY_COLLDET
-CS_POLY_VISCULL = _imesh.CS_POLY_VISCULL
-CS_POLYINDEX_LAST = _imesh.CS_POLYINDEX_LAST
-CS_THING_NOCOMPRESS = _imesh.CS_THING_NOCOMPRESS
-CS_THING_MOVE_NEVER = _imesh.CS_THING_MOVE_NEVER
-CS_THING_MOVE_OCCASIONAL = _imesh.CS_THING_MOVE_OCCASIONAL
-class iPolygonHandle(core.iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def GetThingFactoryState(*args): return _imesh.iPolygonHandle_GetThingFactoryState(*args)
-    def GetMeshObjectFactory(*args): return _imesh.iPolygonHandle_GetMeshObjectFactory(*args)
-    def GetThingState(*args): return _imesh.iPolygonHandle_GetThingState(*args)
-    def GetMeshObject(*args): return _imesh.iPolygonHandle_GetMeshObject(*args)
-    def GetIndex(*args): return _imesh.iPolygonHandle_GetIndex(*args)
-    __swig_destroy__ = _imesh.delete_iPolygonHandle
-    __del__ = lambda self : None;
-iPolygonHandle_swigregister = _imesh.iPolygonHandle_swigregister
-iPolygonHandle_swigregister(iPolygonHandle)
-
-class iThingFactoryState(core.iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def CompressVertices(*args): return _imesh.iThingFactoryState_CompressVertices(*args)
-    def GetPolygonCount(*args): return _imesh.iThingFactoryState_GetPolygonCount(*args)
-    def RemovePolygon(*args): return _imesh.iThingFactoryState_RemovePolygon(*args)
-    def RemovePolygons(*args): return _imesh.iThingFactoryState_RemovePolygons(*args)
-    def FindPolygonByName(*args): return _imesh.iThingFactoryState_FindPolygonByName(*args)
-    def AddEmptyPolygon(*args): return _imesh.iThingFactoryState_AddEmptyPolygon(*args)
-    def AddTriangle(*args): return _imesh.iThingFactoryState_AddTriangle(*args)
-    def AddQuad(*args): return _imesh.iThingFactoryState_AddQuad(*args)
-    def AddPolygon(*args): return _imesh.iThingFactoryState_AddPolygon(*args)
-    def AddOutsideBox(*args): return _imesh.iThingFactoryState_AddOutsideBox(*args)
-    def AddInsideBox(*args): return _imesh.iThingFactoryState_AddInsideBox(*args)
-    def SetPolygonName(*args): return _imesh.iThingFactoryState_SetPolygonName(*args)
-    def GetPolygonName(*args): return _imesh.iThingFactoryState_GetPolygonName(*args)
-    def CreatePolygonHandle(*args): return _imesh.iThingFactoryState_CreatePolygonHandle(*args)
-    def SetPolygonMaterial(*args): return _imesh.iThingFactoryState_SetPolygonMaterial(*args)
-    def GetPolygonMaterial(*args): return _imesh.iThingFactoryState_GetPolygonMaterial(*args)
-    def AddPolygonVertex(*args): return _imesh.iThingFactoryState_AddPolygonVertex(*args)
-    def SetPolygonVertexIndices(*args): return _imesh.iThingFactoryState_SetPolygonVertexIndices(*args)
-    def GetPolygonVertexCount(*args): return _imesh.iThingFactoryState_GetPolygonVertexCount(*args)
-    def GetPolygonVertex(*args): return _imesh.iThingFactoryState_GetPolygonVertex(*args)
-    def GetPolygonVertexIndices(*args): return _imesh.iThingFactoryState_GetPolygonVertexIndices(*args)
-    def SetPolygonTextureMapping(*args): return _imesh.iThingFactoryState_SetPolygonTextureMapping(*args)
-    def GetPolygonTextureMapping(*args): return _imesh.iThingFactoryState_GetPolygonTextureMapping(*args)
-    def SetPolygonTextureMappingEnabled(*args): return _imesh.iThingFactoryState_SetPolygonTextureMappingEnabled(*args)
-    def IsPolygonTextureMappingEnabled(*args): return _imesh.iThingFactoryState_IsPolygonTextureMappingEnabled(*args)
-    def SetPolygonFlags(*args): return _imesh.iThingFactoryState_SetPolygonFlags(*args)
-    def ResetPolygonFlags(*args): return _imesh.iThingFactoryState_ResetPolygonFlags(*args)
-    def GetPolygonFlags(*args): return _imesh.iThingFactoryState_GetPolygonFlags(*args)
-    def GetPolygonObjectPlane(*args): return _imesh.iThingFactoryState_GetPolygonObjectPlane(*args)
-    def IsPolygonTransparent(*args): return _imesh.iThingFactoryState_IsPolygonTransparent(*args)
-    def PointOnPolygon(*args): return _imesh.iThingFactoryState_PointOnPolygon(*args)
-    def GetVertexCount(*args): return _imesh.iThingFactoryState_GetVertexCount(*args)
-    def GetVertex(*args): return _imesh.iThingFactoryState_GetVertex(*args)
-    def GetVertices(*args): return _imesh.iThingFactoryState_GetVertices(*args)
-    def CreateVertex(*args): return _imesh.iThingFactoryState_CreateVertex(*args)
-    def SetVertex(*args): return _imesh.iThingFactoryState_SetVertex(*args)
-    def DeleteVertex(*args): return _imesh.iThingFactoryState_DeleteVertex(*args)
-    def DeleteVertices(*args): return _imesh.iThingFactoryState_DeleteVertices(*args)
-    def SetSmoothingFlag(*args): return _imesh.iThingFactoryState_SetSmoothingFlag(*args)
-    def GetSmoothingFlag(*args): return _imesh.iThingFactoryState_GetSmoothingFlag(*args)
-    def GetNormals(*args): return _imesh.iThingFactoryState_GetNormals(*args)
-    def GetCosinusFactor(*args): return _imesh.iThingFactoryState_GetCosinusFactor(*args)
-    def SetCosinusFactor(*args): return _imesh.iThingFactoryState_SetCosinusFactor(*args)
-    def AddPolygonRenderBuffer(*args): return _imesh.iThingFactoryState_AddPolygonRenderBuffer(*args)
-    def GetLightmapLayout(*args): return _imesh.iThingFactoryState_GetLightmapLayout(*args)
-    scfGetVersion = staticmethod(_imesh.iThingFactoryState_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iThingFactoryState
-    __del__ = lambda self : None;
-iThingFactoryState_swigregister = _imesh.iThingFactoryState_swigregister
-iThingFactoryState_swigregister(iThingFactoryState)
-iThingFactoryState_scfGetVersion = _imesh.iThingFactoryState_scfGetVersion
-
-class iThingState(core.iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def GetVertexW(*args): return _imesh.iThingState_GetVertexW(*args)
-    def GetVerticesW(*args): return _imesh.iThingState_GetVerticesW(*args)
-    def GetMovingOption(*args): return _imesh.iThingState_GetMovingOption(*args)
-    def SetMovingOption(*args): return _imesh.iThingState_SetMovingOption(*args)
-    def Prepare(*args): return _imesh.iThingState_Prepare(*args)
-    def Unprepare(*args): return _imesh.iThingState_Unprepare(*args)
-    def ReplaceMaterial(*args): return _imesh.iThingState_ReplaceMaterial(*args)
-    def ClearReplacedMaterials(*args): return _imesh.iThingState_ClearReplacedMaterials(*args)
-    def SetMixMode(*args): return _imesh.iThingState_SetMixMode(*args)
-    def GetMixMode(*args): return _imesh.iThingState_GetMixMode(*args)
-    def CreatePolygonHandle(*args): return _imesh.iThingState_CreatePolygonHandle(*args)
-    def GetPolygonWorldPlane(*args): return _imesh.iThingState_GetPolygonWorldPlane(*args)
-    def GetPolygonLightmap(*args): return _imesh.iThingState_GetPolygonLightmap(*args)
-    def GetPolygonPDLight(*args): return _imesh.iThingState_GetPolygonPDLight(*args)
-    def GetReplacedMaterial(*args): return _imesh.iThingState_GetReplacedMaterial(*args)
-    scfGetVersion = staticmethod(_imesh.iThingState_scfGetVersion)
-    __swig_destroy__ = _imesh.delete_iThingState
-    __del__ = lambda self : None;
-iThingState_swigregister = _imesh.iThingState_swigregister
-iThingState_swigregister(iThingState)
-iThingState_scfGetVersion = _imesh.iThingState_scfGetVersion
-
-class iThingEnvironment(core.iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def Clear(*args): return _imesh.iThingEnvironment_Clear(*args)
-    def GetLightmapCellSize(*args): return _imesh.iThingEnvironment_GetLightmapCellSize(*args)
-    def SetLightmapCellSize(*args): return _imesh.iThingEnvironment_SetLightmapCellSize(*args)
-    def GetDefaultLightmapCellSize(*args): return _imesh.iThingEnvironment_GetDefaultLightmapCellSize(*args)
-    __swig_destroy__ = _imesh.delete_iThingEnvironment
-    __del__ = lambda self : None;
-iThingEnvironment_swigregister = _imesh.iThingEnvironment_swigregister
-iThingEnvironment_swigregister(iThingEnvironment)
-
 class csCharArrayArray(core.CustomAllocated):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
@@ -1869,6 +1739,9 @@ class iTerrainCellCollisionProperties(core.iBase):
     def SetCollidable(*args): return _imesh.iTerrainCellCollisionProperties_SetCollidable(*args)
     def SetParameter(*args): return _imesh.iTerrainCellCollisionProperties_SetParameter(*args)
     def Clone(*args): return _imesh.iTerrainCellCollisionProperties_Clone(*args)
+    def GetParameterCount(*args): return _imesh.iTerrainCellCollisionProperties_GetParameterCount(*args)
+    def GetParameterName(*args): return _imesh.iTerrainCellCollisionProperties_GetParameterName(*args)
+    def GetParameterValue(*args): return _imesh.iTerrainCellCollisionProperties_GetParameterValue(*args)
     scfGetVersion = staticmethod(_imesh.iTerrainCellCollisionProperties_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainCellCollisionProperties
     __del__ = lambda self : None;
@@ -1884,6 +1757,9 @@ class iTerrainCellRenderProperties(ivideo.iShaderVariableContext):
     def SetVisible(*args): return _imesh.iTerrainCellRenderProperties_SetVisible(*args)
     def SetParameter(*args): return _imesh.iTerrainCellRenderProperties_SetParameter(*args)
     def Clone(*args): return _imesh.iTerrainCellRenderProperties_Clone(*args)
+    def GetParameterCount(*args): return _imesh.iTerrainCellRenderProperties_GetParameterCount(*args)
+    def GetParameterName(*args): return _imesh.iTerrainCellRenderProperties_GetParameterName(*args)
+    def GetParameterValue(*args): return _imesh.iTerrainCellRenderProperties_GetParameterValue(*args)
     scfGetVersion = staticmethod(_imesh.iTerrainCellRenderProperties_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainCellRenderProperties
     __del__ = lambda self : None;
@@ -1901,6 +1777,14 @@ class iTerrainCellFeederProperties(core.iBase):
     def AddAlphaMap(*args): return _imesh.iTerrainCellFeederProperties_AddAlphaMap(*args)
     def SetParameter(*args): return _imesh.iTerrainCellFeederProperties_SetParameter(*args)
     def Clone(*args): return _imesh.iTerrainCellFeederProperties_Clone(*args)
+    def GetParameterCount(*args): return _imesh.iTerrainCellFeederProperties_GetParameterCount(*args)
+    def GetParameterName(*args): return _imesh.iTerrainCellFeederProperties_GetParameterName(*args)
+    def GetParameterValue(*args): return _imesh.iTerrainCellFeederProperties_GetParameterValue(*args)
+    def GetAlphaMapCount(*args): return _imesh.iTerrainCellFeederProperties_GetAlphaMapCount(*args)
+    def GetAlphaMapMaterial(*args): return _imesh.iTerrainCellFeederProperties_GetAlphaMapMaterial(*args)
+    def GetAlphaMapSource(*args): return _imesh.iTerrainCellFeederProperties_GetAlphaMapSource(*args)
+    def SetHeightmapSmooth(*args): return _imesh.iTerrainCellFeederProperties_SetHeightmapSmooth(*args)
+    def GetHeightmapSmooth(*args): return _imesh.iTerrainCellFeederProperties_GetHeightmapSmooth(*args)
     scfGetVersion = staticmethod(_imesh.iTerrainCellFeederProperties_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainCellFeederProperties
     __del__ = lambda self : None;
@@ -2076,6 +1960,7 @@ class iTerrainCell(core.iBase):
     def SetCollisionData(*args): return _imesh.iTerrainCell_SetCollisionData(*args)
     def GetFeederData(*args): return _imesh.iTerrainCell_GetFeederData(*args)
     def SetFeederData(*args): return _imesh.iTerrainCell_SetFeederData(*args)
+    def SetName(*args): return _imesh.iTerrainCell_SetName(*args)
     scfGetVersion = staticmethod(_imesh.iTerrainCell_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainCell
     __del__ = lambda self : None;
@@ -2091,6 +1976,23 @@ class iTerrainFactoryCell(core.iBase):
     def GetCollisionProperties(*args): return _imesh.iTerrainFactoryCell_GetCollisionProperties(*args)
     def GetFeederProperties(*args): return _imesh.iTerrainFactoryCell_GetFeederProperties(*args)
     def SetBaseMaterial(*args): return _imesh.iTerrainFactoryCell_SetBaseMaterial(*args)
+    def GetName(*args): return _imesh.iTerrainFactoryCell_GetName(*args)
+    def SetName(*args): return _imesh.iTerrainFactoryCell_SetName(*args)
+    def GetGridWidth(*args): return _imesh.iTerrainFactoryCell_GetGridWidth(*args)
+    def GetGridHeight(*args): return _imesh.iTerrainFactoryCell_GetGridHeight(*args)
+    def GetPosition(*args): return _imesh.iTerrainFactoryCell_GetPosition(*args)
+    def GetSize(*args): return _imesh.iTerrainFactoryCell_GetSize(*args)
+    def GetMaterialMapWidth(*args): return _imesh.iTerrainFactoryCell_GetMaterialMapWidth(*args)
+    def GetMaterialMapHeight(*args): return _imesh.iTerrainFactoryCell_GetMaterialMapHeight(*args)
+    def GetBaseMaterial(*args): return _imesh.iTerrainFactoryCell_GetBaseMaterial(*args)
+    def GetMaterialPersistent(*args): return _imesh.iTerrainFactoryCell_GetMaterialPersistent(*args)
+    def SetGridWidth(*args): return _imesh.iTerrainFactoryCell_SetGridWidth(*args)
+    def SetGridHeight(*args): return _imesh.iTerrainFactoryCell_SetGridHeight(*args)
+    def SetPosition(*args): return _imesh.iTerrainFactoryCell_SetPosition(*args)
+    def SetSize(*args): return _imesh.iTerrainFactoryCell_SetSize(*args)
+    def SetMaterialMapWidth(*args): return _imesh.iTerrainFactoryCell_SetMaterialMapWidth(*args)
+    def SetMaterialMapHeight(*args): return _imesh.iTerrainFactoryCell_SetMaterialMapHeight(*args)
+    def SetMaterialPersistent(*args): return _imesh.iTerrainFactoryCell_SetMaterialPersistent(*args)
     scfGetVersion = staticmethod(_imesh.iTerrainFactoryCell_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainFactoryCell
     __del__ = lambda self : None;
@@ -2105,10 +2007,17 @@ class iTerrainFactory(core.iBase):
     def SetRenderer(*args): return _imesh.iTerrainFactory_SetRenderer(*args)
     def SetCollider(*args): return _imesh.iTerrainFactory_SetCollider(*args)
     def SetFeeder(*args): return _imesh.iTerrainFactory_SetFeeder(*args)
-    def AddCell(*args): return _imesh.iTerrainFactory_AddCell(*args)
     def SetMaxLoadedCells(*args): return _imesh.iTerrainFactory_SetMaxLoadedCells(*args)
     def SetVirtualViewDistance(*args): return _imesh.iTerrainFactory_SetVirtualViewDistance(*args)
     def SetAutoPreLoad(*args): return _imesh.iTerrainFactory_SetAutoPreLoad(*args)
+    def GetRenderer(*args): return _imesh.iTerrainFactory_GetRenderer(*args)
+    def GetCollider(*args): return _imesh.iTerrainFactory_GetCollider(*args)
+    def GetFeeder(*args): return _imesh.iTerrainFactory_GetFeeder(*args)
+    def GetMaxLoadedCells(*args): return _imesh.iTerrainFactory_GetMaxLoadedCells(*args)
+    def GetCellCount(*args): return _imesh.iTerrainFactory_GetCellCount(*args)
+    def GetDefaultCell(*args): return _imesh.iTerrainFactory_GetDefaultCell(*args)
+    def AddCell(*args): return _imesh.iTerrainFactory_AddCell(*args)
+    def GetCell(*args): return _imesh.iTerrainFactory_GetCell(*args)
     scfGetVersion = staticmethod(_imesh.iTerrainFactory_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iTerrainFactory
     __del__ = lambda self : None;
@@ -2446,8 +2355,6 @@ class iParticleBuiltinEffectorFactory(core.iBase):
 iParticleBuiltinEffectorFactory_swigregister = _imesh.iParticleBuiltinEffectorFactory_swigregister
 iParticleBuiltinEffectorFactory_swigregister(iParticleBuiltinEffectorFactory)
 iParticleBuiltinEffectorFactory_scfGetVersion = _imesh.iParticleBuiltinEffectorFactory_scfGetVersion
-
-CS_POLYRANGE_LAST = csPolygonRange (-1, -1)
 
 
 

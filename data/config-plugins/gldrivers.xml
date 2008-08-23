@@ -570,12 +570,10 @@
     <rule description="NVidia: RECT texture extension apparently broken">
       <conditions fulfill="all">
         <comparever version="glvendor" relation="lt 6.14.10.9371" />
-	<regexp	string="vendor" pattern="NVIDIA" />
-	<regexp string="platform" pattern="Win32" />
-        
+        <regexp string="vendor" pattern="NVIDIA" />
       </conditions>
       <applicable>
-	<usecfg>disableRECTTextures</usecfg>
+	  <usecfg>disableRECTTextures</usecfg>
       </applicable>
     </rule>
 
