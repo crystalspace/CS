@@ -921,20 +921,6 @@ csEventID _csevInput (iObjectRegistry *);
 #undef csevQuit
 csEventID _csevQuit (iObjectRegistry *);
 
-/* Process */
-#define _csevProcess(reg) csevProcess(reg)
-#undef csevProcess
-csEventID _csevProcess (iObjectRegistry *);
-#define _csevPreProcess(reg) csevPreProcess(reg)
-#undef csevPreProcess
-csEventID _csevPreProcess (iObjectRegistry *);
-#define _csevPostProcess(reg) csevPostProcess(reg)
-#undef csevPostProcess
-csEventID _csevPostProcess (iObjectRegistry *);
-#define _csevFinalProcess(reg) csevFinalProcess(reg)
-#undef csevFinalProcess
-csEventID _csevFinalProcess (iObjectRegistry *);
-
 /* Canvas */
 #define _csevCanvasClose(reg, g2d) csevCanvasClose(reg, g2d)
 #undef csevCanvasClose

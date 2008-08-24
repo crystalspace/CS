@@ -461,43 +461,6 @@ static inline csEventID csevCanvasOp (
 #define csevCommandLineHelp(reg)      \
   (csEventNameRegistry::GetID((reg), "crystalspace.application.commandlinehelp"))
 
-/**
- * Broadcasted before csevProcess on every frame.
- * This event will go away soon, since it was a kludge to
- * work around the lack of subscription priorities/scheduling.
- * Should be replaced with subscriptions to csevFrame with subscription 
- * ordering.
- */
-CS_CRYSTALSPACE_EXPORT csEventID csevPreProcess(iObjectRegistry *reg);
-CS_CRYSTALSPACE_EXPORT csEventID csevPreProcess(iEventNameRegistry *reg);
-
-/**
- * Broadcasted every frame.
- * This event will go away soon, replaced by csevFrame.
- */
-CS_CRYSTALSPACE_EXPORT csEventID csevProcess(iObjectRegistry *reg);
-CS_CRYSTALSPACE_EXPORT csEventID csevProcess(iEventNameRegistry *reg);
-
-/**
- * Broadcasted after csevProcess on every frame.
- * This event will go away soon, since it was a kludge to
- * work around the lack of subscription priorities/scheduling.
- * Should be replaced with subscriptions to csevFrame with subscription 
- * ordering.
- */
-CS_CRYSTALSPACE_EXPORT csEventID csevPostProcess(iObjectRegistry *reg);
-CS_CRYSTALSPACE_EXPORT csEventID csevPostProcess(iEventNameRegistry *reg);
-
-/**
- * Broadcasted after csevPostProcess on every frame.
- * This event will go away soon, since it was a kludge to
- * work around the lack of subscription priorities/scheduling.
- * Should be replaced with subscriptions to csevFrame with subscription 
- * ordering.
- */
-CS_CRYSTALSPACE_EXPORT csEventID csevFinalProcess(iObjectRegistry *reg);
-CS_CRYSTALSPACE_EXPORT csEventID csevFinalProcess(iEventNameRegistry *reg);
-
 /** @} */
 
 #define CS_DECLARE_SYSTEM_EVENT_SHORTCUTS			\
@@ -505,11 +468,7 @@ CS_CRYSTALSPACE_EXPORT csEventID csevFinalProcess(iEventNameRegistry *reg);
   csEventID SystemClose
 
 #define CS_DECLARE_FRAME_EVENT_SHORTCUTS			\
-  csEventID Frame;						\
-  csEventID PreProcess;						\
-  csEventID Process;						\
-  csEventID PostProcess;					\
-  csEventID FinalProcess
+  csEventID Frame
 
 #define CS_DECLARE_INPUT_EVENT_SHORTCUTS			\
   csEventID KeyboardEvent;					\
@@ -518,7 +477,7 @@ CS_CRYSTALSPACE_EXPORT csEventID csevFinalProcess(iEventNameRegistry *reg);
 
 /**
  * Shortcut to declare class properties SystemOpen, SystemClose,
- * Frame, PreProcess, Process, PostProcess, FinalProcess.
+ * Frame.
  * Pair with CS_INITIALIZE_EVENT_SHORTCUTS(registry).
  */
 #define CS_DECLARE_EVENT_SHORTCUTS				\
@@ -533,10 +492,6 @@ CS_CRYSTALSPACE_EXPORT csEventID csevFinalProcess(iEventNameRegistry *reg);
 
 #define CS_INITIALIZE_FRAME_EVENT_SHORTCUTS(object_reg) do {	\
     Frame = csevFrame ((object_reg));				\
-    PreProcess = csevPreProcess ((object_reg));			\
-    Process = csevProcess ((object_reg));			\
-    PostProcess = csevPostProcess ((object_reg));		\
-    FinalProcess = csevFinalProcess ((object_reg));		\
   } while (0)
 
 #define CS_INITIALIZE_INPUT_EVENT_SHORTCUTS(object_reg) do {	\
