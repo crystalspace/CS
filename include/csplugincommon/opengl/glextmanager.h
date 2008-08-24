@@ -139,6 +139,13 @@ typedef unsigned int GLhandleARB;
 #ifndef CS_HAVE_GLCHAR_T
 typedef GLcharARB GLchar;
 #endif
+/* Newer GL type identifiers */
+#ifndef CS_HAVE_GLINTPTR_T
+typedef intptr_t GLintptr;
+#endif
+#ifndef CS_HAVE_GLSIZEIPTR_T
+typedef uintptr_t GLsizeiptr;
+#endif
 
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
@@ -11472,7 +11479,7 @@ typedef GLvoid (csAPIENTRY* csGLFLUSHMAPPEDBUFFERRANGE) (GLenum target, GLintptr
       allclear &= funcTest;
 
 #define EXTMGR_REPORT_INIT_RESULT(exttype, nameNC)			\
-      CS_##nameNC = allclear;                                           \
+      CS_##nameNC = allclear;						\
       if (CS_##nameNC) 					                \
       {									\
         CS_##nameNC &= config->GetBool (cfgkey, defaultUse);		\
