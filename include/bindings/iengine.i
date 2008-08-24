@@ -5,6 +5,7 @@
 #endif
 %import "bindings/core.i"
 %import "bindings/ivideo.i" /* due to at least csZBufMode graph3d.h */
+%import "bindings/csgeom.i"
 %{
 #include "crystalspace.h"
 %}
