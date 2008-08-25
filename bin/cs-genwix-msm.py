@@ -25,8 +25,8 @@ if not parsed_options.outfile:
 if not parsed_options.msmid:
     options.error("missing --id")
 
+subdirmap = {}
 if parsed_options.subdirmap:
-    subdirmap = {}
     for s in parsed_options.subdirmap:
         (list, subdirs) = s.split (':', 1)
         subdirmap[list] = subdirs
@@ -50,7 +50,7 @@ dirref = DirectoryRef(
 for list in args:
     listid = os.path.splitext(os.path.basename(list))[0]
     thisdir = dirref
-    if subdirmap and subdirmap.has_key(listid):
+    if subdirmap.has_key(listid):
         dirid = parsed_options.msmid
         list_subdir = subdirmap[listid]
         for subdir in list_subdir.split('/'):
