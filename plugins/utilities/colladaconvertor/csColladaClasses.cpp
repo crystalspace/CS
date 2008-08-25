@@ -825,7 +825,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       csRef<iDocumentNode> materialNode = currentCrystalParamsElement->CreateNodeBefore(CS_NODE_ELEMENT);
       materialNode->SetValue("material");
       csRef<iDocumentNode> materialContents = materialNode->CreateNodeBefore(CS_NODE_TEXT);
-      materialContents->SetValue(GetMaterialPointer()->GetID());
+      materialContents->SetValue(GetMaterialPointer()->GetName());
     }
 
     int counter = 0;
@@ -1657,6 +1657,11 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
   void csColladaMaterial::SetID(const char* newId)
   {
     id = newId;
+  }
+
+  void csColladaMaterial::SetName(const char* newName)
+  {
+    name = newName;
   }
 
   void csColladaMaterial::SetInstanceEffect(iDocumentNode *effectNode)
