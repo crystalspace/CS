@@ -2518,8 +2518,6 @@ iMeshObjectFactory *csThing::GetFactory () const
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_FACTORY (csThingObjectType)
-
 csThingObjectType::csThingObjectType (iBase *pParent) :
   scfImplementationType (this, pParent),
   blk_polygon3dstatic (2000),
