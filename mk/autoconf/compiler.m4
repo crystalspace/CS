@@ -136,7 +136,13 @@ AC_DEFUN([_CS_COMPILER_VERSION],
 	    CS_EMIT_BUILD_PROPERTY([COMPILER.VERSION],
 	        [$_CS_COMPILER_VERSION_SH([$2])],
 		[], [], [], [Y])
-	    ;;
+            _compiler_version_list=`echo $_CS_COMPILER_VERSION_SH([$2]) | sed -e 's/\./ /g'`
+	    CS_EMIT_BUILD_PROPERTY([COMPILER.$2.VERSION_LIST],
+	        [$_compiler_version_list])
+	    CS_EMIT_BUILD_PROPERTY([COMPILER.VERSION_LIST],
+	        [$_compiler_version_list],
+		[], [], [], [Y])
+            ;;
     esac])
 
 AC_DEFUN([_CS_COMPILER_VERSION_SH],
