@@ -3,9 +3,22 @@ SubDir TOP scripts msi ;
 # @@@ Not quite the same ...
 MSM_VERSION ?= $(PACKAGE_VERSION) ;
 
+if $(COMPILER.C++.VERSION_LIST)
+{
+  MSM_ARCH = "$(COMPILER.C++.TYPE)_$(COMPILER.C++.VERSION_LIST[1]).$(COMPILER.C++.VERSION_LIST[2])" ;
+}
+else
+{
+  MSM_ARCH = "$(COMPILER.C++.TYPE)" ;
+}
+
 # Architecture-independent
 MSIMergeModule CS.doc : doc-manual doc-api : $(MSM_VERSION) : doc-manual:manual doc-api:api ;
 MSIMergeModule CS.data : data-demo data-demo-maps data-runtime data-tool : $(MSM_VERSION) ;
 MSIMergeModule CS.include : headers : $(MSM_VERSION) ;
 MSIMergeModule CS.vfs : vfs : $(MSM_VERSION) ;
 
+# Architecture-dependent
+MSIMergeModule CS.arch.$(MSM_ARCH).include : headers-platform : $(MSM_VERSION) ;
+MSIMergeModule CS.arch.$(MSM_ARCH).lib : libs-shared : $(MSM_VERSION) ;
+MSIMergeModule CS.arch.$(MSM_ARCH).executable : app-demo app-tool plugin plugin-cg : $(MSM_VERSION) ;
