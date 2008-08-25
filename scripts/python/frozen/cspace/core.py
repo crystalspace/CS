@@ -1543,10 +1543,6 @@ csevMouseOp = _core.csevMouseOp
 csevJoystick = _core.csevJoystick
 csevJoystickOp = _core.csevJoystickOp
 csevCanvasOp = _core.csevCanvasOp
-csevPreProcess = _core.csevPreProcess
-csevProcess = _core.csevProcess
-csevPostProcess = _core.csevPostProcess
-csevFinalProcess = _core.csevFinalProcess
 iEventHandler_scfGetVersion = _core.iEventHandler_scfGetVersion
 
 class iPluginIterator(iBase):
