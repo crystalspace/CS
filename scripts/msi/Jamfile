@@ -13,12 +13,26 @@ else
 }
 
 # Architecture-independent
-MSIMergeModule CS.doc : doc-manual doc-api : $(MSM_VERSION) : doc-manual:manual doc-api:api ;
-MSIMergeModule CS.data : data-demo data-demo-maps data-runtime data-tool : $(MSM_VERSION) ;
-MSIMergeModule CS.include : headers : $(MSM_VERSION) ;
-MSIMergeModule CS.vfs : vfs : $(MSM_VERSION) ;
+MSIMergeModuleFromList CS.doc : doc-manual doc-api : $(MSM_VERSION) : doc-manual:manual doc-api:api ;
+MSIMergeModuleFromList CS.data : data-demo data-demo-maps data-runtime data-tool : $(MSM_VERSION) ;
+MSIMergeModuleFromList CS.include : headers : $(MSM_VERSION) ;
+MSIMergeModuleFromList CS.vfs : vfs : $(MSM_VERSION) ;
+MakeLocate CS.register.msm : $(LOCATE.MSM) ;
+MSIMergeModule CS.register.msm : CS.register.wxs ;
 
 # Architecture-dependent
-MSIMergeModule CS.arch.$(MSM_ARCH).include : headers-platform : $(MSM_VERSION) ;
-MSIMergeModule CS.arch.$(MSM_ARCH).lib : libs-shared : $(MSM_VERSION) ;
-MSIMergeModule CS.arch.$(MSM_ARCH).executable : app-demo app-tool plugin plugin-cg : $(MSM_VERSION) ;
+MSIMergeModuleFromList CS.arch.$(MSM_ARCH).include : headers-platform : $(MSM_VERSION) ;
+MSIMergeModuleFromList CS.arch.$(MSM_ARCH).lib : libs-shared : $(MSM_VERSION) ;
+MSIMergeModuleFromList CS.arch.$(MSM_ARCH).executable : app-demo app-tool plugin plugin-cg : $(MSM_VERSION) ;
+
+rule MakeMSIsForArch
+{
+  local arch = $(1) ;
+  
+  MakeLocate CS-$(arch).msi : $(LOCATE.MSI) ;
+  MSIPackage CS-$(arch).msi : CS.wxs :
+    "MSM_CS_PATH=$(LOCATE.MSM)" "ARCH=$(arch)" "TOP=$(TOP)" ;
+  #Depends CS-$(arch).msi : mergemodules ;
+  Depends msis : CS-$(arch).msi ;
+}
+MakeMSIsForArch $(MSM_ARCH) ;
