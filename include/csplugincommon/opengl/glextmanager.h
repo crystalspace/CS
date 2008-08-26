@@ -1,5 +1,5 @@
 /**
- * WARNING - This file is automagically tenerated
+ * WARNING - This file is automagically generated
  */
 
 /*
@@ -138,6 +138,13 @@ typedef unsigned int GLhandleARB;
 /* Identifiers after promotion to core */
 #ifndef CS_HAVE_GLCHAR_T
 typedef GLcharARB GLchar;
+#endif
+/* Newer GL type identifiers */
+#ifndef CS_HAVE_GLINTPTR_T
+typedef intptr_t GLintptr;
+#endif
+#ifndef CS_HAVE_GLSIZEIPTR_T
+typedef uintptr_t GLsizeiptr;
 #endif
 
 #include "iutil/cmdline.h"
@@ -11187,6 +11194,269 @@ typedef GLvoid (csAPIENTRY* csGLPROGRAMENVPARAMETERS4FVEXT) (GLenum target, GLui
 typedef GLvoid (csAPIENTRY* csGLCLAMPCOLORARB) (GLenum target, GLenum clamp);
 
 /** @} */
+/**\name GL_ARB_framebuffer_sRGB constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/framebuffer_sRGB.txt">http://www.opengl.org/registry/specs/ARB/framebuffer_sRGB.txt</a>.
+ * @{ */
+#ifndef GL_FRAMEBUFFER_SRGB
+#define GL_FRAMEBUFFER_SRGB                                          0x8DB9
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_framebuffer_sRGB functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/framebuffer_sRGB.txt">http://www.opengl.org/registry/specs/ARB/framebuffer_sRGB.txt</a>.
+ * @{ */
+
+/** @} */
+#ifdef _WIN32
+/**\name WGL_ARB_framebuffer_sRGB constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/wgl_framebuffer_sRGB.txt">http://www.opengl.org/registry/specs/ARB/wgl_framebuffer_sRGB.txt</a>.
+ * @{ */
+#ifndef WGL_FRAMEBUFFER_SRGB_CAPABLE_ARB
+#define WGL_FRAMEBUFFER_SRGB_CAPABLE_ARB                             0x20A9
+#endif
+
+
+/** @} */
+
+/**\name WGL_ARB_framebuffer_sRGB functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/wgl_framebuffer_sRGB.txt">http://www.opengl.org/registry/specs/ARB/wgl_framebuffer_sRGB.txt</a>.
+ * @{ */
+
+/** @} */
+#endif
+
+/**\name GL_ARB_draw_instanced constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/draw_instanced.txt">http://www.opengl.org/registry/specs/ARB/draw_instanced.txt</a>.
+ * @{ */
+
+/** @} */
+
+/**\name GL_ARB_draw_instanced functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/draw_instanced.txt">http://www.opengl.org/registry/specs/ARB/draw_instanced.txt</a>.
+ * @{ */
+typedef GLvoid (csAPIENTRY* csGLDRAWARRAYSINSTANCEDARB) (GLenum mode, GLint first, GLsizei count, GLsizei primcount);
+typedef GLvoid (csAPIENTRY* csGLDRAWELEMENTSINSTANCEDARB) (GLenum mode, GLsizei count, GLenum type, const GLvoid* indices, GLsizei primcount);
+
+/** @} */
+/**\name GL_ARB_depth_buffer_float constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/depth_buffer_float.txt">http://www.opengl.org/registry/specs/ARB/depth_buffer_float.txt</a>.
+ * @{ */
+#ifndef GL_DEPTH_COMPONENT32F
+#define GL_DEPTH_COMPONENT32F                                        0x8CAC
+#endif
+
+#ifndef GL_DEPTH32F_STENCIL8
+#define GL_DEPTH32F_STENCIL8                                         0x8CAD
+#endif
+
+#ifndef GL_FLOAT_32_UNSIGNED_INT_24_8_REV
+#define GL_FLOAT_32_UNSIGNED_INT_24_8_REV                            0x8DAD
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_depth_buffer_float functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/depth_buffer_float.txt">http://www.opengl.org/registry/specs/ARB/depth_buffer_float.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ARB_instanced_arrays constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/instanced_arrays.txt">http://www.opengl.org/registry/specs/ARB/instanced_arrays.txt</a>.
+ * @{ */
+#ifndef GL_VERTEX_ATTRIB_ARRAY_DIVISOR_ARB
+#define GL_VERTEX_ATTRIB_ARRAY_DIVISOR_ARB                           0x88FE
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_instanced_arrays functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/instanced_arrays.txt">http://www.opengl.org/registry/specs/ARB/instanced_arrays.txt</a>.
+ * @{ */
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBDIVISORARB) (GLuint index, GLuint divisor);
+
+/** @} */
+/**\name GL_ARB_half_float_vertex constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/half_float_vertex.txt">http://www.opengl.org/registry/specs/ARB/half_float_vertex.txt</a>.
+ * @{ */
+#ifndef GL_HALF_FLOAT
+#define GL_HALF_FLOAT                                                0x140B
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_half_float_vertex functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/half_float_vertex.txt">http://www.opengl.org/registry/specs/ARB/half_float_vertex.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ARB_map_buffer_range constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/map_buffer_range.txt">http://www.opengl.org/registry/specs/ARB/map_buffer_range.txt</a>.
+ * @{ */
+#ifndef GL_MAP_READ_BIT
+#define GL_MAP_READ_BIT                                              0x0001
+#endif
+
+#ifndef GL_MAP_WRITE_BIT
+#define GL_MAP_WRITE_BIT                                             0x0002
+#endif
+
+#ifndef GL_MAP_INVALIDATE_RANGE_BIT
+#define GL_MAP_INVALIDATE_RANGE_BIT                                  0x0004
+#endif
+
+#ifndef GL_MAP_INVALIDATE_BUFFER_BIT
+#define GL_MAP_INVALIDATE_BUFFER_BIT                                 0x0008
+#endif
+
+#ifndef GL_MAP_FLUSH_EXPLICIT_BIT
+#define GL_MAP_FLUSH_EXPLICIT_BIT                                    0x0010
+#endif
+
+#ifndef GL_MAP_UNSYNCHRONIZED_BIT
+#define GL_MAP_UNSYNCHRONIZED_BIT                                    0x0020
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_map_buffer_range functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/map_buffer_range.txt">http://www.opengl.org/registry/specs/ARB/map_buffer_range.txt</a>.
+ * @{ */
+typedef GLvoid* (csAPIENTRY* csGLMAPBUFFERRANGE) (GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access);
+typedef GLvoid (csAPIENTRY* csGLFLUSHMAPPEDBUFFERRANGE) (GLenum target, GLintptr offset, GLsizeiptr length);
+
+/** @} */
+/**\name GL_ARB_texture_compression_rgtc constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/texture_compression_rgtc.txt">http://www.opengl.org/registry/specs/ARB/texture_compression_rgtc.txt</a>.
+ * @{ */
+#ifndef GL_COMPRESSED_RED_RGTC1
+#define GL_COMPRESSED_RED_RGTC1                                      0x8DBB
+#endif
+
+#ifndef GL_COMPRESSED_SIGNED_RED_RGTC1
+#define GL_COMPRESSED_SIGNED_RED_RGTC1                               0x8DBC
+#endif
+
+#ifndef GL_COMPRESSED_RG_RGTC2
+#define GL_COMPRESSED_RG_RGTC2                                       0x8DBD
+#endif
+
+#ifndef GL_COMPRESSED_SIGNED_RG_RGTC2
+#define GL_COMPRESSED_SIGNED_RG_RGTC2                                0x8DBE
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_texture_compression_rgtc functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/texture_compression_rgtc.txt">http://www.opengl.org/registry/specs/ARB/texture_compression_rgtc.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ARB_texture_rg constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/texture_rg.txt">http://www.opengl.org/registry/specs/ARB/texture_rg.txt</a>.
+ * @{ */
+#ifndef GL_R8
+#define GL_R8                                                        0x8229
+#endif
+
+#ifndef GL_R16
+#define GL_R16                                                       0x822A
+#endif
+
+#ifndef GL_RG8
+#define GL_RG8                                                       0x822B
+#endif
+
+#ifndef GL_RG16
+#define GL_RG16                                                      0x822C
+#endif
+
+#ifndef GL_R16F
+#define GL_R16F                                                      0x822D
+#endif
+
+#ifndef GL_R32F
+#define GL_R32F                                                      0x822E
+#endif
+
+#ifndef GL_RG16F
+#define GL_RG16F                                                     0x822F
+#endif
+
+#ifndef GL_RG32F
+#define GL_RG32F                                                     0x8230
+#endif
+
+#ifndef GL_R8I
+#define GL_R8I                                                       0x8231
+#endif
+
+#ifndef GL_R8UI
+#define GL_R8UI                                                      0x8232
+#endif
+
+#ifndef GL_R16I
+#define GL_R16I                                                      0x8233
+#endif
+
+#ifndef GL_R16UI
+#define GL_R16UI                                                     0x8234
+#endif
+
+#ifndef GL_R32I
+#define GL_R32I                                                      0x8235
+#endif
+
+#ifndef GL_R32UI
+#define GL_R32UI                                                     0x8236
+#endif
+
+#ifndef GL_RG8I
+#define GL_RG8I                                                      0x8237
+#endif
+
+#ifndef GL_RG8UI
+#define GL_RG8UI                                                     0x8238
+#endif
+
+#ifndef GL_RG16I
+#define GL_RG16I                                                     0x8239
+#endif
+
+#ifndef GL_RG16UI
+#define GL_RG16UI                                                    0x823A
+#endif
+
+#ifndef GL_RG32I
+#define GL_RG32I                                                     0x823B
+#endif
+
+#ifndef GL_RG32UI
+#define GL_RG32UI                                                    0x823C
+#endif
+
+#ifndef GL_RG
+#define GL_RG                                                        0x8227
+#endif
+
+#ifndef GL_RG_INTEGER
+#define GL_RG_INTEGER                                                0x8228
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_texture_rg functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/texture_rg.txt">http://www.opengl.org/registry/specs/ARB/texture_rg.txt</a>.
+ * @{ */
+
+/** @} */
 
 
 // end of definitions
@@ -11209,7 +11479,8 @@ typedef GLvoid (csAPIENTRY* csGLCLAMPCOLORARB) (GLenum target, GLenum clamp);
       allclear &= funcTest;
 
 #define EXTMGR_REPORT_INIT_RESULT(exttype, nameNC)			\
-      if (CS_##nameNC = allclear) 					\
+      CS_##nameNC = allclear;						\
+      if (CS_##nameNC) 					                \
       {									\
         CS_##nameNC &= config->GetBool (cfgkey, defaultUse);		\
         if (CS_##nameNC)						\
@@ -17047,6 +17318,79 @@ public:
 
 
   /** @} */
+  /**\name GL_ARB_framebuffer_sRGB functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/framebuffer_sRGB.txt">http://www.opengl.org/registry/specs/ARB/framebuffer_sRGB.txt</a>.
+   * @{ */
+
+  /** @} */
+#ifdef _WIN32
+  /**\name WGL_ARB_framebuffer_sRGB functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/wgl_framebuffer_sRGB.txt">http://www.opengl.org/registry/specs/ARB/wgl_framebuffer_sRGB.txt</a>.
+   * @{ */
+
+  /** @} */
+#endif // _WIN32
+
+  /**\name GL_ARB_draw_instanced functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/draw_instanced.txt">http://www.opengl.org/registry/specs/ARB/draw_instanced.txt</a>.
+   * @{ */
+  #ifndef GLDRAWARRAYSINSTANCEDARB_DECL
+  #define GLDRAWARRAYSINSTANCEDARB_DECL
+  csGLDRAWARRAYSINSTANCEDARB glDrawArraysInstancedARB;
+  #endif
+
+  #ifndef GLDRAWELEMENTSINSTANCEDARB_DECL
+  #define GLDRAWELEMENTSINSTANCEDARB_DECL
+  csGLDRAWELEMENTSINSTANCEDARB glDrawElementsInstancedARB;
+  #endif
+
+
+  /** @} */
+  /**\name GL_ARB_depth_buffer_float functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/depth_buffer_float.txt">http://www.opengl.org/registry/specs/ARB/depth_buffer_float.txt</a>.
+   * @{ */
+
+  /** @} */
+  /**\name GL_ARB_instanced_arrays functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/instanced_arrays.txt">http://www.opengl.org/registry/specs/ARB/instanced_arrays.txt</a>.
+   * @{ */
+  #ifndef GLVERTEXATTRIBDIVISORARB_DECL
+  #define GLVERTEXATTRIBDIVISORARB_DECL
+  csGLVERTEXATTRIBDIVISORARB glVertexAttribDivisorARB;
+  #endif
+
+
+  /** @} */
+  /**\name GL_ARB_half_float_vertex functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/half_float_vertex.txt">http://www.opengl.org/registry/specs/ARB/half_float_vertex.txt</a>.
+   * @{ */
+
+  /** @} */
+  /**\name GL_ARB_map_buffer_range functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/map_buffer_range.txt">http://www.opengl.org/registry/specs/ARB/map_buffer_range.txt</a>.
+   * @{ */
+  #ifndef GLMAPBUFFERRANGE_DECL
+  #define GLMAPBUFFERRANGE_DECL
+  csGLMAPBUFFERRANGE glMapBufferRange;
+  #endif
+
+  #ifndef GLFLUSHMAPPEDBUFFERRANGE_DECL
+  #define GLFLUSHMAPPEDBUFFERRANGE_DECL
+  csGLFLUSHMAPPEDBUFFERRANGE glFlushMappedBufferRange;
+  #endif
+
+
+  /** @} */
+  /**\name GL_ARB_texture_compression_rgtc functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/texture_compression_rgtc.txt">http://www.opengl.org/registry/specs/ARB/texture_compression_rgtc.txt</a>.
+   * @{ */
+
+  /** @} */
+  /**\name GL_ARB_texture_rg functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/texture_rg.txt">http://www.opengl.org/registry/specs/ARB/texture_rg.txt</a>.
+   * @{ */
+
+  /** @} */
 
 // end of functions
 };
@@ -17577,6 +17921,33 @@ public:
   /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/color_buffer_float.txt">GL_ARB_color_buffer_float</a> extension was found. 
    * Set by csGLExtensionManager::InitGL_ARB_color_buffer_float(). */
   bool CS_GL_ARB_color_buffer_float;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/framebuffer_sRGB.txt">GL_ARB_framebuffer_sRGB</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_framebuffer_sRGB(). */
+  bool CS_GL_ARB_framebuffer_sRGB;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/wgl_framebuffer_sRGB.txt">WGL_ARB_framebuffer_sRGB</a> extension was found. 
+   * Set by csGLExtensionManager::InitWGL_ARB_framebuffer_sRGB(). */
+  bool CS_WGL_ARB_framebuffer_sRGB;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/draw_instanced.txt">GL_ARB_draw_instanced</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_draw_instanced(). */
+  bool CS_GL_ARB_draw_instanced;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/depth_buffer_float.txt">GL_ARB_depth_buffer_float</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_depth_buffer_float(). */
+  bool CS_GL_ARB_depth_buffer_float;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/instanced_arrays.txt">GL_ARB_instanced_arrays</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_instanced_arrays(). */
+  bool CS_GL_ARB_instanced_arrays;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/half_float_vertex.txt">GL_ARB_half_float_vertex</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_half_float_vertex(). */
+  bool CS_GL_ARB_half_float_vertex;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/map_buffer_range.txt">GL_ARB_map_buffer_range</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_map_buffer_range(). */
+  bool CS_GL_ARB_map_buffer_range;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/texture_compression_rgtc.txt">GL_ARB_texture_compression_rgtc</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_texture_compression_rgtc(). */
+  bool CS_GL_ARB_texture_compression_rgtc;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/texture_rg.txt">GL_ARB_texture_rg</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_texture_rg(). */
+  bool CS_GL_ARB_texture_rg;
 
 protected:
   bool tested_CS_GL_version_1_2;
@@ -17755,6 +18126,15 @@ protected:
   bool tested_CS_GL_NV_gpu_program4;
   bool tested_CS_GL_EXT_gpu_program_parameters;
   bool tested_CS_GL_ARB_color_buffer_float;
+  bool tested_CS_GL_ARB_framebuffer_sRGB;
+  bool tested_CS_WGL_ARB_framebuffer_sRGB;
+  bool tested_CS_GL_ARB_draw_instanced;
+  bool tested_CS_GL_ARB_depth_buffer_float;
+  bool tested_CS_GL_ARB_instanced_arrays;
+  bool tested_CS_GL_ARB_half_float_vertex;
+  bool tested_CS_GL_ARB_map_buffer_range;
+  bool tested_CS_GL_ARB_texture_compression_rgtc;
+  bool tested_CS_GL_ARB_texture_rg;
 
 };
 
@@ -24094,6 +24474,276 @@ public:
       EXTMGR_FUNC_INIT(glClampColorARB, GLCLAMPCOLORARB);
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_color_buffer_float)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/framebuffer_sRGB.txt">GL_ARB_framebuffer_sRGB</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_framebuffer_sRGB. */
+  void InitGL_ARB_framebuffer_sRGB ()
+  {
+    if (tested_CS_GL_ARB_framebuffer_sRGB) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_framebuffer_sRGB = true;
+    const char* ext = "GL_ARB_framebuffer_sRGB";
+
+    char cfgkey[26 + 23 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_framebuffer_sRGB = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_framebuffer_sRGB;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_framebuffer_sRGB)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+#ifdef _WIN32
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/wgl_framebuffer_sRGB.txt">WGL_ARB_framebuffer_sRGB</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_WGL_ARB_framebuffer_sRGB. */
+  void InitWGL_ARB_framebuffer_sRGB (HDC hDC)
+  {
+    if (tested_CS_WGL_ARB_framebuffer_sRGB) return;
+    tested_CS_WGL_ARB_framebuffer_sRGB = true;
+    const char* ext = "WGL_ARB_framebuffer_sRGB";
+    char cfgkey[26 + 24 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    (void)hDC;      // avoid `unused variable' warning.
+    SetupWGLextStr (hDC);
+    if (!extstrWGL) return;
+    CS_WGL_ARB_framebuffer_sRGB = (strstr (extstrWGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // avoid `unused variable' warning.
+    bool init = CS_WGL_ARB_framebuffer_sRGB;
+    allclear = true;
+    if (init)
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("WGL", WGL_ARB_framebuffer_sRGB)
+      CS_WGL_ARB_framebuffer_sRGB &= allclear;
+    }
+    else
+    {
+      Report (msgExtNotFound, "WGL", ext);
+    }
+  }
+#endif
+
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/draw_instanced.txt">GL_ARB_draw_instanced</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_draw_instanced. */
+  void InitGL_ARB_draw_instanced ()
+  {
+    if (tested_CS_GL_ARB_draw_instanced) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_draw_instanced = true;
+    const char* ext = "GL_ARB_draw_instanced";
+
+    char cfgkey[26 + 21 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_draw_instanced = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_draw_instanced;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glDrawArraysInstancedARB, GLDRAWARRAYSINSTANCEDARB);
+      EXTMGR_FUNC_INIT(glDrawElementsInstancedARB, GLDRAWELEMENTSINSTANCEDARB);
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_draw_instanced)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/depth_buffer_float.txt">GL_ARB_depth_buffer_float</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_depth_buffer_float. */
+  void InitGL_ARB_depth_buffer_float ()
+  {
+    if (tested_CS_GL_ARB_depth_buffer_float) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_depth_buffer_float = true;
+    const char* ext = "GL_ARB_depth_buffer_float";
+
+    char cfgkey[26 + 25 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_depth_buffer_float = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_depth_buffer_float;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_depth_buffer_float)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/instanced_arrays.txt">GL_ARB_instanced_arrays</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_instanced_arrays. */
+  void InitGL_ARB_instanced_arrays ()
+  {
+    if (tested_CS_GL_ARB_instanced_arrays) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_instanced_arrays = true;
+    const char* ext = "GL_ARB_instanced_arrays";
+
+    char cfgkey[26 + 23 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_instanced_arrays = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_instanced_arrays;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glVertexAttribDivisorARB, GLVERTEXATTRIBDIVISORARB);
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_instanced_arrays)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/half_float_vertex.txt">GL_ARB_half_float_vertex</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_half_float_vertex. */
+  void InitGL_ARB_half_float_vertex ()
+  {
+    if (tested_CS_GL_ARB_half_float_vertex) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_half_float_vertex = true;
+    const char* ext = "GL_ARB_half_float_vertex";
+
+    char cfgkey[26 + 24 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_half_float_vertex = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_half_float_vertex;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_half_float_vertex)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/map_buffer_range.txt">GL_ARB_map_buffer_range</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_map_buffer_range. */
+  void InitGL_ARB_map_buffer_range ()
+  {
+    if (tested_CS_GL_ARB_map_buffer_range) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_map_buffer_range = true;
+    const char* ext = "GL_ARB_map_buffer_range";
+
+    char cfgkey[26 + 23 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_map_buffer_range = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_map_buffer_range;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glMapBufferRange, GLMAPBUFFERRANGE);
+      EXTMGR_FUNC_INIT(glFlushMappedBufferRange, GLFLUSHMAPPEDBUFFERRANGE);
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_map_buffer_range)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/texture_compression_rgtc.txt">GL_ARB_texture_compression_rgtc</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_texture_compression_rgtc. */
+  void InitGL_ARB_texture_compression_rgtc ()
+  {
+    if (tested_CS_GL_ARB_texture_compression_rgtc) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_texture_compression_rgtc = true;
+    const char* ext = "GL_ARB_texture_compression_rgtc";
+
+    char cfgkey[26 + 31 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_texture_compression_rgtc = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_texture_compression_rgtc;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_texture_compression_rgtc)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/texture_rg.txt">GL_ARB_texture_rg</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_texture_rg. */
+  void InitGL_ARB_texture_rg ()
+  {
+    if (tested_CS_GL_ARB_texture_rg) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_texture_rg = true;
+    const char* ext = "GL_ARB_texture_rg";
+
+    char cfgkey[26 + 17 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_texture_rg = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_texture_rg;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_texture_rg)
     }
     else
     {

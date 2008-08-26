@@ -20,19 +20,9 @@ floor, @dots{}) or for dynamic data (moving objects). It supports multiple
 materials, vertex lighting, and even animation. Using the new @samp{lighter2}
 app it can also support lightmaps. @xref{Using lighter2}.
 @item
-@samp{Thing} (@pxref{MeshObject Thing}). The thing object is often used
-for static geometry (walls and buildings). It supports lightmaps natively.
-It doesn't support animation and in general it is less suitable for moving
-objects. At this moment it is probably a good idea to avoid the thing
-object for future projects. In the future thing will be removed from Crystal
-Space in favor of @samp{GenMesh}.
-@item
-@samp{Terrain} (@pxref{MeshObject TerrFunc}). The terrain object is very
+@samp{Terrain2}. The terrain object is very
 useful if you want landscapes although you can do landscapes with genmesh
 too. But the terrain mesh object can do it more efficiently.
-@item
-@samp{Terrain2} The new improved terrain engine for rendering landscapes
-and outdoor areas.
 @item
 @samp{SprCal3D} (@pxref{MeshObject SprCal3D}). The sprcal3d object is
 one of the options you have for animated skeletal models. Both Blender
@@ -61,12 +51,10 @@ Crystal Space supports.
 * MeshObject Concepts::
 * Using MeshObject:: Using Mesh Objects
 * Writing MeshObjects:: Writing Mesh Objects
-* HOWTO Create Thing:: Creating a Thing Mesh
 * HOWTO Create Genmesh:: Creating a Genmesh Mesh
 * HOWTO Mesh LightAnim:: Mesh Lighting and Animation
 * HOWTO Mesh Movement:: Mesh Movement
 * MeshObject Genmesh:: Genmesh Mesh Object
-* MeshObject Thing:: Thing Mesh Object
 * MeshObject TerrFunc:: Terrain Mesh Object
 * MeshObject Terrain2:: Terrain2 Mesh Object
 * MeshObject Particles:: Particles Mesh Object
@@ -81,12 +69,10 @@ Crystal Space supports.
 @importss{usingcs,meshobj,concepts.txi}
 @importss{usingcs,meshobj,using.txi}
 @importss{usingcs,meshobj,writing.txi}
-@importss{usingcs,meshobj,creatething.txi}
 @importss{usingcs,meshobj,creategenmesh.txi}
 @importss{usingcs,meshobj,meshanim.txi}
 @importss{usingcs,meshobj,meshmove.txi}
 @importss{usingcs,meshobj,genmesh.txi}
-@importss{usingcs,meshobj,thing.txi}
 @importss{usingcs,meshobj,terrfunc.txi}
 @importss{usingcs,meshobj,terrain2.txi}
 @importss{usingcs,meshobj,particles.txi}

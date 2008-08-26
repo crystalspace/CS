@@ -211,7 +211,7 @@ In general you should use the following code to create any kind of mesh:
 @end example
 
 Replace @samp{meshtype} with the correct mesh type (like @samp{genmesh},
-@samp{thing}, @dots{}). Replace @code{iMeshtypeFactoryState} with the
+@dots{}). Replace @code{iMeshtypeFactoryState} with the
 correct factory state and @code{iMeshtypeObjectState} with the correct
 object state.
 

@@ -3172,6 +3172,50 @@ fi
 "
 fi
 
+	{ echo "$as_me:$LINENO: checking for C compiler version" >&5
+echo $ECHO_N "checking for C compiler version... $ECHO_C" >&6; }
+	case $cs_compiler_name_c in
+        GCC)
+            cs_compiler_version_c=`$CC -dumpversion`
+	    cs_build_prop_val="$cs_compiler_version_c"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C.VERSION ?= $cs_build_prop_val ;
+"
+fi
+
+	    cs_build_prop_val="$cs_compiler_version_c"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.VERSION = $cs_build_prop_val ;
+"
+fi
+
+            _compiler_version_list=`echo $cs_compiler_version_c | sed -e 's/\./ /g'`
+	    cs_build_prop_val="$_compiler_version_list"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C.VERSION_LIST ?= $cs_build_prop_val ;
+"
+fi
+
+	    cs_build_prop_val="$_compiler_version_list"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.VERSION_LIST = $cs_build_prop_val ;
+"
+fi
+
+            ;;
+    esac
+	if test -z "$cs_compiler_version_c"; then
+  { echo "$as_me:$LINENO: result: unknown" >&5
+echo "${ECHO_T}unknown" >&6; }
+else
+  { echo "$as_me:$LINENO: result: $cs_compiler_version_c" >&5
+echo "${ECHO_T}$cs_compiler_version_c" >&6; }
+fi
+
 
 	# Check if compiler recognizes -pipe directive.
 	{ echo "$as_me:$LINENO: checking if $CC accepts -pipe" >&5
@@ -3748,6 +3792,50 @@ fi
 "
 fi
 
+	{ echo "$as_me:$LINENO: checking for C++ compiler version" >&5
+echo $ECHO_N "checking for C++ compiler version... $ECHO_C" >&6; }
+	case $cs_compiler_name_cxx in
+        GCC)
+            cs_compiler_version_cxx=`$CXX -dumpversion`
+	    cs_build_prop_val="$cs_compiler_version_cxx"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++.VERSION ?= $cs_build_prop_val ;
+"
+fi
+
+	    cs_build_prop_val="$cs_compiler_version_cxx"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.VERSION = $cs_build_prop_val ;
+"
+fi
+
+            _compiler_version_list=`echo $cs_compiler_version_cxx | sed -e 's/\./ /g'`
+	    cs_build_prop_val="$_compiler_version_list"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++.VERSION_LIST ?= $cs_build_prop_val ;
+"
+fi
+
+	    cs_build_prop_val="$_compiler_version_list"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.VERSION_LIST = $cs_build_prop_val ;
+"
+fi
+
+            ;;
+    esac
+	if test -z "$cs_compiler_version_cxx"; then
+  { echo "$as_me:$LINENO: result: unknown" >&5
+echo "${ECHO_T}unknown" >&6; }
+else
+  { echo "$as_me:$LINENO: result: $cs_compiler_version_cxx" >&5
+echo "${ECHO_T}$cs_compiler_version_cxx" >&6; }
+fi
+
 
         # Check if compiler can be instructed to produce position-independent-code
         # (PIC).  This feature is required by some platforms when building plugin
@@ -4222,18 +4310,21 @@ cs_prog_binutils_min_suffix_done=
 
 
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix= ; }
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0 ; }
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0.0 ; }
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0.0.0 ; }
 
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0.0.0.0 ; }
 
 
 
@@ -4241,30 +4332,37 @@ test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix
 
 
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+
+
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix= ; }
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0 ; }
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0.0 ; }
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0.0.0 ; }
 
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0.0.0.0 ; }
 
-cs_prog_binutils_is_ver_1=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_binutils_is_ver_2=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_binutils_is_ver_3=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-cs_prog_binutils_is_ver_4=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
-cs_prog_binutils_is_ver_5=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
 
-cs_prog_binutils_min_ver_1=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_binutils_min_ver_2=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_binutils_min_ver_3=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-cs_prog_binutils_min_ver_4=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
-cs_prog_binutils_min_ver_5=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_is_ver_1=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_binutils_is_ver_2=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_binutils_is_ver_3=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+cs_prog_binutils_is_ver_4=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
+cs_prog_binutils_is_ver_5=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_is_ver_6=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\6/'`
+
+cs_prog_binutils_min_ver_1=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_binutils_min_ver_2=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_binutils_min_ver_3=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+cs_prog_binutils_min_ver_4=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
+cs_prog_binutils_min_ver_5=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_min_ver_6=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\6/'`
 
 cs_cv_prog_binutils_version_2_17_ok=''
 test -z "$cs_cv_prog_binutils_version_2_17_ok" \
@@ -4296,6 +4394,12 @@ test -z "$cs_cv_prog_binutils_version_2_17_ok" \
     || cs_cv_prog_binutils_version_2_17_ok=no ; }
 test -z "$cs_cv_prog_binutils_version_2_17_ok" \
   && { expr "$cs_prog_binutils_min_ver_5" ">=" "$cs_prog_binutils_is_ver_5" >/dev/null \
+    || cs_cv_prog_binutils_version_2_17_ok=yes ; }
+test -z "$cs_cv_prog_binutils_version_2_17_ok" \
+  && { expr "$cs_prog_binutils_is_ver_6" ">=" "$cs_prog_binutils_min_ver_6" >/dev/null \
+    || cs_cv_prog_binutils_version_2_17_ok=no ; }
+test -z "$cs_cv_prog_binutils_version_2_17_ok" \
+  && { expr "$cs_prog_binutils_min_ver_6" ">=" "$cs_prog_binutils_is_ver_6" >/dev/null \
     || cs_cv_prog_binutils_version_2_17_ok=yes ; }
 
 if test -z "$cs_cv_prog_binutils_version_2_17_ok"; then
@@ -4342,42 +4446,52 @@ cs_prog_binutils_min_suffix_done=
 
 
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix= ; }
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0 ; }
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0.0 ; }
 
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0.0.0 ; }
 
 
 
 
 
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+
+
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix= ; }
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0 ; }
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0.0 ; }
 
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0.0.0 ; }
 
-cs_prog_binutils_is_ver_1=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_binutils_is_ver_2=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_binutils_is_ver_3=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-cs_prog_binutils_is_ver_4=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
-cs_prog_binutils_is_ver_5=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
 
-cs_prog_binutils_min_ver_1=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_binutils_min_ver_2=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_binutils_min_ver_3=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-cs_prog_binutils_min_ver_4=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
-cs_prog_binutils_min_ver_5=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_is_ver_1=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_binutils_is_ver_2=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_binutils_is_ver_3=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+cs_prog_binutils_is_ver_4=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
+cs_prog_binutils_is_ver_5=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_is_ver_6=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\6/'`
+
+cs_prog_binutils_min_ver_1=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_binutils_min_ver_2=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_binutils_min_ver_3=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+cs_prog_binutils_min_ver_4=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
+cs_prog_binutils_min_ver_5=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_min_ver_6=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\6/'`
 
 cs_cv_prog_binutils_version_2_16_91_ok=''
 test -z "$cs_cv_prog_binutils_version_2_16_91_ok" \
@@ -4409,6 +4523,12 @@ test -z "$cs_cv_prog_binutils_version_2_16_91_ok" \
     || cs_cv_prog_binutils_version_2_16_91_ok=no ; }
 test -z "$cs_cv_prog_binutils_version_2_16_91_ok" \
   && { expr "$cs_prog_binutils_min_ver_5" ">=" "$cs_prog_binutils_is_ver_5" >/dev/null \
+    || cs_cv_prog_binutils_version_2_16_91_ok=yes ; }
+test -z "$cs_cv_prog_binutils_version_2_16_91_ok" \
+  && { expr "$cs_prog_binutils_is_ver_6" ">=" "$cs_prog_binutils_min_ver_6" >/dev/null \
+    || cs_cv_prog_binutils_version_2_16_91_ok=no ; }
+test -z "$cs_cv_prog_binutils_version_2_16_91_ok" \
+  && { expr "$cs_prog_binutils_min_ver_6" ">=" "$cs_prog_binutils_is_ver_6" >/dev/null \
     || cs_cv_prog_binutils_version_2_16_91_ok=yes ; }
 
 if test -z "$cs_cv_prog_binutils_version_2_16_91_ok"; then
@@ -25549,18 +25669,21 @@ cs_prog_binutils_min_suffix_done=
 
 
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix= ; }
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0 ; }
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0.0 ; }
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0.0.0 ; }
 
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0.0.0.0 ; }
 
 
 
@@ -25568,30 +25691,37 @@ test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix
 
 
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+
+
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix= ; }
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0 ; }
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0.0 ; }
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0.0.0 ; }
 
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0.0.0.0 ; }
 
-cs_prog_binutils_is_ver_1=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_binutils_is_ver_2=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_binutils_is_ver_3=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-cs_prog_binutils_is_ver_4=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
-cs_prog_binutils_is_ver_5=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
 
-cs_prog_binutils_min_ver_1=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_binutils_min_ver_2=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_binutils_min_ver_3=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-cs_prog_binutils_min_ver_4=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
-cs_prog_binutils_min_ver_5=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_is_ver_1=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_binutils_is_ver_2=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_binutils_is_ver_3=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+cs_prog_binutils_is_ver_4=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
+cs_prog_binutils_is_ver_5=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_is_ver_6=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\6/'`
+
+cs_prog_binutils_min_ver_1=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_binutils_min_ver_2=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_binutils_min_ver_3=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+cs_prog_binutils_min_ver_4=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
+cs_prog_binutils_min_ver_5=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_min_ver_6=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\6/'`
 
 cs_cv_prog_binutils_version_2_17_ok=''
 test -z "$cs_cv_prog_binutils_version_2_17_ok" \
@@ -25623,6 +25753,12 @@ test -z "$cs_cv_prog_binutils_version_2_17_ok" \
     || cs_cv_prog_binutils_version_2_17_ok=no ; }
 test -z "$cs_cv_prog_binutils_version_2_17_ok" \
   && { expr "$cs_prog_binutils_min_ver_5" ">=" "$cs_prog_binutils_is_ver_5" >/dev/null \
+    || cs_cv_prog_binutils_version_2_17_ok=yes ; }
+test -z "$cs_cv_prog_binutils_version_2_17_ok" \
+  && { expr "$cs_prog_binutils_is_ver_6" ">=" "$cs_prog_binutils_min_ver_6" >/dev/null \
+    || cs_cv_prog_binutils_version_2_17_ok=no ; }
+test -z "$cs_cv_prog_binutils_version_2_17_ok" \
+  && { expr "$cs_prog_binutils_min_ver_6" ">=" "$cs_prog_binutils_is_ver_6" >/dev/null \
     || cs_cv_prog_binutils_version_2_17_ok=yes ; }
 
 if test -z "$cs_cv_prog_binutils_version_2_17_ok"; then
@@ -25669,42 +25805,52 @@ cs_prog_binutils_min_suffix_done=
 
 
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix= ; }
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0 ; }
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0.0 ; }
 
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0.0.0 ; }
 
 
 
 
 
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+
+
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix= ; }
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0 ; }
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0.0 ; }
 
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0.0.0 ; }
 
-cs_prog_binutils_is_ver_1=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_binutils_is_ver_2=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_binutils_is_ver_3=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-cs_prog_binutils_is_ver_4=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
-cs_prog_binutils_is_ver_5=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
 
-cs_prog_binutils_min_ver_1=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_binutils_min_ver_2=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_binutils_min_ver_3=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-cs_prog_binutils_min_ver_4=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
-cs_prog_binutils_min_ver_5=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_is_ver_1=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_binutils_is_ver_2=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_binutils_is_ver_3=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+cs_prog_binutils_is_ver_4=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
+cs_prog_binutils_is_ver_5=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_is_ver_6=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\6/'`
+
+cs_prog_binutils_min_ver_1=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_binutils_min_ver_2=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_binutils_min_ver_3=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+cs_prog_binutils_min_ver_4=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
+cs_prog_binutils_min_ver_5=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_min_ver_6=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\6/'`
 
 cs_cv_prog_binutils_version_2_16_91_ok=''
 test -z "$cs_cv_prog_binutils_version_2_16_91_ok" \
@@ -25736,6 +25882,12 @@ test -z "$cs_cv_prog_binutils_version_2_16_91_ok" \
     || cs_cv_prog_binutils_version_2_16_91_ok=no ; }
 test -z "$cs_cv_prog_binutils_version_2_16_91_ok" \
   && { expr "$cs_prog_binutils_min_ver_5" ">=" "$cs_prog_binutils_is_ver_5" >/dev/null \
+    || cs_cv_prog_binutils_version_2_16_91_ok=yes ; }
+test -z "$cs_cv_prog_binutils_version_2_16_91_ok" \
+  && { expr "$cs_prog_binutils_is_ver_6" ">=" "$cs_prog_binutils_min_ver_6" >/dev/null \
+    || cs_cv_prog_binutils_version_2_16_91_ok=no ; }
+test -z "$cs_cv_prog_binutils_version_2_16_91_ok" \
+  && { expr "$cs_prog_binutils_min_ver_6" ">=" "$cs_prog_binutils_is_ver_6" >/dev/null \
     || cs_cv_prog_binutils_version_2_16_91_ok=yes ; }
 
 if test -z "$cs_cv_prog_binutils_version_2_16_91_ok"; then
@@ -34056,6 +34208,687 @@ else
 	cs_cv_libgl_GLchar_libs=''
 
 fi
+
+    if test "" != yes; then
+  { echo "$as_me:$LINENO: checking for GLintptr" >&5
+echo $ECHO_N "checking for GLintptr... $ECHO_C" >&6; }
+if test "${cs_cv_libgl_GLintptr+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#if HAVE_WINDOWS_H
+    #if !HAVE_TYPE_INT32
+    typedef long int32;
+    #endif
+    #include <windows.h>
+    #endif
+    #ifndef CS_HEADER_GLOBAL
+    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    #endif
+    #ifdef CS_OPENGL_PATH
+    #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+    #else
+    #include <GL/gl.h>
+    #endif
+int
+main ()
+{
+GLintptr x; (void)x;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libgl_GLintptr=yes
+		cs_cv_libgl_GLintptr_cflags=$cs_build_cflags
+		cs_cv_libgl_GLintptr_lflags=$cs_build_lflags
+		cs_cv_libgl_GLintptr_libs=$cs_build_libs
+else
+  cs_cv_libgl_GLintptr=no
+fi
+
+fi
+{ echo "$as_me:$LINENO: result: $cs_cv_libgl_GLintptr" >&5
+echo "${ECHO_T}$cs_cv_libgl_GLintptr" >&6; }
+else
+  { echo "$as_me:$LINENO: checking for GLintptr" >&5
+echo $ECHO_N "checking for GLintptr... $ECHO_C" >&6; }
+	    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#if HAVE_WINDOWS_H
+    #if !HAVE_TYPE_INT32
+    typedef long int32;
+    #endif
+    #include <windows.h>
+    #endif
+    #ifndef CS_HEADER_GLOBAL
+    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    #endif
+    #ifdef CS_OPENGL_PATH
+    #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+    #else
+    #include <GL/gl.h>
+    #endif
+int
+main ()
+{
+GLintptr x; (void)x;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libgl_GLintptr=yes
+		cs_cv_libgl_GLintptr_cflags=$cs_build_cflags
+		cs_cv_libgl_GLintptr_lflags=$cs_build_lflags
+		cs_cv_libgl_GLintptr_libs=$cs_build_libs
+else
+  cs_cv_libgl_GLintptr=no
+fi
+
+	    { echo "$as_me:$LINENO: result: $cs_cv_libgl_GLintptr" >&5
+echo "${ECHO_T}$cs_cv_libgl_GLintptr" >&6; }
+fi
+
+    if test $cs_cv_libgl_GLintptr = yes; then
+  cs_header_text="${cs_header_text}#define CS_HAVE_GLINTPTR_T
+"
+else
+  cs_cv_libgl_GLintptr_cflags=''
+	cs_cv_libgl_GLintptr_lflags=''
+	cs_cv_libgl_GLintptr_libs=''
+
+fi
+
+    if test "" != yes; then
+  { echo "$as_me:$LINENO: checking for GLsizeiptr" >&5
+echo $ECHO_N "checking for GLsizeiptr... $ECHO_C" >&6; }
+if test "${cs_cv_libgl_GLsizeiptr+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#if HAVE_WINDOWS_H
+    #if !HAVE_TYPE_INT32
+    typedef long int32;
+    #endif
+    #include <windows.h>
+    #endif
+    #ifndef CS_HEADER_GLOBAL
+    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    #endif
+    #ifdef CS_OPENGL_PATH
+    #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+    #else
+    #include <GL/gl.h>
+    #endif
+int
+main ()
+{
+GLsizeiptr x; (void)x;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libgl_GLsizeiptr=yes
+		cs_cv_libgl_GLsizeiptr_cflags=$cs_build_cflags
+		cs_cv_libgl_GLsizeiptr_lflags=$cs_build_lflags
+		cs_cv_libgl_GLsizeiptr_libs=$cs_build_libs
+else
+  cs_cv_libgl_GLsizeiptr=no
+fi
+
+fi
+{ echo "$as_me:$LINENO: result: $cs_cv_libgl_GLsizeiptr" >&5
+echo "${ECHO_T}$cs_cv_libgl_GLsizeiptr" >&6; }
+else
+  { echo "$as_me:$LINENO: checking for GLsizeiptr" >&5
+echo $ECHO_N "checking for GLsizeiptr... $ECHO_C" >&6; }
+	    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#if HAVE_WINDOWS_H
+    #if !HAVE_TYPE_INT32
+    typedef long int32;
+    #endif
+    #include <windows.h>
+    #endif
+    #ifndef CS_HEADER_GLOBAL
+    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    #endif
+    #ifdef CS_OPENGL_PATH
+    #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+    #else
+    #include <GL/gl.h>
+    #endif
+int
+main ()
+{
+GLsizeiptr x; (void)x;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libgl_GLsizeiptr=yes
+		cs_cv_libgl_GLsizeiptr_cflags=$cs_build_cflags
+		cs_cv_libgl_GLsizeiptr_lflags=$cs_build_lflags
+		cs_cv_libgl_GLsizeiptr_libs=$cs_build_libs
+else
+  cs_cv_libgl_GLsizeiptr=no
+fi
+
+	    { echo "$as_me:$LINENO: result: $cs_cv_libgl_GLsizeiptr" >&5
+echo "${ECHO_T}$cs_cv_libgl_GLsizeiptr" >&6; }
+fi
+
+    if test $cs_cv_libgl_GLsizeiptr = yes; then
+  cs_header_text="${cs_header_text}#define CS_HAVE_GLSIZEIPTR_T
+"
+else
+  cs_cv_libgl_GLsizeiptr_cflags=''
+	cs_cv_libgl_GLsizeiptr_lflags=''
+	cs_cv_libgl_GLsizeiptr_libs=''
+
+fi
+
 
 fi
 
@@ -89203,7 +90036,7 @@ fi
 { echo "$as_me:$LINENO: checking whether to build shared libraries" >&5
 echo $ECHO_N "checking whether to build shared libraries... $ECHO_C" >&6; }
 case $host_os in
-    mingw*|cygwin*|linux*) enable_shared_default=yes ;;
+    cygwin*|linux*) enable_shared_default=yes ;;
     *) enable_shared_default=no ;;
 esac
 # Check whether --enable-shared was given.

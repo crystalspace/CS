@@ -42,9 +42,6 @@ struct iMaterialWrapper;
 class csFrustumView;
 class csFrustumContext;
 
-CS_PLUGIN_NAMESPACE_BEGIN(Thing)
-{
-
 class csPolyTxtPlane;
 class csPolygon3D;
 class csLightMap;
@@ -708,8 +705,5 @@ public:
 	const csPlane3& world_plane,
 	csPolygon3DStatic* spoly);
 };
-
-}
-CS_PLUGIN_NAMESPACE_END(Thing)
 
 #endif // __CS_POLYGON_H__

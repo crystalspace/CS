@@ -1027,7 +1027,6 @@ class iSequenceWrapper(core.iBase):
     def CreateParameterBlock(*args): return _ivaria.iSequenceWrapper_CreateParameterBlock(*args)
     def AddOperationSetVariable(*args): return _ivaria.iSequenceWrapper_AddOperationSetVariable(*args)
     def AddOperationSetMaterial(*args): return _ivaria.iSequenceWrapper_AddOperationSetMaterial(*args)
-    def AddOperationSetPolygonMaterial(*args): return _ivaria.iSequenceWrapper_AddOperationSetPolygonMaterial(*args)
     def AddOperationSetLight(*args): return _ivaria.iSequenceWrapper_AddOperationSetLight(*args)
     def AddOperationFadeLight(*args): return _ivaria.iSequenceWrapper_AddOperationFadeLight(*args)
     def AddOperationSetAmbient(*args): return _ivaria.iSequenceWrapper_AddOperationSetAmbient(*args)

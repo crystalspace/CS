@@ -81,8 +81,6 @@ WALKALL.PLUGINLIST =
   spr3dldr
   stdpt
   stdrep
-  thing
-  thingldr
   xmlread
   xmlshader
   ;

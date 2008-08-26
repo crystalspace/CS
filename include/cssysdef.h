@@ -776,6 +776,8 @@ extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* ptcalloc_checking (
 #  endif
 #endif
 
+#endif // CS_NO_PTMALLOC
+
 /**\name Default Crystal Space memory allocation
  * Always the same memory allocation functions as internally used by 
  * Crystal Space.
@@ -785,18 +787,6 @@ extern CS_CRYSTALSPACE_EXPORT CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n);
 extern CS_CRYSTALSPACE_EXPORT void cs_free (void* p);
 extern CS_CRYSTALSPACE_EXPORT void* cs_realloc (void* p, size_t n);
 extern CS_CRYSTALSPACE_EXPORT void* cs_calloc (size_t n, size_t s);
-//@}
-
-#else // CS_NO_PTMALLOC
-CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_malloc (size_t n)
-{ return malloc (n); }
-CS_FORCEINLINE void cs_free (void* p)
-{ free (p); }
-CS_FORCEINLINE void* cs_realloc (void* p, size_t n)
-{ return realloc (p, n); }
-CS_FORCEINLINE CS_ATTRIBUTE_MALLOC void* cs_calloc (size_t n, size_t s)
-{ return calloc (n, s); }
-#endif // CS_NO_PTMALLOC
 //@}
 
 #ifdef CS_USE_CUSTOM_ISDIR

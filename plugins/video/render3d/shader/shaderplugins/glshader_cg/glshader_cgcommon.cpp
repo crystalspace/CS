@@ -712,10 +712,11 @@ bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache,
   if (cacheFile.Write ((char*)&diskMagic, sizeof (diskMagic))
       != sizeof (diskMagic)) return false;
   
-  csMD5::Digest nodeHash = csMD5::Encode (
-    CS::DocSystem::FlattenNode (programNode));
-  if (cacheFile.Write ((char*)&nodeHash, sizeof (nodeHash))
-      != sizeof (nodeHash)) return false;
+  csRef<iDataBuffer> programBuffer = GetProgramData();
+  csMD5::Digest progHash = csMD5::Encode (
+    programBuffer->GetData(), programBuffer->GetSize());
+  if (cacheFile.Write ((char*)&progHash, sizeof (progHash))
+      != sizeof (progHash)) return false;
   
   csString objectCode (this->objectCode);
   if ((program != 0) && objectCode.IsEmpty())
@@ -810,8 +811,9 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
   }
   
   if (!GetProgramNode (node)) return iShaderProgram::loadFail;
-  csMD5::Digest nodeHash = csMD5::Encode (
-    CS::DocSystem::FlattenNode (programNode));
+  csRef<iDataBuffer> programBuffer = GetProgramData();
+  csMD5::Digest progHash = csMD5::Encode (
+    programBuffer->GetData(), programBuffer->GetSize());
   
   csArray<CachedShaderWrapper> cachedProgWrappers;
   for (size_t i = 0; i < allCachedPrograms->GetSize(); i++)
@@ -838,7 +840,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     csMD5::Digest diskHash;
     if (cacheFile->Read ((char*)&diskHash, sizeof (diskHash))
 	!= sizeof (diskHash)) continue;
-    if (diskHash != nodeHash) continue;
+    if (diskHash != progHash) continue;
     
     cachedProgWrappers.Push (wrapper);
   }

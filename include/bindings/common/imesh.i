@@ -32,8 +32,6 @@ ARRAY_CHANGE_ALL_TEMPLATE(csSprite2DVertex)
 // to use an alternate way for that function
 %feature("compactdefaultargs") HitBeamObject;
 %include "imesh/object.h"
-%ignore iThingFactoryState::AddPolygon (int num, ...);
-%include "imesh/thing.h"
 %template (csCharArrayArray) csArray<csArray<char> >;
 %include "imesh/terrain.h"
 %include "imesh/terrain2.h"

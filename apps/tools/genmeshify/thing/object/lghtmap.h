@@ -30,9 +30,6 @@ struct iCacheManager;
 struct iFile;
 struct iEngine;
 
-CS_PLUGIN_NAMESPACE_BEGIN(Thing)
-{
-
 class csPolyTexture;
 class csThing;
 class csPolygon3D;
@@ -205,8 +202,5 @@ public:
   /// Get n-th shadow map
   csShadowMap* GetShadowMap (size_t n);
 };
-
-}
-CS_PLUGIN_NAMESPACE_END(Thing)
 
 #endif // __CS_LIGHTMAP_H__

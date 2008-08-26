@@ -152,8 +152,6 @@ public:
   		iSharedVariable* var, const csColor& c);
   virtual void AddOperationSetMaterial (csTicks time, iParameterESM* mesh,
 		iParameterESM* mat);
-  virtual void AddOperationSetPolygonMaterial (csTicks time,
-  		iParameterESM* polygon, iParameterESM* mat);
   virtual void AddOperationSetLight (csTicks time, iParameterESM* light,
 		  const csColor& color);
   virtual void AddOperationFadeLight (csTicks time, iParameterESM* light,

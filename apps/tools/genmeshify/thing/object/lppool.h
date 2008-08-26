@@ -23,9 +23,6 @@
 
 struct iLight;
 
-CS_PLUGIN_NAMESPACE_BEGIN(Thing)
-{
-
 class csLightPatchPool;
 class csPolygon3D;
 
@@ -158,8 +155,5 @@ public:
     csBlockAllocator<csLightPatch>::Free (o);
   }
 };
-
-}
-CS_PLUGIN_NAMESPACE_END(Thing)
 
 #endif // __CS_LPPOOL_H__

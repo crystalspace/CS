@@ -22,7 +22,6 @@
 #include "walktest.h"
 #include "bot.h"
 #include "command.h"
-#include "imesh/thing.h"
 #include "iengine/camera.h"
 #include "iengine/mesh.h"
 #include "iengine/sector.h"
@@ -569,18 +568,13 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
 
   if (mesh && sel != -1)
   {
-    csRef<iThingFactoryState> ps = 
-      scfQueryInterface<iThingFactoryState> (
-      mesh->GetMeshObject ()->GetFactory());
     Sys->selected_polygon = sel;
 
     iMeshObject* obj = mesh->GetMeshObject ();
     csRef<iObject> psobj = 
     	scfQueryInterface<iObject> (obj->GetMeshWrapper ());
-    Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "Hit polygon '%s/%s'",
-    	psobj ? psobj->GetName () : "<null>",
-	ps ? ps->GetPolygonName (sel) : "<null>");
-    //Dumper::dump (sel);
+    Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "Hit object/polygon '%s/%d'",
+    	psobj ? psobj->GetName () : "<null>", sel);
   }
   else if (mesh)
   {

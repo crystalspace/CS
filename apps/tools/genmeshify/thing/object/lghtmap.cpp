@@ -31,9 +31,6 @@
 #include "polygon.h"
 #include "thing.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(Thing)
-{
-
 #define LMMAGIC	    "LM04" // must be 4 chars!
 
 
@@ -772,5 +769,3 @@ void csLightMap::CalcMaxStatic (int r, int g, int b)
   }
 }
 
-}
-CS_PLUGIN_NAMESPACE_END(Thing)

@@ -40,8 +40,8 @@ for map in $(maps)
   InstallData $(files) : data maps $(map) ;
   InstallData $(lmfiles) : data maps $(map) lightmaps ;
 
-  FileListEntriesData $(files) : maps $(map) : data-demo ;
-  FileListEntriesData $(lmfiles) : maps $(map) lightmaps : data-demo ;
+  FileListEntriesData $(files) : $(map) : data-demo-maps ;
+  FileListEntriesData $(lmfiles) : $(map) lightmaps : data-demo-maps ;
 }
 
 SubInclude TOP data castle ;

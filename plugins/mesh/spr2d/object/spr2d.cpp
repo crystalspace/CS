@@ -73,6 +73,19 @@ csSprite2DMeshObject::~csSprite2DMeshObject ()
   delete uvani;
 }
 
+iColoredVertices* csSprite2DMeshObject::GetVertices ()
+{
+  if (scfVertices->GetSize () < 1)
+    return factory->GetVertices ();
+  return scfVertices;
+}
+csColoredVertices* csSprite2DMeshObject::GetCsVertices ()
+{
+  if (vertices.GetSize () < 1)
+    return factory->GetCsVertices ();
+  return &vertices;
+}
+
 void csSprite2DMeshObject::SetupObject ()
 {
   if (!initialized)
@@ -80,16 +93,17 @@ void csSprite2DMeshObject::SetupObject ()
     initialized = true;
     float max_sq_dist = 0;
     size_t i;
-    bbox_2d.StartBoundingBox(vertices[0].pos);
-    for (i = 0 ; i < vertices.GetSize () ; i++)
+    csColoredVertices* vertices = GetCsVertices ();
+    bbox_2d.StartBoundingBox((*vertices)[0].pos);
+    for (i = 0 ; i < vertices->GetSize () ; i++)
     {
-      csSprite2DVertex& v = vertices[i];
+      csSprite2DVertex& v = (*vertices)[i];
       bbox_2d.AddBoundingVertexSmart(v.pos);
       if (!lighting)
       {
         // If there is no lighting then we need to copy the color_init
         // array to color.
-        v.color = vertices[i].color_init;
+        v.color = (*vertices)[i].color_init;
         v.color.Clamp (2, 2, 2);
       }
       float sqdist = v.pos.x*v.pos.x + v.pos.y*v.pos.y;
@@ -132,7 +146,7 @@ void csSprite2DMeshObject::UpdateLighting (
       continue;
 
     csColor light_color = li->GetColor ()
-    	* (256. / CS_NORMAL_LIGHT_LEVEL);
+      * (256. / CS_NORMAL_LIGHT_LEVEL);
     float sq_light_radius = csSquare (li->GetCutoffDistance ());
     // Compute light position.
     csVector3 wor_light_pos = li->GetMovable ()->GetFullPosition ();
@@ -140,18 +154,18 @@ void csSprite2DMeshObject::UpdateLighting (
       csSquaredDist::PointPoint (wor_light_pos, pos);
     if (wor_sq_dist >= sq_light_radius) continue;
     float wor_dist = csQsqrt (wor_sq_dist);
-    float cosinus = 1.;
+    float cosinus = 1.0f;
     cosinus /= wor_dist;
     light_color *= cosinus * li->GetBrightnessAtDistance (wor_dist);
     color += light_color;
   }
-  for (size_t j = 0 ; j < vertices.GetSize () ; j++)
+  csColoredVertices* vertices = GetCsVertices ();
+  for (size_t j = 0 ; j < vertices->GetSize () ; j++)
   {
-    vertices[j].color = vertices[j].color_init + color;
-    vertices[j].color.Clamp (2, 2, 2);
+    (*vertices)[j].color = (*vertices)[j].color_init + color;
+    (*vertices)[j].color.Clamp (2, 2, 2);
   }
   colors_dirty = true;
-
 }
 
 void csSprite2DMeshObject::UpdateLighting (
@@ -189,7 +203,7 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
       relevantLights (lightInfluences); //Yes, know, its on the stack...
 
     factory->light_mgr->GetRelevantLights (logparent, &relevantLights, -1);
-    
+
     UpdateLighting (lightInfluences, movable, offset);
   }
 
@@ -214,7 +228,7 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
     rm->variablecontext = svcontext;
     rm->geometryInstance = this;
   }
-  
+
   rm->material = material;//Moved this statement out of the above 'if'
     //to make the change of the material possible at any time
     //(thru a call to either iSprite2DState::SetMaterialWrapper () or
@@ -232,8 +246,7 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
   rm->worldspace_origin = movable->GetFullPosition ();
 
   rm->object2world = tr_o2c.GetInverse () * camera->GetTransform ();
-  rm->indexend = (uint)vertices.GetSize ();
-
+  rm->indexend = (uint)GetCsVertices ()->GetSize ();
 
   n = 1; 
   return &rm; 
@@ -242,23 +255,24 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
 void csSprite2DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
 {
   if (!holder) return;
+  csColoredVertices* vertices = GetCsVertices ();
 
   if (buffer == CS_BUFFER_INDEX)
   {
-    size_t indexSize = vertices.GetSize ();
+    size_t indexSize = vertices->GetSize ();
     if (!index_buffer.IsValid() || 
       (indicesSize != indexSize))
     {
       index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
 	indexSize, CS_BUF_DYNAMIC, 
-	CS_BUFCOMP_UNSIGNED_INT, 0, vertices.GetSize () - 1);
+	CS_BUFCOMP_UNSIGNED_INT, 0, vertices->GetSize () - 1);
       
       holder->SetRenderBuffer (CS_BUFFER_INDEX, index_buffer);
 
       csRenderBufferLock<uint> indexLock (index_buffer);
       uint* ptr = indexLock;
 
-      for (size_t i = 0; i < vertices.GetSize (); i++)
+      for (size_t i = 0; i < vertices->GetSize (); i++)
       {
 	*ptr++ = (uint)i;
       }
@@ -272,7 +286,7 @@ void csSprite2DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderB
       int texels_count;
       const csVector2 *uvani_uv = 0;
       if (!uvani)
-	texels_count = (int)vertices.GetSize ();
+	texels_count = (int)vertices->GetSize ();
       else
 	uvani_uv = uvani->GetVertices (texels_count);
 	  
@@ -292,8 +306,8 @@ void csSprite2DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderB
 	csVector2& v = texelLock[i];
 	if (!uvani)
 	{
-	  v.x = vertices[i].u;
-	  v.y = vertices[i].v;
+	  v.x = (*vertices)[i].u;
+	  v.y = (*vertices)[i].v;
 	}
 	else
 	{
@@ -308,7 +322,7 @@ void csSprite2DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderB
   {
     if (colors_dirty)
     {
-      size_t color_size = vertices.GetSize ();
+      size_t color_size = vertices->GetSize ();
       if (!color_buffer.IsValid() || (color_buffer->GetSize() 
 	!= color_size * sizeof(float) * 2))
       {
@@ -320,9 +334,9 @@ void csSprite2DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderB
 
       csRenderBufferLock<csColor> colorLock (color_buffer);
 
-      for (size_t i = 0; i < vertices.GetSize (); i++)
+      for (size_t i = 0; i < vertices->GetSize (); i++)
       {
-	colorLock[i] = vertices[i].color;
+	colorLock[i] = (*vertices)[i].color;
       }
       colors_dirty = false;
     }
@@ -331,7 +345,7 @@ void csSprite2DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderB
   {
     if (vertices_dirty)
     {
-      size_t vertices_size = vertices.GetSize ();
+      size_t vertices_size = vertices->GetSize ();
       if (!vertex_buffer.IsValid() || (vertex_buffer->GetSize() 
 	!= vertices_size * sizeof(float) * 3))
       {
@@ -343,9 +357,9 @@ void csSprite2DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderB
 
       csRenderBufferLock<csVector3> vertexLock (vertex_buffer);
 
-      for (size_t i = 0; i < vertices.GetSize (); i++)
+      for (size_t i = 0; i < vertices->GetSize (); i++)
       {
-	vertexLock[i].Set (vertices[i].pos.x, vertices[i].pos.y, 0.0f);
+	vertexLock[i].Set ((*vertices)[i].pos.x, (*vertices)[i].pos.y, 0.0f);
       }
       vertices_dirty = false;
     }
@@ -374,20 +388,21 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
 {
   double angle_inc = TWO_PI / n;
   double angle = 0.0;
-  vertices.SetSize (n);
+  csColoredVertices* vertices = GetCsVertices ();
+  vertices->SetSize (n);
   size_t i;
-  for (i = 0; i < vertices.GetSize (); i++, angle += angle_inc)
+  for (i = 0; i < vertices->GetSize (); i++, angle += angle_inc)
   {
-    vertices [i].pos.y = cos (angle);
-    vertices [i].pos.x = sin (angle);
+    (*vertices) [i].pos.y = cos (angle);
+    (*vertices) [i].pos.x = sin (angle);
     if (setuv)
     {
       // reuse sin/cos values and scale to [0..1]
-      vertices [i].u = vertices [i].pos.x / 2.0f + 0.5f;
-      vertices [i].v = vertices [i].pos.y / 2.0f + 0.5f;
+      (*vertices) [i].u = (*vertices) [i].pos.x / 2.0f + 0.5f;
+      (*vertices) [i].v = (*vertices) [i].pos.y / 2.0f + 0.5f;
     }
-    vertices [i].color.Set (1, 1, 1);
-    vertices [i].color_init.Set (1, 1, 1);
+    (*vertices) [i].color.Set (1, 1, 1);
+    (*vertices) [i].color_init.Set (1, 1, 1);
   }
 
   vertices_dirty = true;
@@ -678,12 +693,13 @@ bool csSprite2DMeshObject::HitBeamOutline(const csVector3& start,
   csMatrix3 o2t;
   CheckBeam (start, pl, sqr, o2t);
   csVector3 r = o2t * isect;
-  int trail, len = (int)vertices.GetSize ();
+  csColoredVertices* vertices = GetCsVertices ();
+  int trail, len = (int)vertices->GetSize ();
   trail = len - 1;
   csVector2 isec(r.x, r.y);
   int i;
   for (i = 0; i < len; trail = i++)
-    if (csMath2::WhichSide2D(isec, vertices[trail].pos, vertices[i].pos) > 0)
+    if (csMath2::WhichSide2D(isec, (*vertices)[trail].pos, (*vertices)[i].pos) > 0)
       return false;
   return true;
 }
@@ -697,6 +713,10 @@ csSprite2DMeshObjectFactory::csSprite2DMeshObjectFactory (iMeshObjectType* pPare
 {
   light_mgr = csQueryRegistry<iLightManager> (object_reg);
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
+
+  scfVertices.AttachNew (new scfArrayWrap<iColoredVertices, 
+    csColoredVertices> (vertices));
+  ax = -10;
 }
 
 csSprite2DMeshObjectFactory::~csSprite2DMeshObjectFactory ()

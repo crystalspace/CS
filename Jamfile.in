@@ -96,3 +96,6 @@ if [ Property build : standalone ]
   local SUBDIR = [ ConcatDirs $(BUILDTOP) include ] ; # Temporary for Recurse.
   Recurse InstallHeader : .h ;
 }
+
+# Create a file list for vfs.cfg
+FileListEntriesData vfs.cfg : : vfs ;

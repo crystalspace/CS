@@ -43,9 +43,6 @@
 #include "lppool.h"
 #include "lghtmap.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(Thing)
-{
-
 // Option variable: cosinus factor.
 float csPolyTexture::cfg_cosinus_factor = 0;
 
@@ -1916,5 +1913,3 @@ void csLightingPolyTexQueue::UpdateMaps (
   polygons.DeleteAll ();
 }
 
-}
-CS_PLUGIN_NAMESPACE_END(Thing)

@@ -1070,7 +1070,13 @@ AS_IF([test $cs_cv_libgl = yes],
         [CS_HEADER_PROPERTY([CS_HAVE_GLHANDLEARB_T])])
     CS_CHECK_OPENGL_TYPE([GLcharARB],
         [CS_HEADER_PROPERTY([CS_HAVE_GLCHARARB_T])]) 
-    CS_CHECK_OPENGL_TYPE([GLchar], [CS_HEADER_PROPERTY([CS_HAVE_GLCHAR_T])])])
+    CS_CHECK_OPENGL_TYPE([GLchar], 
+        [CS_HEADER_PROPERTY([CS_HAVE_GLCHAR_T])])
+    CS_CHECK_OPENGL_TYPE([GLintptr],
+        [CS_HEADER_PROPERTY([CS_HAVE_GLINTPTR_T])])
+    CS_CHECK_OPENGL_TYPE([GLsizeiptr],
+        [CS_HEADER_PROPERTY([CS_HAVE_GLSIZEIPTR_T])])
+    ])
 CS_CHECK_GLU
 CS_CHECK_GLX
 # Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_ present.
@@ -2473,7 +2479,7 @@ AS_IF([test $enable_leak_guard = yes],
 #------------------------------------------------------------------------------
 AC_MSG_CHECKING([whether to build shared libraries])
 case $host_os in
-    mingw*|cygwin*|linux*) enable_shared_default=yes ;;
+    cygwin*|linux*) enable_shared_default=yes ;;
     *) enable_shared_default=no ;;
 esac
 AC_ARG_ENABLE([shared], [AC_HELP_STRING([--enable-shared],
