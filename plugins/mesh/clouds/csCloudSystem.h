@@ -50,7 +50,7 @@ public:
   }
 
   virtual inline const UINT GetCloudCount() const {return static_cast<UINT>(m_ppClouds.GetSize());}
-  virtual inline const iClouds* GetCloud(const UINT i) const {return m_ppClouds.Get(i);}
+  virtual inline iClouds* GetCloud(const UINT i) const {return m_ppClouds.Get(i);}
 
   virtual inline iClouds* AddCloud()
   {

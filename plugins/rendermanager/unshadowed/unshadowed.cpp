@@ -34,7 +34,7 @@
 #include "csplugincommon/rendermanager/viscull.h"
 
 #include "unshadowed.h"
-//#include "csCloudsContexts.h"
+#include "csCloudsContexts.h"
 
 CS_IMPLEMENT_PLUGIN
 

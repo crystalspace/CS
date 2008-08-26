@@ -128,7 +128,7 @@ public:
   virtual inline const UINT GetOLVHeight() const {return m_Renderer->GetOLVHeight();}
   virtual inline iTextureHandle* GetOLVTexture() const {return m_Renderer->GetOLVTexture();}
   virtual inline const CS::Math::Matrix4 GetOLVProjectionMatrix() const {return m_Renderer->GetOLVProjectionMatrix();}
-  virtual inline const CS::Math::Matrix4 GetOLVCameraMatrix() const {return m_Renderer->GetOLVCameraMatrix();}
+  virtual inline const csOrthoTransform GetOLVCameraMatrix() const {return m_Renderer->GetOLVCameraMatrix();}
   virtual inline void SetRenderGridScale(const float dx) {return m_Renderer->SetGridScale(dx);}
   virtual inline void SetCloudPosition(const csVector3& vPosition) {return m_Renderer->SetCloudPosition(vPosition);}
   virtual inline void SetLightDirection(const csVector3& vLightDir) {return m_Renderer->SetLightDirection(vLightDir);}

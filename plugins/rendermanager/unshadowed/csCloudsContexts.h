@@ -24,31 +24,38 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <csutil/objreg.h>
 #include <csgeom/polyclip.h>
 
+#include "unshadowed.h"
+#include "iengine/rendermanager.h"
+#include "imesh/clouds.h"
+#include "csplugincommon/rendermanager/renderview.h"
+
+using namespace CS::RenderManager;
+using namespace CS::Plugin::RMUnshadowed;
+
 class csCloudsContexts
 {
 private:
   iObjectRegistry*              m_pObjectReg;
   RMUnshadowed*                 m_pRenderManager;
-  const LayerConfigType&        m_LayerConfig;
-
+  const MultipleRenderLayer&    m_LayerConfig;
+  RenderTree<>::PersistentData  m_TreePersistent;
 
 public:
-  /*csCloudsContexts(iObjectRegistry* pObjectReg, RMUnshadowed* pRenderManager, const LayerConfigType& LayerConfig)
-    : m_LayerConfig(LayerConfig), m_pObjectReg(pObjectReg), m_pRenderManager(pRenderManager)
-  {
-  }*/
-  csCloudsContexts()
+  csCloudsContexts(iObjectRegistry* pObjectReg, RMUnshadowed* pRenderManager, const MultipleRenderLayer& LayerConfig,
+                   RenderTree<>::PersistentData TreePersistent)
+    : m_LayerConfig(LayerConfig), m_pObjectReg(pObjectReg), m_pRenderManager(pRenderManager),
+      m_TreePersistent(TreePersistent)
   {
   }
   ~csCloudsContexts()
   {
   }
 
-  const bool SetupAllContexts(const CS::RenderManager::RenderTree<>& RenderTree,
-                              const CS::RenderManager::RenderView& RView)
+  const bool SetupAllContexts(CS::RenderManager::RenderTree<>& RenderTree,
+                              CS::RenderManager::RenderView& RView)
   {
     //First get the instance of the cloudsystem (if there is one)
-    csRef<iCloudSystem> pCloudSystem = csQueryRegistry<iClouds>(m_pObjectReg);
+    csRef<iCloudSystem> pCloudSystem = csQueryRegistry<iCloudSystem>(m_pObjectReg);
     //If there is none, abort
     if(!pCloudSystem.IsValid()) return false;
 
@@ -60,14 +67,17 @@ public:
       Modify RenderView such that View Frustum is ok.
       */
       csRef<CS::RenderManager::RenderView> pNewRView;
-      pNewRView.AttachNew(new CS::RenderManager::RenderView());
+      //pNewRView.AttachNew(new CS::RenderManager::RenderView());
+#include "csutil/custom_new_disable.h"
+      pNewRView.AttachNew(new (m_TreePersistent.renderViewPool) CS::RenderManager::RenderView());
+#include "csutil/custom_new_enable.h"
       //Camera and Projectionmatrix
       csRef<iCustomMatrixCamera> pCamera = RView.GetEngine()->CreateCustomMatrixCamera();
       pCamera->SetProjectionMatrix(pCurrentCloud->GetOLVProjectionMatrix());
       pCamera->GetCamera()->SetTransform(pCurrentCloud->GetOLVCameraMatrix());
       pNewRView->SetCamera(pCamera->GetCamera());
       //Clipper
-      csRef<iClipper> BoxClipper;
+      csRef<iClipper2D> pBoxClipper;
       pBoxClipper.AttachNew(new csBoxClipper(0, 0, pCurrentCloud->GetOLVWidth(), pCurrentCloud->GetOLVHeight()));
       pNewRView->SetClipper(pBoxClipper);
 
@@ -81,7 +91,7 @@ public:
         Set one slice of the OLV 3D-Texture as Rendertarget
         then setup shader and shaderSVs
         */
-        CS::RenderManager::RenderTree<>::ContextNode* pContext = RenderTree.CreateContext(NewRView);
+        CS::RenderManager::RenderTree<>::ContextNode* pContext = RenderTree.CreateContext(pNewRView);
 
         //================================================//
 
@@ -108,9 +118,8 @@ public:
         //================================================//
 
         //Set a 3D-Texture slice as rendertarget
-        csRef<CS::RenderManager::RenderTree< TreeTraits >::ContextNode::TargetTexture> pTargetTex;
-        pTargetTex->texHandle = pCurrentCloud->GetOLVTexture();
-        pTargetTex->subtexture = j;
+        pContext->renderTargets[rtaColor0].texHandle  = pCurrentCloud->GetOLVTexture();
+        pContext->renderTargets[rtaColor0].subtexture = j;
       }
     }
 

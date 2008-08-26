@@ -27,6 +27,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/vector3.h"
 #include "csgeom/matrix4.h"
 #include "ivideo/texture.h"
+#include <csgeom/transfrm.h>
 
 //--------------------------------------------------------------------------------------------//
 
@@ -114,7 +115,7 @@ struct iClouds : public virtual iBase
   virtual inline const UINT GetOLVWidth() const = 0;
   virtual inline const UINT GetOLVHeight() const = 0;
   virtual inline const CS::Math::Matrix4 GetOLVProjectionMatrix() const = 0;
-  virtual inline const CS::Math::Matrix4 GetOLVCameraMatrix() const = 0;
+  virtual inline const csOrthoTransform GetOLVCameraMatrix() const = 0;
   virtual inline iTextureHandle* GetOLVTexture() const = 0;
 };
 
@@ -136,7 +137,7 @@ struct iCloudsRenderer : public virtual iBase
   virtual inline const UINT GetOLVWidth() const = 0;
   virtual inline const UINT GetOLVHeight() const = 0;
   virtual inline const CS::Math::Matrix4 GetOLVProjectionMatrix() const = 0;
-  virtual inline const CS::Math::Matrix4 GetOLVCameraMatrix() const = 0;
+  virtual inline const csOrthoTransform GetOLVCameraMatrix() const = 0;
   virtual inline iTextureHandle* GetOLVTexture() const = 0;
 
   /**
@@ -208,7 +209,7 @@ struct iCloudSystem : public virtual iBase
   Some getter which provide various information about the field
   */
   virtual inline const UINT GetCloudCount() const = 0;
-  virtual inline const iClouds* GetCloud(const UINT i) const = 0;
+  virtual inline iClouds* GetCloud(const UINT i) const = 0;
 
   /**
   Add and remove clouds from the field

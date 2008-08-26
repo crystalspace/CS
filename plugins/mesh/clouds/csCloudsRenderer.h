@@ -58,7 +58,7 @@ private:
   csMatrix3                     m_mOLVRotation;
   csMatrix3                     m_mInvOLVRotation;
   csVector3                     m_avBaseSlice[4];    //This is the slice which is farthest away from the lightsource
-  CS::Math::Matrix4             m_mOLVCameraMatrix;
+  csOrthoTransform              m_mOLVCameraMatrix;
   CS::Math::Matrix4             m_mOLVProjectionMatrix;
 
   //Impostor properties
@@ -79,21 +79,17 @@ private:
   }
 
   //Returns a cameramatrix
-  inline const CS::Math::Matrix4 CameraMatrix(const csVector3& vPos, const csVector3& vDir, const csVector3& vUp)
+  inline const csOrthoTransform CameraMatrix(const csVector3& vPos, const csVector3& vDir, const csVector3& vUp)
   {
     const csVector3 vRef   = vUp / vUp.Norm();
     const csVector3 vZAxis = vDir / vDir.Norm();
     const csVector3 vXAxis = vRef % vZAxis;
     const csVector3 vYAxis = vZAxis % vXAxis;
 
-    return CS::Math::Matrix4(1.f, 0.f, 0.f, 0.f,
-                             0.f, 1.f, 0.f, 0.f,
-                             0.f, 0.f, 1.f, 0.f,
-                             -vPos.x, -vPos.y, -vPos.z, 1.f) *
-           CS::Math::Matrix4(vXAxis.x, vYAxis.x, vZAxis.x, 0.0f,
-  	                         vXAxis.y, vYAxis.y, vZAxis.y, 0.0f,
-			                       vXAxis.z, vYAxis.z, vZAxis.z, 0.0f,
-				                     0.0f,     0.0f,     0.0f,     1.0f);
+    const csMatrix3 mRotation = csMatrix3(vXAxis.x, vYAxis.x, vZAxis.x,
+                                          vXAxis.y, vYAxis.y, vZAxis.y,
+                                          vXAxis.z, vYAxis.z, vZAxis.z);
+    return csOrthoTransform(mRotation, vPos);
   }
 
   /**
@@ -150,7 +146,7 @@ public:
   virtual inline const UINT GetOLVWidth() const {return m_iOLVTexWidth;}
   virtual inline const UINT GetOLVHeight() const {return m_iOLVTexHeight;}
   virtual inline const CS::Math::Matrix4 GetOLVProjectionMatrix() const {return m_mOLVProjectionMatrix;}
-  virtual inline const CS::Math::Matrix4 GetOLVCameraMatrix() const {return m_mOLVCameraMatrix;}
+  virtual inline const csOrthoTransform GetOLVCameraMatrix() const {return m_mOLVCameraMatrix;}
   virtual inline iTextureHandle* GetOLVTexture() const {return m_pOLVTexture;}
 
   /**
