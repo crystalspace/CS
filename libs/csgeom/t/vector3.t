@@ -174,6 +174,7 @@ void csVector3Test::testOp()
   temp.Cross (v1, v2);
   CPPUNIT_ASSERT (temp == v1 % v2);
   CPPUNIT_ASSERT (temp != v2 % v1);
+  CPPUNIT_ASSERT (temp == -(v2 % v1));
 }
 
 void csVector3Test::testCond()

@@ -107,11 +107,8 @@ public:
 
   void testSmokeTest ();
   void testPhaseHandlers ();
-  void testFrameSubEvents ();
   void testMixedHandlers ();
   
-  void dumpHandlers ();
-
   CPPUNIT_TEST_SUITE (csEventQueueTest);
     CPPUNIT_TEST (testSmokeTest);
     CPPUNIT_TEST (testPhaseHandlers);
@@ -180,8 +177,6 @@ void csEventQueueTest::testPhaseHandlers ()
   handlers = new csList<csString *> ();
   queue->Process ();
   
-  dumpHandlers ();
-
 #ifdef ADB_DEBUG
   // csEventTree *frameEvent = queue->EventTree->FindNode(csevFrame (objreg), queue);
   // frameEvent->fatRecord->SubscriberGraph->Dump (objreg);
@@ -235,23 +230,4 @@ void csEventQueueTest::testPhaseHandlers ()
 void csEventQueueTest::testMixedHandlers ()
 {
 
-}
-
-// Helper function to print the contents of the handlers list
-void csEventQueueTest::dumpHandlers ()
-{
-  std::cout << std::endl;
-  csList<csString*>::Iterator iter(*handlers);
-  
-  /*for (; iter.HasNext(); ++iter)
-  {
-    std::cout << (*iter)->GetDataSafe () << std::endl;
-  }*/
-  csString* item;
-  
-  while (iter.HasNext())
-  {
-    item = iter.Next();
-    std::cout << item->GetDataSafe() << std::endl;
-  }
 }
