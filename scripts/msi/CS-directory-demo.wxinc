@@ -1,0 +1,12 @@
+<Include>
+  <DirectoryRef Id="CSDIR">
+    <Directory Name="Demos 1.9 ($(var.ARCH))" Id="CSDEMOS1.9">
+      <Merge DiskId="1" SourceFile="$(var.MSM_CS_PATH)/CS.arch.$(var.ARCH).executable.demo.msm" Id="CS.arch.executable.demo" Language="1033" FileCompression="yes"/>
+    </Directory>
+  </DirectoryRef>
+  <DirectoryRef Id="CSVERSION1.9">
+    <Directory Name="data" Id="CS.data.demo">
+      <Merge DiskId="1" SourceFile="$(var.MSM_CS_PATH)/CS.data.demo.msm" Id="CS.data.demo" Language="1033" FileCompression="yes"/>
+    </Directory>
+  </DirectoryRef>
+</Include>

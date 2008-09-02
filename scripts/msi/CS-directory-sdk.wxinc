@@ -1,0 +1,40 @@
+<Include>
+  <DirectoryRef Id="CSDIR">
+    <Directory Name="CS-SDK-1.9-$(var.ARCH)" Id="CSSDK1.9">
+      <Directory Name="bin" Id="CS.arch.bin.sdk">
+        <Merge DiskId="1" SourceFile="$(var.MSM_CS_PATH)/CS.arch.$(var.ARCH).executable.sdk.msm" Id="CS.arch.executable.sdk" Language="1033" FileCompression="yes"/>
+      </Directory>
+      <Directory Name="docs" Id="CS.docs">
+        <Merge DiskId="1" SourceFile="$(var.MSM_CS_PATH)/CS.doc.msm" Id="CS.doc.88888F92-BF93-11DC-B42B-0015582877AD" Language="1033" FileCompression="yes"/>
+      </Directory>
+      <Directory Name="include" Id="CS.arch.include">
+        <Merge DiskId="1" SourceFile="$(var.MSM_CS_PATH)/CS.include.msm" Id="CS.include.8F1B7996-BF93-11DC-B42B-0015582877AD" Language="1033" FileCompression="yes"/>
+        <Merge DiskId="1" SourceFile="$(var.MSM_CS_PATH)/CS.arch.$(var.ARCH).include.msm" Id="CS.arch.include" Language="1033" FileCompression="yes"/>
+      </Directory>
+      <Directory Name="lib" Id="CS.arch.linklibs">
+        <Merge DiskId="1" SourceFile="$(var.MSM_CS_PATH)/CS.arch.$(var.ARCH).link.msm" Id="CS.arch.link" Language="1033" FileCompression="yes"/>
+        <Merge DiskId="1" SourceFile="$(var.TOP)/win32libs/mergemodules/winlibs.common.link.msm" Id="winlibs.common.link" Language="1033" FileCompression="yes"/>
+        <?if $(var.ARCH) = GCC_3.4 ?>
+          <Merge DiskId="1" SourceFile="$(var.TOP)/win32libs/mergemodules/winlibs.mingw.link.msm" Id="winlibs.arch.link" Language="1033" FileCompression="yes"/>
+        <?endif?>
+        <?if $(var.ARCH) = VC_7 ?>
+          <Merge DiskId="1" SourceFile="$(var.TOP)/win32libs/mergemodules/winlibs.vc7.link.msm" Id="winlibs.arch.link" Language="1033" FileCompression="yes"/>
+        <?endif?>
+        <?if $(var.ARCH) = VC_71 ?>
+          <Merge DiskId="1" SourceFile="$(var.TOP)/win32libs/mergemodules/winlibs.vc71.link.msm" Id="winlibs.arch.link" Language="1033" FileCompression="yes"/>
+        <?endif?>
+        <?if $(var.ARCH) = VC_8 ?>
+          <Merge DiskId="1" SourceFile="$(var.TOP)/win32libs/mergemodules/winlibs.vc8.link.msm" Id="winlibs.arch.link" Language="1033" FileCompression="yes"/>
+        <?endif?>
+        <?if $(var.ARCH) = VC_9 ?>
+          <Merge DiskId="1" SourceFile="$(var.TOP)/win32libs/mergemodules/winlibs.vc9.link.msm" Id="winlibs.arch.link" Language="1033" FileCompression="yes"/>
+        <?endif?>
+      </Directory>
+    </Directory>
+  </DirectoryRef>
+  <DirectoryRef Id="CSVERSION1.9">
+    <Directory Name="data" Id="CS.data.sdk">
+      <Merge DiskId="1" SourceFile="$(var.MSM_CS_PATH)/CS.data.sdk.msm" Id="CS.data.sdk" Language="1033" FileCompression="yes"/>
+    </Directory>
+  </DirectoryRef>
+</Include>
