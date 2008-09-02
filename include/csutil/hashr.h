@@ -83,6 +83,27 @@ public:
   }
 
   /**
+   * Delete all the elements matching the given key.
+   */
+  bool DeleteAll (const K& key)
+  {
+    csArray<T> values = csHash::GetAll (key);
+    bool ret = csHash::DeleteAll (key);
+    for(size_t i=0; i<values.GetSize (); i++)
+    {
+      ret &= reverse.Delete (values[i], key);
+    }
+    return ret;
+  }
+
+  /// Delete all the elements.
+  void DeleteAll ()
+  {
+    csHash::DeleteAll ();
+    reverse.DeleteAll ();
+  }
+
+  /**
    * Get a pointer to the first key matching the given value, 
    * or 0 if there is none.
    */
