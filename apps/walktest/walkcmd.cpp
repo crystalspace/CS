@@ -2316,8 +2316,10 @@ bool CommandHandler (const char *cmd, const char *arg)
         int width = csQint(bbox.MaxX() - bbox.MinX());
         int height = csQint(bbox.MaxY() - bbox.MinY());
         Sys->views[0]->SetRectangle((int)bbox.MinX(), (int)bbox.MinY(), width / 2, height);
+	Sys->views[0]->GetCamera()->SetViewportSize (width, height);
         Sys->views[0]->GetCamera()->SetPerspectiveCenter(bbox.MinX() + (width / 4),
                                                         bbox.MinY() + (height / 2));
+	Sys->views[1]->GetCamera()->SetViewportSize (width, height);
         Sys->views[1]->SetRectangle((int)bbox.MinX() + (width / 2), (int)bbox.MinY(), 
                                     width / 2, height);
         Sys->views[1]->GetCamera()->SetPerspectiveCenter(bbox.MinX() + (3 * width / 4),
@@ -2336,6 +2338,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 
         int width = csQint(bbox2.MaxX() - bbox1.MinX());
         int height = csQint(bbox1.MaxY() - bbox1.MinY());
+	Sys->view->GetCamera()->SetViewportSize (width, height);
         Sys->view->SetRectangle((int)bbox1.MinX(), (int)bbox1.MinY(), width, height);
         Sys->view->GetCamera()->SetPerspectiveCenter(bbox1.MinX() + (width / 2), 
                                                     bbox2.MinY() + (height / 2));
