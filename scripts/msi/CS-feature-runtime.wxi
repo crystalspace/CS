@@ -18,9 +18,11 @@
       </Feature>
     </Feature>
   </Feature>
+  <!-- cs-win32libs always needs VC8 runtime -->
   <Feature Id="VCRedist8" Title="Visual C++ 8.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
     <MergeRef Id="VCRedist8"/>
   </Feature>
+  <!-- Pull in runtimes for specific VC versions -->
   <?if ($(var.ARCH) = VC_7) or ($(var.ARCH) = VC_71) ?>
     <Feature Id="VCRedist" Title="Visual C++ Runtime" AllowAdvertise="no" Display="hidden" Level="1">
       <MergeRef Id="VCRedistCRT"/>

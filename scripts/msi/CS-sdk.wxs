@@ -14,13 +14,13 @@
     <DirectoryRef Id="ProgramFilesFolder">
       <Directory Name="CrystalSpace" Id="CSDIR"/>
     </DirectoryRef>
-    <?include CS-directory-runtime.wxinc ?>
-    <?include CS-directory-sdk.wxinc ?>
+    <?include CS-directory-runtime.wxi ?>
+    <?include CS-directory-sdk.wxi ?>
     <Upgrade Id="$(var.UPGRADE_CODE)">
       <UpgradeVersion IncludeMaximum="yes" Minimum="1.9.0" Property="PATCHFOUND" Maximum="1.9.3" IncludeMinimum="yes"/>
     </Upgrade>
-    <?include CS-feature-sdk.wxinc ?>
-    <?include CS-feature-runtime.wxinc ?>
+    <?include CS-feature-sdk.wxi ?>
+    <?include CS-feature-runtime.wxi ?>
   </Product>
 </Wix>
 

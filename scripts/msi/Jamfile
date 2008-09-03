@@ -108,9 +108,9 @@ MSVCFileLists 71 ;
 MSVCFileLists 8 ;
 MSVCFileLists 9 ;
 
-INCL_RUNTIME = $(SUBDIR)/CS-feature-runtime.wxinc $(SUBDIR)/CS-directory-runtime.wxinc ;
-INCL_SDK = $(SUBDIR)/CS-feature-sdk.wxinc $(SUBDIR)/CS-directory-sdk.wxinc ;
-INCL_DEMO = $(SUBDIR)/CS-feature-demo.wxinc $(SUBDIR)/CS-directory-demo.wxinc ;
+INCL_RUNTIME = $(SUBDIR)/CS-feature-runtime.wxi $(SUBDIR)/CS-directory-runtime.wxi ;
+INCL_SDK = $(SUBDIR)/CS-feature-sdk.wxi $(SUBDIR)/CS-directory-sdk.wxi ;
+INCL_DEMO = $(SUBDIR)/CS-feature-demo.wxi $(SUBDIR)/CS-directory-demo.wxi ;
 Includes CS-runtime.wxs : $(INCL_RUNTIME) ;
 Includes CS-sdk.wxs : $(INCL_RUNTIME) $(INCL_SDK) ;
 Includes CS-demos.wxs : $(INCL_RUNTIME) $(INCL_DEMO) ;
@@ -137,6 +137,7 @@ MSIMergeModuleFromList CS.arch.$(MSM_ARCH).link : libs-static : $(MSM_VERSION) ;
 MSIMergeModuleFromList CS.arch.$(MSM_ARCH).executable.demo : app-demo : $(MSM_VERSION) ;
 MSIMergeModuleFromList CS.arch.$(MSM_ARCH).executable.runtime : plugin plugin-cg : $(MSM_VERSION) ;
 MSIMergeModuleFromList CS.arch.$(MSM_ARCH).executable.sdk : app-tool : $(MSM_VERSION) ;
+MSIMergeModuleFromList CS.arch.$(MSM_ARCH).csconfig : cs-config : $(MSM_VERSION) ;
 
 MSI_UPGRADE_CODE.CS.all.GCC_3.4 = 3C8B4562-BF93-11DC-B42B-0015582877AD ;
 MSI_UPGRADE_CODE.CS.all.VC_7 = 70d2beb0-169e-4516-a181-a4603cba2d7d ;
