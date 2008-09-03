@@ -164,7 +164,7 @@ public:
   This method is called everytime when the dynamic part completed one timestep.
   It renders the CloudwaterMixingRatioField viewed from lightdirection --> OLV
   */
-  const bool RenderOLV(const csRef<csField3<float>>& rCondWaterMixingRatios);
+  const bool RenderOLV(const csRef<csField3<float> >& rCondWaterMixingRatios);
 
   /**
   This Method is called every frame. It simply renders the clouds impostor from view direction

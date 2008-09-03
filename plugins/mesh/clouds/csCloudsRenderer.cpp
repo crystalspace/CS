@@ -23,7 +23,7 @@ SCF_IMPLEMENT_FACTORY(csCloudsRenderer)
 
 //-------------------------------------------------------//
 
-const bool csCloudsRenderer::RenderOLV(const csRef<csField3<float>>& rCondWaterMixingRatios)
+const bool csCloudsRenderer::RenderOLV(const csRef<csField3<float> >& rCondWaterMixingRatios)
 {
   //First save the mixingratios into a 3D-Texture
   m_pQcTexture.Invalidate();

@@ -21,7 +21,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 //-----------------------------------------------------//
 
-const float GetInterpolatedValue(const csRef<csField3<float>>& rSrc, const csVector3& vPos)
+const float GetInterpolatedValue(const csRef<csField3<float> >& rSrc, const csVector3& vPos)
 {
   const UINT x = static_cast<UINT>(vPos.x);
   const UINT y = static_cast<UINT>(vPos.y);
@@ -50,7 +50,7 @@ const float GetInterpolatedValue(const csRef<csField3<float>>& rSrc, const csVec
 
 //-----------------------------------------------------//
 
-const float GetInterpolatedValue(const csRef<csField3<csVector3>>& rSrc, const csVector3& vPos, const UINT iIndex)
+const float GetInterpolatedValue(const csRef<csField3<csVector3> >& rSrc, const csVector3& vPos, const UINT iIndex)
 {
   const UINT x = static_cast<UINT>(vPos.x);
   const UINT y = static_cast<UINT>(vPos.y);

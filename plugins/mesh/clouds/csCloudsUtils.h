@@ -110,18 +110,18 @@ public:
 Both function expect vPos to be scaled on gridsize. Means that it doesn't contain
 the REAL position, but coordinates on the voxelgrid
 */
-const float GetInterpolatedValue(const csRef<csField3<float>>& rSrc, const csVector3& vPos);
-const float GetInterpolatedValue(const csRef<csField3<csVector3>>& rSrc, const csVector3& vPos, const UINT iIndex);
+const float GetInterpolatedValue(const csRef<csField3<float> >& rSrc, const csVector3& vPos);
+const float GetInterpolatedValue(const csRef<csField3<csVector3> >& rSrc, const csVector3& vPos, const UINT iIndex);
 
 //Interpolates the velocity
-inline const csVector3 GetVelocityOfCellCenter(const csRef<csField3<csVector3>>& rField, 
+inline const csVector3 GetVelocityOfCellCenter(const csRef<csField3<csVector3> >& rField, 
                                                const UINT x, const UINT y, const UINT z)
 {
   return 0.5f * csVector3(rField->GetValue(x, y, z).x + rField->GetValue(x + 1, y, z).x,
     rField->GetValue(x, y, z).y + rField->GetValue(x, y + 1, z).y,
     rField->GetValue(x, y, z).z + rField->GetValue(x, y, z + 1).z);
 }
-inline const csVector3 GetInterpolatedVelocity(const csRef<csField3<csVector3>>& rField, const csVector3& vPos)
+inline const csVector3 GetInterpolatedVelocity(const csRef<csField3<csVector3> >& rField, const csVector3& vPos)
 {
   csVector3 vVel = csVector3();
   vVel.x = GetInterpolatedValue(rField, csVector3(vPos.x, vPos.y - 0.5f, vPos.z - 0.5f), 0);
@@ -146,7 +146,7 @@ inline const csVector3 Clamp(const csVector3& vPos, const UINT x, const UINT y, 
 
 //------------------------------------------------------------------------------//
 
-inline const csVector3 CalcGradient(const csRef<csField3<float>>& rField, const UINT x, const UINT y, const UINT z,
+inline const csVector3 CalcGradient(const csRef<csField3<float> >& rField, const UINT x, const UINT y, const UINT z,
                                     const float dx)
 {
   const float fInvdx2 = 1.f / (2.f * dx);
@@ -160,7 +160,7 @@ inline const csVector3 CalcGradient(const csRef<csField3<float>>& rField, const 
 //------------------------------------------------------------------------------//
 
 //Calculates the gradient of the norm of a Vectorfield
-inline const csVector3 CalcGradient(const csRef<csField3<csVector3>>& rField, const UINT x, const UINT y, const UINT z,
+inline const csVector3 CalcGradient(const csRef<csField3<csVector3> >& rField, const UINT x, const UINT y, const UINT z,
                                     const float dx)
 {
   const float fInvdx2 = 1.f / (2.f * dx);
@@ -173,7 +173,7 @@ inline const csVector3 CalcGradient(const csRef<csField3<csVector3>>& rField, co
 
 //------------------------------------------------------------------------------//
 
-inline const float CalcDivergence(const csRef<csField3<csVector3>>& rField, const UINT x, const UINT y, const UINT z,
+inline const float CalcDivergence(const csRef<csField3<csVector3> >& rField, const UINT x, const UINT y, const UINT z,
                                   const float dx)
 {
   const float fInvdx = 1.f / dx;
@@ -187,7 +187,7 @@ inline const float CalcDivergence(const csRef<csField3<csVector3>>& rField, cons
 //------------------------------------------------------------------------------//
 
 //Calculates the rotation vector for the center of a cell!
-inline const csVector3 CalcRotation(const csRef<csField3<csVector3>>& rField, const UINT x, const UINT y, const UINT z,
+inline const csVector3 CalcRotation(const csRef<csField3<csVector3> >& rField, const UINT x, const UINT y, const UINT z,
                                     const float dx)
 {
   const float fInvdx = 1.f / dx;
@@ -206,7 +206,7 @@ inline const csVector3 CalcRotation(const csRef<csField3<csVector3>>& rField, co
 //------------------------------------------------------------------------------//
 
 /*template <typename T>
-class csField2 : public scfImplementation1<csField2<T>, iField2<T>>
+class csField2 : public scfImplementation1<csField2<T>, iField2<T> >
 {
 private:
 T**				m_ppArray;

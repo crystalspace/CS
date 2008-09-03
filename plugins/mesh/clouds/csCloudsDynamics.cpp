@@ -352,8 +352,8 @@ void csCloudsDynamics::SolvePoissonPressureEquation(const UINT k)
 
 //----------------------------------------------------------//
 
-void csCloudsDynamics::JacobiSolver(csRef<csField3<float>> rNew, const csRef<csField3<float>>& rOld, 
-                                    const csRef<csField3<float>>& rBField, const float fAlpha, const float fInvBeta)
+void csCloudsDynamics::JacobiSolver(csRef<csField3<float> > rNew, const csRef<csField3<float> >& rOld, 
+                                    const csRef<csField3<float> >& rBField, const float fAlpha, const float fInvBeta)
 {
   for(UINT x = 0; x < rNew->GetSizeX(); ++x)
   {

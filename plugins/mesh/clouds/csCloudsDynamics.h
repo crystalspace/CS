@@ -53,20 +53,20 @@ private:
   Temperature, pressure and both mixing ratios are definded at the center
   of each voxel. Indexing is therefore as always f(x, y, z)
   */
-  csRef<csField3<float>>         m_arfPotTemperature[2];               // T, potential temperature
-  csRef<csField3<float>>         m_arfCondWaterMixingRatios[2];        // qc
-  csRef<csField3<float>>         m_arfWaterVaporMixingRatios[2];       // qv
-  csRef<csField3<csVector3>>     m_arvForceField;
-  csRef<csField3<float>>         m_arfVelDivergence;
-  csRef<csField3<float>>         m_arfPressureField[2];                // p
+  csRef<csField3<float> >         m_arfPotTemperature[2];               // T, potential temperature
+  csRef<csField3<float> >         m_arfCondWaterMixingRatios[2];        // qc
+  csRef<csField3<float> >         m_arfWaterVaporMixingRatios[2];       // qv
+  csRef<csField3<csVector3> >     m_arvForceField;
+  csRef<csField3<float> >         m_arfVelDivergence;
+  csRef<csField3<float> >         m_arfPressureField[2];                // p
   /**
   Velocity is defined at the boundaries of each cell. Half-way index
   notation is used in consequence. These fields are of size N + 1
   */
-  csRef<csField3<csVector3>>   m_arvVelocityField[2];                  // u
+  csRef<csField3<csVector3> >   m_arvVelocityField[2];                  // u
 
   //This rotation-field is defined at Cell-Centers!
-  csRef<csField3<csVector3>>   m_arvRotVelField;                       // rot(u)
+  csRef<csField3<csVector3> >   m_arvRotVelField;                       // rot(u)
 
   float                       m_fTimeStep;
   float                       m_fTimePassed;
@@ -229,8 +229,8 @@ private:
 
   //Implements the straightforward jacobi solver
   //O(n^3)
-  void JacobiSolver(csRef<csField3<float>> rNew, const csRef<csField3<float>>& rOld, 
-                    const csRef<csField3<float>>& rBField, const float fAlpha, const float fInvBeta);
+  void JacobiSolver(csRef<csField3<float> > rNew, const csRef<csField3<float> >& rOld, 
+                    const csRef<csField3<float> >& rBField, const float fAlpha, const float fInvBeta);
 
   //Updates qc and qv and T
   //O(n^3)
@@ -368,7 +368,7 @@ public:
   const bool DoComputation(const UINT iIterationsCount, const float fTime = 0.f);
 
   //Returns the simulation output!
-  inline const csRef<csField3<float>>& GetCondWaterMixingRatios() const
+  inline const csRef<csField3<float> >& GetCondWaterMixingRatios() const
   {
     /**
     Always when an entire timestep was done, the acutal-index becomes the last-index
