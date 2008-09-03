@@ -98,7 +98,7 @@ UnitTest crystalspace : $(CSLIB.TESTS) ;
 CFlags crystalspace : [ FDefines CS_CRYSTALSPACE_LIB ] ;
 MsvcDefine crystalspace :
   CS_CRYSTALSPACE_LIB 
-  "CS_COMPILER_NAME_AND_VERSION=\"VC_$(MSVC_VERSION)\"" 
+  "CS_COMPILER_NAME_AND_VERSION=&quot;VC_$(MSVC_VERSION)&quot;" 
   $(CSLIB.MSVC_DEFINES) ;
 if $(CSLIB.CFLAGS)
 {
