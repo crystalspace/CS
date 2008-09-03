@@ -87,8 +87,8 @@ public:
    */
   bool DeleteAll (const K& key)
   {
-    csArray<T> values = csHash::GetAll (key);
-    bool ret = csHash::DeleteAll (key);
+    csArray<T> values = csHash<T,K>::GetAll (key);
+    bool ret = csHash<T,K>::DeleteAll (key);
     for(size_t i=0; i<values.GetSize (); i++)
     {
       ret &= reverse.Delete (values[i], key);
@@ -99,7 +99,7 @@ public:
   /// Delete all the elements.
   void DeleteAll ()
   {
-    csHash::DeleteAll ();
+    csHash<T,K>::DeleteAll ();
     reverse.DeleteAll ();
   }
 
