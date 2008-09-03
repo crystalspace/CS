@@ -45,11 +45,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
 SCF_IMPLEMENT_FACTORY(RMShadowedPSSM)
 
 
-template<typename RenderTreeType, typename LayerConfigType>
+template<typename RenderTreeType, typename LayerConfigType, bool doShadow>
 class StandardContextSetup
 {
 public:
-  typedef StandardContextSetup<RenderTreeType, LayerConfigType> ThisType;
+  typedef StandardContextSetup<RenderTreeType, LayerConfigType, doShadow> ThisType;
   typedef StandardPortalSetup<RenderTreeType, ThisType> PortalSetupType;
 
   StandardContextSetup (RMShadowedPSSM* rmanager, const LayerConfigType& layerConfig)
@@ -57,6 +57,17 @@ public:
     recurseCount (0)
   {
 
+  }
+  StandardContextSetup (const StandardContextSetup& other)
+    : rmanager (other.rmanager), layerConfig (other.layerConfig),
+      recurseCount (other.recurseCount)
+  {
+  }
+  template<typename T2>
+  StandardContextSetup (const T2& other)
+    : rmanager (other.rmanager), layerConfig (other.layerConfig),
+      recurseCount (other.recurseCount)
+  {
   }
 
   void operator() (typename RenderTreeType::ContextNode& context,
@@ -89,7 +100,7 @@ public:
     // Set up all portals
     {
       recurseCount++;
-      PortalSetupType portalSetup (rmanager->portalPersistent, *this);      
+      PortalSetupType portalSetup (rmanager->portalPersistent, *this);
       portalSetup (context, portalSetupData);
       recurseCount--;
     }
@@ -132,15 +143,64 @@ public:
     SetupStandardTicket (context, shaderManager,
       lightSetup.GetPostLightingLayers());
   
+    switch (rmanager->refrRefrShadows)
     {
-      RMShadowedPSSM::AutoReflectRefractType fxRR (
-        rmanager->reflectRefractPersistent, *this);
-      typedef TraverseUsedSVSets<RenderTreeType,
-        RMShadowedPSSM::AutoReflectRefractType> SVTraverseType;
-      SVTraverseType svTraverser
-        (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
-      // And do the iteration
-      ForEachMeshNode (context, svTraverser);
+      case 0:
+	{
+	  RMShadowedPSSM::ContextSetupType_Unshadowed ctxRefl (*this);
+	  RMShadowedPSSM::ContextSetupType_Unshadowed ctxRefr (*this);
+	  RMShadowedPSSM::AutoReflectRefractType_UU fxRR (
+	    rmanager->reflectRefractPersistent, ctxRefl, ctxRefr);
+	  typedef TraverseUsedSVSets<RenderTreeType,
+	    RMShadowedPSSM::AutoReflectRefractType_UU> SVTraverseType;
+	  SVTraverseType svTraverser
+	    (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+	  // And do the iteration
+	  ForEachMeshNode (context, svTraverser);
+	}
+        break;
+      case RMShadowedPSSM::rrShadowReflect:
+	{
+	  RMShadowedPSSM::ContextSetupType ctxRefl (*this);
+	  RMShadowedPSSM::ContextSetupType_Unshadowed ctxRefr (*this);
+	  RMShadowedPSSM::AutoReflectRefractType_SU fxRR (
+	    rmanager->reflectRefractPersistent, ctxRefl, ctxRefr);
+	  typedef TraverseUsedSVSets<RenderTreeType,
+	    RMShadowedPSSM::AutoReflectRefractType_SU> SVTraverseType;
+	  SVTraverseType svTraverser
+	    (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+	  // And do the iteration
+	  ForEachMeshNode (context, svTraverser);
+	}
+        break;
+      case RMShadowedPSSM::rrShadowRefract:
+	{
+	  RMShadowedPSSM::ContextSetupType_Unshadowed ctxRefl (*this);
+	  RMShadowedPSSM::ContextSetupType ctxRefr (*this);
+	  RMShadowedPSSM::AutoReflectRefractType_US fxRR (
+	    rmanager->reflectRefractPersistent, ctxRefl, ctxRefr);
+	  typedef TraverseUsedSVSets<RenderTreeType,
+	    RMShadowedPSSM::AutoReflectRefractType_US> SVTraverseType;
+	  SVTraverseType svTraverser
+	    (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+	  // And do the iteration
+	  ForEachMeshNode (context, svTraverser);
+	}
+        break;
+      case RMShadowedPSSM::rrShadowReflect | RMShadowedPSSM::rrShadowRefract:
+	{
+	  RMShadowedPSSM::ContextSetupType ctxRefl (*this);
+	  RMShadowedPSSM::ContextSetupType ctxRefr (*this);
+	  RMShadowedPSSM::AutoReflectRefractType_SS fxRR (
+	    rmanager->reflectRefractPersistent, ctxRefl, ctxRefr);
+	  typedef TraverseUsedSVSets<RenderTreeType,
+	    RMShadowedPSSM::AutoReflectRefractType_SS> SVTraverseType;
+	  SVTraverseType svTraverser
+	    (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+	  // And do the iteration
+	  ForEachMeshNode (context, svTraverser);
+	}
+        break;
     }
   }
 
@@ -153,7 +213,7 @@ public:
     operator() (context, portalData);
   }
 
-private:
+public:
   RMShadowedPSSM* rmanager;
   const LayerConfigType& layerConfig;
   int recurseCount;
@@ -359,6 +419,12 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   lightPersistent.Initialize (objectReg, treePersistent.debugPersist);
   reflectRefractPersistent.Initialize (objectReg, treePersistent.debugPersist,
     &postEffects);
+    
+  refrRefrShadows = 0;
+  if (cfg->GetBool ("RenderManager.ShadowPSSM.ShadowsInReflections", true))
+    refrRefrShadows |= rrShadowReflect;
+  if (cfg->GetBool ("RenderManager.ShadowPSSM.ShadowsInRefractions", true))
+    refrRefrShadows |= rrShadowRefract;
   
   return true;
 }

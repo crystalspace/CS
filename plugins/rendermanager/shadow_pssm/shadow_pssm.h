@@ -29,7 +29,7 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
 {
-  template<typename RenderTreeType, typename LayerConfigType>
+  template<typename RenderTreeType, typename LayerConfigType, bool doShadow>
   class StandardContextSetup;
   
   class RenderTreeTraits : public CS::RenderManager::RenderTreeStandardTraits
@@ -90,7 +90,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
     }
     
     typedef StandardContextSetup<RenderTreeType, 
-      CS::RenderManager::MultipleRenderLayer> ContextSetupType;
+      CS::RenderManager::MultipleRenderLayer, true> ContextSetupType;
+    typedef StandardContextSetup<RenderTreeType, 
+      CS::RenderManager::MultipleRenderLayer, false> ContextSetupType_Unshadowed;
 
     typedef CS::RenderManager::StandardPortalSetup<RenderTreeType, 
       ContextSetupType> PortalSetupType;
@@ -103,9 +105,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
     typedef CS::RenderManager::LightSetup<RenderTreeType, 
       CS::RenderManager::MultipleRenderLayer,
       ShadowType> LightSetupType;
+    typedef CS::RenderManager::LightSetup<RenderTreeType, 
+      CS::RenderManager::MultipleRenderLayer> LightSetupType_Unshadowed;
 
     typedef CS::RenderManager::AutoFX_ReflectRefract<RenderTreeType, 
-      ContextSetupType> AutoReflectRefractType;
+      ContextSetupType, ContextSetupType> AutoReflectRefractType_SS;
+    typedef CS::RenderManager::AutoFX_ReflectRefract<RenderTreeType, 
+      ContextSetupType_Unshadowed, ContextSetupType> AutoReflectRefractType_US;
+    typedef CS::RenderManager::AutoFX_ReflectRefract<RenderTreeType, 
+      ContextSetupType, ContextSetupType_Unshadowed> AutoReflectRefractType_SU;
+    typedef CS::RenderManager::AutoFX_ReflectRefract<RenderTreeType, 
+      ContextSetupType_Unshadowed, ContextSetupType_Unshadowed>
+      AutoReflectRefractType_UU;
 
   public:
     iObjectRegistry* objectReg;
@@ -116,7 +127,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
     RenderTreeType::PersistentData treePersistent;
     PortalSetupType::PersistentData portalPersistent;
     LightSetupType::PersistentData lightPersistent;
-    AutoReflectRefractType::PersistentData reflectRefractPersistent;
+    CS::RenderManager::AutoFX_ReflectRefract_Base::PersistentData
+      reflectRefractPersistent;
 
     CS::RenderManager::PostEffectManager       postEffects;
     CS::RenderManager::HDRHelper hdr;
@@ -134,6 +146,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
     TargetManagerType targets;
     csSet<RenderTreeType::ContextNode*> contextsScannedForTargets;
     
+    enum { rrShadowReflect = 1, rrShadowRefract = 2 };
+    int refrRefrShadows;
     uint dbgFlagClipPlanes;
   };  
 
