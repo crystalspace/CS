@@ -22,11 +22,13 @@
     <pass>
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 
+      <mixmode>
+	<blendop src="zero" dst="zero" />
+	<alphatest>disable</alphatest>
+      </mixmode>
+
       <snippet id="position" file="/shader/snippets/position.xml" />
-      <snippet id="surface" file="/shader/snippets/surface/surface-classic.xml" />
       <snippet id="shadowfrag" file="/shader/snippets/shadow/fragment-depth.xml" />
-      
-      <connection from="surface" to="shadowfrag" />
     </pass>
   </technique>
   
