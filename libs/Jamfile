@@ -107,7 +107,7 @@ if $(CSLIB.CFLAGS)
 if [ Property build : projgen ] != msvc
 {
   CFlags crystalspace :
-    [ FDefines "CS_COMPILER_NAME_AND_VERSION=$(CS_COMPILER_NAME_AND_VERSION)" ] ;
+    [ FDefines "CS_COMPILER_NAME_AND_VERSION=\"$(CS_COMPILER_NAME_AND_VERSION)\"" ] ;
 }
 if $(CSLIB.DEPENDS)
 {
