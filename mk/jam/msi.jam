@@ -95,6 +95,7 @@ rule MSIPackage
   Clean mergemodulesclean : $(mod_obj) ;
   
   Depends $(target) : $(mod_obj) ;
+  LIGHTFLAGS.EXTRA on $(target) = -cc $(LOCATE.MSI.TEMP)/cabinets -reusecab ;
   LinkWIXOBJ $(target) : $(mod_obj) ;
   Clean msiclean : $(target) ;
   
@@ -117,5 +118,5 @@ actions CompileWXS
 
 actions LinkWIXOBJ
 {
-  light $(WIX_FLAGS) $(LIGHTFLAGS) $(>) -out $(<)
+  light $(WIX_FLAGS) $(LIGHTFLAGS) $(LIGHTFLAGS.EXTRA) $(>) -out $(<)
 }
