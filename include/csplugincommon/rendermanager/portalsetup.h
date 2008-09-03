@@ -35,55 +35,13 @@ namespace CS
 namespace RenderManager
 {
   /**
-   * Standard setup functor for portals.
-   * Iterates over all portals in a context and sets up new contexts to
-   * render the part of the scene "behind" the portal. Depending on the
-   * settings of a portal, it is either rendered to the same target as the
-   * context or a new texture (in which case the original context is
-   * augmented with a mesh rendering that texture).
-   *
-   * Usage: instiate. Application after the visible meshes were determined,
-   * but before mesh sorting.
-   * Example:
-   * \code
-   *  // Type for portal setup
-   *  typedef CS::RenderManager::StandardPortalSetup<RenderTreeType,
-   *    ContextSetupType> PortalSetupType;
-   *
-   * // Assumes there is an argument 'PortalSetupType::ContextSetupData& portalSetupData'
-   * // to the current method, taking data from the previous portal (if any)
-   *
-   * // Keep track of the portal recursions to avoid infinite portal recursions
-   * if (recurseCount > 30) return;
-   *
-   * // Set up all portals
-   * {
-   *   recurseCount++;
-   *   // Data needed to be passed between portal setup steps
-   *   PortalSetupType portalSetup (rmanager->portalPersistent, *this);
-   *   // Actual setup
-   *   portalSetup (context, portalSetupData);
-   *   recurseCount--;
-   * }
-   * \endcode
-   *
-   * The template parameter \a RenderTree gives the render tree type.
-   * The parameter \a ContextSetup gives a class used to set up the contexts
-   * for the rendering of the scene behind a portal. It must provide an
-   * implementation of operator() (RenderTree::ContextNode& context,
-   *   PortalSetupType::ContextSetupData& portalSetupData).
-   *
-   * \par Internal workings
-   * The standard setup will classify portals into simple and heavy portals
-   * respectively where simple portals can be rendered directly without clipping
-   * while heavy portals requires render-to-texture.
+   * Base class for StandardPortalSetup, containing types and
+   * members which are independent of the template arguments that can be
+   * provided to StandardPortalSetup.
    */
-  template<typename RenderTreeType, typename ContextSetup>
-  class StandardPortalSetup
+  class StandardPortalSetup_Base
   {
   public:
-    typedef StandardPortalSetup<RenderTreeType, ContextSetup> ThisType;
-
     /**
       * Data used by the helper that needs to persist over multiple frames.
       * Render managers must store an instance of this class and provide
@@ -235,6 +193,63 @@ namespace RenderManager
         boxClipperCache.AdvanceTime (time);
       }
     };
+  
+    StandardPortalSetup_Base (PersistentData& persistentData)
+      : persistentData (persistentData)
+    {}
+  protected:
+    PersistentData& persistentData;
+  };
+
+  /**
+   * Standard setup functor for portals.
+   * Iterates over all portals in a context and sets up new contexts to
+   * render the part of the scene "behind" the portal. Depending on the
+   * settings of a portal, it is either rendered to the same target as the
+   * context or a new texture (in which case the original context is
+   * augmented with a mesh rendering that texture).
+   *
+   * Usage: instiate. Application after the visible meshes were determined,
+   * but before mesh sorting.
+   * Example:
+   * \code
+   *  // Type for portal setup
+   *  typedef CS::RenderManager::StandardPortalSetup<RenderTreeType,
+   *    ContextSetupType> PortalSetupType;
+   *
+   * // Assumes there is an argument 'PortalSetupType::ContextSetupData& portalSetupData'
+   * // to the current method, taking data from the previous portal (if any)
+   *
+   * // Keep track of the portal recursions to avoid infinite portal recursions
+   * if (recurseCount > 30) return;
+   *
+   * // Set up all portals
+   * {
+   *   recurseCount++;
+   *   // Data needed to be passed between portal setup steps
+   *   PortalSetupType portalSetup (rmanager->portalPersistent, *this);
+   *   // Actual setup
+   *   portalSetup (context, portalSetupData);
+   *   recurseCount--;
+   * }
+   * \endcode
+   *
+   * The template parameter \a RenderTree gives the render tree type.
+   * The parameter \a ContextSetup gives a class used to set up the contexts
+   * for the rendering of the scene behind a portal. It must provide an
+   * implementation of operator() (RenderTree::ContextNode& context,
+   *   PortalSetupType::ContextSetupData& portalSetupData).
+   *
+   * \par Internal workings
+   * The standard setup will classify portals into simple and heavy portals
+   * respectively where simple portals can be rendered directly without clipping
+   * while heavy portals requires render-to-texture.
+   */
+  template<typename RenderTreeType, typename ContextSetup>
+  class StandardPortalSetup : public StandardPortalSetup_Base
+  {
+  public:
+    typedef StandardPortalSetup<RenderTreeType, ContextSetup> ThisType;
 
     /**
      * Data that needs to be passed between portal setup steps by the
@@ -252,7 +267,7 @@ namespace RenderManager
 
     /// Constructor.
     StandardPortalSetup (PersistentData& persistentData, ContextSetup& cfun)
-      : persistentData (persistentData), contextFunction (cfun)
+      : StandardPortalSetup_Base (persistentData), contextFunction (cfun)
     {}
 
     /**
@@ -322,7 +337,6 @@ namespace RenderManager
     }
 
   private:
-    PersistentData& persistentData;
     ContextSetup& contextFunction;
 
     bool IsSimplePortal (const csFlags& portalFlags)
