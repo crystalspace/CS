@@ -30,13 +30,13 @@ const bool csCloudsRenderer::RenderOLV(const csRef<csField3<float> >& rCondWater
   m_pQcTexture.AttachNew(new csImageVolumeMaker);
   unsigned long* pdwBuffer = new unsigned long[rCondWaterMixingRatios->GetSizeX() * rCondWaterMixingRatios->GetSizeY()];
   //Now add slice per slice
-  for(UINT z = 0; z < rCondWaterMixingRatios->GetSizeZ(); ++z)
+  for(uint z = 0; z < rCondWaterMixingRatios->GetSizeZ(); ++z)
   {
     //convert mixing ratios into a color and save it into a buffer
-    UINT iIndex = 0;
-    for(UINT x = 0; x < rCondWaterMixingRatios->GetSizeX(); ++x)
+    uint iIndex = 0;
+    for(uint x = 0; x < rCondWaterMixingRatios->GetSizeX(); ++x)
     {
-      for(UINT y = 0; y < rCondWaterMixingRatios->GetSizeY(); ++y)
+      for(uint y = 0; y < rCondWaterMixingRatios->GetSizeY(); ++y)
       {
         const float fValue = rCondWaterMixingRatios->GetValue(x, y, z);
         const unsigned char ucA = static_cast<unsigned char>(fValue < 0.f ? 0.f : fValue > 1.f ? 1.f : fValue * 255.f);
@@ -89,7 +89,7 @@ const bool csCloudsRenderer::RenderOLV(const csRef<csField3<float> >& rCondWater
   csVector3 vBBMin;
   csVector3 vBBMax;
   csVector3 avTransBox[8];
-  for(UINT i = 0; i < 8; ++i)
+  for(uint i = 0; i < 8; ++i)
   {
     avTransBox[i] = m_mInvOLVRotation * avQcBox[i];
     //Searching for transformed OBB

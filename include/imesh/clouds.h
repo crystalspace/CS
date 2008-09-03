@@ -41,16 +41,16 @@ struct iField2 : public virtual iBase
 
   /**
   */
-  virtual void SetSize(const UINT iSizeX, const UINT iSizeY) = 0;
-  virtual const UINT GetSizeX() const = 0;
-  virtual const UINT GetSizeY() const = 0;
+  virtual void SetSize(const uint iSizeX, const uint iSizeY) = 0;
+  virtual const uint GetSizeX() const = 0;
+  virtual const uint GetSizeY() const = 0;
 
   /**
   Accses operator and method. Returns the value of the scalarfield
   at position P = (x, y)
   */
-  virtual const float operator () (const UINT x, const UINT y) const = 0;
-  virtual const float GetValue(const UINT x, const UINT y) const = 0;
+  virtual const float operator () (const uint x, const uint y) const = 0;
+  virtual const float GetValue(const uint x, const uint y) const = 0;
 };
 
 //--------------------------------------------------------------------------------------------//
@@ -77,13 +77,13 @@ struct iClouds : public virtual iBase
   there is passed a limit for the iterations to be done. This limit can be set here.
   */
   virtual inline void SetTimeScaleFactor(const float f) = 0;
-  virtual inline void SetSkippingFrameCount(const UINT i) = 0;                //Tuning parameter
-  virtual inline void SetIterationLimitPerInvocation(const UINT i) = 0;       //Tuning parameter
+  virtual inline void SetSkippingFrameCount(const uint i) = 0;                //Tuning parameter
+  virtual inline void SetIterationLimitPerInvocation(const uint i) = 0;       //Tuning parameter
 
   /**
   All of following Setters refer to the iCloudsDynamics instance.
   */
-  virtual inline const bool SetGridSize(const UINT x, const UINT y, const UINT z) = 0;
+  virtual inline const bool SetGridSize(const uint x, const uint y, const uint z) = 0;
   virtual inline void SetGridScale(const float dx) = 0;
   virtual inline void SetCondensedWaterScaleFactor(const float fqc) = 0;
   virtual inline void SetGravityAcceleration(const csVector3& vG) = 0;
@@ -111,9 +111,9 @@ struct iClouds : public virtual iBase
   virtual inline void SetLightDirection(const csVector3& vLightDir) = 0;
   virtual inline void SetImpostorValidityAngle(const float fAngle) = 0;
   //Getter of iCloudsRenderer
-  virtual inline const UINT GetOLVSliceCount() const = 0;
-  virtual inline const UINT GetOLVWidth() const = 0;
-  virtual inline const UINT GetOLVHeight() const = 0;
+  virtual inline const uint GetOLVSliceCount() const = 0;
+  virtual inline const uint GetOLVWidth() const = 0;
+  virtual inline const uint GetOLVHeight() const = 0;
   virtual inline const CS::Math::Matrix4 GetOLVProjectionMatrix() const = 0;
   virtual inline const csOrthoTransform GetOLVCameraMatrix() const = 0;
   virtual inline iTextureHandle* GetOLVTexture() const = 0;
@@ -133,9 +133,9 @@ struct iCloudsRenderer : public virtual iBase
   /**
   Some usful getter
   */
-  virtual inline const UINT GetOLVSliceCount() const = 0;
-  virtual inline const UINT GetOLVWidth() const = 0;
-  virtual inline const UINT GetOLVHeight() const = 0;
+  virtual inline const uint GetOLVSliceCount() const = 0;
+  virtual inline const uint GetOLVWidth() const = 0;
+  virtual inline const uint GetOLVHeight() const = 0;
   virtual inline const CS::Math::Matrix4 GetOLVProjectionMatrix() const = 0;
   virtual inline const csOrthoTransform GetOLVCameraMatrix() const = 0;
   virtual inline iTextureHandle* GetOLVTexture() const = 0;
@@ -164,7 +164,7 @@ struct iCloudsDynamics : public virtual iBase
   This is the most importand initialisation method. It defines the dimensions
   of the entire grid. The standard after constructor was called is 10x10x10
   */
-  virtual inline const bool SetGridSize(const UINT x, const UINT y, const UINT z) = 0;
+  virtual inline const bool SetGridSize(const uint x, const uint y, const uint z) = 0;
 
   /**
   Following methods are used to configure the entire dynamics simulation
@@ -208,15 +208,15 @@ struct iCloudSystem : public virtual iBase
   /**
   Some getter which provide various information about the field
   */
-  virtual inline const UINT GetCloudCount() const = 0;
-  virtual inline iClouds* GetCloud(const UINT i) const = 0;
+  virtual inline const uint GetCloudCount() const = 0;
+  virtual inline iClouds* GetCloud(const uint i) const = 0;
 
   /**
   Add and remove clouds from the field
   */
   virtual iClouds* AddCloud() = 0;
   virtual const bool RemoveCloud(iClouds* pCloud) = 0;
-  virtual const bool RemoveCloud(const UINT iIndex) = 0;
+  virtual const bool RemoveCloud(const uint iIndex) = 0;
   virtual inline const bool RemoveAllClouds() = 0;
 };
 

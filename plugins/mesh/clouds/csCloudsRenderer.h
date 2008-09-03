@@ -46,9 +46,9 @@ private:
   bool                          m_bNewOLVTexture;
   csRef<csImageVolumeMaker>     m_pQcTexture;
   //OLV texture
-  UINT                          m_iOLVTexWidth;
-  UINT                          m_iOLVTexHeight;
-  UINT                          m_iOLVTexDepth;
+  uint                          m_iOLVTexWidth;
+  uint                          m_iOLVTexHeight;
+  uint                          m_iOLVTexDepth;
   csRef<iTextureHandle>         m_pOLVTexture;
 
   //OLV coord system
@@ -142,9 +142,9 @@ public:
   inline void SetObjectRegistry(iObjectRegistry* pObjectReg) {m_pObjectRegistry = pObjectReg;}
 
   //Getter
-  virtual inline const UINT GetOLVSliceCount() const {return m_iOLVTexDepth;}
-  virtual inline const UINT GetOLVWidth() const {return m_iOLVTexWidth;}
-  virtual inline const UINT GetOLVHeight() const {return m_iOLVTexHeight;}
+  virtual inline const uint GetOLVSliceCount() const {return m_iOLVTexDepth;}
+  virtual inline const uint GetOLVWidth() const {return m_iOLVTexWidth;}
+  virtual inline const uint GetOLVHeight() const {return m_iOLVTexHeight;}
   virtual inline const CS::Math::Matrix4 GetOLVProjectionMatrix() const {return m_mOLVProjectionMatrix;}
   virtual inline const csOrthoTransform GetOLVCameraMatrix() const {return m_mOLVCameraMatrix;}
   virtual inline iTextureHandle* GetOLVTexture() const {return m_pOLVTexture;}

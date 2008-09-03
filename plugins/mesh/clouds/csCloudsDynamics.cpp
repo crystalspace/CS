@@ -23,7 +23,7 @@ SCF_IMPLEMENT_FACTORY(csCloudsDynamics)
 
 //----------------------------------------------------------//
 
-const bool csCloudsDynamics::SetGridSize(const UINT x, const UINT y, const UINT z)
+const bool csCloudsDynamics::SetGridSize(const uint x, const uint y, const uint z)
 {
   if(x <= 1 || y <= 1 || z <= 1) return false;
   //Free already reserved fields
@@ -67,11 +67,11 @@ const bool csCloudsDynamics::SetGridSize(const UINT x, const UINT y, const UINT 
   m_iCurrentStep	= 0;
 
   //Fill fields with initial values
-  for(UINT x = 0; x < m_iGridSizeX + 1; ++x)
+  for(uint x = 0; x < m_iGridSizeX + 1; ++x)
   {
-    for(UINT y = 0; y < m_iGridSizeY + 1; ++y)
+    for(uint y = 0; y < m_iGridSizeY + 1; ++y)
     {
-      for(UINT z = 0; z < m_iGridSizeZ + 1; ++z)
+      for(uint z = 0; z < m_iGridSizeZ + 1; ++z)
       {
         if(x < m_iGridSizeX && y < m_iGridSizeY && z < m_iGridSizeZ)
         {
@@ -98,7 +98,7 @@ const bool csCloudsDynamics::SetGridSize(const UINT x, const UINT y, const UINT 
 
 //----------------------------------------------------------//
 
-const csVector3 csCloudsDynamics::ComputeBuoyantForce(const UINT x, const UINT y, const UINT z)
+const csVector3 csCloudsDynamics::ComputeBuoyantForce(const uint x, const uint y, const uint z)
 {
   const float fVirtPotTemp = (1.f + 0.61f * m_arfWaterVaporMixingRatios[m_iActualIndex]->GetValue(x, y, z)) * 
                               m_arfPotTemperature[m_iActualIndex]->GetValue(x, y, z);
@@ -108,7 +108,7 @@ const csVector3 csCloudsDynamics::ComputeBuoyantForce(const UINT x, const UINT y
 
 //----------------------------------------------------------//
 
-const csVector3 csCloudsDynamics::ComputeVorticityConfinement(const UINT x, const UINT y, const UINT z)
+const csVector3 csCloudsDynamics::ComputeVorticityConfinement(const uint x, const uint y, const uint z)
 {
   const csVector3 vRotu = m_arvRotVelField->GetValue(x, y, z);
   csVector3 vEta = CalcGradient(m_arvRotVelField, x, y, z, m_fGridScale);
@@ -127,11 +127,11 @@ void csCloudsDynamics::AdvectAllQuantities()
   NOTE: The boundaries of the velocity field aren't advected, because later on,
   they will be overwritten to satisfy boundary-conditions
   */
-  for(UINT x = 0; x < m_iGridSizeX; ++x)
+  for(uint x = 0; x < m_iGridSizeX; ++x)
   {
-    for(UINT y = 0; y < m_iGridSizeY; ++y)
+    for(uint y = 0; y < m_iGridSizeY; ++y)
     {
-      for(UINT z = 0; z < m_iGridSizeZ; ++z)
+      for(uint z = 0; z < m_iGridSizeZ; ++z)
       {
         if(m_bRestore) RestoreState(&x, &y, &z);
         if(LimitReached()) {SaveState(x, y, z); return;}
@@ -158,11 +158,11 @@ void csCloudsDynamics::AddAcceleratingForces()
 {
   //This loops handle only the interior of the grid.
   //Boundaries are treated seperatly
-  for(UINT x = 1; x < m_iGridSizeX; ++x)
+  for(uint x = 1; x < m_iGridSizeX; ++x)
   {
-    for(UINT y = 1; y < m_iGridSizeY; ++y)
+    for(uint y = 1; y < m_iGridSizeY; ++y)
     {
-      for(UINT z = 1; z < m_iGridSizeZ; ++z)
+      for(uint z = 1; z < m_iGridSizeZ; ++z)
       {
         if(m_bRestore) RestoreState(&x, &y, &z);
         if(LimitReached()) {SaveState(x, y, z); return;}
@@ -184,18 +184,18 @@ void csCloudsDynamics::SatisfyVelocityBoundaryCond()
   //sides: user-defined windspeeds --> all eight corners are going to be overwritten by
   //userdefined windspeeds
   //xy-plane, z = 0 && z = MAX
-  for(UINT x = 0; x <= m_iGridSizeX; ++x)
+  for(uint x = 0; x <= m_iGridSizeX; ++x)
   {
-    for(UINT y = 0; y <= m_iGridSizeY; ++y)
+    for(uint y = 0; y <= m_iGridSizeY; ++y)
     {
       m_arvVelocityField[m_iActualIndex]->SetValue(m_vWindSpeed, x, y, 0);
       m_arvVelocityField[m_iActualIndex]->SetValue(m_vWindSpeed, x, y, m_iGridSizeZ);
     }
   }
   //yz-Plane, x = 0 && x = MAX
-  for(UINT y = 0; y <= m_iGridSizeY; ++y)
+  for(uint y = 0; y <= m_iGridSizeY; ++y)
   {
-    for(UINT z = 0; z <= m_iGridSizeZ; ++z)
+    for(uint z = 0; z <= m_iGridSizeZ; ++z)
     {
       m_arvVelocityField[m_iActualIndex]->SetValue(m_vWindSpeed, 0, y, z);
       m_arvVelocityField[m_iActualIndex]->SetValue(m_vWindSpeed, m_iGridSizeX, y, z);
@@ -204,9 +204,9 @@ void csCloudsDynamics::SatisfyVelocityBoundaryCond()
 
   //Bottom: no-slip (xz plane, y = 0)
   //Top: free-slip (xz plane, y = MAX)
-  for(UINT x = 1; x < m_iGridSizeX; ++x)
+  for(uint x = 1; x < m_iGridSizeX; ++x)
   {
-    for(UINT z = 1; z < m_iGridSizeZ; ++z)
+    for(uint z = 1; z < m_iGridSizeZ; ++z)
     {
       //Bottom
       const csVector3 vCurr	= m_arvVelocityField[m_iActualIndex]->GetValue(x, 0, z);
@@ -231,12 +231,12 @@ void csCloudsDynamics::SatisfyVelocityBoundaryCond()
 void csCloudsDynamics::UpdateMixingRatiosAndPotentialTemp()
 {
   //Only the innercells are updated! All boudaries are set later
-  for(UINT x = 1; x < m_iGridSizeX - 1; ++x)
+  for(uint x = 1; x < m_iGridSizeX - 1; ++x)
   {
-    for(UINT y = 1; y < m_iGridSizeY - 1; ++y)
+    for(uint y = 1; y < m_iGridSizeY - 1; ++y)
     {
       float fHeight = y * m_fGridScale + m_fBaseAltitude;
-      for(UINT z = 1; z < m_iGridSizeZ - 1; ++z)
+      for(uint z = 1; z < m_iGridSizeZ - 1; ++z)
       {
         if(m_bRestore)
         {
@@ -278,9 +278,9 @@ potT.Top/Sides = Userspecific ambient temperature, potT.Bottom = userInputfield
 void csCloudsDynamics::SatisfyScalarBoundaryCond()
 {
   //Front-Back: xy planes, z = 0 && z = MAX
-  for(UINT x = 0; x < m_iGridSizeX; ++x)
+  for(uint x = 0; x < m_iGridSizeX; ++x)
   {
-    for(UINT y = 0; y < m_iGridSizeY; ++y)
+    for(uint y = 0; y < m_iGridSizeY; ++y)
     {
       m_arfCondWaterMixingRatios[m_iActualIndex]->SetValue(0.f, x, y, m_iGridSizeZ - 1);
       m_arfCondWaterMixingRatios[m_iActualIndex]->SetValue(0.f, x, y, 0);
@@ -295,9 +295,9 @@ void csCloudsDynamics::SatisfyScalarBoundaryCond()
   }
 
   //Left-Right: yz-Plane, x = 0 && x = MAX
-  for(UINT y = 0; y < m_iGridSizeY; ++y)
+  for(uint y = 0; y < m_iGridSizeY; ++y)
   {
-    for(UINT z = 0; z < m_iGridSizeZ; ++z)
+    for(uint z = 0; z < m_iGridSizeZ; ++z)
     {
       m_arfCondWaterMixingRatios[m_iActualIndex]->SetValue(0.f, m_iGridSizeX - 1, y, z);
       m_arfCondWaterMixingRatios[m_iActualIndex]->SetValue(0.f, 0, y, z);
@@ -312,9 +312,9 @@ void csCloudsDynamics::SatisfyScalarBoundaryCond()
   }
 
   //Bottom-Top: xz plane, y = 0 && y = MAX
-  for(UINT x = 1; x < m_iGridSizeX - 1; ++x)
+  for(uint x = 1; x < m_iGridSizeX - 1; ++x)
   {
-    for(UINT z = 1; z < m_iGridSizeZ - 1; ++z)
+    for(uint z = 1; z < m_iGridSizeZ - 1; ++z)
     {
       m_arfCondWaterMixingRatios[m_iActualIndex]->SetValue(0.f, x, m_iGridSizeY - 1, z);
       m_arfCondWaterMixingRatios[m_iActualIndex]->SetValue(0.f, x, 0, z);
@@ -336,7 +336,7 @@ void csCloudsDynamics::SatisfyScalarBoundaryCond()
 After this method was invoked, the best approximation to the solution
 is found in m_arfPressureField[m_iNewPressureField]
 */
-void csCloudsDynamics::SolvePoissonPressureEquation(const UINT k)
+void csCloudsDynamics::SolvePoissonPressureEquation(const uint k)
 {
   static const float s_fInvBeta = 1.f / 6.f;
   const float fGridScale2 = m_fGridScale * m_fGridScale;
@@ -355,11 +355,11 @@ void csCloudsDynamics::SolvePoissonPressureEquation(const UINT k)
 void csCloudsDynamics::JacobiSolver(csRef<csField3<float> > rNew, const csRef<csField3<float> >& rOld, 
                                     const csRef<csField3<float> >& rBField, const float fAlpha, const float fInvBeta)
 {
-  for(UINT x = 0; x < rNew->GetSizeX(); ++x)
+  for(uint x = 0; x < rNew->GetSizeX(); ++x)
   {
-    for(UINT y = 0; y < rNew->GetSizeY(); ++y)
+    for(uint y = 0; y < rNew->GetSizeY(); ++y)
     {
-      for(UINT z = 0; z < rNew->GetSizeZ(); ++z)
+      for(uint z = 0; z < rNew->GetSizeZ(); ++z)
       {
         if(m_bRestore) RestoreState(&x, &y, &z);
         if(LimitReached()) {SaveState(x, y, z); return;}
@@ -379,11 +379,11 @@ void csCloudsDynamics::JacobiSolver(csRef<csField3<float> > rNew, const csRef<cs
 void csCloudsDynamics::MakeVelocityFieldDivergenceFree()
 {
   //Only the innercells are updated! All boudaries are set seperatly!
-  for(UINT x = 1; x < m_iGridSizeX; ++x)
+  for(uint x = 1; x < m_iGridSizeX; ++x)
   {
-    for(UINT y = 1; y < m_iGridSizeY; ++y)
+    for(uint y = 1; y < m_iGridSizeY; ++y)
     {
-      for(UINT z = 1; z < m_iGridSizeZ; ++z)
+      for(uint z = 1; z < m_iGridSizeZ; ++z)
       {
         if(m_bRestore) RestoreState(&x, &y, &z);
         if(LimitReached()) {SaveState(x, y, z); return;}
@@ -405,7 +405,7 @@ fTime is taken only if the current simulation step is zero. Means
 only at the beginning of an entire timestep. The value passed there
 is used for the whole timestep!
 */
-const bool csCloudsDynamics::DoComputation(const UINT iIterationsCount, const float fTime)
+const bool csCloudsDynamics::DoComputation(const uint iIterationsCount, const float fTime)
 {
   //preconditions hold? --> initialized?
   //if(m_iGridSizeX <= 0 || m_iGridSizeY <= 0 || m_iGridSizeZ <= 0) return false;

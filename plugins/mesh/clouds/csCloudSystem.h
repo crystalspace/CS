@@ -49,8 +49,8 @@ public:
     return true;
   }
 
-  virtual inline const UINT GetCloudCount() const {return static_cast<UINT>(m_ppClouds.GetSize());}
-  virtual inline iClouds* GetCloud(const UINT i) const {return m_ppClouds.Get(i);}
+  virtual inline const uint GetCloudCount() const {return static_cast<uint>(m_ppClouds.GetSize());}
+  virtual inline iClouds* GetCloud(const uint i) const {return m_ppClouds.Get(i);}
 
   virtual inline iClouds* AddCloud()
   {
@@ -65,7 +65,7 @@ public:
     static_cast<csClouds*>(pCloud)->Exit();
     return m_ppClouds.Delete(pCloud);
   }
-  virtual inline const bool RemoveCloud(const UINT iIndex)
+  virtual inline const bool RemoveCloud(const uint iIndex)
   {
     return RemoveCloud(m_ppClouds.Get(iIndex));
   }

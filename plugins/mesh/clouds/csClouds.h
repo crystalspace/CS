@@ -42,14 +42,14 @@ private:
   csRef<iEventQueue>           m_pEventQueue;
   csRef<iVirtualClock>         m_Clock;
 
-  UINT                         m_iStartTickCount;
-  UINT                         m_iFramesUntilNextStep;
+  uint                         m_iStartTickCount;
+  uint                         m_iFramesUntilNextStep;
   float                        m_fTimeStep;
 
   //Config-Vars
-  UINT                         m_iIterationsPerInvocation;
+  uint                         m_iIterationsPerInvocation;
   float                        m_fTimeScaleFactor;
-  UINT                         m_iSkippingFrameCount;
+  uint                         m_iSkippingFrameCount;
 
 public:
   csClouds(iBase* pParent) 
@@ -97,12 +97,12 @@ public:
   }
 
   //Own setters
-  virtual inline void SetIterationLimitPerInvocation(const UINT i) {m_iIterationsPerInvocation = i;}
+  virtual inline void SetIterationLimitPerInvocation(const uint i) {m_iIterationsPerInvocation = i;}
   virtual inline void SetTimeScaleFactor(const float f) {m_fTimeScaleFactor = fabsf(f);}
-  virtual inline void SetSkippingFrameCount(const UINT i) {m_iSkippingFrameCount = i;}
+  virtual inline void SetSkippingFrameCount(const uint i) {m_iSkippingFrameCount = i;}
 
   //All of following Setters refer to the csCloudsDynamics instance, and are delegated!
-  virtual inline const bool SetGridSize(const UINT x, const UINT y, const UINT z) {return m_Dynamics->SetGridSize(x, y, z);}
+  virtual inline const bool SetGridSize(const uint x, const uint y, const uint z) {return m_Dynamics->SetGridSize(x, y, z);}
   virtual inline void SetGridScale(const float dx) {return m_Dynamics->SetGridScale(dx);}
   virtual inline void SetCondensedWaterScaleFactor(const float fqc) {return m_Dynamics->SetCondensedWaterScaleFactor(fqc);}
   virtual inline void SetGravityAcceleration(const csVector3& vG) {return m_Dynamics->SetGravityAcceleration(vG);}
@@ -123,9 +123,9 @@ public:
   virtual inline void SetWaterVaporBottomInputField(csRef<iField2> Field) {return m_Dynamics->SetWaterVaporBottomInputField(Field);}
 
   //All of following Setters and Getters refer to the csCloudsRenderer instance, and are delegated!
-  virtual inline const UINT GetOLVSliceCount() const {return m_Renderer->GetOLVSliceCount();}
-  virtual inline const UINT GetOLVWidth() const {return m_Renderer->GetOLVWidth();}
-  virtual inline const UINT GetOLVHeight() const {return m_Renderer->GetOLVHeight();}
+  virtual inline const uint GetOLVSliceCount() const {return m_Renderer->GetOLVSliceCount();}
+  virtual inline const uint GetOLVWidth() const {return m_Renderer->GetOLVWidth();}
+  virtual inline const uint GetOLVHeight() const {return m_Renderer->GetOLVHeight();}
   virtual inline iTextureHandle* GetOLVTexture() const {return m_Renderer->GetOLVTexture();}
   virtual inline const CS::Math::Matrix4 GetOLVProjectionMatrix() const {return m_Renderer->GetOLVProjectionMatrix();}
   virtual inline const csOrthoTransform GetOLVCameraMatrix() const {return m_Renderer->GetOLVCameraMatrix();}

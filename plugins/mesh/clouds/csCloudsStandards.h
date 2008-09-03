@@ -29,8 +29,8 @@ class csStdTemperatureInputField : public scfImplementation1<csStdTemperatureInp
 private:
   //Variables are not needed for this implementation. The only reason they exists, is
   //for satisfying the interface!
-  UINT		m_iSizeX;
-  UINT		m_iSizeY;
+  uint		m_iSizeX;
+  uint		m_iSizeY;
 
 public:
   csStdTemperatureInputField(iBase* pParent) : scfImplementationType(this, pParent), m_iSizeX(0), m_iSizeY(0)
@@ -40,21 +40,21 @@ public:
   }
 
   //O(n^2)
-  virtual inline void SetSize(const UINT iSizeX, const UINT iSizeY)
+  virtual inline void SetSize(const uint iSizeX, const uint iSizeY)
   {
     m_iSizeX = iSizeX;
     m_iSizeY = iSizeY;
   }
-  virtual const UINT GetSizeX() const {return m_iSizeX;}
-  virtual const UINT GetSizeY() const {return m_iSizeY;}
+  virtual const uint GetSizeX() const {return m_iSizeX;}
+  virtual const uint GetSizeY() const {return m_iSizeY;}
 
   //O(1)
-  virtual inline const float operator () (const UINT x, const UINT y) const
+  virtual inline const float operator () (const uint x, const uint y) const
   {
     return GetValue(x, y);
   }
   //O(1)
-  virtual inline const float GetValue(const UINT x, const UINT y) const
+  virtual inline const float GetValue(const uint x, const uint y) const
   {
     //Some periodic value generation
     return 20.f * ::cosf(x * ::fmodf(::rand(), 3.14f) + y * ::fmodf(::rand(), 3.14f)) + 285.f;
@@ -75,8 +75,8 @@ private:
   Variables are not needed for this implementation. The only reason they exists, is
   for satisfying the interface!
   */
-  UINT		m_iSizeX;
-  UINT		m_iSizeY;
+  uint		m_iSizeX;
+  uint		m_iSizeY;
 
 public:
   csStdWaterVaporInputField(iBase* pParent) : scfImplementationType(this, pParent), m_iSizeX(0), m_iSizeY(0)
@@ -86,21 +86,21 @@ public:
   }
 
   //O(n^2)
-  virtual inline void SetSize(const UINT iSizeX, const UINT iSizeY)
+  virtual inline void SetSize(const uint iSizeX, const uint iSizeY)
   {
     m_iSizeX = iSizeX;
     m_iSizeY = iSizeY;
   }
-  virtual const UINT GetSizeX() const {return m_iSizeX;}
-  virtual const UINT GetSizeY() const {return m_iSizeY;}
+  virtual const uint GetSizeX() const {return m_iSizeX;}
+  virtual const uint GetSizeY() const {return m_iSizeY;}
 
   //O(1)
-  virtual inline const float operator () (const UINT x, const UINT y) const
+  virtual inline const float operator () (const uint x, const uint y) const
   {
     return GetValue(x, y);
   }
   //O(1)
-  virtual inline const float GetValue(const UINT x, const UINT y) const
+  virtual inline const float GetValue(const uint x, const uint y) const
   {
     //Some periodic value generation
     return ::fabsf(::cosf(x * ::fmodf(::rand(), 3.14f) + y * ::fmodf(::rand(), 3.14f)));

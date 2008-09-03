@@ -23,9 +23,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 const float GetInterpolatedValue(const csRef<csField3<float> >& rSrc, const csVector3& vPos)
 {
-  const UINT x = static_cast<UINT>(vPos.x);
-  const UINT y = static_cast<UINT>(vPos.y);
-  const UINT z = static_cast<UINT>(vPos.z);
+  const uint x = static_cast<uint>(vPos.x);
+  const uint y = static_cast<uint>(vPos.y);
+  const uint z = static_cast<uint>(vPos.z);
   const float i	= static_cast<float>(x);
   const float j	= static_cast<float>(y);
   const float k	= static_cast<float>(z);
@@ -50,11 +50,11 @@ const float GetInterpolatedValue(const csRef<csField3<float> >& rSrc, const csVe
 
 //-----------------------------------------------------//
 
-const float GetInterpolatedValue(const csRef<csField3<csVector3> >& rSrc, const csVector3& vPos, const UINT iIndex)
+const float GetInterpolatedValue(const csRef<csField3<csVector3> >& rSrc, const csVector3& vPos, const uint iIndex)
 {
-  const UINT x = static_cast<UINT>(vPos.x);
-  const UINT y = static_cast<UINT>(vPos.y);
-  const UINT z = static_cast<UINT>(vPos.z);
+  const uint x = static_cast<uint>(vPos.x);
+  const uint y = static_cast<uint>(vPos.y);
+  const uint z = static_cast<uint>(vPos.z);
   const float i	= static_cast<float>(x);
   const float j	= static_cast<float>(y);
   const float k	= static_cast<float>(z);

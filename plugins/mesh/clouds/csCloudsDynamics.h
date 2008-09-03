@@ -38,7 +38,7 @@ The local coordinate system is equal to the one used as global with:
 */
 class csCloudsDynamics : public scfImplementation1<csCloudsDynamics, iCloudsDynamics>
 {
-  static const UINT s_iTotalStepCount = 10;
+  static const uint s_iTotalStepCount = 10;
 private:
   /**
   From each field there are two instances, because each time-step all of
@@ -47,8 +47,8 @@ private:
   and iLastIndex gives the other one. Both are either	0 or 1. 
   At the end of each timestep those two are going to be swapped.
   */
-  UINT   m_iLastIndex;
-  UINT   m_iActualIndex;
+  uint   m_iLastIndex;
+  uint   m_iActualIndex;
   /**
   Temperature, pressure and both mixing ratios are definded at the center
   of each voxel. Indexing is therefore as always f(x, y, z)
@@ -70,16 +70,16 @@ private:
 
   float                       m_fTimeStep;
   float                       m_fTimePassed;
-  UINT                        m_iGridSizeX;
-  UINT                        m_iGridSizeY;
-  UINT                        m_iGridSizeZ;
+  uint                        m_iGridSizeX;
+  uint                        m_iGridSizeY;
+  uint                        m_iGridSizeZ;
   float                       m_fGridScale;                           // dx
-  UINT                        m_iNewPressureField;
-  UINT                        m_iOldPressureField;
+  uint                        m_iNewPressureField;
+  uint                        m_iOldPressureField;
   bool                        m_bNewTimeStep;
 
   //State variables for amortized computation
-  UINT                        m_iCurrentStep;
+  uint                        m_iCurrentStep;
   /**
   The user is able to specify the total number of iterations for each invocation
   of the simulation each N frames. When iIterationsLeft reaches zero, the computation
@@ -87,14 +87,14 @@ private:
   from this certain point.
   */
   int                         m_iIterationsLeft;
-  UINT                        m_iPoissonSolverIterationsCount;
-  UINT                        m_iTempX;
-  UINT                        m_iTempY;
-  UINT                        m_iTempZ;
+  uint                        m_iPoissonSolverIterationsCount;
+  uint                        m_iTempX;
+  uint                        m_iTempY;
+  uint                        m_iTempZ;
   bool                        m_bRestore;
   inline const bool LimitReached() {return --m_iIterationsLeft <= 0;}
-  inline void SaveState(const UINT x, const UINT y, const UINT z) {m_iTempX = x; m_iTempY = y; m_iTempZ = z; m_bRestore = true;}
-  inline void RestoreState(UINT* px, UINT* py, UINT* pz) {*px = m_iTempX; *py = m_iTempY; *pz = m_iTempZ; m_bRestore = false;}
+  inline void SaveState(const uint x, const uint y, const uint z) {m_iTempX = x; m_iTempY = y; m_iTempZ = z; m_bRestore = true;}
+  inline void RestoreState(uint* px, uint* py, uint* pz) {*px = m_iTempX; *py = m_iTempY; *pz = m_iTempZ; m_bRestore = false;}
 
   //Precomputed constants
   float                       m_fInvGridScale;                        // 1 / dx
@@ -146,11 +146,11 @@ private:
   //O(n^3)
   inline void ComputeRotationField()
   {
-    for(UINT x = 0; x < m_iGridSizeX; ++x)
+    for(uint x = 0; x < m_iGridSizeX; ++x)
     {
-      for(UINT y = 0; y < m_iGridSizeY; ++y)
+      for(uint y = 0; y < m_iGridSizeY; ++y)
       {
-        for(UINT z = 0; z < m_iGridSizeZ; ++z)
+        for(uint z = 0; z < m_iGridSizeZ; ++z)
         {
           if(m_bRestore) RestoreState(&x, &y, &z);
           if(LimitReached()) {SaveState(x, y, z); return;}
@@ -164,11 +164,11 @@ private:
   //O(n^3)
   inline void ComputeDivergenceField()
   {
-    for(UINT x = 0; x < m_iGridSizeX; ++x)
+    for(uint x = 0; x < m_iGridSizeX; ++x)
     {
-      for(UINT y = 0; y < m_iGridSizeY; ++y)
+      for(uint y = 0; y < m_iGridSizeY; ++y)
       {
-        for(UINT z = 0; z < m_iGridSizeZ; ++z)
+        for(uint z = 0; z < m_iGridSizeZ; ++z)
         {
           if(m_bRestore) RestoreState(&x, &y, &z);
           if(LimitReached()) {SaveState(x, y, z); return;}
@@ -182,11 +182,11 @@ private:
   //O(n^3)
   inline void ComputeForceField()
   {
-    for(UINT x = 0; x < m_iGridSizeX; ++x)
+    for(uint x = 0; x < m_iGridSizeX; ++x)
     {
-      for(UINT y = 0; y < m_iGridSizeY; ++y)
+      for(uint y = 0; y < m_iGridSizeY; ++y)
       {
-        for(UINT z = 0; z < m_iGridSizeZ; ++z)
+        for(uint z = 0; z < m_iGridSizeZ; ++z)
         {
           if(m_bRestore) RestoreState(&x, &y, &z);
           if(LimitReached()) {SaveState(x, y, z); return;}
@@ -223,9 +223,9 @@ private:
   }
 
   //Returns the vorticity confinement force of a certain parcel depending on rot(u), dx, _e
-  const csVector3 ComputeVorticityConfinement(const UINT x, const UINT y, const UINT z);
+  const csVector3 ComputeVorticityConfinement(const uint x, const uint y, const uint z);
   //Returns the buoyant force of a certain parcel depending on _g, qc, T, _Tp, _fqc
-  const csVector3 ComputeBuoyantForce(const UINT x, const UINT y, const UINT z);
+  const csVector3 ComputeBuoyantForce(const uint x, const uint y, const uint z);
 
   //Implements the straightforward jacobi solver
   //O(n^3)
@@ -246,7 +246,7 @@ private:
 
   //Solves the poisson-pressure equation. Uses k iteration of a solver to do so
   //O(k * n^3)    --> BottleNeck! k = ca. 40-80
-  void SolvePoissonPressureEquation(const UINT k);
+  void SolvePoissonPressureEquation(const uint k);
 
   //Subtracts from velocity field the gradient of the calculated pressure-field
   //O(n^3)
@@ -317,7 +317,7 @@ public:
   ~csCloudsDynamics() {}
 
   //Std grid size is 16x16x16
-  virtual inline const bool SetGridSize(const UINT x, const UINT y, const UINT z);
+  virtual inline const bool SetGridSize(const uint x, const uint y, const uint z);
 
   //Configuration-Setter
   virtual inline void SetGridScale(const float dx) {m_fGridScale = dx; m_fInvGridScale = 1.f / dx;}
@@ -359,13 +359,13 @@ public:
   }
 
   //Getter
-  inline const UINT GetCurrentStep() const {return m_iCurrentStep;}
+  inline const uint GetCurrentStep() const {return m_iCurrentStep;}
   inline const bool NewTimeStepStarted() const {return m_bNewTimeStep;}
 
   /**
   Does approximatly N iterations of the entire simulation.
   */
-  const bool DoComputation(const UINT iIterationsCount, const float fTime = 0.f);
+  const bool DoComputation(const uint iIterationsCount, const float fTime = 0.f);
 
   //Returns the simulation output!
   inline const csRef<csField3<float> >& GetCondWaterMixingRatios() const

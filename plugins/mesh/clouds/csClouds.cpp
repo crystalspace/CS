@@ -30,7 +30,7 @@ bool csClouds::HandleEvent(iEvent& rEvent)
     if(m_Dynamics->NewTimeStepStarted())
     {
       //Measure Time
-      const UINT iEndTickCount = m_Clock->GetCurrentTicks();
+      const uint iEndTickCount = m_Clock->GetCurrentTicks();
       m_fTimeStep = static_cast<float>(iEndTickCount - m_iStartTickCount) * 0.001f * m_fTimeScaleFactor;
       m_iStartTickCount = iEndTickCount;
       printf("Time for one simulation step: %.4f\n", m_fTimeStep);

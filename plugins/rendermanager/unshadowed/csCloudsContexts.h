@@ -60,7 +60,7 @@ public:
     if(!pCloudSystem.IsValid()) return false;
 
     //Iterate over all registred clouds
-    for(UINT i = 0; i < pCloudSystem->GetCloudCount(); ++i)
+    for(uint i = 0; i < pCloudSystem->GetCloudCount(); ++i)
     {
       csRef<iClouds> pCurrentCloud = pCloudSystem->GetCloud(i);
       /**
@@ -83,7 +83,7 @@ public:
 
       //================================================//
 
-      for(UINT j = 0; j < pCurrentCloud->GetOLVSliceCount(); ++j)
+      for(uint j = 0; j < pCurrentCloud->GetOLVSliceCount(); ++j)
       {
         iShaderManager* pShaderManager = m_pRenderManager->shaderManager;
         /**

@@ -30,17 +30,17 @@ class csField3 : public csRefCount
 {
 private:
   T***			m_pppArray;
-  UINT			m_iSizeX;
-  UINT			m_iSizeY;
-  UINT			m_iSizeZ;
+  uint			m_iSizeX;
+  uint			m_iSizeY;
+  uint			m_iSizeZ;
 
   //O(n^2)
   inline void DeleteField()
   {
     if(!m_pppArray) return;
-    for(UINT x = 0; x < m_iSizeX; ++x)
+    for(uint x = 0; x < m_iSizeX; ++x)
     {
-      for(UINT y = 0; y < m_iSizeY; ++y) delete[] m_pppArray[x][y];
+      for(uint y = 0; y < m_iSizeY; ++y) delete[] m_pppArray[x][y];
       delete[] m_pppArray[x];
     }
     delete[] m_pppArray;
@@ -57,7 +57,7 @@ public:
   }
 
   //O(n^2)
-  virtual inline void SetSize(const UINT iSizeX, const UINT iSizeY, const UINT iSizeZ)
+  virtual inline void SetSize(const uint iSizeX, const uint iSizeY, const uint iSizeZ)
   {
     DeleteField();
     m_iSizeX = iSizeX;
@@ -65,41 +65,41 @@ public:
     m_iSizeZ = iSizeZ;
     //reserve memory
     m_pppArray = new T**[m_iSizeX];
-    for(UINT x = 0; x < m_iSizeX; ++x)
+    for(uint x = 0; x < m_iSizeX; ++x)
     {
       m_pppArray[x] = new T*[m_iSizeY];
-      for(UINT y = 0; y < m_iSizeY; ++y)
+      for(uint y = 0; y < m_iSizeY; ++y)
       {
         m_pppArray[x][y] = new T[m_iSizeZ];
       }
     }
   }
-  virtual const UINT GetSizeX() const {return m_iSizeX;}
-  virtual const UINT GetSizeY() const {return m_iSizeY;}
-  virtual const UINT GetSizeZ() const {return m_iSizeZ;}
+  virtual const uint GetSizeX() const {return m_iSizeX;}
+  virtual const uint GetSizeY() const {return m_iSizeY;}
+  virtual const uint GetSizeZ() const {return m_iSizeZ;}
 
   //O(1)
-  virtual inline void SetValue(const T& Value, const UINT x, const UINT y, const UINT z)
+  virtual inline void SetValue(const T& Value, const uint x, const uint y, const uint z)
   {
     if(m_pppArray) m_pppArray[x][y][z] = Value;
   }
 
   //O(1)
-  virtual inline const T operator () (const UINT x, const UINT y, const UINT z) const
+  virtual inline const T operator () (const uint x, const uint y, const uint z) const
   {
     return GetValue(x, y, z);
   }
   //O(1)
-  virtual inline const T GetValue(const UINT x, const UINT y, const UINT z) const
+  virtual inline const T GetValue(const uint x, const uint y, const uint z) const
   {
     return m_pppArray[x][y][z];
   }
   //O(1)
   virtual const T GetValueClamp(const int _x, const int _y, const int _z) const
   {
-    const UINT x = _x < 0 ? 0 : _x >= static_cast<int>(m_iSizeX) ? static_cast<int>(m_iSizeX) - 1 : _x;
-    const UINT y = _y < 0 ? 0 : _y >= static_cast<int>(m_iSizeY) ? static_cast<int>(m_iSizeY) - 1 : _y;
-    const UINT z = _z < 0 ? 0 : _z >= static_cast<int>(m_iSizeZ) ? static_cast<int>(m_iSizeZ) - 1 : _z;
+    const uint x = _x < 0 ? 0 : _x >= static_cast<int>(m_iSizeX) ? static_cast<int>(m_iSizeX) - 1 : _x;
+    const uint y = _y < 0 ? 0 : _y >= static_cast<int>(m_iSizeY) ? static_cast<int>(m_iSizeY) - 1 : _y;
+    const uint z = _z < 0 ? 0 : _z >= static_cast<int>(m_iSizeZ) ? static_cast<int>(m_iSizeZ) - 1 : _z;
     return GetValue(x, y, z);
   }
 };
@@ -111,11 +111,11 @@ Both function expect vPos to be scaled on gridsize. Means that it doesn't contai
 the REAL position, but coordinates on the voxelgrid
 */
 const float GetInterpolatedValue(const csRef<csField3<float> >& rSrc, const csVector3& vPos);
-const float GetInterpolatedValue(const csRef<csField3<csVector3> >& rSrc, const csVector3& vPos, const UINT iIndex);
+const float GetInterpolatedValue(const csRef<csField3<csVector3> >& rSrc, const csVector3& vPos, const uint iIndex);
 
 //Interpolates the velocity
 inline const csVector3 GetVelocityOfCellCenter(const csRef<csField3<csVector3> >& rField, 
-                                               const UINT x, const UINT y, const UINT z)
+                                               const uint x, const uint y, const uint z)
 {
   return 0.5f * csVector3(rField->GetValue(x, y, z).x + rField->GetValue(x + 1, y, z).x,
     rField->GetValue(x, y, z).y + rField->GetValue(x, y + 1, z).y,
@@ -132,21 +132,21 @@ inline const csVector3 GetInterpolatedVelocity(const csRef<csField3<csVector3> >
 
 //------------------------------------------------------------------------------//
 
-inline const csVector3 Clamp(const csVector3& vPos, const UINT x, const UINT y, const UINT z)
+inline const csVector3 Clamp(const csVector3& vPos, const uint x, const uint y, const uint z)
 {
   csVector3 vNew = vPos;
   if(vNew.x < 0.f) vNew.x = 0.f;
   if(vNew.y < 0.f) vNew.y = 0.f;
   if(vNew.z < 0.f) vNew.z = 0.f;
-  if(static_cast<UINT>(vNew.x) >= x) vNew.x = static_cast<float>(x - 1);
-  if(static_cast<UINT>(vNew.y) >= y) vNew.y = static_cast<float>(y - 1);
-  if(static_cast<UINT>(vNew.z) >= z) vNew.z = static_cast<float>(z - 1);
+  if(static_cast<uint>(vNew.x) >= x) vNew.x = static_cast<float>(x - 1);
+  if(static_cast<uint>(vNew.y) >= y) vNew.y = static_cast<float>(y - 1);
+  if(static_cast<uint>(vNew.z) >= z) vNew.z = static_cast<float>(z - 1);
   return vNew;
 }
 
 //------------------------------------------------------------------------------//
 
-inline const csVector3 CalcGradient(const csRef<csField3<float> >& rField, const UINT x, const UINT y, const UINT z,
+inline const csVector3 CalcGradient(const csRef<csField3<float> >& rField, const uint x, const uint y, const uint z,
                                     const float dx)
 {
   const float fInvdx2 = 1.f / (2.f * dx);
@@ -160,7 +160,7 @@ inline const csVector3 CalcGradient(const csRef<csField3<float> >& rField, const
 //------------------------------------------------------------------------------//
 
 //Calculates the gradient of the norm of a Vectorfield
-inline const csVector3 CalcGradient(const csRef<csField3<csVector3> >& rField, const UINT x, const UINT y, const UINT z,
+inline const csVector3 CalcGradient(const csRef<csField3<csVector3> >& rField, const uint x, const uint y, const uint z,
                                     const float dx)
 {
   const float fInvdx2 = 1.f / (2.f * dx);
@@ -173,7 +173,7 @@ inline const csVector3 CalcGradient(const csRef<csField3<csVector3> >& rField, c
 
 //------------------------------------------------------------------------------//
 
-inline const float CalcDivergence(const csRef<csField3<csVector3> >& rField, const UINT x, const UINT y, const UINT z,
+inline const float CalcDivergence(const csRef<csField3<csVector3> >& rField, const uint x, const uint y, const uint z,
                                   const float dx)
 {
   const float fInvdx = 1.f / dx;
@@ -187,7 +187,7 @@ inline const float CalcDivergence(const csRef<csField3<csVector3> >& rField, con
 //------------------------------------------------------------------------------//
 
 //Calculates the rotation vector for the center of a cell!
-inline const csVector3 CalcRotation(const csRef<csField3<csVector3> >& rField, const UINT x, const UINT y, const UINT z,
+inline const csVector3 CalcRotation(const csRef<csField3<csVector3> >& rField, const uint x, const uint y, const uint z,
                                     const float dx)
 {
   const float fInvdx = 1.f / dx;
@@ -210,14 +210,14 @@ class csField2 : public scfImplementation1<csField2<T>, iField2<T> >
 {
 private:
 T**				m_ppArray;
-UINT			m_iSizeX;
-UINT			m_iSizeY;
+uint			m_iSizeX;
+uint			m_iSizeY;
 
 //O(n^2)
 inline void DeleteField()
 {
 if(!m_ppArray) return;
-for(UINT x = 0; x < m_iSizeX; ++x)
+for(uint x = 0; x < m_iSizeX; ++x)
 {
 delete[] m_pppArray[x];
 }
@@ -236,42 +236,42 @@ DeleteField();
 }
 
 //O(n^2)
-virtual inline void SetSize(const UINT iSizeX, const UINT iSizeY)
+virtual inline void SetSize(const uint iSizeX, const uint iSizeY)
 {
 DeleteField();
 m_iSizeX = iSizeX;
 m_iSizeY = iSizeY;
 //reserve memory
 m_ppArray = new T*[m_iSizeX];
-for(UINT x = 0; x < m_iSizeX; ++x)
+for(uint x = 0; x < m_iSizeX; ++x)
 {
 m_pppArray[x] = new T[m_iSizeY];
 }
 }
-virtual const UINT GetSizeX() const {return m_iSizeX;}
-virtual const UINT GetSizeY() const {return m_iSizeY;}
+virtual const uint GetSizeX() const {return m_iSizeX;}
+virtual const uint GetSizeY() const {return m_iSizeY;}
 
 //O(1)
-virtual inline void SetValue(const T& Value, const UINT x, const UINT y)
+virtual inline void SetValue(const T& Value, const uint x, const uint y)
 {
 if(m_ppArray) m_ppArray[x][y] = Value;
 }
 
 //O(1)
-virtual inline const T operator () (const UINT x, const UINT y) const
+virtual inline const T operator () (const uint x, const uint y) const
 {
 return GetValue(x, y);
 }
 //O(1)
-virtual inline const T GetValue(const UINT x, const UINT y) const
+virtual inline const T GetValue(const uint x, const uint y) const
 {
 return m_pppArray[x][y];
 }
 //O(1)
 virtual const T GetValueClamp(const int _x, const int _y) const
 {
-const UINT x = _x < 0 ? 0 : _x >= static_cast<int>(m_iSizeX) ? static_cast<int>(m_iSizeX) - 1 : _x;
-const UINT y = _y < 0 ? 0 : _y >= static_cast<int>(m_iSizeY) ? static_cast<int>(m_iSizeY) - 1 : _y;
+const uint x = _x < 0 ? 0 : _x >= static_cast<int>(m_iSizeX) ? static_cast<int>(m_iSizeX) - 1 : _x;
+const uint y = _y < 0 ? 0 : _y >= static_cast<int>(m_iSizeY) ? static_cast<int>(m_iSizeY) - 1 : _y;
 return GetValue(x, y);
 }
 };*/
