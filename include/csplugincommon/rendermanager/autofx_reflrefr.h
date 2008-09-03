@@ -29,62 +29,12 @@ namespace CS
 {
   namespace RenderManager
   {
-
     /**
-     * Render manager helper for automatic plane reflection/refraction
-     * textures.
-     *
-     * When some shader used in a render tree context uses a planar
-     * reflection texture (SV name <tt>tex plane reflect</tt>),
-     * refraction texture (<tt>tex plane refract</tt>) or matching
-     * depth textures (<tt>tex plane reflect depth</tt>,
-     * <tt>tex plane refract depth</tt>) new contexts are set up to render
-     * the scene with the appropriate settings to textures.
-     *
-     * The reflection/refraction is planar. The reflection texture will contain
-     * the scene from the context's view, but mirrored at and clipped to the 
-     * reflection plane (everything "above" the reflecting planar surface).
-     * The refraction texture will contain the scene from the context's view, 
-     * but clipped to the reflection plane (everything "below" the reflecting 
-     * planar surface).
-     *
-     * The reflection plane can be specified in object space of a mesh object
-     * by attach an SV <tt>plane reflection</tt> to it. If no such SV is
-     * attached, a reflection plane is computed from the object space bounding
-     * box: the plane's origin is the origin of the mesh, the plane's normal
-     * points into the positive direction of the smallest dimension of the
-     * bounding box.
-     *
-     * Usage: Functor for TraverseUsedSVSets. Application must happen after 
-     * shader and ticket setup (e.g. SetupStandardTicket()).
-     * Example:
-     * \code
-     * // Define type using rendermanager-dependent render tree and context setup
-     * typedef CS::RenderManager::AutoFX_ReflectRefract<RenderTreeType, 
-     *   ContextSetupType> AutoReflectRefractType;
-     *
-     * // Instantiate helper in rendering
-     * RenderManagerType::AutoReflectRefractType fxRR (
-     *   rmanager->reflectRefractPersistent, *this);
-     * // Set up a traverser for the sets of shader vars used over each mesh
-     * typedef TraverseUsedSVSets<RenderTreeType,
-     *   RenderManagerType::AutoReflectRefractType> SVTraverseType;
-     * SVTraverseType svTraverser
-     *   (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
-     * // Do the actual traversal.
-     * ForEachMeshNode (context, svTraverser);
-     * \endcode
-     *
-     * The template parameter \a RenderTree gives the render tree type.
-     * The parameter \a ContextSetup gives a class used to set up the contexts
-     * for the reflection/refraction rendering. It must provide an
-     * implementation of operator() (RenderTree::ContextNode&).
-     *
-     * Automatic reflections and refractions have a number of configuration
-     * settings; see \c data/config-plugins/engine.cfg.
+     * Base class for AutoFX_ReflectRefract, containing types and
+     * members which are independent of the template arguments that can be
+     * provided to AutoFX_ReflectRefract.
      */
-    template<typename RenderTree, typename ContextSetup>
-    class AutoFX_ReflectRefract
+    class AutoFX_ReflectRefract_Base
     {
     public:
       /**
@@ -212,7 +162,7 @@ namespace CS
 	void UpdateNewFrame ()
 	{
 	  csTicks currentTicks = csGetTicks ();
-	  typename ReflRefrCache::GlobalIterator reflRefrIt (
+	  ReflRefrCache::GlobalIterator reflRefrIt (
 	    reflRefrCache.GetIterator ());
 	  while (reflRefrIt.HasNext())
 	  {
@@ -243,10 +193,85 @@ namespace CS
 	  texCacheDepth.AdvanceFrame (currentTicks);
 	}
       };
-      
+    
+      AutoFX_ReflectRefract_Base (PersistentData& persist) : persist (persist)
+      {}
+    protected:
+      PersistentData& persist;
+    };
+    
+    /**
+     * Render manager helper for automatic plane reflection/refraction
+     * textures.
+     *
+     * When some shader used in a render tree context uses a planar
+     * reflection texture (SV name <tt>tex plane reflect</tt>),
+     * refraction texture (<tt>tex plane refract</tt>) or matching
+     * depth textures (<tt>tex plane reflect depth</tt>,
+     * <tt>tex plane refract depth</tt>) new contexts are set up to render
+     * the scene with the appropriate settings to textures.
+     *
+     * The reflection/refraction is planar. The reflection texture will contain
+     * the scene from the context's view, but mirrored at and clipped to the 
+     * reflection plane (everything "above" the reflecting planar surface).
+     * The refraction texture will contain the scene from the context's view, 
+     * but clipped to the reflection plane (everything "below" the reflecting 
+     * planar surface).
+     *
+     * The reflection plane can be specified in object space of a mesh object
+     * by attach an SV <tt>plane reflection</tt> to it. If no such SV is
+     * attached, a reflection plane is computed from the object space bounding
+     * box: the plane's origin is the origin of the mesh, the plane's normal
+     * points into the positive direction of the smallest dimension of the
+     * bounding box.
+     *
+     * Usage: Functor for TraverseUsedSVSets. Application must happen after 
+     * shader and ticket setup (e.g. SetupStandardTicket()).
+     * Example:
+     * \code
+     * // Define type using rendermanager-dependent render tree and context setup
+     * typedef CS::RenderManager::AutoFX_ReflectRefract<RenderTreeType, 
+     *   ContextSetupType> AutoReflectRefractType;
+     *
+     * // Instantiate helper in rendering
+     * RenderManagerType::AutoReflectRefractType fxRR (
+     *   rmanager->reflectRefractPersistent, *this);
+     * // Set up a traverser for the sets of shader vars used over each mesh
+     * typedef TraverseUsedSVSets<RenderTreeType,
+     *   RenderManagerType::AutoReflectRefractType> SVTraverseType;
+     * SVTraverseType svTraverser
+     *   (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+     * // Do the actual traversal.
+     * ForEachMeshNode (context, svTraverser);
+     * \endcode
+     *
+     * The template parameter \a RenderTree gives the render tree type.
+     * The parameter \a ContextSetupReflect and \a ContextSetupRefract give 
+     * classes used to set up the contexts for the reflection resp. refraction
+     * rendering. They must provide an implementation of
+     * operator() (RenderTree::ContextNode&).
+     *
+     * Automatic reflections and refractions have a number of configuration
+     * settings; see \c data/config-plugins/engine.cfg.
+     */
+    template<typename RenderTree,
+      typename ContextSetupReflect,
+      typename ContextSetupRefract = ContextSetupReflect>
+    class AutoFX_ReflectRefract : public AutoFX_ReflectRefract_Base
+    {
+    public:
       AutoFX_ReflectRefract (PersistentData& persist,
-        ContextSetup& contextFunction) : persist (persist),
-        contextFunction (contextFunction)
+        ContextSetupReflect& contextFunction) : 
+        AutoFX_ReflectRefract_Base (persist),
+        contextFunctionRefl (contextFunction),
+        contextFunctionRefr (contextFunction)
+      {}
+      AutoFX_ReflectRefract (PersistentData& persist,
+        ContextSetupReflect& contextFunctionRefl,
+        ContextSetupRefract& contextFunctionRefr) : 
+        AutoFX_ReflectRefract_Base (persist),
+        contextFunctionRefl (contextFunctionRefl),
+        contextFunctionRefr (contextFunctionRefr)
       {}
     
       /**
@@ -700,12 +725,12 @@ namespace CS
 	}
 	
         // Setup the new contexts
-	if (reflCtx) contextFunction (*reflCtx);
-	if (refrCtx) contextFunction (*refrCtx);
+	if (reflCtx) contextFunctionRefl (*reflCtx);
+	if (refrCtx) contextFunctionRefr (*refrCtx);
       }
     protected:
-      PersistentData& persist;
-      ContextSetup& contextFunction;
+      ContextSetupReflect& contextFunctionRefl;
+      ContextSetupRefract& contextFunctionRefr;
     };
 
   } // namespace RenderManager
