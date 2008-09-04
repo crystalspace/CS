@@ -98,7 +98,7 @@ UnitTest crystalspace : $(CSLIB.TESTS) ;
 CFlags crystalspace : [ FDefines CS_CRYSTALSPACE_LIB ] ;
 MsvcDefine crystalspace : CS_CRYSTALSPACE_LIB ;
 MsvcDefine crystalspace :
-  CS_COMPILER_NAME_AND_VERSION : "\\"VC_$(MSVC_VERSION)\\"" ;
+  CS_COMPILER_NAME_AND_VERSION : "\"VC_$(MSVC_VERSION)\"" ;
 {
   local def ;
   for def in $(CSLIB.MSVC_DEFINES)
