@@ -2613,7 +2613,7 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_uint16_t swig_types[123]
 #define SWIGTYPE_p_uint32_t swig_types[124]
 #define SWIGTYPE_p_uint64_t swig_types[125]
-#define SWIGTYPE_p_unsigned_char swig_types[126]
+#define SWIGTYPE_p_uint8_t swig_types[126]
 #define SWIGTYPE_p_unsigned_int swig_types[127]
 #define SWIGTYPE_p_unsigned_long swig_types[128]
 #define SWIGTYPE_p_unsigned_long_long swig_types[129]
@@ -8660,7 +8660,7 @@ SWIGINTERN PyObject *_wrap_csImageBase_GetAlpha(PyObject *SWIGUNUSEDPARM(self), 
   }
   arg1 = reinterpret_cast< csImageBase * >(argp1);
   result = (uint8 *)(arg1)->GetAlpha();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_unsigned_char, 0 |  0 );
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_uint8_t, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -10002,7 +10002,7 @@ SWIGINTERN PyObject *_wrap_csImageMemory_GetAlphaPtr(PyObject *SWIGUNUSEDPARM(se
   }
   arg1 = reinterpret_cast< csImageMemory * >(argp1);
   result = (uint8 *)(arg1)->GetAlphaPtr();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_unsigned_char, 0 |  0 );
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_uint8_t, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -10212,7 +10212,7 @@ SWIGINTERN PyObject *_wrap_csImageMemory_GetAlpha(PyObject *SWIGUNUSEDPARM(self)
   }
   arg1 = reinterpret_cast< csImageMemory * >(argp1);
   result = (uint8 *)(arg1)->GetAlpha();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_unsigned_char, 0 |  0 );
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_uint8_t, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -10883,12 +10883,12 @@ SWIGINTERN PyObject *_wrap_csImageMemory_ConvertFromPal8__SWIG_0(PyObject *SWIGU
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csImageMemory_ConvertFromPal8" "', argument " "1"" of type '" "csImageMemory *""'"); 
   }
   arg1 = reinterpret_cast< csImageMemory * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_unsigned_char, 0 |  0 );
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_uint8_t, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csImageMemory_ConvertFromPal8" "', argument " "2"" of type '" "uint8 *""'"); 
   }
   arg2 = reinterpret_cast< uint8 * >(argp2);
-  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_unsigned_char, 0 |  0 );
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_uint8_t, 0 |  0 );
   if (!SWIG_IsOK(res3)) {
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csImageMemory_ConvertFromPal8" "', argument " "3"" of type '" "uint8 *""'"); 
   }
@@ -10936,12 +10936,12 @@ SWIGINTERN PyObject *_wrap_csImageMemory_ConvertFromPal8__SWIG_1(PyObject *SWIGU
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csImageMemory_ConvertFromPal8" "', argument " "1"" of type '" "csImageMemory *""'"); 
   }
   arg1 = reinterpret_cast< csImageMemory * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_unsigned_char, 0 |  0 );
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_uint8_t, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csImageMemory_ConvertFromPal8" "', argument " "2"" of type '" "uint8 *""'"); 
   }
   arg2 = reinterpret_cast< uint8 * >(argp2);
-  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_unsigned_char, 0 |  0 );
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_uint8_t, 0 |  0 );
   if (!SWIG_IsOK(res3)) {
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csImageMemory_ConvertFromPal8" "', argument " "3"" of type '" "uint8 *""'"); 
   }
@@ -10988,12 +10988,12 @@ SWIGINTERN PyObject *_wrap_csImageMemory_ConvertFromPal8__SWIG_2(PyObject *SWIGU
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csImageMemory_ConvertFromPal8" "', argument " "1"" of type '" "csImageMemory *""'"); 
   }
   arg1 = reinterpret_cast< csImageMemory * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_unsigned_char, 0 |  0 );
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_uint8_t, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csImageMemory_ConvertFromPal8" "', argument " "2"" of type '" "uint8 *""'"); 
   }
   arg2 = reinterpret_cast< uint8 * >(argp2);
-  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_unsigned_char, 0 |  0 );
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_uint8_t, 0 |  0 );
   if (!SWIG_IsOK(res3)) {
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csImageMemory_ConvertFromPal8" "', argument " "3"" of type '" "uint8 *""'"); 
   }
@@ -11041,12 +11041,12 @@ SWIGINTERN PyObject *_wrap_csImageMemory_ConvertFromPal8__SWIG_3(PyObject *SWIGU
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csImageMemory_ConvertFromPal8" "', argument " "1"" of type '" "csImageMemory *""'"); 
   }
   arg1 = reinterpret_cast< csImageMemory * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_unsigned_char, 0 |  0 );
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_uint8_t, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csImageMemory_ConvertFromPal8" "', argument " "2"" of type '" "uint8 *""'"); 
   }
   arg2 = reinterpret_cast< uint8 * >(argp2);
-  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_unsigned_char, 0 |  0 );
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_uint8_t, 0 |  0 );
   if (!SWIG_IsOK(res3)) {
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csImageMemory_ConvertFromPal8" "', argument " "3"" of type '" "uint8 *""'"); 
   }
@@ -11081,11 +11081,11 @@ SWIGINTERN PyObject *_wrap_csImageMemory_ConvertFromPal8(PyObject *self, PyObjec
     _v = SWIG_CheckState(res);
     if (_v) {
       void *vptr = 0;
-      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_unsigned_char, 0);
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_uint8_t, 0);
       _v = SWIG_CheckState(res);
       if (_v) {
         void *vptr = 0;
-        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_unsigned_char, 0);
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_uint8_t, 0);
         _v = SWIG_CheckState(res);
         if (_v) {
           void *vptr = 0;
@@ -11105,11 +11105,11 @@ SWIGINTERN PyObject *_wrap_csImageMemory_ConvertFromPal8(PyObject *self, PyObjec
     _v = SWIG_CheckState(res);
     if (_v) {
       void *vptr = 0;
-      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_unsigned_char, 0);
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_uint8_t, 0);
       _v = SWIG_CheckState(res);
       if (_v) {
         void *vptr = 0;
-        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_unsigned_char, 0);
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_uint8_t, 0);
         _v = SWIG_CheckState(res);
         if (_v) {
           void *vptr = 0;
@@ -11129,11 +11129,11 @@ SWIGINTERN PyObject *_wrap_csImageMemory_ConvertFromPal8(PyObject *self, PyObjec
     _v = SWIG_CheckState(res);
     if (_v) {
       void *vptr = 0;
-      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_unsigned_char, 0);
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_uint8_t, 0);
       _v = SWIG_CheckState(res);
       if (_v) {
         void *vptr = 0;
-        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_unsigned_char, 0);
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_uint8_t, 0);
         _v = SWIG_CheckState(res);
         if (_v) {
           void *vptr = 0;
@@ -11159,11 +11159,11 @@ SWIGINTERN PyObject *_wrap_csImageMemory_ConvertFromPal8(PyObject *self, PyObjec
     _v = SWIG_CheckState(res);
     if (_v) {
       void *vptr = 0;
-      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_unsigned_char, 0);
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_uint8_t, 0);
       _v = SWIG_CheckState(res);
       if (_v) {
         void *vptr = 0;
-        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_unsigned_char, 0);
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_uint8_t, 0);
         _v = SWIG_CheckState(res);
         if (_v) {
           void *vptr = 0;
@@ -12546,7 +12546,7 @@ static swig_type_info _swigt__p_scfInterfaceMetadataList = {"_p_scfInterfaceMeta
 static swig_type_info _swigt__p_uint16_t = {"_p_uint16_t", "uint16 *|uint16_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint32_t = {"_p_uint32_t", "uint32_t *|uint32 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint64_t = {"_p_uint64_t", "uint64_t *|uint64 *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_unsigned_char = {"_p_unsigned_char", "unsigned char *|uint8 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_uint8_t = {"_p_uint8_t", "uint8 *|uint8_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_int = {"_p_unsigned_int", "CS::StringIDValue *|unsigned int *|uint *|csTicks *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long = {"_p_unsigned_long", "unsigned long *|scfInterfaceID *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long_long = {"_p_unsigned_long_long", "ulonglong *|unsigned long long *", 0, 0, (void*)0, 0};
@@ -12679,7 +12679,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_uint16_t,
   &_swigt__p_uint32_t,
   &_swigt__p_uint64_t,
-  &_swigt__p_unsigned_char,
+  &_swigt__p_uint8_t,
   &_swigt__p_unsigned_int,
   &_swigt__p_unsigned_long,
   &_swigt__p_unsigned_long_long,
@@ -12812,7 +12812,7 @@ static swig_cast_info _swigc__p_scfInterfaceMetadataList[] = {  {&_swigt__p_scfI
 static swig_cast_info _swigc__p_uint16_t[] = {  {&_swigt__p_uint16_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint32_t[] = {  {&_swigt__p_uint32_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint64_t[] = {  {&_swigt__p_uint64_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_unsigned_char[] = {  {&_swigt__p_unsigned_char, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_uint8_t[] = {  {&_swigt__p_uint8_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_int[] = {  {&_swigt__p_unsigned_int, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_long[] = {  {&_swigt__p_unsigned_long, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_long_long[] = {  {&_swigt__p_unsigned_long_long, 0, 0, 0},{0, 0, 0, 0}};
@@ -12945,7 +12945,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_uint16_t,
   _swigc__p_uint32_t,
   _swigc__p_uint64_t,
-  _swigc__p_unsigned_char,
+  _swigc__p_uint8_t,
   _swigc__p_unsigned_int,
   _swigc__p_unsigned_long,
   _swigc__p_unsigned_long_long,

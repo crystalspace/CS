@@ -2729,7 +2729,7 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_uint16_t swig_types[239]
 #define SWIGTYPE_p_uint32_t swig_types[240]
 #define SWIGTYPE_p_uint64_t swig_types[241]
-#define SWIGTYPE_p_unsigned_char swig_types[242]
+#define SWIGTYPE_p_uint8_t swig_types[242]
 #define SWIGTYPE_p_unsigned_int swig_types[243]
 #define SWIGTYPE_p_unsigned_long swig_types[244]
 #define SWIGTYPE_p_unsigned_long_long swig_types[245]
@@ -3379,22 +3379,6 @@ SWIGINTERN int iObjectRegistry_scfGetVersion(){ return scfInterfaceTraits<iObjec
 SWIGINTERN void delete_iObjectRegistry(iObjectRegistry *self){ if (self) self->DecRef (); }
 SWIGINTERN int iVirtualClock_scfGetVersion(){ return scfInterfaceTraits<iVirtualClock>::GetVersion(); }
 SWIGINTERN void delete_iVirtualClock(iVirtualClock *self){ if (self) self->DecRef (); }
-
-SWIGINTERN int
-SWIG_AsVal_unsigned_SS_char (PyObject * obj, unsigned char *val)
-{
-  unsigned long v;
-  int res = SWIG_AsVal_unsigned_SS_long (obj, &v);
-  if (SWIG_IsOK(res)) {
-    if ((v > UCHAR_MAX)) {
-      return SWIG_OverflowError;
-    } else {
-      if (val) *val = static_cast< unsigned char >(v);
-    }
-  }  
-  return res;
-}
-
 SWIGINTERN csEventError iEvent_RetrieveString(iEvent *self,char const *name,char *&v){
 		return self->Retrieve(name,(const char *&)v);
 	}
@@ -3423,6 +3407,22 @@ SWIGINTERN csWrapPtr iPluginManager_LoadPlugin__SWIG_0(iPluginManager *self,char
   }
 SWIGINTERN int iPluginManager_scfGetVersion(){ return scfInterfaceTraits<iPluginManager>::GetVersion(); }
 SWIGINTERN void delete_iPluginManager(iPluginManager *self){ if (self) self->DecRef (); }
+
+SWIGINTERN int
+SWIG_AsVal_unsigned_SS_char (PyObject * obj, unsigned char *val)
+{
+  unsigned long v;
+  int res = SWIG_AsVal_unsigned_SS_long (obj, &v);
+  if (SWIG_IsOK(res)) {
+    if ((v > UCHAR_MAX)) {
+      return SWIG_OverflowError;
+    } else {
+      if (val) *val = static_cast< unsigned char >(v);
+    }
+  }  
+  return res;
+}
+
 
 SWIGINTERNINLINE PyObject *
 SWIG_From_unsigned_SS_char  (unsigned char value)
@@ -26982,8 +26982,8 @@ SWIGINTERN PyObject *_wrap_iEvent_AddUInt8(PyObject *SWIGUNUSEDPARM(self), PyObj
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  unsigned char val3 ;
-  int ecode3 = 0 ;
+  void *argp3 ;
+  int res3 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -26999,11 +26999,19 @@ SWIGINTERN PyObject *_wrap_iEvent_AddUInt8(PyObject *SWIGUNUSEDPARM(self), PyObj
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iEvent_AddUInt8" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_unsigned_SS_char(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iEvent_AddUInt8" "', argument " "3"" of type '" "uint8""'");
-  } 
-  arg3 = static_cast< uint8 >(val3);
+  {
+    res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res3)) {
+      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iEvent_AddUInt8" "', argument " "3"" of type '" "uint8""'"); 
+    }  
+    if (!argp3) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iEvent_AddUInt8" "', argument " "3"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp3);
+      arg3 = *temp;
+      if (SWIG_IsNewObj(res3)) delete temp;
+    }
+  }
   result = (bool)(arg1)->Add((char const *)arg2,arg3);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
@@ -27817,7 +27825,7 @@ SWIGINTERN PyObject *_wrap_iEvent_RetrieveUInt8(PyObject *SWIGUNUSEDPARM(self), 
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iEvent_RetrieveUInt8" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_unsigned_char,  0 );
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_uint8_t,  0 );
   if (!SWIG_IsOK(res3)) {
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iEvent_RetrieveUInt8" "', argument " "3"" of type '" "uint8 &""'"); 
   }
@@ -30165,8 +30173,8 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_1(PyObject *SWIGUNU
   int res1 = 0 ;
   unsigned int val2 ;
   int ecode2 = 0 ;
-  unsigned char val4 ;
-  int ecode4 = 0 ;
+  void *argp4 ;
+  int res4 = 0 ;
   int val5 ;
   int ecode5 = 0 ;
   int val6 ;
@@ -30213,11 +30221,19 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_1(PyObject *SWIGUNU
   {
     arg3 = (csEventID)PyLong_AsUnsignedLong(obj2);
   }
-  ecode4 = SWIG_AsVal_unsigned_SS_char(obj3, &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csMouseEventHelper_NewEvent" "', argument " "4"" of type '" "uint8""'");
-  } 
-  arg4 = static_cast< uint8 >(val4);
+  {
+    res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res4)) {
+      SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "csMouseEventHelper_NewEvent" "', argument " "4"" of type '" "uint8""'"); 
+    }  
+    if (!argp4) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csMouseEventHelper_NewEvent" "', argument " "4"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp4);
+      arg4 = *temp;
+      if (SWIG_IsNewObj(res4)) delete temp;
+    }
+  }
   ecode5 = SWIG_AsVal_int(obj4, &val5);
   if (!SWIG_IsOK(ecode5)) {
     SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "csMouseEventHelper_NewEvent" "', argument " "5"" of type '" "csMouseEventType""'");
@@ -30283,14 +30299,14 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_2(PyObject *SWIGUNU
   int res1 = 0 ;
   unsigned int val2 ;
   int ecode2 = 0 ;
-  unsigned char val4 ;
-  int ecode4 = 0 ;
+  void *argp4 ;
+  int res4 = 0 ;
   int val5 ;
   int ecode5 = 0 ;
   void *argp6 = 0 ;
   int res6 = 0 ;
-  unsigned char val7 ;
-  int ecode7 = 0 ;
+  void *argp7 ;
+  int res7 = 0 ;
   unsigned long val8 ;
   int ecode8 = 0 ;
   unsigned int val9 ;
@@ -30331,11 +30347,19 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_2(PyObject *SWIGUNU
   {
     arg3 = (csEventID)PyLong_AsUnsignedLong(obj2);
   }
-  ecode4 = SWIG_AsVal_unsigned_SS_char(obj3, &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csMouseEventHelper_NewEvent" "', argument " "4"" of type '" "uint8""'");
-  } 
-  arg4 = static_cast< uint8 >(val4);
+  {
+    res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res4)) {
+      SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "csMouseEventHelper_NewEvent" "', argument " "4"" of type '" "uint8""'"); 
+    }  
+    if (!argp4) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csMouseEventHelper_NewEvent" "', argument " "4"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp4);
+      arg4 = *temp;
+      if (SWIG_IsNewObj(res4)) delete temp;
+    }
+  }
   ecode5 = SWIG_AsVal_int(obj4, &val5);
   if (!SWIG_IsOK(ecode5)) {
     SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "csMouseEventHelper_NewEvent" "', argument " "5"" of type '" "csMouseEventType""'");
@@ -30346,11 +30370,19 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_2(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "csMouseEventHelper_NewEvent" "', argument " "6"" of type '" "int32 const *""'"); 
   }
   arg6 = reinterpret_cast< int32 * >(argp6);
-  ecode7 = SWIG_AsVal_unsigned_SS_char(obj6, &val7);
-  if (!SWIG_IsOK(ecode7)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csMouseEventHelper_NewEvent" "', argument " "7"" of type '" "uint8""'");
-  } 
-  arg7 = static_cast< uint8 >(val7);
+  {
+    res7 = SWIG_ConvertPtr(obj6, &argp7, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res7)) {
+      SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "csMouseEventHelper_NewEvent" "', argument " "7"" of type '" "uint8""'"); 
+    }  
+    if (!argp7) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csMouseEventHelper_NewEvent" "', argument " "7"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp7);
+      arg7 = *temp;
+      if (SWIG_IsNewObj(res7)) delete temp;
+    }
+  }
   ecode8 = SWIG_AsVal_unsigned_SS_long(obj7, &val8);
   if (!SWIG_IsOK(ecode8)) {
     SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csMouseEventHelper_NewEvent" "', argument " "8"" of type '" "uint32""'");
@@ -30512,8 +30544,8 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_4(PyObject *SWIGUNU
   int res1 = 0 ;
   unsigned int val2 ;
   int ecode2 = 0 ;
-  unsigned char val4 ;
-  int ecode4 = 0 ;
+  void *argp4 ;
+  int res4 = 0 ;
   int val5 ;
   int ecode5 = 0 ;
   int val6 ;
@@ -30560,11 +30592,19 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_4(PyObject *SWIGUNU
   {
     arg3 = (csEventID)PyLong_AsUnsignedLong(obj2);
   }
-  ecode4 = SWIG_AsVal_unsigned_SS_char(obj3, &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csMouseEventHelper_NewEvent" "', argument " "4"" of type '" "uint8""'");
-  } 
-  arg4 = static_cast< uint8 >(val4);
+  {
+    res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res4)) {
+      SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "csMouseEventHelper_NewEvent" "', argument " "4"" of type '" "uint8""'"); 
+    }  
+    if (!argp4) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csMouseEventHelper_NewEvent" "', argument " "4"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp4);
+      arg4 = *temp;
+      if (SWIG_IsNewObj(res4)) delete temp;
+    }
+  }
   ecode5 = SWIG_AsVal_int(obj4, &val5);
   if (!SWIG_IsOK(ecode5)) {
     SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "csMouseEventHelper_NewEvent" "', argument " "5"" of type '" "csMouseEventType""'");
@@ -30632,14 +30672,14 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_5(PyObject *SWIGUNU
   int res1 = 0 ;
   unsigned int val2 ;
   int ecode2 = 0 ;
-  unsigned char val4 ;
-  int ecode4 = 0 ;
+  void *argp4 ;
+  int res4 = 0 ;
   int val5 ;
   int ecode5 = 0 ;
   void *argp6 = 0 ;
   int res6 = 0 ;
-  unsigned char val7 ;
-  int ecode7 = 0 ;
+  void *argp7 ;
+  int res7 = 0 ;
   unsigned long val8 ;
   int ecode8 = 0 ;
   unsigned int val9 ;
@@ -30680,11 +30720,19 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_5(PyObject *SWIGUNU
   {
     arg3 = (csEventID)PyLong_AsUnsignedLong(obj2);
   }
-  ecode4 = SWIG_AsVal_unsigned_SS_char(obj3, &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csMouseEventHelper_NewEvent" "', argument " "4"" of type '" "uint8""'");
-  } 
-  arg4 = static_cast< uint8 >(val4);
+  {
+    res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res4)) {
+      SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "csMouseEventHelper_NewEvent" "', argument " "4"" of type '" "uint8""'"); 
+    }  
+    if (!argp4) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csMouseEventHelper_NewEvent" "', argument " "4"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp4);
+      arg4 = *temp;
+      if (SWIG_IsNewObj(res4)) delete temp;
+    }
+  }
   ecode5 = SWIG_AsVal_int(obj4, &val5);
   if (!SWIG_IsOK(ecode5)) {
     SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "csMouseEventHelper_NewEvent" "', argument " "5"" of type '" "csMouseEventType""'");
@@ -30695,11 +30743,19 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_5(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "csMouseEventHelper_NewEvent" "', argument " "6"" of type '" "int32 const *""'"); 
   }
   arg6 = reinterpret_cast< int32 * >(argp6);
-  ecode7 = SWIG_AsVal_unsigned_SS_char(obj6, &val7);
-  if (!SWIG_IsOK(ecode7)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csMouseEventHelper_NewEvent" "', argument " "7"" of type '" "uint8""'");
-  } 
-  arg7 = static_cast< uint8 >(val7);
+  {
+    res7 = SWIG_ConvertPtr(obj6, &argp7, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res7)) {
+      SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "csMouseEventHelper_NewEvent" "', argument " "7"" of type '" "uint8""'"); 
+    }  
+    if (!argp7) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csMouseEventHelper_NewEvent" "', argument " "7"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp7);
+      arg7 = *temp;
+      if (SWIG_IsNewObj(res7)) delete temp;
+    }
+  }
   ecode8 = SWIG_AsVal_unsigned_SS_long(obj7, &val8);
   if (!SWIG_IsOK(ecode8)) {
     SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csMouseEventHelper_NewEvent" "', argument " "8"" of type '" "uint32""'");
@@ -30820,10 +30876,8 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
           _v = (PyLong_Check(argv[2]) || PyInt_Check(argv[2]));
         }
         if (_v) {
-          {
-            int res = SWIG_AsVal_unsigned_SS_char(argv[3], NULL);
-            _v = SWIG_CheckState(res);
-          }
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_uint8_t, 0);
+          _v = SWIG_CheckState(res);
           if (_v) {
             {
               int res = SWIG_AsVal_int(argv[4], NULL);
@@ -30888,10 +30942,8 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
           _v = (PyLong_Check(argv[2]) || PyInt_Check(argv[2]));
         }
         if (_v) {
-          {
-            int res = SWIG_AsVal_unsigned_SS_char(argv[3], NULL);
-            _v = SWIG_CheckState(res);
-          }
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_uint8_t, 0);
+          _v = SWIG_CheckState(res);
           if (_v) {
             {
               int res = SWIG_AsVal_int(argv[4], NULL);
@@ -30902,10 +30954,8 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
               int res = SWIG_ConvertPtr(argv[5], &vptr, SWIGTYPE_p_int, 0);
               _v = SWIG_CheckState(res);
               if (_v) {
-                {
-                  int res = SWIG_AsVal_unsigned_SS_char(argv[6], NULL);
-                  _v = SWIG_CheckState(res);
-                }
+                int res = SWIG_ConvertPtr(argv[6], 0, SWIGTYPE_p_uint8_t, 0);
+                _v = SWIG_CheckState(res);
                 if (_v) {
                   {
                     int res = SWIG_AsVal_unsigned_SS_long(argv[7], NULL);
@@ -31023,10 +31073,8 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
           _v = (PyLong_Check(argv[2]) || PyInt_Check(argv[2]));
         }
         if (_v) {
-          {
-            int res = SWIG_AsVal_unsigned_SS_char(argv[3], NULL);
-            _v = SWIG_CheckState(res);
-          }
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_uint8_t, 0);
+          _v = SWIG_CheckState(res);
           if (_v) {
             {
               int res = SWIG_AsVal_int(argv[4], NULL);
@@ -31097,10 +31145,8 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
           _v = (PyLong_Check(argv[2]) || PyInt_Check(argv[2]));
         }
         if (_v) {
-          {
-            int res = SWIG_AsVal_unsigned_SS_char(argv[3], NULL);
-            _v = SWIG_CheckState(res);
-          }
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_uint8_t, 0);
+          _v = SWIG_CheckState(res);
           if (_v) {
             {
               int res = SWIG_AsVal_int(argv[4], NULL);
@@ -31111,10 +31157,8 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
               int res = SWIG_ConvertPtr(argv[5], &vptr, SWIGTYPE_p_int, 0);
               _v = SWIG_CheckState(res);
               if (_v) {
-                {
-                  int res = SWIG_AsVal_unsigned_SS_char(argv[6], NULL);
-                  _v = SWIG_CheckState(res);
-                }
+                int res = SWIG_ConvertPtr(argv[6], 0, SWIGTYPE_p_uint8_t, 0);
+                _v = SWIG_CheckState(res);
                 if (_v) {
                   {
                     int res = SWIG_AsVal_unsigned_SS_long(argv[7], NULL);
@@ -31599,8 +31643,8 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent__SWIG_1(PyObject *SWIG
   int ecode4 = 0 ;
   void *argp5 = 0 ;
   int res5 = 0 ;
-  unsigned char val6 ;
-  int ecode6 = 0 ;
+  void *argp6 ;
+  int res6 = 0 ;
   unsigned long val7 ;
   int ecode7 = 0 ;
   unsigned int val8 ;
@@ -31650,11 +31694,19 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent__SWIG_1(PyObject *SWIG
     SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "5"" of type '" "int32 const *""'"); 
   }
   arg5 = reinterpret_cast< int32 * >(argp5);
-  ecode6 = SWIG_AsVal_unsigned_SS_char(obj5, &val6);
-  if (!SWIG_IsOK(ecode6)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "6"" of type '" "uint8""'");
-  } 
-  arg6 = static_cast< uint8 >(val6);
+  {
+    res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res6)) {
+      SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "6"" of type '" "uint8""'"); 
+    }  
+    if (!argp6) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csJoystickEventHelper_NewEvent" "', argument " "6"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp6);
+      arg6 = *temp;
+      if (SWIG_IsNewObj(res6)) delete temp;
+    }
+  }
   ecode7 = SWIG_AsVal_unsigned_SS_long(obj6, &val7);
   if (!SWIG_IsOK(ecode7)) {
     SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "7"" of type '" "uint32""'");
@@ -31819,8 +31871,8 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent__SWIG_3(PyObject *SWIG
   int ecode4 = 0 ;
   void *argp5 = 0 ;
   int res5 = 0 ;
-  unsigned char val6 ;
-  int ecode6 = 0 ;
+  void *argp6 ;
+  int res6 = 0 ;
   unsigned long val7 ;
   int ecode7 = 0 ;
   unsigned int val8 ;
@@ -31870,11 +31922,19 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent__SWIG_3(PyObject *SWIG
     SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "5"" of type '" "int32 const *""'"); 
   }
   arg5 = reinterpret_cast< int32 * >(argp5);
-  ecode6 = SWIG_AsVal_unsigned_SS_char(obj5, &val6);
-  if (!SWIG_IsOK(ecode6)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "6"" of type '" "uint8""'");
-  } 
-  arg6 = static_cast< uint8 >(val6);
+  {
+    res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res6)) {
+      SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "6"" of type '" "uint8""'"); 
+    }  
+    if (!argp6) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csJoystickEventHelper_NewEvent" "', argument " "6"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp6);
+      arg6 = *temp;
+      if (SWIG_IsNewObj(res6)) delete temp;
+    }
+  }
   ecode7 = SWIG_AsVal_unsigned_SS_long(obj6, &val7);
   if (!SWIG_IsOK(ecode7)) {
     SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "7"" of type '" "uint32""'");
@@ -32004,10 +32064,8 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent(PyObject *self, PyObje
             int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_int, 0);
             _v = SWIG_CheckState(res);
             if (_v) {
-              {
-                int res = SWIG_AsVal_unsigned_SS_char(argv[5], NULL);
-                _v = SWIG_CheckState(res);
-              }
+              int res = SWIG_ConvertPtr(argv[5], 0, SWIGTYPE_p_uint8_t, 0);
+              _v = SWIG_CheckState(res);
               if (_v) {
                 {
                   int res = SWIG_AsVal_unsigned_SS_long(argv[6], NULL);
@@ -32133,10 +32191,8 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent(PyObject *self, PyObje
             int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_int, 0);
             _v = SWIG_CheckState(res);
             if (_v) {
-              {
-                int res = SWIG_AsVal_unsigned_SS_char(argv[5], NULL);
-                _v = SWIG_CheckState(res);
-              }
+              int res = SWIG_ConvertPtr(argv[5], 0, SWIGTYPE_p_uint8_t, 0);
+              _v = SWIG_CheckState(res);
               if (_v) {
                 {
                   int res = SWIG_AsVal_unsigned_SS_long(argv[6], NULL);
@@ -37798,8 +37854,8 @@ SWIGINTERN PyObject *_wrap_iClipper2D_Clip__SWIG_0(PyObject *SWIGUNUSEDPARM(self
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iClipper2D_Clip" "', argument " "5"" of type '" "size_t &""'"); 
   }
   arg5 = reinterpret_cast< size_t * >(argp5);
-  result = (uint8)(arg1)->Clip(arg2,arg3,arg4,*arg5);
-  resultobj = SWIG_From_unsigned_SS_char(static_cast< unsigned char >(result));
+  result = (arg1)->Clip(arg2,arg3,arg4,*arg5);
+  resultobj = SWIG_NewPointerObj((new uint8(static_cast< const uint8& >(result))), SWIGTYPE_p_uint8_t, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -37871,8 +37927,8 @@ SWIGINTERN PyObject *_wrap_iClipper2D_Clip__SWIG_1(PyObject *SWIGUNUSEDPARM(self
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iClipper2D_Clip" "', argument " "6"" of type '" "csBox2 &""'"); 
   }
   arg6 = reinterpret_cast< csBox2 * >(argp6);
-  result = (uint8)(arg1)->Clip(arg2,arg3,arg4,*arg5,*arg6);
-  resultobj = SWIG_From_unsigned_SS_char(static_cast< unsigned char >(result));
+  result = (arg1)->Clip(arg2,arg3,arg4,*arg5,*arg6);
+  resultobj = SWIG_NewPointerObj((new uint8(static_cast< const uint8& >(result))), SWIGTYPE_p_uint8_t, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -37941,8 +37997,8 @@ SWIGINTERN PyObject *_wrap_iClipper2D_Clip__SWIG_2(PyObject *SWIGUNUSEDPARM(self
     SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "iClipper2D_Clip" "', argument " "6"" of type '" "csVertexStatus *""'"); 
   }
   arg6 = reinterpret_cast< csVertexStatus * >(argp6);
-  result = (uint8)(arg1)->Clip(arg2,arg3,arg4,*arg5,arg6);
-  resultobj = SWIG_From_unsigned_SS_char(static_cast< unsigned char >(result));
+  result = (arg1)->Clip(arg2,arg3,arg4,*arg5,arg6);
+  resultobj = SWIG_NewPointerObj((new uint8(static_cast< const uint8& >(result))), SWIGTYPE_p_uint8_t, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -38113,8 +38169,8 @@ SWIGINTERN PyObject *_wrap_iClipper2D_ClipInPlace(PyObject *SWIGUNUSEDPARM(self)
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iClipper2D_ClipInPlace" "', argument " "4"" of type '" "csBox2 &""'"); 
   }
   arg4 = reinterpret_cast< csBox2 * >(argp4);
-  result = (uint8)(arg1)->ClipInPlace(arg2,*arg3,*arg4);
-  resultobj = SWIG_From_unsigned_SS_char(static_cast< unsigned char >(result));
+  result = (arg1)->ClipInPlace(arg2,*arg3,*arg4);
+  resultobj = SWIG_NewPointerObj((new uint8(static_cast< const uint8& >(result))), SWIGTYPE_p_uint8_t, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -50219,7 +50275,7 @@ SWIGINTERN PyObject *_wrap_iDataBuffer_GetUint8(PyObject *SWIGUNUSEDPARM(self), 
   }
   arg1 = reinterpret_cast< iDataBuffer * >(argp1);
   result = (uint8 *)(arg1)->GetUint8();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_unsigned_char, 0 |  0 );
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_uint8_t, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -50492,7 +50548,7 @@ SWIGINTERN PyObject *_wrap_iImage_GetAlpha(PyObject *SWIGUNUSEDPARM(self), PyObj
   }
   arg1 = reinterpret_cast< iImage * >(argp1);
   result = (uint8 *)(arg1)->GetAlpha();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_unsigned_char, 0 |  0 );
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_uint8_t, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -59457,7 +59513,7 @@ static swig_type_info _swigt__p_size_t = {"_p_size_t", "size_t *", 0, 0, (void*)
 static swig_type_info _swigt__p_uint16_t = {"_p_uint16_t", "uint16 *|uint16_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint32_t = {"_p_uint32_t", "uint32_t *|uint32 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint64_t = {"_p_uint64_t", "uint64_t *|uint64 *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_unsigned_char = {"_p_unsigned_char", "unsigned char *|uint8 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_uint8_t = {"_p_uint8_t", "uint8 *|uint8_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_int = {"_p_unsigned_int", "CS::StringIDValue *|unsigned int *|uint *|csTicks *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long = {"_p_unsigned_long", "unsigned long *|scfInterfaceID *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long_long = {"_p_unsigned_long_long", "ulonglong *|unsigned long long *", 0, 0, (void*)0, 0};
@@ -59707,7 +59763,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_uint16_t,
   &_swigt__p_uint32_t,
   &_swigt__p_uint64_t,
-  &_swigt__p_unsigned_char,
+  &_swigt__p_uint8_t,
   &_swigt__p_unsigned_int,
   &_swigt__p_unsigned_long,
   &_swigt__p_unsigned_long_long,
@@ -59957,7 +60013,7 @@ static swig_cast_info _swigc__p_size_t[] = {  {&_swigt__p_size_t, 0, 0, 0},{0, 0
 static swig_cast_info _swigc__p_uint16_t[] = {  {&_swigt__p_uint16_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint32_t[] = {  {&_swigt__p_uint32_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint64_t[] = {  {&_swigt__p_uint64_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_unsigned_char[] = {  {&_swigt__p_unsigned_char, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_uint8_t[] = {  {&_swigt__p_uint8_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_int[] = {  {&_swigt__p_unsigned_int, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_long[] = {  {&_swigt__p_unsigned_long, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_long_long[] = {  {&_swigt__p_unsigned_long_long, 0, 0, 0},{0, 0, 0, 0}};
@@ -60207,7 +60263,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_uint16_t,
   _swigc__p_uint32_t,
   _swigc__p_uint64_t,
-  _swigc__p_unsigned_char,
+  _swigc__p_uint8_t,
   _swigc__p_unsigned_int,
   _swigc__p_unsigned_long,
   _swigc__p_unsigned_long_long,
