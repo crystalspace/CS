@@ -89,7 +89,7 @@ namespace RenderManager
       /**
        * Cache-helper for box clipper caching
        */
-      struct csBoxClipperCached : public csBoxClipper
+      struct CS_CRYSTALSPACE_EXPORT csBoxClipperCached : public csBoxClipper
       {
         PersistentData* owningPersistentData;
 
