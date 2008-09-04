@@ -22,7 +22,7 @@
   PROCESS control.tlib;
   PROCESS projectx7.tlib;
 
-  MACRO composedefs(defs) GET compose('defines', defs, ';').replace('"', '\\&quot;\\');
+  MACRO composedefs(defs) GET compose('defines', defs, ';').replace('"', '\\&quot;');
   MACRO composedirs(tag, seed) GET composepaths(${"build.${tag}key"},seed,';');
 
   my = {};
