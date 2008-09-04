@@ -22,6 +22,7 @@
 
 #include "csutil/cfgacc.h"
 #include "csutil/objreg.h"
+#include "imap/loader.h"
 
 namespace CS
 {
