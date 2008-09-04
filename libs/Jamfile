@@ -103,7 +103,7 @@ MsvcDefine crystalspace :
   local def ;
   for def in $(CSLIB.MSVC_DEFINES)
   {
-    Msvc_Version crystalspace : $(def) ;
+    MsvcDefine crystalspace : $(def) ;
   }
 }
 if $(CSLIB.CFLAGS)
