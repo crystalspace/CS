@@ -148,11 +148,6 @@ namespace RenderManager
       }
       
       ~ViewSetup() { delete[] splitDists; }
-    
-      void PostLightSetup (typename RenderTree::ContextNode& context,
-        const LayerConfigType& layerConfig)
-      {
-      }
     };
     
     struct CachedLightData :
@@ -1099,6 +1094,8 @@ private:
 	  s++;
 	}
       }
+      else
+        spreadFlags = 1;
       return spreadFlags;
     }
     

@@ -741,6 +741,7 @@ namespace RenderManager
   public:
     struct PersistentData;
     typedef csArray<iShader*> ShaderArrayType;
+    typedef ShadowHandler ShadowHandlerType;
     typedef typename ShadowHandler::ShadowParameters ShadowParamType;
 
     /**

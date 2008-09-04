@@ -29,7 +29,8 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
 {
-  template<typename RenderTreeType, typename LayerConfigType, bool doShadow>
+  template<typename RenderTreeType, typename LayerConfigType,
+           typename LightSetupType>
   class StandardContextSetup;
   
   class RenderTreeTraits : public CS::RenderManager::RenderTreeStandardTraits
@@ -89,17 +90,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
       return false;
     }
     
-    typedef StandardContextSetup<RenderTreeType, 
-      CS::RenderManager::MultipleRenderLayer, true> ContextSetupType;
-    typedef StandardContextSetup<RenderTreeType, 
-      CS::RenderManager::MultipleRenderLayer, false> ContextSetupType_Unshadowed;
-
-    typedef CS::RenderManager::StandardPortalSetup<RenderTreeType, 
-      ContextSetupType> PortalSetupType;
-
-    typedef CS::RenderManager::DependentTargetManager<RenderTreeType, RMShadowedPSSM>
-      TargetManagerType;
-
     typedef CS::RenderManager::ShadowPSSM<RenderTreeType,
       CS::RenderManager::MultipleRenderLayer> ShadowType;
     typedef CS::RenderManager::LightSetup<RenderTreeType, 
@@ -107,6 +97,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
       ShadowType> LightSetupType;
     typedef CS::RenderManager::LightSetup<RenderTreeType, 
       CS::RenderManager::MultipleRenderLayer> LightSetupType_Unshadowed;
+
+    typedef StandardContextSetup<RenderTreeType, 
+      CS::RenderManager::MultipleRenderLayer, LightSetupType> ContextSetupType;
+    typedef StandardContextSetup<RenderTreeType, 
+      CS::RenderManager::MultipleRenderLayer, 
+      LightSetupType_Unshadowed> ContextSetupType_Unshadowed;
+
+    typedef CS::RenderManager::StandardPortalSetup<RenderTreeType, 
+      ContextSetupType> PortalSetupType;
+
+    typedef CS::RenderManager::DependentTargetManager<RenderTreeType, RMShadowedPSSM>
+      TargetManagerType;
 
     typedef CS::RenderManager::AutoFX_ReflectRefract<RenderTreeType, 
       ContextSetupType, ContextSetupType> AutoReflectRefractType_SS;
@@ -127,6 +129,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
     RenderTreeType::PersistentData treePersistent;
     PortalSetupType::PersistentData portalPersistent;
     LightSetupType::PersistentData lightPersistent;
+    LightSetupType_Unshadowed::PersistentData lightPersistent_unshadowed;
     CS::RenderManager::AutoFX_ReflectRefract_Base::PersistentData
       reflectRefractPersistent;
 
