@@ -24,6 +24,7 @@ FileListEntryApplications lighter2_static : app-tool-static ;
 LIGHTER2.PLUGINLIST =
   bezier
   bezierldr
+  bindoc
   csbmpimg
   csddsimg
   csgifimg
@@ -71,8 +72,6 @@ LIGHTER2.PLUGINLIST =
   stdrep
   bruteblock
   terrainldr
-  thing
-  thingldr
   xmlread
   xmlshader
   ;

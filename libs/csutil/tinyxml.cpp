@@ -778,6 +778,11 @@ public:
     bufRemaining = 0;
   }
 
+  void AppendString(const char* data, size_t count)
+  {
+    str->Append(data, count);
+  }
+
   bool FlushBuffer (char*& bufPtr, size_t& bufRemaining)
   {
     const size_t minIncrease = 1024;
@@ -818,6 +823,11 @@ public:
   {
     bufPtr = buf;
     bufRemaining = BufSize;
+  }
+
+  void AppendString(const char* data, size_t count)
+  {
+    // Does nothing.
   }
 
   bool FlushBuffer (char*& bufPtr, size_t& bufRemaining)

@@ -638,7 +638,7 @@ public:
   char* input_data;
 
   /// Create an empty document. Optional buf is given as input data.
-  TrDocument(char* buf = 0);
+  TrDocument(bool largeDoc, char* buf = 0);
 
   virtual ~TrDocument();
 

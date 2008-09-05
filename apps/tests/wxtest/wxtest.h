@@ -22,7 +22,9 @@
 #include <stdarg.h>
 #include "csutil/ref.h"
 
+#include "csutil/custom_new_disable.h"
 #include <wx/wx.h>
+#include "csutil/custom_new_enable.h"
 
 struct iEngine;
 struct iLoader;

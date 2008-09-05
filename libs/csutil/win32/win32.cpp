@@ -151,7 +151,7 @@ public:
 };
 
 //static Win32Assistant* GLOBAL_ASSISTANT = 0;
-static csRefArray<Win32Assistant> assistants;
+static csRefArray<Win32Assistant,CS::Memory::AllocatorMallocPlatform> assistants;
 
 static void ToLower (csString& s)
 {

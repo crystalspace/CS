@@ -2685,6 +2685,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       }
       break;
     case XMLTOKEN_PRIORITY:
+      TEST_MISSING_MESH
       {
         priority = child->GetContentsValue ();
 	long pri = Engine->GetRenderPriority (priority);

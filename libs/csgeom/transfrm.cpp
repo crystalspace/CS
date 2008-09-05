@@ -146,8 +146,8 @@ csBox3 csTransform::Other2This (const csBox3& box) const
     const csVector3 minA = box.Min ();
     const csVector3 maxA = box.Max ();
 
-    csVector3 minB (-v_o2t);
-    csVector3 maxB (-v_o2t);
+    csVector3 minB (-m_o2t*v_o2t);
+    csVector3 maxB (minB);
 
     for (size_t i = 0; i < 3; ++i)
     {

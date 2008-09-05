@@ -1,0 +1,34 @@
+<layerconfig>
+	<layer>
+	        <defaultshader name="lighting_default_pvl" file="/shader/lighting/lighting_default_pvl.xml" />
+		<!-- Tells the shader ambient should be taken into account -
+		     this should only happen on the first pass -->
+		<shadervar name="pass do_ambient" type="integer">1</shadervar>
+	        <!-- Draw layer, even if no lights are present -->
+		<ambient />
+		<!-- Options to control lighting for static lights -->
+		<staticlights>
+		  <!-- Only draw specular lighting for meshes which have the 
+		       CS_ENTITY_STATICLIGHT flag set -->
+		  <specularonly />
+		</staticlights>
+		<maxlightpasses>1</maxlightpasses>
+		<shadertype>base</shadertype>
+		<shadertype>ambient</shadertype>
+		<shadertype>splatting ambient</shadertype>
+		<shadertype>standard</shadertype>
+		<shadertype>terrain splat</shadertype>
+	</layer>
+	<layer>
+	        <defaultshader name="lighting_default_pvl" file="/shader/lighting/lighting_default_pvl.xml" />
+	        <shadertype>diffuse</shadertype>
+		<!-- Practically unlimited passes -->
+		<maxlightpasses>2147483647</maxlightpasses>
+		<!-- Options to control lighting for static lights -->
+		<staticlights>
+		  <!-- Only draw specular lighting for meshes which have the 
+		       CS_ENTITY_STATICLIGHT flag set -->
+		  <specularonly />
+		</staticlights>
+	</layer>
+</layerconfig>

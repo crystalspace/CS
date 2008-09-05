@@ -59,6 +59,15 @@ public:
 
   }
 
+  StandardContextSetup (const StandardContextSetup& other,
+      const LayerConfigType& layerConfig)
+    : rmanager (other.rmanager), layerConfig (layerConfig),
+      recurseCount (other.recurseCount)
+  {
+
+  }
+
+
   void operator() (typename RenderTreeType::ContextNode& context,
     typename PortalSetupType::ContextSetupData& portalSetupData)
   {
@@ -130,8 +139,12 @@ public:
       lightSetup.GetPostLightingLayers());
   
     {
+      ThisType ctxRefl (*this,
+        rmanager->renderLayerReflect);
+      ThisType ctxRefr (*this,
+        rmanager->renderLayerRefract);
       RMUnshadowed::AutoReflectRefractType fxRR (
-        rmanager->reflectRefractPersistent, *this);
+        rmanager->reflectRefractPersistent, ctxRefl, ctxRefr);
       typedef TraverseUsedSVSets<RenderTreeType,
         RMUnshadowed::AutoReflectRefractType> SVTraverseType;
       SVTraverseType svTraverser
@@ -305,6 +318,33 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
       renderLayer);
     if (!layersValid) renderLayer.Clear();
   }
+  layersFile = cfg->GetStr (
+    "RenderManager.Unshadowed.Layers.Reflections", 0);
+  if (layersFile)
+  {
+    if (doVerbose)
+      csReport (objectReg, CS_REPORTER_SEVERITY_NOTIFY, messageID,
+	"Reading reflection render layers from '%s'", layersFile);
+    layersValid = CS::RenderManager::AddLayersFromFile (objectReg, layersFile,
+      renderLayerReflect);
+    if (!layersValid) renderLayerReflect = renderLayer;
+  }
+  else
+    renderLayerReflect = renderLayer;
+  layersFile = cfg->GetStr (
+    "RenderManager.Unshadowed.Layers.Refractions", 0);
+  if (layersFile)
+  {
+    if (doVerbose)
+      csReport (objectReg, CS_REPORTER_SEVERITY_NOTIFY, messageID,
+	"Reading refraction render layers from '%s'", layersFile);
+    layersValid = CS::RenderManager::AddLayersFromFile (objectReg, layersFile,
+      renderLayerRefract);
+    if (!layersValid) renderLayerRefract = renderLayer;
+  }
+  else
+    renderLayerRefract = renderLayer;
+  
   csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
   if (!layersValid)
   {
