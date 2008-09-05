@@ -78,7 +78,7 @@ rule MSIMergeModuleFromList
   Depends clean : mergemodulesclean ;
 }
 
-## MSIPackage msifile : wxs [: preprocvars]
+## MSIPackage msifile : wxs [: preprocvars [: objfile]]
 rule MSIPackage
 {
   local target = $(1) ;
@@ -86,7 +86,8 @@ rule MSIPackage
   local env = $(3) ;
   
   SEARCH on $(mod_src) = $(SEARCH_SOURCE) ;
-  local mod_obj = $(mod_src:S=.wixobj) ;
+  local mod_obj = $(4:E=$(mod_src:S=)) ;
+  mod_obj = $(mod_obj).wixobj ;
   MakeLocate $(mod_obj) : $(LOCATE.MSI.TEMP) ;
   Depends $(mod_obj) : $(mod_src) ;
   VARS on $(mod_obj)  = $(env) ;
@@ -94,6 +95,7 @@ rule MSIPackage
   Clean mergemodulesclean : $(mod_obj) ;
   
   Depends $(target) : $(mod_obj) ;
+  LIGHTFLAGS.EXTRA on $(target) = -cc $(LOCATE.MSI.TEMP)/cabinets -reusecab ;
   LinkWIXOBJ $(target) : $(mod_obj) ;
   Clean msiclean : $(target) ;
   
@@ -116,5 +118,5 @@ actions CompileWXS
 
 actions LinkWIXOBJ
 {
-  light $(WIX_FLAGS) $(LIGHTFLAGS) $(>) -out $(<)
+  light $(WIX_FLAGS) $(LIGHTFLAGS) $(LIGHTFLAGS.EXTRA) $(>) -out $(<)
 }

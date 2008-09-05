@@ -933,6 +933,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  addmbot delmbot addbot delbot fire explosion frain decal_test");
     CONPRI("  rain snow fountain flame portal fs_inter fs_fadeout fs_fadecol");
     CONPRI("  fs_fadetxt fs_red fs_green fs_blue fs_whiteout fs_shadevert");
+    CONPRI("  frankie");
     CONPRI("Debugging:");
     CONPRI("  zbuf debug0 debug1 debug2 palette bugplug");
     CONPRI("  db_boxshow db_boxcam1 db_boxcam2 db_boxsize1 db_boxsize2");
@@ -2094,6 +2095,48 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
     }
   }
+  else if (!csStrCaseCmp (cmd, "frankie"))
+  {
+    RECORD_ARGS (cmd, arg);
+    csRef<iMeshFactoryWrapper> meshfact = Sys->Engine->FindMeshFactory ("franky_frankie");
+    if (!meshfact)
+    {
+      csLoadResult rc = Sys->LevelLoader->Load ("/lib/frankie/frankie.xml");
+      if (!rc.success)
+        Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Can't load frankie!");
+      meshfact = Sys->Engine->FindMeshFactory ("franky_frankie");
+    }
+    if (meshfact)
+    {
+      csRef<iMeshWrapper> sprite = Sys->Engine->CreateMeshWrapper (meshfact, "Frankie",
+	    Sys->view->GetCamera ()->GetSector (),
+	    Sys->view->GetCamera ()->GetTransform ().GetOrigin ());
+      csRef<iAnimatedMesh> animesh = scfQueryInterface<iAnimatedMesh> (sprite->GetMeshObject ());
+      iSkeletonAnimNode2* root = animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
+      csRef<iSkeletonAnimNode2> anim;
+      csRef<iSkeletonFSMNode2> fsm = scfQueryInterface<iSkeletonFSMNode2> (root);
+        if (fsm)
+        {
+          root->Play();
+          csRef<iSkeletonFSMNodeFactory2> fsmfact = scfQueryInterface<iSkeletonFSMNodeFactory2>(root->GetFactory());
+          CS::Animation::StateID wanted_state = fsmfact->FindState("Frankie_Walk");
+          if (wanted_state != CS::Animation::InvalidStateID)
+            if (wanted_state != fsm->GetCurrentState())
+              fsm->SwitchToState(wanted_state);
+        }
+        else
+        {
+          anim = root->FindNode("Frankie_Walk");
+	  if (anim && !anim->IsActive())
+	  {
+            root->Stop();
+            csRef<iSkeletonAnimationNodeFactory2> animfact = scfQueryInterface<iSkeletonAnimationNodeFactory2>(anim->GetFactory());
+            animfact->SetCyclic(true);
+            anim->Play();
+	  }
+        }
+    }
+  }
   else if (!csStrCaseCmp (cmd, "addmbot"))
   {
     RECORD_ARGS (cmd, arg);
@@ -2316,8 +2359,10 @@ bool CommandHandler (const char *cmd, const char *arg)
         int width = csQint(bbox.MaxX() - bbox.MinX());
         int height = csQint(bbox.MaxY() - bbox.MinY());
         Sys->views[0]->SetRectangle((int)bbox.MinX(), (int)bbox.MinY(), width / 2, height);
+	Sys->views[0]->GetCamera()->SetViewportSize (width, height);
         Sys->views[0]->GetCamera()->SetPerspectiveCenter(bbox.MinX() + (width / 4),
                                                         bbox.MinY() + (height / 2));
+	Sys->views[1]->GetCamera()->SetViewportSize (width, height);
         Sys->views[1]->SetRectangle((int)bbox.MinX() + (width / 2), (int)bbox.MinY(), 
                                     width / 2, height);
         Sys->views[1]->GetCamera()->SetPerspectiveCenter(bbox.MinX() + (3 * width / 4),
@@ -2336,6 +2381,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 
         int width = csQint(bbox2.MaxX() - bbox1.MinX());
         int height = csQint(bbox1.MaxY() - bbox1.MinY());
+	Sys->view->GetCamera()->SetViewportSize (width, height);
         Sys->view->SetRectangle((int)bbox1.MinX(), (int)bbox1.MinY(), width, height);
         Sys->view->GetCamera()->SetPerspectiveCenter(bbox1.MinX() + (width / 2), 
                                                     bbox2.MinY() + (height / 2));
