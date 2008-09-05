@@ -305,6 +305,7 @@ bool RMShadowedPSSM::RenderView (iView* view)
   contextsScannedForTargets.Empty ();
   portalPersistent.UpdateNewFrame ();
   lightPersistent.UpdateNewFrame ();
+  lightPersistent_unshadowed.UpdateNewFrame ();
   reflectRefractPersistent.UpdateNewFrame ();
 
   iSector* startSector = rview->GetThisSector ();
