@@ -27,6 +27,7 @@
  * @{ */
 
 #include "csutil/scf.h"
+#include "iutil/object.h"
 
 class csFlags;
 class csMatrix3;

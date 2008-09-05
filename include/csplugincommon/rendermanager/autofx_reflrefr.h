@@ -470,7 +470,9 @@ namespace CS
 	        *rview));
     #include "csutil/custom_new_enable.h"
             reflView->SetCamera (inewcam);
-            reflView->GetMeshFilter().AddFilterMesh (mesh.meshWrapper);
+	    CS::Utility::MeshFilter meshFilter;
+	    meshFilter.AddFilterMesh (mesh.meshWrapper);
+            reflView->SetMeshFilter(meshFilter);
 	    
 	    // Change the camera transform to be a reflection across reflRefrPlane
 	    csReversibleTransform reflection (csTransform::GetReflect (reflRefrPlane));
@@ -588,7 +590,9 @@ namespace CS
 	    csRef<iClipper2D> newView;
 	    newView.AttachNew (new csBoxClipper (clipBoxRefr));
 	    refrView->SetClipper (newView);
-            refrView->GetMeshFilter().AddFilterMesh (mesh.meshWrapper);
+	    CS::Utility::MeshFilter meshFilter;
+	    meshFilter.AddFilterMesh (mesh.meshWrapper);
+            refrView->SetMeshFilter(meshFilter);
             refrView->SetClipPlane (reflRefrPlane_cam.Inverse ());
   
 	    refrCtx = renderTree.CreateContext (refrView);
