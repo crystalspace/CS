@@ -314,3 +314,9 @@ void RenderView::DestroyRenderContext (csRenderContext* context)
 
   delete context;
 }
+
+void RenderView::SetMeshFilter (const CS::Utility::MeshFilter& filter)
+{
+  // NB: If that assignment becomes a problem COW-wrap meshFilter.
+  meshFilter = filter;
+}

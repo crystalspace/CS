@@ -703,7 +703,7 @@ namespace RenderManager
 	    csRef<iClipper2D> newView;
 	    newView.AttachNew (new csBoxClipper (clipBox));
 	    newRenderView->SetClipper (newView);
-	    newRenderView->GetMeshFilter() = superFrust.meshFilter;
+	    newRenderView->SetMeshFilter(superFrust.meshFilter);
     
 	    // Create a new context for shadow map w/ computed view
 	    typename RenderTree::ContextNode* shadowMapCtx = 

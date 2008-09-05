@@ -53,7 +53,7 @@ namespace RenderManager
       typedef typename RenderTreeType::ContextNode ContextNodeType;
 
       ViscullCallback (ContextNodeType& context, RenderView* currentRenderView, 
-        CS::Utility::MeshFilter* filter)
+        const CS::Utility::MeshFilter* filter)
         : scfImplementation1<ViscullCallback, iVisibilityCullerListener> (this), 
         context (context), currentRenderView (currentRenderView),
 	sector (currentRenderView->GetThisSector()), filter (filter)
@@ -115,7 +115,7 @@ namespace RenderManager
       ContextNodeType& context;
       RenderView* currentRenderView;
       iSector* sector;
-      CS::Utility::MeshFilter* filter;
+      const CS::Utility::MeshFilter* filter;
     };
   }
   
@@ -140,7 +140,7 @@ namespace RenderManager
   bool Viscull (typename RenderTree::ContextNode& context, RenderView* rw, 
     iVisibilityCuller* culler)
   {
-    CS::Utility::MeshFilter* filter = &rw->GetMeshFilter();
+    const CS::Utility::MeshFilter* filter = &rw->GetMeshFilter();
     CS::RenderManager::Implementation::ViscullCallback<RenderTree> cb (context, rw, filter);
 
     int renderW = 0, renderH = 0;
