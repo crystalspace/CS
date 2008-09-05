@@ -118,6 +118,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
     csRef<iLightManager>        lightManager;
 
     CS::RenderManager::MultipleRenderLayer renderLayer;
+    CS::RenderManager::MultipleRenderLayer renderLayerReflect;
+    CS::RenderManager::MultipleRenderLayer renderLayerRefract;
 
     TargetManagerType targets;
     csSet<RenderTreeType::ContextNode*> contextsScannedForTargets;
