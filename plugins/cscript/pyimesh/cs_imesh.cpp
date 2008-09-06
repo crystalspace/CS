@@ -3817,7 +3817,7 @@ SWIGINTERN PyObject *_wrap_iObjectModel_GetTriangleDataIterator(PyObject *SWIGUN
   arg1 = reinterpret_cast< iObjectModel * >(argp1);
   result = (arg1)->GetTriangleDataIterator();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTriangleMeshIterator> ref((csPtr<iTriangleMeshIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -4868,7 +4868,7 @@ SWIGINTERN PyObject *_wrap_iGeneralMeshCommonState_GetRenderBufferName(PyObject 
   arg2 = static_cast< int >(val2);
   result = ((iGeneralMeshCommonState const *)arg1)->GetRenderBufferName(arg2);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iString> ref((csRef<iString>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15979,7 +15979,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonFactory2_CreateSkeleton(PyObject *SWIGUNUSED
   arg1 = reinterpret_cast< iSkeletonFactory2 * >(argp1);
   result = (arg1)->CreateSkeleton();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSkeleton2> ref((csPtr<iSkeleton2>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -17084,7 +17084,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimPacketFactory2_CreateInstance(PyObject *
   arg2 = reinterpret_cast< iSkeleton2 * >(argp2);
   result = (arg1)->CreateInstance(arg2);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSkeletonAnimPacket2> ref((csPtr<iSkeletonAnimPacket2>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -17322,7 +17322,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimPacketFactory2_CreateAnimationNode(PyObj
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->CreateAnimationNode((char const *)arg2);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSkeletonAnimationNodeFactory2> ref((csPtr<iSkeletonAnimationNodeFactory2>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -17368,7 +17368,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimPacketFactory2_CreateBlendNode(PyObject 
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->CreateBlendNode((char const *)arg2);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSkeletonBlendNodeFactory2> ref((csPtr<iSkeletonBlendNodeFactory2>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -17414,7 +17414,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimPacketFactory2_CreatePriorityNode(PyObje
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->CreatePriorityNode((char const *)arg2);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSkeletonPriorityNodeFactory2> ref((csPtr<iSkeletonPriorityNodeFactory2>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -17494,7 +17494,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimPacketFactory2_CreateFSMNode(PyObject *S
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->CreateFSMNode((char const *)arg2);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSkeletonFSMNodeFactory2> ref((csPtr<iSkeletonFSMNodeFactory2>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -18333,7 +18333,7 @@ SWIGINTERN PyObject *_wrap_iSkeletonAnimNodeFactory2_CreateInstance(PyObject *SW
   arg3 = reinterpret_cast< iSkeleton2 * >(argp3);
   result = (arg1)->CreateInstance(arg2,arg3);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSkeletonAnimNode2> ref((csPtr<iSkeletonAnimNode2>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -30669,7 +30669,7 @@ SWIGINTERN PyObject *_wrap_iSpriteCal3DState_GetSkeleton(PyObject *SWIGUNUSEDPAR
   arg1 = reinterpret_cast< iSpriteCal3DState * >(argp1);
   result = (arg1)->GetSkeleton();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSkeleton> ref((csPtr<iSkeleton>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -30883,7 +30883,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_Clone(PyObject *SWIGUNUSEDPARM(self), PyO
   arg1 = reinterpret_cast< iMeshObject * >(argp1);
   result = (arg1)->Clone();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshObject> ref((csPtr<iMeshObject>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -31715,7 +31715,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectFactory_NewInstance(PyObject *SWIGUNUSEDPA
   arg1 = reinterpret_cast< iMeshObjectFactory * >(argp1);
   result = (arg1)->NewInstance();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshObject> ref((csPtr<iMeshObject>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -31749,7 +31749,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectFactory_Clone(PyObject *SWIGUNUSEDPARM(sel
   arg1 = reinterpret_cast< iMeshObjectFactory * >(argp1);
   result = (arg1)->Clone();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshObjectFactory> ref((csPtr<iMeshObjectFactory>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -32081,7 +32081,7 @@ SWIGINTERN PyObject *_wrap_iMeshObjectType_NewFactory(PyObject *SWIGUNUSEDPARM(s
   arg1 = reinterpret_cast< iMeshObjectType * >(argp1);
   result = (arg1)->NewFactory();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshObjectFactory> ref((csPtr<iMeshObjectFactory>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -34987,7 +34987,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellCollisionProperties_Clone(PyObject *SWIGU
   arg1 = reinterpret_cast< iTerrainCellCollisionProperties * >(argp1);
   result = (arg1)->Clone();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTerrainCellCollisionProperties> ref((csPtr<iTerrainCellCollisionProperties>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -35323,7 +35323,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellRenderProperties_Clone(PyObject *SWIGUNUS
   arg1 = reinterpret_cast< iTerrainCellRenderProperties * >(argp1);
   result = (arg1)->Clone();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTerrainCellRenderProperties> ref((csPtr<iTerrainCellRenderProperties>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -35760,7 +35760,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCellFeederProperties_Clone(PyObject *SWIGUNUS
   arg1 = reinterpret_cast< iTerrainCellFeederProperties * >(argp1);
   result = (arg1)->Clone();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTerrainCellFeederProperties> ref((csPtr<iTerrainCellFeederProperties>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -36214,7 +36214,7 @@ SWIGINTERN PyObject *_wrap_iTerrainDataFeeder_CreateProperties(PyObject *SWIGUNU
   arg1 = reinterpret_cast< iTerrainDataFeeder * >(argp1);
   result = (arg1)->CreateProperties();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTerrainCellFeederProperties> ref((csPtr<iTerrainCellFeederProperties>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -36704,7 +36704,7 @@ SWIGINTERN PyObject *_wrap_iTerrainCollider_CreateProperties(PyObject *SWIGUNUSE
   arg1 = reinterpret_cast< iTerrainCollider * >(argp1);
   result = (arg1)->CreateProperties();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTerrainCellCollisionProperties> ref((csPtr<iTerrainCellCollisionProperties>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -37156,7 +37156,7 @@ SWIGINTERN PyObject *_wrap_iTerrainRenderer_CreateProperties(PyObject *SWIGUNUSE
   arg1 = reinterpret_cast< iTerrainRenderer * >(argp1);
   result = (arg1)->CreateProperties();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTerrainCellRenderProperties> ref((csPtr<iTerrainCellRenderProperties>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -43330,7 +43330,7 @@ SWIGINTERN PyObject *_wrap_iParticleEmitter_Clone(PyObject *SWIGUNUSEDPARM(self)
   arg1 = reinterpret_cast< iParticleEmitter * >(argp1);
   result = ((iParticleEmitter const *)arg1)->Clone();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iParticleEmitter> ref((csPtr<iParticleEmitter>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -43666,7 +43666,7 @@ SWIGINTERN PyObject *_wrap_iParticleEffector_Clone(PyObject *SWIGUNUSEDPARM(self
   arg1 = reinterpret_cast< iParticleEffector * >(argp1);
   result = ((iParticleEffector const *)arg1)->Clone();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iParticleEffector> ref((csPtr<iParticleEffector>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -45629,7 +45629,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterFactory_CreateSphere(PyObject 
   arg1 = reinterpret_cast< iParticleBuiltinEmitterFactory * >(argp1);
   result = ((iParticleBuiltinEmitterFactory const *)arg1)->CreateSphere();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iParticleBuiltinEmitterSphere> ref((csPtr<iParticleBuiltinEmitterSphere>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -45663,7 +45663,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterFactory_CreateCone(PyObject *S
   arg1 = reinterpret_cast< iParticleBuiltinEmitterFactory * >(argp1);
   result = ((iParticleBuiltinEmitterFactory const *)arg1)->CreateCone();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iParticleBuiltinEmitterCone> ref((csPtr<iParticleBuiltinEmitterCone>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -45697,7 +45697,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterFactory_CreateBox(PyObject *SW
   arg1 = reinterpret_cast< iParticleBuiltinEmitterFactory * >(argp1);
   result = ((iParticleBuiltinEmitterFactory const *)arg1)->CreateBox();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iParticleBuiltinEmitterBox> ref((csPtr<iParticleBuiltinEmitterBox>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -45731,7 +45731,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEmitterFactory_CreateCylinder(PyObjec
   arg1 = reinterpret_cast< iParticleBuiltinEmitterFactory * >(argp1);
   result = ((iParticleBuiltinEmitterFactory const *)arg1)->CreateCylinder();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iParticleBuiltinEmitterCylinder> ref((csPtr<iParticleBuiltinEmitterCylinder>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -46494,7 +46494,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorFactory_CreateForce(PyObject 
   arg1 = reinterpret_cast< iParticleBuiltinEffectorFactory * >(argp1);
   result = ((iParticleBuiltinEffectorFactory const *)arg1)->CreateForce();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iParticleBuiltinEffectorForce> ref((csPtr<iParticleBuiltinEffectorForce>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -46528,7 +46528,7 @@ SWIGINTERN PyObject *_wrap_iParticleBuiltinEffectorFactory_CreateLinColor(PyObje
   arg1 = reinterpret_cast< iParticleBuiltinEffectorFactory * >(argp1);
   result = ((iParticleBuiltinEffectorFactory const *)arg1)->CreateLinColor();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iParticleBuiltinEffectorLinColor> ref((csPtr<iParticleBuiltinEffectorLinColor>&)result); /* explicit cast */
     
     if (!ref.IsValid())

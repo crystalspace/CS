@@ -4867,7 +4867,7 @@ SWIGINTERN PyObject *_wrap_iSndSysLoader_LoadSound__SWIG_0(PyObject *SWIGUNUSEDP
   arg3 = reinterpret_cast< char * >(buf3);
   result = (arg1)->LoadSound(arg2,(char const *)arg3);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSndSysData> ref((csPtr<iSndSysData>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -4912,7 +4912,7 @@ SWIGINTERN PyObject *_wrap_iSndSysLoader_LoadSound__SWIG_1(PyObject *SWIGUNUSEDP
   arg2 = reinterpret_cast< iDataBuffer * >(argp2);
   result = (arg1)->LoadSound(arg2);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSndSysData> ref((csPtr<iSndSysData>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -5495,7 +5495,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSource_GetStream(PyObject *SWIGUNUSEDPARM(self
   arg1 = reinterpret_cast< iSndSysSource * >(argp1);
   result = (arg1)->GetStream();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSndSysStream> ref((csRef<iSndSysStream>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -7959,7 +7959,7 @@ SWIGINTERN PyObject *_wrap_iSndSysRenderer_CreateStream(PyObject *SWIGUNUSEDPARM
   arg3 = static_cast< int >(val3);
   result = (arg1)->CreateStream(arg2,arg3);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSndSysStream> ref((csPtr<iSndSysStream>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -8002,7 +8002,7 @@ SWIGINTERN PyObject *_wrap_iSndSysRenderer_CreateSource(PyObject *SWIGUNUSEDPARM
   arg2 = reinterpret_cast< iSndSysStream * >(argp2);
   result = (arg1)->CreateSource(arg2);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSndSysSource> ref((csPtr<iSndSysSource>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -8098,7 +8098,7 @@ SWIGINTERN PyObject *_wrap_iSndSysRenderer_GetListener(PyObject *SWIGUNUSEDPARM(
   arg1 = reinterpret_cast< iSndSysRenderer * >(argp1);
   result = (arg1)->GetListener();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
+    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSndSysListener> ref((csRef<iSndSysListener>&)result); /* explicit cast */
     
     if (!ref.IsValid())
