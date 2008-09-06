@@ -47,7 +47,7 @@
 
 #include "al_stringlists.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 SCF_IMPLEMENT_FACTORY (csSndSysRendererOpenAL)
 

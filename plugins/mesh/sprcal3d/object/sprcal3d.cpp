@@ -62,7 +62,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 // STL include required by cal3d
 #include <string>
 
-CS_IMPLEMENT_PLUGIN
+
 
 CS_PLUGIN_NAMESPACE_BEGIN(SprCal3d)
 {

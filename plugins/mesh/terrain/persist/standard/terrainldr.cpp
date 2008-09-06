@@ -40,7 +40,7 @@
 
 #include "terrainldr.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 enum
 {

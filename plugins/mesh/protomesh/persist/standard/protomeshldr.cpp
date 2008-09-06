@@ -44,7 +44,7 @@
 
 #include "protomeshldr.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 using namespace CS::Plugins::ProtoMeshLoader;
 

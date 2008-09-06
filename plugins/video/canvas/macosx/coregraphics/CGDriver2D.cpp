@@ -28,7 +28,7 @@
 #define CGDRIVER_REPORTER_ID "crystalspace.canvas.coregraphics"
 
 
-CS_IMPLEMENT_PLUGIN
+
 
 SCF_IMPLEMENT_FACTORY(CGDriver2D)
 

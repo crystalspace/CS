@@ -26,7 +26,7 @@
 
 extern "C" void xs_init (pTHX); // defined in csperlxs.c
 
-CS_IMPLEMENT_PLUGIN
+
 SCF_IMPLEMENT_FACTORY (csPerl5)
 
 //------------------------------------------------------- csPerl5 ----//

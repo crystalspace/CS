@@ -38,7 +38,7 @@
 
 //-------------------------------------------------------- csGraphics2DCaca ---
 
-CS_IMPLEMENT_PLUGIN
+
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DCaca)
 

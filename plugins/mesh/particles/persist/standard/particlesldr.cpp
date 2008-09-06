@@ -31,7 +31,7 @@
 #include "iutil/plugin.h"
 #include "iutil/object.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 template<>
 class csHashComputer<iParticleEmitter*> : public csHashComputerIntegral<iParticleEmitter*> {};

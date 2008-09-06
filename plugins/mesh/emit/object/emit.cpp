@@ -34,7 +34,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-CS_IMPLEMENT_PLUGIN
+
 
 /// helper particle sorting structure
 struct csEmitCompPart

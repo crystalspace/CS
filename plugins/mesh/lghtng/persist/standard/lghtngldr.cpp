@@ -41,7 +41,7 @@
 #include "imap/ldrctxt.h"
 #include "ivaria/reporter.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 enum
 {

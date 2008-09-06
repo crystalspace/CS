@@ -48,7 +48,7 @@
 
 #include "instmeshldr.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 enum
 {

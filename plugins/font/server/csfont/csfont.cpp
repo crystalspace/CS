@@ -30,7 +30,7 @@
 #include "iutil/objreg.h"
 #include "iutil/comp.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 CS_PLUGIN_NAMESPACE_BEGIN(csFont)
 {

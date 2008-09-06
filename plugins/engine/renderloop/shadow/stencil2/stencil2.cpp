@@ -58,7 +58,7 @@
 #include "trimesh.h"
 #include "stencil2.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 csStencil2ShadowCacheEntry::csStencil2ShadowCacheEntry (
   csStencil2ShadowStep* parent, iMeshWrapper* mesh) :

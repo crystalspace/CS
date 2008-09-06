@@ -42,7 +42,7 @@
 
 #include "csplugincommon/render3d/normalizationcube.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 SCF_IMPLEMENT_FACTORY (csNullGraphics3D)
 

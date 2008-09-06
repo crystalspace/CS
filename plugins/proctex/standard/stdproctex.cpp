@@ -32,7 +32,7 @@
 
 // Plugin stuff
 
-CS_IMPLEMENT_PLUGIN
+
 
 //---------------------------------------------------------------------------
 // Base for all PT types

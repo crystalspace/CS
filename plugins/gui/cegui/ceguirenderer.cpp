@@ -26,7 +26,7 @@
 #include "ceguitexture.h"
 #include "CEGUIExceptions.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 SCF_IMPLEMENT_FACTORY (csCEGUIRenderer)
 

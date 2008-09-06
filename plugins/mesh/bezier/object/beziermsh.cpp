@@ -61,7 +61,7 @@
 #include "curvebase.h"
 #include "beziermsh.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 //---------------------------------------------------------------------------
 

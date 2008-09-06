@@ -28,7 +28,7 @@
 #include "genloader.h"
 
 
-CS_IMPLEMENT_PLUGIN
+
 
 
 SCF_IMPLEMENT_FACTORY (SndSysLoader)

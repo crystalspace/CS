@@ -41,7 +41,7 @@
 #include "iutil/comp.h"
 #include "iutil/cfgmgr.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 CS_PLUGIN_NAMESPACE_BEGIN(ConOut)
 {

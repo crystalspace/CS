@@ -33,7 +33,7 @@ extern "C" {
 }
 #endif
 
-CS_IMPLEMENT_PLUGIN
+
 SCF_IMPLEMENT_FACTORY (csGraphicsMemory)
 
 #if THREAD_SUPPORT

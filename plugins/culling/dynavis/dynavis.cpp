@@ -64,7 +64,7 @@
 #include "wqueue.h"
 #include "exvis.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 SCF_IMPLEMENT_FACTORY (csDynaVis)
 

@@ -35,7 +35,7 @@
 
 #include "plugins/video/canvas/openglx/glx2d.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DGLX)
 

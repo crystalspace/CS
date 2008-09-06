@@ -38,7 +38,7 @@
 #include "isndsys/ss_renderer.h"
 #include "driver_coreaudio.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 CS_PLUGIN_NAMESPACE_BEGIN(SndSysCOREAUDIO)
 {

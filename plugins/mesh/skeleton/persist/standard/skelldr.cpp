@@ -47,7 +47,7 @@
 
 #include "skelldr.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 enum
 {

@@ -38,7 +38,7 @@
 
 #include "freefnt2.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 CS_PLUGIN_NAMESPACE_BEGIN(FreeFont2)
 {

@@ -43,7 +43,7 @@
 #include "csgeom/vector2.h"
 #include "csgeom/vector4.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 enum
 {

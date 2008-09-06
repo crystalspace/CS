@@ -46,7 +46,7 @@
 #include "bezierldr.h"
 #include "csqint.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 enum
 {

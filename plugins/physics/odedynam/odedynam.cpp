@@ -61,7 +61,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
   csmat.m31 = odemat[2]; csmat.m32 = odemat[6]; csmat.m33 = odemat[10]; \
 }
 
-CS_IMPLEMENT_PLUGIN
+
 
 CS_PLUGIN_NAMESPACE_BEGIN(odedynam)
 {

@@ -49,7 +49,7 @@
 
 //--//--//--//--//--//--//--//--//--//--//--//--//-- csGraphics2DDDraw3 --//--//
 
-CS_IMPLEMENT_PLUGIN
+
 
 SCF_IMPLEMENT_FACTORY (csGraphics2DDDraw3)
 

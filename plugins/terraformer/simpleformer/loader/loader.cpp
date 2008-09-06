@@ -42,7 +42,7 @@
 
 #include "loader.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 using namespace CS::Plugins::SimpleFormerLoader;
 

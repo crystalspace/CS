@@ -53,7 +53,7 @@
 #include "ivaria/reporter.h"
 #include "frustvis.h"
 
-CS_IMPLEMENT_PLUGIN
+
 
 SCF_IMPLEMENT_FACTORY (csFrustumVis)
 
