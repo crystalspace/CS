@@ -8,6 +8,7 @@
     <Feature Title="Binaries" Id="CS.arch" Level="1" Display="hidden">
       <Feature Title="Libraries" Id="CS.arch.lib" Level="1">
         <MergeRef Id="CS.arch.lib"/>
+        <ComponentRef Id="CS.arch.lib.runtime.register"/>
       </Feature>
       <Feature Title="Applications" Id="CS.arch.executable.runtime" Level="1">
         <MergeRef Id="CS.arch.executable.runtime"/>

@@ -16,8 +16,13 @@
       </Directory>
       <Directory Name="$(var.ARCH)" Id="CS.arch">
         <Directory Name="bin" Id="CS.arch.bin.runtime">
-          <Merge DiskId="30001" SourceFile="$(var.MSM_CS_PATH)/CS.arch.$(var.ARCH).lib.msm" Id="CS.arch.lib" Language="1033" FileCompression="yes"/>
           <Merge DiskId="30001" SourceFile="$(var.MSM_CS_PATH)/CS.arch.$(var.ARCH).executable.runtime.msm" Id="CS.arch.executable.runtime" Language="1033" FileCompression="yes"/>
+        </Directory>
+        <Directory Name="lib" Id="CSLIB_ARCH">
+          <Component Guid="60f8c4a1-7439-4312-aa14-a1717c0b07b0" Id="CS.arch.lib.runtime.register">
+            <Environment Action="set" Part="first" Name="PATH" Value="[CSLIB_ARCH]" Id="CS.arch.lib.runtime.register.env" Permanent="no"/>
+          </Component>
+          <Merge DiskId="30001" SourceFile="$(var.MSM_CS_PATH)/CS.arch.$(var.ARCH).lib.msm" Id="CS.arch.lib" Language="1033" FileCompression="yes"/>
           <Merge DiskId="30000" SourceFile="$(var.TOP)/win32libs/mergemodules/winlibs.common.dlls.msm" Id="winlibs.common.dlls" Language="1033" FileCompression="yes"/>
           <?if $(var.ARCH) = GCC_3.4 ?>
             <Merge DiskId="30001" SourceFile="$(var.TOP)/win32libs/mergemodules/winlibs.mingw.dlls.msm" Id="winlibs.arch.dlls" Language="1033" FileCompression="yes"/>

@@ -1,14 +1,14 @@
 <Include>
   <Media EmbedCab="yes" Id="30010" Cabinet="CS_sdk.cab"/>
   <Media EmbedCab="yes" Id="30011" Cabinet="CS_sdk_$(var.ARCH).cab"/>
-  <DirectoryRef Id="CSDIR">
-    <Directory Name="CS-1.9" Id="CS1.9_d">
-      <Directory Name="$(var.ARCH) SDK" Id="CSSDK1.9">
+  <DirectoryRef Id="TARGETDIR">
+    <Directory Name="CrystalSpaceSDK" Id="CSSDK1.9">
+      <Directory Name="$(var.ARCH)" Id="CSSDK_ARCH">
         <?if $(var.ARCH) = GCC_3.4 ?>
           <!-- GCC SDK: Add SDK dir to environment so configure checks can pick it up -->
           <Component Guid="56d062bb-f775-4e43-a718-8c8f301a996e" Id="CS.sdk.register">
-            <Environment Action="set" Part="first" Name="CRYSTAL_1_9" Value="[CSSDK1.9]" Id="CS.sdk.register.env" Permanent="no"/>
-            <Environment Action="set" Part="first" Name="CRYSTAL" Value="[CSSDK1.9]" Id="CS.sdk.register.env" Permanent="no"/>
+            <Environment Action="set" Part="first" Name="CRYSTAL_1_9" Value="[CSSDK_ARCH]" Id="CS.sdk.register.env1" Permanent="no"/>
+            <Environment Action="set" Part="first" Name="CRYSTAL" Value="[CSSDK_ARCH]" Id="CS.sdk.register.env2" Permanent="no"/>
           </Component>
         <?endif?>
         <Directory Name="bin" Id="CS.arch.bin.sdk">
