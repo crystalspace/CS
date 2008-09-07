@@ -10,7 +10,7 @@
         <MergeRef Id="CS.arch.lib"/>
         <ComponentRef Id="CS.arch.lib.runtime.register"/>
       </Feature>
-      <Feature Title="Applications" Id="CS.arch.executable.runtime" Level="1">
+      <Feature Title="Applications and Plugins" Id="CS.arch.executable.runtime" Level="1">
         <MergeRef Id="CS.arch.executable.runtime"/>
       </Feature>
       <Feature Title="Support Libraries" Id="CS.arch.support" Level="1">

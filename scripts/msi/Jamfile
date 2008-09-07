@@ -1,5 +1,15 @@
 SubDir TOP scripts msi ;
 
+# @@@ Not quite the same, MSM package and CS release version ...
+MSM_VERSION ?= $(PACKAGE_VERSION) ;
+MSM_ARCH = $(CS_COMPILER_NAME_AND_VERSION) ;
+
+MSI_VERSION_MAJORMINOR ?= $(PACKAGE_VERSION_LIST[1]).$(PACKAGE_VERSION_LIST[2]) ;
+
+# Package version.
+# This will become the MSI package version "build" number.
+MSI_VERSION_PACKAGE = 4 ;
+
 # Set up file lists for MSVC binaries.
 rule MSVCFileListSharedLibs
 {
@@ -116,10 +126,6 @@ Includes CS-sdk.wxs : $(INCL_RUNTIME) $(INCL_SDK) ;
 Includes CS-demos.wxs : $(INCL_RUNTIME) $(INCL_DEMO) ;
 Includes CS-all.wxs : $(INCL_RUNTIME) $(INCL_SDK) $(INCL_DEMO) ;
 
-# @@@ Not quite the same, MSM package and CS release version ...
-MSM_VERSION ?= $(PACKAGE_VERSION) ;
-MSM_ARCH = $(CS_COMPILER_NAME_AND_VERSION) ;
-
 # Architecture-independent
 MSIMergeModuleFromList CS.doc : doc-manual doc-api : $(MSM_VERSION) : doc-manual:manual doc-api:api ;
 MSIMergeModuleFromList CS.data.demo : data-demo data-demo-maps : $(MSM_VERSION) ;
@@ -138,6 +144,13 @@ MSIMergeModuleFromList CS.arch.$(MSM_ARCH).executable.demo : app-demo : $(MSM_VE
 MSIMergeModuleFromList CS.arch.$(MSM_ARCH).executable.runtime : plugin plugin-cg : $(MSM_VERSION) ;
 MSIMergeModuleFromList CS.arch.$(MSM_ARCH).executable.sdk : app-tool : $(MSM_VERSION) ;
 MSIMergeModuleFromList CS.arch.$(MSM_ARCH).csconfig : cs-config : $(MSM_VERSION) ;
+
+# Safeguard
+MSI_UPGRADE_CODES_FOR_VERSION = 1.9 ;
+if "$(MSI_UPGRADE_CODES_FOR_VERSION)" != "$(MSI_VERSION_MAJORMINOR)"
+{
+  Exit "CS version was changed, please set new MSI upgrade codes" ;
+}
 
 MSI_UPGRADE_CODE.CS.all.GCC_3.4 = 3C8B4562-BF93-11DC-B42B-0015582877AD ;
 MSI_UPGRADE_CODE.CS.all.VC_7 = 70d2beb0-169e-4516-a181-a4603cba2d7d ;
@@ -163,15 +176,32 @@ MSI_UPGRADE_CODE.CS.demos.VC_71 = 24ace31c-863a-4e07-b63f-f8b4620f3c4b ;
 MSI_UPGRADE_CODE.CS.demos.VC_8 = be05d5d1-a0e1-47e0-8267-ce081be7cbc7 ;
 MSI_UPGRADE_CODE.CS.demos.VC_9 = dd6a2886-2c83-46f8-a242-5de4b6aa2913 ;
 
+rule GetWin32LibsMSMPath
+{
+  if "$(WIN32LIBS.MSM_PATH)" = ""
+  {
+    local guess = "$(TOP)/win32libs/mergemodules" ;
+    echo "No path for the cs-win32libs MSMs was set; I'm guessing $(guess)." ;
+    echo "If that is not what you want specify the WIN32LIBS.MSM_PATH Jam variable." ;
+    WIN32LIBS.MSM_PATH = $(guess) ;
+  }
+  return $(WIN32LIBS.MSM_PATH) ;
+}
+
 rule MakeMSIsForArchAndKind
 {
   local arch = $(1) ;
   local kind = $(2) ;
-  
+  local win32libs_msms = [ GetWin32LibsMSMPath ] ;
+
   MakeLocate CS-$(kind)-$(arch).msi : $(LOCATE.MSI) ;
   MSIPackage CS-$(kind)-$(arch).msi : CS-$(kind).wxs :
-    "MSM_CS_PATH=$(LOCATE.MSM)" "ARCH=$(arch)" "TOP=$(TOP)"
-    "UPGRADE_CODE=$(MSI_UPGRADE_CODE.CS.$(kind).$(arch))" :
+    "CRYSTAL_MSM_PATH=$(LOCATE.MSM)"
+    "WIN32LIBS_MSM_PATH=$(win32libs_msms)"
+    "ARCH=$(arch)" "TOP=$(TOP)"
+    "UPGRADE_CODE=$(MSI_UPGRADE_CODE.CS.$(kind).$(arch))" 
+    "VERSION_MAJORMINOR=$(MSI_VERSION_MAJORMINOR)"
+    "VERSION_PACKAGE=$(MSI_VERSION_PACKAGE)" :
     CS-$(kind)-$(arch) ;
   #Depends CS-$(kind)-$(arch).msi : mergemodules ;
   Depends msis-$(kind) : CS-$(kind)-$(arch).msi ;

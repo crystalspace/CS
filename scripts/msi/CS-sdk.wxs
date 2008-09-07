@@ -1,5 +1,11 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Version="1.9.3" Name="Crystal Space 1.9 SDK ($(var.ARCH))" Language="1033" UpgradeCode="$(var.UPGRADE_CODE)" Id="*" Manufacturer="The Crystal Space Project">
+  <Product
+        Version="$(var.VERSION_MAJORMINOR).$(var.VERSION_PACKAGE)" 
+        Name="Crystal Space $(var.VERSION_MAJORMINOR) SDK ($(var.ARCH))" 
+        Manufacturer="The Crystal Space Project"
+        Language="1033" 
+        UpgradeCode="$(var.UPGRADE_CODE)" 
+        Id="*">
     <Package InstallerVersion="301"/>
     <Media EmbedCab="yes" Id="1" Cabinet="cs1.cab"/>
     <UIRef Id="WixUI_FeatureTree"/>
@@ -17,7 +23,10 @@
     <?include CS-directory-runtime.wxi ?>
     <?include CS-directory-sdk.wxi ?>
     <Upgrade Id="$(var.UPGRADE_CODE)">
-      <UpgradeVersion IncludeMaximum="yes" Minimum="1.9.0" Property="PATCHFOUND" Maximum="1.9.3" IncludeMinimum="yes"/>
+      <UpgradeVersion
+        Minimum="$(var.VERSION_MAJORMINOR).0" IncludeMinimum="yes"
+        Maximum="$(var.VERSION_MAJORMINOR).$(var.VERSION_PACKAGE)" IncludeMaximum="yes" 
+        Property="PATCHFOUND" />
     </Upgrade>
     <?include CS-feature-sdk.wxi ?>
     <?include CS-feature-runtime.wxi ?>
