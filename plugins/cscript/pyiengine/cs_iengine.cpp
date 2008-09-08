@@ -11899,7 +11899,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateBaseMaterial(PyObject *SWIGUNUSEDPARM(s
   arg2 = reinterpret_cast< iTextureWrapper * >(argp2);
   result = (arg1)->CreateBaseMaterial(arg2);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMaterial> ref((csPtr<iMaterial>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -11909,7 +11908,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateBaseMaterial(PyObject *SWIGUNUSEDPARM(s
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMaterial *)ref, SWIGTYPE_p_iMaterial, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -12478,7 +12476,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateLight__SWIG_0(PyObject *SWIGUNUSEDPARM(
   arg6 = static_cast< csLightDynamicType >(val6);
   result = (arg1)->CreateLight((char const *)arg2,(csVector3 const &)*arg3,arg4,(csColor const &)*arg5,arg6);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iLight> ref((csPtr<iLight>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -12488,7 +12485,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateLight__SWIG_0(PyObject *SWIGUNUSEDPARM(
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iLight *)ref, SWIGTYPE_p_iLight, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -12557,7 +12553,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateLight__SWIG_1(PyObject *SWIGUNUSEDPARM(
   arg5 = reinterpret_cast< csColor * >(argp5);
   result = (arg1)->CreateLight((char const *)arg2,(csVector3 const &)*arg3,arg4,(csColor const &)*arg5);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iLight> ref((csPtr<iLight>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -12567,7 +12562,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateLight__SWIG_1(PyObject *SWIGUNUSEDPARM(
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iLight *)ref, SWIGTYPE_p_iLight, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -12839,7 +12833,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetLightIterator__SWIG_0(PyObject *SWIGUNUSED
   arg2 = reinterpret_cast< iCollection * >(argp2);
   result = (arg1)->GetLightIterator(arg2);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iLightIterator> ref((csPtr<iLightIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -12849,7 +12842,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetLightIterator__SWIG_0(PyObject *SWIGUNUSED
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iLightIterator *)ref, SWIGTYPE_p_iLightIterator, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -12873,7 +12865,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetLightIterator__SWIG_1(PyObject *SWIGUNUSED
   arg1 = reinterpret_cast< iEngine * >(argp1);
   result = (arg1)->GetLightIterator();
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iLightIterator> ref((csPtr<iLightIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -12883,7 +12874,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetLightIterator__SWIG_1(PyObject *SWIGUNUSED
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iLightIterator *)ref, SWIGTYPE_p_iLightIterator, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -13484,7 +13474,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbySectors__SWIG_0(PyObject *SWIGUNUSED
   arg4 = static_cast< float >(val4);
   result = (arg1)->GetNearbySectors(arg2,(csVector3 const &)*arg3,arg4);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSectorIterator> ref((csPtr<iSectorIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -13494,7 +13483,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbySectors__SWIG_0(PyObject *SWIGUNUSED
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iSectorIterator *)ref, SWIGTYPE_p_iSectorIterator, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -13539,7 +13527,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbySectors__SWIG_1(PyObject *SWIGUNUSED
   arg3 = reinterpret_cast< csBox3 * >(argp3);
   result = (arg1)->GetNearbySectors(arg2,(csBox3 const &)*arg3);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSectorIterator> ref((csPtr<iSectorIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -13549,7 +13536,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbySectors__SWIG_1(PyObject *SWIGUNUSED
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iSectorIterator *)ref, SWIGTYPE_p_iSectorIterator, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -13792,7 +13778,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_0(PyObject *SWIGUNUSE
   arg5 = reinterpret_cast< csVector3 * >(argp5);
   result = (arg1)->CreateMeshWrapper(arg2,(char const *)arg3,arg4,(csVector3 const &)*arg5);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -13802,7 +13787,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_0(PyObject *SWIGUNUSE
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapper *)ref, SWIGTYPE_p_iMeshWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   return resultobj;
@@ -13856,7 +13840,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_1(PyObject *SWIGUNUSE
   arg4 = reinterpret_cast< iSector * >(argp4);
   result = (arg1)->CreateMeshWrapper(arg2,(char const *)arg3,arg4);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -13866,7 +13849,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_1(PyObject *SWIGUNUSE
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapper *)ref, SWIGTYPE_p_iMeshWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   return resultobj;
@@ -13911,7 +13893,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_2(PyObject *SWIGUNUSE
   arg3 = reinterpret_cast< char * >(buf3);
   result = (arg1)->CreateMeshWrapper(arg2,(char const *)arg3);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -13921,7 +13902,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_2(PyObject *SWIGUNUSE
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapper *)ref, SWIGTYPE_p_iMeshWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   return resultobj;
@@ -13987,7 +13967,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_3(PyObject *SWIGUNUSE
   arg5 = reinterpret_cast< csVector3 * >(argp5);
   result = (arg1)->CreateMeshWrapper(arg2,(char const *)arg3,arg4,(csVector3 const &)*arg5);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -13997,7 +13976,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_3(PyObject *SWIGUNUSE
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapper *)ref, SWIGTYPE_p_iMeshWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   return resultobj;
@@ -14051,7 +14029,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_4(PyObject *SWIGUNUSE
   arg4 = reinterpret_cast< iSector * >(argp4);
   result = (arg1)->CreateMeshWrapper(arg2,(char const *)arg3,arg4);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14061,7 +14038,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_4(PyObject *SWIGUNUSE
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapper *)ref, SWIGTYPE_p_iMeshWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   return resultobj;
@@ -14106,7 +14082,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_5(PyObject *SWIGUNUSE
   arg3 = reinterpret_cast< char * >(buf3);
   result = (arg1)->CreateMeshWrapper(arg2,(char const *)arg3);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14116,7 +14091,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_5(PyObject *SWIGUNUSE
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapper *)ref, SWIGTYPE_p_iMeshWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   return resultobj;
@@ -14183,7 +14157,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_6(PyObject *SWIGUNUSE
   arg5 = reinterpret_cast< csVector3 * >(argp5);
   result = (arg1)->CreateMeshWrapper((char const *)arg2,(char const *)arg3,arg4,(csVector3 const &)*arg5);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14193,7 +14166,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_6(PyObject *SWIGUNUSE
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapper *)ref, SWIGTYPE_p_iMeshWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
@@ -14250,7 +14222,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_7(PyObject *SWIGUNUSE
   arg4 = reinterpret_cast< iSector * >(argp4);
   result = (arg1)->CreateMeshWrapper((char const *)arg2,(char const *)arg3,arg4);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14260,7 +14231,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_7(PyObject *SWIGUNUSE
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapper *)ref, SWIGTYPE_p_iMeshWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
@@ -14308,7 +14278,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_8(PyObject *SWIGUNUSE
   arg3 = reinterpret_cast< char * >(buf3);
   result = (arg1)->CreateMeshWrapper((char const *)arg2,(char const *)arg3);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14318,7 +14287,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_8(PyObject *SWIGUNUSE
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapper *)ref, SWIGTYPE_p_iMeshWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
@@ -14356,7 +14324,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_9(PyObject *SWIGUNUSE
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->CreateMeshWrapper((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14366,7 +14333,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshWrapper__SWIG_9(PyObject *SWIGUNUSE
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapper *)ref, SWIGTYPE_p_iMeshWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -14673,7 +14639,6 @@ SWIGINTERN PyObject *_wrap_iEngine_LoadMeshWrapper(PyObject *SWIGUNUSEDPARM(self
   arg6 = reinterpret_cast< csVector3 * >(argp6);
   result = (arg1)->LoadMeshWrapper((char const *)arg2,(char const *)arg3,arg4,arg5,(csVector3 const &)*arg6);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14683,7 +14648,6 @@ SWIGINTERN PyObject *_wrap_iEngine_LoadMeshWrapper(PyObject *SWIGUNUSEDPARM(self
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapper *)ref, SWIGTYPE_p_iMeshWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
@@ -14780,7 +14744,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyMeshes__SWIG_0(PyObject *SWIGUNUSEDP
   arg5 = static_cast< bool >(val5);
   result = (arg1)->GetNearbyMeshes(arg2,(csVector3 const &)*arg3,arg4,arg5);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapperIterator> ref((csPtr<iMeshWrapperIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14790,7 +14753,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyMeshes__SWIG_0(PyObject *SWIGUNUSEDP
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapperIterator *)ref, SWIGTYPE_p_iMeshWrapperIterator, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -14844,7 +14806,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyMeshes__SWIG_1(PyObject *SWIGUNUSEDP
   arg4 = static_cast< float >(val4);
   result = (arg1)->GetNearbyMeshes(arg2,(csVector3 const &)*arg3,arg4);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapperIterator> ref((csPtr<iMeshWrapperIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14854,7 +14815,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyMeshes__SWIG_1(PyObject *SWIGUNUSEDP
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapperIterator *)ref, SWIGTYPE_p_iMeshWrapperIterator, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -14908,7 +14868,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyMeshes__SWIG_2(PyObject *SWIGUNUSEDP
   arg4 = static_cast< bool >(val4);
   result = (arg1)->GetNearbyMeshes(arg2,(csBox3 const &)*arg3,arg4);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapperIterator> ref((csPtr<iMeshWrapperIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14918,7 +14877,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyMeshes__SWIG_2(PyObject *SWIGUNUSEDP
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapperIterator *)ref, SWIGTYPE_p_iMeshWrapperIterator, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -14963,7 +14921,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyMeshes__SWIG_3(PyObject *SWIGUNUSEDP
   arg3 = reinterpret_cast< csBox3 * >(argp3);
   result = (arg1)->GetNearbyMeshes(arg2,(csBox3 const &)*arg3);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapperIterator> ref((csPtr<iMeshWrapperIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -14973,7 +14930,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyMeshes__SWIG_3(PyObject *SWIGUNUSEDP
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapperIterator *)ref, SWIGTYPE_p_iMeshWrapperIterator, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -15039,7 +14995,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyMeshes__SWIG_4(PyObject *SWIGUNUSEDP
   arg5 = static_cast< bool >(val5);
   result = (arg1)->GetNearbyMeshes(arg2,(csVector3 const &)*arg3,(csVector3 const &)*arg4,arg5);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapperIterator> ref((csPtr<iMeshWrapperIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15049,7 +15004,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyMeshes__SWIG_4(PyObject *SWIGUNUSEDP
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapperIterator *)ref, SWIGTYPE_p_iMeshWrapperIterator, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -15106,7 +15060,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyMeshes__SWIG_5(PyObject *SWIGUNUSEDP
   arg4 = reinterpret_cast< csVector3 * >(argp4);
   result = (arg1)->GetNearbyMeshes(arg2,(csVector3 const &)*arg3,(csVector3 const &)*arg4);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapperIterator> ref((csPtr<iMeshWrapperIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15116,7 +15069,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyMeshes__SWIG_5(PyObject *SWIGUNUSEDP
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapperIterator *)ref, SWIGTYPE_p_iMeshWrapperIterator, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -15500,7 +15452,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshFactory__SWIG_0(PyObject *SWIGUNUSE
   arg3 = reinterpret_cast< char * >(buf3);
   result = (arg1)->CreateMeshFactory((char const *)arg2,(char const *)arg3);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshFactoryWrapper> ref((csPtr<iMeshFactoryWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15510,7 +15461,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshFactory__SWIG_0(PyObject *SWIGUNUSE
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshFactoryWrapper *)ref, SWIGTYPE_p_iMeshFactoryWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
@@ -15557,7 +15507,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshFactory__SWIG_1(PyObject *SWIGUNUSE
   arg3 = reinterpret_cast< char * >(buf3);
   result = (arg1)->CreateMeshFactory(arg2,(char const *)arg3);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshFactoryWrapper> ref((csPtr<iMeshFactoryWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15567,7 +15516,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshFactory__SWIG_1(PyObject *SWIGUNUSE
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshFactoryWrapper *)ref, SWIGTYPE_p_iMeshFactoryWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   return resultobj;
@@ -15603,7 +15551,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshFactory__SWIG_2(PyObject *SWIGUNUSE
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->CreateMeshFactory((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshFactoryWrapper> ref((csPtr<iMeshFactoryWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15613,7 +15560,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateMeshFactory__SWIG_2(PyObject *SWIGUNUSE
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshFactoryWrapper *)ref, SWIGTYPE_p_iMeshFactoryWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -15733,7 +15679,6 @@ SWIGINTERN PyObject *_wrap_iEngine_LoadMeshFactory(PyObject *SWIGUNUSEDPARM(self
   arg4 = reinterpret_cast< iDataBuffer * >(argp4);
   result = (arg1)->LoadMeshFactory((char const *)arg2,(char const *)arg3,arg4);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshFactoryWrapper> ref((csPtr<iMeshFactoryWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15743,7 +15688,6 @@ SWIGINTERN PyObject *_wrap_iEngine_LoadMeshFactory(PyObject *SWIGUNUSEDPARM(self
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshFactoryWrapper *)ref, SWIGTYPE_p_iMeshFactoryWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
@@ -15986,7 +15930,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetCollections(PyObject *SWIGUNUSEDPARM(self)
   arg1 = reinterpret_cast< iEngine * >(argp1);
   result = (arg1)->GetCollections();
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iCollectionArray> ref((csPtr<iCollectionArray>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -15996,7 +15939,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetCollections(PyObject *SWIGUNUSEDPARM(self)
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iCollectionArray *)ref, SWIGTYPE_p_iCollectionArray, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -16148,7 +16090,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateCamera(PyObject *SWIGUNUSEDPARM(self), 
   arg1 = reinterpret_cast< iEngine * >(argp1);
   result = (arg1)->CreateCamera();
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iCamera> ref((csPtr<iCamera>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -16158,7 +16099,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateCamera(PyObject *SWIGUNUSEDPARM(self), 
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iCamera *)ref, SWIGTYPE_p_iCamera, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -16363,7 +16303,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreatePortal__SWIG_0(PyObject *SWIGUNUSEDPARM
   }
   arg4 = reinterpret_cast< iSector * >(argp4);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,362,TYPEMAP_IN_ARRAY_BODY@*/
     if (!PyList_Check(obj4))
     {
       PyErr_SetString(PyExc_TypeError, "not a list");
@@ -16385,7 +16324,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreatePortal__SWIG_0(PyObject *SWIGUNUSEDPARM
       }
       arg5[i] = * p;
     }
-    /*@SWIG@*/
   }
   res7 = SWIG_ConvertPtr(obj5, &argp7, SWIGTYPE_p_p_iPortal,  0 );
   if (!SWIG_IsOK(res7)) {
@@ -16397,7 +16335,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreatePortal__SWIG_0(PyObject *SWIGUNUSEDPARM
   arg7 = reinterpret_cast< iPortal ** >(argp7);
   result = (arg1)->CreatePortal((char const *)arg2,arg3,arg4,arg5,arg6,*arg7);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -16407,7 +16344,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreatePortal__SWIG_0(PyObject *SWIGUNUSEDPARM
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapper *)ref, SWIGTYPE_p_iMeshWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   {
@@ -16485,7 +16421,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreatePortal__SWIG_1(PyObject *SWIGUNUSEDPARM
   }
   arg5 = reinterpret_cast< iSector * >(argp5);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,362,TYPEMAP_IN_ARRAY_BODY@*/
     if (!PyList_Check(obj5))
     {
       PyErr_SetString(PyExc_TypeError, "not a list");
@@ -16507,7 +16442,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreatePortal__SWIG_1(PyObject *SWIGUNUSEDPARM
       }
       arg6[i] = * p;
     }
-    /*@SWIG@*/
   }
   res8 = SWIG_ConvertPtr(obj6, &argp8, SWIGTYPE_p_p_iPortal,  0 );
   if (!SWIG_IsOK(res8)) {
@@ -16519,7 +16453,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreatePortal__SWIG_1(PyObject *SWIGUNUSEDPARM
   arg8 = reinterpret_cast< iPortal ** >(argp8);
   result = (arg1)->CreatePortal((char const *)arg2,arg3,(csVector3 const &)*arg4,arg5,arg6,arg7,*arg8);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -16529,7 +16462,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreatePortal__SWIG_1(PyObject *SWIGUNUSEDPARM
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapper *)ref, SWIGTYPE_p_iMeshWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   {
@@ -16679,7 +16611,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreatePortalContainer__SWIG_0(PyObject *SWIGU
   arg4 = reinterpret_cast< csVector3 * >(argp4);
   result = (arg1)->CreatePortalContainer((char const *)arg2,arg3,(csVector3 const &)*arg4);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -16689,7 +16620,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreatePortalContainer__SWIG_0(PyObject *SWIGU
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapper *)ref, SWIGTYPE_p_iMeshWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -16734,7 +16664,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreatePortalContainer__SWIG_1(PyObject *SWIGU
   arg3 = reinterpret_cast< iSector * >(argp3);
   result = (arg1)->CreatePortalContainer((char const *)arg2,arg3);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -16744,7 +16673,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreatePortalContainer__SWIG_1(PyObject *SWIGU
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapper *)ref, SWIGTYPE_p_iMeshWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -16780,7 +16708,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreatePortalContainer__SWIG_2(PyObject *SWIGU
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->CreatePortalContainer((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -16790,7 +16717,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreatePortalContainer__SWIG_2(PyObject *SWIGU
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapper *)ref, SWIGTYPE_p_iMeshWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -17782,7 +17708,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyObjects__SWIG_0(PyObject *SWIGUNUSED
   arg5 = static_cast< bool >(val5);
   result = (arg1)->GetNearbyObjects(arg2,(csVector3 const &)*arg3,arg4,arg5);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iObjectIterator> ref((csPtr<iObjectIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -17792,7 +17717,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyObjects__SWIG_0(PyObject *SWIGUNUSED
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iObjectIterator *)ref, SWIGTYPE_p_iObjectIterator, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -17846,7 +17770,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyObjects__SWIG_1(PyObject *SWIGUNUSED
   arg4 = static_cast< float >(val4);
   result = (arg1)->GetNearbyObjects(arg2,(csVector3 const &)*arg3,arg4);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iObjectIterator> ref((csPtr<iObjectIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -17856,7 +17779,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetNearbyObjects__SWIG_1(PyObject *SWIGUNUSED
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iObjectIterator *)ref, SWIGTYPE_p_iObjectIterator, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -17972,7 +17894,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetVisibleObjects__SWIG_0(PyObject *SWIGUNUSE
   arg3 = reinterpret_cast< csVector3 * >(argp3);
   result = (arg1)->GetVisibleObjects(arg2,(csVector3 const &)*arg3);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iObjectIterator> ref((csPtr<iObjectIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -17982,7 +17903,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetVisibleObjects__SWIG_0(PyObject *SWIGUNUSE
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iObjectIterator *)ref, SWIGTYPE_p_iObjectIterator, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -18027,7 +17947,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetVisibleMeshes__SWIG_0(PyObject *SWIGUNUSED
   arg3 = reinterpret_cast< csVector3 * >(argp3);
   result = (arg1)->GetVisibleMeshes(arg2,(csVector3 const &)*arg3);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapperIterator> ref((csPtr<iMeshWrapperIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -18037,7 +17956,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetVisibleMeshes__SWIG_0(PyObject *SWIGUNUSED
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapperIterator *)ref, SWIGTYPE_p_iMeshWrapperIterator, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -18082,7 +18000,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetVisibleObjects__SWIG_1(PyObject *SWIGUNUSE
   arg3 = reinterpret_cast< csFrustum * >(argp3);
   result = (arg1)->GetVisibleObjects(arg2,(csFrustum const &)*arg3);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iObjectIterator> ref((csPtr<iObjectIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -18092,7 +18009,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetVisibleObjects__SWIG_1(PyObject *SWIGUNUSE
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iObjectIterator *)ref, SWIGTYPE_p_iObjectIterator, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -18190,7 +18106,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetVisibleMeshes__SWIG_1(PyObject *SWIGUNUSED
   arg3 = reinterpret_cast< csFrustum * >(argp3);
   result = (arg1)->GetVisibleMeshes(arg2,(csFrustum const &)*arg3);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapperIterator> ref((csPtr<iMeshWrapperIterator>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -18200,7 +18115,6 @@ SWIGINTERN PyObject *_wrap_iEngine_GetVisibleMeshes__SWIG_1(PyObject *SWIGUNUSED
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapperIterator *)ref, SWIGTYPE_p_iMeshWrapperIterator, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -18277,7 +18191,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateFrustumView(PyObject *SWIGUNUSEDPARM(se
   arg1 = reinterpret_cast< iEngine * >(argp1);
   result = (arg1)->CreateFrustumView();
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iFrustumView> ref((csPtr<iFrustumView>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -18287,7 +18200,6 @@ SWIGINTERN PyObject *_wrap_iEngine_CreateFrustumView(PyObject *SWIGUNUSEDPARM(se
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iFrustumView *)ref, SWIGTYPE_p_iFrustumView, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -19437,7 +19349,6 @@ SWIGINTERN PyObject *_wrap_iCamera_Clone(PyObject *SWIGUNUSEDPARM(self), PyObjec
   arg1 = reinterpret_cast< iCamera * >(argp1);
   result = ((iCamera const *)arg1)->Clone();
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iCamera> ref((csPtr<iCamera>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -19447,7 +19358,6 @@ SWIGINTERN PyObject *_wrap_iCamera_Clone(PyObject *SWIGUNUSEDPARM(self), PyObjec
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iCamera *)ref, SWIGTYPE_p_iCamera, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -24935,7 +24845,6 @@ SWIGINTERN PyObject *_wrap_iSceneNode_GetChildrenArray(PyObject *SWIGUNUSEDPARM(
   arg1 = reinterpret_cast< iSceneNode * >(argp1);
   result = ((iSceneNode const *)arg1)->GetChildrenArray();
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSceneNodeArray> ref((csPtr<iSceneNodeArray>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -24945,7 +24854,6 @@ SWIGINTERN PyObject *_wrap_iSceneNode_GetChildrenArray(PyObject *SWIGUNUSEDPARM(
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iSceneNodeArray *)ref, SWIGTYPE_p_iSceneNodeArray, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -27827,7 +27735,6 @@ SWIGINTERN PyObject *_wrap_iMeshFactoryWrapper_CreateMeshWrapper(PyObject *SWIGU
   arg1 = reinterpret_cast< iMeshFactoryWrapper * >(argp1);
   result = (arg1)->CreateMeshWrapper();
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -27837,7 +27744,6 @@ SWIGINTERN PyObject *_wrap_iMeshFactoryWrapper_CreateMeshWrapper(PyObject *SWIGU
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapper *)ref, SWIGTYPE_p_iMeshWrapper, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -33815,7 +33721,6 @@ SWIGINTERN PyObject *_wrap_iPortalContainer_CreatePortal(PyObject *SWIGUNUSEDPAR
   }
   arg1 = reinterpret_cast< iPortalContainer * >(argp1);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,362,TYPEMAP_IN_ARRAY_BODY@*/
     if (!PyList_Check(obj1))
     {
       PyErr_SetString(PyExc_TypeError, "not a list");
@@ -33837,7 +33742,6 @@ SWIGINTERN PyObject *_wrap_iPortalContainer_CreatePortal(PyObject *SWIGUNUSEDPAR
       }
       arg2[i] = * p;
     }
-    /*@SWIG@*/
   }
   result = (iPortal *)(arg1)->CreatePortal(arg2,arg3);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iPortal, 0 |  0 );
@@ -34441,7 +34345,6 @@ SWIGINTERN PyObject *_wrap_iRenderLoopManager_Create(PyObject *SWIGUNUSEDPARM(se
   arg1 = reinterpret_cast< iRenderLoopManager * >(argp1);
   result = (arg1)->Create();
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iRenderLoop> ref((csPtr<iRenderLoop>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -34451,7 +34354,6 @@ SWIGINTERN PyObject *_wrap_iRenderLoopManager_Create(PyObject *SWIGUNUSEDPARM(se
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iRenderLoop *)ref, SWIGTYPE_p_iRenderLoop, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -34735,7 +34637,6 @@ SWIGINTERN PyObject *_wrap_iRenderLoopManager_Load(PyObject *SWIGUNUSEDPARM(self
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->Load((char const *)arg2);
   {
-    /*@SWIG:/tmp/tmp0/trunk/include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iRenderLoop> ref((csPtr<iRenderLoop>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -34745,7 +34646,6 @@ SWIGINTERN PyObject *_wrap_iRenderLoopManager_Load(PyObject *SWIGUNUSEDPARM(self
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iRenderLoop *)ref, SWIGTYPE_p_iRenderLoop, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
