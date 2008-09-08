@@ -50,7 +50,7 @@ AS_IF([test -n "$2"],
             IFS=$my_IFS
             ;;
     esac
-    AS_IF([test -n "$$1"],
+    AS_IF([test -z "$$1"],
         [my_IFS=$IFS; IFS=$PATH_SEPARATOR
         for cs_dir in $2; do
             AS_IF([test -n "$$1"], [$1="$$1$PATH_SEPARATOR"])
