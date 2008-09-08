@@ -45,6 +45,16 @@
             <Merge Id="VCRedist" SourceFile="$(env.COMMONPROGRAMFILES)\Merge Modules\Microsoft_VC90_CRT_x86.msm" DiskId="30001" Language="0" FileCompression="yes"/>
           <?endif?>
           <Merge Id="VCRedist8" SourceFile="$(env.COMMONPROGRAMFILES)\Merge Modules\Microsoft_VC80_CRT_x86.msm" DiskId="30000" Language="0" FileCompression="yes"/>
+          <Merge DiskId="30000" SourceFile="$(var.CRYSTAL_MSM_PATH)/python.msm" Id="Python.msm" Language="1033" FileCompression="yes"/>
+        </Directory>
+      </Directory>
+      <Directory Name="scripts" Id="CS.scripts">
+        <Directory Name="python" Id="CS_SCRIPTS_PYTHON">
+          <Merge DiskId="30000" SourceFile="$(var.CRYSTAL_MSM_PATH)/CS.python.msm" Id="CS.scripts.python" Language="1033" FileCompression="yes"/>
+          <?if $(var.ARCH) = GCC_3.4 ?>
+            <!-- FIXME: VC Python module builds! -->
+            <Merge DiskId="30001" SourceFile="$(var.CRYSTAL_MSM_PATH)/CS.arch.$(var.ARCH).python.msm" Id="CS.arch.scripts.python" Language="1033" FileCompression="yes"/>
+          <?endif?>
         </Directory>
       </Directory>
     </Directory>

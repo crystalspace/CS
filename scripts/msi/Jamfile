@@ -133,6 +133,7 @@ MSIMergeModuleFromList CS.data.runtime : data-runtime : $(MSM_VERSION) ;
 MSIMergeModuleFromList CS.data.sdk : data-tool : $(MSM_VERSION) ;
 MSIMergeModuleFromList CS.include : headers : $(MSM_VERSION) ;
 MSIMergeModuleFromList CS.vfs : vfs : $(MSM_VERSION) ;
+MSIMergeModuleFromList CS.python : python-bindings : $(MSM_VERSION) ;
 MakeLocate CS.register.msm : $(LOCATE.MSM) ;
 MSIMergeModule CS.register.msm : CS.register.wxs ;
 
@@ -141,9 +142,10 @@ MSIMergeModuleFromList CS.arch.$(MSM_ARCH).include : headers-platform : $(MSM_VE
 MSIMergeModuleFromList CS.arch.$(MSM_ARCH).lib : libs-shared : $(MSM_VERSION) ;
 MSIMergeModuleFromList CS.arch.$(MSM_ARCH).link : libs-static : $(MSM_VERSION) ;
 MSIMergeModuleFromList CS.arch.$(MSM_ARCH).executable.demo : app-demo : $(MSM_VERSION) ;
-MSIMergeModuleFromList CS.arch.$(MSM_ARCH).executable.runtime : plugin plugin-cg : $(MSM_VERSION) ;
+MSIMergeModuleFromList CS.arch.$(MSM_ARCH).executable.runtime : plugin plugin-cg plugin-python : $(MSM_VERSION) ;
 MSIMergeModuleFromList CS.arch.$(MSM_ARCH).executable.sdk : app-tool : $(MSM_VERSION) ;
 MSIMergeModuleFromList CS.arch.$(MSM_ARCH).csconfig : cs-config : $(MSM_VERSION) ;
+MSIMergeModuleFromList CS.arch.$(MSM_ARCH).python : python-modules : $(MSM_VERSION) ;
 
 # Safeguard
 MSI_UPGRADE_CODES_FOR_VERSION = 1.9 ;
