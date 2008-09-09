@@ -195,9 +195,10 @@ rule MakeMSIsForArchAndKind
   local arch = $(1) ;
   local kind = $(2) ;
   local win32libs_msms = [ GetWin32LibsMSMPath ] ;
+  local msi = CS-$(kind)-$(arch).msi ;
 
-  MakeLocate CS-$(kind)-$(arch).msi : $(LOCATE.MSI) ;
-  MSIPackage CS-$(kind)-$(arch).msi : CS-$(kind).wxs :
+  MakeLocate $(msi) : $(LOCATE.MSI) ;
+  MSIPackage $(msi) : CS-$(kind).wxs :
     "CRYSTAL_MSM_PATH=$(LOCATE.MSM)"
     "WIN32LIBS_MSM_PATH=$(win32libs_msms)"
     "ARCH=$(arch)" "TOP=$(TOP)"
@@ -206,9 +207,15 @@ rule MakeMSIsForArchAndKind
     "VERSION_PACKAGE=$(MSI_VERSION_PACKAGE)" :
     CS-$(kind)-$(arch) ;
   #Depends CS-$(kind)-$(arch).msi : mergemodules ;
-  Depends msis-$(kind) : CS-$(kind)-$(arch).msi ;
-  Depends msis-$(arch) : CS-$(kind)-$(arch).msi ;
-  Depends msis : CS-$(kind)-$(arch).msi ;
+  Depends msis-$(kind) : $(msi) ;
+  Depends msis-$(arch) : $(msi) ;
+  Depends msis : $(msi) ;
+  
+  SEARCH on $(msi) = $(LOCATE.MSI) ;
+  Depends upload-msis-$(arch) : $(msi) ;
+  UploadMSIs upload-msis-$(arch) : $(msi) :
+    crystal@crystalspace3d.org :
+    www/crystalspace3d.org/htdocs/downloads/binary/$(PACKAGE_VERSION) ;
 }
 rule MakeMSIsForArch
 {
