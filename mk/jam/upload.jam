@@ -73,7 +73,7 @@ rule UploadFile
   FILE on $(target) = $(file) ;
   SERVER_USER on $(target) = $(server_user) ;
   DESTPATH on $(target) = $(serverpath) ;
-  DoUploadFile $(target) ;
+  DoUploadFile $(target) : $(file) ;
 }
 
 actions DoUploadFile
@@ -82,7 +82,7 @@ actions DoUploadFile
   DESTPATH=$(DESTPATH)
   $(SSH) $(SERVER_USER) "mkdir -p $DESTPATH"
   # transfer file
-  $(SCP) $(FILE) $(SERVER_USER):$(DESTPATH)/
+  $(SCP) $(>) $(SERVER_USER):$(DESTPATH)/
 }
 
 ##  UploadFiles target : files : server_and_user : serverpath
