@@ -132,11 +132,11 @@
 	  float camDepth = tex2Dproj (texReflectDepth, tc).x*-2 + 1;
 	  float2 screenPos = (reflTC.xy * inv_reflW)*float2(2)-float2(1);
 	  float4 positionProjected = float4 (
-	    screenPos.x, screenPos.y, camDepth, 1);
-	  float4 positionUnprojected = mul (projectedToWorld, positionProjected);
-	  positionUnprojected /= positionUnprojected.w;
+	    screenPos.x, -screenPos.y, camDepth, 1);
+	  float4 positionUnprojectedW = mul (projectedToWorld, positionProjected);
+	  positionUnprojectedW /= positionUnprojectedW.w;
 	  
-	  mirroredPointDist = length (positionW.xyz - positionUnprojected.xyz);
+	  mirroredPointDist = length (positionW.xyz - positionUnprojectedW.xyz);
 	  
 	  float perturbWeight = saturate (mirroredPointDist);
 	  tc.xy += perturb * perturbWeight;

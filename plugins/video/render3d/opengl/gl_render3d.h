@@ -573,6 +573,8 @@ public:
     frustum_valid = false;
     needProjectionUpdate = true;
     explicitProjection = false;
+    
+    UpdateProjectionSVs ();
   }
   
   /// Get center of projection.
@@ -590,6 +592,8 @@ public:
     frustum_valid = false;
     needProjectionUpdate = true;
     explicitProjection = false;
+    
+    UpdateProjectionSVs ();
   }
 
   /// Get perspective aspect.
@@ -607,7 +611,10 @@ public:
   {
     projectionMatrix = m;
     explicitProjection = true;
+    
+    UpdateProjectionSVs ();
   }
+  void UpdateProjectionSVs ();
 
   /// Set the z buffer write/test mode
   virtual void SetZMode (csZBufMode mode)

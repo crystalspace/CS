@@ -3668,7 +3668,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadImage__SWIG_0(PyObject *SWIGUNUSEDPARM(se
   arg3 = static_cast< int >(val3);
   result = (arg1)->LoadImage((char const *)arg2,arg3);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csPtr<iImage>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -3678,7 +3677,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadImage__SWIG_0(PyObject *SWIGUNUSEDPARM(se
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iImage *)ref, SWIGTYPE_p_iImage, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -3714,7 +3712,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadImage__SWIG_1(PyObject *SWIGUNUSEDPARM(se
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->LoadImage((char const *)arg2);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csPtr<iImage>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -3724,7 +3721,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadImage__SWIG_1(PyObject *SWIGUNUSEDPARM(se
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iImage *)ref, SWIGTYPE_p_iImage, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -3787,7 +3783,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_0(PyObject *SWIGUNUSEDPARM(
   arg5 = reinterpret_cast< csRef<iImage > * >(argp5);
   result = (arg1)->LoadTexture((char const *)arg2,arg3,arg4,arg5);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTextureHandle> ref((csPtr<iTextureHandle>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -3797,7 +3792,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_0(PyObject *SWIGUNUSEDPARM(
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iTextureHandle *)ref, SWIGTYPE_p_iTextureHandle, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -3851,7 +3845,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_1(PyObject *SWIGUNUSEDPARM(
   arg4 = reinterpret_cast< iTextureManager * >(argp4);
   result = (arg1)->LoadTexture((char const *)arg2,arg3,arg4);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTextureHandle> ref((csPtr<iTextureHandle>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -3861,7 +3854,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_1(PyObject *SWIGUNUSEDPARM(
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iTextureHandle *)ref, SWIGTYPE_p_iTextureHandle, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -3906,7 +3898,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_2(PyObject *SWIGUNUSEDPARM(
   arg3 = static_cast< int >(val3);
   result = (arg1)->LoadTexture((char const *)arg2,arg3);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTextureHandle> ref((csPtr<iTextureHandle>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -3916,7 +3907,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_2(PyObject *SWIGUNUSEDPARM(
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iTextureHandle *)ref, SWIGTYPE_p_iTextureHandle, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -3952,7 +3942,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_3(PyObject *SWIGUNUSEDPARM(
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->LoadTexture((char const *)arg2);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTextureHandle> ref((csPtr<iTextureHandle>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -3962,7 +3951,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_3(PyObject *SWIGUNUSEDPARM(
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iTextureHandle *)ref, SWIGTYPE_p_iTextureHandle, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -3998,7 +3986,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadSoundSysData(PyObject *SWIGUNUSEDPARM(sel
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->LoadSoundSysData((char const *)arg2);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSndSysData> ref((csPtr<iSndSysData>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -4008,7 +3995,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadSoundSysData(PyObject *SWIGUNUSEDPARM(sel
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iSndSysData *)ref, SWIGTYPE_p_iSndSysData, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -4053,7 +4039,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadSoundStream(PyObject *SWIGUNUSEDPARM(self
   arg3 = static_cast< int >(val3);
   result = (arg1)->LoadSoundStream((char const *)arg2,arg3);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iSndSysStream> ref((csPtr<iSndSysStream>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -4063,7 +4048,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadSoundStream(PyObject *SWIGUNUSEDPARM(self
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iSndSysStream *)ref, SWIGTYPE_p_iSndSysStream, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -4153,7 +4137,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadImage__SWIG_2(PyObject *SWIGUNUSEDPARM(se
   arg3 = static_cast< int >(val3);
   result = (arg1)->LoadImage(arg2,arg3);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csPtr<iImage>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -4163,7 +4146,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadImage__SWIG_2(PyObject *SWIGUNUSEDPARM(se
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iImage *)ref, SWIGTYPE_p_iImage, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -4196,7 +4178,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadImage__SWIG_3(PyObject *SWIGUNUSEDPARM(se
   arg2 = reinterpret_cast< iDataBuffer * >(argp2);
   result = (arg1)->LoadImage(arg2);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iImage> ref((csPtr<iImage>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -4206,7 +4187,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadImage__SWIG_3(PyObject *SWIGUNUSEDPARM(se
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iImage *)ref, SWIGTYPE_p_iImage, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -4349,7 +4329,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_4(PyObject *SWIGUNUSEDPARM(
   arg5 = reinterpret_cast< csRef<iImage > * >(argp5);
   result = (arg1)->LoadTexture(arg2,arg3,arg4,arg5);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTextureHandle> ref((csPtr<iTextureHandle>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -4359,7 +4338,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_4(PyObject *SWIGUNUSEDPARM(
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iTextureHandle *)ref, SWIGTYPE_p_iTextureHandle, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -4410,7 +4388,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_5(PyObject *SWIGUNUSEDPARM(
   arg4 = reinterpret_cast< iTextureManager * >(argp4);
   result = (arg1)->LoadTexture(arg2,arg3,arg4);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTextureHandle> ref((csPtr<iTextureHandle>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -4420,7 +4397,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_5(PyObject *SWIGUNUSEDPARM(
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iTextureHandle *)ref, SWIGTYPE_p_iTextureHandle, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -4462,7 +4438,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_6(PyObject *SWIGUNUSEDPARM(
   arg3 = static_cast< int >(val3);
   result = (arg1)->LoadTexture(arg2,arg3);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTextureHandle> ref((csPtr<iTextureHandle>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -4472,7 +4447,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_6(PyObject *SWIGUNUSEDPARM(
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iTextureHandle *)ref, SWIGTYPE_p_iTextureHandle, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -4505,7 +4479,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_7(PyObject *SWIGUNUSEDPARM(
   arg2 = reinterpret_cast< iDataBuffer * >(argp2);
   result = (arg1)->LoadTexture(arg2);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iTextureHandle> ref((csPtr<iTextureHandle>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -4515,7 +4488,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadTexture__SWIG_7(PyObject *SWIGUNUSEDPARM(
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iTextureHandle *)ref, SWIGTYPE_p_iTextureHandle, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -4951,7 +4923,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMeshObjectFactory__SWIG_0(PyObject *SWIGU
   arg3 = reinterpret_cast< iStreamSource * >(argp3);
   result = (arg1)->LoadMeshObjectFactory((char const *)arg2,arg3);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshFactoryWrapper> ref((csPtr<iMeshFactoryWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -4961,7 +4932,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMeshObjectFactory__SWIG_0(PyObject *SWIGU
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshFactoryWrapper *)ref, SWIGTYPE_p_iMeshFactoryWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -4997,7 +4967,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMeshObjectFactory__SWIG_1(PyObject *SWIGU
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->LoadMeshObjectFactory((char const *)arg2);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshFactoryWrapper> ref((csPtr<iMeshFactoryWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -5007,7 +4976,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMeshObjectFactory__SWIG_1(PyObject *SWIGU
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshFactoryWrapper *)ref, SWIGTYPE_p_iMeshFactoryWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -5100,7 +5068,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMeshObject__SWIG_0(PyObject *SWIGUNUSEDPA
   arg3 = reinterpret_cast< iStreamSource * >(argp3);
   result = (arg1)->LoadMeshObject((char const *)arg2,arg3);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -5110,7 +5077,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMeshObject__SWIG_0(PyObject *SWIGUNUSEDPA
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapper *)ref, SWIGTYPE_p_iMeshWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -5146,7 +5112,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMeshObject__SWIG_1(PyObject *SWIGUNUSEDPA
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->LoadMeshObject((char const *)arg2);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iMeshWrapper> ref((csPtr<iMeshWrapper>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -5156,7 +5121,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadMeshObject__SWIG_1(PyObject *SWIGUNUSEDPA
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iMeshWrapper *)ref, SWIGTYPE_p_iMeshWrapper, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -5249,7 +5213,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadShader__SWIG_0(PyObject *SWIGUNUSEDPARM(s
   arg3 = static_cast< bool >(val3);
   result = (arg1)->LoadShader((char const *)arg2,arg3);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iShader> ref((csRef<iShader>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -5259,7 +5222,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadShader__SWIG_0(PyObject *SWIGUNUSEDPARM(s
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iShader *)ref, SWIGTYPE_p_iShader, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -5295,7 +5257,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadShader__SWIG_1(PyObject *SWIGUNUSEDPARM(s
   arg2 = reinterpret_cast< char * >(buf2);
   result = (arg1)->LoadShader((char const *)arg2);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iShader> ref((csRef<iShader>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -5305,7 +5266,6 @@ SWIGINTERN PyObject *_wrap_iLoader_LoadShader__SWIG_1(PyObject *SWIGUNUSEDPARM(s
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iShader *)ref, SWIGTYPE_p_iShader, 1);
-    /*@SWIG@*/
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -11976,7 +11936,6 @@ SWIGINTERN PyObject *_wrap_iLoaderPlugin_Parse(PyObject *SWIGUNUSEDPARM(self), P
   arg5 = reinterpret_cast< iBase * >(argp5);
   result = (arg1)->Parse(arg2,arg3,arg4,arg5);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iBase> ref((csPtr<iBase>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -11986,7 +11945,6 @@ SWIGINTERN PyObject *_wrap_iLoaderPlugin_Parse(PyObject *SWIGUNUSEDPARM(self), P
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iBase *)ref, SWIGTYPE_p_iBase, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -12088,7 +12046,6 @@ SWIGINTERN PyObject *_wrap_iBinaryLoaderPlugin_Parse(PyObject *SWIGUNUSEDPARM(se
   arg5 = reinterpret_cast< iBase * >(argp5);
   result = (arg1)->Parse(arg2,arg3,arg4,arg5);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iBase> ref((csPtr<iBase>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -12098,7 +12055,6 @@ SWIGINTERN PyObject *_wrap_iBinaryLoaderPlugin_Parse(PyObject *SWIGUNUSEDPARM(se
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iBase *)ref, SWIGTYPE_p_iBase, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -12198,7 +12154,6 @@ SWIGINTERN PyObject *_wrap_iSaver_SaveMapFile__SWIG_1(PyObject *SWIGUNUSEDPARM(s
   arg1 = reinterpret_cast< iSaver * >(argp1);
   result = (arg1)->SaveMapFile();
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iString> ref((csRef<iString>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -12208,7 +12163,6 @@ SWIGINTERN PyObject *_wrap_iSaver_SaveMapFile__SWIG_1(PyObject *SWIGUNUSEDPARM(s
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iString *)ref, SWIGTYPE_p_iString, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:
@@ -12411,7 +12365,6 @@ SWIGINTERN PyObject *_wrap_iSaver_SaveCollection__SWIG_0(PyObject *SWIGUNUSEDPAR
   arg3 = static_cast< int >(val3);
   result = (arg1)->SaveCollection(arg2,arg3);
   {
-    /*@SWIG:./include/bindings/python/pythpre.i,119,TYPEMAP_OUT_csRef_BODY@*/
     csRef<iString> ref((csRef<iString>&)result); /* explicit cast */
     
     if (!ref.IsValid())
@@ -12421,7 +12374,6 @@ SWIGINTERN PyObject *_wrap_iSaver_SaveCollection__SWIG_0(PyObject *SWIGUNUSEDPAR
     }
     ref->IncRef();
     resultobj = SWIG_NewPointerObj((void *)(iString *)ref, SWIGTYPE_p_iString, 1);
-    /*@SWIG@*/
   }
   return resultobj;
 fail:

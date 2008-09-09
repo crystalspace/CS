@@ -8,9 +8,16 @@
     <Feature Title="Binaries" Id="CS.arch" Level="1" Display="hidden">
       <Feature Title="Libraries" Id="CS.arch.lib" Level="1">
         <MergeRef Id="CS.arch.lib"/>
+        <ComponentRef Id="CS.arch.lib.runtime.register"/>
       </Feature>
-      <Feature Title="Applications" Id="CS.arch.executable.runtime" Level="1">
+      <Feature Title="Applications and Plugins" Id="CS.arch.executable.runtime" Level="1">
         <MergeRef Id="CS.arch.executable.runtime"/>
+      </Feature>
+      <Feature Title="Python Bindings" Id="CS.scripts.python" Level="1">
+        <MergeRef Id="CS.scripts.python"/>
+        <?if $(var.ARCH) = GCC_3.4 ?>
+          <MergeRef Id="CS.arch.scripts.python"/>
+        <?endif?>
       </Feature>
       <Feature Title="Support Libraries" Id="CS.arch.support" Level="1">
         <MergeRef Id="winlibs.common.dlls"/>
@@ -34,4 +41,7 @@
       <MergeRef Id="VCRedist"/>
     </Feature>
   <?endif?>
+  <Feature Id="Python" Title="Python" AllowAdvertise="no" Display="hidden" Level="1">
+    <MergeRef Id="Python.msm"/>
+  </Feature>
 </Include>
