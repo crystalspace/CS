@@ -50,6 +50,11 @@ rule LinkWith
   {
     LFlags $(<) : $($($(l).EXTERNALLIBS).LFLAGS) ;
   }
+  
+  for i in $($(<).PROPAGATE_LINKWITH)
+  {
+    LinkWith $(i) : $(>) ;
+  }
 }
 
 ##  CFlags target : flags [ : options ]

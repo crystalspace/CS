@@ -1,15 +1,9 @@
 SubDir TOP plugins video render3d shader shadercompiler ;
 
-#SubInclude TOP plugins video render3d shader shadercompiler weaver ;
-#SubInclude TOP plugins video render3d shader shadercompiler xmlshader ;
+UberPlugin shadercompiler : xmlshader shaderweaver ;
 
-Description shadercompiler : "shader compiler" ;
-Plugin shadercompiler :
-	[ Wildcard xmlshader : *.cpp *.h ]
-	[ Wildcard xmlshader cpi : *.cpp *.h ]
-	[ Wildcard weaver : *.cpp *.h ]
-	;
+SubInclude TOP plugins video render3d shader shadercompiler weaver ;
+SubInclude TOP plugins video render3d shader shadercompiler xmlshader ;
 
-LinkWith shadercompiler : crystalspace ;
 CompileGroups shadercompiler : shaders renderers renderall openglrenderer softrenderer ;
 

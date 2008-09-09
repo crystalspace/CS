@@ -21,6 +21,88 @@
 SUFMETA ?= .csplugin ;
 GRISTMETA ?= pluginmeta ;
 
+CMD.MERGECSPLUGIN = $(TOP)/bin/merge-csplugin.py ;
+
+## UberPlugin name : pluginnames
+rule UberPlugin
+{
+  if "$(PYTHON)" = ""
+  {
+    return ;
+  }
+
+  local plugins = $(2) ;
+
+  local p ;
+  for p in $(plugins)
+  {
+    $(p)_UBERPLUGIN = $(<) ;
+    Depends $(<)clean : $(p)clean ;
+  }
+
+  local target = [ ConstructPluginTarget $(<) ] ;
+  local objects = [ PluginImplementObject ] ;
+  local metafile ;
+  metafile = [ FAppendSuffix $(<) : $(SUFMETA) ] ;
+  MakeLocate $(metafile) : $(LOCATE_TARGET) ;
+  Depends $(target) : $(metafile) ;
+  
+  $(<)_TYPE = plugin ;
+  $(<)_OBJECTS = $(objects) ;
+  $(<)_TARGET = $(target) ;
+  $(<)_METAFILE = $(metafile) ;
+
+  # Create file list entry
+  if ! [ IsElem nodefaultfilelist : $(3) ]
+  {
+    FileListEntryPlugin $(<) : plugin ;
+  }
+
+  # so 'jam foo' works when it's really foo.dll (Windows) or foo.csbundle
+  # (MacOS/X)
+  if $(target) != $(<)
+  {
+    Depends $(<) : $(target) ;
+    NotFile $(<) ;
+  }
+
+  if ! [ IsElem independent : $(3) ]
+  {
+    Depends plugins : $(<) ;
+  }
+
+  # construct install target
+  if ! [ IsElem noinstall : $(3) ]
+  {
+    SystemInstallPlugin $(target) ;
+  }
+
+  # Link
+  MakeLocate $(target) : $(LOCATE.TARGETS) ;
+  SystemLinkPlugin $(<) : $(objects) : $(3) ;
+  
+  local cleanextra ;
+  if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
+  {
+    local debugfile = [ SplitDebugInfo $(target) ] ;
+    $(target)_DEBUGFILE = $(debugfile) ;
+    cleanextra += $(debugfile) ;
+    if ! [ IsElem noinstall : $(3) ]
+    {
+      NoCare $(debugfile) ;
+      Depends install_plugin : [ DoInstall $(debugfile) : $(plugindir) : $(INSTALL_DATA) ] ;
+    }
+  }
+
+  CFlags $(<) : $(PLUGIN.CFLAGS) ;
+  LFlags $(<) : $(LINKLIBS) $(PLUGIN.LFLAGS) ;
+  
+  # create target clean rule
+  Always $(<)clean ;
+  NotFile $(<)clean ;
+  Clean $(<)clean : $(metafile) $(cleanextra) ;
+}
+
 ##  Plugin pluginname : sources [ : options ]
 ##    Build a plugin out of sourcefiles. All sourcefiles will be passed
 ##    to the Objects rule which tries to compile them into object-files. You
@@ -46,7 +128,12 @@ rule Plugin
 
   local target = [ ConstructPluginTarget $(<) : $(3) ] ;
   local sources = [ DoSourceGrist $(>) ] ;
-  local objects = [ CompileObjects $(sources) ] [ PluginImplementObject ] ;
+  local objects = [ CompileObjects $(sources) ] ;
+  local uberplugin = $($(<)_UBERPLUGIN) ;
+  if "$(uberplugin)" = ""
+  {
+	objects += [ PluginImplementObject ] ;
+  }
 
   $(<)_TYPE = plugin ;
   $(<)_OBJECTS = $(objects) ;
@@ -88,68 +175,83 @@ rule Plugin
     SubVariant ;
   }
 
-  # so 'jam foo' works when it's really foo.dll (Windows) or foo.csbundle
-  # (MacOS/X)
-  if $(target) != $(<)
+  if "$(uberplugin)" != ""
   {
-    Depends $(<) : $(target) ;
-    NotFile $(<) ;
+    PluginMergeMetadata $($(uberplugin)_METAFILE) : $(metafile) ;
+    Depends $($(uberplugin)_METAFILE) : $(metafile) ;
+    EXTRAOBJECTS on $($(uberplugin)_TARGET) += $(objects) ;
+    Depends $($(uberplugin)_TARGET) : $(objects) ;
+    CCFLAGS on $(objects) += $(PLUGIN.CFLAGS) ;
+    C++FLAGS on $(objects) += $(PLUGIN.CFLAGS) ;
+    
+    $(<).PROPAGATE_LINKWITH += $(uberplugin) ;
+    $(<).PROPAGATE_EXTERNALLIBS += $(uberplugin) ;
   }
-
-  if ! [ IsElem independent : $(3) ]
+  else
   {
-    Depends plugins : $(<) ;
-  }
+    # so 'jam foo' works when it's really foo.dll (Windows) or foo.csbundle
+    # (MacOS/X)
+    if $(target) != $(<)
+    {
+      Depends $(<) : $(target) ;
+      NotFile $(<) ;
+    }
 
-  # construct install target
-  if ! [ IsElem noinstall : $(3) ]
-  {
-    SystemInstallPlugin $(target) ;
-  }
+    if ! [ IsElem independent : $(3) ]
+    {
+      Depends plugins : $(<) ;
+    }
 
-  # Link
-  MakeLocate $(target) : $(LOCATE.TARGETS) ;
-  SystemLinkPlugin $(<) : $(objects) : $(3) ;
-  
-  local cleanextra ;
-  if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
-  {
-    local debugfile = [ SplitDebugInfo $(target) ] ;
-    $(target)_DEBUGFILE = $(debugfile) ;
-    cleanextra += $(debugfile) ;
+    # construct install target
     if ! [ IsElem noinstall : $(3) ]
     {
-      NoCare $(debugfile) ;
-      Depends install_plugin : [ DoInstall $(debugfile) : $(plugindir) : $(INSTALL_DATA) ] ;
+      SystemInstallPlugin $(target) ;
+    }
+
+    # Link
+    MakeLocate $(target) : $(LOCATE.TARGETS) ;
+    SystemLinkPlugin $(<) : $(objects) : $(3) ;
+    
+    local cleanextra ;
+    if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
+    {
+      local debugfile = [ SplitDebugInfo $(target) ] ;
+      $(target)_DEBUGFILE = $(debugfile) ;
+      cleanextra += $(debugfile) ;
+      if ! [ IsElem noinstall : $(3) ]
+      {
+	NoCare $(debugfile) ;
+	Depends install_plugin : [ DoInstall $(debugfile) : $(plugindir) : $(INSTALL_DATA) ] ;
+      }
+    }
+
+    # Create file list entry
+    if ! [ IsElem nodefaultfilelist : $(3) ]
+    {
+      FileListEntryPlugin $(<) : plugin ;
+    }
+
+    CFlags $(<) : $(PLUGIN.CFLAGS) ;
+    LFlags $(<) : $(LINKLIBS) $(PLUGIN.LFLAGS) ;
+
+    if ! [ IsElem nohelp : $(3) ]
+    {
+      local desc = [ Description $(<) ] ;
+      if ! $(desc) { desc = "$(<) plugin" ; }
+      Help $(<) : "Build the $(desc)" ;
+    }
+
+    if ! [ IsElem notest : $(options) ]
+    {
+      # @@@ Disabled for now; see docs/todo_jam.txt
+      #UnitTest $(<) ;
     }
   }
-
-  # Create file list entry
-  if ! [ IsElem nodefaultfilelist : $(3) ]
-  {
-    FileListEntryPlugin $(<) : plugin ;
-  }
-
-  CFlags $(<) : $(PLUGIN.CFLAGS) ;
-  LFlags $(<) : $(LINKLIBS) $(PLUGIN.LFLAGS) ;
 
   # create target clean rule
   Always $(<)clean ;
   NotFile $(<)clean ;
   Clean $(<)clean : $(objects) $(cleanextra) ;
-
-  if ! [ IsElem nohelp : $(3) ]
-  {
-    local desc = [ Description $(<) ] ;
-    if ! $(desc) { desc = "$(<) plugin" ; }
-    Help $(<) : "Build the $(desc)" ;
-  }
-
-  if ! [ IsElem notest : $(options) ]
-  {
-    # @@@ Disabled for now; see docs/todo_jam.txt
-    #UnitTest $(<) ;
-  }
 }
 
 ## WritePluginImplement file
@@ -203,6 +305,11 @@ rule PluginImplementObject
   NoUpdate $(implement_source) ;
   local implement_obj = [ CompileObjects $(implement_source) ] ;
   return $(implement_obj) ;
+}
+
+actions together PluginMergeMetadata
+{
+	$(CMD.MERGECSPLUGIN) -o $(<) $(>)
 }
 
 # Construct pseudo target plugins

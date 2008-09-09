@@ -1,28 +1,15 @@
 SubDir TOP plugins mesh genmesh ;
 
-#SubInclude TOP plugins mesh genmesh object ;
+UberPlugin gmesh : genmesh gmeshldr ;
+Description gmesh : "General mesh object plugin" ;
+CompileGroups gmesh :  meshes ;
+
+UberPlugin gmeshanm : gmeshanim gmeshskelanim2 gmeshanimpdl;
+Description gmeshanm : "General mesh animation plugin" ;
+CompileGroups gmeshanm :  meshes ;
+
+SubInclude TOP plugins mesh genmesh object ;
 SubInclude TOP plugins mesh genmesh persist ;
-#SubInclude TOP plugins mesh genmesh anim ;
-#SubInclude TOP plugins mesh genmesh skelanim2 ;
-#SubInclude TOP plugins mesh genmesh animpdl ;
-
-Description genmesh : "General mesh object plugin" ;
-
-Plugin genmesh
-	: [ Wildcard object : *.cpp *.h ]
-	[ Wildcard [ ConcatDirs persist standard ] : *.cpp *.h ]
-;
-LinkWith genmesh : crystalspace ;
-
-CompileGroups genmesh :  meshes ;
-
-Description gmeshanim : "General mesh animation plugin" ;
-
-Plugin gmeshanim
-	: [ Wildcard anim : *.cpp *.h ]
-	[ Wildcard skelanim2 : *.cpp *.h ]
-	[ Wildcard animpdl : *.cpp *.h ]
-;
-LinkWith gmeshanim : crystalspace ;
-
-CompileGroups gmeshanim :  meshes ;
+SubInclude TOP plugins mesh genmesh anim ;
+SubInclude TOP plugins mesh genmesh skelanim2 ;
+SubInclude TOP plugins mesh genmesh animpdl ;
