@@ -628,6 +628,7 @@ void csColliderActor::InitializeColliders (
 
   float maxX = MAX(body.x, legs.x)+shift.x;
   float maxZ = MAX(body.z, legs.z)+shift.z;
+  float maxDim = MAX(maxX, maxZ);
 
   csRef<iTriangleMesh> pm;
 
@@ -649,8 +650,9 @@ void csColliderActor::InitializeColliders (
   pm = csPtr<iTriangleMesh> (new csTriangleMeshBox (bot));
   bottomCollider = cdsys->CreateCollider (pm);
 
-  boundingBox.Set(csVector3(-maxX / 2.0f, 0, -maxZ / 2.0f) + shift,
-    csVector3(maxX / 2.0f, bYtop, maxZ / 2.0f) + shift);
+  // Double the dimensions in case the collider has been rotated.
+  boundingBox.Set(csVector3(-maxDim, -bYtop, -maxDim) + shift,
+    csVector3(maxDim, bYtop, maxDim) + shift);
 
 // @@@ Don't know why this is needed!
   csColliderActor::shift.x = -shift.x;
