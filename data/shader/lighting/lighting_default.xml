@@ -23,6 +23,7 @@
   <alias name="lighting" file="/shader/snippets/lighting/lighting-ppl.xml" />
   
   <technique priority="500" minlights="6">
+    <tag>per_pixel_lighting</tag>
     <!-- 1 pass, 6 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
@@ -60,6 +61,7 @@
   </technique>
   
   <technique priority="400" minlights="4">
+    <tag>per_pixel_lighting</tag>
     <!-- 2 passes, 4+2 lights -->
     <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
@@ -109,6 +111,7 @@
   </technique>
   
   <technique priority="300" minlights="3">
+    <tag>per_pixel_lighting</tag>
     <!-- 2 passes, 3+3 lights -->
     <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
@@ -158,6 +161,7 @@
   </technique>
   
   <technique priority="200" minlights="2">
+    <tag>per_pixel_lighting</tag>
     <!-- 3 passes, 2+2+2 lights -->
     <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
@@ -226,6 +230,7 @@
   </technique>
   
   <technique priority="100" minlights="1">
+    <tag>per_pixel_lighting</tag>
     <!-- 6 passes, 1+1+1+1+1+1 lights -->
     <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
