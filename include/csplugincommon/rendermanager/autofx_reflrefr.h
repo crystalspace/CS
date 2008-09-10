@@ -567,9 +567,10 @@ namespace CS
 	    // Create a new view
 	    csRef<CS::RenderManager::RenderView> refrView;
     #include "csutil/custom_new_disable.h"
+            /* Keep old camera to allow shadow map caching  */
 	    refrView.AttachNew (
 	      new (renderTree.GetPersistentData().renderViewPool) RenderView (
-		*rview));
+		*rview, true));
     #include "csutil/custom_new_enable.h"
 	    
 	    csRef<iTextureHandle> tex;

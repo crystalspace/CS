@@ -96,6 +96,8 @@ namespace RenderManager
     RenderView (iView* v);
     /// Copy constructor.
     RenderView (const RenderView& other);
+    /// Copy constructor, optionally keeping the camera
+    RenderView (const RenderView& other, bool keepCamera);
 
     virtual ~RenderView ();
 
