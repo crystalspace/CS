@@ -45,7 +45,6 @@
             <Merge Id="VCRedist" SourceFile="$(env.COMMONPROGRAMFILES)\Merge Modules\Microsoft_VC90_CRT_x86.msm" DiskId="30001" Language="0" FileCompression="yes"/>
           <?endif?>
           <Merge Id="VCRedist8" SourceFile="$(env.COMMONPROGRAMFILES)\Merge Modules\Microsoft_VC80_CRT_x86.msm" DiskId="30000" Language="0" FileCompression="yes"/>
-          <Merge DiskId="30000" SourceFile="$(var.CRYSTAL_MSM_PATH)/python.msm" Id="Python.msm" Language="1033" FileCompression="yes"/>
         </Directory>
       </Directory>
       <Directory Name="scripts" Id="CS.scripts">
@@ -58,5 +57,8 @@
         </Directory>
       </Directory>
     </Directory>
+  </DirectoryRef>
+  <DirectoryRef Id="TARGETDIR">
+    <Merge DiskId="30000" SourceFile="$(var.CRYSTAL_MSM_PATH)/python.msm" Id="Python.msm" Language="1033" FileCompression="yes"/>
   </DirectoryRef>
 </Include>
