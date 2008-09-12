@@ -1,4 +1,6 @@
 SubDir TOP plugins mesh sprcal3d ;
 
+UberPlugin sprcal3d_mesh : sprcal3d sprcal3dldr ;
+
 SubInclude TOP plugins mesh sprcal3d object ;
 SubInclude TOP plugins mesh sprcal3d persist ;

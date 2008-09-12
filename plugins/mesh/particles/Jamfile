@@ -1,4 +1,6 @@
 SubDir TOP plugins mesh particles ;
 
+UberPlugin particles_mesh : particles particlesldr ;
+
 SubInclude TOP plugins mesh particles object ;
 SubInclude TOP plugins mesh particles persist ;

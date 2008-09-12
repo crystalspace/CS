@@ -1,4 +1,6 @@
 SubDir TOP plugins mesh null ;
 
+UberPlugin null_mesh : nullmesh nullmeshldr ;
+
 SubInclude TOP plugins mesh null object ;
 SubInclude TOP plugins mesh null persist ;

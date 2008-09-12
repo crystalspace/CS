@@ -1,4 +1,6 @@
 SubDir TOP plugins mesh bezier ;
 
+UberPlugin bezier_mesh : bezier bezierldr ;
+
 SubInclude TOP plugins mesh bezier object ;
 SubInclude TOP plugins mesh bezier persist ;

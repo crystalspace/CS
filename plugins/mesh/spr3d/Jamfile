@@ -1,11 +1,11 @@
 SubDir TOP plugins mesh spr3d ;
 
-UberPlugin sprite3d : spr3d spr3dldr spr3dbin spr3md2 ;
-Description sprite3d : "3D Sprite mesh object plugin" ;
+UberPlugin sprite3d_mesh : spr3d spr3dldr spr3dbin spr3md2 ;
+Description sprite3d_mesh : "3D Sprite mesh object plugin" ;
 
 SubInclude TOP plugins mesh spr3d object ;
 SubInclude TOP plugins mesh spr3d persist ;
 
-CompileGroups sprite3d :  meshes ;
+CompileGroups sprite3d_mesh :  meshes ;
 
 

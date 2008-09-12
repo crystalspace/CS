@@ -1,4 +1,6 @@
 SubDir TOP plugins mesh spr2d ;
 
+UberPlugin sprite2d_mesh : spr2d spr2dldr ;
+
 SubInclude TOP plugins mesh spr2d object ;
 SubInclude TOP plugins mesh spr2d persist ;

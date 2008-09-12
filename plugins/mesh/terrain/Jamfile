@@ -1,5 +1,8 @@
 SubDir TOP plugins mesh terrain ;
 
+UberPlugin legacy_terrain : bruteblock terrainldr ;
+UberPlugin terrain_mesh : terrain2 terrain2ldr ;
+
 SubInclude TOP plugins mesh terrain brute ;
 SubInclude TOP plugins mesh terrain persist ;
 SubInclude TOP plugins mesh terrain terrain2 ;

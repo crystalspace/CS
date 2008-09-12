@@ -1,4 +1,6 @@
 SubDir TOP plugins mesh instmesh ;
 
+UberPlugin instmesh_mesh : instmesh instmeshldr ;
+
 SubInclude TOP plugins mesh instmesh object ;
 SubInclude TOP plugins mesh instmesh persist ;

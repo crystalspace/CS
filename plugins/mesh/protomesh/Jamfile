@@ -1,4 +1,6 @@
 SubDir TOP plugins mesh protomesh ;
 
+UberPlugin protomesh_mesh : protomesh protomeshldr ;
+
 SubInclude TOP plugins mesh protomesh object ;
 SubInclude TOP plugins mesh protomesh persist ;

@@ -1,4 +1,6 @@
 SubDir TOP plugins mesh lghtng ;
 
+UberPlugin lightning_mesh : lghtng lghtngldr ;
+
 SubInclude TOP plugins mesh lghtng object ;
 SubInclude TOP plugins mesh lghtng persist ;

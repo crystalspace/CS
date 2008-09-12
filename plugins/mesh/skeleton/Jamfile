@@ -1,4 +1,6 @@
 SubDir TOP plugins mesh skeleton ;
 
+UberPlugin skeleton_common : skeleton skelldr ;
+
 SubInclude TOP plugins mesh skeleton object ;
 SubInclude TOP plugins mesh skeleton persist ;
