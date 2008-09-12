@@ -545,7 +545,7 @@ SCF_IMPLEMENT_FACTORY (csEngine)
 
 csEngine::csEngine (iBase *iParent) :
   scfImplementationType (this, iParent), objectRegistry (0),
-  envTexHolder (this),
+  envTexHolder (this), enableEnvTex (true),
   frameWidth (0), frameHeight (0), 
   lightAmbientRed (CS_DEFAULT_LIGHT_LEVEL),
   lightAmbientGreen (CS_DEFAULT_LIGHT_LEVEL),
@@ -1919,6 +1919,9 @@ void csEngine::ReadConfig (iConfigFile *Config)
   defaultClearScreen = 
     Config->GetBool ("Engine.ClearScreen", defaultClearScreen);
   clearScreen = defaultClearScreen;
+  
+  enableEnvTex = 
+    Config->GetBool ("Engine.AutomaticEnvironmentCube", true);
 }
 
 struct LightAndDist

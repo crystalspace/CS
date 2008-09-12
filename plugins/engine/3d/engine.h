@@ -783,6 +783,7 @@ public:
 
   csRef<iRenderManager> renderManager;
   EnvTex::Holder envTexHolder;
+  bool enableEnvTex;
 
   /// For triangle meshes.
   csStringID colldet_id;
