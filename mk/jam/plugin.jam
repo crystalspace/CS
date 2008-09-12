@@ -52,27 +52,27 @@ rule UberPlugin
   $(<)_TARGET = $(target) ;
   $(<)_METAFILE = $(metafile) ;
 
-  # Create file list entry
-  if ! [ IsElem nodefaultfilelist : $(3) ]
-  {
-    FileListEntryPlugin $(<) : plugin ;
-  }
-
-  # so 'jam foo' works when it's really foo.dll (Windows) or foo.csbundle
-  # (MacOS/X)
-  if $(target) != $(<)
-  {
-    Depends $(<) : $(target) ;
-    NotFile $(<) ;
-  }
-
-  if ! [ IsElem independent : $(3) ]
-  {
-    Depends plugins : $(<) ;
-  }
-
   if ! $($(<)_PLUGIN_SETUP)
   {
+    # Create file list entry
+    if ! [ IsElem nodefaultfilelist : $(3) ]
+    {
+      FileListEntryPlugin $(<) : plugin ;
+    }
+
+    # so 'jam foo' works when it's really foo.dll (Windows) or foo.csbundle
+    # (MacOS/X)
+    if $(target) != $(<)
+    {
+      Depends $(<) : $(target) ;
+      NotFile $(<) ;
+    }
+
+    if ! [ IsElem independent : $(3) ]
+    {
+      Depends plugins : $(<) ;
+    }
+
     # construct install target
     if ! [ IsElem noinstall : $(3) ]
     {
