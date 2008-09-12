@@ -10,5 +10,6 @@ rule FilelistEntryShader
   FileListEntriesData $(file_gristed) : shader $(2) : data-runtime ;
 }
 
-Recurse InstallShader : .afp .avp .fvp .xml .cgfp .cgvp .inp .cginc .inc ;
-Recurse FilelistEntryShader : .afp .avp .fvp .xml .cgfp .cgvp .inp .cginc .inc ;
+SHADER_DATA_MASK = .afp .avp .fvp .xml .cgfp .cgvp .inp .cginc .inc .block ;
+Recurse InstallShader : $(SHADER_DATA_MASK) ;
+Recurse FilelistEntryShader : $(SHADER_DATA_MASK) ;
