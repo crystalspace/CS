@@ -370,6 +370,6 @@
     </pass>
   </technique>
   
-  <fallbackshader name="water_simple_cube"
+  <fallbackshader name="reflect_water_simple_cube"
 		  file="/shader/reflect/water_simple_cube.xml" />
 </shader>

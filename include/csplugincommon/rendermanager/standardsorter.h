@@ -87,8 +87,9 @@ namespace RenderManager
       // Get the render priority for node
       int renderPrio = meshNode->priority;
       
-      
-      switch (GetSorting (renderPrio))
+      int sorting = GetSorting (renderPrio);
+      meshNode->sorting = sorting;
+      switch (sorting)
       {
       case CS_RENDPRI_SORT_NONE:
         {

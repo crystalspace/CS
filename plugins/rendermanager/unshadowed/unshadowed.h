@@ -28,7 +28,8 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
 {
-  typedef CS::RenderManager::RenderTree<> RenderTreeType;
+  typedef CS::RenderManager::RenderTree<
+    CS::RenderManager::RenderTreeLightingTraits> RenderTreeType;
     
   template<typename RenderTreeType, typename LayerConfigType>
   class StandardContextSetup;
