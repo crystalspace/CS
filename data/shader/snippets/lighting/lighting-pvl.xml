@@ -31,6 +31,7 @@
 	
 	<input name="lightOffset" type="int" default="value" defval="0"/>
 	<input name="maxLights" type="int" default="value" defval="8"/>
+	<input name="minLights" type="int" default="value" defval="0"/>
 	
 	<block location="pass">
 	  <?Include /shader/snippets/lighting/lighting-tools.inc ?>
@@ -61,7 +62,7 @@
 	  for (int l = 0; l < maxLights; l++)
 	  {
 	    int i = lightOffset + l;
-	    if (i >= lightProps.count) break;
+	    if ((i >= minLights) && (i >= lightProps.count)) break;
           ]]>
 		     
 	    LightSpaceWorld lightSpace;
