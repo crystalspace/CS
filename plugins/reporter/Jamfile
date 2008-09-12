@@ -1,5 +1,7 @@
 SubDir TOP plugins reporter ;
 
+UberPlugin reporter_common : reporter ;
+
 Description reporter : "Reporter plugin" ;
 
 Plugin reporter

@@ -1,6 +1,6 @@
 SubDir TOP plugins documentsystem ;
 
-UberPlugin docsys : bindoc dsplex xmlread xmltiny ;
+UberPlugin docsys_common : bindoc dsplex xmlread xmltiny ;
 
 SubInclude TOP plugins documentsystem binary ;
 SubInclude TOP plugins documentsystem dsplex ;

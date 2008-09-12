@@ -1,5 +1,7 @@
 SubDir TOP plugins engine renderloop ;
 
+UberPlugin legacy_rl : rendloop_loader rendstep_std rendstep_stencil rendstep_stencil2 ;
+
 SubInclude TOP plugins engine renderloop loader ;
 SubInclude TOP plugins engine renderloop stdsteps ;
 SubInclude TOP plugins engine renderloop shadow ;

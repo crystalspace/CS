@@ -1,5 +1,7 @@
 SubDir TOP plugins proctex ;
 
+UberPlugin texture_common : ptanimimg ptpdlight stdpt tlfunc ;
+
 SubInclude TOP plugins proctex ptanimimg ;
 SubInclude TOP plugins proctex ptpdlight ;
 SubInclude TOP plugins proctex standard ;

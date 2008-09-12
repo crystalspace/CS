@@ -1,5 +1,7 @@
 SubDir TOP plugins stdrep ;
 
+UberPlugin reporter_common : stdrep ;
+
 Description stdrep : "Standard Report Listener Plugin" ;
 
 Plugin stdrep

@@ -1,5 +1,7 @@
 SubDir TOP plugins video render3d software ;
 
+UberPlugin soft_render : soft3d ;
+
 Description soft3d : "3D software renderer" ;
 
 Plugin soft3d : [ Wildcard *.cpp *.h ] ;

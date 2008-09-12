@@ -1,7 +1,7 @@
 SubDir TOP plugins csparser ;
 
-UberPlugin mapio : csparser cssaver cssynldr ;
-Description mapio : "map loading and saving" ;
+UberPlugin loader_common : csparser cssaver cssynldr ;
+Description loader_common : "map loading and saving" ;
 
 Description csparser : "map file parser" ;
 

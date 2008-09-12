@@ -1,4 +1,6 @@
 SubDir TOP plugins console ;
 
+UberPlugin console_common : csconin fancycon csconout ;
+
 SubInclude TOP plugins console input ;
 SubInclude TOP plugins console output ;

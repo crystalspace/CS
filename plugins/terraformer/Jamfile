@@ -1,4 +1,8 @@
 SubDir TOP plugins terraformer ;
 
+UberPlugin legacy_terrain :
+        simpleformer simpleformerldr
+        pagingformer pagingformerldr ;
+
 SubInclude TOP plugins terraformer simpleformer ;
 SubInclude TOP plugins terraformer pagingformer ;

@@ -1,5 +1,13 @@
 SubDir TOP plugins sndsys ;
 
+UberPlugin sndsys_common :
+        sndmanager
+        sndsyseventrecorder
+        sndsysloader
+        sndsysnull
+        sndsyssoft
+        sndsyswav ;
+
 SubInclude TOP plugins sndsys element ;
 SubInclude TOP plugins sndsys manager ;
 SubInclude TOP plugins sndsys renderer ;

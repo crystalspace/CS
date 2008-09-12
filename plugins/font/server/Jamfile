@@ -1,6 +1,6 @@
 SubDir TOP plugins font server ;
 
-UberPlugin defaultfont : csfont fontplex ;
+UberPlugin font_common : csfont fontplex ;
 
 SubInclude TOP plugins font server csfont ;
 SubInclude TOP plugins font server fontplex ;
