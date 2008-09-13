@@ -1,0 +1,16 @@
+SubDir TOP data posteffects ;
+
+rule InstallPostEffect
+{
+  InstallData $(1) : data posteffects $(2) ;
+}
+rule FilelistEntryPostEffect
+{
+  local listdir = $(2:E=.) ;
+
+  local file_gristed = $(1:G=$(listdir:J=!)) ;
+  FileListEntriesData $(file_gristed) : posteffects $(2) : data-runtime ;
+}
+
+Recurse InstallPostEffect : .xml ;
+Recurse FilelistEntryPostEffect : .xml ;
