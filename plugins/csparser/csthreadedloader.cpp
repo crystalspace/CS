@@ -2122,9 +2122,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csRef<iBase> rc;
       if(plug->IsThreadSafe())
       {
-        csRef<iThreadReturn> itr;
-        ParseAddOnTC(itr, plug, node, ssource, ldr_context, context);
-        if(!itr->WasSuccessful())
+        csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
+        if(!ParseAddOnTC(itr, plug, node, ssource, ldr_context, context))
         {
           return false;
         }
