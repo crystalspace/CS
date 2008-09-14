@@ -47,9 +47,9 @@ namespace CS
       {
       }
 
-      operator const T () const
+      operator T* () const
       {
-        return *GetValue();
+        return GetValue();
       }
     };
   } // Threading
