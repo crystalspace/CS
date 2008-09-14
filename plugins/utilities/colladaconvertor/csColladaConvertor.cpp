@@ -1272,3 +1272,4 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
 }
 CS_PLUGIN_NAMESPACE_END(ColladaConvertor)
+
