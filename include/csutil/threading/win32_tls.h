@@ -42,14 +42,14 @@ namespace CS
           }
         }
 
-        virtual void SetValue(T* data)
+        virtual void SetValue(T data)
         {
           TlsSetValue(threadIndex, reinterpret_cast<LPVOID>(data));
         }
 
-        T* GetValue() const
+        T GetValue() const
         {
-          return reinterpret_cast<T*>(TlsGetValue(threadIndex));
+          return reinterpret_cast<T>(TlsGetValue(threadIndex));
         }
 
       protected:

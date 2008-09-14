@@ -47,10 +47,16 @@ namespace CS
       {
       }
 
-      operator T* () const
+      operator T () const
       {
         return GetValue();
       }
+
+      ThreadLocal& operator = (T other)
+      {
+        SetValue(other);
+        return *this;
+      } 
     };
   } // Threading
 } // CS

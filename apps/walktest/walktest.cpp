@@ -907,6 +907,7 @@ bool WalkTest::SetMapDir (const char* map_dir)
     	map_dir);
     return false;
   }
+  myVFS->SetSyncDir(myVFS->GetCwd());
   return true;
 }
 

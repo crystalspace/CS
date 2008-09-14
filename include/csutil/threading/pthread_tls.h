@@ -41,14 +41,14 @@ namespace CS
           pthread_key_delete(threadIndex);
         }
 
-        virtual void SetValue(T* data)
+        virtual void SetValue(T data)
         {
           pthread_setspecific(threadIndex, reinterpret_cast<void*>(data))
         }
 
-        T* GetValue() const
+        T GetValue() const
         {
-          return reinterpret_cast<T*>(pthread_getspecific(threadIndex));
+          return reinterpret_cast<T>(pthread_getspecific(threadIndex));
         }
 
       protected:
