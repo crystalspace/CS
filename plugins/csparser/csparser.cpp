@@ -693,8 +693,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if (!filename.IsEmpty ())
     {
       csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-      LoadImageTC (ret, filename, Format, false);
-      csRef<iImage> image = scfQueryInterface<iImage>(ret->GetResultRefPtr());
+      if(!LoadImageTC (ret, filename, Format, false))
+      {
+        SyntaxService->Report("crystalspace.maploader.parse.texture",
+          CS_REPORTER_SEVERITY_ERROR, node, "Could not load image %s!", filename.GetData());
+      }
+
+      csRef<iImage> image = scfQueryInterfaceSafe<iImage>(ret->GetResultRefPtr());
       context.SetImage (image);
       if (image.IsValid() && type.IsEmpty ())
       {
