@@ -149,51 +149,105 @@ void OptimiseData::SortData()
   for(size_t i=0; i<meshFacts.GetSize(); i++)
   {
     csRef<iDocumentNode> meshFact = meshFacts[i];
-    csRef<iDocumentNode> params = meshFact->GetNode("params");
-    csRef<iDocumentNodeIterator> submeshes = params->GetNodes("submesh");
-    bool first = true;
-
     csRefArray<iDocumentNode> tempMats;
-    while((first && params->GetNode("material")) || submeshes->HasNext())
+    csRef<iDocumentNode> params = meshFact->GetNode("params");
+    if(params.IsValid())
     {
-      csString materialName;
-      if(first && params->GetNode("material"))
-      {
-        materialName = params->GetNode("material")->GetContentsValue();
-        first = false;
-      }
-      else if(submeshes->HasNext())
-      {
-        materialName = submeshes->Next()->GetNode("material")->GetContentsValue();
-      }
+      csRef<iDocumentNodeIterator> submeshes = params->GetNodes("submesh");
+      bool first = true;
 
-      bool hasMaterialDecl = false;
-
-      csRef<iDocumentNode> material;
-      for(size_t j=0; j<materials.GetSize(); j++)
+      while((first && params->GetNode("material")) || submeshes->HasNext())
       {
-        material = materials[j];
-        if(materialName.Compare(material->GetAttributeValue("name")))
+        csString materialName;
+        if(first && params->GetNode("material"))
         {
-          hasMaterialDecl = true;
-          break;
+          materialName = params->GetNode("material")->GetContentsValue();
+          first = false;
         }
-      }
+        else if(submeshes->HasNext())
+        {
+          materialName = submeshes->Next()->GetNode("material")->GetContentsValue();
+        }
 
-      if(!hasMaterialDecl)
+        bool hasMaterialDecl = false;
+
+        csRef<iDocumentNode> material;
+        for(size_t j=0; j<materials.GetSize(); j++)
+        {
+          material = materials[j];
+          if(materialName.Compare(material->GetAttributeValue("name")))
+          {
+            hasMaterialDecl = true;
+            break;
+          }
+        }
+
+        if(!hasMaterialDecl)
+        {
+          // Assume material name is also texture name.
+          material = tempDocRoot->CreateNodeBefore(CS_NODE_ELEMENT);
+          material->SetValue("material");
+          material->SetAttribute("name", materialName);
+          csRef<iDocumentNode> materialTex = material->CreateNodeBefore(CS_NODE_ELEMENT);
+          materialTex->SetValue("texture");
+          materialTex = materialTex->CreateNodeBefore(CS_NODE_TEXT);
+          materialTex->SetValue(materialName);
+          materials.Push(material);
+        }
+
+        tempMats.Push(material);
+      }
+    }
+
+    csRef<iDocumentNodeIterator> meshes = meshFact->GetNodes("meshfact");
+    while(meshes->HasNext())
+    {
+      csRef<iDocumentNode> undermesh = meshes->Next();
+      csRef<iDocumentNodeIterator> submeshes = undermesh->GetNodes("submesh");
+      bool first = true;
+
+      csRefArray<iDocumentNode> tempMats;
+      while((first && undermesh->GetNode("material")) || submeshes->HasNext())
       {
-        // Assume material name is also texture name.
-        material = tempDocRoot->CreateNodeBefore(CS_NODE_ELEMENT);
-        material->SetValue("material");
-        material->SetAttribute("name", materialName);
-        csRef<iDocumentNode> materialTex = material->CreateNodeBefore(CS_NODE_ELEMENT);
-        materialTex->SetValue("texture");
-        materialTex = materialTex->CreateNodeBefore(CS_NODE_TEXT);
-        materialTex->SetValue(materialName);
-        materials.Push(material);
-      }
+        csString materialName;
+        if(first && undermesh->GetNode("material"))
+        {
+          materialName = undermesh->GetNode("material")->GetContentsValue();
+          first = false;
+        }
+        else if(submeshes->HasNext())
+        {
+          materialName = submeshes->Next()->GetNode("material")->GetContentsValue();
+        }
 
-      tempMats.Push(material);
+        bool hasMaterialDecl = false;
+
+        csRef<iDocumentNode> material;
+        for(size_t j=0; j<materials.GetSize(); j++)
+        {
+          material = materials[j];
+          if(materialName.Compare(material->GetAttributeValue("name")))
+          {
+            hasMaterialDecl = true;
+            break;
+          }
+        }
+
+        if(!hasMaterialDecl)
+        {
+          // Assume material name is also texture name.
+          material = tempDocRoot->CreateNodeBefore(CS_NODE_ELEMENT);
+          material->SetValue("material");
+          material->SetAttribute("name", materialName);
+          csRef<iDocumentNode> materialTex = material->CreateNodeBefore(CS_NODE_ELEMENT);
+          materialTex->SetValue("texture");
+          materialTex = materialTex->CreateNodeBefore(CS_NODE_TEXT);
+          materialTex->SetValue(materialName);
+          materials.Push(material);
+        }
+
+        tempMats.Push(material);
+      }
     }
 
     csRefArray<iDocumentNode> tempTexs;
