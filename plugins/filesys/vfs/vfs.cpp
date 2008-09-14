@@ -1472,11 +1472,11 @@ csVFS::csVFS (iBase *iParent) :
   basedir(0),
   resdir(0),
   appdir(0),
-  dirstack(8,8),
   object_reg(0),
   auto_name_counter(0),
   verbosity(VERBOSITY_NONE)
 {
+  dirstack = new csStringArray(8,8);
   heap.AttachNew (new HeapRefCounted);
   mainDir = (char*)cs_malloc (2);
   cwd.SetValue((char*)cs_malloc (2));
@@ -1765,24 +1765,7 @@ bool csVFS::CheckIfMounted(char const* virtual_path)
   return ok;
 }
 
-bool csVFS::ChDir (const char *Path)
-{
-  CS::Threading::RecursiveMutexScopedLock lock (mutex);
-  // First, transform Path to absolute
-  char *newwd = _ExpandPath (Path, true);
-  if (!newwd)
-    return false;
-  cs_free (cwd);
-  cwd.SetValue(newwd);
-  if(!initElem)
-  {
-    initElem = threadInit.Push(true);
-  }
-  ArchiveCache->CheckUp ();
-  return true;
-}
-
-const char* csVFS::GetCwd ()
+void csVFS::CheckCurrentDir()
 {
   if(size_t(initElem.GetValue()) != size_t(-1) &&
     (initElem.GetValue() == 0 || !threadInit[size_t(initElem.GetValue()-1)]))
@@ -1809,8 +1792,28 @@ const char* csVFS::GetCwd ()
       cwd [0] = VFS_PATH_SEPARATOR;
       cwd [1] = 0;
     }
-  }
 
+    dirstack = new csStringArray(8,8);
+  }
+}
+
+bool csVFS::ChDir (const char *Path)
+{
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
+  // First, transform Path to absolute
+  char *newwd = _ExpandPath (Path, true);
+  if (!newwd)
+    return false;
+  CheckCurrentDir();
+  char* dir = cwd;
+  memcpy(dir, newwd, strlen(newwd)+1);
+  ArchiveCache->CheckUp ();
+  return true;
+}
+
+const char* csVFS::GetCwd ()
+{
+  CheckCurrentDir();
   return cwd;
 }
 
@@ -1829,9 +1832,10 @@ void csVFS::SetSyncDir(const char* Path)
 
 void csVFS::PushDir (char const* Path)
 {
+  CheckCurrentDir();
   { // Scope.
     CS::Threading::RecursiveMutexScopedLock lock (mutex);
-    dirstack.Push (cwd);
+    dirstack.GetValue()->Push (cwd);
   }
   if (Path != 0)
     ChDir(Path);
@@ -1840,9 +1844,10 @@ void csVFS::PushDir (char const* Path)
 bool csVFS::PopDir ()
 {
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
-  if (!dirstack.GetSize ())
+  CheckCurrentDir();
+  if (!dirstack.GetValue()->GetSize ())
     return false;
-  char *olddir = (char *) dirstack.Pop ();
+  char *olddir = (char *) dirstack.GetValue()->Pop ();
   bool retcode = ChDir (olddir);
   delete[] olddir;
   return retcode;

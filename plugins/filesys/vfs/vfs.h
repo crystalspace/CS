@@ -159,7 +159,7 @@ private:
   // The initialization file
   csConfigFile config;
   // Directory stack (used in PushDir () and PopDir ())
-  csStringArray dirstack;
+  CS::Threading::ThreadLocal<csStringArray*> dirstack;
   // Reference to the object registry.
   iObjectRegistry *object_reg;
   // ChDirAuto() may need to generate unique temporary names for mount points.
@@ -285,6 +285,9 @@ public:
   virtual csRef<iStringArray> GetRealMountPaths (const char *VirtualPath);
 
 private:
+  /// Check the current dir is valid, and (re-)init if needed.
+  void CheckCurrentDir();
+
   /// Same as ExpandPath() but with less overhead
   char *_ExpandPath (const char *Path, bool IsDir = false);
 
