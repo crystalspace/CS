@@ -49,12 +49,12 @@ namespace CS
 
       operator T () const
       {
-        return GetValue();
+        return ThreadLocalBase<T>::GetValue();
       }
 
       ThreadLocal& operator = (T other)
       {
-        SetValue(other);
+        ThreadLocalBase<T>::SetValue(other);
         return *this;
       } 
     };

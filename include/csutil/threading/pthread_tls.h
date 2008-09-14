@@ -43,7 +43,7 @@ namespace CS
 
         virtual void SetValue(T data)
         {
-          pthread_setspecific(threadIndex, reinterpret_cast<void*>(data))
+          pthread_setspecific(threadIndex, reinterpret_cast<void*>(data));
         }
 
         T GetValue() const
