@@ -327,18 +327,35 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
     return;
   }
 
-  csRef<iThreadReturn> ret = Sys->LevelLoader->LoadFile(filename);
-  ret->Wait();
-  if (!ret->WasSuccessful())
+  if(Sys->threaded)
   {
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-  	"There was an error reading model '%s'!", filename);
-    return;
-  }
+    csRef<iThreadReturn> ret = Sys->TLevelLoader->LoadFile(filename);
+    ret->Wait();
+    if (!ret->WasSuccessful())
+    {
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+        "There was an error reading model '%s'!", filename);
+      return;
+    }
 
-  csRef<iMeshFactoryWrapper> wrap = scfQueryInterface<iMeshFactoryWrapper> (ret->GetResultRefPtr());
-  if (wrap)
-    wrap->QueryObject ()->SetName (templatename);
+    csRef<iMeshFactoryWrapper> wrap = scfQueryInterface<iMeshFactoryWrapper> (ret->GetResultRefPtr());
+    if (wrap)
+      wrap->QueryObject ()->SetName (templatename);
+  }
+  else
+  {
+    csLoadResult rc = Sys->LevelLoader->Load (filename);
+    if (!rc.success)
+    {
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+        "There was an error reading model '%s'!", filename);
+      return;
+    }
+    csRef<iMeshFactoryWrapper> wrap = scfQueryInterface<iMeshFactoryWrapper> (
+      rc.result);
+    if (wrap)
+      wrap->QueryObject ()->SetName (templatename);
+  }
 }
 
 
@@ -601,8 +618,7 @@ char* LookForTextureFileName(const char* value)
 
 
 void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
-					   iGraphics3D* /*MyG3D*/, iThreadedLoader* loader,
-					   iObjectRegistry* /*objReg*/)
+					   iGraphics3D* /*MyG3D*/, iObjectRegistry* /*objReg*/)
 {
   iMaterialList* matList = Engine->GetMaterialList();
   //used to check if a material is already registered
@@ -634,11 +650,21 @@ void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
     {
       //Is not registered. We have to do it.
       textFileName = LookForTextureFileName(kp->GetValue());
-      csRef<iThreadReturn> ret = loader->LoadTexture(matName, textFileName);
-      ret->Wait();
-      if(!ret->WasSuccessful())
+      if(Sys->threaded)
       {
-        csPrintf("Error loading %s texture!!",textFileName);
+        csRef<iThreadReturn> ret = Sys->TLevelLoader->LoadTexture(matName, textFileName);
+        ret->Wait();
+        if(!ret->WasSuccessful())
+        {
+          csPrintf("Error loading %s texture!!",textFileName);
+        }
+      }
+      else
+      {
+        if(!Sys->LevelLoader->LoadTexture(matName,textFileName))
+        {
+          csPrintf("Error loading %s texture!!",textFileName);
+        }
       }
 
       //Material registered, let's go to another one
@@ -695,15 +721,14 @@ void BuildSprite(iSector * sector, iObjectIterator* it, csVector3 position)
 
 void BuildObject(iSector * sector,
 	iObjectIterator* it, iEngine* Engine,
-	csVector3 position, iGraphics3D* MyG3D, iThreadedLoader* loader,
-	iObjectRegistry* objReg)
+	csVector3 position, iGraphics3D* MyG3D,	iObjectRegistry* objReg)
 {
   csString factoryName;
   if(strcmp(LookForKeyValue(it,"classname"),"SEED_MESH_OBJ")) return;
   //Now we know this objects iterator belongs to a SEED_MESH_OBJECT
   //Proceeding to contruct the object
 
-  RegisterMaterials(it,Engine,MyG3D,loader,objReg);
+  RegisterMaterials(it,Engine,MyG3D,objReg);
   factoryName = LookForKeyValue(it,"factory");
   if(!Engine->GetMeshFactories()->FindByName(factoryName))
 	  BuildFactory(it, (char*)(const char*)factoryName, Engine);
@@ -728,8 +753,7 @@ void WalkTest::ParseKeyNodes(iObject* src)
     }
     csRef<iObjectIterator> it2 (node_obj->GetIterator());
 
-    BuildObject(sector, it2, Engine, node->GetPosition(), myG3D,
-		LevelLoader, object_reg);
+    BuildObject(sector, it2, Engine, node->GetPosition(), myG3D, object_reg);
   }
 }
 
@@ -1493,13 +1517,25 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
       Sys->Engine->DeleteAll ();
       Sys->Engine->SetVFSCacheManager ();
-      csRef<iThreadReturn> ret = Sys->LevelLoader->LoadMapFile ("world");
-      ret->Wait();
-      if (!ret->WasSuccessful())
+      if(Sys->threaded)
       {
-        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	  "Couldn't load level '%s'!", level);
-	return false;
+        csRef<iThreadReturn> ret = Sys->TLevelLoader->LoadMapFile ("world");
+        ret->Wait();
+        if (!ret->WasSuccessful())
+        {
+          Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+            "Couldn't load level '%s'!", level);
+          return false;
+        }
+      }
+      else
+      {
+        if (!Sys->LevelLoader->LoadMapFile ("world"))
+        {
+          Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+            "Couldn't load level '%s'!", level);
+          return false;
+        }
       }
       Sys->Engine->Prepare ();
       // Look for the start sector in this map.
@@ -1541,8 +1577,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       char level[300];
       csScanStr (arg, "%s", level);
-      void OpenPortal (iThreadedLoader*, iView* view, char* lev);
-      OpenPortal (Sys->LevelLoader, Sys->view, level);
+      void OpenPortal (iView* view, char* lev);
+      OpenPortal (Sys->view, level);
     }
     else
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,

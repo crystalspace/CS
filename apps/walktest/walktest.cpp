@@ -120,6 +120,7 @@ WalkTest::WalkTest () :
   cache_map = 0;
   doSave = false;
   spritesLoaded = false;
+  threaded = false;
 }
 
 WalkTest::~WalkTest ()
@@ -218,6 +219,11 @@ void WalkTest::SetDefaults ()
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Logo disabled.");
   }
 
+  if(cmdline->GetOption("threaded"))
+  {
+    threaded = true;
+  }
+
   doSave = Config->GetBool ("Walktest.Settings.EnableEngineSaving", doSave);
   doSave = cmdline->GetBoolOption ("saveable", doSave);
   Report (CS_REPORTER_SEVERITY_NOTIFY, "World saving %s.", 
@@ -229,6 +235,7 @@ void WalkTest::Help ()
   csRef<iConfigManager> cfg (csQueryRegistry<iConfigManager> (object_reg));
   csPrintf ("Options for WalkTest:\n");
   csPrintf ("  -exec=<script>     execute given script at startup\n");
+  csPrintf ("  -threaded          use threaded loading (default no)\n");
   csPrintf ("  -[no]colldet       collision detection system (default '%scolldet')\n", collider_actor.HasCD () ? "" : "no");
   csPrintf ("  -[no]logo          draw logo (default '%slogo')\n", do_logo ? "" : "no");
   csPrintf ("  -collections       load every map in a separate collection (default off)\n");
@@ -851,14 +858,25 @@ void WalkTest::InitCollDet (iEngine* engine, iCollection* collection)
 void WalkTest::LoadLibraryData (iCollection* collection)
 {
   // Load the "standard" library
-  csRef<iThreadReturn> ret = LevelLoader->LoadTexture ("cslogo2",
-    "/lib/std/cslogo2.png", CS_TEXTURE_2D, 0, true, true,
-    true, collection);
-  ret->Wait();
-  if(!ret->WasSuccessful())
+  if(Sys->threaded)
   {
-    Cleanup ();
-    exit (0);
+    csRef<iThreadReturn> ret = TLevelLoader->LoadTexture ("cslogo2",
+      "/lib/std/cslogo2.png", CS_TEXTURE_2D, 0, true, true,
+      true, collection);
+    ret->Wait();
+    if(!ret->WasSuccessful())
+    {
+      Cleanup ();
+      exit (0);
+    }
+  }
+  else
+  {
+    if (!LevelLoader->LoadLibraryFile ("/lib/std/library", collection))
+    {
+      Cleanup ();
+      exit (0);
+    }
   }
 }
 
@@ -1126,8 +1144,17 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   Engine->SetSaveableFlag (doSave);
 
   // Find the level loader plugin
-  LevelLoader = csQueryRegistryOrLoad<iThreadedLoader>(object_reg, "crystalspace.level.loader.threaded");
-  if (!LevelLoader)
+  if(threaded)
+  {
+    // Done this way because unfortunately having both loaded at the same time breaks the old one.
+    TLevelLoader = csQueryRegistryOrLoad<iThreadedLoader>(object_reg, "crystalspace.level.loader.threaded");
+  }
+  else
+  {
+    LevelLoader = csQueryRegistry<iLoader>(object_reg);
+  }
+
+  if (!TLevelLoader && !LevelLoader)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No level loader plugin!");
     return false;
@@ -1215,8 +1242,15 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     {
       collection = Engine->CreateCollection (map->map_dir);
     }
-    csRef<iThreadReturn> ret = LevelLoader->LoadMapFile ("world", false, collection);
-    ret->Wait();
+    if(threaded)
+    {
+      csRef<iThreadReturn> ret = TLevelLoader->LoadMapFile ("world", false, collection);
+      ret->Wait();
+    }
+    else
+    {
+      LevelLoader->LoadMapFile("world", false, collection);
+    }
 
     if (do_collections)
     {
@@ -1257,7 +1291,10 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   bool camok = false;
   if(Engine->GetCameraPositions ()->GetCount () == 0)
   {
-    Engine->SyncEngineLists(LevelLoader);
+    if(threaded)
+    {
+      Engine->SyncEngineLists(TLevelLoader);
+    }
   }
 
   if (!camok && Engine->GetCameraPositions ()->GetCount () > 0)

@@ -319,8 +319,10 @@ public:
    * The main engine interface
    */
   csRef<iEngine> Engine;
-  /// The level loader
-  csRef<iThreadedLoader> LevelLoader;
+  /// The level loaders
+  csRef<iThreadedLoader> TLevelLoader;
+  csRef<iLoader> LevelLoader;
+  bool threaded;
   ///
   csRef<iGraphics2D> myG2D;
   csRef<iGraphics3D> myG3D;
