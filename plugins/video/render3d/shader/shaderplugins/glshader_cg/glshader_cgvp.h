@@ -43,7 +43,7 @@ public:
   /// Compile a program
   virtual bool Compile (iHierarchicalCache* cache, csRef<iString>*);
   
-  bool Precache (const ProfileLimits& limits,
+  bool Precache (const ProfileLimitsPair& limitsPair,
     const char* tag, iHierarchicalCache* cache);
 
   virtual csVertexAttrib ResolveBufferDestination (const char* binding);

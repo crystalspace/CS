@@ -245,7 +245,7 @@ void csLight::CalculateAttenuationVector ()
       break;
     case CS_ATTN_LINEAR:    
       // @@@ FIXME: cutoff distance != radius, really
-      attenuationConstants.Set (0, 0, 0, 1.0f/cutoffDistance);
+      attenuationConstants.Set (1.0f/SMALL_EPSILON, 0, 0, 1.0f/cutoffDistance);
       break;
     case CS_ATTN_INVERSE:
       attenuationConstants.Set (0, 1, 0, 0);

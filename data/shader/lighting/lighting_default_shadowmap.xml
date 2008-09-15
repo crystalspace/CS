@@ -24,7 +24,7 @@
   <alias name="shadow" file="/shader/snippets/shadow/shadow-depth.xml" />
   
   <?if vars."light shadow map" && ((vars."light count".int &gt; 1) || (vars."light shadow map[0]".texture)) ?>
-  <technique priority="500">
+  <technique priority="500" minlights="5">
     <tag>per_pixel_lighting</tag>
     <!-- 1 pass, 6 lights -->
     <pass>
@@ -57,13 +57,14 @@
       <parameter id="maxLights" type="int">6</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
   </technique>
   
-  <technique priority="400">
+  <technique priority="400" minlights="4">
     <tag>per_pixel_lighting</tag>
     <!-- 2 passes, 4+2 lights -->
-    <pass>
+    <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
 	<!-- First pass: blend with alpha -->
 	<mixmode>
@@ -84,10 +85,12 @@
       
       <parameter id="lightOffset" type="int">0</parameter>
       <parameter id="maxLights" type="int">4</parameter>
+      <parameter id="minLights" type="int">4</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
-    <pass>
+    <pass minlights="5">
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>disable</alphatest>
@@ -100,15 +103,17 @@
       
       <parameter id="lightOffset" type="int">4</parameter>
       <parameter id="maxLights" type="int">2</parameter>
+      <parameter id="minLights" type="int">5</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
   </technique>
   
-  <technique priority="300">
+  <technique priority="300" minlights="3">
     <tag>per_pixel_lighting</tag>
     <!-- 2 passes, 3+3 lights -->
-    <pass>
+    <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
       <!-- First pass: blend with alpha -->
 	<mixmode>
@@ -129,10 +134,12 @@
       
       <parameter id="lightOffset" type="int">0</parameter>
       <parameter id="maxLights" type="int">3</parameter>
+      <parameter id="minLights" type="int">3</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
-    <pass>
+    <pass minlights="4">
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>disable</alphatest>
@@ -145,15 +152,17 @@
       
       <parameter id="lightOffset" type="int">3</parameter>
       <parameter id="maxLights" type="int">3</parameter>
+      <parameter id="minLights" type="int">4</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
   </technique>
   
-  <technique priority="200">
+  <technique priority="200" minlights="2">
     <tag>per_pixel_lighting</tag>
     <!-- 3 passes, 2+2+2 lights -->
-    <pass>
+    <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
 	<!-- First pass: blend with alpha -->
 	<mixmode>
@@ -174,10 +183,12 @@
       
       <parameter id="lightOffset" type="int">0</parameter>
       <parameter id="maxLights" type="int">2</parameter>
+      <parameter id="minLights" type="int">2</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
-    <pass>
+    <pass minlights="3">
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>disable</alphatest>
@@ -190,10 +201,12 @@
       
       <parameter id="lightOffset" type="int">2</parameter>
       <parameter id="maxLights" type="int">2</parameter>
+      <parameter id="minLights" type="int">3</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
-    <pass>
+    <pass minlights="5">
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>disable</alphatest>
@@ -206,15 +219,17 @@
       
       <parameter id="lightOffset" type="int">4</parameter>
       <parameter id="maxLights" type="int">2</parameter>
+      <parameter id="minLights" type="int">5</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
   </technique>
   
-  <technique priority="100">
+  <technique priority="100" minlights="1">
     <tag>per_pixel_lighting</tag>
     <!-- 6 passes, 1+1+1+1+1+1 lights -->
-    <pass>
+    <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
 	<!-- First pass: blend with alpha -->
 	<mixmode>
@@ -235,10 +250,12 @@
       
       <parameter id="lightOffset" type="int">0</parameter>
       <parameter id="maxLights" type="int">1</parameter>
+      <parameter id="minLights" type="int">1</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
-    <pass>
+    <pass minlights="2">
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>disable</alphatest>
@@ -251,10 +268,12 @@
       
       <parameter id="lightOffset" type="int">1</parameter>
       <parameter id="maxLights" type="int">1</parameter>
+      <parameter id="minLights" type="int">2</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
-    <pass>
+    <pass minlights="3">
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>disable</alphatest>
@@ -267,10 +286,12 @@
       
       <parameter id="lightOffset" type="int">2</parameter>
       <parameter id="maxLights" type="int">1</parameter>
+      <parameter id="minLights" type="int">3</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
-    <pass>
+    <pass minlights="4">
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>disable</alphatest>
@@ -283,10 +304,12 @@
       
       <parameter id="lightOffset" type="int">3</parameter>
       <parameter id="maxLights" type="int">1</parameter>
+      <parameter id="minLights" type="int">4</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
-    <pass>
+    <pass minlights="5">
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>disable</alphatest>
@@ -299,10 +322,12 @@
       
       <parameter id="lightOffset" type="int">4</parameter>
       <parameter id="maxLights" type="int">1</parameter>
+      <parameter id="minLights" type="int">5</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
-    <pass>
+    <pass minlights="6">
       <mixmode>
 	<blendop src="one" dst="one" />
 	<alphatest>disable</alphatest>
@@ -315,8 +340,10 @@
       
       <parameter id="lightOffset" type="int">5</parameter>
       <parameter id="maxLights" type="int">1</parameter>
+      <parameter id="minLights" type="int">6</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
+      <connection from="minLights" to="shared" />
     </pass>
   </technique>
   <?endif?>

@@ -222,7 +222,8 @@ static int GetProfileLevel (CGprofile profile)
 }
 
 void csGLShader_CG::GetProfileCompilerArgs (const char* type, 
-                                            CGprofile profile, 
+                                            CGprofile profile,
+                                            const ProfileLimitsPair& limitsPair,
                                             HardwareVendor vendor,
                                             bool noConfigArgs,
                                             ArgumentArray& args)
@@ -243,6 +244,25 @@ void csGLShader_CG::GetProfileCompilerArgs (const char* type,
   csString profileMacroArg ("-DPROFILE_");
   profileMacroArg += profileStr;
   args.Push (profileMacroArg);
+  
+  profileStr = cgGetProfileString (limitsPair.vp.profile);
+  if (!profileStr.IsEmpty())
+  {
+    profileStr.Upcase();
+    profileMacroArg = "-DVERT_PROFILE_";
+    profileMacroArg += profileStr;
+    args.Push (profileMacroArg);
+  }
+  
+  profileStr = cgGetProfileString (limitsPair.fp.profile);
+  if (!profileStr.IsEmpty())
+  {
+    profileStr.Upcase();
+    profileMacroArg = "-DFRAG_PROFILE_";
+    profileMacroArg += profileStr;
+    args.Push (profileMacroArg);
+  }
+  
   int profileLevel = GetProfileLevel (profile);
   if (profileLevel != 0)
   {
@@ -303,25 +323,14 @@ csPtr<iShaderProgram> csGLShader_CG::CreateProgram (const char* type)
     return csPtr<iShaderProgram> (new csShaderGLCGVP(this));
   else if (strcasecmp(type, "fp") == 0)
   {
-    ProfileLimitsPair dummyLimits;
-    return csPtr<iShaderProgram> (new csShaderGLCGFP (this, dummyLimits));
+    return csPtr<iShaderProgram> (new csShaderGLCGFP (this,
+      currentLimits));
   }
   else
     return 0;
 }
 
-static CGprofile ProfileRouted (CGprofile profile)
-{
-  switch (profile)
-  {
-    case CG_PROFILE_FP20:
-      return CG_PROFILE_PS_1_1;
-    default:
-      return profile;
-  }
-}
-
-static CGprofile ProfileUnrouted (CGprofile profile)
+static CGprofile NextBestFakeProfile (CGprofile profile)
 {
   switch (profile)
   {
@@ -330,8 +339,20 @@ static CGprofile ProfileUnrouted (CGprofile profile)
     case CG_PROFILE_PS_1_2:
     case CG_PROFILE_PS_1_3:
       return CG_PROFILE_FP30;
+      
+    case CG_PROFILE_FP20:
+      return CG_PROFILE_PS_1_1;
+    case CG_PROFILE_FP30:
+    case CG_PROFILE_FP40:
+    case CG_PROFILE_GPU_FP:
+      return CG_PROFILE_ARBFP1;
+    
+    case CG_PROFILE_VP30:
+    case CG_PROFILE_VP40:
+    case CG_PROFILE_GPU_VP:
+      return CG_PROFILE_ARBVP1;
     default:
-      return profile;
+      return CG_PROFILE_UNKNOWN;
   }
 }
 
@@ -423,29 +444,65 @@ bool csGLShader_CG::Open()
   enableVP = config->GetBool ("Video.OpenGL.Shader.Cg.Enable.Vertex", true);
   enableFP = config->GetBool ("Video.OpenGL.Shader.Cg.Enable.Fragment", true);
 
+  strictMatchVP = false;
   if (enableVP)
   {
-    if (config->KeyExists ("Video.OpenGL.Shader.Cg.MaxProfile.Vertex"))
+    if (config->KeyExists ("Video.OpenGL.Shader.Cg.Fake.Vertex.Profile"))
     {
       const char* profileStr = 
-        config->GetStr ("Video.OpenGL.Shader.Cg.MaxProfile.Vertex");
+        config->GetStr ("Video.OpenGL.Shader.Cg.Fake.Vertex.Profile");
       CGprofile profile = cgGetProfile (profileStr);
+      /* @@@ Hack: Make sure at least ARB_v_p is used.
+       * This is done because we don't completely support NV_vertex_program based
+       * profiles - those require "manual" binding of state matrices via 
+       * glTrackMatrixNV() which we don't support right now.
+       */
       if (profile == CG_PROFILE_UNKNOWN)
       {
         if (doVerbose)
           Report (CS_REPORTER_SEVERITY_WARNING,
-              "Unknown maximum vertex program profile '%s'", profileStr);
+              "Unknown fake vertex program profile '%s'", profileStr);
       }
       else
       {
-        maxProfileVertex = profile;
-        if (doVerbose)
-          Report (CS_REPORTER_SEVERITY_NOTIFY,
-            "Maximum vertex program profile: %s", profileStr);
+        if (profile < CG_PROFILE_ARBVP1) profile = CG_PROFILE_ARBVP1;
+        CGprofile profile2;
+        if (cgGLIsProfileSupported (profile2 = profile)
+            || cgGLIsProfileSupported (profile2 = NextBestFakeProfile (profile)))
+        {
+	  ProfileLimits limits (vendor, profile2);
+	  limits.ReadFromConfig (config, "Video.OpenGL.Shader.Cg.Fake.Vertex");
+	  currentLimits.vp = limits;
+          strictMatchVP = true;
+	}
+	else
+	{
+	  if (doVerbose)
+	    Report (CS_REPORTER_SEVERITY_WARNING,
+	      "Fake vertex program profile '%s' unsupported",
+	      cgGetProfileString (profile));
+	}
       }
     }
-    else
-      maxProfileVertex = CG_PROFILE_UNKNOWN;
+    if (currentLimits.vp.profile == CG_PROFILE_UNKNOWN)
+    {
+      CGprofile profile = cgGLGetLatestProfile (CG_GL_VERTEX);
+      if (profile < CG_PROFILE_ARBVP1)
+      {
+        if (cgGLIsProfileSupported (CG_PROFILE_ARBVP1))
+          profile = CG_PROFILE_ARBVP1;
+        else
+          profile = CG_PROFILE_UNKNOWN;
+      }
+      ProfileLimits limits (vendor, profile);
+      limits.GetCurrentLimits (ext);
+      currentLimits.vp = limits;
+    }
+    enableVP = currentLimits.vp.profile != CG_PROFILE_UNKNOWN;
+    if (doVerbose)
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+	"Using vertex program limits: %s",
+	currentLimits.vp.ToStringForPunyHumans().GetData());
   }
   else
   {
@@ -454,29 +511,55 @@ bool csGLShader_CG::Open()
           "Vertex program support disabled by user");
   }
 
+  strictMatchFP = false;
   if (enableFP)
   {
-    if (config->KeyExists ("Video.OpenGL.Shader.Cg.MaxProfile.Fragment"))
+    if (config->KeyExists ("Video.OpenGL.Shader.Cg.Fake.Fragment.Profile"))
     {
       const char* profileStr = 
-        config->GetStr ("Video.OpenGL.Shader.Cg.MaxProfile.Fragment");
+        config->GetStr ("Video.OpenGL.Shader.Cg.Fake.Fragment.Profile");
       CGprofile profile = cgGetProfile (profileStr);
       if (profile == CG_PROFILE_UNKNOWN)
       {
         if (doVerbose)
           Report (CS_REPORTER_SEVERITY_WARNING,
-              "Unknown maximum fragment program profile '%s'", profileStr);
+              "Unknown fake fragment program profile '%s'", profileStr);
       }
       else
       {
-        maxProfileFragment = profile;
-        if (doVerbose)
-          Report (CS_REPORTER_SEVERITY_NOTIFY,
-            "Maximum fragment program profile: %s", profileStr);
+        CGprofile profile2;
+        if (cgGLIsProfileSupported (profile2 = profile)
+            || cgGLIsProfileSupported (profile2 = NextBestFakeProfile (profile)))
+        {
+	  ProfileLimits limits (vendor, profile2);
+	  limits.ReadFromConfig (config, "Video.OpenGL.Shader.Cg.Fake.Fragment");
+	  currentLimits.fp = limits;
+          strictMatchFP = true;
+	}
+	else if (IsRoutedProfileSupported (profile2 = profile)
+            || IsRoutedProfileSupported (profile2 = NextBestFakeProfile (profile)))
+	{
+	  ProfileLimits limits (
+	    CS::PluginCommon::ShaderProgramPluginGL::Other,
+	    profile2);
+	  currentLimits.fp = limits;
+          strictMatchFP = true;
+	}
+	else
+	{
+	  if (doVerbose)
+	    Report (CS_REPORTER_SEVERITY_WARNING,
+	      "Fake fragment program profile '%s' unsupported", profileStr);
+	}
       }
     }
-    else
-      maxProfileFragment = CG_PROFILE_UNKNOWN;
+    if (currentLimits.fp.profile == CG_PROFILE_UNKNOWN)
+    {
+      ProfileLimits limits (vendor,
+	cgGLGetLatestProfile (CG_GL_FRAGMENT));
+      limits.GetCurrentLimits (ext);
+      currentLimits.fp = limits;
+    }
   }
   else
   {
@@ -488,47 +571,12 @@ bool csGLShader_CG::Open()
   cgGLSetDebugMode (config->GetBool ("Video.OpenGL.Shader.Cg.CgDebugMode",
     false));
  
-  // Determining what profile to use:
-  //  Start off with the highest supported profile.
-  psProfile = cgGLGetLatestProfile (CG_GL_FRAGMENT);
-  //  Cap at the maximum profile
-  if ((maxProfileFragment != CG_PROFILE_UNKNOWN) 
-    && (GetProfileLevel (psProfile) > GetProfileLevel (maxProfileFragment)))
-  {
-    if (!ProfileNeedsRouting (maxProfileFragment))
-    {
-      //  maxProfileFragment is GL profile.
-      //  maxProfileFragment supported natively?
-      if (cgGLIsProfileSupported (maxProfileFragment))
-        psProfile = maxProfileFragment;
-      //  maxProfileFragment supported by routing?
-      else if (IsRoutedProfileSupported (ProfileRouted (maxProfileFragment)))
-        psProfile = ProfileRouted (maxProfileFragment);
-      else
-        //  Can't support max profile.
-        psProfile = CG_PROFILE_UNKNOWN;
-    }
-    else 
-    {
-      //  maxProfileFragment is DX profile.
-      //  maxProfileFragment supported via routing?
-      if (IsRoutedProfileSupported (maxProfileFragment))
-        psProfile = maxProfileFragment;
-      //  GL equivalent of maxProfileFragment supported?
-      else if (cgGLIsProfileSupported (ProfileUnrouted (maxProfileFragment)))
-        psProfile = ProfileUnrouted (maxProfileFragment);
-      else
-        //  Can't support max profile.
-        psProfile = CG_PROFILE_UNKNOWN;
-    }
-  }
-
   // Check if the requested profile needs routing.
-  bool doRoute = ProfileNeedsRouting (psProfile);
+  bool doRoute = ProfileNeedsRouting (currentLimits.fp.profile);
 
   if (enableFP)
   {
-    if (psProfile != CG_PROFILE_UNKNOWN)
+    if (currentLimits.fp.profile != CG_PROFILE_UNKNOWN)
     {
       // Load PS1 plugin, if requested and/or needed
       if (doVerbose)
@@ -545,17 +593,19 @@ bool csGLShader_CG::Open()
             Report (CS_REPORTER_SEVERITY_WARNING,
                 "Could not find crystalspace.graphics3d.shader.glps1. Cg to PS "
                 "routing unavailable.");
-          psProfile = cgGLGetLatestProfile (CG_GL_FRAGMENT);
+	  ProfileLimits limits (vendor,
+	    cgGLGetLatestProfile (CG_GL_FRAGMENT));
+	  limits.GetCurrentLimits (ext);
+	  currentLimits.fp = limits;
         }
       }
     }
     else
-    {
-      if (doVerbose)
-        Report (CS_REPORTER_SEVERITY_WARNING,
-          "Cg fragment programs unavailable due lack of hardware support.");
       enableFP = false;
-    }
+    if (doVerbose)
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+	"Using fragment program limits: %s",
+	currentLimits.fp.ToStringForPunyHumans().GetData());
   }
 
   return true;
@@ -612,7 +662,7 @@ bool csGLShader_CG::Precache (const char* type, const char* tag,
     prog.AttachNew (new csShaderGLCGFP (this, limits));
     /* Precache for 'tag' */
     if (!prog->Load (resolve, node)) return false;
-    result = Precache (prog, limits.fp, tag, cacheTo);
+    result = Precache (prog, limits, tag, cacheTo);
   }
   else if (strcasecmp(type, "vp") == 0)
   {
@@ -628,7 +678,7 @@ bool csGLShader_CG::Precache (const char* type, const char* tag,
     }
     /* Precache for 'tag' */
     if (!prog->Load (resolve, node)) return false;
-    result = Precache (prog, limits.vp, tag, cacheTo);
+    result = Precache (prog, limits, tag, cacheTo);
   }
   else
     return false;
@@ -639,15 +689,11 @@ bool csGLShader_CG::Precache (const char* type, const char* tag,
 }
 
 bool csGLShader_CG::Precache (csShaderGLCGCommon* prog, 
-                              ProfileLimits& limits,
+                              ProfileLimitsPair& limits,
                               const char* tag,
                               iHierarchicalCache* cacheTo)
 {
   bool result = false;
-  CGprofile customProfile = prog->CustomProfile();
-  if ((customProfile != CG_PROFILE_UNKNOWN)
-      && (limits.profile != customProfile))
-    return false;
   result = prog->Precache (limits, tag, cacheTo);
   return result;
 }

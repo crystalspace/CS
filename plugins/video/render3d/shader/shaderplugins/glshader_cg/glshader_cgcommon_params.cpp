@@ -221,12 +221,25 @@ void csShaderGLCGCommon::ApplyVariableMapArray (const Array& array,
   {
     const VariableMapEntry& mapping = array[i];
     
-    if (mapping.mappingParam.name == (CS::StringIDValue)svClipPackedDist0)
-      var = clipPackedDists[0];
-    else if (mapping.mappingParam.name == (CS::StringIDValue)svClipPackedDist1)
-      var = clipPackedDists[1];
-    else
-      var = GetParamSV (stack, mapping.mappingParam);
+    switch (mapping.mappingParam.name)
+    {
+      case svClipPackedDist0:
+        var = clipPackedDists[0];
+        break;
+      case svClipPackedDist1:
+        var = clipPackedDists[1];
+        break;
+      case svClipPlane-0:
+      case svClipPlane-1:
+      case svClipPlane-2:
+      case svClipPlane-3:
+      case svClipPlane-4:
+      case svClipPlane-5:
+        var = clipPlane[svClipPlane-mapping.mappingParam.name];
+        break;
+      default:
+        var = GetParamSV (stack, mapping.mappingParam);
+    }
     // If var is null now we have no const nor any passed value, ignore it
     if (!var.IsValid ())
       continue;
@@ -250,9 +263,9 @@ struct SetterCg
   void Parameter4fv (uint slot, CGparameter param, float* v) const
   { cgSetParameter4fv (param, v); }
   void MatrixParameter3x3 (uint slot, CGparameter param, float* v) const
-  { cgGLSetMatrixParameterfc (param, v); }
+  { cgGLSetMatrixParameterfr (param, v); }
   void MatrixParameter4x4 (uint slot, CGparameter param, float* v) const
-  { cgGLSetMatrixParameterfc (param, v); }
+  { cgGLSetMatrixParameterfr (param, v); }
 };
 
 template<GLenum Target, bool GP4Prog>
@@ -353,7 +366,9 @@ void csShaderGLCGCommon::ApplyVariableMapArrays (const csShaderVariableStack& st
       ApplyVariableMapArray (variablemap, setter, stack);
     }
   }
-  else if ((programType == progFP) && (programProfile >= CG_PROFILE_ARBFP1))
+  else if ((programType == progFP) &&
+    ((programProfile >= CG_PROFILE_ARBFP1)
+    || (programProfile == CG_PROFILE_FP40)))
   {
     if (programProfile >= CG_PROFILE_GPU_FP)
     {

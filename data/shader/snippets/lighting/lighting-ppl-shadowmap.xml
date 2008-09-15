@@ -138,6 +138,7 @@
 	
 	<input name="lightOffset" type="int" default="value" defval="0"/>
 	<input name="maxLights" type="int" default="value" defval="3"/>
+	<input name="minLights" type="int" default="value" defval="0"/>
 	
 	<block location="pass">
 	  <?Include /shader/snippets/lighting/lighting-tools.inc ?>
@@ -176,7 +177,7 @@
           for (int l = 0; l < maxLights; l++)
 	  {
 	    int i = lightOffset + l;
-	    if (i >= lightProps.count) break;
+	    if ((i >= minLights) && (i >= lightProps.count)) break;
 	  ]]>
 	    
 	    half3 vp_dir;
@@ -205,7 +206,7 @@
           for (int l = 0; l < maxLights; l++)
 	  {
 	    int i = lightOffset + l;
-	    if (i >= lightProps.count) break;
+	    if ((i >= minLights) && (i >= lightProps.count)) break;
 	  ]]>
 	    LightSpaceTangent lightSpace;
 	    lightSpace.Init (lightDir[l].xyz, surfToLight[l].xyz);
