@@ -1246,10 +1246,21 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     {
       csRef<iThreadReturn> ret = TLevelLoader->LoadMapFile ("world", false, collection);
       ret->Wait();
+      if(!ret->WasSuccessful())
+      {
+        Report (CS_REPORTER_SEVERITY_ERROR, "Failing to load map!");
+        return false;
+      }
+      Engine->SyncEngineLists(TLevelLoader);
     }
     else
     {
-      LevelLoader->LoadMapFile("world", false, collection);
+      if (!LevelLoader->LoadMapFile ("world", false, collection, !do_collections,
+        do_dupes))
+      {
+        Report (CS_REPORTER_SEVERITY_ERROR, "Failing to load map!");
+        return false;
+      }
     }
 
     if (do_collections)
@@ -1289,14 +1300,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
   // Look for the start sector in this map.
   bool camok = false;
-  if(Engine->GetCameraPositions ()->GetCount () == 0)
-  {
-    if(threaded)
-    {
-      Engine->SyncEngineLists(TLevelLoader);
-    }
-  }
-
   if (!camok && Engine->GetCameraPositions ()->GetCount () > 0)
   {
     iCameraPosition *cp = Engine->GetCameraPositions ()->Get (0);
