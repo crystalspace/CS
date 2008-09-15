@@ -175,7 +175,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine, 5, 0, 0);
+  SCF_INTERFACE(iEngine, 6, 0, 0);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -275,29 +275,6 @@ struct iEngine : public virtual iBase
    */
   virtual iCacheManager* GetCacheManager () = 0;
 
-  /**
-   * Set the maximum lightmap dimensions. Polys with lightmaps larger than
-   * this are not lit.  
-   * \param w lightmap width 
-   * \param h lightmap height
-   */
-  virtual void SetMaxLightmapSize (int w, int h) = 0;
-
-  /** Retrieve maximum lightmap size.
-   * \param w lightmap width
-   * \param h lightmap height
-  */
-  virtual void GetMaxLightmapSize (int& w, int& h) = 0;
-
-  /** Retrieve default maximum lightmap size.  
-   * \param w lightmap width
-   * \param h lightmap height
-  */
-  virtual void GetDefaultMaxLightmapSize (int& w, int& h) = 0;
-
-  /// Get the maximum aspect ratio for lightmaps.
-  virtual int GetMaxLightmapAspectRatio () const = 0;
-  
   /** @} */
 
   /**\name Render priority functions
@@ -687,9 +664,8 @@ struct iEngine : public virtual iBase
   /**
    * Create a mesh wrapper from a class id.
    * This function will first make a factory from the plugin and then
-   * see if that factory itself implements iMeshObject too. This means
-   * this function is useful to create thing mesh objects (which are both 
-   * factory and object at the same time). If that fails this function
+   * see if that factory itself implements iMeshObject too.
+   * If that fails this function
    * will call NewInstance() on the factory and return that object then.
    * \param classid The SCF name of the plugin 
    * (like 'crystalspace.mesh.object.ball').  The type plugin will only 
@@ -712,37 +688,6 @@ struct iEngine : public virtual iBase
    * Assign to a csRef.
    */
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* name) = 0;
-
-  /**
-   * Convenience function to create the thing containing the
-   * convex outline of a sector. The thing will be empty but
-   * it will have #CS_ZBUF_FILL set (so that the Z-buffer will be filled
-   * by the polygons of this object) and have 'wall' as render
-   * priority. This version creates a mesh wrapper.
-   * Assign to a csRef.
-   * \param sector the sector to add walls to
-   * \param name the engine name of the walls mesh that will be created
-   * \deprecated Deprecated in 1.3. Use CS::Geometry::GeneralMeshBuilder
-   * instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use CS::Geometry::GeneralMeshBuilder instead")
-  virtual csPtr<iMeshWrapper> CreateSectorWallsMesh (iSector* sector,
-      const char* name) = 0;
-
-  /**
-   * Convenience function to create a thing mesh in a sector.
-   * This mesh will have #CS_ZBUF_USE set (use Z-buffer fully)
-   * and have 'object' as render priority. This means this function
-   * is useful for general objects.
-   * Assign to a csRef.
-   * \param sector the sector to add the object to
-   * \param name the engine name of the mesh that will be created
-   * \deprecated Deprecated in 1.3. Use CS::Geometry::GeneralMeshBuilder
-   * instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use CS::Geometry::GeneralMeshBuilder instead")
-  virtual csPtr<iMeshWrapper> CreateThingMesh (iSector* sector,
-  	const char* name) = 0;
 
   /**
    * Convenience function to load a mesh object from a given loader plugin.

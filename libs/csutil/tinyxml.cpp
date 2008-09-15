@@ -769,24 +769,34 @@ csPtr<TiDocumentNode> TiDocument::Clone(TiDocument* document) const
 class PrintOutString : public iPrintOutput
 {
   iString* str;
+  
+  enum { BufSize = 1*1024 };
+  char buf[BufSize];
 public:
-  PrintOutString (iString* str) : str (str) {}
+  PrintOutString (iString* str) : str (str) { }
 
   void Init (char*& bufPtr, size_t& bufRemaining)
   {
-    bufPtr = 0;
-    bufRemaining = 0;
+    bufPtr = buf;
+    bufRemaining = BufSize;
   }
 
   bool FlushBuffer (char*& bufPtr, size_t& bufRemaining)
   {
-    const size_t minIncrease = 1024;
-    const size_t maxIncrease = 2*1024*1024;
-    size_t newCapacity = 
-      csClamp (str->GetCapacity() * 2, maxIncrease, minIncrease) - 1;
-    str->SetCapacity (newCapacity);
-    bufPtr = const_cast<char*> (str->GetData ());
-    bufRemaining = str->GetCapacity() - str->Length();
+    size_t strLen = str->Length();
+    size_t strCap = str->GetCapacity();
+    size_t writeCount = BufSize - bufRemaining;
+    if (strLen + writeCount + 1 > strCap)
+    {
+      const size_t minIncrease = 1024;
+      const size_t maxIncrease = 2*1024*1024;
+      size_t newCapacity = 
+	csClamp (str->GetCapacity() * 2, maxIncrease, minIncrease) - 1;
+      str->SetCapacity (newCapacity);
+    }
+    str->Append (buf, writeCount);
+    bufPtr = buf;
+    bufRemaining = BufSize;
     return true;
   }
 };

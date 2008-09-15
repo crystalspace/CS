@@ -221,7 +221,7 @@ public:
 
   /**
    * Delete the engine and all entities it contains.  All objects added to this
-   * engine by the user (like Things, Sectors, ...) will be deleted as well.
+   * engine by the user (like meshes, sectors, ...) will be deleted as well.
    * If you don't want this then you should unlink them manually before
    * destroying the engine.
    */
@@ -254,19 +254,6 @@ public:
   virtual void SetVFSCacheManager (const char* vfspath = 0);
 
   virtual iCacheManager* GetCacheManager ();
-
-  virtual void SetMaxLightmapSize (int w, int h)
-  { maxLightmapWidth = w; maxLightmapHeight = h; }
-
-  virtual void GetMaxLightmapSize (int& w, int& h)
-  { w = maxLightmapWidth; h = maxLightmapHeight; }
-
-  virtual void GetDefaultMaxLightmapSize (int& w, int& h)
-  { w = defaultMaxLightmapWidth; h = defaultMaxLightmapHeight; }
-
-  virtual int GetMaxLightmapAspectRatio () const
-  { return maxAspectRatio; }
-
 
   //-- Render priority functions
 
@@ -389,12 +376,6 @@ public:
 	const csVector3& pos = csVector3 (0, 0, 0));
 
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* name);
-
-  virtual csPtr<iMeshWrapper> CreateSectorWallsMesh (iSector* sector,
-      const char* name);
-
-  virtual csPtr<iMeshWrapper> CreateThingMesh (iSector* sector,
-  	const char* name);
 
   virtual csPtr<iMeshWrapper> LoadMeshWrapper (
   	const char* name, const char* loaderClassId,
@@ -771,8 +752,6 @@ private:
   // Precache a single mesh
   void PrecacheMesh (iMeshWrapper* s, iRenderView* rview);
 
-  iMeshObjectType* GetThingType ();
-
   iRenderManager* GetRenderManager () { return renderManager; }
   void SetRenderManager (iRenderManager*);
   void ReloadRenderManager (csConfigAccess& cfg);
@@ -804,6 +783,7 @@ public:
 
   csRef<iRenderManager> renderManager;
   EnvTex::Holder envTexHolder;
+  bool enableEnvTex;
 
   /// For triangle meshes.
   csStringID colldet_id;
@@ -997,9 +977,6 @@ private:
 
     /// Option variable: force lightmap recalculation?
   int lightmapCacheMode;
-  /// Maximum lightmap dimensions
-  int maxLightmapWidth;
-  int maxLightmapHeight;
 
   /// Clear the Z-buffer every frame.
   bool clearZBuf;
@@ -1013,18 +990,12 @@ private:
   /// default buffer clear flag.
   bool defaultClearScreen;
 
-  /// default maximum lightmap width/height
-  int defaultMaxLightmapWidth, defaultMaxLightmapHeight;
-
   /// default ambient color
   int defaultAmbientRed, defaultAmbientGreen, defaultAmbientBlue;
   
   /// Verbose flag.
   static bool doVerbose;
 
-  /// Thing mesh object type for convenience.
-  csRef<iMeshObjectType> thingMeshType;
-  
   /// Current render context (proc texture) or 0 if global.
   iTextureHandle* currentRenderContext;
   

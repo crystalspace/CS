@@ -293,7 +293,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
       if (after == channel->keyFrames.GetSize ())
       {
         // Handle end-of-frame
-        after = isPlayingCyclic ? after = 0 : after = before;
+        after = isPlayingCyclic ? 0 : before;
       }      
 
       const KeyFrame& k1 = channel->keyFrames[before];

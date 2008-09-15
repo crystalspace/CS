@@ -44,7 +44,6 @@
 #include "imap/ldrctxt.h"
 #include "imap/reader.h"
 #include "imesh/lighting.h"
-#include "imesh/thing.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
@@ -546,7 +545,7 @@ SCF_IMPLEMENT_FACTORY (csEngine)
 
 csEngine::csEngine (iBase *iParent) :
   scfImplementationType (this, iParent), objectRegistry (0),
-  envTexHolder (this),
+  envTexHolder (this), enableEnvTex (true),
   frameWidth (0), frameHeight (0), 
   lightAmbientRed (CS_DEFAULT_LIGHT_LEVEL),
   lightAmbientGreen (CS_DEFAULT_LIGHT_LEVEL),
@@ -557,10 +556,8 @@ csEngine::csEngine (iBase *iParent) :
   worldSaveable (false), maxAspectRatio (0), nextframePending (0),
   currentFrameNumber (0), 
   lightmapCacheMode (CS_ENGINE_CACHE_READ | CS_ENGINE_CACHE_NOUPDATE),
-  maxLightmapWidth (0), maxLightmapHeight (0),
   clearZBuf (false), defaultClearZBuf (false), 
   clearScreen (false),  defaultClearScreen (false), 
-  defaultMaxLightmapWidth (256), defaultMaxLightmapHeight (256),
   currentRenderContext (0), weakEventHandler(0)
 {
   ClearRenderPriorities ();
@@ -729,17 +726,6 @@ bool csEngine::HandleEvent (iEvent &Event)
   return false;
 }
 
-iMeshObjectType* csEngine::GetThingType ()
-{
-  if (!thingMeshType)
-  {
-    thingMeshType = csLoadPluginCheck<iMeshObjectType> (
-        objectRegistry, "crystalspace.mesh.object.thing");
-  }
-
-  return (iMeshObjectType*)thingMeshType;
-}
-  
 void csEngine::SetRenderManager (iRenderManager* newRM)
 {
   if (newRM == 0) return;
@@ -816,14 +802,6 @@ void csEngine::DeleteAllForce ()
   {
     shaderManager->UnregisterShaderVariableAcessors ();
     shaderManager->UnregisterShaders ();
-  }
-
-  if (thingMeshType != 0)
-  {
-    csRef<iThingEnvironment> te (
-  	scfQueryInterface<iThingEnvironment> (thingMeshType));
-    CS_ASSERT (((iThingEnvironment*)te) != 0);
-    te->Clear ();
   }
 
   currentRenderContext = 0;
@@ -1022,10 +1000,6 @@ void csEngine::ResetWorldSpecificSettings()
 {
   SetClearZBuf (defaultClearZBuf);
   SetClearScreen (defaultClearScreen);
-  csRef<iThingEnvironment> te (scfQueryInterface<iThingEnvironment> (
-          GetThingType ()));
-  te->SetLightmapCellSize (16);
-  SetMaxLightmapSize (defaultMaxLightmapWidth, defaultMaxLightmapHeight);
   SetAmbientLight (csColor (
   	defaultAmbientRed / 255.0f,
 	defaultAmbientGreen / 255.0f, 
@@ -1925,13 +1899,6 @@ iCameraPosition* csEngine::FindCameraPosition (const char* name,
 
 void csEngine::ReadConfig (iConfigFile *Config)
 {
-  defaultMaxLightmapWidth = 
-    Config->GetInt ("Engine.Lighting.MaxLightmapWidth", defaultMaxLightmapWidth);
-  maxLightmapWidth = defaultMaxLightmapWidth;
-  defaultMaxLightmapHeight = 
-    Config->GetInt ("Engine.Lighting.MaxLightmapHeight", defaultMaxLightmapHeight);
-  maxLightmapHeight = defaultMaxLightmapHeight;
-
   defaultAmbientRed = Config->GetInt (
       "Engine.Lighting.Ambient.Red",
       CS_DEFAULT_LIGHT_LEVEL);
@@ -1952,6 +1919,9 @@ void csEngine::ReadConfig (iConfigFile *Config)
   defaultClearScreen = 
     Config->GetBool ("Engine.ClearScreen", defaultClearScreen);
   clearScreen = defaultClearScreen;
+  
+  enableEnvTex = 
+    Config->GetBool ("Engine.AutomaticEnvironmentCube", true);
 }
 
 struct LightAndDist
@@ -2826,28 +2796,6 @@ iMaterialWrapper *csEngine::CreateMaterial (
   iMaterialWrapper *wrapper = materials->NewMaterial (mat, name);
 
   return wrapper;
-}
-
-csPtr<iMeshWrapper> csEngine::CreateThingMesh (
-  iSector *sector,
-  const char *name)
-{
-  csRef<iMeshWrapper> thing_wrap (CreateMeshWrapper (
-  	"crystalspace.mesh.object.thing", name, sector));
-  thing_wrap->SetZBufMode (CS_ZBUF_USE);
-  thing_wrap->SetRenderPriority (GetObjectRenderPriority ());
-  return csPtr<iMeshWrapper> (thing_wrap);
-}
-
-csPtr<iMeshWrapper> csEngine::CreateSectorWallsMesh (
-  iSector *sector,
-  const char *name)
-{
-  csRef<iMeshWrapper> thing_wrap = CreateMeshWrapper (
-  	"crystalspace.mesh.object.thing", name, sector);
-  thing_wrap->SetZBufMode (CS_ZBUF_FILL);
-  thing_wrap->SetRenderPriority (GetWallRenderPriority ());
-  return csPtr<iMeshWrapper> (thing_wrap);
 }
 
 iSector *csEngine::CreateSector (const char *name)

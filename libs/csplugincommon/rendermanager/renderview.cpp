@@ -149,6 +149,47 @@ RenderView::RenderView (const RenderView& other) :
   boty = other.boty;
 }
 
+RenderView::RenderView (const RenderView& other, bool keepCamera) :
+  scfPooledImplementationType (this), viewWidth (other.viewWidth),
+  viewHeight (other.viewHeight)
+{
+  ctxt = new csRenderContext ();
+  memset (ctxt, 0, sizeof (csRenderContext));
+
+  if (keepCamera)
+  {
+    ctxt->icamera = other.ctxt->icamera;
+    original_camera = other.original_camera;
+  }
+  else
+  {
+    ctxt->icamera.AttachNew (other.ctxt->icamera->Clone ());
+    original_camera = ctxt->icamera;
+  }
+  ctxt->iview = other.ctxt->iview;	// @@@ Is this right?
+  memcpy (ctxt->frustum, other.ctxt->frustum, sizeof (other.ctxt->frustum));
+  memcpy (ctxt->clip_planes, other.ctxt->clip_planes,
+    sizeof (other.ctxt->clip_planes));
+  ctxt->clip_planes_mask = other.ctxt->clip_planes_mask;
+  ctxt->last_portal = other.ctxt->last_portal;
+  ctxt->previous_sector = other.ctxt->previous_sector;
+  ctxt->this_sector = other.ctxt->this_sector;
+  ctxt->clip_plane = other.ctxt->clip_plane;
+  ctxt->do_clip_plane = other.ctxt->do_clip_plane;
+  ctxt->do_clip_frustum = other.ctxt->do_clip_frustum;
+  // @@@ fog_info and added_fog_info?
+
+  context_id = 0;
+  engine = other.engine;
+  g3d = other.g3d;
+  g2d = other.g2d;
+  original_camera = 0;	// @@@ Right?
+  leftx = other.leftx;
+  rightx = other.rightx;
+  topy = other.topy;
+  boty = other.boty;
+}
+
 RenderView::~RenderView ()
 {
   delete ctxt;
@@ -313,4 +354,10 @@ void RenderView::DestroyRenderContext (csRenderContext* context)
   }
 
   delete context;
+}
+
+void RenderView::SetMeshFilter (const CS::Utility::MeshFilter& filter)
+{
+  // NB: If that assignment becomes a problem COW-wrap meshFilter.
+  meshFilter = filter;
 }

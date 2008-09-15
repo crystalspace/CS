@@ -38,6 +38,7 @@ namespace Utility
   {
   public:
     MeshFilter();
+    ~MeshFilter();
     
     void AddFilterMesh (iMeshWrapper* mesh);
     void RemoveFilterMesh (iMeshWrapper* mesh);

@@ -16,7 +16,7 @@ objects that you can put in a sector (@pxref{MeshObject}).
 
 A sector is in principle an infinite area of space. But usually the
 sector has logical bounds which are made from some mesh object. In this
-discussion we will use the thing mesh object to make sector boundaries.
+discussion we will use the genmesh mesh object to make sector boundaries.
 
 You can define multiple sectors and connect them together by using
 portals in a portal container (@pxref{MeshObject Portal Container}).
@@ -57,7 +57,7 @@ need to define this room if you want to render the polygons using Z-fill
 mode (this means that the Z-buffer is updated but not tested). If you want
 to be able to render using Z-fill mode a sector has to be @dfn{convex}.
 
-An easier way to define this room is by using only one Sector and one Thing
+An easier way to define this room is by using only one Sector and one GenMesh
 to define the pillar, as shown below.
 
 @picturess{usingcs,engine,thing}
@@ -72,7 +72,7 @@ as one sector and the inside of every building as another sector.
 Using Things like this make it easier to define worlds. If they are small
 enough they will also enhance performance.
 
-With Sectors, Portals, and Things you can describe virtually any world that
+With Sectors, Portals, and GenMeshes you can describe virtually any world that
 you want.
 
 @subsubheading Sectors
@@ -102,19 +102,19 @@ is mainly useful when you have big complex sectors with lots of objects
 and when objects have a good chance of occluding (hiding) other objects.
 @end itemize
 
-@subsubheading Things
-@cindex Things
+@subsubheading GenMeshes
+@cindex GenMeshes
 
-A Thing is one of the basic building blocks to create geometry in
-Crystal Space. A Thing is made from convex polygons.
+A GenMesh is one of the basic building blocks to create geometry in
+Crystal Space. A GenMesh is basically a triangle mesh.
 
-Things (and other mesh objects for that matter) can be rendered using
+GenMeshes (and other mesh objects for that matter) can be rendered using
 Z-fill or Z-use mode. With Z-fill the previous contents of the Z-buffer
-(where that Thing is rendered) is just overwritten. With Z-use the
-previous contents is checked in order to see if the Thing is in front
+(where that GenMesh is rendered) is just overwritten. With Z-use the
+previous contents is checked in order to see if the GenMesh is in front
 or behind the polygons that are already on screen. If you have a convex
 object (like the outer polygons of a room) then you can use Z-fill because
-the polygons will not overlap. Things which are then inside those walls
+the polygons will not overlap. GenMeshes which are then inside those walls
 will need to use Z-use in order not to overwrite each other.
 
 Note that polygons have a visible side and an invisible side (backface
@@ -123,21 +123,14 @@ culling).
 @subsubheading Polygons
 @cindex Polygons
 
-Things are made of 3D polygons.  As mentioned before polygons must
-be convex.  The vertices of polygons are oriented clockwise.  This fact is
-used for backface culling; a polygon has only one visible side.
+GenMeshes are made of 3D triangles. The vertices of triangles are oriented
+clockwise.  This fact is used for backface culling; a
+triangle has only one visible side.
 
-Polygons are drawn with a texture.  How the texture is mapped on the polygon
-depends on a transformation matrix.  This is general enough so that you can
+Triangles are drawn with a texture.  How the texture is mapped on the polygon
+depends on a the uv mapping.  This is general enough so that you can
 translate, rotate, scale, and mirror the texture in every possible direction.
 The texture is tiled across the polygon surface.
-
-In a pre-computing stage three light-maps are created for every polygon (this
-is explained in more detail later).  Lighting is sampled in a grid which is 16
-by 16 texture pixels (or @dfn{texels}) in size, by default.  Bilinear
-interpolation is used by the texture caching machinery to make this lighting
-appear smooth.  The end result of this is a non-tiled lighted texture that is
-mapped across the polygon surface.
 
 @subsubheading Portal Containers
 @cindex Portal Container

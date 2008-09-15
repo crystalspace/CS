@@ -42,7 +42,6 @@
 #include "igraphic/imageio.h"
 #include "imesh/genmesh.h"
 #include "imesh/object.h"
-#include "imesh/thing.h"
 #include "iutil/cmdline.h"
 #include "iutil/comp.h"
 #include "iutil/databuff.h"

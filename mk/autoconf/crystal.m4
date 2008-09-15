@@ -22,6 +22,42 @@ AC_PREREQ([2.56])
 # Should stay in sync with csver.h
 m4_define([cs_min_version_default], [1.9])
 
+
+#------------------------------------------------------------------------------
+# _CS_AUGMENT_PATHS([PATH-VAR], [PATHS])
+#       Add paths from PATHS to the variable PATH-VAR.
+#       Handles PATHS being a Win32-style path list.
+#       Also adds 'bin/' subdirectories of elements in PATHS to PATH-VAR.
+#------------------------------------------------------------------------------
+AC_DEFUN([_CS_AUGMENT_PATHS],
+[AC_REQUIRE([CS_CHECK_HOST])
+AS_IF([test -n "$2"],
+    [# On MinGW, CRYSTAL may contain the path in one of two flavors:
+     # MSYS paths, separated by $PATH_SEPARATOR, or Win32 paths, separated
+     # by ';'. Since for the configure check we need MSYS paths, CRYSTAL
+     # is first treated like a Win32-style list. If that yields sensible
+     # results these are used subsequently. Otherwise use CRYSTAL as-is.
+    case $host_os in
+        mingw*)
+            my_IFS=$IFS; IFS=\;
+            for win32_dir in $2; do
+                win32_dir=CS_PATH_NORMALIZE_EMBEDDED([$win32_dir])
+                win32_dir=`echo $win32_dir | sed "s/\(.\):/\\/\\1/"`
+                AS_IF([test -d "$win32_dir"],
+                    [AS_IF([test -n "$$1"], [$1="$$1$PATH_SEPARATOR"])
+                    cs_path="$$1$win32_dir$PATH_SEPARATOR$win32_dir/bin"])
+            done
+            IFS=$my_IFS
+            ;;
+    esac
+    AS_IF([test -z "$$1"],
+        [my_IFS=$IFS; IFS=$PATH_SEPARATOR
+        for cs_dir in $2; do
+            AS_IF([test -n "$$1"], [$1="$$1$PATH_SEPARATOR"])
+            cs_path="$$1$cs_dir$PATH_SEPARATOR$cs_dir/bin"
+        done
+        IFS=$my_IFS])])])
+
 #------------------------------------------------------------------------------
 # CS_PATH_CRYSTAL_CHECK([DESIRED-VERSION], [ACTION-IF-FOUND],
 #                       [ACTION-IF-NOT-FOUND], [REQUIRED-LIBS],
@@ -72,14 +108,7 @@ cs_version_minor=`echo $cs_version_desired | sed "s/$sed_expr_base/\2/"`
 
 # Try to find an installed cs-config.
 cs_path=''
-AS_IF([test -n "$CRYSTAL"],
-    [my_IFS=$IFS; IFS=$PATH_SEPARATOR
-    for cs_dir in $CRYSTAL; do
-	AS_IF([test -n "$cs_path"], [cs_path="$cs_path$PATH_SEPARATOR"])
-	cs_path="$cs_path$cs_dir$PATH_SEPARATOR$cs_dir/bin"
-    done
-    IFS=$my_IFS])
-
+_CS_AUGMENT_PATHS([cs_path], [$CRYSTAL])
 AS_IF([test -n "$cs_path"], [cs_path="$cs_path$PATH_SEPARATOR"])
 cs_path="$cs_path$PATH$PATH_SEPARATOR/usr/local/crystalspace/bin"
 
@@ -139,7 +168,7 @@ AS_IF([test -n "$CRYSTAL_CONFIG_TOOL"],
 
     # Still do cs-config version check - this one will also take the release
     # component into account. Also needed for legacy cs-config.
-    CS_CHECK_PROG_VERSION([Crystal Space], [$cfg --version],
+    CS_CHECK_PROG_VERSION([Crystal Space], ["$cfg" --version],
 	[m4_default([$1],[cs_min_version_default])], [9.9|.9],
 	[cs_sdk=yes], [cs_sdk=no])
 
@@ -147,15 +176,15 @@ AS_IF([test -n "$CRYSTAL_CONFIG_TOOL"],
 	[cs_liblist="$4"
 	cs_optlibs=CS_TRIM([$5])
 	AS_IF([test -n "$cs_optlibs"],
-	    [cs_optlibs=`$cfg --available-libs $cs_optlibs`
+	    [cs_optlibs=`"$cfg" --available-libs $cs_optlibs`
 	    cs_liblist="$cs_liblist $cs_optlibs"])
-	CRYSTAL_VERSION=`$cfg --version $cs_liblist`
-	CRYSTAL_CFLAGS=CS_RUN_PATH_NORMALIZE([$cfg --cxxflags $cs_liblist])
-	CRYSTAL_LIBS=CS_RUN_PATH_NORMALIZE([$cfg --libs $cs_liblist])
+	CRYSTAL_VERSION=`"$cfg" --version $cs_liblist`
+	CRYSTAL_CFLAGS=CS_RUN_PATH_NORMALIZE(["$cfg" --cxxflags $cs_liblist])
+	CRYSTAL_LIBS=CS_RUN_PATH_NORMALIZE(["$cfg" --libs $cs_liblist])
 	CRYSTAL_INCLUDE_DIR=CS_RUN_PATH_NORMALIZE(
-	    [$cfg --includedir $cs_liblist])
-	CRYSTAL_AVAILABLE_LIBS=`$cfg --available-libs`
-	CRYSTAL_STATICDEPS=`$cfg --static-deps`
+	    ["$cfg" --includedir $cs_liblist])
+	CRYSTAL_AVAILABLE_LIBS=`"$cfg" --available-libs`
+	CRYSTAL_STATICDEPS=`"$cfg" --static-deps`
 	AS_IF([test -z "$CRYSTAL_LIBS"], [cs_sdk=no])])],
     [cs_sdk=no])
 

@@ -1,7 +1,7 @@
 [% FILTER null;
 #==============================================================================
 # TemplateToolkit2 template for MSVC7 project (vcproj) file.
-# Copyright (C) 2004 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C) 2004,2008 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -22,7 +22,7 @@
   PROCESS control.tlib;
   PROCESS projectx7.tlib;
 
-  MACRO composedefs(defs) GET compose('defines', defs, ';');
+  MACRO composedefs(defs) GET compose('defines', defs, ';').replace('"', '\\&quot;');
   MACRO composedirs(tag, seed) GET composepaths(${"build.${tag}key"},seed,';');
 
   my = {};

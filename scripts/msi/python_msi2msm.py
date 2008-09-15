@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import uuid
 import os
 import sha
@@ -14,8 +15,10 @@ config = {}
 config['msidb'] = 'msidb'
 config['dark'] = 'dark'
 config['msiexec'] = 'msiexec'
+config['light'] = 'light'
+config['candle'] = 'candle'
 
-config['python.msi'] = r'c:\Dokumente und Einstellungen\Administrator\Desktop\python-2.5.2.msi'
+config['python.msi'] = sys.argv[1]
 
 temp = ""
 wxs = "a"
@@ -58,11 +61,11 @@ def make_relative(root):
 
 
 def prepare_work():
-    temp = r'c:\dokume~1\admini~1\lokale~1\temp\tmproz3fzcrystal'
-    wxs = r'C:\DOKUME~1\ADMINI~1\LOKALE~1\Temp\tmproz3fzcrystal\python.wxs'
-    data = r'C:\DOKUME~1\ADMINI~1\LOKALE~1\Temp\tmproz3fzcrystal\data'
+    #temp = r'c:\dokume~1\admini~1\lokale~1\temp\tmproz3fzcrystal'
+    #wxs = r'C:\DOKUME~1\ADMINI~1\LOKALE~1\Temp\tmproz3fzcrystal\python.wxs'
+    #data = r'C:\DOKUME~1\ADMINI~1\LOKALE~1\Temp\tmproz3fzcrystal\data'
 
-    return (temp, wxs, data)
+    #return (temp, wxs, data)
 
     temp = tempfile.mkdtemp("crystal")
 
@@ -74,7 +77,7 @@ def prepare_work():
 
     subprocess.call([config['dark'],
                      "-o", wxs,
-                     '-x', data,
+                     '-x', data + os.path.sep + "SourceDir",
                      "-nologo",
                      config['python.msi']]
                     )
@@ -277,6 +280,19 @@ if __name__ == '__main__':
     for f in root.xpath('//wxs:Custom[@Action = "UpdateEditIDLE"]', namespaces = namespacemap):
         f.getparent().remove(f)
 
-    newwxs = open(temp + os.path.sep + "python_new.wxs", "w")
+    newwxsname = temp + os.path.sep + "python_new.wxs"
+    newwxs = open(newwxsname, "w")
     newwxs.write(etree.tostring(root, pretty_print = True))
     newwxs.close()
+
+    subprocess.call([config['candle'],
+                     "-o", "out/msi/temp/python.wixobj",
+                     "-nologo",
+                     newwxsname]
+                    )
+    subprocess.call([config['light'],
+                     "-o", "out/msi/python.msm",
+                     "-nologo",
+                     "-b", data,
+                     "python.wixobj"]
+                    )

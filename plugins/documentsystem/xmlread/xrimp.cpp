@@ -418,17 +418,22 @@ void csXmlReadDocument::Clear ()
   root = 0;
 }
 
-csRef<iDocumentNode> csXmlReadDocument::CreateRoot (char* buf)
+csRef<iDocumentNode> csXmlReadDocument::CreateRoot (char* buf, size_t bufSize)
 {
   Clear ();
-  root = new TrDocument (buf);
+  /* Documents whose data is larger than this threshold are
+     treated as "large" which means the node allocation
+     blocks are bigger - means less allocations but bigger
+     memory usage */
+  const size_t largeThreshold = 32*1024;
+  root = new TrDocument (bufSize >= largeThreshold, buf);
   return csPtr<iDocumentNode> (Alloc (root, false));
 }
 
 csRef<iDocumentNode> csXmlReadDocument::CreateRoot ()
 {
   Clear ();
-  root = new TrDocument ();
+  root = new TrDocument (false);
   return csPtr<iDocumentNode> (Alloc (root, false));
 }
 
@@ -455,34 +460,37 @@ const char* csXmlReadDocument::Parse (iFile* file, bool collapse)
     return "File contains one or more null characters";
   }
 #endif
-  const char *error = Parse (data, collapse);
-  cs_free (data);
-  return error;
+  return ParseInPlace (data, want_size, collapse);
 }
 
 const char* csXmlReadDocument::Parse (iDataBuffer* buf, bool collapse)
 {
-  return Parse ((const char*)buf->GetData (), collapse);
+  return Parse ((const char*)buf->GetData (), 
+    buf->GetSize(), collapse);
 }
 
 const char* csXmlReadDocument::Parse (iString* str, bool collapse)
 {
-  return Parse ((const char*)*str, collapse);
+  return Parse ((const char*)*str, str->Length(), collapse);
 }
 
 const char* csXmlReadDocument::Parse (const char* buf, bool collapse)
 {
-  CreateRoot (CS::StrDup (buf));
-  root->SetCondenseWhiteSpace(collapse);
-  root->Parse (root->input_data);
-  if (root->Error ())
-    return root->ErrorDesc ();
-  return 0;
+  return Parse (buf, strlen (buf), collapse);
 }
 
-const char* csXmlReadDocument::ParseInPlace (char* buf, bool collapse)
+const char* csXmlReadDocument::Parse (const char* buf, size_t bufSize, bool collapse)
 {
-  CreateRoot (buf);
+  size_t want_size = bufSize;
+  char *data = (char*)cs_malloc (want_size + 1);
+  memcpy (data, buf, bufSize);
+  data[bufSize] = 0;
+  return ParseInPlace (data, bufSize, collapse);
+}
+
+const char* csXmlReadDocument::ParseInPlace (char* buf, size_t bufSize, bool collapse)
+{
+  CreateRoot (buf, bufSize);
   root->SetCondenseWhiteSpace(collapse);
   root->Parse (root->input_data);
   if (root->Error ())
