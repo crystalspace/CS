@@ -47,14 +47,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     LIMIT(NumTexInstructionSlots, MAX_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB, 1024) \
   PROFILE_END(ARBFP1) \
   \
-  PROFILE_BEGIN(VP20) \
-    LIMIT(MaxLocalParams, NONE, 96) /* spec 'hardcodes' 96 */  \
-  PROFILE_END(VP20) \
-  \
-  PROFILE_BEGIN(VP30) \
-    LIMIT(MaxLocalParams, MAX_PROGRAM_LOCAL_PARAMETERS_ARB, 256) \
-  PROFILE_END(VP30) \
-  \
   PROFILE_BEGIN(VP40) \
     LIMIT(MaxAddressRegs, MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB, 2) \
     LIMIT(MaxInstructions, MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB, 2048) \
@@ -94,6 +86,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     GLint v;
     ext->glGetProgramivARB (target, what, &v);
     return v;
+  }
+  
+  void ProfileLimits::SetDefaults ()
+  {
+#define PROFILE_BEGIN(PROFILE)  \
+  case CG_PROFILE_ ## PROFILE:  \
+    {
+#define PROFILE_END(PROFILE)    \
+    }                           \
+    break;
+#define LIMIT(Limit, glLimit, cgDefault)   \
+      Limit = cgDefault;
+  
+    switch (profile)
+    {
+      PROFILES
+      default:
+        break;
+    }
+    
+#undef PROFILE_BEGIN
+#undef PROFILE_END
+#undef LIMIT
   }
   
   static GLenum GetProgramIntegerTarget (CGprofile profile)
@@ -143,8 +158,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     csString prefix (_prefix);
     vendor = CS::PluginCommon::ShaderProgramPluginGL::VendorFromString (
       cfg->GetStr (prefix + ".Vendor", "other"));
+    // Set defaults
+    SetDefaults ();
 #define READ(Limit) \
-    Limit = cfg->GetInt (prefix + "." #Limit, 0)
+    { int x = cfg->GetInt (prefix + "." #Limit, -1); if (x >= 0) Limit = x; }
     READ (MaxAddressRegs);
     READ (MaxInstructions);
     READ (MaxLocalParams);
@@ -278,6 +295,47 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     ret.AppendFmt (".%s",
       CS::PluginCommon::ShaderProgramPluginGL::VendorToString (vendor));
 #define EMIT(Limit) if (usedLimits & (1 << lim ## Limit)) ret.AppendFmt (".%u", Limit);
+    EMIT (MaxInstructions);
+    EMIT (NumInstructionSlots);
+    EMIT (NumMathInstructionSlots);
+    EMIT (NumTexInstructionSlots);
+    EMIT (NumTemps);
+    EMIT (MaxLocalParams);
+    EMIT (MaxTexIndirections);
+    EMIT (MaxAddressRegs);
+#undef EMIT
+    return ret;
+  };
+  
+  csString ProfileLimits::ToStringForPunyHumans () const
+  {
+    uint usedLimits = 0;
+  
+#define PROFILE_BEGIN(PROFILE)  \
+  case CG_PROFILE_ ## PROFILE:  \
+    {
+#define PROFILE_END(PROFILE)    \
+    }                           \
+    break;
+#define LIMIT(Limit, glLimit, cgDefault)   \
+      usedLimits |= 1 << lim ## Limit;
+  
+    switch (profile)
+    {
+      PROFILES
+      default:
+        break;
+    }
+    
+#undef PROFILE_BEGIN
+#undef PROFILE_END
+#undef LIMIT
+
+    csString ret (cgGetProfileString (profile));
+    ret.AppendFmt (" %s",
+      CS::PluginCommon::ShaderProgramPluginGL::VendorToString (vendor));
+#define EMIT(Limit) if (usedLimits & (1 << lim ## Limit)) \
+      ret.AppendFmt (" " #Limit "=%u", Limit);
     EMIT (MaxInstructions);
     EMIT (NumInstructionSlots);
     EMIT (NumMathInstructionSlots);

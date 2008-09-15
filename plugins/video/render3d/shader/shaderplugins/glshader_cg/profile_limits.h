@@ -53,6 +53,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     bool FromString (const char* str);
     csString ToString () const;
     void ToCgOptions (ArgumentArray& args) const;
+    csString ToStringForPunyHumans () const;
     
     bool Write (iFile* file) const;
     bool Read (iFile* file);
@@ -60,9 +61,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     bool operator< (const ProfileLimits& other) const;
     bool operator> (const ProfileLimits& other) const;
     bool operator== (const ProfileLimits& other) const;
+    bool operator!= (const ProfileLimits& other) const
+    { return !operator== (other); }
     bool operator>= (const ProfileLimits& other) const
     { return !operator< (other); }
   private:
+    void SetDefaults ();
     static uint glGetProgramInteger (csGLExtensionManager* ext,
       GLenum target, GLenum what);
   };
