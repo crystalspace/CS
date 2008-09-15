@@ -3392,24 +3392,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           Engine->SetClearScreen (yesno);
         }
         break;
-      case XMLTOKEN_MAXLIGHTMAPSIZE:
-        {
-          int max[2];
-          max[0] = child->GetAttributeValueAsInt ("horizontal");
-          max[1] = child->GetAttributeValueAsInt ("vertical");
-          if ( (max[0] > 0) && (max[1] > 0) )
-          {
-            Engine->SetMaxLightmapSize (max[0], max[1]);
-          }
-          else
-          {
-            SyntaxService->ReportError (
-              "crystalspace.maploader.parse.settings",
-              child, "Bogus maximum lightmap size %dx%d", max[0], max[1]);
-            return false;
-          }
-        }
-        break;
       case XMLTOKEN_AMBIENT:
         {
           csColor c;

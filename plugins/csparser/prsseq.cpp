@@ -334,65 +334,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         }
         break;
       case XMLTOKEN_POLYGON:
-        {
-          const char* meshname = child->GetAttributeValue ("mesh");
-          if (!meshname)
-          {
-            SyntaxService->ReportError (
-              "crystalspace.maploader.parse.sequenceparams", child,
-              "Missing 'mesh' attribute in %s '%s'!",
-              parenttype, parentname);
-            error = true;
-            return 0;
-          }
-          iMeshWrapper* mesh = ldr_context->FindMeshObject (meshname);
-          if (!mesh)
-          {
-            SyntaxService->ReportError (
-              "crystalspace.maploader.parse.sequenceparams", child,
-              "Couldn't find mesh '%s' in %s '%s'!",
-              meshname, parenttype, parentname);
-            error = true;
-            return 0;
-          }
-          const char* polyname = child->GetAttributeValue ("polygon");
-          if (!polyname)
-          {
-            SyntaxService->ReportError (
-              "crystalspace.maploader.parse.sequenceparams", child,
-              "Missing 'polygon' attribute in %s '%s'!",
-              parenttype, parentname);
-            error = true;
-            return 0;
-          }
-          csRef<iThingState> st = 
-            scfQueryInterface<iThingState> (mesh->GetMeshObject ());
-          if (!st)
-          {
-            SyntaxService->ReportError (
-              "crystalspace.maploader.parse.sequenceparams", child,
-              "Mesh '%s' is not a thing (%s '%s')!",
-              meshname, parenttype, parentname);
-            error = true;
-            return 0;
-          }
-          csRef<iThingFactoryState> tfs = scfQueryInterface<iThingFactoryState> 
-            (mesh->GetMeshObject ()->GetFactory());
-          int polygon = tfs->FindPolygonByName (polyname);
-          if (polygon == -1)
-          {
-            SyntaxService->ReportError (
-              "crystalspace.maploader.parse.sequenceparams", child,
-              "Couldn't find polygon '%s' in mesh '%s' (%s '%s')!",
-              polyname, meshname, parenttype, parentname);
-            error = true;
-            return 0;
-          }
-
-          csRef<iPolygonHandle> poly_handle = st->CreatePolygonHandle (polygon);
-          params->SetParameter (idx, (iBase*)poly_handle);
-          found_params++;
-        }
+        SyntaxService->Report (
+          "crystalspace.maploader.parse.sequence", CS_REPORTER_SEVERITY_WARNING,
+          child, "The 'polygon' parameter is obsolete since thing objects have been removed.");
         break;
       default:
         SyntaxService->ReportBadToken (child);
@@ -894,7 +838,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             axis3, tot_angle3, offset, duration, relative);
         }
         break;
-      case XMLTOKEN_MATERIAL:
+     case XMLTOKEN_MATERIAL:
         {
           csRef<iParameterESM> mesh = ResolveOperationParameter (
             ldr_context,
@@ -905,15 +849,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             child, PARTYPE_MATERIAL, "material", seqname, base_params);
           if (!mat) return 0;
 
-          // optional polygon parameter.
-          csRef<iParameterESM> polygon = ResolveOperationParameter (
-            ldr_context,
-            child, PARTYPE_POLYGON, "polygon", seqname, base_params);
-
-          if (polygon)
-            sequence->AddOperationSetPolygonMaterial (cur_time, polygon, mat);
-          else
-            sequence->AddOperationSetMaterial (cur_time, mesh, mat);
+          sequence->AddOperationSetMaterial (cur_time, mesh, mat);
         }
         break;
       case XMLTOKEN_FADECOLOR:
@@ -1373,7 +1309,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
       case PARTYPE_LIGHT:
         {
-          iLight* l = ldr_context->FindLight (parname);
+          iLight* l = Engine->FindLight (parname);
           if (l) value = l;
         }
         break;
@@ -1400,49 +1336,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         value = FindSequence (GetEngineSequenceManager (), parname);
         break;
       case PARTYPE_POLYGON:
-        {
-          const char* meshname = opnode->GetAttributeValue ("mesh");
-          if (!meshname)
-          {
-            SyntaxService->ReportError (
-              "crystalspace.maploader.parse.sequenceparams", opnode,
-              "Missing 'mesh' attribute in sequence '%s'!",
-              seqname);
-            return 0;
-          }
-          iMeshWrapper* mesh = ldr_context->FindMeshObject (meshname);
-          if (!mesh)
-          {
-            SyntaxService->ReportError (
-              "crystalspace.maploader.parse.sequenceparams", opnode,
-              "Couldn't find mesh '%s' in sequence '%s'!",
-              meshname, seqname);
-            return 0;
-          }
-          csRef<iThingState> st = 
-            scfQueryInterface<iThingState> (mesh->GetMeshObject ());
-          if (!st)
-          {
-            SyntaxService->ReportError (
-              "crystalspace.maploader.parse.sequenceparams", opnode,
-              "Mesh '%s' is not a thing (sequence '%s')!",
-              meshname, seqname);
-            return 0;
-          }
-          csRef<iThingFactoryState> tfs = scfQueryInterface<iThingFactoryState> 
-            (mesh->GetMeshObject ()->GetFactory());
-          int poly_idx = tfs->FindPolygonByName (parname);
-          if (poly_idx == -1)
-          {
-            SyntaxService->ReportError (
-              "crystalspace.maploader.parse.sequenceparams", opnode,
-              "Couldn't find polygon '%s' in mesh '%s' (sequence '%s')!",
-              parname, meshname, seqname);
-            return 0;
-          }
-          csRef<iPolygonHandle> h = st->CreatePolygonHandle (poly_idx);
-          value = (iBase*)h;
-        }
+        SyntaxService->Report (
+          "crystalspace.maploader.parse.sequence", CS_REPORTER_SEVERITY_WARNING,
+          opnode, "The 'polygon' parameter is obsolete since thing objects have been removed.");
         break;
       }
       if (!value)
@@ -1611,10 +1507,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         }
         break;
       case XMLTOKEN_POLYGON:
-	SyntaxService->Report (
-	        "crystalspace.maploader.parse.sequence", CS_REPORTER_SEVERITY_WARNING,
-                child, "The 'polygon' parameter is obsolete since thing objects have been removed.");
-	break;
+        SyntaxService->Report (
+          "crystalspace.maploader.parse.sequence", CS_REPORTER_SEVERITY_WARNING,
+          child, "The 'polygon' parameter is obsolete since thing objects have been removed.");
+        break;
       default:
         SyntaxService->ReportBadToken (child);
         error = true;
@@ -2126,8 +2022,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             child, PARTYPE_MATERIAL, "material", seqname, base_params);
           if (!mat) return 0;
 
-	  sequence->AddOperationSetMaterial (cur_time, mesh, mat);
-	}
+          sequence->AddOperationSetMaterial (cur_time, mesh, mat);
+        }
         break;
       case XMLTOKEN_FADECOLOR:
         {
