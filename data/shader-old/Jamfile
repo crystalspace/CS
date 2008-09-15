@@ -6,7 +6,9 @@ rule InstallShaderOld
 }
 rule FilelistEntryShaderOld
 {
-  local file_gristed = $(1:G=$(2:J=!)) ;
+  local listdir = $(2:E=.) ;
+
+  local file_gristed = $(1:G=$(listdir:J=!)) ;
   FileListEntriesData $(file_gristed) : shader-old $(2) : data-runtime ;
 }
 

@@ -34,4 +34,4 @@ AC_DEFUN([CS_PATH_NORMALIZE],
 #	Windows/DOS backslashes to forward slashes.  Also collapses whitespace.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_RUN_PATH_NORMALIZE],
-[`AC_RUN_LOG([$1]) | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`])
+[`AC_RUN_LOG([$1]) | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`])

@@ -23,6 +23,8 @@
  * Standard shader variable setup
  */
 
+#include "ivideo/material.h"
+
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/operations.h"
 

@@ -105,19 +105,20 @@ struct iPrintOutput
   virtual ~iPrintOutput() {}
 
   virtual void Init (char*& bufPtr, size_t& bufRemaining) = 0;
+  virtual void AppendString(const char* data, size_t count) = 0;
   virtual bool FlushBuffer (char*& bufPtr, size_t& bufRemaining) = 0;
 };
 
 class PrintState
 {
   iPrintOutput* output;
-  char* bufPtr;
   size_t bufRemaining;
 
   csString fmtBuf;
 public:
   PrintState (iPrintOutput* output) : output (output)
   {
+    char* bufPtr;
     output->Init (bufPtr, bufRemaining);
   }
   
@@ -133,15 +134,15 @@ public:
     {
       if (bufRemaining == 0)
       {
+        char* bufPtr;
         if (!output->FlushBuffer (bufPtr, bufRemaining)) return false;
       }
 
-      size_t copySize = csMin (size, bufRemaining);
-      memcpy (bufPtr, data, copySize);
-      bufRemaining -= copySize;
-      bufPtr += copySize;
-      data += copySize;
-      size -= copySize;
+      size_t appendSize = csMin (size, bufRemaining);
+      output->AppendString(data, appendSize);
+      bufRemaining -= appendSize;
+      data += appendSize;
+      size -= appendSize;
     }
 
     return true;
@@ -149,6 +150,7 @@ public:
 
   bool Flush ()
   {
+    char* bufPtr;
     return output->FlushBuffer (bufPtr, bufRemaining);
   }
 };

@@ -113,7 +113,6 @@ namespace RenderManager
 	// PSSM: split layers
 	
 	float _near = SMALL_Z;
-	// @@@ FIXME: arbitrary; make configurable
 	float _far = persist.farZ;
 	
 	int firstPart = 0;
@@ -149,11 +148,6 @@ namespace RenderManager
       }
       
       ~ViewSetup() { delete[] splitDists; }
-    
-      void PostLightSetup (typename RenderTree::ContextNode& context,
-        const LayerConfigType& layerConfig)
-      {
-      }
     };
     
     struct CachedLightData :
@@ -1060,12 +1054,21 @@ private:
       uint spreadFlags = 0;
       if (!singleMesh.meshFlags.Check (CS_ENTITY_NOSHADOWRECEIVE))
       {
+        csBox3 meshBBoxView =
+          viewSetup.rview->GetCamera()->GetTransform().Other2This (
+            singleMesh.bbox);
 	int s = 0;
 	for (int f = 0; f < viewSetup.numParts; f++)
 	{
 	  typename CachedLightData::SuperFrustum::Frustum& lightFrustum =
 	    superFrust.frustums[f];
 	  //if (lightFrustum.volumePP.Empty()) continue;
+	  // Clip mesh to view split ...
+	  if ((meshBBoxView.MaxZ() < viewSetup.splitDists[f])
+	      || (meshBBoxView.MinZ() > viewSetup.splitDists[f+1]))
+	    continue;
+	  // ... and light frustum in view split (might be a bit smaller)
+  	  if (!lightFrustum.volumePP.Overlap (meshBboxLightPP)) continue;
 	
 	  lightFrustum.receivingObjectsBBoxPP += meshBboxLightPP;
 	
@@ -1091,6 +1094,8 @@ private:
 	  s++;
 	}
       }
+      else
+        spreadFlags = 1;
       return spreadFlags;
     }
     

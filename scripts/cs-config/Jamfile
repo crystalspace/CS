@@ -235,3 +235,6 @@ Clean cs-configclean : cs-config $(CSCONFIGNAME) ;
 Depends apps : cs-config ;
 Help cs-config : "Build the cs-config script" ;
 Depends install_bin : [ DoInstall cs-config : $(bindir) : $(INSTALL_PROGRAM) ] ;
+
+Depends filelists :
+  [ DoFileListEntries $(CS_CONFIG_GRISTED) $(CSCONFIGNAME) : : cs-config ] ;

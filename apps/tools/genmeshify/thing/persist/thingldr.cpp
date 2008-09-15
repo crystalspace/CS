@@ -16,46 +16,14 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "cssysdef.h"
+#include "crystalspace.h"
 
-#include "csgeom/math3d.h"
-#include "csgeom/matrix3.h"
-#include "csgeom/transfrm.h"
-#include "csutil/cscolor.h"
-#include "csutil/csstring.h"
-#include "csutil/dirtyaccessarray.h"
-#include "csutil/flags.h"
-#include "csutil/scanstr.h"
-#include "csutil/scfstr.h"
-#include "csutil/util.h"
-
-
-#include "iengine/engine.h"
-#include "iengine/mesh.h"
-#include "iengine/material.h"
-#include "iengine/portal.h"
-#include "iengine/portalcontainer.h"
-#include "iengine/texture.h"
-#include "imap/ldrctxt.h"
-#include "imap/loader.h"
-#include "imap/services.h"
-#include "imesh/object.h"
 #include "../thing.h"
-#include "iutil/comp.h"
-#include "iutil/document.h"
-#include "iutil/eventh.h"
-#include "iutil/object.h"
-#include "iutil/objreg.h"
-#include "iutil/plugin.h"
-#include "iutil/vfs.h"
-#include "ivaria/reporter.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/material.h"
-#include "ivideo/texture.h"
 #include "../object/thing.h"
 
 
 #include "thingldr.h"
+
 
 enum
 {
@@ -97,11 +65,6 @@ enum
   XMLTOKEN_SMOOTH,
   XMLTOKEN_RENDERBUFFER
 };
-
-SCF_IMPLEMENT_FACTORY (csThingLoader)
-SCF_IMPLEMENT_FACTORY (csThingFactoryLoader)
-SCF_IMPLEMENT_FACTORY (csThingSaver)
-SCF_IMPLEMENT_FACTORY (csThingFactorySaver)
 
 static csRef<iMeshObjectType> GetThing (iObjectRegistry* object_reg)
 {

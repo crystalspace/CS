@@ -324,6 +324,31 @@ void csBugPlug::SetupPlugin ()
   captureMIME = config->GetStr ("Bugplug.Capture.Image.MIME",
     "image/png");
   captureOptions = config->GetStr ("Bugplug.Capture.Image.Options");
+  
+  const char* framespeed = config->GetStr ("Bugplug.ShowFrameSpeed", "fps");
+  if (framespeed)
+  {
+    if (strcmp (framespeed, "fps") == 0)
+    {
+      do_fps = true;
+      display_time = false;
+    }
+    else if (strcmp (framespeed, "time") == 0)
+    {
+      do_fps = true;
+      display_time = true;
+    }
+    else if (strcmp (framespeed, "off") == 0)
+    {
+      do_fps = false;
+      display_time = false;
+    }
+    else
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING,
+        "Invalid value '%s' for frame speed display", framespeed);
+    }
+  }
 
   initialized = true;
 

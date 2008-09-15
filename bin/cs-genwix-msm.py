@@ -4,6 +4,7 @@ from optparse import OptionParser
 
 import time
 import datetime
+import uuid
 
 from guidregistry import guid_registry as gr
 
@@ -25,18 +26,25 @@ if not parsed_options.outfile:
 if not parsed_options.msmid:
     options.error("missing --id")
 
+subdirmap = {}
 if parsed_options.subdirmap:
-    subdirmap = {}
     for s in parsed_options.subdirmap:
         (list, subdirs) = s.split (':', 1)
         subdirmap[list] = subdirs
 
+if gr.has_key(parsed_options.msmid):
+    msm_guid = gr[parsed_options.msmid]
+else:
+    # WiX docs say it's an autogen guid, but using * gives error CNDL0009
+    # when running candle
+    msm_guid = str(uuid.uuid1())
+     
 (base, merge, dir) = generate_merge_module(id = parsed_options.msmid,
                                            path = [('TARGETDIR', 'SourceDir', None),
                                            (parsed_options.msmid + '_dir', None, None)],
                                            filename = parsed_options.outfile,
                                            manufacturer = "The Crystal Space Project",
-                                           guid = gr[parsed_options.msmid],
+                                           guid = msm_guid,
                                            version = parsed_options.version)
                                            
 f = Fragment(
@@ -50,7 +58,7 @@ dirref = DirectoryRef(
 for list in args:
     listid = os.path.splitext(os.path.basename(list))[0]
     thisdir = dirref
-    if subdirmap and subdirmap.has_key(listid):
+    if subdirmap.has_key(listid):
         dirid = parsed_options.msmid
         list_subdir = subdirmap[listid]
         for subdir in list_subdir.split('/'):
