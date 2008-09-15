@@ -1489,6 +1489,7 @@ csVFS::csVFS (iBase *iParent) :
 csVFS::~csVFS ()
 {
   cs_free (cwd);
+  cs_free (mainDir);
   cs_free (basedir);
   cs_free (resdir);
   cs_free (appdir);
@@ -1781,14 +1782,15 @@ void csVFS::CheckCurrentDir()
     }
 
     cs_free(cwd);
-    cwd.SetValue((char*)cs_malloc (2));
     if(syncDir)
     {
-      char* dir = cwd;
+      char* dir = (char*)cs_malloc(strlen(mainDir)+1);
+      cwd.SetValue(dir);
       memcpy(dir, mainDir, strlen(mainDir)+1);
     }
     else
     {
+      cwd.SetValue((char*)cs_malloc (2));
       cwd [0] = VFS_PATH_SEPARATOR;
       cwd [1] = 0;
     }
@@ -1805,7 +1807,9 @@ bool csVFS::ChDir (const char *Path)
   if (!newwd)
     return false;
   CheckCurrentDir();
-  char* dir = cwd;
+  cs_free(cwd);
+  char* dir = (char*)cs_malloc(strlen(newwd)+1);
+  cwd.SetValue(dir);
   memcpy(dir, newwd, strlen(newwd)+1);
   ArchiveCache->CheckUp ();
   return true;
@@ -1820,7 +1824,7 @@ const char* csVFS::GetCwd ()
 void csVFS::SetSyncDir(const char* Path)
 {
   cs_free(mainDir);
-  mainDir = (char*)cs_malloc(2);
+  mainDir = (char*)cs_malloc(strlen(Path)+1);
   memcpy(mainDir, Path, strlen(Path)+1);
   syncDir = true;
 
