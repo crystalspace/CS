@@ -100,6 +100,30 @@ public:
       cs_free (varArray);
   }
 
+  /**
+   * Copies from another stack.
+   * If the other stack was created from a preallocated array, the stack
+   * points to that same array after the assignment. If the other stack used 
+   * internal storage the new stack will allocate it's own internal array and 
+   * copy over the contents.
+   */
+  csShaderVariableStack& operator= (const csShaderVariableStack& other)
+  {
+    if (other.ownArray)
+    {
+      Setup (size);
+      memcpy (varArray, other.varArray, size * sizeof (csShaderVariable*));
+    }
+    else
+    {
+      if (ownArray)
+	cs_free (varArray);
+      ownArray = false;
+      varArray = other.varArray;
+    }
+    return *this;
+  }
+  
   /// Initialize stack internal storage
   void Setup (size_t size)
   {
@@ -126,6 +150,17 @@ public:
 
     varArray = stack;
     csShaderVariableStack::size = size;
+    ownArray = false;
+  }
+
+  /// Initialize stack with external storage taken from another stack
+  void Setup (const csShaderVariableStack& stack)
+  {
+    if (ownArray)
+      cs_free (varArray);
+
+    varArray = stack.varArray;
+    size = stack.size;
     ownArray = false;
   }
 

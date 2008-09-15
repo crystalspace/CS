@@ -24,6 +24,7 @@
 #include "csutil/array.h"
 #include "csutil/plugmgr.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/stringconv.h"
 #include "csutil/util.h"
 
 #include "iutil/comp.h"
@@ -154,7 +155,7 @@ void csPluginManager::QueryOptions (iComponent *obj)
             break;
           case CSVAR_FLOAT:
             if (!val) continue;
-            optval.SetFloat (atof (val));
+            optval.SetFloat (CS::Utility::strtof (val));
             break;
 	  case CSVAR_STRING:
 	    if (!val) continue;

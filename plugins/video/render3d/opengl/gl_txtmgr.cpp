@@ -306,7 +306,27 @@ void csGLTextureManager::UnsetTexture (GLenum target, GLuint texture)
       statecache->SetTexture (target, 0);
   }
 }
-    
+
+bool csGLTextureManager::ImageTypeSupported (csImageType imagetype,
+                                             iString* fail_reason)
+{
+  if ((imagetype == csimgCube)
+      && !G3D->ext->CS_GL_ARB_texture_cube_map)
+  {
+    if (fail_reason) fail_reason->Replace (
+      "Cubemap textures are not supported!");
+    return false;
+  }
+  if ((imagetype == csimg3D)
+      && !G3D->ext->CS_GL_EXT_texture3D)
+  {
+    if (fail_reason) fail_reason->Replace (
+      "3D textures are not supported!");
+    return false;
+  }
+  return true;
+}
+
 csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImage *image,
 	int flags, iString* fail_reason)
 {
@@ -317,20 +337,8 @@ csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImage *image,
     return 0;
   }
 
-  if ((image->GetImageType() == csimgCube)
-      && !G3D->ext->CS_GL_ARB_texture_cube_map)
-  {
-    if (fail_reason) fail_reason->Replace (
-      "Cubemap images are not supported!");
+  if (!ImageTypeSupported (image->GetImageType(), fail_reason))
     return 0;
-  }
-  if ((image->GetImageType() == csimg3D)
-      && !G3D->ext->CS_GL_EXT_texture3D)
-  {
-    if (fail_reason) fail_reason->Replace (
-      "3D images are not supported!");
-    return 0;
-  }
 
   csGLTextureHandle *txt = new csGLTextureHandle (image, flags, G3D);
 
@@ -340,7 +348,7 @@ csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImage *image,
   return csPtr<iTextureHandle> (txt);
 }
 
-csPtr<iTextureHandle> csGLTextureManager::CreateTexture (int w, int h,
+csPtr<iTextureHandle> csGLTextureManager::CreateTexture (int w, int h, int d,
       csImageType imagetype, const char* format, int flags,
       iString* fail_reason)
 {
@@ -357,9 +365,12 @@ csPtr<iTextureHandle> csGLTextureManager::CreateTexture (int w, int h,
          is specified, an "argb" format (CS notation for GL_BGR(A)) could be
          substituted instead. Or does the driver handle that automatically?
    */
+   
+  if (!ImageTypeSupported (imagetype, fail_reason))
+    return 0;
 
   csGLBasicTextureHandle *txt = new csGLBasicTextureHandle (
-      w, h, 1, imagetype, flags, G3D);
+      w, h, d, imagetype, flags, G3D);
 
   if (!txt->SynthesizeUploadData (texFormat, fail_reason))
   {

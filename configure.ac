@@ -1070,7 +1070,13 @@ AS_IF([test $cs_cv_libgl = yes],
         [CS_HEADER_PROPERTY([CS_HAVE_GLHANDLEARB_T])])
     CS_CHECK_OPENGL_TYPE([GLcharARB],
         [CS_HEADER_PROPERTY([CS_HAVE_GLCHARARB_T])]) 
-    CS_CHECK_OPENGL_TYPE([GLchar], [CS_HEADER_PROPERTY([CS_HAVE_GLCHAR_T])])])
+    CS_CHECK_OPENGL_TYPE([GLchar], 
+        [CS_HEADER_PROPERTY([CS_HAVE_GLCHAR_T])])
+    CS_CHECK_OPENGL_TYPE([GLintptr],
+        [CS_HEADER_PROPERTY([CS_HAVE_GLINTPTR_T])])
+    CS_CHECK_OPENGL_TYPE([GLsizeiptr],
+        [CS_HEADER_PROPERTY([CS_HAVE_GLSIZEIPTR_T])])
+    ])
 CS_CHECK_GLU
 CS_CHECK_GLX
 # Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_ present.
@@ -2307,6 +2313,21 @@ CS_CHECK_STD_SPECIAL_FLOAT([isnan])
 CS_CHECK_SPECIAL_FLOAT([isnormal])
 CS_CHECK_SPECIAL_FLOAT([normalf])
 CS_CHECK_STD_SPECIAL_FLOAT([isnormal])
+
+
+
+#------------------------------------------------------------------------------
+# Check if strtof() is available.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([for strtof], [cs_cv_strtof],
+    [AC_LANG_PROGRAM(
+	[[#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+	#endif
+	#include <stdlib.h>]],
+	[strtof (0, 0)])],
+    [], [],
+    [CS_HEADER_PROPERTY([CS_HAVE_STRTOF])])
 
 
 

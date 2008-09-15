@@ -7,4 +7,5 @@ Application mdl2spr
 	: console
 ;
 LinkWith mdl2spr : crystalspace ;
+FileListEntryApplications mdl2spr : app-tool ;
 

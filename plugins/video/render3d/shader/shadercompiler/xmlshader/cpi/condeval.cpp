@@ -21,6 +21,7 @@
 
 #include "csgfx/renderbuffer.h"
 #include "csutil/csendian.h"
+#include "csutil/scanstr.h"
 #include "ivideo/rendermesh.h"
 
 #include "condeval.h"
@@ -504,7 +505,7 @@ const char* csConditionEvaluator::ResolveExpValue (const csExpressionToken& valu
     if (isFloat)
     {
       char dummy;
-      if (sscanf (number, "%f%c", &operand.floatVal, &dummy) != 1)
+      if (csScanStr (number, "%f%c", &operand.floatVal, &dummy) != 1)
       {
 	return SetLastError ("Malformed float value: '%s'",
 	  number.GetData());

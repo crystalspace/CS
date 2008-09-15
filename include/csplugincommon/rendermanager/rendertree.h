@@ -273,6 +273,8 @@ namespace RenderManager
     /**
      * A single context node, Groups meshes which should be rendered from the
      * same view to the same target.
+     *
+     * Create instances of this structure by using RenderTree::CreateContext.
      */
     struct ContextNode : public CS::Meta::EBOptHelper<typename TreeTraits::ContextNodeExtraDataType>
     {

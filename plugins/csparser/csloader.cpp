@@ -74,7 +74,6 @@
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "iutil/verbositymanager.h"
-#include "imesh/thing.h"
 #include "imesh/nullmesh.h"
 #include "ivaria/reporter.h"
 #include "csgeom/poly3d.h"
@@ -4205,52 +4204,14 @@ bool csLoader::LoadSettings (iDocumentNode* node)
         }
         break;
       case XMLTOKEN_LIGHTMAPCELLSIZE:
-        {
-	  int cellsize = child->GetContentsValueAsInt ();
-	  if (cellsize > 0)
-	  {
-	    if (!csIsPowerOf2 (cellsize) )
-	    {
-	      int newcellsize = csFindNearestPowerOf2(cellsize);
-	      if (do_verbose)
-	        ReportNotify ("lightmap cell size %d "
-	          "is not a power of two, using %d", 
-	          cellsize, newcellsize);
-	      cellsize = newcellsize;
-	    }
-	    csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
-	    	object_reg, "crystalspace.mesh.object.thing");
-	    if (!type) return false;
-	    csRef<iThingEnvironment> te = 
-		scfQueryInterface<iThingEnvironment> (type);
-	    te->SetLightmapCellSize (cellsize);
-	  }
-	  else
-	  {
-	    SyntaxService->ReportError (
- 	          "crystalspace.maploader.parse.settings",
-	          child, "Bogus lightmap cell size %d", cellsize);
-	    return false;
-	  }
-        }
+	ReportWarning (
+	        "crystalspace.maploader.parse.settings",
+                child, "The 'lightmapcellsize' attribute is deprecated!");
 	break;
       case XMLTOKEN_MAXLIGHTMAPSIZE:
-        {
-	  int max[2];
-	  max[0] = child->GetAttributeValueAsInt ("horizontal");
-	  max[1] = child->GetAttributeValueAsInt ("vertical");
-	  if ( (max[0] > 0) && (max[1] > 0) )
-	  {
-	    Engine->SetMaxLightmapSize (max[0], max[1]);
-	  }
-	  else
-	  {
-	    SyntaxService->ReportError (
- 	          "crystalspace.maploader.parse.settings",
-	          child, "Bogus maximum lightmap size %dx%d", max[0], max[1]);
-	    return false;
-	  }
-        }
+	ReportWarning (
+	        "crystalspace.maploader.parse.settings",
+                child, "The 'maxlightmapsize' attribute is deprecated!");
 	break;
       case XMLTOKEN_AMBIENT:
         {

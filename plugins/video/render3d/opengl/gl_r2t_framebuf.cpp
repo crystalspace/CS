@@ -53,11 +53,11 @@ bool csGLRender2TextureFramebuf::SetRenderTarget (iTextureHandle* handle,
     return false;
   }
   
-  int targetW, targetH;
-  handle->GetRendererDimensions (targetW, targetH);
+  int targetW, targetH, targetD;
+  handle->GetRendererDimensions (targetW, targetH, targetD);
   if (!targetsSet)
   {
-    txt_w = targetW; txt_h = targetH;
+    txt_w = targetW; txt_h = targetH; txt_d = targetD;
     viewportHelper.Set2DViewport (G3D, txt_w, txt_h, true);
     targetsSet = true;
   }
@@ -481,11 +481,14 @@ void csGLRender2TextureFramebuf::GrabFramebuffer (const RTAttachment<>& target,
   else
   {
     GLenum textarget = tex_mm->GetGLTextureTarget();
-    if ((textarget != GL_TEXTURE_2D) && (textarget != GL_TEXTURE_RECTANGLE_ARB) 
+    if ((textarget != GL_TEXTURE_2D)
+        && (textarget != GL_TEXTURE_3D)  
+        && (textarget != GL_TEXTURE_RECTANGLE_ARB) 
 	&& (textarget != GL_TEXTURE_CUBE_MAP))
       return;
 
     bool handle_subtexture = (textarget == GL_TEXTURE_CUBE_MAP);
+    bool handle_3d = (textarget == GL_TEXTURE_3D);
     /* Reportedly, some drivers crash if using CopyTexImage on a texture
       * size larger than the framebuffer. Use CopyTexSubImage then. */
     bool needSubImage = (txt_w > viewportHelper.GetVPWidth()) 
@@ -510,6 +513,11 @@ void csGLRender2TextureFramebuf::GrabFramebuffer (const RTAttachment<>& target,
 	      GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, internalFormat, 
 	      txt_w, txt_h,0, baseFormat, GL_UNSIGNED_BYTE, 0);
 	}
+	else if (handle_3d)
+	{
+	  G3D->ext->glTexImage3D (textarget, 0, internalFormat, txt_w, txt_h, 
+	    txt_d, 0, baseFormat, GL_UNSIGNED_BYTE, 0);
+	}
 	else
 	  glTexImage2D (textarget, 0, internalFormat, txt_w, txt_h, 
 	    0, baseFormat, GL_UNSIGNED_BYTE, 0);
@@ -524,6 +532,11 @@ void csGLRender2TextureFramebuf::GrabFramebuffer (const RTAttachment<>& target,
 	  GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + target.subtexture,
 	  0, 0, 0, orgX, orgY, 
 	  csMin (txt_w, viewportHelper.GetVPWidth()), 
+	  csMin (txt_h, viewportHelper.GetVPHeight()));
+      else if (handle_3d)
+	G3D->ext->glCopyTexSubImage3D (textarget, 0, 0, 0, orgX, orgY,
+	  target.subtexture,
+	  csMin (txt_w, viewportHelper.GetVPWidth()),
 	  csMin (txt_h, viewportHelper.GetVPHeight()));
       else
 	glCopyTexSubImage2D (textarget, 0, 0, 0, orgX, orgY, 
@@ -546,6 +559,15 @@ void csGLRender2TextureFramebuf::GrabFramebuffer (const RTAttachment<>& target,
 	if (handle_subtexture)
 	  glCopyTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + target.subtexture, 
 	    0, internalFormat, orgX, orgY, txt_w, txt_h, 0);
+	else if (handle_3d)
+	{
+	  // Gah. Turn target texture to required storage.
+	  GLenum baseFormat = GetBaseFormat (fmtClass, tex_mm);
+	  G3D->ext->glTexImage3D (textarget, 0, internalFormat, txt_w, txt_h, 
+	    txt_d, 0, baseFormat, GL_UNSIGNED_BYTE, 0);
+	  G3D->ext->glCopyTexSubImage3D (textarget, 0, 0, 0, orgX, orgY,
+	    target.subtexture, txt_w, txt_h);
+	}
 	else
 	  glCopyTexImage2D (textarget, 0, internalFormat,
 	    orgX, orgY, txt_w, txt_h, 0);
@@ -559,6 +581,9 @@ void csGLRender2TextureFramebuf::GrabFramebuffer (const RTAttachment<>& target,
 	if (handle_subtexture)
 	  glCopyTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + target.subtexture, 
 	    0, 0, 0, orgX, orgY, txt_w, txt_h);
+	else if (handle_3d)
+	  G3D->ext->glCopyTexSubImage3D (textarget, 0, 0, 0, orgX, orgY,
+	    target.subtexture, txt_w, txt_h);
 	else
 	  glCopyTexSubImage2D (textarget, 0,
 	    0, 0, orgX, orgY, txt_w, txt_h);

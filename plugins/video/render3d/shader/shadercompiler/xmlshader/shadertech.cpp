@@ -211,11 +211,14 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
   //get texturemappings
   if (result && !ParseTextures (*pass, node, hlp, resolveFP)) result = false;
   
-  csMemFile perTagFile;
-  WritePassPerTag (*pass, &perTagFile);
-  cacheTo->CacheData (perTagFile.GetData(), perTagFile.GetSize(),
-    csString().Format ("/pass%ddata/%s_%s_%s", GetPassNumber (pass),
-    tagFP.GetDataSafe(), tagVP.GetDataSafe(), tagVPr.GetDataSafe()));
+  if (cacheTo)
+  {
+    csMemFile perTagFile;
+    WritePassPerTag (*pass, &perTagFile);
+    cacheTo->CacheData (perTagFile.GetData(), perTagFile.GetSize(),
+      csString().Format ("/pass%ddata/%s_%s_%s", GetPassNumber (pass),
+      tagFP.GetDataSafe(), tagVP.GetDataSafe(), tagVPr.GetDataSafe()));
+  }
   
   return result;
 }

@@ -28,6 +28,7 @@
 #include "csutil/databuf.h"
 #include "csutil/scf.h"
 #include "csutil/scfstrset.h"
+#include "csutil/scanstr.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
 #include "csutil/vfscache.h"
@@ -44,7 +45,6 @@
 #include "imap/loader.h"
 #include "imap/reader.h"
 #include "imesh/lighting.h"
-#include "imesh/thing.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
@@ -620,10 +620,8 @@ csEngine::csEngine (iBase *iParent) :
   worldSaveable (false), maxAspectRatio (0), nextframePending (0),
   currentFrameNumber (0), 
   lightmapCacheMode (CS_ENGINE_CACHE_READ | CS_ENGINE_CACHE_NOUPDATE),
-  maxLightmapWidth (0), maxLightmapHeight (0),
   clearZBuf (false), defaultClearZBuf (false), 
   clearScreen (false),  defaultClearScreen (false), 
-  defaultMaxLightmapWidth (256), defaultMaxLightmapHeight (256),
   currentRenderContext (0), weakEventHandler(0)
 {
   ClearRenderPriorities ();
@@ -792,17 +790,6 @@ bool csEngine::HandleEvent (iEvent &Event)
   return false;
 }
 
-iMeshObjectType* csEngine::GetThingType ()
-{
-  if (!thingMeshType)
-  {
-    thingMeshType = csLoadPluginCheck<iMeshObjectType> (
-        objectRegistry, "crystalspace.mesh.object.thing");
-  }
-
-  return (iMeshObjectType*)thingMeshType;
-}
-  
 void csEngine::SetRenderManager (iRenderManager* newRM)
 {
   if (newRM == 0) return;
@@ -879,14 +866,6 @@ void csEngine::DeleteAllForce ()
   {
     shaderManager->UnregisterShaderVariableAcessors ();
     shaderManager->UnregisterShaders ();
-  }
-
-  if (thingMeshType != 0)
-  {
-    csRef<iThingEnvironment> te (
-  	scfQueryInterface<iThingEnvironment> (thingMeshType));
-    CS_ASSERT (((iThingEnvironment*)te) != 0);
-    te->Clear ();
   }
 
   currentRenderContext = 0;
@@ -1085,10 +1064,6 @@ void csEngine::ResetWorldSpecificSettings()
 {
   SetClearZBuf (defaultClearZBuf);
   SetClearScreen (defaultClearScreen);
-  csRef<iThingEnvironment> te (scfQueryInterface<iThingEnvironment> (
-          GetThingType ()));
-  te->SetLightmapCellSize (16);
-  SetMaxLightmapSize (defaultMaxLightmapWidth, defaultMaxLightmapHeight);
   SetAmbientLight (csColor (
   	defaultAmbientRed / 255.0f,
 	defaultAmbientGreen / 255.0f, 
@@ -1274,7 +1249,7 @@ void csEngine::ShineLights (iCollection *collection, iProgressMeter *meter)
       if (input) *input++ = 0;
 
       float xf;
-      sscanf (endkw, "%f", &xf);
+      csScanStr (endkw, "%f", &xf);
 
       int xi = int (xf + ((xf < 0) ? -0.5 : + 0.5));
 
@@ -1987,13 +1962,6 @@ iCameraPosition* csEngine::FindCameraPosition (const char* name,
 
 void csEngine::ReadConfig (iConfigFile *Config)
 {
-  defaultMaxLightmapWidth = 
-    Config->GetInt ("Engine.Lighting.MaxLightmapWidth", defaultMaxLightmapWidth);
-  maxLightmapWidth = defaultMaxLightmapWidth;
-  defaultMaxLightmapHeight = 
-    Config->GetInt ("Engine.Lighting.MaxLightmapHeight", defaultMaxLightmapHeight);
-  maxLightmapHeight = defaultMaxLightmapHeight;
-
   defaultAmbientRed = Config->GetInt (
       "Engine.Lighting.Ambient.Red",
       CS_DEFAULT_LIGHT_LEVEL);
@@ -2888,28 +2856,6 @@ iMaterialWrapper *csEngine::CreateMaterial (
   iMaterialWrapper *wrapper = materials->NewMaterial (mat, name);
 
   return wrapper;
-}
-
-csPtr<iMeshWrapper> csEngine::CreateThingMesh (
-  iSector *sector,
-  const char *name)
-{
-  csRef<iMeshWrapper> thing_wrap (CreateMeshWrapper (
-  	"crystalspace.mesh.object.thing", name, sector));
-  thing_wrap->SetZBufMode (CS_ZBUF_USE);
-  thing_wrap->SetRenderPriority (GetObjectRenderPriority ());
-  return csPtr<iMeshWrapper> (thing_wrap);
-}
-
-csPtr<iMeshWrapper> csEngine::CreateSectorWallsMesh (
-  iSector *sector,
-  const char *name)
-{
-  csRef<iMeshWrapper> thing_wrap = CreateMeshWrapper (
-  	"crystalspace.mesh.object.thing", name, sector);
-  thing_wrap->SetZBufMode (CS_ZBUF_FILL);
-  thing_wrap->SetRenderPriority (GetWallRenderPriority ());
-  return csPtr<iMeshWrapper> (thing_wrap);
 }
 
 iSector *csEngine::CreateSector (const char *name, bool addToList)

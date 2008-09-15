@@ -244,6 +244,7 @@ protected:
   csRefArray<iSndSysRendererCallback> m_CallbackList;
 
   csRef<iEventHandler> weakEventHandler;
+  csRef<iEventHandler> weakOpenEventHandler;
 
 protected:
   // Called when the renderer plugin is opened from the HandleEvent function

@@ -7,4 +7,5 @@ Application csfgen
 	: console
 ;
 LinkWith csfgen : crystalspace ;
+FileListEntryApplications csfgen : app-tool ;
 

@@ -443,7 +443,7 @@ stuff = join (getExtensions (xmldoc.getElementsByTagName ("extension")),
   "");
 output = file ("glextmanager.h", "w")
 output.write ("/**\n")
-output.write (" * WARNING - This file is automagically tenerated\n")
+output.write (" * WARNING - This file is automagically generated\n")
 output.write (" */\n\n")
 output.write (stuff)
 output.close ()

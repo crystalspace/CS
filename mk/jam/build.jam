@@ -62,6 +62,8 @@ include $(jamrulesdir)/docs.jam ;
 include $(jamrulesdir)/unittest.jam ;
 
 include $(jamrulesdir)/upload.jam ;
+include $(jamrulesdir)/filelist.jam ;
+include $(jamrulesdir)/msi.jam ;
 
 # Include OS specific rules
 switch $(TARGET.OS)

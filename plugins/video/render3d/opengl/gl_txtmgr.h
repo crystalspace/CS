@@ -90,6 +90,8 @@ private:
   bool FormatSupported (GLenum srcFormat, GLenum srcType);
 
   void CompactTextures ();
+  
+  bool ImageTypeSupported (csImageType imagetype, iString* fail_reason);
 public:
   /* Format tables - maps component sizes to GL sizes.
    * A lot of source formats have the same 'type' bit only differ in 'format'.
@@ -200,6 +202,13 @@ public:
   virtual csPtr<iTextureHandle> RegisterTexture (iImage *image, int flags,
       iString* fail_reason = 0);
   virtual csPtr<iTextureHandle> CreateTexture (int w, int h,
+      csImageType imagetype, const char* format, int flags,
+      iString* fail_reason = 0)
+  {
+    return csGLTextureManager::CreateTexture (w, h, 1, imagetype, format,
+      flags, fail_reason);
+  }
+  virtual csPtr<iTextureHandle> CreateTexture (int w, int h, int d,
       csImageType imagetype, const char* format, int flags,
       iString* fail_reason = 0);
   void MarkTexturesDirty () { compactTextures = true; }

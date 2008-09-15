@@ -66,7 +66,6 @@
 #include "imap/saver.h"
 #include "imesh/genmesh.h"
 #include "imesh/object.h"
-#include "imesh/thing.h"
 #include "imesh/animesh.h"
 #include "imesh/skeleton2.h"
 #include "imesh/skeleton2anim.h"
@@ -517,27 +516,10 @@ void csBugPlug::MouseButtonLeft (iCamera* camera)
       csVector2 (mouse_x, mouse_y), 100.0f, camera);
   iMeshWrapper* sel = result.mesh;
 
-  const char* poly_name = 0;
-  if (result.polygon_idx != -1)
-  {
-    csRef<iThingFactoryState> tfs = scfQueryInterface<iThingFactoryState> 
-      (sel->GetMeshObject ()->GetFactory());
-    if (tfs)
-    {
-      poly_name = tfs->GetPolygonName (result.polygon_idx);
-      Dump (tfs, result.polygon_idx);
-    }
-  }
-  else
-  {
-    poly_name = 0;
-  }
-
   csVector3 vw = result.isect;
   csVector3 v = camera->GetTransform ().Other2This (vw);
   Report (CS_REPORTER_SEVERITY_DEBUG,
-    "LMB down : c:(%f,%f,%f) w:(%f,%f,%f) p:'%s'",
-    v.x, v.y, v.z, vw.x, vw.y, vw.z, poly_name ? poly_name : "<none>");
+    "LMB down : c:(%f,%f,%f) w:(%f,%f,%f)", v.x, v.y, v.z, vw.x, vw.y, vw.z);
 
   if (sel)
   {
@@ -1138,24 +1120,6 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
 	    	"Memory dump sent to stdout!");
 	    }
 	  }
-      break;
-    case DEBUGCMD_UNPREPARE:
-	Report (CS_REPORTER_SEVERITY_DEBUG,
-	    	"Unprepare all things...");
-	{
-	  int i;
-	  iMeshList* ml = Engine->GetMeshes ();
-	  for (i = 0 ; i < ml->GetCount () ; i++)
-	  {
-	    iMeshWrapper* m = ml->Get (i);
-	    csRef<iThingState> th = 
-	    	scfQueryInterface<iThingState> (m->GetMeshObject ());
-	    if (th)
-	    {
-	      th->Unprepare ();
-	    }
-	  }
-	}
       break;
     case DEBUGCMD_COLORSECTORS:
 	Report (CS_REPORTER_SEVERITY_DEBUG,
@@ -2270,7 +2234,6 @@ int csBugPlug::GetCommandCode (const char* cmdstr, csString& args)
   if (!strcmp (cmd, "shadowdebug"))	return DEBUGCMD_SHADOWDEBUG;
   if (!strcmp (cmd, "debugcmd"))	return DEBUGCMD_DEBUGCMD;
   if (!strcmp (cmd, "memorydump"))	return DEBUGCMD_MEMORYDUMP;
-  if (!strcmp (cmd, "unprepare"))	return DEBUGCMD_UNPREPARE;
   if (!strcmp (cmd, "colorsectors"))	return DEBUGCMD_COLORSECTORS;
   if (!strcmp (cmd, "switchculler"))	return DEBUGCMD_SWITCHCULLER;
   if (!strcmp (cmd, "selectmesh"))	return DEBUGCMD_SELECTMESH;
@@ -2594,22 +2557,6 @@ void csBugPlug::Dump (iCamera* c)
   csReversibleTransform& trans = c->GetTransform ();
   Dump (4, trans.GetO2TTranslation (), "Camera vector");
   Dump (4, trans.GetO2T (), "Camera matrix");
-}
-
-void csBugPlug::Dump (iThingFactoryState* fact, int polyidx)
-{
-  const char* poly_name = fact->GetPolygonName (polyidx);
-  if (!poly_name) poly_name = "<noname>";
-  Report (CS_REPORTER_SEVERITY_DEBUG, "Polygon '%s'",
-  	poly_name);
-  int nv = fact->GetPolygonVertexCount (polyidx);
-  int i;
-  int* idx = fact->GetPolygonVertexIndices (polyidx);
-  csString buf;
-  buf << "  Vertices: ";
-  for (i = 0 ; i < nv ; i++)
-    buf << idx[i] << ' ';
-  Report (CS_REPORTER_SEVERITY_DEBUG, buf);
 }
 
 bool csBugPlug::HandleEvent (iEvent& event)

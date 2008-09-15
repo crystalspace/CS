@@ -4,6 +4,7 @@ Description cslight : "Lighting Calculator" ;
 ApplicationIcon win32 : cslight : cslight.ico ;
 Application cslight : [ Wildcard *.cpp *.h ] ;
 LinkWith cslight : crystalspace ;
+FileListEntryApplications cslight : app-tool ;
 
 if [ Property build : projgen_version ] != 6
 {
@@ -72,8 +73,6 @@ CSLIGHT.PLUGINLIST =
   stdrep
   bruteblock
   terrainldr
-  thing
-  thingldr
   xmlread
   xmlshader
   ;
@@ -122,6 +121,7 @@ if $(DIRECTX.AVAILABLE) = "yes" { CSLIGHT.PLUGINLIST += ddraw2d ; }
 if $(TARGET.OS) = "MACOS_X" { CSLIGHT.PLUGINLIST += cgdriver2d ; }
 
 LinkStaticPlugins cslight_static : $(CSLIGHT.PLUGINLIST) ;
+FileListEntryApplications cslight_static : app-tool-static ;
 SubVariant ;
 }
 

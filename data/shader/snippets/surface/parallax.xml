@@ -47,13 +47,13 @@
 	  <?Include /shader/snippets/cg-common.cginc?>
 	</block>
 	
-	<input name="tcScaleOffs" type="float4" default="complex">
+	<input name="tcScaleOffs" type="translateScale2" default="complex">
 	  <block location="shadervars">
 	    <shadervar name="tex height scale" type="vector4">1,1,0,0</shadervar>
 	  </block>
 	  
 	  <block location="cg:fragmentIn">
-	    <uniform type="float4" name="tcScaleOffs" />
+	    <uniform type="translateScale2" name="tcScaleOffs" />
 	  </block>
 	  
 	  <block location="cg:fragmentMain">

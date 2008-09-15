@@ -21,6 +21,7 @@
 
 #include "converter.h"
 #include "genmeshify.h"
+#include "thing/persist/thingldr.h"
 
 namespace genmeshify
 {
@@ -33,10 +34,15 @@ namespace genmeshify
       "crystalspace.mesh.saver.genmesh", true);
     if (gmfactSaver.IsValid() && gmSaver.IsValid())
     {
-      thingFactLoader = csLoadPluginCheck<iLoaderPlugin> (app->objectRegistry,
-        "crystalspace.mesh.loader.factory.thing", true);
-      thingObjLoader = csLoadPluginCheck<iLoaderPlugin> (app->objectRegistry,
-        "crystalspace.mesh.loader.thing", true);
+      csRef<iComponent> comp;
+
+      thingFactLoader.AttachNew (new csThingFactoryLoader (0));
+      comp = scfQueryInterface<iComponent> (thingFactLoader);
+      comp->Initialize (app->objectRegistry);
+
+      thingObjLoader.AttachNew (new csThingLoader (0));
+      comp = scfQueryInterface<iComponent> (thingObjLoader);
+      comp->Initialize (app->objectRegistry);
     }
 
     idTexLightmap = app->svStrings->Request ("tex lightmap");

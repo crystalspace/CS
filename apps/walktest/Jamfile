@@ -3,6 +3,7 @@ SubDir TOP apps walktest ;
 Description walktest : "WalkTest demo" ;
 Application walktest : [ Wildcard *.cpp *.h ] ;
 LinkWith walktest : crystalspace ;
+FileListEntryApplications walktest : app-demo ;
 
 # Some external projects use gcc's -ansi and -pedantic options. We need to
 # ensure that CS's public headers are usable when these options are enabled,
@@ -80,8 +81,6 @@ WALKALL.PLUGINLIST =
   spr3dldr
   stdpt
   stdrep
-  thing
-  thingldr
   xmlread
   xmlshader
   ;
@@ -158,5 +157,7 @@ CFlags walktest_static : [ FDefines CS_STATIC_LINKED ] ;
 MsvcDefine walktest_static : CS_STATIC_LINKED ;
 LinkWith walktest_static : crystalspace ;
 LinkStaticPlugins walktest_static : $(WALKTEST_STATIC.PLUGINLIST) ;
+FileListEntryApplications walktest_static : app-demo-static ;
+
 SubVariant ;
 }

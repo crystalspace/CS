@@ -445,7 +445,7 @@ csPtr<iTextureHandle> csSoftwareTextureManager::RegisterTexture (iImage* image,
 }
 
 csPtr<iTextureHandle> csSoftwareTextureManager::CreateTexture (int w, int h,
-      csImageType imagetype, const char* format, int flags,
+      int d, csImageType imagetype, const char* format, int flags,
       iString* fail_reason)
 {
   CS::StructuredTextureFormat texFormat (

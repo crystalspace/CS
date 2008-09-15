@@ -584,7 +584,7 @@ void csLight::UpdateBBox ()
     break;
   case CS_LIGHT_POINTLIGHT:
     {
-      lightBoundingBox.SetSize (csVector3 (cutoffDistance));
+      lightBoundingBox.SetSize (csVector3 (cutoffDistance*2));
       lightBoundingBox.SetCenter (csVector3 (0));
       break;
     }

@@ -22,6 +22,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
+#include "csutil/stringconv.h"
 #include "csutil/stringreader.h"
 #include "iutil/document.h"
 #include "iutil/string.h"
@@ -221,10 +222,10 @@ bool csPixelShaderParser::GetInstruction (const char *str,
     }
     csPSConstant constant;
     constant.reg = dest.GetData()[1] - '0';
-    constant.value.x = atof(f1.GetData());
-    constant.value.y = atof(f2.GetData());
-    constant.value.z = atof(f3.GetData());
-    constant.value.w = atof(f4.GetData());
+    constant.value.x = CS::Utility::strtof(f1.GetData());
+    constant.value.y = CS::Utility::strtof(f2.GetData());
+    constant.value.z = CS::Utility::strtof(f3.GetData());
+    constant.value.w = CS::Utility::strtof(f4.GetData());
     program_constants.Push (constant);
     return true;
   }

@@ -39,7 +39,7 @@ relevant sections on obtaining (@pxref{Where to Get}) and building
 (@pxref{Building}) Crystal Space.
 
 Lastly, actions are specific to sprite 3D. There is no exactly
-corresponding interface to thing or ball as yet, for example. So I am also
+corresponding interface to genmesh or ball as yet, for example. So I am also
 presuming you have read to sections prior to this section about sprites, if
 not, then it would be a good idea to do so before delving into this section.
 

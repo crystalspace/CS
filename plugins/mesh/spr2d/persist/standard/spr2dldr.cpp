@@ -87,13 +87,15 @@ bool csSprite2DFactoryLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("frame", XMLTOKEN_FRAME);
   xmltokens.Register ("duration", XMLTOKEN_DURATION);
   xmltokens.Register ("v", XMLTOKEN_V);
+  xmltokens.Register ("uv", XMLTOKEN_UV);
+  xmltokens.Register ("color", XMLTOKEN_COLOR);
   return true;
 }
 
 bool csSprite2DFactoryLoader::ParseAnim (iDocumentNode* node,
-	iReporter*, 
-	iSprite2DFactoryState* spr2dLook, 
-	const char *animname)
+        iReporter*, 
+        iSprite2DFactoryState* spr2dLook, 
+        const char *animname)
 {
   int maxv = 200;
   float* verts = new float[maxv];
@@ -112,47 +114,47 @@ bool csSprite2DFactoryLoader::ParseAnim (iDocumentNode* node,
     switch (id)
     {
       case XMLTOKEN_FRAME:
-	{
-	  duration = 1;
-	  int numv = 0;
-	  csRef<iDocumentNodeIterator> child_it = child->GetNodes ();
-	  while (child_it->HasNext ())
-	  {
-	    csRef<iDocumentNode> childchild = child_it->Next ();
-	    if (childchild->GetType () != CS_NODE_ELEMENT) continue;
-	    const char* child_value = childchild->GetValue ();
-	    csStringID id = xmltokens.Request (child_value);
-	    switch (id)
-	    {
-	      case XMLTOKEN_DURATION:
-		duration = childchild->GetContentsValueAsInt ();
-		break;
-	      case XMLTOKEN_V:
-		verts[numv++] = childchild->GetAttributeValueAsFloat ("u");
-		verts[numv++] = childchild->GetAttributeValueAsFloat ("v");
-		if (numv >= maxv)
-		{
-		  maxv += 200;
-		  float* newverts = new float[maxv];
-		  memcpy (newverts, verts, numv*sizeof (float));
-		  delete [] verts;
-		  verts = newverts;
-		}
-		break;
-	      default:
-	        synldr->ReportBadToken (childchild);
-		delete[] verts;
-		return false;
-	    }
-	  }
-	  iSprite2DUVAnimationFrame *frame = ani->CreateFrame (-1);
-	  frame->SetFrameData (child->GetAttributeValue ("name"), duration, numv/2, verts);
-	}
-	break;
+        {
+          duration = 1;
+          int numv = 0;
+          csRef<iDocumentNodeIterator> child_it = child->GetNodes ();
+          while (child_it->HasNext ())
+          {
+            csRef<iDocumentNode> childchild = child_it->Next ();
+            if (childchild->GetType () != CS_NODE_ELEMENT) continue;
+            const char* child_value = childchild->GetValue ();
+            csStringID id = xmltokens.Request (child_value);
+            switch (id)
+            {
+              case XMLTOKEN_DURATION:
+                duration = childchild->GetContentsValueAsInt ();
+                break;
+              case XMLTOKEN_V:
+                verts[numv++] = childchild->GetAttributeValueAsFloat ("u");
+                verts[numv++] = childchild->GetAttributeValueAsFloat ("v");
+                if (numv >= maxv)
+                {
+                  maxv += 200;
+                  float* newverts = new float[maxv];
+                  memcpy (newverts, verts, numv*sizeof (float));
+                  delete [] verts;
+                  verts = newverts;
+                }
+                break;
+              default:
+                synldr->ReportBadToken (childchild);
+                delete[] verts;
+                return false;
+            }
+          }
+          iSprite2DUVAnimationFrame *frame = ani->CreateFrame (-1);
+          frame->SetFrameData (child->GetAttributeValue ("name"), duration, numv/2, verts);
+        }
+        break;
       default:
-	synldr->ReportBadToken (child);
-	delete[] verts;
-	return false;
+        synldr->ReportBadToken (child);
+        delete[] verts;
+        return false;
     }
   }
   delete[] verts;
@@ -164,17 +166,22 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
   iStringArray* failed)
 {
   csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
-  	object_reg, "crystalspace.mesh.object.sprite.2d", false);
+          object_reg, "crystalspace.mesh.object.sprite.2d", false);
   if (!type)
   {
     synldr->ReportError (
-		"crystalspace.sprite2dfactoryloader.setup.objecttype",
-		node, "Could not load the sprite.2d mesh object plugin!");
+      "crystalspace.sprite2dfactoryloader.setup.objecttype",
+      node, "Could not load the sprite.2d mesh object plugin!");
     return 0;
   }
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
   csRef<iSprite2DFactoryState> spr2dLook (
-  	scfQueryInterface<iSprite2DFactoryState> (fact));
+          scfQueryInterface<iSprite2DFactoryState> (fact));
+
+  iColoredVertices* verts = spr2dLook->GetVertices ();
+  int vnum = 0;
+  int uvnum = 0;
+  int colnum = 0;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -186,43 +193,83 @@ csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
     switch (id)
     {
       case XMLTOKEN_MATERIAL:
-	{
-	  const char* matname = child->GetContentsValue ();
+        {
+          const char* matname = child->GetContentsValue ();
           iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-	  if (!mat)
-	  {
-	    synldr->ReportError (
-		"crystalspace.sprite2dfactoryloader.parse.unknownmaterial",
-		child, "Couldn't find material named '%s'", matname);
+          if (!mat)
+          {
+            synldr->ReportError (
+                "crystalspace.sprite2dfactoryloader.parse.unknownmaterial",
+                child, "Couldn't find material named '%s'", matname);
             return 0;
-	  }
-	  fact->SetMaterialWrapper (mat);
-	}
-	break;
+          }
+          fact->SetMaterialWrapper (mat);
+        }
+        break;
       case XMLTOKEN_LIGHTING:
         {
           bool do_lighting;
-	  if (!synldr->ParseBool (child, do_lighting, true))
-	    return 0;
+          if (!synldr->ParseBool (child, do_lighting, true))
+            return 0;
           spr2dLook->SetLighting (do_lighting);
         }
-	break;
+        break;
       case XMLTOKEN_MIXMODE:
         {
-	  uint mm;
-	  if (!synldr->ParseMixmode (child, mm))
-	    return 0;
+          uint mm;
+          if (!synldr->ParseMixmode (child, mm))
+            return 0;
           fact->SetMixMode (mm);
-	}
-	break;
+        }
+        break;
       case XMLTOKEN_UVANIMATION:
-	if (!ParseAnim (child, reporter, spr2dLook,
-		child->GetAttributeValue ("name")))
-	  return 0;
+        if (!ParseAnim (child, reporter, spr2dLook,
+                child->GetAttributeValue ("name")))
+          return 0;
+        break;
+      case XMLTOKEN_V:
+        {
+          float x = child->GetAttributeValueAsFloat ("x");
+          float y = child->GetAttributeValueAsFloat ("y");
+          vnum++;
+          if (vnum > uvnum && vnum > colnum)
+            verts->SetSize (vnum);
+          csSprite2DVertex& v = verts->Get (vnum-1);
+          v.pos.x = x;
+          v.pos.y = y;
+          v.color_init.Set (0, 0, 0);
+          v.color.Set (0, 0, 0);
+        }
+        break;
+      case XMLTOKEN_UV:
+        {
+          float u = child->GetAttributeValueAsFloat ("u");
+          float v = child->GetAttributeValueAsFloat ("v");
+          uvnum++;
+          if (uvnum > vnum && uvnum > colnum)
+            verts->SetSize (uvnum);
+          csSprite2DVertex& V = verts->Get (uvnum-1);
+          V.u = u;
+          V.v = v;
+        }
+        break;
+      case XMLTOKEN_COLOR:
+        {
+          float r = child->GetAttributeValueAsFloat ("red");
+          float g = child->GetAttributeValueAsFloat ("green");
+          float b = child->GetAttributeValueAsFloat ("blue");
+          colnum++;
+          if (colnum > vnum && colnum > uvnum)
+            verts->SetSize (colnum);
+          csSprite2DVertex& v = verts->Get (colnum-1);
+          v.color_init.red = r;
+          v.color_init.green = g;
+          v.color_init.blue = b;
+        }
         break;
       default:
-	synldr->ReportBadToken (child);
-	return 0;
+        synldr->ReportBadToken (child);
+        return 0;
     }
   }
 
@@ -248,13 +295,13 @@ bool csSprite2DFactorySaver::Initialize (iObjectRegistry* object_reg)
 }
 
 bool csSprite2DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
-	iStreamSource*)
+        iStreamSource*)
 {
   if (!parent) return false; //you never know...
   if (!obj) return false; //you never know...
-  
+
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-  paramsNode->SetValue("params");
+  paramsNode->SetValue ("params");
 
   csRef<iSprite2DFactoryState> spritefact = scfQueryInterface<iSprite2DFactoryState> (obj);
   csRef<iMeshObjectFactory> meshfact = scfQueryInterface<iMeshObjectFactory> (obj);
@@ -271,8 +318,8 @@ bool csSprite2DFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
       csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       matNode->SetValue("material");
       matNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(matname);
-    }    
-  }    
+    }
+  }
 
   //Writedown Lighting tag
   synldr->WriteBool(paramsNode, "lighting", spritefact->HasLighting(), true);
@@ -344,8 +391,8 @@ bool csSprite2DLoader::Initialize (iObjectRegistry* object_reg)
 #define CHECK_MESH(m) \
   if (!m) { \
     synldr->ReportError ( \
-	"crystalspace.sprite2dloader.parse.unknownfactory", \
-	child, "Specify the factory first!"); \
+        "crystalspace.sprite2dloader.parse.unknownfactory", \
+        child, "Specify the factory first!"); \
     return 0; \
   }
 
@@ -356,6 +403,7 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
 {
   csRef<iMeshObject> mesh;
   csRef<iSprite2DState> spr2dLook;
+  csRef<iSprite2DFactoryState> spr2dLookFact;
   iColoredVertices* verts = 0;
   int vnum = 0;
   int uvnum = 0;
@@ -411,118 +459,117 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
 
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           spr2dLook = scfQueryInterface<iSprite2DState> (mesh);
-	  if (!spr2dLook)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.sprite2dloader.parse.badfactory",
-		child, "Factory '%s' doesn't appear to be a spr2d factory!",
-		factname);
-	    return 0;
-	  }
-	  verts = spr2dLook->GetVertices ();
-	}
-	break;
-      case XMLTOKEN_MATERIAL:
-	{
-	  const char* matname = child->GetContentsValue ();
-          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-	  if (!mat)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.sprite2dloader.parse.unknownmaterial",
-		child, "Couldn't find material '%s'!", matname);
+          if (!spr2dLook)
+          {
+            synldr->ReportError (
+              "crystalspace.sprite2dloader.parse.badfactory",
+              child, "Factory '%s' doesn't appear to be a spr2d factory!",
+              factname);
             return 0;
-	  }
-	  CHECK_MESH (mesh);
-	  mesh->SetMaterialWrapper (mat);
-	}
-	break;
+          }
+          verts = spr2dLook->GetVertices ();
+        }
+        break;
+      case XMLTOKEN_MATERIAL:
+        {
+          const char* matname = child->GetContentsValue ();
+          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+          if (!mat)
+          {
+            synldr->ReportError (
+              "crystalspace.sprite2dloader.parse.unknownmaterial",
+              child, "Couldn't find material '%s'!", matname);
+            return 0;
+          }
+          CHECK_MESH (mesh);
+          mesh->SetMaterialWrapper (mat);
+        }
+        break;
       case XMLTOKEN_MIXMODE:
         {
-	  uint mm;
-	  if (!synldr->ParseMixmode (child, mm))
-	    return 0;
-	  CHECK_MESH (mesh);
+          uint mm;
+          if (!synldr->ParseMixmode (child, mm))
+            return 0;
+          CHECK_MESH (mesh);
           mesh->SetMixMode (mm);
-	}
-	break;
+        }
+        break;
       case XMLTOKEN_V:
         {
-	  float x = child->GetAttributeValueAsFloat ("x");
-	  float y = child->GetAttributeValueAsFloat ("y");
-	  vnum++;
-	  if (vnum > uvnum && vnum > colnum)
-	    verts->SetSize (vnum);
+          float x = child->GetAttributeValueAsFloat ("x");
+          float y = child->GetAttributeValueAsFloat ("y");
+          vnum++;
+          if (vnum > uvnum && vnum > colnum)
+            verts->SetSize (vnum);
           csSprite2DVertex& v = verts->Get (vnum-1);
-	  v.pos.x = x;
-	  v.pos.y = y;
-	  v.color_init.Set (0, 0, 0);
-	  v.color.Set (0, 0, 0);
+          v.pos.x = x;
+          v.pos.y = y;
+          v.color_init.Set (0, 0, 0);
+          v.color.Set (0, 0, 0);
         }
         break;
       case XMLTOKEN_UV:
         {
-	  float u = child->GetAttributeValueAsFloat ("u");
-	  float v = child->GetAttributeValueAsFloat ("v");
-	  uvnum++;
-	  if (uvnum > vnum && uvnum > colnum)
-	    verts->SetSize (uvnum);
+          float u = child->GetAttributeValueAsFloat ("u");
+          float v = child->GetAttributeValueAsFloat ("v");
+          uvnum++;
+          if (uvnum > vnum && uvnum > colnum)
+            verts->SetSize (uvnum);
           csSprite2DVertex& V = verts->Get (uvnum-1);
-	  V.u = u;
-	  V.v = v;
+          V.u = u;
+          V.v = v;
         }
         break;
       case XMLTOKEN_COLOR:
         {
-	  float r = child->GetAttributeValueAsFloat ("red");
-	  float g = child->GetAttributeValueAsFloat ("green");
-	  float b = child->GetAttributeValueAsFloat ("blue");
-	  colnum++;
-	  if (colnum > vnum && colnum > uvnum)
-	    verts->SetSize (colnum);
+          float r = child->GetAttributeValueAsFloat ("red");
+          float g = child->GetAttributeValueAsFloat ("green");
+          float b = child->GetAttributeValueAsFloat ("blue");
+          colnum++;
+          if (colnum > vnum && colnum > uvnum)
+            verts->SetSize (colnum);
           csSprite2DVertex& v = verts->Get (colnum-1);
-	  v.color_init.red = r;
-	  v.color_init.green = g;
-	  v.color_init.blue = b;
+          v.color_init.red = r;
+          v.color_init.green = g;
+          v.color_init.blue = b;
         }
         break;
       case XMLTOKEN_LIGHTING:
         {
           bool do_lighting;
-	  if (!synldr->ParseBool (child, do_lighting, true))
-	    return 0;
-	  CHECK_MESH (spr2dLook);
+          if (!synldr->ParseBool (child, do_lighting, true))
+            return 0;
+          CHECK_MESH (spr2dLook);
           spr2dLook->SetLighting (do_lighting);
         }
         break;
       case XMLTOKEN_ANIMATE:
         {
-	  CHECK_MESH (spr2dLook);
+          CHECK_MESH (spr2dLook);
           bool loop = false;
-	  int timing = 0;
-	  const char* animname = child->GetAttributeValue ("name");
-	  csRef<iDocumentNode> loopnode = child->GetNode ("loop");
-	  if (loopnode) synldr->ParseBool (loopnode, loop, true);
-	  csRef<iDocumentNode> timingnode = child->GetNode ("timing");
-	  if (timingnode) timing = timingnode->GetContentsValueAsInt ();
-	  iSprite2DUVAnimation *ani = spr2dLook->GetUVAnimation (animname);
-	  if (ani)
-	    spr2dLook->SetUVAnimation (animname, timing, loop);
-	  else
-    	  {
-	    synldr->ReportError (
-		"crystalspace.sprite2dloader.parse.uvanim",
-		child, "UVAnimation '%s' not found!", animname);
-	    return 0;
-	  }
+          int timing = 0;
+          const char* animname = child->GetAttributeValue ("name");
+          csRef<iDocumentNode> loopnode = child->GetNode ("loop");
+          if (loopnode) synldr->ParseBool (loopnode, loop, true);
+          csRef<iDocumentNode> timingnode = child->GetNode ("timing");
+          if (timingnode) timing = timingnode->GetContentsValueAsInt ();
+          iSprite2DUVAnimation *ani = spr2dLook->GetUVAnimation (animname);
+          if (ani)
+            spr2dLook->SetUVAnimation (animname, timing, loop);
+          else
+          {
+            synldr->ReportError (
+              "crystalspace.sprite2dloader.parse.uvanim",
+              child, "UVAnimation '%s' not found!", animname);
+            return 0;
+          }
         }
         break;
       default:
-	synldr->ReportBadToken (child);
-	return 0;
+        synldr->ReportBadToken (child);
+        return 0;
     }
   }
-
   return csPtr<iBase> (mesh);
 }
 
@@ -546,11 +593,11 @@ bool csSprite2DSaver::Initialize (iObjectRegistry* object_reg)
 }
 
 bool csSprite2DSaver::WriteDown (iBase* obj, iDocumentNode* parent,
-	iStreamSource*)
+        iStreamSource*)
 {
   if (!parent) return false; //you never know...
   if (!obj) return false; //you never know...
-  
+
   csRef<iDocumentNode> paramsNode = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
 
@@ -570,7 +617,7 @@ bool csSprite2DSaver::WriteDown (iBase* obj, iDocumentNode* parent,
       csRef<iDocumentNode> factNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       factNode->SetValue("factory");
       factNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(factname);
-    }    
+    }
   }
 
   //Writedown vertex tag
@@ -638,7 +685,7 @@ bool csSprite2DSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     const char* animname = anim->GetName();
     uvaniNode->SetAttribute("name", animname);
     synldr->WriteBool(uvaniNode,"loop",loop,false);
-    
+
     csRef<iDocumentNode> styleNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     styleNode->SetValue ("style");
     styleNode->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValueAsInt(style);

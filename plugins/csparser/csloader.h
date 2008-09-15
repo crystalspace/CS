@@ -75,7 +75,6 @@ struct iRenderLoop;
 struct iImposter;
 
 struct iObject;
-struct iThingState;
 struct iMaterialWrapper;
 struct iMeshFactoryWrapper;
 struct iMeshWrapper;

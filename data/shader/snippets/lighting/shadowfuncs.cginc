@@ -41,7 +41,7 @@ struct ShadowClipper
     bool2 compResLT = shadowMapCoordsProjUnscaled.xy < float2 (-1);
     bool2 compResBR = shadowMapCoordsProjUnscaled.xy >= float2 (1);
     return (compResLT.x || compResLT.y || compResBR.x || compResBR.y
-      || (shadowMapCoordsProj.z > 0));
+      || (shadowMapCoords.w < 0));
   ]]>
   <?else?>
   <![CDATA[
@@ -75,7 +75,7 @@ struct ShadowClipper
     float2 compResLT = shadowMapCoordsProjUnscaled.xy >= float2 (-1);
     float2 compResBR = shadowMapCoordsProjUnscaled.xy < float2 (1);
     factor *= compResLT.x*compResLT.y*compResBR.x*compResBR.y;
-    factor *= (shadowMapCoordsProj.z <= 0);
+    factor *= (shadowMapCoords.w >= 0);
   ]]>
   <?else?>
   <![CDATA[

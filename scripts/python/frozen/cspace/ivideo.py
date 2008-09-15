@@ -697,6 +697,7 @@ class csShaderVariableStack(object):
         except: self.this = this
     __swig_destroy__ = _ivideo.delete_csShaderVariableStack
     __del__ = lambda self : None;
+    def assign(*args): return _ivideo.csShaderVariableStack_assign(*args)
     def Setup(*args): return _ivideo.csShaderVariableStack_Setup(*args)
     def MakeOwnArray(*args): return _ivideo.csShaderVariableStack_MakeOwnArray(*args)
     def GetSize(*args): return _ivideo.csShaderVariableStack_GetSize(*args)
