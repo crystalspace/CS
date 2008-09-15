@@ -847,6 +847,8 @@ void csMeshWrapper::UnsetLODFade ()
 
 void csMeshWrapper::SetDefaultEnvironmentTexture ()
 {
+  if (!engine->enableEnvTex) return;
+
   csRef<csShaderVariable> svTexEnvironment;
   svTexEnvironment.AttachNew (new csShaderVariable (engine->svTexEnvironmentName));
   svTexEnvironment->SetType (csShaderVariable::TEXTURE);

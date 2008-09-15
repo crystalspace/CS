@@ -470,7 +470,9 @@ namespace CS
 	        *rview));
     #include "csutil/custom_new_enable.h"
             reflView->SetCamera (inewcam);
-            reflView->GetMeshFilter().AddFilterMesh (mesh.meshWrapper);
+	    CS::Utility::MeshFilter meshFilter;
+	    meshFilter.AddFilterMesh (mesh.meshWrapper);
+            reflView->SetMeshFilter(meshFilter);
 	    
 	    // Change the camera transform to be a reflection across reflRefrPlane
 	    csReversibleTransform reflection (csTransform::GetReflect (reflRefrPlane));
@@ -565,9 +567,10 @@ namespace CS
 	    // Create a new view
 	    csRef<CS::RenderManager::RenderView> refrView;
     #include "csutil/custom_new_disable.h"
+            /* Keep old camera to allow shadow map caching  */
 	    refrView.AttachNew (
 	      new (renderTree.GetPersistentData().renderViewPool) RenderView (
-		*rview));
+		*rview, true));
     #include "csutil/custom_new_enable.h"
 	    
 	    csRef<iTextureHandle> tex;
@@ -588,7 +591,9 @@ namespace CS
 	    csRef<iClipper2D> newView;
 	    newView.AttachNew (new csBoxClipper (clipBoxRefr));
 	    refrView->SetClipper (newView);
-            refrView->GetMeshFilter().AddFilterMesh (mesh.meshWrapper);
+	    CS::Utility::MeshFilter meshFilter;
+	    meshFilter.AddFilterMesh (mesh.meshWrapper);
+            refrView->SetMeshFilter(meshFilter);
             refrView->SetClipPlane (reflRefrPlane_cam.Inverse ());
   
 	    refrCtx = renderTree.CreateContext (refrView);

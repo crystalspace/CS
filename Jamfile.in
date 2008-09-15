@@ -1,5 +1,5 @@
-TOP ?= "@top_srcdir@" ;
-BUILDTOP ?= "@top_builddir@" ;
+TOP ?= "@CS_TOP_SRCDIR@" ;
+BUILDTOP ?= "@CS_TOP_BUILDDIR@" ;
 
 SubDir TOP ;
 

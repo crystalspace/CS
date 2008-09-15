@@ -39,6 +39,7 @@
 #include "csutil/event.h"
 #include "csutil/eventhandlers.h"
 #include "iutil/objreg.h"
+#include "iutil/systemopenmanager.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 
@@ -81,6 +82,10 @@ csPython::~csPython()
   csRef<iEventQueue> queue = csQueryRegistry<iEventQueue> (object_reg);
   if (queue.IsValid())
     queue->RemoveListener (this);
+  csRef<iSystemOpenManager> sysOpen =
+    csQueryRegistry<iSystemOpenManager> (object_reg);
+  if (sysOpen.IsValid())
+    sysOpen->RemoveWeakListener (weakeh_open);
   Mode = CS_REPORTER_SEVERITY_BUG;
   Py_Finalize();
   object_reg = 0;
@@ -162,6 +167,11 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
     queue->RegisterListener(this, csevCommandLineHelp(object_reg));
   // load further python modules from config file keys.
   LoadConfig();
+  
+  csRef<iSystemOpenManager> sysOpen =
+    csQueryRegistry<iSystemOpenManager> (object_reg);
+  if (sysOpen.IsValid())
+    sysOpen->RegisterWeak (this, weakeh_open);
   return true;
 }
 
@@ -179,9 +189,15 @@ void csPython::LoadConfig()
       Print(true,it->GetStr()+csString(" could not be added to pythonpath."));
     }
   }
+}
+
+void csPython::LoadComponents()
+{
+  csRef<iConfigManager> config;
+  config = csQueryRegistry<iConfigManager> (object_reg);
 
   // Parse Modules in config
-  it = config->Enumerate("CsPython.Module");
+  csRef<iConfigIterator> it = config->Enumerate("CsPython.Module");
   while (it->Next())
   {
     if (!LoadModule(it->GetStr()))
@@ -257,6 +273,10 @@ bool csPython::HandleEvent(iEvent& e)
 	   indent "When Python exception is thrown, launch Python debugger\n");
 #undef indent
     handled = true;
+  }
+  else if (e.Name == csevSystemOpen (object_reg))
+  {
+    LoadComponents();
   }
   return handled;
 }

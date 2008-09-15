@@ -28,13 +28,15 @@ CS_PACKAGEINFO([Crystal Space],
 AC_CONFIG_SRCDIR([libs/Jamfile])
 AC_CONFIG_AUX_DIR([mk/autoconf])
 AC_CANONICAL_HOST
-CS_CHECK_MNO_CYGWIN
+CS_PATH_INIT
 
 
 
 #------------------------------------------------------------------------------
 # Check for compilers and linker.
 #------------------------------------------------------------------------------
+CS_CHECK_MNO_CYGWIN
+
 CS_PROG_CC
 CS_PROG_CXX
 CS_PROG_LINK

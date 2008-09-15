@@ -192,6 +192,8 @@ private:
   bool eval_matrix_row (const oper_arg & arg1, const oper_arg & arg2,
   	oper_arg & output) const;
   bool eval_matrix2gl (const oper_arg & arg1, oper_arg & output) const;
+  bool eval_matrix_transp (const oper_arg & arg1, oper_arg & output) const;
+  bool eval_matrix_inv (const oper_arg & arg1, oper_arg & output) const;
   	
   /// Internal set vector element 1 and 2
   bool eval_selt12(const oper_arg & arg1, const oper_arg & arg2,

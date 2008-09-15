@@ -24,12 +24,13 @@ if $(PYTHON.AVAILABLE) = "yes"
   save_HDRS = $(HDRS) ;
   HDRS = [ on $(swigruntime) GetVar LOCATE ] $(SEARCH_SOURCE) $(HDRS) ;
   Description cspython : "Python plugin" ;
-  Plugin cspython : cspython.h cspython.cpp pytocs.h pytocs.cpp ;
+  Plugin cspython : cspython.h cspython.cpp pytocs.h pytocs.cpp : nodefaultfilelist ;
   LinkWith cspython : crystalspace ;
   ExternalLibs cspython : PYTHON ;
   CFlags cspython : $(CSPYTHON.CFLAGS) ;
   local bindingspath = [ ConcatDirs $(LOCATE.OBJECTS) bindings python ] ;
   CFlags cspython : [ FDefines "DEFAULT_PYTHMOD_PATH=\\\"$(bindingspath)\\\"" ] ;
   MsvcCFlags cspython : "/DDEFAULT_PYTHMOD_PATH=\\\".\\\"" ;
+  FileListEntryPlugin cspython : plugin-python ;
   HDRS = $(save_HDRS) ;
 }

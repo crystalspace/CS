@@ -1,6 +1,6 @@
 <layerconfig>
 	<layer>
-		<defaultshader name="lighting_default" file="/shader/lighting/lighting_default.xml" />
+	        <defaultshader name="lighting_default_pvl" file="/shader/lighting/lighting_default_pvl.xml" />
 		<!-- Tells the shader ambient should be taken into account -
 		     this should only happen on the first pass -->
 		<shadervar name="pass do_ambient" type="integer">1</shadervar>
@@ -20,7 +20,7 @@
 		<shadertype>terrain splat</shadertype>
 	</layer>
 	<layer>
-	        <defaultshader name="lighting_default" file="/shader/lighting/lighting_default.xml" />
+	        <defaultshader name="lighting_default_pvl" file="/shader/lighting/lighting_default_pvl.xml" />
 	        <shadertype>diffuse</shadertype>
 		<!-- Practically unlimited passes -->
 		<maxlightpasses>2147483647</maxlightpasses>

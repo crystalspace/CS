@@ -26,6 +26,13 @@ rule InstallPythMod
   InstallBindingsModule $(1) : $(2) ;
 }
 
+rule FileListEntryPythMod
+{
+  local target = $($(<)_TARGET) ;
+  SEARCH on $(target) = [ on $(target) GetVar LOCATE ] ;
+  Depends filelists : [ DoFileListEntries $(target) : $(2) : $(3) ] ;
+}
+
 # USAGE:
 # Pythmod targetname : module name : src files : install dir : LinkWith : ExternalLibs : desc
 #

@@ -97,9 +97,10 @@ public:
   }
   template<typename T2>
   StandardContextSetup (const T2& other,
-    typename LightSetupType::PersistentData& lightPersistent)
+    typename LightSetupType::PersistentData& lightPersistent,
+    const LayerConfigType& layerConfig)
     : rmanager (other.rmanager), 
-      lightPersistent (lightPersistent), layerConfig (other.layerConfig),
+      lightPersistent (lightPersistent), layerConfig (layerConfig),
       recurseCount (other.recurseCount)
   {
   }
@@ -182,9 +183,11 @@ public:
       case 0:
 	{
 	  RMShadowedPSSM::ContextSetupType_Unshadowed ctxRefl (*this,
-	   rmanager->lightPersistent_unshadowed);
+	   rmanager->lightPersistent_unshadowed,
+	   rmanager->renderLayerReflect);
 	  RMShadowedPSSM::ContextSetupType_Unshadowed ctxRefr (*this,
-	   rmanager->lightPersistent_unshadowed);
+	   rmanager->lightPersistent_unshadowed,
+	   rmanager->renderLayerRefract);
 	  RMShadowedPSSM::AutoReflectRefractType_UU fxRR (
 	    rmanager->reflectRefractPersistent, ctxRefl, ctxRefr);
 	  typedef TraverseUsedSVSets<RenderTreeType,
@@ -198,9 +201,11 @@ public:
       case RMShadowedPSSM::rrShadowReflect:
 	{
 	  RMShadowedPSSM::ContextSetupType ctxRefl (*this,
-	   rmanager->lightPersistent);
+	   rmanager->lightPersistent,
+	   rmanager->renderLayerReflect);
 	  RMShadowedPSSM::ContextSetupType_Unshadowed ctxRefr (*this,
-	   rmanager->lightPersistent_unshadowed);
+	   rmanager->lightPersistent_unshadowed,
+	   rmanager->renderLayerRefract);
 	  RMShadowedPSSM::AutoReflectRefractType_SU fxRR (
 	    rmanager->reflectRefractPersistent, ctxRefl, ctxRefr);
 	  typedef TraverseUsedSVSets<RenderTreeType,
@@ -214,9 +219,11 @@ public:
       case RMShadowedPSSM::rrShadowRefract:
 	{
 	  RMShadowedPSSM::ContextSetupType_Unshadowed ctxRefl (*this,
-	   rmanager->lightPersistent_unshadowed);
+	   rmanager->lightPersistent_unshadowed,
+	   rmanager->renderLayerReflect);
 	  RMShadowedPSSM::ContextSetupType ctxRefr (*this,
-	   rmanager->lightPersistent);
+	   rmanager->lightPersistent,
+	   rmanager->renderLayerRefract);
 	  RMShadowedPSSM::AutoReflectRefractType_US fxRR (
 	    rmanager->reflectRefractPersistent, ctxRefl, ctxRefr);
 	  typedef TraverseUsedSVSets<RenderTreeType,
@@ -230,9 +237,11 @@ public:
       case RMShadowedPSSM::rrShadowReflect | RMShadowedPSSM::rrShadowRefract:
 	{
 	  RMShadowedPSSM::ContextSetupType ctxRefl (*this,
-	   rmanager->lightPersistent);
+	   rmanager->lightPersistent,
+	   rmanager->renderLayerReflect);
 	  RMShadowedPSSM::ContextSetupType ctxRefr (*this,
-	   rmanager->lightPersistent);
+	   rmanager->lightPersistent,
+	   rmanager->renderLayerRefract);
 	  RMShadowedPSSM::AutoReflectRefractType_SS fxRR (
 	    rmanager->reflectRefractPersistent, ctxRefl, ctxRefr);
 	  typedef TraverseUsedSVSets<RenderTreeType,
@@ -296,6 +305,7 @@ bool RMShadowedPSSM::RenderView (iView* view)
   contextsScannedForTargets.Empty ();
   portalPersistent.UpdateNewFrame ();
   lightPersistent.UpdateNewFrame ();
+  lightPersistent_unshadowed.UpdateNewFrame ();
   reflectRefractPersistent.UpdateNewFrame ();
 
   iSector* startSector = rview->GetThisSector ();
@@ -413,6 +423,33 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
       renderLayer);
     if (!layersValid) renderLayer.Clear();
   }
+  layersFile = cfg->GetStr (
+    "RenderManager.ShadowPSSM.Layers.Reflections", 0);
+  if (layersFile)
+  {
+    if (doVerbose)
+      csReport (objectReg, CS_REPORTER_SEVERITY_NOTIFY, messageID,
+	"Reading reflection render layers from '%s'", layersFile);
+    layersValid = CS::RenderManager::AddLayersFromFile (objectReg, layersFile,
+      renderLayerReflect);
+    if (!layersValid) renderLayerReflect = renderLayer;
+  }
+  else
+    renderLayerReflect = renderLayer;
+  layersFile = cfg->GetStr (
+    "RenderManager.ShadowPSSM.Layers.Refractions", 0);
+  if (layersFile)
+  {
+    if (doVerbose)
+      csReport (objectReg, CS_REPORTER_SEVERITY_NOTIFY, messageID,
+	"Reading refraction render layers from '%s'", layersFile);
+    layersValid = CS::RenderManager::AddLayersFromFile (objectReg, layersFile,
+      renderLayerRefract);
+    if (!layersValid) renderLayerRefract = renderLayer;
+  }
+  else
+    renderLayerRefract = renderLayer;
+  
   csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
   if (!layersValid)
   {
