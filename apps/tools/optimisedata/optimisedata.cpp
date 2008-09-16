@@ -137,20 +137,15 @@ void OptimiseData::CollectData(csString in)
           CollectData(in + lib);
           if(addonLib)
           {
-            addonLibraryNames.Push(lib.Slice(lib.FindLast('/')));
-            addonLib = false;
+            addonNames.Push(lib.Slice(lib.FindLast('/')+1));
           }
-        }
-
-        csRef<iDocumentNode> addon = top->GetNode("addon");
-        if(!addon.IsValid())
-        {
           addonLib = false;
         }
 
-        if(addonLib)
+        csRef<iDocumentNodeIterator> addonNodes = top->GetNodes("addon");
+        while(addonLib && addonNodes->HasNext())
         {
-          addonLibraries.Push(root);
+          addons.Push(addonNodes->Next());
         }
       }
     }
@@ -451,16 +446,28 @@ void OptimiseData::SortData()
       nodes = world->GetNodes();
       after = nodes->HasNext() ? nodes->Next() : 0;
     }
-    
-    // Put the 'addon' libraries first, we will assume they're depended upon.
-    for(size_t j=0; j<addonLibraryNames.GetSize(); j++)
-    {
-      csRef<iDocumentNode> lib = world->CreateNodeBefore(CS_NODE_ELEMENT, after);
-      lib->SetValue("library");
-      lib = lib->CreateNodeBefore(CS_NODE_TEXT);
-      lib->SetValue("addons" + addonLibraryNames[j] + ".addon");
-    }
 
+    // Put the 'addon' libraries first.
+    for(size_t j=0; j<addons.GetSize(); j++)
+    {
+      csRef<iDocumentNode> addon = world->CreateNodeBefore(CS_NODE_ELEMENT, after);
+      CS::DocSystem::CloneNode(addons[j], addon);
+      if(addons[j]->GetNode("params"))
+      {
+        addon->RemoveNode(addon->GetNode("params"));
+        addon = addon->CreateNodeBefore(CS_NODE_ELEMENT);
+        addon->SetValue("paramsfile");
+        addon = addon->CreateNodeBefore(CS_NODE_TEXT);
+        addon->SetValue("addons/" + addonNames[j] + ".addon");
+      }
+      else
+      {
+        addons.DeleteIndex(j);
+        addonNames.DeleteIndex(j);
+        j--;
+      }
+    }
+    
     for(size_t j=0; j<libsNeeded.GetSize(); j++)
     {
       csRef<iDocumentNode> lib = world->CreateNodeBefore(CS_NODE_ELEMENT, after);
@@ -479,12 +486,13 @@ void OptimiseData::SortData()
 
 void OptimiseData::WriteData(csString out)
 {
-  for(size_t i=0; i<addonLibraries.GetSize(); i++)
+  for(size_t i=0; i<addons.GetSize(); i++)
   {
     csRef<iDocument> addon = docSys->CreateDocument();
     csRef<iDocumentNode> addonRoot = addon->CreateRoot();
-    CS::DocSystem::CloneNode(addonLibraries[i], addonRoot);
-    csString realOut = out + "/addons" + addonLibraryNames[i];
+    addonRoot = addonRoot->CreateNodeBefore(CS_NODE_ELEMENT);
+    CS::DocSystem::CloneNode(addons[i]->GetNode("params"), addonRoot);
+    csString realOut = out + "/addons/" + addonNames[i];
     addon->Write(vfs, realOut.Append(".addon"));
   }
 

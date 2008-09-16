@@ -45,8 +45,8 @@ private:
   csRefArray<iDocumentNode> materials;
   csRefArray<iDocumentNode> meshFacts;
   csRefArray<iDocumentNode> textures;
-  csArray<csString> addonLibraryNames;
-  csRefArray<iDocumentNode> addonLibraries;
+  csRefArray<iDocumentNode> addons;
+  csArray<csString> addonNames;
   bool addonLib;
 
   // For sorting.
