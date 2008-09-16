@@ -39,13 +39,15 @@ private:
   iVFS* vfs;
 
   // For collection.
-  csRefArray<iDocumentNode> libraries;
   csArray<csString> mapNames;
   csArray<csString> mapInPaths;
   csRefArray<iDocumentNode> maps;
   csRefArray<iDocumentNode> materials;
   csRefArray<iDocumentNode> meshFacts;
   csRefArray<iDocumentNode> textures;
+  csArray<csString> addonLibraryNames;
+  csRefArray<iDocumentNode> addonLibraries;
+  bool addonLib;
 
   // For sorting.
   csRefArray<iDocument> meshFactsOut;

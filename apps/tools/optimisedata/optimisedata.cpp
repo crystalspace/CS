@@ -34,6 +34,7 @@ CS_IMPLEMENT_APPLICATION
 OptimiseData::OptimiseData(iObjectRegistry* objReg, iVFS* vfs) : objReg(objReg),
   vfs(vfs)
 {
+  addonLib = false;
   docSys.AttachNew(new csTinyDocumentSystem());
 }
 
@@ -52,14 +53,15 @@ void OptimiseData::Run(csString in, csString out)
 void OptimiseData::CollectData(csString in)
 {
   csRef<iStringArray> files = vfs->FindFiles(in);
+  if(files->IsEmpty())
+  {
+    files->Push(in);
+  }
+
   for(size_t i=0; i<files->GetSize(); i++)
   {
     csRef<iFile> file = vfs->Open(files->Get(i), VFS_FILE_READ);
-    if(!file.IsValid())
-    {
-      CollectData(files->Get(i));
-    }
-    else
+    if(file.IsValid())
     {
       csRef<iDocument> doc = docSys->CreateDocument();
       doc->Parse(file);
@@ -73,11 +75,7 @@ void OptimiseData::CollectData(csString in)
         }
 
         csRef<iDocumentNode> top = root->GetNode("library");
-        if(top.IsValid())
-        {
-          libraries.Push(top);
-        }
-        else
+        if(!top.IsValid())
         {
           top = root->GetNode("world");
           if(top.IsValid())
@@ -105,6 +103,7 @@ void OptimiseData::CollectData(csString in)
         csRef<iDocumentNode> node = top->GetNode("textures");
         if(node.IsValid())
         {
+          addonLib = false;
           csRef<iDocumentNodeIterator> textureNodes = node->GetNodes("texture");
           while(textureNodes->HasNext())
           {
@@ -115,6 +114,7 @@ void OptimiseData::CollectData(csString in)
         node = top->GetNode("materials");
         if(node.IsValid())
         {
+          addonLib = false;
           csRef<iDocumentNodeIterator> materialNodes = node->GetNodes("material");
           while(materialNodes->HasNext())
           {
@@ -125,14 +125,33 @@ void OptimiseData::CollectData(csString in)
         meshfacts = top->GetNodes("meshfact");
         while(meshfacts->HasNext())
         {
+          addonLib = false;
           meshFacts.PushSmart(meshfacts->Next());
         }
 
         csRef<iDocumentNodeIterator> libraries = top->GetNodes("library");
         while(libraries->HasNext())
         {
-          CollectData(libraries->Next()->GetContentsValue());
-        }        
+          csString lib = libraries->Next()->GetContentsValue();
+          addonLib = true;
+          CollectData(in + lib);
+          if(addonLib)
+          {
+            addonLibraryNames.Push(lib.Slice(lib.FindLast('/')));
+            addonLib = false;
+          }
+        }
+
+        csRef<iDocumentNode> addon = top->GetNode("addon");
+        if(!addon.IsValid())
+        {
+          addonLib = false;
+        }
+
+        if(addonLib)
+        {
+          addonLibraries.Push(root);
+        }
       }
     }
   }
@@ -207,54 +226,65 @@ void OptimiseData::SortData()
       }
     }
 
-    csRef<iDocumentNodeIterator> meshes = meshFact->GetNodes("meshfact");
-    while(meshes->HasNext())
+    csRef<iDocumentNodeIterator> undermeshes = meshFact->GetNodes("meshfact");
+    while(undermeshes->HasNext())
     {
-      csRef<iDocumentNode> undermesh = meshes->Next();
-      csRef<iDocumentNodeIterator> submeshes = undermesh->GetNodes("submesh");
-      bool first = true;
-
-      csRefArray<iDocumentNode> tempMats;
-      while((first && undermesh->GetNode("material")) || submeshes->HasNext())
+      csRef<iDocumentNode> undermesh = undermeshes->Next();
+      csRef<iDocumentNode> params = undermesh->GetNode("params");
+      if(params.IsValid())
       {
-        csString materialName;
-        if(first && undermesh->GetNode("material"))
-        {
-          materialName = undermesh->GetNode("material")->GetContentsValue();
-          first = false;
-        }
-        else if(submeshes->HasNext())
-        {
-          materialName = submeshes->Next()->GetNode("material")->GetContentsValue();
-        }
+        csRef<iDocumentNodeIterator> submeshes = params->GetNodes("submesh");
+        bool first = true;
 
-        bool hasMaterialDecl = false;
-
-        csRef<iDocumentNode> material;
-        for(size_t j=0; j<materials.GetSize(); j++)
+        while((first && params->GetNode("material")) || submeshes->HasNext())
         {
-          material = materials[j];
-          if(materialName.Compare(material->GetAttributeValue("name")))
+          csString materialName;
+          if(first && params->GetNode("material"))
           {
-            hasMaterialDecl = true;
-            break;
+            materialName = params->GetNode("material")->GetContentsValue();
+            first = false;
           }
-        }
+          else if(submeshes->HasNext())
+          {
+            csRef<iDocumentNode> submesh = submeshes->Next();
+            if(submesh->GetNode("material"))
+            {
+              materialName = submesh->GetNode("material")->GetContentsValue();
+            }
+            else
+            {
+              continue;
+            }
+          }
 
-        if(!hasMaterialDecl)
-        {
-          // Assume material name is also texture name.
-          material = tempDocRoot->CreateNodeBefore(CS_NODE_ELEMENT);
-          material->SetValue("material");
-          material->SetAttribute("name", materialName);
-          csRef<iDocumentNode> materialTex = material->CreateNodeBefore(CS_NODE_ELEMENT);
-          materialTex->SetValue("texture");
-          materialTex = materialTex->CreateNodeBefore(CS_NODE_TEXT);
-          materialTex->SetValue(materialName);
-          materials.Push(material);
-        }
+          bool hasMaterialDecl = false;
 
-        tempMats.Push(material);
+          csRef<iDocumentNode> material;
+          for(size_t j=0; j<materials.GetSize(); j++)
+          {
+            material = materials[j];
+            if(materialName.Compare(material->GetAttributeValue("name")))
+            {
+              hasMaterialDecl = true;
+              break;
+            }
+          }
+
+          if(!hasMaterialDecl)
+          {
+            // Assume material name is also texture name.
+            material = tempDocRoot->CreateNodeBefore(CS_NODE_ELEMENT);
+            material->SetValue("material");
+            material->SetAttribute("name", materialName);
+            csRef<iDocumentNode> materialTex = material->CreateNodeBefore(CS_NODE_ELEMENT);
+            materialTex->SetValue("texture");
+            materialTex = materialTex->CreateNodeBefore(CS_NODE_TEXT);
+            materialTex->SetValue(materialName);
+            materials.Push(material);
+          }
+
+          tempMats.PushSmart(material);
+        }
       }
     }
 
@@ -380,6 +410,16 @@ void OptimiseData::SortData()
           libsNeeded.PushSmart(meshobjFact->GetContentsValue()); 
         }
       }
+
+      csRef<iDocumentNodeIterator> meshRefs = sector->GetNodes("meshref");
+      while(meshRefs->HasNext())
+      {
+        csRef<iDocumentNode> fact = meshRefs->Next()->GetNode("factory");
+        if(fact.IsValid())
+        {
+          libsNeeded.PushSmart(fact->GetContentsValue());
+        }
+      }
     }
 
     // Add meshfact libs after the plugins and shaders.
@@ -412,6 +452,14 @@ void OptimiseData::SortData()
       after = nodes->HasNext() ? nodes->Next() : 0;
     }
     
+    // Put the 'addon' libraries first, we will assume they're depended upon.
+    for(size_t j=0; j<addonLibraryNames.GetSize(); j++)
+    {
+      csRef<iDocumentNode> lib = world->CreateNodeBefore(CS_NODE_ELEMENT, after);
+      lib->SetValue("library");
+      lib = lib->CreateNodeBefore(CS_NODE_TEXT);
+      lib->SetValue("addons" + addonLibraryNames[j] + ".addon");
+    }
 
     for(size_t j=0; j<libsNeeded.GetSize(); j++)
     {
@@ -431,6 +479,15 @@ void OptimiseData::SortData()
 
 void OptimiseData::WriteData(csString out)
 {
+  for(size_t i=0; i<addonLibraries.GetSize(); i++)
+  {
+    csRef<iDocument> addon = docSys->CreateDocument();
+    csRef<iDocumentNode> addonRoot = addon->CreateRoot();
+    CS::DocSystem::CloneNode(addonLibraries[i], addonRoot);
+    csString realOut = out + "/addons" + addonLibraryNames[i];
+    addon->Write(vfs, realOut.Append(".addon"));
+  }
+
   for(size_t i=0; i<meshFactsOut.GetSize(); i++)
   {
     csRef<iDocument> meshFact = meshFactsOut[i];
