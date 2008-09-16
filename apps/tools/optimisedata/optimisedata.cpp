@@ -166,7 +166,15 @@ void OptimiseData::SortData()
         }
         else if(submeshes->HasNext())
         {
-          materialName = submeshes->Next()->GetNode("material")->GetContentsValue();
+          csRef<iDocumentNode> submesh = submeshes->Next();
+          if(submesh->GetNode("material"))
+          {
+            materialName = submesh->GetNode("material")->GetContentsValue();
+          }
+          else
+          {
+            continue;
+          }
         }
 
         bool hasMaterialDecl = false;
@@ -254,32 +262,35 @@ void OptimiseData::SortData()
     for(size_t j=0; j<tempMats.GetSize(); j++)
     {
       bool hasTextureDecl = false;
-      csString textureName = tempMats[j]->GetNode("texture")->GetContentsValue();
-      csRef<iDocumentNode> texture;
-      for(size_t k=0; k<textures.GetSize(); k++)
+      if(tempMats[j]->GetNode("texture"))
       {
-        texture = textures[k];
-        if(textureName.Compare(texture->GetAttributeValue("name")))
+        csString textureName = tempMats[j]->GetNode("texture")->GetContentsValue();
+        csRef<iDocumentNode> texture;
+        for(size_t k=0; k<textures.GetSize(); k++)
         {
-          hasTextureDecl = true;
-          break;
+          texture = textures[k];
+          if(textureName.Compare(texture->GetAttributeValue("name")))
+          {
+            hasTextureDecl = true;
+            break;
+          }
         }
-      }
 
-      if(!hasTextureDecl)
-      {
-        // Assume texture name is also file name.
-        texture = tempDocRoot->CreateNodeBefore(CS_NODE_ELEMENT);
-        texture->SetValue("texture");
-        texture->SetAttribute("name", textureName);
-        csRef<iDocumentNode> textureFile = texture->CreateNodeBefore(CS_NODE_ELEMENT);
-        textureFile->SetValue("file");
-        textureFile = textureFile->CreateNodeBefore(CS_NODE_TEXT);
-        textureFile->SetValue(textureName);
-        textures.Push(texture);
-      }
+        if(!hasTextureDecl)
+        {
+          // Assume texture name is also file name.
+          texture = tempDocRoot->CreateNodeBefore(CS_NODE_ELEMENT);
+          texture->SetValue("texture");
+          texture->SetAttribute("name", textureName);
+          csRef<iDocumentNode> textureFile = texture->CreateNodeBefore(CS_NODE_ELEMENT);
+          textureFile->SetValue("file");
+          textureFile = textureFile->CreateNodeBefore(CS_NODE_TEXT);
+          textureFile->SetValue(textureName);
+          textures.Push(texture);
+        }
 
-      tempTexs.Push(texture);
+        tempTexs.Push(texture);
+      }
     }
 
     // Create new output doc.
