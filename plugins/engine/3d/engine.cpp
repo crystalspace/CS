@@ -1166,7 +1166,7 @@ iCacheManager* csEngine::GetCacheManager ()
   return cacheManager;
 }
 
-void csEngine::AddMeshAndChildren (iMeshWrapper* mesh)
+THREADED_CALLABLE_IMPL1(csEngine, AddMeshAndChildren, iMeshWrapper* mesh)
 {
   meshes.Add (mesh);
   // @@@ Consider no longer putting child meshes on main engine list???
@@ -1179,6 +1179,8 @@ void csEngine::AddMeshAndChildren (iMeshWrapper* mesh)
     if (mesh)
       AddMeshAndChildren (mesh);
   }
+
+  return true;
 }
 
 void csEngine::ShineLights (iCollection *collection, iProgressMeter *meter)

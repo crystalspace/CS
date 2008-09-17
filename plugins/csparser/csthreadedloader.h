@@ -512,6 +512,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     THREADED_CALLABLE_DECL2(csThreadedLoader, AddObjectToSector, csLoaderReturn,
       csRef<iMovable>, movable, csRef<iSector>, sector, false, false);
 
+    THREADED_CALLABLE_DECL4(csThreadedLoader, LoadMeshRef, csLoaderReturn, csRef<iDocumentNode>,
+      node, csRef<iSector>, sector, csRef<iLoaderContext>, ldr_context, csRef<iStreamSource>,
+      ssource, true, false);
+
     /**
     * Load the mesh object from the map file.
     * This version will parse FACTORY statement to directly create

@@ -2064,26 +2064,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_MESHREF:
         {
-          const char* meshname = child->GetAttributeValue ("name");
-          if (!meshname)
-          {
-            SyntaxService->ReportError (
-              "crystalspace.maploader.load.meshobject",
-              child, "'meshref' requires a name in sector '%s'!",
-              secname ? secname : "<noname>");
-            return 0;
-          }
-          csRef<iMeshWrapper> mesh = LoadMeshObjectFromFactory (ldr_context,
-            child, ssource);
-          if (!mesh)
-          {
-            // Error is already reported.
-            return 0;
-          }
-          mesh->QueryObject ()->SetName (meshname);
-          mesh->GetMovable ()->SetSector (sector);
-          mesh->GetMovable ()->UpdateMove ();
-          Engine->AddMeshAndChildren (mesh);
+          LoadMeshRef(child, sector, ldr_context, ssource);
         }
         break;
       case XMLTOKEN_TRIMESH:

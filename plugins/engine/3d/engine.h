@@ -202,7 +202,8 @@ using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
  * This class manages all components which comprise a 3D world including
  * sectors, polygons, curves, mesh objects, etc.
  */
-class csEngine : public scfImplementationExt5<csEngine, csObject,
+class csEngine : public ThreadedCallable<csEngine>,
+  public scfImplementationExt5<csEngine, csObject,
   iEngine, iComponent, iPluginConfig, iDebugHelper, iEventHandler>
 {
   // friends
@@ -239,6 +240,11 @@ public:
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject();
+
+  iObjectRegistry* GetObjectRegistry() const
+  {
+    return objectRegistry;
+  }
 
   //-- Preparation and relighting methods
   virtual bool Prepare (iProgressMeter* meter = 0);
@@ -383,7 +389,8 @@ public:
   	const char* name, const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos);
 
-  virtual void AddMeshAndChildren (iMeshWrapper* mesh);
+  THREADED_CALLABLE_DECL1(csEngine, AddMeshAndChildren, csThreadReturn, iMeshWrapper*, mesh,
+    false, false);
 
   virtual csPtr<iMeshWrapperIterator> GetNearbyMeshes (iSector* sector,
     const csVector3& pos, float radius, bool crossPortals = true );

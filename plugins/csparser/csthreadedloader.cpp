@@ -966,15 +966,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_MESHREF:
         {
-          csRef<iMeshWrapper> mesh = LoadMeshObjectFromFactory (ldr_context,
-            child, ssource);
-          if (!mesh)
-          {
-            // Error is already reported.
-            return false;
-          }
-          mesh->QueryObject ()->SetName (child->GetAttributeValue ("name"));
-          Engine->AddMeshAndChildren (mesh);
+          LoadMeshRef(child, 0, ldr_context, ssource);
         }
         break;
       case XMLTOKEN_MESHOBJ:
@@ -1650,16 +1642,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_MESHREF:
         {
-          csRef<iMeshWrapper> sp = LoadMeshObjectFromFactory (ldr_context,
-            child, ssource);
-          if (!sp)
-          {
-            // Error is already reported.
-            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
-            return false;
-          }
-          sp->QueryObject ()->SetName (child->GetAttributeValue ("name"));
-          sp->QuerySceneNode ()->SetParent (mesh->QuerySceneNode ());
+          LoadMeshRef(child, 0, ldr_context, ssource);
         }
         break;
       case XMLTOKEN_MESHOBJ:
@@ -2000,6 +1983,35 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       movable->SetSector(sector);
       movable->UpdateMove();
       return true;
+  }
+
+  THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadMeshRef, csRef<iDocumentNode> node,
+    csRef<iSector> sector, csRef<iLoaderContext> ldr_context, csRef<iStreamSource> ssource)
+  {
+    const char* meshname = node->GetAttributeValue ("name");
+    if (!meshname)
+    {
+      SyntaxService->ReportError (
+        "crystalspace.maploader.load.meshobject",
+        node, "'meshref' requires a name in sector '%s'!",
+        sector && sector->QueryObject()->GetName() ? sector->QueryObject()->GetName() : "<noname>");
+      return false;
+    }
+    csRef<iMeshWrapper> mesh = LoadMeshObjectFromFactory (ldr_context,
+      node, ssource);
+    if (!mesh)
+    {
+      // Error is already reported.
+      return false;
+    }
+    mesh->QueryObject ()->SetName (meshname);
+    if(sector)
+    {
+      mesh->GetMovable ()->SetSector (sector);
+      mesh->GetMovable ()->UpdateMove ();
+    }
+    Engine->AddMeshAndChildren (mesh);
+    return true;
   }
 
   bool csThreadedLoader::LoadLodControl(iLODControl* lodctrl, iDocumentNode* node)

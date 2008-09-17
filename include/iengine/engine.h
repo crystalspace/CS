@@ -34,6 +34,7 @@
 
 #include "iengine/collection.h"
 #include "iengine/light.h"
+#include "iutil/threadmanager.h"
 
 class csBox3;
 class csColor;
@@ -712,7 +713,7 @@ struct iEngine : public virtual iBase
    * Convenience function to add a mesh and all children of that
    * mesh to the engine.
    */
-  virtual void AddMeshAndChildren (iMeshWrapper* mesh) = 0;
+  THREADED_INTERFACE1(AddMeshAndChildren, iMeshWrapper* mesh);
 
   /**
    * This routine returns an iterator to iterate over
