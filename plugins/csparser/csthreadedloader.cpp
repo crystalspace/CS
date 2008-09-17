@@ -3631,6 +3631,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           const char* factname = child->GetAttributeValue ("name");
           float maxdist = child->GetAttributeValueAsFloat ("maxdist");
           iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+          while(!fact && failedMeshFacts->Find(factname) == csArrayItemNotFound)
+          {
+            fact = ldr_context->FindMeshFactory (factname);
+          }
           if (!fact)
           {
             SyntaxService->ReportError (
