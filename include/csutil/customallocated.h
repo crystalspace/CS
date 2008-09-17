@@ -21,6 +21,8 @@
 
 #include "csutil/custom_new_disable.h"
 
+class csMemoryPool;
+
 /**\file
  * Base class to allocate subclasses with cs_malloc().
  */
@@ -43,7 +45,7 @@ namespace CS
      *   and can thus be empty; derivation is supported through templating.
      *   (For details see http://www.cantrip.org/emptyopt.html .)
      */
-    class CustomAllocated
+    class CS_CRYSTALSPACE_EXPORT CustomAllocated
     {
     public:
       // Potentially throwing versions
@@ -88,6 +90,16 @@ namespace CS
 
       CS_FORCEINLINE void operator delete(void*, void*) throw() { }
       CS_FORCEINLINE void operator delete[](void*, void*) throw() { }
+
+      // csMemoryPool versions
+      CS_FORCEINLINE void* operator new(size_t n, csMemoryPool& p) { return MemPoolAlloc(n, p); }
+      CS_FORCEINLINE void* operator new(size_t n, csMemoryPool* p) { return MemPoolAlloc(n, *p); }
+      CS_FORCEINLINE void operator delete(void* /*n*/, csMemoryPool& /*p*/) { }
+      CS_FORCEINLINE void operator delete(void* /*n*/, csMemoryPool* /*p*/) { }
+    private:
+      static void* MemPoolAlloc(size_t n, csMemoryPool& p);
+
+    public:
     
     #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
       CS_FORCEINLINE void* operator new (size_t s, void*, int)
