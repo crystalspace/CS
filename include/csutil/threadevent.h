@@ -704,9 +704,11 @@ public:
   template<typename T>
   void const* Store(T* p)
   {
-    T* ptr = new (this) T;
-    *ptr = *p;
-    return (void const*)ptr;
+    T* ptr = new T();
+    T* newp = (T*)csMemoryPool::Store(ptr, sizeof(T));
+    delete ptr;
+    *newp = *p;
+    return (void const*)newp;
   }
 };
 

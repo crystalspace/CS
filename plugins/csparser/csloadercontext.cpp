@@ -318,7 +318,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       return 0;
     }
 
-    iShader* shader;
+    iShader* shader = 0;
 
     // Always look up builtin shaders globally
     if(!collection || (name && *name == '*'))
