@@ -2301,10 +2301,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return 0;
   }
 
-  THREADED_CALLABLE_IMPL5(csThreadedLoader, ParseAddOn, csRef<iLoaderPlugin> plugin,
+  THREADED_CALLABLE_IMPL6(csThreadedLoader, ParseAddOn, csRef<iLoaderPlugin> plugin,
     csRef<iDocumentNode> node, csRef<iStreamSource> ssource, csRef<iLoaderContext> ldr_context,
-    csRef<iBase> context)
+    csRef<iBase> context, const char* dir)
   {
+    if(dir)
+    {
+      vfs->ChDir(dir);
+    }
     csRef<iBase> base = plugin->Parse(node, ssource, ldr_context, context, failedMeshFacts);
     ret->SetResult(base);
     return base.IsValid();    

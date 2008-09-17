@@ -624,9 +624,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     iRenderLoop* ParseRenderLoop (iDocumentNode* node, bool& set);
 
     /// Parse a addon.
-    THREADED_CALLABLE_DECL5(csThreadedLoader, ParseAddOn, csLoaderReturn,
+    THREADED_CALLABLE_DECL6(csThreadedLoader, ParseAddOn, csLoaderReturn,
       csRef<iLoaderPlugin>, plugin, csRef<iDocumentNode>, node, csRef<iStreamSource>, ssource,
-      csRef<iLoaderContext>, ldr_context, csRef<iBase>, context, false, true);
+      csRef<iLoaderContext>, ldr_context, csRef<iBase>, context, const char*, dir, false, true);
 
     /// Parse a addon (binary plugin).
     THREADED_CALLABLE_DECL5(csThreadedLoader, ParseAddOnBinary, csLoaderReturn,

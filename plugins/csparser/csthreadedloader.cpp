@@ -2135,7 +2135,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if(plug->IsThreadSafe())
       {
         csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-        if(!ParseAddOnTC(itr, plug, node, ssource, ldr_context, context))
+        if(!ParseAddOnTC(itr, plug, node, ssource, ldr_context, context, vfs->GetCwd()))
         {
           return false;
         }
@@ -2143,7 +2143,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
       else
       {
-        csRef<iThreadReturn> itr = ParseAddOn(plug, node, ssource, ldr_context, context);
+        csRef<iThreadReturn> itr = ParseAddOn(plug, node, ssource, ldr_context, context, vfs->GetCwd());
         if(!itr->WasSuccessful())
         {
           return false;
@@ -2188,7 +2188,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             if(plug->IsThreadSafe())
             {
               csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-              if(!ParseAddOnTC(itr, plug, child, ssource, ldr_context, context))
+              if(!ParseAddOnTC(itr, plug, child, ssource, ldr_context, context, vfs->GetCwd()))
               {
                 return false;
               }
@@ -2196,7 +2196,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             }
             else
             {
-              csRef<iThreadReturn> itr = ParseAddOn(plug, child, ssource, ldr_context, context);
+              csRef<iThreadReturn> itr = ParseAddOn(plug, child, ssource, ldr_context, context, vfs->GetCwd());
               if(!itr->WasSuccessful())
               {
                 return false;
@@ -2362,7 +2362,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           if(plug->IsThreadSafe())
           {
             csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-            if(!ParseAddOnTC(itr, plug, paramsnode, ssource, ldr_context, context))
+            if(!ParseAddOnTC(itr, plug, paramsnode, ssource, ldr_context, context, vfs->GetCwd()))
             {
               return false;
             }
@@ -2370,7 +2370,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
           else
           {
-            csRef<iThreadReturn> itr = ParseAddOn(plug, paramsnode, ssource, ldr_context, context);
+            csRef<iThreadReturn> itr = ParseAddOn(plug, paramsnode, ssource, ldr_context, context, vfs->GetCwd());
             if(!itr->WasSuccessful())
             {
               return false;
