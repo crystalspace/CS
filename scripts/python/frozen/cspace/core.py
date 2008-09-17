@@ -690,6 +690,7 @@ class csInitializer(object):
     CreateObjectRegistry = staticmethod(_core.csInitializer_CreateObjectRegistry)
     CreatePluginManager = staticmethod(_core.csInitializer_CreatePluginManager)
     CreateEventQueue = staticmethod(_core.csInitializer_CreateEventQueue)
+    CreateThreadManager = staticmethod(_core.csInitializer_CreateThreadManager)
     CreateVirtualClock = staticmethod(_core.csInitializer_CreateVirtualClock)
     CreateCommandLineParser = staticmethod(_core.csInitializer_CreateCommandLineParser)
     CreateVerbosityManager = staticmethod(_core.csInitializer_CreateVerbosityManager)
@@ -718,6 +719,7 @@ csInitializer__InitializeSCF = _core.csInitializer__InitializeSCF
 csInitializer_CreateObjectRegistry = _core.csInitializer_CreateObjectRegistry
 csInitializer_CreatePluginManager = _core.csInitializer_CreatePluginManager
 csInitializer_CreateEventQueue = _core.csInitializer_CreateEventQueue
+csInitializer_CreateThreadManager = _core.csInitializer_CreateThreadManager
 csInitializer_CreateVirtualClock = _core.csInitializer_CreateVirtualClock
 csInitializer_CreateCommandLineParser = _core.csInitializer_CreateCommandLineParser
 csInitializer_CreateVerbosityManager = _core.csInitializer_CreateVerbosityManager
@@ -772,7 +774,6 @@ class iReporterListener(iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def Report(*args): return _core.iReporterListener_Report(*args)
     scfGetVersion = staticmethod(_core.iReporterListener_scfGetVersion)
     __swig_destroy__ = _core.delete_iReporterListener
     __del__ = lambda self : None;
@@ -924,6 +925,7 @@ class iVFS(iBase):
     __repr__ = _swig_repr
     def ChDir(*args): return _core.iVFS_ChDir(*args)
     def GetCwd(*args): return _core.iVFS_GetCwd(*args)
+    def SetSyncDir(*args): return _core.iVFS_SetSyncDir(*args)
     def PushDir(*args): return _core.iVFS_PushDir(*args)
     def PopDir(*args): return _core.iVFS_PopDir(*args)
     def ExpandPath(*args): return _core.iVFS_ExpandPath(*args)
@@ -1565,7 +1567,6 @@ class iPluginManager(iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def LoadPluginAlways(*args): return _core.iPluginManager_LoadPluginAlways(*args)
     def UnloadPlugin(*args): return _core.iPluginManager_UnloadPlugin(*args)
     def RegisterPlugin(*args): return _core.iPluginManager_RegisterPlugin(*args)
     def GetPlugins(*args): return _core.iPluginManager_GetPlugins(*args)
