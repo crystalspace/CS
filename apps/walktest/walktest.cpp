@@ -1281,16 +1281,17 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     delete meter;
   }
 
+  csTicks stop_time = csGetTicks ();
+  csPrintf ("\nLevel load time: %g seconds.\n",
+      float (stop_time-start_time) / 1000.0); fflush (stdout);
+
   if (!cmdline->GetOption ("noprecache"))
   {
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "Precaching all things...");
+    csTicks start = csGetTicks ();
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Precaching all things...\n");
     Engine->PrecacheDraw ();
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "Precaching finished...");
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "\nPrecaching finished... took %g seconds.\n", (csGetTicks()-start)/1000.0f);
   }
-
-  csTicks stop_time = csGetTicks ();
-  csPrintf ("Total level load time: %g seconds\n",
-      float (stop_time-start_time) / 1000.0); fflush (stdout);
 
   Create2DSprites ();
 
