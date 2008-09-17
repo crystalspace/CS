@@ -1309,7 +1309,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
       case PARTYPE_LIGHT:
         {
-          iLight* l = Engine->FindLight (parname);
+          iLight* l = ldr_context->FindLight (parname);
           if (l) value = l;
         }
         break;
@@ -1317,7 +1317,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         value = ldr_context->FindMeshObject (parname);
         break;
       case PARTYPE_MATERIAL:
-        value = Engine->FindMaterial (parname);
+        value = ldr_context->FindMaterial (parname);
         break;
       case PARTYPE_SECTOR:
         value = ldr_context->FindSector (parname);
