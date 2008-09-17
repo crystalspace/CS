@@ -29,6 +29,10 @@
     </vproc>
   <?Endtemplate?>
   <?AddToList PassMappings Pass_Skinning ?>
+  <?Template MyPass ?>
+        <buffer source="generic 0" destination="Position" />
+  <?Endtemplate?>
+  <?AddToList PassMappings MyPass?>
   <?endif ?>
 <?EndGlue?>
 </include>
