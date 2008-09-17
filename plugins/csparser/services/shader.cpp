@@ -357,6 +357,7 @@ csRef<iShader> csTextSyntaxService::ParseShaderRef (
   {
     csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
     csVfsDirectoryChanger dirChanger (vfs);
+    dirChanger.ChangeTo("/shader/");
     csString filename (shaderFileName);
     csRef<iFile> shaderFile = vfs->Open (filename, VFS_FILE_READ);
 
