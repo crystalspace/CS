@@ -82,7 +82,7 @@ namespace genmeshify
     }
 
     csRef<iMeshFactoryWrapper> mfw = app->engine->CreateMeshFactory (
-      "crystalspace.mesh.object.genmesh", 0);
+      "crystalspace.mesh.object.genmesh", 0, true);
     if (!mfw)
     {
       app->Report ("Could not create genmesh factory");

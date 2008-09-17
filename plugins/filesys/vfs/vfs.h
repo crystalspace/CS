@@ -26,6 +26,7 @@
 #include "csutil/refcount.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/threading/mutex.h"
+#include "csutil/threading/tls.h"
 #include "csutil/stringarray.h"
 #include "iutil/vfs.h"
 #include "iutil/eventh.h"
@@ -139,7 +140,15 @@ private:
 
   // Current working directory (in fact, the automatically-added prefix path)
   // NOTE: cwd ALWAYS ends in '/'!
-  char *cwd;
+  CS::Threading::ThreadLocal<char*> cwd;
+  // True for each thread has init its current dir.
+  csArray<bool> threadInit;
+  // Which element in the init array we are.
+  CS::Threading::ThreadLocal<size_t> initElem;
+  // True if SetSyncDir has been called.
+  bool syncDir;
+  // Dir to sync to.
+  char* mainDir;
   // The installation directory (the value of $@)
   char *basedir;
   // Full path of application's resource directory (the value of $*)
@@ -150,7 +159,7 @@ private:
   // The initialization file
   csConfigFile config;
   // Directory stack (used in PushDir () and PopDir ())
-  csStringArray dirstack;
+  CS::Threading::ThreadLocal<csStringArray*> dirstack;
   // Reference to the object registry.
   iObjectRegistry *object_reg;
   // ChDirAuto() may need to generate unique temporary names for mount points.
@@ -180,11 +189,17 @@ public:
   /// Get verbosity flags.
   unsigned int GetVerbosity() const { return verbosity; }
 
+  /**
+   * Set thread current dir sync.
+   * It is important to use this carefully. This will reset the current dir
+   * for all threads so that they are in the same place.
+   */
+  virtual void SetSyncDir(const char *Path);
+
   /// Set current working directory
   virtual bool ChDir (const char *Path);
   /// Get current working directory
-  virtual const char *GetCwd () const
-  { return cwd; }
+  virtual const char *GetCwd ();
 
   /// Push current directory
   virtual void PushDir (char const* Path = 0);
@@ -197,13 +212,13 @@ public:
    * If IsDir is true, expanded path ends in an '/', otherwise no.
    */
   virtual csPtr<iDataBuffer> ExpandPath (
-  	const char *Path, bool IsDir = false) const;
+  	const char *Path, bool IsDir = false);
 
   /// Check whenever a file exists
-  virtual bool Exists (const char *Path) const;
+  virtual bool Exists (const char *Path);
 
   /// Find all files in a virtual directory and return an array of their names
-  virtual csPtr<iStringArray> FindFiles (const char *Path) const;
+  virtual csPtr<iStringArray> FindFiles (const char *Path);
   /// Replacement for standard fopen()
   virtual csPtr<iFile> Open (const char *FileName, int Mode);
   /**
@@ -248,7 +263,7 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   /// Query file local date/time
-  virtual bool GetFileTime (const char *FileName, csFileTime &oTime) const;
+  virtual bool GetFileTime (const char *FileName, csFileTime &oTime);
   /// Set file local date/time
   virtual bool SetFileTime (const char *FileName, const csFileTime &iTime);
 
@@ -270,8 +285,11 @@ public:
   virtual csRef<iStringArray> GetRealMountPaths (const char *VirtualPath);
 
 private:
+  /// Check the current dir is valid, and (re-)init if needed.
+  void CheckCurrentDir();
+
   /// Same as ExpandPath() but with less overhead
-  char *_ExpandPath (const char *Path, bool IsDir = false) const;
+  char *_ExpandPath (const char *Path, bool IsDir = false);
 
   /// Read and set the VFS config file
   bool ReadConfig ();
@@ -285,7 +303,7 @@ private:
 
   /// Common routine for many functions
   bool PreparePath (const char *Path, bool IsDir, VfsNode *&Node,
-    char *Suffix, size_t SuffixSize) const;
+    char *Suffix, size_t SuffixSize);
 
   /**
    * Check if a virtual path represents an actual physical mount point.  Note
@@ -302,7 +320,7 @@ private:
    * "/lib/textures" and "/lib/materials" are both valid and represented by
    * physical mount points, so true will be returned.
    */
-  bool CheckIfMounted(char const* virtual_path) const;
+  bool CheckIfMounted(char const* virtual_path);
 
   /**
    * Helper for ChDirAuto(). Checks if dir is mounted and invokes ChDir() if it

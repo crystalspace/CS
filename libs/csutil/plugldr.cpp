@@ -354,7 +354,8 @@ bool csPluginLoader::LoadPlugins ()
     r->plugin = 0;
     if (VFS && r->Tag && strcmp (r->Tag, "iVFS") == 0)
       continue;
-    r->plugin.AttachNew(plugin_mgr->LoadPlugin (r->ClassID, true));
+    csRef<iThreadReturn> itr = plugin_mgr->LoadPlugin (r->ClassID, true);
+    r->plugin.AttachNew((iBase*)itr->GetResultRefPtr());
     if (r->plugin)
     {
       if (!object_reg->Register (r->plugin, r->Tag))

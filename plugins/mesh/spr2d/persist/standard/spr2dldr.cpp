@@ -39,6 +39,7 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/stringarray.h"
 #include "imap/ldrctxt.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -161,7 +162,8 @@ bool csSprite2DFactoryLoader::ParseAnim (iDocumentNode* node,
 }
 
 csPtr<iBase> csSprite2DFactoryLoader::Parse (iDocumentNode* node,
-        iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */)
+	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */,
+  iStringArray* failed)
 {
   csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
           object_reg, "crystalspace.mesh.object.sprite.2d", false);
@@ -396,8 +398,8 @@ bool csSprite2DLoader::Initialize (iObjectRegistry* object_reg)
 
 
 csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
-                                iStreamSource*, iLoaderContext* ldr_context,
-                                iBase*)
+				iStreamSource*, iLoaderContext* ldr_context,
+				iBase*, iStringArray* failedMeshFacts)
 {
   csRef<iMeshObject> mesh;
   csRef<iSprite2DState> spr2dLook;
@@ -417,18 +419,46 @@ csPtr<iBase> csSprite2DLoader::Parse (iDocumentNode* node,
     switch (id)
     {
       case XMLTOKEN_FACTORY:
+	{
+	  const char* factname = child->GetContentsValue ();
+	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+
+    if(failedMeshFacts)
+    {
+      // Check for failed meshfact load.
+      int i = 0;
+      while(!fact)
+      {
+        if(failedMeshFacts->GetSize() != 0 &&
+          !strcmp(failedMeshFacts->Get(i), factname))
         {
-          const char* factname = child->GetContentsValue ();
-          iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
-          if (!fact)
-          {
-            synldr->ReportError (
-              "crystalspace.sprite2dloader.parse.unknownfactory",
-              child, "Couldn't find factory '%s'!", factname);
-            return 0;
-          }
-          spr2dLookFact = scfQueryInterface<iSprite2DFactoryState> (fact->GetMeshObjectFactory ());
-          mesh = fact->GetMeshObjectFactory ()->NewInstance ();
+          synldr->ReportError (
+            "crystalspace.sprite2dloader.parse.unknownfactory",
+            child, "Couldn't find factory '%s'!", factname);
+          return 0;
+        }
+
+        if(i >= (int)(failedMeshFacts->GetSize()-1))
+        {
+          fact = ldr_context->FindMeshFactory (factname);
+          i = 0;
+        }
+        else
+        {
+          i++;
+        }
+      }
+    }
+    else if(!fact)
+    {
+      synldr->ReportError (
+        "crystalspace.sprite2dloader.parse.unknownfactory",
+        child, "Couldn't find factory '%s'!", factname);
+      return 0;
+    }
+
+        spr2dLookFact = scfQueryInterface<iSprite2DFactoryState> (fact->GetMeshObjectFactory ());
+	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           spr2dLook = scfQueryInterface<iSprite2DState> (mesh);
           if (!spr2dLook)
           {

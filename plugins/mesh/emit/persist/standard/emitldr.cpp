@@ -34,6 +34,7 @@
 #include "iengine/material.h"
 #include "iutil/vfs.h"
 #include "csutil/csstring.h"
+#include "iutil/stringarray.h"
 #include "iutil/object.h"
 #include "iutil/document.h"
 #include "iutil/objreg.h"
@@ -96,7 +97,8 @@ bool csEmitFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csEmitFactoryLoader::Parse (iDocumentNode* /*node*/,
-	iStreamSource*, iLoaderContext*, iBase* /* context */)
+	iStreamSource*, iLoaderContext*, iBase* /* context */,
+  iStringArray* failed)
 {
   csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
   	object_reg, "crystalspace.mesh.object.emit");
@@ -344,7 +346,7 @@ csRef<iEmitGen3D> csEmitLoader::ParseEmit (iDocumentNode* node,
 
 csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 			    iStreamSource*, iLoaderContext* ldr_context,
-			    iBase*)
+			    iBase*, iStringArray* failedMeshFacts)
 {
   csRef<iEmitGen3D> emit;
   csRef<iMeshObject> mesh;
@@ -365,12 +367,39 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	{
 	  const char* factname = child->GetContentsValue ();
 	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
-	  if (!fact)
-	  {
-	    synldr->ReportError ("crystalspace.emitloader.parse",
-		child, "Cannot find factory '%s' for emit!", factname);
-	    return 0;
-	  }
+
+    if(failedMeshFacts)
+    {
+      // Check for failed meshfact load.
+      int i = 0;
+      while(!fact)
+      {
+        if(failedMeshFacts->GetSize() != 0 &&
+          !strcmp(failedMeshFacts->Get(i), factname))
+        {
+          synldr->ReportError ("crystalspace.emitloader.parse",
+            child, "Cannot find factory '%s' for emit!", factname);
+            return 0;
+        }
+
+        if(i >= (int)(failedMeshFacts->GetSize()-1))
+        {
+          fact = ldr_context->FindMeshFactory (factname);
+          i = 0;
+        }
+        else
+        {
+          i++;
+        }
+      }
+    }
+    else if(!fact)
+    {
+      synldr->ReportError ("crystalspace.emitloader.parse",
+        child, "Cannot find factory '%s' for emit!", factname);
+        return 0;
+    }
+
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           partstate = scfQueryInterface<iParticleState> (mesh);
           emitstate = scfQueryInterface<iEmitState> (mesh);

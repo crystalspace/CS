@@ -54,7 +54,9 @@ public:
   /// Parse the given node block and build the terrain factory
   csPtr<iBase> Parse (iDocumentNode *node,
     iStreamSource*, iLoaderContext *ldr_context,
-    iBase* context);	
+    iBase* context, iStringArray* failed);
+
+  virtual bool IsThreadSafe() { return true; }
 };
 
 /**
@@ -111,7 +113,9 @@ public:
   /// Parse the given block to create a new Terrain object
   csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context,
-    iBase *context);
+    iBase *context, iStringArray* failedMeshFacts);
+
+  virtual bool IsThreadSafe() { return true; }
 };
 
 /**

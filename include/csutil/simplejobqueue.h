@@ -43,6 +43,7 @@ public:
   virtual void PullAndRun (iJob* job);
   virtual void Unqueue (iJob* job, bool waitIfCurrent = true);
   virtual bool IsFinished ();
+  virtual int32 GetQueueCount();
   void Wait(iJob*);
 };
 

@@ -330,6 +330,14 @@ iTextureWrapper* StdLoaderContext::FindNamedTexture (const char* name,
   return result;
 }
 
+void StdLoaderContext::AddToCollection(iObject *obj)
+{
+  if(collection)
+  {
+    collection->Add(obj);
+  } 
+}
+
 //---------------------------------------------------------------------------
 
 bool csLoader::do_verbose = false;
@@ -923,10 +931,7 @@ bool csLoader::LoadLibrary (iDocumentNode* lib_node, iCollection* collection,
 
 void csLoader::AddToCollection(iLoaderContext* ldr_context, iObject* obj)
 {
-  if(ldr_context->GetCollection())
-  {
-    ldr_context->GetCollection()->Add(obj);
-  }
+  ldr_context->AddToCollection(obj);
 }
 
 void csLoader::AddChildrenToCollection (iLoaderContext* ldr_context,

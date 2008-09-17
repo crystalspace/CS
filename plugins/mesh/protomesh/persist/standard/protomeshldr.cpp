@@ -38,6 +38,7 @@
 #include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include "iutil/stringarray.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
@@ -75,7 +76,8 @@ bool csProtoFactoryLoader::Initialize (iObjectRegistry* object_reg)
 csPtr<iBase> csProtoFactoryLoader::Parse (iDocumentNode* node,
                                           iStreamSource*, 
                                           iLoaderContext* /*ldr_context*/, 
-                                          iBase* /* context */)
+                                          iBase* /* context */,
+                                          iStringArray* failed)
 {
   csRef<iPluginManager> plugin_mgr = 
     csQueryRegistry<iPluginManager> (object_reg);
@@ -281,7 +283,8 @@ bool csProtoMeshLoader::Initialize (iObjectRegistry* object_reg)
 
 
 csPtr<iBase> csProtoMeshLoader::Parse (iDocumentNode* node,
-	iStreamSource*, iLoaderContext* ldr_context, iBase*)
+	iStreamSource*, iLoaderContext* ldr_context, iBase*,
+  iStringArray* failedMeshFacts)
 {
   csRef<iMeshObject> mesh;
   csRef<iProtoMeshState> meshstate;
@@ -308,13 +311,41 @@ csPtr<iBase> csProtoMeshLoader::Parse (iDocumentNode* node,
 	{
 	  const char* factname = child->GetContentsValue ();
 	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
-	  if (!fact)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.protomeshloader.parse.unknownfactory",
-		child, "Couldn't find factory '%s'!", factname);
-	    return 0;
-	  }
+
+    if(failedMeshFacts)
+    {
+      // Check for failed meshfact load.
+      int i = 0;
+      while(!fact)
+      {
+        if(failedMeshFacts->GetSize() != 0 &&
+          !strcmp(failedMeshFacts->Get(i), factname))
+        {
+          synldr->ReportError (
+            "crystalspace.protomeshloader.parse.unknownfactory",
+            child, "Couldn't find factory '%s'!", factname);
+          return 0;
+        }
+
+        if(i >= (int)(failedMeshFacts->GetSize()-1))
+        {
+          fact = ldr_context->FindMeshFactory (factname);
+          i = 0;
+        }
+        else
+        {
+          i++;
+        }
+      }
+    }
+    else if(!fact)
+    {
+      synldr->ReportError (
+        "crystalspace.protomeshloader.parse.unknownfactory",
+        child, "Couldn't find factory '%s'!", factname);
+      return 0;
+    }
+
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  CS_ASSERT (mesh != 0);
           meshstate = scfQueryInterface<iProtoMeshState> (mesh);

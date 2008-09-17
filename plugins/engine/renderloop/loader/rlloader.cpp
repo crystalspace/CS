@@ -82,7 +82,8 @@ bool csRenderLoopLoader::ParseRenderSteps (iRenderLoop* loop,
 }
 
 csPtr<iBase> csRenderLoopLoader::Parse (iDocumentNode* node, 
-  iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/)
+  iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/,
+  iStringArray* failed)
 {
   csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
   if (!engine)

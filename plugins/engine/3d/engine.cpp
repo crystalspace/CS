@@ -42,6 +42,7 @@
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "imap/ldrctxt.h"
+#include "imap/loader.h"
 #include "imap/reader.h"
 #include "imesh/lighting.h"
 #include "iutil/cfgmgr.h"
@@ -201,6 +202,14 @@ iCameraPosition *csCameraPositionList::NewCameraPosition (const char *name)
   return cp;
 }
 
+csPtr<iCameraPosition> csCameraPositionList::CreateCameraPosition (const char *name)
+{
+  csVector3 v (0);
+  csRef<csCameraPosition> cp;
+  cp.AttachNew (new csCameraPosition (this, name, "", v, v, v));
+  return csPtr<iCameraPosition>(cp);
+}
+
 int csCameraPositionList::GetCount () const
 {
   return (int)positions.GetSize ();
@@ -218,16 +227,19 @@ int csCameraPositionList::Add (iCameraPosition *obj)
 
 bool csCameraPositionList::Remove (iCameraPosition *obj)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return positions.Delete (obj);
 }
 
 bool csCameraPositionList::Remove (int n)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return positions.DeleteIndex (n);
 }
 
 void csCameraPositionList::RemoveAll ()
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   positions.DeleteAll ();
 }
 
@@ -240,6 +252,7 @@ int csCameraPositionList::Find (
 iCameraPosition *csCameraPositionList::FindByName (
   const char *Name) const
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return positions.FindByName (Name);
 }
 
@@ -539,6 +552,57 @@ void csEngine::HandleImposters ()
   imposterUpdateQueue.Empty ();
 }
 
+void csEngine::SyncEngineLists(iThreadedLoader* loader)
+{
+  csRef<iSectorLoaderIterator> loaderSectors = loader->GetLoaderSectors();
+  while(loaderSectors->HasNext())
+  {
+    sectors.Add(loaderSectors->Next());
+  }
+  loaderSectors.Invalidate();
+
+  csRef<iMeshFactLoaderIterator> loaderMeshFactories = loader->GetLoaderMeshFactories();
+  while(loaderMeshFactories->HasNext())
+  {
+    meshFactories.Add(loaderMeshFactories->Next());
+  }
+  loaderMeshFactories.Invalidate();
+
+  csRef<iMeshLoaderIterator> loaderMeshes = loader->GetLoaderMeshes();
+  while(loaderMeshes->HasNext())
+  {
+    meshes.Add(loaderMeshes->Next());
+  }
+  loaderMeshes.Invalidate();
+
+  csRef<iCamposLoaderIterator> loaderCameraPositions = loader->GetLoaderCameraPositions();
+  while(loaderCameraPositions->HasNext())
+  {
+    cameraPositions.Add(loaderCameraPositions->Next());
+  }
+  loaderCameraPositions.Invalidate();
+
+  csRef<iTextureLoaderIterator> loaderTextures = loader->GetLoaderTextures();
+  while(loaderTextures->HasNext())
+  {
+    textures->Add(loaderTextures->Next());
+  }
+  loaderTextures.Invalidate();
+
+  csRef<iMaterialLoaderIterator> loaderMaterials = loader->GetLoaderMaterials();
+  while(loaderMaterials->HasNext())
+  {
+    materials->Add(loaderMaterials->Next());
+  }
+  loaderMaterials.Invalidate();
+
+  csRef<iSharedVarLoaderIterator> loaderSharedVariables = loader->GetLoaderSharedVariables();
+  while(loaderSharedVariables->HasNext())
+  {
+    sharedVariables->Add(loaderSharedVariables->Next());
+  }
+  loaderSharedVariables.Invalidate();
+}
 
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_FACTORY (csEngine)
@@ -1102,7 +1166,7 @@ iCacheManager* csEngine::GetCacheManager ()
   return cacheManager;
 }
 
-void csEngine::AddMeshAndChildren (iMeshWrapper* mesh)
+THREADED_CALLABLE_IMPL1(csEngine, AddMeshAndChildren, iMeshWrapper* mesh)
 {
   meshes.Add (mesh);
   // @@@ Consider no longer putting child meshes on main engine list???
@@ -1115,6 +1179,8 @@ void csEngine::AddMeshAndChildren (iMeshWrapper* mesh)
     if (mesh)
       AddMeshAndChildren (mesh);
   }
+
+  return true;
 }
 
 void csEngine::ShineLights (iCollection *collection, iProgressMeter *meter)
@@ -1785,8 +1851,7 @@ const char* csEngine::SplitCollectionName(const char* name, iCollection*& collec
 
   csString collectionPart (name, p - name);
   collection = GetCollection (collectionPart);
-  if (!collection) return 0;
-  return p+1;
+  return p;
 }
 
 iMaterialWrapper* csEngine::FindMaterial(const char* name,
@@ -2798,12 +2863,20 @@ iMaterialWrapper *csEngine::CreateMaterial (
   return wrapper;
 }
 
-iSector *csEngine::CreateSector (const char *name)
+iSector *csEngine::CreateSector (const char *name, bool addToList)
 {
   csRef<iSector> sector;
   sector.AttachNew (new csSector (this));
   sector->QueryObject ()->SetName (name);
-  sectors.Add (sector);
+
+  if(addToList)
+  {
+    sectors.Add (sector);
+  }
+  else
+  {
+    sector->IncRef();
+  }
 
   FireNewSector (sector);
 
@@ -2976,8 +3049,7 @@ csPtr<iLight> csEngine::CreateLight (
 }
 
 csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
-  const char *classId,
-  const char *name)
+  const char *classId, const char *name, bool addToList)
 {
   // WARNING! In the past this routine checked if the factory
   // was already created. This is wrong! This routine should not do
@@ -2993,13 +3065,12 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
   if (!fact) return 0;
 
   // don't pass the name to avoid a second search
-  csRef<iMeshFactoryWrapper> fwrap (CreateMeshFactory (fact, name));
+  csRef<iMeshFactoryWrapper> fwrap (CreateMeshFactory (fact, name, addToList));
   return csPtr<iMeshFactoryWrapper> (fwrap);
 }
 
 csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
-  iMeshObjectFactory *fact,
-  const char *name)
+  iMeshObjectFactory *fact, const char *name, bool addToList)
 {
   // WARNING! In the past this routine checked if the factory
   // was already created. This is wrong! This routine should not do
@@ -3009,12 +3080,16 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
   // name are still allowed.
   csMeshFactoryWrapper *mfactwrap = new csMeshFactoryWrapper (this, fact);
   if (name) mfactwrap->SetName (name);
-  GetMeshFactories ()->Add (mfactwrap);
+  if(addToList)
+  {
+    GetMeshFactories ()->Add (mfactwrap);
+  }
   fact->SetMeshFactoryWrapper ((iMeshFactoryWrapper*)mfactwrap);
   return csPtr<iMeshFactoryWrapper> (mfactwrap);
 }
 
-csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (const char *name)
+csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (const char *name, 
+                                                        bool addToList)
 {
   // WARNING! In the past this routine checked if the factory
   // was already created. This is wrong! This routine should not do
@@ -3024,7 +3099,10 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (const char *name)
   // name are still allowed.
   csMeshFactoryWrapper *mfactwrap = new csMeshFactoryWrapper (this);
   if (name) mfactwrap->SetName (name);
-  GetMeshFactories ()->Add (mfactwrap);
+  if(addToList)
+  {
+    GetMeshFactories ()->Add (mfactwrap);
+  }
   return csPtr<iMeshFactoryWrapper> (mfactwrap);
 }
 
@@ -3063,6 +3141,8 @@ public:
   virtual iCollection* GetCollection () const { return collection; }
   virtual uint GetKeepFlags() const { return keepFlags; }
   virtual bool CurrentCollectionOnly() const { return searchCollectionOnly; }
+  virtual void AddToCollection(iObject* obj);
+  bool GetVerbose() { return false; }
 };
 
 
@@ -3154,6 +3234,14 @@ iLight* EngineLoaderContext::FindLight(const char *name)
   return 0;
 }
 
+void EngineLoaderContext::AddToCollection(iObject* obj)
+{
+  if(collection)
+  {
+    collection->Add(obj);
+  }
+}
+
 //------------------------------------------------------------------------
 
 csPtr<iLoaderContext> csEngine::CreateLoaderContext (iCollection* collection,
@@ -3165,10 +3253,8 @@ csPtr<iLoaderContext> csEngine::CreateLoaderContext (iCollection* collection,
 
 //------------------------------------------------------------------------
 
-csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
-  const char *name,
-  const char *loaderClassId,
-  iDataBuffer *input)
+csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (const char *name,
+  const char *loaderClassId, iDataBuffer *input, bool addToList)
 {
   csRef<iDocumentSystem> xml (
     	csQueryRegistry<iDocumentSystem> (objectRegistry));
@@ -3185,7 +3271,7 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
       objectRegistry, loaderClassId);
   if (!plug) return 0;
 
-  csRef<iMeshFactoryWrapper> fact (CreateMeshFactory (name));
+  csRef<iMeshFactoryWrapper> fact (CreateMeshFactory (name, addToList));
   if (!fact) return 0;
 
   csRef<iLoaderContext> elctxt (CreateLoaderContext (0, true));
@@ -3347,14 +3433,15 @@ csPtr<iMeshWrapper> csEngine::CreatePortal (
 }
 
 csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
-  iMeshFactoryWrapper *factory,
-  const char *name,
-  iSector *sector,
-  const csVector3 &pos)
+  iMeshFactoryWrapper *factory, const char *name,
+  iSector *sector, const csVector3 &pos, bool addToList)
 {
   csRef<iMeshWrapper> mesh = factory->CreateMeshWrapper ();
   if (name) mesh->QueryObject ()->SetName (name);
-  GetMeshes ()->Add (mesh);
+  if(addToList)
+  {
+    GetMeshes ()->Add (mesh);
+  }
   if (sector)
   {
     mesh->GetMovable ()->SetSector (sector);
@@ -3367,14 +3454,15 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
 }
 
 csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
-  iMeshObject *mesh,
-  const char *name,
-  iSector *sector,
-  const csVector3 &pos)
+  iMeshObject *mesh, const char *name, iSector *sector,
+  const csVector3 &pos, bool addToList)
 {
   csMeshWrapper *meshwrap = new csMeshWrapper (this, mesh);
   if (name) meshwrap->SetName (name);
-  GetMeshes ()->Add ((iMeshWrapper*)meshwrap);
+  if(addToList)
+  {
+    GetMeshes ()->Add ((iMeshWrapper*)meshwrap);
+  }
   if (sector)
   {
     (meshwrap->GetCsMovable ()).csMovable::SetSector (sector);
@@ -3386,19 +3474,21 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   return csPtr<iMeshWrapper> ((iMeshWrapper*)meshwrap);
 }
 
-csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (const char *name)
+csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (const char *name,
+                                                 bool addToList)
 {
   csMeshWrapper *meshwrap = new csMeshWrapper (this);
   if (name) meshwrap->SetName (name);
-  GetMeshes ()->Add ((iMeshWrapper*)meshwrap);
+  if(addToList)
+  {
+    GetMeshes ()->Add ((iMeshWrapper*)meshwrap);
+  }
   return csPtr<iMeshWrapper> ((iMeshWrapper*)meshwrap);
 }
 
 csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
-  const char *classId,
-  const char *name,
-  iSector *sector,
-  const csVector3 &pos)
+  const char *classId, const char *name, iSector *sector,
+  const csVector3 &pos, bool addToList)
 {
   csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
       objectRegistry, classId);
@@ -3414,11 +3504,11 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
     // factory can return a working mesh object.
     mo = fact->NewInstance ();
     if (mo)
-      return CreateMeshWrapper (mo, name, sector, pos);
+      return CreateMeshWrapper (mo, name, sector, pos, addToList);
     return 0;
   }
 
-  return CreateMeshWrapper (mo, name, sector, pos);
+  return CreateMeshWrapper (mo, name, sector, pos, addToList);
 }
 
 static int CompareDelayedRemoveObject (csDelayedRemoveObject const& r1,
