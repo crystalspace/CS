@@ -238,8 +238,8 @@ void WalkTest::Help ()
   csPrintf ("  -threaded          use threaded loading (default no)\n");
   csPrintf ("  -[no]colldet       collision detection system (default '%scolldet')\n", collider_actor.HasCD () ? "" : "no");
   csPrintf ("  -[no]logo          draw logo (default '%slogo')\n", do_logo ? "" : "no");
-  csPrintf ("  -collections       load every map in a separate collection (default off)\n");
-  csPrintf ("  -dupes             check for duplicate objects in multiple maps (default off)\n");
+  csPrintf ("  -[no]collections   load every map in a separate collection (default no)\n");
+  csPrintf ("  -[no]dupes         check for duplicate objects in multiple maps (default yes)\n");
   csPrintf ("  -noprecache        after loading don't precache to speed up rendering\n");
   csPrintf ("  -bots              allow random generation of bots\n");
   csPrintf ("  -[no]saveable      enable/disable engine 'saveable' flag\n");
@@ -1203,12 +1203,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // Check if we have to load every separate map in a separate collection.
   csRef<iCommandLineParser> cmdline = 
       csQueryRegistry<iCommandLineParser> (object_reg);
-  bool do_collections = false;
-  if (cmdline->GetOption ("collections"))
-    do_collections = true;
-  bool do_dupes = false;
-  if (cmdline->GetOption ("dupes"))
-    do_dupes = true;
+  bool do_collections = cmdline->GetBoolOption ("collections");
+  bool do_dupes = cmdline->GetBoolOption ("dupes", true);
     
   if ((!do_collections) && cache_map != 0)
   {
