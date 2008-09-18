@@ -116,43 +116,43 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     iObjectRegistry* GetObjectRegistry() const { return object_reg; }
 
-    csPtr<iSectorLoaderIterator> GetLoaderSectors()
+    virtual csPtr<iSectorLoaderIterator> GetLoaderSectors()
     {
       csRef<iSectorLoaderIterator> itr;
       itr.AttachNew(new csLoaderIterator<iSector, iSectorLoaderIterator>(&loaderSectors, &sectorsLock));
       return csPtr<iSectorLoaderIterator>(itr);
     }
-    csPtr<iMeshFactLoaderIterator> GetLoaderMeshFactories()
+    virtual csPtr<iMeshFactLoaderIterator> GetLoaderMeshFactories()
     {
       csRef<iMeshFactLoaderIterator> itr;
       itr.AttachNew(new csLoaderIterator<iMeshFactoryWrapper, iMeshFactLoaderIterator>(&loaderMeshFactories, &meshfactsLock));
       return csPtr<iMeshFactLoaderIterator>(itr);
     }
-    csPtr<iMeshLoaderIterator> GetLoaderMeshes()
+    virtual csPtr<iMeshLoaderIterator> GetLoaderMeshes()
     {
       csRef<iMeshLoaderIterator> itr;
       itr.AttachNew(new csLoaderIterator<iMeshWrapper, iMeshLoaderIterator>(&loaderMeshes, &meshesLock));
       return csPtr<iMeshLoaderIterator>(itr);
     }
-    csPtr<iCamposLoaderIterator> GetLoaderCameraPositions()
+    virtual csPtr<iCamposLoaderIterator> GetLoaderCameraPositions()
     {
       csRef<iCamposLoaderIterator> itr;
       itr.AttachNew(new csLoaderIterator<iCameraPosition, iCamposLoaderIterator>(&loaderCameraPositions, &camposLock));
       return csPtr<iCamposLoaderIterator>(itr);
     }
-    csPtr<iTextureLoaderIterator> GetLoaderTextures()
+    virtual csPtr<iTextureLoaderIterator> GetLoaderTextures()
     {
       csRef<iTextureLoaderIterator> itr;
       itr.AttachNew(new csLoaderIterator<iTextureWrapper, iTextureLoaderIterator>(&loaderTextures, &texturesLock));
       return csPtr<iTextureLoaderIterator>(itr);
     }
-    csPtr<iMaterialLoaderIterator> GetLoaderMaterials()
+    virtual csPtr<iMaterialLoaderIterator> GetLoaderMaterials()
     {
       csRef<iMaterialLoaderIterator> itr;
       itr.AttachNew(new csLoaderIterator<iMaterialWrapper, iMaterialLoaderIterator>(&loaderMaterials, &materialsLock));
       return csPtr<iMaterialLoaderIterator>(itr);
     }
-    csPtr<iSharedVarLoaderIterator> GetLoaderSharedVariables()
+    virtual csPtr<iSharedVarLoaderIterator> GetLoaderSharedVariables()
     {
       csRef<iSharedVarLoaderIterator> itr;
       itr.AttachNew(new csLoaderIterator<iSharedVariable, iSharedVarLoaderIterator>(&loaderSharedVariables, &sharedvarLock));

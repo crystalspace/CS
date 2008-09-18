@@ -111,6 +111,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       return false;
     }
 
+    // Start up list sync.
+    Engine->SyncEngineLists(this);
+
     vfs = csQueryRegistry<iVFS>(object_reg);
     if(!vfs.IsValid())
     {

@@ -1299,13 +1299,10 @@ struct iEngine : public virtual iBase
   virtual void ReloadRenderManager() = 0;
   /** @} */
 
-  /**\name Loader List Sync
-   * @{ */
   /**
-   * Set the default render manager.
-   * \remarks Also replaces the iRenderManager in the object registry.
+   * Loader List Sync
    */
-  virtual void SyncEngineLists(iThreadedLoader* loader) = 0;
+  THREADED_INTERFACE1(SyncEngineLists, csRef<iThreadedLoader> loader);
   /** @} */
 };
 

@@ -552,7 +552,7 @@ void csEngine::HandleImposters ()
   imposterUpdateQueue.Empty ();
 }
 
-void csEngine::SyncEngineLists(iThreadedLoader* loader)
+THREADED_CALLABLE_IMPL1(csEngine, SyncEngineLists, csRef<iThreadedLoader> loader)
 {
   csRef<iSectorLoaderIterator> loaderSectors = loader->GetLoaderSectors();
   while(loaderSectors->HasNext())
@@ -585,7 +585,9 @@ void csEngine::SyncEngineLists(iThreadedLoader* loader)
   csRef<iTextureLoaderIterator> loaderTextures = loader->GetLoaderTextures();
   while(loaderTextures->HasNext())
   {
-    textures->Add(loaderTextures->Next());
+    iTextureWrapper* txt = loaderTextures->Next();
+    textures->Add(txt);
+    txt->GetTextureHandle()->Precache();
   }
   loaderTextures.Invalidate();
 
@@ -602,6 +604,10 @@ void csEngine::SyncEngineLists(iThreadedLoader* loader)
     sharedVariables->Add(loaderSharedVariables->Next());
   }
   loaderSharedVariables.Invalidate();
+
+  // Schedule another run.
+  SyncEngineLists(loader);
+  return true;
 }
 
 //---------------------------------------------------------------------------
@@ -1523,15 +1529,21 @@ void csEngine::PrecacheDraw (iCollection* collection)
       s->PrecacheDraw ();
   }
 
-  size_t i;
-  for (i = 0 ; i < textures->GetSize () ; i++)
+  csRef<iThreadedLoader> tloader = csQueryRegistry<iThreadedLoader>(objectRegistry);
+  if(tloader.IsValid())
   {
-    iTextureWrapper* txt = textures->Get ((int)i);
-    if (txt->GetTextureHandle ())
-      if (!collection || collection->IsParentOf(txt->QueryObject ()))
+    size_t i;
+    for (i = 0 ; i < textures->GetSize () ; i++)
+    {
+      iTextureWrapper* txt = textures->Get ((int)i);
+      if (txt->GetTextureHandle ())
       {
-        txt->GetTextureHandle ()->Precache ();
+        if (!collection || collection->IsParentOf(txt->QueryObject ()))
+        {
+          txt->GetTextureHandle ()->Precache ();
+        }
       }
+    }
   }
 }
 

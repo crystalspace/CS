@@ -666,7 +666,7 @@ public:
   /**
    * Sync engine lists with loader lists.
    */
-  virtual void SyncEngineLists(iThreadedLoader* loader);
+  THREADED_CALLABLE_DECL1(csEngine, SyncEngineLists, csThreadReturn, csRef<iThreadedLoader>, loader, false, false);
 
 private:
   // -- PRIVATE METHODS
