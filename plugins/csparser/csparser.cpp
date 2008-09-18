@@ -899,6 +899,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           const char* txtname = child->GetContentsValue ();
           texh = ldr_context->FindTexture (txtname);
+          csTicks start = csGetTicks();
+          while (!texh && (csGetTicks() - start < 60000))
+          {
+            texh = ldr_context->FindTexture (txtname);
+          }
           if (!texh)
           {
             ReportError (

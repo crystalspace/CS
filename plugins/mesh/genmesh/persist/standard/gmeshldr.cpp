@@ -117,6 +117,11 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
       {
         const char* matname = child->GetContentsValue ();
         material = ldr_context->FindMaterial (matname);
+        csTicks start = csGetTicks();
+        while(!material.IsValid() && (csGetTicks() - start < 60000))
+        {
+          material = ldr_context->FindMaterial (matname);
+        }
         if (!material.IsValid ())
         {
           synldr->ReportError (
