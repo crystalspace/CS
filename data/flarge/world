@@ -983,6 +983,9 @@
         </shader>
     </shaders>
     <materials>
+        <material name="christmasTree.png">
+            <texture>christmasTree.png</texture>
+        </material>
         <material name="tree">
             <texture>tree</texture>
         </material>

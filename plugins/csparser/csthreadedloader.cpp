@@ -3170,6 +3170,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           iMeshFactoryWrapper* t = ldr_context->FindMeshFactory (
             child->GetContentsValue ());
+          csTicks start = csGetTicks();
+          while(!t && (csGetTicks() - start < 60000))
+          {
+            t = ldr_context->FindMeshFactory (child->GetContentsValue ());
+          }
           if (!t)
           {
             SyntaxService->ReportError (
