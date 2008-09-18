@@ -1347,7 +1347,7 @@ CS_CHECK_LIB_WITH([bullet],
       btSequentialImpulseConstraintSolver* s;
       btDefaultCollisionConfiguration* c;
       btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)])],
-    [/usr/local/include/bullet/], [C++], [], [],
+    [], [C++], [], [],
     [], [], [-lbulletdynamics -lbulletcollision -lbulletmath],
     [bulletdynamics])
 
