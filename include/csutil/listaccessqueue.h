@@ -32,27 +32,46 @@ class CS_CRYSTALSPACE_EXPORT ListAccessQueue : public csRefCount
 public:
   ListAccessQueue()
   {
-    queueLock.Initialize();
   }
 
-  void Enqueue(iJob* job)
-  {
-    MutexScopedLock lock(queueLock);
-    queue.Push(job);    
+  void Enqueue(iJob* job, bool high)
+  {    
+    if(high)
+    {
+      RecursiveMutexScopedLock lock(highQueueLock);
+      highqueue.Push(job);
+    }
+    else
+    {
+      RecursiveMutexScopedLock lock(lowQueueLock);
+      lowqueue.Push(job);
+    }
   }
 
   void ProcessQueue(uint num)
   {
-    MutexScopedLock lock(queueLock);
-    for(uint i=0; i<num && queue.GetSize() != 0; i++)
     {
-      queue.PopTop()->Run();
+      // Run num jobs.
+      RecursiveMutexScopedLock lock(highQueueLock);
+      for(size_t i=0; i<num && highqueue.GetSize() != 0; i++)
+      {
+        highqueue.PopTop()->Run();
+      }
+    }
+
+    // Run one job.
+    if(lowqueue.GetSize() != 0)
+    {
+      RecursiveMutexScopedLock lock(lowQueueLock);
+      lowqueue.PopTop()->Run();
     }
   }
 
 private:
-  Mutex queueLock;
-  csFIFO<csRef<iJob> > queue;
+  RecursiveMutex lowQueueLock;
+  RecursiveMutex highQueueLock;
+  csFIFO<csRef<iJob> > highqueue;
+  csFIFO<csRef<iJob> > lowqueue;
 };
 
 #endif // __CS_CSUTIL_LISTACCESSQUEUE_H__

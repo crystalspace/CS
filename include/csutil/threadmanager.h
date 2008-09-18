@@ -45,23 +45,23 @@ public:
   void Process(uint num = 1);
   void Wait(csRef<iThreadReturn> ret);
 
-  inline void PushToQueue(bool useThreadQueue, iJob* job)
+  inline void PushToQueue(QueueType queueType, iJob* job)
   {
-    if(useThreadQueue)
+    if(queueType == THREADED)
     {
       MutexScopedLock lock(queuePushLock);
       threadQueue->Enqueue(job);
     }
     else
     {
-      listQueue->Enqueue(job);
+      listQueue->Enqueue(job, queueType == HIGH);
     }
   }
 
-  inline bool RunNow(bool useThreadQueue)
+  inline bool RunNow(QueueType queueType, bool forceQueue)
   {
-    return (IsMainThread() && !useThreadQueue) ||
-      (useThreadQueue && (waiting >= threadCount-1 || threadQueue->GetQueueCount() > 2*threadCount-1));
+    return (IsMainThread() && queueType != THREADED && !forceQueue) ||
+      (queueType == THREADED && (waiting >= threadCount-1 || threadQueue->GetQueueCount() > 2*threadCount-1));
   }
 
 protected:
@@ -106,7 +106,7 @@ private:
       if(Event.Name == parent->ProcessPerFrame ||
          Event.Name == parent->ProcessWhileWait)
       {
-        parent->Process(10);
+        parent->Process(5);
       }
       return false;
     }
@@ -161,126 +161,126 @@ private:
 };
 
 template<class T, typename A1>
-void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1), void const** &argsTC, bool useThreadQueue = true)
+void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1), void const** &argsTC, QueueType queueType)
 {
   csRef<ThreadEvent1<T, A1> > threadEvent;
   threadEvent.AttachNew(new ThreadEvent1<T, A1>(object, method, argsTC));
-  tm->PushToQueue(useThreadQueue, threadEvent);
+  tm->PushToQueue(queueType, threadEvent);
 }
 
 template<class T, typename A1, typename A2>
-void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2), void const** &argsTC, bool useThreadQueue = true)
+void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2), void const** &argsTC, QueueType queueType)
 {
   csRef<ThreadEvent2<T, A1, A2> > threadEvent;
   threadEvent.AttachNew(new ThreadEvent2<T, A1, A2>(object, method, argsTC));
-  tm->PushToQueue(useThreadQueue, threadEvent);
+  tm->PushToQueue(queueType, threadEvent);
 }
 
 template<class T, typename A1, typename A2, typename A3>
-void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3), void const** &argsTC, bool useThreadQueue = true)
+void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3), void const** &argsTC, QueueType queueType)
 {
   csRef<ThreadEvent3<T, A1, A2, A3> > threadEvent;
   threadEvent.AttachNew(new ThreadEvent3<T, A1, A2, A3>(object, method, argsTC));
-  tm->PushToQueue(useThreadQueue, threadEvent);
+  tm->PushToQueue(queueType, threadEvent);
 }
 
 template<class T, typename A1, typename A2, typename A3, typename A4>
-void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4), void const** &argsTC, bool useThreadQueue = true)
+void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4), void const** &argsTC, QueueType queueType)
 {
   csRef<ThreadEvent4<T, A1, A2, A3, A4> > threadEvent;
   threadEvent.AttachNew(new ThreadEvent4<T, A1, A2, A3, A4>(object, method, argsTC));
-  tm->PushToQueue(useThreadQueue, threadEvent);
+  tm->PushToQueue(queueType, threadEvent);
 }
 
 template<class T, typename A1, typename A2, typename A3, typename A4, typename A5>
-void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5), void const** &argsTC, bool useThreadQueue = true)
+void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5), void const** &argsTC, QueueType queueType)
 {
   csRef<ThreadEvent5<T, A1, A2, A3, A4, A5> > threadEvent;
   threadEvent.AttachNew(new ThreadEvent5<T, A1, A2, A3, A4, A5>(object, method, argsTC));
-  tm->PushToQueue(useThreadQueue, threadEvent);
+  tm->PushToQueue(queueType, threadEvent);
 }
 
 template<class T, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
-void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5, A6), void const** &argsTC, bool useThreadQueue = true)
+void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5, A6), void const** &argsTC, QueueType queueType)
 {
   csRef<ThreadEvent6<T, A1, A2, A3, A4, A5, A6> > threadEvent;
   threadEvent.AttachNew(new ThreadEvent6<T, A1, A2, A3, A4, A5, A6>(object, method, argsTC));
-  tm->PushToQueue(useThreadQueue, threadEvent);
+  tm->PushToQueue(queueType, threadEvent);
 }
 
 template<class T, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7>
-void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7), void const** &argsTC, bool useThreadQueue = true)
+void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7), void const** &argsTC, QueueType queueType)
 {
   csRef<ThreadEvent7<T, A1, A2, A3, A4, A5, A6, A7> > threadEvent;
   threadEvent.AttachNew(new ThreadEvent7<T, A1, A2, A3, A4, A5, A6, A7>(object, method, argsTC));
-  tm->PushToQueue(useThreadQueue, threadEvent);
+  tm->PushToQueue(queueType, threadEvent);
 }
 
 template<class T, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8>
-void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8), void const** &argsTC, bool useThreadQueue = true)
+void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8), void const** &argsTC, QueueType queueType)
 {
   csRef<ThreadEvent8<T, A1, A2, A3, A4, A5, A6, A7, A8> > threadEvent;
   threadEvent.AttachNew(new ThreadEvent8<T, A1, A2, A3, A4, A5, A6, A7, A8>(object, method, argsTC));
-  tm->PushToQueue(useThreadQueue, threadEvent);
+  tm->PushToQueue(queueType, threadEvent);
 }
 
 template<class T, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9>
-void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9), void const** &argsTC, bool useThreadQueue = true)
+void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9), void const** &argsTC, QueueType queueType)
 {
   csRef<ThreadEvent9<T, A1, A2, A3, A4, A5, A6, A7, A8, A9> > threadEvent;
   threadEvent.AttachNew(new ThreadEvent9<T, A1, A2, A3, A4, A5, A6, A7, A8, A9>(object, method, argsTC));
-  tm->PushToQueue(useThreadQueue, threadEvent);
+  tm->PushToQueue(queueType, threadEvent);
 }
 
 template<class T, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10>
-void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10), void const** &argsTC, bool useThreadQueue = true)
+void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10), void const** &argsTC, QueueType queueType)
 {
   csRef<ThreadEvent10<T, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10> > threadEvent;
   threadEvent.AttachNew(new ThreadEvent10<T, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10>(object, method, argsTC));
-  tm->PushToQueue(useThreadQueue, threadEvent);
+  tm->PushToQueue(queueType, threadEvent);
 }
 
 template<class T, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11>
-void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11), void const** &argsTC, bool useThreadQueue = true)
+void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11), void const** &argsTC, QueueType queueType)
 {
   csRef<ThreadEvent11<T, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11> > threadEvent;
   threadEvent.AttachNew(new ThreadEvent11<T, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11>(object, method, argsTC));
-  tm->PushToQueue(useThreadQueue, threadEvent);
+  tm->PushToQueue(queueType, threadEvent);
 }
 
 template<class T, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12>
-void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12), void const** &argsTC, bool useThreadQueue = true)
+void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12), void const** &argsTC, QueueType queueType)
 {
   csRef<ThreadEvent12<T, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12> > threadEvent;
   threadEvent.AttachNew(new ThreadEvent12<T, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12>(object, method, argsTC));
-  tm->PushToQueue(useThreadQueue, threadEvent);
+  tm->PushToQueue(queueType, threadEvent);
 }
 
 template<class T, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12, typename A13>
-void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13), void const** &argsTC, bool useThreadQueue = true)
+void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13), void const** &argsTC, QueueType queueType)
 {
   csRef<ThreadEvent13<T, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13> > threadEvent;
   threadEvent.AttachNew(new ThreadEvent13<T, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13>(object, method, argsTC));
-  tm->PushToQueue(useThreadQueue, threadEvent);
+  tm->PushToQueue(queueType, threadEvent);
 }
 
 template<class T, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12, typename A13, typename A14>
-void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14), void const** &argsTC, bool useThreadQueue = true)
+void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14), void const** &argsTC, QueueType queueType)
 {
   csRef<ThreadEvent14<T, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14> > threadEvent;
   threadEvent.AttachNew(new ThreadEvent14<T, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14>(object, method, argsTC));
-  tm->PushToQueue(useThreadQueue, threadEvent);
+  tm->PushToQueue(queueType, threadEvent);
 }
 
 template<class T, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12, typename A13, typename A14, typename A15>
-void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15), void const** &argsTC, bool useThreadQueue = true)
+void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::*method)(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15), void const** &argsTC, QueueType queueType)
 {
   csRef<ThreadEvent15<T, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15> > threadEvent;
   threadEvent.AttachNew(new ThreadEvent15<T, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15>(object, method, argsTC));
-  tm->PushToQueue(useThreadQueue, threadEvent);
+  tm->PushToQueue(queueType, threadEvent);
 }
 
-#define THREADED_CALLABLE_DECL(type, function, returnClass, useThreadQueue, wait) \
+#define THREADED_CALLABLE_DECL(type, function, returnClass, queueType, wait, forceQueue) \
   bool function##TC(csRef<iThreadReturn> ret); \
   csRef<iThreadReturn> function() \
 { \
@@ -292,7 +292,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(useThreadQueue)) \
+  if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     objTC->function##TC(ret); \
@@ -302,7 +302,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   TEventMemPool *mempool = new TEventMemPool; \
   argsTC[0] = mempool; \
   argsTC[1] = mempool->Store<csRef<iThreadReturn> >(&ret); \
-  QueueEvent<type, csRef<iThreadReturn> >(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn> >(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -310,7 +310,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   return ret; \
 }
 
-#define THREADED_CALLABLE_DECL1(type, function, returnClass, T1, A1, useThreadQueue, wait) \
+#define THREADED_CALLABLE_DECL1(type, function, returnClass, T1, A1, queueType, wait, forceQueue) \
   bool function##TC(csRef<iThreadReturn> ret, T1 A1); \
   csRef<iThreadReturn> function(T1 A1) \
 { \
@@ -322,7 +322,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(useThreadQueue)) \
+  if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     objTC->function##TC(ret, A1); \
@@ -333,7 +333,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[0] = mempool; \
   argsTC[1] = mempool->Store<csRef<iThreadReturn> >(&ret); \
   argsTC[2] = mempool->Store<T1>(&A1); \
-  QueueEvent<type, csRef<iThreadReturn> , T1>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn> , T1>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -341,7 +341,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   return ret; \
 }
 
-#define THREADED_CALLABLE_DECL2(type, function, returnClass, T1, A1, T2, A2, useThreadQueue, wait) \
+#define THREADED_CALLABLE_DECL2(type, function, returnClass, T1, A1, T2, A2, queueType, wait, forceQueue) \
   bool function##TC(csRef<iThreadReturn> ret, T1 A1, T2 A2); \
   csRef<iThreadReturn> function(T1 A1, T2 A2) \
 { \
@@ -353,7 +353,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(useThreadQueue)) \
+  if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     objTC->function##TC(ret, A1, A2); \
@@ -365,7 +365,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[1] = mempool->Store<csRef<iThreadReturn> >(&ret); \
   argsTC[2] = mempool->Store<T1>(&A1); \
   argsTC[3] = mempool->Store<T2>(&A2); \
-  QueueEvent<type, csRef<iThreadReturn> , T1, T2>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn> , T1, T2>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -373,7 +373,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   return ret; \
 }
 
-#define THREADED_CALLABLE_DECL3(type, function, returnClass, T1, A1, T2, A2, T3, A3, useThreadQueue, wait) \
+#define THREADED_CALLABLE_DECL3(type, function, returnClass, T1, A1, T2, A2, T3, A3, queueType, wait, forceQueue) \
   bool function##TC(csRef<iThreadReturn> ret, T1 A1, T2 A2, T3 A3); \
   csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3) \
 { \
@@ -385,7 +385,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(useThreadQueue)) \
+  if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     objTC->function##TC(ret, A1, A2, A3); \
@@ -398,7 +398,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[2] = mempool->Store<T1>(&A1); \
   argsTC[3] = mempool->Store<T2>(&A2); \
   argsTC[4] = mempool->Store<T3>(&A3); \
-  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -406,7 +406,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   return ret; \
 }
 
-#define THREADED_CALLABLE_DECL4(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, useThreadQueue, wait) \
+#define THREADED_CALLABLE_DECL4(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, queueType, wait, forceQueue) \
   bool function##TC(csRef<iThreadReturn> ret, T1 A1, T2 A2, T3 A3, T4 A4); \
   csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4) \
 { \
@@ -418,7 +418,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(useThreadQueue)) \
+  if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     objTC->function##TC(ret, A1, A2, A3, A4); \
@@ -432,7 +432,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[3] = mempool->Store<T2>(&A2); \
   argsTC[4] = mempool->Store<T3>(&A3); \
   argsTC[5] = mempool->Store<T4>(&A4); \
-  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -440,7 +440,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   return ret; \
 }
 
-#define THREADED_CALLABLE_DECL5(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, useThreadQueue, wait) \
+#define THREADED_CALLABLE_DECL5(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, queueType, wait, forceQueue) \
   bool function##TC(csRef<iThreadReturn> ret, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5); \
   csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5) \
 { \
@@ -452,7 +452,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(useThreadQueue)) \
+  if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     objTC->function##TC(ret, A1, A2, A3, A4, A5); \
@@ -467,7 +467,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[4] = mempool->Store<T3>(&A3); \
   argsTC[5] = mempool->Store<T4>(&A4); \
   argsTC[6] = mempool->Store<T5>(&A5); \
-  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -475,7 +475,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   return ret; \
 }
 
-#define THREADED_CALLABLE_DECL6(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, T6, A6, useThreadQueue, wait) \
+#define THREADED_CALLABLE_DECL6(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, T6, A6, queueType, wait, forceQueue) \
   bool function##TC(csRef<iThreadReturn> ret, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6); \
   csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6) \
 { \
@@ -487,7 +487,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(useThreadQueue)) \
+  if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     objTC->function##TC(ret, A1, A2, A3, A4, A5, A6); \
@@ -503,7 +503,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[5] = mempool->Store<T4>(&A4); \
   argsTC[6] = mempool->Store<T5>(&A5); \
   argsTC[7] = mempool->Store<T6>(&A6); \
-  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -511,7 +511,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   return ret; \
 }
 
-#define THREADED_CALLABLE_DECL7(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, T6, A6, T7, A7, useThreadQueue, wait) \
+#define THREADED_CALLABLE_DECL7(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, T6, A6, T7, A7, queueType, wait, forceQueue) \
   bool function##TC(csRef<iThreadReturn> ret, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7); \
   csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7) \
 { \
@@ -523,7 +523,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(useThreadQueue)) \
+  if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7); \
@@ -540,7 +540,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[6] = mempool->Store<T5>(&A5); \
   argsTC[7] = mempool->Store<T6>(&A6); \
   argsTC[8] = mempool->Store<T7>(&A7); \
-  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -548,7 +548,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   return ret; \
 }
 
-#define THREADED_CALLABLE_DECL8(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, T6, A6, T7, A7, T8, A8, useThreadQueue, wait) \
+#define THREADED_CALLABLE_DECL8(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, T6, A6, T7, A7, T8, A8, queueType, wait, forceQueue) \
   bool function##TC(csRef<iThreadReturn> ret, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8); \
   csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8) \
 { \
@@ -560,7 +560,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(useThreadQueue)) \
+  if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8); \
@@ -578,7 +578,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[7] = mempool->Store<T6>(&A6); \
   argsTC[8] = mempool->Store<T7>(&A7); \
   argsTC[9] = mempool->Store<T8>(&A8); \
-  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -586,7 +586,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   return ret; \
 }
 
-#define THREADED_CALLABLE_DECL9(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, T6, A6, T7, A7, T8, A8, T9, A9, useThreadQueue, wait) \
+#define THREADED_CALLABLE_DECL9(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, T6, A6, T7, A7, T8, A8, T9, A9, queueType, wait, forceQueue) \
   bool function##TC(csRef<iThreadReturn> ret, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9); \
   csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9) \
 { \
@@ -598,7 +598,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(useThreadQueue)) \
+  if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9); \
@@ -617,7 +617,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[8] = mempool->Store<T7>(&A7); \
   argsTC[9] = mempool->Store<T8>(&A8); \
   argsTC[10] = mempool->Store<T9>(&A9); \
-  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -625,7 +625,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   return ret; \
 }
 
-#define THREADED_CALLABLE_DECL10(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, T6, A6, T7, A7, T8, A8, T9, A9, T10, A10, useThreadQueue, wait) \
+#define THREADED_CALLABLE_DECL10(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, T6, A6, T7, A7, T8, A8, T9, A9, T10, A10, queueType, wait, forceQueue) \
   bool function##TC(csRef<iThreadReturn> ret, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10); \
   csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10) \
 { \
@@ -637,7 +637,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(useThreadQueue)) \
+  if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10); \
@@ -657,7 +657,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[9] = mempool->Store<T8>(&A8); \
   argsTC[10] = mempool->Store<T9>(&A9); \
   argsTC[11] = mempool->Store<T10>(&A10); \
-  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -665,7 +665,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   return ret; \
 }
 
-#define THREADED_CALLABLE_DECL11(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, T6, A6, T7, A7, T8, A8, T9, A9, T10, A10, T11, A11, useThreadQueue, wait) \
+#define THREADED_CALLABLE_DECL11(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, T6, A6, T7, A7, T8, A8, T9, A9, T10, A10, T11, A11, queueType, wait, forceQueue) \
   bool function##TC(csRef<iThreadReturn> ret, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11); \
   csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11) \
 { \
@@ -677,7 +677,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(useThreadQueue)) \
+  if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11); \
@@ -698,7 +698,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[10] = mempool->Store<T9>(&A9); \
   argsTC[11] = mempool->Store<T10>(&A10); \
   argsTC[12] = mempool->Store<T11>(&A11); \
-  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -706,7 +706,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   return ret; \
 }
 
-#define THREADED_CALLABLE_DECL12(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, T6, A6, T7, A7, T8, A8, T9, A9, T10, A10, T11, A11, T12, A12, useThreadQueue, wait) \
+#define THREADED_CALLABLE_DECL12(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, T6, A6, T7, A7, T8, A8, T9, A9, T10, A10, T11, A11, T12, A12, queueType, wait, forceQueue) \
   bool function##TC(csRef<iThreadReturn> ret, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12); \
   csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12) \
 { \
@@ -718,7 +718,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(useThreadQueue)) \
+  if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12); \
@@ -740,7 +740,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[11] = mempool->Store<T10>(&A10); \
   argsTC[12] = mempool->Store<T11>(&A11); \
   argsTC[13] = mempool->Store<T12>(&A12); \
-  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -748,7 +748,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   return ret; \
 }
 
-#define THREADED_CALLABLE_DECL13(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, T6, A6, T7, A7, T8, A8, T9, A9, T10, A10, T11, A11, T12, A12, T13, A13, useThreadQueue, wait) \
+#define THREADED_CALLABLE_DECL13(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, T6, A6, T7, A7, T8, A8, T9, A9, T10, A10, T11, A11, T12, A12, T13, A13, queueType, wait, forceQueue) \
   bool function##TC(csRef<iThreadReturn> ret, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12, T13 A13); \
   csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12, T13 A13) \
 { \
@@ -760,7 +760,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid()) \
+  if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13); \
@@ -783,7 +783,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[12] = mempool->Store<T11>(&A11); \
   argsTC[13] = mempool->Store<T12>(&A12); \
   argsTC[14] = mempool->Store<T13>(&A13); \
-  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -791,7 +791,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   return ret; \
 }
 
-#define THREADED_CALLABLE_DECL14(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, T6, A6, T7, A7, T8, A8, T9, A9, T10, A10, T11, A11, T12, A12, T13, A13, T14, A14, useThreadQueue, wait) \
+#define THREADED_CALLABLE_DECL14(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, T6, A6, T7, A7, T8, A8, T9, A9, T10, A10, T11, A11, T12, A12, T13, A13, T14, A14, queueType, wait, forceQueue) \
   bool function##TC(csRef<iThreadReturn> ret, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12, T13 A13, T14 A14); \
   csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12, T13 A13, T14 A14) \
 { \
@@ -803,7 +803,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(useThreadQueue)) \
+  if(!tm.IsValid() || tm->RunNow(queueType, forceQueue))) \
   { \
     type* objTC = const_cast<type*>(this); \
     objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14); \
@@ -827,7 +827,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[13] = mempool->Store<T12>(&A12); \
   argsTC[14] = mempool->Store<T13>(&A13); \
   argsTC[15] = mempool->Store<T14>(&A14); \
-  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
   if(wait) \
   { \
     ret->Wait(); \
@@ -835,7 +835,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   return ret; \
 }
 
-#define THREADED_CALLABLE_DECL15(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, T6, A6, T7, A7, T8, A8, T9, A9, T10, A10, T11, A11, T12, A12, T13, A13, T14, A14, T15, A15, useThreadQueue, wait) \
+#define THREADED_CALLABLE_DECL15(type, function, returnClass, T1, A1, T2, A2, T3, A3, T4, A4, T5, A5, T6, A6, T7, A7, T8, A8, T9, A9, T10, A10, T11, A11, T12, A12, T13, A13, T14, A14, T15, A15, queueType, wait, forceQueue) \
   bool function##TC(csRef<iThreadReturn> ret, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12, T13 A13, T14 A14, T15 A15); \
   csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12, T13 A13, T14 A14, T15 A15) \
 { \
@@ -847,7 +847,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(useThreadQueue)) \
+  if(!tm.IsValid() || tm->RunNow(queueType, forceQueue))) \
   { \
     type* objTC = const_cast<type*>(this); \
     objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15); \
@@ -872,7 +872,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[14] = mempool->Store<T13>(&A13); \
   argsTC[15] = mempool->Store<T14>(&A14); \
   argsTC[16] = mempool->Store<T15>(&A15); \
-  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, useThreadQueue); \
+  QueueEvent<type, csRef<iThreadReturn>, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
   if(wait) \
   { \
     ret->Wait(); \

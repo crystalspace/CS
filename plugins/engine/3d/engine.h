@@ -390,7 +390,7 @@ public:
 	iDataBuffer* input, iSector* sector, const csVector3& pos);
 
   THREADED_CALLABLE_DECL1(csEngine, AddMeshAndChildren, csThreadReturn, iMeshWrapper*, mesh,
-    false, false);
+    HIGH, false, false);
 
   virtual csPtr<iMeshWrapperIterator> GetNearbyMeshes (iSector* sector,
     const csVector3& pos, float radius, bool crossPortals = true );
@@ -666,7 +666,14 @@ public:
   /**
    * Sync engine lists with loader lists.
    */
-  THREADED_CALLABLE_DECL1(csEngine, SyncEngineLists, csThreadReturn, csRef<iThreadedLoader>, loader, false, false);
+  THREADED_CALLABLE_DECL2(csEngine, SyncEngineLists, csThreadReturn, csRef<iThreadedLoader>, loader, bool, runNow, LOW, false, true);
+  void SyncEngineListsNow(csRef<iThreadedLoader> loader)
+  {
+    csRef<iThreadReturn> itr;
+    csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(objectRegistry);
+    itr.AttachNew(new csThreadReturn(tm));
+    SyncEngineListsTC(itr, loader, true);
+  }
 
 private:
   // -- PRIVATE METHODS
@@ -1029,6 +1036,9 @@ private:
   csEventID CanvasResize;
   csEventID CanvasClose;
   csRef<iEventHandler> weakEventHandler;
+
+  /// Array of new textures to be precached.
+  csRefArray<iTextureWrapper> newTextures;
 };
 
 #include "csutil/deprecated_warn_on.h"

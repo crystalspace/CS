@@ -112,7 +112,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     // Start up list sync.
-    Engine->SyncEngineLists(this);
+    Engine->SyncEngineLists(this, false);
 
     vfs = csQueryRegistry<iVFS>(object_reg);
     if(!vfs.IsValid())
@@ -169,7 +169,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   {
     if(Event.Name == ProcessPerFrame)
     {
-      Engine->SyncEngineLists(this);
+      Engine->SyncEngineLists(this, false);
     }
     return false;
   }

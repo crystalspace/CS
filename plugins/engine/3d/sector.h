@@ -182,7 +182,7 @@ public:
   { drawBusy--; }
 
   THREADED_CALLABLE_DECL1(csSector, SetRenderLoop, csThreadReturn,
-    iRenderLoop*, rl, false, false);
+    iRenderLoop*, rl, HIGH, false, false);
 
   virtual iRenderLoop* GetRenderLoop ()
   { return renderloop; }
@@ -222,7 +222,7 @@ public:
   { return &lights; }
 
   THREADED_CALLABLE_DECL1(csSector, AddLight, csThreadReturn,
-    csRef<iLight>, light, false, false);
+    csRef<iLight>, light, HIGH, false, false);
 
   virtual void ShineLights ()
   { ShineLightsInt ((csProgressPulse*)0); }
@@ -268,10 +268,10 @@ public:
   /**\name Callbacks
    * @{ */
   THREADED_CALLABLE_DECL1(csSector, SetSectorCallback, csThreadReturn,
-    csRef<iSectorCallback>, cb, false, false)
+    csRef<iSectorCallback>, cb, HIGH, false, false)
 
   THREADED_CALLABLE_DECL1(csSector, RemoveSectorCallback, csThreadReturn,
-    csRef<iSectorCallback>, cb, false, false)
+    csRef<iSectorCallback>, cb, HIGH, false, false)
 
   virtual int GetSectorCallbackCount () const 
   { return (int) sectorCallbackList.GetSize (); }

@@ -160,70 +160,70 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, LoadImage, csLoaderReturn, const char*, fname,
-      int, Format, bool, do_verbose, true, false)
+      int, Format, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, LoadImage, csLoaderReturn, iDataBuffer*, buf,
-      int, Format, bool, do_verbose, true, false)
+      int, Format, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL5(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, Filename,
-    int, Flags, csRef<iTextureManager>, texman, csRef<iImage>*, image, bool, do_verbose, true, false)
+    int, Flags, csRef<iTextureManager>, texman, csRef<iImage>*, image, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL5(csThreadedLoader, LoadTexture, csLoaderReturn, iDataBuffer*, buf,
-    int, Flags, iTextureManager*, texman, csRef<iImage>*, image, bool, do_verbose, true, false)
+    int, Flags, iTextureManager*, texman, csRef<iImage>*, image, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL8(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, Name,
     iDataBuffer*, buf, int, Flags, iTextureManager*, texman, bool, reg, bool, create_material, bool,
-    free_image, bool, do_verbose, true, false)
+    free_image, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL10(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, Name,
     const char*, FileName, int, Flags, iTextureManager*, texman, bool, reg, bool, create_material,
-    bool, free_image, iCollection*, Collection, uint, keepFlags, bool, do_verbose, true, false)
+    bool, free_image, iCollection*, Collection, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL2(csThreadedLoader, LoadSoundSysData, csLoaderReturn, const char*, fname,
-    bool, do_verbose, true, false)
+    bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, LoadSoundStream, csLoaderReturn, const char*, fname,
-    int, mode3d, bool, do_verbose, true, false)
+    int, mode3d, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, LoadSoundWrapper, csLoaderReturn, const char*, name,
-    const char*, fname, bool, do_verbose, true, false)
+    const char*, fname, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, LoadMeshObjectFactory, csLoaderReturn, const char*, fname,
-    iStreamSource*, ssource, bool, do_verbose, true, false)
+    iStreamSource*, ssource, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, LoadMeshObject, csLoaderReturn, const char*, fname,
-    iStreamSource*, ssource, bool, do_verbose, true, false)
+    iStreamSource*, ssource, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, LoadShader, csLoaderReturn, const char*, filename,
-    bool, registerShader, bool, do_verbose, true, false)
+    bool, registerShader, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL7(csThreadedLoader, LoadMapFile, csLoaderReturn, const char*, filename,
     bool, clearEngine, iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*,
-    missingdata, uint, keepFlags, bool, do_verbose, true, false)
+    missingdata, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL7(csThreadedLoader, LoadMap, csLoaderReturn, iDocumentNode*, world_node,
     bool, clearEngine, iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*,
-    missingdata, uint, keepFlags, bool, do_verbose, true, false)
+    missingdata, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL6(csThreadedLoader, LoadLibraryFile, csLoaderReturn, const char*, filename,
     iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint,
-    keepFlags, bool, do_verbose, true, false)
+    keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL6(csThreadedLoader, LoadLibrary, csLoaderReturn, iDocumentNode*, lib_node,
     iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint,
-    keepFlags, bool, do_verbose, true, false)
+    keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL6(csThreadedLoader, LoadFile, csLoaderReturn, const char*, fname,
     iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint,
-    keepFlags, bool, do_verbose, true, false)
+    keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL6(csThreadedLoader, LoadBuffer, csLoaderReturn, iDataBuffer*, buffer,
     iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint,
-    keepFlags, bool, do_verbose, true, false)
+    keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL6(csThreadedLoader, LoadNode, csLoaderReturn, csRef<iDocumentNode>,
     node, csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>,
-    missingdata, uint, keepFlags, bool, do_verbose, true, false)
+    missingdata, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
   protected:
 
@@ -249,11 +249,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     // General loading objects.
     csHash<csRef<iThreadReturn>, const char*> loadingMeshObjects;
-    RecursiveMutex loadingMeshObjectsLock;
+    Mutex loadingMeshObjectsLock;
 
     void AddLoadingMeshObject(const char* name, csRef<iThreadReturn> itr)
     {
-      RecursiveMutexScopedLock lock(loadingMeshObjectsLock);
+      MutexScopedLock lock(loadingMeshObjectsLock);
       if(!FindLoadedMeshObject(name))
       {
         loadingMeshObjects.Put(name, itr);
@@ -262,7 +262,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     bool FindLoadedMeshObject(const char* name)
     {
-      RecursiveMutexScopedLock lock(loadingMeshObjectsLock);
+      MutexScopedLock lock(meshesLock);
       for(size_t i=0; i<loaderMeshes.GetSize(); i++)
       {
         if(csString(name).Compare(loaderMeshes[i]->QueryObject()->GetName()))
@@ -276,7 +276,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     void RemoveLoadingMeshObject(const char* name, csRef<iThreadReturn> itr)
     {
-      RecursiveMutexScopedLock lock(loadingMeshObjectsLock);
+      MutexScopedLock lock(loadingMeshObjectsLock);
       loadingMeshObjects.Delete(name, itr);
     }
 
@@ -507,14 +507,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     */
     THREADED_CALLABLE_DECL6(csThreadedLoader, LoadMeshObject, csLoaderReturn,
       csRef<iLoaderContext>, ldr_context, csRef<iMeshWrapper>, mesh, csRef<iMeshWrapper>, parent,
-      csRef<iDocumentNode>, node, csRef<iStreamSource>, ssource, csRef<iSector>, sector, true, false);
+      csRef<iDocumentNode>, node, csRef<iStreamSource>, ssource, csRef<iSector>, sector, THREADED, false, false);
 
     THREADED_CALLABLE_DECL2(csThreadedLoader, AddObjectToSector, csLoaderReturn,
-      csRef<iMovable>, movable, csRef<iSector>, sector, false, false);
+      csRef<iMovable>, movable, csRef<iSector>, sector, HIGH, false, false);
 
     THREADED_CALLABLE_DECL4(csThreadedLoader, LoadMeshRef, csLoaderReturn, csRef<iDocumentNode>,
       node, csRef<iSector>, sector, csRef<iLoaderContext>, ldr_context, csRef<iStreamSource>,
-      ssource, true, false);
+      ssource, THREADED, false, false);
 
     /**
     * Load the mesh object from the map file.
@@ -544,7 +544,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     THREADED_CALLABLE_DECL6(csThreadedLoader, LoadLibraryFromNode, csLoaderReturn,
       csRef<iLoaderContext>, ldr_context, csRef<iDocumentNode>, child, csRef<iStreamSource>,
       ssource, csRef<iMissingLoaderData>, missingdata, bool, loadProxyTex, bool, do_verbose,
-      true, false);
+      THREADED, false, false);
 
     csPtr<iImage> LoadImage (iDataBuffer* buf, const char* fname, int Format, bool do_verbose);
 
@@ -626,12 +626,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     /// Parse a addon.
     THREADED_CALLABLE_DECL6(csThreadedLoader, ParseAddOn, csLoaderReturn,
       csRef<iLoaderPlugin>, plugin, csRef<iDocumentNode>, node, csRef<iStreamSource>, ssource,
-      csRef<iLoaderContext>, ldr_context, csRef<iBase>, context, const char*, dir, false, true);
+      csRef<iLoaderContext>, ldr_context, csRef<iBase>, context, const char*, dir, HIGH, true, false);
 
     /// Parse a addon (binary plugin).
     THREADED_CALLABLE_DECL5(csThreadedLoader, ParseAddOnBinary, csLoaderReturn,
       csRef<iBinaryLoaderPlugin>, plugin, csRef<iDataBuffer>, dbuf, csRef<iStreamSource>,
-      ssource, csRef<iLoaderContext>, ldr_context, csRef<iBase>, context, false, true);
+      ssource, csRef<iLoaderContext>, ldr_context, csRef<iBase>, context, HIGH, true, false);
 
     /**
     * Try loading the file as a structured document.
@@ -702,7 +702,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, SetSectorVisibilityCuller, csLoaderReturn,
       csRef<iSector>, sector, const char*, culplugname, csRef<iDocumentNode>, culler_params,
-      false, false)
+      HIGH, false, false)
 
       // Process the attributes of an <imposter> tag in a mesh specification.
       bool ParseImposterSettings(iImposter* mesh, iDocumentNode *node);

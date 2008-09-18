@@ -127,7 +127,7 @@ public:
 
   /// Load a plugin and (optionally) initialize it.
   THREADED_CALLABLE_DECL3(csPluginManager, LoadPlugin, csThreadReturn,
-    const char*, iClassID, bool, init, bool, report, false, true)
+    const char*, iClassID, bool, init, bool, report, HIGH, true, false);
 
   /**
    * Get first of the loaded plugins that supports given interface ID.

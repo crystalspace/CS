@@ -45,6 +45,7 @@ struct iThreadTest : public virtual iBase
   THREADED_INTERFACE1(Test6, csRef<Data> stuff);
   THREADED_INTERFACE(Test7);
   virtual iObjectRegistry* GetObjectRegistry() const = 0;
+  virtual bool Test7Passed() const = 0;
 };
 
 class csThreadTest : public ThreadedCallable<csThreadTest>,
@@ -57,20 +58,28 @@ public:
 
   iObjectRegistry* GetObjectRegistry() const { return objReg; }
 
-  THREADED_CALLABLE_DECL(csThreadTest, Test1, csThreadReturn, true, false)
-  THREADED_CALLABLE_DECL1(csThreadTest, Test2, csThreadReturn, bool, b, true, false)
-  THREADED_CALLABLE_DECL2(csThreadTest, Test3, csThreadReturn, int, in, float, flo, true, false)
-  THREADED_CALLABLE_DECL1(csThreadTest, Test4, csThreadReturn, csWeakRef<iThreadTest>, myself, true, false)
-  THREADED_CALLABLE_DECL(csThreadTest, Test5Real, csThreadReturn, true, false)
-  THREADED_CALLABLE_DECL1(csThreadTest, Test6, csThreadReturn, csRef<Data>, stuff, true, true)
-  THREADED_CALLABLE_DECL(csThreadTest, Test7, csThreadReturn, true, true)
-  THREADED_CALLABLE_DECL1(csThreadTest, Test7Data, csThreadReturn, int, counter, true, false)
-  THREADED_CALLABLE_DECL(csThreadTest, Test7RealData, csThreadReturn, true, true)
+  THREADED_CALLABLE_DECL(csThreadTest, Test1, csThreadReturn, THREADED, false, false)
+  THREADED_CALLABLE_DECL1(csThreadTest, Test2, csThreadReturn, bool, b, THREADED, false, false)
+  THREADED_CALLABLE_DECL2(csThreadTest, Test3, csThreadReturn, int, in, float, flo, THREADED, false, false)
+  THREADED_CALLABLE_DECL1(csThreadTest, Test4, csThreadReturn, csWeakRef<iThreadTest>, myself, THREADED, false, false)
+  THREADED_CALLABLE_DECL(csThreadTest, Test5Real, csThreadReturn, THREADED, false, false)
+  THREADED_CALLABLE_DECL1(csThreadTest, Test6, csThreadReturn, csRef<Data>, stuff, THREADED, true, false)
+  THREADED_CALLABLE_DECL(csThreadTest, Test7, csThreadReturn, THREADED, true, false)
+  THREADED_CALLABLE_DECL(csThreadTest, Test7Data, csThreadReturn, THREADED, false, false)
+  THREADED_CALLABLE_DECL(csThreadTest, Test7RealData, csThreadReturn, THREADED, true, false)
 
   void Test5() const;
 
+  bool Test7Passed() const
+  {
+    return test7 == 10;
+  }
+
 private:
   iObjectRegistry* objReg;
+
+  Mutex test7lock;
+  uint test7;
 };
 
 #endif // __THREAD_TEST_H__

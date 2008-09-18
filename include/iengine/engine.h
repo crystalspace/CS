@@ -1302,7 +1302,8 @@ struct iEngine : public virtual iBase
   /**
    * Loader List Sync
    */
-  THREADED_INTERFACE1(SyncEngineLists, csRef<iThreadedLoader> loader);
+  THREADED_INTERFACE2(SyncEngineLists, csRef<iThreadedLoader> loader, bool runNow);
+  virtual void SyncEngineListsNow(csRef<iThreadedLoader> loader) = 0;
   /** @} */
 };
 

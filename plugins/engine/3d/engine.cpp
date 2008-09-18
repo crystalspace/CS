@@ -552,61 +552,88 @@ void csEngine::HandleImposters ()
   imposterUpdateQueue.Empty ();
 }
 
-THREADED_CALLABLE_IMPL1(csEngine, SyncEngineLists, csRef<iThreadedLoader> loader)
+THREADED_CALLABLE_IMPL2(csEngine, SyncEngineLists, csRef<iThreadedLoader> loader, bool runNow)
 {
-  csRef<iSectorLoaderIterator> loaderSectors = loader->GetLoaderSectors();
-  while(loaderSectors->HasNext())
   {
-    sectors.Add(loaderSectors->Next());
+    csRef<iSectorLoaderIterator> loaderSectors = loader->GetLoaderSectors();
+    while(loaderSectors->HasNext())
+    {
+      sectors.Add(loaderSectors->Next());
+    }
   }
-  loaderSectors.Invalidate();
 
-  csRef<iMeshFactLoaderIterator> loaderMeshFactories = loader->GetLoaderMeshFactories();
-  while(loaderMeshFactories->HasNext())
   {
-    meshFactories.Add(loaderMeshFactories->Next());
+    csRef<iMeshFactLoaderIterator> loaderMeshFactories = loader->GetLoaderMeshFactories();
+    while(loaderMeshFactories->HasNext())
+    {
+      meshFactories.Add(loaderMeshFactories->Next());
+    }
   }
-  loaderMeshFactories.Invalidate();
 
-  csRef<iMeshLoaderIterator> loaderMeshes = loader->GetLoaderMeshes();
-  while(loaderMeshes->HasNext())
   {
-    meshes.Add(loaderMeshes->Next());
+    csRef<iMeshLoaderIterator> loaderMeshes = loader->GetLoaderMeshes();
+    while(loaderMeshes->HasNext())
+    {
+      meshes.Add(loaderMeshes->Next());
+    }
   }
-  loaderMeshes.Invalidate();
 
-  csRef<iCamposLoaderIterator> loaderCameraPositions = loader->GetLoaderCameraPositions();
-  while(loaderCameraPositions->HasNext())
   {
-    cameraPositions.Add(loaderCameraPositions->Next());
+    csRef<iCamposLoaderIterator> loaderCameraPositions = loader->GetLoaderCameraPositions();
+    while(loaderCameraPositions->HasNext())
+    {
+      cameraPositions.Add(loaderCameraPositions->Next());
+    }
   }
-  loaderCameraPositions.Invalidate();
 
-  csRef<iTextureLoaderIterator> loaderTextures = loader->GetLoaderTextures();
-  while(loaderTextures->HasNext())
   {
-    iTextureWrapper* txt = loaderTextures->Next();
-    textures->Add(txt);
-    txt->GetTextureHandle()->Precache();
+    csRef<iMaterialLoaderIterator> loaderMaterials = loader->GetLoaderMaterials();
+    while(loaderMaterials->HasNext())
+    {
+      materials->Add(loaderMaterials->Next());
+    }
   }
-  loaderTextures.Invalidate();
 
-  csRef<iMaterialLoaderIterator> loaderMaterials = loader->GetLoaderMaterials();
-  while(loaderMaterials->HasNext())
   {
-    materials->Add(loaderMaterials->Next());
+    csRef<iSharedVarLoaderIterator> loaderSharedVariables = loader->GetLoaderSharedVariables();
+    while(loaderSharedVariables->HasNext())
+    {
+      sharedVariables->Add(loaderSharedVariables->Next());
+    }
   }
-  loaderMaterials.Invalidate();
 
-  csRef<iSharedVarLoaderIterator> loaderSharedVariables = loader->GetLoaderSharedVariables();
-  while(loaderSharedVariables->HasNext())
   {
-    sharedVariables->Add(loaderSharedVariables->Next());
+    csRef<iTextureLoaderIterator> loaderTextures = loader->GetLoaderTextures();
+    while(loaderTextures->HasNext())
+    {
+      iTextureWrapper* txt = loaderTextures->Next();
+      textures->Add(txt);
+      newTextures.Push(txt);
+    }
   }
-  loaderSharedVariables.Invalidate();
 
-  // Schedule another run.
-  SyncEngineLists(loader);
+  if(runNow)
+  {
+    // Precache all textures.
+    while(!newTextures.IsEmpty())
+    {
+      csRef<iTextureWrapper> tex = newTextures.Pop();
+      tex->GetTextureHandle()->Precache();
+    }
+  }
+  else
+  {
+  // Precache a texture.
+    if(!newTextures.IsEmpty())
+    {
+      csRef<iTextureWrapper> tex = newTextures.Pop();
+      tex->GetTextureHandle()->Precache();
+    }
+
+    // Schedule another run.
+    SyncEngineLists(loader, false);
+  }
+
   return true;
 }
 

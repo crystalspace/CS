@@ -1247,7 +1247,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
         Report (CS_REPORTER_SEVERITY_ERROR, "Failing to load map!");
         return false;
       }
-      Engine->SyncEngineLists(TLevelLoader);
+      Engine->SyncEngineListsNow(TLevelLoader);
     }
     else
     {
