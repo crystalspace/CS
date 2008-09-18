@@ -17,6 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <ctype.h>
+
 #include "cssysdef.h"
 #include "csqint.h"
 
