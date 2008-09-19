@@ -1293,6 +1293,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_NOTIFY, "\nPrecaching finished... took %g seconds.\n", (csGetTicks()-start)/1000.0f);
   }
 
+  printf("\nTotal load time: %g seconds.\n", (csGetTicks()-start_time)/1000.0f);
+
   Create2DSprites ();
 
   // Look for the start sector in this map.
