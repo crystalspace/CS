@@ -61,7 +61,8 @@ public:
   inline bool RunNow(QueueType queueType, bool forceQueue)
   {
     return (IsMainThread() && queueType != THREADED && !forceQueue) ||
-      (queueType == THREADED && (waiting >= threadCount-1 || threadQueue->GetQueueCount() > 2*threadCount-1));
+      (queueType == THREADED && (((!IsMainThread() || waiting) && waiting >= threadCount-1) ||
+      threadQueue->GetQueueCount() > 2*threadCount-1));
   }
 
 protected:
