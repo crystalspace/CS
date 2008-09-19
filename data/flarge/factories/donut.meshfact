@@ -1,0 +1,147 @@
+<library>
+    <textures>
+        <texture name="topping">
+            <file>/lib/stdtex/topping.png</file>
+        </texture>
+    </textures>
+    <materials>
+        <material name="topping">
+            <texture>topping</texture>
+        </material>
+    </materials>
+    <meshfact name="donut">
+        <plugin>bezierFact</plugin>
+        <params>
+            <curvecenter x="0" y="0" z="0" />
+            <curvescale>80</curvescale>
+            <curvecontrol x="5" y="2" z="0" u="1" v="0.01" />
+            <curvecontrol x="5" y="2" z="5" u="0.5" v="0.01" />
+            <curvecontrol x="0" y="2" z="5" u="0" v="0.01" />
+            <curvecontrol x="-5" y="2" z="5" u="0.5" v="0.01" />
+            <curvecontrol x="-5" y="2" z="0" u="1" v="0.01" />
+            <curvecontrol x="-5" y="2" z="-5" u="0.5" v="0.01" />
+            <curvecontrol x="0" y="2" z="-5" u="0" v="0.01" />
+            <curvecontrol x="5" y="2" z="-5" u="0.5" v="0.01" />
+            <curvecontrol x="2" y="0" z="0" u="1" v="0.5" />
+            <curvecontrol x="2" y="0" z="2" u="0.5" v="0.5" />
+            <curvecontrol x="0" y="0" z="2" u="0" v="0.5" />
+            <curvecontrol x="-2" y="0" z="2" u="0.5" v="0.5" />
+            <curvecontrol x="-2" y="0" z="0" u="1" v="0.5" />
+            <curvecontrol x="-2" y="0" z="-2" u="0.5" v="0.5" />
+            <curvecontrol x="0" y="0" z="-2" u="0" v="0.5" />
+            <curvecontrol x="2" y="0" z="-2" u="0.5" v="0.5" />
+            <curvecontrol x="5" y="-2" z="0" u="1" v="0.99" />
+            <curvecontrol x="5" y="-2" z="5" u="0.5" v="0.99" />
+            <curvecontrol x="0" y="-2" z="5" u="0" v="0.99" />
+            <curvecontrol x="-5" y="-2" z="5" u="0.5" v="0.99" />
+            <curvecontrol x="-5" y="-2" z="0" u="1" v="0.99" />
+            <curvecontrol x="-5" y="-2" z="-5" u="0.5" v="0.99" />
+            <curvecontrol x="0" y="-2" z="-5" u="0" v="0.99" />
+            <curvecontrol x="5" y="-2" z="-5" u="0.5" v="0.99" />
+            <curvecontrol x="8" y="0" z="0" u="1" v="0.5" />
+            <curvecontrol x="8" y="0" z="8" u="0.5" v="0.5" />
+            <curvecontrol x="0" y="0" z="8" u="0" v="0.5" />
+            <curvecontrol x="-8" y="0" z="8" u="0.5" v="0.5" />
+            <curvecontrol x="-8" y="0" z="0" u="1" v="0.5" />
+            <curvecontrol x="-8" y="0" z="-8" u="0.5" v="0.5" />
+            <curvecontrol x="0" y="0" z="-8" u="0" v="0.5" />
+            <curvecontrol x="8" y="0" z="-8" u="0.5" v="0.5" />
+            <curve name="b1">
+                <material>topping</material>
+                <v>0</v>
+                <v>1</v>
+                <v>2</v>
+                <v>8</v>
+                <v>9</v>
+                <v>10</v>
+                <v>16</v>
+                <v>17</v>
+                <v>18</v>
+            </curve>
+            <curve name="b2">
+                <material>topping</material>
+                <v>2</v>
+                <v>3</v>
+                <v>4</v>
+                <v>10</v>
+                <v>11</v>
+                <v>12</v>
+                <v>18</v>
+                <v>19</v>
+                <v>20</v>
+            </curve>
+            <curve name="b3">
+                <material>topping</material>
+                <v>4</v>
+                <v>5</v>
+                <v>6</v>
+                <v>12</v>
+                <v>13</v>
+                <v>14</v>
+                <v>20</v>
+                <v>21</v>
+                <v>22</v>
+            </curve>
+            <curve name="b4">
+                <material>topping</material>
+                <v>6</v>
+                <v>7</v>
+                <v>0</v>
+                <v>14</v>
+                <v>15</v>
+                <v>8</v>
+                <v>22</v>
+                <v>23</v>
+                <v>16</v>
+            </curve>
+            <curve name="b5">
+                <material>topping</material>
+                <v>16</v>
+                <v>17</v>
+                <v>18</v>
+                <v>24</v>
+                <v>25</v>
+                <v>26</v>
+                <v>0</v>
+                <v>1</v>
+                <v>2</v>
+            </curve>
+            <curve name="b6">
+                <material>topping</material>
+                <v>18</v>
+                <v>19</v>
+                <v>20</v>
+                <v>26</v>
+                <v>27</v>
+                <v>28</v>
+                <v>2</v>
+                <v>3</v>
+                <v>4</v>
+            </curve>
+            <curve name="b7">
+                <material>topping</material>
+                <v>20</v>
+                <v>21</v>
+                <v>22</v>
+                <v>28</v>
+                <v>29</v>
+                <v>30</v>
+                <v>4</v>
+                <v>5</v>
+                <v>6</v>
+            </curve>
+            <curve name="b8">
+                <material>topping</material>
+                <v>22</v>
+                <v>23</v>
+                <v>16</v>
+                <v>30</v>
+                <v>31</v>
+                <v>24</v>
+                <v>6</v>
+                <v>7</v>
+                <v>0</v>
+            </curve>
+        </params>
+    </meshfact>
+</library>

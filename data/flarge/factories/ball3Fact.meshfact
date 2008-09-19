@@ -1,0 +1,22 @@
+<library>
+    <textures>
+        <texture name="white.gif">
+            <file>/lib/std/white.gif</file>
+        </texture>
+    </textures>
+    <materials>
+        <material name="white">
+            <texture>white.gif</texture>
+        </material>
+    </materials>
+    <meshfact name="ball3Fact">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <material>white</material>
+            <sphere rimvertices="12">
+                <radius x="0.2" y="0.2" z="0.2" />
+                <center x="0" y="0" z="0.5" />
+            </sphere>
+        </params>
+    </meshfact>
+</library>
