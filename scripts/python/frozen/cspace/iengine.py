@@ -603,7 +603,7 @@ class iEngine(core.iBase):
     def GetRenderManager(*args): return _iengine.iEngine_GetRenderManager(*args)
     def SetRenderManager(*args): return _iengine.iEngine_SetRenderManager(*args)
     def ReloadRenderManager(*args): return _iengine.iEngine_ReloadRenderManager(*args)
-    def SyncEngineLists(*args): return _iengine.iEngine_SyncEngineLists(*args)
+    def SyncEngineListsNow(*args): return _iengine.iEngine_SyncEngineListsNow(*args)
     scfGetVersion = staticmethod(_iengine.iEngine_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iEngine
     __del__ = lambda self : None;

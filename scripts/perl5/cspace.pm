@@ -19610,7 +19610,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetRenderManager = *cspacec::iEngine_GetRenderManager;
 *SetRenderManager = *cspacec::iEngine_SetRenderManager;
 *ReloadRenderManager = *cspacec::iEngine_ReloadRenderManager;
-*SyncEngineLists = *cspacec::iEngine_SyncEngineLists;
+*SyncEngineListsNow = *cspacec::iEngine_SyncEngineListsNow;
 *scfGetVersion = *cspacec::iEngine_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
