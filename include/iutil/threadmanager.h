@@ -44,6 +44,7 @@ enum QueueType
 {
   THREADED = 0,
   HIGH,
+  MED,
   LOW
 };
 

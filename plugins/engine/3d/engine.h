@@ -390,7 +390,7 @@ public:
 	iDataBuffer* input, iSector* sector, const csVector3& pos);
 
   THREADED_CALLABLE_DECL1(csEngine, AddMeshAndChildren, csThreadReturn, iMeshWrapper*, mesh,
-    HIGH, false, false);
+    MED, false, false);
 
   virtual csPtr<iMeshWrapperIterator> GetNearbyMeshes (iSector* sector,
     const csVector3& pos, float radius, bool crossPortals = true );

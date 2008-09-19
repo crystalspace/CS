@@ -24,6 +24,7 @@
 #include "csutil/refcount.h"
 #include "csutil/threading/mutex.h"
 #include "iutil/job.h"
+#include "iutil/threadmanager.h"
 
 using namespace CS::Threading;
 
@@ -34,14 +35,19 @@ public:
   {
   }
 
-  void Enqueue(iJob* job, bool high)
+  void Enqueue(iJob* job, QueueType type)
   {    
-    if(high)
+    if(type == HIGH)
     {
       RecursiveMutexScopedLock lock(highQueueLock);
       highqueue.Push(job);
     }
-    else
+    else if(type == MED)
+    {
+      RecursiveMutexScopedLock lock(medQueueLock);
+      medqueue.Push(job);
+    }
+    else if(type == LOW)
     {
       RecursiveMutexScopedLock lock(lowQueueLock);
       lowqueue.Push(job);
@@ -50,27 +56,59 @@ public:
 
   void ProcessQueue(uint num)
   {
+    uint i=0;
+
+    ProcessHighQueue(i, num);
+
+    if(i<num)
     {
-      // Run num jobs.
-      RecursiveMutexScopedLock lock(highQueueLock);
-      for(size_t i=0; i<num && highqueue.GetSize() != 0; i++)
-      {
-        highqueue.PopTop()->Run();
-      }
+      ProcessMedQueue(i, num);
     }
 
-    // Run one job.
-    if(lowqueue.GetSize() != 0)
+    if(i<num)
     {
-      RecursiveMutexScopedLock lock(lowQueueLock);
-      lowqueue.PopTop()->Run();
+      ProcessLowQueue(i, num);
     }
   }
 
 private:
-  RecursiveMutex lowQueueLock;
+  inline void ProcessHighQueue(uint& i, uint& num)
+  {
+    RecursiveMutexScopedLock lock(highQueueLock);
+    for(; i<num && highqueue.GetSize() != 0; i++)
+    {
+      highqueue.PopTop()->Run();
+    }
+  }
+
+  inline void ProcessMedQueue(uint& i, uint& num)
+  {
+    ProcessHighQueue(i, num);
+    RecursiveMutexScopedLock lock(medQueueLock);
+    for(; i<num && medqueue.GetSize() != 0; i++)
+    {
+      medqueue.PopTop()->Run();
+      ProcessHighQueue(i, num);
+    }
+  }
+
+  inline void ProcessLowQueue(uint& i, uint& num)
+  {
+    ProcessHighQueue(i, num);
+    RecursiveMutexScopedLock lock(lowQueueLock);
+    for(; i<num && lowqueue.GetSize() != 0; i++)
+    {
+      lowqueue.PopTop()->Run();
+      ProcessHighQueue(i, num);
+      ProcessMedQueue(i, num);
+    }
+  }
+
   RecursiveMutex highQueueLock;
+  RecursiveMutex medQueueLock;
+  RecursiveMutex lowQueueLock;
   csFIFO<csRef<iJob> > highqueue;
+  csFIFO<csRef<iJob> > medqueue;
   csFIFO<csRef<iJob> > lowqueue;
 };
 

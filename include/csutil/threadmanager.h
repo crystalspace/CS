@@ -54,7 +54,7 @@ public:
     }
     else
     {
-      listQueue->Enqueue(job, queueType == HIGH);
+      listQueue->Enqueue(job, queueType);
     }
   }
 

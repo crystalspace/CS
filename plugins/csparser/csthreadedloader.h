@@ -510,7 +510,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csRef<iDocumentNode>, node, csRef<iStreamSource>, ssource, csRef<iSector>, sector, THREADED, false, false);
 
     THREADED_CALLABLE_DECL2(csThreadedLoader, AddObjectToSector, csLoaderReturn,
-      csRef<iMovable>, movable, csRef<iSector>, sector, HIGH, false, false);
+      csRef<iMovable>, movable, csRef<iSector>, sector, MED, false, false);
 
     THREADED_CALLABLE_DECL4(csThreadedLoader, LoadMeshRef, csLoaderReturn, csRef<iDocumentNode>,
       node, csRef<iSector>, sector, csRef<iLoaderContext>, ldr_context, csRef<iStreamSource>,
@@ -626,12 +626,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     /// Parse a addon.
     THREADED_CALLABLE_DECL6(csThreadedLoader, ParseAddOn, csLoaderReturn,
       csRef<iLoaderPlugin>, plugin, csRef<iDocumentNode>, node, csRef<iStreamSource>, ssource,
-      csRef<iLoaderContext>, ldr_context, csRef<iBase>, context, const char*, dir, HIGH, true, false);
+      csRef<iLoaderContext>, ldr_context, csRef<iBase>, context, const char*, dir, MED, true, false);
 
     /// Parse a addon (binary plugin).
     THREADED_CALLABLE_DECL5(csThreadedLoader, ParseAddOnBinary, csLoaderReturn,
       csRef<iBinaryLoaderPlugin>, plugin, csRef<iDataBuffer>, dbuf, csRef<iStreamSource>,
-      ssource, csRef<iLoaderContext>, ldr_context, csRef<iBase>, context, HIGH, true, false);
+      ssource, csRef<iLoaderContext>, ldr_context, csRef<iBase>, context, MED, true, false);
 
     /**
     * Try loading the file as a structured document.
@@ -702,7 +702,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, SetSectorVisibilityCuller, csLoaderReturn,
       csRef<iSector>, sector, const char*, culplugname, csRef<iDocumentNode>, culler_params,
-      HIGH, false, false)
+      MED, false, false)
 
       // Process the attributes of an <imposter> tag in a mesh specification.
       bool ParseImposterSettings(iImposter* mesh, iDocumentNode *node);

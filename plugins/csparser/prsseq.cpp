@@ -1440,7 +1440,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             error = true;
             return 0;
           }
-          iLight* light = Engine->FindLight (lightname);
+          iLight* light = ldr_context->FindLight (lightname);
           if (!light)
           {
             SyntaxService->ReportError (
@@ -1492,7 +1492,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             error = true;
             return 0;
           }
-          iMaterialWrapper* mat = Engine->FindMaterial (matname);
+          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
           if (!mat)
           {
             SyntaxService->ReportError (
