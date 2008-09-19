@@ -31,6 +31,7 @@
 #include "iengine/material.h"
 #include "iengine/texture.h"
 #include "igraphic/image.h"
+#include "imap/loader.h"
 #include "itexture/itexfact.h"
 #include "iutil/comp.h"
 #include "iutil/event.h"
@@ -182,21 +183,38 @@ iProcTexture* csProcTexCallback::GetProcTexture() const
 
 iTextureWrapper* csProcTexture::CreateTexture (iObjectRegistry* object_reg)
 {
-  iTextureWrapper* tex;
+  csRef<iTextureWrapper> tex;
 
   csRef<iEngine> engine (csQueryRegistry<iEngine> (object_reg));
+  csRef<iThreadedLoader> tldr = csQueryRegistry<iThreadedLoader> (object_reg);
+  csRef<iTextureManager> texman = csQueryRegistry<iTextureManager> (object_reg);
   if (proc_image)
   {
-    tex = engine->GetTextureList()->NewTexture (proc_image);
+    if(tldr.IsValid())
+    {
+      tex = engine->GetTextureList()->CreateTexture (proc_image);
+      tldr->AddTextureToList(tex);
+    }
+    else
+    {
+      tex = engine->GetTextureList()->NewTexture (proc_image);
+    }
     tex->SetFlags (CS_TEXTURE_3D | texFlags);
     proc_image = 0;
   }
   else
   {
-    csRef<iTextureHandle> texHandle = 
-      g3d->GetTextureManager()->CreateTexture (mat_w, mat_h, csimg2D, "rgb8",
-      CS_TEXTURE_3D | texFlags);
-    tex = engine->GetTextureList()->NewTexture (texHandle);
+    csRef<iTextureHandle> texHandle = g3d->GetTextureManager()->CreateTexture (mat_w, mat_h,
+      csimg2D, "rgb8", CS_TEXTURE_3D | texFlags);
+    if(tldr.IsValid())
+    {
+      tex = engine->GetTextureList()->CreateTexture (texHandle);
+      tldr->AddTextureToList(tex);
+    }
+    else
+    {
+      tex = engine->GetTextureList()->NewTexture (texHandle);
+    }
   }
 
   return tex;

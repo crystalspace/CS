@@ -1652,6 +1652,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_MESHOBJ:
         {
+          if(child->GetAttributeValue ("name") == 0)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.load.plugin",
+              child, "Some meshobj has no name!");
+            return false;
+          }
           csRef<iMeshWrapper> sp = Engine->CreateMeshWrapper(child->GetAttributeValue ("name"), false);
           csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, sp, mesh, child, ssource, 0);
           AddLoadingMeshObject(child->GetAttributeValue("name"), itr);

@@ -618,16 +618,22 @@ THREADED_CALLABLE_IMPL2(csEngine, SyncEngineLists, csRef<iThreadedLoader> loader
     while(!newTextures.IsEmpty())
     {
       csRef<iTextureWrapper> tex = newTextures.Pop();
-      tex->GetTextureHandle()->Precache();
+      if(tex->GetTextureHandle())
+      {
+        tex->GetTextureHandle()->Precache();
+      }
     }
   }
   else
   {
-  // Precache a texture.
+    // Precache a texture.
     if(!newTextures.IsEmpty())
     {
       csRef<iTextureWrapper> tex = newTextures.Pop();
-      tex->GetTextureHandle()->Precache();
+      if(tex->GetTextureHandle())
+      {
+        tex->GetTextureHandle()->Precache();
+      }
     }
 
     // Schedule another run.

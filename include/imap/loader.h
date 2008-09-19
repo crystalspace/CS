@@ -759,6 +759,15 @@ struct iThreadedLoader : public virtual iBase
   csRef<iStreamSource> ssource = 0, csRef<iMissingLoaderData> missingdata = 0, uint keepFlags = KEEP_ALL,
   bool do_verbose = false);
   //@}
+
+  /// Add object to the transfer list.
+  virtual void AddSectorToList(csRef<iSector> obj) = 0;
+  virtual void AddMeshFactToList(csRef<iMeshFactoryWrapper> obj) = 0;
+  virtual void AddMeshToList(csRef<iMeshWrapper> obj) = 0;
+  virtual void AddCamposToList(csRef<iCameraPosition> obj) = 0;
+  virtual void AddTextureToList(csRef<iTextureWrapper> obj) = 0;
+  virtual void AddMaterialToList(csRef<iMaterialWrapper> obj) = 0;
+  virtual void AddSharedVarToList(csRef<iSharedVariable> obj) = 0;
 };
 
 /**

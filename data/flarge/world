@@ -12806,7 +12806,7 @@
                                 <rotx>0</rotx>
                             </matrix>
                         </move>
-                        <meshobj>
+                        <meshobj name="robotHandLeftParticles">
                             <plugin>particles</plugin>
                             <params>
                                 <factory>particlesFactory</factory>

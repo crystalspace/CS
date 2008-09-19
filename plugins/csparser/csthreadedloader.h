@@ -225,6 +225,49 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     node, csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>,
     missingdata, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
+    void AddSectorToList(csRef<iSector> obj)
+    {
+      MutexScopedLock lock(sectorsLock);
+      loaderSectors.Push(obj);
+      obj->DecRef(); // Compensate for CreateSector IncRef().
+    }
+
+    void AddMeshFactToList(csRef<iMeshFactoryWrapper> obj)
+    {
+      MutexScopedLock lock(meshfactsLock);
+      loaderMeshFactories.Push(obj);
+    }
+
+    void AddMeshToList(csRef<iMeshWrapper> obj)
+    {
+      MutexScopedLock lock(meshesLock);
+      loaderMeshes.Push(obj);
+    }
+
+    void AddCamposToList(csRef<iCameraPosition> obj)
+    {
+      MutexScopedLock lock(camposLock);
+      loaderCameraPositions.Push(obj);
+    }
+
+    void AddTextureToList(csRef<iTextureWrapper> obj)
+    {
+      MutexScopedLock lock(texturesLock);
+      loaderTextures.Push(obj);
+    }
+
+    void AddMaterialToList(csRef<iMaterialWrapper> obj)
+    {
+      MutexScopedLock lock(materialsLock);
+      loaderMaterials.Push(obj);
+    }
+
+    void AddSharedVarToList(csRef<iSharedVariable> obj)
+    {
+      MutexScopedLock lock(sharedvarLock);
+      loaderSharedVariables.Push(obj);
+    }
+
   protected:
 
     friend class csLoaderContext;
@@ -397,49 +440,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iSndSysRenderer> SndSysRenderer;
     // Frame event.
     csEventID ProcessPerFrame;
-
-    void AddSectorToList(csRef<iSector> obj)
-    {
-      MutexScopedLock lock(sectorsLock);
-      loaderSectors.Push(obj);
-      obj->DecRef(); // Compensate for CreateSector IncRef().
-    }
-
-    void AddMeshFactToList(csRef<iMeshFactoryWrapper> obj)
-    {
-      MutexScopedLock lock(meshfactsLock);
-      loaderMeshFactories.Push(obj);
-    }
-
-    void AddMeshToList(csRef<iMeshWrapper> obj)
-    {
-      MutexScopedLock lock(meshesLock);
-      loaderMeshes.Push(obj);
-    }
-
-    void AddCamposToList(csRef<iCameraPosition> obj)
-    {
-      MutexScopedLock lock(camposLock);
-      loaderCameraPositions.Push(obj);
-    }
-
-    void AddTextureToList(csRef<iTextureWrapper> obj)
-    {
-      MutexScopedLock lock(texturesLock);
-      loaderTextures.Push(obj);
-    }
-
-    void AddMaterialToList(csRef<iMaterialWrapper> obj)
-    {
-      MutexScopedLock lock(materialsLock);
-      loaderMaterials.Push(obj);
-    }
-
-    void AddSharedVarToList(csRef<iSharedVariable> obj)
-    {
-      MutexScopedLock lock(sharedvarLock);
-      loaderSharedVariables.Push(obj);
-    }
 
     // ----------------------------------------------- //
     struct ProxyKeyColour
