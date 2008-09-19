@@ -391,17 +391,22 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	break;
       case XMLTOKEN_MATERIAL:
 	{
-	  const char* matname = child->GetContentsValue ();
-          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-	  if (!mat)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.genmeshfactoryloader.parse.unknownmaterial",
-		child, "Couldn't find material '%s'!", matname);
-            return 0;
-	  }
-	  fact->SetMaterialWrapper (mat);
-	}
+    const char* matname = child->GetContentsValue ();
+    iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+    csTicks start = csGetTicks();
+    while(!mat && (csGetTicks() - start < 60000))
+    {
+      mat = ldr_context->FindMaterial (matname);
+    }
+    if (!mat)
+    {
+      synldr->ReportError (
+        "crystalspace.genmeshfactoryloader.parse.unknownmaterial",
+        child, "Couldn't find material '%s'!", matname);
+      return 0;
+    }
+    fact->SetMaterialWrapper (mat);
+  }
 	break;
       case XMLTOKEN_BOX:
         {
@@ -1158,8 +1163,12 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
     case XMLTOKEN_MATERIAL:
       {
         const char* matname = child->GetContentsValue ();
-        csRef<iMaterialWrapper> material = 
-          ldr_context->FindMaterial (matname);
+        csRef<iMaterialWrapper> material = ldr_context->FindMaterial (matname);
+        csTicks start = csGetTicks();
+        while(!material.IsValid() && (csGetTicks() - start < 60000))
+        {
+          material = ldr_context->FindMaterial (matname);
+        }
         if (!material.IsValid ())
         {
           synldr->ReportError (
@@ -1335,15 +1344,20 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_MATERIAL:
 	{
 	  const char* matname = child->GetContentsValue ();
-          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-	  if (!mat)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.genmeshloader.parse.unknownmaterial",
-		child, "Couldn't find material '%s'!", matname);
-            return 0;
-	  }
-	  CHECK_MESH(meshstate);
+    iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+    csTicks start = csGetTicks();
+    while(!mat && (csGetTicks() - start < 60000))
+    {
+      mat = ldr_context->FindMaterial (matname);
+    }
+    if (!mat)
+    {
+      synldr->ReportError (
+        "crystalspace.genmeshloader.parse.unknownmaterial",
+        child, "Couldn't find material '%s'!", matname);
+      return 0;
+    }
+    CHECK_MESH(meshstate);
 	  mesh->SetMaterialWrapper (mat);
 	}
 	break;

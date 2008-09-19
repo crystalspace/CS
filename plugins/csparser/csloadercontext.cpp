@@ -372,7 +372,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     loader->texturesLock.Lock();
     for(size_t i=0; i<loader->loaderTextures.GetSize(); i++)
     {
-      if(!strcmp(loader->loaderTextures[i]->QueryObject()->GetName(), name))
+      if(loader->loaderTextures[i]->QueryObject()->GetName() &&
+        !strcmp(loader->loaderTextures[i]->QueryObject()->GetName(), name))
       {
         result = loader->loaderTextures[i];
         loader->texturesLock.Unlock();
