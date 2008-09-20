@@ -22,6 +22,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 CS_IMPLEMENT_APPLICATION
 
+using namespace CS::Threading;
+
 csThreadTest::csThreadTest(iObjectRegistry* objReg) : scfImplementationType(this),
                                                       objReg(objReg)
 {

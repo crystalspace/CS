@@ -78,7 +78,7 @@ public:
 private:
   iObjectRegistry* objReg;
 
-  Mutex test7lock;
+  CS::Threading::Mutex test7lock;
   uint test7;
 };
 
