@@ -40,6 +40,7 @@ csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationTyp
   // If we can't detect, assume we have one.
   if(threadCount == 0)
   {
+    csFPrintf(stderr, "Processor count couldn't be detected!\n");
     threadCount = 1;
   }
 
