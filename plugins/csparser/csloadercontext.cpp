@@ -27,6 +27,8 @@
 
 #include "csloadercontext.h"
 
+using namespace CS::Threading;
+
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
   csLoaderContext::csLoaderContext (iObjectRegistry* object_reg, iEngine* Engine,
