@@ -28,7 +28,7 @@ This concept is completely analogous to the Java interface mechanism.  The
 advantage of using this paradigm is that you have a clear separation between
 the @sc{api} and the implementation.  This allows one to easily replace an
 implementation of some @sc{api} or even provide multiple implementations (for
-example, the software and OpenGL renderers are two implementations of the same
+example, the Null and OpenGL renderers are two implementations of the same
 3D rendering @sc{api}).
 
 Here is the @sc{api} definition for our sample plugin:
@@ -378,7 +378,7 @@ This way has several advantages.  First, it allows the user to override your
 plugin at the command line or in the configuration file (if your program has
 one).  In cases where there are multiple implementations for the same @sc{api}
 this can be an important consideration.  It is by doing this, for example, that
-it is possible to switch between software and OpenGL renderers with the
+it is possible to switch between Null and OpenGL renderers with the
 command-line @samp{--video=} option, or via configuration file.
 
 Secondly it registers the plugin with the object registry so that

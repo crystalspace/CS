@@ -27,9 +27,7 @@ Use this option to set the size of the display.
 Use this option to select the type of 2D canvas to use.
 
 @item -video=opengl
-(or software, ...).
-Use this option to select type of display driver to use.  Other options
-are @code{software}, @code{null}, etc.
+Use this option to select type of display driver to use.
 
 @item -fs
 Open in fullscreen mode (default is windowed).

@@ -218,7 +218,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     else
       imposter->SetImposterActive (true);
 
-    iSharedVariable *var;
+    iSharedVariable *var = 0;
 
     s = node->GetAttributeValue ("range");
     if (s)

@@ -2108,52 +2108,6 @@ static int compare_light (const void *p1, const void *p2)
 // in csEngine so that it will be freed later.
 static csLightArray *light_array = 0;
 
-static bool FindLightBox_Front2Back (csKDTree* treenode,
-	void* userdata, uint32 cur_timestamp, uint32&)
-{
-  csBox3* box = (csBox3*)userdata;
-
-  const csBox3& node_bbox = treenode->GetNodeBBox ();
-
-  // In the first part of this test we are going to test if the
-  // box intersects with the node. If not then we don't need to continue.
-  if (!node_bbox.TestIntersect (*box))
-  {
-    return false;
-  }
-
-  treenode->Distribute ();
-
-  int num_objects;
-  csKDTreeChild** objects;
-  num_objects = treenode->GetObjectCount ();
-  objects = treenode->GetObjects ();
-
-  int i;
-  for (i = 0 ; i < num_objects ; i++)
-  {
-    if (objects[i]->timestamp != cur_timestamp)
-    {
-      objects[i]->timestamp = cur_timestamp;
-      // First test the bounding box of the object.
-      const csBox3& obj_bbox = objects[i]->GetBBox ();
-
-      if (obj_bbox.TestIntersect (*box))
-      {
-        iLight* light = (iLight*)objects[i]->GetObject ();
-	csVector3 light_pos = light->GetMovable ()->GetFullPosition ();
-        csBox3 b (box->Min () - light_pos, box->Max () - light_pos);
-        float sqdist = b.SquaredOriginDist ();
-        if (sqdist < csSquare (light->GetCutoffDistance ()))
-	{
-	  light_array->AddLight (light, sqdist);
-	}
-      }
-    }
-  }
-  return true;
-}
-
 struct LightCollectPoint
 {
   LightCollectPoint (csLightArray* lightArray, const csVector3& pos)

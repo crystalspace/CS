@@ -9,7 +9,7 @@ explains how to control aspects of texture rendering, like the format they are
 uploaded to the graphics hardware.
 
 @subsubheading Texture dimensions
-3D hardware (but also software) can render textures more efficiently if the 
+3D hardware can render textures more efficiently if the 
 dimensions are powers of two (abbreviated as "PO2") (e.g. 256x256, 512x128...), 
 to the extent that hardware and graphics APIs (e.g. OpenGL) require textures 
 to have PO2 dimensions. So does CrystalSpace for all textures, 2D and 3D. 

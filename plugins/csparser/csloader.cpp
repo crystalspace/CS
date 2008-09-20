@@ -3673,7 +3673,7 @@ bool csLoader::ParseImposterSettings (iImposter* imposter,
   else
     imposter->SetImposterActive (true);
 
-  iSharedVariable *var;
+  iSharedVariable *var = 0;
 
   s = node->GetAttributeValue ("range");
   if (s)

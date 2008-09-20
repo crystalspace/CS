@@ -406,27 +406,10 @@ defaults write CrystalSpace.Walktest Walktest.Settings.WorldFile castle
 Other interesting applications, such as csDemo, also come with
 Crystal Space.
 
-By default, Crystal Space renders the 3D scenes with the OpenGL renderer.  Some
+Crystal Space renders the 3D scenes with the OpenGL renderer.  Some
 versions of the MacOS/X operating system ship with OpenGL drivers which do not
 not perform particularly well with the Crystal Space OpenGL renderer, and this
-problem could result in poor frame rates.  Consequently, you may want to
-configure Crystal Space to instead use the software renderer.  There are two
-ways to enable the software renderer.  First, you may instruct a program to use
-software renderer from the command-line:
-
-@example
-./walktest.app/Contents/MacOS/walktest --video=software flarge
-@end example
-
-Second, you can enable the software renderer on a permanent basis for all
-applications by setting the following default.  Once you have applied this
-setting, you no longer need to specify @samp{--video=software} on the
-command-line.
-
-@example
-defaults write CrystalSpace.Global System.Plugins.iGraphics3D \
-  crystalspace.graphics3d.software
-@end example
+problem could result in poor frame rates.
 
 Crystal Space renders 3D scenes in a window by default, however you can
 instruct the applications to use @dfn{full-screen} mode with the @samp{--fs}

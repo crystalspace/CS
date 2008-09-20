@@ -36,8 +36,7 @@ you will need to recalculate the lightmaps for the level.  The option
 @samp{-relight} does this.  Also use this if you modify a map such that its
 geometry has changed.
 
-The other most useful options are @samp{-help} to list available options, and
-@samp{-video=software} or @samp{-video=opengl} to change the renderer used.
+The other most useful option is @samp{-help} to list available options.
 
 Once Walktest is running, you can move about the world using the mouse and
 arrow keys, similar to many First Person Shooter games.  The movement commands
@@ -164,7 +163,7 @@ General options:
 @item -help
 Display a help message.
 @item -video=<s>
-The 3D rendering driver (opengl, software, @dots{}).
+The 3D rendering driver (opengl, @dots{}).
 @item -canvas=<s>
 The 2D canvas driver (asciiart, x2d, @dots{})
 @item -plugin=<s>

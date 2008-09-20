@@ -131,47 +131,6 @@ possible.  Refer to the section in the Crystal Space manual which discusses
 documentation resources.  @xref{Documentation Resources}.
 
 @item
-@strong{Q}: I don't have lots of memory.  Can I still run Crystal Space?
-
-@strong{A1}: You may want to decrease the size of the texture cache with the
-@samp{-cache=<size>} command-line option or the @samp{CACHE} configuration
-option in @file{soft3d.cfg} if you are using the software renderer.  By
-default the size of the texture cache is quite large (typically 5 to eight
-megabytes in size), so adjusting this value might be useful for low-memory
-systems.
-
-@strong{A2}: Using a smaller window size and a lower bit-depth can also
-decrease memory usage.  In addition to the memory used for the actual graphics
-display, Crystal Space uses a Z-buffer containing 4-byte values with the same
-dimensions as the display.  Therefore, a display with dimensions of 640x480
-uses a Z-buffer of 1,228,800 bytes.
-
-@strong{A3}: If you are still low on memory there is only one thing you can
-do: decrease the complexity of the map.  For every polygon in the world a lot
-of memory used.  If you just want to try the engine you can run Crystal Space
-with some of the simpler worlds such as @file{room.zip} or @file{maze.zip}.
-
-@item
-@strong{Q}: Crystal Space is really slow on my computer.  What can I do to
-speed it up?
-
-@strong{A1}: Crystal Space is a 6@sc{dof} engine.  It needs to do
-semi-perspective correct texture mapping to get a nice display and
-calculations to achieve this are slow.  You can expect that Crystal Space will
-probably need the same kind of computer as a game such as Quake 1 or Quake 2,
-at least a Pentium or a very fast 486 with a floating point co-processor.
-Also note that Crystal Space is still in the developmental stage and has not
-yet been fully optimized.  You might try using smaller window dimensions
-with the @samp{-mode=} option.  @xref{Common Command Line Options}.
-
-@strong{A2}: Use a hardware accelerated graphics card and driver.  Such cards
-are quite popular these days and can perform extremely well, especially when
-compared to Crystal Space's software renderer. Framerates of 100 fps and more
-are not uncommon if you have a properly configured OpenGL renderer. Note that
-by default Crystal Space uses OpenGL. You have to use the
-@samp{-video=software} command-line option to go back to Software rendering.
-
-@item
 @strong{Q}: I'm using OpenGL with Crystal Space (via the @samp{-video=opengl}
 command-line option, for example) and the animation is extremely slow.  What's
 wrong?
@@ -341,35 +300,6 @@ them with @code{HardTransform}.
 @strong{A2}: Another common error is forgetting to call
 @code{movable->UpdateMove()} after moving a model. If you don't call that
 function then the visibility culler doesn't know the object has moved.
-
-@item
-@strong{Q}: Why isn't my polygon lit correctly? It is simply full bright.
-
-@strong{A}: Both the software and OpenGL renderer have a limitation on
-lightmap size.  For the software renderer the limitation is that the
-final resulting lit texture may not exceed 1500000 pixels.  To calculate
-the final resulting lit texture size the easiest way is to take the
-texture size that is used on the polygon (i.e. 64x64 for example) and
-calculate how many times the texture is repeated on that polygon.  If the
-given texture is repeated four times on the polygon then you basically
-have a total texture of 256x256 which will be fine.  For the OpenGL
-renderer the limitation is that a lightmap cannot be bigger than 256x256.
-Note that there will be a lightmap lumel for every 16x16 texels on the
-polygon.  To avoid this limitation you basically have five possible
-solutions: (1) split the polygon into smaller polygons, (2) use a smaller
-base texture (this will also reduce size of lightmap/lit texture), (3)
-decrease the number of times the texture is tiled on the polygon, (4)
-increase the size of the lumels (i.e. 32x32 instead of 16x16) by changing
-the @samp{lightmapcellsize} option in the world file, and finally (5) use a
-low-resolution base texture and a high-resolution detail texture to add detail
-(this only works for OpenGL).
-
-@item
-@strong{Q}: I added lights, and/or moved geometry in my level but they are not
-correctly lit.  What did I do wrong?
-
-@strong{A}: Crystal Space does not automatically recalculate lighting.
-To do that you have to use the @samp{-relight} command-line option.
 
 @item
 @strong{Q}: I'm confused by the Crystal Space coordinate system.  The 3D
