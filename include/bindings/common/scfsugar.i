@@ -167,7 +167,7 @@ csWrapPtr CS_LOAD_PLUGIN (iPluginManager *obj, const char *id,
 {
   printf("CS_LOAD_PLUGIN is deprecated, use \
 iPluginManager->LoadPlugin instead\n");
-  return csWrapPtr (iface, iface_ver, csPtr<iBase> (obj->LoadPlugin (id)->GetResultRefPtr()));
+  return csWrapPtr (iface, iface_ver, csPtr<iBase> (obj->LoadPlugin (id)));
 }
 
 csWrapPtr CS_GET_CHILD_OBJECT (iObject *obj, const char *iface, int iface_ver)
