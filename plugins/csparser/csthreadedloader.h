@@ -225,47 +225,53 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     node, csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>,
     missingdata, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
-    void AddSectorToList(csRef<iSector> obj)
+    void AddSectorToList(iSector* obj)
     {
       MutexScopedLock lock(sectorsLock);
       loaderSectors.Push(obj);
       obj->DecRef(); // Compensate for CreateSector IncRef().
     }
 
-    void AddMeshFactToList(csRef<iMeshFactoryWrapper> obj)
+    void AddMeshFactToList(iMeshFactoryWrapper* obj)
     {
       MutexScopedLock lock(meshfactsLock);
       loaderMeshFactories.Push(obj);
     }
 
-    void AddMeshToList(csRef<iMeshWrapper> obj)
+    void AddMeshToList(iMeshWrapper* obj)
     {
       MutexScopedLock lock(meshesLock);
       loaderMeshes.Push(obj);
     }
 
-    void AddCamposToList(csRef<iCameraPosition> obj)
+    void AddCamposToList(iCameraPosition* obj)
     {
       MutexScopedLock lock(camposLock);
       loaderCameraPositions.Push(obj);
     }
 
-    void AddTextureToList(csRef<iTextureWrapper> obj)
+    void AddTextureToList(iTextureWrapper* obj)
     {
       MutexScopedLock lock(texturesLock);
       loaderTextures.Push(obj);
     }
 
-    void AddMaterialToList(csRef<iMaterialWrapper> obj)
+    void AddMaterialToList(iMaterialWrapper* obj)
     {
       MutexScopedLock lock(materialsLock);
       loaderMaterials.Push(obj);
     }
 
-    void AddSharedVarToList(csRef<iSharedVariable> obj)
+    void AddSharedVarToList(iSharedVariable* obj)
     {
       MutexScopedLock lock(sharedvarLock);
       loaderSharedVariables.Push(obj);
+    }
+
+    void AddLightToList(iLight* obj, const char* name)
+    {
+      MutexScopedLock lock(lightsLock);
+      loadedLights.Put(csString(name), obj);
     }
 
   protected:
@@ -280,6 +286,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     Mutex texturesLock;
     Mutex materialsLock;
     Mutex sharedvarLock;
+    Mutex lightsLock;
 
     // Final objects.
     csRefArray<iSector> loaderSectors;
@@ -289,6 +296,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRefArray<iTextureWrapper> loaderTextures;
     csRefArray<iMaterialWrapper> loaderMaterials;
     csRefArray<iSharedVariable> loaderSharedVariables;
+    csWeakRefHash<iLight, csString> loadedLights;
 
     // General loading objects.
     csHash<csRef<iThreadReturn>, const char*> loadingMeshObjects;

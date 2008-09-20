@@ -632,7 +632,6 @@ int csLightList::Add (iLight *obj)
 {
   PrepareLight (obj);
   const char* lightname = obj->QueryObject ()->GetName ();
-  CS::Threading::RecursiveMutexScopedLock lock(llock);
   if (lightname)
     lights_hash.Put (lightname, obj);
   obj->QueryObject ()->AddNameChangeListener (listener);
@@ -643,7 +642,6 @@ bool csLightList::Remove (iLight *obj)
 {
   FreeLight (obj);
   const char* lightname = obj->QueryObject ()->GetName ();
-  CS::Threading::RecursiveMutexScopedLock lock(llock);
   if (lightname)
     lights_hash.Delete (lightname, obj);
   obj->QueryObject ()->RemoveNameChangeListener (listener);
@@ -652,7 +650,6 @@ bool csLightList::Remove (iLight *obj)
 
 bool csLightList::Remove (int n)
 {
-  CS::Threading::RecursiveMutexScopedLock lock(llock);
   FreeLight (list[n]);
   iLight* obj = list[n];
   const char* lightname = obj->QueryObject ()->GetName ();
@@ -665,7 +662,6 @@ bool csLightList::Remove (int n)
 void csLightList::RemoveAll ()
 {
   size_t i;
-  CS::Threading::RecursiveMutexScopedLock lock(llock);
   for (i = 0 ; i < list.GetSize () ; i++)
   {
     list[i]->QueryObject ()->RemoveNameChangeListener (listener);
@@ -682,7 +678,6 @@ int csLightList::Find (iLight *obj) const
 
 iLight *csLightList::FindByName (const char *Name) const
 {
-  CS::Threading::RecursiveMutexScopedLock lock(llock);
   return lights_hash.Get (Name, 0);
 }
 

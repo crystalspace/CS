@@ -256,17 +256,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   iLight* csLoaderContext::FindLight(const char *name)
   {
-    iLight *light = NULL;
-    loader->sectorsLock.Lock();
-    for (size_t i = 0; i < loader->loaderSectors.GetSize(); i++)
-    {
-      light = loader->loaderSectors[i]->GetLights ()->FindByName (name);
-      if (light)
-      {
-        break;
-      }
-    }
-    loader->sectorsLock.Unlock();
+    loader->lightsLock.Lock();
+    iLight *light = loader->loadedLights.Get(csString(name), 0);
+    loader->lightsLock.Unlock();
 
     if(!light && collection)
     {
