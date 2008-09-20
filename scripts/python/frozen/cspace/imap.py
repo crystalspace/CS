@@ -212,6 +212,13 @@ class iThreadedLoader(core.iBase):
     def GetLoaderTextures(*args): return _imap.iThreadedLoader_GetLoaderTextures(*args)
     def GetLoaderMaterials(*args): return _imap.iThreadedLoader_GetLoaderMaterials(*args)
     def GetLoaderSharedVariables(*args): return _imap.iThreadedLoader_GetLoaderSharedVariables(*args)
+    def AddSectorToList(*args): return _imap.iThreadedLoader_AddSectorToList(*args)
+    def AddMeshFactToList(*args): return _imap.iThreadedLoader_AddMeshFactToList(*args)
+    def AddMeshToList(*args): return _imap.iThreadedLoader_AddMeshToList(*args)
+    def AddCamposToList(*args): return _imap.iThreadedLoader_AddCamposToList(*args)
+    def AddTextureToList(*args): return _imap.iThreadedLoader_AddTextureToList(*args)
+    def AddMaterialToList(*args): return _imap.iThreadedLoader_AddMaterialToList(*args)
+    def AddSharedVarToList(*args): return _imap.iThreadedLoader_AddSharedVarToList(*args)
     __swig_destroy__ = _imap.delete_iThreadedLoader
     __del__ = lambda self : None;
 iThreadedLoader_swigregister = _imap.iThreadedLoader_swigregister

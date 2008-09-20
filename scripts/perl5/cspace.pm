@@ -5037,6 +5037,13 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetLoaderTextures = *cspacec::iThreadedLoader_GetLoaderTextures;
 *GetLoaderMaterials = *cspacec::iThreadedLoader_GetLoaderMaterials;
 *GetLoaderSharedVariables = *cspacec::iThreadedLoader_GetLoaderSharedVariables;
+*AddSectorToList = *cspacec::iThreadedLoader_AddSectorToList;
+*AddMeshFactToList = *cspacec::iThreadedLoader_AddMeshFactToList;
+*AddMeshToList = *cspacec::iThreadedLoader_AddMeshToList;
+*AddCamposToList = *cspacec::iThreadedLoader_AddCamposToList;
+*AddTextureToList = *cspacec::iThreadedLoader_AddTextureToList;
+*AddMaterialToList = *cspacec::iThreadedLoader_AddMaterialToList;
+*AddSharedVarToList = *cspacec::iThreadedLoader_AddSharedVarToList;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
