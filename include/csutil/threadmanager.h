@@ -65,6 +65,11 @@ public:
       threadQueue->GetQueueCount() > 2*threadCount-1));
   }
 
+  inline int32 GetThreadCount()
+  {
+    return threadCount;
+  }
+
 protected:
   csEventID ProcessPerFrame;
   csEventID ProcessWhileWait;
@@ -127,6 +132,10 @@ public:
   {
     finished = false;
     result = NULL;
+  }
+
+  virtual ~csThreadReturn()
+  {
   }
 
   bool IsFinished() { return finished; }

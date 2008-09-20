@@ -670,8 +670,7 @@ public:
   void SyncEngineListsNow(csRef<iThreadedLoader> loader)
   {
     csRef<iThreadReturn> itr;
-    csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(objectRegistry);
-    itr.AttachNew(new csThreadReturn(tm));
+    itr.AttachNew(new csThreadReturn(tman));
     SyncEngineListsTC(itr, loader, true);
   }
 
@@ -1036,6 +1035,9 @@ private:
   csEventID CanvasResize;
   csEventID CanvasClose;
   csRef<iEventHandler> weakEventHandler;
+
+  /// Pointer to the thread manager.
+  csRef<iThreadManager> tman;
 
   /// Array of new textures to be precached.
   csRefArray<iTextureWrapper> newTextures;

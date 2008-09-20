@@ -626,12 +626,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     /// Parse a addon.
     THREADED_CALLABLE_DECL6(csThreadedLoader, ParseAddOn, csLoaderReturn,
       csRef<iLoaderPlugin>, plugin, csRef<iDocumentNode>, node, csRef<iStreamSource>, ssource,
-      csRef<iLoaderContext>, ldr_context, csRef<iBase>, context, const char*, dir, MED, true, false);
+      csRef<iLoaderContext>, ldr_context, csRef<iBase>, context, const char*, dir, HIGH, true, false);
 
     /// Parse a addon (binary plugin).
     THREADED_CALLABLE_DECL5(csThreadedLoader, ParseAddOnBinary, csLoaderReturn,
       csRef<iBinaryLoaderPlugin>, plugin, csRef<iDataBuffer>, dbuf, csRef<iStreamSource>,
-      ssource, csRef<iLoaderContext>, ldr_context, csRef<iBase>, context, MED, true, false);
+      ssource, csRef<iLoaderContext>, ldr_context, csRef<iBase>, context, HIGH, true, false);
 
     /**
     * Try loading the file as a structured document.

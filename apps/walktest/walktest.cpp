@@ -857,26 +857,14 @@ void WalkTest::InitCollDet (iEngine* engine, iCollection* collection)
 
 void WalkTest::LoadLibraryData (iCollection* collection)
 {
-  // Load the "standard" library
   if(Sys->threaded)
   {
     csRef<iThreadReturn> ret = TLevelLoader->LoadTexture ("cslogo2",
-      "/lib/std/cslogo2.png", CS_TEXTURE_2D, 0, true, true,
-      true, collection);
-    ret->Wait();
-    if(!ret->WasSuccessful())
-    {
-      Cleanup ();
-      exit (0);
-    }
+      "/lib/std/cslogo2.png", CS_TEXTURE_2D, 0, true, true, true, collection);
   }
   else
   {
-    if (!LevelLoader->LoadLibraryFile ("/lib/std/library", collection))
-    {
-      Cleanup ();
-      exit (0);
-    }
+    LevelLoader->LoadLibraryFile ("/lib/std/library", collection);
   }
 }
 
@@ -1272,6 +1260,10 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   LoadLibraryData (collection);
   ParseKeyCmds ();
 
+  csTicks stop_time = csGetTicks ();
+  csPrintf ("\nLevel load time: %g seconds.\n",
+    float (stop_time-start_time) / 1000.0); fflush (stdout);
+
   // Prepare the engine. This will calculate all lighting and
   // prepare the lightmaps for the 3D rasterizer.
   if (!do_collections)
@@ -1280,10 +1272,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Engine->Prepare (meter);
     delete meter;
   }
-
-  csTicks stop_time = csGetTicks ();
-  csPrintf ("\nLevel load time: %g seconds.\n",
-      float (stop_time-start_time) / 1000.0); fflush (stdout);
 
   if (!cmdline->GetOption ("noprecache"))
   {

@@ -40,8 +40,7 @@ struct iObjectRegistry;
  * The plugin manager is thread-safe.
  */
 class CS_CRYSTALSPACE_EXPORT csPluginManager :
-  public scfImplementation1<csPluginManager, iPluginManager>,
-  public ThreadedCallable<csPluginManager>
+  public scfImplementation1<csPluginManager, iPluginManager>
 {
 private:
   /// Mutex to make the plugin manager thread-safe.
@@ -107,8 +106,6 @@ private:
     }
   };
 
-  iObjectRegistry* GetObjectRegistry() const { return object_reg; }
-
   /// The object registry.
   iObjectRegistry* object_reg;
 
@@ -126,8 +123,7 @@ public:
   virtual ~csPluginManager ();
 
   /// Load a plugin and (optionally) initialize it.
-  THREADED_CALLABLE_DECL3(csPluginManager, LoadPlugin, csThreadReturn,
-    const char*, iClassID, bool, init, bool, report, HIGH, true, false);
+  virtual iBase* LoadPlugin(const char* iClassID, bool init, bool report);
 
   /**
    * Get first of the loaded plugins that supports given interface ID.

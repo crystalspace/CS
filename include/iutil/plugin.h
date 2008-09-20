@@ -72,8 +72,8 @@ struct iPluginManager : public virtual iBase
    *   iComponent's Initialize() method should be called.
    * \param report Whether to report loading failures using the reporter.
    */
-  THREADED_INTERFACE3(LoadPlugin, const char *classID, bool init = true,
-    bool report = true);
+  virtual iBase* LoadPlugin(const char *classID, bool init = true,
+    bool report = true) = 0;
 
   /**
    * Get first of the loaded plugins that supports given interface ID.
@@ -156,8 +156,7 @@ inline csPtr<Interface> csLoadPlugin (iPluginManager *mgr,
 				      bool report = true)
 {
   iBase* base;
-  csRef<iThreadReturn> itr = mgr->LoadPlugin (ClassID, true, report);
-  base = itr->GetResultRefPtr();
+  base = mgr->LoadPlugin (ClassID, true, report);
 
   if (base == 0) return csPtr<Interface> (0);
 
@@ -245,8 +244,7 @@ inline csPtr<iBase> csLoadPluginAlways (iPluginManager *mgr,
                                         const char* ClassID,
 				        bool report = true)
 {
-  csRef<iThreadReturn> itr = mgr->LoadPlugin (ClassID, true, report);
-  return csPtr<iBase> (itr->GetResultRefPtr());
+  return csPtr<iBase>(mgr->LoadPlugin (ClassID, true, report));
 }
 
 /**

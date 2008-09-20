@@ -163,6 +163,10 @@ public:
     success = false;
   }
 
+  virtual ~csLoaderReturn()
+  {
+  }
+
   bool IsFinished() { return finished; }
   bool WasSuccessful() { return success; }
   void* GetResultPtr() { CS_ASSERT_MSG("csLoaderReturn does not implement a void* result", false); return NULL; }

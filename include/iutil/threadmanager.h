@@ -67,6 +67,7 @@ struct iThreadManager : public virtual iBase
   virtual void PushToQueue(QueueType queueType, iJob* job) = 0;
   virtual void Wait(csRef<iThreadReturn> result) = 0;
   virtual bool RunNow(QueueType queueType, bool forceQueue) = 0;
+  virtual int32 GetThreadCount() = 0;
 };
 
 // Interface macros

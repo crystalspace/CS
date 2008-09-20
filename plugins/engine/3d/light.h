@@ -563,6 +563,7 @@ class csLightList : public scfImplementation1<csLightList,
 private:
   csRefArrayObject<iLight> list;
   csHash<iLight*, csString> lights_hash;
+  mutable CS::Threading::RecursiveMutex llock;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>

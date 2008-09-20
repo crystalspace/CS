@@ -1309,8 +1309,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
       case PARTYPE_LIGHT:
         {
-          iLight* l = ldr_context->FindLight (parname);
-          if (l) value = l;
+          value = ldr_context->FindLight (parname);
+          csTicks start = csGetTicks();
+          while(!value && csGetTicks()-start < 60000)
+          {
+            value = ldr_context->FindLight (parname);
+          }
         }
         break;
       case PARTYPE_MESH:

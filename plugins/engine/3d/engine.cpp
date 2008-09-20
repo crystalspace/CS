@@ -608,36 +608,42 @@ THREADED_CALLABLE_IMPL2(csEngine, SyncEngineLists, csRef<iThreadedLoader> loader
     {
       iTextureWrapper* txt = loaderTextures->Next();
       textures->Add(txt);
-      newTextures.Push(txt);
-    }
-  }
-
-  if(runNow)
-  {
-    // Precache all textures.
-    while(!newTextures.IsEmpty())
-    {
-      csRef<iTextureWrapper> tex = newTextures.Pop();
-      if(tex->GetTextureHandle())
+      if(tman->GetThreadCount() > 1)
       {
-        tex->GetTextureHandle()->Precache();
+        newTextures.Push(txt);
       }
     }
   }
-  else
+
+  if(tman->GetThreadCount() > 1)
   {
-    // Precache a texture.
-    if(!newTextures.IsEmpty())
+    if(runNow)
     {
-      csRef<iTextureWrapper> tex = newTextures.Pop();
-      if(tex->GetTextureHandle())
+      // Precache all textures.
+      while(!newTextures.IsEmpty())
       {
-        tex->GetTextureHandle()->Precache();
+        csRef<iTextureWrapper> tex = newTextures.Pop();
+        if(tex->GetTextureHandle())
+        {
+          tex->GetTextureHandle()->Precache();
+        }
       }
     }
+    else
+    {
+      // Precache a texture.
+      if(!newTextures.IsEmpty())
+      {
+        csRef<iTextureWrapper> tex = newTextures.Pop();
+        if(tex->GetTextureHandle())
+        {
+          tex->GetTextureHandle()->Precache();
+        }
+      }
 
-    // Schedule another run.
-    SyncEngineLists(loader, false);
+      // Schedule another run.
+      SyncEngineLists(loader, false);
+    }
   }
 
   return true;
@@ -690,6 +696,8 @@ csEngine::~csEngine ()
 bool csEngine::Initialize (iObjectRegistry *objectRegistry)
 {
   csEngine::objectRegistry = objectRegistry;
+
+  tman = csQueryRegistry<iThreadManager>(objectRegistry);
 
   virtualClock = csQueryRegistry<iVirtualClock> (objectRegistry);
   if (!virtualClock) return false;
@@ -1563,7 +1571,7 @@ void csEngine::PrecacheDraw (iCollection* collection)
   }
 
   csRef<iThreadedLoader> tloader = csQueryRegistry<iThreadedLoader>(objectRegistry);
-  if(tloader.IsValid())
+  if(!tloader.IsValid() || tman->GetThreadCount() == 1)
   {
     size_t i;
     for (i = 0 ; i < textures->GetSize () ; i++)
