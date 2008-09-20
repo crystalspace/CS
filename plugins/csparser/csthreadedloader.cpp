@@ -830,6 +830,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if (!rc)
         return false;
     }
+    else if(child->GetAttributeValueAsBool("compact", false))
+    {
+      LoadLibrary(ldr_context, child, ssource, missingdata, loadProxyTex);
+    }
     else
     {
       if (Engine->GetSaveableFlag ())

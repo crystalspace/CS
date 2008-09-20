@@ -58,4 +58,7 @@ private:
   // For sorting.
   csRefArray<iDocument> meshFactsOut;
   csRefArray<iDocument> mapsOut;
+
+  // False if we want to have a seperate file for each meshfact, addon, etc.
+  bool compact;
 };
