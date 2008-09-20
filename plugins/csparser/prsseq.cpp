@@ -1314,11 +1314,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         }
         break;
       case PARTYPE_MESH:
-        value = ldr_context->FindMeshObject (parname);
-        break;
+        {
+          value = ldr_context->FindMeshObject (parname);
+          csTicks start = csGetTicks();
+          while(!value && csGetTicks()-start < 60000)
+          {
+            value = ldr_context->FindMeshObject (parname);
+          }
+          break;
+        }
       case PARTYPE_MATERIAL:
-        value = ldr_context->FindMaterial (parname);
-        break;
+        {
+          value = ldr_context->FindMaterial (parname);
+          csTicks start = csGetTicks();
+          while(!value && csGetTicks()-start < 60000)
+          {
+            value = ldr_context->FindMaterial (parname);
+          }
+          break;
+        }
       case PARTYPE_SECTOR:
         value = ldr_context->FindSector (parname);
         break;
@@ -1415,6 +1429,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             return 0;
           }
           iMeshWrapper* mesh = ldr_context->FindMeshObject (meshname);
+          csTicks start = csGetTicks();
+          while(!mesh && csGetTicks()-start < 60000)
+          {
+            mesh = ldr_context->FindMeshObject (meshname);
+          }
           if (!mesh)
           {
             SyntaxService->ReportError (
@@ -1567,6 +1586,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
 
           iMeshWrapper* mesh = ldr_context->FindMeshObject (meshname);
+          csTicks start = csGetTicks();
+          while(!mesh && csGetTicks()-start < 60000)
+          {
+            mesh = ldr_context->FindMeshObject (meshname);
+          }
           if (!mesh)
           {
             SyntaxService->ReportError (
