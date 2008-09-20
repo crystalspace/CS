@@ -33,8 +33,6 @@
 
 struct iEvent;
 
-using namespace CS::Threading;
-
 class CS_CRYSTALSPACE_EXPORT csThreadManager : public scfImplementation1<csThreadManager,
   iThreadManager>
 {
@@ -49,7 +47,7 @@ public:
   {
     if(queueType == THREADED)
     {
-      MutexScopedLock lock(queuePushLock);
+      CS::Threading::MutexScopedLock lock(queuePushLock);
       threadQueue->Enqueue(job);
     }
     else
@@ -76,20 +74,20 @@ protected:
 
 private:
 
-  static ThreadID tid;
+  static CS::Threading::ThreadID tid;
 
   inline bool IsMainThread()
   {
-    return tid == Thread::GetThreadID();
+    return tid == CS::Threading::Thread::GetThreadID();
   }
 
   int32 waiting;
   int32 threadCount;
 
-  Mutex queuePushLock;
+  CS::Threading::Mutex queuePushLock;
 
   iObjectRegistry* objectReg;
-  csRef<ThreadedJobQueue> threadQueue;
+  csRef<CS::Threading::ThreadedJobQueue> threadQueue;
   csRef<ListAccessQueue> listQueue;
   csRef<iEventQueue> eventQueue;
   csTicks waitingTime;

@@ -23,6 +23,8 @@
 #include "iengine/engine.h"
 #include "iutil/cfgmgr.h"
 
+using namespace CS::Threading;
+
 ThreadID csThreadManager::tid = Thread::GetThreadID();
 
 csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationType(this), 

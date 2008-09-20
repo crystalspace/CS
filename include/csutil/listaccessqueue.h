@@ -26,8 +26,6 @@
 #include "iutil/job.h"
 #include "iutil/threadmanager.h"
 
-using namespace CS::Threading;
-
 class CS_CRYSTALSPACE_EXPORT ListAccessQueue : public csRefCount
 {
 public:
@@ -39,17 +37,17 @@ public:
   {    
     if(type == HIGH)
     {
-      RecursiveMutexScopedLock lock(highQueueLock);
+      CS::Threading::RecursiveMutexScopedLock lock(highQueueLock);
       highqueue.Push(job);
     }
     else if(type == MED)
     {
-      RecursiveMutexScopedLock lock(medQueueLock);
+      CS::Threading::RecursiveMutexScopedLock lock(medQueueLock);
       medqueue.Push(job);
     }
     else if(type == LOW)
     {
-      RecursiveMutexScopedLock lock(lowQueueLock);
+      CS::Threading::RecursiveMutexScopedLock lock(lowQueueLock);
       lowqueue.Push(job);
     }
   }
@@ -74,7 +72,7 @@ public:
 private:
   inline void ProcessHighQueue(uint& i, uint& num)
   {
-    RecursiveMutexScopedLock lock(highQueueLock);
+    CS::Threading::RecursiveMutexScopedLock lock(highQueueLock);
     for(; i<num && highqueue.GetSize() != 0; i++)
     {
       highqueue.PopTop()->Run();
@@ -84,7 +82,7 @@ private:
   inline void ProcessMedQueue(uint& i, uint& num)
   {
     ProcessHighQueue(i, num);
-    RecursiveMutexScopedLock lock(medQueueLock);
+    CS::Threading::RecursiveMutexScopedLock lock(medQueueLock);
     for(; i<num && medqueue.GetSize() != 0; i++)
     {
       medqueue.PopTop()->Run();
@@ -95,7 +93,7 @@ private:
   inline void ProcessLowQueue(uint& i, uint& num)
   {
     ProcessHighQueue(i, num);
-    RecursiveMutexScopedLock lock(lowQueueLock);
+    CS::Threading::RecursiveMutexScopedLock lock(lowQueueLock);
     for(; i<num && lowqueue.GetSize() != 0; i++)
     {
       lowqueue.PopTop()->Run();
@@ -104,9 +102,9 @@ private:
     }
   }
 
-  RecursiveMutex highQueueLock;
-  RecursiveMutex medQueueLock;
-  RecursiveMutex lowQueueLock;
+  CS::Threading::RecursiveMutex highQueueLock;
+  CS::Threading::RecursiveMutex medQueueLock;
+  CS::Threading::RecursiveMutex lowQueueLock;
   csFIFO<csRef<iJob> > highqueue;
   csFIFO<csRef<iJob> > medqueue;
   csFIFO<csRef<iJob> > lowqueue;
