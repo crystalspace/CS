@@ -1126,6 +1126,11 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
 
   const char* name = node->GetAttributeValue ("name");
   csRef<iGeneralMeshSubMesh> subMesh = state->FindSubMesh (name);
+  csTicks start = csGetTicks();
+  while(!subMesh.IsValid() && csGetTicks()-start < 60000)
+  {
+    subMesh = state->FindSubMesh (name);
+  }
   if (!subMesh)
   {
     synldr->ReportError (
