@@ -3134,14 +3134,14 @@ public:
   virtual ~EngineLoaderContext ();
 
   virtual iSector* FindSector (const char* name);
-  virtual iMaterialWrapper* FindMaterial (const char* name, bool dupe = false);
+  virtual iMaterialWrapper* FindMaterial (const char* name, bool dontWaitForLoad = false);
   virtual iMaterialWrapper* FindNamedMaterial (const char* name,
-  	const char* filename, bool dupe = false);
-  virtual iMeshFactoryWrapper* FindMeshFactory (const char* name, bool dupe = false);
+  	const char* filename, bool dontWaitForLoad = false);
+  virtual iMeshFactoryWrapper* FindMeshFactory (const char* name, bool dontWaitForLoad = false);
   virtual iMeshWrapper* FindMeshObject (const char* name);
-  virtual iTextureWrapper* FindTexture (const char* name, bool dupe = false);
+  virtual iTextureWrapper* FindTexture (const char* name, bool dontWaitForLoad = false);
   virtual iTextureWrapper* FindNamedTexture (const char* name,
-  	const char* filename, bool dupe = false);
+  	const char* filename, bool dontWaitForLoad = false);
   virtual iLight* FindLight (const char *name);
   virtual iShader* FindShader (const char* name);
   virtual iGeneralMeshSubMesh* FindSubmesh(iGeneralMeshState* state, const char* name)
@@ -3171,19 +3171,19 @@ iSector* EngineLoaderContext::FindSector (const char* name)
    return Engine->FindSector (name, searchCollectionOnly ? collection : 0);
 }
 
-iMaterialWrapper* EngineLoaderContext::FindMaterial (const char* name, bool dupe)
+iMaterialWrapper* EngineLoaderContext::FindMaterial (const char* name, bool dontWaitForLoad)
 {
   return Engine->FindMaterial (name, searchCollectionOnly ? collection : 0);
 }
 
 iMaterialWrapper* EngineLoaderContext::FindNamedMaterial (const char* name,
                                                           const char* /*filename*/,
-                                                          bool dupe)
+                                                          bool dontWaitForLoad)
 {
   return Engine->FindMaterial (name, searchCollectionOnly ? collection : 0);
 }
 
-iMeshFactoryWrapper* EngineLoaderContext::FindMeshFactory (const char* name, bool dupe)
+iMeshFactoryWrapper* EngineLoaderContext::FindMeshFactory (const char* name, bool dontWaitForLoad)
 {
   return Engine->FindMeshFactory (name, searchCollectionOnly ? collection : 0);
 }
@@ -3193,14 +3193,14 @@ iMeshWrapper* EngineLoaderContext::FindMeshObject (const char* name)
   return Engine->FindMeshObject (name, searchCollectionOnly ? collection : 0);
 }
 
-iTextureWrapper* EngineLoaderContext::FindTexture (const char* name, bool dupe)
+iTextureWrapper* EngineLoaderContext::FindTexture (const char* name, bool dontWaitForLoad)
 {
   return Engine->FindTexture (name, searchCollectionOnly ? collection : 0);
 }
 
 iTextureWrapper* EngineLoaderContext::FindNamedTexture (const char* name,
                                                         const char* /*filename*/,
-                                                        bool dupe)
+                                                        bool dontWaitForLoad)
 {
   return Engine->FindTexture (name, searchCollectionOnly ? collection : 0);
 }

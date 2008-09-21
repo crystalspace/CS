@@ -77,7 +77,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return s;
   }
 
-  iMaterialWrapper* csLoaderContext::FindMaterial(const char* filename, bool dupe)
+  iMaterialWrapper* csLoaderContext::FindMaterial(const char* filename, bool dontWaitForLoad)
   {
     csRef<iMaterialWrapper> mat;
 
@@ -112,7 +112,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           mat = missingdata->MissingMaterial(0, filename);
         }
 
-        if(dupe)
+        if(dontWaitForLoad)
         {
           break;
         }
@@ -127,7 +127,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return mat;
   }
 
-  iMeshFactoryWrapper* csLoaderContext::FindMeshFactory(const char* name, bool dupe)
+  iMeshFactoryWrapper* csLoaderContext::FindMeshFactory(const char* name, bool dontWaitForLoad)
   {
     csRef<iMeshFactoryWrapper> fact;
     
@@ -162,7 +162,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           fact = missingdata->MissingFactory(name);
         }
 
-        if(dupe)
+        if(dontWaitForLoad)
         {
           break;
         }
@@ -339,7 +339,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return shader;
   }
 
-  iTextureWrapper* csLoaderContext::FindTexture(const char* name, bool dupe)
+  iTextureWrapper* csLoaderContext::FindTexture(const char* name, bool dontWaitForLoad)
   {
     csRef<iTextureWrapper> result;
 
@@ -375,7 +375,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           result = missingdata->MissingTexture (name, 0);
         }
 
-        if(dupe)
+        if(dontWaitForLoad)
         {
           break;
         }

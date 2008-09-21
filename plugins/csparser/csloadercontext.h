@@ -67,17 +67,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     virtual ~csLoaderContext ();
 
     virtual iSector* FindSector (const char* name);
-    virtual iMaterialWrapper* FindMaterial(const char* name, bool dupe = false);
-    virtual iMaterialWrapper* FindNamedMaterial(const char* name, const char *filename, bool dupe = false)
+    virtual iMaterialWrapper* FindMaterial(const char* name, bool dontWaitForLoad = false);
+    virtual iMaterialWrapper* FindNamedMaterial(const char* name, const char *filename, bool dontWaitForLoad = false)
     {
-      return FindMaterial(name, dupe);
+      return FindMaterial(name, dontWaitForLoad);
     }
-    virtual iMeshFactoryWrapper* FindMeshFactory(const char* name, bool dupe = false);
+    virtual iMeshFactoryWrapper* FindMeshFactory(const char* name, bool dontWaitForLoad = false);
     virtual iMeshWrapper* FindMeshObject(const char* name);
-    virtual iTextureWrapper* FindTexture(const char* name, bool dupe = false);
-    virtual iTextureWrapper* FindNamedTexture(const char* name, const char *filename, bool dupe = false)
+    virtual iTextureWrapper* FindTexture(const char* name, bool dontWaitForLoad = false);
+    virtual iTextureWrapper* FindNamedTexture(const char* name, const char *filename, bool dontWaitForLoad = false)
     {
-      return FindTexture(name, dupe);
+      return FindTexture(name, dontWaitForLoad);
     }
     virtual iLight* FindLight(const char *name);
     virtual iShader* FindShader(const char *name);

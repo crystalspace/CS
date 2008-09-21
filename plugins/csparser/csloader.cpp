@@ -122,7 +122,7 @@ iSector* StdLoaderContext::FindSector (const char* name)
   return s;
 }
 
-iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename, bool dupe)
+iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename, bool dontWaitForLoad)
 {
   iMaterialWrapper* mat = Engine->FindMaterial(filename, searchCollectionOnly ? collection : 0);
 
@@ -168,7 +168,7 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename, bool dup
 
 iMaterialWrapper* StdLoaderContext::FindNamedMaterial (const char* name, 
                                                        const char *filename,
-                                                       bool dupe)
+                                                       bool dontWaitForLoad)
 {
   iMaterialWrapper* mat = Engine->FindMaterial (name, searchCollectionOnly ? collection : 0);
 
@@ -212,7 +212,7 @@ iMaterialWrapper* StdLoaderContext::FindNamedMaterial (const char* name,
 }
 
 
-iMeshFactoryWrapper* StdLoaderContext::FindMeshFactory (const char* name, bool dupe)
+iMeshFactoryWrapper* StdLoaderContext::FindMeshFactory (const char* name, bool dontWaitForLoad)
 {
   iMeshFactoryWrapper* fact = Engine->FindMeshFactory(name, searchCollectionOnly ? collection : 0);
 
@@ -287,7 +287,7 @@ iShader* StdLoaderContext::FindShader (const char *name)
   return 0;
 }
 
-iTextureWrapper* StdLoaderContext::FindTexture (const char* name, bool dupe)
+iTextureWrapper* StdLoaderContext::FindTexture (const char* name, bool dontWaitForLoad)
 {
   iTextureWrapper* result;
   if(collection && searchCollectionOnly)
@@ -311,7 +311,7 @@ iTextureWrapper* StdLoaderContext::FindTexture (const char* name, bool dupe)
 
 iTextureWrapper* StdLoaderContext::FindNamedTexture (const char* name,
                                                      const char *filename,
-                                                     bool dupe)
+                                                     bool dontWaitForLoad)
 {
   iTextureWrapper* result;
   if(collection && searchCollectionOnly)

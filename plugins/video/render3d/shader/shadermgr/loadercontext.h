@@ -44,14 +44,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
     LoaderContext (iLoader* loader, iTextureManager* tm);
 
     iSector* FindSector (const char* name) { return 0; }
-    iMaterialWrapper* FindMaterial (const char* name, bool dupe = false) { return 0; }
+    iMaterialWrapper* FindMaterial (const char* name, bool dontWaitForLoad = false) { return 0; }
     iMaterialWrapper* FindNamedMaterial (const char* name,
-      const char *filename, bool dupe = false) { return 0; }
-    iMeshFactoryWrapper* FindMeshFactory (const char* name, bool dupe = false) { return 0; }
+      const char *filename, bool dontWaitForLoad = false) { return 0; }
+    iMeshFactoryWrapper* FindMeshFactory (const char* name, bool dontWaitForLoad = false) { return 0; }
     iMeshWrapper* FindMeshObject (const char* name) { return 0; }
-    iTextureWrapper* FindTexture (const char* name, bool dupe = false);
+    iTextureWrapper* FindTexture (const char* name, bool dontWaitForLoad = false);
     iTextureWrapper* FindNamedTexture (const char* name,
-      const char *filename, bool dupe = false);
+      const char *filename, bool dontWaitForLoad = false);
     iLight* FindLight (const char *name) { return 0; }
     iShader* FindShader (const char *name) { return 0; }
     iGeneralMeshSubMesh* FindSubmesh(iGeneralMeshState* state, const char* name) { return 0; }
