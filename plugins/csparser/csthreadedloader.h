@@ -64,6 +64,8 @@ struct iVFS;
 
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
+  class csLoaderContext;
+
   template<class T, class Interface>
   class csLoaderIterator : public scfImplementation1<csLoaderIterator<T, Interface>,
                                                      Interface>

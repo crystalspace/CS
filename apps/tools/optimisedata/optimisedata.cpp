@@ -218,7 +218,7 @@ void OptimiseData::ParseMeshFact(csRef<iDocumentNode>& meshFact, csRef<iDocument
       {
         // Print error and mark data as incorrect.
         csFPrintf(stderr, "ERROR: Meshfact %s uses material %s but there is no material declaration!\n",
-          meshFact->GetAttributeValue("name"), materialName);
+          meshFact->GetAttributeValue("name"), materialName.GetData());
       }
 
       tempMats.PushSmart(material);
@@ -228,7 +228,8 @@ void OptimiseData::ParseMeshFact(csRef<iDocumentNode>& meshFact, csRef<iDocument
   csRef<iDocumentNodeIterator> undermeshes = meshFact->GetNodes("meshfact");
   while(undermeshes->HasNext())
   {
-    ParseMeshFact(undermeshes->Next(), tempDocRoot, tempMats);
+    csRef<iDocumentNode> next = undermeshes->Next();
+    ParseMeshFact(next, tempDocRoot, tempMats);
   }
 }
 
@@ -269,7 +270,7 @@ void OptimiseData::SortData()
         {
           // Print error and mark data as incorrect.
           csFPrintf(stderr, "ERROR: Material %s uses texture %s but there is no texture declaration!\n",
-            tempMats[j]->GetAttributeValue("name"), textureName);
+            tempMats[j]->GetAttributeValue("name"), textureName.GetData());
         }
 
         tempTexs.Push(texture);
