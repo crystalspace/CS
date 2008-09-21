@@ -120,11 +120,6 @@ bool csBezierLoader::ParseCurve (iCurve* curve, iLoaderContext* ldr_context,
 	{
 	  const char* matname = child->GetContentsValue ();
     iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-    csTicks start = csGetTicks();
-    while(!mat && csGetTicks()-start < 60000)
-    {
-      mat = ldr_context->FindMaterial (matname);
-    }
     if (mat == 0)
     {
       synldr->ReportError (

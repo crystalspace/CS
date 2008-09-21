@@ -465,6 +465,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       ProxyKeyColour keyColour;
     };
 
+    // Parses the data to find all materials and meshfacts.
+    void ParseAvailableObjects(csLoaderContext* ldr_context, iDocumentNode* doc);
+
     // Returns in the 'meshesArray' array all the meshes encountered walking through
     // the hierarchy of meshes starting from 'meshWrapper'.
     void CollectAllChildren (iMeshWrapper* meshWrapper, csRefArray<iMeshWrapper>&
@@ -549,10 +552,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       iStreamSource* ssource, iMissingLoaderData* missingdata, bool loadProxyTex = true,
       bool do_verbose = false);
 
-    THREADED_CALLABLE_DECL6(csThreadedLoader, LoadLibraryFromNode, csLoaderReturn,
+    THREADED_CALLABLE_DECL8(csThreadedLoader, LoadLibraryFromNode, csLoaderReturn,
       csRef<iLoaderContext>, ldr_context, csRef<iDocumentNode>, child, csRef<iStreamSource>,
       ssource, csRef<iMissingLoaderData>, missingdata, bool, loadProxyTex, bool, do_verbose,
-      THREADED, false, false);
+      bool, compact, const char*, libpath, THREADED, false, false);
 
     csPtr<iImage> LoadImage (iDataBuffer* buf, const char* fname, int Format, bool do_verbose);
 

@@ -117,16 +117,17 @@ public:
   virtual ~StdLoaderContext ();
 
   virtual iSector* FindSector (const char* name);
-  virtual iMaterialWrapper* FindMaterial (const char* name);
+  virtual iMaterialWrapper* FindMaterial (const char* name, bool dupe = false);
   virtual iMaterialWrapper* FindNamedMaterial (const char* name,
-      const char *filename);
-  virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
+      const char *filename, bool dupe = false);
+  virtual iMeshFactoryWrapper* FindMeshFactory (const char* name, bool dupe = false);
   virtual iMeshWrapper* FindMeshObject (const char* name);
-  virtual iTextureWrapper* FindTexture (const char* name);
+  virtual iTextureWrapper* FindTexture (const char* name, bool dupe = false);
   virtual iTextureWrapper* FindNamedTexture (const char* name,
-      const char *filename);
+      const char *filename, bool dupe = false);
   virtual iLight* FindLight (const char *name);
   virtual iShader* FindShader (const char *name);
+  virtual iGeneralMeshSubMesh* FindSubmesh(iGeneralMeshState* state, const char* name);
   virtual bool CheckDupes () const { return checkDupes; }
   virtual iCollection* GetCollection() const { return collection; }
   virtual bool CurrentCollectionOnly() const { return searchCollectionOnly; }

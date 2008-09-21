@@ -41,6 +41,7 @@
 #include "imap/saverfile.h"
 #include "imap/ldrctxt.h"
 #include "imap/modelload.h"
+#include "imesh/genmesh.h"
 #include "imesh/lighting.h"
 #include "imesh/object.h"
 #include "iengine/collection.h"
@@ -121,7 +122,7 @@ iSector* StdLoaderContext::FindSector (const char* name)
   return s;
 }
 
-iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename)
+iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename, bool dupe)
 {
   iMaterialWrapper* mat = Engine->FindMaterial(filename, searchCollectionOnly ? collection : 0);
 
@@ -166,7 +167,8 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename)
 }
 
 iMaterialWrapper* StdLoaderContext::FindNamedMaterial (const char* name, 
-                                                       const char *filename)
+                                                       const char *filename,
+                                                       bool dupe)
 {
   iMaterialWrapper* mat = Engine->FindMaterial (name, searchCollectionOnly ? collection : 0);
 
@@ -210,7 +212,7 @@ iMaterialWrapper* StdLoaderContext::FindNamedMaterial (const char* name,
 }
 
 
-iMeshFactoryWrapper* StdLoaderContext::FindMeshFactory (const char* name)
+iMeshFactoryWrapper* StdLoaderContext::FindMeshFactory (const char* name, bool dupe)
 {
   iMeshFactoryWrapper* fact = Engine->FindMeshFactory(name, searchCollectionOnly ? collection : 0);
 
@@ -285,7 +287,7 @@ iShader* StdLoaderContext::FindShader (const char *name)
   return 0;
 }
 
-iTextureWrapper* StdLoaderContext::FindTexture (const char* name)
+iTextureWrapper* StdLoaderContext::FindTexture (const char* name, bool dupe)
 {
   iTextureWrapper* result;
   if(collection && searchCollectionOnly)
@@ -308,7 +310,8 @@ iTextureWrapper* StdLoaderContext::FindTexture (const char* name)
 }
 
 iTextureWrapper* StdLoaderContext::FindNamedTexture (const char* name,
-                                                     const char *filename)
+                                                     const char *filename,
+                                                     bool dupe)
 {
   iTextureWrapper* result;
   if(collection && searchCollectionOnly)
@@ -328,6 +331,11 @@ iTextureWrapper* StdLoaderContext::FindNamedTexture (const char* name,
     result = rc;
   }
   return result;
+}
+
+iGeneralMeshSubMesh* StdLoaderContext::FindSubmesh(iGeneralMeshState* state, const char* name)
+{
+  return state->FindSubMesh(name);
 }
 
 void StdLoaderContext::AddToCollection(iObject *obj)

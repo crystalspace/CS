@@ -415,7 +415,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   {
     const char* txtname = node->GetAttributeValue ("name");
 
-    iTextureWrapper* t = ldr_context->FindTexture (txtname);
+    iTextureWrapper* t = ldr_context->FindTexture (txtname, true);
     if (t)
     {
       ldr_context->AddToCollection(t->QueryObject ());
@@ -855,7 +855,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   {
     const char* matname = node->GetAttributeValue ("name");
 
-    iMaterialWrapper* m = ldr_context->FindMaterial (matname);
+    iMaterialWrapper* m = ldr_context->FindMaterial (matname, true);
     if (m)
     {
       ldr_context->AddToCollection(m->QueryObject ());
@@ -899,11 +899,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           const char* txtname = child->GetContentsValue ();
           texh = ldr_context->FindTexture (txtname);
-          csTicks start = csGetTicks();
-          while (!texh && (csGetTicks() - start < 60000))
-          {
-            texh = ldr_context->FindTexture (txtname);
-          }
           if (!texh)
           {
             ReportError (
