@@ -336,7 +336,7 @@ enum csShaderTagPresence
  */
 struct iShaderManager : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE (iShaderManager, 3, 0, 1);
+  SCF_INTERFACE (iShaderManager, 3, 0, 2);
   /**
    * Register a shader to the shadermanager.
    * Compiler should register all shaders
@@ -421,6 +421,22 @@ struct iShaderManager : public virtual iShaderVariableContext
   
   /// Get the cache for storing precompiled shader data
   virtual iHierarchicalCache* GetShaderCache() = 0;
+  
+  enum
+  {
+    cachePriorityLowest = 0,
+    cachePriorityGlobal = 100,
+    cachePriorityApp = 200,
+    cachePriorityUser = 300,
+    cachePriorityHighest = 400
+  };
+  virtual void AddSubShaderCache (iHierarchicalCache* cache,
+    int priority = cachePriorityApp) = 0;
+  /// Shortcut to add a subcache located in a VFS directory
+  virtual iHierarchicalCache* AddSubCacheDirectory (const char* cacheDir,
+    int priority = cachePriorityApp, bool readOnly = false) = 0;
+  virtual void RemoveSubShaderCache (iHierarchicalCache* cache) = 0;
+  virtual void RemoveAllSubShaderCaches () = 0;
 };
 
 /**
