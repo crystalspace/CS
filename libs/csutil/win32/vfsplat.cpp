@@ -52,6 +52,18 @@ const char* csCheckPlatformVFSVar(const char* VarName)
     return szMyDocs;
   }
 
+  if (!strcasecmp(VarName, "localappdata"))
+  {
+    static char localAppDataPath[MAX_PATH+13] = {'\0'};
+
+    if (!*localAppDataPath) 
+    {
+      csString path (csGetPlatformConfigPath ("CrystalSpace", true));
+      strcpy (localAppDataPath, path);
+    }
+    return localAppDataPath;
+  }
+
   return 0;
 }
 
