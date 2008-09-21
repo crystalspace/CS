@@ -19,6 +19,7 @@
 // Support for platform-specific VFS variables.
 #include "cssysdef.h"
 #include "csutil/vfsplat.h"
+#include "csutil/sysfunc.h"
 
 #ifdef __CYGWIN__
 #include <sys/cygwin.h>
