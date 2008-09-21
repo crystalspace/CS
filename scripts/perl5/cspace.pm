@@ -3121,6 +3121,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::iBase cspace );
 %OWNER = ();
 %ITERATORS = ();
+*LoadPluginAlways = *cspacec::iPluginManager_LoadPluginAlways;
 *UnloadPlugin = *cspacec::iPluginManager_UnloadPlugin;
 *RegisterPlugin = *cspacec::iPluginManager_RegisterPlugin;
 *GetPlugins = *cspacec::iPluginManager_GetPlugins;
@@ -4759,15 +4760,6 @@ sub new {
     bless $self, $pkg if defined($self);
 }
 
-*IsFinished = *cspacec::csLoaderReturn_IsFinished;
-*WasSuccessful = *cspacec::csLoaderReturn_WasSuccessful;
-*GetResultPtr = *cspacec::csLoaderReturn_GetResultPtr;
-*GetResultRefPtr = *cspacec::csLoaderReturn_GetResultRefPtr;
-*MarkFinished = *cspacec::csLoaderReturn_MarkFinished;
-*MarkSuccessful = *cspacec::csLoaderReturn_MarkSuccessful;
-*SetResult = *cspacec::csLoaderReturn_SetResult;
-*Copy = *cspacec::csLoaderReturn_Copy;
-*Wait = *cspacec::csLoaderReturn_Wait;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -4779,6 +4771,15 @@ sub DESTROY {
     }
 }
 
+*IsFinished = *cspacec::csLoaderReturn_IsFinished;
+*WasSuccessful = *cspacec::csLoaderReturn_WasSuccessful;
+*GetResultPtr = *cspacec::csLoaderReturn_GetResultPtr;
+*GetResultRefPtr = *cspacec::csLoaderReturn_GetResultRefPtr;
+*MarkFinished = *cspacec::csLoaderReturn_MarkFinished;
+*MarkSuccessful = *cspacec::csLoaderReturn_MarkSuccessful;
+*SetResult = *cspacec::csLoaderReturn_SetResult;
+*Copy = *cspacec::csLoaderReturn_Copy;
+*Wait = *cspacec::csLoaderReturn_Wait;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
