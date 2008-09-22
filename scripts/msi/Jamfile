@@ -10,6 +10,8 @@ MSI_VERSION_MAJORMINOR ?= $(PACKAGE_VERSION_LIST[1]).$(PACKAGE_VERSION_LIST[2]) 
 # This will become the MSI package version "build" number.
 MSI_VERSION_PACKAGE = 4 ;
 
+WIN32LIBS.MSM_PATH_DEFAULT = "$(BUILDTOP)/win32libs/mergemodules" ;
+
 # Set up file lists for MSVC binaries.
 rule MSVCFileListSharedLibs
 {
@@ -192,14 +194,38 @@ MSI_UPGRADE_CODE.CS.demos.VC_9 = dd6a2886-2c83-46f8-a242-5de4b6aa2913 ;
 
 rule GetWin32LibsMSMPath
 {
-  if "$(WIN32LIBS.MSM_PATH)" = ""
+  local guess ;
+  if ! $(WIN32LIBS.MSM_PATH)
   {
-    local guess = "$(TOP)/win32libs/mergemodules" ;
-    echo "No path for the cs-win32libs MSMs was set; I'm guessing $(guess)." ;
-    echo "If that is not what you want specify the WIN32LIBS.MSM_PATH Jam variable." ;
+    guess = $(WIN32LIBS.MSM_PATH_DEFAULT) ;
     WIN32LIBS.MSM_PATH = $(guess) ;
   }
-  return $(WIN32LIBS.MSM_PATH) ;
+  local p = $(WIN32LIBS.MSM_PATH) ;
+  MkDir $(p) ;
+  if $(guess) 
+  {
+    Depends $(p) : [ WarnMsmPathNotSet $(guess) ] ;
+  }
+  CleanDir clean : $(p) ;
+  return $(p) ;
+}
+
+rule WarnMsmPathNotSet
+{
+  local guess = $(1) ;
+  local w = issue.warning ;
+  MakeLocate $(w) : $(LOCATE.MSI) ;
+  GUESS on $(w) = $(guess) ;
+  WarnMsmPathNotSet1 $(w) ;
+  return $(w) ;
+}
+
+actions WarnMsmPathNotSet1
+{
+  echo "*** No path for the cs-win32libs MSM's was set." >&2
+  echo "*** Defaulting to: $(GUESS)" >&2
+  echo "*** If default is undesirable, assign WIN32LIBS.MSM_PATH Jam variable." >&2
+  echo "dummy file" > $(1)
 }
 
 rule MakeMSIsForArchAndKind
@@ -209,6 +235,7 @@ rule MakeMSIsForArchAndKind
   local win32libs_msms = [ GetWin32LibsMSMPath ] ;
   local msi = CS-$(kind)-$(arch).msi ;
 
+  Depends $(msi) : $(win32libs_msms) ;
   Depends $(msi) : mergemodules-neutral ;
   Depends $(msi) : mergemodules-$(arch) ;
 
