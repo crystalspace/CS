@@ -10477,6 +10477,15 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetActiveLights = *cspacec::iShaderManager_GetActiveLights;
 *GetSVNameStringset = *cspacec::iShaderManager_GetSVNameStringset;
 *GetShaderCache = *cspacec::iShaderManager_GetShaderCache;
+*cachePriorityLowest = *cspacec::iShaderManager_cachePriorityLowest;
+*cachePriorityGlobal = *cspacec::iShaderManager_cachePriorityGlobal;
+*cachePriorityApp = *cspacec::iShaderManager_cachePriorityApp;
+*cachePriorityUser = *cspacec::iShaderManager_cachePriorityUser;
+*cachePriorityHighest = *cspacec::iShaderManager_cachePriorityHighest;
+*AddSubShaderCache = *cspacec::iShaderManager_AddSubShaderCache;
+*AddSubCacheDirectory = *cspacec::iShaderManager_AddSubCacheDirectory;
+*RemoveSubShaderCache = *cspacec::iShaderManager_RemoveSubShaderCache;
+*RemoveAllSubShaderCaches = *cspacec::iShaderManager_RemoveAllSubShaderCaches;
 *scfGetVersion = *cspacec::iShaderManager_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
