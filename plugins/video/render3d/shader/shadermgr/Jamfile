@@ -5,4 +5,4 @@ Plugin shadermgr : [ Wildcard *.cpp *.h ] ;
 Includes shadermgr.h : $(SUBDIR)/shadermgr.tok ;
 MsvcExtraFile shadermgr : $(SUBDIR)/shadermgr.tok ;
 LinkWith shadermgr : crystalspace ;
-CompileGroups shadermgr : shaders renderers renderall openglrenderer softrenderer ;
+CompileGroups shadermgr : shaders renderers renderall openglrenderer ;

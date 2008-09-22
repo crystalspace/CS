@@ -89,7 +89,6 @@ CS_MASTER_HEADER_REJECTS +=
 
 {
   local CSWIN32LIBS_REJECTS =
-    caca.h
     CEGUI*.h
     d3d.h
     d3dcaps.h

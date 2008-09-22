@@ -1,5 +1,5 @@
 /*
-    SDL 2d canvas for Crystal Space (header)
+    Null 2D canvas for Crystal Space (header)
     Copyright (C) 2000 by George Yohng <yohng@drivex.dosware.8m.com>
 
     This library is free software; you can redistribute it and/or
