@@ -401,9 +401,6 @@ private:
    */
   void UpdateCurveTransform ();
 
-  /// Generate a cachename based on geometry.
-  char* GenerateCacheName ();  
-
 public:
   /**
    * Create an empty thing.
@@ -549,16 +546,6 @@ public:
    * Init the lightmaps for all polygons in this thing.
    */
   void InitializeDefault (bool clear);
-
-  /**
-   * Read the lightmaps from the cache.
-   */
-  bool ReadFromCache (iCacheManager* cache_mgr);
-
-  /**
-   * Cache the lightmaps for all polygons in this thing.
-   */
-  bool WriteToCache (iCacheManager* cache_mgr);
 
   /**
    * Prepare the lightmaps for all polys so that they are suitable

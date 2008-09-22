@@ -592,8 +592,6 @@ public:
   /**\name iLightingInfo interface
    * @{ */
   void InitializeDefault (bool /*clear*/) {}
-  bool ReadFromCache (iCacheManager* /*cache_mgr*/) { return true; }
-  bool WriteToCache (iCacheManager* /*cache_mgr*/) { return true; }
   virtual void PrepareLighting () { }
   void LightChanged (iLight* light);
   void LightDisconnect (iLight* light);

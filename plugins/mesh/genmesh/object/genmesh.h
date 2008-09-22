@@ -326,10 +326,7 @@ public:
 
   /**\name Shadow and lighting system
    * @{ */
-  char* GenerateCacheName ();
   void InitializeDefault (bool clear);
-  bool ReadFromCache (iCacheManager* cache_mgr);
-  bool WriteToCache (iCacheManager* cache_mgr);
   void PrepareLighting ();
 
   void AppendShadows (iMovable* movable, iShadowBlockList* shadows,

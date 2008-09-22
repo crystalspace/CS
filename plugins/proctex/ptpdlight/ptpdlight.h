@@ -320,8 +320,6 @@ public:
   void LightChanged (iLight* light);
   void LightDisconnect (iLight* light);
   void PrepareLighting () {}
-  bool ReadFromCache (iCacheManager* /*cache_mgr*/) { return true; }
-  bool WriteToCache (iCacheManager* /*cache_mgr*/) { return true; }
   /** @} */
 
   virtual void UseTexture (iTextureWrapper*)

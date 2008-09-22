@@ -200,18 +200,6 @@ public:
   void DelShadowMap (csCurveShadowMap* plm);
 
   /**
-   * Read lightmap from a file. Return 0 if succesful and
-   * otherwise a description of the error.
-   */
-  const char* ReadFromCache (iFile* file, int w, int h,
-    csCurve* curve, iEngine*);
-
-  /**
-   * Write lightmap to a file.
-   */
-  void Cache (iFile* file, csCurve* curve, iEngine*);
-
-  /**
    * Convert the lightmaps to the correct mixing mode.
    * This function does nothing unless the mixing mode is
    * nocolor.

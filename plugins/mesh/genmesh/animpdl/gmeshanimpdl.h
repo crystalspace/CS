@@ -213,8 +213,6 @@ public:
   }
   void LightDisconnect (iLight* light);
   void PrepareLighting () {}
-  bool ReadFromCache (iCacheManager* /*cache_mgr*/) { return true; }
-  bool WriteToCache (iCacheManager* /*cache_mgr*/) { return true; }
   /** @} */
 };
 

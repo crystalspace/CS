@@ -427,8 +427,6 @@ public:
   // For lighting.
   void CastShadows (iMovable* movable, iFrustumView* fview);
   void InitializeDefault (bool clear);
-  bool ReadFromCache (iCacheManager* cache_mgr);
-  bool WriteToCache (iCacheManager* cache_mgr);
   void PrepareLighting ();
   void LightChanged (iLight* light);
   void LightDisconnect (iLight* light);

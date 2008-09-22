@@ -1232,38 +1232,6 @@ THREADED_CALLABLE_IMPL1(csEngine, AddMeshAndChildren, iMeshWrapper* mesh)
 
 void csEngine::ShineLights (iCollection *collection, iProgressMeter *meter)
 {
-  // If we have to read from the cache then we check if the 'precalc_info'
-  // file exists on the VFS. If not then we cannot use the cache.
-  // If the file exists but is not valid (some flags are different) then
-  // we cannot use the cache either.
-  // If we recalculate then we also update this 'precalc_info' file with
-  // the new settings.
-  struct PrecalcInfo
-  {
-    int lm_version; // This number identifies a version of the lightmap format.
-
-    // If different then the format is different and we need
-    // to recalculate.
-    int normal_light_level; // Normal light level (unlighted level).
-    int ambient_red;
-    int ambient_green;
-    int ambient_blue;
-    float cosinus_factor;
-    int lightmap_size;
-  };
-
-  PrecalcInfo current;
-  memset (&current, 0, sizeof (current));
-  current.lm_version = 3;
-  current.normal_light_level = CS_NORMAL_LIGHT_LEVEL;
-  current.ambient_red = lightAmbientRed;
-  current.ambient_green = lightAmbientGreen;
-  current.ambient_blue = lightAmbientBlue;
-  current.cosinus_factor = 0;	//@@@
-  current.lightmap_size = 0;	//@@@
-
-  const char *reason = 0;
-
   bool do_relight = false;
   if (!(lightmapCacheMode & CS_ENGINE_CACHE_READ))
   {
@@ -1273,122 +1241,12 @@ void csEngine::ShineLights (iCollection *collection, iProgressMeter *meter)
       do_relight = true;
   }
 
-  iCacheManager* cm = GetCacheManager ();
-  csRef<iDataBuffer> data = 0;
-  if (lightmapCacheMode & CS_ENGINE_CACHE_READ)
-    data = cm->ReadCache ("lm_precalc_info", 0, (uint32)~0);
-
-  if (!data)
-  {
-    reason = "no 'lm_precalc_info' found in cache";
-  }
-  else
-  {
-    // data, 0-terminated
-    csDataBuffer* ntData = new csDataBuffer (data);
-    data = 0;
-    char *input = **ntData;
-    while (*input)
-    {
-      char *keyword = input + strspn (input, " \t");
-      char *endkw = strchr (input, '=');
-      if (!endkw) break;
-      *endkw++ = 0;
-      input = strchr (endkw, '\n');
-      if (input) *input++ = 0;
-
-      float xf;
-      csScanStr (endkw, "%f", &xf);
-
-      int xi = int (xf + ((xf < 0) ? -0.5 : + 0.5));
-
-      if (!strcmp (keyword, "LMVERSION"))
-      {
-	if (xi != current.lm_version)
-	{
-	  reason = "lightmap format changed";
-	  break;
-	}
-      }
-    }
-    delete ntData;
-  }
-
-  if (reason)
-  {
-    csString data;
-    data.Format (
-      "LMVERSION=%d\nNORMALLIGHTLEVEL=%d\nAMBIENT_RED=%d\nAMBIENT_GREEN=%d\nAMBIENT_BLUE=%d\nCOSINUS_FACTOR=%g\nLIGHTMAP_SIZE=%d\n",
-      current.lm_version,
-      current.normal_light_level,
-      current.ambient_red,
-      current.ambient_green,
-      current.ambient_blue,
-      current.cosinus_factor,
-      current.lightmap_size);
-    if (lightmapCacheMode & CS_ENGINE_CACHE_WRITE)
-    {
-      cm->CacheData (data.GetData(), data.Length(), "lm_precalc_info", 0, (uint32)~0);
-    }
-    if (doVerbose)
-    {
-      if (do_relight)
-      {
-        Report ("Lightmaps are not up to date (%s).", reason);
-      }
-      else
-      {
-        Warn ("Lightmaps are not up to date (%s).", reason);
-        Warn ("Use -relight cmd option to calc lighting.");
-      }
-    }
-    lightmapCacheMode &= ~CS_ENGINE_CACHE_READ;
-  }
-
-  // Recalculate do_relight since the cache mode might have changed.
-  do_relight = false;
-  if (!(lightmapCacheMode & CS_ENGINE_CACHE_READ))
-  {
-    if (!(lightmapCacheMode & CS_ENGINE_CACHE_NOUPDATE))
-      do_relight = true;
-    else if (lightmapCacheMode & CS_ENGINE_CACHE_WRITE)
-      do_relight = true;
-  }
-
-  if (do_relight)
-  {
-    Report ("Recalculation of lightmaps forced.");
-  }
-
   csRef<iLightIterator> lit = GetLightIterator (collection);
-
-  // Count number of lights to process.
   iLight *l;
-  int light_count = 0;
-  lit->Reset ();
-  while (lit->HasNext ()) { lit->Next (); light_count++; }
 
   int sn = 0;
   int num_meshes = meshes.GetCount ();
 
-  if (do_relight)
-  {
-    Report ("Initializing lighting (%d meshes).", num_meshes);
-    if (meter)
-    {
-      meter->SetProgressDescription (
-        "crystalspace.engine.lighting.init",
-        "Initializing lighting (%d meshes).",
-        num_meshes);
-      meter->SetTotal (num_meshes);
-      meter->Restart ();
-    }
-  }
-
-  size_t failed = 0;
-  csArray<iMeshWrapper*> failed_meshes;
-  size_t max_failed_meshes = 4;
-  if (doVerbose) max_failed_meshes = 100;
   for (sn = 0; sn < num_meshes; sn++)
   {
     iMeshWrapper *s = meshes.Get (sn);
@@ -1398,80 +1256,17 @@ void csEngine::ShineLights (iCollection *collection, iProgressMeter *meter)
     if (!collection || collection->IsParentOf (s->QueryObject ()))
     {
       iLightingInfo* linfo = s->GetLightingInfo ();
-      if (linfo)
-      {
-        if (do_relight)
-          linfo->InitializeDefault (true);
-        else
-          if (!linfo->ReadFromCache (cm))
-          {
-            if (failed_meshes.GetSize () < max_failed_meshes)
-              failed_meshes.Push (s);
-            failed++;
-          }
-      }
+      if (linfo) linfo->InitializeDefault (true);
     }
-
-    if (do_relight && meter) meter->Step ();
-  }
-  if (failed > 0)
-  {
-    Warn ("Couldn't load cached lighting for %zu object(s). Use -relight to calculate lighting:",
-	  failed);
-    size_t i;
-    for (i = 0 ; i < failed_meshes.GetSize () ; i++)
-    {
-      Warn ("    %s", failed_meshes[i]->QueryObject ()->GetName ());
-    }
-    if (failed_meshes.GetSize () < failed)
-      Warn ("    ...");
   }
 
-  csTicks start, stop;
-  start = csGetTicks();
   if (do_relight)
   {
-    Report ("Shining lights (%d lights).", light_count);
-    if (meter)
-    {
-      meter->SetProgressDescription (
-          "crystalspace.engine.lighting.calc",
-        "Shining lights (%d lights)",
-        light_count);
-      meter->SetTotal (light_count);
-      meter->Restart ();
-    }
-
     lit->Reset ();
-    int lit_cnt = 0;
     while (lit->HasNext ())
     {
-      if (doVerbose)
-      {
-	csPrintf ("Doing light %d\n", lit_cnt);
-	fflush (stdout);
-      }
-      lit_cnt++;
       l = lit->Next ();
       ((csLight*)l)->GetPrivateObject ()->CalculateLighting ();
-      if (meter) meter->Step ();
-    }
-
-    stop = csGetTicks ();
-    Report ("Time taken: %.4f seconds.", (float)(stop - start) / 1000.);
-  }
-
-  if (do_relight && (lightmapCacheMode & CS_ENGINE_CACHE_WRITE))
-  {
-    Report ("Caching lighting (%d meshes).", num_meshes);
-    if (meter)
-    {
-      meter->SetProgressDescription (
-          "crystalspace.engine.lighting.cache",
-          "Caching lighting (%d meshes)",
-          num_meshes);
-      meter->SetTotal (num_meshes);
-      meter->Restart ();
     }
   }
 
@@ -1484,20 +1279,10 @@ void csEngine::ShineLights (iCollection *collection, iProgressMeter *meter)
     if (!collection || collection->IsParentOf (s->QueryObject ()))
     {
       iLightingInfo* linfo = s->GetLightingInfo ();
-      if (linfo)
-      {
-	if (do_relight && (lightmapCacheMode & CS_ENGINE_CACHE_WRITE))
-          linfo->WriteToCache (cm);
-        linfo->PrepareLighting ();
-      }
+      if (linfo) linfo->PrepareLighting ();
     }
 
     if (do_relight && meter) meter->Step ();
-  }
-
-  if (do_relight && (lightmapCacheMode & CS_ENGINE_CACHE_WRITE))
-  {
-    cm->Flush ();
   }
 }
 
@@ -3675,8 +3460,7 @@ static const csOptionDescription
   config_options[] =
 {
   { 0, "fov", "Field of Vision", CSVAR_LONG },
-  { 1, "relight", "Force/inhibit recalculation of lightmaps", CSVAR_BOOL },
-  { 2, "renderloop", "Override the default render loop", CSVAR_STRING },
+  { 1, "renderloop", "Override the default render loop", CSVAR_STRING },
 };
 const int NUM_OPTIONS =
 (
@@ -3693,12 +3477,6 @@ bool csEngine::SetOption (int id, csVariant *value)
       PerspectiveImpl::SetDefaultFOV ((float)value->GetLong (), G3D->GetWidth ());
       break;
     case 1:
-      if (value->GetBool ())
-        csEngine::lightmapCacheMode = CS_ENGINE_CACHE_WRITE;
-      else
-        csEngine::lightmapCacheMode = CS_ENGINE_CACHE_READ;
-      break;
-    case 2:
       override_renderloop = value->GetString ();
       LoadDefaultRenderLoop (value->GetString ());
       break;
@@ -3717,9 +3495,6 @@ bool csEngine::GetOption (int id, csVariant *value)
       value->SetLong ((long)PerspectiveImpl::GetDefaultFOV ());
       break;
     case 1:
-      value->SetBool (csEngine::lightmapCacheMode == CS_ENGINE_CACHE_WRITE);
-      break;
-    case 2:
       value->SetString ("");
       break; // @@@
     default:  return false;
@@ -3736,3 +3511,4 @@ bool csEngine::GetOptionDescription (
   *option = config_options[idx];
   return true;
 }
+

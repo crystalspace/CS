@@ -360,30 +360,11 @@ replace @samp{CrystalSpace.Global} in the above commands with
 @samp{CrystalSpace.Application} where @samp{Application} is the name of the
 application (for example, @samp{CrystalSpace.Walktest}).
 
-@strong{Important}: The first time you explore a map after changing the ambient
-white value, you should run WalkTest with the @samp{--relight} option.  This
-causes Crystal Space to recalculate the lighting information in the map in
-order to take advantage of the new ambient light value.  Note, however, that
-relighting a map may be time consuming, particularly for certain sizable maps,
-so be patient.
-
-As a general rule, you may find it useful to specify the @samp{--relight}
-option with newly downloaded maps, or at any other time that the lighting in a
-map seems somehow to be incorrect.
-
 To specify options when running programs, you must invoke the programs from the
 command-line, however the need to specify command-line options is rare, so this
 should not prove much of an inconvenience.
 
-To run WalkTest with a particular map (for instance, @file{flarge}) for the
-very first time, for example, type:
-
-@example
-./walktest.app/Contents/MacOS/walktest --relight flarge
-@end example
-
-Subsequent uses of the map file do not require @samp{--relight}, in which case
-you can type:
+To run WalkTest with a particular map (for instance, @file{flarge}), type:
 
 @example
 ./walktest.app/Contents/MacOS/walktest flarge

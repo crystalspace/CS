@@ -28,15 +28,14 @@
 /**\addtogroup meshplugins
  * @{ */
 
-struct iCacheManager;
 struct iLight;
 
 class csColor;
 
 /**
  * This interface is implemented by mesh objects that have some kind
- * of lighting system. It has features to initialize lighting, to read
- * it from a cache, ...
+ * of lighting system. It has features to initialize lighting and
+ * keep track of lights.
  * 
  * Main creators of instances implementing this interface:
  * - Several mesh objects implement this.
@@ -49,7 +48,7 @@ class csColor;
  */
 struct iLightingInfo : public virtual iBase
 {
-  SCF_INTERFACE (iLightingInfo, 2, 0, 0);
+  SCF_INTERFACE (iLightingInfo, 3, 0, 0);
 
   /**
    * Initialize the lighting information to some default (mostly black).
@@ -59,20 +58,6 @@ struct iLightingInfo : public virtual iBase
    * Thus the first call to this function should use a clear of true.
    */
   virtual void InitializeDefault (bool clear) = 0;
-
-  /**
-   * Read the lighting information from the cache. Call this instead
-   * of InitializeDefault(). Returns false if there was a problem.
-   * This function will read the data from the current VFS dir.
-   */
-  virtual bool ReadFromCache (iCacheManager* cache_mgr) = 0;
-
-  /**
-   * Write the lighting information to the cache. Returns false if there
-   * was a problem. This function will write the data to the current VFS
-   * dir.
-   */
-  virtual bool WriteToCache (iCacheManager* cache_mgr) = 0;
 
   /**
    * Finally prepare the lighting for use. This function must be called
