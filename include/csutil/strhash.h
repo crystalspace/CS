@@ -40,7 +40,7 @@ namespace Utility
  * \sa csStringSet
  */
 template<typename Tag>
-class StringHash
+class CS_CRYSTALSPACE_EXPORT StringHash
 {
 private:
   typedef csHash<StringID<Tag>, char const*> HashType;
