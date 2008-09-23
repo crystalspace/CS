@@ -159,6 +159,8 @@
   INTERFACE_APPLY(iScriptObject)
   INTERFACE_APPLY(iCollider)
   INTERFACE_APPLY(iCollideSystem)
+  INTERFACE_APPLY(iConsoleInput)
+  INTERFACE_APPLY(iConsoleOutput)
   INTERFACE_APPLY(iODEDynamicState)
   INTERFACE_APPLY(iODEDynamicSystemState)
   INTERFACE_APPLY(iODEJointState)
@@ -169,9 +171,6 @@
   INTERFACE_APPLY(iODEHinge2Joint)
   INTERFACE_APPLY(iODEBallJoint)
   INTERFACE_APPLY(iMapNode)
-/*  INTERFACE_APPLY(iReporter)
-  INTERFACE_APPLY(iReporterIterator)
-  INTERFACE_APPLY(iReporterListener)*/
   INTERFACE_APPLY(iSequence)
   INTERFACE_APPLY(iSequenceCondition)
   INTERFACE_APPLY(iSequenceManager)
