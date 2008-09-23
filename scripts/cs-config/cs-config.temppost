@@ -178,20 +178,27 @@ addexlib()
     fi
 }
 
+# Author: Keith Marshall <keith.marshall@total.com>
+# Source: http://article.gmane.org/gmane.comp.gnu.mingw.msys/2785
+msys_canonical_path()
+{
+  mcp_dir="$1"
+  pwd -W >/dev/null 2>&1 && mcp_pwd_w="pwd -W" || mcp_pwd_w=pwd
+  until mcp_val=`exec 2>/dev/null; cd "$mcp_dir" && $mcp_pwd_w`
+  do
+     mcp_dir=`dirname "$mcp_dir"`
+  done
+  mcp_dir=`echo "$mcp_dir" | sed 's?^[./]*??'`
+  mcp_val=`echo "$mcp_val" | sed 's?/*$??'`
+  echo "$1" | sed "s?^[./]*$mcp_dir/*?$mcp_val/?"';s?/*$??'
+}
+
 raw_names=""
 the_libs=""
 show_libs=""
 show_cflags=""
 show_cxxflags=""
 show_availlibs=""
-
-# Prepare path returned by --static-deps - it'll be a MSYS style path, but
-# Jam needs a native Win32 path.
-if test "`uname -s | sed -e 's+\(.*\)_.*+\1+'`" = "MINGW32" ; then
-  libdir_local=`echo $libdir | sed -e 's+^/\(.\)\(.*\)+\1:\2+'`
-else
-  libdir_local=$libdir
-fi
 
 if test $# -eq 0; then
 	usage 1>&2
@@ -248,7 +255,7 @@ while test $# -gt 0; do
 	show_availlibs=true
 	;;
     --static-deps)
-	echo $libdir_local/$staticdeps
+	echo `msys_canonical_path $libdir`/$staticdeps
 	exit 0
 	;;
     *)
