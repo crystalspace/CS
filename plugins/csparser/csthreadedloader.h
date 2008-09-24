@@ -547,8 +547,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     * sounds and textures.
     */
     bool LoadLibrary(iLoaderContext* ldr_context, iDocumentNode* node,
-      iStreamSource* ssource, iMissingLoaderData* missingdata, bool loadProxyTex = true,
-      bool do_verbose = false);
+      iStreamSource* ssource, iMissingLoaderData* missingdata, csRefArray<iThreadReturn>& threadReturns,
+      bool loadProxyTex = true, bool do_verbose = false);
 
     THREADED_CALLABLE_DECL8(csThreadedLoader, LoadLibraryFromNode, csLoaderReturn,
       csRef<iLoaderContext>, ldr_context, csRef<iDocumentNode>, child, csRef<iStreamSource>,
@@ -707,7 +707,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     /// Parse a sector definition and add the sector to the engine
     iSector* ParseSector (iLoaderContext* ldr_context, iDocumentNode* node,
-      iStreamSource* ssource);
+      iStreamSource* ssource, csRefArray<iThreadReturn>& threadReturns);
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, SetSectorVisibilityCuller, csLoaderReturn,
       csRef<iSector>, sector, const char*, culplugname, csRef<iDocumentNode>, culler_params,

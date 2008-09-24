@@ -435,10 +435,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       collection->Add(saverFile->QueryObject());
     }
 
-    csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-      new csLoaderContext (object_reg, Engine, this, collection, missingdata,
-      keepFlags, do_verbose));
-
     csRef<iDocument> doc;
     bool er = LoadStructuredDoc (filename, buf, doc);
     if (!er) return false;
@@ -452,8 +448,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           lib_node, "Expected 'library' token!");
         return false;
       }
-      ParseAvailableObjects(dynamic_cast<csLoaderContext*>((iLoaderContext*)ldr_context), lib_node);
-      return LoadLibrary (ldr_context, lib_node, ssource, missingdata);
+
+      return LoadLibraryTC(ret, lib_node, collection, ssource, missingdata, keepFlags, do_verbose);
     }
     else
     {
@@ -471,7 +467,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       (new csLoaderContext (object_reg, Engine, this, collection,
       missingdata, keepFlags, do_verbose));
 
-    return LoadLibrary (ldr_context, lib_node, ssource, missingdata, true);
+    // Pre-parse.
+    ParseAvailableObjects(dynamic_cast<csLoaderContext*>((iLoaderContext*)ldr_context), lib_node);
+
+    // Array of all thread jobs created from this parse.
+    csRefArray<iThreadReturn> threadReturns;
+
+    // The actual parse.
+    bool success = LoadLibrary (ldr_context, lib_node, ssource, missingdata, threadReturns);
+
+    // Wait for all jobs to finish.
+    for(size_t i=0; i<threadReturns.GetSize(); i++)
+    {
+      while(!threadReturns[i]->IsFinished());
+      success &= threadReturns[i]->WasSuccessful();
+    }
+    return success;
   }
 
   THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadFile, const char* fname,
@@ -517,9 +528,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     {
       csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (
         meshobjnode->GetAttributeValue ("name"), false);
-      csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-      LoadMeshObjectTC(itr, ldr_context, mesh, 0, meshobjnode, ssource, 0);
-      return itr->WasSuccessful();
+      return LoadMeshObjectTC(ret, ldr_context, mesh, 0, meshobjnode, ssource, 0);
     }
 
     // World node.
@@ -533,7 +542,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iDocumentNode> libnode = node->GetNode ("library");
     if (libnode)
     {
-      return LoadLibrary(ldr_context, libnode, ssource, missingdata, true);
+      return LoadLibraryTC(ret, libnode, collection, ssource, missingdata, keepFlags, do_verbose);
     }
 
     // Portals.
@@ -729,6 +738,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     // Parse the map to find all materials and meshfacts.
     ParseAvailableObjects(dynamic_cast<csLoaderContext*>(ldr_context), world_node);
 
+    // Array of all thread jobs created from this parse.
+    csRefArray<iThreadReturn> threadReturns;
+
     // Will be set to true if we find a <shader> section.
     bool shader_given = false;
 
@@ -787,7 +799,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         }
         break;
       case XMLTOKEN_SECTOR:
-        if (!ParseSector (ldr_context, child, ssource))
+        if (!ParseSector (ldr_context, child, ssource, threadReturns))
           return false;
         break;
       case XMLTOKEN_SEQUENCES:
@@ -820,7 +832,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_LIBRARY:
         {
-          LoadLibraryFromNode (ldr_context, child, ssource, missingdata, false, false, false, 0);
+          threadReturns.Push(LoadLibraryFromNode (ldr_context, child, ssource, missingdata, false, false, false, 0));
           break;
         }
       case XMLTOKEN_START:
@@ -866,7 +878,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         return false;
     }
 
-    return true;
+    // Wait for all jobs to finish.
+    bool result = true;
+    for(size_t i=0; i<threadReturns.GetSize(); i++)
+    {
+      while(!threadReturns[i]->IsFinished());
+      result &= threadReturns[i]->WasSuccessful();
+    }
+
+    return result;
   }
 
   THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadLibraryFromNode,
@@ -932,17 +952,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         vfs->PushDir();
         vfs->ChDir(libpath);
       }
-      bool result = LoadLibrary(ldr_context, lib, ssource, missingdata, loadProxyTex);
+
+      // Array of all thread jobs created from this parse.
+      csRefArray<iThreadReturn> threadReturns;
+
+      bool result = LoadLibrary(ldr_context, lib, ssource, missingdata, threadReturns, loadProxyTex, do_verbose);
       if(libpath)
       {
         vfs->PopDir();
       }
+
+      // Wait for all jobs to finish.
+      for(size_t i=0; i<threadReturns.GetSize(); i++)
+      {
+        while(!threadReturns[i]->IsFinished());
+        result &= threadReturns[i]->WasSuccessful();
+      }
+
       return result;
     }
   }
 
   bool csThreadedLoader::LoadLibrary(iLoaderContext* ldr_context, iDocumentNode* node,
-    iStreamSource* ssource, iMissingLoaderData* missingdata, bool loadProxyTex, bool do_verbose)
+    iStreamSource* ssource, iMissingLoaderData* missingdata, csRefArray<iThreadReturn>& threadReturns,
+    bool loadProxyTex, bool do_verbose)
   {
     if (!Engine)
     {
@@ -976,7 +1009,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_LIBRARY:
         {
-          LoadLibraryFromNode(ldr_context, child, ssource, missingdata, true, false, false, 0);
+          threadReturns.Push(LoadLibraryFromNode(ldr_context, child, ssource, missingdata, true, false, false, 0));
           break;
         }
       case XMLTOKEN_ADDON:
@@ -1018,7 +1051,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_MESHREF:
         {
-          LoadMeshRef(child, 0, ldr_context, ssource);
+          threadReturns.Push(LoadMeshRef(child, 0, ldr_context, ssource));
         }
         break;
       case XMLTOKEN_MESHOBJ:
@@ -1027,6 +1060,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             child->GetAttributeValue ("name"), false);
           csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, 0, child, ssource, 0);
           AddLoadingMeshObject(child->GetAttributeValue("name"), itr);
+          threadReturns.Push(itr);
         }
         break;
       case XMLTOKEN_MESHFACT:
