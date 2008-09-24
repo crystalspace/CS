@@ -205,6 +205,10 @@ bool Simple::SetupModules ()
   // Let the engine prepare all lightmaps for use and also free all images 
   // that were loaded for the texture manager.
   engine->Prepare ();
+
+  using namespace CS::Lighting;
+  SimpleStaticLighter::ShineLights (room, engine, 4);
+
   rm = engine->GetRenderManager();
 
   // these are used store the current orientation of the camera
@@ -267,10 +271,6 @@ void Simple::CreateRoom ()
   // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
     engine, room, "walls", "walls_factory", &box);
-
-  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
-    iGeneralMeshState> (walls->GetMeshObject ());
-  mesh_state->SetShadowReceiving (true);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   // Now we need light to see something.

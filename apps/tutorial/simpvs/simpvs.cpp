@@ -89,10 +89,6 @@ bool Simple::Setup ()
   // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
       engine, room, "walls", "walls_factory", &box);
-
-  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
-    iGeneralMeshState> (walls->GetMeshObject ());
-  mesh_state->SetShadowReceiving (true);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
 
@@ -112,6 +108,9 @@ bool Simple::Setup ()
   ll->Add (light);
 
   engine->Prepare ();
+
+  using namespace CS::Lighting;
+  SimpleStaticLighter::ShineLights (room, engine, 4);
 
   view.AttachNew (new csView (engine, g3d));
   view->GetCamera ()->SetSector (room);

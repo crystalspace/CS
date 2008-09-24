@@ -222,6 +222,9 @@ bool ImposterTest::SetupModules()
   // that were loaded for the texture manager.
   engine->Prepare ();
 
+  using namespace CS::Lighting;
+  SimpleStaticLighter::ShineLights (room, engine, 4);
+
   distance = 5.0f;
 
   // Now we need to position the camera in our world.
@@ -262,10 +265,6 @@ void ImposterTest::CreateRoom ()
   // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
       engine, room, "walls", "walls_factory", &box);
-
-  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
-    iGeneralMeshState> (walls->GetMeshObject ());
-  mesh_state->SetShadowReceiving (true);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   // Now we need light to see something.
