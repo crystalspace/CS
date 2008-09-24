@@ -488,10 +488,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       iDocumentNode* meshfactnode, iMeshFactoryWrapper* parent,
       csReversibleTransform* transf, iStreamSource* ssource);
 
-    bool LoadMapLibraryFile (const char* filename, iCollection* collection,
-      iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags = KEEP_ALL,
-      bool loadProxyTex = true, bool do_verbose = false);
-
     /**
     * Load a Mesh Object Factory from the map file.
     * If the transformation pointer is given then this is for a hierarchical

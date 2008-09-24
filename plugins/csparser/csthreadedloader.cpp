@@ -418,7 +418,49 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     iCollection* collection, iStreamSource* ssource, iMissingLoaderData* missingdata,
     uint keepFlags, bool do_verbose)
   {
-    return LoadMapLibraryFile (filename, collection, ssource, missingdata, keepFlags, do_verbose);
+    csRef<iFile> buf = vfs->Open (filename, VFS_FILE_READ);
+
+    if (!buf)
+    { 
+      ReportError (
+        "crystalspace.maploader.parse.library",
+        "Could not open library file '%s' on VFS!", filename);
+      return false;
+    }
+
+    if(Engine->GetSaveableFlag () && collection)
+    {
+      csRef<iSaverFile> saverFile;
+      saverFile.AttachNew (new csSaverFile (filename, CS_SAVER_FILE_LIBRARY));
+      collection->Add(saverFile->QueryObject());
+    }
+
+    csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
+      new csLoaderContext (object_reg, Engine, this, collection, missingdata,
+      keepFlags, do_verbose));
+
+    csRef<iDocument> doc;
+    bool er = LoadStructuredDoc (filename, buf, doc);
+    if (!er) return false;
+    if (doc)
+    {
+      csRef<iDocumentNode> lib_node = doc->GetRoot ()->GetNode ("library");
+      if (!lib_node)
+      {
+        SyntaxService->ReportError (
+          "crystalspace.maploader.parse.expectedlib",
+          lib_node, "Expected 'library' token!");
+        return false;
+      }
+      ParseAvailableObjects(dynamic_cast<csLoaderContext*>((iLoaderContext*)ldr_context), lib_node);
+      return LoadLibrary (ldr_context, lib_node, ssource, missingdata);
+    }
+    else
+    {
+      ReportError ("crystalspace.maploader.parse.plugin",
+        "File does not appear to be a structure map library (%s)!", filename);
+    }
+    return false;
   }
 
   THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadLibrary, iDocumentNode* lib_node,
@@ -897,54 +939,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
       return result;
     }
-  }
-
-  bool csThreadedLoader::LoadMapLibraryFile (const char* fname, iCollection* collection,
-    iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags, bool loadProxyTex,
-    bool do_verbose)
-  {
-    csRef<iFile> buf = vfs->Open (fname, VFS_FILE_READ);
-
-    if (!buf)
-    { 
-      ReportError (
-        "crystalspace.maploader.parse.library",
-        "Could not open library file '%s' on VFS!", fname);
-      return false;
-    }
-
-    if(Engine->GetSaveableFlag () && collection)
-    {
-      csRef<iSaverFile> saverFile;
-      saverFile.AttachNew (new csSaverFile (fname, CS_SAVER_FILE_LIBRARY));
-      collection->Add(saverFile->QueryObject());
-    }
-
-    csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-      new csLoaderContext (object_reg, Engine, this, collection, missingdata,
-      keepFlags, do_verbose));
-
-    csRef<iDocument> doc;
-    bool er = LoadStructuredDoc (fname, buf, doc);
-    if (!er) return false;
-    if (doc)
-    {
-      csRef<iDocumentNode> lib_node = doc->GetRoot ()->GetNode ("library");
-      if (!lib_node)
-      {
-        SyntaxService->ReportError (
-          "crystalspace.maploader.parse.expectedlib",
-          lib_node, "Expected 'library' token!");
-        return false;
-      }
-      return LoadLibrary (ldr_context, lib_node, ssource, missingdata, loadProxyTex);
-    }
-    else
-    {
-      ReportError ("crystalspace.maploader.parse.plugin",
-        "File does not appear to be a structure map library (%s)!", fname);
-    }
-    return false;
   }
 
   bool csThreadedLoader::LoadLibrary(iLoaderContext* ldr_context, iDocumentNode* node,
