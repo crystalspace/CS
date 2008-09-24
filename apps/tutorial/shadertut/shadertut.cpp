@@ -16,22 +16,22 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "simple1.h"
+#include "shadertut.h"
 
 CS_IMPLEMENT_APPLICATION
 
 //---------------------------------------------------------------------------
 
-Simple::Simple ()
+ShaderTut::ShaderTut ()
 {
-  SetApplicationName ("CrystalSpace.Simple1");
+  SetApplicationName ("CrystalSpace.ShaderTut");
 }
 
-Simple::~Simple ()
+ShaderTut::~ShaderTut ()
 {
 }
 
-void Simple::Frame ()
+void ShaderTut::Frame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -89,7 +89,7 @@ void Simple::Frame ()
   rm->RenderView (view);
 }
 
-bool Simple::OnKeyboard(iEvent& ev)
+bool ShaderTut::OnKeyboard(iEvent& ev)
 {
   // We got a keyboard event.
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
@@ -113,7 +113,7 @@ bool Simple::OnKeyboard(iEvent& ev)
   return false;
 }
 
-bool Simple::OnInitialize(int /*argc*/, char* /*argv*/ [])
+bool ShaderTut::OnInitialize(int /*argc*/, char* /*argv*/ [])
 {
   // RequestPlugins() will load all plugins we specify. In addition
   // it will also check if there are plugins that need to be loaded
@@ -152,14 +152,14 @@ bool Simple::OnInitialize(int /*argc*/, char* /*argv*/ [])
   return true;
 }
 
-void Simple::OnExit()
+void ShaderTut::OnExit()
 {
   // Shut down the event handlers we spawned earlier.
   drawer.Invalidate();
   printer.Invalidate();
 }
 
-bool Simple::Application()
+bool ShaderTut::Application()
 {
   // Open the main system. This will open all the previously loaded plug-ins.
   // i.e. all windows will be opened.
@@ -176,7 +176,7 @@ bool Simple::Application()
   return true;
 }
 
-bool Simple::SetupModules ()
+bool ShaderTut::SetupModules ()
 {
   // Now get the pointer to various modules we need. We fetch them
   // from the object registry. The RequestPlugins() call we did earlier
@@ -209,13 +209,9 @@ bool Simple::SetupModules ()
   // Here we create our world.
   CreateRoom();
 
-  // Let the engine prepare the meshes and textures.
+  // Let the engine prepare all lightmaps for use and also free all images 
+  // that were loaded for the texture manager.
   engine->Prepare ();
-
-  // Now calculate static lighting for our geometry.
-  using namespace CS::Lighting;
-  SimpleStaticLighter::ShineLights (room, engine, 4);
-
   rm = engine->GetRenderManager();
 
   // these are used store the current orientation of the camera
@@ -234,15 +230,41 @@ bool Simple::SetupModules ()
   return true;
 }
 
-void Simple::CreateRoom ()
+void ShaderTut::CreateRoom ()
 {
   // Load the texture from the standard library.  This is located in
   // CS/data/standard.zip and mounted as /lib/std using the Virtual
   // File System (VFS) plugin.
   if (!loader->LoadTexture ("brick", "/lib/std/castle/brick1_d.jpg"))
     ReportError("Error loading 'brick1_d' texture!");
+
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("brick");
   
+  /* Shader variables are identified by numeric IDs for performance reasons.
+   * The shader var string set translates string IDs to numeric IDs. */
+  csRef<iShaderVarStringSet> svStrings =
+    csQueryRegistryTagInterface<iShaderVarStringSet> (GetObjectRegistry(),
+      "crystalspace.shader.variablenameset");
+  
+  // Add a normal map to the material.
+  {
+    // Load the normal map texture itself
+    csRef<iTextureHandle> normalMap = loader->LoadTexture (
+      "/lib/std/castle/brick1_n.jpg");
+    // Set this to avoid compression - makes for better quality here
+    normalMap->SetTextureClass ("normalmap");
+    // The normal map is attached to the material through a shader variable.
+    csShaderVariable* svNormalMap =
+      tm->GetMaterial()->GetVariableAdd (svStrings->Request ("tex normal"));
+    svNormalMap->SetValue (normalMap);
+  }
+  // Set a specular reflection color.
+  {
+    csShaderVariable* svSpecColor =
+      tm->GetMaterial()->GetVariableAdd (svStrings->Request ("specular"));
+    svSpecColor->SetValue (csColor (0.8f));
+  }
+
   // We create a new sector called "room".
   room = engine->CreateSector ("room");
 
@@ -259,6 +281,10 @@ void Simple::CreateRoom ()
   // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
       engine, room, "walls", "walls_factory", &box);
+
+  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
+    iGeneralMeshState> (walls->GetMeshObject ());
+  mesh_state->SetShadowReceiving (true);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   // Now we need light to see something.
@@ -284,8 +310,8 @@ int main (int argc, char* argv[])
    *
    * csApplicationRunner<> is a small wrapper to support "restartable" 
    * applications (ie where CS needs to be completely shut down and loaded 
-   * again). Simple1 does not use that functionality itself, however, it
-   * allows you to later use "Simple.Restart();" and it'll just work.
+   * again). ShaderTut does not use that functionality itself, however, it
+   * allows you to later use "ShaderTut.Restart();" and it'll just work.
    */
-  return csApplicationRunner<Simple>::Run (argc, argv);
+  return csApplicationRunner<ShaderTut>::Run (argc, argv);
 }

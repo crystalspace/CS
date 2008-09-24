@@ -211,6 +211,10 @@ bool Simple::SetupModules()
   // that were loaded for the texture manager.
   engine->Prepare ();
 
+  // Now calculate static lighting for our geometry.
+  using namespace CS::Lighting;
+  SimpleStaticLighter::ShineLights (room, engine, 4);
+
   // these are used store the current orientation of the camera
   rotY = rotX = 0;
 
@@ -222,7 +226,6 @@ bool Simple::SetupModules()
 
   return true;
 }
-
 
 void Simple::CreateRoom ()
 {
