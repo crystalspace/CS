@@ -6398,6 +6398,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetMaxLineWidth = *cspacec::iConsoleOutput_GetMaxLineWidth;
 *RegisterWatcher = *cspacec::iConsoleOutput_RegisterWatcher;
 *PerformExtension = *cspacec::iConsoleOutput_PerformExtension;
+*scfGetVersion = *cspacec::iConsoleOutput_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -6405,6 +6406,80 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_iConsoleOutput($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iConsoleExecCallback ##############
+
+package cspace::iConsoleExecCallback;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*Execute = *cspacec::iConsoleExecCallback_Execute;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iConsoleExecCallback($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iConsoleInput ##############
+
+package cspace::iConsoleInput;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*Bind = *cspacec::iConsoleInput_Bind;
+*SetExecuteCallback = *cspacec::iConsoleInput_SetExecuteCallback;
+*GetExecuteCallback = *cspacec::iConsoleInput_GetExecuteCallback;
+*GetText = *cspacec::iConsoleInput_GetText;
+*GetCurLine = *cspacec::iConsoleInput_GetCurLine;
+*GetBufferSize = *cspacec::iConsoleInput_GetBufferSize;
+*SetBufferSize = *cspacec::iConsoleInput_SetBufferSize;
+*Clear = *cspacec::iConsoleInput_Clear;
+*SetPrompt = *cspacec::iConsoleInput_SetPrompt;
+*HandleEvent = *cspacec::iConsoleInput_HandleEvent;
+*scfGetVersion = *cspacec::iConsoleInput_scfGetVersion;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iConsoleInput($self);
         delete $OWNER{$self};
     }
 }
