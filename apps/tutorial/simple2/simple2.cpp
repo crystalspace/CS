@@ -234,7 +234,6 @@ void Simple::CreateRoom ()
   // File System (VFS) plugin.
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
     ReportError("Error loading 'stone4' texture!");
-
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   // We create a new sector called "room".
@@ -253,10 +252,6 @@ void Simple::CreateRoom ()
   // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
       engine, room, "walls", "walls_factory", &box);
-
-  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
-    iGeneralMeshState> (walls->GetMeshObject ());
-  mesh_state->SetShadowReceiving (true);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   // Now we need light to see something.
