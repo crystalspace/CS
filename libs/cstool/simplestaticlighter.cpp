@@ -98,7 +98,8 @@ void SimpleStaticLighter::CalculateLighting (iMeshWrapper* mesh,
   }
 
 
-  const csColor& color = light->GetColor ();
+  // Shaders multiply by 2. So we need to divide by 2 here.
+  csColor color = 0.5f * light->GetColor ();
   float sqcutoff = light->GetCutoffDistance ();
   sqcutoff *= sqcutoff;
 
@@ -126,7 +127,7 @@ void SimpleStaticLighter::CalculateLighting (iMeshWrapper* mesh,
             colors[i] = color * bright;
 	  else
 	    colors[i] += color * bright;
-          colors[i].Clamp (2.0, 2.0, 2.0);
+          colors[i].Clamp (1.0, 1.0, 1.0);
 	  dark = false;
         }
       }
@@ -162,7 +163,7 @@ void SimpleStaticLighter::CalculateLighting (iMeshWrapper* mesh,
               colors[i] = color * bright;
 	    else
               colors[i] += color * bright;
-            colors[i].Clamp (2.0, 2.0, 2.0);
+            colors[i].Clamp (1.0, 1.0, 1.0);
 	    dark = false;
 	  }
 	}
