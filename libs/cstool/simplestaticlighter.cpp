@@ -37,8 +37,10 @@ namespace Lighting
  
 void SimpleStaticLighter::ConstantColor (iMeshWrapper* mesh, const csColor4& color)
 {
+  iMeshFactoryWrapper* meshfact = mesh->GetFactory ();
+  if (!meshfact) return;
   csRef<iGeneralFactoryState> fact_state = scfQueryInterface<
-    iGeneralFactoryState> (mesh->GetFactory ()->GetMeshObjectFactory ());
+    iGeneralFactoryState> (meshfact->GetMeshObjectFactory ());
   if (!fact_state) return;	// Not a mesh we recognize.
   size_t count = fact_state->GetVertexCount ();
   csRef<iRenderBuffer> rbuf = csRenderBuffer::CreateRenderBuffer (
@@ -173,8 +175,10 @@ void SimpleStaticLighter::CalculateLighting (iMeshWrapper* mesh,
 void SimpleStaticLighter::ShineLight (iMeshWrapper* mesh, iLight* light,
     ShadowType shadow_type)
 {
+  iMeshFactoryWrapper* meshfact = mesh->GetFactory ();
+  if (!meshfact) return;
   csRef<iGeneralFactoryState> fact_state = scfQueryInterface<
-    iGeneralFactoryState> (mesh->GetFactory ()->GetMeshObjectFactory ());
+    iGeneralFactoryState> (meshfact->GetMeshObjectFactory ());
   if (!fact_state) return;	// Not a mesh we recognize.
   size_t count = fact_state->GetVertexCount ();
   csRef<iRenderBuffer> rbuf = csRenderBuffer::CreateRenderBuffer (
@@ -209,8 +213,10 @@ void SimpleStaticLighter::ShineLights (iMeshWrapper* mesh, iEngine* engine, int 
     return;
   }
 
+  iMeshFactoryWrapper* meshfact = mesh->GetFactory ();
+  if (!meshfact) return;
   csRef<iGeneralFactoryState> fact_state = scfQueryInterface<
-    iGeneralFactoryState> (mesh->GetFactory ()->GetMeshObjectFactory ());
+    iGeneralFactoryState> (meshfact->GetMeshObjectFactory ());
   if (!fact_state) return;	// Not a mesh we recognize.
   size_t count = fact_state->GetVertexCount ();
   csRef<iRenderBuffer> rbuf = csRenderBuffer::CreateRenderBuffer (
