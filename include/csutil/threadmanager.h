@@ -303,7 +303,11 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
-    objTC->function##TC(ret); \
+    if(objTC->function##TC(ret)) \
+    { \
+      ret->MarkSuccessful(); \
+    } \
+    ret->MarkFinished(); \
     return ret; \
   } \
   void const** argsTC = new void const*[2]; \
@@ -333,7 +337,11 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
-    objTC->function##TC(ret, A1); \
+    if(objTC->function##TC(ret, A1)) \
+    { \
+      ret->MarkSuccessful(); \
+    } \
+    ret->MarkFinished(); \
     return ret; \
   } \
   void const** argsTC = new void const*[3]; \
@@ -364,7 +372,11 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
-    objTC->function##TC(ret, A1, A2); \
+    if(objTC->function##TC(ret, A1, A2)) \
+    { \
+      ret->MarkSuccessful(); \
+    } \
+    ret->MarkFinished(); \
     return ret; \
   } \
   void const** argsTC = new void const*[4]; \
@@ -396,7 +408,11 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
-    objTC->function##TC(ret, A1, A2, A3); \
+    if(objTC->function##TC(ret, A1, A2, A3)) \
+    { \
+      ret->MarkSuccessful(); \
+    } \
+    ret->MarkFinished(); \
     return ret; \
   } \
   void const** argsTC = new void const*[5]; \
@@ -429,7 +445,11 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
-    objTC->function##TC(ret, A1, A2, A3, A4); \
+    if(objTC->function##TC(ret, A1, A2, A3, A4)) \
+    { \
+      ret->MarkSuccessful(); \
+    } \
+    ret->MarkFinished(); \
     return ret; \
   } \
   void const** argsTC = new void const*[6]; \
@@ -463,7 +483,11 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
-    objTC->function##TC(ret, A1, A2, A3, A4, A5); \
+    if(objTC->function##TC(ret, A1, A2, A3, A4, A5)) \
+    { \
+      ret->MarkSuccessful(); \
+    } \
+    ret->MarkFinished(); \
     return ret; \
   } \
   void const** argsTC = new void const*[7]; \
@@ -498,7 +522,11 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
-    objTC->function##TC(ret, A1, A2, A3, A4, A5, A6); \
+    if(objTC->function##TC(ret, A1, A2, A3, A4, A5, A6)) \
+    { \
+      ret->MarkSuccessful(); \
+    } \
+    ret->MarkFinished(); \
     return ret; \
   } \
   void const** argsTC = new void const*[8]; \
@@ -534,7 +562,11 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
-    objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7); \
+    if(objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7)) \
+    { \
+      ret->MarkSuccessful(); \
+    } \
+    ret->MarkFinished(); \
     return ret; \
   } \
   void const** argsTC = new void const*[9]; \
@@ -571,7 +603,11 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
-    objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8); \
+    if(objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8)) \
+    { \
+      ret->MarkSuccessful(); \
+    } \
+    ret->MarkFinished(); \
     return ret; \
   } \
   void const** argsTC = new void const*[10]; \
@@ -609,7 +645,11 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
-    objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9); \
+    if(objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9)) \
+    { \
+      ret->MarkSuccessful(); \
+    } \
+    ret->MarkFinished(); \
     return ret; \
   } \
   void const** argsTC = new void const*[11]; \
@@ -648,7 +688,11 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
-    objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10); \
+    if(objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10)) \
+    { \
+      ret->MarkSuccessful(); \
+    } \
+    ret->MarkFinished(); \
     return ret; \
   } \
   void const** argsTC = new void const*[12]; \
@@ -688,7 +732,11 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
-    objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11); \
+    if(objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11) \
+    { \
+      ret->MarkSuccessful(); \
+    } \
+    ret->MarkFinished(); \
     return ret; \
   } \
   void const** argsTC = new void const*[13]; \
@@ -729,7 +777,11 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
-    objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12); \
+    if(objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12)) \
+    { \
+      ret->MarkSuccessful(); \
+    } \
+    ret->MarkFinished(); \
     return ret; \
   } \
   void const** argsTC = new void const*[14]; \
@@ -771,7 +823,11 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   if(!tm.IsValid() || tm->RunNow(queueType, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
-    objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13); \
+    if(objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13)) \
+    { \
+      ret->MarkSuccessful(); \
+    } \
+    ret->MarkFinished(); \
     return ret; \
   } \
   void const** argsTC = new void const*[15]; \
@@ -814,7 +870,11 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   if(!tm.IsValid() || tm->RunNow(queueType, forceQueue))) \
   { \
     type* objTC = const_cast<type*>(this); \
-    objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14); \
+    if(objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14)) \
+    { \
+      ret->MarkSuccessful(); \
+    } \
+    ret->MarkFinished(); \
     return ret; \
   } \
   void const** argsTC = new void const*[16]; \
@@ -858,7 +918,11 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   if(!tm.IsValid() || tm->RunNow(queueType, forceQueue))) \
   { \
     type* objTC = const_cast<type*>(this); \
-    objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15); \
+    if(objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15)) \
+    { \
+      ret->MarkSuccessful(); \
+    } \
+    ret->MarkFinished(); \
     return ret; \
   } \
   void const** argsTC = new void const*[17]; \
