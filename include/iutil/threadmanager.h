@@ -72,6 +72,7 @@ struct iThreadManager : public virtual iBase
   virtual int32 GetThreadCount() = 0;
   virtual void SetAlwaysRunNow(bool v) = 0;
   virtual bool GetAlwaysRunNow() = 0;
+  virtual bool Exiting() = 0;
 };
 
 // Interface macros

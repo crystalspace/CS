@@ -441,7 +441,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     // Pointer to the engine sequencer (optional module).
     csRef<iEngineSequenceManager> eseqmgr;
     // Pointer to the global thread manager.
-    csRef<iThreadManager> threadman;
+    csWeakRef<iThreadManager> threadman;
     // Sound loader
     csRef<iSndSysLoader> SndSysLoader;
     // Sound manager

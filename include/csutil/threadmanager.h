@@ -79,6 +79,11 @@ public:
     return alwaysRunNow;
   }
 
+  inline bool Exiting()
+  {
+    return exiting;
+  }
+
 protected:
   csEventID ProcessPerFrame;
   csEventID ProcessWhileWait;
@@ -103,6 +108,7 @@ private:
   csRef<ListAccessQueue> listQueue;
   csRef<iEventQueue> eventQueue;
   csTicks waitingTime;
+  bool exiting;
 
   class TMEventHandler : public scfImplementation1<TMEventHandler, 
       iEventHandler>
@@ -180,7 +186,7 @@ private:
   bool finished;
   void* result;
   csRef<iBase> refResult;
-  csRef<iThreadManager> tm;
+  csWeakRef<iThreadManager> tm;
 };
 
 template<class T, typename A1>
@@ -315,7 +321,12 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(queueType, wait, forceQueue)) \
+  if(!tm.IsValid() || tm->Exiting()) \
+  { \
+    ret->MarkFinished(); \
+    return ret; \
+  } \
+  if(tm->RunNow(queueType, wait, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     if(objTC->function##TC(ret)) \
@@ -349,7 +360,12 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(queueType, wait, forceQueue)) \
+  if(!tm.IsValid() || tm->Exiting()) \
+  { \
+    ret->MarkFinished(); \
+    return ret; \
+  } \
+  if(tm->RunNow(queueType, wait, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     if(objTC->function##TC(ret, A1)) \
@@ -384,7 +400,12 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(queueType, wait, forceQueue)) \
+  if(!tm.IsValid() || tm->Exiting()) \
+  { \
+    ret->MarkFinished(); \
+    return ret; \
+  } \
+  if(tm->RunNow(queueType, wait, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     if(objTC->function##TC(ret, A1, A2)) \
@@ -420,7 +441,12 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(queueType, wait, forceQueue)) \
+  if(!tm.IsValid() || tm->Exiting()) \
+  { \
+    ret->MarkFinished(); \
+    return ret; \
+  } \
+  if(tm->RunNow(queueType, wait, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     if(objTC->function##TC(ret, A1, A2, A3)) \
@@ -457,7 +483,12 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(queueType, wait, forceQueue)) \
+  if(!tm.IsValid() || tm->Exiting()) \
+  { \
+    ret->MarkFinished(); \
+    return ret; \
+  } \
+  if(tm->RunNow(queueType, wait, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     if(objTC->function##TC(ret, A1, A2, A3, A4)) \
@@ -495,7 +526,12 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(queueType, wait, forceQueue)) \
+  if(!tm.IsValid() || tm->Exiting()) \
+  { \
+    ret->MarkFinished(); \
+    return ret; \
+  } \
+  if(tm->RunNow(queueType, wait, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     if(objTC->function##TC(ret, A1, A2, A3, A4, A5)) \
@@ -534,7 +570,12 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(queueType, wait, forceQueue)) \
+  if(!tm.IsValid() || tm->Exiting()) \
+  { \
+    ret->MarkFinished(); \
+    return ret; \
+  } \
+  if(tm->RunNow(queueType, wait, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     if(objTC->function##TC(ret, A1, A2, A3, A4, A5, A6)) \
@@ -574,7 +615,12 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(queueType, wait, forceQueue)) \
+  if(!tm.IsValid() || tm->Exiting()) \
+  { \
+    ret->MarkFinished(); \
+    return ret; \
+  } \
+  if(tm->RunNow(queueType, wait, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     if(objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7)) \
@@ -615,7 +661,12 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(queueType, wait, forceQueue)) \
+  if(!tm.IsValid() || tm->Exiting()) \
+  { \
+    ret->MarkFinished(); \
+    return ret; \
+  } \
+  if(tm->RunNow(queueType, wait, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     if(objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8)) \
@@ -657,7 +708,12 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(queueType, wait, forceQueue)) \
+  if(!tm.IsValid() || tm->Exiting()) \
+  { \
+    ret->MarkFinished(); \
+    return ret; \
+  } \
+  if(tm->RunNow(queueType, wait, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     if(objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9)) \
@@ -700,7 +756,12 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(queueType, wait, forceQueue)) \
+  if(!tm.IsValid() || tm->Exiting()) \
+  { \
+    ret->MarkFinished(); \
+    return ret; \
+  } \
+  if(tm->RunNow(queueType, wait, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     if(objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10)) \
@@ -744,7 +805,12 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(queueType, wait, forceQueue)) \
+  if(!tm.IsValid() || tm->Exiting()) \
+  { \
+    ret->MarkFinished(); \
+    return ret; \
+  } \
+  if(tm->RunNow(queueType, wait, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     if(objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11) \
@@ -789,7 +855,12 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(queueType, wait, forceQueue)) \
+  if(!tm.IsValid() || tm->Exiting()) \
+  { \
+    ret->MarkFinished(); \
+    return ret; \
+  } \
+  if(tm->RunNow(queueType, wait, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     if(objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12)) \
@@ -835,7 +906,12 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(queueType, wait, forceQueue)) \
+  if(!tm.IsValid() || tm->Exiting()) \
+  { \
+    ret->MarkFinished(); \
+    return ret; \
+  } \
+  if(tm->RunNow(queueType, wait, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
     if(objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13)) \
@@ -882,7 +958,12 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(queueType, wait, forceQueue))) \
+  if(!tm.IsValid() || tm->Exiting()) \
+  { \
+    ret->MarkFinished(); \
+    return ret; \
+  } \
+  if(tm->RunNow(queueType, wait, forceQueue))) \
   { \
     type* objTC = const_cast<type*>(this); \
     if(objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14)) \
@@ -930,7 +1011,12 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
   ret.AttachNew(new returnClass(tm)); \
-  if(!tm.IsValid() || tm->RunNow(queueType, wait, forceQueue))) \
+  if(!tm.IsValid() || tm->Exiting()) \
+  { \
+    ret->MarkFinished(); \
+    return ret; \
+  } \
+  if(tm->RunNow(queueType, wait, forceQueue))) \
   { \
     type* objTC = const_cast<type*>(this); \
     if(objTC->function##TC(ret, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15)) \

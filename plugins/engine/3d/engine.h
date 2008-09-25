@@ -1026,7 +1026,7 @@ private:
   csRef<iEventHandler> weakEventHandler;
 
   /// Pointer to the thread manager.
-  csRef<iThreadManager> tman;
+  csWeakRef<iThreadManager> tman;
 
   /// Array of new textures to be precached.
   csRefArray<iTextureWrapper> newTextures;

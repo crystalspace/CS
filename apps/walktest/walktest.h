@@ -161,7 +161,7 @@ public:
   csRef<iPluginManager> plugin_mgr;
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
-  csRef<iThreadManager> tm;
+  csWeakRef<iThreadManager> tm;
 
   csRef<iEventNameRegistry> name_reg;
   csEventID CommandLineHelp;
