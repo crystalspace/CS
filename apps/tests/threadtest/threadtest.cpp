@@ -120,7 +120,7 @@ THREADED_CALLABLE_IMPL1(csThreadTest, Test6, csRef<Data> stuff)
     csWeakRef<iThreadTest> t2 = t.Pop();
     passed &= (t1 == t2 && t1 == this &&
                t1->GetRefCount() == 1 &&
-               stuff->GetRefCount() == 5);
+               stuff->GetRefCount() == 4);
   }
   else
   {
@@ -211,14 +211,10 @@ int main(int argc, char* argv[])
   threadTest->Test6(dat);
 
   csRef<iThreadReturn> ret = threadTest->Test7();
-  ret->Wait();
-
   while(!threadTest->Test7Passed());
   printf("Test 7 passed!\n");
 
   getchar();
-
-  objReg->Clear();
 
   return 0;
 }
