@@ -1038,21 +1038,6 @@ void csSpriteCal3DMeshObject::GetObjectBoundingBox (csBox3& bbox,
   bbox = object_bbox;
 }
 
-void csSpriteCal3DMeshObject::LightChanged (iLight*)
-{
-  lighting_dirty = true;
-}
-
-void csSpriteCal3DMeshObject::LightDisconnect (iLight* /*light*/)
-{
-  lighting_dirty = true;
-}
-
-void csSpriteCal3DMeshObject::DisconnectAllLights ()
-{
-  lighting_dirty = true;
-}
-
 void csSpriteCal3DMeshObject::SetUserData(void *data)
 {
   calModel.setUserData(data);

@@ -460,7 +460,7 @@ private:
       CalMesh* calMesh, size_t vertexCount);
   public:
     iMovable* movable;
-
+	
     MeshAccessor (csSpriteCal3DMeshObject* meshobj, int mesh) :
       scfImplementationType (this)
     {
