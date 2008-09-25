@@ -370,6 +370,12 @@ bool csInitializer::SetupConfigManager (
     }
   }
 
+  // Init the threadmanager using this config.
+  {
+    csRef<iThreadManager> tman = csQueryRegistry<iThreadManager> (r);
+    tman->Init(Config);
+  }
+
   config_done = true;
   return true;
 }

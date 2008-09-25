@@ -28,16 +28,9 @@ using namespace CS::Threading;
 ThreadID csThreadManager::tid = Thread::GetThreadID();
 
 csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationType(this), 
-  objectReg(objReg)
+  objectReg(objReg), waiting(0), alwaysRunNow(false)
 {
-  waiting = 0;
   threadCount = CS::Platform::GetProcessorCount();
-
-  csRef<iConfigManager> config = csQueryRegistry<iConfigManager>(objReg);
-  if(config)
-  {
-    threadCount = config->GetInt("ThreadManager.Threads", threadCount);
-  }
 
   // If we can't detect, assume we have one.
   if(threadCount == 0)
@@ -66,6 +59,18 @@ csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationTyp
 csThreadManager::~csThreadManager()
 {
   eventQueue->RemoveListener(tMEventHandler);
+}
+
+void csThreadManager::Init(iConfigManager* config)
+{
+  int32 oldCount = threadCount;
+  threadCount = config->GetInt("ThreadManager.Threads", threadCount);
+  if(oldCount != threadCount)
+  {
+    threadQueue.AttachNew(new ThreadedJobQueue(threadCount));
+  }
+
+  alwaysRunNow = config->GetBool("ThreadManager.AlwaysRunNow");
 }
 
 void csThreadManager::Process(uint num)

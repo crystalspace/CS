@@ -113,19 +113,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     // Start up list sync.
-    Engine->SyncEngineLists(this, false);
+    if(!threadman->GetAlwaysRunNow())
+    {
+      Engine->SyncEngineLists(this, false);
+
+      csRef<iEventQueue> eventQueue = csQueryRegistry<iEventQueue>(object_reg);
+      if(eventQueue)
+      {
+        ProcessPerFrame = csevFrame(object_reg);
+        eventQueue->RegisterListener(this, ProcessPerFrame);
+      }
+    }
 
     vfs = csQueryRegistry<iVFS>(object_reg);
     if(!vfs.IsValid())
     {
       return false;
-    }
-
-    csRef<iEventQueue> eventQueue = csQueryRegistry<iEventQueue>(object_reg);
-    if(eventQueue)
-    {
-      ProcessPerFrame = csevFrame(object_reg);
-      eventQueue->RegisterListener(this, ProcessPerFrame);
     }
 
     SyntaxService = csQueryRegistryOrLoad<iSyntaxService> (object_reg,

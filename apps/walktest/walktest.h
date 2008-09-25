@@ -320,9 +320,7 @@ public:
    */
   csRef<iEngine> Engine;
   /// The level loaders
-  csRef<iThreadedLoader> TLevelLoader;
-  csRef<iLoader> LevelLoader;
-  bool threaded;
+  csRef<iThreadedLoader> LevelLoader;
   ///
   csRef<iGraphics2D> myG2D;
   csRef<iGraphics3D> myG3D;

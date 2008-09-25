@@ -39,6 +39,7 @@ class CS_CRYSTALSPACE_EXPORT csThreadManager : public scfImplementation1<csThrea
 public:
   csThreadManager(iObjectRegistry* objReg);
   virtual ~csThreadManager();
+  void Init(iConfigManager* config);
 
   void Process(uint num = 1);
   void Wait(csRef<iThreadReturn> ret);
@@ -58,7 +59,7 @@ public:
 
   inline bool RunNow(QueueType queueType, bool forceQueue)
   {
-    return (IsMainThread() && queueType != THREADED && !forceQueue) ||
+    return alwaysRunNow || (IsMainThread() && queueType != THREADED && !forceQueue) ||
       (queueType == THREADED && (((!IsMainThread() || waiting) && waiting >= threadCount-1) ||
       threadQueue->GetQueueCount() > 2*threadCount-1));
   }
@@ -66,6 +67,16 @@ public:
   inline int32 GetThreadCount()
   {
     return threadCount;
+  }
+
+  inline void SetAlwaysRunNow(bool v)
+  {
+    alwaysRunNow = v;
+  }
+
+  inline bool GetAlwaysRunNow()
+  {
+    return alwaysRunNow;
   }
 
 protected:
@@ -83,6 +94,7 @@ private:
 
   int32 waiting;
   int32 threadCount;
+  bool alwaysRunNow;
 
   CS::Threading::Mutex queuePushLock;
 
@@ -110,7 +122,10 @@ private:
       if(Event.Name == parent->ProcessPerFrame ||
          Event.Name == parent->ProcessWhileWait)
       {
-        parent->Process(5);
+        if(!parent->alwaysRunNow)
+        {
+          parent->Process(5);
+        }
       }
       return false;
     }
