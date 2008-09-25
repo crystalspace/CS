@@ -21,8 +21,6 @@ if $(COMPILER.C++FLAGS.PEDANTIC.ENABLE)
 WALKALL.PLUGINLIST =
   animesh
   animeshldr
-  bezier
-  bezierldr
   bugplug
   csconin
   csconout
