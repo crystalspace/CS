@@ -394,12 +394,6 @@ struct iSector : public virtual iBase
   virtual iVisibilityCuller* GetVisibilityCuller () = 0;
 
   /**
-   * Check visibility in a frustum way for all things and polygons in
-   * this sector and possibly traverse through portals to other sectors.
-   */
-  virtual void CheckFrustum (iFrustumView* lview) = 0;  
-
-  /**
    * Follow a beam from start to end and return the first polygon that
    * is hit. This function correctly traverse portals and space warping
    * portals. Normally the sector you call this on should be the sector

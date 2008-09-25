@@ -370,15 +370,6 @@ struct iPortal : public virtual iBase
   virtual bool CompleteSector (iBase* context) = 0;
 
   /**
-   * Check frustum visibility of all polygons reachable through this portal.
-   * Alpha is the alpha value you'd like to use to pass through this
-   * portal (0 is no completely transparent, 100 is complete opaque).
-   * 't' is the transform from object to world (this2other).
-   */
-  virtual void CheckFrustum (iFrustumView* lview,
-	  const csReversibleTransform& t, int alpha) = 0;
-
-  /**
    * Follow a beam through this portal and return the mesh and polygon index
    * that it hits with (0 incase no hit). This function properly acounts for
    * space warping portals and also checks for infinite recursion (does

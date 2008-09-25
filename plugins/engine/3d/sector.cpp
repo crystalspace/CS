@@ -1109,32 +1109,6 @@ void csSector::FireRemoveMesh (iMeshWrapper* mesh)
   }
 }
 
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-void csSector::CheckFrustum (iFrustumView *lview)
-{
-  int i = (int)sectorCallbackList.GetSize ()-1;
-  while (i >= 0)
-  {
-    iSectorCallback* cb = sectorCallbackList.Get (i);
-    cb->Traverse ((iSector*)this, lview);
-    i--;
-  }
-
-  RealCheckFrustum (lview);
-}
-
-void csSector::RealCheckFrustum (iFrustumView *lview)
-{
-  if (drawBusy > 1) return ;
-  drawBusy++;
-
-  // Make sure we have a culler.
-  GetVisibilityCuller ();
-  //culler->CastShadows (lview);
-
-  drawBusy--;
-}
-
 iObjectRegistry* csSector::GetObjectRegistry() const
 {
   return engine->objectRegistry;

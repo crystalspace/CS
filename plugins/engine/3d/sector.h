@@ -246,9 +246,6 @@ public:
 
   virtual iVisibilityCuller* GetVisibilityCuller ();
 
-  virtual void CheckFrustum (iFrustumView* lview);
-  
-
   virtual csSectorHitBeamResult HitBeamPortals (const csVector3& start,
   	const csVector3& end);
 
@@ -369,14 +366,6 @@ private:
    * that the sector needs to know this.
    */
   void RelinkMesh (iMeshWrapper* mesh);
-
-  /**
-   * Check visibility in a frustum way for all things and polygons in
-   * this sector and possibly traverse through portals to other sectors.
-   * This version doesn't init the 2D culler cube so it can be used
-   * for recursing.
-   */
-  void RealCheckFrustum (iFrustumView* lview);
 
   /**
    * Intersect world-space segment with polygons of this sector. Return
