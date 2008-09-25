@@ -23,13 +23,11 @@
  */
 #include "cssysdef.h"
 #include "imesh/animesh.h"
-#include "imesh/bezier.h"
 #include "imesh/emit.h"
 #include "imesh/genmesh.h"
 #include "imesh/gmeshanim.h"
 #include "imesh/gmeshskel2.h"
 #include "imesh/haze.h"
-#include "imesh/instmesh.h"
 #include "imesh/lghtng.h"
 #include "imesh/nullmesh.h"
 #include "imesh/object.h"
