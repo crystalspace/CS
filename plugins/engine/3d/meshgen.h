@@ -32,11 +32,9 @@
 #include "csgeom/box.h"
 #include "iengine/mesh.h"
 #include "iengine/meshgen.h"
-#include "imesh/instmesh.h"
 #include "ivaria/terraform.h"
 
 struct iSector;
-struct iInstancingMeshState;
 class csMeshGenerator;
 struct csMGCell;
 
@@ -71,7 +69,6 @@ struct csMGGeom
    * Not used (null) in case we use a 'normal' mesh type.
    */
   csRef<iMeshWrapper> instmesh;
-  csRef<iInstancingMeshState> instmesh_state;
 
   /// For every lod level we have a cache of meshes.
   csArray<csMGMesh> mesh_cache;
