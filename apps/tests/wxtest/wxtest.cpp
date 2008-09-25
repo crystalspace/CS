@@ -33,6 +33,7 @@
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
 #include "cstool/genmeshbuilder.h"
+#include "cstool/simplestaticlighter.h"
 #include "wxtest.h"
 #include "iutil/eventq.h"
 #include "iutil/event.h"
