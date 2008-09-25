@@ -359,10 +359,6 @@ bool CsBench::Initialize (int argc, const char* const argv[],
   if (!csInitializer::OpenApplication (object_reg))
     return ReportError ("Error opening system!");
 
-  // First disable the lighting cache. Our app is simple enough
-  // not to need this.
-  engine->SetLightingCacheMode (0);
-
   if (!SetupMaterials ()) return false;
   if (!CreateTestCaseSingleBigObject ()) return false;
   if (!CreateTestCaseMultipleObjects ()) return false;

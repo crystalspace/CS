@@ -331,10 +331,6 @@ bool Simple::Initialize ()
     return false;
   }
 
-  // First disable the lighting cache. Our app is simple enough
-  // not to need this.
-  engine->SetLightingCacheMode (0);
-
   // Load the texture from the standard library.  This is located in
   // CS/data/standard.zip and mounted as /lib/std using the Virtual
   // File System (VFS) plugin.

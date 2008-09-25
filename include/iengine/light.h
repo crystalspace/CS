@@ -38,7 +38,6 @@ class csVector4;
 class csBox3;
 
 struct iLight;
-struct iLightingInfo;
 struct iMovable;
 struct iObject;
 struct iSector;
@@ -414,24 +413,6 @@ struct iLight : public virtual iBase
    * or position).
    */
   virtual uint32 GetLightNumber () const = 0;
-
-  /**
-   * Add a mesh to this light. This is usually
-   * called during Setup() by meshes that are hit by the
-   * light.
-   */
-  virtual void AddAffectedLightingInfo (iLightingInfo* li) = 0; 
-
-  /**
-   * Remove a mesh from this light.
-   */
-  virtual void RemoveAffectedLightingInfo (iLightingInfo* li) = 0; 
-
-  /**
-   * For a dynamic light you need to call this to do the actual
-   * lighting calculations.
-   */
-  virtual void Setup () = 0;
 
   /**
    * Get the shader variable context of the light.

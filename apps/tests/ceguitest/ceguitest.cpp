@@ -189,10 +189,6 @@ bool CEGUITest::Application()
   btn->subscribeEvent(CEGUI::PushButton::EventClicked,
     CEGUI::Event::Subscriber(&CEGUITest::OnExitButtonClicked, this));
 
-  // First disable the lighting cache. Our app is simple enough
-  // not to need this.
-  engine->SetLightingCacheMode (0);
-
   // These are used store the current orientation of the camera.
   rotY = rotX = 0;
 

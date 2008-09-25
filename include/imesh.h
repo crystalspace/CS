@@ -31,7 +31,6 @@
 #include "imesh/haze.h"
 #include "imesh/instmesh.h"
 #include "imesh/lghtng.h"
-#include "imesh/lighting.h"
 #include "imesh/nullmesh.h"
 #include "imesh/object.h"
 #include "imesh/objmodel.h"

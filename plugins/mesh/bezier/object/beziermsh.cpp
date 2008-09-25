@@ -42,7 +42,6 @@
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "iengine/sector.h"
-#include "iengine/shadcast.h"
 #include "iengine/shadows.h"
 #include "iengine/texture.h"
 #include "iutil/cache.h"
@@ -175,37 +174,6 @@ csBezierMesh::~csBezierMesh ()
 void csBezierMesh::MarkLightmapsDirty ()
 {
   light_version++;
-}
-
-void csBezierMesh::LightChanged (iLight* /*light*/)
-{
-  MarkLightmapsDirty ();
-}
-
-void csBezierMesh::LightDisconnect (iLight* light)
-{
-  MarkLightmapsDirty ();
-  size_t i;
-  int dt = light->GetDynamicType ();
-  for (i = 0; i < curves.GetSize (); i++)
-  {
-    csCurve *c = curves[i];
-    if (dt == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
-      c->DynamicLightDisconnect (light);
-    else
-      c->StaticLightDisconnect (light);
-  }
-}
-
-void csBezierMesh::DisconnectAllLights ()
-{
-  MarkLightmapsDirty ();
-  size_t i;
-  for (i = 0; i < curves.GetSize (); i++)
-  {
-    csCurve *c = curves[i];
-    c->DisconnectAllLights ();
-  }
 }
 
 void csBezierMesh::WorUpdate ()
@@ -453,6 +421,7 @@ float csBezierMesh::GetScreenBoundingBox (
   return cbox.MaxZ ();
 }
 
+#if 0
 void csBezierMesh::AppendShadows (
   iMovable* movable,
   iShadowBlockList *shadows,
@@ -494,6 +463,7 @@ void csBezierMesh::AppendShadows (
   }
 #endif
 }
+#endif
 
 void csBezierMesh::GetRadius (float &rad, csVector3 &cent)
 {
@@ -809,46 +779,6 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
 }
 
 //----------------------------------------------------------------------
-
-void csBezierMesh::CastShadows (iMovable *movable, iFrustumView *lview)
-{
-  Prepare ();
-  //@@@ Ok?
-  cached_movable = movable;
-  WorUpdate ();
-
-  int i;
-
-  iFrustumViewUserdata* fvud = lview->GetUserdata ();
-  iLightingProcessInfo* lpi = (iLightingProcessInfo*)fvud;
-  bool dyn = lpi->IsDynamic ();
-
-  lpi->GetLight ()->AddAffectedLightingInfo ((iLightingInfo*)this);
-
-  for (i = 0; i < GetCurveCount (); i++)
-  {
-    csCurve* curve = curves.Get (i);
-    if (dyn)
-      curve->CalculateLightingDynamic (lview);
-    else
-      curve->CalculateLightingStatic (lview, true);
-  }
-}
-
-void csBezierMesh::InitializeDefault (bool clear)
-{
-  Prepare ();
-
-  int i;
-  for (i = 0; i < GetCurveCount (); i++)
-    curves.Get (i)->InitializeDefaultLighting (clear);
-}
-
-void csBezierMesh::PrepareLighting ()
-{
-  int i;
-  for (i = 0; i < GetCurveCount (); i++) curves.Get (i)->PrepareLighting ();
-}
 
 void csBezierMesh::Merge (csBezierMesh *other)
 {

@@ -208,10 +208,6 @@ bool ImposterTest::SetupModules()
   // We use the full window to draw the world.
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
-  // First disable the lighting cache. Our app is simple enough
-  // not to need this.
-  engine->SetLightingCacheMode (0);
-
   // Here we create our world.
   CreateRoom();
 

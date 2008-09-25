@@ -371,10 +371,6 @@ Now add these chunks of code (texture manager, room, lights) to
 bool Simple::SetupModules ()
 @{
   @dots{}
-  // First disable the lighting cache. Our app is simple enough
-  // not to need this.
-  engine->SetLightingCacheMode (0);
-  @dots{}
   // These are used store the current orientation of the camera.
   rotY = rotX = 0;
   @dots{}

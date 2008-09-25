@@ -251,14 +251,6 @@ public:
   virtual void PrepareTextures ();
   virtual void PrepareMeshes ();
 
-  virtual void ShineLights (iCollection* base = 0, 
-    iProgressMeter* meter = 0);
-
-  virtual void SetLightingCacheMode (int mode)
-  { lightmapCacheMode = mode; }
-  virtual int GetLightingCacheMode ()
-  { return lightmapCacheMode; }
-
   virtual void SetCacheManager (iCacheManager* cache_mgr);
   virtual void SetVFSCacheManager (const char* vfspath = 0);
 
@@ -995,9 +987,6 @@ private:
 
   /// Store the current framenumber. Is incremented every Draw ()
   uint currentFrameNumber;
-
-    /// Option variable: force lightmap recalculation?
-  int lightmapCacheMode;
 
   /// Clear the Z-buffer every frame.
   bool clearZBuf;

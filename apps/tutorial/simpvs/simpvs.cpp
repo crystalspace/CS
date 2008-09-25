@@ -68,10 +68,6 @@ bool Simple::Setup ()
   if (!cegui) 
     return ReportError("Failed to locate CEGUI plugin");
 
-  // First disable the lighting cache. Our app is simple enough
-  // not to need this.
-  engine->SetLightingCacheMode (0);
-
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
     return ReportError("Error loading 'stone4' texture!");
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");

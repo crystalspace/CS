@@ -32,7 +32,6 @@
 #include "imesh/objmodel.h"
 #include "iengine/viscull.h"
 #include "iengine/movable.h"
-#include "iengine/shadcast.h"
 #include "iengine/mesh.h"
 
 class csKDTree;
@@ -59,7 +58,6 @@ public:
 
   // Optional data for shadows. Both fields can be 0.
   csRef<iMeshWrapper> mesh;
-  csRef<iShadowCaster> caster;
 
   csFrustVisObjectWrapper (csFrustumVis* frustvis) :
     scfImplementationType(this), frustvis(frustvis) { }
@@ -170,7 +168,6 @@ public:
     const csVector3& end, csVector3& isect, float* pr = 0,
     iMeshWrapper** p_mesh = 0, int* poly_idx = 0,
     bool accurate = true);
-  virtual void CastShadows (iFrustumView* fview);
   virtual const char* ParseCullerParameters (iDocumentNode*) { return 0; }
 
   bool HandleEvent (iEvent& ev);

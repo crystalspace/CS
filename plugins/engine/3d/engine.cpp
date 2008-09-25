@@ -44,7 +44,6 @@
 #include "imap/ldrctxt.h"
 #include "imap/loader.h"
 #include "imap/reader.h"
-#include "imesh/lighting.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
@@ -664,7 +663,6 @@ csEngine::csEngine (iBase *iParent) :
   renderLoopManager (0), topLevelClipper (0), resize (false),
   worldSaveable (false), maxAspectRatio (0), nextframePending (0),
   currentFrameNumber (0), 
-  lightmapCacheMode (CS_ENGINE_CACHE_READ | CS_ENGINE_CACHE_NOUPDATE),
   clearZBuf (false), defaultClearZBuf (false), 
   clearScreen (false),  defaultClearScreen (false), 
   currentRenderContext (0), weakEventHandler(0)
@@ -1149,28 +1147,12 @@ bool csEngine::Prepare (iProgressMeter *meter)
 {
   PrepareTextures ();
   PrepareMeshes ();
-
-
-  // Prepare lightmaps if we have any sectors
-  if (sectors.GetCount ()) ShineLights (0, meter);
-
   CheckConsistency ();
-
   return true;
 }
 
 void csEngine::RemoveLight (iLight* light)
 {
-  int sn;
-  int num_meshes = meshes.GetCount ();
-
-  for (sn = 0; sn < num_meshes; sn++)
-  {
-    iMeshWrapper *s = meshes.Get (sn);
-    iLightingInfo* linfo = s->GetLightingInfo ();
-    if (linfo)
-      linfo->LightDisconnect (light);
-  }
   if (light->GetSector ())
     light->GetSector ()->GetLights ()->Remove (light);
 }
@@ -1228,62 +1210,6 @@ THREADED_CALLABLE_IMPL1(csEngine, AddMeshAndChildren, iMeshWrapper* mesh)
   }
 
   return true;
-}
-
-void csEngine::ShineLights (iCollection *collection, iProgressMeter *meter)
-{
-  bool do_relight = false;
-  if (!(lightmapCacheMode & CS_ENGINE_CACHE_READ))
-  {
-    if (!(lightmapCacheMode & CS_ENGINE_CACHE_NOUPDATE))
-      do_relight = true;
-    else if (lightmapCacheMode & CS_ENGINE_CACHE_WRITE)
-      do_relight = true;
-  }
-
-  csRef<iLightIterator> lit = GetLightIterator (collection);
-  iLight *l;
-
-  int sn = 0;
-  int num_meshes = meshes.GetCount ();
-
-  for (sn = 0; sn < num_meshes; sn++)
-  {
-    iMeshWrapper *s = meshes.Get (sn);
-    if (s->GetMovable ()->GetSectors ()->GetCount () <= 0 &&
-	s->QuerySceneNode ()->GetParent () == 0)
-      continue;	// No sectors and no parent mesh, don't process lighting.
-    if (!collection || collection->IsParentOf (s->QueryObject ()))
-    {
-      iLightingInfo* linfo = s->GetLightingInfo ();
-      if (linfo) linfo->InitializeDefault (true);
-    }
-  }
-
-  if (do_relight)
-  {
-    lit->Reset ();
-    while (lit->HasNext ())
-    {
-      l = lit->Next ();
-      ((csLight*)l)->GetPrivateObject ()->CalculateLighting ();
-    }
-  }
-
-  for (sn = 0; sn < num_meshes; sn++)
-  {
-    iMeshWrapper *s = meshes.Get (sn);
-    if (s->GetMovable ()->GetSectors ()->GetCount () <= 0 &&
-	s->QuerySceneNode ()->GetParent () == 0)
-      continue;	// No sectors or parent mesh, don't process lighting.
-    if (!collection || collection->IsParentOf (s->QueryObject ()))
-    {
-      iLightingInfo* linfo = s->GetLightingInfo ();
-      if (linfo) linfo->PrepareLighting ();
-    }
-
-    if (do_relight && meter) meter->Step ();
-  }
 }
 
 bool csEngine::CheckConsistency ()

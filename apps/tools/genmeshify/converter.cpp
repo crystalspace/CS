@@ -182,10 +182,10 @@ namespace genmeshify
       }
     }
     meshWrap->GetMovable()->SetSector (sector);
-    iLightingInfo* linfo = meshWrap->GetLightingInfo ();
-    if (linfo)
+    iMeshObject* mo = meshWrap->GetMeshObject ();
+    csThing* t = static_cast<csThing*> (mo);
+    if (t)
     {
-      csThing* t = static_cast<csThing*> (linfo);
       t->ReadFromCache (app->engine->GetCacheManager());
     }
 

@@ -303,10 +303,6 @@ bool Simple::Initialize ()
   	
   font = g3d->GetDriver2D()->GetFontServer()->LoadFont (CSFONT_LARGE, 10);
 
-  // First disable the lighting cache. Our app is simple enough
-  // not to need this.
-  engine->SetLightingCacheMode (0);
-
   // Create our world.
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
     	"crystalspace.application.simplept",

@@ -862,20 +862,6 @@ void csPortalContainer::DrawOnePortal (
   g3d->ClosePortal ();
 }
 
-//------------------- For iShadowReceiver ----------------------------//
-
-void csPortalContainer::CastShadows (iMovable* movable, iFrustumView* fview)
-{
-  CheckMovable ();
-
-  size_t i;
-  for (i = 0 ; i < portals.GetSize () ; i++)
-  {
-    csPortal *p = portals[i];
-    p->CastShadows (movable, fview);
-  }
-}
-
 //--------------------- For iMeshObject ------------------------------//
 
 bool csPortalContainer::ExtraVisTest (iRenderView* rview,

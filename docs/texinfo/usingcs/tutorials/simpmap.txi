@@ -238,17 +238,6 @@ int main (int argc, char* argv[])
 @}
 @end example
 
-One important note in the code above which differs from the earlier tutorials
-is that we removed the following line:
-
-@example
-engine->SetLightingCacheMode (0);
-@end example
-
-This is because, when we are loading from map file, we actually want
-the lighting information to be read from the cache (if present).
-We do so because relighting a map can be a time-consuming process.
-
 @node Simple Loading The Map, Simple Locating the Camera, Simple Base Code, Tutorial Simple Map
 @subsubsection Loading The Map
 @cindex loading a map

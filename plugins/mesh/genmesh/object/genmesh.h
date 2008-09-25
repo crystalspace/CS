@@ -40,9 +40,7 @@
 #include "csutil/weakref.h"
 #include "iengine/light.h"
 #include "iengine/lightmgr.h"
-#include "iengine/shadcast.h"
 #include "imesh/genmesh.h"
-#include "imesh/lighting.h"
 #include "imesh/object.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
@@ -132,11 +130,8 @@ public:
 /**
  * Genmesh version of mesh object.
  */
-class csGenmeshMeshObject : public scfImplementation5<csGenmeshMeshObject, 
+class csGenmeshMeshObject : public scfImplementation2<csGenmeshMeshObject, 
 						      iMeshObject,
-						      iLightingInfo,
-						      iShadowCaster,
-						      iShadowReceiver,
 						      iGeneralMeshState>
 {
 private:
@@ -201,7 +196,7 @@ private:
 
   // If we are using the iLightingInfo lighting system then this
   // is an array of lights that affect us right now.
-  csSet<csPtrKey<iLight> > affecting_lights;
+  //csSet<csPtrKey<iLight> > affecting_lights;
   // In case we are not using the iLightingInfo system then we
   // GetRenderMeshes() will updated the following array:
   csSafeCopyArray<csLightInfluence> relevant_lights;
@@ -323,19 +318,6 @@ public:
   csRef<iString> GetRenderBufferName (int index) const;
   iRenderBuffer* GetRenderBuffer (const char* name);
   iRenderBuffer* GetRenderBuffer (csRenderBufferName name);
-
-  /**\name Shadow and lighting system
-   * @{ */
-  void InitializeDefault (bool clear);
-  void PrepareLighting ();
-
-  void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
-    	const csVector3& origin);
-  void CastShadows (iMovable* movable, iFrustumView* fview);
-  void LightChanged (iLight* light);
-  void LightDisconnect (iLight* light);
-  void DisconnectAllLights ();
-  /** @} */
 
   /**\name iMeshObject implementation
    * @{ */

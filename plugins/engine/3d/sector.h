@@ -224,12 +224,6 @@ public:
   THREADED_CALLABLE_DECL1(csSector, AddLight, csThreadReturn,
     csRef<iLight>, light, MED, false, false);
 
-  virtual void ShineLights ()
-  { ShineLightsInt ((csProgressPulse*)0); }
-  
-  virtual void ShineLights (iMeshWrapper* mesh)
-  { ShineLightsInt (mesh); }
-
   virtual void SetDynamicAmbientLight (const csColor& color);
 
   virtual csColor GetDynamicAmbientLight () const
@@ -383,20 +377,6 @@ private:
    * for recursing.
    */
   void RealCheckFrustum (iFrustumView* lview);
-
-  /**
-   * The whole setup starts with csEngine::shine_lights calling
-   * csSector::shine_lights for every sector in the engine.
-   * This function will call csLight::shine_lightmaps for every
-   * light in the sector.
-   * csLight::shine_light will generate a view frustum from the
-   * center of the light and use that to light all polygons that
-   * are hit by the frustum.
-   */
-  void ShineLightsInt (csProgressPulse* = 0);
-
-  /// Version of shine_lights() which only affects one mesh object.
-  void ShineLightsInt (iMeshWrapper*, csProgressPulse* = 0);
 
   /**
    * Intersect world-space segment with polygons of this sector. Return

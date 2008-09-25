@@ -190,10 +190,6 @@ bool PathTut::Initialize (int argc, const char* const argv[])
     return false;
   }
 
-  // First disable the lighting cache. Our app is PathTut enough
-  // not to need this.
-  engine->SetLightingCacheMode (0);
-
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,

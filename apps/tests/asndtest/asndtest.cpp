@@ -364,8 +364,6 @@ bool ASndTest::Application()
   sndloader = csQueryRegistry<iSndSysLoader> (GetObjectRegistry());
   if (!sndloader) return ReportError("Failed to locate Sound loader!");
 
-  engine->SetLightingCacheMode (0);
-
   CreateWorld ();
 
   view.AttachNew(new csView (engine, g3d));

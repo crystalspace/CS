@@ -2250,10 +2250,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
     ll->Add (dyn);
-    dyn->Setup ();
     Sys->dynamic_lights.Push (dyn);
-    // @@@ BUG: for some reason it is needed to call Setup() twice!!!!
-    dyn->Setup ();
     extern void AttachRandomLight (iLight* light);
     if (rnd)
       AttachRandomLight (dyn);

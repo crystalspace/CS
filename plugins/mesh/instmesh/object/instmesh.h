@@ -37,10 +37,8 @@
 #include "csutil/weakref.h"
 #include "iengine/light.h"
 #include "iengine/lightmgr.h"
-#include "iengine/shadcast.h"
 #include "igeom/trimesh.h"
 #include "imesh/instmesh.h"
-#include "imesh/lighting.h"
 #include "imesh/object.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
@@ -97,12 +95,9 @@ struct csInstance
  * Instmesh version of mesh object.
  */
 class csInstmeshMeshObject : 
-  public scfImplementationExt5<csInstmeshMeshObject, 
+  public scfImplementationExt2<csInstmeshMeshObject, 
                                csObjectModel,
                                iMeshObject,
-                               iLightingInfo,
-                               iShadowCaster,
-                               iShadowReceiver,
                                iInstancingMeshState>
 {
 private:
@@ -177,7 +172,7 @@ private:
 
   // If we are using the iLightingInfo lighting system then this
   // is an array of lights that affect us right now.
-  csSet<csPtrKey<iLight> > affecting_lights;
+  //csSet<csPtrKey<iLight> > affecting_lights;
   // In case we are not using the iLightingInfo system then we
   // GetRenderMeshes() will updated the following array:
   csSafeCopyArray<csLightInfluence> relevant_lights;
@@ -268,17 +263,6 @@ public:
   void RemoveAllInstances ();
   void MoveInstance (size_t id, const csReversibleTransform& trans);
   const csReversibleTransform& GetInstanceTransform (size_t id);
-
-  //----------------------- Shadow and lighting system ----------------------
-  void InitializeDefault (bool clear);
-  void PrepareLighting ();
-
-  void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
-    	const csVector3& origin);
-  void CastShadows (iMovable* movable, iFrustumView* fview);
-  void LightChanged (iLight* light);
-  void LightDisconnect (iLight* light);
-  void DisconnectAllLights ();
 
   //----------------------- iMeshObject implementation ----------------------
   virtual iMeshObjectFactory* GetFactory () const;

@@ -42,7 +42,6 @@
 #include "imap/ldrctxt.h"
 #include "imap/modelload.h"
 #include "imesh/genmesh.h"
-#include "imesh/lighting.h"
 #include "imesh/object.h"
 #include "iengine/collection.h"
 #include "iengine/engine.h"

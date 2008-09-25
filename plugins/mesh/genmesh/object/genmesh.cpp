@@ -80,8 +80,7 @@ CS_LEAKGUARD_IMPLEMENT (csGenmeshMeshObjectFactory::RenderBufferAccessor);
 
 csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
         scfImplementationType (this), factorySubMeshesChangeNum (~0),
-	pseudoDynInfo (29, 32),
-	affecting_lights (29, 32)
+	pseudoDynInfo (29, 32)
 {
   shaderVariableAccessor.AttachNew (new ShaderVariableAccessor (this));
   renderBufferAccessor.AttachNew (new RenderBufferAccessor (this));
@@ -233,112 +232,6 @@ void csGenmeshMeshObject::CheckLitColors ()
     ClearPseudoDynLights ();
     legacyLighting.SetColorNum (factory->GetVertexCount ());
   }
-}
-
-void csGenmeshMeshObject::InitializeDefault (bool clear)
-{
-  SetupObject ();
-
-  if (!do_shadow_rec) return;
-  if (do_manual_colors) return;
-
-  // Set all colors to ambient light.
-  CheckLitColors ();
-  if (clear)
-  {
-    legacyLighting.Clear();
-  }
-  lighting_dirty = true;
-}
-
-void csGenmeshMeshObject::PrepareLighting ()
-{
-}
-
-void csGenmeshMeshObject::LightChanged (iLight*)
-{
-  lighting_dirty = true;
-}
-
-void csGenmeshMeshObject::LightDisconnect (iLight* light)
-{
-  affecting_lights.Delete (light);
-  lighting_dirty = true;
-}
-
-void csGenmeshMeshObject::DisconnectAllLights ()
-{
-  csSet<csPtrKey<iLight> >::GlobalIterator it = affecting_lights.
-      	GetIterator ();
-  while (it.HasNext ())
-  {
-    iLight* l = (iLight*)it.Next ();
-    l->RemoveAffectedLightingInfo (this);
-  }
-  affecting_lights.Empty ();
-  lighting_dirty = true;
-}
-
-#define SHADOW_CAST_BACKFACE
-
-void csGenmeshMeshObject::AppendShadows (iMovable* movable,
-    iShadowBlockList* shadows, const csVector3& origin)
-{
-  if (!do_shadows) return;
-  int tri_num = factory->GetTriangleCount ();
-  csVector3* vt = factory->GetVertices ();
-  int vt_num = factory->GetVertexCount ();
-  csVector3* vt_world, * vt_array_to_delete;
-  int i;
-  if (movable->IsFullTransformIdentity ())
-  {
-    vt_array_to_delete = 0;
-    vt_world = vt;
-  }
-  else
-  {
-    vt_array_to_delete = new csVector3 [vt_num];
-    vt_world = vt_array_to_delete;
-    csReversibleTransform movtrans = movable->GetFullTransform ();
-    for (i = 0 ; i < vt_num ; i++)
-      vt_world[i] = movtrans.This2Other (vt[i]);
-  }
-
-  iShadowBlock *list = shadows->NewShadowBlock (tri_num);
-  csFrustum *frust;
-  bool cw = true;                   //@@@ Use mirroring parameter here!
-  csTriangle* tri = factory->GetTriangles ();
-  for (i = 0 ; i < tri_num ; i++, tri++)
-  {
-    csPlane3 pl (vt_world[tri->c], vt_world[tri->b], vt_world[tri->a]);
-    //if (pl.VisibleFromPoint (origin) != cw) continue;
-    float clas = pl.Classify (origin);
-    if (ABS (clas) < EPSILON) continue;
-#ifdef SHADOW_CAST_BACKFACE
-    if ((clas < 0) == cw) continue;
-#else
-    if ((clas <= 0) != cw) continue;
-#endif
-
-    // Let the casted shadow appear with a tiny tiny offset...
-    const csVector3 offs = csVector3 (pl.norm) * csVector3 (EPSILON);
-    pl.DD += (origin + offs) * pl.norm;
-#ifndef SHADOW_CAST_BACKFACE
-    pl.Invert ();
-#endif
-    frust = list->AddShadow (origin, 0, 3, pl);
-#ifdef SHADOW_CAST_BACKFACE
-    frust->GetVertex (0).Set (vt_world[tri->c] - origin);
-    frust->GetVertex (1).Set (vt_world[tri->b] - origin);
-    frust->GetVertex (2).Set (vt_world[tri->a] - origin);
-#else
-    frust->GetVertex (0).Set (vt_world[tri->a] - origin);
-    frust->GetVertex (1).Set (vt_world[tri->b] - origin);
-    frust->GetVertex (2).Set (vt_world[tri->c] - origin);
-#endif
-  }
-
-  delete[] vt_array_to_delete;
 }
 
 bool csGenmeshMeshObject::SetMaterialWrapper (iMaterialWrapper* mat)
@@ -739,7 +632,7 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
   {
     if (!do_manual_colors)
     {
-      UpdateLighting (relevant_lights, lighting_movable);
+      //UpdateLighting (relevant_lights, lighting_movable);
     }
     if (mesh_colors_dirty_flag || anim_ctrl_colors)
     {
