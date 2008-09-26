@@ -934,7 +934,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  addmbot delmbot addbot delbot fire explosion frain decal_test");
     CONPRI("  rain snow fountain flame portal fs_inter fs_fadeout fs_fadecol");
     CONPRI("  fs_fadetxt fs_red fs_green fs_blue fs_whiteout fs_shadevert");
-    CONPRI("  frankie");
+    CONPRI("  frankie cleareffects");
     CONPRI("Debugging:");
     CONPRI("  zbuf debug0 debug1 debug2 palette bugplug");
     CONPRI("  db_boxshow db_boxcam1 db_boxcam2 db_boxsize1 db_boxsize2");

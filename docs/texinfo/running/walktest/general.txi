@@ -27,6 +27,9 @@ Run a performance test on the current position.
 The default number of runs is 100 but you can change it
 with an optional argument.
 
+@item cleareffects
+Clear special render manager post-effects.
+
 @item coordsave
 Save the current position to the @file{coord} file.
 
@@ -334,6 +337,9 @@ statistics every @var{x} frames and output the summary to
 The @samp{break} option, when WalkTest is compiled in debug mode, will trip
 off a signal trap frame number @var{x}.  This is useful once you take note of
 the frame number of something interesting in an @file{.rps} file.
+
+@item plugins
+List all plugins that are currently loaded.
 
 @item recsubperf @var{file}
 Once a recording has begun this command is used to record the statistics of a
