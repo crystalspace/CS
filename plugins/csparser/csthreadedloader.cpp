@@ -76,9 +76,11 @@
 
 #include "ivideo/material.h"
 
-#include "csthreadedloader.h"
 #include "csloadercontext.h"
+#include "csthreadedloader.h"
 #include "loadtex.h"
+
+CS_IMPLEMENT_PLUGIN
 
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {

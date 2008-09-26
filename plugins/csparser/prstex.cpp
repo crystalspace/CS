@@ -20,39 +20,23 @@
 #include "cssysdef.h"
 #include "csqint.h"
 
-#include "csgfx/imagecubemapmaker.h"
-#include "csgfx/rgbpixel.h"
-#include "cstool/proctex.h"
-#include "csutil/array.h"
-#include "csutil/cscolor.h"
-#include "csutil/scanstr.h"
-#include "iengine/engine.h"
-#include "iengine/material.h"
-#include "iengine/texture.h"
 #include "igraphic/animimg.h"
-#include "imap/ldrctxt.h"
-#include "imap/reader.h"
-#include "iutil/document.h"
-#include "iutil/objreg.h"
-#include "iutil/strset.h"
+#include "imap/services.h"
+#include "itexture/iproctex.h"
+#include "iutil/stringarray.h"
 #include "iutil/vfs.h"
-#include "ivaria/keyval.h"
 #include "ivaria/reporter.h"
-#include "ivideo/graph3d.h"
 #include "ivideo/material.h"
-#include "ivideo/shader/shader.h"
-#include "ivideo/texture.h"
 
-#include "loadtex.h"
-#include "csloader.h"
 #include "csthreadedloader.h"
+#include "loadtex.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
 #define PLUGIN_LEGACY_TEXTYPE_PREFIX  "crystalspace.texture.loader."
 
-  bool csLoader::ParseMaterialList (iLoaderContext* ldr_context,
-    iDocumentNode* node, const char* prefix)
+  bool csThreadedLoader::ParseMaterialList (iLoaderContext* ldr_context,
+    iDocumentNode* node, csWeakRefArray<iMaterialWrapper> &materialArray, const char* prefix)
   {
     if (!Engine) return false;
 
@@ -66,7 +50,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       switch (id)
       {
       case XMLTOKEN_MATERIAL:
-        if (!ParseMaterial (ldr_context, child, prefix))
+        if (!ParseMaterial (ldr_context, child, materialArray, prefix))
           return false;
         break;
       default:
@@ -78,7 +62,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return true;
   }
 
-  bool csLoader::ParseTextureList (iLoaderContext* ldr_context, iDocumentNode* node)
+  bool csThreadedLoader::ParseTextureList (iLoaderContext* ldr_context, iDocumentNode* node,
+    csSafeCopyArray<ProxyTexture> &proxyTextures)
   {
     if (!ImageLoader)
     {
@@ -87,7 +72,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         node, "Image loader is missing!");
       return false;
     }
-    static bool proctex_deprecated_warned = false;
 
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
     while (it->HasNext ())
@@ -98,31 +82,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csStringID id = xmltokens.Request (value);
       switch (id)
       {
-      case XMLTOKEN_PROCTEX:
-        /*        if (!ParseProcTex (child))
-        return false;
-        break;*/
-        if (!proctex_deprecated_warned)
-        {
-          SyntaxService->Report (
-            "crystalspace.maploader.parse.texture",
-            CS_REPORTER_SEVERITY_NOTIFY,
-            child,
-            "Use of <proctex> is deprecated. "
-            "Procedural textures can now be specified with the <texture> node as well.");
-          proctex_deprecated_warned = true;
-        }
       case XMLTOKEN_TEXTURE:
-        if (!ParseTexture (ldr_context, child))
+        if (!ParseTexture (ldr_context, child, proxyTextures))
+        {
+          failedTextures->Push(child->GetAttributeValue("name"));
           return false;
+        }
         break;
       case XMLTOKEN_CUBEMAP:
         if (!ParseCubemap (ldr_context, child))
+        {
+          failedTextures->Push(child->GetAttributeValue("name"));
           return false;
+        }
         break;
       case XMLTOKEN_TEXTURE3D:
         if (!ParseTexture3D (ldr_context, child))
+        {
+          failedTextures->Push(child->GetAttributeValue("name"));
           return false;
+        }
         break;
       default:
         SyntaxService->ReportBadToken (child);
@@ -133,17 +112,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return true;
   }
 
-  iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
-    iDocumentNode* node)
+  bool csThreadedLoader::ParseTexture (iLoaderContext* ldr_context,
+    iDocumentNode* node, csSafeCopyArray<ProxyTexture> &proxyTextures)
   {
     const char* txtname = node->GetAttributeValue ("name");
-    if (ldr_context->CheckDupes ())
+
+    iTextureWrapper* t = ldr_context->FindTexture (txtname, true);
+    if (t)
     {
-      iTextureWrapper* t = Engine->FindTexture (txtname);
+      ldr_context->AddToCollection(t->QueryObject ());
+      return true;
+    }
+
+    if(!AddLoadingTexture(txtname))
+    {
+      t = ldr_context->FindTexture (txtname);
       if (t)
       {
-        AddToCollection (ldr_context, t->QueryObject ());
-        return t;
+        ldr_context->AddToCollection(t->QueryObject ());
+        return true;
       }
     }
 
@@ -181,7 +168,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           bool for2d;
           if (!SyntaxService->ParseBool (child, for2d, true))
-            return 0;
+          {
+            RemoveLoadingTexture(txtname);
+            return false;
+          }
           if (for2d)
             context.SetFlags (context.GetFlags() | CS_TEXTURE_2D);
           else
@@ -192,7 +182,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           bool for3d;
           if (!SyntaxService->ParseBool (child, for3d, true))
-            return 0;
+          {
+            RemoveLoadingTexture(txtname);
+            return false;
+          }
           if (for3d)
             context.SetFlags (context.GetFlags() | CS_TEXTURE_3D);
           else
@@ -202,7 +195,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       case XMLTOKEN_TRANSPARENT:
         do_transp = true;
         if (!SyntaxService->ParseColor (child, transp))
-          return 0;
+          return false;
         break;
       case XMLTOKEN_FILE:
         {
@@ -212,7 +205,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.texture",
               child, "Expected VFS filename for 'file'!");
-            return 0;
+            RemoveLoadingTexture(txtname);
+            return false;
           }
           filename = fname;
         }
@@ -221,27 +215,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           bool mm;
           if (!SyntaxService->ParseBool (child, mm, true))
-            return 0;
+          {
+            RemoveLoadingTexture(txtname);
+            return false;
+          }
           if (!mm)
             context.SetFlags (context.GetFlags() | CS_TEXTURE_NOMIPMAPS);
           else
             context.SetFlags (context.GetFlags() & ~CS_TEXTURE_NOMIPMAPS);
         }
         break;
-      case XMLTOKEN_DITHER:
-        {
-          SyntaxService->Report (
-            "crystalspace.maploader.parse.texture",
-            CS_REPORTER_SEVERITY_NOTIFY,
-            node,
-            "\"dither\" flag has been dropped");
-        }
-        break;
       case XMLTOKEN_NPOTS:
         {
           bool npots;
           if (!SyntaxService->ParseBool (child, npots, true))
-            return 0;
+          {
+            RemoveLoadingTexture(txtname);
+            return false;
+          }
           if (npots)
             context.SetFlags (context.GetFlags() | CS_TEXTURE_NPOTS);
           else
@@ -251,7 +242,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       case XMLTOKEN_KEEPIMAGE:
         {
           if (!SyntaxService->ParseBool (child, keep_image, true))
-            return 0;
+          {
+            RemoveLoadingTexture(txtname);
+            return false;
+          }
         }
         break;
       case XMLTOKEN_PARAMS:
@@ -264,7 +258,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           SyntaxService->ReportError (
             "crystalspace.maploader.parse.texture",
             child, "Expected plugin ID for <type>!");
-          return 0;
+          RemoveLoadingTexture(txtname);
+          return false;
         }
         break;
       case XMLTOKEN_SIZE:
@@ -280,13 +275,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_ALWAYSANIMATE:
         if (!SyntaxService->ParseBool (child, always_animate, true))
-          return 0;
+          return false;
         break;
       case XMLTOKEN_CLAMP:
         {
           bool c;
           if (!SyntaxService->ParseBool (child, c, true))
-            return 0;
+          {
+            RemoveLoadingTexture(txtname);
+            return false;
+          }
           if (c)
             context.SetFlags (context.GetFlags() | CS_TEXTURE_CLAMP);
           else
@@ -297,7 +295,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           bool c;
           if (!SyntaxService->ParseBool (child, c, true))
-            return 0;
+          {
+            RemoveLoadingTexture(txtname);
+            return false;
+          }
           if (c)
             context.SetFlags (context.GetFlags() & ~CS_TEXTURE_NOFILTER);
           else
@@ -313,14 +314,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           csAlphaMode am;
           if (!SyntaxService->ParseAlphaMode (child, 0, am, false))
-            return 0;
+          {
+            RemoveLoadingTexture(txtname);
+            return false;
+          }
           overrideAlphaType = true;
           alphaType = am.alphaType;
         }
         break;
       default:
-        SyntaxService->ReportBadToken (child);
-        return 0;
+        {
+          SyntaxService->ReportBadToken (child);
+          RemoveLoadingTexture(txtname);
+          return false;
+        }
       }
     }
 
@@ -329,7 +336,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     // Proxy texture loading if the loader isn't specified
     // and we don't need to load them immediately.
     if(txtname && type.IsEmpty() && ldr_context->GetKeepFlags() == KEEP_USED &&
-       ldr_context->GetCollection())
+      ldr_context->GetCollection())
     {
       if (filename.IsEmpty())
       {
@@ -337,7 +344,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
 
       // Get absolute path (on VFS) of the file.
-      csRef<iDataBuffer> absolutePath = VFS->ExpandPath(filename);
+      csRef<iDataBuffer> absolutePath = vfs->ExpandPath(filename);
       filename = absolutePath->GetData();
 
       ProxyTexture proxTex;
@@ -345,10 +352,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       proxTex.img.AttachNew (new ProxyImage (loader, filename, object_reg));
       proxTex.always_animate = always_animate;
 
-      tex = Engine->GetTextureList()->NewTexture (proxTex.img);
+      tex = Engine->GetTextureList()->CreateTexture (proxTex.img);
       tex->SetTextureClass(context.GetClass());
       tex->SetFlags(context.GetFlags());
       tex->QueryObject()->SetName(txtname);
+      AddTextureToList(tex);
+      RemoveLoadingTexture(txtname);
 
       proxTex.alphaType = csAlphaMode::alphaNone;
       if(overrideAlphaType)
@@ -366,10 +375,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
 
       proxTex.textureWrapper = tex;
-      AddToCollection (ldr_context, proxTex.textureWrapper->QueryObject());
+      ldr_context->AddToCollection(proxTex.textureWrapper->QueryObject());
       proxyTextures.Push(proxTex);
 
-      return tex;
+      return true;
     }
 
     // @@@ some more comments
@@ -378,15 +387,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       filename = txtname;
     }
 
-    iTextureManager* tm;
-    tm = G3D ? G3D->GetTextureManager() : 0;
+    iTextureManager* texman;
+    texman = g3d ? g3d->GetTextureManager() : 0;
     int Format;
-    Format = tm ? tm->GetTextureFormat () : CS_IMGFMT_TRUECOLOR;
+    Format = texman ? texman->GetTextureFormat () : CS_IMGFMT_TRUECOLOR;
+    csRef<iLoaderPlugin> BuiltinImageTexLoader;
     if (!filename.IsEmpty ())
     {
-      csRef<iImage> image = LoadImage (filename, Format);
+      csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
+      if(!LoadImageTC (ret, filename, Format, false))
+      {
+        SyntaxService->Report("crystalspace.maploader.parse.texture",
+          CS_REPORTER_SEVERITY_ERROR, node, "Could not load image %s!", filename.GetData());
+      }
+
+      csRef<iImage> image = scfQueryInterfaceSafe<iImage>(ret->GetResultRefPtr());
       context.SetImage (image);
-      if (image && type.IsEmpty ())
+      if (image.IsValid() && type.IsEmpty ())
       {
         // special treatment for animated textures
         csRef<iAnimatedImage> anim = scfQueryInterface<iAnimatedImage> (image);
@@ -396,13 +413,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         }
         else
         {
-          // shortcut, no need to go through the plugin list facility
-          if (!BuiltinImageTexLoader)
-          {
-            csImageTextureLoader* itl = new csImageTextureLoader (0);
-            itl->Initialize (object_reg);
-            BuiltinImageTexLoader.AttachNew (itl);
-          }
+          csImageTextureLoader* itl = new csImageTextureLoader (0);
+          itl->Initialize (object_reg);
+          BuiltinImageTexLoader.AttachNew(itl);
           plugin = BuiltinImageTexLoader;
         }
       }
@@ -468,7 +481,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if (plugin)
     {
       csRef<iBase> b = plugin->Parse (ParamsNode,
-        0/*ssource*/, ldr_context, static_cast<iBase*> (&context));
+        0/*ssource*/, ldr_context, static_cast<iBase*> (&context), failedMeshFacts);
       if (b) tex = scfQueryInterface<iTextureWrapper> (b);
     }
 
@@ -479,22 +492,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         CS_REPORTER_SEVERITY_WARNING,
         node, "Could not load texture '%s', using checkerboard instead", txtname);
 
-      /*if (!BuiltinCheckerTexLoader)
-      {
-      csCheckerTextureLoader* ctl = new csCheckerTextureLoader (0);
-      ctl->Initialize (object_reg);
-      BuiltinCheckerTexLoader.AttachNew (ctl);
-      }
-      csRef<iBase> b = BuiltinCheckerTexLoader->Parse (ParamsNode,
-      0, ldr_context, static_cast<iBase*> (&context));*/
-      if (!BuiltinErrorTexLoader)
-      {
-        csMissingTextureLoader* mtl = new csMissingTextureLoader (0);
-        mtl->Initialize (object_reg);
-        BuiltinErrorTexLoader.AttachNew (mtl);
-      }
+      csRef<iLoaderPlugin> BuiltinErrorTexLoader;
+      BuiltinErrorTexLoader.AttachNew(new csMissingTextureLoader (0));
       csRef<iBase> b = BuiltinErrorTexLoader->Parse (ParamsNode,
-        0, ldr_context, static_cast<iBase*> (&context));
+        0, ldr_context, static_cast<iBase*> (&context), failedMeshFacts);
       if (!b.IsValid())
       {
         static bool noMissingWarned = false;
@@ -505,7 +506,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             CS_REPORTER_SEVERITY_ERROR,
             node, "Could not create default texture!");
           noMissingWarned = true;
-          return 0;
+          RemoveLoadingTexture(txtname);
+          return false;
         }
       }
       tex = scfQueryInterface<iTextureWrapper> (b);
@@ -527,36 +529,48 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csRef<iProcTexture> ipt = scfQueryInterface<iProcTexture> (tex);
       if (ipt)
         ipt->SetAlwaysAnimate (always_animate);
-      AddToCollection (ldr_context, tex->QueryObject ());
+      ldr_context->AddToCollection(tex->QueryObject ());
 
       size_t i;
       for (i = 0 ; i < key_nodes.GetSize () ; i++)
       {
         if (!ParseKey (key_nodes[i], tex->QueryObject()))
-          return 0;
+        {
+          RemoveLoadingTexture(txtname);
+          return false;
+        }
       }
     }
 
-    if (tm)
+    if (texman)
     {
-      if (!tex->GetTextureHandle ()) tex->Register (tm);
+      if (!tex->GetTextureHandle ()) tex->Register (texman);
     }
-    return tex;
+
+    AddTextureToList(tex);
+    RemoveLoadingTexture(txtname);
+    return true;
   }
 
-  iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
-    iDocumentNode* node, const char *prefix)
+  bool csThreadedLoader::ParseMaterial (iLoaderContext* ldr_context,
+    iDocumentNode* node, csWeakRefArray<iMaterialWrapper> &materialArray, const char *prefix)
   {
-    if (!Engine) return 0;
-
     const char* matname = node->GetAttributeValue ("name");
-    if (ldr_context->CheckDupes ())
+
+    iMaterialWrapper* m = ldr_context->FindMaterial (matname, true);
+    if (m)
     {
-      iMaterialWrapper* m = Engine->FindMaterial (matname);
-      if (m)
+      ldr_context->AddToCollection(m->QueryObject ());
+      return true;
+    }
+
+    if(!AddLoadingMaterial(matname))
+    {
+      m = ldr_context->FindMaterial (matname);
+      if(m)
       {
-        AddToCollection (ldr_context, m->QueryObject ());
-        return m;
+        ldr_context->AddToCollection(m->QueryObject ());
+        return true;
       }
     }
 
@@ -592,7 +606,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             ReportError (
               "crystalspace.maploader.parse.material",
               "Cannot find texture '%s' for material `%s'", txtname, matname);
-            return 0;
+            RemoveLoadingMaterial(matname);
+            return false;
           }
         }
         break;
@@ -600,7 +615,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           col_set = true;
           if (!SyntaxService->ParseColor (child, col))
-            return 0;
+          {
+            RemoveLoadingMaterial(matname);
+            return false;
+          }
         }
         break;
       case XMLTOKEN_DIFFUSE:
@@ -637,8 +655,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             break;
           }
           shadertypes.Push (stringSet->Request(shadertype));
-          //shaders.Push (shader);
-          //csRef<iShaderWrapper> wrapper = shaderMgr->CreateWrapper (shader);
           shaders.Push (shader);
         }
         break;
@@ -648,7 +664,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           csRef<csShaderVariable> var;
           var.AttachNew (new csShaderVariable);
 
-          if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
+          if (!SyntaxService->ParseShaderVar (ldr_context, child, *var, failedTextures))
           {
             break;
           }
@@ -656,8 +672,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         }
         break;
       default:
-        SyntaxService->ReportBadToken (child);
-        return 0;
+        {
+          SyntaxService->ReportBadToken (child);
+          RemoveLoadingMaterial(matname);
+          return false;
+        }
       }
     }
 
@@ -670,7 +689,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       flatSV->SetValue (col);
     }
 
-    iMaterialWrapper *mat;
+    csRef<iMaterialWrapper> mat;
 
     if (prefix)
     {
@@ -678,13 +697,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       strcpy (prefixedname, prefix);
       strcat (prefixedname, "_");
       strcat (prefixedname, matname);
-      mat = Engine->GetMaterialList ()->NewMaterial (material, prefixedname);
+      mat = Engine->GetMaterialList ()->CreateMaterial (material, prefixedname);
       delete [] prefixedname;
     }
     else
     {
-      mat = Engine->GetMaterialList ()->NewMaterial (material, matname);
+      mat = Engine->GetMaterialList ()->CreateMaterial (material, matname);
     }
+    AddMaterialToList(mat);
+    RemoveLoadingMaterial(matname);
 
     size_t i;
     for (i=0; i<shaders.GetSize (); i++)
@@ -698,17 +719,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     for (i = 0 ; i < key_nodes.GetSize () ; i++)
     {
       if (!ParseKey (key_nodes[i], mat->QueryObject()))
-        return 0;
+        return false;
     }
-    AddToCollection (ldr_context, mat->QueryObject ());
+    ldr_context->AddToCollection(mat->QueryObject ());
 
     materialArray.Push(mat);
 
-    return mat;
+    return true;
   }
 
   /// Parse a Cubemap texture definition and add the texture to the engine
-  iTextureWrapper* csLoader::ParseCubemap (iLoaderContext* ldr_context,
+  iTextureWrapper* csThreadedLoader::ParseCubemap (iLoaderContext* ldr_context,
     iDocumentNode* node)
   {
     static bool cubemapDeprecationWarning = false;
@@ -736,15 +757,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if (tex)
     {
       tex->QueryObject ()->SetName (txtname);
-      AddToCollection (ldr_context, tex->QueryObject ());
-      iTextureManager* tm = G3D ? G3D->GetTextureManager() : 0;
+      ldr_context->AddToCollection(tex->QueryObject ());
+      iTextureManager* tm = g3d ? g3d->GetTextureManager() : 0;
       if (tm) tex->Register (tm);
     }
 
     return tex;
   }
 
-  iTextureWrapper* csLoader::ParseTexture3D (iLoaderContext* ldr_context,
+  iTextureWrapper* csThreadedLoader::ParseTexture3D (iLoaderContext* ldr_context,
     iDocumentNode* node)
   {
     static bool volmapDeprecationWarning = false;
@@ -772,8 +793,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if (tex)
     {
       tex->QueryObject ()->SetName (txtname);
-      AddToCollection (ldr_context, tex->QueryObject ());
-      iTextureManager* tm = G3D ? G3D->GetTextureManager() : 0;
+      ldr_context->AddToCollection(tex->QueryObject ());
+      iTextureManager* tm = g3d ? g3d->GetTextureManager() : 0;
       if (tm) tex->Register (tm);
     }
 

@@ -777,7 +777,9 @@ struct iThreadedLoader : public virtual iBase
 /**
 * This interface represents the map loader.
 */
-struct iLoader : public virtual iBase
+struct
+  CS_DEPRECATED_TYPE_MSG ("iLoader is deprecated. Use iThreadedLoader instead.")
+  iLoader : public virtual iBase
 {
   SCF_INTERFACE (iLoader, 5, 0, 0);
 
