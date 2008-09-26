@@ -972,8 +972,12 @@ Mike added fullscreen support to the X11 canvas.
 @item
 Mike Gist (@email{xordan@@gmail.com})
 
-Mike Gist submitted various fixes to Crystal Space. Most of them related
-to 64-bit code.
+Mike wrote a thread manager system which provides the ability to easily
+execute any function in another (main or non-main) thread. Using this system,
+he modified the level loader (and related plugins) to be multi-threaded (scaling
+to any number of threads). Other work done by him includes a SIMD framework - to
+detect cpu support for such instructions at runtime, and fixes to many areas of
+Crystal Space.
 
 @item
 Mike Handverger

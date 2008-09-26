@@ -61,16 +61,22 @@ alphabetically by surname.
 
 @itemize @bullet
 @item
-M@aa{}rten Svanfeldt (@email{developer@@svanfeldt.com})
+David Asbell (@email{dasbell@@yahoo.com})
 
-M@aa{}rten contributed material describing the rendering mechanism, the
-revised @sc{scf} implementation, and initiated the @sc{csep} initiative.
+David contributed the binary sprite loader and saver to @sc{cs}.
 
 @item
 Robert Bate (@email{rbate@@mac.com})
 
 Robert wrote the documentation detailing the pre-Carbon Macintosh port of
 Crystal Space which he also maintains.
+
+@item
+Andreas Busch (@email{nobita@@t-online.de})
+
+Andreas wrote documentation explaining how to build Crystal Space with
+KDevelop.  He also made a very thorough proof-reading pass through the entire
+user manual and spotted and corrected a large number of typographical problems.
 
 @item
 Brandon Ehle (@email{azverkan@@yahoo.com})
@@ -114,6 +120,12 @@ converted many of the Crystal Space plain text and LaTeX documents to Texinfo
 format.
 
 @item
+Mike Gist (@email{xordan@@gmail.com})
+
+Mike updated the threading section of the manual with information on the
+thread manager and usage of the related macros.
+
+@item
 Gary Haussmann (@email{g.haussmann@@worldnet.att.net})
 
 Gary wrote documentation explaining how to import foreign model formats into
@@ -125,11 +137,6 @@ Thomas Hieber (@email{thieber@@gmx.net})
 Thomas wrote thorough documentation for the very useful @file{map2cs}
 conversion tool which he authored.  For a while, he also maintained the
 documentation which details the Windows port of Crystal Space.
-
-@item
-David Asbell (@email{dasbell@@yahoo.com})
-
-David contributed the binary sprite loader and saver to @sc{cs}.
 
 @item
 David Huen (@email{smh1008@@cus.cam.ac.uk})
@@ -146,6 +153,12 @@ Michael wrote detailed documentation about the Crystal Clear project, of which
 he is the principal developer, and which is layered atop Crystal Space.
 Crystal Clear has now been removed from the Crystal Space project however
 due to lack of maintenance and interest.
+
+@item
+Nathaniel Saint Martin (@email{noote@@bigfoot.com})
+
+Nathaniel wrote documentation for Crystal Space's sound system, of which he
+is also the author.
 
 @item
 Wyatt Miler (@email{wmiler@@nyx.net})
@@ -179,10 +192,16 @@ Alex has written documentation pertaining to Crystal Space's collision
 detection and terrain libraries, both of which he authored.
 
 @item
-Nathaniel Saint Martin (@email{noote@@bigfoot.com})
+Manjunath Sripadarao (@email{msripada@@evl.uic.edu})
 
-Nathaniel wrote documentation for Crystal Space's sound system, of which he
-is also the author.
+Manjunath wrote a tutorial for the @file{md32spr} conversion program,
+wrote for @file{md2spr} and contributed to @file{map2cs}.
+
+@item
+M@aa{}rten Svanfeldt (@email{developer@@svanfeldt.com})
+
+M@aa{}rten contributed material describing the rendering mechanism, the
+revised @sc{scf} implementation, and initiated the @sc{csep} initiative.
 
 @item
 Siu-Hang (@email{shor@@cse.cuhk.edu.hk})
@@ -197,19 +216,6 @@ Philip took over from Frank O'Connor as the Windows port maintainer.
 He also wrote and maintained the instructions for building Crystal
 Space on Windows. Philip is after a while of inactivity is now back working
 on Crystal Space, but with concentration on the @sc{gnu} Linux port.
-
-@item
-Andreas Busch (@email{nobita@@t-online.de})
-
-Andreas wrote documentation explaining how to build Crystal Space with
-KDevelop.  He also made a very thorough proof-reading pass through the entire
-user manual and spotted and corrected a large number of typographical problems.
-
-@item
-Manjunath Sripadarao (@email{msripada@@evl.uic.edu})
-
-Manjunath wrote a tutorial for the @file{md32spr} conversion program,
-wrote for @file{md2spr} and contributed to @file{map2cs}.
 
 @item 
 Martin (@email{martin@@cyber-dog.freeserve.co.uk})
