@@ -51,18 +51,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   csPtr<iImage> csLoader::LoadImage (iDataBuffer* buf, int Format)
   {
-    threadman->SetAlwaysRunNow(true);
+    bool arn = threadman->GetAlwaysRunNow();
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(true);
+    }
     csRef<iThreadReturn> itr = loader->LoadImage(buf, Format);
-    threadman->SetAlwaysRunNow(false);
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(false);
+    }
     engine->SyncEngineListsNow(loader);
     return scfQueryInterface<iImage>(itr->GetResultRefPtr());
   }
 
   csPtr<iImage> csLoader::LoadImage (const char *fname, int Format)
   {
-    threadman->SetAlwaysRunNow(true);
+    bool arn = threadman->GetAlwaysRunNow();
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(true);
+    }
     csRef<iThreadReturn> itr = loader->LoadImage(fname, Format);
-    threadman->SetAlwaysRunNow(false);
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(false);
+    }
     engine->SyncEngineListsNow(loader);
     return scfQueryInterface<iImage>(itr->GetResultRefPtr());
   }
@@ -70,9 +84,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   csPtr<iTextureHandle> csLoader::LoadTexture (iDataBuffer* buf,
     int Flags, iTextureManager *tm , csRef<iImage>* img)
   {
-    threadman->SetAlwaysRunNow(true);
+    bool arn = threadman->GetAlwaysRunNow();
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(true);
+    }
     csRef<iThreadReturn> itr = loader->LoadTexture(buf, Flags, tm, img);
-    threadman->SetAlwaysRunNow(false);
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(false);
+    }
     engine->SyncEngineListsNow(loader);
     return scfQueryInterface<iTextureHandle>(itr->GetResultRefPtr());
   }
@@ -80,9 +101,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   iTextureWrapper* csLoader::LoadTexture (const char *name, iDataBuffer* buf,
     int Flags, iTextureManager *tm, bool reg, bool create_material, bool free_image)
   {
-    threadman->SetAlwaysRunNow(true);
+    bool arn = threadman->GetAlwaysRunNow();
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(true);
+    }
     csRef<iThreadReturn> itr = loader->LoadTexture(name, buf, Flags, tm, reg, create_material, free_image);
-    threadman->SetAlwaysRunNow(false);
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(false);
+    }
     engine->SyncEngineListsNow(loader);
     csRef<iTextureWrapper> ret = scfQueryInterface<iTextureWrapper>(itr->GetResultRefPtr());
     return ret;
@@ -91,36 +119,64 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   csPtr<iTextureHandle> csLoader::LoadTexture (const char* fname,
     int Flags, iTextureManager *tm, csRef<iImage>* img)
   {
-    threadman->SetAlwaysRunNow(true);
+    bool arn = threadman->GetAlwaysRunNow();
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(true);
+    }
     csRef<iThreadReturn> itr = loader->LoadTexture(fname, Flags, tm, img);
-    threadman->SetAlwaysRunNow(false);
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(false);
+    }
     engine->SyncEngineListsNow(loader);
     return scfQueryInterface<iTextureHandle>(itr->GetResultRefPtr());
   }
 
   csPtr<iSndSysData> csLoader::LoadSoundSysData (const char *fname)
   {
-    threadman->SetAlwaysRunNow(true);
+    bool arn = threadman->GetAlwaysRunNow();
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(true);
+    }
     csRef<iThreadReturn> itr = loader->LoadSoundSysData(fname);
-    threadman->SetAlwaysRunNow(false);
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(false);
+    }
     engine->SyncEngineListsNow(loader);
     return scfQueryInterface<iSndSysData>(itr->GetResultRefPtr());
   }
 
   csPtr<iSndSysStream> csLoader::LoadSoundStream (const char *fname, int mode3d)
   {
-    threadman->SetAlwaysRunNow(true);
+    bool arn = threadman->GetAlwaysRunNow();
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(true);
+    }
     csRef<iThreadReturn> itr = loader->LoadSoundStream(fname, mode3d);
-    threadman->SetAlwaysRunNow(false);
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(false);
+    }
     engine->SyncEngineListsNow(loader);
     return scfQueryInterface<iSndSysStream>(itr->GetResultRefPtr());
   }
 
   iSndSysWrapper* csLoader::LoadSoundWrapper (const char *name, const char *fname)
   {
-    threadman->SetAlwaysRunNow(true);
+    bool arn = threadman->GetAlwaysRunNow();
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(true);
+    }
     csRef<iThreadReturn> itr = loader->LoadSoundWrapper(name, fname);
-    threadman->SetAlwaysRunNow(false);
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(false);
+    }
     engine->SyncEngineListsNow(loader);
     csRef<iSndSysWrapper> ret = scfQueryInterface<iSndSysWrapper>(itr->GetResultRefPtr());
     return ret;
@@ -128,27 +184,48 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname, iStreamSource* ssource)
   {
-    threadman->SetAlwaysRunNow(true);
+    bool arn = threadman->GetAlwaysRunNow();
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(true);
+    }
     csRef<iThreadReturn> itr = loader->LoadMeshObjectFactory(fname, ssource);
-    threadman->SetAlwaysRunNow(false);
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(false);
+    }
     engine->SyncEngineListsNow(loader);
     return scfQueryInterface<iMeshFactoryWrapper>(itr->GetResultRefPtr());
   }
 
   csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname, iStreamSource* ssource)
   {
-    threadman->SetAlwaysRunNow(true);
+    bool arn = threadman->GetAlwaysRunNow();
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(true);
+    }
     csRef<iThreadReturn> itr = loader->LoadMeshObject(fname, ssource);
-    threadman->SetAlwaysRunNow(false);
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(false);
+    }
     engine->SyncEngineListsNow(loader);
     return scfQueryInterface<iMeshWrapper>(itr->GetResultRefPtr());
   }
 
   csRef<iShader> csLoader::LoadShader (const char* filename, bool registerShader)
   {
-    threadman->SetAlwaysRunNow(true);
+    bool arn = threadman->GetAlwaysRunNow();
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(true);
+    }
     csRef<iThreadReturn> itr = loader->LoadShader(filename, registerShader);
-    threadman->SetAlwaysRunNow(false);
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(false);
+    }
     engine->SyncEngineListsNow(loader);
     return scfQueryInterface<iShader>(itr->GetResultRefPtr());
   }
@@ -157,10 +234,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     iTextureManager *tm, bool reg, bool create_material, bool free_image,
     iCollection* collection, uint keepFlags)
   {
-    threadman->SetAlwaysRunNow(true);
+    bool arn = threadman->GetAlwaysRunNow();
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(true);
+    }
     csRef<iThreadReturn> itr = loader->LoadTexture(Name, FileName, Flags, tm, reg,
       create_material, free_image, collection, keepFlags);
-    threadman->SetAlwaysRunNow(false);
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(false);
+    }
     engine->SyncEngineListsNow(loader);
     csRef<iTextureWrapper> ret = scfQueryInterface<iTextureWrapper>(itr->GetResultRefPtr());
     return ret;
@@ -170,10 +254,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource, iMissingLoaderData* missingdata,
     uint keepFlags)
   {
-    threadman->SetAlwaysRunNow(true);
+    bool arn = threadman->GetAlwaysRunNow();
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(true);
+    }
     csRef<iThreadReturn> itr = loader->LoadMapFile(filename, clearEngine, collection,
       ssource, missingdata, keepFlags);
-    threadman->SetAlwaysRunNow(false);
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(false);
+    }
     engine->SyncEngineListsNow(loader);
     return itr->WasSuccessful();
   }
@@ -182,10 +273,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource, iMissingLoaderData* missingdata,
     uint keepFlags)
   {
-    threadman->SetAlwaysRunNow(true);
+    bool arn = threadman->GetAlwaysRunNow();
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(true);
+    }
     csRef<iThreadReturn> itr = loader->LoadMap(world_node, clearEngine, collection,
       ssource, missingdata, keepFlags);
-    threadman->SetAlwaysRunNow(false);
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(false);
+    }
     engine->SyncEngineListsNow(loader);
     return itr->WasSuccessful();
   }
@@ -193,9 +291,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   bool csLoader::LoadLibraryFile (const char* filename, iCollection* collection, bool searchCollectionOnly,
     bool checkDupes, iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags)
   {
-    threadman->SetAlwaysRunNow(true);
+    bool arn = threadman->GetAlwaysRunNow();
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(true);
+    }
     csRef<iThreadReturn> itr = loader->LoadLibraryFile(filename, collection, ssource, missingdata, keepFlags);
-    threadman->SetAlwaysRunNow(false);
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(false);
+    }
     engine->SyncEngineListsNow(loader);
     return itr->WasSuccessful();
   }
@@ -203,9 +308,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   bool csLoader::LoadLibrary (iDocumentNode* lib_node, iCollection* collection, bool searchCollectionOnly,
     bool checkDupes, iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags)
   {
-    threadman->SetAlwaysRunNow(true);
+    bool arn = threadman->GetAlwaysRunNow();
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(true);
+    }
     csRef<iThreadReturn> itr = loader->LoadLibrary(lib_node, collection, ssource, missingdata, keepFlags);
-    threadman->SetAlwaysRunNow(false);
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(false);
+    }
     engine->SyncEngineListsNow(loader);
     return itr->WasSuccessful();
   }
@@ -214,9 +326,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool checkDupes, iStreamSource* ssource, const char* override_name, iMissingLoaderData* missingdata,
     uint keepFlags)
   {
-    threadman->SetAlwaysRunNow(true);
+    bool arn = threadman->GetAlwaysRunNow();
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(true);
+    }
     csRef<iThreadReturn> itr = loader->LoadFile(fname, collection, ssource, missingdata, keepFlags);
-    threadman->SetAlwaysRunNow(false);
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(false);
+    }
     engine->SyncEngineListsNow(loader);
     csLoadResult ret;
     ret.success = itr->WasSuccessful();
@@ -228,9 +347,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool checkDupes, iStreamSource* ssource, const char* override_name, iMissingLoaderData* missingdata,
     uint keepFlags)
   {
-    threadman->SetAlwaysRunNow(true);
+    bool arn = threadman->GetAlwaysRunNow();
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(true);
+    }
     csRef<iThreadReturn> itr = loader->LoadBuffer(buffer, collection, ssource, missingdata, keepFlags);
-    threadman->SetAlwaysRunNow(false);
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(false);
+    }
     engine->SyncEngineListsNow(loader);
     csLoadResult ret;
     ret.success = itr->WasSuccessful();
@@ -242,9 +368,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool checkDupes, iStreamSource* ssource, const char* override_name, iMissingLoaderData* missingdata,
     uint keepFlags)
   {
-    threadman->SetAlwaysRunNow(true);
+    bool arn = threadman->GetAlwaysRunNow();
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(true);
+    }
     csRef<iThreadReturn> itr = loader->LoadNode(node, collection, ssource, missingdata, keepFlags);
-    threadman->SetAlwaysRunNow(false);
+    if(!arn)
+    {
+      threadman->SetAlwaysRunNow(false);
+    }
     engine->SyncEngineListsNow(loader);
     csLoadResult ret;
     ret.success = itr->WasSuccessful();
