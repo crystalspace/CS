@@ -432,10 +432,7 @@ specify. Here is a complete settings example:
 <settings>
   <clearzbuf />
   <clearscreen />
-  <lightmapcellsize>16</lightmapcellsize>
-  <maxlightmapsize horizontal="256" vertical="256" />
   <ambient red=".1" green=".1" blue=".1" />
-  <fastmesh>300</fastmesh>
 </settings>
 @end example
 
@@ -447,13 +444,6 @@ so that the z-buffer is updated but not read. Objects in the room can then
 use @samp{zuse}. If you don't want this (i.e. you want to use @samp{zuse}
 for all objects) then you can use @samp{clearzbuf}. Similar for
 @samp{clearscreen}.
-
-The lightmap cellsize defines how many texels (pixels on a texture) there
-are in every lumel (lightmap value). For example, if the lightmap cellsize
-is 16 (default) then for every 16x16 texels there will be one lumel.
-
-The maximum lightmap size is usually 256x256. You can change this value
-here but this usually doesn't make much sense.
 
 In addition to the lighting information given by all lights in the system,
 every object will also get ambient lighting. Ambient lighting is global to

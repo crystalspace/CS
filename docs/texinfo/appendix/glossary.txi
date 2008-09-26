@@ -59,7 +59,7 @@ light-map.  Light-map space is closely related to texture space.
 @item Lumel
 A lumel is a pixel on a lightmap.  A lumel corresponds with one light
 value (red, green, blue) and represents the lighting values of a block of
-texels on the original texture.  Usually this block is 16x16 big.
+texels on the original texture.
 
 @item Material
 A material represents how some object or polygon looks.  In the most common
