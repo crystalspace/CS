@@ -319,7 +319,6 @@
     <library>factories/factory_win1_walls.meshfact</library>
     <library>factories/factory_street1_walls_transp.meshfact</library>
     <library>factories/factory_street1_walls.meshfact</library>
-    <library>factories/donut.meshfact</library>
     <library>factories/factory_street1_car.meshfact</library>
     <library>factories/factory_street1_carRoof.meshfact</library>
     <library>factories/factory_street1_tire1.meshfact</library>
