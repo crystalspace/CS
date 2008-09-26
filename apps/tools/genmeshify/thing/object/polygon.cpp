@@ -31,7 +31,6 @@
 #include "iengine/light.h"
 #include "iengine/material.h"
 #include "iengine/movable.h"
-#include "iengine/shadows.h"
 #include "iengine/texture.h"
 #include "iutil/cache.h"
 #include "iutil/vfs.h"

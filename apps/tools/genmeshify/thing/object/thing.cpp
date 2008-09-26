@@ -47,7 +47,6 @@
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "iengine/sector.h"
-#include "iengine/shadows.h"
 #include "iengine/texture.h"
 #include "igraphic/imageio.h"
 #include "iutil/cache.h"
@@ -1905,22 +1904,6 @@ void csThing::DrawPolygonArrayDPM (
 void csThing::InvalidateMaterialHandles ()
 {
 
-}
-
-// @@@ We need a better algorithm here. We should try
-// to recognize convex sub-parts of a polygonset and return
-// convex shadow frustums for those. This will significantly
-// reduce the number of shadow frustums. There are basically
-// two ways to do this:
-//      - Split object into convex sub-parts in 3D.
-//      - Split object into convex sub-parts in 2D.
-// The first way is probably best because it is more efficient
-// at runtime (important if we plan to use dynamic shadows for things)
-// and also more correct in that a convex 3D object has no internal
-// shadowing while a convex outline may have no correspondance to internal
-// shadows.
-void csThing::AppendShadows (iMovable*, iShadowBlockList*, const csVector3&)
-{
 }
 
 void csThing::GetBoundingBox (iMovable *movable, csBox3 &box)

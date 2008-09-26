@@ -60,7 +60,6 @@ struct iEngine;
 struct iMaterialWrapper;
 struct iMovable;
 struct iObjectRegistry;
-struct iShadowBlockList;
 
 CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 {

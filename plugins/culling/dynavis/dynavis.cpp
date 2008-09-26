@@ -53,7 +53,6 @@
 #include "iengine/rview.h"
 #include "iengine/camera.h"
 #include "iengine/mesh.h"
-#include "iengine/shadows.h"
 #include "imesh/object.h"
 #include "iutil/object.h"
 #include "ivaria/reporter.h"

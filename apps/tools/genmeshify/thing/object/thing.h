@@ -56,7 +56,6 @@
 #include "polygon.h"
 #include "polyrender.h"
 
-struct iShadowBlockList;
 struct csVisObjInfo;
 struct iGraphics3D;
 struct iRenderView;
@@ -878,13 +877,6 @@ public:
   //----------------------------------------------------------------------
   // Utility functions
   //----------------------------------------------------------------------
-
-  /**
-   * Append a list of shadow frustums which extend from
-   * this thing. The origin is the position of the light.
-   */
-  virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
-  	const csVector3& origin);
 
   /**
    * Test a beam with this thing.

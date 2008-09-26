@@ -26,7 +26,6 @@
 #include "iengine/light.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
-#include "iengine/shadows.h"
 #include "iengine/texture.h"
 #include "ivideo/texture.h"
 #include "plugins/engine/3d/portal.h"
