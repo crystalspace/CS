@@ -78,8 +78,8 @@ Full screen effects (fading, whiteout, etc).
 Level of Detail @sc{lod}. @xref{Level of Detail}.
 
 @item
-Various types of mesh objects: bezier curves, polygonal lightmapped
-objects, triangle meshes, haze mesh (bit like volumetric light),
+Various types of mesh objects: particle meshes, terrain mesh, triangle meshes,
+haze mesh (bit like volumetric light), @dots{}.
 @dots{}.
 @xref{MeshObject}.  @xref{MeshObject Genmesh}.
 @xref{HOWTO Create Genmesh}.

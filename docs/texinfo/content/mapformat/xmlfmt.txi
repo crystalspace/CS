@@ -563,37 +563,6 @@ information that you can attach to that context (if it is a mesh object
 for example). The addon plugin will also get an @sc{xml} node that it
 can parse for additional parameters.
 
-Crystal Space itself currently defines two addon loaders itself. The
-first one is useful for defining bezier templates that you can later use
-in a bezier curve. The second one is useful for creating named texture
-planes that can be used to define texture mapping for a number of polygons
-that are all on the same plane. Here is an example of both:
-
-@example
-<addon>
-    <plugin>crystalspace.mesh.loader.thing.bezier</plugin>
-    <params>
-        <name>b1</name>
-        <material>mosaic</material>
-        <v>0</v>
-        <v>1</v>
-        <v>2</v>
-        <v>8</v>
-        <v>9</v>
-        <v>10</v>
-        <v>16</v>
-        <v>17</v>
-        <v>18</v>
-    </params>
-</addon>
-@end example
-
-I will only explain the second example here as bezier curves are likely
-to change in the not-too-distant future. Important in both examples is
-that the part inside the @samp{params} block is parsed by the addon itself.
-It is also possible to specify the parameters of a plugin in another
-@sc{xml} file in which case you can use @samp{paramsfile}.
-
 @subsubheading Mesh Factory Section
 @cindex mesh factories (Map File)
 
