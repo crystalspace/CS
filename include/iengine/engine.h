@@ -47,7 +47,6 @@ struct iCameraPositionList;
 struct iClipper2D;
 struct iCustomMatrixCamera;
 struct iDataBuffer;
-struct iFrustumView;
 struct iLight;
 struct iLightIterator;
 struct iLoaderContext;
@@ -1148,14 +1147,6 @@ struct iEngine : public virtual iBase
    */
   virtual csPtr<iMeshWrapperIterator> GetVisibleMeshes (iSector* sector,
     const csFrustum& frustum) = 0;
-
-  /**
-   * Create a iFrustumView instance that you can give to
-   * iVisibilityCuller->CastShadows(). You can initialize that
-   * instance so that your own function is called for every object
-   * that is being visited.
-   */
-  virtual csPtr<iFrustumView> CreateFrustumView () = 0;
 
   /**
    * Create an object watcher instance that you can use to watch

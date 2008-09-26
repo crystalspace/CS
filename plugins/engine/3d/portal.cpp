@@ -23,7 +23,6 @@
 #include "csgeom/polyclip.h"
 #include "csplugincommon/rendermanager/renderview.h"
 #include "iengine/camera.h"
-#include "iengine/fview.h"
 #include "iengine/light.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"

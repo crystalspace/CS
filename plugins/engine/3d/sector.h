@@ -54,7 +54,6 @@ class csMeshGenerator;
 struct iVisibilityCuller;
 struct iRenderView;
 struct iMeshWrapper;
-struct iFrustumView;
 
 /// A list of meshes for a sector.
 class csSectorMeshList : public csMeshList

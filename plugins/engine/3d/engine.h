@@ -543,8 +543,6 @@ public:
   virtual csPtr<iMeshWrapperIterator> GetVisibleMeshes (iSector* sector,
     const csFrustum& frustum);
 
-  virtual csPtr<iFrustumView> CreateFrustumView ();
-
   virtual csPtr<iObjectWatcher> CreateObjectWatcher ();
 
   virtual iSharedVariableList* GetVariableList () const;

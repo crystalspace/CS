@@ -567,48 +567,6 @@ iLight *csLightList::FindByName (const char *Name) const
   return lights_hash.Get (Name, 0);
 }
 
-// --- csLightingProcessInfo --------------------------------------------------
-
-csLightingProcessInfo::csLightingProcessInfo (csLight* light, bool dynamic)
-  : scfImplementationType (this),
-  light (light), dynamic (dynamic), color (light->GetColor ())
-{
-}
-
-csLightingProcessInfo::~csLightingProcessInfo()
-{
-}
-
-void csLightingProcessInfo::AttachUserdata (iLightingProcessData* userdata)
-{
-  userdatas.Push (userdata);
-}
-
-csPtr<iLightingProcessData> csLightingProcessInfo::QueryUserdata (
-  scfInterfaceID id, int version)
-{
-  size_t i;
-  for (i = 0 ; i < userdatas.GetSize () ; i++)
-  {
-    iLightingProcessData* ptr = (iLightingProcessData*)(
-      userdatas[i]->QueryInterface (id, version));
-    if (ptr)
-    {
-      return csPtr<iLightingProcessData> (ptr);
-    }
-  }
-  return 0;
-}
-
-void csLightingProcessInfo::FinalizeLighting ()
-{
-  size_t i;
-  for (i = 0 ; i < userdatas.GetSize () ; i++)
-  {
-    userdatas[i]->FinalizeLighting ();
-  }
-}
-
 // ---------------------------------------------------------------------------
   
 void LightAttenuationTextureAccessor::CreateAttenuationTexture ()

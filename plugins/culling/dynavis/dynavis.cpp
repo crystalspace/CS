@@ -54,7 +54,6 @@
 #include "iengine/camera.h"
 #include "iengine/mesh.h"
 #include "iengine/shadows.h"
-#include "iengine/fview.h"
 #include "imesh/object.h"
 #include "iutil/object.h"
 #include "ivaria/reporter.h"

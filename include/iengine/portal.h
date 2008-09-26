@@ -37,7 +37,6 @@ class csTransform;
 class csVector3;
 class csSphere;
 
-struct iFrustumView;
 struct iMaterialWrapper;
 struct iMeshWrapper;
 struct iMovable;
@@ -123,7 +122,7 @@ struct iTextureHandle;
  * When a sector is missing this callback will be called. If this callback
  * returns false then this portal will not be traversed. Otherwise this
  * callback has to set up the destination sector and return true.
- * The given context will be either an instance of iRenderView, iFrustumView,
+ * The given context will be either an instance of iRenderView
  * or else 0.
  *
  * This callback is used by:

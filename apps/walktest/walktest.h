@@ -29,7 +29,6 @@
 #include "csutil/weakref.h"
 #include "wentity.h"
 #include "iengine/engine.h"
-#include "iengine/fview.h"
 #include "ivaria/conout.h"
 #include "ivaria/conin.h"
 #include "iutil/vfs.h"

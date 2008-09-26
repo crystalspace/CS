@@ -26,8 +26,6 @@
   INTERFACE_APPLY(iCollection)
   INTERFACE_APPLY(iCollectionArray)
   INTERFACE_APPLY(iEngine)
-  INTERFACE_APPLY(iFrustumView)
-  INTERFACE_APPLY(iFrustumViewUserdata)
   INTERFACE_APPLY(iLight)
   INTERFACE_APPLY(iLightIterator)
   INTERFACE_APPLY(iLightList)

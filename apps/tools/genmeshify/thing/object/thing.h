@@ -61,7 +61,6 @@ struct csVisObjInfo;
 struct iGraphics3D;
 struct iRenderView;
 struct iMovable;
-struct iFrustumView;
 struct iMaterialWrapper;
 struct iPolygonBuffer;
 
@@ -879,12 +878,6 @@ public:
   //----------------------------------------------------------------------
   // Utility functions
   //----------------------------------------------------------------------
-
-  /**
-   * Check frustum visibility on this thing.
-   * First initialize the 2D culler cube.
-   */
-  //virtual void CastShadows (iMovable* movable, iFrustumView* lview);
 
   /**
    * Append a list of shadow frustums which extend from

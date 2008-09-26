@@ -49,7 +49,6 @@ struct iObject;
 
 struct iRenderView;
 struct iRenderLoop;
-struct iFrustumView;
 struct iSector;
 struct iDocumentNode;
 
@@ -94,7 +93,7 @@ struct csFog
 
 /**
  * Set a callback which is called when this sector is traversed.
- * The given context will be either an instance of iRenderView, iFrustumView,
+ * The given context will be either an instance of iRenderView
  * or else 0.
  *
  * This callback is used by:

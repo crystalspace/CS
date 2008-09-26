@@ -34,7 +34,6 @@
 #include "csutil/scfarray.h"
 #include "csutil/weakref.h"
 #include "iutil/selfdestruct.h"
-#include "plugins/engine/3d/lview.h"
 #include "plugins/engine/3d/halo.h"
 #include "plugins/engine/3d/movable.h"
 #include "plugins/engine/3d/scenenode.h"
@@ -563,58 +562,6 @@ public:
   virtual int Find (iLight *obj) const;
   virtual iLight *FindByName (const char *Name) const;
   virtual iLight *FindByID (const char* id) const;
-};
-
-/**
- * This is user-data for iFrustumView for the lighting process.
- */
-struct csLightingProcessInfo : public scfImplementation1<csLightingProcessInfo,
-                                                         iLightingProcessInfo>
-{
-private:
-  // Light.
-  csLight* light;
-  // For dynamic lighting.
-  bool dynamic;
-  // Current lighting color.
-  csColor color;
-  // Array of user data.
-  csRefArray<iLightingProcessData> userdatas;
-
-public:
-  csLightingProcessInfo (csLight* light, bool dynamic);
-  virtual ~csLightingProcessInfo ();
-
-  /**
-   * Get the light.
-   */
-  csLight* GetCsLight () const { return light; }
-  virtual iLight* GetLight () const { return light; }
-
-  /**
-   * Return true if dynamic.
-   */
-  virtual bool IsDynamic () const { return dynamic; }
-
-  /**
-   * Set the current color.
-   */
-  virtual void SetColor (const csColor& col) { color = col; }
-
-  /**
-   * Get the current color.
-   */
-  virtual const csColor& GetColor () const { return color; }
-
-  /// Attach userdata.
-  virtual void AttachUserdata (iLightingProcessData* userdata);
-
-  /// Query for userdata based on SCF type.
-  virtual csPtr<iLightingProcessData> QueryUserdata (scfInterfaceID id,
-    int version);
-
-  /// Finalize lighting.
-  virtual void FinalizeLighting ();
 };
 
 class LightAttenuationTextureAccessor :
