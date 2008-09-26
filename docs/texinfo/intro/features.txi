@@ -89,7 +89,7 @@ Animated 3D models (3D sprites) using frame based animation. @xref{Animation}.
 @xref{MeshObject Spr3D}.
 
 @item
-Animated 3D models using a skeletal animation system with good support
+Animated 3D models (AniMesh) using a skeletal animation system with good support
 for hardware skinning.
 
 @item

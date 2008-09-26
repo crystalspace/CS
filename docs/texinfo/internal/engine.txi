@@ -13,10 +13,6 @@ how the Crystal Space engine works internally and for people who want
 to contribute to the engine proper. The sources for the 3D engine can be found
 in @file{CS/plugins/engine/3d}.
 
-Note: This discussion is specific to how the engine works in relation
-to the new renderer. The old renderer is still in Crystal Space at this moment
-but this discussion does not bear upon it.
-
 @subheading Engine Data Structures
 
 The following sections explain the various data structures that
