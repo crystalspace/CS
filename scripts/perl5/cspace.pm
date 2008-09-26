@@ -18961,9 +18961,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetLightCallbackCount = *cspacec::iLight_GetLightCallbackCount;
 *GetLightCallback = *cspacec::iLight_GetLightCallback;
 *GetLightNumber = *cspacec::iLight_GetLightNumber;
-*AddAffectedLightingInfo = *cspacec::iLight_AddAffectedLightingInfo;
-*RemoveAffectedLightingInfo = *cspacec::iLight_RemoveAffectedLightingInfo;
-*Setup = *cspacec::iLight_Setup;
 *GetSVContext = *cspacec::iLight_GetSVContext;
 *GetLocalBBox = *cspacec::iLight_GetLocalBBox;
 *GetWorldBBox = *cspacec::iLight_GetWorldBBox;
@@ -19403,14 +19400,12 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetFog = *cspacec::iSector_SetFog;
 *DisableFog = *cspacec::iSector_DisableFog;
 *GetLights = *cspacec::iSector_GetLights;
-*ShineLights = *cspacec::iSector_ShineLights;
 *SetDynamicAmbientLight = *cspacec::iSector_SetDynamicAmbientLight;
 *GetDynamicAmbientLight = *cspacec::iSector_GetDynamicAmbientLight;
 *GetDynamicAmbientVersion = *cspacec::iSector_GetDynamicAmbientVersion;
 *CalculateSectorBBox = *cspacec::iSector_CalculateSectorBBox;
 *SetVisibilityCullerPlugin = *cspacec::iSector_SetVisibilityCullerPlugin;
 *GetVisibilityCuller = *cspacec::iSector_GetVisibilityCuller;
-*CheckFrustum = *cspacec::iSector_CheckFrustum;
 *HitBeamPortals = *cspacec::iSector_HitBeamPortals;
 *HitBeam = *cspacec::iSector_HitBeam;
 *FollowSegment = *cspacec::iSector_FollowSegment;
@@ -19600,9 +19595,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *Prepare = *cspacec::iEngine_Prepare;
 *PrepareTextures = *cspacec::iEngine_PrepareTextures;
 *PrepareMeshes = *cspacec::iEngine_PrepareMeshes;
-*ShineLights = *cspacec::iEngine_ShineLights;
-*SetLightingCacheMode = *cspacec::iEngine_SetLightingCacheMode;
-*GetLightingCacheMode = *cspacec::iEngine_GetLightingCacheMode;
 *SetCacheManager = *cspacec::iEngine_SetCacheManager;
 *SetVFSCacheManager = *cspacec::iEngine_SetVFSCacheManager;
 *GetCacheManager = *cspacec::iEngine_GetCacheManager;
@@ -20503,9 +20495,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetMeshObject = *cspacec::iMeshWrapper_GetMeshObject;
 *SetMeshObject = *cspacec::iMeshWrapper_SetMeshObject;
 *GetPortalContainer = *cspacec::iMeshWrapper_GetPortalContainer;
-*GetLightingInfo = *cspacec::iMeshWrapper_GetLightingInfo;
-*GetShadowReceiver = *cspacec::iMeshWrapper_GetShadowReceiver;
-*GetShadowCaster = *cspacec::iMeshWrapper_GetShadowCaster;
 *GetFactory = *cspacec::iMeshWrapper_GetFactory;
 *SetFactory = *cspacec::iMeshWrapper_SetFactory;
 *SetLightingUpdate = *cspacec::iMeshWrapper_SetLightingUpdate;
@@ -20948,7 +20937,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *VisTest = *cspacec::iVisibilityCuller_VisTest;
 *IntersectSegmentSloppy = *cspacec::iVisibilityCuller_IntersectSegmentSloppy;
 *IntersectSegment = *cspacec::iVisibilityCuller_IntersectSegment;
-*CastShadows = *cspacec::iVisibilityCuller_CastShadows;
 *ParseCullerParameters = *cspacec::iVisibilityCuller_ParseCullerParameters;
 *scfGetVersion = *cspacec::iVisibilityCuller_scfGetVersion;
 sub DESTROY {
@@ -21085,7 +21073,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *Warp = *cspacec::iPortal_Warp;
 *WarpSpace = *cspacec::iPortal_WarpSpace;
 *CompleteSector = *cspacec::iPortal_CompleteSector;
-*CheckFrustum = *cspacec::iPortal_CheckFrustum;
 *HitBeamPortals = *cspacec::iPortal_HitBeamPortals;
 *GetVerticesCount = *cspacec::iPortal_GetVerticesCount;
 *GetMaterial = *cspacec::iPortal_GetMaterial;
@@ -23118,9 +23105,6 @@ sub CS_FOG_MODE_LINEAR () { $cspacec::CS_FOG_MODE_LINEAR }
 sub CS_FOG_MODE_CRYSTALSPACE () { $cspacec::CS_FOG_MODE_CRYSTALSPACE }
 sub CS_FOG_MODE_EXP () { $cspacec::CS_FOG_MODE_EXP }
 sub CS_FOG_MODE_EXP2 () { $cspacec::CS_FOG_MODE_EXP2 }
-sub CS_ENGINE_CACHE_READ () { $cspacec::CS_ENGINE_CACHE_READ }
-sub CS_ENGINE_CACHE_WRITE () { $cspacec::CS_ENGINE_CACHE_WRITE }
-sub CS_ENGINE_CACHE_NOUPDATE () { $cspacec::CS_ENGINE_CACHE_NOUPDATE }
 sub CS_RENDPRI_SORT_NONE () { $cspacec::CS_RENDPRI_SORT_NONE }
 sub CS_RENDPRI_SORT_BACK2FRONT () { $cspacec::CS_RENDPRI_SORT_BACK2FRONT }
 sub CS_RENDPRI_SORT_FRONT2BACK () { $cspacec::CS_RENDPRI_SORT_FRONT2BACK }

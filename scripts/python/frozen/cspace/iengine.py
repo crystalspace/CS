@@ -195,9 +195,6 @@ class iLight(core.iBase):
     def GetLightCallbackCount(*args): return _iengine.iLight_GetLightCallbackCount(*args)
     def GetLightCallback(*args): return _iengine.iLight_GetLightCallback(*args)
     def GetLightNumber(*args): return _iengine.iLight_GetLightNumber(*args)
-    def AddAffectedLightingInfo(*args): return _iengine.iLight_AddAffectedLightingInfo(*args)
-    def RemoveAffectedLightingInfo(*args): return _iengine.iLight_RemoveAffectedLightingInfo(*args)
-    def Setup(*args): return _iengine.iLight_Setup(*args)
     def GetSVContext(*args): return _iengine.iLight_GetSVContext(*args)
     def GetLocalBBox(*args): return _iengine.iLight_GetLocalBBox(*args)
     def GetWorldBBox(*args): return _iengine.iLight_GetWorldBBox(*args)
@@ -393,14 +390,12 @@ class iSector(core.iBase):
     def SetFog(*args): return _iengine.iSector_SetFog(*args)
     def DisableFog(*args): return _iengine.iSector_DisableFog(*args)
     def GetLights(*args): return _iengine.iSector_GetLights(*args)
-    def ShineLights(*args): return _iengine.iSector_ShineLights(*args)
     def SetDynamicAmbientLight(*args): return _iengine.iSector_SetDynamicAmbientLight(*args)
     def GetDynamicAmbientLight(*args): return _iengine.iSector_GetDynamicAmbientLight(*args)
     def GetDynamicAmbientVersion(*args): return _iengine.iSector_GetDynamicAmbientVersion(*args)
     def CalculateSectorBBox(*args): return _iengine.iSector_CalculateSectorBBox(*args)
     def SetVisibilityCullerPlugin(*args): return _iengine.iSector_SetVisibilityCullerPlugin(*args)
     def GetVisibilityCuller(*args): return _iengine.iSector_GetVisibilityCuller(*args)
-    def CheckFrustum(*args): return _iengine.iSector_CheckFrustum(*args)
     def HitBeamPortals(*args): return _iengine.iSector_HitBeamPortals(*args)
     def HitBeam(*args): return _iengine.iSector_HitBeam(*args)
     def FollowSegment(*args): return _iengine.iSector_FollowSegment(*args)
@@ -466,9 +461,6 @@ iSectorIterator_swigregister = _iengine.iSectorIterator_swigregister
 iSectorIterator_swigregister(iSectorIterator)
 iSectorIterator_scfGetVersion = _iengine.iSectorIterator_scfGetVersion
 
-CS_ENGINE_CACHE_READ = _iengine.CS_ENGINE_CACHE_READ
-CS_ENGINE_CACHE_WRITE = _iengine.CS_ENGINE_CACHE_WRITE
-CS_ENGINE_CACHE_NOUPDATE = _iengine.CS_ENGINE_CACHE_NOUPDATE
 CS_RENDPRI_SORT_NONE = _iengine.CS_RENDPRI_SORT_NONE
 CS_RENDPRI_SORT_BACK2FRONT = _iengine.CS_RENDPRI_SORT_BACK2FRONT
 CS_RENDPRI_SORT_FRONT2BACK = _iengine.CS_RENDPRI_SORT_FRONT2BACK
@@ -501,9 +493,6 @@ class iEngine(core.iBase):
     def Prepare(*args): return _iengine.iEngine_Prepare(*args)
     def PrepareTextures(*args): return _iengine.iEngine_PrepareTextures(*args)
     def PrepareMeshes(*args): return _iengine.iEngine_PrepareMeshes(*args)
-    def ShineLights(*args): return _iengine.iEngine_ShineLights(*args)
-    def SetLightingCacheMode(*args): return _iengine.iEngine_SetLightingCacheMode(*args)
-    def GetLightingCacheMode(*args): return _iengine.iEngine_GetLightingCacheMode(*args)
     def SetCacheManager(*args): return _iengine.iEngine_SetCacheManager(*args)
     def SetVFSCacheManager(*args): return _iengine.iEngine_SetVFSCacheManager(*args)
     def GetCacheManager(*args): return _iengine.iEngine_GetCacheManager(*args)
@@ -999,9 +988,6 @@ class iMeshWrapper(core.iBase):
     def GetMeshObject(*args): return _iengine.iMeshWrapper_GetMeshObject(*args)
     def SetMeshObject(*args): return _iengine.iMeshWrapper_SetMeshObject(*args)
     def GetPortalContainer(*args): return _iengine.iMeshWrapper_GetPortalContainer(*args)
-    def GetLightingInfo(*args): return _iengine.iMeshWrapper_GetLightingInfo(*args)
-    def GetShadowReceiver(*args): return _iengine.iMeshWrapper_GetShadowReceiver(*args)
-    def GetShadowCaster(*args): return _iengine.iMeshWrapper_GetShadowCaster(*args)
     def GetFactory(*args): return _iengine.iMeshWrapper_GetFactory(*args)
     def SetFactory(*args): return _iengine.iMeshWrapper_SetFactory(*args)
     def SetLightingUpdate(*args): return _iengine.iMeshWrapper_SetLightingUpdate(*args)
@@ -1253,7 +1239,6 @@ class iVisibilityCuller(core.iBase):
     def VisTest(*args): return _iengine.iVisibilityCuller_VisTest(*args)
     def IntersectSegmentSloppy(*args): return _iengine.iVisibilityCuller_IntersectSegmentSloppy(*args)
     def IntersectSegment(*args): return _iengine.iVisibilityCuller_IntersectSegment(*args)
-    def CastShadows(*args): return _iengine.iVisibilityCuller_CastShadows(*args)
     def ParseCullerParameters(*args): return _iengine.iVisibilityCuller_ParseCullerParameters(*args)
     scfGetVersion = staticmethod(_iengine.iVisibilityCuller_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iVisibilityCuller
@@ -1336,7 +1321,6 @@ class iPortal(core.iBase):
     def Warp(*args): return _iengine.iPortal_Warp(*args)
     def WarpSpace(*args): return _iengine.iPortal_WarpSpace(*args)
     def CompleteSector(*args): return _iengine.iPortal_CompleteSector(*args)
-    def CheckFrustum(*args): return _iengine.iPortal_CheckFrustum(*args)
     def HitBeamPortals(*args): return _iengine.iPortal_HitBeamPortals(*args)
     def GetVerticesCount(*args): return _iengine.iPortal_GetVerticesCount(*args)
     def GetMaterial(*args): return _iengine.iPortal_GetMaterial(*args)
