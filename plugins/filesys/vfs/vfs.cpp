@@ -551,7 +551,10 @@ void DiskFile::MakeDir (const char *PathBase, const char *PathSuffix)
     *cur = 0;
     if (debug)
       csPrintf ("VFS_DEBUG: Trying to create directory \"%s\"\n", path);
+    errno = 0;
     CS_MKDIR (path);
+    if (debug && errno != 0)
+      csPrintf ("VFS_DEBUG: Couldn't create directory \"%s\", errno=%d\n", path, errno);
     *cur = oldchar;
     if (*cur)
       cur++;
