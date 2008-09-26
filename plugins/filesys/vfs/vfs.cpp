@@ -530,18 +530,34 @@ void DiskFile::MakeDir (const char *PathBase, const char *PathSuffix)
 {
   bool const debug = IsVerbose(csVFS::VERBOSITY_DEBUG);
   size_t pbl = strlen (PathBase);
-  size_t pl = pbl + strlen (PathSuffix) + 1;
-  char *path = (char*)cs_malloc (pl);
-  char *cur = path + pbl;
+  size_t pl = pbl + strlen (PathSuffix);
+  char *path = (char*)cs_malloc (pl+1);
+  char *cur;
   char *prev = 0;
 
   strcpy (path, PathBase);
-  strcpy (cur, PathSuffix);
+  strcpy (path+pbl, PathSuffix);
 
   // Convert all VFS_PATH_SEPARATOR's in path into CS_PATH_SEPARATOR's
   for (size_t n = 0; n < pl; n++)
     if (path [n] == VFS_PATH_SEPARATOR)
       path [n] = CS_PATH_SEPARATOR;
+    
+  cur = strchr (path, CS_PATH_SEPARATOR);
+  if (cur == 0)
+  {
+    cur = path + pl;
+  }
+  else if ((cur == path)
+#ifdef CS_PLATFORM_WIN32
+    // Skip drive root dir
+    || (*(cur-1) == ':')
+#endif
+    )
+  {
+    cur = strchr (cur+1, CS_PATH_SEPARATOR);
+    if (cur == 0) cur = path + pl;
+  }
 
   while (cur != prev)
   {
