@@ -50,7 +50,7 @@ public:
       TEventMemPool* mempool = (TEventMemPool*)args[0];
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2>
@@ -68,7 +68,7 @@ public:
       a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3>
@@ -88,7 +88,7 @@ public:
       a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4>
@@ -110,7 +110,7 @@ public:
       a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5>
@@ -134,7 +134,7 @@ public:
       a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
@@ -160,7 +160,7 @@ public:
       a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7>
@@ -188,7 +188,7 @@ public:
       a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8>
@@ -218,7 +218,7 @@ public:
       a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9>
@@ -250,7 +250,7 @@ public:
       a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10>
@@ -284,7 +284,7 @@ public:
       a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11>
@@ -320,7 +320,7 @@ public:
       a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12>
@@ -358,7 +358,7 @@ public:
       a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12, typename A13>
@@ -398,7 +398,7 @@ public:
       a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12, typename A13, typename A14>
@@ -440,7 +440,7 @@ public:
       a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12, typename A13, typename A14, typename A15>
@@ -484,7 +484,7 @@ public:
       a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 };
 
