@@ -28,7 +28,7 @@ using namespace CS::Threading;
 ThreadID csThreadManager::tid = Thread::GetThreadID();
 
 csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationType(this), 
-  objectReg(objReg), waiting(0), alwaysRunNow(false), exiting(false)
+  waiting(0), alwaysRunNow(false), objectReg(objReg), exiting(false)
 {
   threadCount = CS::Platform::GetProcessorCount();
 
