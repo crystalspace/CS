@@ -33,7 +33,28 @@ csThreadTest::csThreadTest(iObjectRegistry* objReg) : scfImplementationType(this
 
 THREADED_CALLABLE_IMPL(csThreadTest, Test1)
 {
+  csRefArray<iThreadReturn> threadReturns;
+  threadReturns.Push(Test1Data());
+  csRef<iThreadManager> tm = csQueryRegistry<iThreadManager> (objReg);
+  tm->Wait(threadReturns);
   printf("Test 1 passed!\n");
+  return true;
+}
+
+THREADED_CALLABLE_IMPL(csThreadTest, Test1Data)
+{
+  csRef<iThreadReturn> itr = Test1Data2(Test1Data2(csRef<iThreadReturn>()));
+  while(!itr->IsFinished());
+  return true;
+}
+
+
+THREADED_CALLABLE_IMPL1(csThreadTest, Test1Data2, csRef<iThreadReturn> itr)
+{
+  if(itr.IsValid())
+  {
+    while(!itr->IsFinished());
+  }
   return true;
 }
 
@@ -182,7 +203,8 @@ int main(int argc, char* argv[])
   csRef<iThreadTest> threadTest;
   threadTest.AttachNew(new csThreadTest(objReg));
 
-  threadTest->Test1();
+  csRef<iThreadReturn> itr = threadTest->Test1();
+  while(!itr->IsFinished());
   threadTest->Test2(false);
   threadTest->Test3(3, 0.1415f);
   csWeakRef<iThreadTest> test4 = threadTest;
@@ -214,6 +236,7 @@ int main(int argc, char* argv[])
   while(!threadTest->Test7Passed());
   printf("Test 7 passed!\n");
 
+  printf("\nPress any key to exit.\n");
   getchar();
 
   objReg->Clear();

@@ -43,12 +43,12 @@ public:
 
   void Process(uint num = 1);
   void Wait(csRef<iThreadReturn> ret);
+  bool Wait(csRefArray<iThreadReturn>& threadReturns);
 
   inline void PushToQueue(QueueType queueType, iJob* job)
   {
     if(queueType == THREADED)
     {
-      CS::Threading::MutexScopedLock lock(queuePushLock);
       threadQueue->Enqueue(job);
     }
     else
@@ -100,8 +100,6 @@ private:
   int32 waiting;
   int32 threadCount;
   bool alwaysRunNow;
-
-  CS::Threading::Mutex queuePushLock;
 
   iObjectRegistry* objectReg;
   csRef<CS::Threading::ThreadedJobQueue> threadQueue;

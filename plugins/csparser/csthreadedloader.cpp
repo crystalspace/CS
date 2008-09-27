@@ -483,12 +483,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool success = LoadLibrary (ldr_context, lib_node, ssource, missingdata, threadReturns);
 
     // Wait for all jobs to finish.
-    for(size_t i=0; i<threadReturns.GetSize(); i++)
-    {
-      while(!threadReturns[i]->IsFinished());
-      success &= threadReturns[i]->WasSuccessful();
-    }
-    return success;
+    return threadman->Wait(threadReturns);
   }
 
   THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadFile, const char* fname,
@@ -885,14 +880,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     // Wait for all jobs to finish.
-    bool result = true;
-    for(size_t i=0; i<threadReturns.GetSize(); i++)
-    {
-      while(!threadReturns[i]->IsFinished());
-      result &= threadReturns[i]->WasSuccessful();
-    }
-
-    return result;
+    return threadman->Wait(threadReturns);
   }
 
   THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadLibraryFromNode,
@@ -969,13 +957,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
 
       // Wait for all jobs to finish.
-      for(size_t i=0; i<threadReturns.GetSize(); i++)
-      {
-        while(!threadReturns[i]->IsFinished());
-        result &= threadReturns[i]->WasSuccessful();
-      }
-
-      return result;
+      return threadman->Wait(threadReturns);
     }
   }
 

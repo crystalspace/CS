@@ -20,6 +20,7 @@
 #define __CS_IUTIL_THREADMANAGER_H__
 
 #include "csutil/refcount.h"
+#include "csutil/refarr.h"
 
 struct iConfigManager;
 struct iJob;
@@ -68,6 +69,7 @@ struct iThreadManager : public virtual iBase
   virtual void Process(uint num = 1) = 0;
   virtual void PushToQueue(QueueType queueType, iJob* job) = 0;
   virtual void Wait(csRef<iThreadReturn> result) = 0;
+  virtual bool Wait(csRefArray<iThreadReturn>& threadReturns) = 0;
   virtual bool RunNow(QueueType queueType, bool wait, bool forceQueue) = 0;
   virtual int32 GetThreadCount() = 0;
   virtual void SetAlwaysRunNow(bool v) = 0;

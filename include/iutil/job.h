@@ -46,7 +46,7 @@ struct iJob : public virtual iBase
  */
 struct iJobQueue : public virtual iBase
 {
-  SCF_INTERFACE(iJobQueue, 2,2,0);
+  SCF_INTERFACE(iJobQueue, 3,0,0);
   
   /// Add a job to the queue.
   virtual void Enqueue (iJob* job) = 0;
@@ -56,6 +56,11 @@ struct iJobQueue : public virtual iBase
    * and run it immediately.
    */
   virtual void PullAndRun (iJob* job) = 0;
+
+  /**
+   * Pop a job off the top of the queue and run it.
+   */
+  virtual void PopAndRun() = 0;
   
   /**
    * Remove a job from the queue.

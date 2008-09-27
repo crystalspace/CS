@@ -104,3 +104,29 @@ void csThreadManager::Wait(csRef<iThreadReturn> result)
     }
   }
 }
+
+bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns)
+{
+  bool success = true;
+  bool finished = false;
+
+  while(!finished)
+  {
+    finished = true;
+    for(size_t i=0; i<threadReturns.GetSize(); i++)
+    {
+      finished &= threadReturns[i]->IsFinished();
+      if(finished)
+      {
+        success &= threadReturns[i]->WasSuccessful();
+      }
+    }
+
+    if(!finished)
+    {
+      threadQueue->PopAndRun();
+    }
+  }
+
+  return success;
+}
