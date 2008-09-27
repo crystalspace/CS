@@ -514,9 +514,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     * The parent is not 0 if this mesh is going to be part of a hierarchical
     * mesh.
     */
-    THREADED_CALLABLE_DECL6(csThreadedLoader, LoadMeshObject, csLoaderReturn,
+    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadMeshObject, csLoaderReturn,
       csRef<iLoaderContext>, ldr_context, csRef<iMeshWrapper>, mesh, csRef<iMeshWrapper>, parent,
-      csRef<iDocumentNode>, node, csRef<iStreamSource>, ssource, csRef<iSector>, sector, THREADED, false, false);
+      csRef<iDocumentNode>, node, csRef<iStreamSource>, ssource, csRef<iSector>, sector, csString,
+      name, THREADED, false, false);
 
     THREADED_CALLABLE_DECL2(csThreadedLoader, AddObjectToSector, csLoaderReturn,
       csRef<iMovable>, movable, csRef<iSector>, sector, MED, false, false);

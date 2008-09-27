@@ -1317,7 +1317,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             return 0;
           }
           csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (meshname, false);
-          csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, 0, child, ssource, sector);
+          csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, 0, child, ssource, sector, meshname);
           AddLoadingMeshObject(meshname, itr);
           threadReturns.Push(itr);
         }
@@ -1343,7 +1343,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
               meshname, secname ? secname : "<noname>");
             return 0;
           }
-          csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, 0, child, ssource, sector);
+          csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, 0, child, ssource, sector, meshname);
           AddLoadingMeshObject(meshname, itr);
           threadReturns.Push(itr);
         }
