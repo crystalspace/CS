@@ -54,10 +54,5 @@
 #include "csplugincommon/sndsys/queue.h"
 #include "csplugincommon/sndsys/snddata.h"
 #include "csplugincommon/sndsys/sndstream.h"
-#include "csplugincommon/softshader/defaultshader.h"
-#include "csplugincommon/softshader/renderinterface.h"
-#include "csplugincommon/softshader/scanline.h"
-#include "csplugincommon/softshader/texture.h"
-#include "csplugincommon/softshader/types.h"
 #endif /* __CSPLUGINCOMMON_H__ */
 
