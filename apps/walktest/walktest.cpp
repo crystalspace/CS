@@ -403,11 +403,11 @@ void WalkTest::DrawFrameDebug ()
     extern void DrawZbuffer ();
     DrawZbuffer ();
   }
-  if (do_show_palette)
-  {
-    extern void DrawPalette ();
-    DrawPalette ();
-  }
+  //if (do_show_palette)
+  //{
+    //extern void DrawPalette ();
+    //DrawPalette ();
+  //}
   if (do_show_debug_boxes)
   {
     extern void DrawDebugBoxes (iCamera* cam, bool do3d);
