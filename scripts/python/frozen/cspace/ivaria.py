@@ -201,10 +201,12 @@ class iConsoleExecCallback(core.iBase):
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Execute(*args): return _ivaria.iConsoleExecCallback_Execute(*args)
+    scfGetVersion = staticmethod(_ivaria.iConsoleExecCallback_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iConsoleExecCallback
     __del__ = lambda self : None;
 iConsoleExecCallback_swigregister = _ivaria.iConsoleExecCallback_swigregister
 iConsoleExecCallback_swigregister(iConsoleExecCallback)
+iConsoleExecCallback_scfGetVersion = _ivaria.iConsoleExecCallback_scfGetVersion
 
 class iConsoleInput(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')

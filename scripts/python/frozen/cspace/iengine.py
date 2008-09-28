@@ -67,64 +67,6 @@ if not "core" in dir():
 core.AddSCFLink(_SetSCFPointer)
 CSMutableArrayHelper = core.CSMutableArrayHelper
 
-class iFrustumViewUserdata(core.iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    scfGetVersion = staticmethod(_iengine.iFrustumViewUserdata_scfGetVersion)
-    __swig_destroy__ = _iengine.delete_iFrustumViewUserdata
-    __del__ = lambda self : None;
-iFrustumViewUserdata_swigregister = _iengine.iFrustumViewUserdata_swigregister
-iFrustumViewUserdata_swigregister(iFrustumViewUserdata)
-iFrustumViewUserdata_scfGetVersion = _iengine.iFrustumViewUserdata_scfGetVersion
-
-class csFrustumContext(object):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _iengine.new_csFrustumContext(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    def assign(*args): return _iengine.csFrustumContext_assign(*args)
-    def GetShadows(*args): return _iengine.csFrustumContext_GetShadows(*args)
-    def SetShadows(*args): return _iengine.csFrustumContext_SetShadows(*args)
-    def SetNewShadows(*args): return _iengine.csFrustumContext_SetNewShadows(*args)
-    def IsShared(*args): return _iengine.csFrustumContext_IsShared(*args)
-    def SetLightFrustum(*args): return _iengine.csFrustumContext_SetLightFrustum(*args)
-    def SetNewLightFrustum(*args): return _iengine.csFrustumContext_SetNewLightFrustum(*args)
-    def GetLightFrustum(*args): return _iengine.csFrustumContext_GetLightFrustum(*args)
-    def SetMirrored(*args): return _iengine.csFrustumContext_SetMirrored(*args)
-    def IsMirrored(*args): return _iengine.csFrustumContext_IsMirrored(*args)
-    __swig_destroy__ = _iengine.delete_csFrustumContext
-    __del__ = lambda self : None;
-csFrustumContext_swigregister = _iengine.csFrustumContext_swigregister
-csFrustumContext_swigregister(csFrustumContext)
-
-class iFrustumView(core.iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def GetFrustumContext(*args): return _iengine.iFrustumView_GetFrustumContext(*args)
-    def CreateFrustumContext(*args): return _iengine.iFrustumView_CreateFrustumContext(*args)
-    def CopyFrustumContext(*args): return _iengine.iFrustumView_CopyFrustumContext(*args)
-    def SetFrustumContext(*args): return _iengine.iFrustumView_SetFrustumContext(*args)
-    def RestoreFrustumContext(*args): return _iengine.iFrustumView_RestoreFrustumContext(*args)
-    def SetObjectFunction(*args): return _iengine.iFrustumView_SetObjectFunction(*args)
-    def CallObjectFunction(*args): return _iengine.iFrustumView_CallObjectFunction(*args)
-    def GetRadius(*args): return _iengine.iFrustumView_GetRadius(*args)
-    def GetSquaredRadius(*args): return _iengine.iFrustumView_GetSquaredRadius(*args)
-    def CheckShadowMask(*args): return _iengine.iFrustumView_CheckShadowMask(*args)
-    def CheckProcessMask(*args): return _iengine.iFrustumView_CheckProcessMask(*args)
-    def StartNewShadowBlock(*args): return _iengine.iFrustumView_StartNewShadowBlock(*args)
-    def SetUserdata(*args): return _iengine.iFrustumView_SetUserdata(*args)
-    def GetUserdata(*args): return _iengine.iFrustumView_GetUserdata(*args)
-    scfGetVersion = staticmethod(_iengine.iFrustumView_scfGetVersion)
-    __swig_destroy__ = _iengine.delete_iFrustumView
-    __del__ = lambda self : None;
-iFrustumView_swigregister = _iengine.iFrustumView_swigregister
-iFrustumView_swigregister(iFrustumView)
-iFrustumView_scfGetVersion = _iengine.iFrustumView_scfGetVersion
-
 CS_LIGHT_NOSHADOWS = _iengine.CS_LIGHT_NOSHADOWS
 CS_LIGHT_ACTIVEHALO = _iengine.CS_LIGHT_ACTIVEHALO
 CS_LIGHT_DYNAMICTYPE_STATIC = _iengine.CS_LIGHT_DYNAMICTYPE_STATIC
@@ -232,32 +174,6 @@ class iLightList(core.iBase):
 iLightList_swigregister = _iengine.iLightList_swigregister
 iLightList_swigregister(iLightList)
 iLightList_scfGetVersion = _iengine.iLightList_scfGetVersion
-
-class iLightingProcessData(core.iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def FinalizeLighting(*args): return _iengine.iLightingProcessData_FinalizeLighting(*args)
-    __swig_destroy__ = _iengine.delete_iLightingProcessData
-    __del__ = lambda self : None;
-iLightingProcessData_swigregister = _iengine.iLightingProcessData_swigregister
-iLightingProcessData_swigregister(iLightingProcessData)
-
-class iLightingProcessInfo(iFrustumViewUserdata):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def GetLight(*args): return _iengine.iLightingProcessInfo_GetLight(*args)
-    def IsDynamic(*args): return _iengine.iLightingProcessInfo_IsDynamic(*args)
-    def SetColor(*args): return _iengine.iLightingProcessInfo_SetColor(*args)
-    def GetColor(*args): return _iengine.iLightingProcessInfo_GetColor(*args)
-    def AttachUserdata(*args): return _iengine.iLightingProcessInfo_AttachUserdata(*args)
-    def QueryUserdata(*args): return _iengine.iLightingProcessInfo_QueryUserdata(*args)
-    def FinalizeLighting(*args): return _iengine.iLightingProcessInfo_FinalizeLighting(*args)
-    __swig_destroy__ = _iengine.delete_iLightingProcessInfo
-    __del__ = lambda self : None;
-iLightingProcessInfo_swigregister = _iengine.iLightingProcessInfo_swigregister
-iLightingProcessInfo_swigregister(iLightingProcessInfo)
 
 class iLightIterator(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -578,7 +494,6 @@ class iEngine(core.iBase):
     def GetNearbyObjects(*args): return _iengine.iEngine_GetNearbyObjects(*args)
     def GetVisibleObjects(*args): return _iengine.iEngine_GetVisibleObjects(*args)
     def GetVisibleMeshes(*args): return _iengine.iEngine_GetVisibleMeshes(*args)
-    def CreateFrustumView(*args): return _iengine.iEngine_CreateFrustumView(*args)
     def CreateObjectWatcher(*args): return _iengine.iEngine_CreateObjectWatcher(*args)
     def GetVariableList(*args): return _iengine.iEngine_GetVariableList(*args)
     def RemoveObject(*args): return _iengine.iEngine_RemoveObject(*args)
