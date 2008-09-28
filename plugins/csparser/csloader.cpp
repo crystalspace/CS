@@ -25,6 +25,7 @@
 #include "isndsys/ss_manager.h"
 #include "iutil/document.h"
 #include "iutil/objreg.h"
+#include "iutil/plugin.h"
 #include "ivideo/shader/shader.h"
 
 #include "csloader.h"
@@ -44,7 +45,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   bool csLoader::Initialize(iObjectRegistry *object_reg)
   {
     engine = csQueryRegistry<iEngine>(object_reg);
-    loader = csQueryRegistry<iThreadedLoader>(object_reg);
+    loader = csQueryRegistryOrLoad<iThreadedLoader>(object_reg, "crystalspace.level.threadedloader");
     threadman = csQueryRegistry<iThreadManager>(object_reg);
     return (engine.IsValid() && loader.IsValid() && threadman.IsValid());
   }
