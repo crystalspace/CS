@@ -165,8 +165,6 @@ csGraphics2DOpenGL::csGraphics2DOpenGL (iBase *iParent) :
   scfImplementationType (this, iParent),
   m_nGraphicsReady (true),
   m_hWnd (0),
-  m_bPalettized (false),
-  m_bPaletteChanged (false),
   modeSwitched (true)
 {
 }
@@ -203,12 +201,6 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
   // Get the creation parameters
   m_hInstance = m_piWin32Assistant->GetInstance ();
   m_nCmdShow  = m_piWin32Assistant->GetCmdShow ();
-
-  if (Depth == 8)
-  {
-    pfmt.PalEntries = CS_WIN_PALETTE_SIZE;
-    pfmt.PixelBytes = 1;
-  }
 
   csRef<iCommandLineParser> cmdline (
   	csQueryRegistry<iCommandLineParser> (object_reg));
@@ -531,21 +523,6 @@ bool csGraphics2DOpenGL::Open ()
   hardwareAccelerated = !(pfd.dwFlags & PFD_GENERIC_FORMAT) ||
     (pfd.dwFlags & PFD_GENERIC_ACCELERATED);
 
-  pfmt.PixelBytes = (pfd.cColorBits == 32) ? 4 : (pfd.cColorBits + 7) >> 3;
-  pfmt.RedBits = pfd.cRedBits;
-  pfmt.RedShift = pfd.cRedShift;
-  pfmt.RedMask = ((1 << pfd.cRedBits) - 1) << pfd.cRedShift;
-  pfmt.GreenBits = pfd.cGreenBits;
-  pfmt.GreenShift = pfd.cGreenShift;
-  pfmt.GreenMask = ((1 << pfd.cGreenBits) - 1) << pfd.cGreenShift;
-  pfmt.BlueBits = pfd.cBlueBits;
-  pfmt.BlueShift = pfd.cBlueShift;
-  pfmt.BlueMask = ((1 << pfd.cBlueBits) - 1) << pfd.cBlueShift;
-  pfmt.AlphaBits = pfd.cAlphaBits;
-  pfmt.AlphaShift = pfd.cAlphaShift;
-  pfmt.AlphaMask = ((1 << pfd.cAlphaBits) - 1) << pfd.cAlphaShift;
-  pfmt.PalEntries = 0;
-
   hGLRC = wglCreateContext (hDC);
   wglMakeCurrent (hDC, hGLRC);
 
@@ -583,12 +560,6 @@ bool csGraphics2DOpenGL::Open ()
 
   if (!csGraphics2DGLCommon::Open ())
     return false;
-
-  if (Depth == 8)
-    m_bPalettized = true;
-  else
-    m_bPalettized = false;
-  m_bPaletteChanged = false;
 
   ext.InitWGL_EXT_swap_control (hDC);
 
@@ -663,44 +634,6 @@ void csGraphics2DOpenGL::Print (csRect const* /*area*/)
 {
   glFlush();
   SwapBuffers(hDC);
-}
-
-HRESULT csGraphics2DOpenGL::SetColorPalette ()
-{
-  HRESULT ret = S_OK;
-
-  if ((Depth==8) && m_bPaletteChanged)
-  {
-    m_bPaletteChanged = false;
-
-    if (!FullScreen)
-    {
-      HPALETTE oldPal;
-      HDC dc = GetDC(0);
-
-      SetSystemPaletteUse (dc, SYSPAL_NOSTATIC);
-      PostMessage (HWND_BROADCAST, WM_SYSCOLORCHANGE, 0, 0);
-
-      CreateIdentityPalette (Palette);
-      ClearSystemPalette ();
-
-      oldPal = SelectPalette (dc, hWndPalette, FALSE);
-
-      RealizePalette (dc);
-      SelectPalette (dc, oldPal, FALSE);
-      ReleaseDC (0, dc);
-    }
-
-    return ret;
-  }
-
-  return S_OK;
-}
-
-void csGraphics2DOpenGL::SetRGB (int i, int r, int g, int b)
-{
-  csGraphics2D::SetRGB (i, r, g, b);
-  m_bPaletteChanged = true;
 }
 
 bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape)
