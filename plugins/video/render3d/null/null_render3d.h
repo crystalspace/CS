@@ -22,6 +22,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
+#include "ivideo/shader/shader.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 
@@ -204,7 +205,6 @@ private:
   csPlane3 near_plane;
   csZBufMode zmode;
 
-  csPixelFormat pfmt;
   bool red_mask, green_mask, blue_mask, alpha_mask;
   
   enum { numTargets = 2 };

@@ -196,10 +196,13 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
     SaveKeys (child, texWrap->QueryObject ());
 
     child->SetValue("texture"); // texture node
-    int texTarget = texHand->GetTextureTarget ();
+    iTextureHandle::TextureType texType = texHand->GetTextureType ();
     const char* filename = texHand->GetImageName ();
     // Cubemaps and 3D textures need special "filename logic"
-    if ((texTarget <= iTextureHandle::CS_TEX_IMG_2D) && filename && *filename)
+    if (((texType == iTextureHandle::texType2D) 
+        || (texType == iTextureHandle::texType1D)
+        || (texType == iTextureHandle::texTypeRect))
+      && filename && *filename)
     {
       CreateValueNode(child, "file", filename);
     }
@@ -231,7 +234,7 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
     if ((texClass != 0) && (strcmp (texClass, "default") != 0))
       CreateValueNode (child, "class", texClass);
 
-    if (texTarget == iTextureHandle::CS_TEX_IMG_CUBEMAP)
+    if (texType == iTextureHandle::texTypeCube)
     {
       csString imgName (filename);
 
@@ -268,7 +271,7 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
 	}
       }
     }
-    else if (texTarget == iTextureHandle::CS_TEX_IMG_3D)
+    else if (texType == iTextureHandle::texType3D)
     {
       csString imgName (filename);
 

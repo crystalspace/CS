@@ -251,16 +251,6 @@ bool csGLBasicTextureHandle::GetRendererDimensions (int &mw, int &mh, int &md)
   return true;
 }
 
-void *csGLBasicTextureHandle::GetPrivateObject ()
-{
-  return (csGLBasicTextureHandle *)this;
-}
-
-bool csGLBasicTextureHandle::GetAlphaMap () 
-{
-  return (alphaType != csAlphaMode::alphaNone);
-}
-
 void csGLBasicTextureHandle::PrepareInt ()
 {
 }

@@ -771,23 +771,6 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
     case DEBUGCMD_SELECTMESH:
       EnterEditMode (cmd, "Enter mesh name regexp pattern:", "");
       break;
-    case DEBUGCMD_DBLBUFF:
-      {
-	  bool state = G2D->GetDoubleBufferState ();
-	  state = !state;
-	  if (!G2D->DoubleBuffer (state))
-	  {
-	    Report (CS_REPORTER_SEVERITY_DEBUG,
-	    	"Double buffer not supported in current video mode!");
-	  }
-	  else
-	  {
-	    Report (CS_REPORTER_SEVERITY_DEBUG,
-	    	"BugPlug %s double buffering.",
-		state ? "enabled" : "disabled");
-	  }
-	}
-      break;
     case DEBUGCMD_TERRVIS:
 	{
 	  Report (CS_REPORTER_SEVERITY_DEBUG,
@@ -2222,7 +2205,6 @@ int csBugPlug::GetCommandCode (const char* cmdstr, csString& args)
   if (!strcmp (cmd, "mmx"))		return DEBUGCMD_MMX;
   if (!strcmp (cmd, "transp"))		return DEBUGCMD_TRANSP;
   if (!strcmp (cmd, "gamma"))		return DEBUGCMD_GAMMA;
-  if (!strcmp (cmd, "dblbuff"))		return DEBUGCMD_DBLBUFF;
   if (!strcmp (cmd, "dumpcam"))		return DEBUGCMD_DUMPCAM;
   if (!strcmp (cmd, "fov"))		return DEBUGCMD_FOV;
   if (!strcmp (cmd, "fovangle"))	return DEBUGCMD_FOVANGLE;

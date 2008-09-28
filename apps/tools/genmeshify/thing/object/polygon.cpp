@@ -390,8 +390,8 @@ iMaterial *csPolygon3DStatic::GetMaterial ()
 bool csPolygon3DStatic::IsTransparent ()
 {
   iTextureHandle *txt_handle = GetMaterial ()->GetTexture ();
-  return txt_handle && ((txt_handle->GetAlphaMap ()
-    || txt_handle->GetKeyColor ()));
+  return txt_handle && ((txt_handle->GetAlphaType ()
+    != csAlphaMode::alphaNone));
 }
 
 int csPolygon3DStatic::Classify (const csPlane3 &pl)
