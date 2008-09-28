@@ -26,7 +26,6 @@
 #include "gl_render3d.h"
 #include "gl_txtmgr.h"
 #include "gl_txtmgr_imagetex.h"
-#include "gl_txtmgr_lightmap.h"
 
 using namespace CS::Threading;
 
@@ -269,11 +268,6 @@ void csGLTextureManager::Clear()
     if (tex != 0) tex->Clear ();
   }
   textures.DeleteAll ();
-  for (i = 0; i < superLMs.GetSize (); i++)
-  {
-    superLMs[i]->DeleteTexture();
-  }
-  superLMs.DeleteAll ();
 }
 
 void csGLTextureManager::UnsetTexture (GLenum target, GLuint texture)
@@ -405,52 +399,11 @@ int csGLTextureManager::GetTextureFormat ()
   return CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA;
 }
 
-csPtr<iSuperLightmap> csGLTextureManager::CreateSuperLightmap(int w, int h)
-{
-  csGLSuperLightmap* slm = new csGLSuperLightmap (this, w, h);
-  superLMs.Push (slm);
-  return csPtr<iSuperLightmap> (slm);
-}
-
 void csGLTextureManager::GetMaxTextureSize (int& w, int& h, int& aspect)
 {
   w = max_tex_size;
   h = max_tex_size;
   aspect = max_tex_size;
-}
-
-void csGLTextureManager::DumpSuperLightmaps (iVFS* VFS, iImageIO* iio, 
-					     const char* dir)
-{
-  csString outfn;
-  for (size_t i = 0; i < superLMs.GetSize (); i++)
-  {
-    csRef<iImage> img = superLMs[i]->Dump ();
-    if (img)
-    {
-      csRef<iDataBuffer> buf = iio->Save (img, "image/png");
-      if (!buf)
-      {
-	G3D->Report (CS_REPORTER_SEVERITY_WARNING,
-	  "Could not save super lightmap.");
-      }
-      else
-      {
-	outfn.Format ("%s%zu.png", dir, i);
-	if (!VFS->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
-	{
-	  G3D->Report (CS_REPORTER_SEVERITY_WARNING,
-	    "Could not write to %s.", outfn.GetData ());
-	}
-	else
-	{
-	  G3D->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    "Dumped %dx%d SLM to %s", superLMs[i]->w, superLMs[i]->h,
-	    	outfn.GetData ());
-	}
-      }
-    }
-  }
 }
 
 void csGLTextureManager::DumpTextures (iVFS* VFS, iImageIO* iio, 

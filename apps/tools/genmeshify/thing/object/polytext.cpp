@@ -73,11 +73,6 @@ void csPolyTexture::ObjectToWorld (const csMatrix3& m_obj2tex,
   v_world2tex = obj.This2Other (v_obj2tex);
 }
 
-void csPolyTexture::SetRendererLightmap (iRendererLightmap* rlm)
-{
-  csPolyTexture::rlm = rlm;
-}
-
 csPolyTexture::~csPolyTexture ()
 {
   delete shadow_bitmap;

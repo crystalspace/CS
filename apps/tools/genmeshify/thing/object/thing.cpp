@@ -2199,76 +2199,24 @@ void csThing::PrepareLMs ()
 {
   if (IsLmPrepared()) return;
 
-  csThingObjectType* thing_type = static_data->thing_type;
-  iTextureManager* txtmgr = thing_type->G3D->GetTextureManager ();
-
-  csHash<csRef<iSuperLightmap>,
-    csPtrKey<csThingStatic::StaticSuperLM> > superLMs;
-
   size_t i;
   for (i = 0; i < static_data->litPolys.GetSize (); i++)
   {
     const csThingStatic::csStaticLitPolyGroup& slpg =
       *(static_data->litPolys[i]);
 
-    const csRef<iSuperLightmap>* SLMptr =
-      superLMs.GetElementPointer (slpg.staticSLM);
-    csRef<iSuperLightmap> SLM;
+    csLitPolyGroup* lpg = new csLitPolyGroup;
+    lpg->material = FindRealMaterial (slpg.material);
+    if (lpg->material == 0) lpg->material = slpg.material;
 
-    if (SLMptr == 0)
+    size_t j;
+    lpg->polys.SetSize (slpg.polys.GetSize ());
+    for (j = 0; j < slpg.polys.GetSize (); j++)
     {
-      SLM = txtmgr->CreateSuperLightmap (slpg.staticSLM->width,
-        slpg.staticSLM->height);
-      superLMs.Put (slpg.staticSLM, SLM);
+      lpg->polys.Put (j, slpg.polys[j]);
     }
-    else
-      SLM = *SLMptr;
 
-    // SLM creation failed for some reason. The polys will be drawn unlit.
-    if (SLM == 0)
-    {
-      csPolyGroup* pg = new csPolyGroup;
-      pg->material = FindRealMaterial (slpg.material);
-      if (pg->material == 0) pg->material = slpg.material;
-
-      size_t j;
-      pg->polys.SetSize (slpg.polys.GetSize ());
-      for (j = 0; j < slpg.polys.GetSize (); j++)
-      {
-        pg->polys.Put (j, slpg.polys[j]);
-      }
-      //pg->polys.ShrinkBestFit();
-
-      unlitPolys.Push (pg);
-    }
-    else
-    {
-      csLitPolyGroup* lpg = new csLitPolyGroup;
-      lpg->material = FindRealMaterial (slpg.material);
-      if (lpg->material == 0) lpg->material = slpg.material;
-      lpg->SLM = SLM;
-
-      size_t j;
-      lpg->lightmaps.SetSize (slpg.polys.GetSize ());
-      lpg->polys.SetSize (slpg.polys.GetSize ());
-      for (j = 0; j < slpg.polys.GetSize (); j++)
-      {
-        csPolygon3D* poly = &polygons[slpg.polys[j]];
-
-        lpg->polys.Put (j, slpg.polys[j]);
-        const csRect& r = slpg.lmRects[j];
-        csRef<iRendererLightmap> rlm =
-          SLM->RegisterLightmap (r.xmin, r.ymin, r.Width (), r.Height ());
-
-        csPolyTexture* polytxt = poly->GetPolyTexture ();
-        rlm->SetLightCellSize (polytxt->GetLightCellSize ());
-        polytxt->SetRendererLightmap (rlm);
-
-        lpg->lightmaps.Put (j, rlm);
-      }
-
-      litPolys.Push (lpg);
-    }
+    litPolys.Push (lpg);
   }
 
   for (i = 0; i < static_data->unlitPolys.GetSize (); i++)
@@ -2313,58 +2261,6 @@ void csThing::UpdateDirtyLMs ()
   csColor amb (0, 0, 0);
 
   if (!IsLmDirty()) return;
-
-  bool ident;
-  csReversibleTransform o2c;
-  if (!cached_movable || cached_movable->IsFullTransformIdentity ())
-  {
-    ident = true;
-  }
-  else
-  {
-    ident = false;
-    o2c = cached_movable->GetFullTransform ();
-  }
-
-  csMatrix3 m_world2tex;
-  csVector3 v_world2tex;
-
-  size_t i;
-  for (i = 0; i < litPolys.GetSize (); i++)
-  {
-    size_t j;
-    for (j = 0; j < litPolys[i]->polys.GetSize (); j++)
-    {
-      csPolygon3D& poly = polygons[litPolys[i]->polys[j]];
-      csPolyTexture* lmi = poly.GetPolyTexture ();
-      if (ident)
-      {
-        poly.GetStaticPoly ()->MappingGetTextureSpace (m_world2tex,
-                v_world2tex);
-      }
-      else
-      {
-        csMatrix3 m_obj2tex;
-        csVector3 v_obj2tex;
-        poly.GetStaticPoly ()->MappingGetTextureSpace (m_obj2tex,
-                v_obj2tex);
-        csPolyTexture* lmi = poly.GetPolyTexture ();
-        lmi->ObjectToWorld (m_obj2tex, v_obj2tex,
-                o2c, m_world2tex, v_world2tex);
-      }
-      if (lmi->GetLightVersion () != GetLightVersion ())
-      {
-        const csPlane3& world_plane = GetPolygonWorldPlaneNoCheck (
-                poly.GetPolyIdx ());
-        csLightingScratchBuffer& scratch = static_data->thing_type->lightingScratch;
-        if (lmi->RecalculateDynamicLights (m_world2tex, v_world2tex, &poly,
-                world_plane, amb, scratch))
-        {
-          litPolys[i]->lightmaps[j]->SetData (scratch.GetArray ());
-        }
-      }
-    }
-  }
 
   SetLmDirty (false);
 }

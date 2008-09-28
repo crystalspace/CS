@@ -688,8 +688,6 @@ private:
   /// Polys with the same material and the same SLM
   struct csLitPolyGroup : public csPolyGroup
   {
-    csRefArray<iRendererLightmap> lightmaps;
-    csRef<iSuperLightmap> SLM;
   };
 
   csPDelArray<csLitPolyGroup> litPolys;
@@ -869,7 +867,7 @@ public:
    */
   iTextureHandle* GetPolygonTexture (size_t index)
   {
-    return index < litPolys.GetSize () ? litPolys[index]->SLM->GetTexture() : 0;
+    return 0;
   }
   /// Ensure lightmap textures are up-to-date
   void UpdateDirtyLMs ();

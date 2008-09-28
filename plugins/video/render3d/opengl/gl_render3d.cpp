@@ -3600,34 +3600,7 @@ bool csGLGraphics3D::DebugCommand (const char* cmdstr)
     *space = 0;
   }
 
-  if (strcasecmp (cmd, "dump_slms") == 0)
-  {
-    csRef<iImageIO> imgsaver = csQueryRegistry<iImageIO> (object_reg);
-    if (!imgsaver)
-    {
-      Report (CS_REPORTER_SEVERITY_WARNING,
-        "Could not get image saver.");
-      return false;
-    }
-
-    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
-    if (!vfs)
-    {
-      Report (CS_REPORTER_SEVERITY_WARNING, 
-	"Could not get VFS.");
-      return false;
-    }
-
-    if (txtmgr)
-    {
-      const char* dir = 
-	((param != 0) && (*param != 0)) ? param : "/tmp/slmdump/";
-      txtmgr->DumpSuperLightmaps (vfs, imgsaver, dir);
-    }
-
-    return true;
-  }
-  else if (strcasecmp (cmd, "dump_zbuf") == 0)
+  if (strcasecmp (cmd, "dump_zbuf") == 0)
   {
     const char* dir = 
       ((param != 0) && (*param != 0)) ? param : "/tmp/zbufdump/";

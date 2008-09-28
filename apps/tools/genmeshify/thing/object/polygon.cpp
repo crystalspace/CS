@@ -1152,11 +1152,6 @@ csPolygon3D::~csPolygon3D ()
 
 void csPolygon3D::RemovePolyTexture ()
 {
-  if (GetParent ())
-  {
-    iGraphics3D* G3D = GetParent()->GetStaticData()->thing_type->G3D;
-    if (G3D && txt_info.rlm) G3D->RemoveFromCache (txt_info.rlm);
-  }
   if (txt_info.lm)
   {
     GetParent ()->GetStaticData ()->thing_type->blk_lightmap.Free (txt_info.lm);

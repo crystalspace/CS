@@ -197,9 +197,6 @@ class csPolyTexture
   friend class csPolygon3D;
 
 private:
-  /// Lightmap for the renderer.
-  csRef<iRendererLightmap> rlm;
-
   /// LightMap.
   csLightMap* lm;
   /**
@@ -229,7 +226,6 @@ public:
   ~csPolyTexture ();
 
   void SetTextureMapping (csPolyTextureMapping* mapping);
-  void SetRendererLightmap (iRendererLightmap* rlm);
 
   /**
    * Set the lightmap for this polytexture . Can also be used to clear
@@ -309,10 +305,6 @@ public:
 	csVector3& v_world2tex);
 
   //iMaterialHandle *GetMaterialHandle ();
-  iRendererLightmap* GetRendererLightmap () const
-  {
-    return rlm;
-  }
 
   /// Get light version.
   uint32 GetLightVersion () const { return light_version; }
