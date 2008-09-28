@@ -322,9 +322,15 @@ void csShaderManager::LoadDefaultVariables()
   csRef<iSyntaxService> synldr = csQueryRegistry<iSyntaxService> (objectreg);
   CS_ASSERT(synldr);
   
-  csRef<iLoader> loader = csQueryRegistry<iLoader> (objectreg);
-  CS_ASSERT(loader);
-  
+  csRef<iLoader> loader = csQueryRegistryOrLoad<iLoader> (objectreg,
+    "crystalspace.level.loader", true);
+  if (!loader.IsValid())
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING,
+      "Can not load default shader vars, no iLoader available");
+    return;
+  }
+    
   csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectreg);
   csRef<iTextureManager> tm;
   if (g3d.IsValid())
