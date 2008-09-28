@@ -163,7 +163,6 @@ public:
   iHalo* CreateHalo (float /*iR*/, float /*iG*/, float /*iB*/,
     unsigned char* /*iAlpha*/, int /*iWidth*/, int /*iHeight*/) { return 0; }
 
-  void RemoveFromCache (iRendererLightmap* /*rlm*/) { }
   void SetWorldToCamera (const csReversibleTransform& w2c) { this->w2c = w2c; }
   const csReversibleTransform& GetWorldToCamera () { return w2c; }
   void DrawSimpleMesh (const csSimpleRenderMesh& /*mesh*/, uint /*flags*/ = 0) { }

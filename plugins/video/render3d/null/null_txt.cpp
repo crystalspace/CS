@@ -134,13 +134,6 @@ void csTextureManagerNull::UnregisterTexture (csTextureHandleNull* handle)
   size_t idx = textures.Find (handle);
   if (idx != csArrayItemNotFound) textures.DeleteIndexFast (idx);
 }
-
-csPtr<iSuperLightmap> csTextureManagerNull::CreateSuperLightmap (int /*w*/,
-  int /*h*/)
-{
-  // @@@ implement a "NullRendererLightmap"
-  return 0;
-}
   
 void csTextureManagerNull::GetMaxTextureSize (int& w, int& h, int& aspect)
 {

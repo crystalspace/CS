@@ -140,8 +140,6 @@ public:
       iString* fail_reason = 0);
   virtual void UnregisterTexture (csTextureHandleNull* handle);
 
-  virtual csPtr<iSuperLightmap> CreateSuperLightmap(int w, int h);
-
   virtual void GetMaxTextureSize (int& w, int& h, int& aspect);
 };
 
