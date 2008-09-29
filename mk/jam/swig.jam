@@ -66,11 +66,13 @@ if $(CMD.SWIG)
     #ifndef __STDC_LIMIT_MACROS\\
     #define __STDC_LIMIT_MACROS\\
     #endif\\
+    #ifdef _MSC_VER\\
     #include <io.h>\\
     #include <stdarg.h>\\
     #ifndef DEBUG_PYTHON\\
     #undef _DEBUG\\
     #define RESTORE__DEBUG\\
+    #endif\\
     #endif\\
     \\1\\
     #ifdef RESTORE__DEBUG\\
