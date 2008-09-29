@@ -17,10 +17,17 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#if !defined(DEBUG_PYTHON) && defined(_DEBUG)
+#include <io.h>
+#include <stdarg.h>
+#ifndef DEBUG_PYTHON
 #undef _DEBUG
+#define RESTORE__DEBUG
 #endif
-
+#include <Python.h>
+#ifdef RESTORE__DEBUG
+#define _DEBUG
+#undef RESTORE__DEBUG
+#endif
 
 #include <stdio.h>
 
