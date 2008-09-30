@@ -19,13 +19,14 @@
 #ifndef __CS_GLX2D_H__
 #define __CS_GLX2D_H__
 
+#define GLX_GLXEXT_PROTOTYPES
+#include <GL/glx.h>
+#define CS_GLEXTMANAGER_USE_GLX
+
 #include "csutil/scf.h"
 #include "csplugincommon/opengl/glcommon2d.h"
 #include "csplugincommon/iopengl/openglinterface.h"
 #include "ivaria/xwindow.h"
-
-#define GLX_GLXEXT_PROTOTYPES
-#include <GL/glx.h>
 
 #include "iogldisp.h"
 

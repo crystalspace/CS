@@ -15,7 +15,6 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "cssysdef.h"
 #include "csutil/csinput.h"
 #include "csutil/scf.h"
@@ -139,6 +138,8 @@ bool csGraphics2DGLX::Open()
   // We now select the visual here as with a mesa bug it is not possible
   // to destroy double buffered contexts and then create a single buffered
   // one.
+  
+  ext.InitGLX_ARB_multisample (dpy, screen_num);
 
   if (!ChooseVisual ())
     return false;
@@ -245,42 +246,63 @@ bool csGraphics2DGLX::ChooseVisual ()
   
   GLPixelFormat format;
   csGLPixelFormatPicker picker (this);
+  csDirtyAccessArray<int> desired_attributes;
   
-  while (picker.GetNextFormat (format))
+  bool tryMultisample = ext.CS_GLX_ARB_multisample;
+  
+  for (int run = (tryMultisample?2:1); (run-- > 0) && !xvis; )
   {
-    if (do_verbose)
+    while (picker.GetNextFormat (format))
     {
-      csString pfStr;
-      GetPixelFormatString (format, pfStr);
-  
-      Report (CS_REPORTER_SEVERITY_NOTIFY,
-	"Probing pixel format: %s", pfStr.GetData());
+      if (do_verbose)
+      {
+	csString pfStr;
+	GetPixelFormatString (format, pfStr);
+    
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Probing pixel format: %s", pfStr.GetData());
+      }
+      const int colorBits = format[glpfvColorBits];
+      const int colorComponentSize = 
+	  ((colorBits % 32) == 0) ? colorBits / 4 : colorBits / 3;
+      const int accumBits = format[glpfvAccumColorBits];
+      const int accumComponentSize = 
+	  ((accumBits % 32) == 0) ? accumBits / 4 : accumBits / 3;
+      desired_attributes.DeleteAll();
+      desired_attributes.Push (GLX_RGBA);
+      desired_attributes.Push (GLX_DEPTH_SIZE);
+      desired_attributes.Push (format[glpfvDepthBits]);
+      desired_attributes.Push (GLX_RED_SIZE);
+      desired_attributes.Push (colorComponentSize);
+      desired_attributes.Push (GLX_BLUE_SIZE);
+      desired_attributes.Push (colorComponentSize);
+      desired_attributes.Push (GLX_GREEN_SIZE);
+      desired_attributes.Push (colorComponentSize);
+      desired_attributes.Push (GLX_DOUBLEBUFFER);
+      desired_attributes.Push (GLX_ALPHA_SIZE);
+      desired_attributes.Push (format[glpfvAlphaBits]);
+      desired_attributes.Push (GLX_STENCIL_SIZE);
+      desired_attributes.Push (format[glpfvStencilBits]);
+      desired_attributes.Push (GLX_ACCUM_RED_SIZE);
+      desired_attributes.Push (accumComponentSize);
+      desired_attributes.Push (GLX_ACCUM_BLUE_SIZE);
+      desired_attributes.Push (accumComponentSize);
+      desired_attributes.Push (GLX_ACCUM_GREEN_SIZE);
+      desired_attributes.Push (accumComponentSize);
+      desired_attributes.Push (GLX_ACCUM_ALPHA_SIZE);
+      desired_attributes.Push (format[glpfvAccumAlphaBits]);
+      if (run >= 1)
+      {
+	desired_attributes.Push (GLX_SAMPLE_BUFFERS_ARB);
+	desired_attributes.Push ((format[glpfvMultiSamples] != 0) ? 1 : 0);
+	desired_attributes.Push (GLX_SAMPLES_ARB);
+	desired_attributes.Push (format[glpfvMultiSamples]);
+      }
+      desired_attributes.Push (None);
+      // find a visual that supports all the features we need
+      xvis = glXChooseVisual (dpy, screen_num, desired_attributes.GetArray());
+      if (xvis) break;
     }
-    const int colorBits = format[glpfvColorBits];
-    const int colorComponentSize = 
-	((colorBits % 32) == 0) ? colorBits / 4 : colorBits / 3;
-    const int accumBits = format[glpfvAccumColorBits];
-    const int accumComponentSize = 
-	((accumBits % 32) == 0) ? accumBits / 4 : accumBits / 3;
-    int desired_attributes[] =
-    {
-      GLX_RGBA,
-      GLX_DEPTH_SIZE, format[glpfvDepthBits],
-      GLX_RED_SIZE, colorComponentSize,
-      GLX_BLUE_SIZE, colorComponentSize,
-      GLX_GREEN_SIZE, colorComponentSize,
-      GLX_DOUBLEBUFFER,
-      GLX_ALPHA_SIZE, format[glpfvAlphaBits],
-      GLX_STENCIL_SIZE, format[glpfvStencilBits],
-      GLX_ACCUM_RED_SIZE, accumComponentSize,
-      GLX_ACCUM_BLUE_SIZE, accumComponentSize,
-      GLX_ACCUM_GREEN_SIZE, accumComponentSize,
-      GLX_ACCUM_ALPHA_SIZE, format[glpfvAccumAlphaBits],
-      None
-    };
-    // find a visual that supports all the features we need
-    xvis = glXChooseVisual (dpy, screen_num, desired_attributes);
-    if (xvis) break;
   }
 
   // if a visual was found that we can use, make a graphics context which
@@ -391,6 +413,13 @@ void csGraphics2DGLX::GetCurrentAttributes ()
   }
   currentFormat[glpfvAccumColorBits] = accumBits;
   currentFormat[glpfvAccumAlphaBits] = accumAlpha;
+  
+  if (ext.CS_GLX_ARB_multisample)
+  {
+    int v;
+    glXGetConfig(dpy, xvis, GLX_SAMPLES_ARB, &v);
+    currentFormat[glpfvMultiSamples] = v;
+  }
 
   if (ctype)
   {
