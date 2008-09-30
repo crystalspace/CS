@@ -105,12 +105,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     threadman = csQueryRegistry<iThreadManager>(object_reg);
     if(!threadman.IsValid())
     {
+      ReportError("crystalspace.level.threadedloader", "Failed to find the thread manager!");
       return false;
     }
 
     Engine = csQueryRegistry<iEngine>(object_reg);
     if(!Engine.IsValid())
     {
+      ReportError("crystalspace.level.threadedloader", "Failed to find the engine plugin!");
       return false;
     }
 
@@ -130,6 +132,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     vfs = csQueryRegistry<iVFS>(object_reg);
     if(!vfs.IsValid())
     {
+      ReportError("crystalspace.level.threadedloader", "Failed to find VFS!");
       return false;
     }
 
@@ -150,12 +153,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     ImageLoader = csQueryRegistry<iImageIO> (object_reg);
     if(!ImageLoader)
     {
+      ReportError("crystalspace.level.threadedloader", "Failed to find an image loader!");
       return false;
     }
 
     g3d = csQueryRegistry<iGraphics3D> (object_reg);
     if(!g3d)
     {
+      ReportError("crystalspace.level.threadedloader", "Failed to find iGraphics3D!");
       return false;
     }
 
@@ -483,7 +488,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool success = LoadLibrary (ldr_context, lib_node, ssource, missingdata, threadReturns);
 
     // Wait for all jobs to finish.
-    return threadman->Wait(threadReturns);
+    return success && threadman->Wait(threadReturns);
   }
 
   THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadFile, const char* fname,
@@ -957,7 +962,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
 
       // Wait for all jobs to finish.
-      return threadman->Wait(threadReturns);
+      return result && threadman->Wait(threadReturns);
     }
   }
 
