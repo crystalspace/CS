@@ -98,6 +98,14 @@
 #define _WIN32
 #endif
 
+// Assume that GLX is used on Unix platforms (except OS/X)
+#if defined(CS_PLATFORM_UNIX) && !defined(CS_PLATFORM_MACOSX)
+#define CS_OPENGL_GLX
+/* NOTE: CS_GLEXTMANAGER_USE_GLX must be defined to get the Init*
+   functions for GLX extensions. (This was done to avoid pulling X
+   headers into every component using the GL extension manager.) */
+#endif
+
 /*
  * End system-specific stuff.
  **********************************************************************/
@@ -229,9 +237,9 @@ private:
   const char* msgExtInitFail;
   const char* msgExtNotFound;
   const char* msgDependencyNotFound;
+
 #ifdef __WIN32__
   const char* extstrWGL;
-  
   void SetupWGLextStr (HDC hDC)
   {
     if (extstrWGL != 0) return;
@@ -248,6 +256,18 @@ private:
   }
 #endif
 
+#ifdef CS_OPENGL_GLX
+  const char* extstrGLX;
+#ifdef CS_GLEXTMANAGER_USE_GLX
+  void SetupGLXextStr (Display* glxDisplay, int glxScreen)
+  {
+    if (extstrGLX != 0) return;
+  
+    extstrGLX = glXQueryExtensionsString (glxDisplay, glxScreen);
+  }
+#endif
+#endif
+
   void Report (const char* msg, ...)
   {
     if (!doVerbose)
@@ -260,6 +280,33 @@ private:
     va_end (arg);
   }
 
+  /**
+   * Check if the extension \a extToCheck is present in the GL/WGL/GLX
+   * extensions list \a extensions. Takes care that no substrings are picked
+   * up.
+   */
+  bool CheckExtension (const char* extensions, const char* extToCheck)
+  {
+    size_t extLen = strlen (extToCheck);
+    do
+    {
+      const char* extStrPos = strstr (extensions, extToCheck);
+      if (extStrPos == 0) return false;
+      
+      /* If no space is before and after the ext string it's a substring
+       * of another ext */
+      char endch;
+      if (((extStrPos > extensions) && (*(extStrPos-1) != ' '))
+        || (((endch = *(extStrPos + extLen)) != 0) && (endch != ' ')))
+      {
+        extensions = extStrPos + extLen;
+        continue;
+      }
+      break;
+    }
+    while (true);
+    return true;
+  }
 public:
   void Initialize (iObjectRegistry* object_reg, iGraphics2D* g2d)
   {
@@ -289,6 +336,9 @@ public:
     extstrGL = 0;
 #ifdef __WIN32__
     extstrWGL = 0;
+#endif
+#ifdef CS_OPENGL_GLX
+    extstrGLX = 0;
 #endif
 
     memset ((csGLExtensionFunctions*)this, 0, 

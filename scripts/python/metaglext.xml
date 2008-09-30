@@ -1859,6 +1859,10 @@
       <arg name="invert" type="GLboolean" const="false" pointer="false" />
     </function>
   </extension>
+  <extension name="GLX_ARB_multisample" type="GLX">
+    <token name="GLX_SAMPLE_BUFFERS_ARB" value="100000" />
+    <token name="GLX_SAMPLES_ARB" value="100001" />
+  </extension>
   <extension name="GL_ARB_texture_env_add" type="GL" />
   <extension name="WGL_ARB_extensions_string" type="WGL">
     <function name="wglGetExtensionsStringARB" return="char" pointer="true">
@@ -7569,9 +7573,9 @@
   <extension name="GL_ARB_framebuffer_sRGB" type="GL">
     <token name="GL_FRAMEBUFFER_SRGB" value="0x8DB9" />
   </extension>
-  <!--extension name="GLX_ARB_framebuffer_sRGB" type="GLX">
+  <extension name="GLX_ARB_framebuffer_sRGB" type="GLX">
     <token name="GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB" value="0x20B2" />
-  </extension-->
+  </extension>
   <extension name="WGL_ARB_framebuffer_sRGB" type="WGL">
     <token name="WGL_FRAMEBUFFER_SRGB_CAPABLE_ARB" value="0x20A9" />
   </extension>
