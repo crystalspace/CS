@@ -53,7 +53,7 @@ SCF_IMPLEMENT_FACTORY (csGLShader_CG)
 
 csGLShader_CG::csGLShader_CG (iBase* parent) : 
   scfImplementationType (this, parent), compiledProgram (0),
-  progCacheLookups (0), progCacheHits (0), stringStore (0)
+  stringStore (0)
 {
   context = cgCreateContext ();
   cgSetErrorHandler (ErrorHandlerObjReg, 0);
@@ -69,8 +69,6 @@ csGLShader_CG::~csGLShader_CG()
   cgDestroyContext (context);
   cgSetErrorHandler (ErrorHandlerObjReg, object_reg);
   delete stringStore;
-  csPrintf ("prog cache lookups: %u  prog cache hits: %u  rate: %f\n",
-    progCacheLookups, progCacheHits, (float (progCacheHits) / float (progCacheLookups)));
 }
 
 void csGLShader_CG::ErrorHandler (CGcontext context, CGerror error, 
