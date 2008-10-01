@@ -166,89 +166,6 @@ CS_IMPLEMENT_STATIC_CLASSVAR_REF(Variables::CowBlockAllocator,
   allocator, Allocator, Variables::CowBlockAllocator::BlockAlloc, (256));
 
 //---------------------------------------------------------------------------
-  
-// Handy for debugging
-#if 0
-static csString OperandToString (const CondOperand& operand);
-
-static csString OperationToString (const CondOperation& operation)
-{
-  const char* opStr;
-  switch (operation.operation)
-  {
-    case opAnd:       opStr = "&&"; break;
-    case opOr:        opStr = "||"; break;
-    case opEqual:     opStr = "=="; break;
-    case opNEqual:    opStr = "!="; break;
-    case opLesser:    opStr = "<"; break;
-    case opLesserEq:  opStr = "<="; break;
-    default:
-      return (const char*)0;
-  }
-  
-  csString ret;
-  ret.Format ("%s %s %s",
-    OperandToString (operation.left).GetData(),
-    opStr,
-    OperandToString (operation.right).GetData());
-  return ret;
-}
-
-static csString OperandToString (const CondOperand& operand)
-{
-  csString ret;
-  
-  switch (operand.type)
-  {
-    case operandOperation:
-      ret.Format ("<op %zu>", operand.operation);
-      break;
-    case operandFloat:
-      ret.Format ("%g", operand.floatVal);
-      break;
-    case operandInt:
-      ret.Format ("%d", operand.intVal);
-      break;
-    case operandBoolean:
-      ret = operand.boolVal ? "true" : "false";
-      break;
-    case operandSV:
-    case operandSVValueInt:
-    case operandSVValueFloat:
-    case operandSVValueX:
-    case operandSVValueY:
-    case operandSVValueZ:
-    case operandSVValueW:
-    case operandSVValueTexture:
-    case operandSVValueBuffer:
-      {
-        ret.Format ("vars.<#%u>", operand.svLocation.svName);
-        if (operand.svLocation.indices != 0)
-        {
-          size_t n = *operand.svLocation.indices;
-          for (size_t i = 0; i < n; i++)
-            ret.AppendFmt ("[%zu]", operand.svLocation.indices[i+1]);
-        }
-	switch (operand.type)
-	{
-	  case operandSVValueInt:      ret.Append (".int"); break;
-	  case operandSVValueFloat:    ret.Append (".float"); break;
-	  case operandSVValueX:        ret.Append (".x"); break;
-	  case operandSVValueY:        ret.Append (".y"); break;
-	  case operandSVValueZ:        ret.Append (".z"); break;
-	  case operandSVValueW:        ret.Append (".w"); break;
-	  case operandSVValueTexture:  ret.Append (".texture"); break;
-	  case operandSVValueBuffer:   ret.Append (".buffer"); break;
-	  default: break;
-        }
-        break;
-      }
-    default: break;
-  }
-  
-  return ret;
-}
-#endif
 
 csConditionID ConditionIDMapper::GetConditionID (const CondOperation& operation,
                                                  bool get_new)
@@ -1589,6 +1506,95 @@ void csConditionEvaluator::CompactMemory ()
   Variables::Values::CompactAllocator();
   SliceAllocator::CompactAllocator();
   MyBitArrayAllocatorTemp::CompactAllocators();
+}
+
+csString csConditionEvaluator::GetConditionString (csConditionID id)
+{
+  if (id == csCondAlwaysFalse)
+    return "AlwaysFalse";
+  else if (id == csCondAlwaysTrue)
+    return "AlwaysTrue";
+  else
+    return OperationToString (conditions.GetCondition (id));
+}
+
+csString csConditionEvaluator::OperationToString (const CondOperation& operation)
+{
+  const char* opStr;
+  switch (operation.operation)
+  {
+    case opAnd:       opStr = "&&"; break;
+    case opOr:        opStr = "||"; break;
+    case opEqual:     opStr = "=="; break;
+    case opNEqual:    opStr = "!="; break;
+    case opLesser:    opStr = "<"; break;
+    case opLesserEq:  opStr = "<="; break;
+    default:
+      return (const char*)0;
+  }
+  
+  csString ret;
+  ret.Format ("%s %s %s",
+    OperandToString (operation.left).GetData(),
+    opStr,
+    OperandToString (operation.right).GetData());
+  return ret;
+}
+
+csString csConditionEvaluator::OperandToString (const CondOperand& operand)
+{
+  csString ret;
+  
+  switch (operand.type)
+  {
+    case operandOperation:
+      ret.Format ("(%s)", GetConditionString (operand.operation).GetData());
+      break;
+    case operandFloat:
+      ret.Format ("%g", operand.floatVal);
+      break;
+    case operandInt:
+      ret.Format ("%d", operand.intVal);
+      break;
+    case operandBoolean:
+      ret = operand.boolVal ? "true" : "false";
+      break;
+    case operandSV:
+    case operandSVValueInt:
+    case operandSVValueFloat:
+    case operandSVValueX:
+    case operandSVValueY:
+    case operandSVValueZ:
+    case operandSVValueW:
+    case operandSVValueTexture:
+    case operandSVValueBuffer:
+      {
+        ret.Format ("vars.\"%s\"", strings->Request (
+          operand.svLocation.svName));
+        if (operand.svLocation.indices != 0)
+        {
+          size_t n = *operand.svLocation.indices;
+          for (size_t i = 0; i < n; i++)
+            ret.AppendFmt ("[%zu]", operand.svLocation.indices[i+1]);
+        }
+	switch (operand.type)
+	{
+	  case operandSVValueInt:      ret.Append (".int"); break;
+	  case operandSVValueFloat:    ret.Append (".float"); break;
+	  case operandSVValueX:        ret.Append (".x"); break;
+	  case operandSVValueY:        ret.Append (".y"); break;
+	  case operandSVValueZ:        ret.Append (".z"); break;
+	  case operandSVValueW:        ret.Append (".w"); break;
+	  case operandSVValueTexture:  ret.Append (".texture"); break;
+	  case operandSVValueBuffer:   ret.Append (".buffer"); break;
+	  default: break;
+        }
+        break;
+      }
+    default: break;
+  }
+  
+  return ret;
 }
 
 //---------------------------------------------------------------------------
