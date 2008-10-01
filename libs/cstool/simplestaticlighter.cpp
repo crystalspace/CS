@@ -50,7 +50,8 @@ void SimpleStaticLighter::ConstantColor (iMeshWrapper* mesh, const csColor4& col
   for (i = 0 ; i < count ; i++)
     colors[i] = color;
   rbuf->CopyInto (colors, count);
-  fact_state->AddRenderBuffer ("static color", rbuf);
+  csRef<iGeneralMeshState> state = scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ());
+  state->AddRenderBuffer ("static color", rbuf);
 }
 
 void SimpleStaticLighter::CalculateLighting (iMeshWrapper* mesh,
@@ -189,7 +190,8 @@ void SimpleStaticLighter::ShineLight (iMeshWrapper* mesh, iLight* light,
   CalculateLighting (mesh, fact_state, light, shadow_type, colors, true);
 
   rbuf->CopyInto (colors, count);
-  fact_state->AddRenderBuffer ("static color", rbuf);
+  csRef<iGeneralMeshState> state = scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ());
+  state->AddRenderBuffer ("static color", rbuf);
 }
 
 void SimpleStaticLighter::ShineLights (iMeshWrapper* mesh, iEngine* engine, int maxlights,
@@ -232,7 +234,8 @@ void SimpleStaticLighter::ShineLights (iMeshWrapper* mesh, iEngine* engine, int 
   }
 
   rbuf->CopyInto (colors, count);
-  fact_state->AddRenderBuffer ("static color", rbuf);
+  csRef<iGeneralMeshState> state = scfQueryInterface<iGeneralMeshState> (mesh->GetMeshObject ());
+  state->AddRenderBuffer ("static color", rbuf);
 }
 
 void SimpleStaticLighter::ShineLights (iSector* sector, iEngine* engine, int maxlights,
