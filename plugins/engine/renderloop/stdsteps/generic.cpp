@@ -263,9 +263,9 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
       pusher.meshContext = meshContext;
       pusher.mesh = mesh;
 
-      csShaderVariableStack stack (_stack);
+      csShaderVariableStack stack;
       stack.Setup (shaderManager->GetShaderVariableStack ());
-      stack.Clear();
+      stack.Copy (_stack);
       shaderManager->PushVariables (stack);
       shadervars.Top ().PushVariables (stack);
       pusher.PushVariables (stack);
@@ -330,6 +330,7 @@ void csGenericRenderStep::ToggleStepSettings (iGraphics3D* g3d,
 class ShaderTicketHelper
 {
 private:
+  csShaderVariableStack origStack;
   csShaderVariableStack stack;
   const csArray<csShaderVariableContext>& shadervars;
   size_t shadervars_idx;
@@ -349,11 +350,12 @@ private:
 public:
   ShaderTicketHelper (csShaderVariableStack& _stack,
     const csArray<csShaderVariableContext>& sv,
-    size_t sv_idx) : stack (_stack), shadervars (sv), shadervars_idx (sv_idx),
+    size_t sv_idx) : origStack (_stack), stack (_stack), shadervars (sv),
+      shadervars_idx (sv_idx),
       lastMat (0), lastShader (0), lastMeshContext (0), lastSectorContext (0)
   {
-    stack.MakeOwnArray();
     Reset ();
+    stack.MakeOwnArray();
   }
 
   size_t GetTicket (const ShaderVarPusher& pusher)
@@ -364,7 +366,7 @@ public:
       || (pusher.sectorContext != lastSectorContext))
     {
       Reset ();
-      stack.Clear();
+      stack.Copy (origStack);
       lastMat = pusher.mesh->material;
       lastShader = pusher.shader;
       lastMeshContext = pusher.meshContext;
