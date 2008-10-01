@@ -451,6 +451,7 @@ private:
     csRef<iRenderBuffer> buffer;
   };
   csArray<BufferChange> changeQueue;
+  uint activeVertexAttribs;
   void ApplyBufferChanges();
   //@}
 

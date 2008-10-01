@@ -83,7 +83,8 @@ SCF_IMPLEMENT_FACTORY (csGLGraphics3D)
 csGLGraphics3D::csGLGraphics3D (iBase *parent) : 
   scfImplementationType (this, parent), isOpen (false), 
   explicitProjection (false), needMatrixUpdate (true), imageUnits (0),
-  wantToSwap (false), delayClearFlags (0), currentAttachments (0)
+  activeVertexAttribs (0), wantToSwap (false), delayClearFlags (0),
+  currentAttachments (0)
 {
   verbose = false;
   frustum_valid = false;
@@ -1561,7 +1562,11 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
     {
       for (i = 0; i < CS_VATTRIB_GENERIC_LAST-CS_VATTRIB_GENERIC_FIRST+1; i++)
       {
-        ext->glDisableVertexAttribArrayARB (i);
+	if (activeVertexAttribs & (1 << i))
+	{
+	  ext->glDisableVertexAttribArrayARB (i);
+	  activeVertexAttribs &= ~(1 << i);
+	}
       }
     }
 
@@ -1640,7 +1645,6 @@ void csGLGraphics3D::DeactivateTexture (int unit)
   if (ext->CS_GL_ARB_multitexture)
   {
     statecache->SetCurrentTU (unit);
-    statecache->ActivateTU (csGLStateCache::activateTexEnable);
   }
   else if (unit != 0) return;
 
@@ -1974,7 +1978,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 	}
 	if (bugplug)
 	{
-	  bugplug->AddCounter ("Triangle Count", num_tri);
+	  bugplug->AddCounter ("Triangle Count", (int)num_tri);
 	  bugplug->AddCounter ("Mesh Count", 1);
 	}
       }
@@ -1983,7 +1987,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 	if (bugplug)
 	{
 	  size_t num_tri = (mymesh->indexend-mymesh->indexstart)/primNum_divider - primNum_sub;
-	  bugplug->AddCounter ("Triangle Count", num_tri);
+	  bugplug->AddCounter ("Triangle Count", (int)num_tri);
 	  bugplug->AddCounter ("Mesh Count", 1);
 	}
 	glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
@@ -2413,7 +2417,11 @@ void csGLGraphics3D::ApplyBufferChanges()
 	  {
 	    GLuint index = att - CS_VATTRIB_GENERIC_FIRST;
 	    statecache->ApplyBufferBinding (csGLStateCacheContext::boElementArray);
-	    ext->glEnableVertexAttribArrayARB (index);
+	    if (!(activeVertexAttribs & (1 << index)))
+	    {
+	      ext->glEnableVertexAttribArrayARB (index);
+	      activeVertexAttribs |= (1 << index);
+	    }
 	    ext->glVertexAttribPointerARB(index, buffer->GetComponentCount (),
               compType, normalized, (GLsizei)buffer->GetStride (), data);
 	  }
@@ -2459,6 +2467,7 @@ void csGLGraphics3D::ApplyBufferChanges()
 	  {
 	    GLuint index = att - CS_VATTRIB_GENERIC_FIRST;
 	    ext->glDisableVertexAttribArrayARB (index);
+	    activeVertexAttribs &= ~(1 << index);
 	  }
         }
         else
