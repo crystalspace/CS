@@ -265,6 +265,7 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
 
       csShaderVariableStack stack (_stack);
       stack.Setup (shaderManager->GetShaderVariableStack ());
+      stack.Clear();
       shaderManager->PushVariables (stack);
       shadervars.Top ().PushVariables (stack);
       pusher.PushVariables (stack);
@@ -363,6 +364,7 @@ public:
       || (pusher.sectorContext != lastSectorContext))
     {
       Reset ();
+      stack.Clear();
       lastMat = pusher.mesh->material;
       lastShader = pusher.shader;
       lastMeshContext = pusher.meshContext;
