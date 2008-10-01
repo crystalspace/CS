@@ -40,6 +40,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "glshader_cgfp.h"
 #include "glshader_cg.h"
 #include "profile_limits.h"
+#include "stringstore.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -51,7 +52,8 @@ CS_LEAKGUARD_IMPLEMENT (csGLShader_CG);
 SCF_IMPLEMENT_FACTORY (csGLShader_CG)
 
 csGLShader_CG::csGLShader_CG (iBase* parent) : 
-  scfImplementationType (this, parent), compiledProgram (0)
+  scfImplementationType (this, parent), compiledProgram (0),
+  progCacheLookups (0), progCacheHits (0), stringStore (0)
 {
   context = cgCreateContext ();
   cgSetErrorHandler (ErrorHandlerObjReg, 0);
@@ -66,6 +68,9 @@ csGLShader_CG::~csGLShader_CG()
   cs_free (dumpDir);
   cgDestroyContext (context);
   cgSetErrorHandler (ErrorHandlerObjReg, object_reg);
+  delete stringStore;
+  csPrintf ("prog cache lookups: %u  prog cache hits: %u  rate: %f\n",
+    progCacheLookups, progCacheHits, (float (progCacheHits) / float (progCacheLookups)));
 }
 
 void csGLShader_CG::ErrorHandler (CGcontext context, CGerror error, 
@@ -774,6 +779,24 @@ bool csGLShader_CG::Initialize(iObjectRegistry* reg)
   binDocSys = csLoadPluginCheck<iDocumentSystem> (plugin_mgr,
     "crystalspace.documentsystem.binary");
   xmlDocSys.AttachNew (new csTinyDocumentSystem);
+  
+  csRef<iShaderManager> shaderMgr =
+    csQueryRegistry<iShaderManager> (object_reg);
+  if (!shaderMgr.IsValid())
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING,
+      "Could not obtain iShaderManager");
+  }
+  else
+  {
+    iHierarchicalCache* shaderCache = shaderMgr->GetShaderCache();
+    if (shaderCache != 0)
+    {
+      csRef<iHierarchicalCache> progCache =
+        shaderCache->GetRootedCache ("/CgProgCache");
+      stringStore = new StringStore (progCache);
+    }
+  }
   
   return true;
 }

@@ -37,6 +37,7 @@ struct csGLExtensionManager;
 
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
+class StringStore;
 
 class csGLShader_CG :
   public scfImplementationExt1<csGLShader_CG, 
@@ -79,6 +80,8 @@ public:
   
   csRef<iDocumentSystem> binDocSys;
   csRef<iDocumentSystem> xmlDocSys;
+  
+  StringStore* stringStore;
 
   csGLShader_CG (iBase *parent);
   virtual ~csGLShader_CG ();
