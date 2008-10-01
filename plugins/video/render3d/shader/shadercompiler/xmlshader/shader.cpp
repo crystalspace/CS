@@ -27,6 +27,7 @@
 #include "ivideo/rendermesh.h"
 
 #include "csplugincommon/shader/shadercachehelper.h"
+#include "csutil/base64.h"
 #include "csutil/csendian.h"
 #include "csutil/cspmeter.h"
 #include "csutil/documenthelper.h"
@@ -504,7 +505,6 @@ void csXMLShader::Load (iDocumentNode* source, bool noCacheRead)
       csMD5::Digest sourceDigest (csMD5::Encode (CS::DocSystem::FlattenNode (source)));
       cacheID_base = sourceDigest.HexString();
     }
-    if (cacheTag.IsEmpty()) cacheTag = cacheID_base;
     cacheID_header.Format ("%sXH", cacheID_base.GetData());
     cacheScope_tech.Format ("%sXT", cacheID_base.GetData());
   }
@@ -564,6 +564,18 @@ void csXMLShader::Load (iDocumentNode* source, bool noCacheRead)
 	  cacheFile, hashStream))
 	cacheFile.Invalidate();
     }
+  }
+
+  if (cacheTag.IsEmpty())
+  {
+    csRef<iDataBuffer> hashStream = hasher.GetHashStream ();
+    /* @@@ Actually, the cache tag wouldn't have to be that large.
+       In theory, anything would work as long as (a) it changes when the
+       shader or some file it uses changes (b) the tag is reasonably
+       unique (also over multiple program runs).
+       E.g. a UUID, recomputed when the shader is 'touched',
+       could do as well. */
+    cacheTag = CS::Utility::EncodeBase64 (hashStream);
   }
   
   ConditionsReader* condReader = 0;
