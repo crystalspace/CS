@@ -140,8 +140,7 @@ protected:
     const char* programStr, ProgramType type,
     const ProfileLimitsPair& customLimits, 
     uint flags = loadLoadToGL | loadApplyVmap | loadFlagUnusedV2FForInit);
-  csString GetPreprocessedProgram (const char* programStr,
-    const ArgumentArray& args);
+  csString GetPreprocessedProgram (const char* programStr);
   void DoDebugDump ();
   void WriteAdditionalDumpInfo (const char* description, const char* content);
   const char* GetProgramType()

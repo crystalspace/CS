@@ -228,11 +228,11 @@ void csGLShader_CG::GetProfileCompilerArgs (const char* type,
                                             CGprofile profile,
                                             const ProfileLimitsPair& limitsPair,
                                             HardwareVendor vendor,
-                                            bool noConfigArgs,
+                                            uint argsMask,
                                             ArgumentArray& args)
 {
   csString profileStr (cgGetProfileString (profile));
-  if (!noConfigArgs)
+  if (!(argsMask & argsNoConfig))
   {
     csConfigAccess cfg (object_reg);
     csString key ("Video.OpenGL.Shader.Cg.CompilerOptions");
@@ -243,52 +243,59 @@ void csGLShader_CG::GetProfileCompilerArgs (const char* type,
     SplitArgsString (cfg->GetStr (key), args);
   }
 
-  profileStr.Upcase();
-  csString profileMacroArg ("-DPROFILE_");
-  profileMacroArg += profileStr;
-  args.Push (profileMacroArg);
-  
-  profileStr = cgGetProfileString (limitsPair.vp.profile);
-  if (!profileStr.IsEmpty())
+  if (!(argsMask & argsNoProfileLimits))
   {
     profileStr.Upcase();
-    profileMacroArg = "-DVERT_PROFILE_";
+    csString profileMacroArg ("-DPROFILE_");
     profileMacroArg += profileStr;
     args.Push (profileMacroArg);
-  }
-  
-  profileStr = cgGetProfileString (limitsPair.fp.profile);
-  if (!profileStr.IsEmpty())
-  {
-    profileStr.Upcase();
-    profileMacroArg = "-DFRAG_PROFILE_";
-    profileMacroArg += profileStr;
-    args.Push (profileMacroArg);
-  }
-  
-  int profileLevel = GetProfileLevel (profile);
-  if (profileLevel != 0)
-  {
-    profileMacroArg.Format ("-DFRAGMENT_PROGRAM_LEVEL=0x%x", profileLevel);
-    args.Push (profileMacroArg);
-  }
-  csString typeStr (type);
-  typeStr.Upcase();
-  typeStr = "-DPROGRAM_TYPE_" + typeStr;
-  args.Push (typeStr);
-  
-  if (vendor != Invalid)
-  {
-    csString vendorStr;
-    switch (vendor)
+    
+    profileStr = cgGetProfileString (limitsPair.vp.profile);
+    if (!profileStr.IsEmpty())
     {
-      case ATI:     vendorStr = "ATI"; break;
-      case NVIDIA:  vendorStr = "NVIDIA"; break;
-      case Other:   vendorStr = "OTHER"; break;
-      default:      CS_ASSERT(false);
+      profileStr.Upcase();
+      profileMacroArg = "-DVERT_PROFILE_";
+      profileMacroArg += profileStr;
+      args.Push (profileMacroArg);
     }
-    vendorStr = "-DVENDOR_" + vendorStr;
-    args.Push (vendorStr);
+    
+    profileStr = cgGetProfileString (limitsPair.fp.profile);
+    if (!profileStr.IsEmpty())
+    {
+      profileStr.Upcase();
+      profileMacroArg = "-DFRAG_PROFILE_";
+      profileMacroArg += profileStr;
+      args.Push (profileMacroArg);
+    }
+    
+    int profileLevel = GetProfileLevel (profile);
+    if (profileLevel != 0)
+    {
+      profileMacroArg.Format ("-DFRAGMENT_PROGRAM_LEVEL=0x%x", profileLevel);
+      args.Push (profileMacroArg);
+    }
+  
+    if (vendor != Invalid)
+    {
+      csString vendorStr;
+      switch (vendor)
+      {
+	case ATI:     vendorStr = "ATI"; break;
+	case NVIDIA:  vendorStr = "NVIDIA"; break;
+	case Other:   vendorStr = "OTHER"; break;
+	default:      CS_ASSERT(false);
+      }
+      vendorStr = "-DVENDOR_" + vendorStr;
+      args.Push (vendorStr);
+    }
+  }
+  
+  if (!(argsMask & argsNoProgramType))
+  {
+    csString typeStr (type);
+    typeStr.Upcase();
+    typeStr = "-DPROGRAM_TYPE_" + typeStr;
+    args.Push (typeStr);
   }
 }
 

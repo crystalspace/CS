@@ -84,14 +84,8 @@ bool csShaderGLCGVP::Precache (const ProfileLimitsPair& limits,
     csString programStr;
     programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
     
-    ArgumentArray args;
-    shaderPlug->GetProfileCompilerArgs (GetProgramType(), 
-      limits.vp.profile, limits, limits.vp.vendor, true, args);
-    for (size_t i = 0; i < compilerArgs.GetSize(); i++) 
-      args.Push (compilerArgs[i]);
-  
     // Get preprocessed result of pristine source
-    sourcePreproc = GetPreprocessedProgram (programStr, args);
+    sourcePreproc = GetPreprocessedProgram (programStr);
     if (!sourcePreproc.IsEmpty ())
     {
       // Check preprocessed source against cache

@@ -109,10 +109,17 @@ public:
   /** @} */
 
   void SplitArgsString (const char* str, ArgumentArray& args);
+  enum
+  {
+    argsAll = 0,
+    argsNoConfig = 1,
+    argsNoProfileLimits = 2,
+    argsNoProgramType = 4,
+    argsNone = argsNoConfig | argsNoProfileLimits | argsNoProgramType
+  };
   void GetProfileCompilerArgs (const char* type, CGprofile profile, 
     const ProfileLimitsPair& limitsPair,
-    HardwareVendor vendor,
-    bool noConfigArgs, ArgumentArray& args);
+    HardwareVendor vendor, uint argsMask, ArgumentArray& args);
   static bool ProfileNeedsRouting (CGprofile profile)
   {
     return (profile >= CG_PROFILE_PS_1_1) && (profile <= CG_PROFILE_PS_1_3);

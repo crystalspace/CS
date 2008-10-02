@@ -106,7 +106,8 @@ bool csShaderGLCGFP::Compile (iHierarchicalCache* cache, csRef<iString>* tag)
     shaderPlug->GetProfileCompilerArgs ("fragment",
       shaderPlug->currentLimits.fp.profile, 
       shaderPlug->currentLimits,
-      CS::PluginCommon::ShaderProgramPluginGL::Other, false, args);
+      CS::PluginCommon::ShaderProgramPluginGL::Other,
+      csGLShader_CG::argsAll, args);
     for (i = 0; i < compilerArgs.GetSize(); i++) 
       args.Push (compilerArgs[i]);
     args.Push (0);
@@ -191,14 +192,8 @@ bool csShaderGLCGFP::Precache (const ProfileLimitsPair& limits,
     csString programStr;
     programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
     
-    ArgumentArray args;
-    shaderPlug->GetProfileCompilerArgs (GetProgramType(), 
-      limits.fp.profile, limits, limits.fp.vendor, true, args);
-    for (size_t i = 0; i < compilerArgs.GetSize(); i++) 
-      args.Push (compilerArgs[i]);
-  
     // Get preprocessed result of pristine source
-    sourcePreproc = GetPreprocessedProgram (programStr, args);
+    sourcePreproc = GetPreprocessedProgram (programStr);
     if (!sourcePreproc.IsEmpty ())
     {
       // Check preprocessed source against cache

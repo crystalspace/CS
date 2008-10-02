@@ -39,19 +39,6 @@
 #include "profile_limits.h"
 #include "stringstore.h"
 
-// Enabling this preprocesses Cg sources with boost::Wave
-//#define PREPROCESS_WITH_WAVE
-
-#ifdef PREPROCESS_WITH_WAVE
-#include <string>
-#include <vector>
-
-#include <boost/wave.hpp>
-
-#include <boost/wave/cpplexer/cpp_lex_token.hpp>
-#include <boost/wave/cpplexer/cpp_lex_iterator.hpp>
-#endif
-
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
 
@@ -304,7 +291,9 @@ bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
   ArgumentArray args;
   shaderPlug->GetProfileCompilerArgs (GetProgramType(), profile, 
     customLimitsPair,
-    vendor, (flags & loadIgnoreConfigProgramOpts) != 0, args);
+    vendor,
+    (flags & loadIgnoreConfigProgramOpts) ? csGLShader_CG::argsNoConfig
+      : csGLShader_CG::argsAll, args);
   for (i = 0; i < compilerArgs.GetSize(); i++) 
     args.Push (compilerArgs[i]);
   /* Work around Cg 2.0 bug: it emits "OPTION ARB_position_invariant;"
@@ -440,8 +429,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
   return result;
 }
 
-csString csShaderGLCGCommon::GetPreprocessedProgram (const char* programStr, 
-  const ArgumentArray& args)
+csString csShaderGLCGCommon::GetPreprocessedProgram (const char* programStr)
 {
   csString augmentedProgramStr;
   const csSet<csString>* unusedParams = &this->unusedParams;
@@ -462,111 +450,7 @@ csString csShaderGLCGCommon::GetPreprocessedProgram (const char* programStr,
   
   augmentedProgramStr.Append (programStr);
   
-  csString result;
-  
-  csStringArray macros;
-  for (size_t i = 0; i < args.GetSize(); i++)
-  {
-    const char* s = args[i];
-    if (s && (strlen (s) > 2) && (s[0] == '-') && (s[1] == 'D'))
-      macros.Push (s + 2);
-  }
-  
-#ifdef PREPROCESS_WITH_WAVE
-  /* This code is mostly stolen^Wadapted from the boost::Wave quickstart
-      example */
-
-  // current file position is saved for exception handling
-  boost::wave::util::file_position_type current_position;
-
-  try
-  {
-      //  The template boost::wave::cpplexer::lex_token<> is the token type to be 
-      //  used by the Wave library.
-      typedef boost::wave::cpplexer::lex_token<> token_type;
-    
-      //  The template boost::wave::cpplexer::lex_iterator<> is the lexer type to
-      //  be used by the Wave library.
-      typedef boost::wave::cpplexer::lex_iterator<token_type> lex_iterator_type;
-	
-      //  This is the resulting context type to use. The first template parameter
-      //  should match the iterator type to be used during construction of the
-      //  corresponding context object (see below).
-      typedef boost::wave::context<std::string::iterator, lex_iterator_type>
-	  context_type;
-	  
-      // To work around Wave warning w/ missing newline at EOF
-      std::string instring (augmentedProgramStr);
-      instring.append ("\n");
-
-      // The preprocessor iterator shouldn't be constructed directly. It is 
-      // to be generated through a wave::context<> object. This wave:context<> 
-      // object is to be used additionally to initialize and define different 
-      // parameters of the actual preprocessing.
-      //
-      // The preprocessing of the input stream is done on the fly behind the 
-      // scenes during iteration over the context_type::iterator_type stream.
-      context_type ctx (instring.begin(), instring.end(), "*buffer*");
-      
-      for (size_t i = 0; i < macros.GetSize(); i++)
-      {
-        ctx.add_macro_definition (macros[i], false);
-      }
-
-      // analyze the input file
-      context_type::iterator_type first = ctx.begin();
-      context_type::iterator_type last = ctx.end();
-	
-      while (first != last)
-      {
-	  current_position = (*first).get_position();
-	  result << (*first).get_value().c_str();
-	  ++first;
-      }
-  }
-  catch (boost::wave::cpp_exception const& e)
-  {
-      // some preprocessing error
-      std::cerr 
-	  << e.file_name() << "(" << e.line_no() << "): "
-	  << e.description() << std::endl;
-      if (e.get_severity() >= boost::wave::util::severity_error)
-	result = (char*)0;
-  }
-  catch (std::exception const& e)
-  {
-      // use last recognized token to retrieve the error position
-      std::cerr 
-	  << current_position.get_file() 
-	  << "(" << current_position.get_line() << "): "
-	  << "exception caught: " << e.what()
-	  << std::endl;
-      result = (char*)0;
-  }
-  catch (...)
-  {
-      // use last recognized token to retrieve the error position
-      std::cerr 
-	  << current_position.get_file() 
-	  << "(" << current_position.get_line() << "): "
-	  << "unexpected exception caught." << std::endl;
-      result = (char*)0;
-  }
-#endif
-  
-  if (result.IsEmpty())
-  {
-    /* "Fake" preprocessing: since the output is only used for hashing,
-       return a result that is different for each source/macros combination. */
-       
-    for (size_t i = 0; i < macros.GetSize(); i++)
-    {
-      result.AppendFmt ("// @@MACRO %s\n", macros[i]);
-    }
-    result += augmentedProgramStr;
-  }
-  
-  return result;
+  return augmentedProgramStr;
 }
 
 void csShaderGLCGCommon::DoDebugDump ()
@@ -1367,15 +1251,9 @@ bool csShaderGLCGCommon::WriteToCompileCache (const ProfileLimits& limits,
   CS_ASSERT(objectCodeCachePath.IsEmpty());
   csString source;
 
-  ArgumentArray args;
-  shaderPlug->GetProfileCompilerArgs (GetProgramType(),
-    limits.profile, limitsPair, limits.vendor, false, args);
-  for (size_t i = 0; i < compilerArgs.GetSize(); i++) 
-    args.Push (compilerArgs[i]);
-
   // Get preprocessed result of pristine source
   source = GetPreprocessedProgram (
-    cgGetProgramString (program, CG_PROGRAM_SOURCE), args);
+    cgGetProgramString (program, CG_PROGRAM_SOURCE));
       
   iHierarchicalCache* rootCache = cache->GetTopCache();
   csRef<iHierarchicalCache> progCache = rootCache->GetRootedCache ("/CgProgCache");
