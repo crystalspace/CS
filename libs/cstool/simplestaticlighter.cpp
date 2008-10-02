@@ -121,7 +121,7 @@ void SimpleStaticLighter::CalculateLighting (iMeshWrapper* mesh,
       {
         dist = sqrt (dist);
         float bright = light->GetBrightnessAtDistance (dist);
-        bright *= normals[i] * relpos;
+        bright *= (normals[i] * relpos) / relpos.Norm ();
         if (bright > SMALL_EPSILON)
         {
 	  if (init)
@@ -154,7 +154,7 @@ void SimpleStaticLighter::CalculateLighting (iMeshWrapper* mesh,
       {
         dist = sqrt (dist);
         float bright = light->GetBrightnessAtDistance (dist);
-        bright *= normals[i] * relpos;
+        bright *= (normals[i] * relpos) / relpos.Norm ();
         if (bright > SMALL_EPSILON)
         {
 	  csSectorHitBeamResult rc = light_sector->HitBeamPortals (center, vworld);
