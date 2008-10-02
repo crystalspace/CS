@@ -1338,8 +1338,8 @@ bool VfsNode::FindFile (const char *Suffix, PathString& RealPath,
     {
       // rpath is a directory
       size_t rl = strlen (rpath);
-	  RealPath.Replace (rpath, rl);
-	  RealPath.Append (Suffix);
+      RealPath.Replace (rpath, rl);
+      RealPath.Append (Suffix);
       Archive = 0;
       if (access (RealPath, F_OK) == 0)
         return true;
@@ -1387,6 +1387,13 @@ bool VfsNode::Delete (const char *Suffix)
     return a->DeleteFile (fname);
   else
   {
+    // Remove trailing path separator. (At least needed on Win32.)
+    if ((fname[fname.Length()-1] == CS_PATH_SEPARATOR)
+	|| (fname[fname.Length()-1] == '/'))
+    {
+      fname.Truncate (fname.Length()-1);
+    }
+
     struct stat s;
     if (stat (fname, &s) != 0) return false;
     if (s.st_mode & _S_IFDIR)
