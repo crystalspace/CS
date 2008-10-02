@@ -10314,6 +10314,7 @@ sub DESTROY {
 *Clear = *cspacec::csShaderVariableStack_Clear;
 *MergeFront = *cspacec::csShaderVariableStack_MergeFront;
 *MergeBack = *cspacec::csShaderVariableStack_MergeBack;
+*Copy = *cspacec::csShaderVariableStack_Copy;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

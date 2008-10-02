@@ -636,6 +636,7 @@ class csShaderVariableStack(object):
     def Clear(*args): return _ivideo.csShaderVariableStack_Clear(*args)
     def MergeFront(*args): return _ivideo.csShaderVariableStack_MergeFront(*args)
     def MergeBack(*args): return _ivideo.csShaderVariableStack_MergeBack(*args)
+    def Copy(*args): return _ivideo.csShaderVariableStack_Copy(*args)
 csShaderVariableStack_swigregister = _ivideo.csShaderVariableStack_swigregister
 csShaderVariableStack_swigregister(csShaderVariableStack)
 
