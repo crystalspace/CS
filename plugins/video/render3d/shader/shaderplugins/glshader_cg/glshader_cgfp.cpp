@@ -165,11 +165,11 @@ bool csShaderGLCGFP::Compile (iHierarchicalCache* cache, csRef<iString>* tag)
     bool ret = TryCompile (loadLoadToGL | loadApplyVmap,
       shaderPlug->currentLimits);
   
-    csString limitsStr (shaderPlug->currentLimits.ToString());
+    csString tagStr (csString("CG") + shaderPlug->currentLimits.ToString());
     WriteToCache (cache, shaderPlug->currentLimits.fp, 
-      shaderPlug->currentLimits, limitsStr);
+      shaderPlug->currentLimits, tagStr);
     cacheKeepNodes.DeleteAll ();
-    tag->AttachNew (new scfString (limitsStr));
+    tag->AttachNew (new scfString (tagStr));
     return ret;
   }
 
@@ -220,7 +220,7 @@ bool csShaderGLCGFP::Precache (const ProfileLimitsPair& limits,
       WriteToCompileCache (sourcePreproc, limits.fp, cache);
   }
 
-  WriteToCache (cache, limits.fp, limits, tag);
+  WriteToCache (cache, limits.fp, limits, csString("CG") + tag);
   
   return ret;
 }
