@@ -72,7 +72,7 @@ public:
   virtual void GetUsedShaderVars (csBitArray& bits) const;
   
   virtual iShaderProgram::CacheLoadResult LoadFromCache (
-    iHierarchicalCache* cache, iDocumentNode* programNode,
+    iHierarchicalCache* cache, iBase* previous, iDocumentNode* programNode,
     csRef<iString>* failReason = 0, csRef<iString>* = 0)
   { return iShaderProgram::loadFail; }
   

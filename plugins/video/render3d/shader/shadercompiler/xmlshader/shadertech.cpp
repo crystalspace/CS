@@ -229,12 +229,22 @@ struct PassActionPrecache
     iHierarchicalCache* cacheTo, iDocumentNode* node,
     csXMLShaderTech::LoadHelpers hlp) : passIndex (passIndex),
     tech (tech), variant (variant), cacheTo (cacheTo), node (node),
-    hlp (hlp) {}
+    hlp (hlp)
+  {
+    if (cacheTo)
+    {
+      fpCache = cacheTo->GetRootedCache (csString().Format (
+        "/pass%dfp", passIndex));
+      vpCache = cacheTo->GetRootedCache (csString().Format (
+        "/pass%dvp", passIndex));
+      vprCache = cacheTo->GetRootedCache (csString().Format (
+        "/pass%dvpr", passIndex));
+    }
+  }
   
   bool Perform (const csStringArray& tags,
     CachedPlugins& cachedPlugins)
   {
-    csRef<iShaderProgram> program;
     // load fp
     /* This is done before VP loading b/c the VP could query for TU bindings
     * which are currently handled by the FP. */
@@ -244,86 +254,105 @@ struct PassActionPrecache
     csRef<iBase> fp;
     if (cachedPlugins.fp.programNode)
     {
-      csRef<iHierarchicalCache> fpCache;
-      if (cacheTo) fpCache = cacheTo->GetRootedCache (csString().Format (
-	"/pass%dfp", passIndex));
-      if (!tech->PrecacheProgram (0, cachedPlugins.fp.programNode, variant,
-          fpCache, cachedPlugins.fp, fp, tags[0]))
+      csRef<iBase>* cacheP = fpTagCache.GetElementPointer (tags[0]);
+      if (!cacheP)
       {
-	if (tech->do_verbose && setFailReason)
+	if (!tech->PrecacheProgram (0, cachedPlugins.fp.programNode, variant,
+	    fpCache, cachedPlugins.fp, fp, tags[0]))
 	{
-	  tech->SetFailReason ("fragment program failed to precache");
-	  setFailReason = false;
+	  if (tech->do_verbose && setFailReason)
+	  {
+	    tech->SetFailReason ("fragment program failed to precache");
+	    setFailReason = false;
+	  }
+	  result = false;
 	}
-	result = false;
+	fpTagCache.PutUnique (tags[0], fp);
       }
+      else
+	fp = *cacheP;
     }
   
     csRef<iBase> vp;
     //load vp
     if (cachedPlugins.vp.programNode)
     {
-      csRef<iHierarchicalCache> vpCache;
-      if (cacheTo) vpCache = cacheTo->GetRootedCache (csString().Format (
-	"/pass%dvp", passIndex));
-      if (!tech->PrecacheProgram (fp, cachedPlugins.vp.programNode, variant,
-          vpCache, cachedPlugins.vp, vp, tags[1]))
+      csString pcachekey;
+      pcachekey.Format ("%s_%s", tags[0], tags[1]);
+      csRef<iBase>* cacheP = vpTagCache.GetElementPointer (pcachekey);
+      if (!cacheP)
       {
-	if (tech->do_verbose && setFailReason)
+	if (!tech->PrecacheProgram (fp, cachedPlugins.vp.programNode, variant,
+	    vpCache, cachedPlugins.vp, vp, tags[1]))
 	{
-	  tech->SetFailReason ("vertex program failed to precache");
-	  setFailReason = false;
+	  if (tech->do_verbose && setFailReason)
+	  {
+	    tech->SetFailReason ("vertex program failed to precache");
+	    setFailReason = false;
+	  }
+	  result = false;
 	}
-	result = false;
+	vpTagCache.PutUnique (pcachekey, vp);
       }
+      else
+	vp = *cacheP;
     }
   
     csRef<iBase> vpr;
     //load vproc
     if (cachedPlugins.vproc.programNode)
     {
-      csRef<iHierarchicalCache> vprCache;
-      if (cacheTo) vprCache = cacheTo->GetRootedCache (csString().Format (
-	"/pass%dvpr", passIndex));
-      if (!tech->PrecacheProgram (vp, cachedPlugins.vproc.programNode, variant,
-          vprCache, cachedPlugins.vproc, vpr, tags[2]))
+      csString pcachekey;
+      pcachekey.Format ("%s_%s_%s", tags[0], tags[1], tags[2]);
+      csRef<iBase>* cacheP = vprTagCache.GetElementPointer (pcachekey);
+      if (!cacheP)
       {
-	if (tech->do_verbose && setFailReason)
+	if (!tech->PrecacheProgram (vp, cachedPlugins.vproc.programNode, variant,
+	    vprCache, cachedPlugins.vproc, vpr, tags[2]))
 	{
-	  tech->SetFailReason ("vertex preprocessor failed to precache");
-	  setFailReason = false;
+	  if (tech->do_verbose && setFailReason)
+	  {
+	    tech->SetFailReason ("vertex preprocessor failed to precache");
+	    setFailReason = false;
+	  }
+	  result = false;
 	}
-	result = false;
+	vprTagCache.PutUnique (pcachekey, vpr);
       }
+      else
+	vpr = *cacheP;
     }
-  
-    csRef<iShaderDestinationResolver> resolveFP;
-    if (fp) resolveFP = scfQueryInterface<iShaderDestinationResolver> (fp);
-    csRef<iShaderDestinationResolver> resolveVP;
-    if (vp) resolveVP = scfQueryInterface<iShaderDestinationResolver> (vp);
-    
-    csXMLShaderTech::ShaderPassPerTag passPerTag;
-    
-    //if we got this far, load buffermappings
-    if (result && !tech->ParseBuffers (passPerTag, passIndex,
-      node, hlp, resolveFP, resolveVP)) result = false;
-  
-    //get texturemappings
-    if (result && !tech->ParseTextures (passPerTag, node, hlp, resolveFP))
-      result = false;
-    
+
     if (result)
     {
-      csMemFile perTagFile;
-      tech->WritePassPerTag (passPerTag, &perTagFile);
-      cacheTo->CacheData (perTagFile.GetData(), perTagFile.GetSize(),
-	csString().Format ("/pass%ddata/%s_%s_%s", passIndex,
-	tags[0] ? tags[0] : "",
-	tags[1] ? tags[1] : "",
-	tags[2] ? tags[2] : ""));
-    }
+      csRef<iShaderDestinationResolver> resolveFP;
+      if (fp) resolveFP = scfQueryInterface<iShaderDestinationResolver> (fp);
+      csRef<iShaderDestinationResolver> resolveVP;
+      if (vp) resolveVP = scfQueryInterface<iShaderDestinationResolver> (vp);
+      
+      csXMLShaderTech::ShaderPassPerTag passPerTag;
+      
+      //if we got this far, load buffermappings
+      if (result && !tech->ParseBuffers (passPerTag, passIndex,
+	node, hlp, resolveFP, resolveVP)) result = false;
     
-    oneComboWorked |= result;
+      //get texturemappings
+      if (result && !tech->ParseTextures (passPerTag, node, hlp, resolveFP))
+	result = false;
+      
+      if (result)
+      {
+	csMemFile perTagFile;
+	tech->WritePassPerTag (passPerTag, &perTagFile);
+	cacheTo->CacheData (perTagFile.GetData(), perTagFile.GetSize(),
+	  csString().Format ("/pass%ddata/%s_%s_%s", passIndex,
+	  tags[0] ? tags[0] : "",
+	  tags[1] ? tags[1] : "",
+	  tags[2] ? tags[2] : ""));
+      }
+      
+      oneComboWorked |= result;
+    }
   
     return false;
   }
@@ -335,6 +364,14 @@ private:
   size_t variant;
   iHierarchicalCache* cacheTo;
   iDocumentNode* node;
+
+  csRef<iHierarchicalCache> fpCache;
+  csRef<iHierarchicalCache> vpCache;
+  csRef<iHierarchicalCache> vprCache;
+
+  csHash<csRef<iBase>, csString> fpTagCache;
+  csHash<csRef<iBase>, csString> vpTagCache;
+  csHash<csRef<iBase>, csString> vprTagCache;
   
   csXMLShaderTech::LoadHelpers hlp;
 };
@@ -1160,7 +1197,7 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadProgramFromCache (
   csRef<iString> progTag;
   csRef<iString> failReason;
   iShaderProgram::CacheLoadResult loadRes = prog->LoadFromCache (cache, 
-    cacheInfo.programNode, &failReason, &progTag);
+    previous, cacheInfo.programNode, &failReason, &progTag);
   if (loadRes == iShaderProgram::loadFail)
   {
     if (parent->compiler->do_verbose)

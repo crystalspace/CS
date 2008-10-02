@@ -638,7 +638,7 @@ csPtr<iStringArray> csGLShader_CG::QueryPrecacheTags (const char* type)
   scfStringArray* tags = new scfStringArray;
   for (size_t i = 0; i < precacheLimits.GetSize(); i++)
   {
-    tags->Push (precacheLimits[i].ToString());
+    tags->Push (csString("CG") + precacheLimits[i].ToString());
   }
   return csPtr<iStringArray> (tags);
 }
@@ -654,7 +654,11 @@ bool csGLShader_CG::Precache (const char* type, const char* tag,
     previous));
   csRef<iShaderDestinationResolver> resolve (
     scfQueryInterfaceSafe<iShaderDestinationResolver> (previous));
-    
+  
+  if ((tag == 0) || (tag[0] != 'C') || (tag[1] != 'G'))
+    return false;
+  tag += 2;
+
   ProfileLimitsPair limits;
   if (!limits.FromString (tag))
     return false;
@@ -678,6 +682,7 @@ bool csGLShader_CG::Precache (const char* type, const char* tag,
         (iShaderProgramCG*)prevCG);
       ProfileLimitsPair prevLimits = prevFP->cacheLimits;
       if (limits != prevLimits) return false;
+      if (!prevFP->IsValid()) return false;
     }
     /* Precache for 'tag' */
     if (!prog->Load (resolve, node)) return false;
@@ -686,7 +691,7 @@ bool csGLShader_CG::Precache (const char* type, const char* tag,
   else
     return false;
 
-  if (outObj && result) *outObj = prog;
+  if (outObj) *outObj = prog;
   return result;
 
 }
@@ -699,68 +704,6 @@ bool csGLShader_CG::Precache (csShaderGLCGCommon* prog,
   bool result = false;
   result = prog->Precache (limits, tag, cacheTo);
   return result;
-}
-  
-csPtr<iString> csGLShader_CG::SelectPrecacheTag (const char* type, 
-                                                 iBase* previous,
-                                                 iHierarchicalCache* cacheDir)
-{
-  // @@@ TODO: Prolly good idea: check file magic
-  scfString* result = 0;
-  if (previous != 0)
-  {
-    csRef<iShaderProgramCG> prevCG (scfQueryInterfaceSafe<iShaderProgramCG> (
-      previous));
-    if (!prevCG.IsValid()) return 0;
-    
-    csShaderGLCGFP* prevFP = static_cast<csShaderGLCGFP*> (
-      (iShaderProgramCG*)prevCG);
-        
-    result = new scfString (prevFP->cacheLimits.ToString());
-  }
-  else
-  {
-    ProfileLimitsArray candidates;
-    csRef<iStringArray> availableTags = cacheDir->GetSubItems ("/");
-    for (size_t i = 0; i < availableTags->GetSize(); i++)
-    {
-      csString tag (availableTags->Get (i));
-      if (tag[tag.Length()-1] == '/')\
-	tag.Truncate (tag.Length()-1);
-	
-      ProfileLimitsPair cacheLimits;
-      if (!cacheLimits.FromString (tag)) continue;
-      
-      candidates.Push (cacheLimits);
-    }
-    candidates.Sort ();
-    
-    for (size_t i = candidates.GetSize(); i-- > 0;)
-    {
-      const ProfileLimitsPair& candidate = candidates[i];
-      
-      // TODO: compare vendors
-      bool supportVP = 
-	(ProfileNeedsRouting (candidate.vp.profile)
-	  && IsRoutedProfileSupported (candidate.vp.profile))
-	|| cgGLIsProfileSupported (candidate.vp.profile);
-      bool supportFP = 
-	(ProfileNeedsRouting (candidate.fp.profile)
-	  && IsRoutedProfileSupported (candidate.fp.profile))
-	|| cgGLIsProfileSupported (candidate.fp.profile);
-	
-      if (!supportVP || !supportFP) continue;
-      
-      ProfileLimitsPair currentLimits (candidate);
-      currentLimits.GetCurrentLimits (ext);
-      
-      if (candidate > currentLimits) continue;
-    
-      result = new scfString (candidate.ToString());
-      break;
-    }
-  }
-  return csPtr<iString> (result);
 }
 
 ////////////////////////////////////////////////////////////////////

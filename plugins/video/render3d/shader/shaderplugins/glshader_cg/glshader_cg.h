@@ -80,7 +80,7 @@ public:
   
   csRef<iDocumentSystem> binDocSys;
   csRef<iDocumentSystem> xmlDocSys;
-  
+
   StringStore* stringStore;
 
   csGLShader_CG (iBase *parent);
@@ -99,8 +99,6 @@ public:
     iBase* previous, 
     iDocumentNode* node, iHierarchicalCache* cacheTo,
     csRef<iBase>* outObj = 0);
-  csPtr<iString> SelectPrecacheTag (const char* type, iBase* previous,
-    iHierarchicalCache* cacheDir);
 
   bool Open();
   /** @} */

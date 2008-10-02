@@ -27,12 +27,14 @@
 #include "csutil/documenthelper.h"
 #include "csutil/memfile.h"
 #include "csutil/scfstr.h"
+#include "csutil/scfstringarray.h"
 #include "csutil/stringreader.h"
 #include "iutil/hiercache.h"
 #include "iutil/stringarray.h"
 #include "ivaria/reporter.h"
 
 #include "glshader_cg.h"
+#include "glshader_cgfp.h"
 #include "glshader_cgcommon.h"
 #include "profile_limits.h"
 #include "stringstore.h"
@@ -59,7 +61,6 @@ csShaderGLCGCommon::csShaderGLCGCommon (csGLShader_CG* shaderPlug,
 					ProgramType type) :
   scfImplementationType (this, shaderPlug->object_reg), programType (type)
 {
-  validProgram = true;
   this->shaderPlug = shaderPlug;
   program = 0;
 
@@ -188,7 +189,7 @@ void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
       for (size_t c = 0; c < clips.GetSize(); c++)
       {
 	if (clipFlags & (1 << c))
-          shaderPlug->clipPlanes.EnableClipPlane (c);
+          shaderPlug->clipPlanes.EnableClipPlane ((uint)c);
       }
     }
     else if ((programProfile == CG_PROFILE_ARBVP1)
@@ -303,7 +304,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
   ArgumentArray args;
   shaderPlug->GetProfileCompilerArgs (GetProgramType(), profile, 
     customLimitsPair,
-    vendor, flags & loadIgnoreConfigProgramOpts, args);
+    vendor, (flags & loadIgnoreConfigProgramOpts) != 0, args);
   for (i = 0; i < compilerArgs.GetSize(); i++) 
     args.Push (compilerArgs[i]);
   /* Work around Cg 2.0 bug: it emits "OPTION ARB_position_invariant;"
@@ -577,7 +578,7 @@ void csShaderGLCGCommon::DoDebugDump ()
     CG_PROGRAM_PROFILE) << "\n";
   output << "CG entry point: " << (entrypoint ? entrypoint : "main") << 
     "\n";
-  output << "CG program valid: " << validProgram << "\n";
+  output << "CG program valid: " << IsValid() << "\n";
   output << "\n";
 
   output << "Variable mappings:\n";
@@ -792,19 +793,34 @@ struct CachedShaderWrapper
   csRef<iFile> cacheFile;
   ProfileLimitsPair limits;
   
-  CachedShaderWrapper (iFile* file) : cacheFile (file) {}
-    
   bool operator< (const CachedShaderWrapper& other) const
   { return limits < other.limits; }
 };
 
 iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
-  iHierarchicalCache* cache, iDocumentNode* node,
+  iHierarchicalCache* cache, iBase* previous, iDocumentNode* node,
   csRef<iString>* failReason, csRef<iString>* tag)
 {
   if (!cache) return iShaderProgram::loadFail;
 
-  csRef<iStringArray> allCachedPrograms = cache->GetSubItems ("/");
+  csRef<iShaderProgramCG> prevCG (scfQueryInterfaceSafe<iShaderProgramCG> (
+    previous));
+
+  csRef<iStringArray> allCachedPrograms;
+  if ((programType == progVP) && prevCG.IsValid())
+  {
+    csShaderGLCGFP* prevFP = static_cast<csShaderGLCGFP*> (
+      (iShaderProgramCG*)prevCG);
+    csString tagStr ("CG");
+    tagStr += prevFP->cacheLimits.ToString();
+    if (failReason) failReason->AttachNew (
+      new scfString ("paired cached programs not found"));
+    allCachedPrograms.AttachNew (new scfStringArray);
+    allCachedPrograms->Push (tagStr);
+  }
+  else
+    allCachedPrograms = cache->GetSubItems ("/");
+
   if (!allCachedPrograms.IsValid())
   {
     if (failReason) failReason->AttachNew (
@@ -820,13 +836,21 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
   csArray<CachedShaderWrapper> cachedProgWrappers;
   for (size_t i = 0; i < allCachedPrograms->GetSize(); i++)
   {
+    const char* tag = allCachedPrograms->Get (i);
+    if ((tag[0] != 'C') || (tag[1] != 'G')) continue;
+
+    CachedShaderWrapper wrapper;
+    if (!wrapper.limits.FromString (tag+2)) continue;
+    wrapper.name = tag;
+
     csString cachePath ("/");
-    cachePath.Append (allCachedPrograms->Get (i));
+    cachePath.Append (tag);
     csRef<iDataBuffer> cacheBuf = cache->ReadCache (cachePath);
     if (!cacheBuf.IsValid()) continue;
     
     csRef<iFile> cacheFile;
     cacheFile.AttachNew (new csMemFile (cacheBuf, true));
+    wrapper.cacheFile = cacheFile;
   
     uint32 diskMagic;
     if (cacheFile->Read ((char*)&diskMagic, sizeof (diskMagic))
@@ -834,11 +858,6 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     if (csLittleEndian::UInt32 (diskMagic) != cacheFileMagic)
       continue;
       
-    CachedShaderWrapper wrapper (cacheFile);
-    
-    wrapper.name = allCachedPrograms->Get (i);
-    if (!wrapper.limits.FromString (wrapper.name)) continue;
-    
     csMD5::Digest diskHash;
     if (cacheFile->Read ((char*)&diskHash, sizeof (diskHash))
 	!= sizeof (diskHash)) continue;
@@ -849,7 +868,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
   
   if (cachedProgWrappers.GetSize() == 0)
   {
-    if (failReason) failReason->AttachNew (
+    if (failReason && !*failReason) failReason->AttachNew (
       new scfString ("all cached programs failed to read"));
     return iShaderProgram::loadFail;
   }
@@ -1041,7 +1060,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     if (shaderPlug->debugDump)
       DoDebugDump();
       
-    tag->AttachNew (new scfString (wrapper.limits.ToString()));
+    tag->AttachNew (new scfString (wrapper.name));
     
     return iShaderProgram::loadSuccessShaderValid;
   }
