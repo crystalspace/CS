@@ -51,7 +51,7 @@ static uint query_proc_cpuinfo()
       {
 	key = line.Slice(0, pos);
 	key.Trim();
-	if (key.CompareNoCase("processor"))
+	if (key.CompareNoCase("processor") || key.CompareNoCase("hw.ncpu"))
 	{
 	  val = line.Slice(pos + 1);
 	  val.Trim();
