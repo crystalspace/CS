@@ -188,7 +188,7 @@ THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadTexture, const char* fname,
 
   csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
   LoadImageTC (itr, fname, Format, do_verbose);
-  csRef<iImage> Image = scfQueryInterface<iImage>(itr->GetResultRefPtr());
+  csRef<iImage> Image = scfQueryInterfaceSafe<iImage>(itr->GetResultRefPtr());
   if (!Image)
   {
     ReportWarning ("crystalspace.maploader.parse.texture",
