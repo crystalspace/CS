@@ -29,10 +29,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   {
     csString filename;
     
-    mutable csRef<iBase> loader;
+    mutable csRef<iThreadedLoader> loader;
     mutable csRef<iImage> proxiedImage;
   public:
-    ProxyImage (iBase* loader, const char* fn, iObjectRegistry* object_reg) : 
+    ProxyImage (iThreadedLoader* loader, const char* fn, iObjectRegistry* object_reg) : 
       scfImplementationType (this), filename (fn),
       loader (loader), object_reg(object_reg) {}
       

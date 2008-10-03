@@ -348,8 +348,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       filename = absolutePath->GetData();
 
       ProxyTexture proxTex;
-      csRef<iLoader> loader = scfQueryInterface<iLoader>(this);
-      proxTex.img.AttachNew (new ProxyImage (loader, filename, object_reg));
+      proxTex.img.AttachNew (new ProxyImage (this, filename, object_reg));
       proxTex.always_animate = always_animate;
 
       tex = Engine->GetTextureList()->CreateTexture (proxTex.img);
@@ -574,7 +573,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
     }
 
-    iTextureWrapper* texh = 0;
+    csRef<iTextureWrapper> texh = 0;
     bool col_set = false;
     csColor col;
 
@@ -603,11 +602,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           texh = ldr_context->FindTexture (txtname);
           if (!texh)
           {
-            ReportError (
-              "crystalspace.maploader.parse.material",
-              "Cannot find texture '%s' for material `%s'", txtname, matname);
-            RemoveLoadingMaterial(matname);
-            return false;
+            csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
+            LoadTextureTC(itr, txtname, txtname, CS_TEXTURE_3D, 0, true, false, true,
+              ldr_context->GetCollection(), ldr_context->GetKeepFlags(), true);
+            texh = scfQueryInterface<iTextureWrapper>(itr->GetResultRefPtr());
+            if(!texh)
+            {
+              ReportError (
+                "crystalspace.maploader.parse.material",
+                "Cannot find texture '%s' for material `%s'", txtname, matname);
+              RemoveLoadingMaterial(matname);
+              return false;
+            }
           }
         }
         break;
