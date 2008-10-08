@@ -102,6 +102,14 @@
 #define _WIN32
 #endif
 
+// Assume that GLX is used on Unix platforms (except OS/X)
+#if defined(CS_PLATFORM_UNIX) && !defined(CS_PLATFORM_MACOSX)
+#define CS_OPENGL_GLX
+/* NOTE: CS_GLEXTMANAGER_USE_GLX must be defined to get the Init*
+   functions for GLX extensions. (This was done to avoid pulling X
+   headers into every component using the GL extension manager.) */
+#endif
+
 /*
  * End system-specific stuff.
  **********************************************************************/
@@ -2371,6 +2379,28 @@ typedef GLvoid (csAPIENTRY* csGLMULTTRANSPOSEMATRIXDARB) (GLdouble* m);
 typedef GLvoid (csAPIENTRY* csGLSAMPLECOVERAGEARB) (GLclampf value, GLboolean invert);
 
 /** @} */
+#ifdef CS_OPENGL_GLX
+/**\name GLX_ARB_multisample constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs//ARB_multisample.txt">http://www.opengl.org/registry/specs//ARB_multisample.txt</a>.
+ * @{ */
+#ifndef GLX_SAMPLE_BUFFERS_ARB
+#define GLX_SAMPLE_BUFFERS_ARB                                       100000
+#endif
+
+#ifndef GLX_SAMPLES_ARB
+#define GLX_SAMPLES_ARB                                              100001
+#endif
+
+
+/** @} */
+
+/**\name GLX_ARB_multisample functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs//ARB_multisample.txt">http://www.opengl.org/registry/specs//ARB_multisample.txt</a>.
+ * @{ */
+
+/** @} */
+#endif
+
 /**\name GL_ARB_texture_env_add constants
  * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/texture_env_add.txt">http://www.opengl.org/registry/specs/ARB/texture_env_add.txt</a>.
  * @{ */
@@ -11083,6 +11113,391 @@ typedef GLvoid (csAPIENTRY* csGLBLENDEQUATIONSEPARATEEXT) (GLenum modeRGB, GLenu
  * @{ */
 
 /** @} */
+/**\name GL_NV_gpu_program4 constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/NV/gpu_program4.txt">http://www.opengl.org/registry/specs/NV/gpu_program4.txt</a>.
+ * @{ */
+#ifndef GL_MIN_PROGRAM_TEXEL_OFFSET_EXT
+#define GL_MIN_PROGRAM_TEXEL_OFFSET_EXT                              0x8904
+#endif
+
+#ifndef GL_MAX_PROGRAM_TEXEL_OFFSET_EXT
+#define GL_MAX_PROGRAM_TEXEL_OFFSET_EXT                              0x8905
+#endif
+
+#ifndef GL_PROGRAM_ATTRIB_COMPONENTS_NV
+#define GL_PROGRAM_ATTRIB_COMPONENTS_NV                              0x8906
+#endif
+
+#ifndef GL_PROGRAM_RESULT_COMPONENTS_NV
+#define GL_PROGRAM_RESULT_COMPONENTS_NV                              0x8907
+#endif
+
+#ifndef GL_MAX_PROGRAM_ATTRIB_COMPONENTS_NV
+#define GL_MAX_PROGRAM_ATTRIB_COMPONENTS_NV                          0x8908
+#endif
+
+#ifndef GL_MAX_PROGRAM_RESULT_COMPONENTS_NV
+#define GL_MAX_PROGRAM_RESULT_COMPONENTS_NV                          0x8909
+#endif
+
+#ifndef GL_MAX_PROGRAM_GENERIC_ATTRIBS_NV
+#define GL_MAX_PROGRAM_GENERIC_ATTRIBS_NV                            0x89A5
+#endif
+
+#ifndef GL_MAX_PROGRAM_GENERIC_RESULTS_NV
+#define GL_MAX_PROGRAM_GENERIC_RESULTS_NV                            0x89A6
+#endif
+
+
+/** @} */
+
+/**\name GL_NV_gpu_program4 functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/NV/gpu_program4.txt">http://www.opengl.org/registry/specs/NV/gpu_program4.txt</a>.
+ * @{ */
+typedef GLvoid (csAPIENTRY* csGLPROGRAMLOCALPARAMETERI4INV) (GLenum target, GLuint index, GLint x, GLint y, GLint z, GLint w);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMLOCALPARAMETERI4IVNV) (GLenum target, GLuint index, const GLint* params);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMLOCALPARAMETERSI4IVNV) (GLenum target, GLuint index, GLsizei count, const GLint* params);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMLOCALPARAMETERI4UINV) (GLenum target, GLuint index, GLuint x, GLuint y, GLuint z, GLuint w);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMLOCALPARAMETERI4UIVNV) (GLenum target, GLuint index, const GLuint* params);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMLOCALPARAMETERSI4UIVNV) (GLenum target, GLuint index, GLsizei count, const GLuint* params);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMENVPARAMETERI4INV) (GLenum target, GLuint index, GLint x, GLint y, GLint z, GLint w);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMENVPARAMETERI4IVNV) (GLenum target, GLuint index, const GLint* params);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMENVPARAMETERSI4IVNV) (GLenum target, GLuint index, GLsizei count, const GLint* params);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMENVPARAMETERI4UINV) (GLenum target, GLuint index, GLuint x, GLuint y, GLuint z, GLuint w);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMENVPARAMETERI4UIVNV) (GLenum target, GLuint index, const GLuint* params);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMENVPARAMETERSI4UIVNV) (GLenum target, GLuint index, GLsizei count, const GLuint* params);
+typedef GLvoid (csAPIENTRY* csGLGETPROGRAMLOCALPARAMETERIIVNV) (GLenum target, GLuint index, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLGETPROGRAMLOCALPARAMETERIUIVNV) (GLenum target, GLuint index, GLuint* params);
+typedef GLvoid (csAPIENTRY* csGLGETPROGRAMENVPARAMETERIIVNV) (GLenum target, GLuint index, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLGETPROGRAMENVPARAMETERIUIVNV) (GLenum target, GLuint index, GLuint* params);
+
+/** @} */
+/**\name GL_EXT_gpu_program_parameters constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/EXT/gpu_program_parameters.txt">http://www.opengl.org/registry/specs/EXT/gpu_program_parameters.txt</a>.
+ * @{ */
+
+/** @} */
+
+/**\name GL_EXT_gpu_program_parameters functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/EXT/gpu_program_parameters.txt">http://www.opengl.org/registry/specs/EXT/gpu_program_parameters.txt</a>.
+ * @{ */
+typedef GLvoid (csAPIENTRY* csGLPROGRAMLOCALPARAMETERS4FVEXT) (GLenum target, GLuint index, GLsizei count, const GLfloat* params);
+typedef GLvoid (csAPIENTRY* csGLPROGRAMENVPARAMETERS4FVEXT) (GLenum target, GLuint index, GLsizei count, const GLfloat* params);
+
+/** @} */
+/**\name GL_ARB_color_buffer_float constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/color_buffer_float.txt">http://www.opengl.org/registry/specs/ARB/color_buffer_float.txt</a>.
+ * @{ */
+#ifndef GL_RGBA_FLOAT_MODE_ARB
+#define GL_RGBA_FLOAT_MODE_ARB                                       0x8820
+#endif
+
+#ifndef GL_CLAMP_VERTEX_COLOR_ARB
+#define GL_CLAMP_VERTEX_COLOR_ARB                                    0x891A
+#endif
+
+#ifndef GL_CLAMP_FRAGMENT_COLOR_ARB
+#define GL_CLAMP_FRAGMENT_COLOR_ARB                                  0x891B
+#endif
+
+#ifndef GL_CLAMP_READ_COLOR_ARB
+#define GL_CLAMP_READ_COLOR_ARB                                      0x891C
+#endif
+
+#ifndef GL_FIXED_ONLY_ARB
+#define GL_FIXED_ONLY_ARB                                            0x891D
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_color_buffer_float functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/color_buffer_float.txt">http://www.opengl.org/registry/specs/ARB/color_buffer_float.txt</a>.
+ * @{ */
+typedef GLvoid (csAPIENTRY* csGLCLAMPCOLORARB) (GLenum target, GLenum clamp);
+
+/** @} */
+/**\name GL_ARB_framebuffer_sRGB constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/framebuffer_sRGB.txt">http://www.opengl.org/registry/specs/ARB/framebuffer_sRGB.txt</a>.
+ * @{ */
+#ifndef GL_FRAMEBUFFER_SRGB
+#define GL_FRAMEBUFFER_SRGB                                          0x8DB9
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_framebuffer_sRGB functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/framebuffer_sRGB.txt">http://www.opengl.org/registry/specs/ARB/framebuffer_sRGB.txt</a>.
+ * @{ */
+
+/** @} */
+#ifdef CS_OPENGL_GLX
+/**\name GLX_ARB_framebuffer_sRGB constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs//ARB_framebuffer_sRGB.txt">http://www.opengl.org/registry/specs//ARB_framebuffer_sRGB.txt</a>.
+ * @{ */
+#ifndef GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB
+#define GLX_FRAMEBUFFER_SRGB_CAPABLE_ARB                             0x20B2
+#endif
+
+
+/** @} */
+
+/**\name GLX_ARB_framebuffer_sRGB functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs//ARB_framebuffer_sRGB.txt">http://www.opengl.org/registry/specs//ARB_framebuffer_sRGB.txt</a>.
+ * @{ */
+
+/** @} */
+#endif
+
+#ifdef _WIN32
+/**\name WGL_ARB_framebuffer_sRGB constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/wgl_framebuffer_sRGB.txt">http://www.opengl.org/registry/specs/ARB/wgl_framebuffer_sRGB.txt</a>.
+ * @{ */
+#ifndef WGL_FRAMEBUFFER_SRGB_CAPABLE_ARB
+#define WGL_FRAMEBUFFER_SRGB_CAPABLE_ARB                             0x20A9
+#endif
+
+
+/** @} */
+
+/**\name WGL_ARB_framebuffer_sRGB functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/wgl_framebuffer_sRGB.txt">http://www.opengl.org/registry/specs/ARB/wgl_framebuffer_sRGB.txt</a>.
+ * @{ */
+
+/** @} */
+#endif
+
+/**\name GL_ARB_draw_instanced constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/draw_instanced.txt">http://www.opengl.org/registry/specs/ARB/draw_instanced.txt</a>.
+ * @{ */
+
+/** @} */
+
+/**\name GL_ARB_draw_instanced functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/draw_instanced.txt">http://www.opengl.org/registry/specs/ARB/draw_instanced.txt</a>.
+ * @{ */
+typedef GLvoid (csAPIENTRY* csGLDRAWARRAYSINSTANCEDARB) (GLenum mode, GLint first, GLsizei count, GLsizei primcount);
+typedef GLvoid (csAPIENTRY* csGLDRAWELEMENTSINSTANCEDARB) (GLenum mode, GLsizei count, GLenum type, const GLvoid* indices, GLsizei primcount);
+
+/** @} */
+/**\name GL_ARB_depth_buffer_float constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/depth_buffer_float.txt">http://www.opengl.org/registry/specs/ARB/depth_buffer_float.txt</a>.
+ * @{ */
+#ifndef GL_DEPTH_COMPONENT32F
+#define GL_DEPTH_COMPONENT32F                                        0x8CAC
+#endif
+
+#ifndef GL_DEPTH32F_STENCIL8
+#define GL_DEPTH32F_STENCIL8                                         0x8CAD
+#endif
+
+#ifndef GL_FLOAT_32_UNSIGNED_INT_24_8_REV
+#define GL_FLOAT_32_UNSIGNED_INT_24_8_REV                            0x8DAD
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_depth_buffer_float functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/depth_buffer_float.txt">http://www.opengl.org/registry/specs/ARB/depth_buffer_float.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ARB_instanced_arrays constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/instanced_arrays.txt">http://www.opengl.org/registry/specs/ARB/instanced_arrays.txt</a>.
+ * @{ */
+#ifndef GL_VERTEX_ATTRIB_ARRAY_DIVISOR_ARB
+#define GL_VERTEX_ATTRIB_ARRAY_DIVISOR_ARB                           0x88FE
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_instanced_arrays functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/instanced_arrays.txt">http://www.opengl.org/registry/specs/ARB/instanced_arrays.txt</a>.
+ * @{ */
+typedef GLvoid (csAPIENTRY* csGLVERTEXATTRIBDIVISORARB) (GLuint index, GLuint divisor);
+
+/** @} */
+/**\name GL_ARB_half_float_vertex constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/half_float_vertex.txt">http://www.opengl.org/registry/specs/ARB/half_float_vertex.txt</a>.
+ * @{ */
+#ifndef GL_HALF_FLOAT
+#define GL_HALF_FLOAT                                                0x140B
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_half_float_vertex functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/half_float_vertex.txt">http://www.opengl.org/registry/specs/ARB/half_float_vertex.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ARB_map_buffer_range constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/map_buffer_range.txt">http://www.opengl.org/registry/specs/ARB/map_buffer_range.txt</a>.
+ * @{ */
+#ifndef GL_MAP_READ_BIT
+#define GL_MAP_READ_BIT                                              0x0001
+#endif
+
+#ifndef GL_MAP_WRITE_BIT
+#define GL_MAP_WRITE_BIT                                             0x0002
+#endif
+
+#ifndef GL_MAP_INVALIDATE_RANGE_BIT
+#define GL_MAP_INVALIDATE_RANGE_BIT                                  0x0004
+#endif
+
+#ifndef GL_MAP_INVALIDATE_BUFFER_BIT
+#define GL_MAP_INVALIDATE_BUFFER_BIT                                 0x0008
+#endif
+
+#ifndef GL_MAP_FLUSH_EXPLICIT_BIT
+#define GL_MAP_FLUSH_EXPLICIT_BIT                                    0x0010
+#endif
+
+#ifndef GL_MAP_UNSYNCHRONIZED_BIT
+#define GL_MAP_UNSYNCHRONIZED_BIT                                    0x0020
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_map_buffer_range functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/map_buffer_range.txt">http://www.opengl.org/registry/specs/ARB/map_buffer_range.txt</a>.
+ * @{ */
+typedef GLvoid* (csAPIENTRY* csGLMAPBUFFERRANGE) (GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access);
+typedef GLvoid (csAPIENTRY* csGLFLUSHMAPPEDBUFFERRANGE) (GLenum target, GLintptr offset, GLsizeiptr length);
+
+/** @} */
+/**\name GL_ARB_texture_compression_rgtc constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/texture_compression_rgtc.txt">http://www.opengl.org/registry/specs/ARB/texture_compression_rgtc.txt</a>.
+ * @{ */
+#ifndef GL_COMPRESSED_RED_RGTC1
+#define GL_COMPRESSED_RED_RGTC1                                      0x8DBB
+#endif
+
+#ifndef GL_COMPRESSED_SIGNED_RED_RGTC1
+#define GL_COMPRESSED_SIGNED_RED_RGTC1                               0x8DBC
+#endif
+
+#ifndef GL_COMPRESSED_RG_RGTC2
+#define GL_COMPRESSED_RG_RGTC2                                       0x8DBD
+#endif
+
+#ifndef GL_COMPRESSED_SIGNED_RG_RGTC2
+#define GL_COMPRESSED_SIGNED_RG_RGTC2                                0x8DBE
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_texture_compression_rgtc functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/texture_compression_rgtc.txt">http://www.opengl.org/registry/specs/ARB/texture_compression_rgtc.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ARB_texture_rg constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/texture_rg.txt">http://www.opengl.org/registry/specs/ARB/texture_rg.txt</a>.
+ * @{ */
+#ifndef GL_R8
+#define GL_R8                                                        0x8229
+#endif
+
+#ifndef GL_R16
+#define GL_R16                                                       0x822A
+#endif
+
+#ifndef GL_RG8
+#define GL_RG8                                                       0x822B
+#endif
+
+#ifndef GL_RG16
+#define GL_RG16                                                      0x822C
+#endif
+
+#ifndef GL_R16F
+#define GL_R16F                                                      0x822D
+#endif
+
+#ifndef GL_R32F
+#define GL_R32F                                                      0x822E
+#endif
+
+#ifndef GL_RG16F
+#define GL_RG16F                                                     0x822F
+#endif
+
+#ifndef GL_RG32F
+#define GL_RG32F                                                     0x8230
+#endif
+
+#ifndef GL_R8I
+#define GL_R8I                                                       0x8231
+#endif
+
+#ifndef GL_R8UI
+#define GL_R8UI                                                      0x8232
+#endif
+
+#ifndef GL_R16I
+#define GL_R16I                                                      0x8233
+#endif
+
+#ifndef GL_R16UI
+#define GL_R16UI                                                     0x8234
+#endif
+
+#ifndef GL_R32I
+#define GL_R32I                                                      0x8235
+#endif
+
+#ifndef GL_R32UI
+#define GL_R32UI                                                     0x8236
+#endif
+
+#ifndef GL_RG8I
+#define GL_RG8I                                                      0x8237
+#endif
+
+#ifndef GL_RG8UI
+#define GL_RG8UI                                                     0x8238
+#endif
+
+#ifndef GL_RG16I
+#define GL_RG16I                                                     0x8239
+#endif
+
+#ifndef GL_RG16UI
+#define GL_RG16UI                                                    0x823A
+#endif
+
+#ifndef GL_RG32I
+#define GL_RG32I                                                     0x823B
+#endif
+
+#ifndef GL_RG32UI
+#define GL_RG32UI                                                    0x823C
+#endif
+
+#ifndef GL_RG
+#define GL_RG                                                        0x8227
+#endif
+
+#ifndef GL_RG_INTEGER
+#define GL_RG_INTEGER                                                0x8228
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_texture_rg functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/texture_rg.txt">http://www.opengl.org/registry/specs/ARB/texture_rg.txt</a>.
+ * @{ */
+
+/** @} */
 
 
 // end of definitions
@@ -12567,6 +12982,14 @@ public:
 
 
   /** @} */
+#ifdef CS_OPENGL_GLX
+  /**\name GLX_ARB_multisample functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs//ARB_multisample.txt">http://www.opengl.org/registry/specs//ARB_multisample.txt</a>.
+   * @{ */
+
+  /** @} */
+#endif // CS_OPENGL_GLX
+
   /**\name GL_ARB_texture_env_add functions
    * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/texture_env_add.txt">http://www.opengl.org/registry/specs/ARB/texture_env_add.txt</a>.
    * @{ */
@@ -16833,6 +17256,197 @@ public:
    * @{ */
 
   /** @} */
+  /**\name GL_NV_gpu_program4 functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/NV/gpu_program4.txt">http://www.opengl.org/registry/specs/NV/gpu_program4.txt</a>.
+   * @{ */
+  #ifndef GLPROGRAMLOCALPARAMETERI4INV_DECL
+  #define GLPROGRAMLOCALPARAMETERI4INV_DECL
+  csGLPROGRAMLOCALPARAMETERI4INV glProgramLocalParameterI4iNV;
+  #endif
+
+  #ifndef GLPROGRAMLOCALPARAMETERI4IVNV_DECL
+  #define GLPROGRAMLOCALPARAMETERI4IVNV_DECL
+  csGLPROGRAMLOCALPARAMETERI4IVNV glProgramLocalParameterI4ivNV;
+  #endif
+
+  #ifndef GLPROGRAMLOCALPARAMETERSI4IVNV_DECL
+  #define GLPROGRAMLOCALPARAMETERSI4IVNV_DECL
+  csGLPROGRAMLOCALPARAMETERSI4IVNV glProgramLocalParametersI4ivNV;
+  #endif
+
+  #ifndef GLPROGRAMLOCALPARAMETERI4UINV_DECL
+  #define GLPROGRAMLOCALPARAMETERI4UINV_DECL
+  csGLPROGRAMLOCALPARAMETERI4UINV glProgramLocalParameterI4uiNV;
+  #endif
+
+  #ifndef GLPROGRAMLOCALPARAMETERI4UIVNV_DECL
+  #define GLPROGRAMLOCALPARAMETERI4UIVNV_DECL
+  csGLPROGRAMLOCALPARAMETERI4UIVNV glProgramLocalParameterI4uivNV;
+  #endif
+
+  #ifndef GLPROGRAMLOCALPARAMETERSI4UIVNV_DECL
+  #define GLPROGRAMLOCALPARAMETERSI4UIVNV_DECL
+  csGLPROGRAMLOCALPARAMETERSI4UIVNV glProgramLocalParametersI4uivNV;
+  #endif
+
+  #ifndef GLPROGRAMENVPARAMETERI4INV_DECL
+  #define GLPROGRAMENVPARAMETERI4INV_DECL
+  csGLPROGRAMENVPARAMETERI4INV glProgramEnvParameterI4iNV;
+  #endif
+
+  #ifndef GLPROGRAMENVPARAMETERI4IVNV_DECL
+  #define GLPROGRAMENVPARAMETERI4IVNV_DECL
+  csGLPROGRAMENVPARAMETERI4IVNV glProgramEnvParameterI4ivNV;
+  #endif
+
+  #ifndef GLPROGRAMENVPARAMETERSI4IVNV_DECL
+  #define GLPROGRAMENVPARAMETERSI4IVNV_DECL
+  csGLPROGRAMENVPARAMETERSI4IVNV glProgramEnvParametersI4ivNV;
+  #endif
+
+  #ifndef GLPROGRAMENVPARAMETERI4UINV_DECL
+  #define GLPROGRAMENVPARAMETERI4UINV_DECL
+  csGLPROGRAMENVPARAMETERI4UINV glProgramEnvParameterI4uiNV;
+  #endif
+
+  #ifndef GLPROGRAMENVPARAMETERI4UIVNV_DECL
+  #define GLPROGRAMENVPARAMETERI4UIVNV_DECL
+  csGLPROGRAMENVPARAMETERI4UIVNV glProgramEnvParameterI4uivNV;
+  #endif
+
+  #ifndef GLPROGRAMENVPARAMETERSI4UIVNV_DECL
+  #define GLPROGRAMENVPARAMETERSI4UIVNV_DECL
+  csGLPROGRAMENVPARAMETERSI4UIVNV glProgramEnvParametersI4uivNV;
+  #endif
+
+  #ifndef GLGETPROGRAMLOCALPARAMETERIIVNV_DECL
+  #define GLGETPROGRAMLOCALPARAMETERIIVNV_DECL
+  csGLGETPROGRAMLOCALPARAMETERIIVNV glGetProgramLocalParameterIivNV;
+  #endif
+
+  #ifndef GLGETPROGRAMLOCALPARAMETERIUIVNV_DECL
+  #define GLGETPROGRAMLOCALPARAMETERIUIVNV_DECL
+  csGLGETPROGRAMLOCALPARAMETERIUIVNV glGetProgramLocalParameterIuivNV;
+  #endif
+
+  #ifndef GLGETPROGRAMENVPARAMETERIIVNV_DECL
+  #define GLGETPROGRAMENVPARAMETERIIVNV_DECL
+  csGLGETPROGRAMENVPARAMETERIIVNV glGetProgramEnvParameterIivNV;
+  #endif
+
+  #ifndef GLGETPROGRAMENVPARAMETERIUIVNV_DECL
+  #define GLGETPROGRAMENVPARAMETERIUIVNV_DECL
+  csGLGETPROGRAMENVPARAMETERIUIVNV glGetProgramEnvParameterIuivNV;
+  #endif
+
+
+  /** @} */
+  /**\name GL_EXT_gpu_program_parameters functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/EXT/gpu_program_parameters.txt">http://www.opengl.org/registry/specs/EXT/gpu_program_parameters.txt</a>.
+   * @{ */
+  #ifndef GLPROGRAMLOCALPARAMETERS4FVEXT_DECL
+  #define GLPROGRAMLOCALPARAMETERS4FVEXT_DECL
+  csGLPROGRAMLOCALPARAMETERS4FVEXT glProgramLocalParameters4fvEXT;
+  #endif
+
+  #ifndef GLPROGRAMENVPARAMETERS4FVEXT_DECL
+  #define GLPROGRAMENVPARAMETERS4FVEXT_DECL
+  csGLPROGRAMENVPARAMETERS4FVEXT glProgramEnvParameters4fvEXT;
+  #endif
+
+
+  /** @} */
+  /**\name GL_ARB_color_buffer_float functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/color_buffer_float.txt">http://www.opengl.org/registry/specs/ARB/color_buffer_float.txt</a>.
+   * @{ */
+  #ifndef GLCLAMPCOLORARB_DECL
+  #define GLCLAMPCOLORARB_DECL
+  csGLCLAMPCOLORARB glClampColorARB;
+  #endif
+
+
+  /** @} */
+  /**\name GL_ARB_framebuffer_sRGB functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/framebuffer_sRGB.txt">http://www.opengl.org/registry/specs/ARB/framebuffer_sRGB.txt</a>.
+   * @{ */
+
+  /** @} */
+#ifdef CS_OPENGL_GLX
+  /**\name GLX_ARB_framebuffer_sRGB functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs//ARB_framebuffer_sRGB.txt">http://www.opengl.org/registry/specs//ARB_framebuffer_sRGB.txt</a>.
+   * @{ */
+
+  /** @} */
+#endif // CS_OPENGL_GLX
+
+#ifdef _WIN32
+  /**\name WGL_ARB_framebuffer_sRGB functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/wgl_framebuffer_sRGB.txt">http://www.opengl.org/registry/specs/ARB/wgl_framebuffer_sRGB.txt</a>.
+   * @{ */
+
+  /** @} */
+#endif // _WIN32
+
+  /**\name GL_ARB_draw_instanced functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/draw_instanced.txt">http://www.opengl.org/registry/specs/ARB/draw_instanced.txt</a>.
+   * @{ */
+  #ifndef GLDRAWARRAYSINSTANCEDARB_DECL
+  #define GLDRAWARRAYSINSTANCEDARB_DECL
+  csGLDRAWARRAYSINSTANCEDARB glDrawArraysInstancedARB;
+  #endif
+
+  #ifndef GLDRAWELEMENTSINSTANCEDARB_DECL
+  #define GLDRAWELEMENTSINSTANCEDARB_DECL
+  csGLDRAWELEMENTSINSTANCEDARB glDrawElementsInstancedARB;
+  #endif
+
+
+  /** @} */
+  /**\name GL_ARB_depth_buffer_float functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/depth_buffer_float.txt">http://www.opengl.org/registry/specs/ARB/depth_buffer_float.txt</a>.
+   * @{ */
+
+  /** @} */
+  /**\name GL_ARB_instanced_arrays functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/instanced_arrays.txt">http://www.opengl.org/registry/specs/ARB/instanced_arrays.txt</a>.
+   * @{ */
+  #ifndef GLVERTEXATTRIBDIVISORARB_DECL
+  #define GLVERTEXATTRIBDIVISORARB_DECL
+  csGLVERTEXATTRIBDIVISORARB glVertexAttribDivisorARB;
+  #endif
+
+
+  /** @} */
+  /**\name GL_ARB_half_float_vertex functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/half_float_vertex.txt">http://www.opengl.org/registry/specs/ARB/half_float_vertex.txt</a>.
+   * @{ */
+
+  /** @} */
+  /**\name GL_ARB_map_buffer_range functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/map_buffer_range.txt">http://www.opengl.org/registry/specs/ARB/map_buffer_range.txt</a>.
+   * @{ */
+  #ifndef GLMAPBUFFERRANGE_DECL
+  #define GLMAPBUFFERRANGE_DECL
+  csGLMAPBUFFERRANGE glMapBufferRange;
+  #endif
+
+  #ifndef GLFLUSHMAPPEDBUFFERRANGE_DECL
+  #define GLFLUSHMAPPEDBUFFERRANGE_DECL
+  csGLFLUSHMAPPEDBUFFERRANGE glFlushMappedBufferRange;
+  #endif
+
+
+  /** @} */
+  /**\name GL_ARB_texture_compression_rgtc functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/texture_compression_rgtc.txt">http://www.opengl.org/registry/specs/ARB/texture_compression_rgtc.txt</a>.
+   * @{ */
+
+  /** @} */
+  /**\name GL_ARB_texture_rg functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/texture_rg.txt">http://www.opengl.org/registry/specs/ARB/texture_rg.txt</a>.
+   * @{ */
+
+  /** @} */
 
 // end of functions
 };
@@ -16865,6 +17479,9 @@ public:
   /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/multisample.txt">GL_ARB_multisample</a> extension was found. 
    * Set by csGLExtensionManager::InitGL_ARB_multisample(). */
   bool CS_GL_ARB_multisample;
+  /** Whether the <a href="http://www.opengl.org/registry/specs//ARB_multisample.txt">GLX_ARB_multisample</a> extension was found. 
+   * Set by csGLExtensionManager::InitGLX_ARB_multisample(). */
+  bool CS_GLX_ARB_multisample;
   /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/texture_env_add.txt">GL_ARB_texture_env_add</a> extension was found. 
    * Set by csGLExtensionManager::InitGL_ARB_texture_env_add(). */
   bool CS_GL_ARB_texture_env_add;
@@ -17354,6 +17971,45 @@ public:
   /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/half_float_pixel.txt">GL_ARB_half_float_pixel</a> extension was found. 
    * Set by csGLExtensionManager::InitGL_ARB_half_float_pixel(). */
   bool CS_GL_ARB_half_float_pixel;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/NV/gpu_program4.txt">GL_NV_gpu_program4</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_NV_gpu_program4(). */
+  bool CS_GL_NV_gpu_program4;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/EXT/gpu_program_parameters.txt">GL_EXT_gpu_program_parameters</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_gpu_program_parameters(). */
+  bool CS_GL_EXT_gpu_program_parameters;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/color_buffer_float.txt">GL_ARB_color_buffer_float</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_color_buffer_float(). */
+  bool CS_GL_ARB_color_buffer_float;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/framebuffer_sRGB.txt">GL_ARB_framebuffer_sRGB</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_framebuffer_sRGB(). */
+  bool CS_GL_ARB_framebuffer_sRGB;
+  /** Whether the <a href="http://www.opengl.org/registry/specs//ARB_framebuffer_sRGB.txt">GLX_ARB_framebuffer_sRGB</a> extension was found. 
+   * Set by csGLExtensionManager::InitGLX_ARB_framebuffer_sRGB(). */
+  bool CS_GLX_ARB_framebuffer_sRGB;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/wgl_framebuffer_sRGB.txt">WGL_ARB_framebuffer_sRGB</a> extension was found. 
+   * Set by csGLExtensionManager::InitWGL_ARB_framebuffer_sRGB(). */
+  bool CS_WGL_ARB_framebuffer_sRGB;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/draw_instanced.txt">GL_ARB_draw_instanced</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_draw_instanced(). */
+  bool CS_GL_ARB_draw_instanced;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/depth_buffer_float.txt">GL_ARB_depth_buffer_float</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_depth_buffer_float(). */
+  bool CS_GL_ARB_depth_buffer_float;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/instanced_arrays.txt">GL_ARB_instanced_arrays</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_instanced_arrays(). */
+  bool CS_GL_ARB_instanced_arrays;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/half_float_vertex.txt">GL_ARB_half_float_vertex</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_half_float_vertex(). */
+  bool CS_GL_ARB_half_float_vertex;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/map_buffer_range.txt">GL_ARB_map_buffer_range</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_map_buffer_range(). */
+  bool CS_GL_ARB_map_buffer_range;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/texture_compression_rgtc.txt">GL_ARB_texture_compression_rgtc</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_texture_compression_rgtc(). */
+  bool CS_GL_ARB_texture_compression_rgtc;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/texture_rg.txt">GL_ARB_texture_rg</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_texture_rg(). */
+  bool CS_GL_ARB_texture_rg;
 
 protected:
   bool tested_CS_GL_version_1_2;
@@ -17366,6 +18022,7 @@ protected:
   bool tested_CS_GL_ARB_multitexture;
   bool tested_CS_GL_ARB_transpose_matrix;
   bool tested_CS_GL_ARB_multisample;
+  bool tested_CS_GLX_ARB_multisample;
   bool tested_CS_GL_ARB_texture_env_add;
   bool tested_CS_WGL_ARB_extensions_string;
   bool tested_CS_WGL_ARB_buffer_region;
@@ -17529,6 +18186,19 @@ protected:
   bool tested_CS_GL_EXT_packed_depth_stencil;
   bool tested_CS_GL_ARB_texture_float;
   bool tested_CS_GL_ARB_half_float_pixel;
+  bool tested_CS_GL_NV_gpu_program4;
+  bool tested_CS_GL_EXT_gpu_program_parameters;
+  bool tested_CS_GL_ARB_color_buffer_float;
+  bool tested_CS_GL_ARB_framebuffer_sRGB;
+  bool tested_CS_GLX_ARB_framebuffer_sRGB;
+  bool tested_CS_WGL_ARB_framebuffer_sRGB;
+  bool tested_CS_GL_ARB_draw_instanced;
+  bool tested_CS_GL_ARB_depth_buffer_float;
+  bool tested_CS_GL_ARB_instanced_arrays;
+  bool tested_CS_GL_ARB_half_float_vertex;
+  bool tested_CS_GL_ARB_map_buffer_range;
+  bool tested_CS_GL_ARB_texture_compression_rgtc;
+  bool tested_CS_GL_ARB_texture_rg;
 
 };
 
@@ -17553,9 +18223,9 @@ private:
   const char* msgExtInitFail;
   const char* msgExtNotFound;
   const char* msgDependencyNotFound;
+
 #ifdef __WIN32__
   const char* extstrWGL;
-  
   void SetupWGLextStr (HDC hDC)
   {
     if (extstrWGL != 0) return;
@@ -17572,6 +18242,18 @@ private:
   }
 #endif
 
+#ifdef CS_OPENGL_GLX
+  const char* extstrGLX;
+#ifdef CS_GLEXTMANAGER_USE_GLX
+  void SetupGLXextStr (Display* glxDisplay, int glxScreen)
+  {
+    if (extstrGLX != 0) return;
+  
+    extstrGLX = glXQueryExtensionsString (glxDisplay, glxScreen);
+  }
+#endif
+#endif
+
   void Report (const char* msg, ...)
   {
     if (!doVerbose)
@@ -17584,6 +18266,33 @@ private:
     va_end (arg);
   }
 
+  /**
+   * Check if the extension \a extToCheck is present in the GL/WGL/GLX
+   * extensions list \a extensions. Takes care that no substrings are picked
+   * up.
+   */
+  bool CheckExtension (const char* extensions, const char* extToCheck)
+  {
+    size_t extLen = strlen (extToCheck);
+    do
+    {
+      const char* extStrPos = strstr (extensions, extToCheck);
+      if (extStrPos == 0) return false;
+      
+      /* If no space is before and after the ext string it's a substring
+       * of another ext */
+      char endch;
+      if (((extStrPos > extensions) && (*(extStrPos-1) != ' '))
+        || (((endch = *(extStrPos + extLen)) != 0) && (endch != ' ')))
+      {
+        extensions = extStrPos + extLen;
+        continue;
+      }
+      break;
+    }
+    while (true);
+    return true;
+  }
 public:
   void Initialize (iObjectRegistry* object_reg, iGraphics2D* g2d)
   {
@@ -17613,6 +18322,9 @@ public:
     extstrGL = 0;
 #ifdef __WIN32__
     extstrWGL = 0;
+#endif
+#ifdef CS_OPENGL_GLX
+    extstrGLX = 0;
 #endif
 
     memset ((csGLExtensionFunctions*)this, 0, 
@@ -18043,7 +18755,7 @@ public:
     char cfgkey[26 + 14 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_imaging = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_imaging = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18106,7 +18818,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_multitexture = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_multitexture = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18169,7 +18881,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_transpose_matrix = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_transpose_matrix = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18202,7 +18914,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_multisample = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_multisample = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18220,6 +18932,40 @@ public:
     }
   }
   
+#if defined(CS_OPENGL_GLX) && defined (CS_GLEXTMANAGER_USE_GLX)
+  /** Initialize <a href="http://www.opengl.org/registry/specs//ARB_multisample.txt">GLX_ARB_multisample</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GLX_ARB_multisample. */
+  void InitGLX_ARB_multisample (Display* glxDisplay, int glxScreen)
+  {
+    if (tested_CS_GLX_ARB_multisample) return;
+    tested_CS_GLX_ARB_multisample = true;
+    const char* ext = "GLX_ARB_multisample";
+    char cfgkey[26 + 19 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    (void)glxDisplay;      // avoid `unused variable' warning.
+    (void)glxScreen;
+    SetupGLXextStr (glxDisplay, glxScreen);
+    if (!extstrGLX) return;
+    CS_GLX_ARB_multisample = CheckExtension (extstrGLX, ext);
+
+    bool allclear, funcTest;
+    (void)funcTest; // avoid `unused variable' warning.
+    bool init = CS_GLX_ARB_multisample;
+    allclear = true;
+    if (init)
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GLX", GLX_ARB_multisample)
+      CS_GLX_ARB_multisample &= allclear;
+    }
+    else
+    {
+      Report (msgExtNotFound, "GLX", ext);
+    }
+  }
+#endif
+
   /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/texture_env_add.txt">GL_ARB_texture_env_add</a> extension. 
    * Check presence with csGLExtensionFlags::CS_GL_ARB_texture_env_add. */
   void InitGL_ARB_texture_env_add ()
@@ -18232,7 +18978,7 @@ public:
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_texture_env_add = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_texture_env_add = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18295,7 +19041,7 @@ public:
     (void)hDC;      // avoid `unused variable' warning.
     SetupWGLextStr (hDC);
     if (!extstrWGL) return;
-    CS_WGL_ARB_buffer_region = (strstr (extstrWGL, ext) != 0);
+    CS_WGL_ARB_buffer_region = CheckExtension (extstrWGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // avoid `unused variable' warning.
@@ -18330,7 +19076,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_texture_cube_map = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_texture_cube_map = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18359,7 +19105,7 @@ public:
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_depth_texture = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_depth_texture = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18388,7 +19134,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_point_parameters = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_point_parameters = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18419,7 +19165,7 @@ public:
     char cfgkey[26 + 13 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_shadow = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_shadow = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18448,7 +19194,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_shadow_ambient = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_shadow_ambient = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18477,7 +19223,7 @@ public:
     char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_texture_border_clamp = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_texture_border_clamp = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18506,7 +19252,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_texture_compression = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_texture_compression = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18542,7 +19288,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_texture_env_combine = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_texture_env_combine = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18571,7 +19317,7 @@ public:
     char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_texture_env_crossbar = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_texture_env_crossbar = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18600,7 +19346,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_texture_env_dot3 = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_texture_env_dot3 = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18629,7 +19375,7 @@ public:
     char cfgkey[26 + 30 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_texture_mirrored_repeat = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_texture_mirrored_repeat = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18658,7 +19404,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_vertex_blend = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_vertex_blend = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18698,7 +19444,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_vertex_program = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_vertex_program = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18789,7 +19535,7 @@ public:
     char cfgkey[26 + 17 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_window_pos = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_window_pos = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18834,7 +19580,7 @@ public:
     char cfgkey[26 + 17 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_422_pixels = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_422_pixels = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18863,7 +19609,7 @@ public:
     char cfgkey[26 + 11 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_abgr = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_abgr = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18892,7 +19638,7 @@ public:
     char cfgkey[26 + 11 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_bgra = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_bgra = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18921,7 +19667,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_blend_color = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_blend_color = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18951,7 +19697,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_blend_func_separate = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_blend_func_separate = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -18981,7 +19727,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_blend_logic_op = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_blend_logic_op = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19010,7 +19756,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_blend_minmax = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_blend_minmax = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19040,7 +19786,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_blend_subtract = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_blend_subtract = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19069,7 +19815,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_clip_volume_hint = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_clip_volume_hint = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19098,7 +19844,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_color_subtable = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_color_subtable = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19129,7 +19875,7 @@ public:
     char cfgkey[26 + 28 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_compiled_vertex_array = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_compiled_vertex_array = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19160,7 +19906,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_convolution = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_convolution = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19202,7 +19948,7 @@ public:
     char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_fog_coord = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_fog_coord = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19236,7 +19982,7 @@ public:
     char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_histogram = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_histogram = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19275,7 +20021,7 @@ public:
     char cfgkey[26 + 24 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_multi_draw_arrays = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_multi_draw_arrays = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19306,7 +20052,7 @@ public:
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_packed_pixels = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_packed_pixels = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19335,7 +20081,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_paletted_texture = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_paletted_texture = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19369,7 +20115,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_point_parameters = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_point_parameters = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19400,7 +20146,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_polygon_offset = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_polygon_offset = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19430,7 +20176,7 @@ public:
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_secondary_color = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_secondary_color = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19476,7 +20222,7 @@ public:
     char cfgkey[26 + 30 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_separate_specular_color = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_separate_specular_color = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19505,7 +20251,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_shadow_funcs = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_shadow_funcs = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19534,7 +20280,7 @@ public:
     char cfgkey[26 + 29 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_shared_texture_palette = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_shared_texture_palette = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19563,7 +20309,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_stencil_two_side = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_stencil_two_side = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19593,7 +20339,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_stencil_wrap = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_stencil_wrap = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19622,7 +20368,7 @@ public:
     char cfgkey[26 + 17 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_subtexture = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_subtexture = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19654,7 +20400,7 @@ public:
     char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_texture3D = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_texture3D = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19684,7 +20430,7 @@ public:
     char cfgkey[26 + 31 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_texture_compression_s3tc = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_texture_compression_s3tc = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19713,7 +20459,7 @@ public:
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_texture_env_add = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_texture_env_add = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19742,7 +20488,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_texture_env_combine = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_texture_env_combine = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19771,7 +20517,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_texture_env_dot3 = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_texture_env_dot3 = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19800,7 +20546,7 @@ public:
     char cfgkey[26 + 33 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_texture_filter_anisotropic = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_texture_filter_anisotropic = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19829,7 +20575,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_texture_lod_bias = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_texture_lod_bias = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19858,7 +20604,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_texture_object = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_texture_object = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19893,7 +20639,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_vertex_array = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_vertex_array = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -19931,7 +20677,7 @@ public:
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_vertex_shader = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_vertex_shader = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20002,7 +20748,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_vertex_weighting = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_vertex_weighting = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20034,7 +20780,7 @@ public:
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_HP_occlusion_test = (strstr (extstrGL, ext) != 0);
+    CS_GL_HP_occlusion_test = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20063,7 +20809,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_blend_square = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_blend_square = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20092,7 +20838,7 @@ public:
     char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_copy_depth_to_color = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_copy_depth_to_color = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20121,7 +20867,7 @@ public:
     char cfgkey[26 + 17 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_depth_clamp = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_depth_clamp = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20150,7 +20896,7 @@ public:
     char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_evaluators = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_evaluators = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20188,7 +20934,7 @@ public:
     char cfgkey[26 + 11 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_fence = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_fence = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20224,7 +20970,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_fog_distance = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_fog_distance = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20253,7 +20999,7 @@ public:
     char cfgkey[26 + 24 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_light_max_exponent = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_light_max_exponent = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20282,7 +21028,7 @@ public:
     char cfgkey[26 + 29 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_multisample_filter_hint = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_multisample_filter_hint = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20311,7 +21057,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_occlusion_query = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_occlusion_query = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20347,7 +21093,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_packed_depth_stencil = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_packed_depth_stencil = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20376,7 +21122,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_point_sprite = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_point_sprite = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20407,7 +21153,7 @@ public:
     char cfgkey[26 + 24 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_register_combiners = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_register_combiners = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20449,7 +21195,7 @@ public:
     char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_register_combiners2 = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_register_combiners2 = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20480,7 +21226,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_texgen_emboss = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_texgen_emboss = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20509,7 +21255,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_texgen_reflection = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_texgen_reflection = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20538,7 +21284,7 @@ public:
     char cfgkey[26 + 29 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_texture_compression_vtc = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_texture_compression_vtc = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20567,7 +21313,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_texture_env_combine4 = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_texture_env_combine4 = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20596,7 +21342,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_texture_rectangle = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_texture_rectangle = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20625,7 +21371,7 @@ public:
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_texture_shader = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_texture_shader = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20654,7 +21400,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_texture_shader2 = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_texture_shader2 = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20683,7 +21429,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_texture_shader3 = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_texture_shader3 = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20712,7 +21458,7 @@ public:
     char cfgkey[26 + 24 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_vertex_array_range = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_vertex_array_range = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20745,7 +21491,7 @@ public:
     char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_vertex_array_range2 = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_vertex_array_range2 = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20774,7 +21520,7 @@ public:
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_vertex_program = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_vertex_program = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20865,7 +21611,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_vertex_program1_1 = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_vertex_program1_1 = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20894,7 +21640,7 @@ public:
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ATI_element_array = (strstr (extstrGL, ext) != 0);
+    CS_GL_ATI_element_array = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20926,7 +21672,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ATI_envmap_bumpmap = (strstr (extstrGL, ext) != 0);
+    CS_GL_ATI_envmap_bumpmap = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -20959,7 +21705,7 @@ public:
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ATI_fragment_shader = (strstr (extstrGL, ext) != 0);
+    CS_GL_ATI_fragment_shader = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21002,7 +21748,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ATI_pn_triangles = (strstr (extstrGL, ext) != 0);
+    CS_GL_ATI_pn_triangles = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21033,7 +21779,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ATI_texture_mirror_once = (strstr (extstrGL, ext) != 0);
+    CS_GL_ATI_texture_mirror_once = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21062,7 +21808,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ATI_vertex_array_object = (strstr (extstrGL, ext) != 0);
+    CS_GL_ATI_vertex_array_object = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21103,7 +21849,7 @@ public:
     char cfgkey[26 + 33 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ATI_vertex_attrib_array_object = (strstr (extstrGL, ext) != 0);
+    CS_GL_ATI_vertex_attrib_array_object = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21135,7 +21881,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ATI_vertex_streams = (strstr (extstrGL, ext) != 0);
+    CS_GL_ATI_vertex_streams = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21211,7 +21957,7 @@ public:
     (void)hDC;      // avoid `unused variable' warning.
     SetupWGLextStr (hDC);
     if (!extstrWGL) return;
-    CS_WGL_I3D_image_buffer = (strstr (extstrWGL, ext) != 0);
+    CS_WGL_I3D_image_buffer = CheckExtension (extstrWGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // avoid `unused variable' warning.
@@ -21248,7 +21994,7 @@ public:
     (void)hDC;      // avoid `unused variable' warning.
     SetupWGLextStr (hDC);
     if (!extstrWGL) return;
-    CS_WGL_I3D_swap_frame_lock = (strstr (extstrWGL, ext) != 0);
+    CS_WGL_I3D_swap_frame_lock = CheckExtension (extstrWGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // avoid `unused variable' warning.
@@ -21285,7 +22031,7 @@ public:
     (void)hDC;      // avoid `unused variable' warning.
     SetupWGLextStr (hDC);
     if (!extstrWGL) return;
-    CS_WGL_I3D_swap_frame_usage = (strstr (extstrWGL, ext) != 0);
+    CS_WGL_I3D_swap_frame_usage = CheckExtension (extstrWGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // avoid `unused variable' warning.
@@ -21320,7 +22066,7 @@ public:
     char cfgkey[26 + 32 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_3DFX_texture_compression_FXT1 = (strstr (extstrGL, ext) != 0);
+    CS_GL_3DFX_texture_compression_FXT1 = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21349,7 +22095,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_IBM_cull_vertex = (strstr (extstrGL, ext) != 0);
+    CS_GL_IBM_cull_vertex = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21378,7 +22124,7 @@ public:
     char cfgkey[26 + 28 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_IBM_multimode_draw_arrays = (strstr (extstrGL, ext) != 0);
+    CS_GL_IBM_multimode_draw_arrays = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21409,7 +22155,7 @@ public:
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_IBM_raster_pos_clip = (strstr (extstrGL, ext) != 0);
+    CS_GL_IBM_raster_pos_clip = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21438,7 +22184,7 @@ public:
     char cfgkey[26 + 30 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_IBM_texture_mirrored_repeat = (strstr (extstrGL, ext) != 0);
+    CS_GL_IBM_texture_mirrored_repeat = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21467,7 +22213,7 @@ public:
     char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_IBM_vertex_array_lists = (strstr (extstrGL, ext) != 0);
+    CS_GL_IBM_vertex_array_lists = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21503,7 +22249,7 @@ public:
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_MESA_resize_buffers = (strstr (extstrGL, ext) != 0);
+    CS_GL_MESA_resize_buffers = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21533,7 +22279,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_MESA_window_pos = (strstr (extstrGL, ext) != 0);
+    CS_GL_MESA_window_pos = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21586,7 +22332,7 @@ public:
     char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_OML_interlace = (strstr (extstrGL, ext) != 0);
+    CS_GL_OML_interlace = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21615,7 +22361,7 @@ public:
     char cfgkey[26 + 15 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_OML_resample = (strstr (extstrGL, ext) != 0);
+    CS_GL_OML_resample = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21644,7 +22390,7 @@ public:
     char cfgkey[26 + 16 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_OML_subsample = (strstr (extstrGL, ext) != 0);
+    CS_GL_OML_subsample = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21673,7 +22419,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIS_generate_mipmap = (strstr (extstrGL, ext) != 0);
+    CS_GL_SGIS_generate_mipmap = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21702,7 +22448,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIS_multisample = (strstr (extstrGL, ext) != 0);
+    CS_GL_SGIS_multisample = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21733,7 +22479,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIS_pixel_texture = (strstr (extstrGL, ext) != 0);
+    CS_GL_SGIS_pixel_texture = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21766,7 +22512,7 @@ public:
     char cfgkey[26 + 28 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIS_texture_border_clamp = (strstr (extstrGL, ext) != 0);
+    CS_GL_SGIS_texture_border_clamp = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21795,7 +22541,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIS_texture_color_mask = (strstr (extstrGL, ext) != 0);
+    CS_GL_SGIS_texture_color_mask = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21825,7 +22571,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIS_texture_edge_clamp = (strstr (extstrGL, ext) != 0);
+    CS_GL_SGIS_texture_edge_clamp = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21854,7 +22600,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIS_texture_lod = (strstr (extstrGL, ext) != 0);
+    CS_GL_SGIS_texture_lod = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21883,7 +22629,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIS_depth_texture = (strstr (extstrGL, ext) != 0);
+    CS_GL_SGIS_depth_texture = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21912,7 +22658,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIX_fog_offset = (strstr (extstrGL, ext) != 0);
+    CS_GL_SGIX_fog_offset = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21941,7 +22687,7 @@ public:
     char cfgkey[26 + 17 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIX_interlace = (strstr (extstrGL, ext) != 0);
+    CS_GL_SGIX_interlace = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21970,7 +22716,7 @@ public:
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGIX_shadow_ambient = (strstr (extstrGL, ext) != 0);
+    CS_GL_SGIX_shadow_ambient = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -21999,7 +22745,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGI_color_matrix = (strstr (extstrGL, ext) != 0);
+    CS_GL_SGI_color_matrix = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -22028,7 +22774,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGI_color_table = (strstr (extstrGL, ext) != 0);
+    CS_GL_SGI_color_table = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -22064,7 +22810,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SGI_texture_color_table = (strstr (extstrGL, ext) != 0);
+    CS_GL_SGI_texture_color_table = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -22093,7 +22839,7 @@ public:
     char cfgkey[26 + 13 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_SUN_vertex = (strstr (extstrGL, ext) != 0);
+    CS_GL_SUN_vertex = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -22162,7 +22908,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_fragment_program = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_fragment_program = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -22210,7 +22956,7 @@ public:
     char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ATI_text_fragment_shader = (strstr (extstrGL, ext) != 0);
+    CS_GL_ATI_text_fragment_shader = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -22239,7 +22985,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_APPLE_client_storage = (strstr (extstrGL, ext) != 0);
+    CS_GL_APPLE_client_storage = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -22268,7 +23014,7 @@ public:
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_APPLE_element_array = (strstr (extstrGL, ext) != 0);
+    CS_GL_APPLE_element_array = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -22302,7 +23048,7 @@ public:
     char cfgkey[26 + 14 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_APPLE_fence = (strstr (extstrGL, ext) != 0);
+    CS_GL_APPLE_fence = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -22339,7 +23085,7 @@ public:
     char cfgkey[26 + 28 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_APPLE_vertex_array_object = (strstr (extstrGL, ext) != 0);
+    CS_GL_APPLE_vertex_array_object = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -22372,7 +23118,7 @@ public:
     char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_APPLE_vertex_array_range = (strstr (extstrGL, ext) != 0);
+    CS_GL_APPLE_vertex_array_range = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -22406,7 +23152,7 @@ public:
     (void)hDC;      // avoid `unused variable' warning.
     SetupWGLextStr (hDC);
     if (!extstrWGL) return;
-    CS_WGL_ARB_pixel_format = (strstr (extstrWGL, ext) != 0);
+    CS_WGL_ARB_pixel_format = CheckExtension (extstrWGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // avoid `unused variable' warning.
@@ -22442,7 +23188,7 @@ public:
     (void)hDC;      // avoid `unused variable' warning.
     SetupWGLextStr (hDC);
     if (!extstrWGL) return;
-    CS_WGL_ARB_make_current_read = (strstr (extstrWGL, ext) != 0);
+    CS_WGL_ARB_make_current_read = CheckExtension (extstrWGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // avoid `unused variable' warning.
@@ -22477,7 +23223,7 @@ public:
     (void)hDC;      // avoid `unused variable' warning.
     SetupWGLextStr (hDC);
     if (!extstrWGL) return;
-    CS_WGL_ARB_pbuffer = (strstr (extstrWGL, ext) != 0);
+    CS_WGL_ARB_pbuffer = CheckExtension (extstrWGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // avoid `unused variable' warning.
@@ -22515,7 +23261,7 @@ public:
     (void)hDC;      // avoid `unused variable' warning.
     SetupWGLextStr (hDC);
     if (!extstrWGL) return;
-    CS_WGL_EXT_swap_control = (strstr (extstrWGL, ext) != 0);
+    CS_WGL_EXT_swap_control = CheckExtension (extstrWGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // avoid `unused variable' warning.
@@ -22550,7 +23296,7 @@ public:
     (void)hDC;      // avoid `unused variable' warning.
     SetupWGLextStr (hDC);
     if (!extstrWGL) return;
-    CS_WGL_ARB_render_texture = (strstr (extstrWGL, ext) != 0);
+    CS_WGL_ARB_render_texture = CheckExtension (extstrWGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // avoid `unused variable' warning.
@@ -22586,7 +23332,7 @@ public:
     (void)hDC;      // avoid `unused variable' warning.
     SetupWGLextStr (hDC);
     if (!extstrWGL) return;
-    CS_WGL_EXT_extensions_string = (strstr (extstrWGL, ext) != 0);
+    CS_WGL_EXT_extensions_string = CheckExtension (extstrWGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // avoid `unused variable' warning.
@@ -22620,7 +23366,7 @@ public:
     (void)hDC;      // avoid `unused variable' warning.
     SetupWGLextStr (hDC);
     if (!extstrWGL) return;
-    CS_WGL_EXT_make_current_read = (strstr (extstrWGL, ext) != 0);
+    CS_WGL_EXT_make_current_read = CheckExtension (extstrWGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // avoid `unused variable' warning.
@@ -22655,7 +23401,7 @@ public:
     (void)hDC;      // avoid `unused variable' warning.
     SetupWGLextStr (hDC);
     if (!extstrWGL) return;
-    CS_WGL_EXT_pbuffer = (strstr (extstrWGL, ext) != 0);
+    CS_WGL_EXT_pbuffer = CheckExtension (extstrWGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // avoid `unused variable' warning.
@@ -22693,7 +23439,7 @@ public:
     (void)hDC;      // avoid `unused variable' warning.
     SetupWGLextStr (hDC);
     if (!extstrWGL) return;
-    CS_WGL_EXT_pixel_format = (strstr (extstrWGL, ext) != 0);
+    CS_WGL_EXT_pixel_format = CheckExtension (extstrWGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // avoid `unused variable' warning.
@@ -22729,7 +23475,7 @@ public:
     (void)hDC;      // avoid `unused variable' warning.
     SetupWGLextStr (hDC);
     if (!extstrWGL) return;
-    CS_WGL_I3D_digital_video_control = (strstr (extstrWGL, ext) != 0);
+    CS_WGL_I3D_digital_video_control = CheckExtension (extstrWGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // avoid `unused variable' warning.
@@ -22764,7 +23510,7 @@ public:
     (void)hDC;      // avoid `unused variable' warning.
     SetupWGLextStr (hDC);
     if (!extstrWGL) return;
-    CS_WGL_I3D_gamma = (strstr (extstrWGL, ext) != 0);
+    CS_WGL_I3D_gamma = CheckExtension (extstrWGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // avoid `unused variable' warning.
@@ -22801,7 +23547,7 @@ public:
     (void)hDC;      // avoid `unused variable' warning.
     SetupWGLextStr (hDC);
     if (!extstrWGL) return;
-    CS_WGL_I3D_genlock = (strstr (extstrWGL, ext) != 0);
+    CS_WGL_I3D_genlock = CheckExtension (extstrWGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // avoid `unused variable' warning.
@@ -22844,7 +23590,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_matrix_palette = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_matrix_palette = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -22878,7 +23624,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_element_array = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_element_array = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -22912,7 +23658,7 @@ public:
     char cfgkey[26 + 18 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_float_buffer = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_float_buffer = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -22941,7 +23687,7 @@ public:
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_fragment_program = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_fragment_program = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -22980,7 +23726,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_primitive_restart = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_primitive_restart = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23011,7 +23757,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_NV_vertex_program2 = (strstr (extstrGL, ext) != 0);
+    CS_GL_NV_vertex_program2 = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23040,7 +23786,7 @@ public:
     char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_vertex_buffer_object = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_vertex_buffer_object = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23080,7 +23826,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ATI_separate_stencil = (strstr (extstrGL, ext) != 0);
+    CS_GL_ATI_separate_stencil = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23111,7 +23857,7 @@ public:
     char cfgkey[26 + 31 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_texture_non_power_of_two = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_texture_non_power_of_two = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23140,7 +23886,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_point_sprite = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_point_sprite = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23169,7 +23915,7 @@ public:
     char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_shading_language_100 = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_shading_language_100 = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23198,7 +23944,7 @@ public:
     char cfgkey[26 + 21 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_shader_objects = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_shader_objects = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23266,7 +24012,7 @@ public:
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_fragment_shader = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_fragment_shader = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23295,7 +24041,7 @@ public:
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_vertex_shader = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_vertex_shader = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23372,7 +24118,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_pixel_buffer_object = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_pixel_buffer_object = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23401,7 +24147,7 @@ public:
     char cfgkey[26 + 24 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_texture_rectangle = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_texture_rectangle = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23430,7 +24176,7 @@ public:
     char cfgkey[26 + 25 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_framebuffer_object = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_framebuffer_object = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23481,7 +24227,7 @@ public:
     char cfgkey[26 + 26 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_pixel_buffer_object = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_pixel_buffer_object = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23510,7 +24256,7 @@ public:
     char cfgkey[26 + 24 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_GREMEDY_string_marker = (strstr (extstrGL, ext) != 0);
+    CS_GL_GREMEDY_string_marker = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23540,7 +24286,7 @@ public:
     char cfgkey[26 + 24 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_texture_rectangle = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_texture_rectangle = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23569,7 +24315,7 @@ public:
     char cfgkey[26 + 22 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_occlusion_query = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_occlusion_query = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23606,7 +24352,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_draw_buffers = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_draw_buffers = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23635,7 +24381,7 @@ public:
     char cfgkey[26 + 30 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_blend_equation_separate = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_blend_equation_separate = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23665,7 +24411,7 @@ public:
     char cfgkey[26 + 19 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_texture_sRGB = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_texture_sRGB = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23694,7 +24440,7 @@ public:
     char cfgkey[26 + 27 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_EXT_packed_depth_stencil = (strstr (extstrGL, ext) != 0);
+    CS_GL_EXT_packed_depth_stencil = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23723,7 +24469,7 @@ public:
     char cfgkey[26 + 20 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_texture_float = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_texture_float = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23752,7 +24498,7 @@ public:
     char cfgkey[26 + 23 + 1];
     sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
     
-    CS_GL_ARB_half_float_pixel = (strstr (extstrGL, ext) != 0);
+    CS_GL_ARB_half_float_pixel = CheckExtension (extstrGL, ext);
 
     bool allclear, funcTest;
     (void)funcTest; // shut up "variable unused" warnings
@@ -23762,6 +24508,416 @@ public:
     {
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_half_float_pixel)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/NV/gpu_program4.txt">GL_NV_gpu_program4</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_NV_gpu_program4. */
+  void InitGL_NV_gpu_program4 ()
+  {
+    if (tested_CS_GL_NV_gpu_program4) return;
+    if (!extstrGL) return;
+    tested_CS_GL_NV_gpu_program4 = true;
+    const char* ext = "GL_NV_gpu_program4";
+
+    char cfgkey[26 + 18 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_NV_gpu_program4 = CheckExtension (extstrGL, ext);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_NV_gpu_program4;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glProgramLocalParameterI4iNV, GLPROGRAMLOCALPARAMETERI4INV);
+      EXTMGR_FUNC_INIT(glProgramLocalParameterI4ivNV, GLPROGRAMLOCALPARAMETERI4IVNV);
+      EXTMGR_FUNC_INIT(glProgramLocalParametersI4ivNV, GLPROGRAMLOCALPARAMETERSI4IVNV);
+      EXTMGR_FUNC_INIT(glProgramLocalParameterI4uiNV, GLPROGRAMLOCALPARAMETERI4UINV);
+      EXTMGR_FUNC_INIT(glProgramLocalParameterI4uivNV, GLPROGRAMLOCALPARAMETERI4UIVNV);
+      EXTMGR_FUNC_INIT(glProgramLocalParametersI4uivNV, GLPROGRAMLOCALPARAMETERSI4UIVNV);
+      EXTMGR_FUNC_INIT(glProgramEnvParameterI4iNV, GLPROGRAMENVPARAMETERI4INV);
+      EXTMGR_FUNC_INIT(glProgramEnvParameterI4ivNV, GLPROGRAMENVPARAMETERI4IVNV);
+      EXTMGR_FUNC_INIT(glProgramEnvParametersI4ivNV, GLPROGRAMENVPARAMETERSI4IVNV);
+      EXTMGR_FUNC_INIT(glProgramEnvParameterI4uiNV, GLPROGRAMENVPARAMETERI4UINV);
+      EXTMGR_FUNC_INIT(glProgramEnvParameterI4uivNV, GLPROGRAMENVPARAMETERI4UIVNV);
+      EXTMGR_FUNC_INIT(glProgramEnvParametersI4uivNV, GLPROGRAMENVPARAMETERSI4UIVNV);
+      EXTMGR_FUNC_INIT(glGetProgramLocalParameterIivNV, GLGETPROGRAMLOCALPARAMETERIIVNV);
+      EXTMGR_FUNC_INIT(glGetProgramLocalParameterIuivNV, GLGETPROGRAMLOCALPARAMETERIUIVNV);
+      EXTMGR_FUNC_INIT(glGetProgramEnvParameterIivNV, GLGETPROGRAMENVPARAMETERIIVNV);
+      EXTMGR_FUNC_INIT(glGetProgramEnvParameterIuivNV, GLGETPROGRAMENVPARAMETERIUIVNV);
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_NV_gpu_program4)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/EXT/gpu_program_parameters.txt">GL_EXT_gpu_program_parameters</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_gpu_program_parameters. */
+  void InitGL_EXT_gpu_program_parameters ()
+  {
+    if (tested_CS_GL_EXT_gpu_program_parameters) return;
+    if (!extstrGL) return;
+    tested_CS_GL_EXT_gpu_program_parameters = true;
+    const char* ext = "GL_EXT_gpu_program_parameters";
+
+    char cfgkey[26 + 29 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_EXT_gpu_program_parameters = CheckExtension (extstrGL, ext);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_EXT_gpu_program_parameters;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glProgramLocalParameters4fvEXT, GLPROGRAMLOCALPARAMETERS4FVEXT);
+      EXTMGR_FUNC_INIT(glProgramEnvParameters4fvEXT, GLPROGRAMENVPARAMETERS4FVEXT);
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_gpu_program_parameters)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/color_buffer_float.txt">GL_ARB_color_buffer_float</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_color_buffer_float. */
+  void InitGL_ARB_color_buffer_float ()
+  {
+    if (tested_CS_GL_ARB_color_buffer_float) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_color_buffer_float = true;
+    const char* ext = "GL_ARB_color_buffer_float";
+
+    char cfgkey[26 + 25 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_color_buffer_float = CheckExtension (extstrGL, ext);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_color_buffer_float;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glClampColorARB, GLCLAMPCOLORARB);
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_color_buffer_float)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/framebuffer_sRGB.txt">GL_ARB_framebuffer_sRGB</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_framebuffer_sRGB. */
+  void InitGL_ARB_framebuffer_sRGB ()
+  {
+    if (tested_CS_GL_ARB_framebuffer_sRGB) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_framebuffer_sRGB = true;
+    const char* ext = "GL_ARB_framebuffer_sRGB";
+
+    char cfgkey[26 + 23 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_framebuffer_sRGB = CheckExtension (extstrGL, ext);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_framebuffer_sRGB;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_framebuffer_sRGB)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+#if defined(CS_OPENGL_GLX) && defined (CS_GLEXTMANAGER_USE_GLX)
+  /** Initialize <a href="http://www.opengl.org/registry/specs//ARB_framebuffer_sRGB.txt">GLX_ARB_framebuffer_sRGB</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GLX_ARB_framebuffer_sRGB. */
+  void InitGLX_ARB_framebuffer_sRGB (Display* glxDisplay, int glxScreen)
+  {
+    if (tested_CS_GLX_ARB_framebuffer_sRGB) return;
+    tested_CS_GLX_ARB_framebuffer_sRGB = true;
+    const char* ext = "GLX_ARB_framebuffer_sRGB";
+    char cfgkey[26 + 24 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    (void)glxDisplay;      // avoid `unused variable' warning.
+    (void)glxScreen;
+    SetupGLXextStr (glxDisplay, glxScreen);
+    if (!extstrGLX) return;
+    CS_GLX_ARB_framebuffer_sRGB = CheckExtension (extstrGLX, ext);
+
+    bool allclear, funcTest;
+    (void)funcTest; // avoid `unused variable' warning.
+    bool init = CS_GLX_ARB_framebuffer_sRGB;
+    allclear = true;
+    if (init)
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GLX", GLX_ARB_framebuffer_sRGB)
+      CS_GLX_ARB_framebuffer_sRGB &= allclear;
+    }
+    else
+    {
+      Report (msgExtNotFound, "GLX", ext);
+    }
+  }
+#endif
+
+#ifdef _WIN32
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/wgl_framebuffer_sRGB.txt">WGL_ARB_framebuffer_sRGB</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_WGL_ARB_framebuffer_sRGB. */
+  void InitWGL_ARB_framebuffer_sRGB (HDC hDC)
+  {
+    if (tested_CS_WGL_ARB_framebuffer_sRGB) return;
+    tested_CS_WGL_ARB_framebuffer_sRGB = true;
+    const char* ext = "WGL_ARB_framebuffer_sRGB";
+    char cfgkey[26 + 24 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    (void)hDC;      // avoid `unused variable' warning.
+    SetupWGLextStr (hDC);
+    if (!extstrWGL) return;
+    CS_WGL_ARB_framebuffer_sRGB = CheckExtension (extstrWGL, ext);
+
+    bool allclear, funcTest;
+    (void)funcTest; // avoid `unused variable' warning.
+    bool init = CS_WGL_ARB_framebuffer_sRGB;
+    allclear = true;
+    if (init)
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("WGL", WGL_ARB_framebuffer_sRGB)
+      CS_WGL_ARB_framebuffer_sRGB &= allclear;
+    }
+    else
+    {
+      Report (msgExtNotFound, "WGL", ext);
+    }
+  }
+#endif
+
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/draw_instanced.txt">GL_ARB_draw_instanced</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_draw_instanced. */
+  void InitGL_ARB_draw_instanced ()
+  {
+    if (tested_CS_GL_ARB_draw_instanced) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_draw_instanced = true;
+    const char* ext = "GL_ARB_draw_instanced";
+
+    char cfgkey[26 + 21 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_draw_instanced = CheckExtension (extstrGL, ext);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_draw_instanced;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glDrawArraysInstancedARB, GLDRAWARRAYSINSTANCEDARB);
+      EXTMGR_FUNC_INIT(glDrawElementsInstancedARB, GLDRAWELEMENTSINSTANCEDARB);
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_draw_instanced)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/depth_buffer_float.txt">GL_ARB_depth_buffer_float</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_depth_buffer_float. */
+  void InitGL_ARB_depth_buffer_float ()
+  {
+    if (tested_CS_GL_ARB_depth_buffer_float) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_depth_buffer_float = true;
+    const char* ext = "GL_ARB_depth_buffer_float";
+
+    char cfgkey[26 + 25 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_depth_buffer_float = CheckExtension (extstrGL, ext);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_depth_buffer_float;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_depth_buffer_float)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/instanced_arrays.txt">GL_ARB_instanced_arrays</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_instanced_arrays. */
+  void InitGL_ARB_instanced_arrays ()
+  {
+    if (tested_CS_GL_ARB_instanced_arrays) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_instanced_arrays = true;
+    const char* ext = "GL_ARB_instanced_arrays";
+
+    char cfgkey[26 + 23 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_instanced_arrays = CheckExtension (extstrGL, ext);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_instanced_arrays;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glVertexAttribDivisorARB, GLVERTEXATTRIBDIVISORARB);
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_instanced_arrays)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/half_float_vertex.txt">GL_ARB_half_float_vertex</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_half_float_vertex. */
+  void InitGL_ARB_half_float_vertex ()
+  {
+    if (tested_CS_GL_ARB_half_float_vertex) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_half_float_vertex = true;
+    const char* ext = "GL_ARB_half_float_vertex";
+
+    char cfgkey[26 + 24 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_half_float_vertex = CheckExtension (extstrGL, ext);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_half_float_vertex;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_half_float_vertex)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/map_buffer_range.txt">GL_ARB_map_buffer_range</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_map_buffer_range. */
+  void InitGL_ARB_map_buffer_range ()
+  {
+    if (tested_CS_GL_ARB_map_buffer_range) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_map_buffer_range = true;
+    const char* ext = "GL_ARB_map_buffer_range";
+
+    char cfgkey[26 + 23 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_map_buffer_range = CheckExtension (extstrGL, ext);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_map_buffer_range;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glMapBufferRange, GLMAPBUFFERRANGE);
+      EXTMGR_FUNC_INIT(glFlushMappedBufferRange, GLFLUSHMAPPEDBUFFERRANGE);
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_map_buffer_range)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/texture_compression_rgtc.txt">GL_ARB_texture_compression_rgtc</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_texture_compression_rgtc. */
+  void InitGL_ARB_texture_compression_rgtc ()
+  {
+    if (tested_CS_GL_ARB_texture_compression_rgtc) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_texture_compression_rgtc = true;
+    const char* ext = "GL_ARB_texture_compression_rgtc";
+
+    char cfgkey[26 + 31 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_texture_compression_rgtc = CheckExtension (extstrGL, ext);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_texture_compression_rgtc;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_texture_compression_rgtc)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/texture_rg.txt">GL_ARB_texture_rg</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_texture_rg. */
+  void InitGL_ARB_texture_rg ()
+  {
+    if (tested_CS_GL_ARB_texture_rg) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_texture_rg = true;
+    const char* ext = "GL_ARB_texture_rg";
+
+    char cfgkey[26 + 17 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_texture_rg = CheckExtension (extstrGL, ext);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_texture_rg;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_texture_rg)
     }
     else
     {
