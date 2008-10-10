@@ -402,7 +402,7 @@ AC_DEFUN([CS_JAVA_FLAGS],
 		[$1_cflags="$$1_cflags
 		    $$1_cflags/$cs_java_platform"])
 	    $1_cflags=CS_PATH_NORMALIZE([$$1_cflags])
-	    for i in `find "$JAVA_HOME/" -name '*jvm.*' -print`; do
+	    for i in `find "$$1_dir/" -name '*jvm.*' -print`; do
 	        echo `AS_DIRNAME([$i])`; done | sort | uniq > conftest.jlib
 	    $1_lflags=`sed 's/^\(.*\)$/-L\1/' < conftest.jlib`
 	    $1_lflags=CS_PATH_NORMALIZE([$$1_lflags])
