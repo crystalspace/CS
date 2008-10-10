@@ -98,8 +98,8 @@
 %rename(bitAnd) operator&;
 %rename(bitOr) operator|;
 %rename(bitXor) operator^;
-%rename(and) operator&&;
-%rename(or) operator||;
+%rename(logicalAnd) operator&&;
+%rename(logicalOr) operator||;
 %rename(isLessThan) operator<;
 %rename(equalsOrLess) operator<=;
 %rename(isGreaterThen) operator>;
@@ -109,7 +109,7 @@
 
 %ignore operator+();
 %rename(negate) operator-();
-%rename(not) operator!;
+%rename(logicalNot) operator!;
 %rename(bitComplement) operator~;
 %rename(increment) operator++();
 %rename(getAndIncrement) operator++(int);
