@@ -383,33 +383,37 @@ bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, size_t iSize)
         rl = rl1 = *iPtr++;
         clridx = clridx1 = *iPtr++;
         if (rl == 0)
-           if (clridx == 0)
         {
-    	  // new scanline
-          if (!blip)
+          if (clridx == 0)
           {
-            // if we didnt already jumped to the new line, do it now
-            buffer_x  = 0;
-            buffer_y -= Width;
+    	      // new scanline
+            if (!blip)
+            {
+              // if we didnt already jumped to the new line, do it now
+              buffer_x  = 0;
+              buffer_y -= Width;
+            }
+            continue;
           }
-          continue;
+          else if (clridx == 1)
+          {
+            // end of bitmap
+            break;
+          }
+          else if (clridx == 2)
+          {
+            // next 2 bytes mean column- and scanline- offset
+            buffer_x += *iPtr++;
+            buffer_y -= (Width * (*iPtr++));
+            continue;
+          }
+          else if (clridx > 2)
+            rl1 = clridx;
         }
-        else if (clridx == 1)
-          // end of bitmap
-          break;
-        else if (clridx == 2)
-        {
-          // next 2 bytes mean column- and scanline- offset
-          buffer_x += *iPtr++;
-          buffer_y -= (Width * (*iPtr++));
-          continue;
-        }
-        else if (clridx > 2)
-          rl1 = clridx;
 
         for ( i = 0; i < rl1; i++ )
         {
-          if (!rl) clridx1 = *iPtr++;
+          if (!rl) { clridx1 = *iPtr++; }
           buffer [buffer_y + buffer_x] = clridx1;
 
           if (++buffer_x >= Width)

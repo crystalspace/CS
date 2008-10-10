@@ -926,6 +926,7 @@ bool csGLGraphics3D::Open ()
     stencil_threshold = -1;
   }
   if (verbose)
+  {
     if (broken_stencil)
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Stencil clipping is broken!");
     else if (!stencil_clipping_available)
@@ -934,16 +935,17 @@ bool csGLGraphics3D::Open ()
     {
       if (stencil_threshold >= 0)
       {
-	Report (CS_REPORTER_SEVERITY_NOTIFY, 
-	  "Stencil clipping is used for objects >= %d triangles.", 
-	  stencil_threshold);
+	      Report (CS_REPORTER_SEVERITY_NOTIFY, 
+	        "Stencil clipping is used for objects >= %d triangles.", 
+	      stencil_threshold);
       }
       else
       {
-	Report (CS_REPORTER_SEVERITY_NOTIFY, 
-	  "Plane clipping is preferred.");
+	      Report (CS_REPORTER_SEVERITY_NOTIFY, 
+	        "Plane clipping is preferred.");
       }
     }
+  }
 
   stencilClearWithZ = config->GetBool ("Video.OpenGL.StencilClearWithZ", true);
   if (verbose)
@@ -981,13 +983,13 @@ bool csGLGraphics3D::Open ()
         statecache->SetCurrentTU (u);
         statecache->ActivateTU (csGLStateCache::activateTexEnv);
         glTexEnvf (GL_TEXTURE_FILTER_CONTROL_EXT, 
-	  GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); 
+	        GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); 
       }
     }
     else
     {
       glTexEnvf (GL_TEXTURE_FILTER_CONTROL_EXT, 
-	GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); 
+	      GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); 
     }
   }
 
