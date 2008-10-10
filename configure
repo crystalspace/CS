@@ -14866,7 +14866,7 @@ fi
 fi
 
 	    cs_java_cflags=`echo "x$cs_java_cflags" | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	    for i in `find "$JAVA_HOME/" -name '*jvm.*' -print`; do
+	    for i in `find "$cs_java_dir/" -name '*jvm.*' -print`; do
 	        echo `$as_dirname -- $i ||
 $as_expr X$i : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
 	 X$i : 'X\(//\)[^/]' \| \
