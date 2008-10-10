@@ -336,7 +336,6 @@ jobject _csRef_to_Java(const csRef<iBase>& ref, void* ptr, const char* name,
 %enddef
 #undef INTERFACE_APPLY
 #define INTERFACE_APPLY(T) %typemap(javacode) T %{ INTERFACE_EQUALS %}
-APPLY_FOR_EACH_INTERFACE
 
 // ivaria/event.h
 // Swig 1.3.23 introduces support for default arguments, so it generates this
