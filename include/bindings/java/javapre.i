@@ -23,7 +23,7 @@
 
 %javaconst(1);
 
-%inline %{
+%{
 	struct JNIEnvGetter {
 		JNIEnvGetter() : m_jvm(0) {}
 		virtual ~JNIEnvGetter() {}
@@ -33,7 +33,7 @@
 			jint res = 0;
 			JavaVMInitArgs vm_args;
 			JavaVMOption options[1];
-			options[0].optionString = "";
+			options[0].optionString = const_cast<char*>("");
 			vm_args.version = JNI_VERSION_1_2;
 			vm_args.options = options;
 			vm_args.nOptions = 1;
@@ -98,8 +98,8 @@
 %rename(bitAnd) operator&;
 %rename(bitOr) operator|;
 %rename(bitXor) operator^;
-%rename(and) operator&&;
-%rename(or) operator||;
+%rename(logicalAnd) operator&&;
+%rename(logicalOr) operator||;
 %rename(isLessThan) operator<;
 %rename(equalsOrLess) operator<=;
 %rename(isGreaterThen) operator>;
@@ -109,7 +109,7 @@
 
 %ignore operator+();
 %rename(negate) operator-();
-%rename(not) operator!;
+%rename(logicalNot) operator!;
 %rename(bitComplement) operator~;
 %rename(increment) operator++();
 %rename(getAndIncrement) operator++(int);
@@ -286,7 +286,6 @@ jobject _csRef_to_Java(const csRef<iBase>& ref, void* ptr, const char* name,
 %enddef
 #undef INTERFACE_APPLY
 #define INTERFACE_APPLY(T) %typemap(javacode) T %{ INTERFACE_EQUALS %}
-APPLY_FOR_EACH_INTERFACE
 
 // ivaria/event.h
 // Swig 1.3.23 introduces support for default arguments, so it generates this
