@@ -33,7 +33,7 @@
 			jint res = 0;
 			JavaVMInitArgs vm_args;
 			JavaVMOption options[1];
-			options[0].optionString = "";
+			options[0].optionString = const_cast<char*>("");
 			vm_args.version = JNI_VERSION_1_2;
 			vm_args.options = options;
 			vm_args.nOptions = 1;
