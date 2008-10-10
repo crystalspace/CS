@@ -263,17 +263,23 @@ void MD32spr::Main()
     {
       const char *str = fileNames->Get(i);
       if(stristr(str,".md3"))
-	if(stristr(str,"head"))
-	  head = true;
-	else if(stristr(str,"upper"))
-	  torso = true;
-	else if(stristr(str,"lower"))
-	  leg = true;
+	  {
+        if(stristr(str,"head"))
+	      head = true;
+	    else if(stristr(str,"upper"))
+	      torso = true;
+	    else if(stristr(str,"lower"))
+	      leg = true;
+      }
     }
     if(head && torso && leg)
+    {
       player = true;
+    }
     else
+    {
       player = false;
+    }
   }
 
   for (i = 0; i < fileNames->GetSize (); i++)
@@ -286,71 +292,87 @@ void MD32spr::Main()
      */
 
     if (!player && !weaponDir)
+    {
       if (stristr(str, ".md3"))
       {
-	md3Model *tmpModel = new md3Model(object_reg);
-	if (tmpModel)
-	{
-	  generic.Push(tmpModel);
-	  tmpModel->Init(&vfs);
-	  tmpModel->fileName = str;
-	  tmpModel->LoadMD3();
-	  md3Files++;
-	  continue;
-	}
-	else
-	{
-	  ReportError
-	    ("Fatal Error: Allocating memory for generic model.!");
-	  return;
-	}
-      }
-
-    /* If all 3 files are present we assume this is a player model file. */
-    /* Trying to make it as bullet proof as possible. */
-    if (player) {
-      if (stristr(str, "upper") && stristr(str, ".md3")) {
-	upperModel = new md3Model(object_reg);
-	if (upperModel) {
-	  upperModel->Init(&vfs);
-	  upperModel->fileName = str;
-	  upperModel->LoadMD3();
-	  torso = true;
-	  md3Files++;
-	  continue;
-	} else {
-	  ReportError("Fatal Error: Allocating memory for upperModel!");
-	  return;
-	}
-      } else if (stristr(str, "lower") && stristr(str, ".md3")) {
-	lowerModel = new md3Model(object_reg);
-	if (lowerModel) {
-	  lowerModel->Init(&vfs);
-	  lowerModel->fileName = str;
-	  lowerModel->LoadMD3();
-	  leg = true;
-	  md3Files++;
-	  continue;
-	} else {
-	  ReportError("Fatal Error: Allocating memory for lowerModel!");
-	  return;
-	}
-      } else if (stristr(str, "head") && stristr(str, ".md3")) {
-	headModel = new md3Model(object_reg);
-	if (headModel) {
-	  headModel->Init(&vfs);
-	  headModel->fileName = str;
-	  headModel->LoadMD3();
-	  head = true;
-	  md3Files++;
-	  continue;
-	} else {
-	  ReportError("Fatal Error: Allocating memory for headModel!");
-	  return;
-	}
+	    md3Model *tmpModel = new md3Model(object_reg);
+	    if (tmpModel)
+	    {
+	      generic.Push(tmpModel);
+	      tmpModel->Init(&vfs);
+	      tmpModel->fileName = str;
+	      tmpModel->LoadMD3();
+	      md3Files++;
+	      continue;
+	    }
+	    else
+	    {
+	      ReportError
+	        ("Fatal Error: Allocating memory for generic model.!");
+	      return;
+	    }
       }
     }
 
+    /* If all 3 files are present we assume this is a player model file. */
+    /* Trying to make it as bullet proof as possible. */
+    if (player)
+    {
+      if (stristr(str, "upper") && stristr(str, ".md3"))
+      {
+	    upperModel = new md3Model(object_reg);
+	    if (upperModel)
+        {
+	      upperModel->Init(&vfs);
+	      upperModel->fileName = str;
+	      upperModel->LoadMD3();
+	      torso = true;
+	      md3Files++;
+	      continue;
+	    }
+        else
+        {
+	      ReportError ("Fatal Error: Allocating memory for upperModel!");
+	      return;
+	    }
+      }
+      else if (stristr(str, "lower") && stristr(str, ".md3"))
+      {
+	    lowerModel = new md3Model(object_reg);
+	    if (lowerModel)
+        {
+	      lowerModel->Init (&vfs);
+	      lowerModel->fileName = str;
+	      lowerModel->LoadMD3 ();
+	      leg = true;
+	      md3Files++;
+	      continue;
+	    }
+        else
+        {
+	      ReportError ("Fatal Error: Allocating memory for lowerModel!");
+	      return;
+	    }
+      }
+      else if (stristr(str, "head") && stristr(str, ".md3"))
+      {
+	    headModel = new md3Model(object_reg);
+	    if (headModel)
+        {
+	      headModel->Init(&vfs);
+	      headModel->fileName = str;
+	      headModel->LoadMD3();
+	      head = true;
+	      md3Files++;
+	      continue;
+	    }
+        else
+        {
+	      ReportError ("Fatal Error: Allocating memory for headModel!");
+	      return;
+	    }
+      }
+    }
   }
 
   if (weaponDir.Length() > 0) 
@@ -362,22 +384,22 @@ void MD32spr::Main()
     {
       const char *str = weaponFiles->Get(i);
       /* If this is an md3 file and it contains the weaponName, Init() it. */
-      if (stristr(str, ".md3")) {
-	md3Model *tmpModel = new md3Model(object_reg);
-	if (tmpModel)
-	{
-	  generic.Push(tmpModel);
-	  tmpModel->Init(&vfs);
-	  tmpModel->fileName = str;
-	  tmpModel->LoadMD3();
-	  md3Files++;
-	}
-	else
-	{
-	  ReportError
-	    ("Fatal Error: Allocating memory for generic model.!");
-	  return;
-	}
+      if (stristr(str, ".md3"))
+      {
+	    md3Model *tmpModel = new md3Model (object_reg);
+	    if (tmpModel)
+	    {
+	      generic.Push(tmpModel);
+	      tmpModel->Init(&vfs);
+	      tmpModel->fileName = str;
+	      tmpModel->LoadMD3();
+	      md3Files++;
+	    }
+	    else
+	    {
+	      ReportError ("Fatal Error: Allocating memory for generic model.!");
+	      return;
+	    }
       }
     }
   }
@@ -1228,6 +1250,7 @@ void splitpath (const char *iPathName, char *oPath, size_t iPathSize,
     sl--;
 
   if (iPathSize)
+  {
     if (sl >= iPathSize)
     {
       memcpy (oPath, iPathName, iPathSize - 1);
@@ -1238,13 +1261,18 @@ void splitpath (const char *iPathName, char *oPath, size_t iPathSize,
       memcpy (oPath, iPathName, sl);
       oPath [sl] = 0;
     }
+  }
 
   if (iNameSize)
+  {
     if (maxl - sl >= iNameSize)
     {
       memcpy (oName, &iPathName [sl], iNameSize - 1);
       oName [iNameSize - 1] = 0;
     }
     else
+    {
       memcpy (oName, &iPathName [sl], maxl - sl + 1);
+    }
+  }
 }

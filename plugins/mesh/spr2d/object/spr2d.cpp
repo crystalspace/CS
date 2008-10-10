@@ -588,58 +588,63 @@ void csSprite2DMeshObject::uvAnimationControl::Advance (csTicks current_time)
       counter = 0;
       frameindex++;
       if (frameindex == framecount)
-	if (loop)
-	  frameindex = 0;
-	else
-	{
-	  frameindex = framecount-1;
-	  halted = true;
-	}
-    }
-  }
-  else
-    if (style > 0)
-    { // skip to next frame every <style> millisecond
-      if (last_time == 0)
-	last_time = current_time;
-      counter += (current_time - last_time);
-      last_time = current_time;
-      while (counter > style)
       {
-	counter -= style;
-	frameindex++;
-	if (frameindex == framecount)
-	  if (loop)
-	    frameindex = 0;
-	  else
+	    if (loop)
+	      frameindex = 0;
+	    else
 	    {
 	      frameindex = framecount-1;
 	      halted = true;
 	    }
       }
     }
-    else
-    { // style == 0 -> use time indices attached to the frames
-      if (last_time == 0)
-	last_time = current_time;
-      while (frame->GetDuration () + last_time < current_time)
+  }
+  else if (style > 0)
+  { // skip to next frame every <style> millisecond
+    if (last_time == 0)
+	  last_time = current_time;
+    counter += (current_time - last_time);
+    last_time = current_time;
+    while (counter > style)
+    {
+	  counter -= style;
+	  frameindex++;
+	  if (frameindex == framecount)
       {
-	frameindex++;
-	if (frameindex == framecount)
-	  if (loop)
-	  {
-	    frameindex = 0;
-	  }
-	  else
-	  {
-	    frameindex = framecount-1;
-	    halted = true;
-	    break;
-	  }
-	last_time += frame->GetDuration ();
-	frame = ani->GetFrame (frameindex);
+	    if (loop)
+	      frameindex = 0;
+	    else
+	    {
+	      frameindex = framecount-1;
+	      halted = true;
+	    }
       }
     }
+  }
+  else
+  { // style == 0 -> use time indices attached to the frames
+    if (last_time == 0)
+	  last_time = current_time;
+    while (frame->GetDuration () + last_time < current_time)
+    {
+	  frameindex++;
+	  if (frameindex == framecount)
+      {
+	    if (loop)
+	    {
+	      frameindex = 0;
+	    }
+	    else
+	    {
+	      frameindex = framecount-1;
+	      halted = true;
+	      break;
+        }
+      }
+	}
+    last_time += frame->GetDuration ();
+    frame = ani->GetFrame (frameindex);
+  }
 
   if (oldframeindex != frameindex)
     frame = ani->GetFrame (frameindex);
@@ -689,7 +694,7 @@ bool csSprite2DMeshObject::HitBeamOutline(const csVector3& start,
   if (sqr < SMALL_EPSILON) return false; // Too close, Cannot intersect
   float dist;
   csIntersect3::SegmentPlane(start, end, pl, 0, isect, dist);
-  if (pr) *pr = dist;
+  if (pr) { *pr = dist; }
   csMatrix3 o2t;
   CheckBeam (start, pl, sqr, o2t);
   csVector3 r = o2t * isect;
@@ -699,8 +704,10 @@ bool csSprite2DMeshObject::HitBeamOutline(const csVector3& start,
   csVector2 isec(r.x, r.y);
   int i;
   for (i = 0; i < len; trail = i++)
+  {
     if (csMath2::WhichSide2D(isec, (*vertices)[trail].pos, (*vertices)[i].pos) > 0)
       return false;
+  }
   return true;
 }
 
