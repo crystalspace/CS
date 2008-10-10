@@ -202,6 +202,7 @@ typedef unsigned char uint8;
 // output arguments
 %apply unsigned long { utf32_char };
 %apply unsigned long { uint32 };
+%apply unsigned long { uint };
 %apply unsigned char * OUTPUT { uint8 & red };
 %apply unsigned char * OUTPUT { uint8 & green };
 %apply unsigned char * OUTPUT { uint8 & blue };

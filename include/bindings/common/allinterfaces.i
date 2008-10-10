@@ -160,6 +160,7 @@
   INTERFACE_APPLY(iCollideSystem)
   INTERFACE_APPLY(iConsoleInput)
   INTERFACE_APPLY(iConsoleOutput)
+  INTERFACE_APPLY(iConsoleExecCallback)
   INTERFACE_APPLY(iODEDynamicState)
   INTERFACE_APPLY(iODEDynamicSystemState)
   INTERFACE_APPLY(iODEJointState)
