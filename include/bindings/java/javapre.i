@@ -23,7 +23,7 @@
 
 %javaconst(1);
 
-%inline %{
+%{
 	struct JNIEnvGetter {
 		JNIEnvGetter() : m_jvm(0) {}
 		virtual ~JNIEnvGetter() {}
