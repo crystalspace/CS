@@ -633,8 +633,6 @@ static inline void ComputerInterval2DProj (const csVector3 tri[3],
                                            csSegment3& isectSeg,
                                            float& t0, float &t1)
 {
-  csVector3 tmp;
-
   // t_edge = dv1_0 / (dv1_0 - dv1_1), see (4) in Möller
   float t_edge = d[0] / (d[0] - d[1]);
 
@@ -643,7 +641,6 @@ static inline void ComputerInterval2DProj (const csVector3 tri[3],
 
   // Compute real point of intersection
   isectSeg.SetStart (tri[0] + (tri[1] - tri[0]) * t_edge);
-
 
   // REDO FOR OTHER EDGE
 
