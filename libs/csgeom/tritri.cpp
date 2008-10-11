@@ -204,115 +204,105 @@ static bool coplanar_tri_tri(const csVector3& N, const csVector3 tri1[3],
  * @return true if the triangles intersect, otherwise false
  *
  */
-
-bool csIntersect3::TriangleTriangle(const csVector3 tri1[3],
-                                    const csVector3 tri2[3])
+bool csIntersect3::TriangleTriangle (const csVector3 tri1[3],
+                                     const csVector3 tri2[3])
 {
-  csVector3 E1,E2;
-  csVector3 N1,N2;
-  float d1,d2;
-  float du0,du1,du2,dv0,dv1,dv2;
-  csVector3 D;
-  float isect1[2], isect2[2];
-  float du0du1,du0du2,dv0dv1,dv0dv2;
-  short index;
-  float vp0,vp1,vp2;
-  float up0,up1,up2;
-  float bb,cc,max;
-  float a,b,c,x0,x1;
-  float d,e,f,y0,y1;
-  float xx,yy,xxyy,tmp;
-
   /* compute plane equation of triangle(tri1) */
-  E1 = tri1[1] - tri1[0];
-  E2 = tri1[2] - tri1[0];
-  N1 = E1 % E2;
-  d1=-(N1 * tri1[0]);
-  /* plane equation 1: N1.X+d1=0 */
+  csVector3 E1 = tri1[1] - tri1[0];
+  csVector3 E2 = tri1[2] - tri1[0];
+  csVector3 N1 = E1 % E2;
+  float d1 =- (N1 * tri1[0]);
+  /* plane equation 1: N1.X + d1 = 0 */
 
   /* put tri2 into plane equation 1 to compute signed distances to the plane*/
-  du0=(N1 * tri2[0])+d1;
-  du1=(N1 * tri2[1])+d1;
-  du2=(N1 * tri2[2])+d1;
+  float du0 = (N1 * tri2[0]) + d1;
+  float du1 = (N1 * tri2[1]) + d1;
+  float du2 = (N1 * tri2[2]) + d1;
 
   /* coplanarity robustness check */
 #if USE_EPSILON_TEST==TRUE
-  if(FABS(du0)<SMALL_EPSILON) du0=0.0;
-  if(FABS(du1)<SMALL_EPSILON) du1=0.0;
-  if(FABS(du2)<SMALL_EPSILON) du2=0.0;
+  if (FABS (du0) < SMALL_EPSILON) du0 = 0.0f;
+  if (FABS (du1) < SMALL_EPSILON) du1 = 0.0f;
+  if (FABS (du2) < SMALL_EPSILON) du2 = 0.0f;
 #endif
-  du0du1=du0*du1;
-  du0du2=du0*du2;
 
-  if(du0du1>0.0f && du0du2>0.0f) /* same sign on all of them + not equal 0 ? */
-    return 0;                    /* no intersection occurs */
+  float du0du1 = du0 * du1;
+  float du0du2 = du0 * du2;
+  if (du0du1 > 0.0f && du0du2 > 0.0f) /* same sign on all of them + not equal 0 ? */
+    return false;                     /* no intersection occurs */
 
   /* compute plane of triangle (tri2) */
   E1 = tri2[1] - tri2[0];
   E2 = tri2[2] - tri2[0];
-  N2 = E1 % E2;
-  d2=-(N2 * tri2[0]);
-  /* plane equation 2: N2.X+d2=0 */
+  csVector3 N2 = E1 % E2;
+  float d2 =- (N2 * tri2[0]);
+  /* plane equation 2: N2.X + d2 = 0 */
 
   /* put tri1 into plane equation 2 */
-  dv0=(N2 * tri1[0])+d2;
-  dv1=(N2 * tri1[1])+d2;
-  dv2=(N2 * tri1[2])+d2;
+  float dv0 = (N2 * tri1[0]) + d2;
+  float dv1 = (N2 * tri1[1]) + d2;
+  float dv2 = (N2 * tri1[2]) + d2;
 
 #if USE_EPSILON_TEST==TRUE
-  if(FABS(dv0)<SMALL_EPSILON) dv0=0.0;
-  if(FABS(dv1)<SMALL_EPSILON) dv1=0.0;
-  if(FABS(dv2)<SMALL_EPSILON) dv2=0.0;
+  if (FABS (dv0) < SMALL_EPSILON) dv0 = 0.0f;
+  if (FABS (dv1) < SMALL_EPSILON) dv1 = 0.0f;
+  if (FABS (dv2) < SMALL_EPSILON) dv2 = 0.0f;
 #endif
 
-  dv0dv1=dv0*dv1;
-  dv0dv2=dv0*dv2;
+  float dv0dv1 = dv0 * dv1;
+  float dv0dv2 = dv0 * dv2;
 
-  if(dv0dv1>0.0f && dv0dv2>0.0f) /* same sign on all of them + not equal 0 ? */
-    return 0;                    /* no intersection occurs */
+  if (dv0dv1 > 0.0f && dv0dv2 > 0.0f) /* same sign on all of them + not equal 0 ? */
+    return false;                     /* no intersection occurs */
 
   /* compute direction of intersection line */
-  D = N1 % N2;
+  csVector3 D = N1 % N2;
 
   /* compute and index to the largest component of D */
-  max=(float)FABS(D[0]);
-  index=0;
-  bb=(float)FABS(D[1]);
-  cc=(float)FABS(D[2]);
-  if(bb>max) max=bb,index=1;
-  if(cc>max) max=cc,index=2;
+  float max = (float) FABS (D[0]);
+  short index = 0;
+  float bb = (float) FABS (D[1]);
+  float cc = (float) FABS (D[2]);
+  if (bb > max) max = bb, index = 1;
+  if (cc > max) max = cc, index = 2;
 
   /* this is the simplified projection onto L*/
-  vp0=tri1[0][index];
-  vp1=tri1[1][index];
-  vp2=tri1[2][index];
+  float vp0 = tri1[0][index];
+  float vp1 = tri1[1][index];
+  float vp2 = tri1[2][index];
 
-  up0=tri2[0][index];
-  up1=tri2[1][index];
-  up2=tri2[2][index];
+  float up0 = tri2[0][index];
+  float up1 = tri2[1][index];
+  float up2 = tri2[2][index];
 
+  float a, b, c, x0, x1;
+  float d, e, f, y0, y1;
   /* compute interval for triangle 1 */
-  NEWCOMPUTE_INTERVALS(vp0,vp1,vp2,dv0,dv1,dv2,dv0dv1,dv0dv2,a,b,c,x0,x1);
+  NEWCOMPUTE_INTERVALS (vp0, vp1, vp2, dv0, dv1, dv2, dv0dv1, dv0dv2,
+                          a, b, c, x0, x1);
 
   /* compute interval for triangle 2 */
-  NEWCOMPUTE_INTERVALS(up0,up1,up2,du0,du1,du2,du0du1,du0du2,d,e,f,y0,y1);
+  NEWCOMPUTE_INTERVALS (up0, up1, up2, du0, du1, du2, du0du1, du0du2,
+                          d, e, f, y0, y1);
 
-  xx=x0*x1;
-  yy=y0*y1;
-  xxyy=xx*yy;
+  float xx, yy, xxyy, tmp;
+  float isect1[2], isect2[2];
+  xx = x0 * x1;
+  yy = y0 * y1;
+  xxyy = xx * yy;
 
-  tmp=a*xxyy;
-  isect1[0]=tmp+b*x1*yy;
-  isect1[1]=tmp+c*x0*yy;
+  tmp = a * xxyy;
+  isect1[0] = tmp + b * x1 * yy;
+  isect1[1] = tmp + c * x0 * yy;
 
-  tmp=d*xxyy;
-  isect2[0]=tmp+e*xx*y1;
-  isect2[1]=tmp+f*xx*y0;
+  tmp = d * xxyy;
+  isect2[0] = tmp + e * xx * y1;
+  isect2[1] = tmp + f * xx * y0;
 
-  SORT(isect1[0],isect1[1]);
-  SORT(isect2[0],isect2[1]);
+  SORT (isect1[0], isect1[1]);
+  SORT (isect2[0], isect2[1]);
 
-  if(isect1[1]<isect2[0] || isect2[1]<isect1[0]) return false;
+  if (isect1[1] < isect2[0] || isect2[1] < isect1[0]) return false;
   return true;
 }
 
@@ -641,7 +631,7 @@ static inline void ComputerInterval2DProj (const csVector3 tri[3],
 {
   csVector3 tmp;
 
-  // t_edge = dv1_0 / (dv1_0 - dv1_1), see (4) in Möller
+  // t_edge = dv1_0 / (dv1_0 - dv1_1), see (4) in MÃ¶ller
   float t_edge = d[0] / (d[0] - d[1]);
 
   // Project onto axis
