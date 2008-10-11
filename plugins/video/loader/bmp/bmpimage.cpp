@@ -202,7 +202,7 @@ csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image,
   int w = Image->GetWidth ();
   int h = Image->GetHeight ();
   // BMPs need 4-byte alignment.
-  int pad = (4 - (w * bytesPerPixel) & 0x3) & 0x3;
+  int pad = ((4 - (w * bytesPerPixel)) & 0x3) & 0x3;
   size_t len = sizeof (bmpHeader)-2 + h*(w*bytesPerPixel+pad) + 256*(palette?4:0);
   bmpHeader hdr;
   hdr.bfTypeLo = 'B';
@@ -439,7 +439,7 @@ bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, size_t iSize)
 
     int x;
     // BMPs need 4-byte alignment.
-    int pad = (4 - (Width*3) & 0x3) & 0x3;
+    int pad = ((4 - (Width*3)) & 0x3) & 0x3;
 
     while (iPtr < iBuffer + iSize && buffer_y >= 0)
     {
