@@ -115,8 +115,8 @@ namespace CS
       /// Helper class for user defined OpenGL clip planes.
       class CS_CSPLUGINCOMMON_GL_EXPORT ClipPlanes
       {
-        int maxPlanes;
-        uint32 currentPlanes;
+        size_t maxPlanes;
+        size_t currentPlanes;
         
         CS::ShaderVarStringID svObjectToWorldInv;
         CS::ShaderVarStringID svWorldToCamera;
@@ -154,7 +154,7 @@ namespace CS
          * Enable the \a n th OpenGL clip plane without setting it. It is up 
          * to the caller to call glClipPlane().
          */
-        bool EnableClipPlane (int n);
+        bool EnableClipPlane (size_t n);
         /**
          * Enable the next available OpenGL clip plane without setting it. 
          * It is up  to the caller to call glClipPlane().
