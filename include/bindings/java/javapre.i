@@ -23,50 +23,54 @@
 
 %javaconst(1);
 
-%{
-	struct JNIEnvGetter {
-		JNIEnvGetter() : m_jvm(0) {}
-		virtual ~JNIEnvGetter() {}
-		JNIEnv* getJNIEnv() 
+%inline %{
+	static JNIEnv* getJNIEnv() 
+	{
+		static JavaVM * m_jvm = 0;
+		JNIEnv * m_env = 0;
+		jint res = 0;
+		JavaVMInitArgs vm_args;
+		JavaVMOption options[1];
+		options[0].optionString = 0;
+		vm_args.version = JNI_VERSION_1_2;
+		vm_args.options = options;
+		vm_args.nOptions = 1;
+		vm_args.ignoreUnrecognized = JNI_TRUE;
+		jint existingJvmReturned = 1;
+		if (m_jvm == 0) 
 		{
-			JNIEnv * m_env = 0;
-			jint res = 0;
-			JavaVMInitArgs vm_args;
-			JavaVMOption options[1];
-			options[0].optionString = const_cast<char*>("");
-			vm_args.version = JNI_VERSION_1_2;
-			vm_args.options = options;
-			vm_args.nOptions = 1;
-			vm_args.ignoreUnrecognized = JNI_TRUE;
-			jint existingJvmReturned = 1;
-			if (m_jvm == 0) 
-			{
-				res = JNI_GetCreatedJavaVMs(&m_jvm, 1, &existingJvmReturned);
-			}
-			if (m_jvm != 0 && res == 0 && existingJvmReturned > 0 ) 
-			{
-				// Jvm already existed, get the env
-				res = m_jvm->GetEnv((void**)&m_env, vm_args.version);
-		
-				if ( res == JNI_EDETACHED )
-				{
-					res = m_jvm->AttachCurrentThread((void**)&m_env, 0);
-				}
-		
-				if ( res >= 0 ) 
-				{
-					return m_env;
-				}
-			}
-			return 0;
+			res = JNI_GetCreatedJavaVMs(&m_jvm, 1, &existingJvmReturned);
 		}
-		private:
-		JavaVM * m_jvm;
-	};
-
-	static JNIEnvGetter* jni_env_getter = new JNIEnvGetter();
+		if (m_jvm != 0 && res == 0 && existingJvmReturned > 0 ) 
+		{
+			// Jvm already existed, get the env
+#ifdef __cplusplus
+			res = m_jvm->GetEnv((void**)&m_env, vm_args.version);
+#else
+			res = (*m_jvm)->GetEnv(m_jvm,(void**)&m_env, vm_args.version);
+#endif
+			if ( res == JNI_EDETACHED )
+			{
+#ifdef __cplusplus
+				res = m_jvm->AttachCurrentThread((void**)&m_env, 0);
+#else
+				res = (*m_jvm)->AttachCurrentThread(m_jvm, (void**)&m_env, 0);
+#endif
+			}
+	
+			if ( res >= 0 ) 
+			{
+				return m_env;
+			}
+		}
+		return 0;
+	}
 %}
 
+%include "bindings/java/typemaps.i"
+%include "bindings/java/inout.i"
+%include "bindings/java/wrapper.i"
+%include "bindings/java/extends.i"
 
 // Fill LIST_OBJECT_FUNCTIONS to extend list interfaces.
 #undef LIST_OBJECT_FUNCTIONS
@@ -98,8 +102,8 @@
 %rename(bitAnd) operator&;
 %rename(bitOr) operator|;
 %rename(bitXor) operator^;
-%rename(logicalAnd) operator&&;
-%rename(logicalOr) operator||;
+%rename(__and__) operator&&;
+%rename(__or__) operator||;
 %rename(isLessThan) operator<;
 %rename(equalsOrLess) operator<=;
 %rename(isGreaterThen) operator>;
@@ -109,7 +113,7 @@
 
 %ignore operator+();
 %rename(negate) operator-();
-%rename(logicalNot) operator!;
+%rename(__not__) operator!;
 %rename(bitComplement) operator~;
 %rename(increment) operator++();
 %rename(getAndIncrement) operator++(int);
@@ -185,56 +189,6 @@ jobject _csRef_to_Java(const csRef<iBase>& ref, void* ptr, const char* name,
   return jenv->NewObject(cls, mid, cptr, false);
 }
 %}
-
-%typemap(in) csEventID[]
-{
-	JNIEnv * env = jni_env_getter->getJNIEnv();
-	if (env != 0) 
-	{
-		jlongArray longEventsArray = (jlongArray)$input;
-		jlong * larray = env->GetLongArrayElements(longEventsArray,0);
-		int totalElem = env->GetArrayLength(longEventsArray);
-		csEventID * csEvents = new csEventID[totalElem];
-		for (int j=0;j<totalElem;j++) 
-		{
-			csEvents[j] = csEventID(larray[j]);
-		}
-		env->ReleaseLongArrayElements(longEventsArray,larray,JNI_ABORT);
-		$1 = csEvents;
-	} else {
-		$1 = 0;
-	}
-}
-%typemap(jni) csEventID[] "jlongArray"
-%typemap(jtype) csEventID[] "long[]"
-%typemap(jstype) csEventID[] "long[]"
-%typemap(javain) csEventID[] "$javainput"
-%typemap(javaout) csEventID[] { return $jnicall; }
-%typemap(freearg) csEventID[]
-{
-  delete($1);
-}
-
-%typemap(in) csEventID
-{
-	JNIEnv * env = jni_env_getter->getJNIEnv();
-	if (env != 0) 
-	{
-		csEventID csEvent = csEventID((long)$input);
-		$1 = csEvent;
-	} else {
-		$1 = 0;
-	}
-}
-%typemap(out) csEventID
-{
-	$result = (jlong)$1.GetHash();
-}
-%typemap(jni) csEventID "jlong"
-%typemap(jtype) csEventID "long"
-%typemap(jstype) csEventID "long"
-%typemap(javain) csEventID "$javainput"
-%typemap(javaout) csEventID { return $jnicall; }
 
 /*
   ptr   : either a csRef<type> or csPtr<type>
@@ -324,18 +278,6 @@ jobject _csRef_to_Java(const csRef<iBase>& ref, void* ptr, const char* name,
   }
 %enddef
 
-#undef INTERFACE_EQUALS
-%define INTERFACE_EQUALS
-  public boolean equals (Object obj)
-  {
-    boolean equal = false;
-    if (obj instanceof $javaclassname)
-      equal = ((($javaclassname)obj).swigCPtr == this.swigCPtr);
-    return equal;
-  }
-%enddef
-#undef INTERFACE_APPLY
-#define INTERFACE_APPLY(T) %typemap(javacode) T %{ INTERFACE_EQUALS %}
 
 // ivaria/event.h
 // Swig 1.3.23 introduces support for default arguments, so it generates this
@@ -351,7 +293,7 @@ public void Broadcast (long iCode) { Broadcast(iCode, new SWIGTYPE_p_intptr_t())
 %define IEVENTOUTLET_JAVACODE
 %typemap(javacode) iEventOutlet
 %{
-  INTERFACE_EQUALS
+  INTERFACE_BASE
   IEVENTOUTLET_BROADCAST
 %}
 %enddef
@@ -373,7 +315,7 @@ IEVENTOUTLET_JAVACODE
 %define ICONFIGMANAGER_JAVACODE
 %typemap(javacode) iConfigManager
 %{
-  INTERFACE_EQUALS
+  INTERFACE_BASE
   public final static int ConfigPriorityPlugin =
     iConfigManager.PriorityVeryLow;
   public final static int ConfigPriorityApplication =
@@ -461,82 +403,9 @@ CSINITIALIZER_JAVACODE
 
 %include "arrays_java.i"
 
-%typemap(javacode) iAnimatedMeshFactory
-%{
-  private long[] _ConvertIRenderBufferArrayToNative(final SWIGTYPE_p_iRenderBuffer [] indices) {
-	if (indices == null) {
-		return new long[0];
-	}
-	final long[] pointers = new long[indices.length];
-	for (int i=0;i<indices.length;i++) {
-		pointers[i] = SWIGTYPE_p_iRenderBuffer.getCPtr(indices[i]);
-	}
-	return pointers;
-  }
+%inline %{
+	struct cspaceUtils {
+	};
 %}
-
-
-%typemap(in) csArray<csArray<unsigned int> >& boneIndices
-{
-	csArray<csArray<unsigned int> > * uiaa = new csArray<csArray<unsigned int> >();
-	JNIEnv * env = jni_env_getter->getJNIEnv();
-	if (env != 0) 
-	{
-		jobjectArray boneIndicesarray = (jobjectArray)$input;
-		int length = env->GetArrayLength(boneIndicesarray);
-		int i = 0;
-		for (i=0;i<length;i++) 
-		{
-			csArray<unsigned int> uia;
-			jlongArray indice = (jlongArray)env->GetObjectArrayElement(boneIndicesarray,i);
-			jlong * larray = env->GetLongArrayElements(indice,0);
-			int lengthinner = env->GetArrayLength(indice);
-			int j = 0;
-			for (j=0;j<lengthinner;j++) 
-			{
-				uia.Push((unsigned int)larray[j]);
-			}
-			uiaa->Push(uia);
-			env->ReleaseLongArrayElements(indice,larray,JNI_ABORT);
-		}
-	}
-	$1 = uiaa;
-}
-%typemap(jni) csArray<csArray<unsigned int> >& boneIndices "jobjectArray"
-%typemap(jtype) csArray<csArray<unsigned int> >& boneIndices "long[][]"
-%typemap(jstype) csArray<csArray<unsigned int> >& boneIndices "long[][]"
-%typemap(javain) csArray<csArray<unsigned int> >& boneIndices "$javainput"
-%typemap(freearg) csArray<csArray<unsigned int> >&
-{
-  delete($1);
-}
-
-%typemap(in) csArray<iRenderBuffer*>& indices
-{
-	csArray<iRenderBuffer*> * ira = new csArray<iRenderBuffer*>();
-	JNIEnv * env = jni_env_getter->getJNIEnv();
-	if (env != 0) 
-	{
-		// Fills the arrays
-		jlongArray indicesarray = (jlongArray)$input;
-		jlong * larray = env->GetLongArrayElements(indicesarray,0);
-		int length = env->GetArrayLength(indicesarray);
-		int i = 0;
-		for (i=0;i<length;i++) 
-		{
-			iRenderBuffer* ir = (iRenderBuffer*)(void*)(long)(larray[i]);
-			ira->Push(ir);
-		}
-	}
-	$1 = ira;
-}
-%typemap(jni) csArray<iRenderBuffer*>& indices "jlongArray"
-%typemap(jtype) csArray<iRenderBuffer*>& indices "long[]"
-%typemap(jstype) csArray<iRenderBuffer*>& indices "SWIGTYPE_p_iRenderBuffer []"
-%typemap(javain) csArray<iRenderBuffer*>& indices "_ConvertIRenderBufferArrayToNative($javainput)"
-%typemap(freearg) csArray<iRenderBuffer*>&
-{
-  delete($1);
-}
 
 #endif // SWIGJAVA
