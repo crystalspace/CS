@@ -101,9 +101,10 @@ void csCameraBase::MoveWorld (const csVector3 &v, bool cd)
 
 void csCameraBase::Correct (int n)
 {
+  if (n == 0) return;
+
   csVector3 w1, w2, w3;
   float *vals[5];
-  if (n == 0) return ;
 
   w3 = m_t2o.Col3 ();
   vals[0] = &w3.x;
@@ -127,11 +128,11 @@ void csCameraBase::Correct (int n)
 
 void csCameraBase::Correct (int n, float *vals[])
 {
-  float r, angle;
-
-  if (vals == 0) return ;
-  if (vals[0] == 0) return ;
-  if (vals[1] == 0) return ;
+  if (vals == 0) return;
+  if (vals[0] == 0) return;
+  if (vals[1] == 0) return;
+  
+  float r;
   if (vals[2] != 0)
   {
     if (*vals[0] < *vals[1])
@@ -148,6 +149,7 @@ void csCameraBase::Correct (int n, float *vals[])
     }
   }
 
+  float angle;
   angle = (float)atan2 (*vals[1], *vals[0]);
   angle = (TWO_PI / n) * csQround (n * angle / TWO_PI);
   *vals[1] = csQsqrt ((*vals[0]) * (*vals[0]) + (*vals[1]) * (*vals[1]));
