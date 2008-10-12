@@ -47,14 +47,14 @@ namespace CS
         _errorStatus);
       OptionalPointerWrapper<size_t> errorLevel (_errorLevel);
       
-      CS_ASSERT_MSG("Outer shader variable cannot be 0", outer != 0);
+      CS_ASSERT_MSG ("Outer shader variable cannot be 0", outer != 0);
       
       errorStatus.Set (ShaderVarArrayHelper::errSuccess);
       csShaderVariable* current = outer;
-      for (size_t n = 0; n < indices.GetIndexNum(); n++)
+      for (size_t n = 0; n < indices.GetIndexNum (); n++)
       {
         errorLevel.Set (n);
-        if (current->GetType() != csShaderVariable::ARRAY)
+        if (current->GetType () != csShaderVariable::ARRAY)
         {
           if ((current->GetType() == csShaderVariable::UNKNOWN)
             && (missingAction == ShaderVarArrayHelper::maCreate))

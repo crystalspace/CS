@@ -61,4 +61,3 @@ namespace CS
     
   } // namespace Graphics
 } // namespace CS
-
