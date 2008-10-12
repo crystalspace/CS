@@ -262,12 +262,10 @@ jobject _csRef_to_Java(const csRef<iBase>& ref, void* ptr, const char* name,
 	}
     }
   }
-  //%typemap(out) csWrapPtr %{ $result = $1; %}
   %typemap(jni) csWrapPtr "jobject";
   %typemap(jtype) csWrapPtr "Object";
   %typemap(jstype) csWrapPtr "Object";
   %typemap(javain) csWrapPtr "$javainput";
-  //%typemap(javaout) csWrapPtr { return $jnicall; }
   %typemap(javaout) csWrapPtr
   {
     Object _obj = $jnicall;

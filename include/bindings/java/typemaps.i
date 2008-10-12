@@ -47,13 +47,13 @@ TYPEMAP_CSEVENTID
 #undef TYPEMAP_CSEVENTID
 
 // Typemap to handle csRef<xxx> & OUTPUT parameters
-#undef OUTPUT_TYPEMAP_CSTYPE
-%define OUTPUT_TYPEMAP_CSTYPE(wrapper,type)
-	%typemap(jni) wrapper<type> *OUTPUT, wrapper<type> &OUTPUT "jobjectArray"
-	%typemap(jtype) wrapper<type> *OUTPUT, wrapper<type> &OUTPUT "type[]"
-	%typemap(jstype) wrapper<type> *OUTPUT, wrapper<type> &OUTPUT "type[]"
-	%typemap(javain) wrapper<type> *OUTPUT, wrapper<type> &OUTPUT "$javainput"
-	%typemap(in) wrapper<type> *OUTPUT($*1_ltype temp), wrapper<type> &OUTPUT($*1_ltype temp)
+#undef OUTPUT_TYPEMAP_CSREF
+%define OUTPUT_TYPEMAP_CSREF(type)
+	%typemap(jni) csRef<type> &OUTPUT "jobjectArray"
+	%typemap(jtype) csRef<type> &OUTPUT "type[]"
+	%typemap(jstype) csRef<type> &OUTPUT "type[]"
+	%typemap(javain) csRef<type> &OUTPUT "$javainput"
+	%typemap(in) csRef<type> &OUTPUT($*1_ltype temp)
 	{
 		if (!$input) {
 			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
@@ -65,15 +65,19 @@ TYPEMAP_CSEVENTID
 		}
 		$1 = &temp;
 	}
-	%typemap(argout) wrapper<type> *OUTPUT, wrapper<type> &OUTPUT 
+	%typemap(argout) csRef<type> &OUTPUT 
 	{
 		JCALL3(SetObjectArrayElement, jenv, $input, 0, _csRef_to_Java(csRef<iBase>(
 		(type*)temp$argnum), (void*)(type*)temp$argnum, #type " *", "org/crystalspace3d/" #type, jenv));
 	}
 %enddef
-OUTPUT_TYPEMAP_CSTYPE(csRef,iEvent)
-OUTPUT_TYPEMAP_CSTYPE(csRef,iBase)
-#undef OUTPUT_TYPEMAP_CSTYPE
+#undef INTERFACE_APPLY
+%define INTERFACE_APPLY(T) 
+	OUTPUT_TYPEMAP_CSREF(T) 
+%enddef
+APPLY_FOR_ALL_INTERFACES
+#undef INTERFACE_APPLY
+#undef OUTPUT_TYPEMAP_CSREF
 
 #undef OUTPUT_TYPEMAP_STRING
 %define OUTPUT_TYPEMAP_STRING
@@ -118,16 +122,14 @@ OUTPUT_TYPEMAP_STRING
 			SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
 			return $null;
 		}
-		temp = 0;
-		void * tpv = (void*)temp;
-		$1 = &tpv;
+		$1 = (void**)&temp;
 		$2 = &size;
 	}
 	%typemap(argout) (void *&,size_t &)
 	{
 		jbyteArray barray = JCALL1(NewByteArray, jenv, (long)size$argnum);
 		jbyte * pbarray = JCALL2(GetByteArrayElements,jenv,barray,0);
-		memcpy(pbarray, temp$argnum, size$argnum);
+		memcpy(pbarray,temp$argnum,size$argnum);
 		JCALL3(ReleaseByteArrayElements, jenv, barray, pbarray, JNI_COMMIT);
 		JCALL3(SetObjectArrayElement, jenv, $input, 0, barray);
 	}
