@@ -23,7 +23,7 @@
 
 %javaconst(1);
 
-%inline %{
+%{
 	static JNIEnv* getJNIEnv() 
 	{
 		static JavaVM * m_jvm = 0;
@@ -44,18 +44,10 @@
 		if (m_jvm != 0 && res == 0 && existingJvmReturned > 0 ) 
 		{
 			// Jvm already existed, get the env
-#ifdef __cplusplus
 			res = m_jvm->GetEnv((void**)&m_env, vm_args.version);
-#else
-			res = (*m_jvm)->GetEnv(m_jvm,(void**)&m_env, vm_args.version);
-#endif
 			if ( res == JNI_EDETACHED )
 			{
-#ifdef __cplusplus
 				res = m_jvm->AttachCurrentThread((void**)&m_env, 0);
-#else
-				res = (*m_jvm)->AttachCurrentThread(m_jvm, (void**)&m_env, 0);
-#endif
 			}
 	
 			if ( res >= 0 ) 
@@ -102,8 +94,8 @@
 %rename(bitAnd) operator&;
 %rename(bitOr) operator|;
 %rename(bitXor) operator^;
-%rename(__and__) operator&&;
-%rename(__or__) operator||;
+%rename(logicalAnd) operator&&;
+%rename(logicalOr) operator||;
 %rename(isLessThan) operator<;
 %rename(equalsOrLess) operator<=;
 %rename(isGreaterThen) operator>;
@@ -113,7 +105,7 @@
 
 %ignore operator+();
 %rename(negate) operator-();
-%rename(__not__) operator!;
+%rename(logicalNot) operator!;
 %rename(bitComplement) operator~;
 %rename(increment) operator++();
 %rename(getAndIncrement) operator++(int);

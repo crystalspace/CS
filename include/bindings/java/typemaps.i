@@ -1,3 +1,7 @@
+%{
+	typedef unsigned int StringIDValue;
+%}
+
 #undef TYPEMAP_CSEVENTID_ARRAY
 %define TYPEMAP_CSEVENTID_ARRAY
 %typemap(in) csEventID[]
@@ -20,7 +24,7 @@
 %typemap(javaout) csEventID[] { return $jnicall; }
 %typemap(freearg) csEventID[]
 {
-  delete($1);
+  delete[]($1);
 }
 %enddef
 TYPEMAP_CSEVENTID_ARRAY
@@ -35,7 +39,7 @@ TYPEMAP_CSEVENTID_ARRAY
 }
 %typemap(out) csEventID
 {
-	$result = (jlong)$1.GetHash();
+	$result = (jlong)(StringIDValue)(csEventID)$1;
 }
 %typemap(jni) csEventID "jlong"
 %typemap(jtype) csEventID "long"

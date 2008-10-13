@@ -29,17 +29,10 @@
             		JNIEnv * jenv = getJNIEnv();
 			if (jenv != 0) 
 			{
-#ifdef __cplusplus
 				event_class = (jclass)jenv->NewGlobalRef(jenv->FindClass("org/crystalspace3d/iEvent"));
 				jclass handler_class = jenv->FindClass("org/crystalspace3d/csJEventHandler");
 				event_ctr_mid = jenv->GetMethodID(event_class, "<init>", "(JZ)V");
 				handle_event_mid = jenv->GetMethodID(handler_class, "HandleEvent", "(Lorg/crystalspace3d/iEvent;)Z");
-#else
-				event_class = (jclass)(*jenv)->NewGlobalRef(jenv,(*jenv)->FindClass(jenv,"org/crystalspace3d/iEvent"));
-				jclass handler_class = (*jenv)->FindClass(jenv,"org/crystalspace3d/csJEventHandler");
-				event_ctr_mid = (*jenv)->GetMethodID(jenv,event_class, "<init>", "(JZ)V");
-				handle_event_mid = (*jenv)->GetMethodID(jenv,handler_class, "HandleEvent", "(Lorg/crystalspace3d/iEvent;)Z");
-#endif
 			}
 
 		}
@@ -48,13 +41,8 @@
             		JNIEnv * jenv = getJNIEnv();
 			if (jenv != 0) 
 			{
-#ifdef __cplusplus
 	            		jenv->DeleteGlobalRef(my_jobject);
 	            		jenv->DeleteGlobalRef(event_class);
-#else
-	            		(*jenv)->DeleteGlobalRef(jenv,my_jobject);
-	            		(*jenv)->DeleteGlobalRef(jenv,event_class);
-#endif
 			}
 		}
         	static jobject _csJEventHandler_jobject;
@@ -72,11 +60,7 @@
             		{
 				JNIEnv * jenv = getJNIEnv();
                 		if (jenv != 0) {
-#ifdef __cplusplus
 					jenv->ExceptionClear();
-#else
-					(*jenv)->ExceptionClear(jenv);
-#endif
 				}
             		}
             		return false;
@@ -88,17 +72,10 @@
 			{
 				jlong cptr = 0;
 				*(iEvent **)&cptr = &event; 
-#ifdef __cplusplus
 				jobject event_object = jenv->NewObject(event_class, event_ctr_mid, cptr, false);
 				if (!event_object)
 					return false;
 				jboolean result = jenv->CallBooleanMethod(my_jobject, handle_event_mid, event_object);
-#else
-				jobject event_object = (*jenv)->NewObject(jenv,event_class, event_ctr_mid, cptr, false);
-				if (!event_object)
-					return false;
-				jboolean result = (*jenv)->CallBooleanMethod(my_jobject, handle_event_mid, event_object);
-#endif
 				return result;
 			}
 			return false;
@@ -132,11 +109,7 @@
     JNIEXPORT void JNICALL Java_org_crystalspace3d_csJEventHandler__1exportJEventHandler
         (JNIEnv * jenv, jclass, jobject obj) 
     {
-#ifdef __cplusplus
         _csJEventHandler::_csJEventHandler_jobject = jenv->NewGlobalRef(obj);
-#else
-        _csJEventHandler::_csJEventHandler_jobject = (*jenv)->NewGlobalRef(jenv,obj);
-#endif
     }
 
 %}
