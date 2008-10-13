@@ -2267,6 +2267,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *HasNext = *cspacec::iEventAttributeIterator_HasNext;
 *Next = *cspacec::iEventAttributeIterator_Next;
 *Reset = *cspacec::iEventAttributeIterator_Reset;
+*scfGetVersion = *cspacec::iEventAttributeIterator_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

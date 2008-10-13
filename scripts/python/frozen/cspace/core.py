@@ -1069,10 +1069,12 @@ class iEventAttributeIterator(iBase):
     def HasNext(*args): return _core.iEventAttributeIterator_HasNext(*args)
     def Next(*args): return _core.iEventAttributeIterator_Next(*args)
     def Reset(*args): return _core.iEventAttributeIterator_Reset(*args)
+    scfGetVersion = staticmethod(_core.iEventAttributeIterator_scfGetVersion)
     __swig_destroy__ = _core.delete_iEventAttributeIterator
     __del__ = lambda self : None;
 iEventAttributeIterator_swigregister = _core.iEventAttributeIterator_swigregister
 iEventAttributeIterator_swigregister(iEventAttributeIterator)
+iEventAttributeIterator_scfGetVersion = _core.iEventAttributeIterator_scfGetVersion
 
 class csKeyEventData(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
