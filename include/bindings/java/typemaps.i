@@ -377,7 +377,7 @@ OUTPUT_TYPEMAP_VOIDP
 		$1 = (type**)&temp;
 		$2 = &size;
 	}
-	%typemap(argout) (void *&OUTPUT,size_t &OUTPUT)
+	%typemap(argout) (type *&OUTPUT,size_t &OUTPUT)
 	{
 		jclass clazz = jenv->FindClass("org/crystalspace3d/" #type);
 		jmethodID mid = jenv->GetMethodID(clazz, "<init>", "(JZ)V");
@@ -387,7 +387,7 @@ OUTPUT_TYPEMAP_VOIDP
 		}
 		JCALL3(SetObjectArrayElement, jenv, $input, 0, oarray);
 	}
-	%typemap(freearg) (void *&OUTPUT,size_t &OUTPUT) ""
+	%typemap(freearg) (type *&OUTPUT,size_t &OUTPUT) ""
 %enddef
 OUTPUT_TYPEMAP_TYPEP(csTriangleMinMax)
 OUTPUT_TYPEMAP_TYPEP(csPlane3)
