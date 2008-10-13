@@ -147,6 +147,42 @@ OUTPUT_TYPEMAP_STRING
 INOUT_TYPEMAP_STRING
 #undef INOUT_TYPEMAP_STRING
 
+#undef INPUT_TYPEMAP_CSTYPE_ARRAY
+%define INPUT_TYPEMAP_CSTYPE_ARRAY(type)
+	%typemap(jni) (type *,size_t) "jobjectArray"
+	%typemap(jtype) (type *,size_t) "long[]"
+	%typemap(jstype) (type *,size_t) "type[]"
+	%typemap(javain) (type *,size_t) "cspaceUtils._ConvertArrayToNative($javainput)"
+	%typemap(in) (type *,size_t) (type ** temp,size_t size)
+	{
+		if (!$input) {
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+			return $null;
+		}
+		size = JCALL1(GetArrayLength, jenv, $input);
+		if (size == 0) {
+			SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+			return $null;
+		}
+		jlongArray jlarray = (jlongArray)$input;
+		jlong * larray = JCALL2(GetLongArrayElements,jenv,jlarray,0);
+		temp = new type*[size];
+		for (unsigned int i=0;i<size;i++) {
+			temp[i] = (type*)(void*)(long)larray[i];
+		}
+		JCALL3(ReleaseLongArrayElements,jenv,jlarray,larray,JNI_ABORT);
+		$1 = *temp;
+		$2 = size;
+	}
+	%typemap(freearg) (type *,size_t )
+	{
+		delete[](temp$argnum);
+	}
+%enddef
+INPUT_TYPEMAP_CSTYPE_ARRAY(csTriangleMeshEdge) 
+INPUT_TYPEMAP_CSTYPE_ARRAY(csPlane3) 
+#undef INPUT_TYPEMAP_CSTYPE_ARRAY
+
 #undef OUTPUT_TYPEMAP_VOIDP
 %define OUTPUT_TYPEMAP_VOIDP
 	%typemap(jni) (void *&,size_t &) "jobjectArray"
@@ -258,6 +294,7 @@ INPUT_BONE_INDICES
 		iRenderBuffer* ir = (iRenderBuffer*)(void*)(long)(larray[i]);
 		ira->Push(ir);
 	}
+	JCALL3(ReleaseLongArrayElements,jenv,indicesarray,larray,JNI_ABORT);
 	$1 = ira;
 }
 %typemap(jni) csArray<iRenderBuffer*>& indices "jlongArray"
