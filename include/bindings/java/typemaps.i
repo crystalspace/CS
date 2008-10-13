@@ -110,6 +110,46 @@ APPLY_FOR_ALL_INTERFACES
 OUTPUT_TYPEMAP_STRING
 #undef OUTPUT_TYPEMAP_STRING
 
+#undef INOUT_TYPEMAP_STRING
+%define INOUT_TYPEMAP_STRING
+	%typemap(jni) char *INOUT "jobjectArray"
+	%typemap(jtype) char *INOUT "String[]"
+	%typemap(jstype) char *INOUT "String[]"
+	%typemap(javain) char *INOUT "$javainput"
+	%typemap(in) char *INOUT($*1_ltype temp,jstring theString)
+	{
+		if (!$input) {
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+			return $null;
+		}
+		if (JCALL1(GetArrayLength, jenv, $input) == 0) {
+			SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+			return $null;
+		}
+		theString = (jstring)JCALL2(GetObjectArrayElement,jenv,$input,0);
+		if (theString) {
+			temp = (char *)(jbyte *)JCALL2(GetStringUTFChars,jenv,theString,0);
+		}
+		$1 = &temp;
+	}
+	%typemap(out) char *INOUT
+	{
+		$result = JCALL1(NewObjectArray, jenv, 1);
+		JCALL3(SetObjectArrayElement, jenv, $result, 0, JCALL1(NewStringUTF, jenv, *($1)));
+	}
+	%typemap(argout) char *INOUT
+	{
+		JCALL3(SetObjectArrayElement, jenv, $input, 0, JCALL1(NewStringUTF, jenv, temp$argnum));
+		
+	}
+	%typemap(freearg) char *INOUT 
+	{
+		jenv->ReleaseStringUTFChars(theString$argnum,temp$argnum);
+	}
+%enddef
+INOUT_TYPEMAP_STRING
+#undef INOUT_TYPEMAP_STRING
+
 #undef OUTPUT_TYPEMAP_VOIDP
 %define OUTPUT_TYPEMAP_VOIDP
 	%typemap(jni) (void *&,size_t &) "jobjectArray"
