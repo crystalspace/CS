@@ -1992,6 +1992,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 	  bugplug->AddCounter ("Triangle Count", (int)num_tri);
 	  bugplug->AddCounter ("Mesh Count", 1);
 	}
+  // @@@ CRASHER Function call below causing crash inside i915 Intel
+  // driver on Ubuntu Linux. Unknown if same with other distros.
 	glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
 	  (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
 	  compType, 
