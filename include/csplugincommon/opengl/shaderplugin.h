@@ -116,7 +116,7 @@ namespace CS
       class CS_CSPLUGINCOMMON_GL_EXPORT ClipPlanes
       {
         size_t maxPlanes;
-        size_t currentPlanes;
+        uint32 currentPlanes;
         
         CS::ShaderVarStringID svObjectToWorldInv;
         CS::ShaderVarStringID svWorldToCamera;
