@@ -349,10 +349,11 @@ void csDecal::EndMesh()
 bool csDecal::Age (csTicks ticks)
 {
   const float lifespan = decalTemplate->GetTimeToLive ();
-  life += (float)ticks * 0.001f;
 
   if (lifespan <= 0.0f)
     return true;
+  
+  life += (float)ticks * 0.001f;
 
   return life < lifespan;
 }
