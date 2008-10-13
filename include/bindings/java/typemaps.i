@@ -179,9 +179,45 @@ INOUT_TYPEMAP_STRING
 		delete[](temp$argnum);
 	}
 %enddef
+INPUT_TYPEMAP_CSTYPE_ARRAY(csTriangleMinMax)
 INPUT_TYPEMAP_CSTYPE_ARRAY(csTriangleMeshEdge) 
 INPUT_TYPEMAP_CSTYPE_ARRAY(csPlane3) 
 #undef INPUT_TYPEMAP_CSTYPE_ARRAY
+
+
+#undef OUTPUT_TYPEMAP_CSTYPE_ARRAY
+%define OUTPUT_TYPEMAP_CSTYPE_ARRAY(type)
+	%typemap(jni) (type *&OUTPUT,size_t &OUTPUT) "jobjectArray"
+	%typemap(jtype) (type *&OUTPUT,size_t &OUTPUT) "type[][]"
+	%typemap(jstype) (type *&OUTPUT,size_t &OUTPUT) "type[][]"
+	%typemap(javain) (type *&OUTPUT,size_t &OUTPUT) "$javainput"
+	%typemap(in) (type *&OUTPUT,size_t &OUTPUT) (type * temp,size_t size)
+	{
+		if (!$input) {
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+			return $null;
+		}
+		if (JCALL1(GetArrayLength, jenv, $input) == 0) {
+			SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+			return $null;
+		}
+		$1 = (type**)&temp;
+		$2 = &size;
+	}
+	%typemap(argout) (type *&OUTPUT,size_t &OUTPUT)
+	{
+		jclass clazz = jenv->FindClass("org/crystalspace3d/" #type);
+		jmethodID mid = jenv->GetMethodID(clazz, "<init>", "(JZ)V");
+		jobjectArray oarray = JCALL3(NewObjectArray, jenv, (long)size$argnum, clazz, 0);
+		for (unsigned int i = 0;i<size$argnum;i++) {
+			JCALL3(SetObjectArrayElement, jenv, oarray, i, jenv->NewObject(clazz, mid, (jlong)(void*)(temp$argnum+i), true));
+		}
+		JCALL3(SetObjectArrayElement, jenv, $input, 0, oarray);
+	}
+	%typemap(freearg) (void *&OUTPUT,size_t &OUTPUT) ""
+%enddef
+OUTPUT_TYPEMAP_CSTYPE_ARRAY(csTriangleMinMax)
+#undef OUTPUT_TYPEMAP_CSTYPE_ARRAY
 
 #undef INPUT_TYPEMAP_CSTYPE_ARRAY
 %define INPUT_TYPEMAP_CSTYPE_ARRAY(type)
@@ -269,6 +305,12 @@ OUTPUT_TYPEMAP_CSTYPE_ARRAY(csTriangleMeshEdge)
 			return $null;
 		}
 		$1 = new type[size];
+		for (unsigned int i=0;i<size;i++) {
+			jobject obj = JCALL2(GetObjectArrayElement,jenv,$input,i);
+			if (obj) {
+				$1[i] = *((type*)(void*)_cs_get_swig_pointer(obj,jenv));
+			}
+		}
 	}
 	%typemap(argout) (type *OUTPUT)
 	{
@@ -277,32 +319,12 @@ OUTPUT_TYPEMAP_CSTYPE_ARRAY(csTriangleMeshEdge)
 		for (unsigned int i = 0;i<size$argnum;i++) {
 			JCALL3(SetObjectArrayElement, jenv, $input, i, jenv->NewObject(clazz, mid, (jlong)(void*)($1+i), true));
 		}
+		delete[]($1);
 	}
 %enddef
 OUTPUT_TYPEMAP_CSTYPE_ARRAY(csPlane3) 
 OUTPUT_TYPEMAP_CSTYPE_ARRAY(csVector3) 
 #undef OUTPUT_TYPEMAP_CSTYPE_ARRAY
-
-/*
-#undef OUTPUT_TYPEMAP_OUTLINE_EDGES
-%define OUTPUT_TYPEMAP_OUTLINE_EDGES
-	%typemap(jni) (size_t* outline_edges, size_t& num_outline_edges,bool* outline_verts) "jobject"
-	%typemap(jtype) (size_t* outline_edges, size_t& num_outline_edges,bool* outline_verts) "csOutlineEdgesContainer"
-	%typemap(jstype) (size_t* outline_edges, size_t& num_outline_edges,bool* outline_verts) "csOutlineEdgesContainer"
-	%typemap(javain) (size_t* outline_edges, size_t& num_outline_edges,bool* outline_verts) "$javainput"
-	%typemap(in) (size_t* outline_edges, size_t& num_outline_edges,bool* outline_verts) (size_t ** outline_edges,size_t num_outline_edges,bool ** outline_verts)
-	{
-	}
-	%typemap(argout) (size_t* outline_edges, size_t& num_outline_edges,bool* outline_verts)
-	{
-	}
-	%typemap(freearg) (size_t* outline_edges, size_t& num_outline_edges,bool* outline_verts)
-	{
-	}
-%enddef
-OUTPUT_TYPEMAP_OUTLINE_EDGES
-#undef OUTPUT_TYPEMAP_OUTLINE_EDGES
-*/
 
 #undef OUTPUT_TYPEMAP_VOIDP
 %define OUTPUT_TYPEMAP_VOIDP
@@ -335,6 +357,105 @@ OUTPUT_TYPEMAP_OUTLINE_EDGES
 %enddef
 OUTPUT_TYPEMAP_VOIDP
 #undef OUTPUT_TYPEMAP_VOIDP
+
+#undef OUTPUT_TYPEMAP_TYPEP
+%define OUTPUT_TYPEMAP_TYPEP(type)
+	%typemap(jni) (type *&OUTPUT,size_t &OUTPUT) "jobjectArray"
+	%typemap(jtype) (type *&OUTPUT,size_t &OUTPUT) "type[][]"
+	%typemap(jstype) (type *&OUTPUT,size_t &OUTPUT) "type[][]"
+	%typemap(javain) (type *&OUTPUT,size_t &OUTPUT) "$javainput"
+	%typemap(in) (type *&OUTPUT,size_t &OUTPUT) (type * temp,size_t size)
+	{
+		if (!$input) {
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+			return $null;
+		}
+		if (JCALL1(GetArrayLength, jenv, $input) == 0) {
+			SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+			return $null;
+		}
+		$1 = (type**)&temp;
+		$2 = &size;
+	}
+	%typemap(argout) (void *&OUTPUT,size_t &OUTPUT)
+	{
+		jclass clazz = jenv->FindClass("org/crystalspace3d/" #type);
+		jmethodID mid = jenv->GetMethodID(clazz, "<init>", "(JZ)V");
+		jobjectArray oarray = JCALL3(NewObjectArray, jenv, (long)size$argnum, clazz, 0);
+		for (unsigned int i = 0;i<size$argnum;i++) {
+			JCALL3(SetObjectArrayElement, jenv, oarray, i, jenv->NewObject(clazz, mid, (jlong)(void*)($1+i), true));
+		}
+		JCALL3(SetObjectArrayElement, jenv, $input, 0, oarray);
+	}
+	%typemap(freearg) (void *&OUTPUT,size_t &OUTPUT) ""
+%enddef
+OUTPUT_TYPEMAP_TYPEP(csTriangleMinMax)
+OUTPUT_TYPEMAP_TYPEP(csPlane3)
+#undef OUTPUT_TYPEMAP_TYPEP
+
+
+#undef OUTPUT_TYPEMAP_BOOL_P
+%define OUTPUT_TYPEMAP_BOOL_P
+	%typemap(jni) (bool * OUTPUT,size_t &OUTPUT) "jobjectArray"
+	%typemap(jtype) (bool * OUTPUT,size_t &OUTPUT) "boolean[][]"
+	%typemap(jstype) (bool * OUTPUT,size_t &OUTPUT) "boolean[][]"
+	%typemap(javain) (bool * OUTPUT,size_t &OUTPUT) "$javainput"
+	%typemap(in) (bool * OUTPUT,size_t &OUTPUT) (size_t size)
+	{
+		if (!$input) {
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+			return $null;
+		}
+		if (JCALL1(GetArrayLength, jenv, $input) == 0) {
+			SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+			return $null;
+		}
+		$2 = &size;
+	}
+	%typemap(argout) (bool * OUTPUT,size_t &OUTPUT)
+	{
+		jbooleanArray barray = JCALL1(NewBooleanArray, jenv, (long)size$argnum);
+		jboolean * pbarray = JCALL2(GetBooleanArrayElements,jenv,barray,0);
+		memcpy(pbarray,$1,size$argnum);
+		JCALL3(ReleaseBooleanArrayElements, jenv, barray, pbarray, JNI_COMMIT);
+		JCALL3(SetObjectArrayElement, jenv, $input, 0, barray);
+	}
+	%typemap(freearg) (bool * OUTPUT,size_t &OUTPUT) ""
+%enddef
+OUTPUT_TYPEMAP_BOOL_P
+#undef OUTPUT_TYPEMAP_BOOL_P
+
+#undef OUTPUT_TYPEMAP_SIZET_P
+%define OUTPUT_TYPEMAP_SIZET_P
+	%typemap(jni) (size_t * OUTPUT,size_t &OUTPUT) "jobjectArray"
+	%typemap(jtype) (size_t * OUTPUT,size_t &OUTPUT) "long[][]"
+	%typemap(jstype) (size_t * OUTPUT,size_t &OUTPUT) "long[][]"
+	%typemap(javain) (size_t * OUTPUT,size_t &OUTPUT) "$javainput"
+	%typemap(in) (size_t * OUTPUT,size_t &OUTPUT) (size_t size)
+	{
+		if (!$input) {
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+			return $null;
+		}
+		if (JCALL1(GetArrayLength, jenv, $input) == 0) {
+			SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+			return $null;
+		}
+		$2 = &size;
+	}
+	%typemap(argout) (size_t * OUTPUT,size_t &OUTPUT)
+	{
+		jlongArray barray = JCALL1(NewLongArray, jenv, (long)size$argnum);
+		jlong * pbarray = JCALL2(GetLongArrayElements,jenv,barray,0);
+		memcpy(pbarray,$1,size$argnum);
+		JCALL3(ReleaseLongArrayElements, jenv, barray, pbarray, JNI_COMMIT);
+		JCALL3(SetObjectArrayElement, jenv, $input, 0, barray);
+	}
+	%typemap(freearg) (size_t * OUTPUT,size_t &OUTPUT) ""
+%enddef
+OUTPUT_TYPEMAP_SIZET_P
+#undef OUTPUT_TYPEMAP_SIZET_P
+
 
 #undef INPUT_TYPEMAP_VOIDP
 %define INPUT_TYPEMAP_VOIDP
@@ -430,6 +551,52 @@ INPUT_BONE_INDICES
 INPUT_IRENDERBUFFER_INDICES
 #undef INPUT_IRENDERBUFFER_INDICES
 
+#undef INOUT_TYPEMAP_CSARRAY_TYPE
+%define INOUT_TYPEMAP_CSARRAY_TYPE(type)
+// csArray<type> & INOUT
+%typemap(in) csArray<type> & INOUT
+{
+	csArray<type> * ira = new csArray<type>();
+	$1 = ira;
+}
+%typemap(jni) csArray<type>& INOUT "jobjectArray"
+%typemap(jtype) csArray<type>& INOUT "type[][]"
+%typemap(jstype) csArray<type>& INOUT "type[][]"
+%typemap(javain) csArray<type>& INOUT "$javainput"
+%typemap(freearg) csArray<type>& INOUT
+{
+  delete($1);
+}
+%enddef
+INOUT_TYPEMAP_CSARRAY_TYPE(csTriangle)
+#undef INOUT_TYPEMAP_CSARRAY_TYPE
+
+#undef OUTPUT_TYPEMAP_CSARRAY_INT
+%define OUTPUT_TYPEMAP_CSARRAY_INT
+%ignore csArray<csArray<int> >;
+%typemap(out) csArray<csArray<int> > * OUTPUT
+{
+	jclass clazz = jenv->FindClass("[I");
+	jobjectArray joarray = JCALL3(NewObjectArray, jenv, $1->GetSize(), clazz, 0);
+	for (unsigned int i=0;i<$1->GetSize();i++) {
+		jintArray jiarray = JCALL1(NewIntArray, jenv, $1->Get(i).GetSize());
+		jint * iarray = JCALL2(GetIntArrayElements,jenv,jiarray,0);
+		for (unsigned int j=0;j<$1->Get(i).GetSize();j++) {
+			iarray[j] = (jint)$1->Get(i).Get(j);
+		}
+		JCALL3(ReleaseIntArrayElements, jenv, jiarray, iarray, JNI_COMMIT);
+		JCALL3(SetObjectArrayElement, jenv, joarray, i, jiarray);
+	}
+	delete ($1);
+}
+%typemap(jni) csArray<csArray<int> > * OUTPUT "jobjectArray"
+%typemap(jtype) csArray<csArray<int> > * OUTPUT "int[][]"
+%typemap(jstype) csArray<csArray<int> > * OUTPUT "int[][]"
+%typemap(javaout) csArray<csArray<int> > * OUTPUT { return $jnicall; }
+%enddef
+OUTPUT_TYPEMAP_CSARRAY_INT
+#undef OUTPUT_TYPEMAP_CSARRAY_INT
+
 #undef TYPEMAP_CSUTILS
 %define TYPEMAP_CSUTILS
 %typemap(javacode) cspaceUtils 
@@ -458,124 +625,3 @@ INPUT_IRENDERBUFFER_INDICES
 %enddef
 TYPEMAP_CSUTILS
 #undef TYPEMAP_CSUTILS
-
-/*
-#undef ARRAY_TYPEMAP_CSTYPE
-%define ARRAY_TYPEMAP_CSTYPE(type)
-	%typemap(jni) type **INPUT "jlongArray"
-	%typemap(jtype) type **INPUT "long[]"
-	%typemap(jstype) type **INPUT "type[]"
-	%typemap(javain) type **INPUT "cspaceUtils._ConvertArrayToNative($javainput)"
-	%typemap(javaout) type **INPUT "zut($javaoutput)"
-	%typemap(in) type **INPUT (type** temp,int totalElem)
-	{
-		if ($input) {
-			jlong * larray = jenv->GetLongArrayElements($input,0);
-			totalElem = jenv->GetArrayLength($input);
-			temp = new type*[totalElem];		
-			for (int j=0;j<totalElem;j++) 
-			{
-				temp[j] = ((type*)(void*)larray[j]);
-			}
-			jenv->ReleaseLongArrayElements($input,larray,JNI_ABORT);
-			$1 = temp;
-		}
-	}
-	%typemap(freearg) type **INPUT
-	{
-		if (temp$argnum) {
-			delete temp$argnum;
-		}
-	}
-%enddef
-
-%inline %{
-	class JavaUtils {
-		public:
-		static unsigned int GetListLength(jobject list) 
-		{
-			return 0;
-		}
-		static jlong GetNativePointer(jobject obj) 
-		{
-			return 0;
-		}
-		static jobject NewList() 
-		{
-			return 0;
-		}
-		static jobject GetListElement(jobject list,unsigned int index) 
-		{
-			return 0;
-		}
-		static jobject AddToList(jobject list,jlong pointer,char * className,jobject refList) 
-		{
-			return 0;
-		}
-		static jobject ClearListAndAddAll(jobject list,jobject listToAdd) 
-		{
-			return 0;
-		}
-	}
-%}
-#undef OBJECT_LIST_INOUT_TYPEMAP_CSTYPE
-%define OBJECT_LIST_INOUT_TYPEMAP_CSTYPE(type)
-	%typemap(jni) type **INPUT "jobject"
-	%typemap(jtype) type **INPUT "java.util.List<type>"
-	%typemap(jstype) type **INPUT "java.util.List<type>"
-	%typemap(javain) type **INPUT "$javainput"
-	%typemap(javaout) type **INPUT "$javaoutput"
-	%typemap(in) type **INPUT (type** temp,int totalElem,jobject obj)
-	{
-		if ($input) {
-			obj = $input;	
-			totalElem = JavaUtils::GetListLength($input);
-			temp = new type*[totalElem];		
-			for (int j=0;j<totalElem;j++) 
-			{
-				temp[j] = ((type*)(void*)JavaUtils::GetNativePointer(_csjava_GetListElement($input,j)));
-			}
-			$1 = temp;
-		}
-	}
-	%typemap(argout) type **INPUT
-	{
-		jobject newList = JavaUtils::NewList();
-		int j = 0;
-		while (true) 
-		{
-			type * val = dynamic_cast<type*>(temp$argnum[j]);
-			if (val != 0) {
-				JavaUtils::AddToList(newList,(jlong)(void*)val,"org/crystalspace3d/"#type,obj$argnum);
-			} else {
-				break;
-			}
-			j++;
-		}
-		JavaUtils::ClearListAndAddAll($input,newList);
-	}
-	%typemap(out) type **INPUT
-	{
-		jobject newList = JavaUtils::NewList();
-		int j = 0;
-		while (true) 
-		{
-			type * val = dynamic_cast<type*>(temp$argnum[j]);
-			if (val != 0) {
-				JavaUtils::AddToList(newList,(jlong)(void*)val,"org/crystalspace3d/"#type,0);
-			} else {
-				break;
-			}
-			j++;
-		}
-		$result = newList;
-	}
-	%typemap(freearg) type **INPUT
-	{
-		if (temp$argnum) {
-			delete temp$argnum;
-		}
-	}
-%enddef
-*/
-
