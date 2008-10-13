@@ -8,7 +8,8 @@
 %ignore iEvent::Name;
 %ignore iEvent::Add;
 %ignore iEvent::Retrieve;
-%extend iEvent {
+%extend iEvent 
+{
 	bool AddString(const char *name, const char *v)
 	{
 		return self->Add(name,v);
@@ -41,3 +42,31 @@
 %enddef
 JAVA_IEVENT_WRAPPER
 #undef JAVA_IEVENT_WRAPPER
+
+#undef OUTLINE_EDGES_CONTAINER
+%define OUTLINE_EDGES_CONTAINER
+%typemap(javacode) csOutlineEdgesContainer
+%{
+	public final long [][] outline_edges = new long[1][0];
+	public final boolean [][] outline_verts = new boolean[1][0];
+%}
+%inline 
+%{
+	struct csOutlineEdgesContainer {};
+%}
+%enddef
+OUTLINE_EDGES_CONTAINER
+#undef OUTLINE_EDGES_CONTAINER
+
+#undef CS_TRIANGLE_MESH_EDGE_TOOLS_WRAPPER
+%define CS_TRIANGLE_MESH_EDGE_TOOLS_WRAPPER
+%ignore csTriangleMeshTools::CalculateEdges(iTriangleMesh*, size_t& num_edges);
+%extend csTriangleMeshTools {
+	static void CalculateEdges(iTriangleMesh* edges, size_t& num_edges,csTriangleMeshEdge* results,size_t & num_results) {
+		results = csTriangleMeshTools::CalculateEdges(edges,num_edges);
+		num_results = num_edges;
+	}
+}
+%enddef
+CS_TRIANGLE_MESH_EDGE_TOOLS_WRAPPER
+#undef CS_TRIANGLE_MESH_EDGE_TOOLS_WRAPPER

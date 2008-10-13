@@ -183,6 +183,94 @@ INPUT_TYPEMAP_CSTYPE_ARRAY(csTriangleMeshEdge)
 INPUT_TYPEMAP_CSTYPE_ARRAY(csPlane3) 
 #undef INPUT_TYPEMAP_CSTYPE_ARRAY
 
+#undef INPUT_TYPEMAP_CSTYPE_ARRAY
+%define INPUT_TYPEMAP_CSTYPE_ARRAY(type)
+	%typemap(jni) (type *,size_t &) "jobjectArray"
+	%typemap(jtype) (type *,size_t &) "long[]"
+	%typemap(jstype) (type *,size_t &) "type[]"
+	%typemap(javain) (type *,size_t &) "cspaceUtils._ConvertArrayToNative($javainput)"
+	%typemap(in) (type *,size_t &) (type ** temp,size_t size)
+	{
+		if (!$input) {
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+			return $null;
+		}
+		size = JCALL1(GetArrayLength, jenv, $input);
+		if (size == 0) {
+			SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+			return $null;
+		}
+		jlongArray jlarray = (jlongArray)$input;
+		jlong * larray = JCALL2(GetLongArrayElements,jenv,jlarray,0);
+		temp = new type*[size];
+		for (unsigned int i=0;i<size;i++) {
+			temp[i] = (type*)(void*)(long)larray[i];
+		}
+		JCALL3(ReleaseLongArrayElements,jenv,jlarray,larray,JNI_ABORT);
+		$1 = *temp;
+		$2 = &size;
+	}
+	%typemap(freearg) (type *,size_t &)
+	{
+		delete[](temp$argnum);
+	}
+%enddef
+INPUT_TYPEMAP_CSTYPE_ARRAY(iTriangleMesh) 
+#undef INPUT_TYPEMAP_CSTYPE_ARRAY
+
+%define OUTPUT_TYPEMAP_CSTYPE_ARRAY(type)
+	%typemap(jni) (type *,size_t &) "jobjectArray"
+	%typemap(jtype) (type *,size_t &) "type[][]"
+	%typemap(jstype) (type *,size_t &) "type[][]"
+	%typemap(javain) (type *,size_t &) "$javainput"
+	%typemap(in) (type *,size_t &) (size_t size)
+	{
+		if (!$input) {
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+			return $null;
+		}
+		size = JCALL1(GetArrayLength, jenv, $input);
+		if (size == 0) {
+			SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+			return $null;
+		}
+		$1 = 0;
+		$2 = &size;
+	}
+	%typemap(argout) (type *,size_t &)
+	{
+		jclass clazz = jenv->FindClass("org/crystalspace3d/" #type);
+		jmethodID mid = jenv->GetMethodID(clazz, "<init>", "(JZ)V");
+		jobjectArray oarray = JCALL3(NewObjectArray, jenv, (long)size$argnum, clazz, 0);
+		for (unsigned int i = 0;i<size$argnum;i++) {
+			JCALL3(SetObjectArrayElement, jenv, oarray, i, jenv->NewObject(clazz, mid, (jlong)(void*)($1+i), true));
+		}
+		JCALL3(SetObjectArrayElement, jenv, $input, 0, oarray);
+	}
+	%typemap(freearg) (type *,size_t &) ""
+%enddef
+OUTPUT_TYPEMAP_CSTYPE_ARRAY(csTriangleMeshEdge) 
+#undef OUTPUT_TYPEMAP_CSTYPE_ARRAY
+
+#undef OUTPUT_TYPEMAP_OUTLINE_EDGES
+%define OUTPUT_TYPEMAP_OUTLINE_EDGES
+	%typemap(jni) (size_t* outline_edges, size_t& num_outline_edges,bool* outline_verts) "jobject"
+	%typemap(jtype) (size_t* outline_edges, size_t& num_outline_edges,bool* outline_verts) "csOutlineEdgesContainer"
+	%typemap(jstype) (size_t* outline_edges, size_t& num_outline_edges,bool* outline_verts) "csOutlineEdgesContainer"
+	%typemap(javain) (size_t* outline_edges, size_t& num_outline_edges,bool* outline_verts) "$javainput"
+	%typemap(in) (size_t* outline_edges, size_t& num_outline_edges,bool* outline_verts) (size_t ** outline_edges,size_t num_outline_edges,bool ** outline_verts)
+	{
+	}
+	%typemap(argout) (size_t* outline_edges, size_t& num_outline_edges,bool* outline_verts)
+	{
+	}
+	%typemap(freearg) (size_t* outline_edges, size_t& num_outline_edges,bool* outline_verts)
+	{
+	}
+%enddef
+OUTPUT_TYPEMAP_OUTLINE_EDGES
+#undef OUTPUT_TYPEMAP_OUTLINE_EDGES
+
 #undef OUTPUT_TYPEMAP_VOIDP
 %define OUTPUT_TYPEMAP_VOIDP
 	%typemap(jni) (void *&,size_t &) "jobjectArray"

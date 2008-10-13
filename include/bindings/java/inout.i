@@ -21,3 +21,5 @@
 %apply (void *,size_t) { (const void *v, size_t size) };
 %apply (csTriangleMeshEdge *,size_t) { (csTriangleMeshEdge* edges, size_t num_edges) };
 %apply (csPlane3 *,size_t) { (csPlane3* planes, size_t num_vertices) };
+%apply (iTriangleMesh *,size_t &) { (iTriangleMesh* edges, size_t & num_edges) };
+%apply (csTriangleMeshEdge *,size_t &) { (csTriangleMeshEdge* results, size_t & num_results) };
