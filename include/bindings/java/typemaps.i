@@ -149,11 +149,11 @@ INOUT_TYPEMAP_STRING
 
 #undef INPUT_TYPEMAP_CSTYPE_ARRAY
 %define INPUT_TYPEMAP_CSTYPE_ARRAY(type)
-	%typemap(jni) (type *,size_t) "jobjectArray"
-	%typemap(jtype) (type *,size_t) "long[]"
-	%typemap(jstype) (type *,size_t) "type[]"
-	%typemap(javain) (type *,size_t) "cspaceUtils._ConvertArrayToNative($javainput)"
-	%typemap(in) (type *,size_t) (type ** temp,size_t size)
+	%typemap(jni) (type *INPUT,size_t INPUT) "jobjectArray"
+	%typemap(jtype) (type *INPUT,size_t INPUT) "long[]"
+	%typemap(jstype) (type *INPUT,size_t INPUT) "type[]"
+	%typemap(javain) (type *INPUT,size_t INPUT) "cspaceUtils._ConvertArrayToNative($javainput)"
+	%typemap(in) (type *INPUT,size_t INPUT) (type ** temp,size_t size)
 	{
 		if (!$input) {
 			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
@@ -174,7 +174,7 @@ INOUT_TYPEMAP_STRING
 		$1 = *temp;
 		$2 = size;
 	}
-	%typemap(freearg) (type *,size_t )
+	%typemap(freearg) (type *INPUT,size_t INPUT)
 	{
 		delete[](temp$argnum);
 	}
@@ -185,11 +185,11 @@ INPUT_TYPEMAP_CSTYPE_ARRAY(csPlane3)
 
 #undef INPUT_TYPEMAP_CSTYPE_ARRAY
 %define INPUT_TYPEMAP_CSTYPE_ARRAY(type)
-	%typemap(jni) (type *,size_t &) "jobjectArray"
-	%typemap(jtype) (type *,size_t &) "long[]"
-	%typemap(jstype) (type *,size_t &) "type[]"
-	%typemap(javain) (type *,size_t &) "cspaceUtils._ConvertArrayToNative($javainput)"
-	%typemap(in) (type *,size_t &) (type ** temp,size_t size)
+	%typemap(jni) (type *INPUT,size_t &INPUT) "jobjectArray"
+	%typemap(jtype) (type *INPUT,size_t &INPUT) "long[]"
+	%typemap(jstype) (type *INPUT,size_t &INPUT) "type[]"
+	%typemap(javain) (type *INPUT,size_t &INPUT) "cspaceUtils._ConvertArrayToNative($javainput)"
+	%typemap(in) (type *INPUT,size_t &INPUT) (type ** temp,size_t size)
 	{
 		if (!$input) {
 			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
@@ -210,7 +210,7 @@ INPUT_TYPEMAP_CSTYPE_ARRAY(csPlane3)
 		$1 = *temp;
 		$2 = &size;
 	}
-	%typemap(freearg) (type *,size_t &)
+	%typemap(freearg) (type *INPUT,size_t &INPUT)
 	{
 		delete[](temp$argnum);
 	}
@@ -219,11 +219,11 @@ INPUT_TYPEMAP_CSTYPE_ARRAY(iTriangleMesh)
 #undef INPUT_TYPEMAP_CSTYPE_ARRAY
 
 %define OUTPUT_TYPEMAP_CSTYPE_ARRAY(type)
-	%typemap(jni) (type *,size_t &) "jobjectArray"
-	%typemap(jtype) (type *,size_t &) "type[][]"
-	%typemap(jstype) (type *,size_t &) "type[][]"
-	%typemap(javain) (type *,size_t &) "$javainput"
-	%typemap(in) (type *,size_t &) (size_t size)
+	%typemap(jni) (type *OUTPUT,size_t &OUTPUT) "jobjectArray"
+	%typemap(jtype) (type *OUTPUT,size_t &OUTPUT) "type[][]"
+	%typemap(jstype) (type *OUTPUT,size_t &OUTPUT) "type[][]"
+	%typemap(javain) (type *OUTPUT,size_t &OUTPUT) "$javainput"
+	%typemap(in) (type *OUTPUT,size_t &OUTPUT) (size_t size)
 	{
 		if (!$input) {
 			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
@@ -237,7 +237,7 @@ INPUT_TYPEMAP_CSTYPE_ARRAY(iTriangleMesh)
 		$1 = 0;
 		$2 = &size;
 	}
-	%typemap(argout) (type *,size_t &)
+	%typemap(argout) (type *OUTPUT,size_t &OUTPUT)
 	{
 		jclass clazz = jenv->FindClass("org/crystalspace3d/" #type);
 		jmethodID mid = jenv->GetMethodID(clazz, "<init>", "(JZ)V");
@@ -247,11 +247,43 @@ INPUT_TYPEMAP_CSTYPE_ARRAY(iTriangleMesh)
 		}
 		JCALL3(SetObjectArrayElement, jenv, $input, 0, oarray);
 	}
-	%typemap(freearg) (type *,size_t &) ""
+	%typemap(freearg) (type *OUTPUT,size_t &OUTPUT) ""
 %enddef
 OUTPUT_TYPEMAP_CSTYPE_ARRAY(csTriangleMeshEdge) 
 #undef OUTPUT_TYPEMAP_CSTYPE_ARRAY
 
+%define OUTPUT_TYPEMAP_CSTYPE_ARRAY(type)
+	%typemap(jni) (type *OUTPUT) "jobjectArray"
+	%typemap(jtype) (type *OUTPUT) "type[]"
+	%typemap(jstype) (type *OUTPUT) "type[]"
+	%typemap(javain) (type *OUTPUT) "$javainput"
+	%typemap(in) (type *OUTPUT) (size_t size)
+	{
+		if (!$input) {
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+			return $null;
+		}
+		size = JCALL1(GetArrayLength, jenv, $input);
+		if (size == 0) {
+			SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+			return $null;
+		}
+		$1 = new type[size];
+	}
+	%typemap(argout) (type *OUTPUT)
+	{
+		jclass clazz = jenv->FindClass("org/crystalspace3d/" #type);
+		jmethodID mid = jenv->GetMethodID(clazz, "<init>", "(JZ)V");
+		for (unsigned int i = 0;i<size$argnum;i++) {
+			JCALL3(SetObjectArrayElement, jenv, $input, i, jenv->NewObject(clazz, mid, (jlong)(void*)($1+i), true));
+		}
+	}
+%enddef
+OUTPUT_TYPEMAP_CSTYPE_ARRAY(csPlane3) 
+OUTPUT_TYPEMAP_CSTYPE_ARRAY(csVector3) 
+#undef OUTPUT_TYPEMAP_CSTYPE_ARRAY
+
+/*
 #undef OUTPUT_TYPEMAP_OUTLINE_EDGES
 %define OUTPUT_TYPEMAP_OUTLINE_EDGES
 	%typemap(jni) (size_t* outline_edges, size_t& num_outline_edges,bool* outline_verts) "jobject"
@@ -270,14 +302,15 @@ OUTPUT_TYPEMAP_CSTYPE_ARRAY(csTriangleMeshEdge)
 %enddef
 OUTPUT_TYPEMAP_OUTLINE_EDGES
 #undef OUTPUT_TYPEMAP_OUTLINE_EDGES
+*/
 
 #undef OUTPUT_TYPEMAP_VOIDP
 %define OUTPUT_TYPEMAP_VOIDP
-	%typemap(jni) (void *&,size_t &) "jobjectArray"
-	%typemap(jtype) (void *&,size_t &) "byte[][]"
-	%typemap(jstype) (void *&,size_t &) "byte[][]"
-	%typemap(javain) (void *&,size_t &) "$javainput"
-	%typemap(in) (void *&,size_t &) (char * temp,size_t size)
+	%typemap(jni) (void *&OUTPUT,size_t &OUTPUT) "jobjectArray"
+	%typemap(jtype) (void *&OUTPUT,size_t &OUTPUT) "byte[][]"
+	%typemap(jstype) (void *&OUTPUT,size_t &OUTPUT) "byte[][]"
+	%typemap(javain) (void *&OUTPUT,size_t &OUTPUT) "$javainput"
+	%typemap(in) (void *&OUTPUT,size_t &OUTPUT) (char * temp,size_t size)
 	{
 		if (!$input) {
 			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
@@ -290,7 +323,7 @@ OUTPUT_TYPEMAP_OUTLINE_EDGES
 		$1 = (void**)&temp;
 		$2 = &size;
 	}
-	%typemap(argout) (void *&,size_t &)
+	%typemap(argout) (void *&OUTPUT,size_t &OUTPUT)
 	{
 		jbyteArray barray = JCALL1(NewByteArray, jenv, (long)size$argnum);
 		jbyte * pbarray = JCALL2(GetByteArrayElements,jenv,barray,0);
@@ -298,18 +331,18 @@ OUTPUT_TYPEMAP_OUTLINE_EDGES
 		JCALL3(ReleaseByteArrayElements, jenv, barray, pbarray, JNI_COMMIT);
 		JCALL3(SetObjectArrayElement, jenv, $input, 0, barray);
 	}
-	%typemap(freearg) (void *&,size_t &) ""
+	%typemap(freearg) (void *&OUTPUT,size_t &OUTPUT) ""
 %enddef
 OUTPUT_TYPEMAP_VOIDP
 #undef OUTPUT_TYPEMAP_VOIDP
 
 #undef INPUT_TYPEMAP_VOIDP
 %define INPUT_TYPEMAP_VOIDP
-	%typemap(jni) (void *,size_t) "jbyteArray"
-	%typemap(jtype) (void *,size_t) "byte[]"
-	%typemap(jstype) (void *,size_t) "byte[]"
-	%typemap(javain) (void *,size_t) "$javainput"
-	%typemap(in) (void *,size_t) (char * temp,size_t size)
+	%typemap(jni) (void *INPUT,size_t INPUT) "jbyteArray"
+	%typemap(jtype) (void *INPUT,size_t INPUT) "byte[]"
+	%typemap(jstype) (void *INPUT,size_t INPUT) "byte[]"
+	%typemap(javain) (void *INPUT,size_t INPUT) "$javainput"
+	%typemap(in) (void *INPUT,size_t INPUT) (char * temp,size_t size)
 	{
 		if (!$input) {
 			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
@@ -324,7 +357,7 @@ OUTPUT_TYPEMAP_VOIDP
 		$1 = (void *)temp;
 		$2 = size;
 	}
-	%typemap(freearg) (void *,size_t )
+	%typemap(freearg) (void *INPUT,size_t INPUT)
 	{
 		JCALL3(ReleaseByteArrayElements, jenv, $input, (jbyte *)temp$argnum, JNI_ABORT);
 	}
@@ -334,7 +367,7 @@ INPUT_TYPEMAP_VOIDP
 
 #undef INPUT_BONE_INDICES
 %define INPUT_BONE_INDICES
-%typemap(in) csArray<csArray<unsigned int> >& boneIndices
+%typemap(in) csArray<csArray<unsigned int> >& INPUT
 {
 	csArray<csArray<unsigned int> > * uiaa = new csArray<csArray<unsigned int> >();
 	jobjectArray boneIndicesarray = (jobjectArray)$input;
@@ -355,11 +388,11 @@ INPUT_TYPEMAP_VOIDP
 	}
 	$1 = uiaa;
 }
-%typemap(jni) csArray<csArray<unsigned int> >& boneIndices "jobjectArray"
-%typemap(jtype) csArray<csArray<unsigned int> >& boneIndices "long[][]"
-%typemap(jstype) csArray<csArray<unsigned int> >& boneIndices "long[][]"
-%typemap(javain) csArray<csArray<unsigned int> >& boneIndices "$javainput"
-%typemap(freearg) csArray<csArray<unsigned int> >&
+%typemap(jni) csArray<csArray<unsigned int> >& INPUT "jobjectArray"
+%typemap(jtype) csArray<csArray<unsigned int> >& INPUT "long[][]"
+%typemap(jstype) csArray<csArray<unsigned int> >& INPUT "long[][]"
+%typemap(javain) csArray<csArray<unsigned int> >& INPUT "$javainput"
+%typemap(freearg) csArray<csArray<unsigned int> >& INPUT
 {
   delete($1);
 }
@@ -369,7 +402,7 @@ INPUT_BONE_INDICES
 
 #undef INPUT_IRENDERBUFFER_INDICES
 %define INPUT_IRENDERBUFFER_INDICES
-%typemap(in) csArray<iRenderBuffer*>& indices
+%typemap(in) csArray<iRenderBuffer*>& INPUT
 {
 	csArray<iRenderBuffer*> * ira = new csArray<iRenderBuffer*>();
 	// Fills the arrays
@@ -385,11 +418,11 @@ INPUT_BONE_INDICES
 	JCALL3(ReleaseLongArrayElements,jenv,indicesarray,larray,JNI_ABORT);
 	$1 = ira;
 }
-%typemap(jni) csArray<iRenderBuffer*>& indices "jlongArray"
-%typemap(jtype) csArray<iRenderBuffer*>& indices "long[]"
-%typemap(jstype) csArray<iRenderBuffer*>& indices "SWIGTYPE_p_iRenderBuffer []"
-%typemap(javain) csArray<iRenderBuffer*>& indices "cspaceUtils._ConvertArrayToNative($javainput)"
-%typemap(freearg) csArray<iRenderBuffer*>&
+%typemap(jni) csArray<iRenderBuffer*>& INPUT "jlongArray"
+%typemap(jtype) csArray<iRenderBuffer*>& INPUT "long[]"
+%typemap(jstype) csArray<iRenderBuffer*>& INPUT "SWIGTYPE_p_iRenderBuffer []"
+%typemap(javain) csArray<iRenderBuffer*>& INPUT "cspaceUtils._ConvertArrayToNative($javainput)"
+%typemap(freearg) csArray<iRenderBuffer*>& INPUT
 {
   delete($1);
 }
