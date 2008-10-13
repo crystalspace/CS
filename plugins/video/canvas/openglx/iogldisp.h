@@ -32,8 +32,8 @@ SCF_VERSION (iOpenGLDisp, 0, 0, 1);
  */
 struct iOpenGLDisp : public iComponent
 {
-  virtual bool open() = 0;
-  virtual bool close() = 0;
+  virtual bool open () = 0;
+  virtual bool close () = 0;
 };
 
 #endif // __CS_IOGLDISP_H__
