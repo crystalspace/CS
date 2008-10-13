@@ -144,7 +144,9 @@ OUTPUT_TYPEMAP_STRING
 	}
 	%typemap(freearg) char *INOUT 
 	{
-		jenv->ReleaseStringUTFChars(theString$argnum,temp$argnum);
+		if (theString$argnum) {
+			jenv->ReleaseStringUTFChars(theString$argnum,temp$argnum);
+		}
 	}
 %enddef
 INOUT_TYPEMAP_STRING
