@@ -1178,7 +1178,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   csRef<iCommandLineParser> cmdline = 
       csQueryRegistry<iCommandLineParser> (object_reg);
   bool do_collections = cmdline->GetBoolOption ("collections");
-  bool do_dupes = cmdline->GetBoolOption ("dupes", true);
     
   if ((!do_collections) && cache_map != 0)
   {
