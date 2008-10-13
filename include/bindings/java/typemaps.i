@@ -132,11 +132,6 @@ OUTPUT_TYPEMAP_STRING
 		}
 		$1 = &temp;
 	}
-	%typemap(out) char *INOUT
-	{
-		$result = JCALL1(NewObjectArray, jenv, 1);
-		JCALL3(SetObjectArrayElement, jenv, $result, 0, JCALL1(NewStringUTF, jenv, *($1)));
-	}
 	%typemap(argout) char *INOUT
 	{
 		JCALL3(SetObjectArrayElement, jenv, $input, 0, JCALL1(NewStringUTF, jenv, temp$argnum));
