@@ -28,13 +28,13 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csGraphics2DGLEmbed)
 
 csGraphics2DGLEmbed::csGraphics2DGLEmbed(iBase* iParent)
-: scfImplementationType (this, iParent)
+  : scfImplementationType (this, iParent)
 {
 }
 
-bool csGraphics2DGLEmbed::Open()
+bool csGraphics2DGLEmbed::Open ()
 {
-  bool ret = csGraphics2DGLCommon::Open();
+  bool ret = csGraphics2DGLCommon::Open ();
   AllowResizing = true;
   return ret;
 }
@@ -49,4 +49,3 @@ bool csGraphics2DGLEmbed::PerformExtensionV (char const* command, va_list args)
   }
   return csGraphics2DGLCommon::PerformExtensionV (command,args);
 }
-
