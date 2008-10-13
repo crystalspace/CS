@@ -553,11 +553,35 @@ INPUT_IRENDERBUFFER_INDICES
 
 #undef INOUT_TYPEMAP_CSARRAY_TYPE
 %define INOUT_TYPEMAP_CSARRAY_TYPE(type)
-// csArray<type> & INOUT
-%typemap(in) csArray<type> & INOUT
+%typemap(in) csArray<type> & INOUT (size_t size)
 {
 	csArray<type> * ira = new csArray<type>();
+	if (!$input) {
+		SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
+		return $null;
+	}
+	size = JCALL1(GetArrayLength, jenv, $input);
+	if (size == 0) {
+		SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, "Array must contain at least 1 element");
+		return $null;
+	}
+	for (unsigned int i=0;i<size;i++) {
+		jobject obj = JCALL2(GetObjectArrayElement,jenv,$input,i);
+		if (obj) {
+			ira->Put(i,*((type*)(void*)_cs_get_swig_pointer(obj,jenv)));
+		}
+	}
 	$1 = ira;
+}
+%typemap(argout) csArray<type>& INOUT 
+{
+	jclass clazz = jenv->FindClass("org/crystalspace3d/" #type);
+	jobjectArray joarray = JCALL3(NewObjectArray, jenv, $1->GetSize(), clazz, 0);
+	jmethodID mid = jenv->GetMethodID(clazz, "<init>", "(JZ)V");
+	for (unsigned int i = 0;i<$1->GetSize();i++) {
+		JCALL3(SetObjectArrayElement, jenv, joarray, i, jenv->NewObject(clazz, mid, (jlong)(void*)&($1->Get(i)), true));
+	}
+	JCALL3(SetObjectArrayElement, jenv, $input, 0, joarray);
 }
 %typemap(jni) csArray<type>& INOUT "jobjectArray"
 %typemap(jtype) csArray<type>& INOUT "type[][]"
