@@ -105,6 +105,8 @@ void csDecal::Initialize(iDecalTemplate * decalTemplate,
 
 void csDecal::BeginMesh(iMeshWrapper * mesh)
 {
+  currMesh = 0;
+  
   // check if InitializePosition has been called with decent parameters
   if (width <= 0.01f || height <= 0.01f)
     return;
@@ -112,8 +114,6 @@ void csDecal::BeginMesh(iMeshWrapper * mesh)
   // check if we hit our maximum allowed triangles
   if (indexCount >= CS_DECAL_MAX_TRIS_PER_DECAL * 3)
     return;
-
-  currMesh = 0;
 
   firstIndex = indexCount;
   const csReversibleTransform& trans = 
@@ -349,11 +349,10 @@ void csDecal::EndMesh()
 bool csDecal::Age (csTicks ticks)
 {
   const float lifespan = decalTemplate->GetTimeToLive ();
+  life += (float)ticks * 0.001f;
 
   if (lifespan <= 0.0f)
     return true;
-  
-  life += (float)ticks * 0.001f;
 
   return life < lifespan;
 }
