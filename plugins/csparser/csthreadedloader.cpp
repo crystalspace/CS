@@ -3868,8 +3868,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
         csRef<iDocumentNode> node = doc->GetRoot ();
         csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-        LoadNodeTC(itr, node, collection, ssource, missingdata, keepFlags, do_verbose);
-        return itr->WasSuccessful();
+        return LoadNodeTC(itr, node, collection, ssource, missingdata, keepFlags, do_verbose);
       }
       else
       {
