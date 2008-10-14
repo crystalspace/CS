@@ -44,8 +44,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   bool csLoader::Initialize(iObjectRegistry *object_reg)
   {
-    engine = csQueryRegistry<iEngine>(object_reg);
     loader = csQueryRegistryOrLoad<iThreadedLoader>(object_reg, "crystalspace.level.threadedloader");
+    engine = csQueryRegistry<iEngine>(object_reg);
     threadman = csQueryRegistry<iThreadManager>(object_reg);
     return (engine.IsValid() && loader.IsValid() && threadman.IsValid());
   }
