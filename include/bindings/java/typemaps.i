@@ -148,12 +148,12 @@ INOUT_TYPEMAP_STRING
 #undef INOUT_TYPEMAP_STRING
 
 #undef INPUT_TYPEMAP_CSTYPE_ARRAY
-%define INPUT_TYPEMAP_CSTYPE_ARRAY(type)
-	%typemap(jni) (type *INPUT,size_t INPUT) "jobjectArray"
-	%typemap(jtype) (type *INPUT,size_t INPUT) "long[]"
-	%typemap(jstype) (type *INPUT,size_t INPUT) "type[]"
-	%typemap(javain) (type *INPUT,size_t INPUT) "cspaceUtils._ConvertArrayToNative($javainput)"
-	%typemap(in) (type *INPUT,size_t INPUT) (type ** temp,size_t size)
+%define INPUT_TYPEMAP_CSTYPE_ARRAY(type,size_type)
+	%typemap(jni) (type *INPUT,size_type INPUT) "jobjectArray"
+	%typemap(jtype) (type *INPUT,size_type INPUT) "long[]"
+	%typemap(jstype) (type *INPUT,size_type INPUT) "type[]"
+	%typemap(javain) (type *INPUT,size_type INPUT) "cspaceUtils._ConvertArrayToNative($javainput)"
+	%typemap(in) (type *INPUT,size_type INPUT) (type ** temp,size_type size)
 	{
 		if (!$input) {
 			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
@@ -167,21 +167,22 @@ INOUT_TYPEMAP_STRING
 		jlongArray jlarray = (jlongArray)$input;
 		jlong * larray = JCALL2(GetLongArrayElements,jenv,jlarray,0);
 		temp = new type*[size];
-		for (unsigned int i=0;i<size;i++) {
+		for (size_type i=0;i<size;i++) {
 			temp[i] = (type*)(void*)(long)larray[i];
 		}
 		JCALL3(ReleaseLongArrayElements,jenv,jlarray,larray,JNI_ABORT);
 		$1 = *temp;
 		$2 = size;
 	}
-	%typemap(freearg) (type *INPUT,size_t INPUT)
+	%typemap(freearg) (type *INPUT,size_type INPUT)
 	{
 		delete[](temp$argnum);
 	}
 %enddef
-INPUT_TYPEMAP_CSTYPE_ARRAY(csTriangleMinMax)
-INPUT_TYPEMAP_CSTYPE_ARRAY(csTriangleMeshEdge) 
-INPUT_TYPEMAP_CSTYPE_ARRAY(csPlane3) 
+INPUT_TYPEMAP_CSTYPE_ARRAY(csTriangleMinMax,size_t)
+INPUT_TYPEMAP_CSTYPE_ARRAY(csTriangleMeshEdge,size_t) 
+INPUT_TYPEMAP_CSTYPE_ARRAY(csVector2,int) 
+INPUT_TYPEMAP_CSTYPE_ARRAY(csPlane3,size_t) 
 #undef INPUT_TYPEMAP_CSTYPE_ARRAY
 
 
@@ -220,12 +221,12 @@ OUTPUT_TYPEMAP_CSTYPE_ARRAY(csTriangleMinMax)
 #undef OUTPUT_TYPEMAP_CSTYPE_ARRAY
 
 #undef INPUT_TYPEMAP_CSTYPE_ARRAY
-%define INPUT_TYPEMAP_CSTYPE_ARRAY(type)
-	%typemap(jni) (type *INPUT,size_t &INPUT) "jobjectArray"
-	%typemap(jtype) (type *INPUT,size_t &INPUT) "long[]"
-	%typemap(jstype) (type *INPUT,size_t &INPUT) "type[]"
-	%typemap(javain) (type *INPUT,size_t &INPUT) "cspaceUtils._ConvertArrayToNative($javainput)"
-	%typemap(in) (type *INPUT,size_t &INPUT) (type ** temp,size_t size)
+%define INPUT_TYPEMAP_CSTYPE_ARRAY(type,size_type)
+	%typemap(jni) (type *INPUT,size_type &INPUT) "jobjectArray"
+	%typemap(jtype) (type *INPUT,size_type &INPUT) "long[]"
+	%typemap(jstype) (type *INPUT,size_type &INPUT) "type[]"
+	%typemap(javain) (type *INPUT,size_type &INPUT) "cspaceUtils._ConvertArrayToNative($javainput)"
+	%typemap(in) (type *INPUT,size_type &INPUT) (type ** temp,size_type size)
 	{
 		if (!$input) {
 			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "array null");
@@ -239,19 +240,20 @@ OUTPUT_TYPEMAP_CSTYPE_ARRAY(csTriangleMinMax)
 		jlongArray jlarray = (jlongArray)$input;
 		jlong * larray = JCALL2(GetLongArrayElements,jenv,jlarray,0);
 		temp = new type*[size];
-		for (unsigned int i=0;i<size;i++) {
+		for (size_type i=0;i<size;i++) {
 			temp[i] = (type*)(void*)(long)larray[i];
 		}
 		JCALL3(ReleaseLongArrayElements,jenv,jlarray,larray,JNI_ABORT);
 		$1 = *temp;
 		$2 = &size;
 	}
-	%typemap(freearg) (type *INPUT,size_t &INPUT)
+	%typemap(freearg) (type *INPUT,size_type &INPUT)
 	{
 		delete[](temp$argnum);
 	}
 %enddef
-INPUT_TYPEMAP_CSTYPE_ARRAY(iTriangleMesh) 
+INPUT_TYPEMAP_CSTYPE_ARRAY(iTriangleMesh,size_t) 
+INPUT_TYPEMAP_CSTYPE_ARRAY(csVector3,int) 
 #undef INPUT_TYPEMAP_CSTYPE_ARRAY
 
 %define OUTPUT_TYPEMAP_CSTYPE_ARRAY(type)

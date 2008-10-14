@@ -7,12 +7,13 @@
 
 %apply signed char * OUTPUT { int8 & v };
 %apply short * OUTPUT { uint8 & v };
-%apply int * OUTPUT { int16 & v, uint16 & v };
+%apply int * OUTPUT { int16 & v, uint16 & v, int & style, int& v1, int& v2, int& fleft, int& fright,int& axis };
+%apply int * INOUT { int * visible_sides };
 %apply long * OUTPUT { int32 & v, int & v, uint32 & v, uint & v };
 %apply long long * OUTPUT { int64 & v };
 %apply unsigned long long * OUTPUT { uint64 & v };
-%apply bool * OUTPUT { bool & v, bool & coplanar };
-%apply float * OUTPUT { float & v, float & valid_radius };
+%apply bool * OUTPUT { bool & v, bool & coplanar, bool & red, bool & green, bool & blue, bool & alpha, bool & isTrue, bool & relative, bool & loop,bool & raw };
+%apply float * OUTPUT { float & v, float & valid_radius, float & where, float & min_z, float & max_z };
 %apply double * OUTPUT { double & v };
 %apply csRef<iEvent> & OUTPUT { csRef<iEvent> & v };
 %apply csRef<iBase> & OUTPUT { csRef<iBase> & v };
@@ -22,6 +23,8 @@
 %apply (csTriangleMinMax *INPUT,size_t INPUT) { (csTriangleMinMax* tris, size_t tri_count) };
 %apply (csTriangleMinMax *&OUTPUT,size_t & OUTPUT) { (csTriangleMinMax*& tris, size_t & tri_count) };
 %apply (csTriangleMeshEdge *INPUT,size_t INPUT) { (csTriangleMeshEdge* edges, size_t num_edges) };
+%apply (csVector3 * INPUT,int & INPUT) { (csVector3* array, int& num_array) };
+%apply (csVector2 * INPUT,int INPUT) { (csVector2* poly, int num_poly) };
 %apply (csPlane3 *INPUT,size_t INPUT) { (csPlane3* planes, size_t num_vertices) };
 %apply (iTriangleMesh *INPUT,size_t &INPUT) { (iTriangleMesh* edges, size_t & num_edges) };
 %apply (csTriangleMeshEdge *OUTPUT,size_t &OUTPUT) { (csTriangleMeshEdge* results, size_t & num_results) };
