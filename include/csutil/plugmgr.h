@@ -135,11 +135,11 @@ public:
   /// Destruct.
   virtual ~csPluginManager ();
 
-  virtual iComponent* LoadPluginInstance (const char* iClassID, uint flags);
+  virtual csPtr<iComponent> LoadPluginInstance (const char* iClassID, uint flags);
 
-  virtual iComponent* QueryPluginInstance (const char *iInterface, int iVersion);
-  iComponent* QueryPluginInstance (const char* classID);
-  virtual iComponent* QueryPluginInstance (const char* iClassID,
+  virtual csPtr<iComponent> QueryPluginInstance (const char *iInterface, int iVersion);
+  csPtr<iComponent> QueryPluginInstance (const char* classID);
+  virtual csPtr<iComponent> QueryPluginInstance (const char* iClassID,
   	  const char *iInterface, int iVersion);
   virtual bool UnloadPluginInstance (iComponent *iObject);
   virtual bool RegisterPluginInstance (const char *iClassID,
@@ -172,13 +172,13 @@ public:
   
   csPtr<iStringArray> GetClassIDTags (const char* classID);
   
-  iComponent* LoadTagPluginInstance (const char* tag,
+  csPtr<iComponent> LoadTagPluginInstance (const char* tag,
     uint loadFlags)
   {
     return LoadTagPluginInstance (GetTagClassIDMapping (tag), loadFlags);
   }
   
-  iComponent* QueryTagPluginInstance (const char* tag)
+  csPtr<iComponent> QueryTagPluginInstance (const char* tag)
   {
     return QueryPluginInstance (GetTagClassIDMapping (tag));
   }

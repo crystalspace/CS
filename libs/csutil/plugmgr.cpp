@@ -184,8 +184,8 @@ void csPluginManager::QueryOptions (iComponent *obj)
   }
 }
 
-iComponent* csPluginManager::LoadPluginInstance (const char *classID,
-                                                 uint flags)
+csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
+                                                       uint flags)
 {
   if (do_verbose)
     Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -254,14 +254,14 @@ iComponent* csPluginManager::LoadPluginInstance (const char *classID,
 	      Report (CS_REPORTER_SEVERITY_NOTIFY,
 		"verbose",
 		"  found tag for dependency: %s", tags[t]);
-	    iBase* b = object_reg->Get (tags[t]);
+	    csRef<iBase> b = csPtr<iBase> (object_reg->Get (tags[t]));
 	    if (b == 0)
 	    {
 	      const char* classForTag =
 		GetTagClassIDMapping (tags[t]); // tmp might be wildcard
 	      csPlugin* pl = FindPluginByClassID (classForTag);
 	      if (pl != 0) continue; // Plugin is currently being loaded
-	      iComponent* p = LoadPluginInstance (classForTag, flags);
+	      csRef<iComponent> p = LoadPluginInstance (classForTag, flags);
 	      if (p == 0)
 	      {
 		if (index != csArrayItemNotFound)
@@ -277,7 +277,7 @@ iComponent* csPluginManager::LoadPluginInstance (const char *classID,
 	  // If no tags, always load
 	  csPlugin* pl = FindPluginByClassID (tmp);
 	  if (pl != 0) continue; // Plugin is currently being loaded
-	  iComponent* p = LoadPluginInstance (tmp, flags);
+	  csRef<iComponent> p = LoadPluginInstance (tmp, flags);
 	  if (!p)
 	  {
 	    if (index != csArrayItemNotFound)
@@ -290,9 +290,8 @@ iComponent* csPluginManager::LoadPluginInstance (const char *classID,
   
     if ((!(flags & lpiInitialize)) || p->Initialize (object_reg))
     {
-      p->IncRef();
       if (flags & lpiInitialize) QueryOptions (p);
-      return p;
+      return csPtr<iComponent> (p);
     }
     if (flags & lpiReportErrors)
       Report (CS_REPORTER_SEVERITY_WARNING,
@@ -374,15 +373,15 @@ csPluginManager::csPlugin* csPluginManager::FindPluginByClassID (
 }
 
 
-iComponent* csPluginManager::QueryPluginInstance (const char* classID)
+csPtr<iComponent> csPluginManager::QueryPluginInstance (const char* classID)
 {
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
   csPlugin* pl = FindPluginByClassID (classID);
-  if (pl) return pl->Plugin;
+  if (pl) return csPtr<iComponent> (pl->Plugin);
   return 0;
 }
 
-iComponent* csPluginManager::QueryPluginInstance (const char *iInterface, int iVersion)
+csPtr<iComponent> csPluginManager::QueryPluginInstance (const char *iInterface, int iVersion)
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
@@ -390,14 +389,15 @@ iComponent* csPluginManager::QueryPluginInstance (const char *iInterface, int iV
   {
     iComponent* ret = Plugins[i].Plugin;
     if (ret->QueryInterface (ifID, iVersion))
+      // QI does an implicit IncRef()
       return ret;
   }
   return 0;
 }
 
-iComponent* csPluginManager::QueryPluginInstance (const char* classID,
-				                  const char *iInterface, 
-                                                  int iVersion)
+csPtr<iComponent> csPluginManager::QueryPluginInstance (const char* classID,
+				                        const char *iInterface, 
+                                                        int iVersion)
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
   
@@ -410,6 +410,7 @@ iComponent* csPluginManager::QueryPluginInstance (const char* classID,
     {
       iComponent* p = pl->Plugin;
       if (p->QueryInterface(ifID, iVersion))
+        // QI does an implicit IncRef()
 	return p;
     }
     lastPlugin = pl;

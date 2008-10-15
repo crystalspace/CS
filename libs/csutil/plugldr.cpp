@@ -148,12 +148,13 @@ bool csPluginLoader::LoadPlugins ()
   for (size_t n = 0; n < requested_plugins.GetSize (); n++)
   {
     csPluginLoadRec* r = requested_plugins.Get(n);
-    r->plugin = object_reg->Get (r->Tag);
+    r->plugin = csPtr<iBase> (object_reg->Get (r->Tag));
     if (r->plugin.IsValid()) continue;
     
-    r->plugin.AttachNew(csPtr<iBase>(plugin_mgr->LoadPluginInstance (r->ClassID,
+    csRef<iComponent> c (plugin_mgr->LoadPluginInstance (r->ClassID,
       iPluginManager::lpiInitialize | iPluginManager::lpiReportErrors
-      | iPluginManager::lpiLoadDependencies)));
+      | iPluginManager::lpiLoadDependencies));
+    r->plugin = c;
     if (r->plugin)
     {
       if (!object_reg->Register (r->plugin, r->Tag))

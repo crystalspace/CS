@@ -48,12 +48,10 @@ private:
   {
     csString Tag;
     csString ClassID;
-    bool isDep;
     csRef<iBase> plugin;
   
-    csPluginLoadRec (const char* iTag, const char* iClassID,
-      bool isDep = false)
-    : Tag (iTag), ClassID (iClassID), isDep (isDep) {}
+    csPluginLoadRec (const char* iTag, const char* iClassID)
+    : Tag (iTag), ClassID (iClassID) {}
   };
   // Requested plugins.
   csPDelArray<csPluginLoadRec> requested_plugins;
