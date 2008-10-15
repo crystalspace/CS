@@ -1569,12 +1569,26 @@ class iPluginManager(iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
+    lpiInitialize = _core.iPluginManager_lpiInitialize
+    lpiReportErrors = _core.iPluginManager_lpiReportErrors
+    lpiLoadDependencies = _core.iPluginManager_lpiLoadDependencies
+    def LoadPluginInstance(*args): return _core.iPluginManager_LoadPluginInstance(*args)
     def LoadPluginAlways(*args): return _core.iPluginManager_LoadPluginAlways(*args)
+    def QueryPluginInstance(*args): return _core.iPluginManager_QueryPluginInstance(*args)
+    def UnloadPluginInstance(*args): return _core.iPluginManager_UnloadPluginInstance(*args)
     def UnloadPlugin(*args): return _core.iPluginManager_UnloadPlugin(*args)
+    def RegisterPluginInstance(*args): return _core.iPluginManager_RegisterPluginInstance(*args)
     def RegisterPlugin(*args): return _core.iPluginManager_RegisterPlugin(*args)
+    def GetPluginInstances(*args): return _core.iPluginManager_GetPluginInstances(*args)
     def GetPlugins(*args): return _core.iPluginManager_GetPlugins(*args)
     def Clear(*args): return _core.iPluginManager_Clear(*args)
     def QueryOptions(*args): return _core.iPluginManager_QueryOptions(*args)
+    def SetTagClassIDMapping(*args): return _core.iPluginManager_SetTagClassIDMapping(*args)
+    def UnsetTagClassIDMapping(*args): return _core.iPluginManager_UnsetTagClassIDMapping(*args)
+    def GetTagClassIDMapping(*args): return _core.iPluginManager_GetTagClassIDMapping(*args)
+    def GetClassIDTags(*args): return _core.iPluginManager_GetClassIDTags(*args)
+    def LoadTagPluginInstance(*args): return _core.iPluginManager_LoadTagPluginInstance(*args)
+    def QueryTagPluginInstance(*args): return _core.iPluginManager_QueryTagPluginInstance(*args)
     def LoadPlugin(*args): return _core.iPluginManager_LoadPlugin(*args)
     scfGetVersion = staticmethod(_core.iPluginManager_scfGetVersion)
     __swig_destroy__ = _core.delete_iPluginManager
