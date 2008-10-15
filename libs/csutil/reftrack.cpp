@@ -85,9 +85,17 @@ void csRefTracker::TrackConstruction (void* object)
   RefInfo* oldRef = trackedRefs.Get (object, 0);
   if (oldRef != 0)
   {
-    oldRef->actions.ShrinkBestFit();
-    OldRefInfo oldInfo = {object, oldRef};
-    oldData.Push (oldInfo);
+    if (!oldRef->CorrectlyDestructed())
+    {
+      /* Although it's kind of odd - an object at the same memory location,
+         but it was not correctly destroyed? Anyway, keep around
+         for reporting later ... */
+      oldRef->actions.ShrinkBestFit();
+      OldRefInfo oldInfo = {object, oldRef};
+      oldData.Push (oldInfo);
+    }
+    else
+      riAlloc.Free (oldRef);
     trackedRefs.DeleteAll (object);
   }
   /*
@@ -110,6 +118,7 @@ void csRefTracker::TrackDestruction (void* object, int refCount)
   action.tag = 0;
   refInfo.refCount = refCount;
   refInfo.flags |= RefInfo::flagDestructed;
+  refInfo.actions.ShrinkBestFit();
 }
 
 void csRefTracker::MatchIncRef (void* object, int refCount, void* tag)
@@ -211,11 +220,7 @@ void csRefTracker::SetDescriptionWeak (void* obj, const char* description)
 
 void csRefTracker::ReportOnObj (void* obj, RefInfo* info)
 {
-  bool okay = (info->refCount == 0)
-    /* The next check is to "let through" objects that have been 
-     * destructed with a refcount of 1 remaining
-     * (e.g. ref counted objects created on the stack). */
-     || ((info->flags & RefInfo::flagDestructed) && (info->refCount == 1));
+  bool okay = info->CorrectlyDestructed();
   if (!okay)
   {
     csPrintf ("LEAK: object %p (%s), refcount %d, %s\n",
@@ -240,11 +245,13 @@ void csRefTracker::Report ()
 {
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
-  for (size_t i = 0; i < oldData.GetSize (); i++)
+  while (oldData.GetSize () > 0)
   {
-    const OldRefInfo& oldInfo = oldData[i];
+    const OldRefInfo& oldInfo = oldData[oldData.GetSize ()-1];
 
     ReportOnObj (oldInfo.obj, oldInfo.ri);
+    riAlloc.Free (oldInfo.ri);
+    oldData.Truncate (oldData.GetSize ()-1);
   }
 
   csHash<RefInfo*, void*>::GlobalIterator it (
@@ -256,5 +263,7 @@ void csRefTracker::Report ()
     RefInfo* info = it.Next (obj);
 
     ReportOnObj (obj, info);
+    riAlloc.Free (info);
   }
+  trackedRefs.DeleteAll();
 }
