@@ -262,28 +262,20 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
 	      csPlugin* pl = FindPluginByClassID (classForTag);
 	      if (pl != 0) continue; // Plugin is currently being loaded
 	      csRef<iComponent> p = LoadPluginInstance (classForTag, flags);
-	      if (p == 0)
+	      if (p.IsValid())
 	      {
-		if (index != csArrayItemNotFound)
-		  Plugins.DeleteIndex (index);
-		return 0;
+		object_reg->Register (p, tags[t]);
 	      }
-	      object_reg->Register (p, tags[t]);
+	      else
+	      {
+	        /* Ignore load error (like csPluginLoader did) */
+	      }
 	    }
 	  }
 	}
 	else
 	{
-	  // If no tags, always load
-	  csPlugin* pl = FindPluginByClassID (tmp);
-	  if (pl != 0) continue; // Plugin is currently being loaded
-	  csRef<iComponent> p = LoadPluginInstance (tmp, flags);
-	  if (!p)
-	  {
-	    if (index != csArrayItemNotFound)
-	      Plugins.DeleteIndex (index);
-	    return 0;
-	  }
+	  /* If no tags, ignore dependency (like csPluginLoader did) */
 	}
       }
     }
