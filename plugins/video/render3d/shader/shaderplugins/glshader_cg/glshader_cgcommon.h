@@ -180,8 +180,6 @@ protected:
     iHierarchicalCache* cache);
   bool WriteToCompileCache (const char* source, const ProfileLimits& limits,
     iHierarchicalCache* cache);
-  bool WriteToCompileCache (const ProfileLimits& limits,
-    const ProfileLimitsPair& limitsPair, iHierarchicalCache* cache);
     
   bool GetProgramNode (iDocumentNode* passProgNode);
 public:

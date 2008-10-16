@@ -98,15 +98,9 @@ bool csShaderGLCGVP::Precache (const ProfileLimitsPair& limits,
   if (needBuild)
     ret = DefaultLoadProgram (cgResolve, programStr, progVP, 
       limits,
-      loadApplyVmap | loadIgnoreConfigProgramOpts | loadFlagUnusedV2FForInit);
+      loadApplyVmap | loadFlagUnusedV2FForInit);
   else
     ret = true;
-
-  // Store program against preprocessed source in cache
-  {
-    if (needBuild && !sourcePreproc.IsEmpty ())
-      WriteToCompileCache (sourcePreproc, limits.vp, cache);
-  }
 
   WriteToCache (cache, limits.vp, limits, csString("CG") + tag);
 
