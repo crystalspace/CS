@@ -331,6 +331,13 @@ inline csPtr<Interface> scfQueryInterface (ClassPtr object)
     scfInterfaceTraits<Interface>::GetVersion ());
   return csPtr<Interface> (x);
 }
+// Save a QI for 'identity' queries
+template<class Interface>
+inline csPtr<Interface> scfQueryInterface (Interface* object)
+{
+  object->IncRef ();
+  return csPtr<Interface> (object);
+}
 
 /**
  * Helper function around iBase::QueryInterface which also 
@@ -340,11 +347,7 @@ template<class Interface, class ClassPtr>
 inline csPtr<Interface> scfQueryInterfaceSafe (ClassPtr object)
 {
   if (object == 0) return csPtr<Interface> (0);
-
-  Interface *x = (Interface*)object->QueryInterface (
-    scfInterfaceTraits<Interface>::GetID (),
-    scfInterfaceTraits<Interface>::GetVersion ());
-  return csPtr<Interface> (x);
+  return scfQueryInterface<Interface> (object);
 }
 
 /**
@@ -353,16 +356,8 @@ inline csPtr<Interface> scfQueryInterfaceSafe (ClassPtr object)
 template<class Interface>
 inline csPtr<Interface> scfCreateInstance (char const * const ClassID)
 {
-  iBase *base = iSCF::SCF->CreateInstance (ClassID);
-
-  if (base == 0) return csPtr<Interface> (0);
-
-  Interface *x = (Interface*)base->QueryInterface (
-    scfInterfaceTraits<Interface>::GetID (),
-    scfInterfaceTraits<Interface>::GetVersion ());
-
-  if (x) base->DecRef (); //release our base interface
-  return csPtr<Interface> (x);
+  csRef<iBase> base = csPtr<iBase> (iSCF::SCF->CreateInstance (ClassID));
+  return scfQueryInterfaceSafe<Interface> (base);
 }
 
 
