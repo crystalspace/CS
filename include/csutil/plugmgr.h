@@ -58,8 +58,17 @@ private:
     /// The class ID of the plugin
     csString ClassID;
 
+    csPlugin ();
+
     /// Construct the object that represents a plugin
     csPlugin (iComponent *iObject, const char *iClassID);
+
+    /// Comparison
+    bool operator== (const csPlugin& other) const
+    { return Plugin == other.Plugin && ClassID == other.ClassID; }
+    bool operator< (const csPlugin& other) const
+    { return Plugin < other.Plugin || 
+            (Plugin == other.Plugin && ClassID < other.ClassID); }
   };
 
   /**

@@ -114,7 +114,7 @@ void csPluginLoader::AddCommandLinePlugins (iCommandLineParser* CommandLine)
   {
     csStringFast<100> temp;
     temp = val;
-    char *tag = strchr (temp.GetData(), ':');
+    char *tag = strchr ((char*)temp.GetData(), ':');
     if (tag) *tag++ = 0;
     // If an ID isn't registered try to insert "crystalspace.utilities."
     // at the beginning. That makes it possible to specfiy e.g. 

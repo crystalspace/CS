@@ -1300,7 +1300,8 @@ public:
   {
     if (other.GetSize() != GetSize()) return false;
     for (size_t i = 0; i < GetSize(); i++)
-      if (Get (i) != other[i]) return false;
+      if (!(Get (i) == other[i])) 
+        return false;
     return true;
   }
 

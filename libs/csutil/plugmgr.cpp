@@ -37,6 +37,9 @@
 #include "ivaria/reporter.h"
 
 //------------------------------------------------------ csPlugin class -----//
+csPluginManager::csPlugin::csPlugin ()
+{
+}
 
 csPluginManager::csPlugin::csPlugin (iComponent *obj, const char *classID)
   : Plugin (obj), ClassID (classID) { }
