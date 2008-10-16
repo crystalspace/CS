@@ -3526,7 +3526,9 @@ SWIGINTERN void delete_iAnimatedImage(iAnimatedImage *self){ if (self) self->Dec
   {
     printf("CS_LOAD_PLUGIN_ALWAYS is deprecated, use \
 csLoadPluginAlways instead\n");
-    return csLoadPluginAlways(p,i);
+    csRef<iComponent> c (csLoadPluginAlways(p,i));
+    csRef<iBase> b ((iBase*)c);
+    return csPtr<iBase> (b);
   }
 
 
@@ -36040,7 +36042,7 @@ SWIGINTERN PyObject *_wrap_iPluginManager_LoadPluginInstance(PyObject *SWIGUNUSE
   iPluginManager *arg1 = (iPluginManager *) 0 ;
   char *arg2 = (char *) 0 ;
   uint arg3 ;
-  iComponent *result = 0 ;
+  SwigValueWrapper< csPtr<iComponent > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
   int res2 ;
@@ -36068,8 +36070,18 @@ SWIGINTERN PyObject *_wrap_iPluginManager_LoadPluginInstance(PyObject *SWIGUNUSE
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iPluginManager_LoadPluginInstance" "', argument " "3"" of type '" "uint""'");
   } 
   arg3 = static_cast< uint >(val3);
-  result = (iComponent *)(arg1)->LoadPluginInstance((char const *)arg2,arg3);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iComponent, 0 |  0 );
+  result = (arg1)->LoadPluginInstance((char const *)arg2,arg3);
+  {
+    csRef<iComponent> ref((csPtr<iComponent>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iComponent *)ref, SWIGTYPE_p_iComponent, 1);
+  }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
 fail:
@@ -36286,7 +36298,7 @@ SWIGINTERN PyObject *_wrap_iPluginManager_QueryPluginInstance__SWIG_0(PyObject *
   iPluginManager *arg1 = (iPluginManager *) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
-  iComponent *result = 0 ;
+  SwigValueWrapper< csPtr<iComponent > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
   int res2 ;
@@ -36314,8 +36326,18 @@ SWIGINTERN PyObject *_wrap_iPluginManager_QueryPluginInstance__SWIG_0(PyObject *
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iPluginManager_QueryPluginInstance" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = static_cast< int >(val3);
-  result = (iComponent *)(arg1)->QueryPluginInstance((char const *)arg2,arg3);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iComponent, 0 |  0 );
+  result = (arg1)->QueryPluginInstance((char const *)arg2,arg3);
+  {
+    csRef<iComponent> ref((csPtr<iComponent>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iComponent *)ref, SWIGTYPE_p_iComponent, 1);
+  }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
 fail:
@@ -36328,7 +36350,7 @@ SWIGINTERN PyObject *_wrap_iPluginManager_QueryPluginInstance__SWIG_1(PyObject *
   PyObject *resultobj = 0;
   iPluginManager *arg1 = (iPluginManager *) 0 ;
   char *arg2 = (char *) 0 ;
-  iComponent *result = 0 ;
+  SwigValueWrapper< csPtr<iComponent > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
   int res2 ;
@@ -36348,8 +36370,18 @@ SWIGINTERN PyObject *_wrap_iPluginManager_QueryPluginInstance__SWIG_1(PyObject *
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iPluginManager_QueryPluginInstance" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (iComponent *)(arg1)->QueryPluginInstance((char const *)arg2);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iComponent, 0 |  0 );
+  result = (arg1)->QueryPluginInstance((char const *)arg2);
+  {
+    csRef<iComponent> ref((csPtr<iComponent>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iComponent *)ref, SWIGTYPE_p_iComponent, 1);
+  }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
 fail:
@@ -36364,7 +36396,7 @@ SWIGINTERN PyObject *_wrap_iPluginManager_QueryPluginInstance__SWIG_2(PyObject *
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
   int arg4 ;
-  iComponent *result = 0 ;
+  SwigValueWrapper< csPtr<iComponent > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
   int res2 ;
@@ -36401,8 +36433,18 @@ SWIGINTERN PyObject *_wrap_iPluginManager_QueryPluginInstance__SWIG_2(PyObject *
     SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iPluginManager_QueryPluginInstance" "', argument " "4"" of type '" "int""'");
   } 
   arg4 = static_cast< int >(val4);
-  result = (iComponent *)(arg1)->QueryPluginInstance((char const *)arg2,(char const *)arg3,arg4);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iComponent, 0 |  0 );
+  result = (arg1)->QueryPluginInstance((char const *)arg2,(char const *)arg3,arg4);
+  {
+    csRef<iComponent> ref((csPtr<iComponent>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iComponent *)ref, SWIGTYPE_p_iComponent, 1);
+  }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   return resultobj;
@@ -36911,7 +36953,7 @@ SWIGINTERN PyObject *_wrap_iPluginManager_LoadTagPluginInstance(PyObject *SWIGUN
   iPluginManager *arg1 = (iPluginManager *) 0 ;
   char *arg2 = (char *) 0 ;
   uint arg3 ;
-  iComponent *result = 0 ;
+  SwigValueWrapper< csPtr<iComponent > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
   int res2 ;
@@ -36939,8 +36981,18 @@ SWIGINTERN PyObject *_wrap_iPluginManager_LoadTagPluginInstance(PyObject *SWIGUN
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iPluginManager_LoadTagPluginInstance" "', argument " "3"" of type '" "uint""'");
   } 
   arg3 = static_cast< uint >(val3);
-  result = (iComponent *)(arg1)->LoadTagPluginInstance((char const *)arg2,arg3);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iComponent, 0 |  0 );
+  result = (arg1)->LoadTagPluginInstance((char const *)arg2,arg3);
+  {
+    csRef<iComponent> ref((csPtr<iComponent>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iComponent *)ref, SWIGTYPE_p_iComponent, 1);
+  }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
 fail:
@@ -36953,7 +37005,7 @@ SWIGINTERN PyObject *_wrap_iPluginManager_QueryTagPluginInstance(PyObject *SWIGU
   PyObject *resultobj = 0;
   iPluginManager *arg1 = (iPluginManager *) 0 ;
   char *arg2 = (char *) 0 ;
-  iComponent *result = 0 ;
+  SwigValueWrapper< csPtr<iComponent > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
   int res2 ;
@@ -36973,8 +37025,18 @@ SWIGINTERN PyObject *_wrap_iPluginManager_QueryTagPluginInstance(PyObject *SWIGU
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iPluginManager_QueryTagPluginInstance" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (iComponent *)(arg1)->QueryTagPluginInstance((char const *)arg2);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iComponent, 0 |  0 );
+  result = (arg1)->QueryTagPluginInstance((char const *)arg2);
+  {
+    csRef<iComponent> ref((csPtr<iComponent>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iComponent *)ref, SWIGTYPE_p_iComponent, 1);
+  }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
 fail:
@@ -37296,7 +37358,7 @@ SWIGINTERN PyObject *_wrap_csLoadPluginAlways__SWIG_0(PyObject *SWIGUNUSEDPARM(s
   iPluginManager *arg1 = (iPluginManager *) 0 ;
   char *arg2 = (char *) 0 ;
   bool arg3 ;
-  SwigValueWrapper< csPtr<iBase > > result;
+  SwigValueWrapper< csPtr<iComponent > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
   int res2 ;
@@ -37326,7 +37388,7 @@ SWIGINTERN PyObject *_wrap_csLoadPluginAlways__SWIG_0(PyObject *SWIGUNUSEDPARM(s
   arg3 = static_cast< bool >(val3);
   result = csLoadPluginAlways(arg1,(char const *)arg2,arg3);
   {
-    csRef<iBase> ref((csPtr<iBase>&)result); /* explicit cast */
+    csRef<iComponent> ref((csPtr<iComponent>&)result); /* explicit cast */
     
     if (!ref.IsValid())
     {
@@ -37334,7 +37396,7 @@ SWIGINTERN PyObject *_wrap_csLoadPluginAlways__SWIG_0(PyObject *SWIGUNUSEDPARM(s
       return Py_None;
     }
     ref->IncRef();
-    resultobj = SWIG_NewPointerObj((void *)(iBase *)ref, SWIGTYPE_p_iBase, 1);
+    resultobj = SWIG_NewPointerObj((void *)(iComponent *)ref, SWIGTYPE_p_iComponent, 1);
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -37348,7 +37410,7 @@ SWIGINTERN PyObject *_wrap_csLoadPluginAlways__SWIG_1(PyObject *SWIGUNUSEDPARM(s
   PyObject *resultobj = 0;
   iPluginManager *arg1 = (iPluginManager *) 0 ;
   char *arg2 = (char *) 0 ;
-  SwigValueWrapper< csPtr<iBase > > result;
+  SwigValueWrapper< csPtr<iComponent > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
   int res2 ;
@@ -37370,7 +37432,7 @@ SWIGINTERN PyObject *_wrap_csLoadPluginAlways__SWIG_1(PyObject *SWIGUNUSEDPARM(s
   arg2 = reinterpret_cast< char * >(buf2);
   result = csLoadPluginAlways(arg1,(char const *)arg2);
   {
-    csRef<iBase> ref((csPtr<iBase>&)result); /* explicit cast */
+    csRef<iComponent> ref((csPtr<iComponent>&)result); /* explicit cast */
     
     if (!ref.IsValid())
     {
@@ -37378,7 +37440,7 @@ SWIGINTERN PyObject *_wrap_csLoadPluginAlways__SWIG_1(PyObject *SWIGUNUSEDPARM(s
       return Py_None;
     }
     ref->IncRef();
-    resultobj = SWIG_NewPointerObj((void *)(iBase *)ref, SWIGTYPE_p_iBase, 1);
+    resultobj = SWIG_NewPointerObj((void *)(iComponent *)ref, SWIGTYPE_p_iComponent, 1);
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
