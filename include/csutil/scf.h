@@ -331,13 +331,22 @@ inline csPtr<Interface> scfQueryInterface (ClassPtr object)
     scfInterfaceTraits<Interface>::GetVersion ());
   return csPtr<Interface> (x);
 }
-// Save a QI for 'identity' queries
+// Save a QI for 'identity' queries 
+/*
+   However, this does not fly on all compilers.
+   Known working:
+     gcc 4.1.2
+   Known NOT working:
+     gcc 3.4.2
+ */
+#if (!defined(__GNUC__) || (__GNUC__ >= 4))
 template<class Interface>
 inline csPtr<Interface> scfQueryInterface (Interface* object)
 {
   object->IncRef ();
   return csPtr<Interface> (object);
 }
+#endif
 
 /**
  * Helper function around iBase::QueryInterface which also 
