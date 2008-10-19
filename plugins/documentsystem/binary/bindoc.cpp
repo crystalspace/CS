@@ -1280,10 +1280,10 @@ csRef<iDocumentAttribute> csBinaryDocNode::GetAttribute (const char* name)
 
 const char* csBinaryDocNode::GetAttributeValue (const char* name)
 {
-  csRef<iDocumentAttribute> attr = GetAttribute (name);
-  if (attr)
+  getAttributeValueStrKeeper = GetAttribute (name);
+  if (getAttributeValueStrKeeper)
   {
-    return attr->GetValue ();
+    return getAttributeValueStrKeeper->GetValue ();
   }
   else
   {
