@@ -241,7 +241,8 @@ void csShaderGLCGCommon::PrecacheClear()
     program = 0;
   }
   objectCode.Empty();
-  objectCodeCachePath.Empty();
+  objectCodeCachePathArc.Empty();
+  objectCodeCachePathItem.Empty();
 }
 
 bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
@@ -578,7 +579,7 @@ void csShaderGLCGCommon::WriteAdditionalDumpInfo (const char* description,
 /* Magic value for cg program files.
  * The most significant byte serves as a "version", increase when the
  * cache file format changes. */
-static const uint32 cacheFileMagic = 0x04706763;
+static const uint32 cacheFileMagic = 0x05706763;
 
 enum
 {
@@ -654,7 +655,7 @@ bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache,
 	return false;
     }
     
-    if (objectCodeCachePath.IsEmpty())
+    if (objectCodeCachePathArc.IsEmpty() || objectCodeCachePathItem.IsEmpty())
     {
       csString preprocSource (GetPreprocessedProgram (
         cgGetProgramString (program, CG_PROGRAM_SOURCE)));
@@ -662,9 +663,12 @@ bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache,
         return false;
     }
     
-    CS_ASSERT(!objectCodeCachePath.IsEmpty());
+    CS_ASSERT(!objectCodeCachePathArc.IsEmpty());
     CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile,
-      objectCodeCachePath);
+      objectCodeCachePathArc);
+    CS_ASSERT(!objectCodeCachePathItem.IsEmpty());
+    CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile,
+      objectCodeCachePathItem);
   }
   
   csString cacheName ("/");
@@ -881,9 +885,12 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     }
     if (breakFail) continue;
     
-    objectCodeCachePath =
+    objectCodeCachePathArc =
       CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
-    if (objectCodeCachePath.IsEmpty()) continue;
+    if (objectCodeCachePathArc.IsEmpty()) continue;
+    objectCodeCachePathItem =
+      CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+    if (objectCodeCachePathItem.IsEmpty()) continue;
     
     if (!LoadObjectCodeFromCompileCache (limits, cache))
       continue;
@@ -971,7 +978,7 @@ bool csShaderGLCGCommon::TryLoadFromCompileCache (const char* source,
                                                   const ProfileLimits& limits,
                                                   iHierarchicalCache* cache)
 {
-  csString objectCodeCachePath;
+  csString objectCodeCachePathArc, objectCodeCachePathItem;
   
 #if PROG_CACHE_STORE_SOURCE
   csMemFile stringIDs;
@@ -989,19 +996,27 @@ bool csShaderGLCGCommon::TryLoadFromCompileCache (const char* source,
   
   iHierarchicalCache* rootCache = cache->GetTopCache();
   csMD5::Digest sourceMD5 = csMD5::Encode (source);
-  csString cachePath;
-  cachePath.Format ("/CgProgCache/%s/%s",
-    sourceMD5.HexString().GetData(), limits.ToString().GetData());
+  csString cacheArcPath;
+  cacheArcPath.Format ("/CgProgCache/%s",
+    sourceMD5.HexString().GetData());
+    
+  csRef<iDataBuffer> cacheArcBuf = rootCache->ReadCache (cacheArcPath);
+  if (!cacheArcBuf.IsValid()) return false;
+  CS::PluginCommon::ShaderCacheHelper::MicroArchive cacheArc;
+  {
+    csMemFile cacheArcFile (cacheArcBuf, true);
+    if (!cacheArc.Read (&cacheArcFile)) return false;
+  }
   
   csRef<iFile> foundFile;
 #if PROG_CACHE_STORE_SOURCE
-  csRef<iHierarchicalCache> progCache = rootCache->GetRootedCache (cachePath);
-  csRef<iStringArray> cachedVersions = progCache->GetSubItems ("/");
-  for (size_t i = 0; i < cachedVersions->GetSize(); i++)
+  csString entryPrefix (limits.ToString().GetData());
+  itemPrefix.Append ("/");
+  for (size_t i = 0; i < cacheArc.GetEntriesNum(); i++)
   {
-    csString cachePath2 ("/");
-    cachePath2.Append (cachedVersions->Get (i));
-    csRef<iDataBuffer> cacheBuf = progCache->ReadCache (cachePath2);
+    const char* arcEntry = cacheArc.GetEntryName (i);
+    if (strncmp (arcEntry, entryPrefix, entryPrefix.Length()) != 0) continue;
+    csRef<iDataBuffer> cacheBuf = cacheArc.ReadEntry (arcEntry);
     if (!cacheBuf.IsValid()) continue;
     
     csRef<iFile> cacheFile;
@@ -1023,14 +1038,15 @@ bool csShaderGLCGCommon::TryLoadFromCompileCache (const char* source,
       continue;
       
     foundFile = cacheFile;
-    objectCodeCachePath.Format ("/%s/%s/%s",
-      sourceMD5.HexString().GetData(), limits.ToString().GetData(),
-      cachedVersions->Get (i));
+    objectCodeCachePathArc.Format ("/%s",
+      sourceMD5.HexString().GetData());
+    objectCodeCachePathItem = arcEntry;
     break;
   }
 #else
   {
-    csRef<iDataBuffer> cacheBuf = rootCache->ReadCache (cachePath);
+    csRef<iDataBuffer> cacheBuf =
+      cacheArc.ReadEntry (limits.ToString().GetData());
     if (!cacheBuf.IsValid()) return false;
     
     csRef<iFile> cacheFile;
@@ -1049,8 +1065,9 @@ bool csShaderGLCGCommon::TryLoadFromCompileCache (const char* source,
       return false;;
       
     foundFile = cacheFile;
-    objectCodeCachePath.Format ("/%s/%s",
-      sourceMD5.HexString().GetData(), limits.ToString().GetData());
+    objectCodeCachePathArc.Format ("/%s",
+      sourceMD5.HexString().GetData());
+    objectCodeCachePathItem = limits.ToString().GetData();
   }
 #endif
 
@@ -1099,7 +1116,8 @@ bool csShaderGLCGCommon::TryLoadFromCompileCache (const char* source,
     return false;
   }
   
-  this->objectCodeCachePath = objectCodeCachePath;
+  this->objectCodeCachePathArc = objectCodeCachePathArc;
+  this->objectCodeCachePathItem = objectCodeCachePathItem;
   
   return true;
 }
@@ -1107,15 +1125,24 @@ bool csShaderGLCGCommon::TryLoadFromCompileCache (const char* source,
 bool csShaderGLCGCommon::LoadObjectCodeFromCompileCache (
   const ProfileLimits& limits, iHierarchicalCache* cache)
 {
-  CS_ASSERT(!objectCodeCachePath.IsEmpty());
+  CS_ASSERT(!objectCodeCachePathArc.IsEmpty());
+  CS_ASSERT(!objectCodeCachePathItem.IsEmpty());
 
   iHierarchicalCache* rootCache = cache->GetTopCache();
   csRef<iHierarchicalCache> progCache =
     rootCache->GetRootedCache ("/CgProgCache");
   
-  csRef<iDataBuffer> cacheBuf = progCache->ReadCache (objectCodeCachePath);
-  if (!cacheBuf.IsValid()) return false;
+  csRef<iDataBuffer> cacheArcBuf = progCache->ReadCache (objectCodeCachePathArc);
+  if (!cacheArcBuf.IsValid()) return false;
+  CS::PluginCommon::ShaderCacheHelper::MicroArchive cacheArc;
+  {
+    csMemFile cacheArcFile (cacheArcBuf, true);
+    if (!cacheArc.Read (&cacheArcFile)) return false;
+  }
     
+  csRef<iDataBuffer> cacheBuf = cacheArc.ReadEntry (objectCodeCachePathItem);
+  if (!cacheBuf.IsValid()) return false;
+  
   csRef<iFile> cacheFile;
   cacheFile.AttachNew (new csMemFile (cacheBuf, true));
   
@@ -1169,7 +1196,8 @@ bool csShaderGLCGCommon::WriteToCompileCache (const char* source,
                                               const ProfileLimits& limits,
                                               iHierarchicalCache* cache)
 {
-  CS_ASSERT(objectCodeCachePath.IsEmpty());
+  CS_ASSERT(objectCodeCachePathArc.IsEmpty());
+  CS_ASSERT(objectCodeCachePathItem.IsEmpty());
   
 #if PROG_CACHE_STORE_SOURCE
   csMemFile stringIDs;
@@ -1187,19 +1215,27 @@ bool csShaderGLCGCommon::WriteToCompileCache (const char* source,
   
   iHierarchicalCache* rootCache = cache->GetTopCache();
   csMD5::Digest sourceMD5 = csMD5::Encode (source);
-  csString cachePath;
-  cachePath.Format ("/CgProgCache/%s/%s",
-    sourceMD5.HexString().GetData(), limits.ToString().GetData());
+  csString cacheArcPath;
+  cacheArcPath.Format ("/CgProgCache/%s",
+    sourceMD5.HexString().GetData());
+  
+  csRef<iDataBuffer> cacheArcBuf = rootCache->ReadCache (cacheArcPath);
+  CS::PluginCommon::ShaderCacheHelper::MicroArchive cacheArc;
+  if (cacheArcBuf.IsValid())
+  {
+    csMemFile cacheArcFile (cacheArcBuf, true);
+    cacheArc.Read (&cacheArcFile);
+  }
   
 #if PROG_CACHE_STORE_SOURCE
-  csRef<iHierarchicalCache> progCache = rootCache->GetRootedCache (cachePath);
   csString subItem;
-  csRef<iStringArray> cachedVersions = progCache->GetSubItems ("/");
-  for (size_t i = 0; i < cachedVersions->GetSize(); i++)
+  csString entryPrefix (limits.ToString().GetData());
+  itemPrefix.Append ("/");
+  for (size_t i = 0; i < cacheArc.GetEntriesNum(); i++)
   {
-    csString cachePath2 ("/");
-    cachePath2.Append (cachedVersions->Get (i));
-    csRef<iDataBuffer> cacheBuf = progCache->ReadCache (cachePath2);
+    const char* arcEntry = cacheArc.GetEntryName (i);
+    if (strncmp (arcEntry, entryPrefix, entryPrefix.Length()) != 0) continue;
+    csRef<iDataBuffer> cacheBuf = cacheArc.ReadEntry (arcEntry);
     if (!cacheBuf.IsValid()) continue;
     
     csRef<iFile> cacheFile;
@@ -1220,7 +1256,7 @@ bool csShaderGLCGCommon::WriteToCompileCache (const char* source,
         stringIDs.GetSize()) != 0)
       continue;
       
-    subItem = cachePath2;
+    subItem = arcEntry;
     break;
   }
   
@@ -1230,8 +1266,8 @@ bool csShaderGLCGCommon::WriteToCompileCache (const char* source,
     csRef<iDataBuffer> item;
     do
     {
-      subItem.Format ("/%u", n++);
-      item = progCache->ReadCache (subItem);
+      subItem.Format ("%s%u", entryPrefix.GetData(), n++);
+      item = cacheArc.ReadEntry (subItem);
     }
     while (item.IsValid());
   }
@@ -1287,23 +1323,30 @@ bool csShaderGLCGCommon::WriteToCompileCache (const char* source,
     if (!CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile, 0))
       return false;
   }
-    
+  
+  csRef<iDataBuffer> cacheData = cacheFile.GetAllData();
 #if PROG_CACHE_STORE_SOURCE
-  if (!progCache->CacheData (cacheFile.GetData(), cacheFile.GetSize(),
-      subItem))
-    return false;
-    
-  objectCodeCachePath.Format ("/%s/%s%s",
-    sourceMD5.HexString().GetData(), limits.ToString().GetData(),
-    subItem.GetData());
+  objectCodeCachePathItem = subItem;
 #else
-  if (!rootCache->CacheData (cacheFile.GetData(), cacheFile.GetSize(),
-      cachePath))
-    return false;
-    
-  objectCodeCachePath.Format ("/%s/%s",
-    sourceMD5.HexString().GetData(), limits.ToString().GetData());
+  objectCodeCachePathItem = limits.ToString().GetData();
 #endif
+  if (!cacheArc.WriteEntry (objectCodeCachePathItem, cacheData))
+  {
+    objectCodeCachePathItem.Empty();
+    return false;
+  }
+  objectCodeCachePathArc.Format ("/%s",
+    sourceMD5.HexString().GetData());
+  
+  csMemFile cacheArcFile;
+  if ((!cacheArc.Write (&cacheArcFile))
+    || !(rootCache->CacheData (cacheArcFile.GetData(), cacheArcFile.GetSize(),
+      cacheArcPath)))
+  {
+    objectCodeCachePathArc.Empty();
+    objectCodeCachePathItem.Empty();
+    return false;
+  }
   
   return true;
 }

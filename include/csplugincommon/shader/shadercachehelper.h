@@ -25,6 +25,7 @@
 #include "csutil/csmd5.h"
 #include "csutil/fifo.h"
 #include "csutil/memfile.h"
+#include "csutil/mempool.h"
 #include "csutil/ref.h"
 #include "csutil/set.h"
 
@@ -82,7 +83,7 @@ namespace CS
       
       /// Write a complete data buffer to a file
       CS_CRYSTALSPACE_EXPORT bool WriteDataBuffer (iFile* file, iDataBuffer* buf);
-      /// Get a complete data buffer from a file
+      /// Get a complete data buffer written with WriteDataBuffer from a file
       CS_CRYSTALSPACE_EXPORT csPtr<iDataBuffer> ReadDataBuffer (iFile* file);
       
       /// Write a character string to a file
@@ -136,6 +137,47 @@ namespace CS
         
         /// Get a string for an ID
         const char* GetString (uint32 id) const;
+      };
+      
+      /**
+       * A simple archive format.
+       * It is not terribly efficient to add or modify files in it. Also,
+       * archive data is kept in memory, so it's not suitable for very large
+       * data. However, it's a simple format with little overhead, ideal to
+       * 'pack' a set of small files together.
+       */
+      class CS_CRYSTALSPACE_EXPORT MicroArchive
+      {
+        csRef<iDataBuffer> originalData;
+        csMemoryPool addedNames;
+        struct Entry
+        {
+          /// Name, points either into originalData or addedNames
+          const char* name;
+          /// Buffer with data (either added or pointing inside originalData)
+          csRef<iDataBuffer> data;
+          /// Size of data
+          size_t size;
+          /// Offset of data in originalData
+          size_t offset;
+        };
+        csArray<Entry> entries;
+        
+        iDataBuffer* GetEntryData (Entry& entry);
+        Entry* FindEntry (const char* id);
+      public:
+        bool Read (iFile* file);
+        bool Write (iFile* file);
+      
+        iDataBuffer* ReadEntry (const char* id);
+        bool WriteEntry (const char* id, iDataBuffer* data);
+        
+        size_t GetEntriesNum () const
+        { return entries.GetSize(); }
+        const char* GetEntryName (size_t index) const
+        { return entries[index].name; }
+        iDataBuffer* GetEntryData (size_t index)
+        { return GetEntryData (entries[index]); }
       };
     } // namespace ShaderCacheHelper
   } // namespace PluginCommon

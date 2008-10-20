@@ -79,7 +79,7 @@ protected:
   csString entrypoint;
   csRefArray<iDocumentNode> cacheKeepNodes;
   csString objectCode;
-  csString objectCodeCachePath;
+  csString objectCodeCachePathArc, objectCodeCachePathItem;
 
   enum ProgramType
   {
