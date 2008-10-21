@@ -90,6 +90,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     virtual bool GetVerbose() { return do_verbose; }
 
     void ReportNotify (const char* description, ...);
+    void ReportWarning (const char* description, ...);
 
     // Pre-parse functions.
     void ParseAvailableTextures(iDocumentNode* doc);
