@@ -39,6 +39,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     : scfImplementationType (this), object_reg(object_reg), Engine(Engine), loader(loader),
     collection(collection), missingdata(missingdata), keepFlags(keepFlags), do_verbose(do_verbose)
   {
+    tm = csQueryRegistry<iTextureManager>(object_reg);
   }
 
   csLoaderContext::~csLoaderContext ()
@@ -151,7 +152,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           collection->Add(mat->QueryObject());
         }
 
-        csRef<iTextureManager> tm = csQueryRegistry<iTextureManager>(object_reg);
         tex->Register(tm);
         return mat;
       }
@@ -424,6 +424,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     {
       result = Engine->FindTexture(name, collection);
     }
+
+    // *** This is deprecated behaviour ***
+    if(!dontWaitForLoad && !result.IsValid())
+    {
+      ReportWarning("Could not find texture '%s'. Loading texture. This is deprecated behaviour.", 
+        name);
+      csRef<iThreadManager> tman = csQueryRegistry<iThreadManager>(object_reg);
+      csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(tman));
+      loader->LoadTextureTC(itr, name, name, CS_TEXTURE_3D, tm, true, false, true, collection,
+        KEEP_ALL, do_verbose);
+      result = scfQueryInterfaceSafe<iTextureWrapper>(itr->GetResultRefPtr());
+    }
+    // ***
 
     if(!result.IsValid() && do_verbose)
     {
