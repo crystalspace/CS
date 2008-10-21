@@ -210,7 +210,7 @@ Siu-Hang wrote one of several tutorials for MazeD, the Crystal Space map
 editor.
 
 @item
-Philip Wyett (@email{philip.wyett@@gmail.com})
+Philip Wyett (@email{philwyett@@gmx.com})
 
 Philip took over from Frank O'Connor as the Windows port maintainer.
 He also wrote and maintained the instructions for building Crystal
