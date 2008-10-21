@@ -45,6 +45,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
 class ConditionTree
 {
+  /// Indices for node branches
+  enum
+  {
+    /// Index for 'condition is true' branch
+    bTrue = 0,
+    /// Index for 'condition is false' branch
+    bFalse = 1
+  };
+
   struct Node
   {
     static const csConditionID csCondUnknown = (csConditionID)~2;    
@@ -58,8 +67,8 @@ class ConditionTree
 
     Node (Node* p) : parent (p), condition (csCondUnknown)
     {
-      branches[0] = 0;
-      branches[1] = 0;
+      branches[bTrue] = 0;
+      branches[bFalse] = 0;
     }
     
   };
@@ -114,9 +123,9 @@ public:
   {
     root = (Node*)nodeAlloc.Alloc();
     new (root) Node (0);
-    currentBranch = 0;
+    currentBranch = bTrue;
     NodeStackEntry* newPair = nodeStackEntryAlloc.Alloc();
-    newPair->branches[0].Push (root);
+    newPair->branches[bTrue].Push (root);
     nodeStack.Push (newPair);
     cheapshotCondition = (csConditionID)~2;    
   }
@@ -145,8 +154,8 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
   /* Shortcut */
   if (node->condition == condition)
   {
-    newCurrent.branches[0].Push (node->branches[0]);
-    newCurrent.branches[1].Push (node->branches[1]);
+    newCurrent.branches[bTrue].Push (node->branches[bTrue]);
+    newCurrent.branches[bFalse].Push (node->branches[bFalse]);
     return;
   }
 
@@ -199,10 +208,10 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
     switch (r.state)
     {
       case Logic3::Truth:
-	newCurrent.branches[0].Push (node);
+	newCurrent.branches[bTrue].Push (node);
 	break;
       case Logic3::Lie:
-	newCurrent.branches[1].Push (node);
+	newCurrent.branches[bFalse].Push (node);
 	break;
       case Logic3::Uncertain:
 	{
@@ -243,7 +252,7 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
 	       */
 	      Variables newTrueVals;
 	      Variables newFalseVals;
-	      if (b == 0)
+	      if (b == bTrue)
 	      {
 		evaluator.CheckConditionResults (containerCondition, 
 		  trueVals, newTrueVals, newFalseVals);
@@ -255,14 +264,14 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
 	      }
 	      /* Pick the results for the branch of the containing condition
 	      * the contained one appears in. */
-	      if (containingBranch == 0)
+	      if (containingBranch == bTrue)
 		nn->values = newTrueVals;
 	      else
 		nn->values = newFalseVals;
 	    }
 	    else
 	    {
-	      nn->values = (b == 0) ? trueVals : falseVals;
+	      nn->values = (b == bTrue) ? trueVals : falseVals;
 	    }
 	    //node->branches[b] = nn;
 	    CommitNode commitNode;
@@ -287,10 +296,10 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
     switch (r.state)
     {
       case Logic3::Truth:
-	newCurrent.branches[0].Push (node);
+	newCurrent.branches[bTrue].Push (node);
 	break;
       case Logic3::Lie:
-	newCurrent.branches[1].Push (node);
+	newCurrent.branches[bFalse].Push (node);
 	break;
       case Logic3::Uncertain:
 	RecursiveAdd (condition, node->branches[0], newCurrent, affectedSVs,
@@ -317,10 +326,10 @@ Logic3 ConditionTree::Descend (csConditionID condition)
     switch (condition)
     {
       case csCondAlwaysTrue:
-        newCurrent->branches[0] = currentNodes;
+        newCurrent->branches[bTrue] = currentNodes;
 	break;
       case csCondAlwaysFalse:
-        newCurrent->branches[1] = currentNodes;
+        newCurrent->branches[bFalse] = currentNodes;
 	break;
     }
   }
@@ -337,14 +346,14 @@ Logic3 ConditionTree::Descend (csConditionID condition)
     
   nodeStack.Push (newCurrent);
   branchStack.Push (currentBranch);
-  currentBranch = 0;
+  currentBranch = bTrue;
 
   Logic3 r;
-  if (newCurrent->branches[0].IsEmpty()
-    && !newCurrent->branches[1].IsEmpty())
+  if (newCurrent->branches[bTrue].IsEmpty()
+    && !newCurrent->branches[bFalse].IsEmpty())
     r.state = Logic3::Lie;
-  else if (!newCurrent->branches[0].IsEmpty()
-    && newCurrent->branches[1].IsEmpty())
+  else if (!newCurrent->branches[bTrue].IsEmpty()
+    && newCurrent->branches[bFalse].IsEmpty())
     r.state = Logic3::Truth;
 
   return r;
@@ -352,8 +361,8 @@ Logic3 ConditionTree::Descend (csConditionID condition)
 
 void ConditionTree::SwitchBranch ()
 {
-  CS_ASSERT(currentBranch == 0);
-  currentBranch = 1;
+  CS_ASSERT(currentBranch == bTrue);
+  currentBranch = bFalse;
 }
 
 void ConditionTree::Ascend (int num)
@@ -396,15 +405,15 @@ void ConditionTree::ToResolver (iConditionResolver* resolver,
   csConditionNode* falseNode;
 
   resolver->AddNode (parent, node->condition, trueNode, falseNode);
-  if (node->branches[0] != 0)
-    ToResolver (resolver, node->branches[0], trueNode);
-  if (node->branches[1] != 0)
-    ToResolver (resolver, node->branches[1], falseNode);
+  if (node->branches[bTrue] != 0)
+    ToResolver (resolver, node->branches[bTrue], trueNode);
+  if (node->branches[bFalse] != 0)
+    ToResolver (resolver, node->branches[bFalse], falseNode);
 }
 
 void ConditionTree::ToResolver (iConditionResolver* resolver)
 {
-  if (root->branches[0] != 0)
+  if (root->branches[bTrue] != 0)
   {
     ToResolver (resolver, root, 0);
     resolver->FinishAdding();
@@ -421,7 +430,7 @@ bool ConditionTree::HasContainingCondition (Node* node,
   if (evaluator.IsConditionPartOf (containedCondition, condition)
     && (containedCondition != condition))
   {
-    branch = (node == node->parent->branches[0]) ? 0 : 1;
+    branch = (node == node->parent->branches[bTrue]) ? bTrue : bFalse;
     return true;
   }
   return HasContainingCondition (node->parent, containedCondition, condition, 
@@ -440,8 +449,8 @@ void ConditionTree::ClearCommitArray (CommitArray& ca)
 void ConditionTree::RecursiveFree (Node* node)
 {
   if (node == 0) return;
-  RecursiveFree (node->branches[0]);
-  RecursiveFree (node->branches[1]);
+  RecursiveFree (node->branches[bTrue]);
+  RecursiveFree (node->branches[bFalse]);
   node->~Node();
   nodeAlloc.Free (node);
 }
@@ -469,8 +478,8 @@ void ConditionTree::DumpNode (csString& out, const Node* node, int level)
         out.AppendFmt ("condition %zu", node->condition);
     }
     out += '\n';
-    DumpNode (out, node->branches[0], level+1);
-    DumpNode (out, node->branches[1], level+1);
+    DumpNode (out, node->branches[bTrue], level+1);
+    DumpNode (out, node->branches[bFalse], level+1);
   }
 }
 
