@@ -121,6 +121,7 @@
 #include "csutil/refcount.h"
 #include "csutil/reftrackeraccess.h"
 #include "csutil/regexp.h"
+#include "csutil/rootedhiercache.h"
 #include "csutil/scanstr.h"
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
