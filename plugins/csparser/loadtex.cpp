@@ -866,8 +866,8 @@ csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node,
 
 //----------------------------------------------------------------------------
 
-csMissingTextureLoader::csMissingTextureLoader (iBase *p) : 
-  scfImplementationType(this, p)
+csMissingTextureLoader::csMissingTextureLoader (iObjectRegistry *object_reg)
+: scfImplementationType(this), object_reg(object_reg)
 {
 }
 
