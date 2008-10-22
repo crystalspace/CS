@@ -56,21 +56,31 @@ class ConditionTree
 
   struct Node
   {
-    static const csConditionID csCondUnknown = (csConditionID)~2;    
-    
     Node* parent;
     
     csConditionID condition;
     Node* branches[2];
     Variables values;
     MyBitArrayTemp conditionAffectedSVs;
+    MyBitArrayTemp conditionResults;
 
     Node (Node* p) : parent (p), condition (csCondUnknown)
     {
+      if (p != 0) conditionResults = p->conditionResults;
       branches[bTrue] = 0;
       branches[bFalse] = 0;
     }
     
+    void SetConditionResult (csConditionID cond, bool val)
+    {
+      if (conditionResults.GetSize() <= cond)
+        conditionResults.SetSize (cond+1);
+      if (val)
+        conditionResults.SetBit (cond);
+        
+      if (branches[bTrue]) branches[bTrue]->SetConditionResult (cond, val);
+      if (branches[bFalse]) branches[bFalse]->SetConditionResult (cond, val);
+    }
   };
 
   csFixedSizeAllocator<sizeof (Node), TempHeapAlloc> nodeAlloc;
@@ -127,7 +137,7 @@ public:
     NodeStackEntry* newPair = nodeStackEntryAlloc.Alloc();
     newPair->branches[bTrue].Push (root);
     nodeStack.Push (newPair);
-    cheapshotCondition = (csConditionID)~2;    
+    cheapshotCondition = csCondUnknown;
   }
   ~ConditionTree ()
   {
@@ -160,7 +170,7 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
   }
 
   Logic3 r;
-  bool isLeaf = node->condition == Node::csCondUnknown;
+  bool isLeaf = node->condition == csCondUnknown;
   bool doCheck = true;
   if (node->parent != 0)
   {
@@ -208,9 +218,11 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
     switch (r.state)
     {
       case Logic3::Truth:
+        node->SetConditionResult (condition, true);
 	newCurrent.branches[bTrue].Push (node);
 	break;
       case Logic3::Lie:
+        node->SetConditionResult (condition, false);
 	newCurrent.branches[bFalse].Push (node);
 	break;
       case Logic3::Uncertain:
@@ -273,6 +285,7 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
 	    {
 	      nn->values = (b == bTrue) ? trueVals : falseVals;
 	    }
+	    nn->SetConditionResult (condition, b == bTrue);
 	    //node->branches[b] = nn;
 	    CommitNode commitNode;
 	    commitNode.owner = node;
@@ -296,9 +309,11 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
     switch (r.state)
     {
       case Logic3::Truth:
+        node->SetConditionResult (condition, true);
 	newCurrent.branches[bTrue].Push (node);
 	break;
       case Logic3::Lie:
+        node->SetConditionResult (condition, false);
 	newCurrent.branches[bFalse].Push (node);
 	break;
       case Logic3::Uncertain:
@@ -399,12 +414,11 @@ void ConditionTree::Commit ()
 void ConditionTree::ToResolver (iConditionResolver* resolver, 
                                 Node* node, csConditionNode* parent)
 {
-  if (node->condition == Node::csCondUnknown) return;
-
   csConditionNode* trueNode;
   csConditionNode* falseNode;
 
-  resolver->AddNode (parent, node->condition, trueNode, falseNode);
+  resolver->AddNode (parent, node->condition, trueNode, falseNode,
+    node->conditionResults);
   if (node->branches[bTrue] != 0)
     ToResolver (resolver, node->branches[bTrue], trueNode);
   if (node->branches[bFalse] != 0)
