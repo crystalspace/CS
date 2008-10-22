@@ -45,148 +45,6 @@ class csPolyTexture;
 class csLightMap;
 class csLightPatch;
 
-/**
- * This class represents a shadow-bitmap. It is used while calculating
- * lighting for one light on a polygon. First shadows are collected on
- * this bitmap. Later the bitmap will be used to update the lightmap.
- */
-class csShadowBitmap
-{
-private:
-  char* light;		// Light bitmap.
-  char* shadow;		// Shadow bitmap.
-  int lm_w, lm_h;	// Original lightmap size.
-  int sb_w, sb_h;	// Shadow bitmap size.
-  int quality;		// Quality factor.
-  int cnt_unshadowed;	// Number of bits still unshadowed in 'shadow' array.
-  int cnt_unlit;	// Number of bits still unlit in 'light' array.
-  int default_light;	// Default value to use initially for light map.
-
-private:
-  /**
-   * Get the lighting level of a point in the lightmap (using lightmap
-   * coordinates). This will be a number between 1 and 0 with 1 meaning
-   * fully lit and 0 meaning fully shadowed.
-   */
-  float GetLighting (int lm_u, int lm_v);
-
-  /*
-   * For csAntialiasedPolyFill().
-   */
-  static void LightPutPixel (int x, int y, float area, void *arg);
-  static void LightDrawBox (int x, int y, int w, int h, void *arg);
-  static void ShadowPutPixel (int x, int y, float area, void *arg);
-  static void ShadowDrawBox (int x, int y, int w, int h, void *arg);
-  void _LightPutPixel (int x, int y, float area);
-  void _LightDrawBox (int x, int y, int w, int h);
-  void _ShadowPutPixel (int x, int y, float area);
-  void _ShadowDrawBox (int x, int y, int w, int h);
-
-public:
-  /**
-   * Make a new shadow bitmap of the given lightmap size and quality.
-   * Quality will be a number indicating how much we want to enhance
-   * or reduce size of this bitmap compared to the lightmap size.
-   * A quality of 0 means no change (i.e. the bitmap will hold as many
-   * shadow-points as lumels). A quality of -1 means that for every 2x2
-   * lumels there will be one shadow-point. A quality of 1 means that
-   * one lumel corresponds with 2x2 shadow-points.
-   */
-  csShadowBitmap (int lm_w, int lm_h, int quality, int default_light);
-
-  /**
-   * Destroy the shadow bitmap.
-   */
-  ~csShadowBitmap () { delete[] shadow; delete[] light; }
-
-  /**
-   * Render a polygon on this bitmap. The coordinates of this
-   * polygon are given in lightmap coordinates. WARNING the given polygon
-   * will be modified by this function!
-   * 'val' can be 0 or 1 and will be used to fill the polygon. To render
-   * a shadow you would use 1 and for light you would use 0.
-   */
-  void RenderPolygon (csVector2* poly, int num_vertices, int val);
-
-  /**
-   * Set the entire area of this bitmap to either completely shadowed
-   * (val==1) or fully lit (val==0).
-   */
-  void RenderTotal (int val);
-
-  /**
-   * Take a light and update the lightmap using the information in
-   * this shadow-bitmap.
-   * - lightcell_shift is the shift to scale lightmap space to
-   *   texture space (with texture space meaning 0 to real texture size).
-   * - The shf_u, shf_v, mul_u, and mul_v fields define how to translate
-   *   the previous texture space to uv space (where uv goes between
-   *   0 and 1 for a single texture).
-   * - m_t2w and v_t2w transform uv space to world space coordinates.
-   * - light is the light and lightpos is the position of that light (which
-   *   can be different from the position of the light given by 'light'
-   *   itself because we can have space warping).
-   * - lightcolor can also be different from the color of the light because
-   *   it could in principle be modified by portals.
-   */
-  void UpdateLightMap (csRGBcolor* lightmap,
-	int lightcell_shift,
-	float shf_u, float shf_v,
-	float mul_u, float mul_v,
-	const csMatrix3& m_t2w, const csVector3& v_t2w,
-	iLight* light, const csVector3& lightpos,
-	const csColor& lightcolor,
-	csPolygon3D* poly,
-	const csPlane3& poly_world_plane,
-	float cosfact);
-  /**
-   * Take a light and update the shadowmap using the information in
-   * this shadow-bitmap.
-   * - lightcell_shift is the shift to scale lightmap space to
-   *   texture space (with texture space meaning 0 to real texture size).
-   * - The shf_u, shf_v, mul_u, and mul_v fields define how to translate
-   *   the previous texture space to uv space (where uv goes between
-   *   0 and 1 for a single texture).
-   * - m_t2w and v_t2w transform uv space to world space coordinates.
-   * - light is the light and lightpos is the position of that light (which
-   *   can be different from the position of the light given by 'light'
-   *   itself because we can have space warping).
-   *
-   * Function returns false if there was no light hitting the polygon.
-   */
-  bool UpdateShadowMap (unsigned char* shadowmap,
-	int lightcell_shift,
-	float shf_u, float shf_v,
-	float mul_u, float mul_v,
-	const csMatrix3& m_t2w, const csVector3& v_t2w,
-	iLight* light, const csVector3& lightpos,
-	csPolygon3D* poly,
-	const csPlane3& poly_world_plane,
-	float cosfact);
-  /**
-   * Return true if this bitmap is fully shadowed.
-   */
-  bool IsFullyShadowed () const
-  {
-    return cnt_unshadowed == 0;
-  }
-
-  /**
-   * Return true if this bitmap is fully unlit.
-   */
-  bool IsFullyUnlit () const
-  {
-    return cnt_unlit == sb_w * sb_h;
-  }
-
-  /**
-   * Return true if this bitmap is fully lit.
-   */
-  bool IsFullyLit () const
-  {
-    return cnt_unlit == 0 && (cnt_unshadowed == sb_w * sb_h);
-  }
-};
 
 
 /**
@@ -199,10 +57,6 @@ class csPolyTexture
 private:
   /// LightMap.
   csLightMap* lm;
-  /**
-   * Shadow-bitmap used while doing lighting.
-   */
-  csShadowBitmap* shadow_bitmap;
 
   /**
    * Compared against csThing version to know whether lightmap needs updating.
@@ -257,17 +111,6 @@ public:
 	const csPlane3& subpoly_plane,
 	csPolygon3DStatic* spoly);
 #endif
-
-  /**
-   * Update the lightmap of this polygon using the current shadow-bitmap
-   * and the light information below.
-   */
-  void UpdateFromShadowBitmap (iLight* light, const csVector3& lightpos,
-  	const csColor& lightcolor,
-	const csMatrix3& m_world2tex,
-	const csVector3& v_world2tex,
-	csPolygon3D* polygon,
-	const csPlane3& polygon_world_plane);
 
   /**
    * Update the real lightmap for a given csLightPatch
