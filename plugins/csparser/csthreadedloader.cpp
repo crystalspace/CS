@@ -3492,6 +3492,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           Engine->SetClearScreen (yesno);
         }
         break;
+      case XMLTOKEN_LIGHTMAPCELLSIZE:
+        ReportWarning("crystalspace.maploader.parse.settings",
+          child, "The 'lightmapcellsize' attribute is deprecated!");
+        break;
+      case XMLTOKEN_MAXLIGHTMAPSIZE:
+        ReportWarning("crystalspace.maploader.parse.settings",
+          child, "The 'maxlightmapsize' attribute is deprecated!");
+        break;
       case XMLTOKEN_AMBIENT:
         {
           csColor c;
