@@ -23,11 +23,11 @@
 #include "iutil/vfs.h"
 
 #include "csutil/csstring.h"
+#include "csutil/rootedhiercache.h"
 #include "csutil/scfstringarray.h"
 #include "csutil/set.h"
 
 #include "plexhiercache.h"
-#include "rootedhiercache.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
 {
@@ -108,7 +108,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
   
   csPtr<iHierarchicalCache> PlexHierarchicalCache::GetRootedCache (const char* base)
   {
-    return csPtr<iHierarchicalCache> (new RootedHierarchicalCache (this, base));
+    return csPtr<iHierarchicalCache> (
+      new CS::Utility::RootedHierarchicalCache (this, base));
   }
   
   csPtr<iStringArray> PlexHierarchicalCache::GetSubItems (const char* path)

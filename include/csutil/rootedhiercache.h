@@ -28,9 +28,11 @@
 struct iObjectRegistry;
 struct iVFS;
 
-CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
+namespace CS
 {
-  class RootedHierarchicalCache : 
+namespace Utility
+{
+  class CS_CRYSTALSPACE_EXPORT RootedHierarchicalCache : 
     public scfImplementation1<RootedHierarchicalCache, iHierarchicalCache>
   {
   private:
@@ -62,8 +64,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
     { return wrappedCache; }
     /** @} */
   };
-}
-CS_PLUGIN_NAMESPACE_END(ShaderManager)
+} // namespace Utility
+} // namespace CS
 
 #endif // __CS_UTIL_ROOTEDHIERCACHE_H__
 
