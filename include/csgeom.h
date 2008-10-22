@@ -46,7 +46,6 @@
 #include "csgeom/plane3.h"
 #include "csgeom/poly2d.h"
 #include "csgeom/poly3d.h"
-#include "csgeom/polyaa.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/polyidx.h"
 #include "csgeom/polypool.h"
