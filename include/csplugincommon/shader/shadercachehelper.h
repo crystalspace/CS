@@ -22,6 +22,8 @@
 /**\file
  */
 
+#include "iutil/hiercache.h"
+
 #include "csutil/csmd5.h"
 #include "csutil/fifo.h"
 #include "csutil/memfile.h"
@@ -171,6 +173,8 @@ namespace CS
       
         iDataBuffer* ReadEntry (const char* id);
         bool WriteEntry (const char* id, iDataBuffer* data);
+        bool DeleteEntry (const char* id);
+        void DeleteAllEntries ();
         
         size_t GetEntriesNum () const
         { return entries.GetSize(); }
@@ -178,6 +182,40 @@ namespace CS
         { return entries[index].name; }
         iDataBuffer* GetEntryData (size_t index)
         { return GetEntryData (entries[index]); }
+        void DeleteEntry (size_t i) { entries.DeleteIndex (i); }
+      };
+      
+      /**
+       * iHierarchicalCache implementation storing everything in a
+       * MicroArchive.
+       */
+      class CS_CRYSTALSPACE_EXPORT MicroArchiveCache :
+        public scfImplementation1<MicroArchiveCache, iHierarchicalCache>
+      {
+        MicroArchive archive;
+        csRef<iHierarchicalCache> parentCache;
+        csString cacheItem;
+      public:
+        /**
+         * Construct.
+         * \param paramCache The cache in which the archive will be stored
+         * \param cacheItem The path of the cache item for the archive
+         */
+        MicroArchiveCache (iHierarchicalCache* parentCache,
+          const char* cacheItem);
+        ~MicroArchiveCache();
+        
+	/**\name iHierarchicalCache implementation
+	* @{ */
+	virtual bool CacheData (const void* data, size_t size,
+	  const char* path);
+	virtual csPtr<iDataBuffer> ReadCache (const char* path);
+	virtual bool ClearCache (const char* path);
+	virtual void Flush ();
+	virtual csPtr<iHierarchicalCache> GetRootedCache (const char* base);
+	virtual csPtr<iStringArray> GetSubItems (const char* path);
+	virtual iHierarchicalCache* GetTopCache();
+	/** @} */
       };
     } // namespace ShaderCacheHelper
   } // namespace PluginCommon

@@ -759,8 +759,9 @@ bool csXMLShader::Precache (iDocumentNode* source, iHierarchicalCache* cacheTo)
 	}
   
 	csRef<iHierarchicalCache> varCache;
-	varCache = techCache->GetRootedCache (
-	  csString().Format ("/%zu", vi));
+	varCache.AttachNew (
+	  new CS::PluginCommon::ShaderCacheHelper::MicroArchiveCache (
+	    techCache, csString().Format ("/%zu", vi)));
 	
 	// So external files are found correctly
 	csVfsDirectoryChanger dirChange (compiler->vfs);
@@ -1018,8 +1019,9 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	csRef<iHierarchicalCache> varCache;
 	if (techCache)
 	{
-	  varCache = techCache->GetRootedCache (
-	    csString().Format ("/%zu", vi));
+	  varCache.AttachNew (
+	    new CS::PluginCommon::ShaderCacheHelper::MicroArchiveCache (
+	      techCache, csString().Format ("/%zu", vi)));
 	}
     
 	if (!var.prepared)

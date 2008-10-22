@@ -25,6 +25,8 @@
 #include "csutil/databuf.h"
 #include "csutil/documenthelper.h"
 #include "csutil/parasiticdatabuffer.h"
+#include "csutil/rootedhiercache.h"
+#include "csutil/scfstringarray.h"
 #include "csutil/sysfunc.h"
 #include "csutil/xmltiny.h"
 #include "cstool/vfsdirchange.h"
@@ -549,6 +551,115 @@ namespace CS
         return true;
       }
       
+      bool MicroArchive::DeleteEntry (const char* id)
+      {
+        Entry* entry = FindEntry (id);
+        if (entry == 0) return false;
+        return entries.DeleteIndex (entries.GetIndex (entry));
+      }
+      
+      void MicroArchive::DeleteAllEntries ()
+      {
+        entries.Empty();
+        addedNames.Empty();
+        originalData.Invalidate();
+      }
+      
+      //---------------------------------------------------------------------
+      
+      MicroArchiveCache::MicroArchiveCache (iHierarchicalCache* parentCache,
+	const char* cacheItem) : scfImplementationType (this),
+	parentCache (parentCache), cacheItem (cacheItem)
+      {
+        csRef<iDataBuffer> arcInCache = parentCache->ReadCache (
+          cacheItem);
+        if (arcInCache.IsValid())
+        {
+          csMemFile arcFile (arcInCache, true);
+          archive.Read (&arcFile);
+        }
+      }
+      
+      MicroArchiveCache::~MicroArchiveCache()
+      {
+        Flush();
+      }
+      
+      bool MicroArchiveCache::CacheData (const void* data, size_t size,
+	const char* path)
+      {
+        csRef<CS::DataBuffer<> > dbuf;
+        dbuf.AttachNew (new CS::DataBuffer<> (size));
+        memcpy (dbuf->GetData(), data, size);
+        return archive.WriteEntry (path, dbuf);
+      }
+      
+      csPtr<iDataBuffer> MicroArchiveCache::ReadCache (const char* path)
+      {
+        csRef<iDataBuffer> buf (archive.ReadEntry (path));
+        return csPtr<iDataBuffer> (buf);
+      }
+      
+      bool MicroArchiveCache::ClearCache (const char* path)
+      {
+        if (!path || !*path || (*path != '/')) return false;
+        
+        size_t pathLen = strlen(path);
+        if (path[pathLen-1] == '/')
+        {
+          size_t i = archive.GetEntriesNum();
+          while (i-- > 0)
+          {
+            const char* arcEntry = archive.GetEntryName (i);
+            if (strncmp (arcEntry, path, pathLen) == 0)
+              archive.DeleteEntry (i);
+          }
+          return true;
+        }
+        else
+          return archive.DeleteEntry (path);
+      }
+      
+      void MicroArchiveCache::Flush ()
+      {
+        csMemFile mf;
+        if (archive.Write (&mf))
+        {
+          parentCache->CacheData (mf.GetData(), mf.GetSize(), cacheItem);
+        }
+      }
+      
+      csPtr<iHierarchicalCache> MicroArchiveCache::GetRootedCache (const char* base)
+      {
+	if (!base || !*base || (*base != '/')) return 0;
+      
+	return csPtr<iHierarchicalCache> (
+	  new CS::Utility::RootedHierarchicalCache (this, base));
+      }
+      
+      csPtr<iStringArray> MicroArchiveCache::GetSubItems (const char* path)
+      {
+	scfStringArray* newArray = new scfStringArray;
+	
+	csStringFast<512> fullPath (path);
+	
+	if (fullPath.GetAt (fullPath.Length()-1) != '/')
+	  fullPath.Append ("/");
+	
+	for (size_t i = 0; i < archive.GetEntriesNum(); i++)
+	{
+	  const char* arcEntry = archive.GetEntryName (i);
+	  if (strncmp (arcEntry, fullPath, fullPath.Length()) == 0)
+	    newArray->Push (arcEntry+fullPath.Length());
+	}
+	return csPtr<iStringArray> (newArray);
+      }
+      
+      iHierarchicalCache* MicroArchiveCache::GetTopCache()
+      {
+        return parentCache->GetTopCache();
+      }
+
     } // namespace ShaderCacheHelper
   } // namespace PluginCommon
 } // namespace CS
