@@ -1211,7 +1211,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     {
       collection = Engine->CreateCollection (map->map_dir);
     }
-    csRef<iThreadReturn> ret = LevelLoader->LoadMapFile ("world", false, collection);
+    csRef<iThreadReturn> ret = LevelLoader->LoadMapFile ("world", false, collection,
+      0, 0, KEEP_ALL, cmdline->GetBoolOption("verbose", false));
     ret->Wait();
     if(!ret->WasSuccessful())
     {

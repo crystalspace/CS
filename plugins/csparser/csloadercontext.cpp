@@ -24,6 +24,7 @@
 #include "imap/loader.h"
 #include "imesh/genmesh.h"
 #include "iutil/object.h"
+#include "iutil/stringarray.h"
 #include "ivaria/reporter.h"
 #include "ivideo/material.h"
 
@@ -158,7 +159,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
     /// ***
 
-    if(!mat.IsValid() && do_verbose)
+    if(!mat.IsValid() && !dontWaitForLoad && do_verbose)
     {
       ReportNotify("Could not find material '%s'.", filename);
     }
@@ -200,6 +201,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           break;
         }
+
+        for(size_t i=0; i<loader->failedMeshFacts->GetSize(); i++)
+        {
+          if(!strcmp(loader->failedMeshFacts->Get(i), name))
+          {
+            // Break out of the loop, it's never going to be loaded.
+            break;
+          }
+        }
       }
     }
 
@@ -209,7 +219,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       fact = Engine->FindMeshFactory(name, collection);
     }
 
-    if(!fact.IsValid() && do_verbose)
+    if(!fact.IsValid() && !dontWaitForLoad && do_verbose)
     {
       ReportNotify("Could not find mesh factory '%s'.", name);
     }
@@ -438,7 +448,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
     // ***
 
-    if(!result.IsValid() && do_verbose)
+    if(!result.IsValid() && !dontWaitForLoad && do_verbose)
     {
       ReportNotify ("Could not find texture '%s'. Attempting to load.", name);
     }
