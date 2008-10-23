@@ -23,7 +23,7 @@
 	<?if vars."tex lightmap".texture ?>
 	  <buffer source="texture coordinate lightmap" destination="texture coordinate lightmap" />
 	  <texture name="tex lightmap" destination="lightmap" />
-	<?elsif?>
+	<?elsif vars."static color".buffer ?>
 	  <buffer source="static color" destination="color" />
 	<?else?>
 	  <buffer source="color" destination="color" />
@@ -34,7 +34,7 @@
 	    <?if !vars."tex diffuse".texture ?>
 	      <constantcolor layer="diffuse" type="shadervar">mat flatcolor</constantcolor>
 	    <?endif?>
-	    <?if vars."tex lightmap".texture ?>
+	    <?if vars."tex lightmap".texture || vars."static color".buffer ?>
 	      <constantcolor layer="lightmap" type="expr">
 		<sexp>(* dynamic ambient 0.5)</sexp>
 	      </constantcolor>
