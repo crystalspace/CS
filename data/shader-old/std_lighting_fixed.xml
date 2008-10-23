@@ -35,7 +35,9 @@
 	      <constantcolor layer="diffuse" type="shadervar">mat flatcolor</constantcolor>
 	    <?endif?>
 	    <?if vars."tex lightmap".texture ?>
-	      <constantcolor layer="lightmap" type="shadervar">dynamic ambient</constantcolor>
+	      <constantcolor layer="lightmap" type="expr">
+		<sexp>(* dynamic ambient 0.5)</sexp>
+	      </constantcolor>
 	    <?endif?>
 	    <?Include snippets/fog-fvp.inc ?>
 	  </fixedvp>
@@ -50,7 +52,15 @@
 		<alphasource num="0" source="texture" modifier="alpha"/>
 		<alphaoperation operation="replace" />
 	      </layer>
-	    <?endif?>
+	    <?elsif vars."static color".buffer ?>
+	      <layer name="lighting">
+		<colorsource num="0" source="primary color" modifier="color"/>
+		<colorsource num="1" source="constant color" modifier="color"/>
+		<coloroperation operation="add" />
+		<alphasource num="0" source="texture" modifier="alpha"/>
+		<alphaoperation operation="replace" />
+	      </layer>
+	      <?endif?>
 	    <layer name="diffuse">
 	      <?if vars."tex diffuse".texture ?>
 		<colorsource num="0" source="texture" modifier="color"/>
@@ -59,7 +69,7 @@
 		<colorsource num="0" source="constant color" modifier="color"/>
 		<alphasource num="0" source="constant color" modifier="alpha"/>
 	      <?endif?>
-	      <?if !vars."tex lightmap".texture ?>
+	      <?if !vars."tex lightmap".texture && !vars."static color".buffer ?>
 		<colorsource num="1" source="primary color" modifier="color"/>
 		<coloroperation operation="modulate" />
 	      <?else?>
