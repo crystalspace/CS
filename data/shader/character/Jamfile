@@ -1,4 +1,0 @@
-SubDir TOP data shader character ;
-
-InstallData [ Wildcard *.cgfp *.cgvp *.inc *.xml ] : data shader character ;
-FileListEntriesData [ Wildcard *.cgfp *.cgvp *.inc *.xml ] : data shader character : data-runtime ;

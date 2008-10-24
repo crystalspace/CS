@@ -1,5 +1,0 @@
-SubDir TOP data shader fresnelWater ;
-
-InstallData [ Wildcard *.cgfp *.cgvp *.xml ] :
-  data shader fresnelWater ;
-FileListEntriesData [ Wildcard *.cgfp *.cgvp *.xml ] : shader fresnelWater : data-runtime ;

@@ -1,4 +1,0 @@
-SubDir TOP data shader specular ;
-
-InstallData [ Wildcard *.cgfp *.cgvp *.xml ] : data shader specular ;
-FileListEntriesData [ Wildcard *.cgfp *.cgvp *.xml ] : shader specular : data-runtime ;

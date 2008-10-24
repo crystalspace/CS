@@ -1,19 +1,15 @@
 SubDir TOP data shader ;
 
-InstallData [ Wildcard *.afp *.avp *.fvp *.xml *.cgvp ] : data shader ;
+rule InstallShader
+{
+  InstallData $(1) : data shader $(2) ;
+}
+rule FilelistEntryShader
+{
+  local file_gristed = $(1:G=$(2:J=!)) ;
+  FileListEntriesData $(file_gristed) : shader $(2) : data-runtime ;
+}
 FileListEntriesData [ Wildcard *.afp *.avp *.fvp *.xml *.cgvp ] : shader : data-runtime ;
 
-SubInclude TOP data shader character ;
-SubInclude TOP data shader combiner-cg ;
-SubInclude TOP data shader extrudeGlow ;
-SubInclude TOP data shader fog ;
-SubInclude TOP data shader fresnelWater ;
-SubInclude TOP data shader lighting ;
-SubInclude TOP data shader parallax ;
-SubInclude TOP data shader parallaxAtt ;
-SubInclude TOP data shader reflect ;
-SubInclude TOP data shader shadowmap ;
-SubInclude TOP data shader snippets ;
-SubInclude TOP data shader specular ;
-SubInclude TOP data shader surface ;
-SubInclude TOP data shader uvanim ;
+Recurse InstallShader : .afp .avp .fvp .xml .cgfp .cgvp .inp .cginc .inc ;
+Recurse FilelistEntryShader : .afp .avp .fvp .xml .cgfp .cgvp .inp .cginc .inc ;

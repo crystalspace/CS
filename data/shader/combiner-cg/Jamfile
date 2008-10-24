@@ -1,4 +1,0 @@
-SubDir TOP data shader combiner-cg ;
-
-InstallData [ Wildcard *.inp *.xml ] : data shader combiner-cg ;
-FileListEntriesData [ Wildcard *.inp *.xml ] : shader combiner-cg : data-runtime ;

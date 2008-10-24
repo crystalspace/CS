@@ -1,4 +1,0 @@
-SubDir TOP data shader snippets surface ;
-
-InstallData [ Wildcard *.cginc *.xml *.inp ] : data shader snippets surface ;
-FileListEntriesData [ Wildcard *.cginc *.xml *.inp ] : shader snippets surface : data-runtime ;

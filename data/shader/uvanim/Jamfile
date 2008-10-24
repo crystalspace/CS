@@ -1,4 +1,0 @@
-SubDir TOP data shader uvanim ;
-
-InstallData [ Wildcard *.fvp *.xml ] : data shader uvanim ;
-FileListEntriesData [ Wildcard *.fvp *.xml ] : shader uvanim : data-runtime ;
