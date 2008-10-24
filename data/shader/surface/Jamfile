@@ -1,3 +1,4 @@
 SubDir TOP data shader surface ;
 
 InstallData [ Wildcard *.cginc *.cscg *.inc *.xml ] : data shader surface ;
+FileListEntriesData [ Wildcard *.cginc *.cscg *.inc *.xml ] : shader surface : data-runtime ;

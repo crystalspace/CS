@@ -2,3 +2,4 @@ SubDir TOP data shader extrudeGlow ;
 
 InstallData [ Wildcard *.afp *.avp *.cgfp *.cgvp *.xml ] :
   data shader extrudeGlow ;
+FileListEntriesData [ Wildcard *.afp *.avp *.cgfp *.cgvp *.xml ] : data shader extrudeGlow : data-runtime ;

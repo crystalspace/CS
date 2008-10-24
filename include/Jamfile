@@ -5,6 +5,16 @@ SubDir TOP include ;
 #------------------------------------------------------------------------------
 Recurse InstallHeader : .h .i .inc .fun .tok ;
 
+rule FilelistEntryHeader
+{
+  FileListEntriesData $(1) : $(2) : headers ;
+}
+Recurse FilelistEntryHeader : .h .i .inc .fun .tok ;
+if [ Property build : standalone ]
+{
+  local SUBDIR = [ ConcatDirs $(BUILDTOP) include ] ; # Temporary for Recurse.
+  Recurse FilelistEntryHeader : .h ;
+}
 
 #------------------------------------------------------------------------------
 # Master-header creation / automation
