@@ -388,32 +388,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
           const char* factname = child->GetContentsValue ();
           iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
 
-          if(failedMeshFacts)
-          {
-            // Check for failed meshfact load.
-            int i = 0;
-            while(!fact)
-            {
-              if(failedMeshFacts->GetSize() != 0 &&
-                !strcmp(failedMeshFacts->Get(i), factname))
-              {
-                synldr->ReportError (msgid, child, 
-                  "Couldn't find factory '%s'!", factname);
-                return 0;
-              }
-
-              if(i >= (int)(failedMeshFacts->GetSize()-1))
-              {
-                fact = ldr_context->FindMeshFactory (factname);
-                i = 0;
-              }
-              else
-              {
-                i++;
-              }
-            }
-          }
-          else if(!fact)
+          if(!fact)
           {
             synldr->ReportError (msgid, child, 
               "Couldn't find factory '%s'!", factname);
