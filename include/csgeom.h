@@ -57,7 +57,6 @@
 #include "csgeom/spline.h"
 #include "csgeom/subrec.h"
 #include "csgeom/tcovbuf.h"
-#include "csgeom/textrans.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/tri.h"
 #include "csgeom/triangulate.h"
