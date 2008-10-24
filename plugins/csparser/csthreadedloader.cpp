@@ -180,7 +180,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   {
     if(Event.Name == ProcessPerFrame)
     {
-      Engine->SyncEngineLists(this, false);
+      Engine->SyncEngineListsNow(this);
     }
     return false;
   }

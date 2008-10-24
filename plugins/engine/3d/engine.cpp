@@ -615,19 +615,7 @@ THREADED_CALLABLE_IMPL2(csEngine, SyncEngineLists, csRef<iThreadedLoader> loader
 
   if(tman->GetThreadCount() > 1)
   {
-    if(runNow)
-    {
-      // Precache all textures.
-      while(!newTextures.IsEmpty())
-      {
-        csRef<iTextureWrapper> tex = newTextures.Pop();
-        if(tex->GetTextureHandle())
-        {
-          tex->GetTextureHandle()->Precache();
-        }
-      }
-    }
-    else
+    if(!runNow)
     {
       // Precache a texture.
       if(!newTextures.IsEmpty())
