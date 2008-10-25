@@ -834,7 +834,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           const char* varname = child->GetAttributeValue ("name");
           csRef<csShaderVariable> var;
           var.AttachNew (new csShaderVariable (stringSetSvName->Request (varname)));
-          if (!SyntaxService->ParseShaderVar (ldr_context, child, *var, failedTextures))
+          if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.load.meshobject", child,

@@ -73,6 +73,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       return false;
     }
 
+    // Array of all thread jobs created from this parse.
+    csRefArray<iThreadReturn> threadReturns;
+
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
     while (it->HasNext ())
     {
@@ -83,23 +86,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       switch (id)
       {
       case XMLTOKEN_TEXTURE:
-        if (!ParseTexture (ldr_context, child, proxyTextures))
-        {
-          failedTextures->Push(child->GetAttributeValue("name"));
-          return false;
-        }
+        threadReturns.Push(ParseTexture (ldr_context, child, &proxyTextures));
         break;
       case XMLTOKEN_CUBEMAP:
         if (!ParseCubemap (ldr_context, child))
         {
-          failedTextures->Push(child->GetAttributeValue("name"));
           return false;
         }
         break;
       case XMLTOKEN_TEXTURE3D:
         if (!ParseTexture3D (ldr_context, child))
         {
-          failedTextures->Push(child->GetAttributeValue("name"));
           return false;
         }
         break;
@@ -109,11 +106,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
     }
 
-    return true;
+    // Wait for all jobs to finish.
+    return threadman->Wait(threadReturns);;
   }
 
-  bool csThreadedLoader::ParseTexture (iLoaderContext* ldr_context,
-    iDocumentNode* node, csSafeCopyArray<ProxyTexture> &proxyTextures)
+  THREADED_CALLABLE_IMPL3(csThreadedLoader, ParseTexture, csRef<iLoaderContext> ldr_context,
+    csRef<iDocumentNode> node, csSafeCopyArray<ProxyTexture>* proxyTextures)
   {
     const char* txtname = node->GetAttributeValue ("name");
 
@@ -375,7 +373,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
       proxTex.textureWrapper = tex;
       ldr_context->AddToCollection(proxTex.textureWrapper->QueryObject());
-      proxyTextures.Push(proxTex);
+      proxyTextures->Push(proxTex);
 
       return true;
     }
@@ -670,7 +668,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           csRef<csShaderVariable> var;
           var.AttachNew (new csShaderVariable);
 
-          if (!SyntaxService->ParseShaderVar (ldr_context, child, *var, failedTextures))
+          if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
           {
             break;
           }
