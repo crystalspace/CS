@@ -525,7 +525,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iDocumentNode> meshfactnode = node->GetNode("meshfact");
     if(meshfactnode)
     {
-      return FindOrLoadMeshFactory(ldr_context, meshfactnode, 0, 0, ssource);
+      csRef<iMeshFactoryWrapper> mfw = FindOrLoadMeshFactory(ldr_context, meshfactnode, 0, 0, ssource);
+      ret->SetResult(scfQueryInterface<iBase>(mfw));
+      return mfw.IsValid();
     }
 
     // Mesh Object
@@ -633,7 +635,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return false;
   }
 
-  bool csThreadedLoader::FindOrLoadMeshFactory(iLoaderContext* ldr_context,
+  iMeshFactoryWrapper* csThreadedLoader::FindOrLoadMeshFactory(iLoaderContext* ldr_context,
     iDocumentNode* meshfactnode, iMeshFactoryWrapper* parent,
     csReversibleTransform* transf, iStreamSource* ssource)
   {
@@ -643,7 +645,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if(mfw)
     {
       ldr_context->AddToCollection(mfw->QueryObject());
-      return true;
+      return mfw;
     }
 
     if(!AddLoadingMeshFact(meshfactname))
@@ -652,7 +654,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if(mfw)
       {
         ldr_context->AddToCollection(mfw->QueryObject());
-        return true;
+        return mfw;
       }
     }
 
@@ -660,12 +662,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if(!LoadMeshObjectFactory(ldr_context, mfw, parent, meshfactnode, transf, ssource))
     {
       failedMeshFacts->Push(meshfactname);
-      return false;
+      return 0;
     }
 
     AddMeshFactToList(mfw);
     RemoveLoadingMeshFact(meshfactname);
-    return true;
+    return mfw;
   }
 
   bool csThreadedLoader::LoadShaderExpressions (iLoaderContext* ldr_context,

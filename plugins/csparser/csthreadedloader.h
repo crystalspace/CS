@@ -420,7 +420,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     // List of meshfacts that we know failed to load.
-    // This is used by the meshobj loader plugin to determine
+    // This is used by the meshfact search to determine
     // if it should continue waiting or just fail.
     csRef<iStringArray> failedMeshFacts;
 
@@ -484,7 +484,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool LoadProxyTextures(csSafeCopyArray<ProxyTexture> &proxyTextures,
       csWeakRefArray<iMaterialWrapper> &materialArray);
 
-    bool FindOrLoadMeshFactory(iLoaderContext* ldr_context,
+    iMeshFactoryWrapper* FindOrLoadMeshFactory(iLoaderContext* ldr_context,
       iDocumentNode* meshfactnode, iMeshFactoryWrapper* parent,
       csReversibleTransform* transf, iStreamSource* ssource);
 
