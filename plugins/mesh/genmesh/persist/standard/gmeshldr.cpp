@@ -305,8 +305,7 @@ static void AppendOrSetData (iGeneralFactoryState* factory,
 }
 
 csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
-	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */,
-  iStringArray* failed)
+	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */)
 {
   csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
   	object_reg, "crystalspace.mesh.object.genmesh", false);
@@ -1209,8 +1208,7 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
   }
 
 csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
-	iStreamSource*, iLoaderContext* ldr_context, iBase* context,
-  iStringArray* failedMeshFacts)
+	iStreamSource*, iLoaderContext* ldr_context, iBase* context)
 {
   csRef<iMeshObject> mesh;
   csRef<iGeneralMeshState> meshstate;

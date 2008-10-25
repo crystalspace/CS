@@ -478,7 +478,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if (plugin)
     {
       csRef<iBase> b = plugin->Parse (ParamsNode,
-        0/*ssource*/, ldr_context, static_cast<iBase*> (&context), failedMeshFacts);
+        0/*ssource*/, ldr_context, static_cast<iBase*> (&context));
       if (b) tex = scfQueryInterface<iTextureWrapper> (b);
     }
 
@@ -492,7 +492,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csRef<iLoaderPlugin> BuiltinErrorTexLoader;
       BuiltinErrorTexLoader.AttachNew(new csMissingTextureLoader (object_reg));
       csRef<iBase> b = BuiltinErrorTexLoader->Parse (ParamsNode,
-        0, ldr_context, static_cast<iBase*> (&context), failedMeshFacts);
+        0, ldr_context, static_cast<iBase*> (&context));
       if (!b.IsValid())
       {
         static bool noMissingWarned = false;

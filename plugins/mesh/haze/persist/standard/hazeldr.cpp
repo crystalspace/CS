@@ -150,8 +150,7 @@ static iHazeHull* ParseHull (csStringHash& xmltokens, iReporter*,
 }
 
 csPtr<iBase> csHazeFactoryLoader::Parse (iDocumentNode* node,
-	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */,
-  iStringArray* failed)
+	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */)
 {
   csVector3 a;
 
@@ -366,7 +365,7 @@ bool csHazeLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 			    iStreamSource*, iLoaderContext* ldr_context,
-			    iBase*, iStringArray* failedMeshFacts)
+			    iBase*)
 {
   csRef<iMeshObject> mesh;
   csRef<iHazeFactoryState> hazefactorystate;
@@ -387,33 +386,7 @@ csPtr<iBase> csHazeLoader::Parse (iDocumentNode* node,
 	  const char* factname = child->GetContentsValue ();
 	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
 
-    if(failedMeshFacts)
-    {
-      // Check for failed meshfact load.
-      int i = 0;
-      while(!fact)
-      {
-        if(failedMeshFacts->GetSize() != 0 &&
-          !strcmp(failedMeshFacts->Get(i), factname))
-        {
-          synldr->ReportError (
-            "crystalspace.hazeloader.parse.badfactory",
-            child, "Could not find factory '%s'!", factname);
-          return 0;
-        }
-
-        if(i >= (int)(failedMeshFacts->GetSize()-1))
-        {
-          fact = ldr_context->FindMeshFactory (factname);
-          i = 0;
-        }
-        else
-        {
-          i++;
-        }
-      }
-    }
-    else if(!fact)
+    if(!fact)
     {
       synldr->ReportError (
         "crystalspace.hazeloader.parse.badfactory",

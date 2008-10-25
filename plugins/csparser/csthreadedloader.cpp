@@ -1292,7 +1292,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           // is a new factory this will be 0. Otherwise it is possible
           // to append information to the already loaded factory.
           csRef<iBase> mof = plug->Parse (child, ssource, ldr_context,
-            stemp->GetMeshObjectFactory (), failedMeshFacts);
+            stemp->GetMeshObjectFactory ());
           if (!mof)
           {
             // Error is reported by plug->Parse().
@@ -1857,7 +1857,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         else
         {
           csRef<iBase> mo = plug->Parse (child, ssource, ldr_context,
-            mesh, failedMeshFacts);
+            mesh);
           if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh, zbufSet, 
             prioSet))
           {
@@ -1910,7 +1910,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             }
             csRef<iBase> mo;
             if (plug)
-              mo = plug->Parse (paramsnode, ssource, ldr_context, mesh, failedMeshFacts);
+              mo = plug->Parse (paramsnode, ssource, ldr_context, mesh);
             else
             {
               csRef<iDataBuffer> dbuf = vfs->ReadFile (fname);
@@ -2618,7 +2618,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           context.SetFlags(proxTex.textureWrapper->GetFlags());
           context.SetImage(img);
 
-          csRef<iBase> b = plugin->Parse(0, 0, 0, static_cast<iBase*>(&context), failedMeshFacts);
+          csRef<iBase> b = plugin->Parse(0, 0, 0, static_cast<iBase*>(&context));
           if (b)
           {
             csWeakRef<iTextureWrapper> newTex = scfQueryInterface<iTextureWrapper>(b);

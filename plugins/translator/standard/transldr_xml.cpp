@@ -142,8 +142,7 @@ bool csTranslatorLoaderXml::Process (iDocumentNode* node, const char* lang)
 }
 
 csPtr<iBase> csTranslatorLoaderXml::Parse (iDocumentNode* node,
-	iStreamSource*, iLoaderContext* ldr_context, iBase* context,
-  iStringArray* failed)
+	iStreamSource*, iLoaderContext* ldr_context, iBase* context)
 {
   size_t start = 0;
   size_t pos = 0;

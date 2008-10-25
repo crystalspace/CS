@@ -54,7 +54,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 
   csPtr<iBase> AnimeshFactoryLoader::Parse (iDocumentNode* node,
     iStreamSource* ssource, iLoaderContext* ldr_context,
-    iBase* context, iStringArray* failed)
+    iBase* context)
   {
     csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
       object_reg, "crystalspace.mesh.object.animesh", false);
@@ -367,7 +367,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
 
   csPtr<iBase> AnimeshObjectLoader::Parse (iDocumentNode* node,
     iStreamSource* ssource, iLoaderContext* ldr_context,
-    iBase* context, iStringArray* failedMeshFacts)
+    iBase* context)
   {
     static const char* msgid = "crystalspace.animeshloader";
 

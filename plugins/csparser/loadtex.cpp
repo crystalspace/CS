@@ -491,8 +491,7 @@ csImageTextureLoader::csImageTextureLoader (iBase *p) :
 csPtr<iBase> csImageTextureLoader::Parse (iDocumentNode* /*node*/, 
 					  iStreamSource*,
 					  iLoaderContext* /*ldr_context*/, 	
-					  iBase* context,
-            iStringArray* failedMeshFacts)
+					  iBase* context)
 {
   if (!context) return 0;
   csRef<iTextureLoaderContext> ctx = csPtr<iTextureLoaderContext>
@@ -539,8 +538,7 @@ csCheckerTextureLoader::csCheckerTextureLoader (iBase *p) :
 csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node, 
 					    iStreamSource*,
 					    iLoaderContext* /*ldr_context*/,
-					    iBase* context,
-              iStringArray* failedMeshFacts)
+					    iBase* context)
 {
   int w = 64, h = 64, depth = 6;
   csColor color (1.0f, 1.0f, 1.0f);
@@ -622,8 +620,7 @@ csCubemapTextureLoader::csCubemapTextureLoader (iBase *p) :
 csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node, 
 					    iStreamSource*,
 					    iLoaderContext* /*ldr_context*/,
-					    iBase* context,
-              iStringArray* failedMeshFacts)
+					    iBase* context)
 {
   if (!context) return 0;
   csRef<iTextureLoaderContext> ctx = csPtr<iTextureLoaderContext>
@@ -782,8 +779,7 @@ csTexture3DLoader::csTexture3DLoader (iBase *p) :
 csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node, 
 				       iStreamSource*,
 				       iLoaderContext* /*ldr_context*/,
-				       iBase* context,
-               iStringArray* failedMeshFacts)
+				       iBase* context)
 {
   if (!context) return 0;
   csRef<iTextureLoaderContext> ctx = csPtr<iTextureLoaderContext>
@@ -874,8 +870,7 @@ csMissingTextureLoader::csMissingTextureLoader (iObjectRegistry *object_reg)
 csPtr<iBase> csMissingTextureLoader::Parse (iDocumentNode* node, 
                                             iStreamSource*,
                                             iLoaderContext* /*ldr_context*/,
-                                            iBase* context,
-                                            iStringArray* failedMeshFacts)
+                                            iBase* context)
 {
   int width = 64, height = 64;
   csRef<iTextureLoaderContext> ctx;
