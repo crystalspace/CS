@@ -133,6 +133,9 @@ It takes multiple parameters:
 @item The final parameter is a boolean value which determines whether or not the method will return immediately (false), or if it will wait until the call is finished(true).
 @end itemize
 
+Be very careful when dispatching to the main thread and waiting on it to finish.
+E.g. If you're holding a lock which the main thread is currently waiting on, you will cause a deadlock by calling such a method.
+
 @example
 #include "csutil/threadmanager.h"
 
