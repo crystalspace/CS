@@ -490,6 +490,7 @@ namespace CS
       
       bool MicroArchive::Write (iFile* file)
       {
+	if (!dirty) return false;
         uint32 diskMagic = csLittleEndian::UInt32 (microArcMagic);
         if (file->Write ((char*)&diskMagic, sizeof (diskMagic))
             != sizeof (diskMagic))
@@ -531,6 +532,7 @@ namespace CS
         }
         entries = newentries;
         addedNames.Empty();
+	dirty = false;
         return true;
       }
 
@@ -548,6 +550,7 @@ namespace CS
         entry->name = addedNames.Store (id);
         entry->data = data;
         entry->size = data->GetSize();
+	dirty = true;
         return true;
       }
       
@@ -555,6 +558,7 @@ namespace CS
       {
         Entry* entry = FindEntry (id);
         if (entry == 0) return false;
+	dirty = true;
         return entries.DeleteIndex (entries.GetIndex (entry));
       }
       
@@ -563,6 +567,7 @@ namespace CS
         entries.Empty();
         addedNames.Empty();
         originalData.Invalidate();
+	dirty = true;
       }
       
       //---------------------------------------------------------------------

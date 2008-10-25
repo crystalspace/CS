@@ -164,10 +164,13 @@ namespace CS
           size_t offset;
         };
         csArray<Entry> entries;
+	bool dirty;
         
         iDataBuffer* GetEntryData (Entry& entry);
         Entry* FindEntry (const char* id);
       public:
+	MicroArchive() : dirty (false) {}
+
         bool Read (iFile* file);
         bool Write (iFile* file);
       
