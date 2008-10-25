@@ -536,6 +536,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     {
       const char* name = meshobjnode->GetAttributeValue ("name");
       csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (name, false);
+      ret->SetResult(scfQueryInterface<iBase>(mesh));
       return LoadMeshObjectTC(ret, ldr_context, mesh, 0, meshobjnode, ssource, 0, name);
     }
 
