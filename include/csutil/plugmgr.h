@@ -138,6 +138,12 @@ private:
     const char* message, ...);
   void ReportV (int severity, const char* subMsgID,
     const char* message, va_list args);
+  /* Report while the mutex is held:
+   * Report() might wait for the main thread; if the mutex is held there
+   * b/c a plugin is being loaded a deadlock may occur.
+   * This method avoids that. */
+  void ReportInLock (int severity, const char* subMsgID,
+    const char* message, ...);
 public:
   /// Initialize plugin manager.
   csPluginManager (iObjectRegistry* object_reg);
