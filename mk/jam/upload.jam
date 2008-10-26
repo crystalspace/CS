@@ -70,15 +70,30 @@ rule UploadFile
   local file = $(2) ;
   local server_user = $(3) ;
   local serverpath = $(4) ;
-  FILE on $(target) = $(dir) ;
+  FILE on $(target) = $(file) ;
   SERVER_USER on $(target) = $(server_user) ;
   DESTPATH on $(target) = $(serverpath) ;
-  DoUploadFile $(target) ;
+  DoUploadFile $(target) : $(file) ;
 }
 
 actions DoUploadFile
 {
+  # Create target dir
+  DESTPATH=$(DESTPATH)
+  $(SSH) $(SERVER_USER) "mkdir -p $DESTPATH"
   # transfer file
-  $(SCP) -v $(FILE) $(SERVER_USER):$(DESTPATH)/
+  $(SCP) $(>) $(SERVER_USER):$(DESTPATH)/
 }
 
+##  UploadFiles target : files : server_and_user : serverpath
+rule UploadFiles
+{
+  local target = $(1) ;
+  local f ;
+  for f in $(2)
+  {
+    local filetarget = $(target)_upload_$(f) ;
+    UploadFile $(filetarget) : $(f) : $(3) : $(4) ;
+    Depends $(target) : $(filetarget) ;
+  }
+}

@@ -120,3 +120,20 @@ actions LinkWIXOBJ
 {
   light $(WIX_FLAGS) $(LIGHTFLAGS) $(LIGHTFLAGS.EXTRA) $(>) -out $(<)
 }
+
+## UploadMSIs uploadtarget : msitargets : user@host : path/on/host
+rule UploadMSIs
+{
+  local target = $(1) ;
+  local files = $(2) ;
+
+  local m ;
+  for m in $(files)
+  {
+    local target2 = _$(target)_upload_$(m) ;
+    NotFile $(target2) ;
+    Always $(target2) ;
+    UploadFile $(target2) : $(m) : $(3) : $(4) ;
+    Depends $(target) : $(target2) ;
+  }
+}
