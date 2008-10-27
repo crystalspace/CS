@@ -301,7 +301,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csWeakRefHash<iLight, csString> loadedLights;
 
     // General loading objects.
-    csHash<csRef<iThreadReturn>, const char*> loadingMeshObjects;
+    csHash<csRef<iThreadReturn>, csString> loadingMeshObjects;
     CS::Threading::Mutex loadingMeshObjectsLock;
 
     void AddLoadingMeshObject(const char* name, csRef<iThreadReturn> itr)
@@ -334,7 +334,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     // Loading texture objects.
-    csArray<const char*> loadingTextures;
+    csArray<csString> loadingTextures;
     CS::Threading::RecursiveMutex loadingTexturesLock;
 
     bool AddLoadingTexture(const char* name)
@@ -361,7 +361,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     // Loading material objects.
-    csArray<const char*> loadingMaterials;
+    csArray<csString> loadingMaterials;
     CS::Threading::RecursiveMutex loadingMaterialsLock;
 
     bool AddLoadingMaterial(const char* name)
@@ -388,7 +388,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     // Loading meshfact objects.
-    csArray<const char*> loadingMeshFacts;
+    csArray<csString> loadingMeshFacts;
     CS::Threading::RecursiveMutex loadingMeshFactsLock;
 
     bool AddLoadingMeshFact(const char* name)
