@@ -879,10 +879,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             file = child->GetContentsValue();
           }
 
-          csRef<iDocumentNode> lib = libs.Get(libIDs.Find(file));
-          if(!lib.IsValid())
+          csRef<iDocumentNode> lib = child;
+          size_t idx = libIDs.Find(file);
+          if(idx != csArrayItemNotFound)
           {
-            lib = child;
+              lib = libs.Get(idx);
           }
 
           if(!LoadLibrary(ldr_context, lib, ssource, missingdata, threadReturns, libs, libIDs, false, do_verbose))
