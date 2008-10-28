@@ -176,6 +176,7 @@
 #include "csutil/macosx/OSXAssistant.h"
 #elif defined(CS_PLATFORM_WIN32)
 #include "csutil/win32/callstack.h"
+#include "csutil/win32/csconfig-msvc.h"
 #include "csutil/win32/DbgHelpAPI.h"
 #include "csutil/win32/minidump.h"
 #include "csutil/win32/registrycfg.h"
