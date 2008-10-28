@@ -30,7 +30,6 @@ CSUTIL.GENERIC +=
   appdir.cpp
   apppath.cpp
   appfilename.cpp
-  csprocessorcap.cpp  
   expandname.cpp
   findlib.cpp
   getopt.cpp

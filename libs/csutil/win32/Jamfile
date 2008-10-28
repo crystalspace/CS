@@ -25,7 +25,6 @@ if $(LIBBFD.AVAILABLE) = "yes"
 
 CSUTIL.GENERIC +=
   appdir.cpp
-  csprocessorcap.cpp
   findlib.cpp
   getopt.cpp
   pluginpaths.cpp
