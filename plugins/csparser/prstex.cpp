@@ -119,6 +119,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if (t)
     {
       ldr_context->AddToCollection(t->QueryObject ());
+      ret->SetResult(scfQueryInterfaceSafe<iBase>(t));
       return true;
     }
 
@@ -128,6 +129,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if (t)
       {
         ldr_context->AddToCollection(t->QueryObject ());
+        ret->SetResult(scfQueryInterfaceSafe<iBase>(t));
         return true;
       }
     }
@@ -374,6 +376,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       proxTex.textureWrapper = tex;
       ldr_context->AddToCollection(proxTex.textureWrapper->QueryObject());
       proxyTextures->Push(proxTex);
+      ret->SetResult(scfQueryInterfaceSafe<iBase>(proxTex.textureWrapper));
 
       return true;
     }
@@ -546,6 +549,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     AddTextureToList(tex);
     RemoveLoadingTexture(txtname);
+    ret->SetResult(scfQueryInterfaceSafe<iBase>(tex));
     return true;
   }
 

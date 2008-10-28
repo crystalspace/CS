@@ -525,6 +525,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     ldr_context.AttachNew(new csLoaderContext(object_reg, Engine, this, collection,
       missingdata, keepFlags, do_verbose));
 
+    // texture.
+    csRef<iDocumentNode> texturenode = node->GetNode ("texture");
+    if (texturenode)
+    {
+      csSafeCopyArray<ProxyTexture> proxyTextures;
+      return ParseTextureTC(ret, ldr_context, texturenode, &proxyTextures);
+    }
+
     // Mesh Factory
     csRef<iDocumentNode> meshfactnode = node->GetNode("meshfact");
     if(meshfactnode)
