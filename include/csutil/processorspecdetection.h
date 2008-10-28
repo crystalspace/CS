@@ -19,6 +19,10 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __PROCESSORSPECDETECTION_H__
 #define __PROCESSORSPECDETECTION_H__
 
+/**\file
+ * Processor feature detection
+ */
+
 #include "csextern.h"
 #include "cstypes.h"
 
@@ -120,6 +124,9 @@ namespace CS
             }
         };
 
+        /**
+         * Class performing processor specifications and feature detection.
+         */
         class ProcessorSpecDetection
         {
         private:
@@ -133,26 +140,31 @@ namespace CS
 #endif
 
         public:
+            /// Returns whether MMX instructions are available.
             inline bool HasMMX()
             {
                 return procDetect.HasMMX();
             }
 
+            /// Returns whether SSE instructions are available.
             inline bool HasSSE()
             {
                 return procDetect.HasSSE();
             }
 
+            /// Returns whether SSE2 instructions are available.
             inline bool HasSSE2()
             {
                 return procDetect.HasSSE2();
             }
 
+            /// Returns whether SSE3 instructions are available.
             inline bool HasSSE3()
             {
                 return procDetect.HasSSE3();
             }
 
+            /// Returns whether Altivec instructions are available.
             inline bool HasAltiVec()
             {
                 return procDetect.HasAltiVec();
