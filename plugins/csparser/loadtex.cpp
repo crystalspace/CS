@@ -157,7 +157,7 @@ THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadImage, const char* fname, int Form
   return false;
 }
 
-THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadImage, iDataBuffer* buf, int Format, bool do_verbose)
+THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadImage, csRef<iDataBuffer> buf, int Format, bool do_verbose)
 {
   csRef<iImage> image = LoadImage (buf, 0, Format, do_verbose);
   if(image.IsValid())
@@ -169,7 +169,7 @@ THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadImage, iDataBuffer* buf, int Forma
 }
 
 THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadTexture, const char* fname,
-  int Flags, csRef<iTextureManager> texman, csRef<iImage>* image, bool do_verbose)
+  int Flags, iTextureManager* texman, csRef<iImage>* image, bool do_verbose)
 {
   if (!texman && g3d)
   {
@@ -224,7 +224,7 @@ THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadTexture, const char* fname,
   return true;
 }
 
-THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadTexture, iDataBuffer* buf, int Flags,
+THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadTexture, csRef<iDataBuffer> buf, int Flags,
                         iTextureManager* texman, csRef<iImage>* image, bool do_verbose)
 {
   if (!texman && g3d)
@@ -279,7 +279,7 @@ THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadTexture, iDataBuffer* buf, int Fla
 }
 
 THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadTexture, const char* Name,
-                        iDataBuffer* buf, int Flags, iTextureManager* texman, bool reg, bool create_material,
+                        csRef<iDataBuffer> buf, int Flags, iTextureManager* texman, bool reg, bool create_material,
                         bool free_image, bool do_verbose)
 {
   if (!texman && g3d)

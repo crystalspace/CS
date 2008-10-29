@@ -408,7 +408,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return false;
   }
 
-  THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadMap, iDocumentNode* world_node,
+  THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadMap, csRef<iDocumentNode> world_node,
     bool clearEngine, iCollection* collection, iStreamSource* ssource,
     iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose)
   {
@@ -469,7 +469,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return false;
   }
 
-  THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadLibrary, iDocumentNode* lib_node,
+  THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadLibrary, csRef<iDocumentNode> lib_node,
     iCollection* collection, iStreamSource* ssource, iMissingLoaderData* missingdata,
     uint keepFlags, bool do_verbose)
   {
@@ -510,7 +510,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return Load (buf, fname, collection, ssource, missingdata, keepFlags, do_verbose);
   }
 
-  THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadBuffer, iDataBuffer* buffer,
+  THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadBuffer, csRef<iDataBuffer> buffer,
     iCollection* collection, iStreamSource* ssource, iMissingLoaderData* missingdata,
     uint keepFlags, bool do_verbose)
   {
@@ -518,7 +518,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   }
 
   THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadNode, csRef<iDocumentNode> node,
-      csRef<iCollection> collection, csRef<iStreamSource> ssource,
+      iCollection* collection, csRef<iStreamSource> ssource,
       csRef<iMissingLoaderData> missingdata, uint keepFlags, bool do_verbose)
   {
     csRef<iLoaderContext> ldr_context;
