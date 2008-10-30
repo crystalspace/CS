@@ -73,8 +73,8 @@ SndSysSourceOpenAL2D::SndSysSourceOpenAL2D (csRef<iSndSysStream> stream, csSndSy
 SndSysSourceOpenAL2D::~SndSysSourceOpenAL2D ()
 {
   // Release out OpenAL resources
-  alDeleteBuffers( s_NumberOfBuffers, m_Buffers );
   alDeleteSources( 1, &m_Source );
+  alDeleteBuffers( s_NumberOfBuffers, m_Buffers );
 
   // Release the allocated buffers
   delete[] m_Buffers;
