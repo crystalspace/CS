@@ -486,4 +486,10 @@ void csSndSysRendererOpenAL::Close()
     alcDestroyContext (m_Context);
     m_Context = 0;
   }
+
+  if (m_Device != 0)
+  {
+    alcCloseDevice (m_Device);
+    m_Device = 0;
+  }
 }
