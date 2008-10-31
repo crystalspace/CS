@@ -24,31 +24,108 @@ namespace CS
 {
 namespace Geometry
 {
-
-	iReporter* report;
-
-	bool Triangulate3D::Process(csContour3& polygon, csTriangleMesh& result, iReporter* report2, csContour3* holes)
+	bool Triangulate3D::Process(csContour3& polygon, csTriangleMesh& result)
 	{
-		report = report2;
 		int n = (int)polygon.GetSize();
 
 		if (n < 3)
 		{
 			return false;
 		}
+
+    if (n == 3)
+    {
+      // trivial case, just return the result
+      for (int i = 0; i < (int)polygon.GetSize(); i++)
+      {
+        result.AddVertex(polygon[i]);
+      }
+  
+      result.AddTriangle(0, 1, 2);      
+
+      return true;
+    }
+
+    if (n == 4)
+    {
+      // special case of quadrilateral
+
+      for (int i = 0; i < (int)polygon.GetSize(); i++)
+      {
+        result.AddVertex(polygon[i]);
+      }
+
+      result.AddTriangle(0, 1, 3);
+      result.AddTriangle(1, 2, 3);
+
+      return true;
+    }
+
+    result.Clear();
+
+    // add all of the vertices from the polygon into the triangle mesh
+    for (size_t i = 0; i < polygon.GetSize(); i++)
+    {
+      result.AddVertex(polygon[i]);
+    }
 		
 		// first, let's establish a mapping from 3D -> 2D planar polygon
-		csContour3 planarPolygon = Triangulate3D::MapToPlanar(polygon);
+    csVector3 normal(0.0, 0.0, 0.0);
+		csContour3 planarPolygon = Triangulate3D::MapToPlanar(polygon, normal);
 
-		// rotate the planar polygon so that it's axis-aligned
-		// triangulate the 2D planar polygon
-		// finally, reverse the mapping
+		// rotate the planar polygon so that it's in the XY plane
+    if (ABS(normal.x) > EPSILON || ABS(normal.y) > EPSILON)
+    {
+      // output the normal (for testing)
+      //csPrintf("Normal: (%f, %f, %f)\n", normal.x, normal.y, normal.z);
 
+      // so, the z coordinate isn't the only coordinate in the normal
+      // it means we need to rotate the plane
+      
+      // the y coordinate needs to be removed by rotating about x
+      // the normal in the y direction gives the percentage of 90 we need to rotate
+      float rotationInY = normal.y * 90.0;
+      rotationInY = DEGTORAD(rotationInY);
+
+      // the x coordinate needs to be removed by rotating about y
+      float rotationInX = normal.x * 90.0;
+      rotationInX = DEGTORAD(rotationInX);
+
+      // build the transformation
+      csMatrix3 rotationMatrix = csXRotMatrix3(rotationInX) * csYRotMatrix3(rotationInY);
+
+      // apply the transformation to the planar polygon
+      for (int i = 0; i < (int)planarPolygon.GetSize(); i++)
+      {
+        csVector3 newVert = rotationMatrix*planarPolygon[i];
+        planarPolygon[i] = newVert;
+      }
+    }
+
+    // debugging test
+    for (int i = 0; i < polygon.GetSize(); i++)
+    {
+      polygon[i] = planarPolygon[i];
+    }
+
+		// triangulate the (now) 2D planar polygon in the XY plane using an 
+    // ear clipping method
+    // note that we will actually be triangulating the original 3D polygon
+    // by using vertex indices.  this allows us to skip the reverse mapping
+    // step.
+
+    // we first classify all of the vertices by determining if they are convex
+    // now, create a list of ears of the polygon
+    // while the polygon isn't triangulated yet
+      // find an ear
+      // clip it
+      // remove the vertices from the set of those to be considered
+    
 		// @@@FIXME: Finish implementing.
 		return true;
 	}
 
-	csContour3 Triangulate3D::MapToPlanar(const csContour3& poly)
+	csContour3 Triangulate3D::MapToPlanar(const csContour3& poly, csVector3& normal)
 	{
 		// we'll accomplish this by marching along the vertices of the 
 		// 3D polygon
@@ -59,7 +136,7 @@ namespace Geometry
 		// Held, M. FIST: Fast Industrial Strength Triangulation of Polygons.
 		//    Algorithmica. 30(4): 563-596, 2001.
 
-		csVector3 accumulatorNormal;
+		csVector3 accumulatorNormal(0.0, 0.0, 0.0);
 		
 		int n = (int) poly.GetSize();
 		for (int i = 0; i < n; i++)
@@ -70,32 +147,46 @@ namespace Geometry
 			third = poly[((i+1)%n)];
 
 			// output first second and third to verify nothing crazy is happening
-			report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.triangulate3d", "First point: %f, %f, %f", first.x, first.y, first.z);
-			report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.triangulate3d", "Second point: %f, %f, %f", second.x, second.y, second.z);	
-			report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.triangulate3d", "Third point: %f, %f, %f", third.x, third.y, third.z);
+      //csPrintf("crystalspace.triangulate3d: First point: %f, %f, %f\n", first.x, first.y, first.z);
+      //csPrintf("crystalspace.triangulate3d: Second point: %f, %f, %f\n", second.x, second.y, second.z);	
+      //csPrintf("crystalspace.triangulate3d: Third point: %f, %f, %f\n", third.x, third.y, third.z);
 
 
 			// compute the normals to cross product
 			//csVector3 toCross1 = first - second;
 			csVector3 toCross1 = second - first;
 			csVector3 toCross2 = third - second;
-			report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.triangulate3d", "toCross1: %f, %f, %f", toCross1.x, toCross1.y, toCross1.z);	
-			report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.triangulate3d", "toCross2: %f, %f, %f", toCross2.x, toCross2.y, toCross2.z);
+      //csPrintf("crystalspace.triangulate3d: toCross1: %f, %f, %f\n", toCross1.x, toCross1.y, toCross1.z);	
+      //csPrintf("crystalspace.triangulate3d: toCross2: %f, %f, %f\n", toCross2.x, toCross2.y, toCross2.z);
 
 			csVector3 result = toCross2 % toCross1;
-			report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.triangulate3d", "Cross Product: %f, %f, %f", result.x, result.y, result.z);	
+      //csPrintf("crystalspace.triangulate3d: Cross Product: %f, %f, %f\n", result.x, result.y, result.z);	
 
 			result = csVector3::Unit(result);
-			report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.triangulate3d", "Result (after unit): %f, %f, %f", result.x, result.y, result.z);	
+      //csPrintf("crystalspace.triangulate3d: Result (after unit): %f, %f, %f\n", result.x, result.y, result.z);	
+
+      //if (SIGN(result.x) != SIGN(first.x))
+      //{
+      //  result.x *= -1.0;
+      //}
+
+      //if (SIGN(result.y) != SIGN(first.y))
+      //{
+      //  result.y *= -1.0;
+      //}
+
+      //if (SIGN(result.z) != SIGN(first.z))
+      //{
+      //  result.z *= -1.0;
+      //}
 
 			accumulatorNormal.x += result.x;
 			accumulatorNormal.y += result.y;
 			accumulatorNormal.z += result.z;
 
+      //csPrintf("crystalspace.triangulate3d: accumulator normal (before unit): %f, %f, %f\n", accumulatorNormal.x, accumulatorNormal.y, accumulatorNormal.z);
 		}
-		
-		report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.triangulate3d", "accumulator normal (before unit): %f, %f, %f", accumulatorNormal.x, accumulatorNormal.y, accumulatorNormal.z);
-
+	
 		accumulatorNormal = accumulatorNormal.Unit();
 		
 		// so now, accumulatorNormal contains the normal vector
@@ -103,8 +194,7 @@ namespace Geometry
 
 		// create a csPlane which represents this plane
 		// output the accumulator normal
-		// these also report -1#.IND - why?
-		report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.triangulate3d", "accumulator normal: %f, %f, %f", accumulatorNormal.x, accumulatorNormal.y, accumulatorNormal.z);
+    //csPrintf("crystalspace.triangulate3d: accumulator normal: %f, %f, %f\n", accumulatorNormal.x, accumulatorNormal.y, accumulatorNormal.z);
 
 		csPlane3 ourPlane(accumulatorNormal);
 
@@ -123,9 +213,8 @@ namespace Geometry
 		csTransform transformation;
 		
 		// now, before rotating, we need to make sure we are at the origin
-		// this returns -1.#IND ... Why?
 		float distToOrig = ourPlane.Distance(csVector3(0, 0, 0));
-		report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.Triangulate3D", "distance to origin before: %f", distToOrig);
+    //csPrintf("crystalspace.Triangulate3D: distance to origin before: %f\n", distToOrig);
 		if (distToOrig > 0)
 		{
 			float transX = -(ourPlane.Normal() * distToOrig).x;
@@ -136,14 +225,22 @@ namespace Geometry
 			
 			// print out the matrix to be sure
 			csMatrix3 mat2 = transformation.GetO2T();
-			report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.Triangulate3D", "%f %f %f", mat2.Row1()[0], mat2.Row1()[1], mat2.Row1()[2]);
-			report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.Triangulate3D", "%f %f %f", mat2.Row2()[0], mat2.Row2()[1], mat2.Row2()[2]);
-			report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.Triangulate3D", "%f %f %f", mat2.Row3()[0], mat2.Row3()[1], mat2.Row3()[2]);
+      //csPrintf("crystalspace.Triangulate3D: %f %f %f\n", mat2.Row1()[0], mat2.Row1()[1], mat2.Row1()[2]);
+      //csPrintf("crystalspace.Triangulate3D: %f %f %f\n", mat2.Row2()[0], mat2.Row2()[1], mat2.Row2()[2]);
+      //csPrintf("crystalspace.Triangulate3D: %f %f %f\n", mat2.Row3()[0], mat2.Row3()[1], mat2.Row3()[2]);
 			ourPlane = transformation.Other2This(ourPlane);
 		}
 
 		distToOrig = ourPlane.Distance(csVector3(0, 0, 0));
-		report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.Triangulate3D", "distance to origin after: %f", distToOrig);
+    //csPrintf("crystalspace.Triangulate3D: distance to origin after: %f\n", distToOrig);
+
+    //csPrintf("New polygon:\n");
+    //for (size_t i = 0; i < poly.GetSize(); i++)
+    //{
+    //  csPrintf("(%f, %f, %f)\n", poly[i].x, poly[i].y, poly[i].z);
+    //}
+
+    normal = accumulatorNormal;
 		return poly;
 	}
 
@@ -256,4 +353,5 @@ namespace Geometry
 
 } // namespace Geometry
 } // namespace CS
+
 

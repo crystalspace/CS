@@ -315,7 +315,7 @@ bool Tri3DTest::CreateBox(csContour3& mesh)
   // setup our untriangulated mesh
   mesh.Push(csVector3(-3, -3, 10));
   mesh.Push(csVector3(-3, 3, 10));
-  mesh.Push(csVector3(0, 5, 10));
+  //mesh.Push(csVector3(0, 5, 10));
   mesh.Push(csVector3(3, 3, 10));
   mesh.Push(csVector3(3, -3, 10));
 
