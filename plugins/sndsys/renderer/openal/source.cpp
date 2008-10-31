@@ -189,12 +189,12 @@ size_t SndSysSourceOpenAL2D::s_NumberOfBuffers = 4;
 
 bool SndSysSourceOpenAL2D::FillBuffer (ALuint buffer) {
   // Advance the stream a bit
-  m_Stream->AdvancePosition (32768);
+  m_Stream->AdvancePosition (65536);
 
   // Get some data from the stream
   void *data1, *data2;
   size_t length1, length2;
-  m_Stream->GetDataPointers (&m_PositionMarker, 32768, &data1, &length1, &data2, &length2);
+  m_Stream->GetDataPointers (&m_PositionMarker, 65536, &data1, &length1, &data2, &length2);
 
   // Determine if/how the data must be combined.
   if (length1 == 0)
