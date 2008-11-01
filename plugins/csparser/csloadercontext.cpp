@@ -151,7 +151,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         }
       }
 
-      iTextureWrapper* tex = FindTexture (name, true);
+      iTextureWrapper* tex = FindTexture (name, false);
       if (tex)
       {
         // Add a default material with the same name as the texture
