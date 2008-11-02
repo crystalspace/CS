@@ -1028,6 +1028,9 @@ private:
 
   /// Array of new textures to be precached.
   csRefArray<iTextureWrapper> newTextures;
+
+  /// To precache or not to precache....
+  bool precache;
 };
 
 #include "csutil/deprecated_warn_on.h"
