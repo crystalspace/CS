@@ -169,7 +169,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     // Optional
     SndSysManager = csQueryRegistryOrLoad<iSndSysManager> (object_reg,
       "crystalspace.sndsys.manager", false);
-    SndSysLoader = csQueryRegistry<iSndSysLoader> (object_reg);
+    SndSysLoader = csQueryRegistryOrLoad<iSndSysLoader> (object_reg,
+        "crystalspace.sndsys.element.loader", false);
     SndSysRenderer = csQueryRegistry<iSndSysRenderer> (object_reg);
 
     return true;
