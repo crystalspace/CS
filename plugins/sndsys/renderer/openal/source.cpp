@@ -154,6 +154,17 @@ void SndSysSourceOpenAL2D::PerformUpdate ( bool ExternalUpdates )
     } while (m_EmptyBuffer != ( m_CurrentBuffer + 1 ) % s_NumberOfBuffers);
   }
 
+  // Do we need to update attributes?
+  if (m_Update)
+  {
+    alSourcef (m_Source, AL_GAIN, m_Gain);
+    m_Update = false;
+  }
+
+  // Has anything external changed?
+  if (ExternalUpdates) {
+  }
+
   // Match the playing state of the stream
   // We check this every time, as the openal source may have gone through all
   // the attached buffers and set paused, while we still want it to play. 
@@ -168,17 +179,6 @@ void SndSysSourceOpenAL2D::PerformUpdate ( bool ExternalUpdates )
   {
     if (currentState != AL_PLAYING)
       alSourcePlay (m_Source);
-  }
-
-  // Do we need to update attributes?
-  if (m_Update)
-  {
-    alSourcef (m_Source, AL_GAIN, m_Gain);
-    m_Update = false;
-  }
-
-  // Has anything external changed?
-  if (ExternalUpdates) {
   }
 }
 
@@ -221,7 +221,7 @@ bool SndSysSourceOpenAL2D::FillBuffer (ALuint buffer) {
     {
       // The both buffers have data
       // Combine the buffers
-      CS_ALLOC_STACK_ARRAY(ALuint, tempbuffer, length1+length2);
+      CS_ALLOC_STACK_ARRAY(ALubyte, tempbuffer, length1+length2);
       memcpy (tempbuffer, data1, length1);
       memcpy (tempbuffer+length1, data2, length2);
 
@@ -402,9 +402,6 @@ const csVector3 &SndSysSourceOpenAL3D::GetVelocity ()
 
 void SndSysSourceOpenAL3D::PerformUpdate ( bool ExternalUpdates )
 {
-  // Let SndSysSourceOpenAL2D tak care of buffers and it's attributes:
-  SndSysSourceOpenAL2D::PerformUpdate (ExternalUpdates);
-
   // Do we need to update attributes?
   if (m_Update)
   {
@@ -416,11 +413,13 @@ void SndSysSourceOpenAL3D::PerformUpdate ( bool ExternalUpdates )
     alSourcef (GetSource(), AL_CONE_OUTER_ANGLE, m_OuterAngle);
     alSourcef (GetSource(), AL_CONE_OUTER_GAIN, m_OuterGain);
     alSource3f (GetSource(), AL_VELOCITY, m_Velocity[0], m_Velocity[1], m_Velocity[2]);
-    m_Update = false;
   }
 
   // Has anything external changed?
   if (ExternalUpdates) {
     alSourcef (GetSource(), AL_ROLLOFF_FACTOR, GetRenderer()->GetListener()->GetRollOffFactor());
   }
+
+  // Let SndSysSourceOpenAL2D tak care of buffers and it's attributes:
+  SndSysSourceOpenAL2D::PerformUpdate (ExternalUpdates);
 }
