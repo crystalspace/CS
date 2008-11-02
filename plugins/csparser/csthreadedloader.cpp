@@ -196,7 +196,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   }
 
   THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadMeshObjectFactory, const char* fname,
-    iStreamSource* ssource, bool do_verbose)
+    csRef<iStreamSource> ssource, bool do_verbose)
   {
     csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
       new csLoaderContext (object_reg, Engine, this, 0, 0, KEEP_USED, do_verbose));
@@ -247,7 +247,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   }
 
   THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadMeshObject, const char* fname,
-    iStreamSource* ssource, bool do_verbose)
+    csRef<iStreamSource> ssource, bool do_verbose)
   {
     csRef<iFile> databuff (vfs->Open (fname, VFS_FILE_READ));
     csRef<iMeshWrapper> mesh;
@@ -359,8 +359,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   }
 
   THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadMapFile, const char* filename,
-    bool clearEngine, iCollection* collection, iStreamSource* ssource,
-    iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose)
+    bool clearEngine, csRef<iCollection> collection, csRef<iStreamSource> ssource,
+    csRef<iMissingLoaderData> missingdata, uint keepFlags, bool do_verbose)
   {
     csRef<iFile> buf = vfs->Open (filename, VFS_FILE_READ);
 
@@ -409,8 +409,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   }
 
   THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadMap, csRef<iDocumentNode> world_node,
-    bool clearEngine, iCollection* collection, iStreamSource* ssource,
-    iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose)
+    bool clearEngine, csRef<iCollection> collection, csRef<iStreamSource> ssource,
+    csRef<iMissingLoaderData> missingdata, uint keepFlags, bool do_verbose)
   {
     if (clearEngine)
     {
@@ -425,7 +425,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   }
 
   THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadLibraryFile, const char* filename,
-    iCollection* collection, iStreamSource* ssource, iMissingLoaderData* missingdata,
+    csRef<iCollection> collection, csRef<iStreamSource> ssource, csRef<iMissingLoaderData> missingdata,
     uint keepFlags, bool do_verbose)
   {
     csRef<iFile> buf = vfs->Open (filename, VFS_FILE_READ);
@@ -470,7 +470,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   }
 
   THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadLibrary, csRef<iDocumentNode> lib_node,
-    iCollection* collection, iStreamSource* ssource, iMissingLoaderData* missingdata,
+    csRef<iCollection> collection, csRef<iStreamSource> ssource, csRef<iMissingLoaderData> missingdata,
     uint keepFlags, bool do_verbose)
   {
     csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext>
@@ -496,7 +496,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   }
 
   THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadFile, const char* fname,
-    iCollection* collection, iStreamSource* ssource, iMissingLoaderData* missingdata,
+    csRef<iCollection> collection, csRef<iStreamSource> ssource, csRef<iMissingLoaderData> missingdata,
     uint keepFlags, bool do_verbose)
   {
     csRef<iDataBuffer> buf = vfs->ReadFile (fname);
@@ -511,14 +511,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   }
 
   THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadBuffer, csRef<iDataBuffer> buffer,
-    iCollection* collection, iStreamSource* ssource, iMissingLoaderData* missingdata,
+    csRef<iCollection> collection, csRef<iStreamSource> ssource, csRef<iMissingLoaderData> missingdata,
     uint keepFlags, bool do_verbose)
   {
     return Load(buffer, 0, collection, ssource, missingdata, keepFlags, do_verbose);
   }
 
   THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadNode, csRef<iDocumentNode> node,
-      iCollection* collection, csRef<iStreamSource> ssource,
+      csRef<iCollection> collection, csRef<iStreamSource> ssource,
       csRef<iMissingLoaderData> missingdata, uint keepFlags, bool do_verbose)
   {
     csRef<iLoaderContext> ldr_context;

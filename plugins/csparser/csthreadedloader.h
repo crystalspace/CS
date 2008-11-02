@@ -168,18 +168,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       int, Format, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL5(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, Filename,
-    int, Flags, iTextureManager*, texman, csRef<iImage>*, image, bool, do_verbose, THREADED, false, false)
+    int, Flags, csRef<iTextureManager>, texman, csRef<iImage>*, image, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL5(csThreadedLoader, LoadTexture, csLoaderReturn, csRef<iDataBuffer>, buf,
-    int, Flags, iTextureManager*, texman, csRef<iImage>*, image, bool, do_verbose, THREADED, false, false)
+    int, Flags, csRef<iTextureManager>, texman, csRef<iImage>*, image, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL8(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, Name,
-    csRef<iDataBuffer>, buf, int, Flags, iTextureManager*, texman, bool, reg, bool, create_material, bool,
+    csRef<iDataBuffer>, buf, int, Flags, csRef<iTextureManager>, texman, bool, reg, bool, create_material, bool,
     free_image, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL10(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, Name,
-    const char*, FileName, int, Flags, iTextureManager*, texman, bool, reg, bool, create_material,
-    bool, free_image, iCollection*, Collection, uint, keepFlags, bool, do_verbose, THREADED, false, false)
+    const char*, FileName, int, Flags, csRef<iTextureManager>, texman, bool, reg, bool, create_material,
+    bool, free_image, csRef<iCollection>, collection, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL2(csThreadedLoader, LoadSoundSysData, csLoaderReturn, const char*, fname,
     bool, do_verbose, THREADED, false, false)
@@ -191,40 +191,40 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     const char*, fname, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, LoadMeshObjectFactory, csLoaderReturn, const char*, fname,
-    iStreamSource*, ssource, bool, do_verbose, THREADED, false, false)
+    csRef<iStreamSource>, ssource, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, LoadMeshObject, csLoaderReturn, const char*, fname,
-    iStreamSource*, ssource, bool, do_verbose, THREADED, false, false)
+    csRef<iStreamSource>, ssource, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, LoadShader, csLoaderReturn, const char*, filename,
     bool, registerShader, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL7(csThreadedLoader, LoadMapFile, csLoaderReturn, const char*, filename,
-    bool, clearEngine, iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*,
+    bool, clearEngine, csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>,
     missingdata, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL7(csThreadedLoader, LoadMap, csLoaderReturn, csRef<iDocumentNode>, world_node,
-    bool, clearEngine, iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*,
+    bool, clearEngine, csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>,
     missingdata, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL6(csThreadedLoader, LoadLibraryFile, csLoaderReturn, const char*, filename,
-    iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint,
+    csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>, missingdata, uint,
     keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL6(csThreadedLoader, LoadLibrary, csLoaderReturn, csRef<iDocumentNode>, lib_node,
-    iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint,
+    csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>, missingdata, uint,
     keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL6(csThreadedLoader, LoadFile, csLoaderReturn, const char*, fname,
-    iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint,
+    csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>, missingdata, uint,
     keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL6(csThreadedLoader, LoadBuffer, csLoaderReturn, csRef<iDataBuffer>, buffer,
-    iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint,
+    csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>, missingdata, uint,
     keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL6(csThreadedLoader, LoadNode, csLoaderReturn, csRef<iDocumentNode>,
-    node, iCollection*, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>,
+    node, csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>,
     missingdata, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
     void AddSectorToList(iSector* obj)
