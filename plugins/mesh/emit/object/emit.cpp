@@ -36,13 +36,6 @@
 
 CS_IMPLEMENT_PLUGIN
 
-/// helper particle sorting structure
-struct csEmitCompPart
-{
-  float z;
-  iParticle* part;
-};
-
 csEmitFixed::csEmitFixed(iBase *parent) :
   scfImplementationType(this, parent)
 {
