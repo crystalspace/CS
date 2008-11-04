@@ -828,6 +828,11 @@ struct csParticleParameterSet
   csColor4 color;
   csVector2 particleSize;
 
+  csParticleParameterSet ()
+  {
+    Clear ();
+  }
+
   void Clear ()
   {
     mass = 0.0;
