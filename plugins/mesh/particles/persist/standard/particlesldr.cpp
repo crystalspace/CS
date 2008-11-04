@@ -1368,6 +1368,58 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
       return true;
     }
 
+    csRef<iParticleBuiltinEffectorLinear> linEffector =
+      scfQueryInterface<iParticleBuiltinEffectorLinear> (effector);
+
+    if (linEffector)
+    {
+      effectorNode->SetAttribute ("type", "linear");
+
+      int mask = linEffector->GetMask ();
+      size_t numParams = linEffector->GetParameterSetCount ();
+      csParticleParameterSet c; float t;
+      for (size_t i = 0; i < numParams; ++i)
+      {
+        linEffector->GetParameterSet (i, c, t);
+        csRef<iDocumentNode> paramNode = effectorNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+        paramNode->SetValue ("param");
+        paramNode->SetAttributeAsFloat ("time", t);
+
+	if (mask & CS_PARTICLE_MASK_COLOR)
+	{
+          csRef<iDocumentNode> colorNode = paramNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+          colorNode->SetValue ("color");
+          synldr->WriteColor (colorNode, c.color);
+	}
+	if (mask & CS_PARTICLE_MASK_MASS)
+	{
+          csRef<iDocumentNode> massNode = paramNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+          massNode->SetValue ("mass");
+	  massNode->CreateNodeBefore (CS_NODE_TEXT)->SetValueAsFloat (c.mass);
+	}
+	if (mask & CS_PARTICLE_MASK_ANGULARVELOCITY)
+	{
+          csRef<iDocumentNode> velNode = paramNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+          velNode->SetValue ("angularvelocity");
+          synldr->WriteVector (velNode, c.angularVelocity);
+	}
+	if (mask & CS_PARTICLE_MASK_LINEARVELOCITY)
+	{
+          csRef<iDocumentNode> velNode = paramNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+          velNode->SetValue ("linearvelocity");
+          synldr->WriteVector (velNode, c.linearVelocity);
+	}
+	if (mask & CS_PARTICLE_MASK_PARTICLESIZE)
+	{
+          csRef<iDocumentNode> sizeNode = paramNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+          sizeNode->SetValue ("particlesize");
+          synldr->WriteVector (sizeNode, c.particleSize);
+	}
+      }
+
+      return true;
+    }
+
     csRef<iParticleBuiltinEffectorVelocityField> vfEffector =
       scfQueryInterface<iParticleBuiltinEffectorVelocityField> (effector);
 
