@@ -461,6 +461,67 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     return csPtr<iParticleEmitter> (baseEmitter);
   }
 
+  bool ParticlesBaseLoader::ParseLinearEffectorParameters (
+      iDocumentNode* child, csParticleParameterSet& param, int& mask)
+  {
+    param.Clear ();
+    csRef<iDocumentNodeIterator> cit = child->GetNodes ();
+    while (cit->HasNext ())
+    {
+      csRef<iDocumentNode> c = cit->Next ();
+      if (c->GetType () != CS_NODE_ELEMENT) continue;
+      const char* v = c->GetValue ();
+      csStringID cid = xmltokens.Request (v);
+      switch (cid)
+      {
+	case XMLTOKEN_COLOR:
+	  if (!synldr->ParseColor (c, param.color))
+	  {
+	    synldr->ReportError ("crystalspace.particleloader.parseeffector", child,
+		"Error parsing color!");
+	    return false;
+	  }
+	  mask |= CS_PARTICLE_MASK_COLOR;
+	  break;
+	case XMLTOKEN_MASS:
+	  param.mass = c->GetContentsValueAsFloat ();
+	  mask |= CS_PARTICLE_MASK_MASS;
+	  break;
+	case XMLTOKEN_ANGULARVELOCITY:
+	  if (!synldr->ParseVector (c, param.angularVelocity))
+	  {
+	    synldr->ReportError ("crystalspace.particleloader.parseeffector", child,
+		"Error parsing angular velocity!");
+	    return false;
+	  }
+	  mask |= CS_PARTICLE_MASK_ANGULARVELOCITY;
+	  break;
+	case XMLTOKEN_LINEARVELOCITY:
+	  if (!synldr->ParseVector (c, param.linearVelocity))
+	  {
+	    synldr->ReportError ("crystalspace.particleloader.parseeffector", child,
+		"Error parsing linear velocity!");
+	    return false;
+	  }
+	  mask |= CS_PARTICLE_MASK_LINEARVELOCITY;
+	  break;
+	case XMLTOKEN_PARTICLESIZE:
+	  if (!synldr->ParseVector (c, param.particleSize))
+	  {
+	    synldr->ReportError ("crystalspace.particleloader.parseeffector", child,
+		"Error parsing particle size!");
+	    return false;
+	  }
+	  mask |= CS_PARTICLE_MASK_PARTICLESIZE;
+	  break;
+	default:
+	  synldr->ReportBadToken (c);
+	  return false;
+      }
+    }
+    return true;
+  }
+
 
   csPtr<iParticleEffector> ParticlesBaseLoader::ParseEffector (
     iDocumentNode* node)
@@ -553,6 +614,44 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
           return 0;
         }
       }
+    }
+    else if (!strcasecmp (effectorType, "linear"))
+    {
+      csRef<iParticleBuiltinEffectorLinear> linEffector = 
+        factory->CreateLinear ();
+      effector = linEffector;
+
+      int mask = 0;
+      csRef<iDocumentNodeIterator> it = node->GetNodes ();
+      while (it->HasNext ())
+      {
+        csRef<iDocumentNode> child = it->Next ();
+
+        if (child->GetType () != CS_NODE_ELEMENT) 
+          continue;
+
+        const char* value = child->GetValue ();
+        csStringID id = xmltokens.Request (value);
+        switch(id)
+        {
+        case XMLTOKEN_PARAM:
+          {
+	    csParticleParameterSet param;
+	    if (!ParseLinearEffectorParameters (child, param, mask))
+	      return 0;
+
+            float t (0.0f);
+            t = child->GetAttributeValueAsFloat ("time");
+            linEffector->AddParameterSet (param, t);
+          }
+          break;
+        default:
+          synldr->ReportBadToken (child);
+          return 0;
+        }
+      }
+      linEffector->SetMask (mask);
+
     }
     else if (!strcasecmp (effectorType, "lincolor"))
     {

@@ -801,15 +801,99 @@ struct iParticleBuiltinEffectorVelocityField : public iParticleEffector
 };
 
 /**
+ * Mask to influence which parameters we will interpolate in the
+ * linear effector (iParticleBuiltinEffectorLinear).
+ */
+enum csParticleParameterMask
+{
+  CS_PARTICLE_MASK_MASS = 1,
+  CS_PARTICLE_MASK_LINEARVELOCITY = 2,
+  CS_PARTICLE_MASK_ANGULARVELOCITY = 4,
+  CS_PARTICLE_MASK_COLOR = 8,
+  CS_PARTICLE_MASK_PARTICLESIZE = 16,
+
+  CS_PARTICLE_MASK_ALL = CS_PARTICLE_MASK_MASS | CS_PARTICLE_MASK_LINEARVELOCITY |
+    CS_PARTICLE_MASK_ANGULARVELOCITY | CS_PARTICLE_MASK_COLOR | CS_PARTICLE_MASK_PARTICLESIZE
+};
+
+/**
+ * Parameters that can be modified based on age for the linear
+ * effector (iParticleBuiltinEffectorLinear).
+ */
+struct csParticleParameterSet
+{
+  float mass;
+  csVector3 linearVelocity;
+  csVector3 angularVelocity;
+  csColor4 color;
+  csVector2 particleSize;
+
+  void Clear ()
+  {
+    mass = 0.0;
+    linearVelocity.Set (0, 0, 0);
+    angularVelocity.Set (0, 0, 0);
+    color.Set (0, 0, 0, 0);
+    particleSize.Set (0, 0);
+  }
+};
+
+/**
+ * Linear interpolation of various parameters based on particle lifetime
+ *
+ * The age of particle P is defined as max(0, maxAge - P.TTL)
+ *
+ * The first values are regarded as having time 0, independently of what
+ * they are set to have.
+ */
+struct iParticleBuiltinEffectorLinear : public iParticleEffector
+{
+  SCF_INTERFACE(iParticleBuiltinEffectorLinear,1,0,0);
+
+  /**
+   * Set the mask to influence which parameters we will interpolate. By default
+   * this will be set to CS_PARTICLE_MASK_ALL.
+   */
+  virtual void SetMask (int mask) = 0;
+
+  /**
+   * Get the current mask used to interpolate the parameters.
+   */
+  virtual int GetMask () const = 0;
+
+  /** 
+   * Add a parameter set to the list of parameters to interpolate between.
+   * \return Index of new parameter
+   */
+  virtual size_t AddParameterSet (const csParticleParameterSet& param, float endTTL) = 0;
+
+  /**
+   * Overwrite the parameter set of an already existing entry
+   */
+  virtual void SetParameterSet (size_t index, const csParticleParameterSet& param) = 0;
+
+  /**
+   * Get parameter set and time
+   */
+  virtual void GetParameterSet (size_t index, csParticleParameterSet& param, float& endTTL) const = 0;
+
+  /**
+   * Get number of parameter set entries
+   */
+  virtual size_t GetParameterSetCount () const = 0;
+};
+
+/**
  * Factory for builtin effectors
  */
 struct iParticleBuiltinEffectorFactory : public virtual iBase
 {
-  SCF_INTERFACE(iParticleBuiltinEffectorFactory,1,0,0);
+  SCF_INTERFACE(iParticleBuiltinEffectorFactory,1,0,1);
 
   virtual csPtr<iParticleBuiltinEffectorForce> CreateForce () const = 0;
   virtual csPtr<iParticleBuiltinEffectorLinColor> CreateLinColor () const = 0;
   virtual csPtr<iParticleBuiltinEffectorVelocityField> CreateVelocityField () const = 0;
+  virtual csPtr<iParticleBuiltinEffectorLinear> CreateLinear () const = 0;
 };
 
 /** @} */
