@@ -36,7 +36,6 @@
 
 #include "imesh/object.h"
 #include "imesh/sprite2d.h"
-#include "imesh/particle.h"
 #include "ivideo/graph3d.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -59,11 +58,10 @@ class csSprite2DMeshObjectFactory;
  * Sprite 2D version of mesh object.
  */
 class csSprite2DMeshObject : 
-  public scfImplementationExt3<csSprite2DMeshObject, 
+  public scfImplementationExt2<csSprite2DMeshObject, 
                                csObjectModel, 
                                iMeshObject,
-                               iSprite2DState,
-                               iParticle>
+                               iSprite2DState>
 {
 protected:
   class uvAnimationControl
