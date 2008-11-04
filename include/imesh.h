@@ -32,6 +32,7 @@
 #include "imesh/nullmesh.h"
 #include "imesh/object.h"
 #include "imesh/objmodel.h"
+#include "imesh/particle.h"
 #include "imesh/particles.h"
 #include "imesh/partsys.h"
 #include "imesh/protomesh.h"
