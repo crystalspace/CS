@@ -390,7 +390,7 @@ void csBinaryDocAttribute::SetValueAsFloat (float f)
 
 void csBinaryDocAttribute::Store (csMemFile* nodesFile)
 {
-  bdNodeAttribute diskAttr;
+  bdNodeAttributePOD diskAttr;
   size_t attrSize = sizeof (diskAttr);
 
   diskAttr.flags = attrPtr->flags & BD_VALUE_TYPE_MASK;
@@ -413,13 +413,18 @@ void csBinaryDocAttribute::Store (csMemFile* nodesFile)
     diskAttr.value = attrPtr->value;
 
   bool putFlagsInName = false;
-  const size_t nameLen = strlen (attrPtr->GetNameStr (node->doc));
-  if (nameLen < MAX_IMM_ATTR_NAME_STR)
+  const size_t nameSize = strlen (attrPtr->GetNameStr (node->doc))+1;
+  if (nameSize <= MAX_IMM_ATTR_NAME_STR)
   {
     diskAttr.flags |= BD_ATTR_NAME_IMMEDIATE;
     diskAttr.nameID = 0;
-    strcpy ((char*)&diskAttr.nameID, attrPtr->GetNameStr (node->doc));
-    putFlagsInName = (nameLen < MAX_IMM_ATTR_NAME_STR_W_FLAGS);
+    /* We really want to copy into nameID.
+     * Yes, it may spill over, that's by design.
+     * But since fortify will complain when that happens, directly
+     * copy into an offset of the diskAttr struct. */
+    memcpy ((char*)&diskAttr + offsetof (bdNodeAttributePOD, nameID),
+      attrPtr->GetNameStr (node->doc), nameSize);
+    putFlagsInName = (nameSize <= MAX_IMM_ATTR_NAME_STR_W_FLAGS);
   }
   else
   {
@@ -1396,10 +1401,16 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
 	(diskNode.flags & ~BD_VALUE_TYPE_MASK) | BD_VALUE_TYPE_STR_IMMEDIATE;
     // Hack: cram one more byte into value, if possible
     if ((newFlags & BE (0xff)) == 0) maximmvalue++;
-    if (strlen (nodeData->vstr) < maximmvalue)
+    size_t vstrsize = strlen (nodeData->vstr)+1;
+    if (vstrsize <= maximmvalue)
     {
       diskNode.value = 0;
-      strcpy ((char*)&diskNode.value, nodeData->vstr);
+      /* We really want to copy into value.
+       * Yes, it may spill over, that's by design.
+       * But since fortify will complain when that happens, copy into the
+       * diskNode struct directly, exploiting that value is the first
+       * member. */
+      memcpy (&diskNode, nodeData->vstr, vstrsize);
       diskNode.flags = (diskNode.flags & ~BD_VALUE_TYPE_MASK) | 
 	BD_VALUE_TYPE_STR_IMMEDIATE;
     }

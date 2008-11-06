@@ -203,7 +203,8 @@ struct bdNodeChildTab
 };
 
 /// Binary document node attribute
-struct bdNodeAttribute
+// POD struct to avoid warnings.
+struct bdNodeAttributePOD
 {
   /// Value, same as in node value
   uint32 value;
@@ -211,10 +212,18 @@ struct bdNodeAttribute
   uint32 nameID;
   /// Attribute flags
   uint32 flags;
-  
+};
+
+/// Binary document node attribute (extra C++ methods)
+struct bdNodeAttribute : public bdNodeAttributePOD
+{
   bdNodeAttribute() {}
-  bdNodeAttribute (uint32 value, uint32 nameID, uint32 flags) :
-    value (value), nameID (nameID), flags (flags) {}
+  bdNodeAttribute (uint32 value, uint32 nameID, uint32 flags)
+  {
+    this->value = value;
+    this->nameID = nameID;
+    this->flags = flags;
+  }
 };
 
 /// Binary document node attribute table
