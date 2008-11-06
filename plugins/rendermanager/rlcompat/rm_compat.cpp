@@ -32,6 +32,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RM_RLCompat)
 
   bool RMCompat::Initialize (iObjectRegistry* objReg)
   {
+    dbgDebugClearScreen = debugPersist.RegisterDebugFlag ("debugclear");
     return true;
   }
   
@@ -39,11 +40,45 @@ CS_PLUGIN_NAMESPACE_BEGIN(RM_RLCompat)
   {
     iEngine* engine = view->GetEngine();
     view->UpdateClipper();
+    
+    if (debugPersist.IsDebugFlagEnabled (dbgDebugClearScreen))
+    {
+      iGraphics2D* G2D = view->GetContext()->GetDriver2D();
+      view->GetContext()->BeginDraw (CSDRAW_2DGRAPHICS | CSDRAW_CLEARZBUFFER);
+      int bgcolor_clear = G2D->FindRGB (0, 255, 255);
+      G2D->Clear (bgcolor_clear);
+    }
+      
     CS::RenderManager::BeginFinishDrawScope drawScope (
       view->GetContext(),
       engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS);
     engine->Draw (view->GetCamera(), view->GetClipper());
     return true;
   }
+  
+  bool RMCompat::DebugCommand (const char* _cmd)
+  {
+    csString cmd (_cmd);
+    csString args;
+    size_t space = cmd.FindFirst (' ');
+    if (space != (size_t)-1)
+    {
+      cmd.SubString (args, space+1);
+      cmd.Truncate (space);
+    }
+
+    if (strcmp (cmd, "toggle_debug_flag") == 0)
+    {
+      uint flag = debugPersist.QueryDebugFlag (args);
+      if (flag != (uint)-1)
+      {
+	debugPersist.EnableDebugFlag (flag,
+	  !debugPersist.IsDebugFlagEnabled (flag));
+      }
+      return true;
+    }
+    return false;
+  }
+
 }
 CS_PLUGIN_NAMESPACE_END(RM_RLCompat)

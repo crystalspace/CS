@@ -20,6 +20,8 @@
 
 #include "csplugincommon/rendermanager/rendertree.h"
 
+#include "ivideo/graph2d.h"
+
 namespace CS
 {
   namespace RenderManager
@@ -256,27 +258,54 @@ namespace CS
 	frustum_mask |= (1 << i);*/
       }
     }
+    
+    void RenderTreeBase::AddDebugLineScreen (const csVector2& v1, 
+                                             const csVector2& v2,
+                                             csRGBcolor color)
+    {
+      DebugLineScreen line;
+      line.v1 = v1;
+      line.v2 = v2;
+      line.color = color;
+      debugLinesScreen.Push (line);
+    }
+    
 
     void RenderTreeBase::DrawDebugLines (iGraphics3D* g3d, RenderView* view)
     {
-      if (debugLines.verts.GetSize() == 0) return;
+      if (debugLines.verts.GetSize() > 0)
+      {
+	g3d->SetProjectionMatrix (view->GetCamera()->GetProjectionMatrix());
+	g3d->SetClipper (0, CS_CLIPPER_TOPLEVEL);
+	// [res] WTF - why does that not work, but in mesh.object2world it does?
+	//g3d->SetWorldToCamera (view->GetCamera()->GetTransform().GetInverse());
+	
+	g3d->BeginDraw (CSDRAW_3DGRAPHICS);
+	
+	csSimpleRenderMesh mesh;
+	mesh.alphaType.alphaType = csAlphaMode::alphaNone;
+	mesh.meshtype = CS_MESHTYPE_LINES;
+	mesh.vertexCount = (uint)debugLines.verts.GetSize();
+	mesh.vertices = debugLines.verts.GetArray();
+	mesh.colors = debugLines.colors.GetArray();
+	mesh.object2world = view->GetCamera()->GetTransform().GetInverse();
+	g3d->DrawSimpleMesh (mesh);
+	g3d->FinishDraw ();
+      }
       
-      g3d->SetProjectionMatrix (view->GetCamera()->GetProjectionMatrix());
-      g3d->SetClipper (0, CS_CLIPPER_TOPLEVEL);
-      // [res] WTF - why does that not work, but in mesh.object2world it does?
-      //g3d->SetWorldToCamera (view->GetCamera()->GetTransform().GetInverse());
-      
-      g3d->BeginDraw (CSDRAW_3DGRAPHICS);
-      
-      csSimpleRenderMesh mesh;
-      mesh.alphaType.alphaType = csAlphaMode::alphaNone;
-      mesh.meshtype = CS_MESHTYPE_LINES;
-      mesh.vertexCount = (uint)debugLines.verts.GetSize();
-      mesh.vertices = debugLines.verts.GetArray();
-      mesh.colors = debugLines.colors.GetArray();
-      mesh.object2world = view->GetCamera()->GetTransform().GetInverse();
-      g3d->DrawSimpleMesh (mesh);
-      g3d->FinishDraw ();
+      if (debugLinesScreen.GetSize() > 0)
+      {
+        iGraphics2D* g2d = g3d->GetDriver2D();
+	g3d->BeginDraw (CSDRAW_2DGRAPHICS);
+	for (size_t i = 0; i < debugLinesScreen.GetSize(); i++)
+	{
+	  const DebugLineScreen& line = debugLinesScreen[i];
+	  int color = g2d->FindRGB (line.color.red, line.color.green,
+	    line.color.blue);
+	  g2d->DrawLine (line.v1.x, line.v1.y, line.v2.x, line.v2.y, color);
+	}
+	g3d->FinishDraw ();
+      }
     }
   } // namespace RenderManager
 } // namespace CS
