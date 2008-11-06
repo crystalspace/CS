@@ -29,40 +29,42 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
+#define UNLIMITED  ~(1 << 31)
+
 // Tabularize what profiles use what limits
 #define PROFILES  \
   PROFILE_BEGIN(ARBVP1) \
-    LIMIT(MaxAddressRegs, MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB, 1) \
-    LIMIT(MaxInstructions, MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB, 1024) \
-    LIMIT(MaxLocalParams, MAX_PROGRAM_LOCAL_PARAMETERS_ARB, 96) \
-    LIMIT(NumTemps, MAX_PROGRAM_TEMPORARIES_ARB, 32)  \
+    LIMIT(MaxAddressRegs, MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB, 1, 8) \
+    LIMIT(MaxInstructions, MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB, 1024, 4096) \
+    LIMIT(MaxLocalParams, MAX_PROGRAM_LOCAL_PARAMETERS_ARB, 96, UNLIMITED) \
+    LIMIT(NumTemps, MAX_PROGRAM_TEMPORARIES_ARB, 32, 32)  \
   PROFILE_END(ARBVP1) \
   \
   PROFILE_BEGIN(ARBFP1) \
-    LIMIT(MaxLocalParams, MAX_PROGRAM_LOCAL_PARAMETERS_ARB, 32) \
-    LIMIT(MaxTexIndirections, MAX_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB, ~(1 << 31)) \
-    LIMIT(NumInstructionSlots, MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB, 1024) \
-    LIMIT(NumMathInstructionSlots, MAX_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB, 1024) \
-    LIMIT(NumTemps, MAX_PROGRAM_TEMPORARIES_ARB, 32) \
-    LIMIT(NumTexInstructionSlots, MAX_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB, 1024) \
+    LIMIT(MaxLocalParams, MAX_PROGRAM_LOCAL_PARAMETERS_ARB, 32, UNLIMITED) \
+    LIMIT(MaxTexIndirections, MAX_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB, UNLIMITED, UNLIMITED) \
+    LIMIT(NumInstructionSlots, MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB, 1024, UNLIMITED) \
+    LIMIT(NumMathInstructionSlots, MAX_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB, 1024, UNLIMITED) \
+    LIMIT(NumTemps, MAX_PROGRAM_TEMPORARIES_ARB, 32, UNLIMITED) \
+    LIMIT(NumTexInstructionSlots, MAX_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB, 1024, UNLIMITED) \
   PROFILE_END(ARBFP1) \
   \
   PROFILE_BEGIN(VP40) \
-    LIMIT(MaxAddressRegs, MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB, 2) \
-    LIMIT(MaxInstructions, MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB, 2048) \
-    LIMIT(MaxLocalParams, MAX_PROGRAM_LOCAL_PARAMETERS_ARB, 256) \
-    LIMIT(NumTemps, MAX_PROGRAM_TEMPORARIES_ARB, 32) \
+    LIMIT(MaxAddressRegs, MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB, 2, 8) \
+    LIMIT(MaxInstructions, MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB, 2048, 4096) \
+    LIMIT(MaxLocalParams, MAX_PROGRAM_LOCAL_PARAMETERS_ARB, 256, UNLIMITED) \
+    LIMIT(NumTemps, MAX_PROGRAM_TEMPORARIES_ARB, 32, UNLIMITED) \
   PROFILE_END(VP40) \
   \
   PROFILE_BEGIN(FP30) \
-    LIMIT(NumInstructionSlots, MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB, 256) \
-    LIMIT(NumTemps, MAX_PROGRAM_TEMPORARIES_ARB, 32) \
+    LIMIT(NumInstructionSlots, MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB, 256, UNLIMITED) \
+    LIMIT(NumTemps, MAX_PROGRAM_TEMPORARIES_ARB, 32, 32) \
   PROFILE_END(FP30) \
   \
   PROFILE_BEGIN(FP40) \
-    LIMIT(MaxLocalParams, MAX_PROGRAM_LOCAL_PARAMETERS_ARB, 1024) \
-    LIMIT(NumInstructionSlots, MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB, 4096) \
-    LIMIT(NumTemps, MAX_PROGRAM_TEMPORARIES_ARB, 32) \
+    LIMIT(MaxLocalParams, MAX_PROGRAM_LOCAL_PARAMETERS_ARB, 1024, UNLIMITED) \
+    LIMIT(NumInstructionSlots, MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB, 4096, UNLIMITED) \
+    LIMIT(NumTemps, MAX_PROGRAM_TEMPORARIES_ARB, 32, UNLIMITED) \
   PROFILE_END(FP40)
 
   ProfileLimits::ProfileLimits (
@@ -96,7 +98,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #define PROFILE_END(PROFILE)    \
     }                           \
     break;
-#define LIMIT(Limit, glLimit, cgDefault)   \
+#define LIMIT(Limit, glLimit, cgDefault, cgMax)   \
       Limit = cgDefault;
   
     switch (profile)
@@ -137,9 +139,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #define PROFILE_END(PROFILE)    \
     }                           \
     break;
-#define LIMIT(Limit, glLimit, cgDefault)   \
+#define LIMIT(Limit, glLimit, cgDefault, cgMax)   \
       Limit = (GL_ ## glLimit != GL_NONE)	\
-	? glGetProgramInteger (ext, target, GL_ ## glLimit) : cgDefault;
+	? glGetProgramInteger (ext, target, GL_ ## glLimit) : cgDefault; \
+      if (Limit > cgMax) Limit = cgMax;
   
     switch (profile)
     {
@@ -181,7 +184,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #define PROFILE_END(PROFILE)    \
     }                           \
     break;
-#define LIMIT(Limit, glLimit, cgDefault)   \
+#define LIMIT(Limit, glLimit, cgDefault, cgMax)   \
       Limit = cgDefault;
   
     switch (profile)
@@ -232,7 +235,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #define PROFILE_END(PROFILE)    \
     }                           \
     break;
-#define LIMIT(Limit, glLimit, cgDefault)   \
+#define LIMIT(Limit, glLimit, cgDefault, cgMax)   \
       usedLimits |= 1 << lim ## Limit;
   
     switch (profile)
@@ -277,7 +280,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #define PROFILE_END(PROFILE)    \
     }                           \
     break;
-#define LIMIT(Limit, glLimit, cgDefault)   \
+#define LIMIT(Limit, glLimit, cgDefault, cgMax)   \
       usedLimits |= 1 << lim ## Limit;
   
     switch (profile)
@@ -317,7 +320,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #define PROFILE_END(PROFILE)    \
     }                           \
     break;
-#define LIMIT(Limit, glLimit, cgDefault)   \
+#define LIMIT(Limit, glLimit, cgDefault, cgMax)   \
       usedLimits |= 1 << lim ## Limit;
   
     switch (profile)
@@ -356,7 +359,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 #define PROFILE_END(PROFILE)    \
     }                           \
     break;
-#define LIMIT(Limit, glLimit, cgDefault)   \
+#define LIMIT(Limit, glLimit, cgDefault, cgMax)   \
       args.Push ("-po"); \
       args.Push (csString().Format (#Limit "=%u", Limit));
   
