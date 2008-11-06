@@ -107,7 +107,12 @@ csObjectRegistry::csObjectRegistry ()
 {
 #if defined(CS_DEBUG) || defined (CS_MEMORY_TRACKER)
   if (iSCF::SCF == 0)
+  {
+    static const char highlight[] = CS_ANSI_FR CS_ANSI_TEXT_BOLD_ON "%s" CS_ANSI_RST " ";
+    csFPrintf(stderr, highlight, "Warning - scfInitialize() has been called for you.\n"
+        "Your program will crash in optimise mode if you do not do this yourself!\n\n");
     scfInitialize (0); // Make sure we've got an iSCF::SCF
+  }
   iSCF::SCF->object_reg = this;
 #endif
 }
