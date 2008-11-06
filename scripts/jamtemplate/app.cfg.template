@@ -46,6 +46,7 @@ DefaultStartPos = 0,2,0
 DefaultMap = /appdata/defaultmap
 
 ;; Settings for the SimpleStaticLighter, used in PostLoadMap()
+StaticLighter.Enabled = true
 StaticLighter.NumLights = 4
 ;; ShadowType: 0 -> none, 1 -> center, 2 -> boundingbox, 3 -> full
 StaticLighter.ShadowType = 0
