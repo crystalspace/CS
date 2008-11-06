@@ -255,7 +255,7 @@ const char* csLightMap::ReadFromCache (
   SetSize (w, h);
   size_t lm_size = lwidth * lheight;
 
-  strcpy (pswanted.header, LMMAGIC);
+  memcpy (pswanted.header, LMMAGIC, 4);
   if (poly)
   {
     pswanted.x1 = csFloatToShort (spoly->Vobj (0).x);
