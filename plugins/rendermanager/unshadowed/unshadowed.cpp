@@ -389,7 +389,8 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
     hdrExposure.Initialize (objectReg, hdr);
   }
   
-  portalPersistent.Initialize (shaderManager, g3d);
+  portalPersistent.Initialize (shaderManager, g3d,
+    treePersistent.debugPersist);
   lightPersistent.Initialize (objectReg, treePersistent.debugPersist);
   reflectRefractPersistent.Initialize (objectReg, treePersistent.debugPersist,
     &postEffects);
