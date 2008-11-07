@@ -332,6 +332,8 @@ bool App#PROJECTNAMECAP#::PostLoadMap ()
   // The static lighter provides a simple way to initialize the "static color"
   // of a mesh (usually genmesh) to provide a way to do simple static 'lighting'
   // Once you've lit your map using lighter2, disable it.
+  // You must also disable it if you want to use hardware dynamic lighting,
+  // like with parallax/normalmapping shaders.
   if (cfgAcc->GetBool ("StaticLighter.Enabled", true))
   {
     int maxLights = cfgAcc->GetInt ("StaticLighter.MaxLights", 4);
