@@ -22256,6 +22256,50 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::SimpleStaticLighter ##############
+
+package cspace::SimpleStaticLighter;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*CS_SHADOW_NONE = *cspacec::SimpleStaticLighter_CS_SHADOW_NONE;
+*CS_SHADOW_CENTER = *cspacec::SimpleStaticLighter_CS_SHADOW_CENTER;
+*CS_SHADOW_BOUNDINGBOX = *cspacec::SimpleStaticLighter_CS_SHADOW_BOUNDINGBOX;
+*CS_SHADOW_FULL = *cspacec::SimpleStaticLighter_CS_SHADOW_FULL;
+*ConstantColor = *cspacec::SimpleStaticLighter_ConstantColor;
+*ShineLight = *cspacec::SimpleStaticLighter_ShineLight;
+*ShineLights = *cspacec::SimpleStaticLighter_ShineLights;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_SimpleStaticLighter(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_SimpleStaticLighter($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 # ------- CONSTANT STUBS -------
 
 package cspace;
