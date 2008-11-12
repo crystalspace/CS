@@ -8,9 +8,10 @@
 #ifdef USE_CEL
 #include <celtool/initapp.h>
 #endif
+#include <cstool/simplestaticlighter.h>
 
 // Convenience function to get a csVector3 from a config file.
-static csVector3 GetConfigVector (csConfigAccess& config,
+static csVector3 GetConfigVector (iConfigFile* config,
         const char* key, const char* def)
 {
   csVector3 v;
@@ -327,6 +328,22 @@ bool App#PROJECTNAMECAP#::PostLoadMap ()
   }
   else
     ReportWarning ("Couldn't find the genSimpleCube mesh factory!");
+
+  // The static lighter provides a simple way to initialize the "static color"
+  // of a mesh (usually genmesh) to provide a way to do simple static 'lighting'
+  // Once you've lit your map using lighter2, disable it.
+  // You must also disable it if you want to use hardware dynamic lighting,
+  // like with parallax/normalmapping shaders.
+  if (cfgAcc->GetBool ("StaticLighter.Enabled", true))
+  {
+    int maxLights = cfgAcc->GetInt ("StaticLighter.MaxLights", 4);
+    using namespace CS::Lighting;
+    SimpleStaticLighter::ShadowType shadowType =
+      (SimpleStaticLighter::ShadowType)cfgAcc->GetInt (
+      "StaticLighter.ShadowType", 0);
+    // Note you could only "shine lights" on a specific mesh (see the API).
+    SimpleStaticLighter::ShineLights (sector, engine, maxLights, shadowType);
+  }
 
   return true;
 }
