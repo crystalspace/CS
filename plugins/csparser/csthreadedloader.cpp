@@ -3715,8 +3715,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       case XMLTOKEN_MESHOBJ:
         {
           const char* meshname = child->GetContentsValue ();
-          iMeshList* meshes = sector->GetMeshes ();
-          iMeshWrapper* mesh = meshes->FindByName (meshname);
+          iMeshWrapper* mesh = ldr_context->FindMeshObject (meshname);
           if (!mesh)
           {
             SyntaxService->ReportError (
