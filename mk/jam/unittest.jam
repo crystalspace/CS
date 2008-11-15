@@ -312,7 +312,7 @@ rule UnitTestDriver
   #     requires.
 
   if $($(owner)_TYPE) = library { LinkWith $(test_driver) : $(owner) ; }
-  LinkWith $(test_driver) : [ on $($(owner)_TARGET) GetVar NEEDLIBS ] ;
+  LFlags $(test_driver) : [ on $($(owner)_TARGET) GetVar NEEDLIBS ] ;
 
   return $(test_driver) ;
 }
