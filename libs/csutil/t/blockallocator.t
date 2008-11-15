@@ -146,7 +146,7 @@ void csBlockAllocatorTest::testMap()
   b.Free(i1);          countBits(b, 0, 4);
   i1 = b.Alloc();      countBits(b, 1, 3);
   i2 = b.Alloc();      countBits(b, 2, 2);
-  b.Empty();           countBits(b, 0, 0);
+  b.DeleteAll();       countBits(b, 0, 0);
 }
 
 void csBlockAllocatorTest::testCompact()
@@ -169,7 +169,9 @@ void csBlockAllocatorTest::testCompact()
   CPPUNIT_ASSERT_EQUAL((size_t)1, b.get_block_count());
   countBits(b, 1, 1);
 
-  b.Empty();
+  b.Empty(); // does not free allocator memory
+  CPPUNIT_ASSERT_EQUAL((size_t)1, b.get_block_count());
+  b.DeleteAll(); // frees allocator memory
   CPPUNIT_ASSERT_EQUAL((size_t)0, b.get_block_count());
 
   i1 = b.Alloc();
