@@ -806,12 +806,18 @@ struct iParticleBuiltinEffectorVelocityField : public iParticleEffector
  */
 enum csParticleParameterMask
 {
+  /// Mass
   CS_PARTICLE_MASK_MASS = 1,
+  /// Linear velocity
   CS_PARTICLE_MASK_LINEARVELOCITY = 2,
+  /// Angular velocity
   CS_PARTICLE_MASK_ANGULARVELOCITY = 4,
+  /// Color
   CS_PARTICLE_MASK_COLOR = 8,
+  /// Particle size
   CS_PARTICLE_MASK_PARTICLESIZE = 16,
 
+  /// All parameters
   CS_PARTICLE_MASK_ALL = CS_PARTICLE_MASK_MASS | CS_PARTICLE_MASK_LINEARVELOCITY |
     CS_PARTICLE_MASK_ANGULARVELOCITY | CS_PARTICLE_MASK_COLOR | CS_PARTICLE_MASK_PARTICLESIZE
 };
@@ -822,10 +828,15 @@ enum csParticleParameterMask
  */
 struct csParticleParameterSet
 {
+  /// Mass
   float mass;
+  /// Linear velocity
   csVector3 linearVelocity;
+  /// Angular velocity
   csVector3 angularVelocity;
+  /// Color
   csColor4 color;
+  /// Particle size
   csVector2 particleSize;
 
   csParticleParameterSet ()
@@ -833,6 +844,7 @@ struct csParticleParameterSet
     Clear ();
   }
 
+  /// Set all parameters to 0.
   void Clear ()
   {
     mass = 0.0;
@@ -857,7 +869,7 @@ struct iParticleBuiltinEffectorLinear : public iParticleEffector
 
   /**
    * Set the mask to influence which parameters we will interpolate. By default
-   * this will be set to CS_PARTICLE_MASK_ALL.
+   * this will be set to #CS_PARTICLE_MASK_ALL.
    */
   virtual void SetMask (int mask) = 0;
 
