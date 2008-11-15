@@ -54,7 +54,7 @@ private:
   void countBits(Allocator<T> const& a, size_t expect_1, size_t expect_0) const
   {
     csBitArray m(a.get_allocation_map());
-    size_t n = m.Length();
+    size_t n = m.GetSize();
     size_t t = 0, f = 0;
     CPPUNIT_ASSERT_EQUAL(n, expect_1 + expect_0);
     while (n-- > 0)
