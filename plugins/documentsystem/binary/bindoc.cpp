@@ -760,9 +760,8 @@ void csBinaryDocNode::DecRef ()
 {
   /* In case we're freed the doc's node pool will be accessed; to make sure
      it's valid keep a ref to the doc while we're (potentially) destructed */
-  doc->csBinaryDocument::IncRef();
+  csRef<csBinaryDocument> tmp(doc);
   scfPooledImplementationType::DecRef();
-  doc->csBinaryDocument::DecRef();
 }
 
 csBinaryDocNode::csBinaryDocNode (csBdNode* ptr,
