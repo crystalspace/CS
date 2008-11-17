@@ -95,7 +95,7 @@ namespace Geometry
       csMatrix3 rotationMatrix = csXRotMatrix3(rotationInX) * csYRotMatrix3(rotationInY);
 
       // apply the transformation to the planar polygon
-      for (int i = 0; i < (int)planarPolygon.GetSize(); i++)
+      for (size_t i = 0; i < planarPolygon.GetSize(); i++)
       {
         csVector3 newVert = rotationMatrix*planarPolygon[i];
         planarPolygon[i] = newVert;
@@ -103,12 +103,12 @@ namespace Geometry
     }
 
     // debugging test
-    for (int i = 0; i < polygon.GetSize(); i++)
+    for (size_t i = 0; i < polygon.GetSize(); i++)
     {
       polygon[i] = planarPolygon[i];
     }
 
-		// triangulate the (now) 2D planar polygon in the XY plane using an 
+    // triangulate the (now) 2D planar polygon in the XY plane using an 
     // ear clipping method
     // note that we will actually be triangulating the original 3D polygon
     // by using vertex indices.  this allows us to skip the reverse mapping
