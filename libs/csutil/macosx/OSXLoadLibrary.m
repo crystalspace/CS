@@ -43,8 +43,9 @@ static void clear_error_message()
 static void set_error_message(NSString* s)
 {
   clear_error_message();
-  CS_ERROR_MESSAGE = (char*)malloc([s cStringLength] + 1);
-  [s getCString:CS_ERROR_MESSAGE];
+  size_t n = [s maximumLengthOfBytesUsingEncoding:NSUTF8StringEncoding] + 1;
+  CS_ERROR_MESSAGE = (char*)malloc(n);
+  [s getCString:CS_ERROR_MESSAGE maxLength:n encoding:NSUTF8StringEncoding];
 }
 
 
