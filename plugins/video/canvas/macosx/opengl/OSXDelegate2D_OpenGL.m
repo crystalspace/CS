@@ -56,21 +56,38 @@ NSOpenGLContext *context;
 - (CGLContextObj) createOpenGLContext:(int) depth display:(CGDirectDisplayID) display
 {
     NSOpenGLPixelFormat *pixelFormat;
-    long return_value;
+    GLint return_value;
 
-    // Attributes for OpenGL contexts (0 is for fullscreen, 1 is for window)
     NSOpenGLPixelFormatAttribute attribs[] = {
-        NSOpenGLPFAWindow, NSOpenGLPFADoubleBuffer, NSOpenGLPFAAccelerated,
-        NSOpenGLPFAColorSize, depth, NSOpenGLPFADepthSize, 32,
+        NSOpenGLPFAWindow,
+	NSOpenGLPFADoubleBuffer,
+	NSOpenGLPFAAccelerated,
+        NSOpenGLPFAColorSize, depth,
+	NSOpenGLPFADepthSize, 32,
         NSOpenGLPFAStencilSize, 8,
         NSOpenGLPFAAlphaSize, 8,
-        NSOpenGLPFAScreenMask, CGDisplayIDToOpenGLDisplayMask(display), nil
+        NSOpenGLPFAScreenMask, CGDisplayIDToOpenGLDisplayMask(display),
+	0
+    };
+    NSOpenGLPixelFormatAttribute attribsNoAccel[] = {
+        NSOpenGLPFAWindow,
+	NSOpenGLPFADoubleBuffer,
+        NSOpenGLPFAColorSize, depth,
+	NSOpenGLPFADepthSize, 32,
+        NSOpenGLPFAStencilSize, 8,
+        NSOpenGLPFAAlphaSize, 8,
+        NSOpenGLPFAScreenMask, CGDisplayIDToOpenGLDisplayMask(display),
+	0
     };
 
     // Create a pixel format
     pixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:attribs];
     if (pixelFormat == nil)
-        return 0;
+    {
+      pixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:attribsNoAccel];
+      if (pixelFormat == nil)
+	return 0;
+    }
 
     // Store pixelFormatValues before pixelFormat is release'd
     // pixelFormatValues is free'd in GLOSXDriver2D.cpp
