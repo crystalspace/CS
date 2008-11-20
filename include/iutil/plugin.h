@@ -100,7 +100,7 @@ struct iPluginManager : public virtual iBase
     if (init) flags |= lpiInitialize;
     if (report) flags |= lpiReportErrors;
     csRef<iComponent> comp (LoadPluginInstance (classID, flags));
-    comp->IncRef();
+    if (comp) comp->IncRef();
     return (iBase*)comp;
   }
 
@@ -118,7 +118,7 @@ struct iPluginManager : public virtual iBase
   inline iBase* QueryPlugin (const char *iInterface, int iVersion)
   {
     csRef<iComponent> comp (QueryPluginInstance (iInterface, iVersion));
-    comp->IncRef();
+    if (comp) comp->IncRef();
     return (iBase*)comp;
   }
   
@@ -134,7 +134,7 @@ struct iPluginManager : public virtual iBase
   	const char *iInterface, int iVersion)
   {
     csRef<iComponent> comp (QueryPluginInstance (classID, iInterface, iVersion));
-    comp->IncRef();
+    if (comp) comp->IncRef();
     return (iBase*)comp;
   }
   
