@@ -450,14 +450,20 @@ private:
   protected:
     csSpriteCal3DMeshObject* meshobj;
     int mesh;
-    uint colorVersion, normalVersion;
+    uint colorVersion, normalVersion, binormalVersion, tangentVersion;
     int vertexCount;
 
+    csRef<iRenderBuffer> binormal_buffer;
+    csRef<iRenderBuffer> tangent_buffer;
     csRef<iRenderBuffer> normal_buffer;
     csRef<iRenderBuffer> color_buffer;
 
-    void UpdateNormals (CalRenderer* render, int meshIndex,
-      CalMesh* calMesh, size_t vertexCount);
+    void UpdateNormals (CalRenderer* render,
+      CalMesh* calMesh);
+    void UpdateBinormals (CalRenderer* render,
+      CalMesh* calMesh);
+    void UpdateTangents (CalRenderer* render,
+      CalMesh* calMesh);
   public:
     iMovable* movable;
 	
@@ -466,7 +472,7 @@ private:
     {
       MeshAccessor::meshobj = meshobj;
       MeshAccessor::mesh = mesh;
-      colorVersion = normalVersion = (uint)-1;
+      colorVersion = normalVersion = binormalVersion = tangentVersion = (uint)-1;
       vertexCount = meshobj->ComputeVertexCount (mesh);
     }
 

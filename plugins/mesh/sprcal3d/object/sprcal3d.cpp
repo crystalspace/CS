@@ -2258,22 +2258,15 @@ iShaderVariableContext* csSpriteCal3DMeshObject::GetCoreMeshShaderVarContext (
 //----------------------------------------------------------------------
 
 void csSpriteCal3DMeshObject::MeshAccessor::UpdateNormals (
-  CalRenderer* render, int meshIndex, CalMesh* calMesh, size_t vertexCount)
+  CalRenderer* render, CalMesh* calMesh)
 {
-  if (normal_buffer == 0)
-  {
-    normal_buffer = csRenderBuffer::CreateRenderBuffer (
-      vertexCount, CS_BUF_DYNAMIC,
-      CS_BUFCOMP_FLOAT, 3);
-  }
-
   csRenderBufferLock<float> normalLock (normal_buffer);
 
   int vertOffs = 0;
   for (int submesh = 0; submesh < calMesh->getSubmeshCount();
     submesh++)
   {
-    render->selectMeshSubmesh (meshIndex, submesh);
+    render->selectMeshSubmesh ((int)MeshIndex(), submesh);
 
     render->getNormals (normalLock.Lock() + vertOffs * 3);
 
@@ -2283,85 +2276,195 @@ void csSpriteCal3DMeshObject::MeshAccessor::UpdateNormals (
   normalVersion = meshobj->meshVersion;
 }
 
+void csSpriteCal3DMeshObject::MeshAccessor::UpdateBinormals (
+  CalRenderer* render, CalMesh* calMesh)
+{
+  csRenderBufferLock<csVector3> normalLock (normal_buffer);
+  csRenderBufferLock<csVector3> binormalLock (binormal_buffer);
+  csRenderBufferLock<csVector4> tangentLock (tangent_buffer);
+
+  for (int submesh = 0; submesh < calMesh->getSubmeshCount(); submesh++)
+  {
+    render->selectMeshSubmesh ((int)MeshIndex(), submesh);
+
+    for (int vertex = 0; vertex < render->getVertexCount(); vertex++)
+    {
+      int idx = submesh * render->getVertexCount() + vertex;
+      binormalLock.Get(idx).Cross(normalLock.Get(idx),
+        csVector3(tangentLock.Get(idx).x, tangentLock.Get(idx).y, tangentLock.Get(idx).z));
+      binormalLock.Get(idx) *= tangentLock.Get(idx).w;
+    }
+  }
+
+  binormalVersion = meshobj->meshVersion;
+}
+
+void csSpriteCal3DMeshObject::MeshAccessor::UpdateTangents (
+  CalRenderer* render, CalMesh* calMesh)
+{
+  csRenderBufferLock<float> tangentLock (tangent_buffer);
+
+  int vertOffs = 0;
+  for (int submesh = 0; submesh < calMesh->getSubmeshCount(); submesh++)
+  {
+    render->selectMeshSubmesh ((int)MeshIndex(), submesh);
+
+    if(!render->isTangentsEnabled(0))
+    {
+      calMesh->getSubmesh(submesh)->enableTangents(0, true);
+    }
+
+    render->getTangentSpaces (0, tangentLock.Lock() + vertOffs * 4);
+
+    vertOffs += render->getVertexCount();
+  }
+
+  tangentVersion = meshobj->meshVersion;
+}
+
 void csSpriteCal3DMeshObject::MeshAccessor::PreGetBuffer 
   (csRenderBufferHolder* holder, csRenderBufferName buffer)
 {
-  if (!holder) return;
-  if (buffer == CS_BUFFER_POSITION)
-  {
-    holder->SetRenderBuffer (CS_BUFFER_POSITION, 
-    meshobj->GetVertexBufferCal (mesh, 0));
-  }
-  else if (buffer == CS_BUFFER_COLOR)
-  {
-    if (meshobj->meshVersion != colorVersion)
-    {
-      CalRenderer* render = meshobj->calModel.getRenderer();
-      CalMesh* calMesh = meshobj->calModel.getMesh (mesh);
+  if (!holder)
+    return;
 
-      int submesh;
-      if (color_buffer == 0)
+  switch(buffer)
+  {
+  case CS_BUFFER_POSITION:
+    {
+      holder->SetRenderBuffer (CS_BUFFER_POSITION, 
+        meshobj->GetVertexBufferCal (mesh, 0));
+    }
+  case CS_BUFFER_COLOR:
+    {
+      if (meshobj->meshVersion != colorVersion)
       {
-        color_buffer = csRenderBuffer::CreateRenderBuffer (
+        CalRenderer* render = meshobj->calModel.getRenderer();
+        CalMesh* calMesh = meshobj->calModel.getMesh (mesh);
+
+        int submesh;
+        if (color_buffer == 0)
+        {
+          color_buffer = csRenderBuffer::CreateRenderBuffer (
+            vertexCount, CS_BUF_DYNAMIC,
+            CS_BUFCOMP_FLOAT, 3);
+          holder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
+        }
+
+        if (normal_buffer == 0)
+        {
+          normal_buffer = csRenderBuffer::CreateRenderBuffer (
+            vertexCount, CS_BUF_DYNAMIC,
+            CS_BUFCOMP_FLOAT, 3);
+          holder->SetRenderBuffer (CS_BUFFER_NORMAL, normal_buffer);
+        }
+
+        render->beginRendering();
+
+        if (meshobj->meshVersion != normalVersion)
+          UpdateNormals (render, calMesh);
+
+        csRenderBufferLock<float> normalLock (normal_buffer);
+        csRenderBufferLock<float> colorLock (color_buffer);
+
+        int vertOffs = 0;
+        for (submesh = 0; submesh < calMesh->getSubmeshCount();
+          submesh++)
+        {
+          render->selectMeshSubmesh ((int)MeshIndex(), submesh);
+
+          csSafeCopyArray<csLightInfluence> lightInfluences;
+          scfArrayWrap<iLightInfluenceArray, csSafeCopyArray<csLightInfluence> > 
+            relevantLights (lightInfluences); //Yes, know, its on the stack...
+
+          meshobj->factory->light_mgr->GetRelevantLights (
+            meshobj->logparent, &relevantLights, -1);
+
+          meshobj->UpdateLightingSubmesh (lightInfluences, 
+            movable,
+            render,
+            mesh,
+            submesh,
+            normalLock.Lock() + vertOffs * 3, 
+            (csColor*)(colorLock.Lock() + vertOffs * 3));
+
+          vertOffs += render->getVertexCount();
+        }
+        render->endRendering();
+
+        colorVersion = meshobj->meshVersion;
+      }
+    }
+  case CS_BUFFER_NORMAL:
+    {
+      if (normal_buffer == 0)
+      {
+        normal_buffer = csRenderBuffer::CreateRenderBuffer (
           vertexCount, CS_BUF_DYNAMIC,
           CS_BUFCOMP_FLOAT, 3);
+        holder->SetRenderBuffer (CS_BUFFER_NORMAL, normal_buffer);
       }
 
-      render->beginRendering();
-
-      int meshIndex = (int)MeshIndex();
       if (meshobj->meshVersion != normalVersion)
-        UpdateNormals (render, meshIndex, calMesh, (size_t)vertexCount);
-
-      csRenderBufferLock<float> normalLock (normal_buffer);
-      csRenderBufferLock<float> colorLock (color_buffer);
-
-      int vertOffs = 0;
-      for (submesh = 0; submesh < calMesh->getSubmeshCount();
-        submesh++)
       {
-        render->selectMeshSubmesh (meshIndex, submesh);
+        CalRenderer* render = meshobj->calModel.getRenderer();
+        CalMesh* calMesh = meshobj->calModel.getMesh (mesh);
 
-        csSafeCopyArray<csLightInfluence> lightInfluences;
-        scfArrayWrap<iLightInfluenceArray, csSafeCopyArray<csLightInfluence> > 
-          relevantLights (lightInfluences); //Yes, know, its on the stack...
-
-        meshobj->factory->light_mgr->GetRelevantLights (
-          meshobj->logparent, &relevantLights, -1);
-
-        meshobj->UpdateLightingSubmesh (lightInfluences, 
-                    movable,
-                    render,
-                    mesh,
-                    submesh,
-                    normalLock.Lock() + vertOffs * 3, 
-                    (csColor*)(colorLock.Lock() + vertOffs * 3));
-
-        vertOffs += render->getVertexCount();
+        render->beginRendering();
+        UpdateNormals (render, calMesh);
+        render->endRendering();
       }
-      render->endRendering();
 
-      colorVersion = meshobj->meshVersion;
+      break;
     }
-
-    holder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
-  }
-  else if (buffer == CS_BUFFER_NORMAL)
-  {
-    if (meshobj->meshVersion != normalVersion)
+  case CS_BUFFER_TANGENT:
     {
-      CalRenderer* render = meshobj->calModel.getRenderer();
-      CalMesh* calMesh = meshobj->calModel.getMesh (mesh);
+      if (tangent_buffer == 0)
+      {
+        tangent_buffer = csRenderBuffer::CreateRenderBuffer (
+          vertexCount, CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 4);
+        holder->SetRenderBuffer (CS_BUFFER_TANGENT, tangent_buffer);
+      }
 
-      render->beginRendering();
-      UpdateNormals (render, (int)MeshIndex(), calMesh, (size_t)vertexCount);
-      render->endRendering();
+      if (meshobj->meshVersion != tangentVersion)
+      {
+        CalRenderer* render = meshobj->calModel.getRenderer();
+        CalMesh* calMesh = meshobj->calModel.getMesh (mesh);
+
+        render->beginRendering();
+        UpdateTangents (render, calMesh);
+        render->endRendering();
+      }
+
+      break;
     }
+  case CS_BUFFER_BINORMAL:
+    {
+      if (binormal_buffer == 0)
+      {
+        binormal_buffer = csRenderBuffer::CreateRenderBuffer (
+          vertexCount, CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 3);
+        holder->SetRenderBuffer (CS_BUFFER_BINORMAL, binormal_buffer);
+      }
 
-    holder->SetRenderBuffer (CS_BUFFER_NORMAL, normal_buffer);
+      if (meshobj->meshVersion != binormalVersion)
+      {
+        CalRenderer* render = meshobj->calModel.getRenderer();
+        CalMesh* calMesh = meshobj->calModel.getMesh (mesh);
+
+        render->beginRendering();
+        UpdateBinormals (render, calMesh);
+        render->endRendering();
+      }
+
+      break;
+    }
+  default:
+    {
+      meshobj->factory->DefaultGetBuffer (mesh, holder, buffer);
+      break;
+    }
   }
-  else
-    meshobj->factory->DefaultGetBuffer (mesh, holder, buffer);
 }
 
 //---------------------------csCal3dSkeleton---------------------------
