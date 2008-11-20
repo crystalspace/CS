@@ -48,6 +48,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
   {
     stride = 0;
     count = 0;
+    accessorNames = 0;
   }
 
   csColladaAccessor::csColladaAccessor(iDocumentNode* source, csColladaConvertor* par)
@@ -170,6 +171,8 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     parent = par;
     triangles = new csTriangleMesh();
     materials = 0;
+    normalAccessor = 0;
+    vertexAccessor = 0;
     Process(meshElement);
   }
 
@@ -181,8 +184,12 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     }
 
     delete triangles;
-    delete vertexAccessor;
-    delete normalAccessor;
+    if ( vertexAccessor ) {
+      delete vertexAccessor;
+    }
+    if ( normalAccessor ) {
+      delete normalAccessor;
+    }
   }
 
   csRef<iDocumentNode> csColladaMesh::FindNumericArray(const csRef<iDocumentNode>& node)
@@ -339,15 +346,21 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     // find the offset of the normals and vertices
     csRef<iDocumentNodeIterator> inputElements = element->GetNodes("input");
     csRef<iDocumentNode> currentInputElement;
-    int counter = 0;
-    normalOffset = 0;
-    textureOffset = 0;
+    int currentElementOffset=-1;
+    nextElementOffset = -1;
+    normalOffset = -1;
+    textureOffset = -1;
+    vertexOffset = -1;
 
     bool foundN = false, foundT = false, foundP = false;
 
     while (inputElements->HasNext())
     {
       currentInputElement = inputElements->Next();
+      currentElementOffset = currentInputElement->GetAttributeValueAsInt("offset");
+      if ( currentElementOffset > nextElementOffset ) {
+        nextElementOffset = currentElementOffset;
+      }
       scfString semVal(currentInputElement->GetAttributeValue("semantic"));
       if (semVal.Compare("NORMAL"))
       {
@@ -358,7 +371,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
           normalId.DeleteAt(0, 1);
         }
 
-        normalOffset = counter;
+        normalOffset = currentElementOffset;
       }
       else if (semVal.Compare("TEXCOORD"))
       {
@@ -369,7 +382,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
           textureId.DeleteAt(0, 1);
         }
 
-        textureOffset = counter;
+        textureOffset = currentElementOffset;
       }
 
       else if (semVal.Compare("VERTEX"))
@@ -381,25 +394,10 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
           vertexId.DeleteAt(0, 1);
         }
 
-        vertexOffset = counter;
+        vertexOffset = currentElementOffset;
       }
-
-      counter++;
     }
-
-    // no idea why this was previously set to multiply by # of verts
-    //vertexOffset = vertexOffset * numberOfVertices;
-    //normalOffset = normalOffset * numberOfVertices;
-
-    if (!foundT)
-    {
-      textureOffset = -1;
-    }
-
-    if (!foundN)
-    {
-      normalOffset = -1;
-    }
+    nextElementOffset = nextElementOffset + 1;
   }
 
   int csColladaMesh::GetNumInputElements(iDocumentNode* element)
@@ -972,11 +970,9 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       }
 
       // find the offset of the normals and vertices
-      /// @todo Clean this up, so that it doesn't rely on an external counter
-      /// like this
-
+      /// @todo Clean this up, so that it doesn't rely on 
+      ///       an external counter like this.
       int counter = 0;
-
       csRef<iDocumentNodeIterator> nodeIter = trifansElement->GetNodes("input");
       while (nodeIter->HasNext())
       {
@@ -1009,21 +1005,21 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       // now, the number of triangles will be equal to the number of 
       // vertices in the tristrips mesh, minus two (the starting vertices)
       int listSize = (int)linearList.GetSize();
-      int vCount = 0;
-      int vertex1 = linearList[(vCount*counter)+vertexOffset];
-      vCount++;
-      int vertex2 = linearList[(vCount*counter)+vertexOffset];
-      vCount++;
-      int vertex3 = linearList[(vCount*counter)+vertexOffset];
-      vCount++;
+      int vertexIndex = 0;
+      int vertex1 = linearList[(vertexIndex*nextElementOffset)+vertexOffset];
+      vertexIndex++;
+      int vertex2 = linearList[(vertexIndex*nextElementOffset)+vertexOffset];
+      vertexIndex++;
+      int vertex3 = linearList[(vertexIndex*nextElementOffset)+vertexOffset];
+      vertexIndex++;
 
-      while ((counter*vCount) < listSize)
+      while ((nextElementOffset*vertexIndex) < listSize)
       {
         triangles->AddTriangle(vertex1, vertex2, vertex3);
         // for fans, vertex1 always stays the same
         vertex2 = vertex3;
-        vertex3 = linearList[(vCount*counter)+vertexOffset];
-        vCount++;
+        vertex3 = linearList[(vertexIndex*nextElementOffset)+vertexOffset];
+        vertexIndex++;
       }
 
       linearList.Empty();
@@ -1720,4 +1716,5 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
 } /* End of ColladaConvertor namespace */
 CS_PLUGIN_NAMESPACE_END(ColladaConvertor)
+
 

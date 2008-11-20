@@ -84,29 +84,33 @@ namespace Geometry
       
       // the y coordinate needs to be removed by rotating about x
       // the normal in the y direction gives the percentage of 90 we need to rotate
-      float rotationInY = normal.y * 90.0;
-      rotationInY = DEGTORAD(rotationInY);
+      float rotationAboutX = normal.y * 90.0;
+      rotationAboutX = DEGTORAD(rotationAboutX);
 
       // the x coordinate needs to be removed by rotating about y
-      float rotationInX = normal.x * 90.0;
-      rotationInX = DEGTORAD(rotationInX);
+      float rotationAboutY = normal.x * 90.0;
+      rotationAboutY = DEGTORAD(rotationAboutY);
+
+      //csPrintf("rotation about y: %f, rotation about x: %f\n", rotationAboutY, rotationAboutX);
 
       // build the transformation
-      csMatrix3 rotationMatrix = csXRotMatrix3(rotationInX) * csYRotMatrix3(rotationInY);
+      csMatrix3 rotationMatrix = csXRotMatrix3(rotationAboutX) * csYRotMatrix3(rotationAboutY);
 
       // apply the transformation to the planar polygon
       for (size_t i = 0; i < planarPolygon.GetSize(); i++)
       {
         csVector3 newVert = rotationMatrix*planarPolygon[i];
         planarPolygon[i] = newVert;
+        planarPolygon[i].z = 0.0;
       }
     }
 
     // debugging test
-    for (size_t i = 0; i < polygon.GetSize(); i++)
-    {
-      polygon[i] = planarPolygon[i];
-    }
+    //for (size_t i = 0; i < polygon.GetSize(); i++)
+    //{
+    //  polygon[i] = planarPolygon[i];
+    //  csPrintf("planarPolygon: %f, %f, %f\n", planarPolygon[i].x, planarPolygon[i].y, planarPolygon[i].z);
+    //}
 
     // triangulate the (now) 2D planar polygon in the XY plane using an 
     // ear clipping method
@@ -114,8 +118,14 @@ namespace Geometry
     // by using vertex indices.  this allows us to skip the reverse mapping
     // step.
 
-    // we first classify all of the vertices by determining if they are convex
-    // now, create a list of ears of the polygon
+    // we first classify all of the vertices by determining if they are reflex
+    // and create a list of ears of the polygon
+    csArray<bool> isReflex;
+    isReflex.SetCapacity(polygon.GetSize());
+    csArray<size_t> earIndices;
+
+    Triangulate3D::FindVertexGroups(planarPolygon, isReflex, earIndices);
+    
     // while the polygon isn't triangulated yet
       // find an ear
       // clip it
@@ -244,8 +254,7 @@ namespace Geometry
 		return poly;
 	}
 
-	/*
-	bool Triangulate3D::FindVertexGroups(csContour3& poly, csContour3& reflex, csContour3& convex, csArray<size_t>& ears)
+	bool Triangulate3D::FindVertexGroups(csContour3& poly, csArray<bool>& isReflex, csArray<size_t>& ears)
 	{
 		int length = (int)poly.GetSize();
 
@@ -254,14 +263,12 @@ namespace Geometry
 			if (!IsConvex(poly, x))
 			{
 				// add to reflex set
-				report->ReportWarning("crystalspace.Triangulate3D", "Vertex %d is reflex", x);
-				reflex.Push(poly[x]);
+        isReflex[x] = true;
 			}
 			else
 			{
 				// add to convex set
-				report->ReportWarning("crystalspace.Triangulate3D", "Vertex %d is convex", x);
-				convex.Push(poly[x]);
+        isReflex[x] = false;
 				ears.Push(x);
 			}
 		}
@@ -269,6 +276,7 @@ namespace Geometry
 		return true;
 	}
 
+  /*
 	bool Triangulate3D::Snip(csContour3& polygon, csArray<size_t>& ears, const size_t earPoint, csTriangleMesh& addTo)
 	{
 		size_t vCount = addTo.GetVertexCount();
@@ -284,27 +292,22 @@ namespace Geometry
 
 		return true;
 	}
+  */
 
 	bool Triangulate3D::IsConvex(const csContour3& polygon, const int index)
 	{
 		int polyLength = (int)polygon.GetSize();
 		int nextIndex = (index+1)%polyLength;
 		int prevIndex = (index-1);
-		
-		while (prevIndex < 0)
-		{
-			prevIndex += polyLength;
-		}
 
-		prevIndex = prevIndex%polyLength;
-		
-		report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.Triangulate3D", "polyLength: %d, index: %d, index+1mod: %d, index-1mod: %d", polyLength, index, nextIndex, prevIndex);
-
+    if (prevIndex < 0)
+    {
+      prevIndex = polyLength + prevIndex;
+    }
+				
 		csPlane3 plane(polygon[index], polygon[nextIndex], polygon[prevIndex]);
 
 		// detect clockwise movement, and invert plane in that case
-		
-
 		csVector3 temp1 = polygon[index] - polygon[nextIndex];
 		csVector3 temp2 = polygon[index] - polygon[prevIndex];
 
@@ -349,7 +352,6 @@ namespace Geometry
 			return false;
 		}
 	}
-*/
 
 } // namespace Geometry
 } // namespace CS

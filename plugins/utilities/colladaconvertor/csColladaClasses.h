@@ -67,7 +67,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
   public:
     csColladaAccessor();
     csColladaAccessor(iDocumentNode* source, csColladaConvertor* parent);
-    ~csColladaAccessor();
+    virtual ~csColladaAccessor();
 
     int GetStride() { return stride; }
     int GetCount() { return count; }
@@ -117,7 +117,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     csString pluginType;  // the type of plugin we're using (default = genmeshfact)
 
     // the offsets of the normals, positions, and texture coordinates
-    int vertexOffset, normalOffset, textureOffset;  
+    int vertexOffset, normalOffset, textureOffset, nextElementOffset ;  
 
     csColladaMaterial* materials; // the materials applied to the mesh object
 
@@ -365,4 +365,5 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 CS_PLUGIN_NAMESPACE_END(ColladaConvertor)
 
 #endif
+
 

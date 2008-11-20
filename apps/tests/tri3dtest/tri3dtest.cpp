@@ -313,11 +313,11 @@ bool Tri3DTest::CreateBox(csContour3& mesh)
   mesh.DeleteAll();
 
   // setup our untriangulated mesh
-  mesh.Push(csVector3(-3, -3, 10));
-  mesh.Push(csVector3(-3, 3, 10));
-  //mesh.Push(csVector3(0, 5, 10));
-  mesh.Push(csVector3(3, 3, 10));
-  mesh.Push(csVector3(3, -3, 10));
+  mesh.Push(csVector3(-3, 0, -3));
+  mesh.Push(csVector3(-3, 0, 3));
+  mesh.Push(csVector3(0, 0, 5));
+  mesh.Push(csVector3(3, 0, 3));
+  mesh.Push(csVector3(3, 0, -3));
 
   // triangulate the mesh
   CS::Geometry::Triangulate3D::Process(mesh, tm);
