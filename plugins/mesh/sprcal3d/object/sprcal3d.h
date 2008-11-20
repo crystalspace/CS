@@ -458,12 +458,9 @@ private:
     csRef<iRenderBuffer> normal_buffer;
     csRef<iRenderBuffer> color_buffer;
 
-    void UpdateNormals (CalRenderer* render,
-      CalMesh* calMesh);
-    void UpdateBinormals (CalRenderer* render,
-      CalMesh* calMesh);
-    void UpdateTangents (CalRenderer* render,
-      CalMesh* calMesh);
+    void UpdateNormals (csRenderBufferHolder* holder);
+    void UpdateBinormals (csRenderBufferHolder* holder);
+    void UpdateTangents (csRenderBufferHolder* holder);
   public:
     iMovable* movable;
 	

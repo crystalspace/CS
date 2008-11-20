@@ -2257,69 +2257,109 @@ iShaderVariableContext* csSpriteCal3DMeshObject::GetCoreMeshShaderVarContext (
 
 //----------------------------------------------------------------------
 
-void csSpriteCal3DMeshObject::MeshAccessor::UpdateNormals (
-  CalRenderer* render, CalMesh* calMesh)
+void csSpriteCal3DMeshObject::MeshAccessor::UpdateNormals (csRenderBufferHolder* holder)
 {
-  csRenderBufferLock<float> normalLock (normal_buffer);
-
-  int vertOffs = 0;
-  for (int submesh = 0; submesh < calMesh->getSubmeshCount();
-    submesh++)
+  if (normal_buffer == 0)
   {
-    render->selectMeshSubmesh ((int)MeshIndex(), submesh);
-
-    render->getNormals (normalLock.Lock() + vertOffs * 3);
-
-    vertOffs += render->getVertexCount();
+    normal_buffer = csRenderBuffer::CreateRenderBuffer (
+      vertexCount, CS_BUF_DYNAMIC,
+      CS_BUFCOMP_FLOAT, 3);
+    holder->SetRenderBuffer (CS_BUFFER_NORMAL, normal_buffer);
   }
 
-  normalVersion = meshobj->meshVersion;
-}
-
-void csSpriteCal3DMeshObject::MeshAccessor::UpdateBinormals (
-  CalRenderer* render, CalMesh* calMesh)
-{
-  csRenderBufferLock<csVector3> normalLock (normal_buffer);
-  csRenderBufferLock<csVector3> binormalLock (binormal_buffer);
-  csRenderBufferLock<csVector4> tangentLock (tangent_buffer);
-
-  for (int submesh = 0; submesh < calMesh->getSubmeshCount(); submesh++)
+  if (meshobj->meshVersion != normalVersion)
   {
-    render->selectMeshSubmesh ((int)MeshIndex(), submesh);
+    CalRenderer* render = meshobj->calModel.getRenderer();
+    CalMesh* calMesh = meshobj->calModel.getMesh (mesh);
 
-    for (int vertex = 0; vertex < render->getVertexCount(); vertex++)
+    csRenderBufferLock<float> normalLock (normal_buffer);
+
+    int vertOffs = 0;
+    for (int submesh = 0; submesh < calMesh->getSubmeshCount();
+      submesh++)
     {
-      int idx = submesh * render->getVertexCount() + vertex;
-      binormalLock.Get(idx).Cross(normalLock.Get(idx),
-        csVector3(tangentLock.Get(idx).x, tangentLock.Get(idx).y, tangentLock.Get(idx).z));
-      binormalLock.Get(idx) *= tangentLock.Get(idx).w;
-    }
-  }
+      render->selectMeshSubmesh ((int)MeshIndex(), submesh);
 
-  binormalVersion = meshobj->meshVersion;
-}
+      render->getNormals (normalLock.Lock() + vertOffs * 3);
 
-void csSpriteCal3DMeshObject::MeshAccessor::UpdateTangents (
-  CalRenderer* render, CalMesh* calMesh)
-{
-  csRenderBufferLock<float> tangentLock (tangent_buffer);
-
-  int vertOffs = 0;
-  for (int submesh = 0; submesh < calMesh->getSubmeshCount(); submesh++)
-  {
-    render->selectMeshSubmesh ((int)MeshIndex(), submesh);
-
-    if(!render->isTangentsEnabled(0))
-    {
-      calMesh->getSubmesh(submesh)->enableTangents(0, true);
+      vertOffs += render->getVertexCount();
     }
 
-    render->getTangentSpaces (0, tangentLock.Lock() + vertOffs * 4);
+    normalVersion = meshobj->meshVersion;
+  }
+}
 
-    vertOffs += render->getVertexCount();
+void csSpriteCal3DMeshObject::MeshAccessor::UpdateBinormals (csRenderBufferHolder* holder)
+{
+  if (binormal_buffer == 0)
+  {
+    binormal_buffer = csRenderBuffer::CreateRenderBuffer (
+      vertexCount, CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 3);
+    holder->SetRenderBuffer (CS_BUFFER_BINORMAL, binormal_buffer);
   }
 
-  tangentVersion = meshobj->meshVersion;
+  if (meshobj->meshVersion != binormalVersion)
+  {
+    UpdateNormals(holder);
+    UpdateTangents(holder);
+
+    CalRenderer* render = meshobj->calModel.getRenderer();
+    CalMesh* calMesh = meshobj->calModel.getMesh (mesh);
+
+    csRenderBufferLock<csVector3> normalLock (normal_buffer);
+    csRenderBufferLock<csVector3> binormalLock (binormal_buffer);
+    csRenderBufferLock<csVector4> tangentLock (tangent_buffer);
+
+    for (int submesh = 0; submesh < calMesh->getSubmeshCount(); submesh++)
+    {
+      render->selectMeshSubmesh ((int)MeshIndex(), submesh);
+
+      for (int vertex = 0; vertex < render->getVertexCount(); vertex++)
+      {
+        int idx = submesh * render->getVertexCount() + vertex;
+        binormalLock.Get(idx).Cross(normalLock.Get(idx),
+          csVector3(tangentLock.Get(idx).x, tangentLock.Get(idx).y, tangentLock.Get(idx).z));
+        binormalLock.Get(idx) *= tangentLock.Get(idx).w;
+      }
+    }
+
+    binormalVersion = meshobj->meshVersion;
+  }
+}
+
+void csSpriteCal3DMeshObject::MeshAccessor::UpdateTangents (csRenderBufferHolder* holder)
+{
+  if (tangent_buffer == 0)
+  {
+    tangent_buffer = csRenderBuffer::CreateRenderBuffer (
+      vertexCount, CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 4);
+    holder->SetRenderBuffer (CS_BUFFER_TANGENT, tangent_buffer);
+  }
+
+  if (meshobj->meshVersion != tangentVersion)
+  {
+    CalRenderer* render = meshobj->calModel.getRenderer();
+    CalMesh* calMesh = meshobj->calModel.getMesh (mesh);
+
+    csRenderBufferLock<float> tangentLock (tangent_buffer);
+
+    int vertOffs = 0;
+    for (int submesh = 0; submesh < calMesh->getSubmeshCount(); submesh++)
+    {
+      render->selectMeshSubmesh ((int)MeshIndex(), submesh);
+
+      if(!render->isTangentsEnabled(0))
+      {
+        calMesh->getSubmesh(submesh)->enableTangents(0, true);
+      }
+
+      render->getTangentSpaces (0, tangentLock.Lock() + vertOffs * 4);
+
+      vertOffs += render->getVertexCount();
+    }
+
+    tangentVersion = meshobj->meshVersion;
+  }
 }
 
 void csSpriteCal3DMeshObject::MeshAccessor::PreGetBuffer 
@@ -2351,18 +2391,9 @@ void csSpriteCal3DMeshObject::MeshAccessor::PreGetBuffer
           holder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
         }
 
-        if (normal_buffer == 0)
-        {
-          normal_buffer = csRenderBuffer::CreateRenderBuffer (
-            vertexCount, CS_BUF_DYNAMIC,
-            CS_BUFCOMP_FLOAT, 3);
-          holder->SetRenderBuffer (CS_BUFFER_NORMAL, normal_buffer);
-        }
-
         render->beginRendering();
 
-        if (meshobj->meshVersion != normalVersion)
-          UpdateNormals (render, calMesh);
+        UpdateNormals (holder);
 
         csRenderBufferLock<float> normalLock (normal_buffer);
         csRenderBufferLock<float> colorLock (color_buffer);
@@ -2397,66 +2428,17 @@ void csSpriteCal3DMeshObject::MeshAccessor::PreGetBuffer
     }
   case CS_BUFFER_NORMAL:
     {
-      if (normal_buffer == 0)
-      {
-        normal_buffer = csRenderBuffer::CreateRenderBuffer (
-          vertexCount, CS_BUF_DYNAMIC,
-          CS_BUFCOMP_FLOAT, 3);
-        holder->SetRenderBuffer (CS_BUFFER_NORMAL, normal_buffer);
-      }
-
-      if (meshobj->meshVersion != normalVersion)
-      {
-        CalRenderer* render = meshobj->calModel.getRenderer();
-        CalMesh* calMesh = meshobj->calModel.getMesh (mesh);
-
-        render->beginRendering();
-        UpdateNormals (render, calMesh);
-        render->endRendering();
-      }
-
+      UpdateNormals (holder);
       break;
     }
   case CS_BUFFER_TANGENT:
     {
-      if (tangent_buffer == 0)
-      {
-        tangent_buffer = csRenderBuffer::CreateRenderBuffer (
-          vertexCount, CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 4);
-        holder->SetRenderBuffer (CS_BUFFER_TANGENT, tangent_buffer);
-      }
-
-      if (meshobj->meshVersion != tangentVersion)
-      {
-        CalRenderer* render = meshobj->calModel.getRenderer();
-        CalMesh* calMesh = meshobj->calModel.getMesh (mesh);
-
-        render->beginRendering();
-        UpdateTangents (render, calMesh);
-        render->endRendering();
-      }
-
+      UpdateTangents (holder);
       break;
     }
   case CS_BUFFER_BINORMAL:
     {
-      if (binormal_buffer == 0)
-      {
-        binormal_buffer = csRenderBuffer::CreateRenderBuffer (
-          vertexCount, CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 3);
-        holder->SetRenderBuffer (CS_BUFFER_BINORMAL, binormal_buffer);
-      }
-
-      if (meshobj->meshVersion != binormalVersion)
-      {
-        CalRenderer* render = meshobj->calModel.getRenderer();
-        CalMesh* calMesh = meshobj->calModel.getMesh (mesh);
-
-        render->beginRendering();
-        UpdateBinormals (render, calMesh);
-        render->endRendering();
-      }
-
+      UpdateBinormals (holder);
       break;
     }
   default:
