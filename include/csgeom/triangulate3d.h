@@ -68,7 +68,7 @@ namespace Geometry
 		private:
 			
 			static csContour3 MapToPlanar(const csContour3& poly, csVector3& normal);
-	    static bool Triangulate3D::FindVertexGroups(csContour3& poly, csArray<bool>& isReflex, csArray<size_t>& ears);
+	    static bool FindVertexGroups(csContour3& poly, csArray<bool>& isReflex, csArray<size_t>& ears);
 			static bool IsConvex(const csContour3& polygon, const int index);
 			static bool IsContained(const csVector3& testVertex, const csVector3& a, const csVector3& b, const csVector3& c);
 			static bool IsSameSide(const csVector3& p1, const csVector3& p2, const csVector3& a, const csVector3& b);
