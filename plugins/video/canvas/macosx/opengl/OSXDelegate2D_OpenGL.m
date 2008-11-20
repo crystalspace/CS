@@ -45,9 +45,9 @@
 
 @implementation OSXDelegate2D (OpenGL)
 
-long * pixelFormatValues;
+static long *pixelFormatValues; // FIXME: Should be instance variable.
 
-NSOpenGLContext *context;
+static NSOpenGLContext *context; // FIXME: Should be instance variable.
 
 // createOpenGLContext
 // Create an OpenGL context in the window and return it
