@@ -42,7 +42,6 @@ using std::skipws;
 
 CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 {
-
   // =============== Auxiliary Class: csColladaAccessor ===============
   csColladaAccessor::csColladaAccessor()
   {
