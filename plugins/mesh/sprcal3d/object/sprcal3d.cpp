@@ -173,8 +173,6 @@ csSpriteCal3DMeshObjectFactory::csSpriteCal3DMeshObjectFactory (
 {
   csSpriteCal3DMeshObjectFactory::object_reg = object_reg;
 
-  light_mgr = csQueryRegistry<iLightManager> (object_reg);
-
   skel_factory.AttachNew (new csCal3dSkeletonFactory ());
 }
 
@@ -1043,108 +1041,6 @@ void csSpriteCal3DMeshObject::SetUserData(void *data)
   calModel.setUserData(data);
 }
 
-void csSpriteCal3DMeshObject::UpdateLightingSubmesh (
-  const csSafeCopyArray<csLightInfluence>& lights, 
-  iMovable* movable,
-  CalRenderer *pCalRenderer,
-  int mesh, int submesh, float *meshNormals,
-  csColor* colors)
-{
-  int vertCount;
-  vertCount = pCalRenderer->getVertexCount();
-
-  int i;
-
-  // Do the lighting.
-  csReversibleTransform trans = movable->GetFullTransform ();
-  // the object center in world coordinates. "0" because the object
-  // center in object space is obviously at (0,0,0).
-  csColor color;
-
-  size_t num_lights = lights.GetSize ();
-
-  // Make sure colors array exists and set all to ambient
-  InitSubmeshLighting (mesh, submesh, pCalRenderer, movable, colors);
-
-  // Update Lighting for all relevant lights
-  for (size_t l = 0; l < num_lights; l++)
-  {
-    iLight* li = lights[l].light;
-    if (!li)
-      continue;
-
-    // Compute light position in object coordinates
-    // @@@ Can be optimized a bit. E.g. store obj_light_pos so it can be
-    //  reused by submesh lighting.
-    csVector3 wor_light_pos = li->GetMovable ()->GetFullPosition ();
-    csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
-    float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, 0);
-    if (obj_sq_dist >= csSquare (li->GetCutoffDistance ())) return;
-    float in_obj_dist = (obj_sq_dist >= SMALL_EPSILON)?
-        csQisqrt (obj_sq_dist):1.0f;
-
-    csColor light_color = li->GetColor () * (256.0f / CS_NORMAL_LIGHT_LEVEL)
-      * li->GetBrightnessAtDistance (csQsqrt (obj_sq_dist));
-
-    int normal_index=0;
-    for (i = 0; i < vertCount; i++)
-    {
-      csVector3 normal(meshNormals[normal_index],
-        meshNormals[normal_index+1],
-        meshNormals[normal_index+2]);
-        
-      normal_index+=3;
-      float cosinus;
-      if (obj_sq_dist < SMALL_EPSILON) 
-        cosinus = 1;
-      else 
-        cosinus = obj_light_pos * normal; 
-      // because the vector from the object center to the light center
-      // in object space is equal to the position of the light
-
-      if (cosinus > 0)
-      {
-        color = light_color;
-        if (obj_sq_dist >= SMALL_EPSILON) 
-            cosinus *= in_obj_dist;
-        if (cosinus < 1.0f) 
-            color *= cosinus;
-        colors[i] += color;
-      }
-    }
-  }
-
-  // Clamp all vertex colors to 2.
-  for (i = 0 ; i < vertCount; i++)
-    colors[i].Clamp (2.0f, 2.0f, 2.0f);
-}
-
-void csSpriteCal3DMeshObject::InitSubmeshLighting (int /*mesh*/, int /*submesh*/,
-                           CalRenderer *pCalRenderer,
-                           iMovable* movable, 
-                           csColor* colors)
-{
-  int vertCount = pCalRenderer->getVertexCount();
-
-  // Set all colors to ambient light.
-  csColor col;
-  if (((csSpriteCal3DMeshObjectFactory*)factory)->engine)
-  {
-    ((csSpriteCal3DMeshObjectFactory*)factory)->engine->GetAmbientLight (col);
-    //    col += color;  // no inherent color in cal3d sprites
-    iSector* sect = movable->GetSectors ()->Get (0);
-    if (sect)
-      col += sect->GetDynamicAmbientLight ();
-  }
-  else
-  {
-    //    col = color;
-    col.Set (0, 0, 0);
-  }
-  for (int i = 0 ; i < vertCount ; i++)
-    colors[i] = col;
-}
-
 bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr)
 {
@@ -1620,7 +1516,6 @@ bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
     }
   }
   meshVersion++;
-  lighting_dirty = true;
   //vertices_dirty = true;
   return true;
 }
@@ -2374,57 +2269,6 @@ void csSpriteCal3DMeshObject::MeshAccessor::PreGetBuffer
     {
       holder->SetRenderBuffer (CS_BUFFER_POSITION, 
         meshobj->GetVertexBufferCal (mesh, 0));
-    }
-  case CS_BUFFER_COLOR:
-    {
-      if (meshobj->meshVersion != colorVersion)
-      {
-        CalRenderer* render = meshobj->calModel.getRenderer();
-        CalMesh* calMesh = meshobj->calModel.getMesh (mesh);
-
-        int submesh;
-        if (color_buffer == 0)
-        {
-          color_buffer = csRenderBuffer::CreateRenderBuffer (
-            vertexCount, CS_BUF_DYNAMIC,
-            CS_BUFCOMP_FLOAT, 3);
-          holder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
-        }
-
-        render->beginRendering();
-
-        UpdateNormals (holder);
-
-        csRenderBufferLock<float> normalLock (normal_buffer);
-        csRenderBufferLock<float> colorLock (color_buffer);
-
-        int vertOffs = 0;
-        for (submesh = 0; submesh < calMesh->getSubmeshCount();
-          submesh++)
-        {
-          render->selectMeshSubmesh ((int)MeshIndex(), submesh);
-
-          csSafeCopyArray<csLightInfluence> lightInfluences;
-          scfArrayWrap<iLightInfluenceArray, csSafeCopyArray<csLightInfluence> > 
-            relevantLights (lightInfluences); //Yes, know, its on the stack...
-
-          meshobj->factory->light_mgr->GetRelevantLights (
-            meshobj->logparent, &relevantLights, -1);
-
-          meshobj->UpdateLightingSubmesh (lightInfluences, 
-            movable,
-            render,
-            mesh,
-            submesh,
-            normalLock.Lock() + vertOffs * 3, 
-            (csColor*)(colorLock.Lock() + vertOffs * 3));
-
-          vertOffs += render->getVertexCount();
-        }
-        render->endRendering();
-
-        colorVersion = meshobj->meshVersion;
-      }
     }
   case CS_BUFFER_NORMAL:
     {
