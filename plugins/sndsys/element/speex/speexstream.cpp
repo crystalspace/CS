@@ -24,7 +24,7 @@
  * the higher layer which may cause problems
  * 1 , 1 will decode 1/1 or 1 second of audio in advance */
 #define SPEEX_BUFFER_LENGTH_MULTIPLIER  1
-#define SPEEX_BUFFER_LENGTH_DIVISOR     5
+#define SPEEX_BUFFER_LENGTH_DIVISOR     20
 
 SndSysSpeexSoundStream::SndSysSpeexSoundStream (csRef<SndSysSpeexSoundData> pData, 
 					    SpeexDataStore *pDataStore, csSndSysSoundFormat *pRenderFormat, 
@@ -168,7 +168,10 @@ void SndSysSpeexSoundStream::AdvancePosition(size_t frame_delta)
     // Read and decode.
     speex_bits_read_from(&bits, (char*)op.packet, op.bytes);
     speex_decode_int(state, &bits, (spx_int16_t*)m_pPreparedDataBuffer);
+
+    // Frame size is in shorts.
     speex_decoder_ctl(state, SPEEX_GET_FRAME_SIZE, &m_PreparedDataBufferUsage);
+    m_PreparedDataBufferUsage *= sizeof(short);
 
     if (m_PreparedDataBufferUsage > 0)
       needed_bytes -= CopyBufferBytes (needed_bytes);
