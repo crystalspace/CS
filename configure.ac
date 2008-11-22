@@ -1273,6 +1273,19 @@ AS_IF([test "$cs_cv_libvorbis" = yes],
 	[$cs_cv_libogg_lflags $cs_cv_libvorbis_lflags],
 	[$cs_cv_libogg_libs $cs_cv_libvorbis_libs])])
 
+#------------------------------------------------------------------------------
+# Check for Speex.  In addition to the standard installed locations, we
+# also search CS/libs/libspeex*
+#------------------------------------------------------------------------------
+AS_IF([test "$cs_cv_libogg" = yes],
+    [CS_CHECK_LIB_WITH([speex],
+	[AC_LANG_PROGRAM([[#include <speex/speex.h>]],
+	  [SpeexBits bits; speex_bits_init(&bits);])],
+	[$srcdir/libs/libspeex.*], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libspeex], [SPEEX])], [],
+	[$cs_cv_libogg_cflags],
+	[$cs_cv_libogg_lflags],
+	[$cs_cv_libogg_libs])])
 
 
 #------------------------------------------------------------------------------
