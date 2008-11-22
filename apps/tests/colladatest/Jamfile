@@ -1,5 +1,0 @@
-SubDir TOP apps tests colladatest ;
-
-Description colladatest : "COLLADA Conversion Test Application" ;
-Application colladatest : [ Wildcard *.cpp *.h ] : noinstall ;
-LinkWith colladatest : crystalspace ;
