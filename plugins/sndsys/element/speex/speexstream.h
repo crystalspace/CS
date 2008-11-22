@@ -31,7 +31,7 @@ using namespace CS::SndSys;
 class SndSysSpeexSoundStream : public SndSysBasicStream
 {
 public:
-  SndSysSpeexSoundStream(csRef<SndSysSpeexSoundData> pData, SpeexDataStore *pDataStore, 
+  SndSysSpeexSoundStream(csRef<SndSysSpeexSoundData> pData, 
     csSndSysSoundFormat *pRenderFormat, int Mode3D);
 
   virtual ~SndSysSpeexSoundStream ();
@@ -51,7 +51,11 @@ public:
     * Not permitted (yet) operations.
     */
   virtual bool SetPosition (size_t newposition) { return false; }
-  virtual bool ResetPosition() { return false; }
+
+  /**
+   * Reset the stream back to the beginning.
+   */
+  virtual bool ResetPosition();
 
   /**
   * NOT AN APPLICATION CALLABLE FUNCTION!   This function advances the stream

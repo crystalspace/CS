@@ -43,8 +43,7 @@ size_t SndSysSpeexSoundData::GetDataSize()
 
 iSndSysStream *SndSysSpeexSoundData::CreateStream(csSndSysSoundFormat *pRenderFormat, int Mode3D)
 {
-  SndSysSpeexSoundStream *pStream =
-    new SndSysSpeexSoundStream(this, &m_DataStore, pRenderFormat, Mode3D);
+  SndSysSpeexSoundStream *pStream = new SndSysSpeexSoundStream(this, pRenderFormat, Mode3D);
 
   return (pStream);
 }

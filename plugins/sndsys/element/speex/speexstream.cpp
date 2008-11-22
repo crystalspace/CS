@@ -27,13 +27,11 @@
 #define SPEEX_BUFFER_LENGTH_DIVISOR     20
 
 SndSysSpeexSoundStream::SndSysSpeexSoundStream (csRef<SndSysSpeexSoundData> pData, 
-					    SpeexDataStore *pDataStore, csSndSysSoundFormat *pRenderFormat, 
-              int Mode3D) :
-  SndSysBasicStream(pRenderFormat, Mode3D), newPage(true), stream_init(false),
-    packet_count(0)
+                                                csSndSysSoundFormat *pRenderFormat, 
+                                                int Mode3D) : 
+SndSysBasicStream(pRenderFormat, Mode3D), m_pSoundData(pData), newPage(true), stream_init(false),
+packet_count(0)
 {
-  m_pSoundData=pData;
-
   // Allocate an advance buffer
   m_pCyclicBuffer = new SoundCyclicBuffer (
     (m_RenderFormat.Bits/8 * m_RenderFormat.Channels) * 
@@ -44,14 +42,15 @@ SndSysSpeexSoundStream::SndSysSpeexSoundStream (csRef<SndSysSpeexSoundData> pDat
   // Initialize speex stream.
   speex_bits_init(&bits);
   ogg_sync_init(&oy);
-  oy.data = pDataStore->data;
-  oy.storage = (int)pDataStore->length;
-  ogg_sync_wrote(&oy, (long)pDataStore->length);
+  oy.data = m_pSoundData->GetDataStore().data;
+  oy.storage = (int)m_pSoundData->GetDataStore().length;
+  ogg_sync_wrote(&oy, (long)m_pSoundData->GetDataStore().length);
 }
 
 SndSysSpeexSoundStream::~SndSysSpeexSoundStream ()
 {
   free(header);
+  ogg_stream_clear(&os);
 }
 
 const char *SndSysSpeexSoundStream::GetDescription()
@@ -74,6 +73,20 @@ size_t SndSysSpeexSoundStream::GetFrameCount()
   framecount/=data_format->Freq;
 
   return framecount;
+}
+
+bool SndSysSpeexSoundStream::ResetPosition()
+{
+  ogg_stream_clear(&os);
+  speex_bits_init(&bits);
+  ogg_sync_init(&oy);
+  oy.data = m_pSoundData->GetDataStore().data;
+  oy.storage = (int)m_pSoundData->GetDataStore().length;
+  ogg_sync_wrote(&oy, (long)m_pSoundData->GetDataStore().length);
+  stream_init = false;
+  newPage = true;
+  packet_count = 0;
+  return true;
 }
 
 void SndSysSpeexSoundStream::AdvancePosition(size_t frame_delta)
@@ -102,7 +115,15 @@ void SndSysSpeexSoundStream::AdvancePosition(size_t frame_delta)
     {
       if(ogg_sync_pageout(&oy, &og) != 1)
       {
-        m_bPlaybackReadComplete = true;
+        // Mark as complete if not looping.
+        if (!m_bLooping)
+        {
+          m_bPlaybackReadComplete = true;
+        }
+
+        // Reset stream.
+        ResetPosition();
+
         return;
       }
 

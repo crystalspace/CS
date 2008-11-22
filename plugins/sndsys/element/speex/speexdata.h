@@ -56,6 +56,8 @@ public:
   /// Call to determine if the provided data can be decoded as speex audio
   static bool IsSpeex (iDataBuffer* Buffer);
 
+  SpeexDataStore& GetDataStore() { return m_DataStore; }
+
   /**
    * Return the size of the data stored in bytes.  This is informational only
    * and is not guaranteed to be a number usable for sound calculations.
