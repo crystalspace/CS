@@ -29,8 +29,7 @@
 SndSysSpeexSoundStream::SndSysSpeexSoundStream (csRef<SndSysSpeexSoundData> pData, 
                                                 csSndSysSoundFormat *pRenderFormat, 
                                                 int Mode3D) : 
-SndSysBasicStream(pRenderFormat, Mode3D), m_pSoundData(pData), newPage(true), stream_init(false),
-packet_count(0)
+SndSysBasicStream(pRenderFormat, Mode3D), m_pSoundData(pData)
 {
   // Allocate an advance buffer
   m_pCyclicBuffer = new SoundCyclicBuffer (
@@ -40,11 +39,7 @@ packet_count(0)
   CS_ASSERT(m_pCyclicBuffer!=0);
 
   // Initialize speex stream.
-  speex_bits_init(&bits);
-  ogg_sync_init(&oy);
-  oy.data = m_pSoundData->GetDataStore().data;
-  oy.storage = (int)m_pSoundData->GetDataStore().length;
-  ogg_sync_wrote(&oy, (long)m_pSoundData->GetDataStore().length);
+  ResetPosition();
 }
 
 SndSysSpeexSoundStream::~SndSysSpeexSoundStream ()
