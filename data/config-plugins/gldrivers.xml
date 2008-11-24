@@ -797,7 +797,10 @@
     <rule description="Mesa 6.5.2: garbled text">
       <conditions>
         <regexp string="renderer" pattern="Mesa.*" />
-        <comparever version="glvendor" relation="mesaver ge 6.5 && mesaver lt 7.0" />
+        <conditions fulfill="all">
+          <comparever version="glvendor" relation="ge Mesa 6.5.2" />
+          <comparever version="glvendor" relation="lt Mesa 7.0" />
+        </conditions>
       </conditions>
       <applicable>
         <usecfg>disableMTtext</usecfg>
