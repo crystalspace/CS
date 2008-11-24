@@ -147,7 +147,8 @@ void SndSysSpeexSoundStream::AdvancePosition(size_t frame_delta)
     if(packet_count == 0)
     {
       header = speex_packet_to_header((char*)op.packet, op.bytes);
-      const SpeexMode* mode = speex_lib_get_mode (header->mode);
+      // const_cast for version compatibility.
+      SpeexMode* mode = const_cast<SpeexMode*>(speex_lib_get_mode (header->mode));
       state = speex_decoder_init(mode);
       speex_decoder_ctl(state, SPEEX_SET_SAMPLING_RATE, &header->rate);
 
@@ -183,7 +184,7 @@ void SndSysSpeexSoundStream::AdvancePosition(size_t frame_delta)
 
     // Read and decode.
     speex_bits_read_from(&bits, (char*)op.packet, op.bytes);
-    speex_decode_int(state, &bits, (spx_int16_t*)m_pPreparedDataBuffer);
+    speex_decode_int(state, &bits, (int16*)m_pPreparedDataBuffer);
 
     // Frame size is in shorts.
     speex_decoder_ctl(state, SPEEX_GET_FRAME_SIZE, &m_PreparedDataBufferUsage);
