@@ -44,7 +44,7 @@ SndSysBasicStream(pRenderFormat, Mode3D), m_pSoundData(pData)
 
 SndSysSpeexSoundStream::~SndSysSpeexSoundStream ()
 {
-  free(header);
+  speex_header_free(header);
   ogg_stream_clear(&os);
 }
 
