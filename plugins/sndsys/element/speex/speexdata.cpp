@@ -43,6 +43,9 @@ size_t SndSysSpeexSoundData::GetDataSize()
 
 iSndSysStream *SndSysSpeexSoundData::CreateStream(csSndSysSoundFormat *pRenderFormat, int Mode3D)
 {
+  if (!m_bInfoReady)
+    Initialize();
+
   SndSysSpeexSoundStream *pStream = new SndSysSpeexSoundStream(this, pRenderFormat, Mode3D);
 
   return (pStream);
@@ -82,7 +85,7 @@ void SndSysSpeexSoundData::Initialize()
   m_FrameCount = header->frames_per_packet * count;
 
   // Free memory.
-  free(header);
+  speex_header_free(header);
   ogg_stream_clear(&os);
 
   // No need to call this again.
