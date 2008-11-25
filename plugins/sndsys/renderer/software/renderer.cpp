@@ -124,20 +124,15 @@ float csSndSysRendererSoftware::GetVolume ()
 
 csPtr<iSndSysStream> csSndSysRendererSoftware::CreateStream(iSndSysData* data, int mode3d)
 {
-  csSndSysSoundFormat stream_format;
-  iSndSysStream *stream;
+  // Copy over format information
+  csSndSysSoundFormat format = *data->GetFormat();
 
-  // Determine the desired format based on the 3d mode
-  stream_format.Bits=m_PlaybackFormat.Bits;
-  stream_format.Freq=m_PlaybackFormat.Freq;
-
-  if (mode3d == CS_SND3D_DISABLE)
-    stream_format.Channels=m_PlaybackFormat.Channels;
-  else
-    stream_format.Channels=1; // positional sounds are rendered to mono format
+  // Make sure 3D streams are in mono
+  if (mode3d != CS_SND3D_DISABLE)
+    format.Channels = 1;
 
   // Tell the data object to create a stream using our desired format
-  stream=data->CreateStream(&stream_format, mode3d);
+  iSndSysStream* stream=data->CreateStream(&format, mode3d);
 
   // This is the reference that will belong to the render thread
   stream->IncRef();
