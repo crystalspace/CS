@@ -1294,12 +1294,12 @@ AS_IF([test $cs_cv_libspeex = yes],
     [CS_CHECK_BUILD([for speex_header_free()], [cs_cv_speex_header_free],
 	[AC_LANG_PROGRAM([[#include <speex/speex_header.h>]],
 	  [SpeexHeader* header = 0; speex_header_free(header);])],
-	[], [C++], [], [], [],
-	[$cs_cv_libspeex_cflags], [$cs_cv_libspeex_lflags], [$cs_cv_libspeex_libs])],
-        [cs_cv_speex_header_free=no])
+	[], [C++],
+	[cs_cv_speex_header_free=yes], [cs_cv_speex_header_free=no], [],
+	[$cs_cv_libspeex_cflags], [$cs_cv_libspeex_lflags], [$cs_cv_libspeex_libs])])
 
-AS_IF([test $cs_cv_speex_header_free = no],
-      [CS_HEADER_PROPERTY([NO_SPEEX_HEADER_FREE])])
+AS_IF([test $cs_cv_speex_header_free = yes],
+      [CS_HEADER_PROPERTY([CS_HAVE_SPEEX_HEADER_FREE])])
 
 
 #------------------------------------------------------------------------------
