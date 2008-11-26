@@ -1295,12 +1295,8 @@ AS_IF([test $cs_cv_libspeex = yes],
 	[AC_LANG_PROGRAM([[#include <speex/speex_header.h>]],
 	  [SpeexHeader* header = 0; speex_header_free(header);])],
 	[], [C++],
-	[cs_cv_speex_header_free=yes], [cs_cv_speex_header_free=no], [],
+	[CS_HEADER_PROPERTY([CS_HAVE_SPEEX_HEADER_FREE])], [], [],
 	[$cs_cv_libspeex_cflags], [$cs_cv_libspeex_lflags], [$cs_cv_libspeex_libs])])
-
-AS_IF([test $cs_cv_speex_header_free = yes],
-      [CS_HEADER_PROPERTY([CS_HAVE_SPEEX_HEADER_FREE])])
-
 
 #------------------------------------------------------------------------------
 # Check for lib3ds.  In addition to the standard installed locations, we also
