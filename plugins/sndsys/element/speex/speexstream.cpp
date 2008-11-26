@@ -44,7 +44,12 @@ SndSysBasicStream(pRenderFormat, Mode3D), m_pSoundData(pData)
 
 SndSysSpeexSoundStream::~SndSysSpeexSoundStream ()
 {
+#ifndef NO_SPEEX_HEADER_FREE
   speex_header_free(header);
+#else
+  free(header);
+#endif
+
   ogg_stream_clear(&os);
 }
 
@@ -146,6 +151,15 @@ void SndSysSpeexSoundStream::AdvancePosition(size_t frame_delta)
     // First packets contain header data.
     if(packet_count == 0)
     {
+      if(header)
+      {
+#ifndef NO_SPEEX_HEADER_FREE
+        speex_header_free(header);
+#else
+        free(header);
+#endif
+      }
+
       header = speex_packet_to_header((char*)op.packet, op.bytes);
       // const_cast for version compatibility.
       SpeexMode* mode = const_cast<SpeexMode*>(speex_lib_get_mode (header->mode));

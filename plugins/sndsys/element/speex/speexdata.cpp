@@ -85,7 +85,11 @@ void SndSysSpeexSoundData::Initialize()
   m_FrameCount = header->frames_per_packet * count;
 
   // Free memory.
+#ifndef NO_SPEEX_HEADER_FREE
   speex_header_free(header);
+#else
+  free(header);
+#endif
   ogg_stream_clear(&os);
 
   // No need to call this again.
