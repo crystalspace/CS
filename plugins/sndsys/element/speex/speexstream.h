@@ -26,6 +26,10 @@
 #include "csplugincommon/sndsys/sndstream.h"
 #include "speexdata.h"
 
+#ifndef CS_HAVE_SPEEX_HEADER_FREE
+#define speex_header_free(X)	free(X)
+#endif
+
 using namespace CS::SndSys;
 
 class SndSysSpeexSoundStream : public SndSysBasicStream

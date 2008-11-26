@@ -1271,7 +1271,7 @@ AS_IF([test "$cs_cv_libvorbis" = yes],
 # Check for Speex.  In addition to the standard installed locations, we
 # also search CS/libs/libspeex*
 #------------------------------------------------------------------------------
-AS_IF([test "$cs_cv_libogg" = yes],
+AS_IF([test $cs_cv_libogg = yes],
     [CS_CHECK_LIB_WITH([speex],
 	[AC_LANG_PROGRAM([[#include <speex/speex.h>]],
 	  [SpeexBits bits; speex_bits_init(&bits);])],
@@ -1281,6 +1281,16 @@ AS_IF([test "$cs_cv_libogg" = yes],
 	[$cs_cv_libogg_lflags],
 	[$cs_cv_libogg_libs])])
 
+#------------------------------------------------------------------------------
+# Check for speex_header_free().
+#------------------------------------------------------------------------------
+AS_IF([test $cs_cv_libspeex = yes],
+    [CS_CHECK_BUILD([for speex_header_free()], [cs_cv_speex_header_free],
+	[AC_LANG_PROGRAM([[#include <speex/speex_header.h>]],
+	  [SpeexHeader* header = 0; speex_header_free(header);])],
+	[], [C++],
+	[CS_HEADER_PROPERTY([CS_HAVE_SPEEX_HEADER_FREE])], [], [],
+	[$cs_cv_libspeex_cflags], [$cs_cv_libspeex_lflags], [$cs_cv_libspeex_libs])])
 
 #------------------------------------------------------------------------------
 # Check for lib3ds.  In addition to the standard installed locations, we also
