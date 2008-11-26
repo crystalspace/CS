@@ -49773,7 +49773,8 @@ echo "${ECHO_T}$cs_cv_speex_header_free" >&6; }
 fi
 
     if test $cs_cv_speex_header_free = yes; then
-  :
+  cs_header_text="${cs_header_text}#define CS_HAVE_SPEEX_HEADER_FREE
+"
 else
   cs_cv_speex_header_free_cflags=''
 	cs_cv_speex_header_free_lflags=''
@@ -49781,16 +49782,7 @@ else
 
 fi
 
-else
-  cs_cv_speex_header_free=no
 fi
-
-
-if test $cs_cv_speex_header_free = no; then
-  cs_header_text="${cs_header_text}#define NO_SPEEX_HEADER_FREE
-"
-fi
-
 
 
 #------------------------------------------------------------------------------
