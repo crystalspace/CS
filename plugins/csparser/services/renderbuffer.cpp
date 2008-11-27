@@ -893,8 +893,11 @@ public:
 
   virtual size_t GetSize() const
   {
-    return csRenderBufferComponentSizes[header->compType] 
-      * header->elementCount * header->compCount;
+    if (IsEdited())
+      return GetWrappedBuffer()->GetSize();
+    else
+      return csRenderBufferComponentSizes[header->compType] 
+	* csLittleEndian::Convert (header->elementCount) * header->compCount;
   }
 
   virtual size_t GetStride() const 
