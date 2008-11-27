@@ -29,7 +29,7 @@
 SndSysSpeexSoundStream::SndSysSpeexSoundStream (csRef<SndSysSpeexSoundData> pData, 
                                                 csSndSysSoundFormat *pRenderFormat, 
                                                 int Mode3D) : 
-SndSysBasicStream(pRenderFormat, Mode3D), m_pSoundData(pData)
+SndSysBasicStream(pRenderFormat, Mode3D), m_pSoundData(pData), header(0)
 {
   // Allocate an advance buffer
   m_pCyclicBuffer = new SoundCyclicBuffer (
