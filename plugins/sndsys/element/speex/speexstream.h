@@ -59,7 +59,7 @@ public:
   /**
    * Reset the stream back to the beginning.
    */
-  virtual bool ResetPosition();
+  virtual bool ResetPosition(bool clear = true);
 
   /**
   * NOT AN APPLICATION CALLABLE FUNCTION!   This function advances the stream
