@@ -29,7 +29,7 @@
 SndSysSpeexSoundStream::SndSysSpeexSoundStream (csRef<SndSysSpeexSoundData> pData, 
                                                 csSndSysSoundFormat *pRenderFormat, 
                                                 int Mode3D) : 
-SndSysBasicStream(pRenderFormat, Mode3D), m_pSoundData(pData)
+SndSysBasicStream(pRenderFormat, Mode3D), m_pSoundData(pData), header(0)
 {
   // Allocate an advance buffer
   m_pCyclicBuffer = new SoundCyclicBuffer (
@@ -39,7 +39,7 @@ SndSysBasicStream(pRenderFormat, Mode3D), m_pSoundData(pData)
   CS_ASSERT(m_pCyclicBuffer!=0);
 
   // Initialize speex stream.
-  ResetPosition();
+  ResetPosition(false);
 }
 
 SndSysSpeexSoundStream::~SndSysSpeexSoundStream ()
@@ -70,17 +70,26 @@ size_t SndSysSpeexSoundStream::GetFrameCount()
   return framecount;
 }
 
-bool SndSysSpeexSoundStream::ResetPosition()
+bool SndSysSpeexSoundStream::ResetPosition(bool clear)
 {
-  ogg_stream_clear(&os);
+  // Clear the stream if needed.
+  if(clear)
+  {
+    ogg_stream_clear(&os);
+  }
+
+  // Set up the sync state and buffers.
   speex_bits_init(&bits);
   ogg_sync_init(&oy);
   oy.data = m_pSoundData->GetDataStore().data;
   oy.storage = (int)m_pSoundData->GetDataStore().length;
   ogg_sync_wrote(&oy, (long)m_pSoundData->GetDataStore().length);
+
+  // Reset flags and counters.
   stream_init = false;
   newPage = true;
   packet_count = 0;
+
   return true;
 }
 
