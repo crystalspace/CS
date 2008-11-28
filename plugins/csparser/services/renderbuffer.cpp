@@ -1111,6 +1111,8 @@ csRef<iRenderBuffer> csTextSyntaxService::ReadRenderBuffer (iDataBuffer* buf,
   }
 
   buf = newData;
+  header = 
+    reinterpret_cast<RenderBufferHeaderCommon*> (buf->GetData());
 #endif
 
   csRef<StoredRenderBuffer> newBuffer;
