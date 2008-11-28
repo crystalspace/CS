@@ -1068,6 +1068,11 @@ csRef<iRenderBuffer> csTextSyntaxService::ReadRenderBuffer (iDataBuffer* buf,
   if (buf->GetSize() < sizeof (RenderBufferHeaderCommon)) return 0;
   RenderBufferHeaderCommon* header = 
     reinterpret_cast<RenderBufferHeaderCommon*> (buf->GetData());
+  printf("sizeof (RenderBufferHeaderCommon) = %u\n", sizeof (RenderBufferHeaderCommon));
+  printf("header->magic = %.4x, ", header->magic);
+  printf("header->compType = %.4x, ", header->compType);
+  printf("header->compCount = %.4x, ", header->compCount);
+  printf("header->elementCount = %.4x\n", header->elementCount);
 
   const uint16 magic = csLittleEndian::Convert (header->magic);
   if ((magic != RenderBufferHeaderCommon::MagicNormal)
@@ -1095,7 +1100,7 @@ csRef<iRenderBuffer> csTextSyntaxService::ReadRenderBuffer (iDataBuffer* buf,
   newData.AttachNew (new CS::DataBuffer<> (headerSize + totalSize));
   /* Also copy the header since StoredRenderBuffer will pull the header from
      the data buffer we provide on construction. */
-  memcpy (newData->GetData(), header, sizeof (headerSize));
+  memcpy (newData->GetData(), header, headerSize);
   void* src = buf->GetData() + headerSize;
   void* dst = newData->GetData() + headerSize;
 
