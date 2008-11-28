@@ -1093,6 +1093,8 @@ csRef<iRenderBuffer> csTextSyntaxService::ReadRenderBuffer (iDataBuffer* buf,
   // Buffer data is in little endian format, floats in IEEE, need to convert...
   csRef<iDataBuffer> newData;
   newData.AttachNew (new CS::DataBuffer<> (headerSize + totalSize));
+  /* Also copy the header since StoredRenderBuffer will pull the header from
+     the data buffer we provide on construction. */
   memcpy (newData->GetData(), header, sizeof (headerSize));
   void* src = buf->GetData() + headerSize;
   void* dst = newData->GetData() + headerSize;
@@ -1110,9 +1112,8 @@ csRef<iRenderBuffer> csTextSyntaxService::ReadRenderBuffer (iDataBuffer* buf,
         src, dst, totalElements);
   }
 
+  // Use converted data
   buf = newData;
-  header = 
-    reinterpret_cast<RenderBufferHeaderCommon*> (buf->GetData());
 #endif
 
   csRef<StoredRenderBuffer> newBuffer;
