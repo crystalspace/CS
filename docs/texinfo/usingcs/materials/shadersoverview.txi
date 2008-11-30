@@ -137,6 +137,9 @@ may have more abstract mappings (e.g. registers for @sc{arb} programs).
 
 
 @subheading Shader Variables
+@cindex iShaderVarStringSet
+@cindex Shader variables
+@cindex Shader variable context
 
 Shader variables serve as an important carrier for data related to rendering
 in Crystal Space.  The function ``customize shaders'' is actually just a
