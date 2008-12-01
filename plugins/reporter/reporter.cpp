@@ -169,7 +169,8 @@ void csReporter::ReportV (int severity, const char* msgId,
   size_t n = 0;
   while (n < messageQueue.GetSize())
   {
-    const ReportedMessage& msg = messageQueue[n];
+    // Copy to protect against memory being reallocated
+    ReportedMessage msg (messageQueue[n]);
     ActualReport (copy, msg.severity, msg.msgID, msg.buf);
     n++;
   }
