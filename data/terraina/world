@@ -8,10 +8,8 @@
   <plugins>
     <plugin name="genmeshFactory">crystalspace.mesh.loader.factory.genmesh</plugin>
     <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
-    <plugin name="terrainFact">crystalspace.mesh.loader.factory.terrain</plugin>
-    <plugin name="terrain">crystalspace.mesh.loader.terrain</plugin>
-    <plugin name="foliageFact">crystalspace.mesh.loader.factory.foliage</plugin>
-    <plugin name="foliage">crystalspace.mesh.loader.foliage</plugin>
+    <plugin name="terrainFact">crystalspace.mesh.loader.factory.terrain2</plugin>
+    <plugin name="terrain">crystalspace.mesh.loader.terrain2</plugin>    
   </plugins>
 
   <textures>
@@ -85,70 +83,33 @@
     </params>
   </meshfact>
 
-  <addon plugin="crystalspace.terraformer.simple.loader">
-      <name>simple</name>
-      <heightmap>/lev/terrain/heightmap_257x257.png</heightmap>
-      <!--<heightmap image="/lev/terrain/heightmap_2049x2049.png"/>-->
-      <scale x="256" y="32" z="256" />
-      <materialalphamap image="/lev/terraina/alpha_marble.png" />
-      <materialalphamap image="/lev/terraina/alpha_stone.png" />
-  </addon>
-
   <meshfact name="TerrainFact">
     <plugin>terrainFact</plugin>
     <params>
-      <plugin>crystalspace.mesh.object.terrain.bruteblock</plugin>
-      <terraformer>simple</terraformer>
-      <sampleregion>
-        <min x="-256" y="-256" />
-        <max x="256" y="256" />
-      </sampleregion>
-    </params>
-  </meshfact>
+      <renderer>crystalspace.mesh.object.terrain2.bruteblockrenderer</renderer>
+      <collider>crystalspace.mesh.object.terrain2.collider</collider>
+      <feeder>crystalspace.mesh.object.terrain2.simpledatafeeder</feeder>
 
-  <!--
-  <meshfact name="FoliageFact">
-    <plugin>foliageFact</plugin>
-    <params>
-      <terraformer>simple</terraformer>
-      <sampleregion>
-        <min x="-256" y="-256" />
-        <max x="256" y="256" />
-      </sampleregion>
-      <object name="oak">
-	<loddistance varm="LodM" vora="LodA" />
-	<geometry lod="0">
-	  <v x="0" y="0" z="0" u="0" v="u" nx="0" ny="0" nz="0" red="0" green="0" blue="0" />
-	  ...
-	  <t v1="0" v2="1" v3="2" />
-	  ...
-	  <material>xxx</material>
-	</geometry>
-	<geometry lod="1">
-	  <v x="0" y="0" z="0" u="0" v="u" nx="0" ny="0" nz="0" red="0" green="0" blue="0" />
-	  ...
-	  <t v1="0" v2="1" v3="2" />
-	  ...
-	  <material>xxx</material>
-	</geometry>
-      </object>
-      <foliagepalette>
-	<palette index="0">
-	  <foliage name="oak" density="1" />
-	  <foliage name="grass" density="10" />
-	</palette>
-	<palette index="1">
-	  <foliage name="grass" density="10" />
-	</palette>
-	<palette index="2">
-	  <foliage name="oak" density="1" />
-	  <foliage name="pine" density="1" />
-	  <foliage name="grass" density="4" />
-	</palette>
-      </foliagepalette>
+      <cells>
+        <celldefault>
+          <gridsize width="257" height="257" />
+          <materialmapsize width="32" height="32" />
+          <size x="256" y="32" z="256" />
+        </celldefault>
+        
+        <cell>
+          <name>0</name>
+          <position x="-127" y="-127" />
+          <basematerial>Base</basematerial>
+          <feederproperties>
+            <param name="heightmap source">/lev/terrain/heightmap_257x257.png</param>
+            <alphamap material="Marble">/lev/terraina/alpha_marble.png</alphamap>
+            <alphamap material="Stone">/lev/terraina/alpha_stone.png</alphamap>
+          </feederproperties>
+        </cell>
+      </cells>
     </params>
   </meshfact>
-  -->
 
   <sector name="room">
      <light name="sun">
@@ -174,26 +135,11 @@
       <plugin>terrain</plugin>
       <params>
         <factory>TerrainFact</factory>
-        <material>Base</material>
-	<materialpalette>
-	  <material>Marble</material>
-	  <material>Stone</material>
-	  <material>Grass</material>
-	</materialpalette>
-	<lodvalue name="splatting distance">400</lodvalue>
-  	<lodvalue name="block resolution">16</lodvalue>
-  	<lodvalue name="block split distance">8</lodvalue>
-  	<lodvalue name="minimum block size">32</lodvalue>
-  	<lodvalue name="cd resolution">256</lodvalue>
-	<staticlighting>yes</staticlighting>
-	<castshadows>yes</castshadows>
       </params>
       <move> 
         <v x="0" y="0" z="0" /> 
       </move>
     </meshobj>
 
-    <!-- Uncomment for ...fog: -->
-    <!--fog red=".3" green=".27" blue=".27" density="0.002" /-->
   </sector>
 </world>
