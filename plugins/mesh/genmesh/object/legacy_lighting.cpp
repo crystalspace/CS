@@ -30,14 +30,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 {
 
 csGenmeshMeshObject::LegacyLightingData::LegacyLightingData ()
- : lit_mesh_colors (0), num_lit_mesh_colors (0), static_mesh_colors (0)
+ : lit_mesh_colors (0), num_lit_mesh_colors (0)
 {
 }
 
 csGenmeshMeshObject::LegacyLightingData::~LegacyLightingData ()
 {
   delete[] lit_mesh_colors;
-  delete[] static_mesh_colors;
 }
 
 void csGenmeshMeshObject::LegacyLightingData::SetColorNum (int num)
@@ -45,16 +44,12 @@ void csGenmeshMeshObject::LegacyLightingData::SetColorNum (int num)
   num_lit_mesh_colors = num;
   delete[] lit_mesh_colors;
   lit_mesh_colors = new csColor4 [num_lit_mesh_colors];
-  delete[] static_mesh_colors;
-  static_mesh_colors = new csColor4 [num_lit_mesh_colors];
 }
 
 void csGenmeshMeshObject::LegacyLightingData::Free ()
 {
   delete[] lit_mesh_colors;
   lit_mesh_colors = 0;
-  delete[] static_mesh_colors;
-  static_mesh_colors = 0;
 }
 
 void csGenmeshMeshObject::LegacyLightingData::Clear ()
@@ -65,7 +60,6 @@ void csGenmeshMeshObject::LegacyLightingData::Clear ()
   for (i = 0 ; i < num_lit_mesh_colors ; i++)
   {
     lit_mesh_colors[i].Set (0, 0, 0);
-    static_mesh_colors[i].Set (0, 0, 0);
   }
 }
 
