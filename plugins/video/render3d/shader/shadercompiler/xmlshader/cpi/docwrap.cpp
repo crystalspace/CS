@@ -2518,7 +2518,8 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapperStatic (
     CS_ASSERT (globalState->vfs);
     EvalStatic eval (resolver);
     node = new csWrappedDocumentNode (eval, 0, wrappedNode, resolver, this, 
-      globalState, false);
+      globalState,
+      wdnfpoExpandTemplates | wdnfpoHandleConditions);
     CS_ASSERT(globalState->GetRefCount() == 1);
   }
   return node;
