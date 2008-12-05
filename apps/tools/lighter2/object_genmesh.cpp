@@ -496,6 +496,10 @@ namespace lighter
 
   void Object_Genmesh::SaveMesh (iDocumentNode *node)
   {
+    if (objFlags.Check (OBJECT_FLAG_NOLIGHT))
+      // Assume object is unchanged
+      return;
+    
     csRef<iGeneralMeshState> genMesh = 
       scfQueryInterface<iGeneralMeshState> (
       meshWrapper->GetMeshObject());
