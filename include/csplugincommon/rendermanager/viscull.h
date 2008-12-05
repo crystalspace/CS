@@ -126,8 +126,7 @@ namespace RenderManager
    * Usually the first thing done with a view and context. Example:
    * \code
    * // Renderview+sector setup
-   * renderView->SetThisSector (sector);
-   * sector->CallSectorCallbacks (renderView);
+   * sector->PrepareDraw (renderView);
    * // Make sure the clip-planes are ok
    * CS::RenderViewClipper::SetupClipPlanes (renderView->GetRenderContext ());
    * 
