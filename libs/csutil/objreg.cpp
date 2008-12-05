@@ -147,9 +147,11 @@ bool csObjectRegistry::Register (iBase* obj, char const* tag)
   if (obj == 0)
     return false;
 
-  CS::Threading::MutexScopedLock lock(registryLock);
+  {
+    CS::Threading::MutexScopedLock lock(registryLock);
+    CS_ASSERT (registry.GetSize () == tags.GetSize ());
+  }
 
-  CS_ASSERT (registry.GetSize () == tags.GetSize ());
   if (!clearing)
   {
     // Don't allow adding an object with an already existing tag.
@@ -164,6 +166,7 @@ bool csObjectRegistry::Register (iBase* obj, char const* tag)
       }
     }
 
+    CS::Threading::MutexScopedLock lock(registryLock);
     obj->IncRef ();
     registry.Push (obj);
     tags.Push (tag);
