@@ -52,14 +52,14 @@ void csGenmeshMeshObject::LegacyLightingData::Free ()
   lit_mesh_colors = 0;
 }
 
-void csGenmeshMeshObject::LegacyLightingData::Clear ()
+void csGenmeshMeshObject::LegacyLightingData::Clear (const csColor4& base_color)
 {
   //csColor amb;
   //factory->engine->GetAmbientLight (amb);
   int i;
   for (i = 0 ; i < num_lit_mesh_colors ; i++)
   {
-    lit_mesh_colors[i].Set (0, 0, 0);
+    lit_mesh_colors[i].Set (base_color);
   }
 }
 

@@ -181,7 +181,7 @@ private:
     
     void SetColorNum (int num);
     void Free();
-    void Clear();
+    void Clear(const csColor4& base_color);
   };
   LegacyLightingData legacyLighting;
 

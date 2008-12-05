@@ -307,7 +307,7 @@ void csGenmeshMeshObject::SetupObject ()
     if (!do_manual_colors)
     {
       legacyLighting.SetColorNum (factory->GetVertexCount ());
-      legacyLighting.Clear();
+      legacyLighting.Clear(base_color);
     }
     /*iMaterialWrapper* mater = material;
     if (!mater) mater = factory->GetMaterialWrapper ();
