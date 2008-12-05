@@ -44,7 +44,7 @@ private:
   bool clearing;
 
   // Lock for thread safety.
-  CS::Threading::Mutex registryLock;
+  CS::Threading::RecursiveMutex registryLock;
 
 public:
   csObjectRegistry ();
