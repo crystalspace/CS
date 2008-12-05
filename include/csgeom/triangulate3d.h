@@ -25,9 +25,6 @@
 #ifndef __CS_GEOM_TRIANGULATE_3D_H_
 #define __CS_GEOM_TRIANGULATE_3D_H_
 
-#define	RADTODEG(x)			x*57.2957795130823208768f									/// Convert radians to degrees
-#define	DEGTORAD(x)			x*0.01745329251994329577f									/// Convert degrees to radians
-
 namespace CS
 {
   namespace Geometry

@@ -20,6 +20,8 @@
 #include "csgeom/triangulate3d.h"
 #include "csgeom/transfrm.h"
 
+#define DEGTORAD(x) ((x)*PI/180.0f)
+
 namespace CS
 {
   namespace Geometry
