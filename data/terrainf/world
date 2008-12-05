@@ -135,6 +135,7 @@
     </start>
     <meshfact name="skydome">
         <plugin>genmeshFactory</plugin>
+        <nolighting />
         <params>
             <sphere rimvertices="6" reversed="true">
                 <radius x="1000" y="1000" z="1000" />
@@ -176,6 +177,7 @@
     </meshfact>
     <meshfact name="factory_room_sky">
         <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <nolighting />
         <params>
             <numvt>24</numvt>
             <v x="-1000" y="1000" z="-1000" u="0.005" v="0.005" />
@@ -317,7 +319,7 @@
                         <name>0</name>
                         <renderproperties>
                             <shadervar name="texture lod distance" type="vector3">200.000000,200.000000,200.000000</shadervar>
-                            <shadervar name="tex lightmap" type="texture">lightmaps_terrainf_30_png</shadervar>
+                            <shadervar name="tex lightmap" type="texture">lightmaps_terrainf_0_png</shadervar>
                         </renderproperties>
                     </cell>
                 </cells>
