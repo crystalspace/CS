@@ -1514,7 +1514,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
       case XMLTOKEN_MESHFACT:
         {
-          FindOrLoadMeshFactory(ldr_context, child, stemp, 0, ssource);
+          csReversibleTransform child_transf;
+          csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
+          if(!FindOrLoadMeshFactoryTC(ret, ldr_context, child, stemp, &child_transf, ssource))
+          {
+            return false;
+          }
         }
         break;
 
