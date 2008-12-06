@@ -711,7 +711,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
   else
     allCachedPrograms = cache->GetSubItems ("/");
 
-  if (!allCachedPrograms.IsValid())
+  if (!allCachedPrograms.IsValid() || (allCachedPrograms->GetSize() == 0))
   {
     if (failReason) failReason->AttachNew (
       new scfString ("no cached programs found"));
