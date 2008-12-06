@@ -128,7 +128,8 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
     {
       if (do_verbose && setFailReason)
       {
-	SetFailReason ("fragment program failed to load");
+	SetFailReason ("pass %d fragment program failed to load",
+	  GetPassNumber (pass));
 	setFailReason = false;
       }
       result = false;
@@ -155,7 +156,8 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
     {
       if (do_verbose && setFailReason)
       {
-	SetFailReason ("vertex program failed to load");
+	SetFailReason ("pass %d vertex program failed to load",
+	  GetPassNumber (pass));
 	setFailReason = false;
       }
       result = false;
@@ -182,7 +184,8 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
     {
       if (do_verbose && setFailReason)
       {
-	SetFailReason ("vertex preprocessor failed to load");
+	SetFailReason ("pass %d vertex preprocessor failed to load",
+	  GetPassNumber (pass));
 	setFailReason = false;
       }
       result = false;
@@ -262,7 +265,8 @@ struct PassActionPrecache
 	{
 	  if (tech->do_verbose && setFailReason)
 	  {
-	    tech->SetFailReason ("fragment program failed to precache");
+	    tech->SetFailReason ("pass %d fragment program failed to precache",
+	      passIndex);
 	    setFailReason = false;
 	  }
 	  result = false;
@@ -287,7 +291,8 @@ struct PassActionPrecache
 	{
 	  if (tech->do_verbose && setFailReason)
 	  {
-	    tech->SetFailReason ("vertex program failed to precache");
+	    tech->SetFailReason ("pass %d vertex program failed to precache",
+	      passIndex);
 	    setFailReason = false;
 	  }
 	  result = false;
@@ -312,7 +317,8 @@ struct PassActionPrecache
 	{
 	  if (tech->do_verbose && setFailReason)
 	  {
-	    tech->SetFailReason ("vertex preprocessor failed to precache");
+	    tech->SetFailReason ("pass %d vertex preprocessor failed to precache",
+	      passIndex);
 	    setFailReason = false;
 	  }
 	  result = false;
@@ -935,7 +941,7 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadPassFromCache (
     if (cache) fpCache = cache->GetRootedCache (csString().Format (
       "/pass%dfp", GetPassNumber (pass)));
     loadRes = LoadProgramFromCache (0, variant, fpCache, plugins.fp,
-      pass->fp, tagFP);
+      pass->fp, tagFP, GetPassNumber (pass));
     if (loadRes != iShaderProgram::loadSuccessShaderValid) return loadRes;
   }
   
@@ -945,7 +951,7 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadPassFromCache (
     if (cache) vpCache = cache->GetRootedCache (csString().Format (
       "/pass%dvp", GetPassNumber (pass)));
     loadRes = LoadProgramFromCache (pass->fp, variant, vpCache, plugins.vp, pass->vp,
-      tagVP);
+      tagVP, GetPassNumber (pass));
     if (loadRes != iShaderProgram::loadSuccessShaderValid) return loadRes;
   }
   
@@ -955,7 +961,7 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadPassFromCache (
     if (cache) vprCache = cache->GetRootedCache (csString().Format (
       "/pass%dvpr", GetPassNumber (pass)));
     loadRes = LoadProgramFromCache (pass->vp, variant, vprCache, plugins.vproc,
-      pass->vproc, tagVPr);
+      pass->vproc, tagVPr, GetPassNumber (pass));
     if (loadRes != iShaderProgram::loadSuccessShaderValid) return loadRes;
   }
   
@@ -1177,7 +1183,8 @@ csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
   
 iShaderProgram::CacheLoadResult csXMLShaderTech::LoadProgramFromCache (
   iBase* previous, size_t variant, iHierarchicalCache* cache,
-  const CachedPlugin& cacheInfo, csRef<iShaderProgram>& prog, csString& tag)
+  const CachedPlugin& cacheInfo, csRef<iShaderProgram>& prog, csString& tag,
+  int passNumber)
 {
   //load the plugin
   csRef<iShaderProgramPlugin> plg;
@@ -1202,8 +1209,8 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadProgramFromCache (
   {
     if (parent->compiler->do_verbose)
       SetFailReason(
-	"Failed to read '%s' from cache: %s",
-	cacheInfo.progType.GetData(),
+	"Failed to read '%s' for pass %d from cache: %s",
+	cacheInfo.progType.GetData(), passNumber,
 	failReason.IsValid() ? failReason->GetData() : "no reason given");
     return iShaderProgram::loadFail;
   }
