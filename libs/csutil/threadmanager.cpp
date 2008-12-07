@@ -108,27 +108,19 @@ void csThreadManager::Wait(csRef<iThreadReturn> result)
 bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns)
 {
   bool success = true;
-  bool finished = false;
 
-  while(!finished)
+  while(threadReturns.GetSize() != 0)
   {
-    finished = true;
-    for(size_t i=0; i<threadReturns.GetSize(); i++)
+    if(threadReturns[0]->IsFinished())
     {
-      finished &= threadReturns[i]->IsFinished();
-      if(finished)
-      {
-        success &= threadReturns[i]->WasSuccessful();
-      }
+      success &= threadReturns[0]->WasSuccessful();
+      threadReturns.DeleteIndexFast(0);
     }
-
-    if(!finished)
+    else
     {
       threadQueue->PopAndRun();
     }
   }
-
-  threadReturns.Empty();
 
   return success;
 }
