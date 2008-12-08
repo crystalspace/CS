@@ -480,9 +480,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool LoadProxyTextures(csSafeCopyArray<ProxyTexture> &proxyTextures,
       csWeakRefArray<iMaterialWrapper> &materialArray);
 
-    THREADED_CALLABLE_DECL5(csThreadedLoader, FindOrLoadMeshFactory, csLoaderReturn,csRef<iLoaderContext>,
+    THREADED_CALLABLE_DECL6(csThreadedLoader, FindOrLoadMeshFactory, csLoaderReturn,csRef<iLoaderContext>,
       ldr_context, csRef<iDocumentNode>, meshfactnode, csRef<iMeshFactoryWrapper>, parent,
-      csReversibleTransform*, transf, csRef<iStreamSource>, ssource, THREADED, false, false);
+      csReversibleTransform*, transf, csRef<iStreamSource>, ssource, const char*, path,
+      THREADED, false, false);
 
     /**
     * Load a Mesh Object Factory from the map file.

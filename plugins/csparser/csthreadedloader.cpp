@@ -538,7 +538,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iDocumentNode> meshfactnode = node->GetNode("meshfact");
     if(meshfactnode)
     {
-      return FindOrLoadMeshFactoryTC(ret, ldr_context, meshfactnode, 0, 0, ssource);
+      return FindOrLoadMeshFactoryTC(ret, ldr_context, meshfactnode, 0, 0, ssource, vfs->GetCwd());
     }
 
     // Mesh Object
@@ -647,10 +647,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return false;
   }
 
-  THREADED_CALLABLE_IMPL5(csThreadedLoader, FindOrLoadMeshFactory, csRef<iLoaderContext> ldr_context,
+  THREADED_CALLABLE_IMPL6(csThreadedLoader, FindOrLoadMeshFactory, csRef<iLoaderContext> ldr_context,
     csRef<iDocumentNode> meshfactnode, csRef<iMeshFactoryWrapper> parent, csReversibleTransform* transf,
-    csRef<iStreamSource> ssource)
+    csRef<iStreamSource> ssource, const char* path)
   {
+    csVfsDirectoryChanger dirchange(vfs);
+    dirchange.ChangeTo(path);
+
     const char* meshfactname = meshfactnode->GetAttributeValue("name");
 
     csRef<iMeshFactoryWrapper> mfw = ldr_context->FindMeshFactory(meshfactname, true);
@@ -835,7 +838,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
               ldr_context->GetVerbose());
           }
 
-          threadReturns.Push(FindOrLoadMeshFactory(ldr_context, child, 0, 0, ssource));
+          threadReturns.Push(FindOrLoadMeshFactory(ldr_context, child, 0, 0, ssource, vfs->GetCwd()));
         }
         break;
       case XMLTOKEN_SECTOR:
@@ -1124,7 +1127,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_MESHFACT:
         {
-          threadReturns.Push(FindOrLoadMeshFactory(ldr_context, child, 0, 0, ssource));
+          threadReturns.Push(FindOrLoadMeshFactory(ldr_context, child, 0, 0, ssource, vfs->GetCwd()));
         }
         break;
       case XMLTOKEN_PLUGINS:
@@ -1521,7 +1524,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           csReversibleTransform child_transf;
           csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-          if(!FindOrLoadMeshFactoryTC(ret, ldr_context, child, stemp, &child_transf, ssource))
+          if(!FindOrLoadMeshFactoryTC(ret, ldr_context, child, stemp, &child_transf, ssource, vfs->GetCwd()))
           {
             return false;
           }
