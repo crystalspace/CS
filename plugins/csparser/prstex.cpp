@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "csqint.h"
 
+#include "cstool/vfsdirchange.h"
 #include "igraphic/animimg.h"
 #include "imap/services.h"
 #include "itexture/iproctex.h"
@@ -86,7 +87,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       switch (id)
       {
       case XMLTOKEN_TEXTURE:
-        threadReturns.Push(ParseTexture (ldr_context, child, &proxyTextures));
+        threadReturns.Push(ParseTexture (ldr_context, child, &proxyTextures, vfs->GetCwd()));
         break;
       case XMLTOKEN_CUBEMAP:
         if (!ParseCubemap (ldr_context, child))
@@ -110,9 +111,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return threadman->Wait(threadReturns);;
   }
 
-  THREADED_CALLABLE_IMPL3(csThreadedLoader, ParseTexture, csRef<iLoaderContext> ldr_context,
-    csRef<iDocumentNode> node, csSafeCopyArray<ProxyTexture>* proxyTextures)
+  THREADED_CALLABLE_IMPL4(csThreadedLoader, ParseTexture, csRef<iLoaderContext> ldr_context,
+    csRef<iDocumentNode> node, csSafeCopyArray<ProxyTexture>* proxyTextures, const char* path)
   {
+    csVfsDirectoryChanger dirchange(vfs);
+    dirchange.ChangeTo(path);
+
     const char* txtname = node->GetAttributeValue ("name");
 
     iTextureWrapper* t = ldr_context->FindTexture (txtname, true);

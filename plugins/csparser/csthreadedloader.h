@@ -612,9 +612,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csWeakRefArray<iMaterialWrapper> &materialArray, const char* prefix = 0);
 
     /// Parse a texture definition and add the texture to the engine
-    THREADED_CALLABLE_DECL3(csThreadedLoader, ParseTexture, csLoaderReturn,
+    THREADED_CALLABLE_DECL4(csThreadedLoader, ParseTexture, csLoaderReturn,
       csRef<iLoaderContext>, ldr_context, csRef<iDocumentNode>, node,
-      csSafeCopyArray<ProxyTexture>*, proxyTextures, THREADED, false, false);
+      csSafeCopyArray<ProxyTexture>*, proxyTextures, const char*, path,
+      THREADED, false, false);
 
     /// Parse a Cubemap texture definition and add the texture to the engine
     iTextureWrapper* ParseCubemap (iLoaderContext* ldr_context,

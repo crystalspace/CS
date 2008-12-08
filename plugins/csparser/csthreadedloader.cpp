@@ -531,7 +531,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if (texturenode)
     {
       csSafeCopyArray<ProxyTexture> proxyTextures;
-      return ParseTextureTC(ret, ldr_context, texturenode, &proxyTextures);
+      return ParseTextureTC(ret, ldr_context, texturenode, &proxyTextures, vfs->GetCwd());
     }
 
     // Mesh Factory
@@ -879,8 +879,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             path = child->GetAttributeValue("path");
             if(path)
             {
-              vfs->PushDir();
-              vfs->ChDir(path);
+              vfs->PushDir(path);
             }
           }
           else
@@ -897,6 +896,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
           if(!LoadLibrary(ldr_context, lib, ssource, missingdata, threadReturns, libs, libIDs, false, do_verbose))
             return false;
+
+          if(path)
+          {
+            vfs->PopDir();
+          }
+
           break;
         }
       case XMLTOKEN_START:
