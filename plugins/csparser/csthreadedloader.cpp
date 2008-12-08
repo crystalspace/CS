@@ -538,7 +538,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iDocumentNode> meshfactnode = node->GetNode("meshfact");
     if(meshfactnode)
     {
-      return FindOrLoadMeshFactoryTC(ret, ldr_context, meshfactnode, 0, 0, ssource, vfs->GetCwd());
+      return FindOrLoadMeshFactoryTC(ret, ldr_context, meshfactnode, 0, 0, ssource, 0);
     }
 
     // Mesh Object
@@ -652,7 +652,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iStreamSource> ssource, const char* path)
   {
     csVfsDirectoryChanger dirchange(vfs);
-    dirchange.ChangeTo(path);
+    if(path)
+    {
+      dirchange.ChangeTo(path);
+    }
 
     const char* meshfactname = meshfactnode->GetAttributeValue("name");
 
