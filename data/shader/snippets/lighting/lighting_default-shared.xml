@@ -21,16 +21,28 @@
   <technique priority="200">
     <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 
+    <!--
+	Weak aliases.
+	"Weak" means they do _not_ override aliases specified above this
+	snippet; instead, the weak alias applies only if an alias with the
+	given has not been specified yet.
+	The practical effect is that this allows to use aliased snippets,
+	but also provide "default" snippets and thus does not require users
+	of this snippets to provide all aliases.
+      -->
+    <alias name="surface" weak="yes" file="/shader/snippets/surface/surface-classic.xml" />
+    <alias name="specular" weak="yes" file="/shader/snippets/surface/specular-weirdold.xml" />
+    
     <!-- Snippets - the building blocks of this shader. -->
     <snippet id="position" file="/shader/snippets/position.xml" />
     <snippet id="parallax" file="/shader/snippets/surface/parallax.xml" />
     <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
-    <snippet id="surface" file="/shader/snippets/surface/surface-classic.xml" />
+    <snippet id="surface" filealias="surface" />
     <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
     <snippet id="apply_alpha" filealias="apply_alpha" />
     <snippet id="lighting" filealias="lighting" />
     <snippet id="ambient" filealias="ambient" />
-    <snippet id="specular" file="/shader/snippets/surface/specular-weirdold.xml" />
+    <snippet id="specular" filealias="specular" />
     <snippet id="apply_lighting" file="/shader/snippets/lighting/apply-lighting.xml" />
     <snippet id="glow" file="/shader/lighting/glow.xml" />
     <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
