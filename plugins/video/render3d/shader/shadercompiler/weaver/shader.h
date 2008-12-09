@@ -81,9 +81,9 @@ protected:
   csRef<iDocument> LoadTechsFromDoc (const csArray<TechniqueKeeper>& techniques,
     const FileAliases& aliases, iDocumentNode* docSource,
     const char* cacheID, const char* cacheTag, iFile* cacheFile,
-    bool& cacheState);
+    csRef<iString>& cachingError);
   csRef<iDocument> LoadTechsFromCache (iFile* cacheFile,
-    const char* cacheFailReason);
+    const char*& cacheFailReason);
   
   csRef<iDocument> DoSynthesis (iDocumentNode* source,
     iHierarchicalCache* cacheTo, int forcepriority);

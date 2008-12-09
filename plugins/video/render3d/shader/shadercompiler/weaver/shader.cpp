@@ -32,6 +32,7 @@
 #include "csutil/documenthelper.h"
 #include "csutil/memfile.h"
 #include "csutil/objreg.h"
+#include "csutil/scfstr.h"
 #include "csutil/parasiticdatabuffer.h"
 #include "csutil/xmltiny.h"
 
@@ -149,9 +150,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 						   iDocumentNode* docSource,
 						   const char* cacheID, 
 						   const char* cacheTag,
-						   iFile* cacheFile, bool& cacheState)
+						   iFile* cacheFile,
+						   csRef<iString>& cachingError)
   {
-    cacheState = true;
     realShader.Invalidate();
     
     csRef<iDocumentSystem> docsys;
@@ -279,12 +280,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       
       csMemFile cachedDocFile;
       if (cacheDoc->Write (&cachedDocFile) != 0)
-	cacheState = false;
+	cachingError.AttachNew (new scfString ("failed to write cache doc"));
       else
       {
 	csRef<iDataBuffer> cachedDocBuf = cachedDocFile.GetAllData ();
-	CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (
-	  cacheFile, cachedDocBuf);
+	if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (
+	  cacheFile, cachedDocBuf))
+	{
+	  cachingError.AttachNew (new scfString ("failed to write cache doc buffer"));
+	}
       }
     }
       
@@ -292,7 +296,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   csRef<iDocument> WeaverShader::LoadTechsFromCache (iFile* cacheFile,
-                                                     const char* cacheFailReason)
+                                                     const char*& cacheFailReason)
   {
     size_t read;
   
@@ -454,18 +458,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	 could do as well. */
       csString cacheTag = CS::Utility::EncodeBase64 (hashStream);
     
-      bool cacheState;
+      csRef<iString> cacheState;
       csMemFile cacheFile;
       synthShader = LoadTechsFromDoc (techniques, aliases, 
 	source, cacheID_base, cacheTag, cacheValid ? &cacheFile : 0,
 	cacheState);
-      if (cacheValid && cacheState)
+      if (cacheValid && !cacheState.IsValid ())
       {
 	csRef<iDataBuffer> allCacheData = cacheFile.GetAllData();
-	shaderCache->CacheData (allCacheData->GetData(),
+	if (!shaderCache->CacheData (allCacheData->GetData(),
 	  allCacheData->GetSize(), 
 	  csString().Format ("/%s/%s",
-            shaderName.GetData(), cacheID_tech.GetData()));
+            shaderName.GetData(), cacheID_tech.GetData())))
+        {
+          cacheState.AttachNew (new scfString ("error writing to cache"));
+        }
+      }
+      if (cacheState.IsValid() && compiler->do_verbose)
+      {
+	compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Could not get cache '%s' because: %s",
+	  shaderName.GetData(), cacheState->GetData());
       }
     }
     CS_ASSERT (synthShader.IsValid());

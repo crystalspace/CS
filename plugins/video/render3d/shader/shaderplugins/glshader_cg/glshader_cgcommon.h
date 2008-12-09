@@ -171,6 +171,8 @@ protected:
     const csShaderVariableStack& stack);
   void ApplyVariableMapArrays (const csShaderVariableStack& stack);
   
+  bool WriteToCacheWorker (iHierarchicalCache* cache, const ProfileLimits& limits,
+    const ProfileLimitsPair& limitsPair, const char* tag, csString& failReason);
   bool WriteToCache (iHierarchicalCache* cache, const ProfileLimits& limits,
     const ProfileLimitsPair& limitsPair, const char* tag);
   
@@ -179,7 +181,7 @@ protected:
   bool LoadObjectCodeFromCompileCache (const ProfileLimits& limits,
     iHierarchicalCache* cache);
   bool WriteToCompileCache (const char* source, const ProfileLimits& limits,
-    iHierarchicalCache* cache);
+    iHierarchicalCache* cache, csString& failReason);
     
   bool GetProgramNode (iDocumentNode* passProgNode);
 public:
