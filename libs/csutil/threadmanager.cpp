@@ -94,7 +94,6 @@ void csThreadManager::Wait(csRef<iThreadReturn> result)
       {
         csRef<iEvent> evt = eventQueue->CreateBroadcastEvent(ProcessWhileWait);
         eventQueue->Dispatch(*evt);
-        csSleep(1);
       }
     }
 
@@ -118,7 +117,15 @@ bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns)
     }
     else
     {
-      threadQueue->PopAndRun();
+      if(IsMainThread())
+      {
+        csRef<iEvent> evt = eventQueue->CreateBroadcastEvent(ProcessWhileWait);
+        eventQueue->Dispatch(*evt);
+      }
+      else
+      {
+        threadQueue->PopAndRun();
+      }
     }
   }
 
