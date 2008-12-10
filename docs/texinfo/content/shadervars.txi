@@ -31,7 +31,7 @@ Height map texture for parallax shading
 Type: Texture
 Specular map.
 
-@item tex tex ambient occlusion
+@item tex ambient occlusion
 Type: Texture
 Ambient occlusion map.
 
