@@ -197,26 +197,47 @@ void csPluginManager::QueryOptions (iComponent *obj)
   }
 }
 
+using namespace CS::Utility;
+using namespace CS::Threading;
 csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
                                                        uint flags)
 {
-  bool isLoading = false;
+  csRef<PluginLoadCondition> loading;
   {
-    CS::Threading::MutexScopedLock lock (loading);
-    isLoading = alreadyLoading.Contains (classID);
+    bool isAlreadyLoading = true;
+    MutexScopedLock lock (loadingLock);
 
-    if(!isLoading)
-      alreadyLoading.AddNoTest (classID);
-  }
+    // Check if this plugin is already loading.
+    loading = alreadyLoading.Get(classID, csRef<PluginLoadCondition>());
 
-  while(isLoading)
-  {
+    // If not...
+    if(!loading.IsValid())
     {
-      CS::Threading::MutexScopedLock lock (loading);
-      isLoading = alreadyLoading.Contains (classID);
+      // If we wish to return any loaded instance of this plugin..
+      if(flags & lpiReturnLoadedInstance)
+      {
+        // Check if this plugin is already loaded and return it if so.
+        csRef<iComponent> comp = csQueryPluginClass<iComponent> (this, classID);
+        if(comp)
+          return csPtr<iComponent>(comp);
+      }
+
+      // Create a new loading condition and mark this plugin as loading.
+      csRef<PluginLoadCondition> cond = csPtr<PluginLoadCondition>(new PluginLoadCondition());
+      loading = alreadyLoading.Put (classID, cond);
+      isAlreadyLoading = false;
     }
-    if(!isLoading && (flags & lpiLoadSingleInstance))
-      return csQueryPluginClass<iComponent> (this, classID);
+
+    // If another thread is currently loading this plugin..
+    if(isAlreadyLoading)
+    {
+      // Wait until it's finished.
+      loading->Wait(loadingLock);
+
+      // If we wish to return any loaded instance of this plugin then do so.
+      if(flags & lpiReturnLoadedInstance)
+        return csQueryPluginClass<iComponent> (this, classID);
+    }
   }
 
   if (do_verbose)
@@ -317,8 +338,9 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
     if ((!(flags & lpiInitialize)) || p->Initialize (object_reg))
     {
       if (flags & lpiInitialize) QueryOptions (p);
-      CS::Threading::MutexScopedLock lock (loading);
-      alreadyLoading.Delete(classID);
+      CS::Threading::MutexScopedLock lock (loadingLock);
+      alreadyLoading.Delete(classID, loading);
+      loading->NotifyAll();
       return csPtr<iComponent> (p);
     }
     // If we added this plugin in this call then we remove it here as well.
@@ -336,8 +358,9 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
     }
   }
 
-  CS::Threading::MutexScopedLock lock (loading);
-  alreadyLoading.Delete(classID);
+  CS::Threading::MutexScopedLock lock (loadingLock);
+  alreadyLoading.Delete(classID, loading);
+  loading->NotifyAll();
   return 0;
 }
 

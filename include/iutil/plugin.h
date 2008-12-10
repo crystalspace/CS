@@ -60,7 +60,7 @@ struct iPluginIterator : public virtual iBase
  */
 struct iPluginManager : public virtual iBase
 {
-  SCF_INTERFACE(iPluginManager, 4, 1, 0);
+  SCF_INTERFACE(iPluginManager, 4, 0, 1);
   
   /**
    * LoadPluginInstance flags.
@@ -74,8 +74,8 @@ struct iPluginManager : public virtual iBase
     lpiReportErrors = 2,
     /// Load dependent plugins
     lpiLoadDependencies = 4,
-    /// Load only a single instance
-    lpiLoadSingleInstance = 8
+    /// Return an existing instance of the plugin if it exists, else create a new one.
+    lpiReturnLoadedInstance = 8
   };
   
   /**
@@ -249,12 +249,12 @@ template<class Interface>
 inline csPtr<Interface> csLoadPlugin (iPluginManager *mgr,
                                       const char* ClassID,
                                       bool report = true,
-                                      bool singleInstance = false)
+                                      bool returnLoadedInstance = false)
 {
   csRef<iComponent> base;
   uint flags = iPluginManager::lpiInitialize | iPluginManager::lpiLoadDependencies;
   if (report) flags |= iPluginManager::lpiReportErrors;
-  if (singleInstance) flags |= iPluginManager::lpiLoadSingleInstance;
+  if (returnLoadedInstance) flags |= iPluginManager::lpiReturnLoadedInstance;
   base = mgr->LoadPluginInstance (ClassID, flags);
   return scfQueryInterfaceSafe<Interface> (base);
 }
