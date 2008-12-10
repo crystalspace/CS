@@ -346,10 +346,6 @@
 typedef void (*csStaticVarCleanupFN) (void (*p)());
 extern csStaticVarCleanupFN csStaticVarCleanup;
 
-#include "csutil/threading/mutex.h"
-
-// The lock here may have init issues which can cause a lockup.
-// A better solution needs to be found to deal with this.
 #ifndef CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION
 #  define CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(Name)              \
 void Name (void (*p)())                                                \
@@ -357,9 +353,6 @@ void Name (void (*p)())                                                \
   static void (**a)() = 0;                                             \
   static int lastEntry = 0;                                            \
   static int maxEntries = 0;                                           \
-  static CS::Threading::Mutex staticVarLock;                           \
-                                                                       \
-  CS::Threading::MutexScopedLock lock(staticVarLock);                  \
                                                                        \
   if (p != 0)                                                          \
   {                                                                    \

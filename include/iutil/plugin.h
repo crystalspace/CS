@@ -91,7 +91,8 @@ struct iPluginManager : public virtual iBase
    * \param loadFlags Load options.
    */
   virtual csPtr<iComponent> LoadPluginInstance (const char *classID,
-                                                uint loadFlags) = 0;
+                                                uint loadFlags,
+                                                bool singleInstance = false) = 0;
   // Deprecated in 1.9
   CS_DEPRECATED_METHOD_MSG("Use LoadPluginInstance()")
   inline iBase* LoadPlugin (const char *classID, bool init = true, bool report = true)
@@ -239,13 +240,13 @@ inline csPtr<Interface> csQueryPluginClass (iPluginManager *mgr,
 template<class Interface>
 inline csPtr<Interface> csLoadPlugin (iPluginManager *mgr,
                                       const char* ClassID,
-				      bool report = true)
+                                      bool report = true,
+                                      bool singleInstance = false)
 {
   csRef<iComponent> base;
-  uint flags =
-    iPluginManager::lpiInitialize | iPluginManager::lpiLoadDependencies;
+  uint flags = iPluginManager::lpiInitialize | iPluginManager::lpiLoadDependencies;
   if (report) flags |= iPluginManager::lpiReportErrors;
-  base = mgr->LoadPluginInstance (ClassID, flags);
+  base = mgr->LoadPluginInstance (ClassID, flags, singleInstance);
   return scfQueryInterfaceSafe<Interface> (base);
 }
 
@@ -258,7 +259,7 @@ inline csPtr<Interface> csLoadPlugin (iPluginManager *mgr,
 template<class Interface>
 inline csPtr<Interface> csLoadPlugin (iObjectRegistry* object_reg,
                                       const char* ClassID,
-				      bool report = true)
+                                      bool report = true)
 {
   csRef<iPluginManager> mgr = csQueryRegistry<iPluginManager> (object_reg);
   if (!mgr) return 0;
@@ -274,12 +275,12 @@ inline csPtr<Interface> csLoadPlugin (iObjectRegistry* object_reg,
  */
 template<class Interface>
 inline csPtr<Interface> csLoadPluginCheck (iPluginManager *mgr,
-                                      const char* ClassID,
-				      bool report = true)
+                                           const char* ClassID,
+                                           bool report = true)
 {
   csRef<Interface> i = csQueryPluginClass<Interface> (mgr, ClassID);
   if (i) return (csPtr<Interface>) i;
-  i = csLoadPlugin<Interface> (mgr, ClassID, report);
+  i = csLoadPlugin<Interface> (mgr, ClassID, report, true);
   if (!i) return 0;
   return (csPtr<Interface>) i;
 }
