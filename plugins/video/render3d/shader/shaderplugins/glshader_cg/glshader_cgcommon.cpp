@@ -1268,12 +1268,14 @@ bool csShaderGLCGCommon::WriteToCompileCache (const char* source,
   cacheArcPath.Format ("/CgProgCache/%s",
     sourceMD5.HexString().GetData());
   
-  csRef<iDataBuffer> cacheArcBuf = rootCache->ReadCache (cacheArcPath);
   CS::PluginCommon::ShaderCacheHelper::MicroArchive cacheArc;
-  if (cacheArcBuf.IsValid())
   {
-    csMemFile cacheArcFile (cacheArcBuf, true);
-    cacheArc.Read (&cacheArcFile);
+    csRef<iDataBuffer> cacheArcBuf = rootCache->ReadCache (cacheArcPath);
+    if (cacheArcBuf.IsValid())
+    {
+      csMemFile cacheArcFile (cacheArcBuf, true);
+      cacheArc.Read (&cacheArcFile);
+    }
   }
   
 #if PROG_CACHE_STORE_SOURCE
