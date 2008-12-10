@@ -80,7 +80,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       rec->Component = csQueryRegistryTag (object_reg, rec->ClassID);
       if (!rec->Component)
       {
-        csRef<iComponent> comp = csLoadPlugin<iComponent> (plugin_mgr,
+        csRef<iComponent> comp = csLoadPluginCheck<iComponent> (plugin_mgr,
           rec->ClassID);
         rec->Component = comp;
       }
