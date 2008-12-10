@@ -35,7 +35,7 @@ Specular map.
 Type: Texture
 Ambient occlusion map.
 
-@item colour modulation
+@item color modulation
 Type: RGB
 Values used to set the colour of a material. The change in colour depends on the existing pixels in the material.
 The lower (darker) the value of the pixel, the less it's affected by the colour change.
