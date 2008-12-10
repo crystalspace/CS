@@ -605,6 +605,7 @@ bool csODEDynamics::HandleEvent (iEvent& Event)
 csODEDynamicSystem::csODEDynamicSystem (iObjectRegistry* object_reg,
     float erp, float cfm) : scfImplementationType (this)
 {
+  dInitODE ();
   //TODO: QUERY for collidesys
 
   worldID = dWorldCreate ();
