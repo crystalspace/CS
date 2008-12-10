@@ -22,6 +22,7 @@
   <alias name="apply_alpha" file="/shader/snippets/surface/alpha-nochange.xml" />
   <alias name="lighting" file="/shader/snippets/lighting/lighting-ppl-shadowmap.xml" />
   <alias name="shadow" file="/shader/snippets/shadow/shadow-depth.xml" />
+  <alias name="surface" file="/shader/snippets/surface/surface-modulate.xml" />
   
   <?if vars."light shadow map" && ((vars."light count".int &gt; 1) || (vars."light shadow map[0]".texture)) ?>
   <technique priority="500" minlights="5">
