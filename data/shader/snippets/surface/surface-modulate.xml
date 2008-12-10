@@ -27,6 +27,10 @@
         <input name="inputColor" type="rgba" />
 
         <input name="colour_modulation" type="rgb" default="complex">
+          <block location="shadervars">
+             <shadervar name="colour modulation" type="vector3">1,1,1</shadervar>
+          </block>
+
           <block location="cg:variablemap">
 	      <variablemap variable="colour modulation" destination="fragmentIn.colour_modulation" />
           </block>
@@ -41,12 +45,8 @@
         </input>
     
         <block location="cg:fragmentMain">
-        <?if vars."colour modulation"?>
           outputColor.rgb = inputColor.rgb * colour_modulation.rgb;
           outputColor.a = inputColor.a;
-        <?else?>
-          outputColor.rgba = inputColor.rgba;
-        <?endif?>
         </block>
 
         <output name="outputColor" type="rgba" />
