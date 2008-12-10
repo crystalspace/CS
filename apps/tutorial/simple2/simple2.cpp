@@ -83,7 +83,7 @@ void Simple::Frame ()
   // rotation matrix.  The rotations are applied in right to left
   // order .
   csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
-  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
+  csOrthoTransform ot (rot, c->GetTransform ().GetOrigin ());
   c->SetTransform (ot);
 
   // Tell 3D driver we're going to display 3D things.
