@@ -107,11 +107,13 @@ struct iPluginManager : public virtual iBase
   }
 
   /**
-   * Get first of the loaded plugins that supports given interface ID.
-   * Warning! Usage of this function is usually not safe since multiple
+   * Get one of the loaded plugins that supports given interface ID.
+   * \warning Usage of this function is usually not safe since multiple
    * plugins can implement the same interface and there is no way to know
-   * which one is the correct one. It is better to use the object registry
-   * to find about single loaded components.
+   * which one is the correct one.  This method will return a random plugin
+   * providing the given interface.
+   * It is usually better to use the object registry to obtain components
+   * with a certain interface.
    */
   virtual csPtr<iComponent> QueryPluginInstance (const char *iInterface,
                                                  int iVersion) = 0;
@@ -125,7 +127,12 @@ struct iPluginManager : public virtual iBase
   }
   
   //@{
-  /// Find a plugin given its class ID.
+  /**
+   * Find a plugin given its class ID.
+   * \warning It is valid to load multiple plugin instances for the same
+   * plugin class IDs. If this is the case, querying for an instance of a
+   * plugin class ID will return a random loaded plugin instance.
+   */
   virtual csPtr<iComponent> QueryPluginInstance (const char* classID) = 0;
   virtual csPtr<iComponent> QueryPluginInstance (const char* classID,
   	const char *iInterface, int iVersion) = 0;
@@ -140,7 +147,7 @@ struct iPluginManager : public virtual iBase
     return (iBase*)comp;
   }
   
-  /// Remove a plugin from system driver's plugin list.
+  /// Remove a plugin from the plugin manager's plugin list.
   virtual bool UnloadPluginInstance (iComponent *obj) = 0;
   // Deprecated in 1.9
   CS_DEPRECATED_METHOD_MSG("Use UnloadPluginInstance()")
