@@ -60,7 +60,7 @@ struct iPluginIterator : public virtual iBase
  */
 struct iPluginManager : public virtual iBase
 {
-  SCF_INTERFACE(iPluginManager, 4, 0, 1);
+  SCF_INTERFACE(iPluginManager, 4, 1, 0);
   
   /**
    * LoadPluginInstance flags.
@@ -73,7 +73,9 @@ struct iPluginManager : public virtual iBase
     /// Report loading errors
     lpiReportErrors = 2,
     /// Load dependent plugins
-    lpiLoadDependencies = 4
+    lpiLoadDependencies = 4,
+    /// Load only a single instance
+    lpiLoadSingleInstance = 8
   };
   
   /**
@@ -91,8 +93,7 @@ struct iPluginManager : public virtual iBase
    * \param loadFlags Load options.
    */
   virtual csPtr<iComponent> LoadPluginInstance (const char *classID,
-                                                uint loadFlags,
-                                                bool singleInstance = false) = 0;
+                                                uint loadFlags) = 0;
   // Deprecated in 1.9
   CS_DEPRECATED_METHOD_MSG("Use LoadPluginInstance()")
   inline iBase* LoadPlugin (const char *classID, bool init = true, bool report = true)
@@ -246,7 +247,8 @@ inline csPtr<Interface> csLoadPlugin (iPluginManager *mgr,
   csRef<iComponent> base;
   uint flags = iPluginManager::lpiInitialize | iPluginManager::lpiLoadDependencies;
   if (report) flags |= iPluginManager::lpiReportErrors;
-  base = mgr->LoadPluginInstance (ClassID, flags, singleInstance);
+  if (singleInstance) flags |= iPluginManager::lpiLoadSingleInstance;
+  base = mgr->LoadPluginInstance (ClassID, flags);
   return scfQueryInterfaceSafe<Interface> (base);
 }
 

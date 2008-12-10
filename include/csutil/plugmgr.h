@@ -157,8 +157,7 @@ public:
   /// Destruct.
   virtual ~csPluginManager ();
 
-  virtual csPtr<iComponent> LoadPluginInstance (const char* iClassID, uint flags,
-    bool singleInstance = false);
+  virtual csPtr<iComponent> LoadPluginInstance (const char* iClassID, uint flags);
 
   virtual csPtr<iComponent> QueryPluginInstance (const char *iInterface, int iVersion);
   csPtr<iComponent> QueryPluginInstance (const char* classID);

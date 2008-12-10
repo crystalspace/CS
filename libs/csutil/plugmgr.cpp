@@ -198,7 +198,7 @@ void csPluginManager::QueryOptions (iComponent *obj)
 }
 
 csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
-                                                       uint flags, bool singleInstance)
+                                                       uint flags)
 {
   bool isLoading = false;
   {
@@ -215,7 +215,7 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
       CS::Threading::MutexScopedLock lock (loading);
       isLoading = alreadyLoading.Contains (classID);
     }
-    if(!isLoading && singleInstance)
+    if(!isLoading && (flags & lpiLoadSingleInstance))
       return csQueryPluginClass<iComponent> (this, classID);
   }
 
