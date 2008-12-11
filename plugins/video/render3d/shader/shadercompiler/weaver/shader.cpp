@@ -367,13 +367,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (useShaderCache)
     {
       useShaderCache = false;
+      csString cacheFileName;
+      cacheFileName.Format ("/%s/%s",
+	shaderName.GetData(), cacheID_header.GetData());
       csRef<iFile> cacheFile;
-      csRef<iDataBuffer> cacheData;
-      cacheData = shaderCache->ReadCache (csString().Format ("/%s/%s",
-	shaderName.GetData(), cacheID_header.GetData()));
-      if (cacheData.IsValid())
       {
-	cacheFile.AttachNew (new csMemFile (cacheData, true));
+	csRef<iDataBuffer> cacheData;
+	cacheData = shaderCache->ReadCache (cacheFileName);
+	if (cacheData.IsValid())
+	{
+	  cacheFile.AttachNew (new csMemFile (cacheData, true));
+	}
       }
       if (cacheFile.IsValid())
       {
@@ -424,27 +428,33 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  cacheFile, hashStream))
 	{
 	  csRef<iDataBuffer> allCacheData = cacheFile->GetAllData();
-	  shaderCache->CacheData (allCacheData->GetData(),
-	    allCacheData->GetSize(), 
-	    csString().Format ("/%s/%s",
-              shaderName.GetData(), cacheID_header.GetData()));
+	  if (!shaderCache->CacheData (allCacheData->GetData(),
+	      allCacheData->GetSize(), cacheFileName)
+	    && compiler->do_verbose)
+	  {
+	    compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	      "Could not cache header data for '%s'",
+	      shaderName.GetData());
+	  }
 	}
       }
     }
     
     csRef<iDocument> synthShader;
-    csRef<iDataBuffer> cacheData;
-    if (useShaderCache)
-      cacheData = shaderCache->ReadCache (csString().Format ("/%s/%s",
-        shaderName.GetData(), cacheID_tech.GetData()));
-    if (cacheData.IsValid())
     {
-      csMemFile cacheFile (cacheData, true);
-      const char* techCacheFailReason = 0;
-      synthShader = LoadTechsFromCache (&cacheFile, techCacheFailReason);
-      if (techCacheFailReason != 0)
-        cacheFailReason.Format ("Could not get cached techniques: %s",
-          techCacheFailReason);
+      csRef<iDataBuffer> cacheData;
+      if (useShaderCache)
+	cacheData = shaderCache->ReadCache (csString().Format ("/%s/%s",
+	  shaderName.GetData(), cacheID_tech.GetData()));
+      if (cacheData.IsValid())
+      {
+	csMemFile cacheFile (cacheData, true);
+	const char* techCacheFailReason = 0;
+	synthShader = LoadTechsFromCache (&cacheFile, techCacheFailReason);
+	if (techCacheFailReason != 0)
+	  cacheFailReason.Format ("Could not get cached techniques: %s",
+	    techCacheFailReason);
+      }
     }
     
     if (!synthShader.IsValid())
@@ -477,7 +487,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       if (cacheState.IsValid() && compiler->do_verbose)
       {
 	compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "Could not get cache '%s' because: %s",
+	  "Could not cache '%s' because: %s",
 	  shaderName.GetData(), cacheState->GetData());
       }
     }
