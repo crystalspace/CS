@@ -18,10 +18,6 @@
 
 // Implementation specific to the pure Python "core" module (coremod).
 
-#if !defined(DEBUG_PYTHON) && defined(_DEBUG)
-#undef _DEBUG
-#endif
-
 #include "cssysdef.h"
 
 CS_IMPLEMENT_FOREIGN_DLL

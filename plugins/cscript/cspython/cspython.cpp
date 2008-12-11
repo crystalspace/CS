@@ -17,10 +17,19 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#if !defined(DEBUG_PYTHON) && defined(_DEBUG)
+#ifdef _MSC_VER
+#include <io.h>
+#include <stdarg.h>
+#ifndef DEBUG_PYTHON
 #undef _DEBUG
+#define RESTORE__DEBUG
 #endif
-
+#endif
+#include <Python.h>
+#ifdef RESTORE__DEBUG
+#define _DEBUG
+#undef RESTORE__DEBUG
+#endif
 
 #include <stdio.h>
 
@@ -46,7 +55,15 @@
 
 extern "C"
 {
+#if defined(CS_COMPILER_MSVC)
+  // MSVC will always use the shipped copy.
   #include "swigpyruntime.h"
+#else
+  /* *Must* be pointy include. The right file (generated when swig is present,
+     shipped copy otherwise) is determined by include paths specified via
+     the compiler command line. */
+  #include <swigpyruntime.h>
+#endif
 }
 
 CS_IMPLEMENT_PLUGIN
