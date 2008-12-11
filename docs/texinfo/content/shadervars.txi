@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Default Lighting Shader Variables, Working with Engine Content, Internals, Using Crystal Space, Top
+@node Default Lighting Shader Variables, , , 
 @subsubsection Default Lighting Shader Variables
 @cindex Default Lighting Shader Variables
 

@@ -1572,6 +1572,7 @@ class iPluginManager(iBase):
     lpiInitialize = _core.iPluginManager_lpiInitialize
     lpiReportErrors = _core.iPluginManager_lpiReportErrors
     lpiLoadDependencies = _core.iPluginManager_lpiLoadDependencies
+    lpiReturnLoadedInstance = _core.iPluginManager_lpiReturnLoadedInstance
     def LoadPluginInstance(*args): return _core.iPluginManager_LoadPluginInstance(*args)
     def LoadPluginAlways(*args): return _core.iPluginManager_LoadPluginAlways(*args)
     def QueryPluginInstance(*args): return _core.iPluginManager_QueryPluginInstance(*args)

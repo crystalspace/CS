@@ -3125,6 +3125,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *lpiInitialize = *cspacec::iPluginManager_lpiInitialize;
 *lpiReportErrors = *cspacec::iPluginManager_lpiReportErrors;
 *lpiLoadDependencies = *cspacec::iPluginManager_lpiLoadDependencies;
+*lpiReturnLoadedInstance = *cspacec::iPluginManager_lpiReturnLoadedInstance;
 *LoadPluginInstance = *cspacec::iPluginManager_LoadPluginInstance;
 *LoadPluginAlways = *cspacec::iPluginManager_LoadPluginAlways;
 *QueryPluginInstance = *cspacec::iPluginManager_QueryPluginInstance;
