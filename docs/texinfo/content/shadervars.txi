@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Default Lighting Shader Variables, , , 
+@node Default Lighting Shader Variables, Blender, Simple Map Example, Working with Engine Content
 @section Default Lighting Shader Variables
 @cindex Default Lighting Shader Variables
 
