@@ -324,6 +324,12 @@ public:
   { return CS_VATTRIB_INVALID; }
 
   virtual void GetUsedShaderVars (csBitArray& bits) const;
+
+  /* Does not really load from cache, just pretends to - in reality, calls
+     Load() */
+  virtual iShaderProgram::CacheLoadResult LoadFromCache (
+    iHierarchicalCache* cache, iBase* previous, iDocumentNode* programNode,
+    csRef<iString>* failReason = 0, csRef<iString>* = 0);
 };
 
 /** @} */
