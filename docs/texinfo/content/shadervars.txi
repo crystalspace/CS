@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node Default Lighting Shader Variables, , , 
-@subsubsection Default Lighting Shader Variables
+@section Default Lighting Shader Variables
 @cindex Default Lighting Shader Variables
 
 @cindex Shader variables
