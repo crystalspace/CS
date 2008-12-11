@@ -579,7 +579,7 @@ void csShaderGLCGCommon::WriteAdditionalDumpInfo (const char* description,
 /* Magic value for cg program files.
  * The most significant byte serves as a "version", increase when the
  * cache file format changes. */
-static const uint32 cacheFileMagic = 0x05706763;
+static const uint32 cacheFileMagic = 0x06706763;
 
 enum
 {
@@ -643,34 +643,6 @@ bool csShaderGLCGCommon::WriteToCacheWorker (iHierarchicalCache* cache,
     }
     
     CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile, description);
-    
-    csRef<iDocumentSystem> docsys = shaderPlug->binDocSys;
-    if (!docsys.IsValid()) docsys = shaderPlug->xmlDocSys;
-    csRef<iDocument> doc = docsys->CreateDocument();
-    csRef<iDocumentNode> root = doc->CreateRoot();
-    for (size_t i = 0; i < cacheKeepNodes.GetSize(); i++)
-    {
-      csRef<iDocumentNode> newNode = root->CreateNodeBefore (
-	cacheKeepNodes[i]->GetType());
-      CS::DocSystem::CloneNode (cacheKeepNodes[i], newNode);
-    }
-    
-    {
-      csMemFile docFile;
-      const char* err = doc->Write (&docFile);
-      if (err != 0)
-      {
-	failReason.Format ("error creting document: %s", err);
-	return false;
-      }
-      csRef<iDataBuffer> docBuf = docFile.GetAllData (false);
-      if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (&cacheFile,
-	  docBuf))
-      {
-	failReason = "write error (document buffer)";
-	return false;
-      }
-    }
     
     if (objectCodeCachePathArc.IsEmpty() || objectCodeCachePathItem.IsEmpty())
     {
@@ -818,6 +790,12 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
       : shaderPlug->currentLimits.fp);
   bool strictMatch = (programType == progVP) ? shaderPlug->strictMatchVP 
       : shaderPlug->strictMatchFP;
+  const char* progTypeNode = 0;
+  switch (programType)
+  {
+    case progVP: progTypeNode = "cgvp"; break;
+    case progFP: progTypeNode = "cgfp"; break;
+  }
   
   csString allReasons;
   bool oneReadCorrectly = false;
@@ -877,40 +855,10 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
     
     description = CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
     
-    csRef<iDataBuffer> docBuf =
-      CS::PluginCommon::ShaderCacheHelper::ReadDataBuffer (cacheFile);
-    if (!docBuf.IsValid()) continue;
-    
-    csRef<iDocument> doc;
-    if (shaderPlug->binDocSys.IsValid())
-    {
-      doc = shaderPlug->binDocSys->CreateDocument ();
-      const char* err = doc->Parse (docBuf);
-      if (err != 0)
-      {
-	csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
-	  "crystalspace.graphics3d.shader.glcg",
-	  "Error reading document: %s", err);
-      }
-    }
-    if (!doc.IsValid() && shaderPlug->xmlDocSys.IsValid())
-    {
-      doc = shaderPlug->xmlDocSys->CreateDocument ();
-      const char* err = doc->Parse (docBuf);
-      if (err != 0)
-      {
-	csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
-	  "crystalspace.graphics3d.shader.glcg",
-	  "Error reading document: %s", err);
-      }
-    }
-    if (!doc.IsValid()) continue;
-    
-    csRef<iDocumentNode> root = doc->GetRoot();
-    if (!root.IsValid()) continue;
-    
     bool breakFail = false;
-    csRef<iDocumentNodeIterator> nodes = root->GetNodes();
+    csRef<iDocumentNode> cgNode = node->GetNode (progTypeNode);
+    if (!cgNode.IsValid()) continue;
+    csRef<iDocumentNodeIterator> nodes = cgNode->GetNodes();
     while(nodes->HasNext() && !breakFail)
     {
       csRef<iDocumentNode> child = nodes->Next();
@@ -928,7 +876,9 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
 	    breakFail = true;
 	  break;
 	default:
-	  breakFail = true;
+	  /* Ignore unknown nodes. Invalid nodes would have been caught
+	     by the first (not from cache) parsing */
+	  break;
       }
     }
     if (breakFail) continue;
