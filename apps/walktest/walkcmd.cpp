@@ -2118,27 +2118,23 @@ bool CommandHandler (const char *cmd, const char *arg)
       csRef<iAnimatedMesh> animesh = scfQueryInterface<iAnimatedMesh> (sprite->GetMeshObject ());
       iSkeletonAnimNode2* root = animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
       csRef<iSkeletonAnimNode2> anim;
-      csRef<iSkeletonFSMNode2> fsm = scfQueryInterface<iSkeletonFSMNode2> (root);
+       
+      if (root)
+      {
+        anim = root->FindNode("standard");
+
+        csRef<iSkeletonFSMNode2> fsm = scfQueryInterfaceSafe<iSkeletonFSMNode2> (anim);
         if (fsm)
         {
+          csRef<iSkeletonFSMNodeFactory2> fsmfact = scfQueryInterface<iSkeletonFSMNodeFactory2>(anim->GetFactory());
+          CS::Animation::StateID wanted_state = fsmfact->FindState("walk");
+          if (wanted_state != CS::Animation::InvalidStateID)            
+            fsm->SwitchToState(wanted_state);
+
           root->Play();
-          csRef<iSkeletonFSMNodeFactory2> fsmfact = scfQueryInterface<iSkeletonFSMNodeFactory2>(root->GetFactory());
-          CS::Animation::StateID wanted_state = fsmfact->FindState("Frankie_Walk");
-          if (wanted_state != CS::Animation::InvalidStateID)
-            if (wanted_state != fsm->GetCurrentState())
-              fsm->SwitchToState(wanted_state);
+          anim->Play();
         }
-        else
-        {
-          anim = root->FindNode("Frankie_Walk");
-	  if (anim && !anim->IsActive())
-	  {
-            root->Stop();
-            csRef<iSkeletonAnimationNodeFactory2> animfact = scfQueryInterface<iSkeletonAnimationNodeFactory2>(anim->GetFactory());
-            animfact->SetCyclic(true);
-            anim->Play();
-	  }
-        }
+      }    
     }
   }
   else if (!csStrCaseCmp (cmd, "addmbot"))
