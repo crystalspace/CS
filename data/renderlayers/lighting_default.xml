@@ -1,4 +1,7 @@
 <layerconfig>
+      <layer>
+            <defaultshader name="z_only" file="/shader/early_z/z_only.xml" />
+      </layer>
 	<layer>
 		<defaultshader name="lighting_default" file="/shader/lighting/lighting_default.xml" />
 		<!-- Tells the shader ambient should be taken into account -
