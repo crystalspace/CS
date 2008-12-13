@@ -985,13 +985,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         if (lightCount < tech.minLights) continue;
 
         csRef<iHierarchicalCache> techCache;
-        if (shaderCache)
-        {
-          techCache = shaderCache->GetRootedCache (
-            csString().Format ("/%s/%zu/%zu", cacheScope_tech.GetData(), tvi, t));
-        }
         if (tech.resolver == 0)
         {
+          if (shaderCache.IsValid())
+          {
+            techCache = shaderCache->GetRootedCache (
+              csString().Format ("/%s/%zu/%zu", cacheScope_tech.GetData(), tvi, t));
+          }
+
           bool cachedValid = false;
           if (techCache.IsValid())
           {
@@ -1016,16 +1017,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
           ShaderVariant& var = tech.variants.GetExtend (vi);
           ticket = ((vi*techVar.techniques.GetSize() + t) * (tvc+1) + (tvi+1));
 
-	  csRef<iHierarchicalCache> varCache;
+          csRef<iHierarchicalCache> varCache;
           if (!var.prepared)
           {
-	    if (techCache)
-	    {
-	      varCache.AttachNew (
-		new CS::PluginCommon::ShaderCacheHelper::MicroArchiveCache (
-		techCache, csString().Format ("/%zu", vi)));
-	    }
-  
+            if (!techCache.IsValid() && shaderCache.IsValid())
+            {
+              techCache = shaderCache->GetRootedCache (
+                csString().Format ("/%s/%zu/%zu", cacheScope_tech.GetData(), tvi, t));
+            }
+
+            if (techCache.IsValid())
+            {
+              varCache.AttachNew (
+                new CS::PluginCommon::ShaderCacheHelper::MicroArchiveCache (
+                techCache, csString().Format ("/%zu", vi)));
+            }
+
             if (compiler->doDumpXML)
             {
               csRef<iDocumentSystem> docsys;
