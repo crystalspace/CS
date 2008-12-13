@@ -242,23 +242,23 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
 
   if (do_verbose)
     /* LoadPluginInstance() may be called recursively and the lock
-     * actually held here */
+    * actually held here */
     ReportInLock (CS_REPORTER_SEVERITY_NOTIFY,
-      "verbose",
-      "loading plugin instance for %s", classID);
-  
+    "verbose",
+    "loading plugin instance for %s", classID);
+
   csRef<iComponent> p (scfCreateInstance<iComponent> (classID));
 
   if (!p)
   {
     if (flags & lpiReportErrors)
       Report (CS_REPORTER_SEVERITY_WARNING,
-        "loadplugin",
-        "could not load plugin '%s'", classID);
+      "loadplugin",
+      "could not load plugin '%s'", classID);
   }
   else
   {
-    CS::Threading::RecursiveMutexScopedLock lock (mutex);
+    mutex.Lock();
     // See if the plugin is already in our plugin list.
     csPlugin* pl = FindPluginByClassID (classID);
     size_t index = pl ? Plugins.GetIndex (pl) : csArrayItemNotFound;
@@ -273,71 +273,72 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
     {
       // Grab dependencies of plugin to load.
       const char *dep = iSCF::SCF->GetClassDependencies (classID);
-      
+
       csStringFast<128> tmp;
       // For each dependency:
       while (dep && *dep)
       {
-	const char *comma = strchr (dep, ',');
-	if (!comma)
-	  comma = strchr (dep, 0);
-	size_t sl = comma - dep;
-	tmp.Replace (dep, sl);
-	
-	dep = comma;
-	while (*dep == ',' || *dep == ' ' || *dep == '\t')
-	  dep++;
-  
-	tmp.Trim();
-	if (tmp.IsEmpty())
-	  continue;
-	  
-	if (do_verbose)
-	  ReportInLock (CS_REPORTER_SEVERITY_NOTIFY,
-	    "verbose",
-	    "found dependency on %s", tmp.GetData());
-      
-	// Check if tags are associated with class IDs.
-	csStringArray tags (GetClassIDTagsLocal (tmp));
-	if (tags.GetSize() > 0)
-	{
-	  // If tags are associated check if object reg has something registered
-	  //  with the(se) tag(s).
-	  for (size_t t = 0; t < tags.GetSize(); t++)
-	  {
-	    if (do_verbose)
-	      ReportInLock (CS_REPORTER_SEVERITY_NOTIFY,
-		"verbose",
-		"  found tag for dependency: %s", tags[t]);
-	    csRef<iBase> b = csPtr<iBase> (object_reg->Get (tags[t]));
-	    if (b == 0)
-	    {
-	      const char* classForTag =
-		GetTagClassIDMapping (tags[t]); // tmp might be wildcard
-	      csPlugin* pl = FindPluginByClassID (classForTag);
-	      if (pl != 0) continue; // Plugin is currently being loaded
-	      csRef<iComponent> p = LoadPluginInstance (classForTag, flags);
-	      if (p.IsValid())
-	      {
-		object_reg->Register (p, tags[t]);
-	      }
-	      else
-	      {
-	        /* Ignore load error (like csPluginLoader did) */
-	      }
-	    }
-	  }
-	}
-	else
-	{
-	  /* If no tags, ignore dependency (like csPluginLoader did) */
-	}
+        const char *comma = strchr (dep, ',');
+        if (!comma)
+          comma = strchr (dep, 0);
+        size_t sl = comma - dep;
+        tmp.Replace (dep, sl);
+
+        dep = comma;
+        while (*dep == ',' || *dep == ' ' || *dep == '\t')
+          dep++;
+
+        tmp.Trim();
+        if (tmp.IsEmpty())
+          continue;
+
+        if (do_verbose)
+          ReportInLock (CS_REPORTER_SEVERITY_NOTIFY,
+          "verbose",
+          "found dependency on %s", tmp.GetData());
+
+        // Check if tags are associated with class IDs.
+        csStringArray tags (GetClassIDTagsLocal (tmp));
+        if (tags.GetSize() > 0)
+        {
+          // If tags are associated check if object reg has something registered
+          //  with the(se) tag(s).
+          for (size_t t = 0; t < tags.GetSize(); t++)
+          {
+            if (do_verbose)
+              ReportInLock (CS_REPORTER_SEVERITY_NOTIFY,
+              "verbose",
+              "  found tag for dependency: %s", tags[t]);
+            csRef<iBase> b = csPtr<iBase> (object_reg->Get (tags[t]));
+            if (b == 0)
+            {
+              const char* classForTag =
+                GetTagClassIDMapping (tags[t]); // tmp might be wildcard
+              csPlugin* pl = FindPluginByClassID (classForTag);
+              if (pl != 0) continue; // Plugin is currently being loaded
+              csRef<iComponent> p = LoadPluginInstance (classForTag, flags);
+              if (p.IsValid())
+              {
+                object_reg->Register (p, tags[t]);
+              }
+              else
+              {
+                /* Ignore load error (like csPluginLoader did) */
+              }
+            }
+          }
+        }
+        else
+        {
+          /* If no tags, ignore dependency (like csPluginLoader did) */
+        }
       }
     }
-  
+
     if ((!(flags & lpiInitialize)) || p->Initialize (object_reg))
     {
       if (flags & lpiInitialize) QueryOptions (p);
+      mutex.Unlock();
       CS::Threading::MutexScopedLock lock (loadingLock);
       alreadyLoading.Delete(classID, loading);
       loading->NotifyAll();
@@ -347,14 +348,12 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
     if (index != csArrayItemNotFound)
       Plugins.DeleteIndex (index);
 
+    mutex.Unlock();
     if (flags & lpiReportErrors)
     {
-      mutex.Unlock(); // Lock is not needed here any more ...
       Report (CS_REPORTER_SEVERITY_WARNING,
         "loadplugin",
         "failed to initialize plugin '%s'", classID);
-      // ... but must be retaken to make 'lock' destruction work
-      mutex.Lock();
     }
   }
 
