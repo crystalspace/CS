@@ -1016,16 +1016,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
           ShaderVariant& var = tech.variants.GetExtend (vi);
           ticket = ((vi*techVar.techniques.GetSize() + t) * (tvc+1) + (tvi+1));
 
-          csRef<iHierarchicalCache> varCache;
-          if (techCache)
-          {
-            varCache.AttachNew (
-              new CS::PluginCommon::ShaderCacheHelper::MicroArchiveCache (
-              techCache, csString().Format ("/%zu", vi)));
-          }
-
+	  csRef<iHierarchicalCache> varCache;
           if (!var.prepared)
           {
+	    if (techCache)
+	    {
+	      varCache.AttachNew (
+		new CS::PluginCommon::ShaderCacheHelper::MicroArchiveCache (
+		techCache, csString().Format ("/%zu", vi)));
+	    }
+  
             if (compiler->doDumpXML)
             {
               csRef<iDocumentSystem> docsys;
