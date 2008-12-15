@@ -158,6 +158,8 @@ namespace lighter
 
   void SimpleUVFactoryLayouter::PrepareLighting (Statistics::Progress& progress)
   {
+    CS_ASSERT_MSG("You can only prepare a UV layouter once", !prepared);
+    prepared = true;
     progress.SetProgress (0);
 
     Statistics::Progress progressPDLQueues (0, 90, &progress);
