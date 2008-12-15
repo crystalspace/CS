@@ -616,7 +616,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
           compiler->vfs->WriteFile (filename, tree.GetData(), tree.Length ());
         }
       }
-      else
+      if (!readFromCache)
       {
         // Make sure resolver is pristine
         delete techsResolver;
