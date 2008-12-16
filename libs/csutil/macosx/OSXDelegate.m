@@ -144,9 +144,9 @@ enum
 // Remark: this functionality still works on 10.5, but as it is no longer
 // part of the public interface, it could disappear without notice.
 //------------------------------------------------------------------------------
-//@interface NSApplication(MissingFunction)
-//- (void)setAppleMenu:(NSMenu *)menu;
-//@end
+@interface NSApplication(MissingFunction)
+- (void)setAppleMenu:(NSMenu *)menu;
+@end
 
 @interface OSXApplication : NSApplication
 - (void)sendEvent:(NSEvent*)e;
