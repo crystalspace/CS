@@ -39,7 +39,6 @@
 #include "csutil/scfarray.h"
 #include "csutil/weakref.h"
 #include "iengine/light.h"
-#include "iengine/lightmgr.h"
 #include "imesh/genmesh.h"
 #include "imesh/object.h"
 #include "iutil/comp.h"
