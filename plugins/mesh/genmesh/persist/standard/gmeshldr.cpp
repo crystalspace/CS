@@ -985,18 +985,6 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
         ->SetValue("back2front");
 
-    //Writedown Lighting tag
-    synldr->WriteBool(paramsNode, "lighting", gfact->IsLighting(), true);
-
-    //Writedown NoShadows tag
-    if (!gfact->IsShadowCasting())
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("noshadows");
-
-    //Writedown LocalShadows tag
-    if (gfact->IsShadowReceiving())
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
-        ->SetValue("localshadows");
-
     //Writedown ManualColor tag
     synldr->WriteBool(paramsNode, "manualcolors", gfact->IsManualColors(), false);
 
@@ -1435,18 +1423,6 @@ bool csGeneralMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
         factNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(factname);
       }    
     }
-
-    //Writedown Lighting tag
-    synldr->WriteBool(paramsNode, "lighting", gmesh->IsLighting(), true);
-
-    //Writedown NoShadows tag
-    if (!gmesh->IsShadowCasting())
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("noshadows");
-
-    //Writedown LocalShadows tag
-    if (gmesh->IsShadowReceiving())
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
-        ->SetValue("localshadows");
 
     //Writedown Color tag
     csColor col;

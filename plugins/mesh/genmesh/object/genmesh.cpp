@@ -79,8 +79,7 @@ CS_LEAKGUARD_IMPLEMENT (csGenmeshMeshObject::RenderBufferAccessor);
 CS_LEAKGUARD_IMPLEMENT (csGenmeshMeshObjectFactory::RenderBufferAccessor);
 
 csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
-        scfImplementationType (this), factorySubMeshesChangeNum (~0),
-	pseudoDynInfo (29, 32)
+        scfImplementationType (this), factorySubMeshesChangeNum (~0)
 {
   shaderVariableAccessor.AttachNew (new ShaderVariableAccessor (this));
   renderBufferAccessor.AttachNew (new RenderBufferAccessor (this));
@@ -91,21 +90,14 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
   cur_movablenr = -1;
   //material = 0;
   //MixMode = 0;
-  do_lighting = true;
   do_manual_colors = false;
   base_color.red = 0;
   base_color.green = 0;
   base_color.blue = 0;
   current_lod = 1;
   current_features = 0;
-  do_shadows = true;
-  do_shadow_rec = false;
-  lighting_dirty = true;
-  shadow_caps = false;
   factory_user_rb_state = 0;
   mesh_user_rb_dirty_flag = false;
-
-  dynamic_ambient_version = 0;
 
   anim_ctrl_verts = false;
   anim_ctrl_texels = false;
@@ -125,7 +117,6 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
 
 csGenmeshMeshObject::~csGenmeshMeshObject ()
 {
-  ClearPseudoDynLights ();
 }
 
 const csVector3* csGenmeshMeshObject::AnimControlGetVertices ()
@@ -210,27 +201,6 @@ void csGenmeshMeshObject::UpdateSubMeshProxies () const
       subMeshes = newSubMeshes;
     }
     factorySubMeshesChangeNum = sm.GetChangeNum();
-  }
-}
-
-void csGenmeshMeshObject::ClearPseudoDynLights ()
-{
-  csHash<csShadowArray*, csPtrKey<iLight> >::GlobalIterator it (
-    pseudoDynInfo.GetIterator ());
-  while (it.HasNext ())
-  {
-    csShadowArray* arr = it.Next ();
-    delete arr;
-  }
-}
-
-void csGenmeshMeshObject::CheckLitColors ()
-{
-  if (do_manual_colors) return;
-  if (factory->GetVertexCount () != legacyLighting.num_lit_mesh_colors)
-  {
-    ClearPseudoDynLights ();
-    legacyLighting.SetColorNum (factory->GetVertexCount ());
   }
 }
 
@@ -351,7 +321,6 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
 	iMovable* movable, uint32 frustum_mask)
 {
   SetupObject ();
-  CheckLitColors ();
 
   n = 0;
 
@@ -360,18 +329,6 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   int clip_portal, clip_plane, clip_z_plane;
   CS::RenderViewClipper::CalculateClipSettings (rview->GetRenderContext (),
       frustum_mask, clip_portal, clip_plane, clip_z_plane);
-
-  lighting_movable = movable;
-
-  if (!do_manual_colors && !do_shadow_rec && factory->light_mgr)
-  {
-    // Remember relevant lights for later.
-    scfArrayWrap<iLightInfluenceArray, csSafeCopyArray<csLightInfluence> > 
-      relevantLightsWrap (relevant_lights); //Yes, know, its on the stack...
-
-    relevant_lights.DeleteAll();
-    factory->light_mgr->GetRelevantLights (logparent, &relevantLightsWrap, -1);
-  }
 
   if (anim_ctrl2)
     anim_ctrl2->Update (vc->GetCurrentTicks (), factory->GetVertexCount(), 
@@ -646,10 +603,6 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
 
   if (buffer == CS_BUFFER_COLOR)
   {
-    if (!do_manual_colors)
-    {
-      //UpdateLighting (relevant_lights, lighting_movable);
-    }
     if (mesh_colors_dirty_flag || anim_ctrl_colors)
     {
       if (!do_manual_colors)
@@ -662,8 +615,7 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
           //  the existing buffer.
           legacyLighting.color_buffer = csRenderBuffer::CreateRenderBuffer (
               legacyLighting.num_lit_mesh_colors, 
-              do_lighting ? CS_BUF_DYNAMIC : CS_BUF_STATIC,
-              CS_BUFCOMP_FLOAT, 4);
+              CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 4);
         }
         mesh_colors_dirty_flag = false;
         const csColor4* mesh_colors = 0;
