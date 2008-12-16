@@ -756,7 +756,6 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
   object_bbox_valid = false;
 
   //material = 0;
-  light_mgr = csQueryRegistry<iLightManager> (object_reg);
   back2front = false;
   back2front_tree = 0;
 

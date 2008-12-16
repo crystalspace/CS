@@ -467,7 +467,6 @@ public:
   iObjectRegistry* object_reg;
   iMeshFactoryWrapper* logparent;
   csRef<csGenmeshMeshObjectType> genmesh_type;
-  csRef<iLightManager> light_mgr;
   csFlags flags;
 
   iEngine* engine;
