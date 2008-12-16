@@ -13,6 +13,8 @@
 #include "ivideo/cursor.h"
 
 #include <OpenGL/OpenGL.h>
+// OpenGL/gl.h needs to be included separately for OSX prior to version 10.5:
+#include <OpenGL/gl.h>
 
 // Part of this API must be callable from C++ code.  So we have to generate a C
 // API that provides access to this class
