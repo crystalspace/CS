@@ -49,6 +49,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     public CS::ShaderVariableContextImpl
   {
     csRef<iRenderBuffer> index_buffer;
+    csBox3 bbox;
+    bool bbox_valid;
+    
+    /// Iterate over all vertices used in this submesh
+    template<typename T>
+    void IterateAllVertices (iRenderBuffer* positions, T& functor);
   public:
     const char* name;
     csRef<iMaterialWrapper> material;
@@ -73,11 +79,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     csBSPTree* b2fTree;
     csFrameDataHolder<csRef<iRenderBuffer> > b2fIndices;
 
-    SubMesh () : scfImplementationType (this), name (0), MixMode ((uint)~0),
-      zmode ((csZBufMode)~0), renderPrio (-1), back2front (false), b2fTree (0)
+    SubMesh () : scfImplementationType (this), bbox_valid (false), name (0), 
+      MixMode ((uint)~0), zmode ((csZBufMode)~0), renderPrio (-1),
+      back2front (false), b2fTree (0)
     { }
     SubMesh (const SubMesh& other) : scfImplementationType (this), 
-      index_buffer (other.index_buffer), name (other.name), 
+      index_buffer (other.index_buffer), bbox (other.bbox),
+      bbox_valid (other.bbox_valid), name (other.name), 
       material (other.material), MixMode (other.MixMode), zmode (other.zmode),
       renderPrio (other.renderPrio), back2front (other.back2front), b2fTree (0)
     { }
@@ -119,6 +127,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     bool GetBack2Front () const { return back2front; }
 
     void SetIndices (iRenderBuffer* newIndices);
+    
+    const csBox3& GetObjectBoundingBox (iRenderBuffer* positions);
+    float ComputeMaxSqRadius (iRenderBuffer* positions,
+      const csVector3& center);
+    void InvalidateBoundingBox ();
   };
 
   class SubMeshesContainer

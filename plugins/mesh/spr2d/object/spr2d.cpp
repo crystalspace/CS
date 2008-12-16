@@ -246,6 +246,7 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
   rm->worldspace_origin = movable->GetFullPosition ();
 
   rm->object2world = tr_o2c.GetInverse () * camera->GetTransform ();
+  rm->bbox = GetObjectBoundingBox();
   rm->indexend = (uint)GetCsVertices ()->GetSize ();
 
   n = 1; 

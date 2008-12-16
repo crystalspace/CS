@@ -975,6 +975,7 @@ void TerrainBlock::CullRenderMeshes (iRenderView* rview, const csPlane3* cullPla
     mesh->buffers = bufferHolder;
 
     mesh->worldspace_origin = worldOrigin;
+    mesh->bbox = boundingBox;
 
     meshCache.Push (mesh);
   }
@@ -1002,6 +1003,7 @@ void TerrainBlock::CullRenderMeshes (iRenderView* rview, const csPlane3* cullPla
     mesh->buffers = bufferHolder;
 
     mesh->worldspace_origin = worldOrigin;
+    mesh->bbox = boundingBox;
 
     meshCache.Push (mesh);
   }

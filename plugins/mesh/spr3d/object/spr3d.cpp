@@ -1249,6 +1249,7 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n,
     rmesh->variablecontext = svcontext;
   }
   rmesh->object2world = movable->GetFullTransform ();
+  rmesh->bbox = GetObjectBoundingBox();
 
   rmesh->meshtype = CS_MESHTYPE_TRIANGLES;
   n = 1;

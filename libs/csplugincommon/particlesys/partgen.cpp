@@ -413,7 +413,8 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
   rm->material = m;
   CS_ASSERT (m != 0);
   rm->worldspace_origin = movable->GetFullPosition ();
-  rm->object2world = camera->GetTransform ();  
+  rm->object2world = camera->GetTransform ();
+  rm->bbox = GetObjectBoundingBox();  
 
   n = 1;
   return &rm;

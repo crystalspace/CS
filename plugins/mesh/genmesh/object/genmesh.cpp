@@ -322,6 +322,26 @@ void csGenmeshMeshObject::SetupObject ()
   }
 }
 
+iRenderBuffer* csGenmeshMeshObject::GetPositions()
+{
+  if (anim_ctrl)
+  {
+    // If we have an animation control then we must get the vertex data
+    // here.
+    int num_mesh_vertices = factory->GetVertexCount ();
+    if (!animBuffers.position)
+      animBuffers.position = csRenderBuffer::CreateRenderBuffer (
+	num_mesh_vertices, CS_BUF_STATIC,
+	CS_BUFCOMP_FLOAT, 3);
+    const csVector3* mesh_vertices = AnimControlGetVertices ();
+    if (!mesh_vertices) mesh_vertices = factory->GetVertices ();
+    animBuffers.position->SetData (mesh_vertices);
+    return animBuffers.position;
+  }
+  
+  return factory->GetPositions ();
+}
+
 #include "csutil/custom_new_disable.h"
 
 #include "csutil/custom_new_disable.h"
@@ -358,6 +378,8 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
       factory->GetShapeNumber());
   else if (anim_ctrl)
     anim_ctrl->Update (vc->GetCurrentTicks ());
+    
+  iRenderBuffer* positions = GetPositions();
 
   const csReversibleTransform o2wt = movable->GetFullTransform ();
   const csVector3& wo = o2wt.GetOrigin ();
@@ -424,6 +446,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
       static_cast<iShaderVariableContext*> (&subMesh), svcontext));
     meshPtr->variablecontext = mergedSVContext;
     meshPtr->object2world = o2wt;
+    meshPtr->bbox = subMesh.parentSubMesh->GetObjectBoundingBox (positions);
 
     meshPtr->buffers = smBufferHolder;
     meshPtr->geometryInstance = (void*)factory;
@@ -592,14 +615,7 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
     int num_mesh_vertices = factory->GetVertexCount ();
     if (buffer == CS_BUFFER_POSITION)
     {
-      if (!animBuffers.position)
-        animBuffers.position = csRenderBuffer::CreateRenderBuffer (
-          num_mesh_vertices, CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 3);
-      const csVector3* mesh_vertices = AnimControlGetVertices ();
-      if (!mesh_vertices) mesh_vertices = factory->GetVertices ();
-      animBuffers.position->SetData (mesh_vertices);
-      holder->SetRenderBuffer (buffer, animBuffers.position);
+      holder->SetRenderBuffer (buffer, GetPositions());
       return;
     }
     if (buffer == CS_BUFFER_TEXCOORD0)
@@ -890,35 +906,19 @@ void csGenmeshMeshObjectFactory::CalculateBBoxRadius ()
   UpdateFromLegacyBuffers();
 
   object_bbox_valid = true;
-  if (!knownBuffers.position.IsValid()
-    || (knownBuffers.position->GetElementCount() == 0))
+  
+  for (size_t s = 0; s < subMeshes.GetSize(); s++)
   {
-    object_bbox.Set (0, 0, 0, 0, 0, 0);
-    radius = 0.0f;
-    return;
+    object_bbox += subMeshes[s]->GetObjectBoundingBox (knownBuffers.position);
   }
-  csVertexListWalker<float, csVector3> vertices (knownBuffers.position);
-  const csVector3& v0 = *vertices;
-  object_bbox.StartBoundingBox (v0);
-  size_t i;
-  for (i = 1 ; i < vertices.GetSize () ; i++)
-  {
-    ++vertices;
-    const csVector3& v = *vertices;
-    object_bbox.AddBoundingVertexSmart (v);
-  }
-
-  vertices.ResetState();
-  const csVector3& center = object_bbox.GetCenter ();
+  
   float max_sqradius = 0.0f;
-  for (i = 0 ; i < vertices.GetSize () ; i++)
+  const csVector3& center = object_bbox.GetCenter ();
+  for (size_t s = 0; s < subMeshes.GetSize(); s++)
   {
-    const csVector3& v = *vertices;
-    ++vertices;
-    float sqradius = csSquaredDist::PointPoint (center, v);
-    if (sqradius > max_sqradius) max_sqradius = sqradius;
-  }
-
+    max_sqradius = csMax (max_sqradius,
+      subMeshes[s]->ComputeMaxSqRadius (knownBuffers.position, center));
+  }  
   radius = csQsqrt (max_sqradius);
 }
 
@@ -1008,6 +1008,13 @@ void csGenmeshMeshObjectFactory::UpdateTangentsBitangents ()
   
     cs_free (tangentData);
   }
+}
+
+iRenderBuffer* csGenmeshMeshObjectFactory::GetPositions()
+{
+  if (legacyBuffers.mesh_vertices_dirty_flag)
+    UpdateFromLegacyBuffers ();
+  return knownBuffers.position;
 }
 
 template<typename T>
@@ -1163,9 +1170,7 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
   {
     case CS_BUFFER_POSITION:
       {
-	if (legacyBuffers.mesh_vertices_dirty_flag)
-	  UpdateFromLegacyBuffers ();
-	holder->SetRenderBuffer (buffer, knownBuffers.position);
+	holder->SetRenderBuffer (buffer, GetPositions());
 	return;
       }
     case CS_BUFFER_TEXCOORD0:
@@ -1676,6 +1681,9 @@ void csGenmeshMeshObjectFactory::Invalidate ()
   legacyBuffers.mesh_normals_dirty_flag = true;
   legacyBuffers.mesh_colors_dirty_flag = true;
   subMeshes.GetDefaultSubmesh()->legacyTris.mesh_triangle_dirty_flag = true;
+  
+  for (size_t s = 0; s < subMeshes.GetSize(); s++)
+    subMeshes[s]->InvalidateBoundingBox();
 
   ShapeChanged ();
 }

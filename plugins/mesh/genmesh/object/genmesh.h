@@ -241,6 +241,8 @@ private:
   void UpdateLighting (
       const csSafeCopyArray<csLightInfluence>& lights, iMovable* movable);
 
+  /// Get positions buffer
+  iRenderBuffer* GetPositions();
 public:
   /// Constructor.
   csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory);
@@ -502,6 +504,9 @@ public:
 
   /// Update tangent and bitangent buffers
   void UpdateTangentsBitangents ();
+  
+  /// Get positions buffer
+  iRenderBuffer* GetPositions();
 public:
   CS_LEAKGUARD_DECLARE (csGenmeshMeshObjectFactory);
 
