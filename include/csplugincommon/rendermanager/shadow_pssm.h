@@ -1060,8 +1060,10 @@ private:
       
       csBox3 meshBboxLS;
       csVector3 vLight;
+      csBox3 meshBboxWorld (singleMesh.renderMesh->object2world.This2Other (
+        singleMesh.renderMesh->bbox));
       vLight = superFrust.world2light_rotated.Other2This (
-        singleMesh.bbox.GetCorner (0));
+        meshBboxWorld.GetCorner (0));
       meshBboxLS.StartBoundingBox (csVector3 (vLight.x,
 	vLight.y, vLight.z));
       csBox3 meshBboxLightPP;
@@ -1073,7 +1075,7 @@ private:
       for (int c = 1; c < 8; c++)
       {
 	vLight = superFrust.world2light_rotated.Other2This (
-	  singleMesh.bbox.GetCorner (c));
+	  meshBboxWorld.GetCorner (c));
 	meshBboxLS.AddBoundingVertexSmart (csVector3 (vLight.x,
 	  vLight.y, vLight.z));
 	vLightPP = lightData.lightProject * csVector4 (vLight);
@@ -1121,7 +1123,7 @@ private:
       {
         csBox3 meshBBoxView =
           viewSetup.rview->GetCamera()->GetTransform().Other2This (
-            singleMesh.bbox);
+            meshBboxWorld);
 	int s = 0;
 	for (int f = 0; f < superFrust.actualNumParts; f++)
 	{

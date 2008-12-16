@@ -261,8 +261,6 @@ namespace RenderManager
         csRef<csShaderVariable> svObjectToWorld;
         /// Mesh object to world inverse transformation
         csRef<csShaderVariable> svObjectToWorldInv;
-        /// Bounding box (world space)
-        csBox3 bbox;
         /// Mesh flags
         csFlags meshFlags;
 
