@@ -91,9 +91,11 @@ struct LightSpaceWorld : LightSpace
     float4x4 lightTransform = lightProps.transform[lightNum];
     float3 lightDirW = mul (lightTransform, float4 (0, 0, 1, 0)).xyz;
     dir = lightDirW;
-    surfToLight = (pos - surfPositionWorld).xyz;
-    lightDist = length (surfToLight);
-    surfToLight = normalize (surfToLight);
+    /* Compute distance between surface and light with float precision to
+       avoid precision issues with GF6 (see trac #561). */
+    float3 surfToLightF = (pos - surfPositionWorld).xyz;
+    lightDist = length (surfToLightF);
+    surfToLight = normalize (surfToLightF);
   }
   half3 GetDirection() { return dir; }
   half3 GetSurfaceToLight() { return surfToLight; }
