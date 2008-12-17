@@ -10007,6 +10007,8 @@ sub DESTROY {
 *swig_material_set = *cspacec::CoreRenderMesh_material_set;
 *swig_object2world_get = *cspacec::CoreRenderMesh_object2world_get;
 *swig_object2world_set = *cspacec::CoreRenderMesh_object2world_set;
+*swig_bbox_get = *cspacec::CoreRenderMesh_bbox_get;
+*swig_bbox_set = *cspacec::CoreRenderMesh_bbox_set;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

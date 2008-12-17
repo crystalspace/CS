@@ -501,6 +501,7 @@ class CoreRenderMesh(object):
     indexend = _swig_property(_ivideo.CoreRenderMesh_indexend_get, _ivideo.CoreRenderMesh_indexend_set)
     material = _swig_property(_ivideo.CoreRenderMesh_material_get, _ivideo.CoreRenderMesh_material_set)
     object2world = _swig_property(_ivideo.CoreRenderMesh_object2world_get, _ivideo.CoreRenderMesh_object2world_set)
+    bbox = _swig_property(_ivideo.CoreRenderMesh_bbox_get, _ivideo.CoreRenderMesh_bbox_set)
 CoreRenderMesh_swigregister = _ivideo.CoreRenderMesh_swigregister
 CoreRenderMesh_swigregister(CoreRenderMesh)
 
