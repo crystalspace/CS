@@ -805,11 +805,8 @@ namespace RenderManager
         size_t numLights;
         csLightInfluence* influences;
 	lightmgr->GetRelevantLights (node->owner.sector,
-	  mesh.renderMesh->object2world.This2Other (mesh.renderMesh->bbox),
-	   /* @@@ Testing the light sphere/mesh box intersection in object space
-	      would give tighter volumes compared to current light box/mesh box
-	      intersection in world space */
-	  influences, numLights, allMaxLights);
+	  mesh.renderMesh->bbox, influences, numLights, allMaxLights,
+	  &mesh.renderMesh->object2world);
 	
 	LightingSorter sortedLights (persist.lightSorterPersist,  numLights);
 	for (size_t l = 0; l < numLights; l++)
