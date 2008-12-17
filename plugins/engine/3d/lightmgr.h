@@ -76,6 +76,12 @@ public:
     size_t& numLights, size_t maxLights = (size_t)~0,
     const csReversibleTransform* bboxToWorld = 0,
     uint flags = CS_LIGHTQUERY_GET_ALL);
+
+  virtual void GetRelevantLightsSorted (iSector* sector, 
+    const csBox3& boundingBox, csLightInfluence*& lightArray, 
+    size_t& numLights, size_t maxLights = (size_t)~0,
+    const csReversibleTransform* bboxToWorld = 0,
+    uint flags = CS_LIGHTQUERY_GET_ALL);
 protected:
   template<typename BoxSpace>
   void GetRelevantLightsWorker (

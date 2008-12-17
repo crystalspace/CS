@@ -26,7 +26,9 @@
 
 using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
 
-static csLightInfluence MakeInfluence (csLight* light)
+static csLightInfluence MakeInfluence (csLight* light,
+                                       const csBox3& box,
+                                       const csVector3& lightCenter)
 {
   csLightInfluence l;
   l.light = light;
@@ -35,6 +37,16 @@ static csLightInfluence MakeInfluence (csLight* light)
     l.type = light->csLight::GetType();
     l.flags = light->csLight::GetFlags();
     l.dynamicType = light->csLight::GetDynamicType();
+    
+    float distAttn;
+    if (box.In (lightCenter))
+      distAttn = 1.0f;
+    else
+    {
+      distAttn = csMin (light->GetBrightnessAtDistance (
+        sqrt (box.SquaredPosDist (lightCenter))), 1.0f);
+    }
+    l.perceivedIntensity = light->GetColor().Luminance() * distAttn;
   }
   return l;
 }
@@ -158,7 +170,8 @@ struct LightCollectArray
           lightSphere.GetRadius()*lightSphere.GetRadius()))
         continue;
       
-      csLightInfluence newInfluence = MakeInfluence (light);
+      csLightInfluence newInfluence = MakeInfluence (light,
+        testBox, lightSphere.GetCenter());
       lightArray->Push (newInfluence);
     }
       
@@ -197,7 +210,8 @@ struct LightCollectCallback
           lightSphere.GetRadius()*lightSphere.GetRadius()))
         continue;
       
-      csLightInfluence newInfluence = MakeInfluence (light);
+      csLightInfluence newInfluence = MakeInfluence (light,
+        testBox, lightSphere.GetCenter());
       lightCallback->LightInfluence (newInfluence);
     }
     return true;
@@ -328,7 +342,8 @@ struct LightCollectArrayPtr
       
       if (arr.GetSize() < max)
       {
-        csLightInfluence newInfluence = MakeInfluence (light);
+        csLightInfluence newInfluence = MakeInfluence (light,
+          testBox, lightSphere.GetCenter());
         arr.Push (newInfluence);
       }
       else
@@ -440,4 +455,34 @@ void csLightManager::GetRelevantLights (iSector* sector,
   const csBox3 bigBox;  
   csLightManager::GetRelevantLights (sector, bigBox, lightArray, numLights,
     maxLights, 0, flags);
+}
+
+static int SortInfluenceByIntensity (const void* a, const void* b)
+{
+  float d = reinterpret_cast<const csLightInfluence*>(a)->perceivedIntensity
+    - reinterpret_cast<const csLightInfluence*>(b)->perceivedIntensity;
+  if (d < 0)
+    return 1;
+  else if (d > 0)
+    return -1;
+  else
+    return 0;
+}
+
+void csLightManager::GetRelevantLightsSorted (iSector* sector,
+                                              const csBox3& boundingBox,
+                                              csLightInfluence*& lightArray, 
+                                              size_t& numLights,
+                                              size_t maxLights,
+                                              const csReversibleTransform* bboxToWorld,
+                                              uint flags)
+{
+  // Get all lights,
+  csLightManager::GetRelevantLights (sector, boundingBox, lightArray, numLights,
+    (size_t)~0, bboxToWorld, flags);
+  // sort,
+  qsort (lightArray, numLights, sizeof (csLightInfluence),
+    SortInfluenceByIntensity);
+  // return only first numLights lights
+  numLights = csMin (numLights, maxLights);
 }
