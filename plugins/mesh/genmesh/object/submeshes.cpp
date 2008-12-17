@@ -160,6 +160,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
   template<typename T>
   void SubMesh::IterateAllVertices (iRenderBuffer* positions, T& functor)
   {
+    UpdateFromLegacyBuffer();
     if (!index_buffer.IsValid()) return;
     
     csVertexListWalker<float, csVector3> vertices (positions);
