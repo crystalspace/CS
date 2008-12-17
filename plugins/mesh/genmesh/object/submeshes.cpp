@@ -184,11 +184,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
         size_t vertex = tri[v];
         const size_t vertexHashIndex = (vertex-indexOffs) % vertexHashSize;
         if (seenVertices[vertexHashIndex] == vertex) continue;
-        
+
         vertices.SetElement (vertex);
-	const csVector3& v = *vertices;
-	functor (v);
-        
+        const csVector3& vert = *vertices;
+        functor (vert);
+
         seenVertices[vertexHashIndex] = vertex;
       }
     }
