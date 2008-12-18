@@ -40,7 +40,7 @@ half Attenuation_Realistic (float d)
 
 half Attenuation_CLQ (float d, float3 coeff)
 {
-  return 1/(dot (half3 (1, d, d*d), half3 (coeff)));
+  return 1/(dot (float3 (1, d, d*d), float3 (coeff)));
 }
 
 half Light_Spot (half3 surfToLight, half3 lightDir, half falloffInner, half falloffOuter)
