@@ -55,6 +55,8 @@ void Bot::move (csTicks elapsed_time)
 {
   csOrthoTransform old_pos (mesh->GetMovable()->GetTransform ().GetO2T (), follow);
   csVector3 rd = (8.*(float)elapsed_time)/1000. * d;
+  if (fabs (rd.x) < .00001 && fabs (rd.y) < .00001 && fabs (rd.z) < .00001)
+    return;
   follow += rd;
   csVector3 new_pos = follow;
   iSector* s = f_sector;
@@ -84,7 +86,10 @@ void Bot::move (csTicks elapsed_time)
   csVector3 old_p = mesh->GetMovable()->GetPosition ();
   csVector3 dir = follow-old_p;
   dir.Normalize ();
-  csVector3 new_p = old_p + ((3.*(float)elapsed_time)/1000.)*dir;
+  csVector3 d = ((3.*(float)elapsed_time)/1000.)*dir;
+  if (fabs (d.x) < .00001 && fabs (d.y) < .00001 && fabs (d.z) < .00001)
+    return;
+  csVector3 new_p = old_p + d;
   mesh->GetMovable()->SetPosition (new_p);
 
   //@@@
