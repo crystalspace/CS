@@ -82,7 +82,7 @@ extern void move_mesh (iMeshWrapper* sprite, iSector* where,
 
 bool do_bots = false;
 
-// Add a bot with some size at the specified positin.
+// Add a bot with some size at the specified position.
 void WalkTest::add_bot (float size, iSector* where, csVector3 const& pos,
 	float dyn_radius, bool manual)
 {
@@ -103,8 +103,8 @@ void WalkTest::add_bot (float size, iSector* where, csVector3 const& pos,
   csRef<iMeshWrapper> botWrapper = Engine->CreateMeshWrapper (botmesh, "bot",
     where);
 
-  csMatrix3 m; m.Identity (); m = m * size;
-  botWrapper->GetMovable ()->SetTransform (m);
+  //csMatrix3 m; m.Identity (); m = m * size;
+  //botWrapper->GetMovable ()->SetTransform (m);
   
   botWrapper->GetMovable ()->UpdateMove ();
   csRef<iSprite3DState> state (scfQueryInterface<iSprite3DState> (botmesh));

@@ -794,6 +794,7 @@ void WalkTest::LoadLibraryData (iCollection* collection)
 {
   LevelLoader->LoadTexture ("cslogo2", "/lib/std/cslogo2.png",
     CS_TEXTURE_2D, 0, true, true, true, csRef<iCollection>(collection));
+  LevelLoader->LoadLibraryFile ("/lib/std/library", collection);
 }
 
 bool WalkTest::Create2DSprites ()
