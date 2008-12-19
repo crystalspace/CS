@@ -19,6 +19,9 @@
 class WalkTest;
 struct iCamera;
 
+#ifndef __WALKTEST_SPLITVIEW_H__
+#define __WALKTEST_SPLITVIEW_H__
+
 #include "ivaria/view.h"
 
 /**
@@ -51,4 +54,6 @@ public:
   iCamera* GetCamera () { return view->GetCamera (); }
 };
 
+
+#endif // __WALKTEST_SPLITVIEW_H__
 
