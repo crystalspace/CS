@@ -37,6 +37,7 @@
 #include "walktest.h"
 #include "command.h"
 #include "splitview.h"
+#include "recorder.h"
 
 #if defined(CS_PLATFORM_DOS) || defined(CS_PLATFORM_WIN32)
 #  include <io.h>
@@ -80,10 +81,9 @@ WalkTest::WalkTest () :
   selected_light = 0;
   selected_polygon = 0;
   move_forward = false;
-  cfg_recording = -1;
-  recorded_cmd = 0;
-  recorded_arg = 0;
-  cfg_playrecording = -1;
+
+  recorder = new WalkTestRecorder (this);
+
   cfg_debug_check_frustum = 0;
   do_fs_inter = false;
   do_fs_shadevert = false;
@@ -133,6 +133,8 @@ WalkTest::~WalkTest ()
     delete first_map;
     first_map = map;
   }
+  delete recorder;
+  delete views;
 }
 
 void WalkTest::Report (int severity, const char* msg, ...)
@@ -258,15 +260,7 @@ void WalkTest::SetupFrame ()
 
   if (!myConsole || !myConsole->GetVisible ())
   {
-    // Emit recorded commands directly to the CommandHandler
-    if (cfg_playrecording > 0 &&
-	recording.GetSize () > 0)
-    {
-      csRecordedCamera* reccam = (csRecordedCamera*)recording[
-      	cfg_playrecording];
-      if (reccam->cmd)
-	CommandHandler(reccam->cmd, reccam->arg);
-    }
+    recorder->HandleRecordedCommand ();
   }
 
   MoveSystems (elapsed_time, current_time);
@@ -657,56 +651,8 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
 {
   if (!myConsole || !myConsole->GetVisible ())
   {
-    if (cfg_recording >= 0)
-    {
-      // @@@ Memory leak!
-      csRecordedCamera* reccam = new csRecordedCamera ();
-      iCamera* c = views->GetCamera ();
-      const csMatrix3& m = c->GetTransform ().GetO2T ();
-      const csVector3& v = c->GetTransform ().GetOrigin ();
-      reccam->mat = m;
-      reccam->vec = v;
-      reccam->mirror = c->IsMirrored ();
-      reccam->sector = c->GetSector ();
-      reccam->cmd = recorded_cmd;
-      reccam->arg = recorded_arg;
-      recorded_cmd = recorded_arg = 0;
-      recording.Push (reccam);
-    }
-    if (cfg_playrecording >= 0 && recording.GetSize () > 0)
-    {
-      csRecordedCamera* reccam = (csRecordedCamera*)recording[cfg_playrecording];
-      cfg_playrecording++;
-      record_frame_count++;
-      if ((size_t)cfg_playrecording >= recording.GetSize ())
-      {
-	csTicks t1 = record_start_time;
-	csTicks t2 = csGetTicks ();
-	int num = record_frame_count;
-	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "End demo: %f secs to render %d frames: %f fps",
-	  (float) (t2 - t1) / 1000.,
-	  num, float (num) * 1000. / (float) (t2 - t1));
-	csPrintf (
-	  "End demo: %f secs to render %d frames: %f fps\n",
-	  (float) (t2 - t1) / 1000.,
-	  num, float (num) * 1000. / (float) (t2 - t1));
-	fflush (stdout);
-	if (cfg_playloop)
-	  cfg_playrecording = 0;
-	else
-	  cfg_playrecording = -1;
-
-        record_start_time = csGetTicks ();
-        record_frame_count = 0;
-      }
-      iCamera* c = views->GetCamera ();
-      if (reccam->sector)
-        c->SetSector (reccam->sector);
-      c->SetMirrored (reccam->mirror);
-      c->GetTransform ().SetO2T (reccam->mat);
-      c->GetTransform ().SetOrigin (reccam->vec);
-    }
+    recorder->RecordCamera (views->GetCamera ());
+    recorder->HandleRecordedCamera (views->GetCamera ());
   }
 
 
@@ -785,10 +731,7 @@ void perf_test (int num)
   int i;
   for (i = 0 ; i < num ; i++)
   {
-    if (Sys->cfg_playrecording >= 0 && Sys->recording.GetSize () > 0)
-    {
-      Sys->record_frame_count++;
-    }
+    Sys->recorder->NewFrame ();
     Sys->DrawFrame (csGetTicks ()-t, csGetTicks ());
     Sys->FinishFrame ();
     t = csGetTicks ();

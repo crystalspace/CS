@@ -74,153 +74,12 @@
 #include "walktest.h"
 #include "wentity.h"
 #include "splitview.h"
+#include "recorder.h"
 
 extern WalkTest* Sys;
 
 csString LookForKeyValue(iObjectIterator* it,const char* key);
 double ParseScaleFactor(iObjectIterator* it);
-
-/// Save recording
-void SaveRecording (iVFS* vfs, const char* fName)
-{
-  csRef<iFile> cf;
-  cf = vfs->Open (fName, VFS_FILE_WRITE);
-  uint32 l = (int32)Sys->recording.GetSize ();
-  l = csLittleEndian::Convert (l);
-  cf->Write ((char*)&l, sizeof (l));
-  size_t i;
-  csRecordedCameraFile camint;
-  iSector* prev_sector = 0;
-  for (i = 0 ; i < Sys->recording.GetSize () ; i++)
-  {
-    csRecordedCamera* reccam = (csRecordedCamera*)Sys->recording[i];
-    camint.m11 = csLittleEndian::Convert (csFloatToLong (reccam->mat.m11));
-    camint.m12 = csLittleEndian::Convert (csFloatToLong (reccam->mat.m12));
-    camint.m13 = csLittleEndian::Convert (csFloatToLong (reccam->mat.m13));
-    camint.m21 = csLittleEndian::Convert (csFloatToLong (reccam->mat.m21));
-    camint.m22 = csLittleEndian::Convert (csFloatToLong (reccam->mat.m22));
-    camint.m23 = csLittleEndian::Convert (csFloatToLong (reccam->mat.m23));
-    camint.m31 = csLittleEndian::Convert (csFloatToLong (reccam->mat.m31));
-    camint.m32 = csLittleEndian::Convert (csFloatToLong (reccam->mat.m32));
-    camint.m33 = csLittleEndian::Convert (csFloatToLong (reccam->mat.m33));
-    camint.x = csLittleEndian::Convert (csFloatToLong (reccam->vec.x));
-    camint.y = csLittleEndian::Convert (csFloatToLong (reccam->vec.y));
-    camint.z = csLittleEndian::Convert (csFloatToLong (reccam->vec.z));
-    camint.mirror = reccam->mirror;
-    cf->Write ((char*)&camint, sizeof (camint));
-    unsigned char len;
-    if (prev_sector == reccam->sector)
-    {
-      len = 255;
-      cf->Write ((char*)&len, 1);
-    }
-    else
-    {
-      size_t _len = strlen (reccam->sector->QueryObject ()->GetName ());
-      len = (_len > 255) ? 255 : (unsigned char)len;
-      cf->Write ((char*)&len, 1);
-      cf->Write (reccam->sector->QueryObject ()->GetName (),
-      	1+len);
-    }
-    prev_sector = reccam->sector;
-    if (reccam->cmd)
-    {
-      size_t _len = strlen (reccam->cmd);
-      len = (_len > 255) ? 255 : (unsigned char)len;
-      cf->Write ((char*)&len, 1);
-      cf->Write (reccam->cmd, 1+len);
-    }
-    else
-    {
-      len = 254;
-      cf->Write ((char*)&len, 1);
-    }
-    if (reccam->arg)
-    {
-      size_t _len = strlen (reccam->arg);
-      len = (_len > 255) ? 255 : (unsigned char)len;
-      cf->Write ((char*)&len, 1);
-      cf->Write (reccam->arg, 1+len);
-    }
-    else
-    {
-      len = 254;
-      cf->Write ((char*)&len, 1);
-    }
-  }
-}
-
-/// Load recording
-void LoadRecording (iVFS* vfs, const char* fName)
-{
-  csRef<iFile> cf;
-  cf = vfs->Open (fName, VFS_FILE_READ);
-  if (!cf) return;
-  Sys->recording.DeleteAll ();
-  Sys->recording.SetSize (0);
-  int32 l;
-  cf->Read ((char*)&l, sizeof (l));
-  l = csLittleEndian::Convert (l);
-  csRecordedCameraFile camint;
-  iSector* prev_sector = 0;
-  int i;
-  for (i = 0 ; i < l ; i++)
-  {
-    csRecordedCamera* reccam = new csRecordedCamera ();
-    cf->Read ((char*)&camint, sizeof (camint));
-    reccam->mat.m11 = csLongToFloat (csLittleEndian::Convert (camint.m11));
-    reccam->mat.m12 = csLongToFloat (csLittleEndian::Convert (camint.m12));
-    reccam->mat.m13 = csLongToFloat (csLittleEndian::Convert (camint.m13));
-    reccam->mat.m21 = csLongToFloat (csLittleEndian::Convert (camint.m21));
-    reccam->mat.m22 = csLongToFloat (csLittleEndian::Convert (camint.m22));
-    reccam->mat.m23 = csLongToFloat (csLittleEndian::Convert (camint.m23));
-    reccam->mat.m31 = csLongToFloat (csLittleEndian::Convert (camint.m31));
-    reccam->mat.m32 = csLongToFloat (csLittleEndian::Convert (camint.m32));
-    reccam->mat.m33 = csLongToFloat (csLittleEndian::Convert (camint.m33));
-    reccam->vec.x = csLongToFloat (csLittleEndian::Convert (camint.x));
-    reccam->vec.y = csLongToFloat (csLittleEndian::Convert (camint.y));
-    reccam->vec.z = csLongToFloat (csLittleEndian::Convert (camint.z));
-    reccam->mirror = (camint.mirror != 0);
-    unsigned char len;
-    cf->Read ((char*)&len, 1);
-    iSector* s;
-    if (len == 255)
-    {
-      s = prev_sector;
-    }
-    else
-    {
-      char* buf = new char[1+len];
-      cf->Read (buf, 1+len);
-      s = Sys->Engine->GetSectors ()->FindByName (buf);
-      delete[] buf;
-    }
-    reccam->sector = s;
-    prev_sector = s;
-
-    cf->Read ((char*)&len, 1);
-    if (len == 254)
-    {
-      reccam->cmd = 0;
-    }
-    else
-    {
-      reccam->cmd = new char[len+1];
-      cf->Read (reccam->cmd, 1+len);
-    }
-    cf->Read ((char*)&len, 1);
-    if (len == 254)
-    {
-      reccam->arg = 0;
-    }
-    else
-    {
-      reccam->arg = new char[len+1];
-      cf->Read (reccam->arg, 1+len);
-    }
-    Sys->recording.Push (reccam);
-  }
-}
 
 /// Save/load camera functions
 void WalkTest::SaveCamera (const char *fName)
@@ -880,23 +739,8 @@ float safe_atof (const char* arg)
 //--//--//--//--//--//--//--//--//--//--//-- Handle our additional commands --//
 
 // Command recording
-#define RECORD_ARGS(CMD, ARG) \
-if (Sys->cfg_recording >= 0)                        \
-{                                                   \
-  Sys->recorded_cmd = new char[strlen(CMD)+1];      \
-  strcpy (Sys->recorded_cmd, CMD);                  \
-  if (ARG)                                          \
-  {                                                 \
-    Sys->recorded_arg = new char[strlen(ARG)+1];    \
-    strcpy (Sys->recorded_arg, ARG);                \
-  }                                                 \
-}
-#define RECORD_CMD(CMD) \
-if (Sys->cfg_recording >= 0)                        \
-{                                                   \
-  Sys->recorded_cmd = new char[strlen(CMD)+1];      \
-  strcpy (Sys->recorded_cmd, CMD);                  \
-}
+#define RECORD_ARGS(CMD, ARG) Sys->recorder->RecordArgs (CMD, ARG);
+#define RECORD_CMD(CMD) Sys->recorder->RecordCommand (CMD);
 
 bool CommandHandler (const char *cmd, const char *arg)
 {
@@ -1223,10 +1067,10 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       csString buf;
       buf.Format ("/tmp/%s.rec", arg);
-      SaveRecording (Sys->myVFS, buf);
+      Sys->recorder->SaveRecording (Sys->myVFS, buf);
     }
     else
-      SaveRecording (Sys->myVFS, "/tmp/record");
+      Sys->recorder->SaveRecording (Sys->myVFS, "/tmp/record");
   }
   else if (!csStrCaseCmp (cmd, "loadrec"))
   {
@@ -1234,67 +1078,26 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       csString buf;
       buf.Format ("/tmp/%s.rec", arg);
-      LoadRecording (Sys->myVFS, buf);
+      Sys->recorder->LoadRecording (Sys->myVFS, buf);
     }
     else
-      LoadRecording (Sys->myVFS, "/tmp/record");
+      Sys->recorder->LoadRecording (Sys->myVFS, "/tmp/record");
   }
   else if (!csStrCaseCmp (cmd, "clrrec"))
   {
-    Sys->recording.DeleteAll ();
-    Sys->recording.SetSize (0);
+    Sys->recorder->Clear ();
   }
   else if (!csStrCaseCmp (cmd, "record"))
   {
-    if (Sys->cfg_recording == -1)
-    {
-      Sys->cfg_playrecording = -1;
-      Sys->cfg_recording = 0;
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Start recording camera movement...");
-    }
-    else
-    {
-      Sys->cfg_recording = -1;
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Stop recording.");
-    }
+    Sys->recorder->ToggleRecording ();
   }
   else if (!csStrCaseCmp (cmd, "play"))
   {
-    if (Sys->cfg_playrecording == -1)
-    {
-      Sys->cfg_recording = -1;
-      Sys->cfg_playrecording = 0;
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Start playing back camera movement...");
-      Sys->cfg_playloop = true;
-      Sys->record_start_time = csGetTicks ();
-      Sys->record_frame_count = 0;
-    }
-    else
-    {
-      Sys->cfg_playrecording = -1;
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Stop playback.");
-    }
+    Sys->recorder->PlayRecording (true);
   }
   else if (!csStrCaseCmp (cmd, "playonce"))
   {
-    if (Sys->cfg_playrecording == -1)
-    {
-      Sys->cfg_recording = -1;
-      Sys->cfg_playrecording = 0;
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Start playing back camera movement once...");
-      Sys->cfg_playloop = false;
-      Sys->record_start_time = csGetTicks ();
-      Sys->record_frame_count = 0;
-    }
-    else
-    {
-      Sys->cfg_playrecording = -1;
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Stop playback.");
-    }
+    Sys->recorder->PlayRecording (false);
   }
   else if (!csStrCaseCmp (cmd, "bind"))
   {
