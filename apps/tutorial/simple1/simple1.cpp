@@ -83,7 +83,7 @@ void Simple::Frame ()
   // rotation matrix.  The rotations are applied in right to left
   // order .
   csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
-  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
+  csOrthoTransform ot (rot, c->GetTransform ().GetOrigin ());
   c->SetTransform (ot);
 
   rm->RenderView (view);
@@ -110,6 +110,7 @@ bool Simple::OnKeyboard (iEvent& ev)
       	csevQuit (GetObjectRegistry ()));
     }
   }
+
   return false;
 }
 
@@ -156,7 +157,6 @@ bool Simple::OnInitialize (int /*argc*/, char* /*argv*/ [])
 void Simple::OnExit ()
 {
   // Shut down the event handlers we spawned earlier.
-  drawer.Invalidate ();
   printer.Invalidate ();
 }
 
@@ -215,7 +215,7 @@ bool Simple::SetupModules ()
 
   rm = engine->GetRenderManager ();
 
-  // these are used store the current orientation of the camera
+  // These are used store the current orientation of the camera
   rotY = rotX = 0;
  
   // Now we need to position the camera in our world.
@@ -225,7 +225,6 @@ bool Simple::SetupModules ()
   // We use some other "helper" event handlers to handle 
   // pushing our work into the 3D engine and rendering it
   // to the screen.
-  //drawer.AttachNew(new FrameBegin3DDraw (GetObjectRegistry (), view));
   printer.AttachNew (new FramePrinter (GetObjectRegistry ()));
 
   return true;
@@ -236,9 +235,9 @@ void Simple::CreateRoom ()
   // Load the texture from the standard library.  This is located in
   // CS/data/standard.zip and mounted as /lib/std using the Virtual
   // File System (VFS) plugin.
-  if (!loader->LoadTexture ("brick", "/lib/std/castle/brick1_d.jpg"))
-    ReportError ("Error loading 'brick1_d' texture!");
-  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("brick");
+  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
+    ReportError ("Error loading 'stone4' texture!");
+  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
   
   // We create a new sector called "room".
   room = engine->CreateSector ("room");
@@ -255,20 +254,20 @@ void Simple::CreateRoom ()
 
   // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
-      engine, room, "walls", "walls_factory", &box);
+    engine, room, "walls", "walls_factory", &box);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   // Now we need light to see something.
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();
 
-  light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10, csColor (2, 0, 0));
+  light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10, csColor (1, 0, 0));
   ll->Add (light);
 
-  light = engine->CreateLight (0, csVector3 (3, 5,  0), 10, csColor (0, 0, 2));
+  light = engine->CreateLight (0, csVector3 (3, 5,  0), 10, csColor (0, 0, 1));
   ll->Add (light);
 
-  light = engine->CreateLight (0, csVector3 (0, 5, -3), 10, csColor (0, 2, 0));
+  light = engine->CreateLight (0, csVector3 (0, 5, -3), 10, csColor (0, 1, 0));
   ll->Add (light);
 }
 
@@ -277,10 +276,10 @@ void Simple::CreateRoom ()
  *-------------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  /* Runs the application. 
+  /* Runs the application.
    *
-   * csApplicationRunner<> is a small wrapper to support "restartable" 
-   * applications (ie where CS needs to be completely shut down and loaded 
+   * csApplicationRunner<> is a small wrapper to support "restartable"
+   * applications (ie where CS needs to be completely shut down and loaded
    * again). Simple1 does not use that functionality itself, however, it
    * allows you to later use "Simple.Restart();" and it'll just work.
    */

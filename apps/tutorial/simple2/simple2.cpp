@@ -86,12 +86,7 @@ void Simple::Frame ()
   csOrthoTransform ot (rot, c->GetTransform ().GetOrigin ());
   c->SetTransform (ot);
 
-  // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
-    return;
-
-  // Tell the camera to render into the frame buffer.
-  view->Draw ();
+  rm->RenderView (view);
 }
 
 bool Simple::OnKeyboard (iEvent& ev)
@@ -115,6 +110,7 @@ bool Simple::OnKeyboard (iEvent& ev)
 	    csevQuit (GetObjectRegistry ()));
     }
   }
+
   return false;
 }
 
@@ -139,18 +135,27 @@ bool Simple::OnInitialize (int /*argc*/, char* /*argv*/ [])
 
   csBaseEventHandler::Initialize (GetObjectRegistry ());
 
-  // Now we need to setup an event handler for our application.
+  // Now we need to register the event handler for our application.
   // Crystal Space is fully event-driven. Everything (except for this
   // initialization) happens in an event.
-  if (!RegisterQueue (GetObjectRegistry (),
-      csevAllEvents (GetObjectRegistry ())))
+  // Rather than simply handling all events, we subscribe to the
+  // particular events we're interested in.
+  csEventID events[] = {
+    csevFrame (GetObjectRegistry ()),
+    csevKeyboardEvent (GetObjectRegistry ()),
+    CS_EVENTLIST_END
+  };
+
+  if (!RegisterQueue (GetObjectRegistry (), events))
     return ReportError ("Failed to set up event handler!");
 
+  // Report success
   return true;
 }
 
 void Simple::OnExit ()
 {
+  // Shut down the event handlers we spawned earlier.
   printer.Invalidate ();
 }
 
@@ -167,6 +172,7 @@ bool Simple::Application ()
     // broadcasting process events to keep the game going.
     Run ();
   }
+
   return true;
 }
 
@@ -175,7 +181,6 @@ bool Simple::SetupModules ()
   // Now get the pointer to various modules we need. We fetch them
   // from the object registry. The RequestPlugins() call we did earlier
   // registered all loaded plugins with the object registry.
-  // The virtual clock.
   g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry ());
   if (!g3d) return ReportError ("Failed to locate 3D renderer!");
 
@@ -210,14 +215,19 @@ bool Simple::SetupModules ()
   // Now calculate static lighting for our geometry.
   using namespace CS::Lighting;
   SimpleStaticLighter::ShineLights (room, engine, 4);
+  
+  rm = engine->GetRenderManager ();
 
-  // these are used store the current orientation of the camera
+  // These are used store the current orientation of the camera
   rotY = rotX = 0;
 
   // Now we need to position the camera in our world.
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
 
+  // We use some other "helper" event handlers to handle 
+  // pushing our work into the 3D engine and rendering it
+  // to the screen.
   printer.AttachNew (new FramePrinter (object_reg));
 
   return true;
@@ -247,7 +257,7 @@ void Simple::CreateRoom ()
 
   // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
-      engine, room, "walls", "walls_factory", &box);
+    engine, room, "walls", "walls_factory", &box);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   // Now we need light to see something.
