@@ -62,7 +62,6 @@ private:
   float rotX, rotY;
 
   /// Event handlers to draw and print the 3D canvas on each frame
-  //csRef<FrameBegin3DDraw> drawer;
   csRef<FramePrinter> printer;
 
 public:
