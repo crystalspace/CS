@@ -76,6 +76,7 @@
 #include "splitview.h"
 #include "recorder.h"
 #include "varmanager.h"
+#include "particles.h"
 
 extern WalkTest* Sys;
 
@@ -1511,112 +1512,45 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!csStrCaseCmp (cmd, "decal_test"))
   {
+    RECORD_CMD (cmd);
     extern void test_decal();
     test_decal ();
   }
   else if (!csStrCaseCmp (cmd, "lightning"))
   {
+    RECORD_CMD (cmd);
     extern void show_lightning ();
     show_lightning ();
   }
   else if (!csStrCaseCmp (cmd, "rain"))
   {
-    char txtname[100];
-    int cnt = 0;
-    /* speed and num must be preset to prevent compiler warnings
-     * on some systems. */
-    int num = 0;
-    float speed = 0;
-    if (arg) cnt = csScanStr (arg, "%s,%d,%f", txtname, &num, &speed);
-    extern void add_particles_rain (iSector* sector, char* txtname,
-    	int num, float speed, bool do_camera);
-    if (cnt <= 2) speed = 2;
-    if (cnt <= 1) num = 500;
-    if (cnt <= 0) strcpy (txtname, "raindrop");
-    add_particles_rain (Sys->views->GetCamera ()->GetSector (),
-    	txtname, num, speed, false);
+    RECORD_ARGS (cmd, arg);
+    WalkTestParticleDemos::Rain (Sys, arg);
   }
   else if (!csStrCaseCmp (cmd, "frain"))
   {
-    char txtname[100];
-    int cnt = 0;
-    /* speed and num must be preset to prevent compiler warnings
-     * on some systems. */
-    int num = 0;
-    float speed = 0;
-    if (arg) cnt = csScanStr (arg, "%s,%d,%f", txtname, &num, &speed);
-    extern void add_particles_rain (iSector* sector, char* txtname,
-    	int num, float speed, bool do_camera);
-    if (cnt <= 2) speed = 2;
-    if (cnt <= 1) num = 500;
-    if (cnt <= 0) strcpy (txtname, "raindrop");
-    add_particles_rain (Sys->views->GetCamera ()->GetSector (),
-    	txtname, num, speed, true);
+    RECORD_ARGS (cmd, arg);
+    WalkTestParticleDemos::FollowRain (Sys, arg);
   }
   else if (!csStrCaseCmp (cmd, "snow"))
   {
-    char txtname[100];
-    int cnt = 0;
-    /* speed and num must be preset to prevent compiler warnings
-     * on some systems. */
-    int num = 0;
-    float speed = 0;
-    if (arg) cnt = csScanStr (arg, "%s,%d,%f", txtname, &num, &speed);
-    extern void add_particles_snow (iSector* sector, char* txtname,
-    	int num, float speed);
-    if (cnt <= 2) speed = 0.3f;
-    if (cnt <= 1) num = 500;
-    if (cnt <= 0) strcpy (txtname, "snow");
-    add_particles_snow (Sys->views->GetCamera ()->GetSector (),
-    	txtname, num, speed);
+    RECORD_ARGS (cmd, arg);
+    WalkTestParticleDemos::Snow (Sys, arg);
   }
   else if (!csStrCaseCmp (cmd, "flame"))
   {
     RECORD_ARGS (cmd, arg);
-    char txtname[100];
-    int cnt = 0;
-    int num = 0;
-    if (arg) cnt = csScanStr (arg, "%s,%d", txtname, &num);
-    extern void add_particles_fire (iSector* sector, char* txtname,
-    	int num, const csVector3& origin);
-    if (cnt <= 1) num = 200;
-    if (cnt <= 0) strcpy (txtname, "raindrop");
-    add_particles_fire (Sys->views->GetCamera ()->GetSector (),
-    	txtname, num, Sys->views->GetCamera ()->GetTransform ().GetOrigin ()-
-	csVector3 (0, Sys->cfg_body_height, 0));
+    WalkTestParticleDemos::Flame (Sys, arg);
   }
   else if (!csStrCaseCmp (cmd, "fountain"))
   {
     RECORD_ARGS (cmd, arg);
-    char txtname[100];
-    int cnt = 0;
-    int num = 0;
-    if (arg) cnt = csScanStr (arg, "%s,%d", txtname, &num);
-    extern void add_particles_fountain (iSector* sector, char* txtname,
-    	int num, const csVector3& origin);
-    if (cnt <= 1) num = 400;
-    if (cnt <= 0) strcpy (txtname, "spark");
-    add_particles_fountain (Sys->views->GetCamera ()->GetSector (),
-    	txtname, num, Sys->views->GetCamera ()->GetTransform ().GetOrigin ()-
-	csVector3 (0, Sys->cfg_body_height, 0));
+    WalkTestParticleDemos::Fountain (Sys, arg);
   }
   else if (!csStrCaseCmp (cmd, "explosion"))
   {
-    char txtname[100];
-    int cnt = 0;
-    if (arg) cnt = csScanStr (arg, "%s", txtname);
-    extern void add_particles_explosion (iSector* sector,
-    	iEngine* engine, const csVector3& center,
-    	const char* txtname);
-    if (cnt != 1)
-    {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Expected parameter 'texture'!");
-    }
-    else
-      add_particles_explosion (Sys->views->GetCamera ()->GetSector (),
-    	Sys->Engine,
-	Sys->views->GetCamera ()->GetTransform ().GetOrigin (), txtname);
+    RECORD_ARGS (cmd, arg);
+    WalkTestParticleDemos::Explosion (Sys, arg);
   }
   else if (!csStrCaseCmp (cmd, "loadmesh"))
   {
