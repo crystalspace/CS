@@ -75,6 +75,7 @@
 #include "wentity.h"
 #include "splitview.h"
 #include "recorder.h"
+#include "varmanager.h"
 
 extern WalkTest* Sys;
 
@@ -822,145 +823,23 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!csStrCaseCmp (cmd, "setvarc"))
   {
-    if (!arg)
-    {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  	"Please give a name of a variable and a color.");
-      return false;
-    }
-    char name[256];
-    csColor c;
-    csScanStr (arg, "%s,%f,%f,%f", name, &c.red, &c.green, &c.blue);
-
-    iSharedVariableList* vl = Sys->Engine->GetVariableList ();
-    iSharedVariable* v = vl->FindByName (name);
-    if (!v)
-    {
-      csRef<iSharedVariable> nv = vl->New ();
-      v = nv;
-      v->SetName (name);
-      vl->Add (nv);
-    }
-    v->SetColor (c);
+    if (!WalkTestVarManager::SetVariableColor (Sys, arg)) return false;
   }
   else if (!csStrCaseCmp (cmd, "setvarv"))
   {
-    if (!arg)
-    {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  	"Please give a name of a variable and a vector.");
-      return false;
-    }
-    char name[256];
-    csVector3 w;
-    csScanStr (arg, "%s,%f,%f,%f", name, &w.x, &w.y, &w.z);
-
-    iSharedVariableList* vl = Sys->Engine->GetVariableList ();
-    iSharedVariable* v = vl->FindByName (name);
-    if (!v)
-    {
-      csRef<iSharedVariable> nv = vl->New ();
-      v = nv;
-      v->SetName (name);
-      vl->Add (nv);
-    }
-    v->SetVector (w);
+    if (!WalkTestVarManager::SetVariableVector (Sys, arg)) return false;
   }
   else if (!csStrCaseCmp (cmd, "setvar"))
   {
-    if (!arg)
-    {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  	"Please give a name of a variable and a value.");
-      return false;
-    }
-    char name[256];
-    float value;
-    csScanStr (arg, "%s,%f", name, &value);
-
-    iSharedVariableList* vl = Sys->Engine->GetVariableList ();
-    iSharedVariable* v = vl->FindByName (name);
-    if (!v)
-    {
-      csRef<iSharedVariable> nv = vl->New ();
-      v = nv;
-      v->SetName (name);
-      vl->Add (nv);
-    }
-    v->Set (value);
+    if (!WalkTestVarManager::SetVariable (Sys, arg)) return false;
   }
   else if (!csStrCaseCmp (cmd, "var"))
   {
-    if (!arg)
-    {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  	"Please give a name of a variable to show.");
-      return false;
-    }
-    char name[256];
-    csScanStr (arg, "%s", name);
-
-    iSharedVariableList* vl = Sys->Engine->GetVariableList ();
-    iSharedVariable* v = vl->FindByName (name);
-    if (!v)
-    {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  	"Couldn't find variable '%s'!", name);
-      return false;
-    }
-    int t = v->GetType ();
-    switch (t)
-    {
-      case iSharedVariable::SV_FLOAT:
-        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  float '%s'=%g",
-	  	v->GetName (), v->Get ());
-	break;
-      case iSharedVariable::SV_COLOR:
-        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  color '%s'=%g,%g,%g",
-	  	v->GetName (), v->GetColor ().red, v->GetColor ().green,
-		v->GetColor ().blue);
-	break;
-      case iSharedVariable::SV_VECTOR:
-        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  vector '%s'=%g,%g,%g",
-	  	v->GetName (), v->GetVector ().x, v->GetVector ().y,
-		v->GetVector ().z);
-        break;
-      default:
-        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  unknown '%s'=?",
-	  	v->GetName ());
-        break;
-    }
+    if (!WalkTestVarManager::ShowVariable (Sys, arg)) return false;
   }
   else if (!csStrCaseCmp (cmd, "varlist"))
   {
-    iSharedVariableList* vl = Sys->Engine->GetVariableList ();
-    int i;
-    for (i = 0 ; i < vl->GetCount () ; i++)
-    {
-      iSharedVariable* v = vl->Get (i);
-      int t = v->GetType ();
-      switch (t)
-      {
-        case iSharedVariable::SV_FLOAT:
-          Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  float '%s'=%g",
-	  	v->GetName (), v->Get ());
-	  break;
-        case iSharedVariable::SV_COLOR:
-          Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  color '%s'=%g,%g,%g",
-	  	v->GetName (), v->GetColor ().red, v->GetColor ().green,
-		v->GetColor ().blue);
-	  break;
-        case iSharedVariable::SV_VECTOR:
-          Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  vector '%s'=%g,%g,%g",
-	  	v->GetName (), v->GetVector ().x, v->GetVector ().y,
-		v->GetVector ().z);
-          break;
-        default:
-          Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  unknown '%s'=?",
-	  	v->GetName ());
-          break;
-      }
-    }
+    if (!WalkTestVarManager::ListVariables (Sys, arg)) return false;
   }
   else if (!csStrCaseCmp (cmd, "conflist"))
   {

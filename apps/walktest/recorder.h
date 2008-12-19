@@ -60,6 +60,9 @@ struct csRecordedCameraFile
  */
 typedef csPDelArray<csRecordedCamera> csRecordVector;
 
+/**
+ * Recording facility for movement and camera.
+ */
 class WalkTestRecorder
 {
 private:
