@@ -73,20 +73,12 @@
 #include "command.h"
 #include "walktest.h"
 #include "wentity.h"
+#include "splitview.h"
 
 extern WalkTest* Sys;
 
 csString LookForKeyValue(iObjectIterator* it,const char* key);
 double ParseScaleFactor(iObjectIterator* it);
-
-// Use a view's clipping rect to calculate a bounding box
-void BoundingBoxForView(iView *view, csBox2 *box)
-{
-    size_t vertexCount = view->GetClipper()->GetVertexCount();
-    csVector2 *clip = view->GetClipper()->GetClipPoly();
-    for (size_t i = 0; i < vertexCount; i++)
-        box->AddBoundingVertex(clip[i]);
-}
 
 /// Save recording
 void SaveRecording (iVFS* vfs, const char* fName)
@@ -233,8 +225,7 @@ void LoadRecording (iVFS* vfs, const char* fName)
 /// Save/load camera functions
 void WalkTest::SaveCamera (const char *fName)
 {
-  if (!view) return;
-  iCamera *c = view->GetCamera ();
+  iCamera *c = views->GetCamera ();
   csOrthoTransform& camtrans = c->GetTransform ();
   if (!c) return;
   const csMatrix3& m_o2t = camtrans.GetO2T ();
@@ -296,7 +287,7 @@ bool WalkTest::LoadCamera (const char *fName)
 	    "exist in this map!", sector_name);
   if (ok)
   {
-    iCamera *c = view->GetCamera ();
+    iCamera *c = views->GetCamera ();
     c->SetSector (s);
     c->SetMirrored (imirror != 0);
     c->GetTransform ().SetO2T (m);
@@ -321,7 +312,7 @@ void move_mesh (iMeshWrapper* sprite, iSector* where, csVector3 const& pos)
 void load_meshobj (char *filename, char *templatename, char* txtname)
 {
   // First check if the texture exists.
-  if (!Sys->view->GetEngine ()->GetMaterialList ()->FindByName (txtname))
+  if (!Sys->Engine->GetMaterialList ()->FindByName (txtname))
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"Can't find material '%s' in memory!", txtname);
@@ -951,7 +942,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!csStrCaseCmp (cmd, "cleareffects"))
   {
-    iRenderManager *rm = Sys->view->GetEngine ()->GetRenderManager();
+    iRenderManager *rm = Sys->Engine->GetRenderManager();
     csRef<iRenderManagerPostEffects> pe = scfQueryInterface<iRenderManagerPostEffects>(rm);
     if (pe)
     {
@@ -997,7 +988,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     csColor c;
     csScanStr (arg, "%s,%f,%f,%f", name, &c.red, &c.green, &c.blue);
 
-    iSharedVariableList* vl = Sys->view->GetEngine ()->GetVariableList ();
+    iSharedVariableList* vl = Sys->Engine->GetVariableList ();
     iSharedVariable* v = vl->FindByName (name);
     if (!v)
     {
@@ -1020,7 +1011,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     csVector3 w;
     csScanStr (arg, "%s,%f,%f,%f", name, &w.x, &w.y, &w.z);
 
-    iSharedVariableList* vl = Sys->view->GetEngine ()->GetVariableList ();
+    iSharedVariableList* vl = Sys->Engine->GetVariableList ();
     iSharedVariable* v = vl->FindByName (name);
     if (!v)
     {
@@ -1043,7 +1034,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     float value;
     csScanStr (arg, "%s,%f", name, &value);
 
-    iSharedVariableList* vl = Sys->view->GetEngine ()->GetVariableList ();
+    iSharedVariableList* vl = Sys->Engine->GetVariableList ();
     iSharedVariable* v = vl->FindByName (name);
     if (!v)
     {
@@ -1065,7 +1056,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     char name[256];
     csScanStr (arg, "%s", name);
 
-    iSharedVariableList* vl = Sys->view->GetEngine ()->GetVariableList ();
+    iSharedVariableList* vl = Sys->Engine->GetVariableList ();
     iSharedVariable* v = vl->FindByName (name);
     if (!v)
     {
@@ -1098,7 +1089,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!csStrCaseCmp (cmd, "varlist"))
   {
-    iSharedVariableList* vl = Sys->view->GetEngine ()->GetVariableList ();
+    iSharedVariableList* vl = Sys->Engine->GetVariableList ();
     int i;
     for (i = 0 ; i < vl->GetCount () ; i++)
     {
@@ -1346,9 +1337,9 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!csStrCaseCmp (cmd, "db_boxshow"))
     csCommandProcessor::change_boolean (arg, &Sys->do_show_debug_boxes, "show debug boxes");
   else if (!csStrCaseCmp (cmd, "db_boxcam1"))
-    Sys->debug_box1.SetCenter (Sys->view->GetCamera ()->GetTransform ().GetOrigin ());
+    Sys->debug_box1.SetCenter (Sys->views->GetCamera ()->GetTransform ().GetOrigin ());
   else if (!csStrCaseCmp (cmd, "db_boxcam2"))
-    Sys->debug_box2.SetCenter (Sys->view->GetCamera ()->GetTransform ().GetOrigin ());
+    Sys->debug_box2.SetCenter (Sys->views->GetCamera ()->GetTransform ().GetOrigin ());
   else if (!csStrCaseCmp (cmd, "db_boxsize1"))
   {
     float size = Sys->debug_box1.MaxX ()-Sys->debug_box1.MinX ();
@@ -1424,7 +1415,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 	  ->GetTransform ();
 	csVector3 v (-f, 0, 0);
 	tr.Translate (
-	    Sys->view->GetCamera ()->GetTransform ().This2OtherRelative (v));
+	    Sys->views->GetCamera ()->GetTransform ().This2OtherRelative (v));
 	Sys->closestMesh->GetMovable ()->UpdateMove ();
       }
     }
@@ -1440,7 +1431,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 	  ->GetTransform ();
 	csVector3 v (0, 0, f);
 	tr.Translate (
-	    Sys->view->GetCamera ()->GetTransform ().This2OtherRelative (v));
+	    Sys->views->GetCamera ()->GetTransform ().This2OtherRelative (v));
 	Sys->closestMesh->GetMovable ()->UpdateMove ();
       }
     }
@@ -1449,7 +1440,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     if (!arg)
     {
-      const csFog& f = Sys->view->GetCamera ()->GetSector ()->GetFog ();
+      const csFog& f = Sys->views->GetCamera ()->GetSector ()->GetFog ();
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	"Fog in current sector (%f,%f,%f) density=%f",
       	f.color.red, f.color.green, f.color.blue, f.density);
@@ -1469,7 +1460,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       f.color.green = g;
       f.color.blue = b;
       f.mode = CS_FOG_MODE_CRYSTALSPACE;
-      Sys->view->GetCamera ()->GetSector ()->SetFog (f);
+      Sys->views->GetCamera ()->GetSector ()->SetFog (f);
     }
   }
   else if (!csStrCaseCmp (cmd, "loadmap"))
@@ -1503,28 +1494,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
       Sys->Engine->Prepare ();
       // Look for the start sector in this map.
-      bool camok = false;
-      if (!camok && Sys->Engine->GetCameraPositions ()->GetCount () > 0)
-      {
-        iCameraPosition *cp = Sys->Engine->GetCameraPositions ()->Get (0);
-        if (cp->Load(Sys->views[0]->GetCamera (), Sys->Engine) &&
-	    cp->Load(Sys->views[1]->GetCamera (), Sys->Engine))
-	  camok = true;
-      }
-      if (!camok)
-      {
-        iSector* room = Sys->Engine->GetSectors ()->FindByName ("room");
-        if (room)
-        {
-	  Sys->views[0]->GetCamera ()->SetSector (room);
-	  Sys->views[1]->GetCamera ()->SetSector (room);
-	  Sys->views[0]->GetCamera ()->GetTransform ().SetOrigin (
-	      csVector3 (0, 0, 0));
-	  Sys->views[1]->GetCamera ()->GetTransform ().SetOrigin (
-	      csVector3 (0, 0, 0));
-	  camok = true;
-        }
-      }
+      bool camok = Sys->views->SetupViewStart ();
       if (!camok)
       {
         Sys->Report (CS_REPORTER_SEVERITY_ERROR,
@@ -1542,7 +1512,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       char level[300];
       csScanStr (arg, "%s", level);
       void OpenPortal (iView* view, char* lev);
-      OpenPortal (Sys->view, level);
+      OpenPortal (Sys->views->GetView (), level);
     }
     else
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -1591,7 +1561,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       char buf[255];
       *buf = 0;
       if (arg) csScanStr (arg, "%s", buf);
-      iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->FindByName (buf);
+      iMaterialWrapper* mat = Sys->Engine->GetMaterialList ()->FindByName (buf);
       if (mat)
       {
         Sys->fs_fadetxt_txt = mat->GetMaterial()->GetTexture ();
@@ -1881,7 +1851,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (cnt <= 2) speed = 2;
     if (cnt <= 1) num = 500;
     if (cnt <= 0) strcpy (txtname, "raindrop");
-    add_particles_rain (Sys->view->GetCamera ()->GetSector (),
+    add_particles_rain (Sys->views->GetCamera ()->GetSector (),
     	txtname, num, speed, false);
   }
   else if (!csStrCaseCmp (cmd, "frain"))
@@ -1898,7 +1868,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (cnt <= 2) speed = 2;
     if (cnt <= 1) num = 500;
     if (cnt <= 0) strcpy (txtname, "raindrop");
-    add_particles_rain (Sys->view->GetCamera ()->GetSector (),
+    add_particles_rain (Sys->views->GetCamera ()->GetSector (),
     	txtname, num, speed, true);
   }
   else if (!csStrCaseCmp (cmd, "snow"))
@@ -1915,7 +1885,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (cnt <= 2) speed = 0.3f;
     if (cnt <= 1) num = 500;
     if (cnt <= 0) strcpy (txtname, "snow");
-    add_particles_snow (Sys->view->GetCamera ()->GetSector (),
+    add_particles_snow (Sys->views->GetCamera ()->GetSector (),
     	txtname, num, speed);
   }
   else if (!csStrCaseCmp (cmd, "flame"))
@@ -1929,8 +1899,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     	int num, const csVector3& origin);
     if (cnt <= 1) num = 200;
     if (cnt <= 0) strcpy (txtname, "raindrop");
-    add_particles_fire (Sys->view->GetCamera ()->GetSector (),
-    	txtname, num, Sys->view->GetCamera ()->GetTransform ().GetOrigin ()-
+    add_particles_fire (Sys->views->GetCamera ()->GetSector (),
+    	txtname, num, Sys->views->GetCamera ()->GetTransform ().GetOrigin ()-
 	csVector3 (0, Sys->cfg_body_height, 0));
   }
   else if (!csStrCaseCmp (cmd, "fountain"))
@@ -1944,8 +1914,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     	int num, const csVector3& origin);
     if (cnt <= 1) num = 400;
     if (cnt <= 0) strcpy (txtname, "spark");
-    add_particles_fountain (Sys->view->GetCamera ()->GetSector (),
-    	txtname, num, Sys->view->GetCamera ()->GetTransform ().GetOrigin ()-
+    add_particles_fountain (Sys->views->GetCamera ()->GetSector (),
+    	txtname, num, Sys->views->GetCamera ()->GetTransform ().GetOrigin ()-
 	csVector3 (0, Sys->cfg_body_height, 0));
   }
   else if (!csStrCaseCmp (cmd, "explosion"))
@@ -1962,9 +1932,9 @@ bool CommandHandler (const char *cmd, const char *arg)
       	"Expected parameter 'texture'!");
     }
     else
-      add_particles_explosion (Sys->view->GetCamera ()->GetSector (),
+      add_particles_explosion (Sys->views->GetCamera ()->GetSector (),
     	Sys->Engine,
-	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), txtname);
+	Sys->views->GetCamera ()->GetTransform ().GetOrigin (), txtname);
   }
   else if (!csStrCaseCmp (cmd, "loadmesh"))
   {
@@ -1992,8 +1962,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     else
     {
-      add_meshobj (tname, sname, Sys->view->GetCamera ()->GetSector (),
-    	          Sys->view->GetCamera ()->GetTransform ().GetOrigin (), size);
+      add_meshobj (tname, sname, Sys->views->GetCamera ()->GetSector (),
+    	          Sys->views->GetCamera ()->GetTransform ().GetOrigin (), size);
     }
   }
   else if (!csStrCaseCmp (cmd, "delmesh"))
@@ -2113,8 +2083,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (meshfact)
     {
       csRef<iMeshWrapper> sprite = Sys->Engine->CreateMeshWrapper (meshfact, "Frankie",
-	    Sys->view->GetCamera ()->GetSector (),
-	    Sys->view->GetCamera ()->GetTransform ().GetOrigin ());
+	    Sys->views->GetCamera ()->GetSector (),
+	    Sys->views->GetCamera ()->GetTransform ().GetOrigin ());
       csRef<iAnimatedMesh> animesh = scfQueryInterface<iAnimatedMesh> (sprite->GetMeshObject ());
       iSkeletonAnimNode2* root = animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
       csRef<iSkeletonAnimNode2> anim;
@@ -2142,8 +2112,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     RECORD_ARGS (cmd, arg);
     float radius = 0;
     if (arg) csScanStr (arg, "%f", &radius);
-    Sys->add_bot (2, Sys->view->GetCamera ()->GetSector (),
-    	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), radius,
+    Sys->add_bot (2, Sys->views->GetCamera ()->GetSector (),
+    	Sys->views->GetCamera ()->GetTransform ().GetOrigin (), radius,
 	true);
   }
   else if (!csStrCaseCmp (cmd, "addbot"))
@@ -2151,8 +2121,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     RECORD_ARGS (cmd, arg);
     float radius = 0;
     if (arg) csScanStr (arg, "%f", &radius);
-    Sys->add_bot (2, Sys->view->GetCamera ()->GetSector (),
-    	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), radius);
+    Sys->add_bot (2, Sys->views->GetCamera ()->GetSector (),
+    	Sys->views->GetCamera ()->GetTransform ().GetOrigin (), radius);
   }
   else if (!csStrCaseCmp (cmd, "delbot"))
   {
@@ -2165,7 +2135,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!csStrCaseCmp (cmd, "clrlights"))
   {
     RECORD_CMD (cmd);
-    csRef<iLightIterator> lit (Sys->view->GetEngine ()->GetLightIterator ());
+    csRef<iLightIterator> lit (Sys->Engine->GetLightIterator ());
     iLight* l;
     while (lit->HasNext ())
     {
@@ -2190,24 +2160,24 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     RECORD_ARGS (cmd, arg);
     csVector3 dir (0,0,0);
-    csVector3 pos = Sys->view->GetCamera ()->GetTransform ().This2Other (dir);
+    csVector3 pos = Sys->views->GetCamera ()->GetTransform ().This2Other (dir);
     csRef<iLight> dyn;
 
     bool rnd;
     float r, g, b, radius;
     if (arg && csScanStr (arg, "%f,%f,%f,%f", &r, &g, &b, &radius) == 4)
     {
-      dyn = Sys->view->GetEngine ()->CreateLight ("", pos,
+      dyn = Sys->Engine->CreateLight ("", pos,
       	radius, csColor (r, g, b), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
       rnd = false;
     }
     else
     {
-      dyn = Sys->view->GetEngine ()->CreateLight ("", pos,
+      dyn = Sys->Engine->CreateLight ("", pos,
       	6, csColor (1, 1, 1), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
       rnd = true;
     }
-    iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
+    iLightList* ll = Sys->views->GetCamera ()->GetSector ()->GetLights ();
     ll->Add (dyn);
     Sys->dynamic_lights.Push (dyn);
     extern void AttachRandomLight (iLight* light);
@@ -2226,7 +2196,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       strcpy (name, "deflight");
     }
-    iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
+    iLightList* ll = Sys->views->GetCamera ()->GetSector ()->GetLights ();
     iLight* l = ll->FindByName (name);
     if (!l)
     {
@@ -2235,7 +2205,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     else
     {
-      Sys->view->GetEngine ()->RemoveLight (l);
+      Sys->Engine->RemoveLight (l);
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Static light removed.");
     }
   }
@@ -2243,7 +2213,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     RECORD_ARGS (cmd, arg);
     csVector3 dir (0,0,0);
-    csVector3 pos = Sys->view->GetCamera ()->GetTransform ().This2Other (dir);
+    csVector3 pos = Sys->views->GetCamera ()->GetTransform ().This2Other (dir);
     csRef<iLight> light;
 
     float r, g, b, radius;
@@ -2251,22 +2221,22 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg && csScanStr (arg, "%s,%f,%f,%f,%f", name, &r, &g, &b,
     	&radius) == 5)
     {
-      light = Sys->view->GetEngine ()->CreateLight (name,
+      light = Sys->Engine->CreateLight (name,
         pos, radius, csColor (r, g, b), CS_LIGHT_DYNAMICTYPE_PSEUDO);
     }
     else
     {
-      light = Sys->view->GetEngine ()->CreateLight ("deflight",
+      light = Sys->Engine->CreateLight ("deflight",
         pos, 12, csColor (0, 0, 1), CS_LIGHT_DYNAMICTYPE_PSEUDO);
     }
-    iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
+    iLightList* ll = Sys->views->GetCamera ()->GetSector ()->GetLights ();
     ll->Add (light);
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Static light added.");
   }
   else if (!csStrCaseCmp (cmd, "dellight"))
   {
     RECORD_CMD (cmd);
-    iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
+    iLightList* ll = Sys->views->GetCamera ()->GetSector ()->GetLights ();
     int i;
     for (i = 0 ; i < ll->GetCount () ; i++)
     {
@@ -2291,7 +2261,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!csStrCaseCmp (cmd, "dellights"))
   {
     RECORD_CMD (cmd);
-    iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
+    iLightList* ll = Sys->views->GetCamera ()->GetSector ()->GetLights ();
     int i;
     for (i = 0 ; i < ll->GetCount () ; i++)
     {
@@ -2348,54 +2318,17 @@ bool CommandHandler (const char *cmd, const char *arg)
     Sys->myG2D->PerformExtension("fullscreen");
   else if (!csStrCaseCmp(cmd, "split_view"))
   {
-    if (Sys->split == -1)
-    {	
-        csBox2 bbox;
-        BoundingBoxForView(Sys->view, &bbox);
-        
-        int width = csQint(bbox.MaxX() - bbox.MinX());
-        int height = csQint(bbox.MaxY() - bbox.MinY());
-        Sys->views[0]->SetRectangle((int)bbox.MinX(), (int)bbox.MinY(), width / 2, height);
-	Sys->views[0]->GetCamera()->SetViewportSize (width, height);
-        Sys->views[0]->GetCamera()->SetPerspectiveCenter(bbox.MinX() + (width / 4),
-                                                        bbox.MinY() + (height / 2));
-	Sys->views[1]->GetCamera()->SetViewportSize (width, height);
-        Sys->views[1]->SetRectangle((int)bbox.MinX() + (width / 2), (int)bbox.MinY(), 
-                                    width / 2, height);
-        Sys->views[1]->GetCamera()->SetPerspectiveCenter(bbox.MinX() + (3 * width / 4),
-                                                        bbox.MinY() + (height / 2));
-        Sys->split = (Sys->view == Sys->views[0]) ? 0 : 1;
-        Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "Splitting to 2 views");
-    };
+    Sys->views->SplitView ();
   }
   else if (!csStrCaseCmp(cmd, "unsplit_view"))
   {
-    if (Sys->split != -1)
-    {
-        csBox2 bbox1, bbox2;
-        BoundingBoxForView(Sys->views[0], &bbox1);
-        BoundingBoxForView(Sys->views[1], &bbox2);
-
-        int width = csQint(bbox2.MaxX() - bbox1.MinX());
-        int height = csQint(bbox1.MaxY() - bbox1.MinY());
-	Sys->view->GetCamera()->SetViewportSize (width, height);
-        Sys->view->SetRectangle((int)bbox1.MinX(), (int)bbox1.MinY(), width, height);
-        Sys->view->GetCamera()->SetPerspectiveCenter(bbox1.MinX() + (width / 2), 
-                                                    bbox2.MinY() + (height / 2));
-        Sys->split = -1;
-	Sys->collider_actor.SetCamera (Sys->view->GetCamera ());
-        Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "Unsplitting view");
-    }
+    if (Sys->views->UnsplitView ())
+      Sys->collider_actor.SetCamera (Sys->views->GetCamera ());
   }
   else if (!csStrCaseCmp(cmd, "toggle_view"))
   {
-    if (Sys->split != -1)
-    {
-        Sys->split = (Sys->split + 1) % 2;
-        Sys->view = Sys->views[Sys->split];
-	Sys->collider_actor.SetCamera (Sys->view->GetCamera ());
-        Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "Switching to view %d", Sys->split);
-    }
+    if (Sys->views->ToggleView ())
+      Sys->collider_actor.SetCamera (Sys->views->GetCamera ());
   }
   else if (!csStrCaseCmp(cmd, "farplane"))
   {
@@ -2410,14 +2343,14 @@ bool CommandHandler (const char *cmd, const char *arg)
     // disable farplane
     if (distance==0)
     {
-	Sys->view->GetCamera()->SetFarPlane(0);
+	Sys->views->GetCamera()->SetFarPlane(0);
 	// we can't disable zclear now... because we can't say for sure that
 	// the level didn't need it
 	Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "farplane disabled");
 	return true;
     }
     csPlane3 farplane(0,0,-1,distance);
-    Sys->view->GetCamera()->SetFarPlane(&farplane);
+    Sys->views->GetCamera()->SetFarPlane(&farplane);
     // turn on zclear to be sure
     Sys->Engine->SetClearZBuf(true);
   }
@@ -2460,8 +2393,8 @@ bool CommandHandler (const char *cmd, const char *arg)
 
     csRef<iView> sideView;
     sideView.AttachNew (new csView (Sys->Engine, Sys->myG3D));
-    sideView->GetCamera()->SetSector (Sys->view->GetCamera()->GetSector());
-    sideView->GetCamera()->SetTransform (Sys->view->GetCamera()->GetTransform());
+    sideView->GetCamera()->SetSector (Sys->views->GetCamera()->GetSector());
+    sideView->GetCamera()->SetTransform (Sys->views->GetCamera()->GetTransform());
     sideView->GetCamera()->SetFOVAngle (90, dim);
     sideView->GetCamera()->SetPerspectiveCenter (dim / 2, dim / 2);
     

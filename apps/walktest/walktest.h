@@ -38,11 +38,13 @@
 #include "iutil/eventnames.h"
 #include "csutil/eventhandlers.h"
 #include "ivideo/fontserv.h"
-#include "bot.h"
-
 #include "iengine/engine.h"
 
+#include "bot.h"
+#include "walktest.h"
+
 class WalkTest;
+class WalkTestViews;
 class csPixmap;
 class csWireFrameCam;
 class InfiniteMaze;
@@ -327,8 +329,7 @@ public:
   csRef<iVFS> myVFS;
   csRef<iSndSysRenderer> mySound;
 
-  /// The view on the world.
-  iView* view;
+  WalkTestViews* views;
 
   /// A pointer to a skybox to animate (if any).
   iMeshWrapper* anim_sky;
@@ -394,11 +395,6 @@ public:
 
   /// The font we'll use for writing
   csRef<iFont> Font;
-
-  /// Value to indicate split state
-  /// -1 = not split, other value is index of current view
-  int split;
-  csRef<iView> views[2];
 
   /// is actually anything visible on the canvas?
   bool canvas_exposed;
@@ -647,9 +643,6 @@ extern csVector2 coord_check_vector;
 extern void perf_test (int num);
 extern void CaptureScreen ();
 extern void free_keymap ();
-
-// Use a view's clipping rect to calculate a bounding box
-void BoundingBoxForView(iView *view, csBox2 *box);
 
 // The global system driver
 extern WalkTest *Sys;

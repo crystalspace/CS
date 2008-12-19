@@ -52,6 +52,7 @@
 #include "bot.h"
 #include "command.h"
 #include "walktest.h"
+#include "splitview.h"
 
 extern WalkTest* Sys;
 
@@ -80,7 +81,7 @@ extern void move_mesh (iMeshWrapper* sprite, iSector* where,
 void add_particles_rain (iSector* sector, char* matname, int num, float speed,
 	bool do_camera)
 {
-  iEngine* engine = Sys->view->GetEngine ();
+  iEngine* engine = Sys->Engine;
   // First check if the material exists.
   iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (matname);
   if (!mat)
@@ -105,7 +106,7 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed,
 
   if (do_camera)
   {
-    iEngine* e = Sys->view->GetEngine ();
+    iEngine* e = Sys->Engine;
     int c = e->GetAlphaRenderPriority ();
     exp->GetFlags ().Set (CS_ENTITY_CAMERA);
     exp->SetRenderPriority (c);
@@ -155,9 +156,9 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed,
 //===========================================================================
 void add_particles_snow (iSector* sector, char* matname, int num, float speed)
 {
-  iEngine* engine = Sys->view->GetEngine ();
+  iEngine* engine = Sys->Engine;
   // First check if the material exists.
-  iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->
+  iMaterialWrapper* mat = Sys->Engine->GetMaterialList ()->
   	FindByName (matname);
   if (!mat)
   {
@@ -224,7 +225,7 @@ void add_particles_snow (iSector* sector, char* matname, int num, float speed)
 void add_particles_fire (iSector* sector, char* matname, int num,
 	const csVector3& origin)
 {
-  iEngine* engine = Sys->view->GetEngine ();
+  iEngine* engine = Sys->Engine;
 
   // First check if the material exists.
   iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (matname);
@@ -296,7 +297,7 @@ void add_particles_fire (iSector* sector, char* matname, int num,
 void add_particles_fountain (iSector* sector, char* matname, int num,
 	const csVector3& origin)
 {
-  iEngine* engine = Sys->view->GetEngine ();
+  iEngine* engine = Sys->Engine;
 
   // First check if the material exists.
   iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (matname);
@@ -358,7 +359,7 @@ void add_particles_explosion (iSector* sector, iEngine* engine,
 	const csVector3& center, const char* matname)
 {
   // First check if the material exists.
-  iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->
+  iMaterialWrapper* mat = Sys->Engine->GetMaterialList ()->
   	FindByName (matname);
   if (!mat)
   {
@@ -431,12 +432,12 @@ void WalkTest::add_bot (float size, iSector* where, csVector3 const& pos,
   {
     float r, g, b;
     RandomColor (r, g, b);
-    dyn = Sys->view->GetEngine ()->CreateLight ("",
+    dyn = Sys->Engine->CreateLight ("",
     	pos, dyn_radius, csColor(r, g, b), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
     where->GetLights ()->Add (dyn);
     Sys->dynamic_lights.Push (dyn);
   }
-  iMeshFactoryWrapper* tmpl = Sys->view->GetEngine ()->GetMeshFactories ()
+  iMeshFactoryWrapper* tmpl = Sys->Engine->GetMeshFactories ()
   	->FindByName ("bot");
   if (!tmpl) return;
   csRef<iMeshObject> botmesh (tmpl->GetMeshObjectFactory ()->NewInstance ());
@@ -450,7 +451,7 @@ void WalkTest::add_bot (float size, iSector* where, csVector3 const& pos,
   csRef<iSprite3DState> state (scfQueryInterface<iSprite3DState> (botmesh));
   state->SetAction ("default");
   
-  Bot* bot = new Bot (Sys->view->GetEngine(), botWrapper);
+  Bot* bot = new Bot (Sys->Engine, botWrapper);
   bot->set_bot_move (pos);
   bot->set_bot_sector (where);
   bot->light = dyn;
@@ -551,7 +552,7 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
             Sys->add_bot (1, dyn->GetSector (), dyn->GetCenter (), 0);
 	  }
 	  ms->sprite->GetMovable ()->ClearSectors ();
-	  Sys->view->GetEngine ()->GetMeshes ()->Remove (ms->sprite);
+	  Sys->Engine->GetMeshes ()->Remove (ms->sprite);
 	}
 	csRef<WalkDataObject> ido (
 		CS::GetChildObject<WalkDataObject>(dyn->QueryObject()));
@@ -666,8 +667,8 @@ void show_lightning ()
   {
     // This finds the light L1 (the colored light over the stairs) and
     // makes the lightning restore this color back after it runs.
-    iLight *light = Sys->view->GetEngine ()->FindLight("l1");
-    iSharedVariable *var = Sys->view->GetEngine ()->GetVariableList()
+    iLight *light = Sys->Engine->FindLight("l1");
+    iSharedVariable *var = Sys->Engine->GetVariableList()
     	->FindByName("Lightning Restore Color");
     if (light && var)
     {
@@ -685,13 +686,13 @@ void show_lightning ()
 void fire_missile ()
 {
   csVector3 dir (0, 0, 0);
-  csVector3 pos = Sys->view->GetCamera ()->GetTransform ().This2Other (dir);
+  csVector3 pos = Sys->views->GetCamera ()->GetTransform ().This2Other (dir);
   float r, g, b;
   RandomColor (r, g, b);
   csRef<iLight> dyn =
-  	Sys->view->GetEngine ()->CreateLight ("", pos, 4, csColor (r, g, b),
+  	Sys->Engine->CreateLight ("", pos, 4, csColor (r, g, b),
 		CS_LIGHT_DYNAMICTYPE_DYNAMIC);
-  Sys->view->GetCamera ()->GetSector ()->GetLights ()->Add (dyn);
+  Sys->views->GetCamera ()->GetSector ()->GetLights ()->Add (dyn);
   Sys->dynamic_lights.Push (dyn);
 
   MissileStruct* ms = new MissileStruct;
@@ -712,7 +713,7 @@ void fire_missile ()
     }
   }
   ms->type = DYN_TYPE_MISSILE;
-  ms->dir = (csOrthoTransform)(Sys->view->GetCamera ()->GetTransform ());
+  ms->dir = (csOrthoTransform)(Sys->views->GetCamera ()->GetTransform ());
   ms->sprite = 0;
   WalkDataObject* msdata = new WalkDataObject(ms);
   dyn->QueryObject ()->ObjAdd(msdata);
@@ -721,7 +722,7 @@ void fire_missile ()
   csString misname;
   misname.Format ("missile%d", ((rand () >> 3) & 1)+1);
 
-  iMeshFactoryWrapper *tmpl = Sys->view->GetEngine ()->GetMeshFactories ()
+  iMeshFactoryWrapper *tmpl = Sys->Engine->GetMeshFactories ()
   	->FindByName (misname);
   if (!tmpl)
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -729,8 +730,8 @@ void fire_missile ()
   else
   {
     csRef<iMeshWrapper> sp (
-    	Sys->view->GetEngine ()->CreateMeshWrapper (tmpl,
-	"missile",Sys->view->GetCamera ()->GetSector (), pos));
+    	Sys->Engine->CreateMeshWrapper (tmpl,
+	"missile",Sys->views->GetCamera ()->GetSector (), pos));
 
     ms->sprite = sp;
     csMatrix3 m = ms->dir.GetT2O ();
@@ -747,7 +748,7 @@ void test_decal ()
     return;
 
   iMaterialWrapper * material = 
-    Sys->view->GetEngine()->GetMaterialList()->FindByName("decal");
+    Sys->Engine->GetMaterialList()->FindByName("decal");
   if (!material)
   {
     csRef<iLoader> loader = csQueryRegistry<iLoader>(Sys->object_reg);
@@ -761,7 +762,7 @@ void test_decal ()
       Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, 
                   "Couldn't load decal texture!");
 
-    material = Sys->view->GetEngine()->GetMaterialList()->FindByName("decal");
+    material = Sys->Engine->GetMaterialList()->FindByName("decal");
     if (!material)
     {
       Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, 
@@ -775,14 +776,14 @@ void test_decal ()
       decalMgr->CreateDecalTemplate(material);
   decalTemplate->SetTimeToLive(5.0f);
   
-  csVector3 start = Sys->view->GetCamera()->GetTransform().GetOrigin();
+  csVector3 start = Sys->views->GetCamera()->GetTransform().GetOrigin();
 
   csVector3 normal = 
-    Sys->view->GetCamera()->GetTransform().This2OtherRelative(csVector3(0,0,-1));
+    Sys->views->GetCamera()->GetTransform().This2OtherRelative(csVector3(0,0,-1));
 
   csVector3 end = start - normal * 10000.0f;
 
-  csSectorHitBeamResult result = Sys->view->GetCamera()->GetSector()->HitBeamPortals(start, end);
+  csSectorHitBeamResult result = Sys->views->GetCamera()->GetSector()->HitBeamPortals(start, end);
   if (!result.mesh)
       return;
       
@@ -800,7 +801,7 @@ void test_decal ()
   csVector3 iSect;
   csIntersectingTriangle closestTri;
   iMeshWrapper * selMesh;
-  if (csColliderHelper::TraceBeam(cdsys, Sys->view->GetCamera()->GetSector(), 
+  if (csColliderHelper::TraceBeam(cdsys, Sys->views->GetCamera()->GetSector(), 
         start, end, true, closestTri, iSect, &selMesh) <= 0.0f)
   {
       printf("No Decal Tracebeam\n");
@@ -812,7 +813,7 @@ void test_decal ()
 
   // make the up direction of the decal the same as the camera
   csVector3 up =
-    Sys->view->GetCamera()->GetTransform().This2OtherRelative(
+    Sys->views->GetCamera()->GetTransform().This2OtherRelative(
 	csVector3(0,1,0));
 
   // create the decal
