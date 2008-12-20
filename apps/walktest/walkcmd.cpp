@@ -77,6 +77,8 @@
 #include "recorder.h"
 #include "varmanager.h"
 #include "particles.h"
+#include "missile.h"
+#include "lights.h"
 
 extern WalkTest* Sys;
 
@@ -1507,8 +1509,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!csStrCaseCmp (cmd, "fire"))
   {
     RECORD_CMD (cmd);
-    extern void fire_missile ();
-    fire_missile ();
+    Sys->missiles->FireMissile ();
   }
   else if (!csStrCaseCmp (cmd, "decal_test"))
   {
@@ -1775,31 +1776,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!csStrCaseCmp (cmd, "addlight"))
   {
     RECORD_ARGS (cmd, arg);
-    csVector3 dir (0,0,0);
-    csVector3 pos = Sys->views->GetCamera ()->GetTransform ().This2Other (dir);
-    csRef<iLight> dyn;
-
-    bool rnd;
-    float r, g, b, radius;
-    if (arg && csScanStr (arg, "%f,%f,%f,%f", &r, &g, &b, &radius) == 4)
-    {
-      dyn = Sys->Engine->CreateLight ("", pos,
-      	radius, csColor (r, g, b), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
-      rnd = false;
-    }
-    else
-    {
-      dyn = Sys->Engine->CreateLight ("", pos,
-      	6, csColor (1, 1, 1), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
-      rnd = true;
-    }
-    iLightList* ll = Sys->views->GetCamera ()->GetSector ()->GetLights ();
-    ll->Add (dyn);
-    Sys->dynamic_lights.Push (dyn);
-    extern void AttachRandomLight (iLight* light);
-    if (rnd)
-      AttachRandomLight (dyn);
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Dynamic light added.");
+    Sys->lights->AddLight (arg);
   }
   else if (!csStrCaseCmp (cmd, "delstlight"))
   {
@@ -1852,52 +1829,12 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!csStrCaseCmp (cmd, "dellight"))
   {
     RECORD_CMD (cmd);
-    iLightList* ll = Sys->views->GetCamera ()->GetSector ()->GetLights ();
-    int i;
-    for (i = 0 ; i < ll->GetCount () ; i++)
-    {
-      iLight* l = ll->Get (i);
-      if (l->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
-      {
-        ll->Remove (l);
-	size_t j;
-	for (j = 0 ; j < Sys->dynamic_lights.GetSize () ; j++)
-	{
-	  if (Sys->dynamic_lights[j] == l)
-	  {
-	    Sys->dynamic_lights.DeleteIndex (j);
-	    break;
-	  }
-	}
-	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Dynamic light removed.");
-        break;
-      }
-    }
+    Sys->lights->DelLight ();
   }
   else if (!csStrCaseCmp (cmd, "dellights"))
   {
     RECORD_CMD (cmd);
-    iLightList* ll = Sys->views->GetCamera ()->GetSector ()->GetLights ();
-    int i;
-    for (i = 0 ; i < ll->GetCount () ; i++)
-    {
-      iLight* l = ll->Get (i);
-      if (l->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
-      {
-        ll->Remove (l);
-	size_t j;
-	for (j = 0 ; j < Sys->dynamic_lights.GetSize () ; j++)
-	{
-	  if (Sys->dynamic_lights[j] == l)
-	  {
-	    Sys->dynamic_lights.DeleteIndex (j);
-	    break;
-	  }
-	}
-	i--;
-      }
-    }
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "All dynamic lights deleted.");
+    Sys->lights->DelLights ();
   }
   else if (!csStrCaseCmp (cmd, "snd_play"))
   {

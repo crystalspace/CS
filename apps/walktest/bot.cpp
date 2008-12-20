@@ -29,6 +29,8 @@
 
 #include "bot.h"
 #include "walktest.h"
+#include "missile.h"
+#include "lights.h"
 
 extern void RandomColor (float& r, float& g, float& b);
 
@@ -130,12 +132,7 @@ Bot* BotManager::CreateBot (iSector* where, const csVector3& pos, float dyn_radi
   csRef<iLight> dyn;
   if (dyn_radius)
   {
-    float r, g, b;
-    RandomColor (r, g, b);
-    dyn = walktest->Engine->CreateLight ("",
-    	pos, dyn_radius, csColor(r, g, b), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
-    where->GetLights ()->Add (dyn);
-    walktest->dynamic_lights.Push (dyn);
+    dyn = walktest->lights->CreateRandomLight (pos, where, dyn_radius);
   }
   iMeshFactoryWrapper* tmpl = walktest->Engine->GetMeshFactories ()
   	->FindByName ("bot");

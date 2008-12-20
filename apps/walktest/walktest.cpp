@@ -38,6 +38,8 @@
 #include "command.h"
 #include "splitview.h"
 #include "recorder.h"
+#include "missile.h"
+#include "lights.h"
 
 #if defined(CS_PLATFORM_DOS) || defined(CS_PLATFORM_WIN32)
 #  include <io.h>
@@ -122,6 +124,8 @@ WalkTest::WalkTest () :
 
   bots = new BotManager (this);
   do_bots = false;
+  missiles = new WalkTestMissileLauncher (this);
+  lights = new WalkTestLights (this);
 }
 
 WalkTest::~WalkTest ()
@@ -567,20 +571,7 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
     */
 
   // Apply lighting BEFORE the very first frame
-  size_t i;
-  for (i = 0 ; i < dynamic_lights.GetSize () ; i++)
-  {
-    iLight* dyn = dynamic_lights[i];
-    extern bool HandleDynLight (iLight*, iEngine*);
-    csRef<WalkDataObject> dao (
-        CS::GetChildObject<WalkDataObject>(dyn->QueryObject()));
-    if (dao)
-      if (HandleDynLight (dyn, Engine))
-      {
-        dynamic_lights.DeleteIndex (i);
-	i--;
-      }
-  }
+  lights->HandleDynLights ();
 
   //------------
   // Here comes the main call to the engine. views->Draw() actually

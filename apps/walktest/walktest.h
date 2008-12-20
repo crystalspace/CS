@@ -46,6 +46,9 @@
 class WalkTest;
 class WalkTestViews;
 class WalkTestRecorder;
+class WalkTestMissileLauncher;
+class WalkTestLights;
+class BotManager;
 class csPixmap;
 class csWireFrameCam;
 class InfiniteMaze;
@@ -139,7 +142,8 @@ public:
   csEventID CanvasExposed;
   csEventID CanvasResize;
 
-  csRefArray<iLight> dynamic_lights;
+  WalkTestMissileLauncher* missiles;
+  WalkTestLights* lights;
 
   int FrameWidth, FrameHeight;
 
