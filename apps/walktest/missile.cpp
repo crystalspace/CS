@@ -28,7 +28,6 @@
 #include "particles.h"
 #include "lights.h"
 
-extern void RandomColor (float& r, float& g, float& b);
 extern void move_mesh (iMeshWrapper* sprite, iSector* where, csVector3 const& pos);
 
 

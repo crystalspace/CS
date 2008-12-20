@@ -32,8 +32,6 @@
 #include "missile.h"
 #include "lights.h"
 
-extern void RandomColor (float& r, float& g, float& b);
-
 Bot::Bot (iEngine *Engine, iMeshWrapper* botmesh)
 {
   engine = Engine;
