@@ -1728,7 +1728,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     RECORD_ARGS (cmd, arg);
     float radius = 0;
     if (arg) csScanStr (arg, "%f", &radius);
-    Sys->add_bot (2, Sys->views->GetCamera ()->GetSector (),
+    Sys->bots->CreateBot (Sys->views->GetCamera ()->GetSector (),
     	Sys->views->GetCamera ()->GetTransform ().GetOrigin (), radius,
 	true);
   }
@@ -1737,16 +1737,16 @@ bool CommandHandler (const char *cmd, const char *arg)
     RECORD_ARGS (cmd, arg);
     float radius = 0;
     if (arg) csScanStr (arg, "%f", &radius);
-    Sys->add_bot (2, Sys->views->GetCamera ()->GetSector (),
-    	Sys->views->GetCamera ()->GetTransform ().GetOrigin (), radius);
+    Sys->bots->CreateBot (Sys->views->GetCamera ()->GetSector (),
+    	Sys->views->GetCamera ()->GetTransform ().GetOrigin (), radius, false);
   }
   else if (!csStrCaseCmp (cmd, "delbot"))
   {
-    Sys->del_bot ();
+    Sys->bots->DeleteOldestBot (false);
   }
   else if (!csStrCaseCmp (cmd, "delmbot"))
   {
-    Sys->del_bot (true);
+    Sys->bots->DeleteOldestBot (true);
   }
   else if (!csStrCaseCmp (cmd, "clrlights"))
   {

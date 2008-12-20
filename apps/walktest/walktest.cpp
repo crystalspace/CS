@@ -119,6 +119,9 @@ WalkTest::WalkTest () :
   cache_map = 0;
   doSave = false;
   spritesLoaded = false;
+
+  bots = new BotManager (this);
+  do_bots = false;
 }
 
 WalkTest::~WalkTest ()
@@ -187,7 +190,6 @@ void WalkTest::SetDefaults ()
     val = cmdline->GetName (idx);
   }
 
-  extern bool do_bots;
   if (cmdline->GetOption ("bots"))
     do_bots = true;
 
@@ -338,7 +340,6 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
   }
 
   // Record the first time this routine is called.
-  extern bool do_bots;
   if (do_bots)
   {
     static long first_time = -1;
@@ -350,8 +351,8 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
     }
     if (current_time > next_bot_at)
     {
-      add_bot (2, views->GetCamera ()->GetSector (),
-               views->GetCamera ()->GetTransform ().GetOrigin (), 0);
+      bots->CreateBot (views->GetCamera ()->GetSector (),
+               views->GetCamera ()->GetTransform ().GetOrigin (), 0, false);
       next_bot_at = current_time+1000*10;
     }
   }
@@ -376,7 +377,7 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
     }
   }
 
-  move_bots (elapsed_time);
+  bots->MoveBots (elapsed_time);
 
   if (move_forward)
     Step (1);

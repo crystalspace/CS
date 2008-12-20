@@ -509,13 +509,8 @@ public:
 
   void GfxWrite (int x, int y, int fg, int bg, const char *str, ...);
 
-  // Bot stuff
-  csPDelArray<Bot> bots;
-  csPDelArray<Bot> manual_bots;
-  void add_bot (float size, iSector* where, csVector3 const& pos,
-    float dyn_radius, bool manual = false);
-  void del_bot (bool manual = true);
-  void move_bots (csTicks);
+  bool do_bots;
+  BotManager* bots;
 
   //@{
   /// Save/load camera functions

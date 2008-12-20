@@ -77,73 +77,6 @@ extern void move_mesh (iMeshWrapper* sprite, iSector* where,
 	csVector3 const& pos);
 
 //===========================================================================
-// Everything for bots.
-//===========================================================================
-
-bool do_bots = false;
-
-// Add a bot with some size at the specified position.
-void WalkTest::add_bot (float size, iSector* where, csVector3 const& pos,
-	float dyn_radius, bool manual)
-{
-  csRef<iLight> dyn;
-  if (dyn_radius)
-  {
-    float r, g, b;
-    RandomColor (r, g, b);
-    dyn = Sys->Engine->CreateLight ("",
-    	pos, dyn_radius, csColor(r, g, b), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
-    where->GetLights ()->Add (dyn);
-    Sys->dynamic_lights.Push (dyn);
-  }
-  iMeshFactoryWrapper* tmpl = Sys->Engine->GetMeshFactories ()
-  	->FindByName ("bot");
-  if (!tmpl) return;
-  csRef<iMeshObject> botmesh (tmpl->GetMeshObjectFactory ()->NewInstance ());
-  csRef<iMeshWrapper> botWrapper = Engine->CreateMeshWrapper (botmesh, "bot",
-    where);
-
-  //csMatrix3 m; m.Identity (); m = m * size;
-  //botWrapper->GetMovable ()->SetTransform (m);
-  
-  botWrapper->GetMovable ()->UpdateMove ();
-  csRef<iSprite3DState> state (scfQueryInterface<iSprite3DState> (botmesh));
-  state->SetAction ("default");
-  
-  Bot* bot = new Bot (Sys->Engine, botWrapper);
-  bot->set_bot_move (pos);
-  bot->set_bot_sector (where);
-  bot->light = dyn;
-  if (manual)
-    manual_bots.Push (bot);
-  else
-    bots.Push (bot);
-}
-
-void WalkTest::del_bot (bool manual)
-{
-  if (manual)
-  {
-    if (manual_bots.GetSize () > 0)
-      manual_bots.DeleteIndex (0);
-  }
-  else
-  {
-    if (bots.GetSize () > 0)
-      bots.DeleteIndex (0);
-  }
-}
-
-void WalkTest::move_bots (csTicks elapsed_time)
-{
-  size_t i;
-  for (i = 0; i < bots.GetSize (); i++)
-  {
-    bots[i]->move (elapsed_time);
-  }
-}
-
-//===========================================================================
 // Everything for the missile.
 //===========================================================================
 
@@ -203,13 +136,6 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
         v = old;
         if (ms->sprite)
       	{
-          if ((rand () & 0x3) == 1)
-	  {
-	    int i;
-	    if (do_bots)
-	      for (i = 0 ; i < 40 ; i++)
-            Sys->add_bot (1, dyn->GetSector (), dyn->GetCenter (), 0);
-	  }
 	  ms->sprite->GetMovable ()->ClearSectors ();
 	  Sys->Engine->GetMeshes ()->Remove (ms->sprite);
 	}
