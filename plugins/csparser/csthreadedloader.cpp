@@ -526,106 +526,188 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     ldr_context.AttachNew(new csLoaderContext(object_reg, Engine, this, collection,
       missingdata, keepFlags, do_verbose));
 
-    // texture.
-    csRef<iDocumentNode> texturenode = node->GetNode ("texture");
-    if (texturenode)
+    for(int attempt=1; attempt<3; attempt++)
     {
-      csSafeCopyArray<ProxyTexture> proxyTextures;
-      return ParseTextureTC(ret, ldr_context, texturenode, &proxyTextures, vfs->GetCwd());
-    }
-
-    // Mesh Factory
-    csRef<iDocumentNode> meshfactnode = node->GetNode("meshfact");
-    if(meshfactnode)
-    {
-      return FindOrLoadMeshFactoryTC(ret, ldr_context, meshfactnode, 0, 0, ssource, 0);
-    }
-
-    // Mesh Object
-    csRef<iDocumentNode> meshobjnode = node->GetNode ("meshobj");
-    if(meshobjnode)
-    {
-      const char* name = meshobjnode->GetAttributeValue ("name");
-      csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (name, false);
-      ret->SetResult(scfQueryInterfaceSafe<iBase>(mesh));
-      return LoadMeshObjectTC(ret, ldr_context, mesh, 0, meshobjnode, ssource, 0, name);
-    }
-
-    // World node.
-    csRef<iDocumentNode> worldnode = node->GetNode ("world");
-    if(worldnode)
-    {
-      return LoadMap (ldr_context, worldnode, ssource, missingdata, do_verbose);
-    }
-
-    // Library node.
-    csRef<iDocumentNode> libnode = node->GetNode ("library");
-    if (libnode)
-    {
-      return LoadLibraryTC(ret, libnode, collection, ssource, missingdata, keepFlags, do_verbose);
-    }
-
-    // Portals.
-    csRef<iDocumentNode> portalsnode = node->GetNode ("portals");
-    if (portalsnode)
-    {
-      const char* portalsname = portalsnode->GetAttributeValue ("name");
-      if (portalsname)
+      // texture.
+      csRef<iDocumentNode> texturenode;
+      if(attempt == 1)
       {
-        csRef<iMeshWrapper> mw = Engine->FindMeshObject (portalsname);
-        if (mw)
+        texturenode = node->GetNode ("texture");
+      }
+      if(attempt == 2)
+      {
+        if(csString("texture").Compare(node->GetValue()))
+          texturenode = node;
+      }
+      if (texturenode)
+      {
+        csSafeCopyArray<ProxyTexture> proxyTextures;
+        return ParseTextureTC(ret, ldr_context, texturenode, &proxyTextures, vfs->GetCwd());
+      }
+
+      // Mesh Factory
+      csRef<iDocumentNode> meshfactnode;
+      if(attempt == 1)
+      {
+        meshfactnode = node->GetNode ("meshfact");
+      }
+      if(attempt == 2)
+      {
+        if(csString("meshfact").Compare(node->GetValue()))
+          meshfactnode = node;
+      }
+      if (meshfactnode)
+      {
+        return FindOrLoadMeshFactoryTC(ret, ldr_context, meshfactnode, 0, 0, ssource, 0);
+      }
+
+      // Mesh Object
+      csRef<iDocumentNode> meshobjnode;
+      if(attempt == 1)
+      {
+        meshobjnode = node->GetNode ("meshobj");
+      }
+      if(attempt == 2)
+      {
+        if(csString("meshobj").Compare(node->GetValue()))
+          meshobjnode = node;
+      }
+      if (meshobjnode)
+      {
+        const char* name = meshobjnode->GetAttributeValue ("name");
+        csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (name, false);
+        ret->SetResult(scfQueryInterfaceSafe<iBase>(mesh));
+        return LoadMeshObjectTC(ret, ldr_context, mesh, 0, meshobjnode, ssource, 0, name);
+      }
+
+      // World node.
+      csRef<iDocumentNode> worldnode;
+      if(attempt == 1)
+      {
+        worldnode = node->GetNode ("world");
+      }
+      if(attempt == 2)
+      {
+        if(csString("world").Compare(node->GetValue()))
+          worldnode = node;
+      }
+      if (worldnode)
+      {
+        return LoadMap (ldr_context, worldnode, ssource, missingdata, do_verbose);
+      }
+
+      // Library node.
+      csRef<iDocumentNode> libnode;
+      if(attempt == 1)
+      {
+        libnode = node->GetNode ("library");
+      }
+      if(attempt == 2)
+      {
+        if(csString("library").Compare(node->GetValue()))
+          libnode = node;
+      }
+      if (libnode)
+      {
+        return LoadLibraryTC(ret, libnode, collection, ssource, missingdata, keepFlags, do_verbose);
+      }
+
+      // Portals.
+      csRef<iDocumentNode> portalsnode;
+      if(attempt == 1)
+      {
+        portalsnode = node->GetNode ("portals");
+      }
+      if(attempt == 2)
+      {
+        if(csString("portals").Compare(node->GetValue()))
+          portalsnode = node;
+      }
+      if (portalsnode)
+      {
+        const char* portalsname = portalsnode->GetAttributeValue ("name");
+        if (portalsname)
         {
-          csRef<iPortalContainer> pc = 
-            scfQueryInterface<iPortalContainer>(mw->GetMeshObject());
-          if (pc)
+          csRef<iMeshWrapper> mw = Engine->FindMeshObject (portalsname);
+          if (mw)
+          {
+            csRef<iPortalContainer> pc = 
+              scfQueryInterface<iPortalContainer>(mw->GetMeshObject());
+            if (pc)
+            {
+              ldr_context->AddToCollection(mw->QueryObject());
+              ret->SetResult(csRef<iBase>(mw));
+              return true;
+            }
+          }
+        }
+        if (ParsePortals (ldr_context, portalsnode, 0, 0, ssource))
+        {
+          csRef<iMeshWrapper> mw = 0;
+          if (ldr_context->GetCollection())
+            mw = ldr_context->GetCollection()->FindMeshObject(portalsname);
+
+          if (mw)
+          {
+            mw->QueryObject()->SetName(portalsname);
+            ret->SetResult(csRef<iBase>(mw));
+            return true;
+          }
+        }
+
+        return false;
+      }
+
+      // Light.
+      csRef<iDocumentNode> lightnode;
+      if(attempt == 1)
+      {
+        lightnode = node->GetNode ("light");
+      }
+      if(attempt == 2)
+      {
+        if(csString("light").Compare(node->GetValue()))
+          lightnode = node;
+      }
+      if (lightnode)
+      {
+        const char* lightname = lightnode->GetAttributeValue ("name");
+        csRef<iLight> light = ParseStatlight (ldr_context, lightnode);
+        if (light)
+        {
+          light->QueryObject()->SetName(lightname);
+          ret->SetResult(csRef<iBase>(light));
+          return true;
+        }
+
+        return false;
+      }
+
+      // MeshRef
+      csRef<iDocumentNode> meshrefnode;
+      if(attempt == 1)
+      {
+        meshrefnode = node->GetNode ("meshref");
+      }
+      if(attempt == 2)
+      {
+        if(csString("meshref").Compare(node->GetValue()))
+          meshrefnode = node;
+      }
+      if (meshrefnode)
+      {
+        const char* meshobjname = meshrefnode->GetAttributeValue ("name");
+        if (meshobjname)
+        {
+          csRef<iMeshWrapper> mw = Engine->FindMeshObject (meshobjname);
+          if (mw)
           {
             ldr_context->AddToCollection(mw->QueryObject());
             ret->SetResult(csRef<iBase>(mw));
             return true;
           }
         }
-      }
-      if (ParsePortals (ldr_context, portalsnode, 0, 0, ssource))
-      {
-        csRef<iMeshWrapper> mw = 0;
-        if (ldr_context->GetCollection())
-          mw = ldr_context->GetCollection()->FindMeshObject(portalsname);
-
-        if (mw)
-        {
-          mw->QueryObject()->SetName(portalsname);
-          ret->SetResult(csRef<iBase>(mw));
-          return true;
-        }
-      }
-
-      return false;
-    }
-
-    // Light.
-    csRef<iDocumentNode> lightnode = node->GetNode ("light");
-    if (lightnode)
-    {
-      const char* lightname = lightnode->GetAttributeValue ("name");
-      csRef<iLight> light = ParseStatlight (ldr_context, lightnode);
-      if (light)
-      {
-        light->QueryObject()->SetName(lightname);
-        ret->SetResult(csRef<iBase>(light));
-        return true;
-      }
-
-      return false;
-    }
-
-    // MeshRef
-    csRef<iDocumentNode> meshrefnode = node->GetNode ("meshref");
-    if (meshrefnode)
-    {
-      const char* meshobjname = meshrefnode->GetAttributeValue ("name");
-      if (meshobjname)
-      {
-        csRef<iMeshWrapper> mw = Engine->FindMeshObject (meshobjname);
+        csRef<iMeshWrapper> mw = LoadMeshObjectFromFactory (ldr_context, meshrefnode, ssource);
         if (mw)
         {
           ldr_context->AddToCollection(mw->QueryObject());
@@ -633,17 +715,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           return true;
         }
       }
-      csRef<iMeshWrapper> mw = LoadMeshObjectFromFactory (ldr_context, meshrefnode, ssource);
-      if (mw)
+
+      // Plugins
+      csRef<iDocumentNode> pluginsnode;
+      if(attempt == 1)
       {
-        ldr_context->AddToCollection(mw->QueryObject());
-        ret->SetResult(csRef<iBase>(mw));
+        pluginsnode = node->GetNode ("plugins");
+      }
+      if(attempt == 2)
+      {
+        if(csString("plugins").Compare(node->GetValue()))
+          pluginsnode = node;
+      }
+      if (pluginsnode)
+      {
+        LoadPlugins(pluginsnode);
         return true;
       }
     }
 
     ReportError("crystalspace.maploader.parse",
-      "File doesn't seem to be a world, library, meshfact, meshobj, meshref, portals or light file!");
+      "File doesn't seem to be a world, library, meshfact, meshobj, meshref, portals, light or plugins file!");
     return false;
   }
 
@@ -1781,7 +1873,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           if (!ParsePortal (ldr_context, child, 0, 0, container_mesh, mesh))
           {
             RemoveLoadingMeshObject(name, ret);
-            return 0;
+            return false;
           }
         }
         break;
@@ -1789,7 +1881,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         if (!ParsePortals (ldr_context, child, 0, mesh, ssource))
         {
           RemoveLoadingMeshObject(name, ret);
-          return 0;
+          return false;
         }
         break;
       case XMLTOKEN_MESHREF:

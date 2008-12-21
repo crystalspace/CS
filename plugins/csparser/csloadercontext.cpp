@@ -558,7 +558,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   iGeneralMeshSubMesh* csLoaderContext::FindSubmesh(iGeneralMeshState* state, const char* name)
   {
-    csRef<iGeneralMeshSubMesh> submesh;
+    csRef<iGeneralMeshSubMesh> submesh = state->FindSubMesh(name);
     if(FindAvailSubmesh(name))
     {
       while(!submesh.IsValid())
