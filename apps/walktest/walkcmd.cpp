@@ -81,6 +81,7 @@
 #include "lights.h"
 #include "decaltest.h"
 #include "animsky.h"
+#include "fullscreenfx.h"
 
 extern WalkTest* Sys;
 
@@ -1196,107 +1197,39 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!csStrCaseCmp (cmd, "fs_inter"))
   {
-    Sys->do_fs_inter = !Sys->do_fs_inter;
-    if (Sys->do_fs_inter)
-    {
-      Sys->fs_inter_amount = 0.3f;
-      Sys->fs_inter_length = 30;
-      Sys->fs_inter_anim = 0;
-      if (arg)
-        csScanStr (arg, "%f,%f", &Sys->fs_inter_amount, &Sys->fs_inter_length);
-    }
+    Sys->fsfx->InterFX (arg);
   }
   else if (!csStrCaseCmp (cmd, "fs_fadeout"))
   {
-    Sys->do_fs_fadeout = !Sys->do_fs_fadeout;
-    if (Sys->do_fs_fadeout)
-    {
-      Sys->fs_fadeout_fade = 0;
-      Sys->fs_fadeout_dir = true;
-    }
+    Sys->fsfx->FadeOutFX ();
   }
   else if (!csStrCaseCmp (cmd, "fs_fadecol"))
   {
-    Sys->do_fs_fadecol = !Sys->do_fs_fadecol;
-    if (Sys->do_fs_fadecol)
-    {
-      Sys->fs_fadecol_fade = 0;
-      Sys->fs_fadecol_dir = true;
-      float r = 1, g = 0, b = 0;
-      if (arg) csScanStr (arg, "%f,%f,%f", &r, &g, &b);
-      Sys->fs_fadecol_color.Set (r, g, b);
-    }
+    Sys->fsfx->FadeColFX (arg);
   }
   else if (!csStrCaseCmp (cmd, "fs_fadetxt"))
   {
-    Sys->do_fs_fadetxt = !Sys->do_fs_fadetxt;
-    if (Sys->do_fs_fadetxt)
-    {
-      Sys->fs_fadetxt_fade = 0;
-      Sys->fs_fadetxt_dir = true;
-      char buf[255];
-      *buf = 0;
-      if (arg) csScanStr (arg, "%s", buf);
-      iMaterialWrapper* mat = Sys->Engine->GetMaterialList ()->FindByName (buf);
-      if (mat)
-      {
-        Sys->fs_fadetxt_txt = mat->GetMaterial()->GetTexture ();
-      }
-      else
-      {
-        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"Can't find material!");
-	Sys->do_fs_fadetxt = false;
-      }
-    }
+    Sys->fsfx->FadeTxtFX (arg);
   }
   else if (!csStrCaseCmp (cmd, "fs_red"))
   {
-    Sys->do_fs_red = !Sys->do_fs_red;
-    if (Sys->do_fs_red)
-    {
-      Sys->fs_red_fade = 0;
-      Sys->fs_red_dir = true;
-    }
+    Sys->fsfx->FadeRedFX ();
   }
   else if (!csStrCaseCmp (cmd, "fs_green"))
   {
-    Sys->do_fs_green = !Sys->do_fs_green;
-    if (Sys->do_fs_green)
-    {
-      Sys->fs_green_fade = 0;
-      Sys->fs_green_dir = true;
-    }
+    Sys->fsfx->FadeGreenFX ();
   }
   else if (!csStrCaseCmp (cmd, "fs_blue"))
   {
-    Sys->do_fs_blue = !Sys->do_fs_blue;
-    if (Sys->do_fs_blue)
-    {
-      Sys->fs_blue_fade = 0;
-      Sys->fs_blue_dir = true;
-    }
+    Sys->fsfx->FadeBlueFX ();
   }
   else if (!csStrCaseCmp (cmd, "fs_whiteout"))
   {
-    Sys->do_fs_whiteout = !Sys->do_fs_whiteout;
-    if (Sys->do_fs_whiteout)
-    {
-      Sys->fs_whiteout_fade = 0;
-      Sys->fs_whiteout_dir = true;
-    }
+    Sys->fsfx->FadeWhiteFX ();
   }
   else if (!csStrCaseCmp (cmd, "fs_shadevert"))
   {
-    Sys->do_fs_shadevert = !Sys->do_fs_shadevert;
-    if (Sys->do_fs_shadevert)
-    {
-      float tr = 1, tg = 0, tb = 0, br = 0, bg = 0, bb = 1;
-      if (arg) csScanStr (arg, "%f,%f,%f,%f,%f,%f",
-      	&tr, &tg, &tb, &br, &bg, &bb);
-      Sys->fs_shadevert_topcol.Set (tr, tg, tb);
-      Sys->fs_shadevert_botcol.Set (br, bg, bb);
-    }
+    Sys->fsfx->ShadeVertFX (arg);
   }
   else if (!csStrCaseCmp (cmd, "perftest"))
   {

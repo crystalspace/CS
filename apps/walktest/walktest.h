@@ -42,6 +42,7 @@
 
 #include "bot.h"
 #include "walktest.h"
+#include "fullscreenfx.h"
 
 class WalkTest;
 class WalkTestViews;
@@ -238,46 +239,10 @@ public:
    */
   bool do_edges;
 
-  // Various settings for fullscreen effects.
-  bool do_fs_inter;
-  float fs_inter_amount;
-  float fs_inter_anim;
-  float fs_inter_length;
-
-  bool do_fs_fadeout;
-  float fs_fadeout_fade;
-  bool fs_fadeout_dir;
-
-  bool do_fs_fadecol;
-  float fs_fadecol_fade;
-  bool fs_fadecol_dir;
-  csColor fs_fadecol_color;
-
-  bool do_fs_fadetxt;
-  float fs_fadetxt_fade;
-  bool fs_fadetxt_dir;
-  iTextureHandle* fs_fadetxt_txt;
-
-  bool do_fs_red;
-  float fs_red_fade;
-  bool fs_red_dir;
-  bool do_fs_green;
-  float fs_green_fade;
-  bool fs_green_dir;
-  bool do_fs_blue;
-  float fs_blue_fade;
-  bool fs_blue_dir;
-
-  bool do_fs_whiteout;
-  float fs_whiteout_fade;
-  bool fs_whiteout_dir;
-
-  bool do_fs_shadevert;
-  csColor fs_shadevert_topcol;
-  csColor fs_shadevert_botcol;
-
   // True if we've loaded all the 2d textures and sprites.
   bool spritesLoaded;
+
+  WalkTestFullScreenFX* fsfx;
 
   /**
    * The main engine interface
@@ -438,10 +403,6 @@ public:
   virtual void DrawFrame3D (int drawflags, csTicks current_time);
   /// Draws 2D objects to screen
   virtual void DrawFrame2D (void);
-  /// Draw 3D fullscreen effects.
-  virtual void DrawFullScreenFX3D (csTicks elapsed_time, csTicks current_time);
-  /// Draw 2D fullscreen effects.
-  virtual void DrawFullScreenFX2D (csTicks elapsed_time, csTicks current_time);
 
   /// Load all the graphics libraries needed
   virtual void LoadLibraryData (iCollection* collection);
