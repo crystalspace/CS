@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csqsqrt.h"
 #include "decal.h"
 #include "decaltemplate.h"
 #include "iutil/objreg.h"
@@ -81,7 +82,7 @@ iDecal * csDecalManager::CreateDecal(iDecalTemplate * decalTemplate,
     iDecal * oldDecal)
 {
   // compute the maximum distance the decal can reach
-  float radius = sqrt(width*width + height*height) * 2.0f;
+  float radius = csQsqrt (width * width + height * height) * 2.0f;
 
   if (!EnsureEngineReference())
     return 0;

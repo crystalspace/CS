@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csqsqrt.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "iutil/object.h"
@@ -87,7 +88,7 @@ void csDecal::Initialize(iDecalTemplate * decalTemplate,
   this->width = width;
   this->height = height;
 
-  radius = sqrt(width*width + height*height);
+  radius = csQsqrt (width * width + height * height);
 
   invWidth = 1.0f / width;
   invHeight = 1.0f / height;
