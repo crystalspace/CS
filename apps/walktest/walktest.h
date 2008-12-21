@@ -48,6 +48,7 @@ class WalkTestViews;
 class WalkTestRecorder;
 class WalkTestMissileLauncher;
 class WalkTestLights;
+class WalkTestAnimateSky;
 class BotManager;
 class csPixmap;
 class csWireFrameCam;
@@ -292,16 +293,7 @@ public:
   csRef<iSndSysRenderer> mySound;
 
   WalkTestViews* views;
-
-  /// A pointer to a skybox to animate (if any).
-  iMeshWrapper* anim_sky;
-  /// Speed of this animation (with 1 meaning 1 full rotation in a second).
-  float anim_sky_speed;
-  /// Rotation direction (0=x, 1=y, 2=z)
-  int anim_sky_rot;
-
-  /// A pointer to the terrain for which we animate the dirlight.
-  iMeshWrapper* anim_dirlight;
+  WalkTestAnimateSky* sky;
 
   /// A sprite to display the Crystal Space Logo
   csPixmap* cslogo;

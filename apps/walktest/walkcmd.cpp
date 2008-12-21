@@ -80,6 +80,7 @@
 #include "missile.h"
 #include "lights.h"
 #include "decaltest.h"
+#include "animsky.h"
 
 extern WalkTest* Sys;
 
@@ -600,22 +601,11 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
     if (!strcmp (kp->GetKey (), "cmd_AnimateSky"))
     {
-      csRef<iSector> Sector (scfQueryInterface<iSector> (src));
-      if (Sector)
-      {
-        char name[100], rot[100];
-        csScanStr (kp->GetValue (), "%s,%s,%f", name, rot, &anim_sky_speed);
-        if (rot[0] == 'x') anim_sky_rot = 0;
-        else if (rot[0] == 'y') anim_sky_rot = 1;
-        else anim_sky_rot = 2;
-        anim_sky = Sector->GetMeshes ()->FindByName (name);
-      }
+      sky->AnimateSky (kp->GetValue (), src);
     }
     else if (!strcmp (kp->GetKey (), "cmd_AnimateDirLight"))
     {
-      csRef<iMeshWrapper> wrap = scfQueryInterface<iMeshWrapper> (src);
-      if (wrap)
-        anim_dirlight = wrap;	// @@@ anim_dirlight should be csRef
+      sky->AnimateDirLight (src);
     }
     else if (!strcmp (kp->GetKey (), "entity_WavePortal"))
     {

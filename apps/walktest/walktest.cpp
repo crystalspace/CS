@@ -40,6 +40,7 @@
 #include "recorder.h"
 #include "missile.h"
 #include "lights.h"
+#include "animsky.h"
 
 #if defined(CS_PLATFORM_DOS) || defined(CS_PLATFORM_WIN32)
 #  include <io.h>
@@ -66,8 +67,7 @@ WalkTest::WalkTest () :
   wMissile_boom = 0;
   wMissile_whoosh = 0;
   cslogo = 0;
-  anim_sky = 0;
-  anim_dirlight = 0;
+  sky = new WalkTestAnimateSky (this);
 
   do_edges = false;
   do_show_coord = false;
@@ -142,6 +142,9 @@ WalkTest::~WalkTest ()
   }
   delete recorder;
   delete views;
+  delete sky;
+  delete missiles;
+  delete lights;
 }
 
 void WalkTest::Report (int severity, const char* msg, ...)
@@ -295,36 +298,7 @@ void WalkTest::FinishFrame ()
 
 void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
 {
-  // First move the sky.
-  if (anim_sky)
-  {
-    iMovable* move = anim_sky->GetMovable ();
-    switch (anim_sky_rot)
-    {
-      case 0:
-	{
-          csXRotMatrix3 mat (anim_sky_speed * TWO_PI
-	  	* (float)elapsed_time/1000.);
-          move->Transform (mat);
-	  break;
-	}
-      case 1:
-	{
-          csYRotMatrix3 mat (anim_sky_speed * TWO_PI
-	  	* (float)elapsed_time/1000.);
-          move->Transform (mat);
-	  break;
-	}
-      case 2:
-	{
-          csZRotMatrix3 mat (anim_sky_speed * TWO_PI
-	  	* (float)elapsed_time/1000.);
-          move->Transform (mat);
-	  break;
-	}
-    }
-    move->UpdateMove ();
-  }
+  sky->MoveSky (elapsed_time, current_time);
 
   // Update all busy entities.
   // We first push all entities in a vector so that NextFrame() can safely
