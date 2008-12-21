@@ -210,7 +210,7 @@ void csDecalManager::FillDecal (csDecal * decal,
       continue;
 
     csVector3 relPos = 
-        mesh->GetMovable ()->GetFullTransform ().Other2This (pos);
+      mesh->GetMovable ()->GetFullTransform ().Other2This (pos);
 
     decal->BeginMesh (mesh);
     mesh->GetMeshObject ()->BuildDecal (&relPos, radius, (iDecalBuilder*)decal);
