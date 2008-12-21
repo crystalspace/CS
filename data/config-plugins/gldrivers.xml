@@ -698,10 +698,7 @@
     <rule description="Intel DRI: Disable texture compression">
       <conditions>
         <regexp string="renderer" pattern="Mesa.*Intel" />
-        <conditions fulfill="one">
-          <regexp string="glversion" pattern="Mesa 6\.5\.." />
-          <regexp string="glversion" pattern="Mesa 7\.0\.." />
-        </conditions>
+        <comparever version="glvendor" relation="ge Mesa 6.5" />
       </conditions>
       <applicable>
         <usecfg>disableTC</usecfg>

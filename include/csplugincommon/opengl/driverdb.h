@@ -30,16 +30,36 @@
 #include "csutil/strhash.h"
 
 struct iConfigDocument;
+struct iConfigFile;
 struct iDocumentNode;
 class csGraphics2DGLCommon;
 
 /**\addtogroup plugincommon
  * @{ */
+ 
+// Private class uses to parse gldrivers.xml
+class csDriverDBReader;
+ 
 /**
  * OpenGL driver database
  */
 class CS_CSPLUGINCOMMON_GL_EXPORT csGLDriverDatabase
 {
+protected:
+  friend class csDriverDBReader;
+  
+  enum Relation
+  {
+    eq = 0,
+    neq,
+    lt,
+    le,
+    gt,
+    ge
+  };
+  static bool Compare (int a, int b, Relation rel);
+  static bool VersionCompare (const char* verStr1, const char* verStr2,
+    Relation rel);
 public:
   CS_LEAKGUARD_DECLARE (csGLDriverDatabase);
 
