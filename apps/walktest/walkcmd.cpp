@@ -79,6 +79,7 @@
 #include "particles.h"
 #include "missile.h"
 #include "lights.h"
+#include "decaltest.h"
 
 extern WalkTest* Sys;
 
@@ -1514,8 +1515,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!csStrCaseCmp (cmd, "decal_test"))
   {
     RECORD_CMD (cmd);
-    extern void test_decal();
-    test_decal ();
+    WalkTestDecalTester::TestDecal (Sys);
   }
   else if (!csStrCaseCmp (cmd, "lightning"))
   {
