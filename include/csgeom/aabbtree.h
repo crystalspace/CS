@@ -685,20 +685,33 @@ namespace Geometry //@@Right?
           {
             csBox3 newNodeBB;
 
+            if (right)
+            {
+              newNodeBB = right->GetBBox ();
+            }
+
             // Tree was updated, update our bb
             if (left->GetObjectCount () > 0)
             {
-              newNodeBB = left->GetBBox ();
+              newNodeBB += left->GetBBox ();
             }
             else
             {
-              node->SetChild1 (0);
+	      // We have to delete the left node. We do that by moving the children
+	      // of the right node down.
+	      if (right)
+	      {
+	        node->Copy (right);
+		nodeAllocator.Free (right);
+                newNodeBB += node->GetBBox ();
+	      }
+	      else
+	      {
+                node->SetChild1 (0);
+	      }
             }
-            
-            if (right)
-            {
-              newNodeBB += right->GetBBox ();
-            }
+
+            node->SetBBox (newNodeBB);
 
             return true;
           }
@@ -707,20 +720,33 @@ namespace Geometry //@@Right?
           {
             csBox3 newNodeBB;
 
+            if (left)
+            {
+              newNodeBB = left->GetBBox ();
+            }
+
             // Tree was updated, update our bb
             if (right->GetObjectCount () > 0)
             {
-              newNodeBB = right->GetBBox ();
+              newNodeBB += right->GetBBox ();
             }
             else
             {
-              node->SetChild2 (0);
+	      // We have to delete the right node. We do that by moving the children
+	      // of the left node down.
+	      if (left)
+	      {
+	        node->Copy (left);
+		nodeAllocator.Free (left);
+                newNodeBB += node->GetBBox ();
+	      }
+	      else
+	      {
+                node->SetChild1 (0);
+	      }
             }
 
-            if (left)
-            {
-              newNodeBB += left->GetBBox ();
-            }
+            node->SetBBox (newNodeBB);
 
             return true;
           }
@@ -887,6 +913,25 @@ namespace Geometry //@@Right?
     {
       CS_ASSERT(!IsLeaf ());
       children[1] = child;
+    }
+
+    /// Copy the node contents to this one.
+    void Copy (Node* source)
+    {
+      if (source->IsLeaf ())
+      {
+	SetLeaf (true);
+	memcpy (leafStorage, source->leafStorage, sizeof (ObjectType) * objectsPerLeaf);
+      }
+      else
+      {
+	SetLeaf (false);
+        SetChild1 (source->GetChild1 ());
+        SetChild2 (source->GetChild2 ());
+      }
+      leafObjCount = source->leafObjCount;
+      typeAndFlags = source->typeAndFlags;
+      SetBBox (source->GetBBox ());
     }
 
     // Accessor for leaf node data
