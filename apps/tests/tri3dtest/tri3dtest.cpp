@@ -263,7 +263,7 @@ bool Tri3DTest::SetupModules ()
 
   loader = csQueryRegistry<iLoader> (GetObjectRegistry());
   if (!loader) return ReportError("Failed to locate Loader!");
-\
+
   // We need a View to the virtual world.
   view.AttachNew(new csView (engine, g3d));
   iGraphics2D* g2d = g3d->GetDriver2D ();
@@ -315,7 +315,7 @@ bool Tri3DTest::CreateBox(csContour3& mesh)
   // setup our untriangulated mesh
   mesh.Push(csVector3(-3, 0, -3));
   mesh.Push(csVector3(-3, 0, 3));
-  mesh.Push(csVector3(0, 0, 5));
+  //mesh.Push(csVector3(0, 0, 5));
   mesh.Push(csVector3(3, 0, 3));
   mesh.Push(csVector3(3, 0, -3));
 

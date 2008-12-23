@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2007 by Scott Johnson
+    Copyright (C) 2007-2008 by Scott Johnson
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -30,6 +30,50 @@ namespace CS
   namespace Geometry
   {
     typedef csDirtyAccessArray< csVector3 > csContour3;
+
+    
+/** @class csEarClipper A data structure for clipping polygon ears
+  *
+  * A polygon ear is defined as three consecutive ears of a polygon, for
+  * which no other vertices are within the triangle formed by these three
+  * vertices.  A ear is clipped by connecting the two end vertices (on either
+  * side of the ear vertex), and removing the ear vertex from the vertices
+  * left to be clipped.  Ear clipping is used to triangulate polygons. 
+  */
+
+    class CS_CRYSTALSPACE_EXPORT csEarClipper
+    {
+      private:
+
+        /// The polygon we are currently in the process of clipping ears from
+        csContour3 clipPoly;
+
+        /// The original indices of the vertices in the polygon
+        csDirtyAccessArray<int> originalIndices;
+
+        /// An array indicating whether the specified vertex is reflex or convex
+        csDirtyAccessArray<bool> isVertexReflex;
+
+        /// An array indicating which vertices are ears
+        csDirtyAccessArray<int> ears;
+
+        /// A function to classify polygon vertices as either convex or reflex
+        void ClassifyVertices();
+
+        /// A function which determines if a specified vertex is convex
+        bool IsConvex(int x);
+
+      public:
+        csEarClipper(csContour3 polygon);
+        ~csEarClipper() {}
+
+        /// Returns whether the ear clipper is finished or not
+        bool IsFinished();
+
+        /// Returns the index of the vertex clipped
+        int ClipEar();
+
+    }; // End class csEarClipper
 
     /** @class Triangulate3D 3D Triangulation Functions
     * @brief A collection of functions for 3D triangulation.
