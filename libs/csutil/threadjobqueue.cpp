@@ -247,7 +247,7 @@ namespace Threading
 
   ThreadedJobQueue::QueueRunnable::QueueRunnable (ThreadedJobQueue* queue, 
     ThreadState* ts, bool doLow)
-    : ownerQueue (queue), threadState (ts)
+    : ownerQueue (queue), threadState (ts), doLow(doLow)
   {
   }
 
