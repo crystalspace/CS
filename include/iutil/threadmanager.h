@@ -45,6 +45,7 @@ struct iThreadReturn : public csRefCount
 enum QueueType
 {
   THREADED = 0,
+  THREADEDL,
   HIGH,
   MED,
   LOW
