@@ -12974,6 +12974,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *Max = *cspacec::csBox3_Max;
 *Volume = *cspacec::csBox3_Volume;
 *Area = *cspacec::csBox3_Area;
+*IsNaN = *cspacec::csBox3_IsNaN;
 *GetCorner = *cspacec::csBox3_GetCorner;
 *GetEdgeInfo = *cspacec::csBox3_GetEdgeInfo;
 *GetFaceEdges = *cspacec::csBox3_GetFaceEdges;
@@ -19339,6 +19340,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetDefaultClearScreen = *cspacec::iEngine_GetDefaultClearScreen;
 *GetBeginDrawFlags = *cspacec::iEngine_GetBeginDrawFlags;
 *GetTopLevelClipper = *cspacec::iEngine_GetTopLevelClipper;
+*PrecacheMesh = *cspacec::iEngine_PrecacheMesh;
 *PrecacheDraw = *cspacec::iEngine_PrecacheDraw;
 *Draw = *cspacec::iEngine_Draw;
 *SetContext = *cspacec::iEngine_SetContext;
@@ -19431,14 +19433,48 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iCameraSectorListener ##############
+############# Class : cspace::iCameraListener ##############
 
-package cspace::iCameraSectorListener;
+package cspace::iCameraListener;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::iBase cspace );
 %OWNER = ();
 %ITERATORS = ();
+*NewSector = *cspacec::iCameraListener_NewSector;
+*CameraMoved = *cspacec::iCameraListener_CameraMoved;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iCameraListener($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iCameraSectorListener ##############
+
+package cspace::iCameraSectorListener;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iCameraListener cspace );
+%OWNER = ();
+%ITERATORS = ();
 *NewSector = *cspacec::iCameraSectorListener_NewSector;
+*CameraMoved = *cspacec::iCameraSectorListener_CameraMoved;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -19500,6 +19536,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetOnlyPortals = *cspacec::iCamera_GetOnlyPortals;
 *AddCameraSectorListener = *cspacec::iCamera_AddCameraSectorListener;
 *RemoveCameraSectorListener = *cspacec::iCamera_RemoveCameraSectorListener;
+*AddCameraListener = *cspacec::iCamera_AddCameraListener;
+*RemoveCameraListener = *cspacec::iCamera_RemoveCameraListener;
 *GetProjectionMatrix = *cspacec::iCamera_GetProjectionMatrix;
 *GetVisibleVolume = *cspacec::iCamera_GetVisibleVolume;
 *SetViewportSize = *cspacec::iCamera_SetViewportSize;
