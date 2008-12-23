@@ -702,6 +702,7 @@ namespace Geometry //@@Right?
 	      if (right)
 	      {
 	        node->Copy (right);
+		nodeAllocator.Free (left);
 		nodeAllocator.Free (right);
                 newNodeBB += node->GetBBox ();
 	      }
@@ -738,6 +739,7 @@ namespace Geometry //@@Right?
 	      {
 	        node->Copy (left);
 		nodeAllocator.Free (left);
+		nodeAllocator.Free (right);
                 newNodeBB += node->GetBBox ();
 	      }
 	      else
@@ -921,7 +923,7 @@ namespace Geometry //@@Right?
       if (source->IsLeaf ())
       {
 	SetLeaf (true);
-	memcpy (leafStorage, source->leafStorage, sizeof (ObjectType) * objectsPerLeaf);
+	memcpy (leafStorage, source->leafStorage, sizeof (ObjectType*) * objectsPerLeaf);
       }
       else
       {
