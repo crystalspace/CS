@@ -79,8 +79,8 @@ struct iCameraListener : public virtual iBase
  * This callback is used by:
  * - iCamera
  */
-CS_DEPRECATED_TYPE_MSG("Use iCameraListener instead")
-struct iCameraSectorListener : public iCameraListener
+struct CS_DEPRECATED_TYPE_MSG("Use iCameraListener instead")
+iCameraSectorListener : public iCameraListener
 {
   SCF_INTERFACE (iCameraSectorListener, 1, 0, 0);
 
