@@ -43,7 +43,7 @@ class CS_CRYSTALSPACE_EXPORT ThreadedJobQueue :
 {
 public:
   ThreadedJobQueue (size_t numWorkers = 1, ThreadPriority priority = THREAD_PRIO_NORMAL,
-    size_t numLowWorkers = 0);
+    size_t numNonLowWorkers = 0);
   virtual ~ThreadedJobQueue ();
 
   virtual void Enqueue (iJob* job, bool lowPriority = false);
