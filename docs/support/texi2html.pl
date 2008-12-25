@@ -5119,7 +5119,8 @@ sub rearrange_elements()
                              'nodeprev' => $back,
                              'place' => [],
                              'seen' => 1,
-                             'page' => $page
+                             'page' => $page,
+                             'file' => "${docu_name}_index$index_num.$docu_ext"
                             };
                             $index_page->{'node'} = 1 if ($element->{'node'});
                             while ($nodes{$index_page->{'texi'}})
