@@ -288,6 +288,7 @@ namespace lighter
 
   void TUI::DrawSimple ()
   {
+    bool doFlush = false;
     const char* lt = (const char*)lastTask;
     const char* tn = globalStats.progress.GetTaskName ();
     if ((lt == 0 && tn != 0) || (lt != 0 && lastTask != tn))
@@ -298,6 +299,7 @@ namespace lighter
       csPrintf ("\n% 4d %% - %s ", 
         globalStats.progress.GetOverallProgress(),
         lastTask.GetDataSafe());
+      doFlush = true;
 
       // Print new task and global progress
       lastTaskProgress = 0;
@@ -309,8 +311,10 @@ namespace lighter
         prevWasReporter = false;
         csPrintf (".");
         lastTaskProgress += 10;
+        doFlush = true;
       }
     }
+    if (doFlush) fflush (stdout);
   }
 
   void TUI::DrawSimpleEnd ()
