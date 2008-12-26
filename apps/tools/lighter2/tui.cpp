@@ -201,14 +201,17 @@ namespace lighter
   
   void TUI::DrawSwapCacheStats () const
   {
-    uint64 swappedIn, swappedOut, maxSize;
-    globalLighter->swapManager->GetSizes (swappedIn, swappedOut, maxSize);
     csPrintf (CS_ANSI_CURSOR(28,19) 
       "                                                   ");
-    csPrintf (CS_ANSI_CURSOR(28,19) "%s/%s in, %s out",
-      FormatByteSize (swappedIn).GetData(),
-      FormatByteSize (maxSize).GetData(),
-      FormatByteSize (swappedOut).GetData());
+    if (globalLighter->swapManager)
+    {
+      uint64 swappedIn, swappedOut, maxSize;
+      globalLighter->swapManager->GetSizes (swappedIn, swappedOut, maxSize);
+      csPrintf (CS_ANSI_CURSOR(28,19) "%s/%s in, %s out",
+	FormatByteSize (swappedIn).GetData(),
+	FormatByteSize (maxSize).GetData(),
+	FormatByteSize (swappedOut).GetData());
+    }
     csPrintf (CS_ANSI_CURSOR(1,1));
   }
 
