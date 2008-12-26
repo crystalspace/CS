@@ -100,7 +100,36 @@ namespace lighter
 
   Scene::~Scene ()
   {
-    CleanLightingData ();
+    Statistics::Progress progDummy (0, 0);
+    CleanLightingData (progDummy);
+  }
+  
+  void Scene::CleanUp (Statistics::Progress& progress)
+  {
+    progress.SetProgress (0);
+    
+    Statistics::Progress sectorsProgress (0, 1, &progress);
+    Statistics::Progress filesProgress (0, 1, &progress);
+    
+    float progressStep = 1.0f/sectors.GetSize();
+    sectorsProgress.SetProgress (0);
+    SectorHash::GlobalIterator sectorIt = sectors.GetIterator();
+    while (sectorIt.HasNext())
+    {
+      sectors.DeleteElement (sectorIt);
+      sectorsProgress.IncProgress (progressStep);
+    }
+    sectorsProgress.SetProgress (1);
+        
+    progressStep = 1.0f/sceneFiles.GetSize();
+    filesProgress.SetProgress (0);
+    while (sceneFiles.GetSize() > 0)
+    {
+      sceneFiles.DeleteIndex (sceneFiles.GetSize()-1);
+    }
+    filesProgress.SetProgress (1);
+    
+    progress.SetProgress (1);
   }
 
   void Scene::AddFile (const char* directory)
@@ -563,8 +592,12 @@ namespace lighter
     return true;
   }
 
-  void Scene::CleanLightingData ()
+  void Scene::CleanLightingData (Statistics::Progress& progress)
   {
+    static const int cleanupSteps = 5;
+    float progressStep = 1.0f/cleanupSteps;
+  
+    progress.SetProgress (0);
     PDLightmapsHash::GlobalIterator pdlIt = pdLightmaps.GetIterator();
     while (pdlIt.HasNext())
     {
@@ -572,11 +605,17 @@ namespace lighter
       delete lm;
     }
     pdLightmaps.DeleteAll ();
+    progress.SetProgress (1*progressStep);
 
     lightmaps.DeleteAll ();
+    progress.SetProgress (2*progressStep);
     radFactories.DeleteAll ();
+    progress.SetProgress (3*progressStep);
     radMaterials.DeleteAll ();
+    progress.SetProgress (4*progressStep);
     originalSectorHash.DeleteAll ();
+    
+    progress.SetProgress (1);
   }
 
   Lightmap* Scene::GetLightmap (uint lightmapID, size_t subLightmapNum, 
@@ -1980,9 +2019,8 @@ namespace lighter
 
   void Scene::LightingPostProcessor::ApplyExposure (csColor* colors, size_t numColors)
   {
-    // @@@ ATM shader does *not* do *2 for vertex lighting
-    //LightmapPostProcess::ApplyExposureFunction(colors, numColors, 1.8f, 1.0f);
-    //LightmapPostProcess::ApplyScaleClampFunction (colors, numColors, 1.0f, 1.0f);
+    //LightmapPostProcess::ApplyExposureFunction(colors, numColors, 1.8f, 0.5f);
+    LightmapPostProcess::ApplyScaleClampFunction (colors, numColors, 0.5f, 1.0f);
   }
   
   void Scene::LightingPostProcessor::ApplyAmbient (Lightmap* lightmap)

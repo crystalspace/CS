@@ -66,6 +66,9 @@ namespace lighter
 
     /// Free memory, around \a desiredAmount bytes
     void FreeMemory (size_t desiredAmount);
+    
+    /// Get sizes of swapmanager-managed data
+    void GetSizes (uint64& swappedIn, uint64& swappedOut, uint64& maxSize);
   private:
     // One in-memory entry
     struct SwapEntry
@@ -122,6 +125,7 @@ namespace lighter
 
     //Statistics for house-keeping
     size_t maxCacheSize, currentCacheSize;
+    uint64 swappedOutSize;
     size_t currentUnlockTime;
 
     CS::Threading::Mutex swapMutex;

@@ -61,6 +61,7 @@ namespace lighter
         progPostprocLM (0, 50, &progPostproc),
       progSaveResult ("Saving result", 2),
       progSaveMeshesPostLight ("Updating meshes", 1),
+      progCleanLightingData ("Cleanup", 1),
       progApplyWorldChanges ("Updating world files", 1),
       progCleanup ("Cleanup", 1),
       progFinished ("Finished!", 0)
@@ -69,7 +70,8 @@ namespace lighter
 
   Lighter::~Lighter ()
   {
-    CleanUp ();
+    Statistics::Progress progDummy (0, 0);
+    CleanUp (progDummy);
   }
 
   int Lighter::Run ()
@@ -221,14 +223,28 @@ namespace lighter
     return true;
   }
 
-  void Lighter::CleanUp ()
+  void Lighter::CleanUp (Statistics::Progress& progress)
   {
+    static const int cleanupSteps = 3;
+    float progressStep = 1.0f/cleanupSteps;
+  
+    progress.SetProgress (0);
+  
+    Statistics::Progress* progCleanupScene =
+      progress.CreateProgress (progressStep*0.9f);
+    if (scene) scene->CleanUp (*progCleanupScene);
+    delete progCleanupScene;
     delete scene; scene = 0;
+    progress.SetProgress (1*progressStep);
     
     delete swapManager; swapManager = 0;
+    progress.SetProgress (2*progressStep);
     
     engine.Invalidate ();
-  }
+    progress.SetProgress (3*progressStep);
+  
+    progress.SetProgress (1);
+}
 
   bool Lighter::LightEmUp ()
   {
@@ -274,13 +290,11 @@ namespace lighter
       return false;
     if (!scene->SaveLightmaps (progSaveResult)) 
       return false;
-    scene->CleanLightingData ();
+    scene->CleanLightingData (progCleanLightingData);
     if (!scene->ApplyWorldChanges (progApplyWorldChanges)) 
       return false;
 
-    progCleanup.SetProgress (0);
-    CleanUp ();
-    progCleanup.SetProgress (1);
+    CleanUp (progCleanup);
 
     progFinished.SetProgress (1);
 
