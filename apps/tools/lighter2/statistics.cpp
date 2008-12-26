@@ -92,6 +92,8 @@ namespace lighter
   void Statistics::GlobalProgress::UpdateProgressDisplay (
     const char* taskName)
   {
+    if (taskName == 0) return;
+
     lastUpdatePercentGlobal = int (100.0f * progress);
     int redrawFlags;
     if (this->taskName != taskName)

@@ -92,6 +92,8 @@ namespace lighter
   public:
     Scene ();
     ~Scene ();
+    
+    void CleanUp (Statistics::Progress& progress);
 
     // Add a file for later loading
     void AddFile (const char* directory);
@@ -115,7 +117,7 @@ namespace lighter
     // Save any mesh data that can only be saved after lighting.
     bool SaveMeshesPostLighting (Statistics::Progress& progress);
     // Clean up all data not needed after lighting.
-    void CleanLightingData ();
+    void CleanLightingData (Statistics::Progress& progress);
 
     // Data access
     inline ObjectFactoryHash& GetFactories () 
