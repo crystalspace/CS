@@ -100,7 +100,7 @@ namespace lighter
       redrawFlags = TUI::TUI_DRAW_ALL;
     }
     else
-      redrawFlags = TUI::TUI_DRAW_PROGRESS;
+      redrawFlags = TUI::TUI_DRAW_PROGRESS | TUI::TUI_DRAW_SWAPCACHE;
 
     globalTUI.Redraw (redrawFlags);
   }

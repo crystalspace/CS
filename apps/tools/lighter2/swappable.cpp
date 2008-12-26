@@ -28,7 +28,7 @@
 namespace lighter
 {
   SwapManager::SwapManager (size_t maxSize) : entryAlloc (1000),   
-    currentCacheSize (0), currentUnlockTime (1)
+    currentCacheSize (0), swappedOutSize (0), currentUnlockTime (1)
   {
 #if CS_PROCESSOR_SIZE == 32
     //@@ Try to make sure we don't run out of virtual address space, don't use above 1GB for swapcache
@@ -219,6 +219,7 @@ namespace lighter
       CS::Threading::MutexScopedLock lock (swapMutex);
       unlockedCacheEntries.Delete (e);    
       currentCacheSize -= e->lastSize;
+      swappedOutSize += e->lastSize;
     }
 
     return true;
@@ -314,6 +315,7 @@ namespace lighter
     {
       CS::Threading::MutexScopedLock lock (swapMutex);
       currentCacheSize += e->lastSize;
+      swappedOutSize -= e->lastSize;
     }    
 
     return true;
@@ -350,6 +352,14 @@ namespace lighter
         abort();
       }
     }
+  }
+  
+  void SwapManager::GetSizes (uint64& swappedIn, uint64& swappedOut,
+                              uint64& maxSize)
+  {
+    swappedIn = currentCacheSize;
+    swappedOut = swappedOutSize;
+    maxSize = maxCacheSize;
   }
 
   csString SwapManager::GetFileName (iSwappable* obj)
