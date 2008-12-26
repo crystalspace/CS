@@ -2321,9 +2321,8 @@ namespace lighter
 
   void Scene::LightingPostProcessor::ApplyExposure (csColor* colors, size_t numColors)
   {
-    // @@@ ATM shader does *not* do *2 for vertex lighting
-    //LightmapPostProcess::ApplyExposureFunction(colors, numColors, 1.8f, 1.0f);
-    //LightmapPostProcess::ApplyScaleClampFunction (colors, numColors, 1.0f, 1.0f);
+    //LightmapPostProcess::ApplyExposureFunction(colors, numColors, 1.8f, 0.5f);
+    LightmapPostProcess::ApplyScaleClampFunction (colors, numColors, 0.5f, 1.0f);
   }
   
   void Scene::LightingPostProcessor::ApplyAmbient (Lightmap* lightmap)
