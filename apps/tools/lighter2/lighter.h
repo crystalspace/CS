@@ -123,6 +123,7 @@ namespace lighter
     Statistics::Progress progPostproc;
     Statistics::Progress progPostprocSector;
     Statistics::Progress progPostprocLM;
+    Statistics::Progress progSpecMaps;
     Statistics::Progress progSaveResult;
     Statistics::Progress progSaveMeshesPostLight;
     Statistics::Progress progApplyWorldChanges;

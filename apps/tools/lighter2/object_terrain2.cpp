@@ -155,13 +155,13 @@ namespace lighter
 	{
 	  for (uint x = 0; x < primSamplesX-1; x++)
 	  {
-	    Primitive prim1 (primVertexData);
+	    Primitive prim1 (primVertexData, 0);
 	    prim1.GetTriangle().a = indexOffs + (y*primSamplesX) + x;
 	    prim1.GetTriangle().b = indexOffs + (y*primSamplesX) + x + 1;
 	    prim1.GetTriangle().c = indexOffs + ((y+1)*primSamplesX) + x;
 	    prim1.ComputePlane ();
 
-	    Primitive prim2 (primVertexData);
+	    Primitive prim2 (primVertexData, 0);
 	    prim2.GetTriangle().a = indexOffs + ((y+1)*primSamplesX) + x;
 	    prim2.GetTriangle().b = indexOffs + (y*primSamplesX) + x + 1;
 	    prim2.GetTriangle().c = indexOffs + ((y+1)*primSamplesX) + x + 1;

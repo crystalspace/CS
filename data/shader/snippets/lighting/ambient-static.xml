@@ -203,6 +203,10 @@
 	  </block>
 	</input>
 	
+	<block location="cg:definitions">
+	  <?Include /shader/snippets/lighting/directional_lms.cginc ?>
+	</block>
+	
 	<block location="cg:fragmentMain">
 	  <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
 	  float3 ambient_dynamic = dynamicAmbient * occlusionFactor;
@@ -212,18 +216,6 @@
 	  // Utilize directional LM/colors only if normal is changed per-fragment
 	  if (normal_attr_perfragment)
 	  {
-	    /* These should really match up with those in lighter2... */
-	    float3 base[3] = 
-	    { 
-	      float3 (/* -1/sqrt(6) */ -0.408248, /* 1/sqrt(2) */ 0.707107, /* 1/sqrt(3) */ 0.577350),
-	      float3 (/* sqrt(2/3) */ 0.816497, 0, /* 1/sqrt(3) */ 0.577350),
-	      float3 (/* -1/sqrt(6) */ -0.408248, /* -1/sqrt(2) */ -0.707107, /* 1/sqrt(3) */ 0.577350)
-	    };
-	    float3 coeff = float3 (saturate (dot (normal, base[0])),
-	    saturate (dot (normal, base[1])),
-	    saturate (dot (normal, base[2])));
-	    coeff *= coeff;
-	    
 	    float3 baseLit[3];
 	  ]]>
 	  <?if vars."tex lightmap dir 1".texture ?>
@@ -240,9 +232,7 @@
 	  ]]>
 	  <?endif?>
 	  <![CDATA[
-	    ambient_static = 2 * (coeff.x * baseLit[0]
-			     + coeff.y * baseLit[1]
-			     + coeff.z * baseLit[2]);
+	    ambient_static = 2 * ComputeDLMColor (normal, baseLit);
 	    ambient_attr_perfragment = true;
 	  }
 	  else

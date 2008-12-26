@@ -34,6 +34,7 @@ namespace lighter
     //Setup defaults
     lighterProperties.doDirectLight = true;
     lighterProperties.directionalLMs = false;
+    lighterProperties.specularDirectionMaps = false;
     lighterProperties.numThreads = CS::Platform::GetProcessorCount();
     lighterProperties.saveBinaryBuffers = true;
     lighterProperties.checkDupes = true;
@@ -62,6 +63,8 @@ namespace lighter
       lighterProperties.doDirectLight);
     lighterProperties.directionalLMs = cfgFile->GetBool ("lighter2.BumpLMs", 
       lighterProperties.directionalLMs);
+    lighterProperties.specularDirectionMaps = cfgFile->GetBool ("lighter2.SpecMaps", 
+      true) && lighterProperties.directionalLMs;
     lighterProperties.numThreads = cfgFile->GetInt ("lighter2.NumThreads", 
       lighterProperties.numThreads);
     lighterProperties.checkDupes = cfgFile->GetBool ("lighter2.CheckDupes",

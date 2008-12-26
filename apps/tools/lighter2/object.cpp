@@ -215,7 +215,7 @@ namespace lighter
 
   Object::Object (ObjectFactory* fact)
     : lightPerVertex (fact->lightPerVertex), sector (0), litColors (0), 
-      litColorsPD (0), factory (fact)
+      litColorsPD (0), factory (fact), lightInfluences (0)
   {
     if (factory->noSelfShadow)
       objFlags.Set (OBJECT_FLAG_NOSELFSHADOW);
@@ -225,6 +225,7 @@ namespace lighter
   {
     delete[] litColors;
     delete[] litColorsPD;
+    delete lightInfluences;
   }
 
   bool Object::Initialize (Sector* sector)
@@ -242,6 +243,7 @@ namespace lighter
 
     const csReversibleTransform transform = meshWrapper->GetMovable ()->
       GetFullTransform ();
+    objectToWorld = transform;
 
     //Copy over data, transform the radprimitives..
     vertexData = factory->vertexData;
@@ -283,7 +285,7 @@ namespace lighter
 	allPrimitives.SetCapacity (allPrimitives.GetSize() + factPrims.GetSize());
 	for (i = 0; i < factPrims.GetSize(); i++)
 	{
-	  Primitive newPrim (vertexData);
+	  Primitive newPrim (vertexData, j);
 	  
 	  Primitive& prim = allPrimitives[allPrimitives.Push (newPrim)];
 	  //prim.SetOriginalPrimitive (&factPrims[i]);
@@ -586,7 +588,69 @@ namespace lighter
                       tang[1], bitang[1], normal[1],
                       tang[2], bitang[2], normal[2]);
   }
+  
+  LightInfluences& Object::GetLightInfluences (uint groupID, Light* light)
+  {
+    if (!lightInfluences)
+      lightInfluences = new LightInfluencesHash;
+  
+    GroupAndLight key (light, groupID);
+    csRef<LightInfluencesRC>& infl = lightInfluences->GetOrCreate (key);
+    
+    if (!infl.IsValid())
+    {
+      float minU = FLT_MAX, minV = FLT_MAX, maxU = -FLT_MAX, maxV = -FLT_MAX;
+      const PrimitiveArray& groupPrims = allPrimitives[groupID];
+      for (size_t p = 0; p < groupPrims.GetSize(); p++)
+      {
+        const Primitive& prim = groupPrims[p];
+        CS_ASSERT(prim.GetGroupID() == groupID);
+        
+        const csVector2& primMinUV = prim.GetMinUV();
+        if (primMinUV.x < minU) minU = primMinUV.x;
+        if (primMinUV.y < minV) minV = primMinUV.y;
+        
+        const csVector2& primMaxUV = prim.GetMaxUV();
+        if (primMaxUV.x > maxU) maxU = primMaxUV.x;
+        if (primMaxUV.y > maxV) maxV = primMaxUV.y;
+      }
+      
+      uint inflOffsX = uint (floorf (minU));
+      uint inflOffsY = uint (floorf (minV));
+      uint inflW = uint (ceilf (maxU)) - inflOffsX;
+      uint inflH = uint (ceilf (maxV)) - inflOffsY;
+      infl.AttachNew (
+        new LightInfluencesRC (inflW, inflH, inflOffsX, inflOffsY));
+    }
+    
+    return *infl;
+  }
 
+  csArray<Light*> Object::GetLightsAffectingGroup (uint groupID) const
+  {
+    csArray<Light*> lights;
+    if (lightInfluences)
+    {
+      csSet<csPtrKey<Light> > lightsSeen;
+      
+      LightInfluencesHash::GlobalIterator inflIt = 
+	lightInfluences->GetIterator();
+      
+      while (inflIt.HasNext())
+      {
+	GroupAndLight key (0, 0);
+	inflIt.Next (key);
+	if ((key.groupID == groupID) && !lightsSeen.Contains (key.light))
+	{
+	  lights.Push (key.light);
+	  lightsSeen.AddNoTest (key.light);
+	}
+      }
+    }
+    
+    return lights;
+  }
+  
   void Object::RenormalizeLightmapUVs (const LightmapPtrDelArray& lightmaps,
                                        csVector2* lmcoords)
   {

@@ -108,6 +108,8 @@ namespace lighter
 
     // Copy the temporary file created in SaveWorld() over the actual world file.
     bool ApplyWorldChanges (Statistics::Progress& progress);
+    // Generate specular direction maps
+    bool GenerateSpecularDirectionMaps (Statistics::Progress& progress);
     // Write the generated lightmaps out.
     bool SaveLightmaps (Statistics::Progress& progress);
     // Save any mesh data that can only be saved after lighting.
@@ -136,6 +138,9 @@ namespace lighter
       Light* light = 0);
 
     csArray<LightmapPtrDelArray*> GetAllLightmaps ();
+    
+    enum { specDirectionMapCount = 3 };
+    iTextureWrapper* GetSpecDirectionMapTexture (uint ID, int subNum);
     
     const RadMaterial* GetRadMaterial (iMaterialWrapper* matWrap) const
     {
@@ -196,6 +201,17 @@ namespace lighter
     LightmapPtrDelArray lightmaps;
     typedef csHash<LightmapPtrDelArray*, csPtrKey<Light> > PDLightmapsHash;
     PDLightmapsHash pdLightmaps;
+    DirectionMapPtrDelArray directionMaps[2];
+    csStringArray directionMapBaseNames;
+    csString GetDirectionMapFilename (uint ID, int subNum) const;
+    
+    struct DirectionMapTextures
+    {
+      iTextureWrapper* t[specDirectionMapCount];
+      
+      DirectionMapTextures() { memset (t, 0, sizeof (t)); }
+    };
+    csArray<DirectionMapTextures> directionMapTextures;
 
     struct LoadedFile
     {
@@ -257,6 +273,11 @@ namespace lighter
     SaveResult SaveMeshObjectToDom (csSet<csString>& savedObjects, 
                                     iDocumentNode *objNode, 
                                     Sector* sect, LoadedFile* fileInfo);
+
+    void GenerateSpecularDirectionMaps (LoadedFile* fileInfo,
+      Statistics::Progress& progress);
+    void SaveSpecularDirectionMaps (LoadedFile* fileInfo,
+      csStringArray& filenames, csStringArray& textureNames);
 
     csStringHash solidColorFiles;
     const char* GetSolidColorFile (LoadedFile* fileInfo, const csColor& col);

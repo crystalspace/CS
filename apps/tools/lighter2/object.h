@@ -233,12 +233,24 @@ namespace lighter
       const csVector3& pt) const;
 
     csMatrix3 GetTangentSpace (size_t vert) const;
+    
+    const csReversibleTransform& GetObjectToWorld () const
+    { return objectToWorld; }
 
     // Name
     csString meshName;
 
     /// Whether to light mesh per vertex
     bool lightPerVertex;
+    
+    /// Get the light influences for a certain primitive group
+    LightInfluences& GetLightInfluences (uint groupID, Light* light);
+    const LightInfluences& GetLightInfluences (uint groupID, Light* light) const;
+    
+    size_t GetPrimitiveGroupNum() const { return allPrimitives.GetSize(); }
+    csArray<Light*> GetLightsAffectingGroup (uint groupID) const;
+    uint GetPrimitiveGroupLightmap (uint groupID) const
+    { return allPrimitives[groupID].Get (0).GetGlobalLightmapID (); }
   protected:
     // All faces, already transformed
     csArray<PrimitiveArray> allPrimitives;
@@ -260,6 +272,9 @@ namespace lighter
 
     // Bounding sphere
     csSphere bsphere;
+    
+    // Object to world transform
+    csReversibleTransform objectToWorld;
 
     // Vertex data for above, transformed
     ObjectVertexData vertexData;
@@ -301,6 +316,35 @@ namespace lighter
     /* Wrap a render buffer in a RenderBufferPersistent if binary buffers
        are enabled */
     csPtr<iRenderBuffer> WrapBuffer (iRenderBuffer* buffer, const char* suffix);
+    
+    struct GroupAndLight
+    {
+      Light* light;
+      uint groupID;
+      
+      GroupAndLight (Light* light, uint groupID) : light (light),
+        groupID (groupID) {}
+        
+      bool operator< (const GroupAndLight& other) const
+      {
+        if (light < other.light) return true;
+        if (light > other.light) return false;
+        return groupID < other.groupID;
+      }
+      uint GetHash() const
+      {
+        return uint (uintptr_t (light)) ^ groupID;
+      }
+    };
+    struct LightInfluencesRC :
+      public CS::Utility::FastRefCount<LightInfluencesRC>,
+      public LightInfluences
+    {
+      LightInfluencesRC (uint w, uint h, uint xOffs, uint yOffs)
+       : LightInfluences (w, h, xOffs, yOffs) {}
+    };
+    typedef csHash<csRef<LightInfluencesRC>, GroupAndLight> LightInfluencesHash;
+    LightInfluencesHash* lightInfluences;
 
     friend class ObjectFactory;
   };

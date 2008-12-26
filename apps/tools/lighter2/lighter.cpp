@@ -59,8 +59,9 @@ namespace lighter
       progPostproc ("Postprocessing lightmaps", 10),
         progPostprocSector (0, 50, &progPostproc),
         progPostprocLM (0, 50, &progPostproc),
-      progSaveResult ("Saving result", 2),
       progSaveMeshesPostLight ("Updating meshes", 1),
+      progSpecMaps ("Generating specular direction maps", 10),
+      progSaveResult ("Saving result", 2),
       progApplyWorldChanges ("Updating world files", 1),
       progCleanup ("Cleanup", 1),
       progFinished ("Finished!", 0)
@@ -272,6 +273,8 @@ namespace lighter
     //Save the result
     if (!scene->SaveMeshesPostLighting (progSaveMeshesPostLight)) 
       return false;
+    if (!scene->GenerateSpecularDirectionMaps (progSpecMaps))
+      return false;
     if (!scene->SaveLightmaps (progSaveResult)) 
       return false;
     scene->CleanLightingData ();
@@ -389,6 +392,7 @@ namespace lighter
       sect->PrepareLighting (*progSector);
       delete progSector;
     }
+    
     progPrepareLightingSector.SetProgress (1);
   }
 
@@ -614,6 +618,14 @@ namespace lighter
     csPrintf ("  Set maximum terrain lightmap size in v-mapping direction\n");
     csPrintf ("   Default: value for non-terrain lightmaps\n");
 
+    csPrintf (" --bumplms\n");
+    csPrintf ("  Generate directional lightmaps needed for normalmapping static\n");
+    csPrintf ("  lit surfaces\n");
+    csPrintf ("   Default: False\n");
+    
+    csPrintf (" --nospecmaps\n");
+    csPrintf ("  Don't generate maps for specular lighting on static lit surfaces\n");
+    
     csPrintf (" --expert\n");
     csPrintf ("  Display advanced command line options\n");
 
