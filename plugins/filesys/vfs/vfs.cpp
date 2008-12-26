@@ -418,7 +418,7 @@ csMMapDataBuffer::csMMapDataBuffer (const char* filename, size_t fileSize) :
 
 // files above this size are attempted to be mapped into memory, 
 // instead of accessed via 'normal' file operations
-#define VFS_DISKFILE_MAPPING_THRESHOLD_MIN	    0
+#define VFS_DISKFILE_MAPPING_THRESHOLD_MIN	    256*1024
 // same as above, but upper size limit
 #define VFS_DISKFILE_MAPPING_THRESHOLD_MAX	    256*1024*1024
 // disabled for now.
@@ -494,9 +494,7 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, size_t RIndex,
     csPrintf ("VFS_DEBUG: Successfully opened, handle = %d\n", fileno (file));
 
 #if defined(VFS_DISKFILE_MAPPING)
-  if ((Error == VFS_STATUS_OK) && (!writemode) && 
-    (Size >= VFS_DISKFILE_MAPPING_THRESHOLD_MIN) &&
-    (Size <= VFS_DISKFILE_MAPPING_THRESHOLD_MAX))
+  if ((Error == VFS_STATUS_OK) && (!writemode))
   {
     alldata = csPtr<iDataBuffer> (TryCreateMapping ());
     if (alldata)
@@ -813,6 +811,9 @@ csPtr<iDataBuffer> DiskFile::GetAllData (bool nullterm)
 iDataBuffer* DiskFile::TryCreateMapping ()
 {
   if (!Size) return 0;
+  if ((Size < VFS_DISKFILE_MAPPING_THRESHOLD_MIN)
+      || (Size > VFS_DISKFILE_MAPPING_THRESHOLD_MAX))
+    return 0;
   csMMapDataBuffer* buf = new csMMapDataBuffer (fName, Size);
   if (buf->GetStatus())
     return buf;
