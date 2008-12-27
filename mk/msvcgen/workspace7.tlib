@@ -57,8 +57,10 @@ Global
 [% FOREACH project IN projects; g = guids.$project -%]
 [% FOREACH build IN builds -%]
   [% FOREACH mutator IN mutators -%]
-		{[% g %]}.[% build.name %][% mutator.namesuffix %].ActiveCfg = [% build.name %][% mutator.namesuffix %]|Win32
-		{[% g %]}.[% build.name %][% mutator.namesuffix %].Build.0 = [% build.name %][% mutator.namesuffix %]|Win32
+    [% FOREACH platform IN platforms -%]
+		{[% g %]}.[% build.name %][% mutator.namesuffix %].ActiveCfg = [% build.name %][% mutator.namesuffix %]|[% platform.name %]
+		{[% g %]}.[% build.name %][% mutator.namesuffix %].Build.0 = [% build.name %][% mutator.namesuffix %]|[% platform.name %]
+    [% END -%]
   [% END -%]
 [% END -%]
 [% END -%]

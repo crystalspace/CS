@@ -40,14 +40,16 @@ END -%]
 	SccProjectName=""
 	SccLocalPath="">
 	<Platforms>
-		<Platform
-			Name="Win32"/>
+[% FOREACH platform IN platforms -%]
+		<Platform Name="[% platform.name %]"/>
+[% END -%]
 	</Platforms>
 	<Configurations>
-[% FOREACH build IN builds -%]
-  [% FOREACH mutator IN mutators -%]
+[% FOREACH platform IN platforms -%]
+  [% FOREACH build IN builds -%]
+    [% FOREACH mutator IN mutators -%]
 		<Configuration
-			Name="[% build.name %][% mutator.namesuffix %]|Win32"
+			Name="[% build.name %][% mutator.namesuffix %]|[% platform.name %]"
 			OutputDirectory="[% workbuild([]) %]"
 			IntermediateDirectory="[% workbuild([]) %]"
 [% interpolate('global') -%]
@@ -79,7 +81,11 @@ END -%]
 				AdditionalDependencies="[% compose('libs', [], ' ') %]"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="[% composedirs('libdirs', []) %]"
+[% IF platform.name == 'x64' %]
+				TargetMachine="17"/>
+[% ELSE %]
 				TargetMachine="1"/>
+[% END %]
 			<Tool
 				Name="VCLibrarianTool"
 [% interpolate('librarian') -%]
@@ -109,6 +115,7 @@ END -%]
 			<Tool
 				Name="VCWebDeploymentTool"/>
 		</Configuration>
+    [% END -%]
   [% END -%]
 [% END -%]
 	</Configurations>
