@@ -1,0 +1,27 @@
+<library>
+    <meshfact name="genbase-floor00">
+        <plugin>genmeshfact</plugin>
+        <zuse />
+        <params>
+            <renderbuffer name="position" checkelementcount="no" file="bindata/genbase-floor00_v" />
+            <renderbuffer name="normal" file="bindata/genbase-floor00_n" />
+            <renderbuffer name="texture coordinate 0" file="bindata/genbase-floor00_tc" />
+            <renderbuffer name="tangent" file="bindata/genbase-floor00_tng" />
+            <renderbuffer name="bitangent" file="bindata/genbase-floor00_btg" />
+            <renderbuffer name="lit color" components="4" type="float">
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+            </renderbuffer>
+            <material>parallaxAtt_concrete4_3-parallaconcrete_floor4_3.png</material>
+            <mixmode>
+                <copy />
+            </mixmode>
+            <submesh name="">
+                <material>parallaxAtt_concrete4_3-parallaconcrete_floor4_3.png</material>
+                <indexbuffer file="bindata/genbase-floor00_i0" />
+            </submesh>
+        </params>
+    </meshfact>
+</library>
