@@ -81,11 +81,7 @@ END -%]
 				AdditionalDependencies="[% compose('libs', [], ' ') %]"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="[% composedirs('libdirs', []) %]"
-[% IF platform.name == 'x64' %]
-				TargetMachine="17"/>
-[% ELSE %]
-				TargetMachine="1"/>
-[% END %]
+				TargetMachine="[% platform.targetmachine %]"/>
 			<Tool
 				Name="VCLibrarianTool"
 [% interpolate('librarian') -%]

@@ -197,10 +197,12 @@ mutators = [
 #------------------------------------------------------------------------------
 platforms = [
   {
-    name => 'Win32'
+    name => 'Win32',
+    targetmachine => 1
   },
   {
-    name => 'x64'
+    name => 'x64',
+    targetmachine => 17
   }
 ];
 
