@@ -200,6 +200,9 @@
 #             Online browseable files are placed into
 #             $jobber_browseable_dir/$dir, and downloadable packages are placed
 #             into $jobber_package_dir/$dir.
+#         package-dir [optional]
+#             Directory name into which downloadable package files for this
+#             task are published. If omitted, "dir" is used.
 #         name [required]
 #             Base package name used when generating downloadable packages via
 #             @jobber_archivers (see below).  When published, the base package
