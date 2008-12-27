@@ -20,6 +20,7 @@
 
 #include "cssysdef.h"
 
+#include "csgfx/imagecubemapmaker.h"
 #include "csgfx/imagememory.h"
 
 #include "gl_render3d.h"
@@ -945,8 +946,8 @@ void csGLBasicTextureHandle::GetMipmapLimits (int& maxMip, int& minMip)
   
 #include "csutil/custom_new_disable.h"
 
-csPtr<iDataBuffer> csGLBasicTextureHandle::Readback (
-  const CS::StructuredTextureFormat& format, int mip)
+csPtr<iDataBuffer> csGLBasicTextureHandle::Readback (GLenum textarget,
+    const CS::StructuredTextureFormat& format, int mip)
 {
   if (format.GetFormat() == CS::StructuredTextureFormat::Special)
     return 0;
@@ -968,8 +969,6 @@ csPtr<iDataBuffer> csGLBasicTextureHandle::Readback (
   size_t byteSize = w * h * d * ((s+7)/8);
   void* data = cs_malloc (byteSize);
 
-  GLenum textarget = GetGLTextureTarget();
-  csGLGraphics3D::statecache->SetTexture (textarget, GetHandle ());
   glGetTexImage (textarget, mip, sourceFormat.format, sourceFormat.type, data);
   
   csRef<iDataBuffer> db;
@@ -980,42 +979,83 @@ csPtr<iDataBuffer> csGLBasicTextureHandle::Readback (
 
 #include "csutil/custom_new_enable.h"
 
-csPtr<iImage> csGLBasicTextureHandle::Dump ()
+csPtr<iDataBuffer> csGLBasicTextureHandle::Readback (
+  const CS::StructuredTextureFormat& format, int mip)
+{
+  GLenum textarget = GetGLTextureTarget();
+  textarget = (textarget == GL_TEXTURE_CUBE_MAP) 
+      ? GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB : textarget;
+  csGLGraphics3D::statecache->SetTexture (textarget, GetHandle ());
+  return Readback (textarget, format, mip);
+}
+  
+class ReadbackImage :
+  public scfImplementationExt0<ReadbackImage, csImageBase>
+{
+  int w, h, d;
+  csRef<iDataBuffer> data;
+public:
+  ReadbackImage (int w, int h, int d, iDataBuffer* data)
+   : scfImplementationType (this), w (w), h (h), d (d), data (data)
+  {}
+  
+  const void* GetImageData() { return data->GetData(); }
+  int GetWidth() const { return w; }
+  int GetHeight() const { return h; }
+  int GetDepth() const { return d; }
+  csRef<iDataBuffer> GetRawData() const { return data; }
+  /* @@@ Lies, damn lies: causes at least depth data to be reinterpreted as
+     RGBA data. Useful for dumping, but not necessarily other scenarios */
+  int GetFormat() const
+  { return CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA; }
+  const char* GetRawFormat() const { return "abgr8"; }
+};
+
+csPtr<iImage> csGLBasicTextureHandle::GetTextureFromGL ()
 {
   // @@@ hmm... or just return an empty image?
   if (GetHandle () == (GLuint)~0) return 0;
 
-  GLint tw, th;
   GLenum textarget = GetGLTextureTarget();
-  csGLGraphics3D::statecache->SetTexture (textarget, GetHandle ());
-  if (textarget == GL_TEXTURE_3D) return 0; // @@@ Not supported yet
-
-  GLenum useTarget = (textarget == GL_TEXTURE_CUBE_MAP) 
+  GLenum usetarget = (textarget == GL_TEXTURE_CUBE_MAP) 
       ? GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB : textarget;
-  glGetTexLevelParameteriv (useTarget, 0, GL_TEXTURE_WIDTH, &tw);
-  glGetTexLevelParameteriv (useTarget, 0, GL_TEXTURE_HEIGHT, &th);
-
+  csGLGraphics3D::statecache->SetTexture (textarget, GetHandle ());
+  
+  CS::StructuredTextureFormat texFormat;
   GLint depthSize;
-  glGetTexLevelParameteriv (useTarget, 0, GL_TEXTURE_DEPTH_SIZE, &depthSize);
-  
-  uint8* data = new uint8[tw * th * 4];
-  
+  glGetTexLevelParameteriv (usetarget, 0, GL_TEXTURE_DEPTH_SIZE, &depthSize);
   if (depthSize > 0)
   {
     // Depth texture
-    glGetTexImage (useTarget, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, data);
+    texFormat = CS::StructuredTextureFormat ('d', 32);
   }
   else
   {
     // Color texture
-    glGetTexImage (useTarget, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    texFormat = CS::StructuredTextureFormat ('a', 8, 'b', 8, 'g', 8, 'r', 8);
   }
-  csImageMemory* lmimg = 
-      new csImageMemory (tw, th,
-			 data, true, 
-    CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
   
-  return csPtr<iImage> (lmimg);
+  if (textarget == GL_TEXTURE_CUBE_MAP)
+  {
+    csRef<iImage> face[6];
+    for (int f = 0; f < 6; f++)
+    {
+      csRef<iDataBuffer> texData (Readback (
+        GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB+f, texFormat, 0));
+      face[f].AttachNew (new ReadbackImage (actual_width, actual_height,
+        actual_d, texData));
+    }
+    csImageCubeMapMaker* img = new csImageCubeMapMaker (
+      face[0], face[1], face[2], face[3], face[4], face[5]);
+    return csPtr<iImage> (img);
+  }
+  else
+  {
+    csRef<iDataBuffer> texData (Readback (usetarget, texFormat, 0));
+    ReadbackImage* img = new ReadbackImage (actual_width, actual_height,
+      actual_d, texData);
+    return csPtr<iImage> (img);
+  }
 }
 
 }

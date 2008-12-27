@@ -421,7 +421,7 @@ void csGLTextureManager::DumpTextures (iVFS* VFS, iImageIO* iio,
   {
     if (!textures[i]) continue;
     
-    csRef<iImage> img = textures[i]->Dump ();
+    csRef<iImage> img = textures[i]->GetTextureFromGL ();
     if (img)
     {
       csRef<iDataBuffer> buf = iio->Save (img, "image/png");
