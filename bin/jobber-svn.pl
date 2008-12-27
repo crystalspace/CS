@@ -279,7 +279,7 @@ use warnings;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber-svn.pl';
-my $PROG_VERSION = '37';
+my $PROG_VERSION = '38';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000-2005 by $AUTHOR_NAME <$AUTHOR_EMAIL>\nConverted for SVN support by Marten Svanfeldt";
@@ -820,8 +820,8 @@ sub publish_packages {
 	}
 
 	my $base = $export->{'name'};
-	my $dst = "$jobber_package_dir/$export->{'package-dir'}";
-	$dst = "$jobber_package_dir/$export->{'dir'}" unless $dst;
+	my $dst = "$jobber_package_dir/" . ($export->{'package-dir'} ?
+	    $export->{'package-dir'} : $export->{'dir'});
 	create_directory_deep($dst, $jobber_public_group) unless $TESTING;
 	foreach my $archiver (@jobber_archivers) {
 	    publish_package($archiver, $appear, $dst, $base, '  ');
