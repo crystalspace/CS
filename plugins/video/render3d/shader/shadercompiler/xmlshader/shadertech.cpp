@@ -1122,8 +1122,11 @@ bool csXMLShaderTech::ReadPassPerTag (ShaderPassPerTag& pass,
     for (size_t i = 0; i < numTextures; i++)
     {
       ShaderPass::TextureMapping mapping;
-      mapping.tex.id = parent->compiler->stringsSvName->Request (
-        CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile));
+      const char* texSvName = 
+        CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+      mapping.tex.id =
+        texSvName ? parent->compiler->stringsSvName->Request (texSvName)
+                  : CS::InvalidShaderVarStringID;
 	
       size_t numIndices;
       uint32 diskNumIndices;
@@ -1138,8 +1141,11 @@ bool csXMLShaderTech::ReadPassPerTag (ShaderPassPerTag& pass,
 	mapping.tex.indices.Push (csLittleEndian::UInt32 (diskIndex));
       }
       
-      mapping.fallback.id = parent->compiler->stringsSvName->Request (
-        CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile));
+      texSvName = 
+        CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+      mapping.fallback.id =
+        texSvName ? parent->compiler->stringsSvName->Request (texSvName)
+                  : CS::InvalidShaderVarStringID;
 	
       if (cacheFile->Read ((char*)&diskNumIndices, sizeof (diskNumIndices))
 	  != sizeof (diskNumIndices)) return false;
