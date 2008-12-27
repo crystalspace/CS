@@ -35,7 +35,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 CS_LEAKGUARD_IMPLEMENT(csGLTextureManager);
 
 static const csGLTextureClassSettings defaultSettings = 
-  {GL_RGB, GL_RGBA, false, false, true, true};
+  {GL_RGB, GL_RGBA, false, false, true, true, false};
 
 csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
@@ -242,6 +242,10 @@ void csGLTextureManager::ReadTextureClasses (iConfigFile* config)
       else if (strcasecmp (optionName, "AllowMipSharpen") == 0)
       {
 	settings->allowMipSharpen = it->GetBool ();
+      } 
+      else if (strcasecmp (optionName, "RenormalizeGeneratedMips") == 0)
+      {
+	settings->renormalizeGeneratedMips = it->GetBool ();
       } 
       else
       {
