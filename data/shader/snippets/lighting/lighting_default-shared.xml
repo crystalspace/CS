@@ -59,7 +59,6 @@
     <connection from="parallax" to="normalmap" />
     <connection from="normalmap" to="ambient" />
     <connection from="normalmap" to="lighting" />
-    <connection from="normalmap" to="specular" />
     <connection from="normalmap" to="staticspecular" />
     <connection from="surface" to="apply_mixmode_alpha" />
     <connection from="surface" to="specular" />
