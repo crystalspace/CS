@@ -621,16 +621,16 @@ csRef<iImage> csImageManipulate::RenormalizeNormals (iImage* source)
   for (int n = Width * Height * Depth; n > 0; n--)
   {
     csRGBpixel n_biased (*src);
-    csVector3 n (
+    csVector3 nCurrent (
       n_biased.red*(2.0f/255.0f)-1.0f,
       n_biased.green*(2.0f/255.0f)-1.0f,
       n_biased.blue*(2.0f/255.0f)-1.0f);
-    n.Normalize();
+    nCurrent.Normalize();
     
     csRGBpixel n_new (
-      csClamp (int(n.x*127.5f+127.5f), 255, 0),
-      csClamp (int(n.y*127.5f+127.5f), 255, 0),
-      csClamp (int(n.z*127.5f+127.5f), 255, 0),
+      csClamp (int(nCurrent.x*127.5f+127.5f), 255, 0),
+      csClamp (int(nCurrent.y*127.5f+127.5f), 255, 0),
+      csClamp (int(nCurrent.z*127.5f+127.5f), 255, 0),
       n_biased.alpha);
     *dest = n_new;
 
