@@ -53,18 +53,22 @@
 	<variablemap variable="fog limit" destination="fragmentIn.fogLimit" />
 	<!-- See the glshader_fixed plugin source for a detailed explanation 
 	      of the formular below. -->
-	<?if vars."fogplane".z &gt; 0 ?>
-	  <variablemap destination="vertexIn.fogPlaneS" type="expr">
-	    <sexp>
+	<variablemap destination="vertexIn.fogPlaneS" type="expr">
+	  <sexp>
+	  (if (&gt; (elt3 fogplane) 0)
 	    (make-vector 
 	      0 
 	      0 
 	      "fog density" 
 	      (- (min (max (* (elt4 fogplane) "fog density") -1) 0) (* 0.1 "fog density"))
-	    )</sexp>
-	  </variablemap>
-	  <variablemap destination="vertexIn.fogPlaneT" type="expr">
-	    <sexp>
+	    )
+	    (make-vector 0 0 "fog density" (* -0.1 "fog density"))
+	  )
+	  </sexp>
+	</variablemap>
+	<variablemap destination="vertexIn.fogPlaneT" type="expr">
+	  <sexp>
+	  (if (&gt; (elt3 fogplane) 0)
 	    (make-vector
 	      (/ (* (elt1 fogplane) "fog density") (elt3 fogplane))
 	      (/ (* (elt2 fogplane) "fog density") (elt3 fogplane))
@@ -72,14 +76,10 @@
 	      (+ (min (max (pow (+ 1 (* (elt4 fogplane) 0.2)) 5) 0) 1)
 		  (* "fog density" (- (/ (elt4 fogplane) (elt3 fogplane)) 0.1)))
 	    )
-	    </sexp>
-	  </variablemap>
-	<?else?>
-	  <variablemap destination="vertexIn.fogPlaneS" type="expr">
-	    <sexp>(make-vector 0 0 "fog density" (* -0.1 "fog density"))</sexp>
-	  </variablemap>
-	  <variablemap destination="vertexIn.fogPlaneT" type="vector4">0,0,0,1</variablemap>
-	<?endif?>
+	    (make-vector 0 0 0 1)
+	  )
+	  </sexp>
+	</variablemap>
       <?endif?>
     </block>
     
