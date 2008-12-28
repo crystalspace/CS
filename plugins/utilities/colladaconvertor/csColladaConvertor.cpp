@@ -739,7 +739,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
         {
           csRef<iDocumentNode> classTag = newTexture->CreateNodeBefore(CS_NODE_ELEMENT);
           classTag->SetValue("class");
-  
+
           csRef<iDocumentNode> normalmapText = classTag->CreateNodeBefore(CS_NODE_TEXT);
           normalmapText->SetValue("normalmap");
         }
@@ -1292,35 +1292,35 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       return CS_COLLADA_NORMAL_MAP_3DS;
     return 0;
   }
-  
-  
+
+
   bool csColladaConvertor::CheckForNormalMap3DSMaxVersion(csRef<iDocumentNode> texture)
   {
     csRef<iDocumentNode> effectsNode = colladaElement->GetNode("library_effects");
     csRef<iDocumentNodeIterator> effectNodes = effectsNode->GetNodes("effect");
-    
+
     csString surfaceID("");
-    
+
     while(effectNodes->HasNext())
     {
       bool foundSurface = false;
-        
+
       csRef<iDocumentNode> effect = effectNodes->Next();
       csRef<iDocumentNodeIterator> newparamNodes = effect->GetNode("profile_COMMON")->GetNodes("newparam");
-      
+
       while(newparamNodes->HasNext())
       {      
         csRef<iDocumentNode> newparam = newparamNodes->Next();
-        
+
         if(!foundSurface)
         {        
           csRef<iDocumentNode> surfaceNode = newparam->GetNode("surface");
-          
+
           if(surfaceNode.IsValid())
           {
             csString paramnodeInitValue(surfaceNode->GetNode("init_from")->GetContentsValue());
             csString textureID(texture->GetAttributeValue("id"));
-                      
+
             if(textureID == paramnodeInitValue)
             {
               foundSurface = true;
@@ -1341,7 +1341,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
               csString normalmapTexture;
               csRef<iDocumentNode> normalmapNode = effect->GetNode("profile_COMMON")->GetNode("technique")->GetNode("extra")->GetNode("technique")->GetNode("bump");
               if(normalmapNode.IsValid())
-                  normalmapTexture = normalmapNode->GetNode("texture")->GetAttributeValue("texture");
+                normalmapTexture = normalmapNode->GetNode("texture")->GetAttributeValue("texture");
               if(normalmapTexture == samplerSID)
               {
                 return true;
@@ -1353,7 +1353,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     }
     return false;
   }
-  
+
 
   void csColladaConvertor::CreateShaderVarNodes(csRef<iDocumentNode> newMaterial, csRef<iDocumentNode> effect)
   {
@@ -1362,36 +1362,36 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     {
       csRef<iDocumentNode> surfaceParamNode = surfaceParamNodes->Next();
       if(!surfaceParamNode->GetNode("surface"))
-          continue;
-      
+        continue;
+
       csString surfaceID(surfaceParamNode->GetAttributeValue("sid"));
-      
+
       csRef<iDocumentNodeIterator> samplerParamNodes = effect->GetNode("profile_COMMON")->GetNodes("newparam");
       while(samplerParamNodes->HasNext())
       {
         csRef<iDocumentNode> samplerParamNode = samplerParamNodes->Next();
-        
+
         if(!samplerParamNode->GetNode("sampler2D"))
           continue;
-          
+
         csString samplerSource = samplerParamNode->GetNode("sampler2D")->GetNode("source")->GetContentsValue();
         if(surfaceID == samplerSource)
         {
           csString samplerID;
           samplerID = samplerParamNode->GetAttributeValue("sid");
-          
+
           csString shadervarValue = surfaceParamNode->GetNode("surface")->GetNode("init_from")->GetContentsValue();
-          
+
           if(HasNormalMap(effect, samplerID))
           {
             CreateShaderVarNode( newMaterial, "tex normal", shadervarValue);
           }
-          
+
           if(HasHeightMap(effect, samplerID))
           {
             CreateShaderVarNode( newMaterial, "tex height", shadervarValue);
           }
-          
+
           if(HasSpecMap(effect, samplerID))
           {
             CreateShaderVarNode( newMaterial, "tex specular", shadervarValue);
@@ -1400,7 +1400,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       }
     }
   }
-  
+
 
   bool csColladaConvertor::HasNormalMap(csRef<iDocumentNode> effect, csString samplerID)
   {
@@ -1410,10 +1410,10 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       normalmapString = normalmapNode->GetNode("texture")->GetAttributeValue("texture");
     if(normalmapString == samplerID)
       return true;
-  
+
     return false;
   }
-  
+
 
   bool csColladaConvertor::HasHeightMap(csRef<iDocumentNode> effect, csString samplerID)
   {
@@ -1423,10 +1423,10 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       heightmapString = heightmapNode->GetNode("texture")->GetAttributeValue("texture");
     if(heightmapString == samplerID)
       return true;
-  
+
     return false;
   }
-  
+
 
   bool csColladaConvertor::HasSpecMap(csRef<iDocumentNode> effect, csString samplerID)
   {
@@ -1435,7 +1435,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     if(specmapNode.IsValid())
       specmapString = specmapNode->GetNode("texture")->GetAttributeValue("texture");
     if(specmapString == samplerID)
-        return true;
+      return true;
     return false;
   }
 
@@ -1444,10 +1444,10 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
   {
     csRef<iDocumentNode> shadervar = newMaterial->CreateNodeBefore(CS_NODE_ELEMENT);
     shadervar->SetValue("shadervar");
-    
+
     shadervar->SetAttribute("type", "texture");
     shadervar->SetAttribute("name", name);
-    
+
     csRef<iDocumentNode> shadervarText = shadervar->CreateNodeBefore(CS_NODE_TEXT);
     shadervarText->SetValue(value);
   }
