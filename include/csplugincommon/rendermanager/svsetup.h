@@ -208,6 +208,33 @@ namespace RenderManager
       if (context.shadervars.IsValid())
         context.shadervars->PushVariables (svStack);
       sector->GetSVContext ()->PushVariables (svStack);
+      
+      // @@@ Split out fog plane setup into it's own function?
+      CS::RenderManager::RenderView* rview = context.renderView;
+      if (sector->HasFog())
+      {
+        context.svFogplane.AttachNew (new csShaderVariable (
+          context.owner.GetPersistentData().svFogplaneName));
+          
+	//construct a cameraplane
+	csVector4 fogPlane;
+	iPortal *lastPortal = rview->GetLastPortal();
+	if(lastPortal)
+	{
+	  csPlane3 plane;
+	  lastPortal->ComputeCameraPlane(rview->GetCamera()->GetTransform(), plane);
+	  fogPlane = plane.norm;
+	  fogPlane.w = plane.DD;
+	}
+	else
+	{
+	  fogPlane = csVector4(0.0,0.0,1.0,0.0);
+	}
+	context.svFogplane->SetValue (fogPlane);
+	
+	svStack[context.owner.GetPersistentData().svFogplaneName]
+	 = context.svFogplane;
+      }
 
       // Replicate
       context.svArrays.ReplicateSet (0, 0, 1);
