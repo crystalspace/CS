@@ -9369,6 +9369,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *Sharpen = *cspacec::csImageManipulate_Sharpen;
 *TransformColor = *cspacec::csImageManipulate_TransformColor;
 *Gray = *cspacec::csImageManipulate_Gray;
+*RenormalizeNormals = *cspacec::csImageManipulate_RenormalizeNormals;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csImageManipulate(@_);

@@ -11885,6 +11885,38 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csImageManipulate_RenormalizeNormals(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iImage *arg1 = (iImage *) 0 ;
+  SwigValueWrapper< csRef<iImage > > result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csImageManipulate_RenormalizeNormals",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iImage, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csImageManipulate_RenormalizeNormals" "', argument " "1"" of type '" "iImage *""'"); 
+  }
+  arg1 = reinterpret_cast< iImage * >(argp1);
+  result = csImageManipulate::RenormalizeNormals(arg1);
+  {
+    csRef<iImage> ref((csRef<iImage>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iImage *)ref, SWIGTYPE_p_iImage, 1);
+  }
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_new_csImageManipulate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csImageManipulate *result = 0 ;
@@ -12100,6 +12132,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csImageManipulate_Sharpen", _wrap_csImageManipulate_Sharpen, METH_VARARGS, NULL},
 	 { (char *)"csImageManipulate_TransformColor", _wrap_csImageManipulate_TransformColor, METH_VARARGS, NULL},
 	 { (char *)"csImageManipulate_Gray", _wrap_csImageManipulate_Gray, METH_VARARGS, NULL},
+	 { (char *)"csImageManipulate_RenormalizeNormals", _wrap_csImageManipulate_RenormalizeNormals, METH_VARARGS, NULL},
 	 { (char *)"new_csImageManipulate", _wrap_new_csImageManipulate, METH_VARARGS, NULL},
 	 { (char *)"delete_csImageManipulate", _wrap_delete_csImageManipulate, METH_VARARGS, NULL},
 	 { (char *)"csImageManipulate_swigregister", csImageManipulate_swigregister, METH_VARARGS, NULL},
