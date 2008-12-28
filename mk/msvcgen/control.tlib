@@ -198,7 +198,7 @@ mutators = [
 platforms = [
   {
     name => 'Win32',
-    suffix => '-x86',
+    suffix => '',
     targetmachine => 1,
     debugformat => 4
   },
