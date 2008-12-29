@@ -211,7 +211,7 @@ private:
   /// Internal load operator
   bool eval_load(const oper_arg & arg1, oper_arg & output) const;
   /// Internal select operator
-  bool eval_select(const oper_arg & arg1, const oper_arg & arg1,
+  bool eval_select(const oper_arg & arg1, const oper_arg & arg2,
     oper_arg & output) const;
 
   /// Evaluate a variable into an oper_arg
