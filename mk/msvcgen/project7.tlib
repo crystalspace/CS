@@ -50,8 +50,8 @@ END -%]
     [% FOREACH mutator IN mutators -%]
 		<Configuration
 			Name="[% build.name %][% mutator.namesuffix %]|[% platform.name %]"
-			OutputDirectory="[% workbuild([platform.name]) %]"
-			IntermediateDirectory="[% workbuild([platform.name]) %]"
+			OutputDirectory="[% workbuild([]) %]"
+			IntermediateDirectory="[% workbuild([]) %]"
 [% interpolate('global') -%]
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE">
@@ -63,9 +63,9 @@ END -%]
 				OptimizeForProcessor="1"
 				AdditionalOptions="[% flags(compose('cflags', [], ' ')) | html %] [% flags(compose('cflags7', [], ' ')) | html %]"
 				AdditionalIncludeDirectories="[% composedirs('incdirs', ['.']) %]"
-				PrecompiledHeaderFile="[% workbuild([platform.name, '\\', my.doc.project.0, '.pch']) %]"
-				AssemblerListingLocation="[% workbuild([platform.name]) %]"
-				ObjectFile="[% workbuild([platform.name]) %]"
+				PrecompiledHeaderFile="[% workbuild([my.doc.project.0, '.pch']) %]"
+				AssemblerListingLocation="[% workbuild([]) %]"
+				ObjectFile="[% workbuild([]) %]"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				Detect64BitPortabilityProblems="false"
@@ -93,7 +93,7 @@ END -%]
 				MkTypLibCompatible="TRUE"
 				SuppressStartupBanner="TRUE"
 				TargetEnvironment="1"
-				TypeLibraryName="[% workbuild([platform.name, '\\', my.doc.project.0, '.tlb']) %]"/>
+				TypeLibraryName="[% workbuild([my.doc.project.0, '.tlb']) %]"/>
 			<Tool
 				Name="VCPostBuildEventTool"
 [% interpolate('postbuild') -%]
