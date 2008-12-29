@@ -7,17 +7,6 @@
         <plugin name="particles">crystalspace.mesh.loader.particles</plugin>
         <plugin name="particlesfact">crystalspace.mesh.loader.factory.particles</plugin>
     </plugins>
-    <shaders>
-        <shader>
-            <file>/shader/parallaxAtt/parallaxAtt.xml</file>
-        </shader>
-        <shader>
-            <file>/shader/ambient.xml</file>
-        </shader>
-        <shader>
-            <file>/shader/std_lighting.xml</file>
-        </shader>
-    </shaders>
     <library>lightmaps.cslib</library>
     <textures>
         <texture name="castle-detail1_d.jpg">
@@ -517,10 +506,6 @@
             <fire sequence="LaIpoLamp.028" />
         </trigger>
     </triggers>
-    <addon>
-        <plugin>crystalspace.renderloop.loop.loader</plugin>
-        <paramsfile>/shader/std_rloop_diffuse.xml</paramsfile>
-    </addon>
     <meshfact name="parttorch.041">
         <plugin>crystalspace.mesh.loader.factory.particles</plugin>
         <priority>transp</priority>
@@ -627,7 +612,6 @@
                 </matrix>
             </hardmove>
         </portals>
-        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="Cube.582">
@@ -1227,7 +1211,6 @@
                 </matrix>
             </hardmove>
         </portals>
-        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.011">
@@ -1610,7 +1593,6 @@
                 </matrix>
             </hardmove>
         </portals>
-        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.013">
@@ -2070,7 +2052,6 @@
                 </matrix>
             </hardmove>
         </portals>
-        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.006">
@@ -3098,7 +3079,6 @@
                 </matrix>
             </hardmove>
         </portals>
-        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.001">
@@ -3805,7 +3785,6 @@
                 </matrix>
             </hardmove>
         </portals>
-        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.010">
@@ -4056,7 +4035,6 @@
                 </matrix>
             </hardmove>
         </portals>
-        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.002">
@@ -5197,7 +5175,6 @@
                 </matrix>
             </hardmove>
         </portals>
-        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.015">
@@ -5818,7 +5795,6 @@
                 </matrix>
             </hardmove>
         </portals>
-        <renderloop>std_rloop_diffuse</renderloop>
         <ambient blue="0.1" green="0.1" red="0.1" />
         <cullerp plugin="crystalspace.culling.dynavis" />
         <meshobj name="explo_small_fire.009">
