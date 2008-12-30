@@ -26,6 +26,9 @@ distribution.
 #include <ctype.h>
 #include "tinyxml.h"
 #include "csutil/scfstr.h"
+#include "csutil/stringconv.h"
+
+#include "iutil/vfs.h"
 
 namespace CS
 {
@@ -120,7 +123,7 @@ void TiXmlBase::PutString( const TiXmlString& str, TiXmlString* outString )
 }
 
 
-TiDocumentNode::TiDocumentNode( ) : refcount (1), parent (0)
+TiDocumentNode::TiDocumentNode( ) : typeAndRefCount (1), parent (0)
 {
 }
 
@@ -131,15 +134,14 @@ TiDocumentNode::~TiDocumentNode()
 
 void TiDocumentNode::DecRef ()
 {
-  csRefTrackerAccess::TrackDecRef (this, refcount);
-  refcount--;
-  if (refcount <= 0)
+  csRefTrackerAccess::TrackDecRef (this, int16 (typeAndRefCount & 0xffff));
+  if (int16 (CS::Threading::AtomicOperations::Decrement (&typeAndRefCount)  & 0xffff) <= 0)
     GetDocument()->DeleteNode (this);
 }
 
 const char* TiDocumentNode::Value() const
 {
-  switch (type)
+  switch (Type())
   {
     case DOCUMENT:
       return static_cast<const TiDocument*> (this)->Value ();
@@ -163,7 +165,7 @@ const char* TiDocumentNode::Value() const
 
 void TiDocumentNode::SetValue (const char* v)
 {
-  switch (type)
+  switch (Type())
   {
     case DOCUMENT:
       static_cast<TiDocument*> (this)->SetValue (v);
@@ -193,7 +195,7 @@ void TiDocumentNode::SetValue (const char* v)
 
 csPtr<TiDocumentNode> TiDocumentNode::Clone (TiDocument* doc) const
 {
-  switch (type)
+  switch (Type())
   {
     case DOCUMENT:
       return static_cast<const TiDocument*> (this)->Clone (doc);
@@ -215,33 +217,31 @@ csPtr<TiDocumentNode> TiDocumentNode::Clone (TiDocument* doc) const
   }
 }
 
-void TiDocumentNode::Print( iString* cfile, int depth ) const
+const char* TiDocumentNode::Print( PrintState& print, int depth ) const
 {
-  switch (type)
+  switch (Type())
   {
-    case DOCUMENT:
-      static_cast<const TiDocument*> (this)->Print (cfile, depth);
-      break;
     case ELEMENT:
-      static_cast<const TiXmlElement*> (this)->Print (cfile, depth);
+      return static_cast<const TiXmlElement*> (this)->Print (print, depth);
       break;
     case COMMENT:
-      static_cast<const TiXmlComment*> (this)->Print (cfile, depth);
+      return static_cast<const TiXmlComment*> (this)->Print (print, depth);
       break;
     case UNKNOWN:
-      static_cast<const TiXmlUnknown*> (this)->Print (cfile, depth);
+      return static_cast<const TiXmlUnknown*> (this)->Print (print, depth);
       break;
     case TEXT:
-      static_cast<const TiXmlText*> (this)->Print (cfile, depth);
+      return static_cast<const TiXmlText*> (this)->Print (print, depth);
       break;
     case CDATA:
-      static_cast<const TiXmlCData*> (this)->Print (cfile, depth);
+      return static_cast<const TiXmlCData*> (this)->Print (print, depth);
       break;
     case DECLARATION:
-      static_cast<const TiXmlDeclaration*> (this)->Print (cfile, depth);
+      return static_cast<const TiXmlDeclaration*> (this)->Print (print, depth);
       break;
     default:
       CS_ASSERT(false);
+      return "Unsupported node type???";
   }
 }
 
@@ -257,6 +257,7 @@ TiDocumentNode* TiDocumentNode::NextSibling( const char * value ) const
   return 0;
 }
 
+#include "csutil/custom_new_disable.h"
 
 csPtr<TiDocumentNode> TiDocumentNodeChildren::Identify( ParseInfo& parse,
 	const char* p )
@@ -266,6 +267,8 @@ csPtr<TiDocumentNode> TiDocumentNodeChildren::Identify( ParseInfo& parse,
   p = SkipWhiteSpace( parse, p );
   if( !p || !*p || *p != '<' )
   {
+    // Will happen if the document is binary xml.
+    parse.document->SetError( TIXML_ERROR, this, p );
     return 0;
   }
 
@@ -273,6 +276,7 @@ csPtr<TiDocumentNode> TiDocumentNodeChildren::Identify( ParseInfo& parse,
 
   if ( !p || !*p )
   {
+    parse.document->SetError( TIXML_ERROR, this, p );
     return 0;
   }
 
@@ -319,6 +323,8 @@ csPtr<TiDocumentNode> TiDocumentNodeChildren::Identify( ParseInfo& parse,
   }
   return returnNode;
 }
+
+#include "csutil/custom_new_enable.h"
 
 // -------------------------------------------------------------------------
 TiDocumentNodeChildren::TiDocumentNodeChildren ()
@@ -502,7 +508,7 @@ TiDocument* TiDocumentNode::GetDocument() const
 TiXmlElement::TiXmlElement ()
 {
   value = 0;
-  type = ELEMENT;
+  SetType (ELEMENT);
 }
 
 TiXmlElement::~TiXmlElement()
@@ -582,37 +588,43 @@ void TiXmlElement::SetAttribute (TiDocument* document,
   GetAttributeRegistered (reg_name).SetValue (value);
 }
 
-static void StrPrintf (iString* file, const char* msg, ...)
+static const char* StrPrintf (PrintState& print, const char* msg, ...)
 {
-  csString str;
-  str.SetGrowsBy (0);
   va_list args;
   va_start (args, msg);
-  str.FormatV (msg, args);
+  bool b = print.AppendFmtV (msg, args);
   va_end (args);
-  file->Append (str);
+  if (!b) return "Output error";
+  return 0;
 }
 
-static void StrPuts (const char* msg, iString* file)
+static const char* StrPuts (PrintState& print, const char* msg)
 {
-  file->Append (msg);
+  if (!print.Append (msg, strlen (msg))) return "Output error";
+  return 0;
 }
 
-void TiXmlElement::Print( iString* cfile, int depth ) const
+const char* TiXmlElement::Print( PrintState& print, int depth ) const
 {
+  const char* err;
+
   int d;
   for ( d=0; d<depth; d++ )
   {
-    StrPrintf ( cfile, "    " );
+    err = StrPuts ( print, "    " );
+    if (err != 0) return err;
   }
 
-  StrPrintf ( cfile, "<%s", value );
+  err = StrPrintf ( print, "<%s", value );
+  if (err != 0) return err;
 
   for (size_t i = 0 ; i < attributeSet.set.GetSize () ; i++)
   {
     const TiDocumentAttribute& attrib = attributeSet.set[i];
-    StrPrintf ( cfile, " " );
-    attrib.Print( cfile, depth );
+    err = StrPuts ( print, " " );
+    if (err != 0) return err;
+    err = attrib.Print( print, depth );
+    if (err != 0) return err;
   }
 
   // There are 3 different formatting approaches:
@@ -622,32 +634,47 @@ void TiXmlElement::Print( iString* cfile, int depth ) const
   TiDocumentNode* node;
   if ( !firstChild )
   {
-    StrPrintf ( cfile, " />" );
+    err = StrPuts ( print, " />" );
   }
   else if ( (firstChild->next == 0) && firstChild->ToText() )
   {
-    StrPrintf ( cfile, ">" );
-    firstChild->Print( cfile, depth + 1 );
-    StrPrintf ( cfile, "</%s>", value );
+    err = StrPuts ( print, ">" );
+    if (err != 0) return err;
+    err = firstChild->Print( print, depth + 1 );
+    if (err != 0) return err;
+    err = StrPrintf ( print, "</%s>", value );
+    if (err != 0) return err;
   }
   else
   {
-    StrPrintf ( cfile, ">" );
+    err = StrPuts ( print, ">" );
+    if (err != 0) return err;
 
     for ( node = firstChild; node; node=node->NextSibling() )
     {
       if ( !node->ToText() )
       {
-        StrPrintf ( cfile, "\n" );
+        err = StrPuts ( print, "\n" );
+        if (err != 0) return err;
       }
-      node->Print( cfile, depth+1 );
+      err = node->Print( print, depth+1 );
+      if (err != 0) return err;
     }
-    StrPrintf ( cfile, "\n" );
+    err = StrPuts ( print, "\n" );
+    if (err != 0) return err;
     for( d=0; d<depth; ++d )
-    StrPrintf ( cfile, "    " );
-    StrPrintf ( cfile, "</%s>", value );
+    {
+      err = StrPuts ( print, "    " );
+      if (err != 0) return err;
+    }
+    err = StrPrintf ( print, "</%s>", value );
+    if (err != 0) return err;
   }
+
+  return 0;
 }
+
+#include "csutil/custom_new_disable.h"
 
 csPtr<TiDocumentNode> TiXmlElement::Clone(TiDocument* document) const
 {
@@ -679,6 +706,7 @@ csPtr<TiDocumentNode> TiXmlElement::Clone(TiDocument* document) const
   return csPtr<TiDocumentNode> (clone);
 }
 
+#include "csutil/custom_new_enable.h"
 
 TiDocument::TiDocument() :
   deleteNest (0),
@@ -688,7 +716,8 @@ TiDocument::TiDocument() :
 {
   errorId = TIXML_NO_ERROR;
   //  ignoreWhiteSpace = true;
-  type = DOCUMENT;
+  SetType (DOCUMENT);
+  parse.document = this;
   parse.document = this;
 }
 
@@ -701,7 +730,8 @@ TiDocument::TiDocument( const char * documentName ) :
   //  ignoreWhiteSpace = true;
   value = documentName;
   errorId = TIXML_NO_ERROR;
-  type = DOCUMENT;
+  SetType (DOCUMENT);
+  parse.document = this;
   parse.document = this;
 }
 
@@ -736,29 +766,119 @@ csPtr<TiDocumentNode> TiDocument::Clone(TiDocument* document) const
   return csPtr<TiDocumentNode> (clone);
 }
 
+class PrintOutString : public iPrintOutput
+{
+  iString* str;
+  
+  enum { BufSize = 1*1024 };
+  char buf[BufSize];
+public:
+  PrintOutString (iString* str) : str (str) { }
 
-void TiDocument::Print( iString* cfile, int depth ) const
+  void Init (char*& bufPtr, size_t& bufRemaining)
+  {
+    bufPtr = buf;
+    bufRemaining = BufSize;
+  }
+
+  bool FlushBuffer (char*& bufPtr, size_t& bufRemaining)
+  {
+    size_t strLen = str->Length();
+    size_t strCap = str->GetCapacity();
+    size_t writeCount = BufSize - bufRemaining;
+    if (strLen + writeCount + 1 > strCap)
+    {
+      const size_t minIncrease = 1024;
+      const size_t maxIncrease = 2*1024*1024;
+      size_t newCapacity = 
+	csClamp (str->GetCapacity() * 2, maxIncrease, minIncrease) - 1;
+      str->SetCapacity (newCapacity);
+    }
+    str->Append (buf, writeCount);
+    bufPtr = buf;
+    bufRemaining = BufSize;
+    return true;
+  }
+};
+
+const char* TiDocument::Print( iString* cfile ) const
+{
+  PrintOutString out (cfile);
+  PrintState print (&out);
+  return Print (print, 0);
+}
+ 
+class PrintOutFile : public iPrintOutput
+{
+  iFile* file;
+
+  enum { BufSize = 1*1024*1024 };
+  char* buf;
+public:
+  PrintOutFile (iFile* file) : file (file) 
+  {
+    buf = (char*)cs_malloc (BufSize);
+  }
+  ~PrintOutFile()
+  {
+    cs_free (buf);
+  }
+
+  void Init (char*& bufPtr, size_t& bufRemaining)
+  {
+    bufPtr = buf;
+    bufRemaining = BufSize;
+  }
+
+  bool FlushBuffer (char*& bufPtr, size_t& bufRemaining)
+  {
+    size_t writeCount = BufSize - bufRemaining;
+    size_t written = file->Write (buf, writeCount);
+    bufPtr = buf;
+    bufRemaining = BufSize;
+    return written == writeCount;
+  }
+};
+
+const char* TiDocument::Print( iFile* cfile ) const
+{
+  PrintOutFile out (cfile);
+  PrintState print (&out);
+  return Print (print, 0);
+}
+
+const char* TiDocument::Print( PrintState& print, int depth ) const
 {
   TiDocumentNode* node;
   for ( node=FirstChild(); node; node=node->NextSibling() )
   {
-    node->Print( cfile, depth );
-    StrPrintf ( cfile, "\n" );
+    const char* err;
+    err = node->Print( print, depth );
+    if (err != 0) return err;
+    err = StrPuts ( print, "\n" );
+    if (err != 0) return err;
   }
+  if (!print.Flush ()) return "Output error";
+  return 0;
 }
 
-void TiDocumentAttribute::Print( iString* cfile, int /*depth*/ ) const
+const char* TiDocumentAttribute::Print( PrintState& print, int /*depth*/ ) const
 {
+  if (!value) // Don't print attributes without value
+    return 0;
+
   TiXmlString n, v;
 
   TiXmlBase::PutString( Name(), &n );
   TiXmlBase::PutString( Value(), &v );
 
+  const char* err;
   char* idx = strchr (value, '\"');
   if (idx == 0)
-    StrPrintf  (cfile, "%s=\"%s\"", n.c_str(), v.c_str() );
+    err = StrPrintf  (print, "%s=\"%s\"", n.c_str(), v.c_str() );
   else
-    StrPrintf  (cfile, "%s='%s'", n.c_str(), v.c_str() );
+    err = StrPrintf  (print, "%s='%s'", n.c_str(), v.c_str() );
+  return err;
 }
 
 
@@ -783,17 +903,21 @@ int TiDocumentAttribute::IntValue() const
 
 double  TiDocumentAttribute::DoubleValue() const
 {
-  return atof (value);
+  return CS::Utility::strtof (value);
 }
 
-void TiXmlComment::Print( iString* cfile, int depth ) const
+const char* TiXmlComment::Print( PrintState& print, int depth ) const
 {
+  const char* err;
   for ( int i=0; i<depth; i++ )
   {
-    StrPuts ( "    ", cfile );
+    err = StrPuts ( print, "    ");
+    if (err != 0) return err;
   }
-  StrPrintf ( cfile, "<!--%s-->", value );
+  return StrPrintf ( print, "<!--%s-->", value );
 }
+
+#include "csutil/custom_new_disable.h"
 
 csPtr<TiDocumentNode> TiXmlComment::Clone(TiDocument* document) const
 {
@@ -808,6 +932,7 @@ csPtr<TiDocumentNode> TiXmlComment::Clone(TiDocument* document) const
   return csPtr<TiDocumentNode> (clone);
 }
 
+#include "csutil/custom_new_enable.h"
 
 void TiXmlText::SetValue (const char * name)
 {
@@ -824,23 +949,24 @@ void TiXmlText::SetValue (const char * name)
   }
 }
 
-void TiXmlText::Print( iString* cfile, int /*depth*/ ) const
+const char* TiXmlText::Print( PrintState& print, int /*depth*/ ) const
 {
   bool printCData = 
     (strchr (value, '\r') != 0) || (strchr (value, '\n') != 0);
 
   if (printCData)
   {
-    StrPrintf ( cfile, "<![CDATA[%s]]>", value );
+    return StrPrintf ( print, "<![CDATA[%s]]>", value );
   }
   else
   {
     TiXmlString buffer;
     PutString( value, &buffer );
-    StrPrintf ( cfile, "%s", buffer.c_str() );
+    return StrPuts ( print, buffer.c_str() );
   }
 }
 
+#include "csutil/custom_new_disable.h"
 
 csPtr<TiDocumentNode> TiXmlText::Clone(TiDocument* document) const
 {  
@@ -855,6 +981,7 @@ csPtr<TiDocumentNode> TiXmlText::Clone(TiDocument* document) const
   return csPtr<TiDocumentNode> (clone);
 }
 
+#include "csutil/custom_new_enable.h"
 
 TiXmlDeclaration::TiXmlDeclaration( const char * _version,
   const char * _encoding,
@@ -863,22 +990,35 @@ TiXmlDeclaration::TiXmlDeclaration( const char * _version,
   version = _version;
   encoding = _encoding;
   standalone = _standalone;
-  type = DECLARATION;
+  SetType (DECLARATION);
 }
 
 
-void TiXmlDeclaration::Print( iString* cfile, int /*depth*/ ) const
+const char* TiXmlDeclaration::Print( PrintState& print, int /*depth*/ ) const
 {
-  StrPrintf  (cfile, "<?xml ");
+  const char* err;
+  err = StrPuts (print, "<?xml ");
+  if (err != 0) return err;
 
   if ( !version.empty() )
-    StrPrintf  (cfile, "version=\"%s\" ", version.c_str ());
+  {
+    err = StrPrintf  (print, "version=\"%s\" ", version.c_str ());
+    if (err != 0) return err;
+  }
   if ( !encoding.empty() )
-    StrPrintf  (cfile, "encoding=\"%s\" ", encoding.c_str ());
+  {
+    err = StrPrintf  (print, "encoding=\"%s\" ", encoding.c_str ());
+    if (err != 0) return err;
+  }
   if ( !standalone.empty() )
-    StrPrintf  (cfile, "standalone=\"%s\" ", standalone.c_str ());
-  StrPrintf  (cfile, "?>");
+  {
+    err = StrPrintf  (print, "standalone=\"%s\" ", standalone.c_str ());
+    if (err != 0) return err;
+  }
+  return StrPuts (print, "?>");
 }
+
+#include "csutil/custom_new_disable.h"
 
 csPtr<TiDocumentNode> TiXmlDeclaration::Clone(TiDocument* document) const
 {  
@@ -896,13 +1036,20 @@ csPtr<TiDocumentNode> TiXmlDeclaration::Clone(TiDocument* document) const
   return csPtr<TiDocumentNode> (clone);
 }
 
+#include "csutil/custom_new_enable.h"
 
-void TiXmlUnknown::Print( iString* cfile, int depth ) const
+const char* TiXmlUnknown::Print( PrintState& print, int depth ) const
 {
+  const char* err;
   for ( int i=0; i<depth; i++ )
-    StrPrintf ( cfile, "    " );
-  StrPrintf ( cfile, "<%s>", value.c_str() );
+  {
+    err = StrPuts ( print, "    " );
+    if (err != 0) return err;
+  }
+  return StrPrintf ( print, "<%s>", value.c_str() );
 }
+
+#include "csutil/custom_new_disable.h"
 
 csPtr<TiDocumentNode> TiXmlUnknown::Clone(TiDocument* document) const
 {
@@ -917,6 +1064,7 @@ csPtr<TiDocumentNode> TiXmlUnknown::Clone(TiDocument* document) const
   return csPtr<TiDocumentNode> (clone);
 }
 
+#include "csutil/custom_new_enable.h"
 
 size_t TiDocumentAttributeSet::Find (const char * name) const
 {

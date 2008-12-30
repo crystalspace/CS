@@ -6,9 +6,8 @@
 To utilize Crystal Space you need at least the following resources.
 
 @strong{Hardware}: To fully utilize the 3D engine a 3D-accelerated graphics
-card is highly recommended, however you can get by without it by using the
-software renderer if you have a fast enough system.  The minimum recommended
-processor on the x86 architecture is one of the i586 family (Pentium).
+card is highly recommended. The minimum recommended processor on the
+x86 architecture is one of the i586 family (Pentium).
 
 @strong{Operating System}: You will need to be running a supported Operating
 System.  Currently Crystal Space supports: Windows (32 bit), Unix
@@ -29,7 +28,7 @@ scripting language you use.
 downloaded from:
 
 @noindent
-@uref{http://www.crystalspace3d.org/tikiwiki/tiki-index.php?page=Download}
+@uref{http://www.crystalspace3d.org/main/Download}
 
 The release includes all of the source code, some pre-generated documentation,
 and a few example data files.  Alternately, you can download the latest
@@ -43,7 +42,7 @@ You can also checkout the source directly from the @sc{svn} repository.
 Directions for doing this can be found here:
 
 @noindent
-@uref{http://sourceforge.net/svn/?group_id=649}
+@uref{http://www.crystalspace3d.org/main/Subversion}
 
 @strong{External Dependencies}: Crystal Space can use a number of optional
 libraries and tools to provide a more robust set of features.  A brief list of

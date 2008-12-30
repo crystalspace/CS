@@ -36,8 +36,6 @@ libmng
 @sc{cegui}
 @item
 wxWidgets
-@item
-@sc{caca}
 @end itemize
 
 Most of these libraries are optional.  If you do not have them installed, then
@@ -78,11 +76,11 @@ location:
 
 @noindent
 @ifnottex
-@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-win32libs-1.2_002.exe}
+@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-win32libs-1.3_004.exe}
 @end ifnottex
 @iftex
 @code{http://www.crystalspace3d.org/downloads/cs-win32libs/}@*
-@code{cs-win32libs-1.2_002.exe}
+@code{cs-win32libs-1.3_004.exe}
 @end iftex
 
 @subheading zlib
@@ -187,7 +185,7 @@ can get the latest version at:
 @cindex Libraries, @sc{cg}
 @cindex CG library
 
-@emph{Version:} 1.5 recommended
+@emph{Version:} 2.0 minimum
 
 Many Crystal Space shaders require the @sc{cg} library from nVidia.
 Crystal Space depends on the @sc{cg} library with version number at least
@@ -216,7 +214,7 @@ in order to use the library with Crystal Space.
 @cindex Libraries, Bullet
 @cindex Physics library
 
-@emph{Version:} 1.9f recommended
+@emph{Version:} 2.69 minimum
 
 Crystal Space can also provide physics through Bullet. You can get
 the required version at:
@@ -278,15 +276,6 @@ After downloading you can either install the package normally (i.e. @samp{make
 install}) or unpack it into the directory @file{CS/libs/libmng*}.  In general,
 if you have permission to do so, it is best to install the library.
 
-@subheading @sc{caca} Colour AsCii Art Library
-This library is used for 2D rendering in text mode.  This is optional and only
-needed for fun. libcaca can be downloaded from:
-
-@emph{Version:} 0.9 recommended
-
-@noindent
-@uref{http://sam.zoy.org/libcaca/}
-
 @subheading @sc{cegui}
 @cindex @sc{cegui}
 @cindex Libraries, @sc{cegui}
@@ -312,13 +301,3 @@ this canvas, wxWidgets is required.
 
 @noindent
 @uref{http://wxwidgets.org}
-
-@subheading Maps
-
-Needed if you want to see examples of Crystal Space at work.
-A few data files are provided in the Crystal Space release itself, but more can
-be downloaded from the @file{maps} subdirectory of each release.  Most files
-can just be placed in the @file{CS/data} directory.
-
-@noindent
-@uref{http://www.crystalspace3d.org/support/release/}

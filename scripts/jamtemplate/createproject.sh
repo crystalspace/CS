@@ -245,6 +245,11 @@ mkdir "$PROJECTNAME/mk/jam" || exit 2
 mkdir "$PROJECTNAME/mk/msvcgen" || exit 2
 mkdir "$PROJECTNAME/msvc" || exit 2
 mkdir "$PROJECTNAME/src" || exit 2
+mkdir "$PROJECTNAME/data" || exit 2
+mkdir "$PROJECTNAME/data/cache" || exit 2
+mkdir "$PROJECTNAME/data/defaultmap" || exit 2
+mkdir "$PROJECTNAME/data/defaultmap/textures" || exit 2
+mkdir "$PROJECTNAME/data/defaultmap/factories" || exit 2
 
 # copy Autoconf, Jam, and msvcgen support files.
 cp -p  "$SUPPORTDIR/autoconf/"*.m4 "$PROJECTNAME/mk/autoconf"
@@ -253,6 +258,10 @@ cp -p  "$SUPPORTDIR/autoconf/"install-sh "$PROJECTNAME/mk/autoconf"
 cp -p  "$SUPPORTDIR/jam/"*.jam "$PROJECTNAME/mk/jam"
 cp -p  "$SUPPORTDIR/msvcgen/"*.tlib "$PROJECTNAME/mk/msvcgen"
 cp -p  "$SUPPORTDIR/msvcgen/custom.cslib" "$PROJECTNAME/mk/msvcgen"
+
+cp -p  "$TEMPLATEDIR/world" "$PROJECTNAME/data/defaultmap"
+cp -p  "$TEMPLATEDIR/genCube" "$PROJECTNAME/data/defaultmap/factories"
+cp -p  "$TEMPLATEDIR/libSimpleCube" "$PROJECTNAME/data/defaultmap"
 
 if $EXTRAM4
 then
@@ -274,6 +283,8 @@ Instantiate "$TEMPLATEDIR/projheader.template" \
 	    "$PROJECTNAME/src/$PROJECTNAME.h"
 Instantiate "$TEMPLATEDIR/README.template" "$PROJECTNAME/README"
 Instantiate "$TEMPLATEDIR/README-msvc.template" "$PROJECTNAME/msvc/README"
+Instantiate "$TEMPLATEDIR/vfs.cfg.template" "$PROJECTNAME/vfs.cfg"
+Instantiate "$TEMPLATEDIR/app.cfg.template" "$PROJECTNAME/App$PROJECTNAMECAP.cfg"
 
 chmod +x "$PROJECTNAME/autogen.sh"
 

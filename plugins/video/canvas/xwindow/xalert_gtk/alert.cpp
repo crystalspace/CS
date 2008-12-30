@@ -53,12 +53,13 @@ bool csXWindow::AlertV_GTK (int type, const char* title, const char* okMsg,
   bool doSecondary = libgtk_x11_2_0_symbol_is_present (
     "gtk_message_dialog_format_secondary_text");
   
-  GtkMessageType gtkType = GTK_MESSAGE_OTHER;
+  GtkMessageType gtkType;
   switch (type)
   {
   case CS_ALERT_ERROR:   gtkType = GTK_MESSAGE_ERROR;   break;
   case CS_ALERT_WARNING: gtkType = GTK_MESSAGE_WARNING; break;
   case CS_ALERT_NOTE:    gtkType = GTK_MESSAGE_INFO;    break;
+  default:               gtkType = GTK_MESSAGE_INFO;    break;
   }
   
   csString messageString;

@@ -165,8 +165,6 @@ csGraphics2DOpenGL::csGraphics2DOpenGL (iBase *iParent) :
   scfImplementationType (this, iParent),
   m_nGraphicsReady (true),
   m_hWnd (0),
-  m_bPalettized (false),
-  m_bPaletteChanged (false),
   modeSwitched (true)
 {
 }
@@ -203,17 +201,6 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
   // Get the creation parameters
   m_hInstance = m_piWin32Assistant->GetInstance ();
   m_nCmdShow  = m_piWin32Assistant->GetCmdShow ();
-
-  if (Depth == 8)
-  {
-    pfmt.PalEntries = CS_WIN_PALETTE_SIZE;
-    pfmt.PixelBytes = 1;
-  }
-
-  // Create the event outlet
-  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
-  if (q != 0)
-    EventOutlet = q->CreateEventOutlet (this);
 
   csRef<iCommandLineParser> cmdline (
   	csQueryRegistry<iCommandLineParser> (object_reg));
@@ -377,7 +364,7 @@ LRESULT CALLBACK csGraphics2DOpenGL::DummyWindow (HWND hWnd, UINT message,
 	  iAttributes[index++] = GL_TRUE;
 	  iAttributes[index++] = WGL_SAMPLE_BUFFERS_ARB;
 	  iAttributes[index++] = 
-	    (format[glpfvMultiSamples] != 0) ? GL_TRUE : GL_FALSE;
+	    (format[glpfvMultiSamples] != 0) ? 1 : 0;
 	  iAttributes[index++] = WGL_SAMPLES_ARB;
 	  iAttributes[index++] = format[glpfvMultiSamples];
 	  iAttributes[index++] = WGL_COLOR_BITS_ARB;
@@ -462,8 +449,8 @@ bool csGraphics2DOpenGL::Open ()
 
   m_bActivated = true;
 
-  int wwidth = Width;
-  int wheight = Height;
+  int wwidth = fbWidth;
+  int wheight = fbHeight;
   DWORD exStyle = 0;
   DWORD style = WS_POPUP | WS_SYSMENU;
   int xpos = 0;
@@ -536,21 +523,6 @@ bool csGraphics2DOpenGL::Open ()
   hardwareAccelerated = !(pfd.dwFlags & PFD_GENERIC_FORMAT) ||
     (pfd.dwFlags & PFD_GENERIC_ACCELERATED);
 
-  pfmt.PixelBytes = (pfd.cColorBits == 32) ? 4 : (pfd.cColorBits + 7) >> 3;
-  pfmt.RedBits = pfd.cRedBits;
-  pfmt.RedShift = pfd.cRedShift;
-  pfmt.RedMask = ((1 << pfd.cRedBits) - 1) << pfd.cRedShift;
-  pfmt.GreenBits = pfd.cGreenBits;
-  pfmt.GreenShift = pfd.cGreenShift;
-  pfmt.GreenMask = ((1 << pfd.cGreenBits) - 1) << pfd.cGreenShift;
-  pfmt.BlueBits = pfd.cBlueBits;
-  pfmt.BlueShift = pfd.cBlueShift;
-  pfmt.BlueMask = ((1 << pfd.cBlueBits) - 1) << pfd.cBlueShift;
-  pfmt.AlphaBits = pfd.cAlphaBits;
-  pfmt.AlphaShift = pfd.cAlphaShift;
-  pfmt.AlphaMask = ((1 << pfd.cAlphaBits) - 1) << pfd.cAlphaShift;
-  pfmt.PalEntries = 0;
-
   hGLRC = wglCreateContext (hDC);
   wglMakeCurrent (hDC, hGLRC);
 
@@ -583,17 +555,11 @@ bool csGraphics2DOpenGL::Open ()
      * of the window rectangle equal to the size of the screen with 
      * SetWindowPos."
      */
-    SetWindowPos (m_hWnd, CS_WINDOW_Z_ORDER, 0, 0, Width, Height, 0);
+    SetWindowPos (m_hWnd, CS_WINDOW_Z_ORDER, 0, 0, fbWidth, fbHeight, 0);
   }
 
   if (!csGraphics2DGLCommon::Open ())
     return false;
-
-  if (Depth == 8)
-    m_bPalettized = true;
-  else
-    m_bPalettized = false;
-  m_bPaletteChanged = false;
 
   ext.InitWGL_EXT_swap_control (hDC);
 
@@ -668,44 +634,6 @@ void csGraphics2DOpenGL::Print (csRect const* /*area*/)
 {
   glFlush();
   SwapBuffers(hDC);
-}
-
-HRESULT csGraphics2DOpenGL::SetColorPalette ()
-{
-  HRESULT ret = S_OK;
-
-  if ((Depth==8) && m_bPaletteChanged)
-  {
-    m_bPaletteChanged = false;
-
-    if (!FullScreen)
-    {
-      HPALETTE oldPal;
-      HDC dc = GetDC(0);
-
-      SetSystemPaletteUse (dc, SYSPAL_NOSTATIC);
-      PostMessage (HWND_BROADCAST, WM_SYSCOLORCHANGE, 0, 0);
-
-      CreateIdentityPalette (Palette);
-      ClearSystemPalette ();
-
-      oldPal = SelectPalette (dc, hWndPalette, FALSE);
-
-      RealizePalette (dc);
-      SelectPalette (dc, oldPal, FALSE);
-      ReleaseDC (0, dc);
-    }
-
-    return ret;
-  }
-
-  return S_OK;
-}
-
-void csGraphics2DOpenGL::SetRGB (int i, int r, int g, int b)
-{
-  csGraphics2D::SetRGB (i, r, g, b);
-  m_bPaletteChanged = true;
 }
 
 bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape)
@@ -878,13 +806,13 @@ bool csGraphics2DOpenGL::Resize (int width, int height)
   {
     RECT R;
     GetClientRect (m_hWnd, &R);
-    if (R.right - R.left != Width || R.bottom - R.top != Height)
+    if (R.right - R.left != fbWidth || R.bottom - R.top != fbHeight)
     {
       // We only resize the window when the canvas is different. This only
       // happens on a manual Resize() from the app, as this is called after
       // the window resizing is finished     
-      int wwidth = Width + 2 * GetSystemMetrics (SM_CXSIZEFRAME);
-      int wheight = Height + 2 * GetSystemMetrics (SM_CYSIZEFRAME)
+      int wwidth = fbWidth + 2 * GetSystemMetrics (SM_CXSIZEFRAME);
+      int wheight = fbHeight + 2 * GetSystemMetrics (SM_CYSIZEFRAME)
         + GetSystemMetrics (SM_CYCAPTION);
 
       // To prevent a second resize of the canvas, we temporarily disable resizing
@@ -914,7 +842,7 @@ void csGraphics2DOpenGL::SetFullScreen (bool b)
       SwitchDisplayMode (false);
       style = WS_POPUP | WS_VISIBLE | WS_SYSMENU;
       SetWindowLong (m_hWnd, GWL_STYLE, style);
-      SetWindowPos (m_hWnd, CS_WINDOW_Z_ORDER, 0, 0, Width, Height, SWP_FRAMECHANGED);
+      SetWindowPos (m_hWnd, CS_WINDOW_Z_ORDER, 0, 0, fbWidth, fbHeight, SWP_FRAMECHANGED);
       ShowWindow (m_hWnd, SW_SHOW);
     }
     else
@@ -925,14 +853,14 @@ void csGraphics2DOpenGL::SetFullScreen (bool b)
       if (AllowResizing)
       {
         style |= WS_THICKFRAME | WS_MAXIMIZEBOX;
-        wwidth = Width + 2 * GetSystemMetrics (SM_CXSIZEFRAME);
-        wheight = Height + 2 * GetSystemMetrics (SM_CYSIZEFRAME)
+        wwidth = fbWidth + 2 * GetSystemMetrics (SM_CXSIZEFRAME);
+        wheight = fbHeight + 2 * GetSystemMetrics (SM_CYSIZEFRAME)
           + GetSystemMetrics (SM_CYCAPTION);
       }
       else
       {
-        wwidth = Width + 2 * GetSystemMetrics (SM_CXFIXEDFRAME);
-        wheight = Height + 2 * GetSystemMetrics (SM_CYFIXEDFRAME)
+        wwidth = fbWidth + 2 * GetSystemMetrics (SM_CXFIXEDFRAME);
+        wheight = fbHeight + 2 * GetSystemMetrics (SM_CYFIXEDFRAME)
           + GetSystemMetrics (SM_CYCAPTION);
       }
       SetWindowLong (m_hWnd, GWL_STYLE, style);
@@ -995,7 +923,7 @@ void csGraphics2DOpenGL::Activate (bool activated)
     {
       SwitchDisplayMode (false);
       ShowWindow (m_hWnd, SW_RESTORE);
-      SetWindowPos (m_hWnd, CS_WINDOW_Z_ORDER, 0, 0, Width, Height, 0);
+      SetWindowPos (m_hWnd, CS_WINDOW_Z_ORDER, 0, 0, fbWidth, fbHeight, 0);
       wglMakeCurrent (hDC, hGLRC);
     }
     else
@@ -1039,16 +967,16 @@ void csGraphics2DOpenGL::SwitchDisplayMode (bool userMode)
 
     // check if we already are in the desired display mode
     if (((int)curdmode.dmBitsPerPel == Depth) &&
-      ((int)curdmode.dmPelsWidth == Width) &&
-      ((int)curdmode.dmPelsHeight == Height) &&
+      ((int)curdmode.dmPelsWidth == fbWidth) &&
+      ((int)curdmode.dmPelsHeight == fbHeight) &&
       (!m_nDisplayFrequency || (dmode.dmDisplayFrequency == m_nDisplayFrequency)))
     {
       // no action necessary
       return;
     }
     dmode.dmBitsPerPel = Depth;
-    dmode.dmPelsWidth = Width;
-    dmode.dmPelsHeight = Height;
+    dmode.dmPelsWidth = fbWidth;
+    dmode.dmPelsHeight = fbHeight;
     if (m_nDisplayFrequency) dmode.dmDisplayFrequency = m_nDisplayFrequency;
     dmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFREQUENCY;
     
@@ -1059,8 +987,8 @@ void csGraphics2DOpenGL::SwitchDisplayMode (bool userMode)
       // so try without setting it.
       // but first check resolution/depth w/o refresh rate
       if (((int)curdmode.dmBitsPerPel == Depth) &&
-        ((int)curdmode.dmPelsWidth == Width) &&
-        ((int)curdmode.dmPelsHeight == Height))
+        ((int)curdmode.dmPelsWidth == fbWidth) &&
+        ((int)curdmode.dmPelsHeight == fbHeight))
       {
 	refreshRate = curdmode.dmDisplayFrequency;
         // no action necessary

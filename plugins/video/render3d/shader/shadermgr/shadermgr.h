@@ -49,6 +49,8 @@
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
 {
 
+class PlexHierarchicalCache;
+
 typedef csHash<csRef<iShaderVariableAccessor>,csStringBase> csSVAHash;
 
 class csShaderManager : 
@@ -63,7 +65,9 @@ private:
   csRef<iVirtualClock> vc;
   csRef<iTextureManager> txtmgr;
   csRef<iStringSet> strings;
+  csRef<iShaderVarStringSet> stringsSvName;
   csRef<iEventHandler> weakEventHandler;
+  csRef<PlexHierarchicalCache> shaderCache;
 
   bool do_verbose;
 
@@ -79,7 +83,7 @@ private:
   csRef<csShaderVariable> sv_time;
   void UpdateStandardVariables();
 
-  csRef<iShaderVarStack> shaderVarStack;
+  csShaderVariableStack shaderVarStack;
 
   csSet<csStringID> neutralTags;
   csSet<csStringID> forbiddenTags;
@@ -97,10 +101,18 @@ private:
 
   csArray<iLight*> activeLights;
 
-  csEventID PreProcess;
+  csEventID Frame;
   csEventID SystemOpen;
   csEventID SystemClose;
 
+#define CS_TOKEN_ITEM_FILE \
+  "plugins/video/render3d/shader/shadermgr/shadermgr.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE
+  csStringHash xmltokens;
+    
+  void AddDefaultVariables();
+  void LoadDefaultVariables();
 public:
   csShaderManager(iBase* parent);
   virtual ~csShaderManager();
@@ -141,7 +153,7 @@ public:
   void Report (int severity, const char* msg, ...);
 
   /// Get the shadervariablestack used to handle shadervariables on rendering
-  virtual iShaderVarStack* GetShaderVariableStack ()
+  virtual csShaderVariableStack& GetShaderVariableStack ()
   {
     return shaderVarStack;
   }
@@ -167,6 +179,20 @@ public:
   {
     return activeLights;
   }
+
+  virtual iShaderVarStringSet* GetSVNameStringset () const
+  {
+    return stringsSvName;
+  }
+  
+  iHierarchicalCache* GetShaderCache();
+  
+  void AddSubShaderCache (iHierarchicalCache* cache,
+    int priority = cachePriorityApp);
+  iHierarchicalCache* AddSubCacheDirectory (const char* cacheDir,
+    int priority = cachePriorityApp, bool readOnly = false);
+  void RemoveSubShaderCache (iHierarchicalCache* cache);
+  void RemoveAllSubShaderCaches ();
   /** @} */
 
   /**\name iComponent implementation
@@ -181,16 +207,26 @@ public:
 
   CS_EVENTHANDLER_NAMES("crystalspace.graphics3d.shadermgr")
   
-  CS_CONST_METHOD virtual const csHandlerID * GenericPrec (
+  virtual const csHandlerID * GenericPrec (
     csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,
     csEventID) const { return 0; }
-  
-  csHandlerID eventSucc[2];
-  CS_CONST_METHOD virtual const csHandlerID * GenericSucc (
-    csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,
-    csEventID) const 
+
+  virtual const csHandlerID * GenericSucc (
+    csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,
+    csEventID event) const 
   { 
-    return 0;//eventSucc; 
+    /// \todo Create signposts for the SystemOpen event
+    if (event != csevFrame(r2))
+      return 0;
+    static csHandlerID succConstraint[6] = {
+      FrameSignpost_Logic3D::StaticID(r1),
+      FrameSignpost_3D2D::StaticID(r1),
+      FrameSignpost_2DConsole::StaticID(r1),
+      FrameSignpost_ConsoleDebug::StaticID(r1),
+      FrameSignpost_DebugFrame::StaticID(r1),
+      CS_HANDLERLIST_END
+    };
+    return succConstraint; 
   }
   
   CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS

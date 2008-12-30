@@ -1,3 +1,13 @@
+crystalspace (1.2-20072611-1) unstable; urgency=low
+
+  * New upstream release
+  * Limit support to i386, amd64 and powerpc, supporting all arch is far too
+    complex given all the dependancies
+    This should reduce FTBFS (Closes: #358545) and (Closes: #430229)
+    like this package should not be removed (CLoses: #456927)
+
+ -- Christian Bayle <bayle@debian.org>  Mon, 26 Nov 2007 23:48:58 +0100
+
 crystalspace (1.0-20070508-1) unstable; urgency=low
 
   * First upstream stable version (Closes: #400884)

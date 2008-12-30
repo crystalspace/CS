@@ -130,7 +130,7 @@
     if (! SWIG_IsOK (err))
       croak ("Failed to access pointer from wrapped object");
 
-    XSRETURN_IV ((int) ptr);
+    XSRETURN_IV ((PTRV) ptr);
   }
 %}
 
@@ -299,16 +299,6 @@
   sub CS_VEC_TILT_LEFT	{ new cspace::csVector3 ( 0,  0,  1) }
   sub CS_VEC_TILT_UP	{ new cspace::csVector3 (-1,  0,  0) }
   sub CS_VEC_TILT_DOWN	{ new cspace::csVector3 ( 1,  0,  0) }
-%}
-
-/****************************************************************************
- * CS_POLYRANGE replacements.
- ****************************************************************************/
-%perlcode %{
-  sub CS_POLYRANGE {		new cspace::csPolygonRange ($_[0], $_[1]) }
-  sub CS_POLYRANGE_SINGLE {	new cspace::csPolygonRange ($_[0]) }
-  sub CS_POLYRANGE_LAST {	new cspace::csPolygonRange (-1, -1) }
-  sub CS_POLYRANGE_ALL {	new cspace::csPolygonRange (0, 2000000000) }
 %}
 
 /****************************************************************************

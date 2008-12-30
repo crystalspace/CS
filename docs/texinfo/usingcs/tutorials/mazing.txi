@@ -473,9 +473,6 @@ bool Maze::CreateLight (const csColor& color,
 
 bool Maze::CreateGeometry ()
 @{
-  // We don't need a lighting cache. Disable it.
-  app->GetEngine ()->SetLightingCacheMode (0);
-
   // Load the texture we are going to use for all walls.
   if (!app->GetLoader ()->LoadTexture ("wall_texture", "/lib/std/stone4.gif"))
     return app->ReportError ("Error loading 'stone4' texture!");
@@ -1407,10 +1404,7 @@ bool Game::SetupGame ()
 
 Here we setup the game by creating the maze (@code{Maze::CreateGeometry()})
 and then creating all factories (@code{CreateFactories()}). After that
-we create @code{iEngine::Prepare()}. In @code{CreateGeometry()} we used
-@code{iEngine::SetLightingCacheMode()} to disable caching of lightmaps.
-This will be used in @code{Prepare()} so that the lightmaps are calculated
-right away.
+we create @code{iEngine::Prepare()}.
 
 After that setup collision detection.
 

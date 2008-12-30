@@ -29,7 +29,7 @@
 #include <errno.h>
 #include <string.h>
 
-
+#include "csutil/scanstr.h"
 
 File::File(const char *str)
 {
@@ -131,7 +131,7 @@ int InputFile::ReadLine(csString &str)
         return x;
 }
 
-csString& InputFile::ReadWord(char *pCharList,int iWantTrailingSpace)
+csString& InputFile::ReadWord(const char *pCharList,int iWantTrailingSpace)
 {
     int ch='a';
 
@@ -254,12 +254,13 @@ bool MayaInputFile::GetFloat(int type,float& fl)
     {
     case 1:
         GetToken(token);
-        sscanf(token,"%f",&fl);
+        csScanStr (token,"%f",&fl);
         return true;
 
     case 2:
         double d;
         GetToken(token);
+	// @@@ FIXME: should be csScanStr(), too, but that doesn't support %lf
         sscanf(token,"%lf",&d);
         fl = (float)d;
         return true;

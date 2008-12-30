@@ -22,6 +22,7 @@
 #include "csextern.h"
 #include "csutil/pooledscfclass.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/scanstr.h"
 #include "iutil/document.h"
 #include "tinyxml.h"
 
@@ -94,7 +95,7 @@ public:
   {
     const char* val = attr->Value ();
     float f;
-    sscanf (val, "%f", &f);
+    csScanStr (val, "%f", &f);
     return f;
   }
 
@@ -164,7 +165,9 @@ public:
  */
 struct CS_CRYSTALSPACE_EXPORT csTinyXmlNode : 
   public scfImplementationPooled<scfImplementation1<csTinyXmlNode, 
-                                                    iDocumentNode> >
+                                                    iDocumentNode>,
+                                 CS::Memory::AllocatorMalloc,
+                                 true>
 {
 private:
   friend class csTinyXmlDocument;

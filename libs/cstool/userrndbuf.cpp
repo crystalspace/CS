@@ -27,7 +27,8 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
 
-iRenderBuffer* csUserRenderBufferManager::GetRenderBuffer (csStringID name) const
+iRenderBuffer* csUserRenderBufferManager::GetRenderBuffer (
+  CS::ShaderVarStringID name) const
 {
   size_t bufIndex = userBuffers.FindSortedKey (UserBufArrayCmp (name));
   if (bufIndex == csArrayItemNotFound) return 0;
@@ -41,7 +42,7 @@ int csUserRenderBufferManager::BufCompare (userbuffer const& r,
   return r.name - k.name;
 }
 
-bool csUserRenderBufferManager::AddRenderBuffer (csStringID name, 
+bool csUserRenderBufferManager::AddRenderBuffer (CS::ShaderVarStringID name, 
 						 iRenderBuffer* buffer)
 {
   size_t bufIndex = userBuffers.FindSortedKey (UserBufArrayCmp (name));
@@ -54,7 +55,7 @@ bool csUserRenderBufferManager::AddRenderBuffer (csStringID name,
   return true;
 }
 
-bool csUserRenderBufferManager::RemoveRenderBuffer (csStringID name)
+bool csUserRenderBufferManager::RemoveRenderBuffer (CS::ShaderVarStringID name)
 {
   size_t bufIndex = userBuffers.FindSortedKey (UserBufArrayCmp (name));
   if (bufIndex == csArrayItemNotFound) return false;
@@ -67,7 +68,7 @@ class BufferNameIter : public scfImplementation1<BufferNameIter,
 {
   size_t index;
 public:
-  csArray<csStringID> names;
+  csArray<CS::ShaderVarStringID> names;
   csRefArray<iRenderBuffer> buffers;
 
   BufferNameIter() : scfImplementationType (this), index(0) 
@@ -78,7 +79,7 @@ public:
   }
 
   bool HasNext();
-  csStringID Next (csRef<iRenderBuffer>* buf = 0);
+  CS::ShaderVarStringID Next (csRef<iRenderBuffer>* buf = 0);
   void Reset();
 };
 
@@ -102,7 +103,7 @@ bool BufferNameIter::HasNext()
   return index < names.GetSize ();
 }
 
-csStringID BufferNameIter::Next (csRef<iRenderBuffer>* buf)
+CS::ShaderVarStringID BufferNameIter::Next (csRef<iRenderBuffer>* buf)
 {
   if (index < names.GetSize ())
   {
@@ -113,7 +114,7 @@ csStringID BufferNameIter::Next (csRef<iRenderBuffer>* buf)
   else
   {
     if (buf != 0) *buf = 0;
-    return csInvalidStringID;
+    return CS::InvalidShaderVarStringID;
   }
 }
 

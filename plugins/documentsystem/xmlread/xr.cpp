@@ -26,6 +26,7 @@ distribution.
 #include <ctype.h>
 #include "xr.h"
 #include "csutil/scfstr.h"
+#include "csutil/stringconv.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLRead)
 {
@@ -263,9 +264,9 @@ TrDocumentAttribute& TrXmlElement::GetAttributeRegistered (
   return attributeSet.set[idx];
 }
 
-TrDocument::TrDocument(char* buf) :
-  blk_element (7000),
-  blk_text (100)
+TrDocument::TrDocument(bool largeDoc, char* buf) :
+  blk_element (largeDoc ? 7000 : 100),
+  blk_text (largeDoc ? 100 : 16)
 {
   errorId = TIXML_NO_ERROR;
   //  ignoreWhiteSpace = true;
@@ -290,7 +291,7 @@ const int TrDocumentAttribute::IntValue() const
 const double  TrDocumentAttribute::DoubleValue() const
 {
   value[vallen] = 0;
-  return atof (value);
+  return CS::Utility::strtof (value);
 }
 
 TrXmlDeclaration::TrXmlDeclaration( const char * _version,

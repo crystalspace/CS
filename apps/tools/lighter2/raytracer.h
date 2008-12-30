@@ -54,9 +54,12 @@ namespace lighter
     // Specific primitive to ignore
     const Primitive* ignorePrimitive;
 
+    // Also ignore all primitives from this object
+    const Object* ignoreObject;
+
     Ray () 
       : origin (0,0,0), direction (1,0,0), minLength (0), maxLength (FLT_MAX*0.9f),
-      rayID (0), ignoreFlags (0), ignorePrimitive (0)
+      rayID (0), ignoreFlags (0), ignorePrimitive (0), ignoreObject (0)
     {}
 
     // Clip to box. Returns if ray touch box at all
@@ -136,12 +139,15 @@ namespace lighter
 
     // The primitive we hit
     Primitive *primitive;
+    
+    // KD tree primitive flags
+    int32 kdFlags;
 
     HitPoint ()
       : distance (0), hitPoint (0,0,0), primitive (0)
     {}
 
-    bool operator< (const HitPoint& o)
+    bool operator< (const HitPoint& o) const
     {
       return distance < o.distance;
     }
@@ -151,7 +157,8 @@ namespace lighter
   {
     virtual ~HitPointCallback () {}
 
-    virtual void RegisterHit (const Ray &ray, const HitPoint &hit) = 0;
+    /// Returns whether to continue tracing.
+    virtual bool RegisterHit (const Ray &ray, const HitPoint &hit) = 0;
   };
 
   struct HitIgnoreCallback
@@ -304,6 +311,7 @@ namespace lighter
   class Raytracer
   {
   public:
+    //@{
     /**
      * Raytrace until there is any hit.
      * This might not be the closest hit so it is faster but not suitable
@@ -311,6 +319,9 @@ namespace lighter
      */
     static bool TraceAnyHit (const KDTree* tree, const Ray &ray, HitPoint &hit, 
       HitIgnoreCallback* ignoreCB = 0);
+    static bool TraceAnyHit (const KDTree* tree, const Ray &ray, 
+      HitPointCallback* hitCallback, HitIgnoreCallback* ignoreCB = 0);
+    //@}
 
     /**
      * Raytrace for closest hit. 
@@ -321,7 +332,7 @@ namespace lighter
     /**
      * Raytrace for all hits along a ray.
      */
-    static void TraceAllHits (const KDTree* tree, const Ray &ray, 
+    static bool TraceAllHits (const KDTree* tree, const Ray &ray, 
       HitPointCallback* hitCallback, HitIgnoreCallback* ignoreCB = 0);
   };
 

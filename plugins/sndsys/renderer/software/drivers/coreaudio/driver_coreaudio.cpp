@@ -38,6 +38,14 @@
 #include "isndsys/ss_renderer.h"
 #include "driver_coreaudio.h"
 
+#if defined(MAC_OS_X_VERSION_10_5) && (MAC_OS_X_VERSION_MIN_REQUIRED>=MAC_OS_X_VERSION_10_5)
+#define CS_AUDIO_CREATE_PROC(DEV,PROC,DATA) AudioDeviceCreateIOProcID(DEV,PROC,DATA,0)
+#define CS_AUDIO_DESTROY_PROC(DEV,PROC) AudioDeviceDestroyIOProcID(DEV,PROC)
+#else
+#define CS_AUDIO_CREATE_PROC(DEV,PROC,DATA) AudioDeviceAddIOProc(DEV,PROC,DATA)
+#define CS_AUDIO_DESTROY_PROC(DEV,PROC) AudioDeviceRemoveIOProc(DEV,PROC)
+#endif
+
 CS_IMPLEMENT_PLUGIN
 
 CS_PLUGIN_NAMESPACE_BEGIN(SndSysCOREAUDIO)
@@ -98,7 +106,7 @@ bool csSndSysDriverCoreAudio::Initialize (iObjectRegistry* r)
 bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
 				   csSndSysSoundFormat *requested_format)
 {
-  uint32 propertysize, buffersize;
+  uint32 propertysize;
   
   //target format that we get from Core Audio
   AudioStreamBasicDescription outStreamDesc;
@@ -133,24 +141,31 @@ bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
   }
 
   // Set buffer size - 1/10th of a second buffer of floats
-  propertysize = sizeof(buffersize);
-  buffersize = requested_format->Freq * sizeof(float) *
-    requested_format->Channels / 10;
-	
-  convert_size = requested_format->Freq / 10;
-	
-  convert_buffer = cs_malloc(convert_size * requested_format->Channels * requested_format->Bits/8);
+  propertysize = sizeof(convert_size);
+  convert_size = requested_format->Freq / 10; //Number of sound *frames*
 	
   status = AudioDeviceSetProperty(outputDeviceID, 0, 0, false,
-    kAudioDevicePropertyBufferSize, propertysize, &buffersize);
+       		      kAudioDevicePropertyBufferFrameSize, propertysize, &convert_size);
   if (status)
   {
-    Report(CS_REPORTER_SEVERITY_ERROR,
-	   "Failed to set buffersize to %d bytes for CoreAudio output device. "
-	   "Return of %d.", buffersize, (int)status);
-	cs_free(convert_buffer);
-    return false;
+    // Try to find a smaller buffer size which can successfully be used. This is due to the problem of
+    // some hardware devices don't having the initially requested buffer size.
+    // ToDo: obtain maximal buffer size from the device directly.
+    while(status && (convert_size > 0))
+    {
+      --convert_size;
+      status = AudioDeviceSetProperty(outputDeviceID, 0, 0, false,
+		  kAudioDevicePropertyBufferFrameSize, propertysize, &convert_size);
+    }
+    if( status )
+    {
+      Report(CS_REPORTER_SEVERITY_ERROR, "Failed to set sound buffer");
+      return false;
+    }
+    Report(CS_REPORTER_SEVERITY_WARNING, "Successfully set sound buffer to: %d frames, ",convert_size);
   }
+
+  convert_buffer = cs_malloc(convert_size * requested_format->Channels * requested_format->Bits/8);
   
   // Get stream information
   propertysize = sizeof(outStreamDesc);
@@ -197,7 +212,7 @@ bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
   memcpy(&playback_format, requested_format, sizeof(csSndSysSoundFormat));
 
   // Add a callback and begin playback
-  status = AudioDeviceAddIOProc(outputDeviceID, StaticAudioProc, this);
+  status = CS_AUDIO_CREATE_PROC(outputDeviceID, StaticAudioProc, this);
   if (status != 0)
   {
     Report(CS_REPORTER_SEVERITY_ERROR,
@@ -212,7 +227,7 @@ bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
 void csSndSysDriverCoreAudio::Close ()
 {
   StopThread();
-  AudioDeviceRemoveIOProc(outputDeviceID, StaticAudioProc);
+  CS_AUDIO_DESTROY_PROC(outputDeviceID, StaticAudioProc);
   cs_free(convert_buffer);
   convert_buffer = 0;
 }

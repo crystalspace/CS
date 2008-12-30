@@ -37,12 +37,9 @@
 #include "csutil/refarr.h"
 #include "csutil/sysfunc.h"
 #include "csutil/weakref.h"
-#include "iengine/light.h"
-#include "iengine/lightmgr.h"
 #include "iengine/lod.h"
 #include "iengine/material.h"
 #include "iengine/mesh.h"
-#include "imesh/lighting.h"
 #include "imesh/object.h"
 #include "imesh/spritecal3d.h"
 #include "imesh/skeleton.h"
@@ -195,7 +192,7 @@ public:
 
 class csSpriteCal3DMeshObject;
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 class csCal3dSkeletonFactory;
 
@@ -248,7 +245,6 @@ public:
   iVirtualClock* vc;
 
   csWeakRef<iGraphics3D> g3d;
-  csRef<iLightManager> light_mgr;
 
   /**
    * Reference to the engine (optional because sprites can also be
@@ -384,6 +380,12 @@ public:
   {
     first=0; second=0;
   }
+
+  // LOD fade not supported.
+  void SetLODFade (float f) { }
+  void GetLODFade (float& f) const { f = 0; }
+  void SetLODFade (iSharedVariable* varf) { }
+  void GetLODFade (iSharedVariable*& varf) const { varf = 0; }
   /** @} */
 };
 
@@ -395,10 +397,9 @@ class csCal3dSkeleton;
  * a skeleton).
  */
 class csSpriteCal3DMeshObject :
-  public scfImplementationExt4<csSpriteCal3DMeshObject,
+  public scfImplementationExt3<csSpriteCal3DMeshObject,
 			       csObjectModel,
 			       iMeshObject,
-			       iLightingInfo,
 			       iSpriteCal3DState,
 			       iLODControl>
 {
@@ -419,6 +420,7 @@ private:
   int  default_idle_anim,last_locked_anim;
   float idle_override_interval;
   int   idle_action;
+  float cyclic_blend_factor;
 
   csRef<csCal3dSkeleton> skeleton;
 
@@ -445,23 +447,25 @@ private:
   protected:
     csSpriteCal3DMeshObject* meshobj;
     int mesh;
-    uint colorVersion, normalVersion;
+    uint normalVersion, binormalVersion, tangentVersion;
     int vertexCount;
 
+    csRef<iRenderBuffer> binormal_buffer;
+    csRef<iRenderBuffer> tangent_buffer;
     csRef<iRenderBuffer> normal_buffer;
-    csRef<iRenderBuffer> color_buffer;
 
-    void UpdateNormals (CalRenderer* render, int meshIndex,
-      CalMesh* calMesh, size_t vertexCount);
+    void UpdateNormals (csRenderBufferHolder* holder);
+    void UpdateBinormals (csRenderBufferHolder* holder);
+    void UpdateTangents (csRenderBufferHolder* holder);
   public:
     iMovable* movable;
-
+	
     MeshAccessor (csSpriteCal3DMeshObject* meshobj, int mesh) :
       scfImplementationType (this)
     {
       MeshAccessor::meshobj = meshobj;
       MeshAccessor::mesh = mesh;
-      colorVersion = normalVersion = (uint)-1;
+      normalVersion = binormalVersion = tangentVersion = (uint)-1;
       vertexCount = meshobj->ComputeVertexCount (mesh);
     }
 
@@ -491,7 +495,6 @@ private:
     void UpdatePosition (float delta, CalModel*);
   };
 
-  csRef<iStringSet> strings;
   csWeakRef<iGraphics3D> G3D;
 
   /* The deal with meshes, submeshes and attached meshes:
@@ -509,7 +512,6 @@ private:
   uint meshVersion;
   csBox3 object_bbox;
   uint bboxVersion;
-  bool lighting_dirty;
 
   /** A mesh attached to the model.  These form the list of meshes that
     * the current model has attached to it.
@@ -524,6 +526,7 @@ private:
     csRef<iRenderBuffer> vertex_buffer;
     uint vertexVersion;
     csRenderMesh render_mesh;
+    csRef<iMaterialWrapper> matRef;
 
     Mesh() : vertexVersion((uint)~0) {}
   };
@@ -547,12 +550,6 @@ private:
   int FindAnimCyclePos(int idx) const;
   int FindAnimCycleNamePos(char const*) const;
   void ClearAnimCyclePos(int pos, float delay);
-
-  void InitSubmeshLighting (int mesh, int submesh, CalRenderer *pCalRenderer,
-    iMovable* movable, csColor* colors);
-  void UpdateLightingSubmesh (const csArray<iLightSectorInfluence*>& lights,
-      iMovable*, CalRenderer*, int mesh, int submesh, float* have_normals,
-      csColor* colors);
 
 public:
   float updateanim_sqdistance1;
@@ -581,17 +578,6 @@ public:
 
   /// Get the factory.
   csSpriteCal3DMeshObjectFactory* GetFactory3D () const { return factory; }
-
-  /**\name iLightingInfo interface
-   * @{ */
-  void InitializeDefault (bool /*clear*/) {}
-  bool ReadFromCache (iCacheManager* /*cache_mgr*/) { return true; }
-  bool WriteToCache (iCacheManager* /*cache_mgr*/) { return true; }
-  virtual void PrepareLighting () { }
-  void LightChanged (iLight* light);
-  void LightDisconnect (iLight* light);
-  void DisconnectAllLights ();
-  /** @} */
 
   /**\name iMeshObject implementation
    * @{ */
@@ -687,6 +673,7 @@ public:
   void SetLOD(float lod);
   void SetTimeFactor(float timeFactor);
   float GetTimeFactor();
+  void SetCyclicBlendFactor(float factor);
 
   bool AttachCoreMesh(const char *meshname);
 
@@ -767,6 +754,12 @@ public:
   {
     first=0; second=0;
   }
+
+  // LOD fade not supported.
+  void SetLODFade (float f) { }
+  void GetLODFade (float& f) const { f = 0; }
+  void SetLODFade (iSharedVariable* varf) { }
+  void GetLODFade (iSharedVariable*& varf) const { varf = 0; }
   /** @} */
 
   /**\name iObjectModel implementation
@@ -811,7 +804,7 @@ public:
   iSkeletonBoneFactory *FindBone (const char *name);
   size_t FindBoneIndex (const char *name);
   size_t GetBonesCount () const {return bones_factories.GetSize ();}
-  iSkeletonBoneFactory *GetBone (size_t i) {return (iSkeletonBoneFactory*)bones_factories[i];}
+  iSkeletonBoneFactory *GetBone (size_t i);
   iSkeletonGraveyard *GetGraveyard  () {return 0;}
   iSkeletonSocketFactory *CreateSocket(const char *name, iSkeletonBoneFactory *bone) {return 0;}
   iSkeletonSocketFactory *FindSocket(const char *name) {return 0;}
@@ -819,7 +812,7 @@ public:
   void RemoveSocket (int i) {;}
   size_t GetSocketsCount () {return 0;}   
   size_t GetAnimationsCount () {return animations.GetSize ();}
-  iSkeletonAnimation *GetAnimation (size_t idx) {return (iSkeletonAnimation *)animations[idx];}
+  iSkeletonAnimation *GetAnimation (size_t idx);
   /** @} */
 };
 
@@ -861,7 +854,7 @@ public:
   /** @} */
 };
 
-#define CAL_TIME_2_CS_TIME(time) time * 1000
+#define CAL_TIME_2_CS_TIME(time) static_cast<csTicks>(time * 1000)
 #define CS_TIME_2_CAL_TIME(time) ((float)time) / 1000
 class csCal3dSkeletonAnimation;
 
@@ -1028,7 +1021,7 @@ public:
 
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Sprite Cal3D type. This is the plugin you have to use to create instances

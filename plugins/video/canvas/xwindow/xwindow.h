@@ -29,7 +29,8 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/event.h"
-#include "plugins/video/canvas/xwindowcommon/xwindow.h"
+#include "csutil/eventhandlers.h"
+#include "ivaria/xwindow.h"
 #include "plugins/video/canvas/xwindowcommon/xextf86vm.h"
 #include "ivideo/graph2d.h"
 
@@ -42,11 +43,8 @@
 #include <X11/cursorfont.h>
 #include <X11/Xatom.h>
 
-class csXWindow : 
-  public scfImplementation3<csXWindow,
-                            iXWindow, 
-                            iEventPlug,
-                            iComponent>
+class csXWindow : public scfImplementation3<csXWindow, iXWindow, 
+  iEventPlug, iComponent>
 {
   /// The Object Registry
   iObjectRegistry *object_reg;
@@ -76,6 +74,8 @@ class csXWindow :
   Window wm_win;
   /// Dimensions
   int wm_width, wm_height;
+
+  XEvent storedEvent;
 
   // "WM_DELETE_WINDOW" atom
   Atom wm_delete_window;
@@ -124,6 +124,8 @@ public:
   virtual void SetTitle (const char* title);
   virtual void SetCanvas (iGraphics2D *canvas);
 
+  virtual XEvent GetStoredEvent()
+  { return storedEvent; }
   virtual Display *GetDisplay ()
   { return dpy; }
   virtual int GetScreen ()
@@ -158,8 +160,7 @@ public:
 #endif
 
   struct EventHandler : 
-    public scfImplementation1<EventHandler, 
-                              iEventHandler>
+    public scfImplementation1<EventHandler, iEventHandler>
   {
   private:
     csWeakRef<csXWindow> parent;
@@ -169,9 +170,9 @@ public:
       EventHandler::parent = parent;
     }
     virtual ~EventHandler () { }
-    virtual bool HandleEvent (iEvent& e) { return parent ? parent->HandleEvent(e) : false; }
-    CS_EVENTHANDLER_NAMES("crystalspace.window")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
+    virtual bool HandleEvent (iEvent& e)
+    { return parent ? parent->HandleEvent(e) : false; }
+    CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.window")
   };
   csRef<EventHandler> scfiEventHandler;
 

@@ -1,0 +1,23 @@
+<library>
+    <textures>
+        <texture name="oldmetal.gif">
+            <file>/lib/stdtex/oldmetal.jpg</file>
+        </texture>
+    </textures>
+    <materials>
+        <material name="robot">
+            <texture>oldmetal.gif</texture>
+        </material>
+    </materials>
+    <meshfact name="robotFoot">
+        <plugin>meshFact</plugin>
+        <params>
+            <material>robot</material>
+            <box>
+                <min x="-0.05" y="-0.1" z="-0.05" />
+                <max x="0.25" y="0" z="0.05" />
+            </box>
+            <autonormals />
+        </params>
+    </meshfact>
+</library>

@@ -58,6 +58,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     csPtr<iParticleEmitter> ParseEmitter (iDocumentNode* node);
 
     csPtr<iParticleEffector> ParseEffector (iDocumentNode* node);
+
+    bool ParseLinearEffectorParameters (
+      iDocumentNode* child, csParticleParameterSet& param, int& mask);
   };
 
 
@@ -73,6 +76,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource* ssource, iLoaderContext* ldr_context,
   	iBase* context);
+
+    virtual bool IsThreadSafe() { return true; }
   };
 
   class ParticlesObjectLoader : public ParticlesBaseLoader
@@ -87,6 +92,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource* ssource, iLoaderContext* ldr_context,
   	iBase* context);
+
+    virtual bool IsThreadSafe() { return true; }
   };
 
 

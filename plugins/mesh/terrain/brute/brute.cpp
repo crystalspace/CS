@@ -364,6 +364,7 @@ bool csTerrBlock::Split ()
   children[3]->child = 3;
 
   if (neighbours[0])
+  {
     if (!neighbours[0]->IsLeaf ())
     {
       children[0]->neighbours[0] = neighbours[0]->children[2];
@@ -378,7 +379,9 @@ bool csTerrBlock::Split ()
       children[1]->neighbours[0] = neighbours[0];
       neighbours[0]->neighbours[3] = this;
     }
+  }
   if (neighbours[1])
+  {
     if (!neighbours[1]->IsLeaf ())
     {
       children[1]->neighbours[1] = neighbours[1]->children[0];
@@ -393,7 +396,9 @@ bool csTerrBlock::Split ()
       children[3]->neighbours[1] = neighbours[1];
       neighbours[1]->neighbours[2] = this;
     }
+  }
   if (neighbours[2])
+  {
     if (!neighbours[2]->IsLeaf ())
     {
       children[0]->neighbours[2] = neighbours[2]->children[1];
@@ -408,7 +413,9 @@ bool csTerrBlock::Split ()
       children[2]->neighbours[2] = neighbours[2];
       neighbours[2]->neighbours[1] = this;
     }
+  }
   if (neighbours[3])
+  {
     if (!neighbours[3]->IsLeaf ())
     {
       children[2]->neighbours[3] = neighbours[3]->children[0];
@@ -423,6 +430,7 @@ bool csTerrBlock::Split ()
       children[3]->neighbours[3] = neighbours[3];
       neighbours[3]->neighbours[0] = this;
     }
+  }
   children[0]->neighbours[1] = children[1];
   children[0]->neighbours[3] = children[2];
 
@@ -748,6 +756,7 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
       rm->variablecontext = terr->paletteContexts[i-1];
     }
     rm->object2world = o2wt;
+    rm->bbox = bbox;
     rm->worldspace_origin = wo;
     rm->do_mirror = isMirrored;
     terr->returnMeshes->Push (rm);
@@ -1462,24 +1471,6 @@ iMeshObjectFactory* csTerrainObject::GetFactory () const
   return pFactory;
 }
 
-void csTerrainObject::InitializeDefault (bool clear)
-{
-  if (!staticlighting) return;
-
-  if (clear)
-  {
-    csColor amb;
-    float lightScale = CS_NORMAL_LIGHT_LEVEL / 256.0f;
-    pFactory->engine->GetAmbientLight (amb);
-    amb *= lightScale;
-    for (size_t i = 0 ; i < staticLights.GetSize (); i++)
-    {
-      staticLights[i] = amb;
-    }
-  }
-  colorVersion++;
-}
-
 char* csTerrainObject::GenerateCacheName ()
 {
   csMemFile mf;
@@ -1505,174 +1496,6 @@ char* csTerrainObject::GenerateCacheName ()
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
   csString hex(digest.HexString());
   return hex.Detach();
-}
-
-static const char CachedLightingMagic[] = "brute";
-static const size_t CachedLightingMagicSize = sizeof (CachedLightingMagic) - 1;
-
-#define STATIC_LIGHT_SCALE	255.0f
-
-bool csTerrainObject::ReadFromCache (iCacheManager* cache_mgr)
-{
-  if (!staticlighting) return true;
-
-  colorVersion++;
-  char* cachename = GenerateCacheName ();
-  cache_mgr->SetCurrentScope (cachename);
-  delete[] cachename;
-
-  bool rc = false;
-  csRef<iDataBuffer> db = cache_mgr->ReadCache ("bruteblock_lm", 0, (uint32)~0);
-  if (db)
-  {
-    csMemFile mf ((const char*)(db->GetData ()), db->GetSize ());
-    char magic[CachedLightingMagicSize + 1];
-    if (mf.Read (magic, CachedLightingMagicSize) != CachedLightingMagicSize) 
-      goto stop;
-    magic[CachedLightingMagicSize] = 0;
-    if (strcmp (magic, CachedLightingMagic) == 0)
-    {
-      size_t v;
-      for (v = 0; v < staticLights.GetSize (); v++)
-      {
-	csColor& c = staticLights[v];
-	uint8 b;
-	if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;
-	c.red = (float)b / STATIC_LIGHT_SCALE;
-	if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;
-	c.green = (float)b / STATIC_LIGHT_SCALE;
-	if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;
-	c.blue = (float)b / STATIC_LIGHT_SCALE;
-      }
-
-      uint8 c;
-      if (mf.Read ((char*)&c, sizeof (c)) != sizeof (c)) goto stop;
-      while (c != 0)
-      {
-	char lid[16];
-	if (mf.Read (lid, 16) != 16) goto stop;
-	iLight *l = pFactory->engine->FindLightID (lid);
-	if (!l) goto stop;
-	l->AddAffectedLightingInfo ((iLightingInfo*)this);
-
-	csShadowArray* shadowArr = new csShadowArray();
-	float* intensities = new float[staticLights.GetSize ()];
-	shadowArr->shadowmap = intensities;
-	for (size_t n = 0; n < staticLights.GetSize (); n++)
-	{
-          uint8 b;
-          if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b))
-          {
-            delete shadowArr;
-            goto stop;
-          }
-          intensities[n] = (float)b / STATIC_LIGHT_SCALE;
-	}
-	pseudoDynInfo.Put (l, shadowArr);
-
-        if (mf.Read ((char*)&c, sizeof (c)) != sizeof (c)) goto stop;
-      }
-      rc = true;
-    }
-  }
-
-stop:
-  cache_mgr->SetCurrentScope (0);
-  return rc;
-}
-
-bool csTerrainObject::WriteToCache (iCacheManager* cache_mgr)
-{
-  if (!staticlighting) return true;
-  char* cachename = GenerateCacheName ();
-  cache_mgr->SetCurrentScope (cachename);
-  delete[] cachename;
-
-  bool rc = false;
-  csMemFile mf;
-  mf.Write (CachedLightingMagic, CachedLightingMagicSize);
-  for (size_t v = 0; v < staticLights.GetSize (); v++)
-  {
-    const csColor& c = staticLights[v];
-    int i; uint8 b;
-
-    i = csQint (c.red * STATIC_LIGHT_SCALE);
-    if (i < 0) i = 0; if (i > 255) i = 255; b = i;
-    mf.Write ((char*)&b, sizeof (b));
-
-    i = csQint (c.green * STATIC_LIGHT_SCALE);
-    if (i < 0) i = 0; if (i > 255) i = 255; b = i;
-    mf.Write ((char*)&b, sizeof (b));
-
-    i = csQint (c.blue * STATIC_LIGHT_SCALE);
-    if (i < 0) i = 0; if (i > 255) i = 255; b = i;
-    mf.Write ((char*)&b, sizeof (b));
-  }
-  uint8 c = 1;
-
-  csHash<csShadowArray*, csPtrKey<iLight> >::GlobalIterator pdlIt (
-    pseudoDynInfo.GetIterator ());
-  while (pdlIt.HasNext ())
-  {
-    mf.Write ((char*)&c, sizeof (c));
-
-    csPtrKey<iLight> l;
-    csShadowArray* shadowArr = pdlIt.Next (l);
-    const char* lid = l->GetLightID ();
-    mf.Write ((char*)lid, 16);
-
-    float* intensities = shadowArr->shadowmap;
-    for (size_t n = 0; n < staticLights.GetSize (); n++)
-    {
-      int i; uint8 b;
-      i = csQint (intensities[n] * STATIC_LIGHT_SCALE);
-      if (i < 0) i = 0; if (i > 255) i = 255; b = i;
-      mf.Write ((char*)&b, sizeof (b));
-    }
-  }
-  c = 0;
-  mf.Write ((char*)&c, sizeof (c));
-
-
-  rc = cache_mgr->CacheData ((void*)(mf.GetData ()), mf.GetSize (),
-    "bruteblock_lm", 0, (uint32)~0);
-  cache_mgr->SetCurrentScope (0);
-  return rc;
-}
-
-void csTerrainObject::PrepareLighting ()
-{
-  if (!staticlighting && pFactory->light_mgr)
-  {
-    const csArray<iLightSectorInfluence*>& relevant_lights = pFactory->light_mgr
-      ->GetRelevantLights (logparent, -1, false);
-    for (size_t i = 0; i < relevant_lights.GetSize (); i++)
-      affecting_lights.Add (relevant_lights[i]->GetLight ());
-  }
-}
-
-void csTerrainObject::LightChanged (iLight* /*light*/)
-{
-  colorVersion++;
-}
-
-void csTerrainObject::LightDisconnect (iLight* light)
-{
-  affecting_lights.Delete (light);
-  colorVersion++;
-}
-
-void csTerrainObject::DisconnectAllLights ()
-{
-  csSet<csPtrKey<iLight> >::GlobalIterator it = affecting_lights.
-      	GetIterator ();
-  while (it.HasNext ())
-  {
-    iLight* l = (iLight*)it.Next ();
-    l->RemoveAffectedLightingInfo ((iLightingInfo*)this);
-  }
-  affecting_lights.Empty ();
-  colorVersion++;
 }
 
 void csTerrainObject::UpdateColors (iMovable* movable)
@@ -1718,154 +1541,6 @@ void csTerrainObject::UpdateColors (iMovable* movable)
   }
 }
 
-#define VERTEX_OFFSET       (10.0f * SMALL_EPSILON)
-
-/*
-  Lighting w/o local shadows:
-  - Contribution from all affecting lights is calculated and summed up
-    at runtime.
-  Lighting with local shadows:
-  - Contribution from static lights is calculated, summed and stored.
-  - For every static pseudo-dynamic lights, the intensity of contribution
-    is stored.
-  - At runtime, the static lighting colors are copied to the actual used
-    colors, the intensities of the pseudo-dynamic lights are multiplied
-    with the actual colors of that lights and added as well, and finally,
-    dynamic lighst are calculated.
- */
-void csTerrainObject::CastShadows (iMovable* movable, iFrustumView* fview)
-{
-  SetupObject ();
-  iBase* b = (iBase *)fview->GetUserdata ();
-  csRef<iLightingProcessInfo> lpi = scfQueryInterface<iLightingProcessInfo> (b);
-  CS_ASSERT (lpi != 0);
-
-  iLight* li = lpi->GetLight ();
-  bool dyn = lpi->IsDynamic ();
-
-  if (!dyn)
-  {
-    if (!staticlighting || 
-      li->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_PSEUDO)
-    {
-      li->AddAffectedLightingInfo ((iLightingInfo*)this);
-      if (li->GetDynamicType () != CS_LIGHT_DYNAMICTYPE_PSEUDO)
-        affecting_lights.Add (li);
-    }
-  }
-  else
-  {
-    if (!affecting_lights.In (li))
-    {
-      li->AddAffectedLightingInfo ((iLightingInfo*)this);
-      affecting_lights.Add (li);
-    }
-    if (staticlighting) return;
-  }
-
-  if (!staticlighting) return;
-
-  csReversibleTransform o2w (movable->GetFullTransform ());
-
-  csFrustum *light_frustum = fview->GetFrustumContext ()->GetLightFrustum ();
-  iShadowBlockList* shadows = fview->GetFrustumContext ()->GetShadows ();
-  iShadowIterator* shadowIt = shadows->GetShadowIterator ();
-
-  // Compute light position in object coordinates
-  csVector3 wor_light_pos = li->GetMovable ()->GetFullPosition ();
-  csVector3 obj_light_pos = o2w.Other2This (wor_light_pos);
-
-  bool pseudoDyn = li->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_PSEUDO;
-  csShadowArray* shadowArr = 0;
-  if (pseudoDyn)
-  {
-    shadowArr = new csShadowArray ();
-    pseudoDynInfo.Put (li, shadowArr);
-    shadowArr->shadowmap = new float[staticLights.GetSize ()];
-    memset(shadowArr->shadowmap, 0, staticLights.GetSize () * sizeof(float));
-  }
-
-  float lightScale = CS_NORMAL_LIGHT_LEVEL / 256.0f;
-  csColor light_color =
-    li->GetColor () * lightScale /* * (256. / CS_NORMAL_LIGHT_LEVEL)*/;
-
-  csRef<iTerraSampler> terrasampler = terraformer->GetSampler (
-      csBox2 (rootblock->center.x - rootblock->size / 2.0,
-      	      rootblock->center.z - rootblock->size / 2.0, 
-	      rootblock->center.x + rootblock->size / 2.0,
-	      rootblock->center.z + rootblock->size / 2.0), lmres);
-  const csVector3* lm_vertices = terrasampler->SampleVector3 (vertices_name);
-  const csVector3* lm_normals = terrasampler->SampleVector3 (normals_name);
-
-  csColor col;
-  size_t i;
-  float light_radiussq = csSquare (li->GetCutoffDistance ());
-  for (i = 0 ; i < staticLights.GetSize () ; i++)
-  {
-    if (verbose && (i % 10000 == 0))
-    {
-      csPrintf ("%zu out of %zu\n", i, staticLights.GetSize ());
-      fflush (stdout);
-    }
-    /*
-      A small fraction of the normal is added to prevent unwanted
-      self-shadowing (due small inaccuracies, the tri(s) this vertex
-      lies on may shadow it.)
-     */
-    csVector3 v = o2w.This2Other (lm_vertices[i] +
-    	(lm_normals[i] * VERTEX_OFFSET)) - wor_light_pos;
-
-    if (!light_frustum->Contains (v))
-    {
-      continue;
-    }
-
-    float vrt_sq_dist = csSquaredDist::PointPoint (obj_light_pos,
-      lm_vertices[i]);
-    if (vrt_sq_dist >= light_radiussq) continue;
-
-    bool inShadow = false;
-    shadowIt->Reset ();
-    while (shadowIt->HasNext ())
-    {
-      csFrustum* shadowFrust = shadowIt->Next ();
-      if (shadowFrust->Contains (v))
-      {
-	inShadow = true;
-	break;
-      }
-    }
-    if (inShadow) continue;
-
-    float cosinus;
-    if (vrt_sq_dist < SMALL_EPSILON) cosinus = 1;
-    else cosinus = (obj_light_pos - lm_vertices[i]) * lm_normals[i];
-    // because the vector from the object center to the light center
-    // in object space is equal to the position of the light
-
-    if (cosinus > 0)
-    {
-      float vrt_dist = csQsqrt (vrt_sq_dist);
-      if (vrt_sq_dist >= SMALL_EPSILON) cosinus /= vrt_dist;
-      float bright = li->GetBrightnessAtDistance (vrt_dist);
-      if (cosinus < 1) bright *= cosinus;
-      if (pseudoDyn)
-      {
-	// Pseudo-dynamic
-	bright *= lightScale;
-	if (bright > 1.0f) bright = 1.0f; // @@@ clamp here?
-	shadowArr->shadowmap[i] = bright;
-      }
-      else
-      {
-	col = light_color * bright;
-	staticLights[i] += col;
-      }
-    }
-  }
-  terrasampler->Cleanup ();
-}
-
 bool csTerrainObject::SetMaterialPalette (
   const csArray<iMaterialWrapper*>& pal)
 {
@@ -1873,8 +1548,9 @@ bool csTerrainObject::SetMaterialPalette (
   paletteContexts.SetSize (pal.GetSize ());
   for (size_t i = 0; i < pal.GetSize (); i++)
   {
-    palette[i] = pal[i];
-    paletteContexts[i] = new csShaderVariableContext();
+      palette[i] = pal[i];
+      refPalette.Put(i, pal.Get(i));
+      paletteContexts[i] = new csShaderVariableContext();
   }
 
   return true;
@@ -1944,13 +1620,13 @@ bool csTerrainObject::SetCurrentMaterialAlphaMaps (
 
   csRef<iGraphics3D> g3d = 
     csQueryRegistry<iGraphics3D> (object_reg);
-  csRef<iStringSet> strings = 
-    csQueryRegistryTagInterface<iStringSet>
-    (object_reg, "crystalspace.shared.stringset");
+  csRef<iShaderVarStringSet> stringsSvName = 
+    csQueryRegistryTagInterface<iShaderVarStringSet>
+    (object_reg, "crystalspace.shader.variablenameset");
   csRef<iTextureManager> mgr = g3d->GetTextureManager ();
 
   csRef<csShaderVariable> lod_var = 
-    new csShaderVariable (strings->Request ("texture lod distance"));
+    new csShaderVariable (stringsSvName->Request ("texture lod distance"));
   lod_var->SetType (csShaderVariable::VECTOR3);
   lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
   baseContext->AddVariable (lod_var);
@@ -2014,13 +1690,13 @@ printf("%s\n",fn.GetData());
     csRef<iTextureHandle> hdl = mgr->RegisterTexture (alpha, 
       CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
     csRef<csShaderVariable> var = 
-      new csShaderVariable (strings->Request ("splat alpha map"));
+      new csShaderVariable (stringsSvName->Request ("splat alpha map"));
     var->SetType (csShaderVariable::TEXTURE);
     var->SetValue (hdl);
     paletteContexts[i]->AddVariable (var);
 
     csRef<csShaderVariable> lod_var = 
-      new csShaderVariable (strings->Request ("texture lod distance"));
+      new csShaderVariable (stringsSvName->Request ("texture lod distance"));
     lod_var->SetType (csShaderVariable::VECTOR3);
     lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
     paletteContexts[i]->AddVariable (lod_var);
@@ -2158,13 +1834,13 @@ bool csTerrainObject::SetCurrentMaterialMap (const csArray<char>& data,
 
   csRef<iGraphics3D> g3d = 
     csQueryRegistry<iGraphics3D> (object_reg);
-  csRef<iStringSet> strings = 
-    csQueryRegistryTagInterface<iStringSet>
-    (object_reg, "crystalspace.shared.stringset");
+  csRef<iShaderVarStringSet> stringsSvName = 
+    csQueryRegistryTagInterface<iShaderVarStringSet>
+    (object_reg, "crystalspace.shader.variablenameset");
   iTextureManager* mgr = g3d->GetTextureManager ();
 
   csRef<csShaderVariable> lod_var = 
-    new csShaderVariable (strings->Request ("texture lod distance"));
+    new csShaderVariable (stringsSvName->Request ("texture lod distance"));
   lod_var->SetType (csShaderVariable::VECTOR3);
   lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
   baseContext->AddVariable (lod_var);
@@ -2205,13 +1881,13 @@ printf("%s\n",fn.GetData());
     csRef<iTextureHandle> hdl = mgr->RegisterTexture (alpha, 
       CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
     csRef<csShaderVariable> var = 
-      new csShaderVariable (strings->Request ("splat alpha map"));
+      new csShaderVariable (stringsSvName->Request ("splat alpha map"));
     var->SetType (csShaderVariable::TEXTURE);
     var->SetValue (hdl);
     paletteContexts[i]->AddVariable (var);
 
     csRef<csShaderVariable> lod_var = 
-      new csShaderVariable (strings->Request ("texture lod distance"));
+      new csShaderVariable (stringsSvName->Request ("texture lod distance"));
     lod_var->SetType (csShaderVariable::VECTOR3);
     lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
     paletteContexts[i]->AddVariable (lod_var);

@@ -256,6 +256,25 @@ public:
 
   /// Remove specific item by iterator.
   void Delete (Iterator& it);
+  
+  /**
+   * Remove specified item.
+   * \remarks Slow!
+   */
+  bool Delete (const T& item)
+  {
+    ListElement* e = head.p;
+    while (e != 0)
+    {
+      if (e->data == item)
+      {
+	Delete (e);
+	return true;
+      }
+      e = e->next;
+    }
+    return false;
+  }
 
   /// Empty an list.
   void DeleteAll();
@@ -339,6 +358,8 @@ inline void csList<T, MemoryAllocator>::DeleteAll ()
   head.p = tail = 0;
 }
 
+#include "csutil/custom_new_disable.h"
+
 /// Add one item last in the list
 template <class T, class MemoryAllocator>
 inline typename csList<T, MemoryAllocator>::Iterator 
@@ -399,6 +420,8 @@ inline void csList<T, MemoryAllocator>::InsertBefore (Iterator &it,
     el->prev->next = newEl;
   el->prev = newEl;
 }
+
+#include "csutil/custom_new_enable.h"
 
 template <class T, class MemoryAllocator>
 inline void csList<T, MemoryAllocator>::MoveAfter (const Iterator &it, 
@@ -520,13 +543,26 @@ inline void csList<T, MemoryAllocator>::Delete (Iterator &it)
   CS_ASSERT(it.HasCurrent());
   ListElement* el = it.ptr;
 
-  // Advance the iterator so we can delete the data it's using
-  if (it.IsReverse())
-    --it;
+  if (el->prev == 0)
+  {
+    // Deleting first element, reset to next
+    if (it.IsReverse())
+      --it;
+    else
+      ++it;
+    Delete(el);
+    it.visited = false;
+  }
   else
-    ++it;
-
-  Delete(el);
+  {
+    /* Make a step back so the current element can be deleted
+       and the next element returned is the one after the deleted */
+    if (it.IsReverse())
+      ++it;
+    else
+      --it;
+    Delete(el);
+  }
 }
 
 template <class T, class MemoryAllocator>

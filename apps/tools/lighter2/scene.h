@@ -22,6 +22,7 @@
 #include "object.h"
 #include "kdtree.h"
 #include "light.h"
+#include "material.h"
 
 namespace lighter
 {
@@ -91,6 +92,8 @@ namespace lighter
   public:
     Scene ();
     ~Scene ();
+    
+    void CleanUp (Statistics::Progress& progress);
 
     // Add a file for later loading
     void AddFile (const char* directory);
@@ -107,10 +110,14 @@ namespace lighter
 
     // Copy the temporary file created in SaveWorld() over the actual world file.
     bool ApplyWorldChanges (Statistics::Progress& progress);
+    // Generate specular direction maps
+    bool GenerateSpecularDirectionMaps (Statistics::Progress& progress);
     // Write the generated lightmaps out.
     bool SaveLightmaps (Statistics::Progress& progress);
     // Save any mesh data that can only be saved after lighting.
     bool SaveMeshesPostLighting (Statistics::Progress& progress);
+    // Clean up all data not needed after lighting.
+    void CleanLightingData (Statistics::Progress& progress);
 
     // Data access
     inline ObjectFactoryHash& GetFactories () 
@@ -129,9 +136,20 @@ namespace lighter
     LightmapPtrDelArray& GetLightmaps () 
     { return lightmaps; }
 
-    Lightmap* GetLightmap (uint lightmapID, Light* light);
+    Lightmap* GetLightmap (uint lightmapID, size_t subLightmapNum, 
+      Light* light = 0);
 
     csArray<LightmapPtrDelArray*> GetAllLightmaps ();
+    
+    enum { specDirectionMapCount = 3 };
+    iTextureWrapper* GetSpecDirectionMapTexture (uint ID, int subNum);
+    
+    const RadMaterial* GetRadMaterial (iMaterialWrapper* matWrap) const
+    {
+      if (matWrap == 0) return 0;
+      return radMaterials.GetElementPointer (
+        matWrap->QueryObject()->GetName());
+    }
 
     /**
      * Helper class to perform some lightmap postprocessing
@@ -168,12 +186,14 @@ namespace lighter
     {
       csSet<csPtrKey<Portal> > seenPortals;
     };
-    void PropagateLight (Light* light, const csFrustum& lightFrustum, 
-      PropageState& state);
+    void PropagateLights (Sector* sector);
   protected:
     
     //  factories
     ObjectFactoryHash radFactories;
+    
+    // Materials
+    MaterialHash radMaterials;
  
     // All sectors
     SectorHash sectors;
@@ -183,15 +203,45 @@ namespace lighter
     LightmapPtrDelArray lightmaps;
     typedef csHash<LightmapPtrDelArray*, csPtrKey<Light> > PDLightmapsHash;
     PDLightmapsHash pdLightmaps;
+    DirectionMapPtrDelArray directionMaps[2];
+    csStringArray directionMapBaseNames;
+    csString GetDirectionMapFilename (uint ID, int subNum) const;
+    
+    struct DirectionMapTextures
+    {
+      iTextureWrapper* t[specDirectionMapCount];
+      
+      DirectionMapTextures() { memset (t, 0, sizeof (t)); }
+    };
+    csArray<DirectionMapTextures> directionMapTextures;
 
     struct LoadedFile
     {
-      csRef<iDocumentNode> rootNode;
+    private:
       csRef<iDocument> document;
+      bool docChangeable;
+      bool changed;
+    public:
+      Configuration sceneConfig;
+      csString levelName;
+      csString fileName;
       csString directory; //VFS name, full path
       csSet<csString> texturesToClean;
       csSet<csString> texFileNamesToDelete;
       csArray<Object*> fileObjects;
+
+    LoadedFile() : changed(false), sceneConfig (globalConfig) {}
+
+      void SetDocument (iDocument* doc)
+      {
+        document = doc;
+        docChangeable = doc && (doc->Changeable () == CS_CHANGEABLE_YES);
+      }
+      iDocument* GetDocument() const { return document; }
+      iDocument* GetDocumentChangeable();
+
+      bool IsChanged() const { return changed; }
+      void SetChanged (bool c) { changed = c; }
     };
 
     // All files loaded into scene
@@ -200,11 +250,12 @@ namespace lighter
     // Save functions
     void CollectDeleteTextures (iDocumentNode* textureNode,
                                 csSet<csString>& filesToDelete);
-    void BuildLightmapTextureList (csStringArray& texturesToSave);
+    void BuildLightmapTextureList (LoadedFile* fileInfo, 
+      csStringArray& texturesToSave);
     void CleanOldLightmaps (LoadedFile* fileInfo);
-    void SaveSceneFactoriesToDom (iDocumentNode* root, LoadedFile* fileInfo,
-                                  Statistics::Progress& progress);
-    void SaveSceneMeshesToDom (iDocumentNode* root, LoadedFile* fileInfo,
+    void SaveSceneFactoriesToDom (LoadedFile* fileInfo, 
+                                 Statistics::Progress& progress);
+    void SaveSceneMeshesToDom (LoadedFile* fileInfo,
                                Statistics::Progress& progress);
     bool SaveSceneLibrary (csSet<csString>& savedFactories, 
                            const char* libFile, LoadedFile* fileInfo,
@@ -212,40 +263,60 @@ namespace lighter
     void HandleLibraryNode (csSet<csString>& savedFactories, 
                             iDocumentNode* node, LoadedFile* fileInfo,
                             Statistics::Progress& progress, bool noModify);
-    void SaveMeshFactoryToDom (csSet<csString>& savedObjects, 
+
+    enum SaveResult
+    {
+      svFailure, svSuccess, svRemoveItem
+    };
+    SaveResult SaveMeshFactoryToDom (csSet<csString>& savedObjects, 
                                iDocumentNode* factNode, LoadedFile* fileInfo);
     void SaveSectorToDom (iDocumentNode* sectorNode, LoadedFile* fileInfo,
                           Statistics::Progress& progress);
-    void SaveMeshObjectToDom (csSet<csString>& savedObjects, iDocumentNode *objNode, 
-                              Sector* sect, LoadedFile* fileInfo);
+    SaveResult SaveMeshObjectToDom (csSet<csString>& savedObjects, 
+                                    iDocumentNode *objNode, 
+                                    Sector* sect, LoadedFile* fileInfo);
+
+    void GenerateSpecularDirectionMaps (LoadedFile* fileInfo,
+      Statistics::Progress& progress);
+    void SaveSpecularDirectionMaps (LoadedFile* fileInfo,
+      csStringArray& filenames, csStringArray& textureNames);
 
     csStringHash solidColorFiles;
-    const char* GetSolidColorFile (const csColor& col);
+    const char* GetSolidColorFile (LoadedFile* fileInfo, const csColor& col);
     void SaveLightmapsToDom (iDocumentNode* root, LoadedFile* fileInfo,
                              Statistics::Progress& progress);
+
+    csPtr<iDataBuffer> SaveDebugData (LoadedFile& fileInfo, 
+      iDataBuffer* sourceData, Statistics::Progress& progress);
     
     // Load functions
     bool ParseEngine (LoadedFile* fileInfo, Statistics::Progress& progress);
+    bool ParseEngineAll (Statistics::Progress& progress);
     void ParseSector (LoadedFile* fileInfo, iSector *sector, 
       Statistics::Progress& progress);
     void ParsePortals (iSector *srcSect, Sector* sector);
     enum MeshParseResult
     {
-      Failure, Success, NotAGenMesh
+      mpFailure, mpSuccess, mpNotAGenMesh
     };
     MeshParseResult ParseMesh (LoadedFile* fileInfo, Sector *sector,  
       iMeshWrapper *mesh, csRef<Object>& obj);
     MeshParseResult ParseMeshFactory (LoadedFile* fileInfo, 
       iMeshFactoryWrapper *factory, csRef<ObjectFactory>& radFact);
+    bool ParseMaterial (iMaterialWrapper* material);
+    void PropagateLight (Light* light, const csFrustum& lightFrustum, 
+      PropageState& state);
     void PropagateLight (Light* light, const csFrustum& lightFrustum)
     { 
       PropageState state;
       PropagateLight (light, lightFrustum, state);
     }
-
-    iRegion* GetRegion (iObject* obj);
+    
+    iCollection* GetCollection (iObject* obj);
     bool IsObjectFromBaseDir (iObject* obj, const char* baseDir);
     bool IsFilenameFromBaseDir (const char* filename, const char* baseDir);
+
+    static csRef<iDocument> EnsureChangeable (iDocument* doc);
   };
 }
 

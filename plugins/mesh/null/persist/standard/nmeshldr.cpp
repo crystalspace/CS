@@ -38,6 +38,7 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/stringarray.h"
 #include "imap/services.h"
 #include "imap/ldrctxt.h"
 #include "csgeom/vector2.h"
@@ -378,13 +379,15 @@ csPtr<iBase> csNullMeshLoader::Parse (iDocumentNode* node,
 	{
 	  const char* factname = child->GetContentsValue ();
 	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
-	  if (!fact)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.nullmeshloader.parse.unknownfactory",
-		child, "Couldn't find factory '%s'!", factname);
-	    return 0;
-	  }
+
+    if(!fact)
+    {
+      synldr->ReportError (
+        "crystalspace.nullmeshloader.parse.unknownfactory",
+        child, "Couldn't find factory '%s'!", factname);
+      return 0;
+    }
+
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           state = scfQueryInterface<iNullMeshState> (mesh);
 	  if (!state)

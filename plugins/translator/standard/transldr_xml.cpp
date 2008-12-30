@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2006 by Dariusz Dawidowski
+    Copyright (C) 2006, 2007 by Dariusz Dawidowski
+    Copyright (C) 2007 by Amir Taaki
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,11 +18,13 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/cfgacc.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "iutil/document.h"
 #include "iutil/object.h"
 #include "iutil/cfgmgr.h"
+#include "iutil/stringarray.h"
 #include "ivaria/translator.h"
 #include "transldr_xml.h"
 #include "trans.h"
@@ -63,35 +66,11 @@ void csTranslatorLoaderXml::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-csPtr<iBase> csTranslatorLoaderXml::Parse (iDocumentNode* node,
-	iStreamSource*, iLoaderContext* ldr_context, iBase* context)
+bool csTranslatorLoaderXml::Process (iDocumentNode* node, const char* lang)
 {
-  if (!node)
-    return 0;
   bool found_language = false;
-  csRef<csTranslator> trans;
-  trans.AttachNew (new csTranslator (context));
-  if (!trans)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't initialize csTranslator!");
-    return 0;
-  }
-  csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (object_reg);
-  if (!cfg)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't load iConfigManager!");
-    return 0;
-  }
-  const char* cfglang = 0;
-  cfglang = cfg->GetStr ("Translator.Language", 0);
-  if (!cfglang)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR,
-    	"Couldn't found 'Translator.Language' in the cfg!");
-    return 0;
-  }
   csRef<iDocumentNodeIterator> it1 = node->GetNodes ();
-  while (it1->HasNext ())
+  while (lang && it1->HasNext ())
   {
     csRef<iDocumentNode> ch1 = it1->Next ();
     if (ch1->GetType () != CS_NODE_ELEMENT) continue;
@@ -105,10 +84,10 @@ csPtr<iBase> csTranslatorLoaderXml::Parse (iDocumentNode* node,
         {
           synldr->ReportError (
           	"crystalspace.translation.loader.xml",
-          	node, "Missing 'name' attribute!");
-          return 0;
+          	node, "Translator: Missing 'name' attribute!");
+          return false;
         }
-        if (!strcmp (cfglang, language))
+        if (!strcmp (lang, language))
         {
           found_language = true;
           csRef<iDocumentNodeIterator> it2 = ch1->GetNodes ();
@@ -139,15 +118,16 @@ csPtr<iBase> csTranslatorLoaderXml::Parse (iDocumentNode* node,
                     break;
                     default:
                       if (synldr) synldr->ReportBadToken (ch3);
-                      return 0;
+                      return false;
                   }
                 }
-                if (src && dst) trans->SetMsg (src, dst);
+                if ((src && dst) && (strcmp (src, dst)))
+                	trans->SetMsg (src, dst);
               }
               break;
               default:
                 if (synldr) synldr->ReportBadToken (ch2);
-                return 0;
+                return false;
             }
           }
         }
@@ -155,14 +135,84 @@ csPtr<iBase> csTranslatorLoaderXml::Parse (iDocumentNode* node,
       break;
       default:
         if (synldr) synldr->ReportBadToken (ch1);
-        return 0;
+        return false;
     }
   }
-  if (!found_language)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR,
-    	"Couldn't found '%s' language!", cfglang);
+  return found_language;
+}
+
+csPtr<iBase> csTranslatorLoaderXml::Parse (iDocumentNode* node,
+	iStreamSource*, iLoaderContext* ldr_context, iBase* context)
+{
+  size_t start = 0;
+  size_t pos = 0;
+  if (!node)
     return 0;
+  trans.AttachNew (new csTranslator (context));
+  if (!trans)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't initialize csTranslator!");
+    return 0;
+  }
+  // local and global configuration
+  csConfigAccess cfg;
+  cfg.AddConfig (object_reg, "/config/translator.cfg");
+  const char* lang = 0;
+  lang = cfg->GetStr ("Translator.Language", 0);
+/*  if (!lang)
+  {
+    const char* syslang = 0;
+    // Unix
+    syslang = getenv ("LANG");
+    // Windows
+    //WCHAR wcBuffer [32];
+    //if (GetSystemDefaultLocaleName (wcBuffer, 32) > 0)
+    //{
+    //  syslang = wcBuffer;
+    //}
+    csRef<iConfigIterator> it_alias (cfg->Enumerate ("Translator.Alias."));
+    if (it_alias)
+      while (it_alias->Next ())
+      {
+        csString keystr = it_alias->GetStr ();
+        start = 0;
+        pos = 0;
+        do
+        {
+          pos = keystr.Find (" ", pos + 1);
+          csString keyslice = keystr.Slice (start, pos - start);
+          if (!strcmp (syslang, keyslice.GetData ()))
+          {
+            lang = it_alias->GetKey (true);
+            break;
+          }
+          start = pos + 1;
+        }
+        while (pos != (size_t)-1);
+        if (pos != (size_t)-1)
+          break;
+      }
+  }*/
+  if (lang)
+  {
+    if (!Process (node, lang))
+    {
+      char fallbackname [24];
+      strcpy (fallbackname, "Translator.Fallback.");
+      strcat (fallbackname, lang);
+      csString fallback = cfg->GetStr (fallbackname);
+      start = 0;
+      pos = 0;
+      do
+      {
+        pos = fallback.Find (" ", pos + 1);
+        csString keyslice = fallback.Slice (start, pos - start);
+        if (Process (node, keyslice.GetData ()))
+          break;
+        start = pos + 1;
+      }
+      while (pos != (size_t)-1);
+    }
   }
   csRef<iTranslator> old = csQueryRegistry<iTranslator> (object_reg);
   object_reg->Unregister (old, "iTranslator");

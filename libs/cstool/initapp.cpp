@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgfx/shadervar.h"
 #include "cstool/initapp.h"
 #include "csutil/ansicommand.h"
 #include "csutil/cfgacc.h"
@@ -28,11 +29,14 @@
 #include "csutil/csinput.h"
 #include "csutil/csshlib.h"
 #include "csutil/csstring.h"
+#include "csutil/memdebug.h"
 #include "csutil/objreg.h"
 #include "csutil/plugldr.h"
 #include "csutil/plugmgr.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/scfstrset.h"
+#include "csutil/systemopenmanager.h"
+#include "csutil/threadmanager.h"
 #include "csutil/verbosity.h"
 #include "csutil/virtclk.h"
 
@@ -110,21 +114,22 @@ iObjectRegistry* csInitializer::CreateEnvironment (
     iObjectRegistry* r = CreateObjectRegistry();
     if (r != 0)
     {
-      if (CreatePluginManager(r) &&
+      if (CreateCommandLineParser(r, argc, argv) &&
+          CreateVerbosityManager(r) &&
+          CreatePluginManager(r) &&
           CreateEventQueue(r) &&
           CreateVirtualClock(r) &&
-          CreateCommandLineParser(r, argc, argv) &&
-          CreateVerbosityManager(r) &&
           CreateConfigManager(r) &&
+          CreateThreadManager(r) &&
           CreateInputDrivers(r) &&
-	  CreateStringSet (r) &&
+	        CreateStringSet (r) &&
+	  CreateSystemOpenManager (r) &&
           csPlatformStartup(r))
         reg = r;
       else
         r->DecRef();
 #ifdef CS_MEMORY_TRACKER
-    extern void mtiRegisterModule (char* Class);
-    mtiRegisterModule ("app");
+    CS::Debug::MemTracker::RegisterModule ("app");
 #endif
 
     }
@@ -160,6 +165,13 @@ iEventQueue* csInitializer::CreateEventQueue (iObjectRegistry* r)
   return q;
 }
 
+iThreadManager* csInitializer::CreateThreadManager (iObjectRegistry* r)
+{
+  csRef<iThreadManager> threadmgr = csPtr<iThreadManager> (new csThreadManager (r));
+  r->Register (threadmgr, "iThreadManager");
+  return threadmgr;
+}
+
 bool csInitializer::CreateInputDrivers (iObjectRegistry* r)
 {
   // Register some generic pseudo-plugins.  (Some day these should probably
@@ -179,8 +191,11 @@ bool csInitializer::CreateInputDrivers (iObjectRegistry* r)
 bool csInitializer::CreateStringSet (iObjectRegistry* r)
 {
   csRef<iStringSet> strings;
-  strings.AttachNew (new csScfStringSet ());
+  strings.AttachNew (new csScfStringSet);
   r->Register (strings, "crystalspace.shared.stringset");
+  csRef<iShaderVarStringSet> svStrings;
+  svStrings.AttachNew (new CS::ScfStringSet<iShaderVarStringSet> );
+  r->Register (svStrings, "crystalspace.shader.variablenameset");
   return true;
 }
 
@@ -232,6 +247,14 @@ iConfigManager* csInitializer::CreateConfigManager (iObjectRegistry* r)
   return Config;
 }
 
+iSystemOpenManager* csInitializer::CreateSystemOpenManager (iObjectRegistry* r)
+{
+  csRef<iSystemOpenManager> mgr;
+  mgr.AttachNew (new CS::Base::SystemOpenManager (r));
+  r->Register (mgr, "iSystemOpenManager");
+  return mgr;
+}
+
 static void SetupPluginLoadErrVerbosity(iObjectRegistry* r)
 {
   csRef<iVerbosityManager> verbosemgr (
@@ -248,8 +271,8 @@ iVFS* csInitializer::SetupVFS(iObjectRegistry* r, const char* pluginID)
   if (!VFS)
   {
     csRef<iPluginManager> plugin_mgr (csQueryRegistry<iPluginManager> (r));
-    csRef<iBase> b = csPtr<iBase> (plugin_mgr->QueryPlugin (
-      "iVFS", scfInterfaceTraits<iVFS>::GetVersion()));
+    csRef<iComponent> b = plugin_mgr->QueryPluginInstance (
+      "iVFS", scfInterfaceTraits<iVFS>::GetVersion());
     VFS = scfQueryInterfaceSafe<iVFS> (b);
   }
   if (!VFS)
@@ -347,6 +370,12 @@ bool csInitializer::SetupConfigManager (
     }
   }
 
+  // Init the threadmanager using this config.
+  {
+    csRef<iThreadManager> tman = csQueryRegistry<iThreadManager> (r);
+    tman->Init(Config);
+  }
+
   config_done = true;
   return true;
 }
@@ -399,9 +428,21 @@ bool csInitializer::RequestPlugins (
     }
     plugldr->RequestPlugin (plugName, intName);
   }
+  
+  csRef<iConfigManager> Config (csQueryRegistry<iConfigManager> (r));
+  plugldr->AddConfigurationPlugins (Config, "System.Plugins.");
+
+  csRef<iCommandLineParser> CommandLine (
+  	csQueryRegistry<iCommandLineParser> (r));
+  CS_ASSERT (CommandLine != 0);
+  plugldr->AddCommandLinePlugins (CommandLine);
 
   bool rc = plugldr->LoadPlugins ();
   delete plugldr;
+  
+  // flush all removed config files
+  Config->FlushRemoved();
+
   return rc;
 }
 

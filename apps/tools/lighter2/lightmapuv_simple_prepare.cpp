@@ -158,12 +158,14 @@ namespace lighter
 
   void SimpleUVFactoryLayouter::PrepareLighting (Statistics::Progress& progress)
   {
+    CS_ASSERT_MSG("You can only prepare a UV layouter once", !prepared);
+    prepared = true;
     progress.SetProgress (0);
 
     Statistics::Progress progressPDLQueues (0, 90, &progress);
     Statistics::Progress progressOntoGlobal (0, 1, &progress);
     Statistics::Progress progressNonPDL (0, 3, &progress);
-    size_t u, updateFreq;
+    size_t u = 0, updateFreq = 0;
     float progressStep;
 
     totalAffectedPrimCount = new csArray<size_t> ();
@@ -484,11 +486,11 @@ namespace lighter
         const QueuedPDPrimitives& queue = currentQueue.queue->Get (queueIndex);
         queue.layouter->LayoutQueuedPrims (*queue.prims, queue.layoutID,
           queue.groupNum, result.allocIndex, result.positions, 0, 0);
-        if (--u == 0)
-        {
-          progressNonPDL.IncProgress (progressStep);
-          u = updateFreq;
-        }
+      }
+      if (--u == 0)
+      {
+        progressNonPDL.IncProgress (progressStep);
+        u = updateFreq;
       }
     }
     progressNonPDL.SetProgress (1);
@@ -506,6 +508,18 @@ namespace lighter
       str.Format ("glm%zu", g);
       lm->GetAllocator().Dump (str);
 #endif
+    }
+
+    if (globalConfig.GetLighterProperties().directionalLMs)
+    {
+      size_t numLMs = globalLightmaps.GetSize();
+      for (size_t i = 0; i < 3; i++)
+      {
+        for (size_t g = 0; g < numLMs; g++)
+        {
+          globalLightmaps.Push (new Lightmap (*(globalLightmaps[g])));
+        }
+      }
     }
 
     progress.SetProgress (1);

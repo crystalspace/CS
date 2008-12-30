@@ -35,21 +35,23 @@
 #include "ivaria/terraform.h"
 
 struct iSector;
-struct iInstancingMeshState;
 class csMeshGenerator;
 struct csMGCell;
-
-#define USE_INSTANCING
 
 #define CS_GEOM_MAX_ROTATIONS 16
 
 /**
- * Per-vertex information for instancing.
+ * A representation of a single mesh. Can be either a stand-alone
+ * mesh or else an instance of a mesh.
  */
-struct csMGInstVertexInfo
+struct csMGMesh
 {
-  csRef<csShaderVariable> transformVar;
-  csRef<csShaderVariable> fadeFactorVar;
+  // A reference to either the standalone mesh or else the instmesh
+  // of which we represent a single instance.
+  csRef<iMeshWrapper> mesh;
+  // If this is equal to csArrayItemNotFound then we are a single mesh.
+  // Otherwise this is the id of the instance.
+  size_t instance_id;
 };
 
 /**
@@ -61,20 +63,17 @@ struct csMGGeom
   float maxdistance;
   float sqmaxdistance;
 
-#ifndef USE_INSTANCING
-  /// For every lod level we have a cache of meshes.
-  csRefArray<iMeshWrapper> mesh_cache;
   /**
-   * For every lod level we have a cache of meshes that are set aside.
-   * Setaside meshes are still associated with the original sector, while
-   * cached meshes aren't.
+   * If this geometry is derived from an instmesh then this is the
+   * pointer to the mesh from which we can create instances.
+   * Not used (null) in case we use a 'normal' mesh type.
    */
-  csRefArray<iMeshWrapper> mesh_setaside;
-#else
-  csMGInstVertexInfo vertexInfoArray;
-  csRef<iMeshWrapper> mesh;
-  csArray<csMGInstVertexInfo> vertexinfo_setaside;
-#endif
+  csRef<iMeshWrapper> instmesh;
+
+  /// For every lod level we have a cache of meshes.
+  csArray<csMGMesh> mesh_cache;
+  /// For every lod level we have a cache of meshes that are set aside.
+  csArray<csMGMesh> mesh_setaside;
 };
 
 struct csMGDensityMaterialFactor
@@ -111,11 +110,7 @@ private:
 
   csArray<csVector2> *positions;
   int celldim;
-  
-  csStringID colldetID;
 
-  void AddSVToMesh (iMeshWrapper* mesh, csShaderVariable* sv);
-  void SetMeshBBox (iMeshWrapper* mesh, const csBox3& bbox);
 public:
   csMeshGeneratorGeometry (csMeshGenerator* generator);
   virtual ~csMeshGeneratorGeometry ();
@@ -171,8 +166,8 @@ public:
    * It will also return an instance_id if the mesh represents an
    * instance from an instmesh.
    */
-  csPtr<iMeshWrapper> AllocMesh (int cidx, const csMGCell& cell,
-      float sqdist, size_t& lod, csMGInstVertexInfo& vertexInfo);
+  iMeshWrapper* AllocMesh (int cidx, const csMGCell& cell,
+      float sqdist, size_t& lod, size_t& instance_id);
 
   /**
    * Set aside the mesh temporarily. This is called if we have a mesh that
@@ -184,7 +179,7 @@ public:
    * haven't been reused.
    */
   void SetAsideMesh (int cidx, iMeshWrapper* mesh,
-      size_t lod, csMGInstVertexInfo& vertexInfo);
+      size_t lod, size_t instance_id);
 
   /**
    * Free all meshes that were put aside and that were not reused by
@@ -195,9 +190,8 @@ public:
   /**
    * Move the mesh to some position.
    */
-  void MoveMesh (int cidx, iMeshWrapper* mesh, size_t lod, 
-    csMGInstVertexInfo& vertexInfo, const csVector3& position, 
-    const csMatrix3& matrix);
+  void MoveMesh (int cidx, iMeshWrapper* mesh, size_t lod, size_t instance_id,
+      const csVector3& position, const csMatrix3& matrix);
 
   /**
    * Get the right lod level for the given squared distance.
@@ -209,10 +203,6 @@ public:
    * Check if this is the right mesh for the given LOD level.
    */
   bool IsRightLOD (float sqdist, size_t current_lod);
-
-#ifdef USE_INSTANCING
-  void UpdatePosition (const csVector3& pos);
-#endif
 };
 
 /**
@@ -249,11 +239,15 @@ struct csMGPosition
   iMeshWrapper* mesh;
   /// The LOD level for the mesh above.
   size_t lod;
+  /**
+   * If the mesh on this position is an instmesh then this
+   * number is the id of the instance. Otherwise this id will
+   * be csArrayItemNotFound.
+   */
+  size_t instance_id;
 
-  /// Vertex info for instancing.
-  csMGInstVertexInfo vertexInfo;
-
-  csMGPosition () : last_mixmode (CS_FX_COPY), mesh (0) { }
+  csMGPosition () : last_mixmode (CS_FX_COPY), mesh (0),
+		    instance_id (csArrayItemNotFound) { }
 };
 
 struct csMGCell;
@@ -350,7 +344,7 @@ private:
   float alpha_mindist, sq_alpha_mindist, alpha_maxdist;
   float alpha_scale;
 
-  csVector3 last_pos;
+  csVector2 last_pos;
 
   /**
    * If true the cells are correctly set up. This is cleared by
@@ -389,8 +383,7 @@ private:
    * the given position.
    * This function assumes the cell has a valid block.
    */
-  void AllocateMeshes (int cidx, csMGCell& cell, const csVector3& pos,
-    const csVector3& delta);
+  void AllocateMeshes (int cidx, csMGCell& cell, const csVector3& pos);
 
   /**
    * Generate the positions in the given block.
@@ -428,19 +421,18 @@ private:
   size_t CountPositions (int cidx, csMGCell& cell);
   size_t CountAllPositions ();
 
+protected:
+  void InternalRemove() { SelfDestruct(); }
+
 public:
   csEngine* engine;
-  csRef<iStringSet> strings;
   csStringID varTransform;
-  csStringID varFadeFactor;
 
   csMeshGenerator (csEngine* engine);
   virtual ~csMeshGenerator ();
 
   void SetSector (iSector* sector) { csMeshGenerator::sector = sector; }
   iSector* GetSector () { return sector; }
-  
-  csRef<iStringSet> GetStringSet () { return strings; }
 
   /**
    * Allocate blocks. This function will allocate all blocks needed

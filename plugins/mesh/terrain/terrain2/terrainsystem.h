@@ -32,8 +32,6 @@
 #include "iengine/engine.h"
 #include "iengine/lightmgr.h"
 #include "iengine/material.h"
-#include "iengine/shadcast.h"
-#include "imesh/lighting.h"
 #include "imesh/object.h"
 #include "imesh/terrain2.h"
 #include "iutil/comp.h"
@@ -77,6 +75,8 @@ public:
   {
     return dataFeeder;
   }
+
+  void CellSizeUpdate (csTerrainCell* cell);
 
   // ------------ iTerrainSystem implementation ------------
   virtual iTerrainCell* GetCell (const char* name, bool loadData = false);
@@ -125,13 +125,15 @@ public:
   virtual void RemoveCellLoadListener (iTerrainCellLoadCallback* cb);
 
   virtual void AddCellHeightUpdateListener (iTerrainCellHeightDataCallback* cb);
-  virtual void RemoveCellHeightUpdateListener (iTerrainCellHeightDataCallback* cb);  
+  virtual void RemoveCellHeightUpdateListener (
+      iTerrainCellHeightDataCallback* cb);  
 
   // ------------ iMeshObject implementation ------------
 
   virtual iMeshObjectFactory* GetFactory () const;
-  virtual CS::Graphics::RenderMesh** GetRenderMeshes (int& num, iRenderView* rview, 
-    iMovable* movable, uint32 frustum_mask);
+  virtual CS::Graphics::RenderMesh** GetRenderMeshes (
+      int& num, iRenderView* rview, iMovable* movable,
+      uint32 frustum_mask);
 
   virtual bool HitBeamOutline (const csVector3& start,
         const csVector3& end, csVector3& isect, float* pr);

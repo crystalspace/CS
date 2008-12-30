@@ -125,6 +125,9 @@ private:
   csRef<csEngineSequenceParameters> params;
   uint sequence_id;
 
+protected:
+  void InternalRemove() { SelfDestruct(); }
+
 public:
   csSequenceWrapper (csEngineSequenceManager* eseqmgr, iSequence* sequence,
       uint sequence_id);
@@ -149,8 +152,6 @@ public:
   		iSharedVariable* var, const csColor& c);
   virtual void AddOperationSetMaterial (csTicks time, iParameterESM* mesh,
 		iParameterESM* mat);
-  virtual void AddOperationSetPolygonMaterial (csTicks time,
-  		iParameterESM* polygon, iParameterESM* mat);
   virtual void AddOperationSetLight (csTicks time, iParameterESM* light,
 		  const csColor& color);
   virtual void AddOperationFadeLight (csTicks time, iParameterESM* light,
@@ -181,7 +182,7 @@ public:
 		int axis2, float tot_angle2,
 		int axis3, float tot_angle3,
 		const csVector3& offset,
-		csTicks duration);
+		csTicks duration, bool relative);
   virtual void AddOperationMoveDuration (csTicks time, iParameterESM* mesh,
 		const csVector3& offset,
 		csTicks duration);
@@ -259,6 +260,9 @@ private:
 
   int total_conditions;
   int fired_conditions;
+
+protected:
+  void InternalRemove() { SelfDestruct(); }
 
 public:
   csSequenceTrigger (csEngineSequenceManager* eseqmgr);
@@ -467,12 +471,11 @@ public:
     { }
     virtual bool HandleEvent (iEvent& e) 
     { return parent ? parent->HandleEvent(e) : false; }
-    CS_EVENTHANDLER_NAMES("crystalspace.utilities.sequence.engine")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
+    CS_EVENTHANDLER_PHASE_2D("crystalspace.utilities.sequence.engine")
   };
   csRef<EventHandler> eventHandler;
 
-  csEventID PostProcess;
+  csEventID Frame;
   csEventID MouseEvent;
 };
 

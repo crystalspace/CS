@@ -33,9 +33,9 @@ CS_IMPLEMENT_STATIC_CLASSVAR_REF(csMaterial, svNames, SVNames,
 
 void csMaterial::SetupSVNames()
 {
-  if (SVNames().diffuseTex == csInvalidStringID)
+  if ((CS::ShaderVarStringID)(SVNames().diffuseTex) == CS::InvalidShaderVarStringID)
   {
-    SVNames().diffuseTex = CS::ShaderVarName (engine->globalStringSet,
+    SVNames().diffuseTex = CS::ShaderVarName (engine->svNameStringSet,
       CS_MATERIAL_TEXTURE_DIFFUSE);
   }
 }
@@ -61,7 +61,7 @@ csMaterial::~csMaterial ()
 {
 }
 
-csShaderVariable* csMaterial::GetVar (csStringID name, bool create)
+csShaderVariable* csMaterial::GetVar (CS::ShaderVarStringID name, bool create)
 {
   csRef<csShaderVariable> var = 
     CS::ShaderVariableContextImpl::GetVariable (name);
@@ -79,14 +79,14 @@ void csMaterial::SetTextureWrapper (iTextureWrapper *tex)
 }
 
 
-iTextureWrapper* csMaterial::GetTextureWrapper (csStringID name)
+iTextureWrapper* csMaterial::GetTextureWrapper (CS::ShaderVarStringID name)
 {
   iTextureWrapper* tex;
   GetVar (name)->GetValue (tex);
   return tex;
 }
 
-void csMaterial::SetTextureWrapper (csStringID name, iTextureWrapper* tex)
+void csMaterial::SetTextureWrapper (CS::ShaderVarStringID name, iTextureWrapper* tex)
 {
   csShaderVariable* var = GetVar (name, true);
   var->SetValue (tex);
@@ -104,6 +104,18 @@ iShader* csMaterial::GetShader(csStringID type)
   return shaders.Get (type, (iShader*)0);
 }
 
+iShader* csMaterial::GetFirstShader (const csStringID* types,
+                                     size_t numTypes)
+{
+  iShader* s = 0;
+  for (size_t i = 0; i < numTypes; i++)
+  {
+    s = shaders.Get (types[i], (iShader*)0);
+    if (s != 0) break;
+  }
+  return s;
+}
+
 iTextureHandle *csMaterial::GetTexture ()
 {
   iTextureWrapper* tex;
@@ -112,7 +124,7 @@ iTextureHandle *csMaterial::GetTexture ()
   else return 0;
 }
 
-iTextureHandle* csMaterial::GetTexture (csStringID name)
+iTextureHandle* csMaterial::GetTexture (CS::ShaderVarStringID name)
 {
   iTextureWrapper* tex;
   csShaderVariable* var = GetVar (name);
@@ -231,6 +243,15 @@ iMaterialWrapper *csMaterialList::NewMaterial (iMaterial *material,
   return tm;
 }
 
+csPtr<iMaterialWrapper> csMaterialList::CreateMaterial (iMaterial* material,
+  	const char* name)
+{
+  csRef<iMaterialWrapper> tm;
+  tm.AttachNew (new csMaterialWrapper (this, material));
+  tm->QueryObject ()->SetName (name);
+  return csPtr<iMaterialWrapper>(tm);
+}
+
 int csMaterialList::Add (iMaterialWrapper *obj)
 {
   const char* name = obj->QueryObject ()->GetName ();
@@ -242,6 +263,7 @@ int csMaterialList::Add (iMaterialWrapper *obj)
 
 bool csMaterialList::Remove (iMaterialWrapper *obj)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
     mat_hash.Delete (name, obj);
@@ -251,6 +273,7 @@ bool csMaterialList::Remove (iMaterialWrapper *obj)
 
 bool csMaterialList::Remove (int n)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   iMaterialWrapper* obj = list[n];
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
@@ -261,6 +284,7 @@ bool csMaterialList::Remove (int n)
 
 void csMaterialList::RemoveAll ()
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   size_t i;
   for (i = 0 ; i < list.GetSize () ; i++)
     list[i]->QueryObject ()->RemoveNameChangeListener (listener);
@@ -275,5 +299,6 @@ int csMaterialList::Find (iMaterialWrapper *obj) const
 
 iMaterialWrapper *csMaterialList::FindByName (const char *Name) const
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return mat_hash.Get (Name, 0);
 }

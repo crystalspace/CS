@@ -31,6 +31,7 @@
  
 #include "csutil/scf.h"
 
+#include "csgeom/matrix4.h"
 #include "csgeom/transfrm.h"
 #include "csutil/flags.h"
 #include "csutil/strset.h"
@@ -41,10 +42,8 @@ struct iClipper2D;
 struct iGraphics2D;
 struct iHalo;
 struct iRenderBuffer;
-struct iRendererLightmap;
 struct iShader;
 struct iShaderVariableContext;
-struct iShaderVarStack;
 struct iTextureHandle;
 struct iTextureManager;
 
@@ -64,6 +63,7 @@ namespace CS
   } // namespace Graphics
 } // namespace CS
 class csRenderBufferHolder;
+class csShaderVariableStack;
 
 
 /**\name iGraphics3D::BeginDraw() flags
@@ -76,6 +76,8 @@ class csRenderBufferHolder;
 #define CSDRAW_CLEARZBUFFER 0x00000010
 /// Clear frame buffer ?
 #define CSDRAW_CLEARSCREEN  0x00000020
+/// Ignore clipping rectangle when clearing?
+#define CSDRAW_NOCLIPCLEAR  0x00000040
 /** @} */
 
 /**\name Type of clipper (for iGraphics3D::SetClipper())
@@ -146,10 +148,12 @@ enum csZBufMode
 // \todo Document me!
 #define CS_VATTRIB_SPECIFIC_FIRST    0
 #define CS_VATTRIB_SPECIFIC_LAST    15
+#define CS_VATTRIB_SPECIFIC_NUM     \
+  (CS_VATTRIB_SPECIFIC_LAST - CS_VATTRIB_SPECIFIC_FIRST + 1)
 #define CS_VATTRIB_GENERIC_FIRST   100
 #define CS_VATTRIB_GENERIC_LAST    (CS_VATTRIB_GENERIC_FIRST + 15)
-#define CS_IATTRIB_FIRST           200
-#define CS_IATTRIB_LAST            (CS_IATTRIB_FIRST + 0)
+#define CS_VATTRIB_GENERIC_NUM     \
+  (CS_VATTRIB_GENERIC_LAST - CS_VATTRIB_GENERIC_FIRST + 1)
 
 #define CS_VATTRIB_IS_GENERIC(va)   \
   ((va >= CS_VATTRIB_GENERIC_FIRST) && (va <=CS_VATTRIB_GENERIC_LAST))
@@ -218,11 +222,8 @@ enum csVertexAttrib
   CS_VATTRIB_12 = CS_VATTRIB_GENERIC_FIRST + 12,
   CS_VATTRIB_13 = CS_VATTRIB_GENERIC_FIRST + 13,
   CS_VATTRIB_14 = CS_VATTRIB_GENERIC_FIRST + 14,
-  CS_VATTRIB_15 = CS_VATTRIB_GENERIC_FIRST + 15,
+  CS_VATTRIB_15 = CS_VATTRIB_GENERIC_FIRST + 15
   //@}
-
-  /// Pseudo-instancing attribute: object-to-world matrix
-  CS_IATTRIB_OBJECT2WORLD = CS_IATTRIB_FIRST + 0
 };
 
 /**\name Mix mode: Types
@@ -470,8 +471,11 @@ struct csAlphaMode
   {
     /// Alpha mode to use when autoAlphaMode is \p false
     AlphaType alphaType;
-    /// Texture to retrieve the alpha mode from when autoAlphaMode is \p true
-    csStringID autoModeTexture;
+    /** 
+     * String ID for texture to retrieve the alpha mode from when autoAlphaMode
+     * is \p true
+     */
+    CS::StringIDValue autoModeTexture;
   };
 };
 /** @} */
@@ -711,6 +715,8 @@ struct csSimpleRenderMesh
    *  effect, too.
    */
   csReversibleTransform object2world;
+  /// (Optional) Buffer holder with all vertex buffers.
+  csRef<csRenderBufferHolder> renderBuffers;
 
   csSimpleRenderMesh () : indexCount(0), indices(0), texcoords(0), colors(0), 
     texture (0), shader (0), dynDomain (0), z_buf_mode (CS_ZBUF_NONE), 
@@ -720,6 +726,45 @@ struct csSimpleRenderMesh
     alphaType.autoModeTexture = csInvalidStringID;
   };
 };
+
+/**
+ * Render target attachment - selects which result of the rasterization gets
+ * output to the given texture when setting a render target.
+ */
+enum csRenderTargetAttachment
+{
+  /// Depth
+  rtaDepth,
+  /// Color
+  rtaColor0,
+
+  /// Number of supported attachments
+  rtaNumAttachments
+};
+
+namespace CS
+{
+  namespace Graphics
+  {
+    struct TextureComparisonMode
+    {
+      enum Mode
+      {
+        compareNone,
+        compareR
+      };
+      Mode mode;
+      enum Function
+      {
+        funcLEqual,
+        funcGEqual
+      };
+      Function function;
+      
+      TextureComparisonMode() : mode (compareNone), function (funcLEqual) {}
+    };
+  } // namespace Graphics
+} // namespace CS
 
 /**
  * This is the standard 3D graphics interface.
@@ -737,7 +782,7 @@ struct csSimpleRenderMesh
  */
 struct iGraphics3D : public virtual iBase
 {
-  SCF_INTERFACE(iGraphics3D, 2, 1, 1);
+  SCF_INTERFACE(iGraphics3D, 4, 0, 0);
   
   /// Open the 3D graphics display.
   virtual bool Open () = 0;
@@ -761,7 +806,11 @@ struct iGraphics3D : public virtual iBase
    */
   virtual iTextureManager *GetTextureManager () = 0;
 
-  /// Change the dimensions of the display.
+  /**
+   * Change the dimensions of the display.
+   * \deprecated Deprecated in 1.3. 
+   */
+  CS_DEPRECATED_METHOD
   virtual void SetDimensions (int width, int height) = 0;
   /// Get drawing buffer width.
   virtual int GetWidth () const = 0;
@@ -780,6 +829,7 @@ struct iGraphics3D : public virtual iBase
    *   space, i.e. y=0 is at the bottom of the viewport, y=GetHeight() at the 
    *   top.
    */
+  CS_DEPRECATED_METHOD_MSG("Use explicit projection matrix instead")
   virtual void SetPerspectiveCenter (int x, int y) = 0;
 
   /**
@@ -788,39 +838,81 @@ struct iGraphics3D : public virtual iBase
    *   space, i.e. y=0 is at the bottom of the viewport, y=GetHeight() at the 
    *   top.
    */
+  CS_DEPRECATED_METHOD_MSG("Use explicit projection matrix instead")
   virtual void GetPerspectiveCenter (int& x, int& y) const = 0;
 
   /**
    * Set aspect ratio for perspective projection.
    */
+  CS_DEPRECATED_METHOD_MSG("Use explicit projection matrix instead")
   virtual void SetPerspectiveAspect (float aspect) = 0;
 
   /// Get aspect ratio.
+  CS_DEPRECATED_METHOD_MSG("Use explicit projection matrix instead")
   virtual float GetPerspectiveAspect () const = 0;
  
   /**
-   * Set the target of rendering. If this is 0 then the target will
-   * be the main screen. Otherwise it is a texture. After calling
-   * g3d->FinishDraw() the target will automatically be reset to 0 (main
-   * screen). Note that on some implementions rendering on a texture
-   * will overwrite the screen. So you should only do this BEFORE you
-   * start rendering your frame.
-   * <p>
+   * Set the target of rendering for a certain rasterization result.
+   * If all result attachments have a 0 target rendering is performed to the
+   * framebuffer (ie main screen). If at least one texture is attached
+   * rendering is performed off-screen to the given texture(s).
+   * After calling FinishDraw() the targets will automatically be unset. 
+   * Note that on some implementions rendering on a texture
+   * will overwrite the framebuffer contents. So you should only do this 
+   * BEFORE you start rendering your frame.
+   *
    * \param persistent If this is true then the current contents of the texture
-   * will be copied on screen before drawing occurs (in the first
-   * call to BeginDraw). Otherwise it is assumed that you fully render
-   * the texture.
+   *   will be preserved when drawing occurs (in the first call to BeginDraw). 
+   *   Otherwise it is assumed that you fully render the texture - untouched 
+   *   parts may be undefined. Using persistence may incur a performance
+   *   penalty so it's recommended to avoid this flag.
    * \param subtexture this specifies the subtexture index if the texture
-   * is a cubemap. It is in the range 0 to 5.
+   *   is a cubemap or volume texture. It is in the range 0 to 5 for cubemaps
+   *   (\sa iTextureHandle::CS_TEXTURE_CUBE_POS_X et al) or the depth index
+   *   for volume textures.
+   * \param attachment Specifies to what result of the rasterization the
+   *   texture should be attached to.
+   * \returns Whether setting the render target was successful. However, even
+   *   if 'true' is returned, it may be possible that rendering to the eventual
+   *   set of render targets is \em not possible. Only if ValidateRenderTargets
+   *   returns 'true' the set of targets can really be used as a render target.
+   * \sa UnsetRenderTargets
    */
-  virtual void SetRenderTarget (iTextureHandle* handle,
+  virtual bool SetRenderTarget (iTextureHandle* handle,
 	bool persistent = false,
-	int subtexture = 0) = 0;
+	int subtexture = 0,
+	csRenderTargetAttachment attachment = rtaColor0) = 0;
+
+  /**
+   * Check if the current set of render targets is valid.
+   * \returns Whether the current set of render targets is valid and useable. 
+   *   Reasons for invalidity/unusability can include:
+   *   - The hardware or driver does not support the given attachment with
+   *     the given texture or not at all.
+   *   - The dimensions of the various attachments don't match.
+   */
+  virtual bool ValidateRenderTargets () = 0;
+	
+  /**
+   * Check if a texture with the given format can be set as a render target for
+   * the given attachment.
+   * \remarks Texture formats may be reported as supported even though textures
+   *   with that format can't be created.
+   */
+  virtual bool CanSetRenderTarget (const char* format,
+    csRenderTargetAttachment attachment = rtaColor0) = 0;
 
   /**
    * Get the current render target (0 for screen).
+   * \param attachment The attachment for which to return the render target.
+   * \param subtexture Optionally returns the subtexture index.
    */
-  virtual iTextureHandle* GetRenderTarget () const = 0;
+  virtual iTextureHandle* GetRenderTarget (
+    csRenderTargetAttachment attachment = rtaColor0,
+    int* subtexture = 0) const = 0;
+  
+  /// Clear render targets for all rasterization result attachments.
+  virtual void UnsetRenderTargets() = 0;
 
   /// Start a new frame (see CSDRAW_XXX bit flags)
   virtual bool BeginDraw (int DrawFlags) = 0;
@@ -838,7 +930,7 @@ struct iGraphics3D : public virtual iBase
   /// Drawroutine. Only way to draw stuff
   virtual void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
                          const CS::Graphics::RenderMeshModes& modes,
-                         const iShaderVarStack* stacks) = 0;
+                         const csShaderVariableStack& stack) = 0;
   /**
   * Draw a csSimpleRenderMesh on the screen.
   * Simple render meshes are intended for cases where setting up
@@ -902,7 +994,8 @@ struct iGraphics3D : public virtual iBase
 
   /**
   * Activate or deactivate all given textures depending on the value
-  * of 'textures' for that unit (i.e. deactivate if 0).
+  * of the entry of \a textures for that unit (i.e. deactivate if 0). 
+  * If \a textures itself is 0 all specified units are deactivated.
   */
   virtual void SetTextureState (int* units, iTextureHandle** textures,
     int count) = 0;
@@ -971,10 +1064,16 @@ struct iGraphics3D : public virtual iBase
   /// Get the z buffer write/test mode
   virtual csZBufMode GetZMode () = 0;
 
-  /// Enables offsetting of Z values
+  /**
+   * \deprecated Deprecated in 1.3.
+   */
+  CS_DEPRECATED_METHOD_MSG("Nonfunctional. Use RenderMeshModes::zoffset instead")
   virtual void EnableZOffset () = 0;
 
-  /// Disables offsetting of Z values
+  /**
+   * \deprecated Deprecated in 1.3.
+   */
+  CS_DEPRECATED_METHOD_MSG("Nonfunctional. Use RenderMeshModes::zoffset instead")
   virtual void DisableZOffset () = 0;
 
   /// Controls shadow drawing
@@ -1005,13 +1104,6 @@ struct iGraphics3D : public virtual iBase
   /// Create a halo of the specified color and return a handle.
   virtual iHalo *CreateHalo (float iR, float iG, float iB,
     unsigned char *iAlpha, int iWidth, int iHeight) = 0;
-
-  /**
-   * Remove some polygon from the cache.
-   * You have to call this function before deleting a polygon
-   * (csPolygon3D destructor will do that).
-   */
-  virtual void RemoveFromCache (iRendererLightmap* rlm) = 0;
 
   /**
    * Set the world to camera transform.
@@ -1045,6 +1137,19 @@ struct iGraphics3D : public virtual iBase
    * Get the current drawflags
    */
   virtual int GetCurrentDrawFlags() const = 0;
+  
+  virtual const CS::Math::Matrix4& GetProjectionMatrix() = 0;
+  /**
+   * Set the projection matrix to use.
+   */
+  virtual void SetProjectionMatrix (const CS::Math::Matrix4& m) = 0;
+
+  /**
+   * Set the texture comparison modes for the given texture units.
+   */
+  virtual void SetTextureComparisonModes (int* units, 
+    CS::Graphics::TextureComparisonMode* texCompare,
+    int count) = 0;
 };
 
 /** @} */

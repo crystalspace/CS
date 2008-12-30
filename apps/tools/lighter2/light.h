@@ -19,10 +19,12 @@
 #ifndef __LIGHT_H__
 #define __LIGHT_H__
 
+#include "lighter.h"
 #include "raytracer.h"
 
 namespace lighter
 {
+  class Light;
   class Raytracer;
   class Sector;
   struct HitIgnoreCallback;
@@ -32,28 +34,65 @@ namespace lighter
   
   class VisibilityTester
   {
+    static size_t rayID;
   public:
-    VisibilityTester ();
+    VisibilityTester (Light* light, Object* obj);
 
-    bool Unoccluded (const Primitive* ignorePrim = 0);
-    bool Unoccluded (HitIgnoreCallback* ignoreCB);
+    enum OcclusionState
+    {
+      occlOccluded,
+      occlUnoccluded,
+      occlPartial
+    };
+    OcclusionState Occlusion (const Object* ignoreObject,
+      const Primitive* ignorePrim = 0);
+    OcclusionState Occlusion (const Object* ignoreObject,
+      HitIgnoreCallback* ignoreCB);
 
-    void CollectHits (HitPointCallback* hitCB, HitIgnoreCallback* ignoreCB);
+    
+    csColor GetFilterColor ();
+
+    //void CollectHits (HitPointCallback* hitCB, HitIgnoreCallback* ignoreCB);
 
     void AddSegment (KDTree* tree, const csVector3& start, const csVector3& end);
     void AddSegment (KDTree* tree, const csVector3& start, const csVector3& dir, float maxL);
+    
+    void Clear() { allSegments.DeleteAll(); }
 
   private:
+    // for RayDebugHelper
+    Light* light;
+    Object* obj;
+
     struct Segment
     {
       KDTree* tree;
       Ray ray;
     };
     csArray<Segment> allSegments;
+
+    csArray<HitPoint> transparentHits;
+    struct HitCallback : public HitPointCallback
+    {
+      VisibilityTester& parent;
+      HitCallback (VisibilityTester& parent) : parent (parent) {}
+  
+      bool RegisterHit (const Ray &ray, const HitPoint &hit)
+      {
+        globalLighter->rayDebug.RegisterHit (parent.light, parent.obj, 
+          ray, hit);
+        if (hit.kdFlags & KDPRIM_FLAG_TRANSPARENT)
+        {
+          parent.transparentHits.Push (hit);
+          return true;
+        }
+        return false;
+      }
+    };
   };
 
   typedef float(*LightAttenuationFunc)(float squaredDistance, 
-    const csVector3& constants);
+    const csVector4& constants);
 
   /// Baseclass for lights
   class Light : public csRefCount
@@ -85,7 +124,7 @@ namespace lighter
     virtual csVector3 GetLightSamplePosition (float u1, float u2) = 0;
 
     // Properties
-    void SetAttenuation (csLightAttenuationMode mode, const csVector3& constants);
+    void SetAttenuation (csLightAttenuationMode mode, const csVector4& constants);
 
     // Getters/setters
     
@@ -151,6 +190,16 @@ namespace lighter
       return lightFrustum;
     }
 
+    inline const csString& GetName () const
+    {
+      return name;
+    }
+
+    inline void SetName (const char* name)
+    {
+      this->name = name;
+    }
+
     /**
      * If the light is a proxy, returns the pointer to the "original" light.
      * If the light is not a proxy simply returns pointer to itself.
@@ -172,7 +221,7 @@ namespace lighter
 
     // Atteunation related
     csLightAttenuationMode attenuationMode;
-    csVector3 attenuationConsts;
+    csVector4 attenuationConsts;
     LightAttenuationFunc attenuationFunc;
 
     // Common properties
@@ -181,6 +230,7 @@ namespace lighter
     csColor color;
     csMD5::Digest lightId;
     csSphere boundingSphere;
+    csString name;
 
     csFrustum lightFrustum;
 
@@ -225,7 +275,7 @@ namespace lighter
 
     float radius;
   };
-
+  
   // Proxy light, used when light source is in different sector
   class ProxyLight : public Light
   {

@@ -1,0 +1,8 @@
+<library>
+    <textures />
+    <materials />
+    <meshfact name="particlesFactory">
+        <plugin>particlesFact</plugin>
+        <params />
+    </meshfact>
+</library>

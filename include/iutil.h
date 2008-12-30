@@ -17,7 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/**\file 
+/**@file 
  * Directory master header. This header file includes all headers in a
  * subdirectory of the top Crystal Space include directory.
  */
@@ -39,6 +39,7 @@
 #include "iutil/eventhandlers.h"
 #include "iutil/eventnames.h"
 #include "iutil/eventq.h"
+#include "iutil/hiercache.h"
 #include "iutil/job.h"
 #include "iutil/kitchensink.h"
 #include "iutil/memdebug.h"
@@ -51,6 +52,8 @@
 #include "iutil/string.h"
 #include "iutil/stringarray.h"
 #include "iutil/strset.h"
+#include "iutil/systemopenmanager.h"
+#include "iutil/threadmanager.h"
 #include "iutil/timer.h"
 #include "iutil/verbositymanager.h"
 #include "iutil/vfs.h"

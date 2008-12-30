@@ -26,7 +26,6 @@
 
 #include "csutil/csstring.h"
 
-//---------------------------------------------------------------------------
 const csBox2::bEdge csBox2::edges[8] =
 {
   { CS_BOX_CORNER_xy, CS_BOX_CORNER_Xy },
@@ -39,10 +38,10 @@ const csBox2::bEdge csBox2::edges[8] =
   { CS_BOX_CORNER_xy, CS_BOX_CORNER_xY }
 };
 
-csString csBox2::Description() const
+csString csBox2::Description () const
 {
   csString s;
-  s.Format("(%g,%g)-(%g,%g)", MinX(), MinY(), MaxX(), MaxY());
+  s.Format ("(%g,%g)-(%g,%g)", MinX (), MinY (), MaxX (), MaxY ());
   return s;
 }
 
@@ -325,8 +324,6 @@ float csBox2::SquaredPosMaxDist (const csVector2& pos) const
   return res;
 }
 
-//---------------------------------------------------------------------------
-
 /*
  * We have a coordinate system around our box which is
  * divided into 27 regions. The center region at coordinate (1,1,1)
@@ -456,11 +453,11 @@ const csBox3::bFace csBox3:: faces[6] =
       CS_BOX_EDGE_XyZ_XYZ }
 };
 
-csString csBox3::Description() const
+csString csBox3::Description () const
 {
   csString s;
   s.Format("(%g,%g,%g)-(%g,%g,%g)",
-    MinX(), MinY(), MinZ(), MaxX(), MaxY(), MaxZ());
+    MinX (), MinY (), MinZ (), MaxX (), MaxY (), MaxZ ());
   return s;
 }
 
@@ -854,7 +851,7 @@ float csBox3::SquaredPosMaxDist (const csVector3& pos) const
 // it is used below the result is acceptable because it generates a
 // conservative result (i.e. a box or outline that is bigger then reality).
 static void PerspectiveWrong (const csVector3& v, csVector2& p, float fov,
-    	float sx, float sy)
+  float sx, float sy)
 {
   float iz = fov * 10;
   p.x = v.x * iz + sx;
@@ -937,8 +934,7 @@ bool csBox3::ProjectBox (const csTransform& trans, float fov,
 }
 
 bool csBox3::ProjectOutline (const csVector3& origin,
-	int axis, float where,
-  	csArray<csVector2>& poly) const
+	int axis, float where, csArray<csVector2>& poly) const
 {
   int idx = CalculatePointSegment (origin);
   const Outline &ol = outlines[idx];
@@ -964,8 +960,7 @@ bool csBox3::ProjectOutline (const csVector3& origin,
 }
 
 bool csBox3::ProjectOutline (const csVector3& origin,
-	int axis, float where,
-  	csPoly2D& poly) const
+	int axis, float where, csPoly2D& poly) const
 {
   int idx = CalculatePointSegment (origin);
   const Outline &ol = outlines[idx];
@@ -990,8 +985,7 @@ bool csBox3::ProjectOutline (const csVector3& origin,
 }
 
 bool csBox3::ProjectOutline (const csTransform& trans, float fov,
-	float sx, float sy,
-  	csPoly2D& poly, float& min_z, float& max_z) const
+	float sx, float sy, csPoly2D& poly, float& min_z, float& max_z) const
 {
   const csVector3& origin = trans.GetOrigin ();
   int idx = CalculatePointSegment (origin);
@@ -1022,8 +1016,8 @@ bool csBox3::ProjectOutline (const csTransform& trans, float fov,
 }
 
 bool csBox3::ProjectBoxAndOutline (const csTransform& trans, float fov,
-	float sx, float sy, csBox2& sbox,
-  	csPoly2D& poly, float& min_z, float& max_z) const
+	float sx, float sy, csBox2& sbox, csPoly2D& poly,
+  float& min_z, float& max_z) const
 {
   const csVector3& origin = trans.GetOrigin ();
   int idx = CalculatePointSegment (origin);
@@ -1053,6 +1047,95 @@ bool csBox3::ProjectBoxAndOutline (const csTransform& trans, float fov,
     }
   }
   return max_z >= .1;
+}
+
+static void Perspective (const csVector3& v, csVector2& p,
+  const CS::Math::Matrix4& proj, int screenWidth, int screenHeight)
+{
+  csVector4 v_proj (proj * csVector4 (v, 1));
+  float inv_w = 1.0f/v_proj.w;
+  p.x = (v_proj.x * inv_w + 1) * screenWidth/2;
+  p.y = (v_proj.y * inv_w + 1) * screenHeight/2;
+}
+
+// Version to cope with z <= 0. This is wrong but it in the places where
+// it is used below the result is acceptable because it generates a
+// conservative result (i.e. a box or outline that is bigger then reality).
+static void PerspectiveWrong (const csVector3& v, csVector2& p,
+  const CS::Math::Matrix4& proj, int screenWidth, int screenHeight)
+{
+  csVector3 v_new (v.x, v.y, 0.1f);
+  Perspective (v_new, p, proj, screenWidth, screenHeight);
+}
+
+bool csBox3::ProjectBox (const csTransform& trans, 
+  const CS::Math::Matrix4& projection, csBox2& sbox,
+  float& min_z, float& max_z, int screenWidth, int screenHeight) const
+{
+  const csVector3& origin = trans.GetOrigin ();
+  int idx = CalculatePointSegment (origin);
+  const Outline &ol = outlines[idx];
+  int num_array = MIN (ol.num, 6);
+
+  csBox3 cbox (trans * GetCorner (ol.vertices[0]));
+  int i;
+  // We go to 8 so that we can calculate the correct min_z/max_z.
+  // If we only go to num_array we will only calculate min_z/max_z
+  // for the outine vertices.
+  for (i = 1; i < 8; i++)
+  {
+    csVector3 v = trans * GetCorner (ol.vertices[i]);
+    if (i < num_array)
+    {
+      cbox.AddBoundingVertexSmart (v);
+      min_z = cbox.MinZ ();
+      max_z = cbox.MaxZ ();
+    }
+    else
+    {
+      if (v.z < min_z) min_z = v.z;
+      if (v.z > max_z) max_z = v.z;
+    }
+  }
+
+  if (max_z < 0.01) return false;
+
+// @@@ In theory we can optimize here again by calling CalculatePointSegment
+// again for the new box and the 0,0,0 point. By doing that we could
+// avoid doing four perspective projections.
+
+  // If z < .1 we do conservative clipping. Not correct but it will generate
+  // a box that is bigger then the real one which is ok for testing culling.
+  csVector2 oneCorner;
+  if (cbox.Max ().z < .1)
+    PerspectiveWrong (cbox.Max (), oneCorner, projection, 
+      screenWidth, screenHeight);
+  else
+    Perspective (cbox.Max (), oneCorner, projection, screenWidth, screenHeight);
+  sbox.StartBoundingBox (oneCorner);
+
+  csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
+  if (v.z < .1)
+    PerspectiveWrong (v, oneCorner, projection, screenWidth, screenHeight);
+  else
+    Perspective (v, oneCorner, projection, screenWidth, screenHeight);
+  sbox.AddBoundingVertexSmart (oneCorner);
+
+  if (cbox.Min ().z < .1)
+    PerspectiveWrong (cbox.Min (), oneCorner, projection, 
+      screenWidth, screenHeight);
+  else
+    Perspective (cbox.Min (), oneCorner, projection, screenWidth, screenHeight);
+  sbox.AddBoundingVertexSmart (oneCorner);
+
+  v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
+  if (v.z < .1)
+    PerspectiveWrong (v, oneCorner, projection, screenWidth, screenHeight);
+  else
+    Perspective (v, oneCorner, projection, screenWidth, screenHeight);
+  sbox.AddBoundingVertexSmart (oneCorner);
+
+  return true;
 }
 
 csBox3 &csBox3::operator+= (const csBox3 &box)
@@ -1113,23 +1196,23 @@ csBox3 operator+ (const csBox3 &box1, const csBox3 &box2)
 csBox3 operator+ (const csBox3 &box, const csVector3 &point)
 {
   return csBox3 (
-      MIN (box.minbox.x, point.x),
-      MIN (box.minbox.y, point.y),
-      MIN (box.minbox.z, point.z),
-      MAX (box.maxbox.x, point.x),
-      MAX (box.maxbox.y, point.y),
-      MAX (box.maxbox.z, point.z));
+    MIN (box.minbox.x, point.x),
+    MIN (box.minbox.y, point.y),
+    MIN (box.minbox.z, point.z),
+    MAX (box.maxbox.x, point.x),
+    MAX (box.maxbox.y, point.y),
+    MAX (box.maxbox.z, point.z));
 }
 
 csBox3 operator * (const csBox3 &box1, const csBox3 &box2)
 {
   return csBox3 (
-      MAX (box1.minbox.x, box2.minbox.x),
-      MAX (box1.minbox.y, box2.minbox.y),
-      MAX (box1.minbox.z, box2.minbox.z),
-      MIN (box1.maxbox.x, box2.maxbox.x),
-      MIN (box1.maxbox.y, box2.maxbox.y),
-      MIN (box1.maxbox.z, box2.maxbox.z));
+    MAX (box1.minbox.x, box2.minbox.x),
+    MAX (box1.minbox.y, box2.minbox.y),
+    MAX (box1.minbox.z, box2.minbox.z),
+    MIN (box1.maxbox.x, box2.maxbox.x),
+    MIN (box1.maxbox.y, box2.maxbox.y),
+    MIN (box1.maxbox.z, box2.maxbox.z));
 }
 
 bool operator== (const csBox3 &box1, const csBox3 &box2)
@@ -1175,7 +1258,5 @@ bool operator < (const csVector3 &point, const csBox3 &box)
 {
   return (point.x >= box.minbox.x) && (point.x <= box.maxbox.x) &&
     (point.y >= box.minbox.y) && (point.y <= box.maxbox.y) &&
-      (point.z >= box.minbox.z) && (point.z <= box.maxbox.z);
+    (point.z >= box.minbox.z) && (point.z <= box.maxbox.z);
 }
-
-//---------------------------------------------------------------------------

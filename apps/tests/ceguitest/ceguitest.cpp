@@ -36,7 +36,7 @@ CEGUITest::~CEGUITest()
 {
 }
 
-void CEGUITest::ProcessFrame()
+void CEGUITest::Frame()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -102,12 +102,6 @@ void CEGUITest::ProcessFrame()
   cegui->Render ();
 }
 
-void CEGUITest::FinishFrame()
-{
-  g3d->FinishDraw ();
-  g3d->Print (0);
-}
-
 bool CEGUITest::OnInitialize(int /*argc*/, char* /*argv*/ [])
 {
   if (!csInitializer::RequestPlugins(GetObjectRegistry(),
@@ -133,6 +127,7 @@ bool CEGUITest::OnInitialize(int /*argc*/, char* /*argv*/ [])
 
 void CEGUITest::OnExit()
 {
+  printer.Invalidate ();
 }
 
 bool CEGUITest::Application()
@@ -194,16 +189,14 @@ bool CEGUITest::Application()
   btn->subscribeEvent(CEGUI::PushButton::EventClicked,
     CEGUI::Event::Subscriber(&CEGUITest::OnExitButtonClicked, this));
 
-  // First disable the lighting cache. Our app is simple enough
-  // not to need this.
-  engine->SetLightingCacheMode (0);
-
   // These are used store the current orientation of the camera.
   rotY = rotX = 0;
 
   view.AttachNew(new csView (engine, g3d));
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle(0, 0, g2d->GetWidth(), g2d->GetHeight ());
+
+  printer.AttachNew (new FramePrinter (object_reg));
 
   CreateRoom();
   view->GetCamera()->SetSector (room);
@@ -262,10 +255,6 @@ void CEGUITest::CreateRoom ()
   // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
       engine, room, "walls", "walls_factory", &box);
-
-  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
-    iGeneralMeshState> (walls->GetMeshObject ());
-  mesh_state->SetShadowReceiving (true);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   csRef<iLight> light;
@@ -284,6 +273,9 @@ void CEGUITest::CreateRoom ()
   ll->Add (light);
 
   engine->Prepare ();
+
+  using namespace CS::Lighting;
+  SimpleStaticLighter::ShineLights (room, engine, 4);
 }
 
 

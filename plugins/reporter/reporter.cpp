@@ -147,6 +147,7 @@ void csReporter::ReportV (int severity, const char* msgId,
     msg.buf = buf;
     msg.msgID = msgId;
     msg.severity = severity;
+    CS::Threading::RecursiveMutexScopedLock mqlock (messageQueueMutex);
     messageQueue.Push (msg);
     return;
   }
@@ -167,10 +168,14 @@ void csReporter::ReportV (int severity, const char* msgId,
   ActualReport (copy, severity, msgId, buf);
 
   size_t n = 0;
+  CS::Threading::RecursiveMutexScopedLock mqlock (messageQueueMutex);
   while (n < messageQueue.GetSize())
   {
-    const ReportedMessage& msg = messageQueue[n];
+    // Copy to protect against memory being reallocated
+    ReportedMessage msg (messageQueue[n]);
+    messageQueueMutex.Unlock ();
     ActualReport (copy, msg.severity, msg.msgID, msg.buf);
+    messageQueueMutex.Lock ();
     n++;
   }
   messageQueue.DeleteAll();

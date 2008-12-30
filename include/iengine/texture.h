@@ -175,16 +175,26 @@ struct iTextureWrapper : public virtual iBase
  */
 struct iTextureList : public virtual iBase
 {
-  SCF_INTERFACE (iTextureList, 1, 0, 0);
+  SCF_INTERFACE (iTextureList, 2, 0, 0);
 
   /// Create a new texture.
   virtual iTextureWrapper *NewTexture (iImage *image) = 0;
+
+  // Create a new texture but don't add it to the engine list.
+  virtual csPtr<iTextureWrapper> CreateTexture (iImage *image) = 0;
 
   /**
    * Create a engine wrapper for a pre-prepared iTextureHandle
    * The handle will be IncRefed.
    */
   virtual iTextureWrapper *NewTexture (iTextureHandle *ith) = 0;
+
+  /**
+   * Create a engine wrapper for a pre-prepared iTextureHandle
+   * The handle will be IncRefed. The texture won't be added to
+   * the engine list.
+   */
+  virtual csPtr<iTextureWrapper> CreateTexture (iTextureHandle *ith) = 0;
 
   /// Return the number of textures in this list.
   virtual int GetCount () const = 0;

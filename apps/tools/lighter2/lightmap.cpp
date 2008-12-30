@@ -30,6 +30,13 @@ namespace lighter
     lightmapAllocator.SetGrowPO2 (true);
   }
 
+  Lightmap::Lightmap (const Lightmap& other) : colorArray (0), 
+    width (other.width), height (other.height),
+    lightmapAllocator (other.lightmapAllocator.GetRectangle()), texture (0)
+  {
+    lightmapAllocator.SetGrowPO2 (other.lightmapAllocator.GetGrowPO2());
+  }
+
   Lightmap::~Lightmap ()
   {
     Lock();
@@ -215,6 +222,8 @@ namespace lighter
 
   bool Lightmap::IsOneColor (float threshold, csColor& color)
   {
+    ScopedSwapLock<Lightmap> l (*this);
+
     if ((width == 1) && (height == 1))
     {
       color = colorArray[0];
@@ -301,7 +310,39 @@ namespace lighter
   }
 
   //-------------------------------------------------------------------------
-
+  
+  void DirectionMap::Normalize()
+  {
+    ScopedSwapLock<DirectionMap> l (*this);
+    
+    const size_t directionsArraySize = width*height;
+    
+    for (size_t i = 0; i < directionsArraySize; i++)
+    {
+      csVector3& v = mapData[i];
+      if (!v.IsZero()) v.Normalize();
+    }
+  }
+  
+  void DirectionMap::AddFromLightInfluences (const LightInfluences& influences)
+  {
+    ScopedSwapLock<DirectionMap> l (*this);
+    ScopedSwapLock<LightInfluences> l2 (influences);
+    
+    uint inflW = csMin (influences.GetWidth(), width-influences.GetXOffset());
+    uint inflH = csMin (influences.GetHeight(), height-influences.GetYOffset());
+    for (uint y = 0; y < inflH; y++)
+    {
+      for (uint x = 0; x < inflW; x++)
+      {
+        mapData[(x+influences.GetXOffset())+width*(y+influences.GetYOffset())]
+          += influences.GetDirectionForLocalCoord (x, y);
+      }
+    }
+  }
+  
+  //-------------------------------------------------------------------------
+  
   void LightmapPostProcess::AddAmbientTerm (csColor* colors, 
                                             size_t numColors, 
                                             const csColor amb)

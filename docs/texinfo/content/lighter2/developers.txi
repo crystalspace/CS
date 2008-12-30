@@ -24,7 +24,7 @@ object options respectively a @samp{meshfact} node for mesh factory options.
 
 Here, @samp{name="lighter2"} is used by @code{lighter2} to identify keys 
 containing options.  @samp{editoronly="yes"} instructs the engine to discard
-the key-value-pait during normal execution in order to conserve memory (since
+the key-value-pair during normal execution in order to conserve memory (since
 the @code{lighter2}-specific settings are simply not needed).  The actual
 options are specified by a number of @samp{@emph{option}=@emph{value}} pairs.
 
@@ -40,4 +40,10 @@ Enable per-vertex lighting.
 Values: floating point values
 
 Control lightmap density.
+
+@item noselfshadow
+Values: @samp{yes}, @samp{no}
+
+Disables casting of shadows from an object onto itself.
+
 @end table

@@ -96,7 +96,7 @@ csObject::csObject (iBase* pParent)
 }
 
 csObject::csObject (csObject &o) 
-  : iBase(), scfImplementationType (this),  Children (0), Name (0)
+  : iBase(), scfImplementationType (this), Children (0), Name (0)
 {
   InitializeObject ();
 

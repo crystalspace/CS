@@ -97,20 +97,8 @@ bool OSXDriver2D::Initialize(iObjectRegistry *reg)
 bool OSXDriver2D::Open()
 {
     // Copy original values
-    origWidth = canvas->Width;
-    origHeight = canvas->Height;
-
-        // Set up pixel format
-    if (canvas->Depth == 32)
-        Initialize32();
-    else if (canvas->Depth == 16)
-        Initialize16();
-    else
-    {
-        csFPrintf(stderr, "Depth %d not supported in CGDriver2D yet",
-	    canvas->Depth);
-        return false;
-    }
+    origWidth = canvas->fbWidth;
+    origHeight = canvas->fbHeight;
 
     // Switch to fullscreen mode if necessary
     if (canvas->FullScreen == true)
@@ -119,7 +107,7 @@ bool OSXDriver2D::Open()
 
     // Create window
     if (OSXDelegate2D_openWindow(delegate, canvas->win_title.GetData(),
-	canvas->Width, canvas->Height, canvas->Depth,
+	canvas->fbWidth, canvas->fbHeight, canvas->Depth,
 	canvas->FullScreen, display, screen) == false)
         return false;
 
@@ -198,41 +186,13 @@ void OSXDriver2D::ShowMouse()
 }
 
 
-// Initialize16
-// Initialize pixel format for 16 bit depth
-void OSXDriver2D::Initialize16()
-{
-    canvas->pfmt.PalEntries = 0;
-    canvas->pfmt.PixelBytes = 2;
-    canvas->pfmt.RedMask = 0x1F << 10;
-    canvas->pfmt.GreenMask = 0x1F << 5;
-    canvas->pfmt.BlueMask = 0x1F;
-    canvas->pfmt.AlphaMask = 0;
-    canvas->pfmt.complete();
-}
-
-
-// Initialize32
-// Initialize pixel format for 32 bit depth
-void OSXDriver2D::Initialize32()
-{
-    canvas->pfmt.PalEntries = 0;
-    canvas->pfmt.PixelBytes = 4;
-    canvas->pfmt.RedMask = 0xFF0000;
-    canvas->pfmt.GreenMask = 0x00FF00;
-    canvas->pfmt.BlueMask = 0x0000FF;
-    canvas->pfmt.AlphaMask = 0xFF000000;
-    canvas->pfmt.complete();
-}
-
-
 // EnterFullscreenMode
 // Switch to fullscreen mode - returns true on success
 bool OSXDriver2D::EnterFullscreenMode()
 {
     // Find mode and copy parameters
     CFDictionaryRef mode = CGDisplayBestModeForParameters(display, 
-                        canvas->Depth, canvas->Width, canvas->Height, 0);
+                        canvas->Depth, canvas->fbWidth, canvas->fbHeight, 0);
     if (mode == 0)
         return false;
 
@@ -249,10 +209,12 @@ bool OSXDriver2D::EnterFullscreenMode()
         // Extract actual Width/Height/Depth
         CFNumberGetValue(
 	    (CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayWidth),
-	    kCFNumberLongType, &canvas->Width);
+	    kCFNumberLongType, &canvas->fbWidth);
+	canvas->vpWidth = canvas->fbWidth;
         CFNumberGetValue(
 	    (CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayHeight),
-	    kCFNumberLongType, &canvas->Height);
+	    kCFNumberLongType, &canvas->fbHeight);
+	canvas->vpHeight = canvas->fbHeight;
         CFNumberGetValue(
 	    (CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayBitsPerPixel), 
 	    kCFNumberLongType, &canvas->Depth);
@@ -310,7 +272,7 @@ bool OSXDriver2D::ToggleFullscreen()
 
     if (success == true)
         OSXDelegate2D_openWindow(delegate, canvas->win_title.GetData(),
-                                canvas->Width, canvas->Height, canvas->Depth, 
+                                canvas->fbWidth, canvas->fbHeight, canvas->Depth, 
                                 canvas->FullScreen, display, screen);
 
     return success;

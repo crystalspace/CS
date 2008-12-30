@@ -25,9 +25,11 @@
 
 #include "csextern.h"
 #include "csutil/parray.h"
+#include "csutil/hash.h"
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/threading/mutex.h"
+#include "csutil/threadmanager.h"
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "iutil/pluginconfig.h"
@@ -44,6 +46,21 @@ class CS_CRYSTALSPACE_EXPORT csPluginManager :
 private:
   /// Mutex to make the plugin manager thread-safe.
   CS::Threading::RecursiveMutex mutex;
+  bool do_verbose;
+
+  /// Mutex on 'already loading' array.
+  CS::Threading::Mutex loadingLock;
+
+  /**
+   * Ref counted plugin load condition.
+   */
+  class PluginLoadCondition : public CS::Threading::Condition,
+    public CS::Utility::FastRefCount<PluginLoadCondition>
+  {
+  };
+
+  /// Hash of loading plugins and their conditions.
+  csHash<csRef<PluginLoadCondition>, csString> alreadyLoading;
 
   /**
    * This is a private structure used to keep the list of plugins.
@@ -54,25 +71,38 @@ private:
     /// The plugin itself
     csRef<iComponent> Plugin;
     /// The class ID of the plugin
-    char *ClassID;
+    csString ClassID;
+
+    csPlugin ();
 
     /// Construct the object that represents a plugin
     csPlugin (iComponent *iObject, const char *iClassID);
-    /// Free storage
-    virtual ~csPlugin ();
+
+    /// Comparison
+    bool operator== (const csPlugin& other) const
+    { return Plugin == other.Plugin && ClassID == other.ClassID; }
+    bool operator< (const csPlugin& other) const
+    { return Plugin < other.Plugin || 
+            (Plugin == other.Plugin && ClassID < other.ClassID); }
   };
 
   /**
-   * This is a superset of csPDelArray that can find by pointer a plugin.
+   * This is a superset of csArray that can find by pointer a plugin.
    */
-  class CS_CRYSTALSPACE_EXPORT csPluginsVector : public csPDelArray<csPlugin>
+  class CS_CRYSTALSPACE_EXPORT csPluginsVector :
+    public csArray<csPlugin, 
+                   csArrayElementHandler<csPlugin>,
+                   CS::Container::ArrayAllocDefault,
+                   csArrayCapacityFixedGrow<8> >
   {
   public:
     /// Create the vector
-    csPluginsVector (int l, int d) : csPDelArray<csPlugin> (l, d) {}
+    csPluginsVector (int l) : csArray<csPlugin, 
+      csArrayElementHandler<csPlugin>, CS::Container::ArrayAllocDefault,
+      csArrayCapacityFixedGrow<8> > (l) {}
     /// Find a plugin by its address
-    static int CompareAddress (csPlugin* const& Item, iComponent* const& Key)
-    { return Item->Plugin == Key ? 0 : 1; }
+    static int CompareAddress (csPlugin const& Item, iComponent* const& Key)
+    { return Item.Plugin == Key ? 0 : 1; }
   };
 
   /**
@@ -107,38 +137,81 @@ private:
 
   /// The list of all plug-ins
   csPluginsVector Plugins;
+  
+  csPlugin* FindPluginByClassID (const char* classID,
+    csPlugin* startAfter = 0);
+  csStringArray GetClassIDTagsLocal (const char* classID);
 
-  // List of all options for all plug-in modules.
-  csPDelArray<csPluginOption> OptionList;
-
+  /// List of all options for all plug-in modules.
+  csPDelArray<csPluginOption, CS::Container::ArrayAllocDefault,
+    csArrayCapacityFixedGrow<16> > OptionList;
+    
+  typedef csHash<csString, csString> TagToClassHash;
+  TagToClassHash tagToClassMap;
+  
+  void Report (int severity, const char* subMsgID,
+    const char* message, ...);
+  void ReportV (int severity, const char* subMsgID,
+    const char* message, va_list args);
+  /* Report while the mutex is held:
+   * Report() might wait for the main thread; if the mutex is held there
+   * b/c a plugin is being loaded a deadlock may occur.
+   * This method avoids that. */
+  void ReportInLock (int severity, const char* subMsgID,
+    const char* message, ...);
 public:
   /// Initialize plugin manager.
   csPluginManager (iObjectRegistry* object_reg);
   /// Destruct.
   virtual ~csPluginManager ();
 
-  /// Load a plugin and (optionally) initialize it.
-  virtual iBase *LoadPlugin (const char *iClassID, bool init = true);
+  virtual csPtr<iComponent> LoadPluginInstance (const char* iClassID, uint flags);
 
-  /**
-   * Get first of the loaded plugins that supports given interface ID.
-   */
-  virtual iBase *QueryPlugin (const char *iInterface, int iVersion);
-  /// Find a plugin given his class ID.
-  virtual iBase *QueryPlugin (const char* iClassID,
+  virtual csPtr<iComponent> QueryPluginInstance (const char *iInterface, int iVersion);
+  csPtr<iComponent> QueryPluginInstance (const char* classID);
+  virtual csPtr<iComponent> QueryPluginInstance (const char* iClassID,
   	  const char *iInterface, int iVersion);
-  /// Remove a plugin from system driver's plugin list.
-  virtual bool UnloadPlugin (iComponent *iObject);
-  /// Register a object that implements the iComponent interface as a plugin.
-  virtual bool RegisterPlugin (const char *iClassID,
+  virtual bool UnloadPluginInstance (iComponent *iObject);
+  virtual bool RegisterPluginInstance (const char *iClassID,
           iComponent *iObject);
-  /// Get an iterator to iterate over all plugins.
-  virtual csPtr<iPluginIterator> GetPlugins ();
-  /// Unload all plugins from this plugin manager.
+  virtual csPtr<iPluginIterator> GetPluginInstances ();
   virtual void Clear ();
 
   /// Query all options supported by given plugin and place into OptionList
   virtual void QueryOptions (iComponent *iObject);
+  
+  bool SetTagClassIDMapping (const char* tag, const char* classID)
+  {
+    CS::Threading::RecursiveMutexScopedLock lock (mutex);
+    bool result = tagToClassMap.Contains (tag);
+    tagToClassMap.PutUnique (tag, classID);
+    return result;
+  }
+  
+  bool UnsetTagClassIDMapping (const char* tag)
+  {
+    CS::Threading::RecursiveMutexScopedLock lock (mutex);
+    return tagToClassMap.DeleteAll (tag);
+  }
+  
+  const char* GetTagClassIDMapping (const char* tag)
+  {
+    CS::Threading::RecursiveMutexScopedLock lock (mutex);
+    return tagToClassMap.Get (tag, (const char*)0);
+  }
+  
+  csPtr<iStringArray> GetClassIDTags (const char* classID);
+  
+  csPtr<iComponent> LoadTagPluginInstance (const char* tag,
+    uint loadFlags)
+  {
+    return LoadTagPluginInstance (GetTagClassIDMapping (tag), loadFlags);
+  }
+  
+  csPtr<iComponent> QueryTagPluginInstance (const char* tag)
+  {
+    return QueryPluginInstance (GetTagClassIDMapping (tag));
+  }
 };
 
 #endif // __CS_PLUGMGR_H__

@@ -71,6 +71,14 @@ Now, you can actually build the entire project:
 jam
 @end example
 
+If your machine includes a dual core processor, you can easily reduce build
+times by as much as half and utilize the cores better by enabling more shell
+processes e.g.
+
+@example
+jam -j 2
+@end example
+
 The build process will create an executable for each demonstration program or
 tool, and a dynamic-load-library for each plugin module (with extension
 @file{.so} on @sc{gnu}/Linux and most Unix platforms).  Plugin modules include
@@ -87,23 +95,3 @@ jam distclean
 
 You can now try running the @file{walktest} demonstration. @xref{Quick Start}.
 
-@subsubheading Renderer Selection
-
-The OpenGL renderer is used by default when you run Crystal Space programs.  To
-select a different renderer, such as the software renderer, you can edit your
-local configuration file @file{$HOME/.crystalspace/Global.cfg}.  Add the
-following line to select the software renderer for all applications:
-
-@example
-System.Plugins.iGraphics3D = crystalspace.graphics3d.software
-@end example
-
-@noindent
-Alternately, you can choose the software renderer from the command-line:
-
-@example
-./walktest -video=software
-@end example
-
-The software renderer interacts with X11, placing output on the display
-indicated by the @samp{DISPLAY} environment variable.

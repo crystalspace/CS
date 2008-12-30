@@ -1,0 +1,823 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+    How the GL driver database works:
+    
+    First, a set of configurations is specified in the <configs> section.
+    Each configuration has an associated name.
+    
+    Then, some rules are declared in the <rules> section. Rules consist of
+    severeral <conditions>, which can be:
+    - <regexp>: Match one of the GL strings against a regular expression.
+    - <comparever>: Compare the a version against a prefined value.
+    - <negate>: True if the contained rule(s) are false.
+    - <conditions>: True if the contained rule(s) are true.
+    <conditions> as well as <negate> are containers for conditions; by 
+    default, they are true if all contained conditions are true. This 
+    behaviour can be changed by specifying the 'fulfill="one"' attribute. 
+    (You can also specify 'fulfill="all"', but that's just like the default.)
+    
+    If the <conditions> section evaluates to 'true', all the configurations 
+    from the <configs> section specified in the <applicable> sections (in 
+    <usecfg>...</usecfg> tags) are added to the global config tree; otherwise, 
+    the configurations specified in <notapplicable> are added.
+    
+    The rules are evaluated in the order they appear in the database.
+  -->
+
+<!--
+    IMPORTANT: PLEASE COMMENT RULES
+    
+    When you add or change a tweak please make sure to add a small comment
+    on that change above the rule! (If there's no comment yet, add one ;)
+    The comment should include the date, who discovered the issue(or tweak),
+    the hardware it happened on, platform, and driver version (practically
+    all that information can be cut from CS --verbose=-scf output); when 
+    adding a new tweak spend a few words on the issue that is worked around.
+    These comments are currently the closest thing to a "database" of HW/driver
+    issues we have; without them we'd quickly lose track of why certain tweaks
+    were introduced and it'd be much harder to determine whether a certain
+    tweak could be disabled for e.g. newer drivers. So please _always_ update
+    the comments!
+  -->
+<gldriverdb>
+  <configs>
+    <config name="brokenstencil">
+      <Video>
+	<OpenGL>
+	  <BrokenStencil>true</BrokenStencil>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="novbo">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_vertex_buffer_object>no</GL_ARB_vertex_buffer_object>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="noavp">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_vertex_program>no</GL_ARB_vertex_program>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="noaps">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_point_sprite>no</GL_ARB_point_sprite>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="3dfxhacks">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_multitexture>no</GL_ARB_multitexture>
+	  </UseExtension>
+	  <Win32>
+	    <DisableConsoleWindow>yes</DisableConsoleWindow>
+	  </Win32>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="nofilter">
+      <Video>
+	<OpenGL>
+	  <TextureFilter>none</TextureFilter>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="nostencil">
+      <Video>
+	<OpenGL>
+	  <Caps>
+	    <Stencil>no</Stencil>
+	  </Caps>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="noinvertedfog">
+      <Video>
+	<ShaderManager>
+	  <Tags>
+	    <inverted_fog>
+	      <Presence>forbidden</Presence>
+	    </inverted_fog>
+	  </Tags>
+	</ShaderManager>
+      </Video>
+    </config>
+    <config name="pixelformatbroken">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <WGL_ARB_pixel_format>no</WGL_ARB_pixel_format>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="cutdownTUs">
+      <Video>
+	<OpenGL>
+	  <Shader>
+	    <Fixed>
+	      <MaxTextureUnits>1</MaxTextureUnits>
+	    </Fixed>
+	  </Shader>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="disableMT">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_multitexture>no</GL_ARB_multitexture>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="disableMTtext">
+      <Video>
+	<OpenGL>
+	  <FontCache>
+	    <UseMultiTexturing>no</UseMultiTexturing>
+	  </FontCache>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="disableIntensityBlendText">
+      <Video>
+	<OpenGL>
+	  <FontCache>
+	    <UseIntensityBlend>no</UseIntensityBlend>
+	  </FontCache>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="enableIntensityBlendText">
+      <Video>
+	<OpenGL>
+	  <FontCache>
+	    <UseIntensityBlend>yes</UseIntensityBlend>
+	  </FontCache>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="nolinearfog">
+      <Video>
+	<ShaderManager>
+	  <Tags>
+	    <linear_fog>
+	      <Presence>forbidden</Presence>
+	    </linear_fog>
+	  </Tags>
+	</ShaderManager>
+      </Video>
+    </config>
+    <config name="disableTC">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_texture_compression>no</GL_ARB_texture_compression>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="disableMipmapGeneration">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_SGIS_generate_mipmap>no</GL_SGIS_generate_mipmap>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="noCompressionForRECTTextures">
+      <Video>
+	<OpenGL>
+	  <DisableRECTTextureCompression>yes</DisableRECTTextureCompression>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="disableRECTTextures">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_texture_rectangle>no</GL_ARB_texture_rectangle>
+	    <GL_EXT_texture_rectangle>no</GL_EXT_texture_rectangle>
+	    <GL_NV_texture_rectangle>no</GL_NV_texture_rectangle>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="hiddenNPOTS">
+      <Video>
+	<OpenGL>
+	  <EnableNonPowerOfTwo2DTextures>yes</EnableNonPowerOfTwo2DTextures>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="nodetail">
+      <Video>
+        <ShaderManager>
+          <Tags>
+            <detail_texture>
+              <Presence>forbidden</Presence>
+            </detail_texture>
+          </Tags>
+        </ShaderManager>
+      </Video>
+    </config>
+    <config name="fixedFunctionForcefulEnable">
+      <Video>
+	<OpenGL>
+	  <FixedFunctionForcefulEnable>yes</FixedFunctionForcefulEnable>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="disableLodBias">
+      <Video>
+       <OpenGL>
+         <UseExtension>
+           <GL_EXT_texture_lod_bias>no</GL_EXT_texture_lod_bias>
+         </UseExtension>
+       </OpenGL>
+      </Video>
+    </config>
+    <config name="noafp">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_fragment_program>no</GL_ARB_fragment_program>
+	  </UseExtension>
+	  <!-- Our GL ext disabling obviously doesn't apply to CgGL, so set
+	       the maximum FP profile to the highest below AFP. -->
+	  <Shader>
+	    <Cg>
+	      <MaxProfile>
+		<Fragment>ps_1_3</Fragment>
+	      </MaxProfile>
+	    </Cg>
+	  </Shader>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="nofbo">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_EXT_framebuffer_object>no</GL_EXT_framebuffer_object>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="nopbo">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_ARB_pixel_buffer_object>no</GL_ARB_pixel_buffer_object>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
+    <config name="generateexcessmipmap">
+      <Video>
+	<OpenGL>
+	  <GenerateOneExcessMipMap>yes</GenerateOneExcessMipMap>
+	</OpenGL>
+      </Video>
+    </config>
+  </configs>
+  <rules>
+    <!-- rule description="Some more examples">
+      <conditions>
+	<comparever version="gl" relation="ge 1.1" />
+	<comparever version="win32_driver" relation="lt 6.34" />
+      </conditions>
+      <applicable>
+      </applicable>
+      <notapplicable>
+      </notapplicable>
+    </rule -->
+    
+    <rule description="Broken stencil support">
+      <conditions fulfill="all">
+	<regexp string="platform" pattern="Unix" />
+	<regexp string="renderer" pattern="Rage *128" />
+	<regexp string="glversion" pattern="1.2" />
+      </conditions>
+      <applicable>
+	<usecfg>brokenstencil</usecfg>
+      </applicable>
+    </rule>
+
+    <!--
+      * 2005-11-22: Jorrit reports despicable performance with 64bit ATI
+		    drivers and also states other sources would attribute a
+		    generally poor performance to ATI Linux drivers.
+		    @@@ Whether only certain version(s) are affected is unknown.
+      * 2007-12-17: Jorrit reports Linux ATI drivers version 2.1.7059 finally
+		    get VBO right.
+      -->
+    <rule description="Disable VBO for GNU/Linux ATI drivers">
+      <conditions fulfill="all">
+	<regexp string="platform" pattern="Unix" />
+	<regexp string="vendor" pattern="^ATI" />
+	<comparever version="gl" relation="lt 2.1.7059" />
+      </conditions>
+      <applicable>
+	<usecfg>novbo</usecfg>
+      </applicable>
+    </rule>
+
+    <!-- 
+      * 2005-11-22: VBO reported to give slowdown for at least 
+		    GF4Go/Forceware 75.90
+      * 2005-11-22: VBO reported to give speed up for at least 
+		    GF5/Forceware 81.85
+      * 2005-11-22: VBO reported to give speed up for at least 
+		    GF5/Forceware 78.01
+      * 2005-11-22: VBO reported to give speed up for at least 
+		    GF5/Linux Forceware 76.67 
+		    (version string "2.0.0 NVIDIA 76.67")
+      * 2005-12-19: Reported: GF4 slowdown for 77.72, speedup for 81.95
+      -->
+    <rule description="NVIDIA: Slow VBO">
+      <conditions>
+	<regexp string="vendor" pattern="NVIDIA" />
+	<conditions fulfill="one">
+	  <comparever version="win32_driver" relation="lt 6.14.10.7801" />
+	  <conditions fulfill="all">
+	    <regexp string="platform" pattern="Unix" />
+	    <comparever version="glvendor" relation="lt NVIDIA 76.67" />
+	    <!-- Note: comparever is dumb, it just compares numbers, nothing
+		 in between. 
+		 E.g. "ATI 78.90" would make the comparison above, true,
+		 too. -->
+	  </conditions>
+	</conditions>
+      </conditions>
+      <applicable>
+	<usecfg>novbo</usecfg>
+      </applicable>
+    </rule>
+
+    <!--
+      * 2007-04-26: Reportedly sky corruption in PlaneShift
+		    OpenGL vendor string: NVIDIA Corporation
+		    OpenGL renderer string: GeForce 6600/PCI/SSE2/3DNOW!
+		    OpenGL version string: 2.1.0 NVIDIA 97.55
+		    Platform: Linux
+      -->
+    <rule description="Disable VBO on GeForce 6600">
+      <conditions fulfill="all">
+	<regexp string="platform" pattern="Unix" />
+	<regexp string="renderer" pattern="^GeForce 6600" />
+	<comparever version="glvendor" relation="eq NVIDIA 97.55" />
+      </conditions>
+      <applicable>
+        <usecfg>novbo</usecfg>
+      </applicable>
+    </rule>
+
+
+    <!-- 
+      * 2005-12-21: Point sprites are fixed with at least Catalyst 5.13.
+      -->
+    <rule description="Work around broken ATI point sprites">
+      <conditions fulfill="all">
+	<!-- Point sprite activation messes up all other geometry -->
+	<regexp string="vendor" pattern="^ATI" />
+	<regexp string="platform" pattern="Win32" />
+	<comparever version="win32_driver" relation="lt 6.14.10.5525" />
+      </conditions>
+      <applicable>
+	<usecfg>noaps</usecfg>
+      </applicable>
+    </rule>
+
+    <!-- 
+      * 2006-02-04: Jorrit found point sprites to be miniscule on driver 
+		    version X4.3.0-8.19.10
+      -->
+    <rule description="Broken ATI point sprites (ATI)">
+      <conditions fulfill="all">
+	<regexp string="vendor" pattern="^ATI" />
+	<regexp string="platform" pattern="Unix" />
+      </conditions>
+      <applicable>
+	<usecfg>noaps</usecfg>
+      </applicable>
+    </rule>
+    
+    <!-- 
+      * 2006-02-20: vknecht and dingobloo found point sprites to be miniscule.
+      -->
+    <rule description="Broken ATI point sprites (NV)">
+      <conditions fulfill="one">
+	<regexp string="renderer" pattern="GeForce 6600" />
+	<regexp string="renderer" pattern="GeForce 7800" />
+      </conditions>
+      <applicable>
+	<usecfg>noaps</usecfg>
+      </applicable>
+    </rule>
+    
+    
+    <rule description="Work around 3dfx Voodoo shortcomings">
+      <conditions>
+	<regexp string="vendor" pattern="^3dfx" />
+      </conditions>
+      <applicable>
+	<usecfg>3dfxhacks</usecfg>
+      </applicable>
+    </rule>
+    
+    <rule description="GeForce FX 5xxx: Broken 'Inverted fog'">
+      <conditions>
+	<regexp string="renderer" pattern="GeForce FX 5..." />
+	<!-- @@@ Add some version check ? -->
+      </conditions>
+      <applicable>
+	<usecfg>noinvertedfog</usecfg>
+      </applicable>
+    </rule>
+    
+    <rule description="NVidia: borked WGL_ARB_pixel_format" phase="preinit">
+      <!-- 
+        'phase="preinit"' means this rule is only considered during 
+	"pre-initialization". On Win32 this is the time a pixel format is 
+	picked.
+      -->
+      <conditions fulfill="all">
+	<regexp	string="win32_driver" pattern="^nv" />
+	<comparever version="win32_driver" relation="le 6.13.10.2846" />
+      </conditions>
+      <applicable>
+	<usecfg>pixelformatbroken</usecfg>
+      </applicable>
+    </rule>
+    
+    <rule description="Intel: Extreme Buggy Graphics">
+      <conditions>
+	<regexp string="vendor" pattern="^Intel" />
+	<!-- @@@ Check if we really need to be that cruel and shoot down all
+	     Intel gfx hardware. -->
+	<regexp string="platform" pattern="Win32" />
+      </conditions>
+      <applicable>
+	<usecfg>nolinearfog</usecfg>
+	<usecfg>enableIntensityBlendText</usecfg>
+	<usecfg>disableMipmapGeneration</usecfg>
+      </applicable>
+    </rule>
+
+    <!-- 2008-02-13: texture compression is broken for Intel GMA 950 under OSX. As a result
+            the OSX distribution of Planeshift to disable texture compression
+            by default for all: http://hydlaa.com/smf/index.php?topic=29281.0
+	    * Intel GMA cards are used in in low-end x86-based Mac hardware, i.e. relevant
+	      for OSX 10.4 in MacBook, iMac and Mac mini.
+	    * problem persists with recent driver updates under OSX 10.4
+	    * has been reported for GMA 3100 under OSX 10.5, which is found in newer MacBooks.
+         2008-05-27: confirmed problem also for 10.5-drivers. (Trymm)
+    -->
+    <rule description="Intel GMA on OSX">
+      <conditions fulfill="all">
+        <conditions fulfill="one">
+          <regexp string="renderer" pattern="Intel GMA X3100 OpenGL Engine" />
+	  <regexp string="renderer" pattern="Intel GMA 950 OpenGL Engine" />
+        </conditions>
+        <conditions fulfill="one">
+          <regexp string="glversion" pattern="1.2 APPLE-1\.4\..*" />
+          <regexp string="glversion" pattern="1.2 APPLE-1\.5\..*" />
+        </conditions>
+	<regexp string="platform" pattern="MacOS/X" />
+      </conditions>
+      <applicable>
+	<usecfg>disableTC</usecfg>
+      </applicable>
+    </rule>
+    
+    <rule description="ATI: Can't handle GL_BLEND texenv for GL_INTENSITY textures">
+      <conditions>
+	<regexp string="vendor" pattern="^ATI" />
+	<regexp string="platform" pattern="Win32" />
+      </conditions>
+      <applicable>
+	<usecfg>disableIntensityBlendText</usecfg>
+	<!-- NB: this is the default in video.cfg actually. But to ensure the
+	     setting it's made here, too -->
+      </applicable>
+    </rule>
+    
+    <rule description="Mesa DRI Radeon: No proper texture compression support">
+      <conditions>
+	<regexp string="renderer" pattern="^Mesa DRI Radeon 2002" />
+      </conditions>
+      <applicable>
+	<usecfg>disableTC</usecfg>
+      </applicable>
+    </rule>
+    
+    <rule description="ATI: Can't handle compressed formats for RECT textures">
+      <conditions>
+	<regexp string="vendor" pattern="^ATI" />
+      </conditions>
+      <applicable>
+	<usecfg>noCompressionForRECTTextures</usecfg>
+      </applicable>
+    </rule>
+    
+    <rule description="ATI: RECT texture extension support apparently sucks">
+      <conditions>
+	<regexp string="vendor" pattern="^ATI" />
+      </conditions>
+      <applicable>
+	<usecfg>disableRECTTextures</usecfg>
+      </applicable>
+    </rule>
+
+    <!-- 
+      * 2006-09-17: Quadro NVS up to 285 are GF2 derivates
+      * 2006-09-17: GeForce2 GTS is affected 
+		    (source: http://hydlaa.com/smf/index.php?topic=25552.0)
+      -->
+    <rule description="GeForce: RECT texture extension support apparently sucks">
+      <conditions fulfill="one">
+	<regexp	string="renderer" pattern="GeForce.*MX" />
+	<regexp	string="renderer" pattern="GeForce.*Go" />
+	<regexp	string="renderer" pattern="Quadro.*NVS.*\(50\|1..\|2..\).*" />
+	<regexp	string="renderer" pattern="GeForce2.*GTS" />
+      </conditions>
+      <applicable>
+	<usecfg>disableRECTTextures</usecfg>
+      </applicable>
+    </rule>
+
+    <!-- 
+      * 2006-11-25: A lot of crashes with NVIDIA hardware and RECT textures.
+		    Also see http://trac.crystalspace3d.org/trac/CS/wiki/RECT%20texture%20woes
+      * 2007-10-20: Driver version 6.14.10.9371 works on an GeForce 7800. 
+        Enabling for all later drivers.
+      -->
+    <rule description="NVidia: RECT texture extension apparently broken">
+      <conditions fulfill="all">
+        <comparever version="glvendor" relation="lt 6.14.10.9371" />
+        <regexp string="vendor" pattern="NVIDIA" />
+      </conditions>
+      <applicable>
+	  <usecfg>disableRECTTextures</usecfg>
+      </applicable>
+    </rule>
+
+    <!--
+	* 2008-05-01: GeForce 8800 GTS/PCI/SSE2, Linux 64-bit, 
+	              OpenGL 2.1.2 NVIDIA 169.12
+		      When setting a max LOD level for a texture and generating
+		      mipmaps with GL_GENERATE_MIPMAPS_SGIS, the last LOD
+		      level stays black.
+	-->
+    <rule description="NVidia: GENERATE_MIPMAPS does not generate last level">
+      <conditions>
+	<regexp	string="vendor" pattern="NVIDIA" />
+      </conditions>
+      <applicable>
+	<usecfg>generateexcessmipmap</usecfg>
+      </applicable>
+    </rule>
+    
+    <rule description="SiS: Text drawing only seems to work using the worst method">
+      <conditions>
+	<regexp string="vendor" pattern="^SiS" />
+      </conditions>
+      <applicable>
+	<usecfg>disableMTtext</usecfg>
+      </applicable>
+    </rule>
+
+    <!--
+      * 2005-12-29: ATI Radeon 9700Pro, Win32, driver 6.14.10.5525 (Cat 5.13)
+		    "walktest terrainf" exhibits garbled text and CS logo;
+		    curiously fixed by not using a multitexturing setup but
+		    an AFP while drawing.
+      * 2005-12-30: Jorrit reports problems with MOBILITY RADEON X700 Generic,
+		    1.3.5461 (X4.3.0-8.19.10) on Linux
+      * 2006-01-03: Vasily Rudnikov reports corruption and subsequent fix
+		    by this tweak with a Radeon 9600, Win32, 
+		    driver 6.14.10.4517 (Cat 4.8)
+      * 2006-09-28: More investigation leads to the corruption showing up 
+		    after ARB programs are disabled; apparently this does not
+		    work correctly. Changing a fixed function state and an
+		    empty glBegin()/glEnd() works around the issue.
+		    Observation made with ATI Radeon 9700Pro, Win32, 
+		    driver 6.14.10.6067 (Cat 6.9). Changed to that workaround
+		    from "2D with AFP" one.
+      -->
+    <rule description="ATI: 'Forceful' fixed function enable">
+      <conditions fulfill="all">
+	<regexp string="vendor" pattern="^ATI" />
+	<conditions fulfill="one">
+	  <comparever version="win32_driver" relation="ge 6.14.10.4517" />
+	  <regexp string="platform" pattern="Unix" />
+	</conditions>
+      </conditions>
+      <applicable>
+	<usecfg>fixedFunctionForcefulEnable</usecfg>
+      </applicable>
+    </rule>
+
+ 
+    <!--
+      * 2006-06-05: ATI Radeon 9700Pro, Win32, OpenGL 2.0.5885 (Cat 6.5)
+		    Apparently NPOTS textures via glTexture2D don't get 
+		    garbled anymore.
+      -->
+    <rule description="ATI: Enable hidden 2D texture NPOTS support">
+      <conditions>
+	<regexp string="vendor" pattern="^ATI" />
+	<conditions fulfill="one">
+	  <regexp string="renderer" pattern="R\(ADEON\|adeon\) 9\(5\|6\|7\|8\).*" />
+	  <regexp string="renderer" pattern="R\(ADEON\|adeon\) X.*" />
+	</conditions>
+	<comparever version="gl" relation="ge 2.0.5885" />
+      </conditions>
+      <applicable>
+	<usecfg>hiddenNPOTS</usecfg>
+      </applicable>
+    </rule>
+    
+    <!--
+      * 2007-02-15: ATI MOBILITY RADEON 9600/9700 Series, Win32, 
+                    OpenGL 2.0.6288
+		    Render targets are corrupted with GL_EXT_framebuffer_object.
+		    (See trac #261).
+      * 2007-10-12: GL_EXT_framebuffer_object seems to work fine with
+        an ATI Mobility Radeon x1600, win32 and 2.0.6174. Re-enabling
+        it on other ATI cards than the 9x000 series.
+      -->
+    <rule description="ATI: Work around EXT_framebuffer_object corruption">
+      <conditions>
+	<regexp string="renderer" pattern="R\(ADEON\|adeon\) 9\(5\|6\|7\|8\).*" />
+	<comparever version="gl" relation="le 2.0.6288" />
+      </conditions>
+      <applicable>
+	<usecfg>nofbo</usecfg>
+      </applicable>
+    </rule>
+    
+    <!--
+      * 2007-10-19: RADEON 9700 PRO x86/MMX/3DNow!/SSE, Win32, 
+                    OpenGL 2.0.6956, GL driver: atioglxx.dll 6.14.10.6956
+		    When setting texture data with ARB_pixel_buffer_object,
+		    the first 512 lines of the texture are repeted every
+		    512 lines (in other words, data past line 512 is invalid).
+      * 2008-01-14: RADEON 9700 PRO x86/MMX/3DNow!/SSE, Win32, 
+                    OpenGL 2.1.7169, GL driver: atioglxx.dll 6.14.10.7169
+		    Issue has been fixed.
+      -->
+    <rule description="ATI: Disable broken pixel buffer objects">
+      <conditions>
+	<regexp string="vendor" pattern="^ATI" />
+	<comparever version="gl" relation="lt 2.1.7169" />
+      </conditions>
+      <applicable>
+	<usecfg>nopbo</usecfg>
+      </applicable>
+    </rule>
+    
+    <!--
+	* 2008-04-04: ATI Mobility Radeon HD 2600, Linux (32 bit),
+		      OpenGL 2.1.7281 Release
+		      Framebuffer objects don't work well: mipmap generation
+		      and readback seem to be broken.
+	-->
+    <rule description="ATI: Disable unsatisfactory framebuffer objects">
+	<conditions>
+		<regexp string="vendor" pattern="^ATI" />
+		<comparever version="gl" relation="le 2.1.7281" />
+	</conditions>
+	<applicable>
+		<usecfg>nofbo</usecfg>
+	</applicable>
+    </rule>
+    
+    <rule description="Software GL tweaks">
+      <conditions fulfill="one">
+	<regexp string="renderer" pattern="Mesa GLX Indirect" />
+	<regexp string="renderer" pattern="GDI Generic" />
+      </conditions>
+      <applicable>
+        <usecfg>nofilter</usecfg>
+        <usecfg>nostencil</usecfg>
+        <usecfg>nodetail</usecfg>
+      </applicable>
+    </rule>
+    
+    <!--
+      * 2006-09-25: Older DRI i810 versions crash when using LOD bias
+                    Renderer string: "Mesa DRI I810 20020221", 
+		    version string: "1.2 Mesa 4.0.4" is known to be affected
+      -->
+    <rule description="disable lod bias for i810 driver">
+      <conditions>
+       <regexp string="renderer" pattern="Mesa DRI I810 20020221" />
+      </conditions>
+      <applicable>
+       <usecfg>disableLodBias</usecfg>
+      </applicable>
+    </rule>
+
+    <!--
+      * 2006-11-24: S3TC support in Intel DRI (at least in Mesa 6.5.1) is 
+        broken. Since S3TC may also be used through generic
+		compression formats, disable TC completely.
+      * 2008-11-18: Still broken on 7.0.4
+    -->
+    <rule description="Intel DRI: Disable texture compression">
+      <conditions>
+        <regexp string="renderer" pattern="Mesa.*Intel" />
+        <comparever version="glvendor" relation="ge Mesa 6.5" />
+      </conditions>
+      <applicable>
+        <usecfg>disableTC</usecfg>
+      </applicable>
+    </rule>
+    
+    <!--
+      * 2007-04-24: S3TC support in Mesa DRI R200 is broken.
+                    (Linux stock OpenGL drivers on Slackware)
+                    Since S3TC may also be used through generic
+                    compression formats, disable TC completely.
+      -->
+    <rule description="Mesa R200 DRI: Disable texture compression">
+        <conditions fulfill="all">
+          <regexp string="renderer" pattern="^Mesa DRI R200" />
+          <regexp string="glversion" pattern="Mesa 6\.4\.." />
+        </conditions>
+      <applicable>
+        <usecfg>disableTC</usecfg>
+      </applicable>
+    </rule>
+
+    <!--
+      * 2006-11-24: AFP support in Intel DRI (at least in Mesa 6.5.1) is 
+                    broken.
+      * 2008-05-02: Still broken as of Mesa 7.0.3.
+      -->
+    <rule description="Intel DRI: Disable ARB_fragment_program">
+      <conditions fulfill="all">
+        <regexp string="renderer" pattern="Mesa.*Intel" />
+        <conditions fulfill="one">
+          <regexp string="glversion" pattern="Mesa 6\.5\.." />
+          <regexp string="glversion" pattern="Mesa 7\.0\.." />
+        </conditions>
+      </conditions>
+      <applicable>
+        <usecfg>noafp</usecfg>
+      </applicable>
+    </rule>
+
+    <!-- 
+      * 2007-04-09: ATI Radeon 7200 series exhibits garbled text. Version 6.5.1 does not.
+                    vendor: Tungsten Graphics, Inc.
+                    renderer: Mesa DRI Radeon 20061018 AGP 1x x86/MMX+/3DNow!+/SSE TCL
+                    version: 1.3 Mesa 6.5.2
+      * 2007-09-13: Intel DRI on Mesa 6.5.2 exhibits garbled text.
+                    renderer: Mesa DRI Intel(R) 915GM 20061017 x86/MMX/SSE2
+		    vendor: Tungsten Graphics, Inc
+		    version: 1.3 Mesa 6.5.2
+      -->
+    <rule description="Mesa 6.5.2: garbled text">
+      <conditions>
+        <regexp string="renderer" pattern="Mesa.*" />
+        <conditions fulfill="all">
+          <comparever version="glvendor" relation="ge Mesa 6.5.2" />
+          <comparever version="glvendor" relation="lt Mesa 7.0" />
+        </conditions>
+      </conditions>
+      <applicable>
+        <usecfg>disableMTtext</usecfg>
+      </applicable>
+    </rule>
+
+    <!--
+    <rule description="GeForce MX/Go class HW">
+      <conditions fulfill="one">
+	<regexp	string="renderer" pattern="GeForce.*MX" />
+	<regexp	string="renderer" pattern="GeForce.*Go" />
+      </conditions>
+      <applicable>
+	<usecfg>noavp</usecfg>
+      </applicable>
+    </rule>
+    -->
+
+  </rules>
+</gldriverdb>

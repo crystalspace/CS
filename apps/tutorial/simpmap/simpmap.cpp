@@ -18,6 +18,29 @@
 
 #include "simpmap.h"
 
+#include "csgeom/aabbtree.h"
+
+csRandomVectorGen vgen;
+
+struct MyObject
+{
+  MyObject ()
+  {
+    myBB.StartBoundingBox ();
+    myBB.SetSize (vgen.Get ());
+    myBB.SetCenter (vgen.Get ()*10);    
+  }
+
+  const csBox3& GetBBox () const
+  {
+    return myBB;
+  }
+
+  csBox3 myBB;
+};
+
+CS::Geometry::AABBTree<MyObject, 2> tree;
+
 CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
@@ -25,6 +48,16 @@ CS_IMPLEMENT_APPLICATION
 Simple::Simple ()
 {
   SetApplicationName ("CrystalSpace.SimpleMap");
+
+  
+  csPDelArray<MyObject> objects;
+
+  for (int i = 0; i < 10; ++i)
+  {
+    MyObject* o = new MyObject;
+    objects.Push (o);
+    tree.AddObject (o);
+  }  
 }
 
 Simple::~Simple ()
@@ -54,6 +87,8 @@ bool Simple::Setup ()
 
   cdsys = csQueryRegistry<iCollideSystem> (GetObjectRegistry());
   if (!cdsys) return ReportError ("Failed to locate CD system!");
+
+  rm = engine->GetRenderManager ();
 
   // We need a View to the virtual world.
   view.AttachNew(new csView (engine, g3d));
@@ -103,9 +138,13 @@ bool Simple::Setup ()
   collider_actor.InitializeColliders (view->GetCamera (),
   	legs, body, shift);
 
+  collider_actor.SetGravity (0);
+
+  printer.AttachNew (new FramePrinter (object_reg));
+
   return true;
 }
-void Simple::ProcessFrame ()
+void Simple::Frame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -151,18 +190,11 @@ void Simple::ProcessFrame ()
     	obj_move, obj_rotate);
 
   // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
-    return;
+  //if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
+    //return;
 
   // Tell the camera to render into the frame buffer.
-  view->Draw ();
-}
-
-void Simple::FinishFrame ()
-{
-  // Just tell the 3D renderer that everything has been rendered.
-  g3d->FinishDraw ();
-  g3d->Print (0);
+  rm->RenderView (view);
 }
 
 bool Simple::OnKeyboard(iEvent& ev)
@@ -223,6 +255,7 @@ bool Simple::OnInitialize(int /*argc*/, char* /*argv*/ [])
 
 void Simple::OnExit()
 {
+  printer.Invalidate ();
 }
 
 bool Simple::Application()
@@ -246,7 +279,7 @@ bool Simple::LoadMap ()
 {
   // Set VFS current directory to the level we want to load.
   csRef<iVFS> VFS (csQueryRegistry<iVFS> (GetObjectRegistry ()));
-  VFS->ChDir ("/lev/flarge");
+  VFS->ChDir ("/lev/partsys");
   // Load the level file which is called 'world'.
   if (!loader->LoadMapFile ("world"))
     ReportError("Error couldn't load level!");

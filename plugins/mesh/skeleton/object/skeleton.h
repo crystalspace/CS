@@ -570,7 +570,7 @@ public:
   size_t GetID ();
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 class csSkeleton :
   public scfImplementation1<csSkeleton, iSkeleton>
@@ -717,7 +717,7 @@ public:
   virtual size_t GetSocketsCount();
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 class csSkeletonSocketFactory :
   public scfImplementation1<csSkeletonSocketFactory, iSkeletonSocketFactory>
@@ -755,7 +755,7 @@ private:
   csRef<iVirtualClock> vc;
   csRefArray<csSkeletonFactory> factories;
   csRefArray<iSkeleton> skeletons;
-  csEventID PreProcess;
+  csEventID Frame;
   bool manual_updates;
 public:
   csSkeletonGraveyard (iBase*);
@@ -788,8 +788,7 @@ public:
       return parent->HandleEvent (ev);
     }
 
-    CS_EVENTHANDLER_NAMES("crystalspace.skeleton.graveyard")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
+    CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.skeleton.graveyard")
   };
   csRef<csSkelEventHandler> evhandler;
 };

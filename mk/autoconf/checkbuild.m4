@@ -1,6 +1,6 @@
 # checkbuild.m4                                                -*- Autoconf -*-
 #==============================================================================
-# Copyright (C)2003 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2003-2008 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -49,24 +49,6 @@ AC_DEFUN([_CS_SPLIT_TUPLE],
 #	within individual flags or library references.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CREATE_TUPLE], [`echo @$1@$2@$3 | sed 'y% %@%:@%'`])
-
-
-
-#------------------------------------------------------------------------------
-# CS_LANG_CFLAGS
-#	Return the literal string CFLAGS if the current language is C.  Return
-#	the literal string CXXFLAGS if the current language is C++.  Generic
-#	compiler test macros which need to modify or save the compiler flags
-#	can invoke this macro to get the name of the compiler flags environment
-#	variable (either CFLAGS or CXXFLAGS) depending upon the current
-#	language.  For example:
-#		CS_LANG_CFLAGS="$CS_LANG_CFLAGS -Wall"
-#	With C, this expands to:
-#		CFLAGS="$CFLAGS -Wall"
-#	With C++, it expands to:
-#		CXXFLAGS="$CXXFLAGS -Wall"
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_LANG_CFLAGS], [AC_LANG_CASE([C], [CFLAGS], [C++], [CXXFLAGS])])
 
 
 
@@ -120,8 +102,8 @@ AC_DEFUN([CS_LANG_CFLAGS], [AC_LANG_CASE([C], [CFLAGS], [C++], [CXXFLAGS])])
 #	conftest.err before it returns.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_BUILD_IFELSE],
-    [AC_LANG_PUSH(m4_default([$3],[C]))
-    cs_cflags_save="$CS_LANG_CFLAGS"
+    [AC_LANG_PUSH(CS_LANG_RESOLVE([$3]))
+    cs_cflags_save="$_CS_LANG_CFLAGS([$3])"
     cs_lflags_save="$LDFLAGS"
     cs_libs_save="$LIBS"
     cs_build_ok=no
@@ -131,7 +113,7 @@ AC_DEFUN([CS_BUILD_IFELSE],
     do
 	CS_SPLIT_TUPLE(
 	    [$cs_build_item],[cs_cflags_test,cs_lflags_test,cs_libs_test])
-	CS_LANG_CFLAGS="$cs_cflags_test $6 $cs_cflags_save"
+	_CS_LANG_CFLAGS([$3])="$cs_cflags_test $6 $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test $7 $cs_lflags_save"
 	LIBS="$cs_libs_test $8 $cs_libs_save"
 	AC_LINK_IFELSE(m4_default([$1], [AC_LANG_PROGRAM([],[])]),
@@ -144,10 +126,10 @@ AC_DEFUN([CS_BUILD_IFELSE],
     done
 
     m4_ifval([$10], [m4_popdef([AC_TRY_EVAL]) rm -f conftest.err])
-    CS_LANG_CFLAGS=$cs_cflags_save
+    _CS_LANG_CFLAGS([$3])=$cs_cflags_save
     LDFLAGS=$cs_lflags_save
     LIBS=$cs_libs_save
-    AC_LANG_POP(m4_default([$3],[C]))
+    AC_LANG_POP(CS_LANG_RESOLVE([$3]))
 
     AS_IF([test $cs_build_ok = yes],
 	[cs_build_cflags=CS_TRIM([$cs_cflags_test[]m4_ifval([$9],[],[ $6])])
@@ -155,6 +137,11 @@ AC_DEFUN([CS_BUILD_IFELSE],
 	cs_build_libs=CS_TRIM([$cs_libs_test[]m4_ifval([$9],[],[ $8])])
 	$4],
 	[$5])])
+
+
+# Return an appropriate CFLAGS-style variable name for $1 (for example, returns
+# CXXFLAGS for "C++").
+AC_DEFUN([_CS_LANG_CFLAGS], [CS_TR_SH_LANG([CS_LANG_RESOLVE([$1])FLAGS])])
 
 
 
@@ -214,17 +201,21 @@ AC_DEFUN([CS_CHECK_BUILD],
 #	set to the composite value of $cs_build_cflags, $cs_build_lflags, and
 #	$cs_build_libs of the FLAGS element which succeeded (not including the
 #	"other" flags) and ACTION-IF-RECOGNIZED is invoked.  If no options are
-#	recognized, then CACHE-VAR is set to the empty string, and
-#	ACTION-IF-NOT-RECOGNIZED is invoked. As a convenience, in case
-#	comparing CACHE-VAR against the empty string to test for failure is
-#	undesirable, a second variable named CACHE-VAR_ok is set to the literal
-#	"no" upon failure, and to the same value as CACHE-VAR upon success.
+#	recognized or if FLAGS is empty, then CACHE-VAR is set to the empty
+#	string, and ACTION-IF-NOT-RECOGNIZED is invoked. As a convenience, in
+#	case comparing CACHE-VAR against the empty string to test for failure
+#	is undesirable, a second variable named CACHE-VAR_ok is set to the
+#	literal "no" upon failure, and to the same value as CACHE-VAR upon
+#	success.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_BUILD_FLAGS],
     [AC_CACHE_CHECK([$1], [$2_ok],
-	[CS_BUILD_IFELSE([], [$3], [$4],
-	    [$2=CS_TRIM([$cs_build_cflags $cs_build_lflags $cs_build_libs])
-	    $2_ok="$$2"],
-	    [$2=''
-	    $2_ok=no], [$7], [$8], [$9], [Y], [$10])])
+        [AS_IF([test -n "$3"],
+	    [CS_BUILD_IFELSE([], [$3], [$4],
+		[$2=CS_TRIM([$cs_build_cflags $cs_build_lflags $cs_build_libs])
+		$2_ok="$$2"],
+		[$2=''
+		$2_ok=no], [$7], [$8], [$9], [Y], [$10])],
+            [$2=''
+            $2_ok=no])])
     AS_IF([test "$$2_ok" != no], [$5], [$6])])

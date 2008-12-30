@@ -1,0 +1,17 @@
+<library>
+    <textures />
+    <materials />
+    <meshfact name="box_tri">
+        <plugin>meshFact</plugin>
+        <params>
+            <numvt>3</numvt>
+            <numtri>2</numtri>
+            <v x="0" y="0" z="-2" u="0" v="0" />
+            <v x="2" y="0" z="0" u="1" v="0" />
+            <v x="0" y="0" z="2" u="1" v="1" />
+            <t v1="0" v2="1" v3="2" />
+            <t v1="2" v2="1" v3="0" />
+            <autonormals />
+        </params>
+    </meshfact>
+</library>

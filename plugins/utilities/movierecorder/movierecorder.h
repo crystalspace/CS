@@ -126,9 +126,6 @@ public:
   virtual ~csMovieRecorder ();
   virtual bool Initialize (iObjectRegistry *iobject_reg);  
 
-  /// Called via the embedded iEventHandler
-  bool HandleEvent (iEvent &event);
-
   /// Called by the embedded iVirtualClock
   void ClockAdvance ();
   void ClockSuspend ();
@@ -145,27 +142,85 @@ public:
   virtual bool IsPaused(void) const;
 
   /**
-   * Embedded iEventHandler interface that forwards its events to
-   * csMovieRecorder's event handler
+   * Embedded iEventHandler interface that handles keyboard events
    */
-  class EventHandler : 
-    public scfImplementation1<EventHandler, 
+  class KeyEventHandler : 
+    public scfImplementation1<KeyEventHandler, 
                               iEventHandler>
   {
   private:
     csWeakRef<csMovieRecorder> parent;
   public:
-    EventHandler (csMovieRecorder* parent) : scfImplementationType (this),
+    KeyEventHandler (csMovieRecorder* parent) : scfImplementationType (this),
       parent (parent) { }
-    virtual ~EventHandler () { }
+    virtual ~KeyEventHandler () { }
     virtual bool HandleEvent (iEvent& ev)
     {
-      return parent ? parent->HandleEvent (ev) : false;
+      if (parent && (CS_IS_KEYBOARD_EVENT(parent->object_reg, ev)))
+      {      
+        return parent->EatKey (ev);
+      }
+
+      return false;
     }
-    CS_EVENTHANDLER_NAMES("crystalspace.movierecorder")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS /* DOME : actually, we want a lot of constraints... */
+    CS_EVENTHANDLER_NAMES("crystalspace.movierecorder.keyboard")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
   };
-  csRef<EventHandler> eventHandler;
+  csRef<KeyEventHandler> keyEventHandler;
+
+  /**
+  * Embedded iEventHandler interface that handles frame events in the
+  * logic phase.
+  */
+  class LogicEventHandler : 
+    public scfImplementation1<LogicEventHandler, 
+    iEventHandler>
+  {
+  private:
+    csWeakRef<csMovieRecorder> parent;
+  public:
+    LogicEventHandler (csMovieRecorder* parent) :
+        scfImplementationType (this), parent (parent) { }
+    virtual ~LogicEventHandler () { }
+    virtual bool HandleEvent (iEvent& ev)
+    {
+      if (parent && (ev.Name == parent->Frame))
+      {      
+        return parent->HandleStartFrame (ev);
+      }
+
+      return false;
+    }
+    CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.movierecorder.frame.logic")
+  };
+  csRef<LogicEventHandler> logicEventHandler;
+
+  /**
+  * Embedded iEventHandler interface that handles frame events in the
+  * frame phase.
+  */
+  class FrameEventHandler : 
+    public scfImplementation1<FrameEventHandler, 
+    iEventHandler>
+  {
+  private:
+    csWeakRef<csMovieRecorder> parent;
+  public:
+    FrameEventHandler (csMovieRecorder* parent) :
+        scfImplementationType (this), parent (parent) { }
+    virtual ~FrameEventHandler () { }
+    virtual bool HandleEvent (iEvent& ev)
+    {
+      if (parent && (ev.Name == parent->Frame))
+      {      
+        return parent->HandleEndFrame (ev);
+      }
+
+      return false;
+    }
+    CS_EVENTHANDLER_PHASE_FRAME("crystalspace.movierecorder.frame.frame")
+  };
+  csRef<FrameEventHandler> frameEventHandler;
 
   /**
    * Embedded iVirtualClock. We replace the system's default virtual clock

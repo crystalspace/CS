@@ -17,7 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/**\file 
+/**@file 
  * Directory master header. This header file includes all headers in a
  * subdirectory of the top Crystal Space include directory.
  */
@@ -41,9 +41,11 @@
 #include "csgfx/shaderexp.h"
 #include "csgfx/shaderexpaccessor.h"
 #include "csgfx/shadervar.h"
+#include "csgfx/shadervararrayhelper.h"
 #include "csgfx/shadervarblockalloc.h"
 #include "csgfx/shadervarcontext.h"
 #include "csgfx/shadervarframeholder.h"
+#include "csgfx/shadervarnameparser.h"
 #include "csgfx/textureformatstrings.h"
 #include "csgfx/trianglestream.h"
 #include "csgfx/vertexlight.h"

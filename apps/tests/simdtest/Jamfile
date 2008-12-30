@@ -1,0 +1,5 @@
+SubDir TOP apps tests simdtest ;
+
+Description simdtest : "SIMD Test" ;
+Application simdtest : [ Wildcard *.cpp *.h ] : console noinstall ;
+LinkWith simdtest : crystalspace ;

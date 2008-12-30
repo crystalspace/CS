@@ -19,8 +19,10 @@
 #include "csqsqrt.h"
 #include "csqint.h"
 
+#include "ivideo/txtmgr.h"
 #include "csgeom/frustum.h"
 #include "csgeom/trimesh.h"
+#include "csgfx/imagememory.h"
 #include "csutil/csendian.h"
 #include "csutil/csmd5.h"
 #include "csutil/memfile.h"
@@ -32,68 +34,42 @@
 #include "sector.h"
 #include "portal.h"
 
-//float csLight::influenceIntensityFraction = 256;
 #define HUGE_RADIUS 100000000
 
-
-void csLight::UpdateViscullMesh ()
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 {
-  if (!object_model) return;
-
-  // Update the 'viscull_mesh' data so that it roughly
-  // represents a shape that corresponds with the shape of the
-  // 'influence-object'. The influence-object is a sphere in case of a
-  // point light (with the influence radius as the radius) and a capped cone
-  // in case of a spot light. The geometry specified here should be at
-  // least as big as that shape (for example, a box in case of a point light
-  // would be fine).
-  csRef<iTriangleMesh> m;
-  switch (type)
-  {
-    case CS_LIGHT_POINTLIGHT:
-      {
-        object_model->box.Set (
-		-cutoffDistance, -cutoffDistance, -cutoffDistance,
-		cutoffDistance, cutoffDistance, cutoffDistance);
-        m.AttachNew (new csTriangleMeshBox (object_model->box));
-	object_model->radius = cutoffDistance;
-      }
-      break;
-    case CS_LIGHT_DIRECTIONAL:
-      // @@@ TODO
-      break;
-    case CS_LIGHT_SPOTLIGHT:
-      // @@@ TODO
-      break;
-  }
-  object_model->SetTriangleData (engine->viscull_id, m);
-  object_model->ShapeChanged ();
-}
 
 csLight::csLight (csEngine* engine,
   float x, float y, float z,
   float d,
   float red, float green, float blue,
   csLightDynamicType dyntype) :
-    scfImplementationType (this), light_id (0), color (red, green, blue),
-    specularColor (red, green, blue), userSpecular (false),
-    halo (0), dynamicType (dyntype), type (CS_LIGHT_POINTLIGHT), 
-    attenuation (CS_ATTN_LINEAR), cutoffDistance (d),
-    directionalCutoffRadius (d), spotlightFalloffInner (0),
-    spotlightFalloffOuter (1), lightnr (0), engine (engine)
+    scfImplementationType (this), light_id (0),
+    userSpecular (false), halo (0), dynamicType (dyntype), 
+    cutoffDistance (d), directionalCutoffRadius (d), 
+    userDirectionalCutoffRadius (false),
+    lightnr (0), engine (engine)
 {
   //movable.scfParent = (iBase*)(csObject*)this; //@@MS: Look at this?
   movable.SetLight (this);
-  movable.SetPosition (csVector3 (x,y,z));
+  
+  // Call setters explicitly since they also set SVs
+  csLight::SetCenter (csVector3 (x,y,z));
+  csLight::SetColor (csColor (red, green, blue));
+  csLight::SetType (CS_LIGHT_POINTLIGHT);
+  csLight::SetAttenuationMode (CS_ATTN_LINEAR);
+  csLight::SetSpotLightFalloff (1, 0);
 
   SetName ("__light__");
 
 
   //if (ABS (cutoffDistance) < SMALL_EPSILON)
   //  CalculateInfluenceRadius ();
-  CalculateAttenuationVector();
-
-  sectors_wanting_visculling = 0;
+  CalculateAttenuationVector ();
+  UpdateBBox ();
+  
+  CS::ShaderVariableContextImpl::AddVariable (
+    engine->GetLightAttenuationTextureSV ());
 }
 
 csLight::~csLight ()
@@ -103,8 +79,6 @@ csLight::~csLight ()
   size_t j;
   for (j = 0 ; j < children.GetSize () ; j++)
     children[j]->SetParent (0);
-
-  CleanupLSI ();
 
   int i = (int)light_cb_vector.GetSize ()-1;
   while (i >= 0)
@@ -118,173 +92,19 @@ csLight::~csLight ()
     engine->RemoveHalo (this);
   delete halo;
   delete[] light_id;
-
-  LightingInfo::GlobalIterator it(lightinginfos.GetIterator());
-  while (it.HasNext ())
-  {
-    csRef<iLightingInfo> linfo = it.Next ();
-    linfo->LightDisconnect (this);
-  }
-  lightinginfos.DeleteAll ();
+}
+  
+csShaderVariable* csLight::GetPropertySV (
+  csLightShaderVarCache::LightProperty prop)
+{
+  return CS::ShaderVariableContextImpl::GetVariableAdd (
+    engine->lightSvNames.GetLightSVId (prop));
 }
 
 void csLight::SelfDestruct ()
 {
   if (GetSector ())
     GetSector ()->GetLights ()->Remove ((iLight*)this);
-}
-
-void csLight::UseAsCullingObject ()
-{
-  sectors_wanting_visculling++;
-  if (!object_model)
-  {
-    object_model.AttachNew (new csLightObjectModel ());
-    UpdateViscullMesh ();
-  }
-}
-
-void csLight::StopUsingAsCullingObject ()
-{
-  CS_ASSERT (sectors_wanting_visculling > 0);
-  sectors_wanting_visculling--;
-  if (sectors_wanting_visculling <= 0)
-  {
-    object_model = 0;
-  }
-}
-
-void csLight::AddAffectedLightingInfo (iLightingInfo* li)
-{
-  csRef<iLightingInfo> p(li);
-  if (!lightinginfos.In (p))
-    lightinginfos.AddNoTest(p);
-}
-
-void csLight::RemoveAffectedLightingInfo (iLightingInfo* li)
-{
-  csRef<iLightingInfo> p(li);
-  lightinginfos.Delete (p);
-}
-
-void csLight::RemoveLSI (csLightSectorInfluence* inf)
-{
-  influences.Delete (inf);
-}
-
-void csLight::CleanupLSI ()
-{
-  csLightSectorInfluences::GlobalIterator it = influences.GetIterator ();
-  while (it.HasNext ())
-  {
-    csLightSectorInfluence* inf = it.Next ();
-    ((csSector*)inf->sector)->RemoveLSI (inf);
-  }
-  influences.Empty ();
-}
-
-void csLight::FindLSI ()
-{
-  CleanupLSI ();
-
-  iSector* sector = GetFullSector ();
-  if (!sector) return;
-  const csVector3 center = GetFullCenter ();
-
-  csLightSectorInfluence* inf = new csLightSectorInfluence ();
-  inf->sector = sector;
-  inf->light = (iLight*)this;
-  inf->frustum.AttachNew (new csFrustum (center));
-  influences.Add (inf);
-  inf->DecRef ();
-  ((csSector*)sector)->AddLSI (inf);
-
-  if (type == CS_LIGHT_SPOTLIGHT)
-  {
-    // @@@ TODO: calculate frustum for spot light.
-  }
-  else if (type == CS_LIGHT_DIRECTIONAL)
-  {
-    // @@@ TODO: is this right for directional?
-    inf->frustum->MakeInfinite ();
-  }
-  else if (type == CS_LIGHT_POINTLIGHT)
-  {
-    inf->frustum->MakeInfinite ();
-  }
-
-  FindLSI (inf);
-}
-
-void csLight::FindLSI (csLightSectorInfluence* inf)
-{
-  iSector* sector = inf->sector;
-  if (!sector) return;
-  const csVector3& center = inf->frustum->GetOrigin ();
-  float sq_cutoff = cutoffDistance * cutoffDistance;
-
-  // Find all portals that are in the influence radius around
-  // the light center.
-  const csSet<csPtrKey<iMeshWrapper> >& portals = sector->GetPortalMeshes ();
-  csSet<csPtrKey<iMeshWrapper> >::GlobalIterator it = portals.GetIterator ();
-  while (it.HasNext ())
-  {
-    iMeshWrapper* portal_mesh = it.Next ();
-    iPortalContainer* pc = portal_mesh->GetPortalContainer ();
-    int i;
-    for (i = 0 ; i < pc->GetPortalCount () ; i++)
-    {
-      iPortal* portal = pc->GetPortal (i);
-      const csVector3* world_vertices = portal->GetWorldVertices ();
-      const csPlane3& wor_plane = portal->GetWorldPlane ();
-      // Can we see the portal?
-      if (wor_plane.Classify (center) < -0.001)
-      {
-	// @@@ Consider having a simpler version that looks
-	// at center of portal instead of trying to calculate distance
-	// to portal polygon?
-        csVector3 poly[100];	//@@@ HARDCODE
-        int k;
-	int* idx = portal->GetVertexIndices ();
-        for (k = 0 ; k < portal->GetVertexIndicesCount () ; k++)
-        {
-          poly[k] = world_vertices[idx[k]];
-        }
-        float sqdist_portal = csSquaredDist::PointPoly (
-                  center, poly, portal->GetVertexIndicesCount (),
-                  wor_plane);
-        if (sqdist_portal <= sq_cutoff)
-        {
-	  portal->CompleteSector (0);
-	  if (portal->GetSector ())
-	  {
-	    // Check if in frustum.
-	    csRef<csFrustum> new_frustum = inf->frustum->Intersect (
-	        poly, portal->GetVertexIndicesCount ());
-	    if (new_frustum && !new_frustum->IsEmpty ())
-	    {
-	      new_frustum->SetBackPlane (wor_plane);
-	      if (portal->GetFlags ().Check (CS_PORTAL_WARP))
-	      {
-	        csReversibleTransform warp_wor;
-	        portal->ObjectToWorld (
-		  portal_mesh->GetMovable ()->GetFullTransform (), warp_wor);
-	        new_frustum->Transform (&warp_wor);
-	      }
-	      csLightSectorInfluence* newinf = new csLightSectorInfluence ();
-	      newinf->sector = portal->GetSector ();
-	      newinf->light = (iLight*)this;
-	      newinf->frustum = new_frustum;
-	      influences.Add (newinf);
-	      newinf->DecRef ();
-	      ((csSector*)portal->GetSector ())->AddLSI (newinf);
-	      FindLSI (newinf);
-	    }
-	  }
-	}
-      }
-    }
-  }
 }
 
 const char* csLight::GenerateUniqueID ()
@@ -352,7 +172,7 @@ float csLight::GetLuminanceAtSquaredDistance (float sqdist) const
       bright = 1;
       break;
     case CS_ATTN_LINEAR:
-      bright = 1 - sqrt (sqdist) / attenuationConstants.x;
+      bright = 1 - sqrt (sqdist) * attenuationConstants.w;
       break;
     case CS_ATTN_INVERSE:
       {
@@ -377,8 +197,10 @@ float csLight::GetBrightnessAtDistance (float d) const
 {
   switch (attenuation)
   {
-    case CS_ATTN_NONE:      return 1;
-    case CS_ATTN_LINEAR:    return 1 - d / attenuationConstants.x;
+    case CS_ATTN_NONE:      
+      return 1;
+    case CS_ATTN_LINEAR:    
+      return csClamp (1.0f - d * attenuationConstants.w, 1.0f, 0.0f);
     case CS_ATTN_INVERSE:
       if (d < SMALL_EPSILON) d = SMALL_EPSILON;
       return 1 / d;
@@ -397,29 +219,45 @@ void csLight::CalculateAttenuationVector ()
   switch (attenuation)
   {
     case CS_ATTN_NONE:
-      attenuationConstants.Set (1, 0, 0);
+      attenuationConstants.Set (1, 0, 0, 0);
       break;
     case CS_ATTN_LINEAR:    
       // @@@ FIXME: cutoff distance != radius, really
-      attenuationConstants.Set (cutoffDistance, 0, 0);
+      attenuationConstants.Set (1.0f/SMALL_EPSILON, 0, 0, 1.0f/cutoffDistance);
       break;
     case CS_ATTN_INVERSE:
-      attenuationConstants.Set (0, 1, 0);
+      attenuationConstants.Set (0, 1, 0, 0);
       break;
     case CS_ATTN_REALISTIC:
-      attenuationConstants.Set (0, 0, 1);
+      attenuationConstants.Set (0, 0, 1, 0);
       break;
     case CS_ATTN_CLQ:
       /* Nothing to do */
-      break;
     default:
-      ;
+      return;
   }
+  GetPropertySV (csLightShaderVarCache::lightAttenuation)->SetValue (
+    attenuationConstants);
 }
 
 void csLight::OnSetPosition ()
 {
-  FindLSI ();
+  // Update the AABB
+  {
+    const csBox3 oldBox = worldBoundingBox;
+    UpdateBBox ();
+    
+    iSectorList* list = movable.csMovable::GetSectors ();
+    if (list)
+    {
+      for (int i = 0; i < list->GetCount (); ++i)
+      {
+        csSector* sect = static_cast<csSector*> (list->Get (i));
+        sect->UpdateLightBounds (this, oldBox);
+      }      
+    }    
+  }
+
   csVector3 pos = GetFullCenter ();
   size_t i = light_cb_vector.GetSize ();
   while (i-- > 0)
@@ -428,6 +266,26 @@ void csLight::OnSetPosition ()
     cb->OnPositionChange (this, pos);
   }
 
+  GetPropertySV (csLightShaderVarCache::lightPositionWorld)->SetValue (pos);
+  const csReversibleTransform& lightT = 
+    movable.csMovable::GetFullTransform ();
+  GetPropertySV (csLightShaderVarCache::lightTransformWorld)->SetValue (
+    lightT);
+  GetPropertySV (csLightShaderVarCache::lightTransformWorldInverse)->SetValue (
+    lightT.GetInverse());
+      
+  const csVector3 lightDirW = 
+    lightT.This2OtherRelative (csVector3 (0, 0, 1));
+  if (!lightDirW.IsZero())
+  {
+    GetPropertySV (csLightShaderVarCache::lightDirectionWorld)->SetValue (
+      lightDirW.Unit());
+  }
+  else
+  {
+    GetPropertySV (csLightShaderVarCache::lightDirectionWorld)->SetValue (
+      csVector3 (0));
+  }
   lightnr++;
 }
 
@@ -453,15 +311,13 @@ void csLight::SetColor (const csColor& col)
   }
 
   color = col; 
-  if (!userSpecular) specularColor = col;
-  lightnr++;
-
-  LightingInfo::GlobalIterator it(lightinginfos.GetIterator());
-  while (it.HasNext ())
+  GetPropertySV (csLightShaderVarCache::lightDiffuse)->SetValue (col);
+  if (!userSpecular)
   {
-    csRef<iLightingInfo> linfo = it.Next ();
-    linfo->LightChanged (this);
+    specularColor = col;
+    GetPropertySV (csLightShaderVarCache::lightSpecular)->SetValue (col);
   }
+  lightnr++;
 }
 
 
@@ -481,6 +337,7 @@ void csLight::SetAttenuationMode (csLightAttenuationMode a)
 
   attenuation = a;
   CalculateAttenuationVector();
+  GetPropertySV (csLightShaderVarCache::lightAttenuationMode)->SetValue (a);
 
   size_t i = light_cb_vector.GetSize ();
   while (i-- > 0)
@@ -490,13 +347,15 @@ void csLight::SetAttenuationMode (csLightAttenuationMode a)
   }
 }
 
-void csLight::SetAttenuationConstants (const csVector3& attenv)
+void csLight::SetAttenuationConstants (const csVector4& attenv)
 {
   //@@TODO : Implement!
   /*attenuation = CS_ATTN_CLQ;
   attenuationvec.Set (attenv);
   influenceValid = false;*/
   attenuationConstants = attenv;
+  GetPropertySV (csLightShaderVarCache::lightAttenuation)->SetValue (
+    attenuationConstants);
 
   size_t i = light_cb_vector.GetSize ();
   while (i-- > 0)
@@ -509,6 +368,7 @@ void csLight::SetAttenuationConstants (const csVector3& attenv)
 void csLight::SetCutoffDistance (float radius)
 {
   if (radius <= 0) return;
+  
   size_t i = light_cb_vector.GetSize ();
   while (i-- > 0)
   {
@@ -516,8 +376,28 @@ void csLight::SetCutoffDistance (float radius)
     cb->OnRadiusChange (this, radius);
   }
   lightnr++;
+
   cutoffDistance = radius;
-  UpdateViscullMesh ();
+  if (!userDirectionalCutoffRadius)
+    directionalCutoffRadius = radius;
+
+  // Update the AABB
+  {
+    const csBox3 oldBox = worldBoundingBox;
+    UpdateBBox ();
+    
+    iSectorList* list = movable.csMovable::GetSectors ();
+    if (list)
+    {
+      for (int i = 0; i < list->GetCount (); ++i)
+      {
+        csSector* sect = static_cast<csSector*> (list->Get (i));
+        sect->UpdateLightBounds (this, oldBox);
+      }      
+    }
+  }
+
+  CalculateAttenuationVector();
 }
 
 iCrossHalo *csLight::CreateCrossHalo (float intensity, float cross)
@@ -552,22 +432,6 @@ iFlareHalo *csLight::CreateFlareHalo ()
 
 //---------------------------------------------------------------------------
 
-static void object_light_func (iMeshWrapper *mesh, iFrustumView *lview,
-  bool vis)
-{
-  // @@@ Note: In case of dynamic light and static lod we probably only want
-  // to calculate lighting on the currently visible mesh. Have to think on
-  // how to do that exactly.
-
-  if (!vis) return;
-  iShadowReceiver* receiver = mesh->GetShadowReceiver ();
-  if (receiver)
-    receiver->CastShadows (mesh->GetMovable (), lview);
-
-  csMeshWrapper* cmw = (csMeshWrapper*)mesh;
-  cmw->InvalidateRelevantLights ();
-}
-
 iSector* csLight::GetFullSector ()
 {
   iSector* s = GetSector ();
@@ -587,78 +451,32 @@ iSector* csLight::GetFullSector ()
   return 0;
 }
 
-void csLight::CalculateLighting ()
+csBox3 csLight::GetBBox () const
 {
-  csFrustumView lview;
-  csFrustumContext *ctxt = lview.GetFrustumContext ();
-
-  LightingInfo::GlobalIterator it(lightinginfos.GetIterator());
-  while (it.HasNext ())
-  {
-    csRef<iLightingInfo> linfo = it.Next ();
-    linfo->LightDisconnect (this);
-  }
-  lightinginfos.Empty ();
-
-  lview.SetObjectFunction (object_light_func);
-  lview.SetRadius (GetCutoffDistance ());
-  lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
-  lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
-
-  csRef<csLightingProcessInfo> lpi;
-  lpi.AttachNew (new csLightingProcessInfo (
-        this, dynamicType == CS_LIGHT_DYNAMICTYPE_DYNAMIC));
-  lview.SetUserdata (lpi);
-
-  ctxt->SetNewLightFrustum (new csFrustum (GetFullCenter ()));
-  ctxt->GetLightFrustum ()->MakeInfinite ();
-
-  iSector* sect = GetFullSector ();
-  if (!sect) return;	// Do nothing.
-
-  if (dynamicType == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
-  {
-    csRef<iMeshWrapperIterator> it = engine->GetNearbyMeshes (
-      sect, GetFullCenter (), GetCutoffDistance ());
-    while (it->HasNext ())
-    {
-      iMeshWrapper* m = it->Next ();
-      iShadowReceiver* receiver = m->GetShadowReceiver ();
-      if (receiver)
-      {
-        receiver->CastShadows (m->GetMovable (), &lview);
-        csMeshWrapper* cmw = (csMeshWrapper*)m;
-        cmw->InvalidateRelevantLights ();
-      }
-    }
-  }
-  else
-  {
-    sect->CheckFrustum ((iFrustumView *) &lview);
-    lpi->FinalizeLighting ();
-  }
+  return worldBoundingBox;
 }
 
-void csLight::CalculateLighting (iMeshWrapper *th)
+void csLight::UpdateBBox ()
 {
-  csFrustumView lview;
-  csFrustumContext *ctxt = lview.GetFrustumContext ();
-  lview.SetObjectFunction (object_light_func);
-  lview.SetRadius (GetCutoffDistance ());
-  lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
-  lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
+  switch (type)
+  {
+  case CS_LIGHT_DIRECTIONAL:
+      //@@TODO: Implement
+  case CS_LIGHT_SPOTLIGHT:
+    // @@@ This could be tighter if the falloff is taken into account.
+    lightBoundingBox.Set (
+      csVector3 (-cutoffDistance, -cutoffDistance, 0),
+      csVector3 (cutoffDistance, cutoffDistance, cutoffDistance));
+    break;
+  case CS_LIGHT_POINTLIGHT:
+    {
+      lightBoundingBox.SetSize (csVector3 (cutoffDistance*2));
+      lightBoundingBox.SetCenter (csVector3 (0));
+      break;
+    }
+  }
 
-  csRef<csLightingProcessInfo> lpi;
-  lpi.AttachNew (new csLightingProcessInfo (
-      this, dynamicType == CS_LIGHT_DYNAMICTYPE_DYNAMIC));
-  lview.SetUserdata (lpi);
-
-  ctxt->SetNewLightFrustum (new csFrustum (GetFullCenter ()));
-  ctxt->GetLightFrustum ()->MakeInfinite ();
-
-  lview.CallObjectFunction (th, true);
-
-  lpi->FinalizeLighting ();
+  worldBoundingBox = movable.GetFullTransform ().This2Other (lightBoundingBox);
 }
 
 //---------------------------------------------------------------------------
@@ -749,47 +567,49 @@ iLight *csLightList::FindByName (const char *Name) const
   return lights_hash.Get (Name, 0);
 }
 
-// --- csLightingProcessInfo --------------------------------------------------
-
-csLightingProcessInfo::csLightingProcessInfo (csLight* light, bool dynamic)
-  : scfImplementationType (this),
-  light (light), dynamic (dynamic), color (light->GetColor ())
+// ---------------------------------------------------------------------------
+  
+void LightAttenuationTextureAccessor::CreateAttenuationTexture ()
 {
-}
-
-csLightingProcessInfo::~csLightingProcessInfo()
-{
-}
-
-void csLightingProcessInfo::AttachUserdata (iLightingProcessData* userdata)
-{
-  userdatas.Push (userdata);
-}
-
-csPtr<iLightingProcessData> csLightingProcessInfo::QueryUserdata (
-  scfInterfaceID id, int version)
-{
-  size_t i;
-  for (i = 0 ; i < userdatas.GetSize () ; i++)
+#define CS_ATTTABLE_SIZE	  128
+#define CS_HALF_ATTTABLE_SIZE	  ((float)CS_ATTTABLE_SIZE/2.0f)
+  csRGBpixel *attenuationdata = 
+    new csRGBpixel[CS_ATTTABLE_SIZE * CS_ATTTABLE_SIZE];
+  csRGBpixel* data = attenuationdata;
+  for (int y=0; y < CS_ATTTABLE_SIZE; y++)
   {
-    iLightingProcessData* ptr = (iLightingProcessData*)(
-      userdatas[i]->QueryInterface (id, version));
-    if (ptr)
+    for (int x=0; x < CS_ATTTABLE_SIZE; x++)
     {
-      return csPtr<iLightingProcessData> (ptr);
+      float yv = 3.0f * ((y + 0.5f)/CS_HALF_ATTTABLE_SIZE - 1.0f);
+      float xv = 3.0f * ((x + 0.5f)/CS_HALF_ATTTABLE_SIZE - 1.0f);
+      float i = exp (-0.7 * (xv*xv + yv*yv));
+      unsigned char v = i>1.0f ? 255 : csQint (i*255.99f);
+      (data++)->Set (v, v, v, v);
     }
   }
-  return 0;
+
+  csRef<iImage> img = csPtr<iImage> (new csImageMemory (
+    CS_ATTTABLE_SIZE, CS_ATTTABLE_SIZE, attenuationdata, true, 
+    CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
+   attTex = engine->G3D->GetTextureManager()->RegisterTexture (
+      img, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS);
+  attTex->SetTextureClass ("lookup");
 }
 
-void csLightingProcessInfo::FinalizeLighting ()
+LightAttenuationTextureAccessor::LightAttenuationTextureAccessor (
+  csEngine* engine) : scfImplementationType (this), engine (engine)
 {
-  size_t i;
-  for (i = 0 ; i < userdatas.GetSize () ; i++)
-  {
-    userdatas[i]->FinalizeLighting ();
-  }
 }
 
-// ---------------------------------------------------------------------------
+LightAttenuationTextureAccessor::~LightAttenuationTextureAccessor ()
+{
+}
 
+void LightAttenuationTextureAccessor::PreGetValue (csShaderVariable *variable)
+{
+  if (!attTex.IsValid()) CreateAttenuationTexture ();
+  variable->SetValue (attTex);
+}
+
+}
+CS_PLUGIN_NAMESPACE_END(Engine)

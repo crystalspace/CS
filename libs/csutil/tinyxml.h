@@ -43,10 +43,13 @@ distribution.
 #include "csutil/memheap.h"
 #include "csutil/reftrackeraccess.h"
 #include "csutil/strset.h"
+#include "csutil/threading/atomicops.h"
 #include "csutil/util.h"
 #include "csgeom/math.h"
 
 #include "tinystr.h"
+
+struct iFile;
 
 namespace CS
 {
@@ -97,6 +100,59 @@ struct ParseInfo
   { startOfLine = p; linenum = 1; }
 };
 
+struct iPrintOutput
+{
+  virtual ~iPrintOutput() {}
+
+  virtual void Init (char*& bufPtr, size_t& bufRemaining) = 0;
+  virtual bool FlushBuffer (char*& bufPtr, size_t& bufRemaining) = 0;
+};
+
+class PrintState
+{
+  iPrintOutput* output;
+  char* bufPtr;
+  size_t bufRemaining;
+
+  csString fmtBuf;
+public:
+  PrintState (iPrintOutput* output) : output (output)
+  {
+    output->Init (bufPtr, bufRemaining);
+  }
+  
+  bool AppendFmtV (const char* fmt, va_list args)
+  {
+    fmtBuf.FormatV (fmt, args);
+    return Append (fmtBuf.GetData(), fmtBuf.Length ());
+  }
+
+  bool Append (const char* data, size_t size)
+  {
+    while (size > 0)
+    {
+      if (bufRemaining == 0)
+      {
+        if (!output->FlushBuffer (bufPtr, bufRemaining)) return false;
+      }
+
+      size_t copySize = csMin (size, bufRemaining);
+      memcpy (bufPtr, data, copySize);
+      bufRemaining -= copySize;
+      bufPtr += copySize;
+      data += copySize;
+      size -= copySize;
+    }
+
+    return true;
+  }
+
+  bool Flush ()
+  {
+    return output->FlushBuffer (bufPtr, bufRemaining);
+  }
+};
+
 /**
  * TiXmlBase is a base class for every class in TinyXml.
  * It does little except to establish that TinyXml classes
@@ -120,7 +176,7 @@ struct ParseInfo
  * A Decleration contains: Attributes (not on tree)
  * @endverbatim
  */
-class TiXmlBase
+class TiXmlBase : public CS::Memory::CustomAllocated
 {
   friend class TiDocumentNode;
   friend class TiXmlElement;
@@ -203,7 +259,7 @@ private:
  * in a document, or stand on its own. The type of a TiDocumentNode
  * can be queried, and it can be cast to its more defined type.
  */
-class TiDocumentNode : public TiXmlBase,  public CS::Memory::CustomAllocated
+class TiDocumentNode : public TiXmlBase
 {
   friend class TiDocument;
   friend class TiDocumentNodeChildren;
@@ -223,18 +279,19 @@ public:
 
   void IncRef () 
   { 
-    csRefTrackerAccess::TrackIncRef (this, refcount); 
-    refcount++; 
+    csRefTrackerAccess::TrackIncRef (this, int16 (typeAndRefCount & 0xffff)); 
+    CS::Threading::AtomicOperations::Increment (&typeAndRefCount);
   }
   void DecRef ();
-  int GetRefCount () const { return refcount; }
+  int GetRefCount () const
+  { return int16 (CS::Threading::AtomicOperations::Read (&typeAndRefCount) & 0xffff); }
 
   /**
    * All TinyXml classes can print themselves to a filestream.
    * This is a formatted print, and will insert tabs and newlines.
    * (For an unformatted stream, use the << operator.)
    */
-  void Print( iString* cfile, int depth ) const;
+  const char* Print( PrintState& print, int depth ) const;
   const char* Parse( ParseInfo& parse, const char* p );
 
   /**
@@ -280,7 +337,8 @@ public:
   TiXmlElement* NextSiblingElement( const char * ) const;
 
   /// Query the type (as an enumerated value, above) of this node.
-  NodeType Type() const { return type; }
+  NodeType Type() const
+  { return (NodeType)(CS::Threading::AtomicOperations::Read (&typeAndRefCount) >> 16); }
 
   /**
    * Return a pointer to the Document this node lives in.
@@ -304,7 +362,11 @@ public:
   csPtr<TiDocumentNode> Clone(TiDocument* document) const;
 
 protected:
-  int refcount;
+  int32 typeAndRefCount;
+  void SetType (NodeType type)
+  {
+    typeAndRefCount = (typeAndRefCount & 0xffff) | (type << 16);
+  }
 
   TiDocumentNode( );
 
@@ -313,7 +375,6 @@ protected:
     target->SetValue (Value () );
   }
 
-  NodeType type;
   TiDocumentNodeChildren* parent;
 
   csRef<TiDocumentNode> next;
@@ -430,7 +491,7 @@ private:
   friend class TiXmlElement;
 
   // [internal use]
-  void Print( iString* cfile, int depth ) const;
+  const char* Print( PrintState& print, int depth ) const;
 
   const char* name;
   char* value;
@@ -531,10 +592,14 @@ public:
   }
   void SetValue (const char * _value);
 
+  void ShrinkAttributes ()
+  {
+    attributeSet.set.ShrinkBestFit ();
+  }
 protected:
   friend class TiDocumentNode;
 
-  void Print( iString* cfile, int depth ) const;
+  const char* Print( PrintState& print, int depth ) const;
 
   /*  [internal use]
    * Attribtue parsing starts: next char past '<'
@@ -561,7 +626,7 @@ class TiXmlComment : public TiDocumentNode
 {
 public:
   /// Constructs an empty comment.
-  TiXmlComment() { value = 0; type = COMMENT; }
+  TiXmlComment() { value = 0; SetType (COMMENT); }
   ~TiXmlComment() { cs_free (value); }
 
   // [internal use] Creates a new Element and returs it.
@@ -577,7 +642,7 @@ protected:
   friend class TiDocumentNode;
 
   // [internal use]
-  void Print( iString* cfile, int depth ) const;
+  const char* Print( PrintState& print, int depth ) const;
 
   /*  [internal use]
    * Attribtue parsing starts: at the ! of the !--
@@ -600,7 +665,7 @@ public:
   TiXmlText ()
   {
     value = 0;
-    type = TEXT;
+    SetType (TEXT);
   }
   ~TiXmlText()
   {
@@ -615,7 +680,7 @@ protected :
   friend class TiDocumentNode;
 
   // [internal use]
-  void Print( iString* cfile, int depth ) const;
+  const char* Print( PrintState& print, int depth ) const;
 
   // [internal use] Creates a new Element and returns it.
   csPtr<TiDocumentNode> Clone(TiDocument* document) const;
@@ -642,7 +707,7 @@ public:
   /// Constructor.
   TiXmlCData () : TiXmlText ()
   {
-    type = CDATA;
+    SetType (CDATA);
   }
   ~TiXmlCData() {}
 
@@ -670,7 +735,7 @@ class TiXmlDeclaration : public TiDocumentNode
 {
 public:
   /// Construct an empty declaration.
-  TiXmlDeclaration() { type = DECLARATION; }
+  TiXmlDeclaration() { SetType (DECLARATION); }
 
   /// Construct.
   TiXmlDeclaration (const char * _version,
@@ -694,7 +759,7 @@ protected:
   friend class TiDocumentNode;
 
   // [internal use]
-  void Print( iString* cfile, int depth ) const;
+  const char* Print( PrintState& print, int depth ) const;
 
   //  [internal use]
   //  Attribtue parsing starts: next char past '<'
@@ -718,7 +783,7 @@ private:
 class TiXmlUnknown : public TiDocumentNode
 {
 public:
-  TiXmlUnknown() { type = UNKNOWN; }
+  TiXmlUnknown() { SetType (UNKNOWN); }
   ~TiXmlUnknown() {}
 
   // [internal use]
@@ -729,7 +794,7 @@ protected:
   friend class TiDocumentNode;
 
   // [internal use]
-  void Print( iString* cfile, int depth ) const;
+  const char* Print( PrintState& print, int depth ) const;
 
   /*  [internal use]
    * Attribute parsing starts: First char of the text
@@ -899,6 +964,7 @@ public:
 private:
   /// Parse the given null terminated block of xml data.
   const char* Parse( ParseInfo& parse, const char* p );
+  const char* Print( PrintState& print, int depth = 0 ) const;
 public:
   const char* Parse( const char* p )
   {
@@ -922,7 +988,8 @@ public:
   void ClearError() { errorId = TIXML_NO_ERROR; errorDesc = ""; }
 
   // [internal use]
-  void Print( iString* cfile, int depth = 0 ) const;
+  const char* Print( iString* cfile ) const;
+  const char* Print( iFile* cfile ) const;
   // [internal use]
   void SetError( int err, TiDocumentNode* errorNode, const char* errorPos )
   {
@@ -935,7 +1002,7 @@ public:
       while (errorNode != 0)
       {
         const char* nodeVal;
-        if ((errorNode->type == ELEMENT)
+        if ((errorNode->Type() == ELEMENT)
           && (nodeVal = errorNode->Value()) && *nodeVal)
         {
           if (!errorPath.IsEmpty ())
@@ -949,7 +1016,8 @@ public:
       csString location;
       location.Format ("line %d", parse.linenum);
       if (errorPos != 0)
-        location.AppendFmt (":%zu", errorPos - parse.startOfLine + 1);
+        location.AppendFmt (":%zu",
+          static_cast<size_t>(errorPos - parse.startOfLine + 1));
       errorDesc += location.GetDataSafe();
       if (!errorPath.IsEmpty())
       {

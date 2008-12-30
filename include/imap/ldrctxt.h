@@ -26,14 +26,17 @@
 
 /**\addtogroup loadsave
  * @{ */
+struct iCollection;
+struct iGeneralMeshState;
+struct iGeneralMeshSubMesh;
 struct iMaterialWrapper;
 struct iMeshFactoryWrapper;
 struct iMeshWrapper;
 struct iSector;
-struct iRegion;
 struct iTextureWrapper;
 struct iLight;
 struct iShader;
+struct iObject;
 
 /**
  * This interface gives the context for the loader.
@@ -50,7 +53,7 @@ struct iShader;
  */
 struct iLoaderContext : public virtual iBase
 {
-  SCF_INTERFACE(iLoaderContext,2,0,0);
+  SCF_INTERFACE(iLoaderContext, 4, 0, 0);
   /// Find a sector.
   virtual iSector* FindSector (const char* name) = 0;
   
@@ -59,7 +62,7 @@ struct iLoaderContext : public virtual iBase
    *  the texture using the filename.  If loaded then it is also
    *  Prepared.
    */
-  virtual iMaterialWrapper* FindMaterial (const char* filename) = 0;
+  virtual iMaterialWrapper* FindMaterial (const char* filename, bool dontWaitForLoad = false) = 0;
 
   /**
    * Same as FindMaterial but there is no assumption that the name
@@ -68,9 +71,9 @@ struct iLoaderContext : public virtual iBase
    * names with /'s will never be found correctly.
    */
   virtual iMaterialWrapper* FindNamedMaterial (const char* name,
-  	const char *filename) = 0;
+  	const char *filename, bool dontWaitForLoad = false) = 0;
   /// Find a mesh factory.
-  virtual iMeshFactoryWrapper* FindMeshFactory (const char* name) = 0;
+  virtual iMeshFactoryWrapper* FindMeshFactory (const char* name, bool dontWaitForLoad = false) = 0;
   /// Find a mesh object.
   virtual iMeshWrapper* FindMeshObject (const char* name) = 0;
   
@@ -78,20 +81,31 @@ struct iLoaderContext : public virtual iBase
    * Find a texture.  If not found, attempt to load and prepare the
    * texture using the supplied filename as the name.
    */
-  virtual iTextureWrapper* FindTexture (const char* filename) = 0;
+  virtual iTextureWrapper* FindTexture (const char* filename, bool dontWaitForLoad = false) = 0;
 
   /**
    * Find a texture with the given name.  If not found, attempt to load
    * the supplied filename and prepare the texture using the supplied name.
    */
   virtual iTextureWrapper* FindNamedTexture (const char* name,
-  	const char *filename) = 0;
+  	const char *filename, bool dontWaitForLoad = false) = 0;
 
   /// Find a light
   virtual iLight* FindLight (const char* name) = 0;
 
-  /// Find a shader.
+  /**
+   * Find a shader.
+   * \remarks Implementations should treat shader names starting with a '*'
+   *   in a special way: These are "built-in" shaders and should be searched 
+   *   globally even if only the current collection is supposed to be looked
+   *   up.
+   */
   virtual iShader* FindShader (const char* name) = 0;
+
+  /**
+   * Find a genmesh submesh.
+   */
+  virtual iGeneralMeshSubMesh* FindSubmesh(iGeneralMeshState* state, const char* name) = 0;
 
   /**
    * Return true if we check for dupes (to avoid objects with same name
@@ -100,16 +114,31 @@ struct iLoaderContext : public virtual iBase
   virtual bool CheckDupes () const = 0;
 
   /**
-   * Return a region if we only want to load in that region.
-   * 0 otherwise. If not 0 then all objects will be created in the region.
+   * Return a collection if we only want to load in that collection.
+   * 0 otherwise. If not 0 then all objects will be created in the collection.
    */
-  virtual iRegion* GetRegion () const = 0;
+  virtual iCollection* GetCollection() const = 0;
 
   /**
    * Return true if we only want to look for objects in the region
    * given by GetRegion().
    */
-  virtual bool CurrentRegionOnly () const = 0;
+  virtual bool CurrentCollectionOnly() const = 0;
+
+  /**
+   * Returns the flags to tell us what we want to keep.
+   */
+  virtual uint GetKeepFlags() const = 0;
+
+  /**
+   * Adds the object to the stored collection.
+   */
+  virtual void AddToCollection(iObject* obj) = 0;
+
+  /**
+   * Get the message verbosity.
+   */
+  virtual bool GetVerbose() = 0;
 };
 
 /** @} */

@@ -82,16 +82,18 @@ bool cswinIsWinNT (cswinWindowsVersion* version)
   return GetWinVer ()->IsWinNT;
 }
 
-wchar_t* cswinGetErrorMessageW (HRESULT code)
+static wchar_t* CallFormatMessage (HRESULT code, DWORD flags)
 {
-  LPVOID lpMsgBuf;
   DWORD dwResult;
-  wchar_t* ret;
+  LPVOID lpMsgBuf;
+  wchar_t* ret = 0;
 
   if (cswinIsWinNT ())
   {
-    dwResult = FormatMessageW (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-      0, code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR) &lpMsgBuf, 0, 0);
+    dwResult = FormatMessageW (
+      FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | flags,
+      0, code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR) &lpMsgBuf, 
+      0, 0);
     if (dwResult != 0)
     {
       ret = csStrNewW ((wchar_t*)lpMsgBuf);
@@ -100,8 +102,10 @@ wchar_t* cswinGetErrorMessageW (HRESULT code)
   }
   else
   {
-    dwResult = FormatMessageA (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-      0, code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR) &lpMsgBuf, 0, 0);
+    dwResult = FormatMessageA (
+      FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | flags,
+      0, code, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR) &lpMsgBuf, 
+      0, 0);
     if (dwResult != 0)
     {
       ret = cswinAnsiToWide ((char*)lpMsgBuf);
@@ -109,7 +113,14 @@ wchar_t* cswinGetErrorMessageW (HRESULT code)
     }
   }
 
-  if (dwResult == 0)
+  return ret;
+}
+
+wchar_t* cswinGetErrorMessageW (HRESULT code)
+{
+  wchar_t* ret = CallFormatMessage (code, FORMAT_MESSAGE_IGNORE_INSERTS);
+
+  if (ret == 0)
   {
     HRESULT fmError = GetLastError ();
     csString msg;
@@ -117,6 +128,7 @@ wchar_t* cswinGetErrorMessageW (HRESULT code)
     ret = csStrNewW (msg);
   }
 
+  // Slash trailing CRLF
   wchar_t* retEnd = ret + wcslen (ret);
   while (retEnd > ret)
   {

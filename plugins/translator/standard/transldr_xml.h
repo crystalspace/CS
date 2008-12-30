@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2006 by Dariusz Dawidowski
+    Copyright (C) 2006-2007 by Dariusz Dawidowski
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -25,6 +25,7 @@
 #include "csutil/csstring.h"
 #include "imap/reader.h"
 #include "imap/services.h"
+#include "trans.h"
 
 struct iObjectRegistry;
 
@@ -39,12 +40,14 @@ class csTranslatorLoaderXml :public scfImplementation2<csTranslatorLoaderXml,
 {
 private:
   iObjectRegistry* object_reg;
+  csRef<csTranslator> trans;
   csRef<iSyntaxService> synldr;
   csStringHash tokens;
 #define CS_TOKEN_ITEM_FILE "plugins/translator/standard/transldr_xml.tok"
 #include "cstool/tokenlist.h"
 #undef CS_TOKEN_ITEM_FILE
   void Report (int severity, const char* msg, ...);
+  bool Process (iDocumentNode* node, const char* lang);
 
 public:
   csTranslatorLoaderXml (iBase* parent);
@@ -52,6 +55,8 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context, iBase* context);
+
+  virtual bool IsThreadSafe() { return true; }
 };
 
 }

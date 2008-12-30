@@ -36,7 +36,6 @@
 
 #include "csgfx/rgbpixel.h"
 #include "plugins/engine/3d/engine.h"
-#include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/sector.h"
 #include "csutil/xmltiny.h"
 #include "cstool/rviewclipper.h"
@@ -69,19 +68,20 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s, iMeshWrapper* mesh)
 
     // Needed so halos are correctly recognized as "visible".
     csRef<iClipper2D> oldClipper = rview->GetGraphics3D()->GetClipper();
-    int oldClipType = rview->GetGraphics3D()->GetClipType();
-
-    csRef<iShaderVarStack> varStack = shadermanager->GetShaderVariableStack ();
+    int oldClipType = rview->GetGraphics3D()->GetClipType();    
 
     s->IncRecLevel ();
     s->PrepareDraw (rview);
     csSector* cs = (csSector*)s;
     cs->SetSingleMesh (mesh);
 
+    csShaderVariableStack stack;
+    stack.Setup (shadermanager->GetShaderVariableStack ().GetSize());
     size_t i;
     for (i = 0; i < steps.GetSize (); i++)
     {
-      steps[i]->Perform (rview, s, varStack);
+      stack.Clear ();
+      steps[i]->Perform (rview, s, stack);
     }
     s->DecRecLevel ();
     cs->SetSingleMesh (0);
@@ -93,7 +93,7 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s, iMeshWrapper* mesh)
     for (i = lights->GetCount (); i-- > 0;)
       // Tell the engine to try to add this light into the halo queue
       engine->AddHalo (rview->GetCamera(), 
-        ((csLight*)lights->Get ((int)i))->GetPrivateObject ());
+        ((csLight*)lights->Get ((int)i))->GetPrivateObject ());    
   }
 }
 
@@ -149,10 +149,14 @@ csPtr<iRenderLoop> csRenderLoopManager::Create ()
   return csPtr<iRenderLoop> (loop);
 }
   
-bool csRenderLoopManager::Register (const char* name, iRenderLoop* loop)
+bool csRenderLoopManager::Register (const char* name, iRenderLoop* loop,
+                                    bool checkDupes)
 {
   const char* myName = strings.Request (strings.Request (name));
-  if (loops.In (myName)) return false;
+  if (loops.In (myName))
+  {
+    return checkDupes;
+  }
   loops.Put (myName, loop);
   return true;
 }
@@ -173,6 +177,37 @@ bool csRenderLoopManager::Unregister (iRenderLoop* loop)
   if ((key = loops.GetKey (loop, 0)) == 0) return false;
   loops.Delete (key, loop);
   return true;
+}
+  
+struct LoopNamePair
+{
+  const char* n;
+  iRenderLoop* l;
+    
+  LoopNamePair (const char* n, iRenderLoop* l) : n (n), l (l) {}
+};
+
+void csRenderLoopManager::UnregisterAll (bool evenDefault)
+{
+  if (evenDefault)
+  {
+    loops.DeleteAll();
+    return;
+  }
+  
+  LoopsHash::ConstGlobalIterator it (
+    const_cast<const LoopsHash*> (&loops)->GetIterator());
+  csArray<LoopNamePair> deleteList;
+  deleteList.SetCapacity (loops.GetSize());
+  while (it.HasNext())
+  {
+    const char* name;
+    iRenderLoop* loop = it.Next (name);
+    if (strcmp (name, CS_DEFAULT_RENDERLOOP_NAME) != 0)
+      deleteList.Push (LoopNamePair (name, loop));
+  }
+  for (size_t i = 0; i < deleteList.GetSize(); i++)
+    loops.Delete (deleteList[i].n, deleteList[i].l);
 }
 
 csPtr<iRenderLoop> csRenderLoopManager::Load (const char* fileName)

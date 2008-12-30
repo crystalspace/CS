@@ -106,6 +106,7 @@ class csODECollider;
 // Helper base for classes that can contain multiple colliders
 struct ColliderContainer
 {
+  virtual ~ColliderContainer() {}
   virtual bool DoFullInertiaRecalculation () const = 0;
   virtual void RecalculateFullInertia (csODECollider* thisCol) = 0;
 };
@@ -139,7 +140,7 @@ private:
   float total_elapsed;
   csRefArrayObject<iODEFrameUpdateCallback> updates;
 
-  csWeakRefArray<iDynamicsStepCallback> step_callbacks;
+  csRefArray<iDynamicsStepCallback> step_callbacks;
 
   bool stepfast;
   int sfiter;
@@ -147,7 +148,7 @@ private:
   int qsiter;
   bool fastobjects;
 
-  csEventID PreProcess;
+  csEventID Frame;
 public:
   csODEDynamics (iBase* parent);
   virtual ~csODEDynamics ();
@@ -227,8 +228,7 @@ public:
     virtual ~EventHandler () { }
     virtual bool HandleEvent (iEvent& ev)
     { return parent ? parent->HandleEvent (ev) : false; }
-    CS_EVENTHANDLER_NAMES("crystalspace.dynamics.ode")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
+    CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.dynamics.ode")
   };
   csRef<EventHandler> scfiEventHandler;
 };
@@ -375,6 +375,12 @@ public:
 
   virtual iDynamicsMoveCallback* GetDefaultMoveCallback () { return move_cb; }
 
+  virtual bool AttachColliderConvexMesh (iMeshWrapper* mesh,
+        const csOrthoTransform& trans, float friction, float elasticity,
+	float softness)
+  {
+    return AttachColliderMesh (mesh, trans, friction, elasticity, softness);
+  }
   virtual bool AttachColliderMesh (iMeshWrapper* mesh,
         const csOrthoTransform& trans, float friction, float elasticity,
 	float softness);
@@ -429,7 +435,7 @@ public:
   bool BodyInGroup (iRigidBody *body);
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 class csODECollider : public scfImplementation1<csODECollider,
                                                 iDynamicsSystemCollider>
@@ -451,9 +457,14 @@ public:
   
   bool CreateSphereGeometry (const csSphere& sphere);
   bool CreatePlaneGeometry (const csPlane3& plane);
+  bool CreateConvexMeshGeometry (iMeshWrapper *mesh)
+  {
+    return CreateMeshGeometry (mesh);
+  }
   bool CreateMeshGeometry (iMeshWrapper *mesh);
   bool CreateBoxGeometry (const csVector3& box_size);
   bool CreateCapsuleGeometry (float length, float radius); 
+  bool CreateCylinderGeometry (float length, float radius); 
   bool GetBoxGeometry (csVector3& size); 
   bool GetSphereGeometry (csSphere& sphere);
   bool GetPlaneGeometry (csPlane3& box); 
@@ -502,7 +513,7 @@ private:
 
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 struct GeomData 
 {
@@ -559,6 +570,13 @@ public:
   void UnsetGroup () { collision_group = 0; }
   csRef<iBodyGroup> GetGroup (void) { return collision_group; }
 
+  bool AttachColliderConvexMesh (iMeshWrapper* mesh,
+        const csOrthoTransform& trans, float friction, float density,
+        float elasticity, float softness)
+  {
+    return AttachColliderMesh (mesh, trans, friction, density,
+      elasticity, softness);
+  }
   bool AttachColliderMesh (iMeshWrapper* mesh,
         const csOrthoTransform& trans, float friction, float density,
         float elasticity, float softness);
@@ -1556,12 +1574,11 @@ class csODEJoint : public scfImplementation2<
   csRef<iRigidBody> body[2];
   dBodyID bodyID[2];
 
-  int transConstraint[3], rotConstraint[3];
-  csVector3 lo_stop, hi_stop, vel, fmax, fudge_factor, bounce,
-    cfm, stop_erp, stop_cfm, suspension_cfm, suspension_erp;
+  bool is_dirty;
 
-  csVector3 aconstraint_axis[2];
-  bool custom_aconstraint_axis;
+  int transConstraint[3], rotConstraint[3];
+  csVector3 min_angle, max_angle, min_dist, max_dist, vel, fmax, fudge_factor, bounce,
+    cfm, stop_erp, stop_cfm, suspension_cfm, suspension_erp;
 
   csOrthoTransform transform;
 
@@ -1574,108 +1591,117 @@ public:
 
   inline dJointID GetID () { return jointID; }
 
-  void Attach (iRigidBody *body1, iRigidBody *body2);
+  void Attach (iRigidBody *body1, iRigidBody *body2, bool force_update);
   csRef<iRigidBody> GetAttachedBody (int body);
 
-  void SetTransform (const csOrthoTransform &trans);
+  void SetTransform (const csOrthoTransform &trans, bool force_update);
   csOrthoTransform GetTransform ();
 
-  void SetStopAndMotorsParams ();
+  void SetMotorsParams (dJointID joint);
 
-  void SetTransConstraints (bool X, bool Y, bool Z);
+  void SetTransConstraints (bool X, bool Y, bool Z, bool force_update);
   inline bool IsXTransConstrained () { return (transConstraint[0] != 0); }
   inline bool IsYTransConstrained () { return (transConstraint[1] != 0); }
   inline bool IsZTransConstrained () { return (transConstraint[2] != 0); }
-  void SetMinimumDistance (const csVector3 &min);
+  void SetMinimumDistance (const csVector3 &min, bool force_update);
   csVector3 GetMinimumDistance ();
-  void SetMaximumDistance (const csVector3 &max);
+  void SetMaximumDistance (const csVector3 &max, bool force_update);
   csVector3 GetMaximumDistance ();
 
-  void SetRotConstraints (bool X, bool Y, bool Z);
+  void SetRotConstraints (bool X, bool Y, bool Z, bool force_update);
   inline bool IsXRotConstrained () { return (rotConstraint[0] != 0); }
   inline bool IsYRotConstrained () { return (rotConstraint[1] != 0); }
   inline bool IsZRotConstrained () { return (rotConstraint[2] != 0); }
-  void SetMinimumAngle (const csVector3 &min);
+  void SetMinimumAngle (const csVector3 &min, bool force_update);
   csVector3 GetMinimumAngle ();
-  void SetMaximumAngle (const csVector3 &max);
+  void SetMaximumAngle (const csVector3 &max, bool force_update);
   csVector3 GetMaximumAngle ();
 
-  void SetBounce (const csVector3 & bounce )
+  bool RebuildJoint ();
+
+  void SetBounce (const csVector3 & bounce, bool force_update)
   { 
     csODEJoint::bounce = bounce;
-    ApplyJointProperty (dParamBounce, bounce); 
+    if (force_update)
+      RebuildJoint ();
+  }
+  void SetBounce (const csVector3 & bounce)
+  { 
+    SetBounce (bounce, true);
   }
   csVector3 GetBounce (){return bounce;}
-  void SetDesiredVelocity (const csVector3 & velocity )
+  void SetDesiredVelocity (const csVector3 & velocity, bool force_update)
   { 
     vel = velocity;
-    ApplyJointProperty (dParamVel, velocity); 
+    if (force_update)
+      RebuildJoint ();
   }
   csVector3 GetDesiredVelocity (){return vel;}
-  void SetMaxForce (const csVector3 & maxForce )
+  void SetMaxForce (const csVector3 & maxForce, bool force_update)
   { 
     fmax = maxForce;
-    ApplyJointProperty (dParamFMax, maxForce); 
+    if (force_update)
+      RebuildJoint ();
   }
   csVector3 GetMaxForce (){return fmax;}
-  void SetAngularConstraintAxis (const csVector3 &axis, int body); 
+  void SetAngularConstraintAxis (const csVector3 &axis, int body, bool force_update); 
   csVector3 GetAngularConstraintAxis (int body);
 
   //----------------iODEJointState----------------
   ODEJointType GetType();
   void SetLoStop (const csVector3 &value) 
   { 
-    lo_stop = value;
-    ApplyJointProperty (dParamLoStop, value); 
+    min_angle = min_dist = value;
+    RebuildJoint ();
   }
   void SetHiStop (const csVector3 &value) 
   { 
-    hi_stop = value;
-    ApplyJointProperty (dParamHiStop, value); 
+    max_angle = max_dist = value;
+    RebuildJoint ();
   }
   void SetVel (const csVector3 &value) 
   {
     vel = value;
-    ApplyJointProperty (dParamVel, value); 
+    RebuildJoint ();
   }
   void SetFMax (const csVector3 &value) 
   {
     fmax = value;
-    ApplyJointProperty (dParamFMax, value);
+    RebuildJoint ();
   }
   void SetFudgeFactor (const csVector3 &value) 
   {
     fudge_factor = value;
-    ApplyJointProperty (dParamFudgeFactor, value); 
+    RebuildJoint ();
   }
   void SetCFM (const csVector3 &value) 
   {
     cfm = value;
-    ApplyJointProperty (dParamCFM, value); 
+    RebuildJoint ();
   }
   void SetStopERP (const csVector3 &value) 
   {
     stop_erp = value;
-    ApplyJointProperty (dParamStopERP, value); 
+    RebuildJoint ();
   }
   void SetStopCFM (const csVector3 &value) 
   { 
     stop_cfm = value;
-    ApplyJointProperty (dParamStopCFM, value); 
+    RebuildJoint ();
   }
   void SetSuspensionERP (const csVector3 &value)
   {
     suspension_erp = value;
-    ApplyJointProperty (dParamSuspensionERP, value);
+    RebuildJoint ();
   }
   void SetSuspensionCFM (const csVector3 &value)
   {
     suspension_cfm = value;
-    ApplyJointProperty (dParamSuspensionCFM, value);
+    RebuildJoint ();
   }
 
-  csVector3 GetLoStop () { return lo_stop; }
-  csVector3 GetHiStop () { return hi_stop; }
+  csVector3 GetLoStop () { return min_angle; }
+  csVector3 GetHiStop () { return max_angle; }
   csVector3 GetVel () { return vel; }
   csVector3 GetFMax () { return fmax; }
   csVector3 GetFudgeFactor () { return fudge_factor; }
@@ -1687,13 +1713,16 @@ public:
 
 private:
 
-  void ApplyJointProperty (int parameter, const csVector3 &values);
+  void ApplyJointProperty (dJointID joint, int parameter, const csVector3 &values);
   csVector3 GetParam (int parameter);
 
-  void BuildHinge (const csVector3 &axis);
-  void BuildHinge2 (const csVector3 &axis1,const csVector3 &axis2);
-  void BuildSlider (const csVector3 &axis);
-  void BuildJoint ();
+  void BuildHinge ();
+  void BuildHinge2 ();
+  void BuildBall ();
+  void BuildAMotor ();
+  void BuildSlider ();
+  
+  void Clear ();
 
 };
 

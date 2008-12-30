@@ -21,11 +21,12 @@
 #ifndef __CS_GL_NEWTXTMGR_H__
 #define __CS_GL_NEWTXTMGR_H__
 
+#include "csgfx/textureformatstrings.h"
+#include "csutil/threadmanager.h"
+#include "csutil/weakrefarr.h"
+
 #include "iutil/cfgfile.h"
 #include "ivideo/txtmgr.h"
-
-#include "csgfx/textureformatstrings.h"
-#include "csutil/weakrefarr.h"
 
 #include "gl_txtmgr_basictex.h"
 
@@ -35,7 +36,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
 
 class csGLGraphics3D;
-class csGLSuperLightmap;
 class csGLTextureHandle;
 class csGLTextureManager;
 
@@ -47,6 +47,7 @@ struct csGLTextureClassSettings
   bool forceDecompress;
   bool allowDownsample;
   bool allowMipSharpen;
+  bool renormalizeGeneratedMips;
 };
 
 /*
@@ -62,6 +63,10 @@ private:
   typedef csWeakRefArray<csGLBasicTextureHandle> csTexVector;
   /// List of textures.
   csTexVector textures;
+  bool compactTextures;
+
+  /// Lock on textures vector.
+  CS::Threading::Mutex texturesLock;
 
   csStringSet textureClassIDs;
   csHash<csGLTextureClassSettings, csStringID> textureClasses;
@@ -84,6 +89,9 @@ private:
   void InitFormats ();
   bool FormatSupported (GLenum srcFormat, GLenum srcType);
 
+  void CompactTextures ();
+  
+  bool ImageTypeSupported (csImageType imagetype, iString* fail_reason);
 public:
   /* Format tables - maps component sizes to GL sizes.
    * A lot of source formats have the same 'type' bit only differ in 'format'.
@@ -114,9 +122,6 @@ public:
 
   csWeakRef<csGLGraphics3D> G3D;
 
-  /// All SLMs currently in use.
-  csArray<csGLSuperLightmap*> superLMs;
-
   int max_tex_size;
   /// Sharpen mipmaps?
   int sharpen_mipmaps;
@@ -126,18 +131,36 @@ public:
   float texture_filter_anisotropy;
   /// Whether bilinear filtering should be used (0 = no, 1 = yes, 2 = trilinear)
   int rstate_bilinearmap;
-  /**
-   * Whether to prevent uploading of NPOTS textures to a generic compressed 
-   * format (causes crashes on some drivers).
-   */
-  bool disableRECTTextureCompression;
-  /**
-   * Whether to enable uploading of NPOTS textures as 2D textures.
-   * Some ATI hardware (Radeon 9500+) has a "hidden" feature where you can 
-   * specify NPOTS textures as 2D textures. (Normally they would have to be 
-   * POTS.) 
-   */
-  bool enableNonPowerOfTwo2DTextures;
+  
+  struct
+  {
+    /**
+    * Whether to prevent uploading of NPOTS textures to a generic compressed 
+    * format (causes crashes on some drivers).
+    */
+    bool disableRECTTextureCompression;
+    /**
+    * Whether to enable uploading of NPOTS textures as 2D textures.
+    * Some ATI hardware (Radeon 9500+) has a "hidden" feature where you can 
+    * specify NPOTS textures as 2D textures. (Normally they would have to be 
+    * POTS.) 
+    */
+    bool enableNonPowerOfTwo2DTextures;
+  
+    /// Some drivers seem to ignore glGenerateMipmap calls
+    bool disableGenerateMipmap;
+    
+    /**
+     * Workaround a bug in NV OpenGL (169.12): when using GENERATE_MIPMAPS
+     * the max lod level isn't generated but is black.
+     * Solution: set max LOD level to desired level plus one.
+     */
+    bool generateMipMapsExcessOne;
+  } tweaks;
+    
+  bool hasPBO;
+  
+  TextureReadbackSimple::Pool simpleTextureReadbacks;
 
   csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
@@ -158,7 +181,7 @@ public:
   {
     return textureClassIDs.Request (classID);
   }
-
+  
   /**
    * Helper function to make sure a texture isn't selected on any TU.
    * Useful when deleting a texture.
@@ -177,8 +200,15 @@ public:
       iString* fail_reason = 0);
   virtual csPtr<iTextureHandle> CreateTexture (int w, int h,
       csImageType imagetype, const char* format, int flags,
+      iString* fail_reason = 0)
+  {
+    return csGLTextureManager::CreateTexture (w, h, 1, imagetype, format,
+      flags, fail_reason);
+  }
+  virtual csPtr<iTextureHandle> CreateTexture (int w, int h, int d,
+      csImageType imagetype, const char* format, int flags,
       iString* fail_reason = 0);
-  void UnregisterTexture (csGLBasicTextureHandle* handle);
+  void MarkTexturesDirty () { compactTextures = true; }
 
   /**
    * Query the basic format of textures that can be registered with this
@@ -189,12 +219,9 @@ public:
    */
   virtual int GetTextureFormat ();
 
-  virtual csPtr<iSuperLightmap> CreateSuperLightmap(int width, int height);
-
   virtual void GetMaxTextureSize (int& w, int& h, int& aspect);
 
-  /// Dump all SLMs to image files.
-  void DumpSuperLightmaps (iVFS* VFS, iImageIO* iio, const char* dir);
+  void DumpTextures (iVFS* VFS, iImageIO* iio, const char* dir);
 };
 
 }

@@ -52,35 +52,6 @@ csEventQueue::csEventQueue (iObjectRegistry* r, size_t iLength) :
   EventTree = csEventTree::CreateRootNode(HandlerRegistry, NameRegistry, this);
 
   Frame = csevFrame (NameRegistry);
-  PreProcess = csevPreProcess (NameRegistry);
-  ProcessEvent = csevProcess (NameRegistry);
-  PostProcess = csevPostProcess (NameRegistry);
-  FinalProcess = csevFinalProcess (NameRegistry);
-
-  csRef<iTypedFrameEventDispatcher> PreProcessEventDispatcher;
-  csRef<iTypedFrameEventDispatcher> ProcessEventDispatcher;
-  csRef<iTypedFrameEventDispatcher> PostProcessEventDispatcher;
-  csRef<iTypedFrameEventDispatcher> FinalProcessEventDispatcher;
-  PreProcessEventDispatcher.AttachNew (
-    new PreProcessFrameEventDispatcher (this));
-  ProcessEventDispatcher.AttachNew (
-    new ProcessFrameEventDispatcher (this));
-  PostProcessEventDispatcher.AttachNew (
-    new PostProcessFrameEventDispatcher (this));
-  FinalProcessEventDispatcher.AttachNew (
-    new FinalProcessFrameEventDispatcher (this));
-
-  if (!RegisterListener (PreProcessEventDispatcher)
-    || !Subscribe (PreProcessEventDispatcher, Frame) 
-    || !RegisterListener (ProcessEventDispatcher)
-    || !Subscribe (ProcessEventDispatcher, Frame) 
-    || !RegisterListener (PostProcessEventDispatcher)
-    || !Subscribe (PostProcessEventDispatcher, Frame) 
-    || !RegisterListener (FinalProcessEventDispatcher)
-    || !Subscribe (FinalProcessEventDispatcher, Frame))
-  {
-    CS_ASSERT(0);
-  }
 }
 
 csEventQueue::~csEventQueue ()
@@ -96,7 +67,7 @@ csEventQueue::~csEventQueue ()
     EventPool->Free();
     EventPool = e;
   }
-  csEventTree::DeleteRootNode (EventTree); // Magic!
+  RemoveAllListeners();
   EventTree = 0;
 }
 
@@ -131,7 +102,7 @@ iEvent *csEventQueue::CreateRawEvent ()
 csPtr<iEvent> csEventQueue::CreateEvent ()
 {
   iEvent *e = CreateRawEvent ();
-  e->Name = 0;
+  e->Name = csInvalidStringID;
   e->Broadcast = 0;
   e->Time = csGetTicks();
   return csPtr<iEvent>((iEvent*)e);
@@ -175,14 +146,12 @@ void csEventQueue::Post (iEvent *Event)
 	    << std::endl;
 #endif
 again:
-  Lock ();
   size_t newHead = evqHead + 1;
   if (newHead == Length)
     newHead = 0;
 
   if (newHead == evqTail) // Queue full?
-  {
-    Unlock ();
+  {    
     Resize (Length * 2); // Normally queue should not be more than half full.
     goto again;
   }
@@ -190,7 +159,6 @@ again:
   EventQueue [evqHead] = Event;
   Event->IncRef ();
   evqHead = newHead;
-  Unlock ();
 }
 
 csPtr<iEvent> csEventQueue::Get ()
@@ -198,12 +166,10 @@ csPtr<iEvent> csEventQueue::Get ()
   iEvent* ev = 0;
   if (!IsEmpty ())
   {
-    Lock ();
     size_t oldTail = evqTail++;
     if (evqTail == Length)
       evqTail = 0;
     ev = (iEvent*)EventQueue [oldTail];
-    Unlock ();
   }
 #ifdef ADB_DEBUG
   if (ev != 0)
@@ -228,10 +194,8 @@ void csEventQueue::Resize (size_t iLength)
   if (iLength <= 0)
     iLength = DEF_EVENT_QUEUE_LENGTH;
 
-  Lock ();
   if (iLength == Length)
   {
-    Unlock ();
     return;
   }
 
@@ -256,8 +220,7 @@ void csEventQueue::Resize (size_t iLength)
     }
   }
 
-  delete[] oldEventQueue;
-  Unlock ();
+  delete[] oldEventQueue; 
 }
 
 void csEventQueue::Notify (const csEventID &name)

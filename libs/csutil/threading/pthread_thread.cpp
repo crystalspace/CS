@@ -20,6 +20,7 @@
 
 #include "csutil/threading/thread.h"
 #include "csutil/threading/pthread_thread.h"
+#include "csutil/threading/barrier.h"
 #include "csutil/threading/condition.h"
 
 
@@ -33,48 +34,37 @@ namespace Implementation
   namespace
   {
 
-    class ThreadStartParams
+    class ThreadStartParams : public CS::Memory::CustomAllocated
     {
     public:
-      ThreadStartParams (Runnable* runner, int32* isRunningPtr)
-        : runnable (runner), isRunningPtr (isRunningPtr)
+      ThreadStartParams (Runnable* runner, int32* isRunningPtr, 
+        Barrier* startupBarrier)
+        : runnable (runner), isRunningPtr (isRunningPtr), 
+        startupBarrier (startupBarrier)
       {
       }
-
-      // Wait for thread to start up
-      void Wait ()
-      {
-        ScopedLock<Mutex> lock (mutex);
-        while (!(*isRunningPtr))
-          startCondition.Wait (mutex);
-      }
-
-      void Started ()
-      {
-        ScopedLock<Mutex> lock (mutex);
-        AtomicOperations::Set (isRunningPtr, 1);
-        startCondition.NotifyOne ();
-      }
-
-    
-      Mutex mutex;
-      Condition startCondition;
 
       Runnable* runnable;
       int32* isRunningPtr;
+      Barrier* startupBarrier;
     };
 
     void* proxyFunc (void* param)
     {
+      // Extract the parameters
       ThreadStartParams* tp = static_cast<ThreadStartParams*> (param);
       int32* isRunningPtr = tp->isRunningPtr;
-      Runnable* runnable =  tp->runnable;
+      Runnable* runnable = tp->runnable;
+      Barrier* startupBarrier = tp->startupBarrier;
 
-      tp->Started ();
+      // Set as running and wait for main thread to catch up
+      AtomicOperations::Set (isRunningPtr, 1);
+      startupBarrier->Wait ();
 
+      // Run      
       runnable->Run ();
 
-      AtomicOperations::Set (isRunningPtr, 0);
+      // Set as non-running
       
       pthread_exit (0);
       return 0;
@@ -84,22 +74,26 @@ namespace Implementation
 
 
   ThreadBase::ThreadBase (Runnable* runnable)
-    : runnable (runnable), isRunning (0)
+    : runnable (runnable), isRunning (0), priority (THREAD_PRIO_NORMAL),
+    startupBarrier (2)
   {
   }
 
   void ThreadBase::Start ()
   {
     if (!IsRunning ())
-    {
-      ThreadStartParams param (runnable, &isRunning);
+    {      
+      ThreadStartParams param (runnable, &isRunning, &startupBarrier);
 
       pthread_attr_t attr;
       pthread_attr_init(&attr);
       pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
       pthread_create(&threadHandle, &attr, proxyFunc, &param); 
-      
-      param.Wait ();
+            
+      startupBarrier.Wait ();
+
+      // Set priority to make sure its updated if we set it before starting
+      SetPriority (priority);
     }
   }
 
@@ -122,38 +116,40 @@ namespace Implementation
 
   bool ThreadBase::SetPriority (ThreadPriority prio)
   {
-    int res;
-    struct sched_param SchedulerProperties;
+    int res = 1;
+    
+    if (IsRunning ())
+    {    
+      struct sched_param SchedulerProperties;
 
-    // Clear the properties initially
-    memset(&SchedulerProperties, 0, sizeof (struct sched_param));
+      // Clear the properties initially
+      memset(&SchedulerProperties, 0, sizeof (struct sched_param));
 
-    // Map the CS thread priority identifier to an appropriate platform specific identifier
-    //  or fail if this mapping is not possible.
-    switch(prio)
-    {
-    case THREAD_PRIO_LOW:
-      // Posix Pthreads does not guarantee support for any compatible priority,
-      //  so we'll default to NORMAL
-    case THREAD_PRIO_NORMAL:
-      SchedulerProperties.sched_priority = sched_get_priority_max (SCHED_OTHER);
-      res = pthread_setschedparam (threadHandle, SCHED_OTHER, &SchedulerProperties);
+      // Map the CS thread priority identifier to an appropriate platform specific identifier
+      //  or fail if this mapping is not possible.
+      switch(prio)
+      {
+      case THREAD_PRIO_LOW:
+        // Posix Pthreads does not guarantee support for any compatible priority,
+        //  so we'll default to NORMAL
+      case THREAD_PRIO_NORMAL:
+        SchedulerProperties.sched_priority = sched_get_priority_max (SCHED_OTHER);
+        res = pthread_setschedparam (threadHandle, SCHED_OTHER, &SchedulerProperties);
+        break;
 
-      if (res != 0)
-        return false;
-
-      return true;
-    case THREAD_PRIO_HIGH:
-      SchedulerProperties.sched_priority = sched_get_priority_max (SCHED_RR) - 1;
-      res = pthread_setschedparam (threadHandle, SCHED_RR, &SchedulerProperties);
-
-      if (res != 0)
-        return false;
-
-      return true;
+      case THREAD_PRIO_HIGH:
+        SchedulerProperties.sched_priority = sched_get_priority_max (SCHED_RR) - 1;
+        res = pthread_setschedparam (threadHandle, SCHED_RR, &SchedulerProperties);
+        break;
+      }
     }
 
-    return false;
+    if (res != 0)
+    {
+      priority = prio;
+    }
+
+    return res != 0;
   }
 
   void ThreadBase::Wait () const

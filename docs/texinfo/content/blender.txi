@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Blender, 3DSMax, Simple Map Example, Working with Engine Content
+@node Blender, 3DSMax, Default Lighting Shader Variables, Working with Engine Content
 @section Making Levels and Models in Blender
 @cindex Blender
 @cindex blend2cs

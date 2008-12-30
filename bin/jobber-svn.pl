@@ -98,7 +98,7 @@
 #     as noted above.
 #
 # $jobber_svn_flags [optional]
-#     Additional flags to pass to each of the `cvs' command invocations.  An
+#     Additional flags to pass to each of the `svn' command invocations.  An
 #     obvious example would be to set this variable to "-z9" to enable
 #     compression. No default.
 #
@@ -200,6 +200,9 @@
 #             Online browseable files are placed into
 #             $jobber_browseable_dir/$dir, and downloadable packages are placed
 #             into $jobber_package_dir/$dir.
+#         package-dir [optional]
+#             Directory name into which downloadable package files for this
+#             task are published. If omitted, "dir" is used.
 #         name [required]
 #             Base package name used when generating downloadable packages via
 #             @jobber_archivers (see below).  When published, the base package
@@ -279,7 +282,7 @@ use warnings;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber-svn.pl';
-my $PROG_VERSION = '35';
+my $PROG_VERSION = '38';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000-2005 by $AUTHOR_NAME <$AUTHOR_EMAIL>\nConverted for SVN support by Marten Svanfeldt";
@@ -312,7 +315,7 @@ my @jobber_archivers = ($ARCHIVER_BZIP2, $ARCHIVER_GZIP, $ARCHIVER_ZIP);
 my %jobber_properties = ();
 
 # SVN binary name
-my $jobber_svn_command = '/home/crystal/CS/bin/svnwrapper';
+my $jobber_svn_command = '/usr/bin/svn';
 
 my $CONFIG_FILE = undef;
 my $TESTING = undef;
@@ -454,6 +457,14 @@ sub rename_file {
 }
 
 #------------------------------------------------------------------------------
+# Remove a directory.
+#------------------------------------------------------------------------------
+sub remove_dir {
+    my $dir = shift;
+    rmdir($dir) or expire("rmdir($dir)");
+}
+
+#------------------------------------------------------------------------------
 # Generate a temporary name in a directory.  Perl tmpnam() only works with
 # '/tmp', so must do this manually, instead.
 #------------------------------------------------------------------------------
@@ -491,7 +502,7 @@ sub run_command {
 #------------------------------------------------------------------------------
 # Perform a recursive scan of a directory and return a sorted list of all
 # files and directories contained therein, except for the ".svn" directory and
-# its control files.  Also ignores ".cvsignore" files.
+# its control files.  Also ignores ".cvsignore" files and ".svn" directories.
 #------------------------------------------------------------------------------
 sub scandir {
     my $dir = shift;
@@ -509,7 +520,7 @@ sub svn_remove {
     return unless @{$files};
     my $paths = prepare_pathnames(@{$files});
     print "Invoking SVN delete: ${\scalar(@{$files})} paths\n";
-    run_command("$jobber_svn_command $jobber_svn_flags delete $paths") unless $TESTING;
+    run_command("$jobber_svn_command delete $paths $jobber_svn_flags") unless $TESTING;
 }
 
 #------------------------------------------------------------------------------
@@ -542,7 +553,7 @@ sub svn_add {
     $flags = '' unless defined($flags);
     print "Invoking SVN add: ${\scalar(@{$files})} paths" .
 	($flags ? " [$flags]" : '') . "\n";
-    run_command("$jobber_svn_command $jobber_svn_flags add $flags $paths") unless $TESTING;
+    run_command("$jobber_svn_command add $flags $paths $jobber_svn_flags") unless $TESTING;
 }
 
 #------------------------------------------------------------------------------
@@ -584,7 +595,7 @@ sub svn_examine {
 #------------------------------------------------------------------------------
 sub svn_checkout {
     print "URL: $jobber_svn_base_url\n";
-    run_command("$jobber_svn_command co $jobber_svn_flags $jobber_svn_base_url");
+    run_command("$jobber_svn_command co $jobber_svn_base_url $jobber_svn_flags");
 }
 
 #------------------------------------------------------------------------------
@@ -599,7 +610,7 @@ sub svn_update {
     }
     if ($dirs) {
         print "$line\n$message\n";
-        my $changes = run_command("$jobber_svn_command $jobber_svn_flags status $dirs");
+        my $changes = run_command("$jobber_svn_command status $dirs $jobber_svn_flags");
 	print $changes ? $changes : "  No files modified\n", "$line\n";
     }
 }
@@ -617,7 +628,7 @@ sub svn_commit_dirs {
     print RESPFILE $message;
     close(RESPFILE);
 
-    run_command("$jobber_svn_command $jobber_svn_flags --username $jobber_svn_user commit -F $respFileName $dirsAsText")
+    run_command("$jobber_svn_command commit --username $jobber_svn_user -F $respFileName $dirsAsText $jobber_svn_flags")
 	unless $TESTING;
     unlink($respFileName);
 }
@@ -750,6 +761,10 @@ sub publish_browseable {
 
 	print "  Installing.\n";
 	rename_file($dst, $old_dir) if -e $dst;
+	create_directory_deep($dst, $jobber_public_group);
+	# create_directory_deep also creates the directory which we want to
+	# move in, so delete that first
+	remove_dir($dst);
 	rename_file($new_dir, $dst);
 
 	print "  Cleaning.\n";
@@ -808,7 +823,8 @@ sub publish_packages {
 	}
 
 	my $base = $export->{'name'};
-	my $dst = "$jobber_package_dir/$export->{'dir'}";
+	my $dst = "$jobber_package_dir/" . ($export->{'package-dir'} ?
+	    $export->{'package-dir'} : $export->{'dir'});
 	create_directory_deep($dst, $jobber_public_group) unless $TESTING;
 	foreach my $archiver (@jobber_archivers) {
 	    publish_package($archiver, $appear, $dst, $base, '  ');
@@ -895,8 +911,6 @@ sub validate_config {
 	    last;
 	}
     }
-
-    # $jobber_cvs_sources = $jobber_project_root unless $jobber_svna_sources;
 }
 
 #------------------------------------------------------------------------------

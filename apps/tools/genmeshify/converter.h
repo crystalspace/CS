@@ -20,6 +20,8 @@
 #ifndef __CONVERTER_H__
 #define __CONVERTER_H__
 
+#include "thing/thing.h"
+
 namespace genmeshify
 {
   class App;
@@ -27,9 +29,9 @@ namespace genmeshify
   class Converter
   {
     App* app;
-    csStringID idTexLightmap;
+    CS::ShaderVarStringID idTexLightmap;
     csRef<iLoaderContext> context;
-    csRef<iRegion> region;
+    csRef<iCollection> collection;
 
     csRef<iLoaderPlugin> thingFactLoader;
     csRef<iLoaderPlugin> thingObjLoader;
@@ -95,7 +97,7 @@ namespace genmeshify
     bool WriteTriMeshes (iObjectModel* objmodel, iDocumentNode* to);
     bool WriteTriMesh (iTriangleMesh* triMesh, iDocumentNode* to);
   public:
-    Converter (App* app, iLoaderContext* context, iRegion* region);
+    Converter (App* app, iLoaderContext* context, iCollection* collection);
   
     bool ConvertMeshFact (const char* factoryName, 
       iDocumentNode* from, iDocumentNode* to);

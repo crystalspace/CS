@@ -53,7 +53,6 @@ struct iShader;
 struct iShaderVariableAccessor;
 struct iString;
 struct iStringSet;
-struct iThingFactoryState;
 
 /**\name Texture transformation description
  * @{ */
@@ -95,7 +94,7 @@ namespace CS
  */
 struct iSyntaxService : public virtual iBase
 {
-  SCF_INTERFACE (iSyntaxService, 2, 1, 3);
+  SCF_INTERFACE (iSyntaxService, 2, 2, 0);
   
   /**\name Parse reporting helpers
    * @{ */
@@ -311,7 +310,8 @@ struct iSyntaxService : public virtual iBase
    * Parse a shader variable declaration
    */
   virtual bool ParseShaderVar (iLoaderContext* ldr_context,
-      iDocumentNode* node, csShaderVariable& var) = 0;
+      iDocumentNode* node, csShaderVariable& var,
+      iStringArray* failedTextures = 0) = 0;
   /**
    * Parse a shader variable expression. Returns an acessor that can be set
    * on a shader variable. The accessor subsequently evaluates the expression.
@@ -432,6 +432,19 @@ struct iSyntaxService : public virtual iBase
     iDocumentNode* child, iLoaderContext* ldr_context,
     csRef<csRefCount>& parseState, CS::Utility::PortalParameters& params,
     bool& handled) = 0;
+
+  /**
+   * Parse a user render buffer.
+   */
+  virtual bool ParseRenderBuffer (iDocumentNode* node, iRenderBuffer* buffer) = 0;
+
+  /**
+   * Parse a <tt>&lt;<i>shader</i>&gt;<tt> node (as found in shader XML files
+   * or possibly world files. 
+   */
+  virtual csRef<iShader> ParseShader (iLoaderContext* ldr_context,
+      iDocumentNode* node) = 0;
+
 };
 
 /** @} */

@@ -25,11 +25,13 @@
 #include "csutil/hash.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
+#include "csutil/eventhandlers.h"
 #include "csutil/scf_implementation.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "iengine/texture.h"
 #include "igraphic/image.h"
+#include "imap/loader.h"
 #include "itexture/itexfact.h"
 #include "iutil/comp.h"
 #include "iutil/event.h"
@@ -67,8 +69,7 @@ public:
 
   virtual bool HandleEvent (iEvent& event);
 
-  CS_EVENTHANDLER_NAMES("crystalspace.proctex")
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
+  CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.proctex")
 
 public:
   virtual void PushTexture (csProcTexture* txt)
@@ -90,7 +91,7 @@ bool csProcTexEventHandler::HandleEvent (iEvent& event)
   current_time = vc->GetCurrentTicks ();
   csSet<csPtrKey<csProcTexture> > keep_tex;
   (void) event; // unused except for this assert so silence the warning
-  CS_ASSERT(event.Name == csevPreProcess(object_reg));
+  CS_ASSERT(event.Name == csevFrame(object_reg));
   {
     {
       csSet<csPtrKey<csProcTexture> >::GlobalIterator it = textures.GetIterator();
@@ -155,7 +156,7 @@ iEventHandler* csProcTexture::SetupProcEventHandler (
   csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
   {
-    q->RegisterListener (proceh, csevPreProcess(object_reg));
+    q->RegisterListener (proceh, csevFrame(object_reg));
     object_reg->Register (proceh, "crystalspace.proctex.eventhandler");
   }
   return proceh;
@@ -182,21 +183,38 @@ iProcTexture* csProcTexCallback::GetProcTexture() const
 
 iTextureWrapper* csProcTexture::CreateTexture (iObjectRegistry* object_reg)
 {
-  iTextureWrapper* tex;
+  csRef<iTextureWrapper> tex;
 
   csRef<iEngine> engine (csQueryRegistry<iEngine> (object_reg));
+  csRef<iThreadedLoader> tldr = csQueryRegistry<iThreadedLoader> (object_reg);
+  csRef<iTextureManager> texman = csQueryRegistry<iTextureManager> (object_reg);
   if (proc_image)
   {
-    tex = engine->GetTextureList()->NewTexture (proc_image);
+    if(tldr.IsValid())
+    {
+      tex = engine->GetTextureList()->CreateTexture (proc_image);
+      tldr->AddTextureToList(tex);
+    }
+    else
+    {
+      tex = engine->GetTextureList()->NewTexture (proc_image);
+    }
     tex->SetFlags (CS_TEXTURE_3D | texFlags);
     proc_image = 0;
   }
   else
   {
-    csRef<iTextureHandle> texHandle = 
-      g3d->GetTextureManager()->CreateTexture (mat_w, mat_h, csimg2D, "rgb8",
-      CS_TEXTURE_3D | texFlags);
-    tex = engine->GetTextureList()->NewTexture (texHandle);
+    csRef<iTextureHandle> texHandle = g3d->GetTextureManager()->CreateTexture (mat_w, mat_h,
+      csimg2D, "rgb8", CS_TEXTURE_3D | texFlags);
+    if(tldr.IsValid())
+    {
+      tex = engine->GetTextureList()->CreateTexture (texHandle);
+      tldr->AddTextureToList(tex);
+    }
+    else
+    {
+      tex = engine->GetTextureList()->NewTexture (texHandle);
+    }
   }
 
   return tex;

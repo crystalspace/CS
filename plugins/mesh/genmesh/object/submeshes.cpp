@@ -19,7 +19,9 @@
 
 #include "cssysdef.h"
 
+#include "csgeom/math3d.h"
 #include "csgfx/renderbuffer.h"
+#include "csgfx/vertexlistwalker.h"
 #include "cstool/rbuflock.h"
 
 #include "submeshes.h"
@@ -27,9 +29,86 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 {
+  SubMesh::LegacyTriangles::LegacyTriangles() : triangles_setup (false), 
+    mesh_triangle_dirty_flag (false)
+  {
+  }
+
+  void SubMesh::CreateLegacyBuffer()
+  {
+    if (!legacyTris.triangles_setup)
+    {
+      if (index_buffer.IsValid())
+      {
+	if ((index_buffer->GetComponentType() == CS_BUFCOMP_INT)
+	    || (index_buffer->GetComponentType() == CS_BUFCOMP_UNSIGNED_INT))
+	{
+	  size_t triNum = index_buffer->GetElementCount() / 3;
+	  legacyTris.mesh_triangles.SetSize (triNum);
+	  csRenderBufferLock<uint8> indexLock (index_buffer, CS_BUF_LOCK_READ);
+	  memcpy (legacyTris.mesh_triangles.GetArray(),
+	    indexLock.Lock(), triNum * sizeof (csTriangle));
+	}
+	else
+	{
+	  size_t indexTris = index_buffer->GetElementCount() / 3;
+	  legacyTris.mesh_triangles.Empty();
+	  legacyTris.mesh_triangles.SetCapacity (indexTris);
+	  CS::TriangleIndicesStream<int> triangles (index_buffer,
+	    CS_MESHTYPE_TRIANGLES);
+	  while (triangles.HasNext())
+	    legacyTris.mesh_triangles.Push (triangles.Next());
+	}
+      }
+	
+      legacyTris.mesh_triangle_dirty_flag = true;
+      legacyTris.triangles_setup = true;
+    }
+  }
+
+  void SubMesh::ClearLegacyBuffer()
+  {
+    if (!legacyTris.triangles_setup) return;
+    legacyTris.triangles_setup = false;
+    legacyTris.mesh_triangle_dirty_flag = false;
+    legacyTris.mesh_triangles.DeleteAll ();
+  }
+
+  void SubMesh::UpdateFromLegacyBuffer ()
+  {
+    if (legacyTris.triangles_setup)
+    {
+      if (legacyTris.mesh_triangle_dirty_flag)
+      {
+	size_t rangeMin = (size_t)~0, rangeMax = 0;
+	for (size_t n = 0; n < legacyTris.mesh_triangles.GetSize(); n++)
+	{
+	  for (int e = 0; e < 3; e++)
+	  {
+	    size_t index = size_t (legacyTris.mesh_triangles[n][e]);
+	    if (index < rangeMin)
+	      rangeMin = index;
+	    else if (index > rangeMax)
+	      rangeMax = index;
+	  }
+	}
+	csRef<iRenderBuffer> newBuffer =
+	  csRenderBuffer::CreateIndexRenderBuffer (
+	    legacyTris.mesh_triangles.GetSize() * 3, CS_BUF_STATIC,
+	    CS_BUFCOMP_UNSIGNED_INT, rangeMin,
+	    rangeMax);
+	newBuffer->SetData (legacyTris.mesh_triangles.GetArray());
+	index_buffer = newBuffer;
+	legacyTris.mesh_triangle_dirty_flag = false;
+      }
+    }
+  }
+
   iRenderBuffer* SubMesh::GetIndicesB2F (const csVector3& pos, uint frameNum,
                                          const csVector3* vertices, size_t vertNum)
   {
+    UpdateFromLegacyBuffer();
+
     if (!b2fTree)
     {
       CS::TriangleIndicesStream<int> triangles (index_buffer,
@@ -60,7 +139,113 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     return newIndexBuffer;
   }
   
+  iRenderBuffer* SubMesh::GetIndices ()
+  {
+    UpdateFromLegacyBuffer();
+    return index_buffer;
+  }
+
+  void SubMesh::SetIndices (iRenderBuffer* indices)
+  {
+    ClearLegacyBuffer();
+    index_buffer = indices;
+    if (b2fTree) 
+    {
+      delete b2fTree;
+      b2fTree = 0;
+    }
+    InvalidateBoundingBox ();
+  }
+  
+  template<typename T>
+  void SubMesh::IterateAllVertices (iRenderBuffer* positions, T& functor)
+  {
+    UpdateFromLegacyBuffer();
+    if (!index_buffer.IsValid()) return;
+    
+    csVertexListWalker<float, csVector3> vertices (positions);
+    
+    /* Set up a simple hash table to store which vertices have already
+       been seen & handled, to avoid, to some degree, unnecessary
+       bbox vertex adds. */
+    const size_t maxVertexHashSize = 4093;
+    const size_t indexOffs = index_buffer->GetRangeStart();
+    const size_t vertexHashSize = csMin (maxVertexHashSize,
+      index_buffer->GetRangeEnd() - indexOffs + 1);
+    CS_ALLOC_STACK_ARRAY(size_t, seenVertices, vertexHashSize);
+    for (size_t v = 0; v < vertexHashSize; v++) seenVertices[v] = (size_t)~0;
+    
+    CS::TriangleIndicesStream<size_t> triangles (index_buffer,
+      CS_MESHTYPE_TRIANGLES);
+    while (triangles.HasNext())
+    {
+      const TriangleT<size_t> tri (triangles.Next());
+      for (int v = 0; v < 3; v++)
+      {
+        size_t vertex = tri[v];
+        const size_t vertexHashIndex = (vertex-indexOffs) % vertexHashSize;
+        if (seenVertices[vertexHashIndex] == vertex) continue;
+
+        vertices.SetElement (vertex);
+        const csVector3& vert = *vertices;
+        functor (vert);
+
+        seenVertices[vertexHashIndex] = vertex;
+      }
+    }
+    
+  }
+  
+  struct IterateBB
+  {
+    csBox3 bbox;
+  
+    void operator() (const csVector3& pos)
+    { bbox.AddBoundingVertex (pos); }
+  };
+
+  const csBox3& SubMesh::GetObjectBoundingBox (iRenderBuffer* positions)
+  {
+    if (!bbox_valid)
+    {
+      IterateBB itbb;
+      IterateAllVertices (positions, itbb);
+      bbox = itbb.bbox;
+      bbox_valid = true;
+    }
+    return bbox;
+  }
+  
+  struct IterateRadius
+  {
+    csVector3 center;
+    float sqradius;
+  
+    IterateRadius (const csVector3& center) : center (center), sqradius (0) {}
+    void operator() (const csVector3& pos)
+    { sqradius = csMax (sqradius, csSquaredDist::PointPoint (center, pos)); }
+  };
+  
+  float SubMesh::ComputeMaxSqRadius (iRenderBuffer* positions,
+                                     const csVector3& center)
+  {
+    IterateRadius itr (center);
+    IterateAllVertices (positions, itr);
+    return itr.sqradius;
+  }
+  
+  void SubMesh::InvalidateBoundingBox ()
+  {
+    bbox_valid = false;
+  }
+
   //-------------------------------------------------------------------------
+
+  SubMeshesContainer::SubMeshesContainer() : changeNum (0)
+  {
+    defaultSubmesh.AttachNew (new SubMesh);
+    subMeshes.Push (defaultSubmesh);
+  }
   
   static int SubmeshSubmeshCompare (SubMesh* const& A, 
                                     SubMesh* const& B)
@@ -76,12 +261,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     iRenderBuffer* indices, iMaterialWrapper *material, const char* name, 
     uint mixmode)
   {
+    if ((subMeshes.GetSize() == 1)
+	&& (subMeshes[0] == defaultSubmesh))
+      subMeshes.Empty();
+
     csRef<SubMesh> subMesh;
     subMesh.AttachNew (new SubMesh ());
     subMesh->material = material;
     subMesh->MixMode = mixmode;
-    subMesh->index_buffer = indices;
     subMesh->name = name;
+    subMesh->SetIndices (indices);
 
     subMeshes.InsertSorted (subMesh, SubmeshSubmeshCompare);
     /* @@@ FIXME: Prolly do some error checking, like sanity of
@@ -89,7 +278,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     changeNum++;
     return subMesh;
   }
-
+  
   static int SubmeshStringCompare (SubMesh* const& A, const char* const& b)
   {
     const char* a = A->GetName();
@@ -113,19 +302,62 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       csArrayCmp<SubMesh*, SubMesh*> (subMesh, &SubmeshSubmeshCompare));
     if (idx == csArrayItemNotFound) return;
     subMeshes.DeleteIndex (idx);
+
+    if (subMeshes.GetSize() == 0)
+      subMeshes.Push (defaultSubmesh);
   }
 
   //-------------------------------------------------------------------------
 
-  csRenderBufferHolder* SubMeshProxy::GetBufferHolder()
+  csRenderBufferHolder* SubMeshProxy::GetBufferHolder (
+    csRenderBufferHolder* copyFrom)
   {
-    if (!bufferHolder.IsValid()) bufferHolder.AttachNew (
-      new csRenderBufferHolder);
+    if (!renderBufferAccessor.IsValid())
+      renderBufferAccessor.AttachNew (new RenderBufferAccessor (this));
+    if (!bufferHolder.IsValid())
+      bufferHolder.AttachNew (new csRenderBufferHolder);
+    *bufferHolder = *copyFrom;
+    if (parentSubMesh->legacyTris.mesh_triangle_dirty_flag)
+    {
+      renderBufferAccessor->wrappedHolder = copyFrom->GetAccessor();
+      bufferHolder->SetAccessor (renderBufferAccessor,
+	copyFrom->GetAccessorMask() | CS_BUFFER_INDEX_MASK);
+    }
+    else
+    {
+      renderBufferAccessor->wrappedHolder.Invalidate();
+      bufferHolder->SetAccessor (copyFrom->GetAccessor(),
+	copyFrom->GetAccessorMask() & ~CS_BUFFER_INDEX_MASK);
+      bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX,
+	parentSubMesh->GetIndices());
+    }
     return bufferHolder;
   }
 
   //-------------------------------------------------------------------------
 
+  void SubMeshProxy::RenderBufferAccessor::PreGetBuffer (
+    csRenderBufferHolder* holder, csRenderBufferName buffer)
+  {
+    if ((buffer == CS_BUFFER_INDEX) && (parent.IsValid()))
+      holder->SetRenderBuffer (CS_BUFFER_INDEX, parent->GetIndices());
+    else
+      wrappedHolder->PreGetBuffer (holder, buffer);
+  }
+
+  //-------------------------------------------------------------------------
+
+  SubMeshProxiesContainer::SubMeshProxiesContainer ()
+  {
+    defaultSubmesh.AttachNew (new SubMeshProxy);
+    subMeshes.Push (defaultSubmesh);
+  }
+    
+  SubMeshProxiesContainer::SubMeshProxiesContainer (SubMeshProxy* dflt)
+   : defaultSubmesh (dflt)
+  {
+  }
+    
   static int SubmeshProxySubmeshProxyCompare (SubMeshProxy* const& A, 
                                               SubMeshProxy* const& B)
   {
@@ -138,6 +370,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 
   void SubMeshProxiesContainer::AddSubMesh (SubMeshProxy* subMesh)
   {
+    if ((subMeshes.GetSize() == 1)
+	&& (subMeshes[0] == defaultSubmesh))
+      subMeshes.Empty();
+
     subMeshes.InsertSorted (subMesh, SubmeshProxySubmeshProxyCompare);
   }
 

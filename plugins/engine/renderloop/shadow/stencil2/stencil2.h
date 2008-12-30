@@ -137,6 +137,8 @@ private:
   csStringID base_id;
   csStringID shadows_id;
 
+  csRef<iShaderVarStringSet> svNameStringset;
+
   bool enableShadows;
   csRefArray<iLightRenderStep> steps;
 
@@ -171,9 +173,9 @@ public:
   csStringID GetShadowsID () const { return shadows_id; }
 
   void Perform (iRenderView* rview, iSector* sector,
-    iShaderVarStack* stacks);
+    csShaderVariableStack& stack);
   void Perform (iRenderView* rview, iSector* sector, iLight* light,
-    iShaderVarStack* stacks);
+    csShaderVariableStack& stack);
 
   virtual size_t AddStep (iRenderStep* step);
   virtual bool DeleteStep (iRenderStep* step);
@@ -232,6 +234,8 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
+
+  virtual bool IsThreadSafe() { return true; }
 };
 
 #endif // __CS_STENCILEN_H

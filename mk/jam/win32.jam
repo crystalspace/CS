@@ -97,6 +97,11 @@ FILEFLAGS 0x0
       VALUE "WWW", "$(PACKAGE_HOMEPAGE)"
     }
   }
+  BLOCK "VarFileInfo"
+  {
+      VALUE "Translation", 0x409, 1200
+  }
+
 }
 __EOF__
 }
@@ -240,7 +245,7 @@ rule ConstructStaticLibraryTarget
 rule ConstructSharedLibraryTarget
 {
   local libbase = [ LibraryBaseName $(<) ] ;
-  return $(libbase)-$(COMPILER.TYPE).dll ;
+  return $(libbase)-$(COMPILER.C++.TYPE).dll ;
 }
 rule ConstructSharedLibraryLinkLib
 {
@@ -334,6 +339,7 @@ rule AppResourceWin32
   LOCATE on $(versionrc) = $(LOCATE_TARGET) ;
   SEARCH on $(versionrc) = $(LOCATE_TARGET) ;
   
+  MakeLocate $(versionrc) : $(LOCATE_TARGET) ;
   MakeVersionRc $(versionrc) : $(<) ;
   Clean $(<)clean : $(versionrc) ;
   Clean clean : $(versionrc) ;
@@ -345,6 +351,7 @@ rule AppResourceWin32
     LOCATE on $(manifestrc) = $(LOCATE_TARGET) ;
     SEARCH on $(manifestrc) = $(LOCATE_TARGET) ;
   
+    MakeLocate $(manifestrc) : $(LOCATE_TARGET) ;
     MakeManifestRc $(manifestrc) : $(<) ;
     Clean $(<)clean : $(manifestrc) ;
     Clean clean : $(manifestrc) ;
@@ -405,6 +412,12 @@ rule SystemLinkApplication
   local target = $($(<)_TARGET) ;
 
   Depends $(target) : $(>) ;
+  if ! [ IsElem console : $(3) ] && $(MODE) = optimize
+  {
+    # Like the MSVC projects build GUI applications as such in optimize builds.
+    # In debug mode, let everything be console apps.
+    EXTRALFLAGS on $(target) += -mwindows ;
+  }
   LinkApplication $(target) : $(>) ;
   # setup clean rules
   Clean clean : $(target) ;
@@ -434,10 +447,39 @@ rule SystemInstallApplication
   }
 }
 
+rule SystemDoFileListEntryApplications
+{
+  local target = $($(<)_TARGET) ;
+  local entries = [ DoFileListEntries $(target) : : $(2) ] ;
+  if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
+  {
+    local debugfile = $($(target)_DEBUGFILE) ;
+    entries += [ DoFileListEntries $(debugfile) : : debug-$(2) ] ;
+  }
+  return $(entries) ;
+}
+
+
 rule SystemInstallPlugin
 {
   Depends install_plugin : [ DoInstall $(<) : $(plugindir) $(2) :
       $(INSTALL_PROGRAM) ] ;
+}
+
+rule SystemDoFileListEntryPlugin
+{
+  local target = $($(<)_TARGET) ;
+  local entries = [ DoFileListEntries $(target) : : $(2) ] ;
+  if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
+  {
+    local debugfile = $($(target)_DEBUGFILE) ;
+    entries += [ DoFileListEntries $(debugfile) : : debug-$(2) ] ;
+  }
+  if $(EMBED_META) != "yes" || $(OBJCOPY.AVAILABLE) != "yes"
+  {
+    entries += [ DoFileListEntries $($(<)_METAFILE) : : $(2) ] ;
+  }
+  return $(entries) ;
 }
 
 # SystemLinkPlugin target : objects : options
@@ -487,9 +529,14 @@ rule MakeDllDefFile
   }
 }
 
+# SystemLinkSharedLibrary barename : target : objects : linklib
 rule SystemLinkSharedLibrary
 {
-  LFlags $(<) : $(LINKLIBS) ;
+  local barename = $(1) ;
+  local target = $(2) ;
+  local objects = $(3) ;
+  local linklib = $(4) ;
+  LFlags $(target) : $(LINKLIBS) ;
   
   # The "crystalspace" library is so massive that it blows Jam's command line
   # length limit when all object files are passed in at once to some command.
@@ -505,34 +552,34 @@ rule SystemLinkSharedLibrary
   # DLL. Conveniently (somewhat), all exported symbols are into a section
   # ".drectve" of an object file by gcc. After extracting these sections and
   # some postprocessing, we finally have all .DEF entries. Phew.
-  local lib = $(<).a ;
-  MakeLocate $(lib) $(lib)($(>:BS)) : $(LOCATE.OBJECTS)/libs ;
-  Depends $(lib) : $(lib)($(>:BS)) ;
+  local lib = $(target).a ;
+  MakeLocate $(lib) $(lib)($(objects:BS)) : $(LOCATE.OBJECTS)/libs ;
+  Depends $(lib) : $(lib)($(objects:BS)) ;
   local i ;
-  for i in $(>)
+  for i in $(objects)
   {
     Depends $(lib)($(i:BS)) : $(i) ;
   }
-  Archive $(lib) : $(>) ;
+  Archive $(lib) : $(objects) ;
   Ranlib $(lib) ;
-  #RmTemps $(lib) : $(>) ;
+  #RmTemps $(lib) : $(objects) ;
   
-  Depends $(<) : $(lib) ;
+  Depends $(target) : $(lib) ;
   
-  local def = $(<).def ;
-  MakeDllDefFile $(def) : $(>) ;
-  Depends $(<) : $(def) ;
+  local def = $(target).def ;
+  MakeDllDefFile $(def) : $(objects) ;
+  Depends $(target) : $(def) ;
   Clean clean : $(def) ;
-  Clean $(<)clean : $(def) ;
-  Depends $(<)clean : $(def)clean ;
+  Clean $(barename)clean : $(def) ;
+  Depends $(barename)clean : $(def)clean ;
   
-  EXPORTDEFS on $(<) = $(def) ;
-  IMPLIB on $(<) = $(3) ;
-  Depends $(3) : $(<) ;
-  LinkSharedLibrary $(<) : $(lib) ;
+  EXPORTDEFS on $(target) = $(def) ;
+  IMPLIB on $(target) = $(linklib) ;
+  Depends $(linklib) : $(target) ;
+  LinkSharedLibrary $(target) : $(lib) ;
 
   Clean clean : $(target) ;
-  Clean $(<)clean : $(target) ;
+  Clean $(barename)clean : $(target) ;
 }
 
 actions ExtractDrectve
@@ -567,7 +614,7 @@ actions GenerateImportLib
 
 actions LinkApplication bind NEEDLIBS bind EXTRAOBJECTS
 {
-  $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+  $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS) $(EXTRALFLAGS)
 }
 
 if $(USE_DLLWRAP) != "yes"

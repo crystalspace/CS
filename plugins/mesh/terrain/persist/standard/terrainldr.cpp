@@ -35,6 +35,7 @@
 #include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include "iutil/stringarray.h"
 #include "iutil/vfs.h"
 #include "ivaria/terraform.h"
 
@@ -287,12 +288,14 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
         const char* factname = child->GetContentsValue ();
         csRef<iMeshFactoryWrapper> fact = ldr_context->FindMeshFactory (
           factname);
-        if (!fact)
+
+        if(!fact)
         {
           synldr->ReportError ("crystalspace.terrain.object.loader",
             child, "Couldn't find factory '%s'!", factname);
           return 0;
         }
+
         mesh = fact->GetMeshObjectFactory ()->NewInstance ();
         state = scfQueryInterface<iTerrainObjectState> (mesh);
 	if (!state)

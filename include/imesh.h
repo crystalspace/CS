@@ -17,19 +17,18 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/**\file 
+/**@file 
  * Directory master header. This header file includes all headers in a
  * subdirectory of the top Crystal Space include directory.
  */
 #include "cssysdef.h"
-#include "imesh/bezier.h"
+#include "imesh/animesh.h"
 #include "imesh/emit.h"
 #include "imesh/genmesh.h"
 #include "imesh/gmeshanim.h"
+#include "imesh/gmeshskel2.h"
 #include "imesh/haze.h"
-#include "imesh/instmesh.h"
 #include "imesh/lghtng.h"
-#include "imesh/lighting.h"
 #include "imesh/nullmesh.h"
 #include "imesh/object.h"
 #include "imesh/objmodel.h"
@@ -38,11 +37,12 @@
 #include "imesh/partsys.h"
 #include "imesh/protomesh.h"
 #include "imesh/skeleton.h"
-#include "imesh/spiral.h"
+#include "imesh/skeleton2.h"
+#include "imesh/skeleton2anim.h"
 #include "imesh/sprite2d.h"
 #include "imesh/sprite3d.h"
 #include "imesh/spritecal3d.h"
 #include "imesh/terrain.h"
-#include "imesh/thing.h"
+#include "imesh/terrain2.h"
 #endif /* __IMESH_H__ */
 

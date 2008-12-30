@@ -28,11 +28,14 @@
 
 #include "csutil/leakguard.h"
 #include "csutil/refarr.h"
+#include "csutil/refcount.h"
 #include "csutil/scf_implementation.h"
 
 #include "iutil/object.h"
 
 typedef csRefArray<iObject> csObjectContainer;
+
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * A generic csObject class. Any csObject can have any number of iObject
@@ -40,7 +43,8 @@ typedef csRefArray<iObject> csObjectContainer;
  * from the child objects.
  */
 class CS_CRYSTALSPACE_EXPORT csObject : 
-  public scfImplementation1<csObject, iObject>
+  public scfImplementation1<csObject, iObject>,
+  public CS::Utility::InternalRefCount
 {
 protected:
   friend class csObjectIterator;
@@ -139,5 +143,7 @@ public:
   virtual iObject* GetChild (int iInterfaceID, int iVersion,
     const char *Name = 0) const;
 };
+
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_CSOBJECT_H__

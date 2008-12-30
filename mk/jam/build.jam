@@ -51,7 +51,7 @@ include $(jamrulesdir)/assembler.jam ;
 include $(jamrulesdir)/bisonflex.jam ;
 include $(jamrulesdir)/swig.jam ;
 include $(jamrulesdir)/pythmod.jam ;
-include $(jamrulesdir)/strip.jam ;
+include $(jamrulesdir)/debuginfo.jam ;
 
 include $(jamrulesdir)/flags.jam ;
 include $(jamrulesdir)/library.jam ;
@@ -60,6 +60,10 @@ include $(jamrulesdir)/application.jam ;
 include $(jamrulesdir)/plugin.jam ;
 include $(jamrulesdir)/docs.jam ;
 include $(jamrulesdir)/unittest.jam ;
+
+include $(jamrulesdir)/upload.jam ;
+include $(jamrulesdir)/filelist.jam ;
+include $(jamrulesdir)/msi.jam ;
 
 # Include OS specific rules
 switch $(TARGET.OS)

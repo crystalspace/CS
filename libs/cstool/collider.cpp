@@ -26,13 +26,14 @@
 #include "csgeom/trimesh.h"
 
 #include "cstool/collider.h"
+#include "iengine/collection.h"
+#include "cstool/collider.h"
 #include "iengine/camera.h"
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/portal.h"
 #include "iengine/portalcontainer.h"
-#include "iengine/region.h"
 #include "iengine/sector.h"
 #include "iengine/viscull.h"
 #include "iengine/scenenode.h"
@@ -137,13 +138,13 @@ bool csColliderWrapper::Collide (csColliderWrapper& otherCollider,
 
 csColliderWrapper* csColliderWrapper::GetColliderWrapper (csObject &object)
 {
-  csRef<csColliderWrapper> w (CS_GET_CHILD_OBJECT (&object, csColliderWrapper));
+  csRef<csColliderWrapper> w (CS::GetChildObject<csColliderWrapper> (&object));
   return w;	// This will DecRef() but that's ok in this case.
 }
 
 csColliderWrapper* csColliderWrapper::GetColliderWrapper (iObject* object)
 {
-  csRef<csColliderWrapper> w (CS_GET_CHILD_OBJECT (object, csColliderWrapper));
+  csRef<csColliderWrapper> w (CS::GetChildObject<csColliderWrapper> (object));
   return w;	// This will DecRef() but that's ok in this case.
 }
 
@@ -297,8 +298,10 @@ csColliderWrapper* csColliderHelper::InitializeCollisionWrapper (
   return cw;
 }
 
+#include "csutil/deprecated_warn_off.h"
+
 void csColliderHelper::InitializeCollisionWrappers (iCollideSystem* colsys,
-  	iEngine* engine, iRegion* region)
+  	iEngine* engine, iCollection* collection)
 {
   // Initialize all mesh objects for collision detection.
   int i;
@@ -306,10 +309,12 @@ void csColliderHelper::InitializeCollisionWrappers (iCollideSystem* colsys,
   for (i = 0 ; i < meshes->GetCount () ; i++)
   {
     iMeshWrapper* sp = meshes->Get (i);
-    if (region && !region->IsInRegion (sp->QueryObject ())) continue;
+    if (collection && !collection->IsParentOf(sp->QueryObject ())) continue;
     InitializeCollisionWrapper (colsys, sp);
   }
 }
+
+#include "csutil/deprecated_warn_on.h"
 
 bool csColliderHelper::CollideArray (
 	iCollideSystem* colsys,
@@ -596,7 +601,6 @@ float csColliderHelper::TraceBeam (iCollideSystem* cdsys, iSector* sector,
 
 csColliderActor::csColliderActor ()
 {
-  revertMove = false;
   gravity = 9.806f;
   onground = false;
   cd = true;
@@ -606,7 +610,6 @@ csColliderActor::csColliderActor ()
   mesh = 0;
   camera = 0;
   movable = 0;
-  revertCount = 0;
   do_hit_meshes = false;
 
   // Only used in case a camera is used.
@@ -625,6 +628,7 @@ void csColliderActor::InitializeColliders (
 
   float maxX = MAX(body.x, legs.x)+shift.x;
   float maxZ = MAX(body.z, legs.z)+shift.z;
+  float maxDim = MAX(maxX, maxZ);
 
   csRef<iTriangleMesh> pm;
 
@@ -646,8 +650,9 @@ void csColliderActor::InitializeColliders (
   pm = csPtr<iTriangleMesh> (new csTriangleMeshBox (bot));
   bottomCollider = cdsys->CreateCollider (pm);
 
-  boundingBox.Set(csVector3(-maxX / 2.0f, 0, -maxZ / 2.0f) + shift,
-    csVector3(maxX / 2.0f, bYtop, maxZ / 2.0f) + shift);
+  // Double the dimensions in case the collider has been rotated.
+  boundingBox.Set(csVector3(-maxDim, -bYtop, -maxDim) + shift,
+    csVector3(maxDim, bYtop, maxDim) + shift);
 
 // @@@ Don't know why this is needed!
   csColliderActor::shift.x = -shift.x;
@@ -908,7 +913,7 @@ int csColliderActor::CollisionDetectIterative (
 
   //cdsys->SetOneHitOnly(true);
   // Repeatedly split the range with which to test the collision against
-  while ((upper - lower).SquaredNorm() > EPSILON)
+  while ((upper - lower).SquaredNorm() > 0.01f)
   {
     // Test in the middle between upper and lower bounds
     csOrthoTransform current (id, lower + (upper - lower)/2);
@@ -948,10 +953,10 @@ bool csColliderActor::AdjustForCollisions (
 	const csVector3& vel,
 	float delta)
 {
-  revertMove = false;
-
   if (movable && movable->GetSectors()->GetCount() == 0)
     return true;
+
+  bool hitsurface = false;
 
   int hits;
   size_t i;
@@ -975,11 +980,17 @@ bool csColliderActor::AdjustForCollisions (
   cdsys->SetOneHitOnly (false);
   cdsys->ResetCollisionPairs ();
 
-  // Perform recursive collision testing to minimise hits and
+  // Perform collision testing to minimise hits and
   // find distance we can travel
   if (cd)
-    hits = CollisionDetectIterative (topCollider, current_sector,
-      &transform_newpos, &transform_oldpos, maxmove);
+  {
+      if(onground)
+          hits = CollisionDetect (topCollider, current_sector,
+      &transform_newpos, &transform_oldpos);
+      else
+          hits = CollisionDetect (bottomCollider, current_sector,
+                                           &transform_newpos, &transform_oldpos);
+  }
   else
   {
     hits = 0;
@@ -987,33 +998,59 @@ bool csColliderActor::AdjustForCollisions (
   }
 
   // localvel is smaller because we can partly move the object in that direction
-  localvel -= maxmove - oldpos;
+  maxmove = transform_oldpos.GetOrigin ();
+  //localvel -= maxmove - oldpos;
   csVector3 correctedVel(localvel);
-
+    
+    bool bounced = false;
+    csVector3 bestBounce;
   for (i = 0; i < our_cd_contact.GetSize () ; i++ )
   {
     csCollisionPair& cd = our_cd_contact[i];
     csPlane3 obstacle (cd.a2, cd.b2, cd.c2);
     csVector3 normal = obstacle.Normal ();
-
+      
+      // Check, have we collided against an 'inner' face
+      if (normal * localvel > 0)
+      {
+           
+          continue;
+      }
     float norm = normal.Norm ();
     if (fabs (norm) < SMALL_EPSILON) continue;
+
+      
     csVector3 unit = normal / norm;
 
-    if (unit * localvel > 0) continue;
+    // No sliding forces from ground-like surfaces
+    // sin(Pi/4) == 0.7
+    if(unit.y >= 0.7) continue;
+    
 
+    csVector3 bounce(unit * (unit * localvel));
+    
+    if((localvel - bounce).y > 0)
+    {
+        unit.y = 0;
+        bounce = unit * (unit * localvel);
+    }
+      
     // Bounce back
+    if(bounced && (localvel - bounce).SquaredNorm() < (localvel - bestBounce).SquaredNorm())
+        bestBounce = bounce;
+    
+    bounced = true;
+      
+    correctedVel = localvel - 1.1 * bestBounce; //(-(localvel % unit) % unit);    
 
-    correctedVel -= unit * (unit * correctedVel)*1.1; //(-(localvel % unit) % unit);
+      
   }
- 
-  localvel = correctedVel;
-  newpos = maxmove + localvel;
 
-  transform_newpos = csOrthoTransform (csMatrix3(), newpos);
- 
+    localvel = correctedVel;
+  //newpos = maxmove + localvel;
+    newpos = oldpos + localvel;
+    
   // Part2: legs
-
   our_cd_contact.Empty ();
 
   transform_newpos = csOrthoTransform (csMatrix3(), newpos);
@@ -1026,15 +1063,43 @@ bool csColliderActor::AdjustForCollisions (
   else
     hits = 0;
 
-  bool stepDown;
-
+  bool stepDown = true;
+    
+    for (i = 0; i < our_cd_contact.GetSize (); i++ )
+    {
+        csCollisionPair cd = our_cd_contact[i];
+        csPlane3 obstacle (cd.a2, cd.b2, cd.c2);
+        csVector3 normal = obstacle.Normal();
+        float norm = normal.Norm ();
+        
+        // Ensure this is a big-enough triangle to count as a collision.
+        if (fabs (norm) < 1e-4f ) continue;
+        
+        csVector3 n = normal / norm;
+        
+        csVector3 line[2];
+        
+        // This needs to be done for numerical inaccuracies in this test
+        // versus the collision system test.
+        if(!FindIntersection (cd,line))
+            continue;
+        
+        // Is it a collision with a ground polygon?
+        //  (this tests for the angle between ground and colldet
+        //  triangle)
+        // sin(Pi/4) == 0.7
+        if(n.y >= 0.7)
+        {
+            stepDown = false;
+        }
+    }
+    
+    
   // Only able to step down if we aren't jumping or falling
-  if (hits > 0 || vel.y != 0)
+  if (vel.y != 0)
     stepDown = false;
-  else
+  if(stepDown)
   {
-    stepDown = true;
-
     // Try stepping down
     newpos.y -= bottomSize.y/2;
     transform_newpos = csOrthoTransform (csMatrix3(), newpos);
@@ -1055,11 +1120,12 @@ bool csColliderActor::AdjustForCollisions (
 
   float maxJump = newpos.y + bottomSize.y;
   float max_y = -1e9;
+    float max_y_steep = -1e9;
 
   // Keep moving the model up until it no longer collides
   while (hits > 0 && newpos.y < maxJump)
   {
-    bool adjust = false;
+    hitsurface = false;
     for (i = 0; i < our_cd_contact.GetSize (); i++ )
     {
       csCollisionPair cd = our_cd_contact[i];
@@ -1082,28 +1148,38 @@ bool csColliderActor::AdjustForCollisions (
       // Is it a collision with a ground polygon?
       //  (this tests for the angle between ground and colldet
       //  triangle)
-      if(!(n.y < 0.7))
-          onground = true;
-      adjust = true;
-      max_y = MAX(MAX(line[0].y, line[1].y)+shift.y,max_y);
-      if (max_y > maxJump)
+      // sin(Pi/4) == 0.7
+      if((fabs(n.y) >= 0.7))
       {
-        max_y = maxJump;
-        break;
+          onground = true;
+          // This is a ground triangle so we can move on top of it
+          max_y = MAX(MAX(line[0].y, line[1].y)+shift.y,max_y);
       }
+     
+          // This is not a ground polygon so we can move down to rest on it
+          max_y_steep = MAX(MAX(line[0].y, line[1].y)+shift.y, max_y_steep);
+      hitsurface = true;
     }
-    hits = 0;
 
     // This prevents us from going up if there is no surface to rest on.
-    if(!onground && max_y > oldpos.y)
+    if(!onground && max_y_steep > oldpos.y)
     {
-        newpos.y = oldpos.y;
+        // in this case we do not accept the move
+        // hitsurface must be true so this will be adjusted down later
+        newpos = oldpos;
+        newpos.y = oldpos.y + 0.01f;
         break;
     }
-    if (adjust)
+        
+    if (hitsurface)
     {
       // Temporarily lift the model up so that it passes the final check
-      newpos.y = max_y + 0.01f;
+      if(onground)
+        newpos.y = max_y + 0.01f;
+      else
+        newpos.y = max_y_steep + 0.01f;
+      break;
+        
       our_cd_contact.Empty ();
 
       transform_newpos = csOrthoTransform (csMatrix3(), newpos);
@@ -1116,9 +1192,11 @@ bool csColliderActor::AdjustForCollisions (
       else
         hits = 0;
     }
+    else
+      hits = 0;
   }
 
-  if (!onground)
+  if (hits == 0)
   {
     // Reaction force - Disabled because no distinction made between physics
     // engine predicted velocity and player controlled velocity
@@ -1138,6 +1216,8 @@ bool csColliderActor::AdjustForCollisions (
   // Bring the model back down now that it has passed the final check
   if (onground)
     newpos.y -= 0.02f;
+  else if(hitsurface)
+    newpos.y -= 0.01f;
 
   if (cd)
     hits = CollisionDetect (topCollider, current_sector,
@@ -1158,19 +1238,16 @@ bool csColliderActor::AdjustForCollisions (
 
     if (unit * (newpos - oldpos) > 0) continue;
     hits++;
+    break;
   }
 
-  if (hits > 0)
+  if (hits > 0 || (newpos - oldpos).IsZero())
   {
     // No move possible without a collision with the torso
-    revertMove = true;
-    if(vel.y < 0)// && fabs(vel.x) < 0.01 && fabs(vel.y) < 0.01)
-      revertCount++;
     newpos = oldpos;
     return false;
   }
 
-  revertCount = 0;
   return true;
 }
 
@@ -1263,7 +1340,31 @@ bool csColliderActor::MoveV (float delta,
 
   // Check for collisions and adjust position
   if (!AdjustForCollisions (oldpos, newpos, worldVel, delta))
-    return false;                   // We haven't moved so return early
+  {
+      if(worldVel.y != 0 && (worldVel.x != 0 || worldVel.z != 0))
+      {
+          // Try to move again without the x and z actor vectors
+          // Otherwise the actor may 'stick' to the wall
+          worldVel = fulltransf.This2OtherRelative (csVector3(0, velBody.y, 0)) + velWorld;
+          newpos = worldVel*delta + oldpos;
+          if(!AdjustForCollisions (oldpos, newpos, worldVel, delta))
+          {
+              // Pathologic case where there is no where for the actor to move eg.
+              // \    /
+              //  \  /
+              //   \/
+              // In this case stop Y and pretend actor is on the ground
+              if(velWorld.y < -ABS_MAX_FREEFALL_VELOCITY / 2)
+              {
+                  velWorld.y = 0;
+                  onground = true;
+              }
+              return false;
+          }
+      }
+      else
+          return false;                   // We haven't moved so return early
+  }
   
   bool mirror = false;
 
@@ -1401,6 +1502,11 @@ bool csColliderActor::Move (float delta, float speed, const csVector3& velBody,
 
     if (!rc) return rc;
 
+    // We must update the transform after every rotation!
+    if (movable)
+    {
+        fulltransf = movable->GetFullTransform ();
+    }
     // The velocity may have changed by now
     bodyVel = fulltransf.Other2ThisRelative(velWorld) + velBody;
 

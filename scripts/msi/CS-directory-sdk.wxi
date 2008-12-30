@@ -1,0 +1,55 @@
+<Include>
+  <Media EmbedCab="yes" Id="30010" Cabinet="CS_sdk.cab"/>
+  <Media EmbedCab="yes" Id="30011" Cabinet="CS_sdk_$(var.ARCH).cab"/>
+  <DirectoryRef Id="TARGETDIR">
+    <Directory Name="CrystalSpaceSDK" Id="CSSDK$(var.VERSION_MAJORMINOR)">
+      <Directory Name="$(var.ARCH)" Id="CSSDK_ARCH">
+        <?if $(var.ARCH) = GCC_3.4 ?>
+          <!-- GCC SDK: Add SDK dir to environment so configure checks can pick it up -->
+          <Component Guid="56d062bb-f775-4e43-a718-8c8f301a996e" Id="CS.sdk.register">
+            <Environment Action="set" Part="first" Name="CRYSTAL_$(var.VERSION_MAJOR)_$(var.VERSION_MINOR)" Value="[CSSDK_ARCH]" Id="CS.sdk.register.env1" Permanent="no"/>
+            <Environment Action="set" Part="first" Name="CRYSTAL" Value="[CSSDK_ARCH]" Id="CS.sdk.register.env2" Permanent="no"/>
+          </Component>
+        <?endif?>
+        <Directory Name="bin" Id="CS.arch.bin.sdk">
+          <Merge DiskId="30011" SourceFile="$(var.CRYSTAL_MSM_PATH)/CS.arch.$(var.ARCH).executable.sdk.msm" Id="CS.arch.executable.sdk" Language="1033" FileCompression="yes"/>
+          <?if $(var.ARCH) = GCC_3.4 ?>
+            <!-- GCC SDK: include cs-config -->
+            <Merge DiskId="30011" SourceFile="$(var.CRYSTAL_MSM_PATH)/CS.arch.$(var.ARCH).csconfig.msm" Id="CS.arch.csconfig" Language="1033" FileCompression="yes"/>
+          <?endif?>
+        </Directory>
+        <Directory Name="include" Id="CS.arch.include">
+          <Merge DiskId="30010" SourceFile="$(var.CRYSTAL_MSM_PATH)/CS.include.msm" Id="CS.include.8F1B7996-BF93-11DC-B42B-0015582877AD" Language="1033" FileCompression="yes"/>
+          <Merge DiskId="30011" SourceFile="$(var.CRYSTAL_MSM_PATH)/CS.arch.$(var.ARCH).include.msm" Id="CS.arch.include" Language="1033" FileCompression="yes"/>
+        </Directory>
+        <Directory Name="lib" Id="CS.arch.linklibs">
+          <Merge DiskId="30011" SourceFile="$(var.CRYSTAL_MSM_PATH)/CS.arch.$(var.ARCH).link.msm" Id="CS.arch.link" Language="1033" FileCompression="yes"/>
+          <Merge DiskId="30010" SourceFile="$(var.TOP)/win32libs/mergemodules/winlibs.common.link.msm" Id="winlibs.common.link" Language="1033" FileCompression="yes"/>
+          <?if $(var.ARCH) = GCC_3.4 ?>
+            <Merge DiskId="30011" SourceFile="$(var.TOP)/win32libs/mergemodules/winlibs.mingw.link.msm" Id="winlibs.arch.link" Language="1033" FileCompression="yes"/>
+          <?endif?>
+          <?if $(var.ARCH) = VC_7 ?>
+            <Merge DiskId="30011" SourceFile="$(var.TOP)/win32libs/mergemodules/winlibs.vc7.link.msm" Id="winlibs.arch.link" Language="1033" FileCompression="yes"/>
+          <?endif?>
+          <?if $(var.ARCH) = VC_71 ?>
+            <Merge DiskId="30011" SourceFile="$(var.TOP)/win32libs/mergemodules/winlibs.vc71.link.msm" Id="winlibs.arch.link" Language="1033" FileCompression="yes"/>
+          <?endif?>
+          <?if $(var.ARCH) = VC_8 ?>
+            <Merge DiskId="30011" SourceFile="$(var.TOP)/win32libs/mergemodules/winlibs.vc8.link.msm" Id="winlibs.arch.link" Language="1033" FileCompression="yes"/>
+          <?endif?>
+          <?if $(var.ARCH) = VC_9 ?>
+            <Merge DiskId="30011" SourceFile="$(var.TOP)/win32libs/mergemodules/winlibs.vc9.link.msm" Id="winlibs.arch.link" Language="1033" FileCompression="yes"/>
+          <?endif?>
+        </Directory>
+      </Directory>
+      <Directory Name="Documentation" Id="CSDOCS">
+        <Merge DiskId="30010" SourceFile="$(var.CRYSTAL_MSM_PATH)/CS.doc.msm" Id="CS.doc.88888F92-BF93-11DC-B42B-0015582877AD" Language="1033" FileCompression="yes"/>
+      </Directory>
+    </Directory>
+  </DirectoryRef>
+  <DirectoryRef Id="CSVERSION$(var.VERSION_MAJORMINOR)">
+    <Directory Name="data" Id="CS.data.sdk">
+      <Merge DiskId="30010" SourceFile="$(var.CRYSTAL_MSM_PATH)/CS.data.sdk.msm" Id="CS.data.sdk" Language="1033" FileCompression="yes"/>
+    </Directory>
+  </DirectoryRef>
+</Include>

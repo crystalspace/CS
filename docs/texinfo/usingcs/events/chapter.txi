@@ -15,9 +15,11 @@ their own event types easily.
 * Event Scheduling:: Scheduling
 * Event Subscription:: Subscription
 * Frame phase events::
+* Event Bindings:: Bindings
 @end menu
 
 @importss{usingcs,events,names.txi}
 @importss{usingcs,events,scheduling.txi}
 @importss{usingcs,events,subscription.txi}
 @importss{usingcs,events,framephases.txi}
+@importss{usingcs,events,bindings.txi}

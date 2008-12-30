@@ -40,6 +40,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/document.h"
+#include "iutil/stringarray.h"
 #include "imap/ldrctxt.h"
 #include "sprcal3dldr.h"
 
@@ -110,8 +111,7 @@ bool csSpriteCal3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
 
 
 csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
-						iStreamSource*,
-						iLoaderContext* ldr_context, 
+						iStreamSource*,	iLoaderContext* ldr_context, 
 						iBase* context)
 {
   csRef<iPluginManager> plugin_mgr (
@@ -705,8 +705,7 @@ bool csSpriteCal3DLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csSpriteCal3DLoader::Parse (iDocumentNode* node,
-					 iStreamSource*,
-					 iLoaderContext* ldr_context, iBase*)
+					 iStreamSource*, iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
   csRef<iSpriteCal3DState> sprCal3dLook;
@@ -724,13 +723,15 @@ csPtr<iBase> csSpriteCal3DLoader::Parse (iDocumentNode* node,
       {
 	const char* factname = child->GetContentsValue ();
 	iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
-	if (!fact)
-	{
-	  synldr->ReportError (
-	    "crystalspace.spritecal3dloader.parse.unknownfactory",
-	    child, "Couldn't find factory '%s'!", factname);
-	  return 0;
-	}
+
+  if(!fact)
+  {
+    synldr->ReportError (
+      "crystalspace.spritecal3dloader.parse.unknownfactory",
+      child, "Couldn't find factory '%s'!", factname);
+    return 0;
+  }
+
 	mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	sprCal3dLook = scfQueryInterface<iSpriteCal3DState> (mesh);
       }

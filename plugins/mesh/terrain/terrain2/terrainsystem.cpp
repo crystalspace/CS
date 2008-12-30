@@ -41,16 +41,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 {
 
 csTerrainSystem::csTerrainSystem (iMeshObjectFactory* factory, 
-  iTerrainRenderer* renderer, iTerrainCollider* collider, iTerrainDataFeeder* feeder)
-  : scfImplementationType (this, (iEngine*)0), factory (factory), renderer (renderer),
-  collider (collider), dataFeeder (feeder), virtualViewDistance (2.0f), 
-  maxLoadedCells (~0), autoPreload (false), bbStarted (false)
+  iTerrainRenderer* renderer, iTerrainCollider* collider,
+  iTerrainDataFeeder* feeder)
+  : scfImplementationType (this, (iEngine*)0), factory (factory),
+    renderer (renderer), collider (collider), dataFeeder (feeder),
+    virtualViewDistance (2.0f), maxLoadedCells (~0), autoPreload (false),
+    bbStarted (false)
 {
-  renderer->ConnectTerrain (this);
+  if (renderer)
+    renderer->ConnectTerrain (this);
 }
 
 csTerrainSystem::~csTerrainSystem ()
 {
+  cells.Empty();
+  if (renderer)
+    renderer->DisconnectTerrain (this);
 }
 
 void csTerrainSystem::AddCell (csTerrainCell* cell)
@@ -65,6 +71,8 @@ void csTerrainSystem::AddCell (csTerrainCell* cell)
   }
 
   boundingbox += cell->GetBBox ();
+
+  ShapeChanged ();
 }
 
 void csTerrainSystem::FireLoadCallbacks (csTerrainCell* cell)
@@ -91,13 +99,20 @@ void csTerrainSystem::FireUnloadCallbacks (csTerrainCell* cell)
   }
 }
 
-void csTerrainSystem::FireHeightUpdateCallbacks (csTerrainCell* cell, const csRect& rectangle)
+void csTerrainSystem::FireHeightUpdateCallbacks (csTerrainCell* cell,
+    const csRect& rectangle)
 {
   for (size_t i = 0; i < heightDataCallbacks.GetSize (); ++i)
   {
     heightDataCallbacks[i]->OnHeightUpdate (cell, rectangle);
   }
 }
+
+void csTerrainSystem::CellSizeUpdate (csTerrainCell* cell)
+{
+  ComputeBBox ();
+}
+
 
 iTerrainCell* csTerrainSystem::GetCell (const char* name, bool loadData)
 {
@@ -227,7 +242,7 @@ csTerrainColliderCollideSegmentResult csTerrainSystem::CollideSegment (
 
     csVector3 isect;
 
-    if (csIntersect3::ClipSegmentBox (seg, box, use_ray) >= 0)
+    if (csIntersect3::ClipSegmentBox (seg, box, use_ray))
     {
       rc = cells[i]->CollideSegment (seg.End (), seg.Start ());
       if (rc.hit)
@@ -257,6 +272,11 @@ bool csTerrainSystem::CollideTriangles (const csVector3* vertices,
 
     if (csIntersect3::BoxSphere (box, sphere.GetCenter (), sphere.GetRadius ()))
     {
+      if (cells[i]->GetLoadState () != csTerrainCell::Loaded)
+      {
+        cells[i]->SetLoadState (csTerrainCell::Loaded);
+      }
+
       if (cells[i]->CollideTriangles (vertices, tri_count, indices, radius,
           trans, oneHit, pairs) && oneHit)
         return true;
@@ -462,6 +482,12 @@ iMeshObjectFactory* csTerrainSystem::GetFactory () const
 csRenderMesh** csTerrainSystem::GetRenderMeshes (int& num, iRenderView* rview, 
     iMovable* movable, uint32 frustum_mask)
 {
+  if (!renderer)
+  {
+    num = 0;
+    return 0;
+  }
+
   csArray<iTerrainCell*> neededCells;
   
   csOrthoTransform c2ot = rview->GetCamera ()->GetTransform ();
@@ -575,6 +601,20 @@ void csTerrainSystem::InvalidateMaterialHandles ()
 csColliderType csTerrainSystem::GetColliderType ()
 {
   return CS_TERRAIN_COLLIDER;
+}
+
+void csTerrainSystem::ComputeBBox ()
+{
+  boundingbox.Empty ();
+  boundingbox.StartBoundingBox ();
+  bbStarted = true;
+
+  for (size_t i = 0; i < cells.GetSize (); ++i)
+  {
+    boundingbox += cells[i]->GetBBox ();
+  }
+
+  ShapeChanged ();
 }
 
 }

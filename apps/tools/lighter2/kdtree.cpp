@@ -19,6 +19,7 @@
 #include "common.h"
 
 #include "kdtree.h"
+#include "material.h"
 #include "primitive.h"
 #include "statistics.h"
 #include "object.h"
@@ -35,6 +36,10 @@ namespace lighter
     CS::Memory::AlignedFree (this->primitives);
     CS::Memory::AlignedFree (this->nodeList);
   }
+
+  KDTreeBuilder::KDTreeBuilder ()
+    : boxAllocator (1024), nodeAllocator (1024)
+  {}
 
   KDTree* KDTreeBuilder::BuildTree (ObjectHash::GlobalIterator& objects,
                                     Statistics::Progress& progress)
@@ -58,8 +63,8 @@ namespace lighter
     KDTree* tree = SetupRealTree (rootNode);
     
     //Clean up some memory
-    boxAllocator.Empty ();
-    nodeAllocator.Empty ();
+    boxAllocator.DeleteAll ();
+    nodeAllocator.DeleteAll ();
 
     progress.SetProgress (1);
     return tree;
@@ -146,7 +151,7 @@ namespace lighter
 
     //Best axis and side for planar
     uint bestAxis = ~0, bestSide = ~0;
-    size_t bestNLeft, bestNRight, bestNPlanar;
+    size_t bestNLeft = 0, bestNRight = 0, bestNPlanar = 0;
 
     for (uint axis = 0; axis < 3; ++axis)
     {
@@ -521,6 +526,8 @@ namespace lighter
 
           if (prim->GetObject ()->GetFlags ().Check (OBJECT_FLAG_NOSHADOW))
             kdFlags |= KDPRIM_FLAG_NOSHADOW;
+	  if (prim->GetMaterial() && prim->GetMaterial()->IsTransparent())
+	    kdFlags |= KDPRIM_FLAG_TRANSPARENT;
 
           //Extract our info
           const csVector3& N = prim->GetPlane ().Normal ();

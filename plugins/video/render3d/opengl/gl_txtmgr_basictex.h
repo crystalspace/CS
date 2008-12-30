@@ -28,12 +28,14 @@
 #endif
 
 #include "csutil/leakguard.h"
+#include "csutil/pooledscfclass.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/weakref.h"
 
 #include "igraphic/image.h"
+#include "iutil/databuff.h"
 #include "ivideo/texture.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
@@ -47,7 +49,7 @@ struct TextureStorageFormat
   /// Format in which to store the texture ('internalformat' in GL spec)
   GLenum targetFormat;
   /**
-   * Whether the format is compressed. Accompanying "source format" 
+   * Whether the format is compressed. Accompanying "source format"
    * information is only valid for uncompressed textures.
    */
   bool isCompressed;
@@ -55,7 +57,7 @@ struct TextureStorageFormat
   /// Init with default values
   TextureStorageFormat () : targetFormat (0), isCompressed (false) {}
   /// Init with given format
-  TextureStorageFormat (GLenum targetFormat, bool compressed) : 
+  TextureStorageFormat (GLenum targetFormat, bool compressed) :
     targetFormat (targetFormat), isCompressed (compressed) {}
 };
 
@@ -69,7 +71,7 @@ struct TextureSourceFormat
   /// Init with default values
   TextureSourceFormat () : format (0), type (0) {}
   /// Init for uncompressed texture
-  TextureSourceFormat (GLenum format, GLenum type) : 
+  TextureSourceFormat (GLenum format, GLenum type) :
     format (format), type (type) {}
 };
 
@@ -89,11 +91,35 @@ struct csGLUploadData
 
 struct csGLTextureClassSettings;
 
+class TextureReadbackSimple :
+  public scfImplementationPooled<scfImplementation1<TextureReadbackSimple,
+                                                    iDataBuffer> >
+{
+  typedef scfImplementationPooled<scfImplementation1<TextureReadbackSimple,
+                                                    iDataBuffer> > SuperClass;
+
+  void* data;
+  size_t size;
+public:
+  TextureReadbackSimple (void* data, size_t size) : SuperClass (this),
+    data (data), size (size) {}
+  ~TextureReadbackSimple()
+  {
+    cs_free (data);
+  }
+  
+  char* GetData () const { return (char*)data; }
+  int8* GetInt8 () { return (int8*)data; }
+  size_t GetSize () const { return size; }
+  uint8* GetUint8 () { return (uint8*)data; }
+  char* operator * () const { return (char*)data; }
+};
+
 // For GetTextureTarget ()
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 class csGLBasicTextureHandle :
-  public scfImplementation1<csGLBasicTextureHandle, 
+  public scfImplementation1<csGLBasicTextureHandle,
 			    iTextureHandle>
 {
 protected:
@@ -109,17 +135,20 @@ protected:
   /// Private texture flags
   enum
   {
-    flagTexupdateNeeded = 1 << 31, 
-    flagPrepared = 1 << 30, 
+    flagTexupdateNeeded = 1 << 31,
+    flagPrepared = 1 << 30,
     flagForeignHandle = 1 << 29,
     flagWasRenderTarget = 1 << 28,
-    flagNeedMips = 1 << 27,
+    flagExcessMaxMip = 1 << 27,
 
     // Flags below are used by csGLTextureHandle
     /// Does it have a keycolor?
     flagTransp = 1 << 26,
     /// Is the color valid?
     flagTranspSet = 1 << 25,
+    
+    /// Special flag to mark this texture is used in an FBO
+    flagInFBO = 1 << 24,
 
     flagLast,
     /// Mask to get only the "public" flags
@@ -147,7 +176,7 @@ protected:
   GLenum DetermineTargetFormat (GLenum defFormat, bool allowCompress,
     const char* rawFormat, bool& compressedTarget);
 
-  static void ComputeNewPo2ImageSize (int texFlags, 
+  static void ComputeNewPo2ImageSize (int texFlags,
     int orig_width, int orig_height, int orig_depth,
     int& newwidth, int& newheight, int& newdepth,
     int max_tex_size);
@@ -156,12 +185,33 @@ protected:
   void FreshUploadData ();
 private:
   void AdjustSizePo2 ();
-    
+
+  struct BlitBuffer
+  {
+    int x;
+    int y;
+    int width;
+    int height;
+    iTextureHandle::TextureBlitDataFormat format;
+  };
+  csHash<BlitBuffer, csPtrKey<uint8> > blitBuffers;
+  uint8* QueryBlitBufferGeneric (int x, int y, int width, int height,
+    size_t& pitch, TextureBlitDataFormat format, uint bufFlags);
+  void ApplyBlitBufferGeneric (uint8* buf);
+
+  int pboMapped;
+  void* pboMapPtr;
+  uint8* QueryBlitBufferPBO (int x, int y, int width, int height,
+    size_t& pitch, TextureBlitDataFormat format, uint bufFlags);
+  void ApplyBlitBufferPBO (uint8* buf);
 protected:
   GLuint Handle;
+  GLuint pbo;
   /// Upload the texture to GL.
   void Load ();
   void Unload ();
+  
+  CS::Graphics::TextureComparisonMode texCompare;
 public:
   /// The dimensions which were requested upon texture creation
   int orig_width, orig_height, orig_d;
@@ -180,8 +230,9 @@ public:
   {
     texFlags.SetBool (flagWasRenderTarget, b);
   }
-  bool IsNeedMips() const { return texFlags.Check (flagNeedMips); }
-  void SetNeedMips (bool b) { texFlags.SetBool (flagNeedMips, b); }
+  
+  bool IsInFBO() const { return texFlags.Check (flagInFBO); }
+  void SetInFBO (bool b) { texFlags.SetBool (flagInFBO, b); }
 
   /// Create a texture with given dimensions
   csGLBasicTextureHandle (int width, int height, int depth,
@@ -192,7 +243,7 @@ public:
   virtual ~csGLBasicTextureHandle ();
 
   /**
-   * Synthesize empty upload data structures for textures of the format 
+   * Synthesize empty upload data structures for textures of the format
    * \a format. */
   bool SynthesizeUploadData (const CS::StructuredTextureFormat& format,
     iString* fail_reason);
@@ -234,7 +285,7 @@ public:
   /**
    * Texture Depth Indices are used for Cubemap interface
    */
-  //enum { CS_TEXTURE_CUBE_POS_X = 0, CS_TEXTURE_CUBE_NEG_X, 
+  //enum { CS_TEXTURE_CUBE_POS_X = 0, CS_TEXTURE_CUBE_NEG_X,
   //       CS_TEXTURE_CUBE_POS_Y, CS_TEXTURE_CUBE_NEG_Y,
   //       CS_TEXTURE_CUBE_POS_Z, CS_TEXTURE_CUBE_NEG_Z };
 
@@ -262,22 +313,7 @@ public:
   virtual void Blit (int x, int y, int width, int height,
     unsigned char const* data, TextureBlitDataFormat format = RGBA8888);
   void SetupAutoMipping();
-
-  /// Get the texture target
-  virtual int GetTextureTarget () const { return int (texType); }
-
-  /**
-   * Query the private object associated with this handle.
-   * For internal usage by the 3D driver.
-   */
-  virtual void *GetPrivateObject ();
-
-  /**
-   * Query if the texture has an alpha channel.<p>
-   * This depends both on whenever the original image had an alpha channel
-   * and of the fact whenever the renderer supports alpha maps at all.
-   */
-  virtual bool GetAlphaMap ();
+  void RegenerateMipmaps();
 
   virtual csAlphaMode::AlphaType GetAlphaType () const
   { return alphaType; }
@@ -285,6 +321,7 @@ public:
   { this->alphaType = alphaType; }
 
   virtual void Precache ();
+  virtual bool IsPrecached () { return Handle != 0; }
 
   virtual void SetTextureClass (const char* className);
   virtual const char* GetTextureClass ();
@@ -294,6 +331,8 @@ public:
   void UpdateTexture ();
 
   GLuint GetHandle ();
+  void ChangeTextureCompareMode (
+    const CS::Graphics::TextureComparisonMode& mode);
 
   /**
    * Return the texture target for this texture (e.g. GL_TEXTURE_2D)
@@ -312,15 +351,32 @@ public:
    * incur a hefty performance penalty (due the performed compression of the
    * changed texels), so for texture intended for such use it's a good idea
    * to make sure the internal format is not compressed.
-   * \param keepPixels Whether to keep the existing pixel data should be 
+   * \param keepPixels Whether to keep the existing pixel data should be
    *   preserved.
+   * \param newTexFormat New texture format the texture should have.
    * \remarks The texture handle must be bound properly before this method
    *   is called.
    */
-  void EnsureUncompressed (bool keepPixels);
+  void EnsureUncompressed (bool keepPixels,
+    TextureBlitDataFormat newTexFormat = (TextureBlitDataFormat)~0);
+
+  uint8* QueryBlitBuffer (int x, int y, int width, int height,
+    size_t& pitch, TextureBlitDataFormat format, uint bufFlags);
+  void ApplyBlitBuffer (uint8* buf);
+  BlitBufferNature GetBufferNature (uint8* buf);
+
+  void SetMipmapLimits (int maxMip, int minMip = 0);
+  void GetMipmapLimits (int& maxMip, int& minMip);
+  
+  csPtr<iDataBuffer> Readback (GLenum textarget,
+    const CS::StructuredTextureFormat&, int);
+  csPtr<iDataBuffer> Readback (const CS::StructuredTextureFormat&, int);
+  
+  /// Download texture from GL as an image
+  csPtr<iImage> GetTextureFromGL ();
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 }
 CS_PLUGIN_NAMESPACE_END(gl3d)

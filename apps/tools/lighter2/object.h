@@ -30,6 +30,10 @@
 
 namespace lighter
 {
+  csPtr<iRenderBuffer> WrapBuffer (iRenderBuffer* buffer, 
+                                   const char* suffix,
+                                   const char* basename);
+
   class LightmapUVFactoryLayouter;
   class LightmapUVObjectLayouter;
   class Object;
@@ -38,8 +42,16 @@ namespace lighter
 
   enum ObjectFlags
   {
+    // Don't compute lighting
     OBJECT_FLAG_NOLIGHT = 1,
-    OBJECT_FLAG_NOSHADOW = 2
+    // Don't cast shadows
+    OBJECT_FLAG_NOSHADOW = 2,
+    // Include in occlusion debugging
+    OBJECT_FLAG_RAYDEBUG = 4,
+    // Tangent space is available
+    OBJECT_FLAG_TANGENTS = 8,
+    // Don't cast shadows on itself
+    OBJECT_FLAG_NOSELFSHADOW = 16
   };
 
   /**
@@ -50,7 +62,7 @@ namespace lighter
   class ObjectFactory : public csRefCount
   {
   public:
-    ObjectFactory ();
+    ObjectFactory (const Configuration& config);
 
     virtual bool PrepareLightmapUV (LightmapUVFactoryLayouter* uvlayout);
 
@@ -69,12 +81,27 @@ namespace lighter
 
     // Name of the factory
     csString factoryName;
+  
+    //@{
+    /// Indices of tangent/bitangent in vertex data
+    size_t vdataTangents;
+    size_t vdataBitangents;
+    //@}
 
     /// Whether to light meshes of this factory per vertex
-    bool lightPerVertex;
+    bool lightPerVertex : 1;
     
     /// Whether to avoid modifying this factory
-    bool noModify;
+    bool noModify : 1;
+
+    /// Whether tangent space data is available
+    bool hasTangents : 1;
+
+    /**
+     * Whether meshes of this factory should not cast shadows
+     * on themselves
+     */
+    bool noSelfShadow : 1;
   protected:
 
     // Begin remapping of submeshes
@@ -117,6 +144,13 @@ namespace lighter
     // classes
     const char* saverPluginName;
 
+    // Helper function: get a filename prefix for this mesh
+    csString GetFileName() const;
+    
+    /* Wrap a render buffer in a RenderBufferPersistent if binary buffers
+       are enabled */
+    csPtr<iRenderBuffer> WrapBuffer (iRenderBuffer* buffer, const char* suffix);
+
     friend class Object;
   };
   typedef csRefArray<ObjectFactory> ObjectFactoryRefArray;
@@ -146,7 +180,7 @@ namespace lighter
     virtual void ParseMesh (iMeshWrapper *wrapper);
 
     // Write out the data again
-    virtual void SaveMesh (Sector* sector, iDocumentNode *node);
+    virtual void SaveMesh (iDocumentNode *node);
 
     /* Conserve memory: free all object data that won't be needed for the 
      * actual lighting. */
@@ -180,24 +214,43 @@ namespace lighter
     { return bsphere; }
 
     typedef csDirtyAccessArray<csColor> LitColorArray;
-    inline LitColorArray* GetLitColors ()
-    { return litColors; }
+    inline LitColorArray* GetLitColors (size_t num)
+    { return litColors + num; }
 
     typedef csHash<LitColorArray, csPtrKey<Light> > LitColorsPDHash;
     /// Return lit colors for all PD lights
-    inline LitColorsPDHash* GetLitColorsPD ()
-    { return litColorsPD; }
+    inline LitColorsPDHash* GetLitColorsPD (size_t num)
+    { return litColorsPD + num; }
     /// Return lit colors for one PD light
-    LitColorArray* GetLitColorsPD (Light* light);
+    LitColorArray* GetLitColorsPD (Light* light, size_t num);
 
     inline const csFlags& GetFlags () const
     { return objFlags; }
+
+    inline Sector* GetSector() const { return sector; }
+
+    csMatrix3 ComputeTangentSpace (const Primitive* prim,
+      const csVector3& pt) const;
+
+    csMatrix3 GetTangentSpace (size_t vert) const;
+    
+    const csReversibleTransform& GetObjectToWorld () const
+    { return objectToWorld; }
 
     // Name
     csString meshName;
 
     /// Whether to light mesh per vertex
     bool lightPerVertex;
+    
+    /// Get the light influences for a certain primitive group
+    LightInfluences& GetLightInfluences (uint groupID, Light* light);
+    const LightInfluences& GetLightInfluences (uint groupID, Light* light) const;
+    
+    size_t GetPrimitiveGroupNum() const { return allPrimitives.GetSize(); }
+    csArray<Light*> GetLightsAffectingGroup (uint groupID) const;
+    uint GetPrimitiveGroupLightmap (uint groupID) const
+    { return allPrimitives[groupID].Get (0).GetGlobalLightmapID (); }
   protected:
     // All faces, already transformed
     csArray<PrimitiveArray> allPrimitives;
@@ -214,8 +267,14 @@ namespace lighter
     };
     csArray<LMLayoutingInfo> lmLayouts;
 
+    // Sector the object belongs in
+    Sector* sector;
+
     // Bounding sphere
     csSphere bsphere;
+    
+    // Object to world transform
+    csReversibleTransform objectToWorld;
 
     // Vertex data for above, transformed
     ObjectVertexData vertexData;
@@ -238,6 +297,12 @@ namespace lighter
     // Internal flags
     csFlags objFlags;
 
+    //@{
+    /// Indices of tangent/bitangent in vertex data
+    size_t vdataTangents;
+    size_t vdataBitangents;
+    //@}
+
     // Renormalize lightmap UVs into buffer \a lmcoords.
     virtual void RenormalizeLightmapUVs (const LightmapPtrDelArray& lightmaps,
       csVector2* lmcoords);
@@ -247,6 +312,39 @@ namespace lighter
 
     // Helper function: get a filename prefix for this mesh
     csString GetFileName() const;
+    
+    /* Wrap a render buffer in a RenderBufferPersistent if binary buffers
+       are enabled */
+    csPtr<iRenderBuffer> WrapBuffer (iRenderBuffer* buffer, const char* suffix);
+    
+    struct GroupAndLight
+    {
+      Light* light;
+      uint groupID;
+      
+      GroupAndLight (Light* light, uint groupID) : light (light),
+        groupID (groupID) {}
+        
+      bool operator< (const GroupAndLight& other) const
+      {
+        if (light < other.light) return true;
+        if (light > other.light) return false;
+        return groupID < other.groupID;
+      }
+      uint GetHash() const
+      {
+        return uint (uintptr_t (light)) ^ groupID;
+      }
+    };
+    struct LightInfluencesRC :
+      public CS::Utility::FastRefCount<LightInfluencesRC>,
+      public LightInfluences
+    {
+      LightInfluencesRC (uint w, uint h, uint xOffs, uint yOffs)
+       : LightInfluences (w, h, xOffs, yOffs) {}
+    };
+    typedef csHash<csRef<LightInfluencesRC>, GroupAndLight> LightInfluencesHash;
+    LightInfluencesHash* lightInfluences;
 
     friend class ObjectFactory;
   };

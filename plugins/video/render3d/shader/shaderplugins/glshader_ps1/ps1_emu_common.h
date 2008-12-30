@@ -78,7 +78,9 @@ public:
     csArray<csShaderVarMapping> &);
 
   /// Compile a program
-  virtual bool Compile();
+  virtual bool Compile (iHierarchicalCache*, csRef<iString>*);
+
+  virtual void GetUsedShaderVars (csBitArray& bits) const;
 };
 
 }

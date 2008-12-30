@@ -23,6 +23,7 @@
 #include "csutil/util.h"
 #include "csutil/xmltiny.h"
 #include "csutil/scfstr.h"
+#include "csutil/scanstr.h"
 #include "xmltinyp.h"
 #include "iutil/vfs.h"
 #include "iutil/string.h"
@@ -105,7 +106,7 @@ csTinyXmlNodeIterator::csTinyXmlNodeIterator (
   csTinyXmlNodeIterator::value = value ? StrDup (value) : 0;
 
   TiDocumentNodeChildren* node_children = 0;
-  if (parent && 
+  if (parent && parent->GetTiNode() &&
     ((parent->GetTiNode()->Type() == TiDocumentNode::ELEMENT)
       || (parent->GetTiNode()->Type() == TiDocumentNode::DOCUMENT)))
     node_children = parent->GetTiNodeChildren ();
@@ -166,6 +167,10 @@ csTinyXmlNode::csTinyXmlNode (csTinyXmlDocument* doc)
 
 csTinyXmlNode::~csTinyXmlNode ()
 {
+  if (node && node->Type () == TiDocumentNode::ELEMENT)
+  {
+    static_cast<TiXmlElement*> ((TiDocumentNode*)node)->ShrinkAttributes ();
+  }
 }
 
 csRef<iDocumentNode> csTinyXmlNode::GetParent ()
@@ -239,8 +244,8 @@ csRef<iDocumentNodeIterator> csTinyXmlNode::GetNodes (const char* value)
 
 csRef<iDocumentNode> csTinyXmlNode::GetNode (const char* value)
 {
-  if ((node->Type() != TiDocumentNode::ELEMENT)
-    && (node->Type() != TiDocumentNode::DOCUMENT)) return 0;
+  if (!node || ((node->Type() != TiDocumentNode::ELEMENT)
+    && (node->Type() != TiDocumentNode::DOCUMENT))) return 0;
   TiDocumentNodeChildren* node_children = GetTiNodeChildren ();
   csRef<iDocumentNode> child;
   TiDocumentNode* c = node_children->FirstChild (value);
@@ -419,7 +424,7 @@ float csTinyXmlNode::GetContentsValueAsFloat ()
   const char* v = GetContentsValue ();
   if (!v) return 0;
   float val = 0.0;
-  sscanf (v, "%f", &val);
+  csScanStr (v, "%f", &val);
   return val;
 }
 
@@ -477,7 +482,7 @@ float csTinyXmlNode::GetAttributeValueAsFloat (const char* name)
   TiDocumentAttribute* a = GetAttributeInternal (name);
   if (!a) return 0;
   float f;
-  sscanf (a->Value (), "%f", &f);
+  csScanStr (a->Value (), "%f", &f);
   return f;
 }
 
@@ -496,14 +501,33 @@ bool csTinyXmlNode::GetAttributeValueAsBool(const char* name,
     return false;
 }
 
-void csTinyXmlNode::RemoveAttribute (const csRef<iDocumentAttribute>&)
+void csTinyXmlNode::RemoveAttribute (const csRef<iDocumentAttribute>& attribute)
 {
-  // @@@ TODO
+  TiXmlElement* element = node->ToElement ();
+  if (element)
+  {
+    for (size_t i = 0 ; i < element->GetAttributeCount (); i++)
+    {
+      TiDocumentAttribute& attrib = element->GetAttribute (i);
+      if (strcmp (attribute->GetName(), attrib.Name ()) == 0)
+      {
+        element->RemoveAttribute(attrib.Name());
+      }
+    }
+  }
 }
 
 void csTinyXmlNode::RemoveAttributes ()
 {
-  // @@@ TODO
+  TiXmlElement* element = node->ToElement ();
+  if (element)
+  {
+    for (size_t i = 0; i < element->GetAttributeCount (); i++)
+    {
+      TiDocumentAttribute& attrib = element->GetAttribute (i);
+      element->RemoveAttribute(attrib.Name ());
+    }
+  }
 }
 
 void csTinyXmlNode::SetAttribute (const char* name, const char* value)
@@ -604,29 +628,21 @@ const char* csTinyXmlDocument::Parse (const char* buf, bool collapse)
 
 const char* csTinyXmlDocument::Write (iFile* file)
 {
-  scfString str;
-  const char* error = Write (&str);
-  if (error) return error;
-  if (!file->Write (str.GetData (), str.Length ()))
-    return "Error writing file!";
-  return 0;
+  return root->Print (file);
 }
 
 const char* csTinyXmlDocument::Write (iString* str)
 {
   str->SetGrowsBy (0);
-  root->Print (str, 0);
-  return 0;
+  return root->Print (str);
 }
 
 const char* csTinyXmlDocument::Write (iVFS* vfs, const char* filename)
 {
-  scfString str;
-  const char* error = Write (&str);
-  if (error) return error;
-  if (!vfs->WriteFile (filename, str.GetData (), str.Length ()))
-    return "Error writing file!";
-  return 0;
+  csRef<iFile> file = vfs->Open (filename, VFS_FILE_WRITE);
+  if (!file.IsValid ())
+    return "Error opening file";
+  return root->Print (file);
 }
 
 int csTinyXmlDocument::Changeable ()
@@ -634,10 +650,14 @@ int csTinyXmlDocument::Changeable ()
   return CS_CHANGEABLE_YES;
 }
 
+#include "csutil/custom_new_disable.h"
+
 csTinyXmlNode* csTinyXmlDocument::Alloc ()
 {
   return new (pool) csTinyXmlNode (this);
 }
+
+#include "csutil/custom_new_enable.h"
 
 csTinyXmlNode* csTinyXmlDocument::Alloc (TiDocumentNode* node)
 {

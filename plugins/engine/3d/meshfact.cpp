@@ -48,6 +48,12 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine,
   render_priority = engine->GetObjectRenderPriority ();
   imposter_active = false;
   imposter_factory = 0;
+  
+  /* Work around iShaderVariableContext cast not working before 
+     CS::ShaderVariableContextImpl construction */
+  csRefTrackerAccess::AddAlias (
+    static_cast<iShaderVariableContext*> (this),
+    this);
 }
 
 csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine)
@@ -59,6 +65,12 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine)
   render_priority = engine->GetObjectRenderPriority ();
   imposter_active = false;
   imposter_factory = 0;
+  
+  /* Work around iShaderVariableContext cast not working before 
+     CS::ShaderVariableContextImpl construction */
+  csRefTrackerAccess::AddAlias (
+    static_cast<iShaderVariableContext*> (this),
+    this);
 }
 
 csMeshFactoryWrapper::~csMeshFactoryWrapper ()
@@ -244,7 +256,7 @@ void csMeshFactoryWrapper::SetImposterActive (bool flag)
 // csMeshFactoryList
 //--------------------------------------------------------------------------
 csMeshFactoryList::csMeshFactoryList ()
-  : scfImplementationType (this), list (64, 64)
+  : scfImplementationType (this), list (64)
 {
   listener.AttachNew (new NameChangeListener (this));
 }
@@ -276,22 +288,25 @@ int csMeshFactoryList::Add (iMeshFactoryWrapper *obj)
 
 bool csMeshFactoryList::Remove (iMeshFactoryWrapper *obj)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   FreeFactory (obj);
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
     factories_hash.Delete (name, obj);
-  list.Delete (obj);
   obj->QueryObject ()->RemoveNameChangeListener (listener);
+  list.Delete (obj);
   return true;
 }
 
 bool csMeshFactoryList::Remove (int n)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return Remove (Get (n));
 }
 
 void csMeshFactoryList::RemoveAll ()
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   size_t i;
   for (i = 0 ; i < list.GetSize () ; i++)
   {
@@ -310,6 +325,7 @@ int csMeshFactoryList::Find (iMeshFactoryWrapper *obj) const
 iMeshFactoryWrapper *csMeshFactoryList::FindByName (
   const char *Name) const
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   if (!Name) return 0;
   return factories_hash.Get (Name, 0);
 }

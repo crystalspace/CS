@@ -1,0 +1,9 @@
+SubDir TOP apps tests asndtest ;
+
+if $(OPENAL.AVAILABLE) = "yes"
+{
+Description asndtest : "Advanced sound test" ;
+Application asndtest : [ Wildcard *.cpp *.h ] : noinstall ;
+LinkWith asndtest : crystalspace ;
+ExternalLibs asndtest : OPENAL ;
+}

@@ -46,6 +46,8 @@ CS_IMPLEMENT_PLUGIN
 CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 {
 
+  CS_LEAKGUARD_IMPLEMENT (ParticlesMeshObject::RenderBufferAccessor);
+
   SCF_IMPLEMENT_FACTORY(ParticlesMeshObjectType)
 
   //-- Object type
@@ -525,6 +527,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     mesh->worldspace_origin = obj2world.GetOrigin (); //@@TODO: use real center
     mesh->geometryInstance = (void*)this;
     mesh->object2world = obj2world;
+    mesh->bbox = GetObjectBoundingBox();
 
     SetupIndexBuffer (mesh->buffers, obj2cam);
     SetupVertexBuffer (mesh->buffers, obj2cam);

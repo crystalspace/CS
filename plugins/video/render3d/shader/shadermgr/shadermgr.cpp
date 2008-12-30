@@ -23,16 +23,19 @@
 #include "csgeom/vector3.h"
 #include "csgeom/vector4.h"
 #include "cstypes.h"
-#include "csutil/objreg.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
+#include "csutil/eventhandlers.h"
+#include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
-#include "csutil/callstack.h"
+#include "csutil/vfshiercache.h"
+#include "csutil/xmltiny.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
 #include "iengine/texture.h"
 #include "igeom/clip2d.h"
+#include "imap/loader.h"
 #include "imap/services.h"
 #include "iutil/comp.h"
 #include "iutil/document.h"
@@ -42,13 +45,16 @@
 #include "iutil/stringarray.h"
 #include "iutil/verbositymanager.h"
 #include "iutil/virtclk.h"
+#include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 #include "ivideo/texture.h"
 
 #include "shadermgr.h"
+#include "loadercontext.h"
 #include "nullshader.h"
+#include "plexhiercache.h"
 
 // Pluginstuff
 CS_IMPLEMENT_PLUGIN
@@ -69,12 +75,13 @@ void csNullShader::SelfDestruct ()
 
 // General stuff
 csShaderManager::csShaderManager(iBase* parent) : 
-  scfImplementationType (this, parent)
+  scfImplementationType (this, parent), shaderVarStack (0,0)
 {
-  shaderVarStack.AttachNew (new scfArray<iShaderVarStack>);
   seqnumber = 0;
-  eventSucc[0] = CS_HANDLERLIST_END;
-  eventSucc[1] = CS_HANDLERLIST_END;
+  //eventSucc[0] = CS_HANDLERLIST_END;
+  //eventSucc[1] = CS_HANDLERLIST_END;
+  
+  InitTokenTable (xmltokens);
 }
 
 csShaderManager::~csShaderManager()
@@ -111,18 +118,18 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   else
     do_verbose = false;
 
-  PreProcess = csevPreProcess(objectreg);
+  Frame = csevFrame(objectreg);
   SystemOpen = csevSystemOpen(objectreg);
   SystemClose = csevSystemClose(objectreg);
 
   csRef<iEventHandlerRegistry> handlerReg = 
     csQueryRegistry<iEventHandlerRegistry> (objectreg);
-  eventSucc[0] = handlerReg->GetGenericID ("crystalspace.graphics3d");
+  //eventSucc[0] = handlerReg->GetGenericID ("crystalspace.graphics3d");
 
   csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (objectreg);
   if (q)
   {
-    csEventID events[] = { PreProcess, SystemOpen, SystemClose, 
+    csEventID events[] = { Frame, SystemOpen, SystemClose, 
 			    CS_EVENTLIST_END };
     RegisterWeakListener (q, this, events, weakEventHandler);
   }
@@ -132,6 +139,8 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
 
   strings = csQueryRegistryTagInterface<iStringSet> (
     objectreg, "crystalspace.shared.stringset");
+  stringsSvName = csQueryRegistryTagInterface<iShaderVarStringSet> (
+    objectreg, "crystalspace.shader.variablenameset");
 
   {
     csRef<csNullShader> nullShader;
@@ -214,15 +223,169 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
     SetTagOptions (tagID, presence, tagPriority);
   }
 
-  sv_time.AttachNew (new csShaderVariable (strings->Request ("standard time")));
+  sv_time.AttachNew (new csShaderVariable (stringsSvName->Request ("standard time")));
   sv_time->SetValue (0.0f);
-  AddVariable (sv_time);
+  
+  if (config->GetBool ("Video.ShaderManager.EnableShaderCache", false))
+  {
+    shaderCache.AttachNew (new PlexHierarchicalCache ());
+    
+    csRef<CS::Utility::VfsHierarchicalCache> cache;
+    const char* cachePath;
+    
+    cachePath = config->GetStr ("Video.ShaderManager.ShaderCachePath.User",
+      "/shadercache/user");
+    if (cachePath && *cachePath)
+    {
+      cache.AttachNew (new CS::Utility::VfsHierarchicalCache (objectreg,
+	cachePath));
+      shaderCache->AddSubShaderCache (cache, cachePriorityUser);
+    }
+    
+    cachePath = config->GetStr ("Video.ShaderManager.ShaderCachePath.App",
+      0);
+    if (cachePath && *cachePath)
+    {
+      cache.AttachNew (new CS::Utility::VfsHierarchicalCache (objectreg,
+	cachePath));
+      cache->SetReadOnly (true);
+      shaderCache->AddSubShaderCache (cache, cachePriorityApp);
+    }
+      
+    cachePath = config->GetStr ("Video.ShaderManager.ShaderCachePath.Global",
+      "/shadercache/global");
+    if (cachePath && *cachePath)
+    {
+      cache.AttachNew (new CS::Utility::VfsHierarchicalCache (objectreg,
+	cachePath));
+      cache->SetReadOnly (true);
+      shaderCache->AddSubShaderCache (cache, cachePriorityGlobal);
+    }
+  }
 
   return true;
 }
 
+iHierarchicalCache* csShaderManager::GetShaderCache()
+{
+  return shaderCache;
+}
+
+
+void csShaderManager::AddSubShaderCache (iHierarchicalCache* cache,
+                                         int priority)
+{
+  if (!shaderCache) return;
+  shaderCache->AddSubShaderCache (cache, priority);
+}
+
+iHierarchicalCache* csShaderManager::AddSubCacheDirectory (
+  const char* cacheDir, int priority, bool readOnly)
+{
+  csRef<CS::Utility::VfsHierarchicalCache> cache;
+  cache.AttachNew (new CS::Utility::VfsHierarchicalCache (objectreg,
+    cacheDir));
+  cache->SetReadOnly (readOnly);
+  shaderCache->AddSubShaderCache (cache, priority);
+  return cache;
+}
+
+void csShaderManager::RemoveSubShaderCache (iHierarchicalCache* cache)
+{
+  if (!shaderCache) return;
+  shaderCache->RemoveSubShaderCache (cache);
+}
+
+void csShaderManager::RemoveAllSubShaderCaches ()
+{
+  if (!shaderCache) return;
+  shaderCache->RemoveAllSubShaderCaches ();
+}
+
+void csShaderManager::AddDefaultVariables()
+{
+  AddVariable (sv_time);
+}
+
+void csShaderManager::LoadDefaultVariables()
+{
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectreg);
+  CS_ASSERT(vfs);
+  csRef<iSyntaxService> synldr = csQueryRegistry<iSyntaxService> (objectreg);
+  CS_ASSERT(synldr);
+  
+  csRef<iLoader> loader = csQueryRegistryOrLoad<iLoader> (objectreg,
+    "crystalspace.level.loader", true);
+  if (!loader.IsValid())
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING,
+      "Can not load default shader vars, no iLoader available");
+    return;
+  }
+    
+  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectreg);
+  csRef<iTextureManager> tm;
+  if (g3d.IsValid())
+    tm = g3d->GetTextureManager();
+  
+  csRef<iLoaderContext> ldr_context;
+  ldr_context.AttachNew (new LoaderContext (loader, tm));
+  
+  // @@@ TODO: Should allow for more than one hardcoded defaults file
+  const char* defaultsFile = "/config/shadermgr-defaults.xml";
+  csRef<iDataBuffer> buf = vfs->ReadFile (defaultsFile, false);
+  if (!buf.IsValid())
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING,
+      "Could not open default shadervars file %s",
+      defaultsFile);
+    return;
+  }
+  
+  csRef<iDocumentSystem> docsys = csQueryRegistry<iDocumentSystem> (objectreg);
+  if (!docsys.IsValid())
+    docsys.AttachNew (new csTinyDocumentSystem);
+  csRef<iDocument> doc = docsys->CreateDocument();
+  const char* err = doc->Parse (buf);
+  if (err != 0)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING,
+      "Error parsing default shadervars file %s: %s",
+      defaultsFile, err);
+    return;
+  }
+  
+  csRef<iDocumentNode> docRoot = doc->GetRoot();
+  csRef<iDocumentNode> docShaderVars = docRoot->GetNode ("shadervars");
+  if (!docShaderVars.IsValid()) return;
+  csRef<iDocumentNodeIterator> nodes = docShaderVars->GetNodes();
+  while (nodes->HasNext ())
+  {
+    csRef<iDocumentNode> child = nodes->Next ();
+    if (child->GetType() != CS_NODE_ELEMENT) continue;
+    
+    csStringID id = xmltokens.Request (child->GetValue());
+    switch (id)
+    {
+      case XMLTOKEN_SHADERVAR:
+        {
+          csRef<csShaderVariable> sv;
+          sv.AttachNew (new csShaderVariable);
+          if (synldr->ParseShaderVar (ldr_context, child, *sv))
+            AddVariable (sv);
+        }
+	break;
+      default:
+	synldr->ReportBadToken (child);
+    }
+  }
+}
+
 void csShaderManager::Open ()
 {
+  Clear();
+  AddDefaultVariables();
+  LoadDefaultVariables();
 }
 
 void csShaderManager::Close ()
@@ -254,7 +417,7 @@ void csShaderManager::UnregisterShaderVariableAcessors ()
 
 bool csShaderManager::HandleEvent(iEvent& event)
 {
-  if (event.Name == PreProcess)
+  if (event.Name == Frame)
   {
     UpdateStandardVariables();
     return false;

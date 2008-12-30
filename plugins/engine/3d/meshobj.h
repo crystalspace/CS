@@ -32,11 +32,9 @@
 #include "iutil/selfdestruct.h"
 #include "csgfx/shadervarcontext.h"
 #include "imesh/object.h"
-#include "imesh/lighting.h"
 #include "iengine/mesh.h"
 #include "iengine/imposter.h"
 #include "iengine/viscull.h"
-#include "iengine/shadcast.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 
@@ -51,8 +49,13 @@ struct iMovable;
 struct iRenderView;
 struct iSharedVariable;
 class csEngine;
-class csLight;
 class csMeshWrapper;
+
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
+{
+  class csLight;
+}
+CS_PLUGIN_NAMESPACE_END(Engine)
 
 /**
  * General list of meshes.
@@ -60,8 +63,10 @@ class csMeshWrapper;
 class csMeshList : public scfImplementation1<csMeshList, iMeshList>
 {
 private:
-  csRefArrayObject<iMeshWrapper> list;
+  csRefArrayObject<iMeshWrapper, CS::Container::ArrayAllocDefault,
+    csArrayCapacityVariableGrow> list;
   csHash<iMeshWrapper*, csString> meshes_hash;
+  mutable CS::Threading::RecursiveMutex removeLock;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>
@@ -94,9 +99,6 @@ public:
   csMeshList (int cap, int thresshold);
   virtual ~csMeshList ();
 
-  /// Find a mesh in <name>:<childname>:<childname> notation.
-  iMeshWrapper *FindByNameWithChild (const char *Name) const;
-
   /// Override PrepareMesh
   virtual void PrepareMesh (iMeshWrapper*) { }
   /// Override FreeMesh
@@ -112,31 +114,26 @@ public:
   virtual iMeshWrapper *FindByName (const char *Name) const;
 };
 
-struct LSIAndDist
-{
-  csLightSectorInfluence* lsi;
-  // An indication of how powerful this light affects the object.
-  // Higher values mean more influence.
-  float influence;
-};
 
 struct ExtraRenderMeshData
 {
     csZBufMode      zBufMode;
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * The holder class for all implementations of iMeshObject.
  */
-class csMeshWrapper : public scfImplementationExt5<csMeshWrapper,
-                                                   csObject,
-                                                   iMeshWrapper,
-                                                   iShaderVariableContext,
-                                                   iVisibilityObject,
-						   iSceneNode,
-						   iSelfDestruct>
+class csMeshWrapper : 
+  public scfImplementationExt5<csMeshWrapper,
+                               csObject,
+                               iMeshWrapper,
+                               scfFakeInterface<iShaderVariableContext>,
+                               iVisibilityObject,
+    		               iSceneNode,
+                               iSelfDestruct>,
+  public CS::Graphics::OverlayShaderVariableContextImpl
 {
   friend class csMovable;
   friend class csMovableSectorList;
@@ -201,29 +198,12 @@ protected:
   csRef<csLODListener> var_min_render_dist_listener;
   csRef<csLODListener> var_max_render_dist_listener;
 
-  csShaderVariableContext svcontext;
-  csRef<iShaderVariableContext> factorySVC;
+protected:
+  virtual void InternalRemove() { SelfDestruct(); }
 
-  csEngine* engine;
 private:
   /// Mesh object corresponding with this csMeshWrapper.
   csRef<iMeshObject> meshobj;
-  /// For optimization purposes we keep the iLightingInfo interface here.
-  csRef<iLightingInfo> light_info;
-  /**
-   * For optimization purposes we keep the iShadowReceiver interface here.
-   * Also for maintaining the special version of the shadow receiver that
-   * multiplexes in case of static lod.
-   */
-  csRef<iShadowReceiver> shadow_receiver;
-  bool shadow_receiver_valid;
-  /**
-   * For optimization purposes we keep the iShadowCaster interface here.
-   * Also for maintaining the special version of the shadow caster that
-   * multiplexes in case of static lod.
-   */
-  csRef<iShadowCaster> shadow_caster;
-  bool shadow_caster_valid;
 
   /**
    * For optimization purposes we keep the portal container interface here
@@ -245,28 +225,6 @@ private:
 
   csImposterMesh *imposter_mesh;
 
-  /**
-   * Array of lights affecting this mesh object. This is calculated
-   * by the csLightManager class.
-   */
-  csDirtyAccessArray<iLightSectorInfluence*> relevant_lights;
-#define MAX_INF_LIGHTS 100
-  static LSIAndDist relevant_lights_cache[MAX_INF_LIGHTS];
-
-  // This is a mirror of 'relevant_lights' which we use to detect if
-  // a light has been removed or changed. It is only used in case we
-  // are not updating all the time (if CS_LIGHTINGUPDATE_ALWAYSUPDATE is
-  // not set).
-  struct LightRef
-  {
-    csWeakRef<iLightSectorInfluence> lsi;
-    uint32 light_nr;
-  };
-  csSafeCopyArray<LightRef> relevant_lights_ref;
-  bool relevant_lights_valid;
-  size_t relevant_lights_max;
-  csFlags relevant_lights_flags;
-
   // In case the mesh has CS_ENTITY_NOCLIP set then this will
   // contain the value of the last frame number and camera pointer.
   // This is used to detect if we can skip rendering the mesh.
@@ -280,6 +238,8 @@ public:
   csFlags flags;
   /// Culler flags.
   csFlags culler_flags;
+
+  csEngine* engine;
 
   /**
    * Clear this object from all sector portal lists.
@@ -325,7 +285,7 @@ public:
   virtual void SetFactory (iMeshFactoryWrapper* factory)
   {
     csMeshWrapper::factory = factory;
-    factorySVC = factory ? factory->GetSVContext() : 0;
+    SetParentContext (factory ? factory->GetSVContext() : 0);
   }
   /// Get the mesh factory.
   virtual iMeshFactoryWrapper* GetFactory () const
@@ -340,8 +300,6 @@ public:
 
   virtual iPortalContainer* GetPortalContainer () const
   { return portal_container; }
-  virtual iShadowReceiver* GetShadowReceiver ();
-  virtual iShadowCaster* GetShadowCaster ();
 
   /// For iVisibilityObject: Get the object model.
   virtual iObjectModel* GetObjectModel ()
@@ -420,17 +378,7 @@ public:
     return draw_cb_vector.Get (idx);
   }
 
-  virtual void SetLightingUpdate (int flags, int num_lights);
-
-  /**
-   * Get the array of relevant lights for this object.
-   */
-  const csArray<iLightSectorInfluence*>& GetRelevantLights (
-  	int maxLights, bool desireSorting);
-  /**
-   * Forcibly invalidate relevant lights.
-   */
-  void InvalidateRelevantLights () { relevant_lights_valid = false; }
+  virtual void SetLightingUpdate (int flags, int num_lights){}
 
   /**
    * Draw this mesh object given a camera transformation.
@@ -515,6 +463,11 @@ public:
    */
   csRenderMesh** GetImposter (iRenderView *rview);
 
+  void SetLODFade (float fade);
+  void UnsetLODFade ();
+
+  void SetDefaultEnvironmentTexture ();
+
   //---------- Bounding volume and beam functions -----------------//
 
   virtual csSphere GetRadius () const;
@@ -556,57 +509,8 @@ public:
   virtual csScreenBoxResult GetScreenBoundingBox (iCamera *camera);
 
   //--------------------- SCF stuff follows ------------------------------//
-  /**\name iShaderVariableContext implementation
-   * @{ */
-  /// Add a variable to this context
-  void AddVariable (csShaderVariable *variable)
-  { svcontext.AddVariable (variable); }
-
-  /// Get a named variable from this context
-  csShaderVariable* GetVariable (csStringID name) const
-  { 
-    csShaderVariable* sv = svcontext.GetVariable (name); 
-    if ((sv == 0) && (factorySVC.IsValid()))
-      sv = factorySVC->GetVariable (name);
-    return sv;
-  }
-
-  /// Get Array of all ShaderVariables
-  const csRefArray<csShaderVariable>& GetShaderVariables () const
-  { 
-    // @@@ Will not return factory SVs
-    return svcontext.GetShaderVariables (); 
-  }
-
-  /**
-   * Push the variables of this context onto the variable stacks
-   * supplied in the "stacks" argument
-   */
-  void PushVariables (iShaderVarStack* stacks) const
-  { 
-    if (factorySVC.IsValid()) factorySVC->PushVariables (stacks);
-    svcontext.PushVariables (stacks); 
-  }
-
-  bool IsEmpty () const 
-  {
-    return svcontext.IsEmpty() 
-      && (!factorySVC.IsValid() || factorySVC->IsEmpty());
-  }
-
-  void ReplaceVariable (csShaderVariable *variable)
-  { svcontext.ReplaceVariable (variable); }
-  void Clear () { svcontext.Clear(); }
-  
-  bool RemoveVariable (csShaderVariable* variable)
-  { 
-    // @@@ Also remove from factory?
-    return svcontext.RemoveVariable (variable); 
-  }
-  /** @} */
 
   //--------------------- iSelfDestruct implementation -------------------//
-
   virtual void SelfDestruct ();
 
   /**\name iSceneNode implementation
@@ -645,10 +549,6 @@ public:
     return this;
   }
   virtual iMeshWrapper* FindChildByName (const char* name);
-  virtual iLightingInfo* GetLightingInfo () const
-  {
-    return light_info;
-  }
   virtual csFlags& GetFlags ()
   {
     return flags;
@@ -678,6 +578,6 @@ public:
   }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_MESHOBJ_H__

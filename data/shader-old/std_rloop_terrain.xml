@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<params>
+  <name>std_rloop_terrain</name>
+    <steps>
+      <!-- ambient lighting -->
+      <step plugin="crystalspace.renderloop.step.generic">
+        <shadertype>ambient</shadertype>
+        <zoffset>yes</zoffset>
+        <portaltraversal/>
+        <zmesh />
+      </step>
+      <!-- dynamic lighting -->
+      <step plugin="crystalspace.renderloop.step.lightiter">
+        <steps>
+      	  <step plugin="crystalspace.renderloop.step.generic">
+            <shadertype>dynamic</shadertype>
+	    <zoffset>no</zoffset>
+            <zuse />
+          </step>
+        </steps>
+      </step>
+      <!-- terrain splatting ambient -->
+     <step plugin="crystalspace.renderloop.step.generic">
+        <shadertype>splatting ambient</shadertype>
+        <zoffset>no</zoffset>
+	<portaltraversal/>
+        <zuse />
+      </step>
+      <!-- terrain splatting dynamic -->
+       <step plugin="crystalspace.renderloop.step.lightiter">
+        <steps>
+          <step plugin="crystalspace.renderloop.step.generic">
+            <shadertype>terrain splat</shadertype>
+            <zoffset>no</zoffset>
+            <zuse />
+          </step>
+        </steps>
+      </step>
+      <!-- diffuse lighting -->
+      <step plugin="crystalspace.renderloop.step.lightiter">
+        <steps>
+          <step plugin="crystalspace.renderloop.step.generic">
+            <shadertype>diffuse</shadertype>
+            <zoffset>no</zoffset>
+            <ztest />
+          </step>
+        </steps>
+      </step>
+      <!-- draws geometry -->
+      <step plugin="crystalspace.renderloop.step.generic">
+	<shadertype>standard</shadertype>
+	<zoffset>no</zoffset>
+	<zuse />
+	<defaultshader name="std_lighting" />
+	<nodefaulttrigger>ambient</nodefaulttrigger>
+	<nodefaulttrigger>terrain splat</nodefaulttrigger>
+	<portaltraversal/>
+      </step>
+    </steps>
+</params>

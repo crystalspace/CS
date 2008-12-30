@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Jorrit Tyberghein
+		      (C) 2007 by Scott Johnson
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -45,17 +46,13 @@ void csPlane3::Set (
 
 csVector3 csPlane3::FindPoint () const
 {
-  if (norm.x >= norm.y && norm.x >= norm.z)
+  switch (norm.DominantAxis())
   {
-    return csVector3 (-DD / norm.x, 0, 0);
-  }
-  else if (norm.y >= norm.x && norm.y >= norm.z)
-  {
-    return csVector3 (0, -DD / norm.y, 0);
-  }
-  else
-  {
-    return csVector3 (0, 0, -DD / norm.z);
+    case CS_AXIS_X: return csVector3 (-DD / norm.x, 0, 0);
+    case CS_AXIS_Y: return csVector3 (0, -DD / norm.y, 0);
+    default:
+      CS_ASSERT(false);
+    case CS_AXIS_Z: return csVector3 (0, 0, -DD / norm.z);
   }
 }
 
@@ -83,6 +80,45 @@ void csPlane3::FindOrthogonalPoints (const csVector3& norm,
     q.Set (-norm.z*p.y, norm.z*p.x, a*k);
   }
 }
+
+csVector3 csPlane3::ProjectOnto(const csVector3& p)
+{
+	// make sure our normal is actually normalized
+	Normalize();
+
+	// since a plane in 3-space is infinite, the normal of the
+	// plane gives us a directional ray from the point p to the plane
+	// we need to find the distance between p and the plane
+	// create a vector triDist which is equivalent to a vector from a point
+	// on the plane to p
+	csVector3 triDist =  p - FindPoint();
+
+	// now, the distance from p to the plane is equivalent to the absolute
+	// value of the scalar projection of triDist onto the normal of the plane
+	// equation for scalar projection of b onto a = (a . b) / norm(a)
+	// so we want (n . triDist) / norm(n)
+	float aDOTb = Normal() * triDist;
+	float distance = aDOTb / csVector3::Norm(Normal());
+	distance = fabs(distance);
+
+	// finally, we need to multiply this with the normal of the plane, and
+	// add the resulting vector to our current vector, to get our projection
+	csVector3 result;
+
+	if (Classify(p) > 0)
+	{
+		result = (-distance * Normal()) + p;
+	}
+
+	else
+	{
+		result = (distance * Normal()) + p;
+	}
+
+	return result;
+
+}
+
 
 namespace
 {
@@ -167,7 +203,7 @@ bool csPlane3::ClipPolygon (
 }
 
 uint8 csPlane3::ClipPolygon (const csVector3* InVerts, size_t InCount,
-                             csVector3* OutPolygon, size_t& OutCount, 
+                             csVector3* OutPolygon, size_t& OutCount,
                              csVertexStatus* OutStatus, bool reversed) const
 {
   size_t i, i1, num_vertices = InCount, cnt_vis = 0;

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- animesh.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.animesh</name>
+        <implementation>AnimeshObjectType</implementation>
+        <description>Crystal Space Animated Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

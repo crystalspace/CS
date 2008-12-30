@@ -29,8 +29,10 @@ csString csGetPlatformConfigPath (const char* key, bool /*local*/)
   NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
   NSArray* paths = NSSearchPathForDirectoriesInDomains(
     NSLibraryDirectory, NSUserDomainMask, YES);
-  NSString* nsdir = [[paths objectAtIndex:0]
-    stringByAppendingPathComponent:@"Application Support"];
+  NSString* nskey = [[NSString alloc] initWithCString:key];
+  NSString* nsdir = [[[paths objectAtIndex:0]
+    stringByAppendingPathComponent:@"Application Support"]
+    stringByAppendingPathComponent: nskey];
   csString dir([nsdir fileSystemRepresentation]);
   [pool release];
   return dir;

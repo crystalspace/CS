@@ -17,7 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/**\file 
+/**@file 
  * Directory master header. This header file includes all headers in a
  * subdirectory of the top Crystal Space include directory.
  */
@@ -40,6 +40,7 @@
 #include "cstool/initapp.h"
 #include "cstool/keyval.h"
 #include "cstool/mapnode.h"
+#include "cstool/meshfilter.h"
 #include "cstool/meshobjtmpl.h"
 #include "cstool/normalcalc.h"
 #include "cstool/numberedfilenamehelper.h"
@@ -55,8 +56,10 @@
 #include "cstool/rviewclipper.h"
 #include "cstool/saverfile.h"
 #include "cstool/saverref.h"
+#include "cstool/simplestaticlighter.h"
 #include "cstool/smartfileopen.h"
 #include "cstool/uberscreenshot.h"
+#include "cstool/unusedresourcehelper.h"
 #include "cstool/userrndbuf.h"
 #include "cstool/vertexcompress.h"
 #include "cstool/vfsdirchange.h"

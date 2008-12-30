@@ -21,6 +21,8 @@
 
 #include "csutil/sysfunc.h"
 
+#include "csutil/threading/barrier.h"
+
 #if !defined(CS_PLATFORM_WIN32)
 #error "This file is only for Windows and requires you to include csysdefs.h before"
 #else
@@ -61,6 +63,11 @@ namespace Implementation
 
     static CS::Threading::ThreadID GetThreadID ();
 
+    ThreadPriority GetPriority () const
+    {
+      return priority;
+    }
+
   private:
     csRef<Runnable> runnable;
 
@@ -68,6 +75,8 @@ namespace Implementation
     uint threadId;
 
     int32 isRunning;
+    ThreadPriority priority;
+    Barrier startupBarrier;
   };
 
 

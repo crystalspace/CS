@@ -327,7 +327,7 @@ public:
   virtual bool AnimatesTexels () const { return animates_texels; }
   virtual bool AnimatesNormals () const { return animates_normals; }
   virtual bool AnimatesColors () const { return animates_colors; }
-  virtual void Update(csTicks current) { }
+  virtual void Update(csTicks) { }
   virtual const csVector3* UpdateVertices (csTicks current,
   	const csVector3* verts, int num_verts, uint32 version_id);
   virtual const csVector2* UpdateTexels (csTicks current,
@@ -423,12 +423,11 @@ public:
  * Genmesh animation control type.
  */
 class csGenmeshAnimationControlType :
-  public scfImplementation3<csGenmeshAnimationControlType,
-    iGenMeshAnimationControlType, iComponent, iEventHandler>
+  public scfImplementation2<csGenmeshAnimationControlType,
+    iGenMeshAnimationControlType, iComponent>
 {
 private:
   iObjectRegistry* object_reg;
-  csRef<iEventHandler> weakEventHandler;
 
 public:
   /// Constructor.
@@ -437,17 +436,9 @@ public:
   virtual ~csGenmeshAnimationControlType ();
   /// Initialize.
   bool Initialize (iObjectRegistry* object_reg);
-  /// Event handler.
-  bool HandleEvent (iEvent& ev);
 
   virtual csPtr<iGenMeshAnimationControlFactory> CreateAnimationControlFactory
   	();
-
-  CS_EVENTHANDLER_NAMES("crystalspace.mesh.genmesh.anim")
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
-
-  csEventID Frame;
-  csEventID PreProcess;
 };
 
 #endif // __CS_GENMESHANIM_H__

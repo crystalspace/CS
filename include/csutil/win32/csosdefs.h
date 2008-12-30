@@ -103,9 +103,14 @@
   #endif
 #endif
 
-#ifndef WINVER
-#define WINVER 0x0400
+#ifndef WINVER  
+  #define WINVER 0x0500
 #endif
+
+#ifndef _WIN32_WINNT
+  #define _WIN32_WINNT 0x0500
+#endif
+
 
 // So many things require this. IF you have an issue with something defined
 // in it then undef that def here.
@@ -266,8 +271,7 @@
   #define CS_INITIALIZE_PLATFORM_APPLICATION CS_WIN32_MSVC_DEBUG_GOOP
 #endif
 
-// The 2D graphics driver used by software renderer on this platform
-#define CS_SOFTWARE_2D_DRIVER "crystalspace.graphics2d.directdraw"
+// The 2D graphics driver used by renderers on this platform
 #define CS_OPENGL_2D_DRIVER "crystalspace.graphics2d.glwin32"
 
 // The sound driver
@@ -289,6 +293,7 @@
 #if defined (CS_COMPILER_MSVC)
 #  define strcasecmp _stricmp
 #  define strncasecmp _strnicmp
+#  define snprintf _snprintf
 #endif
 
 #if defined (CS_COMPILER_MSVC)
@@ -396,17 +401,6 @@ struct DIR;
 #ifndef _endthread
 #define _endthread()  {}
 #endif
-#endif
-
-// Fake up setenv(), if necessary
-#ifndef CS_HAVE_SETENV
-  #ifdef CS_CRYSTALSPACE_LIB
-    CS_EXPORT_SYM int setenv (const char* name, const char* value, 
-      bool overwrite);
-  #else
-    CS_IMPORT_SYM int setenv (const char* name, const char* value, 
-      bool overwrite);
-  #endif
 #endif
 
 // just to avoid windows.h inclusion

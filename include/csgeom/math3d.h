@@ -691,42 +691,6 @@ public:
 			 csSegment3& isectline, bool& coplanar);
 };
 
-/**
- * This is a class that does unit testing (and other debug stuff) for most
- * of csgeom classes.
- */
-class CS_CRYSTALSPACE_EXPORT csGeomDebugHelper :
-  public scfImplementation1<csGeomDebugHelper, iDebugHelper>
-{
-public:
-  csGeomDebugHelper ();
-  virtual ~csGeomDebugHelper ();
-
-  virtual int GetSupportedTests () const
-  {
-    return CS_DBGHELP_UNITTEST;
-  }
-  virtual csPtr<iString> UnitTest ();
-  virtual csPtr<iString> StateTest ()
-  {
-    return 0;
-  }
-  virtual csTicks Benchmark (int /*num_iterations*/)
-  {
-    return 0;
-  }
-  virtual csPtr<iString> Dump ()
-  {
-    return 0;
-  }
-  virtual void Dump (iGraphics3D* /*g3d*/)
-  {
-  }
-  virtual bool DebugCommand (const char*)
-  {
-    return false;
-  }
-};
 
 /** @} */
 

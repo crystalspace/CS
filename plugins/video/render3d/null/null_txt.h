@@ -20,21 +20,41 @@
 #ifndef __CS_NULL_TXT_H__
 #define __CS_NULL_TXT_H__
 
-#include "csplugincommon/render3d/txtmgr.h"
 #include "igraphic/image.h"
+#include "iutil/databuff.h"
+#include "iutil/string.h"
+#include "ivideo/shader/shader.h"
+#include "ivideo/texture.h"
+#include "ivideo/txtmgr.h"
+#include "csgfx/rgbpixel.h"
+#include "csutil/scf_implementation.h"
+#include "csutil/weakrefarr.h"
 
 class csTextureManagerNull;
+struct iObjectRegistry;
+struct iConfigFile;
 
 // For GetTextureTarget ()
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * csTextureHandleNull represents a texture and all its mipmapped
  * variants.
  */
-class csTextureHandleNull : public csTextureHandle
+class csTextureHandleNull : public scfImplementation1<csTextureHandleNull,
+                                                      iTextureHandle>
 {
 protected:
+  /// Texture usage flags: 2d/3d/etc
+  int flags;
+
+  /// Does color 0 mean "transparent" for this texture?
+  bool transp;
+  /// The transparent color
+  csRGBpixel transp_color;
+
+  csStringID texClass;
+
   csString imageName;
 
   /// Is already prepared.
@@ -45,25 +65,42 @@ protected:
 
   int w, h, d;
   int orig_w, orig_h, orig_d;
+  
+  void AdjustSizePo2 (int, int, int, int&, int&, int&);
+  void CalculateNextBestPo2Size (int texFlags, const int orgDim, int& newDim);
 public:
   /// Create the mipmapped texture object
   csTextureHandleNull (csTextureManagerNull *txtmgr, iImage *image, int flags);
-  csTextureHandleNull (csTextureManagerNull *txtmgr, int w, int h, int d, 
+  csTextureHandleNull (csTextureManagerNull *txtmgr, int w, int h, int d,
     int flags);
   /// Destroy the object and free all associated storage
   virtual ~csTextureHandleNull ();
 
+  int GetFlags () const { return flags; }
+
+  /// Enable transparent color
+  virtual void SetKeyColor (bool Enable);
+
+  /// Set the transparent color.
+  virtual void SetKeyColor (uint8 red, uint8 green, uint8 blue);
+
   /**
-   * Query if the texture has an alpha channel.<p>
-   * This depends both on whenever the original image had an alpha channel
-   * and of the fact whenever the renderer supports alpha maps at all.
+   * Get the transparent status (false if no transparency, true if
+   * transparency).
    */
-  bool GetAlphaMap ()
-  { return false; }
+  virtual bool GetKeyColor () const;
 
-  csAlphaMode::AlphaType GetAlphaType () { return csAlphaMode::alphaNone; }
+  /// Get the transparent color
+  virtual void GetKeyColor (uint8 &r, uint8 &g, uint8 &b) const;
 
-  void Precache () {}
+  csAlphaMode::AlphaType GetAlphaType () const { return csAlphaMode::alphaNone; }
+  virtual void SetAlphaType (csAlphaMode::AlphaType alphaType) { }
+
+  virtual void SetTextureClass (const char* className);
+  virtual const char* GetTextureClass ();
+
+  void Precache () { }
+  bool IsPrecached () { return true; }
   bool GetRendererDimensions (int &mw, int &mh)
   { mw = w; mh = h; return true; }
   bool GetRendererDimensions (int &mw, int &mh, int &md)
@@ -72,15 +109,29 @@ public:
   { mw = orig_w; mh = orig_h; md = orig_d; }
   void GetOriginalDimensions (int& mw, int& mh)
   { mw = orig_w; mh = orig_h; }
-  void SetTextureTarget (int /*target*/) { }
-  int GetTextureTarget () const { return iTextureHandle::CS_TEX_IMG_2D; }
   const char* GetImageName () const { return imageName; }
-  virtual void Blit (int, int, int, int, unsigned char const*, 
+  virtual void Blit (int, int, int, int, unsigned char const*,
     TextureBlitDataFormat) {}
   virtual TextureType GetTextureType () const { return texType2D; }
+
+  uint8* QueryBlitBuffer (int x, int y, int width, int height,
+    size_t& pitch, TextureBlitDataFormat format, uint bufFlags)
+  {
+    pitch = width * 4;
+    return (uint8*)cs_malloc (height * pitch);
+  }
+  void ApplyBlitBuffer (uint8* buf) { cs_free (buf); }
+  BlitBufferNature GetBufferNature (uint8* buf) { return natureDirect; }
+  
+  void SetMipmapLimits (int maxMip, int minMip = 0) {}
+  void GetMipmapLimits (int& maxMip, int& minMip)
+  { maxMip = 1000; minMip = 0; }
+  
+  csPtr<iDataBuffer> Readback (const CS::StructuredTextureFormat&, int)
+  { return 0; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Software version of the texture manager. This instance of the
@@ -89,21 +140,38 @@ public:
  * a lot of work regarding palette management and the creation
  * of lots of lookup tables.
  */
-class csTextureManagerNull : public csTextureManager
+class csTextureManagerNull :
+  public scfImplementation1<csTextureManagerNull,
+                            iTextureManager>
 {
 private:
   /// We need a pointer to the 2D driver
   iGraphics2D *G2D;
 
+  typedef csWeakRefArray<csTextureHandleNull> csTexVector;
+
+  /// Lock on textures vector.
+  CS::Threading::Mutex texturesLock;
+
+  /// List of textures.
+  csTexVector textures;
+
+  /// Clear (free) all textures
+  void Clear ()
+  {
+    CS::Threading::MutexScopedLock lock(texturesLock);
+    textures.DeleteAll ();
+  }
 public:
+  CS::ShaderVarStringID nameDiffuseTexture;
+
+  csStringSet texClassIDs;
+  
   ///
   csTextureManagerNull (iObjectRegistry *object_reg,
   	iGraphics2D *iG2D, iConfigFile *config);
   ///
   virtual ~csTextureManagerNull ();
-
-  /// Called from G3D::Open ()
-  void SetPixelFormat (csPixelFormat &PixelFormat);
 
   int GetTextureFormat ()
   { return CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA; }
@@ -112,11 +180,16 @@ public:
       iString* fail_reason = 0);
   virtual csPtr<iTextureHandle> CreateTexture (int w, int h,
       csImageType imagetype, const char* format, int flags,
+      iString* fail_reason = 0)
+  {
+    return csTextureManagerNull::CreateTexture (w, h, 1, imagetype, format,
+      flags, fail_reason);
+  }
+  virtual csPtr<iTextureHandle> CreateTexture (int w, int h, int d,
+      csImageType imagetype, const char* format, int flags,
       iString* fail_reason = 0);
   virtual void UnregisterTexture (csTextureHandleNull* handle);
 
-  virtual csPtr<iSuperLightmap> CreateSuperLightmap(int w, int h);
-  
   virtual void GetMaxTextureSize (int& w, int& h, int& aspect);
 };
 

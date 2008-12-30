@@ -50,7 +50,7 @@ struct iGeneralMeshSubMesh : public virtual iBase
   SCF_INTERFACE (iGeneralMeshSubMesh, 1, 0, 3);
   
   /// Get the index render buffer
-  virtual iRenderBuffer* GetIndices () const = 0;
+  virtual iRenderBuffer* GetIndices () = 0;
 
   /// Get the material
   virtual iMaterialWrapper* GetMaterial () const = 0;
@@ -96,11 +96,19 @@ struct iGeneralMeshSubMesh : public virtual iBase
  */
 struct iGeneralMeshCommonState : public virtual iBase
 {
-  SCF_INTERFACE (iGeneralMeshCommonState, 1, 2, 0);
+  SCF_INTERFACE (iGeneralMeshCommonState, 1, 2, 2);
   
-  /// Set lighting.
+  /**
+   * Set lighting.
+   * \deprecated Deprecated in 1.9 by change to shader-based lighting.
+   */
+  CS_DEPRECATED_METHOD_MSG("Deprecated by change to shader-based lighting.")
   virtual void SetLighting (bool l) = 0;
-  /// Is lighting enabled.
+  /**
+   * Is lighting enabled.
+   * \deprecated Deprecated in 1.9 by change to shader-based lighting.
+   */
+  CS_DEPRECATED_METHOD_MSG("Deprecated by change to shader-based lighting.")
   virtual bool IsLighting () const = 0;
   /**
    * Set manual colors. If this is set then lighting will be ignored
@@ -113,9 +121,15 @@ struct iGeneralMeshCommonState : public virtual iBase
   /**
    * Set shadowing. By default genmesh objects will cast shadows
    * (during the static lighting phase). You can disable this here.
+   * \deprecated Deprecated in 1.9 by change to shader-based lighting.
    */
+  CS_DEPRECATED_METHOD_MSG("Deprecated by change to shader-based lighting.")
   virtual void SetShadowCasting (bool m) = 0;
-  /// Is shadow casting enabled?
+  /**
+   * Is shadow casting enabled?
+   * \deprecated Deprecated in 1.9 by change to shader-based lighting.
+   */
+  CS_DEPRECATED_METHOD_MSG("Deprecated by change to shader-based lighting.")
   virtual bool IsShadowCasting () const = 0;
   /**
    * Set shadow receiving on. By default this is disabled in which
@@ -124,9 +138,15 @@ struct iGeneralMeshCommonState : public virtual iBase
    * the lighting system resembles more the lighting system with
    * things which static and pseudo-dynamic lighting. In this
    * case there will be shadows on the genmesh instance.
+   * \deprecated Deprecated in 1.9 by change to shader-based lighting.
    */
+  CS_DEPRECATED_METHOD_MSG("Deprecated by change to shader-based lighting.")
   virtual void SetShadowReceiving (bool m) = 0;
-  /// Is shadow receiving enabled?
+  /**
+   * Is shadow receiving enabled?
+   * \deprecated Deprecated in 1.9 by change to shader-based lighting.
+   */
+  CS_DEPRECATED_METHOD_MSG("Deprecated by change to shader-based lighting.")
   virtual bool IsShadowReceiving () const = 0;
 
   /**\name Custom render buffers
@@ -149,12 +169,32 @@ struct iGeneralMeshCommonState : public virtual iBase
   /**
    * Get independent render buffer by index
    */
-  virtual csRef<iRenderBuffer> GetRenderBuffer (int index) = 0;
+  virtual iRenderBuffer* GetRenderBuffer (int index) = 0;
 
   /**
    * Get the name of an independent render buffer by index
    */
   virtual csRef<iString> GetRenderBufferName (int index) const = 0;
+  
+  /**
+   * Get independent render buffer by name
+   */
+  virtual iRenderBuffer* GetRenderBuffer (const char* name) = 0;
+
+  /**
+   * Adds an independently named render buffer.
+   */
+  virtual bool AddRenderBuffer (csRenderBufferName name, iRenderBuffer* buffer) = 0;
+
+  /**
+   * Removes an independently named render buffer.
+   */
+  virtual bool RemoveRenderBuffer (csRenderBufferName name) = 0;
+
+  /**
+   * Get independent render buffer by name
+   */
+  virtual iRenderBuffer* GetRenderBuffer (csRenderBufferName name) = 0;
   /** @} */
 };
 
@@ -174,7 +214,7 @@ struct iGeneralMeshCommonState : public virtual iBase
  */
 struct iGeneralMeshState : public virtual iGeneralMeshCommonState
 {
-  SCF_INTERFACE (iGeneralMeshState, 1, 1, 1);
+  SCF_INTERFACE (iGeneralMeshState, 2, 0, 0);
   
   /**
    * Set the animation control to use for this mesh object.
@@ -226,7 +266,7 @@ struct iGeneralMeshState : public virtual iGeneralMeshCommonState
  */
 struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
 {
-  SCF_INTERFACE (iGeneralFactoryState, 1, 1, 1);
+  SCF_INTERFACE (iGeneralFactoryState, 2, 0, 0);
   
   /// Set the color to use. Will be added to the lighting values.
   virtual void SetColor (const csColor& col) = 0;
@@ -460,6 +500,7 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
  * Main users of this interface:
  * - Genmesh plugin (crystalspace.mesh.object.genmesh)
  *   
+ * \sa iGenMeshAnimationControl1_4
  */
 struct iGenMeshAnimationControl : public virtual iBase
 {
@@ -475,7 +516,10 @@ struct iGenMeshAnimationControl : public virtual iBase
   virtual bool AnimatesColors () const = 0;
 
   /**
-   * General update method
+   * General update method.
+   * \remarks You can get vertex count and mesh ID by implementing the
+   *   iGenMeshAnimationControl1_4 interface. If that interface is
+   *   implemented, this method is not called.
    */
   virtual void Update (csTicks current) = 0;
 
@@ -528,6 +572,22 @@ struct iGenMeshAnimationControl : public virtual iBase
    */
   virtual const csColor4* UpdateColors (csTicks current,
   	const csColor4* colors, int num_colors, uint32 version_id) = 0;
+};
+
+/**
+ * Enhanced Update() for genmesh animation plugins.
+ * This interface must be implemented in addition to iGenMeshAnimationControl.
+ */
+struct iGenMeshAnimationControl1_4 : public virtual iBase
+{
+  SCF_INTERFACE(iGenMeshAnimationControl1_4, 0, 1, 0);
+
+  /**
+   * General update method.
+   * \remarks Takes precedence over iGenMeshAnimationControl::Update().
+   */
+  virtual void Update (csTicks current, int num_verts, 
+    uint32 version_id) = 0;
 };
 
 /**

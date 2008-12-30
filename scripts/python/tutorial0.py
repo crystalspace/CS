@@ -32,6 +32,8 @@ try:    # get in CS
     from cspace import *
 except:
     print "WARNING: Failed to import module cspace"
+    traceback.print_exc()
+    sys.exit(1) # die!!
 
 # utils code
 #############################
@@ -43,25 +45,16 @@ def FatalError(msg="FatalError"):
     csReport(object_reg,CS_REPORTER_SEVERITY_ERROR, "crystalspace.application.python", msg)
     sys.exit(1)
 
-        
-# IMPORTANT:
-# due to the nature of the event handler 
-# (its called directly from the C++ code)
-# any exceptions thrown (including those caused by syntax errors)
-# will not display error messages/cause the execution to end
-# therefore we must add in our own code to catch this
+# EventHandler
+#############################
 def EventHandler(ev):
-    try:
-        #print 'EventHandler called'
-        if ((ev.Name  == KeyboardDown) and
-            (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
-            q  = CS_QUERY_REGISTRY(object_reg, iEventQueue)
-            if q:
-                q.GetEventOutlet().Broadcast(csevQuit(object_reg))
-                return 1
-    except: # the exception catcher
-        traceback.print_exc()   # prints the usual error messages
-        sys.exit(1)             # stop dead
+    #print 'EventHandler called'
+    if ((ev.Name  == KeyboardDown) and
+        (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
+        q  = object_reg.Get(iEventQueue)
+        if q:
+            q.GetEventOutlet().Broadcast(csevQuit(object_reg))
+            return 1
     return 0
 
 # startup code
@@ -82,7 +75,7 @@ if not csInitializer.SetupConfigManager(object_reg):
     FatalError("Couldn't init app!")
 
 plugin_requests = [
-    CS_REQUEST_VFS, CS_REQUEST_SOFTWARE3D, CS_REQUEST_ENGINE,
+    CS_REQUEST_VFS, CS_REQUEST_OPENGL3D, CS_REQUEST_ENGINE,
     CS_REQUEST_FONTSERVER, CS_REQUEST_IMAGELOADER, CS_REQUEST_LEVELLOADER,
 ]
 if not csInitializer.RequestPlugins(object_reg, plugin_requests):

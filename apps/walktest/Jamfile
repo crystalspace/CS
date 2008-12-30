@@ -3,6 +3,7 @@ SubDir TOP apps walktest ;
 Description walktest : "WalkTest demo" ;
 Application walktest : [ Wildcard *.cpp *.h ] ;
 LinkWith walktest : crystalspace ;
+FileListEntryApplications walktest : app-demo ;
 
 # Some external projects use gcc's -ansi and -pedantic options. We need to
 # ensure that CS's public headers are usable when these options are enabled,
@@ -18,8 +19,9 @@ if $(COMPILER.C++FLAGS.PEDANTIC.ENABLE)
 
 # List of plugins which should be go into walkall.
 WALKALL.PLUGINLIST =
-  bezier
-  bezierldr
+  animesh
+  animeshldr
+  bindoc
   bugplug
   csconin
   csconout
@@ -43,9 +45,12 @@ WALKALL.PLUGINLIST =
   frustvis
   genmesh
   gmeshanim
+  gmeshanimpdl
   gmeshldr
   gmeshskelanim2
   skeleton
+  skeleton2
+  skeleton2ldr
   skelldr
   vproc_std
   haze
@@ -57,12 +62,17 @@ WALKALL.PLUGINLIST =
   rendloop_loader
   rendstep_std
   reporter
+  rm_rlcompat
+  rm_unshadowed
+  rm_shadow_pssm
   sequence
   shadermgr
   simpleformer
   simpleformerldr
   bruteblock
   terrainldr
+  terrain2
+  terrain2ldr
   shaderweaver
   spr2d
   spr2dldr
@@ -70,13 +80,14 @@ WALKALL.PLUGINLIST =
   spr3dldr
   stdpt
   stdrep
-  thing
-  thingldr
-  vfs
   xmlread
   xmlshader
   ;
 
+if $(ZLIB.AVAILABLE) = "yes"
+{
+  WALKALL.PLUGINLIST += vfs ;
+}
 if $(JPEG.AVAILABLE) = "yes"
 {
   WALKALL.PLUGINLIST += csjpgimg ;
@@ -90,10 +101,10 @@ if $(CAL3D.AVAILABLE) = "yes"
   ;WALKALL.PLUGINLIST += sprcal3d sprcal3dldr ;
 }
 
-# Plugins needed by both software & GL renderers
+# Plugins needed by GL renderer
 if $(X11.AVAILABLE) = "yes"
 {
-  WALKALL.PLUGINLIST += xwin xextshm ;
+  WALKALL.PLUGINLIST += xwin ;
   if $(XFREE86VM.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += xext86vm ; }
 }
 
@@ -108,16 +119,6 @@ if $(GL.AVAILABLE) = "yes"
 
   if $(CG.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += glshader_cg ; }
 }
-else
-{
-  WALKALL.PLUGINLIST += soft3d softshader ;
-
-  # Software canvases.
-  if $(X11.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += x2d ; }
-  if $(DIRECTX.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += ddraw2d ; }
-  if $(TARGET.OS) = "MACOS_X" { WALKALL.PLUGINLIST += cgdriver2d ; }
-  #if $(LIBCACA.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += cacacanvas ; }
-}
 
 for p in $(WALKALL.PLUGINLIST)
 {
@@ -131,6 +132,7 @@ if [ Property build : projgen_version ] != 6
 WALKTEST_STATIC.PLUGINLIST =
   $(WALKALL.PLUGINLIST)
   bruteblock
+  bindoc
   csbmpimg
   rendstep_stencil
   ;
@@ -140,9 +142,11 @@ Description walktest_static : "WalkTest demo (static build)" ;
 SubVariant static ;
 Application walktest_static : [ Wildcard *.cpp *.h ] :
   independent noinstall nohelp ;
-CFlags walktest_static : [ FDefines CS_STATIC_LINKED ] : nostatic ;
+CFlags walktest_static : [ FDefines CS_STATIC_LINKED ] ;
 MsvcDefine walktest_static : CS_STATIC_LINKED ;
 LinkWith walktest_static : crystalspace ;
 LinkStaticPlugins walktest_static : $(WALKTEST_STATIC.PLUGINLIST) ;
+FileListEntryApplications walktest_static : app-demo-static ;
+
 SubVariant ;
 }

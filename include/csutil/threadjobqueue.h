@@ -27,7 +27,6 @@
 #include "csextern.h"
 #include "csutil/fifo.h"
 #include "csutil/scf_implementation.h"
-#include "csutil/thread.h"
 #include "iutil/job.h"
 
 #include "csutil/threading/condition.h"
@@ -43,17 +42,17 @@ class CS_CRYSTALSPACE_EXPORT ThreadedJobQueue :
   public scfImplementation1<ThreadedJobQueue, iJobQueue>
 {
 public:
-  ThreadedJobQueue (size_t numWorkers = 1);
+  ThreadedJobQueue (size_t numWorkers = 1, ThreadPriority priority = THREAD_PRIO_NORMAL,
+    size_t numNonLowWorkers = 0);
   virtual ~ThreadedJobQueue ();
 
-  virtual void Enqueue (iJob* job);
+  virtual void Enqueue (iJob* job, bool lowPriority = false);
   virtual void PullAndRun (iJob* job);
+  virtual void PopAndRun();
   virtual void Unqueue (iJob* job, bool waitIfCurrent = true);
-
-  enum
-  {
-    MAX_WORKER_THREADS = 16
-  };
+  virtual bool IsFinished ();
+  virtual void Wait (iJob* job);
+  virtual int32 GetQueueCount();
 
 private:
   
@@ -63,21 +62,22 @@ private:
   class QueueRunnable : public Runnable
   {
   public:
-    QueueRunnable (ThreadedJobQueue* queue, ThreadState* ts);
+    QueueRunnable (ThreadedJobQueue* queue, ThreadState* ts, bool doLow = true);
 
     virtual void Run ();
 
   private:
     ThreadedJobQueue* ownerQueue;
     ThreadState* threadState;
+    bool doLow;
   };
 
   // Per thread state
   struct ThreadState
   {
-    ThreadState (ThreadedJobQueue* queue)
+    ThreadState (ThreadedJobQueue* queue, bool doLow = true)
     {
-      runnable.AttachNew (new QueueRunnable (queue, this));
+      runnable.AttachNew (new QueueRunnable (queue, this, doLow));
       threadObject.AttachNew (new Thread (runnable, false));
     }
 
@@ -90,16 +90,20 @@ private:
   // Shared queue state
   typedef csFIFO<csRef<iJob> > JobFifo;
   JobFifo jobQueue;
+  JobFifo jobQueueL;
   Mutex jobMutex;
   Condition newJob;
 
-  ThreadState* allThreadState[MAX_WORKER_THREADS];
+  ThreadState** allThreadState;
   ThreadGroup allThreads;
   Mutex threadStateMutex;
-  Mutex jobFinishMutex;
+  // Condition to detect a finished job in any of the running threads
+  Mutex jobFinishedMutex;
+  Condition jobFinished;
 
   size_t numWorkerThreads;
   bool shutdownQueue;
+  int32 outstandingJobs;
 };
 
 }

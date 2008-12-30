@@ -7,3 +7,4 @@ Application md32spr
 	: console
 ;
 LinkWith md32spr : crystalspace ;
+FileListEntryApplications md32spr : app-tool ;

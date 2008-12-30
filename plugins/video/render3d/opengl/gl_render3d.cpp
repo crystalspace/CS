@@ -35,8 +35,10 @@
 #include "ivideo/rendermesh.h"
 
 #include "csgeom/box.h"
+#include "csgeom/projections.h"
 #include "csgfx/imagememory.h"
 #include "csgfx/renderbuffer.h"
+#include "csplugincommon/opengl/assumedstate.h"
 #include "csplugincommon/opengl/glhelper.h"
 #include "csplugincommon/opengl/glstates.h"
 #include "csplugincommon/render3d/normalizationcube.h"
@@ -63,6 +65,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 
 CS_DECLARE_PROFILER
 CS_DECLARE_PROFILER_ZONE(csGLGraphics3D_DrawMesh);
+CS_DECLARE_PROFILER_ZONE(csGLGraphics3D_DrawMesh_DrawElements);
 
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
 
@@ -79,7 +82,9 @@ SCF_IMPLEMENT_FACTORY (csGLGraphics3D)
 
 csGLGraphics3D::csGLGraphics3D (iBase *parent) : 
   scfImplementationType (this, parent), isOpen (false), 
-  wantToSwap (false), delayClearFlags (0)
+  explicitProjection (false), needMatrixUpdate (true), imageUnits (0),
+  activeVertexAttribs (0), wantToSwap (false), delayClearFlags (0),
+  currentAttachments (0)
 {
   verbose = false;
   frustum_valid = false;
@@ -93,8 +98,6 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) :
   clip_planes_enabled = false;
   hasOld2dClip = false;
 
-  render_target = 0;
-
   current_drawflags = 0;
   current_shadow_state = 0;
   current_zmode = CS_ZBUF_NONE;
@@ -106,11 +109,6 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) :
   broken_stencil = false;
 
   unsigned int i;
-  for (i=0; i<16; i++)
-  {
-    texunittarget[i] = 0;
-    texunitenabled[i] = false;
-  }
   for (i = 0; i < CS_VATTRIB_SPECIFIC_LAST+1; i++)
   {
     scrapMapping[i] = CS_BUFFER_NONE;
@@ -131,40 +129,35 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) :
   cliptype = CS_CLIPPER_NONE;
 
   r2tbackend = 0;
-
-  memset (npotsStatus, 0, sizeof (npotsStatus));
 }
 
 csGLGraphics3D::~csGLGraphics3D()
 {
   csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q)
-    q->RemoveListener (scfiEventHandler);
+  {
+    q->RemoveListener (eventHandler1);
+    q->RemoveListener (eventHandler2);
+  }
 }
 
 void csGLGraphics3D::OutputMarkerString (const char* function, 
 					 const wchar_t* file,
 					 int line, const char* message)
 {
-  if (ext && ext->CS_GL_GREMEDY_string_marker)
-  {
-    csStringFast<256> marker;
-    marker.Format ("[%ls %s():%d] %s", file, function, line, message);
-    ext->glStringMarkerGREMEDY ((GLsizei)marker.Length (), marker);
-  }
+  csStringFast<256> marker;
+  marker.Format ("[%ls %s():%d] %s", file, function, line, message);
+  ext->glStringMarkerGREMEDY ((GLsizei)marker.Length (), marker);
 }
 
 void csGLGraphics3D::OutputMarkerString (const char* function, 
 					 const wchar_t* file,
 					 int line, MakeAString& message)
 {
-  if (ext && ext->CS_GL_GREMEDY_string_marker)
-  {
-    csStringFast<256> marker;
-    marker.Format ("[%ls %s():%d] %s", file, function, line, 
-      message.GetStr());
-    ext->glStringMarkerGREMEDY ((GLsizei)marker.Length (), marker);
-  }
+  csStringFast<256> marker;
+  marker.Format ("[%ls %s():%d] %s", file, function, line, 
+    message.GetStr());
+  ext->glStringMarkerGREMEDY ((GLsizei)marker.Length (), marker);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -224,6 +217,16 @@ void csGLGraphics3D::SetGlOrtho (bool inverted)
   else
     glOrtho (0., (GLdouble) viewwidth, 0., (GLdouble) viewheight, -1.0, 10.0);
 }
+  
+void csGLGraphics3D::ComputeProjectionMatrix()
+{
+  if (!needMatrixUpdate) return;
+  
+  projectionMatrix = CS::Math::Projections::CSPerspective (
+    viewwidth, viewheight, asp_center_x, asp_center_y, inv_aspect);
+  
+  needMatrixUpdate = false;
+}
 
 csZBufMode csGLGraphics3D::GetZModePass2 (csZBufMode mode)
 {
@@ -261,13 +264,13 @@ void csGLGraphics3D::SetZModeInternal (csZBufMode mode)
       break;
     case CS_ZBUF_INVERT:
       statecache->Enable_GL_DEPTH_TEST ();
-      statecache->SetDepthFunc (GL_LESS);
+      statecache->SetDepthFunc (GL_GREATER);
       statecache->SetDepthMask (GL_FALSE);
       break;
     case CS_ZBUF_TEST:
     case CS_ZBUF_USE:
       statecache->Enable_GL_DEPTH_TEST ();
-      statecache->SetDepthFunc (GL_GEQUAL);
+      statecache->SetDepthFunc (GL_LEQUAL);
       statecache->SetDepthMask ((mode == CS_ZBUF_USE) ? GL_TRUE : GL_FALSE);
       break;
   }
@@ -535,7 +538,7 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
 {
   GLRENDER3D_OUTPUT_STRING_MARKER(("(%d, %d, %d, %d)", 
     clip_portal, clip_plane, clip_z_plane, tri_count));
-
+  
   // @@@@ RETHINK!!! THIS IS A HUGE PERFORMANCE BOOST. BUT???
   clip_z_plane = CS_CLIP_NOT;
 
@@ -696,28 +699,35 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
 }
 */
 
+void csGLGraphics3D::UpdateProjectionSVs ()
+{
+  if (!shadermgr) return;
+
+  CS::Math::Matrix4 actualProjection = csGLGraphics3D::GetProjectionMatrix();
+
+  shadermgr->GetVariableAdd (string_projection)->SetValue (actualProjection);
+  shadermgr->GetVariableAdd (string_projection_inv)->SetValue (
+    actualProjection.GetInverse());
+}
+
 void csGLGraphics3D::SetupProjection ()
 {
   if (!needProjectionUpdate) return;
 
-  statecache->SetMatrixMode (GL_PROJECTION);
-  glLoadIdentity ();
-  if (render_target)
-    r2tbackend->SetupProjection();
+  GLRENDER3D_OUTPUT_LOCATION_MARKER;
+  
+  CS::Math::Matrix4 actualProjection;
+  if (currentAttachments != 0)
+    actualProjection = r2tbackend->FixupProjection (
+      csGLGraphics3D::GetProjectionMatrix());
   else
-  {
-    SetGlOrtho (false);
-    //glTranslatef (asp_center_x, asp_center_y, 0);
-  }
-  glTranslatef (asp_center_x, asp_center_y, 0);
+    actualProjection = csGLGraphics3D::GetProjectionMatrix();
 
+  statecache->SetMatrixMode (GL_PROJECTION);
   GLfloat matrixholder[16];
-  for (int i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
-  matrixholder[0] = matrixholder[5] = 1.0;
-  matrixholder[11] = 1.0/aspect;
-  matrixholder[14] = -matrixholder[11];
-  glMultMatrixf (matrixholder);
-
+  CS::PluginCommon::MakeGLMatrix4x4 (actualProjection, matrixholder);
+  glLoadMatrixf (matrixholder);
+    
   statecache->SetMatrixMode (GL_MODELVIEW);
   needProjectionUpdate = false;
 }
@@ -766,8 +776,7 @@ bool csGLGraphics3D::Open ()
   if (verbosemgr) verbose = verbosemgr->Enabled ("renderer");
   if (!verbose) bugplug = 0;
 
-  textureLodBias = config->GetFloat ("Video.OpenGL.TextureLODBias",
-    -0.3f);
+  textureLodBias = config->GetFloat ("Video.OpenGL.TextureLODBias", 0.0f);
   if (verbose)
     Report (CS_REPORTER_SEVERITY_NOTIFY,
       "Texture LOD bias %g", textureLodBias);
@@ -778,19 +787,17 @@ bool csGLGraphics3D::Open ()
     return false;
   }
 
-  SetPerspectiveAspect (G2D->GetHeight ());
-  SetPerspectiveCenter (G2D->GetWidth ()/2, G2D->GetHeight ()/2);
+  viewwidth = G2D->GetWidth();
+  viewheight = G2D->GetHeight();
+  SetPerspectiveAspect (viewheight);
+  SetPerspectiveCenter (viewwidth/2, viewheight/2);
   
   object_reg->Register( G2D, "iGraphics2D");
 
   G2D->PerformExtension ("getstatecache", &statecache);
   G2D->PerformExtension	("getextmanager", &ext);
 
-  int w = G2D->GetWidth ();
-  int h = G2D->GetHeight ();
-  SetDimensions (w, h);
-  asp_center_x = w/2;
-  asp_center_y = h/2;
+  G2D->GetFramebufferDimensions (scrwidth, scrheight);
 
   // The extension manager requires to initialize all used extensions with
   // a call to Init<ext> first.
@@ -831,7 +838,10 @@ bool csGLGraphics3D::Open ()
 #ifdef CS_DEBUG
   ext->InitGL_GREMEDY_string_marker ();
 #endif
-
+  
+  // Some 'assumed state' is for extensions, so set again
+  CS::PluginCommon::GL::SetAssumedState (statecache, ext);
+  
   rendercaps.minTexHeight = 2;
   rendercaps.minTexWidth = 2;
   GLint mts = config->GetInt ("Video.OpenGL.Caps.MaxTextureSize", -1);
@@ -919,6 +929,7 @@ bool csGLGraphics3D::Open ()
     stencil_threshold = -1;
   }
   if (verbose)
+  {
     if (broken_stencil)
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Stencil clipping is broken!");
     else if (!stencil_clipping_available)
@@ -927,16 +938,17 @@ bool csGLGraphics3D::Open ()
     {
       if (stencil_threshold >= 0)
       {
-	Report (CS_REPORTER_SEVERITY_NOTIFY, 
-	  "Stencil clipping is used for objects >= %d triangles.", 
-	  stencil_threshold);
+	      Report (CS_REPORTER_SEVERITY_NOTIFY, 
+	        "Stencil clipping is used for objects >= %d triangles.", 
+	      stencil_threshold);
       }
       else
       {
-	Report (CS_REPORTER_SEVERITY_NOTIFY, 
-	  "Plane clipping is preferred.");
+	      Report (CS_REPORTER_SEVERITY_NOTIFY, 
+	        "Plane clipping is preferred.");
       }
     }
+  }
 
   stencilClearWithZ = config->GetBool ("Video.OpenGL.StencilClearWithZ", true);
   if (verbose)
@@ -951,31 +963,36 @@ bool csGLGraphics3D::Open ()
   txtmgr.AttachNew (new csGLTextureManager (
     object_reg, GetDriver2D (), config, this));
 
-  glClearDepth (0.0);
   statecache->Enable_GL_CULL_FACE ();
-  statecache->SetCullFace (GL_FRONT);
+  statecache->SetCullFace (GL_BACK);
 
   statecache->SetStencilMask (stencil_shadow_mask);
+
+  numImageUnits = statecache->GetNumImageUnits();
+  numTCUnits = statecache->GetNumTexCoords();
+  imageUnits = new ImageUnit[numImageUnits];
+  if (verbose)
+    Report (CS_REPORTER_SEVERITY_NOTIFY, 
+      "Available texture image units: %d texture coordinate units: %d",
+      numImageUnits, numTCUnits);
 
   // Set up texture LOD bias.
   if (ext->CS_GL_EXT_texture_lod_bias)
   {
     if (ext->CS_GL_ARB_multitexture)
     {
-      GLint texUnits;
-      glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &texUnits);
-      for (int u = texUnits - 1; u >= 0; u--)
+      for (int u = numImageUnits - 1; u >= 0; u--)
       {
         statecache->SetCurrentTU (u);
         statecache->ActivateTU (csGLStateCache::activateTexEnv);
         glTexEnvf (GL_TEXTURE_FILTER_CONTROL_EXT, 
-	  GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); 
+	        GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); 
       }
     }
     else
     {
       glTexEnvf (GL_TEXTURE_FILTER_CONTROL_EXT, 
-	GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); 
+	      GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); 
     }
   }
 
@@ -988,7 +1005,109 @@ bool csGLGraphics3D::Open ()
   string_point_scale = strings->Request ("point scale");
   string_texture_diffuse = strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
   string_world2camera = strings->Request ("world2camera transform");
+  string_world2camera_inv = strings->Request ("world2camera transform inverse");
+  string_projection = strings->Request ("projection transform");
+  string_projection_inv = strings->Request ("projection transform inverse");
 
+  cache_clip_portal = -1;
+  cache_clip_plane = -1;
+  cache_clip_z_plane = -1;
+
+  const char* r2tBackendStr;
+  if (ext->CS_GL_EXT_framebuffer_object)
+  {
+    r2tBackendStr = "EXT_framebuffer_object";
+    r2tbackend = new csGLRender2TextureEXTfbo (this);
+  }
+  
+  if ((r2tbackend == 0) || !r2tbackend->Status())
+  {
+    r2tBackendStr = "framebuffer";
+    delete r2tbackend;
+    r2tbackend = new csGLRender2TextureFramebuf (this);
+  }
+  
+  if (verbose)
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Render-to-texture backend: %s",
+      r2tBackendStr);
+
+  enableDelaySwap = config->GetBool ("Video.OpenGL.DelaySwap", false);
+  if (verbose)
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Delayed buffer swapping: %s",
+      enableDelaySwap ? "enabled" : "disabled");
+
+  drawPixmapAFP = config->GetBool ("Video.OpenGL.AFPDrawPixmap", false)
+    && ext->CS_GL_ARB_fragment_program;
+  if (verbose)
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "AFP DrawPixmap() workaround: %s",
+      drawPixmapAFP ? "enabled" : "disabled");
+
+  if (drawPixmapAFP)
+  {
+    static const char drawPixmapProgramStr[] = 
+      "!!ARBfp1.0\n"
+      "TEMP texel;\n"
+      "TEX texel, fragment.texcoord[0], texture[0], 2D;\n"
+      "MUL result.color, texel, fragment.color.primary;\n"
+      "END\n";
+
+    ext->glGenProgramsARB (1, &drawPixmapProgram);
+    ext->glBindProgramARB (GL_FRAGMENT_PROGRAM_ARB, drawPixmapProgram);
+    ext->glProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, 
+      GL_PROGRAM_FORMAT_ASCII_ARB, 
+      (GLsizei)(sizeof (drawPixmapProgramStr) - 1), 
+      (void*)drawPixmapProgramStr);
+
+    const GLubyte * programErrorString = glGetString (GL_PROGRAM_ERROR_STRING_ARB);
+
+    GLint errorpos;
+    glGetIntegerv (GL_PROGRAM_ERROR_POSITION_ARB, &errorpos);
+    if(errorpos != -1)
+    {
+      if (verbose)
+      {
+        Report (CS_REPORTER_SEVERITY_WARNING, 
+          "Couldn't load fragment program for text drawing");
+        Report (CS_REPORTER_SEVERITY_WARNING, "Program error at position %d", errorpos);
+        Report (CS_REPORTER_SEVERITY_WARNING, "Error string: '%s'", 
+          programErrorString);
+        ext->glDeleteProgramsARB (1, &drawPixmapProgram);
+        drawPixmapAFP = false;
+      }
+    }
+    else
+    {
+      if (verbose && (programErrorString != 0) && (*programErrorString != 0))
+      {
+        Report (CS_REPORTER_SEVERITY_WARNING, 
+	  "Warning for DrawPixmap() fragment program: '%s'", 
+	  programErrorString);
+      }
+    }
+  }
+
+#define LQUOT   "\xE2\x80\x9c"
+#define RQUOT   "\xE2\x80\x9d"
+  fixedFunctionForcefulEnable = 
+    config->GetBool ("Video.OpenGL.FixedFunctionForcefulEnable", false);
+  if (verbose)
+    Report (CS_REPORTER_SEVERITY_NOTIFY, 
+      LQUOT "Forceful" RQUOT " fixed function enable: %s",
+      fixedFunctionForcefulEnable ? "yes" : "no");
+      
+  return true;
+}
+
+void csGLGraphics3D::SetupShaderVariables()
+{
+  /* The shadermanager clears all SVs in Open(), but renderer Open() is called
+     before the shadermanager's, thus the renderer needs to catch the open
+     event twice, the second time setting up SVs */
+  shadermgr->GetVariableAdd (strings->Request ("world2camera transform"));
+  shadermgr->GetVariableAdd (strings->Request ("world2camera transform inverse"));
+  shadermgr->GetVariableAdd (strings->Request ("projection transform"));
+  shadermgr->GetVariableAdd (strings->Request ("projection transform inverse"));
+  
   /* @@@ All those default textures, better put them into the engine? */
 
   // @@@ These shouldn't be here, I guess.
@@ -1069,91 +1188,6 @@ bool csGLGraphics3D::Open ()
     shadermgr->AddVariable (whitevar);
   }
 
-  cache_clip_portal = -1;
-  cache_clip_plane = -1;
-  cache_clip_z_plane = -1;
-
-  const char* r2tBackendStr;
-  if (ext->CS_GL_EXT_framebuffer_object)
-  {
-    r2tBackendStr = "EXT_framebuffer_object";
-    r2tbackend = new csGLRender2TextureEXTfbo (this);
-  }
-  else
-  {
-    r2tBackendStr = "framebuffer";
-    r2tbackend = new csGLRender2TextureFramebuf (this);
-  }
-  
-  if (verbose)
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "Render-to-texture backend: %s",
-      r2tBackendStr);
-
-  enableDelaySwap = config->GetBool ("Video.OpenGL.DelaySwap", false);
-  if (verbose)
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "Delayed buffer swapping: %s",
-      enableDelaySwap ? "enabled" : "disabled");
-
-  drawPixmapAFP = config->GetBool ("Video.OpenGL.AFPDrawPixmap", false)
-    && ext->CS_GL_ARB_fragment_program;
-  if (verbose)
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "AFP DrawPixmap() workaround: %s",
-      drawPixmapAFP ? "enabled" : "disabled");
-
-  if (drawPixmapAFP)
-  {
-    static const char drawPixmapProgramStr[] = 
-      "!!ARBfp1.0\n"
-      "TEMP texel;\n"
-      "TEX texel, fragment.texcoord[0], texture[0], 2D;\n"
-      "MUL result.color, texel, fragment.color.primary;\n"
-      "END\n";
-
-    ext->glGenProgramsARB (1, &drawPixmapProgram);
-    ext->glBindProgramARB (GL_FRAGMENT_PROGRAM_ARB, drawPixmapProgram);
-    ext->glProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, 
-      GL_PROGRAM_FORMAT_ASCII_ARB, 
-      (GLsizei)(sizeof (drawPixmapProgramStr) - 1), 
-      (void*)drawPixmapProgramStr);
-
-    const GLubyte * programErrorString = glGetString (GL_PROGRAM_ERROR_STRING_ARB);
-
-    GLint errorpos;
-    glGetIntegerv (GL_PROGRAM_ERROR_POSITION_ARB, &errorpos);
-    if(errorpos != -1)
-    {
-      if (verbose)
-      {
-        Report (CS_REPORTER_SEVERITY_WARNING, 
-          "Couldn't load fragment program for text drawing");
-        Report (CS_REPORTER_SEVERITY_WARNING, "Program error at position %d", errorpos);
-        Report (CS_REPORTER_SEVERITY_WARNING, "Error string: '%s'", 
-          programErrorString);
-        ext->glDeleteProgramsARB (1, &drawPixmapProgram);
-        drawPixmapAFP = false;
-      }
-    }
-    else
-    {
-      if (verbose && (programErrorString != 0) && (*programErrorString != 0))
-      {
-        Report (CS_REPORTER_SEVERITY_WARNING, 
-	  "Warning for DrawPixmap() fragment program: '%s'", 
-	  programErrorString);
-      }
-    }
-  }
-
-#define LQUOT   "\xE2\x80\x9c"
-#define RQUOT   "\xE2\x80\x9d"
-  fixedFunctionForcefulEnable = 
-    config->GetBool ("Video.OpenGL.FixedFunctionForcefulEnable", false);
-  if (verbose)
-    Report (CS_REPORTER_SEVERITY_NOTIFY, 
-      LQUOT "Forceful" RQUOT " fixed function enable: %s",
-      fixedFunctionForcefulEnable ? "yes" : "no");
-
-  return true;
 }
 
 void csGLGraphics3D::Close ()
@@ -1165,21 +1199,81 @@ void csGLGraphics3D::Close ()
   if (drawPixmapAFP)
     ext->glDeleteProgramsARB (1, &drawPixmapProgram);
 
-  if (txtmgr)
-  {
-    txtmgr->Clear ();
-    //delete txtmgr; txtmgr = 0;
-  }
   txtmgr = 0;
   shadermgr = 0;
+  delete[] imageUnits;
   delete r2tbackend; r2tbackend = 0;
   for (size_t h = 0; h < halos.GetSize (); h++)
   {
     if (halos[h]) halos[h]->DeleteTexture();
   }
+  vboManager.Invalidate();
 
   if (G2D)
     G2D->Close ();
+  statecache = 0;
+  
+  isOpen = false;
+}
+
+bool csGLGraphics3D::SetRenderTarget (iTextureHandle* handle, bool persistent,
+                                      int subtexture,
+                                      csRenderTargetAttachment attachment)
+{
+  uint newAttachments = currentAttachments;
+  if (handle != 0)
+    newAttachments |= (1 << attachment);
+  else
+    newAttachments &= ~(1 << attachment);
+  
+  if (newAttachments == 0)
+  {
+    r2tbackend->UnsetRenderTargets();
+  }
+  else
+  {
+    if ((handle != 0)
+        && !r2tbackend->SetRenderTarget (handle, persistent, subtexture,
+      attachment)) return false; 
+  }
+  
+  if ((newAttachments != 0) != (currentAttachments != 0))
+  {
+    int hasRenderTarget = (newAttachments != 0) ? 1 : 0;
+    G2D->PerformExtension ("userendertarget", hasRenderTarget);
+    viewwidth = G2D->GetWidth();
+    viewheight = G2D->GetHeight();
+    needViewportUpdate = true;
+  }
+  currentAttachments = newAttachments;
+  return true;
+}
+
+bool csGLGraphics3D::ValidateRenderTargets ()
+{
+  return r2tbackend->ValidateRenderTargets ();
+}
+
+bool csGLGraphics3D::CanSetRenderTarget (const char* format,
+                                         csRenderTargetAttachment attachment)
+{
+  return r2tbackend->CanSetRenderTarget (format, attachment);
+}
+
+iTextureHandle* csGLGraphics3D::GetRenderTarget (csRenderTargetAttachment attachment,
+                                                 int* subtexture) const
+{
+  return r2tbackend->GetRenderTarget (attachment, subtexture);
+}
+
+void csGLGraphics3D::UnsetRenderTargets()
+{
+  r2tbackend->UnsetRenderTargets();
+  
+  G2D->PerformExtension ("userendertarget", 0);
+  viewwidth = G2D->GetWidth();
+  viewheight = G2D->GetHeight();
+  needViewportUpdate = true;
 }
 
 bool csGLGraphics3D::BeginDraw (int drawflags)
@@ -1190,6 +1284,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     csBitmaskToString::GetStr (drawflags, drawflagNames)));
 
   SetWriteMask (true, true, true, true);
+  if (ext->CS_GL_ARB_point_sprite)
+    statecache->Disable_GL_POINT_SPRITE_ARB();
 
   clipportal_dirty = true;
   clipportal_floating = 0;
@@ -1198,7 +1294,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   debug_inhibit_draw = false;
 
   int i = 0;
-  for (i = 15; i >= 0; i--)
+  for (i = numImageUnits; i-- > 0;)
     DeactivateTexture (i);
 
   // if 2D graphics is not locked, lock it
@@ -1212,6 +1308,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       G2D->PerformExtension ("glflushtext");
     GLRENDER3D_OUTPUT_STRING_MARKER(("after G2D->BeginDraw()"));
   }
+  viewwidth = G2D->GetWidth();
+  viewheight = G2D->GetHeight();
   needViewportUpdate = false;
   const int old_drawflags = current_drawflags;
   current_drawflags = drawflags;
@@ -1236,24 +1334,40 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     clearMask = GL_COLOR_BUFFER_BIT;
   else if (doStencilClear)
     clearMask = GL_STENCIL_BUFFER_BIT;
+  
+  bool scissorWasEnabled = false;
+  if (drawflags & CSDRAW_NOCLIPCLEAR)
+  {
+    scissorWasEnabled = statecache->IsEnabled_GL_SCISSOR_TEST();
+    statecache->Disable_GL_SCISSOR_TEST();
+  }
+    
   if (!enableDelaySwap)
     glClear (clearMask);
   else
     delayClearFlags = clearMask;
+    
+  if ((drawflags & CSDRAW_NOCLIPCLEAR) && scissorWasEnabled)
+    statecache->Enable_GL_SCISSOR_TEST();
 
   statecache->SetCullFace (GL_FRONT);
 
   /* Note: this function relies on the canvas and/or the R2T backend to setup
    * matrices etc. So be careful when changing stuff. */
 
-  if (render_target)
+  if (currentAttachments != 0)
     r2tbackend->BeginDraw (drawflags); 
 
   if (drawflags & CSDRAW_3DGRAPHICS)
   {
+    // @@@ Jorrit: to avoid flickering I had to increase the
+    // values below and multiply them with 3.
+    // glPolygonOffset (-0.05f, -2.0f); 
+    glPolygonOffset (-0.15f, -6.0f); 
     needProjectionUpdate = true;
+    glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
 
-//    object2camera.Identity ();
+  //    object2camera.Identity ();
     //@@@ TODO FIX
     return true;
   }
@@ -1275,6 +1389,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
         statecache->ActivateTU (csGLStateCache::activateImage
           | csGLStateCache::activateTexCoord);
       }
+      statecache->Disable_GL_POLYGON_OFFSET_FILL ();
 
       if (fixedFunctionForcefulEnable)
       {
@@ -1312,10 +1427,11 @@ void csGLGraphics3D::FinishDraw ()
 
   DeactivateBuffers (0, 0);
 
-  if (render_target)
+  if (currentAttachments != 0)
   {
     r2tbackend->FinishDraw();
-    SetRenderTarget (0);
+    UnsetRenderTargets();
+    currentAttachments = 0;
   }
   
   current_drawflags = 0;
@@ -1342,6 +1458,8 @@ void csGLGraphics3D::Print (csRect const* area)
     SwapIfNeeded();
   }
   G2D->Print (area);
+  
+  r2tbackend->NextFrame();
 }
 
 void csGLGraphics3D::DrawLine (const csVector3 & v1, const csVector3 & v2,
@@ -1452,7 +1570,7 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
       statecache->Disable_GL_SECONDARY_COLOR_ARRAY_EXT ();
     if (ext->CS_GL_ARB_multitexture)
     {
-      for (i = CS_GL_MAX_LAYER; i-- > 0;)
+      for (i = numTCUnits; i-- > 0;)
       {
         statecache->SetCurrentTU (i);
         statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
@@ -1462,7 +1580,11 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
     {
       for (i = 0; i < CS_VATTRIB_GENERIC_LAST-CS_VATTRIB_GENERIC_FIRST+1; i++)
       {
-        ext->glDisableVertexAttribArrayARB (i);
+	if (activeVertexAttribs & (1 << i))
+	{
+	  ext->glDisableVertexAttribArrayARB (i);
+	  activeVertexAttribs &= ~(1 << i);
+	}
       }
     }
 
@@ -1470,15 +1592,6 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
     {
       iRenderBuffer *b = spec_renderBuffers[i];
       if (b) RenderRelease (b);// b->RenderRelease ();
-      if (i >= CS_VATTRIB_TEXCOORD0 && i <= CS_VATTRIB_TEXCOORD7)
-      {
-        if (npotsStatus[i-CS_VATTRIB_TEXCOORD0])
-        {
-          npotsFixupScrap.Push (b);
-          npotsStatus[i-CS_VATTRIB_TEXCOORD0] = false;
-        }
-      }
-      spec_renderBuffers[i] = 0;
     }
     for (i = 0; i < CS_VATTRIB_GENERIC_LAST-CS_VATTRIB_GENERIC_FIRST+1; i++)
     {
@@ -1540,67 +1653,91 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
       DeactivateTexture (unit);
       return false;
   }
-  /*texunitenabled[unit] = true;
-  texunittarget[unit] = gltxthandle->target;*/
-  bool doNPOTS = (gltxthandle->texType == iTextureHandle::texTypeRect);
-  if (doNPOTS && (unit < 8))
-    needNPOTSfixup[unit] = gltxthandle;
-  else
-    needNPOTSfixup[unit] = 0;
+  imageUnits[unit].texture = gltxthandle;
+  
   return true;
 }
 
 void csGLGraphics3D::DeactivateTexture (int unit)
 {
-  /*if (!texunitenabled[unit])
-    return;*/
-
   if (ext->CS_GL_ARB_multitexture)
   {
     statecache->SetCurrentTU (unit);
-    statecache->ActivateTU (csGLStateCache::activateTexEnable);
   }
   else if (unit != 0) return;
-
-  /*switch (texunittarget[unit])
-  {
-    case iTextureHandle::CS_TEX_IMG_1D:
-      statecache->Disable_GL_TEXTURE_1D ();
-      break;
-    case iTextureHandle::CS_TEX_IMG_2D:
-      statecache->Disable_GL_TEXTURE_2D ();
-      break;
-    case iTextureHandle::CS_TEX_IMG_3D:
-      statecache->Disable_GL_TEXTURE_3D ();
-      break;
-    case iTextureHandle::CS_TEX_IMG_CUBEMAP:
-      statecache->Disable_GL_TEXTURE_CUBE_MAP ();
-      break;
-  }*/
 
   statecache->Disable_GL_TEXTURE_1D ();
   statecache->Disable_GL_TEXTURE_2D ();
   statecache->Disable_GL_TEXTURE_3D ();
   statecache->Disable_GL_TEXTURE_CUBE_MAP ();
   statecache->Disable_GL_TEXTURE_RECTANGLE_ARB ();
-  needNPOTSfixup[unit] = 0;
 
-  texunitenabled[unit] = false;
+  imageUnits[unit].texture = 0;
 }
 
 void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures,
 	int count)
 {
-  int i;
-  int unit = 0;
-  for (i = 0 ; i < count ; i++)
+  if (!textures)
   {
-    unit = units[i];
-    iTextureHandle* txt = textures[i];
-    if (txt)
-      ActivateTexture (txt, unit);
-    else
+    for (int i = 0 ; i < count ; i++)
+    {
+      int unit = units[i];
       DeactivateTexture (unit);
+    }
+  }
+  else
+  {
+    for (int i = 0 ; i < count ; i++)
+    {
+      int unit = units[i];
+      iTextureHandle* txt = textures[i];
+      if (txt)
+	ActivateTexture (txt, unit);
+      else
+	DeactivateTexture (unit);
+    }
+  }
+}
+  
+void csGLGraphics3D::SetTextureComparisonModes (int* units,
+  CS::Graphics::TextureComparisonMode* modes, int count)
+{
+  if (modes == 0)
+  {
+    CS::Graphics::TextureComparisonMode modeDisabled;
+    for (int i = 0 ; i < count ; i++)
+    {
+      int unit = units[i];
+      
+      if (imageUnits[unit].texture == 0) continue;
+      
+      if (ext->CS_GL_ARB_multitexture)
+      {
+	statecache->SetCurrentTU (unit);
+	statecache->ActivateTU (csGLStateCache::activateImage);
+      }
+      else if (unit != 0) continue;
+      
+      imageUnits[unit].texture->ChangeTextureCompareMode (modeDisabled);
+    }
+  }
+  else
+  {
+    for (int i = 0 ; i < count ; i++)
+    {
+      int unit = units[i];
+      if (imageUnits[unit].texture == 0) continue;
+      
+      if (ext->CS_GL_ARB_multitexture)
+      {
+	statecache->SetCurrentTU (unit);
+	statecache->ActivateTU (csGLStateCache::activateTexEnv);
+      }
+      else if (unit != 0) continue;
+      
+      imageUnits[unit].texture->ChangeTextureCompareMode (modes[i]);
+    }
   }
 }
 
@@ -1612,161 +1749,22 @@ GLvoid csGLGraphics3D::myDrawRangeElements (GLenum mode, GLuint /*start*/,
 
 void csGLGraphics3D::SetWorldToCamera (const csReversibleTransform& w2c)
 {
+  GLRENDER3D_OUTPUT_LOCATION_MARKER;
+
   world2camera = w2c;
   float m[16];
 
   shadermgr->GetVariableAdd (string_world2camera)->SetValue (w2c);
+  shadermgr->GetVariableAdd (string_world2camera_inv)->SetValue (w2c.GetInverse());
 
   makeGLMatrix (world2camera, m);
   statecache->SetMatrixMode (GL_MODELVIEW);
   glLoadMatrixf (m);
 }
 
-void csGLGraphics3D::SetupInstance (size_t instParamNum, 
-                                    const csVertexAttrib targets[], 
-                                    csShaderVariable* const params[])
-{
-  csVector4 v;
-  float matrix[16];
-  bool uploadMatrix;
-  for (size_t n = 0; n < instParamNum; n++)
-  {
-    csShaderVariable* param = params[n];
-    csVertexAttrib target = targets[n];
-    switch (param->GetType())
-    {
-      case csShaderVariable::MATRIX:
-        {
-          csMatrix3 m;
-          params[n]->GetValue (m);
-          makeGLMatrix (m, matrix, target != CS_IATTRIB_OBJECT2WORLD);
-          uploadMatrix = true;
-        }
-        break;
-      case csShaderVariable::TRANSFORM:
-        {
-          csReversibleTransform tf;
-          params[n]->GetValue (tf);
-          makeGLMatrix (tf, matrix, target != CS_IATTRIB_OBJECT2WORLD);
-          uploadMatrix = true;
-        }
-        break;
-      default:
-        uploadMatrix = false;
-    }
-    if (uploadMatrix)
-    {
-      switch (target)
-      {
-        case CS_IATTRIB_OBJECT2WORLD:
-          {
-            statecache->SetMatrixMode (GL_MODELVIEW);
-            glPushMatrix ();
-            glMultMatrixf (matrix);
-          }
-          break;
-        default:
-          if (ext->CS_GL_ARB_multitexture)
-          {
-            if ((target >= CS_VATTRIB_TEXCOORD0) 
-              && (target <= CS_VATTRIB_TEXCOORD7))
-            {
-              size_t maxN = csMin (4, CS_VATTRIB_TEXCOORD7 - target + 1);
-              GLenum tu = GL_TEXTURE0 + (target - CS_VATTRIB_TEXCOORD0);
-              for (size_t n = 0; n < maxN; n++)
-              {
-                ext->glMultiTexCoord4fvARB (tu + n, &matrix[n*4]);
-              }
-            }
-          }
-          if (ext->glVertexAttrib4fvARB)
-          {
-            if (CS_VATTRIB_IS_GENERIC (target))
-            {
-              size_t maxN = csMin (4, CS_VATTRIB_GENERIC_LAST - target + 1);
-              GLenum attr = (target - CS_VATTRIB_GENERIC_FIRST);
-              for (size_t n = 0; n < maxN; n++)
-              {
-                ext->glVertexAttrib4fvARB (attr + n, &matrix[n*4]);
-              }
-            }
-          }
-      }
-    }
-    else
-    {
-      params[n]->GetValue (v);
-      switch (target)
-      {
-        case CS_VATTRIB_WEIGHT:
-          if (ext->CS_GL_EXT_vertex_weighting)
-            ext->glVertexWeightfvEXT (v.m);
-          break;
-        case CS_VATTRIB_NORMAL:
-          glNormal3fv (v.m);
-          break;
-        case CS_VATTRIB_PRIMARY_COLOR:
-          glColor4fv (v.m);
-          break;
-        case CS_VATTRIB_SECONDARY_COLOR:
-          if (ext->CS_GL_EXT_secondary_color)
-            ext->glSecondaryColor3fvEXT (v.m);
-          break;
-        case CS_VATTRIB_FOGCOORD:
-          if (ext->CS_GL_EXT_fog_coord)
-            ext->glFogCoordfvEXT (v.m);
-          break;
-        case CS_IATTRIB_OBJECT2WORLD:
-          {
-            statecache->SetMatrixMode (GL_MODELVIEW);
-            glPushMatrix ();
-          }
-          break;
-        default:
-          if (ext->CS_GL_ARB_multitexture)
-          {
-            if ((target >= CS_VATTRIB_TEXCOORD0) 
-              && (target <= CS_VATTRIB_TEXCOORD7))
-              ext->glMultiTexCoord4fvARB (
-                GL_TEXTURE0 + (target - CS_VATTRIB_TEXCOORD0), 
-                v.m);
-          }
-          else if (target == CS_VATTRIB_TEXCOORD)
-          {
-            glTexCoord4fv (v.m);
-          }
-          if (ext->glVertexAttrib4fvARB)
-          {
-            if (CS_VATTRIB_IS_GENERIC (target))
-              ext->glVertexAttrib4fvARB (target - CS_VATTRIB_0,
-                v.m);
-          }
-      }
-    }
-  }
-}
-
-void csGLGraphics3D::TeardownInstance (size_t instParamNum, 
-                                       const csVertexAttrib targets[])
-{
-  for (size_t n = 0; n < instParamNum; n++)
-  {
-    csVertexAttrib target = targets[n];
-    switch (target)
-    {
-      case CS_IATTRIB_OBJECT2WORLD:
-        {
-          statecache->SetMatrixMode (GL_MODELVIEW);
-          glPopMatrix ();
-        }
-        break;
-    }
-  }
-}
-
-void csGLGraphics3D::DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
-    const CS::Graphics::RenderMeshModes& modes,
-    const iShaderVarStack* stacks)
+void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
+    const csRenderMeshModes& modes,
+    const csShaderVariableStack& stacks)
 {
   if (cliptype == CS_CLIPPER_EMPTY) 
     return;
@@ -1778,12 +1776,10 @@ void csGLGraphics3D::DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
 
   SetupProjection ();
 
-  int num_tri = (mymesh->indexend-mymesh->indexstart)/3;
-
   SetupClipper (mymesh->clip_portal, 
                 mymesh->clip_plane, 
                 mymesh->clip_z_plane,
-		num_tri);
+		(mymesh->indexend-mymesh->indexstart)/3);
   if (debug_inhibit_draw) 
     return;
 
@@ -1820,75 +1816,60 @@ void csGLGraphics3D::DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
     csRenderBufferComponentSizes[iIndexbuf->GetComponentType()];
   CS_ASSERT_MSG("Expecting index buffers to have only 1 component",
     (iIndexbuf->GetComponentCount() == 1));
-  CS_ASSERT((indexCompsBytes * mymesh->indexstart) <= iIndexbuf->GetSize());
-  CS_ASSERT((indexCompsBytes * mymesh->indexend) <= iIndexbuf->GetSize());
+  if (!(mymesh->multiRanges && mymesh->rangesNum))
+  {
+    CS_ASSERT((indexCompsBytes * mymesh->indexstart) <= iIndexbuf->GetSize());
+    CS_ASSERT((indexCompsBytes * mymesh->indexend) <= iIndexbuf->GetSize());
+  }
 
   GLenum primitivetype = GL_TRIANGLES;
+  int primNum_divider = 1, primNum_sub = 0;
   switch (mymesh->meshtype)
   {
     case CS_MESHTYPE_QUADS:
-      num_tri = (mymesh->indexend-mymesh->indexstart)/2;
+      primNum_divider = 2;
       primitivetype = GL_QUADS;
       break;
     case CS_MESHTYPE_TRIANGLESTRIP:
-      num_tri = (mymesh->indexend-mymesh->indexstart)-2;
+      primNum_sub = 2;
       primitivetype = GL_TRIANGLE_STRIP;
       break;
     case CS_MESHTYPE_TRIANGLEFAN:
-      num_tri = (mymesh->indexend-mymesh->indexstart)-2;
+      primNum_sub = 2;
       primitivetype = GL_TRIANGLE_FAN;
       break;
     case CS_MESHTYPE_POINTS:
       primitivetype = GL_POINTS;
-      num_tri = (mymesh->indexend-mymesh->indexstart);
       break;
     case CS_MESHTYPE_POINT_SPRITES:
     {
-      num_tri = (mymesh->indexend-mymesh->indexstart);
       if(!(ext->CS_GL_ARB_point_sprite && ext->CS_GL_ARB_point_parameters))
       {
         break;
       }
-      float radius, scale;
-      csShaderVariable* radiusSV = csGetShaderVariableFromStack (stacks, string_point_radius);
-      CS_ASSERT (radiusSV);
-      radiusSV->GetValue (radius);
-
-      csShaderVariable* scaleSV = csGetShaderVariableFromStack (stacks, string_point_scale);
-      CS_ASSERT (scaleSV);
-      scaleSV->GetValue (scale);
-
-      glPointSize (1.0f);
-      GLfloat atten[3] = {0.0f, 0.0f, scale * scale};
-      ext->glPointParameterfvARB (GL_POINT_DISTANCE_ATTENUATION_ARB, atten);
-      ext->glPointParameterfARB (GL_POINT_SIZE_MAX_ARB, 9999.0f);
-      ext->glPointParameterfARB (GL_POINT_SIZE_MIN_ARB, 0.0f);
-      ext->glPointParameterfARB (GL_POINT_FADE_THRESHOLD_SIZE_ARB, 1.0f);
-
-      glEnable (GL_POINT_SPRITE_ARB);
       primitivetype = GL_POINTS;
-      if (ext->CS_GL_ARB_multitexture)
-      {
-        statecache->SetCurrentTU (0);
-        statecache->ActivateTU (csGLStateCache::activateTexCoord);
-      }
-      glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
-
       break;
     }
     case CS_MESHTYPE_LINES:
-      num_tri = (mymesh->indexend-mymesh->indexstart)/2;
+      primNum_divider = 2;
       primitivetype = GL_LINES;
       break;
     case CS_MESHTYPE_LINESTRIP:
-      num_tri = (mymesh->indexend-mymesh->indexstart)-1;
+      primNum_sub = 1;
       primitivetype = GL_LINE_STRIP;
       break;
     case CS_MESHTYPE_TRIANGLES:
     default:
-      num_tri = (mymesh->indexend-mymesh->indexstart)/3;
+      primNum_divider = 3;
       primitivetype = GL_TRIANGLES;
       break;
+  }
+  if (ext->CS_GL_ARB_point_sprite)
+  {
+    if (primitivetype == GL_POINTS)
+      statecache->Enable_GL_POINT_SPRITE_ARB();
+    else
+      statecache->Disable_GL_POINT_SPRITE_ARB();
   }
 
   // Based on the kind of clipping we need we set or clip mask.
@@ -1974,19 +1955,19 @@ void csGLGraphics3D::DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
   const uint mixmode = modes.mixmode;
   statecache->SetShadeModel ((mixmode & CS_FX_FLAT) ? GL_FLAT : GL_SMOOTH);
 
+  if (modes.zoffset)
+    statecache->Enable_GL_POLYGON_OFFSET_FILL ();
+  else
+    statecache->Disable_GL_POLYGON_OFFSET_FILL ();
 
   GLenum compType;
-  void* bufData = //indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS);
-    RenderLock (iIndexbuf, CS_GLBUF_RENDERLOCK_ELEMENTS, compType);
+  bool normalized;
+  void* bufData =
+    RenderLock (iIndexbuf, CS_GLBUF_RENDERLOCK_ELEMENTS, compType, normalized);
+  statecache->ApplyBufferBinding (csGLStateCacheContext::boIndexArray);
   if (bufData != (void*)-1)
   {
     SetMixMode (mixmode, modes.alphaType);
-
-    if (bugplug)
-    {
-      bugplug->AddCounter ("Triangle Count", num_tri);
-      bugplug->AddCounter ("Mesh Count", 1);
-    }
 
     if ((current_zmode == CS_ZBUF_MESH) || (current_zmode == CS_ZBUF_MESH2))
     {
@@ -2002,39 +1983,47 @@ void csGLGraphics3D::DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
       }*/
     }
 
-    float alpha = 1.0f;
-    if (mixmode & CS_FX_MASK_ALPHA)
-      alpha = 1.0f - (float)(mixmode & CS_FX_MASK_ALPHA) / 255.0f;
-    glColor4f (1.0f, 1.0f, 1.0f, alpha);
-
-    if (modes.doInstancing)
     {
-      const size_t instParamNum = modes.instParamNum;
-      const csVertexAttrib* const instParamsTargets = modes.instParamsTargets;
-      for (size_t n = 0; n < modes.instanceNum; n++)
+      CS_PROFILER_ZONE(csGLGraphics3D_DrawMesh_DrawElements);
+      if (mymesh->multiRanges && mymesh->rangesNum)
       {
-        SetupInstance (instParamNum, instParamsTargets, modes.instParams[n]);
-        glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
-          (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
-          compType, 
-          ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
-        TeardownInstance (instParamNum, instParamsTargets);
+	size_t num_tri = 0;
+	for (size_t r = 0; r < mymesh->rangesNum; r++)
+	{
+	  CS::Graphics::RenderMeshIndexRange range = mymesh->multiRanges[r];
+	  if (bugplug) num_tri += (range.end-range.start)/primNum_divider - primNum_sub;
+	  glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+	    (GLuint)iIndexbuf->GetRangeEnd(), range.end - range.start,
+	    compType, 
+            ((uint8*)bufData) + (indexCompsBytes * range.start));
+	}
+	if (bugplug)
+	{
+	  bugplug->AddCounter ("Triangle Count", (int)num_tri);
+	  bugplug->AddCounter ("Mesh Count", 1);
+	}
+      }
+      else
+      {
+	if (bugplug)
+	{
+	  size_t num_tri = (mymesh->indexend-mymesh->indexstart)/primNum_divider - primNum_sub;
+	  bugplug->AddCounter ("Triangle Count", (int)num_tri);
+	  bugplug->AddCounter ("Mesh Count", 1);
+	}
+  // @@@ Temporary comment. If runnung Ubuntu 8.04 on a machine with Intel
+  // hardware and you get an error that traces back to the function below.
+  // Please see: http://trac.crystalspace3d.org/trac/CS/ticket/551 in the
+  // first instance.
+	glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+	  (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
+	  compType, 
+	  ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
       }
     }
-    else
-    {
-      glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
-        (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
-        compType, 
-        ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
-    }
+    //indexbuf->Release();
   }
 
-  if (mymesh->meshtype == CS_MESHTYPE_POINT_SPRITES) 
-  {
-    glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE);
-    glDisable (GL_POINT_SPRITE_ARB);
-  }
   if (needMatrix)
     glPopMatrix ();
   //indexbuf->RenderRelease ();
@@ -2072,8 +2061,8 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   // we correct the input coordinates here.
   int bitmapwidth = 0, bitmapheight = 0;
   hTex->GetRendererDimensions (bitmapwidth, bitmapheight);
-  csGLBasicTextureHandle *txt_mm = static_cast<csGLBasicTextureHandle*>
-    (hTex->GetPrivateObject ());
+  csGLBasicTextureHandle *txt_mm = static_cast<csGLBasicTextureHandle*> (
+    (iTextureHandle*)hTex);
   int owidth = txt_mm->orig_width;
   int oheight = txt_mm->orig_height;
   if (owidth != bitmapwidth || oheight != bitmapheight)
@@ -2095,7 +2084,7 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
 
   // if the texture has transparent bits, we have to tweak the
   // OpenGL blend mode so that it handles the transparent pixels correctly
-  if ((hTex->GetKeyColor () || hTex->GetAlphaMap () || Alpha) ||
+  if ((hTex->GetKeyColor () || Alpha) ||
     (current_drawflags & CSDRAW_2DGRAPHICS)) // In 2D mode we always want to blend
     SetMixMode (CS_FX_ALPHA, hTex->GetAlphaType());
   else
@@ -2167,7 +2156,7 @@ void csGLGraphics3D::SetShadowState (int state)
       // @@@ Jorrit: to avoid flickering I had to increase the
       // values below and multiply them with 3.
       //glPolygonOffset (-0.1f, -4.0f); 
-      glPolygonOffset (-0.3f, -12.0f); 
+      glPolygonOffset (0.3f, 12.0f); 
       statecache->Enable_GL_POLYGON_OFFSET_FILL ();
       break;
     case CS_SHADOW_VOLUME_PASS1:
@@ -2282,7 +2271,7 @@ void csGLGraphics3D::ClosePortal ()
     
     GLenum oldcullface;
     statecache->GetCullFace (oldcullface);
-    if (render_target)
+    if (currentAttachments != 0)
     {
       r2tbackend->SetupClipPortalDrawing ();
       statecache->SetCullFace (mirror?GL_FRONT:GL_BACK);
@@ -2334,9 +2323,13 @@ void csGLGraphics3D::ClosePortal ()
 
 void* csGLGraphics3D::RenderLock (iRenderBuffer* buffer, 
 				  csGLRenderBufferLockType type, 
-				  GLenum& compGLType)
+                                  GLenum& compGLType, bool& normalized)
 {
-  compGLType = compGLtypes[buffer->GetComponentType()];
+  csRenderBufferComponentType compType = buffer->GetComponentType();
+  normalized = (compType != CS_BUFCOMP_FLOAT) 
+    && (compType != CS_BUFCOMP_DOUBLE)
+    && (compType & CS_BUFCOMP_NORMALIZED);
+  compGLType = compGLtypes[compType];
   if (vboManager.IsValid())
     return vboManager->RenderLock (buffer, type);
   else
@@ -2371,7 +2364,7 @@ void csGLGraphics3D::RenderRelease (iRenderBuffer* buffer)
 void csGLGraphics3D::ApplyBufferChanges()
 {
   GLRENDER3D_OUTPUT_LOCATION_MARKER;
-
+  
   for (size_t i = 0; i < changeQueue.GetSize (); i++)
   {
     const BufferChange& changeEntry = changeQueue[i];
@@ -2390,52 +2383,40 @@ void csGLGraphics3D::ApplyBufferChanges()
 
       if (CS_VATTRIB_IS_GENERIC (att)) 
         AssignGenericBuffer (att-CS_VATTRIB_GENERIC_FIRST, buffer);
-      else 
-      {
-        if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
-        {
-          unsigned int unit = att - CS_VATTRIB_TEXCOORD0;
-          if (npotsStatus[unit])
-          {
-            npotsFixupScrap.Push (spec_renderBuffers[att-CS_VATTRIB_SPECIFIC_FIRST]);
-            AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, 0);
-            npotsStatus[unit] = false;
-          }
-          if (needNPOTSfixup[unit].IsValid())
-          {
-            buffer = bufferRef = DoNPOTSFixup (buffer, unit);
-            npotsStatus[unit] = true;
-          }
-        }
-        AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, buffer);
-      }
+      else               
+        AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, buffer);      
 
       GLenum compType;
+      bool normalized;
       void *data =
-        RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType);
+	RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType, normalized);
 
       if (data == (void*)-1) continue;
 
       switch (att)
       {
       case CS_VATTRIB_POSITION:
+	// @@@ FIXME: How to deal with normalized buffers?
         statecache->Enable_GL_VERTEX_ARRAY ();
         statecache->SetVertexPointer (buffer->GetComponentCount (),
           compType, (GLsizei)buffer->GetStride (), data);
         break;
       case CS_VATTRIB_NORMAL:
-        statecache->Enable_GL_NORMAL_ARRAY ();
+	// @@@ FIXME: How to deal with unnormalized buffers?
+	statecache->Enable_GL_NORMAL_ARRAY ();
         statecache->SetNormalPointer (compType, (GLsizei)buffer->GetStride (), 
           data);
         break;
       case CS_VATTRIB_COLOR:
-        statecache->Enable_GL_COLOR_ARRAY ();
+	// @@@ FIXME: How to deal with unnormalized buffers?
+	statecache->Enable_GL_COLOR_ARRAY ();
         statecache->SetColorPointer (buffer->GetComponentCount (),
           compType, (GLsizei)buffer->GetStride (), data);
         break;
       case CS_VATTRIB_SECONDARY_COLOR:
         if (ext->CS_GL_EXT_secondary_color)
         {
+	  // @@@ FIXME: How to deal with unnormalized buffers?
 	  statecache->Enable_GL_SECONDARY_COLOR_ARRAY_EXT ();
 	  statecache->SetSecondaryColorPointerExt (buffer->GetComponentCount (),
 	    compType, (GLsizei)buffer->GetStride (), data);
@@ -2450,7 +2431,8 @@ void csGLGraphics3D::ApplyBufferChanges()
           {
             statecache->SetCurrentTU (unit);
           } 
-          statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
+	  // @@@ FIXME: How to deal with normalized buffers?
+	  statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
           statecache->SetTexCoordPointer (buffer->GetComponentCount (),
             compType, (GLsizei)buffer->GetStride (), data);
         }
@@ -2459,9 +2441,14 @@ void csGLGraphics3D::ApplyBufferChanges()
 	  if (ext->glEnableVertexAttribArrayARB)
 	  {
 	    GLuint index = att - CS_VATTRIB_GENERIC_FIRST;
-	    ext->glEnableVertexAttribArrayARB (index);
+	    statecache->ApplyBufferBinding (csGLStateCacheContext::boElementArray);
+	    if (!(activeVertexAttribs & (1 << index)))
+	    {
+	      ext->glEnableVertexAttribArrayARB (index);
+	      activeVertexAttribs |= (1 << index);
+	    }
 	    ext->glVertexAttribPointerARB(index, buffer->GetComponentCount (),
-	      compType, false, (GLsizei)buffer->GetStride (), data);
+              compType, normalized, (GLsizei)buffer->GetStride (), data);
 	  }
         }
         else
@@ -2498,11 +2485,6 @@ void csGLGraphics3D::ApplyBufferChanges()
             statecache->SetCurrentTU (unit);
           }
           statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
-          if (npotsStatus[unit])
-          {
-            npotsFixupScrap.Push (spec_renderBuffers[att - CS_VATTRIB_SPECIFIC_FIRST]);
-            npotsStatus[unit] = false;
-          }
         }
         else if (CS_VATTRIB_IS_GENERIC(att))
         {
@@ -2510,6 +2492,7 @@ void csGLGraphics3D::ApplyBufferChanges()
 	  {
 	    GLuint index = att - CS_VATTRIB_GENERIC_FIRST;
 	    ext->glDisableVertexAttribArrayARB (index);
+	    activeVertexAttribs &= ~(1 << index);
 	  }
         }
         else
@@ -2558,65 +2541,6 @@ static void DoFixup (iRenderBuffer* src, T* dest, const T2 scales[],
       *dest++ = (T)((c < srcComps ? *s++ : defaultComps[c]) * scales[c]);
     }
   }
-}
-
-csRef<iRenderBuffer> csGLGraphics3D::DoNPOTSFixup (iRenderBuffer* buffer, int unit)
-{
-  csRef<iRenderBuffer> scrapBuf;
-  if (npotsFixupScrap.GetSize () > 0) scrapBuf = npotsFixupScrap.Pop();
-  if (!scrapBuf.IsValid()
-    || (scrapBuf->GetElementCount() < buffer->GetElementCount())
-    || (scrapBuf->GetComponentCount() != buffer->GetComponentCount())
-    || (scrapBuf->GetComponentType() != buffer->GetComponentType()))
-  {
-    scrapBuf = csRenderBuffer::CreateRenderBuffer (buffer->GetElementCount(),
-      CS_BUF_STREAM, buffer->GetComponentType(), buffer->GetComponentCount());
-  }
-
-  const int componentScale[] = {
-    needNPOTSfixup[unit]->actual_width, 
-    needNPOTSfixup[unit]->actual_height,
-    1, 1};
-
-  switch (scrapBuf->GetComponentType())
-  {
-    case CS_BUFCOMP_BYTE:
-      DoFixup (buffer, csRenderBufferLock<char> (scrapBuf).Lock(),
-        componentScale);
-      break;
-    case CS_BUFCOMP_UNSIGNED_BYTE:
-      DoFixup (buffer, csRenderBufferLock<unsigned char> (scrapBuf).Lock(),
-        componentScale);
-      break;
-    case CS_BUFCOMP_SHORT:
-      DoFixup (buffer, csRenderBufferLock<short> (scrapBuf).Lock(),
-        componentScale);
-      break;
-    case CS_BUFCOMP_UNSIGNED_SHORT:
-      DoFixup (buffer, csRenderBufferLock<unsigned short> (scrapBuf).Lock(),
-        componentScale);
-      break;
-    case CS_BUFCOMP_INT:
-      DoFixup (buffer, csRenderBufferLock<int> (scrapBuf).Lock(),
-        componentScale);
-      break;
-    case CS_BUFCOMP_UNSIGNED_INT:
-      DoFixup (buffer, csRenderBufferLock<unsigned int> (scrapBuf).Lock(),
-        componentScale);
-      break;
-    case CS_BUFCOMP_FLOAT:
-      DoFixup (buffer, csRenderBufferLock<float> (scrapBuf).Lock(),
-        componentScale);
-      break;
-    case CS_BUFCOMP_DOUBLE:
-      DoFixup (buffer, csRenderBufferLock<double> (scrapBuf).Lock(),
-        componentScale);
-      break;
-    default:
-      CS_ASSERT(false); // Should never happen.
-      break;
-  }
-  return scrapBuf;
 }
 
 csRef<iRenderBuffer> csGLGraphics3D::DoColorFixup (iRenderBuffer* buffer)
@@ -2830,7 +2754,7 @@ void csGLGraphics3D::SetupClipPortals ()
   glLoadIdentity ();
   //We should call render_target->SetupClipPortalDrawing just one time
   //because next call will flip modelview matrix again
-  if (render_target)
+  if (currentAttachments != 0)
     r2tbackend->SetupClipPortalDrawing ();
   
   GLboolean wmRed, wmGreen, wmBlue, wmAlpha;
@@ -2869,7 +2793,7 @@ void csGLGraphics3D::SetupClipPortals ()
       if (ffps < ffpnz)
       {
         //clear stencil of ffps
-        if (render_target)
+        if (currentAttachments != 0)
         	statecache->SetCullFace (IsPortalMirrored(ffps)?GL_FRONT:GL_BACK);
         else 
           statecache->SetCullFace (IsPortalMirrored(ffps)?GL_BACK:GL_FRONT);
@@ -2888,7 +2812,7 @@ void csGLGraphics3D::SetupClipPortals ()
     if (ffps == csArrayItemNotFound)
     {
       //make s-fill of ffpnz
-      if (render_target) 
+      if (currentAttachments != 0) 
         statecache->SetCullFace (IsPortalMirrored(ffpnz)?GL_FRONT:GL_BACK);
       else 
         statecache->SetCullFace (IsPortalMirrored(ffpnz)?GL_BACK:GL_FRONT);
@@ -2904,7 +2828,7 @@ void csGLGraphics3D::SetupClipPortals ()
       ffps = ffpnz;
     }
     //perform z-clear finally
-    if (render_target) 
+    if (currentAttachments != 0) 
       statecache->SetCullFace (IsPortalMirrored(ffpnz)?GL_FRONT:GL_BACK);
     else 
       statecache->SetCullFace (IsPortalMirrored(ffpnz)?GL_BACK:GL_FRONT);
@@ -2930,11 +2854,11 @@ void csGLGraphics3D::SetupClipPortals ()
 	  
     cp = clipportal_stack[ffpnz];
     //map all Z-values to 0.0
-    glDepthRange(0.0, 0.0);
+    glDepthRange(1.0, 1.0);
     //Draw2DPolygon (cp->poly, cp->num_poly, cp->normal);
     DrawScreenPolygon (cp->poly, cp->num_poly);
     //restore default z-mapping
-    glDepthRange(0.0, 1.0);
+    glDepthRange(1.0, 0.0);
     
     // finish of debug coloring
     //glColorMask (false, false, false, false);
@@ -2953,7 +2877,7 @@ void csGLGraphics3D::SetupClipPortals ()
     if (ffps != csArrayItemNotFound)
     {
       //clear previous s-fill
-      if (render_target) 
+      if (currentAttachments != 0) 
         statecache->SetCullFace (IsPortalMirrored(ffps)?GL_FRONT:GL_BACK);
       else 
         statecache->SetCullFace (IsPortalMirrored(ffps)?GL_BACK:GL_FRONT);
@@ -2970,7 +2894,7 @@ void csGLGraphics3D::SetupClipPortals ()
       ffps = csArrayItemNotFound;
     }
     //perform s-fill finally
-    if (render_target)
+    if (currentAttachments != 0)
       statecache->SetCullFace (IsPortalMirrored(cfp)?GL_FRONT:GL_BACK);
     else 
       statecache->SetCullFace (IsPortalMirrored(cfp)?GL_BACK:GL_FRONT);
@@ -3053,11 +2977,15 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
       (int)floorf (scissorbox.MinY ()), 
       (int)ceilf (scissorbox.MaxX ()), 
       (int)ceilf (scissorbox.MaxY ()));
-    if (render_target)
+    if (currentAttachments != 0)
       r2tbackend->SetClipRect (scissorRect);
     else
-      glScissor (scissorRect.xmin, scissorRect.ymin, scissorRect.Width(),
+    {
+      GLint vp[4];
+      glGetIntegerv (GL_VIEWPORT, vp);
+      glScissor (vp[0] + scissorRect.xmin, vp[1] + scissorRect.ymin, scissorRect.Width(),
 	scissorRect.Height());
+    }
   }
   else if (hasOld2dClip)
   {
@@ -3109,89 +3037,95 @@ bool csGLGraphics3D::SetOption (const char* name, const char* value)
 void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh, 
 				     uint flags)
 {  
+  
   if (current_drawflags & CSDRAW_2DGRAPHICS)
   {
     // Try to be compatible with 2D drawing mode
     G2D->PerformExtension ("glflushtext");
   }
 
-  uint indexCount = mesh.indices ? mesh.indexCount : mesh.vertexCount;
-  if (scrapIndicesSize < indexCount)
-  {
-    scrapIndices = csRenderBuffer::CreateIndexRenderBuffer (indexCount,
-      CS_BUF_STREAM, CS_BUFCOMP_UNSIGNED_INT, 0, mesh.vertexCount - 1);
-    scrapIndicesSize = indexCount;
-  }
-  if (scrapVerticesSize < mesh.vertexCount)
-  {
-    scrapVertices = csRenderBuffer::CreateRenderBuffer (
-      mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
-    scrapTexcoords = csRenderBuffer::CreateRenderBuffer (
-      mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 2);
-    scrapColors = csRenderBuffer::CreateRenderBuffer (
-      mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 4);
-
-    scrapVerticesSize = mesh.vertexCount;
-  }
-
   bool useShader = (mesh.shader != 0);
+  uint indexCount = mesh.indices ? mesh.indexCount : mesh.vertexCount;
+  if (!mesh.renderBuffers.IsValid())
+  {
+    if (scrapIndicesSize < indexCount)
+    {
+      scrapIndices = csRenderBuffer::CreateIndexRenderBuffer (indexCount,
+	CS_BUF_STREAM, CS_BUFCOMP_UNSIGNED_INT, 0, mesh.vertexCount - 1);
+      scrapIndicesSize = indexCount;
+    }
+    if (scrapVerticesSize < mesh.vertexCount)
+    {
+      scrapVertices = csRenderBuffer::CreateRenderBuffer (
+	mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+      scrapTexcoords = csRenderBuffer::CreateRenderBuffer (
+	mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 2);
+      scrapColors = csRenderBuffer::CreateRenderBuffer (
+	mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 4);
+  
+      scrapVerticesSize = mesh.vertexCount;
+    }
+  }
 
   csShaderVariable* sv;
-  sv = scrapContext.GetVariableAdd (string_indices);
-  if (mesh.indices)
+  if (!mesh.renderBuffers.IsValid())
   {
-    scrapIndices->CopyInto (mesh.indices, indexCount);
-  }
-  else
-  {
-    csRenderBufferLock<uint> indexLock (scrapIndices);
-    for (uint i = 0; i < mesh.vertexCount; i++)
-      indexLock[(size_t)i] = i;
-  }
-  sv->SetValue (scrapIndices);
-  scrapBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, scrapIndices);
-
-  sv = scrapContext.GetVariableAdd (string_vertices);
-  if (mesh.vertices)
-  {
-    scrapVertices->CopyInto (mesh.vertices, mesh.vertexCount);
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, scrapVertices);
-    if (useShader)
-      sv->SetValue (scrapVertices);
-  }
-  else
-  {
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, 0);
-    if (useShader)
-      sv->SetValue (0);
-  }
-  sv = scrapContext.GetVariableAdd (string_texture_coordinates);
-  if (mesh.texcoords)
-  {
-    scrapTexcoords->CopyInto (mesh.texcoords, mesh.vertexCount);
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, scrapTexcoords);
-    if (useShader)
-      sv->SetValue (scrapTexcoords);
-  }
-  else
-  {
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, 0);
-    if (useShader)
-      sv->SetValue (0);
-  }
-  sv = scrapContext.GetVariableAdd (string_colors);
-  if (mesh.colors)
-  {
-    scrapColors->CopyInto (mesh.colors, mesh.vertexCount);
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, scrapColors);
-    if (useShader)
-      sv->SetValue (scrapColors);
-  }
-  else
-  {
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, 0);
-    if (useShader)
-      sv->SetValue (0);
+    sv = scrapContext.GetVariableAdd (string_indices);
+    if (mesh.indices)
+    {
+      scrapIndices->CopyInto (mesh.indices, indexCount);
+    }
+    else
+    {
+      csRenderBufferLock<uint> indexLock (scrapIndices);
+      for (uint i = 0; i < mesh.vertexCount; i++)
+	indexLock[(size_t)i] = i;
+    }
+    sv->SetValue (scrapIndices);
+    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, scrapIndices);
+  
+    sv = scrapContext.GetVariableAdd (string_vertices);
+    if (mesh.vertices)
+    {
+      scrapVertices->CopyInto (mesh.vertices, mesh.vertexCount);
+      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, scrapVertices);
+      if (useShader)
+	sv->SetValue (scrapVertices);
+    }
+    else
+    {
+      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, 0);
+      if (useShader)
+	sv->SetValue (0);
+    }
+    sv = scrapContext.GetVariableAdd (string_texture_coordinates);
+    if (mesh.texcoords)
+    {
+      scrapTexcoords->CopyInto (mesh.texcoords, mesh.vertexCount);
+      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, scrapTexcoords);
+      if (useShader)
+	sv->SetValue (scrapTexcoords);
+    }
+    else
+    {
+      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, 0);
+      if (useShader)
+	sv->SetValue (0);
+    }
+    sv = scrapContext.GetVariableAdd (string_colors);
+    if (mesh.colors)
+    {
+      scrapColors->CopyInto (mesh.colors, mesh.vertexCount);
+      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, scrapColors);
+      if (useShader)
+	sv->SetValue (scrapColors);
+    }
+    else
+    {
+      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, 0);
+      if (useShader)
+	sv->SetValue (0);
+    }
   }
   if (useShader)
   {
@@ -3215,7 +3149,11 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
         | csGLStateCache::activateTexCoord);
     }
     if (mesh.texture)
+    {
       ActivateTexture (mesh.texture);
+      imageUnits[0].texture->ChangeTextureCompareMode (
+        CS::Graphics::TextureComparisonMode ());
+    }
     else
       DeactivateTexture ();
   }
@@ -3231,49 +3169,60 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   rmesh.indexstart = 0;
   rmesh.indexend = indexCount;
   rmesh.variablecontext = &scrapContext;
-  rmesh.buffers = scrapBufferHolder;
+  rmesh.buffers =
+    mesh.renderBuffers.IsValid() ? mesh.renderBuffers : scrapBufferHolder;
+
+  bool restoreProjection = false;
+  bool wasProjectionExplicit = false;
+  CS::Math::Matrix4 oldProjection;
+  csReversibleTransform oldWorld2Camera;
 
   if (flags & csSimpleMeshScreenspace)
   {
-    csReversibleTransform camtrans;
     if (current_drawflags & CSDRAW_2DGRAPHICS)
     {
+      csReversibleTransform camtrans;
       camtrans.SetO2T (
         csMatrix3 (1.0f, 0.0f, 0.0f,
                    0.0f, -1.0f, 0.0f,
                    0.0f, 0.0f, 1.0f));
       camtrans.SetO2TTranslation (csVector3 (0, viewheight, 0));
+      SetWorldToCamera (camtrans.GetInverse ());
     } 
     else 
     {
       const float vwf = (float)(viewwidth);
       const float vhf = (float)(viewheight);
 
-      camtrans.SetO2T (
-	csMatrix3 (1.0f, 0.0f, 0.0f,
-		   0.0f, -1.0f, 0.0f,
-		   0.0f, 0.0f, 1.0f));
-      camtrans.SetO2TTranslation (csVector3 (
-	vwf / 2.0f, vhf / 2.0f, -aspect));
+      wasProjectionExplicit = explicitProjection;
+      explicitProjection = true;
+      oldProjection = projectionMatrix;
+      
+      projectionMatrix = CS::Math::Projections::Ortho (0, vwf, vhf, 0, -1.0, 10.0);
+
+      oldWorld2Camera = world2camera;
+      SetWorldToCamera (csReversibleTransform ());
+      
+      restoreProjection = true;
+      needProjectionUpdate = true;
     }
-    SetWorldToCamera (camtrans.GetInverse ());
   }
   
   rmesh.object2world = mesh.object2world;
 
-  csRef<iShaderVarStack> stacks;
-  stacks.AttachNew(new scfArray<iShaderVarStack>);
-  shadermgr->PushVariables (stacks);
-  scrapContext.PushVariables (stacks);
-  if (mesh.shader != 0) mesh.shader->PushVariables (stacks);
-  if (mesh.dynDomain != 0) mesh.dynDomain->PushVariables (stacks);
+  csShaderVariableStack stack;
+  stack.Setup (strings->GetSize ());
+  if (mesh.shader != 0) mesh.shader->PushVariables (stack);
+  shadermgr->PushVariables (stack);
+  scrapContext.PushVariables (stack);
+  if (mesh.dynDomain != 0) mesh.dynDomain->PushVariables (stack);
 
   if (mesh.alphaType.autoAlphaMode)
   {
     csAlphaMode::AlphaType autoMode = csAlphaMode::alphaNone;
 
     iTextureHandle* tex = 0;
-    csShaderVariable *texVar = csGetShaderVariableFromStack (stacks, 
+    csShaderVariable *texVar = csGetShaderVariableFromStack (stack, 
       mesh.alphaType.autoModeTexture);
     if (texVar)
       texVar->GetValue (tex);
@@ -3298,7 +3247,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   size_t passCount = 1;
   if (mesh.shader != 0)
   {
-    shaderTicket = mesh.shader->GetTicket (modes, stacks);
+    shaderTicket = mesh.shader->GetTicket (modes, stack);
     passCount = mesh.shader->GetNumberOfPasses (shaderTicket);
   }
 
@@ -3307,13 +3256,13 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
     if (mesh.shader != 0)
     {
       mesh.shader->ActivatePass (shaderTicket, p);
-      mesh.shader->SetupPass (shaderTicket, &rmesh, modes, stacks);
+      mesh.shader->SetupPass (shaderTicket, &rmesh, modes, stack);
     }
     else
     {
       ActivateBuffers (scrapBufferHolder, scrapMapping);
     }
-    DrawMesh (&rmesh, modes, stacks);
+    DrawMesh (&rmesh, modes, stack);
     if (mesh.shader != 0)
     {
       mesh.shader->TeardownPass (shaderTicket);
@@ -3342,6 +3291,14 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   }
 
   SetZMode (old_zbufmode);
+  
+  if (restoreProjection)
+  {
+    explicitProjection = wasProjectionExplicit;
+    projectionMatrix = oldProjection;
+    world2camera = oldWorld2Camera;
+    needProjectionUpdate = true;
+  }
 }
 
 bool csGLGraphics3D::PerformExtensionV (char const* command, va_list /*args*/)
@@ -3388,7 +3345,6 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB,
     rgbaPtr += (Width - iWidth) * 4;
   }
 
-  glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
   // Create handle
   glGenTextures (1, &halohandle);
   // Activate handle
@@ -3569,8 +3525,10 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
   bool ok = true;
   object_reg = p;
 
-  if (!scfiEventHandler)
-    scfiEventHandler = csPtr<EventHandler> (new EventHandler (this));
+  if (!eventHandler1)
+    eventHandler1.AttachNew (new EventHandler<false> (this));
+  if (!eventHandler2)
+    eventHandler2.AttachNew (new EventHandler<true> (this));
 
   SystemOpen = csevSystemOpen(object_reg);
   SystemClose = csevSystemClose(object_reg);
@@ -3578,16 +3536,18 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
   csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
   if (q)
   {
-    csEventID events[] = { SystemOpen, SystemClose, 
+    csEventID events1[] = { SystemOpen, SystemClose,
 			    CS_EVENTLIST_END };
-    q->RegisterListener (scfiEventHandler, events);
+    q->RegisterListener (eventHandler1, events1);
+    csEventID events2[] = { SystemOpen, CS_EVENTLIST_END };
+    q->RegisterListener (eventHandler2, events2);
   }
   // We subscribe to csevCanvasResize after G2D has been created
   
   bugplug = csQueryRegistry<iBugPlug> (object_reg);
 
-  strings = csQueryRegistryTagInterface<iStringSet> (
-    object_reg, "crystalspace.shared.stringset");
+  strings = csQueryRegistryTagInterface<iShaderVarStringSet> (
+    object_reg, "crystalspace.shader.variablenameset");
 
   csRef<iPluginManager> plugin_mgr = 
   	csQueryRegistry<iPluginManager> (object_reg);
@@ -3626,7 +3586,7 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
   if (ok)
   {
     CanvasResize = csevCanvasResize(object_reg, G2D);
-    q->RegisterListener (scfiEventHandler, CanvasResize);
+    q->RegisterListener (eventHandler1, CanvasResize);
   }
 
   return ok;
@@ -3639,8 +3599,18 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
 // iEventHandler
 ////////////////////////////////////////////////////////////////////
 
-bool csGLGraphics3D::HandleEvent (iEvent& Event)
+bool csGLGraphics3D::HandleEvent (iEvent& Event, bool postShaderManager)
 {
+  if (postShaderManager)
+  {
+    if (Event.Name == SystemOpen)
+    {
+      SetupShaderVariables ();
+      return true;
+    }
+    return false;
+  }
+  
   if (Event.Name == SystemOpen)
   {
     Open ();
@@ -3653,11 +3623,11 @@ bool csGLGraphics3D::HandleEvent (iEvent& Event)
   }
   else if (Event.Name == CanvasResize)
   {
-    int w = G2D->GetWidth ();
-    int h = G2D->GetHeight ();
-    SetDimensions (w, h);
-    asp_center_x = w/2;
-    asp_center_y = h/2;
+    viewwidth = G2D->GetWidth();
+    viewheight = G2D->GetHeight();
+    G2D->GetFramebufferDimensions (scrwidth, scrheight);
+    asp_center_x = (int)(viewwidth/2.0f);
+    asp_center_y = (int)(viewheight/2.0f);
     return true;
   }
   return false;
@@ -3680,13 +3650,21 @@ bool csGLGraphics3D::DebugCommand (const char* cmdstr)
     *space = 0;
   }
 
-  if (strcasecmp (cmd, "dump_slms") == 0)
+  if (strcasecmp (cmd, "dump_zbuf") == 0)
+  {
+    const char* dir = 
+      ((param != 0) && (*param != 0)) ? param : "/tmp/zbufdump/";
+    DumpZBuffer (dir);
+
+    return true;
+  }
+  else if (strcasecmp (cmd, "dump_textures") == 0)
   {
     csRef<iImageIO> imgsaver = csQueryRegistry<iImageIO> (object_reg);
     if (!imgsaver)
     {
       Report (CS_REPORTER_SEVERITY_WARNING,
-        "Could not get image saver.");
+	      "Could not get image saver.");
       return false;
     }
 
@@ -3694,24 +3672,16 @@ bool csGLGraphics3D::DebugCommand (const char* cmdstr)
     if (!vfs)
     {
       Report (CS_REPORTER_SEVERITY_WARNING, 
-	"Could not get VFS.");
+	      "Could not get VFS.");
       return false;
     }
 
     if (txtmgr)
     {
       const char* dir = 
-	((param != 0) && (*param != 0)) ? param : "/tmp/slmdump/";
-      txtmgr->DumpSuperLightmaps (vfs, imgsaver, dir);
+	  ((param != 0) && (*param != 0)) ? param : "/tmp/textures/";
+      txtmgr->DumpTextures (vfs, imgsaver, dir);
     }
-
-    return true;
-  }
-  else if (strcasecmp (cmd, "dump_zbuf") == 0)
-  {
-    const char* dir = 
-      ((param != 0) && (*param != 0)) ? param : "/tmp/zbufdump/";
-    DumpZBuffer (dir);
 
     return true;
   }

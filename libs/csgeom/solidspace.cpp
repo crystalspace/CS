@@ -71,7 +71,7 @@ csSolidSpace::~csSolidSpace ()
 
 bool csSolidSpace::CheckBox (const csBox3& bbox, csSolidSpaceNode* node,
 	csVector3* vertices,
-	csTriangleMinMax* tris, int tri_count, 
+	csTriangleMinMax* tris, size_t tri_count, 
 	csPlane3* planes)
 {
   // If node is already completely solid we don't have to proceed.

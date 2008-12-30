@@ -35,7 +35,7 @@
 struct iTextureWrapper;
 struct iTextureManager;
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * A material class.
@@ -53,7 +53,7 @@ private:
   /// Shader associated with material
   csHash<csRef<iShader>, csStringID> shaders;
   csEngine* engine;
-  csShaderVariable* GetVar (csStringID name, bool create = false);
+  csShaderVariable* GetVar (CS::ShaderVarStringID name, bool create = false);
 
   struct SVNamesHolder
   {
@@ -90,10 +90,10 @@ public:
   void SetTextureWrapper (iTextureWrapper* tex);
 
   /// Set a texture (pass 0 to set no texture)
-  void SetTextureWrapper (csStringID name, iTextureWrapper* tex);
+  void SetTextureWrapper (CS::ShaderVarStringID name, iTextureWrapper* tex);
 
   /// Get a texture (if none 0 is returned)
-  iTextureWrapper* GetTextureWrapper (csStringID name);
+  iTextureWrapper* GetTextureWrapper (CS::ShaderVarStringID name);
 
   /**\name iMaterial implementation
    * @{ */
@@ -111,7 +111,10 @@ public:
   /**
    * Get a texture from the material.
    */
-  virtual iTextureHandle *GetTexture (csStringID name);
+  virtual iTextureHandle *GetTexture (CS::ShaderVarStringID name);
+
+  virtual iShader* GetFirstShader (const csStringID* types,
+    size_t numTypes);
 
   /** @} */
 
@@ -122,7 +125,7 @@ public:
   bool IsVisitRequired () const;
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * csMaterialWrapper represents a texture and its link
@@ -140,6 +143,10 @@ private:
   csRef<iMaterialEngine> matEngine;
 
   iMaterialList* materials;
+
+protected:
+  virtual void InternalRemove() { SelfDestruct(); }
+
 private:
   /// Release material handle
   virtual ~csMaterialWrapper ();
@@ -184,6 +191,7 @@ class csMaterialList : public scfImplementation1<csMaterialList,
 private:
   csRefArrayObject<iMaterialWrapper> list;
   csHash<iMaterialWrapper*, csString> mat_hash;
+  mutable CS::Threading::RecursiveMutex removeLock;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>
@@ -217,6 +225,9 @@ public:
 
   virtual iMaterialWrapper* NewMaterial (iMaterial* material,
   	const char* name);
+  virtual csPtr<iMaterialWrapper> CreateMaterial (iMaterial* material,
+  	const char* name);
+
   virtual int GetCount () const { return (int)list.GetSize (); }
   virtual iMaterialWrapper *Get (int n) const { return list[n]; }
   virtual int Add (iMaterialWrapper *obj);

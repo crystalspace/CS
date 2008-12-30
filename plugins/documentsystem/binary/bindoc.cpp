@@ -73,8 +73,8 @@ bool csBinaryDocAttributeIterator::HasNext ()
 csRef<iDocumentAttribute> csBinaryDocAttributeIterator::Next ()
 {
   csBdAttr* attrPtr = iteratedNode->atGetItem (pos++);
-  csBinaryDocAttribute* attr = parentNode->doc->GetPoolAttr();
-  attr->SetTo (attrPtr, parentNode);
+  csBinaryDocAttribute* attr =
+    parentNode->doc->GetPoolAttr (attrPtr, parentNode);
   return csPtr<iDocumentAttribute> (attr);
 }
 
@@ -82,38 +82,31 @@ csRef<iDocumentAttribute> csBinaryDocAttributeIterator::Next ()
 //  csBdAttr
 // =================================================
 
-csBdAttr::csBdAttr (const char* name)
+csBdAttr::csBdAttr (const char* name) : 
+  bdNodeAttribute (0, 0, BD_ATTR_MODIFIED),
+  nstr (CS::StrDup (name)), vstr (0)
 {
-  flags = BD_ATTR_MODIFIED;
-  nameID = 0;
-  value = 0;
-  vstr = 0;
-  nstr = csStrNew (name);
 }
 
-csBdAttr::csBdAttr ()
+csBdAttr::csBdAttr () : 
+  bdNodeAttribute (0, 0, BD_ATTR_MODIFIED), nstr (0), vstr (0)
 {
-  flags = BD_ATTR_MODIFIED;
-  nameID = 0;
-  value = 0;
-  vstr = 0;
-  nstr = 0;
 }
 
 csBdAttr::~csBdAttr ()
 {
   if (flags & BD_ATTR_MODIFIED)
   {
-    delete[] nstr;
-    delete[] vstr;
+    cs_free (nstr);
+    cs_free (vstr);
   }
 }
 
 void csBdAttr::SetName (const char* name)
 {
   CS_ASSERT(flags & BD_ATTR_MODIFIED);
-  delete[] nstr;
-  nstr = csStrNew (name);
+  cs_free (nstr);
+  nstr = CS::StrDup (name);
 }
 
 const char* csBdAttr::GetNameStr (csBinaryDocument* doc) const
@@ -158,43 +151,21 @@ const char* csBdAttr::GetValueStr (csBinaryDocument* doc) const
 //  csBinaryDocAttribute
 // =================================================
 
-void csBinaryDocAttribute::DecRef ()
+csBinaryDocAttribute::csBinaryDocAttribute (csBdAttr* ptr,
+				            csBinaryDocNode* owner) :
+  scfPooledImplementationType (this), node (owner), attrPtr (ptr),
+  vstr (0), vsptr (0)
 {
-  csRefTrackerAccess::TrackDecRef (scfObject, scfRefCount);
-  if (scfRefCount == 1)
-  {
-    // Not needed atm
-    //scfRemoveRefOwners ();
-    //if (scfParent) scfParent->DecRef();
-    node->doc->RecyclePoolAttr (this);
-    return;
-  }
-  scfRefCount--;
-}
-
-csBinaryDocAttribute::csBinaryDocAttribute () :
-  scfImplementationType (this)
-{
-  vstr = 0;
-  vsptr = 0;
 }
 
 csBinaryDocAttribute::~csBinaryDocAttribute ()
 {
   CleanData ();
-  delete vstr; 
+  cs_free (vstr); 
 }
 
 void csBinaryDocAttribute::CleanData ()
 {
-}
-
-void csBinaryDocAttribute::SetTo (csBdAttr* ptr,
-				  csBinaryDocNode* owner)
-{
-  CleanData();
-  node = owner;
-  attrPtr = ptr;
 }
 
 const char* csBinaryDocAttribute::GetName ()
@@ -218,8 +189,8 @@ const char* csBinaryDocAttribute::GetValue ()
   	  char buf[50];
 	  cs_snprintf (buf, sizeof (buf) - 1, "%" PRId32, 
 	    (int32)csLittleEndian::UInt32 (attrPtr->value));
-	  delete[] vstr; 
-	  vstr = csStrNew (buf);
+	  cs_free (vstr); 
+	  vstr = CS::StrDup (buf);
 	  vsptr = attrPtr;
 	}
 	return vstr;
@@ -231,8 +202,8 @@ const char* csBinaryDocAttribute::GetValue ()
   	  char buf[50];
 	  cs_snprintf (buf, sizeof (buf) - 1,
 	    "%g", csLongToFloat (csLittleEndian::UInt32 (attrPtr->value)));
-	  delete[] vstr; 
-	  vstr = csStrNew (buf);
+	  cs_free (vstr); 
+	  vstr = CS::StrDup (buf);
 	  vsptr = attrPtr;
 	}
 	return vstr;
@@ -327,8 +298,8 @@ void csBinaryDocAttribute::SetName (const char* name)
 {
   if (attrPtr->flags & BD_NODE_MODIFIED)
   {
-    delete[] attrPtr->nstr;
-    attrPtr->nstr = csStrNew (name);
+    cs_free (attrPtr->nstr);
+    attrPtr->nstr = CS::StrDup (name);
     node->ResortAttrs();
   }
 }
@@ -366,8 +337,8 @@ void csBinaryDocAttribute::SetValue (const char* val)
 {
   if (attrPtr->flags & BD_NODE_MODIFIED)
   {
-    delete[] attrPtr->vstr; attrPtr->vstr = 0;
-    delete[] vstr; vstr = 0;
+    cs_free (attrPtr->vstr); attrPtr->vstr = 0;
+    cs_free (vstr); vstr = 0;
     int v;
     float f;
     if (val == 0) val = ""; 
@@ -388,7 +359,7 @@ void csBinaryDocAttribute::SetValue (const char* val)
     {
       attrPtr->flags = (attrPtr->flags & ~BD_VALUE_TYPE_MASK) | 
 	BD_VALUE_TYPE_STR;
-      attrPtr->vstr = csStrNew (val);
+      attrPtr->vstr = CS::StrDup (val);
     }
   }
 }
@@ -397,8 +368,8 @@ void csBinaryDocAttribute::SetValueAsInt (int v)
 {
   if (attrPtr->flags & BD_NODE_MODIFIED)
   {
-    delete[] attrPtr->vstr; attrPtr->vstr = 0;
-    delete[] vstr; vstr = 0;
+    cs_free (attrPtr->vstr); attrPtr->vstr = 0;
+    cs_free (vstr); vstr = 0;
     attrPtr->flags = (attrPtr->flags & ~BD_VALUE_TYPE_MASK) | 
       BD_VALUE_TYPE_INT;
     attrPtr->value = csLittleEndian::UInt32 ((long)v);
@@ -409,8 +380,8 @@ void csBinaryDocAttribute::SetValueAsFloat (float f)
 {
   if (attrPtr->flags & BD_NODE_MODIFIED)
   {
-    delete[] attrPtr->vstr;	attrPtr->vstr = 0;
-    delete[] vstr; vstr = 0;
+    cs_free (attrPtr->vstr); attrPtr->vstr = 0;
+    cs_free (vstr); vstr = 0;
     attrPtr->flags = (attrPtr->flags & ~BD_VALUE_TYPE_MASK) | 
       BD_VALUE_TYPE_FLOAT;
     attrPtr->value = csLittleEndian::UInt32 (csFloatToLong (f));
@@ -419,7 +390,7 @@ void csBinaryDocAttribute::SetValueAsFloat (float f)
 
 void csBinaryDocAttribute::Store (csMemFile* nodesFile)
 {
-  bdNodeAttribute diskAttr;
+  bdNodeAttributePOD diskAttr;
   size_t attrSize = sizeof (diskAttr);
 
   diskAttr.flags = attrPtr->flags & BD_VALUE_TYPE_MASK;
@@ -442,13 +413,18 @@ void csBinaryDocAttribute::Store (csMemFile* nodesFile)
     diskAttr.value = attrPtr->value;
 
   bool putFlagsInName = false;
-  const size_t nameLen = strlen (attrPtr->GetNameStr (node->doc));
-  if (nameLen < MAX_IMM_ATTR_NAME_STR)
+  const size_t nameSize = strlen (attrPtr->GetNameStr (node->doc))+1;
+  if (nameSize <= MAX_IMM_ATTR_NAME_STR)
   {
     diskAttr.flags |= BD_ATTR_NAME_IMMEDIATE;
     diskAttr.nameID = 0;
-    strcpy ((char*)&diskAttr.nameID, attrPtr->GetNameStr (node->doc));
-    putFlagsInName = (nameLen < MAX_IMM_ATTR_NAME_STR_W_FLAGS);
+    /* We really want to copy into nameID.
+     * Yes, it may spill over, that's by design.
+     * But since fortify will complain when that happens, directly
+     * copy into an offset of the diskAttr struct. */
+    memcpy ((char*)&diskAttr + offsetof (bdNodeAttributePOD, nameID),
+      attrPtr->GetNameStr (node->doc), nameSize);
+    putFlagsInName = (nameSize <= MAX_IMM_ATTR_NAME_STR_W_FLAGS);
   }
   else
   {
@@ -472,9 +448,8 @@ void csBinaryDocAttribute::Store (csMemFile* nodesFile)
 // =================================================
 
 csBinaryDocNodeIterator::csBinaryDocNodeIterator () :
-  scfImplementationType (this)
+  scfImplementationType (this), value (0)
 {
-  value = 0;
 }
 
 void csBinaryDocNodeIterator::SetTo (csBdNode* node,
@@ -483,10 +458,10 @@ void csBinaryDocNodeIterator::SetTo (csBdNode* node,
 {
   parentNode = parent; 
   pos = 0;
-  delete[] value;
+  cs_free (value);
   if (onlyval) 
   {
-    value = csStrNew (onlyval);
+    value = CS::StrDup (onlyval);
   }
   else
   {
@@ -505,7 +480,7 @@ void csBinaryDocNodeIterator::SetTo (csBdNode* node,
 
 csBinaryDocNodeIterator::~csBinaryDocNodeIterator ()
 {
-  delete[] value;
+  cs_free (value);
 }
 
 void csBinaryDocNodeIterator::FastForward()
@@ -537,8 +512,8 @@ bool csBinaryDocNodeIterator::HasNext ()
 csRef<iDocumentNode> csBinaryDocNodeIterator::Next ()
 {
   csBdNode* nodeData = iteratedNode->ctGetItem (pos++);
-  csBinaryDocNode* retNode = parentNode->doc->GetPoolNode();
-  retNode->SetTo (nodeData, parentNode);
+  csBinaryDocNode* retNode =
+    parentNode->doc->GetPoolNode (nodeData, parentNode);
   FastForward();
   return csPtr<iDocumentNode> (retNode);
 }
@@ -557,22 +532,15 @@ size_t csBinaryDocNodeIterator::GetEndPosition ()
 //  csBdNode
 // =================================================
 
-csBdNode::csBdNode (uint32 newType)
+csBdNode::csBdNode (uint32 newType) : 
+  bdNode (0, newType | BD_NODE_MODIFIED), vstr (0)
 {
-  flags = newType | BD_NODE_MODIFIED;
-  value = 0;
-  vstr = 0;
-
   attrs = new csArray<csBdAttr*>;
   nodes = new csArray<csBdNode*>;
 }
 
-csBdNode::csBdNode ()
+csBdNode::csBdNode () : bdNode (0, BD_NODE_MODIFIED), vstr (0)
 {
-  flags = BD_NODE_MODIFIED;
-  value = 0;
-  vstr = 0;
-
   attrs = new csArray<csBdAttr*>;
   nodes = new csArray<csBdNode*>;
 }
@@ -581,7 +549,7 @@ csBdNode::~csBdNode ()
 {
   if (flags & BD_NODE_MODIFIED)
   {
-    delete[] vstr;
+    cs_free (vstr);
     size_t i;
     for (i = 0; i < attrs->GetSize (); i++)
       doc->FreeBdAttr (attrs->Get (i));
@@ -790,40 +758,24 @@ uint csBdNode::ctNum ()
 
 void csBinaryDocNode::DecRef ()
 {
-  csRefTrackerAccess::TrackDecRef (scfObject, scfRefCount);
-  if (scfRefCount == 1)
-  {
-    // Not needed atm
-    //scfRemoveRefOwners ();
-    //if (scfParent) scfParent->DecRef();
-    doc->RecyclePoolNode (this);
-    return;
-  }
-  scfRefCount--;
+  /* In case we're freed the doc's node pool will be accessed; to make sure
+     it's valid keep a ref to the doc while we're (potentially) destructed */
+  csRef<csBinaryDocument> tmp(doc);
+  scfPooledImplementationType::DecRef();
 }
 
-csBinaryDocNode::csBinaryDocNode () : scfImplementationType (this)
+csBinaryDocNode::csBinaryDocNode (csBdNode* ptr,
+			          csBinaryDocNode* parent)
+  : scfPooledImplementationType (this),
+    nodeData (ptr), 
+    vstr (0), vsptr (0), Parent (parent)
 {
-  vstr = 0;
-  vsptr = 0;
 }
 
 csBinaryDocNode::~csBinaryDocNode ()
 {
   CleanData();
-  delete vstr;
-}
-
-void csBinaryDocNode::SetTo (csBdNode* ptr,
-			     csBinaryDocNode* parent)
-{
-  CleanData();
-
-  // we have to keep a ref on the parent.
-  // RecyclePoolNode() takes care of DecRef()ing.
-  PoolNextOrParent = parent;
-  if (parent) parent->scfRefCount++;
-  nodeData = ptr;
+  cs_free (vstr);
 }
 
 csDocumentNodeType csBinaryDocNode::GetType ()
@@ -869,8 +821,8 @@ const char* csBinaryDocNode::nodeValueStr (csBdNode* nodeData)
   	  char buf[50];
 	  cs_snprintf (buf, sizeof (buf) - 1, "%" PRId32, 
 	    (int32)csLittleEndian::UInt32 (nodeData->value));
-	  delete[] vstr; 
-	  vstr = csStrNew (buf);
+	  cs_free (vstr); 
+	  vstr = CS::StrDup (buf);
 	  vsptr = nodeData;
 	}
 	return vstr;
@@ -882,8 +834,8 @@ const char* csBinaryDocNode::nodeValueStr (csBdNode* nodeData)
   	  char buf[50];
 	  cs_snprintf (buf, sizeof (buf) - 1, "%g", 
 	    csLongToFloat (csLittleEndian::UInt32 (nodeData->value)));
-	  delete[] vstr; 
-	  vstr = csStrNew (buf);
+	  cs_free (vstr);
+	  vstr = CS::StrDup (buf);
 	  vsptr = nodeData;
 	}
 	return vstr;
@@ -1048,8 +1000,8 @@ void csBinaryDocNode::SetValue (const char* value)
 {
   if (nodeData->flags & BD_NODE_MODIFIED)
   {
-    delete[] vstr; vstr = 0;
-    delete[] nodeData->vstr; nodeData->vstr = 0;
+    cs_free (vstr); vstr = 0;
+    cs_free (nodeData->vstr); nodeData->vstr = 0;
     int v;
     float f;
     if (value == 0) value = ""; 
@@ -1070,7 +1022,7 @@ void csBinaryDocNode::SetValue (const char* value)
     {
       nodeData->flags = (nodeData->flags & ~BD_VALUE_TYPE_MASK) | 
 	BD_VALUE_TYPE_STR;
-      nodeData->vstr = csStrNew (value);
+      nodeData->vstr = CS::StrDup (value);
     }
   }
 }
@@ -1079,7 +1031,7 @@ void csBinaryDocNode::SetValueAsInt (int value)
 {
   if (nodeData->flags & BD_NODE_MODIFIED)
   {
-    delete[] vstr; vstr = 0;
+    cs_free (vstr); vstr = 0;
     nodeData->flags = (nodeData->flags & ~BD_VALUE_TYPE_MASK) |
       BD_VALUE_TYPE_INT;
     nodeData->value = csLittleEndian::UInt32 ((int32)value);
@@ -1090,7 +1042,7 @@ void csBinaryDocNode::SetValueAsFloat (float value)
 {
   if (nodeData->flags & BD_NODE_MODIFIED)
   {
-    delete[] vstr; vstr = 0;
+    cs_free (vstr); vstr = 0;
     nodeData->flags = (nodeData->flags & ~BD_VALUE_TYPE_MASK) | 
       BD_VALUE_TYPE_FLOAT;
     nodeData->value = csLittleEndian::UInt32 (csFloatToLong (value));
@@ -1099,7 +1051,7 @@ void csBinaryDocNode::SetValueAsFloat (float value)
 
 csRef<iDocumentNode> csBinaryDocNode::GetParent ()
 {
-  return (iDocumentNode*) (PoolNextOrParent);
+  return (iDocumentNode*) (Parent);
 }
 
 csRef<iDocumentNodeIterator> csBinaryDocNode::GetNodes ()
@@ -1126,8 +1078,7 @@ csRef<iDocumentNode> csBinaryDocNode::GetNode (const char* value)
       csBdNode* nodeData = csBinaryDocNode::nodeData->ctGetItem (i);
       if (strcmp (nodeData->GetValueStr (doc), value) == 0)
       {
-	csBinaryDocNode* node = doc->GetPoolNode();
-	node->SetTo (nodeData, this);
+	csBinaryDocNode* node = doc->GetPoolNode (nodeData, this);
 	return csPtr<iDocumentNode> (node);
       }
     }
@@ -1211,8 +1162,7 @@ csRef<iDocumentNode> csBinaryDocNode::CreateNodeBefore (csDocumentNodeType type,
     if (newPos < 0) newPos = oldChildCount;
     nodeData->ctInsertBefore (newData, newPos);
 
-    csBinaryDocNode* newNode = doc->GetPoolNode ();
-    newNode->SetTo (newData, this);
+    csBinaryDocNode* newNode = doc->GetPoolNode (newData, this);
 
     return csPtr<iDocumentNode> (newNode);
   }
@@ -1314,8 +1264,7 @@ csRef<iDocumentAttribute> csBinaryDocNode::GetAttribute (const char* name)
       }
       nodeData->atInsertBefore (newAttr, newpos);
 
-      csBinaryDocAttribute* attr = doc->GetPoolAttr ();
-      attr->SetTo (newAttr, this);
+      csBinaryDocAttribute* attr = doc->GetPoolAttr (newAttr, this);
       return csPtr<iDocumentAttribute> (attr);
     }
     else
@@ -1326,8 +1275,7 @@ csRef<iDocumentAttribute> csBinaryDocNode::GetAttribute (const char* name)
   else
   {
     csBdAttr* ptr = nodeData->atGetItem (index);
-    csBinaryDocAttribute* attr = doc->GetPoolAttr ();
-    attr->SetTo (ptr, this);
+    csBinaryDocAttribute* attr = doc->GetPoolAttr (ptr, this);
     return csPtr<iDocumentAttribute> (attr);
   }
 
@@ -1336,10 +1284,10 @@ csRef<iDocumentAttribute> csBinaryDocNode::GetAttribute (const char* name)
 
 const char* csBinaryDocNode::GetAttributeValue (const char* name)
 {
-  csRef<iDocumentAttribute> attr = GetAttribute (name);
-  if (attr)
+  getAttributeValueStrKeeper = GetAttribute (name);
+  if (getAttributeValueStrKeeper)
   {
-    return attr->GetValue ();
+    return getAttributeValueStrKeeper->GetValue ();
   }
   else
   {
@@ -1452,10 +1400,16 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
 	(diskNode.flags & ~BD_VALUE_TYPE_MASK) | BD_VALUE_TYPE_STR_IMMEDIATE;
     // Hack: cram one more byte into value, if possible
     if ((newFlags & BE (0xff)) == 0) maximmvalue++;
-    if (strlen (nodeData->vstr) < maximmvalue)
+    size_t vstrsize = strlen (nodeData->vstr)+1;
+    if (vstrsize <= maximmvalue)
     {
       diskNode.value = 0;
-      strcpy ((char*)&diskNode.value, nodeData->vstr);
+      /* We really want to copy into value.
+       * Yes, it may spill over, that's by design.
+       * But since fortify will complain when that happens, copy into the
+       * diskNode struct directly, exploiting that value is the first
+       * member. */
+      memcpy (&diskNode, nodeData->vstr, vstrsize);
       diskNode.flags = (diskNode.flags & ~BD_VALUE_TYPE_MASK) | 
 	BD_VALUE_TYPE_STR_IMMEDIATE;
     }
@@ -1487,22 +1441,24 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
   CS_ALLOC_STACK_ARRAY(uint32, startsScratch, scratchSize);
   
   size_t attrStart = 0;
-  uint32 attrCount;
+  uint32 attrCount = 0;
   if (nodeData->flags & BD_NODE_HAS_ATTR)
   {
     attrStart = nodesFile->GetPos();
     attrCount = nodeData->atNum();
-    nodesFile->Write ((char*)&attrCount, sizeof(uint32));
+    uint32 diskAttrCount = csLittleEndian::UInt32 (attrCount); 
+    nodesFile->Write ((char*)&diskAttrCount, sizeof(uint32));
     nodesFile->Write ((char*)startsScratch, sizeof(uint32) * attrCount);
   }
 
   size_t childStart = 0;
-  uint32 childCount;
+  uint32 childCount = 0;
   if (nodeData->flags & BD_NODE_HAS_CHILDREN)
   {
     childStart = nodesFile->GetPos();
     childCount = nodeData->ctNum();
-    nodesFile->Write ((char*)&childCount, sizeof(uint32));
+    uint32 diskChildCount = csLittleEndian::UInt32 (childCount);
+    nodesFile->Write ((char*)&diskChildCount, sizeof(uint32));
     nodesFile->Write ((char*)startsScratch, sizeof(uint32) * childCount);
   }
 
@@ -1514,8 +1470,7 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
     {
       startsScratch[i] = csLittleEndian::UInt32 (
 	(uint32)(nodesFile->GetPos() - attrStart));
-      attr.AttachNew (doc->GetPoolAttr ());
-      attr->SetTo (nodeData->atGetItem (i), this);
+      attr.AttachNew (doc->GetPoolAttr (nodeData->atGetItem (i), this));
       attr->Store (nodesFile);
     }
     size_t attrEnd = nodesFile->GetPos ();
@@ -1532,8 +1487,7 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
     {
       startsScratch[i] = csLittleEndian::UInt32 (
 	(uint32)(nodesFile->GetPos() - childStart));
-      node.AttachNew (doc->GetPoolNode());
-      node->SetTo (nodeData->ctGetItem (i), this);
+      node.AttachNew (doc->GetPoolNode (nodeData->ctGetItem (i), this));
       node->Store (nodesFile);
     }
     size_t childEnd = nodesFile->GetPos ();
@@ -1556,8 +1510,7 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
 // =================================================
 
 csBinaryDocument::csBinaryDocument () : scfImplementationType (this),
-  root (0), nodePool (0), attrPool (0), attrAlloc (0), nodeAlloc (0),
-  outStrHash (0)
+  root (0), attrAlloc (0), nodeAlloc (0), outStrHash (0)
 {
 }
 
@@ -1565,18 +1518,6 @@ csBinaryDocument::~csBinaryDocument ()
 {
   if (root && (root->flags & BD_NODE_MODIFIED))
     delete root;
-  while (nodePool)
-  {
-    csBinaryDocNode *node = nodePool;
-    nodePool = node->PoolNextOrParent;
-    delete node;
-  }
-  while (attrPool)
-  {
-    csBinaryDocAttribute *attr = attrPool;
-    attrPool = attr->pool_next;
-    delete attr;
-  }
   delete attrAlloc;
   delete nodeAlloc;
 }
@@ -1605,78 +1546,28 @@ void csBinaryDocument::FreeBdNode (csBdNode* node)
   nodeAlloc->Free (node);
 }
 
-csBinaryDocNode* csBinaryDocument::GetPoolNode ()
+#include "csutil/custom_new_disable.h"
+
+csBinaryDocNode* csBinaryDocument::GetPoolNode (csBdNode* ptr,
+    csBinaryDocNode* parent)
 {
-  if (nodePool)
-  {
-    csBinaryDocNode *node = nodePool;
-    nodePool = nodePool->PoolNextOrParent;
-    node->doc = this;
-    // the node has to keep a ref on us. But to avoid
-    // a virtual function call, we increase our refcount
-    // 'manually'.
-    scfRefCount++;
-    return node;
-  }
-  else
-  {
-    csBinaryDocNode *node = new csBinaryDocNode ();
-    node->doc = this;
-    scfRefCount++;
-    return node;
-  }
+  csBinaryDocNode *node = new (nodePool) csBinaryDocNode (ptr, parent);
+  node->doc = this;
+  return node;
 }
 
-void csBinaryDocument::RecyclePoolNode (csBinaryDocNode *node)
+csBinaryDocAttribute* csBinaryDocument::GetPoolAttr (csBdAttr* ptr,
+  csBinaryDocNode* owner)
 {
-  csBinaryDocNode *parent;
-  parent = node->PoolNextOrParent;
-  node->PoolNextOrParent = nodePool;
-  nodePool = node;
-  if (parent)
-  {
-    if (parent->scfRefCount == 1)
-    {
-      RecyclePoolNode (parent);
-    }
-    else
-      parent->scfRefCount--;
-  }
-  // DecRef us.
-  if (scfRefCount == 1)
-  {
-    delete this;
-    return;
-  }
-  scfRefCount--;
+  return new (attrPool) csBinaryDocAttribute (ptr, owner);
 }
 
-csBinaryDocAttribute* csBinaryDocument::GetPoolAttr ()
-{
-  if (attrPool)
-  {
-    csBinaryDocAttribute* attr = attrPool;
-    attrPool = attrPool->pool_next;
-    return attr;
-  }
-  else
-  {
-    csBinaryDocAttribute* attr = new csBinaryDocAttribute ();
-    return attr;
-  }
-}
-
-void csBinaryDocument::RecyclePoolAttr (csBinaryDocAttribute *attr)
-{
-  attr->pool_next = attrPool;
-  attrPool = attr;
-}
+#include "csutil/custom_new_enable.h"
 
 csBinaryDocNode* csBinaryDocument::GetRootNode ()
 {
   csBinaryDocNode* rootNode;
-  rootNode = GetPoolNode();
-  rootNode->SetTo (root, 0);
+  rootNode = GetPoolNode (root, 0);
   return rootNode;
 }
 

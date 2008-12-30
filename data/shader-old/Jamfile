@@ -1,0 +1,16 @@
+SubDir TOP data shader-old ;
+
+rule InstallShaderOld
+{
+  InstallData $(1) : data shader-old $(2) ;
+}
+rule FilelistEntryShaderOld
+{
+  local listdir = $(2:E=.) ;
+
+  local file_gristed = $(1:G=$(listdir:J=!)) ;
+  FileListEntriesData $(file_gristed) : shader-old $(2) : data-runtime ;
+}
+
+Recurse InstallShaderOld : .afp .avp .fvp .xml .cgfp .cgvp .inp .cginc .inc ;
+Recurse FilelistEntryShaderOld : .afp .avp .fvp .xml .cgfp .cgvp .inp .cginc .inc ;

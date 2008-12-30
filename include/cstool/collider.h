@@ -35,6 +35,7 @@
 #include "ivaria/collider.h"
 
 struct iCamera;
+struct iCollection;
 struct iCollider;
 struct iCollideSystem;
 struct iEngine;
@@ -42,7 +43,6 @@ struct iMeshWrapper;
 struct iMovable;
 struct iObject;
 struct iTriangleMesh;
-struct iRegion;
 struct iSector;
 struct iTerrainSystem;
 
@@ -220,7 +220,7 @@ public:
    * the objects from that region will be initialized.
    */
   static void InitializeCollisionWrappers (iCollideSystem* colsys,
-  	iEngine* engine, iRegion* region = 0);
+      iEngine* engine, iCollection* collection = 0);
 
   /**
    * Test collision between one collider and an array of colliders.

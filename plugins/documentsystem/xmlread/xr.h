@@ -378,9 +378,10 @@ private:
 class TrDocumentAttributeSet
 {
 public:
-  csArray<TrDocumentAttribute> set;
+  csArray<TrDocumentAttribute, csArrayElementHandler<TrDocumentAttribute>,
+    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<4> > set;
 
-  TrDocumentAttributeSet() : set (0, 4) { }
+  TrDocumentAttributeSet() : set (0) { }
   size_t Find (const char * name) const;
   size_t FindExact (const char * reg_name) const;
 };
@@ -637,7 +638,7 @@ public:
   char* input_data;
 
   /// Create an empty document. Optional buf is given as input data.
-  TrDocument(char* buf = 0);
+  TrDocument(bool largeDoc, char* buf = 0);
 
   virtual ~TrDocument();
 
@@ -708,7 +709,7 @@ public:
       csString location;
       location.Format ("line %d", parse.linenum);
       if (errorPos != 0)
-        location.AppendFmt (":%zu", errorPos - parse.startOfLine + 1);
+        location.AppendFmt (":%tu", errorPos - parse.startOfLine + 1);
       errorDesc += location.GetDataSafe();
       if (!errorPath.IsEmpty())
       {

@@ -22,9 +22,11 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
+#include "csutil/eventhandlers.h"
 #include "csutil/scf.h"
 #include "csutil/stringarray.h"
 #include "csutil/sysfunc.h"
+#include "csutil/threadmanager.h"
 #include "csutil/util.h"
 
 #include "iutil/cfgmgr.h"
@@ -142,14 +144,14 @@ bool csReporterListener::Initialize (iObjectRegistry* r)
   object_reg = r;
   SetDefaults ();
 
-  PostProcess = csevPostProcess (object_reg);
+  Frame = csevFrame (object_reg);
   if (!eventHandler)
   {
     eventHandler.AttachNew (new EventHandler (this));
   }
   csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
-    q->RegisterListener (eventHandler, PostProcess);
+    q->RegisterListener (eventHandler, Frame);
 
   csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (r);
   if (cfg)
@@ -318,7 +320,7 @@ void csReporterListener::WriteLine (int severity, const char* msgID,
   }
 }
 
-bool csReporterListener::Report (iReporter*, int severity,
+THREADED_CALLABLE_IMPL4(csReporterListener, Report, iReporter*, int severity,
   const char* msgID, const char* description)
 {
   if (dest_alert[severity] && nativewm)
@@ -342,7 +344,7 @@ bool csReporterListener::Report (iReporter*, int severity,
 
 bool csReporterListener::HandleEvent (iEvent& event)
 {
-  if (event.Name == PostProcess)
+  if (event.Name == Frame)
   {
     CS::Threading::RecursiveMutexScopedLock lock (mutex);
     size_t l = messages.GetSize ();
@@ -521,6 +523,78 @@ void csReporterListener::SetMessageDestination (int severity,
   dest_alert[severity] = do_alert;
   dest_debug[severity] = do_debug;
   dest_popup[severity] = do_popup;
+}
+
+void csReporterListener::SetStandardOutput (int severity, bool en)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  dest_stdout[severity] = en;
+}
+
+bool csReporterListener::IsStandardOutput (int severity)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  return dest_stdout[severity];
+}
+
+void csReporterListener::SetStandardError (int severity, bool en)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  dest_stderr[severity] = en;
+}
+
+bool csReporterListener::IsStandardError (int severity)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  return dest_stderr[severity];
+}
+
+void csReporterListener::SetConsoleOutput (int severity, bool en)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  dest_console[severity] = en;
+}
+
+bool csReporterListener::IsConsoleOutput (int severity)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  return dest_console[severity];
+}
+
+void csReporterListener::SetAlertOutput (int severity, bool en)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  dest_alert[severity] = en;
+}
+
+bool csReporterListener::IsAlertOutput (int severity)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  return dest_alert[severity];
+}
+
+void csReporterListener::SetDebugOutput (int severity, bool en)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  dest_debug[severity] = en;
+}
+
+bool csReporterListener::IsDebugOutput (int severity)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  return dest_debug[severity];
+}
+
+void csReporterListener::SetPopupOutput (int severity, bool en)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  dest_popup[severity] = en;
+}
+
+bool csReporterListener::IsPopupOutput (int severity)
+{
+  CS_ASSERT (severity >= 0 && severity <= 4);
+  return dest_popup[severity];
 }
 
 void csReporterListener::RemoveMessages (int severity, bool remove)

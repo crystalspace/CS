@@ -59,7 +59,7 @@ private:
 
   /// The sound source.
   csRef<iSndSysSource> sndsource;
-  csRef<iSndSysSourceSoftware3D> sndsource3d;
+  csRef<iSndSysSource3D> sndsource3d;
 
   /// The model that moves with the sound.
   csRef<iMeshWrapper> sprite;
@@ -69,6 +69,8 @@ private:
 
   /// Current angle.
   float cur_angle;
+
+  csRef<FramePrinter> printer;
 
   /**
    * Handle keyboard events - ie key presses and releases.
@@ -82,13 +84,7 @@ private:
    * is called from the event handler in response to a cscmdProcess
    * broadcast message.
    */
-  void ProcessFrame ();
-
-  /**
-   * Finally render the screen. This routine is called from the event
-   * handler in response to a cscmdFinalProcess broadcast message.
-   */
-  void FinishFrame ();
+  void Frame ();
 
   /// Here we will create our little, simple world.
   bool CreateRoom ();

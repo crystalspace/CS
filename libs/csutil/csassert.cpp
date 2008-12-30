@@ -64,6 +64,13 @@ namespace CS
 	fflush (stderr);
 	stack->Free();
       }
+      
+      const char* dumpMemoryEnv = getenv ("CS_ASSERT_DUMPALLOC");
+      if (!dumpMemoryEnv || (atoi (dumpMemoryEnv) != 0))
+      {
+	if (VerifyAllMemory())
+	  DumpAllocateMemoryBlocks();
+      }
 
       assertCnt--;
       

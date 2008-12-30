@@ -28,19 +28,24 @@ namespace CS
   namespace Debug
   {
 
-    static void Demangle (const char* symbol, csString& str)
+    static char* Demangle (const char* symbol)
     {
+    #if defined(CS_COMPILER_GCC)
+      /* Workaround: sometimes symbols are tried to be demangled which are
+       * not method or function names; occasionally, libstdc++ chokes on
+       * these. So don't try to demangle these */
+      if ((symbol[0] != '_') || (symbol[1] != 'Z'))
+        return strdup (symbol);
+    #endif
     #ifdef CS_HAVE_ABI_CXA_DEMANGLE
       {
         int status;
         char* s = abi::__cxa_demangle (symbol, 0, 0, &status);
-        if (status == 0)
-          str = s;
+        if (status == 0) return s;
         if (s != 0) free (s);
-        if (status == 0) return;
       }
     #endif
-      str = symbol;
+      return strdup (symbol);
     }
 
   } // namespace Debug

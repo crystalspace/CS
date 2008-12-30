@@ -1,6 +1,6 @@
 # configure.ac                                                 -*- Autoconf -*-
 #==============================================================================
-# Copyright (C)2003-2006 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2003-2008 by Eric Sunshine <sunshine@sunshineco.com>
 #
 # Autoconf input script for Crystal Space.  Process this file with
 # CS/bin/autogen.sh to produce a configure script.
@@ -10,11 +10,10 @@ AC_PREREQ([2.56])
 
 #------------------------------------------------------------------------------
 # cs_version_number
-#	Keep this value synchronized with CS/include/csver.h.
-#       Also, mk/autoconf/crystal.m4 should be updated with the current version
-#         number.
+#	Keep this value synchronized with CS/include/csver.h,
+#	CS/docs/texinfo/version.txi, and CS/mk/autoconf/crystal.m4.
 #------------------------------------------------------------------------------
-m4_define([cs_version_number], [1.3])
+m4_define([cs_version_number], [1.9])
 
 
 
@@ -24,18 +23,20 @@ m4_define([cs_version_number], [1.3])
 AC_INIT([crystalspace], [cs_version_number],
         [crystal-main@lists.sourceforge.net])
 CS_PACKAGEINFO([Crystal Space],
-    [Copyright (C)1998-2007 Jorrit Tyberghein and others],
+    [Copyright (C)1998-2008 Jorrit Tyberghein and others],
     [http://www.crystalspace3d.org/])
 AC_CONFIG_SRCDIR([libs/Jamfile])
 AC_CONFIG_AUX_DIR([mk/autoconf])
 AC_CANONICAL_HOST
-CS_CHECK_MNO_CYGWIN
+CS_PATH_INIT
 
 
 
 #------------------------------------------------------------------------------
 # Check for compilers and linker.
 #------------------------------------------------------------------------------
+CS_CHECK_MNO_CYGWIN
+
 CS_PROG_CC
 CS_PROG_CXX
 CS_PROG_LINK
@@ -45,11 +46,9 @@ AC_PROG_CXXCPP
 CS_EMIT_BUILD_PROPERTY([CMD.C++CPP], [$CXXCPP])
 
 AS_IF([test $ac_compiler_gnu = yes],
-    [cs_compiler_name=GCC CS_HEADER_PROPERTY([CS_COMPILER_GCC])],
-    [cs_compiler_name="AS_TR_CPP([$CXX])"])
-CS_EMIT_BUILD_PROPERTY([COMPILER.TYPE], [$cs_compiler_name])
+    [CS_HEADER_PROPERTY([CS_COMPILER_GCC])])
 CS_HEADER_PROPERTY([CS_COMPILER_NAME],
-    [AS_ESCAPE(["])$cs_compiler_name[]AS_ESCAPE(["])])
+    [AS_ESCAPE(["])$cs_compiler_name_cxx[]AS_ESCAPE(["])])
 
 
 
@@ -75,7 +74,9 @@ CS_EMIT_BUILD_PROPERTY([CMD.HHC], [$HHC])
 CS_CHECK_PROGS([SWIG], [swig])
 AS_IF([test -n "$SWIG"],
     [CS_CHECK_PROG_VERSION([swig], [$SWIG -version 2>&1], [1.3.21],
-	[9.9|.9], [CS_EMIT_BUILD_PROPERTY([CMD.SWIG], [$SWIG])])])
+	[9.9|.9],
+        [CS_EMIT_BUILD_PROPERTY([CMD.SWIG], [$SWIG])
+        CS_EMIT_BUILD_PROPERTY([CMD.SWIG.VERSION], [$cs_prog_swig_version])])])
 
 CS_CHECK_COMMON_TOOLS_ICONS
 
@@ -148,7 +149,7 @@ CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [$LDFLAGS], [+])
 
 
 #------------------------------------------------------------------------------
-# Check for typical required libraries (libm, libmx, libdl, libnsl).
+# Check for typical required libraries (libc, libm, libmx, libdl, libnsl).
 #------------------------------------------------------------------------------
 AC_LANG_PUSH([C++])
 AC_CHECK_HEADERS([cmath], [CS_HEADER_PROPERTY([CS_HAVE_CMATH_H])])
@@ -158,14 +159,8 @@ AC_LANG_POP([C++])
 
 CS_CHECK_COMMON_LIBS
 
-AS_IF([test $ac_cv_lib_m_pow = yes || test $ac_cv_lib_m_cosf = yes],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lm], [+])])
-AS_IF([test $ac_cv_lib_mx_cosf = yes],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lmx], [+])])
 AS_IF([test $ac_cv_lib_dl_dlopen = yes],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-ldl], [+])])
-AS_IF([test $ac_cv_lib_nsl_gethostbyname = yes],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [-lnsl], [+])])
+    [AC_CHECK_LIB([dl], [dladdr], [CS_HEADER_PROPERTY([CS_HAVE_DLADDR])])])
 
 AS_IF([test $ac_cv_lib_m_cosf != no || test $ac_cv_lib_mx_cosf != no],
     [CS_HEADER_PROPERTY([CS_HAVE_MATH_H_FLOAT_FUNCS])])
@@ -224,7 +219,34 @@ CS_CHECK_RTLD
 
 
 #------------------------------------------------------------------------------
-# Determine host platform.  Recognized families: Unix, Windows, MacOS/X.
+# Check for SIMD flags
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx],
+    [CS_CREATE_TUPLE([-mmmx])])
+CS_CHECK_BUILD_FLAGS([for -msse flag], [cs_cv_prog_cc_msse],
+    [CS_CREATE_TUPLE([-msse])])
+CS_CHECK_BUILD_FLAGS([for -msse2 flag], [cs_cv_prog_cc_msse2],
+    [CS_CREATE_TUPLE([-msse2])])
+CS_CHECK_BUILD_FLAGS([for -mfpmath=sse flag], [cs_cv_prog_cc_mfpmath_sse],
+    [CS_CREATE_TUPLE([-mfpmath=sse])])
+
+AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],[+])])
+
+AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
+    [CS_CHECK_BUILD([for mmintrin.h],
+        [cs_cv_header_mmintrin_h],
+        [AC_LANG_PROGRAM([[#include <mmintrin.h>]], [])],
+        [CS_CREATE_TUPLE([$cs_cv_prog_cc_mmmx])],
+        [C++],
+        [CS_HEADER_PROPERTY([CS_SUPPORTS_MMX])
+        CS_EMIT_BUILD_PROPERTY([CS_SUPPORTS_MMX], [yes])])])
+
+
+
+#------------------------------------------------------------------------------
+# Determine host platform.  Recognized platforms: Unix, Windows, Mac OS X.
+# Recognized families: Unix, Windows.
 #
 # CS_CHECK_HOST
 #	Sets the shell variables cs_host_target and cs_host_family.  Client
@@ -232,18 +254,32 @@ CS_CHECK_RTLD
 #	CS_PLATFORM_FOO header define.
 #------------------------------------------------------------------------------
 CS_CHECK_HOST
-AS_IF([test "x$cs_host_macosx" = "xyes"],
-    [# We assume that we always have CoreAudio available on MacOS/X.
-    CS_EMIT_BUILD_PROPERTY([COREAUDIO.AVAILABLE], [yes])
-    CS_EMIT_BUILD_PROPERTY([COREAUDIO.LFLAGS], [-framework CoreAudio -framework AudioToolbox])
-    CS_HEADER_PROPERTY([CS_PLATFORM_MACOSX])],
-    [case $cs_host_family in
-	windows)
-	    CS_HEADER_PROPERTY([CS_PLATFORM_WIN32])
-	    ;;
-	unix)
-	    CS_HEADER_PROPERTY([CS_PLATFORM_UNIX])
-    esac])
+case $cs_host_target in
+    macosx)
+        # We assume that we always have CoreAudio available on MacOS/X.
+        CS_EMIT_BUILD_PROPERTY([COREAUDIO.AVAILABLE], [yes])
+        CS_EMIT_BUILD_PROPERTY([COREAUDIO.LFLAGS],
+	    [-framework CoreAudio -framework AudioToolbox])
+        CS_HEADER_PROPERTY([CS_PLATFORM_MACOSX])
+        AS_IF([test -n "$cs_cv_prog_cc_msse"],
+            [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
+             [$cs_cv_prog_cc_msse], [+])])
+        AS_IF([test -n "$cs_cv_prog_cc_msse2"],
+            [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
+             [$cs_cv_prog_cc_msse2], [+])])
+        AS_IF([test -n "$cs_cv_prog_cc_mfpmath_sse"],
+            [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
+             [$cs_cv_prog_cc_mfpmath_sse], [+])])
+        ;;
+esac
+case $cs_host_family in
+    windows)
+	CS_HEADER_PROPERTY([CS_PLATFORM_WIN32])
+	;;
+    unix)
+	CS_HEADER_PROPERTY([CS_PLATFORM_UNIX])
+        ;;
+    esac
 CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
     [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
 
@@ -371,7 +407,13 @@ AC_DEFUN([CS_JAVA_FLAGS],
 	    AS_IF([test -n "$cs_java_platform"],
 		[$1_cflags="$$1_cflags
 		    $$1_cflags/$cs_java_platform"])
-	    $1_cflags=CS_PATH_NORMALIZE([$$1_cflags])])])])
+	    $1_cflags=CS_PATH_NORMALIZE([$$1_cflags])
+	    for i in `find "$$1_dir/" -name '*jvm.*' -print`; do
+	        echo `AS_DIRNAME([$i])`; done | sort | uniq > conftest.jlib
+	    $1_lflags=`sed 's/^\(.*\)$/-L\1/' < conftest.jlib`
+	    $1_lflags=CS_PATH_NORMALIZE([$$1_lflags])
+	    rm -f conftest.jlib
+	    $1_libs="-ljvm"])])])
 
 JAVA_HOME=CS_PATH_NORMALIZE([$JAVA_HOME])
 
@@ -403,7 +445,8 @@ AS_IF([test "$with_java" != no && test -n "$JAVAC" && test -n "$JAVA"],
 	    #endif
 	    #endif
 	    #include <jni.h>
-	    JNIEXPORT void JNICALL f(JNIEnv* env, jobject obj);]])],
+	    JNIEXPORT void JNICALL f(JNIEnv* env, jobject obj);]],
+	    [JNI_GetCreatedJavaVMs(0,0,0);])],
 	[CS_CREATE_TUPLE() \
         CS_CREATE_TUPLE([$cs_java_cflags],[$cs_java_lflags],[$cs_java_libs])],
 	[], [CS_EMIT_BUILD_RESULT([cs_cv_java], [JAVA])])])
@@ -418,12 +461,7 @@ CS_EMIT_BUILD_PROPERTY([ANT], [$ANT])
 # a few plugin modules take advantage of it, so they need to know if it is
 # available.
 #------------------------------------------------------------------------------
-CS_CHECK_BUILD([for STL], [cs_cv_libstl],
-    [AC_LANG_PROGRAM(
-	[[#include <map>
-	#include <string>]],
-	[[std::map<std::string,int> m; m.begin();]])],
-    [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libstl], [STL])])
+CS_CHECK_STL([CS_EMIT_BUILD_RESULT([cs_cv_libstl], [STL])])
 
 
 
@@ -453,6 +491,11 @@ CS_COMPILER_IGNORE_PRAGMAS([C++], [cs_cv_prog_cxx_ignore_unknown_pragmas],
 CS_COMPILER_IGNORE_LONG_DOUBLE([C++], [cs_cv_prog_cxx_ignore_long_double],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MANDATORY],
 	[$cs_cv_prog_cxx_ignore_long_double], [+])])
+
+CS_COMPILER_IGNORE_NON_VIRTUAL_DTOR([C++],
+    [cs_cv_prog_cxx_ignore_non_virtual_dtor],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS.WARNING.NO_NON_VIRTUAL_DTOR],
+        [$cs_cv_prog_cxx_ignore_non_virtual_dtor])])
 
 
 
@@ -619,95 +662,27 @@ CS_EMIT_BUILD_FLAGS([how to disable function inlining],
 
 
 #------------------------------------------------------------------------------
-# Check if "hidden" visibilty for inline functions is supported.
-#
-# IMPLEMENTATION NOTES
-#
-# There is an obscure bug in gcc 3.4.x and at least up to 4.1.1 where
-# -fvisibility-inlines-hidden on AMD64 in combination with -fPIC and -shared
-# flags causes the linker to fail with a bogus error stating that the target
-# library needs to be built with -fPIC even when it has been built using that
-# option. On such installations, if Crystal Space is built with
-# -fvisibility-inlines-hidden, then clients liking against Crystal Space
-# experience this bogus error.  Normally, we would test for this anomaly by
-# manipulating a std::basic_string<> in a test program, and avoid
-# -fvisibility-inlines-hidden if the test program fails to link, however,
-# practical experience has shown that this test is not 100% reliable for all
-# such installations. Instead, for simplicity, we disable this flag presently
-# for gcc on AMD64.  References:
-#
-#     http://dev.gentoo.org/~kugelfang/pappy-visibility.txt
-#     http://www.gnu.org/software/gcc/gcc-4.0/changes.html#visibility
-#     http://www.nedprod.com/programs/gccvisibility.html
-#     http://bugs.gentoo.org/show_bug.cgi?id=78720
-#     http://trac.crystalspace3d.org/trac/CS/ticket/333
-#
-# Furthermore, there seems to be a bug on MacOS/X with gcc 4.0.x where use of
-# -fvisibility-inlines-hidden causes link problems with external clients which
-# do not specify this flag.  For this reason, we also disable this flag on
-# MacOS/X.  In particular, clients receive errors of this sort:
-#
-#    /usr/bin/ld: libcrystalspace.a(scf.o) malformed object, illegal
-#        reference for -dynamic code (reference to a coalesced section
-#        (__TEXT,__textcoal_nt) from section (__TEXT,__text) relocation
-#        entry (1))
+# Check how to declare symbol visibility.
 #------------------------------------------------------------------------------
-CS_CHECK_BUILD_FLAGS([for inline visibility flag],
-    [cs_cv_prog_cxx_visibility_inlines_hidden],
-    [CS_CREATE_TUPLE([-fvisibility-inlines-hidden])],[C++])
-
-AS_IF([test -n "$cs_cv_prog_cxx_visibility_inlines_hidden"],
-    [# The test below can be uncommented and adjusted once a non-buggy gcc 
-    # version is found.
-    #CS_CHECK_PROG_VERSION([g++], [$CXX --version], [4.1], [9.9|.9],
-    #   [cs_cv_gxx_version_buggy=no],
-    #   [cs_cv_gxx_version_buggy=yes])
-    AC_CACHE_CHECK([if $cs_cv_prog_cxx_visibility_inlines_hidden is buggy],
-	[cs_cv_prog_cxx_visibility_inlines_hidden_buggy],
-	[AS_IF([test $ac_compiler_gnu = yes],
-	    [AS_IF([test $host_cpu = x86_64 || test x$cs_host_macosx = xyes], 
-		[cs_cv_prog_cxx_visibility_inlines_hidden_buggy=yes],
-		[cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])],
-	    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])])],
-    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])
-
-AS_IF([test $cs_cv_prog_cxx_visibility_inlines_hidden_buggy != yes],
+CS_VISIBILITY_FLAG_INLINES_HIDDEN(
     [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS],
-	[$cs_cv_prog_cxx_visibility_inlines_hidden], [+])])
+	[$cs_prog_cxx_visibility_inlines_hidden], [+])])
 
-
-
-#------------------------------------------------------------------------------
-# Check how to set default symbol visibility, and how to override the setting
-# in code.
-#------------------------------------------------------------------------------
-CS_CHECK_BUILD_FLAGS([for "hidden" symbol visibility flag],
-    [cs_cv_prog_cc_visibility_hidden],
-    [CS_CREATE_TUPLE([-fvisibility=hidden])])
-AS_IF([test -n "$cs_cv_prog_cc_visibility_hidden"],
+CS_VISIBILITY_FLAG_HIDDEN([C], [],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], 
-	[$cs_cv_prog_cc_visibility_hidden], [+])])
+	[$cs_cv_prog_c_visibility_hidden], [+])])
 
-CS_CHECK_BUILD_FLAGS([for "default" symbol visibility flag],
-    [cs_cv_prog_cc_visibility_default],
-    [CS_CREATE_TUPLE([-fvisibility=default])])
-AS_IF([test -n "$cs_cv_prog_cc_visibility_default"],
+CS_VISIBILITY_FLAG_DEFAULT([C], [],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.VISIBILITY_DEFAULT], 
-	[$cs_cv_prog_cc_visibility_default])])
+	[$cs_cv_prog_c_visibility_default])])
 
-CS_SYMBOL_QUALIFIER([how to declare default visibility],
-    [cs_cv_prog_cxx_declare_visible_def],
-    [__attribute__((visibility("default")))], [], [C++])
-AS_IF([test $cs_cv_prog_cxx_declare_visible_def != no],
-    [CS_HEADER_PROPERTY([CS_VISIBILITY_DEFAULT],
-	[$cs_cv_prog_cxx_declare_visible_def])])
-
-CS_SYMBOL_QUALIFIER([how to declare hidden visibility],
-    [cs_cv_prog_cxx_declare_visible_hidden],
-    [__attribute__((visibility("hidden")))], [], [C++])
-AS_IF([test $cs_cv_prog_cxx_declare_visible_hidden != no],
+CS_VISIBILITY_DECLARE_HIDDEN([C++], [],
     [CS_HEADER_PROPERTY([CS_VISIBILITY_HIDDEN],
-	[$cs_cv_prog_cxx_declare_visible_hidden])])
+	[$cs_cv_prog_cxx_declare_visibility_hidden])])
+
+CS_VISIBILITY_DECLARE_DEFAULT([C++], [],
+    [CS_HEADER_PROPERTY([CS_VISIBILITY_DEFAULT],
+	[$cs_cv_prog_cxx_declare_visibility_default])])
 
 
 
@@ -1104,7 +1079,13 @@ AS_IF([test $cs_cv_libgl = yes],
         [CS_HEADER_PROPERTY([CS_HAVE_GLHANDLEARB_T])])
     CS_CHECK_OPENGL_TYPE([GLcharARB],
         [CS_HEADER_PROPERTY([CS_HAVE_GLCHARARB_T])]) 
-    CS_CHECK_OPENGL_TYPE([GLchar], [CS_HEADER_PROPERTY([CS_HAVE_GLCHAR_T])])])
+    CS_CHECK_OPENGL_TYPE([GLchar], 
+        [CS_HEADER_PROPERTY([CS_HAVE_GLCHAR_T])])
+    CS_CHECK_OPENGL_TYPE([GLintptr],
+        [CS_HEADER_PROPERTY([CS_HAVE_GLINTPTR_T])])
+    CS_CHECK_OPENGL_TYPE([GLsizeiptr],
+        [CS_HEADER_PROPERTY([CS_HAVE_GLSIZEIPTR_T])])
+    ])
 CS_CHECK_GLU
 CS_CHECK_GLX
 # Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_ present.
@@ -1230,18 +1211,32 @@ CS_CHECK_LIB_WITH([mng],
 
 
 #------------------------------------------------------------------------------
-# Check for MikMod.  In addition to the standard installed locations, we also
-# search CS/libs/libmikmod*.
+# Check for vgvm. (And it's dependencies, cairo and cairomm.)
 #------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([mikmod],
+CS_CHECK_LIB_WITH([cairo],
     [AC_LANG_PROGRAM(
-	[[#include <mikmod.h>]],
-	[MikMod_Init("mikmodtest"); MikMod_Exit();])],
-    [$srcdir/libs/libmikmod*], [],
-    [CS_EMIT_BUILD_RESULT([cs_cv_libmikmod], [MIKMOD])], [],
-    [$cs_cv_sys_pthread_cflags],
-    [$cs_cv_sys_pthread_lflags],
-    [$cs_cv_sys_pthread_libs])
+	[[#include <cairo.h>]],
+	[cairo_create (0)])],
+    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcairo], [CAIRO])])
+
+CS_CHECK_LIB_WITH([cairomm],
+    [AC_LANG_PROGRAM(
+	[[#include <cairomm/cairomm.h>]],
+	[Cairo::Context c ((cairo_t*)0)])],
+    [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libcairomm], [CAIROMM])], [],
+    [$cs_cv_libcairo_cflags],
+    [$cs_cv_libcairo_lflags],
+    [$cs_cv_libcairo_libs],
+    [cairomm-1, cairomm-1.0])
+
+CS_CHECK_LIB_WITH([vgvm],
+    [AC_LANG_PROGRAM(
+	[[#include <vgvm/vgvm.h>]],
+	[new vgvm::Program (0,0)])],
+    [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libvgvm], [VGVM])], [],
+    [$cs_cv_libcairomm_cflags],
+    [$cs_cv_libcairomm_lflags],
+    [$cs_cv_libcairomm_libs])
 
 
 
@@ -1278,7 +1273,30 @@ AS_IF([test "$cs_cv_libvorbis" = yes],
 	[$cs_cv_libogg_lflags $cs_cv_libvorbis_lflags],
 	[$cs_cv_libogg_libs $cs_cv_libvorbis_libs])])
 
+#------------------------------------------------------------------------------
+# Check for Speex.  In addition to the standard installed locations, we
+# also search CS/libs/libspeex*
+#------------------------------------------------------------------------------
+AS_IF([test $cs_cv_libogg = yes],
+    [CS_CHECK_LIB_WITH([speex],
+	[AC_LANG_PROGRAM([[#include <speex/speex.h>]],
+	  [SpeexBits bits; speex_bits_init(&bits);])],
+	[$srcdir/libs/libspeex.*], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libspeex], [SPEEX])], [],
+	[$cs_cv_libogg_cflags],
+	[$cs_cv_libogg_lflags],
+	[$cs_cv_libogg_libs])])
 
+#------------------------------------------------------------------------------
+# Check for speex_header_free().
+#------------------------------------------------------------------------------
+AS_IF([test $cs_cv_libspeex = yes],
+    [CS_CHECK_BUILD([for speex_header_free()], [cs_cv_speex_header_free],
+	[AC_LANG_PROGRAM([[#include <speex/speex_header.h>]],
+	  [SpeexHeader* header = 0; speex_header_free(header);])],
+	[], [C++],
+	[CS_HEADER_PROPERTY([CS_HAVE_SPEEX_HEADER_FREE])], [], [],
+	[$cs_cv_libspeex_cflags], [$cs_cv_libspeex_lflags], [$cs_cv_libspeex_libs])])
 
 #------------------------------------------------------------------------------
 # Check for lib3ds.  In addition to the standard installed locations, we also
@@ -1300,12 +1318,17 @@ AS_IF([test $cs_cv_lib3ds = yes],
 	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_lib3ds], [3DS])], [], [],
 	[$cs_cv_lib3ds_cflags], [$cs_cv_lib3ds_lflags], [$cs_cv_lib3ds_libs])
 	AS_IF([test $cs_cv_lib3ds_recent = yes],
-	    [CS_CHECK_BUILD([if lib3ds version is >= 1.3.0], [cs_cv_lib3ds_1_3],
+	    [CS_CHECK_BUILD([for generic lib3ds data I/O callbacks],
+	    [cs_cv_lib3ds_1_3],
 	    [AC_LANG_PROGRAM([[#include <lib3ds/io.h>
-	        size_t DataReadFunc (void *self, void *buffer, size_t size) {}]],
+	        size_t DataReadFunc (void *self, void *buffer, size_t n) {}]],
 	        [lib3ds_io_new (0, 0, 0, 0, DataReadFunc, 0)])],
-	    [], [C++], [CS_EMIT_BUILD_PROPERTY([LIB3DS.ONE_THREE_OH], [yes])], [], [],
-	    [$cs_cv_lib3ds_cflags], [$cs_cv_lib3ds_lflags], [$cs_cv_lib3ds_libs])])])
+	    [], [C++],
+	    [CS_EMIT_BUILD_PROPERTY([LIB3DS.GENERIC_DATA_IO_CALLBACKS],[yes])],
+	    [], [],
+	    [$cs_cv_lib3ds_cflags],
+	    [$cs_cv_lib3ds_lflags],
+	    [$cs_cv_lib3ds_libs])])])
 
 
 
@@ -1342,23 +1365,33 @@ AS_IF([test $cs_cv_libode_opcode = yes],
 #------------------------------------------------------------------------------
 # Check for bullet physics library.
 #------------------------------------------------------------------------------
+# Note: The pkg-config package name for Bullet 2.x is 'bullet', but the actual
+# libraries are bulletdynamics, bulletcollision and bulletmath. So note that
+# there is actually no 'bullet' library.
 CS_CHECK_LIB_WITH([bullet],
-    [AC_LANG_PROGRAM([[
-    #include <BroadphaseCollision/SimpleBroadphase.h>
-    #include <CcdPhysics/CcdPhysicsController.h>
-    #include <CcdPhysics/CcdPhysicsEnvironment.h>
-    #include <CollisionDispatch/CollisionDispatcher.h>
-    ]],
-    [CollisionDispatcher d;
-    SimpleBroadphase b;
-    CcdPhysicsEnvironment* e = new CcdPhysicsEnvironment (&d, &b)])],
-    [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libbullet], [BULLET])], [],
-    [], [], 
-    [-lbulletccdphysics \
-    -lbulletphysicsinterfacecommon \
-    -lbulletdynamics \
-    -lbullet])
+    [AC_LANG_PROGRAM(
+      [[#include "btBulletDynamicsCommon.h"
+      #include "btBulletCollisionCommon.h"]],
+      [btCollisionDispatcher* d;
+      btBroadphaseInterface* b;
+      btSequentialImpulseConstraintSolver* s;
+      btDefaultCollisionConfiguration* c;
+      btDynamicsWorld* world = new btDiscreteDynamicsWorld (d, b, s, c)])],
+    [], [C++], [], [],
+    [], [], [-lbulletdynamics -lbulletcollision -lbulletmath],
+    [bulletdynamics])
 
+AS_IF([test $cs_cv_libbullet = yes],
+    [CS_CHECK_BUILD([if bullet is sufficiently recent (>=2.68)], [cs_cv_bullet_recent],
+	[AC_LANG_PROGRAM(
+	    [[#include "btBulletDynamicsCommon.h"]],
+	    [btManifoldPoint *p = new btManifoldPoint();
+             p->m_appliedImpulse;])],
+	[], [C++],
+	[CS_EMIT_BUILD_RESULT([cs_cv_bullet_recent], [BULLET])], [], [],
+	[$cs_cv_libbullet_cflags],
+	[$cs_cv_libbullet_lflags],
+	[$cs_cv_libbullet_libs])])
 
 
 #------------------------------------------------------------------------------
@@ -1380,18 +1413,14 @@ AC_DEFUN([CS_CHECK_LIBOPENAL],
     [AC_REQUIRE([CS_CHECK_COMMON_LIBS])
     CS_CHECK_BUILD([for OpenAL], [cs_cv_libopenal],
 	[AC_LANG_PROGRAM(
-	    [CS_AL_INCLUDE([CS_OPENAL_PATH],[AL],[alut.h])],
-	    [alutInit(0,0);])],
+	    [CS_AL_INCLUDE([CS_OPENAL_PATH],[AL],[alc.h])],
+	    [alcCreateContext (0,0);])],
 	[CS_CREATE_TUPLE([-DCS_OPENAL_PATH=OpenAL],[],[-framework OpenAL]) \
 	CS_CREATE_TUPLE([],[],[-lopenal]) \
 	CS_CREATE_TUPLE([],[],[-lopenal32]) \
-	CS_CREATE_TUPLE([],[],[-lalut -lopenal]) \
-	CS_CREATE_TUPLE([],[],[-lalut -lopenal32]) \
-	CS_CREATE_TUPLE([],[],[-lALut -lOpenAL32]) \
+	CS_CREATE_TUPLE([],[],[-lOpenAL32]) \
 	CS_CREATE_TUPLE([],[],[-lopenal -ldsound]) \
-	CS_CREATE_TUPLE([],[],[-lopenal32 -ldsound]) \
-	CS_CREATE_TUPLE([],[],[-lalut -lopenal -ldsound]) \
-	CS_CREATE_TUPLE([],[],[-lalut -lopenal32 -ldsound])], [],
+	CS_CREATE_TUPLE([],[],[-lopenal32 -ldsound])], [],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libopenal], [OPENAL])], [], [],
 	[$cs_cv_sys_pthread_cflags],
 	[$cs_cv_sys_pthread_lflags],
@@ -1482,26 +1511,6 @@ AS_IF([test $cs_cv_libcal3d = yes],
 
 
 #------------------------------------------------------------------------------
-# Check for SDL.
-#------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([sdl],
-    [AC_LANG_PROGRAM(
-	[[#include <SDL.h>
-	#undef main]],
-	[SDL_Init(0); SDL_Quit();])])
-
-AS_IF([test $cs_cv_libsdl = yes],
-    [CS_CHECK_BUILD([if SDL is sufficiently recent], [cs_cv_sdl_recent],
-	[AC_LANG_PROGRAM(
-	    [[#include <SDL.h>
-	    #undef main]],
-	    [SDL_EnableKeyRepeat(0,0)])],
-	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_libsdl], [SDL])], [], [],
-	[$cs_cv_libsdl_cflags], [$cs_cv_libsdl_lflags], [$cs_cv_libsdl_libs])])
-
-
-
-#------------------------------------------------------------------------------
 # Check for wxWidgets. Also check if it was built with OpenGL support since it
 # is required by the Crystal Space wxWidgets canvas.
 #
@@ -1544,7 +1553,8 @@ AS_IF([test $cs_cv_libwx = yes],
 	    #endif
 	    #include "wx/glcanvas.h"
 	    ]],
-	    [wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY, wxPoint()); glVertex3f(0,0,0)])],
+	    [wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY, wxPoint());
+	    glVertex3f(0,0,0)])],
 	[CS_CREATE_TUPLE(
 	    [$cs_cv_libwx_cflags],
 	    [$cs_cv_libwx_lflags],
@@ -1599,7 +1609,7 @@ CS_CHECK_LIB_WITH([GTK],
     [CS_EMIT_BUILD_RESULT([cs_cv_libGTK], [GTK])], [], [], [], [], [gtk+-2.0])
 
 AS_IF([test $cs_cv_libGTK = yes],
-    [CS_CHECK_BUILD([if gtk_message_dialog_format_secondary_text is available], 
+    [CS_CHECK_BUILD([if gtk_message_dialog_format_secondary_text is available],
         [cs_cv_GTK_gtk_message_dialog_format_secondary_text],
 	[AC_LANG_PROGRAM(
 	    [[#include <gtk/gtk.h>]],
@@ -1658,7 +1668,7 @@ AC_DEFUN([CS_CHECK_LIBCG],
     	[AC_LANG_PROGRAM(
     	    [[#include <Cg/cg.h>]],
 	   [CGcontext c = cgCreateContext();])],
-    	[], [], [], [],
+    	[], [C++], [], [],
     	[$cs_cv_libm_cflags $cs_cv_sys_pthread_cflags], 
     	[$cs_cv_libm_lflags $cs_cv_sys_pthread_lflags], 
     	[$cs_cv_libm_libs   $cs_cv_sys_pthread_libs],
@@ -1667,8 +1677,9 @@ AC_DEFUN([CS_CHECK_LIBCG],
     AS_IF([test $cs_cv_libCg = yes],
 	[CS_CHECK_BUILD([if Cg is sufficiently recent], [cs_cv_libCg_recent],
 	    [AC_LANG_PROGRAM(
-	    	[[#include <Cg/cg.h>]], [cgSetErrorHandler(0,0);])],
-	    [], [], [], [], [],
+	    	[[#include <Cg/cg.h>]], [cgSetErrorHandler(0,0);
+	    	CGprofile profile = CG_PROFILE_GPU_VP])],
+	    [], [C++], [], [], [],
 	    [$cs_cv_libCg_cflags],
 	    [$cs_cv_libCg_lflags],
 	    [$cs_cv_libCg_libs])],
@@ -1739,17 +1750,6 @@ AS_IF([test $cs_host_family != windows],
 
 
 #------------------------------------------------------------------------------
-# Check for Colour Ascii Art library (libcaca).
-#------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([caca],
-    [AC_LANG_PROGRAM([[#include <caca.h>]], [caca_init(); caca_end();])],
-    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcaca], [LIBCACA])], [], [], [], [],
-    [libcaca])
-
-
-
-
-#------------------------------------------------------------------------------
 # Check if regular expressions are available.
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD([for regexp support], [cs_cv_regexp],
@@ -1783,7 +1783,7 @@ CS_CHECK_BUILD([for backtrace], [cs_cv_backtrace],
 
 
 #------------------------------------------------------------------------------
-# Check if setenv() is available.
+# Check if setenv() or putenv() is available.
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD([for setenv], [cs_cv_setenv],
     [AC_LANG_PROGRAM(
@@ -1794,6 +1794,16 @@ CS_CHECK_BUILD([for setenv], [cs_cv_setenv],
 	[setenv(0, 0, 0);])],
     [], [],
     [CS_HEADER_PROPERTY([CS_HAVE_SETENV])])
+
+CS_CHECK_BUILD([for putenv], [cs_cv_putenv],
+    [AC_LANG_PROGRAM(
+	[[#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+	#endif
+	#include <stdlib.h>]],
+	[putenv(0);])],
+    [], [],
+    [CS_HEADER_PROPERTY([CS_HAVE_PUTENV])])
 
 
 
@@ -1809,7 +1819,19 @@ CS_CHECK_BUILD([for _aligned_malloc], [cs_cv__aligned_malloc],
 	[_aligned_malloc(0, 0);])],
     [], [],
     [CS_HEADER_PROPERTY([CS_HAVE__ALIGNED_MALLOC])])
-
+    
+AC_CHECK_HEADERS([sys/sysinfo.h],
+    [CS_HEADER_PROPERTY([CS_HAVE_SYS_SYSINFO_H])
+    CS_CHECK_BUILD([for sysinfo()], [cs_cv_sysinfo],
+	[AC_LANG_PROGRAM(
+	    [[#include <sys/sysinfo.h>]],
+	    [struct sysinfo x; sysinfo(&x);])],
+	[],[],
+	[CS_HEADER_PROPERTY([CS_HAVE_SYSINFO])])
+    AC_CHECK_MEMBERS([struct sysinfo.totalram],
+        [CS_HEADER_PROPERTY([CS_HAVE_STRUCT_SYSINFO_TOTALRAM])], [],
+        [#include <sys/sysinfo.h>])])
+   
 
 
 #------------------------------------------------------------------------------
@@ -1837,6 +1859,18 @@ AC_CHECK_HEADERS([cxxabi.h],
         [], [C++], [CS_HEADER_PROPERTY([CS_HAVE_ABI_CXA_DEMANGLE])])])
 AC_LANG_POP([C++])
 
+
+
+#------------------------------------------------------------------------------
+# Check for processor count related things
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([for sysconf(_SC_NPROCESSORS_ONLN)], [cs_cv_sysconf_processors],
+    [AC_LANG_PROGRAM(
+	[[#include <unistd.h>]],
+	[sysconf(_SC_NPROCESSORS_ONLN);])],
+    [],[],
+    [CS_HEADER_PROPERTY([CS_HAVE_SYSCONF_PROCESSORS])])
+   
 
 
 #------------------------------------------------------------------------------
@@ -2035,7 +2069,7 @@ AS_IF([test $cs_type_wchar_t = yes],
     AC_CHECK_FUNC([wcslen], [CS_HEADER_PROPERTY([CS_HAVE_WCSLEN])])
     AC_CHECK_FUNC([fputws], [CS_HEADER_PROPERTY([CS_HAVE_FPUTWS])])
     AC_CHECK_FUNC([fwide], [CS_HEADER_PROPERTY([CS_HAVE_FWIDE])])
-    AC_CHECK_FUNC([wcsrtombs], [CS_HEADER_PROPERTY([CS_HAVE_WCSRTOMBS])])
+    AC_CHECK_FUNC([wcsnrtombs], [CS_HEADER_PROPERTY([CS_HAVE_WCSNRTOMBS])])
     AC_CHECK_SIZEOF([wchar_t], []
 	[[#if HAVE_WCHAR_H
 	#include <wchar.h>
@@ -2152,7 +2186,7 @@ AC_CHECK_HEADERS([byteswap.h],
 #------------------------------------------------------------------------------
 # Check how to declare functions and types deprecated.
 #------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([how to declare deprecations],
+CS_SYMBOL_QUALIFIER([how to declare deprecation],
     [cs_cv_prog_cxx_declare_deprecated],
     [__attribute__((deprecated))], [], [C++],
     [CS_HEADER_PROPERTY([CS_ATTRIBUTE_DEPRECATED],
@@ -2161,38 +2195,26 @@ CS_SYMBOL_QUALIFIER([how to declare deprecations],
 
 
 #------------------------------------------------------------------------------
-# Check how to declare functions and types perfectly constant (not affected by
-# any global state and always returning the same value for the same input).
-#------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([how to declare const functions],
-    [cs_cv_prog_cxx_declare_const],
-    [__attribute__((const))], [], [C++],
-    [CS_HEADER_PROPERTY([CS_CONST_METHOD],
-	[$cs_cv_prog_cxx_declare_const])])
-
-
-
-#------------------------------------------------------------------------------
-# Check how to declare functions and types pure (not affected by any global
-# state).
-#------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([how to declare pure functions],
-    [cs_cv_prog_cxx_declare_pure],
-    [__attribute__((pure))], [], [C++],
-    [CS_HEADER_PROPERTY([CS_PURE_METHOD],
-	[$cs_cv_prog_cxx_declare_pure])])
-
-
-
-#------------------------------------------------------------------------------
 # Check if the "malloc" attribute is available.
 #------------------------------------------------------------------------------
-CS_SYMBOL_QUALIFIER([for "malloc" attribute],
+CS_SYMBOL_QUALIFIER([how to declare allocation function],
     [cs_cv_prog_c_attr_malloc],
-    [__attribute__((malloc))], [], [C])
-AS_IF([test $cs_cv_prog_c_attr_malloc != no],
+    [__attribute__((malloc))], [], [C],
     [CS_HEADER_PROPERTY([CS_ATTRIBUTE_MALLOC],
 	[$cs_cv_prog_c_attr_malloc])])
+
+
+
+#------------------------------------------------------------------------------
+# Check if the "init_priority" attribute is available.
+#------------------------------------------------------------------------------
+CS_SYMBOL_QUALIFIER([how to declare object initialization priority],
+    [cs_cv_prog_cxx_attr_init_priority],
+    [__attribute__((init_priority(PRI)))],
+    [[#define PRI 1010
+    class X{}; X x]], [C++],
+    [CS_HEADER_PROPERTY([CS_ATTRIBUTE_INIT_PRIORITY(PRI)],
+	[$cs_cv_prog_cxx_attr_init_priority])])
 
 
 
@@ -2286,6 +2308,21 @@ CS_CHECK_STD_SPECIAL_FLOAT([isnormal])
 
 
 #------------------------------------------------------------------------------
+# Check if strtof() is available.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([for strtof], [cs_cv_strtof],
+    [AC_LANG_PROGRAM(
+	[[#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+	#endif
+	#include <stdlib.h>]],
+	[strtof (0, 0)])],
+    [], [],
+    [CS_HEADER_PROPERTY([CS_HAVE_STRTOF])])
+
+
+
+#------------------------------------------------------------------------------
 # Determine if plugin meta-information should be embedded directly into plugin
 # modules or if it should exist in stand-alone .csplugin files.
 #------------------------------------------------------------------------------
@@ -2296,9 +2333,7 @@ AS_IF([test $enable_meta_info_embedding = yes],
 	[AS_ESCAPE([$(EMBED_META.CFLAGS)])], [+])
     CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS],
 	[AS_ESCAPE([$(EMBED_META.LFLAGS)])], [+])
-    AC_CHECK_HEADERS([elf.h], [CS_HEADER_PROPERTY([CS_HAVE_ELF_H])])
-    AS_IF([test "$cs_cv_libbfd_ok" = yes],
-	[CS_HEADER_PROPERTY([CS_HAVE_LIBBFD])])])
+    AC_CHECK_HEADERS([elf.h], [CS_HEADER_PROPERTY([CS_HAVE_ELF_H])])])
 
 
 
@@ -2317,13 +2352,16 @@ AS_IF([test $enable_meta_info_embedding = yes],
 AS_IF([test $cs_build_mode = debug],
     [case $host_os in
 	mingw*|cygwin*)
-	    CS_CHECK_LIBBFD([emit],
-		[CS_HEADER_PROPERTY([CS_HAVE_LIBBFD])
-		cs_debug_libbfd=yes],
-		[cs_debug_libbfd=no])
-	    ;;
-	*) cs_debug_libbfd=no ;;
+	    do_check_libbfd=yes ;;
+	*) do_check_libbfd=$ac_cv_lib_dl_dladdr ;;
     esac],
+    [do_check_libbfd=no])
+
+AS_IF([test $do_check_libbfd = yes],
+    [CS_CHECK_LIBBFD([emit],
+	[CS_HEADER_PROPERTY([CS_BFD_DEBUG_SYMBOLS])
+	cs_debug_libbfd=yes],
+	[cs_debug_libbfd=no])],
     [cs_debug_libbfd=no])
 
 
@@ -2357,6 +2395,24 @@ CS_EMIT_BUILD_PROPERTY([EXTENSIVE_MEMDEBUG],
     [$enable_extensive_memory_debugger])
 AS_IF([test $enable_extensive_memory_debugger = yes],
     [CS_HEADER_PROPERTY([CS_EXTENSIVE_MEMDEBUG])])
+
+
+
+#------------------------------------------------------------------------------
+# Determine if checking allocations should be enabled.
+#------------------------------------------------------------------------------
+AS_IF([test $enable_extensive_memory_debugger = yes],
+    [AC_MSG_CHECKING([whether to use checking allocations])
+    AC_ARG_ENABLE([checking-allocations],
+	[AC_HELP_STRING([--enable-checking-allocations],
+	    [make allocations by default `checking' if the extensive memory
+	    debugger is enabled (default NO)])],
+	[], [enable_checking_allocations=no])
+    AC_MSG_RESULT([$enable_checking_allocations])
+    CS_EMIT_BUILD_PROPERTY([CHECKING_ALLOCATIONS],
+	[$enable_checking_allocations])
+    AS_IF([test $enable_checking_allocations = yes],
+	[CS_HEADER_PROPERTY([CS_CHECKING_ALLOCATIONS])])])
 
 
 
@@ -2413,9 +2469,14 @@ AS_IF([test $enable_leak_guard = yes],
 # Determine whether link libraries should be static or shared.
 #------------------------------------------------------------------------------
 AC_MSG_CHECKING([whether to build shared libraries])
+case $host_os in
+    cygwin*|linux*) enable_shared_default=yes ;;
+    *) enable_shared_default=no ;;
+esac
 AC_ARG_ENABLE([shared], [AC_HELP_STRING([--enable-shared],
-    [enable creation of shared libraries (_EXPERIMENTAL_!) (default NO)])],
-    [], [enable_shared=no])
+    [enable creation of shared libraries (default YES on Win32 and Linux, 
+    NO otherwise)])],
+    [], [enable_shared=$enable_shared_default])
 AC_MSG_RESULT([$enable_shared])
 CS_EMIT_BUILD_PROPERTY([BUILD_SHARED_LIBS], [$enable_shared])
 AS_IF([test $enable_shared = yes], 

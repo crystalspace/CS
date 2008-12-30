@@ -30,7 +30,7 @@ struct iEngine;
 struct iMeshWrapper;
 struct iCamera;
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * BugPlug is the hiding place for many dark creatures. While Spider only
@@ -56,6 +56,7 @@ private:
   bool do_bbox;	// Show bounding box.
   bool do_rad;	// Show bounding sphere.
   bool do_normals; // Show normals
+  bool do_skeleton; // Show skeleton
   csFlags flags;
   csRef<iRenderView> keep_view;
   csBox3 bbox;
@@ -88,21 +89,23 @@ public:
   /**
    * Set what we are showing.
    */
-  void SetShowOptions (bool bbox, bool rad, bool norm)
+  void SetShowOptions (bool bbox, bool rad, bool norm, bool skel)
   {
     do_bbox = bbox;
     do_rad = rad;
     do_normals = norm;
+    do_skeleton = skel;
   }
 
   /**
    * Get what we are showing.
    */
-  void GetShowOptions (bool& bbox, bool& rad, bool& norm) const
+  void GetShowOptions (bool& bbox, bool& rad, bool& norm, bool& skel) const
   {
     bbox = do_bbox;
     rad = do_rad;
     norm = do_normals;
+    skel = do_skeleton;
   }
 
   const csBox3& GetObjectBoundingBox ()
@@ -170,6 +173,6 @@ public:
 
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_SHADOW_H__

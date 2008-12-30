@@ -20,6 +20,7 @@
 
 #include "csutil/threading/thread.h"
 #include "csutil/threading/win32_thread.h"
+#include "csutil/threading/barrier.h"
 #include "csutil/threading/condition.h"
 
 #include <process.h>
@@ -72,50 +73,40 @@ namespace Implementation
   namespace
   {
 
-    class ThreadStartParams
+    class ThreadStartParams : public CS::Memory::CustomAllocated
     {
     public:
-      ThreadStartParams (Runnable* runner, int32* isRunningPtr)
-        : runnable (runner), isRunningPtr (isRunningPtr)
+      ThreadStartParams (Runnable* runner, int32* isRunningPtr, 
+        Barrier* startupBarrier)
+        : runnable (runner), isRunningPtr (isRunningPtr), 
+        startupBarrier (startupBarrier)
       {
       }
-
-      // Wait for thread to start up
-      void Wait ()
-      {
-        ScopedLock<Mutex> lock (mutex);
-        while (!(*isRunningPtr))
-          startCondition.Wait (mutex);
-      }
-
-      void Started ()
-      {
-        ScopedLock<Mutex> lock (mutex);
-        AtomicOperations::Set (isRunningPtr, 1);
-        startCondition.NotifyOne ();
-      }
-
-    
-      Mutex mutex;
-      Condition startCondition;
 
       Runnable* runnable;
       int32* isRunningPtr;
+      Barrier* startupBarrier;
     };
 
     unsigned int __stdcall proxyFunc (void* param)
     {
+      // Extract the parameters
       ThreadStartParams* tp = static_cast<ThreadStartParams*> (param);
-
       int32* isRunningPtr = tp->isRunningPtr;
       Runnable* runnable = tp->runnable;
+      Barrier* startupBarrier = tp->startupBarrier;
 
-      tp->Started ();
-
+      // Set as running and wait for main thread to catch up
+      AtomicOperations::Set (isRunningPtr, 1);
+      startupBarrier->Wait ();
+      
+      // Run      
       runnable->Run ();
 
+      // Set as non-running
       AtomicOperations::Set (isRunningPtr, 0);
 
+      
       return 0;
     }
 
@@ -123,7 +114,8 @@ namespace Implementation
 
 
   ThreadBase::ThreadBase (Runnable* runnable)
-    : runnable (runnable), threadHandle (0), threadId (0), isRunning (0)
+    : runnable (runnable), threadHandle (0), threadId (0), isRunning (0), 
+    priority (THREAD_PRIO_NORMAL), startupBarrier (2)
   {
   }
 
@@ -136,7 +128,7 @@ namespace Implementation
   {
     if (!threadHandle)
     {
-      ThreadStartParams param (runnable, &isRunning);
+      ThreadStartParams param (runnable, &isRunning, &startupBarrier);
 
       // _beginthreadex does not always return a void*,
       // on some versions of MSVC it gives uintptr_t
@@ -144,10 +136,10 @@ namespace Implementation
       threadHandle = reinterpret_cast<void*> (_beginthreadex (0, 0, &proxyFunc, 
         &param, 0, &threadId));
 
-      if (threadHandle == 0)
-        return;
+      startupBarrier.Wait ();
 
-      param.Wait ();
+      // Set priority to make sure its updated if we set it before starting
+      SetPriority (priority);
     }
   }
 
@@ -171,13 +163,23 @@ namespace Implementation
 
   bool ThreadBase::SetPriority (ThreadPriority prio)
   {
-    int PrioTable[] = {
-      THREAD_PRIORITY_IDLE,
+    static const int PrioTable[] = {
+      THREAD_PRIORITY_LOWEST,
       THREAD_PRIORITY_NORMAL,
       THREAD_PRIORITY_HIGHEST
     };
+   
+    int res = 1;
 
-    int res = SetThreadPriority (threadHandle, PrioTable[prio]);
+    if (threadHandle)
+    {
+      res = SetThreadPriority (threadHandle, PrioTable[prio]);
+    }    
+
+    if (res != 0)
+    {
+      priority = prio;
+    }
 
     return res != 0;
   }

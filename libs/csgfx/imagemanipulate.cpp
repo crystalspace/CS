@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2005 by Jorrit Tyberghein
-	      (C) 2005 by Frank Richter
+	      (C) 2005-2008 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,6 +20,9 @@
 #include "cssysdef.h"
 #include "csqint.h"
 #include "csutil/refarr.h"
+#include "csgeom/math.h"
+#include "csgeom/vector3.h"
+#include "csgfx/imageautoconvert.h"
 #include "csgfx/imagememory.h"
 
 #include "csgfx/imagemanipulate.h"
@@ -268,26 +271,28 @@ csRef<iImage> csImageManipulate::Mipmap2D (iImage* source, int steps,
     {
       case CS_IMGFMT_NONE:
       case CS_IMGFMT_PALETTED8:
-	if (simg->GetImageData())
-	  if (transpidx < 0)
-	    mipmap_1_p (cur_w, cur_h, 
-	      (uint8 *)simg->GetImageData(), mipmap, simg->GetPalette());
-	  else
-	    mipmap_1_pt (cur_w, cur_h, (uint8*)simg->GetImageData(), mipmap,
-	      simg->GetPalette(), transpidx);
-	nimg->ConvertFromRGBA (mipmap);
-	if (simg->GetAlpha ())
-	{
-	  mipmap_1_a (cur_w, cur_h, (uint8 *)simg->GetAlpha (), Alpha);
-	}
-	break;
+    if (simg->GetImageData())
+    {
+      if (transpidx < 0)
+        mipmap_1_p (cur_w, cur_h, 
+          (uint8 *)simg->GetImageData(), mipmap, simg->GetPalette());
+      else
+        mipmap_1_pt (cur_w, cur_h, (uint8*)simg->GetImageData(), mipmap,
+          simg->GetPalette(), transpidx);
+    }
+    nimg->ConvertFromRGBA (mipmap);
+    if (simg->GetAlpha ())
+    {
+      mipmap_1_a (cur_w, cur_h, (uint8 *)simg->GetAlpha (), Alpha);
+    }
+    break;
       case CS_IMGFMT_TRUECOLOR:
-	if (!transp)
-	  mipmap_1 (cur_w, cur_h, (csRGBpixel *)simg->GetImageData (), mipmap);
-	else
-	  mipmap_1_t (cur_w, cur_h, (csRGBpixel *)simg->GetImageData (), mipmap, *transp);
-	nimg->ConvertFromRGBA (mipmap);
-	break;
+    if (!transp)
+      mipmap_1 (cur_w, cur_h, (csRGBpixel *)simg->GetImageData (), mipmap);
+    else
+      mipmap_1_t (cur_w, cur_h, (csRGBpixel *)simg->GetImageData (), mipmap, *transp);
+    nimg->ConvertFromRGBA (mipmap);
+    break;
     }
 
     simg = nimg;
@@ -321,6 +326,115 @@ csRef<iImage> csImageManipulate::Mipmap (iImage* source, int steps,
     return Mipmap2D (source, steps, transp);
 }
 
+static csRGBpixel TransformOneColor (const csRGBpixel& s, const csColor4& mult,
+    const csColor4& add)
+{
+  float r = float (s.red) * mult.red + add.red;
+  if (r < 0) r = 0; else if (r > 255) r = 255;
+  float g = float (s.green) * mult.green + add.green;
+  if (g < 0) g = 0; else if (g > 255) g = 255;
+  float b = float (s.blue) * mult.blue + add.blue;
+  if (b < 0) b = 0; else if (b > 255) b = 255;
+  float a = float (s.alpha) * mult.alpha + add.alpha;
+  if (a < 0) a = 0; else if (a > 255) a = 255;
+  csRGBpixel p;
+  p.red = (uint8)r;
+  p.green = (uint8)g;
+  p.blue = (uint8)b;
+  p.alpha = (uint8)a;
+  return p;
+}
+
+csRef<iImage> csImageManipulate::TransformColor (iImage* source,
+    const csColor4& mult, const csColor4& add)
+{
+  const int Width = source->GetWidth();
+  const int Height = source->GetHeight();
+
+  csRef<csImageMemory> nimg;
+
+  const csRGBpixel* src;
+  csRGBpixel* dst;
+
+  size_t i;
+
+  switch (source->GetFormat() & CS_IMGFMT_MASK)
+  {
+    case CS_IMGFMT_NONE:
+      return 0; // Not supported.
+    case CS_IMGFMT_PALETTED8:
+      {
+        nimg.AttachNew (new csImageMemory (source));
+        src = source->GetPalette ();
+        dst = nimg->GetPalettePtr ();
+        for (i = 0 ; i < 256 ; i++)
+	  *dst++ = TransformOneColor (*src++, mult, add);
+      }
+      break;
+    case CS_IMGFMT_TRUECOLOR:
+      {
+        nimg.AttachNew (new csImageMemory (Width, Height, source->GetFormat()));
+	csRGBpixel* mipmap = new csRGBpixel [Width * Height];
+        src = (const csRGBpixel*)source->GetImageData ();
+        dst = mipmap;
+        for (i = 0 ; i < size_t (Width * Height) ; i++)
+	  *dst++ = TransformOneColor (*src++, mult, add);
+        nimg->ConvertFromRGBA (mipmap);
+      }
+      break;
+  }
+
+  return nimg;
+}
+
+static csRGBpixel GrayColor (const csRGBpixel& s)
+{
+  unsigned char lum = s.Luminance ();
+  csRGBpixel p = csRGBpixel (lum, lum, lum);
+  p.alpha = s.alpha;
+  return p;
+}
+
+csRef<iImage> csImageManipulate::Gray (iImage* source)
+{
+  const int Width = source->GetWidth();
+  const int Height = source->GetHeight();
+
+  csRef<csImageMemory> nimg;
+
+  const csRGBpixel* src;
+  csRGBpixel* dst;
+  size_t i;
+
+  switch (source->GetFormat() & CS_IMGFMT_MASK)
+  {
+    case CS_IMGFMT_NONE:
+      return 0; // Not supported.
+    case CS_IMGFMT_PALETTED8:
+      {
+        nimg.AttachNew (new csImageMemory (source));
+        src = source->GetPalette ();
+        dst = nimg->GetPalettePtr ();
+        for (i = 0 ; i < 256 ; i++)
+	  *dst++ = GrayColor (*src++);
+      }
+      break;
+    case CS_IMGFMT_TRUECOLOR:
+      {
+        nimg.AttachNew (new csImageMemory (Width, Height, source->GetFormat()));
+	csRGBpixel* mipmap = new csRGBpixel [Width * Height];
+        src = (const csRGBpixel*)source->GetImageData ();
+        dst = mipmap;
+        for (i = 0 ; i < size_t (Width * Height) ; i++)
+	  *dst++ = GrayColor (*src++);
+        nimg->ConvertFromRGBA (mipmap);
+      }
+      break;
+  }
+
+  return nimg;
+}
+
 csRef<iImage> csImageManipulate::Blur (iImage* source, csRGBpixel* transp)
 {
   const int Width = source->GetWidth();
@@ -343,27 +457,29 @@ csRef<iImage> csImageManipulate::Blur (iImage* source, csRGBpixel* transp)
     case CS_IMGFMT_NONE:
     case CS_IMGFMT_PALETTED8:
       if (source->GetImageData())
-	if (transpidx < 0)
-	  mipmap_0_p (source->GetWidth(), source->GetHeight(), 
-	    (uint8 *)source->GetImageData(), mipmap, source->GetPalette());
-	else
-	  mipmap_0_pt(source->GetWidth(), source->GetHeight(), 
-	    (uint8*)source->GetImageData(), mipmap, source->GetPalette(),
-	    transpidx);
+      {
+        if (transpidx < 0)
+          mipmap_0_p (source->GetWidth(), source->GetHeight(), 
+            (uint8 *)source->GetImageData(), mipmap, source->GetPalette());
+        else
+          mipmap_0_pt(source->GetWidth(), source->GetHeight(), 
+            (uint8*)source->GetImageData(), mipmap, source->GetPalette(),
+            transpidx);
+      }
       nimg->ConvertFromRGBA (mipmap);
       if (source->GetAlpha())
       {
-	mipmap_0_a (source->GetWidth(), source->GetHeight(), 
-	  (uint8 *)source->GetAlpha(), Alpha);
+        mipmap_0_a (source->GetWidth(), source->GetHeight(), 
+          (uint8 *)source->GetAlpha(), Alpha);
       }
       break;
     case CS_IMGFMT_TRUECOLOR:
       if (!transp)
-	mipmap_0 (source->GetWidth(), source->GetHeight(), 
-	  (csRGBpixel *)source->GetImageData(), mipmap);
+        mipmap_0 (source->GetWidth(), source->GetHeight(), 
+          (csRGBpixel *)source->GetImageData(), mipmap);
       else
-	mipmap_0_t (source->GetWidth(), source->GetHeight(), 
-	  (csRGBpixel *)source->GetImageData(), mipmap, *transp);
+        mipmap_0_t (source->GetWidth(), source->GetHeight(), 
+          (csRGBpixel *)source->GetImageData(), mipmap, *transp);
       nimg->ConvertFromRGBA (mipmap);
       break;
   }
@@ -483,6 +599,44 @@ csRef<iImage> csImageManipulate::Sharpen (iImage* source, int strength,
   csRef<csImageMemory> resimg;
   resimg.AttachNew (new csImageMemory (source->GetWidth(), source->GetHeight(),
     result, true));
+
+  return resimg;
+}
+
+csRef<iImage> csImageManipulate::RenormalizeNormals (iImage* source)
+{
+  const int Width = source->GetWidth();
+  const int Height = source->GetHeight();
+  const int Depth = source->GetDepth();
+
+  CS::ImageAutoConvert imageRGB (source,
+    (source->GetFormat() & ~CS_IMGFMT_MASK) | CS_IMGFMT_TRUECOLOR);
+  
+  csRef<csImageMemory> resimg;
+  resimg.AttachNew (new csImageMemory (Width, Height, Depth,
+    imageRGB->GetFormat()));
+  csRGBpixel *src = (csRGBpixel*)imageRGB->GetImageData ();
+  csRGBpixel *dest = (csRGBpixel*)resimg->GetImageData ();
+ 
+  for (int n = Width * Height * Depth; n > 0; n--)
+  {
+    csRGBpixel n_biased (*src);
+    csVector3 nCurrent (
+      n_biased.red*(2.0f/255.0f)-1.0f,
+      n_biased.green*(2.0f/255.0f)-1.0f,
+      n_biased.blue*(2.0f/255.0f)-1.0f);
+    nCurrent.Normalize();
+    
+    csRGBpixel n_new (
+      csClamp (int(nCurrent.x*127.5f+127.5f), 255, 0),
+      csClamp (int(nCurrent.y*127.5f+127.5f), 255, 0),
+      csClamp (int(nCurrent.z*127.5f+127.5f), 255, 0),
+      n_biased.alpha);
+    *dest = n_new;
+
+    dest++;
+    src++;
+  }
 
   return resimg;
 }

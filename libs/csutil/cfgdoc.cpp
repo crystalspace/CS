@@ -25,6 +25,7 @@
 #include "csutil/util.h"
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/scanstr.h"
 #include "csutil/xmltiny.h"
 
 class csConfigDocumentIterator : public scfImplementation1<
@@ -162,7 +163,7 @@ float csConfigDocumentIterator::GetFloat () const
   const char* val = currentKey->cachedStringValue;
 
   float v = 0.0f;
-  sscanf (val, "%f", &v);
+  csScanStr (val, "%f", &v);
   return v;
 }
 
@@ -377,7 +378,7 @@ float csConfigDocument::GetFloat (const char *Key, float Def) const
   if (!val) return Def;
 
   float v = Def;
-  sscanf (val, "%f", &v);
+  csScanStr (val, "%f", &v);
   return v;
 }
 

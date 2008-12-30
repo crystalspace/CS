@@ -68,22 +68,11 @@ void PathTut::SetupFrame ()
   view->Draw ();
 }
 
-void PathTut::FinishFrame ()
-{
-  g3d->FinishDraw ();
-  g3d->Print (0);
-}
-
 bool PathTut::HandleEvent (iEvent& ev)
 {
-  if (ev.Name == csevProcess (object_reg))
+  if (ev.Name == Frame)
   {
     pathtut->SetupFrame ();
-    return true;
-  }
-  else if (ev.Name == csevFinalProcess (object_reg))
-  {
-    pathtut->FinishFrame ();
     return true;
   }
   else if ((ev.Name == csevKeyboardDown (object_reg)) && 
@@ -127,8 +116,7 @@ bool PathTut::Initialize (int argc, const char* const argv[])
     return false;
   }
 
-  Process = csevProcess (object_reg);
-  FinalProcess = csevFinalProcess (object_reg);
+  Frame = csevFrame (object_reg);
   KeyboardDown = csevKeyboardDown (object_reg);
 
   if (!csInitializer::SetupEventHandler (object_reg, PathTutEventHandler))
@@ -202,10 +190,6 @@ bool PathTut::Initialize (int argc, const char* const argv[])
     return false;
   }
 
-  // First disable the lighting cache. Our app is PathTut enough
-  // not to need this.
-  engine->SetLightingCacheMode (0);
-
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -228,10 +212,6 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
       engine, room, "walls", "walls_factory", &box);
-
-  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
-    iGeneralMeshState> (walls->GetMeshObject ());
-  mesh_state->SetShadowReceiving (true);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   csRef<iLight> light;
@@ -251,11 +231,16 @@ bool PathTut::Initialize (int argc, const char* const argv[])
 
   engine->Prepare ();
 
+  using namespace CS::Lighting;
+  SimpleStaticLighter::ShineLights (room, engine, 4);
+
   view = csPtr<iView> (new csView (engine, g3d));
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
+  printer.AttachNew (new FramePrinter (object_reg));
 
   // Load a texture for our sprite.
   iTextureWrapper* txt = loader->LoadTexture ("spark",
@@ -306,6 +291,11 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   sprite->SetRenderPriority (engine->GetObjectRenderPriority ());
 
   return true;
+}
+
+void PathTut::Shutdown ()
+{
+  printer.Invalidate ();
 }
 
 void PathTut::Animate (csTicks elapsedTime)
@@ -398,6 +388,8 @@ int main (int argc, char* argv[])
 
   if (pathtut->Initialize (argc, argv))
     pathtut->Start ();
+
+  pathtut->Shutdown ();
 
   delete pathtut;
   pathtut = 0;

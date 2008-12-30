@@ -102,7 +102,7 @@ bool Maze::CreateWallOrPortal (iGeneralFactoryState* factory_state,
 }
 
 bool Maze::CreateRoom (iMaterialWrapper* wall_material,
-	int x, int y, int z, char* portals)
+	int x, int y, int z, const char* portals)
 {
   iSector* room = GetSector (x, y, z);
 
@@ -114,9 +114,9 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
   if (!walls)
     return app->ReportError ("Couldn't create the walls for the room!");
 
-  csRef<iGeneralMeshState> object_state = scfQueryInterface<
-    iGeneralMeshState> (walls->GetMeshObject ());
-  object_state->SetShadowReceiving (true);
+  //csRef<iGeneralMeshState> object_state = scfQueryInterface<
+    //iGeneralMeshState> (walls->GetMeshObject ());
+  //object_state->SetShadowReceiving (true);
   walls->GetMeshObject ()->SetMaterialWrapper (wall_material);
   csRef<iGeneralFactoryState> factory_state = scfQueryInterface<
     iGeneralFactoryState> (walls_factory->GetMeshObjectFactory ());
@@ -205,9 +205,6 @@ bool Maze::CreateLight (const csColor& color,
 
 bool Maze::CreateGeometry ()
 {
-  // We don't need a lighting cache. Disable it.
-  app->GetEngine ()->SetLightingCacheMode (0);
-
   // Load the texture we are going to use for all walls.
   if (!app->GetLoader ()->LoadTexture ("wall_texture", "/lib/std/stone4.gif"))
     return app->ReportError ("Error loading 'stone4' texture!");
@@ -516,8 +513,8 @@ void Laser::Check ()
   	laserstart, laserend);
   if (rc.mesh)
   {
-    csRef<Adversary> adv = CS_GET_CHILD_OBJECT (
-    	rc.mesh->QueryObject (), Adversary);
+    csRef<Adversary> adv = CS::GetChildObject<Adversary> (
+    	rc.mesh->QueryObject ());
     if (adv)
     {
       // Hit!
@@ -678,6 +675,15 @@ bool Game::SetupGame ()
 
   iEngine* engine = app->GetEngine ();
   engine->Prepare ();
+
+  using namespace CS::Lighting;
+  size_t i;
+  iSectorList* sl = engine->GetSectors ();
+  for (i = 0 ; i < (size_t)sl->GetCount () ; i++)
+  {
+    iSector* s = sl->Get (i);
+    SimpleStaticLighter::ShineLights (s, engine, 8);
+  }
 
   if (!InitCollisionDetection ())
     return false;

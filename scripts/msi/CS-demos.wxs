@@ -1,0 +1,35 @@
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product
+        Version="$(var.VERSION_MAJORMINOR).$(var.VERSION_PACKAGE)" 
+        Name="Crystal Space $(var.VERSION_MAJORMINOR) Demos ($(var.ARCH))" 
+        Manufacturer="The Crystal Space Project"
+        Language="1033" 
+        UpgradeCode="$(var.UPGRADE_CODE)" 
+        Id="*">
+    <Package InstallerVersion="301"/>
+    <Media EmbedCab="yes" Id="1" Cabinet="cs1.cab"/>
+    <UIRef Id="WixUI_FeatureTree"/>
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.TOP)/scripts/msi/lgpl.rtf"/>
+    <InstallExecuteSequence>
+      <RemoveExistingProducts After="InstallFinalize"/>
+    </InstallExecuteSequence>
+    <Directory Name="SourceDir" Id="TARGETDIR"/>
+    <DirectoryRef Id="TARGETDIR">
+      <Directory Name="PFiles" Id="ProgramFilesFolder"/>
+    </DirectoryRef>
+    <DirectoryRef Id="ProgramFilesFolder">
+      <Directory Name="CrystalSpace" Id="CSDIR"/>
+    </DirectoryRef>
+    <?include CS-directory-runtime.wxi ?>
+    <?include CS-directory-demo.wxi ?>
+    <Upgrade Id="$(var.UPGRADE_CODE)">
+      <UpgradeVersion
+        Minimum="$(var.VERSION_MAJORMINOR).0" IncludeMinimum="yes"
+        Maximum="$(var.VERSION_MAJORMINOR).$(var.VERSION_PACKAGE)" IncludeMaximum="yes" 
+        Property="PATCHFOUND" />
+    </Upgrade>
+    <?include CS-feature-demo.wxi ?>
+    <?include CS-feature-runtime.wxi ?>
+  </Product>
+</Wix>
+

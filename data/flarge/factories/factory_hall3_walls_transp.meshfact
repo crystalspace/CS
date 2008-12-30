@@ -1,0 +1,46 @@
+<library>
+    <textures>
+        <texture name="blue.gif">
+            <file>/lib/stdtex/blue.jpg</file>
+        </texture>
+    </textures>
+    <materials>
+        <material name="blue">
+            <texture>blue.gif</texture>
+        </material>
+    </materials>
+    <meshfact name="factory_hall3_walls_transp">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <numvt>4</numvt>
+            <v x="-7" y="15" z="50" u="1.4" v="0.6" />
+            <v x="-10" y="15" z="50" u="2" v="0.6" />
+            <v x="-10" y="10" z="50" u="2" v="1.6" />
+            <v x="-7" y="10" z="50" u="1.4" v="1.6" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <submesh name="blue_0">
+                <material>blue</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                </indexbuffer>
+            </submesh>
+            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                <e c0="0.25" c1="0.25" />
+                <e c0="0.5" c1="0.25" />
+                <e c0="0.5" c1="0.5" />
+                <e c0="0.25" c1="0.5" />
+            </renderbuffer>
+        </params>
+    </meshfact>
+</library>

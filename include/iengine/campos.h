@@ -127,9 +127,12 @@ struct iCameraPosition : public virtual iBase
  */
 struct iCameraPositionList : public virtual iBase
 {
-  SCF_INTERFACE(iCameraPositionList,2,0,0);
-  /// Create a new empty camera position.
+  SCF_INTERFACE(iCameraPositionList,2,1,0);
+  /// Create a new empty camera position and add it to the engine list.
   virtual iCameraPosition* NewCameraPosition (const char* name) = 0;
+
+  /// Create a new empty camera position but don't add it to the engine list.
+  virtual csPtr<iCameraPosition> CreateCameraPosition (const char* name) = 0;
 
   /// Return the number of camera positions in this list
   virtual int GetCount () const = 0;

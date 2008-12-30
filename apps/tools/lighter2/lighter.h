@@ -21,18 +21,19 @@
 
 #include "csutil/refcount.h"
 
+#include "raydebug.h"
 #include "statistics.h"
 
 namespace lighter
 {
-  class Scene;
-  class Sector;
+  class ElementAreasAlloc;
   class Light_old;
+  class LightmapUVFactoryLayouter;
   class Primitive;
   class Raytracer;
+  class Scene;
+  class Sector;
   class SwapManager;
-  
-  class ElementAreasAlloc;
 
   class Lighter : public csRefCount
   {
@@ -62,22 +63,47 @@ namespace lighter
     csRef<iCommandLineParser> cmdLine;
     csRef<iConfigManager> configMgr;
     iObjectRegistry *objectRegistry;
-    csRef<iStringSet> strings;
+    csRef<iShaderVarStringSet> svStrings;
+    csRef<iJobQueue> jobManager;
+    csRef<iSyntaxService> syntaxService;
 
     SwapManager* swapManager;
+    RayDebugHelper rayDebug;
 
   protected:
     // Cleanup and prepare for shutdown
-    void CleanUp ();
+    void CleanUp (Statistics::Progress& progress);
 
     // Parse the commandline and load any files specified
     bool LoadFiles (Statistics::Progress& progress);
 
+    // Calculate lightmapping
+    void CalculateLightmaps ();
+
+    // Initialize objects after LM construction
+    void InitializeObjects ();
+
+    // Prepare for lighting
+    void PrepareLighting ();
+
+    // Build per-sector KD-tree
+    void BuildKDTrees ();
+
+    // Shoot direct lighting
+    void DoDirectLighting ();
+
+    // Post-process all lightmaps
+    void PostprocessLightmaps ();
+
+    // Load configuration from config file & command line
     void LoadConfiguration ();
 
-    void CommandLineHelp () const;
+    // Print command line help
+    void CommandLineHelp (bool expert) const;
 
     Scene *scene;
+
+    csRef<LightmapUVFactoryLayouter> uvLayout;
 
     Statistics::Progress progStartup;
     Statistics::Progress progLoadFiles;
@@ -86,7 +112,6 @@ namespace lighter
     Statistics::Progress progInitializeMain;
     Statistics::Progress progInitialize;
     Statistics::Progress progInitializeLightmaps;
-    Statistics::Progress progInitializeLM;
     Statistics::Progress progPrepareLighting;
     Statistics::Progress progPrepareLightingUVL;
     Statistics::Progress progPrepareLightingSector;
@@ -98,8 +123,10 @@ namespace lighter
     Statistics::Progress progPostproc;
     Statistics::Progress progPostprocSector;
     Statistics::Progress progPostprocLM;
-    Statistics::Progress progSaveResult;
     Statistics::Progress progSaveMeshesPostLight;
+    Statistics::Progress progSpecMaps;
+    Statistics::Progress progSaveResult;
+    Statistics::Progress progCleanLightingData;
     Statistics::Progress progApplyWorldChanges;
     Statistics::Progress progCleanup;
     Statistics::Progress progFinished;

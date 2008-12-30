@@ -21,6 +21,7 @@
 #include "config.h"
 #include "statistics.h"
 #include "lighter.h"
+#include "swappable.h"
 #include "tui.h"
 
 
@@ -35,8 +36,9 @@ namespace lighter
   {
   }
 
-  void TUI::Initialize ()
+  void TUI::Initialize (iObjectRegistry* objReg)
   {
+    object_reg = objReg;
     simpleMode = globalLighter->configMgr->GetBool ("lighter2.simpletui", false);
   }
 
@@ -72,14 +74,25 @@ namespace lighter
     // Draw global settings
     if (drawFlags & TUI_DRAW_SETTINGS)
       DrawSettings ();
-
+      
     // Draw global stats
     if (drawFlags & TUI_DRAW_STATS)
       DrawStats ();
       
+    if (drawFlags & TUI_DRAW_SWAPCACHE)
+      DrawSwapCacheStats ();
+
     /* Linux: output is buffered, and the UI may appear "incomplete" if not 
      * flushed */
     fflush (stdout);
+  }
+
+  void TUI::FinishDraw ()
+  {
+    if (simpleMode)
+    {
+      DrawSimpleEnd ();
+    }
   }
 
   static const char* TUI_SEVERITY_TEXT[] = 
@@ -91,8 +104,8 @@ namespace lighter
     CS_ANSI_FW CS_ANSI_BW "D" CS_ANSI_RST " "
   };
 
-  bool TUI::Report (iReporter* reporter, int severity, const char* msgId,
-    const char* description)
+  THREADED_CALLABLE_IMPL4(TUI, Report, iReporter* reporter, int severity,
+    const char* msgId, const char* description)
   {
     csStringArray descrSplit;
     descrSplit.SplitString (description, "\n");
@@ -133,18 +146,18 @@ namespace lighter
     csPrintf ("| Part progress:                                                              |\n");
     csPrintf ("|                                                                             |\n");
     csPrintf ("|-----------------------------------------------------------------------------|\n");
-    csPrintf ("| RayCore  | Settings   | Scene Stats                                         |\n");
-    csPrintf ("| Time:    | [ ] DL     | Sectors:                                            |\n");
-    csPrintf ("|          | [ ] GI     |                                                     |\n");
-    csPrintf ("| Rays:    | [ ] LMs    | Objects:                                            |\n");
-    csPrintf ("|          | [ ] AO     |                                                     |\n");
-    csPrintf ("| Rays/s:  | PLM:       | Lightmaps:                                          |\n");
+    csPrintf ("| Rays:    | Settings   | Scene Stats                                         |\n");
+    csPrintf ("|          | [ ] DL     | S:                                                  |\n");
+    csPrintf ("|          | [ ] GI     | O:                                                  |\n");
+    csPrintf ("|          | [ ] LMs    | L:                                                  |\n");
+    csPrintf ("|          | [ ] AO     | LM:                                                 |\n");
+    csPrintf ("|          | PLM:       |                                                     |\n");
+    csPrintf ("|          |            | KD-stats                                            |\n");
+    csPrintf ("|          | ALM:       | N:                                                  |\n");
+    csPrintf ("|          |            | D:                                                  |\n");
+    csPrintf ("|          | Density:   | P:                                                  |\n");
     csPrintf ("|          |            |                                                     |\n");
-    csPrintf ("|          | ALM:       | KD-stats                                            |\n");
-    csPrintf ("|          |            | N:                                                  |\n");
-    csPrintf ("|          | Tu/u:      | D:                                                  |\n");
-    csPrintf ("|          |            | P:                                                  |\n");
-    csPrintf ("|          | Tv/v:      |                                                     |\n");
+    csPrintf ("|          |            | SwapCache                                           |\n");
     csPrintf ("|          |            |                                                     |\n");
     csPrintf ("|- CS Messages ---------------------------------------------------------------|\n");
     csPrintf ("|                                                                             |\n");
@@ -157,11 +170,48 @@ namespace lighter
 
   void TUI::DrawStats () const
   {
-    csPrintf (CS_ANSI_CURSOR(30,15) "% 8d / % 8d", globalStats.kdtree.numNodes, globalStats.kdtree.leafNodes);
-    csPrintf (CS_ANSI_CURSOR(30,16) "% 8d / % 8.03f", globalStats.kdtree.maxDepth, 
+    csPrintf (CS_ANSI_CURSOR(30,14) "%8zu / %8zu", globalStats.kdtree.numNodes, globalStats.kdtree.leafNodes);
+    csPrintf (CS_ANSI_CURSOR(30,15) "%8zu / %8.03f", globalStats.kdtree.maxDepth, 
       (float)globalStats.kdtree.sumDepth / (float)globalStats.kdtree.leafNodes);
-    csPrintf (CS_ANSI_CURSOR(30,17) "% 8d / % 8.03f", globalStats.kdtree.numPrimitives, 
+    csPrintf (CS_ANSI_CURSOR(30,16) "%8zu / %8.03f", globalStats.kdtree.numPrimitives, 
       (float)globalStats.kdtree.numPrimitives / (float)globalStats.kdtree.leafNodes);
+    csPrintf (CS_ANSI_CURSOR(1,1));
+  }
+  
+  csString TUI::FormatByteSize (uint64 size)
+  {
+    static const char* const units[] = {"KB", "MB", "GB"};
+    const int numUnits = sizeof(units)/sizeof(const char*);
+    const uint64 unitThreshold = CONST_UINT64(2048);
+    
+    if (size <= unitThreshold)
+    {
+      return csString().Format ("%" CS_PRIu64 "B", size);
+    }
+    
+    int unit = 0;
+    while ((size > unitThreshold * CONST_UINT64(1024)) && (unit < numUnits))
+    {
+      size /= CONST_UINT64(1024);
+      unit++;
+    }
+    return csString().Format ("%.1f%s",
+      double (size) / 1024.0, units[unit]);
+  }
+  
+  void TUI::DrawSwapCacheStats () const
+  {
+    csPrintf (CS_ANSI_CURSOR(28,19) 
+      "                                                   ");
+    if (globalLighter->swapManager)
+    {
+      uint64 swappedIn, swappedOut, maxSize;
+      globalLighter->swapManager->GetSizes (swappedIn, swappedOut, maxSize);
+      csPrintf (CS_ANSI_CURSOR(28,19) "%s/%s in, %s out",
+	FormatByteSize (swappedIn).GetData(),
+	FormatByteSize (maxSize).GetData(),
+	FormatByteSize (swappedOut).GetData());
+    }
     csPrintf (CS_ANSI_CURSOR(1,1));
   }
 
@@ -175,65 +225,26 @@ namespace lighter
     csPrintf (CS_ANSI_CURSOR(14,13) "%#4.2g", globalConfig.GetDIProperties ().pointLightMultiplier);
     csPrintf (CS_ANSI_CURSOR(14,15) "%#4.2g", globalConfig.GetDIProperties ().areaLightMultiplier);
 
-    /* @@@ FIXME: We don't need to display the same value twice, one as If Tu/u 
-                  and once as Tv/v ... */
     csPrintf (CS_ANSI_CURSOR(14,17) "%#4.2g", globalConfig.GetLMProperties ().lmDensity);
-    csPrintf (CS_ANSI_CURSOR(14,19) "%#4.2g", globalConfig.GetLMProperties ().lmDensity);
 
     csPrintf (CS_ANSI_CURSOR(1,1));
   }
 
   void TUI::DrawRayCore () const
   {
-    // Time
-    csString unit ("us");
-    uint64 time = globalStats.raytracer.usRaytracing;
-
-    if (time > CONST_UINT64(1000000))
-    {
-      time /= CONST_UINT64(1000000);
-      unit = "s ";
-    }
-    else if (time > CONST_UINT64(1000))
-    {
-      time /= CONST_UINT64(1000);
-      unit = "ms";
-    }
-
-    csPrintf (CS_ANSI_CURSOR(3,9) "%6" PRIu64 " %s", time, unit.GetDataSafe ());
-
     // Rays
     const char* siConv[] = {" ", "K", "M", "G", "T"};
 
     uint64 rays = globalStats.raytracer.numRays;
     int prefix = 0;
     
-    while (rays > CONST_UINT64(10000) && prefix < 5)
+    while (rays > CONST_UINT64(99999) && prefix < 5)
     {
       rays /= CONST_UINT64(1000);
       prefix++;
     }
 
-    csPrintf (CS_ANSI_CURSOR(3,11) "%6" PRIu64 " %s", rays, siConv[prefix]);
-
-    // Rays per second
-    if (globalStats.raytracer.usRaytracing < 10)
-      return; 
-
-    uint64 raysPerS = (globalStats.raytracer.numRays*CONST_UINT64(1000000)) / (globalStats.raytracer.usRaytracing);
-    uint64 raysPerSfraction = raysPerS - (raysPerS / CONST_UINT64(1000))*CONST_UINT64(1000);
-    raysPerSfraction *= CONST_UINT64(1000);
-
-    prefix = 0;
-    while (raysPerS > CONST_UINT64(10000) && prefix < 5)
-    {
-      raysPerS /= CONST_UINT64(1000);
-      raysPerSfraction /= CONST_UINT64(1000);
-      prefix++;
-    }
-
-    csPrintf (CS_ANSI_CURSOR(2,13) "%2" PRIu64 ".%03" PRIu64 " %s", raysPerS, raysPerSfraction, siConv[prefix]);
-    csPrintf (CS_ANSI_CURSOR(1,1));
+    csPrintf (CS_ANSI_CURSOR(3,8) "%6" PRIu64 " %s", rays, siConv[prefix]);
   }
 
   void TUI::DrawProgress () const
@@ -318,21 +329,7 @@ namespace lighter
 
   void TUI::DrawSimple ()
   {
-    // Check if kd-tree haven't been printed but now have been created
-    if (globalStats.kdtree.numNodes != kdLastNumNodes)
-    {
-      prevWasReporter = false;
-      // Print KD-tree stats
-      csPrintf ("\nKD-tree: \n");
-      csPrintf ("N: % 8d / % 8d\n", globalStats.kdtree.numNodes, globalStats.kdtree.leafNodes);
-      csPrintf ("D: % 8d / % 8.03f\n", globalStats.kdtree.maxDepth, 
-        (float)globalStats.kdtree.sumDepth / (float)globalStats.kdtree.leafNodes);
-      csPrintf ("P: % 8d / % 8.03f\n", globalStats.kdtree.numPrimitives, 
-        (float)globalStats.kdtree.numPrimitives / (float)globalStats.kdtree.leafNodes);
-
-      kdLastNumNodes = globalStats.kdtree.numNodes;
-    }
-
+    bool doFlush = false;
     const char* lt = (const char*)lastTask;
     const char* tn = globalStats.progress.GetTaskName ();
     if ((lt == 0 && tn != 0) || (lt != 0 && lastTask != tn))
@@ -343,6 +340,7 @@ namespace lighter
       csPrintf ("\n% 4d %% - %s ", 
         globalStats.progress.GetOverallProgress(),
         lastTask.GetDataSafe());
+      doFlush = true;
 
       // Print new task and global progress
       lastTaskProgress = 0;
@@ -354,7 +352,23 @@ namespace lighter
         prevWasReporter = false;
         csPrintf (".");
         lastTaskProgress += 10;
+        doFlush = true;
       }
     }
+    if (doFlush) fflush (stdout);
   }
+
+  void TUI::DrawSimpleEnd ()
+  {
+    // Print KD-tree stats
+    csPrintf ("\nKD-tree: \n");
+    csPrintf ("N: %8zu / %8zu\n", globalStats.kdtree.numNodes, globalStats.kdtree.leafNodes);
+    csPrintf ("D: %8zu / %8.03f\n", globalStats.kdtree.maxDepth, 
+      (float)globalStats.kdtree.sumDepth / (float)globalStats.kdtree.leafNodes);
+    csPrintf ("P: %8zu / %8.03f\n", globalStats.kdtree.numPrimitives, 
+      (float)globalStats.kdtree.numPrimitives / (float)globalStats.kdtree.leafNodes);
+
+    kdLastNumNodes = globalStats.kdtree.numNodes;
+  }
+
 }

@@ -77,7 +77,7 @@ namespace CS
     {
     #ifdef CS_MEMORY_TRACKER
       /// Memory tracking info
-      csMemTrackerInfo* mti;
+      const char* mti;
     #endif
     public:
     #ifdef CS_MEMORY_TRACKER
@@ -87,10 +87,8 @@ namespace CS
       CS_ATTRIBUTE_MALLOC void* Alloc (const size_t n)
       {
       #ifdef CS_MEMORY_TRACKER
-	size_t* p = (size_t*)cs_malloc (n + sizeof (size_t));
-	*p = n;
-	p++;
-	if (mti) mtiUpdateAmount (mti, 1, int (n));
+	size_t* p = (size_t*)cs_malloc (n);
+	if (mti) CS::Debug::MemTracker::RegisterAlloc (p, n, mti);
 	return p;
       #else
 	return cs_malloc (n);
@@ -100,27 +98,17 @@ namespace CS
       void Free (void* p)
       {
       #ifdef CS_MEMORY_TRACKER
-	size_t* x = (size_t*)p;
-	x--;
-	size_t allocSize = *x;
-	cs_free (x);
-	if (mti) mtiUpdateAmount (mti, -1, -int (allocSize));
-      #else
-	cs_free (p);
+	CS::Debug::MemTracker::RegisterFree (p);
       #endif
+	cs_free (p);
       }
       /// Resize the allocated block \p p to size \p newSize.
       void* Realloc (void* p, size_t newSize)
       {
       #ifdef CS_MEMORY_TRACKER
         if (p == 0) return Alloc (newSize);
-	size_t* x = (size_t*)p;
-	x--;
-	if (mti) mtiUpdateAmount (mti, -1, -int (*x));
-	size_t* np = (size_t*)cs_realloc (x, newSize + sizeof (size_t));
-	*np = newSize;
-	np++;
-	if (mti) mtiUpdateAmount (mti, 1, int (newSize));
+	size_t* np = (size_t*)cs_realloc (p, newSize);
+	CS::Debug::MemTracker::UpdateSize (p, np, newSize);
 	return np;
       #else
 	return cs_realloc (p, newSize);
@@ -130,7 +118,7 @@ namespace CS
       void SetMemTrackerInfo (const char* info)
       {
       #ifdef CS_MEMORY_TRACKER
-	mti = mtiRegister (info);
+	mti = info;
       #else
 	(void)info;
       #endif
@@ -160,6 +148,9 @@ namespace CS
       bool SingleAllocation = false>
     class LocalBufferAllocator : public ExcessAllocator
     {
+    #ifdef CS_DEBUG
+      void* startThis;
+    #endif
       static const size_t localSize = N * sizeof (T);
       static const uint8 freePattern = 0xfa;
       static const uint8 newlyAllocatedSalt = 0xac;
@@ -175,6 +166,9 @@ namespace CS
         }
         else
           localBuf[localSize] = 0;
+      #ifdef CS_DEBUG
+        startThis = this;
+      #endif
       }
       LocalBufferAllocator (const ExcessAllocator& xalloc) : 
         ExcessAllocator (xalloc)
@@ -187,9 +181,13 @@ namespace CS
         }
         else
           localBuf[localSize] = 0;
+      #ifdef CS_DEBUG
+        startThis = this;
+      #endif
       }
       T* Alloc (size_t allocSize)
       {
+        CS_ASSERT(startThis == this);
         if (SingleAllocation)
         {
       #ifdef CS_DEBUG
@@ -239,26 +237,33 @@ namespace CS
     
       void Free (T* mem)
       {
+        CS_ASSERT(startThis == this);
         if (SingleAllocation)
         {
+          if (mem != (T*)localBuf)
+	    ExcessAllocator::Free (mem);
+	  else
+	  {
       #ifdef CS_DEBUG
-          /* Verify that the local buffer consists entirely of the "local
-             buffer unallocated" pattern. (Not 100% safe since a valid 
-             allocated buffer may be coincidentally filled with just that
-             pattern, but let's just assume that it's unlikely.) */
-          bool validPattern = true;
-          for (size_t n = 0; n < localSize; n++)
-          {
-            if (localBuf[n] != freePattern)
-            {
-              validPattern = false;
-              break;
-            }
-          }
-          CS_ASSERT_MSG("Free() without prior allocation", !validPattern);
-          memset (localBuf, freePattern, localSize);
+	    /* Verify that the local buffer does entirely consist of the "local
+	       buffer unallocated" pattern. (Not 100% safe since a valid 
+	       allocated buffer may be coincidentally filled with just that
+	       pattern, but let's just assume that it's unlikely.) */
+	    bool validPattern = true;
+	    for (size_t n = 0; n < localSize; n++)
+	    {
+	      if (localBuf[n] != freePattern)
+	      {
+		validPattern = false;
+		break;
+	      }
+	    }
+	    CS_ASSERT_MSG("Free() without prior allocation", !validPattern);
       #endif
-          if (mem != (T*)localBuf) ExcessAllocator::Free (mem);
+	  }
+      #ifdef CS_DEBUG
+	  memset (localBuf, freePattern, localSize);
+      #endif
         }
         else
         {
@@ -275,6 +280,7 @@ namespace CS
       // in the old array that are initialized.
       void* Realloc (void* p, size_t newSize)
       {
+        CS_ASSERT(startThis == this);
         if (p == 0) return Alloc (newSize);
         if (p == localBuf)
         {
@@ -355,7 +361,7 @@ namespace CS
     {
     #ifdef CS_MEMORY_TRACKER
       /// Memory tracking info
-      csMemTrackerInfo* mti;
+      const char* mti;
     #endif
     public:
     #ifdef CS_MEMORY_TRACKER
@@ -364,40 +370,36 @@ namespace CS
       /// Allocate a block of memory of size \p n.
       CS_ATTRIBUTE_MALLOC void* Alloc (const size_t n)
       {
-        // Note that with memtracking we store the alloc'ed size anyway.
-      #ifndef CS_MEMORY_TRACKER
         if (!Reallocatable)
         {
-          return new char[n];
-        }
+          char* p = new char[n];
+      #ifdef CS_MEMORY_TRACKER
+          if (mti) CS::Debug::MemTracker::RegisterAlloc (p, n, mti);
       #endif
+          return p;
+        }
 	size_t* p = (size_t*)new char[n + sizeof (size_t)];
 	*p = n;
 	p++;
       #ifdef CS_MEMORY_TRACKER
-	if (mti) mtiUpdateAmount (mti, 1, int (n));
+	if (mti) CS::Debug::MemTracker::RegisterAlloc (p, n, mti);
       #endif
 	return p;
       }
       /// Free the block \p p.
       void Free (void* p)
       {
-      #ifndef CS_MEMORY_TRACKER
+      #ifdef CS_MEMORY_TRACKER
+        CS::Debug::MemTracker::RegisterFree (p);
+      #endif
         if (!Reallocatable)
         {
           delete[] (char*)p;
           return;
         }
-      #endif
 	size_t* x = (size_t*)p;
 	x--;
-	size_t allocSize = *x;
 	delete[] (char*)x;
-      #ifdef CS_MEMORY_TRACKER
-	if (mti) mtiUpdateAmount (mti, -1, -int (allocSize));
-      #else
-        (void)allocSize;
-      #endif
       }
       /// Resize the allocated block \p p to size \p newSize.
       void* Realloc (void* p, size_t newSize)
@@ -408,9 +410,6 @@ namespace CS
 	size_t* x = (size_t*)p;
 	x--;
         size_t oldSize = *x;
-      #ifdef CS_MEMORY_TRACKER
-	if (mti) mtiUpdateAmount (mti, -1, -int (oldSize));
-      #endif
 	size_t* np = (size_t*)Alloc (newSize);
         if (newSize < oldSize)
           memcpy (np, p, newSize);
@@ -418,7 +417,7 @@ namespace CS
           memcpy (np, p, oldSize);
         Free (p);
       #ifdef CS_MEMORY_TRACKER
-	if (mti) mtiUpdateAmount (mti, 1, int (newSize));
+	if (mti) CS::Debug::MemTracker::UpdateSize (p, np, newSize);
       #endif
 	return np;
       }
@@ -426,7 +425,8 @@ namespace CS
       void SetMemTrackerInfo (const char* info)
       {
       #ifdef CS_MEMORY_TRACKER
-	mti = mtiRegister (info);
+        if (!Reallocatable) return;
+	mti = info;
       #else
 	(void)info;
       #endif
@@ -489,6 +489,34 @@ namespace CS
         Allocator (alloc), p (p) {}
     };
 
+    /**
+     * Memory allocator using the platform's default allocation functions
+     * (malloc, free etc.)
+     */
+    class AllocatorMallocPlatform
+    {
+    public:
+      /// Allocate a block of memory of size \p n.
+      CS_ATTRIBUTE_MALLOC void* Alloc (const size_t n)
+      {
+	return malloc (n);
+      }
+      /// Free the block \p p.
+      void Free (void* p)
+      {
+	free (p);
+      }
+      /// Resize the allocated block \p p to size \p newSize.
+      void* Realloc (void* p, size_t newSize)
+      {
+	return realloc (p, newSize);
+      }
+      /// Set the information used for memory tracking.
+      void SetMemTrackerInfo (const char* info)
+      {
+	(void)info;
+      }
+    };
   } // namespace Memory
 } // namespace CS
 

@@ -21,6 +21,20 @@
 #ifndef CS_MICRO_SWIG
 
 #ifndef SWIGIMPORTED
+
+%template (csPyEventPlugParent) scfImplementation1<csPyEventPlug, iEventPlug>;
+
+%inline %{
+  struct csPyEventPlug : public scfImplementation1<csPyEventPlug,iEventPlug>
+  {
+    csPyEventPlug () : scfImplementationType(this) { }
+    virtual ~csPyEventPlug () { }
+    virtual unsigned GetPotentiallyConflictingEvents () { return CSEVTYPE_Joystick|CSEVTYPE_Mouse|CSEVTYPE_Keyboard; }
+    virtual unsigned QueryEventPriority (unsigned) { return 110; }
+  };
+%}
+
+
 %template (csPyEventHandlerParent) scfImplementation1<_csPyEventHandler, iEventHandler>;
 %inline %{
 
@@ -42,6 +56,8 @@
       Py_DECREF(event_obj);
       if (!result)
       {
+        if (PyErr_Occurred ())
+                PyErr_Print ();
         return false;
       }
       bool res = PyInt_AsLong(result);
@@ -50,25 +66,25 @@
     }
 
   static const char * StaticHandlerName() {return "crystalspace.cspython";};
-  CS_CONST_METHOD static const csHandlerID StaticID(csRef<iEventHandlerRegistry> &reg) 
+  static const csHandlerID StaticID(csRef<iEventHandlerRegistry> &reg) 
   { return reg->GetGenericID(StaticHandlerName()); }			;
-  CS_CONST_METHOD virtual const char * GenericName() const		
+  virtual const char * GenericName() const		
   { return StaticHandlerName(); }					;
-  CS_CONST_METHOD virtual csHandlerID GenericID(csRef<iEventHandlerRegistry> &reg) const 
+  virtual csHandlerID GenericID(csRef<iEventHandlerRegistry> &reg) const 
   { return StaticID(reg); };
 
 
-  CS_CONST_METHOD virtual const csHandlerID * GenericPrec (		
+  virtual const csHandlerID * GenericPrec (		
     csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &, 	
     csEventID) const { return 0; }	
-  CS_CONST_METHOD virtual const csHandlerID * GenericSucc (		
+  virtual const csHandlerID * GenericSucc (		
     csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &, 	
     csEventID) const { return 0; }
 
-  CS_CONST_METHOD virtual const csHandlerID * InstancePrec (		
+  virtual const csHandlerID * InstancePrec (		
       csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2, 	
     csEventID e) const { return GenericPrec(r1, r2, e); } 
-  CS_CONST_METHOD virtual const csHandlerID * InstanceSucc (		
+  virtual const csHandlerID * InstanceSucc (		
     csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2, 	
     csEventID e) const { return GenericSucc(r1, r2, e); }
 
@@ -96,7 +112,6 @@
       self._func._cs_event_handler_wrapper = self
     def HandleEvent (self, event):
       return self._func(event)
-
   def _csInitializer_SetupEventHandler (reg, obj,
       eventids=None):
     """Replacement of C++ versions."""
@@ -114,7 +129,6 @@
   
   csInitializer.SetupEventHandler = \
     staticmethod(_csInitializer_SetupEventHandler)
-
 %}
 
 #endif // SWIGIMPORTED
@@ -123,7 +137,8 @@
 
   def csevCommandLineHelp(reg):
     csEventNameRegistry.GetID(reg, "crystalspace.application.commandlinehelp")
-    
+  
+  csInvalidStringID = ~0 # we want stringids as unsigned long
   CS_EVENTLIST_END = csInvalidStringID
 %}
 

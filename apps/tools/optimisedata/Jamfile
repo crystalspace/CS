@@ -1,0 +1,9 @@
+SubDir TOP apps tools optimisedata ;
+
+Description optimisedata : "Game data optimiser" ;
+
+Application optimisedata 
+	: [ Wildcard *.cpp *.h ]
+      : console
+;
+LinkWith optimisedata : crystalspace  ;

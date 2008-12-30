@@ -9,8 +9,8 @@ well as in discussions of 3D graphics.
 @table @emph
 @item 3D Renderer
 The 3D renderer plugin in Crystal Space is responsible for rendering
-3D objects (polygons) on the canvas.  We have several renderers but the two
-most common are the software and OpenGL renderers.
+3D objects (polygons) on the canvas. The two renderers we have now
+are the null and the OpenGL renderers.
 
 @item 3D Sprite
 A 3D Sprite in Crystal Space is a mesh object based on a triangle mesh.
@@ -22,6 +22,9 @@ through the Cal3d library.
 @item Ambient (lighting)
 Ambient lighting is a constant amount of lighting that is added to all other
 lighting.
+
+@item AniMesh
+An animesh is a hierarchical animated mesh.
 
 @item Camera Space
 Before viewing objects and rooms are transformed from world to camera space.
@@ -37,7 +40,7 @@ will represent the screen.  The 3D renderer will use a canvas to render on.
 @item Detail Texture
 A detail texture is a texture that is blended on top of another texture
 so that the texture gets more detail.  Crystal Space supports this by
-allowing several detail layers on top of the base texture in a material.
+using the @samp{std_lighting_detail} shader.
 
 @item Event Queue
 Crystal Space is an event-driven framework.  So a Crystal Space application
@@ -59,13 +62,13 @@ light-map.  Light-map space is closely related to texture space.
 @item Lumel
 A lumel is a pixel on a lightmap.  A lumel corresponds with one light
 value (red, green, blue) and represents the lighting values of a block of
-texels on the original texture.  Usually this block is 16x16 big.
+texels on the original texture.
 
 @item Material
 A material represents how some object or polygon looks.  In the most common
 case a material is just a texture. But a material can contain additional
-information like detail textures (textures that are blended on top of
-the base texture).  In future materials will be able to do much more.
+information which is used by some shader to do various effects like specular,
+bump mapping, parallax mapping, @dots{}.
 
 @item Mesh Factory
 A mesh factory is an object from which you can create mesh objects.
@@ -76,7 +79,7 @@ A mesh object represents geometry in Crystal Space.  The Crystal Space engine
 is very modular.  The engine itself does not know how to render.  It only
 knows about mesh objects.  Every mesh object is responsible for rendering
 what it represents (using the 3D renderer).  Crystal Space supports several
-mesh objects: things, 3D sprites, 2D sprites, particle systems, haze,
+mesh objects: genmeshes, 3D sprites, 2D sprites, particle systems, haze,
 terrain engine, @dots{}
 
 @item Object Registry
@@ -94,8 +97,7 @@ Every object or room is defined with its own local 3D coordinate system
 typically centered around (0,0,0).
 
 @item Particle System
-A particle system is another kind of mesh object.  Crystal Space supports
-several particle systems (snow, rain, fire, explosion, emit, ...).
+A particle system is another kind of mesh object.
 
 @item Plugin
 A plugin is a number of classes that can be loaded dynamically into
@@ -115,13 +117,16 @@ plugin.  So the plugin manager is an important object.  See also
 @code{csInitializer::CreateEnvironment()}.
 
 @item Portal
-A Portal is one of the polygons of a thing mesh object which will not be
-texture mapped (unless it has a semi-transparent texture).  Instead another
-sector (visible through that portal) will be drawn.  A portal may
-even point back into the sector in which it is contained.  This is
-useful for portals which act as mirrors.  A more general form of a mirror
-is a space warping portal.  This way a portal can go to any place in the
-world.
+A Portal is a special kind of polygons which will not be
+texture mapped.  Instead another sector (visible through that portal)
+will be drawn.  A portal may even point back into the sector in which it
+is contained.  This is useful for portals which act as mirrors.  A
+more general form of a mirror is a space warping portal.  This way a
+portal can go to any place in the world.
+There are heavy and light portals. A light portal is for simple cases
+where the portal doesn't transform space or has any special flags. In that
+case the contents of the portal is simply rendered on screen. With heavy
+portals the contents of the portal is rendered on a separate texture.
 
 @item Procedural Texture
 A procedural texture is a special texture that has a 3D renderer
@@ -130,16 +135,6 @@ procedural texture by drawing on it.  Since the procedural texture
 has a full 3D renderer associated with it you can even use the 3D
 engine to render on a texture.  Procedural textures can be used on
 all objects in Crystal Space that can use textures.
-
-@item Region
-A region in Crystal Space is a collection of objects (textures, materials,
-mesh objects, mesh factories, sectors, sequences, triggers, shared variables,
-collections, @dots{}).  Regions are not a geometrical concept.  It is possible
-to define a region which contains all wall geometry and a region which
-contains all moving geometry.  Usually though, regions represent some area
-in the world.  You can use regions to dynamically load/unload parts of the
-world.  This is useful if you have really big worlds that don't fit in
-memory at once.
 
 @item Reporter
 The reporter is a plugin in Crystal Space that listens to messages.
@@ -169,9 +164,9 @@ Screen space is perspective corrected camera space.
 @item Sector
 A sector is simply a container of geometry.  It contains several mesh objects
 which will represent the geometry of the sector.  A common mesh object is
-the thing mesh object which is usually used to put walls around a sector
+the genmesh mesh object which is usually used to put walls around a sector
 (that way the sector represents a room).  Other mesh objects like 3d sprites
-can be used for actors.
+or AniMeshes can be used for actors.
 
 @item Texel
 A texel is a pixel on a texture.  For example, an 128x128 texture has
@@ -184,7 +179,7 @@ Two-dimensional (u,v) coordinate-system corresponding to some point on a
 texture.  Texture space is given by a transformation matrix and vector going
 from object space to texture space.
 
-@item Thing Mesh Object
+@item GenMesh Mesh Object
 A mesh object which is often used to represent walls of a sector but can
 in general be used to represent many more kinds of objects.
 

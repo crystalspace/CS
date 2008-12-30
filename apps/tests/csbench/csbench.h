@@ -60,6 +60,7 @@ private:
   csRef<iView> view;
   csRef<iMeshObject> meshObject;
   csRef<iStringSet> strings;
+  csRef<iShaderVarStringSet> stringsSvName;
   iSector* room_single;
   iSector* room_multi;
   iMaterialWrapper* material;

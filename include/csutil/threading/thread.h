@@ -38,20 +38,20 @@ namespace Threading
   enum ThreadPriority
   {
     /// Reduced thread priority. Useful for background tasks.
-    THREAD_PRIO_LOW,
+    THREAD_PRIO_LOW = 0,
 
     /// Normal thread priority.
-    THREAD_PRIO_NORMAL,
+    THREAD_PRIO_NORMAL = 1,
 
     /**
      * Increased thread priority. Useful for tasks that needs precedence over
      * all other.
      */
-    THREAD_PRIO_HIGH
+    THREAD_PRIO_HIGH = 2
   };
 
   /**
-   * Abstract base class for objects to be run in threads.
+   * Abstract base class for objects acting as executor in separate threads.
    * The lifetime of the Runnable object must at least be as long as the thread
    * object.
    */
@@ -181,17 +181,8 @@ namespace Threading
      * \return true if the priority was successfully set.
      */
     bool SetPriority (ThreadPriority prio)
-    {
-      if (prio == priority)
-        return true;
-
-      bool result;
-      result = ThreadBase::SetPriority (prio);
-      
-      if (result)
-        priority = priority;
-
-      return result;
+    {      
+      return ThreadBase::SetPriority (prio);          
     }
 
     /**
@@ -199,7 +190,7 @@ namespace Threading
      */
     ThreadPriority GetPriority () const
     {
-      return priority;
+      return ThreadBase::GetPriority ();
     }
 
     /**
@@ -214,7 +205,7 @@ namespace Threading
     /**
      * Yield Thread frees CPU time if nothing to do.
      * \remark This Yields execution time in the thread in which this function 
-     * is called. For example,  OtherThread->Yeild() will NOT have the results 
+     * is called. For example,  OtherThread->Yield() will NOT have the results 
      * that would be expected.
      */
     static void Yield ()
@@ -231,9 +222,6 @@ namespace Threading
     {
       return ThreadBase::GetThreadID ();
     }
-
-  private:
-    ThreadPriority priority;
   };
 
 

@@ -31,13 +31,23 @@ namespace lighter
     Configuration ();
 
     // Initialize configuration
-    void Initialize ();
+    void Initialize (iConfigFile* cfgFile = 0);
    
     // Settings of what to do
     struct LighterProperties
     {
       // Direct lighting from light sources
       bool doDirectLight;
+      // HL2-style directional LMs
+      bool directionalLMs;
+      // Whether to generate maps containing light directions for specular
+      bool specularDirectionMaps;
+      // Number of threads to use for multicore parts
+      uint numThreads;
+      // Save buffers as binary
+      bool saveBinaryBuffers;
+      // Check for duplicate objects when loading map data.
+      bool checkDupes;
     };
 
     // Lightmap and lightmap layout properties
@@ -58,6 +68,13 @@ namespace lighter
 
       // Whether to store PD light maps as grayscale maps.
       bool grayPDMaps;
+    };
+    
+    // Terrain lighting properties
+    struct TerrainProperties
+    {
+      // Max lightmap sizes
+      uint maxLightmapU, maxLightmapV;
     };
 
     // Direct light (direct illumination) calculation settings
@@ -88,6 +105,13 @@ namespace lighter
       
     };
 
+    struct DebugProperties
+    {
+      /* Regular expression for meshes for which to generate "debug occlusion"
+         visualiuzation. */
+      csString rayDebugRE;
+    };
+
 
     // Public accessible (readable) properties
     const LighterProperties& GetLighterProperties () const
@@ -100,16 +124,28 @@ namespace lighter
       return lmProperties;
     }
 
+    const TerrainProperties& GetTerrainProperties () const
+    {
+      return terrainProperties;
+    }
+
     const DIProperties& GetDIProperties () const
     {
       return diProperties;
+    }
+
+    const DebugProperties& GetDebugProperties() const
+    {
+      return debugProperties;
     }
 
   protected:
     // Properties
     LighterProperties     lighterProperties;
     LightmapProperties    lmProperties;
+    TerrainProperties     terrainProperties;
     DIProperties          diProperties;
+    DebugProperties       debugProperties;
   };
 
 }

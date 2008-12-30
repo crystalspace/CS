@@ -75,6 +75,8 @@ public:
 
   /// Add a triangle to the mesh.
   void AddTriangle (int a, int b, int c);
+	/// Add another triangle mesh to this one.
+	void AddTriangleMesh(const csTriangleMesh& tm);
   /// Query the array of triangles.
   virtual csTriangle* GetTriangles () { return triangles.GetArray (); }
   /// Query the array of triangles.
@@ -97,6 +99,9 @@ public:
   virtual void Unlock () { }
   virtual csFlags& GetFlags () { return flags; }
   virtual uint32 GetChangeNumber () const { return change_nr; }
+
+	/// Adds another triangle mesh to this one
+	csTriangleMesh& operator+=(const csTriangleMesh& tm);
 };
 
 /**
@@ -159,7 +164,7 @@ public:
  * A convenience triangle mesh implementation that represents a cube.
  */
 class CS_CRYSTALSPACE_EXPORT csTriangleMeshBox :
-  public virtual scfImplementation1<csTriangleMeshBox,iTriangleMesh>
+  public scfImplementation1<csTriangleMeshBox,iTriangleMesh>
 {
 private:
   csVector3 vertices[8];
@@ -229,7 +234,7 @@ public:
  * this class is still in use.
  */
 class CS_CRYSTALSPACE_EXPORT csTriangleMeshPointer :
-  public virtual scfImplementation1<csTriangleMeshPointer,iTriangleMesh>
+  public scfImplementation1<csTriangleMeshPointer,iTriangleMesh>
 {
 private:
   csVector3* vertices;

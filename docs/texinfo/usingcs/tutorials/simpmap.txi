@@ -238,17 +238,6 @@ int main (int argc, char* argv[])
 @}
 @end example
 
-One important note in the code above which differs from the earlier tutorials
-is that we removed the following line:
-
-@example
-engine->SetLightingCacheMode (0);
-@end example
-
-This is because, when we are loading from map file, we actually want
-the lighting information to be read from the cache (if present).
-We do so because relighting a map can be a time-consuming process.
-
 @node Simple Loading The Map, Simple Locating the Camera, Simple Base Code, Tutorial Simple Map
 @subsubsection Loading The Map
 @cindex loading a map
@@ -291,8 +280,7 @@ directory. Then, it will parse that file and create the geometry which
 is specified there.
 
 If loading is successful, then you must call @code{iEngine::Prepare()} to
-make sure that all lightmaps are correctly loaded from the cache
-and other necessary setup work is done (i.e. textures are registered
+make sure that the necessary setup work is done (i.e. textures are registered
 and so on). This is demonstrated in the code below, which you add to the
 @code{Application()} method, following the @code{SetRectangle()} invocation.
 We also add code to initialize collision detection for geometry in the map
@@ -310,8 +298,6 @@ bool Simple::Application ()
   // Initialize collision objects for all loaded objects.
   csColliderHelper::InitializeCollisionWrappers (cdsys, engine);
 
-  // Let the engine prepare all lightmaps for use and also free all
-  // images that were loaded for the texture manager.
   engine->Prepare ();
 
   Run();

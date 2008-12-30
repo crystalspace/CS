@@ -20,6 +20,7 @@
 
 #include "cssysdef.h"
 #include "csutil/documenthelper.h"
+#include "csutil/stringarray.h"
 
 namespace CS
 {
@@ -28,17 +29,24 @@ namespace DocSystem
   csString FlattenNode (iDocumentNode* node)
   {
     csString str;
+    str.SetGrowsBy (0);
     str << node->GetValue ();
     csRef<iDocumentAttributeIterator> attrIter = node->GetAttributes ();
     if (attrIter)
     {
-	str << '[';
-	while (attrIter->HasNext())
-	{
-	  csRef<iDocumentAttribute> attr = attrIter->Next();
-	  str << attr->GetName () << '=' << attr->GetValue() << ',';
-	}
-	str << ']';
+      csStringArray attrStrs;
+      while (attrIter->HasNext())
+      {
+	csRef<iDocumentAttribute> attr = attrIter->Next();
+	csString str;
+	str << attr->GetName () << '=' << attr->GetValue() << ',';
+	attrStrs.Push (str);
+      }
+      str << '[';
+      attrStrs.Sort (true);
+      for (size_t i = 0; i < attrStrs.GetSize(); i++)
+        str << attrStrs[i]; 
+      str << ']';
     }
     str << '(';
     csRef<iDocumentNodeIterator> it = node->GetNodes ();

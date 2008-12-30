@@ -37,7 +37,8 @@ builddebug.import({defines => builddebug.defines.merge(['CS_DEBUG'])});
 # configurations.
 #------------------------------------------------------------------------------
 FOREACH build IN builds;
-  build.defines = build.defines.merge(['CS_WIN32_CSCONFIG','__CRYSTAL_SPACE__']);
+  build.defines = build.defines.merge(['CS_WIN32_CSCONFIG','__CRYSTAL_SPACE__',
+    'CS_SUPPORTS_MMX']);
 END;
 
 END %]

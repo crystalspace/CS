@@ -17,15 +17,15 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/**\file 
+/**@file 
  * Directory master header. This header file includes all headers in a
  * subdirectory of the top Crystal Space include directory.
  */
 #include "cssysdef.h"
 #include "iengine/camera.h"
 #include "iengine/campos.h"
+#include "iengine/collection.h"
 #include "iengine/engine.h"
-#include "iengine/fview.h"
 #include "iengine/halo.h"
 #include "iengine/imposter.h"
 #include "iengine/light.h"
@@ -38,8 +38,8 @@
 #include "iengine/objwatch.h"
 #include "iengine/portal.h"
 #include "iengine/portalcontainer.h"
-#include "iengine/region.h"
 #include "iengine/renderloop.h"
+#include "iengine/rendermanager.h"
 #include "iengine/rendersteps/icontainer.h"
 #include "iengine/rendersteps/igeneric.h"
 #include "iengine/rendersteps/ilightiter.h"
@@ -48,8 +48,6 @@
 #include "iengine/rview.h"
 #include "iengine/scenenode.h"
 #include "iengine/sector.h"
-#include "iengine/shadcast.h"
-#include "iengine/shadows.h"
 #include "iengine/sharevar.h"
 #include "iengine/texture.h"
 #include "iengine/viscull.h"

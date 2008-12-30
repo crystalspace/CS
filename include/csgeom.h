@@ -17,16 +17,18 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/**\file 
+/**@file 
  * Directory master header. This header file includes all headers in a
  * subdirectory of the top Crystal Space include directory.
  */
 #include "cssysdef.h"
+#include "csgeom/aabbtree.h"
 #include "csgeom/box.h"
 #include "csgeom/bsptree.h"
 #include "csgeom/chainhull2d.h"
 #include "csgeom/csrect.h"
 #include "csgeom/csrectrg.h"
+#include "csgeom/dualquaternion.h"
 #include "csgeom/fixed.h"
 #include "csgeom/frustum.h"
 #include "csgeom/kdtree.h"
@@ -36,6 +38,7 @@
 #include "csgeom/math3d_d.h"
 #include "csgeom/matrix2.h"
 #include "csgeom/matrix3.h"
+#include "csgeom/matrix4.h"
 #include "csgeom/obb.h"
 #include "csgeom/odesolver.h"
 #include "csgeom/path.h"
@@ -43,10 +46,10 @@
 #include "csgeom/plane3.h"
 #include "csgeom/poly2d.h"
 #include "csgeom/poly3d.h"
-#include "csgeom/polyaa.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/polyidx.h"
 #include "csgeom/polypool.h"
+#include "csgeom/projections.h"
 #include "csgeom/quaternion.h"
 #include "csgeom/segment.h"
 #include "csgeom/solidspace.h"
@@ -54,10 +57,10 @@
 #include "csgeom/spline.h"
 #include "csgeom/subrec.h"
 #include "csgeom/tcovbuf.h"
-#include "csgeom/textrans.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/tri.h"
 #include "csgeom/triangulate.h"
+#include "csgeom/triangulate3d.h"
 #include "csgeom/trimesh.h"
 #include "csgeom/trimeshlod.h"
 #include "csgeom/trimeshtools.h"

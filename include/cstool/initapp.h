@@ -47,14 +47,16 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
 
-struct iObjectRegistry;
+struct iCommandLineParser;
+struct iConfigManager;
 struct iEvent;
 struct iEventHandler;
 struct iEventQueue;
+struct iObjectRegistry;
 struct iPluginManager;
+struct iThreadManager;
 struct iVirtualClock;
-struct iCommandLineParser;
-struct iConfigManager;
+struct iSystemOpenManager;
 struct iVerbosityManager;
 
 /**\name Plugin request macros
@@ -104,6 +106,7 @@ struct iVerbosityManager;
   CS_REQUEST_PLUGIN("crystalspace.engine.3d", iEngine)
 /// Request map loader.
 #define CS_REQUEST_LEVELLOADER \
+  CS_REQUEST_PLUGIN("crystalspace.level.threadedloader", iThreadedLoader), \
   CS_REQUEST_PLUGIN("crystalspace.level.loader", iLoader)
 /// Request map writer.
 #define CS_REQUEST_LEVELSAVER \
@@ -179,6 +182,7 @@ public:
    * - CreateCommandLineParser()
    * - CreateVerbosityManager()
    * - CreateConfigManager()
+   * - CreateThreadManager()
    * - CreateInputDrivers()
    * - CreateStringSet()
    * - csPlatformStartup()
@@ -227,6 +231,12 @@ public:
   static iEventQueue* CreateEventQueue (iObjectRegistry*);
 
   /**
+   * This function creates the thread manager, which coordinates
+   * the thread queue system in CS.
+   */
+  static iThreadManager* CreateThreadManager (iObjectRegistry*);
+
+  /**
    * Create the virtual clock. This clock is responsible for keeping
    * track of virtual time in the game system. This function will
    * register the created virtual clock with the object registry as the
@@ -244,7 +254,7 @@ public:
 
   /**
    * Create and, if needed, register the verbosity manager. It is used by a 
-   * lot of plugins to control diagnostoc output while running.
+   * lot of plugins to control diagnostic output while running.
    */
   static iVerbosityManager* CreateVerbosityManager (iObjectRegistry*);
 
@@ -264,15 +274,30 @@ public:
   static bool CreateInputDrivers (iObjectRegistry*);
 
   /**
-   * Create the global shared string set and register it with the registry.
-   * This can be used if multiple, distinct modules want to share string IDs.
+   * Create the global shared string sets and register them with the registry.
+   * The first can be used if multiple, distinct modules want to share string IDs.
    * The set can be requested with:
    * \code
    * csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
    *   object_reg, "crystalspace.shared.stringset");
    * \endcode
+   *
+   * The second string set is used for shader variable names and can be
+   * requested by:
+   * \code
+   * csRef<iShaderVarStringSet> strings =
+   *   csQueryRegistryTagInterface<iShaderVarStringSet> (
+   *     objectRegistry, "crystalspace.shader.variablenameset");
+   * \endcode
    */
   static bool CreateStringSet (iObjectRegistry*);
+
+  /**
+   * Create the global system open manager sets and it them with the registry.
+   * Must be called after CreateEventQueue() and is most sensibly called
+   * before RequestPlugins().
+   */
+  static iSystemOpenManager* CreateSystemOpenManager (iObjectRegistry*);
 
   /**
    * Setup the config manager. If you have no config file then you can still
@@ -361,7 +386,7 @@ public:
    * that are sent through the event manager. Use this function to know
    * about keyboard, mouse and other events. Note that you also have to
    * use this function to be able to render something as rendering
-   * happens as a result of one event (csevProcess).
+   * happens as a result of one event (csevFrame).
    */
   static bool SetupEventHandler (iObjectRegistry*, iEventHandler*, const csEventID[]);
 

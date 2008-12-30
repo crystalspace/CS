@@ -43,6 +43,7 @@
 #include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include "iutil/stringarray.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
@@ -114,8 +115,7 @@ bool csSprite3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
-				       iStreamSource*,
-				       iLoaderContext* ldr_context, 
+				       iStreamSource*, iLoaderContext* ldr_context, 
 				       iBase* context)
 {
   csRef<iPluginManager> plugin_mgr (csQueryRegistry<iPluginManager>
@@ -162,14 +162,14 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
         {
           const char* matname = child->GetContentsValue ();
           iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-	  if (!mat)
-	  {
-	    synldr->ReportError (
-		  "crystalspace.sprite3dfactoryloader.parse.unknownmaterial",
-		  child, "Couldn't find material named '%s'", matname);
+          if (!mat)
+          {
+            synldr->ReportError (
+              "crystalspace.sprite3dfactoryloader.parse.unknownmaterial",
+              child, "Couldn't find material named '%s'", matname);
             return 0;
-	  }
-	  fact->SetMaterialWrapper (mat);
+          }
+          fact->SetMaterialWrapper (mat);
         }
         break;
 
@@ -518,13 +518,15 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 	{
 	  const char* factname = child->GetContentsValue ();
 	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
-	  if (!fact)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.sprite3dloader.parse.unknownfactory",
-		child, "Couldn't find factory '%s'!", factname);
-	    return 0;
-	  }
+
+    if(!fact)
+    {
+      synldr->ReportError (
+        "crystalspace.sprite3dloader.parse.unknownfactory",
+        child, "Couldn't find factory '%s'!", factname);
+      return 0;
+    }
+
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  spr3dLook = scfQueryInterface<iSprite3DState> (mesh);
 	  if (!spr3dLook)

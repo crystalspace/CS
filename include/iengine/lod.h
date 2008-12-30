@@ -36,7 +36,7 @@ struct iSharedVariable;
  */
 struct iLODControl : public virtual iBase
 {
-  SCF_INTERFACE(iLODControl, 2,0,0);
+  SCF_INTERFACE(iLODControl, 2,0,1);
   /**
    * Set a parameters for a function to compute LOD for the given
    * LOD control. The function is as follows:
@@ -73,6 +73,12 @@ struct iLODControl : public virtual iBase
    * the same number of polygons.
    */
   virtual int GetLODPolygonCount (float lod) const = 0;
+
+  // @@@ Poke res for docs
+  virtual void SetLODFade (float f) = 0;
+  virtual void GetLODFade (float& f) const = 0;
+  virtual void SetLODFade (iSharedVariable* varf) = 0;
+  virtual void GetLODFade (iSharedVariable*& varf) const = 0;
 };
 
 /** @} */

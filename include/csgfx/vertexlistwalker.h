@@ -53,16 +53,24 @@ public:
    *   are requested than available. If 0, the values {0,0,0,1} are used.
    */
   csVertexListWalker (iRenderBuffer* buffer, size_t desiredComponents = 0, 
-    const Tbase* defaultComponents = 0) : currElement (0), bufLock (buffer), 
-    defaultComponents (defaultComponents)
+    const Tbase* defaultComponents = 0) : currElement (0), 
+    bufLock (buffer, CS_BUF_LOCK_READ), defaultComponents (defaultComponents)
   {
-    bufferComponents = buffer->GetComponentCount ();
+    bufferComponents = buffer ? buffer->GetComponentCount () : 0;
     components = (desiredComponents != 0) ? desiredComponents : 
       bufferComponents;
     CS_ASSERT (components <= maxComponents);
-    elements = buffer->GetElementCount();
-    compType = buffer->GetComponentType();
-    FetchCurrentElement();
+    if (buffer)
+    {
+      elements = buffer->GetElementCount();
+      compType = buffer->GetComponentType();
+      FetchCurrentElement();
+    }
+    else
+    {
+      elements = 0;
+      compType = (csRenderBufferComponentType)~0;
+    }
   }
 
   //@{
@@ -97,6 +105,17 @@ public:
     currElement = 0;
     FetchCurrentElement();
   }
+  
+  /// Get number of elements in the iterated buffer.
+  size_t GetSize() const { return elements; }
+  
+  /// Set position to a specific element
+  void SetElement (size_t newElement)
+  {
+    CS_ASSERT(newElement < elements);
+    currElement = newElement;
+    FetchCurrentElement();
+  }
 private:
   /// Number of elements
   size_t elements;
@@ -124,6 +143,7 @@ private:
     return (defaultComponents != 0) ? defaultComponents[n] : 
       ((n == 3) ? Tbase(1) : Tbase(0));
   }
+  //@{
   /// Fetch a component, convert to T
   template<typename C>
   void FetchCurrentElementReal()
@@ -137,6 +157,34 @@ private:
       data += sizeof (C);
     }
   }
+  template<typename C, bool Signed, int range>
+  void FetchCurrentElementRealNorm()
+  {
+    uint8* data = bufLock + (currElement * bufferComponents * sizeof (C));
+    for (size_t c = 0; c < components; c++)
+    {
+      Tbase newComp;
+      if (c < bufferComponents)
+      {
+        double orgVal = double (*(C*)data);
+        if (Signed)
+        {
+          orgVal = (orgVal + (-range - 1)) / double ((int64)range*2+1);
+          newComp = Tbase (-1.0 + orgVal * 2.0);
+        }
+        else
+        {
+          orgVal = orgVal / double (range);
+          newComp = Tbase (orgVal);
+        }
+      }
+      else
+        newComp = GetDefaultComponent (c);
+      convertedComps[c] = newComp;
+      data += sizeof (C);
+    }
+  }
+  //@}
   /// Fetch a component based on buffer component type
   void FetchCurrentElement()
   {
@@ -153,20 +201,38 @@ private:
       case CS_BUFCOMP_BYTE:
         FetchCurrentElementReal<char>();
 	break;
+      case CS_BUFCOMP_BYTE_NORM:
+        FetchCurrentElementRealNorm<char, true, 127>();
+	break;
       case CS_BUFCOMP_UNSIGNED_BYTE:
         FetchCurrentElementReal<unsigned char>();
+	break;
+      case CS_BUFCOMP_UNSIGNED_BYTE_NORM:
+        FetchCurrentElementRealNorm<unsigned char, false, 255>();
 	break;
       case CS_BUFCOMP_SHORT:
         FetchCurrentElementReal<short>();
 	break;
+      case CS_BUFCOMP_SHORT_NORM:
+        FetchCurrentElementRealNorm<short, true, 32767>();
+	break;
       case CS_BUFCOMP_UNSIGNED_SHORT:
         FetchCurrentElementReal<unsigned short>();
+	break;
+      case CS_BUFCOMP_UNSIGNED_SHORT_NORM:
+        FetchCurrentElementRealNorm<unsigned short, false, 65535>();
 	break;
       case CS_BUFCOMP_INT:
         FetchCurrentElementReal<int>();
 	break;
+      case CS_BUFCOMP_INT_NORM:
+        FetchCurrentElementRealNorm<int, true, 2147483647>();
+	break;
       case CS_BUFCOMP_UNSIGNED_INT:
         FetchCurrentElementReal<unsigned int>();
+	break;
+      case CS_BUFCOMP_UNSIGNED_INT_NORM:
+        FetchCurrentElementRealNorm<unsigned int, false, 4294967295u>();
 	break;
       case CS_BUFCOMP_FLOAT:
         FetchCurrentElementReal<float>();

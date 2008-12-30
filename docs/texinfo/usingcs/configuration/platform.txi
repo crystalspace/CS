@@ -92,8 +92,7 @@ csInitializer::SetupConfigManager(object_reg, "myapp.cfg");
 @item
 Plugin-specific settings have the lowest priority.  These settings define
 default values for options specific to plugin modules.  For example, the OpenGL
-renderer loads configuration information from the @file{opengl.cfg} file, and
-the software renderer loads configuration from the @file{soft3d.cfg} file.
+renderer loads configuration information from the @file{opengl.cfg} file.
 @end itemize
 
 If the program allows the user to change options and settings, these changes

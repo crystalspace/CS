@@ -1,0 +1,292 @@
+SubDir TOP scripts msi ;
+
+# @@@ Not quite the same, MSM package and CS release version ...
+MSM_VERSION ?= $(PACKAGE_VERSION) ;
+MSM_ARCH = $(CS_COMPILER_NAME_AND_VERSION) ;
+
+MSI_VERSION_MAJORMINOR ?= $(PACKAGE_VERSION_LIST[1]).$(PACKAGE_VERSION_LIST[2]) ;
+
+# Package version.
+# This will become the MSI package version "build" number.
+MSI_VERSION_PACKAGE = 4 ;
+
+WIN32LIBS.MSM_PATH_DEFAULT = "$(BUILDTOP)/win32libs/mergemodules" ;
+
+# Set up file lists for MSVC binaries.
+rule MSVCFileListSharedLibs
+{
+  local filelist = $(1) ;
+  local builddir = $(2) ;
+  local suffix = $(3) ;
+  
+  local SUBDIR = [ ConcatDirs $(TOP) out $(builddir) bin ] ;
+  local libs = [ Wildcard *-$(suffix).dll ] ;
+  for l in $(libs)
+  {
+    FileListEntriesData $(l) : : $(filelist) ;
+    
+    local basename = [ Match "(.*)-(.*)-(.*)\.dll" : $(l:G=) ] ;
+    MSVC_$(builddir)_lib$(basename[1])_FILELIST = $(filelist) ;
+  }
+  return $(libs) ;
+}
+
+rule MSVCFileListStaticLibs
+{
+  local filelist = $(1) ;
+  local builddir = $(2) ;
+  
+  local SUBDIR = [ ConcatDirs $(TOP) out $(builddir) libs ] ;
+  FileListEntriesData [ Wildcard *.lib ] : : $(filelist) ;
+}
+
+rule MSVCFileListApps
+{
+  local listsuffix = $(1) ;
+  local builddir = $(2) ;
+  
+  local SUBDIR = [ ConcatDirs $(TOP) out $(builddir) bin ] ;
+  local exes = [ Wildcard *.exe ] ;
+  for e in $(exes)
+  {
+    local list = $($(e)_FILELIST) ;
+    if $(list)
+    {
+      FileListEntriesData $(e) : : $(list)$(listsuffix) ;
+      
+      local basename = [ Match "(.*)\.exe" : $(e:G=) ] ;
+      MSVC_$(builddir)_app$(basename[1])_FILELIST = $(list)$(listsuffix) ;
+    }
+  }
+}
+
+rule MSVCFileListPlugins
+{
+  local listsuffix = $(1) ;
+  local builddir = $(2) ;
+  local sharedlibs = $(3) ;
+  
+  local SUBDIR = [ ConcatDirs $(TOP) out $(builddir) bin ] ;
+  local plugins = [ Filter [ Wildcard *.dll ] : $(sharedlibs) ] ;
+  for p in $(plugins)
+  {
+    local list = $($(p)_FILELIST) ;
+    if $(list)
+    {
+      FileListEntriesData $(p) : : $(list)$(listsuffix) ;
+      
+      local basename = [ Match "(.*)\.dll" : $(p:G=) ] ;
+      MSVC_$(builddir)_plg$(basename[1])_FILELIST = $(list)$(listsuffix) ;
+    }
+  }
+}
+
+rule MSVCScanPDBs
+{
+  local builddir = $(1) ;
+  local prefix = $(2) ;
+  
+  local SUBDIR = [ ConcatDirs $(TOP) out $(builddir) build ] ;
+  local dirs = [ Wildcard $(prefix)* ] ;
+  for d in $(dirs)
+  {
+    local SUBDIR = [ ConcatDirs $(TOP) out $(builddir) build $(d) ] ;
+    local baselist = $(MSVC_$(builddir)_$(d)_FILELIST) ;
+    if $(baselist)
+    {
+      local pdbs = [ Wildcard *.pdb ] ;
+      FileListEntriesData $(pdbs) : : debug-$(baselist) ;
+    }
+  }
+}
+
+rule MSVCFileLists
+{
+  local version = $(1) ;
+
+  local sharedlibs = [ MSVCFileListSharedLibs libs-shared_vc$(version) :
+    release$(version) : vc$(version) ] ;
+  MSVCFileListStaticLibs libs-static_vc$(version) : release$(version) ;
+  MSVCFileListApps _vc$(version) : release$(version) ;
+  MSVCFileListPlugins _vc$(version) : release$(version) : $(sharedlibs) ;
+  
+  MSVCScanPDBs release$(version) : app ;
+  MSVCScanPDBs release$(version) : lib ;
+  MSVCScanPDBs release$(version) : plg ;
+}
+
+MSVCFileLists 7 ;
+MSVCFileLists 71 ;
+MSVCFileLists 8 ;
+MSVCFileLists 9 ;
+
+INCL_RUNTIME = $(SUBDIR)/CS-feature-runtime.wxi $(SUBDIR)/CS-directory-runtime.wxi ;
+INCL_SDK = $(SUBDIR)/CS-feature-sdk.wxi $(SUBDIR)/CS-directory-sdk.wxi ;
+INCL_DEMO = $(SUBDIR)/CS-feature-demo.wxi $(SUBDIR)/CS-directory-demo.wxi ;
+Includes CS-runtime.wxs : $(INCL_RUNTIME) ;
+Includes CS-sdk.wxs : $(INCL_RUNTIME) $(INCL_SDK) ;
+Includes CS-demos.wxs : $(INCL_RUNTIME) $(INCL_DEMO) ;
+Includes CS-all.wxs : $(INCL_RUNTIME) $(INCL_SDK) $(INCL_DEMO) ;
+
+rule MSIMergeModuleFromList_N
+{
+  MSIMergeModuleFromList $(1) : $(2) : $(3) : $(4) ;
+  Depends mergemodules-neutral : $(1) ;
+}
+# Architecture-independent
+MSIMergeModuleFromList_N CS.doc : doc-manual doc-api : $(MSM_VERSION) : doc-manual:manual doc-api:api ;
+MSIMergeModuleFromList_N CS.data.demo : data-demo data-demo-maps : $(MSM_VERSION) ;
+MSIMergeModuleFromList_N CS.data.runtime : data-runtime : $(MSM_VERSION) ;
+MSIMergeModuleFromList_N CS.data.sdk : data-tool : $(MSM_VERSION) ;
+MSIMergeModuleFromList_N CS.include : headers : $(MSM_VERSION) ;
+MSIMergeModuleFromList_N CS.vfs : vfs : $(MSM_VERSION) ;
+MSIMergeModuleFromList_N CS.python : python-bindings : $(MSM_VERSION) ;
+MakeLocate CS.register.msm : $(LOCATE.MSM) ;
+MSIMergeModule CS.register.msm : CS.register.wxs ;
+Depends mergemodules-neutral : CS.register.msm ;
+
+rule MSIMergeModuleFromList_A
+{
+  MSIMergeModuleFromList $(1) : $(2) : $(3) : $(4) ;
+  NotFile mergemodules-$(5) ;
+  Depends mergemodules-$(5) : $(1) ;
+}
+# Architecture-dependent
+MSIMergeModuleFromList_A CS.arch.$(MSM_ARCH).include : headers-platform : $(MSM_VERSION) : : $(MSM_ARCH) ;
+MSIMergeModuleFromList_A CS.arch.$(MSM_ARCH).lib : libs-shared : $(MSM_VERSION) : : $(MSM_ARCH) ;
+MSIMergeModuleFromList_A CS.arch.$(MSM_ARCH).link : libs-static : $(MSM_VERSION) : : $(MSM_ARCH) ;
+MSIMergeModuleFromList_A CS.arch.$(MSM_ARCH).executable.demo : app-demo : $(MSM_VERSION) : : $(MSM_ARCH) ;
+MSIMergeModuleFromList_A CS.arch.$(MSM_ARCH).executable.runtime : plugin plugin-cg plugin-python : $(MSM_VERSION) : : $(MSM_ARCH) ;
+MSIMergeModuleFromList_A CS.arch.$(MSM_ARCH).executable.sdk : app-tool : $(MSM_VERSION) : : $(MSM_ARCH) ;
+MSIMergeModuleFromList_A CS.arch.$(MSM_ARCH).csconfig : cs-config : $(MSM_VERSION) : : $(MSM_ARCH) ;
+MSIMergeModuleFromList_A CS.arch.$(MSM_ARCH).python : python-modules : $(MSM_VERSION) : : $(MSM_ARCH) ;
+
+# Safeguard
+MSI_UPGRADE_CODES_FOR_VERSION = 1.9 ;
+if "$(MSI_UPGRADE_CODES_FOR_VERSION)" != "$(MSI_VERSION_MAJORMINOR)"
+{
+  Exit "CS version was changed, please set new MSI upgrade codes" ;
+}
+
+MSI_UPGRADE_CODE.CS.all.GCC_3.4 = 3C8B4562-BF93-11DC-B42B-0015582877AD ;
+MSI_UPGRADE_CODE.CS.all.VC_7 = 70d2beb0-169e-4516-a181-a4603cba2d7d ;
+MSI_UPGRADE_CODE.CS.all.VC_71 = dc75cc70-8533-4043-9c98-bddef5254c2c ;
+MSI_UPGRADE_CODE.CS.all.VC_8 = d9337f5b-5aba-4fec-83d2-aba3f3b704d4 ;
+MSI_UPGRADE_CODE.CS.all.VC_9 = b317c81a-c3cd-4da5-90b1-e09df718fd03 ;
+
+MSI_UPGRADE_CODE.CS.runtime.GCC_3.4 = f9081efd-7fb9-4740-ad60-43f9a4a3197d ;
+MSI_UPGRADE_CODE.CS.runtime.VC_7 = 72e8130a-4242-4d5d-a5c4-a299d9aba969 ;
+MSI_UPGRADE_CODE.CS.runtime.VC_71 = bec0fb35-d30c-400b-8870-8df95e944a36 ;
+MSI_UPGRADE_CODE.CS.runtime.VC_8 = cbb8fa4b-da54-496f-92c2-f1dafcf087fc ;
+MSI_UPGRADE_CODE.CS.runtime.VC_9 = 0bf4504e-3f02-4fe0-a533-ea4848befe79 ;
+
+MSI_UPGRADE_CODE.CS.sdk.GCC_3.4 = dea233a5-b850-4d56-bb52-c5329c07e7e1 ;
+MSI_UPGRADE_CODE.CS.sdk.VC_7 = 8811ea0e-a093-4019-ac23-930da08eaee3 ;
+MSI_UPGRADE_CODE.CS.sdk.VC_71 = c516be4e-42b1-42f6-81eb-a5e6d9e3c462 ;
+MSI_UPGRADE_CODE.CS.sdk.VC_8 = 3512c07f-aabc-4ce4-a571-cf4beedb946f ;
+MSI_UPGRADE_CODE.CS.sdk.VC_9 = af960da9-3d97-4011-b03e-d2e97fb86a17 ;
+
+MSI_UPGRADE_CODE.CS.demos.GCC_3.4 = 11ef91dd-2581-48a1-acb1-5e9dda3e760f ;
+MSI_UPGRADE_CODE.CS.demos.VC_7 = d4693da7-1d62-40bb-96b3-061b669c2064 ;
+MSI_UPGRADE_CODE.CS.demos.VC_71 = 24ace31c-863a-4e07-b63f-f8b4620f3c4b ;
+MSI_UPGRADE_CODE.CS.demos.VC_8 = be05d5d1-a0e1-47e0-8267-ce081be7cbc7 ;
+MSI_UPGRADE_CODE.CS.demos.VC_9 = dd6a2886-2c83-46f8-a242-5de4b6aa2913 ;
+
+rule GetMsiRelatedPath
+{
+  local env = $(1) ;
+  local target = $(2) ;
+  if ! $($(env))
+  {
+    $(env) = $($(env)_DEFAULT) ;
+
+    local w = $(env).warning ;
+    MakeLocate $(w) : $(LOCATE.MSI) ;
+    ENV on $(w) = $(env) ;
+    GUESS on $(w) = $($(env)) ;
+    WarnMsiPathNotSet $(w) ;
+    Depends $(target) : $(w) ;
+    Clean clean : $(w) ;
+  }
+  return $($(env)) ;
+}
+
+actions WarnMsiPathNotSet
+{
+  echo "*** $(ENV) not set; defaulting to: $(GUESS)" >&2
+  echo "*** If default is undesirable, assign $(ENV) Jam variable." >&2
+  echo "dummy file" > $(1)
+}
+
+rule GetWin32LibsMSMPath
+{ return [ GetMsiRelatedPath WIN32LIBS.MSM_PATH : $(1) ] ; }
+
+rule MakeMSIsForArchAndKind
+{
+  local arch = $(1) ;
+  local kind = $(2) ;
+  local msi = CS-$(kind)-$(arch).msi ;
+  local win32libs_msms = [ GetWin32LibsMSMPath $(msi) ] ;
+
+  Depends $(msi) : mergemodules-neutral ;
+  Depends $(msi) : mergemodules-$(arch) ;
+
+  MakeLocate $(msi) : $(LOCATE.MSI) ;
+  MSIPackage $(msi) : CS-$(kind).wxs :
+    "CRYSTAL_MSM_PATH=$(LOCATE.MSM)"
+    "WIN32LIBS_MSM_PATH=$(win32libs_msms)"
+    "ARCH=$(arch)" "TOP=$(TOP)"
+    "UPGRADE_CODE=$(MSI_UPGRADE_CODE.CS.$(kind).$(arch))" 
+    "VERSION_MAJORMINOR=$(MSI_VERSION_MAJORMINOR)"
+    "VERSION_MAJOR=$(PACKAGE_VERSION_LIST[1])"
+    "VERSION_MINOR=$(PACKAGE_VERSION_LIST[2])"
+    "VERSION_PACKAGE=$(MSI_VERSION_PACKAGE)" :
+    CS-$(kind)-$(arch) ;
+  Depends msis-$(kind) : $(msi) ;
+  Depends msis-$(arch) : $(msi) ;
+  Depends msis : $(msi) ;
+  
+  SEARCH on $(msi) = $(LOCATE.MSI) ;
+  Depends upload-msis-$(arch) : $(msi) ;
+  UploadMSIs upload-msis-$(arch) : $(msi) :
+    crystal@crystalspace3d.org :
+    www/crystalspace3d.org/htdocs/downloads/binary/$(PACKAGE_VERSION) ;
+}
+rule MakeMSIsForArch
+{
+  local arch = $(1) ;
+  
+  MakeMSIsForArchAndKind $(arch) : runtime ;
+  MakeMSIsForArchAndKind $(arch) : sdk ;
+  MakeMSIsForArchAndKind $(arch) : demos ;
+  MakeMSIsForArchAndKind $(arch) : all ;
+}
+
+MakeMSIsForArch $(MSM_ARCH) ;
+
+# Merge modules for VC builds
+rule MSIMergeModulesVC
+{
+  local version = $(1) ;
+  
+  local arch = VC_$(version) ;
+  # VC builds don't have specific headers, make empty MSM
+  MSIMergeModuleFromList CS.arch.$(arch).include : : $(MSM_VERSION) ;
+  MSIMergeModuleFromList CS.arch.$(arch).lib : libs-shared_vc$(version) : $(MSM_VERSION) ;
+  MSIMergeModuleFromList CS.arch.$(arch).link : libs-static_vc$(version) : $(MSM_VERSION) ;
+  MSIMergeModuleFromList CS.arch.$(arch).executable.demo :
+    app-demo_vc$(version) : $(MSM_VERSION) ;
+  MSIMergeModuleFromList CS.arch.$(arch).executable.runtime :
+    plugin_vc$(version)
+    plugin-cg_vc$(version) : $(MSM_VERSION) ;
+  MSIMergeModuleFromList CS.arch.$(arch).executable.sdk :
+    app-tool_vc$(version) : $(MSM_VERSION) ;
+}
+MSIMergeModulesVC 7 ;
+MSIMergeModulesVC 71 ;
+MSIMergeModulesVC 8 ;
+MSIMergeModulesVC 9 ;
+MakeMSIsForArch VC_7 ;
+MakeMSIsForArch VC_71 ;
+MakeMSIsForArch VC_8 ;
+MakeMSIsForArch VC_9 ;

@@ -31,6 +31,7 @@
 #include "csutil/csstring.h"
 #include "csutil/flags.h"
 #include "csutil/scanstr.h"
+#include "csutil/stringconv.h"
 #include "csutil/util.h"
 #include "iengine/camera.h"
 #include "iengine/light.h"
@@ -42,6 +43,7 @@
 #include "iengine/sector.h"
 #include "iengine/sharevar.h"
 #include "iengine/scenenode.h"
+#include "iengine/rendermanager.h"
 #include "iengine/campos.h"
 #include "igeom/clip2d.h"
 #include "igraphic/imageio.h"
@@ -63,172 +65,33 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
 
+#include "imesh/animesh.h"
+#include "imesh/skeleton2.h"
+#include "imesh/skeleton2anim.h"
+
 #include "bot.h"
 #include "command.h"
 #include "walktest.h"
 #include "wentity.h"
+#include "splitview.h"
+#include "recorder.h"
+#include "varmanager.h"
+#include "particles.h"
+#include "missile.h"
+#include "lights.h"
+#include "decaltest.h"
+#include "animsky.h"
+#include "fullscreenfx.h"
 
 extern WalkTest* Sys;
 
 csString LookForKeyValue(iObjectIterator* it,const char* key);
 double ParseScaleFactor(iObjectIterator* it);
 
-// Use a view's clipping rect to calculate a bounding box
-void BoundingBoxForView(iView *view, csBox2 *box)
-{
-    size_t vertexCount = view->GetClipper()->GetVertexCount();
-    csVector2 *clip = view->GetClipper()->GetClipPoly();
-    for (size_t i = 0; i < vertexCount; i++)
-        box->AddBoundingVertex(clip[i]);
-}
-
-/// Save recording
-void SaveRecording (iVFS* vfs, const char* fName)
-{
-  csRef<iFile> cf;
-  cf = vfs->Open (fName, VFS_FILE_WRITE);
-  uint32 l = (int32)Sys->recording.GetSize ();
-  l = csLittleEndian::Convert (l);
-  cf->Write ((char*)&l, sizeof (l));
-  size_t i;
-  csRecordedCameraFile camint;
-  iSector* prev_sector = 0;
-  for (i = 0 ; i < Sys->recording.GetSize () ; i++)
-  {
-    csRecordedCamera* reccam = (csRecordedCamera*)Sys->recording[i];
-    camint.m11 = csLittleEndian::Convert (csFloatToLong (reccam->mat.m11));
-    camint.m12 = csLittleEndian::Convert (csFloatToLong (reccam->mat.m12));
-    camint.m13 = csLittleEndian::Convert (csFloatToLong (reccam->mat.m13));
-    camint.m21 = csLittleEndian::Convert (csFloatToLong (reccam->mat.m21));
-    camint.m22 = csLittleEndian::Convert (csFloatToLong (reccam->mat.m22));
-    camint.m23 = csLittleEndian::Convert (csFloatToLong (reccam->mat.m23));
-    camint.m31 = csLittleEndian::Convert (csFloatToLong (reccam->mat.m31));
-    camint.m32 = csLittleEndian::Convert (csFloatToLong (reccam->mat.m32));
-    camint.m33 = csLittleEndian::Convert (csFloatToLong (reccam->mat.m33));
-    camint.x = csLittleEndian::Convert (csFloatToLong (reccam->vec.x));
-    camint.y = csLittleEndian::Convert (csFloatToLong (reccam->vec.y));
-    camint.z = csLittleEndian::Convert (csFloatToLong (reccam->vec.z));
-    camint.mirror = reccam->mirror;
-    cf->Write ((char*)&camint, sizeof (camint));
-    unsigned char len;
-    if (prev_sector == reccam->sector)
-    {
-      len = 255;
-      cf->Write ((char*)&len, 1);
-    }
-    else
-    {
-      size_t _len = strlen (reccam->sector->QueryObject ()->GetName ());
-      len = (_len > 255) ? 255 : (unsigned char)len;
-      cf->Write ((char*)&len, 1);
-      cf->Write (reccam->sector->QueryObject ()->GetName (),
-      	1+len);
-    }
-    prev_sector = reccam->sector;
-    if (reccam->cmd)
-    {
-      size_t _len = strlen (reccam->cmd);
-      len = (_len > 255) ? 255 : (unsigned char)len;
-      cf->Write ((char*)&len, 1);
-      cf->Write (reccam->cmd, 1+len);
-    }
-    else
-    {
-      len = 254;
-      cf->Write ((char*)&len, 1);
-    }
-    if (reccam->arg)
-    {
-      size_t _len = strlen (reccam->arg);
-      len = (_len > 255) ? 255 : (unsigned char)len;
-      cf->Write ((char*)&len, 1);
-      cf->Write (reccam->arg, 1+len);
-    }
-    else
-    {
-      len = 254;
-      cf->Write ((char*)&len, 1);
-    }
-  }
-}
-
-/// Load recording
-void LoadRecording (iVFS* vfs, const char* fName)
-{
-  csRef<iFile> cf;
-  cf = vfs->Open (fName, VFS_FILE_READ);
-  if (!cf) return;
-  Sys->recording.DeleteAll ();
-  Sys->recording.SetSize (0);
-  int32 l;
-  cf->Read ((char*)&l, sizeof (l));
-  l = csLittleEndian::Convert (l);
-  csRecordedCameraFile camint;
-  iSector* prev_sector = 0;
-  int i;
-  for (i = 0 ; i < l ; i++)
-  {
-    csRecordedCamera* reccam = new csRecordedCamera ();
-    cf->Read ((char*)&camint, sizeof (camint));
-    reccam->mat.m11 = csLongToFloat (csLittleEndian::Convert (camint.m11));
-    reccam->mat.m12 = csLongToFloat (csLittleEndian::Convert (camint.m12));
-    reccam->mat.m13 = csLongToFloat (csLittleEndian::Convert (camint.m13));
-    reccam->mat.m21 = csLongToFloat (csLittleEndian::Convert (camint.m21));
-    reccam->mat.m22 = csLongToFloat (csLittleEndian::Convert (camint.m22));
-    reccam->mat.m23 = csLongToFloat (csLittleEndian::Convert (camint.m23));
-    reccam->mat.m31 = csLongToFloat (csLittleEndian::Convert (camint.m31));
-    reccam->mat.m32 = csLongToFloat (csLittleEndian::Convert (camint.m32));
-    reccam->mat.m33 = csLongToFloat (csLittleEndian::Convert (camint.m33));
-    reccam->vec.x = csLongToFloat (csLittleEndian::Convert (camint.x));
-    reccam->vec.y = csLongToFloat (csLittleEndian::Convert (camint.y));
-    reccam->vec.z = csLongToFloat (csLittleEndian::Convert (camint.z));
-    reccam->mirror = (camint.mirror != 0);
-    unsigned char len;
-    cf->Read ((char*)&len, 1);
-    iSector* s;
-    if (len == 255)
-    {
-      s = prev_sector;
-    }
-    else
-    {
-      char* buf = new char[1+len];
-      cf->Read (buf, 1+len);
-      s = Sys->Engine->GetSectors ()->FindByName (buf);
-      delete[] buf;
-    }
-    reccam->sector = s;
-    prev_sector = s;
-
-    cf->Read ((char*)&len, 1);
-    if (len == 254)
-    {
-      reccam->cmd = 0;
-    }
-    else
-    {
-      reccam->cmd = new char[len+1];
-      cf->Read (reccam->cmd, 1+len);
-    }
-    cf->Read ((char*)&len, 1);
-    if (len == 254)
-    {
-      reccam->arg = 0;
-    }
-    else
-    {
-      reccam->arg = new char[len+1];
-      cf->Read (reccam->arg, 1+len);
-    }
-    Sys->recording.Push (reccam);
-  }
-}
-
 /// Save/load camera functions
 void WalkTest::SaveCamera (const char *fName)
 {
-  if (!view) return;
-  iCamera *c = view->GetCamera ();
+  iCamera *c = views->GetCamera ();
   csOrthoTransform& camtrans = c->GetTransform ();
   if (!c) return;
   const csMatrix3& m_o2t = camtrans.GetO2T ();
@@ -255,11 +118,11 @@ bool WalkTest::LoadCamera (const char *fName)
   bool ok = true;
 #define IFFAIL(x) if (ok && !(ok = (x)))
   IFFAIL (myVFS->Exists (fName))
-    Report (CS_REPORTER_SEVERITY_ERROR,
+    Report (CS_REPORTER_SEVERITY_WARNING,
 	    "Could not open camera file '%s'!", fName);
   csRef<iDataBuffer> data;
   IFFAIL ((data = myVFS->ReadFile(fName)) != 0)
-    Report (CS_REPORTER_SEVERITY_ERROR,
+    Report (CS_REPORTER_SEVERITY_WARNING,
 	    "Could not read camera file '%s'!", fName);
   csMatrix3 m;
   csVector3 v;
@@ -281,16 +144,16 @@ bool WalkTest::LoadCamera (const char *fName)
 			   &m.m31, &m.m32, &m.m33,
 			   sector_name,
 			   &imirror))
-    Report (CS_REPORTER_SEVERITY_ERROR,
+    Report (CS_REPORTER_SEVERITY_WARNING,
 	    "Wrong format for camera file '%s'", fName);
   iSector* s = 0;
   IFFAIL ((s = Engine->GetSectors ()->FindByName (sector_name)) != 0)
-    Report (CS_REPORTER_SEVERITY_ERROR,
+    Report (CS_REPORTER_SEVERITY_WARNING,
 	    "Sector `%s' in coordinate file does not "
 	    "exist in this map!", sector_name);
   if (ok)
   {
-    iCamera *c = view->GetCamera ();
+    iCamera *c = views->GetCamera ();
     c->SetSector (s);
     c->SetMirrored (imirror != 0);
     c->GetTransform ().SetO2T (m);
@@ -315,23 +178,23 @@ void move_mesh (iMeshWrapper* sprite, iSector* where, csVector3 const& pos)
 void load_meshobj (char *filename, char *templatename, char* txtname)
 {
   // First check if the texture exists.
-  if (!Sys->view->GetEngine ()->GetMaterialList ()->FindByName (txtname))
+  if (!Sys->Engine->GetMaterialList ()->FindByName (txtname))
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"Can't find material '%s' in memory!", txtname);
     return;
   }
 
-  iBase* result;
-  if (!Sys->LevelLoader->Load (filename, result))
+  csRef<iThreadReturn> ret = Sys->LevelLoader->LoadFile(filename);
+  ret->Wait();
+  if (!ret->WasSuccessful())
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-  	"There was an error reading model '%s'!", filename);
+      "There was an error reading model '%s'!", filename);
     return;
   }
 
-  csRef<iMeshFactoryWrapper> wrap = scfQueryInterface<iMeshFactoryWrapper> (
-  	result);
+  csRef<iMeshFactoryWrapper> wrap = scfQueryInterface<iMeshFactoryWrapper> (ret->GetResultRefPtr());
   if (wrap)
     wrap->QueryObject ()->SetName (templatename);
 }
@@ -545,7 +408,7 @@ double ParseScaleFactor(iObjectIterator* it)
   double sf;
   csString scaleValue = LookForKeyValue(it,"scalefactor");
 
-  sf = atof(scaleValue);
+  sf = CS::Utility::strtof(scaleValue);
   return sf;
 }
 
@@ -596,8 +459,7 @@ char* LookForTextureFileName(const char* value)
 
 
 void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
-					   iGraphics3D* /*MyG3D*/, iLoader* loader,
-					   iObjectRegistry* /*objReg*/)
+					   iGraphics3D* /*MyG3D*/, iObjectRegistry* /*objReg*/)
 {
   iMaterialList* matList = Engine->GetMaterialList();
   //used to check if a material is already registered
@@ -629,10 +491,14 @@ void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
     {
       //Is not registered. We have to do it.
       textFileName = LookForTextureFileName(kp->GetValue());
-      if(!loader->LoadTexture(matName,textFileName))
+
+      csRef<iThreadReturn> ret = Sys->LevelLoader->LoadTexture(matName, textFileName);
+      ret->Wait();
+      if(!ret->WasSuccessful())
       {
         csPrintf("Error loading %s texture!!",textFileName);
       }
+
       //Material registered, let's go to another one
       delete [] matName;
       delete [] textFileName;
@@ -687,15 +553,14 @@ void BuildSprite(iSector * sector, iObjectIterator* it, csVector3 position)
 
 void BuildObject(iSector * sector,
 	iObjectIterator* it, iEngine* Engine,
-	csVector3 position, iGraphics3D* MyG3D, iLoader* loader,
-	iObjectRegistry* objReg)
+	csVector3 position, iGraphics3D* MyG3D,	iObjectRegistry* objReg)
 {
   csString factoryName;
   if(strcmp(LookForKeyValue(it,"classname"),"SEED_MESH_OBJ")) return;
   //Now we know this objects iterator belongs to a SEED_MESH_OBJECT
   //Proceeding to contruct the object
 
-  RegisterMaterials(it,Engine,MyG3D,loader,objReg);
+  RegisterMaterials(it,Engine,MyG3D,objReg);
   factoryName = LookForKeyValue(it,"factory");
   if(!Engine->GetMeshFactories()->FindByName(factoryName))
 	  BuildFactory(it, (char*)(const char*)factoryName, Engine);
@@ -720,8 +585,7 @@ void WalkTest::ParseKeyNodes(iObject* src)
     }
     csRef<iObjectIterator> it2 (node_obj->GetIterator());
 
-    BuildObject(sector, it2, Engine, node->GetPosition(), myG3D,
-		LevelLoader, object_reg);
+    BuildObject(sector, it2, Engine, node->GetPosition(), myG3D, object_reg);
   }
 }
 
@@ -738,22 +602,11 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
     if (!strcmp (kp->GetKey (), "cmd_AnimateSky"))
     {
-      csRef<iSector> Sector (scfQueryInterface<iSector> (src));
-      if (Sector)
-      {
-        char name[100], rot[100];
-        csScanStr (kp->GetValue (), "%s,%s,%f", name, rot, &anim_sky_speed);
-        if (rot[0] == 'x') anim_sky_rot = 0;
-        else if (rot[0] == 'y') anim_sky_rot = 1;
-        else anim_sky_rot = 2;
-        anim_sky = Sector->GetMeshes ()->FindByName (name);
-      }
+      sky->AnimateSky (kp->GetValue (), src);
     }
     else if (!strcmp (kp->GetKey (), "cmd_AnimateDirLight"))
     {
-      csRef<iMeshWrapper> wrap = scfQueryInterface<iMeshWrapper> (src);
-      if (wrap)
-        anim_dirlight = wrap;	// @@@ anim_dirlight should be csRef
+      sky->AnimateDirLight (src);
     }
     else if (!strcmp (kp->GetKey (), "entity_WavePortal"))
     {
@@ -875,30 +728,15 @@ void WalkTest::ActivateObject (iObject* src)
 
 float safe_atof (const char* arg)
 {
-  if (arg) return atof (arg);
+  if (arg) return CS::Utility::strtof (arg);
   else return 1;
 }
 
 //--//--//--//--//--//--//--//--//--//--//-- Handle our additional commands --//
 
 // Command recording
-#define RECORD_ARGS(CMD, ARG) \
-if (Sys->cfg_recording >= 0)                        \
-{                                                   \
-  Sys->recorded_cmd = new char[strlen(CMD)+1];      \
-  strcpy (Sys->recorded_cmd, CMD);                  \
-  if (ARG)                                          \
-  {                                                 \
-    Sys->recorded_arg = new char[strlen(ARG)+1];    \
-    strcpy (Sys->recorded_arg, ARG);                \
-  }                                                 \
-}
-#define RECORD_CMD(CMD) \
-if (Sys->cfg_recording >= 0)                        \
-{                                                   \
-  Sys->recorded_cmd = new char[strlen(CMD)+1];      \
-  strcpy (Sys->recorded_cmd, CMD);                  \
-}
+#define RECORD_ARGS(CMD, ARG) Sys->recorder->RecordArgs (CMD, ARG);
+#define RECORD_CMD(CMD) Sys->recorder->RecordCommand (CMD);
 
 bool CommandHandler (const char *cmd, const char *arg)
 {
@@ -912,7 +750,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  farplane");
     CONPRI("Lights:");
     CONPRI("  addlight dellight dellights addstlight delstlight");
-    CONPRI("  clrlights setlight relight");
+    CONPRI("  clrlights setlight");
     CONPRI("Views:");
     CONPRI("  split_view unsplit_view toggle_view");
     CONPRI("Movement:");
@@ -927,6 +765,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  addmbot delmbot addbot delbot fire explosion frain decal_test");
     CONPRI("  rain snow fountain flame portal fs_inter fs_fadeout fs_fadecol");
     CONPRI("  fs_fadetxt fs_red fs_green fs_blue fs_whiteout fs_shadevert");
+    CONPRI("  frankie cleareffects");
     CONPRI("Debugging:");
     CONPRI("  zbuf debug0 debug1 debug2 palette bugplug");
     CONPRI("  db_boxshow db_boxcam1 db_boxcam2 db_boxsize1 db_boxsize2");
@@ -940,6 +779,15 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  varlist var setvar setvarv setvarc loadmap saveworld");
 
 #   undef CONPRI
+  }
+  else if (!csStrCaseCmp (cmd, "cleareffects"))
+  {
+    iRenderManager *rm = Sys->Engine->GetRenderManager();
+    csRef<iRenderManagerPostEffects> pe = scfQueryInterface<iRenderManagerPostEffects>(rm);
+    if (pe)
+    {
+      pe->ClearLayers();
+    }
   }
   else if (!csStrCaseCmp (cmd, "coordsave"))
   {
@@ -970,145 +818,23 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!csStrCaseCmp (cmd, "setvarc"))
   {
-    if (!arg)
-    {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  	"Please give a name of a variable and a color.");
-      return false;
-    }
-    char name[256];
-    csColor c;
-    csScanStr (arg, "%s,%f,%f,%f", name, &c.red, &c.green, &c.blue);
-
-    iSharedVariableList* vl = Sys->view->GetEngine ()->GetVariableList ();
-    iSharedVariable* v = vl->FindByName (name);
-    if (!v)
-    {
-      csRef<iSharedVariable> nv = vl->New ();
-      v = nv;
-      v->SetName (name);
-      vl->Add (nv);
-    }
-    v->SetColor (c);
+    if (!WalkTestVarManager::SetVariableColor (Sys, arg)) return false;
   }
   else if (!csStrCaseCmp (cmd, "setvarv"))
   {
-    if (!arg)
-    {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  	"Please give a name of a variable and a vector.");
-      return false;
-    }
-    char name[256];
-    csVector3 w;
-    csScanStr (arg, "%s,%f,%f,%f", name, &w.x, &w.y, &w.z);
-
-    iSharedVariableList* vl = Sys->view->GetEngine ()->GetVariableList ();
-    iSharedVariable* v = vl->FindByName (name);
-    if (!v)
-    {
-      csRef<iSharedVariable> nv = vl->New ();
-      v = nv;
-      v->SetName (name);
-      vl->Add (nv);
-    }
-    v->SetVector (w);
+    if (!WalkTestVarManager::SetVariableVector (Sys, arg)) return false;
   }
   else if (!csStrCaseCmp (cmd, "setvar"))
   {
-    if (!arg)
-    {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  	"Please give a name of a variable and a value.");
-      return false;
-    }
-    char name[256];
-    float value;
-    csScanStr (arg, "%s,%f", name, &value);
-
-    iSharedVariableList* vl = Sys->view->GetEngine ()->GetVariableList ();
-    iSharedVariable* v = vl->FindByName (name);
-    if (!v)
-    {
-      csRef<iSharedVariable> nv = vl->New ();
-      v = nv;
-      v->SetName (name);
-      vl->Add (nv);
-    }
-    v->Set (value);
+    if (!WalkTestVarManager::SetVariable (Sys, arg)) return false;
   }
   else if (!csStrCaseCmp (cmd, "var"))
   {
-    if (!arg)
-    {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  	"Please give a name of a variable to show.");
-      return false;
-    }
-    char name[256];
-    csScanStr (arg, "%s", name);
-
-    iSharedVariableList* vl = Sys->view->GetEngine ()->GetVariableList ();
-    iSharedVariable* v = vl->FindByName (name);
-    if (!v)
-    {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  	"Couldn't find variable '%s'!", name);
-      return false;
-    }
-    int t = v->GetType ();
-    switch (t)
-    {
-      case iSharedVariable::SV_FLOAT:
-        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  float '%s'=%g",
-	  	v->GetName (), v->Get ());
-	break;
-      case iSharedVariable::SV_COLOR:
-        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  color '%s'=%g,%g,%g",
-	  	v->GetName (), v->GetColor ().red, v->GetColor ().green,
-		v->GetColor ().blue);
-	break;
-      case iSharedVariable::SV_VECTOR:
-        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  vector '%s'=%g,%g,%g",
-	  	v->GetName (), v->GetVector ().x, v->GetVector ().y,
-		v->GetVector ().z);
-        break;
-      default:
-        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  unknown '%s'=?",
-	  	v->GetName ());
-        break;
-    }
+    if (!WalkTestVarManager::ShowVariable (Sys, arg)) return false;
   }
   else if (!csStrCaseCmp (cmd, "varlist"))
   {
-    iSharedVariableList* vl = Sys->view->GetEngine ()->GetVariableList ();
-    int i;
-    for (i = 0 ; i < vl->GetCount () ; i++)
-    {
-      iSharedVariable* v = vl->Get (i);
-      int t = v->GetType ();
-      switch (t)
-      {
-        case iSharedVariable::SV_FLOAT:
-          Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  float '%s'=%g",
-	  	v->GetName (), v->Get ());
-	  break;
-        case iSharedVariable::SV_COLOR:
-          Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  color '%s'=%g,%g,%g",
-	  	v->GetName (), v->GetColor ().red, v->GetColor ().green,
-		v->GetColor ().blue);
-	  break;
-        case iSharedVariable::SV_VECTOR:
-          Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  vector '%s'=%g,%g,%g",
-	  	v->GetName (), v->GetVector ().x, v->GetVector ().y,
-		v->GetVector ().z);
-          break;
-        default:
-          Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "  unknown '%s'=?",
-	  	v->GetName ());
-          break;
-      }
-    }
+    if (!WalkTestVarManager::ListVariables (Sys, arg)) return false;
   }
   else if (!csStrCaseCmp (cmd, "conflist"))
   {
@@ -1215,10 +941,10 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       csString buf;
       buf.Format ("/tmp/%s.rec", arg);
-      SaveRecording (Sys->myVFS, buf);
+      Sys->recorder->SaveRecording (Sys->myVFS, buf);
     }
     else
-      SaveRecording (Sys->myVFS, "/tmp/record");
+      Sys->recorder->SaveRecording (Sys->myVFS, "/tmp/record");
   }
   else if (!csStrCaseCmp (cmd, "loadrec"))
   {
@@ -1226,67 +952,26 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       csString buf;
       buf.Format ("/tmp/%s.rec", arg);
-      LoadRecording (Sys->myVFS, buf);
+      Sys->recorder->LoadRecording (Sys->myVFS, buf);
     }
     else
-      LoadRecording (Sys->myVFS, "/tmp/record");
+      Sys->recorder->LoadRecording (Sys->myVFS, "/tmp/record");
   }
   else if (!csStrCaseCmp (cmd, "clrrec"))
   {
-    Sys->recording.DeleteAll ();
-    Sys->recording.SetSize (0);
+    Sys->recorder->Clear ();
   }
   else if (!csStrCaseCmp (cmd, "record"))
   {
-    if (Sys->cfg_recording == -1)
-    {
-      Sys->cfg_playrecording = -1;
-      Sys->cfg_recording = 0;
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Start recording camera movement...");
-    }
-    else
-    {
-      Sys->cfg_recording = -1;
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Stop recording.");
-    }
+    Sys->recorder->ToggleRecording ();
   }
   else if (!csStrCaseCmp (cmd, "play"))
   {
-    if (Sys->cfg_playrecording == -1)
-    {
-      Sys->cfg_recording = -1;
-      Sys->cfg_playrecording = 0;
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Start playing back camera movement...");
-      Sys->cfg_playloop = true;
-      Sys->record_start_time = csGetTicks ();
-      Sys->record_frame_count = 0;
-    }
-    else
-    {
-      Sys->cfg_playrecording = -1;
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Stop playback.");
-    }
+    Sys->recorder->PlayRecording (true);
   }
   else if (!csStrCaseCmp (cmd, "playonce"))
   {
-    if (Sys->cfg_playrecording == -1)
-    {
-      Sys->cfg_recording = -1;
-      Sys->cfg_playrecording = 0;
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Start playing back camera movement once...");
-      Sys->cfg_playloop = false;
-      Sys->record_start_time = csGetTicks ();
-      Sys->record_frame_count = 0;
-    }
-    else
-    {
-      Sys->cfg_playrecording = -1;
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Stop playback.");
-    }
+    Sys->recorder->PlayRecording (false);
   }
   else if (!csStrCaseCmp (cmd, "bind"))
   {
@@ -1295,9 +980,9 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!csStrCaseCmp (cmd, "bugplug"))
   {
-    csRef<iBase> plug = csLoadPluginAlways (Sys->plugin_mgr,
+    csRef<iComponent> plug = csLoadPluginAlways (Sys->plugin_mgr,
     	"crystalspace.utilities.bugplug");
-    plug->IncRef ();	// Avoid smart pointer release (@@@)
+    plug->IncRef ();	// Avoid smart pointer release (@@@ leak)
   }
   else if (!csStrCaseCmp (cmd, "do_logo"))
     csCommandProcessor::change_boolean (arg, &Sys->do_logo, "do_logo");
@@ -1329,9 +1014,9 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!csStrCaseCmp (cmd, "db_boxshow"))
     csCommandProcessor::change_boolean (arg, &Sys->do_show_debug_boxes, "show debug boxes");
   else if (!csStrCaseCmp (cmd, "db_boxcam1"))
-    Sys->debug_box1.SetCenter (Sys->view->GetCamera ()->GetTransform ().GetOrigin ());
+    Sys->debug_box1.SetCenter (Sys->views->GetCamera ()->GetTransform ().GetOrigin ());
   else if (!csStrCaseCmp (cmd, "db_boxcam2"))
-    Sys->debug_box2.SetCenter (Sys->view->GetCamera ()->GetTransform ().GetOrigin ());
+    Sys->debug_box2.SetCenter (Sys->views->GetCamera ()->GetTransform ().GetOrigin ());
   else if (!csStrCaseCmp (cmd, "db_boxsize1"))
   {
     float size = Sys->debug_box1.MaxX ()-Sys->debug_box1.MinX ();
@@ -1407,7 +1092,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 	  ->GetTransform ();
 	csVector3 v (-f, 0, 0);
 	tr.Translate (
-	    Sys->view->GetCamera ()->GetTransform ().This2OtherRelative (v));
+	    Sys->views->GetCamera ()->GetTransform ().This2OtherRelative (v));
 	Sys->closestMesh->GetMovable ()->UpdateMove ();
       }
     }
@@ -1423,7 +1108,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 	  ->GetTransform ();
 	csVector3 v (0, 0, f);
 	tr.Translate (
-	    Sys->view->GetCamera ()->GetTransform ().This2OtherRelative (v));
+	    Sys->views->GetCamera ()->GetTransform ().This2OtherRelative (v));
 	Sys->closestMesh->GetMovable ()->UpdateMove ();
       }
     }
@@ -1432,7 +1117,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     if (!arg)
     {
-      const csFog& f = Sys->view->GetCamera ()->GetSector ()->GetFog ();
+      const csFog& f = Sys->views->GetCamera ()->GetSector ()->GetFog ();
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	"Fog in current sector (%f,%f,%f) density=%f",
       	f.color.red, f.color.green, f.color.blue, f.density);
@@ -1452,7 +1137,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       f.color.green = g;
       f.color.blue = b;
       f.mode = CS_FOG_MODE_CRYSTALSPACE;
-      Sys->view->GetCamera ()->GetSector ()->SetFog (f);
+      Sys->views->GetCamera ()->GetSector ()->SetFog (f);
     }
   }
   else if (!csStrCaseCmp (cmd, "loadmap"))
@@ -1476,36 +1161,17 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
       Sys->Engine->DeleteAll ();
       Sys->Engine->SetVFSCacheManager ();
-      if (!Sys->LevelLoader->LoadMapFile ("world"))
+      csRef<iThreadReturn> ret = Sys->LevelLoader->LoadMapFile ("world");
+      ret->Wait();
+      if (!ret->WasSuccessful())
       {
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	  "Couldn't load level '%s'!", level);
-	return false;
+          "Couldn't load level '%s'!", level);
+        return false;
       }
       Sys->Engine->Prepare ();
       // Look for the start sector in this map.
-      bool camok = false;
-      if (!camok && Sys->Engine->GetCameraPositions ()->GetCount () > 0)
-      {
-        iCameraPosition *cp = Sys->Engine->GetCameraPositions ()->Get (0);
-        if (cp->Load(Sys->views[0]->GetCamera (), Sys->Engine) &&
-	    cp->Load(Sys->views[1]->GetCamera (), Sys->Engine))
-	  camok = true;
-      }
-      if (!camok)
-      {
-        iSector* room = Sys->Engine->GetSectors ()->FindByName ("room");
-        if (room)
-        {
-	  Sys->views[0]->GetCamera ()->SetSector (room);
-	  Sys->views[1]->GetCamera ()->SetSector (room);
-	  Sys->views[0]->GetCamera ()->GetTransform ().SetOrigin (
-	      csVector3 (0, 0, 0));
-	  Sys->views[1]->GetCamera ()->GetTransform ().SetOrigin (
-	      csVector3 (0, 0, 0));
-	  camok = true;
-        }
-      }
+      bool camok = Sys->views->SetupViewStart ();
       if (!camok)
       {
         Sys->Report (CS_REPORTER_SEVERITY_ERROR,
@@ -1522,8 +1188,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       char level[300];
       csScanStr (arg, "%s", level);
-      void OpenPortal (iLoader*, iView* view, char* lev);
-      OpenPortal (Sys->LevelLoader, Sys->view, level);
+      void OpenPortal (iView* view, char* lev);
+      OpenPortal (Sys->views->GetView (), level);
     }
     else
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -1531,107 +1197,39 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!csStrCaseCmp (cmd, "fs_inter"))
   {
-    Sys->do_fs_inter = !Sys->do_fs_inter;
-    if (Sys->do_fs_inter)
-    {
-      Sys->fs_inter_amount = 0.3f;
-      Sys->fs_inter_length = 30;
-      Sys->fs_inter_anim = 0;
-      if (arg)
-        csScanStr (arg, "%f,%f", &Sys->fs_inter_amount, &Sys->fs_inter_length);
-    }
+    Sys->fsfx->InterFX (arg);
   }
   else if (!csStrCaseCmp (cmd, "fs_fadeout"))
   {
-    Sys->do_fs_fadeout = !Sys->do_fs_fadeout;
-    if (Sys->do_fs_fadeout)
-    {
-      Sys->fs_fadeout_fade = 0;
-      Sys->fs_fadeout_dir = true;
-    }
+    Sys->fsfx->FadeOutFX ();
   }
   else if (!csStrCaseCmp (cmd, "fs_fadecol"))
   {
-    Sys->do_fs_fadecol = !Sys->do_fs_fadecol;
-    if (Sys->do_fs_fadecol)
-    {
-      Sys->fs_fadecol_fade = 0;
-      Sys->fs_fadecol_dir = true;
-      float r = 1, g = 0, b = 0;
-      if (arg) csScanStr (arg, "%f,%f,%f", &r, &g, &b);
-      Sys->fs_fadecol_color.Set (r, g, b);
-    }
+    Sys->fsfx->FadeColFX (arg);
   }
   else if (!csStrCaseCmp (cmd, "fs_fadetxt"))
   {
-    Sys->do_fs_fadetxt = !Sys->do_fs_fadetxt;
-    if (Sys->do_fs_fadetxt)
-    {
-      Sys->fs_fadetxt_fade = 0;
-      Sys->fs_fadetxt_dir = true;
-      char buf[255];
-      *buf = 0;
-      if (arg) csScanStr (arg, "%s", buf);
-      iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->FindByName (buf);
-      if (mat)
-      {
-        Sys->fs_fadetxt_txt = mat->GetMaterial()->GetTexture ();
-      }
-      else
-      {
-        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"Can't find material!");
-	Sys->do_fs_fadetxt = false;
-      }
-    }
+    Sys->fsfx->FadeTxtFX (arg);
   }
   else if (!csStrCaseCmp (cmd, "fs_red"))
   {
-    Sys->do_fs_red = !Sys->do_fs_red;
-    if (Sys->do_fs_red)
-    {
-      Sys->fs_red_fade = 0;
-      Sys->fs_red_dir = true;
-    }
+    Sys->fsfx->FadeRedFX ();
   }
   else if (!csStrCaseCmp (cmd, "fs_green"))
   {
-    Sys->do_fs_green = !Sys->do_fs_green;
-    if (Sys->do_fs_green)
-    {
-      Sys->fs_green_fade = 0;
-      Sys->fs_green_dir = true;
-    }
+    Sys->fsfx->FadeGreenFX ();
   }
   else if (!csStrCaseCmp (cmd, "fs_blue"))
   {
-    Sys->do_fs_blue = !Sys->do_fs_blue;
-    if (Sys->do_fs_blue)
-    {
-      Sys->fs_blue_fade = 0;
-      Sys->fs_blue_dir = true;
-    }
+    Sys->fsfx->FadeBlueFX ();
   }
   else if (!csStrCaseCmp (cmd, "fs_whiteout"))
   {
-    Sys->do_fs_whiteout = !Sys->do_fs_whiteout;
-    if (Sys->do_fs_whiteout)
-    {
-      Sys->fs_whiteout_fade = 0;
-      Sys->fs_whiteout_dir = true;
-    }
+    Sys->fsfx->FadeWhiteFX ();
   }
   else if (!csStrCaseCmp (cmd, "fs_shadevert"))
   {
-    Sys->do_fs_shadevert = !Sys->do_fs_shadevert;
-    if (Sys->do_fs_shadevert)
-    {
-      float tr = 1, tg = 0, tb = 0, br = 0, bg = 0, bb = 1;
-      if (arg) csScanStr (arg, "%f,%f,%f,%f,%f,%f",
-      	&tr, &tg, &tb, &br, &bg, &bb);
-      Sys->fs_shadevert_topcol.Set (tr, tg, tb);
-      Sys->fs_shadevert_botcol.Set (br, bg, bb);
-    }
+    Sys->fsfx->ShadeVertFX (arg);
   }
   else if (!csStrCaseCmp (cmd, "perftest"))
   {
@@ -1835,117 +1433,48 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!csStrCaseCmp (cmd, "fire"))
   {
     RECORD_CMD (cmd);
-    extern void fire_missile ();
-    fire_missile ();
+    Sys->missiles->FireMissile ();
   }
   else if (!csStrCaseCmp (cmd, "decal_test"))
   {
-    extern void test_decal();
-    test_decal ();
+    RECORD_CMD (cmd);
+    WalkTestDecalTester::TestDecal (Sys);
   }
   else if (!csStrCaseCmp (cmd, "lightning"))
   {
+    RECORD_CMD (cmd);
     extern void show_lightning ();
     show_lightning ();
   }
   else if (!csStrCaseCmp (cmd, "rain"))
   {
-    char txtname[100];
-    int cnt = 0;
-    /* speed and num must be preset to prevent compiler warnings
-     * on some systems. */
-    int num = 0;
-    float speed = 0;
-    if (arg) cnt = csScanStr (arg, "%s,%d,%f", txtname, &num, &speed);
-    extern void add_particles_rain (iSector* sector, char* txtname,
-    	int num, float speed, bool do_camera);
-    if (cnt <= 2) speed = 2;
-    if (cnt <= 1) num = 500;
-    if (cnt <= 0) strcpy (txtname, "raindrop");
-    add_particles_rain (Sys->view->GetCamera ()->GetSector (),
-    	txtname, num, speed, false);
+    RECORD_ARGS (cmd, arg);
+    WalkTestParticleDemos::Rain (Sys, arg);
   }
   else if (!csStrCaseCmp (cmd, "frain"))
   {
-    char txtname[100];
-    int cnt = 0;
-    /* speed and num must be preset to prevent compiler warnings
-     * on some systems. */
-    int num = 0;
-    float speed = 0;
-    if (arg) cnt = csScanStr (arg, "%s,%d,%f", txtname, &num, &speed);
-    extern void add_particles_rain (iSector* sector, char* txtname,
-    	int num, float speed, bool do_camera);
-    if (cnt <= 2) speed = 2;
-    if (cnt <= 1) num = 500;
-    if (cnt <= 0) strcpy (txtname, "raindrop");
-    add_particles_rain (Sys->view->GetCamera ()->GetSector (),
-    	txtname, num, speed, true);
+    RECORD_ARGS (cmd, arg);
+    WalkTestParticleDemos::FollowRain (Sys, arg);
   }
   else if (!csStrCaseCmp (cmd, "snow"))
   {
-    char txtname[100];
-    int cnt = 0;
-    /* speed and num must be preset to prevent compiler warnings
-     * on some systems. */
-    int num = 0;
-    float speed = 0;
-    if (arg) cnt = csScanStr (arg, "%s,%d,%f", txtname, &num, &speed);
-    extern void add_particles_snow (iSector* sector, char* txtname,
-    	int num, float speed);
-    if (cnt <= 2) speed = 0.3f;
-    if (cnt <= 1) num = 500;
-    if (cnt <= 0) strcpy (txtname, "snow");
-    add_particles_snow (Sys->view->GetCamera ()->GetSector (),
-    	txtname, num, speed);
+    RECORD_ARGS (cmd, arg);
+    WalkTestParticleDemos::Snow (Sys, arg);
   }
   else if (!csStrCaseCmp (cmd, "flame"))
   {
     RECORD_ARGS (cmd, arg);
-    char txtname[100];
-    int cnt = 0;
-    int num = 0;
-    if (arg) cnt = csScanStr (arg, "%s,%d", txtname, &num);
-    extern void add_particles_fire (iSector* sector, char* txtname,
-    	int num, const csVector3& origin);
-    if (cnt <= 1) num = 200;
-    if (cnt <= 0) strcpy (txtname, "raindrop");
-    add_particles_fire (Sys->view->GetCamera ()->GetSector (),
-    	txtname, num, Sys->view->GetCamera ()->GetTransform ().GetOrigin ()-
-	csVector3 (0, Sys->cfg_body_height, 0));
+    WalkTestParticleDemos::Flame (Sys, arg);
   }
   else if (!csStrCaseCmp (cmd, "fountain"))
   {
     RECORD_ARGS (cmd, arg);
-    char txtname[100];
-    int cnt = 0;
-    int num = 0;
-    if (arg) cnt = csScanStr (arg, "%s,%d", txtname, &num);
-    extern void add_particles_fountain (iSector* sector, char* txtname,
-    	int num, const csVector3& origin);
-    if (cnt <= 1) num = 400;
-    if (cnt <= 0) strcpy (txtname, "spark");
-    add_particles_fountain (Sys->view->GetCamera ()->GetSector (),
-    	txtname, num, Sys->view->GetCamera ()->GetTransform ().GetOrigin ()-
-	csVector3 (0, Sys->cfg_body_height, 0));
+    WalkTestParticleDemos::Fountain (Sys, arg);
   }
   else if (!csStrCaseCmp (cmd, "explosion"))
   {
-    char txtname[100];
-    int cnt = 0;
-    if (arg) cnt = csScanStr (arg, "%s", txtname);
-    extern void add_particles_explosion (iSector* sector,
-    	iEngine* engine, const csVector3& center,
-    	char* txtname);
-    if (cnt != 1)
-    {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	"Expected parameter 'texture'!");
-    }
-    else
-      add_particles_explosion (Sys->view->GetCamera ()->GetSector (),
-    	Sys->Engine,
-	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), txtname);
+    RECORD_ARGS (cmd, arg);
+    WalkTestParticleDemos::Explosion (Sys, arg);
   }
   else if (!csStrCaseCmp (cmd, "loadmesh"))
   {
@@ -1973,8 +1502,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     else
     {
-      add_meshobj (tname, sname, Sys->view->GetCamera ()->GetSector (),
-    	          Sys->view->GetCamera ()->GetTransform ().GetOrigin (), size);
+      add_meshobj (tname, sname, Sys->views->GetCamera ()->GetSector (),
+    	          Sys->views->GetCamera ()->GetTransform ().GetOrigin (), size);
     }
   }
   else if (!csStrCaseCmp (cmd, "delmesh"))
@@ -2079,13 +1608,52 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
     }
   }
+  else if (!csStrCaseCmp (cmd, "frankie"))
+  {
+    RECORD_ARGS (cmd, arg);
+    csRef<iMeshFactoryWrapper> meshfact = Sys->Engine->FindMeshFactory ("franky_frankie");
+    if (!meshfact)
+    {
+      csRef<iThreadReturn> itr = Sys->LevelLoader->LoadFile ("/lib/frankie/frankie.xml");
+      itr->Wait();
+      if (!itr->WasSuccessful())
+        Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Can't load frankie!");
+      meshfact = Sys->Engine->FindMeshFactory ("franky_frankie");
+    }
+    if (meshfact)
+    {
+      csRef<iMeshWrapper> sprite = Sys->Engine->CreateMeshWrapper (meshfact, "Frankie",
+	    Sys->views->GetCamera ()->GetSector (),
+	    Sys->views->GetCamera ()->GetTransform ().GetOrigin ());
+      csRef<iAnimatedMesh> animesh = scfQueryInterface<iAnimatedMesh> (sprite->GetMeshObject ());
+      iSkeletonAnimNode2* root = animesh->GetSkeleton ()->GetAnimationPacket ()->GetAnimationRoot ();
+      csRef<iSkeletonAnimNode2> anim;
+       
+      if (root)
+      {
+        anim = root->FindNode("standard");
+
+        csRef<iSkeletonFSMNode2> fsm = scfQueryInterfaceSafe<iSkeletonFSMNode2> (anim);
+        if (fsm)
+        {
+          csRef<iSkeletonFSMNodeFactory2> fsmfact = scfQueryInterface<iSkeletonFSMNodeFactory2>(anim->GetFactory());
+          CS::Animation::StateID wanted_state = fsmfact->FindState("walk");
+          if (wanted_state != CS::Animation::InvalidStateID)            
+            fsm->SwitchToState(wanted_state);
+
+          root->Play();
+          anim->Play();
+        }
+      }    
+    }
+  }
   else if (!csStrCaseCmp (cmd, "addmbot"))
   {
     RECORD_ARGS (cmd, arg);
     float radius = 0;
     if (arg) csScanStr (arg, "%f", &radius);
-    Sys->add_bot (2, Sys->view->GetCamera ()->GetSector (),
-    	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), radius,
+    Sys->bots->CreateBot (Sys->views->GetCamera ()->GetSector (),
+    	Sys->views->GetCamera ()->GetTransform ().GetOrigin (), radius,
 	true);
   }
   else if (!csStrCaseCmp (cmd, "addbot"))
@@ -2093,21 +1661,21 @@ bool CommandHandler (const char *cmd, const char *arg)
     RECORD_ARGS (cmd, arg);
     float radius = 0;
     if (arg) csScanStr (arg, "%f", &radius);
-    Sys->add_bot (2, Sys->view->GetCamera ()->GetSector (),
-    	Sys->view->GetCamera ()->GetTransform ().GetOrigin (), radius);
+    Sys->bots->CreateBot (Sys->views->GetCamera ()->GetSector (),
+    	Sys->views->GetCamera ()->GetTransform ().GetOrigin (), radius, false);
   }
   else if (!csStrCaseCmp (cmd, "delbot"))
   {
-    Sys->del_bot ();
+    Sys->bots->DeleteOldestBot (false);
   }
   else if (!csStrCaseCmp (cmd, "delmbot"))
   {
-    Sys->del_bot (true);
+    Sys->bots->DeleteOldestBot (true);
   }
   else if (!csStrCaseCmp (cmd, "clrlights"))
   {
     RECORD_CMD (cmd);
-    csRef<iLightIterator> lit (Sys->view->GetEngine ()->GetLightIterator ());
+    csRef<iLightIterator> lit (Sys->Engine->GetLightIterator ());
     iLight* l;
     while (lit->HasNext ())
     {
@@ -2131,34 +1699,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!csStrCaseCmp (cmd, "addlight"))
   {
     RECORD_ARGS (cmd, arg);
-    csVector3 dir (0,0,0);
-    csVector3 pos = Sys->view->GetCamera ()->GetTransform ().This2Other (dir);
-    csRef<iLight> dyn;
-
-    bool rnd;
-    float r, g, b, radius;
-    if (arg && csScanStr (arg, "%f,%f,%f,%f", &r, &g, &b, &radius) == 4)
-    {
-      dyn = Sys->view->GetEngine ()->CreateLight ("", pos,
-      	radius, csColor (r, g, b), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
-      rnd = false;
-    }
-    else
-    {
-      dyn = Sys->view->GetEngine ()->CreateLight ("", pos,
-      	6, csColor (1, 1, 1), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
-      rnd = true;
-    }
-    iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
-    ll->Add (dyn);
-    dyn->Setup ();
-    Sys->dynamic_lights.Push (dyn);
-    // @@@ BUG: for some reason it is needed to call Setup() twice!!!!
-    dyn->Setup ();
-    extern void AttachRandomLight (iLight* light);
-    if (rnd)
-      AttachRandomLight (dyn);
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Dynamic light added.");
+    Sys->lights->AddLight (arg);
   }
   else if (!csStrCaseCmp (cmd, "delstlight"))
   {
@@ -2171,7 +1712,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       strcpy (name, "deflight");
     }
-    iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
+    iLightList* ll = Sys->views->GetCamera ()->GetSector ()->GetLights ();
     iLight* l = ll->FindByName (name);
     if (!l)
     {
@@ -2180,7 +1721,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     else
     {
-      Sys->view->GetEngine ()->RemoveLight (l);
+      Sys->Engine->RemoveLight (l);
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Static light removed.");
     }
   }
@@ -2188,7 +1729,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     RECORD_ARGS (cmd, arg);
     csVector3 dir (0,0,0);
-    csVector3 pos = Sys->view->GetCamera ()->GetTransform ().This2Other (dir);
+    csVector3 pos = Sys->views->GetCamera ()->GetTransform ().This2Other (dir);
     csRef<iLight> light;
 
     float r, g, b, radius;
@@ -2196,78 +1737,27 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg && csScanStr (arg, "%s,%f,%f,%f,%f", name, &r, &g, &b,
     	&radius) == 5)
     {
-      light = Sys->view->GetEngine ()->CreateLight (name,
+      light = Sys->Engine->CreateLight (name,
         pos, radius, csColor (r, g, b), CS_LIGHT_DYNAMICTYPE_PSEUDO);
     }
     else
     {
-      light = Sys->view->GetEngine ()->CreateLight ("deflight",
+      light = Sys->Engine->CreateLight ("deflight",
         pos, 12, csColor (0, 0, 1), CS_LIGHT_DYNAMICTYPE_PSEUDO);
     }
-    iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
+    iLightList* ll = Sys->views->GetCamera ()->GetSector ()->GetLights ();
     ll->Add (light);
-    Sys->view->GetEngine ()->ForceRelight (light);
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Static light added.");
   }
   else if (!csStrCaseCmp (cmd, "dellight"))
   {
     RECORD_CMD (cmd);
-    iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
-    int i;
-    for (i = 0 ; i < ll->GetCount () ; i++)
-    {
-      iLight* l = ll->Get (i);
-      if (l->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
-      {
-        ll->Remove (l);
-	size_t j;
-	for (j = 0 ; j < Sys->dynamic_lights.GetSize () ; j++)
-	{
-	  if (Sys->dynamic_lights[j] == l)
-	  {
-	    Sys->dynamic_lights.DeleteIndex (j);
-	    break;
-	  }
-	}
-	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Dynamic light removed.");
-        break;
-      }
-    }
+    Sys->lights->DelLight ();
   }
   else if (!csStrCaseCmp (cmd, "dellights"))
   {
     RECORD_CMD (cmd);
-    iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
-    int i;
-    for (i = 0 ; i < ll->GetCount () ; i++)
-    {
-      iLight* l = ll->Get (i);
-      if (l->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
-      {
-        ll->Remove (l);
-	size_t j;
-	for (j = 0 ; j < Sys->dynamic_lights.GetSize () ; j++)
-	{
-	  if (Sys->dynamic_lights[j] == l)
-	  {
-	    Sys->dynamic_lights.DeleteIndex (j);
-	    break;
-	  }
-	}
-	i--;
-      }
-    }
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "All dynamic lights deleted.");
-  }
-  else if (!csStrCaseCmp (cmd, "relight"))
-  {
-    csRef<iConsoleOutput> console = csQueryRegistry<iConsoleOutput> (Sys->object_reg);
-    if(console.IsValid())
-    {
-      csTextProgressMeter* meter = new csTextProgressMeter(console);
-      Sys->Engine->ForceRelight (0, meter);
-      delete meter;
-    }
+    Sys->lights->DelLights ();
   }
   else if (!csStrCaseCmp (cmd, "snd_play"))
   {
@@ -2304,51 +1794,17 @@ bool CommandHandler (const char *cmd, const char *arg)
     Sys->myG2D->PerformExtension("fullscreen");
   else if (!csStrCaseCmp(cmd, "split_view"))
   {
-    if (Sys->split == -1)
-    {	
-        csBox2 bbox;
-        BoundingBoxForView(Sys->view, &bbox);
-        
-        int width = csQint(bbox.MaxX() - bbox.MinX());
-        int height = csQint(bbox.MaxY() - bbox.MinY());
-        Sys->views[0]->SetRectangle((int)bbox.MinX(), (int)bbox.MinY(), width / 2, height);
-        Sys->views[0]->GetCamera()->SetPerspectiveCenter(bbox.MinX() + (width / 4),
-                                                        bbox.MinY() + (height / 2));
-        Sys->views[1]->SetRectangle((int)bbox.MinX() + (width / 2), (int)bbox.MinY(), 
-                                    width / 2, height);
-        Sys->views[1]->GetCamera()->SetPerspectiveCenter(bbox.MinX() + (3 * width / 4),
-                                                        bbox.MinY() + (height / 2));
-        Sys->split = (Sys->view == Sys->views[0]) ? 0 : 1;
-        Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "Splitting to 2 views");
-    };
+    Sys->views->SplitView ();
   }
   else if (!csStrCaseCmp(cmd, "unsplit_view"))
   {
-    if (Sys->split != -1)
-    {
-        csBox2 bbox1, bbox2;
-        BoundingBoxForView(Sys->views[0], &bbox1);
-        BoundingBoxForView(Sys->views[1], &bbox2);
-
-        int width = csQint(bbox2.MaxX() - bbox1.MinX());
-        int height = csQint(bbox1.MaxY() - bbox1.MinY());
-        Sys->view->SetRectangle((int)bbox1.MinX(), (int)bbox1.MinY(), width, height);
-        Sys->view->GetCamera()->SetPerspectiveCenter(bbox1.MinX() + (width / 2), 
-                                                    bbox2.MinY() + (height / 2));
-        Sys->split = -1;
-	Sys->collider_actor.SetCamera (Sys->view->GetCamera ());
-        Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "Unsplitting view");
-    }
+    if (Sys->views->UnsplitView ())
+      Sys->collider_actor.SetCamera (Sys->views->GetCamera ());
   }
   else if (!csStrCaseCmp(cmd, "toggle_view"))
   {
-    if (Sys->split != -1)
-    {
-        Sys->split = (Sys->split + 1) % 2;
-        Sys->view = Sys->views[Sys->split];
-	Sys->collider_actor.SetCamera (Sys->view->GetCamera ());
-        Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "Switching to view %d", Sys->split);
-    }
+    if (Sys->views->ToggleView ())
+      Sys->collider_actor.SetCamera (Sys->views->GetCamera ());
   }
   else if (!csStrCaseCmp(cmd, "farplane"))
   {
@@ -2363,14 +1819,14 @@ bool CommandHandler (const char *cmd, const char *arg)
     // disable farplane
     if (distance==0)
     {
-	Sys->view->GetCamera()->SetFarPlane(0);
+	Sys->views->GetCamera()->SetFarPlane(0);
 	// we can't disable zclear now... because we can't say for sure that
 	// the level didn't need it
 	Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "farplane disabled");
 	return true;
     }
     csPlane3 farplane(0,0,-1,distance);
-    Sys->view->GetCamera()->SetFarPlane(&farplane);
+    Sys->views->GetCamera()->SetFarPlane(&farplane);
     // turn on zclear to be sure
     Sys->Engine->SetClearZBuf(true);
   }
@@ -2413,8 +1869,8 @@ bool CommandHandler (const char *cmd, const char *arg)
 
     csRef<iView> sideView;
     sideView.AttachNew (new csView (Sys->Engine, Sys->myG3D));
-    sideView->GetCamera()->SetSector (Sys->view->GetCamera()->GetSector());
-    sideView->GetCamera()->SetTransform (Sys->view->GetCamera()->GetTransform());
+    sideView->GetCamera()->SetSector (Sys->views->GetCamera()->GetSector());
+    sideView->GetCamera()->SetTransform (Sys->views->GetCamera()->GetTransform());
     sideView->GetCamera()->SetFOVAngle (90, dim);
     sideView->GetCamera()->SetPerspectiveCenter (dim / 2, dim / 2);
     
@@ -2500,6 +1956,54 @@ bool CommandHandler (const char *cmd, const char *arg)
       if (!success)
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, 
         "bugplug failed to execute '%s'", arg);
+    }
+  }
+  else if (!csStrCaseCmp (cmd, "sk2"))
+  {
+    if (!arg)
+      return true;
+
+    //sk2 mesh,node,play/stop
+    char meshName[64];
+    char nodeName[64];
+    char action[64];
+    int index = 0;
+    csScanStr (arg, "%s,%s,%s,%d", meshName, nodeName, action, &index);
+
+    // Get the data
+    csRef<iMeshWrapper> mesh = Sys->Engine->FindMeshObject (meshName);   
+    csRef<iAnimatedMesh> animesh = scfQueryInterfaceSafe<iAnimatedMesh> (mesh->GetMeshObject ());
+    
+    if (!animesh)
+      return true;
+  
+    csRef<iSkeleton2> skel = animesh->GetSkeleton ();
+    if (!skel)
+      return true;
+
+    csRef<iSkeletonAnimNode2> node = skel->GetAnimationPacket ()->GetAnimationRoot ();
+    if (!node)
+      return true;
+
+    node = node->FindNode (nodeName);
+    if (!node)
+      return true;
+
+    if (!csStrCaseCmp (action, "play"))
+    {
+      node->Play ();
+    }
+    else if (!csStrCaseCmp (action, "stop"))
+    {
+      node->Stop ();
+    }
+    else if (!csStrCaseCmp (action, "state"))
+    {
+      csRef<iSkeletonFSMNode2> fsm = scfQueryInterfaceSafe<iSkeletonFSMNode2> (node);
+      if (!fsm)
+        return true;
+
+      fsm->SwitchToState (index);
     }
   }
   else

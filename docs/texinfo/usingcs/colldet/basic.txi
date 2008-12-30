@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Basic Collision Detection, Physics ODE, Collision Detection, Collision Detection
+@node Basic Collision Detection, Physics Bullet, Collision Detection, Collision Detection
 @subsection Basic Collision Detection
 @cindex @code{csColliderWrapper}
 @cindex @code{csColliderHelper}
@@ -218,7 +218,7 @@ csColliderHelper::InitializeCollisionWrappers (cd_sys, engine);
 @end example
 
 This will call @code{csColliderHelper::InitializeCollisionWrapper()} for
-every loaded mesh. You can also restrict the above code to one region.
+every loaded mesh. You can also restrict the above code to one collection.
 
 @subsubheading The Player Collider
 

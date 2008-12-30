@@ -27,6 +27,7 @@
  * @{ */
 
 #include "csutil/scf.h"
+#include "iutil/object.h"
 
 class csFlags;
 class csMatrix3;
@@ -34,8 +35,9 @@ class csPlane3;
 class csReversibleTransform;
 class csTransform;
 class csVector3;
+class csSphere;
 
-struct iFrustumView;
+struct iMaterialWrapper;
 struct iMeshWrapper;
 struct iMovable;
 struct iObject;
@@ -120,7 +122,7 @@ struct iTextureHandle;
  * When a sector is missing this callback will be called. If this callback
  * returns false then this portal will not be traversed. Otherwise this
  * callback has to set up the destination sector and return true.
- * The given context will be either an instance of iRenderView, iFrustumView,
+ * The given context will be either an instance of iRenderView
  * or else 0.
  *
  * This callback is used by:
@@ -156,7 +158,7 @@ struct iPortalCallback : public virtual iBase
  */
 struct iPortal : public virtual iBase
 {
-  SCF_INTERFACE(iPortal, 2,0,0);
+  SCF_INTERFACE(iPortal, 2,0,1);
 
   /// Set the name of this portal.
   virtual void SetName (const char* name) = 0;
@@ -198,6 +200,18 @@ struct iPortal : public virtual iBase
    * Get the world space plane of this portal.
    */
   virtual const csPlane3& GetWorldPlane () = 0;
+
+  /**
+   * Get a sphere representing the object space bounding sphere
+   * of this portal.
+   */
+  virtual const csSphere& GetObjectSphere () = 0;
+
+  /**
+   * Get a sphere representing the world space bounding sphere
+   * of this portal.
+   */
+  virtual const csSphere& GetWorldSphere () = 0;
 
   /**
    * Calculate the camera space plane for this portal.
@@ -268,14 +282,30 @@ struct iPortal : public virtual iBase
   /// Get the specified missing sector callback.
   virtual iPortalCallback* GetMissingSectorCallback (int idx) const = 0;
 
-  /// Set the filter texture
+  /**
+   * Set the filter texture
+   * \deprecated Deprecated in 1.3. Use portal materials.
+   */
+  CS_DEPRECATED_METHOD_MSG("Use portal materials.")
   virtual void SetFilter (iTextureHandle* ft) = 0;
-  /// Get the filter texture
+  /**
+   * Get the filter texture
+   * \deprecated Deprecated in 1.3. Use portal materials.
+   */
+  CS_DEPRECATED_METHOD_MSG("Use portal materials.")
   virtual iTextureHandle* GetTextureFilter () const = 0;
 
-  /// Set a color filter (instead of the texture).
+  /**
+   * Set a color filter (instead of the texture).
+   * \deprecated Deprecated in 1.3. Use portal materials.
+   */
+  CS_DEPRECATED_METHOD_MSG("Use portal materials.")
   virtual void SetFilter (float r, float g, float b) = 0;
-  /// Get the current color filter
+  /**
+   * Get the current color filter
+   * \deprecated Deprecated in 1.3. Use portal materials.
+   */
+  CS_DEPRECATED_METHOD_MSG("Use portal materials.")
   virtual void GetColorFilter (float &r, float &g, float &b) const = 0;
 
   //---- space warping ------------------------------------------------------
@@ -339,15 +369,6 @@ struct iPortal : public virtual iBase
   virtual bool CompleteSector (iBase* context) = 0;
 
   /**
-   * Check frustum visibility of all polygons reachable through this portal.
-   * Alpha is the alpha value you'd like to use to pass through this
-   * portal (0 is no completely transparent, 100 is complete opaque).
-   * 't' is the transform from object to world (this2other).
-   */
-  virtual void CheckFrustum (iFrustumView* lview,
-	  const csReversibleTransform& t, int alpha) = 0;
-
-  /**
    * Follow a beam through this portal and return the mesh and polygon index
    * that it hits with (0 incase no hit). This function properly acounts for
    * space warping portals and also checks for infinite recursion (does
@@ -365,6 +386,10 @@ struct iPortal : public virtual iBase
    */
   virtual size_t GetVerticesCount () const = 0;
 
+  /// Set portal material.
+  virtual iMaterialWrapper* GetMaterial() const = 0;
+  /// Get portal material.
+  virtual void SetMaterial (iMaterialWrapper* mat) = 0;
 };
 
 /** @} */

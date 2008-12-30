@@ -48,6 +48,8 @@ public:
   virtual csPtr<iBase> Parse (iDocumentNode *node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 
+  virtual bool IsThreadSafe() { return true; }
+
   csRef<iSyntaxService> synldr;
   csRef<iDataBuffer> GetDataBuffer (iDocumentNode* child);
 private:

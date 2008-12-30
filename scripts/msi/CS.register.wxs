@@ -1,0 +1,13 @@
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Module Version="$(var.VERSION_PACKAGE)" Id="CS.register" Language="1033">
+    <Package InstallerVersion="200" Id="8E4AB45A-BF93-11DC-B42B-0015582877AD" Manufacturer="The Crystal Space Project"/>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="INSTALLDIR" >
+        <Component Guid="4c44555a-bcb6-3ab7-ad15-9f5ae3498dcb" Id="CS.register.">
+          <RegistryValue Name="InstallPath" Key="SOFTWARE\CrystalSpace\$(var.VERSION_MAJORMINOR)" Action="write" Type="string" Root="HKLM" Id="CS.register.reg" Value="[INSTALLDIR]"/>
+        </Component>
+      </Directory>
+    </Directory>
+  </Module>
+</Wix>
+

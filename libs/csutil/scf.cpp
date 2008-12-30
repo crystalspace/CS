@@ -159,7 +159,7 @@ public:
 
 class scfSharedLibrary;
 
-static class csStringSet* libraryNames = 0; 
+static csStringSet* libraryNames = 0; 
 static char const* get_library_name(csStringID s)
 { return s != csInvalidStringID ? libraryNames->Request(s) : "{none}"; }
 
@@ -360,7 +360,7 @@ class scfClassRegistry : public csPDelArray<scfFactory>
 {
   typedef csPDelArray<scfFactory> superclass;
 public:
-  scfClassRegistry () : superclass(16, 16) {}
+  scfClassRegistry () : superclass(16) {}
   static int CompareClass (scfFactory* const& Item, char const* const& key)
   { return strcmp (Item->ClassID, key); }
   size_t FindClass(char const* name, bool assume_sorted = false) const
@@ -379,7 +379,7 @@ public:
 //----------------------------------------- Class factory implementation ----//
 
 #ifdef CS_REF_TRACKER
-static class csStringHash* classIDs = 0; 
+static csStringHash* classIDs = 0; 
 #endif
 
 scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
@@ -584,8 +584,8 @@ void* csSCF::QueryInterface (scfInterfaceID iInterfaceID,
   if (iInterfaceID == scfInterfaceTraits<iSCF>::GetID () &&
     scfCompatibleVersion (iVersion, scfInterfaceTraits<iSCF>::GetVersion ()))
   {
-    scfObject->IncRef ();
-    return static_cast<iSCF*> (scfObject);
+    GetSCFObject()->IncRef ();
+    return static_cast<iSCF*> (GetSCFObject());
   }
 #ifdef CS_REF_TRACKER
   if (refTracker)
@@ -940,9 +940,30 @@ void csSCF::RegisterClassesInt(char const* pluginPath, iDocumentNode* scfnode,
   }
 }
 
+uint64 scfImplementationHelper::stats[scfImplementationHelper::scfstatsNum];
+CS::Threading::Mutex scfImplementationHelper::statsLock;
+
+class scfImplementationHelperXS : public scfImplementationHelper
+{
+public:
+  static void DumpStats ()
+  {
+#ifdef SCF_TRACK_STATS
+    csPrintf ("Total SCF objects created: %llu\n", stats[scfstatTotal]);
+    csPrintf (" SCF-parented:             %llu\n", stats[scfstatParented]);
+    csPrintf (" Weak-Referenced:          %llu\n", stats[scfstatWeakreffed]);
+    csPrintf (" Metadata requested:       %llu\n", stats[scfstatMetadata]);
+    csPrintf ("\n");
+    csPrintf ("IncRef calls:              %llu\n", stats[scfstatIncRef]);
+    csPrintf ("DecRef calls:              %llu\n", stats[scfstatDecRef]);
+#endif
+  }
+};
+
 void csSCF::Finish ()
 {
   delete this;
+  scfImplementationHelperXS::DumpStats();
 }
 
 iBase *csSCF::CreateInstance (const char *iClassID)
@@ -1222,7 +1243,7 @@ bool csSCF::ClassRegistered (const char *iClassID)
 char const* csSCF::GetInterfaceName (scfInterfaceID i) const
 {
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
-  return InterfaceRegistry.Request(i);
+  return InterfaceRegistry.Request (i);
 }
 
 scfInterfaceID csSCF::GetInterfaceID (const char *iInterface)

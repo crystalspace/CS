@@ -21,16 +21,19 @@ SubDir TOP libs csutil unix ;
   CsLibAddModule $(rejects) ;
 }
 
+if $(LIBBFD.AVAILABLE) = "yes"
+{
+  CSUTIL.GENERIC += callstack-bfd.cpp ;
+}
+
 CSUTIL.GENERIC +=
   appdir.cpp
   apppath.cpp
   appfilename.cpp
-  csprocessorcap.cpp
-  cspthrd.cpp
-  cspthrd.h
   expandname.cpp
   findlib.cpp
   getopt.cpp
+  loadlib.cpp
   mmap.cpp
   pathutil.cpp
   platformconfig.cpp 
@@ -38,5 +41,10 @@ CSUTIL.GENERIC +=
   printf.cpp
   resdir.cpp
   runloop.cpp 
+  setenv.cpp
   sysroot.cpp 
   vfsplat.cpp ;
+
+CSLIB.CFLAGS +=
+  [ FDefines CS_PLUGIN_META_EXT='\".csplugin\"' ]
+  [ FDefines CS_PLUGIN_EXT='\".so\"' ] ;

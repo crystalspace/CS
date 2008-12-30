@@ -17,7 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/**\file 
+/**@file 
  * Directory master header. This header file includes all headers in a
  * subdirectory of the top Crystal Space include directory.
  */
@@ -35,6 +35,7 @@
 #include "ivideo/rendermesh.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
+#include "ivideo/shader/xmlshader.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
 #endif /* __IVIDEO_H__ */

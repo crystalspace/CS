@@ -26,10 +26,15 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/weakref.h"
 #include "csgeom/transfrm.h"
+#include "csgeom/sphere.h"
 #include "csutil/scf_implementation.h"
+#include "iengine/material.h"
 #include "iengine/sector.h"
 #include "iengine/portal.h"
 #include "ivideo/texture.h"
+
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
+{
 
 class csPortalContainer;
 
@@ -56,9 +61,14 @@ private:
   csPlane3 object_plane;
   /// World plane.
   csPlane3 world_plane;
+  /// Object space sphere.
+  csSphere object_sphere;
+  /// World space sphere.
+  csSphere world_sphere;
   /// Name.
   char* name;
 
+  csRef<iMaterialWrapper> material;
 public:
   /// Set of flags
   csFlags flags;
@@ -130,11 +140,11 @@ public:
 
   virtual const csPlane3& GetObjectPlane () { return object_plane; }
   virtual const csPlane3& GetWorldPlane ();
+  virtual const csSphere& GetObjectSphere () { return object_sphere; }
+  virtual const csSphere& GetWorldSphere ();
   virtual void ComputeCameraPlane (const csReversibleTransform& t,
   	csPlane3& camplane);
   virtual bool PointOnPolygon (const csVector3& point);
-
-  void CastShadows (iMovable* movable, iFrustumView* fview);
 
   bool IntersectRay (const csVector3 &start, const csVector3 &end) const;
   bool IntersectSegmentPlane (const csVector3 &start, const csVector3 &end,
@@ -286,15 +296,12 @@ public:
    */
   virtual bool CompleteSector (iBase* context);
 
-  /**
-   * Check frustum visibility of all polygons reachable through this portal.
-   * Alpha is the alpha value you'd like to use to pass through this
-   * portal (0 is no completely transparent, 100 is complete opaque).
-   * 't' is the transform from object to world (this2other).
-   */
-  virtual void CheckFrustum (iFrustumView* lview,
-  	const csReversibleTransform& t, int alpha);
+  virtual iMaterialWrapper* GetMaterial() const { return material; };
+  virtual void SetMaterial (iMaterialWrapper* mat) { material = mat; }
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(Engine)
 
 #endif // __CS_ENGINE_PORTAL_H__
 

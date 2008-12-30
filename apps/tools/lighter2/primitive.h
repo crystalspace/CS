@@ -29,6 +29,7 @@ namespace lighter
 {
   class Object;
   struct ElementProxy;
+  struct RadMaterial;
 
   class Primitive;
   
@@ -132,19 +133,21 @@ namespace lighter
     enum ElementType
     {ELEMENT_EMPTY, ELEMENT_BORDER, ELEMENT_INSIDE};
 
-    inline Primitive (ObjectVertexData &dataHolder) 
+    inline Primitive (ObjectVertexData &dataHolder, uint groupID) 
       : PrimitiveBase (&dataHolder), uFormVector (0), vFormVector (0), 
         /*illuminationColor (0,0,0), reflectanceColor (1.0f,1.0f,1.0f), */
         minCoord (0), minUV (0,0), maxUV (0,0), /*originalPrim (0), */
-        radObject (0)
+        radObject (0), groupID (groupID)
     {
     }
     inline Primitive (const Primitive& other) 
       : PrimitiveBase (other), elementClassification (other.elementClassification), 
         uFormVector (other.uFormVector), vFormVector (other.uFormVector), 
         minCoord (other.minCoord), minUV (other.minUV), maxUV (other.maxUV), 
-        radObject (other.radObject), globalLightmapID (other.globalLightmapID),
-        lambdaCoeffTV (other.lambdaCoeffTV), myCoeffTV (other.myCoeffTV)
+        radObject (other.radObject), groupID (other.groupID),
+        globalLightmapID (other.globalLightmapID),
+        lambdaCoeffTV (other.lambdaCoeffTV), myCoeffTV (other.myCoeffTV),
+        material (0)
     {
     }
     inline ~Primitive () { }
@@ -166,6 +169,21 @@ namespace lighter
     /// Get interpolated normal at point
     csVector3 ComputeNormal (const csVector3& point) const;
 
+    /// Get interpolated UV coords at point
+    csVector2 ComputeUV (const csVector3& point) const;
+
+    void ComputeCustomData (const csVector3& point, 
+      size_t customData, size_t numComps, float* out) const;
+
+    template<typename T>
+    T ComputeCustomData (const csVector3& point, size_t customData) const
+    {
+      const size_t comps = sizeof (T) / sizeof (float);
+      T r;
+      ComputeCustomData (point, customData, comps, (float*)&r);
+      return r;
+    }
+
     /// Calculate min-max UV-coords
     void ComputeMinMaxUV (csVector2 &min, csVector2 &max) const;
 
@@ -186,7 +204,8 @@ namespace lighter
     void ComputeUVTransform ();
 
     /// Update quadrant offsets
-    bool RecomputeQuadrantOffset (size_t element, csVector2 offsets[4]) const;
+    uint RecomputeQuadrantOffset (size_t element, 
+      const csVector2 inOffsets[4], csVector2 outOffsets[4]) const;
 
     /// Compute if point is inside primitive or not
     bool PointInside (const csVector3& pt) const;
@@ -237,11 +256,14 @@ namespace lighter
     inline const Object* GetObject () const { return radObject; }
     inline Object* GetObject () { return radObject; }
     inline void SetObject (Object *obj) { radObject = obj; }
+    
+    inline uint GetGroupID () const { return groupID; }
 
     inline uint GetGlobalLightmapID () const { return globalLightmapID; }
     inline void SetGlobalLightmapID (uint id) { globalLightmapID = id; }
 
-    
+    inline const RadMaterial* GetMaterial () const { return material; }
+    inline void SetMaterial (const RadMaterial* mat) { material = mat; }
 protected:
     //@{
     /// Elements
@@ -266,6 +288,9 @@ protected:
 
     /// Original object
     Object* radObject;
+    
+    /// Primitive group ID (a primitive group was lightmapped together)
+    uint groupID;
 
     /// GLobal lightmap id
     uint globalLightmapID;
@@ -281,6 +306,8 @@ protected:
     csVector3 lambdaCoeffTV, myCoeffTV;
 
     void ComputeBaryCoeffs ();
+    
+    const RadMaterial* material;
   };
 
   typedef csArray<FactoryPrimitive> FactoryPrimitiveArray;

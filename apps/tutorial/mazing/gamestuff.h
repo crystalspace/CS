@@ -125,7 +125,7 @@ public:
 	const RoomCoordinate& dest);
   bool CreateRoom (iMaterialWrapper* wall_material,
   	int x, int y, int z,
-	char* portals);
+	const char* portals);
   bool CreateLight (const csColor& color,
   	int x, int y, int z);
 };

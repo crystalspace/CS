@@ -17,11 +17,19 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#if !defined(DEBUG_PYTHON) && defined(_DEBUG)
+#ifdef _MSC_VER
+#include <io.h>
+#include <stdarg.h>
+#ifndef DEBUG_PYTHON
 #undef _DEBUG
+#define RESTORE__DEBUG
 #endif
-
+#endif
 #include <Python.h>
+#ifdef RESTORE__DEBUG
+#define _DEBUG
+#undef RESTORE__DEBUG
+#endif
 
 #include "cssysdef.h"
 #include "csutil/csstring.h"
@@ -61,16 +69,13 @@ extern "C" PyObject* pytocs_printerr(PyObject *self, PyObject* args)
 PyMethodDef PytocsMethods[] =
 {
   { "printout", pytocs_printout, METH_VARARGS, "" },
-  { "printerr", pytocs_printout, METH_VARARGS, "" },
+  { "printerr", pytocs_printerr, METH_VARARGS, "" },
   { 0, 0, 0, "" }
 };
-
-extern "C" void SWIG_init_cspace();
 
 void InitPytocs()
 {
   Py_InitModule("pytocs", PytocsMethods);
-  SWIG_init_cspace();
 }
 
 }

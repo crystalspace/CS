@@ -51,8 +51,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
     bool Load (float* outputBuffer, size_t outputWidth, size_t outputHeight,
       size_t outputPitch, float heightScale, float offset);
 
-    bool LoadFromImage (float* outputBuffer, size_t outputWidth, size_t outputHeight,
-      size_t outputPitch, float heightScale, float offset);
+    bool LoadFromImage (float* outputBuffer, size_t outputWidth,
+	size_t outputHeight, size_t outputPitch, float heightScale,
+	float offset);
 
   private:
     csString sourceLocation;
@@ -62,6 +63,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
     csRef<iVFS> vfs;
     iObjectRegistry* objReg;
   };
+
+  void SmoothHeightmap (float* heightBuffer, size_t width, size_t height, 
+    size_t pitch);
   
 }
 CS_PLUGIN_NAMESPACE_END(Terrain2)

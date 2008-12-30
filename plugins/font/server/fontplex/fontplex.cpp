@@ -24,6 +24,7 @@
 #include "csutil/csuctransform.h"
 #include "csutil/util.h"
 #include "csutil/set.h"
+#include "csutil/scanstr.h"
 #include "iutil/databuff.h"
 #include "iutil/eventh.h"
 #include "iutil/objreg.h"
@@ -40,7 +41,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(FontPlex)
 
 //---------------------------------------------------------------------------
 
-csFontLoadOrderEntry::csFontLoadOrderEntry (csRefArray<iFontServer> servers, 
+csFontLoadOrderEntry::csFontLoadOrderEntry (const ServersArray& servers, 
 					    const char* fontName, float scale,
                                             bool fallback) : servers (servers),
                                               fallback (fallback), loaded (false), 
@@ -341,7 +342,7 @@ void csFontServerMultiplexer::ParseFontLoaderOrder (
     }
 
     float scale;
-    if ((fontScale.IsEmpty()) || (sscanf (fontScale, "%f", &scale) <= 0))
+    if ((fontScale.IsEmpty()) || (csScanStr (fontScale, "%f", &scale) <= 0))
     {
       scale = 1.0f;
     }
@@ -351,7 +352,7 @@ void csFontServerMultiplexer::ParseFontLoaderOrder (
       csRef<iFontServer> fs = ResolveFontServer (newserver);
       if (fs)
       {
-        csRefArray<iFontServer> a (1, 1);
+        csFontLoadOrderEntry::ServersArray a (1);
         a.Push (fs);
 	order.PushSmart (csFontLoadOrderEntry (a, fontName, scale, fallback));
       }

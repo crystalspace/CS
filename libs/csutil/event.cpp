@@ -123,7 +123,7 @@ csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   csTicks iTime, csEventID name, csMouseEventType mType, 
   int mx, int my, uint32 axesChanged,
   uint mButton, bool mButtonState, 
-  uint32 buttonMask, uint32 mModifiers)
+  uint32 buttonMask, const csKeyModifiers& modifiers)
 {
   csEvent *ev = new csEvent(iTime, name, false);
   (void)reg; // reg is unused except for this assert so silence the warning
@@ -137,7 +137,7 @@ csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   ev->Add("mButton", (uint8) mButton);
   ev->Add("mButtonState", mButtonState);
   ev->Add("mButtonMask", buttonMask);
-  ev->Add("keyModifiers", (uint32) mModifiers);
+  ev->Add("keyModifiers", &modifiers, sizeof (csKeyModifiers));
   return ev;
 }
 
@@ -145,7 +145,7 @@ csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   csTicks iTime, csEventID name, uint8 n, csMouseEventType mType, 
   int x, int y, uint32 axesChanged, 
   uint button, bool buttonState, 
-  uint32 buttonMask, uint32 modifiers)
+  uint32 buttonMask, const csKeyModifiers& modifiers)
 {
   csEvent *ev = new csEvent(iTime, name, false);
   int32 axes[2] = { x, y };
@@ -159,14 +159,15 @@ csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   ev->Add("mButton", (uint8) button);
   ev->Add("mButtonState", buttonState);
   ev->Add("mButtonMask", buttonMask);
-  ev->Add("keyModifiers", (uint32) modifiers);
+  ev->Add("keyModifiers", &modifiers, sizeof (csKeyModifiers));
   return ev;
 }
 
 csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   csTicks iTime, csEventID name, uint8 n, csMouseEventType mType,
   const int32 *axes, uint8 numAxes, uint32 axesChanged, 
-  uint button, bool buttonState, uint32 buttonMask, uint32 modifiers)
+  uint button, bool buttonState, uint32 buttonMask, 
+  const csKeyModifiers& modifiers)
 {
   csEvent *ev = new csEvent (iTime, name, false);
   (void)reg; // reg is unused except for this assert so silence the warning
@@ -179,7 +180,7 @@ csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   ev->Add("mButton", (uint8) button);
   ev->Add("mButtonState", buttonState);
   ev->Add("mButtonMask", buttonMask);
-  ev->Add("keyModifiers", (uint32) modifiers);
+  ev->Add("keyModifiers", &modifiers, sizeof (csKeyModifiers));
   return ev;
 }
 
@@ -266,8 +267,12 @@ bool csMouseEventHelper::GetEventData (const iEvent* event,
   ok = event->Retrieve("mButton", ui8);
   CS_ASSERT(ok == csEventErrNone);
   data.Button = ui8;
-  ok = event->Retrieve("keyModifiers", data.Modifiers);
+  const void* m;
+  size_t mSize;
+  ok = event->Retrieve("keyModifiers", m, mSize);
   CS_ASSERT(ok == csEventErrNone);
+  CS_ASSERT(mSize == sizeof (csKeyModifiers));
+  data.Modifiers = csKeyEventHelper::GetModifiersBits (*((csKeyModifiers*)m));
   return true;
 }
 
@@ -277,7 +282,7 @@ csEvent *csJoystickEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   csTicks iTime, csEventID name, int n, 
   int x, int y, uint32 axesChanged, 
   uint button, bool buttonState, 
-  uint32 buttonMask, uint32 modifiers)
+  uint32 buttonMask, const csKeyModifiers& modifiers)
 {
   csEvent *ev = new csEvent (iTime, name, false);
   int axes[2] = { x, y };
@@ -290,7 +295,7 @@ csEvent *csJoystickEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   ev->Add("jsButton", (uint8) button);
   ev->Add("jsButtonState", buttonState);
   ev->Add("jsButtonMask", buttonMask);
-  ev->Add("keyModifiers", (uint32) modifiers);
+  ev->Add("keyModifiers", &modifiers, sizeof (csKeyModifiers));
   return ev;
 }
 
@@ -298,7 +303,7 @@ csEvent *csJoystickEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   csTicks iTime, csEventID name, int n, const int32 *axes, 
   uint8 numAxes, uint32 axesChanged, 
   uint button, bool buttonState,
-  uint32 buttonMask, uint32 modifiers)
+  uint32 buttonMask, const csKeyModifiers& modifiers)
 {
   csEvent *ev = new csEvent (iTime, name, false);
   (void)reg; // reg is unused except for this assert so silence the warning
@@ -310,7 +315,7 @@ csEvent *csJoystickEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   ev->Add("jsButton", (uint8) button);
   ev->Add("jsButtonState", buttonState);
   ev->Add("jsButtonMask", buttonMask);
-  ev->Add("keyModifiers", (uint32) modifiers);
+  ev->Add("keyModifiers", &modifiers, sizeof (csKeyModifiers));
   return ev;
 }
 
@@ -392,8 +397,12 @@ bool csJoystickEventHelper::GetEventData (const iEvent* event,
   ok = event->Retrieve("jsButton", ui8);
   CS_ASSERT(ok == csEventErrNone);
   data.Button = ui8;
-  ok = event->Retrieve("keyModifiers", data.Modifiers);
+  const void* m;
+  size_t mSize;
+  ok = event->Retrieve("keyModifiers", m, mSize);
   CS_ASSERT(ok == csEventErrNone);
+  CS_ASSERT(mSize == sizeof (csKeyModifiers));
+  data.Modifiers = csKeyEventHelper::GetModifiersBits (*((csKeyModifiers*)m));
   return true;
 }
 

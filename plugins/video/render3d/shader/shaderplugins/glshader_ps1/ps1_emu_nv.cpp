@@ -64,7 +64,7 @@ void csShaderGLPS1_NV::Deactivate()
 
 void csShaderGLPS1_NV::SetupState (const CS::Graphics::RenderMesh* /*mesh*/, 
                                    CS::Graphics::RenderMeshModes& /*modes*/,
-	                           const iShaderVarStack* stacks)
+	                           const csShaderVariableStack& stack)
 {
   csGLExtensionManager *ext = shaderPlug->ext;
 
@@ -73,7 +73,7 @@ void csShaderGLPS1_NV::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
   {
     csRef<csShaderVariable> var;
 
-    var = csGetShaderVariableFromStack (stacks, constantRegs[i].name);
+    var = csGetShaderVariableFromStack (stack, constantRegs[i].name);
     if (!var.IsValid ())
       var = constantRegs[i].var;
 
@@ -710,7 +710,7 @@ bool csShaderGLPS1_NV::LoadProgramStringToGL ()
   {
     const csPSConstant& constant = constants.Get (i);
 
-    constantRegs[constant.reg].var.AttachNew (new csShaderVariable (csInvalidStringID));
+    constantRegs[constant.reg].var.AttachNew (new csShaderVariable (CS::InvalidShaderVarStringID));
     constantRegs[constant.reg].var->SetValue (constant.value);
     constantRegs[constant.reg].valid = true;
   }

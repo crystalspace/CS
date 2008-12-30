@@ -35,7 +35,6 @@
 #include "ivideo/shader/shader.h"
 
 class csEngine;
-class csRenderView;
 class csRenderLoop;
 
 class csRenderLoop : public scfImplementationExt3<csRenderLoop,
@@ -52,6 +51,10 @@ protected:
 
   csRefArray<iRenderStep> steps;
   csRef<iShaderManager> shadermanager;
+
+protected:
+  virtual void InternalRemove() { SelfDestruct(); }
+
 public:
 
   csRenderLoop (csEngine* engine);
@@ -73,7 +76,8 @@ public:
 class csRenderLoopManager : public scfImplementation1<csRenderLoopManager,
                                                       iRenderLoopManager>
 {
-  csHashReversible<csRef<iRenderLoop>, const char*> loops;
+  typedef csHashReversible<csRef<iRenderLoop>, const char*> LoopsHash;
+  LoopsHash loops;
   csStringSet strings;
 
   csEngine* engine;
@@ -84,7 +88,7 @@ public:
 
   virtual csPtr<iRenderLoop> Create ();
   
-  virtual bool Register (const char* name, iRenderLoop* loop);
+  virtual bool Register (const char* name, iRenderLoop* loop, bool checkDupes = false);
   virtual iRenderLoop* Retrieve (const char* name);
   virtual const char* GetName (iRenderLoop* loop);
   virtual bool Unregister (iRenderLoop* loop);
@@ -93,6 +97,8 @@ public:
    * Load a renderloop from VFS file named \p file.
    */
   virtual csPtr<iRenderLoop> Load (const char* fileName);
+  
+  void UnregisterAll (bool evenDefault);
 };
 
 #endif

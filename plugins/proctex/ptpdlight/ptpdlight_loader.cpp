@@ -22,6 +22,7 @@
 
 #include "iutil/document.h"
 #include "iutil/objreg.h"
+#include "iutil/verbositymanager.h"
 #include "imap/loader.h"
 #include "imap/services.h"
 #include "ivaria/reporter.h"
@@ -29,6 +30,7 @@
 
 #include "csutil/cfgacc.h"
 #include "csutil/cscolor.h"
+#include "csutil/processorspecdetection.h"
 
 #include "ptpdlight.h"
 #include "ptpdlight_loader.h"
@@ -43,7 +45,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(PTPDLight)
 SCF_IMPLEMENT_FACTORY(ProctexPDLightLoader)
 
 ProctexPDLightLoader::ProctexPDLightLoader (iBase *p) :
-  scfImplementationType(this, p)
+  scfImplementationType(this, p), doMMX (false)
 {
   InitTokenTable (tokens);
 }
@@ -62,13 +64,26 @@ bool ProctexPDLightLoader::Initialize(iObjectRegistry *object_reg)
     sched.SetBudget (cfg->GetInt ("Texture.PTPDLight.TimePerFrame", 25));
   }
 
+  CS::Platform::ProcessorSpecDetection procSpec;
+#ifdef CS_SUPPORTS_MMX
+  doMMX = procSpec.HasMMX()
+    && cfg->GetBool ("Texture.PTPDLight.UseMMX", true);
+#endif
+  csRef<iVerbosityManager> verbosemgr (
+    csQueryRegistry<iVerbosityManager> (object_reg));
+  if (verbosemgr && verbosemgr->Enabled ("proctex.pdlight")) 
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY, 0,
+      "PD light texture computation implementation: %s",
+      doMMX ? "MMX" : "generic");
+  }
+
   return true;
 }
 
 csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,  
-				          iStreamSource*,
-					  iLoaderContext* /*ldr_context*/,
-  					  iBase* context)
+				          iStreamSource*, iLoaderContext* /*ldr_context*/,
+  					      iBase* context)
 {
   csRef<iLoader> LevelLoader = csQueryRegistry<iLoader> (object_reg);
   if (!LevelLoader) 
@@ -153,34 +168,7 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
         switch (id)
         {
           case XMLTOKEN_MAP:
-            {
-              const char* lightId = child->GetAttributeValue ("lightid");
-              const char* image = child->GetContentsValue ();
-              csRef<iImage> map = LevelLoader->LoadImage (image, 
-                CS_IMGFMT_ANY);
-              if (!map)
-              {
-                Report (CS_REPORTER_SEVERITY_WARNING, child, 
-	          "Couldn't load image '%s'", image);
-                return 0;
-              }
-              ProctexPDLight::MappedLight light (pt->NewLight (map));;
-              light.lightId = new char[16];
-              if (!HexToLightID (light.lightId, lightId))
-              {
-                Report (CS_REPORTER_SEVERITY_WARNING, child, 
-                  "Invalid light ID '%s'", lightId);
-              }
-              else
-              {
-                const char* err = pt->AddLight (light);
-                if (err != 0)
-                {
-                  Report (CS_REPORTER_SEVERITY_WARNING, child, 
-                    "Couldn't add map '%s' for light '%s': %s", image, lightId, err);
-                }
-              }
-            }
+            ParseMap (child, pt, LevelLoader);
             break;
           case XMLTOKEN_BASECOLOR:
             {
@@ -270,6 +258,63 @@ void ProctexPDLightLoader::Scheduler::UnqueuePT (ProctexPDLight* texture)
   while (queue.Delete (texture)) {}
 }
 
+bool ProctexPDLightLoader::ParseMap (iDocumentNode* node, ProctexPDLight* pt,
+                                     iLoader* LevelLoader)
+{
+  const char* sector = node->GetAttributeValue ("lightsector");
+  const char* lightName = node->GetAttributeValue ("lightname");
+  bool hasSector = sector && *sector;
+  bool hasLightName = lightName && *lightName;
+  if ((hasSector || hasLightName) && (!hasSector || !hasLightName))
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, node, 
+      "Both 'lightsector' and 'lightname' attributes need to be specified");
+    return false;
+  }
+  const char* lightId = node->GetAttributeValue ("lightid");
+  bool hasLightID = lightId && *lightId;
+  if (!hasSector && !hasLightName && !hasLightID)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, node, 
+      "'lightsector' and 'lightname' attributes or a 'lightid' attribute "
+      "need to be specified");
+    return false;
+  }
+  const char* image = node->GetContentsValue ();
+  csRef<iImage> map = LevelLoader->LoadImage (image, 
+    CS_IMGFMT_ANY);
+  if (!map)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, node, 
+      "Couldn't load image '%s'", image);
+    return false;
+  }
+  ProctexPDLight::MappedLight light (pt->NewLight (map));;
+  light.lightId = new ProctexPDLight::LightIdentity;
+  if (hasSector && hasLightName)
+  {
+    light.lightId->sectorName = sector;
+    light.lightId->lightName = lightName;
+  }
+  else
+  {
+    if (!HexToLightID (light.lightId->lightId, lightId))
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING, node, 
+        "Invalid light ID '%s'", lightId);
+    }
+    return false;
+  }
+  const char* err = pt->AddLight (light);
+  if (err != 0)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, node, 
+      "Couldn't add map '%s' for light '%s': %s", image, lightId, err);
+  }
+  
+  return !err;
+}
+
 void ProctexPDLightLoader::Report (int severity, iDocumentNode* node,
 				   const char* msg, ...)
 {
@@ -297,7 +342,7 @@ void ProctexPDLightLoader::Report (int severity, iDocumentNode* node,
   va_end (arg);
 }
 
-bool ProctexPDLightLoader::HexToLightID (char* lightID, const char* lightIDHex)
+bool ProctexPDLightLoader::HexToLightID (uint8* lightID, const char* lightIDHex)
 {
   bool valid = strlen (lightIDHex) == 32;
   if (valid)
@@ -331,7 +376,7 @@ bool ProctexPDLightLoader::HexToLightID (char* lightID, const char* lightIDHex)
         valid = false; 
         break;
       }
-      lightID[i] = char (v);
+      lightID[i] = v;
     }
   }
   return valid;

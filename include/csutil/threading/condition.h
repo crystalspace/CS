@@ -91,7 +91,7 @@ namespace Threading
      */
     template<typename LockType>
     bool Wait (LockType& lock, csTicks timeout = 0)
-    {
+    {      
       return ConditionBase::Wait (lock, timeout);
     }
   };

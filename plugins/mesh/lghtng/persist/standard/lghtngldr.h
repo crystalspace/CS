@@ -58,6 +58,8 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
+
+  virtual bool IsThreadSafe() { return true; }
 };
 
 /**
@@ -110,6 +112,8 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
+
+  virtual bool IsThreadSafe() { return true; }
 };
 
 /**

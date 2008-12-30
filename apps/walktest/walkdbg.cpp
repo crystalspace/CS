@@ -68,18 +68,6 @@ void DrawZbuffer ()
 #endif
 }
 
-void DrawPalette ()
-{
-  if (Gfx2D->GetPixelBytes () != 1)
-    return;
-  int pw = Gfx2D->GetWidth () / 16;
-  int ph = Gfx2D->GetHeight () / 16;
-  int i, j;
-  for (i = 0; i < 16; i++)
-    for (j = 0; j < 16; j++)
-      Gfx2D->DrawBox (i * pw, j * ph, pw, ph, j * 16 + i);
-}
-
 int collcount = 0;
 
 //------------------------------------------------------------------------

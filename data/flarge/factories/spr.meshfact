@@ -1,0 +1,18 @@
+<library>
+    <textures>
+        <texture name="oldmetal.gif">
+            <file>/lib/stdtex/oldmetal.jpg</file>
+        </texture>
+    </textures>
+    <materials>
+        <material name="robot">
+            <texture>oldmetal.gif</texture>
+        </material>
+    </materials>
+    <meshfact name="spr">
+        <plugin>spr2dFact</plugin>
+        <params>
+            <material>robot</material>
+        </params>
+    </meshfact>
+</library>

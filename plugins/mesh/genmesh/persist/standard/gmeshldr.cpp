@@ -25,11 +25,14 @@
 #include "csgeom/vector2.h"
 #include "csgeom/vector4.h"
 #include "csgeom/sphere.h"
+#include "csgfx/renderbuffer.h"
+#include "cstool/primitives.h"
 #include "csutil/cscolor.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/refarr.h"
 #include "csutil/scanstr.h"
 #include "csutil/sysfunc.h"
+#include "csutil/stringconv.h"
 #include "csutil/stringreader.h"
 
 #include "iengine/engine.h"
@@ -45,6 +48,7 @@
 #include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include "iutil/stringarray.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
@@ -178,12 +182,6 @@ bool csGeneralFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
   if(!state) return false;
 
   const char *name = node->GetAttributeValue("name");
-  if ((name == 0) || (*name == 0))
-  {
-    synldr->ReportError ("crystalspace.genmeshfactoryloader.parse",
-      node, "<renderbuffer>s must have names");
-    return false;
-  }
   csRef<iRenderBuffer> buf = synldr->ParseRenderBuffer (node);
   if (!buf.IsValid()) return false;
 
@@ -234,7 +232,7 @@ static bool GetFloat (char*& p, float& f)
   while (*p && !isspace (*p)) p++;
   char old = *p;
   *p = 0;
-  f = atof (start);
+  f = CS::Utility::strtof (start);
   *p = old;
   return true;
 }
@@ -282,6 +280,28 @@ static bool GetTri (char*& p, csTriangle& v)
   if (!GetInt (p, v.b)) return false;
   if (!GetInt (p, v.c)) return false;
   return true;
+}
+
+static void AppendOrSetData (iGeneralFactoryState* factory,
+    const csDirtyAccessArray<csVector3>& mesh_vertices,
+    const csDirtyAccessArray<csVector2>& mesh_texels,
+    const csDirtyAccessArray<csVector3>& mesh_normals,
+    const csDirtyAccessArray<csTriangle>& mesh_triangles)
+{
+  csColor4 black (0, 0, 0);
+  size_t cur_vt_count = factory->GetVertexCount ();
+  size_t i;
+  for (i = 0 ; i < mesh_vertices.GetSize () ; i++)
+    factory->AddVertex (mesh_vertices[i], mesh_texels[i],
+	  mesh_normals[i], black);
+  for (i = 0 ; i < mesh_triangles.GetSize () ; i++)
+  {
+    csTriangle tri = mesh_triangles[i];
+    tri.a += cur_vt_count;
+    tri.b += cur_vt_count;
+    tri.c += cur_vt_count;
+    factory->AddTriangle (tri);
+  }
 }
 
 csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
@@ -365,26 +385,36 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	break;
       case XMLTOKEN_MATERIAL:
 	{
-	  const char* matname = child->GetContentsValue ();
-          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-	  if (!mat)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.genmeshfactoryloader.parse.unknownmaterial",
-		child, "Couldn't find material '%s'!", matname);
-            return 0;
-	  }
-	  fact->SetMaterialWrapper (mat);
-	}
+    const char* matname = child->GetContentsValue ();
+    iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+    if (!mat)
+    {
+      synldr->ReportError (
+        "crystalspace.genmeshfactoryloader.parse.unknownmaterial",
+        child, "Couldn't find material '%s'!", matname);
+      return 0;
+    }
+    fact->SetMaterialWrapper (mat);
+  }
 	break;
       case XMLTOKEN_BOX:
         {
 	  num_vt_given = true;
 	  num_tri_given = true;
-	  csBox3 box;
-	  if (!synldr->ParseBox (child, box))
-	    return 0;
-	  state->GenerateBox (box);
+
+	  using namespace CS::Geometry;
+          csBox3 box;
+          if (!synldr->ParseBox (child, box))
+            return 0;
+	  csDirtyAccessArray<csVector3> mesh_vertices;
+	  csDirtyAccessArray<csVector2> mesh_texels;
+	  csDirtyAccessArray<csVector3> mesh_normals;
+	  csDirtyAccessArray<csTriangle> mesh_triangles;
+	  Primitives::GenerateBox (box, mesh_vertices, mesh_texels,
+	      mesh_normals, mesh_triangles, 0, 0);
+	  AppendOrSetData (state, mesh_vertices, mesh_texels,
+	    mesh_normals, mesh_triangles);
+
 	  num_vt = state->GetVertexCount ();
 	  num_tri = state->GetTriangleCount ();
 	}
@@ -393,42 +423,51 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
         {
 	  num_vt_given = true;
 	  num_tri_given = true;
-	  csVector3 center (0, 0, 0);
-	  int rim_vertices = 8;
-	  csEllipsoid ellips;
-	  csRef<iDocumentAttribute> attr;
-	  csRef<iDocumentNode> c = child->GetNode ("center");
-	  if (c)
-	    if (!synldr->ParseVector (c, ellips.GetCenter ()))
-	      return 0;
-	  c = child->GetNode ("radius");
-	  if (c)
-	  {
-	    if (!synldr->ParseVector (c, ellips.GetRadius ()))
-	      return 0;
-	  }
-	  else
-	  {
-	    attr = child->GetAttribute ("radius");
-	    float radius;
-	    if (attr) radius = attr->GetValueAsFloat ();
-	    else radius = 1.0f;
-	    ellips.SetRadius (csVector3 (radius, radius, radius));
-	  }
-	  attr = child->GetAttribute ("rimvertices");
-	  if (attr) rim_vertices = attr->GetValueAsInt ();
-	  bool cylmapping, toponly, reversed;
-	  if (!synldr->ParseBoolAttribute (child, "cylindrical", cylmapping,
-	  	false, false))
-  	    return 0;
-	  if (!synldr->ParseBoolAttribute (child, "toponly", toponly,
-	  	false, false))
-  	    return 0;
-	  if (!synldr->ParseBoolAttribute (child, "reversed", reversed,
-	  	false, false))
-  	    return 0;
-	  state->GenerateSphere (ellips, rim_vertices,
-	      cylmapping, toponly, reversed);
+	  using namespace CS::Geometry;
+          csVector3 center (0, 0, 0);
+          int rim_vertices = 8;
+          csEllipsoid ellips;
+          csRef<iDocumentAttribute> attr;
+          csRef<iDocumentNode> c = child->GetNode ("center");
+          if (c)
+            if (!synldr->ParseVector (c, ellips.GetCenter ()))
+              return 0;
+          c = child->GetNode ("radius");
+          if (c)
+          {
+            if (!synldr->ParseVector (c, ellips.GetRadius ()))
+              return 0;
+          }
+          else
+          {
+            attr = child->GetAttribute ("radius");
+            float radius;
+            if (attr) radius = attr->GetValueAsFloat ();
+            else radius = 1.0f;
+            ellips.SetRadius (csVector3 (radius, radius, radius));
+          }
+          attr = child->GetAttribute ("rimvertices");
+          if (attr) rim_vertices = attr->GetValueAsInt ();
+          bool cylmapping, toponly, reversed;
+          if (!synldr->ParseBoolAttribute (child, "cylindrical", cylmapping,
+              false, false))
+            return 0;
+          if (!synldr->ParseBoolAttribute (child, "toponly", toponly,
+              false, false))
+            return 0;
+          if (!synldr->ParseBoolAttribute (child, "reversed", reversed,
+              false, false))
+            return 0;
+	  csDirtyAccessArray<csVector3> mesh_vertices;
+	  csDirtyAccessArray<csVector2> mesh_texels;
+	  csDirtyAccessArray<csVector3> mesh_normals;
+	  csDirtyAccessArray<csTriangle> mesh_triangles;
+	  Primitives::GenerateSphere (ellips, rim_vertices,
+	      mesh_vertices, mesh_texels,
+	      mesh_normals, mesh_triangles, cylmapping,
+	      toponly, reversed, 0);
+	  AppendOrSetData (state, mesh_vertices, mesh_texels,
+	    mesh_normals, mesh_triangles);
 	  num_vt = state->GetVertexCount ();
 	  num_tri = state->GetTriangleCount ();
 	}
@@ -877,66 +916,37 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     if (!gfact) return false;
     if (!meshfact) return false;
 
-    //Write NumVt Tag
-    csRef<iDocumentNode> numvtNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    numvtNode->SetValue("numvt");
-    numvtNode->CreateNodeBefore(CS_NODE_TEXT, 0)
-      ->SetValueAsInt(gfact->GetVertexCount());
-
-    //Write NumTri Tag
-    bool writeTriangles = gfact->GetSubMeshCount() == 0;
-    if (writeTriangles)
+    // Write render buffers
     {
-      csRef<iDocumentNode> numtriNode = 
-        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      numtriNode->SetValue("numtri");
-      numtriNode->CreateNodeBefore(CS_NODE_TEXT, 0)
-        ->SetValueAsInt(gfact->GetTriangleCount());
+      iRenderBuffer* posBuffer = gfact->GetRenderBuffer (CS_BUFFER_POSITION);
+      if (!posBuffer) return false;
+      csRef<iDocumentNode> rbufNode = 
+        paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+      rbufNode->SetValue ("renderbuffer");
+      rbufNode->SetAttribute ("name", "position");
+      /* Disabled checking on this buffer b/c no vertex count is available
+       * when loading it */
+      rbufNode->SetAttribute ("checkelementcount", "no");
+      synldr->WriteRenderBuffer (rbufNode, posBuffer);
     }
-
-    int i;
-    //Write Vertex Tags
-    for (i=0; i<gfact->GetVertexCount(); i++)
+    
+    int rbufCount = gfact->GetRenderBufferCount ();
+    for (int i = 0; i < rbufCount; ++i)
     {
-      csRef<iDocumentNode> triaNode = 
-        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      triaNode->SetValue("v");
-      csVector3 vertex = gfact->GetVertices()[i];
-      csVector2 texel = gfact->GetTexels()[i];
-      synldr->WriteVector(triaNode, vertex);
-      triaNode->SetAttributeAsFloat("u", texel.x);
-      triaNode->SetAttributeAsFloat("v", texel.y);
+      csRef<iString> name = gfact->GetRenderBufferName (i);
+      csRenderBufferName bufName =
+        csRenderBuffer::GetBufferNameFromDescr (name->GetData());
+      if (bufName == CS_BUFFER_POSITION)
+        continue;
+      
+      csRef<iDocumentNode> rbufNode = 
+        paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+      rbufNode->SetValue ("renderbuffer");
+      rbufNode->SetAttribute ("name", name->GetData ());
+      csRef<iRenderBuffer> buffer = gfact->GetRenderBuffer (i);
+      synldr->WriteRenderBuffer (rbufNode, buffer);
     }
-
-    //Write Color Tags
-    if (!gfact->IsLighting())
-    {
-      for (i=0; i<gfact->GetVertexCount(); i++)
-      {
-        csRef<iDocumentNode> colorNode = 
-          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-        colorNode->SetValue("color");
-        csColor4 color = gfact->GetColors()[i];
-        synldr->WriteColor(colorNode, color);
-      }
-    }
-
-    //Write Triangle Tags
-    if (writeTriangles)
-    {
-      for (i=0; i<gfact->GetTriangleCount(); i++)
-      {
-        csRef<iDocumentNode> triaNode = 
-          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-        triaNode->SetValue("t");
-        csTriangle tria = gfact->GetTriangles()[i];
-        triaNode->SetAttributeAsInt("v1", tria.a);
-        triaNode->SetAttributeAsInt("v2", tria.b);
-        triaNode->SetAttributeAsInt("v3", tria.c);
-      }
-    }
-
+    
     //Writedown DefaultColor tag
     csColor col = gfact->GetColor();
     if (col.red != 0 || col.green != 0 || col.blue != 0)
@@ -975,18 +985,6 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
         ->SetValue("back2front");
 
-    //Writedown Lighting tag
-    synldr->WriteBool(paramsNode, "lighting", gfact->IsLighting(), true);
-
-    //Writedown NoShadows tag
-    if (!gfact->IsShadowCasting())
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("noshadows");
-
-    //Writedown LocalShadows tag
-    if (gfact->IsShadowReceiving())
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
-        ->SetValue("localshadows");
-
     //Writedown ManualColor tag
     synldr->WriteBool(paramsNode, "manualcolors", gfact->IsManualColors(), false);
 
@@ -1010,47 +1008,19 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
       //Write Autonormals Tag
       paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("autonormals");
     }
-    else
-    {
-      //Write Normal Tags
-      for (i=0; i<gfact->GetVertexCount(); i++)
-      {
-        csRef<iDocumentNode> normalNode = 
-          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-        normalNode->SetValue("n");
-        csVector3 normal = gfact->GetNormals()[i];
-        synldr->WriteVector(normalNode, normal);
-      }
-    }
 
     //TBD: Writedown box tag
 
     // Write submeshes
-    if (!writeTriangles)
+    size_t smc = gfact->GetSubMeshCount();
+    for (size_t s = 0; s < smc; s++)
     {
-      size_t smc = gfact->GetSubMeshCount();
-      for (size_t s = 0; s < smc; s++)
-      {
-        csRef<iDocumentNode> submeshNode = 
-          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-        submeshNode->SetValue("submesh");
+      csRef<iDocumentNode> submeshNode = 
+	paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      submeshNode->SetValue("submesh");
 
-        iGeneralMeshSubMesh* submesh = gfact->GetSubMesh (s);
-        WriteSubMesh (submesh, submeshNode);
-      }
-    }
-
-    // Write render buffers
-    int rbufCount = gfact->GetRenderBufferCount ();
-    for (i = 0; i < rbufCount; ++i)
-    {
-      csRef<iDocumentNode> rbufNode = 
-        paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-      rbufNode->SetValue ("renderbuffer");
-      csRef<iString> name = gfact->GetRenderBufferName (i);
-      rbufNode->SetAttribute ("name", name->GetData ());
-      csRef<iRenderBuffer> buffer = gfact->GetRenderBuffer (i);
-      synldr->WriteRenderBuffer (rbufNode, buffer);
+      iGeneralMeshSubMesh* submesh = gfact->GetSubMesh (s);
+      WriteSubMesh (submesh, submeshNode);
     }
   }
   return true;
@@ -1132,7 +1102,7 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
   if(!node) return false;
 
   const char* name = node->GetAttributeValue ("name");
-  csRef<iGeneralMeshSubMesh> subMesh = state->FindSubMesh (name);
+  csRef<iGeneralMeshSubMesh> subMesh = ldr_context->FindSubmesh (state, name);
   if (!subMesh)
   {
     synldr->ReportError (
@@ -1170,8 +1140,7 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
     case XMLTOKEN_MATERIAL:
       {
         const char* matname = child->GetContentsValue ();
-        csRef<iMaterialWrapper> material = 
-          ldr_context->FindMaterial (matname);
+        csRef<iMaterialWrapper> material = ldr_context->FindMaterial (matname);
         if (!material.IsValid ())
         {
           synldr->ReportError (
@@ -1227,7 +1196,7 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
   }
 
 csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
-	iStreamSource*, iLoaderContext* ldr_context, iBase*)
+	iStreamSource*, iLoaderContext* ldr_context, iBase* context)
 {
   csRef<iMeshObject> mesh;
   csRef<iGeneralMeshState> meshstate;
@@ -1285,13 +1254,14 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	{
 	  const char* factname = child->GetContentsValue ();
 	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
-	  if (!fact)
+	  if(!fact)
 	  {
-      	    synldr->ReportError (
-		"crystalspace.genmeshloader.parse.unknownfactory",
-		child, "Couldn't find factory '%s'!", factname);
+	    synldr->ReportError (
+	      "crystalspace.genmeshloader.parse.unknownfactory",
+	      child, "Couldn't find factory '%s'!", factname);
 	    return 0;
 	  }
+
 	  factstate =  
 	    scfQueryInterface<iGeneralFactoryState> (fact->GetMeshObjectFactory());
 	  if (!factstate)
@@ -1318,15 +1288,15 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_MATERIAL:
 	{
 	  const char* matname = child->GetContentsValue ();
-          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-	  if (!mat)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.genmeshloader.parse.unknownmaterial",
-		child, "Couldn't find material '%s'!", matname);
-            return 0;
-	  }
-	  CHECK_MESH(meshstate);
+    iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+    if (!mat)
+    {
+      synldr->ReportError (
+        "crystalspace.genmeshloader.parse.unknownmaterial",
+        child, "Couldn't find material '%s'!", matname);
+      return 0;
+    }
+    CHECK_MESH(meshstate);
 	  mesh->SetMaterialWrapper (mat);
 	}
 	break;
@@ -1453,18 +1423,6 @@ bool csGeneralMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
         factNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue(factname);
       }    
     }
-
-    //Writedown Lighting tag
-    synldr->WriteBool(paramsNode, "lighting", gmesh->IsLighting(), true);
-
-    //Writedown NoShadows tag
-    if (!gmesh->IsShadowCasting())
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue("noshadows");
-
-    //Writedown LocalShadows tag
-    if (gmesh->IsShadowReceiving())
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
-        ->SetValue("localshadows");
 
     //Writedown Color tag
     csColor col;

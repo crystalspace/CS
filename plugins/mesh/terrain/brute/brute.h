@@ -32,13 +32,11 @@
 #include "csutil/refarr.h"
 #include "csutil/sysfunc.h"
 #include "csutil/scf_implementation.h"
-#include "csutil/thread.h"
+#include "csutil/scfarray.h"
 #include "csutil/weakref.h"
 #include "iengine/lightmgr.h"
 #include "iengine/mesh.h"
-#include "iengine/shadcast.h"
 #include "imesh/objmodel.h"
-#include "imesh/lighting.h"
 #include "imesh/object.h"
 #include "imesh/terrain.h"
 #include "iutil/comp.h"
@@ -167,14 +165,12 @@ public:
   }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 class csTerrainObject : 
-  public scfImplementationExt4<csTerrainObject,
+  public scfImplementationExt2<csTerrainObject,
                                csObjectModel,
                                iMeshObject,
-                               iShadowReceiver,
-                               iLightingInfo,
                                iTerrainObjectState>
 {
 private:
@@ -193,7 +189,9 @@ private:
   int numindices[16];
 
   csRef<iMaterialWrapper> matwrap;
-  csArray<iMaterialWrapper*> palette;	// TODO@@@ Use csRefArray!!!
+  csArray<iMaterialWrapper*> palette;
+  // Used to make sure we hold refs to materials (so the ref count is correct when we look to unload).
+  csRefArray<iMaterialWrapper> refPalette;
   csRefArray<iImage> alphas;
   csRef<iShaderVariableContext> baseContext;
   csRefArray<iShaderVariableContext> paletteContexts;
@@ -276,7 +274,7 @@ private:
 
   // If we are using the iLightingInfo lighting system then this
   // is an array of lights that affect us right now.
-  csSet<csPtrKey<iLight> > affecting_lights;
+  //csSet<csPtrKey<iLight> > affecting_lights;
   csHash<csShadowArray*, csPtrKey<iLight> > pseudoDynInfo;
   void UpdateColors (iMovable* movable);
   //=============
@@ -422,15 +420,6 @@ public:
   void AddListener (iObjectModelListener* listener);
   void RemoveListener (iObjectModelListener* listener);
 
-  // For lighting.
-  void CastShadows (iMovable* movable, iFrustumView* fview);
-  void InitializeDefault (bool clear);
-  bool ReadFromCache (iCacheManager* cache_mgr);
-  bool WriteToCache (iCacheManager* cache_mgr);
-  void PrepareLighting ();
-  void LightChanged (iLight* light);
-  void LightDisconnect (iLight* light);
-  void DisconnectAllLights ();
   char* GenerateCacheName ();
   void SetStaticLighting (bool enable);
 
@@ -569,7 +558,7 @@ public:
   virtual uint GetMixMode () const { return 0; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
 * TerrFunc type. This is the plugin you have to use to create instances

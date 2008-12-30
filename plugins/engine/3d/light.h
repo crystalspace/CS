@@ -20,6 +20,9 @@
 #define __CS_LIGHT_H__
 
 #include "csgeom/transfrm.h"
+#include "csgeom/box.h"
+#include "csgfx/lightsvcache.h"
+#include "csgfx/shadervarcontext.h"
 #include "cstool/objmodel.h"
 #include "csutil/cscolor.h"
 #include "csutil/csobject.h"
@@ -31,25 +34,23 @@
 #include "csutil/scfarray.h"
 #include "csutil/weakref.h"
 #include "iutil/selfdestruct.h"
-#include "plugins/engine/3d/lview.h"
 #include "plugins/engine/3d/halo.h"
 #include "plugins/engine/3d/movable.h"
 #include "plugins/engine/3d/scenenode.h"
 #include "iengine/light.h"
 #include "iengine/lightmgr.h"
 #include "iengine/viscull.h"
-#include "csgfx/shadervarcontext.h"
-
 
 class csLightMap;
 class csPolygon3D;
 class csCurve;
-class csKDTreeChild;
 struct iMeshWrapper;
-struct iLightingInfo;
 struct iSector;
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
+
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
+{
 
 class csLightObjectModel : public scfImplementationExt0<csLightObjectModel,
                                                         csObjectModel>
@@ -83,33 +84,7 @@ public:
   virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
-/**
- * Class that represents the influence that a certain light
- * has on a sector.
- */
-class csLightSectorInfluence : public scfImplementation1<
-			       csLightSectorInfluence,
-			       iLightSectorInfluence>
-{
-public:
-  iSector* sector;	// Weak ref@@@?
-  iLight* light;	// Weak ref@@@?
-  // Influence frustum. Or infinite if point light
-  // and in starting sector.
-  csRef<csFrustum> frustum;
-
-  csLightSectorInfluence () : scfImplementationType (this) { }
-  virtual ~csLightSectorInfluence () { }
-  virtual iSector* GetSector () const { return sector; }
-  virtual iLight* GetLight () const { return light; }
-  virtual const csFrustum* GetFrustum () const { return frustum; }
-};
-
-typedef csSet<csRef<csLightSectorInfluence> > csLightSectorInfluences;
-
-#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 /**
  * Superclass of all positional lights.
@@ -117,10 +92,9 @@ typedef csSet<csRef<csLightSectorInfluence> > csLightSectorInfluences;
  * and a radius.
  */
 class csLight : 
-  public scfImplementationExt5<csLight,
+  public scfImplementationExt4<csLight,
                                csObject,
-                               iLight,
-                               iVisibilityObject,
+                               iLight,                               
                                scfFakeInterface<iShaderVariableContext>,
 			       iSceneNode,
 			       iSelfDestruct>,
@@ -128,14 +102,11 @@ class csLight :
 {
 private:
   /// ID for this light (16-byte MD5).
-  char* light_id;
-
-  /// Childnode representing this light in the sector light list kdtree.
-  csKDTreeChild* childnode;
-
+  char* light_id;  
+  
 protected:
   /// Movable for the light
-  csMovable movable;
+  mutable csMovable movable;
 
   /// Color.
   csColor color;
@@ -159,13 +130,15 @@ protected:
   /// Attenuation type
   csLightAttenuationMode attenuation;
   /// Attenuation constants
-  csVector3 attenuationConstants;
+  csVector4 attenuationConstants;
 
   /// The distance where the light have any effect at all
   float cutoffDistance; 
 
   /// Radial cutoff radius for directional lights
   float directionalCutoffRadius;
+  // Analogue to userSpecular
+  bool userDirectionalCutoffRadius;
 
   /// Falloff coefficients for spotlight.
   float spotlightFalloffInner, spotlightFalloffOuter;
@@ -178,12 +151,6 @@ protected:
    */
   csRefArray<iLightCallback> light_cb_vector;
 
-  /// Type of element contained in \c lightinginfos set.
-  typedef csSet<csRef<iLightingInfo> > LightingInfo;
-
-  /// Set of meshes that we are currently affecting.
-  LightingInfo lightinginfos;
-
   /// Get a unique ID for this light. Generate it if needed.
   const char* GenerateUniqueID ();
 
@@ -195,19 +162,14 @@ protected:
   /// Compute attenuation vector from current attenuation mode.
   void CalculateAttenuationVector ();
 
-  /// For the culler.
-  csFlags culler_flags;
-  csRef<csLightObjectModel> object_model;
-  // The following counter keeps track of how many sectors would like to have
-  // this light as a vis culling object.
-  int sectors_wanting_visculling;
-
-  void UpdateViscullMesh ();
-
-  /// List of light/sector influences.
-  csLightSectorInfluences influences;
+  csBox3 lightBoundingBox, worldBoundingBox;
 
   csEngine* engine;
+
+protected:
+  void InternalRemove() { SelfDestruct(); }
+
+  csShaderVariable* GetPropertySV (csLightShaderVarCache::LightProperty prop);
 public:
   /// Set of flags
   csFlags flags;
@@ -230,53 +192,6 @@ public:
   virtual ~csLight ();
 
   csLightDynamicType GetDynamicType () const { return dynamicType; }
-
-  /**
-   * Another sector wants to use this light as a culling object.
-   */
-  void UseAsCullingObject ();
-  /**
-   * A sector no longer wants to use this light as a culling object.
-   */
-  void StopUsingAsCullingObject ();
-
-  /**
-   * Shine this light on all polygons visible from the light.
-   * This routine will update the lightmaps of all polygons or
-   * update the vertex colors if gouraud shading is used.
-   * It correctly takes pseudo-dynamic lights into account and will then
-   * update the corresponding shadow map.
-   * For dynamic lights this will work differently.
-   */
-  void CalculateLighting ();
-
-  /**
-   * Shine this light on all polygons of the mesh.
-   * Only backface culling is used. The light is assumed
-   * to be in the same sector as the mesh.
-   * Currently only works on thing meshes.
-   */
-  void CalculateLighting (iMeshWrapper* mesh);
-
-  // Functions related to light/sector influence.
-  void RemoveLSI (csLightSectorInfluence* inf);
-  void CleanupLSI ();
-  void FindLSI (csLightSectorInfluence* inf);
-  void FindLSI ();
-
-  /**
-   * Set the kdtree child node used by this light (in the kdtree
-   * that is maintained by the sector light list).
-   */
-  void SetChildNode (csKDTreeChild* childnode)
-  {
-    csLight::childnode = childnode;
-  }
-
-  /**
-   * Get the kdtree child node.
-   */
-  csKDTreeChild* GetChildNode () const { return childnode; }
 
   /// Get the ID of this light.
   const char* GetLightID () { return GenerateUniqueID (); }
@@ -362,7 +277,11 @@ public:
   { return specularColor; }
   /// Set the specular color of this light.
   void SetSpecularColor (const csColor& col) 
-  { userSpecular = true; specularColor = col; }
+  {
+    userSpecular = true; 
+    specularColor = col; 
+    GetPropertySV (csLightShaderVarCache::lightSpecular)->SetValue (col);
+  }
 
   /**
    * Return the associated halo
@@ -391,12 +310,12 @@ public:
   * Set attenuation constants
   * \sa csLightAttenuationMode
   */
-  void SetAttenuationConstants (const csVector3& constants);
+  void SetAttenuationConstants (const csVector4& constants);
   /**
   * Get attenuation constants
   * \sa csLightAttenuationMode
   */
-  const csVector3 &GetAttenuationConstants () const
+  const csVector4 &GetAttenuationConstants () const
   { return attenuationConstants; }
 
   /**
@@ -432,8 +351,8 @@ public:
   void SetDirectionalCutoffRadius (float radius)
   {
     directionalCutoffRadius = radius;
+    userDirectionalCutoffRadius = true;
     lightnr++;
-    UpdateViscullMesh ();
   }
 
   /**
@@ -444,6 +363,8 @@ public:
     spotlightFalloffInner = inner;
     spotlightFalloffOuter = outer;
     lightnr++;
+    GetPropertySV (csLightShaderVarCache::lightInnerFalloff)->SetValue (inner);
+    GetPropertySV (csLightShaderVarCache::lightOuterFalloff)->SetValue (outer);
   }
 
   /**
@@ -474,29 +395,12 @@ public:
   void SetType (csLightType type)
   {
     this->type = type;
-    UpdateViscullMesh ();
   }
 
   virtual iShaderVariableContext* GetSVContext()
   {
     return (iShaderVariableContext*)this;
   }
-
-  //----------------------------------------------------------------------
-  // Light influence stuff.
-  //----------------------------------------------------------------------
-
-  /**
-   * Add a lighting info to this dynamic light. This is usually
-   * called during Setup() by meshes that are hit by the
-   * light.
-   */
-  void AddAffectedLightingInfo (iLightingInfo* li);
-
-  /**
-   * Remove a lighting info from this light.
-   */
-  void RemoveAffectedLightingInfo (iLightingInfo* li);
 
   //----------------------------------------------------------------------
   // Callbacks
@@ -537,14 +441,14 @@ public:
   virtual iObject *QueryObject() { return this; }
   virtual iSceneNode* QuerySceneNode () { return this; }
   csLight* GetPrivateObject () { return this; }
-  //------------------- iVisibilityObject interface -----------------------
-  virtual iMovable *GetMovable () const { return (iMovable*)&movable; }
-  virtual iMeshWrapper* GetMeshWrapper () const { return 0; }
-  virtual iObjectModel* GetObjectModel () { return object_model; }
-  virtual csFlags& GetCullerFlags () { return culler_flags; }
-
+  
   /**\name iSceneNode implementation
    * @{ */
+  virtual iMovable* GetMovable () const
+  {
+    return &movable;
+  }
+
   virtual void SetParent (iSceneNode* parent)
   {
     csSceneNode::SetParent ((iSceneNode*)this, parent, &movable);
@@ -589,14 +493,19 @@ public:
   virtual uint32 GetLightNumber () const
   { return lightnr; }
 
-  virtual void Setup ()
+  virtual const csBox3& GetLocalBBox () const
   {
-    CalculateLighting ();
+    return lightBoundingBox;
   }
+  const csBox3& GetWorldBBox () const
+  { return worldBoundingBox; }
 
+  csBox3 GetBBox () const;
+
+  void UpdateBBox ();
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * List of lights for a sector. This class implements iLightList.
@@ -655,57 +564,25 @@ public:
   virtual iLight *FindByID (const char* id) const;
 };
 
-/**
- * This is user-data for iFrustumView for the lighting process.
- */
-struct csLightingProcessInfo : public scfImplementation1<csLightingProcessInfo,
-                                                         iLightingProcessInfo>
+class LightAttenuationTextureAccessor :
+  public scfImplementation1<LightAttenuationTextureAccessor ,
+                            iShaderVariableAccessor>
 {
-private:
-  // Light.
-  csLight* light;
-  // For dynamic lighting.
-  bool dynamic;
-  // Current lighting color.
-  csColor color;
-  // Array of user data.
-  csRefArray<iLightingProcessData> userdatas;
-
+  csEngine* engine;
+  void CreateAttenuationTexture ();
 public:
-  csLightingProcessInfo (csLight* light, bool dynamic);
-  virtual ~csLightingProcessInfo ();
+  csRef<iTextureHandle> attTex;
 
-  /**
-   * Get the light.
-   */
-  csLight* GetCsLight () const { return light; }
-  virtual iLight* GetLight () const { return light; }
+  LightAttenuationTextureAccessor (csEngine* engine);
+  virtual ~LightAttenuationTextureAccessor ();
 
-  /**
-   * Return true if dynamic.
-   */
-  virtual bool IsDynamic () const { return dynamic; }
-
-  /**
-   * Set the current color.
-   */
-  virtual void SetColor (const csColor& col) { color = col; }
-
-  /**
-   * Get the current color.
-   */
-  virtual const csColor& GetColor () const { return color; }
-
-  /// Attach userdata.
-  virtual void AttachUserdata (iLightingProcessData* userdata);
-
-  /// Query for userdata based on SCF type.
-  virtual csPtr<iLightingProcessData> QueryUserdata (scfInterfaceID id,
-    int version);
-
-  /// Finalize lighting.
-  virtual void FinalizeLighting ();
+  virtual void PreGetValue (csShaderVariable *variable);
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(Engine)
+
+using CS_PLUGIN_NAMESPACE_NAME(Engine)::csLightList;
 
 #endif // __CS_LIGHT_H__
 

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<shader compiler="xmlshader" name="std_lighting_detail">
+
+  <!-- See also std_lighting.xml for explanations -->
+  <?Include /shader/snippets/shaderframework-cg.inc ?>
+
+  <?Include /shader/surface/cg-surface-classic.inc ?>
+  <?Include /shader/lighting/cg-light-classic.inc ?>
+  <?Include /shader/fog/cg-fog-sector.inc ?>
+  <?Include /shader/surface/cg-parallax.inc ?>
+  <?Include /shader/snippets/cg-mixmode-alpha.inc ?>
+
+  <?CgUseSharedCond texCoord ?>
+
+  <?Template CgProgram?>
+  struct VertToFrag
+  {
+    float4 Hposition : POSITION;
+    VertToFrag_Framework framework;
+    
+    SurfaceClassic surfClassic;
+    LightingClassic lightClassic;
+    FogSector fog;
+    Parallax parallax;
+    
+    float2 tcDetail;
+  };
+  
+  VertToFrag VertexMain (float4 Position : POSITION,
+			 uniform float4x4 ModelViewProj : state.matrix.mvp,
+			 uniform float2 texDetailScale)
+  {
+    VertToFrag V2F;
+  
+    V2F.Hposition = mul (ModelViewProj, Position);
+    V2F.surfClassic.SetupVert();
+    V2F.lightClassic.SetupVert();
+    V2F.fog.SetupVert();
+    V2F.parallax.SetupVert();
+    
+    V2F.tcDetail = texCoord * texDetailScale;
+  
+    V2F.framework.SetupVert();
+  
+    return V2F;
+  }
+  
+  float4 FragmentMain (VertToFrag V2F, uniform sampler2D texDetail) : COLOR
+  {
+    V2F.framework.SetupFrag();
+    
+    float4 color = V2F.surfClassic.GetDiffuse (V2F.parallax.GetTCOffset()) * 
+      float4 (V2F.lightClassic.IllumAmbient()+V2F.lightClassic.IllumDiffuse(), 
+	  GetMixmodeAlpha());
+    // Apply detail
+    color.rgb *= 2 * tex2D (texDetail, 
+      V2F.tcDetail + V2F.parallax.GetTCOffset()).rgb;
+    
+    if (V2F.fog.HasFog())
+    {
+      color.rgb = lerp(color.rgb, V2F.fog.GetColor(), V2F.fog.GetIntensity());
+    }
+    return color;
+  }
+  <?Endtemplate?>
+  
+  <?Template MyPass ?>
+    <texture name="tex detail" destination="texDetail" />
+  <?Endtemplate?>
+  <?AddToList PassMappings MyPass?>
+  <?Template MyProgram ?>
+    <variablemap variable="tex detail scale" 
+      destination="texDetailScale" />
+  <?Endtemplate?>
+  <?AddToList ProgramMappings MyProgram?>
+  <?Template MyShaderVar?>
+    <shadervar name="tex detail scale" type="vector2">1,1</shadervar>
+  <?Endtemplate?>
+  <?AddToList ShaderVars MyShaderVar?>
+  
+  <?Template CgVertexOptions?>
+    <!-- We want position invariance here -->
+    <compilerargs>-posinv</compilerargs>
+  <?Endtemplate?>
+  <?CgSetVertexFunc VertexMain ?>
+  <?CgSetFragmentFunc FragmentMain ?>
+
+  <?! Finally, this will write the technique with the given priority (300). ?>
+  <?WriteShaderTechnique 300?>
+  
+  <?! Now, basically the same, just without parallax mapping now. ?>
+  <?Template CgProgram?>
+  struct VertToFrag
+  {
+    float4 Hposition : POSITION;
+    
+    VertToFrag_Framework framework;
+    
+    SurfaceClassic surfClassic;
+    LightingClassic lightClassic;
+    FogSector fog;
+    
+    float2 tcDetail;
+  };
+  
+  VertToFrag VertexMain (float4 Position : POSITION,
+			 uniform float4x4 ModelViewProj : state.matrix.mvp,
+			 uniform float2 texDetailScale)
+  {
+    VertToFrag V2F;
+  
+    V2F.Hposition = mul (ModelViewProj, Position);
+    V2F.surfClassic.SetupVert();
+    V2F.lightClassic.SetupVert();
+    V2F.fog.SetupVert();
+  
+    V2F.tcDetail = texCoord * texDetailScale;
+  
+    V2F.framework.SetupVert();
+  
+    return V2F;
+  }
+  
+  float4 FragmentMain (VertToFrag V2F, uniform sampler2D texDetail) : COLOR
+  {
+    V2F.framework.SetupFrag();
+
+    float4 color = V2F.surfClassic.GetDiffuse () * 
+      float4 (V2F.lightClassic.IllumAmbient()+V2F.lightClassic.IllumDiffuse(), 
+	GetMixmodeAlpha());
+    // Apply detail
+    color.rgb *= 2 * tex2D (texDetail, V2F.tcDetail).rgb;
+    
+    if (V2F.fog.HasFog())
+    {
+      color.rgb = lerp(color.rgb, V2F.fog.GetColor(), V2F.fog.GetIntensity());
+    }
+    return color;
+  }
+  <?Endtemplate?>
+  <?WriteShaderTechnique 250?>
+
+  <?WriteShaderVars?>
+
+  <fallbackshader name="std_lighting_detail_fixed" 
+    file="/shader/std_lighting_detail_fixed.xml" />
+</shader>

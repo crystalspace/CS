@@ -40,7 +40,9 @@ namespace lighter
   public:
     Object_Genmesh (ObjectFactory_Genmesh* factory);
 
-    virtual void SaveMesh (Sector* sector, iDocumentNode *node);
+    virtual bool Initialize (Sector* sector);
+    
+    virtual void SaveMesh (iDocumentNode *node);
 
     virtual void FreeNotNeededForLighting ();
 
@@ -52,7 +54,7 @@ namespace lighter
   class ObjectFactory_Genmesh : public ObjectFactory
   {
   public:
-    ObjectFactory_Genmesh ();
+    ObjectFactory_Genmesh (const Configuration& config);
 
     // Get a new object
     virtual csPtr<Object> CreateObject ();
@@ -72,6 +74,8 @@ namespace lighter
     };
   protected:
     friend class Object_Genmesh;
+
+    void SetupTangents (iGeneralFactoryState* genFact);
 
     // Begin remapping of submeshes
     virtual void BeginSubmeshRemap ();
@@ -102,7 +106,8 @@ namespace lighter
       { }
 
       IntDArray* FindSubmesh (size_t submeshIndex);
-      void CommitSubmeshes (iGeneralFactoryState* genFact);
+      void CommitSubmeshes (iGeneralFactoryState* genFact,
+        const char* factFN);
       void CommitSubmeshNames ();
     protected:
       ObjectFactory_Genmesh* factory;
@@ -125,7 +130,6 @@ namespace lighter
         AllocatedSubmeshKey const& key);
     };
   };
-
 }
 
 template<>

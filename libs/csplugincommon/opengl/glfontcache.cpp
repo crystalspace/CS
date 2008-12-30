@@ -53,7 +53,7 @@ const GLenum fontFilterMode = /*GL_LINEAR*/GL_NEAREST;
 //---------------------------------------------------------------------------
 
 csGLFontCache::csGLFontCache (csGraphics2DGLCommon* G2D) : 
-  cacheDataAlloc (512), verts2d (256, 256), texcoords (256, 256)
+  cacheDataAlloc (512), verts2d (256), texcoords (256)
 {
   csGLFontCache::G2D = G2D;
   statecache = G2D->statecache;
@@ -125,7 +125,7 @@ void csGLFontCache::Setup()
       textMethod = 1;
     else
       textMethod = 2;
-    static const char* textMethodStr[4] =
+    static const char* const textMethodStr[4] =
       {"Multitexturing",
        "GL_BLEND texenv with GL_INTENSITY texture",
        "GL_MODULATE, two-pass",
@@ -396,7 +396,7 @@ void csGLFontCache::CopyGlyphData (iFont* /*font*/, utf32_char /*glyph*/, size_t
   {
     statecache->SetTexture (GL_TEXTURE_2D, textures[tex].handle);
 
-    glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
+    statecache->SetPixelUnpackAlignment (1);
 
     uint8* intData = new uint8[MAX((texRect.Width () * texRect.Height ()),
       (bmetrics.width * bmetrics.height))];
@@ -529,7 +529,7 @@ void csGLFontCache::FlushArrays ()
     statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     statecache->Enable_GL_BLEND ();
 
-    static float envTransparent[4] = {1.0f, 1.0f, 1.0f, 0.0f};
+    static const float envTransparent[4] = {1.0f, 1.0f, 1.0f, 0.0f};
     if (afpText)
       G2D->ext.glProgramLocalParameter4fvARB (GL_FRAGMENT_PROGRAM_ARB, 0, 
         envTransparent);
@@ -948,6 +948,7 @@ void csGLFontCache::FlushText ()
   textWriting = false;
 }
 
+#include "csutil/custom_new_disable.h"
 void csGLFontCache::DumpFontCache (csRefArray<iImage>& pages)
 {
   for (size_t t = 0; t < textures.GetSize (); t++)
@@ -967,3 +968,4 @@ void csGLFontCache::DumpFontCache (csRefArray<iImage>& pages)
     pages.Push (page);
   }
 }
+#include "csutil/custom_new_enable.h"

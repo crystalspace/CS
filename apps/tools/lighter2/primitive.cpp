@@ -83,12 +83,14 @@ namespace lighter
   void PrimitiveBase::ComputePlane ()
   {
     //Setup a temporary array of our vertices
-    Vector3DArray vertices;
-    vertices.Push (vertexData->positions[triangle.a]);
-    vertices.Push (vertexData->positions[triangle.b]);
-    vertices.Push (vertexData->positions[triangle.c]);
+    const csVector3 vertices[] =
+    {
+      vertexData->positions[triangle.a],
+      vertexData->positions[triangle.b],
+      vertexData->positions[triangle.c]
+    };
 
-    plane = csPoly3D::ComputePlane (vertices);
+    plane = csPoly3D::ComputePlane (vertices, 3);
   }
 
   template<typename Array>
@@ -145,7 +147,7 @@ namespace lighter
 
   struct Scanline
   {
-    int min, max;
+    uint min, max;
   };
 
   void ScanConvert(Scanline* scanBuf, const csVector2& v1, const csVector2& v2, size_t vc)
@@ -173,7 +175,7 @@ namespace lighter
     }
 
     fy = (uint)floorf(f->y);
-    ly = (uint)ceilf(l->y);
+    ly = (uint)floorf(l->y+1);
 
     // Clip or reject
     if (fy >= vc) 
@@ -197,11 +199,10 @@ namespace lighter
 
     for (uint i = fy; i < ly; ++i)
     {
-      int sx = (int)x;
-      if (sx < scanBuf[i].min)
-        scanBuf[i].min = sx;
-      if ((sx+1) > scanBuf[i].max)
-        scanBuf[i].max = (sx+1);
+      if (x < scanBuf[i].min)
+        scanBuf[i].min = static_cast<uint>(x);
+      if ((x+1) > scanBuf[i].max)
+        scanBuf[i].max = static_cast<uint>(x+1);
 
       x += slopeX;
     }
@@ -211,6 +212,9 @@ namespace lighter
 
   void Primitive::Prepare ()
   {
+    ComputeBaryCoeffs();
+    if (radObject->lightPerVertex) return;
+
     // Reset current data
     
     // Compute min/max uv
@@ -225,8 +229,7 @@ namespace lighter
     ObjectVertexData& vdata = GetVertexData();
 
     // Min xyz
-    csVector2 d = minUV -
-      (vdata.lightmapUVs[triangle.a] + csVector2(0.5f,0.5f));
+    csVector2 d = minUV - (vdata.lightmapUVs[triangle.a]);
     
     minCoord = vdata.positions[triangle.a]
       + uFormVector * d.x + vFormVector * d.y;
@@ -259,17 +262,16 @@ namespace lighter
     ScanConvert (scanBuffer, verts[1], verts[2], vc);
     ScanConvert (scanBuffer, verts[2], verts[0], vc);
 
-    uint maxRow = (uint)ceilf(csMax(verts[0].y, csMax(verts[1].y, verts[2].y)));
+    uint maxRow = (uint)floorf(csMax(verts[0].y, csMax(verts[1].y, verts[2].y))+1);
 
     for (uint row = 0; row < maxRow; ++row)
     {
       // Get start and ends
-      int min = scanBuffer[row].min;
-      int max = scanBuffer[row].max;
+      uint min = scanBuffer[row].min;
+      uint max = scanBuffer[row].max;
 
       // Clip
-      if (min >= uc) continue;
-      if (max < 0) continue;
+      if ((max < 0) && (min >= uc)) continue;
 
       if (min < 0)
          min = 0;
@@ -278,23 +280,19 @@ namespace lighter
 
       size_t rowOffset = row*uc;
 
-      // Left border
-      elementClassification.SetBit (2*(rowOffset+min));
-
-      for (int col = (int)(min+1); col < max; ++col)
+      for (uint col = min; col <= max; ++col)
       {
-        elementClassification.SetBit (2*(rowOffset+col));
-        if (row > 0 && row < (maxRow-1))
-          elementClassification.SetBit (2*(rowOffset+col)+1);
+        float area = ComputeElementFraction (rowOffset+col);
+        if (area > 0)
+        {
+          elementClassification.SetBit (2*(rowOffset+col));
+          if (area > (1.0f - LITEPSILON))
+            elementClassification.SetBit (2*(rowOffset+col)+1);
+        }
       }
-
-      // Right border
-      elementClassification.SetBit (2*(rowOffset+max));
     }
 
     //PrintElements (elementClassification, uc, vc);
-
-    ComputeBaryCoeffs();
   }
 
   size_t Primitive::ComputeElementIndex (const csVector3& pt) const
@@ -332,6 +330,44 @@ namespace lighter
       (1 - lambda - my) * vertexData->normals[triangle.c];
 
     return norm.Unit ();
+  }
+
+  csVector2 Primitive::ComputeUV (const csVector3& point) const
+  {
+    float lambda, my;
+    ComputeBaryCoords (point, lambda, my);
+
+    // Clamp lambda/my
+    lambda = csClamp (lambda, 1.0f, 0.0f);
+    my = csClamp (my, 1.0f, 0.0f);
+
+    csVector2 uv;
+
+    uv = lambda * vertexData->uvs[triangle.a] + 
+      my * vertexData->uvs[triangle.b] + 
+      (1 - lambda - my) * vertexData->uvs[triangle.c];
+
+    return uv;
+  }
+
+  void Primitive::ComputeCustomData (const csVector3& point, 
+                                     size_t customData, 
+                                     size_t numComps, float* out) const
+  {
+    float lambda, my;
+    ComputeBaryCoords (point, lambda, my);
+
+    // Clamp lambda/my
+    lambda = csClamp (lambda, 1.0f, 0.0f);
+    my = csClamp (my, 1.0f, 0.0f);
+
+    float* va = vertexData->GetCustomData (triangle.a, customData);
+    float* vb = vertexData->GetCustomData (triangle.b, customData);
+    float* vc = vertexData->GetCustomData (triangle.c, customData);
+
+    float oneMinusLambdaMy = (1 - lambda - my);
+    for (size_t c = 0; c < numComps; c++)
+      out[c] = lambda * va[c] + my * vb[c] + oneMinusLambdaMy * vc[c];
   }
 
   void Primitive::ComputeMinMaxUV (csVector2 &min, csVector2 &max) const
@@ -643,11 +679,14 @@ namespace lighter
     }
   }
 
-  bool Primitive::RecomputeQuadrantOffset (size_t element, csVector2 offsets[4]) const
+  uint Primitive::RecomputeQuadrantOffset (size_t element, 
+    const csVector2 inOffsets[4], csVector2 offsets[4]) const
   {
+    memcpy (offsets, inOffsets, sizeof (csVector2) * 4);
+
     const ObjectVertexData& vdata = GetVertexData ();
 
-    bool anyClip = false;
+    uint clipMask = 0;
 
     size_t u, v;
     GetElementUV(element, u, v);
@@ -656,9 +695,10 @@ namespace lighter
     float uvArea = csMath2::Area2 (vdata.lightmapUVs[triangle.a],
       vdata.lightmapUVs[triangle.b], vdata.lightmapUVs[triangle.c]);
 
-    csVector2 elementCenter = minUV + csVector2(u+0.5f,v+0.5f);
-    
-    // Traverse the triangle edges, clip the offsets to the edge
+    csVector2 elementCenter = minUV + csVector2(u+0.5f, v+0.5f);
+
+    csVector2 edgeD[3];
+    csVector2 edgeN[3];
     for (size_t e1 = 0; e1 < 3; ++e1)
     {
       size_t e2 = CS::Math::NextModulo3 (e1);
@@ -667,36 +707,58 @@ namespace lighter
       csVector2 uv2 = vdata.lightmapUVs[triangle[e2]];
 
       // Possible violating edge        
-      csVector2 edgeD = uv2-uv1;
-      csVector2 edgeN (edgeD.y, -edgeD.x); 
+      edgeD[e1] = uv2-uv1;
+      edgeN[e1].Set (edgeD[e1].y, -edgeD[e1].x); 
+      edgeN[e1] /= edgeN[e1].Norm();
+    }
+    
+    for (size_t i = 0; i < 4; ++i)
+    {
+      csVector2 absOffset;
+      absOffset = offsets[i] + elementCenter;
 
-      for (size_t i = 0; i < 4; ++i)
+      size_t endOfLoop = 3;
+      // Traverse the triangle edges, clip the offsets to the edge
+      for (size_t e = 0; e < endOfLoop; ++e)
       {
-        csVector2 absOffset;
-        absOffset = offsets[i] + elementCenter;
+        size_t e1 = e % 3;
+        csVector2 uv1 = vdata.lightmapUVs[triangle[e1]];
 
         // Compute edge-point distance
         csVector2 pointUV1Offset = absOffset - uv1;  
-        float dist = edgeN * pointUV1Offset;        
+        float dist = edgeN[e1] * pointUV1Offset;        
 
-        if (dist*uvArea > 0)
+        if ((fabsf (dist) > EPSILON) && (dist*uvArea > 0))
         {
-          anyClip = true;
-          float denom = edgeN * edgeN;
+          clipMask |= (1 << i);
+          float denom = edgeN[e1] * edgeN[e1];
           
-          csVector2 lineOffset = edgeN * (dist / denom)*0.99f;
+          csVector2 lineOffset = edgeN[e1] * (dist / denom)*(1.0f + EPSILON);
+
+          /* Make sure the point is not just on the edge, but also on the
+             triangle */
+          const float nd = (edgeD[e1].Norm());
+          const float f = ((pointUV1Offset - lineOffset) * edgeD[e1]) / (nd * nd);
+          if (f < LITEPSILON)
+          {
+            lineOffset -= edgeD[e1] * (-f + EPSILON);
+          }
+          else if (f > 1.0f-LITEPSILON)
+          {
+            lineOffset -= edgeD[e1] * (1.0f-f - EPSILON);
+          }
 
           offsets[i] -= lineOffset;
+          absOffset -= lineOffset;
         }
       }
     }
 
-    return anyClip;
+    return clipMask;
   }
 
   float Primitive::ComputeElementFraction (size_t index) const
   {
-    
     const ObjectVertexData& vdata = GetVertexData ();
 
     size_t u, v;
@@ -711,7 +773,7 @@ namespace lighter
       vdata.lightmapUVs[triangle[2]]
     };
 
-    csVector2 outVerts[6];
+    csVector2 outVerts[7];
 
     size_t numVert = 0;
 
@@ -721,7 +783,7 @@ namespace lighter
     float area = 0.0;
     if (numVert >= 3)
     {
-      // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
+      // triangulate the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
       for (size_t i = 0; i < numVert - 2; ++i)
         area += fabsf(csMath2::Area2 (outVerts[0], outVerts[i + 1], outVerts[i + 2]));
     }

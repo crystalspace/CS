@@ -23,6 +23,47 @@
 
 %javaconst(1);
 
+%{
+	static JNIEnv* getJNIEnv() 
+	{
+		static JavaVM * m_jvm = 0;
+		JNIEnv * m_env = 0;
+		jint res = 0;
+		JavaVMInitArgs vm_args;
+		JavaVMOption options[1];
+		options[0].optionString = 0;
+		vm_args.version = JNI_VERSION_1_2;
+		vm_args.options = options;
+		vm_args.nOptions = 1;
+		vm_args.ignoreUnrecognized = JNI_TRUE;
+		jint existingJvmReturned = 1;
+		if (m_jvm == 0) 
+		{
+			res = JNI_GetCreatedJavaVMs(&m_jvm, 1, &existingJvmReturned);
+		}
+		if (m_jvm != 0 && res == 0 && existingJvmReturned > 0 ) 
+		{
+			// Jvm already existed, get the env
+			res = m_jvm->GetEnv((void**)&m_env, vm_args.version);
+			if ( res == JNI_EDETACHED )
+			{
+				res = m_jvm->AttachCurrentThread((void**)&m_env, 0);
+			}
+	
+			if ( res >= 0 ) 
+			{
+				return m_env;
+			}
+		}
+		return 0;
+	}
+%}
+
+%include "bindings/java/typemaps.i"
+%include "bindings/java/inout.i"
+%include "bindings/java/wrapper.i"
+%include "bindings/java/extends.i"
+
 // Fill LIST_OBJECT_FUNCTIONS to extend list interfaces.
 #undef LIST_OBJECT_FUNCTIONS
 %define LIST_OBJECT_FUNCTIONS(classname,typename)
@@ -53,8 +94,8 @@
 %rename(bitAnd) operator&;
 %rename(bitOr) operator|;
 %rename(bitXor) operator^;
-%rename(and) operator&&;
-%rename(or) operator||;
+%rename(logicalAnd) operator&&;
+%rename(logicalOr) operator||;
 %rename(isLessThan) operator<;
 %rename(equalsOrLess) operator<=;
 %rename(isGreaterThen) operator>;
@@ -64,7 +105,7 @@
 
 %ignore operator+();
 %rename(negate) operator-();
-%rename(not) operator!;
+%rename(logicalNot) operator!;
 %rename(bitComplement) operator~;
 %rename(increment) operator++();
 %rename(getAndIncrement) operator++(int);
@@ -141,6 +182,14 @@ jobject _csRef_to_Java(const csRef<iBase>& ref, void* ptr, const char* name,
 }
 %}
 
+%{
+jlong _cs_get_swig_pointer(jobject obj,JNIEnv* jenv)
+{
+	jclass clazz = jenv->GetObjectClass(obj);
+	jfieldID field = jenv->GetFieldID(clazz,"swigCPtr","J");
+	return jenv->GetLongField(obj,field);
+}
+%}
 /*
   ptr   : either a csRef<type> or csPtr<type>
   name  : type name, e.g. "iEngine *"
@@ -194,28 +243,29 @@ jobject _csRef_to_Java(const csRef<iBase>& ref, void* ptr, const char* name,
 %define TYPEMAP_OUT_csWrapPtr
   %typemap(out) csWrapPtr
   {
-    iBase * ibase = (iBase *)$1.Ref;
-    void * ptr = ibase->QueryInterface(iSCF::SCF->GetInterfaceID($1.Type), $1.Version);
-    ibase->DecRef(); // Undo IncRef from QueryInterface
-    if (ptr == 0)
-      $result = 0;
-    else
+    iBase * ibase = dynamic_cast<iBase *>((iBase *)$1.Ref);
+    if (ibase != 0) 
     {
-      jlong cptr = 0;
-      *(void **)&cptr = ptr;
-      char cls_name[1024];
-      strcat(strcpy(cls_name, "org/crystalspace3d/"), $1.Type);
-      jclass cls = jenv->FindClass(cls_name);
-      jmethodID mid = jenv->GetMethodID(cls, "<init>", "(JZ)V");
-      $result = jenv->NewObject(cls, mid, cptr, false);
+	void * ptr = ibase->QueryInterface(iSCF::SCF->GetInterfaceID($1.Type), $1.Version);
+	ibase->DecRef(); // Undo IncRef from QueryInterface
+	if (ptr == 0)
+		$result = 0;
+	else
+	{
+		jlong cptr = 0;
+		*(void **)&cptr = ptr;
+		char cls_name[1024];
+		strcat(strcpy(cls_name, "org/crystalspace3d/"), $1.Type);
+		jclass cls = jenv->FindClass(cls_name);
+		jmethodID mid = jenv->GetMethodID(cls, "<init>", "(JZ)V");
+		$result = jenv->NewObject(cls, mid, cptr, false);
+	}
     }
   }
-  //%typemap(out) csWrapPtr %{ $result = $1; %}
   %typemap(jni) csWrapPtr "jobject";
   %typemap(jtype) csWrapPtr "Object";
   %typemap(jstype) csWrapPtr "Object";
   %typemap(javain) csWrapPtr "$javainput";
-  //%typemap(javaout) csWrapPtr { return $jnicall; }
   %typemap(javaout) csWrapPtr
   {
     Object _obj = $jnicall;
@@ -226,19 +276,6 @@ jobject _csRef_to_Java(const csRef<iBase>& ref, void* ptr, const char* name,
   }
 %enddef
 
-#undef INTERFACE_EQUALS
-%define INTERFACE_EQUALS
-  public boolean equals (Object obj)
-  {
-    boolean equal = false;
-    if (obj instanceof $javaclassname)
-      equal = ((($javaclassname)obj).swigCPtr == this.swigCPtr);
-    return equal;
-  }
-%enddef
-#undef INTERFACE_APPLY
-#define INTERFACE_APPLY(T) %typemap(javacode) T %{ INTERFACE_EQUALS %}
-APPLY_FOR_EACH_INTERFACE
 
 // ivaria/event.h
 // Swig 1.3.23 introduces support for default arguments, so it generates this
@@ -254,7 +291,7 @@ public void Broadcast (long iCode) { Broadcast(iCode, new SWIGTYPE_p_intptr_t())
 %define IEVENTOUTLET_JAVACODE
 %typemap(javacode) iEventOutlet
 %{
-  INTERFACE_EQUALS
+  INTERFACE_BASE
   IEVENTOUTLET_BROADCAST
 %}
 %enddef
@@ -276,7 +313,7 @@ IEVENTOUTLET_JAVACODE
 %define ICONFIGMANAGER_JAVACODE
 %typemap(javacode) iConfigManager
 %{
-  INTERFACE_EQUALS
+  INTERFACE_BASE
   public final static int ConfigPriorityPlugin =
     iConfigManager.PriorityVeryLow;
   public final static int ConfigPriorityApplication =
@@ -363,5 +400,10 @@ CSINITIALIZER_JAVACODE
 %typemap(javain) (int argc, char const * const argv []) "$javainput"
 
 %include "arrays_java.i"
+
+%inline %{
+	struct cspaceUtils {
+	};
+%}
 
 #endif // SWIGJAVA

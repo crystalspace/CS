@@ -60,6 +60,7 @@ public:
   virtual iTerrainSystem* GetTerrain ();
 
   virtual const char* GetName () const;
+  virtual void SetName (const char* name);
 
   virtual iTerrainCellRenderProperties* GetRenderProperties () const;
   virtual iTerrainCellCollisionProperties* GetCollisionProperties () const;
@@ -85,6 +86,8 @@ public:
   virtual void SetMaterialMask (unsigned int material, iImage* image);
   virtual void SetMaterialMask (unsigned int material, const unsigned char*
     data, unsigned int width, unsigned int height);
+
+  virtual void SetAlphaMask (iMaterialWrapper* material, iImage* alphaMap);
 
   virtual void SetBaseMaterial (iMaterialWrapper* material);
   virtual iMaterialWrapper* GetBaseMaterial () const;
@@ -113,6 +116,7 @@ public:
   virtual csVector3 GetBinormal (int x, int y) const;
   virtual csVector3 GetBinormal (const csVector2& pos) const;
 
+  inline csVector3 GetNormalDN (int x, int y) const;
   virtual csVector3 GetNormal (int x, int y) const;
   virtual csVector3 GetNormal (const csVector2& pos) const;
 
@@ -146,6 +150,8 @@ private:
   csVector2 position;
   csVector3 size;
   float step_x, step_z;
+  float minHeight, maxHeight;
+  csBox3 boundingBox;
   
   csRef<iTerrainCellRenderProperties> renderProperties;
   csRef<iTerrainCellCollisionProperties> collisionProperties;

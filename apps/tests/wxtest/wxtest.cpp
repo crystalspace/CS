@@ -25,6 +25,7 @@
 
 #include "csutil/sysfunc.h"
 #include "csutil/event.h"
+#include "csutil/common_handlers.h"
 #include "csutil/cfgfile.h"
 #include "csutil/cfgmgr.h"
 #include "iutil/vfs.h"
@@ -32,6 +33,7 @@
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
 #include "cstool/genmeshbuilder.h"
+#include "cstool/simplestaticlighter.h"
 #include "wxtest.h"
 #include "iutil/eventq.h"
 #include "iutil/event.h"
@@ -169,22 +171,11 @@ void Simple::SetupFrame ()
   view->Draw ();
 }
 
-void Simple::FinishFrame ()
-{
-  g3d->FinishDraw ();
-  g3d->Print (0);
-}
-
 bool Simple::HandleEvent (iEvent& ev)
 {
-  if (ev.Name == Process)
+  if (ev.Name == Frame)
   {
     SetupFrame ();
-    return true;
-  }
-  else if (ev.Name == FinalProcess)
-  {
-    FinishFrame ();
     return true;
   }
   else if (CS_IS_KEYBOARD_EVENT(object_reg, ev))
@@ -340,10 +331,6 @@ bool Simple::Initialize ()
     return false;
   }
 
-  // First disable the lighting cache. Our app is simple enough
-  // not to need this.
-  engine->SetLightingCacheMode (0);
-
   // Load the texture from the standard library.  This is located in
   // CS/data/standard.zip and mounted as /lib/std using the Virtual
   // File System (VFS) plugin.
@@ -372,10 +359,6 @@ bool Simple::Initialize ()
   // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
       engine, room, "walls", "walls_factory", &box);
-
-  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
-    iGeneralMeshState> (walls->GetMeshObject ());
-  mesh_state->SetShadowReceiving (true);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   csRef<iLight> light;
@@ -395,11 +378,16 @@ bool Simple::Initialize ()
 
   engine->Prepare ();
 
+  using namespace CS::Lighting;
+  SimpleStaticLighter::ShineLights (room, engine, 4);
+
   view = csPtr<iView> (new csView (engine, g3d));
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
 
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
+  printer.AttachNew (new FramePrinter (object_reg));
 
   return true;
 }
@@ -521,6 +509,7 @@ void MyApp::OnIdle() {
 
 int MyApp::OnExit()
 {
+  simple->Shutdown ();
   simple = 0;
   csInitializer::DestroyApplication (object_reg);
   return 0;

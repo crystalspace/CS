@@ -53,7 +53,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Spr2D)
 
 class csSprite2DMeshObjectFactory;
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
+
+typedef csDirtyAccessArray<csSprite2DVertex> csColoredVertices;
 
 /**
  * Sprite 2D version of mesh object.
@@ -134,7 +136,6 @@ private:
   csBox2 bbox_2d;
   csFlags flags;
 
-  typedef csDirtyAccessArray<csSprite2DVertex> csColoredVertices;
   /**
    * Array of 3D vertices.
    */
@@ -153,9 +154,9 @@ private:
   void SetupObject ();
 
   /// Update lighting given a position.
-  void UpdateLighting (const csArray<iLightSectorInfluence*>& lights,
+  void UpdateLighting (const csSafeCopyArray<csLightInfluence>& lights,
       const csVector3& pos);
-  void UpdateLighting (const csArray<iLightSectorInfluence*>& lights,
+  void UpdateLighting (const csSafeCopyArray<csLightInfluence>& lights,
       	iMovable* movable, csVector3 offset);
 
   /// Check the start vector and recalculate the LookAt matrix if changed.
@@ -172,7 +173,12 @@ public:
   virtual ~csSprite2DMeshObject ();
 
   /// Get the vertex array.
-  iColoredVertices* GetVertices () { return scfVertices; }
+  iColoredVertices* GetVertices ();
+  csColoredVertices* GetCsVertices ();
+
+  void SetUseFactoryVertices (bool ufv);
+  bool GetUseFactoryVertices () const;
+
   /**
    * Set vertices to form a regular n-polygon around (0,0),
    * optionally also set u,v to corresponding coordinates in a texture.
@@ -280,12 +286,12 @@ public:
   virtual void AddColor (const csColor& col);
   virtual void ScaleBy (float factor);
   virtual void Rotate (float angle);
-  virtual void UpdateLighting (const csArray<iLightSectorInfluence*>& lights,
+  virtual void UpdateLighting (const csSafeCopyArray<csLightInfluence>& lights,
 	const csReversibleTransform& transform);
   /** @} */
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Factory for 2D sprites. This factory also implements iSprite2DFactoryState.
@@ -299,7 +305,7 @@ protected:
   class animVector : public csArray<csSprite2DUVAnimation*>
   {
   public:
-    animVector () : csArray<csSprite2DUVAnimation*> (8, 16){}
+    animVector () : csArray<csSprite2DUVAnimation*> (8){}
     static int CompareKey (csSprite2DUVAnimation* const& item,
 			   char const* const& key)
     {
@@ -324,6 +330,13 @@ private:
    */
   bool lighting;
   csFlags flags;
+  int ax;
+
+  /**
+   * Array of 3D vertices.
+   */
+  csColoredVertices vertices;
+  csRef<iColoredVertices> scfVertices;
 
 public:
   CS_LEAKGUARD_DECLARE (csSprite2DMeshObjectFactory);
@@ -334,10 +347,14 @@ public:
 public:
   /// Constructor.
   csSprite2DMeshObjectFactory (iMeshObjectType* pParent,
-  	iObjectRegistry* object_reg);
+    iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csSprite2DMeshObjectFactory ();
+
+  /// Get the vertex array.
+  iColoredVertices* GetVertices () { return scfVertices; }
+  csColoredVertices* GetCsVertices () { return &vertices; }
 
   /// Has this sprite lighting?
   bool HasLighting () const { return lighting; }

@@ -619,7 +619,8 @@ bool csInputDefinition::ParseKey (iEventNameRegistry* reg, const char *str,
 				  csKeyModifiers *mods)
 {
   csInputDefinition def (reg, str, CSMASK_ALLMODIFIERS, false);
-  if (! def.IsValid ()) return false;
+  if (! def.IsValid () || def.GetName () != csevKeyboardEvent (reg))
+    return false;
   if (raw) *raw = def.keyboard.code;
   if (cooked)
   {

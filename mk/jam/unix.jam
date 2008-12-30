@@ -95,10 +95,38 @@ rule SystemInstallApplication
   }
 }
 
+rule SystemDoFileListEntryApplications
+{
+  local target = $($(<)_TARGET) ;
+  local entries = [ DoFileListEntries $(target) : : $(2) ] ;
+  if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
+  {
+    local debugfile = $($(target)_DEBUGFILE) ;
+    entries += [ DoFileListEntries $(debugfile) : : debug-$(2) ] ;
+  }
+  return $(entries) ;
+}
+
 rule SystemInstallPlugin
 {
   Depends install_plugin : [ DoInstall $(<) : $(plugindir) $(2) :
       $(INSTALL_PROGRAM) ] ;
+}
+
+rule SystemDoFileListEntryPlugin
+{
+  local target = $($(<)_TARGET) ;
+  local entries = [ DoFileListEntries $(target) : : $(2) ] ;
+  if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
+  {
+    local debugfile = $($(target)_DEBUGFILE) ;
+    entries += [ DoFileListEntries $(debugfile) : : debug-$(2) ] ;
+  }
+  if $(EMBED_META) != "yes" || $(OBJCOPY.AVAILABLE) != "yes"
+  {
+    entries += [ DoFileListEntries $($(<)_METAFILE) : : $(2) ] ;
+  }
+  return $(entries) ;
 }
 
 # Put the meta data into the object file headers
@@ -133,28 +161,35 @@ rule SystemLinkPlugin
   Clean $(<)clean : $(target) ;
 }
 
+# SystemLinkSharedLibrary barename : target : objects : linklib
 rule SystemLinkSharedLibrary
 {
-  LFlags $(<) : $(LINKLIBS) ;
-  Depends $(<) : $(>) ;
+  local barename = $(1) ;
+  local target = $(2) ;
+  local objects = $(3) ;
+  local linklib = $(4) ;
+  LFlags $(target) : $(LINKLIBS) ;
+  Depends $(target) : $(objects) ;
   if $(LINKER.RESPONSEFILES) = "yes"
   {
-    local response = $(<).resp ;
+    local response = $(target).resp ;
     MakeLocate $(response) : $(LOCATE.OBJECTS)/libs ;
-    ResponseFile $(response) : $(>) ;
-    Depends $(response) : $(>) ;
-    Depends $(<) : $(response) ;
-    LinkSharedLibraryRsp $(<) : $(response) ;
+    ResponseFile $(response) : $(objects) ;
+    Depends $(response) : $(objects) ;
+    Depends $(target) : $(response) ;
+    LinkSharedLibraryRsp $(target) : $(response) ;
+    Clean clean : $(response) ;
+    Clean $(barename)clean : $(response) ;
   }
   else
   {
-    LinkSharedLibraryFirst $(<) : $(>[1]) ;
-    LinkSharedLibraryIncremental $(<) : $(>[2-]) ;
-    LinkSharedLibraryFinal $(<) ;
+    LinkSharedLibraryFirst $(target) : $(objects[1]) ;
+    LinkSharedLibraryIncremental $(target) : $(objects[2-]) ;
+    LinkSharedLibraryFinal $(target) ;
   }
 
-  Clean clean : $(<) ;
-  Clean $(<)clean : $(<) ;
+  Clean clean : $(target) ;
+  Clean $(barename)clean : $(target) ;
 }
 
 actions LinkApplication bind NEEDLIBS bind EXTRAOBJECTS

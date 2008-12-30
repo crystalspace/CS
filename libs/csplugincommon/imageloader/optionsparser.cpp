@@ -21,6 +21,8 @@
 
 #include "csplugincommon/imageloader/optionsparser.h"
 
+#include "csutil/scanstr.h"
+
 csImageLoaderOptionsParser::csImageLoaderOptionsParser (const char* options)
 {
   const char *current_opt = options;
@@ -78,7 +80,7 @@ bool csImageLoaderOptionsParser::GetFloat (const char* key, float& v) const
   if (!val) return false;
 
   char dummy;
-  return (sscanf ("%f%c", *val, &v, &dummy) == 1);
+  return (csScanStr ("%f%c", *val, &v, &dummy) == 1);
 }
 
 bool csImageLoaderOptionsParser::GetString (const char* key, csString& v) const

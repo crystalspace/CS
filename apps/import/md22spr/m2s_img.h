@@ -38,6 +38,17 @@ public:
   virtual int GetHeight () const;
   virtual int GetFormat () const;
   virtual const csRGBpixel *GetPalette ();
+
+  virtual const char* GetRawFormat() const
+  {
+    CS_ASSERT_MSG("Not implemented yet: return image data as RGB", false);
+    return 0;
+  }
+  virtual csRef<iDataBuffer> GetRawData() const
+  {
+    CS_ASSERT_MSG("Not implemented yet: return image data as RGB", false);
+    return 0;
+  }
 };
 
 #endif // __M2S_IMG_H__

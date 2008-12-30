@@ -24,6 +24,7 @@
 #include "csutil/util.h"
 #include "xriface.h"
 #include "xrpriv.h"
+#include "csutil/scanstr.h"
 #include "csutil/scfstr.h"
 #include "iutil/vfs.h"
 #include "iutil/string.h"
@@ -36,7 +37,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLRead)
 //------------------------------------------------------------------------
 
 csXmlReadDocumentSystem::csXmlReadDocumentSystem (iBase* parent) :
-  scfImplementationType(this), parent(parent)
+  scfImplementationType(this, parent)
 {
 }
 
@@ -176,30 +177,30 @@ size_t csXmlReadNodeIterator::GetEndPosition ()
 
 //------------------------------------------------------------------------
 
-void csXmlReadNode::DecRef ()
-{
-  CS_ASSERT_MSG("Refcount decremented for destroyed object", 
-    scfRefCount != 0);
-  csRefTrackerAccess::TrackDecRef (scfObject, scfRefCount);
-  scfRefCount--;
-  if (scfRefCount == 0)
-  {
-    scfRemoveRefOwners ();
-    if (scfParent) scfParent->DecRef();
-    doc->Free (this);
-  }
+csXmlReadDocument* csXmlReadNode::GetDoc()
+{ 
+  return static_cast<csXmlReadDocument*> (scfPool); 
 }
 
-csXmlReadNode::csXmlReadNode (csXmlReadDocument* doc) :
-  scfImplementationType(this)
+void csXmlReadNode::DecRef ()
 {
-  node = 0;
-  node_children = 0;
-  csXmlReadNode::doc = doc;	// Increase reference.
+  csXmlReadDocument* doc = GetDoc();
+  /* In case we're freed the doc's node pool will be accessed; to make sure
+     it's valid keep a ref to the doc while we're (potentially) destructed */
+  doc->csXmlReadDocument::IncRef();
+  scfPooledImplementationType::DecRef();
+  doc->csXmlReadDocument::DecRef();
+}
+
+csXmlReadNode::csXmlReadNode () :
+  scfPooledImplementationType(this), node (0), node_children (0)
+{
+  GetDoc()->IncRef();
 }
 
 csXmlReadNode::~csXmlReadNode ()
 {
+  GetDoc()->DecRef();
 }
 
 csRef<iDocumentNode> csXmlReadNode::GetParent ()
@@ -214,7 +215,7 @@ csRef<iDocumentNode> csXmlReadNode::GetParent ()
   else
   {
     if (!node->Parent ()) return child;
-    child = csPtr<iDocumentNode> (doc->Alloc (node->Parent (), false));
+    child = csPtr<iDocumentNode> (GetDoc()->Alloc (node->Parent (), false));
     return child;
   }
   
@@ -261,7 +262,7 @@ csRef<iDocumentNodeIterator> csXmlReadNode::GetNodes ()
 {
   csRef<iDocumentNodeIterator> it;
   it = csPtr<iDocumentNodeIterator> (new csXmlReadNodeIterator (
-  	doc, use_contents_value ? 0 : node_children, 0));
+  	GetDoc(), use_contents_value ? 0 : node_children, 0));
   return it;
 }
 
@@ -269,7 +270,7 @@ csRef<iDocumentNodeIterator> csXmlReadNode::GetNodes (const char* value)
 {
   csRef<iDocumentNodeIterator> it;
   it = csPtr<iDocumentNodeIterator> (new csXmlReadNodeIterator (
-  	doc, use_contents_value ? 0 : node_children, value));
+  	GetDoc(), use_contents_value ? 0 : node_children, value));
   return it;
 }
 
@@ -279,7 +280,7 @@ csRef<iDocumentNode> csXmlReadNode::GetNode (const char* value)
   csRef<iDocumentNode> child;
   TrDocumentNode* c = node_children->FirstChild (value);
   if (!c) return child;
-  child = csPtr<iDocumentNode> (doc->Alloc (c, false));
+  child = csPtr<iDocumentNode> (GetDoc()->Alloc (c, false));
   return child;
 }
 
@@ -319,7 +320,7 @@ float csXmlReadNode::GetContentsValueAsFloat ()
   const char* v = GetContentsValue ();
   if (!v) return 0;
   float val = 0.0;
-  sscanf (v, "%f", &val);
+  csScanStr (v, "%f", &val);
   return val;
 }
 
@@ -380,7 +381,7 @@ float csXmlReadNode::GetAttributeValueAsFloat (const char* name)
   TrDocumentAttribute* a = GetAttributeInternal (name);
   if (!a) return 0;
   float f;
-  sscanf (a->Value (), "%f", &f);
+  csScanStr (a->Value (), "%f", &f);
   return f;
 }
 
@@ -400,24 +401,20 @@ bool csXmlReadNode::GetAttributeValueAsBool (const char* name,bool defaultvalue)
 
 //------------------------------------------------------------------------
 
-csXmlReadDocument::csXmlReadDocument (csXmlReadDocumentSystem* sys) :
-  scfImplementationType(this)
+static inline bool HasUTF8Bom (const char* buf)
 {
-  csXmlReadDocument::sys = sys;	// Increase ref.
-  pool = 0;
-  root = 0;
+  unsigned char* ub = (unsigned char*)buf; //Need for test...
+  return (ub[0] == 0xEF && ub[1] == 0xBB && ub[2] == 0xBF);
+}
+
+csXmlReadDocument::csXmlReadDocument (csXmlReadDocumentSystem* sys) :
+  scfImplementationType(this), root (0), sys (sys)
+{
 }
 
 csXmlReadDocument::~csXmlReadDocument ()
 {
   Clear ();
-  while (pool)
-  {
-    csXmlReadNode* n = pool->next_pool;
-    // The 'sys' member in pool should be 0 here.
-    delete pool;
-    pool = n;
-  }
 }
 
 void csXmlReadDocument::Clear ()
@@ -427,18 +424,21 @@ void csXmlReadDocument::Clear ()
   root = 0;
 }
 
-csRef<iDocumentNode> csXmlReadDocument::CreateRoot (char* buf)
+csRef<iDocumentNode> csXmlReadDocument::CreateRoot (char* buf, size_t bufSize)
 {
   Clear ();
-  root = new TrDocument (buf);
+  /* Documents whose data is larger than this threshold are
+     treated as "large" which means the node allocation
+     blocks are bigger - means less allocations but bigger
+     memory usage */
+  const size_t largeThreshold = 32*1024;
+  root = new TrDocument (bufSize >= largeThreshold, buf);
   return csPtr<iDocumentNode> (Alloc (root, false));
 }
 
 csRef<iDocumentNode> csXmlReadDocument::CreateRoot ()
 {
-  Clear ();
-  root = new TrDocument ();
-  return csPtr<iDocumentNode> (Alloc (root, false));
+  return 0;
 }
 
 csRef<iDocumentNode> csXmlReadDocument::GetRoot ()
@@ -450,38 +450,92 @@ const char* csXmlReadDocument::Parse (iFile* file, bool collapse)
 {
   size_t want_size = file->GetSize ();
   char *data = (char*)cs_malloc (want_size + 1);
+  char* parse_data = data;
+  if (want_size >= 3)
+  {
+    if (file->Read (data, 3) != 3)
+    {
+      cs_free (parse_data);
+      return "Unexpected EOF encountered";
+    }
+    want_size -= 3;
+    if (!HasUTF8Bom (data))
+      // Not a BOM - keep the read sata
+      data += 3;
+  }
   size_t real_size = file->Read (data, want_size);
   if (want_size != real_size)
   {
-    cs_free (data);
+    cs_free (parse_data);
     return "Unexpected EOF encountered";
   }
   data[real_size] = '\0';
 #ifdef CS_DEBUG
   if (strlen (data) != real_size)
   {
-    cs_free (data);
+    cs_free (parse_data);
     return "File contains one or more null characters";
   }
 #endif
-  const char *error = Parse (data, collapse);
-  cs_free (data);
-  return error;
+
+  const char* b = parse_data;
+  while ((*b == ' ') || (*b == '\n') || (*b == '\t') || 
+    (*b == '\r')) b++;
+  if (*b != '<')
+  {
+    cs_free (parse_data);
+    return "Data does not seem to be XML.";
+  }
+  
+  /* Note: it's okay if want_size is a bit too small;
+   * it's not used as the actual data size in ParseInPlace,
+   * only to choose between 'small' and 'large' docs. */
+  return ParseInPlace (parse_data, want_size, collapse);
 }
 
 const char* csXmlReadDocument::Parse (iDataBuffer* buf, bool collapse)
 {
-  return Parse ((const char*)buf->GetData (), collapse);
+  return Parse ((const char*)buf->GetData (), 
+    buf->GetSize(), collapse);
 }
 
 const char* csXmlReadDocument::Parse (iString* str, bool collapse)
 {
-  return Parse ((const char*)*str, collapse);
+  return Parse ((const char*)*str, str->Length(), collapse);
 }
 
 const char* csXmlReadDocument::Parse (const char* buf, bool collapse)
 {
-  CreateRoot (CS::StrDup (buf));
+  return Parse (buf, strlen (buf), collapse);
+}
+
+const char* csXmlReadDocument::Parse (const char* buf, size_t bufSize, bool collapse)
+{
+  // Skip any UTF8 BOM
+  if ((bufSize >= 3) && HasUTF8Bom (buf))
+  {
+    buf += 3;
+    bufSize -= 3;
+  }
+
+  const char* b = buf;
+  while ((*b == ' ') || (*b == '\n') || (*b == '\t') || 
+    (*b == '\r')) b++;
+  if (*b != '<')
+  {
+    return "Data does not seem to be XML.";
+  }
+
+  size_t want_size = bufSize;
+  char *data = (char*)cs_malloc (want_size + 1);
+  memcpy (data, buf, bufSize);
+  data[bufSize] = 0;
+  return ParseInPlace (data, bufSize, collapse);
+}
+
+const char* csXmlReadDocument::ParseInPlace (char* buf, size_t bufSize, bool collapse)
+{
+  CreateRoot (buf, bufSize);
   root->SetCondenseWhiteSpace(collapse);
   root->Parse (root->input_data);
   if (root->Error ())
@@ -489,32 +543,29 @@ const char* csXmlReadDocument::Parse (const char* buf, bool collapse)
   return 0;
 }
 
-const char* csXmlReadDocument::ParseInPlace (char* buf, bool collapse)
+const char* csXmlReadDocument::Write (iFile*)
 {
-  CreateRoot (buf);
-  root->SetCondenseWhiteSpace(collapse);
-  root->Parse (root->input_data);
-  if (root->Error ())
-    return root->ErrorDesc ();
-  return 0;
+  return "Writing not supported by this plugin!";
 }
+
+const char* csXmlReadDocument::Write (iString*)
+{
+  return "Writing not supported by this plugin!";
+}
+
+const char* csXmlReadDocument::Write (iVFS*, const char*)
+{
+  return "Writing not supported by this plugin!";
+}
+
+#include "csutil/custom_new_disable.h"
 
 csXmlReadNode* csXmlReadDocument::Alloc ()
 {
-  if (pool)
-  {
-    csXmlReadNode* n = pool;
-    pool = n->next_pool;
-    n->scfRefCount = 1;
-    n->doc = this;	// Incref.
-    return n;
-  }
-  else
-  {
-    csXmlReadNode* n = new csXmlReadNode (this);
-    return n;
-  }
+  return new (*this) csXmlReadNode ();
 }
+
+#include "csutil/custom_new_enable.h"
 
 csXmlReadNode* csXmlReadDocument::Alloc (TrDocumentNode* node,
 	bool use_contents_value)
@@ -522,13 +573,6 @@ csXmlReadNode* csXmlReadDocument::Alloc (TrDocumentNode* node,
   csXmlReadNode* n = Alloc ();
   n->SetTiNode (node, use_contents_value);
   return n;
-}
-
-void csXmlReadDocument::Free (csXmlReadNode* n)
-{
-  n->next_pool = pool;
-  pool = n;
-  n->doc = 0;	// Free ref.
 }
 
 //------------------------------------------------------------------------

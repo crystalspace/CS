@@ -52,10 +52,15 @@ private:
   /// A pointer to the view which contains the camera.
   csRef<iView> view;
 
+  /// The render manager, cares about selecting lights+meshes to render
+  csRef<iRenderManager> rm;
+
   /// A pointer to the sector the camera will be in.
   iSector* room;
 
   float rotX, rotY;
+
+  csRef<FramePrinter> printer;
 
   /**
    * Handle keyboard events - ie key presses and releases.
@@ -66,16 +71,10 @@ private:
 
   /**
    * Setup everything that needs to be rendered on screen. This routine
-   * is called from the event handler in response to a csevProcess
+   * is called from the event handler in response to a csevFrame
    * broadcast message.
    */
-  void ProcessFrame ();
-  
-  /**
-   * Finally render the screen. This routine is called from the event
-   * handler in response to a csevFinalProcess broadcast message.
-   */
-  void FinishFrame ();
+  void Frame ();
   
   /// Here we will create our little, simple world.
   void CreateRoom ();

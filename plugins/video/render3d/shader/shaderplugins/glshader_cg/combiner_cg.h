@@ -67,6 +67,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       const char* locationPrefix, const char* svName, 
       const char* outputType, const char* outputName, 
       const char* uniqueTag);
+    void GenerateBufferInputBlocks (iDocumentNode* node,
+      const char* locationPrefix, const char* bufName, 
+      const char* outputType, const char* outputName, 
+      const char* uniqueTag);
     /** @} */
   
     /**\name iComponent implementation
@@ -140,6 +144,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     csRef<ShaderCombinerLoaderCg> loader;
     bool writeVP, writeFP;
     
+    struct Attribute
+    {
+      csString name;
+      csString type;
+    };
+    typedef csArray<Attribute> AttributeArray;
+    Attribute* FindAttr (AttributeArray& arr, const char* name, 
+      const char* type);
     struct Snippet
     {
       csString annotation;
@@ -155,33 +167,49 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       csRefArray<iDocumentNode> fragmentBody;
       csHash<csString, csString> outputMaps;
       csString links;
+
+      csHash<csString, csString> attrInputMaps;
+      csHash<csString, csString> attrOutputMaps;
     };
     size_t uniqueCounter;
     csArray<Snippet> snippets;
     Snippet currentSnippet;
+    csRefArray<iDocumentNode> vertexCompilerArgs;
+    csRefArray<iDocumentNode> fragmentCompilerArgs; 
     csRefArray<iDocumentNode> variableMaps;
-    csString outputAssign;
+    csString outputAssign[rtaNumAttachments];
     csRefArray<iDocumentNode> definitions;
     csSet<csString> globalIDs;
     csString globals;
+
+    csHash<AttributeArray, csString> attributes;
   public:
     ShaderCombinerCg (ShaderCombinerLoaderCg* loader, bool vp, bool fp);
     
     void BeginSnippet (const char* annotation = 0);
     void AddInput (const char* name, const char* type);
+    void AddInputValue (const char* name, const char* type,
+      const char* value);
     void AddOutput (const char* name, const char* type);
     void InputRename (const char* fromName, const char* toName);
     void OutputRename (const char* fromName, const char* toName);
-    csPtr<WeaverCommon::iCoerceChainIterator> QueryCoerceChain (
-      const char* fromType, const char* toType);
+    void PropagateAttributes (const char* fromInput, const char* toOutput);
+    void AddOutputAttribute (const char* outputName,  const char* name, 
+      const char* type);
+    void AddInputAttribute (const char* inputName, const char* name, 
+      const char* type, const char* defVal);
     void Link (const char* fromName, const char* toName);
     void WriteBlock (const char* location, iDocumentNode* blockNodes);
     bool EndSnippet ();
         
     void AddGlobal (const char* name, const char* type,
           const char* annotation = 0);
-    void SetOutput (const char* name, const char* annotation = 0);
+    void SetOutput (csRenderTargetAttachment target,
+      const char* name, const char* annotation = 0);
     
+    csPtr<WeaverCommon::iCoerceChainIterator> QueryCoerceChain (
+      const char* fromType, const char* toType);
+
     uint CoerceCost (const char* fromType, const char* toType);
         
     void WriteToPass (iDocumentNode* pass);
@@ -192,10 +220,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       iDocumentNode* blockNodes);
   private:
     class DocNodeCgAppender;
+    class V2FAutoSematicsHelper;
   
     void AppendProgramInput (const csRefArray<iDocumentNode>& nodes, 
       DocNodeCgAppender& appender);
+    void AppendProgramInput_V2FHead (const Snippet& snippet, 
+      DocNodeCgAppender& appender);
     void AppendProgramInput_V2FDecl (const Snippet& snippet, 
+      const V2FAutoSematicsHelper& semanticsHelper,
+      DocNodeCgAppender& appender);
+    void AppendProgramInput_V2FLocals (const Snippet& snippet, 
       DocNodeCgAppender& appender);
     void AppendProgramInput_V2FVP (const Snippet& snippet, 
       DocNodeCgAppender& appender);
@@ -203,11 +237,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       DocNodeCgAppender& appender);
     void AppendProgramInput (iDocumentNode* node, DocNodeCgAppender& appender);
     csString CgType (const char* weaverType);
+    csString GetAttrIdentifier (const char* var, const char* attr);
 
     csString annotateStr;
     const char* MakeComment (const char* s);
     void AppendSnippetMap (const csHash<csString, csString>& map, 
       DocNodeCgAppender& appender);
+      
+    void SplitOffArrayCount (csString& name, int& count);
     
     class DocNodeCgAppender
     {

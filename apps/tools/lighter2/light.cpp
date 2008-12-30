@@ -25,11 +25,11 @@
 #include "scene.h"
 
 // Attenuation functions
-static float LightAttnNone (float, const csVector3&);
-static float LightAttnLinear (float, const csVector3&);
-static float LightAttnInverse (float, const csVector3&);
-static float LightAttnRealistic (float, const csVector3&);
-static float LightAttnCLQ (float, const csVector3&);
+static float LightAttnNone (float, const csVector4&);
+static float LightAttnLinear (float, const csVector4&);
+static float LightAttnInverse (float, const csVector4&);
+static float LightAttnRealistic (float, const csVector4&);
+static float LightAttnCLQ (float, const csVector4&);
 
 static lighter::LightAttenuationFunc attnFuncTable[] = 
 {
@@ -56,7 +56,7 @@ namespace lighter
 
   }
 
-  void Light::SetAttenuation (csLightAttenuationMode mode, const csVector3& constants)
+  void Light::SetAttenuation (csLightAttenuationMode mode, const csVector4& constants)
   {
     attenuationMode = mode;
     attenuationConsts = constants;
@@ -65,11 +65,15 @@ namespace lighter
 
 
   //--
-  VisibilityTester::VisibilityTester ()
-  {
+  size_t VisibilityTester::rayID;
+
+  VisibilityTester::VisibilityTester (Light* light, Object* obj) : 
+    light (light), obj (obj)
+  {    
   }
 
-  void VisibilityTester::AddSegment (KDTree* tree, const csVector3& start, const csVector3& end)
+  void VisibilityTester::AddSegment (KDTree* tree, const csVector3& start, 
+    const csVector3& end)
   {
     csVector3 dir = end-start;
     float d = dir.Norm ();
@@ -77,8 +81,8 @@ namespace lighter
     AddSegment (tree, start, dir / d, d);
   }
 
-  void VisibilityTester::AddSegment (KDTree* tree, const csVector3& start, const csVector3& dir,
-    float maxL)
+  void VisibilityTester::AddSegment (KDTree* tree, const csVector3& start, 
+    const csVector3& dir, float maxL)
   {
     Segment s;
 
@@ -87,63 +91,162 @@ namespace lighter
     s.ray.minLength = FLT_EPSILON*10.0f;
     s.ray.maxLength = maxL - FLT_EPSILON*10.0f;
     s.ray.ignoreFlags = KDPRIM_FLAG_NOSHADOW; // Ignore primitives that don't cast shadows
+    s.ray.rayID = ++rayID; // Give unique IDs to rays; needed for the ray debugger.
     s.tree = tree;
 
     allSegments.Push (s);
   }
 
-  bool VisibilityTester::Unoccluded (const Primitive* ignorePrim)
+  VisibilityTester::OcclusionState VisibilityTester::Occlusion (
+    const Object* ignoreObject, const Primitive* ignorePrim)
   {
-    HitPoint hp;
+    HitCallback hitcb (*this);
+    size_t lastHitCount = transparentHits.GetSize();
+
+    bool haveAnyHit = false;
+
+    // Start by testing if we have no hits or possibly hit a non-transparent one first
+    if (globalLighter->rayDebug.IsEnabled())
+    {
+      // Use hit call back to register ray hits for debugging
+      for (size_t i = 0; i < allSegments.GetSize (); ++i)
+      {
+	Segment& s = allSegments[i];
+	s.ray.ignoreObject = ignoreObject;
+	s.ray.ignorePrimitive = ignorePrim;
+  
+	if (Raytracer::TraceAnyHit (s.tree,s.ray, &hitcb))
+	{
+	  haveAnyHit = true;
+	  if (transparentHits.GetSize() == lastHitCount)
+	  {
+	    // Non-transparent hit
+	    return occlOccluded;
+	  }
+	}
+      }
+    }
+    else
+    {
+      // No ray hit registration needed, so no callback needed either
+      for (size_t i = 0; i < allSegments.GetSize (); ++i)
+      {
+	Segment& s = allSegments[i];
+	s.ray.ignoreObject = ignoreObject;
+	s.ray.ignorePrimitive = ignorePrim;
+  
+	HitPoint hit;
+	if (Raytracer::TraceAnyHit (s.tree,s.ray, hit))
+	{
+	  haveAnyHit = true;
+	  if (!(hit.kdFlags & KDPRIM_FLAG_TRANSPARENT))
+	  {
+	    // Non-transparent hit
+	    return occlOccluded;
+	  }
+	}
+      }
+    }
+
+    // Didn't hit anything, cannot be anything transparent either
+    if (!haveAnyHit)
+    {
+      return occlUnoccluded;
+    }
+
     for (size_t i = 0; i < allSegments.GetSize (); ++i)
     {
       Segment& s = allSegments[i];
+      s.ray.ignoreObject = ignoreObject;
       s.ray.ignorePrimitive = ignorePrim;
 
-      if (Raytracer::TraceAnyHit (s.tree, s.ray, hp))
-        return false;
+      if (Raytracer::TraceAllHits (s.tree, s.ray, &hitcb))
+      {
+        if (transparentHits.GetSize() == 0) return occlOccluded;
+      }
+
+      if (transparentHits.GetSize() == lastHitCount)
+        globalLighter->rayDebug.RegisterUnhit (light, obj, s.ray);
+      lastHitCount = transparentHits.GetSize();
     }
 
-    return true;    
+    return (transparentHits.GetSize() != 0) ? occlPartial : occlUnoccluded;
   }
 
-  bool VisibilityTester::Unoccluded (HitIgnoreCallback* ignoreCB)
+  VisibilityTester::OcclusionState VisibilityTester::Occlusion (
+    const Object* ignoreObject, HitIgnoreCallback* ignoreCB)
   {
-    HitPoint hp;
+    HitCallback hitcb (*this);
+    size_t lastHitCount = transparentHits.GetSize();
+
+    bool haveAnyHit = false;
+
+    // Start by testing if we have no hits or possibly hit a non-transparent one first
     for (size_t i = 0; i < allSegments.GetSize (); ++i)
     {
       Segment& s = allSegments[i];
+      s.ray.ignoreObject = ignoreObject;
 
-      if (Raytracer::TraceAnyHit (s.tree, s.ray, hp, ignoreCB))
-        return false;
+      HitPoint hit;
+      if (Raytracer::TraceAnyHit (s.tree,s.ray, hit, ignoreCB))
+      {
+        haveAnyHit = true;
+        if (!(hit.kdFlags & KDPRIM_FLAG_TRANSPARENT))
+        {
+          // Non-transparent hit
+          return occlOccluded;
+        }
+      }
     }
 
-    return true;
-  }
+    // Didn't hit anything, cannot be anything transparent either
+    if (!haveAnyHit)
+    {
+      return occlUnoccluded;
+    }
 
-  void VisibilityTester::CollectHits (HitPointCallback* hitCB, 
-    HitIgnoreCallback* ignoreCB)
-  {
     for (size_t i = 0; i < allSegments.GetSize (); ++i)
     {
       Segment& s = allSegments[i];
+      s.ray.ignoreObject = ignoreObject;
 
-      Raytracer::TraceAllHits (s.tree, s.ray, hitCB, ignoreCB);
+      if (Raytracer::TraceAllHits (s.tree, s.ray, &hitcb, ignoreCB))
+      {
+        if (transparentHits.GetSize() == 0) return occlOccluded;
+      }
+
+      if (transparentHits.GetSize() == lastHitCount)
+        globalLighter->rayDebug.RegisterUnhit (light, obj, s.ray);
+      lastHitCount = transparentHits.GetSize();
     }
+
+    return (transparentHits.GetSize() != 0) ? occlPartial : occlUnoccluded;
   }
-
-
+    
+  csColor VisibilityTester::GetFilterColor ()
+  {
+    csColor c (1, 1, 1);
+    transparentHits.Sort (); //@@TODO: Consider hits from different segments...
+    for (size_t i = transparentHits.GetSize(); i-- > 0; )
+    {
+      const HitPoint& hit = transparentHits[i];
+      csVector2 uv = hit.primitive->ComputeUV (hit.hitPoint);
+      const RadMaterial* mat = hit.primitive->GetMaterial ();
+      if (mat == 0) continue;
+      if (!mat->filterImage.IsValid()) continue;
+      ScopedSwapLock<MaterialImage<csColor> > (*(mat->filterImage));
+      c *= mat->filterImage->GetInterpolated (uv);
+    }
+    return c;
+  }
+  
   //--
   PointLight::PointLight (Sector* o)
     : Light (o, true)
-  {
-
-  }
+  {}
 
   PointLight::~PointLight ()
-  {
-
-  }
+  {}
 
   csColor PointLight::SampleLight (const csVector3& point, const csVector3& n,
     float u1, float u2, csVector3& lightVec, float& pdf, VisibilityTester& vistest,
@@ -181,6 +284,8 @@ namespace lighter
   }
 
 
+
+
   ProxyLight::ProxyLight (Sector* owner, Light* parentLight, const csFrustum& frustum,
     const csReversibleTransform& transform, const csPlane3& portalPlane)
     : Light (owner, parentLight->IsDeltaLight ()), parent (parentLight),
@@ -191,10 +296,12 @@ namespace lighter
     SetPDLight (parent->IsPDLight ());
     SetColor (parent->GetColor ());
     SetLightID ((const char*)parent->GetLightID ().data);
+    SetName (parent->GetName ());
     lightFrustum = frustum;
+    boundingSphere = transform.Other2This (parentLight->GetBoundingSphere ());
 
     csPlane3 bp (portalPlane);
-    bp.DD -= bp.norm * lightFrustum.GetOrigin ();
+    bp.DD += bp.norm * lightFrustum.GetOrigin ();
     bp.Invert ();
     lightFrustum.SetBackPlane (bp);
   }
@@ -230,7 +337,8 @@ namespace lighter
     csPlane3 transformedPlane;
     transformedPlane = proxyTransform.Other2This (portalPlane);
 
-    const csColor parentLight = parent->SampleLight (point, n, u1, u2, parentLightVec, pdf, vistest, &transformedPlane);
+    const csColor parentLight = parent->SampleLight (point, n, u1, u2, 
+      parentLightVec, pdf, vistest, &transformedPlane);
     lightVec = proxyTransform.Other2ThisRelative (parentLightVec);
 
     return parentLight;
@@ -262,35 +370,35 @@ namespace lighter
 
 
 // Attenuation functions
-static float LightAttnNone (float, const csVector3&)
+static float LightAttnNone (float, const csVector4&)
 {
   /// no attenuation: *1
   return 1;
 }
 
-static float LightAttnLinear (float squaredDistance, const csVector3& c)
+static float LightAttnLinear (float squaredDistance, const csVector4& c)
 {
-  /// linear attenuation:  * (1 - distance / radius)
-  return csMax (0.0f, 1.0f - (sqrtf (squaredDistance) / c.x));
+  /// linear attenuation:  * (1 - distance * inverse_radius)
+  return csMax (0.0f, 1.0f - (sqrtf (squaredDistance) * c.w));
 }
 
-static float LightAttnInverse (float squaredDistance, const csVector3&)
+static float LightAttnInverse (float squaredDistance, const csVector4&)
 {
   /// inverse attenuation:  * 1 / distance
   return 1.0f / sqrtf(squaredDistance);
 }
 
-static float LightAttnRealistic (float squaredDistance, const csVector3&)
+static float LightAttnRealistic (float squaredDistance, const csVector4&)
 {
   /// realistic attenuation: * 1 / distance^2
   return 1.0f / squaredDistance;
 }
 
-static float LightAttnCLQ (float squaredDistance, const csVector3& c)
+static float LightAttnCLQ (float squaredDistance, const csVector4& c)
 {
   /** 
    * CLQ, Constant Linear Quadratic: 
    * * 1 / (constant1 + constant2*distance + constant3*distance^2)
    */
-  return c * csVector3 (1, sqrtf(squaredDistance), squaredDistance);
+  return c * csVector4 (1, sqrtf(squaredDistance), squaredDistance, 0);
 }

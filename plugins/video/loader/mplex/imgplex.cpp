@@ -73,6 +73,9 @@ void csImageIOMultiplexer::StoreDesc (
     formats.Push (format[i]);
 }
 
+// For SetDithering()
+#include "csutil/deprecated_warn_off.h"
+
 bool csImageIOMultiplexer::LoadNextPlugin ()
 {
   if (!classlist) return false;
@@ -107,12 +110,17 @@ bool csImageIOMultiplexer::LoadNextPlugin ()
   return true;
 }
 
+#include "csutil/deprecated_warn_on.h"
+
 const csImageIOFileFormatDescriptions& csImageIOMultiplexer::GetDescription ()
 {
   // need all plugins.
   while (LoadNextPlugin()); 
   return formats;
 }
+
+// For SetDithering()
+#include "csutil/deprecated_warn_off.h"
 
 void csImageIOMultiplexer::SetDithering (bool iEnable)
 {
@@ -121,8 +129,11 @@ void csImageIOMultiplexer::SetDithering (bool iEnable)
     list[i]->SetDithering (global_dither);
 }
 
+#include "csutil/deprecated_warn_on.h"
+
 csPtr<iImage> csImageIOMultiplexer::Load (iDataBuffer* buf, int iFormat)
 {
+  CS::Threading::MutexScopedLock slock(lock);
   bool consecutive = false; // set to true if we searched the list completely.
   do
   {

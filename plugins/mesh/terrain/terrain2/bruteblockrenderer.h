@@ -27,6 +27,7 @@
 #include "iutil/comp.h"
 #include "iutil/strset.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/shader/shader.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 {
@@ -57,9 +58,15 @@ public:
 
   virtual void OnMaterialPaletteUpdate (const csTerrainMaterialPalette&
                                         material_palette);  
-  virtual void OnMaterialMaskUpdate (iTerrainCell* cell, size_t material,
-                               const csRect& rectangle, const unsigned char*
-                               data, size_t pitch);
+
+  virtual void OnMaterialMaskUpdate (iTerrainCell* cell, 
+    const csRect& rectangle, const unsigned char* materialMap, size_t pitch);
+
+  virtual void OnMaterialMaskUpdate (iTerrainCell* cell, size_t matIdx,
+    const csRect& rectangle, const unsigned char* materialMap, size_t pitch); 
+
+  virtual void OnAlphaMapUpdate (iTerrainCell* cell,
+    iMaterialWrapper* material, iImage* alphaMap);
 
   // ------------ iTerrainCellHeightDataCallback ------------
   virtual void OnHeightUpdate (iTerrainCell* cell, const csRect& rectangle);
@@ -88,7 +95,7 @@ public:
     return emptyPalette;
   }
 
-  inline iStringSet* GetStringSet ()
+  inline iShaderVarStringSet* GetStringSet ()
   {
     return stringSet;
   }
@@ -96,6 +103,9 @@ public:
   // Get index buffer with given resolution and index
   iRenderBuffer* GetIndexBuffer (size_t blockResolution, size_t indexType, uint& numIndices);
 
+  // Allocate the material palette related data in cell
+  void SetupCellMMArrays (iTerrainCell* cell);
+  
 private:
   // Holder for render meshes while rendering
   csDirtyAccessArray<csRenderMesh*> renderMeshCache;
@@ -103,7 +113,7 @@ private:
 
   iObjectRegistry* objectRegistry;
   csRef<iGraphics3D> graph3d;
-  csRef<iStringSet> stringSet;
+  csRef<iShaderVarStringSet> stringSet;
 
   const csTerrainMaterialPalette* materialPalette;
   csTerrainMaterialPalette emptyPalette;  

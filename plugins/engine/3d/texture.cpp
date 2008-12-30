@@ -33,15 +33,15 @@ csTextureWrapper::csTextureWrapper (csEngine* engine, iImage *Image)
   flags(CS_TEXTURE_3D)
 {
   image = Image;
-  keep_image = false;
+  keep_image = engine->csEngine::GetDefaultKeepImage();
   texClass = 0;
-  UpdateKeyColorFromImage ();
+  keyColorDirty = true;
 }
 
 csTextureWrapper::csTextureWrapper (csEngine* engine, iTextureHandle *ith) 
   : scfImplementationType (this), engine (engine)
 {
-  keep_image = false;
+  keep_image = engine->csEngine::GetDefaultKeepImage();
   texClass = 0;
 
   handle = ith;
@@ -54,7 +54,15 @@ csTextureWrapper::csTextureWrapper (csEngine* engine, iTextureHandle *ith)
     flags = 0;
   }
 
-  UpdateKeyColorFromHandle ();
+  keyColorDirty = true;
+}
+
+csTextureWrapper::csTextureWrapper (csEngine* engine)
+  : scfImplementationType (this), engine (engine),
+  flags(CS_TEXTURE_3D)
+{
+  keep_image = engine->csEngine::GetDefaultKeepImage();
+  texClass = 0;
 }
 
 void csTextureWrapper::SelfDestruct ()
@@ -74,7 +82,7 @@ csTextureWrapper::csTextureWrapper (const csTextureWrapper &t) :
   else
     texClass = 0;
 
-  UpdateKeyColorFromImage ();
+  keyColorDirty = true;
 }
 
 csTextureWrapper::~csTextureWrapper ()
@@ -88,7 +96,7 @@ void csTextureWrapper::SetImageFile (iImage *Image)
   image = Image;
 
   if (image)
-    UpdateKeyColorFromImage ();
+    keyColorDirty = true;
 }
 
 void csTextureWrapper::SetTextureHandle (iTextureHandle *tex)
@@ -98,19 +106,22 @@ void csTextureWrapper::SetTextureHandle (iTextureHandle *tex)
   handle = tex;
 
   flags = handle->GetFlags ();
-  UpdateKeyColorFromHandle ();
+  keyColorDirty = true;
 }
 
 void csTextureWrapper::SetKeyColor (int red, int green, int blue)
 {
   if (handle)
+  {
     if (red >= 0)
       handle->SetKeyColor (red, green, blue);
     else
       handle->SetKeyColor (false);
+  }
   key_col_r = red;
   key_col_g = green;
   key_col_b = blue;
+  keyColorDirty = false;
 }
 
 void csTextureWrapper::Register (iTextureManager *txtmgr)
@@ -142,6 +153,8 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
   handle = txtmgr->RegisterTexture (image, flags, fail_reason);
   if (handle)
   {
+    if (keyColorDirty)
+      UpdateKeyColorFromHandle ();
     SetKeyColor (key_col_r, key_col_g, key_col_b);
     handle->SetTextureClass (texClass);
     delete[] texClass; texClass = 0; 
@@ -177,7 +190,7 @@ const char* csTextureWrapper::GetTextureClass ()
 //------------------------------------------------------- csTextureList -----//
 
 csTextureList::csTextureList (csEngine* engine) : scfImplementationType (this),
-  csRefArrayObject<iTextureWrapper> (16, 16), engine (engine)
+  csRefArrayObject<iTextureWrapper> (16), engine (engine)
 {
 }
 
@@ -193,12 +206,27 @@ iTextureWrapper *csTextureList::NewTexture (iImage *image)
   return tm;
 }
 
+csPtr<iTextureWrapper> csTextureList::CreateTexture (iImage *image)
+{
+  csRef<iTextureWrapper> tm;
+  tm.AttachNew (new csTextureWrapper (engine, image));
+  return csPtr<iTextureWrapper>(tm);
+}
+
+
 iTextureWrapper *csTextureList::NewTexture (iTextureHandle *ith)
 {
   csRef<iTextureWrapper> tm;
   tm.AttachNew (new csTextureWrapper (engine, ith));
   Push (tm);
   return tm;
+}
+
+csPtr<iTextureWrapper> csTextureList::CreateTexture (iTextureHandle *ith)
+{
+  csRef<iTextureWrapper> tm;
+  tm.AttachNew (new csTextureWrapper (engine, ith));
+  return csPtr<iTextureWrapper>(tm);
 }
 
 int csTextureList::GetCount () const
@@ -218,16 +246,19 @@ int csTextureList::Add (iTextureWrapper *obj)
 
 bool csTextureList::Remove (iTextureWrapper *obj)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return this->Delete (obj);
 }
 
 bool csTextureList::Remove (int n)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return this->DeleteIndex (n);
 }
 
 void csTextureList::RemoveAll ()
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   this->DeleteAll ();
 }
 
@@ -238,5 +269,6 @@ int csTextureList::Find (iTextureWrapper *obj) const
 
 iTextureWrapper *csTextureList::FindByName (const char *Name) const
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return csRefArrayObject<iTextureWrapper>::FindByName (Name);
 }

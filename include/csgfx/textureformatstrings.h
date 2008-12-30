@@ -146,6 +146,12 @@ namespace CS
   public:
     /// Construct an invalid texture format.
     StructuredTextureFormat ();
+    /// Construct a texture format with the given components and sizes.
+    StructuredTextureFormat (char cmp1, int size1,
+      char cmp2 = 0, int size2 = 0,
+      char cmp3 = 0, int size3 = 0,
+      char cmp4 = 0, int size4 = 0,
+      TextureFormat fmt = Integer);
 
     /**
      * A special format (like '*dxt1').
@@ -190,6 +196,13 @@ namespace CS
       if (coded_components != other.coded_components) return false;
       if (format != other.format) return false;
       return (special == other.special);
+    }
+
+    bool operator!= (const StructuredTextureFormat& other) const
+    {
+      if (coded_components != other.coded_components) return true;
+      if (format != other.format) return true;
+      return (special != other.special);
     }
 
     /// Returns whether the contained format is a valid texture format.
@@ -299,13 +312,14 @@ namespace CS
      * // Succeeds
      * if (format.GetComponentMask() == CS::StructuredTextureFormat::compRGB)
      * { ... }
-     * // Would also succeed for formatString = "bgr8", or even wierd formats like 
-     * // "gbr4", and more
+     * // Would also succeed for formatString = "bgr8" or even wierd formats like 
+     * // "gbr4" and more, but not if an additional component such as alpha is
+     * // present.
      * \endcode
      */
     uint GetComponentMask () const;
   };
-
+  
   /**
    * Texture format string parser routines.
    */

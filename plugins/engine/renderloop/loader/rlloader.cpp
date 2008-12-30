@@ -27,7 +27,6 @@
 #include "iengine/renderloop.h"
 #include "imap/services.h"
 #include "imap/ldrctxt.h"
-#include "iengine/region.h"
 #include "ivaria/reporter.h"
 #include "iengine/rendersteps/irenderstep.h"
 #include "iengine/rendersteps/icontainer.h"
@@ -107,8 +106,15 @@ csPtr<iBase> csRenderLoopLoader::Parse (iDocumentNode* node,
 
   csRef<iRenderLoop> loop = loopmgr->Create ();
   csRef<iObject> obj = scfQueryInterface<iObject> (loop);
-  if (ldr_context && ldr_context->GetRegion ())
-    ldr_context->GetRegion ()->QueryObject ()->ObjAdd (obj);
+
+  if (ldr_context)
+  {
+    if(ldr_context->GetCollection ())
+    {
+      ldr_context->GetCollection ()->Add (obj);
+    }
+  }
+  
 
   char* loopName = 0;
 
@@ -144,7 +150,9 @@ csPtr<iBase> csRenderLoopLoader::Parse (iDocumentNode* node,
 
   if (loopName)
   {
-    if (!loopmgr->Register (loopName, loop))
+    obj->SetName(loopName);
+    bool checkDupes = ldr_context ? ldr_context->CheckDupes() : false;
+    if (!loopmgr->Register (loopName, loop, checkDupes))
     {
       if (synldr) 
       {

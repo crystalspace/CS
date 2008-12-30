@@ -32,11 +32,9 @@
 #include "iutil/selfdestruct.h"
 #include "csgfx/shadervarcontext.h"
 #include "imesh/object.h"
-#include "imesh/lighting.h"
 #include "iengine/mesh.h"
 #include "iengine/imposter.h"
 #include "iengine/viscull.h"
-#include "iengine/shadcast.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 
@@ -51,8 +49,13 @@ struct iMovable;
 struct iRenderView;
 struct iSharedVariable;
 class csEngine;
-class csLight;
 class csMeshFactoryWrapper;
+
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
+{
+  class csLight;
+}
+CS_PLUGIN_NAMESPACE_END(Engine)
 
 /**
  * A list of mesh factories.
@@ -61,9 +64,11 @@ class csMeshFactoryList : public scfImplementation1<csMeshFactoryList,
 	iMeshFactoryList>
 {
 private:
-  csRefArrayObject<iMeshFactoryWrapper> list;
+  csRefArrayObject<iMeshFactoryWrapper, CS::Container::ArrayAllocDefault,
+    csArrayCapacityFixedGrow<64> > list;
   csHash<iMeshFactoryWrapper*, csString>
   	factories_hash;
+  mutable CS::Threading::RecursiveMutex removeLock;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>
@@ -167,6 +172,9 @@ private:
 
   /// Class for keeping track of imposter information.
   csImposterFactory* imposter_factory;
+
+protected:
+  virtual void InternalRemove() { SelfDestruct(); }
 
 public:
   /// Flag indicating whether this factory should try to imposter or not.

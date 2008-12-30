@@ -35,7 +35,6 @@
 #include "ivideo/rendermesh.h"
 
 struct iCamera;
-struct iLightingInfo;
 struct iLODControl;
 struct iMeshFactoryList;
 struct iMeshFactoryWrapper;
@@ -48,8 +47,6 @@ struct iObject;
 struct iPortalContainer;
 struct iRenderView;
 struct iShaderVariableContext;
-struct iShadowCaster;
-struct iShadowReceiver;
 struct iSharedVariable;
 struct iSceneNode;
 struct iMaterialWrapper;
@@ -98,11 +95,12 @@ class csReversibleTransform;
 #define CS_ENTITY_INVISIBLE (CS_ENTITY_INVISIBLEMESH+CS_ENTITY_NOHITBEAM)
 
 /**
- * If CS_ENTITY_NOSHADOWS is set then this thing will not cast
+ * If CS_ENTITY_NOSHADOWCAST is set then this mesh will not cast
  * shadows. Lighting will still be calculated for it though. Use the
  * CS_ENTITY_NOLIGHTING flag to disable that.
  */
-#define CS_ENTITY_NOSHADOWS 16
+#define CS_ENTITY_NOSHADOWCAST 16
+#define CS_ENTITY_NOSHADOWS   CS_ENTITY_NOSHADOWCAST
 
 /**
  * If CS_ENTITY_NOLIGHTING is set then this thing will not be lit.
@@ -132,6 +130,23 @@ class csReversibleTransform;
  * If CS_ENTITY_NODECAL is set then this entity will not accept decals.
  */
 #define CS_ENTITY_NODECAL 256
+
+/**
+ * Indicates that static lighting was computed for this mesh.
+ */
+#define CS_ENTITY_STATICLIT 512
+
+/**
+ * If CS_ENTITY_NOSHADOWRECEIVE is set then this mesh will not receive
+ * shadows. 
+ */
+#define CS_ENTITY_NOSHADOWRECEIVE 1024
+
+/**
+ * Mark a mesh as a shadow caster if a render managers allows limiting shadow
+ * casting limited to select meshes.
+ */
+#define CS_ENTITY_LIMITEDSHADOWCAST 2048
 
 /** @} */
 
@@ -273,39 +288,6 @@ struct iMeshWrapper : public virtual iBase
    * get the portal container interface.
    */
   virtual iPortalContainer* GetPortalContainer () const = 0;
-
-  /**
-   * Get the optional lighting information that is implemented
-   * by this mesh object. If the mesh object doesn't implement it
-   * then this will return 0. This is similar (but more efficient)
-   * to calling scfQueryInterface<iLightingInfo> on the mesh object.
-   */
-  virtual iLightingInfo* GetLightingInfo () const = 0;
-
-  /**
-   * Get the optional shadow receiver that is implemented
-   * by this mesh object. If the mesh object doesn't implement it
-   * then this will return 0. This is similar (but more efficient)
-   * to calling scfQueryInterface<iShadowReceiver> on the mesh object.
-   * <p>
-   * Note! If the mesh is a static lod mesh (i.e. a parent of a mesh
-   * hierarchy that is used for static lod) then this will return
-   * a shadow receiver that automatically multiplexes the receiving shadows
-   * to all child meshes.
-   */
-  virtual iShadowReceiver* GetShadowReceiver () = 0;
-
-  /**
-   * Get the optional shadow caster that is implemented
-   * by this mesh object. If the mesh object doesn't implement it
-   * then this will return 0. This is similar (but more efficient)
-   * to calling scfQueryInterface<iShadowCaster> on the mesh object.
-   * <p>
-   * Note! If the mesh is a static lod mesh (i.e. a parent of a mesh
-   * hierarchy that is used for static lod) then this will return a
-   * shadow caster that gets shadows from the highest detail objects.
-   */
-  virtual iShadowCaster* GetShadowCaster () = 0;
 
   /// Get the parent factory.
   virtual iMeshFactoryWrapper *GetFactory () const = 0;
@@ -650,6 +632,12 @@ struct iMeshWrapper : public virtual iBase
   virtual iShaderVariableContext* GetSVContext() = 0;
 
   /**
+   * Get the render mesh list for this mesh wrapper and given view
+   */
+  virtual csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview,
+    uint32 frustum_mask) = 0;
+
+  /**
    * Adds a render mesh to the list of extra render meshes.
    * This list is used for special cases (like decals) where additional
    * things need to be renderered for the mesh in an abstract way.
@@ -965,7 +953,27 @@ struct iMeshFactoryList : public virtual iBase
 };
 
 /**
- * This is an iterator mesh wrappers.
+ * This is an iterator mesh factory wrappers.
+ *
+ * Main ways to get pointers to this interface:
+ *   - iEngine::GetNearbyMeshes()
+ *   - iEngine::GetVisibleMeshes()
+ */
+struct iMeshFactoryWrapperIterator : public virtual iBase
+{
+  SCF_INTERFACE(iMeshFactoryWrapperIterator,1,0,0);
+  /// Move forward.
+  virtual iMeshFactoryWrapper* Next () = 0;
+
+  /// Reset the iterator to the beginning.
+  virtual void Reset () = 0;
+
+  /// Check if we have any more meshes.
+  virtual bool HasNext () const = 0;
+};
+
+/**
+ * This is an iterator of mesh wrappers.
  *
  * Main ways to get pointers to this interface:
  *   - iEngine::GetNearbyMeshes()

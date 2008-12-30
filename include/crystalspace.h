@@ -17,7 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/**\file 
+/**@file 
  * Crystal Space master header. This header file essentially causes most of 
  * the Crystal Space header files to be included, providing a convenient way 
  * to use any feature of Crystal Space without having to worry about including 

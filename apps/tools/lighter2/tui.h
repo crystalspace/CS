@@ -20,19 +20,21 @@
 #define __TUI_H__
 
 #include "csutil/scf_implementation.h"
+#include "csutil/threadmanager.h"
 
 #include "ivaria/reporter.h"
 
 namespace lighter
 {
   /// Text-mode User Interface
-  class TUI : public scfImplementation1<TUI, iReporterListener>
+  class TUI : public ThreadedCallable<TUI>,
+              public scfImplementation1<TUI, iReporterListener>
   {
   public:
     TUI ();
 
     // Setup
-    void Initialize ();
+    void Initialize (iObjectRegistry* objReg);
 
     enum RedrawFlag
     {
@@ -43,6 +45,7 @@ namespace lighter
       TUI_DRAW_RAYCORE = (1<<5),
       TUI_DRAW_SETTINGS = (1<<6),
       TUI_DRAW_STATS = (1<<7),
+      TUI_DRAW_SWAPCACHE = (1<<8),
       TUI_DRAW_ALL = 0xFFFFFFFF
     };
 
@@ -50,9 +53,12 @@ namespace lighter
     /// Redraw the TUI
     void Redraw (int drawFlags = TUI_DRAW_ALL);
 
+    /// Finish drawing
+    void FinishDraw ();
+
     /// iReporterListener
-    virtual bool Report (iReporter* reporter, int severity, const char* msgId,
-      const char* description);
+    THREADED_CALLABLE_DECL4(TUI, Report, csThreadReturn, iReporter*, reporter,
+      int, severity, const char*, msgId, const char*, description, HIGH, true, false);
   private:
     csString GetProgressBar (uint percent) const;
 
@@ -74,8 +80,13 @@ namespace lighter
     //Draw stats
     void DrawStats () const;
 
+    //Draw swap cache stats
+    static csString FormatByteSize (uint64 size);
+    void DrawSwapCacheStats () const;
+
     //Update simple output, if anything to update
     void DrawSimple ();
+    void DrawSimpleEnd ();
 
     // Reporting stuff
     csString messageBuffer[4];
@@ -89,6 +100,9 @@ namespace lighter
 
     // Last printed task
     csString lastTask; float lastTaskProgress;
+
+    iObjectRegistry* GetObjectRegistry() const { return object_reg; }
+    iObjectRegistry* object_reg;
   };
 
   extern TUI globalTUI;

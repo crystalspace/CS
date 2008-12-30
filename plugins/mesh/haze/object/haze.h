@@ -183,7 +183,7 @@ public:
   }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * Haze mesh object.
@@ -237,7 +237,7 @@ private:
   };
   csFrameDataHolder<HazeRenderBuffer> renderBuffers;
   csFrameDataHolder<HazeRenderBuffer> indexBuffers;
-  static csStringID vertex_name, texel_name, index_name;
+  static CS::ShaderVarStringID vertex_name, texel_name, index_name;
 
   /**
    * Setup this object. This function will check if setup is needed.
@@ -382,7 +382,7 @@ public:
   { return this->layers[layer]->scale; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * Factory for 2D sprites. This factory also implements iHazeFactoryState.

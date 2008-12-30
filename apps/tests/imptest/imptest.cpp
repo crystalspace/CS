@@ -32,7 +32,7 @@ ImposterTest::~ImposterTest ()
 {
 }
 
-void ImposterTest::ProcessFrame ()
+void ImposterTest::Frame ()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -106,13 +106,6 @@ void ImposterTest::ProcessFrame ()
   view->Draw ();
 }
 
-void ImposterTest::FinishFrame ()
-{
-  // Just tell the 3D renderer that everything has been rendered.
-  g3d->FinishDraw ();
-  g3d->Print (0);
-}
-
 bool ImposterTest::OnKeyboard(iEvent& ev)
 {
   // We got a keyboard event.
@@ -169,6 +162,7 @@ bool ImposterTest::OnInitialize(int /*argc*/, char* /*argv*/ [])
 
 void ImposterTest::OnExit()
 {
+  printer.Invalidate ();
 }
 
 bool ImposterTest::Application()
@@ -214,10 +208,6 @@ bool ImposterTest::SetupModules()
   // We use the full window to draw the world.
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
-  // First disable the lighting cache. Our app is simple enough
-  // not to need this.
-  engine->SetLightingCacheMode (0);
-
   // Here we create our world.
   CreateRoom();
 
@@ -228,6 +218,9 @@ bool ImposterTest::SetupModules()
   // that were loaded for the texture manager.
   engine->Prepare ();
 
+  using namespace CS::Lighting;
+  SimpleStaticLighter::ShineLights (room, engine, 4);
+
   distance = 5.0f;
 
   // Now we need to position the camera in our world.
@@ -237,6 +230,8 @@ bool ImposterTest::SetupModules()
   c->GetTransform ().SetOrigin (look_point
 	+ (orig - look_point).Unit () * distance);
   c->GetTransform ().LookAt (look_point-orig, csVector3(0,1,0) );
+
+  printer.AttachNew (new FramePrinter (object_reg));
 
   return true;
 }
@@ -266,10 +261,6 @@ void ImposterTest::CreateRoom ()
   // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
       engine, room, "walls", "walls_factory", &box);
-
-  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
-    iGeneralMeshState> (walls->GetMeshObject ());
-  mesh_state->SetShadowReceiving (true);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   // Now we need light to see something.

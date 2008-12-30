@@ -6,3 +6,4 @@ Application partconv
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith partconv : crystalspace  ;
+FileListEntryApplications partconv : app-tool ;

@@ -46,7 +46,7 @@ private:
 
   bool CheckBox (const csBox3& bbox, csSolidSpaceNode* node,
 	csVector3* vertices,
-	csTriangleMinMax* tris, int tri_count, 
+        csTriangleMinMax* tris, size_t tri_count, 
 	csPlane3* planes);
 
 public:

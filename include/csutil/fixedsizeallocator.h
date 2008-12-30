@@ -278,6 +278,32 @@ protected: // 'protected' allows access by test-suite.
     }
     return true;
   }
+  /**
+   * Free all objects without releasing the memory blocks themselves.
+   * This works almost as DisposeAll but does not free the memory.
+   * \param disposer Disposer object that is passed to DestroyObject().
+   */
+  template<typename Disposer>
+  void FreeAll (Disposer& disposer)
+  {
+    insideDisposeAll = true;
+    csBitArray const mask(GetAllocationMap());
+    size_t node = 0;
+    for (size_t b = 0, bN = blocks.b.GetSize(); b < bN; b++)
+    {
+      for (uint8 *p = blocks.b[b], *pN = p + blocksize; p < pN; p += elsize)
+      {
+        if (mask.IsBitSet(node++))
+        {
+          DestroyObject (disposer, p);
+          FreeNode* f = (FreeNode*)p;
+          f->next = freenode;
+          freenode = f;          
+        }
+      }
+    }
+    insideDisposeAll = false;
+  }
 
   /// Find and allocate a block
   void* AllocCommon ()
@@ -295,12 +321,17 @@ protected: // 'protected' allows access by test-suite.
       blocks.b.InsertSorted(p);
       freenode = (FreeNode*)p;
     }
-    void* const node = freenode;
+    union
+    {
+      FreeNode* a;
+      void* b;
+    } pun;
+    pun.a = freenode;
     freenode = freenode->next;
 #ifdef CS_FIXEDSIZEALLOC_DEBUG
-    memset (node, 0xfa, elsize);
+    memset (pun.b, 0xfa, elsize);
 #endif
-    return node;
+    return pun.b;
   }
 private:
   void operator= (csFixedSizeAllocator const&); 	// Illegal; unimplemented.
@@ -349,6 +380,9 @@ public:
     elcount (other.elcount), elsize (other.elsize), 
     blocksize (other.blocksize), freenode (0), insideDisposeAll (false)
   {
+#ifdef CS_MEMORY_TRACKER
+    blocks.SetMemTrackerInfo (typeid(*this).name());
+#endif
     /* Technically, an allocator can be empty even with freenode != 0 */
     CS_ASSERT(other.freenode == 0);
   }
@@ -416,6 +450,15 @@ public:
       }
       freenode = nextfree;
     }
+  }
+  
+  /**
+   * Return number of allocated elements (potentially slow).
+   */
+  size_t GetAllocatedElems() const
+  {
+    csBitArray mask(GetAllocationMap());
+    return mask.NumBitsSet();
   }
 
   /**

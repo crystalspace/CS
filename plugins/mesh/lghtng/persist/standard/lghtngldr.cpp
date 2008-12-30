@@ -38,6 +38,7 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/stringarray.h"
 #include "imap/ldrctxt.h"
 #include "ivaria/reporter.h"
 
@@ -94,8 +95,7 @@ bool csLightningFactoryLoader::Initialize (iObjectRegistry* object_reg)
 
 
 csPtr<iBase> csLightningFactoryLoader::Parse (iDocumentNode* node,
-        iStreamSource*, iLoaderContext* ldr_context,
-        iBase* /* context */)
+  iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */)
 {
   csVector3 a;
 
@@ -337,13 +337,15 @@ csPtr<iBase> csLightningLoader::Parse (iDocumentNode* node,
           const char* factname = child->GetContentsValue ();
           iMeshFactoryWrapper* fact =
               ldr_context->FindMeshFactory (factname);
-          if (!fact)
+
+          if(!fact)
           {
             synldr->ReportError (
-                "crystalspace.lightningloader.parse.badfactory",
-                child, "Could not find factory '%s'!", factname);
+              "crystalspace.lightningloader.parse.badfactory",
+              child, "Could not find factory '%s'!", factname);
             return 0;
           }
+
           mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           Lightningstate = scfQueryInterface<iLightningState> (mesh);
 	  if (!Lightningstate)

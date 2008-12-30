@@ -31,15 +31,21 @@ AC_PREREQ([2.56])
 #	Prepend text to the Jam text cache.  This is a cover for
 #	CS_TEXT_CACHE_PREPEND().
 #
-# CS_JAMCONFIG_PROPERTY(KEY, VALUE, [APPEND], [UNCONDITIONAL])
-#	Append a line of the form "KEY ?= VALUE" to the Jam text cache.  If the
-#	APPEND argument is not the empty string, then VALUE is appended to the
-#	existing value of KEY using the form "KEY += VALUE".  If the
-#	UNCONDITIONAL argument is not empty, then the value of KEY is set
-#	unconditionally "KEY = VALUE", rather than via "KEY ?= VALUE".  APPEND
-#	takes precedence over UNCONDITIONAL.  Note that if VALUE references
-#	other Jam variables, for example $(OBJS), then be sure to protect the
-#	value with AS_ESCAPE().  For example:
+# CS_JAMCONFIG_PROPERTY(KEY, VALUE, [OPTIONS])
+#	Append, by default, a line of the form "KEY ?= VALUE" to the Jam text
+#	cache.  OPTIONS is a comma-separated list of keywords which alter the
+#	format of the emitted line. The following options are understood:
+#	    append - Employ += appending assignment.
+#	    atomic - Emit VALUE as an atomic (quote-enclosed) string.
+#	    conditional - Employ ?= optional assignment (the default).
+#	    default - Alias for "conditional".
+#	    unconditional - Employ = unconditional assignment.
+#	For backward compatibility, if OPTIONS is not one of the above keywords
+#	and is not the empty string, then "append" is assumed.  Furthermore, if
+#	the macro is invoked with a non-empty fourth argument, then
+#	"unconditional" is assumed.  Note that if VALUE references other Jam
+#	variables, for example $(OBJS), then be sure to protect the value with
+#	AS_ESCAPE().  For example:
 #	CS_JAMCONFIG_PROPERTY([ALLOBJS], [AS_ESCAPE([$(OBJS) $(LIBOBJS)])])
 #
 # CS_JAMCONFIG_OUTPUT(FILENAME)
@@ -48,11 +54,23 @@ AC_PREREQ([2.56])
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_JAMCONFIG_APPEND],
     [CS_TEXT_CACHE_APPEND([cs_jamconfig_text], [$1])])
+
 AC_DEFUN([CS_JAMCONFIG_PREPEND],
     [CS_TEXT_CACHE_PREPEND([cs_jamconfig_text], [$1])])
+
 AC_DEFUN([CS_JAMCONFIG_PROPERTY],
     [CS_JAMCONFIG_APPEND(
-	[$1 m4_ifval([$3], [+=], m4_ifval([$4], [=], [?=])) \"$2\" ;
+[$1 dnl
+CS_MEMBERSHIP_ANY([append], [$3], [+=],
+[CS_MEMBERSHIP_ANY([unconditional], [$3], [=],
+[CS_MEMBERSHIP_ANY([conditional, default], [$3], [?=],
+[CS_MEMBERSHIP_ANY([atomic], [$3], [?=], dnl Backward compatibility. 
+[m4_ifval([$3], [+=], dnl Backward compatibility.
+[m4_ifval([$4], [=], dnl Backward compatibility.
+[?=])])])])])]) dnl
+_CS_JAMCONFIG_QUOTE([$2], CS_MEMBERSHIP_ANY([atomic], [$3], [\"])) ;
 ])])
+AC_DEFUN([_CS_JAMCONFIG_QUOTE], [$2$1$2])
+
 AC_DEFUN([CS_JAMCONFIG_OUTPUT],
     [CS_TEXT_CACHE_OUTPUT([cs_jamconfig_text], [$1])])

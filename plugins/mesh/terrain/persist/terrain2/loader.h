@@ -29,19 +29,22 @@ struct iObjectRegistry;
 struct iSyntaxService;
 struct iVFS;
 
+CS_PLUGIN_NAMESPACE_BEGIN(Terrain2Loader)
+{
+
 /**
  *
  */
-class csTerrainFactoryLoader :
-  public scfImplementation2<csTerrainFactoryLoader,
+class csTerrain2FactoryLoader :
+  public scfImplementation2<csTerrain2FactoryLoader,
                             iLoaderPlugin,
                             iComponent>
 {
 public:
   /// Constructor
-  csTerrainFactoryLoader (iBase*);
+  csTerrain2FactoryLoader (iBase*);
   /// Destructor
-  virtual ~csTerrainFactoryLoader ();
+  virtual ~csTerrain2FactoryLoader ();
 
   /// Setup the plugin with the system driver
   bool Initialize (iObjectRegistry *objreg);
@@ -49,29 +52,10 @@ public:
   /// Parse the given node block and build the terrain factory
   csPtr<iBase> Parse (iDocumentNode *node,
     iStreamSource*, iLoaderContext *ldr_context,
-    iBase* context);	
+    iBase* context);
+
+  virtual bool IsThreadSafe() { return true; }
 private:
-  struct ParamPair
-  {
-    csString name, value;
-  };
-
-  typedef csArray<ParamPair> ParamPairArray;
-
-  struct DefaultCellValues
-  {
-    DefaultCellValues ()
-      : size (128.0f, 32.0f, 128.0f), gridWidth (128), gridHeight (128),
-      materialmapWidth (128), materialmapHeight (128), materialmapPersist (false)
-    {}
-
-    ParamPairArray renderParams, collParams, feederParams;
-    csVector3 size;
-    unsigned int gridWidth, gridHeight, materialmapWidth, materialmapHeight;
-    bool materialmapPersist;
-    csRef<iMaterialWrapper> baseMaterial;
-  };
-
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
   csRef<iReporter> reporter;
@@ -82,20 +66,23 @@ private:
 #undef CS_TOKEN_ITEM_FILE 
 
   bool ParseCell (iDocumentNode* node, iLoaderContext* ldr_ctx,
-    iTerrainFactory* fact, const DefaultCellValues& defaults);
+    iTerrainFactory* fact, iTerrainFactoryCell* cell = 0);
 
-  bool ParseDefaultCell (iDocumentNode* node, iLoaderContext* ldr_ctx,
-    DefaultCellValues& defaults);
+  template<typename IProp>
+  bool ParseParams (IProp* props, iDocumentNode* node);
 
-  bool ParseParams (csArray<ParamPair>& pairs, iDocumentNode* node);
+  bool ParseFeederParams (iTerrainCellFeederProperties* props,
+    iDocumentNode* node);
 
+  bool ParseRenderParams (iTerrainCellRenderProperties* props,
+    iLoaderContext* ldr_context, iDocumentNode* node);
 };
 
 /**
  *
  */
-class csTerrainObjectLoader :
-  public scfImplementation2<csTerrainObjectLoader,
+class csTerrain2ObjectLoader :
+  public scfImplementation2<csTerrain2ObjectLoader,
                             iLoaderPlugin,
                             iComponent>
 {
@@ -109,12 +96,23 @@ private:
 #include "cstool/tokenlist.h"
 #undef CS_TOKEN_ITEM_FILE 
 
+  bool ParseCell (iDocumentNode* node, iLoaderContext* ldr_ctx,
+    iTerrainSystem* terrain);
+
+  template<typename IProp>
+  bool ParseParams (IProp* props, iDocumentNode* node);
+
+  bool ParseFeederParams (iTerrainCellFeederProperties* props,
+    iDocumentNode* node);
+
+  bool ParseRenderParams (iTerrainCellRenderProperties* props,
+    iLoaderContext* ldr_context, iDocumentNode* node);
 public:
   /// Constructor
-  csTerrainObjectLoader (iBase*);
+  csTerrain2ObjectLoader (iBase*);
 
   /// Destructor
-  virtual ~csTerrainObjectLoader ();
+  virtual ~csTerrain2ObjectLoader ();
 
   /// Register plugin with system driver
   bool Initialize (iObjectRegistry *objreg);
@@ -123,6 +121,11 @@ public:
   csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context,
     iBase *context);
+
+  virtual bool IsThreadSafe() { return true; }
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(Terrain2Loader)
 
 #endif // __CS_CHUNKLDR_H

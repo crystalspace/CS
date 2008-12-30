@@ -20,6 +20,8 @@
 #define __SWAPPABLE_H__
 
 #include "lighter.h"
+#include "csutil/threading/mutex.h"
+#include "csutil/threading/atomicops.h"
 
 namespace lighter
 {
@@ -64,6 +66,9 @@ namespace lighter
 
     /// Free memory, around \a desiredAmount bytes
     void FreeMemory (size_t desiredAmount);
+    
+    /// Get sizes of swapmanager-managed data
+    void GetSizes (uint64& swappedIn, uint64& swappedOut, uint64& maxSize);
   private:
     // One in-memory entry
     struct SwapEntry
@@ -77,10 +82,13 @@ namespace lighter
       iSwappable* obj;
       enum
       {
-        swappedOut,
-        swappedOutEmpty,
-        swappedIn
-      } swapStatus;
+        swappedOut = 0,
+        swappedOutEmpty = 1,
+        swappedIn = 2,
+        swapping = 3
+      };
+
+      int32 swapStatus;
       size_t lastUnlockTime;
       size_t lastSize;
     };
@@ -117,7 +125,10 @@ namespace lighter
 
     //Statistics for house-keeping
     size_t maxCacheSize, currentCacheSize;
+    uint64 swappedOutSize;
     size_t currentUnlockTime;
+
+    CS::Threading::Mutex swapMutex;
 
     void AccountEntrySize (SwapEntry* e)
     {
@@ -149,7 +160,8 @@ namespace lighter
 
   /**
    * Base implementation for a swappable object. Also supports nested
-   * locking. */
+   * locking. 
+   */
   class Swappable : public iSwappable
   {
     mutable uint lockCount;

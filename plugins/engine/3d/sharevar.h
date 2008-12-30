@@ -51,6 +51,9 @@ private:
 
   void FireListeners ();
 
+protected:
+  virtual void InternalRemove() { SelfDestruct(); }
+
 public:
   CS_LEAKGUARD_DECLARE (csSharedVariable);
 
@@ -150,6 +153,7 @@ public:
 class csSharedVariableList : public scfImplementation1<csSharedVariableList,
                                                        iSharedVariableList>
 {
+  mutable CS::Threading::RecursiveMutex removeLock;
 public:
   
   /// constructor

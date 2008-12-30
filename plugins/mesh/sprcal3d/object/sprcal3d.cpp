@@ -35,6 +35,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/randomgen.h"
 #include "csutil/hash.h"
 #include "csutil/sysfunc.h"
+#include "csutil/scfarray.h"
 #include "cstool/rbuflock.h"
 
 #include "ivideo/graph3d.h"
@@ -171,8 +172,6 @@ csSpriteCal3DMeshObjectFactory::csSpriteCal3DMeshObjectFactory (
   calCoreModel("no name")
 {
   csSpriteCal3DMeshObjectFactory::object_reg = object_reg;
-
-  light_mgr = csQueryRegistry<iLightManager> (object_reg);
 
   skel_factory.AttachNew (new csCal3dSkeletonFactory ());
 }
@@ -716,7 +715,9 @@ void csCal3dSkeletonFactory::SetSkeleton (CalCoreModel *model)
   std::vector<CalCoreBone*> bvect = core_skeleton->getVectorCoreBone ();
   for (size_t i = 0; i < bvect.size (); i++)
   {
-    bones_factories.Push (new csCal3dSkeletonBoneFactory (bvect[i], this));
+    csRef<csCal3dSkeletonBoneFactory> newFact;
+    newFact.AttachNew (new csCal3dSkeletonBoneFactory (bvect[i], this));
+    bones_factories.Push (newFact);
   }
 
   //now we can setup parents and childres
@@ -761,6 +762,17 @@ iSkeletonAnimation *csCal3dSkeletonFactory::FindAnimation (const char *name)
     return animations[idx];
   return 0;
 }
+
+iSkeletonBoneFactory* csCal3dSkeletonFactory::GetBone (size_t i)
+{ 
+  return bones_factories[i];
+}
+
+iSkeletonAnimation* csCal3dSkeletonFactory::GetAnimation (size_t idx)
+{ 
+  return animations[idx];
+}
+
 //---------------------------csCal3dSkeletonBoneFactory---------------------------
 
 csCal3dSkeletonBoneFactory::csCal3dSkeletonBoneFactory (CalCoreBone *core_bone,
@@ -856,19 +868,20 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
 //      "Error creating model instance");
 //    return;
 //  }
-  
-  strings = csQueryRegistryTagInterface<iStringSet> (object_reg, 
-    "crystalspace.shared.stringset");
   G3D = csQueryRegistry<iGraphics3D> (object_reg);
 
   // set the material set of the whole model
   vis_cb = 0;
   is_idling = false;
+  idle_override_interval = 0;
 
   meshVersion = 0;
   bboxVersion = (uint)-1;
   default_idle_anim = -1;
+  idle_action = -1;
   last_locked_anim = -1;
+
+  cyclic_blend_factor = 0.0f;
 
   do_update = -1;
   updateanim_sqdistance1 = 10*10;
@@ -1023,123 +1036,9 @@ void csSpriteCal3DMeshObject::GetObjectBoundingBox (csBox3& bbox,
   bbox = object_bbox;
 }
 
-void csSpriteCal3DMeshObject::LightChanged (iLight*)
-{
-  lighting_dirty = true;
-}
-
-void csSpriteCal3DMeshObject::LightDisconnect (iLight* /*light*/)
-{
-  lighting_dirty = true;
-}
-
-void csSpriteCal3DMeshObject::DisconnectAllLights ()
-{
-  lighting_dirty = true;
-}
-
 void csSpriteCal3DMeshObject::SetUserData(void *data)
 {
   calModel.setUserData(data);
-}
-
-void csSpriteCal3DMeshObject::UpdateLightingSubmesh (
-    const csArray<iLightSectorInfluence*>& lights, 
-    iMovable* movable,
-    CalRenderer *pCalRenderer,
-    int mesh, int submesh, float *meshNormals,
-    csColor* colors)
-{
-  int vertCount;
-  vertCount = pCalRenderer->getVertexCount();
-
-  int i;
-
-  // Do the lighting.
-  csReversibleTransform trans = movable->GetFullTransform ();
-  // the object center in world coordinates. "0" because the object
-  // center in object space is obviously at (0,0,0).
-  csColor color;
-
-  size_t num_lights = lights.GetSize ();
-
-  // Make sure colors array exists and set all to ambient
-  InitSubmeshLighting (mesh, submesh, pCalRenderer, movable, colors);
-
-  // Update Lighting for all relevant lights
-  for (size_t l = 0; l < num_lights; l++)
-  {
-    iLight* li = lights[l]->GetLight ();
-    // Compute light position in object coordinates
-    // @@@ Can be optimized a bit. E.g. store obj_light_pos so it can be
-    //  reused by submesh lighting.
-    csVector3 wor_light_pos = li->GetMovable ()->GetFullPosition ();
-    csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
-    float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, 0);
-    if (obj_sq_dist >= csSquare (li->GetCutoffDistance ())) return;
-    float in_obj_dist = (obj_sq_dist >= SMALL_EPSILON)?
-        csQisqrt (obj_sq_dist):1.0f;
-
-    csColor light_color = li->GetColor () * (256.0f / CS_NORMAL_LIGHT_LEVEL)
-      * li->GetBrightnessAtDistance (csQsqrt (obj_sq_dist));
-
-    int normal_index=0;
-    for (i = 0; i < vertCount; i++)
-    {
-      csVector3 normal(meshNormals[normal_index],
-        meshNormals[normal_index+1],
-        meshNormals[normal_index+2]);
-        
-      normal_index+=3;
-      float cosinus;
-      if (obj_sq_dist < SMALL_EPSILON) 
-        cosinus = 1;
-      else 
-        cosinus = obj_light_pos * normal; 
-      // because the vector from the object center to the light center
-      // in object space is equal to the position of the light
-
-      if (cosinus > 0)
-      {
-        color = light_color;
-        if (obj_sq_dist >= SMALL_EPSILON) 
-            cosinus *= in_obj_dist;
-        if (cosinus < 1.0f) 
-            color *= cosinus;
-        colors[i] += color;
-      }
-    }
-  }
-
-  // Clamp all vertex colors to 2.
-  for (i = 0 ; i < vertCount; i++)
-    colors[i].Clamp (2.0f, 2.0f, 2.0f);
-}
-
-void csSpriteCal3DMeshObject::InitSubmeshLighting (int /*mesh*/, int /*submesh*/,
-                           CalRenderer *pCalRenderer,
-                           iMovable* movable, 
-                           csColor* colors)
-{
-  int vertCount = pCalRenderer->getVertexCount();
-
-  // Set all colors to ambient light.
-  csColor col;
-  if (((csSpriteCal3DMeshObjectFactory*)factory)->engine)
-  {
-    ((csSpriteCal3DMeshObjectFactory*)factory)->engine->GetAmbientLight (col);
-    //    col += color;  // no inherent color in cal3d sprites
-    iSector* sect = movable->GetSectors ()->Get (0);
-    if (sect)
-      col += sect->GetDynamicAmbientLight ();
-  }
-  else
-  {
-    //    col = color;
-    col.Set (0, 0, 0);
-  }
-  for (int i = 0 ; i < vertCount ; i++)
-    colors[i] = col;
 }
 
 bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
@@ -1568,6 +1467,7 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
     rm->do_mirror = camera->IsMirrored ();
     rm->worldspace_origin = wo;
     rm->object2world = o2wt;
+    rm->bbox = GetObjectBoundingBox(); // @@@ FIXME: could be tighter (submesh bbox)
 
     // @@@ Hacky.
     ((MeshAccessor*)rm->buffers->GetAccessor())->movable = movable;
@@ -1609,14 +1509,14 @@ bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
   if (is_idling) // check for override and play if time
   {
     idle_override_interval -= delta;
-    if (idle_override_interval <= 0)
+    if ((idle_override_interval <= 0) && (default_idle_anim != -1))
     {
+      csRandomGen rng;
+      SetIdleOverrides(&rng,default_idle_anim);
       SetAnimAction(factory->anims[idle_action]->name,.25,.25);
-      idle_override_interval = 20;
     }
   }
   meshVersion++;
-  lighting_dirty = true;
   //vertices_dirty = true;
   return true;
 }
@@ -1659,7 +1559,9 @@ int csSpriteCal3DMeshObject::FindAnim(const char *name)
 void csSpriteCal3DMeshObject::ClearAllAnims()
 {
   while (active_anims.GetSize ())
-    ClearAnimCyclePos ((int)(active_anims.GetSize () - 1), 0);
+  {
+    ClearAnimCyclePos ((int)(active_anims.GetSize () - 1), cyclic_blend_factor);
+  }
 
   if (last_locked_anim != -1)
   {
@@ -1672,13 +1574,13 @@ void csSpriteCal3DMeshObject::ClearAllAnims()
 bool csSpriteCal3DMeshObject::SetAnimCycle(const char *name, float weight)
 {
   ClearAllAnims();
-  return AddAnimCycle(name, weight, 0);
+  return AddAnimCycle(name, weight, cyclic_blend_factor);
 }
 
 bool csSpriteCal3DMeshObject::SetAnimCycle(int idx, float weight)
 {
   ClearAllAnims();
-  return AddAnimCycle(idx, weight, 0);
+  return AddAnimCycle(idx, weight, cyclic_blend_factor);
 }
 
 bool csSpriteCal3DMeshObject::AddAnimCycle(const char *name, float weight,
@@ -1810,8 +1712,6 @@ void csSpriteCal3DMeshObject::SetIdleOverrides(csRandomGen *rng,int which)
 {
   csCal3DAnimation *anim = factory->anims[which];
 
-  is_idling = true;
-
   // Determine interval till next override.
   idle_override_interval = rng->Get(anim->max_interval - anim->min_interval)
     + anim->min_interval;
@@ -1836,6 +1736,12 @@ void csSpriteCal3DMeshObject::SetIdleOverrides(csRandomGen *rng,int which)
 void csSpriteCal3DMeshObject::SetDefaultIdleAnim(const char *name)
 {
     default_idle_anim = FindAnim(name);
+    if( default_idle_anim != -1 )
+    {
+      float max_interval(factory->anims[default_idle_anim]->max_interval);
+      if(idle_override_interval > max_interval)
+        idle_override_interval = max_interval;
+    }
 }
 
 bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
@@ -1845,6 +1751,8 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
   ClearAllAnims();
   if (!vel)
   {
+    is_idling = true;
+    SetTimeFactor(1);
     if (default_idle_anim != -1)
     {
       AddAnimCycle(default_idle_anim,1,0);
@@ -1856,9 +1764,10 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
     {
       if (factory->anims[i]->type == iSpriteCal3DState::C3D_ANIM_TYPE_IDLE)
       {
+        default_idle_anim = i;
         AddAnimCycle(i,1,0);
-    if (rng)
-      SetIdleOverrides(rng,i);
+        if (rng)
+          SetIdleOverrides(rng,i);
         return true;
       }
     }
@@ -1876,6 +1785,21 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
   }
 
   is_idling = false;
+
+  // Remove idle-animation that should not be played while moving too fast:
+  if( idle_action != -1)
+  {
+    /* Default value for max_vel is 0 if it is not set in the cal3d file.
+       Ideally, we would just test for (max_vel < vel). However, this would
+       break expected behaviour for old .cal3d files, and hence require
+       additional explanation. */
+    if((factory->anims[idle_action]->max_velocity) && (factory->anims[idle_action]->max_velocity < vel))
+    {
+      calModel.getMixer()->removeAction(idle_action);
+      idle_action = -1;
+    }
+  }
+
   // first look for animations with a base velocity that exactly matches
   bool found_match = false;
   for (i=0; i<count; i++)
@@ -2087,6 +2011,7 @@ bool csSpriteCal3DMeshObject::AttachCoreMesh(int calCoreMeshID,
     newMesh.render_mesh.indexend += submesh->getFaceCount () * 3;
   }  
   newMesh.render_mesh.material = iMatWrapID;
+  newMesh.matRef = iMatWrapID;
   
   meshes.Push(newMesh);
   
@@ -2190,6 +2115,8 @@ bool csSpriteCal3DMeshObject::SetMaterial(const char *mesh_name,
     return false;
 
   meshes[meshIdx].render_mesh.material = mat;
+  meshes[meshIdx].matRef = mat;
+
   return true;
 }
 
@@ -2201,6 +2128,11 @@ void csSpriteCal3DMeshObject::SetTimeFactor(float timeFactor)
 float csSpriteCal3DMeshObject::GetTimeFactor()
 {
   return calModel.getMixer()->getTimeFactor();
+}
+
+void csSpriteCal3DMeshObject::SetCyclicBlendFactor(float factor)
+{
+  cyclic_blend_factor = factor;
 }
 
 iShaderVariableContext* csSpriteCal3DMeshObject::GetCoreMeshShaderVarContext (
@@ -2221,108 +2153,145 @@ iShaderVariableContext* csSpriteCal3DMeshObject::GetCoreMeshShaderVarContext (
 
 //----------------------------------------------------------------------
 
-void csSpriteCal3DMeshObject::MeshAccessor::UpdateNormals (
-  CalRenderer* render, int meshIndex, CalMesh* calMesh, size_t vertexCount)
+void csSpriteCal3DMeshObject::MeshAccessor::UpdateNormals (csRenderBufferHolder* holder)
 {
   if (normal_buffer == 0)
   {
     normal_buffer = csRenderBuffer::CreateRenderBuffer (
       vertexCount, CS_BUF_DYNAMIC,
       CS_BUFCOMP_FLOAT, 3);
+    holder->SetRenderBuffer (CS_BUFFER_NORMAL, normal_buffer);
   }
 
-  csRenderBufferLock<float> normalLock (normal_buffer);
-
-  int vertOffs = 0;
-  for (int submesh = 0; submesh < calMesh->getSubmeshCount();
-    submesh++)
+  if (meshobj->meshVersion != normalVersion)
   {
-    render->selectMeshSubmesh (meshIndex, submesh);
+    CalRenderer* render = meshobj->calModel.getRenderer();
+    CalMesh* calMesh = meshobj->calModel.getMesh (mesh);
 
-    render->getNormals (normalLock.Lock() + vertOffs * 3);
+    csRenderBufferLock<float> normalLock (normal_buffer);
 
-    vertOffs += render->getVertexCount();
+    int vertOffs = 0;
+    for (int submesh = 0; submesh < calMesh->getSubmeshCount();
+      submesh++)
+    {
+      render->selectMeshSubmesh ((int)MeshIndex(), submesh);
+
+      render->getNormals (normalLock.Lock() + vertOffs * 3);
+
+      vertOffs += render->getVertexCount();
+    }
+
+    normalVersion = meshobj->meshVersion;
+  }
+}
+
+void csSpriteCal3DMeshObject::MeshAccessor::UpdateBinormals (csRenderBufferHolder* holder)
+{
+  if (binormal_buffer == 0)
+  {
+    binormal_buffer = csRenderBuffer::CreateRenderBuffer (
+      vertexCount, CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 3);
+    holder->SetRenderBuffer (CS_BUFFER_BINORMAL, binormal_buffer);
   }
 
-  normalVersion = meshobj->meshVersion;
+  if (meshobj->meshVersion != binormalVersion)
+  {
+    UpdateNormals(holder);
+    UpdateTangents(holder);
+
+    CalRenderer* render = meshobj->calModel.getRenderer();
+    CalMesh* calMesh = meshobj->calModel.getMesh (mesh);
+
+    csRenderBufferLock<csVector3> normalLock (normal_buffer);
+    csRenderBufferLock<csVector3> binormalLock (binormal_buffer);
+    csRenderBufferLock<csVector4> tangentLock (tangent_buffer);
+
+    for (int submesh = 0; submesh < calMesh->getSubmeshCount(); submesh++)
+    {
+      render->selectMeshSubmesh ((int)MeshIndex(), submesh);
+
+      for (int vertex = 0; vertex < render->getVertexCount(); vertex++)
+      {
+        int idx = submesh * render->getVertexCount() + vertex;
+        binormalLock.Get(idx).Cross(normalLock.Get(idx),
+          csVector3(tangentLock.Get(idx).x, tangentLock.Get(idx).y, tangentLock.Get(idx).z));
+        binormalLock.Get(idx) *= tangentLock.Get(idx).w;
+      }
+    }
+
+    binormalVersion = meshobj->meshVersion;
+  }
+}
+
+void csSpriteCal3DMeshObject::MeshAccessor::UpdateTangents (csRenderBufferHolder* holder)
+{
+  if (tangent_buffer == 0)
+  {
+    tangent_buffer = csRenderBuffer::CreateRenderBuffer (
+      vertexCount, CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT, 4);
+    holder->SetRenderBuffer (CS_BUFFER_TANGENT, tangent_buffer);
+  }
+
+  if (meshobj->meshVersion != tangentVersion)
+  {
+    CalRenderer* render = meshobj->calModel.getRenderer();
+    CalMesh* calMesh = meshobj->calModel.getMesh (mesh);
+
+    csRenderBufferLock<float> tangentLock (tangent_buffer);
+
+    int vertOffs = 0;
+    for (int submesh = 0; submesh < calMesh->getSubmeshCount(); submesh++)
+    {
+      render->selectMeshSubmesh ((int)MeshIndex(), submesh);
+
+      if(!render->isTangentsEnabled(0))
+      {
+        calMesh->getSubmesh(submesh)->enableTangents(0, true);
+      }
+
+      render->getTangentSpaces (0, tangentLock.Lock() + vertOffs * 4);
+
+      vertOffs += render->getVertexCount();
+    }
+
+    tangentVersion = meshobj->meshVersion;
+  }
 }
 
 void csSpriteCal3DMeshObject::MeshAccessor::PreGetBuffer 
   (csRenderBufferHolder* holder, csRenderBufferName buffer)
 {
-  if (!holder) return;
-  if (buffer == CS_BUFFER_POSITION)
+  if (!holder)
+    return;
+
+  switch(buffer)
   {
-    holder->SetRenderBuffer (CS_BUFFER_POSITION, 
-    meshobj->GetVertexBufferCal (mesh, 0));
-  }
-  else if (buffer == CS_BUFFER_COLOR)
-  {
-    if (meshobj->meshVersion != colorVersion)
+  case CS_BUFFER_POSITION:
     {
-      CalRenderer* render = meshobj->calModel.getRenderer();
-      CalMesh* calMesh = meshobj->calModel.getMesh (mesh);
-
-      int submesh;
-      if (color_buffer == 0)
-      {
-        color_buffer = csRenderBuffer::CreateRenderBuffer (
-          vertexCount, CS_BUF_DYNAMIC,
-          CS_BUFCOMP_FLOAT, 3);
-      }
-
-      render->beginRendering();
-
-      int meshIndex = (int)MeshIndex();
-      if (meshobj->meshVersion != normalVersion)
-        UpdateNormals (render, meshIndex, calMesh, (size_t)vertexCount);
-
-      csRenderBufferLock<float> normalLock (normal_buffer);
-      csRenderBufferLock<float> colorLock (color_buffer);
-
-      int vertOffs = 0;
-      for (submesh = 0; submesh < calMesh->getSubmeshCount();
-        submesh++)
-      {
-        render->selectMeshSubmesh (meshIndex, submesh);
-
-        const csArray<iLightSectorInfluence*>& relevant_lights =
-        meshobj->factory->light_mgr->GetRelevantLights (
-          meshobj->logparent, -1, false);
-
-        meshobj->UpdateLightingSubmesh (relevant_lights, 
-                    movable,
-                    render,
-                    mesh,
-                    submesh,
-                    normalLock.Lock() + vertOffs * 3, 
-                    (csColor*)(colorLock.Lock() + vertOffs * 3));
-
-        vertOffs += render->getVertexCount();
-      }
-      render->endRendering();
-
-      colorVersion = meshobj->meshVersion;
+      holder->SetRenderBuffer (CS_BUFFER_POSITION, 
+        meshobj->GetVertexBufferCal (mesh, 0));
     }
-
-    holder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
-  }
-  else if (buffer == CS_BUFFER_NORMAL)
-  {
-    if (meshobj->meshVersion != normalVersion)
+  case CS_BUFFER_NORMAL:
     {
-      CalRenderer* render = meshobj->calModel.getRenderer();
-      CalMesh* calMesh = meshobj->calModel.getMesh (mesh);
-
-      render->beginRendering();
-      UpdateNormals (render, (int)MeshIndex(), calMesh, (size_t)vertexCount);
-      render->endRendering();
+      UpdateNormals (holder);
+      break;
     }
-
-    holder->SetRenderBuffer (CS_BUFFER_NORMAL, normal_buffer);
+  case CS_BUFFER_TANGENT:
+    {
+      UpdateTangents (holder);
+      break;
+    }
+  case CS_BUFFER_BINORMAL:
+    {
+      UpdateBinormals (holder);
+      break;
+    }
+  default:
+    {
+      meshobj->factory->DefaultGetBuffer (mesh, holder, buffer);
+      break;
+    }
   }
-  else
-    meshobj->factory->DefaultGetBuffer (mesh, holder, buffer);
 }
 
 //---------------------------csCal3dSkeleton---------------------------

@@ -25,19 +25,23 @@
 
 void csLightShaderVarCache::ClearDefVars ()
 {
-  for (size_t n = 0; n < _varCount; n++) defaultVars[n] = csInvalidStringID;
+  for (size_t n = 0; n < _varCount; n++)
+    defaultVars[n] = CS::InvalidShaderVarStringID;
+  for (size_t n = 0; n < _lightCount; n++)
+    lightSVIdCache_unnumbered[n] = CS::InvalidShaderVarStringID;
 }
 
-void csLightShaderVarCache::SetStrings (iStringSet* strings)
+void csLightShaderVarCache::SetStrings (iShaderVarStringSet* strings)
 {
   lightSVIdCache.DeleteAll ();
   ClearDefVars();
   this->strings = strings;
 }
   
-csStringID csLightShaderVarCache::GetLightSVId (size_t num, LightProperty prop)
+namespace
 {
-  static const char* const svSuffixes[_lightCount] = {
+  static const char* const svSuffixes[csLightShaderVarCache::_lightCount] =
+  {
     "diffuse",
     "specular",
     "position object",
@@ -45,6 +49,7 @@ csStringID csLightShaderVarCache::GetLightSVId (size_t num, LightProperty prop)
     "position world",
     "transform",
     "transform world",
+    "transform world inverse",
     "attenuation",
     "attenuationtex",
     "direction object",
@@ -53,10 +58,15 @@ csStringID csLightShaderVarCache::GetLightSVId (size_t num, LightProperty prop)
     "inner falloff",
     "outer falloff",
     "type",
-    "attenuation mode"
+    "attenuation mode",
+    "shadow map projection",
+    "shadow map pixel size"
   };
+}
 
-  if (!strings.IsValid()) return csInvalidStringID;
+CS::ShaderVarStringID csLightShaderVarCache::GetLightSVId (size_t num, LightProperty prop)
+{
+  if (!strings.IsValid()) return CS::InvalidShaderVarStringID;
   
   if (num >= lightSVIdCache.GetSize())
   {
@@ -77,14 +87,28 @@ csStringID csLightShaderVarCache::GetLightSVId (size_t num, LightProperty prop)
   return lightSVIdCache[num].ids[prop];
 }
 
-csStringID csLightShaderVarCache::GetDefaultSVId (DefaultSV var)
+CS::ShaderVarStringID csLightShaderVarCache::GetLightSVId (LightProperty prop)
+{
+  if (!strings.IsValid()) return CS::InvalidShaderVarStringID;
+
+  if (lightSVIdCache_unnumbered[prop] == csInvalidStringID)
+  {
+    csString str;
+    str.Format ("light %s", svSuffixes[prop]);
+    lightSVIdCache_unnumbered[prop] = strings->Request (str);
+  }
+  
+  return lightSVIdCache_unnumbered[prop];
+}
+
+CS::ShaderVarStringID csLightShaderVarCache::GetDefaultSVId (DefaultSV var)
 {
   static const char* const svNames[_varCount] = {
     "light ambient",
     "light count"
   };
   
-  if (!strings.IsValid()) return csInvalidStringID;
+  if (!strings.IsValid()) return CS::InvalidShaderVarStringID;
 
   if (defaultVars[var] == csInvalidStringID)
   {
