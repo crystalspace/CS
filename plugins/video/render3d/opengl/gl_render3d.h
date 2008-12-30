@@ -651,6 +651,11 @@ public:
   /// Do backbuffer printing
   void Print (csRect const* area);
 
+  /// Pseudo-instancing 
+  void SetupInstance (size_t instParamNum, const csVertexAttrib targets[],  
+    csShaderVariable* const params[]); 
+  void TeardownInstance (size_t instParamNum, const csVertexAttrib targets[]); 
+
   /// Drawroutine. Only way to draw stuff
   void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
     const CS::Graphics::RenderMeshModes& modes,

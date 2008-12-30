@@ -631,6 +631,18 @@ public:
     ShaderVarArray->Put (element, variable);
   }
 
+  /** 
+   * Find a specific element in an array variable. 
+   * \return The index of the found element, or csArrayItemNotFound if not found. 
+   */ 
+  size_t FindArrayElement (const csRef<csShaderVariable>& sv) 
+  { 
+    if (ShaderVarArray == 0) 
+      return csArrayItemNotFound; 
+    else 
+      return ShaderVarArray->Find (sv); 
+  } 
+
 private:
   CS::ShaderVarStringID Name;
   VariableType Type;

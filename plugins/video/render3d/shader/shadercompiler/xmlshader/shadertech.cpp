@@ -67,9 +67,18 @@ struct CachedPlugins
   CachedPlugin fp, vp, vproc;
 };
 
+CS_IMPLEMENT_STATIC_CLASSVAR_REF (csXMLShaderTech, instParamsTargets,  
+                                  GetInstParamsTargets, csDirtyAccessArray<csVertexAttrib>, ()); 
+CS_IMPLEMENT_STATIC_CLASSVAR_REF (csXMLShaderTech, instParams, GetInstParams, 
+                                  csDirtyAccessArray<csShaderVariable*>, ()); 
+CS_IMPLEMENT_STATIC_CLASSVAR_REF (csXMLShaderTech, instParamPtrs,  
+                                  GetInstParamPtrs, csDirtyAccessArray<csShaderVariable**>, ()); 
+CS_IMPLEMENT_STATIC_CLASSVAR_REF (csXMLShaderTech, instOuterVar,  
+                                  GetInstOuterVars, csArray<csShaderVariable*>, ()); 
+
 csXMLShaderTech::csXMLShaderTech (csXMLShader* parent) : 
-  passes(0), passesCount(0), currentPass((size_t)~0),
-  xmltokens (parent->compiler->xmltokens)
+passes(0), passesCount(0), currentPass((size_t)~0),
+xmltokens (parent->compiler->xmltokens)
 {
   csXMLShaderTech::parent = parent;
 
@@ -84,6 +93,83 @@ csXMLShaderTech::~csXMLShaderTech()
 static inline bool IsDestalphaMixmode (uint mode)
 {
   return (mode == CS_FX_DESTALPHAADD);
+}
+
+csVertexAttrib csXMLShaderTech::ParseVertexAttribute (const char* dest,
+                                                      iShaderDestinationResolver* resolveVP, iShaderDestinationResolver* resolveFP)
+{
+  csVertexAttrib attrib = CS_VATTRIB_INVALID;
+  int i;
+  for(i=0;i<16;i++)
+  {
+    csString str;
+    str.Format ("attribute %d", i);
+    if (strcasecmp(str, dest)==0)
+    {
+      attrib = (csVertexAttrib)(CS_VATTRIB_0 + i);
+      break;
+    }
+  }
+  if (attrib == CS_VATTRIB_INVALID)
+  {
+    if (strcasecmp (dest, "position") == 0)
+    {
+      attrib = CS_VATTRIB_POSITION;
+    }
+    else if (strcasecmp (dest, "normal") == 0)
+    {
+      attrib = CS_VATTRIB_NORMAL;
+    }
+    else if (strcasecmp (dest, "color") == 0)
+    {
+      attrib = CS_VATTRIB_COLOR;
+    }
+    else if (strcasecmp (dest, "primary color") == 0)
+    {
+      attrib = CS_VATTRIB_PRIMARY_COLOR;
+    }
+    else if (strcasecmp (dest, "secondary color") == 0)
+    {
+      attrib = CS_VATTRIB_SECONDARY_COLOR;
+    }
+    else if (strcasecmp (dest, "texture coordinate") == 0)
+    {
+      attrib = CS_VATTRIB_TEXCOORD;
+    }
+    else if (strcasecmp (dest, "matrix object2world") == 0)
+    {
+      attrib = CS_IATTRIB_OBJECT2WORLD;
+    }
+    else
+    {
+      static const char mapName[] = "texture coordinate ";
+      if (strncasecmp (dest, mapName, sizeof (mapName) - 1) == 0)
+      {
+        const char* target = dest + sizeof (mapName) - 1;
+
+        int texUnit = 
+          resolveFP ? resolveFP->ResolveTU (target) : -1;
+        if (texUnit >= 0)
+        {
+          attrib = (csVertexAttrib)((int)CS_VATTRIB_TEXCOORD0 + texUnit);
+        }
+        else
+        {
+          char dummy;
+          if (sscanf (target, "%d%c", &texUnit, &dummy) == 1)
+          {
+            attrib = (csVertexAttrib)((int)CS_VATTRIB_TEXCOORD0 + texUnit);
+          }
+        }
+      }
+      else
+      {
+        attrib = resolveVP ? resolveVP->ResolveBufferDestination (dest) : 
+          CS_VATTRIB_INVALID;
+      }
+    }
+  }
+  return attrib;
 }
 
 struct csXMLShaderTech::LoadHelpers
@@ -213,6 +299,43 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
 
   //get texturemappings
   if (result && !ParseTextures (*pass, node, hlp, resolveFP)) result = false;
+
+  // Load pseudo-instancing binds
+  csRef<iDocumentNodeIterator> it = node->GetNodes (xmltokens.Request (
+    csXMLShaderCompiler::XMLTOKEN_INSTANCEPARAM));
+  while(it->HasNext ())
+  {
+    csRef<iDocumentNode> mapping = it->Next ();
+    if (mapping->GetType () != CS_NODE_ELEMENT) continue;
+
+    const char* dest = mapping->GetAttributeValue ("destination");
+    csVertexAttrib attrib = ParseVertexAttribute (dest, resolveVP, resolveFP);
+    if (attrib > CS_VATTRIB_INVALID)
+    {
+      const char *source = mapping->GetAttributeValue ("source");
+      if (source == 0)
+      {
+        SetFailReason ("invalid instanceparam, source missing.");
+        return false;
+      }
+
+      ShaderPass::InstanceMapping map;
+      map.variable = hlp.stringsSvName->Request (source);
+      map.destination = attrib;
+
+      pass->instances_binds.Push (map);
+    }
+    else
+    {
+      if (attrib != CS_VATTRIB_UNUSED)
+      {
+        parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+          "Shader '%s', pass %d: invalid instanceparam destination '%s'",
+          parent->GetName (), GetPassNumber (pass), dest);
+      }
+    }
+  }
+  pass->instances_binds.ShrinkBestFit ();
   
   if (cacheTo)
   {
@@ -552,87 +675,11 @@ bool csXMLShaderTech::ParseBuffers (ShaderPassPerTag& pass, int passNum,
   {
     csRef<iDocumentNode> mapping = it->Next ();
     if (mapping->GetType () != CS_NODE_ELEMENT) continue;
-    
-    const char* dest = mapping->GetAttributeValue ("destination");
-    csVertexAttrib attrib = CS_VATTRIB_INVALID;
-    bool found = false;
-    int i;
-    for(i=0;i<16;i++)
-    {
-      csString str;
-      str.Format ("attribute %d", i);
-      if (strcasecmp(str, dest)==0)
-      {
-        found = true;
-        attrib = (csVertexAttrib)(CS_VATTRIB_0 + i);
-        break;
-      }
-    }
-    if (!found)
-    {
-      if (strcasecmp (dest, "position") == 0)
-      {
-        attrib = CS_VATTRIB_POSITION;
-        found = true;
-      }
-      else if (strcasecmp (dest, "normal") == 0)
-      {
-        attrib = CS_VATTRIB_NORMAL;
-        found = true;
-      }
-      else if (strcasecmp (dest, "color") == 0)
-      {
-        attrib = CS_VATTRIB_COLOR;
-        found = true;
-      }
-      else if (strcasecmp (dest, "primary color") == 0)
-      {
-        attrib = CS_VATTRIB_PRIMARY_COLOR;
-        found = true;
-      }
-      else if (strcasecmp (dest, "secondary color") == 0)
-      {
-        attrib = CS_VATTRIB_SECONDARY_COLOR;
-        found = true;
-      }
-      else if (strcasecmp (dest, "texture coordinate") == 0)
-      {
-        attrib = CS_VATTRIB_TEXCOORD;
-        found = true;
-      }
-      else
-      {
-	static const char mapName[] = "texture coordinate ";
-	if (strncasecmp (dest, mapName, sizeof (mapName) - 1) == 0)
-	{
-	  const char* target = dest + sizeof (mapName) - 1;
 
-	  int texUnit = 
-	    resolveFP ? resolveFP->ResolveTU (target) : -1;
-	  if (texUnit >= 0)
-	  {
-	    attrib = (csVertexAttrib)((int)CS_VATTRIB_TEXCOORD0 + texUnit);
-	    found = true;
-	  }
-	  else
-	  {
-	    char dummy;
-	    if (sscanf (target, "%d%c", &texUnit, &dummy) == 1)
-	    {
-	      attrib = (csVertexAttrib)((int)CS_VATTRIB_TEXCOORD0 + texUnit);
-	      found = true;
-	    }
-	  }
-	}
-	else
-	{
-	  attrib = resolveVP ? resolveVP->ResolveBufferDestination (dest) : 
-	    CS_VATTRIB_INVALID;
-          found = (attrib > CS_VATTRIB_INVALID);
-	}
-      }
-    }
-    if (found)
+    const char* dest = mapping->GetAttributeValue ("destination");
+    csVertexAttrib attrib = ParseVertexAttribute (dest, resolveVP, resolveFP); 
+    if ((attrib > CS_VATTRIB_INVALID) 
+      && (CS_VATTRIB_IS_SPECIFIC (attrib) || CS_VATTRIB_IS_GENERIC (attrib))) 
     {
       const char* cname = mapping->GetAttributeValue("customsource");
       const char *source = mapping->GetAttributeValue ("source");
@@ -655,7 +702,6 @@ bool csXMLShaderTech::ParseBuffers (ShaderPassPerTag& pass, int passNum,
 
         CS::ShaderVarStringID varID = h.stringsSvName->Request (cname);
         pass.custommapping_id.Push (varID);
-        //pass->bufferGeneric[pass->bufferCount] = CS_VATTRIB_IS_GENERIC (attrib);
 
         pass.custommapping_attrib.Push (attrib);
 	pass.custommapping_buffer.Push (CS_BUFFER_NONE);
@@ -670,8 +716,7 @@ bool csXMLShaderTech::ParseBuffers (ShaderPassPerTag& pass, int passNum,
           return false;
         }
         
-	if ((attrib >= CS_VATTRIB_SPECIFIC_FIRST)
-	  && (attrib <= CS_VATTRIB_SPECIFIC_LAST))
+  if (CS_VATTRIB_IS_SPECIFIC (attrib))
 	  pass.defaultMappings[attrib] = sourceName;
 	else
 	{
@@ -688,8 +733,7 @@ bool csXMLShaderTech::ParseBuffers (ShaderPassPerTag& pass, int passNum,
     }
     else
     {
-      if ((attrib == CS_VATTRIB_INVALID)
-        && parent->compiler->do_verbose)
+      if (attrib != CS_VATTRIB_UNUSED && parent->compiler->do_verbose)
       {
         parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
 	  "Shader '%s', pass %d: invalid buffer destination '%s'",
@@ -1013,16 +1057,16 @@ bool csXMLShaderTech::ReadPass (ShaderPass* pass,
 	!= sizeof (diskFlags)) return false;
     uint32 cacheFlags = csLittleEndian::UInt32 (diskFlags);
   
-    pass->wmRed = cacheFlags & (1 << cacheFlagWMR);
-    pass->wmGreen = cacheFlags & (1 << cacheFlagWMG);
-    pass->wmBlue = cacheFlags & (1 << cacheFlagWMB);
-    pass->wmAlpha = cacheFlags & (1 << cacheFlagWMA);
+    pass->wmRed = (cacheFlags & (1 << cacheFlagWMR)) != 0;
+    pass->wmGreen = (cacheFlags & (1 << cacheFlagWMG)) != 0;
+    pass->wmBlue = (cacheFlags & (1 << cacheFlagWMB)) != 0;
+    pass->wmAlpha = (cacheFlags & (1 << cacheFlagWMA)) != 0;
     
-    pass->overrideZmode = cacheFlags & (1 << cacheFlagOverrideZ);
-    pass->flipCulling = cacheFlags & (1 << cacheFlagFlipCulling);
-    pass->zoffset = cacheFlags & (1 << cacheFlagZoffset);
+    pass->overrideZmode = (cacheFlags & (1 << cacheFlagOverrideZ)) != 0;
+    pass->flipCulling = (cacheFlags & (1 << cacheFlagFlipCulling)) != 0;
+    pass->zoffset = (cacheFlags & (1 << cacheFlagZoffset)) != 0;
     
-    pass->alphaMode.autoAlphaMode = cacheFlags & (1 << cacheFlagAlphaAuto);
+    pass->alphaMode.autoAlphaMode = (cacheFlags & (1 << cacheFlagAlphaAuto)) != 0;
   }
   
   {
@@ -1843,6 +1887,9 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   if(thispass->vp) thispass->vp->SetupState (mesh, modes, stack);
   if(thispass->fp) thispass->fp->SetupState (mesh, modes, stack);
 
+  // pseudo instancing setup
+  SetupInstances (modes, thispass, stack);
+
   return true;
 }
 
@@ -1855,6 +1902,72 @@ bool csXMLShaderTech::TeardownPass ()
   if(thispass->fp) thispass->fp->ResetState ();
 
   return true;
+}
+
+void csXMLShaderTech::SetupInstances (csRenderMeshModes& modes, 
+                                      ShaderPass *thispass,
+                                      const csShaderVariableStack& stack)
+{
+  const csArray<ShaderPass::InstanceMapping>& instances_binds =
+    thispass->instances_binds;
+  if (instances_binds.GetSize() == 0)
+  {
+    modes.doInstancing = false;
+    return;
+  }
+
+  size_t numVars = 0;
+  size_t numInsts = 0;
+  GetInstParamsTargets().Empty ();
+  GetInstOuterVars().Empty ();
+
+  // Pass one: collect number of instances, SVs per instance
+  for (size_t i = 0; i < instances_binds.GetSize(); i++)
+  {
+    csShaderVariable* var = 0;
+    var = csGetShaderVariableFromStack (stack, instances_binds[i].variable);
+    GetInstOuterVars().Push (var);
+    if (var == 0) continue;
+    size_t varElems = 1;
+    if (var->GetType() == csShaderVariable::ARRAY)
+    {
+      varElems = var->GetArraySize();
+    }
+    if (varElems == 0) continue;
+    GetInstParamsTargets().Push (instances_binds[i].destination);
+    numInsts = csMax (varElems, numInsts);
+    numVars++;
+  }
+
+  // Pass two: fill arrays
+  GetInstParams().SetSize (numInsts * numVars);
+  GetInstParamPtrs().SetSize (numInsts);
+  size_t svPos = 0;
+  for (size_t instNum = 0; instNum < numInsts; instNum++)
+  {
+    GetInstParamPtrs()[instNum] = 
+      GetInstParams().GetArray() + svPos;
+    for (size_t i = 0; i < instances_binds.GetSize(); i++)
+    {
+      csShaderVariable* var = GetInstOuterVars()[i];
+      if (var == 0) continue;
+
+      if (var->GetType() == csShaderVariable::ARRAY)
+      {
+        size_t varElems = var->GetArraySize();
+        size_t n = csMin (varElems, instNum);
+        var = var->GetArrayElement (n);
+      }
+      GetInstParams()[svPos] = var;
+      svPos++;
+    }
+  }
+
+  modes.instParamNum = numVars;
+  modes.instParamsTargets = GetInstParamsTargets().GetArray(); 
+  modes.instanceNum = numInsts;
+  modes.instParams = GetInstParamPtrs().GetArray();
+  modes.doInstancing = true;
 }
 
 void csXMLShaderTech::GetUsedShaderVars (csBitArray& bits) const
