@@ -993,7 +993,12 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadPassFromCache (
   csRef<iDataBuffer> perTagData = cache->ReadCache (
     csString().Format ("/pass%ddata/%s_%s_%s", GetPassNumber (pass),
       tagFP.GetDataSafe(), tagVP.GetDataSafe(), tagVPr.GetDataSafe()));
-  if (!perTagData.IsValid()) return iShaderProgram::loadFail;
+  if (!perTagData.IsValid())
+  {
+    SetFailReason("Per tag data failed to be read from cache.");
+    return iShaderProgram::loadFail;
+  }
+
   csMemFile perTagCacheFile (perTagData, true);
   if (!ReadPassPerTag (*pass, &perTagCacheFile))
     return iShaderProgram::loadFail;
@@ -1602,7 +1607,11 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadFromCache (
   iHierarchicalCache* cache, iDocumentNode* parentSV, size_t variant)
 {
   csRef<iDataBuffer> cacheData (cache->ReadCache ("/passes"));
-  if (!cacheData.IsValid()) return iShaderProgram::loadFail;
+  if (!cacheData.IsValid())
+  {
+    SetFailReason("Failed to load cache data from '/passes'");
+    return iShaderProgram::loadFail;
+  }
 
   csMemFile cacheFile (cacheData, true);
   
