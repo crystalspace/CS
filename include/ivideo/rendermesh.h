@@ -80,7 +80,7 @@ namespace Graphics
    */
   struct RenderMeshModes
   {
-    RenderMeshModes () : z_buf_mode (CS_ZBUF_NONE), mixmode (CS_FX_COPY),
+    RenderMeshModes () : z_buf_mode ((csZBufMode)~0), mixmode (CS_FX_COPY),
       renderPrio (-1), flipCulling (false), cullMode (cullNormal),
       alphaType (csAlphaMode::alphaNone), zoffset (false), doInstancing (false)
     {
