@@ -30,12 +30,13 @@
 	but also provide "default" snippets and thus does not require users
 	of this snippets to provide all aliases.
       -->
+    <alias name="position" weak="yes" file="/shader/snippets/position.xml" />
     <alias name="surface" weak="yes" file="/shader/snippets/surface/surface-classic.xml" />
     <alias name="specular" weak="yes" file="/shader/snippets/surface/specular-weirdold.xml" />
     <alias name="staticspecular" weak="yes" file="/shader/snippets/lighting/staticspec-default.xml" />
     
     <!-- Snippets - the building blocks of this shader. -->
-    <snippet id="position" file="/shader/snippets/position.xml" />
+    <snippet id="position" filealias="position" />
     <snippet id="parallax" file="/shader/snippets/surface/parallax.xml" />
     <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
     <snippet id="surface" filealias="surface" />
