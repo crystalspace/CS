@@ -883,13 +883,14 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
 
 void csMeshGenerator::AllocateBlocks (const csVector3& pos)
 {
-  //if (setup_cells)
-    //if (pos.x == last_pos.x && pos.z == last_pos.y)
-      //return;
   csVector3 delta = pos - last_pos;
+  if(delta.IsZero())
+  {
+    return;
+  }
+
   last_pos = pos;
   SetupSampleBox ();
-  //printf ("positions=%d\n", CountAllPositions ()); fflush (stdout);
 
   for (size_t i = 0 ; i < geometries.GetSize () ; i++) 
   { 
