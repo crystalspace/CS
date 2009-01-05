@@ -52,6 +52,7 @@
       <varying type="position4" name="position_object"/>
       <varying type="position4" name="position_world"/>
       <varying type="position4" name="position_camera"/>
+      <varying type="float3x4" name="o2w"/>
     </block>
     
     <block location="cg:clips">
@@ -61,6 +62,10 @@
       </clip>
     </block>
   
+    <block location="cg:definitions">
+      <?Include /shader/snippets/cg-global_objectToWorld.cginc?>
+    </block>
+	
     <block location="cg:vertexMain">
       position_world = mul (instancingTransforms, Hposition);
       position_object = Hposition;
@@ -68,12 +73,25 @@
       position_camera = mul (ModelView, position_world);
       
       APPLY_CLIPPING_VP(position_camera, position_world, position_object);
+      
+      /* The objectToWorld transform is needed in other places, so there is a 
+	 global variable for it. Set that */
+      SetGlobalObjectToWorld (instancingTransforms);
+      // instanced params are only available in VPs, forward to FP manually
+      o2w = float3x4(instancingTransforms[0],
+	instancingTransforms[1], 
+	instancingTransforms[2]);
     </block>
     
     <block location="cg:fragmentMain">
       APPLY_CLIPPING_FP;
       
       position = position_screen;
+      
+      /* The objectToWorld transform is needed in other places, so there is a 
+	 global variable for it. Set that */
+      SetGlobalObjectToWorld (
+	float4x4 (o2w[0], o2w[1], o2w[2], float4 (0, 0, 0, 1)));
     </block>
     
     <output name="position" type="position4_screen" />

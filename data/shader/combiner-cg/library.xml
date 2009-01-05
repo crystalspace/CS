@@ -249,8 +249,6 @@
   </coercion>
   
   <coercion from="normal_object" to="normal_world" cost="3">
-    <input file="/shader/combiner-cg/objectToWorld.inp" private="yes" />
-    
     <block location="vertexMain">
       output =  mul (objectToWorld, float4 (input, 0)).xyz;
     </block>

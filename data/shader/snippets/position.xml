@@ -43,7 +43,30 @@
     </input>
     <input file="/shader/snippets/ModelView.inp" private="yes" />
 
-    <input file="/shader/snippets/objectToWorld.inp" private="yes" />
+    <input name="objectToWorld" type="float4x4" default="complex" private="yes">
+      <block location="cg:vertexIn">
+	<uniform type="float4x4" name="objectToWorld" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="float4x4" name="objectToWorld" />
+      </block>
+      
+      <block location="cg:vertexMain">
+	objectToWorld = vertexIn.objectToWorld;
+      </block>
+
+      <block location="cg:fragmentMain">
+	objectToWorld = fragmentIn.objectToWorld;
+      </block>
+
+      <block location="cg:variablemap">
+	<variablemap variable="object2world transform" 
+	  destination="vertexIn.objectToWorld" />
+	<variablemap variable="object2world transform" 
+	  destination="fragmentIn.objectToWorld" />
+      </block>
+    </input>
 
     <block location="cg:vertexToFragment">
       <varying type="position4" name="position" binding="POSITION" />
@@ -65,6 +88,10 @@
       -posinv
     </block>
     
+    <block location="cg:definitions">
+      <?Include /shader/snippets/cg-global_objectToWorld.cginc?>
+    </block>
+	
     <block location="cg:vertexMain">
       position_object = Hposition;
       position_screen = position = mul (ModelViewProj, position_object);
@@ -72,11 +99,18 @@
       position_world = mul (objectToWorld, position_object);
       
       APPLY_CLIPPING_VP_POSINV(position_camera, position_world, position_object);
+
+      /* The objectToWorld transform is needed in other places, so there is a 
+	 global variable for it. Set that */
+      SetGlobalObjectToWorld (objectToWorld);
     </block>
     
     <block location="cg:fragmentMain">
       APPLY_CLIPPING_FP_POSINV;
       
+      /* The objectToWorld transform is needed in other places, so there is a 
+	 global variable for it. Set that */
+      SetGlobalObjectToWorld (objectToWorld);
       position = position_screen;
     </block>
     
