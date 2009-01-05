@@ -81,6 +81,7 @@
   INTERFACE_APPLY(iParticleBuiltinEmitterFactory)
   INTERFACE_APPLY(iParticleBuiltinEffectorForce)
   INTERFACE_APPLY(iParticleBuiltinEffectorLinColor)
+  INTERFACE_APPLY(iParticleBuiltinEffectorLinear)
   INTERFACE_APPLY(iParticleBuiltinEffectorFactory)
   INTERFACE_APPLY(iMeshObject)
   INTERFACE_APPLY(iMeshObjectFactory)
