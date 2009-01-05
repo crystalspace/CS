@@ -1811,7 +1811,7 @@ void csGLGraphics3D::SetupInstance (size_t instParamNum,
           if ((target >= CS_VATTRIB_TEXCOORD0) 
             && (target <= CS_VATTRIB_TEXCOORD7))
           {
-            size_t maxN = csMin (4, CS_VATTRIB_TEXCOORD7 - target + 1);
+            size_t maxN = csMin (3, numTCUnits - (target - CS_VATTRIB_TEXCOORD0));
             GLenum tu = GL_TEXTURE0 + (target - CS_VATTRIB_TEXCOORD0);
             for (size_t n = 0; n < maxN; n++)
             {
@@ -1823,7 +1823,7 @@ void csGLGraphics3D::SetupInstance (size_t instParamNum,
         {
           if (CS_VATTRIB_IS_GENERIC (target))
           {
-            size_t maxN = csMin (4, CS_VATTRIB_GENERIC_LAST - target + 1);
+            size_t maxN = csMin (3, CS_VATTRIB_GENERIC_LAST - target + 1);
             GLenum attr = (target - CS_VATTRIB_GENERIC_FIRST);
             for (size_t n = 0; n < maxN; n++)
             {
