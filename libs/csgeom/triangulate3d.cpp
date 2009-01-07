@@ -33,6 +33,8 @@ namespace CS
         clipPoly.Push(polygon[i]);
         originalIndices.Push(i);
       }
+
+      ClassifyVertices();
     }
 
     bool csEarClipper::IsConvex(const int index)
@@ -70,6 +72,8 @@ namespace CS
 
     void csEarClipper::ClassifyVertices()
     {
+      ears.DeleteAll();
+
       int length = (int)clipPoly.GetSize();
       isVertexReflex.SetSize(length);
 
@@ -87,6 +91,57 @@ namespace CS
           ears.Push(x);
         }
       }
+    }
+
+    bool csEarClipper::IsFinished()
+    {
+      if (clipPoly.GetSize() <= 3)
+      {
+        return true;
+      }
+
+      return false;
+    }
+
+    csVertexSet csEarClipper::ClipEar()
+    {
+      csVertexSet resultingSet;
+
+      // clip the first ear in ears
+      int earIndex = ears.Top();
+      ears.Pop();
+      
+      // get the index in the clip poly array of the ear
+      size_t indexInPoly = originalIndices[earIndex];
+
+      // this vertex is the one we want to remove
+      size_t indexToReturn = originalIndices[earIndex];
+
+      // build the set of vertices that make up the triangle we just
+      // clipped
+      int prevIndex = (int)earIndex - 1;
+      while (prevIndex < 0)
+      {
+        prevIndex += originalIndices.GetSize();
+      }
+
+      int nextIndex = earIndex + 1;
+      while (nextIndex >= (int)originalIndices.GetSize())
+      {
+        nextIndex -= originalIndices.GetSize();
+      }
+
+      resultingSet.Push(originalIndices[prevIndex]);
+      resultingSet.Push(indexToReturn);
+      resultingSet.Push(originalIndices[nextIndex]);
+
+      // now, remove the ear and reclassify the vertices
+      clipPoly.DeleteIndex(indexInPoly);
+      originalIndices.DeleteIndex(indexInPoly);
+
+      ClassifyVertices();
+
+      return resultingSet;
     }
 
     bool Triangulate3D::Process(csContour3& polygon, csTriangleMesh& result)
@@ -179,7 +234,38 @@ namespace CS
       // step.
 
       // utilize a csEarClipper data structure and remove all of the ears from it
+      csEarClipper clipper(planarPolygon);
 
+      while (!clipper.IsFinished())
+      {
+        // grab the next index of the vertex to be clipped
+        csVertexSet clippedTri = clipper.ClipEar();
+
+        // connect the vertices to the left and right of this index
+        size_t leftIndex = clippedTri.Get(0);
+        size_t earIndex = clippedTri.Get(1);
+        size_t rightIndex = clippedTri.Get(2);
+
+        // do a check, just to make sure that the polygon is sided
+        // correctly
+        if (leftIndex > rightIndex)
+        {
+          result.AddTriangle(leftIndex, earIndex, rightIndex);
+        }
+
+        else
+        {
+          result.AddTriangle(rightIndex, earIndex, leftIndex);
+        }
+      }
+
+      // if we're done, then make sure to add the remainder to
+      // the triangle mesh
+      int firstIndex = clipper.GetOriginalIndex(0);
+      int secondIndex = clipper.GetOriginalIndex(1);
+      int thirdIndex = clipper.GetOriginalIndex(2);
+
+      result.AddTriangle(firstIndex, secondIndex, thirdIndex);
 
       // @@@FIXME: Finish implementing.
       return true;
