@@ -884,10 +884,6 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
 void csMeshGenerator::AllocateBlocks (const csVector3& pos)
 {
   csVector3 delta = pos - last_pos;
-  if(delta.IsZero())
-  {
-    return;
-  }
 
   last_pos = pos;
   SetupSampleBox ();
