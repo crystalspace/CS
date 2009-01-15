@@ -82,8 +82,6 @@ if $(CEGUI.AVAILABLE) = "yes"
       stdpt
       stdrep
       terrainldr
-      thing
-      thingldr
       vproc_std
       xmlread
       xmlshader
@@ -123,16 +121,6 @@ if $(CEGUI.AVAILABLE) = "yes"
       if $(TARGET.OS) = "MACOS_X" { VIEWMESH.PLUGINLIST += glosx2d ; }
 
       if $(CG.AVAILABLE) = "yes" { VIEWMESH.PLUGINLIST += glshader_cg ; }
-    }
-    else
-    {
-      VIEWMESH.PLUGINLIST += soft3d softshader ;
-
-      # Software canvases.
-      if $(X11.AVAILABLE) = "yes" { VIEWMESH.PLUGINLIST += x2d ; }
-      if $(DIRECTX.AVAILABLE) = "yes" { VIEWMESH.PLUGINLIST += ddraw2d ; }
-      if $(TARGET.OS) = "MACOS_X" { VIEWMESH.PLUGINLIST += cgdriver2d ; }
-      #if $(LIBCACA.AVAILABLE) = "yes" { VIEWMESH.PLUGINLIST += cacacanvas ; }
     }
 
     LinkStaticPlugins viewmesh_static : $(VIEWMESH.PLUGINLIST) ;
