@@ -147,7 +147,13 @@ rule RelayLFlags
   else
   {
     local relayparamslist = "--relay $(2)" ;
-    local lflags = $(1) ;
+    local lflags = $(1[1]) ;
+    # Concatenate arrays into single strings
+    local lf ;
+    for lf in $(1[2-])
+    {
+      lflags = "$(lflags) $(lf)" ;
+    }
     local relayparam = $(relayparamslist[1]) ;
     local r ;
     for r in $(relayparamslist[2-])
