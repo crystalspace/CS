@@ -382,6 +382,7 @@ rule StaticPluginLibrary
   # Write out needed CFLAGS, LFLAGS
   STATICPLUGINS.DEPENDENCIES = $(name).jam ;
   MakeLocate $(STATICPLUGINS.DEPENDENCIES) : $(LOCATE.OBJECTS)/libs ;
+  SEARCH on $(STATICPLUGINS.DEPENDENCIES) = $(LOCATE.OBJECTS)/libs ;
   for t in $(targets)
   {
     WriteDependencies $(STATICPLUGINS.DEPENDENCIES) : $(t) : $(name) ;
@@ -396,6 +397,9 @@ rule StaticPluginLibrary
   Depends install_staticplugins : 
     [ DoInstall $(STATICPLUGINS.DEPENDENCIES) : $(libdir) ] ;
   Depends install_staticplugins : install_libs ;
+  
+  Depends filelists : [ DoFileListEntries [ ConstructLibraryTarget $(name) ] : : libs-staticplugins ] ;
+  Depends filelists : [ DoFileListEntries $(STATICPLUGINS.DEPENDENCIES) : : libs-staticplugins ] ;
     
   INSTALLEDLIBS_OPTIONAL += $(name) ;
   
