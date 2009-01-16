@@ -210,9 +210,8 @@ rule RelayLibs
   {
     ExtraObjects $(<) : [ RelayObjs $(<) : $(3) : $(2) ] ;
     CFlags $(<) : $($(extlib).CFLAGS) ;
-    LFlags $(<) : [ RelayLFlags $($(extlib).LFLAGS) : $(3) ] ;
+    LFlags $(<) : [ RelayLFlags $($(extlib).LFLAGS) : $(3) ] : noexternal ;
     
-    $(<).EXTERNALLIBS += $(extlib) ;
     $(<).RELAYDEPS += $(extlib) ;
     $(<).RELAYLIBS.$(extlib) = $(3) ;
   }
