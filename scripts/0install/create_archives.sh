@@ -13,6 +13,6 @@ $csbindir/archive-from-lists.sh crystalspace-libs-$CSVER libs-shared@lib
 # SDKs: we need to lump everything together
 # splitting things over multiple feeds works, but is less robust
 # (e.g. cs-config won't find the libs dir when invoked w/o 0launch)
-SDK_LISTS="libs-static@lib libs-shared@lib cs-config@bin headers@include headers-platform@include"
+SDK_LISTS="libs-static@lib libs-shared@lib cs-config@bin bin-tool@bin headers@include headers-platform@include"
 $csbindir/archive-from-lists.sh crystalspace-sdk-$CSVER $SDK_LISTS
 $csbindir/archive-from-lists.sh crystalspace-sdk-staticplugins-$CSVER $SDK_LISTS libs-staticplugins@lib
