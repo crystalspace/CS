@@ -97,6 +97,7 @@ fi
 CS_VERSION=$(PACKAGE_VERSION_SIGNIFICANT)
 CRYSTAL="\${CRYSTAL-$(prefix)\$PATH_SEPARATOR.}"
 CRYSTAL_$(ENV_VERSION)="\${CRYSTAL_$(ENV_VERSION)-\$CRYSTAL}"
+_CRYSTAL_ACTUAL="\$CRYSTAL_$(ENV_VERSION)"
 
 # On MinGW, CRYSTAL may contain the path in one of two flavors:
 # MSYS paths, separated by $PATH_SEPARATOR, or Win32 paths, separated
@@ -106,7 +107,7 @@ CRYSTAL_$(ENV_VERSION)="\${CRYSTAL_$(ENV_VERSION)-\$CRYSTAL}"
 if test "\`uname -s | sed -e 's+\(.*\)_.*+\1+'\`" = "MINGW32" ; then
     NEW_CRYSTAL=''
     my_IFS=\$IFS; IFS=\;
-    for win32_dir in \$CRYSTAL_$(ENV_VERSION); do
+    for win32_dir in \$_CRYSTAL_ACTUAL; do
         win32_dir=\`echo \$win32_dir | tr '\\\\\\\\' '/'  | sed "s/\(.\):/\\\\/\\\\1/"\`
         if test -d "\$win32_dir"; then
             if test -n "\$NEW_CRYSTAL"; then
@@ -117,12 +118,12 @@ if test "\`uname -s | sed -e 's+\(.*\)_.*+\1+'\`" = "MINGW32" ; then
     done
     IFS=\$my_IFS
     if test -n "\$NEW_CRYSTAL"; then
-        CRYSTAL_$(ENV_VERSION)="\$NEW_CRYSTAL"
+        _CRYSTAL_ACTUAL="\$NEW_CRYSTAL"
     fi
 fi
 
 my_IFS=\$IFS; IFS=\$PATH_SEPARATOR
-for p in \$CRYSTAL_$(ENV_VERSION)
+for p in \$_CRYSTAL_ACTUAL
 do
   prefix="\${p}"
   exec_prefix="\${prefix}"

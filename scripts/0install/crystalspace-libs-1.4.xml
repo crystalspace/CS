@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<?xml-stylesheet type='text/xsl' href='interface.xsl'?>
+<interface uri="http://crystalspace3d.org/0install/crystalspace-libs-1.4.xml" xmlns="http://zero-install.sourceforge.net/2004/injector/interface">
+  <name>crystalspace-libs-1.4</name>
+  <summary>CrystalSpace shared libraries</summary>
+  <description>
+Shared libraries used by CrystalSpace applications</description>
+  <homepage>http://www.crystalspace3d.org/</homepage>
+  <category>Game</category>
+  <icon href="http://crystalspace3d.org/mediawiki/images/thumb/3/3e/Cs-compact.png/120px-Cs-compact.png" type="image/png"/>
+  <group license="OSI Approved :: GNU Lesser General Public License (LGPL)">
+    <implementation arch="Linux-x86_64" id="sha1new=767071b3f38d3d16f98f88b328386f758dd305fc" released="2009-01-16" stability="testing" version="1.4.0.31900">
+      <archive extract="crystalspace-libs-1.4.0.31900" href="http://crystalspace3d.org/downloads/binary/1.4/linux-x86_64/crystalspace-libs-1.4.0.31900.tar.lzma" size="899769" type="application/x-lzma-compressed-tar"/>
+    </implementation>
+  </group>
+</interface>
+<!-- Base64 Signature
+iEYEABECAAYFAklwmCEACgkQnCws0dQa9buLMwCgnMaZ4wEoOjoDgBjt8+opCxF3XhoAnA6B52Lm
+a4q1BmWqwW9QTMbRARtM
+
+-->
