@@ -34,7 +34,7 @@ if $(X11.AVAILABLE) = "yes"
   }
   if $(GTK.AVAILABLE) = "yes"
   {
-    RelayLibs xwin : GTK : gtk-x11-2.0 ;
+    RelayLibs xwin : GTK : gtk-x11-2.0 gobject-2.0 ;
     CFlags xwin : [ FDefines HAVE_GTK ] ;
     if $(GTK.MESSAGE_HAS_SECONDARY) = "yes"
     {
