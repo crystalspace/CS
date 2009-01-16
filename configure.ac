@@ -80,18 +80,11 @@ AS_IF([test -n "$SWIG"],
 
 CS_CHECK_COMMON_TOOLS_ICONS
 
-AC_ARG_ENABLE([relaytool], [AC_HELP_STRING([--enable-relaytool],
-    [enable use of relaytool for some libraries (default YES)])])
-    AS_IF([test -z "$enable_relaytool"], 
-	[enable_relaytool=yes])
-AS_IF([test "$enable_relaytool" != "no"],
-    [# Note that CS comes with a copy of relaytool that, compared to the 
-    # current (as of 2007-09-18) version from apbuild-2.0.5, has some 
-    # additions and small fixes applied. Thus, prefer the version that 
-    # ships with CS.
-    CS_PATH_TOOL([RELAYTOOL], [relaytool], [], 
-	[${srcdir}/bin$PATH_SEPARATOR$PATH])
-    CS_EMIT_BUILD_PROPERTY([CMD.RELAYTOOL], [$RELAYTOOL])])
+# Note that CS comes with a copy of relaytool that, compared to the 
+# current (as of 2007-09-18) version from apbuild-2.0.5, has some 
+# additions and small fixes applied. Thus, prefer the version that 
+# ships with CS.
+CS_CHECK_COMMON_TOOLS_RELAYTOOL([${srcdir}/bin])
 
 #------------------------------------------------------------------------------
 # In order to avoid alienating users by forcing them to install and use Jam,
