@@ -1159,6 +1159,9 @@ bool csXMLShaderTech::ReadPassPerTag (ShaderPassPerTag& pass,
 
       pass.custommapping_id.Push (ReadShadervarName (cacheFile));
     }
+    pass.custommapping_buffer.ShrinkBestFit();
+    pass.custommapping_attrib.ShrinkBestFit();
+    pass.custommapping_id.ShrinkBestFit();
   }
 
   {
@@ -1217,6 +1220,7 @@ bool csXMLShaderTech::ReadPassPerTag (ShaderPassPerTag& pass,
       
       pass.textures.Push (mapping);
     }
+    pass.textures.ShrinkBestFit();
   }  
 
   {
@@ -1237,6 +1241,7 @@ bool csXMLShaderTech::ReadPassPerTag (ShaderPassPerTag& pass,
 
       pass.instances_binds.Push (newInst);
     }
+    pass.instances_binds.ShrinkBestFit();
   }
 
   return true;
