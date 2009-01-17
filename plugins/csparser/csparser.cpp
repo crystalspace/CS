@@ -1521,10 +1521,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   {
     if(dir)
     {
+      vfs->PushDir();
       vfs->ChDir(dir);
     }
     csRef<iBase> base = plugin->Parse(node, ssource, ldr_context, context);
     ret->SetResult(base);
+    if(dir)
+    {
+      vfs->PopDir();
+    }
     return base.IsValid();    
   }
 
