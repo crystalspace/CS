@@ -182,6 +182,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     bool WritePassPerTag (const ShaderPassPerTag& pass, 
       iFile* cacheFile);
     bool ReadPassPerTag (ShaderPassPerTag& pass, iFile* cacheFile);
+    
+    bool WriteShadervarName (CS::ShaderVarStringID svid, iFile* cacheFile);
+    CS::ShaderVarStringID ReadShadervarName (iFile* cacheFile);
 
     bool LoadBoilerplate (iLoaderContext* ldr_context, iDocumentNode* node,
       iDocumentNode* parentSV);

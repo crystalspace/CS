@@ -46,7 +46,7 @@ CS_LEAKGUARD_IMPLEMENT (csXMLShaderTech);
 /* Magic value for tech + pass cache files.
  * The most significant byte serves as a "version", increase when the
  * cache file format changes. */
-static const uint32 cacheFileMagic = 0x05747863;
+static const uint32 cacheFileMagic = 0x06747863;
 
 //---------------------------------------------------------------------------
 
@@ -870,9 +870,7 @@ bool csXMLShaderTech::WritePass (ShaderPass* pass,
   
   if (pass->alphaMode.autoAlphaMode)
   {
-    const char* autoTexStr = parent->compiler->stringsSvName->Request (
-      pass->alphaMode.autoModeTexture);
-    if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, autoTexStr))
+    if (!WriteShadervarName (pass->alphaMode.autoModeTexture, cacheFile))
       return false;
   }
   else
@@ -925,9 +923,7 @@ bool csXMLShaderTech::WritePassPerTag (const ShaderPassPerTag& pass,
     if (cacheFile->Write ((char*)&diskAttr, sizeof (diskAttr))
 	!= sizeof (diskAttr)) return false;
 	
-    const char* svStr = parent->compiler->stringsSvName->Request (
-      pass.custommapping_id[i]);
-    if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, svStr))
+    if (!WriteShadervarName (pass.custommapping_id[i], cacheFile))
       return false;
   }
 
@@ -939,9 +935,7 @@ bool csXMLShaderTech::WritePassPerTag (const ShaderPassPerTag& pass,
   }
   for (size_t i = 0; i < pass.textures.GetSize(); i++)
   {
-    const char* svStr = parent->compiler->stringsSvName->Request (
-      pass.textures[i].tex.id);
-    if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, svStr))
+    if (!WriteShadervarName (pass.textures[i].tex.id, cacheFile))
       return false;
       
     uint32 diskNumIndices = csLittleEndian::UInt32 (
@@ -956,8 +950,7 @@ bool csXMLShaderTech::WritePassPerTag (const ShaderPassPerTag& pass,
 	  != sizeof (diskIndex)) return false;
     }
     
-    svStr = parent->compiler->stringsSvName->Request (pass.textures[i].fallback.id);
-    if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, svStr))
+    if (!WriteShadervarName (pass.textures[i].fallback.id, cacheFile))
       return false;
       
     diskNumIndices = csLittleEndian::UInt32 (
@@ -987,6 +980,22 @@ bool csXMLShaderTech::WritePassPerTag (const ShaderPassPerTag& pass,
 	!= sizeof (diskCompareMode)) return false;
   }
   
+  {
+    uint32 diskNumInstances = csLittleEndian::UInt32 (
+      (uint)pass.instances_binds.GetSize());
+    if (cacheFile->Write ((char*)&diskNumInstances, sizeof (diskNumInstances))
+	!= sizeof (diskNumInstances)) return false;
+  }
+  for (size_t i = 0; i < pass.instances_binds.GetSize(); i++)
+  {
+    if (!WriteShadervarName (pass.instances_binds[i].variable, cacheFile))
+      return false;
+    
+    int32 diskAttr = csLittleEndian::Int32 (pass.instances_binds[i].destination);
+    if (cacheFile->Write ((char*)&diskAttr, sizeof (diskAttr))
+	!= sizeof (diskAttr)) return false;
+  }
+
   return true;
 }
   
@@ -1083,11 +1092,7 @@ bool csXMLShaderTech::ReadPass (ShaderPass* pass,
   
   if (pass->alphaMode.autoAlphaMode)
   {
-    const char* svName =
-      CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
-    if (!svName) return false;
-    pass->alphaMode.autoModeTexture = parent->compiler->stringsSvName->Request (
-      svName);
+    pass->alphaMode.autoModeTexture = ReadShadervarName (cacheFile);
   }
   else
   {
@@ -1152,13 +1157,7 @@ bool csXMLShaderTech::ReadPassPerTag (ShaderPassPerTag& pass,
       pass.custommapping_attrib.Push (
         (csVertexAttrib)csLittleEndian::Int32 (diskAttr));
 
-      const char* mappingStr = 
-          CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
-      if (mappingStr != 0)
-	pass.custommapping_id.Push (
-	  parent->compiler->stringsSvName->Request (mappingStr));
-      else
-	pass.custommapping_id.Push (CS::InvalidShaderVarStringID);
+      pass.custommapping_id.Push (ReadShadervarName (cacheFile));
     }
   }
 
@@ -1171,11 +1170,7 @@ bool csXMLShaderTech::ReadPassPerTag (ShaderPassPerTag& pass,
     for (size_t i = 0; i < numTextures; i++)
     {
       ShaderPass::TextureMapping mapping;
-      const char* texSvName = 
-        CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
-      mapping.tex.id =
-        texSvName ? parent->compiler->stringsSvName->Request (texSvName)
-                  : CS::InvalidShaderVarStringID;
+      mapping.tex.id = ReadShadervarName (cacheFile);
 	
       size_t numIndices;
       uint32 diskNumIndices;
@@ -1190,11 +1185,7 @@ bool csXMLShaderTech::ReadPassPerTag (ShaderPassPerTag& pass,
 	mapping.tex.indices.Push (csLittleEndian::UInt32 (diskIndex));
       }
       
-      texSvName = 
-        CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
-      mapping.fallback.id =
-        texSvName ? parent->compiler->stringsSvName->Request (texSvName)
-                  : CS::InvalidShaderVarStringID;
+      mapping.fallback.id = ReadShadervarName (cacheFile);
 	
       if (cacheFile->Read ((char*)&diskNumIndices, sizeof (diskNumIndices))
 	  != sizeof (diskNumIndices)) return false;
@@ -1227,6 +1218,27 @@ bool csXMLShaderTech::ReadPassPerTag (ShaderPassPerTag& pass,
       pass.textures.Push (mapping);
     }
   }  
+
+  {
+    size_t numInstances;
+    uint32 diskNumInstances;
+    if (cacheFile->Read ((char*)&diskNumInstances, sizeof (diskNumInstances))
+	!= sizeof (diskNumInstances)) return false;
+    numInstances = csLittleEndian::UInt32 (diskNumInstances);
+    for (size_t i = 0; i < numInstances; i++)
+    {
+      ShaderPassPerTag::InstanceMapping newInst;
+      newInst.variable = ReadShadervarName (cacheFile);
+      
+      int32 diskAttr;
+      if (cacheFile->Read ((char*)&diskAttr, sizeof (diskAttr))
+	  != sizeof (diskAttr)) return false;
+      newInst.destination = (csVertexAttrib)csLittleEndian::Int32 (diskAttr);
+
+      pass.instances_binds.Push (newInst);
+    }
+  }
+
   return true;
 }
   
@@ -1246,6 +1258,21 @@ bool csXMLShaderCompiler::LoadSVBlock (iLoaderContext* ldr_context,
   }
 
   return true;
+}
+
+bool csXMLShaderTech::WriteShadervarName (CS::ShaderVarStringID svid,
+					  iFile* cacheFile)
+{
+  const char* svStr = parent->compiler->stringsSvName->Request (svid);
+  return CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, svStr);
+}
+
+CS::ShaderVarStringID csXMLShaderTech::ReadShadervarName (iFile* cacheFile)
+{
+  const char* texSvName = 
+    CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+  return texSvName ? parent->compiler->stringsSvName->Request (texSvName)
+	      : CS::InvalidShaderVarStringID;
 }
 
 csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
