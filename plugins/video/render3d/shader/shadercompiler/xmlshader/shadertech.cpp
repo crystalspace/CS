@@ -646,7 +646,7 @@ bool csXMLShaderTech::ParseModes (ShaderPass* pass,
   csRef<iDocumentNode> nodeCullmode = node->GetNode ("cullmode");
   if (nodeCullmode)
   {
-    const char* cullModeStr = node->GetContentsValue();
+    const char* cullModeStr = nodeCullmode->GetContentsValue();
     if (cullModeStr)
     {
       if (strcmp (cullModeStr, "normal") == 0)
