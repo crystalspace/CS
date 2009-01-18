@@ -756,7 +756,7 @@ void csMeshGenerator::SetFade (iMeshWrapper* mesh, uint mode)
 
 void csMeshGenerator::SetFade (csMGPosition& p, float factor)
 {
-  p.vertexInfo.fadeFactorVar->SetValue (1.0f);
+  p.vertexInfo.fadeFactorVar->SetValue (factor);
 }
 
 void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
