@@ -41,6 +41,7 @@
 	ModelViewProj = vertexIn.ModelViewProj;
       </block>
     </input>
+
     <input file="/shader/snippets/ModelView.inp" private="yes" />
 
     <input file="/shader/snippets/instancingTransforms.inp" private="yes" />
