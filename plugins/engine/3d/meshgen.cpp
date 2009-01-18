@@ -342,7 +342,7 @@ csMeshGenerator::csMeshGenerator (csEngine* engine) :
   SVstrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
     engine->objectRegistry, "crystalspace.shader.variablenameset");
   varTransform = SVstrings->Request ("instancing transforms");
-  varFadeFactor = SVstrings->Request ("fade factor");
+  varFadeFactor = SVstrings->Request ("alpha factor");
 }
 
 csMeshGenerator::~csMeshGenerator ()
@@ -756,7 +756,7 @@ void csMeshGenerator::SetFade (iMeshWrapper* mesh, uint mode)
 
 void csMeshGenerator::SetFade (csMGPosition& p, float factor)
 {
-  p.vertexInfo.fadeFactorVar->SetValue (csVector4 (0, 0, 0, factor));
+  p.vertexInfo.fadeFactorVar->SetValue (1.0f);
 }
 
 void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
