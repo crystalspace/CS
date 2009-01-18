@@ -46,7 +46,7 @@ CS_LEAKGUARD_IMPLEMENT (csXMLShaderTech);
 /* Magic value for tech + pass cache files.
  * The most significant byte serves as a "version", increase when the
  * cache file format changes. */
-static const uint32 cacheFileMagic = 0x06747863;
+static const uint32 cacheFileMagic = 0x07747863;
 
 //---------------------------------------------------------------------------
 
@@ -631,7 +631,44 @@ bool csXMLShaderTech::ParseModes (ShaderPass* pass,
   csRef<iDocumentNode> nodeFlipCulling = node->GetNode ("flipculling");
   if (nodeFlipCulling)
   {
-    h.synldr->ParseBool(nodeFlipCulling, pass->flipCulling, false);
+    bool flipCullFlag;
+    h.synldr->ParseBool(nodeFlipCulling, flipCullFlag, false);
+    pass->cullMode = flipCullFlag ? CS::Graphics::cullFlipped : CS::Graphics::cullNormal;
+    if (parent->compiler->do_verbose)
+    {
+      parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+	nodeFlipCulling,
+	"Shader '%s', pass %d: <flipculling> is deprecated",
+	parent->GetName (), GetPassNumber (pass));
+    }
+  }
+
+  csRef<iDocumentNode> nodeCullmode = node->GetNode ("cullmode");
+  if (nodeCullmode)
+  {
+    const char* cullModeStr = node->GetContentsValue();
+    if (cullModeStr)
+    {
+      if (strcmp (cullModeStr, "normal") == 0)
+      {
+	pass->cullMode = CS::Graphics::cullNormal;
+      }
+      else if (strcmp (cullModeStr, "flipped") == 0)
+      {
+	pass->cullMode = CS::Graphics::cullFlipped;
+      }
+      else if (strcmp (cullModeStr, "disabled") == 0)
+      {
+	pass->cullMode = CS::Graphics::cullDisabled;
+      }
+      else
+      {
+      parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+	nodeFlipCulling,
+	"Shader '%s', pass %d: invalid culling mode '%s'",
+	parent->GetName (), GetPassNumber (pass), cullModeStr);
+      }
+    }
   }
 
   csRef<iDocumentNode> nodeZOffset = node->GetNode ("zoffset");
@@ -831,10 +868,11 @@ enum
   cacheFlagWMA,
   
   cacheFlagOverrideZ,
-  cacheFlagFlipCulling,
   cacheFlagZoffset,
   
-  cacheFlagAlphaAuto
+  cacheFlagAlphaAuto,
+  
+  cacheFlagLast
 };
 
 bool csXMLShaderTech::WritePass (ShaderPass* pass, 
@@ -852,10 +890,10 @@ bool csXMLShaderTech::WritePass (ShaderPass* pass,
     if (pass->wmAlpha) cacheFlags |= 1 << cacheFlagWMA;
     
     if (pass->overrideZmode) cacheFlags |= 1 << cacheFlagOverrideZ;
-    if (pass->flipCulling) cacheFlags |= 1 << cacheFlagFlipCulling;
     if (pass->zoffset) cacheFlags |= 1 << cacheFlagZoffset;
     
     if (pass->alphaMode.autoAlphaMode) cacheFlags |= 1 << cacheFlagAlphaAuto;
+    cacheFlags |= uint (pass->cullMode) << cacheFlagLast;
     
     uint32 diskFlags = csLittleEndian::UInt32 (cacheFlags);
     if (cacheFile->Write ((char*)&diskFlags, sizeof (diskFlags))
@@ -1077,10 +1115,11 @@ bool csXMLShaderTech::ReadPass (ShaderPass* pass,
     pass->wmAlpha = (cacheFlags & (1 << cacheFlagWMA)) != 0;
     
     pass->overrideZmode = (cacheFlags & (1 << cacheFlagOverrideZ)) != 0;
-    pass->flipCulling = (cacheFlags & (1 << cacheFlagFlipCulling)) != 0;
     pass->zoffset = (cacheFlags & (1 << cacheFlagZoffset)) != 0;
     
     pass->alphaMode.autoAlphaMode = (cacheFlags & (1 << cacheFlagAlphaAuto)) != 0;
+
+    pass->cullMode = (CS::Graphics::MeshCullMode)((cacheFlags >> cacheFlagLast) & 0x3);
   }
   
   {
@@ -1914,7 +1953,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   if ((thispass->mixMode & CS_MIXMODE_TYPE_MASK) != CS_FX_MESH)
     modes.mixmode = thispass->mixMode;
 
-  modes.flipCulling = thispass->flipCulling;
+  modes.cullMode = thispass->cullMode;
   
   float alpha = 1.0f;
   if (modes.mixmode & CS_FX_MASK_ALPHA)

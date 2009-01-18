@@ -101,14 +101,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       csAlphaMode alphaMode;
       csZBufMode zMode;
       bool overrideZmode;
-      bool flipCulling;
+      CS::Graphics::MeshCullMode cullMode;
       bool zoffset;
 
-      ShaderPass () : zoffset (false), minLights (0)
+      ShaderPass () : cullMode (CS::Graphics::cullNormal), zoffset (false), minLights (0)
       { 
         mixMode = CS_FX_MESH;
         overrideZmode = false;
-        flipCulling = false;
       }
 
       // writemasks

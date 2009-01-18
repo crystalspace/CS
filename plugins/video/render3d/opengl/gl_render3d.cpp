@@ -2070,9 +2070,6 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   else
     mirrorflag = mymesh->do_mirror;
     
-  if (modes.flipCulling)
-    mirrorflag = !mirrorflag;
-    
   GLenum cullFace;
   statecache->GetCullFace (cullFace);
     
