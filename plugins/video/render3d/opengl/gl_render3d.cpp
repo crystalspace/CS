@@ -1900,6 +1900,9 @@ void csGLGraphics3D::TeardownInstance (size_t instParamNum,
         glPopMatrix ();
       }
       break;
+    default:
+      /* Nothing to do */
+      break;
     }
   }
 }
