@@ -17,15 +17,15 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
-<shader compiler="shaderweaver" name="grass" lights="6">
+<shader compiler="shaderweaver" name="foliage_grass" lights="2">
   <alias name="position" file="/shader/snippets/position-instance.xml" />
   <alias name="ambient" file="/shader/snippets/lighting/ambient-static.xml" />
   <alias name="apply_alpha" file="/shader/snippets/surface/alpha-nochange.xml" />
   <alias name="lighting" file="/shader/snippets/lighting/lighting-pvl.xml" />
   <alias name="surface" file="/shader/snippets/surface/surface-modulate-alpha_instance.xml" />
-  
-  <technique priority="500" minlights="5">
-    <!-- 1 pass, 6 lights -->
+
+<technique priority="200" minlights="1">
+    <!-- 1 pass, 2 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
 	<!-- First pass: blend with alpha -->
@@ -55,184 +55,8 @@
       <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
       
       <parameter id="lightOffset" type="int">0</parameter>
-      <parameter id="maxLights" type="int">6</parameter>
-      <parameter id="minLights" type="int">5</parameter>
-      <connection from="lightOffset" to="shared" />
-      <connection from="maxLights" to="shared" />
-      <connection from="minLights" to="shared" />
-    </pass>
-  </technique>
-  
-  <technique priority="400" minlights="4">
-    <!-- 2 passes, 4+2 lights -->
-    <pass minlights="1">
-      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: blend with alpha -->
-	<mixmode>
-	  <blendop src="one" dst="zero" />
-	  <alphatest>enable</alphatest>
-	</mixmode>
-      <?else?>
-	<!-- Later pass: blend with add -->
-	<mixmode>
-	  <blendop src="one" dst="one" />
-	  <alphatest>enable</alphatest>
-	</mixmode>
-      <?endif?>
-
-      <cullmode>disabled</cullmode>
-      
-      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
-      
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
-      
-      <parameter id="lightOffset" type="int">0</parameter>
-      <parameter id="maxLights" type="int">4</parameter>
-      <parameter id="minLights" type="int">4</parameter>
-      <connection from="lightOffset" to="shared" />
-      <connection from="maxLights" to="shared" />
-      <connection from="minLights" to="shared" />
-    </pass>
-    <pass minlights="5">
-      <!-- Later pass: blend with add -->
-      <mixmode>
-	<blendop src="one" dst="one" />
-	<alphatest>enable</alphatest>
-      </mixmode>
-      
-      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
-      
-      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
-      
-      <parameter id="lightOffset" type="int">4</parameter>
       <parameter id="maxLights" type="int">2</parameter>
-      <parameter id="minLights" type="int">5</parameter>
-      <connection from="lightOffset" to="shared" />
-      <connection from="maxLights" to="shared" />
-      <connection from="minLights" to="shared" />
-    </pass>
-  </technique>
-  
-  <technique priority="300" minlights="3">
-    <!-- 2 passes, 3+3 lights -->
-    <pass minlights="1">
-      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: blend with alpha -->
-	<mixmode>
-	  <blendop src="one" dst="zero" />
-	  <alphatest>enable</alphatest>
-	</mixmode>
-      <?else?>
-	<!-- Later pass: blend with add -->
-	<mixmode>
-	  <blendop src="one" dst="one" />
-	  <alphatest>enable</alphatest>
-	</mixmode>
-      <?endif?>
-
-      <cullmode>disabled</cullmode>
-      
-      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
-      
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
-      
-      <parameter id="lightOffset" type="int">0</parameter>
-      <parameter id="maxLights" type="int">3</parameter>
-      <parameter id="minLights" type="int">3</parameter>
-      <connection from="lightOffset" to="shared" />
-      <connection from="maxLights" to="shared" />
-      <connection from="minLights" to="shared" />
-    </pass>
-    <pass minlights="4">
-      <!-- Later pass: blend with add -->
-      <mixmode>
-	<blendop src="one" dst="one" />
-	<alphatest>enable</alphatest>
-      </mixmode>
-
-      <cullmode>disabled</cullmode>
-      
-      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
-      
-      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
-      
-      <parameter id="lightOffset" type="int">3</parameter>
-      <parameter id="maxLights" type="int">3</parameter>
-      <parameter id="minLights" type="int">4</parameter>
-      <connection from="lightOffset" to="shared" />
-      <connection from="maxLights" to="shared" />
-      <connection from="minLights" to="shared" />
-    </pass>
-  </technique>
-  
-  <technique priority="200" minlights="2">
-    <!-- 3 passes, 2+2+2 lights -->
-    <pass minlights="1">
-      <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: blend with alpha -->
-	<mixmode>
-	  <blendop src="one" dst="zero" />
-	  <alphatest>enable</alphatest>
-	</mixmode>
-      <?else?>
-	<!-- Later pass: blend with add -->
-	<mixmode>
-	  <blendop src="one" dst="one" />
-	  <alphatest>enable</alphatest>
-	</mixmode>
-      <?endif?>
-      
-      <cullmode>disabled</cullmode>
-
-      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
-      
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
-      
-      <parameter id="lightOffset" type="int">0</parameter>
-      <parameter id="maxLights" type="int">2</parameter>
-      <parameter id="minLights" type="int">2</parameter>
-      <connection from="lightOffset" to="shared" />
-      <connection from="maxLights" to="shared" />
-      <connection from="minLights" to="shared" />
-    </pass>
-    <pass minlights="3">
-      <!-- Later pass: blend with add -->
-      <mixmode>
-	<blendop src="one" dst="one" />
-	<alphatest>enable</alphatest>
-      </mixmode>
-      
-      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
-      
-      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
-      
-      <parameter id="lightOffset" type="int">2</parameter>
-      <parameter id="maxLights" type="int">2</parameter>
-      <parameter id="minLights" type="int">3</parameter>
-      <connection from="lightOffset" to="shared" />
-      <connection from="maxLights" to="shared" />
-      <connection from="minLights" to="shared" />
-    </pass>
-    <pass minlights="5">
-      <!-- Later pass: blend with add -->
-      <mixmode>
-	<blendop src="one" dst="one" />
-	<alphatest>enable</alphatest>
-      </mixmode>
-
-      <cullmode>disabled</cullmode>
-      
-      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
-      
-      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
-      
-      <parameter id="lightOffset" type="int">4</parameter>
-      <parameter id="maxLights" type="int">2</parameter>
-      <parameter id="minLights" type="int">5</parameter>
+      <parameter id="minLights" type="int">1</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
       <connection from="minLights" to="shared" />
@@ -240,7 +64,7 @@
   </technique>
   
   <technique priority="100" minlights="1">
-    <!-- 6 passes, 1+1+1+1+1+1 lights -->
+    <!-- 2 passes, 1+1 lights -->
     <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
 	<!-- First pass: blend with alpha -->
@@ -275,6 +99,8 @@
 	<blendop src="one" dst="one" />
 	<alphatest>enable</alphatest>
       </mixmode>
+
+      <cullmode>disabled</cullmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
@@ -284,90 +110,6 @@
       <parameter id="lightOffset" type="int">1</parameter>
       <parameter id="maxLights" type="int">1</parameter>
       <parameter id="minLights" type="int">2</parameter>
-      <connection from="lightOffset" to="shared" />
-      <connection from="maxLights" to="shared" />
-      <connection from="minLights" to="shared" />
-    </pass>
-    <pass minlights="3">
-      <!-- Later pass: blend with add -->
-      <mixmode>
-	<blendop src="one" dst="one" />
-	<alphatest>enable</alphatest>
-      </mixmode>
-
-      <cullmode>disabled</cullmode>
-      
-      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
-      
-      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
-      
-      <parameter id="lightOffset" type="int">2</parameter>
-      <parameter id="maxLights" type="int">1</parameter>
-      <parameter id="minLights" type="int">3</parameter>
-      <connection from="lightOffset" to="shared" />
-      <connection from="maxLights" to="shared" />
-      <connection from="minLights" to="shared" />
-    </pass>
-    <pass minlights="4">
-      <!-- Later pass: blend with add -->
-      <mixmode>
-	<blendop src="one" dst="one" />
-	<alphatest>enable</alphatest>
-      </mixmode>
-
-      <cullmode>disabled</cullmode>
-      
-      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
-      
-      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
-      
-      <parameter id="lightOffset" type="int">3</parameter>
-      <parameter id="maxLights" type="int">1</parameter>
-      <parameter id="minLights" type="int">4</parameter>
-      <connection from="lightOffset" to="shared" />
-      <connection from="maxLights" to="shared" />
-      <connection from="minLights" to="shared" />
-    </pass>
-    <pass minlights="5">
-      <!-- Later pass: blend with add -->
-      <mixmode>
-	<blendop src="one" dst="one" />
-	<alphatest>enable</alphatest>
-      </mixmode>
-
-      <cullmode>disabled</cullmode>
-      
-      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
-      
-      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
-      
-      <parameter id="lightOffset" type="int">4</parameter>
-      <parameter id="maxLights" type="int">1</parameter>
-      <parameter id="minLights" type="int">5</parameter>
-      <connection from="lightOffset" to="shared" />
-      <connection from="maxLights" to="shared" />
-      <connection from="minLights" to="shared" />
-    </pass>
-    <pass minlights="6">
-      <!-- Later pass: blend with add -->
-      <mixmode>
-	<blendop src="one" dst="one" />
-	<alphatest>enable</alphatest>
-      </mixmode>
-
-      <cullmode>disabled</cullmode>
-      
-      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
-      
-      <alias name="ambient" file="/shader/snippets/lighting/ambient-null.xml" />
-      <snippet id="shared" file="/shader/snippets/lighting/lighting_default-shared.xml" />
-      
-      <parameter id="lightOffset" type="int">5</parameter>
-      <parameter id="maxLights" type="int">1</parameter>
-      <parameter id="minLights" type="int">6</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
       <connection from="minLights" to="shared" />
