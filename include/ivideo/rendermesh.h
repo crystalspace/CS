@@ -82,7 +82,7 @@ namespace Graphics
   {
     RenderMeshModes () : z_buf_mode ((csZBufMode)~0), mixmode (CS_FX_COPY),
       renderPrio (-1), flipCulling (false), cullMode (cullNormal),
-      alphaType (csAlphaMode::alphaNone), zoffset (false)
+      alphaType (csAlphaMode::alphaNone), zoffset (false), doInstancing (false)
     {
     }
 
@@ -141,6 +141,12 @@ namespace Graphics
 
     /// Holder of default render buffers
     csRef<csRenderBufferHolder> buffers;
+
+    bool doInstancing; 
+    size_t instParamNum; 
+    const csVertexAttrib* instParamsTargets; 
+    size_t instanceNum; 
+    csShaderVariable** const * instParams;
   };
 
   /**
