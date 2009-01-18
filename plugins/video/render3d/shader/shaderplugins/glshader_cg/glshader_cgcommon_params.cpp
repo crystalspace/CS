@@ -530,10 +530,24 @@ bool csShaderGLCGCommon::GetPostCompileParamProps (ShaderParameter* sparam)
 
 void csShaderGLCGCommon::CollectUnusedParameters (csSet<csString>& unusedParams)
 {
+  csSet<uint> sharedResources;
   CGparameter cgParam = cgGetFirstLeafParameter (program, CG_PROGRAM);
   while (cgParam)
   {
-    if (!cgIsParameterUsed (cgParam, program))
+    CGresource paramRes = cgGetParameterResource (cgParam);
+    /* At least Cg 2.1.0.12 evidently has a cool feature where it packs
+       vertexToFragment data automatically (e.g. you have 9 V2F fields, one 
+       of them is a float2, the other a simple float -> these two are packed
+       into one field). However, the field that is packed into another field
+       is incorrectly marked as unused. The only hint to it being actually 
+       used in the compiled program is that the resource is not UNDEFINED and
+       that a parameter using the same resource was not unused.
+       So if we come across a parameter that is reported unused, but its
+       resource was found used earlier, we also assume that parameter to be
+       used.
+     */
+    if (!cgIsParameterUsed (cgParam, program)
+      && (!sharedResources.Contains (paramRes)))
     {
       csString param (cgGetParameterName (cgParam));
       for (size_t j = 0; j < param.Length(); j++)
@@ -545,6 +559,8 @@ void csShaderGLCGCommon::CollectUnusedParameters (csSet<csString>& unusedParams)
       s.Format ("PARAM_%s_UNUSED", param.GetData());
       unusedParams.Add (s);
     }
+    else if (paramRes != CG_UNDEFINED)
+      sharedResources.Add (paramRes);
 
     cgParam = cgGetNextLeafParameter (cgParam);
   }
