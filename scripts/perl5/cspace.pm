@@ -9063,6 +9063,7 @@ sub DESTROY {
 *GetArraySize = *cspacec::csShaderVariable_GetArraySize;
 *GetArrayElement = *cspacec::csShaderVariable_GetArrayElement;
 *SetArrayElement = *cspacec::csShaderVariable_SetArrayElement;
+*FindArrayElement = *cspacec::csShaderVariable_FindArrayElement;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -9906,6 +9907,16 @@ sub DESTROY {
 *swig_zoffset_set = *cspacec::RenderMeshModes_zoffset_set;
 *swig_buffers_get = *cspacec::RenderMeshModes_buffers_get;
 *swig_buffers_set = *cspacec::RenderMeshModes_buffers_set;
+*swig_doInstancing_get = *cspacec::RenderMeshModes_doInstancing_get;
+*swig_doInstancing_set = *cspacec::RenderMeshModes_doInstancing_set;
+*swig_instParamNum_get = *cspacec::RenderMeshModes_instParamNum_get;
+*swig_instParamNum_set = *cspacec::RenderMeshModes_instParamNum_set;
+*swig_instParamsTargets_get = *cspacec::RenderMeshModes_instParamsTargets_get;
+*swig_instParamsTargets_set = *cspacec::RenderMeshModes_instParamsTargets_set;
+*swig_instanceNum_get = *cspacec::RenderMeshModes_instanceNum_get;
+*swig_instanceNum_set = *cspacec::RenderMeshModes_instanceNum_set;
+*swig_instParams_get = *cspacec::RenderMeshModes_instParams_get;
+*swig_instParams_set = *cspacec::RenderMeshModes_instParams_set;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -22596,6 +22607,8 @@ sub CS_VATTRIB_SPECIFIC_NUM () { $cspacec::CS_VATTRIB_SPECIFIC_NUM }
 sub CS_VATTRIB_GENERIC_FIRST () { $cspacec::CS_VATTRIB_GENERIC_FIRST }
 sub CS_VATTRIB_GENERIC_LAST () { $cspacec::CS_VATTRIB_GENERIC_LAST }
 sub CS_VATTRIB_GENERIC_NUM () { $cspacec::CS_VATTRIB_GENERIC_NUM }
+sub CS_IATTRIB_FIRST () { $cspacec::CS_IATTRIB_FIRST }
+sub CS_IATTRIB_LAST () { $cspacec::CS_IATTRIB_LAST }
 sub CS_VATTRIB_UNUSED () { $cspacec::CS_VATTRIB_UNUSED }
 sub CS_VATTRIB_INVALID () { $cspacec::CS_VATTRIB_INVALID }
 sub CS_VATTRIB_POSITION () { $cspacec::CS_VATTRIB_POSITION }
@@ -22630,6 +22643,7 @@ sub CS_VATTRIB_12 () { $cspacec::CS_VATTRIB_12 }
 sub CS_VATTRIB_13 () { $cspacec::CS_VATTRIB_13 }
 sub CS_VATTRIB_14 () { $cspacec::CS_VATTRIB_14 }
 sub CS_VATTRIB_15 () { $cspacec::CS_VATTRIB_15 }
+sub CS_IATTRIB_OBJECT2WORLD () { $cspacec::CS_IATTRIB_OBJECT2WORLD }
 sub CS_MIXMODE_TYPE_AUTO () { $cspacec::CS_MIXMODE_TYPE_AUTO }
 sub CS_MIXMODE_TYPE_BLENDOP () { $cspacec::CS_MIXMODE_TYPE_BLENDOP }
 sub CS_MIXMODE_FLAG_BLENDOP_ALPHA () { $cspacec::CS_MIXMODE_FLAG_BLENDOP_ALPHA }

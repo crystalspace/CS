@@ -2663,24 +2663,25 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_p_csShaderVariable swig_types[164]
 #define SWIGTYPE_p_p_iRenderBuffer swig_types[165]
 #define SWIGTYPE_p_p_iTextureHandle swig_types[166]
-#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[167]
-#define SWIGTYPE_p_scfImplementation1TcsImageBase_iImage_t swig_types[168]
-#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[169]
-#define SWIGTYPE_p_scfImplementationExt0TcsImageMemory_csImageBase_t swig_types[170]
-#define SWIGTYPE_p_scfImplementationExt1TcsPath_csObject_iPath_t swig_types[171]
-#define SWIGTYPE_p_size_t swig_types[172]
-#define SWIGTYPE_p_uint16_t swig_types[173]
-#define SWIGTYPE_p_uint32_t swig_types[174]
-#define SWIGTYPE_p_uint64_t swig_types[175]
-#define SWIGTYPE_p_uint8_t swig_types[176]
-#define SWIGTYPE_p_unsigned_char swig_types[177]
-#define SWIGTYPE_p_unsigned_int swig_types[178]
-#define SWIGTYPE_p_unsigned_long swig_types[179]
-#define SWIGTYPE_p_unsigned_long_long swig_types[180]
-#define SWIGTYPE_p_void swig_types[181]
-#define SWIGTYPE_p_wchar_t swig_types[182]
-static swig_type_info *swig_types[184];
-static swig_module_info swig_module = {swig_types, 183, 0, 0, 0, 0};
+#define SWIGTYPE_p_p_p_csShaderVariable swig_types[167]
+#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[168]
+#define SWIGTYPE_p_scfImplementation1TcsImageBase_iImage_t swig_types[169]
+#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[170]
+#define SWIGTYPE_p_scfImplementationExt0TcsImageMemory_csImageBase_t swig_types[171]
+#define SWIGTYPE_p_scfImplementationExt1TcsPath_csObject_iPath_t swig_types[172]
+#define SWIGTYPE_p_size_t swig_types[173]
+#define SWIGTYPE_p_uint16_t swig_types[174]
+#define SWIGTYPE_p_uint32_t swig_types[175]
+#define SWIGTYPE_p_uint64_t swig_types[176]
+#define SWIGTYPE_p_uint8_t swig_types[177]
+#define SWIGTYPE_p_unsigned_char swig_types[178]
+#define SWIGTYPE_p_unsigned_int swig_types[179]
+#define SWIGTYPE_p_unsigned_long swig_types[180]
+#define SWIGTYPE_p_unsigned_long_long swig_types[181]
+#define SWIGTYPE_p_void swig_types[182]
+#define SWIGTYPE_p_wchar_t swig_types[183]
+static swig_type_info *swig_types[185];
+static swig_module_info swig_module = {swig_types, 184, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -3231,16 +3232,16 @@ SWIGINTERN int iGraphics3D_scfGetVersion(){ return scfInterfaceTraits<iGraphics3
 SWIGINTERN void delete_iGraphics3D(iGraphics3D *self){ if (self) self->DecRef (); }
 
 SWIGINTERNINLINE PyObject *
-SWIG_From_unsigned_SS_int  (unsigned int value)
+SWIG_From_size_t  (size_t value)
 {    
-  return SWIG_From_unsigned_SS_long  (value);
+  return SWIG_From_unsigned_SS_long  (static_cast< unsigned long >(value));
 }
 
 
 SWIGINTERNINLINE PyObject *
-SWIG_From_size_t  (size_t value)
+SWIG_From_unsigned_SS_int  (unsigned int value)
 {    
-  return SWIG_From_unsigned_SS_long  (static_cast< unsigned long >(value));
+  return SWIG_From_unsigned_SS_long  (value);
 }
 
 SWIGINTERN int iFont_scfGetVersion(){ return scfInterfaceTraits<iFont>::GetVersion(); }
@@ -11743,6 +11744,271 @@ SWIGINTERN PyObject *_wrap_RenderMeshModes_buffers_get(PyObject *SWIGUNUSEDPARM(
   arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
   result = (csRef<csRenderBufferHolder > *)& ((arg1)->buffers);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csRefTcsRenderBufferHolder_t, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_RenderMeshModes_doInstancing_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
+  bool arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  bool val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_doInstancing_set",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_doInstancing_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
+  ecode2 = SWIG_AsVal_bool(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "RenderMeshModes_doInstancing_set" "', argument " "2"" of type '" "bool""'");
+  } 
+  arg2 = static_cast< bool >(val2);
+  if (arg1) (arg1)->doInstancing = arg2;
+  
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_RenderMeshModes_doInstancing_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_doInstancing_get",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_doInstancing_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
+  result = (bool) ((arg1)->doInstancing);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_RenderMeshModes_instParamNum_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
+  size_t arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_instParamNum_set",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instParamNum_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "RenderMeshModes_instParamNum_set" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  if (arg1) (arg1)->instParamNum = arg2;
+  
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_RenderMeshModes_instParamNum_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
+  size_t result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_instParamNum_get",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instParamNum_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
+  result =  ((arg1)->instParamNum);
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_RenderMeshModes_instParamsTargets_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
+  csVertexAttrib *arg2 = (csVertexAttrib *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_instParamsTargets_set",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instParamsTargets_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_csVertexAttrib, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "RenderMeshModes_instParamsTargets_set" "', argument " "2"" of type '" "csVertexAttrib const *""'"); 
+  }
+  arg2 = reinterpret_cast< csVertexAttrib * >(argp2);
+  if (arg1) (arg1)->instParamsTargets = (csVertexAttrib const *)arg2;
+  
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_RenderMeshModes_instParamsTargets_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
+  csVertexAttrib *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_instParamsTargets_get",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instParamsTargets_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
+  result = (csVertexAttrib *) ((arg1)->instParamsTargets);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csVertexAttrib, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_RenderMeshModes_instanceNum_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
+  size_t arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_instanceNum_set",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instanceNum_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "RenderMeshModes_instanceNum_set" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  if (arg1) (arg1)->instanceNum = arg2;
+  
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_RenderMeshModes_instanceNum_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
+  size_t result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_instanceNum_get",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instanceNum_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
+  result =  ((arg1)->instanceNum);
+  resultobj = SWIG_From_size_t(static_cast< size_t >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_RenderMeshModes_instParams_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
+  csShaderVariable ***arg2 = (csShaderVariable ***) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_instParams_set",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instParams_set" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_p_p_csShaderVariable, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "RenderMeshModes_instParams_set" "', argument " "2"" of type '" "csShaderVariable **const *""'"); 
+  }
+  arg2 = reinterpret_cast< csShaderVariable *** >(argp2);
+  if (arg1) (arg1)->instParams = (csShaderVariable **const *)arg2;
+  
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_RenderMeshModes_instParams_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Graphics::RenderMeshModes *arg1 = (CS::Graphics::RenderMeshModes *) 0 ;
+  csShaderVariable ***result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"RenderMeshModes_instParams_get",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__RenderMeshModes, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "RenderMeshModes_instParams_get" "', argument " "1"" of type '" "CS::Graphics::RenderMeshModes *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Graphics::RenderMeshModes * >(argp1);
+  result = (csShaderVariable ***) ((arg1)->instParams);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_p_p_csShaderVariable, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -22776,6 +23042,16 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"RenderMeshModes_zoffset_get", _wrap_RenderMeshModes_zoffset_get, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshModes_buffers_set", _wrap_RenderMeshModes_buffers_set, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshModes_buffers_get", _wrap_RenderMeshModes_buffers_get, METH_VARARGS, NULL},
+	 { (char *)"RenderMeshModes_doInstancing_set", _wrap_RenderMeshModes_doInstancing_set, METH_VARARGS, NULL},
+	 { (char *)"RenderMeshModes_doInstancing_get", _wrap_RenderMeshModes_doInstancing_get, METH_VARARGS, NULL},
+	 { (char *)"RenderMeshModes_instParamNum_set", _wrap_RenderMeshModes_instParamNum_set, METH_VARARGS, NULL},
+	 { (char *)"RenderMeshModes_instParamNum_get", _wrap_RenderMeshModes_instParamNum_get, METH_VARARGS, NULL},
+	 { (char *)"RenderMeshModes_instParamsTargets_set", _wrap_RenderMeshModes_instParamsTargets_set, METH_VARARGS, NULL},
+	 { (char *)"RenderMeshModes_instParamsTargets_get", _wrap_RenderMeshModes_instParamsTargets_get, METH_VARARGS, NULL},
+	 { (char *)"RenderMeshModes_instanceNum_set", _wrap_RenderMeshModes_instanceNum_set, METH_VARARGS, NULL},
+	 { (char *)"RenderMeshModes_instanceNum_get", _wrap_RenderMeshModes_instanceNum_get, METH_VARARGS, NULL},
+	 { (char *)"RenderMeshModes_instParams_set", _wrap_RenderMeshModes_instParams_set, METH_VARARGS, NULL},
+	 { (char *)"RenderMeshModes_instParams_get", _wrap_RenderMeshModes_instParams_get, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshModes_swigregister", RenderMeshModes_swigregister, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshIndexRange_start_set", _wrap_RenderMeshIndexRange_start_set, METH_VARARGS, NULL},
 	 { (char *)"RenderMeshIndexRange_start_get", _wrap_RenderMeshIndexRange_start_get, METH_VARARGS, NULL},
@@ -23527,6 +23803,7 @@ static swig_type_info _swigt__p_long_long = {"_p_long_long", "longlong *|long lo
 static swig_type_info _swigt__p_p_csShaderVariable = {"_p_p_csShaderVariable", "csShaderVariable **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_iRenderBuffer = {"_p_p_iRenderBuffer", "iRenderBuffer **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_iTextureHandle = {"_p_p_iTextureHandle", "iTextureHandle **", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_p_p_csShaderVariable = {"_p_p_p_csShaderVariable", "csShaderVariable ***", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_size_t = {"_p_size_t", "size_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint16_t = {"_p_uint16_t", "uint16 *|uint16_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint32_t = {"_p_uint32_t", "uint32_t *|uint32 *", 0, 0, (void*)0, 0};
@@ -23707,6 +23984,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_p_csShaderVariable,
   &_swigt__p_p_iRenderBuffer,
   &_swigt__p_p_iTextureHandle,
+  &_swigt__p_p_p_csShaderVariable,
   &_swigt__p_scfImplementation1TcsConfigFile_iConfigFile_t,
   &_swigt__p_scfImplementation1TcsImageBase_iImage_t,
   &_swigt__p_scfImplementation1TcsObject_iObject_t,
@@ -23897,6 +24175,7 @@ static swig_cast_info _swigc__p_long_long[] = {  {&_swigt__p_long_long, 0, 0, 0}
 static swig_cast_info _swigc__p_p_csShaderVariable[] = {  {&_swigt__p_p_csShaderVariable, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_iRenderBuffer[] = {  {&_swigt__p_p_iRenderBuffer, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_iTextureHandle[] = {  {&_swigt__p_p_iTextureHandle, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_p_p_csShaderVariable[] = {  {&_swigt__p_p_p_csShaderVariable, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_size_t[] = {  {&_swigt__p_size_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint16_t[] = {  {&_swigt__p_uint16_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint32_t[] = {  {&_swigt__p_uint32_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -24077,6 +24356,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_p_csShaderVariable,
   _swigc__p_p_iRenderBuffer,
   _swigc__p_p_iTextureHandle,
+  _swigc__p_p_p_csShaderVariable,
   _swigc__p_scfImplementation1TcsConfigFile_iConfigFile_t,
   _swigc__p_scfImplementation1TcsImageBase_iImage_t,
   _swigc__p_scfImplementation1TcsObject_iObject_t,
@@ -24640,6 +24920,8 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CS_VATTRIB_GENERIC_FIRST",SWIG_From_int(static_cast< int >(100)));
   SWIG_Python_SetConstant(d, "CS_VATTRIB_GENERIC_LAST",SWIG_From_int(static_cast< int >((100+15))));
   SWIG_Python_SetConstant(d, "CS_VATTRIB_GENERIC_NUM",SWIG_From_int(static_cast< int >(((100+15) -100+1))));
+  SWIG_Python_SetConstant(d, "CS_IATTRIB_FIRST",SWIG_From_int(static_cast< int >(200)));
+  SWIG_Python_SetConstant(d, "CS_IATTRIB_LAST",SWIG_From_int(static_cast< int >((200+0))));
   SWIG_Python_SetConstant(d, "CS_VATTRIB_UNUSED",SWIG_From_int(static_cast< int >(CS_VATTRIB_UNUSED)));
   SWIG_Python_SetConstant(d, "CS_VATTRIB_INVALID",SWIG_From_int(static_cast< int >(CS_VATTRIB_INVALID)));
   SWIG_Python_SetConstant(d, "CS_VATTRIB_POSITION",SWIG_From_int(static_cast< int >(CS_VATTRIB_POSITION)));
@@ -24674,6 +24956,7 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CS_VATTRIB_13",SWIG_From_int(static_cast< int >(CS_VATTRIB_13)));
   SWIG_Python_SetConstant(d, "CS_VATTRIB_14",SWIG_From_int(static_cast< int >(CS_VATTRIB_14)));
   SWIG_Python_SetConstant(d, "CS_VATTRIB_15",SWIG_From_int(static_cast< int >(CS_VATTRIB_15)));
+  SWIG_Python_SetConstant(d, "CS_IATTRIB_OBJECT2WORLD",SWIG_From_int(static_cast< int >(CS_IATTRIB_OBJECT2WORLD)));
   SWIG_Python_SetConstant(d, "CS_MIXMODE_TYPE_AUTO",SWIG_From_int(static_cast< int >((0x00000000))));
   SWIG_Python_SetConstant(d, "CS_MIXMODE_TYPE_BLENDOP",SWIG_From_int(static_cast< int >((0x40000000))));
   SWIG_Python_SetConstant(d, "CS_MIXMODE_FLAG_BLENDOP_ALPHA",SWIG_From_int(static_cast< int >((0x08000000))));
