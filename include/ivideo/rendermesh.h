@@ -93,6 +93,7 @@ namespace Graphics
       cullMode (x.cullMode),
       alphaType (x.alphaType),
       zoffset (x.zoffset),
+      doInstancing (x.doInstancing),
       buffers (x.buffers)
     {
     }
