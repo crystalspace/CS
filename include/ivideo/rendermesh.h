@@ -93,8 +93,12 @@ namespace Graphics
       cullMode (x.cullMode),
       alphaType (x.alphaType),
       zoffset (x.zoffset),
+      buffers (x.buffers),
       doInstancing (x.doInstancing),
-      buffers (x.buffers)
+      instParamNum (x.instParamNum),
+      instParamsTargets (x.instParamsTargets),
+      instanceNum (x.instanceNum),
+      instParams (x.instParams)	
     {
     }
 
