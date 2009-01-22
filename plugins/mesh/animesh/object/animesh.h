@@ -19,17 +19,19 @@
 #ifndef __CS_ANIMESH_H__
 #define __CS_ANIMESH_H__
 
+#include "csgeom/box.h"
 #include "csgfx/shadervarcontext.h"
+#include "cstool/objmodel.h"
 #include "cstool/rendermeshholder.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/flags.h"
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
+#include "iengine/movable.h"
+#include "iengine/scenenode.h"
 #include "imesh/animesh.h"
 #include "imesh/object.h"
 #include "iutil/comp.h"
-#include "csgeom/box.h"
-#include "cstool/objmodel.h"
 
 #include "morphtarget.h"
 
@@ -37,6 +39,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 {
 
   class FactorySubmesh;
+  class FactorySocket;
 
   class AnimeshObjectType : 
     public scfImplementation2<AnimeshObjectType, 
@@ -100,6 +103,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     virtual void ClearMorphTargets ();
     virtual uint FindMorphTarget (const char* name) const;
 
+    virtual void CreateSocket (BoneID bone, 
+      const csReversibleTransform& transform, const char* name);
+    virtual size_t GetSocketCount () const;
+    virtual iAnimatedMeshSocketFactory* GetSocket (size_t index) const;
+
     //-- iMeshObjectFactory
     virtual csFlags& GetFlags ();
 
@@ -159,6 +167,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csRefArray<MorphTarget> morphTargets;
     csHash<uint, csString> morphTargetNames;
 
+    // Sockets
+    csRefArray<FactorySocket> sockets;
+
     friend class AnimeshObject;
   };
 
@@ -210,6 +221,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   };
 
 
+  class FactorySocket :
+    public scfImplementation1<FactorySocket,
+                              iAnimatedMeshSocketFactory>
+  {
+  public:
+    FactorySocket (AnimeshObjectFactory* factory, BoneID bone, const char* name,
+                   csReversibleTransform transform);
+
+    //-- iAnimatedMeshSocketFactory
+    virtual const char* GetName () const;
+    virtual const csReversibleTransform& GetTransform () const;
+    virtual void SetTransform (csReversibleTransform& tf);
+    virtual BoneID GetBone () const;
+    virtual void SetBone (BoneID bone);
+    virtual iAnimatedMeshFactory* GetFactory ();
+
+    AnimeshObjectFactory* factory;
+    BoneID bone;
+    csString name;
+    csReversibleTransform transform;        
+  };
+
 
   class AnimeshObject :
     public scfImplementationExt2<AnimeshObject,
@@ -229,6 +262,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     virtual void SetMorphTargetWeight (uint target, float weight);
     virtual float GetMorphTargetWeight (uint target) const;
+
+    virtual size_t GetSocketCount () const;
+    virtual iAnimatedMeshSocket* GetSocket (size_t index) const;
 
     //-- iMeshObject
     virtual iMeshObjectFactory* GetFactory () const;
@@ -284,13 +320,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
     //-- iRenderBufferAccessor
     void PreGetBuffer (csRenderBufferHolder* holder, 
-      csRenderBufferName buffer);
-
-    //
-    void SetupSubmeshes ();
-    void UpdateLocalBoneTransforms ();
+      csRenderBufferName buffer);    
 
   private:
+    //
+    void SetupSubmeshes ();
+    void SetupSockets ();
+    void UpdateLocalBoneTransforms ();
+    void UpdateSocketTransforms ();
+
     void SkinVertices ();
     void SkinNormals ();
     void SkinVerticesAndNormals ();
@@ -354,6 +392,33 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       csRefArray<csShaderVariable> boneTransformArray;
     };    
 
+    class Socket : public scfImplementation1<Socket, 
+                                             iAnimatedMeshSocket>
+    {
+    public:
+      Socket (AnimeshObject* object, FactorySocket* factorySocket);
+
+      //-- iAnimatedMeshSocket
+      virtual const char* GetName () const;
+      virtual iAnimatedMeshSocketFactory* GetFactory ();
+      virtual const csReversibleTransform& GetTransform () const;
+      virtual void SetTransform (csReversibleTransform& tf);
+      virtual const csReversibleTransform GetFullTransform () const;     
+      virtual BoneID GetBone () const;
+      virtual iAnimatedMesh* GetMesh () const;
+      virtual iSceneNode* GetSceneNode () const;
+      virtual void SetSceneNode (iSceneNode* sn);
+
+      void UpdateSceneNode ();
+
+      AnimeshObject* object;
+      FactorySocket* factorySocket;
+      BoneID bone;      
+      csReversibleTransform transform;      
+      csReversibleTransform socketBoneTransform;
+      iSceneNode* sceneNode;
+    };
+
     AnimeshObjectFactory* factory;
     iMeshWrapper* logParent;
     iMaterialWrapper* material;
@@ -372,6 +437,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     csDirtyAccessArray<CS::Graphics::RenderMesh*> renderMeshList;
 
     csRefArray<Submesh> submeshes;
+    csRefArray<Socket> sockets;
 
     // Holder for skinned vertex buffers
     csRef<iRenderBuffer> skinnedVertices;
