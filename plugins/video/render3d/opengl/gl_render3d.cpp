@@ -2114,14 +2114,14 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     if ((current_zmode == CS_ZBUF_MESH) || (current_zmode == CS_ZBUF_MESH2))
     {
       CS_ASSERT_MSG ("Meshes can't have zmesh zmode. You deserve some spanking", 
-	(modes.z_buf_mode != CS_ZBUF_MESH) && 
-	(modes.z_buf_mode != CS_ZBUF_MESH2));
-        SetZModeInternal ((current_zmode == CS_ZBUF_MESH2) ? 
-	  GetZModePass2 (modes.z_buf_mode) : modes.z_buf_mode);
+        (modes.z_buf_mode != CS_ZBUF_MESH) && 
+        (modes.z_buf_mode != CS_ZBUF_MESH2));
+      SetZModeInternal ((current_zmode == CS_ZBUF_MESH2) ? 
+        GetZModePass2 (modes.z_buf_mode) : modes.z_buf_mode);
       /*if (current_zmode == CS_ZBUF_MESH2)
       {
-        glPolygonOffset (0.15f, 6.0f); 
-        statecache->Enable_GL_POLYGON_OFFSET_FILL ();
+      glPolygonOffset (0.15f, 6.0f); 
+      statecache->Enable_GL_POLYGON_OFFSET_FILL ();
       }*/
     }
 
@@ -2129,56 +2129,56 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       CS_PROFILER_ZONE(csGLGraphics3D_DrawMesh_DrawElements);
       if (mymesh->multiRanges && mymesh->rangesNum)
       {
-	size_t num_tri = 0;
-	for (size_t r = 0; r < mymesh->rangesNum; r++)
-	{
-	  CS::Graphics::RenderMeshIndexRange range = mymesh->multiRanges[r];
-	  if (bugplug) num_tri += (range.end-range.start)/primNum_divider - primNum_sub;
-	  glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
-	    (GLuint)iIndexbuf->GetRangeEnd(), range.end - range.start,
-	    compType, 
+        size_t num_tri = 0;
+        for (size_t r = 0; r < mymesh->rangesNum; r++)
+        {
+          CS::Graphics::RenderMeshIndexRange range = mymesh->multiRanges[r];
+          if (bugplug) num_tri += (range.end-range.start)/primNum_divider - primNum_sub;
+          glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+            (GLuint)iIndexbuf->GetRangeEnd(), range.end - range.start,
+            compType, 
             ((uint8*)bufData) + (indexCompsBytes * range.start));
-	}
-	if (bugplug)
-	{
-	  bugplug->AddCounter ("Triangle Count", (int)num_tri);
-	  bugplug->AddCounter ("Mesh Count", 1);
-	}
+        }
+        if (bugplug)
+        {
+          bugplug->AddCounter ("Triangle Count", (int)num_tri);
+          bugplug->AddCounter ("Mesh Count", 1);
+        }
       }
       else
       {
-	if (bugplug)
-	{
-	  size_t num_tri = (mymesh->indexend-mymesh->indexstart)/primNum_divider - primNum_sub;
-	  bugplug->AddCounter ("Triangle Count", (int)num_tri);
-	  bugplug->AddCounter ("Mesh Count", 1);
-	}
+        if (bugplug)
+        {
+          size_t num_tri = (mymesh->indexend-mymesh->indexstart)/primNum_divider - primNum_sub;
+          bugplug->AddCounter ("Triangle Count", (int)num_tri);
+          bugplug->AddCounter ("Mesh Count", 1);
+        }
 
-  if (modes.doInstancing)
-  {
-    const size_t instParamNum = modes.instParamNum;
-    const csVertexAttrib* const instParamsTargets = modes.instParamsTargets;
-    for (size_t n = 0; n < modes.instanceNum; n++)
-    {
-      SetupInstance (instParamNum, instParamsTargets, modes.instParams[n]);
-      glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
-        (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
-        compType, 
-        ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
-      TeardownInstance (instParamNum, instParamsTargets);
-    }
-  }
-  else
-  {
-    // @@@ Temporary comment. If runnung Ubuntu 8.04 on a machine with Intel
-    // hardware and you get an error that traces back to the function below.
-    // Please see: http://trac.crystalspace3d.org/trac/CS/ticket/551 in the
-    // first instance.
-    glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
-      (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
-      compType, 
-      ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
-  }
+        if (modes.doInstancing)
+        {
+          const size_t instParamNum = modes.instParamNum;
+          const csVertexAttrib* const instParamsTargets = modes.instParamsTargets;
+          for (size_t n = 0; n < modes.instanceNum; n++)
+          {
+            SetupInstance (instParamNum, instParamsTargets, modes.instParams[n]);
+            glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+              (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
+              compType, 
+              ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
+            TeardownInstance (instParamNum, instParamsTargets);
+          }
+        }
+        else
+        {
+          // @@@ Temporary comment. If runnung Ubuntu 8.04 on a machine with Intel
+          // hardware and you get an error that traces back to the function below.
+          // Please see: http://trac.crystalspace3d.org/trac/CS/ticket/551 in the
+          // first instance.
+          glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+            (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
+            compType, 
+            ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
+        }
       }
     }
   }
