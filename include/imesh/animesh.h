@@ -55,7 +55,7 @@ struct csAnimatedMeshBoneInfluence
 /**
  * Factory for sockets attached to animated meshes
  */
-struct iAnimatedMeshSocketFactory
+struct iAnimatedMeshSocketFactory : public virtual iBase
 {
 public:
   SCF_INTERFACE(iAnimatedMeshSocketFactory, 1, 0, 0);
@@ -89,7 +89,7 @@ public:
 /**
  * 
  */
-struct iAnimatedMeshSocket
+struct iAnimatedMeshSocket : public virtual iBase
 {
 public:
   SCF_INTERFACE(iAnimatedMeshSocket, 1, 0, 0);
