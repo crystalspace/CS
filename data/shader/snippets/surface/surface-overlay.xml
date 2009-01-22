@@ -53,7 +53,7 @@
           <?if vars."tex overlay".texture ?>
             surfaceColor = surfaceColorIn;
             float4 overlayTex = tex2D(texOverlay, texCoord);
-            surfaceColor.rgb = (surfaceColor.rgb * overlayTex.a) + (overlayTex.rgb * (1 - overlayTex.a));
+            surfaceColor.rgb = lerp(overlayTex.rgb, surfaceColor.rgb, overlayTex.a);
             surfaceColor_attr_perfragment = true;
           <?else?>
             surfaceColor = surfaceColorIn;
