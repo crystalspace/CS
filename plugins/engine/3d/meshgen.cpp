@@ -36,7 +36,7 @@ csMeshGeneratorGeometry::csMeshGeneratorGeometry (
   default_material_factor = 0.0f;
   celldim = 0;
   positions = 0;
-  wind_direction = csVector2(0, 0);
+  wind_direction = csVector3(0, 0, 0);
   wind_bias = 1.0f;
 }
 
@@ -256,7 +256,7 @@ void csMeshGeneratorGeometry::MoveMesh (int cidx, iMeshWrapper* mesh,
 void csMeshGeneratorGeometry::SetWindDirection (float x, float z)
 {
   wind_direction.x = x;
-  wind_direction.y = z;
+  wind_direction.z = z;
 }
 
 void csMeshGeneratorGeometry::SetWindBias (float bias)
@@ -793,7 +793,10 @@ void csMeshGenerator::SetFade (csMGPosition& p, float factor)
 void csMeshGenerator::SetWindData (csMGPosition& p)
 {
   csMeshGeneratorGeometry* geom = geometries[p.geom_type];
-  p.vertexInfo.windVar->SetValue (csVector4(geom->GetWindDirection().x, geom->GetWindDirection().y, p.vertexInfo.windRandVar, geom->GetWindBias()));
+  csReversibleTransform transform;
+  p.vertexInfo.transformVar->GetValue(transform);
+  csVector3 windDirection = transform.This2OtherRelative(geom->GetWindDirection());
+  p.vertexInfo.windVar->SetValue (csVector4(windDirection.x, windDirection.z, p.vertexInfo.windRandVar, geom->GetWindBias()));
 }
 
 void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,

@@ -115,7 +115,7 @@ private:
   int celldim;
 
   /// For wind.
-  csVector2 wind_direction;
+  csVector3 wind_direction;
   float wind_bias;
 
   csStringID colldetID;
@@ -167,7 +167,7 @@ public:
     default_material_factor = factor;
   }
 
-  const csVector2& GetWindDirection() const { return wind_direction; }
+  const csVector3& GetWindDirection() const { return wind_direction; }
   virtual void SetWindDirection (float x, float z);
 
   const float& GetWindBias() const { return wind_bias; }
