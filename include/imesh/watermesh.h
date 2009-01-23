@@ -66,15 +66,14 @@ struct iMaterialWrapper;
         (crystalspace.mesh.loader.factory.protomesh)
  *   
  */
+enum waterMeshType {
+	WATER_TYPE_LOCAL,
+	WATER_TYPE_OCEAN
+};
+
 struct iWaterFactoryState : public virtual iBase
 {
   SCF_INTERFACE (iWaterFactoryState, 2, 0, 0);
-
-  virtual csVector3* GetVertices () = 0;
-  virtual csVector2* GetTexels () = 0;
-  virtual csVector3* GetNormals () = 0;
-  virtual csColor* GetColors () = 0;
-  virtual csTriangle* GetTriangles () = 0;
 
   /**
    * After making a significant change to the vertices or triangles you
@@ -95,9 +94,28 @@ struct iWaterFactoryState : public virtual iBase
 
   virtual void SetMurkiness(float murk) = 0;
   virtual float GetMurkiness() = 0;
+	
+  virtual void SetWaterType(waterMeshType type) = 0;
+  virtual bool isOcean() = 0;
+
+  /*
+   *	These are the wave properties as outlined in section 4.1 in this paper by
+   *	Jerry Tessendorf, presented in 2004, which uses ideas from Fournier and 
+   *	Reeves' paper from Siggraph '86 Proceedings:
+   *
+   *	http://www.finelightvisualtechnology.com/docs/coursenotes2004.pdf
+   *	http://www.iro.umontreal.ca/~poulin/fournier/papers/p75-fournier.pdf
+   *	
+   *	TODO: Move from Gerstner waves to a statistical model representation using
+   *	Fast Fourier Transforms as described in section 4.3 of Tessendorf's paper.
+   */
+  virtual void SetAmplitudes(float amp1, float amp2, float amp3) = 0;
+  virtual void SetFrequencies(float freq1, float freq2, float freq3) = 0;
+  virtual void SetPhases(float phase1, float phase2, float phase3) = 0;
+  virtual void SetDirections(csVector2 dir1, csVector2 dir2, csVector2 dir3) = 0;
 
   //Size must be a power of two.
-  //virtual csRef<iTextureWrapper> MakeFresnelTex(int size);
+  virtual csRef<iTextureWrapper> MakeFresnelTex(int size) = 0;
 };
 
 /**

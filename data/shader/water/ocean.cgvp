@@ -35,7 +35,7 @@ float2 WaveDisp(float2 k, float amp, float2 pos, float freq, float phase, float 
 	return normk * amp * sin(dot(k, pos) - (freq * time) + phase);
 }
 
-//Wave displacement z
+//Wave displacement y
 float WaveDispVert(float2 k, float amp, float2 pos, float freq, float phase, float time)
 {
 	return amp * cos(dot(k, pos) - (freq * time) + phase);
@@ -53,14 +53,17 @@ vert2frag main (app2vert IN,
 			 uniform float3 freqs,
 			 uniform float3 phases,
 			 uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
-			 uniform float4x4 ModelViewProj : state.matrix.mvp)
+			 uniform float4x4 ModelViewProj : state.matrix.mvp,
+			 uniform float4x4 o2w)
 {
     vert2frag OUT;
 
 	float4 inPos = IN.Position;
+	
+  	float4 camera = ModelViewIT[3];
 
 	//Grab xz position
-	float2 xzpos = IN.Position.xz;
+	float2 xzpos = mul(o2w, IN.Position).xz;
 
 	//Displace once
 	float2 k = float2(kxs.x, kys.x);
@@ -86,21 +89,21 @@ vert2frag main (app2vert IN,
 	OUT.Position = mul (ModelViewProj, inPos);
 
 	OUT.Color = IN.Color;
-
-  	float4 camera = ModelViewIT[3];
 	OUT.CamVec = (camera - IN.Position).xzy;
+	//OUT.CamVec = inPos.xyz;
 
 	float s1, cs1, s2, cs2;
+	float4 texCoord = mul(o2w, float4(IN.TexCoord.x, 0, IN.TexCoord.y, 1));
 	sincos (time, s1, cs1);
 	sincos (time + 1.41, s2, cs2);
 
-	OUT.TexCoord2.x = IN.TexCoord.x  - s1 * 0.1;
-	OUT.TexCoord2.y = IN.TexCoord.y  + cs1 * 0.1;
+	OUT.TexCoord2.x = texCoord.x  - s1 * 0.1;
+	OUT.TexCoord2.y = texCoord.z  + cs1 * 0.1;
 	OUT.TexCoord2.z = 0.0;
 	OUT.TexCoord2.w = 1.0;
 		
-	OUT.TexCoord3.x = IN.TexCoord.x + s2 * 0.1;
-	OUT.TexCoord3.y = IN.TexCoord.y - cs2 * 0.1;
+	OUT.TexCoord3.x = texCoord.x + s2 * 0.1;
+	OUT.TexCoord3.y = texCoord.z - cs2 * 0.1;
 	OUT.TexCoord3.z = 0.0;
 	OUT.TexCoord3.w = 1.0;
 		

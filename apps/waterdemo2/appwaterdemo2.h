@@ -60,7 +60,7 @@ private:
    */
   virtual bool OnKeyboard(iEvent&);
 
-  void CreateRoom();
+  bool LoadMap ();
   
 public:
   /**

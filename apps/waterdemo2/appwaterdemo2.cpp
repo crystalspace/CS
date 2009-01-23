@@ -187,13 +187,13 @@ bool AppWaterdemo2::Application()
   if (!engine)
     return ReportError("Failed to locate 3D engine!");
     
-  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
+  vc = csQueryRegistry<iVirtualClock> (r);
   if (!vc) return ReportError("Failed to locate Virtual Clock!");
 
-  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry());
+  kbd = csQueryRegistry<iKeyboardDriver> (r);
   if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
 
-  loader = csQueryRegistry<iLoader> (GetObjectRegistry());
+  loader = csQueryRegistry<iLoader> (r);
   if (!loader) return ReportError("Failed to locate Loader!");
 
 
@@ -203,144 +203,9 @@ bool AppWaterdemo2::Application()
   rotY = 0;
   rotX = 0;
 
-  fact = engine->CreateMeshFactory (
-    "crystalspace.mesh.object.genmesh", "cubeFact");
-  csRef<iGeneralFactoryState> factstate = scfQueryInterface<iGeneralFactoryState> (
-    fact->GetMeshObjectFactory ());
-
-  csEllipsoid ellips (csVector3 (0, 0, 0), csVector3 (1, 1, 1));
-  factstate->GenerateSphere (ellips, 8);
-  factstate->CalculateNormals ();
-    
-  waterfact = engine->CreateMeshFactory(
-  	"crystalspace.mesh.object.watermesh", "meshFact");
-  		
-  if(!waterfact) return ReportError("Failed to load water mesh factory!");
-
-	csRef<iWaterFactoryState> waterFactState = scfQueryInterface<iWaterFactoryState> (
-		waterfact->GetMeshObjectFactory());
-	waterFactState->SetLength(11);
-	waterFactState->SetWidth(11);
-	waterFactState->SetGranularity(2);
-	waterFactState->SetMurkiness(0.2);
-
-	// Load in lighting shaders
-	csRef<iVFS> vfs (csQueryRegistry<iVFS> (object_reg));
-	csRef<iFile> shaderFile = vfs->Open ("/shader/water/water.xml", VFS_FILE_READ);
-	csRef<iPluginManager> plugin_mgr (csQueryRegistry<iPluginManager> (object_reg));
-
-	csRef<iDocumentSystem> docsys = csLoadPlugin<iDocumentSystem > 
-		(plugin_mgr, "crystalspace.documentsystem.xmlread");
-	if (docsys.IsValid())
-	    object_reg->Register (docsys, "iDocumentSystem ");
-
-	csRef<iDocument> shaderDoc = docsys->CreateDocument ();
-	shaderDoc->Parse (shaderFile, true);
-
-	csRef<iShaderManager> shmgr (csQueryRegistry<iShaderManager> (object_reg));
-	csRef<iShaderCompiler> shcom (shmgr->GetCompiler ("XMLShader"));
-	csRef<iLoaderContext> ldr_context = engine->CreateLoaderContext();
-	csRef<iShader> shader = shcom->CompileShader 
-		(ldr_context, shaderDoc->GetRoot()->GetNode("shader"));
-	csRef<iMaterial> mat = engine->CreateBaseMaterial (0);
-	csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
-	 	(object_reg, "crystalspace.shared.stringset");
-	mat->SetShader (strings->Request ("standard"), shader);
-
-	csRef<iMaterialWrapper> waterMatW = 
-		engine->GetMaterialList ()->NewMaterial (mat, "waterMaterial");
-
-  //CreateRoom();
-
-// Load the texture from the standard library.  This is located in
-  // CS/data/standard.zip and mounted as /lib/std using the Virtual
-  // File System (VFS) plugin.
-  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-    ReportError("Error loading 'stone4' texture!");
-
-  if (!loader->LoadTexture ("wood", "/lib/std/andrew_wood.gif"))
-    ReportError("Error loading 'andrew_wood' texture!");
-
-  //iTextureWrapper* normalMap = loader->LoadTexture ("normal map", "/water/723-normal.jpg");
-  iTextureWrapper* normalMap = loader->LoadTexture ("normal map", "/water/w_normalmap.png");  
-  //iTextureWrapper* normalMap = loader->LoadTexture ("normal map", "/water/940-bump.jpg");
-  if(!normalMap)
-	ReportError("Error loading normal map!");
-
-  iMaterialWrapper* stone =
-    engine->GetMaterialList ()->FindByName ("stone");
-
-  iMaterialWrapper* wood =
-    engine->GetMaterialList ()->FindByName ("wood");
-
-  room = engine->CreateSector ("room");
-
-
-  // First we make a primitive for our geometry.
-  using namespace CS::Geometry;
-  DensityTextureMapper mapper (0.3f);
-  TesselatedBox box (csVector3 (0, -5, 0), csVector3 (10, 5, 10));
-  box.SetLevel (3);
-  box.SetMapper (&mapper);
-  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
-
-  // Now we make a factory and a mesh at once.
-  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
-      engine, room, "walls", "walls_factory", &box);
-
-  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
-    iGeneralMeshState> (walls->GetMeshObject ());
-  mesh_state->SetShadowReceiving (true);
-  walls->GetMeshObject ()->SetMaterialWrapper (wood);
-
-  csRef<iLight> light;
-  iLightList* ll = room->GetLights ();
-
-  light = engine->CreateLight (0, csVector3 (1, 3, 1), 10,
-        csColor (1, 0, 0));
-  ll->Add (light);
-
-  light = engine->CreateLight (0, csVector3 (1, 3,  9), 10,
-        csColor (0, 0, 1));
-  ll->Add (light);
-
-  light = engine->CreateLight (0, csVector3 (19, 3, 1), 10,
-        csColor (0, 1, 0));
-  ll->Add (light);
-  
-  light = engine->CreateLight (0, csVector3 (19, 3, 9), 10,
-        csColor (1, 1, 1));
-  ll->Add (light);
-  
-    // Make a ball using the genmesh plug-in.
-
-  csRef<iMeshWrapper> ball =
-    engine->CreateMeshWrapper (
-    	fact, 
-    	"ball", 
-    	room, 
-    	csVector3 (5, 5, 5));
-    
-  csRef<iMeshObject> ballstate = scfQueryInterface<iMeshObject> (
-    ball->GetMeshObject ());
-  ballstate->SetMaterialWrapper (stone);
-
-  csRef<iMeshWrapper> watermesh =
-    engine->CreateMeshWrapper (
-    	waterfact, 
-    	"watermesh", 
-    	room, 
-    	csVector3 (0, 0, 0));
-
-  //watermesh->SetFlagsRecursive(CS_ENTITY_CAMERA);
-
-  csRef<iWaterMeshState> watermeshstate = scfQueryInterface<iWaterMeshState> (
-    watermesh->GetMeshObject ());
-  csRef<iMeshObject> watermeshobj = scfQueryInterface<iMeshObject> (
-    watermesh->GetMeshObject ());
-
-  watermeshobj->SetMaterialWrapper (waterMatW);
-  watermeshstate->SetNormalMap(normalMap);
+  if(!LoadMap()) return 0;
+	
+  room = engine->FindSector ("room");
 
   engine->Prepare ();
 
@@ -359,85 +224,14 @@ bool AppWaterdemo2::Application()
   return true;
 }
 
-void AppWaterdemo2::CreateRoom ()
+bool AppWaterdemo2::LoadMap ()
 {
-  // Load the texture from the standard library.  This is located in
-  // CS/data/standard.zip and mounted as /lib/std using the Virtual
-  // File System (VFS) plugin.
-  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-    ReportError("Error loading 'stone4' texture!");
-    
-  if (!loader->LoadTexture ("wood", "/lib/std/andrew_wood.gif"))
-    ReportError("Error loading 'andrew_wood' texture!");
+  // Set VFS current directory to the level we want to load.
+  csRef<iVFS> VFS (csQueryRegistry<iVFS> (GetObjectRegistry ()));
+  VFS->ChDir ("/lev/oceantest");
+  // Load the level file which is called 'world'.
+  if (!loader->LoadMapFile ("world"))
+    ReportError("Error couldn't load level!");
 
-  iMaterialWrapper* stone =
-    engine->GetMaterialList ()->FindByName ("stone");
-    
-  iMaterialWrapper* wood =
-    engine->GetMaterialList ()->FindByName ("wood");
-
-  room = engine->CreateSector ("room");
-
-
-  // First we make a primitive for our geometry.
-  using namespace CS::Geometry;
-  DensityTextureMapper mapper (0.3f);
-  TesselatedBox box (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
-  box.SetLevel (3);
-  box.SetMapper (&mapper);
-  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
-
-  // Now we make a factory and a mesh at once.
-  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
-      engine, room, "walls", "walls_factory", &box);
-
-  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
-    iGeneralMeshState> (walls->GetMeshObject ());
-  mesh_state->SetShadowReceiving (true);
-  walls->GetMeshObject ()->SetMaterialWrapper (wood);
-
-  csRef<iLight> light;
-  iLightList* ll = room->GetLights ();
-
-  light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10,
-        csColor (1, 0, 0));
-  ll->Add (light);
-
-  light = engine->CreateLight (0, csVector3 (3, 5,  0), 10,
-        csColor (0, 0, 1));
-  ll->Add (light);
-
-  light = engine->CreateLight (0, csVector3 (0, 5, -3), 10,
-        csColor (0, 1, 0));
-  ll->Add (light);
-  
-  light = engine->CreateLight (0, csVector3 (0, 15, 0), 10,
-        csColor (1, 1, 1));
-  ll->Add (light);
-  
-    // Make a ball using the genmesh plug-in.
-
-  csRef<iMeshWrapper> ball =
-    engine->CreateMeshWrapper (
-    	fact, 
-    	"ball", 
-    	room, 
-    	csVector3 (-3, 5, -3));
-    
-  csRef<iMeshObject> ballstate = scfQueryInterface<iMeshObject> (
-    ball->GetMeshObject ());
-  ballstate->SetMaterialWrapper (stone);
-  
-  csRef<iMeshWrapper> watermesh =
-    engine->CreateMeshWrapper (
-    	waterfact, 
-    	"watermesh", 
-    	room, 
-    	csVector3 (-5, 1, -5));
-    
-  csRef<iMeshObject> watermeshstate = scfQueryInterface<iMeshObject> (
-    watermesh->GetMeshObject ());
-  //watermeshstate->SetMaterialWrapper (stone);
-
-  engine->Prepare ();
+  return true;
 }

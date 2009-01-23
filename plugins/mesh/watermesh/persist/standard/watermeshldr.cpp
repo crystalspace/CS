@@ -48,6 +48,7 @@ CS_IMPLEMENT_PLUGIN
 
 using namespace CS::Plugins::WaterMeshLoader;
 
+
 SCF_IMPLEMENT_FACTORY (csWaterFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csWaterFactorySaver)
 SCF_IMPLEMENT_FACTORY (csWaterMeshLoader)
@@ -99,14 +100,6 @@ csPtr<iBase> csWaterFactoryLoader::Parse (iDocumentNode* node,
   fact = type->NewFactory ();
   state = scfQueryInterface<iWaterFactoryState> (fact);
 
-  int idx = 0;
-  int triidx = 0;
-  csVector3* vertices = state->GetVertices ();
-  csVector2* texels = state->GetTexels ();
-  csVector3* normals = state->GetNormals ();
-  csColor* colors = state->GetColors ();
-  csTriangle* triangles = state->GetTriangles ();
-
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -116,62 +109,44 @@ csPtr<iBase> csWaterFactoryLoader::Parse (iDocumentNode* node,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-      case XMLTOKEN_T:
+      case XMLTOKEN_LENGTH:
         {
-	  if (triidx >= 12)
-	  {
-	    synldr->ReportError (
-		"crystalspace.watermeshfactoryloader.parsetriangle",
-		node, "Only twelve triangles allowed!");
-	    return 0;
-	  }
-	  triangles[triidx].a = child->GetAttributeValueAsInt ("v1");
-	  triangles[triidx].b = child->GetAttributeValueAsInt ("v2");
-	  triangles[triidx].c = child->GetAttributeValueAsInt ("v3");
-	  triidx++;
+			float len = child->GetContentsValueAsFloat();
+			state->SetLength(len);
         }
 	break;
-      case XMLTOKEN_V:
+	  case XMLTOKEN_WIDTH:
         {
-	  if (idx >= 8)
-	  {
-	    synldr->ReportError (
-		"crystalspace.watermeshfactoryloader.parsevertex",
-		node, "Only eight vertices allowed!");
-	    return 0;
-	  }
-	  vertices[idx].x = child->GetAttributeValueAsFloat ("x");
-	  vertices[idx].y = child->GetAttributeValueAsFloat ("y");
-	  vertices[idx].z = child->GetAttributeValueAsFloat ("z");
-	  texels[idx].x = child->GetAttributeValueAsFloat ("u");
-	  texels[idx].y = child->GetAttributeValueAsFloat ("v");
-	  normals[idx].x = child->GetAttributeValueAsFloat ("nx");
-	  normals[idx].y = child->GetAttributeValueAsFloat ("ny");
-	  normals[idx].z = child->GetAttributeValueAsFloat ("nz");
-	  colors[idx].red = child->GetAttributeValueAsFloat ("red");
-	  colors[idx].green = child->GetAttributeValueAsFloat ("green");
-	  colors[idx].blue = child->GetAttributeValueAsFloat ("blue");
-	  idx++;
-	}
-        break;
+			float wid = child->GetContentsValueAsFloat();
+			state->SetWidth(wid);
+        }
+	break;
+	  case XMLTOKEN_GRAN:
+        {
+			float gran = child->GetContentsValueAsFloat();
+			state->SetGranularity(gran);
+        }
+	break;
+	  case XMLTOKEN_MURK:
+        {
+			float murk = child->GetContentsValueAsFloat();
+			state->SetMurkiness(murk);
+        }
+	break;
+	  case XMLTOKEN_ISOCEAN:
+	    {
+			bool makeOcean;
+			synldr->ParseBool(child, makeOcean, false);
+			if(makeOcean) 
+				state->SetWaterType(WATER_TYPE_OCEAN);
+			else
+				state->SetWaterType(WATER_TYPE_LOCAL);
+        }
+		break;
       default:
 	synldr->ReportBadToken (child);
 	return 0;
     }
-  }
-  if (idx != 8)
-  {
-    synldr->ReportError (
-		"crystalspace.watermeshfactoryloader.parsevertex",
-		node, "Eight vertices are needed!");
-    return 0;
-  }
-  if (triidx != 12)
-  {
-    synldr->ReportError (
-		"crystalspace.watermeshfactoryloader.parsetriangle",
-		node, "Twelve triangles are needed!");
-    return 0;
   }
 
   return csPtr<iBase> (fact);
@@ -212,41 +187,26 @@ bool csWaterFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     if (!gfact) return false;
     if (!meshfact) return false;
 
-    csVector3* vertices = gfact->GetVertices ();
-    csVector2* texels = gfact->GetTexels ();
-    csVector3* normals = gfact->GetNormals ();
-    csColor* colors = gfact->GetColors ();
-    csTriangle* triangles = gfact->GetTriangles ();
+    csRef<iDocumentNode> vNode = 
+      paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+    vNode->SetValue ("width");
+    vNode->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValueAsFloat (gfact->GetWidth());
 
-    int i;
-    // Writedown vertices.
-    for (i = 0 ; i < 8 ; i++)
-    {
-      csRef<iDocumentNode> vNode = 
-        paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-      vNode->SetValue ("v");
-      vNode->SetAttributeAsFloat ("x", vertices[i].x);
-      vNode->SetAttributeAsFloat ("y", vertices[i].y);
-      vNode->SetAttributeAsFloat ("z", vertices[i].z);
-      vNode->SetAttributeAsFloat ("u", texels[i].x);
-      vNode->SetAttributeAsFloat ("v", texels[i].y);
-      vNode->SetAttributeAsFloat ("nx", normals[i].x);
-      vNode->SetAttributeAsFloat ("ny", normals[i].y);
-      vNode->SetAttributeAsFloat ("nz", normals[i].z);
-      vNode->SetAttributeAsFloat ("red", colors[i].red);
-      vNode->SetAttributeAsFloat ("green", colors[i].green);
-      vNode->SetAttributeAsFloat ("blue", colors[i].blue);
-    }
-    // Writedown triangles.
-    for (i = 0 ; i < 12 ; i++)
-    {
-      csRef<iDocumentNode> tNode = 
-        paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-      tNode->SetValue ("t");
-      tNode->SetAttributeAsInt ("v1", triangles[i].a);
-      tNode->SetAttributeAsInt ("v2", triangles[i].b);
-      tNode->SetAttributeAsInt ("v3", triangles[i].c);
-    }
+	vNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+	vNode->SetValue ("length");
+    vNode->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValueAsFloat (gfact->GetLength());
+
+    vNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+	vNode->SetValue ("gran");
+    vNode->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValueAsFloat (gfact->GetGranularity());
+
+    vNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+	vNode->SetValue ("murk");
+    vNode->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValueAsFloat (gfact->GetMurkiness());
+
+    vNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+	vNode->SetValue ("isocean");
+    vNode->CreateNodeBefore (CS_NODE_TEXT, 0)->SetValue ((gfact->isOcean())? "yes" : "no");
   }
   return true;
 }
@@ -295,15 +255,6 @@ csPtr<iBase> csWaterMeshLoader::Parse (iDocumentNode* node,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-      case XMLTOKEN_COLOR:
-	{
-	  csColor col;
-	  if (!synldr->ParseColor (child, col))
-	    return 0;
-	  CHECK_MESH (mesh);
-	  mesh->SetColor (col);
-	}
-	break;
       case XMLTOKEN_FACTORY:
 	{
 	  const char* factname = child->GetContentsValue ();
@@ -341,15 +292,6 @@ csPtr<iBase> csWaterMeshLoader::Parse (iDocumentNode* node,
 	  }
 	  CHECK_MESH (mesh);
 	  mesh->SetMaterialWrapper (mat);
-	}
-	break;
-      case XMLTOKEN_MIXMODE:
-        {
-	  uint mm;
-	  if (!synldr->ParseMixmode (child, mm))
-	    return 0;
-	  CHECK_MESH (mesh);
-          mesh->SetMixMode (mm);
 	}
 	break;
       default:
@@ -410,14 +352,6 @@ bool csWaterMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
       }    
     }
 
-    // Writedown Color tag
-    csColor col (0, 0, 0);
-    mesh->GetColor (col);
-    csRef<iDocumentNode> colorNode = 
-      paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-    colorNode->SetValue ("color");
-    synldr->WriteColor (colorNode, col);
-
     // Writedown Material tag
     iMaterialWrapper* mat = mesh->GetMaterialWrapper ();
     if (mat)
@@ -433,13 +367,6 @@ bool csWaterMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
         matnameNode->SetValue (matname);
       }    
     }    
-
-    // Writedown Mixmode tag
-    int mixmode = mesh->GetMixMode();
-    csRef<iDocumentNode> mixmodeNode = 
-      paramsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-    mixmodeNode->SetValue ("mixmode");
-    synldr->WriteMixmode (mixmodeNode, mixmode, true);
   }
   return true;
 }

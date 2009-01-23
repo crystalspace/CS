@@ -30,17 +30,21 @@ struct vert2frag
 vert2frag main (app2vert IN,
 			 uniform float time,
 			 uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
-			 uniform float4x4 ModelViewProj : state.matrix.mvp)
+			 uniform float4x4 ModelViewProj : state.matrix.mvp,
+			 uniform float4x4 o2w)
 {
     vert2frag OUT;
 
-	OUT.Position = mul (ModelViewProj, IN.Position);
+	float4 inPos = IN.Position;
+  	float4 camera = ModelViewIT[3];
+
+	//Get real position again.
+	OUT.Position = mul (ModelViewProj, inPos);
 
 	OUT.Color = IN.Color;
-
-  	float4 camera = ModelViewIT[3];
 	OUT.CamVec = (camera - IN.Position).xzy;
 
+	//float4 texCoord = mul(float4(IN.TexCoord.x, 0, IN.TexCoord.y, 1), o2w);
 	float s1, cs1, s2, cs2;
 	sincos (time, s1, cs1);
 	sincos (time + 1.41, s2, cs2);

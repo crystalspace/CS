@@ -9,7 +9,7 @@
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+    Library General Public License for more details.`
 
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
@@ -33,6 +33,8 @@
 #include "csutil/flags.h"
 #include "csutil/cscolor.h"
 
+#include "oceancell.h"
+
 struct iObjectRegistry;
 
 class csShaderVariableContext;
@@ -44,12 +46,13 @@ namespace Plugins
 namespace WaterMesh
 {
 
-
 class csWaterMeshObjectFactory;
 
-#define WATER_SIZE	16
+#define WATER_SIZE  16
 #define WATER_VERTS (WATER_SIZE * WATER_SIZE)
 #define WATER_TRIS (2 * (WATER_SIZE - 1) * (WATER_SIZE - 1)) 
+
+#define NUM_WAVE_FUNCS 3
 
 /**
  * Watermesh version of mesh object.
@@ -62,6 +65,8 @@ class csWaterMeshObject :
 private:
   // The render mesh holder is used by GetRenderMeshes() to supply
   // render meshes that can be returned by that function.
+  csFrameDataHolder<csDirtyAccessArray<csRenderMesh*> > meshesHolder;
+  csArray<csRenderCell> meshQueue;
   csRenderMeshHolder rmHolder;
 
   // The standard render buffer holder. It takes care of giving
@@ -92,12 +97,17 @@ private:
 
   // Admin stuff.
   csWeakRef<iGraphics3D> g3d;
+  csWeakRef<iEngine> engine;
+  csRef<iStringSet> strings;
+
   csRef<csWaterMeshObjectFactory> factory;
   iMeshWrapper* logparent;
 
   // Normal Map
   csRef<iTextureWrapper> nMap;
   csShaderVariable *nMapVar;
+
+  
 
   // Callback when object is rendered (in GetRenderMeshes()).
   csRef<iMeshObjectDrawCallback> vis_cb;
@@ -132,6 +142,16 @@ private:
    * Setup this object. This function will check if setup is needed.
    */
   void SetupObject ();
+
+  void updateLocal();
+
+  void DrawFromNode(csOceanNode start, const csVector3 camPos, csPlane3 *planes, uint32 frustum_mask);
+  void DrawLeftFromNode(csOceanNode start, const csVector3 camPos, csPlane3 *planes, uint32 frustum_mask);
+  void DrawRightFromNode(csOceanNode start, const csVector3 camPos, csPlane3 *planes, uint32 frustum_mask);
+  void DrawTopFromNode(csOceanNode start, const csVector3 camPos, csPlane3 *planes, uint32 frustum_mask);
+  void DrawBottomFromNode(csOceanNode start, const csVector3 camPos, csPlane3 *planes, uint32 frustum_mask);
+
+  void AddNode(csOceanNode start, float dist);
 
 public:
   /// Constructor.
@@ -172,8 +192,8 @@ public:
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
     csVector3& isect, float *pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr, int* polygon_idx = 0,
-	iMaterialWrapper** material = 0);
+    csVector3& isect, float* pr, int* polygon_idx = 0,
+  iMaterialWrapper** material = 0);
   virtual void SetMeshWrapper (iMeshWrapper* lp)
   {
     logparent = lp;
@@ -207,7 +227,8 @@ public:
   {
   }
 
-  bool vertsChanged;
+  bool vertsChanged;  
+  void UpdateWater(iCamera *cam);
   /** @} */
 
   /**\name iRenderBufferAccessor implementation
@@ -227,7 +248,7 @@ public:
     }
     virtual ~RenderBufferAccessor () { }
     virtual void PreGetBuffer (csRenderBufferHolder* holder,
-    	csRenderBufferName buffer)
+      csRenderBufferName buffer)
     {
       if (parent) parent->PreGetBuffer (holder, buffer);
     }
@@ -254,23 +275,17 @@ class csWaterMeshObjectFactory :
 
 private:
   // The actual data.
-	csDirtyAccessArray<csVector3> verts;
-	csDirtyAccessArray<csVector3> norms;
-	csDirtyAccessArray<csVector2> texs;
-	csDirtyAccessArray<csColor>	cols;
-	csDirtyAccessArray<csTriangle> tris;
-	
-	int numVerts, numTris;
-
-
-
-/////// GET RID OF THESE //////////
-  csVector3 vertices[WATER_VERTS];
-  csVector3 normals[WATER_VERTS];
-  csVector2 texels[WATER_VERTS];
-  csColor colors[WATER_VERTS];
-  csTriangle triangles[WATER_TRIS];
-////////////////////////////////////
+  //Near patch and local water
+  csDirtyAccessArray<csVector3> verts;
+  csDirtyAccessArray<csVector3> norms;
+  csDirtyAccessArray<csVector2> texs;
+  csDirtyAccessArray<csColor>  cols;
+  csDirtyAccessArray<csTriangle> tris;
+  
+  //Ocean cells
+  csArray<csOceanCell> cells;
+  
+  int numVerts, numTris;
 
   //size vars
   uint len, wid;
@@ -289,6 +304,7 @@ private:
   bool mesh_texels_dirty_flag;
   bool mesh_normals_dirty_flag;
   bool mesh_triangle_dirty_flag;
+  bool mesh_cells_dirty_flag;
 
   // Admin.
   bool initialized;
@@ -298,6 +314,22 @@ private:
   // Water variables
   float waterAlpha;
   bool murkChanged;
+
+  waterMeshType type;
+
+  //Ocean Attributes
+    //Amplitudes
+    float amps[NUM_WAVE_FUNCS];
+  
+    //Frequencies
+    float freqs[NUM_WAVE_FUNCS];
+    
+    //Phases
+    float phases[NUM_WAVE_FUNCS];
+    
+    //Directional vectors
+    csVector2 k1, k2, k3;
+  
 
   // Buffers for the renderers.
   csRef<iRenderBuffer> vertex_buffer;
@@ -331,38 +363,56 @@ public:
   csRef<iMeshObjectType> water_type;
   csFlags flags;
 
-  bool changedVerts;
+  bool changedVerts;  
+
+  bool amplitudes_changed;
+  bool frequencies_changed;
+  bool phases_changed;
+  bool directions_changed;
+
+  bool far_patch_needs_update;
 
   /// Constructor.
   csWaterMeshObjectFactory (iMeshObjectType *pParent,
-  	iObjectRegistry* object_reg);
+    iObjectRegistry* object_reg);
 
   /// Destructor.
   virtual ~csWaterMeshObjectFactory ();
 
   /**\name iWaterFactoryState implementation
    * @{ */
-   csVector3* GetVertices () { return vertices; }
-   csVector2* GetTexels () { return texels; }
-   csVector3* GetNormals () { return normals; }
-   csColor* GetColors () { return colors; }
-   csTriangle* GetTriangles () { return triangles; }
   void Invalidate ();
 
-	void SetLength(uint length) { len = length; size_changed = true; }
-	uint GetLength() { return len; }
+  void SetLength(uint length);
+  uint GetLength() { return len; }
 
-	void SetWidth(uint width) { wid = width; size_changed = true; }
-	uint GetWidth() { return wid; }
-	
-	void SetGranularity(uint granularity) { gran = granularity; size_changed = true; }
-	uint GetGranularity() { return gran; }
-	
-	void SetMurkiness(float murk);
-	float GetMurkiness();
-	
-	csRef<iTextureWrapper> MakeFresnelTex(int size);
-	
+  void SetWidth(uint width);
+  uint GetWidth() { return wid; }
+  
+  void SetGranularity(uint granularity);
+  uint GetGranularity() { return gran; }
+  
+  void SetMurkiness(float murk);
+  float GetMurkiness();
+  
+  void SetWaterType(waterMeshType waterType);
+  
+  void SetAmplitudes(float amp1, float amp2, float amp3);  
+  void SetFrequencies(float freq1, float freq2, float freq3);  
+  void SetPhases(float phase1, float phase2, float phase3);  
+  void SetDirections(csVector2 dir1, csVector2 dir2, csVector2 dir3);
+  
+  inline bool isOcean() { return type == WATER_TYPE_OCEAN; }
+
+  csRef<iTextureWrapper> MakeFresnelTex(int size);
+  
+  //Under the hood functions
+  csVector3 GetFrequencies() { return csVector3(freqs[0], freqs[1], freqs[2]); }
+  csVector3 GetPhases() { return csVector3(phases[0], phases[1], phases[2]); }
+  csVector3 GetDirsX() { return csVector3(k1.x, k2.x, k3.x); }
+  csVector3 GetDirsY() { return csVector3(k1.y, k2.y, k3.y); }
+  csVector3 GetAmplitudes() { return csVector3(amps[0], amps[1], amps[2]); }
+  
   /** @} */
 
   const csBox3& GetObjectBoundingBox ();
