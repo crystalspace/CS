@@ -45,7 +45,7 @@ private:
 
   void ReadHeightmap();
   void ProcessHeightmap();
-  void SmoothHeightmap(size_t pitch);
+  void SmoothHeightmap();
   void WriteHeightmap();
 };
 

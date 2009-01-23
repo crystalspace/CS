@@ -118,11 +118,14 @@ void HeightMapProc::ProcessHeightmap()
     }
   }
 
-  SmoothHeightmap(width);
+  SmoothHeightmap();
 }
 
-void HeightMapProc::SmoothHeightmap(size_t pitch)
+void HeightMapProc::SmoothHeightmap()
 {
+  // What should this be?
+  size_t pitch = width;
+
   // We need a temporary buffer for smoothing into
   float* tempBuffer = (float*)cs_malloc(width * height * sizeof(float));
 
