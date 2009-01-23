@@ -1,0 +1,6 @@
+SubDir TOP apps tools heightmapproc ;
+
+Description heightmapproc : "Applies filters and other actions on a heightmap." ;
+Application heightmapproc : [ Wildcard *.cpp *.h ] ;
+LinkWith heightmapproc : crystalspace ;
+FileListEntryApplications heightmapproc : app-tool ;
