@@ -19,6 +19,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
+#include "csutil/randomgen.h"
 #include "plugins/engine/3d/engine.h"
 #include "plugins/engine/3d/meshgen.h"
 #include "iengine/material.h"
@@ -35,6 +36,7 @@ csMeshGeneratorGeometry::csMeshGeneratorGeometry (
   default_material_factor = 0.0f;
   celldim = 0;
   positions = 0;
+  wind_direction = csVector2(0, 0);
 }
 
 csMeshGeneratorGeometry::~csMeshGeneratorGeometry ()
@@ -175,8 +177,12 @@ void csMeshGeneratorGeometry::AddFactory (iMeshFactoryWrapper* factory,
   g.vertexInfoArray.fadeFactorVar.AttachNew (new csShaderVariable (generator->varFadeFactor)); 
   g.vertexInfoArray.fadeFactorVar->SetType (csShaderVariable::ARRAY);
   g.vertexInfoArray.fadeFactorVar->SetArraySize (0); 
+  g.vertexInfoArray.windVar.AttachNew (new csShaderVariable (generator->varWind)); 
+  g.vertexInfoArray.windVar->SetType (csShaderVariable::ARRAY);
+  g.vertexInfoArray.windVar->SetArraySize (0); 
   AddSVToMesh (g.mesh, g.vertexInfoArray.transformVar); 
   AddSVToMesh (g.mesh, g.vertexInfoArray.fadeFactorVar); 
+  AddSVToMesh (g.mesh, g.vertexInfoArray.windVar); 
   csBox3 bbox;
   bbox.SetSize (csVector3 (maxdist, maxdist, maxdist));
   SetMeshBBox (g.mesh, bbox);
@@ -220,12 +226,16 @@ iMeshWrapper* csMeshGeneratorGeometry::AllocMesh (
     if (geom.vertexInfoArray.transformVar->GetArraySize() == 0) 
     { 
       geom.mesh->GetMovable ()->SetSector (generator->GetSector ()); 
-      geom.mesh->GetMovable ()->UpdateMove (); 
-    } 
-    vertexInfo.transformVar.AttachNew (new csShaderVariable); 
- 	  vertexInfo.fadeFactorVar.AttachNew (new csShaderVariable); 
- 	  geom.vertexInfoArray.transformVar->AddVariableToArray (vertexInfo.transformVar); 
- 	  geom.vertexInfoArray.fadeFactorVar->AddVariableToArray (vertexInfo.fadeFactorVar); 
+      geom.mesh->GetMovable ()->UpdateMove ();
+    }
+    vertexInfo.transformVar.AttachNew (new csShaderVariable);
+ 	  vertexInfo.fadeFactorVar.AttachNew (new csShaderVariable);
+    vertexInfo.windVar.AttachNew (new csShaderVariable);
+    csRandomGen rng (csGetTicks ());
+    vertexInfo.windRandVar = rng.Get();
+ 	  geom.vertexInfoArray.transformVar->AddVariableToArray (vertexInfo.transformVar);
+ 	  geom.vertexInfoArray.fadeFactorVar->AddVariableToArray (vertexInfo.fadeFactorVar);
+    geom.vertexInfoArray.windVar->AddVariableToArray (vertexInfo.windVar);
     return geom.mesh;
   }
 }
@@ -240,6 +250,12 @@ void csMeshGeneratorGeometry::MoveMesh (int cidx, iMeshWrapper* mesh,
   csVector3 pos = position - meshpos;
   csReversibleTransform tr (matrix, pos);
   vertexInfo.transformVar->SetValue (tr);
+}
+
+void csMeshGeneratorGeometry::SetWindDirection (float x, float z)
+{
+  wind_direction.x = x;
+  wind_direction.y = z;
 }
 
 void csMeshGeneratorGeometry::SetAsideMesh (int cidx, iMeshWrapper* mesh,
@@ -270,6 +286,13 @@ void csMeshGeneratorGeometry::FreeSetAsideMeshes ()
       if (idx != csArrayItemNotFound) 
       { 
         geom.vertexInfoArray.fadeFactorVar->RemoveFromArray (idx); 
+        varRemoved = true; 
+      } 
+
+      idx = geom.vertexInfoArray.windVar->FindArrayElement (vertexInfo.windVar); 
+      if (idx != csArrayItemNotFound) 
+      { 
+        geom.vertexInfoArray.windVar->RemoveFromArray (idx); 
         varRemoved = true; 
       } 
     } 
@@ -317,9 +340,9 @@ void csMeshGeneratorGeometry::UpdatePosition (const csVector3& pos)
 csMeshGenerator::csMeshGenerator (csEngine* engine) : 
   scfImplementationType (this), total_max_dist (-1.0f), 
   use_density_scaling (false), use_alpha_scaling (false),
-  last_pos (0, 0, 0), setup_cells (false), cell_dim (50),
-  inuse_blocks (0), inuse_blocks_last (0), max_blocks (100),
-  engine (engine)
+  last_pos (0, 0, 0), setup_cells (false),
+  cell_dim (50), inuse_blocks (0), inuse_blocks_last (0),
+  max_blocks (100), engine (engine)
 {
   cells = new csMGCell [cell_dim * cell_dim];
 
@@ -343,6 +366,7 @@ csMeshGenerator::csMeshGenerator (csEngine* engine) :
     engine->objectRegistry, "crystalspace.shader.variablenameset");
   varTransform = SVstrings->Request ("instancing transforms");
   varFadeFactor = SVstrings->Request ("alpha factor");
+  varWind = SVstrings->Request ("wind data");
 }
 
 csMeshGenerator::~csMeshGenerator ()
@@ -759,6 +783,12 @@ void csMeshGenerator::SetFade (csMGPosition& p, float factor)
   p.vertexInfo.fadeFactorVar->SetValue (factor);
 }
 
+void csMeshGenerator::SetWindData (csMGPosition& p)
+{
+  csMeshGeneratorGeometry* geom = geometries[p.geom_type];
+  p.vertexInfo.windVar->SetValue (csVector4(geom->GetWindDirection().x, geom->GetWindDirection().y, p.vertexInfo.windRandVar));
+}
+
 void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
                                       const csVector3& pos,
                                       const csVector3& delta)
@@ -838,6 +868,10 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
           geometries[p.geom_type]->MoveMesh (cidx, p.mesh, p.lod, p.vertexInfo, 
             p.position, rotation_matrices[p.rotation]); 
         } 
+      }
+      if (p.mesh)
+      {
+        SetWindData(p);
       }
       if (p.mesh && use_alpha_scaling)
       {
