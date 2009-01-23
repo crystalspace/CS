@@ -793,10 +793,13 @@ void csMeshGenerator::SetFade (csMGPosition& p, float factor)
 void csMeshGenerator::SetWindData (csMGPosition& p)
 {
   csMeshGeneratorGeometry* geom = geometries[p.geom_type];
-  csReversibleTransform transform;
-  p.vertexInfo.transformVar->GetValue(transform);
-  csVector3 windDirection = transform.This2OtherRelative(geom->GetWindDirection());
-  p.vertexInfo.windVar->SetValue (csVector4(windDirection.x, windDirection.z, p.vertexInfo.windRandVar, geom->GetWindBias()));
+  if(!geom->GetWindDirection().IsZero())
+  {
+    csReversibleTransform transform;
+    p.vertexInfo.transformVar->GetValue(transform);
+    csVector3 windDirection = transform.Other2ThisRelative(geom->GetWindDirection());
+    p.vertexInfo.windVar->SetValue (csVector4(windDirection.x, windDirection.z, p.vertexInfo.windRandVar, geom->GetWindBias()));
+  }
 }
 
 void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
