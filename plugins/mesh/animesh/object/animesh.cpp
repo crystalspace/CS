@@ -987,15 +987,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
 
   void AnimeshObject::UpdateSocketTransforms ()
   {
-    if (!skeleton || !lastSkeletonState)
+    if (!skeleton)
       return;
 
     for (size_t i = 0; i < sockets.GetSize (); ++i)
     {
       BoneID bone = sockets[i]->bone;
 
-      sockets[i]->socketBoneTransform.SetO2T (csMatrix3 (lastSkeletonState->GetQuaternion (bone)));
-      sockets[i]->socketBoneTransform.SetOrigin (lastSkeletonState->GetVector (bone));
+      csQuaternion q;
+      csVector3 v;
+
+      skeleton->GetTransformAbsSpace(bone, q, v);
+
+      sockets[i]->socketBoneTransform.SetO2T (csMatrix3 (q));
+      sockets[i]->socketBoneTransform.SetOrigin (v);
       sockets[i]->UpdateSceneNode ();
     }
   }
