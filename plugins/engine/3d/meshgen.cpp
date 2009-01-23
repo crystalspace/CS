@@ -786,7 +786,7 @@ void csMeshGenerator::SetFade (csMGPosition& p, float factor)
 void csMeshGenerator::SetWindData (csMGPosition& p)
 {
   csMeshGeneratorGeometry* geom = geometries[p.geom_type];
-  p.vertexInfo.windVar->SetValue (csVector4(geom->GetWindDirection().x, geom->GetWindDirection().y, p.vertexInfo.windRandVar));
+  p.vertexInfo.windVar->SetValue (csVector3(geom->GetWindDirection().x, geom->GetWindDirection().y, p.vertexInfo.windRandVar));
 }
 
 void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
