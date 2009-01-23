@@ -151,6 +151,14 @@ struct iMeshGeneratorGeometry : public virtual iBase
    * \param z is the z coordinate direction.
    */
   virtual void SetWindDirection (float x, float z) = 0;
+
+  /**
+   * Set the swing bias of simulated wind.
+   * A higher bias equals a lower back swing on foliage.
+   * Min bias of 1.0;
+   * \param bias is the value of the wind bias.
+   */
+  virtual void SetWindBias (float bias) = 0;
 };
 
 /**

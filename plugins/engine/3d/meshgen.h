@@ -116,6 +116,7 @@ private:
 
   /// For wind.
   csVector2 wind_direction;
+  float wind_bias;
 
   csStringID colldetID;
 
@@ -168,6 +169,9 @@ public:
 
   const csVector2& GetWindDirection() const { return wind_direction; }
   virtual void SetWindDirection (float x, float z);
+
+  const float& GetWindBias() const { return wind_bias; }
+  virtual void SetWindBias (float bias);
 
   void AddPosition (const csVector2 &pos);
 

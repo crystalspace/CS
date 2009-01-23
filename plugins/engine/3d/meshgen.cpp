@@ -37,6 +37,7 @@ csMeshGeneratorGeometry::csMeshGeneratorGeometry (
   celldim = 0;
   positions = 0;
   wind_direction = csVector2(0, 0);
+  wind_bias = 1.0f;
 }
 
 csMeshGeneratorGeometry::~csMeshGeneratorGeometry ()
@@ -256,6 +257,12 @@ void csMeshGeneratorGeometry::SetWindDirection (float x, float z)
 {
   wind_direction.x = x;
   wind_direction.y = z;
+}
+
+void csMeshGeneratorGeometry::SetWindBias (float bias)
+{
+  if(bias >= 1.0f)
+    wind_bias = bias;
 }
 
 void csMeshGeneratorGeometry::SetAsideMesh (int cidx, iMeshWrapper* mesh,
@@ -786,7 +793,7 @@ void csMeshGenerator::SetFade (csMGPosition& p, float factor)
 void csMeshGenerator::SetWindData (csMGPosition& p)
 {
   csMeshGeneratorGeometry* geom = geometries[p.geom_type];
-  p.vertexInfo.windVar->SetValue (csVector3(geom->GetWindDirection().x, geom->GetWindDirection().y, p.vertexInfo.windRandVar));
+  p.vertexInfo.windVar->SetValue (csVector4(geom->GetWindDirection().x, geom->GetWindDirection().y, p.vertexInfo.windRandVar, geom->GetWindBias()));
 }
 
 void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
