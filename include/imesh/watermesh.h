@@ -70,35 +70,10 @@ struct iWaterFactoryState : public virtual iBase
 {
   SCF_INTERFACE (iWaterFactoryState, 2, 0, 0);
 
-  /**
-   * Get the array of vertices. It is legal to modify the vertices
-   * in this array. The number of vertices in this array is guaranteed
-   * to be equal to 8.
-   */
   virtual csVector3* GetVertices () = 0;
-  /**
-   * Get the array of texels. It is legal to modify the texels in this
-   * array. The number of texels in this array is guaranteed to
-   * be equal to 8.
-   */
   virtual csVector2* GetTexels () = 0;
-  /**
-   * Get the array of normals. It is legal to modify the normals in this
-   * array. The number of normals in this array is guaranteed to
-   * be equal to 8.
-   */
   virtual csVector3* GetNormals () = 0;
-  /**
-   * Get the array of colors. It is legal to modify the colors in this
-   * array. The number of colors in this array is guaranteed to
-   * be equal to 8.
-   */
   virtual csColor* GetColors () = 0;
-  /**
-   * Get the array of triangles. It is legal to modify the triangles in this
-   * array. The number of triangles in this array is guaranteed to
-   * be equal to 12.
-   */
   virtual csTriangle* GetTriangles () = 0;
 
   /**
@@ -109,14 +84,20 @@ struct iWaterFactoryState : public virtual iBase
    */
   virtual void Invalidate () = 0;
 
-	virtual void SetLength(uint length) = 0;
-	virtual uint GetLength() = 0;
+  virtual void SetLength(uint length) = 0;
+  virtual uint GetLength() = 0;
 
-	virtual void SetWidth(uint width) = 0;
-	virtual uint GetWidth() = 0;
+  virtual void SetWidth(uint width) = 0;
+  virtual uint GetWidth() = 0;
 
-	virtual void SetGranularity(uint granularity) = 0;
-	virtual uint GetGranularity() = 0;
+  virtual void SetGranularity(uint granularity) = 0;
+  virtual uint GetGranularity() = 0;
+
+  virtual void SetMurkiness(float murk) = 0;
+  virtual float GetMurkiness() = 0;
+
+  //Size must be a power of two.
+  //virtual csRef<iTextureWrapper> MakeFresnelTex(int size);
 };
 
 /**
@@ -137,20 +118,10 @@ struct iWaterMeshState : public virtual iBase
 {
   SCF_INTERFACE (iWaterMeshState, 1, 0, 0);
 
-  /**
-   * Set mesh-specific fuzz factor.
-   * \remarks This method is purely present for illustrational purposes and
-   *   has, in fact, no effect on the actual mesh.
-   */
-  virtual void SetFuzzFactor (float factor) = 0;
-  /**
-   * Get mesh-specific fuzz factor.
-   * \remarks This method is purely present for illustrational purposes.
-   */
-  virtual float GetFuzzFactor () = 0;
+  virtual void SetNormalMap(iTextureWrapper *map) = 0;
+  virtual iTextureWrapper *GetNormalMap() = 0;
 };
 
 /** @} */
 
 #endif // __CS_IMESH_PROTOMESH_H__
-

@@ -1,0 +1,84 @@
+<shader compiler="xmlshader" name="water">
+	
+	<shadervars>
+		<shadervar name="position" type="vector4">-1.0, -1.0, -1.0, 0.0</shadervar>
+		<shadervar name="color" type="vector4">0.9, 0.9, 0.9, 1.0</shadervar>
+		<shadervar name="shine" type="float">1.0</shadervar>
+		<shadervar name="murkiness" type="float">0.3</shadervar>
+		
+		<!-- Wave properties -->
+		<!----
+			These are the wave properties as outlined in section 4.1 in this paper by
+			Jerry Tessendorf, presented in 2004, which uses ideas from Fournier and 
+			Reeves' paper from Siggraph '86 Proceedings:
+			
+			http://www.finelightvisualtechnology.com/docs/coursenotes2004.pdf
+			http://www.iro.umontreal.ca/~poulin/fournier/papers/p75-fournier.pdf
+			
+			Of the following variables, "amps" are the amplitudes for the three
+			different functions. 
+			
+			The "kxs" and "kys" are the X and Z components of the 2D directional 
+			vectors of the waves. It is possible to grab these values from a time 
+			dependent function of the vertex's position, but it generates visually 
+			pleasing effects even if they are hardcoded.
+			
+			"freqs" refer to the wave frequencies.
+			"phases" refer to the wave phases.
+			
+			
+			TODO: Move from Gerstner waves to a statistical model representation using
+			Fast Fourier Transforms as described in section 4.3 of Tessendorf's paper.
+		--->
+		<shadervar name="amps" type="vector3">0.1, 0.03, 0.05</shadervar>
+		<shadervar name="kxs" type="vector4">1.4, -1.1, 0.5</shadervar>
+		<shadervar name="kys" type="vector4">1.6, 0.7, -2.5</shadervar>
+		<shadervar name="freqs" type="vector4">2.0, 1.7, 1.6</shadervar>
+		<shadervar name="phases" type="vector4">0.0, 1.0, 1.41</shadervar>
+		
+		<shadervar name="time" type="expression">
+	      <sexp>(* "standard time" 1)</sexp>
+	    </shadervar>
+	    
+	</shadervars>
+
+	
+  <technique priority="250">
+    <pass>
+      <mixmode><alpha/></mixmode>
+      <buffer source="normal" destination="normal"/>
+	  <buffer source="color" destination="color" />
+	  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+	
+      <vp plugin="glcg" name="Water Vertices">
+		<cgvp>
+			<variablemap variable="time" destination="time" />
+			
+			<?if vars."freqs" && vars."kxs" && vars."kys" && vars."amps" && vars."phases"?>
+			<variablemap variable="amps" destination="amps" />
+			<variablemap variable="kxs" destination="kxs" />
+			<variablemap variable="kys" destination="kys" />
+			<variablemap variable="freqs" destination="freqs" />
+			<variablemap variable="phases" destination="phases" />
+			
+			<program file="/shader/water/ocean.cgvp"/>
+			<?else ?>
+			<program file="/shader/water/water.cgvp"/>
+			<?endif ?>
+		</cgvp>
+      </vp>	
+
+	  <texture destination="TexNormal" name="texture normal" />
+      <fp plugin="glcg" name="Water pixels">
+		<cgfp>
+			<variablemap variable="position" destination="lightPos" />
+			<variablemap variable="color" destination="lightCol" />
+			<variablemap variable="shine" destination="shininess" />
+			<variablemap variable="murkiness" destination="waterAlpha" />
+			
+			<program file="/shader/water/water.cgfp"/>
+		</cgfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>

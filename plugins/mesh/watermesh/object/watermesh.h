@@ -24,6 +24,7 @@
 #include "csutil/leakguard.h"
 #include "csutil/weakref.h"
 #include "cstool/rendermeshholder.h"
+#include "iengine/engine.h"
 #include "imesh/objmodel.h"
 #include "iutil/comp.h"
 #include "imesh/watermesh.h"
@@ -80,10 +81,23 @@ private:
   // for all types of data we need.
   void SetupBufferHolder ();
 
+  //Local buffers and variables
+  csRef<iRenderBuffer> vertex_buffer;
+  csRef<iRenderBuffer> normal_buffer;
+
+  csDirtyAccessArray<csVector3> verts;
+  csDirtyAccessArray<csVector3> norms;
+
+  void SetupVertexBuffer();
+
   // Admin stuff.
   csWeakRef<iGraphics3D> g3d;
   csRef<csWaterMeshObjectFactory> factory;
   iMeshWrapper* logparent;
+
+  // Normal Map
+  csRef<iTextureWrapper> nMap;
+  csShaderVariable *nMapVar;
 
   // Callback when object is rendered (in GetRenderMeshes()).
   csRef<iMeshObjectDrawCallback> vis_cb;
@@ -126,9 +140,6 @@ public:
   /// Destructor.
   virtual ~csWaterMeshObject ();
 
-  virtual void SetFuzzFactor (float factor) { fuzz = factor; }
-  virtual float GetFuzzFactor () { return fuzz; }
-
   /**\name iMeshObject implementation
    * @{ */
   void SetMixMode (uint mode) { MixMode = mode; }
@@ -151,10 +162,7 @@ public:
   {
     return vis_cb;
   }
-  virtual void NextFrame (csTicks, const csVector3&, uint)
-  {
-    // We don't support animation.
-  }
+  virtual void NextFrame (csTicks, const csVector3&, uint);
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const
   {
@@ -172,6 +180,9 @@ public:
     CS_ASSERT (logparent != 0);
   }
   virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
+
+  virtual void SetNormalMap(iTextureWrapper *map);
+  virtual iTextureWrapper* GetNormalMap();
 
   virtual iObjectModel* GetObjectModel ();
   virtual bool SetColor (const csColor& col)
@@ -195,6 +206,8 @@ public:
           iDecalBuilder* decalBuilder)
   {
   }
+
+  bool vertsChanged;
   /** @} */
 
   /**\name iRenderBufferAccessor implementation
@@ -246,16 +259,23 @@ private:
 	csDirtyAccessArray<csVector2> texs;
 	csDirtyAccessArray<csColor>	cols;
 	csDirtyAccessArray<csTriangle> tris;
+	
+	int numVerts, numTris;
 
+
+
+/////// GET RID OF THESE //////////
   csVector3 vertices[WATER_VERTS];
   csVector3 normals[WATER_VERTS];
   csVector2 texels[WATER_VERTS];
   csColor colors[WATER_VERTS];
   csTriangle triangles[WATER_TRIS];
+////////////////////////////////////
 
   //size vars
   uint len, wid;
   uint gran;
+  uint detail;
   bool size_changed;
 
   // If the colors change we increase this number
@@ -273,6 +293,11 @@ private:
   // Admin.
   bool initialized;
   csWeakRef<iGraphics3D> g3d;
+  csWeakRef<iEngine> engine;
+
+  // Water variables
+  float waterAlpha;
+  bool murkChanged;
 
   // Buffers for the renderers.
   csRef<iRenderBuffer> vertex_buffer;
@@ -297,11 +322,16 @@ private:
    */
   void SetupFactory ();
 
+
+  csArray<csWaterMeshObject *> children;
+
 public:
   iObjectRegistry* object_reg;
   iMeshFactoryWrapper* logparent;
   csRef<iMeshObjectType> water_type;
   csFlags flags;
+
+  bool changedVerts;
 
   /// Constructor.
   csWaterMeshObjectFactory (iMeshObjectType *pParent,
@@ -312,11 +342,11 @@ public:
 
   /**\name iWaterFactoryState implementation
    * @{ */
-  csVector3* GetVertices () { return vertices; }
-  csVector2* GetTexels () { return texels; }
-  csVector3* GetNormals () { return normals; }
-  csColor* GetColors () { return colors; }
-  csTriangle* GetTriangles () { return triangles; }
+   csVector3* GetVertices () { return vertices; }
+   csVector2* GetTexels () { return texels; }
+   csVector3* GetNormals () { return normals; }
+   csColor* GetColors () { return colors; }
+   csTriangle* GetTriangles () { return triangles; }
   void Invalidate ();
 
 	void SetLength(uint length) { len = length; size_changed = true; }
@@ -327,6 +357,11 @@ public:
 	
 	void SetGranularity(uint granularity) { gran = granularity; size_changed = true; }
 	uint GetGranularity() { return gran; }
+	
+	void SetMurkiness(float murk);
+	float GetMurkiness();
+	
+	csRef<iTextureWrapper> MakeFresnelTex(int size);
 	
   /** @} */
 
@@ -360,6 +395,8 @@ public:
   virtual iObjectModel* GetObjectModel () { return this; }
 
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
+  void AddMeshObject (csWaterMeshObject* meshObj);
+  void RemoveMeshObject (csWaterMeshObject* meshObj);
 };
 
 #include "csutil/deprecated_warn_on.h"
