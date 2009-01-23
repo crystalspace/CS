@@ -117,6 +117,22 @@ void HeightMapProc::ProcessHeightmap()
       }
     }
   }
+  else if ((image->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
+  {
+    unsigned char *data = (unsigned char*)image->GetImageData ();
+    const csRGBpixel *palette = image->GetPalette ();
+
+    for (int y = 0; y < height; ++y)
+    {
+      for (int x = 0; x < width; ++x)
+      {   
+        const unsigned char p = *data++;
+        const int h = palette[p].Intensity (); 
+
+        *heightData++ = float(h<<16);
+      }
+    }
+  }
 
   SmoothHeightmap();
 }
