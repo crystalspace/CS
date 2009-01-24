@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <!--
-  Copyright (C) 2007 by Frank Richter
+  Copyright (C) 2007-2008 by Frank Richter
 	    (C) 2007 by Jorrit Tyberghein
 
   This library is free software; you can redistribute it and/or
@@ -17,31 +17,30 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
-<shader compiler="shaderweaver" name="lighting_default_instance" lights="6">
+<shader compiler="shaderweaver" name="lighting_default_instance_binalpha_pvl" lights="6">
   <alias name="position" file="/shader/snippets/position-instance.xml" />
   <alias name="ambient" file="/shader/snippets/lighting/ambient-simple.xml" />
-  <alias name="apply_alpha" file="/shader/snippets/surface/alpha-premult.xml" />
-  <alias name="lighting" file="/shader/snippets/lighting/lighting-ppl.xml" />
+  <alias name="apply_alpha" file="/shader/snippets/surface/alpha-nochange.xml" />
+  <alias name="lighting" file="/shader/snippets/lighting/lighting-pvl.xml" />
   <alias name="surface" file="/shader/snippets/surface/surface-modulate-alpha_instance.xml" />
   
   <technique priority="500" minlights="5">
-    <tag>per_pixel_lighting</tag>
     <!-- 1 pass, 6 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: blend with alpha -->
+	<!-- First pass: don't blend -->
 	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
-	  <alphatest>disable</alphatest>
+	  <blendop src="one" dst="zero" />
+	  <alphatest>enable</alphatest>
 	</mixmode>
       <?else?>
 	<!-- Later pass: blend with add -->
 	<mixmode>
 	  <blendop src="one" dst="one" />
-	  <alphatest>disable</alphatest>
+	  <alphatest>enable</alphatest>
 	</mixmode>
       <?endif?>
-      
+
       <!-- Combiner to use for this particular pass.
 	   Techniques Referenced snippets must only utilize the same 
 	   combiner with compatible options specified. If a technique
@@ -63,20 +62,19 @@
   </technique>
   
   <technique priority="400" minlights="4">
-    <tag>per_pixel_lighting</tag>
     <!-- 2 passes, 4+2 lights -->
     <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: blend with alpha -->
+	<!-- First pass: don't blend -->
 	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
-	  <alphatest>disable</alphatest>
+	  <blendop src="one" dst="zero" />
+	  <alphatest>enable</alphatest>
 	</mixmode>
       <?else?>
 	<!-- Later pass: blend with add -->
 	<mixmode>
 	  <blendop src="one" dst="one" />
-	  <alphatest>disable</alphatest>
+	  <alphatest>enable</alphatest>
 	</mixmode>
       <?endif?>
       
@@ -95,7 +93,7 @@
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
-	<alphatest>disable</alphatest>
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -113,20 +111,19 @@
   </technique>
   
   <technique priority="300" minlights="3">
-    <tag>per_pixel_lighting</tag>
     <!-- 2 passes, 3+3 lights -->
     <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: blend with alpha -->
+	<!-- First pass: don't blend -->
 	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
-	  <alphatest>disable</alphatest>
+	  <blendop src="one" dst="zero" />
+	  <alphatest>enable</alphatest>
 	</mixmode>
       <?else?>
 	<!-- Later pass: blend with add -->
 	<mixmode>
 	  <blendop src="one" dst="one" />
-	  <alphatest>disable</alphatest>
+	  <alphatest>enable</alphatest>
 	</mixmode>
       <?endif?>
       
@@ -145,7 +142,7 @@
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
-	<alphatest>disable</alphatest>
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -163,20 +160,19 @@
   </technique>
   
   <technique priority="200" minlights="2">
-    <tag>per_pixel_lighting</tag>
     <!-- 3 passes, 2+2+2 lights -->
     <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: blend with alpha -->
+	<!-- First pass: don't blend -->
 	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
-	  <alphatest>disable</alphatest>
+	  <blendop src="one" dst="zero" />
+	  <alphatest>enable</alphatest>
 	</mixmode>
       <?else?>
 	<!-- Later pass: blend with add -->
 	<mixmode>
 	  <blendop src="one" dst="one" />
-	  <alphatest>disable</alphatest>
+	  <alphatest>enable</alphatest>
 	</mixmode>
       <?endif?>
       
@@ -195,7 +191,7 @@
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
-	<alphatest>disable</alphatest>
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -214,7 +210,7 @@
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
-	<alphatest>disable</alphatest>
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -232,20 +228,19 @@
   </technique>
   
   <technique priority="100" minlights="1">
-    <tag>per_pixel_lighting</tag>
     <!-- 6 passes, 1+1+1+1+1+1 lights -->
     <pass minlights="1">
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
-	<!-- First pass: blend with alpha -->
+	<!-- First pass: don't blend -->
 	<mixmode>
-	  <blendop src="one" dst="srcalpha_inv" />
-	  <alphatest>disable</alphatest>
+	  <blendop src="one" dst="zero" />
+	  <alphatest>enable</alphatest>
 	</mixmode>
       <?else?>
 	<!-- Later pass: blend with add -->
 	<mixmode>
 	  <blendop src="one" dst="one" />
-	  <alphatest>disable</alphatest>
+	  <alphatest>enable</alphatest>
 	</mixmode>
       <?endif?>
       
@@ -264,7 +259,7 @@
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
-	<alphatest>disable</alphatest>
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -283,7 +278,7 @@
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
-	<alphatest>disable</alphatest>
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -302,7 +297,7 @@
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
-	<alphatest>disable</alphatest>
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -321,7 +316,7 @@
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
-	<alphatest>disable</alphatest>
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -340,7 +335,7 @@
       <!-- Later pass: blend with add -->
       <mixmode>
 	<blendop src="one" dst="one" />
-	<alphatest>disable</alphatest>
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
@@ -360,12 +355,11 @@
   <!-- No lights (ie ambient only) technique -->
   <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
   <technique priority="50">
-    <tag>per_pixel_lighting</tag>
     <pass>
-      <!-- First(only) pass: blend with alpha -->
+      <!-- First(only) pass: don't blend -->
       <mixmode>
-	<blendop src="one" dst="srcalpha_inv" />
-	<alphatest>disable</alphatest>
+	<blendop src="one" dst="zero" />
+	<alphatest>enable</alphatest>
       </mixmode>
       
       <!-- Combiner to use for this particular pass.
@@ -386,8 +380,4 @@
     </pass>
   </technique>
   <?endif?>
-  
-  <!-- If PPL is not available, try PVL -->
-  <fallbackshader name="lighting_default_instance_pvl" file="/shader/lighting/lighting_default_instance_pvl.xml" />
 </shader>
-
