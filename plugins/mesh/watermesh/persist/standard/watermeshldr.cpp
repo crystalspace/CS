@@ -111,19 +111,19 @@ csPtr<iBase> csWaterFactoryLoader::Parse (iDocumentNode* node,
     {
       case XMLTOKEN_LENGTH:
         {
-			float len = child->GetContentsValueAsFloat();
+			int len = child->GetContentsValueAsInt();
 			state->SetLength(len);
         }
 	break;
 	  case XMLTOKEN_WIDTH:
         {
-			float wid = child->GetContentsValueAsFloat();
+			int wid = child->GetContentsValueAsInt();
 			state->SetWidth(wid);
         }
 	break;
 	  case XMLTOKEN_GRAN:
         {
-			float gran = child->GetContentsValueAsFloat();
+			int gran = child->GetContentsValueAsInt();
 			state->SetGranularity(gran);
         }
 	break;

@@ -141,4 +141,4 @@ struct iWaterMeshState : public virtual iBase
 
 /** @} */
 
-#endif // __CS_IMESH_PROTOMESH_H__
+#endif // __CS_IMESH_WATERMESH_H__

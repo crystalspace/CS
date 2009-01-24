@@ -56,8 +56,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "watermesh.h"
 
 #define OCEAN_BBOX_RADIUS 50000.0f
-#define OCEAN_NP_WID  40.0f
-#define OCEAN_NP_LEN  40.0f
+#define OCEAN_NP_WID  40
+#define OCEAN_NP_LEN  40
 
 #define CELL_WID    20.0f
 #define CELL_LEN    20.0f
@@ -940,7 +940,7 @@ csRef<iTextureWrapper> csWaterMeshObjectFactory::MakeFresnelTex(int size)
   
   int maxDist = size >> 1;
   
-  int n = 1.0 / 1.33333333;
+  float n = 1.0f / 1.33333333f;
   float g, ratio;
   int dist;
   
