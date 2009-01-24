@@ -196,8 +196,6 @@ bool AppWaterdemo2::Application()
   loader = csQueryRegistry<iLoader> (r);
   if (!loader) return ReportError("Failed to locate Loader!");
 
-
-  engine->SetLightingCacheMode(0);
   engine->SetClearScreen(true);
   
   rotY = 0;
