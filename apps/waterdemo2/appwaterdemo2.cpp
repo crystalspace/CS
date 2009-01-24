@@ -28,7 +28,7 @@ AppWaterdemo2::~AppWaterdemo2()
 {
 }
 
-void AppWaterdemo2::ProcessFrame()
+void AppWaterdemo2::Frame()
 {
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
@@ -85,14 +85,10 @@ void AppWaterdemo2::ProcessFrame()
   
   if (g3d->BeginDraw(engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS))
   {
-	view->Draw ();
+    view->Draw ();
+    g3d->FinishDraw();
+    g3d->Print(0);
   }
-}
-
-void AppWaterdemo2::FinishFrame()
-{
-  g3d->FinishDraw();
-  g3d->Print(0);
 }
 
 bool AppWaterdemo2::OnKeyboard(iEvent& ev)
