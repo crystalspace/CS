@@ -1,0 +1,61 @@
+<!--<shader compiler="shaderweaver" name="simpleweaver1">
+  <technique priority="100">
+    <pass>
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+
+      <snippet id="position" file="/shader/snippets/position.xml" />
+      <snippet id="surface" file="/shader/snippets/surface/surface-classic.xml" />
+    </pass>
+  </technique>
+</shader> -->
+
+<shader compiler="shaderweaver" name="water" lights="4">
+  <technique priority="100">
+    <pass>
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+
+      <snippet id="position" file="/shader/snippets/position.xml" />
+      <snippet id="surface" file="/shader/snippets/surface/surface-classic.xml" />
+      
+      <snippet id="lighting" file="/shader/snippets/lighting/lighting-ppl.xml" />
+      <snippet id="apply_lighting" file="/shader/snippets/lighting/apply-lighting.xml" />
+      
+      <connection from="position" to="lighting" />
+      <connection from="surface" to="apply_lighting">
+	<explicit from="surfaceColor" to="surfaceDiffuse" />
+      </connection>
+      <connection from="lighting" to="apply_lighting">
+	<explicit from="diffuseColor" to="lightDiffuse" />
+      </connection>
+      
+      <parameter id="lightOffset" type="int">0</parameter>
+      <parameter id="maxLights" type="int">4</parameter>
+      <connection from="lightOffset" to="apply_lighting" />
+      <connection from="maxLights" to="apply_lighting" />
+     
+      <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
+      
+      <connection from="position" to="normalmap" />
+      <connection from="normalmap" to="lighting" />
+
+      <snippet id="reflection" file="/shader/snippets/reflect/reflect-env-world.xml" />
+      <snippet id="reflection_cubemap" file="/shader/snippets/surface/envmap-cube.xml" />
+      <snippet id="fresnel" file="/shader/snippets/reflect/fresnel.xml" />
+      <snippet id="lerp_reflect_surface" file="/shader/snippets/lerp.xml" />
+
+      <connection from="position" to="reflection" />
+      <connection from="position" to="fresnel" />
+      <connection from="normalmap" to="reflection" />
+      <connection from="normalmap" to="fresnel" />
+      <connection from="reflection" to="reflection_cubemap" />
+      <connection from="reflection_cubemap" to="lerp_reflect_surface">
+	<explicit from="envColor" to="b" />
+      </connection>
+      <connection from="fresnel" to="lerp_reflect_surface" />
+      <connection from="apply_lighting" to="lerp_reflect_surface">
+	<explicit from="result" to="a" />
+      </connection>
+
+    </pass>
+  </technique>
+</shader>
