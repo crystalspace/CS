@@ -953,7 +953,7 @@ csRef<iTextureWrapper> csWaterMeshObjectFactory::MakeFresnelTex(int size)
       }
       else
       {
-        ratio = sqrt(dist / (maxDist * maxDist));
+        ratio = sqrt((float)dist / (maxDist * maxDist));
         g = sqrt((ratio * ratio) - 1.0 + (n * n));
         a = g - ratio;
         b = g + ratio;
