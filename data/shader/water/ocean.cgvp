@@ -1,25 +1,3 @@
-<cgvp>
-<!-- The wave amplitudes -->
-<variablemap variable="amps" destination="amps" />
-
-<!-- The "kxs" and "kys" are the X and Z components of the 2D directional 
-vectors of the waves. It is possible to grab these values from a time 
-dependent function of the vertex's position, but it generates visually 
-pleasing effects even if they are hardcoded. -->
-<variablemap variable="kxs" destination="kxs" />
-<variablemap variable="kys" destination="kys" />
-
-<!-- The wave frequencies -->
-<variablemap variable="freqs" destination="freqs" />
-
-<!-- The wave phases -->
-<variablemap variable="phases" destination="phases" />
-
-<variablemap variable="o2w transform" destination="o2w" />
-
-<program>
-<![CDATA[
-
 //---------------------------------------------------------------------------------
 //Input
 //---------------------------------------------------------------------------------
@@ -135,7 +113,3 @@ vert2frag main (app2vert IN,
 //---------------------------------------------------------------------------------
 //end
 //---------------------------------------------------------------------------------
-
-]]>
-</program>
-</cgvp>
