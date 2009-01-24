@@ -96,6 +96,9 @@ csWaterMeshObject::csWaterMeshObject (csWaterMeshObjectFactory* factory) :
   strings = csQueryRegistryTagInterface<iStringSet> 
     (factory->object_reg, "crystalspace.shared.stringset");
 
+  svStrings = csQueryRegistryTagInterface<iShaderVarStringSet> 
+    (factory->object_reg, "crystalspace.shader.variablenameset");
+
   variableContext.AttachNew (new csShaderVariableContext);
 
   factory->AddMeshObject(this);
@@ -206,7 +209,7 @@ void csWaterMeshObject::SetupObject ()
 
   if(factory->murkChanged)
   {
-    csShaderVariable *murkVar = variableContext->GetVariableAdd(strings->Request("murkiness"));
+    csShaderVariable *murkVar = variableContext->GetVariableAdd(svStrings->Request("murkiness"));
     murkVar->SetType(csShaderVariable::FLOAT);
     murkVar->SetValue(factory->waterAlpha);
   
@@ -215,7 +218,7 @@ void csWaterMeshObject::SetupObject ()
 
   if(factory->amplitudes_changed)
   {
-    csShaderVariable *ampsVar = variableContext->GetVariableAdd(strings->Request("amps"));
+    csShaderVariable *ampsVar = variableContext->GetVariableAdd(svStrings->Request("amps"));
     ampsVar->SetType(csShaderVariable::VECTOR3);
     ampsVar->SetValue(factory->GetAmplitudes());
   
@@ -224,7 +227,7 @@ void csWaterMeshObject::SetupObject ()
 
   if(factory->frequencies_changed)
   {
-    csShaderVariable *freqsVar = variableContext->GetVariableAdd(strings->Request("freqs"));
+    csShaderVariable *freqsVar = variableContext->GetVariableAdd(svStrings->Request("freqs"));
     freqsVar->SetType(csShaderVariable::VECTOR3);
     freqsVar->SetValue(factory->GetFrequencies());
   
@@ -233,7 +236,7 @@ void csWaterMeshObject::SetupObject ()
 
   if(factory->phases_changed)
   {
-    csShaderVariable *phasesVar = variableContext->GetVariableAdd(strings->Request("phases"));
+    csShaderVariable *phasesVar = variableContext->GetVariableAdd(svStrings->Request("phases"));
     phasesVar->SetType(csShaderVariable::VECTOR3);
     phasesVar->SetValue(factory->GetPhases());
   
@@ -242,11 +245,11 @@ void csWaterMeshObject::SetupObject ()
 
   if(factory->directions_changed)
   {
-    csShaderVariable *kxsVar = variableContext->GetVariableAdd(strings->Request("kxs"));
+    csShaderVariable *kxsVar = variableContext->GetVariableAdd(svStrings->Request("kxs"));
     kxsVar->SetType(csShaderVariable::VECTOR3);
     kxsVar->SetValue(factory->GetDirsX());
   
-    csShaderVariable *kysVar = variableContext->GetVariableAdd(strings->Request("kys"));
+    csShaderVariable *kysVar = variableContext->GetVariableAdd(svStrings->Request("kys"));
     kysVar->SetType(csShaderVariable::VECTOR3);
     kysVar->SetValue(factory->GetDirsY());
 
@@ -474,7 +477,7 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
       renderMeshes[i]->object2world = o2world * trans;
       
       //update mesh-specific shader variable
-      o2wtVar = renderMeshes[i]->variablecontext->GetVariableAdd(strings->Request("o2w transform"));
+      o2wtVar = renderMeshes[i]->variablecontext->GetVariableAdd(svStrings->Request("o2w transform"));
       o2wtVar->SetType(csShaderVariable::MATRIX);
       o2wtVar->SetValue(renderMeshes[i]->object2world);
     
@@ -511,7 +514,7 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
     renderMeshes[0]->object2world = o2world * trans;
 
     //update shader variable
-    o2wtVar = variableContext->GetVariableAdd(strings->Request("o2w transform"));
+    o2wtVar = variableContext->GetVariableAdd(svStrings->Request("o2w transform"));
     o2wtVar->SetType(csShaderVariable::MATRIX);
     o2wtVar->SetValue(renderMeshes[0]->object2world);
   }
@@ -608,7 +611,7 @@ iObjectModel* csWaterMeshObject::GetObjectModel ()
 void csWaterMeshObject::SetNormalMap(iTextureWrapper *map)
 { 
   nMap = map;
-  nMapVar = variableContext->GetVariableAdd(strings->Request("texture normal"));
+  nMapVar = variableContext->GetVariableAdd(svStrings->Request("texture normal"));
   nMapVar->SetType(csShaderVariable::TEXTURE);
   nMapVar->SetValue(nMap);
 }
@@ -637,12 +640,13 @@ void csWaterMeshObject::PreGetBuffer (csRenderBufferHolder *holder,
       mesh_colors_dirty_flag = false;
       const csColor* factory_colors = factory->cols.GetArray();
       int i;
-      csColor colors[factory->numVerts];
+      csColor* colors = new csColor[factory->numVerts];
       for (i = 0 ; i < factory->numVerts ; i++)
         colors[i] = factory_colors[i]+color;
       // Copy the data into the render buffer
       // since we don't keep a local copy of the color buffer here.
       color_buffer->CopyInto (colors, factory->numVerts);
+      delete colors;
     }
     holder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
   } 
@@ -712,7 +716,7 @@ csWaterMeshObjectFactory::csWaterMeshObjectFactory (
 
   detail = 1;
 
-  waterAlpha = 0.3;
+  waterAlpha = 0.3f;
   murkChanged = true;
 }
 
@@ -790,14 +794,14 @@ void csWaterMeshObjectFactory::SetWaterType(waterMeshType waterType)
     len = OCEAN_NP_LEN;
     gran = 1;
     
-    SetMurkiness(0.2);
+    SetMurkiness(0.2f);
     
     //Setup Ocean defaults
-    SetAmplitudes(0.1, 0.03, 0.05);
-    SetFrequencies(2.0, 1.7, 1.6);
-    SetPhases(0.0, 1.0, 1.41);
+    SetAmplitudes(0.1f, 0.03f, 0.05f);
+    SetFrequencies(2.0f, 1.7f, 1.6f);
+    SetPhases(0.0f, 1.0f, 1.41f);
     
-    SetDirections(csVector2(1.4, 1.6), csVector2(-1.1, 0.7), csVector2(0.5, -2.5));
+    SetDirections(csVector2(1.4f, 1.6f), csVector2(-1.1f, 0.7f), csVector2(0.5f, -2.5f));
     
     size_changed = true;
   }
@@ -848,7 +852,7 @@ void csWaterMeshObjectFactory::SetupFactory ()
         {
           verts.Push(csVector3 ((i / gran) - offx, 0, (j / gran) - offz));
           norms.Push(csVector3 (0, 1, 0));
-          cols.Push(csColor (0.17,0.27,0.26));
+          cols.Push(csColor (0.17f, 0.27f, 0.26f));
           texs.Push(csVector2((i / gran) / (1.5 * detail), (j / gran) / (1.5 * detail)));
         }
       }
@@ -929,7 +933,7 @@ csRef<iTextureWrapper> csWaterMeshObjectFactory::MakeFresnelTex(int size)
 {
   if(size < 0) return 0;
   
-  float buf[size * size];
+  float* buf = new float[size * size];
   
   int i, j;
   
@@ -970,6 +974,9 @@ csRef<iTextureWrapper> csWaterMeshObjectFactory::MakeFresnelTex(int size)
 
   csRef<iTextureWrapper> fresnelTexWrapper;
   // fresnelTexWrapper->SetTextureHandle(texHandle);
+
+  delete buf;
+
   return fresnelTexWrapper;
 }
 

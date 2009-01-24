@@ -99,6 +99,7 @@ private:
   csWeakRef<iGraphics3D> g3d;
   csWeakRef<iEngine> engine;
   csRef<iStringSet> strings;
+  csRef<iShaderVarStringSet> svStrings;
 
   csRef<csWaterMeshObjectFactory> factory;
   iMeshWrapper* logparent;
