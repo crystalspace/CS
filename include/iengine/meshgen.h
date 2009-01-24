@@ -159,6 +159,13 @@ struct iMeshGeneratorGeometry : public virtual iBase
    * \param bias is the value of the wind bias.
    */
   virtual void SetWindBias (float bias) = 0;
+
+  /**
+   * Set the swing speed of simulated wind.
+   * Min speed of 0.0;
+   * \param speed is the value of the wind speed.
+   */
+  virtual void SetWindSpeed (float speed) = 0;
 };
 
 /**

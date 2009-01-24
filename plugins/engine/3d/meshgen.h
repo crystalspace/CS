@@ -62,6 +62,7 @@ struct csMGInstVertexInfo
   csRef<csShaderVariable> transformVar;
   csRef<csShaderVariable> fadeFactorVar;
   csRef<csShaderVariable> windVar;
+  csRef<csShaderVariable> windSpeedVar;
   float windRandVar;
 };
 
@@ -117,6 +118,7 @@ private:
   /// For wind.
   csVector3 wind_direction;
   float wind_bias;
+  float wind_speed;
 
   csStringID colldetID;
 
@@ -172,6 +174,9 @@ public:
 
   const float& GetWindBias() const { return wind_bias; }
   virtual void SetWindBias (float bias);
+
+  const float& GetWindSpeed() const { return wind_speed; }
+  virtual void SetWindSpeed (float speed);
 
   void AddPosition (const csVector2 &pos);
 
@@ -455,6 +460,7 @@ public:
   CS::ShaderVarStringID varTransform;
   CS::ShaderVarStringID varFadeFactor;
   CS::ShaderVarStringID varWind;
+  CS::ShaderVarStringID varWindSpeed;
 
   csMeshGenerator (csEngine* engine);
   virtual ~csMeshGenerator ();

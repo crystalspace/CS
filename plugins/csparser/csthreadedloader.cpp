@@ -3997,6 +3997,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         geom->SetWindDirection(child->GetAttributeValueAsFloat("x"),
           child->GetAttributeValueAsFloat("y"));
         break;
+      case XMLTOKEN_WINDSPEED:
+        geom->SetWindSpeed(child->GetContentsValueAsFloat ());
+        break;
       default:
         SyntaxService->ReportBadToken (child);
         return false;
