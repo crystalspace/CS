@@ -135,7 +135,6 @@ class csVector3(object):
     def SquaredNorm(*args): return _csgeom.csVector3_SquaredNorm(*args)
     def Unit(*args): return _csgeom.csVector3_Unit(*args)
     def Normalize(*args): return _csgeom.csVector3_Normalize(*args)
-    def Distance(*args): return _csgeom.csVector3_Distance(*args)
     def IsZero(*args): return _csgeom.csVector3_IsZero(*args)
     def UnitAxisClamped(*args): return _csgeom.csVector3_UnitAxisClamped(*args)
     def DominantAxis(*args): return _csgeom.csVector3_DominantAxis(*args)

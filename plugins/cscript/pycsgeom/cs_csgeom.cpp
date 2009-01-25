@@ -5539,40 +5539,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csVector3_Distance(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  csVector3 *arg1 = (csVector3 *) 0 ;
-  csVector3 *arg2 = 0 ;
-  float result;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"csVector3_Distance",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csVector3, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csVector3_Distance" "', argument " "1"" of type '" "csVector3 *""'"); 
-  }
-  arg1 = reinterpret_cast< csVector3 * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csVector3_Distance" "', argument " "2"" of type '" "csVector3 const &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csVector3_Distance" "', argument " "2"" of type '" "csVector3 const &""'"); 
-  }
-  arg2 = reinterpret_cast< csVector3 * >(argp2);
-  result = (float)(arg1)->Distance((csVector3 const &)*arg2);
-  resultobj = SWIG_From_float(static_cast< float >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_csVector3_IsZero__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csVector3 *arg1 = (csVector3 *) 0 ;
@@ -48054,7 +48020,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csVector3_SquaredNorm", _wrap_csVector3_SquaredNorm, METH_VARARGS, NULL},
 	 { (char *)"csVector3_Unit", _wrap_csVector3_Unit, METH_VARARGS, NULL},
 	 { (char *)"csVector3_Normalize", _wrap_csVector3_Normalize, METH_VARARGS, NULL},
-	 { (char *)"csVector3_Distance", _wrap_csVector3_Distance, METH_VARARGS, NULL},
 	 { (char *)"csVector3_IsZero", _wrap_csVector3_IsZero, METH_VARARGS, NULL},
 	 { (char *)"csVector3_UnitAxisClamped", _wrap_csVector3_UnitAxisClamped, METH_VARARGS, NULL},
 	 { (char *)"csVector3_DominantAxis", _wrap_csVector3_DominantAxis, METH_VARARGS, NULL},

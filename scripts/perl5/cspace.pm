@@ -10973,7 +10973,6 @@ sub new {
 *SquaredNorm = *cspacec::csVector3_SquaredNorm;
 *Unit = *cspacec::csVector3_Unit;
 *Normalize = *cspacec::csVector3_Normalize;
-*Distance = *cspacec::csVector3_Distance;
 *IsZero = *cspacec::csVector3_IsZero;
 *UnitAxisClamped = *cspacec::csVector3_UnitAxisClamped;
 *DominantAxis = *cspacec::csVector3_DominantAxis;
