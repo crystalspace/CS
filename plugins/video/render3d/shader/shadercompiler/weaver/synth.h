@@ -76,6 +76,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       friend class SynthesizeNodeTree;
     
       bool status;
+      csString techniqueConditions;
     
       const WeaverCompiler* compiler;
       const Synthesizer* synth;
@@ -161,6 +162,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         defaultCombiner->WriteToPass (passNode);
         combiner->WriteToPass (passNode);
       }
+      const char* GetTechniqueConditions() const { return techniqueConditions; }
     };
     
     typedef csHash<csString, csString> StringStringHash;
