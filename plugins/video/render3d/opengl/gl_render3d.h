@@ -63,6 +63,14 @@ struct iTextureManager;
 
 struct iEvent;
 
+namespace CS
+{
+namespace Graphics
+{
+  struct AlphaTestOptions;
+}
+}
+
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
 
@@ -529,7 +537,8 @@ public:
   iTextureManager* GetTextureManager () 
   { return txtmgr; }
 
-  void SetMixMode (uint mode, csAlphaMode::AlphaType alphaType);
+  void SetMixMode (uint mode, csAlphaMode::AlphaType alphaType,
+    const CS::Graphics::AlphaTestOptions& alphaTest);
   void SetGlOrtho (bool inverted);
   float GetAspect () const { return aspect; }
 
