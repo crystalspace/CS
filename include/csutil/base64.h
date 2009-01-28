@@ -33,7 +33,10 @@ namespace CS
     /// Base64-encode the given data buffer.
     CS_CRYSTALSPACE_EXPORT csString EncodeBase64 (void* data, size_t size);
     inline csString EncodeBase64 (iDataBuffer* data)
-    { return EncodeBase64 (data->GetData(), data->GetSize()); }
+    {
+      if (!data) return "";
+      return EncodeBase64 (data->GetData(), data->GetSize());
+    }
     //@}
   } // namespace Utility
 } // namespace CS

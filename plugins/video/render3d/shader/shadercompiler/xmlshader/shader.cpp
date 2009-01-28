@@ -578,16 +578,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     if (cacheTag.IsEmpty())
     {
       csRef<iDataBuffer> hashStream = hasher.GetHashStream ();
-      if (hashStream.IsValid())
-      {
-	/* @@@ Actually, the cache tag wouldn't have to be that large.
-	In theory, anything would work as long as (a) it changes when
-	some file the shader uses changes (b) the tag is reasonably
-	unique (also over multiple program runs).
-	E.g. a UUID, recomputed when the shader is 'touched',
-	could do as well. */
-	cacheTag = CS::Utility::EncodeBase64 (hashStream);
-      }
+      /* @@@ Actually, the cache tag wouldn't have to be that large.
+      In theory, anything would work as long as (a) it changes when
+      some file the shader uses changes (b) the tag is reasonably
+      unique (also over multiple program runs).
+      E.g. a UUID, recomputed when the shader is 'touched',
+      could do as well. */
+      cacheTag = CS::Utility::EncodeBase64 (hashStream);
     }
 
     ConditionsReader* condReader = 0;
