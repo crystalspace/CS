@@ -818,6 +818,8 @@ void csMeshGenerator::AllocateBlock (int cidx, csMGCell& cell)
     else inuse_blocks_last = block;
     inuse_blocks = block;
 
+    delete cell.positionMap;
+    cell.positionMap = new PositionMap(cell.box);
     GeneratePositions (cidx, cell, block);
   }
   else
@@ -841,6 +843,8 @@ void csMeshGenerator::AllocateBlock (int cidx, csMGCell& cell)
     inuse_blocks->prev = block;
     inuse_blocks = block;
 
+    delete cell.positionMap;
+    cell.positionMap = new PositionMap(cell.box);
     GeneratePositions (cidx, cell, block);
   }
 }
