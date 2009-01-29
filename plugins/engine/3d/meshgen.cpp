@@ -25,6 +25,51 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iengine/material.h"
 #include "igraphic/image.h"
 
+PositionMap::PositionMap(const csBox2& box)
+{
+  freeAreas.Push(csVector4(box.MinX(), box.MinY(), box.MaxX(), box.MaxY()));
+}
+
+bool PositionMap::GetRandomPosition(float& xpos, float& zpos, float& radius)
+{
+  posGen.Initialize();
+  csArray<size_t> notAttempted;
+
+  for(size_t i=0; i<freeAreas.GetSize(); i++)
+  {
+    notAttempted.Push(i);
+  }
+
+  // Do a quick search.
+  while(notAttempted.GetSize() != 0)
+  {
+    uint32 idx = posGen.Get(notAttempted.GetSize());
+
+    csVector4 freeArea = freeAreas[notAttempted[idx]];
+    if(abs(freeArea.x - freeArea.z) < radius ||
+       abs(freeArea.y - freeArea.w) < radius)
+    {
+      notAttempted.DeleteIndexFast(idx);
+      continue;
+    }
+
+    xpos = (freeArea.x + freeArea.z)/2;
+    zpos = (freeArea.y + freeArea.w)/2;
+
+    freeAreas.DeleteIndexFast(notAttempted[idx]);
+
+    freeAreas.Push(csVector4(freeArea.x, freeArea.y, xpos+radius, zpos-radius));
+    freeAreas.Push(csVector4(xpos+radius, freeArea.y, freeArea.z, zpos+radius));
+    freeAreas.Push(csVector4(xpos-radius, zpos+radius, freeArea.z, freeArea.w));
+    freeAreas.Push(csVector4(freeArea.x, zpos-radius, xpos-radius, freeArea.w));
+
+    return true;
+  }
+
+  // No space found.. we could do a more thorough search if this case happens often.
+  return false;
+}
+
 csMeshGeneratorGeometry::csMeshGeneratorGeometry (
   csMeshGenerator* generator) : scfImplementationType (this),
   generator (generator)
@@ -553,12 +598,13 @@ void csMeshGenerator::SetupSampleBox ()
   int idx = 0;
   for (z = 0 ; z < cell_dim ; z++)
   {
-    float wz = GetWorldX (z);
+    float wz = GetWorldZ (z);
     for (x = 0 ; x < cell_dim ; x++)
     {
       float wx = GetWorldX (x);
-      cells[idx].box.Set (wx, wz, wx + samplecellwidth_x,
-        wz + samplecellheight_z);
+      cells[idx].box.Set (wx, wz, wx + samplecellwidth_x, wz + samplecellheight_z);
+      delete cells[idx].positionMap;
+      cells[idx].positionMap = new PositionMap(cells[idx].box);
       // Here we need to calculate the meshes relevant for this cell (i.e.
       // meshes that intersect this cell as seen in 2D space).
       // @@@ For now we just copy the list of meshes from csMeshGenerator.
@@ -666,8 +712,12 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
       float z;
       if (mpos_count == 0)
       {
-        x = random.Get (box.MinX (), box.MaxX ());
-        z = random.Get (box.MinY (), box.MaxY ());
+        float r = geometries[g]->GetRadius();
+        if(!cell.positionMap->GetRandomPosition(x, z, r))
+        {
+          // Ran out of room in this cell.
+          return;
+        }
         geometries[g]->GetDensityMapFactor (x, z, pos_factor);
       }
       else

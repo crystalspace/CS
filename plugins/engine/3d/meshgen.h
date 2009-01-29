@@ -23,6 +23,7 @@
 #include "csutil/array.h"
 #include "csutil/weakref.h"
 #include "csutil/parray.h"
+#include "csutil/randomgen.h"
 #include "csutil/refarr.h"
 #include "csutil/hash.h"
 #include "csutil/set.h"
@@ -297,6 +298,27 @@ struct csMGPositionBlock
 };
 
 /**
+ * A map of available positions.
+ */
+class PositionMap
+{
+public:
+  PositionMap(const csBox2& box);
+
+  /**
+   * Get a random available position. 
+   * \param xpos X position.
+   * \param zpos Z position.
+   * \param radius The radius from the (x, z) coordinates to mark off as used.
+   */
+  bool GetRandomPosition(float& xpos, float& zpos, float& radius);
+
+private:
+  csArray<csVector4> freeAreas;
+  csRandomGen posGen;
+};
+
+/**
  * The 2D x/z plane of the box used by the mesh generator is divided
  * in cells.
  */
@@ -311,12 +333,17 @@ struct csMGCell
   csMGPositionBlock* block;
 
   /**
+   * A map of all available positions.
+   */
+  PositionMap* positionMap;
+
+  /**
    * An array of meshes that are relevant in this cell (for calculating the
    * beam downwards).
    */
   csRefArray<iMeshWrapper> meshes;
 
-  csMGCell () : block (0) { }
+  csMGCell () : block (0), positionMap (0) { }
 };
 
 /**
