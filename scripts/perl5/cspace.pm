@@ -9869,6 +9869,47 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::AlphaTestOptions ##############
+
+package cspace::AlphaTestOptions;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_threshold_get = *cspacec::AlphaTestOptions_threshold_get;
+*swig_threshold_set = *cspacec::AlphaTestOptions_threshold_set;
+*swig_func_get = *cspacec::AlphaTestOptions_func_get;
+*swig_func_set = *cspacec::AlphaTestOptions_func_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_AlphaTestOptions(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_AlphaTestOptions($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::RenderMeshModes ##############
 
 package cspace::RenderMeshModes;
@@ -9903,6 +9944,8 @@ sub DESTROY {
 *swig_cullMode_set = *cspacec::RenderMeshModes_cullMode_set;
 *swig_alphaType_get = *cspacec::RenderMeshModes_alphaType_get;
 *swig_alphaType_set = *cspacec::RenderMeshModes_alphaType_set;
+*swig_alphaTest_get = *cspacec::RenderMeshModes_alphaTest_get;
+*swig_alphaTest_set = *cspacec::RenderMeshModes_alphaTest_set;
 *swig_zoffset_get = *cspacec::RenderMeshModes_zoffset_get;
 *swig_zoffset_set = *cspacec::RenderMeshModes_zoffset_set;
 *swig_buffers_get = *cspacec::RenderMeshModes_buffers_get;
@@ -22809,6 +22852,10 @@ sub CS_ALERT_NOTE () { $cspacec::CS_ALERT_NOTE }
 sub CS::Graphics::cullNormal () { $cspacec::CS::Graphics::cullNormal }
 sub CS::Graphics::cullFlipped () { $cspacec::CS::Graphics::cullFlipped }
 sub CS::Graphics::cullDisabled () { $cspacec::CS::Graphics::cullDisabled }
+sub CS::Graphics::atfGreaterEqual () { $cspacec::CS::Graphics::atfGreaterEqual }
+sub CS::Graphics::atfGreater () { $cspacec::CS::Graphics::atfGreater }
+sub CS::Graphics::atfLowerEqual () { $cspacec::CS::Graphics::atfLowerEqual }
+sub CS::Graphics::atfLower () { $cspacec::CS::Graphics::atfLower }
 sub CSFONT_LARGE () { $cspacec::CSFONT_LARGE }
 sub CSFONT_ITALIC () { $cspacec::CSFONT_ITALIC }
 sub CSFONT_COURIER () { $cspacec::CSFONT_COURIER }
