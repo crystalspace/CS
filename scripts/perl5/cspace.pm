@@ -14713,6 +14713,82 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iAnimatedMeshSocketFactory ##############
+
+package cspace::iAnimatedMeshSocketFactory;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetName = *cspacec::iAnimatedMeshSocketFactory_GetName;
+*GetTransform = *cspacec::iAnimatedMeshSocketFactory_GetTransform;
+*SetTransform = *cspacec::iAnimatedMeshSocketFactory_SetTransform;
+*GetBone = *cspacec::iAnimatedMeshSocketFactory_GetBone;
+*GetFactory = *cspacec::iAnimatedMeshSocketFactory_GetFactory;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iAnimatedMeshSocketFactory($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iAnimatedMeshSocket ##############
+
+package cspace::iAnimatedMeshSocket;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetName = *cspacec::iAnimatedMeshSocket_GetName;
+*GetFactory = *cspacec::iAnimatedMeshSocket_GetFactory;
+*GetTransform = *cspacec::iAnimatedMeshSocket_GetTransform;
+*SetTransform = *cspacec::iAnimatedMeshSocket_SetTransform;
+*GetFullTransform = *cspacec::iAnimatedMeshSocket_GetFullTransform;
+*GetBone = *cspacec::iAnimatedMeshSocket_GetBone;
+*GetMesh = *cspacec::iAnimatedMeshSocket_GetMesh;
+*GetSceneNode = *cspacec::iAnimatedMeshSocket_GetSceneNode;
+*SetSceneNode = *cspacec::iAnimatedMeshSocket_SetSceneNode;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iAnimatedMeshSocket($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iAnimatedMeshFactory ##############
 
 package cspace::iAnimatedMeshFactory;
@@ -14748,6 +14824,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetMorphTargetCount = *cspacec::iAnimatedMeshFactory_GetMorphTargetCount;
 *ClearMorphTargets = *cspacec::iAnimatedMeshFactory_ClearMorphTargets;
 *FindMorphTarget = *cspacec::iAnimatedMeshFactory_FindMorphTarget;
+*CreateSocket = *cspacec::iAnimatedMeshFactory_CreateSocket;
+*GetSocketCount = *cspacec::iAnimatedMeshFactory_GetSocketCount;
+*GetSocket = *cspacec::iAnimatedMeshFactory_GetSocket;
 *scfGetVersion = *cspacec::iAnimatedMeshFactory_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -14821,6 +14900,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetSubMeshCount = *cspacec::iAnimatedMesh_GetSubMeshCount;
 *SetMorphTargetWeight = *cspacec::iAnimatedMesh_SetMorphTargetWeight;
 *GetMorphTargetWeight = *cspacec::iAnimatedMesh_GetMorphTargetWeight;
+*GetSocketCount = *cspacec::iAnimatedMesh_GetSocketCount;
+*GetSocket = *cspacec::iAnimatedMesh_GetSocket;
 *scfGetVersion = *cspacec::iAnimatedMesh_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -18548,6 +18629,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetParameterSet = *cspacec::iParticleBuiltinEffectorLinear_SetParameterSet;
 *GetParameterSet = *cspacec::iParticleBuiltinEffectorLinear_GetParameterSet;
 *GetParameterSetCount = *cspacec::iParticleBuiltinEffectorLinear_GetParameterSetCount;
+*scfGetVersion = *cspacec::iParticleBuiltinEffectorLinear_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
