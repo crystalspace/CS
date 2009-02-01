@@ -660,7 +660,7 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode,
 		child, "Invalid blend factor %s", dstAlphaFactorStr);
 	    }
 	    mixmode &= ~((CS_MIXMODE_FACT_MASK << 12) | (CS_MIXMODE_FACT_MASK << 8));
-	    mixmode |= ((srcFactor << 12) | (dstFactor << 8));
+	    mixmode |= ((srcFactorA << 12) | (dstFactorA << 8));
 	    mixmode |= CS_MIXMODE_FLAG_BLENDOP_ALPHA;
 	  }
         }
