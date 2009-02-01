@@ -599,6 +599,7 @@ public:
     extmgr->InitGL_ARB_multitexture ();
     extmgr->InitGL_ARB_fragment_program ();
     
+    numTexCoords = numImageUnits = 1;
     if (extmgr->CS_GL_ARB_fragment_program)
     {
       glGetIntegerv (GL_MAX_TEXTURE_IMAGE_UNITS_ARB, &numImageUnits);
@@ -608,10 +609,6 @@ public:
     {
       glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &numImageUnits);
       numTexCoords = numImageUnits;
-    }
-    else
-    {
-      numTexCoords = numImageUnits = 1;
     }
     
     boundtexture.Setup (numImageUnits);
