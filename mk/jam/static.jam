@@ -292,8 +292,23 @@ rule LinkStaticPlugins
     # Grab flags
     for p in $(plugins)
     {
-      lflags += [ Filter $($(p).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ;
+      lflags += [ Filter $($(p).LFLAGS.EXTERNAL) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ;
       libs += $($(p).NEEDLIBS) ;
+      
+      local relaydeps = $($(p).RELAYDEPS) ;
+      for relaydep in $(relaydeps)
+      {
+	local libpath ;
+	libpath = [ ConcatDirs
+	  [ on $($(STATICPLUGINS.LIBRARY)_TARGET) GetVar SEARCH ] 
+	  $($(STATICPLUGINS.LIBRARY)_TARGET)
+	] ;
+	lflags = [ MergeRemovingDups $(lflags) : 
+	  [ RelayLFlags $($(relaydep).LFLAGS) :
+	    $($(p).RELAYLIBS.$(relaydep)) : $(libpath) ] ] ;
+	relayobjs += [ RelayObjs $(target) :
+	    $($(p).RELAYLIBS.$(relaydep)) : $(relaydep) ] ;
+      }
     }
     target_link_with = [ RemoveDupFlags $(libs) ] ;
     target_lflags = [ RemoveDups $(lflags) ] ;
