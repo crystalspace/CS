@@ -1101,8 +1101,12 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
 {
   if(!node) return false;
 
+  csString factname;
+  csRef<iDocumentNode> factory = node->GetParent()->GetNode("factory");
+  if(factory.IsValid())
+    factname = factory->GetContentsValue();
   const char* name = node->GetAttributeValue ("name");
-  csRef<iGeneralMeshSubMesh> subMesh = ldr_context->FindSubmesh (state, name);
+  csRef<iGeneralMeshSubMesh> subMesh = ldr_context->FindSubmesh (state, factname, name);
   if (!subMesh)
   {
     synldr->ReportError (
