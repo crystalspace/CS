@@ -23,6 +23,10 @@
       <technique priority="100">
 	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 	
+	<input name="normalMapAlpha" type="float" default="value" defval="1">
+	  <attribute name="perfragment" type="bool" defval="false" />
+	</input>
+	
 	<input file="/shader/snippets/texCoord.inp"/>
 	
 	<input name="texSpecular" type="tex2d" default="complex">
@@ -40,7 +44,9 @@
 	  </block>
 	</input>
 	
-	<input name="alpha" type="float" default="value" defval="1">
+	<!-- Surface color - the RGB part is ignored, but alpha is used to modulate the
+	     specular color for correct appearance on transparent surfaces. -->
+	<input name="surfaceColorWithAlpha" type="rgba" default="value" defval="0,0,0,1">
 	  <attribute name="perfragment" type="bool" defval="true" />
 	</input>
 	
@@ -70,14 +76,11 @@
 	    specular = vertexIn.specular;
 	  </block>
 	</input>
-	<input name="normalMapAlpha" type="float" default="value" defval="1" private="yes">
-	  <attribute name="perfragment" type="bool" defval="false" />
-	</input>
 	  
 	<block location="cg:vertexMain">
 	  specularColor = specular;
 	  specularColor_attr_perfragment = true;
-	  specularColor *= alpha;
+	  specularColor *= surfaceColorWithAlpha.a;
 	</block>
 	
 	<block location="cg:fragmentMain">
@@ -85,8 +88,7 @@
 	  specularColor_attr_perfragment = true;
 	  float weirdCoef = (normalMapAlpha+1)/2;
 	  specularColor *= weirdCoef;
-	  specularColor *= alpha;
-	  specularColor_attr_perfragment |= normalMapAlpha_attr_perfragment;
+	  specularColor *= surfaceColorWithAlpha.a;
 	</block>
 	
 	<output name="specularColor" type="rgb">
@@ -94,6 +96,8 @@
 	</output>
       </technique>
     </snippet>
-    <connection from="normalMapAlpha" to="specular" />
+    <connection from="normalMapAlpha" to="specular">
+      <explicit from="normalmap_alpha" to="normalMapAlpha" />
+    </connection>
   </technique>
 </snippet>

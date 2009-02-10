@@ -66,7 +66,7 @@
     <connection from="normalmap" to="lighting" />
     <connection from="normalmap" to="staticspecular" />
     <connection from="surface" to="apply_mixmode_alpha" />
-    <connection from="surface" to="specular" />
+    <connection from="apply_mixmode_alpha" to="specular" />
     <connection from="apply_mixmode_alpha" to="apply_alpha" />
     <connection from="apply_alpha" to="apply_lighting">
       <explicit from="outputColor" to="surfaceDiffuse" />

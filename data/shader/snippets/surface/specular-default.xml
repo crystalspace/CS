@@ -36,7 +36,9 @@
       </block>
     </input>
     
-    <input name="alpha" type="float" default="value" defval="1">
+    <!-- Surface color - the RGB part is ignored, but alpha is used to modulate the
+	 specular color for correct appearance on transparent surfaces. -->
+    <input name="surfaceColorWithAlpha" type="rgba" default="value" defval="0,0,0,1">
       <attribute name="perfragment" type="bool" defval="true" />
     </input>
     
@@ -68,14 +70,14 @@
     </input>
       
     <block location="cg:vertexMain">
-      specularColor = specular*alpha;
+      specularColor = specular*surfaceColorWithAlpha.a;
       specularColor_attr_perfragment = true;
     </block>
     
     <block location="cg:fragmentMain">
       specularColor = tex2D (texSpecular, texCoord).rgb * specular;
       specularColor_attr_perfragment = true;
-      specularColor *= alpha;
+      specularColor *= surfaceColorWithAlpha.a;
     </block>
     
     <output name="specularColor" type="rgb">
