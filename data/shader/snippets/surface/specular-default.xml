@@ -23,7 +23,8 @@
     
     <input name="texSpecular" type="tex2d" default="complex">
       <block location="pass">
-	<texture name="tex specular" destination="fragmentIn.texSpecular" />
+	<texture name="tex specular" destination="fragmentIn.texSpecular"
+		 fallback="tex diffuse" />
       </block>
       
       <block location="cg:fragmentIn">
@@ -40,6 +41,10 @@
     </input>
     
     <input name="specular" type="rgb" default="complex" private="yes">
+      <block location="shadervars">
+	<shadervar name="specular" type="vector3">1,1,1</shadervar>
+      </block>
+      
       <block location="cg:variablemap">
 	<variablemap variable="specular" destination="fragmentIn.specular" />
 	<variablemap variable="specular" destination="vertexIn.specular" />
@@ -64,21 +69,12 @@
       
     <block location="cg:vertexMain">
       specularColor = specular*alpha;
-      <?if vars."tex specular".texture?>
-        specularColor_attr_perfragment = true;
-      <?else?>
-        specularColor_attr_perfragment = alpha_attr_perfragment;
-      <?endif?>
+      specularColor_attr_perfragment = true;
     </block>
     
     <block location="cg:fragmentMain">
-      <?if vars."tex specular".texture?>
-        specularColor = tex2D (texSpecular, texCoord).rgb;
-	specularColor_attr_perfragment = true;
-      <?else?>
-        specularColor = specular;
-	specularColor_attr_perfragment = alpha_attr_perfragment;
-      <?endif?>
+      specularColor = tex2D (texSpecular, texCoord).rgb * specular;
+      specularColor_attr_perfragment = true;
       specularColor *= alpha;
     </block>
     
