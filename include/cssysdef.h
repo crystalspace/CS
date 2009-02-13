@@ -394,21 +394,6 @@ void Name (void (*p)())                                                \
     CS_DECLARE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);
 #endif
 
-/* scfStaticallyLinked - Flag indicating whether external linkage was used when 
- * building the application. Determines whether SCF scans for plugins at 
- * startup.
- */
-/**\def CS_DEFINE_STATICALLY_LINKED_FLAG
- * Define the scfStaticallyLinked variable.
- */
-#if defined(CS_BUILD_SHARED_LIBS)
-#  define CS_DEFINE_STATICALLY_LINKED_FLAG
-#elif defined(CS_STATIC_LINKED)
-#  define CS_DEFINE_STATICALLY_LINKED_FLAG  bool scfStaticallyLinked = true;
-#else
-#  define CS_DEFINE_STATICALLY_LINKED_FLAG  bool scfStaticallyLinked = false;
-#endif
-
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
 #  define CS_DEFINE_MEMTRACKER_MODULE             \
   class csMemTrackerModule;                       \
@@ -452,13 +437,11 @@ void Name (void (*p)())                                                \
 #  if defined(CS_BUILD_SHARED_LIBS)
 #    define CS_IMPLEMENT_FOREIGN_DLL					    \
        CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(csStaticVarCleanup_local); \
-       CS_DEFINE_STATICALLY_LINKED_FLAG					    \
        CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_local);   \
        CS_DEFINE_MEMTRACKER_MODULE
 #  else
 #    define CS_IMPLEMENT_FOREIGN_DLL					    \
        CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION			    \
-       CS_DEFINE_STATICALLY_LINKED_FLAG					    \
        CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);  \
        CS_DEFINE_MEMTRACKER_MODULE
 #  endif
@@ -484,7 +467,6 @@ void Name (void (*p)())                                                \
 #  ifndef CS_IMPLEMENT_PLUGIN
 #  define CS_IMPLEMENT_PLUGIN        					\
           CS_IMPLEMENT_PLATFORM_PLUGIN 					\
-	  CS_DEFINE_STATICALLY_LINKED_FLAG				\
 	  CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION		\
 	  CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);   \
           CS_DEFINE_MEMTRACKER_MODULE
@@ -494,7 +476,6 @@ void Name (void (*p)())                                                \
 
 #  ifndef CS_IMPLEMENT_PLUGIN
 #  define CS_IMPLEMENT_PLUGIN						\
-   CS_DEFINE_STATICALLY_LINKED_FLAG					\
    CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(csStaticVarCleanup_local)	\
    CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_local);	\
    CS_IMPLEMENT_PLATFORM_PLUGIN                                         \
@@ -514,7 +495,6 @@ void Name (void (*p)())                                                \
 #ifndef CS_IMPLEMENT_APPLICATION
 #  define CS_IMPLEMENT_APPLICATION       				\
   CS_DECLARE_DEFAULT_STATIC_VARIABLE_REGISTRATION			\
-  CS_DEFINE_STATICALLY_LINKED_FLAG					\
   CS_DEFINE_STATIC_VARIABLE_REGISTRATION (csStaticVarCleanup_csutil);	\
   CS_IMPLEMENT_PLATFORM_APPLICATION                                     \
   CS_DEFINE_MEMTRACKER_MODULE

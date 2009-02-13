@@ -27,6 +27,7 @@ should send mail to the Crystal Space mailing list and ask for help.
 * Release Notes 17:: Release Notes from 0.16 to 0.17
 @end menu
 
+@imports{appendix,apimod20.txi}
 @imports{appendix,apimod14.txi}
 @imports{appendix,apimod12.txi}
 @imports{appendix,apimod10.txi}
