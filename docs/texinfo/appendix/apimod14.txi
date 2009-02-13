@@ -7,15 +7,8 @@ This section documents the major changes between versions 1.2 and 1.4 of
 Crystal Space.
 
 @menu
-* Api1_4 iGenMeshAnimationControl changes:: @code{iGenMeshAnimationControl} changes
 * Api1_4 Deprecation of the old event system:: Deprecation of the old event system
 @end menu
-
-@node Api1_4 iGenMeshAnimationControl changes, Api1_4 Deprecation of the old event system, Release Notes 1_4, Release Notes 1_4
-@subsection @code{iGenMeshAnimationControl} changes
-
-The @code{Update} method of the @code{iGenMeshAnimationControl} interface has
-a different prototype, as more parameters have been added.
 
 @node Api1_4 Deprecation of the old event system, , Api1_4 iGenMeshAnimationControl changes, Release Notes 1_4
 @subsection Deprecation of the old event system
