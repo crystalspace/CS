@@ -111,7 +111,7 @@
 	  
 	  <block location="cg:variablemap">
 	    <variablemap destination="fragmentIn.projectedToWorld" type="expr">
-	      <sexp>(* "world2camera transform inverse" "projection transform inverse")</sexp>
+	      <sexp>(* "world2camera transform" "projection transform inverse")</sexp>
 	    </variablemap>
 	  </block>
 	</input>
