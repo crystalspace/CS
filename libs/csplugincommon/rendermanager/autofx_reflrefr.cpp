@@ -39,7 +39,7 @@ namespace CS
 	CS::Utility::ResourceCache::ReuseIfOnlyOneRef ()),
       texCacheDepth (csimg2D, "d32",
 	CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP
-	  | CS_TEXTURE_NPOTS | CS_TEXTURE_CLAMP | CS_TEXTURE_SCALE_UP,
+	  | CS_TEXTURE_NPOTS | CS_TEXTURE_CLAMP | CS_TEXTURE_SCALE_UP | CS_TEXTURE_NOFILTER,
 	"target", 0,
 	CS::Utility::ResourceCache::ReuseIfOnlyOneRef ())
     {
