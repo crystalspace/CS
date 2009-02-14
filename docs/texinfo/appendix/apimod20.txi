@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Release Notes 2_0, Release Notes 1_2, Release Notes, Release Notes
+@node Release Notes 2_0, Release Notes 1_4, Release Notes, Release Notes
 @appendixsec Release Notes from 1.4 to 2.0
 @cindex Release Notes
 
@@ -7,9 +7,10 @@ This section documents the major changes between versions 1.4 and 2.0 of
 Crystal Space.
 
 @menu
+* Api2_0 Static Build Plugin Scanning:: Plugin scanning in static builds changes
 @end menu
 
-@node Api2_0 Static Build Plugin Scanning
+@node Api2_0 Static Build Plugin Scanning, , Release Notes 2_0, Release Notes 2_0
 @subsection Plugin scanning in static builds changes
 
 When building an application with ``statically linked plugins'' (usually by
