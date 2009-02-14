@@ -55,7 +55,10 @@ public:
 
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
-    iStreamSource*, iLoaderContext* ldr_context, iBase* context);
+    iStreamSource*, iLoaderContext* ldr_context, iBase* context,
+    iStringArray* failed);
+
+  virtual bool IsThreadSafe() { return true; }
 };
 
 /**
@@ -110,7 +113,11 @@ public:
 
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
-    iStreamSource*, iLoaderContext* ldr_context, iBase* context);
+    iStreamSource*, iLoaderContext* ldr_context, iBase* context,
+    iStringArray* failedMeshFacts);
+
+  virtual bool IsThreadSafe() { return true; }
+
   /// Parse a render buffer node
 };
 

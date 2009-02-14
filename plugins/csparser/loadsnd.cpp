@@ -23,6 +23,7 @@
 
 #include "cssysdef.h"
 #include "csloader.h"
+#include "csthreadedloader.h"
 #include "iutil/databuff.h"
 #include "iutil/vfs.h"
 #include "iengine/engine.h"
@@ -33,6 +34,93 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
+  THREADED_CALLABLE_IMPL2(csThreadedLoader, LoadSoundSysData, const char* filename,
+    bool do_verbose)
+  {
+    if (!SndSysLoader)
+    {
+      return false;
+    }
+
+    // read the file data
+    csRef<iDataBuffer> buf = vfs->ReadFile (filename);
+    if (!buf || !buf->GetSize ())
+    {
+      ReportError (
+        "crystalspace.maploader.parse.sound",
+        "Cannot open sound file '%s' from VFS!", filename);
+      return false;
+    }
+
+    // load the sound
+    csRef<iSndSysData> Sound = SndSysLoader->LoadSound (buf, filename);
+
+    // check for valid sound data
+    if (!Sound)
+    {
+      ReportError (
+        "crystalspace.maploader.parse.sound",
+        "Cannot create sound data from file '%s'!", filename);
+      return false;
+    }
+
+    ret->SetResult(csRef<iBase>(Sound));
+    return true;
+  }
+
+  THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadSoundStream, const char* fname, int mode3d,
+    bool do_verbose)
+  {
+    if (!SndSysRenderer)
+    {
+      return false;
+    }
+
+    csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
+    if (!LoadSoundSysDataTC (itr, fname, do_verbose))
+    {
+      return false;
+    }
+
+    /* register the sound */
+    csRef<iSndSysData> sound = scfQueryInterface<iSndSysData>(itr->GetResultRefPtr());
+    csRef<iSndSysStream> stream = SndSysRenderer->CreateStream (sound, mode3d);
+    if (!stream)
+    {
+      ReportError (
+        "crystalspace.maploader.parse.sound",
+        "Cannot register sound '%s'!", fname);
+      return false;
+    }
+
+    ret->SetResult(csRef<iBase>(stream));
+    return true;
+  }
+
+  THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadSoundWrapper, const char* name,
+    const char* fname, bool do_verbose)
+  {
+    if (!SndSysManager)
+    {
+      return false;
+    }
+
+    // load the sound handle
+    csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
+    if (!LoadSoundSysDataTC (itr, fname, do_verbose))
+    {
+      return false;
+    }
+
+    // build wrapper object
+    iSndSysWrapper* wrapper = SndSysManager->CreateSound (name);
+    csRef<iSndSysData> data = scfQueryInterface<iSndSysData>(itr->GetResultRefPtr());
+    wrapper->SetData(data);
+    ret->SetResult(csRef<iBase>(wrapper));
+    return true;
+  }
+
+  // ----------------------------------------------------------------- //
 
 csPtr<iSndSysData> csLoader::LoadSoundSysData (const char* filename)
 {

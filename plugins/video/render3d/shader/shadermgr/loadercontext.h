@@ -58,6 +58,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
     iCollection* GetCollection() const { return 0; }
     bool CurrentCollectionOnly() const { return false; }
     uint GetKeepFlags() const { return 0; }
+    void AddToCollection(iObject* obj) { return; }
+    bool GetVerbose() { return false; }
   };
 
 }

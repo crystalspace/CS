@@ -575,7 +575,8 @@ const char *csSkeletonFactoryLoader::ParseFrame (iDocumentNode* node,
 }
 
 csPtr<iBase> csSkeletonFactoryLoader::Parse (iDocumentNode* node,
-  iStreamSource*, iLoaderContext* /*ldr_context*/, iBase* /*context*/)
+  iStreamSource*, iLoaderContext* /*ldr_context*/, iBase* /*context*/,
+  iStringArray* failed)
 {
   csRef<iSkeletonGraveyard> graveyard = csLoadPluginCheck<iSkeletonGraveyard> (
   	object_reg, "crystalspace.graveyard", false);

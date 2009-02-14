@@ -69,7 +69,7 @@ bool csSimpleFormerLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
 		iStreamSource*, iLoaderContext* /*ldr_context*/,
-		iBase* /*context*/)
+		iBase* /*context*/, iStringArray* failed)
 {
   csRef<iTerraFormer> former = csLoadPlugin<iTerraFormer> (pluginmgr, 
   	"crystalspace.terraformer.simple");

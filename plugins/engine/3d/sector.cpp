@@ -750,6 +750,18 @@ csSectorHitBeamResult csSector::HitBeam (
   return rc;
 }
 
+THREADED_CALLABLE_IMPL1(csSector, SetSectorCallback, csRef<iSectorCallback> cb)
+{
+  sectorCallbackList.Push(cb);
+  return true;
+}
+
+THREADED_CALLABLE_IMPL1(csSector, RemoveSectorCallback, csRef<iSectorCallback> cb)
+{
+  sectorCallbackList.Delete(cb);
+  return true;
+}
+
 int csSector::IntersectSegment (
   const csVector3 &start,
   const csVector3 &end,
@@ -830,6 +842,12 @@ int csSector::IntersectSegment (
 
   if (pr) *pr = best_r;
   return best_p;
+}
+
+THREADED_CALLABLE_IMPL1(csSector, SetRenderLoop, iRenderLoop* rl)
+{
+  renderloop = rl;
+  return true;
 }
 
 iSector *csSector::FollowSegment (
@@ -1117,6 +1135,17 @@ void csSector::RealCheckFrustum (iFrustumView *lview)
   drawBusy--;
 }
 
+iObjectRegistry* csSector::GetObjectRegistry() const
+{
+  return engine->objectRegistry;
+}
+
+THREADED_CALLABLE_IMPL1(csSector, AddLight, csRef<iLight> light)
+{
+  GetLights()->Add(light);
+  return true;
+}
+
 void csSector::ShineLightsInt (csProgressPulse *pulse)
 {
   int i;
@@ -1298,6 +1327,7 @@ int csSectorList::Add (iSector *obj)
 
 bool csSectorList::Remove (iSector *obj)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   engine->FireRemoveSector (obj);
   FreeSector (obj);
   const char* name = obj->QueryObject ()->GetName ();
@@ -1309,6 +1339,7 @@ bool csSectorList::Remove (iSector *obj)
 
 bool csSectorList::Remove (int n)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   iSector* obj = list[n];
   FreeSector (obj);
   const char* name = obj->QueryObject ()->GetName ();
@@ -1320,6 +1351,7 @@ bool csSectorList::Remove (int n)
 
 void csSectorList::RemoveAll ()
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   size_t i;
   for (i = 0 ; i < list.GetSize () ; i++)
   {
@@ -1337,6 +1369,7 @@ int csSectorList::Find (iSector *obj) const
 
 iSector *csSectorList::FindByName (const char *Name) const
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return sectors_hash.Get (Name, 0);
 }
 

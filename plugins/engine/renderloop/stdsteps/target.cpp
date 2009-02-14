@@ -75,7 +75,7 @@ bool csTargetRSLoader::Initialize (iObjectRegistry* object_reg)
 csPtr<iBase> csTargetRSLoader::Parse (iDocumentNode* node, 
 				       iStreamSource*,
 				       iLoaderContext* /*ldr_context*/,      
-				       iBase* /*context*/)
+				       iBase* /*context*/, iStringArray* failed)
 {
   csRef<iRenderStep> newstep;
   csTargetRenderStep* step = new csTargetRenderStep (object_reg);

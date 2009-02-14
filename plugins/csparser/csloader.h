@@ -44,6 +44,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 
+#include "ldrplug.h"
 #include "proxyimage.h"
 
 class csReversibleTransform;
@@ -130,6 +131,8 @@ public:
   virtual iCollection* GetCollection() const { return collection; }
   virtual bool CurrentCollectionOnly() const { return searchCollectionOnly; }
   virtual uint GetKeepFlags() const { return keepFlags; }
+  virtual void AddToCollection(iObject* obj);
+  virtual bool GetVerbose() { return false; }
 };
 
 
@@ -196,49 +199,6 @@ private:
   //CS_TRIMESH_CONVEX flags on a single mesh wrapper.
   void ConvexFlags (iMeshWrapper* mesh);
   void ClosedFlags (iMeshWrapper* mesh);
-
-  class csLoadedPluginVector
-  {
-  private:
-    /// Mutex to make the plugin vector thread-safe.
-    CS::Threading::RecursiveMutex mutex;
-    iObjectRegistry* object_reg;
-
-    csArray<csLoaderPluginRec*> vector;
-
-    // Find a loader plugin record
-    struct csLoaderPluginRec* FindPluginRec (const char* name);
-    // Return the loader plugin from a record, possibly loading the plugin now
-    bool GetPluginFromRec (csLoaderPluginRec*,
-    	iLoaderPlugin*& plug, iBinaryLoaderPlugin*& binplug);
-  public:
-    iPluginManager* plugin_mgr;
-
-    // constructor
-    csLoadedPluginVector ();
-    // destructor
-    ~csLoadedPluginVector ();
-    /**
-     * Find a plugin by its name or load it if it doesn't exist.
-     * Supports both binary and normal plugins. Returns 'false' if the
-     * plugin doesn't exist.
-     */
-    bool FindPlugin (const char* Name, iLoaderPlugin*& plug,
-    	iBinaryLoaderPlugin*& binplug, iDocumentNode*& defaults);
-    /// Find a plugin's class ID by its name. Returns 0 if it is not found.
-    const char* FindPluginClassID (const char* Name);
-    // add a new plugin record
-    void NewPlugin (const char* ShortName, iDocumentNode* child);
-    /**
-     * Delete all loaded plugins.
-     */
-    void DeleteAll ();
-
-    void SetObjectRegistry (iObjectRegistry* object_reg)
-    {
-      csLoadedPluginVector::object_reg = object_reg;
-    }
-  };
 
   /// List of loaded plugins
   csLoadedPluginVector loaded_plugins;
@@ -534,7 +494,6 @@ public:
   	const char* description, ...)
 	CS_GNUC_PRINTF(4,5);
 
-  static csPtr<iImage> GenerateErrorTexture (int width, int height);
   csPtr<iImage> LoadImage (iDataBuffer* buf, const char* fname, int Format);
 
 private:

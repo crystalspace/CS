@@ -1036,7 +1036,7 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
   return 0;
 }
 
-void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
+void OpenPortal (iView* view, char* lev)
 {
 #if 0
   iSector* room = view->GetCamera ()->GetSector ();
@@ -1061,7 +1061,15 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
     csString buf;
     buf.Format ("/lev/%s", lev);
     Sys->myVFS->ChDir (buf);
-    LevelLoader->LoadMapFile ("world", false, collection, true);
+
+    if(Sys->threaded)
+    {
+      Sys->TLevelLoader->LoadMapFile ("world", false, collection);
+    }
+    else
+    {
+      Sys->LevelLoader->LoadMapFile ("world", false, collection);
+    }
   }
 
   iMovable* tmov = thing->GetMovable ();

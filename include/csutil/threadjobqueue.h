@@ -50,11 +50,7 @@ public:
   virtual void Unqueue (iJob* job, bool waitIfCurrent = true);
   virtual bool IsFinished ();
   virtual void Wait (iJob* job);
-
-  enum
-  {
-    MAX_WORKER_THREADS = 16
-  };
+  virtual int32 GetQueueCount();
 
 private:
   
@@ -94,7 +90,7 @@ private:
   Mutex jobMutex;
   Condition newJob;
 
-  ThreadState* allThreadState[MAX_WORKER_THREADS];
+  ThreadState** allThreadState;
   ThreadGroup allThreads;
   Mutex threadStateMutex;
   // Condition to detect a finished job in any of the running threads

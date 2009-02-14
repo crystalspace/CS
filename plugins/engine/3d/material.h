@@ -191,6 +191,7 @@ class csMaterialList : public scfImplementation1<csMaterialList,
 private:
   csRefArrayObject<iMaterialWrapper> list;
   csHash<iMaterialWrapper*, csString> mat_hash;
+  mutable CS::Threading::RecursiveMutex removeLock;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>
@@ -224,6 +225,9 @@ public:
 
   virtual iMaterialWrapper* NewMaterial (iMaterial* material,
   	const char* name);
+  virtual csPtr<iMaterialWrapper> CreateMaterial (iMaterial* material,
+  	const char* name);
+
   virtual int GetCount () const { return (int)list.GetSize (); }
   virtual iMaterialWrapper *Get (int n) const { return list[n]; }
   virtual int Add (iMaterialWrapper *obj);

@@ -20,19 +20,29 @@
 #ifndef __CS_LOADTEX_H__
 #define __CS_LOADTEX_H__
 
+#include "csutil/csstring.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/strhash.h"
+
 #include "igraphic/image.h"
+
+#include "imap/reader.h"
+
 #include "itexture/itexloaderctx.h"
+
 #include "iutil/comp.h"
+
+struct iDocumentNode;
 
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
-
 #define PLUGIN_TEXTURELOADER_IMAGE    "crystalspace.texture.loader.image"
 #define PLUGIN_TEXTURELOADER_ANIMIMG  "crystalspace.texture.loader.animimg"
 #define PLUGIN_TEXTURELOADER_CHECKERS "crystalspace.texture.loader.checkerboard"
 #define PLUGIN_TEXTURELOADER_CUBEMAP  "crystalspace.texture.loader.cubemap"
 #define PLUGIN_TEXTURELOADER_TEX3D    "crystalspace.texture.loader.tex3d"
+
+csPtr<iImage> GenerateErrorTexture (int width, int height);
 
 /// Default texture loader context
 class TextureLoaderContext :
@@ -84,7 +94,9 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
-  	iBase* context) = 0;
+  	iBase* context, iStringArray* failed = 0) = 0;
+
+  virtual bool IsThreadSafe() { return true; }
 };  
 
 /// Image texture loader pseudo-plugin
@@ -96,7 +108,9 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
-  	iBase* context);
+  	iBase* context, iStringArray* failed = 0);
+
+  virtual bool IsThreadSafe() { return true; }
 };
 
 /// Checkerboard texture loader pseudo-plugin
@@ -108,7 +122,9 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
-  	iBase* context);
+  	iBase* context, iStringArray* failed = 0);
+
+  virtual bool IsThreadSafe() { return true; }
 };
 
 /// Error-texture loader pseudo-plugin
@@ -120,7 +136,9 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context,
-    iBase* context);
+    iBase* context, iStringArray* failed = 0);
+
+  virtual bool IsThreadSafe() { return true; }
 };
 
 /// Cubemap texture loader pseudo-plugin
@@ -136,7 +154,9 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
-    	iBase* context);
+    	iBase* context, iStringArray* failed = 0);
+
+  virtual bool IsThreadSafe() { return true; }
 };
 
 /// 3D texture loader pseudo-plugin
@@ -152,7 +172,9 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
-	iBase* context);
+	iBase* context, iStringArray* failed = 0);
+
+  virtual bool IsThreadSafe() { return true; }
 };
 
 }
