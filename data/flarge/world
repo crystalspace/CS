@@ -1,7 +1,5 @@
 <world>
     <plugins>
-        <plugin name="bezier">crystalspace.mesh.loader.bezier</plugin>
-        <plugin name="bezierFact">crystalspace.mesh.loader.factory.bezier</plugin>
         <plugin name="spr3dFact">crystalspace.mesh.loader.factory.sprite.3d</plugin>
         <plugin name="spr3dMD2Fact">crystalspace.mesh.loader.factory.sprite.3d.md2</plugin>
         <plugin name="spr3d">crystalspace.mesh.loader.sprite.3d</plugin>
@@ -6880,26 +6878,6 @@
             </move>
             <ztest />
             <priority>alpha</priority>
-        </meshobj>
-        <meshobj name="donut_1">
-            <plugin>bezier</plugin>
-            <params>
-                <factory>donut</factory>
-            </params>
-            <hardmove>
-                <matrix>
-                    <m11>0.2</m11>
-                    <m12>0</m12>
-                    <m13>0</m13>
-                    <m21>0</m21>
-                    <m22>0.2</m22>
-                    <m23>0</m23>
-                    <m31>0</m31>
-                    <m32>0</m32>
-                    <m33>0.2</m33>
-                </matrix>
-                <v x="-5" y="3" z="-1" />
-            </hardmove>
         </meshobj>
         <meshobj name="car">
             <plugin>crystalspace.mesh.loader.genmesh</plugin>
