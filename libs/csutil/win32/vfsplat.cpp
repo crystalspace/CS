@@ -19,6 +19,7 @@
 // Support for platform-specific VFS variables.
 #include "cssysdef.h"
 #include "csutil/vfsplat.h"
+#include "csutil/sysfunc.h"
 
 #ifdef __CYGWIN__
 #include <sys/cygwin.h>
@@ -50,6 +51,18 @@ const char* csCheckPlatformVFSVar(const char* VarName)
       if (!GetShellFolderPath (CSIDL_PERSONAL, szMyDocs)) return 0;
     }
     return szMyDocs;
+  }
+
+  if (!strcasecmp(VarName, "localappdata"))
+  {
+    static char localAppDataPath[MAX_PATH+13] = {'\0'};
+
+    if (!*localAppDataPath) 
+    {
+      csString path (csGetPlatformConfigPath ("CrystalSpace", true));
+      strcpy (localAppDataPath, path);
+    }
+    return localAppDataPath;
   }
 
   return 0;

@@ -109,8 +109,6 @@ void StartMe::Frame ()
 
   light_v = camera->InvPerspective (p, DEMO_MESH_Z-3);
   pointer_light->SetCenter (light_v);
-  pointer_light->Setup ();
-  pointer_light->Setup ();
 
   csVector3 start_v, end_v;
   start_v = camera->InvPerspective (p, DEMO_MESH_Z-4);
@@ -358,10 +356,6 @@ bool StartMe::Application()
   iGraphics2D* g2d = g3d->GetDriver2D ();
   // We use the full window to draw the world.
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
-
-  // First disable the lighting cache. Our app is simple enough
-  // not to need this.
-  engine->SetLightingCacheMode (0);
 
   LoadConfig ();
 

@@ -21,6 +21,9 @@
 #include "csutil/sysfunc.h"
 #include "csutil/threadmanager.h"
 #include "iengine/engine.h"
+#include "iutil/cfgmgr.h"
+
+using namespace CS::Threading;
 
 ThreadID csThreadManager::tid = Thread::GetThreadID();
 
@@ -28,11 +31,18 @@ csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationTyp
   objectReg(objReg)
 {
   waiting = 0;
-  threadCount = CS::Platform::GetProcessorCount()+1;
+  threadCount = CS::Platform::GetProcessorCount();
+
+  csRef<iConfigManager> config = csQueryRegistry<iConfigManager>(objReg);
+  if(config)
+  {
+    threadCount = config->GetInt("ThreadManager.Threads", threadCount);
+  }
 
   // If we can't detect, assume we have one.
   if(threadCount == 0)
   {
+    csFPrintf(stderr, "Processor count couldn't be detected!\n");
     threadCount = 1;
   }
 

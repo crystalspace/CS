@@ -251,14 +251,6 @@ public:
   virtual void PrepareTextures ();
   virtual void PrepareMeshes ();
 
-  virtual void ShineLights (iCollection* base = 0, 
-    iProgressMeter* meter = 0);
-
-  virtual void SetLightingCacheMode (int mode)
-  { lightmapCacheMode = mode; }
-  virtual int GetLightingCacheMode ()
-  { return lightmapCacheMode; }
-
   virtual void SetCacheManager (iCacheManager* cache_mgr);
   virtual void SetVFSCacheManager (const char* vfspath = 0);
 
@@ -390,7 +382,7 @@ public:
 	iDataBuffer* input, iSector* sector, const csVector3& pos);
 
   THREADED_CALLABLE_DECL1(csEngine, AddMeshAndChildren, csThreadReturn, iMeshWrapper*, mesh,
-    false, false);
+    MED, false, false);
 
   virtual csPtr<iMeshWrapperIterator> GetNearbyMeshes (iSector* sector,
     const csVector3& pos, float radius, bool crossPortals = true );
@@ -666,7 +658,13 @@ public:
   /**
    * Sync engine lists with loader lists.
    */
-  virtual void SyncEngineLists(iThreadedLoader* loader);
+  THREADED_CALLABLE_DECL2(csEngine, SyncEngineLists, csThreadReturn, csRef<iThreadedLoader>, loader, bool, runNow, LOW, false, true);
+  void SyncEngineListsNow(csRef<iThreadedLoader> loader)
+  {
+    csRef<iThreadReturn> itr;
+    itr.AttachNew(new csThreadReturn(tman));
+    SyncEngineListsTC(itr, loader, true);
+  }
 
 private:
   // -- PRIVATE METHODS
@@ -990,9 +988,6 @@ private:
   /// Store the current framenumber. Is incremented every Draw ()
   uint currentFrameNumber;
 
-    /// Option variable: force lightmap recalculation?
-  int lightmapCacheMode;
-
   /// Clear the Z-buffer every frame.
   bool clearZBuf;
 
@@ -1029,6 +1024,12 @@ private:
   csEventID CanvasResize;
   csEventID CanvasClose;
   csRef<iEventHandler> weakEventHandler;
+
+  /// Pointer to the thread manager.
+  csRef<iThreadManager> tman;
+
+  /// Array of new textures to be precached.
+  csRefArray<iTextureWrapper> newTextures;
 };
 
 #include "csutil/deprecated_warn_on.h"

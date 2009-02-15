@@ -1,0 +1,179 @@
+<library>
+    <textures>
+        <texture name="bricks.gif">
+            <file>/lib/stdtex/bricks.jpg</file>
+        </texture>
+        <texture name="bricks.gif">
+            <file>/lib/stdtex/bricks.jpg</file>
+        </texture>
+        <texture name="spark">
+            <file>/lib/std/spark.png</file>
+        </texture>
+        <texture name="spark">
+            <file>/lib/std/spark.png</file>
+        </texture>
+    </textures>
+    <materials>
+        <material name="bricks2">
+            <texture>bricks.gif</texture>
+            <shader type="standard">std_lighting_detail_alpha</shader>
+            <shadervar name="tex detail" type="texture">spark</shadervar>
+            <shadervar name="tex detail scale" type="expression">
+                <make-vector>
+                    <add>
+                        <atom type="num">6</atom>
+                        <mul>
+                            <sin>
+                                <atom type="var">standard time</atom>
+                            </sin>
+                            <atom type="num">4</atom>
+                        </mul>
+                    </add>
+                    <atom type="num">10</atom>
+                </make-vector>
+            </shadervar>
+            <shadervar name="tex detail color" type="vector4">1,1,1,0.25</shadervar>
+        </material>
+        <material name="bricks">
+            <texture>bricks.gif</texture>
+            <shader type="standard">std_lighting_detail_alpha_scroll</shader>
+            <shadervar name="tex detail" type="texture">spark</shadervar>
+            <shadervar name="tex detail scale" type="vector2">10,10</shadervar>
+            <shadervar name="tex detail color" type="vector4">1,1,1,0.25</shadervar>
+        </material>
+    </materials>
+    <meshfact name="factory_room_walls">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <numvt>24</numvt>
+            <v x="2" y="3" z="2" u="0" v="0" />
+            <v x="2" y="3" z="-2" u="1.33333" v="0" />
+            <v x="2" y="-1" z="-2" u="1.33333" v="1.33333" />
+            <v x="2" y="-1" z="2" u="0" v="1.33333" />
+            <v x="2" y="3" z="-2" u="0" v="0" />
+            <v x="-2" y="3" z="-2" u="1.33333" v="0" />
+            <v x="-2" y="-1" z="-2" u="1.33333" v="1.33333" />
+            <v x="2" y="-1" z="-2" u="0" v="1.33333" />
+            <v x="-2" y="3" z="-2" u="0" v="0" />
+            <v x="-2" y="3" z="2" u="1.33333" v="0" />
+            <v x="-2" y="-1" z="2" u="1.33333" v="1.33333" />
+            <v x="-2" y="-1" z="-2" u="0" v="1.33333" />
+            <v x="-2" y="3" z="-2" u="0" v="0" />
+            <v x="2" y="3" z="-2" u="1.33333" v="0" />
+            <v x="2" y="3" z="2" u="1.33333" v="1.33333" />
+            <v x="-2" y="3" z="2" u="0" v="1.33333" />
+            <v x="1" y="3" z="2" u="0.999999" v="0" />
+            <v x="2" y="3" z="2" u="1.33333" v="0" />
+            <v x="2" y="-1" z="2" u="1.33333" v="1.33333" />
+            <v x="1" y="-1" z="2" u="0.999999" v="1.33333" />
+            <v x="-2" y="-1" z="2" u="0" v="0" />
+            <v x="2" y="-1" z="2" u="1.33333" v="0" />
+            <v x="2" y="-1" z="-2" u="1.33333" v="1.33333" />
+            <v x="-2" y="-1" z="-2" u="0" v="1.33333" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="0" z="-1" />
+            <n x="0" y="0" z="-1" />
+            <n x="0" y="0" z="-1" />
+            <n x="0" y="0" z="-1" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <submesh name="bricks2_0">
+                <material>bricks2</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                    <e c0="4" />
+                    <e c0="5" />
+                    <e c0="6" />
+                    <e c0="4" />
+                    <e c0="6" />
+                    <e c0="7" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="bricks_0">
+                <material>bricks</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="8" />
+                    <e c0="9" />
+                    <e c0="10" />
+                    <e c0="8" />
+                    <e c0="10" />
+                    <e c0="11" />
+                    <e c0="12" />
+                    <e c0="13" />
+                    <e c0="14" />
+                    <e c0="12" />
+                    <e c0="14" />
+                    <e c0="15" />
+                    <e c0="16" />
+                    <e c0="17" />
+                    <e c0="18" />
+                    <e c0="16" />
+                    <e c0="18" />
+                    <e c0="19" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="bricks_1">
+                <material>bricks</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="20" />
+                    <e c0="21" />
+                    <e c0="22" />
+                    <e c0="20" />
+                    <e c0="22" />
+                    <e c0="23" />
+                </indexbuffer>
+            </submesh>
+            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                <e c0="0.390625" c1="0.015625" />
+                <e c0="0.71875" c1="0.015625" />
+                <e c0="0.71875" c1="0.34375" />
+                <e c0="0.390625" c1="0.34375" />
+                <e c0="0.015625" c1="0.015625" />
+                <e c0="0.34375" c1="0.015625" />
+                <e c0="0.34375" c1="0.34375" />
+                <e c0="0.015625" c1="0.34375" />
+                <e c0="0.015625" c1="0.390625" />
+                <e c0="0.34375" c1="0.390625" />
+                <e c0="0.34375" c1="0.71875" />
+                <e c0="0.015625" c1="0.71875" />
+                <e c0="0.390625" c1="0.390625" />
+                <e c0="0.71875" c1="0.390625" />
+                <e c0="0.71875" c1="0.71875" />
+                <e c0="0.390625" c1="0.71875" />
+                <e c0="0.765625" c1="0.015625" />
+                <e c0="0.84375" c1="0.015625" />
+                <e c0="0.84375" c1="0.34375" />
+                <e c0="0.765625" c1="0.34375" />
+                <e c0="0.03125" c1="0.03125" />
+                <e c0="0.6875" c1="0.03125" />
+                <e c0="0.6875" c1="0.6875" />
+                <e c0="0.03125" c1="0.6875" />
+            </renderbuffer>
+        </params>
+    </meshfact>
+</library>

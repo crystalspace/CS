@@ -46,7 +46,6 @@ class csLightMap;
 class csPolygon3D;
 class csCurve;
 struct iMeshWrapper;
-struct iLightingInfo;
 struct iSector;
 
 #include "csutil/deprecated_warn_off.h"
@@ -153,12 +152,6 @@ protected:
    */
   csRefArray<iLightCallback> light_cb_vector;
 
-  /// Type of element contained in \c lightinginfos set.
-  typedef csSet<csRef<iLightingInfo> > LightingInfo;
-
-  /// Set of meshes that we are currently affecting.
-  LightingInfo lightinginfos;
-
   /// Get a unique ID for this light. Generate it if needed.
   const char* GenerateUniqueID ();
 
@@ -200,24 +193,6 @@ public:
   virtual ~csLight ();
 
   csLightDynamicType GetDynamicType () const { return dynamicType; }
-
-  /**
-   * Shine this light on all polygons visible from the light.
-   * This routine will update the lightmaps of all polygons or
-   * update the vertex colors if gouraud shading is used.
-   * It correctly takes pseudo-dynamic lights into account and will then
-   * update the corresponding shadow map.
-   * For dynamic lights this will work differently.
-   */
-  void CalculateLighting ();
-
-  /**
-   * Shine this light on all polygons of the mesh.
-   * Only backface culling is used. The light is assumed
-   * to be in the same sector as the mesh.
-   * Currently only works on thing meshes.
-   */
-  void CalculateLighting (iMeshWrapper* mesh);
 
   /// Get the ID of this light.
   const char* GetLightID () { return GenerateUniqueID (); }
@@ -429,22 +404,6 @@ public:
   }
 
   //----------------------------------------------------------------------
-  // Light influence stuff.
-  //----------------------------------------------------------------------
-
-  /**
-   * Add a lighting info to this dynamic light. This is usually
-   * called during Setup() by meshes that are hit by the
-   * light.
-   */
-  void AddAffectedLightingInfo (iLightingInfo* li);
-
-  /**
-   * Remove a lighting info from this light.
-   */
-  void RemoveAffectedLightingInfo (iLightingInfo* li);
-
-  //----------------------------------------------------------------------
   // Callbacks
   //----------------------------------------------------------------------
   void SetLightCallback (iLightCallback* cb)
@@ -534,11 +493,6 @@ public:
 
   virtual uint32 GetLightNumber () const
   { return lightnr; }
-
-  virtual void Setup ()
-  {
-    CalculateLighting ();
-  }
 
   virtual const csBox3& GetLocalBBox () const
   {

@@ -210,7 +210,7 @@ algorithm (more on that later).
 
 In this particular example we use the @file{terrain_fixed_base.xml} and
 @file{terrain_fixed_splatting.xml} shaders. This means that we use simple
-static lighting (needs a @samp{-relight}). Other options here are the
+static lighting (needs rilighting using @samp{lighter2}). Other options here are the
 @file{splatting_base.xml} and related shaders which allow for fully dynamic
 lighting and bumpmapping.
 
@@ -286,8 +286,7 @@ means that a mesh of 256x256x2 triangles will be used. Larger values will
 result in more accurate collision detection (no sinking through floor) but
 slower and more memory usage.
 @item
-@samp{staticlighting}: enable this if you want to use static lighting (using
-@samp{-relight}).
+@samp{staticlighting}: enable this if you want to use static lighting.
 @item
 @samp{castshadows}: enable this if you want to enable shadow casting for
 other objects on this terrain. This is only used in combination with

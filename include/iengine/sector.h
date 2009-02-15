@@ -207,7 +207,7 @@ struct csSectorVisibleRenderMeshes
  */
 struct iSector : public virtual iBase
 {
-  SCF_INTERFACE(iSector,2,3,1);
+  SCF_INTERFACE(iSector,3,0,0);
   /// Get the iObject for this sector.
   virtual iObject *QueryObject () = 0;
 
@@ -350,11 +350,6 @@ struct iSector : public virtual iBase
    * Add a light to the light lists in the main thread.
    */
   THREADED_INTERFACE1(AddLight, csRef<iLight> light);
-
-  /// Calculate lighting for all objects in this sector
-  virtual void ShineLights () = 0;
-  /// Version of ShineLights() which only affects one mesh object.
-  virtual void ShineLights (iMeshWrapper*) = 0;
 
   /**
    * Sets dynamic ambient light this sector. This works in addition

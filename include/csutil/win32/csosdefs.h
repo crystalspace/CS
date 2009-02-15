@@ -271,8 +271,7 @@
   #define CS_INITIALIZE_PLATFORM_APPLICATION CS_WIN32_MSVC_DEBUG_GOOP
 #endif
 
-// The 2D graphics driver used by software renderer on this platform
-#define CS_SOFTWARE_2D_DRIVER "crystalspace.graphics2d.directdraw"
+// The 2D graphics driver used by renderers on this platform
 #define CS_OPENGL_2D_DRIVER "crystalspace.graphics2d.glwin32"
 
 // The sound driver

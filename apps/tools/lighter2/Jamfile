@@ -97,10 +97,6 @@ if $(GL.AVAILABLE) = "yes"
   LIGHTER2.PLUGINLIST += glshader_arb glshader_fixed ;
   if $(CG.AVAILABLE) = "yes" { LIGHTER2.PLUGINLIST += glshader_cg ; }
 }
-else
-{
-  LIGHTER2.PLUGINLIST += softshader ;
-}
 
 LinkStaticPlugins lighter2_static : $(LIGHTER2.PLUGINLIST) ;
 SubVariant ;

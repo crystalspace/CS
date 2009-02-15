@@ -140,9 +140,12 @@ public:
 
   bool Initialize (iObjectRegistry* p);
 
+  bool IsThreadSafe() { return true; }
+
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
-    iStreamSource*, iLoaderContext* ldr_context, iBase* context);
+    iStreamSource*, iLoaderContext* ldr_context, iBase* context,
+    iStringArray*);
 };
 
 /**
@@ -156,9 +159,11 @@ public:
   /// Destructor.
   virtual ~csThingFactoryLoader () { }
 
+  bool IsThreadSafe() { return true; }
+
   /// Parse a given node and return a new object for it.
-  virtual csPtr<iBase> Parse (iDocumentNode* node,
-    iStreamSource*, iLoaderContext* ldr_context, iBase* context);
+  virtual csPtr<iBase> Parse (iDocumentNode* node, iStreamSource*,
+    iLoaderContext* ldr_context, iBase* context, iStringArray*);
 };
 
 /**

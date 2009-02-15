@@ -34,6 +34,11 @@ private:
   void SortData();
   void WriteData(csString out);
 
+  void ParseMeshObj(csArray<csString>& libsNeeded, csArray<csString>& materialsNeeded,
+    csString& mapInPath, csRef<iDocumentNode> meshobj);
+  void ParseMeshFact(csRef<iDocumentNode>& meshFact, csRef<iDocumentNode>& tempDocRoot,
+    csRefArray<iDocumentNode>& tempMats);
+
   csRef<iDocumentSystem> docSys;
   iObjectRegistry* objReg;
   iVFS* vfs;
@@ -46,10 +51,14 @@ private:
   csRefArray<iDocumentNode> meshFacts;
   csRefArray<iDocumentNode> textures;
   csRefArray<iDocumentNode> addons;
+  csRefArray<iDocumentNode> lightmaps;
   csArray<csString> addonNames;
   bool addonLib;
 
   // For sorting.
   csRefArray<iDocument> meshFactsOut;
   csRefArray<iDocument> mapsOut;
+
+  // False if we want to have a seperate file for each meshfact, addon, etc.
+  bool compact;
 };

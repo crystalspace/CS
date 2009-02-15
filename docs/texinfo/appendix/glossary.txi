@@ -9,8 +9,8 @@ well as in discussions of 3D graphics.
 @table @emph
 @item 3D Renderer
 The 3D renderer plugin in Crystal Space is responsible for rendering
-3D objects (polygons) on the canvas.  We have several renderers but the two
-most common are the software and OpenGL renderers.
+3D objects (polygons) on the canvas. The two renderers we have now
+are the null and the OpenGL renderers.
 
 @item 3D Sprite
 A 3D Sprite in Crystal Space is a mesh object based on a triangle mesh.

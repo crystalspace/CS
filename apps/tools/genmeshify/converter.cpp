@@ -22,6 +22,7 @@
 #include "converter.h"
 #include "genmeshify.h"
 #include "thing/persist/thingldr.h"
+#include "thing/object/thing.h"
 
 namespace genmeshify
 {
@@ -181,8 +182,12 @@ namespace genmeshify
       }
     }
     meshWrap->GetMovable()->SetSector (sector);
-    iLightingInfo* linfo = meshWrap->GetLightingInfo ();
-    if (linfo) linfo->ReadFromCache (app->engine->GetCacheManager());
+    iMeshObject* mo = meshWrap->GetMeshObject ();
+    csThing* t = static_cast<csThing*> (mo);
+    if (t)
+    {
+      t->ReadFromCache (app->engine->GetCacheManager());
+    }
 
     // @@@ FIXME: properly share factories, if possible
     csRef<iThingFactoryState> thingfact = 

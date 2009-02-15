@@ -37,10 +37,8 @@
 #include "cstool/objmodel.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
-#include "iengine/shadcast.h"
 #include "imesh/bezier.h"
 #include "imesh/object.h"
-#include "imesh/lighting.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/pluginconfig.h"
@@ -260,13 +258,10 @@ public:
 /**
  * A bezier is a set of bezier curves.
  */
-class csBezierMesh : public scfImplementationExt6<csBezierMesh,
+class csBezierMesh : public scfImplementationExt3<csBezierMesh,
                                                   csBezierMesh1,
                                                   iBezierFactoryState,
                                                   iBezierState,
-                                                  iLightingInfo,
-                                                  iShadowCaster,
-                                                  iShadowReceiver,
                                                   scfFakeInterface<iMeshObject> >,
 		     public csBezierMesh2
 {
@@ -400,9 +395,6 @@ private:
    * is used.
    */
   void UpdateCurveTransform ();
-
-  /// Generate a cachename based on geometry.
-  char* GenerateCacheName ();  
 
 public:
   /**
@@ -545,27 +537,6 @@ public:
   // Lighting
   //----------------------------------------------------------------------
 
-  /**
-   * Init the lightmaps for all polygons in this thing.
-   */
-  void InitializeDefault (bool clear);
-
-  /**
-   * Read the lightmaps from the cache.
-   */
-  bool ReadFromCache (iCacheManager* cache_mgr);
-
-  /**
-   * Cache the lightmaps for all polygons in this thing.
-   */
-  bool WriteToCache (iCacheManager* cache_mgr);
-
-  /**
-   * Prepare the lightmaps for all polys so that they are suitable
-   * for the 3D rasterizer.
-   */
-  void PrepareLighting ();
-
   /// Marks the whole object as it is affected by any light.
   void MarkLightmapsDirty ();
 
@@ -573,23 +544,6 @@ public:
   float GetCosinusFactor () const { return cosinus_factor; }
   /// Set cosinus factor.
   void SetCosinusFactor (float c) { cosinus_factor = c; }
-
-  //----------------------------------------------------------------------
-  // Utility functions
-  //----------------------------------------------------------------------
-
-  /**
-   * Check frustum visibility on this thing.
-   * First initialize the 2D culler cube.
-   */
-  void CastShadows (iMovable* movable, iFrustumView* lview);
-
-  /**
-   * Append a list of shadow frustums which extend from
-   * this thing. The origin is the position of the light.
-   */
-  void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
-  	const csVector3& origin);
 
   //----------------------------------------------------------------------
   // Transformation
@@ -611,10 +565,6 @@ public:
   /// Get light version.
   uint32 GetLightVersion() const
   { return light_version; }
-
-  void LightChanged (iLight* light);
-  void LightDisconnect (iLight* light);
-  void DisconnectAllLights ();
 
   /** \name iBezierFactoryState implementation
    * @{ */

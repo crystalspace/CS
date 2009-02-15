@@ -119,16 +119,16 @@ bool csBezierLoader::ParseCurve (iCurve* curve, iLoaderContext* ldr_context,
       case XMLTOKEN_MATERIAL:
 	{
 	  const char* matname = child->GetContentsValue ();
-          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-          if (mat == 0)
-          {
-	    synldr->ReportError (
-	      "crystalspace.bezierloader.parse.material",
-              child, "Couldn't find material named '%s'!", matname);
-            return false;
-          }
-          curve->SetMaterial (mat);
-	}
+    iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+    if (mat == 0)
+    {
+      synldr->ReportError (
+        "crystalspace.bezierloader.parse.material",
+        child, "Couldn't find material named '%s'!", matname);
+      return false;
+    }
+    curve->SetMaterial (mat);
+  }
         break;
       case XMLTOKEN_V:
         {

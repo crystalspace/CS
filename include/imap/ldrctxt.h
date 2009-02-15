@@ -27,6 +27,8 @@
 /**\addtogroup loadsave
  * @{ */
 struct iCollection;
+struct iGeneralMeshState;
+struct iGeneralMeshSubMesh;
 struct iMaterialWrapper;
 struct iMeshFactoryWrapper;
 struct iMeshWrapper;
@@ -51,7 +53,7 @@ struct iObject;
  */
 struct iLoaderContext : public virtual iBase
 {
-  SCF_INTERFACE(iLoaderContext, 3, 2, 0);
+  SCF_INTERFACE(iLoaderContext, 4, 0, 0);
   /// Find a sector.
   virtual iSector* FindSector (const char* name) = 0;
   
@@ -60,7 +62,7 @@ struct iLoaderContext : public virtual iBase
    *  the texture using the filename.  If loaded then it is also
    *  Prepared.
    */
-  virtual iMaterialWrapper* FindMaterial (const char* filename) = 0;
+  virtual iMaterialWrapper* FindMaterial (const char* filename, bool dontWaitForLoad = false) = 0;
 
   /**
    * Same as FindMaterial but there is no assumption that the name
@@ -69,9 +71,9 @@ struct iLoaderContext : public virtual iBase
    * names with /'s will never be found correctly.
    */
   virtual iMaterialWrapper* FindNamedMaterial (const char* name,
-  	const char *filename) = 0;
+  	const char *filename, bool dontWaitForLoad = false) = 0;
   /// Find a mesh factory.
-  virtual iMeshFactoryWrapper* FindMeshFactory (const char* name) = 0;
+  virtual iMeshFactoryWrapper* FindMeshFactory (const char* name, bool dontWaitForLoad = false) = 0;
   /// Find a mesh object.
   virtual iMeshWrapper* FindMeshObject (const char* name) = 0;
   
@@ -79,14 +81,14 @@ struct iLoaderContext : public virtual iBase
    * Find a texture.  If not found, attempt to load and prepare the
    * texture using the supplied filename as the name.
    */
-  virtual iTextureWrapper* FindTexture (const char* filename) = 0;
+  virtual iTextureWrapper* FindTexture (const char* filename, bool dontWaitForLoad = false) = 0;
 
   /**
    * Find a texture with the given name.  If not found, attempt to load
    * the supplied filename and prepare the texture using the supplied name.
    */
   virtual iTextureWrapper* FindNamedTexture (const char* name,
-  	const char *filename) = 0;
+  	const char *filename, bool dontWaitForLoad = false) = 0;
 
   /// Find a light
   virtual iLight* FindLight (const char* name) = 0;
@@ -99,6 +101,11 @@ struct iLoaderContext : public virtual iBase
    *   up.
    */
   virtual iShader* FindShader (const char* name) = 0;
+
+  /**
+   * Find a genmesh submesh.
+   */
+  virtual iGeneralMeshSubMesh* FindSubmesh(iGeneralMeshState* state, const char* name) = 0;
 
   /**
    * Return true if we check for dupes (to avoid objects with same name

@@ -1142,10 +1142,10 @@ csPolygon3D::~csPolygon3D ()
   {
     while (lightpatches)
     {
-      iLight* dl = lightpatches->GetLight ();
-      if (dl)
-        dl->RemoveAffectedLightingInfo (
-                (iLightingInfo*)thing);
+      //iLight* dl = lightpatches->GetLight ();
+      //if (dl)
+        //dl->RemoveAffectedLightingInfo (
+                //(iLightingInfo*)thing);
       thing->GetStaticData ()->thing_type->lightpatch_pool->Free (lightpatches);
     }
   }
@@ -1274,14 +1274,6 @@ const char* csPolygon3D::ReadFromCache (iFile* file, csPolygon3DStatic* spoly)
 
 bool csPolygon3D::WriteToCache (iFile* file, csPolygon3DStatic* spoly)
 {
-  if (txt_info.lm == 0 || txt_info.lm->GetStaticMap () == 0) return true;
-  if ((thing->GetStaticData ()->thing_type->engine->GetLightingCacheMode ()
-       & CS_ENGINE_CACHE_WRITE))
-  {
-    txt_info.lm->Cache (file, this,
-        spoly,
-                        thing->GetStaticData ()->thing_type->engine);
-  }
   return true;
 }
 

@@ -17652,6 +17652,380 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iShaderManager_AddSubShaderCache__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShaderManager *arg1 = (iShaderManager *) 0 ;
+  iHierarchicalCache *arg2 = (iHierarchicalCache *) 0 ;
+  int arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShaderManager_AddSubShaderCache",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderManager_AddSubShaderCache" "', argument " "1"" of type '" "iShaderManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iShaderManager * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iHierarchicalCache, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderManager_AddSubShaderCache" "', argument " "2"" of type '" "iHierarchicalCache *""'"); 
+  }
+  arg2 = reinterpret_cast< iHierarchicalCache * >(argp2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iShaderManager_AddSubShaderCache" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  (arg1)->AddSubShaderCache(arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShaderManager_AddSubShaderCache__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShaderManager *arg1 = (iShaderManager *) 0 ;
+  iHierarchicalCache *arg2 = (iHierarchicalCache *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShaderManager_AddSubShaderCache",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderManager_AddSubShaderCache" "', argument " "1"" of type '" "iShaderManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iShaderManager * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iHierarchicalCache, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderManager_AddSubShaderCache" "', argument " "2"" of type '" "iHierarchicalCache *""'"); 
+  }
+  arg2 = reinterpret_cast< iHierarchicalCache * >(argp2);
+  (arg1)->AddSubShaderCache(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShaderManager_AddSubShaderCache(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[4];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 3); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iShaderManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iHierarchicalCache, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_iShaderManager_AddSubShaderCache__SWIG_1(self, args);
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iShaderManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_iHierarchicalCache, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        {
+          int res = SWIG_AsVal_int(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          return _wrap_iShaderManager_AddSubShaderCache__SWIG_0(self, args);
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iShaderManager_AddSubShaderCache'.\n  Possible C/C++ prototypes are:\n""    AddSubShaderCache(iShaderManager *,iHierarchicalCache *,int)\n""    AddSubShaderCache(iShaderManager *,iHierarchicalCache *)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShaderManager_AddSubCacheDirectory__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShaderManager *arg1 = (iShaderManager *) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  bool arg4 ;
+  iHierarchicalCache *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  bool val4 ;
+  int ecode4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShaderManager_AddSubCacheDirectory",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderManager_AddSubCacheDirectory" "', argument " "1"" of type '" "iShaderManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iShaderManager * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderManager_AddSubCacheDirectory" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iShaderManager_AddSubCacheDirectory" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  ecode4 = SWIG_AsVal_bool(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iShaderManager_AddSubCacheDirectory" "', argument " "4"" of type '" "bool""'");
+  } 
+  arg4 = static_cast< bool >(val4);
+  result = (iHierarchicalCache *)(arg1)->AddSubCacheDirectory((char const *)arg2,arg3,arg4);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iHierarchicalCache, 0 |  0 );
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShaderManager_AddSubCacheDirectory__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShaderManager *arg1 = (iShaderManager *) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  iHierarchicalCache *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShaderManager_AddSubCacheDirectory",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderManager_AddSubCacheDirectory" "', argument " "1"" of type '" "iShaderManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iShaderManager * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderManager_AddSubCacheDirectory" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iShaderManager_AddSubCacheDirectory" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  result = (iHierarchicalCache *)(arg1)->AddSubCacheDirectory((char const *)arg2,arg3);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iHierarchicalCache, 0 |  0 );
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShaderManager_AddSubCacheDirectory__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShaderManager *arg1 = (iShaderManager *) 0 ;
+  char *arg2 = (char *) 0 ;
+  iHierarchicalCache *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShaderManager_AddSubCacheDirectory",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderManager_AddSubCacheDirectory" "', argument " "1"" of type '" "iShaderManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iShaderManager * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderManager_AddSubCacheDirectory" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (iHierarchicalCache *)(arg1)->AddSubCacheDirectory((char const *)arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iHierarchicalCache, 0 |  0 );
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShaderManager_AddSubCacheDirectory(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[5];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 4); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iShaderManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_iShaderManager_AddSubCacheDirectory__SWIG_2(self, args);
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iShaderManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        {
+          int res = SWIG_AsVal_int(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          return _wrap_iShaderManager_AddSubCacheDirectory__SWIG_1(self, args);
+        }
+      }
+    }
+  }
+  if (argc == 4) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iShaderManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        {
+          int res = SWIG_AsVal_int(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          {
+            int res = SWIG_AsVal_bool(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            return _wrap_iShaderManager_AddSubCacheDirectory__SWIG_0(self, args);
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iShaderManager_AddSubCacheDirectory'.\n  Possible C/C++ prototypes are:\n""    AddSubCacheDirectory(iShaderManager *,char const *,int,bool)\n""    AddSubCacheDirectory(iShaderManager *,char const *,int)\n""    AddSubCacheDirectory(iShaderManager *,char const *)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShaderManager_RemoveSubShaderCache(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShaderManager *arg1 = (iShaderManager *) 0 ;
+  iHierarchicalCache *arg2 = (iHierarchicalCache *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShaderManager_RemoveSubShaderCache",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderManager_RemoveSubShaderCache" "', argument " "1"" of type '" "iShaderManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iShaderManager * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iHierarchicalCache, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iShaderManager_RemoveSubShaderCache" "', argument " "2"" of type '" "iHierarchicalCache *""'"); 
+  }
+  arg2 = reinterpret_cast< iHierarchicalCache * >(argp2);
+  (arg1)->RemoveSubShaderCache(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iShaderManager_RemoveAllSubShaderCaches(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iShaderManager *arg1 = (iShaderManager *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iShaderManager_RemoveAllSubShaderCaches",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShaderManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShaderManager_RemoveAllSubShaderCaches" "', argument " "1"" of type '" "iShaderManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iShaderManager * >(argp1);
+  (arg1)->RemoveAllSubShaderCaches();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iShaderManager_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -24661,6 +25035,10 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iShaderManager_GetActiveLights", _wrap_iShaderManager_GetActiveLights, METH_VARARGS, NULL},
 	 { (char *)"iShaderManager_GetSVNameStringset", _wrap_iShaderManager_GetSVNameStringset, METH_VARARGS, NULL},
 	 { (char *)"iShaderManager_GetShaderCache", _wrap_iShaderManager_GetShaderCache, METH_VARARGS, NULL},
+	 { (char *)"iShaderManager_AddSubShaderCache", _wrap_iShaderManager_AddSubShaderCache, METH_VARARGS, NULL},
+	 { (char *)"iShaderManager_AddSubCacheDirectory", _wrap_iShaderManager_AddSubCacheDirectory, METH_VARARGS, NULL},
+	 { (char *)"iShaderManager_RemoveSubShaderCache", _wrap_iShaderManager_RemoveSubShaderCache, METH_VARARGS, NULL},
+	 { (char *)"iShaderManager_RemoveAllSubShaderCaches", _wrap_iShaderManager_RemoveAllSubShaderCaches, METH_VARARGS, NULL},
 	 { (char *)"iShaderManager_scfGetVersion", _wrap_iShaderManager_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iShaderManager", _wrap_delete_iShaderManager, METH_VARARGS, NULL},
 	 { (char *)"iShaderManager_swigregister", iShaderManager_swigregister, METH_VARARGS, NULL},
@@ -26564,6 +26942,11 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "TagNeutral",SWIG_From_int(static_cast< int >(TagNeutral)));
   SWIG_Python_SetConstant(d, "TagForbidden",SWIG_From_int(static_cast< int >(TagForbidden)));
   SWIG_Python_SetConstant(d, "TagRequired",SWIG_From_int(static_cast< int >(TagRequired)));
+  SWIG_Python_SetConstant(d, "iShaderManager_cachePriorityLowest",SWIG_From_int(static_cast< int >(iShaderManager::cachePriorityLowest)));
+  SWIG_Python_SetConstant(d, "iShaderManager_cachePriorityGlobal",SWIG_From_int(static_cast< int >(iShaderManager::cachePriorityGlobal)));
+  SWIG_Python_SetConstant(d, "iShaderManager_cachePriorityApp",SWIG_From_int(static_cast< int >(iShaderManager::cachePriorityApp)));
+  SWIG_Python_SetConstant(d, "iShaderManager_cachePriorityUser",SWIG_From_int(static_cast< int >(iShaderManager::cachePriorityUser)));
+  SWIG_Python_SetConstant(d, "iShaderManager_cachePriorityHighest",SWIG_From_int(static_cast< int >(iShaderManager::cachePriorityHighest)));
   SWIG_Python_SetConstant(d, "iTextureHandle_CS_TEX_IMG_1D",SWIG_From_int(static_cast< int >(iTextureHandle::CS_TEX_IMG_1D)));
   SWIG_Python_SetConstant(d, "iTextureHandle_CS_TEX_IMG_2D",SWIG_From_int(static_cast< int >(iTextureHandle::CS_TEX_IMG_2D)));
   SWIG_Python_SetConstant(d, "iTextureHandle_CS_TEX_IMG_3D",SWIG_From_int(static_cast< int >(iTextureHandle::CS_TEX_IMG_3D)));

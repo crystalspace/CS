@@ -42,7 +42,6 @@
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "iengine/sector.h"
-#include "iengine/shadcast.h"
 #include "iengine/shadows.h"
 #include "iengine/texture.h"
 #include "iutil/cache.h"
@@ -172,66 +171,9 @@ csBezierMesh::~csBezierMesh ()
   delete static_data;
 }
 
-char* csBezierMesh::GenerateCacheName ()
-{
-  csMemFile mf;
-  int32 l;
-  l = csLittleEndian::Convert ((int32)static_data->num_curve_vertices);
-  mf.Write ((char*)&l, 4);
-  l = csLittleEndian::Convert ((int32)curves.GetSize ());
-  mf.Write ((char*)&l, 4);
-
-  if (logparent)
-  {
-    iMeshWrapper* mw = logparent;
-    if (mw->QueryObject ()->GetName ())
-      mf.Write (mw->QueryObject ()->GetName (),
-		strlen (mw->QueryObject ()->GetName ()));
-    iSector* sect = mw->GetMovable ()->GetSectors ()->Get (0);
-    if (sect && sect->QueryObject ()->GetName ())
-      mf.Write (sect->QueryObject ()->GetName (),
-		strlen (sect->QueryObject ()->GetName ()));
-  }
-
-  csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
-  csString hex(digest.HexString());
-  return hex.Detach();
-}
-
 void csBezierMesh::MarkLightmapsDirty ()
 {
   light_version++;
-}
-
-void csBezierMesh::LightChanged (iLight* /*light*/)
-{
-  MarkLightmapsDirty ();
-}
-
-void csBezierMesh::LightDisconnect (iLight* light)
-{
-  MarkLightmapsDirty ();
-  size_t i;
-  int dt = light->GetDynamicType ();
-  for (i = 0; i < curves.GetSize (); i++)
-  {
-    csCurve *c = curves[i];
-    if (dt == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
-      c->DynamicLightDisconnect (light);
-    else
-      c->StaticLightDisconnect (light);
-  }
-}
-
-void csBezierMesh::DisconnectAllLights ()
-{
-  MarkLightmapsDirty ();
-  size_t i;
-  for (i = 0; i < curves.GetSize (); i++)
-  {
-    csCurve *c = curves[i];
-    c->DisconnectAllLights ();
-  }
 }
 
 void csBezierMesh::WorUpdate ()
@@ -479,6 +421,7 @@ float csBezierMesh::GetScreenBoundingBox (
   return cbox.MaxZ ();
 }
 
+#if 0
 void csBezierMesh::AppendShadows (
   iMovable* movable,
   iShadowBlockList *shadows,
@@ -520,6 +463,7 @@ void csBezierMesh::AppendShadows (
   }
 #endif
 }
+#endif
 
 void csBezierMesh::GetRadius (float &rad, csVector3 &cent)
 {
@@ -835,119 +779,6 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
 }
 
 //----------------------------------------------------------------------
-
-void csBezierMesh::CastShadows (iMovable *movable, iFrustumView *lview)
-{
-  Prepare ();
-  //@@@ Ok?
-  cached_movable = movable;
-  WorUpdate ();
-
-  int i;
-
-  iFrustumViewUserdata* fvud = lview->GetUserdata ();
-  iLightingProcessInfo* lpi = (iLightingProcessInfo*)fvud;
-  bool dyn = lpi->IsDynamic ();
-
-  lpi->GetLight ()->AddAffectedLightingInfo ((iLightingInfo*)this);
-
-  for (i = 0; i < GetCurveCount (); i++)
-  {
-    csCurve* curve = curves.Get (i);
-    if (dyn)
-      curve->CalculateLightingDynamic (lview);
-    else
-      curve->CalculateLightingStatic (lview, true);
-  }
-}
-
-void csBezierMesh::InitializeDefault (bool clear)
-{
-  Prepare ();
-
-  int i;
-  for (i = 0; i < GetCurveCount (); i++)
-    curves.Get (i)->InitializeDefaultLighting (clear);
-}
-
-bool csBezierMesh::ReadFromCache (iCacheManager* cache_mgr)
-{
-  Prepare ();
-  char* cachename = GenerateCacheName ();
-  cache_mgr->SetCurrentScope (cachename);
-  delete[] cachename;
-
-  // For error reporting.
-  const char* thing_name = 0;
-  if (static_data->thing_type->do_verbose && logparent)
-  {
-    thing_name = logparent->QueryObject ()->GetName ();
-  }
-
-  bool rc = true;
-  csRef<iDataBuffer> db = cache_mgr->ReadCache ("bezier_lm", 0, (uint32)~0);
-  if (db)
-  {
-    csMemFile mf ((const char*)(db->GetData ()), db->GetSize ());
-    int i;
-    for (i = 0; i < GetCurveCount (); i++)
-    {
-      const char* error = curves.Get (i)->ReadFromCache (&mf);
-      if (error != 0)
-      {
-        rc = false;
-        if (static_data->thing_type->do_verbose)
-	{
-	  csPrintf ("  Bezier '%s' Curve '%s': %s\n",
-	  	thing_name, curves.Get (i)->GetName (),
-		error);
-	  fflush (stdout);
-        }
-      }
-    }
-  }
-  else
-  {
-    if (static_data->thing_type->do_verbose)
-    {
-      csPrintf ("  Bezier '%s': Couldn't find cached lightmap file for bezier!\n",
-      	thing_name);
-      fflush (stdout);
-    }
-    rc = false;
-  }
-
-  cache_mgr->SetCurrentScope (0);
-  return rc;
-}
-
-bool csBezierMesh::WriteToCache (iCacheManager* cache_mgr)
-{
-  char* cachename = GenerateCacheName ();
-  cache_mgr->SetCurrentScope (cachename);
-  delete[] cachename;
-
-  int i;
-  bool rc = false;
-  csMemFile mf;
-  for (i = 0; i < GetCurveCount (); i++)
-    if (!curves.Get (i)->WriteToCache (&mf)) goto stop;
-  if (!cache_mgr->CacheData ((void*)(mf.GetData ()), mf.GetSize (),
-    	"bezier_lm", 0, (uint32)~0))
-    goto stop;
-
-  rc = true;
-
-stop:
-  cache_mgr->SetCurrentScope (0);
-  return rc;
-}
-
-void csBezierMesh::PrepareLighting ()
-{
-  int i;
-  for (i = 0; i < GetCurveCount (); i++) curves.Get (i)->PrepareLighting ();
-}
 
 void csBezierMesh::Merge (csBezierMesh *other)
 {

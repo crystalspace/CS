@@ -48,7 +48,6 @@
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "iengine/sector.h"
-#include "iengine/shadcast.h"
 #include "iengine/shadows.h"
 #include "iengine/texture.h"
 #include "igraphic/imageio.h"
@@ -1608,32 +1607,6 @@ void csThing::MarkLightmapsDirty ()
   light_version++;
 }
 
-void csThing::LightChanged (iLight*)
-{
-  MarkLightmapsDirty ();
-}
-
-void csThing::LightDisconnect (iLight* light)
-{
-  MarkLightmapsDirty ();
-  int dt = light->GetDynamicType ();
-  int i;
-  for (i = 0 ; i < (int)polygons.GetSize () ; i++)
-  {
-    csPolygon3D *p = GetPolygon3D (i);
-    if (dt == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
-      p->DynamicLightDisconnect (light);
-    else
-      p->StaticLightDisconnect (light);
-  }
-}
-
-void csThing::DisconnectAllLights ()
-{
-  MarkLightmapsDirty ();
-  // @@@?
-}
-
 void csThing::SetMovingOption (int opt)
 {
   cfg_moving = opt;
@@ -2106,20 +2079,6 @@ void TriMeshHelper::ForceCleanup ()
 
 //----------------------------------------------------------------------
 
-void csThing::CastShadows (iMovable*, iFrustumView*)
-{
-}
-
-void csThing::InitializeDefault (bool clear)
-{
-  if (clear) Unprepare();
-  PrepareSomethingOrOther ();
-
-  size_t i;
-  for (i = 0; i < polygons.GetSize (); i++)
-    polygons.Get (i).InitializeDefault (clear);
-}
-
 bool csThing::ReadFromCache (iCacheManager* cache_mgr)
 {
   PrepareSomethingOrOther ();
@@ -2196,27 +2155,6 @@ bool csThing::WriteToCache (iCacheManager* cache_mgr)
 stop:
   cache_mgr->SetCurrentScope (0);
   return rc;
-}
-
-void csThing::PrepareLighting ()
-{
-  csColor ambient;
-  static_data->thing_type->engine->GetAmbientLight (ambient);
-  size_t i;
-  for (i = 0 ; i < polygons.GetSize () ; i++)
-  {
-    csPolygon3D& p = polygons.Get (i);
-    csLightMap* lm = p.GetPolyTexture ()->GetLightMap ();
-    if (lm && lm->GetStaticMap ())
-    {
-      lm->CalcMaxStatic (
-          int(ambient.red * 255.0f),
-          int(ambient.green * 255.0f),
-          int(ambient.blue * 255.0f));
-    }
-  }
-  ClearLMs ();
-  PrepareLMs ();
 }
 
 void csThing::PrepareRenderMeshes (

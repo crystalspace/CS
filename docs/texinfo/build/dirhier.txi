@@ -313,29 +313,14 @@ for rendering and also supports limited 2D drawing capabilities (including 2D
 pixmaps).
 
 @table @code
-@item CS/plugins/video/canvas/caca
-Colour @sc{ascii} Art driver.
-
 @item CS/plugins/video/canvas/common
 Common code for 2D drivers.
 
-@item CS/plugins/video/canvas/ddraw
-Windows DirectDraw driver.
-
-@item CS/plugins/video/canvas/directxcommon
-Common DirectX (Win32) code.
-
 @item CS/plugins/video/canvas/macosx
-MacOS/X OpenGL and CoreGraphics graphics drivers.
-
-@item CS/plugins/video/canvas/memory
-Memory driver (render a scene directly to memory).
+MacOS/X OpenGL graphics driver.
 
 @item CS/plugins/video/canvas/null2d
 A do-nothing 2D canvas.
-
-@item CS/plugins/video/canvas/openglcommon
-Common code for all OpenGL 2D drivers.
 
 @item CS/plugins/video/canvas/openglwin
 OpenGL 2D driver for Windows.
@@ -343,14 +328,8 @@ OpenGL 2D driver for Windows.
 @item CS/plugins/video/canvas/openglx
 OpenGL 2D driver for X11.
 
-@item CS/plugins/video/canvas/softx
-X11 software 2D driver.
-
 @item CS/plugins/video/canvas/xextf86vm
 X-extension driver (X11).
-
-@item CS/plugins/video/canvas/xextshm
-@sc{mit} X-extension shared memory driver (X11).
 
 @item CS/plugins/video/canvas/xwindow
 X-window X11 driver.
@@ -372,9 +351,6 @@ A do-nothing renderer (required when working only with 2D graphics).
 
 @item CS/plugins/video/renderer/opengl
 OpenGL renderer.
-
-@item CS/plugins/video/renderer/software
-Software (non-accelerated) renderer.
 @end table
 @end table
 @end table

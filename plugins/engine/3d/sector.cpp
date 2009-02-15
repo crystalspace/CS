@@ -26,7 +26,6 @@
 #include "iengine/portal.h"
 #include "iengine/rview.h"
 #include "igeom/clip2d.h"
-#include "imesh/lighting.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
@@ -1110,6 +1109,7 @@ void csSector::FireRemoveMesh (iMeshWrapper* mesh)
   }
 }
 
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 void csSector::CheckFrustum (iFrustumView *lview)
 {
   int i = (int)sectorCallbackList.GetSize ()-1;
@@ -1130,7 +1130,7 @@ void csSector::RealCheckFrustum (iFrustumView *lview)
 
   // Make sure we have a culler.
   GetVisibilityCuller ();
-  culler->CastShadows (lview);
+  //culler->CastShadows (lview);
 
   drawBusy--;
 }
@@ -1144,30 +1144,6 @@ THREADED_CALLABLE_IMPL1(csSector, AddLight, csRef<iLight> light)
 {
   GetLights()->Add(light);
   return true;
-}
-
-void csSector::ShineLightsInt (csProgressPulse *pulse)
-{
-  int i;
-  for (i = 0; i < lights.GetCount (); i++)
-  {
-    if (pulse != 0) pulse->Step ();
-
-    csLight *cl = ((csLight*)lights.Get (i))->GetPrivateObject ();
-    cl->CalculateLighting ();
-  }
-}
-
-void csSector::ShineLightsInt (iMeshWrapper *mesh, csProgressPulse *pulse)
-{
-  int i;
-  for (i = 0; i < lights.GetCount (); i++)
-  {
-    if (pulse != 0) pulse->Step ();
-
-    csLight *cl = ((csLight*)lights.Get (i))->GetPrivateObject ();
-    cl->CalculateLighting (mesh);
-  }
 }
 
 void csSector::SetDynamicAmbientLight (const csColor& color)

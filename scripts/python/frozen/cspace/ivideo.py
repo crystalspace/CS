@@ -754,6 +754,15 @@ class iShaderManager(iShaderVariableContext):
     def GetActiveLights(*args): return _ivideo.iShaderManager_GetActiveLights(*args)
     def GetSVNameStringset(*args): return _ivideo.iShaderManager_GetSVNameStringset(*args)
     def GetShaderCache(*args): return _ivideo.iShaderManager_GetShaderCache(*args)
+    cachePriorityLowest = _ivideo.iShaderManager_cachePriorityLowest
+    cachePriorityGlobal = _ivideo.iShaderManager_cachePriorityGlobal
+    cachePriorityApp = _ivideo.iShaderManager_cachePriorityApp
+    cachePriorityUser = _ivideo.iShaderManager_cachePriorityUser
+    cachePriorityHighest = _ivideo.iShaderManager_cachePriorityHighest
+    def AddSubShaderCache(*args): return _ivideo.iShaderManager_AddSubShaderCache(*args)
+    def AddSubCacheDirectory(*args): return _ivideo.iShaderManager_AddSubCacheDirectory(*args)
+    def RemoveSubShaderCache(*args): return _ivideo.iShaderManager_RemoveSubShaderCache(*args)
+    def RemoveAllSubShaderCaches(*args): return _ivideo.iShaderManager_RemoveAllSubShaderCaches(*args)
     scfGetVersion = staticmethod(_ivideo.iShaderManager_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iShaderManager
     __del__ = lambda self : None;

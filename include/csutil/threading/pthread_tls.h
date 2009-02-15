@@ -19,6 +19,8 @@
 #ifndef __CS_CSUTIL_THREADING_PTHREAD_TLS_H__
 #define __CS_CSUTIL_THREADING_PTHREAD_TLS_H__
 
+#ifndef DOXYGEN_RUN
+
 #include <pthread.h>
 
 namespace CS
@@ -57,5 +59,7 @@ namespace CS
     }
   } // Threading
 } // CS
+
+#endif // DOXYGEN_RUN
 
 #endif // __CS_CSUTIL_THREADING_PTHREAD_TLS_H__

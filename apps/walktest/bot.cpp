@@ -105,7 +105,6 @@ void Bot::move (csTicks elapsed_time)
         light->DecRef ();
       }
       light->SetCenter (new_p);
-      light->Setup ();
     }
   }
   mesh->GetMovable()->UpdateMove ();

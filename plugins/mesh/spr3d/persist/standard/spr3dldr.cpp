@@ -160,14 +160,14 @@ csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
         {
           const char* matname = child->GetContentsValue ();
           iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-	  if (!mat)
-	  {
-	    synldr->ReportError (
-		  "crystalspace.sprite3dfactoryloader.parse.unknownmaterial",
-		  child, "Couldn't find material named '%s'", matname);
+          if (!mat)
+          {
+            synldr->ReportError (
+              "crystalspace.sprite3dfactoryloader.parse.unknownmaterial",
+              child, "Couldn't find material named '%s'", matname);
             return 0;
-	  }
-	  fact->SetMaterialWrapper (mat);
+          }
+          fact->SetMaterialWrapper (mat);
         }
         break;
 

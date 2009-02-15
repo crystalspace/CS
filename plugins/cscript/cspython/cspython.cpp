@@ -128,7 +128,7 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
   CS::Utility::setenv ("PYTHONPATH", pythonpath, true);
 #endif
 
-  Py_SetProgramName("Crystal Space -- Python");
+  Py_SetProgramName(const_cast<char*>("Crystal Space -- Python"));
   Py_Initialize();
 
   py_main = PyImport_AddModule("__main__");
@@ -138,7 +138,7 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
 
   // some parts of python api require sys.argv to be filled.
   // so strange errors will appear if we dont do the following
-  char *(argv[2]) = {"", NULL};
+  char *(argv[2]) = {const_cast<char*>(""), NULL};
   PySys_SetArgv(1, argv);
 
   // add cs scripts paths to pythonpath

@@ -1,0 +1,118 @@
+<library>
+    <textures>
+        <texture name="bricks.gif">
+            <file>/lib/stdtex/bricks.jpg</file>
+        </texture>
+        <texture name="parket.gif">
+            <file>/lib/stdtex/parket.jpg</file>
+        </texture>
+        <texture name="spark">
+            <file>/lib/std/spark.png</file>
+        </texture>
+    </textures>
+    <materials>
+        <material name="bricks">
+            <texture>bricks.gif</texture>
+            <shader type="standard">std_lighting_detail_alpha_scroll</shader>
+            <shadervar name="tex detail" type="texture">spark</shadervar>
+            <shadervar name="tex detail scale" type="vector2">10,10</shadervar>
+            <shadervar name="tex detail color" type="vector4">1,1,1,0.25</shadervar>
+        </material>
+        <material name="parket">
+            <texture>parket.gif</texture>
+        </material>
+    </materials>
+    <meshfact name="factory_roof1_walls">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <numvt>16</numvt>
+            <v x="-23" y="11" z="-10" u="0" v="0" />
+            <v x="-23" y="11" z="-15" u="1" v="0" />
+            <v x="-23" y="10.9" z="-15" u="1" v="0.0200001" />
+            <v x="-23" y="6" z="-10" u="0" v="1" />
+            <v x="-23" y="11" z="-15" u="0" v="0" />
+            <v x="-33" y="11" z="-15" u="2" v="0" />
+            <v x="-33" y="10.9" z="-15" u="2" v="0.0200001" />
+            <v x="-23" y="10.9" z="-15" u="0" v="0.0200001" />
+            <v x="-33" y="11" z="-15" u="0" v="0" />
+            <v x="-33" y="11" z="-10" u="1" v="0" />
+            <v x="-33" y="6" z="-10" u="1" v="1" />
+            <v x="-33" y="10.9" z="-15" u="0" v="0.0200001" />
+            <v x="-33" y="6" z="-10" u="0" v="0" />
+            <v x="-23" y="6" z="-10" u="2" v="0" />
+            <v x="-23" y="10.9" z="-15" u="2" v="1.40015" />
+            <v x="-33" y="10.9" z="-15" u="0" v="1.40015" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="-1.36225e-008" y="0.714213" z="0.699929" />
+            <n x="-1.36225e-008" y="0.714213" z="0.699929" />
+            <n x="-1.36225e-008" y="0.714213" z="0.699929" />
+            <n x="-1.36225e-008" y="0.714213" z="0.699929" />
+            <submesh name="bricks_0">
+                <material>bricks</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                    <e c0="4" />
+                    <e c0="5" />
+                    <e c0="6" />
+                    <e c0="4" />
+                    <e c0="6" />
+                    <e c0="7" />
+                    <e c0="8" />
+                    <e c0="9" />
+                    <e c0="10" />
+                    <e c0="8" />
+                    <e c0="10" />
+                    <e c0="11" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="parket_0">
+                <material>parket</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="12" />
+                    <e c0="13" />
+                    <e c0="14" />
+                    <e c0="12" />
+                    <e c0="14" />
+                    <e c0="15" />
+                </indexbuffer>
+            </submesh>
+            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                <e c0="0.546875" c1="0.296875" />
+                <e c0="0.78125" c1="0.296875" />
+                <e c0="0.78125" c1="0.301563" />
+                <e c0="0.546875" c1="0.53125" />
+                <e c0="0.015625" c1="0.421875" />
+                <e c0="0.5" c1="0.421875" />
+                <e c0="0.5" c1="0.4375" />
+                <e c0="0.015625" c1="0.4375" />
+                <e c0="0.546875" c1="0.015625" />
+                <e c0="0.78125" c1="0.015625" />
+                <e c0="0.78125" c1="0.25" />
+                <e c0="0.546875" c1="0.0203125" />
+                <e c0="0.015625" c1="0.015625" />
+                <e c0="0.5" c1="0.015625" />
+                <e c0="0.5" c1="0.375" />
+                <e c0="0.015625" c1="0.375" />
+            </renderbuffer>
+        </params>
+    </meshfact>
+</library>

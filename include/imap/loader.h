@@ -163,6 +163,10 @@ public:
     success = false;
   }
 
+  virtual ~csLoaderReturn()
+  {
+  }
+
   bool IsFinished() { return finished; }
   bool WasSuccessful() { return success; }
   void* GetResultPtr() { CS_ASSERT_MSG("csLoaderReturn does not implement a void* result", false); return NULL; }
@@ -759,6 +763,15 @@ struct iThreadedLoader : public virtual iBase
   csRef<iStreamSource> ssource = 0, csRef<iMissingLoaderData> missingdata = 0, uint keepFlags = KEEP_ALL,
   bool do_verbose = false);
   //@}
+
+  /// Add object to the transfer list.
+  virtual void AddSectorToList(iSector* obj) = 0;
+  virtual void AddMeshFactToList(iMeshFactoryWrapper* obj) = 0;
+  virtual void AddMeshToList(iMeshWrapper* obj) = 0;
+  virtual void AddCamposToList(iCameraPosition* obj) = 0;
+  virtual void AddTextureToList(iTextureWrapper* obj) = 0;
+  virtual void AddMaterialToList(iMaterialWrapper* obj) = 0;
+  virtual void AddSharedVarToList(iSharedVariable* obj) = 0;
 };
 
 /**

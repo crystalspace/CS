@@ -43,16 +43,17 @@ namespace genmeshify
     virtual ~StdLoaderContext ();
 
     virtual iSector* FindSector (const char* name);
-    virtual iMaterialWrapper* FindMaterial (const char* name);
+    virtual iMaterialWrapper* FindMaterial (const char* name, bool dontWaitForLoad = false);
     virtual iMaterialWrapper* FindNamedMaterial (const char* name,
-      const char *filename);
-    virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
+      const char *filename, bool dontWaitForLoad = false);
+    virtual iMeshFactoryWrapper* FindMeshFactory (const char* name, bool dontWaitForLoad = false);
     virtual iMeshWrapper* FindMeshObject (const char* name);
-    virtual iTextureWrapper* FindTexture (const char* name);
+    virtual iTextureWrapper* FindTexture (const char* name, bool dontWaitForLoad = false);
     virtual iTextureWrapper* FindNamedTexture (const char* name,
-      const char *filename);
+      const char *filename, bool dontWaitForLoad = false);
     virtual iLight* FindLight (const char *name);
     virtual iShader* FindShader (const char *name);
+    virtual iGeneralMeshSubMesh* FindSubmesh(iGeneralMeshState *,const char *) { return 0; }
     virtual bool CheckDupes () const { return checkDupes; }
     virtual iCollection* GetCollection() const { return collection; }
     virtual bool CurrentCollectionOnly() const { return false; }

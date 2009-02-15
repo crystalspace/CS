@@ -56,6 +56,7 @@
 #include "cstool/rviewclipper.h"
 #include "cstool/saverfile.h"
 #include "cstool/saverref.h"
+#include "cstool/simplestaticlighter.h"
 #include "cstool/smartfileopen.h"
 #include "cstool/uberscreenshot.h"
 #include "cstool/unusedresourcehelper.h"

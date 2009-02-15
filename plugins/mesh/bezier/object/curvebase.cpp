@@ -527,46 +527,6 @@ void csCurve::InitializeDefaultLighting (bool clear)
   LightmapUpToDate = false;
 }
 
-const char* csCurve::ReadFromCache (iFile* file)
-{
-  if (!IsLightable ()) return 0;
-  LightMap = new csCurveLightMap ();
-
-  // Allocate space for the LightMap and initialize it to ambient color.
-  csColor ambient;
-  ParentThing->GetStaticData ()->thing_type->engine->GetAmbientLight (ambient);
-  LightMap->Alloc (
-      CURVE_LM_SIZE * csCurveLightMap::lightcell_size,
-      CURVE_LM_SIZE * csCurveLightMap::lightcell_size,
-        int(ambient.red * 255.0f),
-  int(ambient.green * 255.0f),
-        int(ambient.blue * 255.0f));
-
-  const char* error = LightMap->ReadFromCache (
-      file,
-      CURVE_LM_SIZE * csCurveLightMap::lightcell_size,
-      CURVE_LM_SIZE * csCurveLightMap::lightcell_size,
-      this,
-      thing_type->engine);
-  LightmapUpToDate = true;
-  return error;
-}
-
-bool csCurve::WriteToCache (iFile* file)
-{
-  if (!LightMap) return true;
-  if (!LightmapUpToDate)
-  {
-    LightmapUpToDate = true;
-    if (
-      thing_type->engine->GetLightingCacheMode ()
-        & CS_ENGINE_CACHE_WRITE)
-      LightMap->Cache (file, this, thing_type->engine);
-  }
-
-  return true;
-}
-
 void csCurve::PrepareLighting ()
 {
   if (LightMap) LightMap->ConvertToMixingMode ();

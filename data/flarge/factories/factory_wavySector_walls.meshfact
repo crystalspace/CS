@@ -1,0 +1,64 @@
+<library>
+    <textures>
+        <texture name="plasma">
+            <type>crystalspace.texture.loader.plasma</type>
+        </texture>
+    </textures>
+    <materials>
+        <material name="plasma">
+            <texture>plasma</texture>
+        </material>
+    </materials>
+    <meshfact name="factory_wavySector_walls">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <numvt>8</numvt>
+            <v x="7" y="4" z="6" u="-1.09091" v="-1.09091" />
+            <v x="19" y="4" z="6" u="1.09091" v="-1.09091" />
+            <v x="19" y="4" z="18" u="1.09091" v="1.09091" />
+            <v x="7" y="4" z="18" u="-1.09091" v="1.09091" />
+            <v x="7" y="-4" z="18" u="-1.09091" v="1.09091" />
+            <v x="19" y="-4" z="18" u="1.09091" v="1.09091" />
+            <v x="19" y="-4" z="6" u="1.09091" v="-1.09091" />
+            <v x="7" y="-4" z="6" u="-1.09091" v="-1.09091" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <submesh name="0">
+                <material>plasma</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                    <e c0="4" />
+                    <e c0="5" />
+                    <e c0="6" />
+                    <e c0="4" />
+                    <e c0="6" />
+                    <e c0="7" />
+                </indexbuffer>
+            </submesh>
+            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                <e c0="0" c1="0" />
+                <e c0="0" c1="0" />
+                <e c0="0" c1="0" />
+                <e c0="0" c1="0" />
+                <e c0="0" c1="0" />
+                <e c0="0" c1="0" />
+                <e c0="0" c1="0" />
+                <e c0="0" c1="0" />
+            </renderbuffer>
+        </params>
+    </meshfact>
+</library>

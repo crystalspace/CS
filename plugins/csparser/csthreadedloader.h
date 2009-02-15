@@ -64,6 +64,8 @@ struct iVFS;
 
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
+  class csLoaderContext;
+
   template<class T, class Interface>
   class csLoaderIterator : public scfImplementation1<csLoaderIterator<T, Interface>,
                                                      Interface>
@@ -116,43 +118,43 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     iObjectRegistry* GetObjectRegistry() const { return object_reg; }
 
-    csPtr<iSectorLoaderIterator> GetLoaderSectors()
+    virtual csPtr<iSectorLoaderIterator> GetLoaderSectors()
     {
       csRef<iSectorLoaderIterator> itr;
       itr.AttachNew(new csLoaderIterator<iSector, iSectorLoaderIterator>(&loaderSectors, &sectorsLock));
       return csPtr<iSectorLoaderIterator>(itr);
     }
-    csPtr<iMeshFactLoaderIterator> GetLoaderMeshFactories()
+    virtual csPtr<iMeshFactLoaderIterator> GetLoaderMeshFactories()
     {
       csRef<iMeshFactLoaderIterator> itr;
       itr.AttachNew(new csLoaderIterator<iMeshFactoryWrapper, iMeshFactLoaderIterator>(&loaderMeshFactories, &meshfactsLock));
       return csPtr<iMeshFactLoaderIterator>(itr);
     }
-    csPtr<iMeshLoaderIterator> GetLoaderMeshes()
+    virtual csPtr<iMeshLoaderIterator> GetLoaderMeshes()
     {
       csRef<iMeshLoaderIterator> itr;
       itr.AttachNew(new csLoaderIterator<iMeshWrapper, iMeshLoaderIterator>(&loaderMeshes, &meshesLock));
       return csPtr<iMeshLoaderIterator>(itr);
     }
-    csPtr<iCamposLoaderIterator> GetLoaderCameraPositions()
+    virtual csPtr<iCamposLoaderIterator> GetLoaderCameraPositions()
     {
       csRef<iCamposLoaderIterator> itr;
       itr.AttachNew(new csLoaderIterator<iCameraPosition, iCamposLoaderIterator>(&loaderCameraPositions, &camposLock));
       return csPtr<iCamposLoaderIterator>(itr);
     }
-    csPtr<iTextureLoaderIterator> GetLoaderTextures()
+    virtual csPtr<iTextureLoaderIterator> GetLoaderTextures()
     {
       csRef<iTextureLoaderIterator> itr;
       itr.AttachNew(new csLoaderIterator<iTextureWrapper, iTextureLoaderIterator>(&loaderTextures, &texturesLock));
       return csPtr<iTextureLoaderIterator>(itr);
     }
-    csPtr<iMaterialLoaderIterator> GetLoaderMaterials()
+    virtual csPtr<iMaterialLoaderIterator> GetLoaderMaterials()
     {
       csRef<iMaterialLoaderIterator> itr;
       itr.AttachNew(new csLoaderIterator<iMaterialWrapper, iMaterialLoaderIterator>(&loaderMaterials, &materialsLock));
       return csPtr<iMaterialLoaderIterator>(itr);
     }
-    csPtr<iSharedVarLoaderIterator> GetLoaderSharedVariables()
+    virtual csPtr<iSharedVarLoaderIterator> GetLoaderSharedVariables()
     {
       csRef<iSharedVarLoaderIterator> itr;
       itr.AttachNew(new csLoaderIterator<iSharedVariable, iSharedVarLoaderIterator>(&loaderSharedVariables, &sharedvarLock));
@@ -160,83 +162,133 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, LoadImage, csLoaderReturn, const char*, fname,
-      int, Format, bool, do_verbose, true, false)
+      int, Format, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, LoadImage, csLoaderReturn, iDataBuffer*, buf,
-      int, Format, bool, do_verbose, true, false)
+      int, Format, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL5(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, Filename,
-    int, Flags, csRef<iTextureManager>, texman, csRef<iImage>*, image, bool, do_verbose, true, false)
+    int, Flags, csRef<iTextureManager>, texman, csRef<iImage>*, image, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL5(csThreadedLoader, LoadTexture, csLoaderReturn, iDataBuffer*, buf,
-    int, Flags, iTextureManager*, texman, csRef<iImage>*, image, bool, do_verbose, true, false)
+    int, Flags, iTextureManager*, texman, csRef<iImage>*, image, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL8(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, Name,
     iDataBuffer*, buf, int, Flags, iTextureManager*, texman, bool, reg, bool, create_material, bool,
-    free_image, bool, do_verbose, true, false)
+    free_image, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL10(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, Name,
     const char*, FileName, int, Flags, iTextureManager*, texman, bool, reg, bool, create_material,
-    bool, free_image, iCollection*, Collection, uint, keepFlags, bool, do_verbose, true, false)
+    bool, free_image, iCollection*, Collection, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL2(csThreadedLoader, LoadSoundSysData, csLoaderReturn, const char*, fname,
-    bool, do_verbose, true, false)
+    bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, LoadSoundStream, csLoaderReturn, const char*, fname,
-    int, mode3d, bool, do_verbose, true, false)
+    int, mode3d, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, LoadSoundWrapper, csLoaderReturn, const char*, name,
-    const char*, fname, bool, do_verbose, true, false)
+    const char*, fname, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, LoadMeshObjectFactory, csLoaderReturn, const char*, fname,
-    iStreamSource*, ssource, bool, do_verbose, true, false)
+    iStreamSource*, ssource, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, LoadMeshObject, csLoaderReturn, const char*, fname,
-    iStreamSource*, ssource, bool, do_verbose, true, false)
+    iStreamSource*, ssource, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, LoadShader, csLoaderReturn, const char*, filename,
-    bool, registerShader, bool, do_verbose, true, false)
+    bool, registerShader, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL7(csThreadedLoader, LoadMapFile, csLoaderReturn, const char*, filename,
     bool, clearEngine, iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*,
-    missingdata, uint, keepFlags, bool, do_verbose, true, false)
+    missingdata, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL7(csThreadedLoader, LoadMap, csLoaderReturn, iDocumentNode*, world_node,
     bool, clearEngine, iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*,
-    missingdata, uint, keepFlags, bool, do_verbose, true, false)
+    missingdata, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL6(csThreadedLoader, LoadLibraryFile, csLoaderReturn, const char*, filename,
     iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint,
-    keepFlags, bool, do_verbose, true, false)
+    keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL6(csThreadedLoader, LoadLibrary, csLoaderReturn, iDocumentNode*, lib_node,
     iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint,
-    keepFlags, bool, do_verbose, true, false)
+    keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL6(csThreadedLoader, LoadFile, csLoaderReturn, const char*, fname,
     iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint,
-    keepFlags, bool, do_verbose, true, false)
+    keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL6(csThreadedLoader, LoadBuffer, csLoaderReturn, iDataBuffer*, buffer,
     iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint,
-    keepFlags, bool, do_verbose, true, false)
+    keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL6(csThreadedLoader, LoadNode, csLoaderReturn, csRef<iDocumentNode>,
     node, csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>,
-    missingdata, uint, keepFlags, bool, do_verbose, true, false)
+    missingdata, uint, keepFlags, bool, do_verbose, THREADED, false, false)
+
+    void AddSectorToList(iSector* obj)
+    {
+      CS::Threading::MutexScopedLock lock(sectorsLock);
+      loaderSectors.Push(obj);
+      obj->DecRef(); // Compensate for CreateSector IncRef().
+    }
+
+    void AddMeshFactToList(iMeshFactoryWrapper* obj)
+    {
+      CS::Threading::MutexScopedLock lock(meshfactsLock);
+      loaderMeshFactories.Push(obj);
+    }
+
+    void AddMeshToList(iMeshWrapper* obj)
+    {
+      CS::Threading::MutexScopedLock lock(meshesLock);
+      loaderMeshes.Push(obj);
+    }
+
+    void AddCamposToList(iCameraPosition* obj)
+    {
+      CS::Threading::MutexScopedLock lock(camposLock);
+      loaderCameraPositions.Push(obj);
+    }
+
+    void AddTextureToList(iTextureWrapper* obj)
+    {
+      CS::Threading::MutexScopedLock lock(texturesLock);
+      loaderTextures.Push(obj);
+    }
+
+    void AddMaterialToList(iMaterialWrapper* obj)
+    {
+      CS::Threading::MutexScopedLock lock(materialsLock);
+      loaderMaterials.Push(obj);
+    }
+
+    void AddSharedVarToList(iSharedVariable* obj)
+    {
+      CS::Threading::MutexScopedLock lock(sharedvarLock);
+      loaderSharedVariables.Push(obj);
+    }
+
+    void AddLightToList(iLight* obj, const char* name)
+    {
+      CS::Threading::MutexScopedLock lock(lightsLock);
+      loadedLights.Put(csString(name), obj);
+    }
 
   protected:
 
     friend class csLoaderContext;
 
     // Shared lists and locks.
-    Mutex sectorsLock;
-    Mutex meshfactsLock;
-    Mutex meshesLock;
-    Mutex camposLock;
-    Mutex texturesLock;
-    Mutex materialsLock;
-    Mutex sharedvarLock;
+    CS::Threading::Mutex sectorsLock;
+    CS::Threading::Mutex meshfactsLock;
+    CS::Threading::Mutex meshesLock;
+    CS::Threading::Mutex camposLock;
+    CS::Threading::Mutex texturesLock;
+    CS::Threading::Mutex materialsLock;
+    CS::Threading::Mutex sharedvarLock;
+    CS::Threading::Mutex lightsLock;
 
     // Final objects.
     csRefArray<iSector> loaderSectors;
@@ -246,14 +298,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRefArray<iTextureWrapper> loaderTextures;
     csRefArray<iMaterialWrapper> loaderMaterials;
     csRefArray<iSharedVariable> loaderSharedVariables;
+    csWeakRefHash<iLight, csString> loadedLights;
 
     // General loading objects.
     csHash<csRef<iThreadReturn>, const char*> loadingMeshObjects;
-    RecursiveMutex loadingMeshObjectsLock;
+    CS::Threading::Mutex loadingMeshObjectsLock;
 
     void AddLoadingMeshObject(const char* name, csRef<iThreadReturn> itr)
     {
-      RecursiveMutexScopedLock lock(loadingMeshObjectsLock);
+      CS::Threading::MutexScopedLock lock(loadingMeshObjectsLock);
       if(!FindLoadedMeshObject(name))
       {
         loadingMeshObjects.Put(name, itr);
@@ -262,7 +315,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     bool FindLoadedMeshObject(const char* name)
     {
-      RecursiveMutexScopedLock lock(loadingMeshObjectsLock);
+      CS::Threading::MutexScopedLock lock(meshesLock);
       for(size_t i=0; i<loaderMeshes.GetSize(); i++)
       {
         if(csString(name).Compare(loaderMeshes[i]->QueryObject()->GetName()))
@@ -276,17 +329,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     void RemoveLoadingMeshObject(const char* name, csRef<iThreadReturn> itr)
     {
-      RecursiveMutexScopedLock lock(loadingMeshObjectsLock);
+      CS::Threading::MutexScopedLock lock(loadingMeshObjectsLock);
       loadingMeshObjects.Delete(name, itr);
     }
 
     // Loading texture objects.
     csArray<const char*> loadingTextures;
-    RecursiveMutex loadingTexturesLock;
+    CS::Threading::RecursiveMutex loadingTexturesLock;
 
     bool AddLoadingTexture(const char* name)
     {
-      RecursiveMutexScopedLock lock(loadingTexturesLock);
+      CS::Threading::RecursiveMutexScopedLock lock(loadingTexturesLock);
       if(!FindLoadingTexture(name))
       {
         loadingTextures.Push(name);
@@ -297,13 +350,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     bool FindLoadingTexture(const char* name)
     {
-      RecursiveMutexScopedLock lock(loadingTexturesLock);
+      CS::Threading::RecursiveMutexScopedLock lock(loadingTexturesLock);
       return loadingTextures.Find(name) != csArrayItemNotFound;
     }
 
     void RemoveLoadingTexture(const char* name)
     {
-      RecursiveMutexScopedLock lock(loadingTexturesLock);
+      CS::Threading::RecursiveMutexScopedLock lock(loadingTexturesLock);
       loadingTextures.Delete(name);
     }
 
@@ -314,11 +367,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     // Loading material objects.
     csArray<const char*> loadingMaterials;
-    RecursiveMutex loadingMaterialsLock;
+    CS::Threading::RecursiveMutex loadingMaterialsLock;
 
     bool AddLoadingMaterial(const char* name)
     {
-      RecursiveMutexScopedLock lock(loadingMaterialsLock);
+      CS::Threading::RecursiveMutexScopedLock lock(loadingMaterialsLock);
       if(!FindLoadingMaterial(name))
       {
         loadingMaterials.Push(name);
@@ -329,23 +382,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     bool FindLoadingMaterial(const char* name)
     {
-      RecursiveMutexScopedLock lock(loadingMaterialsLock);
+      CS::Threading::RecursiveMutexScopedLock lock(loadingMaterialsLock);
       return loadingMaterials.Find(name) != csArrayItemNotFound;
     }
 
     void RemoveLoadingMaterial(const char* name)
     {
-      RecursiveMutexScopedLock lock(loadingMaterialsLock);
+      CS::Threading::RecursiveMutexScopedLock lock(loadingMaterialsLock);
       loadingMaterials.Delete(name);
     }
 
     // Loading meshfact objects.
     csArray<const char*> loadingMeshFacts;
-    RecursiveMutex loadingMeshFactsLock;
+    CS::Threading::RecursiveMutex loadingMeshFactsLock;
 
     bool AddLoadingMeshFact(const char* name)
     {
-      RecursiveMutexScopedLock lock(loadingMeshFactsLock);
+      CS::Threading::RecursiveMutexScopedLock lock(loadingMeshFactsLock);
       if(!FindLoadingMeshFact(name))
       {
         return true;
@@ -356,13 +409,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     bool FindLoadingMeshFact(const char* name)
     {
-      RecursiveMutexScopedLock lock(loadingMeshFactsLock);
+      CS::Threading::RecursiveMutexScopedLock lock(loadingMeshFactsLock);
       return loadingMeshFacts.Find(name) != csArrayItemNotFound;
     }
 
     void RemoveLoadingMeshFact(const char* name)
     {
-      RecursiveMutexScopedLock lock(loadingMeshFactsLock);
+      CS::Threading::RecursiveMutexScopedLock lock(loadingMeshFactsLock);
       loadingMeshFacts.Delete(name);
     }
 
@@ -398,49 +451,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     // Frame event.
     csEventID ProcessPerFrame;
 
-    void AddSectorToList(csRef<iSector> obj)
-    {
-      MutexScopedLock lock(sectorsLock);
-      loaderSectors.Push(obj);
-      obj->DecRef(); // Compensate for CreateSector IncRef().
-    }
-
-    void AddMeshFactToList(csRef<iMeshFactoryWrapper> obj)
-    {
-      MutexScopedLock lock(meshfactsLock);
-      loaderMeshFactories.Push(obj);
-    }
-
-    void AddMeshToList(csRef<iMeshWrapper> obj)
-    {
-      MutexScopedLock lock(meshesLock);
-      loaderMeshes.Push(obj);
-    }
-
-    void AddCamposToList(csRef<iCameraPosition> obj)
-    {
-      MutexScopedLock lock(camposLock);
-      loaderCameraPositions.Push(obj);
-    }
-
-    void AddTextureToList(csRef<iTextureWrapper> obj)
-    {
-      MutexScopedLock lock(texturesLock);
-      loaderTextures.Push(obj);
-    }
-
-    void AddMaterialToList(csRef<iMaterialWrapper> obj)
-    {
-      MutexScopedLock lock(materialsLock);
-      loaderMaterials.Push(obj);
-    }
-
-    void AddSharedVarToList(csRef<iSharedVariable> obj)
-    {
-      MutexScopedLock lock(sharedvarLock);
-      loaderSharedVariables.Push(obj);
-    }
-
     // ----------------------------------------------- //
     struct ProxyKeyColour
     {
@@ -456,6 +466,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       bool always_animate;
       ProxyKeyColour keyColour;
     };
+
+    // Parses the data to find all materials and meshfacts.
+    void ParseAvailableObjects(csLoaderContext* ldr_context, iDocumentNode* doc);
 
     // Returns in the 'meshesArray' array all the meshes encountered walking through
     // the hierarchy of meshes starting from 'meshWrapper'.
@@ -474,10 +487,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool FindOrLoadMeshFactory(iLoaderContext* ldr_context,
       iDocumentNode* meshfactnode, iMeshFactoryWrapper* parent,
       csReversibleTransform* transf, iStreamSource* ssource);
-
-    bool LoadMapLibraryFile (const char* filename, iCollection* collection,
-      iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags = KEEP_ALL,
-      bool loadProxyTex = true, bool do_verbose = false);
 
     /**
     * Load a Mesh Object Factory from the map file.
@@ -507,14 +516,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     */
     THREADED_CALLABLE_DECL6(csThreadedLoader, LoadMeshObject, csLoaderReturn,
       csRef<iLoaderContext>, ldr_context, csRef<iMeshWrapper>, mesh, csRef<iMeshWrapper>, parent,
-      csRef<iDocumentNode>, node, csRef<iStreamSource>, ssource, csRef<iSector>, sector, true, false);
+      csRef<iDocumentNode>, node, csRef<iStreamSource>, ssource, csRef<iSector>, sector, THREADED, false, false);
 
     THREADED_CALLABLE_DECL2(csThreadedLoader, AddObjectToSector, csLoaderReturn,
-      csRef<iMovable>, movable, csRef<iSector>, sector, false, false);
+      csRef<iMovable>, movable, csRef<iSector>, sector, MED, false, false);
 
     THREADED_CALLABLE_DECL4(csThreadedLoader, LoadMeshRef, csLoaderReturn, csRef<iDocumentNode>,
       node, csRef<iSector>, sector, csRef<iLoaderContext>, ldr_context, csRef<iStreamSource>,
-      ssource, true, false);
+      ssource, THREADED, false, false);
 
     /**
     * Load the mesh object from the map file.
@@ -538,13 +547,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     * sounds and textures.
     */
     bool LoadLibrary(iLoaderContext* ldr_context, iDocumentNode* node,
-      iStreamSource* ssource, iMissingLoaderData* missingdata, bool loadProxyTex = true,
-      bool do_verbose = false);
+      iStreamSource* ssource, iMissingLoaderData* missingdata, csRefArray<iThreadReturn>& threadReturns,
+      bool loadProxyTex = true, bool do_verbose = false);
 
-    THREADED_CALLABLE_DECL6(csThreadedLoader, LoadLibraryFromNode, csLoaderReturn,
+    THREADED_CALLABLE_DECL8(csThreadedLoader, LoadLibraryFromNode, csLoaderReturn,
       csRef<iLoaderContext>, ldr_context, csRef<iDocumentNode>, child, csRef<iStreamSource>,
       ssource, csRef<iMissingLoaderData>, missingdata, bool, loadProxyTex, bool, do_verbose,
-      true, false);
+      bool, compact, const char*, libpath, THREADED, false, false);
 
     csPtr<iImage> LoadImage (iDataBuffer* buf, const char* fname, int Format, bool do_verbose);
 
@@ -624,14 +633,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     iRenderLoop* ParseRenderLoop (iDocumentNode* node, bool& set);
 
     /// Parse a addon.
-    THREADED_CALLABLE_DECL5(csThreadedLoader, ParseAddOn, csLoaderReturn,
+    THREADED_CALLABLE_DECL6(csThreadedLoader, ParseAddOn, csLoaderReturn,
       csRef<iLoaderPlugin>, plugin, csRef<iDocumentNode>, node, csRef<iStreamSource>, ssource,
-      csRef<iLoaderContext>, ldr_context, csRef<iBase>, context, false, true);
+      csRef<iLoaderContext>, ldr_context, csRef<iBase>, context, const char*, dir, HIGH, true, false);
 
     /// Parse a addon (binary plugin).
     THREADED_CALLABLE_DECL5(csThreadedLoader, ParseAddOnBinary, csLoaderReturn,
       csRef<iBinaryLoaderPlugin>, plugin, csRef<iDataBuffer>, dbuf, csRef<iStreamSource>,
-      ssource, csRef<iLoaderContext>, ldr_context, csRef<iBase>, context, false, true);
+      ssource, csRef<iLoaderContext>, ldr_context, csRef<iBase>, context, HIGH, true, false);
 
     /**
     * Try loading the file as a structured document.
@@ -698,11 +707,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     /// Parse a sector definition and add the sector to the engine
     iSector* ParseSector (iLoaderContext* ldr_context, iDocumentNode* node,
-      iStreamSource* ssource);
+      iStreamSource* ssource, csRefArray<iThreadReturn>& threadReturns);
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, SetSectorVisibilityCuller, csLoaderReturn,
       csRef<iSector>, sector, const char*, culplugname, csRef<iDocumentNode>, culler_params,
-      false, false)
+      MED, false, false)
 
       // Process the attributes of an <imposter> tag in a mesh specification.
       bool ParseImposterSettings(iImposter* mesh, iDocumentNode *node);

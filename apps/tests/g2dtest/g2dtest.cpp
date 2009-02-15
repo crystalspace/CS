@@ -1687,7 +1687,7 @@ int main (int argc, char *argv[])
   {
     csString canvas = cmdline->GetOption ("video");
     if (!canvas || !*canvas)
-      canvas = "crystalspace.graphics3d.software"; //CS_SOFTWARE_2D_DRIVER;
+      canvas = "crystalspace.graphics3d.opengl";
     else if (strncmp ("crystalspace.", canvas, 13))
     {
       canvas = "crystalspace.graphics3d." + canvas;

@@ -399,8 +399,8 @@ const char* csLightMap::ReadFromCache (
     return "Mismatch with expected number of pseudo-dynamic lightmaps!";
   }
 
-  iLightingInfo* li;
-  li = (iLightingInfo*)parent;
+  //iLightingInfo* li;
+  //li = (iLightingInfo*)parent;
 
   for (i = 0 ; i < lh.dyn_cnt ; i++)
   {
@@ -414,7 +414,7 @@ const char* csLightMap::ReadFromCache (
     {
       csShadowMap *smap = NewShadowMap (light);
 
-      light->AddAffectedLightingInfo (li);
+      //light->AddAffectedLightingInfo (li);
 
       csRef<iDataBuffer> smDataBuffer = file->GetAllData();
       smDataBuffer.AttachNew (ParasiticDataBufferBlockAllocated::Alloc (

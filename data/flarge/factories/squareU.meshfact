@@ -1,0 +1,20 @@
+<library>
+    <textures />
+    <materials />
+    <meshfact name="squareU">
+        <plugin>meshFact</plugin>
+        <params>
+            <numvt>4</numvt>
+            <numtri>4</numtri>
+            <v x="-2" y="0" z="0" u="0" v="0" />
+            <v x="2" y="0" z="0" u="1" v="0" />
+            <v x="2" y="4" z="0" u="1" v="1" />
+            <v x="-2" y="4" z="0" u="0" v="1" />
+            <t v1="3" v2="0" v3="1" />
+            <t v1="1" v2="2" v3="3" />
+            <t v1="1" v2="0" v3="3" />
+            <t v1="3" v2="2" v3="1" />
+            <autonormals />
+        </params>
+    </meshfact>
+</library>

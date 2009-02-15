@@ -64,7 +64,7 @@ namespace Threading
     {
       delete allThreadState[i];
     }
-    delete allThreadState;
+    delete[] allThreadState;
   }
 
 

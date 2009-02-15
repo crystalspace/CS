@@ -27,9 +27,7 @@ Use this option to set the size of the display.
 Use this option to select the type of 2D canvas to use.
 
 @item -video=opengl
-(or software, ...).
-Use this option to select type of display driver to use.  Other options
-are @code{software}, @code{null}, etc.
+Use this option to select type of display driver to use.
 
 @item -fs
 Open in fullscreen mode (default is windowed).
@@ -39,12 +37,6 @@ This enable very verbose output. This is useful for debugging why
 Crystal Space isn't behaving as it should. If you just specify @samp{-verbose}
 you will get a lot of output. If your problem is not @sc{scf} related
 you can also do: @samp{-verbose=-scf}.
-
-@item -relight
-Use this option to recalculate all lightmaps after you changed lighting
-or geometry in a level that you're trying. If you don't do this you either
-get the old lightmaps or no lightmaps at all. Note that this command
-is only for the old lightmap system as used by the thing mesh object.
 
 @item -fullbright
 Use this option to get fullbright rendering of all objects. This is useful

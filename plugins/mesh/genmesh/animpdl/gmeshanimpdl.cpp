@@ -50,7 +50,6 @@ void GenmeshAnimationPDL::PrepareBuffer (iEngine* engine,
   {
     const GenmeshAnimationPDLFactory::ColorBuffer::MappedLight& factoryLight = 
       factoryBuf.lights[i];
-    bool success = false;
     ColorBuffer::MappedLight newLight;
     newLight.colors = factoryLight.colors;
     if (!factoryLight.lightId->sectorName.IsEmpty()
@@ -92,12 +91,6 @@ void GenmeshAnimationPDL::PrepareBuffer (iEngine* engine,
       }
     }
     if (newLight.light)
-    {
-      success = true;
-      newLight.light->AddAffectedLightingInfo (
-        static_cast<iLightingInfo*> (this));
-    }
-    if (success)
     {
       buffer.lights.Push (newLight);
     }
@@ -245,23 +238,6 @@ const csColor4* GenmeshAnimationPDL::UpdateColors (csTicks current,
   if (colorsBuffer.name == 0) return colors;
   UpdateBuffer (colorsBuffer, current, colors, num_colors, version_id);
   return colorsBuffer.combinedColors.GetArray();
-}
-
-void GenmeshAnimationPDL::LightDisconnect (iLight* light)
-{
-  for (size_t b = 0; b < buffers.GetSize(); b++)
-  {
-    csSafeCopyArray<ColorBuffer::MappedLight>& lights = buffers[b].lights;
-    for (size_t i = 0; i < lights.GetSize(); i++)
-    {
-      if (lights[i].light == light)
-      {
-        lights.DeleteIndexFast (i);
-        buffers[b].lightsDirty = true;
-        return;
-      }
-    }
-  }
 }
 
 //-------------------------------------------------------------------------

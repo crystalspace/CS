@@ -22,9 +22,12 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 CS_IMPLEMENT_APPLICATION
 
+using namespace CS::Threading;
+
 csThreadTest::csThreadTest(iObjectRegistry* objReg) : scfImplementationType(this),
                                                       objReg(objReg)
 {
+  test7 = 0;
 }
 
 
@@ -138,24 +141,23 @@ THREADED_CALLABLE_IMPL1(csThreadTest, Test6, csRef<Data> stuff)
 
 THREADED_CALLABLE_IMPL(csThreadTest, Test7)
 {
-  csSleep(1000);
-  Test7Data(1);
-  Test7Data(2);
-  Test7Data(3);
-  Test7Data(4);
-  Test7Data(5);
-  Test7Data(6);
-  Test7Data(7);
-  Test7Data(8);
-  Test7Data(9);
-  Test7Data(10);
+  csSleep(100);
+  Test7Data();
+  Test7Data();
+  Test7Data();
+  Test7Data();
+  Test7Data();
+  Test7Data();
+  Test7Data();
+  Test7Data();
+  Test7Data();
+  Test7Data();
   return true;
 }
 
-THREADED_CALLABLE_IMPL1(csThreadTest, Test7Data, int counter)
+THREADED_CALLABLE_IMPL(csThreadTest, Test7Data)
 {
-  csSleep(1000);
-  printf("Test 7 Data %i of 10\n", counter);
+  csSleep(100);
   Test7RealData();
 
   return true;
@@ -164,6 +166,10 @@ THREADED_CALLABLE_IMPL1(csThreadTest, Test7Data, int counter)
 THREADED_CALLABLE_IMPL(csThreadTest, Test7RealData)
 {
   csSleep(500);
+
+  MutexScopedLock lock(test7lock);
+  test7++;
+
   return true;
 }
 
@@ -205,10 +211,10 @@ int main(int argc, char* argv[])
   threadTest->Test6(dat);
 
   csRef<iThreadReturn> ret = threadTest->Test7();
-  if(ret->WasSuccessful())
-  {
-    printf("Test 7 passed!\n");
-  }
+  ret->Wait();
+
+  while(!threadTest->Test7Passed());
+  printf("Test 7 passed!\n");
 
   getchar();
 

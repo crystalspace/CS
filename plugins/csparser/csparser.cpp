@@ -218,7 +218,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     else
       imposter->SetImposterActive (true);
 
-    iSharedVariable *var;
+    iSharedVariable *var = 0;
 
     s = node->GetAttributeValue ("range");
     if (s)
@@ -415,7 +415,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   {
     const char* txtname = node->GetAttributeValue ("name");
 
-    iTextureWrapper* t = ldr_context->FindTexture (txtname);
+    iTextureWrapper* t = ldr_context->FindTexture (txtname, true);
     if (t)
     {
       ldr_context->AddToCollection(t->QueryObject ());
@@ -855,7 +855,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   {
     const char* matname = node->GetAttributeValue ("name");
 
-    iMaterialWrapper* m = ldr_context->FindMaterial (matname);
+    iMaterialWrapper* m = ldr_context->FindMaterial (matname, true);
     if (m)
     {
       ldr_context->AddToCollection(m->QueryObject ());
@@ -1976,7 +1976,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   }
 
   iSector* csThreadedLoader::ParseSector (iLoaderContext* ldr_context,
-    iDocumentNode* node, iStreamSource* ssource)
+    iDocumentNode* node, iStreamSource* ssource, csRefArray<iThreadReturn>& threadReturns)
   {
     const char* secname = node->GetAttributeValue ("name");
 
@@ -2064,7 +2064,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_MESHREF:
         {
-          LoadMeshRef(child, sector, ldr_context, ssource);
+          threadReturns.Push(LoadMeshRef(child, sector, ldr_context, ssource));
         }
         break;
       case XMLTOKEN_TRIMESH:
@@ -2108,6 +2108,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (meshname, false);
           csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, 0, child, ssource, sector);
           AddLoadingMeshObject(meshname, itr);
+          threadReturns.Push(itr);
         }
         break;
       case XMLTOKEN_MESHLIB:
@@ -2133,12 +2134,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
           csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, 0, child, ssource, sector);
           AddLoadingMeshObject(meshname, itr);
+          threadReturns.Push(itr);
         }
         break;
       case XMLTOKEN_LIGHT:
         {
           iLight* sl = ParseStatlight (ldr_context, child);
           if (!sl) return 0;
+          AddLightToList(sl, sl->QueryObject()->GetName());
           sector->AddLight (sl);
           sl->DecRef ();
         }
@@ -2301,10 +2304,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return 0;
   }
 
-  THREADED_CALLABLE_IMPL5(csThreadedLoader, ParseAddOn, csRef<iLoaderPlugin> plugin,
+  THREADED_CALLABLE_IMPL6(csThreadedLoader, ParseAddOn, csRef<iLoaderPlugin> plugin,
     csRef<iDocumentNode> node, csRef<iStreamSource> ssource, csRef<iLoaderContext> ldr_context,
-    csRef<iBase> context)
+    csRef<iBase> context, const char* dir)
   {
+    if(dir)
+    {
+      vfs->ChDir(dir);
+    }
     csRef<iBase> base = plugin->Parse(node, ssource, ldr_context, context, failedMeshFacts);
     ret->SetResult(base);
     return base.IsValid();    

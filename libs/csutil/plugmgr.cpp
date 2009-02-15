@@ -168,8 +168,7 @@ void csPluginManager::QueryOptions (iComponent *obj)
   }
 }
 
-THREADED_CALLABLE_IMPL3(csPluginManager, LoadPlugin, const char *classID,
-                        bool init, bool report)
+iBase* csPluginManager::LoadPlugin(const char *classID, bool init, bool report)
 {
   csRef<iComponent> p (scfCreateInstance<iComponent> (classID));
 
@@ -206,8 +205,7 @@ THREADED_CALLABLE_IMPL3(csPluginManager, LoadPlugin, const char *classID,
     {
       p->IncRef();
       if (init) QueryOptions (p);
-      ret->SetResult(csPtr<iBase>(p));
-      return true;
+      return p;
     }
     if (report)
       csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
@@ -217,7 +215,7 @@ THREADED_CALLABLE_IMPL3(csPluginManager, LoadPlugin, const char *classID,
     if (index != csArrayItemNotFound)
       Plugins.DeleteIndex (index);
   }
-  return false;
+  return NULL;
 }
 
 bool csPluginManager::RegisterPlugin (const char *classID,

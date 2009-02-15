@@ -35,6 +35,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/material.h"
 #include "cstool/genmeshbuilder.h"
+#include "cstool/simplestaticlighter.h"
 
 // Hack: work around problems caused by #defining 'new'
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
@@ -529,8 +530,6 @@ bool ViewMesh::Application()
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
-  engine->SetLightingCacheMode (0);
-
   collection = engine->CreateCollection ("viewmesh_region");
   reloadFilename = "";
 
@@ -561,6 +560,9 @@ bool ViewMesh::Application()
   HandleCommandLine();
 
   engine->Prepare ();
+
+  using namespace CS::Lighting;
+  SimpleStaticLighter::ShineLights (room, engine, 4);
 
   rotY = rotX = 0;
 
@@ -633,10 +635,6 @@ bool ViewMesh::CreateRoom ()
   // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
       engine, room, "walls", "walls_factory", &box);
-
-  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
-    iGeneralMeshState> (walls->GetMeshObject ());
-  mesh_state->SetShadowReceiving (true);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   csRef<iLight> light;

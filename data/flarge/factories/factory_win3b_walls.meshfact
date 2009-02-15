@@ -1,0 +1,110 @@
+<library>
+    <textures>
+        <texture name="oldbrick.gif">
+            <file>/lib/stdtex/oldbrick.jpg</file>
+        </texture>
+        <texture name="oldbrick_h.png">
+            <file>oldbrick_h.png</file>
+        </texture>
+    </textures>
+    <materials>
+        <material name="oldbrick">
+            <texture>oldbrick.gif</texture>
+            <shadervar name="tex height" type="texture">oldbrick_h.png</shadervar>
+            <!--color red="1" green="1" blue="1" /-->
+        </material>
+    </materials>
+    <meshfact name="factory_win3b_walls">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <numvt>16</numvt>
+            <v x="-8.5" y="2.4" z="20.25" u="0" v="0" />
+            <v x="-6" y="2.4" z="20.25" u="0.833332" v="0" />
+            <v x="-6" y="2.4" z="20.5" u="0.833332" v="0.0833332" />
+            <v x="-8.5" y="2.4" z="20.5" u="0" v="0.0833332" />
+            <v x="-8.5" y="0" z="20.5" u="0" v="0" />
+            <v x="-6" y="0" z="20.5" u="0.833332" v="0" />
+            <v x="-6" y="0" z="20.25" u="0.833332" v="0.0833332" />
+            <v x="-8.5" y="0" z="20.25" u="0" v="0.0833332" />
+            <v x="-6" y="2.4" z="20.5" u="0" v="0" />
+            <v x="-6" y="2.4" z="20.25" u="0.0833332" v="0" />
+            <v x="-6" y="0" z="20.25" u="0.0833332" v="0.799999" />
+            <v x="-6" y="0" z="20.5" u="0" v="0.799999" />
+            <v x="-8.5" y="2.4" z="20.25" u="0" v="0" />
+            <v x="-8.5" y="2.4" z="20.5" u="0.0833332" v="0" />
+            <v x="-8.5" y="0" z="20.5" u="0.0833332" v="0.799999" />
+            <v x="-8.5" y="0" z="20.25" u="0" v="0.799999" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="0" y="-1" z="3.8147e-007" />
+            <n x="0" y="-1" z="3.8147e-007" />
+            <n x="0" y="-1" z="3.8147e-007" />
+            <n x="0" y="-1" z="3.8147e-007" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <submesh name="oldbrick_0">
+                <material>oldbrick</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                    <e c0="4" />
+                    <e c0="5" />
+                    <e c0="6" />
+                    <e c0="4" />
+                    <e c0="6" />
+                    <e c0="7" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="oldbrick_1">
+                <material>oldbrick</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="8" />
+                    <e c0="9" />
+                    <e c0="10" />
+                    <e c0="8" />
+                    <e c0="10" />
+                    <e c0="11" />
+                    <e c0="12" />
+                    <e c0="13" />
+                    <e c0="14" />
+                    <e c0="12" />
+                    <e c0="14" />
+                    <e c0="15" />
+                </indexbuffer>
+            </submesh>
+            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                <e c0="0.03125" c1="0.0625" />
+                <e c0="0.4375" c1="0.0625" />
+                <e c0="0.4375" c1="0.125" />
+                <e c0="0.03125" c1="0.125" />
+                <e c0="0.03125" c1="0.3125" />
+                <e c0="0.4375" c1="0.3125" />
+                <e c0="0.4375" c1="0.375" />
+                <e c0="0.03125" c1="0.375" />
+                <e c0="0.125" c1="0.0625" />
+                <e c0="0.25" c1="0.0625" />
+                <e c0="0.25" c1="0.875" />
+                <e c0="0.125" c1="0.875" />
+                <e c0="0.625" c1="0.0625" />
+                <e c0="0.75" c1="0.0625" />
+                <e c0="0.75" c1="0.875" />
+                <e c0="0.625" c1="0.875" />
+            </renderbuffer>
+        </params>
+    </meshfact>
+</library>

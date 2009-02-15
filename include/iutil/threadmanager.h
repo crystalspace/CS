@@ -40,6 +40,14 @@ struct iThreadReturn : public csRefCount
   virtual void Wait() = 0;
 };
 
+enum QueueType
+{
+  THREADED = 0,
+  HIGH,
+  MED,
+  LOW
+};
+
 /**
  * This is the thread manager.
  *
@@ -56,9 +64,10 @@ struct iThreadManager : public virtual iBase
   SCF_INTERFACE(iThreadManager, 1, 0, 0);
 
   virtual void Process(uint num = 1) = 0;
-  virtual void PushToQueue(bool useThreadQueue, iJob* job) = 0;
+  virtual void PushToQueue(QueueType queueType, iJob* job) = 0;
   virtual void Wait(csRef<iThreadReturn> result) = 0;
-  virtual bool RunNow(bool useThreadQueue) = 0;
+  virtual bool RunNow(QueueType queueType, bool forceQueue) = 0;
+  virtual int32 GetThreadCount() = 0;
 };
 
 // Interface macros

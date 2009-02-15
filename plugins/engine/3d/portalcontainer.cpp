@@ -862,20 +862,6 @@ void csPortalContainer::DrawOnePortal (
   g3d->ClosePortal ();
 }
 
-//------------------- For iShadowReceiver ----------------------------//
-
-void csPortalContainer::CastShadows (iMovable* movable, iFrustumView* fview)
-{
-  CheckMovable ();
-
-  size_t i;
-  for (i = 0 ; i < portals.GetSize () ; i++)
-  {
-    csPortal *p = portals[i];
-    p->CastShadows (movable, fview);
-  }
-}
-
 //--------------------- For iMeshObject ------------------------------//
 
 bool csPortalContainer::ExtraVisTest (iRenderView* rview,
@@ -961,8 +947,6 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* /*movable*/,
   csPoly2D poly;
   int viewWidth = rview->GetGraphics3D ()->GetWidth();
   int viewHeight = rview->GetGraphics3D ()->GetHeight();
-  float iw = 2.0f/viewWidth;
-  float ih = 2.0f/viewHeight;
   PerspectiveOutlet2D outlet (camera->GetProjectionMatrix(), poly, viewWidth, viewHeight);
 
   size_t i;
@@ -1178,7 +1162,6 @@ public:
     csPoly3D orgDest3D (dest3D);
     MakeEmpty ();
       
-    float iw = 1.0f/viewWidth, ih = 1.0f/viewHeight;
     for (size_t i = 0 ; i < outNum; i++)
     {
       dest.AddVertex (csVector2 (clipOut[i].x, clipOut[i].y));

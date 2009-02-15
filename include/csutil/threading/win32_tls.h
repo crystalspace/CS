@@ -19,6 +19,10 @@
 #ifndef __CS_CSUTIL_THREADING_WIN32_TLS_H__
 #define __CS_CSUTIL_THREADING_WIN32_TLS_H__
 
+#if !defined(CS_PLATFORM_WIN32)
+#error "This file is only for Windows and requires you to include csysdefs.h before"
+#else
+
 namespace CS
 {
   namespace Threading
@@ -58,5 +62,7 @@ namespace CS
     }
   } // Threading
 } // CS
+
+#endif // !defined(CS_PLATFORM_WIN32)
 
 #endif // __CS_CSUTIL_THREADING_WIN32_TLS_H__

@@ -98,7 +98,6 @@
 
   <settings>
     <clearzbuf>yes</clearzbuf>
-    <lightmapcellsize>16</lightmapcellsize>
     <renderloop>std_rloop_terrain</renderloop>
   </settings>
 

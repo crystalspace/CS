@@ -1309,16 +1309,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
       case PARTYPE_LIGHT:
         {
-          iLight* l = Engine->FindLight (parname);
-          if (l) value = l;
+          value = ldr_context->FindLight (parname);
         }
         break;
       case PARTYPE_MESH:
-        value = ldr_context->FindMeshObject (parname);
-        break;
+        {
+          value = ldr_context->FindMeshObject (parname);
+          break;
+        }
       case PARTYPE_MATERIAL:
-        value = Engine->FindMaterial (parname);
-        break;
+        {
+          value = ldr_context->FindMaterial (parname);
+          break;
+        }
       case PARTYPE_SECTOR:
         value = ldr_context->FindSector (parname);
         break;
@@ -1440,7 +1443,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             error = true;
             return 0;
           }
-          iLight* light = Engine->FindLight (lightname);
+          iLight* light = ldr_context->FindLight (lightname);
           if (!light)
           {
             SyntaxService->ReportError (
@@ -1492,7 +1495,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             error = true;
             return 0;
           }
-          iMaterialWrapper* mat = Engine->FindMaterial (matname);
+          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
           if (!mat)
           {
             SyntaxService->ReportError (

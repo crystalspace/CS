@@ -371,16 +371,16 @@ Now add these chunks of code (texture manager, room, lights) to
 bool Simple::SetupModules ()
 @{
   @dots{}
-  // First disable the lighting cache. Our app is simple enough
-  // not to need this.
-  engine->SetLightingCacheMode (0);
-  @dots{}
   // These are used store the current orientation of the camera.
   rotY = rotX = 0;
   @dots{}
   CreateRoom ()
   
   engine->Prepare ();
+
+  using namespace CS::Lighting;
+  SimpleStaticLighter::ShineLights (room, engine, 4);
+
   rm = engine->GetRenderManager();
   @dots{}
 @}
@@ -389,21 +389,8 @@ void Simple::CreateRoom ()
 @{
   if (!loader->LoadTexture ("brick", "/lib/std/castle/brick1_d.jpg"))
     ReportError("Error loading 'brick1_d' texture!");
-
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("brick");
   
-  @{
-    csRef<iShaderVarStringSet> svStrings =
-      csQueryRegistryTagInterface<iShaderVarStringSet> (GetObjectRegistry(),
-        "crystalspace.shader.variablenameset");
-    csRef<iTextureHandle> normalMap = loader->LoadTexture (
-      "/lib/std/castle/brick1_n.jpg");
-    normalMap->SetTextureClass ("normalmap");
-    csShaderVariable* svNormalMap =
-      tm->GetMaterial()->GetVariableAdd (svStrings->Request ("tex normal"));
-    svNormalMap->SetValue (normalMap);
-  @}
-
   room = engine->CreateSector ("room");
 
   // First we make a primitive for our geometry.
@@ -417,10 +404,6 @@ void Simple::CreateRoom ()
   // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
       engine, room, "walls", "walls_factory", &box);
-
-  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
-    iGeneralMeshState> (walls->GetMeshObject ());
-  mesh_state->SetShadowReceiving (true);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   csRef<iLight> light;
@@ -494,26 +477,6 @@ object at the origin in the sector (i.e. @samp{0,0,0}). If you want to change
 that you have to use @code{iMeshWrapper::GetMovable()}. But in this example
 the origin is fine.
 
-There are only two more things to be done before our object is good for us. First
-we call @code{iGeneralMeshState::SetShadowReceiving(true)}. The @samp{iGeneralMeshState}
-interface is the interface containing genmesh specific functions for genmesh
-objects. @samp{iGeneralFactoryState} was the interface for genmesh specific
-functions for factories. To get access to these special interfaces we use the function
-@code{scfQueryInterface<>()} which is part of @sc{scf} (@pxref{SCF}). This
-will see if the mesh object actually implements @samp{iGeneralMeshState} (which
-should be the case here) and, if so, it will return a pointer to the
-implementation of @samp{iGeneralMeshState}. 
-All mesh objects and factories implement some kind of state interface which is 
-used to set up or query the state of that mesh object or factory.
-Note that all interfaces which you query using @code{scfQueryInterface<>()}
-must be assigned to a variable of type @code{csRef<>}. This ensures that the
-reference to the interface is released once it is no longer needed.
-
-We use @code{SetShadowReceiving(true)} so that our
-object will be lit by a more accurate per-vertex method. If we don't use
-this then the genmesh will be lit according to the light that it receives
-at the center of the model.
-
 The last thing we have to do is to set a material to use for this mesh. You can
 set a material both on the factory (in which case all objects that are created
 from this factory will share it) or on the mesh. In this case we set it on the
@@ -540,9 +503,17 @@ There are some performance costs associated with pseudo-dynamic lights so
 it is not enabled by default.
 
 The call to @code{Prepare()} prepares the engine for rendering your scene.  It
-will prepare all textures and create all lightmaps if needed.  Only after this
-call can you start rendering your world, because lightmaps may have to be
-converted to a format more suitable for the chosen 3D renderer.
+will prepare all textures and meshes.
+
+Using the @code{ShineLights()} function we generate static vertex lighting
+for our dynamically created geometry. Most of the times Crystal Space applications
+will probably load maps from disk and for that situation the lighting information
+(vertex and lightmaps) should already be present as calculated by the @samp{lighter2}
+application. However, for dynamically generated geometry you can choose to either
+use some kind of hardware assisted lighting (by using the @samp{unshadowed}
+render manager for example) or else you can use static lighting. @code{ShineLights()}
+is a convenience function that has the same end result as if the objects were
+lit using @samp{lighter2} with vertex lighting.
 
 Ok, now we have created our room and properly initialized it.  If you
 compile and run this application you would still see a black screen.  Why?

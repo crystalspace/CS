@@ -57,7 +57,7 @@ namespace lighter
 
     /// iReporterListener
     THREADED_CALLABLE_DECL4(TUI, Report, csThreadReturn, iReporter*, reporter,
-      int, severity, const char*, msgId, const char*, description, false, true);
+      int, severity, const char*, msgId, const char*, description, HIGH, true, false);
   private:
     csString GetProgressBar (uint percent) const;
 

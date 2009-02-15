@@ -108,9 +108,8 @@ and @sc{3ds} models directly.
 Crystal Space native windowing system using CEGUI.
 
 @item
-Cross-platform support for hardware rendering via OpenGL and software 
-rendering as well as a special ``null'' renderer for applications like game 
-servers. @xref{3D Renderer}.
+Cross-platform support for hardware rendering via OpenGL as well as a special
+``null'' renderer for applications like game servers. @xref{3D Renderer}.
 
 @item
 Supports various common image formats (@sc{bmp}, @sc{dds}, @sc{gif}, @sc{jpg}, 
