@@ -759,6 +759,9 @@ class csConditionEvaluator :
       return sv;
     }
   };
+
+  csString OperandToString (const CondOperand& operand);
+  csString OperationToString (const CondOperation& operation);
 public:
   template<typename Evaluator>
   typename Evaluator::EvalResult Evaluate (Evaluator& eval, csConditionID condition);
@@ -836,6 +839,9 @@ public:
 
   /// Try to release unused temporary memory
   static void CompactMemory ();
+  
+  /// Debugging: get string for condition
+  csString GetConditionString (csConditionID id);
 };
 
 class ConditionsWriter

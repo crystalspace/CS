@@ -543,8 +543,6 @@ public:
   virtual csPtr<iMeshWrapperIterator> GetVisibleMeshes (iSector* sector,
     const csFrustum& frustum);
 
-  virtual csPtr<iFrustumView> CreateFrustumView ();
-
   virtual csPtr<iObjectWatcher> CreateObjectWatcher ();
 
   virtual iSharedVariableList* GetVariableList () const;
@@ -1026,7 +1024,7 @@ private:
   csRef<iEventHandler> weakEventHandler;
 
   /// Pointer to the thread manager.
-  csRef<iThreadManager> tman;
+  csWeakRef<iThreadManager> tman;
 
   /// Array of new textures to be precached.
   csRefArray<iTextureWrapper> newTextures;

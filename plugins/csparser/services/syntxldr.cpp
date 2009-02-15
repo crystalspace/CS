@@ -85,6 +85,7 @@ bool csTextSyntaxService::ParseBoolAttribute (iDocumentNode* node,
 {
   csRef<iDocumentAttribute> attr = node->GetAttribute (attrname);
   if (!attr)
+  {
     if (required)
     {
       ReportError ("crystalspace.syntax.boolean", node,
@@ -96,6 +97,8 @@ bool csTextSyntaxService::ParseBoolAttribute (iDocumentNode* node,
       result = def_result;
       return true;
     }
+  }
+
   const char* v = attr->GetValue ();
   if (!v) { result = def_result; return true; }
   if (!strcasecmp (v, "1"))     { result = true; return true; }

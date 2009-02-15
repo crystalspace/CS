@@ -222,6 +222,21 @@ public:
         varArray[i] = other.varArray[i];
     }
   }
+
+  /**
+   * Copy contents of another stack.
+   * Unlike operator=() it does not change the storage of this stack.
+   * This stack must have the same number of elements as \a other.
+   * Returns whether a copy was actually made. No copy is made if both
+   * stacks point to the same storage.
+   */
+  bool Copy (const csShaderVariableStack& other)
+  {
+    CS_ASSERT(other.size == size);
+    if (varArray == other.varArray) return false;
+    memcpy (varArray, other.varArray, sizeof(csShaderVariable*)*size);
+    return true;
+  }
 private:
   csShaderVariable** varArray;
   size_t size;

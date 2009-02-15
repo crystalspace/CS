@@ -97,14 +97,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
         }
 
-        if(collection)
-        {
-          mat = Engine->FindMaterial(filename, collection);
-        }
-
         if(!mat.IsValid())
         {
-          mat = Engine->FindMaterial(filename);
+          mat = Engine->FindMaterial(filename, collection);
         }
 
         if(!mat.IsValid() && missingdata)
@@ -117,6 +112,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           break;
         }
       }
+    }
+
+    // General search, as the object may not have been added via the loader.
+    if(!mat.IsValid())
+    {
+      mat = Engine->FindMaterial(filename, collection);
     }
 
     if(!mat.IsValid() && do_verbose)
@@ -147,14 +148,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
         }
 
-        if(collection)
-        {
-          fact = Engine->FindMeshFactory(name, collection);
-        }
-
         if(!fact.IsValid())
         {
-          fact = Engine->FindMeshFactory(name);
+          fact = Engine->FindMeshFactory(name, collection);
         }
 
         if(!fact.IsValid() && missingdata)
@@ -167,6 +163,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           break;
         }
       }
+    }
+
+    // General search, as the object may not have been added via the loader.
+    if(!fact.IsValid())
+    {
+      fact = Engine->FindMeshFactory(name, collection);
     }
 
     if(!fact.IsValid() && do_verbose)
@@ -208,14 +210,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
         }
 
-        if(collection)
-        {
-          mesh = Engine->FindMeshObject(name, collection);
-        }
-
         if(!mesh.IsValid())
         {
-          mesh = Engine->FindMeshObject(name);
+          mesh = Engine->FindMeshObject(name, collection);
         }
 
         if (!mesh.IsValid() && missingdata)
@@ -223,6 +220,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           mesh = missingdata->MissingMesh(name);
         }
       }
+    }
+
+    // General search, as the object may not have been added via the loader.
+    if(!mesh.IsValid())
+    {
+      mesh = Engine->FindMeshObject(name, collection);
     }
 
     if(!mesh.IsValid() && do_verbose)
@@ -245,23 +248,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           light = loader->loadedLights.Get(csString(name), 0);
         }
 
-        if(!light.IsValid() && collection)
-        {
-          csRef<iLightIterator> li = Engine->GetLightIterator(collection);
-
-          while(li->HasNext())
-          {
-            light = li->Next();
-            if(!strcmp(light->QueryObject()->GetName(), name))
-            {
-              break;
-            }
-          }
-        }
-
         if(!light.IsValid())
         {
-          csRef<iLightIterator> li = Engine->GetLightIterator();
+          csRef<iLightIterator> li = Engine->GetLightIterator(collection);
 
           while(li->HasNext())
           {
@@ -276,6 +265,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         if(!light.IsValid() && missingdata)
         {
           light = missingdata->MissingLight(name);
+        }
+      }
+    }
+
+    // General search, as the object may not have been added via the loader.
+    if(!light.IsValid())
+    {
+      csRef<iLightIterator> li = Engine->GetLightIterator(collection);
+
+      while(li->HasNext())
+      {
+        light = li->Next();
+        if(!strcmp(light->QueryObject()->GetName(), name))
+        {
+          break;
         }
       }
     }
@@ -360,14 +364,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
         }
 
-        if(!result.IsValid() && collection)
-        {
-          result = collection->FindTexture(name);
-        }
-
         if(!result.IsValid())
         {
-          result = Engine->GetTextureList()->FindByName (name);
+          result = Engine->FindTexture(name, collection);
         }
 
         if(!result.IsValid() && missingdata)
@@ -380,6 +379,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           break;
         }
       }
+    }
+
+    // General search, as the object may not have been added via the loader.
+    if(!result.IsValid())
+    {
+      result = Engine->FindTexture(name, collection);
     }
 
     if(!result.IsValid() && do_verbose)

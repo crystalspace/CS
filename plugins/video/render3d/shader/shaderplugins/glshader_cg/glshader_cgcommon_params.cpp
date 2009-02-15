@@ -525,7 +525,7 @@ bool csShaderGLCGCommon::GetPostCompileParamProps (ShaderParameter* sparam)
     return ret;
   }
   else
-    return cgIsParameterReferenced (param);
+    return cgIsParameterReferenced (param) != 0;
 }
 
 void csShaderGLCGCommon::CollectUnusedParameters (csSet<csString>& unusedParams)

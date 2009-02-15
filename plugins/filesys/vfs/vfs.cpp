@@ -51,6 +51,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(VFS)
 // Characters ignored in VFS paths (except in middle)
 #define CS_VFSSPACE		" \t"
 
+typedef csStringFast<CS_MAXPATHLEN> PathString;
+
 //***********************************************************
 // NOTE on naming convention: public classes begin with "cs"
 // while private (local) classes do not.
@@ -339,7 +341,7 @@ private:
   // Copy a string from src to dst and expand all variables
   csString Expand (csVFS *Parent, char const *src);
   // Find a file either on disk or in archive - in this node only
-  bool FindFile (const char *Suffix, char *RealPath, csArchive *&) const;
+  bool FindFile (const char *Suffix, PathString& RealPath, csArchive *&) const;
 };
 
 // The global archive cache
@@ -530,18 +532,34 @@ void DiskFile::MakeDir (const char *PathBase, const char *PathSuffix)
 {
   bool const debug = IsVerbose(csVFS::VERBOSITY_DEBUG);
   size_t pbl = strlen (PathBase);
-  size_t pl = pbl + strlen (PathSuffix) + 1;
-  char *path = (char*)cs_malloc (pl);
-  char *cur = path + pbl;
+  size_t pl = pbl + strlen (PathSuffix);
+  char *path = (char*)cs_malloc (pl+1);
+  char *cur;
   char *prev = 0;
 
   strcpy (path, PathBase);
-  strcpy (cur, PathSuffix);
+  strcpy (path+pbl, PathSuffix);
 
   // Convert all VFS_PATH_SEPARATOR's in path into CS_PATH_SEPARATOR's
   for (size_t n = 0; n < pl; n++)
     if (path [n] == VFS_PATH_SEPARATOR)
       path [n] = CS_PATH_SEPARATOR;
+    
+  cur = strchr (path, CS_PATH_SEPARATOR);
+  if (cur == 0)
+  {
+    cur = path + pl;
+  }
+  else if ((cur == path)
+#ifdef CS_PLATFORM_WIN32
+    // Skip drive root dir
+    || (*(cur-1) == ':')
+#endif
+    )
+  {
+    cur = strchr (cur+1, CS_PATH_SEPARATOR);
+    if (cur == 0) cur = path + pl;
+  }
 
   while (cur != prev)
   {
@@ -551,7 +569,10 @@ void DiskFile::MakeDir (const char *PathBase, const char *PathSuffix)
     *cur = 0;
     if (debug)
       csPrintf ("VFS_DEBUG: Trying to create directory \"%s\"\n", path);
+    errno = 0;
     CS_MKDIR (path);
+    if (debug && errno != 0)
+      csPrintf ("VFS_DEBUG: Couldn't create directory \"%s\", errno=%d\n", path, errno);
     *cur = oldchar;
     if (*cur)
       cur++;
@@ -1305,7 +1326,7 @@ iFile* VfsNode::Open (int Mode, const char *FileName)
   return f;
 }
 
-bool VfsNode::FindFile (const char *Suffix, char *RealPath,
+bool VfsNode::FindFile (const char *Suffix, PathString& RealPath,
   csArchive *&Archive) const
 {
   // Look through all RPathV's for file or directory
@@ -1317,8 +1338,8 @@ bool VfsNode::FindFile (const char *Suffix, char *RealPath,
     {
       // rpath is a directory
       size_t rl = strlen (rpath);
-      memcpy (RealPath, rpath, rl);
-      strcpy (RealPath + rl, Suffix);
+      RealPath.Replace (rpath, rl);
+      RealPath.Append (Suffix);
       Archive = 0;
       if (access (RealPath, F_OK) == 0)
         return true;
@@ -1343,7 +1364,7 @@ bool VfsNode::FindFile (const char *Suffix, char *RealPath,
       if (a->FileExists (Suffix, 0))
       {
         Archive = a;
-        strcpy (RealPath, Suffix);
+        RealPath = Suffix;
         return true;
       }
     }
@@ -1357,7 +1378,7 @@ bool VfsNode::FindFile (const char *Suffix, char *RealPath,
 
 bool VfsNode::Delete (const char *Suffix)
 {
-  char fname [CS_MAXPATHLEN + 1];
+  PathString fname;
   csArchive *a;
   if (!FindFile (Suffix, fname, a))
     return false;
@@ -1366,6 +1387,13 @@ bool VfsNode::Delete (const char *Suffix)
     return a->DeleteFile (fname);
   else
   {
+    // Remove trailing path separator. (At least needed on Win32.)
+    if ((fname[fname.Length()-1] == CS_PATH_SEPARATOR)
+	|| (fname[fname.Length()-1] == '/'))
+    {
+      fname.Truncate (fname.Length()-1);
+    }
+
     struct stat s;
     if (stat (fname, &s) != 0) return false;
     if (s.st_mode & _S_IFDIR)
@@ -1377,14 +1405,14 @@ bool VfsNode::Delete (const char *Suffix)
 
 bool VfsNode::Exists (const char *Suffix)
 {
-  char fname [CS_MAXPATHLEN + 1];
+  PathString fname;
   csArchive *a;
   return FindFile (Suffix, fname, a);
 }
 
 bool VfsNode::GetFileTime (const char *Suffix, csFileTime &oTime) const
 {
-  char fname [CS_MAXPATHLEN + 1];
+  PathString fname;
   csArchive *a;
   if (!FindFile (Suffix, fname, a))
     return false;
@@ -1410,7 +1438,7 @@ bool VfsNode::GetFileTime (const char *Suffix, csFileTime &oTime) const
 
 bool VfsNode::SetFileTime (const char *Suffix, const csFileTime &iTime)
 {
-  char fname [CS_MAXPATHLEN + 1];
+  PathString fname;
   csArchive *a;
   if (!FindFile (Suffix, fname, a))
     return false;
@@ -1432,7 +1460,7 @@ bool VfsNode::SetFileTime (const char *Suffix, const csFileTime &iTime)
 
 bool VfsNode::GetFileSize (const char *Suffix, size_t &oSize)
 {
-  char fname [CS_MAXPATHLEN + 1];
+  PathString fname;
   csArchive *a;
   if (!FindFile (Suffix, fname, a))
     return false;

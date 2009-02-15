@@ -143,10 +143,19 @@ template <typename T> T SwigValueInit() {
     #ifndef __STDC_LIMIT_MACROS
     #define __STDC_LIMIT_MACROS
     #endif
+    #ifdef _MSC_VER
+    #include <io.h>
+    #include <stdarg.h>
     #ifndef DEBUG_PYTHON
     #undef _DEBUG
+    #define RESTORE__DEBUG
+    #endif
     #endif
     #include <Python.h>
+    #ifdef RESTORE__DEBUG
+    #define _DEBUG
+    #undef RESTORE__DEBUG
+    #endif
 
 /* -----------------------------------------------------------------------------
  * swigrun.swg
@@ -2846,13 +2855,6 @@ SWIG_From_unsigned_SS_long  (unsigned long value)
 }
 
 
-SWIGINTERNINLINE PyObject *
-SWIG_From_unsigned_SS_int  (unsigned int value)
-{    
-  return SWIG_From_unsigned_SS_long  (value);
-}
-
-
 #include <float.h>
 
 
@@ -2999,16 +3001,6 @@ SWIG_AsVal_bool (PyObject *obj, bool *val)
 }
 
 
-#include <limits.h>
-#if !defined(SWIG_NO_LLONG_MAX)
-# if !defined(LLONG_MAX) && defined(__GNUC__) && defined (__LONG_LONG_MAX__)
-#   define LLONG_MAX __LONG_LONG_MAX__
-#   define LLONG_MIN (-LLONG_MAX - 1LL)
-#   define ULLONG_MAX (LLONG_MAX * 2ULL + 1ULL)
-# endif
-#endif
-
-
 SWIGINTERN int
 SWIG_AsVal_unsigned_SS_long (PyObject *obj, unsigned long *val) 
 {
@@ -3050,22 +3042,6 @@ SWIG_AsVal_unsigned_SS_long (PyObject *obj, unsigned long *val)
   }
 #endif
   return SWIG_TypeError;
-}
-
-
-SWIGINTERN int
-SWIG_AsVal_unsigned_SS_int (PyObject * obj, unsigned int *val)
-{
-  unsigned long v;
-  int res = SWIG_AsVal_unsigned_SS_long (obj, &v);
-  if (SWIG_IsOK(res)) {
-    if ((v > UINT_MAX)) {
-      return SWIG_OverflowError;
-    } else {
-      if (val) *val = static_cast< unsigned int >(v);
-    }
-  }  
-  return res;
 }
 
 SWIGINTERN int iDecalTemplate_scfGetVersion(){ return scfInterfaceTraits<iDecalTemplate>::GetVersion(); }
@@ -3165,6 +3141,16 @@ SWIG_AsCharPtrAndSize(PyObject *obj, char** cptr, size_t* psize, int *alloc)
 
 
 
+#include <limits.h>
+#if !defined(SWIG_NO_LLONG_MAX)
+# if !defined(LLONG_MAX) && defined(__GNUC__) && defined (__LONG_LONG_MAX__)
+#   define LLONG_MAX __LONG_LONG_MAX__
+#   define LLONG_MIN (-LLONG_MAX - 1LL)
+#   define ULLONG_MAX (LLONG_MAX * 2ULL + 1ULL)
+# endif
+#endif
+
+
 SWIGINTERN int
 SWIG_AsVal_int (PyObject * obj, int *val)
 {
@@ -3206,6 +3192,8 @@ SWIG_FromCharPtr(const char *cptr)
 
 SWIGINTERN int iConsoleOutput_scfGetVersion(){ return scfInterfaceTraits<iConsoleOutput>::GetVersion(); }
 SWIGINTERN void delete_iConsoleOutput(iConsoleOutput *self){ if (self) self->DecRef (); }
+SWIGINTERN int iConsoleExecCallback_scfGetVersion(){ return scfInterfaceTraits<iConsoleExecCallback>::GetVersion(); }
+SWIGINTERN void delete_iConsoleExecCallback(iConsoleExecCallback *self){ if (self) self->DecRef (); }
 SWIGINTERN int iConsoleInput_scfGetVersion(){ return scfInterfaceTraits<iConsoleInput>::GetVersion(); }
 SWIGINTERN void delete_iConsoleInput(iConsoleInput *self){ if (self) self->DecRef (); }
 SWIGINTERN int iStandardReporterListener_scfGetVersion(){ return scfInterfaceTraits<iStandardReporterListener>::GetVersion(); }
@@ -3221,6 +3209,22 @@ SWIGINTERN int iCollideSystem_scfGetVersion(){ return scfInterfaceTraits<iCollid
 SWIGINTERN void delete_iCollideSystem(iCollideSystem *self){ if (self) self->DecRef (); }
 SWIGINTERN int iDynamics_scfGetVersion(){ return scfInterfaceTraits<iDynamics>::GetVersion(); }
 SWIGINTERN void delete_iDynamics(iDynamics *self){ if (self) self->DecRef (); }
+
+SWIGINTERN int
+SWIG_AsVal_unsigned_SS_int (PyObject * obj, unsigned int *val)
+{
+  unsigned long v;
+  int res = SWIG_AsVal_unsigned_SS_long (obj, &v);
+  if (SWIG_IsOK(res)) {
+    if ((v > UINT_MAX)) {
+      return SWIG_OverflowError;
+    } else {
+      if (val) *val = static_cast< unsigned int >(v);
+    }
+  }  
+  return res;
+}
+
 SWIGINTERN int iDynamicSystem_scfGetVersion(){ return scfInterfaceTraits<iDynamicSystem>::GetVersion(); }
 SWIGINTERN void delete_iDynamicSystem(iDynamicSystem *self){ if (self) self->DecRef (); }
 SWIGINTERN int iBodyGroup_scfGetVersion(){ return scfInterfaceTraits<iBodyGroup>::GetVersion(); }
@@ -3255,6 +3259,13 @@ SWIGINTERN int iSequenceOperation_scfGetVersion(){ return scfInterfaceTraits<iSe
 SWIGINTERN void delete_iSequenceOperation(iSequenceOperation *self){ if (self) self->DecRef (); }
 SWIGINTERN int iSequenceCondition_scfGetVersion(){ return scfInterfaceTraits<iSequenceCondition>::GetVersion(); }
 SWIGINTERN void delete_iSequenceCondition(iSequenceCondition *self){ if (self) self->DecRef (); }
+
+SWIGINTERNINLINE PyObject *
+SWIG_From_unsigned_SS_int  (unsigned int value)
+{    
+  return SWIG_From_unsigned_SS_long  (value);
+}
+
 SWIGINTERN int iSequence_scfGetVersion(){ return scfInterfaceTraits<iSequence>::GetVersion(); }
 SWIGINTERN void delete_iSequence(iSequence *self){ if (self) self->DecRef (); }
 SWIGINTERN int iSequenceManager_scfGetVersion(){ return scfInterfaceTraits<iSequenceManager>::GetVersion(); }
@@ -3710,7 +3721,7 @@ SWIGINTERN PyObject *_wrap_iDecalTemplate_GetMixMode(PyObject *SWIGUNUSEDPARM(se
   }
   arg1 = reinterpret_cast< iDecalTemplate * >(argp1);
   result = (uint)((iDecalTemplate const *)arg1)->GetMixMode();
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -4161,7 +4172,7 @@ SWIGINTERN PyObject *_wrap_iDecalTemplate_SetMixMode(PyObject *SWIGUNUSEDPARM(se
   uint arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -4172,7 +4183,7 @@ SWIGINTERN PyObject *_wrap_iDecalTemplate_SetMixMode(PyObject *SWIGUNUSEDPARM(se
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iDecalTemplate_SetMixMode" "', argument " "1"" of type '" "iDecalTemplate *""'"); 
   }
   arg1 = reinterpret_cast< iDecalTemplate * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iDecalTemplate_SetMixMode" "', argument " "2"" of type '" "uint""'");
   } 
@@ -6250,6 +6261,19 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iConsoleExecCallback_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iConsoleExecCallback_scfGetVersion",0,0)) SWIG_fail;
+  result = (int)iConsoleExecCallback_scfGetVersion();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iConsoleExecCallback(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iConsoleExecCallback *arg1 = (iConsoleExecCallback *) 0 ;
@@ -6263,7 +6287,7 @@ SWIGINTERN PyObject *_wrap_delete_iConsoleExecCallback(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iConsoleExecCallback" "', argument " "1"" of type '" "iConsoleExecCallback *""'"); 
   }
   arg1 = reinterpret_cast< iConsoleExecCallback * >(argp1);
-  delete arg1;
+  delete_iConsoleExecCallback(arg1);
   
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -8419,7 +8443,7 @@ SWIGINTERN PyObject *_wrap_iBugPlug_DebugSectorBox__SWIG_0(PyObject *SWIGUNUSEDP
   int alloc6 = 0 ;
   void *argp7 = 0 ;
   int res7 = 0 ;
-  unsigned int val8 ;
+  unsigned long val8 ;
   int ecode8 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -8469,7 +8493,7 @@ SWIGINTERN PyObject *_wrap_iBugPlug_DebugSectorBox__SWIG_0(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "iBugPlug_DebugSectorBox" "', argument " "7"" of type '" "iMeshObject *""'"); 
   }
   arg7 = reinterpret_cast< iMeshObject * >(argp7);
-  ecode8 = SWIG_AsVal_unsigned_SS_int(obj7, &val8);
+  ecode8 = SWIG_AsVal_unsigned_SS_long(obj7, &val8);
   if (!SWIG_IsOK(ecode8)) {
     SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "iBugPlug_DebugSectorBox" "', argument " "8"" of type '" "uint""'");
   } 
@@ -8845,7 +8869,7 @@ SWIGINTERN PyObject *_wrap_iBugPlug_DebugSectorBox(PyObject *self, PyObject *arg
                 _v = SWIG_CheckState(res);
                 if (_v) {
                   {
-                    int res = SWIG_AsVal_unsigned_SS_int(argv[7], NULL);
+                    int res = SWIG_AsVal_unsigned_SS_long(argv[7], NULL);
                     _v = SWIG_CheckState(res);
                   }
                   if (_v) {
@@ -8890,7 +8914,7 @@ SWIGINTERN PyObject *_wrap_iBugPlug_DebugSectorTriangle__SWIG_0(PyObject *SWIGUN
   int ecode6 = 0 ;
   float val7 ;
   int ecode7 = 0 ;
-  unsigned int val8 ;
+  unsigned long val8 ;
   int ecode8 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -8946,7 +8970,7 @@ SWIGINTERN PyObject *_wrap_iBugPlug_DebugSectorTriangle__SWIG_0(PyObject *SWIGUN
     SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iBugPlug_DebugSectorTriangle" "', argument " "7"" of type '" "float""'");
   } 
   arg7 = static_cast< float >(val7);
-  ecode8 = SWIG_AsVal_unsigned_SS_int(obj7, &val8);
+  ecode8 = SWIG_AsVal_unsigned_SS_long(obj7, &val8);
   if (!SWIG_IsOK(ecode8)) {
     SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "iBugPlug_DebugSectorTriangle" "', argument " "8"" of type '" "uint""'");
   } 
@@ -9123,7 +9147,7 @@ SWIGINTERN PyObject *_wrap_iBugPlug_DebugSectorTriangle(PyObject *self, PyObject
                 }
                 if (_v) {
                   {
-                    int res = SWIG_AsVal_unsigned_SS_int(argv[7], NULL);
+                    int res = SWIG_AsVal_unsigned_SS_long(argv[7], NULL);
                     _v = SWIG_CheckState(res);
                   }
                   if (_v) {
@@ -30776,7 +30800,7 @@ SWIGINTERN PyObject *_wrap_iEngineSequenceManager_FireTimedOperation__SWIG_0(PyO
   int res4 = 0 ;
   void *argp5 = 0 ;
   int res5 = 0 ;
-  unsigned int val6 ;
+  unsigned long val6 ;
   int ecode6 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -30811,7 +30835,7 @@ SWIGINTERN PyObject *_wrap_iEngineSequenceManager_FireTimedOperation__SWIG_0(PyO
     SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iEngineSequenceManager_FireTimedOperation" "', argument " "5"" of type '" "iBase *""'"); 
   }
   arg5 = reinterpret_cast< iBase * >(argp5);
-  ecode6 = SWIG_AsVal_unsigned_SS_int(obj5, &val6);
+  ecode6 = SWIG_AsVal_unsigned_SS_long(obj5, &val6);
   if (!SWIG_IsOK(ecode6)) {
     SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iEngineSequenceManager_FireTimedOperation" "', argument " "6"" of type '" "uint""'");
   } 
@@ -31021,7 +31045,7 @@ SWIGINTERN PyObject *_wrap_iEngineSequenceManager_FireTimedOperation(PyObject *s
             _v = SWIG_CheckState(res);
             if (_v) {
               {
-                int res = SWIG_AsVal_unsigned_SS_int(argv[5], NULL);
+                int res = SWIG_AsVal_unsigned_SS_long(argv[5], NULL);
                 _v = SWIG_CheckState(res);
               }
               if (_v) {
@@ -31046,7 +31070,7 @@ SWIGINTERN PyObject *_wrap_iEngineSequenceManager_DestroyTimedOperations(PyObjec
   uint arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -31057,7 +31081,7 @@ SWIGINTERN PyObject *_wrap_iEngineSequenceManager_DestroyTimedOperations(PyObjec
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iEngineSequenceManager_DestroyTimedOperations" "', argument " "1"" of type '" "iEngineSequenceManager *""'"); 
   }
   arg1 = reinterpret_cast< iEngineSequenceManager * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iEngineSequenceManager_DestroyTimedOperations" "', argument " "2"" of type '" "uint""'");
   } 
@@ -32085,7 +32109,7 @@ SWIGINTERN PyObject *_wrap_csSequenceOp_sequence_id_set(PyObject *SWIGUNUSEDPARM
   uint arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -32096,7 +32120,7 @@ SWIGINTERN PyObject *_wrap_csSequenceOp_sequence_id_set(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSequenceOp_sequence_id_set" "', argument " "1"" of type '" "csSequenceOp *""'"); 
   }
   arg1 = reinterpret_cast< csSequenceOp * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csSequenceOp_sequence_id_set" "', argument " "2"" of type '" "uint""'");
   } 
@@ -32125,7 +32149,7 @@ SWIGINTERN PyObject *_wrap_csSequenceOp_sequence_id_get(PyObject *SWIGUNUSEDPARM
   }
   arg1 = reinterpret_cast< csSequenceOp * >(argp1);
   result = (uint) ((arg1)->sequence_id);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -32211,7 +32235,7 @@ SWIGINTERN PyObject *_wrap_iSequence_AddOperation__SWIG_0(PyObject *SWIGUNUSEDPA
   int res3 = 0 ;
   void *argp4 = 0 ;
   int res4 = 0 ;
-  unsigned int val5 ;
+  unsigned long val5 ;
   int ecode5 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -32240,7 +32264,7 @@ SWIGINTERN PyObject *_wrap_iSequence_AddOperation__SWIG_0(PyObject *SWIGUNUSEDPA
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iSequence_AddOperation" "', argument " "4"" of type '" "iBase *""'"); 
   }
   arg4 = reinterpret_cast< iBase * >(argp4);
-  ecode5 = SWIG_AsVal_unsigned_SS_int(obj4, &val5);
+  ecode5 = SWIG_AsVal_unsigned_SS_long(obj4, &val5);
   if (!SWIG_IsOK(ecode5)) {
     SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iSequence_AddOperation" "', argument " "5"" of type '" "uint""'");
   } 
@@ -32415,7 +32439,7 @@ SWIGINTERN PyObject *_wrap_iSequence_AddOperation(PyObject *self, PyObject *args
           _v = SWIG_CheckState(res);
           if (_v) {
             {
-              int res = SWIG_AsVal_unsigned_SS_int(argv[4], NULL);
+              int res = SWIG_AsVal_unsigned_SS_long(argv[4], NULL);
               _v = SWIG_CheckState(res);
             }
             if (_v) {
@@ -32448,7 +32472,7 @@ SWIGINTERN PyObject *_wrap_iSequence_AddRunSequence__SWIG_0(PyObject *SWIGUNUSED
   int res3 = 0 ;
   void *argp4 = 0 ;
   int res4 = 0 ;
-  unsigned int val5 ;
+  unsigned long val5 ;
   int ecode5 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -32477,7 +32501,7 @@ SWIGINTERN PyObject *_wrap_iSequence_AddRunSequence__SWIG_0(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iSequence_AddRunSequence" "', argument " "4"" of type '" "iBase *""'"); 
   }
   arg4 = reinterpret_cast< iBase * >(argp4);
-  ecode5 = SWIG_AsVal_unsigned_SS_int(obj4, &val5);
+  ecode5 = SWIG_AsVal_unsigned_SS_long(obj4, &val5);
   if (!SWIG_IsOK(ecode5)) {
     SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iSequence_AddRunSequence" "', argument " "5"" of type '" "uint""'");
   } 
@@ -32652,7 +32676,7 @@ SWIGINTERN PyObject *_wrap_iSequence_AddRunSequence(PyObject *self, PyObject *ar
           _v = SWIG_CheckState(res);
           if (_v) {
             {
-              int res = SWIG_AsVal_unsigned_SS_int(argv[4], NULL);
+              int res = SWIG_AsVal_unsigned_SS_long(argv[4], NULL);
               _v = SWIG_CheckState(res);
             }
             if (_v) {
@@ -32691,7 +32715,7 @@ SWIGINTERN PyObject *_wrap_iSequence_AddCondition__SWIG_0(PyObject *SWIGUNUSEDPA
   int res5 = 0 ;
   void *argp6 = 0 ;
   int res6 = 0 ;
-  unsigned int val7 ;
+  unsigned long val7 ;
   int ecode7 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -32732,7 +32756,7 @@ SWIGINTERN PyObject *_wrap_iSequence_AddCondition__SWIG_0(PyObject *SWIGUNUSEDPA
     SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "iSequence_AddCondition" "', argument " "6"" of type '" "iBase *""'"); 
   }
   arg6 = reinterpret_cast< iBase * >(argp6);
-  ecode7 = SWIG_AsVal_unsigned_SS_int(obj6, &val7);
+  ecode7 = SWIG_AsVal_unsigned_SS_long(obj6, &val7);
   if (!SWIG_IsOK(ecode7)) {
     SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "iSequence_AddCondition" "', argument " "7"" of type '" "uint""'");
   } 
@@ -32971,7 +32995,7 @@ SWIGINTERN PyObject *_wrap_iSequence_AddCondition(PyObject *self, PyObject *args
               _v = SWIG_CheckState(res);
               if (_v) {
                 {
-                  int res = SWIG_AsVal_unsigned_SS_int(argv[6], NULL);
+                  int res = SWIG_AsVal_unsigned_SS_long(argv[6], NULL);
                   _v = SWIG_CheckState(res);
                 }
                 if (_v) {
@@ -33009,7 +33033,7 @@ SWIGINTERN PyObject *_wrap_iSequence_AddLoop__SWIG_0(PyObject *SWIGUNUSEDPARM(se
   int res4 = 0 ;
   void *argp5 = 0 ;
   int res5 = 0 ;
-  unsigned int val6 ;
+  unsigned long val6 ;
   int ecode6 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -33044,7 +33068,7 @@ SWIGINTERN PyObject *_wrap_iSequence_AddLoop__SWIG_0(PyObject *SWIGUNUSEDPARM(se
     SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iSequence_AddLoop" "', argument " "5"" of type '" "iBase *""'"); 
   }
   arg5 = reinterpret_cast< iBase * >(argp5);
-  ecode6 = SWIG_AsVal_unsigned_SS_int(obj5, &val6);
+  ecode6 = SWIG_AsVal_unsigned_SS_long(obj5, &val6);
   if (!SWIG_IsOK(ecode6)) {
     SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iSequence_AddLoop" "', argument " "6"" of type '" "uint""'");
   } 
@@ -33251,7 +33275,7 @@ SWIGINTERN PyObject *_wrap_iSequence_AddLoop(PyObject *self, PyObject *args) {
             _v = SWIG_CheckState(res);
             if (_v) {
               {
-                int res = SWIG_AsVal_unsigned_SS_int(argv[5], NULL);
+                int res = SWIG_AsVal_unsigned_SS_long(argv[5], NULL);
                 _v = SWIG_CheckState(res);
               }
               if (_v) {
@@ -33592,7 +33616,7 @@ SWIGINTERN PyObject *_wrap_iSequenceManager_RunSequence__SWIG_0(PyObject *SWIGUN
   int res3 = 0 ;
   void *argp4 = 0 ;
   int res4 = 0 ;
-  unsigned int val5 ;
+  unsigned long val5 ;
   int ecode5 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -33621,7 +33645,7 @@ SWIGINTERN PyObject *_wrap_iSequenceManager_RunSequence__SWIG_0(PyObject *SWIGUN
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "iSequenceManager_RunSequence" "', argument " "4"" of type '" "iBase *""'"); 
   }
   arg4 = reinterpret_cast< iBase * >(argp4);
-  ecode5 = SWIG_AsVal_unsigned_SS_int(obj4, &val5);
+  ecode5 = SWIG_AsVal_unsigned_SS_long(obj4, &val5);
   if (!SWIG_IsOK(ecode5)) {
     SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "iSequenceManager_RunSequence" "', argument " "5"" of type '" "uint""'");
   } 
@@ -33796,7 +33820,7 @@ SWIGINTERN PyObject *_wrap_iSequenceManager_RunSequence(PyObject *self, PyObject
           _v = SWIG_CheckState(res);
           if (_v) {
             {
-              int res = SWIG_AsVal_unsigned_SS_int(argv[4], NULL);
+              int res = SWIG_AsVal_unsigned_SS_long(argv[4], NULL);
               _v = SWIG_CheckState(res);
             }
             if (_v) {
@@ -33820,7 +33844,7 @@ SWIGINTERN PyObject *_wrap_iSequenceManager_DestroySequenceOperations(PyObject *
   uint arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -33831,7 +33855,7 @@ SWIGINTERN PyObject *_wrap_iSequenceManager_DestroySequenceOperations(PyObject *
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSequenceManager_DestroySequenceOperations" "', argument " "1"" of type '" "iSequenceManager *""'"); 
   }
   arg1 = reinterpret_cast< iSequenceManager * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSequenceManager_DestroySequenceOperations" "', argument " "2"" of type '" "uint""'");
   } 
@@ -33859,7 +33883,7 @@ SWIGINTERN PyObject *_wrap_iSequenceManager_GetUniqueID(PyObject *SWIGUNUSEDPARM
   }
   arg1 = reinterpret_cast< iSequenceManager * >(argp1);
   result = (uint)(arg1)->GetUniqueID();
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -38392,6 +38416,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"delete_iConsoleOutput", _wrap_delete_iConsoleOutput, METH_VARARGS, NULL},
 	 { (char *)"iConsoleOutput_swigregister", iConsoleOutput_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iConsoleExecCallback_Execute", _wrap_iConsoleExecCallback_Execute, METH_VARARGS, NULL},
+	 { (char *)"iConsoleExecCallback_scfGetVersion", _wrap_iConsoleExecCallback_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iConsoleExecCallback", _wrap_delete_iConsoleExecCallback, METH_VARARGS, NULL},
 	 { (char *)"iConsoleExecCallback_swigregister", iConsoleExecCallback_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iConsoleInput_Bind", _wrap_iConsoleInput_Bind, METH_VARARGS, NULL},

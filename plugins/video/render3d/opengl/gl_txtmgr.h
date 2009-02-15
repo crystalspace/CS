@@ -36,7 +36,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
 
 class csGLGraphics3D;
-class csGLSuperLightmap;
 class csGLTextureHandle;
 class csGLTextureManager;
 
@@ -121,9 +120,6 @@ public:
   CS_LEAKGUARD_DECLARE (csGLTextureManager);
 
   csWeakRef<csGLGraphics3D> G3D;
-
-  /// All SLMs currently in use.
-  csArray<csGLSuperLightmap*> superLMs;
 
   int max_tex_size;
   /// Sharpen mipmaps?
@@ -222,13 +218,8 @@ public:
    */
   virtual int GetTextureFormat ();
 
-  virtual csPtr<iSuperLightmap> CreateSuperLightmap(int width, int height);
-
   virtual void GetMaxTextureSize (int& w, int& h, int& aspect);
 
-  /// Dump all SLMs to image files.
-  void DumpSuperLightmaps (iVFS* VFS, iImageIO* iio, const char* dir);
-  
   void DumpTextures (iVFS* VFS, iImageIO* iio, const char* dir);
 };
 

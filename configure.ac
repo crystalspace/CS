@@ -407,7 +407,13 @@ AC_DEFUN([CS_JAVA_FLAGS],
 	    AS_IF([test -n "$cs_java_platform"],
 		[$1_cflags="$$1_cflags
 		    $$1_cflags/$cs_java_platform"])
-	    $1_cflags=CS_PATH_NORMALIZE([$$1_cflags])])])])
+	    $1_cflags=CS_PATH_NORMALIZE([$$1_cflags])
+	    for i in `find "$$1_dir/" -name '*jvm.*' -print`; do
+	        echo `AS_DIRNAME([$i])`; done | sort | uniq > conftest.jlib
+	    $1_lflags=`sed 's/^\(.*\)$/-L\1/' < conftest.jlib`
+	    $1_lflags=CS_PATH_NORMALIZE([$$1_lflags])
+	    rm -f conftest.jlib
+	    $1_libs="-ljvm"])])])
 
 JAVA_HOME=CS_PATH_NORMALIZE([$JAVA_HOME])
 
@@ -439,7 +445,8 @@ AS_IF([test "$with_java" != no && test -n "$JAVAC" && test -n "$JAVA"],
 	    #endif
 	    #endif
 	    #include <jni.h>
-	    JNIEXPORT void JNICALL f(JNIEnv* env, jobject obj);]])],
+	    JNIEXPORT void JNICALL f(JNIEnv* env, jobject obj);]],
+	    [JNI_GetCreatedJavaVMs(0,0,0);])],
 	[CS_CREATE_TUPLE() \
         CS_CREATE_TUPLE([$cs_java_cflags],[$cs_java_lflags],[$cs_java_libs])],
 	[], [CS_EMIT_BUILD_RESULT([cs_cv_java], [JAVA])])])

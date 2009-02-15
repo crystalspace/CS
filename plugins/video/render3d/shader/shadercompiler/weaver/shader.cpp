@@ -26,6 +26,7 @@
 #include "ivaria/reporter.h"
 
 #include "csplugincommon/shader/shadercachehelper.h"
+#include "csutil/base64.h"
 #include "csutil/csendian.h"
 #include "csutil/cspmeter.h"
 #include "csutil/documenthelper.h"
@@ -40,48 +41,6 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
-
-  static csString EncodeBase64 (iDataBuffer* data)
-  {
-    static const char encodeChars[] =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-  
-    csString ret;
-    uint8* ptr = data->GetUint8();
-    size_t bytes = data->GetSize();
-    ret.SetCapacity (((bytes+2)/3)*4);
-    while (bytes >= 3)
-    {
-      uint v = (ptr[0] << 16) | (ptr[1] << 8) | (ptr[2]);
-      ptr += 3;
-      bytes -= 3;
-      ret << encodeChars[(v >> 18)];
-      ret << encodeChars[(v >> 12) & 0x3f];
-      ret << encodeChars[(v >> 6) & 0x3f];
-      ret << encodeChars[v & 0x3f];
-    }
-    if (bytes > 0)
-    {
-      uint v = (ptr[0] << 16);
-      if (bytes > 1)
-        v |= (ptr[1] << 8);
-      data += 3;
-      bytes -= 3;
-      ret << encodeChars[(v >> 18)];
-      ret << encodeChars[(v >> 12) & 0x3f];
-      if (bytes > 1)
-      {
-        ret << encodeChars[(v >> 6) & 0x3f];
-        ret << "=";
-      }
-      else
-        ret << "==";
-    }
-    
-    return ret;
-  }
-
-  //-------------------------------------------------------------------------
 
   CS_LEAKGUARD_IMPLEMENT (WeaverShader);
 
@@ -487,7 +446,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (!synthShader.IsValid())
     {
       csRef<iDataBuffer> hashStream = hasher.GetHashStream ();
-      csString cacheTag = EncodeBase64 (hashStream);
+      /* @@@ Actually, the cache tag wouldn't have to be that large.
+	 In theory, anything would work as long as (a) it changes when the
+	 shader or some file it uses changes (b) the tag is reasonably
+	 unique (also over multiple program runs).
+	 E.g. a UUID, recomputed when the shader is 'touched',
+	 could do as well. */
+      csString cacheTag = CS::Utility::EncodeBase64 (hashStream);
     
       bool cacheState;
       csMemFile cacheFile;

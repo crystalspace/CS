@@ -56,12 +56,10 @@
 #include "polygon.h"
 #include "polyrender.h"
 
-struct iShadowBlockList;
 struct csVisObjInfo;
 struct iGraphics3D;
 struct iRenderView;
 struct iMovable;
-struct iFrustumView;
 struct iMaterialWrapper;
 struct iPolygonBuffer;
 
@@ -690,8 +688,6 @@ private:
   /// Polys with the same material and the same SLM
   struct csLitPolyGroup : public csPolyGroup
   {
-    csRefArray<iRendererLightmap> lightmaps;
-    csRef<iSuperLightmap> SLM;
   };
 
   csPDelArray<csLitPolyGroup> litPolys;
@@ -871,7 +867,7 @@ public:
    */
   iTextureHandle* GetPolygonTexture (size_t index)
   {
-    return index < litPolys.GetSize () ? litPolys[index]->SLM->GetTexture() : 0;
+    return 0;
   }
   /// Ensure lightmap textures are up-to-date
   void UpdateDirtyLMs ();
@@ -879,19 +875,6 @@ public:
   //----------------------------------------------------------------------
   // Utility functions
   //----------------------------------------------------------------------
-
-  /**
-   * Check frustum visibility on this thing.
-   * First initialize the 2D culler cube.
-   */
-  //virtual void CastShadows (iMovable* movable, iFrustumView* lview);
-
-  /**
-   * Append a list of shadow frustums which extend from
-   * this thing. The origin is the position of the light.
-   */
-  virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
-  	const csVector3& origin);
 
   /**
    * Test a beam with this thing.

@@ -44,16 +44,17 @@
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "imap/reader.h"
+#include "imap/services.h"
 #include "itexture/iproctex.h"
 #include "iutil/databuff.h"
 #include "iutil/document.h"
 #include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
+#include "ivaria/reporter.h"
 #include "ivideo/material.h"
 #include "ivideo/texture.h"
 
-#include "csloader.h"
 #include "csthreadedloader.h"
 #include "loadtex.h"
 
@@ -187,7 +188,7 @@ THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadTexture, const char* fname,
 
   csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
   LoadImageTC (itr, fname, Format, do_verbose);
-  csRef<iImage> Image = scfQueryInterface<iImage>(itr->GetResultRefPtr());
+  csRef<iImage> Image = scfQueryInterfaceSafe<iImage>(itr->GetResultRefPtr());
   if (!Image)
   {
     ReportWarning ("crystalspace.maploader.parse.texture",
@@ -378,326 +379,7 @@ THREADED_CALLABLE_IMPL10(csThreadedLoader, LoadTexture, const char* name,
   return true;
 }
 
-// --------------------------------------------------------------------- //
-
-csPtr<iImage> csLoader::LoadImage (iDataBuffer* buf, const char* fname,
-	int Format)
-{
-  if (!ImageLoader)
-     return 0;
-
-  if (Format & CS_IMGFMT_INVALID)
-  {
-    if (Engine)
-      Format = Engine->GetTextureFormat ();
-    else if (G3D)
-      Format = G3D->GetTextureManager()->GetTextureFormat();
-    else
-      Format = CS_IMGFMT_TRUECOLOR;
-  }
-
-  if (!buf || !buf->GetSize ())
-  {
-    ReportWarning (
-	"crystalspace.maploader.parse.image",
-    	"Could not open image file '%s' on VFS!", fname ? fname : "<unknown>");
-    return 0;
-  }
-
-  // we don't use csRef because we need to return an Increfed object later
-  csRef<iImage> image (ImageLoader->Load (buf, Format));
-  if (!image)
-  {
-    ReportWarning (
-	"crystalspace.maploader.parse.image",
-	"Could not load image '%s'. Unknown format!",
-	fname ? fname : "<unknown>");
-    return 0;
-  }
-
-  if (fname)
-  {
-    csRef<iDataBuffer> xname = VFS->ExpandPath (fname);
-    image->SetName (**xname);
-  }
-
-  return csPtr<iImage> (image);
-}
-
-csPtr<iImage> csLoader::LoadImage (iDataBuffer* buf, int Format)
-{
-  return LoadImage (buf, 0, Format);
-}
-
-csPtr<iTextureHandle> csLoader::LoadTexture (iDataBuffer* buf, int Flags,
-	iTextureManager *tm, csRef<iImage>* img)
-{
-  if (!tm && G3D) tm = G3D->GetTextureManager();
-  int Format;
-  if (tm)
-    Format = tm->GetTextureFormat ();
-  else
-    Format = CS_IMGFMT_TRUECOLOR;
-
-  csRef<iImage> Image = LoadImage (buf, Format);
-  if (!Image)
-  {
-    ReportWarning (
-	"crystalspace.maploader.parse.texture",
-	"Couldn't load image. Using error texture instead!");
-    //Image = csCreateXORPatternImage (32, 32, 5);
-    Image = GenerateErrorTexture (32, 32);
-    if (!Image)
-      return 0;
-  }
-
-  if(img) *img=Image;
-
-  if (!tm)
-    return 0;
-  
-  csRef<scfString> fail_reason;
-  fail_reason.AttachNew (new scfString ());
-  csRef<iTextureHandle> TexHandle = tm->RegisterTexture (Image, Flags,
-      fail_reason);
-  if (!TexHandle)
-  {
-    ReportError (
-	"crystalspace.maploader.parse.texture",
-	"Cannot create texture: %s",
-	fail_reason->GetData ());
-    return 0;
-  }
-
-  return csPtr<iTextureHandle> (TexHandle);
-}
-
-iTextureWrapper* csLoader::LoadTexture (const char *name,
-	iDataBuffer* buf, int Flags, iTextureManager *tm, bool reg,
-	bool create_material, bool free_image)
-{
-  if (!Engine)
-    return 0;
-
-  csRef<iImage> img;
-  if (!tm && G3D) tm = G3D->GetTextureManager();
-  csRef<iTextureHandle> TexHandle = LoadTexture (buf, Flags, tm, &img);
-  if (!TexHandle)
-    return 0;
-
-  iTextureWrapper *TexWrapper =
-	Engine->GetTextureList ()->NewTexture(TexHandle);
-  TexWrapper->QueryObject ()->SetName (name);
-  TexWrapper->SetImageFile(img);
-
-  iMaterialWrapper* matwrap = 0;
-  if (create_material)
-  {
-    csRef<iMaterial> material (Engine->CreateBaseMaterial (TexWrapper));
-    matwrap = Engine->GetMaterialList ()->NewMaterial (material, name);
-  }
-
-  if (reg && tm)
-  {
-    // If we already have a texture handle then we don't register again.
-    if (!TexWrapper->GetTextureHandle ())
-      TexWrapper->Register (tm);
-    if (free_image)
-      TexWrapper->SetImageFile (0);
-  }
-
-  return TexWrapper;
-}
-
-csPtr<iImage> csLoader::LoadImage (const char* fname, int Format)
-{
-  csRef<iDataBuffer> buf = VFS->ReadFile (fname, false);
-  return LoadImage (buf, fname, Format);
-}
-
-csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
-	iTextureManager *tm, csRef<iImage>* img)
-{
-  if (!tm && G3D) tm = G3D->GetTextureManager();
-  int Format;
-  if (tm)
-    Format = tm->GetTextureFormat ();
-  else
-    Format = CS_IMGFMT_TRUECOLOR;
-
-  csRef<iImage> Image = LoadImage (fname, Format);
-  if (!Image)
-  {
-    ReportWarning (
-	"crystalspace.maploader.parse.texture",
-	"Couldn't load image '%s', using error texture instead!",
-	fname);
-    //Image = csCreateXORPatternImage (32, 32, 5);
-    Image = GenerateErrorTexture (32, 32);
-    if (!Image)
-      return 0;
-  }
-
-  if(img) *img=Image;
-
-  if (!tm)
-    return 0;
-  
-  csRef<scfString> fail_reason;
-  fail_reason.AttachNew (new scfString ());
-  csRef<iTextureHandle> TexHandle (tm->RegisterTexture (Image, Flags,
-	fail_reason));
-  if (!TexHandle)
-  {
-    ReportError (
-	"crystalspace.maploader.parse.texture",
-	"Cannot create texture from '%s': '%s'", fname,
-	fail_reason->GetData ());
-    return 0;
-  }
-
-  return csPtr<iTextureHandle> (TexHandle);
-}
-
-iTextureWrapper* csLoader::LoadTexture (const char *name,
-	const char *fname, int Flags, iTextureManager *tm, bool reg,
-	bool create_material, bool free_image, iCollection* collection,
-  uint keepFlags)
-{
-  if (!Engine)
-    return 0;
-
-  csRef<iImage> img;
-  if (!tm && G3D) tm = G3D->GetTextureManager();
-  csRef<iTextureHandle> TexHandle = LoadTexture (fname, Flags, tm, &img);
-  if (!TexHandle)
-    return 0;
-
-  iTextureWrapper *TexWrapper =
-    Engine->GetTextureList ()->NewTexture(TexHandle);
-  TexWrapper->QueryObject ()->SetName (name);
-  TexWrapper->SetImageFile(img);
-  if(collection)
-  {
-    collection->Add(TexWrapper->QueryObject());
-  }
-
-  iMaterialWrapper* matwrap = 0;
-  if (create_material)
-  {
-    csRef<iMaterial> material (Engine->CreateBaseMaterial (TexWrapper));
-    matwrap = Engine->GetMaterialList ()->NewMaterial (material, name);
-    if(collection)
-    {
-      collection->Add(matwrap->QueryObject());
-    }
-  }
-
-  if (reg && tm)
-  {
-    // If we already have a texture handle then we don't register again.
-    if (!TexWrapper->GetTextureHandle ())
-      TexWrapper->Register (tm);
-    if (free_image)
-      TexWrapper->SetImageFile (0);
-  }
-
-  return TexWrapper;
-}
-
-bool csLoader::LoadProxyTextures()
-{
-  // Remove all unused textures and materials.
-  csWeakRefArray<iTextureWrapper> texArray;
-
-  for(uint i=0; i<proxyTextures.GetSize(); i++)
-  {
-    ProxyTexture& proxTex = proxyTextures.Get(i);
-    if(!proxTex.textureWrapper)
-    {
-      proxyTextures.DeleteIndex(i);
-      i--;
-      continue;
-    }
-
-    texArray.Push(proxTex.textureWrapper);
-  }
-
-  CS::Utility::UnusedResourceHelper::UnloadUnusedMaterials(Engine,
-    materialArray);
-  CS::Utility::UnusedResourceHelper::UnloadUnusedTextures(Engine, texArray);
-  materialArray.Empty();
-
-  // Load the remaining textures.
-  iTextureManager *tm = G3D->GetTextureManager();
-  size_t i = proxyTextures.GetSize();
-  while (i-- > 0)
-  {
-    ProxyTexture& proxTex = proxyTextures.Get(i);
-
-    if(!proxTex.textureWrapper)
-    {
-      continue;
-    }
-
-    csRef<iImage> img = proxTex.img->GetProxiedImage();
-
-    csRef<iAnimatedImage> anim = scfQueryInterface<iAnimatedImage>(img);
-    if (anim && anim->IsAnimated())
-    {
-      iLoaderPlugin* plugin = NULL;
-      iBinaryLoaderPlugin* Binplug = NULL;
-      iDocumentNode* defaults = NULL;
-
-      loaded_plugins.FindPlugin(PLUGIN_TEXTURELOADER_ANIMIMG, plugin, Binplug, defaults);
-      if(plugin)
-      {
-        TextureLoaderContext context(proxTex.textureWrapper->QueryObject()->GetName());
-        context.SetClass(proxTex.textureWrapper->GetTextureClass());
-        context.SetFlags(proxTex.textureWrapper->GetFlags());
-        context.SetImage(img);
-
-        csRef<iBase> b = plugin->Parse(0, 0, 0, static_cast<iBase*>(&context));
-        if (b)
-        {
-          csWeakRef<iTextureWrapper> newTex = scfQueryInterface<iTextureWrapper>(b);
-          newTex->QueryObject()->SetName(proxTex.textureWrapper->QueryObject()->GetName());
-          newTex->SetTextureClass(context.GetClass());
-
-          proxTex.textureWrapper->SetTextureHandle(newTex->GetTextureHandle());
-          proxTex.textureWrapper->SetUseCallback(newTex->GetUseCallback());
-
-          csRef<iProcTexture> ipt = scfQueryInterface<iProcTexture> (proxTex.textureWrapper);
-          if(ipt)
-            ipt->SetAlwaysAnimate (proxTex.always_animate);
-        }
-      }
-
-    }
-    else
-    {
-      proxTex.textureWrapper->SetImageFile (img);
-      proxTex.textureWrapper->Register (tm);
-    }
-
-    if(proxTex.keyColour.do_transp)
-    {
-      proxTex.textureWrapper->SetKeyColor(csQint(proxTex.keyColour.colours.red * 255.99),
-        csQint(proxTex.keyColour.colours.green * 255.99),
-        csQint(proxTex.keyColour.colours.blue * 255.99));
-    }
-
-    if(proxTex.alphaType != csAlphaMode::alphaNone)
-    {
-      proxTex.textureWrapper->GetTextureHandle()->SetAlphaType(proxTex.alphaType);
-    }
-  }
-  proxyTextures.Empty ();
-
-  return true;
-}
-
-//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------//
 
 TextureLoaderContext::TextureLoaderContext (const char* texname) :
   scfImplementationType(this)
@@ -840,15 +522,7 @@ csPtr<iBase> csImageTextureLoader::Parse (iDocumentNode* /*node*/,
   }
 
   csRef<iTextureWrapper> TexWrapper;
-  csRef<iThreadedLoader> itl = csQueryRegistry<iThreadedLoader>(object_reg);
-  if(itl.IsValid())
-  {
-    TexWrapper = Engine->GetTextureList ()->CreateTexture(TexHandle);
-  }
-  else
-  {
-    TexWrapper = Engine->GetTextureList ()->NewTexture(TexHandle);
-  }
+  TexWrapper = Engine->GetTextureList ()->CreateTexture(TexHandle);
   TexWrapper->SetImageFile(ctx->GetImage());
 
   return csPtr<iBase> (TexWrapper);
@@ -928,15 +602,7 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
   }
 
   csRef<iTextureWrapper> TexWrapper;
-  csRef<iThreadedLoader> itl = csQueryRegistry<iThreadedLoader>(object_reg);
-  if(itl.IsValid())
-  {
-    TexWrapper = Engine->GetTextureList ()->CreateTexture(TexHandle);
-  }
-  else
-  {
-    TexWrapper = Engine->GetTextureList ()->NewTexture(TexHandle);
-  }
+  TexWrapper = Engine->GetTextureList ()->CreateTexture(TexHandle);
   TexWrapper->SetImageFile (Image);
 
   return csPtr<iBase> (TexWrapper);
@@ -968,7 +634,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
   csRef<iEngine> Engine = csQueryRegistry<iEngine> (object_reg);
   csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
   csRef<iTextureManager> tm = G3D->GetTextureManager();
-  csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
+  csRef<iThreadedLoader> loader = csQueryRegistry<iThreadedLoader> (object_reg);
   csRef<iSyntaxService> SyntaxService = 
     csQueryRegistry<iSyntaxService> (object_reg);
 
@@ -978,6 +644,10 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 
   int Format = tm->GetTextureFormat ();
   const char* fname;
+
+  csThreadedLoader* cstldr = dynamic_cast<csThreadedLoader*>((iThreadedLoader*)loader);
+  csRef<iThreadManager> threadman = csQueryRegistry<iThreadManager>(object_reg);
+  csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -990,32 +660,35 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
     {
       case XMLTOKEN_POSZ:
       case XMLTOKEN_NORTH:
-        fname = child->GetContentsValue ();
-	if (!fname)
-	{
-	  SyntaxService->ReportError (
-	       PLUGIN_TEXTURELOADER_CUBEMAP,
-	       child, "Expected VFS filename for 'file'!");
-	  return 0;
-	}
-      
-	cube->SetSubImage (4, csRef<iImage>(loader->LoadImage (fname, Format)));
-        break;
-    
+        {
+          fname = child->GetContentsValue ();
+          if (!fname)
+          {
+            SyntaxService->ReportError (
+              PLUGIN_TEXTURELOADER_CUBEMAP,
+              child, "Expected VFS filename for 'file'!");
+            return 0;
+          }
+
+          cstldr->LoadImageTC (ret, fname, Format, false);
+          cube->SetSubImage (4, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
+          break;
+        }    
       case XMLTOKEN_NEGZ:
       case XMLTOKEN_SOUTH:
-        fname = child->GetContentsValue ();
-	if (!fname)
-	{
-	  SyntaxService->ReportError (
-	       PLUGIN_TEXTURELOADER_CUBEMAP,
-	       child, "Expected VFS filename for 'file'!");
-	  return 0;
-	}
-      
-	cube->SetSubImage (5, csRef<iImage>(loader->LoadImage (fname, Format)));
-        break;
-    
+        {
+          fname = child->GetContentsValue ();
+          if (!fname)
+          {
+            SyntaxService->ReportError (
+              PLUGIN_TEXTURELOADER_CUBEMAP,
+              child, "Expected VFS filename for 'file'!");
+            return 0;
+          }
+          cstldr->LoadImageTC (ret, fname, Format, false);
+          cube->SetSubImage (5, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
+          break;
+        }    
       case XMLTOKEN_POSX:
       case XMLTOKEN_EAST:
         fname = child->GetContentsValue ();
@@ -1027,7 +700,8 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-	cube->SetSubImage (0, csRef<iImage>(loader->LoadImage (fname, Format)));
+  cstldr->LoadImageTC (ret, fname, Format, false);
+	cube->SetSubImage (0, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
         break;
     
       case XMLTOKEN_NEGX:
@@ -1041,7 +715,8 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-	cube->SetSubImage (1, csRef<iImage>(loader->LoadImage (fname, Format)));
+  cstldr->LoadImageTC (ret, fname, Format, false);
+	cube->SetSubImage (1, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
         break;
     
       case XMLTOKEN_POSY:
@@ -1055,7 +730,8 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-	cube->SetSubImage (2, csRef<iImage>(loader->LoadImage (fname, Format)));
+  cstldr->LoadImageTC (ret, fname, Format, false);
+	cube->SetSubImage (2, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
         break;
     
       case XMLTOKEN_NEGY:
@@ -1069,7 +745,8 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-	cube->SetSubImage (3, csRef<iImage>(loader->LoadImage (fname, Format)));
+  cstldr->LoadImageTC (ret, fname, Format, false);
+	cube->SetSubImage (3, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
         break;
     }
   }
@@ -1087,15 +764,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
   }
 
   csRef<iTextureWrapper> TexWrapper;
-	csRef<iThreadedLoader> itl = csQueryRegistry<iThreadedLoader>(object_reg);
-  if(itl.IsValid())
-  {
-    TexWrapper = Engine->GetTextureList ()->CreateTexture(TexHandle);
-  }
-  else
-  {
-    TexWrapper = Engine->GetTextureList ()->NewTexture(TexHandle);
-  }
+  TexWrapper = Engine->GetTextureList ()->CreateTexture(TexHandle);
   TexWrapper->SetImageFile (cube);
 
   return csPtr<iBase> (TexWrapper);
@@ -1125,7 +794,10 @@ csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node,
   csRef<iEngine> Engine = csQueryRegistry<iEngine> (object_reg);
   csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
   csRef<iTextureManager> tm = G3D->GetTextureManager();
-  csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
+  csRef<iThreadedLoader> loader = csQueryRegistry<iThreadedLoader> (object_reg);
+  csThreadedLoader* cstldr = dynamic_cast<csThreadedLoader*>((iThreadedLoader*)loader);
+  csRef<iThreadManager> threadman = csQueryRegistry<iThreadManager>(object_reg);
+  csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
   csRef<iSyntaxService> SyntaxService = 
     csQueryRegistry<iSyntaxService> (object_reg);
 
@@ -1167,7 +839,8 @@ csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-	vol->AddImage (csRef<iImage>(loader->LoadImage (fname, Format)));
+  cstldr->LoadImageTC (ret, fname, Format, false);
+	vol->AddImage (csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
         break;
     }
   }
@@ -1185,15 +858,7 @@ csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node,
   }
 
   csRef<iTextureWrapper> TexWrapper;
-	csRef<iThreadedLoader> itl = csQueryRegistry<iThreadedLoader>(object_reg);
-  if(itl.IsValid())
-  {
-    TexWrapper = Engine->GetTextureList ()->CreateTexture(TexHandle);
-  }
-  else
-  {
-    TexWrapper = Engine->GetTextureList ()->NewTexture(TexHandle);
-  }
+  TexWrapper = Engine->GetTextureList ()->CreateTexture(TexHandle);
   TexWrapper->SetImageFile (vol);
 
   return csPtr<iBase> (TexWrapper);
@@ -1255,15 +920,7 @@ csPtr<iBase> csMissingTextureLoader::Parse (iDocumentNode* node,
   }
 
   csRef<iTextureWrapper> TexWrapper ;
-  csRef<iThreadedLoader> itl = csQueryRegistry<iThreadedLoader>(object_reg);
-  if(itl.IsValid())
-  {
-    TexWrapper = Engine->GetTextureList ()->CreateTexture(TexHandle);
-  }
-  else
-  {
-    TexWrapper = Engine->GetTextureList ()->NewTexture(TexHandle);
-  }
+  TexWrapper = Engine->GetTextureList ()->CreateTexture(TexHandle);
   TexWrapper->SetImageFile (image);
 
   return csPtr<iBase> (TexWrapper);

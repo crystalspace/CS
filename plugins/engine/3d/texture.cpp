@@ -112,10 +112,12 @@ void csTextureWrapper::SetTextureHandle (iTextureHandle *tex)
 void csTextureWrapper::SetKeyColor (int red, int green, int blue)
 {
   if (handle)
+  {
     if (red >= 0)
       handle->SetKeyColor (red, green, blue);
     else
       handle->SetKeyColor (false);
+  }
   key_col_r = red;
   key_col_g = green;
   key_col_b = blue;

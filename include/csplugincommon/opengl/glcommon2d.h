@@ -140,8 +140,6 @@ protected:
   /// Set up current GL RGB color from a packed color format
   void setGLColorfromint (int color);
 
-  uint8 *screen_shot;
-
   csGLScreenShot* ssPool;
 
   csGLScreenShot* GetScreenShot ();
@@ -224,32 +222,6 @@ public:
   /// Clear the screen with color
   virtual void Clear (int color);
 
-  /// Set a palette entry
-  virtual void SetRGB (int i, int r, int g, int b);
-  virtual int FindRGB (int r, int g, int b, int a = 255)
-  {
-    if (r < 0) r = 0; else if (r > 255) r = 255;
-    if (g < 0) g = 0; else if (g > 255) g = 255;
-    if (b < 0) b = 0; else if (b > 255) b = 255;
-    if (a < 0) a = 0; else if (a > 255) a = 255;
-    return ((255 - a) << 24) | (r << 16) | (g << 8) | b;
-    /* Alpha is "inverted" so '-1' can be decomposed to a 
-       transparent color. (But alpha not be inverted, '-1'
-       would be "opaque white". However, -1 is the color
-       index for "transparent text background". */
-  }
-  virtual void GetRGB (int color, int& r, int& g, int& b)
-  {
-    r = (color >> 16) & 0xff;
-    g = (color >> 8) & 0xff;
-    b = color & 0xff;
-  }
-  virtual void GetRGB (int color, int& r, int& g, int& b, int& a)
-  {
-    a = 255 - (color >> 24);
-    GetRGB (color, r, g, b);
-  }
-
   /// Draw a line
   virtual void DrawLine (float x1, float y1, float x2, float y2, int color);
   /// Draw a box
@@ -261,25 +233,14 @@ public:
     int color);
   /// Blit.
   virtual void Blit (int x, int y, int w, int h, unsigned char const* data);
-
-  /**
-   * Get address of video RAM at given x,y coordinates.
-   * The OpenGL version of this function just returns 0
-   * if not doing a screenshot.
-   */
-  virtual unsigned char *GetPixelAt (int x, int y);
+  
+  /// Query pixel R,G,B at given screen location
+  virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB);
+  /// As GetPixel() above, but with alpha
+  virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB, uint8 &oA);
 
   /// Do a screenshot: return a new iImage object
   virtual csPtr<iImage> ScreenShot ();
-
-  /**
-   * Save a subarea of screen area into the variable Data.
-   * Storage is allocated in this call, you should either FreeArea()
-   * it after usage or RestoreArea() it.
-   */
-  virtual csImageArea *SaveArea (int x, int y, int w, int h);
-  /// Restore a subarea of screen saved with SaveArea()
-  virtual void RestoreArea (csImageArea *Area, bool Free = true);
 
   /// Get the double buffer state
   virtual bool GetDoubleBufferState ()

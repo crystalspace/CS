@@ -40,7 +40,7 @@ class csXMLShaderTech
 {
 private:
   friend class csXMLShader;
-  friend class PassActionPrecache;
+  friend struct PassActionPrecache;
   
   struct ShaderPassPerTag : public CS::Memory::CustomAllocated
   {

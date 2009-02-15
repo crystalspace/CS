@@ -22,6 +22,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
+#include "ivideo/shader/shader.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 
@@ -163,7 +164,6 @@ public:
   iHalo* CreateHalo (float /*iR*/, float /*iG*/, float /*iB*/,
     unsigned char* /*iAlpha*/, int /*iWidth*/, int /*iHeight*/) { return 0; }
 
-  void RemoveFromCache (iRendererLightmap* /*rlm*/) { }
   void SetWorldToCamera (const csReversibleTransform& w2c) { this->w2c = w2c; }
   const csReversibleTransform& GetWorldToCamera () { return w2c; }
   void DrawSimpleMesh (const csSimpleRenderMesh& /*mesh*/, uint /*flags*/ = 0) { }
@@ -205,7 +205,6 @@ private:
   csPlane3 near_plane;
   csZBufMode zmode;
 
-  csPixelFormat pfmt;
   bool red_mask, green_mask, blue_mask, alpha_mask;
   
   enum { numTargets = 2 };

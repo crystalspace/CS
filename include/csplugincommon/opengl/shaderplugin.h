@@ -30,7 +30,7 @@
 #include "csutil/scf_implementation.h"
 
 struct csGLExtensionManager;
-struct csGLStateCache;
+class csGLStateCache;
 
 namespace CS
 {

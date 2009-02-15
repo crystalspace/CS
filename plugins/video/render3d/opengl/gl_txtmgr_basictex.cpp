@@ -21,7 +21,6 @@
 #include "cssysdef.h"
 
 #include "csgfx/imagememory.h"
-#include "csplugincommon/render3d/txtmgr.h"
 
 #include "gl_render3d.h"
 #include "gl_txtmgr_basictex.h"
@@ -30,6 +29,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
 
 CS_LEAKGUARD_IMPLEMENT(csGLBasicTextureHandle);
+
+static void CalculateNextBestPo2Size (int texFlags, 
+                                      const int orgDim, int& newDim)
+{
+  const int sizeFlags = CS_TEXTURE_SCALE_UP | CS_TEXTURE_SCALE_DOWN;
+  
+  newDim = csFindNearestPowerOf2 (orgDim);
+  if (newDim != orgDim)
+  {
+    if ((texFlags & sizeFlags) == CS_TEXTURE_SCALE_UP)
+      /* newDim is fine */;
+    else if ((texFlags & sizeFlags) == CS_TEXTURE_SCALE_DOWN)
+      newDim >>= 1;
+    else
+    {
+      int dU = newDim - orgDim;
+      int dD = orgDim - (newDim >> 1);
+      if (dD < dU)
+        newDim >>= 1;
+    }
+  }
+}
 
 csGLBasicTextureHandle::csGLBasicTextureHandle (int width,
                                                 int height,
@@ -230,16 +251,6 @@ bool csGLBasicTextureHandle::GetRendererDimensions (int &mw, int &mh, int &md)
   return true;
 }
 
-void *csGLBasicTextureHandle::GetPrivateObject ()
-{
-  return (csGLBasicTextureHandle *)this;
-}
-
-bool csGLBasicTextureHandle::GetAlphaMap () 
-{
-  return (alphaType != csAlphaMode::alphaNone);
-}
-
 void csGLBasicTextureHandle::PrepareInt ()
 {
 }
@@ -287,9 +298,9 @@ void csGLBasicTextureHandle::ComputeNewPo2ImageSize (int texFlags,
   int& newwidth, int& newheight, int& newdepth,
   int max_tex_size)
 {
-  csTextureHandle::CalculateNextBestPo2Size (texFlags, orig_width, newwidth);
-  csTextureHandle::CalculateNextBestPo2Size (texFlags, orig_height, newheight);
-  csTextureHandle::CalculateNextBestPo2Size (texFlags, orig_depth, newdepth);
+  CalculateNextBestPo2Size (texFlags, orig_width, newwidth);
+  CalculateNextBestPo2Size (texFlags, orig_height, newheight);
+  CalculateNextBestPo2Size (texFlags, orig_depth, newdepth);
 
   // If necessary rescale if bigger than maximum texture size,
   // but only if a dimension has changed. For textures that are

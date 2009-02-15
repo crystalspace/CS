@@ -28,6 +28,7 @@
 #include "csutil/ansicommand.h"
 #include "csutil/ansiparse.h"
 #include "csutil/array.h"
+#include "csutil/base64.h"
 #include "csutil/binder.h"
 #include "csutil/bitarray.h"
 #include "csutil/bitops.h"

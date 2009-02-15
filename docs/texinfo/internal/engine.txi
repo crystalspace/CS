@@ -13,10 +13,6 @@ how the Crystal Space engine works internally and for people who want
 to contribute to the engine proper. The sources for the 3D engine can be found
 in @file{CS/plugins/engine/3d}.
 
-Note: This discussion is specific to how the engine works in relation
-to the new renderer. The old renderer is still in Crystal Space at this moment
-but this discussion does not bear upon it.
-
 @subheading Engine Data Structures
 
 The following sections explain the various data structures that
@@ -128,7 +124,7 @@ numerical identifiers is faster than comparison of string identifiers.
 @code{cache_mgr}: Interface @samp{iCacheManager}.  This is the default cache
 manager maintained by the engine.  The cache manager is responsible for storing
 data that is hard to compute.  Mesh objects and other plugins may use the cache
-manager to store, for example, lightmaps and other stuff.
+manager to store, for example, shader and other stuff.
 
 @item
 @code{defaultRenderLoop}: Interface @samp{iRenderLoop}. The default renderloop

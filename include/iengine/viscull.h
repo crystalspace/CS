@@ -30,7 +30,6 @@
 #include "csutil/scf_interface.h"
 
 struct iDocumentNode;
-struct iFrustumView;
 struct iMeshWrapper;
 struct iMovable;
 struct iObjectModel;

@@ -139,20 +139,6 @@ void csMeshGeneratorGeometry::AddFactory (iMeshFactoryWrapper* factory,
   g.maxdistance = maxdist;
   g.sqmaxdistance = maxdist * maxdist;
 
-  csRef<iInstancingFactoryState> fs =
-    scfQueryInterface<iInstancingFactoryState> (
-    factory->GetMeshObjectFactory ());
-  if (fs != 0)
-  {
-    g.instmesh = generator->engine->CreateMeshWrapper (
-        factory, 0);
-    g.instmesh->GetMovable ()->SetPosition (generator->GetSector (),
-        csVector3 (0)); // @@@ Right position?
-    g.instmesh->GetMovable ()->UpdateMove ();
-    g.instmesh_state = scfQueryInterface<iInstancingMeshState> (
-	g.instmesh->GetMeshObject ());
-  }
-
   factories.InsertSorted (g, CompareGeom);
 
   if (maxdist > total_max_dist) total_max_dist = maxdist;
@@ -198,17 +184,8 @@ iMeshWrapper* csMeshGeneratorGeometry::AllocMesh (
   else
   {
     csRef<iMeshWrapper> mesh;
-    if (geom.instmesh)
-    {
-      instance_id = geom.instmesh_state->AddInstance (
-	  csReversibleTransform ());
-      mesh = geom.instmesh;
-    }
-    else
-    {
-      instance_id = csArrayItemNotFound;
-      mesh = generator->engine->CreateMeshWrapper (geom.factory, 0);
-    }
+    instance_id = csArrayItemNotFound;
+    mesh = generator->engine->CreateMeshWrapper (geom.factory, 0);
 
     return mesh;
   }
@@ -219,21 +196,9 @@ void csMeshGeneratorGeometry::MoveMesh (int cidx, iMeshWrapper* mesh,
 					const csVector3& position,
                                         const csMatrix3& matrix)
 {
-  if (instance_id == csArrayItemNotFound)
-  {
-    mesh->GetMovable ()->SetPosition (generator->GetSector (), position);
-    mesh->GetMovable ()->SetTransform (matrix);
-    mesh->GetMovable ()->UpdateMove ();
-  }
-  else
-  {
-    csMGGeom& geom = factories[lod];
-    csVector3 meshpos = mesh->GetMovable ()->GetFullPosition ();
-    csVector3 pos = position - meshpos;
-    ////printf ("position=%g,%g,%g    meshpos=%g,%g,%g  ->  pos=%g,%g,%g\n", position.x, position.y, position.z, meshpos.x, meshpos.y, meshpos.z, pos.x, pos.y, pos.z); fflush (stdout);
-    csReversibleTransform tr (matrix, pos);
-    geom.instmesh_state->MoveInstance (instance_id, tr);
-  }
+  mesh->GetMovable ()->SetPosition (generator->GetSector (), position);
+  mesh->GetMovable ()->SetTransform (matrix);
+  mesh->GetMovable ()->UpdateMove ();
 }
 
 void csMeshGeneratorGeometry::SetAsideMesh (int cidx, iMeshWrapper* mesh,
@@ -255,17 +220,7 @@ void csMeshGeneratorGeometry::FreeSetAsideMeshes ()
     while (geom.mesh_setaside.GetSize () > 0)
     {
       csMGMesh mgmesh = geom.mesh_setaside.Pop ();
-      if (mgmesh.instance_id != csArrayItemNotFound)
-      {
-	// @@@ Hack: we need a way to hide an instance.
-        csReversibleTransform tr (csMatrix3 (), csVector3 (10000, 10000, 10000));
-        geom.instmesh_state->MoveInstance (mgmesh.instance_id, tr);
-	//geom.instmesh_state->RemoveInstance (mgmesh.instance_id);
-      }
-      else
-      {
-        mgmesh.mesh->GetMovable ()->ClearSectors ();
-      }
+      mgmesh.mesh->GetMovable ()->ClearSectors ();
       geom.mesh_cache.Push (mgmesh);
     }
   }

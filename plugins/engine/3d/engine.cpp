@@ -69,7 +69,6 @@
 #include "plugins/engine/3d/halo.h"
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/lightmgr.h"
-#include "plugins/engine/3d/lview.h"
 #include "plugins/engine/3d/material.h"
 #include "plugins/engine/3d/meshobj.h"
 #include "plugins/engine/3d/objwatch.h"
@@ -3329,14 +3328,6 @@ void csEngine::GetDefaultAmbientLight (csColor &c) const
   c.red = lightAmbientRed / 255.0f;
   c.green = lightAmbientGreen / 255.0f;
   c.blue = lightAmbientBlue / 255.0f;
-}
-
-csPtr<iFrustumView> csEngine::CreateFrustumView ()
-{
-  csFrustumView* lview = new csFrustumView ();
-  lview->SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
-  lview->SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
-  return csPtr<iFrustumView> (lview);
 }
 
 csPtr<iObjectWatcher> csEngine::CreateObjectWatcher ()

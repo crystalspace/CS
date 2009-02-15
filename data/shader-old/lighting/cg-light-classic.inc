@@ -75,7 +75,7 @@ struct LightingClassic
     float grid_y = (frac (texCoordLM.y * 1024) &lt; 0.02) ? 0 : 1;
     light_diffuse = light_diffuse * grid_x * grid_y;*/
   <?elsif vars."static color".buffer ?>
-    light_diffuse = staticPVLColor;
+    light_diffuse = 2 * staticPVLColor;
   <?else?>
     light_diffuse = primaryColor.rgb;
   <?endif?>

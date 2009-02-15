@@ -49,7 +49,6 @@ struct iObject;
 
 struct iRenderView;
 struct iRenderLoop;
-struct iFrustumView;
 struct iSector;
 struct iDocumentNode;
 
@@ -94,7 +93,7 @@ struct csFog
 
 /**
  * Set a callback which is called when this sector is traversed.
- * The given context will be either an instance of iRenderView, iFrustumView,
+ * The given context will be either an instance of iRenderView
  * or else 0.
  *
  * This callback is used by:
@@ -392,12 +391,6 @@ struct iSector : public virtual iBase
    * will be created and used for this sector.
    */
   virtual iVisibilityCuller* GetVisibilityCuller () = 0;
-
-  /**
-   * Check visibility in a frustum way for all things and polygons in
-   * this sector and possibly traverse through portals to other sectors.
-   */
-  virtual void CheckFrustum (iFrustumView* lview) = 0;  
 
   /**
    * Follow a beam from start to end and return the first polygon that

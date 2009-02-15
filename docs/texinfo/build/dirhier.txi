@@ -43,9 +43,11 @@ Miscellaneous scripts used by the project maintainers.
 @item CS/data
 Location of data files and maps distributed with Crystal Space.
 
-@item CS/data/config
-May applications and plugins utilize a (@file{.cfg}) file.  For convenience
-they are grouped here.
+@item CS/data/config-apps
+Configuration (@file{.cfg}) files for applications in Crystal Space.
+
+@item CS/data/config-plugins
+Configuration (@file{.cfg}) files for plugins in Crystal Space.
 
 @item CS/data/shader
 This important directory contains shaders and other related information
@@ -186,7 +188,7 @@ Dynamically loaded plug-ins. Communication with these modules is performed
 strictly via @sc{scf} interfaces. @xref{SCF}.
 
 @table @code
-@item CS/plugins/bugplug
+@item CS/plugins/utilities/bugplug
 Crystal Space debugger.
 
 @item CS/plugins/collide

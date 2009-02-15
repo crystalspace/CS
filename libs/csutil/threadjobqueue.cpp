@@ -122,6 +122,24 @@ namespace Threading
     }
   }
 
+  void ThreadedJobQueue::PopAndRun()
+  {
+    csRef<iJob> job;
+    {
+      MutexScopedLock lock (jobMutex);
+      if(jobQueue.GetSize () > 0)
+      {
+        job = jobQueue.PopTop();
+      }
+    }
+    
+    if(job.IsValid())
+    {
+      job->Run ();
+      CS::Threading::AtomicOperations::Decrement (&outstandingJobs);
+    }
+  }
+
   void ThreadedJobQueue::Unqueue (iJob* job, bool waitIfCurrent)
   {
     {

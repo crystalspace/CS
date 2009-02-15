@@ -244,8 +244,8 @@ csRef<iDocumentNodeIterator> csTinyXmlNode::GetNodes (const char* value)
 
 csRef<iDocumentNode> csTinyXmlNode::GetNode (const char* value)
 {
-  if (!node || (node->Type() != TiDocumentNode::ELEMENT)
-    && (node->Type() != TiDocumentNode::DOCUMENT)) return 0;
+  if (!node || ((node->Type() != TiDocumentNode::ELEMENT)
+    && (node->Type() != TiDocumentNode::DOCUMENT))) return 0;
   TiDocumentNodeChildren* node_children = GetTiNodeChildren ();
   csRef<iDocumentNode> child;
   TiDocumentNode* c = node_children->FirstChild (value);

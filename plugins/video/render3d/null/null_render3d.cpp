@@ -155,7 +155,6 @@ bool csNullGraphics3D::Open ()
     return false;
   }
 
-  pfmt = *G2D->GetPixelFormat ();
   SetDimensions (G2D->GetWidth (), G2D->GetHeight());
 
   SetPerspectiveAspect (G2D->GetHeight ());
