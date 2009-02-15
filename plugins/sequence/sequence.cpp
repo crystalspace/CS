@@ -93,11 +93,11 @@ void csSequence::AddOperation (csTicks time, iSequenceOperation* operation,
       if (time <= o->time)
       {
         op->next = o;
-	op->prev = o->prev;
-	if (o->prev) o->prev->next = op;
-	else first = op;
-	o->prev = op;
-	break;
+        op->prev = o->prev;
+        if (o->prev) o->prev->next = op;
+        else first = op;
+        o->prev = op;
+        break;
       }
       o = o->next;
     }
@@ -319,8 +319,8 @@ csPtr<iSequence> csSequenceManager::NewSequence ()
       for (i = 0 ; i < sequences.GetSize () ; i++)
       {
         csWeakRef<csSequence>* seq = sequences[i];
-	if ((*seq) != 0) copy.Push (seq);
-	else weakref_alloc.Free (seq);
+        if ((*seq) != 0) copy.Push (seq);
+        else weakref_alloc.Free (seq);
       }
       sequences = copy;
     }

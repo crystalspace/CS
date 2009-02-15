@@ -84,6 +84,8 @@ class csShaderConditionResolver : public iConditionResolver
   csConditionNode* rootNode;
   size_t nextVariant;
   csHash<size_t, MyBitArrayTemp, TempHeapAlloc> variantIDs;
+  bool keepVariantToConditionsMap;
+  csHash<MyBitArrayTemp, size_t, TempHeapAlloc> variantConditions;
 
   const CS::Graphics::RenderMeshModes* modes;
   const csShaderVariableStack* stack;
@@ -105,11 +107,12 @@ class csShaderConditionResolver : public iConditionResolver
     const ConditionsWriter& condWrite);
     
   bool SetVariantRecursive (size_t variant, csConditionNode* node,
-    csBitArray& conditionResults);
+    csBitArray& condSet, csBitArray& conditionResults);
 public:
   csConditionEvaluator& evaluator;
 
-  csShaderConditionResolver (csConditionEvaluator& evaluator);
+  csShaderConditionResolver (csConditionEvaluator& evaluator,
+    bool keepVariantToConditionsMap);
   virtual ~csShaderConditionResolver ();
 
   virtual const char* ParseCondition (const char* str, size_t len, 
@@ -121,7 +124,8 @@ public:
 
   virtual void AddNode (csConditionNode* parent,
     csConditionID condition, csConditionNode*& trueNode, 
-    csConditionNode*& falseNode);
+    csConditionNode*& falseNode,
+    const MyBitArrayTemp& conditionResults);
   virtual void FinishAdding ();
 
   void SetEvalParams (const CS::Graphics::RenderMeshModes* modes,
@@ -272,7 +276,7 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
 protected:
   void InternalRemove() { SelfDestruct(); }
 
-  void Load (iDocumentNode* source, bool noCacheRead);
+  void Load (iDocumentNode* source, bool forPrecache);
     
   void PrepareTechVar (ShaderTechVariant& techVar,
     int forcepriority);
@@ -280,7 +284,8 @@ protected:
   bool LoadTechniqueFromCache (ShaderTechVariant::Technique& tech,
     iHierarchicalCache* cache);
   void LoadTechnique (ShaderTechVariant::Technique& tech,
-    iHierarchicalCache* cacheTo, size_t dbgTechNum);
+    iHierarchicalCache* cacheTo, size_t dbgTechNum,
+    bool forPrecache = true);
 public:
   CS_LEAKGUARD_DECLARE (csXMLShader);
 

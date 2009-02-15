@@ -3227,7 +3227,7 @@ void csBugPlug::SaveMap ()
   do
   {
     name.Format ("/this/world%u.xml", i);
-    if (exists = VFS->Exists (name)) i++;
+    if ((exists = VFS->Exists (name))) i++;
   }
   while ((i > 0) && (exists));
 

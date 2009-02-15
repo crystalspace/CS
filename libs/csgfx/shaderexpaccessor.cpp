@@ -47,10 +47,11 @@ void csShaderExpressionAccessor::PreGetValue (csShaderVariable *variable)
       shaderMgr->GetShaderVariableStack()))
     {
       csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-	"crystalspace.shader.expressionaccessor",
-	"eval error: %s", expression->GetError());
+        "crystalspace.shader.expressionaccessor",
+        "eval error: %s", expression->GetError());
       // Prevent flooding with errors...
-      delete expression; expression = 0;
+      delete expression;
+      expression = 0;
     }
   }
 }
@@ -62,4 +63,3 @@ void csShaderExpressionAccessor::SelfDestruct ()
     shaderMgr->UnregisterShaderVariableAccessor (GetName (), this);
   }
 }
-

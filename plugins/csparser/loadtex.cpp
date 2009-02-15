@@ -289,8 +289,7 @@ THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadTexture, const char* Name,
 
   csRef<iImage> img;
   csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-  LoadTextureTC (itr, buf, Flags, texman, &img, do_verbose);
-  if (!itr->WasSuccessful())
+  if (!LoadTextureTC (itr, buf, Flags, texman, &img, do_verbose))
   {
     return false;
   }
@@ -867,8 +866,8 @@ csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node,
 
 //----------------------------------------------------------------------------
 
-csMissingTextureLoader::csMissingTextureLoader (iBase *p) : 
-  scfImplementationType(this, p)
+csMissingTextureLoader::csMissingTextureLoader (iObjectRegistry *object_reg)
+: scfImplementationType(this), object_reg(object_reg)
 {
 }
 

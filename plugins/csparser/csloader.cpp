@@ -44,8 +44,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   bool csLoader::Initialize(iObjectRegistry *object_reg)
   {
-    engine = csQueryRegistry<iEngine>(object_reg);
     loader = csQueryRegistryOrLoad<iThreadedLoader>(object_reg, "crystalspace.level.threadedloader");
+    engine = csQueryRegistry<iEngine>(object_reg);
     threadman = csQueryRegistry<iThreadManager>(object_reg);
     return (engine.IsValid() && loader.IsValid() && threadman.IsValid());
   }
@@ -63,7 +63,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       threadman->SetAlwaysRunNow(false);
     }
     engine->SyncEngineListsNow(loader);
-    return scfQueryInterface<iImage>(itr->GetResultRefPtr());
+    return scfQueryInterfaceSafe<iImage>(itr->GetResultRefPtr());
   }
 
   csPtr<iImage> csLoader::LoadImage (const char *fname, int Format)
@@ -79,7 +79,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       threadman->SetAlwaysRunNow(false);
     }
     engine->SyncEngineListsNow(loader);
-    return scfQueryInterface<iImage>(itr->GetResultRefPtr());
+    return scfQueryInterfaceSafe<iImage>(itr->GetResultRefPtr());
   }
 
   csPtr<iTextureHandle> csLoader::LoadTexture (iDataBuffer* buf,
@@ -96,7 +96,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       threadman->SetAlwaysRunNow(false);
     }
     engine->SyncEngineListsNow(loader);
-    return scfQueryInterface<iTextureHandle>(itr->GetResultRefPtr());
+    return scfQueryInterfaceSafe<iTextureHandle>(itr->GetResultRefPtr());
   }
 
   iTextureWrapper* csLoader::LoadTexture (const char *name, iDataBuffer* buf,
@@ -113,7 +113,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       threadman->SetAlwaysRunNow(false);
     }
     engine->SyncEngineListsNow(loader);
-    csRef<iTextureWrapper> ret = scfQueryInterface<iTextureWrapper>(itr->GetResultRefPtr());
+    csRef<iTextureWrapper> ret = scfQueryInterfaceSafe<iTextureWrapper>(itr->GetResultRefPtr());
     return ret;
   }
 
@@ -131,7 +131,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       threadman->SetAlwaysRunNow(false);
     }
     engine->SyncEngineListsNow(loader);
-    return scfQueryInterface<iTextureHandle>(itr->GetResultRefPtr());
+    return scfQueryInterfaceSafe<iTextureHandle>(itr->GetResultRefPtr());
   }
 
   csPtr<iSndSysData> csLoader::LoadSoundSysData (const char *fname)
@@ -147,7 +147,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       threadman->SetAlwaysRunNow(false);
     }
     engine->SyncEngineListsNow(loader);
-    return scfQueryInterface<iSndSysData>(itr->GetResultRefPtr());
+    return scfQueryInterfaceSafe<iSndSysData>(itr->GetResultRefPtr());
   }
 
   csPtr<iSndSysStream> csLoader::LoadSoundStream (const char *fname, int mode3d)
@@ -163,7 +163,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       threadman->SetAlwaysRunNow(false);
     }
     engine->SyncEngineListsNow(loader);
-    return scfQueryInterface<iSndSysStream>(itr->GetResultRefPtr());
+    return scfQueryInterfaceSafe<iSndSysStream>(itr->GetResultRefPtr());
   }
 
   iSndSysWrapper* csLoader::LoadSoundWrapper (const char *name, const char *fname)
@@ -179,7 +179,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       threadman->SetAlwaysRunNow(false);
     }
     engine->SyncEngineListsNow(loader);
-    csRef<iSndSysWrapper> ret = scfQueryInterface<iSndSysWrapper>(itr->GetResultRefPtr());
+    csRef<iSndSysWrapper> ret = scfQueryInterfaceSafe<iSndSysWrapper>(itr->GetResultRefPtr());
     return ret;
   }
 
@@ -196,7 +196,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       threadman->SetAlwaysRunNow(false);
     }
     engine->SyncEngineListsNow(loader);
-    return scfQueryInterface<iMeshFactoryWrapper>(itr->GetResultRefPtr());
+    return scfQueryInterfaceSafe<iMeshFactoryWrapper>(itr->GetResultRefPtr());
   }
 
   csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname, iStreamSource* ssource)
@@ -212,7 +212,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       threadman->SetAlwaysRunNow(false);
     }
     engine->SyncEngineListsNow(loader);
-    return scfQueryInterface<iMeshWrapper>(itr->GetResultRefPtr());
+    return scfQueryInterfaceSafe<iMeshWrapper>(itr->GetResultRefPtr());
   }
 
   csRef<iShader> csLoader::LoadShader (const char* filename, bool registerShader)
@@ -228,7 +228,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       threadman->SetAlwaysRunNow(false);
     }
     engine->SyncEngineListsNow(loader);
-    return scfQueryInterface<iShader>(itr->GetResultRefPtr());
+    return scfQueryInterfaceSafe<iShader>(itr->GetResultRefPtr());
   }
 
   iTextureWrapper* csLoader::LoadTexture (const char *Name, const char *FileName, int Flags,
@@ -247,7 +247,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       threadman->SetAlwaysRunNow(false);
     }
     engine->SyncEngineListsNow(loader);
-    csRef<iTextureWrapper> ret = scfQueryInterface<iTextureWrapper>(itr->GetResultRefPtr());
+    csRef<iTextureWrapper> ret = scfQueryInterfaceSafe<iTextureWrapper>(itr->GetResultRefPtr());
     return ret;
   }
 

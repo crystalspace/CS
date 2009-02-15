@@ -204,16 +204,9 @@ bool csShaderGLCGFP::Precache (const ProfileLimitsPair& limits,
   
   bool ret;
   if (needBuild)
-    ret = TryCompile (
-      loadApplyVmap | loadIgnoreConfigProgramOpts, limits);
+    ret = TryCompile (loadApplyVmap, limits);
   else
     ret = true;
-
-  // Store program against preprocessed source in cache
-  {
-    if (needBuild && !sourcePreproc.IsEmpty ())
-      WriteToCompileCache (sourcePreproc, limits.fp, cache);
-  }
 
   WriteToCache (cache, limits.fp, limits, csString("CG") + tag);
   

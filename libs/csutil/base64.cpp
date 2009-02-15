@@ -28,6 +28,10 @@ namespace CS
   {
     csString EncodeBase64 (iDataBuffer* data)
     {
+      // Empty buffer is encoded to empty string.
+      if (!data || (data->GetSize() == 0))
+        return "";
+    
       static const char encodeChars[] =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     

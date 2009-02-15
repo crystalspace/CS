@@ -492,7 +492,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         node, "Could not load texture '%s', using checkerboard instead", txtname);
 
       csRef<iLoaderPlugin> BuiltinErrorTexLoader;
-      BuiltinErrorTexLoader.AttachNew(new csMissingTextureLoader (0));
+      BuiltinErrorTexLoader.AttachNew(new csMissingTextureLoader (object_reg));
       csRef<iBase> b = BuiltinErrorTexLoader->Parse (ParamsNode,
         0, ldr_context, static_cast<iBase*> (&context), failedMeshFacts);
       if (!b.IsValid())

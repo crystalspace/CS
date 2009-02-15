@@ -1928,7 +1928,7 @@ csRef<iStringArray> csVFS::MountRoot (const char *Path)
       }
 
       csString real_dir(s);
-      if (slen > 0 && (c = real_dir.GetAt(slen - 1)) == '/' || c == '\\')
+      if (slen > 0 && ((c = real_dir.GetAt(slen - 1)) == '/' || c == '\\'))
         real_dir.Truncate(slen - 1);
       real_dir << "$/";
 

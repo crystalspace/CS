@@ -2578,175 +2578,174 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_csRefTiDocumentAttribute_t swig_types[79]
 #define SWIGTYPE_p_csRefTiDocumentNodeIterator_t swig_types[80]
 #define SWIGTYPE_p_csRefTiDocumentNode_t swig_types[81]
-#define SWIGTYPE_p_csRefTiEventAttributeIterator_t swig_types[82]
-#define SWIGTYPE_p_csRefTiEventHandlerRegistry_t swig_types[83]
-#define SWIGTYPE_p_csRefTiEventHandler_t swig_types[84]
-#define SWIGTYPE_p_csRefTiEventNameRegistry_t swig_types[85]
-#define SWIGTYPE_p_csRefTiEvent_t swig_types[86]
-#define SWIGTYPE_p_csReporterHelper swig_types[87]
-#define SWIGTYPE_p_csSetTCS__StringIDTCS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t swig_types[88]
-#define SWIGTYPE_p_csString swig_types[89]
-#define SWIGTYPE_p_csStringArray swig_types[90]
-#define SWIGTYPE_p_csStringBase swig_types[91]
-#define SWIGTYPE_p_csStringFastT36_t swig_types[92]
-#define SWIGTYPE_p_csTinyDocumentSystem swig_types[93]
-#define SWIGTYPE_p_csTriangle swig_types[94]
-#define SWIGTYPE_p_csVector2 swig_types[95]
-#define SWIGTYPE_p_csVector3 swig_types[96]
-#define SWIGTYPE_p_csVector4 swig_types[97]
-#define SWIGTYPE_p_csVertexStatus swig_types[98]
-#define SWIGTYPE_p_csWrapPtr swig_types[99]
-#define SWIGTYPE_p_double swig_types[100]
-#define SWIGTYPE_p_f_p_iBase__p__csPyEventHandler swig_types[101]
-#define SWIGTYPE_p_f_p_iBase__p_csConfigFile swig_types[102]
-#define SWIGTYPE_p_f_p_iBase__p_csObject swig_types[103]
-#define SWIGTYPE_p_f_p_iBase__p_csPyEventPlug swig_types[104]
-#define SWIGTYPE_p_f_p_iBase__p_iAnimatedImage swig_types[105]
-#define SWIGTYPE_p_f_p_iBase__p_iBase swig_types[106]
-#define SWIGTYPE_p_f_p_iBase__p_iCacheManager swig_types[107]
-#define SWIGTYPE_p_f_p_iBase__p_iClipper2D swig_types[108]
-#define SWIGTYPE_p_f_p_iBase__p_iCommandLineParser swig_types[109]
-#define SWIGTYPE_p_f_p_iBase__p_iComponent swig_types[110]
-#define SWIGTYPE_p_f_p_iBase__p_iConfigFile swig_types[111]
-#define SWIGTYPE_p_f_p_iBase__p_iConfigIterator swig_types[112]
-#define SWIGTYPE_p_f_p_iBase__p_iConfigManager swig_types[113]
-#define SWIGTYPE_p_f_p_iBase__p_iDataBuffer swig_types[114]
-#define SWIGTYPE_p_f_p_iBase__p_iDebugHelper swig_types[115]
-#define SWIGTYPE_p_f_p_iBase__p_iDocument swig_types[116]
-#define SWIGTYPE_p_f_p_iBase__p_iDocumentAttribute swig_types[117]
-#define SWIGTYPE_p_f_p_iBase__p_iDocumentAttributeIterator swig_types[118]
-#define SWIGTYPE_p_f_p_iBase__p_iDocumentNode swig_types[119]
-#define SWIGTYPE_p_f_p_iBase__p_iDocumentNodeIterator swig_types[120]
-#define SWIGTYPE_p_f_p_iBase__p_iDocumentSystem swig_types[121]
-#define SWIGTYPE_p_f_p_iBase__p_iEvent swig_types[122]
-#define SWIGTYPE_p_f_p_iBase__p_iEventAttributeIterator swig_types[123]
-#define SWIGTYPE_p_f_p_iBase__p_iEventCord swig_types[124]
-#define SWIGTYPE_p_f_p_iBase__p_iEventHandler swig_types[125]
-#define SWIGTYPE_p_f_p_iBase__p_iEventNameRegistry swig_types[126]
-#define SWIGTYPE_p_f_p_iBase__p_iEventOutlet swig_types[127]
-#define SWIGTYPE_p_f_p_iBase__p_iEventPlug swig_types[128]
-#define SWIGTYPE_p_f_p_iBase__p_iEventQueue swig_types[129]
-#define SWIGTYPE_p_f_p_iBase__p_iFactory swig_types[130]
-#define SWIGTYPE_p_f_p_iBase__p_iFile swig_types[131]
-#define SWIGTYPE_p_f_p_iBase__p_iImage swig_types[132]
-#define SWIGTYPE_p_f_p_iBase__p_iImageIO swig_types[133]
-#define SWIGTYPE_p_f_p_iBase__p_iJoystickDriver swig_types[134]
-#define SWIGTYPE_p_f_p_iBase__p_iKeyComposer swig_types[135]
-#define SWIGTYPE_p_f_p_iBase__p_iKeyboardDriver swig_types[136]
-#define SWIGTYPE_p_f_p_iBase__p_iMouseDriver swig_types[137]
-#define SWIGTYPE_p_f_p_iBase__p_iObject swig_types[138]
-#define SWIGTYPE_p_f_p_iBase__p_iObjectIterator swig_types[139]
-#define SWIGTYPE_p_f_p_iBase__p_iObjectNameChangeListener swig_types[140]
-#define SWIGTYPE_p_f_p_iBase__p_iObjectRegistry swig_types[141]
-#define SWIGTYPE_p_f_p_iBase__p_iObjectRegistryIterator swig_types[142]
-#define SWIGTYPE_p_f_p_iBase__p_iPath swig_types[143]
-#define SWIGTYPE_p_f_p_iBase__p_iPluginIterator swig_types[144]
-#define SWIGTYPE_p_f_p_iBase__p_iPluginManager swig_types[145]
-#define SWIGTYPE_p_f_p_iBase__p_iProcTexture swig_types[146]
-#define SWIGTYPE_p_f_p_iBase__p_iReporter swig_types[147]
-#define SWIGTYPE_p_f_p_iBase__p_iReporterIterator swig_types[148]
-#define SWIGTYPE_p_f_p_iBase__p_iReporterListener swig_types[149]
-#define SWIGTYPE_p_f_p_iBase__p_iSCF swig_types[150]
-#define SWIGTYPE_p_f_p_iBase__p_iString swig_types[151]
-#define SWIGTYPE_p_f_p_iBase__p_iStringArray swig_types[152]
-#define SWIGTYPE_p_f_p_iBase__p_iStringSet swig_types[153]
-#define SWIGTYPE_p_f_p_iBase__p_iStringSetBaseTCS__StringSetTag__General_t swig_types[154]
-#define SWIGTYPE_p_f_p_iBase__p_iTriangleMesh swig_types[155]
-#define SWIGTYPE_p_f_p_iBase__p_iVFS swig_types[156]
-#define SWIGTYPE_p_f_p_iBase__p_iVirtualClock swig_types[157]
-#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1T_csPyEventHandler_iEventHandler_t swig_types[158]
-#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[159]
-#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1TcsObject_iObject_t swig_types[160]
-#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1TcsPyEventPlug_iEventPlug_t swig_types[161]
-#define SWIGTYPE_p_f_p_iBase__p_scfImplementationExt1TcsPath_csObject_iPath_t swig_types[162]
-#define SWIGTYPE_p_float swig_types[163]
-#define SWIGTYPE_p_iAnimatedImage swig_types[164]
-#define SWIGTYPE_p_iBase swig_types[165]
-#define SWIGTYPE_p_iCacheManager swig_types[166]
-#define SWIGTYPE_p_iClipper2D swig_types[167]
-#define SWIGTYPE_p_iCommandLineParser swig_types[168]
-#define SWIGTYPE_p_iComponent swig_types[169]
-#define SWIGTYPE_p_iConfigFile swig_types[170]
-#define SWIGTYPE_p_iConfigIterator swig_types[171]
-#define SWIGTYPE_p_iConfigManager swig_types[172]
-#define SWIGTYPE_p_iDataBuffer swig_types[173]
-#define SWIGTYPE_p_iDebugHelper swig_types[174]
-#define SWIGTYPE_p_iDocument swig_types[175]
-#define SWIGTYPE_p_iDocumentAttribute swig_types[176]
-#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[177]
-#define SWIGTYPE_p_iDocumentNode swig_types[178]
-#define SWIGTYPE_p_iDocumentNodeIterator swig_types[179]
-#define SWIGTYPE_p_iDocumentSystem swig_types[180]
-#define SWIGTYPE_p_iEvent swig_types[181]
-#define SWIGTYPE_p_iEventAttributeIterator swig_types[182]
-#define SWIGTYPE_p_iEventCord swig_types[183]
-#define SWIGTYPE_p_iEventHandler swig_types[184]
-#define SWIGTYPE_p_iEventNameRegistry swig_types[185]
-#define SWIGTYPE_p_iEventOutlet swig_types[186]
-#define SWIGTYPE_p_iEventPlug swig_types[187]
-#define SWIGTYPE_p_iEventQueue swig_types[188]
-#define SWIGTYPE_p_iFactory swig_types[189]
-#define SWIGTYPE_p_iFile swig_types[190]
-#define SWIGTYPE_p_iGraphics2D swig_types[191]
-#define SWIGTYPE_p_iGraphics3D swig_types[192]
-#define SWIGTYPE_p_iImage swig_types[193]
-#define SWIGTYPE_p_iImageIO swig_types[194]
-#define SWIGTYPE_p_iJoystickDriver swig_types[195]
-#define SWIGTYPE_p_iKeyComposer swig_types[196]
-#define SWIGTYPE_p_iKeyboardDriver swig_types[197]
-#define SWIGTYPE_p_iMouseDriver swig_types[198]
-#define SWIGTYPE_p_iObject swig_types[199]
-#define SWIGTYPE_p_iObjectIterator swig_types[200]
-#define SWIGTYPE_p_iObjectNameChangeListener swig_types[201]
-#define SWIGTYPE_p_iObjectRegistry swig_types[202]
-#define SWIGTYPE_p_iObjectRegistryIterator swig_types[203]
-#define SWIGTYPE_p_iPath swig_types[204]
-#define SWIGTYPE_p_iPluginIterator swig_types[205]
-#define SWIGTYPE_p_iPluginManager swig_types[206]
-#define SWIGTYPE_p_iProcTexture swig_types[207]
-#define SWIGTYPE_p_iReporter swig_types[208]
-#define SWIGTYPE_p_iReporterIterator swig_types[209]
-#define SWIGTYPE_p_iReporterListener swig_types[210]
-#define SWIGTYPE_p_iSCF swig_types[211]
-#define SWIGTYPE_p_iString swig_types[212]
-#define SWIGTYPE_p_iStringArray swig_types[213]
-#define SWIGTYPE_p_iStringSet swig_types[214]
-#define SWIGTYPE_p_iStringSetBaseTCS__StringSetTag__General_t swig_types[215]
-#define SWIGTYPE_p_iSystemOpenManager swig_types[216]
-#define SWIGTYPE_p_iTextureFactory swig_types[217]
-#define SWIGTYPE_p_iThreadManager swig_types[218]
-#define SWIGTYPE_p_iTriangleMesh swig_types[219]
-#define SWIGTYPE_p_iVFS swig_types[220]
-#define SWIGTYPE_p_iVerbosityManager swig_types[221]
-#define SWIGTYPE_p_iVirtualClock swig_types[222]
-#define SWIGTYPE_p_int swig_types[223]
-#define SWIGTYPE_p_int16_t swig_types[224]
-#define SWIGTYPE_p_int64_t swig_types[225]
-#define SWIGTYPE_p_int8_t swig_types[226]
-#define SWIGTYPE_p_intptr_t swig_types[227]
-#define SWIGTYPE_p_long_long swig_types[228]
-#define SWIGTYPE_p_p_char swig_types[229]
-#define SWIGTYPE_p_p_csImageIOFileFormatDescription swig_types[230]
-#define SWIGTYPE_p_p_void swig_types[231]
-#define SWIGTYPE_p_scfImplementation1T_csPyEventHandler_iEventHandler_t swig_types[232]
-#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[233]
-#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[234]
-#define SWIGTYPE_p_scfImplementation1TcsPyEventPlug_iEventPlug_t swig_types[235]
-#define SWIGTYPE_p_scfImplementationExt1TcsPath_csObject_iPath_t swig_types[236]
-#define SWIGTYPE_p_scfInterfaceMetadata swig_types[237]
-#define SWIGTYPE_p_scfInterfaceMetadataList swig_types[238]
-#define SWIGTYPE_p_size_t swig_types[239]
-#define SWIGTYPE_p_uint16_t swig_types[240]
-#define SWIGTYPE_p_uint32_t swig_types[241]
-#define SWIGTYPE_p_uint64_t swig_types[242]
-#define SWIGTYPE_p_uint8_t swig_types[243]
-#define SWIGTYPE_p_unsigned_int swig_types[244]
-#define SWIGTYPE_p_unsigned_long swig_types[245]
-#define SWIGTYPE_p_unsigned_long_long swig_types[246]
-#define SWIGTYPE_p_utf32_char swig_types[247]
-#define SWIGTYPE_p_void swig_types[248]
-static swig_type_info *swig_types[250];
-static swig_module_info swig_module = {swig_types, 249, 0, 0, 0, 0};
+#define SWIGTYPE_p_csRefTiEventHandlerRegistry_t swig_types[82]
+#define SWIGTYPE_p_csRefTiEventHandler_t swig_types[83]
+#define SWIGTYPE_p_csRefTiEventNameRegistry_t swig_types[84]
+#define SWIGTYPE_p_csRefTiEvent_t swig_types[85]
+#define SWIGTYPE_p_csReporterHelper swig_types[86]
+#define SWIGTYPE_p_csSetTCS__StringIDTCS__StringSetTag__General_t_CS__Memory__AllocatorMalloc_t swig_types[87]
+#define SWIGTYPE_p_csString swig_types[88]
+#define SWIGTYPE_p_csStringArray swig_types[89]
+#define SWIGTYPE_p_csStringBase swig_types[90]
+#define SWIGTYPE_p_csStringFastT36_t swig_types[91]
+#define SWIGTYPE_p_csTinyDocumentSystem swig_types[92]
+#define SWIGTYPE_p_csTriangle swig_types[93]
+#define SWIGTYPE_p_csVector2 swig_types[94]
+#define SWIGTYPE_p_csVector3 swig_types[95]
+#define SWIGTYPE_p_csVector4 swig_types[96]
+#define SWIGTYPE_p_csVertexStatus swig_types[97]
+#define SWIGTYPE_p_csWrapPtr swig_types[98]
+#define SWIGTYPE_p_double swig_types[99]
+#define SWIGTYPE_p_f_p_iBase__p__csPyEventHandler swig_types[100]
+#define SWIGTYPE_p_f_p_iBase__p_csConfigFile swig_types[101]
+#define SWIGTYPE_p_f_p_iBase__p_csObject swig_types[102]
+#define SWIGTYPE_p_f_p_iBase__p_csPyEventPlug swig_types[103]
+#define SWIGTYPE_p_f_p_iBase__p_iAnimatedImage swig_types[104]
+#define SWIGTYPE_p_f_p_iBase__p_iBase swig_types[105]
+#define SWIGTYPE_p_f_p_iBase__p_iCacheManager swig_types[106]
+#define SWIGTYPE_p_f_p_iBase__p_iClipper2D swig_types[107]
+#define SWIGTYPE_p_f_p_iBase__p_iCommandLineParser swig_types[108]
+#define SWIGTYPE_p_f_p_iBase__p_iComponent swig_types[109]
+#define SWIGTYPE_p_f_p_iBase__p_iConfigFile swig_types[110]
+#define SWIGTYPE_p_f_p_iBase__p_iConfigIterator swig_types[111]
+#define SWIGTYPE_p_f_p_iBase__p_iConfigManager swig_types[112]
+#define SWIGTYPE_p_f_p_iBase__p_iDataBuffer swig_types[113]
+#define SWIGTYPE_p_f_p_iBase__p_iDebugHelper swig_types[114]
+#define SWIGTYPE_p_f_p_iBase__p_iDocument swig_types[115]
+#define SWIGTYPE_p_f_p_iBase__p_iDocumentAttribute swig_types[116]
+#define SWIGTYPE_p_f_p_iBase__p_iDocumentAttributeIterator swig_types[117]
+#define SWIGTYPE_p_f_p_iBase__p_iDocumentNode swig_types[118]
+#define SWIGTYPE_p_f_p_iBase__p_iDocumentNodeIterator swig_types[119]
+#define SWIGTYPE_p_f_p_iBase__p_iDocumentSystem swig_types[120]
+#define SWIGTYPE_p_f_p_iBase__p_iEvent swig_types[121]
+#define SWIGTYPE_p_f_p_iBase__p_iEventAttributeIterator swig_types[122]
+#define SWIGTYPE_p_f_p_iBase__p_iEventCord swig_types[123]
+#define SWIGTYPE_p_f_p_iBase__p_iEventHandler swig_types[124]
+#define SWIGTYPE_p_f_p_iBase__p_iEventNameRegistry swig_types[125]
+#define SWIGTYPE_p_f_p_iBase__p_iEventOutlet swig_types[126]
+#define SWIGTYPE_p_f_p_iBase__p_iEventPlug swig_types[127]
+#define SWIGTYPE_p_f_p_iBase__p_iEventQueue swig_types[128]
+#define SWIGTYPE_p_f_p_iBase__p_iFactory swig_types[129]
+#define SWIGTYPE_p_f_p_iBase__p_iFile swig_types[130]
+#define SWIGTYPE_p_f_p_iBase__p_iImage swig_types[131]
+#define SWIGTYPE_p_f_p_iBase__p_iImageIO swig_types[132]
+#define SWIGTYPE_p_f_p_iBase__p_iJoystickDriver swig_types[133]
+#define SWIGTYPE_p_f_p_iBase__p_iKeyComposer swig_types[134]
+#define SWIGTYPE_p_f_p_iBase__p_iKeyboardDriver swig_types[135]
+#define SWIGTYPE_p_f_p_iBase__p_iMouseDriver swig_types[136]
+#define SWIGTYPE_p_f_p_iBase__p_iObject swig_types[137]
+#define SWIGTYPE_p_f_p_iBase__p_iObjectIterator swig_types[138]
+#define SWIGTYPE_p_f_p_iBase__p_iObjectNameChangeListener swig_types[139]
+#define SWIGTYPE_p_f_p_iBase__p_iObjectRegistry swig_types[140]
+#define SWIGTYPE_p_f_p_iBase__p_iObjectRegistryIterator swig_types[141]
+#define SWIGTYPE_p_f_p_iBase__p_iPath swig_types[142]
+#define SWIGTYPE_p_f_p_iBase__p_iPluginIterator swig_types[143]
+#define SWIGTYPE_p_f_p_iBase__p_iPluginManager swig_types[144]
+#define SWIGTYPE_p_f_p_iBase__p_iProcTexture swig_types[145]
+#define SWIGTYPE_p_f_p_iBase__p_iReporter swig_types[146]
+#define SWIGTYPE_p_f_p_iBase__p_iReporterIterator swig_types[147]
+#define SWIGTYPE_p_f_p_iBase__p_iReporterListener swig_types[148]
+#define SWIGTYPE_p_f_p_iBase__p_iSCF swig_types[149]
+#define SWIGTYPE_p_f_p_iBase__p_iString swig_types[150]
+#define SWIGTYPE_p_f_p_iBase__p_iStringArray swig_types[151]
+#define SWIGTYPE_p_f_p_iBase__p_iStringSet swig_types[152]
+#define SWIGTYPE_p_f_p_iBase__p_iStringSetBaseTCS__StringSetTag__General_t swig_types[153]
+#define SWIGTYPE_p_f_p_iBase__p_iTriangleMesh swig_types[154]
+#define SWIGTYPE_p_f_p_iBase__p_iVFS swig_types[155]
+#define SWIGTYPE_p_f_p_iBase__p_iVirtualClock swig_types[156]
+#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1T_csPyEventHandler_iEventHandler_t swig_types[157]
+#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[158]
+#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1TcsObject_iObject_t swig_types[159]
+#define SWIGTYPE_p_f_p_iBase__p_scfImplementation1TcsPyEventPlug_iEventPlug_t swig_types[160]
+#define SWIGTYPE_p_f_p_iBase__p_scfImplementationExt1TcsPath_csObject_iPath_t swig_types[161]
+#define SWIGTYPE_p_float swig_types[162]
+#define SWIGTYPE_p_iAnimatedImage swig_types[163]
+#define SWIGTYPE_p_iBase swig_types[164]
+#define SWIGTYPE_p_iCacheManager swig_types[165]
+#define SWIGTYPE_p_iClipper2D swig_types[166]
+#define SWIGTYPE_p_iCommandLineParser swig_types[167]
+#define SWIGTYPE_p_iComponent swig_types[168]
+#define SWIGTYPE_p_iConfigFile swig_types[169]
+#define SWIGTYPE_p_iConfigIterator swig_types[170]
+#define SWIGTYPE_p_iConfigManager swig_types[171]
+#define SWIGTYPE_p_iDataBuffer swig_types[172]
+#define SWIGTYPE_p_iDebugHelper swig_types[173]
+#define SWIGTYPE_p_iDocument swig_types[174]
+#define SWIGTYPE_p_iDocumentAttribute swig_types[175]
+#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[176]
+#define SWIGTYPE_p_iDocumentNode swig_types[177]
+#define SWIGTYPE_p_iDocumentNodeIterator swig_types[178]
+#define SWIGTYPE_p_iDocumentSystem swig_types[179]
+#define SWIGTYPE_p_iEvent swig_types[180]
+#define SWIGTYPE_p_iEventAttributeIterator swig_types[181]
+#define SWIGTYPE_p_iEventCord swig_types[182]
+#define SWIGTYPE_p_iEventHandler swig_types[183]
+#define SWIGTYPE_p_iEventNameRegistry swig_types[184]
+#define SWIGTYPE_p_iEventOutlet swig_types[185]
+#define SWIGTYPE_p_iEventPlug swig_types[186]
+#define SWIGTYPE_p_iEventQueue swig_types[187]
+#define SWIGTYPE_p_iFactory swig_types[188]
+#define SWIGTYPE_p_iFile swig_types[189]
+#define SWIGTYPE_p_iGraphics2D swig_types[190]
+#define SWIGTYPE_p_iGraphics3D swig_types[191]
+#define SWIGTYPE_p_iImage swig_types[192]
+#define SWIGTYPE_p_iImageIO swig_types[193]
+#define SWIGTYPE_p_iJoystickDriver swig_types[194]
+#define SWIGTYPE_p_iKeyComposer swig_types[195]
+#define SWIGTYPE_p_iKeyboardDriver swig_types[196]
+#define SWIGTYPE_p_iMouseDriver swig_types[197]
+#define SWIGTYPE_p_iObject swig_types[198]
+#define SWIGTYPE_p_iObjectIterator swig_types[199]
+#define SWIGTYPE_p_iObjectNameChangeListener swig_types[200]
+#define SWIGTYPE_p_iObjectRegistry swig_types[201]
+#define SWIGTYPE_p_iObjectRegistryIterator swig_types[202]
+#define SWIGTYPE_p_iPath swig_types[203]
+#define SWIGTYPE_p_iPluginIterator swig_types[204]
+#define SWIGTYPE_p_iPluginManager swig_types[205]
+#define SWIGTYPE_p_iProcTexture swig_types[206]
+#define SWIGTYPE_p_iReporter swig_types[207]
+#define SWIGTYPE_p_iReporterIterator swig_types[208]
+#define SWIGTYPE_p_iReporterListener swig_types[209]
+#define SWIGTYPE_p_iSCF swig_types[210]
+#define SWIGTYPE_p_iString swig_types[211]
+#define SWIGTYPE_p_iStringArray swig_types[212]
+#define SWIGTYPE_p_iStringSet swig_types[213]
+#define SWIGTYPE_p_iStringSetBaseTCS__StringSetTag__General_t swig_types[214]
+#define SWIGTYPE_p_iSystemOpenManager swig_types[215]
+#define SWIGTYPE_p_iTextureFactory swig_types[216]
+#define SWIGTYPE_p_iThreadManager swig_types[217]
+#define SWIGTYPE_p_iTriangleMesh swig_types[218]
+#define SWIGTYPE_p_iVFS swig_types[219]
+#define SWIGTYPE_p_iVerbosityManager swig_types[220]
+#define SWIGTYPE_p_iVirtualClock swig_types[221]
+#define SWIGTYPE_p_int swig_types[222]
+#define SWIGTYPE_p_int16_t swig_types[223]
+#define SWIGTYPE_p_int64_t swig_types[224]
+#define SWIGTYPE_p_int8_t swig_types[225]
+#define SWIGTYPE_p_intptr_t swig_types[226]
+#define SWIGTYPE_p_long_long swig_types[227]
+#define SWIGTYPE_p_p_char swig_types[228]
+#define SWIGTYPE_p_p_csImageIOFileFormatDescription swig_types[229]
+#define SWIGTYPE_p_p_void swig_types[230]
+#define SWIGTYPE_p_scfImplementation1T_csPyEventHandler_iEventHandler_t swig_types[231]
+#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[232]
+#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[233]
+#define SWIGTYPE_p_scfImplementation1TcsPyEventPlug_iEventPlug_t swig_types[234]
+#define SWIGTYPE_p_scfImplementationExt1TcsPath_csObject_iPath_t swig_types[235]
+#define SWIGTYPE_p_scfInterfaceMetadata swig_types[236]
+#define SWIGTYPE_p_scfInterfaceMetadataList swig_types[237]
+#define SWIGTYPE_p_size_t swig_types[238]
+#define SWIGTYPE_p_uint16_t swig_types[239]
+#define SWIGTYPE_p_uint32_t swig_types[240]
+#define SWIGTYPE_p_uint64_t swig_types[241]
+#define SWIGTYPE_p_uint8_t swig_types[242]
+#define SWIGTYPE_p_unsigned_int swig_types[243]
+#define SWIGTYPE_p_unsigned_long swig_types[244]
+#define SWIGTYPE_p_unsigned_long_long swig_types[245]
+#define SWIGTYPE_p_utf32_char swig_types[246]
+#define SWIGTYPE_p_void swig_types[247]
+static swig_type_info *swig_types[249];
+static swig_module_info swig_module = {swig_types, 248, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -3389,6 +3388,8 @@ SWIGINTERN int iObjectRegistry_scfGetVersion(){ return scfInterfaceTraits<iObjec
 SWIGINTERN void delete_iObjectRegistry(iObjectRegistry *self){ if (self) self->DecRef (); }
 SWIGINTERN int iVirtualClock_scfGetVersion(){ return scfInterfaceTraits<iVirtualClock>::GetVersion(); }
 SWIGINTERN void delete_iVirtualClock(iVirtualClock *self){ if (self) self->DecRef (); }
+SWIGINTERN int iEventAttributeIterator_scfGetVersion(){ return scfInterfaceTraits<iEventAttributeIterator>::GetVersion(); }
+SWIGINTERN void delete_iEventAttributeIterator(iEventAttributeIterator *self){ if (self) self->DecRef (); }
 SWIGINTERN csEventError iEvent_RetrieveString(iEvent *self,char const *name,char *&v){
 		return self->Retrieve(name,(const char *&)v);
 	}
@@ -3525,7 +3526,9 @@ SWIGINTERN void delete_iAnimatedImage(iAnimatedImage *self){ if (self) self->Dec
   {
     printf("CS_LOAD_PLUGIN_ALWAYS is deprecated, use \
 csLoadPluginAlways instead\n");
-    return csLoadPluginAlways(p,i);
+    csRef<iComponent> c (csLoadPluginAlways(p,i));
+    csRef<iBase> b ((iBase*)c);
+    return csPtr<iBase> (b);
   }
 
 
@@ -25473,6 +25476,19 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iEventAttributeIterator_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iEventAttributeIterator_scfGetVersion",0,0)) SWIG_fail;
+  result = (int)iEventAttributeIterator_scfGetVersion();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iEventAttributeIterator(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iEventAttributeIterator *arg1 = (iEventAttributeIterator *) 0 ;
@@ -25486,7 +25502,7 @@ SWIGINTERN PyObject *_wrap_delete_iEventAttributeIterator(PyObject *SWIGUNUSEDPA
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iEventAttributeIterator" "', argument " "1"" of type '" "iEventAttributeIterator *""'"); 
   }
   arg1 = reinterpret_cast< iEventAttributeIterator * >(argp1);
-  delete arg1;
+  delete_iEventAttributeIterator(arg1);
   
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -28619,7 +28635,17 @@ SWIGINTERN PyObject *_wrap_iEvent_GetAttributeIterator(PyObject *SWIGUNUSEDPARM(
   }
   arg1 = reinterpret_cast< iEvent * >(argp1);
   result = (arg1)->GetAttributeIterator();
-  resultobj = SWIG_NewPointerObj((new csRef<iEventAttributeIterator >(static_cast< const csRef<iEventAttributeIterator >& >(result))), SWIGTYPE_p_csRefTiEventAttributeIterator_t, SWIG_POINTER_OWN |  0 );
+  {
+    csRef<iEventAttributeIterator> ref((csRef<iEventAttributeIterator>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iEventAttributeIterator *)ref, SWIGTYPE_p_iEventAttributeIterator, 1);
+  }
   return resultobj;
 fail:
   return NULL;
@@ -35950,7 +35976,7 @@ fail:
 SWIGINTERN PyObject *_wrap_iPluginIterator_Next(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iPluginIterator *arg1 = (iPluginIterator *) 0 ;
-  iBase *result = 0 ;
+  iComponent *result = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
@@ -35961,8 +35987,8 @@ SWIGINTERN PyObject *_wrap_iPluginIterator_Next(PyObject *SWIGUNUSEDPARM(self), 
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPluginIterator_Next" "', argument " "1"" of type '" "iPluginIterator *""'"); 
   }
   arg1 = reinterpret_cast< iPluginIterator * >(argp1);
-  result = (iBase *)(arg1)->Next();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iBase, 0 |  0 );
+  result = (iComponent *)(arg1)->Next();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iComponent, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -36010,6 +36036,59 @@ SWIGINTERN PyObject *iPluginIterator_swigregister(PyObject *SWIGUNUSEDPARM(self)
   SWIG_TypeNewClientData(SWIGTYPE_p_iPluginIterator, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
+
+SWIGINTERN PyObject *_wrap_iPluginManager_LoadPluginInstance(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPluginManager *arg1 = (iPluginManager *) 0 ;
+  char *arg2 = (char *) 0 ;
+  uint arg3 ;
+  SwigValueWrapper< csPtr<iComponent > > result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  unsigned long val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPluginManager_LoadPluginInstance",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPluginManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPluginManager_LoadPluginInstance" "', argument " "1"" of type '" "iPluginManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iPluginManager * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iPluginManager_LoadPluginInstance" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iPluginManager_LoadPluginInstance" "', argument " "3"" of type '" "uint""'");
+  } 
+  arg3 = static_cast< uint >(val3);
+  result = (arg1)->LoadPluginInstance((char const *)arg2,arg3);
+  {
+    csRef<iComponent> ref((csPtr<iComponent>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iComponent *)ref, SWIGTYPE_p_iComponent, 1);
+  }
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
 
 SWIGINTERN PyObject *_wrap_iPluginManager_LoadPluginAlways__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
@@ -36214,6 +36293,271 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iPluginManager_QueryPluginInstance__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPluginManager *arg1 = (iPluginManager *) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  SwigValueWrapper< csPtr<iComponent > > result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPluginManager_QueryPluginInstance",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPluginManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPluginManager_QueryPluginInstance" "', argument " "1"" of type '" "iPluginManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iPluginManager * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iPluginManager_QueryPluginInstance" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iPluginManager_QueryPluginInstance" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  result = (arg1)->QueryPluginInstance((char const *)arg2,arg3);
+  {
+    csRef<iComponent> ref((csPtr<iComponent>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iComponent *)ref, SWIGTYPE_p_iComponent, 1);
+  }
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iPluginManager_QueryPluginInstance__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPluginManager *arg1 = (iPluginManager *) 0 ;
+  char *arg2 = (char *) 0 ;
+  SwigValueWrapper< csPtr<iComponent > > result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPluginManager_QueryPluginInstance",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPluginManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPluginManager_QueryPluginInstance" "', argument " "1"" of type '" "iPluginManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iPluginManager * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iPluginManager_QueryPluginInstance" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (arg1)->QueryPluginInstance((char const *)arg2);
+  {
+    csRef<iComponent> ref((csPtr<iComponent>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iComponent *)ref, SWIGTYPE_p_iComponent, 1);
+  }
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iPluginManager_QueryPluginInstance__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPluginManager *arg1 = (iPluginManager *) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  int arg4 ;
+  SwigValueWrapper< csPtr<iComponent > > result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPluginManager_QueryPluginInstance",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPluginManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPluginManager_QueryPluginInstance" "', argument " "1"" of type '" "iPluginManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iPluginManager * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iPluginManager_QueryPluginInstance" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iPluginManager_QueryPluginInstance" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iPluginManager_QueryPluginInstance" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = static_cast< int >(val4);
+  result = (arg1)->QueryPluginInstance((char const *)arg2,(char const *)arg3,arg4);
+  {
+    csRef<iComponent> ref((csPtr<iComponent>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iComponent *)ref, SWIGTYPE_p_iComponent, 1);
+  }
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iPluginManager_QueryPluginInstance(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[5];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 4); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iPluginManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_iPluginManager_QueryPluginInstance__SWIG_1(self, args);
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iPluginManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        {
+          int res = SWIG_AsVal_int(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          return _wrap_iPluginManager_QueryPluginInstance__SWIG_0(self, args);
+        }
+      }
+    }
+  }
+  if (argc == 4) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iPluginManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_AsCharPtrAndSize(argv[2], 0, NULL, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          {
+            int res = SWIG_AsVal_int(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            return _wrap_iPluginManager_QueryPluginInstance__SWIG_2(self, args);
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iPluginManager_QueryPluginInstance'.\n  Possible C/C++ prototypes are:\n""    QueryPluginInstance(iPluginManager *,char const *,int)\n""    QueryPluginInstance(iPluginManager *,char const *)\n""    QueryPluginInstance(iPluginManager *,char const *,char const *,int)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iPluginManager_UnloadPluginInstance(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPluginManager *arg1 = (iPluginManager *) 0 ;
+  iComponent *arg2 = (iComponent *) 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPluginManager_UnloadPluginInstance",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPluginManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPluginManager_UnloadPluginInstance" "', argument " "1"" of type '" "iPluginManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iPluginManager * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iComponent, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iPluginManager_UnloadPluginInstance" "', argument " "2"" of type '" "iComponent *""'"); 
+  }
+  arg2 = reinterpret_cast< iComponent * >(argp2);
+  result = (bool)(arg1)->UnloadPluginInstance(arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iPluginManager_UnloadPlugin(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iPluginManager *arg1 = (iPluginManager *) 0 ;
@@ -36241,6 +36585,49 @@ SWIGINTERN PyObject *_wrap_iPluginManager_UnloadPlugin(PyObject *SWIGUNUSEDPARM(
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iPluginManager_RegisterPluginInstance(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPluginManager *arg1 = (iPluginManager *) 0 ;
+  char *arg2 = (char *) 0 ;
+  iComponent *arg3 = (iComponent *) 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPluginManager_RegisterPluginInstance",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPluginManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPluginManager_RegisterPluginInstance" "', argument " "1"" of type '" "iPluginManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iPluginManager * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iPluginManager_RegisterPluginInstance" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_iComponent, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iPluginManager_RegisterPluginInstance" "', argument " "3"" of type '" "iComponent *""'"); 
+  }
+  arg3 = reinterpret_cast< iComponent * >(argp3);
+  result = (bool)(arg1)->RegisterPluginInstance((char const *)arg2,arg3);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return NULL;
 }
 
@@ -36284,6 +36671,38 @@ SWIGINTERN PyObject *_wrap_iPluginManager_RegisterPlugin(PyObject *SWIGUNUSEDPAR
   return resultobj;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iPluginManager_GetPluginInstances(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPluginManager *arg1 = (iPluginManager *) 0 ;
+  SwigValueWrapper< csPtr<iPluginIterator > > result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPluginManager_GetPluginInstances",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPluginManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPluginManager_GetPluginInstances" "', argument " "1"" of type '" "iPluginManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iPluginManager * >(argp1);
+  result = (arg1)->GetPluginInstances();
+  {
+    csRef<iPluginIterator> ref((csPtr<iPluginIterator>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iPluginIterator *)ref, SWIGTYPE_p_iPluginIterator, 1);
+  }
+  return resultobj;
+fail:
   return NULL;
 }
 
@@ -36367,6 +36786,261 @@ SWIGINTERN PyObject *_wrap_iPluginManager_QueryOptions(PyObject *SWIGUNUSEDPARM(
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iPluginManager_SetTagClassIDMapping(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPluginManager *arg1 = (iPluginManager *) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPluginManager_SetTagClassIDMapping",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPluginManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPluginManager_SetTagClassIDMapping" "', argument " "1"" of type '" "iPluginManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iPluginManager * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iPluginManager_SetTagClassIDMapping" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_AsCharPtrAndSize(obj2, &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iPluginManager_SetTagClassIDMapping" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  result = (bool)(arg1)->SetTagClassIDMapping((char const *)arg2,(char const *)arg3);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iPluginManager_UnsetTagClassIDMapping(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPluginManager *arg1 = (iPluginManager *) 0 ;
+  char *arg2 = (char *) 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPluginManager_UnsetTagClassIDMapping",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPluginManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPluginManager_UnsetTagClassIDMapping" "', argument " "1"" of type '" "iPluginManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iPluginManager * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iPluginManager_UnsetTagClassIDMapping" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (bool)(arg1)->UnsetTagClassIDMapping((char const *)arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iPluginManager_GetTagClassIDMapping(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPluginManager *arg1 = (iPluginManager *) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPluginManager_GetTagClassIDMapping",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPluginManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPluginManager_GetTagClassIDMapping" "', argument " "1"" of type '" "iPluginManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iPluginManager * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iPluginManager_GetTagClassIDMapping" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (char *)(arg1)->GetTagClassIDMapping((char const *)arg2);
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iPluginManager_GetClassIDTags(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPluginManager *arg1 = (iPluginManager *) 0 ;
+  char *arg2 = (char *) 0 ;
+  SwigValueWrapper< csPtr<iStringArray > > result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPluginManager_GetClassIDTags",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPluginManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPluginManager_GetClassIDTags" "', argument " "1"" of type '" "iPluginManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iPluginManager * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iPluginManager_GetClassIDTags" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (arg1)->GetClassIDTags((char const *)arg2);
+  {
+    csRef<iStringArray> ref((csPtr<iStringArray>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iStringArray *)ref, SWIGTYPE_p_iStringArray, 1);
+  }
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iPluginManager_LoadTagPluginInstance(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPluginManager *arg1 = (iPluginManager *) 0 ;
+  char *arg2 = (char *) 0 ;
+  uint arg3 ;
+  SwigValueWrapper< csPtr<iComponent > > result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  unsigned long val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPluginManager_LoadTagPluginInstance",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPluginManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPluginManager_LoadTagPluginInstance" "', argument " "1"" of type '" "iPluginManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iPluginManager * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iPluginManager_LoadTagPluginInstance" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iPluginManager_LoadTagPluginInstance" "', argument " "3"" of type '" "uint""'");
+  } 
+  arg3 = static_cast< uint >(val3);
+  result = (arg1)->LoadTagPluginInstance((char const *)arg2,arg3);
+  {
+    csRef<iComponent> ref((csPtr<iComponent>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iComponent *)ref, SWIGTYPE_p_iComponent, 1);
+  }
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iPluginManager_QueryTagPluginInstance(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPluginManager *arg1 = (iPluginManager *) 0 ;
+  char *arg2 = (char *) 0 ;
+  SwigValueWrapper< csPtr<iComponent > > result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPluginManager_QueryTagPluginInstance",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPluginManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPluginManager_QueryTagPluginInstance" "', argument " "1"" of type '" "iPluginManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iPluginManager * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iPluginManager_QueryTagPluginInstance" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (arg1)->QueryTagPluginInstance((char const *)arg2);
+  {
+    csRef<iComponent> ref((csPtr<iComponent>&)result); /* explicit cast */
+    
+    if (!ref.IsValid())
+    {
+      Py_INCREF(Py_None);
+      return Py_None;
+    }
+    ref->IncRef();
+    resultobj = SWIG_NewPointerObj((void *)(iComponent *)ref, SWIGTYPE_p_iComponent, 1);
+  }
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return NULL;
 }
 
@@ -36684,7 +37358,7 @@ SWIGINTERN PyObject *_wrap_csLoadPluginAlways__SWIG_0(PyObject *SWIGUNUSEDPARM(s
   iPluginManager *arg1 = (iPluginManager *) 0 ;
   char *arg2 = (char *) 0 ;
   bool arg3 ;
-  SwigValueWrapper< csPtr<iBase > > result;
+  SwigValueWrapper< csPtr<iComponent > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
   int res2 ;
@@ -36714,7 +37388,7 @@ SWIGINTERN PyObject *_wrap_csLoadPluginAlways__SWIG_0(PyObject *SWIGUNUSEDPARM(s
   arg3 = static_cast< bool >(val3);
   result = csLoadPluginAlways(arg1,(char const *)arg2,arg3);
   {
-    csRef<iBase> ref((csPtr<iBase>&)result); /* explicit cast */
+    csRef<iComponent> ref((csPtr<iComponent>&)result); /* explicit cast */
     
     if (!ref.IsValid())
     {
@@ -36722,7 +37396,7 @@ SWIGINTERN PyObject *_wrap_csLoadPluginAlways__SWIG_0(PyObject *SWIGUNUSEDPARM(s
       return Py_None;
     }
     ref->IncRef();
-    resultobj = SWIG_NewPointerObj((void *)(iBase *)ref, SWIGTYPE_p_iBase, 1);
+    resultobj = SWIG_NewPointerObj((void *)(iComponent *)ref, SWIGTYPE_p_iComponent, 1);
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -36736,7 +37410,7 @@ SWIGINTERN PyObject *_wrap_csLoadPluginAlways__SWIG_1(PyObject *SWIGUNUSEDPARM(s
   PyObject *resultobj = 0;
   iPluginManager *arg1 = (iPluginManager *) 0 ;
   char *arg2 = (char *) 0 ;
-  SwigValueWrapper< csPtr<iBase > > result;
+  SwigValueWrapper< csPtr<iComponent > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
   int res2 ;
@@ -36758,7 +37432,7 @@ SWIGINTERN PyObject *_wrap_csLoadPluginAlways__SWIG_1(PyObject *SWIGUNUSEDPARM(s
   arg2 = reinterpret_cast< char * >(buf2);
   result = csLoadPluginAlways(arg1,(char const *)arg2);
   {
-    csRef<iBase> ref((csPtr<iBase>&)result); /* explicit cast */
+    csRef<iComponent> ref((csPtr<iComponent>&)result); /* explicit cast */
     
     if (!ref.IsValid())
     {
@@ -36766,7 +37440,7 @@ SWIGINTERN PyObject *_wrap_csLoadPluginAlways__SWIG_1(PyObject *SWIGUNUSEDPARM(s
       return Py_None;
     }
     ref->IncRef();
-    resultobj = SWIG_NewPointerObj((void *)(iBase *)ref, SWIGTYPE_p_iBase, 1);
+    resultobj = SWIG_NewPointerObj((void *)(iComponent *)ref, SWIGTYPE_p_iComponent, 1);
   }
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return resultobj;
@@ -57948,6 +58622,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iEventAttributeIterator_HasNext", _wrap_iEventAttributeIterator_HasNext, METH_VARARGS, NULL},
 	 { (char *)"iEventAttributeIterator_Next", _wrap_iEventAttributeIterator_Next, METH_VARARGS, NULL},
 	 { (char *)"iEventAttributeIterator_Reset", _wrap_iEventAttributeIterator_Reset, METH_VARARGS, NULL},
+	 { (char *)"iEventAttributeIterator_scfGetVersion", _wrap_iEventAttributeIterator_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iEventAttributeIterator", _wrap_delete_iEventAttributeIterator, METH_VARARGS, NULL},
 	 { (char *)"iEventAttributeIterator_swigregister", iEventAttributeIterator_swigregister, METH_VARARGS, NULL},
 	 { (char *)"csKeyEventData_eventType_set", _wrap_csKeyEventData_eventType_set, METH_VARARGS, NULL},
@@ -58175,12 +58850,23 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iPluginIterator_scfGetVersion", _wrap_iPluginIterator_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iPluginIterator", _wrap_delete_iPluginIterator, METH_VARARGS, NULL},
 	 { (char *)"iPluginIterator_swigregister", iPluginIterator_swigregister, METH_VARARGS, NULL},
+	 { (char *)"iPluginManager_LoadPluginInstance", _wrap_iPluginManager_LoadPluginInstance, METH_VARARGS, NULL},
 	 { (char *)"iPluginManager_LoadPluginAlways", _wrap_iPluginManager_LoadPluginAlways, METH_VARARGS, NULL},
+	 { (char *)"iPluginManager_QueryPluginInstance", _wrap_iPluginManager_QueryPluginInstance, METH_VARARGS, NULL},
+	 { (char *)"iPluginManager_UnloadPluginInstance", _wrap_iPluginManager_UnloadPluginInstance, METH_VARARGS, NULL},
 	 { (char *)"iPluginManager_UnloadPlugin", _wrap_iPluginManager_UnloadPlugin, METH_VARARGS, NULL},
+	 { (char *)"iPluginManager_RegisterPluginInstance", _wrap_iPluginManager_RegisterPluginInstance, METH_VARARGS, NULL},
 	 { (char *)"iPluginManager_RegisterPlugin", _wrap_iPluginManager_RegisterPlugin, METH_VARARGS, NULL},
+	 { (char *)"iPluginManager_GetPluginInstances", _wrap_iPluginManager_GetPluginInstances, METH_VARARGS, NULL},
 	 { (char *)"iPluginManager_GetPlugins", _wrap_iPluginManager_GetPlugins, METH_VARARGS, NULL},
 	 { (char *)"iPluginManager_Clear", _wrap_iPluginManager_Clear, METH_VARARGS, NULL},
 	 { (char *)"iPluginManager_QueryOptions", _wrap_iPluginManager_QueryOptions, METH_VARARGS, NULL},
+	 { (char *)"iPluginManager_SetTagClassIDMapping", _wrap_iPluginManager_SetTagClassIDMapping, METH_VARARGS, NULL},
+	 { (char *)"iPluginManager_UnsetTagClassIDMapping", _wrap_iPluginManager_UnsetTagClassIDMapping, METH_VARARGS, NULL},
+	 { (char *)"iPluginManager_GetTagClassIDMapping", _wrap_iPluginManager_GetTagClassIDMapping, METH_VARARGS, NULL},
+	 { (char *)"iPluginManager_GetClassIDTags", _wrap_iPluginManager_GetClassIDTags, METH_VARARGS, NULL},
+	 { (char *)"iPluginManager_LoadTagPluginInstance", _wrap_iPluginManager_LoadTagPluginInstance, METH_VARARGS, NULL},
+	 { (char *)"iPluginManager_QueryTagPluginInstance", _wrap_iPluginManager_QueryTagPluginInstance, METH_VARARGS, NULL},
 	 { (char *)"iPluginManager_LoadPlugin", _wrap_iPluginManager_LoadPlugin, METH_VARARGS, NULL},
 	 { (char *)"iPluginManager_scfGetVersion", _wrap_iPluginManager_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iPluginManager", _wrap_delete_iPluginManager, METH_VARARGS, NULL},
@@ -59231,7 +59917,6 @@ static swig_type_info _swigt__p_csRefTiBase_t = {"_p_csRefTiBase_t", "csRef<iBas
 static swig_type_info _swigt__p_csRefTiDocumentAttribute_t = {"_p_csRefTiDocumentAttribute_t", "csRef<iDocumentAttribute > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRefTiDocumentNodeIterator_t = {"_p_csRefTiDocumentNodeIterator_t", "csRef<iDocumentNodeIterator > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRefTiDocumentNode_t = {"_p_csRefTiDocumentNode_t", "csRef<iDocumentNode > *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_csRefTiEventAttributeIterator_t = {"_p_csRefTiEventAttributeIterator_t", "csRef<iEventAttributeIterator > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRefTiEventHandlerRegistry_t = {"_p_csRefTiEventHandlerRegistry_t", "csRef<iEventHandlerRegistry > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRefTiEventHandler_t = {"_p_csRefTiEventHandler_t", "csRef<iEventHandler > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRefTiEventNameRegistry_t = {"_p_csRefTiEventNameRegistry_t", "csRef<iEventNameRegistry > *", 0, 0, (void*)0, 0};
@@ -59482,7 +60167,6 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_csRefTiDocumentAttribute_t,
   &_swigt__p_csRefTiDocumentNodeIterator_t,
   &_swigt__p_csRefTiDocumentNode_t,
-  &_swigt__p_csRefTiEventAttributeIterator_t,
   &_swigt__p_csRefTiEventHandlerRegistry_t,
   &_swigt__p_csRefTiEventHandler_t,
   &_swigt__p_csRefTiEventNameRegistry_t,
@@ -59733,7 +60417,6 @@ static swig_cast_info _swigc__p_csRefTiBase_t[] = {  {&_swigt__p_csRefTiBase_t, 
 static swig_cast_info _swigc__p_csRefTiDocumentAttribute_t[] = {  {&_swigt__p_csRefTiDocumentAttribute_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRefTiDocumentNodeIterator_t[] = {  {&_swigt__p_csRefTiDocumentNodeIterator_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRefTiDocumentNode_t[] = {  {&_swigt__p_csRefTiDocumentNode_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_csRefTiEventAttributeIterator_t[] = {  {&_swigt__p_csRefTiEventAttributeIterator_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRefTiEventHandlerRegistry_t[] = {  {&_swigt__p_csRefTiEventHandlerRegistry_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRefTiEventHandler_t[] = {  {&_swigt__p_csRefTiEventHandler_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRefTiEventNameRegistry_t[] = {  {&_swigt__p_csRefTiEventNameRegistry_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -59984,7 +60667,6 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_csRefTiDocumentAttribute_t,
   _swigc__p_csRefTiDocumentNodeIterator_t,
   _swigc__p_csRefTiDocumentNode_t,
-  _swigc__p_csRefTiEventAttributeIterator_t,
   _swigc__p_csRefTiEventHandlerRegistry_t,
   _swigc__p_csRefTiEventHandler_t,
   _swigc__p_csRefTiEventNameRegistry_t,
@@ -60801,6 +61483,9 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CSEVTYPE_Keyboard",SWIG_From_int(static_cast< int >(0x00000001)));
   SWIG_Python_SetConstant(d, "CSEVTYPE_Mouse",SWIG_From_int(static_cast< int >(0x00000002)));
   SWIG_Python_SetConstant(d, "CSEVTYPE_Joystick",SWIG_From_int(static_cast< int >(0x00000004)));
+  SWIG_Python_SetConstant(d, "iPluginManager_lpiInitialize",SWIG_From_int(static_cast< int >(iPluginManager::lpiInitialize)));
+  SWIG_Python_SetConstant(d, "iPluginManager_lpiReportErrors",SWIG_From_int(static_cast< int >(iPluginManager::lpiReportErrors)));
+  SWIG_Python_SetConstant(d, "iPluginManager_lpiLoadDependencies",SWIG_From_int(static_cast< int >(iPluginManager::lpiLoadDependencies)));
   SWIG_Python_SetConstant(d, "MAX_OUTPUT_VERTICES",SWIG_From_int(static_cast< int >(64)));
   SWIG_Python_SetConstant(d, "CS_CLIP_OUTSIDE",SWIG_From_int(static_cast< int >(CS_CLIP_OUTSIDE)));
   SWIG_Python_SetConstant(d, "CS_CLIP_CLIPPED",SWIG_From_int(static_cast< int >(CS_CLIP_CLIPPED)));

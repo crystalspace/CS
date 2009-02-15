@@ -1992,6 +1992,10 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 	  bugplug->AddCounter ("Triangle Count", (int)num_tri);
 	  bugplug->AddCounter ("Mesh Count", 1);
 	}
+  // @@@ Temporary comment. If runnung Ubuntu 8.04 on a machine with Intel
+  // hardware and you get an error that traces back to the function below.
+  // Please see: http://trac.crystalspace3d.org/trac/CS/ticket/551 in the
+  // first instance.
 	glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
 	  (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
 	  compType, 

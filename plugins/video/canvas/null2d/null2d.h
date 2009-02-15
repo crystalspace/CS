@@ -21,6 +21,7 @@
 #define __CS_NULL2D_H__
 
 #include "csutil/scf.h"
+#include "igraphic/image.h"
 #include "csplugincommon/canvas/graph2d.h"
 
 /// Null version.

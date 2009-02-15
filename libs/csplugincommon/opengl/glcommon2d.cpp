@@ -143,17 +143,17 @@ bool csGraphics2DGLCommon::Open ()
       // Sanity check
       if ((vMajor < 1) || ((vMajor == 1) && (vMinor < 1)))
       {
-	Report (CS_REPORTER_SEVERITY_ERROR,
-	  "OpenGL >= 1.1 is required, but only %d.%d is present.",
-	  vMajor, vMinor);
+	      Report (CS_REPORTER_SEVERITY_ERROR,
+	        "OpenGL >= 1.1 is required, but only %d.%d is present.",
+	        vMajor, vMinor);
       }
       if ((vMajor >= 1) || ((vMajor == 1) && (vMinor >= 2)))
       {
-	//ext.InitGL_version_1_2 ();
+	      //ext.InitGL_version_1_2 ();
       }
       if ((vMajor >= 1) || ((vMajor == 1) && (vMinor >= 3)))
       {
-	//ext.InitGL_version_1_3 ();
+	      //ext.InitGL_version_1_3 ();
       }
     }
   }
@@ -186,28 +186,26 @@ bool csGraphics2DGLCommon::Open ()
     if (glmultisamp)
     {
       if (glmultisamp != currentFormat[glpfvMultiSamples])
-	Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "Multisample: actually %d samples",
-	  (int)glmultisamp);
+	      Report (CS_REPORTER_SEVERITY_NOTIFY,
+	        "Multisample: actually %d samples", (int)glmultisamp);
 
       ext.InitGL_NV_multisample_filter_hint();
       if (ext.CS_GL_NV_multisample_filter_hint)
       {
-	glHint (GL_MULTISAMPLE_FILTER_HINT_NV,
-	  multiFavorQuality ? GL_NICEST : GL_FASTEST);
+        glHint (GL_MULTISAMPLE_FILTER_HINT_NV,
+          multiFavorQuality ? GL_NICEST : GL_FASTEST);
 	
-	GLint msHint;
-	glGetIntegerv (GL_MULTISAMPLE_FILTER_HINT_NV, &msHint);
-	Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "Multisample settings: %s",
-	  ((msHint == GL_NICEST) ? "quality" :
-	  ((msHint == GL_FASTEST) ? "performance" : "unknown")));
+        GLint msHint;
+        glGetIntegerv (GL_MULTISAMPLE_FILTER_HINT_NV, &msHint);
+        Report (CS_REPORTER_SEVERITY_NOTIFY,
+          "Multisample settings: %s", ((msHint == GL_NICEST) ? "quality" :
+          ((msHint == GL_FASTEST) ? "performance" : "unknown")));
       }
     }
     else
     {
       Report (CS_REPORTER_SEVERITY_NOTIFY,
-	"Multisample: disabled");
+	      "Multisample: disabled");
     }
   }
 
@@ -655,7 +653,6 @@ csPtr<iImage> csGraphics2DGLCommon::ScreenShot ()
 {
   ((csGLFontCache*)fontCache)->FlushText ();
 
-
   // Need to resolve pixel alignment issues
   int screen_width = vpWidth * (4);
   uint8* screen_shot = new uint8 [screen_width * vpHeight];
@@ -748,22 +745,22 @@ bool csGraphics2DGLCommon::DebugCommand (const char* cmdstr)
       csRef<iDataBuffer> buf = imgsaver->Save (images[i], "image/png");
       if (!buf)
       {
-	Report (CS_REPORTER_SEVERITY_WARNING,
-	  "Could not save font cache page.");
+	      Report (CS_REPORTER_SEVERITY_WARNING,
+	        "Could not save font cache page.");
       }
       else
       {
-	outfn.Format ("%s%zu.png", dir, i);
-	if (!vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
-	{
-	  Report (CS_REPORTER_SEVERITY_WARNING,
-	    "Could not write to %s.", outfn.GetData ());
-	}
-	else
-	{
-	  Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    "Dumped font cache page to %s", outfn.GetData ());
-	}
+	      outfn.Format ("%s%zu.png", dir, i);
+	      if (!vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
+	      {
+	        Report (CS_REPORTER_SEVERITY_WARNING,
+	          "Could not write to %s.", outfn.GetData ());
+	      }
+	      else
+	      {
+	        Report (CS_REPORTER_SEVERITY_NOTIFY,
+	          "Dumped font cache page to %s", outfn.GetData ());
+	      }
       }
     }
 
@@ -896,7 +893,7 @@ void csGraphics2DGLCommon::csGLPixelFormatPicker::ReadPickerValue (
       int val;
       if (sscanf (currentVal, "%d%c", &val, &dummy) == 1)
       {
-	values.Push (val);
+	      values.Push (val);
       }
       currentVal = comma ? comma + 1 : 0;
     }

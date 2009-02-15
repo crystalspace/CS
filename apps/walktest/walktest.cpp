@@ -1178,7 +1178,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   csRef<iCommandLineParser> cmdline = 
       csQueryRegistry<iCommandLineParser> (object_reg);
   bool do_collections = cmdline->GetBoolOption ("collections");
-  bool do_dupes = cmdline->GetBoolOption ("dupes", true);
     
   if ((!do_collections) && cache_map != 0)
   {
@@ -1212,7 +1211,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     {
       collection = Engine->CreateCollection (map->map_dir);
     }
-    csRef<iThreadReturn> ret = LevelLoader->LoadMapFile ("world", false, collection);
+    csRef<iThreadReturn> ret = LevelLoader->LoadMapFile ("world", false, collection,
+      0, 0, KEEP_ALL, cmdline->GetBoolOption("verbose", false));
     ret->Wait();
     if(!ret->WasSuccessful())
     {

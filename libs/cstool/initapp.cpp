@@ -114,11 +114,11 @@ iObjectRegistry* csInitializer::CreateEnvironment (
     iObjectRegistry* r = CreateObjectRegistry();
     if (r != 0)
     {
-      if (CreatePluginManager(r) &&
+      if (CreateCommandLineParser(r, argc, argv) &&
+          CreateVerbosityManager(r) &&
+          CreatePluginManager(r) &&
           CreateEventQueue(r) &&
           CreateVirtualClock(r) &&
-          CreateCommandLineParser(r, argc, argv) &&
-          CreateVerbosityManager(r) &&
           CreateConfigManager(r) &&
           CreateThreadManager(r) &&
           CreateInputDrivers(r) &&
@@ -271,8 +271,8 @@ iVFS* csInitializer::SetupVFS(iObjectRegistry* r, const char* pluginID)
   if (!VFS)
   {
     csRef<iPluginManager> plugin_mgr (csQueryRegistry<iPluginManager> (r));
-    csRef<iBase> b = csPtr<iBase> (plugin_mgr->QueryPlugin (
-      "iVFS", scfInterfaceTraits<iVFS>::GetVersion()));
+    csRef<iComponent> b = plugin_mgr->QueryPluginInstance (
+      "iVFS", scfInterfaceTraits<iVFS>::GetVersion());
     VFS = scfQueryInterfaceSafe<iVFS> (b);
   }
   if (!VFS)
@@ -428,9 +428,21 @@ bool csInitializer::RequestPlugins (
     }
     plugldr->RequestPlugin (plugName, intName);
   }
+  
+  csRef<iConfigManager> Config (csQueryRegistry<iConfigManager> (r));
+  plugldr->AddConfigurationPlugins (Config, "System.Plugins.");
+
+  csRef<iCommandLineParser> CommandLine (
+  	csQueryRegistry<iCommandLineParser> (r));
+  CS_ASSERT (CommandLine != 0);
+  plugldr->AddCommandLinePlugins (CommandLine);
 
   bool rc = plugldr->LoadPlugins ();
   delete plugldr;
+  
+  // flush all removed config files
+  Config->FlushRemoved();
+
   return rc;
 }
 

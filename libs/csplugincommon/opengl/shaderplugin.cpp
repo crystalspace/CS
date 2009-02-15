@@ -228,7 +228,7 @@ namespace CS
       size_t nextPlane;
       if (!CS::Utility::BitOps::ScanBitForward (~currentPlanes, nextPlane))
         return false;
-      if (nextPlane >= (size_t)maxPlanes) return false;
+      if (nextPlane >= maxPlanes) return false;
       
       csPlane3 planeTF;
       switch (space)
@@ -259,7 +259,7 @@ namespace CS
       return true;
     }
     
-    bool ShaderProgramPluginGL::ClipPlanes::EnableClipPlane (int n)
+    bool ShaderProgramPluginGL::ClipPlanes::EnableClipPlane (size_t n)
     {
       if (n >= maxPlanes) return false;
       
@@ -273,7 +273,7 @@ namespace CS
       size_t nextPlane;
       if (!CS::Utility::BitOps::ScanBitForward (~currentPlanes, nextPlane))
         return false;
-      if (nextPlane >= (size_t)maxPlanes) return false;
+      if (nextPlane >= maxPlanes) return false;
       
       glEnable (GL_CLIP_PLANE0 + nextPlane);
       
@@ -283,7 +283,7 @@ namespace CS
     
     void ShaderProgramPluginGL::ClipPlanes::DisableClipPlanes ()
     {
-      for (int i = 0; i < maxPlanes; i++)
+      for (size_t i = 0; i < maxPlanes; i++)
       {
         if (currentPlanes & (1 << i)) glDisable (GL_CLIP_PLANE0 + i);
       }

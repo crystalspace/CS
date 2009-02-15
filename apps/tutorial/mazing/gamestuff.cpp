@@ -679,7 +679,7 @@ bool Game::SetupGame ()
   using namespace CS::Lighting;
   size_t i;
   iSectorList* sl = engine->GetSectors ();
-  for (i = 0 ; i < sl->GetCount () ; i++)
+  for (i = 0 ; i < (size_t)sl->GetCount () ; i++)
   {
     iSector* s = sl->Get (i);
     SimpleStaticLighter::ShineLights (s, engine, 8);

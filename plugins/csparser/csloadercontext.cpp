@@ -24,7 +24,9 @@
 #include "imap/loader.h"
 #include "imesh/genmesh.h"
 #include "iutil/object.h"
+#include "iutil/stringarray.h"
 #include "ivaria/reporter.h"
+#include "ivideo/material.h"
 
 #include "csloadercontext.h"
 
@@ -38,6 +40,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     : scfImplementationType (this), object_reg(object_reg), Engine(Engine), loader(loader),
     collection(collection), missingdata(missingdata), keepFlags(keepFlags), do_verbose(do_verbose)
   {
+    tm = csQueryRegistry<iTextureManager>(object_reg);
   }
 
   csLoaderContext::~csLoaderContext ()
@@ -119,8 +122,44 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     {
       mat = Engine->FindMaterial(filename, collection);
     }
+    
+    // *** This is deprecated behaviour ***
+    if(!dontWaitForLoad && !mat.IsValid())
+    {
+      ReportWarning("Could not find material '%s'. Creating material. This behaviour is deprecated.", filename);
+      if(missingdata)
+      {
+        mat = missingdata->MissingMaterial(0, filename);
+        if(mat)
+        {
+          return mat;
+        }
+      }
 
-    if(!mat.IsValid() && do_verbose)
+      iTextureWrapper* tex = FindTexture (filename, true);
+      if (tex)
+      {
+        // Add a default material with the same name as the texture
+        csRef<iMaterial> material = Engine->CreateBaseMaterial (tex);
+        // First we have to extract the optional region name from the name:
+        char const* n = strchr (filename, '/');
+        if (!n) n = filename;
+        else n++;
+        csRef<iMaterialWrapper> mat = Engine->GetMaterialList()->CreateMaterial (material, n);
+        loader->AddMaterialToList(mat);
+
+        if(collection)
+        {
+          collection->Add(mat->QueryObject());
+        }
+
+        tex->Register(tm);
+        return mat;
+      }
+    }
+    /// ***
+
+    if(!mat.IsValid() && !dontWaitForLoad && do_verbose)
     {
       ReportNotify("Could not find material '%s'.", filename);
     }
@@ -162,6 +201,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           break;
         }
+
+        for(size_t i=0; i<loader->failedMeshFacts->GetSize(); i++)
+        {
+          if(!strcmp(loader->failedMeshFacts->Get(i), name))
+          {
+            // Break out of the loop, it's never going to be loaded.
+            break;
+          }
+        }
       }
     }
 
@@ -171,7 +219,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       fact = Engine->FindMeshFactory(name, collection);
     }
 
-    if(!fact.IsValid() && do_verbose)
+    if(!fact.IsValid() && !dontWaitForLoad && do_verbose)
     {
       ReportNotify("Could not find mesh factory '%s'.", name);
     }
@@ -387,7 +435,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       result = Engine->FindTexture(name, collection);
     }
 
-    if(!result.IsValid() && do_verbose)
+    // *** This is deprecated behaviour ***
+    if(!dontWaitForLoad && !result.IsValid())
+    {
+      ReportWarning("Could not find texture '%s'. Loading texture. This is deprecated behaviour.", 
+        name);
+      csRef<iThreadManager> tman = csQueryRegistry<iThreadManager>(object_reg);
+      csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(tman));
+      loader->LoadTextureTC(itr, name, name, CS_TEXTURE_3D, tm, true, false, true, collection,
+        KEEP_ALL, do_verbose);
+      result = scfQueryInterfaceSafe<iTextureWrapper>(itr->GetResultRefPtr());
+    }
+    // ***
+
+    if(!result.IsValid() && !dontWaitForLoad && do_verbose)
     {
       ReportNotify ("Could not find texture '%s'. Attempting to load.", name);
     }
@@ -423,6 +484,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     va_list arg;
     va_start (arg, description);
     csReportV (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.maploader", description, arg);
+    va_end (arg);
+  }
+
+  void csLoaderContext::ReportWarning (const char* description, ...)
+  {
+    va_list arg;
+    va_start (arg, description);
+    csReportV (object_reg, CS_REPORTER_SEVERITY_WARNING, "crystalspace.maploader", description, arg);
     va_end (arg);
   }
 

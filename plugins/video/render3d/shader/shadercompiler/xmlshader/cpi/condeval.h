@@ -781,7 +781,8 @@ public:
   bool Evaluate (csConditionID condition, const CS::Graphics::RenderMeshModes& modes,
     const csShaderVariableStack* stack);
     
-  void ForceConditionResults (const csBitArray& condResults);
+  void ForceConditionResults (const csBitArray& condSet,
+    const csBitArray& condResults);
     
   /**
    * Start an evaluation. If this is the first nested evaluation the evaluation cache

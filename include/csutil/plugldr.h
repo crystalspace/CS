@@ -24,39 +24,15 @@
  */
 
 #include "csextern.h"
+#include "csutil/csstring.h"
 #include "csutil/parray.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/util.h"
 
+struct iConfigFile;
+struct iCommandLineParser;
 struct iObjectRegistry;
-
-/** \internal
- * Helper class for csPluginLoader.
- */
-struct csPluginLoadRec
-{
-  char* Tag;
-  char* ClassID;
-  csRef<iBase> plugin;
-
-  csPluginLoadRec (const char* iTag, const char* iClassID)
-  { Tag = csStrNew (iTag); ClassID = csStrNew (iClassID); }
-  ~csPluginLoadRec ()
-  { delete [] ClassID; delete [] Tag; }
-};
-
-/** \internal
- * Helper class for csPluginLoader.
- */
-class CS_CRYSTALSPACE_EXPORT csPluginList : public csPDelArray<csPluginLoadRec>
-{
-public:
-  bool Sort (iObjectRegistry* object_reg);
-private:
-  bool RecurseSort (iObjectRegistry*, size_t row, size_t* order, size_t* loop,
-    bool *matrix);
-};
 
 /**
  * This utility class helps to load plugins based on request,
@@ -64,13 +40,21 @@ private:
  */
 class CS_CRYSTALSPACE_EXPORT csPluginLoader
 {
-  friend class csPluginList;
-
 private:
   // The object registry.
   iObjectRegistry* object_reg;
+  
+  struct csPluginLoadRec
+  {
+    csString Tag;
+    csString ClassID;
+    csRef<iBase> plugin;
+  
+    csPluginLoadRec (const char* iTag, const char* iClassID)
+    : Tag (iTag), ClassID (iClassID) {}
+  };
   // Requested plugins.
-  csPluginList requested_plugins;
+  csPDelArray<csPluginLoadRec> requested_plugins;
 
 public:
   /// Initialize.
@@ -82,13 +66,35 @@ public:
    * A shortcut for requesting to load a plugin (before LoadPlugins()).
    * If you want this class to register the plugin as a default for
    * some interface then you should use the interface name as the
-   * tag name (i.e. 'iGraphics3D').
-   * Note that plugins requested with some tag here get lowest precendence.
-   * The commandline has highest priority followed by the config file.
-   * If after this no plugin with the given tag exists then RequestPlugin()
-   * will work.
+   * tag name (e.g. 'iGraphics3D').
    */
   void RequestPlugin (const char* pluginName, const char* tagName);
+
+  /**
+   * Replace a tag that was requested earlier with the given plugin, or add
+   * the plugin and tag.
+   * \param pluginName Plugin ID of the plugin to load for the tag.
+   * \param tagName Tag to change the plugin of.
+   * \return \c true if a plugin was requested for \a tagName and replaced with
+   *   \a pluginName; \c false if a new request was added.
+   */
+  bool ReplaceRequestedPlugin (const char* pluginName, const char* tagName);
+  
+  /**
+   * Add plugins from configuration.
+   * \a prefix is the prefix of the configuration keys to scan. The tag
+   * name is the key name (minus the prefix), the plugin ID is the associated
+   * value. Previously requested plugins with the same tag are replaced.
+   */
+  void AddConfigurationPlugins (iConfigFile* config, const char* prefix);
+  
+  /**
+   * Add plugins from command line.
+   * Handles the <tt>-video</tt>, <tt>-canvas</tt> and <tt>-plugin</tt> command
+   * line parameters. Previously requested plugins with the tags for these
+   * parameters are replaced.
+   */
+  void AddCommandLinePlugins (iCommandLineParser* commandLine);
 
   /// Load the plugins.
   bool LoadPlugins ();

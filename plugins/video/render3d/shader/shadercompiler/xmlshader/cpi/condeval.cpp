@@ -963,7 +963,8 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
   return result;
 }
 
-void csConditionEvaluator::ForceConditionResults (const csBitArray& condResults)
+void csConditionEvaluator::ForceConditionResults (
+  const csBitArray& condSet, const csBitArray& condResults)
 {
   /* Hack: it can happen that while evaluating a shader, new conditions 
    * are added (notably when a shader source is retrieved from an
@@ -974,10 +975,12 @@ void csConditionEvaluator::ForceConditionResults (const csBitArray& condResults)
     condChecked.SetSize (GetNumConditions ());
     condResult.SetSize (GetNumConditions ());
   }
+  condChecked.Clear();
+  condResult.Clear();
 
   for (size_t i = 0; i < condResults.GetSize(); i++)
   {
-    condChecked.Set (i, true);
+    condChecked.Set (i, condSet[i]);
     condResult.Set (i, condResults[i]);
   }
 }

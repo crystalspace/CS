@@ -31,10 +31,10 @@ ShaderVariableContextImpl::~ShaderVariableContextImpl ()
 namespace
 {
 class SvVarArrayCmp : public csArrayCmp<csShaderVariable*, 
-                                        CS::ShaderVarStringID>
+  CS::ShaderVarStringID>
 {
   static int SvKeyCompare (csShaderVariable* const& r,
-			   CS::ShaderVarStringID const& k)
+		                         CS::ShaderVarStringID const& k)
   { 
     return r->GetName() - k;
   }
@@ -72,7 +72,7 @@ csShaderVariable* ShaderVariableContextImpl::GetVariable (
 void ShaderVariableContextImpl::PushVariables (
   csShaderVariableStack& stack) const
 {
-  for (size_t i=0; i<variables.GetSize (); ++i)
+  for (size_t i = 0; i < variables.GetSize (); ++i)
   {
     ShaderVarStringID name = variables[i]->GetName ();
     if (name >= stack.GetSize ())
@@ -103,7 +103,7 @@ bool ShaderVariableContextImpl::RemoveVariable (ShaderVarStringID name)
   size_t index = variables.FindSortedKey (SvVarArrayCmp (name));
   if (index != csArrayItemNotFound)
   {
-      return variables.DeleteIndex(index);
+      return variables.DeleteIndex (index);
   }
   return false;
 }
@@ -116,13 +116,13 @@ bool ShaderVariableContextImpl::RemoveVariable (ShaderVarStringID name)
 CS_LEAKGUARD_IMPLEMENT (csShaderVariableContext);
 
 csShaderVariableContext::csShaderVariableContext () :
-  scfImplementationType(this, 0)
+  scfImplementationType (this, 0)
 {}
 
 csShaderVariableContext::csShaderVariableContext (
   const csShaderVariableContext& other) :
-  iBase(), iShaderVariableContext(),
-  scfImplementationType(this), CS::ShaderVariableContextImpl()
+  iBase (), iShaderVariableContext(),
+  scfImplementationType(this), CS::ShaderVariableContextImpl ()
 {
   variables = other.variables;
 }

@@ -5,7 +5,7 @@
 @cindex MSVC, Building
 
 @noindent
-Originally written by Philip Wyett @email{philipwyett@@blueyonder.co.uk}.
+Originally written by Philip Wyett @email{philwyett@@gmx.com}.
 @noindent
 @emph{Last updated 18 May 2005.}
 

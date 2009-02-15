@@ -1265,41 +1265,14 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_FACTORY:
 	{
 	  const char* factname = child->GetContentsValue ();
-    iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
-
-    if(failedMeshFacts)
-    {
-      // Check for failed meshfact load.
-      int i = 0;
-      while(!fact)
-      {
-        if(failedMeshFacts->GetSize() != 0 &&
-          !strcmp(failedMeshFacts->Get(i), factname))
-        {
-          synldr->ReportError (
-            "crystalspace.genmeshloader.parse.unknownfactory",
-            child, "Couldn't find factory '%s'!", factname);
-          return 0;
-        }
-
-        if(i >= (int)(failedMeshFacts->GetSize()-1))
-        {
-          fact = ldr_context->FindMeshFactory (factname);
-          i = 0;
-        }
-        else
-        {
-          i++;
-        }
-      }
-    }
-    else if(!fact)
-    {
-      synldr->ReportError (
-        "crystalspace.genmeshloader.parse.unknownfactory",
-        child, "Couldn't find factory '%s'!", factname);
-      return 0;
-    }
+	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+	  if(!fact)
+	  {
+	    synldr->ReportError (
+	      "crystalspace.genmeshloader.parse.unknownfactory",
+	      child, "Couldn't find factory '%s'!", factname);
+	    return 0;
+	  }
 
 	  factstate =  
 	    scfQueryInterface<iGeneralFactoryState> (fact->GetMeshObjectFactory());
