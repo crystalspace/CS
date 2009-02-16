@@ -886,8 +886,9 @@ void csMeshWrapper::PlaceMesh ()
   iSectorList *movable_sectors = movable.GetSectors ();
   if (movable_sectors->GetCount () == 0) return ; // Do nothing
   csSphere sphere;
-  float radius;
-  GetObjectModel ()->GetRadius (radius, sphere.GetCenter ());
+  float radius = 0.0f;
+  if(GetObjectModel ())
+    GetObjectModel ()->GetRadius (radius, sphere.GetCenter ());
 
   iSector *sector = movable_sectors->Get (0);
   movable.SetSector (sector);       // Make sure all other sectors are removed

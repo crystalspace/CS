@@ -304,7 +304,7 @@ public:
   /// For iVisibilityObject: Get the object model.
   virtual iObjectModel* GetObjectModel ()
   {
-    return meshobj->GetObjectModel ();
+    return (meshobj != 0) ? meshobj->GetObjectModel () : 0;
   }
 
   // For iVisibilityObject:
