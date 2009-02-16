@@ -294,18 +294,10 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
   visobj_wrap->visobj = visobj;
   iMovable* movable = visobj->GetMovable ();
   visobj_wrap->update_number = movable->GetUpdateNumber ();
+  visobj_wrap->shape_number = visobj->GetObjectModel () ? visobj->GetObjectModel ()->GetShapeNumber () : 0;
 
   csBox3 bbox;
-  if(!visobj->GetObjectModel())
-  {
-    bbox.AddBoundingVertex(movable->GetPosition());
-    visobj_wrap->shape_number = 0;
-  }
-  else
-  {
-    CalculateVisObjBBox (visobj, bbox);
-    visobj_wrap->shape_number = visobj->GetObjectModel ()->GetShapeNumber ();
-  }
+  CalculateVisObjBBox (visobj, bbox);
   visobj_wrap->child = kdtree->AddObject (bbox, (void*)visobj_wrap);
   kdtree_box += bbox;
 
@@ -316,8 +308,8 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
   // be called by the calls above (i.e. especially the calculation of
   // the bounding box could cause a listener to be fired).
   movable->AddListener ((iMovableListener*)visobj_wrap);
-  if(visobj->GetObjectModel ())
-    visobj->GetObjectModel ()->AddListener ((iObjectModelListener*)visobj_wrap);
+  visobj->GetObjectModel ()->AddListener (
+		  (iObjectModelListener*)visobj_wrap);
 
   visobj_vector.Push (visobj_wrap);
 }
@@ -334,8 +326,7 @@ void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
       visobj->GetMovable ()->RemoveListener (
 		  (iMovableListener*)visobj_wrap);
       iObjectModel* objmodel = visobj->GetObjectModel ();
-      if(objmodel)
-        objmodel->RemoveListener ((iObjectModelListener*)visobj_wrap);
+      objmodel->RemoveListener ((iObjectModelListener*)visobj_wrap);
       kdtree->RemoveObject (visobj_wrap->child);
 #ifdef CS_DEBUG
       // To easily recognize that the vis wrapper has been deleted:
@@ -376,18 +367,10 @@ void csFrustumVis::UpdateObject (csFrustVisObjectWrapper* visobj_wrap)
   iVisibilityObject* visobj = visobj_wrap->visobj;
   iMovable* movable = visobj->GetMovable ();
   csBox3 bbox;
-  if(!visobj->GetObjectModel())
-  {
-    bbox.AddBoundingVertex(movable->GetPosition());
-    visobj_wrap->shape_number = 0;
-  }
-  else
-  {
-    CalculateVisObjBBox (visobj, bbox);
-    visobj_wrap->shape_number = visobj->GetObjectModel ()->GetShapeNumber ();
-  }
+  CalculateVisObjBBox (visobj, bbox);
   kdtree->MoveObject (visobj_wrap->child, bbox);
   kdtree_box += bbox;
+  visobj_wrap->shape_number = visobj->GetObjectModel ()->GetShapeNumber ();
   visobj_wrap->update_number = movable->GetUpdateNumber ();
 }
 
