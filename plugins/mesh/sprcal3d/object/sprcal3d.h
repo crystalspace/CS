@@ -37,8 +37,6 @@
 #include "csutil/refarr.h"
 #include "csutil/sysfunc.h"
 #include "csutil/weakref.h"
-#include "iengine/light.h"
-#include "iengine/lightmgr.h"
 #include "iengine/lod.h"
 #include "iengine/material.h"
 #include "iengine/mesh.h"
@@ -247,7 +245,6 @@ public:
   iVirtualClock* vc;
 
   csWeakRef<iGraphics3D> g3d;
-  csRef<iLightManager> light_mgr;
 
   /**
    * Reference to the engine (optional because sprites can also be
@@ -450,14 +447,16 @@ private:
   protected:
     csSpriteCal3DMeshObject* meshobj;
     int mesh;
-    uint colorVersion, normalVersion;
+    uint normalVersion, binormalVersion, tangentVersion;
     int vertexCount;
 
+    csRef<iRenderBuffer> binormal_buffer;
+    csRef<iRenderBuffer> tangent_buffer;
     csRef<iRenderBuffer> normal_buffer;
-    csRef<iRenderBuffer> color_buffer;
 
-    void UpdateNormals (CalRenderer* render, int meshIndex,
-      CalMesh* calMesh, size_t vertexCount);
+    void UpdateNormals (csRenderBufferHolder* holder);
+    void UpdateBinormals (csRenderBufferHolder* holder);
+    void UpdateTangents (csRenderBufferHolder* holder);
   public:
     iMovable* movable;
 	
@@ -466,7 +465,7 @@ private:
     {
       MeshAccessor::meshobj = meshobj;
       MeshAccessor::mesh = mesh;
-      colorVersion = normalVersion = (uint)-1;
+      normalVersion = binormalVersion = tangentVersion = (uint)-1;
       vertexCount = meshobj->ComputeVertexCount (mesh);
     }
 
@@ -513,7 +512,6 @@ private:
   uint meshVersion;
   csBox3 object_bbox;
   uint bboxVersion;
-  bool lighting_dirty;
 
   /** A mesh attached to the model.  These form the list of meshes that
     * the current model has attached to it.
@@ -552,12 +550,6 @@ private:
   int FindAnimCyclePos(int idx) const;
   int FindAnimCycleNamePos(char const*) const;
   void ClearAnimCyclePos(int pos, float delay);
-
-  void InitSubmeshLighting (int mesh, int submesh, CalRenderer *pCalRenderer,
-    iMovable* movable, csColor* colors);
-  void UpdateLightingSubmesh (const csSafeCopyArray<csLightInfluence>& lights,
-      iMovable*, CalRenderer*, int mesh, int submesh, float* have_normals,
-      csColor* colors);
 
 public:
   float updateanim_sqdistance1;

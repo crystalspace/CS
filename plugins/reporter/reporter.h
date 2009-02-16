@@ -63,6 +63,7 @@ private:
   };
   /// Queue of messages that were reported while nested
   csArray<ReportedMessage> messageQueue;
+  CS::Threading::RecursiveMutex messageQueueMutex;
   /// Actually report a message to listeners and record
   void ActualReport (const csRefArray<iReporterListener>& listeners,
     int severity, const char* msgId, const char* buf);

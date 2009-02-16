@@ -88,9 +88,6 @@ public:
   }
 
 protected:
-  // Set up the function pointers for drawing based on the current Depth
-  virtual void SetupDrawingFunctions();
-
   // OpenGL context for drawing
   CGLContextObj context;
 };

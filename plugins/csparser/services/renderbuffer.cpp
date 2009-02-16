@@ -893,8 +893,11 @@ public:
 
   virtual size_t GetSize() const
   {
-    return csRenderBufferComponentSizes[header->compType] 
-      * header->elementCount * header->compCount;
+    if (IsEdited())
+      return GetWrappedBuffer()->GetSize();
+    else
+      return csRenderBufferComponentSizes[header->compType] 
+	* csLittleEndian::Convert (header->elementCount) * header->compCount;
   }
 
   virtual size_t GetStride() const 
@@ -1090,7 +1093,9 @@ csRef<iRenderBuffer> csTextSyntaxService::ReadRenderBuffer (iDataBuffer* buf,
   // Buffer data is in little endian format, floats in IEEE, need to convert...
   csRef<iDataBuffer> newData;
   newData.AttachNew (new CS::DataBuffer<> (headerSize + totalSize));
-  memcpy (newData->GetData(), header, sizeof (headerSize));
+  /* Also copy the header since StoredRenderBuffer will pull the header from
+     the data buffer we provide on construction. */
+  memcpy (newData->GetData(), header, headerSize);
   void* src = buf->GetData() + headerSize;
   void* dst = newData->GetData() + headerSize;
 
@@ -1107,6 +1112,7 @@ csRef<iRenderBuffer> csTextSyntaxService::ReadRenderBuffer (iDataBuffer* buf,
         src, dst, totalElements);
   }
 
+  // Use converted data
   buf = newData;
 #endif
 

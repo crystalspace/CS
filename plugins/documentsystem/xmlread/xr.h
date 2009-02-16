@@ -709,7 +709,7 @@ public:
       csString location;
       location.Format ("line %d", parse.linenum);
       if (errorPos != 0)
-        location.AppendFmt (":%zu", errorPos - parse.startOfLine + 1);
+        location.AppendFmt (":%tu", errorPos - parse.startOfLine + 1);
       errorDesc += location.GetDataSafe();
       if (!errorPath.IsEmpty())
       {

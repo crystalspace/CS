@@ -574,7 +574,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   {
     if(collection)
     {
-      CS::Threading::MutexScopedLock lock(collectionLock);
       collection->Add(obj);
     }
   }

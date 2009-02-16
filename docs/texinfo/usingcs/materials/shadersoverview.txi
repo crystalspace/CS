@@ -137,6 +137,9 @@ may have more abstract mappings (e.g. registers for @sc{arb} programs).
 
 
 @subheading Shader Variables
+@cindex iShaderVarStringSet
+@cindex Shader variables
+@cindex Shader variable context
 
 Shader variables serve as an important carrier for data related to rendering
 in Crystal Space.  The function ``customize shaders'' is actually just a
@@ -144,9 +147,9 @@ subset of what shader variables are used for; other uses include passing
 around data inside the engine itself.
 
 Shader variables are identified by a name which is a string ID obtained
-from the global @code{iStringSet}.  Note that a name is not unique to an
-instance of a variable.  Indeed, commonly multiple variables will have the
-same name; there is no global single namespace of variables, which one is 
+from the global @code{iShaderVarStringSet}.  Note that a name is not unique
+to an instance of a variable.  Indeed, commonly multiple variables will have
+the same name; there is no global single namespace of variables, which one is
 chosen depends on what variables are attached to the different contexts -
 see below.
 

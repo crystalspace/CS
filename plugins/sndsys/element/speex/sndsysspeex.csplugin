@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- sndsysspeex.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sndsys.element.speex</name>
+        <implementation>SndSysSpeexLoader</implementation>
+        <description>Speex Sound System Element</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
+

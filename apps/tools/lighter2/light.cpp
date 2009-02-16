@@ -378,8 +378,8 @@ static float LightAttnNone (float, const csVector4&)
 
 static float LightAttnLinear (float squaredDistance, const csVector4& c)
 {
-  /// linear attenuation:  * (1 - distance / radius)
-  return csMax (0.0f, 1.0f - (sqrtf (squaredDistance) / c.w));
+  /// linear attenuation:  * (1 - distance * inverse_radius)
+  return csMax (0.0f, 1.0f - (sqrtf (squaredDistance) * c.w));
 }
 
 static float LightAttnInverse (float squaredDistance, const csVector4&)

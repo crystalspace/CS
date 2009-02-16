@@ -14,7 +14,6 @@
 #include "iutil/eventq.h"
 #include "ivaria/reporter.h"
 #include "csver.h"
-#include "csplugincommon/canvas/scrshot.h"
 #include "GLOSXDriver2D.h"
 
 #include <ApplicationServices/ApplicationServices.h>
@@ -90,9 +89,6 @@ bool GLOSXDriver2D::Open()
   // Initialize base class - will create window, switch mdoes, etx
   if (OSXDriver2D::Open() == false)
       return false;
-
-  // Initialize function pointers
-  SetupDrawingFunctions();
 
   // Initialize currentFormat with bit-depth & other info
   values = OSXDelegate2D_getOpenGLPixelFormatValues(delegate);
@@ -192,21 +188,4 @@ bool GLOSXDriver2D::ToggleFullscreen()
   if (success == true)
     OSXDelegate2D_updateOpenGLContext(delegate);
   return success;
-}
-
-
-// SetupDrawingFunctions
-// Set up the function pointers for drawing based on the current Depth
-void GLOSXDriver2D::SetupDrawingFunctions()
-{
-  if (Depth == 32)
-  {
-    _DrawPixel = DrawPixel32;
-    _GetPixelAt = GetPixelAt32;
-  }
-  else	// Depth is 16
-  {
-    _DrawPixel = DrawPixel16;
-    _GetPixelAt = GetPixelAt16;
-  }
 }

@@ -17,6 +17,7 @@
 */
 
 #include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 
 /**
  * Test iSCF operations and related SCF utilities.
@@ -36,40 +37,20 @@ public:
   CPPUNIT_TEST_SUITE_END();
 };
 
-struct iBaseTest  : public iBase {};
-struct iEmbedTest : public iBase {};
-class  csBaseTest : public iBaseTest
+struct iBaseTest  : public virtual iBase
 {
-  SCF_DECLARE_IBASE;
-  struct eiEmbedTest : public iEmbedTest
+  SCF_INTERFACE(iBaseTest,  1, 2, 3);
+};
+struct iEmbedTest : public virtual iBase
+{
+  SCF_INTERFACE(iEmbedTest, 4, 5, 6);
+};
+class  csBaseTest : public scfImplementation2<csBaseTest, iBaseTest, iEmbedTest>
+{
+  csBaseTest(iBase* p) : scfImplementationType (this, p)
   {
-    SCF_DECLARE_EMBEDDED_IBASE(csBaseTest);
-  } scfiEmbedTest;
-  csBaseTest(iBase* p)
-  {
-    SCF_CONSTRUCT_IBASE(p);
-    SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEmbedTest);
-  }
-  virtual ~csBaseTest()
-  {
-    SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEmbedTest);
-    SCF_DESTRUCT_IBASE();
   }
 };
-
-SCF_VERSION(iBaseTest,  1, 2, 3);
-SCF_VERSION(iEmbedTest, 4, 5, 6);
-
-SCF_IMPLEMENT_FACTORY(csBaseTest)
-
-SCF_IMPLEMENT_IBASE (csBaseTest)
-  SCF_IMPLEMENTS_INTERFACE(iBaseTest)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEmbedTest)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE(csBaseTest::eiEmbedTest)
-  SCF_IMPLEMENTS_INTERFACE(iEmbedTest)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 void scfTest::setUp()
 {

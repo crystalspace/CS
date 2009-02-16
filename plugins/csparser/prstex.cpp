@@ -398,7 +398,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if(!LoadImageTC (ret, filename, Format, false))
       {
         SyntaxService->Report("crystalspace.maploader.parse.texture",
-          CS_REPORTER_SEVERITY_ERROR, node, "Could not load image %s!", filename.GetData());
+          CS_REPORTER_SEVERITY_WARNING, node, "Could not load image %s!", filename.GetData());
       }
 
       csRef<iImage> image = scfQueryInterfaceSafe<iImage>(ret->GetResultRefPtr());
