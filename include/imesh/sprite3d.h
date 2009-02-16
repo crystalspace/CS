@@ -259,9 +259,17 @@ struct iSprite3DFactoryState : public virtual iBase
   virtual void EnableTweening (bool en) = 0;
   /// Query state of tweening.
   virtual bool IsTweeningEnabled () const = 0;
-  /// Set lighting quality (one of CS_SPR_LIGHTING_*).
+  /**
+   * Set lighting quality (one of CS_SPR_LIGHTING_*).
+   * \deprecated Deprecated in 1.9 by change to shader-based lighting.
+   */
+  CS_DEPRECATED_METHOD_MSG("Deprecated by change to shader-based lighting.")
   virtual void SetLightingQuality (int qual) = 0;
-  /// Get lighting quality (one of CS_SPR_LIGHTING_*).
+  /**
+   * Get lighting quality (one of CS_SPR_LIGHTING_*).
+   * \deprecated Deprecated in 1.9 by change to shader-based lighting.
+   */
+  CS_DEPRECATED_METHOD_MSG("Deprecated by change to shader-based lighting.")
   virtual int GetLightingQuality () const = 0;
   /**
    * Sets which lighting config variable that all new sprites created
@@ -270,9 +278,15 @@ struct iSprite3DFactoryState : public virtual iBase
    * - CS_SPR_LIGHT_GLOBAL (default)
    * - CS_SPR_LIGHT_TEMPLATE
    * - CS_SPR_LIGHT_LOCAL
+   * \deprecated Deprecated in 1.9 by change to shader-based lighting.
    */
+  CS_DEPRECATED_METHOD_MSG("Deprecated by change to shader-based lighting.")
   virtual void SetLightingQualityConfig (int qual) = 0;
-  /// Get the lighting quality config.
+  /**
+   * Get the lighting quality config.
+   * \deprecated Deprecated in 1.9 by change to shader-based lighting.
+   */
+  CS_DEPRECATED_METHOD_MSG("Deprecated by change to shader-based lighting.")
   virtual int GetLightingQualityConfig () const = 0;
 
   /**
@@ -392,12 +406,14 @@ struct iSprite3DState : public virtual iBase
    * See SPR_LIGHTING_* macros defined in this header for the different types
    * of lighting.
    */
+  CS_DEPRECATED_METHOD_MSG("Deprecated by change to shader-based lighting.")
   virtual int GetLightingQuality () = 0;
 
   /**
    * Sets the local lighting quality for this sprite.  NOTE: you must use
    * SetLightingQualityConfig (CS_SPR_LIGHT_LOCAL) for the sprite to use this.
    */
+  CS_DEPRECATED_METHOD_MSG("Deprecated by change to shader-based lighting.")
   virtual void SetLocalLightingQuality (int lighting_quality) = 0;
 
   /**
@@ -407,11 +423,13 @@ struct iSprite3DState : public virtual iBase
    * - CS_SPR_LIGHT_TEMPLATE
    * - CS_SPR_LIGHT_LOCAL
    */
+  CS_DEPRECATED_METHOD_MSG("Deprecated by change to shader-based lighting.")
   virtual void SetLightingQualityConfig (int config_flag) = 0;
 
   /**
    * Returns what this sprite is using for determining the lighting quality.
    */
+  CS_DEPRECATED_METHOD_MSG("Deprecated by change to shader-based lighting.")
   virtual int GetLightingQualityConfig () const = 0;
 
   /**

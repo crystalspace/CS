@@ -40,7 +40,8 @@ csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationTyp
   }
 
   // Have 'processor count' extra processing threads.
-  threadQueue.AttachNew(new ThreadedJobQueue(threadCount));
+  threadQueue.AttachNew(new ThreadedJobQueue(ceil(threadCount/2.0f), THREAD_PRIO_NORMAL,
+    threadCount == 1 ? 0 : ceil(threadCount/2.0f)));
   listQueue.AttachNew(new ListAccessQueue());
 
   // Event handler.

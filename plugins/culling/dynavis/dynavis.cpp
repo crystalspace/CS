@@ -359,10 +359,26 @@ void csDynaVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox,
   if (full_transform_identity)
   {
     bbox = visobj->GetObjectModel ()->GetObjectBoundingBox ();
+#ifdef CS_DEBUG
+    if (bbox.IsNaN ())
+    {
+      iMeshWrapper* mesh = visobj->GetMeshWrapper ();
+      csPrintfErr ("The bounding box of '%s' is invalid!\n",
+	  mesh ? mesh->QueryObject ()->GetName () : "<unknown>");
+    }
+#endif
   }
   else
   {
     const csBox3& box = visobj->GetObjectModel ()->GetObjectBoundingBox ();
+#ifdef CS_DEBUG
+    if (box.IsNaN ())
+    {
+      iMeshWrapper* mesh = visobj->GetMeshWrapper ();
+      csPrintfErr ("The bounding box of '%s' is invalid!\n",
+	  mesh ? mesh->QueryObject ()->GetName () : "<unknown>");
+    }
+#endif
     csReversibleTransform trans = movable->GetFullTransform ();
     bbox.StartBoundingBox (trans.This2Other (box.GetCorner (0)));
     bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (1)));
@@ -372,6 +388,14 @@ void csDynaVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox,
     bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (5)));
     bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (6)));
     bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (7)));
+#ifdef CS_DEBUG
+    if (bbox.IsNaN ())
+    {
+      iMeshWrapper* mesh = visobj->GetMeshWrapper ();
+      csPrintfErr ("The transformed bounding box of '%s' is invalid!\n",
+	  mesh ? mesh->QueryObject ()->GetName () : "<unknown>");
+    }
+#endif
   }
 }
 

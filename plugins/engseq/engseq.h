@@ -121,7 +121,7 @@ class csSequenceWrapper : public scfImplementationExt2<csSequenceWrapper,
 {
 private:
   csRef<iSequence> sequence;
-  csRef<csEngineSequenceManager> eseqmgr;
+  csEngineSequenceManager* eseqmgr;
   csRef<csEngineSequenceParameters> params;
   uint sequence_id;
 
@@ -244,7 +244,7 @@ private:
   uint32 onetest_framenr;	// We test for this frame.
   iSequenceWrapper* fire_sequence;
   csRef<iEngineSequenceParameters> params;
-  csRef<csEngineSequenceManager> eseqmgr;
+  csEngineSequenceManager* eseqmgr;
   csTicks fire_delay;
   uint32 framenr;
   // Sequence created by TestConditions().

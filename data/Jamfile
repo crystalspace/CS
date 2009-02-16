@@ -45,6 +45,7 @@ for map in $(maps)
 }
 
 SubInclude TOP data castle ;
+SubInclude TOP data castle-staticlit ;
 SubInclude TOP data ceguitest ;
 SubInclude TOP data config-app ;
 SubInclude TOP data config-plugins ;

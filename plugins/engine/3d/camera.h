@@ -53,7 +53,7 @@ protected:
   bool mirror;
 
   /// Callbacks.
-  csRefArray<iCameraSectorListener> listeners;
+  csRefArray<iCameraListener> listeners;
 
   /**
    * If true then we only check collision with portals and not
@@ -161,6 +161,7 @@ public:
   virtual void SetO2T (const csMatrix3& m)
   {
     csOrthoTransform::SetO2T (m);
+    FireCameraMovedListeners ();
     cameranr = cur_cameranr++;
   }
 
@@ -172,6 +173,7 @@ public:
   virtual void SetT2O (const csMatrix3& m)
   {
     csOrthoTransform::SetT2O (m);
+    FireCameraMovedListeners ();
     cameranr = cur_cameranr++;
   }
 
@@ -183,6 +185,7 @@ public:
   virtual void SetO2TTranslation (const csVector3& v)
   {
     csOrthoTransform::SetO2TTranslation (v);
+    FireCameraMovedListeners ();
     cameranr = cur_cameranr++;
   }
 
@@ -193,7 +196,11 @@ public:
    * fact it is legal to set the position outside the sector
    * boundaries.
    */
-  virtual void SetPosition (const csVector3& v) { SetOrigin (v); }
+  virtual void SetPosition (const csVector3& v) 
+  { 
+    SetOrigin (v); 
+    FireCameraMovedListeners ();
+  }
 
   /**
    * Set the world to camera transformation matrix.
@@ -261,7 +268,11 @@ public:
    * doesn't want to restrict its movement by portals and
    * sector boundaries.
    */
-  virtual void MoveWorldUnrestricted (const csVector3& v) { Translate (v); }
+  virtual void MoveWorldUnrestricted (const csVector3& v) 
+  { 
+    Translate (v); 
+    FireCameraMovedListeners ();
+  }
 
   /**
    * Moves the camera a relative amount in camera coordinates,
@@ -270,7 +281,11 @@ public:
    * doesn't want to restrict its movement by portals and
    * sector boundaries.
    */
-  virtual void MoveUnrestricted (const csVector3& v) { Translate (m_t2o * v); }
+  virtual void MoveUnrestricted (const csVector3& v) 
+  { 
+    Translate (m_t2o * v); 
+    FireCameraMovedListeners ();
+  }
 
   /**
    * Eliminate roundoff error by snapping the camera orientation to a
@@ -302,7 +317,19 @@ public:
     listeners.Delete (listener);
   }
 
+  virtual void AddCameraListener (iCameraListener* listener)
+  {
+    listeners.Push (listener);
+  }
+
+  virtual void RemoveCameraListener (iCameraListener* listener)
+  {
+    listeners.Delete (listener);
+  }
+
   void FireCameraSectorListeners (iSector* sector);
+
+  void FireCameraMovedListeners ();
 
   virtual void OnlyPortals (bool hop)
   {
@@ -319,6 +346,7 @@ public:
   virtual void SetTransform (const csOrthoTransform& tr)
   {
     *(csOrthoTransform*)this = tr;
+    FireCameraMovedListeners ();
     cameranr = cur_cameranr++;
   }
   virtual iSceneNode* QuerySceneNode () { return this; }

@@ -40,50 +40,48 @@ struct iObjectRegistry;
 class csDecal;
 
 class csDecalManager : public scfImplementation3<csDecalManager,
-                                                 iDecalManager,
-                                                 iComponent,
-						 iEventHandler>
+  iDecalManager, iComponent, iEventHandler>
 {
   friend class csDecal;
 
 private:
-  iObjectRegistry *     objectReg;
-  csRef<iEngine>        engine;
-  csArray<csDecal *>    decals;
-  csRef<iEventHandler>  weakEventHandler;
-  csRef<iVirtualClock>  vc;
-  csBlockAllocator<csRenderMesh>	renderMeshAllocator;
+  iObjectRegistry* objectReg;
+  csRef<iEngine> engine;
+  csArray<csDecal*> decals;
+  csRef<iEventHandler> weakEventHandler;
+  csRef<iVirtualClock> vc;
+  csBlockAllocator<csRenderMesh> renderMeshAllocator;
 
 public:
-  csDecalManager(iBase * parent);
-  virtual ~csDecalManager();
+  csDecalManager (iBase* parent);
+  virtual ~csDecalManager ();
 
-  virtual bool Initialize(iObjectRegistry * objectReg);
+  virtual bool Initialize (iObjectRegistry* objectReg);
 
-  virtual iDecal * CreateDecal(iDecalTemplate * decalTemplate, 
-      iSector * sector, const csVector3 & pos, const csVector3 & up, 
-      const csVector3 & normal, float width, float height, iDecal * oldDecal);
+  virtual iDecal* CreateDecal (iDecalTemplate* decalTemplate, 
+    iSector* sector, const csVector3& pos, const csVector3& up, 
+    const csVector3& normal, float width, float height, iDecal* oldDecal);
 
-  virtual csRef<iDecalTemplate> CreateDecalTemplate(
-      iMaterialWrapper * material);
+  virtual csRef<iDecalTemplate> CreateDecalTemplate (
+    iMaterialWrapper* material);
 
-  virtual void DeleteDecal(const iDecal * decal);
-  virtual size_t GetDecalCount() const;
-  virtual iDecal * GetDecal(size_t idx) const;
+  virtual void DeleteDecal (const iDecal* decal);
+  virtual size_t GetDecalCount () const;
+  virtual iDecal* GetDecal (size_t idx) const;
 
   // event handler stuff
-  virtual bool HandleEvent(iEvent & ev);
+  virtual bool HandleEvent (iEvent& ev);
 
-  CS_EVENTHANDLER_PHASE_LOGIC("crystalspace.decals")
+  CS_EVENTHANDLER_PHASE_LOGIC ("crystalspace.decals")
   CS_DECLARE_EVENT_SHORTCUTS;
   
 private:
-  bool EnsureEngineReference();
+  bool EnsureEngineReference ();
 
-  void FillDecal(csDecal * decal, iMeshWrapperIterator * meshIter, 
-      const csVector3 & pos, float radius);
+  void FillDecal (csDecal* decal, iMeshWrapperIterator* meshIter, 
+    const csVector3 & pos, float radius);
       
-  void RemoveDecalFromList(csDecal * decal);
+  void RemoveDecalFromList (csDecal* decal);
 };  
 
 #endif // __CS_DECAL_MANAGER_H__

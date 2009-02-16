@@ -92,6 +92,8 @@ namespace lighter
   void Statistics::GlobalProgress::UpdateProgressDisplay (
     const char* taskName)
   {
+    if (taskName == 0) return;
+
     lastUpdatePercentGlobal = int (100.0f * progress);
     int redrawFlags;
     if (this->taskName != taskName)
@@ -100,7 +102,7 @@ namespace lighter
       redrawFlags = TUI::TUI_DRAW_ALL;
     }
     else
-      redrawFlags = TUI::TUI_DRAW_PROGRESS;
+      redrawFlags = TUI::TUI_DRAW_PROGRESS | TUI::TUI_DRAW_SWAPCACHE;
 
     globalTUI.Redraw (redrawFlags);
   }

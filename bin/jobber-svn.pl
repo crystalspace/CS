@@ -200,6 +200,9 @@
 #             Online browseable files are placed into
 #             $jobber_browseable_dir/$dir, and downloadable packages are placed
 #             into $jobber_package_dir/$dir.
+#         package-dir [optional]
+#             Directory name into which downloadable package files for this
+#             task are published. If omitted, "dir" is used.
 #         name [required]
 #             Base package name used when generating downloadable packages via
 #             @jobber_archivers (see below).  When published, the base package
@@ -279,7 +282,7 @@ use warnings;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber-svn.pl';
-my $PROG_VERSION = '35';
+my $PROG_VERSION = '38';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000-2005 by $AUTHOR_NAME <$AUTHOR_EMAIL>\nConverted for SVN support by Marten Svanfeldt";
@@ -451,6 +454,14 @@ sub remove_file {
 sub rename_file {
     my ($src, $dst) = @_;
     rename($src, $dst) or expire("rename($src,$dst)");
+}
+
+#------------------------------------------------------------------------------
+# Remove a directory.
+#------------------------------------------------------------------------------
+sub remove_dir {
+    my $dir = shift;
+    rmdir($dir) or expire("rmdir($dir)");
 }
 
 #------------------------------------------------------------------------------
@@ -750,6 +761,10 @@ sub publish_browseable {
 
 	print "  Installing.\n";
 	rename_file($dst, $old_dir) if -e $dst;
+	create_directory_deep($dst, $jobber_public_group);
+	# create_directory_deep also creates the directory which we want to
+	# move in, so delete that first
+	remove_dir($dst);
 	rename_file($new_dir, $dst);
 
 	print "  Cleaning.\n";
@@ -808,7 +823,8 @@ sub publish_packages {
 	}
 
 	my $base = $export->{'name'};
-	my $dst = "$jobber_package_dir/$export->{'dir'}";
+	my $dst = "$jobber_package_dir/" . ($export->{'package-dir'} ?
+	    $export->{'package-dir'} : $export->{'dir'});
 	create_directory_deep($dst, $jobber_public_group) unless $TESTING;
 	foreach my $archiver (@jobber_archivers) {
 	    publish_package($archiver, $appear, $dst, $base, '  ');

@@ -1284,7 +1284,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     csBitmaskToString::GetStr (drawflags, drawflagNames)));
 
   SetWriteMask (true, true, true, true);
-  statecache->Disable_GL_POINT_SPRITE_ARB();
+  if (ext->CS_GL_ARB_point_sprite)
+    statecache->Disable_GL_POINT_SPRITE_ARB();
 
   clipportal_dirty = true;
   clipportal_floating = 0;
@@ -1863,10 +1864,13 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       primitivetype = GL_TRIANGLES;
       break;
   }
-  if (primitivetype == GL_POINTS)
-    statecache->Enable_GL_POINT_SPRITE_ARB();
-  else
-    statecache->Disable_GL_POINT_SPRITE_ARB();
+  if (ext->CS_GL_ARB_point_sprite)
+  {
+    if (primitivetype == GL_POINTS)
+      statecache->Enable_GL_POINT_SPRITE_ARB();
+    else
+      statecache->Disable_GL_POINT_SPRITE_ARB();
+  }
 
   // Based on the kind of clipping we need we set or clip mask.
   int clip_mask, clip_value;

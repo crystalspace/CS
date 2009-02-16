@@ -42,10 +42,11 @@ class CS_CRYSTALSPACE_EXPORT ThreadedJobQueue :
   public scfImplementation1<ThreadedJobQueue, iJobQueue>
 {
 public:
-  ThreadedJobQueue (size_t numWorkers = 1, ThreadPriority priority = THREAD_PRIO_NORMAL);
+  ThreadedJobQueue (size_t numWorkers = 1, ThreadPriority priority = THREAD_PRIO_NORMAL,
+    size_t numNonLowWorkers = 0);
   virtual ~ThreadedJobQueue ();
 
-  virtual void Enqueue (iJob* job);
+  virtual void Enqueue (iJob* job, bool lowPriority = false);
   virtual void PullAndRun (iJob* job);
   virtual void PopAndRun();
   virtual void Unqueue (iJob* job, bool waitIfCurrent = true);
@@ -61,21 +62,22 @@ private:
   class QueueRunnable : public Runnable
   {
   public:
-    QueueRunnable (ThreadedJobQueue* queue, ThreadState* ts);
+    QueueRunnable (ThreadedJobQueue* queue, ThreadState* ts, bool doLow = true);
 
     virtual void Run ();
 
   private:
     ThreadedJobQueue* ownerQueue;
     ThreadState* threadState;
+    bool doLow;
   };
 
   // Per thread state
   struct ThreadState
   {
-    ThreadState (ThreadedJobQueue* queue)
+    ThreadState (ThreadedJobQueue* queue, bool doLow = true)
     {
-      runnable.AttachNew (new QueueRunnable (queue, this));
+      runnable.AttachNew (new QueueRunnable (queue, this, doLow));
       threadObject.AttachNew (new Thread (runnable, false));
     }
 
@@ -88,6 +90,7 @@ private:
   // Shared queue state
   typedef csFIFO<csRef<iJob> > JobFifo;
   JobFifo jobQueue;
+  JobFifo jobQueueL;
   Mutex jobMutex;
   Condition newJob;
 

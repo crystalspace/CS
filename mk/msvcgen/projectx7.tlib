@@ -43,7 +43,7 @@
 [% MACRO library_dll_versuffix GET 
   ('-' _ my.doc.packageversion.0) IF my.doc.packageversion.0 -%]
 [% MACRO library_dll_outfile(suffix) GET
-  my.doc.rawtarget.0 _ library_dll_versuffix _ '-vc' _ my.doc.msvcversion.0 _ suffix
+  my.doc.rawtarget.0 _ library_dll_versuffix _ '-vc' _ my.doc.msvcversion.0 _ platform.suffix _ suffix
 %]
 
 [% MACRO global_app BLOCK -%]
@@ -113,7 +113,7 @@
 
 # The default PDB file name
 [% MACRO compiler_default_pdb BLOCK -%]
-				ProgramDataBaseFileName="[% workbuild([my.doc.rawtarget.0,'.pdb']) %]"
+				ProgramDataBaseFileName="[% workbuild([platform.name, '\\', my.doc.rawtarget.0, '.pdb']) %]"
 [% END %]
 [% MACRO compiler_appcon  GET compiler_default_pdb %]
 [% MACRO compiler_appgui  GET compiler_default_pdb %]
@@ -124,12 +124,12 @@
 # For shared libraries, use a different PDB name (resembling the shared lib
 # file name)
 [% MACRO compiler_library_shared_release BLOCK -%]
-				ProgramDatabaseFileName="[% workbuild(library_dll_outfile('.pdb')) %]"
+				ProgramDatabaseFileName="[% workbuild([platform.name, '\\', library_dll_outfile('.pdb')]) %]"
 [% END %]
 
 [% MACRO compiler_library_shared_debug BLOCK -%]
 [% precompiled_header -%]
-				ProgramDatabaseFileName="[% workbuild(library_dll_outfile('_d.pdb')) %]"
+				ProgramDatabaseFileName="[% workbuild([platform.name, '\\', library_dll_outfile('_d.pdb')]) %]"
 [% END %]
 
 
@@ -148,7 +148,7 @@
 
 [% MACRO linker_common BLOCK -%]
 				OutputFile="[% path([my.doc.buildroot.0, my.doc.target.0]) %]"
-				ProgramDatabaseFile="[% workbuild([my.doc.rawtarget.0,'.pdb']) %]"
+				ProgramDatabaseFile="[% workbuild([platform.name, '\\', my.doc.rawtarget.0, '.pdb']) %]"
 [% END %]
 
 [% MACRO linker_app(subsys) BLOCK -%]
@@ -160,32 +160,32 @@
 [% MACRO linker_appgui_debug GET linker_app(1) %]
 
 [% MACRO linker_library_shared_release BLOCK -%]
-                                OutputFile="[% path([my.doc.buildroot.0, library_dll_outfile('.dll')]) %]"
-				ImportLibrary="[% worklibout %]\[% my.doc.project.0 %].lib"
-				ProgramDatabaseFile="[% workbuild(library_dll_outfile('.pdb')) %]"
+                        OutputFile="[% path([my.doc.buildroot.0, library_dll_outfile('.dll')]) %]"
+				ImportLibrary="[% worklibout %]\[% platform.name %]\[% my.doc.project.0 %].lib"
+				ProgramDatabaseFile="[% workbuild([platform.name, '\\', library_dll_outfile('.pdb')]) %]"
 [% END %]
 
 [% MACRO linker_library_shared_debug BLOCK -%]
-                                OutputFile="[% path([my.doc.buildroot.0, library_dll_outfile('_d.dll')]) %]"
-				ImportLibrary="[% worklibout %]\[% my.doc.project.0 %]_d.lib"
-				ProgramDatabaseFile="[% workbuild(library_dll_outfile('_d.pdb')) %]"
+                        OutputFile="[% path([my.doc.buildroot.0, library_dll_outfile('_d.dll')]) %]"
+				ImportLibrary="[% worklibout %]\[% platform.name %]\[% my.doc.project.0 %]_d.lib"
+				ProgramDatabaseFile="[% workbuild([platform.name, '\\', library_dll_outfile('_d.pdb')]) %]"
 [% END %]
 
 [% MACRO linker_plugin BLOCK -%]
 [% linker_common -%]
 				IgnoreImportLibrary="TRUE"
 				DelayLoadDLLs="[% glue(my.doc.librarydelay,';','','.dll') %]"
-				ImportLibrary="[% workbuild([my.doc.project.0,'.lib']) %]"
+				ImportLibrary="[% workbuild([platform.name, '\\', my.doc.project.0, '.lib']) %]"
 [% END %]
 
 [% MACRO linker_dll BLOCK -%]
 [% linker_common -%]
 				DelayLoadDLLs="[% glue(my.doc.librarydelay,';','','.dll') %]"
-				ImportLibrary="[% workbuild([my.doc.project.0,'.lib']) %]"
+				ImportLibrary="[% workbuild([platform.name, '\\', my.doc.project.0, '.lib']) %]"
 [% END %]
 
 [% MACRO library_outfile(suffix) BLOCK -%]
-				OutputFile="[% worklibout %]\[% my.doc.project.0 %][% suffix %].lib"
+				OutputFile="[% worklibout %]\[% platform.name %]\[% my.doc.project.0 %][% suffix %].lib"
 [% END %]
 [% MACRO librarian_library_release GET library_outfile('') %]
 [% MACRO librarian_library_debug   GET library_outfile('_d') %]

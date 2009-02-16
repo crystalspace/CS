@@ -89,7 +89,7 @@ namespace CS
       float val;
       struct lconv *locale_data;
       const char *decimal_point;
-      int decimal_point_len;
+      size_t decimal_point_len;
       const char *p, *decimal_point_pos;
       const char *end = NULL; /* Silence gcc */
       int strtod_errno;

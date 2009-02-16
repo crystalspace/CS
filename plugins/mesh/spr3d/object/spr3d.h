@@ -333,16 +333,6 @@ private:
   /// Enable tweening.
   bool do_tweening;
 
-  /// The lighting_quality for this template.  See macros CS_SPR_LIGHTING_*
-  int lighting_quality;
-
-  /**
-   * The lighting_quality_config for this template.
-   * See macros CS_SPR_LIGHT_*
-   * This is used to set new sprites lighting_quality_config to this one.
-   */
-  int lighting_quality_config;
-
   /**
    * Values for the function <code>lod=m*distance+a</code> that is used
    * to compute the actual LOD level for this object.
@@ -426,10 +416,10 @@ public:
   bool IsTweeningEnabled () const { return do_tweening; }
 
   /// Returns the lighting quality for this template.
-  int GetLightingQuality() const { return lighting_quality; }
+  int GetLightingQuality() const { return 0; }
 
   /// Sets the lighting quality for this template.  See CS_SPR_LIGHTING_* defs.
-  void SetLightingQuality(int quality) {lighting_quality = quality; }
+  void SetLightingQuality(int quality) { }
 
   /**
    * Sets which lighting config variable that all new sprites created
@@ -439,14 +429,12 @@ public:
    * - CS_SPR_LIGHT_TEMPLATE
    * - CS_SPR_LIGHT_LOCAL
    */
-  void SetLightingQualityConfig (int config_flag)
-  { lighting_quality_config = config_flag; };
+  void SetLightingQualityConfig (int config_flag) { };
 
   /**
    * Returns what this template is using for determining the lighting quality.
    */
-  int GetLightingQualityConfig () const
-  { return lighting_quality_config; };
+  int GetLightingQualityConfig () const { return 0; };
 
   /**
    * Sets which lod config variable that all new sprites created
@@ -1026,9 +1014,6 @@ private:
   /// Enable single-step mode on actions
   bool single_step;
 
-  /// Enable or disable lighting.
-  bool do_lighting;
-
   ///
   bool force_otherskin;
 
@@ -1083,48 +1068,6 @@ private:
   /// Setup this object.
   void SetupObject ();
 
-
-private:
-  /**
-   * Update the lighting on this sprite.
-   */
-  void UpdateLighting (const csSafeCopyArray<csLightInfluence>& lights,
-      iMovable* movable);
-
-  /**
-   * High quality version of UpdateLighting() which recalculates
-   * the distance between the light and every vertex.
-   * This version can use tweening of the normals and vertices
-   */
-  void UpdateLightingHQ (const csSafeCopyArray<csLightInfluence>& lights,
-      iMovable* movable);
-
-  /**
-   * Low quality version of UpdateLighting() which only
-   * calculates the distance once (from the center of the sprite.)
-   * This method can use tweening of the normals.
-   */
-  void UpdateLightingLQ (const csSafeCopyArray<csLightInfluence>& lights,
-      iMovable* movable);
-
-  /**
-   * Low quality Fast version of UpdateLighting() which only
-   * calculates the distance once (from the center of the sprite.)
-   * This version can NOT use any tweening.
-   */
-  void UpdateLightingFast (const csSafeCopyArray<csLightInfluence>& lights,
-      iMovable* movable);
-
-  /**
-   * A fairly fast :P totally inaccurate(usually) lighting method.
-   *  Intended for use for things like powerups.
-   */
-  void UpdateLightingRandom ();
-
-  
-  /// random number generator used for random lighting.
-  csRandomGen *rand_num;
-
 public:
   /// Constructor.
   csSprite3DMeshObject ();
@@ -1160,15 +1103,11 @@ public:
   bool IsTweeningEnabled () const { return do_tweening; }
 
   /// Set lighting.
-  void SetLighting (bool l)
-  {
-    do_lighting = l;
-    ResetVertexColors ();
-  }
+  void SetLighting (bool l) { }
   /// Is lighting enabled?
   bool IsLighting () const
   {
-    return do_lighting;
+    return false;
   }
 
   float GetTweenRatio(){return tween_ratio;}

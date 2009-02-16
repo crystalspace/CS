@@ -133,18 +133,19 @@ namespace lighter
     enum ElementType
     {ELEMENT_EMPTY, ELEMENT_BORDER, ELEMENT_INSIDE};
 
-    inline Primitive (ObjectVertexData &dataHolder) 
+    inline Primitive (ObjectVertexData &dataHolder, uint groupID) 
       : PrimitiveBase (&dataHolder), uFormVector (0), vFormVector (0), 
         /*illuminationColor (0,0,0), reflectanceColor (1.0f,1.0f,1.0f), */
         minCoord (0), minUV (0,0), maxUV (0,0), /*originalPrim (0), */
-        radObject (0)
+        radObject (0), groupID (groupID)
     {
     }
     inline Primitive (const Primitive& other) 
       : PrimitiveBase (other), elementClassification (other.elementClassification), 
         uFormVector (other.uFormVector), vFormVector (other.uFormVector), 
         minCoord (other.minCoord), minUV (other.minUV), maxUV (other.maxUV), 
-        radObject (other.radObject), globalLightmapID (other.globalLightmapID),
+        radObject (other.radObject), groupID (other.groupID),
+        globalLightmapID (other.globalLightmapID),
         lambdaCoeffTV (other.lambdaCoeffTV), myCoeffTV (other.myCoeffTV),
         material (0)
     {
@@ -255,6 +256,8 @@ namespace lighter
     inline const Object* GetObject () const { return radObject; }
     inline Object* GetObject () { return radObject; }
     inline void SetObject (Object *obj) { radObject = obj; }
+    
+    inline uint GetGroupID () const { return groupID; }
 
     inline uint GetGlobalLightmapID () const { return globalLightmapID; }
     inline void SetGlobalLightmapID (uint id) { globalLightmapID = id; }
@@ -285,6 +288,9 @@ protected:
 
     /// Original object
     Object* radObject;
+    
+    /// Primitive group ID (a primitive group was lightmapped together)
+    uint groupID;
 
     /// GLobal lightmap id
     uint globalLightmapID;

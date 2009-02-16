@@ -36,6 +36,28 @@ StructuredTextureFormat::StructuredTextureFormat ()
   coded_components = CONST_UINT64 (0);
   format = Invalid;
 }
+    
+StructuredTextureFormat::StructuredTextureFormat (
+  char cmp1, int size1,
+  char cmp2, int size2,
+  char cmp3, int size3,
+  char cmp4, int size4,
+  TextureFormat fmt) : coded_components (CONST_UINT64 (0)), format (fmt)
+{
+  if (cmp1 != 0) 
+  {
+    AddComponent (cmp1, size1);
+    if (cmp2 != 0)
+    {
+      AddComponent (cmp2, size2);
+      if (cmp3 != 0)
+      {
+        AddComponent (cmp3, size3);
+        if (cmp4 != 0) AddComponent (cmp4, size4);
+      }
+    }
+  }
+}
 
 bool StructuredTextureFormat::AddComponent (char cmp, int size)
 {

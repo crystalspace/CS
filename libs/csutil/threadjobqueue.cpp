@@ -29,17 +29,21 @@ namespace CS
 namespace Threading
 {
 
-  ThreadedJobQueue::ThreadedJobQueue (size_t numWorkers, ThreadPriority priority)
+  ThreadedJobQueue::ThreadedJobQueue (size_t numWorkers, ThreadPriority priority,
+    size_t numNonLowWorkers)
     : scfImplementationType (this), 
-    numWorkerThreads (numWorkers), 
+    numWorkerThreads (numWorkers+numNonLowWorkers), 
     shutdownQueue (false), outstandingJobs (0)
   {
-    allThreadState = new ThreadState*[numWorkers];
+    allThreadState = new ThreadState*[numWorkerThreads];
 
     // Start up the threads
     for (size_t i = 0; i < numWorkerThreads; ++i)
     {
-      allThreadState[i] = new ThreadState (this);
+      if(i < numWorkers)
+        allThreadState[i] = new ThreadState (this);
+      else
+        allThreadState[i] = new ThreadState (this, false);
       allThreadState[i]->threadObject->SetPriority(priority);
       allThreads.Add (allThreadState[i]->threadObject);
     }
@@ -52,6 +56,7 @@ namespace Threading
       // Empty the queue for new jobs
       MutexScopedLock lock (jobMutex);
       jobQueue.DeleteAll ();
+      jobQueueL.DeleteAll ();
     }
 
     // Wait for all threads to finish their current job
@@ -68,13 +73,16 @@ namespace Threading
   }
 
 
-  void ThreadedJobQueue::Enqueue (iJob* job)
+  void ThreadedJobQueue::Enqueue (iJob* job, bool lowPriority)
   {
     if (!job)
       return;
 
     MutexScopedLock lock (jobMutex);
-    jobQueue.Push (job);
+    if(lowPriority)
+      jobQueueL.Push (job);
+    else
+      jobQueue.Push (job);
     CS::Threading::AtomicOperations::Increment (&outstandingJobs);
     newJob.NotifyOne ();
   }
@@ -86,7 +94,7 @@ namespace Threading
     {
       MutexScopedLock lock (jobMutex);
       // Check if in queue
-      jobUnqued = jobQueue.Delete (job);
+      jobUnqued = jobQueue.Delete (job) || jobQueueL.Delete (job);
     }
 
     if (jobUnqued)
@@ -131,6 +139,10 @@ namespace Threading
       {
         job = jobQueue.PopTop();
       }
+      else if(jobQueueL.GetSize () > 0)
+      {
+        job = jobQueueL.PopTop();
+      }
     }
     
     if(job.IsValid())
@@ -145,7 +157,7 @@ namespace Threading
     {
       MutexScopedLock lock (jobMutex);
       // Check if in queue
-      bool jobUnqued = jobQueue.Delete (job);
+      bool jobUnqued = jobQueue.Delete (job) || jobQueueL.Delete (job);
 
       if (jobUnqued)
         return;
@@ -210,7 +222,7 @@ namespace Threading
       {
 	MutexScopedLock lock (jobMutex);
 	// Check if in queue
-	bool jobUnqued = jobQueue.Contains (job);
+	bool jobUnqued = jobQueue.Contains (job) || jobQueueL.Contains (job);
   
 	if (!jobUnqued)
 	  // Not queued or running at all (any more)
@@ -234,8 +246,8 @@ namespace Threading
   }
 
   ThreadedJobQueue::QueueRunnable::QueueRunnable (ThreadedJobQueue* queue, 
-    ThreadState* ts)
-    : ownerQueue (queue), threadState (ts)
+    ThreadState* ts, bool doLow)
+    : ownerQueue (queue), threadState (ts), doLow(doLow)
   {
   }
 
@@ -246,7 +258,8 @@ namespace Threading
       // Get a job
       {
         MutexScopedLock lock (ownerQueue->jobMutex);
-        while (ownerQueue->jobQueue.GetSize () == 0)
+        while (ownerQueue->jobQueue.GetSize () == 0 &&
+          (!doLow || ownerQueue->jobQueueL.GetSize () == 0))
         {
           if (ownerQueue->shutdownQueue)
             return;
@@ -255,7 +268,10 @@ namespace Threading
 
         {
           MutexScopedLock lock2 (ownerQueue->threadStateMutex);
-          threadState->currentJob = ownerQueue->jobQueue.PopTop (); 
+          if (ownerQueue->jobQueue.GetSize () > 0)
+            threadState->currentJob = ownerQueue->jobQueue.PopTop ();
+          else if (doLow)
+            threadState->currentJob = ownerQueue->jobQueueL.PopTop ();
         }
       }
 
@@ -269,7 +285,7 @@ namespace Threading
       // Clean up
       {
         MutexScopedLock lock (ownerQueue->threadStateMutex);
-        threadState->currentJob = 0;
+        threadState->currentJob.Invalidate ();
         threadState->jobFinished.NotifyAll ();
       }
       {

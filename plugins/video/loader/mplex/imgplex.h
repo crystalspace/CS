@@ -51,6 +51,7 @@ class csImageIOMultiplexer :
   csRef<iStringArray> classlist;
   csWeakRef<iPluginManager> plugin_mgr;
   bool global_dither;
+  CS::Threading::Mutex lock;
 
   void StoreDesc (const csImageIOFileFormatDescriptions& format);
   /**

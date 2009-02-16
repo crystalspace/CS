@@ -47,6 +47,7 @@
       <alias name="surface" weak="yes" file="/shader/snippets/surface/surface-clear.xml" />
       <alias name="apply_alpha" weak="yes" file="/shader/snippets/surface/alpha-premult.xml" />
       <alias name="lighting" weak="yes" file="/shader/snippets/lighting/lighting-ppl.xml" />
+      <alias name="staticspecular" weak="yes" file="/shader/snippets/lighting/staticspec-default.xml" />
 
       <!-- Snippets - the building blocks of this shader. -->
       <snippet id="position" file="/shader/snippets/position.xml" />
@@ -71,6 +72,8 @@
       <snippet id="specular_limit" file="/shader/snippets/modulate_rgb.xml" />
       <snippet id="ambient" file="/shader/snippets/lighting/ambient-one.xml" />
       <snippet id="specular" file="/shader/snippets/surface/specular-default.xml" />
+      <snippet id="staticspecular" filealias="staticspecular" />
+      <snippet id="add_specular" file="/shader/snippets/add.xml" />
       <snippet id="apply_lighting" file="/shader/snippets/lighting/apply-lighting.xml" />
       <snippet id="glow" file="/shader/lighting/glow.xml" />
       <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
@@ -83,6 +86,7 @@
       <connection from="position" to="fresnel" />
       <connection from="position" to="surface" />
       <connection from="position" to="lighting" />
+      <connection from="position" to="staticspecular" />
       <connection from="surface" to="specular" />
       <connection from="surface" to="apply_mixmode_alpha" />
       <connection from="apply_mixmode_alpha" to="apply_alpha" />
@@ -90,6 +94,7 @@
       <connection from="normalmap" to="perturb_norm_refl" />
       <connection from="normalmap" to="perturb_norm_refr" />
       <connection from="normalmap" to="lighting" />
+      <connection from="normalmap" to="staticspecular" />
       <connection from="perturb_norm_refl" to="reflection" />
       <connection from="perturb_norm_refr" to="refraction" />
       <connection from="reflection" to="hdrscalerefl" />
@@ -124,8 +129,14 @@
       <connection from="fake_light_diffuse" to="apply_lighting">
 	<explicit from="result" to="lightDiffuse" />
       </connection>
-      <connection from="lighting" to="specular_limit">
+      <connection from="lighting" to="add_specular">
 	<explicit from="specularColor" to="a" />
+      </connection>
+      <connection from="staticspecular" to="add_specular">
+	<explicit from="specular" to="b" />
+      </connection>
+      <connection from="add_specular" to="specular_limit">
+	<explicit from="result" to="a" />
       </connection>
       <connection from="refraction" to="specular_limit">
 	<explicit from="mirroredPointDistSat" to="b" />

@@ -32,6 +32,7 @@
       -->
     <alias name="surface" weak="yes" file="/shader/snippets/surface/surface-classic.xml" />
     <alias name="specular" weak="yes" file="/shader/snippets/surface/specular-weirdold.xml" />
+    <alias name="staticspecular" weak="yes" file="/shader/snippets/lighting/staticspec-default.xml" />
     
     <!-- Snippets - the building blocks of this shader. -->
     <snippet id="position" file="/shader/snippets/position.xml" />
@@ -43,6 +44,8 @@
     <snippet id="lighting" filealias="lighting" />
     <snippet id="ambient" filealias="ambient" />
     <snippet id="specular" filealias="specular" />
+    <snippet id="staticspecular" filealias="staticspecular" />
+    <snippet id="add_specular" file="/shader/snippets/add.xml" />
     <snippet id="apply_lighting" file="/shader/snippets/lighting/apply-lighting.xml" />
     <snippet id="glow" file="/shader/lighting/glow.xml" />
     <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
@@ -56,6 +59,7 @@
     <connection from="parallax" to="normalmap" />
     <connection from="normalmap" to="ambient" />
     <connection from="normalmap" to="lighting" />
+    <connection from="normalmap" to="staticspecular" />
     <connection from="surface" to="apply_mixmode_alpha" />
     <connection from="surface" to="specular" />
     <connection from="apply_mixmode_alpha" to="apply_alpha" />
@@ -64,7 +68,15 @@
     </connection>
     <connection from="lighting" to="apply_lighting">
       <explicit from="diffuseColor" to="lightDiffuse" />
-      <explicit from="specularColor" to="lightSpecular" />
+    </connection>
+    <connection from="lighting" to="add_specular">
+      <explicit from="specularColor" to="a" />
+    </connection>
+    <connection from="staticspecular" to="add_specular">
+      <explicit from="specular" to="b" />
+    </connection>
+    <connection from="add_specular" to="apply_lighting">
+      <explicit from="result" to="lightSpecular" />
     </connection>
     <connection from="ambient" to="apply_lighting">
       <explicit from="ambient" to="ambient" />

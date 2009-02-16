@@ -77,6 +77,11 @@
 #include "recorder.h"
 #include "varmanager.h"
 #include "particles.h"
+#include "missile.h"
+#include "lights.h"
+#include "decaltest.h"
+#include "animsky.h"
+#include "fullscreenfx.h"
 
 extern WalkTest* Sys;
 
@@ -597,22 +602,11 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
     if (!strcmp (kp->GetKey (), "cmd_AnimateSky"))
     {
-      csRef<iSector> Sector (scfQueryInterface<iSector> (src));
-      if (Sector)
-      {
-        char name[100], rot[100];
-        csScanStr (kp->GetValue (), "%s,%s,%f", name, rot, &anim_sky_speed);
-        if (rot[0] == 'x') anim_sky_rot = 0;
-        else if (rot[0] == 'y') anim_sky_rot = 1;
-        else anim_sky_rot = 2;
-        anim_sky = Sector->GetMeshes ()->FindByName (name);
-      }
+      sky->AnimateSky (kp->GetValue (), src);
     }
     else if (!strcmp (kp->GetKey (), "cmd_AnimateDirLight"))
     {
-      csRef<iMeshWrapper> wrap = scfQueryInterface<iMeshWrapper> (src);
-      if (wrap)
-        anim_dirlight = wrap;	// @@@ anim_dirlight should be csRef
+      sky->AnimateDirLight (src);
     }
     else if (!strcmp (kp->GetKey (), "entity_WavePortal"))
     {
@@ -1203,107 +1197,39 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!csStrCaseCmp (cmd, "fs_inter"))
   {
-    Sys->do_fs_inter = !Sys->do_fs_inter;
-    if (Sys->do_fs_inter)
-    {
-      Sys->fs_inter_amount = 0.3f;
-      Sys->fs_inter_length = 30;
-      Sys->fs_inter_anim = 0;
-      if (arg)
-        csScanStr (arg, "%f,%f", &Sys->fs_inter_amount, &Sys->fs_inter_length);
-    }
+    Sys->fsfx->InterFX (arg);
   }
   else if (!csStrCaseCmp (cmd, "fs_fadeout"))
   {
-    Sys->do_fs_fadeout = !Sys->do_fs_fadeout;
-    if (Sys->do_fs_fadeout)
-    {
-      Sys->fs_fadeout_fade = 0;
-      Sys->fs_fadeout_dir = true;
-    }
+    Sys->fsfx->FadeOutFX ();
   }
   else if (!csStrCaseCmp (cmd, "fs_fadecol"))
   {
-    Sys->do_fs_fadecol = !Sys->do_fs_fadecol;
-    if (Sys->do_fs_fadecol)
-    {
-      Sys->fs_fadecol_fade = 0;
-      Sys->fs_fadecol_dir = true;
-      float r = 1, g = 0, b = 0;
-      if (arg) csScanStr (arg, "%f,%f,%f", &r, &g, &b);
-      Sys->fs_fadecol_color.Set (r, g, b);
-    }
+    Sys->fsfx->FadeColFX (arg);
   }
   else if (!csStrCaseCmp (cmd, "fs_fadetxt"))
   {
-    Sys->do_fs_fadetxt = !Sys->do_fs_fadetxt;
-    if (Sys->do_fs_fadetxt)
-    {
-      Sys->fs_fadetxt_fade = 0;
-      Sys->fs_fadetxt_dir = true;
-      char buf[255];
-      *buf = 0;
-      if (arg) csScanStr (arg, "%s", buf);
-      iMaterialWrapper* mat = Sys->Engine->GetMaterialList ()->FindByName (buf);
-      if (mat)
-      {
-        Sys->fs_fadetxt_txt = mat->GetMaterial()->GetTexture ();
-      }
-      else
-      {
-        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"Can't find material!");
-	Sys->do_fs_fadetxt = false;
-      }
-    }
+    Sys->fsfx->FadeTxtFX (arg);
   }
   else if (!csStrCaseCmp (cmd, "fs_red"))
   {
-    Sys->do_fs_red = !Sys->do_fs_red;
-    if (Sys->do_fs_red)
-    {
-      Sys->fs_red_fade = 0;
-      Sys->fs_red_dir = true;
-    }
+    Sys->fsfx->FadeRedFX ();
   }
   else if (!csStrCaseCmp (cmd, "fs_green"))
   {
-    Sys->do_fs_green = !Sys->do_fs_green;
-    if (Sys->do_fs_green)
-    {
-      Sys->fs_green_fade = 0;
-      Sys->fs_green_dir = true;
-    }
+    Sys->fsfx->FadeGreenFX ();
   }
   else if (!csStrCaseCmp (cmd, "fs_blue"))
   {
-    Sys->do_fs_blue = !Sys->do_fs_blue;
-    if (Sys->do_fs_blue)
-    {
-      Sys->fs_blue_fade = 0;
-      Sys->fs_blue_dir = true;
-    }
+    Sys->fsfx->FadeBlueFX ();
   }
   else if (!csStrCaseCmp (cmd, "fs_whiteout"))
   {
-    Sys->do_fs_whiteout = !Sys->do_fs_whiteout;
-    if (Sys->do_fs_whiteout)
-    {
-      Sys->fs_whiteout_fade = 0;
-      Sys->fs_whiteout_dir = true;
-    }
+    Sys->fsfx->FadeWhiteFX ();
   }
   else if (!csStrCaseCmp (cmd, "fs_shadevert"))
   {
-    Sys->do_fs_shadevert = !Sys->do_fs_shadevert;
-    if (Sys->do_fs_shadevert)
-    {
-      float tr = 1, tg = 0, tb = 0, br = 0, bg = 0, bb = 1;
-      if (arg) csScanStr (arg, "%f,%f,%f,%f,%f,%f",
-      	&tr, &tg, &tb, &br, &bg, &bb);
-      Sys->fs_shadevert_topcol.Set (tr, tg, tb);
-      Sys->fs_shadevert_botcol.Set (br, bg, bb);
-    }
+    Sys->fsfx->ShadeVertFX (arg);
   }
   else if (!csStrCaseCmp (cmd, "perftest"))
   {
@@ -1507,14 +1433,12 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!csStrCaseCmp (cmd, "fire"))
   {
     RECORD_CMD (cmd);
-    extern void fire_missile ();
-    fire_missile ();
+    Sys->missiles->FireMissile ();
   }
   else if (!csStrCaseCmp (cmd, "decal_test"))
   {
     RECORD_CMD (cmd);
-    extern void test_decal();
-    test_decal ();
+    WalkTestDecalTester::TestDecal (Sys);
   }
   else if (!csStrCaseCmp (cmd, "lightning"))
   {
@@ -1728,7 +1652,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     RECORD_ARGS (cmd, arg);
     float radius = 0;
     if (arg) csScanStr (arg, "%f", &radius);
-    Sys->add_bot (2, Sys->views->GetCamera ()->GetSector (),
+    Sys->bots->CreateBot (Sys->views->GetCamera ()->GetSector (),
     	Sys->views->GetCamera ()->GetTransform ().GetOrigin (), radius,
 	true);
   }
@@ -1737,16 +1661,16 @@ bool CommandHandler (const char *cmd, const char *arg)
     RECORD_ARGS (cmd, arg);
     float radius = 0;
     if (arg) csScanStr (arg, "%f", &radius);
-    Sys->add_bot (2, Sys->views->GetCamera ()->GetSector (),
-    	Sys->views->GetCamera ()->GetTransform ().GetOrigin (), radius);
+    Sys->bots->CreateBot (Sys->views->GetCamera ()->GetSector (),
+    	Sys->views->GetCamera ()->GetTransform ().GetOrigin (), radius, false);
   }
   else if (!csStrCaseCmp (cmd, "delbot"))
   {
-    Sys->del_bot ();
+    Sys->bots->DeleteOldestBot (false);
   }
   else if (!csStrCaseCmp (cmd, "delmbot"))
   {
-    Sys->del_bot (true);
+    Sys->bots->DeleteOldestBot (true);
   }
   else if (!csStrCaseCmp (cmd, "clrlights"))
   {
@@ -1775,31 +1699,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!csStrCaseCmp (cmd, "addlight"))
   {
     RECORD_ARGS (cmd, arg);
-    csVector3 dir (0,0,0);
-    csVector3 pos = Sys->views->GetCamera ()->GetTransform ().This2Other (dir);
-    csRef<iLight> dyn;
-
-    bool rnd;
-    float r, g, b, radius;
-    if (arg && csScanStr (arg, "%f,%f,%f,%f", &r, &g, &b, &radius) == 4)
-    {
-      dyn = Sys->Engine->CreateLight ("", pos,
-      	radius, csColor (r, g, b), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
-      rnd = false;
-    }
-    else
-    {
-      dyn = Sys->Engine->CreateLight ("", pos,
-      	6, csColor (1, 1, 1), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
-      rnd = true;
-    }
-    iLightList* ll = Sys->views->GetCamera ()->GetSector ()->GetLights ();
-    ll->Add (dyn);
-    Sys->dynamic_lights.Push (dyn);
-    extern void AttachRandomLight (iLight* light);
-    if (rnd)
-      AttachRandomLight (dyn);
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Dynamic light added.");
+    Sys->lights->AddLight (arg);
   }
   else if (!csStrCaseCmp (cmd, "delstlight"))
   {
@@ -1852,52 +1752,12 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!csStrCaseCmp (cmd, "dellight"))
   {
     RECORD_CMD (cmd);
-    iLightList* ll = Sys->views->GetCamera ()->GetSector ()->GetLights ();
-    int i;
-    for (i = 0 ; i < ll->GetCount () ; i++)
-    {
-      iLight* l = ll->Get (i);
-      if (l->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
-      {
-        ll->Remove (l);
-	size_t j;
-	for (j = 0 ; j < Sys->dynamic_lights.GetSize () ; j++)
-	{
-	  if (Sys->dynamic_lights[j] == l)
-	  {
-	    Sys->dynamic_lights.DeleteIndex (j);
-	    break;
-	  }
-	}
-	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Dynamic light removed.");
-        break;
-      }
-    }
+    Sys->lights->DelLight ();
   }
   else if (!csStrCaseCmp (cmd, "dellights"))
   {
     RECORD_CMD (cmd);
-    iLightList* ll = Sys->views->GetCamera ()->GetSector ()->GetLights ();
-    int i;
-    for (i = 0 ; i < ll->GetCount () ; i++)
-    {
-      iLight* l = ll->Get (i);
-      if (l->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
-      {
-        ll->Remove (l);
-	size_t j;
-	for (j = 0 ; j < Sys->dynamic_lights.GetSize () ; j++)
-	{
-	  if (Sys->dynamic_lights[j] == l)
-	  {
-	    Sys->dynamic_lights.DeleteIndex (j);
-	    break;
-	  }
-	}
-	i--;
-      }
-    }
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "All dynamic lights deleted.");
+    Sys->lights->DelLights ();
   }
   else if (!csStrCaseCmp (cmd, "snd_play"))
   {

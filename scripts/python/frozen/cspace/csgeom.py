@@ -1259,6 +1259,7 @@ class csBox3(object):
     def Max(*args): return _csgeom.csBox3_Max(*args)
     def Volume(*args): return _csgeom.csBox3_Volume(*args)
     def Area(*args): return _csgeom.csBox3_Area(*args)
+    def IsNaN(*args): return _csgeom.csBox3_IsNaN(*args)
     def GetCorner(*args): return _csgeom.csBox3_GetCorner(*args)
     def GetEdgeInfo(*args): return _csgeom.csBox3_GetEdgeInfo(*args)
     def GetFaceEdges(*args): return _csgeom.csBox3_GetFaceEdges(*args)

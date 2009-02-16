@@ -44,78 +44,78 @@ class csDecalManager;
 struct csDecalRenderMeshInfo
 {
   csRenderMesh* pRenderMesh;
-  csRef<iMeshWrapper>	mesh;
+  csRef<iMeshWrapper> mesh;
 };
 
 class csDecal : public iDecal, iDecalBuilder
 {
 private:
-  iObjectRegistry*              objectReg;
-  csRef<iEngine>                engine;
-  csDecalManager *		decalManager;
+  iObjectRegistry* objectReg;
+  csRef<iEngine> engine;
+  csDecalManager * decalManager;
 
   // buffers and rendermesh to hold the rendering data
-  csRef<csRenderBuffer>             vertexBuffer;
-  csRef<csRenderBuffer>             texCoordBuffer;
-  csRef<csRenderBuffer>             normalBuffer;
-  csRef<csRenderBuffer>             colorBuffer;
-  csRef<csRenderBuffer>             indexBuffer;
-  csRef<csRenderBufferHolder>       bufferHolder;
-  csArray<csRenderMesh*>            renderMeshes;
-  csArray<csDecalRenderMeshInfo>    renderMeshInfos;
+  csRef<csRenderBuffer> vertexBuffer;
+  csRef<csRenderBuffer> texCoordBuffer;
+  csRef<csRenderBuffer> normalBuffer;
+  csRef<csRenderBuffer> colorBuffer;
+  csRef<csRenderBuffer> indexBuffer;
+  csRef<csRenderBufferHolder> bufferHolder;
+  csArray<csRenderMesh*> renderMeshes;
+  csArray<csDecalRenderMeshInfo> renderMeshInfos;
 
-  csRef<iDecalTemplate>             decalTemplate;
+  csRef<iDecalTemplate> decalTemplate;
 
-  float                             life;
+  float life;
 
   // used to keep track of the next open slot in our buffers and what to render
-  uint                          indexCount;
-  size_t                        vertexCount;
+  uint indexCount;
+  size_t vertexCount;
 
   // some worldspace values defining this decal
-  csVector3                     normal;
-  csVector3                     right;
-  csVector3                     up;
-  csVector3                     pos;
+  csVector3 normal;
+  csVector3 right;
+  csVector3 up;
+  csVector3 pos;
 
   // dimensions of the polygon
-  float                         width;
-  float                         height;
-  float				invWidth;
-  float				invHeight;
+  float width;
+  float height;
+  float	invWidth;
+  float	invHeight;
 
   // radius is the length from the center of the decal to a corner
-  float                         radius;
+  float radius;
 
   // some settings for the current mesh
-  iMeshWrapper*                 currMesh;
-  uint                          firstIndex;
-  csVector3                     localNormal;
-  csVector3                     localUp;
-  csVector3                     localRight;
-  csVector3                     vertOffset;
-  csVector3                     relPos;
-  csPlane3                      clipPlanes[6];
-  size_t                        numClipPlanes;
-  float                         topPlaneDist;
-  float                         bottomPlaneDist;
+  iMeshWrapper* currMesh;
+  uint firstIndex;
+  csVector3 localNormal;
+  csVector3 localUp;
+  csVector3 localRight;
+  csVector3 vertOffset;
+  csVector3 relPos;
+  csPlane3 clipPlanes[6];
+  size_t numClipPlanes;
+  float topPlaneDist;
+  float bottomPlaneDist;
   
 public:
-  csDecal(iObjectRegistry * objectReg, csDecalManager * decalManager);
-  virtual ~csDecal();
+  csDecal (iObjectRegistry * objectReg, csDecalManager * decalManager);
+  virtual ~csDecal ();
 
-  void Initialize(iDecalTemplate * decalTemplate, 
-      const csVector3 & normal, const csVector3 & pos, const csVector3& up, 
-      const csVector3 & right, float width, float height);
+  void Initialize (iDecalTemplate * decalTemplate, 
+    const csVector3 & normal, const csVector3 & pos, const csVector3& up, 
+    const csVector3 & right, float width, float height);
   
-  void BeginMesh(iMeshWrapper * mesh);
-  virtual void AddStaticPoly(const csPoly3D & p);
-  void EndMesh();
+  void BeginMesh (iMeshWrapper * mesh);
+  virtual void AddStaticPoly (const csPoly3D & p);
+  void EndMesh ();
 
-  bool Age(csTicks ticks);
+  bool Age (csTicks ticks);
 
 private:
-  void ClearRenderMeshes();
+  void ClearRenderMeshes ();
 };
 
 #endif // __CS_DECAL_H__

@@ -477,6 +477,7 @@ class iEngine(core.iBase):
     def GetDefaultClearScreen(*args): return _iengine.iEngine_GetDefaultClearScreen(*args)
     def GetBeginDrawFlags(*args): return _iengine.iEngine_GetBeginDrawFlags(*args)
     def GetTopLevelClipper(*args): return _iengine.iEngine_GetTopLevelClipper(*args)
+    def PrecacheMesh(*args): return _iengine.iEngine_PrecacheMesh(*args)
     def PrecacheDraw(*args): return _iengine.iEngine_PrecacheDraw(*args)
     def Draw(*args): return _iengine.iEngine_Draw(*args)
     def SetContext(*args): return _iengine.iEngine_SetContext(*args)
@@ -529,11 +530,23 @@ class iLODControl(core.iBase):
 iLODControl_swigregister = _iengine.iLODControl_swigregister
 iLODControl_swigregister(iLODControl)
 
-class iCameraSectorListener(core.iBase):
+class iCameraListener(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def NewSector(*args): return _iengine.iCameraListener_NewSector(*args)
+    def CameraMoved(*args): return _iengine.iCameraListener_CameraMoved(*args)
+    __swig_destroy__ = _iengine.delete_iCameraListener
+    __del__ = lambda self : None;
+iCameraListener_swigregister = _iengine.iCameraListener_swigregister
+iCameraListener_swigregister(iCameraListener)
+
+class iCameraSectorListener(iCameraListener):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def NewSector(*args): return _iengine.iCameraSectorListener_NewSector(*args)
+    def CameraMoved(*args): return _iengine.iCameraSectorListener_CameraMoved(*args)
     __swig_destroy__ = _iengine.delete_iCameraSectorListener
     __del__ = lambda self : None;
 iCameraSectorListener_swigregister = _iengine.iCameraSectorListener_swigregister
@@ -573,6 +586,8 @@ class iCamera(core.iBase):
     def GetOnlyPortals(*args): return _iengine.iCamera_GetOnlyPortals(*args)
     def AddCameraSectorListener(*args): return _iengine.iCamera_AddCameraSectorListener(*args)
     def RemoveCameraSectorListener(*args): return _iengine.iCamera_RemoveCameraSectorListener(*args)
+    def AddCameraListener(*args): return _iengine.iCamera_AddCameraListener(*args)
+    def RemoveCameraListener(*args): return _iengine.iCamera_RemoveCameraListener(*args)
     def GetProjectionMatrix(*args): return _iengine.iCamera_GetProjectionMatrix(*args)
     def GetVisibleVolume(*args): return _iengine.iCamera_GetVisibleVolume(*args)
     def SetViewportSize(*args): return _iengine.iCamera_SetViewportSize(*args)

@@ -21,6 +21,7 @@
 #include "config.h"
 #include "statistics.h"
 #include "lighter.h"
+#include "swappable.h"
 #include "tui.h"
 
 
@@ -73,11 +74,14 @@ namespace lighter
     // Draw global settings
     if (drawFlags & TUI_DRAW_SETTINGS)
       DrawSettings ();
-
+      
     // Draw global stats
     if (drawFlags & TUI_DRAW_STATS)
       DrawStats ();
       
+    if (drawFlags & TUI_DRAW_SWAPCACHE)
+      DrawSwapCacheStats ();
+
     /* Linux: output is buffered, and the UI may appear "incomplete" if not 
      * flushed */
     fflush (stdout);
@@ -148,12 +152,12 @@ namespace lighter
     csPrintf ("|          | [ ] LMs    | L:                                                  |\n");
     csPrintf ("|          | [ ] AO     | LM:                                                 |\n");
     csPrintf ("|          | PLM:       |                                                     |\n");
+    csPrintf ("|          |            | KD-stats                                            |\n");
+    csPrintf ("|          | ALM:       | N:                                                  |\n");
+    csPrintf ("|          |            | D:                                                  |\n");
+    csPrintf ("|          | Density:   | P:                                                  |\n");
     csPrintf ("|          |            |                                                     |\n");
-    csPrintf ("|          | ALM:       | KD-stats                                            |\n");
-    csPrintf ("|          |            | N:                                                  |\n");
-    csPrintf ("|          | Density:   | D:                                                  |\n");
-    csPrintf ("|          |            | P:                                                  |\n");
-    csPrintf ("|          |            |                                                     |\n");
+    csPrintf ("|          |            | SwapCache                                           |\n");
     csPrintf ("|          |            |                                                     |\n");
     csPrintf ("|- CS Messages ---------------------------------------------------------------|\n");
     csPrintf ("|                                                                             |\n");
@@ -166,11 +170,48 @@ namespace lighter
 
   void TUI::DrawStats () const
   {
-    csPrintf (CS_ANSI_CURSOR(30,15) "%8zu / %8zu", globalStats.kdtree.numNodes, globalStats.kdtree.leafNodes);
-    csPrintf (CS_ANSI_CURSOR(30,16) "%8zu / %8.03f", globalStats.kdtree.maxDepth, 
+    csPrintf (CS_ANSI_CURSOR(30,14) "%8zu / %8zu", globalStats.kdtree.numNodes, globalStats.kdtree.leafNodes);
+    csPrintf (CS_ANSI_CURSOR(30,15) "%8zu / %8.03f", globalStats.kdtree.maxDepth, 
       (float)globalStats.kdtree.sumDepth / (float)globalStats.kdtree.leafNodes);
-    csPrintf (CS_ANSI_CURSOR(30,17) "%8zu / %8.03f", globalStats.kdtree.numPrimitives, 
+    csPrintf (CS_ANSI_CURSOR(30,16) "%8zu / %8.03f", globalStats.kdtree.numPrimitives, 
       (float)globalStats.kdtree.numPrimitives / (float)globalStats.kdtree.leafNodes);
+    csPrintf (CS_ANSI_CURSOR(1,1));
+  }
+  
+  csString TUI::FormatByteSize (uint64 size)
+  {
+    static const char* const units[] = {"KB", "MB", "GB"};
+    const int numUnits = sizeof(units)/sizeof(const char*);
+    const uint64 unitThreshold = CONST_UINT64(2048);
+    
+    if (size <= unitThreshold)
+    {
+      return csString().Format ("%" CS_PRIu64 "B", size);
+    }
+    
+    int unit = 0;
+    while ((size > unitThreshold * CONST_UINT64(1024)) && (unit < numUnits))
+    {
+      size /= CONST_UINT64(1024);
+      unit++;
+    }
+    return csString().Format ("%.1f%s",
+      double (size) / 1024.0, units[unit]);
+  }
+  
+  void TUI::DrawSwapCacheStats () const
+  {
+    csPrintf (CS_ANSI_CURSOR(28,19) 
+      "                                                   ");
+    if (globalLighter->swapManager)
+    {
+      uint64 swappedIn, swappedOut, maxSize;
+      globalLighter->swapManager->GetSizes (swappedIn, swappedOut, maxSize);
+      csPrintf (CS_ANSI_CURSOR(28,19) "%s/%s in, %s out",
+	FormatByteSize (swappedIn).GetData(),
+	FormatByteSize (maxSize).GetData(),
+	FormatByteSize (swappedOut).GetData());
+    }
     csPrintf (CS_ANSI_CURSOR(1,1));
   }
 
@@ -288,6 +329,7 @@ namespace lighter
 
   void TUI::DrawSimple ()
   {
+    bool doFlush = false;
     const char* lt = (const char*)lastTask;
     const char* tn = globalStats.progress.GetTaskName ();
     if ((lt == 0 && tn != 0) || (lt != 0 && lastTask != tn))
@@ -298,6 +340,7 @@ namespace lighter
       csPrintf ("\n% 4d %% - %s ", 
         globalStats.progress.GetOverallProgress(),
         lastTask.GetDataSafe());
+      doFlush = true;
 
       // Print new task and global progress
       lastTaskProgress = 0;
@@ -309,8 +352,10 @@ namespace lighter
         prevWasReporter = false;
         csPrintf (".");
         lastTaskProgress += 10;
+        doFlush = true;
       }
     }
+    if (doFlush) fflush (stdout);
   }
 
   void TUI::DrawSimpleEnd ()

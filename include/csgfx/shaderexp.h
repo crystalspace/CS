@@ -122,6 +122,8 @@ private:
   bool compile_cons(const cons *, int & acc_top);
   /// Compile a MAKE-VECTOR pseudo-op
   bool compile_make_vector(const cons *, int & acc_top, int acc);
+  /// Compile an IF pseudo-op
+  bool compile_if(const cons *, int & acc_top, int acc);
 
   /// Evaluate away constant values 
   bool eval_const(cons *&);
@@ -187,6 +189,11 @@ private:
   /// Frame function
   bool eval_frame(oper_arg & output) const;
 
+  template<typename Comparator>
+  bool eval_compare (const Comparator& cmp,
+        const oper_arg & arg1, const oper_arg & arg2,
+  	oper_arg & output) const;
+  	
   bool eval_matrix_column (const oper_arg & arg1, const oper_arg & arg2,
   	oper_arg & output) const;
   bool eval_matrix_row (const oper_arg & arg1, const oper_arg & arg2,
@@ -203,6 +210,9 @@ private:
   	oper_arg & output) const;
   /// Internal load operator
   bool eval_load(const oper_arg & arg1, oper_arg & output) const;
+  /// Internal select operator
+  bool eval_select(const oper_arg & arg1, const oper_arg & arg2,
+    oper_arg & output) const;
 
   /// Evaluate a variable into an oper_arg
   bool eval_variable(csShaderVariable *, oper_arg & out);

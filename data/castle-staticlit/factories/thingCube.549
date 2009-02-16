@@ -1,0 +1,21 @@
+<library>
+    <meshfact name="thingCube.549">
+        <priority>transp</priority>
+        <ztest />
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <renderbuffer name="position" checkelementcount="no" file="bindata/thingCube_549_v" />
+            <renderbuffer name="normal" file="bindata/thingCube_549_n" />
+            <renderbuffer name="texture coordinate 0" file="bindata/thingCube_549_tc" />
+            <renderbuffer name="tangent" file="bindata/thingCube_549_tng" />
+            <renderbuffer name="bitangent" file="bindata/thingCube_549_btg" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <submesh name="parallaxAtt_crystalcrystal.png_0">
+                <material>parallaxAtt_crystalcrystal.png</material>
+                <indexbuffer file="bindata/thingCube_549_i0" />
+            </submesh>
+        </params>
+    </meshfact>
+</library>

@@ -38,6 +38,9 @@
 #include "command.h"
 #include "splitview.h"
 #include "recorder.h"
+#include "missile.h"
+#include "lights.h"
+#include "animsky.h"
 
 #if defined(CS_PLATFORM_DOS) || defined(CS_PLATFORM_WIN32)
 #  include <io.h>
@@ -64,8 +67,8 @@ WalkTest::WalkTest () :
   wMissile_boom = 0;
   wMissile_whoosh = 0;
   cslogo = 0;
-  anim_sky = 0;
-  anim_dirlight = 0;
+  sky = new WalkTestAnimateSky (this);
+  fsfx = new WalkTestFullScreenFX (this);
 
   do_edges = false;
   do_show_coord = false;
@@ -85,15 +88,6 @@ WalkTest::WalkTest () :
   recorder = new WalkTestRecorder (this);
 
   cfg_debug_check_frustum = 0;
-  do_fs_inter = false;
-  do_fs_shadevert = false;
-  do_fs_whiteout = false;
-  do_fs_blue = false;
-  do_fs_red = false;
-  do_fs_green = false;
-  do_fs_fadetxt = false;
-  do_fs_fadecol = false;
-  do_fs_fadeout = false;
 
   velocity.Set (0, 0, 0);
   desired_velocity.Set (0, 0, 0);
@@ -119,6 +113,11 @@ WalkTest::WalkTest () :
   cache_map = 0;
   doSave = false;
   spritesLoaded = false;
+
+  bots = new BotManager (this);
+  do_bots = false;
+  missiles = new WalkTestMissileLauncher (this);
+  lights = new WalkTestLights (this);
 }
 
 WalkTest::~WalkTest ()
@@ -135,6 +134,10 @@ WalkTest::~WalkTest ()
   }
   delete recorder;
   delete views;
+  delete sky;
+  delete fsfx;
+  delete missiles;
+  delete lights;
 }
 
 void WalkTest::Report (int severity, const char* msg, ...)
@@ -187,7 +190,6 @@ void WalkTest::SetDefaults ()
     val = cmdline->GetName (idx);
   }
 
-  extern bool do_bots;
   if (cmdline->GetOption ("bots"))
     do_bots = true;
 
@@ -289,36 +291,7 @@ void WalkTest::FinishFrame ()
 
 void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
 {
-  // First move the sky.
-  if (anim_sky)
-  {
-    iMovable* move = anim_sky->GetMovable ();
-    switch (anim_sky_rot)
-    {
-      case 0:
-	{
-          csXRotMatrix3 mat (anim_sky_speed * TWO_PI
-	  	* (float)elapsed_time/1000.);
-          move->Transform (mat);
-	  break;
-	}
-      case 1:
-	{
-          csYRotMatrix3 mat (anim_sky_speed * TWO_PI
-	  	* (float)elapsed_time/1000.);
-          move->Transform (mat);
-	  break;
-	}
-      case 2:
-	{
-          csZRotMatrix3 mat (anim_sky_speed * TWO_PI
-	  	* (float)elapsed_time/1000.);
-          move->Transform (mat);
-	  break;
-	}
-    }
-    move->UpdateMove ();
-  }
+  sky->MoveSky (elapsed_time, current_time);
 
   // Update all busy entities.
   // We first push all entities in a vector so that NextFrame() can safely
@@ -338,7 +311,6 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
   }
 
   // Record the first time this routine is called.
-  extern bool do_bots;
   if (do_bots)
   {
     static long first_time = -1;
@@ -350,8 +322,8 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
     }
     if (current_time > next_bot_at)
     {
-      add_bot (2, views->GetCamera ()->GetSector (),
-               views->GetCamera ()->GetTransform ().GetOrigin (), 0);
+      bots->CreateBot (views->GetCamera ()->GetSector (),
+               views->GetCamera ()->GetTransform ().GetOrigin (), 0, false);
       next_bot_at = current_time+1000*10;
     }
   }
@@ -376,7 +348,7 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
     }
   }
 
-  move_bots (elapsed_time);
+  bots->MoveBots (elapsed_time);
 
   if (move_forward)
     Step (1);
@@ -479,83 +451,6 @@ void WalkTest::DrawFrameConsole ()
   }
 }
 
-void WalkTest::DrawFullScreenFX2D (csTicks /*elapsed_time*/,
-	csTicks current_time)
-{
-  if (do_fs_inter)
-  {
-    csfxInterference (Gfx2D, fs_inter_amount, fs_inter_anim,
-    	fs_inter_length);
-    fs_inter_anim = fmod (fabs (float (current_time)/3000.0), 1.);
-  }
-}
-
-void WalkTest::DrawFullScreenFX3D (csTicks /*elapsed_time*/,
-	csTicks current_time)
-{
-  if (do_fs_fadeout)
-  {
-    csfxFadeOut (Gfx3D, fs_fadeout_fade);
-    float t3 = fabs (float (current_time)/3000.0);
-    fs_fadeout_fade = fmod (t3, 1.0f);
-    fs_fadeout_dir = fmod (t3, 2.0f) >= 1;
-    if (!fs_fadeout_dir) fs_fadeout_fade = 1-fs_fadeout_fade;
-  }
-  if (do_fs_fadecol)
-  {
-    csfxFadeToColor (Gfx3D, fs_fadecol_fade, fs_fadecol_color);
-    float t3 = fabs (float (current_time)/3000.0);
-    fs_fadecol_fade = fmod (t3, 1.0f);
-    fs_fadecol_dir = fmod (t3, 2.0f) >= 1;
-    if (!fs_fadecol_dir) fs_fadecol_fade = 1-fs_fadecol_fade;
-  }
-  if (do_fs_fadetxt)
-  {
-    csfxFadeTo (Gfx3D, fs_fadetxt_txt, fs_fadetxt_fade);
-    float t3 = fabs (float (current_time)/3000.0);
-    fs_fadetxt_fade = fmod (t3, 1.0f);
-    fs_fadetxt_dir = fmod (t3, 2.0f) >= 1;
-    if (!fs_fadetxt_dir) fs_fadetxt_fade = 1-fs_fadetxt_fade;
-  }
-  if (do_fs_red)
-  {
-    csfxRedScreen (Gfx3D, fs_red_fade);
-    float t3 = fabs (float (current_time)/3000.0);
-    fs_red_fade = fmod (t3, 1.0f);
-    fs_red_dir = fmod (t3, 2.0f) >= 1;
-    if (!fs_red_dir) fs_red_fade = 1-fs_red_fade;
-  }
-  if (do_fs_green)
-  {
-    csfxGreenScreen (Gfx3D, fs_green_fade);
-    float t3 = fabs (float (current_time)/3000.0);
-    fs_green_fade = fmod (t3, 1.0f);
-    fs_green_dir = fmod (t3, 2.0f) >= 1;
-    if (!fs_green_dir) fs_green_fade = 1-fs_green_fade;
-  }
-  if (do_fs_blue)
-  {
-    csfxBlueScreen (Gfx3D, fs_blue_fade);
-    float t3 = fabs (float (current_time)/3000.0);
-    fs_blue_fade = fmod (t3, 1.0f);
-    fs_blue_dir = fmod (t3, 2.0f) >= 1;
-    if (!fs_blue_dir) fs_blue_fade = 1-fs_blue_fade;
-  }
-  if (do_fs_whiteout)
-  {
-    csfxWhiteOut (Gfx3D, fs_whiteout_fade);
-    float t3 = fabs (float (current_time)/3000.0);
-    fs_whiteout_fade = fmod (t3, 1.0f);
-    fs_whiteout_dir = fmod (t3, 2.0f) >= 1;
-    if (!fs_whiteout_dir) fs_whiteout_fade = 1-fs_whiteout_fade;
-  }
-  if (do_fs_shadevert)
-  {
-    csfxShadeVert (Gfx3D, fs_shadevert_topcol, fs_shadevert_botcol,
-    	CS_FX_ADD);
-  }
-}
-
 void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
 {
   // Tell Gfx3D we're going to display 3D things
@@ -566,20 +461,7 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
     */
 
   // Apply lighting BEFORE the very first frame
-  size_t i;
-  for (i = 0 ; i < dynamic_lights.GetSize () ; i++)
-  {
-    iLight* dyn = dynamic_lights[i];
-    extern bool HandleDynLight (iLight*, iEngine*);
-    csRef<WalkDataObject> dao (
-        CS::GetChildObject<WalkDataObject>(dyn->QueryObject()));
-    if (dao)
-      if (HandleDynLight (dyn, Engine))
-      {
-        dynamic_lights.DeleteIndex (i);
-	i--;
-      }
-  }
+  lights->HandleDynLights ();
 
   //------------
   // Here comes the main call to the engine. views->Draw() actually
@@ -668,7 +550,7 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
   {
     DrawFrame3D (drawflags, current_time);
     DrawFrameDebug3D ();
-    DrawFullScreenFX3D (elapsed_time, current_time);
+    fsfx->Draw3D (current_time);
   }
 
   // Start drawing 2D graphics
@@ -680,7 +562,7 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
    || SmallConsole
    || myConsole->GetTransparency ())
   {
-    DrawFullScreenFX2D (elapsed_time, current_time);
+    fsfx->Draw2D (current_time);
   }
 
   DrawFrameDebug ();
@@ -792,8 +674,23 @@ void WalkTest::InitCollDet (iEngine* engine, iCollection* collection)
 
 void WalkTest::LoadLibraryData (iCollection* collection)
 {
-  LevelLoader->LoadTexture ("cslogo2", "/lib/std/cslogo2.png",
+  csRef<iThreadReturn> itr = LevelLoader->LoadTexture ("cslogo2", "/lib/std/cslogo2.png",
     CS_TEXTURE_2D, 0, true, true, true, csRef<iCollection>(collection));
+  csRef<iThreadReturn> itr2 = LevelLoader->LoadLibraryFile ("/lib/std/library", collection);
+  
+  itr->Wait();
+  if(!itr->WasSuccessful())
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "logo failed to load!\n");
+  }
+
+  itr2->Wait();
+  if(!itr2->WasSuccessful())
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "std library failed to load!\n");
+  }
+
+  Engine->SyncEngineListsNow(LevelLoader);
 }
 
 bool WalkTest::Create2DSprites ()

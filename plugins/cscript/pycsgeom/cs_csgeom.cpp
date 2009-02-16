@@ -35473,6 +35473,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csBox3_IsNaN(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csBox3 *arg1 = (csBox3 *) 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csBox3_IsNaN",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csBox3, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csBox3_IsNaN" "', argument " "1"" of type '" "csBox3 const *""'"); 
+  }
+  arg1 = reinterpret_cast< csBox3 * >(argp1);
+  result = (bool)((csBox3 const *)arg1)->IsNaN();
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csBox3_GetCorner(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csBox3 *arg1 = (csBox3 *) 0 ;
@@ -48624,6 +48646,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csBox3_Max", _wrap_csBox3_Max, METH_VARARGS, NULL},
 	 { (char *)"csBox3_Volume", _wrap_csBox3_Volume, METH_VARARGS, NULL},
 	 { (char *)"csBox3_Area", _wrap_csBox3_Area, METH_VARARGS, NULL},
+	 { (char *)"csBox3_IsNaN", _wrap_csBox3_IsNaN, METH_VARARGS, NULL},
 	 { (char *)"csBox3_GetCorner", _wrap_csBox3_GetCorner, METH_VARARGS, NULL},
 	 { (char *)"csBox3_GetEdgeInfo", _wrap_csBox3_GetEdgeInfo, METH_VARARGS, NULL},
 	 { (char *)"csBox3_GetFaceEdges", _wrap_csBox3_GetFaceEdges, METH_VARARGS, NULL},
