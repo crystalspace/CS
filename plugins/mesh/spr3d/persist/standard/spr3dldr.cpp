@@ -114,7 +114,7 @@ bool csSprite3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csSprite3DFactoryLoader::Parse (iDocumentNode* node,
 				       iStreamSource*, iLoaderContext* ldr_context, 
-				       iBase* context, iStringArray* failed)
+				       iBase* context)
 {
   csRef<iPluginManager> plugin_mgr (csQueryRegistry<iPluginManager>
     (object_reg));
@@ -498,8 +498,7 @@ bool csSprite3DLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
-	iStreamSource*, iLoaderContext* ldr_context, iBase*,
-  iStringArray* failedMeshFacts)
+	iStreamSource*, iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
   csRef<iSprite3DState> spr3dLook;
@@ -518,33 +517,7 @@ csPtr<iBase> csSprite3DLoader::Parse (iDocumentNode* node,
 	  const char* factname = child->GetContentsValue ();
 	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
 
-    if(failedMeshFacts)
-    {
-      // Check for failed meshfact load.
-      int i = 0;
-      while(!fact)
-      {
-        if(failedMeshFacts->GetSize() != 0 &&
-          !strcmp(failedMeshFacts->Get(i), factname))
-        {
-          synldr->ReportError (
-            "crystalspace.sprite3dloader.parse.unknownfactory",
-            child, "Couldn't find factory '%s'!", factname);
-          return 0;
-        }
-
-        if(i >= (int)(failedMeshFacts->GetSize()-1))
-        {
-          fact = ldr_context->FindMeshFactory (factname);
-          i = 0;
-        }
-        else
-        {
-          i++;
-        }
-      }
-    }
-    else if(!fact)
+    if(!fact)
     {
       synldr->ReportError (
         "crystalspace.sprite3dloader.parse.unknownfactory",

@@ -107,12 +107,12 @@ public:
   }
 
   /// Pop an element from tail end of array.
-  csPtr<T> Pop ()
+  csRef<T> Pop ()
   {
     CS_ASSERT (this->GetSize () > 0);
     csRef<T> ret = this->Get (this->GetSize () - 1); // see *1*
     SetSize (this->GetSize () - 1);
-    return csPtr<T> (ret);
+    return ret;
   }
 };
 

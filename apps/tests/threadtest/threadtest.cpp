@@ -196,6 +196,7 @@ THREADED_CALLABLE_IMPL(csThreadTest, Test7RealData)
 
 int main(int argc, char* argv[])
 {
+  csInitializer::InitializeSCF(argc, argv);
   iObjectRegistry* objReg = csInitializer::CreateObjectRegistry();
   csInitializer::CreateEventQueue(objReg);
   csInitializer::CreateThreadManager(objReg);

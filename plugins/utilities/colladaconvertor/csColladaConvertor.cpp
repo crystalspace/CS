@@ -108,12 +108,12 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     scfImplementationType(this, parent), 
     docSys(0),
     warningsOn(false),
+    sectorScene(false),
     obj_reg(0),
     lastEffectId(-1),
     csOutputReady(false),
     outputFileType(CS_NO_FILE),
-    colladaReady(false),
-    sectorScene(false)
+    colladaReady(false)
   {
   }
 

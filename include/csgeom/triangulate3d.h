@@ -25,6 +25,9 @@
 #ifndef __CS_GEOM_TRIANGULATE_3D_H_
 #define __CS_GEOM_TRIANGULATE_3D_H_
 
+#define	RADTODEG(x)			x*57.2957795130823208768f									/// Convert radians to degrees
+#define	DEGTORAD(x)			x*0.01745329251994329577f									/// Convert degrees to radians
+
 namespace CS
 {
 namespace Geometry
@@ -56,17 +59,15 @@ namespace Geometry
 			 * @param result The csTriangleMesh into which the resulting triangulation 
 			 *               should be placed.
 			 * @param report2 A reporter to which errors are sent.
-			 * @param holes A pointer to (possibly many) holes, each defined by the 
-			 *              edge of the sub-polygon (a csContour3), in clockwise order.
 			 * 
 			 * @warning This function does not yet work correctly.  Do not use until 
 			 *			this message is removed.
 			 */
-			static bool Process(csContour3& polygon, csTriangleMesh& result, iReporter* report2, csContour3* holes = 0);
+			static bool Process(csContour3& polygon, csTriangleMesh& result);
 
 		private:
 			
-			static csContour3 MapToPlanar(const csContour3& poly);
+			static csContour3 MapToPlanar(const csContour3& poly, csVector3& normal);
 
 			/*
 			static bool FindVertexGroups(csContour3& poly, csContour3& reflex, csContour3& convex, csArray<size_t>& ears);
@@ -82,4 +83,5 @@ namespace Geometry
 } // namespace CS
 
 #endif // __CS_GEOM_TRIANGULATE_3D_H_
+
 

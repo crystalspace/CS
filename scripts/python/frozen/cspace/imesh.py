@@ -2342,6 +2342,45 @@ class iParticleBuiltinEffectorVelocityField(iParticleEffector):
 iParticleBuiltinEffectorVelocityField_swigregister = _imesh.iParticleBuiltinEffectorVelocityField_swigregister
 iParticleBuiltinEffectorVelocityField_swigregister(iParticleBuiltinEffectorVelocityField)
 
+CS_PARTICLE_MASK_MASS = _imesh.CS_PARTICLE_MASK_MASS
+CS_PARTICLE_MASK_LINEARVELOCITY = _imesh.CS_PARTICLE_MASK_LINEARVELOCITY
+CS_PARTICLE_MASK_ANGULARVELOCITY = _imesh.CS_PARTICLE_MASK_ANGULARVELOCITY
+CS_PARTICLE_MASK_COLOR = _imesh.CS_PARTICLE_MASK_COLOR
+CS_PARTICLE_MASK_PARTICLESIZE = _imesh.CS_PARTICLE_MASK_PARTICLESIZE
+CS_PARTICLE_MASK_ALL = _imesh.CS_PARTICLE_MASK_ALL
+class csParticleParameterSet(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    mass = _swig_property(_imesh.csParticleParameterSet_mass_get, _imesh.csParticleParameterSet_mass_set)
+    linearVelocity = _swig_property(_imesh.csParticleParameterSet_linearVelocity_get, _imesh.csParticleParameterSet_linearVelocity_set)
+    angularVelocity = _swig_property(_imesh.csParticleParameterSet_angularVelocity_get, _imesh.csParticleParameterSet_angularVelocity_set)
+    color = _swig_property(_imesh.csParticleParameterSet_color_get, _imesh.csParticleParameterSet_color_set)
+    particleSize = _swig_property(_imesh.csParticleParameterSet_particleSize_get, _imesh.csParticleParameterSet_particleSize_set)
+    def __init__(self, *args): 
+        this = _imesh.new_csParticleParameterSet(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def Clear(*args): return _imesh.csParticleParameterSet_Clear(*args)
+    __swig_destroy__ = _imesh.delete_csParticleParameterSet
+    __del__ = lambda self : None;
+csParticleParameterSet_swigregister = _imesh.csParticleParameterSet_swigregister
+csParticleParameterSet_swigregister(csParticleParameterSet)
+
+class iParticleBuiltinEffectorLinear(iParticleEffector):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetMask(*args): return _imesh.iParticleBuiltinEffectorLinear_SetMask(*args)
+    def GetMask(*args): return _imesh.iParticleBuiltinEffectorLinear_GetMask(*args)
+    def AddParameterSet(*args): return _imesh.iParticleBuiltinEffectorLinear_AddParameterSet(*args)
+    def SetParameterSet(*args): return _imesh.iParticleBuiltinEffectorLinear_SetParameterSet(*args)
+    def GetParameterSet(*args): return _imesh.iParticleBuiltinEffectorLinear_GetParameterSet(*args)
+    def GetParameterSetCount(*args): return _imesh.iParticleBuiltinEffectorLinear_GetParameterSetCount(*args)
+    __swig_destroy__ = _imesh.delete_iParticleBuiltinEffectorLinear
+    __del__ = lambda self : None;
+iParticleBuiltinEffectorLinear_swigregister = _imesh.iParticleBuiltinEffectorLinear_swigregister
+iParticleBuiltinEffectorLinear_swigregister(iParticleBuiltinEffectorLinear)
+
 class iParticleBuiltinEffectorFactory(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
@@ -2349,6 +2388,7 @@ class iParticleBuiltinEffectorFactory(core.iBase):
     def CreateForce(*args): return _imesh.iParticleBuiltinEffectorFactory_CreateForce(*args)
     def CreateLinColor(*args): return _imesh.iParticleBuiltinEffectorFactory_CreateLinColor(*args)
     def CreateVelocityField(*args): return _imesh.iParticleBuiltinEffectorFactory_CreateVelocityField(*args)
+    def CreateLinear(*args): return _imesh.iParticleBuiltinEffectorFactory_CreateLinear(*args)
     scfGetVersion = staticmethod(_imesh.iParticleBuiltinEffectorFactory_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iParticleBuiltinEffectorFactory
     __del__ = lambda self : None;

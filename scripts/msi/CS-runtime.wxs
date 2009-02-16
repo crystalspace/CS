@@ -15,8 +15,8 @@
     </InstallExecuteSequence>
     <Directory Name="SourceDir" Id="TARGETDIR"/>
     <?include CS-directory-runtime.wxi ?>
-    <Property Id="CSVERSION1.9">
-      <RegistrySearch Type="directory" Root="HKLM" Name="InstallPath" Key="SOFTWARE\CrystalSpace\1.9" Id="CS.old_installdir_prop"/>
+    <Property Id="CSVERSION$(var.VERSION_MAJORMINOR)">
+      <RegistrySearch Type="directory" Root="HKLM" Name="InstallPath" Key="SOFTWARE\CrystalSpace\$(var.VERSION_MAJORMINOR)" Id="CS.old_installdir_prop"/>
     </Property>
     <Upgrade Id="$(var.UPGRADE_CODE)">
       <UpgradeVersion

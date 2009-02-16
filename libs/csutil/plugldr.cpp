@@ -148,8 +148,12 @@ bool csPluginLoader::LoadPlugins ()
   for (size_t n = 0; n < requested_plugins.GetSize (); n++)
   {
     csPluginLoadRec* r = requested_plugins.Get(n);
-    r->plugin = csPtr<iBase> (object_reg->Get (r->Tag));
-    if (r->plugin.IsValid()) continue;
+    if (r->Tag)
+    {
+      // If we have a tag check if an object is already registered
+      r->plugin = csPtr<iBase> (object_reg->Get (r->Tag));
+      if (r->plugin.IsValid()) continue; // If yes, don't load the plugin
+    }
     
     csRef<iComponent> c (plugin_mgr->LoadPluginInstance (r->ClassID,
       iPluginManager::lpiInitialize | iPluginManager::lpiReportErrors

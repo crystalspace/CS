@@ -355,6 +355,24 @@ void OptimiseData::SortData()
     csRef<iDocumentNodeIterator> sectors = world->GetNodes("sector");
     csArray<csString> libsNeeded;
     csArray<csString> materialsNeeded;
+
+    if(compact)
+    {
+      for(size_t i=0; i<meshFactsOut.GetSize(); i++)
+      {
+        csRef<iDocumentNode> node = meshFactsOut[i]->GetRoot()->GetNode("library");
+        node = node->GetNode("materials");
+        if(node.IsValid())
+        {
+          csRef<iDocumentNodeIterator> mats = node->GetNodes("material");
+          while(mats->HasNext())
+          {
+            materialsNeeded.PushSmart(mats->Next()->GetAttributeValue("name"));
+          }
+        }
+      }
+    }
+
     while(sectors->HasNext())
     {
       csRef<iDocumentNode> sector = sectors->Next();
@@ -489,6 +507,24 @@ void OptimiseData::SortData()
       }
     }
 
+    if(compact)
+    {
+      // Write lightmaps.
+      csRef<iDocumentNode> texturesNode = world->GetNode("textures");
+      if(!texturesNode.IsValid())
+      {
+        texturesNode = world->CreateNodeBefore(CS_NODE_ELEMENT, after);
+        texturesNode->SetValue("textures");
+      }
+
+      for(size_t i=0; i<lightmaps.GetSize(); i++)
+      {
+        texturesNode = texturesNode->CreateNodeBefore(CS_NODE_ELEMENT);
+        CS::DocSystem::CloneNode(lightmaps[i], texturesNode);
+        texturesNode = texturesNode->GetParent();
+      }
+    }
+
     // Put the 'addon' libraries next.
     for(size_t j=0; j<addons.GetSize(); j++)
     {
@@ -512,27 +548,11 @@ void OptimiseData::SortData()
 
     if(compact)
     {
-      // Write meshfact libs.
+      // Write meshfacts.
       for(size_t i=0; i<meshFactsOut.GetSize(); i++)
       {
-        csRef<iDocumentNode> lib = world->CreateNodeBefore(CS_NODE_ELEMENT, after);
-        CS::DocSystem::CloneNode(meshFactsOut[i]->GetRoot()->GetNode("library"), lib);
-        lib->SetAttribute("compact", "true");
-      }
-
-      // Write lightmaps.
-      csRef<iDocumentNode> texturesNode = world->GetNode("textures");
-      if(!texturesNode.IsValid())
-      {
-        texturesNode = world->CreateNodeBefore(CS_NODE_ELEMENT, after);
-        texturesNode->SetValue("textures");
-      }
-      
-      for(size_t i=0; i<lightmaps.GetSize(); i++)
-      {
-        texturesNode = texturesNode->CreateNodeBefore(CS_NODE_ELEMENT);
-        CS::DocSystem::CloneNode(lightmaps[i], texturesNode);
-        texturesNode = texturesNode->GetParent();
+        csRef<iDocumentNode> meshfact = world->CreateNodeBefore(CS_NODE_ELEMENT, after);
+        CS::DocSystem::CloneNode(meshFactsOut[i]->GetRoot()->GetNode("library")->GetNode("meshfact"), meshfact);
       }
     }
     else
@@ -733,7 +753,7 @@ int main(int argc, char** argv)
 
   if(argc > 1 && (!strcmp(argv[1], "--help") || !strcmp(argv[1], "-help")))
   {
-    printf("Usage: optimisedata(.exe) folder1 folder2\n");
+    printf("Usage: optimisedata(.exe) --[no]compact folder1 folder2\n");
   }
   else
   {

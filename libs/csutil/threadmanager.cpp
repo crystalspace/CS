@@ -128,5 +128,7 @@ bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns)
     }
   }
 
+  threadReturns.Empty();
+
   return success;
 }

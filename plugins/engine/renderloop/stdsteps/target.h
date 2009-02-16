@@ -58,7 +58,7 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node, 
     iStreamSource*, iLoaderContext* ldr_context, 	
-    iBase* context, iStringArray* failed);
+    iBase* context);
 
   virtual bool IsThreadSafe() { return true; }
 };

@@ -61,30 +61,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         }
       }
     }
-    
-    if(!s.IsValid() && collection)
-    {
-      s = Engine->FindSector(name, collection);
-    }
-
-    if(!s.IsValid())
-    {
-      s = Engine->FindSector(name);
-    }
 
     if(!s.IsValid() && missingdata)
     {
       s = missingdata->MissingSector(name);
     }
+    
+    if(!s.IsValid())
+    {
+      s = Engine->FindSector(name, collection);
+    }
+
+    if(!s.IsValid() && collection)
+    {
+      s = Engine->FindSector(name);
+    }
 
     return s;
   }
 
-  iMaterialWrapper* csLoaderContext::FindMaterial(const char* filename, bool dontWaitForLoad)
+  iMaterialWrapper* csLoaderContext::FindMaterial(const char* name, bool dontWaitForLoad)
   {
     csRef<iMaterialWrapper> mat;
 
-    if(FindAvailMaterial(filename))
+    if(FindAvailMaterial(name))
     {
       while(!mat.IsValid())
       {
@@ -92,7 +92,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           CS::Threading::MutexScopedLock lock(loader->materialsLock);
           for(size_t i=0; i<loader->loaderMaterials.GetSize(); i++)
           {
-            if(!strcmp(loader->loaderMaterials[i]->QueryObject()->GetName(), filename))
+            if(!strcmp(loader->loaderMaterials[i]->QueryObject()->GetName(), name))
             {
               mat = loader->loaderMaterials[i];
               return mat;
@@ -100,14 +100,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
         }
 
-        if(!mat.IsValid())
-        {
-          mat = Engine->FindMaterial(filename, collection);
-        }
-
         if(!mat.IsValid() && missingdata)
         {
-          mat = missingdata->MissingMaterial(0, filename);
+          mat = missingdata->MissingMaterial(name, name);
+        }
+
+        if(!mat.IsValid())
+        {
+          mat = Engine->FindMaterial(name, collection);
+        }
+
+        if(!mat.IsValid() && collection)
+        {
+            mat = Engine->FindMaterial(name);
         }
 
         if(dontWaitForLoad)
@@ -118,32 +123,42 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     // General search, as the object may not have been added via the loader.
+    if(!mat.IsValid() && missingdata)
+    {
+      mat = missingdata->MissingMaterial(name, name);
+    }
+
     if(!mat.IsValid())
     {
-      mat = Engine->FindMaterial(filename, collection);
+      mat = Engine->FindMaterial(name, collection);
+    }
+
+    if(!mat.IsValid() && collection)
+    {
+      mat = Engine->FindMaterial(name);
     }
     
     // *** This is deprecated behaviour ***
     if(!dontWaitForLoad && !mat.IsValid())
     {
-      ReportWarning("Could not find material '%s'. Creating material. This behaviour is deprecated.", filename);
+      ReportWarning("Could not find material '%s'. Creating material. This behaviour is deprecated.", name);
       if(missingdata)
       {
-        mat = missingdata->MissingMaterial(0, filename);
+        mat = missingdata->MissingMaterial(name, name);
         if(mat)
         {
           return mat;
         }
       }
 
-      iTextureWrapper* tex = FindTexture (filename, true);
+      iTextureWrapper* tex = FindTexture (name, false);
       if (tex)
       {
         // Add a default material with the same name as the texture
         csRef<iMaterial> material = Engine->CreateBaseMaterial (tex);
         // First we have to extract the optional region name from the name:
-        char const* n = strchr (filename, '/');
-        if (!n) n = filename;
+        char const* n = strchr (name, '/');
+        if (!n) n = name;
         else n++;
         csRef<iMaterialWrapper> mat = Engine->GetMaterialList()->CreateMaterial (material, n);
         loader->AddMaterialToList(mat);
@@ -161,7 +176,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     if(!mat.IsValid() && !dontWaitForLoad && do_verbose)
     {
-      ReportNotify("Could not find material '%s'.", filename);
+      ReportNotify("Could not find material '%s'.", name);
     }
 
     return mat;
@@ -187,14 +202,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
         }
 
+        if(!fact.IsValid() && missingdata)
+        {
+          fact = missingdata->MissingFactory(name);
+        }
+
         if(!fact.IsValid())
         {
           fact = Engine->FindMeshFactory(name, collection);
         }
 
-        if(!fact.IsValid() && missingdata)
+        if(!fact.IsValid() && collection)
         {
-          fact = missingdata->MissingFactory(name);
+            fact = Engine->FindMeshFactory(name);
         }
 
         if(dontWaitForLoad)
@@ -214,9 +234,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     // General search, as the object may not have been added via the loader.
+    if(!fact.IsValid() && missingdata)
+    {
+      fact = missingdata->MissingFactory(name);
+    }
+
     if(!fact.IsValid())
     {
       fact = Engine->FindMeshFactory(name, collection);
+    }
+
+    if(!fact.IsValid() && collection)
+    {
+      fact = Engine->FindMeshFactory(name);
     }
 
     if(!fact.IsValid() && !dontWaitForLoad && do_verbose)
@@ -258,22 +288,37 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
         }
 
+        if (!mesh.IsValid() && missingdata)
+        {
+          mesh = missingdata->MissingMesh(name);
+        }
+
         if(!mesh.IsValid())
         {
           mesh = Engine->FindMeshObject(name, collection);
         }
 
-        if (!mesh.IsValid() && missingdata)
+        if(!mesh.IsValid() && collection)
         {
-          mesh = missingdata->MissingMesh(name);
+            mesh = Engine->FindMeshObject(name);
         }
       }
     }
 
     // General search, as the object may not have been added via the loader.
+    if (!mesh.IsValid() && missingdata)
+    {
+      mesh = missingdata->MissingMesh(name);
+    }
+
     if(!mesh.IsValid())
     {
       mesh = Engine->FindMeshObject(name, collection);
+    }
+
+    if(!mesh.IsValid() && collection)
+    {
+      mesh = Engine->FindMeshObject(name);
     }
 
     if(!mesh.IsValid() && do_verbose)
@@ -296,6 +341,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           light = loader->loadedLights.Get(csString(name), 0);
         }
 
+        if(!light.IsValid() && missingdata)
+        {
+          light = missingdata->MissingLight(name);
+        }
+
         if(!light.IsValid())
         {
           csRef<iLightIterator> li = Engine->GetLightIterator(collection);
@@ -310,17 +360,45 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
         }
 
-        if(!light.IsValid() && missingdata)
+        if(!light.IsValid() && collection)
         {
-          light = missingdata->MissingLight(name);
+          csRef<iLightIterator> li = Engine->GetLightIterator();
+
+          while(li->HasNext())
+          {
+            light = li->Next();
+            if(!strcmp(light->QueryObject()->GetName(), name))
+            {
+              break;
+            }
+          }
         }
       }
     }
 
     // General search, as the object may not have been added via the loader.
+    if(!light.IsValid() && missingdata)
+    {
+      light = missingdata->MissingLight(name);
+    }
+
     if(!light.IsValid())
     {
       csRef<iLightIterator> li = Engine->GetLightIterator(collection);
+
+      while(li->HasNext())
+      {
+        light = li->Next();
+        if(!strcmp(light->QueryObject()->GetName(), name))
+        {
+          break;
+        }
+      }
+    }
+
+    if(!light.IsValid() && collection)
+    {
+      csRef<iLightIterator> li = Engine->GetLightIterator();
 
       while(li->HasNext())
       {
@@ -354,32 +432,39 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     // Always look up builtin shaders globally
     if(!collection || (name && *name == '*'))
     {
-      shader = shaderMgr->GetShader(name);
-      if(!shader && missingdata)
+      if(missingdata)
       {
         shader = missingdata->MissingShader(name);
+      }
+
+      if(!shader)
+      {
+        shader = shaderMgr->GetShader(name);
       }
     }
     else
     {
-      csRefArray<iShader> shaders = shaderMgr->GetShaders();
-      for(size_t i=0; i<shaders.GetSize(); i++)
-      {
-        shader = shaders[i];
-        if(collection)
-        {
-          if((collection->IsParentOf(shader->QueryObject()) ||
-            collection->FindShader(shader->QueryObject()->GetName())) &&
-            !strcmp(name, shader->QueryObject()->GetName()))
-          {
-            break;
-          }
-        }
-      }
-
       if(missingdata)
       {
         shader = missingdata->MissingShader(name);
+      }
+
+      if(!shader)
+      {
+        csRefArray<iShader> shaders = shaderMgr->GetShaders();
+        for(size_t i=0; i<shaders.GetSize(); i++)
+        {
+          shader = shaders[i];
+          if(collection)
+          {
+            if((collection->IsParentOf(shader->QueryObject()) ||
+              collection->FindShader(shader->QueryObject()->GetName())) &&
+              !strcmp(name, shader->QueryObject()->GetName()))
+            {
+              break;
+            }
+          }
+        }
       }
     }
 
@@ -412,14 +497,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
         }
 
+        if(!result.IsValid() && missingdata)
+        {
+          result = missingdata->MissingTexture (name, name);
+        }
+
         if(!result.IsValid())
         {
           result = Engine->FindTexture(name, collection);
         }
 
-        if(!result.IsValid() && missingdata)
+        if(!result.IsValid() && collection)
         {
-          result = missingdata->MissingTexture (name, 0);
+          result = Engine->FindTexture(name);
         }
 
         if(dontWaitForLoad)
@@ -430,9 +520,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     // General search, as the object may not have been added via the loader.
+    if(!result.IsValid() && missingdata)
+    {
+      result = missingdata->MissingTexture (name, name);
+    }
+
     if(!result.IsValid())
     {
       result = Engine->FindTexture(name, collection);
+    }
+
+    if(!result.IsValid() && collection)
+    {
+      result = Engine->FindTexture(name);
     }
 
     // *** This is deprecated behaviour ***

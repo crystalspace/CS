@@ -157,7 +157,7 @@ THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadImage, const char* fname, int Form
   return false;
 }
 
-THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadImage, iDataBuffer* buf, int Format, bool do_verbose)
+THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadImage, csRef<iDataBuffer> buf, int Format, bool do_verbose)
 {
   csRef<iImage> image = LoadImage (buf, 0, Format, do_verbose);
   if(image.IsValid())
@@ -224,8 +224,8 @@ THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadTexture, const char* fname,
   return true;
 }
 
-THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadTexture, iDataBuffer* buf, int Flags,
-                        iTextureManager* texman, csRef<iImage>* image, bool do_verbose)
+THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadTexture, csRef<iDataBuffer> buf, int Flags,
+                        csRef<iTextureManager> texman, csRef<iImage>* image, bool do_verbose)
 {
   if (!texman && g3d)
   {
@@ -279,7 +279,7 @@ THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadTexture, iDataBuffer* buf, int Fla
 }
 
 THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadTexture, const char* Name,
-                        iDataBuffer* buf, int Flags, iTextureManager* texman, bool reg, bool create_material,
+                        csRef<iDataBuffer> buf, int Flags, csRef<iTextureManager> texman, bool reg, bool create_material,
                         bool free_image, bool do_verbose)
 {
   if (!texman && g3d)
@@ -325,8 +325,8 @@ THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadTexture, const char* Name,
 }
 
 THREADED_CALLABLE_IMPL10(csThreadedLoader, LoadTexture, const char* name,
-                        const char* FileName, int Flags, iTextureManager* texman, bool reg, bool create_material,
-                        bool free_image, iCollection* collection, uint keepFlags, bool do_verbose)
+                        const char* FileName, int Flags, csRef<iTextureManager> texman, bool reg, bool create_material,
+                        bool free_image, csRef<iCollection> collection, uint keepFlags, bool do_verbose)
 {
   if (!texman && g3d)
   {
@@ -491,8 +491,7 @@ csImageTextureLoader::csImageTextureLoader (iBase *p) :
 csPtr<iBase> csImageTextureLoader::Parse (iDocumentNode* /*node*/, 
 					  iStreamSource*,
 					  iLoaderContext* /*ldr_context*/, 	
-					  iBase* context,
-            iStringArray* failedMeshFacts)
+					  iBase* context)
 {
   if (!context) return 0;
   csRef<iTextureLoaderContext> ctx = csPtr<iTextureLoaderContext>
@@ -539,8 +538,7 @@ csCheckerTextureLoader::csCheckerTextureLoader (iBase *p) :
 csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node, 
 					    iStreamSource*,
 					    iLoaderContext* /*ldr_context*/,
-					    iBase* context,
-              iStringArray* failedMeshFacts)
+					    iBase* context)
 {
   int w = 64, h = 64, depth = 6;
   csColor color (1.0f, 1.0f, 1.0f);
@@ -622,8 +620,7 @@ csCubemapTextureLoader::csCubemapTextureLoader (iBase *p) :
 csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node, 
 					    iStreamSource*,
 					    iLoaderContext* /*ldr_context*/,
-					    iBase* context,
-              iStringArray* failedMeshFacts)
+					    iBase* context)
 {
   if (!context) return 0;
   csRef<iTextureLoaderContext> ctx = csPtr<iTextureLoaderContext>
@@ -782,8 +779,7 @@ csTexture3DLoader::csTexture3DLoader (iBase *p) :
 csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node, 
 				       iStreamSource*,
 				       iLoaderContext* /*ldr_context*/,
-				       iBase* context,
-               iStringArray* failedMeshFacts)
+				       iBase* context)
 {
   if (!context) return 0;
   csRef<iTextureLoaderContext> ctx = csPtr<iTextureLoaderContext>
@@ -874,8 +870,7 @@ csMissingTextureLoader::csMissingTextureLoader (iObjectRegistry *object_reg)
 csPtr<iBase> csMissingTextureLoader::Parse (iDocumentNode* node, 
                                             iStreamSource*,
                                             iLoaderContext* /*ldr_context*/,
-                                            iBase* context,
-                                            iStringArray* failedMeshFacts)
+                                            iBase* context)
 {
   int width = 64, height = 64;
   csRef<iTextureLoaderContext> ctx;

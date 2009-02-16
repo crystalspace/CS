@@ -113,6 +113,16 @@ void csPluginManager::ReportV (int severity, const char* subMsgID,
   csReportV (object_reg, severity, msgId, message, args);
 }
 
+void csPluginManager::ReportInLock (int severity, const char* subMsgID,
+				    const char* message, ...)
+{
+  va_list args;
+  va_start (args, message);
+  csStringFast<64> msgId ("crystalspace.pluginmgr.");
+  msgId.Append (subMsgID);
+  csReportV (0/*deliberate, force printf*/, severity, msgId, message, args);
+  va_end (args);
+}
 
 void csPluginManager::Clear ()
 {
@@ -191,7 +201,9 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
                                                        uint flags)
 {
   if (do_verbose)
-    Report (CS_REPORTER_SEVERITY_NOTIFY,
+    /* LoadPluginInstance() may be called recursively and the lock
+     * actually held here */
+    ReportInLock (CS_REPORTER_SEVERITY_NOTIFY,
       "verbose",
       "loading plugin instance for %s", classID);
   
@@ -241,7 +253,7 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
 	  continue;
 	  
 	if (do_verbose)
-	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  ReportInLock (CS_REPORTER_SEVERITY_NOTIFY,
 	    "verbose",
 	    "found dependency on %s", tmp.GetData());
       
@@ -254,7 +266,7 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
 	  for (size_t t = 0; t < tags.GetSize(); t++)
 	  {
 	    if (do_verbose)
-	      Report (CS_REPORTER_SEVERITY_NOTIFY,
+	      ReportInLock (CS_REPORTER_SEVERITY_NOTIFY,
 		"verbose",
 		"  found tag for dependency: %s", tags[t]);
 	    csRef<iBase> b = csPtr<iBase> (object_reg->Get (tags[t]));
@@ -288,13 +300,19 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
       if (flags & lpiInitialize) QueryOptions (p);
       return csPtr<iComponent> (p);
     }
-    if (flags & lpiReportErrors)
-      Report (CS_REPORTER_SEVERITY_WARNING,
-        "loadplugin",
-        "failed to initialize plugin '%s'", classID);
     // If we added this plugin in this call then we remove it here as well.
     if (index != csArrayItemNotFound)
       Plugins.DeleteIndex (index);
+
+    if (flags & lpiReportErrors)
+    {
+      mutex.Unlock(); // Lock is not needed here any more ...
+      Report (CS_REPORTER_SEVERITY_WARNING,
+        "loadplugin",
+        "failed to initialize plugin '%s'", classID);
+      // ... but must be retaken to make 'lock' destruction work
+      mutex.Lock();
+    }
   }
   return 0;
 }
@@ -311,10 +329,13 @@ bool csPluginManager::RegisterPluginInstance (const char *classID,
   }
   else
   {
+    Plugins.DeleteIndex (index);
+    mutex.Unlock(); // Lock is not needed here any more ...
     Report (CS_REPORTER_SEVERITY_WARNING,
       "registerplugin",
       "failed to initialize plugin '%s'", classID);
-    Plugins.DeleteIndex (index);
+    // ... but must be retaken to make 'lock' destruction work
+    mutex.Lock();
     return false;
   }
 }

@@ -41,7 +41,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
     //-- iLoaderPlugin
     virtual csPtr<iBase> Parse (iDocumentNode* node,
       iStreamSource* ssource, iLoaderContext* ldr_context,
-      iBase* context, iStringArray* failed);
+      iBase* context);
 
     virtual bool IsThreadSafe() { return true; }
 
@@ -93,7 +93,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
     //-- iLoaderPlugin
     virtual csPtr<iBase> Parse (iDocumentNode* node,
       iStreamSource* ssource, iLoaderContext* ldr_context,
-      iBase* context, iStringArray* failedMeshFacts);
+      iBase* context);
 
     virtual bool IsThreadSafe() { return true; }
 

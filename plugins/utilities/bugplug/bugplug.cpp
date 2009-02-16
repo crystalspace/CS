@@ -353,8 +353,6 @@ void csBugPlug::SetupPlugin ()
   initialized = true;
 
   Report (CS_REPORTER_SEVERITY_DEBUG, "BugPlug loaded...");
-
-  do_clear = false;
 }
 
 void csBugPlug::SwitchCuller (iSector* sector, const char* culler)
@@ -707,11 +705,6 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
     case DEBUGCMD_DUMPSEC:
       Report (CS_REPORTER_SEVERITY_DEBUG, "Not implemented yet.");
       break;
-    case DEBUGCMD_CLEAR:
-      do_clear = !do_clear;
-      Report (CS_REPORTER_SEVERITY_DEBUG, "BugPlug %s screen clearing.",
-	  	do_clear ? "enabled" : "disabled");
-      break;
     case DEBUGCMD_EDGES:
       ToggleG3DState (G3DRENDERSTATE_EDGES, "edge drawing");
       {
@@ -719,7 +712,6 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
 	  break;
 	bool v;
 	v = (G3D->GetRenderState (G3DRENDERSTATE_EDGES) != 0);
-	if (v && !do_clear) do_clear = true;
       }
       break;
     case DEBUGCMD_TEXTURE:
@@ -1508,13 +1500,6 @@ bool csBugPlug::HandleStartFrame (iEvent& /*event*/)
 
   if (shadow) shadow->ClearView ();
   
-  if (do_clear)
-  {
-    G3D->BeginDraw (CSDRAW_2DGRAPHICS | CSDRAW_CLEARZBUFFER);
-    int bgcolor_clear = G2D->FindRGB (0, 255, 255);
-    G2D->Clear (bgcolor_clear);
-  }
-
   if (do_profiler_reset)
   {
     CS_PROFILER_RESET();
@@ -2059,7 +2044,8 @@ void csBugPlug::ExitEditMode ()
 
 void csBugPlug::DebugCmd (const char* cmd)
 {
-  char* cmdstr = csStrNew (cmd);
+  CS_ALLOC_STACK_ARRAY(char, cmdstr, strlen (cmd)+1);
+  strcpy (cmdstr, cmd);
   char* params;
   char* space = strchr (cmdstr, ' ');
   if (space == 0)
@@ -2104,12 +2090,12 @@ void csBugPlug::DebugCmd (const char* cmd)
       {
 	bool res = dbghelp->DebugCommand (params);
 	Report (CS_REPORTER_SEVERITY_DEBUG,
-	  "Debug command execution %s.",
+	  "Execution of debug command '%s' on '%s' %s.",
+	  params, cmdstr,
 	  res ? "successful" : "failed");
       }
     }
   }
-  delete[] cmdstr;
 }
 
 int csBugPlug::GetKeyCode (const char* keystring, bool& shift, bool& alt,
@@ -2193,7 +2179,6 @@ int csBugPlug::GetCommandCode (const char* cmdstr, csString& args)
   if (!strcmp (cmd, "dumpeng"))		return DEBUGCMD_DUMPENG;
   if (!strcmp (cmd, "dumpsec"))		return DEBUGCMD_DUMPSEC;
   if (!strcmp (cmd, "edges"))		return DEBUGCMD_EDGES;
-  if (!strcmp (cmd, "clear"))		return DEBUGCMD_CLEAR;
   if (!strcmp (cmd, "cacheclear"))	return DEBUGCMD_CACHECLEAR;
   if (!strcmp (cmd, "cachedump"))	return DEBUGCMD_CACHEDUMP;
   if (!strcmp (cmd, "texture"))		return DEBUGCMD_TEXTURE;

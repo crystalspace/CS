@@ -462,6 +462,67 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     return csPtr<iParticleEmitter> (baseEmitter);
   }
 
+  bool ParticlesBaseLoader::ParseLinearEffectorParameters (
+      iDocumentNode* child, csParticleParameterSet& param, int& mask)
+  {
+    param.Clear ();
+    csRef<iDocumentNodeIterator> cit = child->GetNodes ();
+    while (cit->HasNext ())
+    {
+      csRef<iDocumentNode> c = cit->Next ();
+      if (c->GetType () != CS_NODE_ELEMENT) continue;
+      const char* v = c->GetValue ();
+      csStringID cid = xmltokens.Request (v);
+      switch (cid)
+      {
+	case XMLTOKEN_COLOR:
+	  if (!synldr->ParseColor (c, param.color))
+	  {
+	    synldr->ReportError ("crystalspace.particleloader.parseeffector", child,
+		"Error parsing color!");
+	    return false;
+	  }
+	  mask |= CS_PARTICLE_MASK_COLOR;
+	  break;
+	case XMLTOKEN_MASS:
+	  param.mass = c->GetContentsValueAsFloat ();
+	  mask |= CS_PARTICLE_MASK_MASS;
+	  break;
+	case XMLTOKEN_ANGULARVELOCITY:
+	  if (!synldr->ParseVector (c, param.angularVelocity))
+	  {
+	    synldr->ReportError ("crystalspace.particleloader.parseeffector", child,
+		"Error parsing angular velocity!");
+	    return false;
+	  }
+	  mask |= CS_PARTICLE_MASK_ANGULARVELOCITY;
+	  break;
+	case XMLTOKEN_LINEARVELOCITY:
+	  if (!synldr->ParseVector (c, param.linearVelocity))
+	  {
+	    synldr->ReportError ("crystalspace.particleloader.parseeffector", child,
+		"Error parsing linear velocity!");
+	    return false;
+	  }
+	  mask |= CS_PARTICLE_MASK_LINEARVELOCITY;
+	  break;
+	case XMLTOKEN_PARTICLESIZE:
+	  if (!synldr->ParseVector (c, param.particleSize))
+	  {
+	    synldr->ReportError ("crystalspace.particleloader.parseeffector", child,
+		"Error parsing particle size!");
+	    return false;
+	  }
+	  mask |= CS_PARTICLE_MASK_PARTICLESIZE;
+	  break;
+	default:
+	  synldr->ReportBadToken (c);
+	  return false;
+      }
+    }
+    return true;
+  }
+
 
   csPtr<iParticleEffector> ParticlesBaseLoader::ParseEffector (
     iDocumentNode* node)
@@ -554,6 +615,44 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
           return 0;
         }
       }
+    }
+    else if (!strcasecmp (effectorType, "linear"))
+    {
+      csRef<iParticleBuiltinEffectorLinear> linEffector = 
+        factory->CreateLinear ();
+      effector = linEffector;
+
+      int mask = 0;
+      csRef<iDocumentNodeIterator> it = node->GetNodes ();
+      while (it->HasNext ())
+      {
+        csRef<iDocumentNode> child = it->Next ();
+
+        if (child->GetType () != CS_NODE_ELEMENT) 
+          continue;
+
+        const char* value = child->GetValue ();
+        csStringID id = xmltokens.Request (value);
+        switch(id)
+        {
+        case XMLTOKEN_PARAM:
+          {
+	    csParticleParameterSet param;
+	    if (!ParseLinearEffectorParameters (child, param, mask))
+	      return 0;
+
+            float t (0.0f);
+            t = child->GetAttributeValueAsFloat ("time");
+            linEffector->AddParameterSet (param, t);
+          }
+          break;
+        default:
+          synldr->ReportBadToken (child);
+          return 0;
+        }
+      }
+      linEffector->SetMask (mask);
+
     }
     else if (!strcasecmp (effectorType, "lincolor"))
     {
@@ -680,8 +779,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
 
 
   csPtr<iBase> ParticlesFactoryLoader::Parse (iDocumentNode* node,
-    iStreamSource* ssource, iLoaderContext* ldr_context, iBase* context,
-    iStringArray* failed)
+    iStreamSource* ssource, iLoaderContext* ldr_context, iBase* context)
   {
     csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
   	objectRegistry, "crystalspace.mesh.object.particles", false);
@@ -755,8 +853,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
   }
 
   csPtr<iBase> ParticlesObjectLoader::Parse (iDocumentNode* node,
-    iStreamSource* ssource, iLoaderContext* ldr_context, iBase* context,
-    iStringArray* failedMeshFacts)
+    iStreamSource* ssource, iLoaderContext* ldr_context, iBase* context)
   {
     
     csRef<iMeshObject> meshObj;
@@ -776,32 +873,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
           const char* factname = child->GetContentsValue ();
           iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
 
-          if(failedMeshFacts)
-          {
-            // Check for failed meshfact load.
-            int i = 0;
-            while(!fact)
-            {
-              if(failedMeshFacts->GetSize() != 0 &&
-                !strcmp(failedMeshFacts->Get(i), factname))
-              {
-                synldr->ReportError ("crystalspace.particleloader.parsesystem",
-                  child, "Could not find factory '%s'!", factname);
-                return 0;
-              }
-
-              if(i >= (int)(failedMeshFacts->GetSize()-1))
-              {
-                fact = ldr_context->FindMeshFactory (factname);
-                i = 0;
-              }
-              else
-              {
-                i++;
-              }
-            }
-          }
-          else if(!fact)
+          if(!fact)
           {
             synldr->ReportError ("crystalspace.particleloader.parsesystem",
               child, "Could not find factory '%s'!", factname);
@@ -1291,6 +1363,58 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
 
         synldr->WriteColor (colorNode, c);
         colorNode->SetAttributeAsFloat ("time", t);
+      }
+
+      return true;
+    }
+
+    csRef<iParticleBuiltinEffectorLinear> linEffector =
+      scfQueryInterface<iParticleBuiltinEffectorLinear> (effector);
+
+    if (linEffector)
+    {
+      effectorNode->SetAttribute ("type", "linear");
+
+      int mask = linEffector->GetMask ();
+      size_t numParams = linEffector->GetParameterSetCount ();
+      csParticleParameterSet c; float t;
+      for (size_t i = 0; i < numParams; ++i)
+      {
+        linEffector->GetParameterSet (i, c, t);
+        csRef<iDocumentNode> paramNode = effectorNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+        paramNode->SetValue ("param");
+        paramNode->SetAttributeAsFloat ("time", t);
+
+	if (mask & CS_PARTICLE_MASK_COLOR)
+	{
+          csRef<iDocumentNode> colorNode = paramNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+          colorNode->SetValue ("color");
+          synldr->WriteColor (colorNode, c.color);
+	}
+	if (mask & CS_PARTICLE_MASK_MASS)
+	{
+          csRef<iDocumentNode> massNode = paramNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+          massNode->SetValue ("mass");
+	  massNode->CreateNodeBefore (CS_NODE_TEXT)->SetValueAsFloat (c.mass);
+	}
+	if (mask & CS_PARTICLE_MASK_ANGULARVELOCITY)
+	{
+          csRef<iDocumentNode> velNode = paramNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+          velNode->SetValue ("angularvelocity");
+          synldr->WriteVector (velNode, c.angularVelocity);
+	}
+	if (mask & CS_PARTICLE_MASK_LINEARVELOCITY)
+	{
+          csRef<iDocumentNode> velNode = paramNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+          velNode->SetValue ("linearvelocity");
+          synldr->WriteVector (velNode, c.linearVelocity);
+	}
+	if (mask & CS_PARTICLE_MASK_PARTICLESIZE)
+	{
+          csRef<iDocumentNode> sizeNode = paramNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+          sizeNode->SetValue ("particlesize");
+          synldr->WriteVector (sizeNode, c.particleSize);
+	}
       }
 
       return true;

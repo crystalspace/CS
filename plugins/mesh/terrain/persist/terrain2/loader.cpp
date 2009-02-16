@@ -71,8 +71,7 @@ bool csTerrain2FactoryLoader::Initialize (iObjectRegistry* objreg)
 }
 
 csPtr<iBase> csTerrain2FactoryLoader::Parse (iDocumentNode* node,
-  iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/,
-  iStringArray* failed)
+  iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/)
 {
   csRef<iPluginManager> pluginManager = csQueryRegistry<iPluginManager> (object_reg);
 
@@ -465,8 +464,7 @@ bool csTerrain2ObjectLoader::Initialize (iObjectRegistry* objreg)
 }
 
 csPtr<iBase> csTerrain2ObjectLoader::Parse (iDocumentNode* node, 
-  iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/,
-  iStringArray* failedMeshFacts)
+  iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/)
 {
   csRef<iMeshObject> mesh;
   csRef<iTerrainSystem> terrain;
@@ -486,32 +484,7 @@ csPtr<iBase> csTerrain2ObjectLoader::Parse (iDocumentNode* node,
         csRef<iMeshFactoryWrapper> fact = ldr_context->FindMeshFactory (
           factname);
 
-        if(failedMeshFacts)
-        {
-          // Check for failed meshfact load.
-          int i = 0;
-          while(!fact)
-          {
-            if(failedMeshFacts->GetSize() != 0 &&
-              !strcmp(failedMeshFacts->Get(i), factname))
-            {
-              synldr->ReportError ("crystalspace.terrain.object.loader",
-                child, "Couldn't find factory '%s'!", factname);
-              return 0;
-            }
-
-            if(i >= (int)(failedMeshFacts->GetSize()-1))
-            {
-              fact = ldr_context->FindMeshFactory (factname);
-              i = 0;
-            }
-            else
-            {
-              i++;
-            }
-          }
-        }
-        else if(!fact)
+        if(!fact)
         {
           synldr->ReportError ("crystalspace.terrain.object.loader",
             child, "Couldn't find factory '%s'!", factname);

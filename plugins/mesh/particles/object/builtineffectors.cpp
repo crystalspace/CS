@@ -43,6 +43,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     return new ParticleEffectorLinColor;
   }
 
+  csPtr<iParticleBuiltinEffectorLinear> 
+    ParticleEffectorFactory::CreateLinear () const
+  {
+    return new ParticleEffectorLinear;
+  }
+
   csPtr<iParticleBuiltinEffectorVelocityField> 
     ParticleEffectorFactory::CreateVelocityField () const
   {
@@ -191,7 +197,138 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     precalcInvalid = false;
   }
 
+  //------------------------------------------------------------------------
 
+  ParticleEffectorLinear::ParticleEffectorLinear ()
+    : scfImplementationType (this),
+      mask (CS_PARTICLE_MASK_ALL), precalcInvalid (true)
+  {
+
+  }
+
+  csPtr<iParticleEffector> ParticleEffectorLinear::Clone () const
+  {
+    return new ParticleEffectorLinear (*this);
+  }
+
+#define INTERPOLATE_PARAMETER(parname) \
+      particle.parname = ei.add.parname + ei.mult.parname * ttl;
+#define INTERPOLATE_PARAMETER_AUX(parname) \
+      particleAux.parname = ei.add.parname + ei.mult.parname * ttl;
+
+  void ParticleEffectorLinear::EffectParticles (iParticleSystemBase* system,
+    const csParticleBuffer& particleBuffer, float dt, float totalTime)
+  {
+    Precalc ();
+
+    if (precalcList.GetSize () == 0)
+      return;
+
+    for (size_t idx = 0; idx < particleBuffer.particleCount; ++idx)
+    {
+      csParticle& particle = particleBuffer.particleData[idx];
+      csParticleAux& particleAux = particleBuffer.particleAuxData[idx];
+
+      float ttl = particle.timeToLive;
+
+      //Classify
+      size_t aSpan;
+      for(aSpan = 0; aSpan < precalcList.GetSize (); ++aSpan)
+      {
+        if (ttl < precalcList[aSpan].maxTTL)
+          break;
+      }
+
+      aSpan = csMin (aSpan, precalcList.GetSize ()-1);
+
+      const PrecalcEntry& ei = precalcList[aSpan];
+      if (mask & CS_PARTICLE_MASK_MASS) { INTERPOLATE_PARAMETER (mass) }
+      if (mask & CS_PARTICLE_MASK_LINEARVELOCITY) { INTERPOLATE_PARAMETER (linearVelocity) }
+      if (mask & CS_PARTICLE_MASK_ANGULARVELOCITY) { INTERPOLATE_PARAMETER (angularVelocity) }
+      if (mask & CS_PARTICLE_MASK_COLOR) { INTERPOLATE_PARAMETER_AUX (color) }
+      if (mask & CS_PARTICLE_MASK_PARTICLESIZE) { INTERPOLATE_PARAMETER_AUX (particleSize) }
+    }
+  }
+
+  size_t ParticleEffectorLinear::AddParameterSet (const csParticleParameterSet& param, float maxTTL)
+  {
+    ParamEntry c;
+    c.param = param;
+    c.maxTTL = maxTTL;
+
+    paramList.Push (c);
+
+    precalcInvalid = true;
+    return paramList.GetSize () - 1;
+  }
+
+  void ParticleEffectorLinear::SetParameterSet (size_t index, const csParticleParameterSet& param)
+  {
+    if (index >= paramList.GetSize ())
+      return;
+
+    paramList[index].param = param;
+
+    precalcInvalid = true;
+  }
+
+  int ParticleEffectorLinear::ParamEntryCompare(
+    const ParticleEffectorLinear::ParamEntry &e0, 
+    const ParticleEffectorLinear::ParamEntry &e1)
+  {
+    if (e0.maxTTL < e1.maxTTL)
+      return -1;
+    else if (e0.maxTTL > e1.maxTTL)
+      return 1;
+    return 0;
+  }
+
+#define INIT_PARAM_PRECALC(parname) \
+	ei.mult.parname = (ci.param.parname - cip.param.parname) / (ci.maxTTL - cip.maxTTL); \
+	ei.add.parname = ci.param.parname - ei.mult.parname * ei.maxTTL;
+
+  void ParticleEffectorLinear::Precalc ()
+  {
+    if (!precalcInvalid)
+      return;
+
+    precalcList.SetSize (paramList.GetSize ());
+    
+    if (precalcList.GetSize () == 0)
+        return;
+
+    csArray<ParamEntry> localList = paramList;
+    localList.Sort (ParamEntryCompare);
+
+    PrecalcEntry& e0 = precalcList[0];
+    e0.add = localList[0].param;
+    e0.mult.Clear ();
+    e0.maxTTL = localList[0].maxTTL;
+
+    for (size_t i = 1; i < precalcList.GetSize (); ++i)
+    {
+      PrecalcEntry& ei = precalcList[i];
+      const ParamEntry& ci = localList[i];
+      const ParamEntry& cip = localList[i-1];
+
+      ei.maxTTL = ci.maxTTL;
+      if (mask & CS_PARTICLE_MASK_MASS) { INIT_PARAM_PRECALC (mass) }
+      if (mask & CS_PARTICLE_MASK_LINEARVELOCITY) { INIT_PARAM_PRECALC (linearVelocity) }
+      if (mask & CS_PARTICLE_MASK_ANGULARVELOCITY) { INIT_PARAM_PRECALC (angularVelocity) }
+      if (mask & CS_PARTICLE_MASK_COLOR) { INIT_PARAM_PRECALC (color) }
+      if (mask & CS_PARTICLE_MASK_PARTICLESIZE) { INIT_PARAM_PRECALC (particleSize) }
+    }
+
+    PrecalcEntry copyLast;
+    copyLast.maxTTL = FLT_MAX;
+    copyLast.add = localList.Top ().param;
+    copyLast.mult.Clear ();
+    precalcList.Push (copyLast);
+
+    precalcInvalid = false;
+  }
+
+  //------------------------------------------------------------------------
   
   namespace
   {

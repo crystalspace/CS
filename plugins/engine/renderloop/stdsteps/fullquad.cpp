@@ -67,7 +67,7 @@ csFullScreenQuadRSLoader::csFullScreenQuadRSLoader (iBase* p) :
 
 csPtr<iBase> csFullScreenQuadRSLoader::Parse (iDocumentNode* node, 
 				       iStreamSource*, iLoaderContext* ldr_context, 
-				       iBase* /*context*/, iStringArray* failed)
+				       iBase* /*context*/)
 {
   csFullScreenQuadRenderStep* newstep = 
     new csFullScreenQuadRenderStep (object_reg);

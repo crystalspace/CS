@@ -86,6 +86,7 @@ namespace RenderManager
   
     //@{
     /**\name Debugging helpers: line drawing
+     * \sa DrawDebugLines
      */
     /// Add debug line (world space)
     void AddDebugLine3D (const csVector3& v1, const csVector3& v2,
@@ -116,11 +117,6 @@ namespace RenderManager
      * Visualize camera clip planes for the given view.
      */
     void AddDebugClipPlanes (RenderView* view);
-    /**
-     * Render out debug lines. To be called by the rendermanager at the end
-     * of rendering a view.
-     */
-    void DrawDebugLines (iGraphics3D* g3d, RenderView* view);
 
     struct DebugLines
     {
@@ -135,9 +131,32 @@ namespace RenderManager
      */
     void SetDebugLines (const DebugLines& lines) { debugLines = lines; }
     //@}
+  
+      
+    //@{
+    /**\name Debugging helpers: screen space line drawing
+     * \sa DrawDebugLines
+     */
+    /**
+     * Add a debug line (screen space - ie pixel coordinates!).
+     */
+    void AddDebugLineScreen (const csVector2& v1, const csVector2& v2,
+      csRGBcolor color);
+    //@}
     
+    /**
+     * Render out debug lines (world space and screen space). 
+     * To be called by the rendermanager at the end of rendering a view.
+     */
+    void DrawDebugLines (iGraphics3D* g3d, RenderView* view);
   protected:
     DebugLines debugLines;
+    struct DebugLineScreen
+    {
+      csVector2 v1, v2;
+      csRGBcolor color;
+    };
+    csArray<DebugLineScreen> debugLinesScreen;
   };
 
   /**
@@ -192,6 +211,8 @@ namespace RenderManager
           shmgr->GetSVNameStringset()->Request ("object2world transform");
         svObjectToWorldInvName = 
           shmgr->GetSVNameStringset()->Request ("object2world transform inverse");
+          
+        dbgDebugClearScreen = debugPersist.RegisterDebugFlag ("debugclear");
       }
 
       void Clear ()
@@ -212,6 +233,7 @@ namespace RenderManager
       csRenderMeshHolder rmHolder;
       
       DebugPersistent debugPersist;
+      uint dbgDebugClearScreen;
     };
 
     /**
@@ -553,7 +575,7 @@ namespace RenderManager
     { return persistentData.debugPersist.QueryDebugFlag (string); }
     
     /// Check whether a debug flag is enabled
-    bool IsDebugFlagEnabled (uint flag)
+    bool IsDebugFlagEnabled (uint flag) const
     { return persistentData.debugPersist.IsDebugFlagEnabled (flag); }
     /**
      * Enable or disable a debug flag.
@@ -576,6 +598,11 @@ namespace RenderManager
     }
     /** @} */
     
+    /// Debugging helper: whether debug screen clearing is enabled
+    bool IsDebugClearEnabled () const
+    {
+      return IsDebugFlagEnabled (persistentData.dbgDebugClearScreen);
+    }
     
     PersistentData& GetPersistentData()
     {

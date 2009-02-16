@@ -28,6 +28,8 @@
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/svarrayholder.h"
 
+#include "ivideo/graph2d.h"
+
 namespace CS
 {
 namespace RenderManager
@@ -279,20 +281,40 @@ namespace RenderManager
       iCamera* cam = rview->GetCamera ();
       iClipper2D* clipper = rview->GetClipper ();
 
+      if (context->owner.IsDebugClearEnabled())
+      {
+        iGraphics2D* G2D = g3d->GetDriver2D();
+        g3d->BeginDraw (CSDRAW_2DGRAPHICS | CSDRAW_CLEARZBUFFER);
+	int bgcolor_clear = G2D->FindRGB (0, 255, 255);
+	G2D->Clear (bgcolor_clear);
+      }
+      
       // Setup the camera etc.. @@should be delayed as well
       g3d->SetProjectionMatrix (cam->GetProjectionMatrix ());
       g3d->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
 
-      BeginFinishDrawScope bd (g3d, drawFlags);      
+      BeginFinishDrawScope bd (g3d, drawFlags);
+
+      /* Different contexts may have different numbers of layers,
+       * so determine the upper layer number */
+      size_t maxLayer = 0;
+      for (size_t i = 0; i < contextStack.GetSize (); ++i)
+      {
+        maxLayer = csMax (maxLayer,
+          contextStack[i]->svArrays.GetNumLayers());
+      }
 
       // Render all mesh nodes in context
-      for (size_t layer = 0; layer < context->svArrays.GetNumLayers(); ++layer)
+      for (size_t layer = 0; layer < maxLayer; ++layer)
       {
         meshRender.SetLayer (layer);
 
         for (size_t i = 0; i < contextStack.GetSize (); ++i)
         {
           context = contextStack.Get (i);
+          /* Bail out if layer index is above the actual layer count in the
+           * context */
+          if (layer >= context->svArrays.GetNumLayers()) continue;
 
           g3d->SetWorldToCamera (context->cameraTransform.GetInverse ());
           ForEachMeshNode (*context, meshRender);
