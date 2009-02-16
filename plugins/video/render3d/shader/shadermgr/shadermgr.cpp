@@ -305,14 +305,6 @@ void csShaderManager::RemoveAllSubShaderCaches ()
 void csShaderManager::AddDefaultVariables()
 {
   AddVariable (sv_time);
-  
-  /* @@@ The renderer would be a better place, however, the shadermanager
-     clears all SVs in Open(), but renderer Open() is called before the
-     shadermanagers, making it hard to find a good spot for these ... */
-  GetVariableAdd (stringsSvName->Request ("world2camera transform"));
-  GetVariableAdd (stringsSvName->Request ("world2camera transform inverse"));
-  GetVariableAdd (stringsSvName->Request ("projection transform"));
-  GetVariableAdd (stringsSvName->Request ("projection transform inverse"));
 }
 
 void csShaderManager::LoadDefaultVariables()

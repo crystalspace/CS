@@ -52,6 +52,8 @@
 #include "bot.h"
 #include "command.h"
 #include "walktest.h"
+#include "splitview.h"
+#include "particles.h"
 
 extern WalkTest* Sys;
 
@@ -75,348 +77,6 @@ extern void move_mesh (iMeshWrapper* sprite, iSector* where,
 	csVector3 const& pos);
 
 //===========================================================================
-// Demo particle system (rain).
-//===========================================================================
-void add_particles_rain (iSector* sector, char* matname, int num, float speed,
-	bool do_camera)
-{
-  iEngine* engine = Sys->view->GetEngine ();
-  // First check if the material exists.
-  iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (matname);
-  if (!mat)
-  {
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"Can't find material '%s' in memory!", matname);
-    return;
-  }
-
-  csBox3 bbox;
-  if (do_camera)
-    bbox.Set (-5, -5, -5, 5, 5, 5);
-  else
-    sector->CalculateSectorBBox (bbox, true);
-
-  csRef<iMeshFactoryWrapper> mfw = engine->CreateMeshFactory (
-      "crystalspace.mesh.object.particles", "rain");
-  if (!mfw) return;
-
-  csRef<iMeshWrapper> exp = engine->CreateMeshWrapper (mfw, "custom rain",
-	sector, csVector3 (0, 0, 0));
-
-  if (do_camera)
-  {
-    iEngine* e = Sys->view->GetEngine ();
-    int c = e->GetAlphaRenderPriority ();
-    exp->GetFlags ().Set (CS_ENTITY_CAMERA);
-    exp->SetRenderPriority (c);
-  }
-  exp->SetZBufMode(CS_ZBUF_TEST);
-  exp->GetMeshObject()->SetMixMode (CS_FX_ADD);
-  exp->GetMeshObject()->SetMaterialWrapper (mat);
-
-  csRef<iParticleBuiltinEmitterFactory> emit_factory = 
-      csLoadPluginCheck<iParticleBuiltinEmitterFactory> (
-        Sys->object_reg, "crystalspace.mesh.object.particles.emitter", false);
-  csRef<iParticleBuiltinEffectorFactory> eff_factory = 
-      csLoadPluginCheck<iParticleBuiltinEffectorFactory> (
-        Sys->object_reg, "crystalspace.mesh.object.particles.effector", false);
-
-  csRef<iParticleBuiltinEmitterBox> boxemit = emit_factory->CreateBox ();
-  // Time to live depends on height of sector.
-  float velocity = 2.84f * speed / 2.0f;
-  float seconds_to_live = (bbox.MaxY () - bbox.MinY ()) / velocity;
-  csBox3 emit_bbox = bbox;
-  emit_bbox.SetMin (1, emit_bbox.MaxY ());
-  boxemit->SetBox (emit_bbox);
-  boxemit->SetParticlePlacement (CS_PARTICLE_BUILTIN_VOLUME);
-  boxemit->SetEmissionRate (float (num) / seconds_to_live);
-  boxemit->SetInitialMass (5.0f, 7.5f);
-  boxemit->SetUniformVelocity (true);
-  boxemit->SetInitialTTL (seconds_to_live, seconds_to_live);
-  boxemit->SetInitialVelocity (csVector3 (0, -velocity, 0),
-      csVector3 (0));
-
-  csRef<iParticleBuiltinEffectorLinColor> lincol = eff_factory->
-    CreateLinColor ();
-  lincol->AddColor (csColor4 (.25,.25,.25,1), seconds_to_live);
-
-  csRef<iParticleSystem> partstate =
-  	scfQueryInterface<iParticleSystem> (exp->GetMeshObject ());
-  partstate->SetMinBoundingBox (bbox);
-  partstate->SetParticleSize (csVector2 (0.3f/50.0f, 0.3f));
-  partstate->SetParticleRenderOrientation (CS_PARTICLE_ORIENT_COMMON);
-  partstate->SetCommonDirection (csVector3 (0, 1, 0));
-  partstate->AddEmitter (boxemit);
-  partstate->AddEffector (lincol);
-}
-
-//===========================================================================
-// Demo particle system (snow).
-//===========================================================================
-void add_particles_snow (iSector* sector, char* matname, int num, float speed)
-{
-  iEngine* engine = Sys->view->GetEngine ();
-  // First check if the material exists.
-  iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->
-  	FindByName (matname);
-  if (!mat)
-  {
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
-    return;
-  }
-
-  csBox3 bbox;
-  sector->CalculateSectorBBox (bbox, true);
-
-  csRef<iMeshFactoryWrapper> mfw = engine->CreateMeshFactory (
-      "crystalspace.mesh.object.particles", "snow");
-  if (!mfw) return;
-
-  csRef<iMeshWrapper> exp = engine->CreateMeshWrapper (mfw, "custom snow",
-	sector, csVector3 (0, 0, 0));
-
-  exp->SetZBufMode(CS_ZBUF_TEST);
-  exp->GetMeshObject()->SetMixMode (CS_FX_ADD);
-  exp->GetMeshObject()->SetMaterialWrapper (mat);
-
-  csRef<iParticleBuiltinEmitterFactory> emit_factory = 
-      csLoadPluginCheck<iParticleBuiltinEmitterFactory> (
-        Sys->object_reg, "crystalspace.mesh.object.particles.emitter", false);
-  csRef<iParticleBuiltinEffectorFactory> eff_factory = 
-      csLoadPluginCheck<iParticleBuiltinEffectorFactory> (
-        Sys->object_reg, "crystalspace.mesh.object.particles.effector", false);
-
-  csRef<iParticleBuiltinEmitterBox> boxemit = emit_factory->CreateBox ();
-  // Time to live depends on height of sector.
-  float velocity = 2.0f * speed / 2.0f;
-  float seconds_to_live = (bbox.MaxY () - bbox.MinY ()) / velocity;
-  csBox3 emit_bbox = bbox;
-  emit_bbox.SetMin (1, emit_bbox.MaxY ());
-  boxemit->SetBox (emit_bbox);
-  boxemit->SetParticlePlacement (CS_PARTICLE_BUILTIN_VOLUME);
-  boxemit->SetEmissionRate (float (num) / seconds_to_live);
-  boxemit->SetInitialMass (5.0f, 7.5f);
-  boxemit->SetUniformVelocity (true);
-  boxemit->SetInitialTTL (seconds_to_live, seconds_to_live);
-  boxemit->SetInitialVelocity (csVector3 (0, -velocity, 0),
-      csVector3 (0));
-
-  csRef<iParticleBuiltinEffectorLinColor> lincol = eff_factory->
-    CreateLinColor ();
-  lincol->AddColor (csColor4 (.25,.25,.25,1), seconds_to_live);
-
-  csRef<iParticleBuiltinEffectorForce> force = eff_factory->
-    CreateForce ();
-  force->SetRandomAcceleration (csVector3 (1.5f, 0.0f, 1.5f));
-
-  csRef<iParticleSystem> partstate =
-  	scfQueryInterface<iParticleSystem> (exp->GetMeshObject ());
-  partstate->SetMinBoundingBox (bbox);
-  partstate->SetParticleSize (csVector2 (0.07f, 0.07f));
-  partstate->AddEmitter (boxemit);
-  partstate->AddEffector (lincol);
-  partstate->AddEffector (force);
-}
-
-//===========================================================================
-// Demo particle system (fire).
-//===========================================================================
-void add_particles_fire (iSector* sector, char* matname, int num,
-	const csVector3& origin)
-{
-  iEngine* engine = Sys->view->GetEngine ();
-
-  // First check if the material exists.
-  iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (matname);
-  if (!mat)
-  {
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
-    return;
-  }
-
-  csRef<iMeshFactoryWrapper> mfw = engine->CreateMeshFactory (
-      "crystalspace.mesh.object.particles", "fire");
-  if (!mfw) return;
-
-  csRef<iMeshWrapper> exp = engine->CreateMeshWrapper (mfw, "custom fire",
-	sector, origin);
-
-  exp->SetZBufMode(CS_ZBUF_TEST);
-  exp->GetMeshObject()->SetMixMode (CS_FX_ADD);
-  exp->GetMeshObject()->SetMaterialWrapper (mat);
-
-  csRef<iParticleBuiltinEmitterFactory> emit_factory = 
-      csLoadPluginCheck<iParticleBuiltinEmitterFactory> (
-        Sys->object_reg, "crystalspace.mesh.object.particles.emitter", false);
-  csRef<iParticleBuiltinEffectorFactory> eff_factory = 
-      csLoadPluginCheck<iParticleBuiltinEffectorFactory> (
-        Sys->object_reg, "crystalspace.mesh.object.particles.effector", false);
-
-  csRef<iParticleBuiltinEmitterSphere> sphemit = emit_factory->CreateSphere ();
-  float velocity = 0.5f;
-  float seconds_to_live = 2.0f;
-  sphemit->SetRadius (.2f);
-  sphemit->SetParticlePlacement (CS_PARTICLE_BUILTIN_VOLUME);
-  sphemit->SetEmissionRate (float (num) / seconds_to_live);
-  sphemit->SetInitialMass (5.0f, 7.5f);
-  sphemit->SetUniformVelocity (true);
-  sphemit->SetInitialTTL (seconds_to_live, seconds_to_live);
-  sphemit->SetInitialVelocity (csVector3 (0, velocity, 0),
-      csVector3 (0));
-
-  csRef<iParticleBuiltinEffectorLinColor> lincol = eff_factory->
-    CreateLinColor ();
-  lincol->AddColor (csColor4 (0.00f, 0.00f, 0.00f, 1.00f), 2.0000f);
-  lincol->AddColor (csColor4 (1.00f, 0.35f, 0.00f, 0.00f), 1.5000f);
-  lincol->AddColor (csColor4 (1.00f, 0.22f, 0.00f, 0.10f), 1.3125f);
-  lincol->AddColor (csColor4 (1.00f, 0.12f, 0.00f, 0.30f), 1.1250f);
-  lincol->AddColor (csColor4 (0.80f, 0.02f, 0.00f, 0.80f), 0.9375f);
-  lincol->AddColor (csColor4 (0.60f, 0.00f, 0.00f, 0.90f), 0.7500f);
-  lincol->AddColor (csColor4 (0.40f, 0.00f, 0.00f, 0.97f), 0.5625f);
-  lincol->AddColor (csColor4 (0.20f, 0.00f, 0.00f, 1.00f), 0.3750f);
-  lincol->AddColor (csColor4 (0.00f, 0.00f, 0.00f, 1.00f), 0.1875f);
-  lincol->AddColor (csColor4 (0.00f, 0.00f, 0.00f, 1.00f), 0.0000f);
-
-  csRef<iParticleBuiltinEffectorForce> force = eff_factory->
-    CreateForce ();
-  force->SetRandomAcceleration (csVector3 (1.5f, 1.5f, 1.5f));
-
-  csRef<iParticleSystem> partstate =
-  	scfQueryInterface<iParticleSystem> (exp->GetMeshObject ());
-  //partstate->SetMinBoundingBox (bbox);
-  partstate->SetParticleSize (csVector2 (0.04f, 0.08f));
-  partstate->AddEmitter (sphemit);
-  partstate->AddEffector (lincol);
-  partstate->AddEffector (force);
-}
-
-//===========================================================================
-// Demo particle system (fountain).
-//===========================================================================
-void add_particles_fountain (iSector* sector, char* matname, int num,
-	const csVector3& origin)
-{
-  iEngine* engine = Sys->view->GetEngine ();
-
-  // First check if the material exists.
-  iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (matname);
-  if (!mat)
-  {
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s'!", matname);
-    return;
-  }
-
-  csRef<iMeshFactoryWrapper> mfw = engine->CreateMeshFactory (
-      "crystalspace.mesh.object.particles", "fountain");
-  if (!mfw) return;
-
-  csRef<iMeshWrapper> exp = engine->CreateMeshWrapper (mfw, "custom fountain",
-	sector, origin);
-
-  exp->SetZBufMode(CS_ZBUF_TEST);
-  exp->GetMeshObject()->SetMixMode (CS_FX_ADD);
-  exp->GetMeshObject()->SetMaterialWrapper (mat);
-
-  csRef<iParticleBuiltinEmitterFactory> emit_factory = 
-      csLoadPluginCheck<iParticleBuiltinEmitterFactory> (
-        Sys->object_reg, "crystalspace.mesh.object.particles.emitter", false);
-  csRef<iParticleBuiltinEffectorFactory> eff_factory = 
-      csLoadPluginCheck<iParticleBuiltinEffectorFactory> (
-        Sys->object_reg, "crystalspace.mesh.object.particles.effector", false);
-
-  csRef<iParticleBuiltinEmitterCone> conemit = emit_factory->CreateCone ();
-  float velocity = 3.0f;
-  float seconds_to_live = 1.5f;
-  conemit->SetExtent (csVector3 (0, 0.5f, 0));
-  conemit->SetConeAngle (0.3f);
-  conemit->SetParticlePlacement (CS_PARTICLE_BUILTIN_VOLUME);
-  conemit->SetEmissionRate (float (num) / seconds_to_live);
-  conemit->SetInitialMass (8.0f, 10.0f);
-  conemit->SetInitialTTL (seconds_to_live, seconds_to_live);
-  conemit->SetInitialVelocity (csVector3 (0, velocity, 0), csVector3 (0));
-
-  csRef<iParticleBuiltinEffectorLinColor> lincol = eff_factory->
-    CreateLinColor ();
-  lincol->AddColor (csColor4 (0.25f, 0.35f, 0.55f, 1), seconds_to_live);
-
-  csRef<iParticleBuiltinEffectorForce> force = eff_factory->
-    CreateForce ();
-  force->SetAcceleration (csVector3 (0.0f, -3.0f, 0.0f));
-
-  csRef<iParticleSystem> partstate =
-  	scfQueryInterface<iParticleSystem> (exp->GetMeshObject ());
-  partstate->SetParticleSize (csVector2 (0.1f, 0.1f));
-  partstate->AddEmitter (conemit);
-  partstate->AddEffector (lincol);
-  partstate->AddEffector (force);
-}
-
-//===========================================================================
-// Demo particle system (explosion).
-//===========================================================================
-void add_particles_explosion (iSector* sector, iEngine* engine,
-	const csVector3& center, const char* matname)
-{
-  // First check if the material exists.
-  iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->
-  	FindByName (matname);
-  if (!mat)
-  {
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
-    return;
-  }
-
-  csRef<iMeshFactoryWrapper> mfw = engine->CreateMeshFactory (
-      "crystalspace.mesh.object.particles", "explosion");
-  if (!mfw) return;
-
-  csRef<iMeshWrapper> exp = engine->CreateMeshWrapper (mfw, "custom explosion",
-	sector, center);
-
-  exp->SetZBufMode(CS_ZBUF_TEST);
-  exp->SetRenderPriority (engine->GetAlphaRenderPriority ());
-  exp->GetMeshObject()->SetMaterialWrapper (mat);
-  exp->GetMeshObject()->SetMixMode (CS_FX_ALPHA);
-  exp->GetMeshObject()->SetColor (csColor (1, 1, 0));
-
-  csRef<iParticleBuiltinEmitterFactory> emit_factory = 
-      csLoadPluginCheck<iParticleBuiltinEmitterFactory> (
-        Sys->object_reg, "crystalspace.mesh.object.particles.emitter", false);
-  csRef<iParticleBuiltinEffectorFactory> eff_factory = 
-      csLoadPluginCheck<iParticleBuiltinEffectorFactory> (
-        Sys->object_reg, "crystalspace.mesh.object.particles.effector", false);
-
-  csRef<iParticleBuiltinEmitterSphere> sphereemit = emit_factory->
-    CreateSphere ();
-  sphereemit->SetRadius (0.1f);
-  sphereemit->SetParticlePlacement (CS_PARTICLE_BUILTIN_CENTER);
-  sphereemit->SetPosition (csVector3 (0, 0, 0));
-  sphereemit->SetInitialVelocity (csVector3 (1, 0, 0), csVector3 (3, 3, 3));
-  sphereemit->SetUniformVelocity (false);
-  sphereemit->SetDuration (0.1f);
-  sphereemit->SetEmissionRate (1000.0f);
-  sphereemit->SetInitialTTL (1.0f, 1.0f);
-
-  csRef<iParticleBuiltinEffectorLinColor> lincol = eff_factory->
-    CreateLinColor ();
-  lincol->AddColor (csColor4 (1,1,1,1), 1.0f);
-  lincol->AddColor (csColor4 (1,1,1,0), 0.0f);
-
-  csRef<iParticleSystem> partstate =
-  	scfQueryInterface<iParticleSystem> (exp->GetMeshObject ());
-  partstate->SetParticleSize (csVector2 (0.15f, 0.15f));
-  partstate->SetRotationMode (CS_PARTICLE_ROTATE_VERTICES);
-  partstate->SetIntegrationMode (CS_PARTICLE_INTEGRATE_BOTH);
-  partstate->AddEmitter (sphereemit);
-  partstate->AddEffector (lincol);
-
-  Sys->Engine->DelayedRemoveObject (1100, exp);
-  Sys->Engine->DelayedRemoveObject (1101, mfw);
-
-  exp->PlaceMesh ();
-}
-
-//===========================================================================
 // Everything for bots.
 //===========================================================================
 
@@ -431,12 +91,12 @@ void WalkTest::add_bot (float size, iSector* where, csVector3 const& pos,
   {
     float r, g, b;
     RandomColor (r, g, b);
-    dyn = Sys->view->GetEngine ()->CreateLight ("",
+    dyn = Sys->Engine->CreateLight ("",
     	pos, dyn_radius, csColor(r, g, b), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
     where->GetLights ()->Add (dyn);
     Sys->dynamic_lights.Push (dyn);
   }
-  iMeshFactoryWrapper* tmpl = Sys->view->GetEngine ()->GetMeshFactories ()
+  iMeshFactoryWrapper* tmpl = Sys->Engine->GetMeshFactories ()
   	->FindByName ("bot");
   if (!tmpl) return;
   csRef<iMeshObject> botmesh (tmpl->GetMeshObjectFactory ()->NewInstance ());
@@ -450,7 +110,7 @@ void WalkTest::add_bot (float size, iSector* where, csVector3 const& pos,
   csRef<iSprite3DState> state (scfQueryInterface<iSprite3DState> (botmesh));
   state->SetAction ("default");
   
-  Bot* bot = new Bot (Sys->view->GetEngine(), botWrapper);
+  Bot* bot = new Bot (Sys->Engine, botWrapper);
   bot->set_bot_move (pos);
   bot->set_bot_sector (where);
   bot->light = dyn;
@@ -551,7 +211,7 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
             Sys->add_bot (1, dyn->GetSector (), dyn->GetCenter (), 0);
 	  }
 	  ms->sprite->GetMovable ()->ClearSectors ();
-	  Sys->view->GetEngine ()->GetMeshes ()->Remove (ms->sprite);
+	  Sys->Engine->GetMeshes ()->Remove (ms->sprite);
 	}
 	csRef<WalkDataObject> ido (
 		CS::GetChildObject<WalkDataObject>(dyn->QueryObject()));
@@ -588,8 +248,8 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
         WalkDataObject* esdata = new WalkDataObject (es);
         dyn->QueryObject ()->ObjAdd (esdata);
 	esdata->DecRef ();
-        add_particles_explosion (dyn->GetSector (),
-		engine, dyn->GetCenter (), "explo");
+	WalkTestParticleDemos::Explosion (Sys, dyn->GetSector (),
+		dyn->GetCenter (), "explo");
         return false;
       }
       else ms->dir.SetOrigin (v);
@@ -666,8 +326,8 @@ void show_lightning ()
   {
     // This finds the light L1 (the colored light over the stairs) and
     // makes the lightning restore this color back after it runs.
-    iLight *light = Sys->view->GetEngine ()->FindLight("l1");
-    iSharedVariable *var = Sys->view->GetEngine ()->GetVariableList()
+    iLight *light = Sys->Engine->FindLight("l1");
+    iSharedVariable *var = Sys->Engine->GetVariableList()
     	->FindByName("Lightning Restore Color");
     if (light && var)
     {
@@ -685,13 +345,13 @@ void show_lightning ()
 void fire_missile ()
 {
   csVector3 dir (0, 0, 0);
-  csVector3 pos = Sys->view->GetCamera ()->GetTransform ().This2Other (dir);
+  csVector3 pos = Sys->views->GetCamera ()->GetTransform ().This2Other (dir);
   float r, g, b;
   RandomColor (r, g, b);
   csRef<iLight> dyn =
-  	Sys->view->GetEngine ()->CreateLight ("", pos, 4, csColor (r, g, b),
+  	Sys->Engine->CreateLight ("", pos, 4, csColor (r, g, b),
 		CS_LIGHT_DYNAMICTYPE_DYNAMIC);
-  Sys->view->GetCamera ()->GetSector ()->GetLights ()->Add (dyn);
+  Sys->views->GetCamera ()->GetSector ()->GetLights ()->Add (dyn);
   Sys->dynamic_lights.Push (dyn);
 
   MissileStruct* ms = new MissileStruct;
@@ -712,7 +372,7 @@ void fire_missile ()
     }
   }
   ms->type = DYN_TYPE_MISSILE;
-  ms->dir = (csOrthoTransform)(Sys->view->GetCamera ()->GetTransform ());
+  ms->dir = (csOrthoTransform)(Sys->views->GetCamera ()->GetTransform ());
   ms->sprite = 0;
   WalkDataObject* msdata = new WalkDataObject(ms);
   dyn->QueryObject ()->ObjAdd(msdata);
@@ -721,7 +381,7 @@ void fire_missile ()
   csString misname;
   misname.Format ("missile%d", ((rand () >> 3) & 1)+1);
 
-  iMeshFactoryWrapper *tmpl = Sys->view->GetEngine ()->GetMeshFactories ()
+  iMeshFactoryWrapper *tmpl = Sys->Engine->GetMeshFactories ()
   	->FindByName (misname);
   if (!tmpl)
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -729,8 +389,8 @@ void fire_missile ()
   else
   {
     csRef<iMeshWrapper> sp (
-    	Sys->view->GetEngine ()->CreateMeshWrapper (tmpl,
-	"missile",Sys->view->GetCamera ()->GetSector (), pos));
+    	Sys->Engine->CreateMeshWrapper (tmpl,
+	"missile",Sys->views->GetCamera ()->GetSector (), pos));
 
     ms->sprite = sp;
     csMatrix3 m = ms->dir.GetT2O ();
@@ -747,7 +407,7 @@ void test_decal ()
     return;
 
   iMaterialWrapper * material = 
-    Sys->view->GetEngine()->GetMaterialList()->FindByName("decal");
+    Sys->Engine->GetMaterialList()->FindByName("decal");
   if (!material)
   {
     csRef<iLoader> loader = csQueryRegistry<iLoader>(Sys->object_reg);
@@ -761,7 +421,7 @@ void test_decal ()
       Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, 
                   "Couldn't load decal texture!");
 
-    material = Sys->view->GetEngine()->GetMaterialList()->FindByName("decal");
+    material = Sys->Engine->GetMaterialList()->FindByName("decal");
     if (!material)
     {
       Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, 
@@ -775,14 +435,14 @@ void test_decal ()
       decalMgr->CreateDecalTemplate(material);
   decalTemplate->SetTimeToLive(5.0f);
   
-  csVector3 start = Sys->view->GetCamera()->GetTransform().GetOrigin();
+  csVector3 start = Sys->views->GetCamera()->GetTransform().GetOrigin();
 
   csVector3 normal = 
-    Sys->view->GetCamera()->GetTransform().This2OtherRelative(csVector3(0,0,-1));
+    Sys->views->GetCamera()->GetTransform().This2OtherRelative(csVector3(0,0,-1));
 
   csVector3 end = start - normal * 10000.0f;
 
-  csSectorHitBeamResult result = Sys->view->GetCamera()->GetSector()->HitBeamPortals(start, end);
+  csSectorHitBeamResult result = Sys->views->GetCamera()->GetSector()->HitBeamPortals(start, end);
   if (!result.mesh)
       return;
       
@@ -800,7 +460,7 @@ void test_decal ()
   csVector3 iSect;
   csIntersectingTriangle closestTri;
   iMeshWrapper * selMesh;
-  if (csColliderHelper::TraceBeam(cdsys, Sys->view->GetCamera()->GetSector(), 
+  if (csColliderHelper::TraceBeam(cdsys, Sys->views->GetCamera()->GetSector(), 
         start, end, true, closestTri, iSect, &selMesh) <= 0.0f)
   {
       printf("No Decal Tracebeam\n");
@@ -812,7 +472,7 @@ void test_decal ()
 
   // make the up direction of the decal the same as the camera
   csVector3 up =
-    Sys->view->GetCamera()->GetTransform().This2OtherRelative(
+    Sys->views->GetCamera()->GetTransform().This2OtherRelative(
 	csVector3(0,1,0));
 
   // create the decal

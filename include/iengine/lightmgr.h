@@ -39,6 +39,7 @@ struct iMeshWrapper;
 struct iSector;
 class csFrustum;
 class csBox3;
+class csReversibleTransform;
 
 /**
  * 
@@ -61,17 +62,25 @@ enum csLightQueryFlags
 struct csLightInfluence
 {
   iLight* light;
-  /// Other useful information in one handy package
+  /**
+   * Other useful information in one handy package
+   * @{ */
   csLightType type;
   csFlags flags;
   csLightDynamicType dynamicType;
+  /// @}
+  /**
+   * Light intensity (taking into account color and attenuation) at the
+   * closest point on the supplied bounding box.
+   */
+  float perceivedIntensity;
+  
+  csLightInfluence () : light (0), type (CS_LIGHT_POINTLIGHT),
+    dynamicType (CS_LIGHT_DYNAMICTYPE_DYNAMIC), perceivedIntensity (0) {}
   
   inline friend bool operator == (const csLightInfluence& r1, const csLightInfluence& r2) 
   {
-    return (r1.light == r2.light)
-      && (r1.type == r2.type)
-      && (r1.flags == r2.flags)
-      && (r1.dynamicType == r2.dynamicType);
+    return (r1.light == r2.light);
   }
 };
 
@@ -113,11 +122,11 @@ struct iLightInfluenceCallback : public virtual iBase
  * - csQueryRegistry<iLightManager>
  * 
  * Main users of this interface:
- * - meshes
+ * - render managers
  */
 struct iLightManager : public virtual iBase
 {
-  SCF_INTERFACE(iLightManager,4,0,0);
+  SCF_INTERFACE(iLightManager,5,0,1);
 
   /**
    * Return all 'relevant' light that hit this object. Depending on 
@@ -197,10 +206,15 @@ struct iLightManager : public virtual iBase
    * light manager may still return an array containing more lights. You just
    * have to ignore the additional lights then. If you don't want to limit
    * the number of lights you can set maxLights to -1.
+   * \param bboxToWorld Optional transformation from bounding box to world
+   *   space. 'this' space is bounding box space, 'other' space is world space.
+   *   Not specifying the transformation has the same effect as specifying
+   *   an identity transform.
    * \param flags flags provided by csLightQueryFlags
    */
   virtual void GetRelevantLights (iSector* sector, const csBox3& boundingBox,
     iLightInfluenceArray* lightArray, int maxLights, 
+    const csReversibleTransform* bboxToWorld = 0,
     uint flags = CS_LIGHTQUERY_GET_ALL) = 0;
 
   /**
@@ -214,10 +228,15 @@ struct iLightManager : public virtual iBase
    * light manager may still return an array containing more lights. You just
    * have to ignore the additional lights then. If you don't want to limit
    * the number of lights you can set maxLights to -1.
+   * \param bboxToWorld Optional transformation from bounding box to world
+   *   space. 'this' space is bounding box space, 'other' space is world space.
+   *   Not specifying the transformation has the same effect as specifying
+   *   an identity transform.
    * \param flags flags provided by csLightQueryFlags
    */
   virtual void GetRelevantLights (iSector* sector, const csBox3& boundingBox,
     iLightInfluenceCallback* lightCallback, int maxLights, 
+    const csReversibleTransform* bboxToWorld = 0,
     uint flags = CS_LIGHTQUERY_GET_ALL) = 0;
 
   /**
@@ -271,14 +290,41 @@ struct iLightManager : public virtual iBase
    * \param numLights The number of lights returned in \a lightArray.
    * \param maxLights The maximum number of lights that you (as
    *   the caller of this function) are interested in.
+   * \param bboxToWorld Optional transformation from bounding box to world
+   *   space. 'this' space is bounding box space, 'other' space is world space.
+   *   Not specifying the transformation has the same effect as specifying
+   *   an identity transform.
    * \param flags Flags provided by csLightQueryFlags.
    */
   virtual void GetRelevantLights (iSector* sector, 
     const csBox3& boundingBox, csLightInfluence*& lightArray, 
     size_t& numLights, size_t maxLights = (size_t)~0,
+    const csReversibleTransform* bboxToWorld = 0,
+    uint flags = CS_LIGHTQUERY_GET_ALL) = 0;
+  
+  /**
+   * Return all 'relevant' lights that intersects a giving bounding box within
+   * a specified sector. The returned lights are sorted by the intensity at
+   * the closest point on(or in) the box.
+   * \param sector is the sector to check for.
+   * \param boundingBox The bounding box to be used when querying lights.
+   * \param lightArray Returns a pointer to an arry with the influences of the
+   *   relevant lights. Must be freed with FreeInfluenceArray() after use.
+   * \param numLights The number of lights returned in \a lightArray.
+   * \param maxLights The maximum number of lights that you (as
+   *   the caller of this function) are interested in.
+   * \param bboxToWorld Optional transformation from bounding box to world
+   *   space. 'this' space is bounding box space, 'other' space is world space.
+   *   Not specifying the transformation has the same effect as specifying
+   *   an identity transform.
+   * \param flags Flags provided by csLightQueryFlags.
+   */
+  virtual void GetRelevantLightsSorted (iSector* sector, 
+    const csBox3& boundingBox, csLightInfluence*& lightArray, 
+    size_t& numLights, size_t maxLights = (size_t)~0,
+    const csReversibleTransform* bboxToWorld = 0,
     uint flags = CS_LIGHTQUERY_GET_ALL) = 0;
 };
-
 
 /** @} */
 

@@ -531,14 +531,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if (texturenode)
     {
       csSafeCopyArray<ProxyTexture> proxyTextures;
-      return ParseTextureTC(ret, ldr_context, texturenode, &proxyTextures);
+      return ParseTextureTC(ret, ldr_context, texturenode, &proxyTextures, vfs->GetCwd());
     }
 
     // Mesh Factory
     csRef<iDocumentNode> meshfactnode = node->GetNode("meshfact");
     if(meshfactnode)
     {
-      return FindOrLoadMeshFactoryTC(ret, ldr_context, meshfactnode, 0, 0, ssource);
+      return FindOrLoadMeshFactoryTC(ret, ldr_context, meshfactnode, 0, 0, ssource, 0);
     }
 
     // Mesh Object
@@ -647,10 +647,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return false;
   }
 
-  THREADED_CALLABLE_IMPL5(csThreadedLoader, FindOrLoadMeshFactory, csRef<iLoaderContext> ldr_context,
+  THREADED_CALLABLE_IMPL6(csThreadedLoader, FindOrLoadMeshFactory, csRef<iLoaderContext> ldr_context,
     csRef<iDocumentNode> meshfactnode, csRef<iMeshFactoryWrapper> parent, csReversibleTransform* transf,
-    csRef<iStreamSource> ssource)
+    csRef<iStreamSource> ssource, const char* path)
   {
+    csVfsDirectoryChanger dirchange(vfs);
+    if(path)
+    {
+      dirchange.ChangeTo(path);
+    }
+
     const char* meshfactname = meshfactnode->GetAttributeValue("name");
 
     csRef<iMeshFactoryWrapper> mfw = ldr_context->FindMeshFactory(meshfactname, true);
@@ -835,7 +841,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
               ldr_context->GetVerbose());
           }
 
-          threadReturns.Push(FindOrLoadMeshFactory(ldr_context, child, 0, 0, ssource));
+          threadReturns.Push(FindOrLoadMeshFactory(ldr_context, child, 0, 0, ssource, vfs->GetCwd()));
         }
         break;
       case XMLTOKEN_SECTOR:
@@ -879,8 +885,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             path = child->GetAttributeValue("path");
             if(path)
             {
-              vfs->PushDir();
-              vfs->ChDir(path);
+              vfs->PushDir(path);
             }
           }
           else
@@ -897,6 +902,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
           if(!LoadLibrary(ldr_context, lib, ssource, missingdata, threadReturns, libs, libIDs, false, do_verbose))
             return false;
+
+          if(path)
+          {
+            vfs->PopDir();
+          }
+
           break;
         }
       case XMLTOKEN_START:
@@ -1119,7 +1130,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_MESHFACT:
         {
-          threadReturns.Push(FindOrLoadMeshFactory(ldr_context, child, 0, 0, ssource));
+          threadReturns.Push(FindOrLoadMeshFactory(ldr_context, child, 0, 0, ssource, vfs->GetCwd()));
         }
         break;
       case XMLTOKEN_PLUGINS:
@@ -1516,7 +1527,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           csReversibleTransform child_transf;
           csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-          if(!FindOrLoadMeshFactoryTC(ret, ldr_context, child, stemp, &child_transf, ssource))
+          if(!FindOrLoadMeshFactoryTC(ret, ldr_context, child, stemp, &child_transf, ssource, vfs->GetCwd()))
           {
             return false;
           }

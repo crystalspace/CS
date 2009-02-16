@@ -33,7 +33,7 @@
  */
 class Simple : public csApplicationFramework, public csBaseEventHandler
 {
- private:
+private:
   /// A pointer to the 3D engine.
   csRef<iEngine> engine;
    
@@ -62,10 +62,9 @@ class Simple : public csApplicationFramework, public csBaseEventHandler
   float rotX, rotY;
 
   /// Event handlers to draw and print the 3D canvas on each frame
-  csRef<FrameBegin3DDraw> drawer;
   csRef<FramePrinter> printer;
 
- public:
+public:
   bool SetupModules ();
 
   /**

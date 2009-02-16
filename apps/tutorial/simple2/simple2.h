@@ -52,6 +52,9 @@ private:
   /// A pointer to the view which contains the camera.
   csRef<iView> view;
 
+  /// The render manager, cares about selecting lights+meshes to render
+  csRef<iRenderManager> rm;
+
   /// A pointer to the sector the camera will be in.
   iSector* room;
 

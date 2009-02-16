@@ -98,9 +98,17 @@ struct iGeneralMeshCommonState : public virtual iBase
 {
   SCF_INTERFACE (iGeneralMeshCommonState, 1, 2, 2);
   
-  /// Set lighting.
+  /**
+   * Set lighting.
+   * \deprecated Deprecated in 1.9 by change to shader-based lighting.
+   */
+  CS_DEPRECATED_METHOD_MSG("Deprecated by change to shader-based lighting.")
   virtual void SetLighting (bool l) = 0;
-  /// Is lighting enabled.
+  /**
+   * Is lighting enabled.
+   * \deprecated Deprecated in 1.9 by change to shader-based lighting.
+   */
+  CS_DEPRECATED_METHOD_MSG("Deprecated by change to shader-based lighting.")
   virtual bool IsLighting () const = 0;
   /**
    * Set manual colors. If this is set then lighting will be ignored
@@ -113,9 +121,15 @@ struct iGeneralMeshCommonState : public virtual iBase
   /**
    * Set shadowing. By default genmesh objects will cast shadows
    * (during the static lighting phase). You can disable this here.
+   * \deprecated Deprecated in 1.9 by change to shader-based lighting.
    */
+  CS_DEPRECATED_METHOD_MSG("Deprecated by change to shader-based lighting.")
   virtual void SetShadowCasting (bool m) = 0;
-  /// Is shadow casting enabled?
+  /**
+   * Is shadow casting enabled?
+   * \deprecated Deprecated in 1.9 by change to shader-based lighting.
+   */
+  CS_DEPRECATED_METHOD_MSG("Deprecated by change to shader-based lighting.")
   virtual bool IsShadowCasting () const = 0;
   /**
    * Set shadow receiving on. By default this is disabled in which
@@ -124,9 +138,15 @@ struct iGeneralMeshCommonState : public virtual iBase
    * the lighting system resembles more the lighting system with
    * things which static and pseudo-dynamic lighting. In this
    * case there will be shadows on the genmesh instance.
+   * \deprecated Deprecated in 1.9 by change to shader-based lighting.
    */
+  CS_DEPRECATED_METHOD_MSG("Deprecated by change to shader-based lighting.")
   virtual void SetShadowReceiving (bool m) = 0;
-  /// Is shadow receiving enabled?
+  /**
+   * Is shadow receiving enabled?
+   * \deprecated Deprecated in 1.9 by change to shader-based lighting.
+   */
+  CS_DEPRECATED_METHOD_MSG("Deprecated by change to shader-based lighting.")
   virtual bool IsShadowReceiving () const = 0;
 
   /**\name Custom render buffers

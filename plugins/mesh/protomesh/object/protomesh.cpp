@@ -182,6 +182,7 @@ csRenderMesh** csProtoMeshObject::GetRenderMeshes (
   meshPtr->material = material;
   meshPtr->worldspace_origin = wo;
   meshPtr->object2world = o2wt;
+  meshPtr->bbox = factory->GetObjectBoundingBox();
   if (rmCreated)
   {
     meshPtr->buffers = bufferHolder;

@@ -56,10 +56,10 @@ public:
 
   virtual void GetRelevantLights (iSector* sector, const csBox3& boundingBox,
     iLightInfluenceArray* lightArray, int maxLights, 
-    uint flags);
+    const csReversibleTransform* bboxToWorld, uint flags);
   virtual void GetRelevantLights (iSector* sector, const csBox3& boundingBox,
     iLightInfluenceCallback* lightCallback, int maxLights, 
-    uint flags);
+    const csReversibleTransform* bboxToWorld, uint flags);
 
   virtual void FreeInfluenceArray (csLightInfluence* Array);
 
@@ -74,7 +74,22 @@ public:
   virtual void GetRelevantLights (iSector* sector, 
     const csBox3& boundingBox, csLightInfluence*& lightArray, 
     size_t& numLights, size_t maxLights = (size_t)~0,
+    const csReversibleTransform* bboxToWorld = 0,
     uint flags = CS_LIGHTQUERY_GET_ALL);
+
+  virtual void GetRelevantLightsSorted (iSector* sector, 
+    const csBox3& boundingBox, csLightInfluence*& lightArray, 
+    size_t& numLights, size_t maxLights = (size_t)~0,
+    const csReversibleTransform* bboxToWorld = 0,
+    uint flags = CS_LIGHTQUERY_GET_ALL);
+protected:
+  template<typename BoxSpace>
+  void GetRelevantLightsWorker (
+    const BoxSpace& boxSpace, iSector* sector, 
+    const csBox3& boundingBox, csLightInfluence*& lightArray, 
+    size_t& numLights, size_t maxLights = (size_t)~0,
+    uint flags = CS_LIGHTQUERY_GET_ALL);
+
 };
 
 #endif // __CS_CSENGINE_LIGHTMGR_H__

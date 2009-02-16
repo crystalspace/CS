@@ -94,7 +94,6 @@ void csThreadManager::Wait(csRef<iThreadReturn> result)
       {
         csRef<iEvent> evt = eventQueue->CreateBroadcastEvent(ProcessWhileWait);
         eventQueue->Dispatch(*evt);
-        csSleep(1);
       }
     }
 
@@ -108,27 +107,27 @@ void csThreadManager::Wait(csRef<iThreadReturn> result)
 bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns)
 {
   bool success = true;
-  bool finished = false;
 
-  while(!finished)
+  while(threadReturns.GetSize() != 0)
   {
-    finished = true;
-    for(size_t i=0; i<threadReturns.GetSize(); i++)
+    if(threadReturns[0]->IsFinished())
     {
-      finished &= threadReturns[i]->IsFinished();
-      if(finished)
+      success &= threadReturns[0]->WasSuccessful();
+      threadReturns.DeleteIndexFast(0);
+    }
+    else
+    {
+      if(IsMainThread())
       {
-        success &= threadReturns[i]->WasSuccessful();
+        csRef<iEvent> evt = eventQueue->CreateBroadcastEvent(ProcessWhileWait);
+        eventQueue->Dispatch(*evt);
+      }
+      else
+      {
+        threadQueue->PopAndRun();
       }
     }
-
-    if(!finished)
-    {
-      threadQueue->PopAndRun();
-    }
   }
-
-  threadReturns.Empty();
 
   return success;
 }

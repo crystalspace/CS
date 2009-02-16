@@ -121,8 +121,7 @@ public:
     iShaderManager* shaderManager = rmanager->shaderManager;
 
     // @@@ This is somewhat "boilerplate" sector/rview setup.
-    rview->SetThisSector (sector);
-    sector->CallSectorCallbacks (rview);
+    sector->PrepareDraw (rview);
     // Make sure the clip-planes are ok
     CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext ());
     

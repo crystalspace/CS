@@ -36,6 +36,27 @@
       <file>/lev/terrain/normalmap.png</file>
       <class>normalmap</class>
     </texture>
+        <texture name="clouds">
+	  <file>/lev/terrainf/clouddome.jpg</file>
+        </texture>
+        <texture name="sky_up">
+	  <file>/lev/terrainf/skybox_u.jpg</file>
+        </texture>
+        <texture name="sky_down">
+	  <file>/lev/terrainf/skybox_d.jpg</file>
+        </texture>
+        <texture name="sky_left">
+	  <file>/lev/terrainf/skybox_l.jpg</file>
+        </texture>
+        <texture name="sky_right">
+	  <file>/lev/terrainf/skybox_r.jpg</file>
+        </texture>
+        <texture name="sky_front">
+	  <file>/lev/terrainf/skybox_f.jpg</file>
+        </texture>
+        <texture name="sky_back">
+	  <file>/lev/terrainf/skybox_b.jpg</file>
+        </texture>
   </textures>
 
   <shaders>
@@ -54,6 +75,9 @@
     <shader>
       <file>/shader/splatting_scattering.xml</file>
     </shader>
+        <shader>
+            <file>/shader/lighting/fullbright.xml</file>
+        </shader>
   </shaders>
 
   <materials>
@@ -96,6 +120,34 @@
       <shadervar name="texture scale" type="vector2">16,16</shadervar>
       <shader type="terrain splat">splatting_scattering</shader>
     </material>
+        <material name="clouds">
+            <texture>clouds</texture>
+	    <shader type="diffuse">lighting_fullbright</shader>
+        </material>
+        <material name="sky_up">
+            <texture>sky_up</texture>
+	    <shader type="diffuse">lighting_fullbright</shader>
+        </material>
+        <material name="sky_down">
+            <texture>sky_down</texture>
+	    <shader type="diffuse">lighting_fullbright</shader>
+        </material>
+        <material name="sky_left">
+            <texture>sky_left</texture>
+	    <shader type="diffuse">lighting_fullbright</shader>
+        </material>
+        <material name="sky_right">
+            <texture>sky_right</texture>
+	    <shader type="diffuse">lighting_fullbright</shader>
+        </material>
+        <material name="sky_front">
+            <texture>sky_front</texture>
+	    <shader type="diffuse">lighting_fullbright</shader>
+        </material>
+        <material name="sky_back">
+            <texture>sky_back</texture>
+	    <shader type="diffuse">lighting_fullbright</shader>
+        </material>
   </materials>
 
   <addon>
@@ -115,6 +167,13 @@
     <up x="0" y="1" z="0" />
   </start>
 
+  <library path="/lev/terrainf" file="grass.lib" />
+  <library path="/lev/terrainf" file="rock.lib" />
+  <library path="/lev/terrainf" file="tree.lib" />
+  <library path="/lev/terrainf" file="tree_skimp.lib" />
+  <library path="/lev/terrainf" file="treebark_bare.lib" />
+  <library path="/lev/terrainf" file="bush2.lib" />
+  <!--
   <meshfact name="skydome">
     <plugin>genmeshFactory</plugin>
     <params>
@@ -123,6 +182,141 @@
       </sphere>
     </params>
   </meshfact>
+  -->
+
+    <meshfact name="skydome">
+        <plugin>genmeshFactory</plugin>
+        <nolighting />
+        <params>
+            <sphere rimvertices="6" reversed="true">
+                <radius x="1000" y="1000" z="1000" />
+            </sphere>
+        </params>
+    </meshfact>
+    <meshfact name="factory_room_sky">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <nolighting />
+        <params>
+            <numvt>24</numvt>
+            <v x="-1000" y="1000" z="-1000" u="0.005" v="0.005" />
+            <v x="-1000" y="1000" z="1000" u="0.995" v="0.005" />
+            <v x="-1000" y="-1000" z="1000" u="0.995" v="0.995" />
+            <v x="-1000" y="-1000" z="-1000" u="0.00500003" v="0.995" />
+            <v x="-1000" y="1000" z="1000" u="0.005" v="0.005" />
+            <v x="1000" y="1000" z="1000" u="0.995" v="0.005" />
+            <v x="1000" y="-1000" z="1000" u="0.995" v="0.995" />
+            <v x="-1000" y="-1000" z="1000" u="0.00500003" v="0.995" />
+            <v x="-1000" y="1000" z="-1000" u="0.005" v="0.005" />
+            <v x="1000" y="1000" z="-1000" u="0.995" v="0.005" />
+            <v x="1000" y="1000" z="1000" u="0.995" v="0.995" />
+            <v x="-1000" y="1000" z="1000" u="0.00500003" v="0.995" />
+            <v x="1000" y="-1000" z="-1000" u="0.005" v="0.005" />
+            <v x="-1000" y="-1000" z="-1000" u="0.995" v="0.005" />
+            <v x="-1000" y="-1000" z="1000" u="0.995" v="0.995" />
+            <v x="1000" y="-1000" z="1000" u="0.00500003" v="0.995" />
+            <v x="1000" y="1000" z="1000" u="0.005" v="0.005" />
+            <v x="1000" y="1000" z="-1000" u="0.995" v="0.005" />
+            <v x="1000" y="-1000" z="-1000" u="0.995" v="0.995" />
+            <v x="1000" y="-1000" z="1000" u="0.00500003" v="0.995" />
+            <v x="1000" y="1000" z="-1000" u="0.005" v="0.005" />
+            <v x="-1000" y="1000" z="-1000" u="0.995" v="0.005" />
+            <v x="-1000" y="-1000" z="-1000" u="0.995" v="0.995" />
+            <v x="1000" y="-1000" z="-1000" u="0.00500003" v="0.995" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="0" y="0" z="-1" />
+            <n x="0" y="0" z="-1" />
+            <n x="0" y="0" z="-1" />
+            <n x="0" y="0" z="-1" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <submesh name="0">
+                <material>sky_left</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="0">
+                <material>sky_front</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="4" />
+                    <e c0="5" />
+                    <e c0="6" />
+                    <e c0="4" />
+                    <e c0="6" />
+                    <e c0="7" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="0">
+                <material>sky_down</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="12" />
+                    <e c0="13" />
+                    <e c0="14" />
+                    <e c0="12" />
+                    <e c0="14" />
+                    <e c0="15" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="0">
+                <material>sky_back</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="20" />
+                    <e c0="21" />
+                    <e c0="22" />
+                    <e c0="20" />
+                    <e c0="22" />
+                    <e c0="23" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="0">
+                <material>sky_right</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="16" />
+                    <e c0="17" />
+                    <e c0="18" />
+                    <e c0="16" />
+                    <e c0="18" />
+                    <e c0="19" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="0">
+                <material>sky_up</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="8" />
+                    <e c0="9" />
+                    <e c0="10" />
+                    <e c0="8" />
+                    <e c0="10" />
+                    <e c0="11" />
+                </indexbuffer>
+            </submesh>
+        </params>
+    </meshfact>
 
   <meshfact name="TerrainFact">
     <plugin>terrainFact</plugin>
@@ -134,7 +328,7 @@
         <celldefault>
           <gridsize width="257" height="257" />
           <materialmapsize width="512" height="512" />
-          <size x="256" y="30" z="256" />
+          <size x="256" y="15" z="256" />
 
           <renderproperties>
             <param name="block resolution">16</param>
@@ -164,6 +358,7 @@
       <attenuation>realistic</attenuation>
     </light>
 
+    <!--
     <meshobj name="sky">
       <plugin>genmesh</plugin>
       <params>
@@ -181,6 +376,38 @@
         <v x="0" y="0" z="0" />
       </move>
     </meshobj>
+    -->
+        <meshobj name="clouds">
+            <plugin>genmesh</plugin>
+            <params>
+                <factory>skydome</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <material>clouds</material>
+                <lighting>no</lighting>
+                <color red="0.5" green="0.5" blue="0.5" />
+            </params>
+            <znone />
+            <priority>portal</priority>
+            <noshadows />
+            <camera />
+        </meshobj>
+        <meshobj name="sky">
+            <noshadows />
+            <plugin>crystalspace.mesh.loader.genmesh</plugin>
+            <params>
+                <factory>factory_room_sky</factory>
+                <color red="1" green="1" blue="1" />
+                <manualcolors />
+                <mixmode>
+                    <copy />
+                </mixmode>
+            </params>
+            <camera />
+            <zfill />
+            <priority>sky</priority>
+        </meshobj>
 
     <meshobj name="Terrain">
       <plugin>terrain</plugin>
@@ -196,6 +423,81 @@
         <v x="0" y="0" z="0" />
       </move>
     </meshobj>
+        <meshgen name="grass">
+            <geometry>
+                <factory maxdist="30" name="treebark_bare" />
+                <radius>1</radius>
+                <density>0.02</density>
+                <materialfactor material="Grass" factor=".4" />
+                <defaultmaterialfactor>.7</defaultmaterialfactor>
+            </geometry>
+            <geometry>
+                <factory maxdist="30" name="tree" />
+                <radius>1</radius>
+                <density>0.02</density>
+                <materialfactor material="Grass" factor="1" />
+                <defaultmaterialfactor>.1</defaultmaterialfactor>
+            </geometry>
+            <geometry>
+                <factory maxdist="30" name="tree_skimp" />
+                <radius>1</radius>
+                <density>0.01</density>
+                <materialfactor material="Grass" factor="1" />
+                <defaultmaterialfactor>.1</defaultmaterialfactor>
+            </geometry>
+            <geometry>
+                <factory maxdist="10" name="Grass" />
+                <factory maxdist="30" name="GrassLow" />
+                <radius>1</radius>
+                <density>0.4</density>
+                <materialfactor material="Grass" factor="1" />
+            </geometry>
+            <geometry>
+                <factory maxdist="30" name="bush2" />
+                <radius>1</radius>
+                <density>0.04</density>
+                <materialfactor material="Marble" factor="1" />
+                <materialfactor material="Stone" factor="1" />
+                <defaultmaterialfactor>.1</defaultmaterialfactor>
+            </geometry>
+            <geometry>
+                <factory maxdist="10" name="TallGrass" />
+                <factory maxdist="30" name="TallGrassLow" />
+                <radius>1</radius>
+                <density>.08</density>
+                <materialfactor material="Grass" factor="1" />
+            </geometry>
+            <geometry>
+                <factory maxdist="30" name="Rock" />
+                <radius>1</radius>
+                <density>.010</density>
+                <materialfactor material="Marble" factor="1" />
+                <materialfactor material="Stone" factor="0" />
+                <defaultmaterialfactor>.3</defaultmaterialfactor>
+            </geometry>
+            <geometry>
+                <factory maxdist="30" name="RockSmall" />
+                <radius>1</radius>
+                <density>.10</density>
+                <materialfactor material="Marble" factor="1" />
+                <materialfactor material="Stone" factor="0" />
+                <defaultmaterialfactor>.3</defaultmaterialfactor>
+            </geometry>
+            <!--
+        <geometry>
+	    <factory maxdist="30" name="squareInst" />
+	    <radius>1</radius>
+	    <density>.3</density>
+        </geometry>
+	-->
+            <!--<densityscale mindist="26" maxdist="30" maxfactor="0" />-->
+            <alphascale mindist="22" maxdist="30" />
+            <samplebox>
+                <min x="-256" y="-200" z="-256" />
+                <max x="256" y="200" z="256" />
+            </samplebox>
+            <meshobj>Terrain</meshobj>
+        </meshgen>
 
   </sector>
   <sequences>

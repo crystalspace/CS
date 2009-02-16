@@ -515,6 +515,7 @@ public:
 
   /// Open 3d renderer.
   bool Open ();
+  void SetupShaderVariables();
 
   /// Close renderer and release all resources used
   void Close ();
@@ -751,15 +752,17 @@ public:
   //                         iEventHandler
   ////////////////////////////////////////////////////////////////////
   
-  bool HandleEvent (iEvent& Event);
+  bool HandleEvent (iEvent& Event, bool postShaderManager);
 
-  struct EventHandler : public scfImplementation1<EventHandler,
+  template<bool PostShaderManager>
+  struct EventHandler : public scfImplementation1<EventHandler<PostShaderManager>,
 						  iEventHandler>
   {
   private:
     csGLGraphics3D* parent;
   public:
-    EventHandler (csGLGraphics3D* parent) : scfImplementationType (this)
+    EventHandler (csGLGraphics3D* parent) : 
+      scfImplementation1<EventHandler<PostShaderManager>, iEventHandler> (this)
     {
       EventHandler::parent = parent;
     }
@@ -767,11 +770,40 @@ public:
     {
     }
     virtual bool HandleEvent (iEvent& ev) 
-    { return parent->HandleEvent (ev); }
-    CS_EVENTHANDLER_NAMES("crystalspace.graphics3d")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
+    { return parent->HandleEvent (ev, PostShaderManager); }
+    
+    static const char * StaticHandlerName()
+    { return PostShaderManager ? "crystalspace.graphics3d.2" : "crystalspace.graphics3d"; }
+    static const csHandlerID StaticID(csRef<iEventHandlerRegistry> &reg)
+    {return reg->GetGenericID(StaticHandlerName()); }
+    virtual const char * GenericName() const
+    { return StaticHandlerName(); }
+    virtual csHandlerID GenericID(csRef<iEventHandlerRegistry> &reg) const
+    { return StaticID(reg); }
+    
+    virtual const csHandlerID * GenericPrec (
+      csRef<iEventHandlerRegistry> & r1, csRef<iEventNameRegistry> &,
+      csEventID) const
+    {
+      if (PostShaderManager)
+      {
+	static csHandlerID constraint[3] =
+	{
+	  EventHandler<false>::StaticID (r1),
+	  r1->GetGenericID("crystalspace.graphics3d.shadermgr"),
+	  CS_HANDLERLIST_END
+	};
+	return constraint;
+      }
+      return 0;
+    }
+    virtual const csHandlerID * GenericSucc (
+      csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,
+      csEventID) const { return 0; }
+      
+    CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS 
   };
-  csRef<EventHandler> scfiEventHandler;
+  csRef<iEventHandler> eventHandler1, eventHandler2;
 
   ////////////////////////////////////////////////////////////////////
   //                          iDebugHelper

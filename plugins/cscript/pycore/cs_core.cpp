@@ -61486,6 +61486,7 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "iPluginManager_lpiInitialize",SWIG_From_int(static_cast< int >(iPluginManager::lpiInitialize)));
   SWIG_Python_SetConstant(d, "iPluginManager_lpiReportErrors",SWIG_From_int(static_cast< int >(iPluginManager::lpiReportErrors)));
   SWIG_Python_SetConstant(d, "iPluginManager_lpiLoadDependencies",SWIG_From_int(static_cast< int >(iPluginManager::lpiLoadDependencies)));
+  SWIG_Python_SetConstant(d, "iPluginManager_lpiReturnLoadedInstance",SWIG_From_int(static_cast< int >(iPluginManager::lpiReturnLoadedInstance)));
   SWIG_Python_SetConstant(d, "MAX_OUTPUT_VERTICES",SWIG_From_int(static_cast< int >(64)));
   SWIG_Python_SetConstant(d, "CS_CLIP_OUTSIDE",SWIG_From_int(static_cast< int >(CS_CLIP_OUTSIDE)));
   SWIG_Python_SetConstant(d, "CS_CLIP_CLIPPED",SWIG_From_int(static_cast< int >(CS_CLIP_CLIPPED)));

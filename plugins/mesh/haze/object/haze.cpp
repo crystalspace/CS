@@ -763,6 +763,7 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
   rm->do_mirror = camera->IsMirrored ();
 
   rm->object2world = camera->GetTransform ();
+  rm->bbox = GetObjectBoundingBox();
 
   rm->indexend = (uint)GetTempIndices()->GetSize ();
 

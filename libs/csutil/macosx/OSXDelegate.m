@@ -138,6 +138,16 @@ enum
 #define OSXAppDefinedData1 0x1827
 #define OSXAppDefinedData2 0x4851
 
+//------------------------------------------------------------------------------
+// Provide an interface to deal with the fact that setAppleMenu() disappeared
+// from the header files as of OSX 10.4.
+// Remark: this functionality still works on 10.5, but as it is no longer
+// part of the public interface, it could disappear without notice.
+//------------------------------------------------------------------------------
+@interface NSApplication(MissingFunction)
+- (void)setAppleMenu:(NSMenu *)menu;
+@end
+
 @interface OSXApplication : NSApplication
 - (void)sendEvent:(NSEvent*)e;
 @end

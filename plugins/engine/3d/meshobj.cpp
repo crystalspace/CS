@@ -1083,20 +1083,6 @@ void csMeshList::NameChanged (iObject* object, const char* oldname,
   if (newname) meshes_hash.Put (newname, mesh);
 }
 
-iMeshWrapper* csMeshList::FindByNameWithChild (const char *Name) const
-{
-  char const* p = strchr (Name, ':');
-  if (!p) return meshes_hash.Get (Name, 0);
-
-  int firstsize = p-Name;
-  csString firstName;
-  firstName.Append (Name, firstsize);
-
-  iMeshWrapper* m = meshes_hash.Get (firstName, 0);
-  if (!m) return 0;
-  return m->FindChildByName (p+1);
-}
-
 int csMeshList::Add (iMeshWrapper *obj)
 {
   PrepareMesh (obj);
@@ -1153,10 +1139,7 @@ int csMeshList::Find (iMeshWrapper *obj) const
 iMeshWrapper *csMeshList::FindByName (const char *Name) const
 {
   CS::Threading::RecursiveMutexScopedLock lock(removeLock);
-  if (strchr (Name, ':'))
-    return FindByNameWithChild (Name);
-  else
-    return meshes_hash.Get (Name, 0);
+  return meshes_hash.Get (Name, 0);
 }
 
 #if 0

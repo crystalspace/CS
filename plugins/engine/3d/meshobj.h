@@ -99,9 +99,6 @@ public:
   csMeshList (int cap, int thresshold);
   virtual ~csMeshList ();
 
-  /// Find a mesh in <name>:<childname>:<childname> notation.
-  iMeshWrapper *FindByNameWithChild (const char *Name) const;
-
   /// Override PrepareMesh
   virtual void PrepareMesh (iMeshWrapper*) { }
   /// Override FreeMesh

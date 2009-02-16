@@ -38,11 +38,14 @@
 #include "iutil/eventnames.h"
 #include "csutil/eventhandlers.h"
 #include "ivideo/fontserv.h"
-#include "bot.h"
-
 #include "iengine/engine.h"
 
+#include "bot.h"
+#include "walktest.h"
+
 class WalkTest;
+class WalkTestViews;
+class WalkTestRecorder;
 class csPixmap;
 class csWireFrameCam;
 class InfiniteMaze;
@@ -113,38 +116,6 @@ struct csKeyMap
   bool need_status,is_on;
 };
 
-/**
- * An entry for the record function.
- */
-struct csRecordedCamera
-{
-  csMatrix3 mat;
-  csVector3 vec;
-  bool mirror;
-  iSector* sector;
-  char *cmd;
-  char *arg;
-  ~csRecordedCamera ()
-  { delete [] cmd; delete [] arg; }
-};
-
-/**
- * A recorded entry saved in a file.
- */
-struct csRecordedCameraFile
-{
-  int32 m11, m12, m13;
-  int32 m21, m22, m23;
-  int32 m31, m32, m33;
-  int32 x, y, z;
-  unsigned char mirror;
-};
-
-/**
- * A vector which holds the recorded items and cleans them up if needed.
- */
-typedef csPDelArray<csRecordedCamera> csRecordVector;
-
 struct csMapToLoad
 {
   /// The startup directory on VFS with needed map file
@@ -202,22 +173,11 @@ public:
   csArray<csWalkEntity*> busy_entities;
   /// A vector that is used to temporarily store references to busy entities.
   csArray<csWalkEntity*> busy_vector;
-  /// Vector with recorded camera transformations and commands.
-  csRecordVector recording;
-  /// This frames current recorded cmd and arg
-  char *recorded_cmd;
-  char *recorded_arg;
-  /// Time when we started playing back the recording.
-  csTicks record_start_time;
-  /// Number of frames that have passed since we started playing back recording.
-  int record_frame_count;
+
+  // For recording.
+  WalkTestRecorder* recorder;
+
   // Various configuration values for collision detection.
-  /// If >= 0 then we're recording. The value is the current frame entry.
-  int cfg_recording;
-  /// If >= 0 then we're playing a recording.
-  int cfg_playrecording;
-  /// If true the demo recording loops.
-  bool cfg_playloop;
   /// Initial speed of jumping.
   float cfg_jumpspeed;
   /// Walk acceleration.
@@ -327,8 +287,7 @@ public:
   csRef<iVFS> myVFS;
   csRef<iSndSysRenderer> mySound;
 
-  /// The view on the world.
-  iView* view;
+  WalkTestViews* views;
 
   /// A pointer to a skybox to animate (if any).
   iMeshWrapper* anim_sky;
@@ -394,11 +353,6 @@ public:
 
   /// The font we'll use for writing
   csRef<iFont> Font;
-
-  /// Value to indicate split state
-  /// -1 = not split, other value is index of current view
-  int split;
-  csRef<iView> views[2];
 
   /// is actually anything visible on the canvas?
   bool canvas_exposed;
@@ -647,9 +601,6 @@ extern csVector2 coord_check_vector;
 extern void perf_test (int num);
 extern void CaptureScreen ();
 extern void free_keymap ();
-
-// Use a view's clipping rect to calculate a bounding box
-void BoundingBoxForView(iView *view, csBox2 *box);
 
 // The global system driver
 extern WalkTest *Sys;

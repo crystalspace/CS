@@ -188,11 +188,27 @@ namespace lighter
   {
     if (lmW == 0) lmW = globalConfig.GetLMProperties ().maxLightmapU;
     if (lmH == 0) lmH = globalConfig.GetLMProperties ().maxLightmapV;
+    
     Lightmap *newL = new Lightmap (lmW, lmH);
-    size_t index = globalLightmaps.Push (newL);
     csRect r;
     newL->GetAllocator().Alloc (lmW, lmH, r);
     newL->UpdateDimensions();
+    
+    size_t index;
+    if (prepared && globalConfig.GetLighterProperties().directionalLMs)
+    {
+      size_t numLMs = globalLightmaps.GetSize();
+      numLMs /= 4;
+      index = numLMs;
+      for (size_t i = 5; i-- > 2; )
+      {
+	globalLightmaps.Insert (index + numLMs*i,
+	  new Lightmap (*newL));
+      }
+      globalLightmaps.Insert (index, newL);
+    }
+    else
+      index = globalLightmaps.Push (newL);
 
     return (uint)index;
   }

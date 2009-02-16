@@ -36,6 +36,8 @@
 
 #include "walktest.h"
 #include "command.h"
+#include "splitview.h"
+#include "recorder.h"
 
 #if defined(CS_PLATFORM_DOS) || defined(CS_PLATFORM_WIN32)
 #  include <io.h>
@@ -58,7 +60,7 @@ WalkTest::WalkTest () :
   extern bool CommandHandler (const char *cmd, const char *arg);
   csCommandProcessor::ExtraHandler = CommandHandler;
   auto_script = 0;
-  view = 0;
+  views = 0;
   wMissile_boom = 0;
   wMissile_whoosh = 0;
   cslogo = 0;
@@ -79,10 +81,9 @@ WalkTest::WalkTest () :
   selected_light = 0;
   selected_polygon = 0;
   move_forward = false;
-  cfg_recording = -1;
-  recorded_cmd = 0;
-  recorded_arg = 0;
-  cfg_playrecording = -1;
+
+  recorder = new WalkTestRecorder (this);
+
   cfg_debug_check_frustum = 0;
   do_fs_inter = false;
   do_fs_shadevert = false;
@@ -110,8 +111,6 @@ WalkTest::WalkTest () :
   debug_box1.Set (csVector3 (-1, -1, -1), csVector3 (1, 1, 1));
   debug_box2.Set (csVector3 (2, 2, 2), csVector3 (3, 3, 3));
   do_show_debug_boxes = false;
-  
-  split = -1;			// Not split
 
   canvas_exposed = true;
 
@@ -134,6 +133,8 @@ WalkTest::~WalkTest ()
     delete first_map;
     first_map = map;
   }
+  delete recorder;
+  delete views;
 }
 
 void WalkTest::Report (int severity, const char* msg, ...)
@@ -259,15 +260,7 @@ void WalkTest::SetupFrame ()
 
   if (!myConsole || !myConsole->GetVisible ())
   {
-    // Emit recorded commands directly to the CommandHandler
-    if (cfg_playrecording > 0 &&
-	recording.GetSize () > 0)
-    {
-      csRecordedCamera* reccam = (csRecordedCamera*)recording[
-      	cfg_playrecording];
-      if (reccam->cmd)
-	CommandHandler(reccam->cmd, reccam->arg);
-    }
+    recorder->HandleRecordedCommand ();
   }
 
   MoveSystems (elapsed_time, current_time);
@@ -357,8 +350,8 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
     }
     if (current_time > next_bot_at)
     {
-      add_bot (2, view->GetCamera ()->GetSector (),
-               view->GetCamera ()->GetTransform ().GetOrigin (), 0);
+      add_bot (2, views->GetCamera ()->GetSector (),
+               views->GetCamera ()->GetTransform ().GetOrigin (), 0);
       next_bot_at = current_time+1000*10;
     }
   }
@@ -371,9 +364,9 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
       iSndSysListener *sndListener = mySound->GetListener();
       if(sndListener)
       {
-        // take position/direction from view->GetCamera ()
-        csVector3 v = view->GetCamera ()->GetTransform ().GetOrigin ();
-        csMatrix3 m = view->GetCamera ()->GetTransform ().GetT2O();
+        // take position/direction from views->GetCamera ()
+        csVector3 v = views->GetCamera ()->GetTransform ().GetOrigin ();
+        csMatrix3 m = views->GetCamera ()->GetTransform ().GetT2O();
         csVector3 f = m.Col3();
         csVector3 t = m.Col2();
         sndListener->SetPosition(v);
@@ -411,7 +404,7 @@ void WalkTest::DrawFrameDebug ()
   if (do_show_debug_boxes)
   {
     extern void DrawDebugBoxes (iCamera* cam, bool do3d);
-    DrawDebugBoxes (view->GetCamera (), false);
+    DrawDebugBoxes (views->GetCamera (), false);
   }
 }
 
@@ -424,7 +417,7 @@ void WalkTest::DrawFrameDebug3D ()
   if (do_show_debug_boxes)
   {
     extern void DrawDebugBoxes (iCamera* cam, bool do3d);
-    DrawDebugBoxes (view->GetCamera (), true);
+    DrawDebugBoxes (views->GetCamera (), true);
   }
 }
 
@@ -467,10 +460,10 @@ void WalkTest::DrawFrameConsole ()
     {
       csString buffer;
       buffer.Format ("%2.2f,%2.2f,%2.2f: %s",
-      view->GetCamera ()->GetTransform ().GetO2TTranslation ().x,
-      view->GetCamera ()->GetTransform ().GetO2TTranslation ().y,
-      view->GetCamera ()->GetTransform ().GetO2TTranslation ().z,
-      view->GetCamera ()->GetSector()->QueryObject ()->GetName ());
+      views->GetCamera ()->GetTransform ().GetO2TTranslation ().x,
+      views->GetCamera ()->GetTransform ().GetO2TTranslation ().y,
+      views->GetCamera ()->GetTransform ().GetO2TTranslation ().z,
+      views->GetCamera ()->GetSector()->QueryObject ()->GetName ());
 
       int buffWidth, buffHeight;
       Font->GetDimensions( buffer, buffWidth, buffHeight );
@@ -589,20 +582,12 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
   }
 
   //------------
-  // Here comes the main call to the engine. view->Draw() actually
+  // Here comes the main call to the engine. views->Draw() actually
   // takes the current camera and starts rendering.
   //------------
   if (!do_covtree_dump)
   {
-    if (split == -1)
-      //view->Draw ();
-      Engine->GetRenderManager()->RenderView (view);
-    else 
-    {	
-      iRenderManager* rm = Engine->GetRenderManager();
-      rm->RenderView (views[0]);
-      rm->RenderView (views[1]);
-    }
+    views->Draw ();
   }
 
   // no need to clear screen anymore
@@ -666,56 +651,8 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
 {
   if (!myConsole || !myConsole->GetVisible ())
   {
-    if (cfg_recording >= 0)
-    {
-      // @@@ Memory leak!
-      csRecordedCamera* reccam = new csRecordedCamera ();
-      iCamera* c = view->GetCamera ();
-      const csMatrix3& m = c->GetTransform ().GetO2T ();
-      const csVector3& v = c->GetTransform ().GetOrigin ();
-      reccam->mat = m;
-      reccam->vec = v;
-      reccam->mirror = c->IsMirrored ();
-      reccam->sector = c->GetSector ();
-      reccam->cmd = recorded_cmd;
-      reccam->arg = recorded_arg;
-      recorded_cmd = recorded_arg = 0;
-      recording.Push (reccam);
-    }
-    if (cfg_playrecording >= 0 && recording.GetSize () > 0)
-    {
-      csRecordedCamera* reccam = (csRecordedCamera*)recording[cfg_playrecording];
-      cfg_playrecording++;
-      record_frame_count++;
-      if ((size_t)cfg_playrecording >= recording.GetSize ())
-      {
-	csTicks t1 = record_start_time;
-	csTicks t2 = csGetTicks ();
-	int num = record_frame_count;
-	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "End demo: %f secs to render %d frames: %f fps",
-	  (float) (t2 - t1) / 1000.,
-	  num, float (num) * 1000. / (float) (t2 - t1));
-	csPrintf (
-	  "End demo: %f secs to render %d frames: %f fps\n",
-	  (float) (t2 - t1) / 1000.,
-	  num, float (num) * 1000. / (float) (t2 - t1));
-	fflush (stdout);
-	if (cfg_playloop)
-	  cfg_playrecording = 0;
-	else
-	  cfg_playrecording = -1;
-
-        record_start_time = csGetTicks ();
-        record_frame_count = 0;
-      }
-      iCamera* c = view->GetCamera ();
-      if (reccam->sector)
-        c->SetSector (reccam->sector);
-      c->SetMirrored (reccam->mirror);
-      c->GetTransform ().SetO2T (reccam->mat);
-      c->GetTransform ().SetOrigin (reccam->vec);
-    }
+    recorder->RecordCamera (views->GetCamera ());
+    recorder->HandleRecordedCamera (views->GetCamera ());
   }
 
 
@@ -794,10 +731,7 @@ void perf_test (int num)
   int i;
   for (i = 0 ; i < num ; i++)
   {
-    if (Sys->cfg_playrecording >= 0 && Sys->recording.GetSize () > 0)
-    {
-      Sys->record_frame_count++;
-    }
+    Sys->recorder->NewFrame ();
     Sys->DrawFrame (csGetTicks ()-t, csGetTicks ());
     Sys->FinishFrame ();
     t = csGetTicks ();
@@ -1134,13 +1068,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  // csView is a view encapsulating both a camera and a clipper.
-  // You don't have to use csView as you can do the same by
-  // manually creating a camera and a clipper but it makes things a little
-  // easier.
-  views[0] = csPtr<iView> (new csView (Engine, Gfx3D));
-  views[1] = csPtr<iView> (new csView (Engine, Gfx3D));
-  view = views[0];
+  views = new WalkTestViews (this);
 
   // Get the collide system plugin.
   const char* p = cfg->GetStr ("Walktest.Settings.CollDetPlugin",
@@ -1154,7 +1082,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   object_reg->Register (collide_system, "iCollideSystem");
 
   // Initialize the command processor with the engine and camera.
-  csCommandProcessor::Initialize (Engine, view->GetCamera (),
+  csCommandProcessor::Initialize (Engine, views->GetView ()->GetCamera (),
     Gfx3D, myConsole, object_reg);
 
   // Load from a map file.
@@ -1260,25 +1188,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   Create2DSprites ();
 
   // Look for the start sector in this map.
-  bool camok = false;
-  if (!camok && Engine->GetCameraPositions ()->GetCount () > 0)
-  {
-    iCameraPosition *cp = Engine->GetCameraPositions ()->Get (0);
-    if (cp->Load(views[0]->GetCamera (), Engine) &&
-	cp->Load(views[1]->GetCamera (), Engine))
-      camok = true;
-  }
-  if (!camok)
-  {
-    iSector* room = Engine->GetSectors ()->FindByName ("room");
-    if (room)
-    {
-      views[0]->GetCamera ()->SetSector (room);
-      views[1]->GetCamera ()->SetSector (room);
-      camok = true;
-    }
-  }
-
+  bool camok = views->SetupViewStart ();
   if (!camok)
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
@@ -1347,10 +1257,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   myG2D->ClearAll (myG2D->FindRGB(0,0,0));
   Gfx3D->FinishDraw ();
 #ifdef CS_DEBUG
-  view->SetRectangle (2, 2, w3d - 4, h3d - 4);
   myG2D->SetClipRect (2, 2, w3d - 2, h3d - 2);
-#else
-  view->SetRectangle (0, 0, w3d, h3d);
 #endif
 
 #if 0
@@ -1376,7 +1283,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
   // Lastly set the camera to the collider so its transform is
   // updated to the camera's one.
-  collider_actor.SetCamera (view->GetCamera (), true);
+  collider_actor.SetCamera (views->GetCamera (), true);
 
   return true;
 }

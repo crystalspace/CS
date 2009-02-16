@@ -135,7 +135,10 @@ csGLGraphics3D::~csGLGraphics3D()
 {
   csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q)
-    q->RemoveListener (scfiEventHandler);
+  {
+    q->RemoveListener (eventHandler1);
+    q->RemoveListener (eventHandler2);
+  }
 }
 
 void csGLGraphics3D::OutputMarkerString (const char* function, 
@@ -1006,86 +1009,6 @@ bool csGLGraphics3D::Open ()
   string_projection = strings->Request ("projection transform");
   string_projection_inv = strings->Request ("projection transform inverse");
 
-  /* @@@ All those default textures, better put them into the engine? */
-
-  // @@@ These shouldn't be here, I guess.
-  #ifdef CS_FOGTABLE_SIZE
-  #undef CS_FOGTABLE_SIZE
-  #endif
-  #define CS_FOGTABLE_SIZE 256
-  // Each texel in the fog table holds the fog alpha value at a certain
-  // (distance*density).  The median distance parameter determines the
-  // (distance*density) value represented by the texel at the center of
-  // the fog table.  The fog calculation is:
-  // alpha = 1.0 - exp( -(density*distance) / CS_FOGTABLE_MEDIANDISTANCE)
-  #define CS_FOGTABLE_MEDIANDISTANCE 10.0f
-  #define CS_FOGTABLE_MAXDISTANCE (CS_FOGTABLE_MEDIANDISTANCE * 2.0f)
-  #define CS_FOGTABLE_DISTANCESCALE (1.0f / CS_FOGTABLE_MAXDISTANCE)
-
-  csRGBpixel *transientfogdata = 
-    new csRGBpixel[CS_FOGTABLE_SIZE * CS_FOGTABLE_SIZE];
-  memset(transientfogdata, 255, CS_FOGTABLE_SIZE * CS_FOGTABLE_SIZE * 4);
-  for (unsigned int fogindex1 = 0; fogindex1 < CS_FOGTABLE_SIZE; fogindex1++)
-  {
-    for (unsigned int fogindex2 = 0; fogindex2 < CS_FOGTABLE_SIZE; fogindex2++)
-    {
-      unsigned char fogalpha1 = 
-        (unsigned char)(255.0f * csFogMath::Ramp (
-          (float)fogindex1 / CS_FOGTABLE_SIZE));
-      if (fogindex1 == (CS_FOGTABLE_SIZE - 1))
-        fogalpha1 = 255;
-      unsigned char fogalpha2 = 
-        (unsigned char)(255.0f * csFogMath::Ramp (
-          (float)fogindex2 / CS_FOGTABLE_SIZE));
-      if (fogindex2 == (CS_FOGTABLE_SIZE - 1))
-        fogalpha2 = 255;
-      transientfogdata[(fogindex1+fogindex2*CS_FOGTABLE_SIZE)].alpha = 
-        MIN(fogalpha1, fogalpha2);
-    }
-  }
-
-  csRef<iImage> img = csPtr<iImage> (new csImageMemory (
-    CS_FOGTABLE_SIZE, CS_FOGTABLE_SIZE, transientfogdata, true, 
-    CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
-  csRef<iTextureHandle> fogtex = txtmgr->RegisterTexture (
-    img, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS);
-  fogtex->SetTextureClass ("lookup");
-
-  csRef<csShaderVariable> fogvar = csPtr<csShaderVariable> (
-  	new csShaderVariable (strings->Request ("standardtex fog")));
-  fogvar->SetValue (fogtex);
-  shadermgr->AddVariable(fogvar);
-
-  {
-    const int normalizeCubeSize = config->GetInt (
-      "Video.OpenGL.NormalizeCubeSize", 256);
-
-    csRef<csShaderVariable> normvar = 
-      csPtr<csShaderVariable> (new csShaderVariable (
-      strings->Request ("standardtex normalization map")));
-    csRef<iShaderVariableAccessor> normCube;
-    normCube.AttachNew (new csNormalizationCubeAccessor (txtmgr, 
-      normalizeCubeSize));
-    normvar->SetAccessor (normCube);
-    shadermgr->AddVariable(normvar);
-  }
-
-  {
-    csRGBpixel* white = new csRGBpixel[1];
-    white->Set (255, 255, 255);
-    img = csPtr<iImage> (new csImageMemory (1, 1, white, true, 
-      CS_IMGFMT_TRUECOLOR));
-
-    csRef<iTextureHandle> whitetex = txtmgr->RegisterTexture (
-      img, CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS);
-
-    csRef<csShaderVariable> whitevar = csPtr<csShaderVariable> (
-      new csShaderVariable (
-      strings->Request ("standardtex white")));
-    whitevar->SetValue (whitetex);
-    shadermgr->AddVariable (whitevar);
-  }
-
   cache_clip_portal = -1;
   cache_clip_plane = -1;
   cache_clip_z_plane = -1;
@@ -1173,6 +1096,98 @@ bool csGLGraphics3D::Open ()
       fixedFunctionForcefulEnable ? "yes" : "no");
       
   return true;
+}
+
+void csGLGraphics3D::SetupShaderVariables()
+{
+  /* The shadermanager clears all SVs in Open(), but renderer Open() is called
+     before the shadermanager's, thus the renderer needs to catch the open
+     event twice, the second time setting up SVs */
+  shadermgr->GetVariableAdd (strings->Request ("world2camera transform"));
+  shadermgr->GetVariableAdd (strings->Request ("world2camera transform inverse"));
+  shadermgr->GetVariableAdd (strings->Request ("projection transform"));
+  shadermgr->GetVariableAdd (strings->Request ("projection transform inverse"));
+  
+  /* @@@ All those default textures, better put them into the engine? */
+
+  // @@@ These shouldn't be here, I guess.
+  #ifdef CS_FOGTABLE_SIZE
+  #undef CS_FOGTABLE_SIZE
+  #endif
+  #define CS_FOGTABLE_SIZE 256
+  // Each texel in the fog table holds the fog alpha value at a certain
+  // (distance*density).  The median distance parameter determines the
+  // (distance*density) value represented by the texel at the center of
+  // the fog table.  The fog calculation is:
+  // alpha = 1.0 - exp( -(density*distance) / CS_FOGTABLE_MEDIANDISTANCE)
+  #define CS_FOGTABLE_MEDIANDISTANCE 10.0f
+  #define CS_FOGTABLE_MAXDISTANCE (CS_FOGTABLE_MEDIANDISTANCE * 2.0f)
+  #define CS_FOGTABLE_DISTANCESCALE (1.0f / CS_FOGTABLE_MAXDISTANCE)
+
+  csRGBpixel *transientfogdata = 
+    new csRGBpixel[CS_FOGTABLE_SIZE * CS_FOGTABLE_SIZE];
+  memset(transientfogdata, 255, CS_FOGTABLE_SIZE * CS_FOGTABLE_SIZE * 4);
+  for (unsigned int fogindex1 = 0; fogindex1 < CS_FOGTABLE_SIZE; fogindex1++)
+  {
+    for (unsigned int fogindex2 = 0; fogindex2 < CS_FOGTABLE_SIZE; fogindex2++)
+    {
+      unsigned char fogalpha1 = 
+        (unsigned char)(255.0f * csFogMath::Ramp (
+          (float)fogindex1 / CS_FOGTABLE_SIZE));
+      if (fogindex1 == (CS_FOGTABLE_SIZE - 1))
+        fogalpha1 = 255;
+      unsigned char fogalpha2 = 
+        (unsigned char)(255.0f * csFogMath::Ramp (
+          (float)fogindex2 / CS_FOGTABLE_SIZE));
+      if (fogindex2 == (CS_FOGTABLE_SIZE - 1))
+        fogalpha2 = 255;
+      transientfogdata[(fogindex1+fogindex2*CS_FOGTABLE_SIZE)].alpha = 
+        MIN(fogalpha1, fogalpha2);
+    }
+  }
+
+  csRef<iImage> img = csPtr<iImage> (new csImageMemory (
+    CS_FOGTABLE_SIZE, CS_FOGTABLE_SIZE, transientfogdata, true, 
+    CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
+  csRef<iTextureHandle> fogtex = txtmgr->RegisterTexture (
+    img, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS);
+  fogtex->SetTextureClass ("lookup");
+
+  csRef<csShaderVariable> fogvar = csPtr<csShaderVariable> (
+  	new csShaderVariable (strings->Request ("standardtex fog")));
+  fogvar->SetValue (fogtex);
+  shadermgr->AddVariable(fogvar);
+
+  {
+    const int normalizeCubeSize = config->GetInt (
+      "Video.OpenGL.NormalizeCubeSize", 256);
+
+    csRef<csShaderVariable> normvar = 
+      csPtr<csShaderVariable> (new csShaderVariable (
+      strings->Request ("standardtex normalization map")));
+    csRef<iShaderVariableAccessor> normCube;
+    normCube.AttachNew (new csNormalizationCubeAccessor (txtmgr, 
+      normalizeCubeSize));
+    normvar->SetAccessor (normCube);
+    shadermgr->AddVariable(normvar);
+  }
+
+  {
+    csRGBpixel* white = new csRGBpixel[1];
+    white->Set (255, 255, 255);
+    img = csPtr<iImage> (new csImageMemory (1, 1, white, true, 
+      CS_IMGFMT_TRUECOLOR));
+
+    csRef<iTextureHandle> whitetex = txtmgr->RegisterTexture (
+      img, CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS);
+
+    csRef<csShaderVariable> whitevar = csPtr<csShaderVariable> (
+      new csShaderVariable (
+      strings->Request ("standardtex white")));
+    whitevar->SetValue (whitetex);
+    shadermgr->AddVariable (whitevar);
+  }
+
 }
 
 void csGLGraphics3D::Close ()
@@ -3506,8 +3521,10 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
   bool ok = true;
   object_reg = p;
 
-  if (!scfiEventHandler)
-    scfiEventHandler = csPtr<EventHandler> (new EventHandler (this));
+  if (!eventHandler1)
+    eventHandler1.AttachNew (new EventHandler<false> (this));
+  if (!eventHandler2)
+    eventHandler2.AttachNew (new EventHandler<true> (this));
 
   SystemOpen = csevSystemOpen(object_reg);
   SystemClose = csevSystemClose(object_reg);
@@ -3515,9 +3532,11 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
   csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
   if (q)
   {
-    csEventID events[] = { SystemOpen, SystemClose,
+    csEventID events1[] = { SystemOpen, SystemClose,
 			    CS_EVENTLIST_END };
-    q->RegisterListener (scfiEventHandler, events);
+    q->RegisterListener (eventHandler1, events1);
+    csEventID events2[] = { SystemOpen, CS_EVENTLIST_END };
+    q->RegisterListener (eventHandler2, events2);
   }
   // We subscribe to csevCanvasResize after G2D has been created
   
@@ -3563,7 +3582,7 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
   if (ok)
   {
     CanvasResize = csevCanvasResize(object_reg, G2D);
-    q->RegisterListener (scfiEventHandler, CanvasResize);
+    q->RegisterListener (eventHandler1, CanvasResize);
   }
 
   return ok;
@@ -3576,8 +3595,18 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
 // iEventHandler
 ////////////////////////////////////////////////////////////////////
 
-bool csGLGraphics3D::HandleEvent (iEvent& Event)
+bool csGLGraphics3D::HandleEvent (iEvent& Event, bool postShaderManager)
 {
+  if (postShaderManager)
+  {
+    if (Event.Name == SystemOpen)
+    {
+      SetupShaderVariables ();
+      return true;
+    }
+    return false;
+  }
+  
   if (Event.Name == SystemOpen)
   {
     Open ();
