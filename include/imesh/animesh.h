@@ -31,23 +31,114 @@ struct iAnimatedMesh;
 struct iAnimatedMeshSubMesh;
 struct iAnimatedMeshMorphTarget;
 
+class csReversibleTransform;
+
 /**\file
  * Animated mesh interface files
  */
 
 /**
- * 
+ * Represent a single influence of a bone on a single vertex
  */
 struct csAnimatedMeshBoneInfluence
 {
-  ///
+  /// The id of the bone
   BoneID bone;
 
-  ///
+  /**
+   * The relative influence of the bone. Does technically not have to be
+   * normalized, but you usually want it to be.
+   */
   float influenceWeight;
 };
 
+/**
+ * Factory for sockets attached to animated meshes
+ */
+struct iAnimatedMeshSocketFactory : public virtual iBase
+{
+public:
+  SCF_INTERFACE(iAnimatedMeshSocketFactory, 1, 0, 0);
 
+  /**
+   * Get the name of the socket
+   */
+  virtual const char* GetName () const = 0;
+  
+  /**
+   * Get the bone to socket transform of the socket
+   */
+  virtual const csReversibleTransform& GetTransform () const = 0;
+
+  /**
+   * Set the bone to socket transform of the socket
+   */
+  virtual void SetTransform (csReversibleTransform& tf) = 0;
+  
+  /**
+   * Get the bone ID associated with the socket
+   */
+  virtual BoneID GetBone () const = 0;
+
+  /**
+   * Get the associated mesh factory
+   */
+  virtual iAnimatedMeshFactory* GetFactory () = 0;
+};
+
+/**
+ * 
+ */
+struct iAnimatedMeshSocket : public virtual iBase
+{
+public:
+  SCF_INTERFACE(iAnimatedMeshSocket, 1, 0, 0);
+
+  /**
+   * Get the name of the socket
+   */
+  virtual const char* GetName () const = 0;
+
+  /**
+   * Get the socket factory this socket was created from
+   */
+  virtual iAnimatedMeshSocketFactory* GetFactory () = 0;
+
+  /**
+   * Get the bone to socket transform of the socket
+   */
+  virtual const csReversibleTransform& GetTransform () const = 0;
+
+  /**
+   * Set the bone to socket transform of the socket
+   */
+  virtual void SetTransform (csReversibleTransform& tf) = 0;
+
+  /**
+   * Get the full transform of the socket
+   */
+  virtual const csReversibleTransform GetFullTransform () const = 0;
+
+  /**
+   * Get the bone ID associated with the socket
+   */
+  virtual BoneID GetBone () const = 0;
+
+  /**
+   * Get the associated animated mesh
+   */
+  virtual iAnimatedMesh* GetMesh () const = 0;
+
+  /**
+   * Get the scene node associated with the socket
+   */
+  virtual iSceneNode* GetSceneNode () const = 0;
+
+  /**
+   * Set the scene node associated with the socket
+   */
+  virtual void SetSceneNode (iSceneNode* sn) = 0;
+};
 
 
 /**\addtogroup meshplugins
@@ -271,6 +362,29 @@ struct iAnimatedMeshFactory : public virtual iBase
   virtual uint FindMorphTarget (const char* name) const = 0;
 
   /** @} */
+
+  /**\name Socket
+  * @{ */
+
+  /**
+   * Create a new socket
+   * \param bone Bone id to connect socket for
+   * \param transform Initial transform
+   * \param name Name of the socket, optional
+   */
+  virtual void CreateSocket (BoneID bone, 
+    const csReversibleTransform& transform, const char* name) = 0;
+
+  /**
+   * Get the number of sockets in factory
+   */
+  virtual size_t GetSocketCount () const = 0;
+
+  /**
+   * Get a specific socket instance
+   */
+  virtual iAnimatedMeshSocketFactory* GetSocket (size_t index) const = 0;
+  /** @} */
 };
 
 /**
@@ -336,6 +450,20 @@ struct iAnimatedMesh : public virtual iBase
    * Get the weight for blending of a given morph target
    */
   virtual float GetMorphTargetWeight (uint target) const = 0;
+
+  /**\name Socket
+  * @{ */
+
+  /**
+   * Get the number of sockets in factory
+   */
+  virtual size_t GetSocketCount () const = 0;
+
+  /**
+   * Get a specific socket instance
+   */
+  virtual iAnimatedMeshSocket* GetSocket (size_t index) const = 0;
+  /** @} */
 };
 
 /**

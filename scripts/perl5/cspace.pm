@@ -9063,6 +9063,7 @@ sub DESTROY {
 *GetArraySize = *cspacec::csShaderVariable_GetArraySize;
 *GetArrayElement = *cspacec::csShaderVariable_GetArrayElement;
 *SetArrayElement = *cspacec::csShaderVariable_SetArrayElement;
+*FindArrayElement = *cspacec::csShaderVariable_FindArrayElement;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -9906,6 +9907,16 @@ sub DESTROY {
 *swig_zoffset_set = *cspacec::RenderMeshModes_zoffset_set;
 *swig_buffers_get = *cspacec::RenderMeshModes_buffers_get;
 *swig_buffers_set = *cspacec::RenderMeshModes_buffers_set;
+*swig_doInstancing_get = *cspacec::RenderMeshModes_doInstancing_get;
+*swig_doInstancing_set = *cspacec::RenderMeshModes_doInstancing_set;
+*swig_instParamNum_get = *cspacec::RenderMeshModes_instParamNum_get;
+*swig_instParamNum_set = *cspacec::RenderMeshModes_instParamNum_set;
+*swig_instParamsTargets_get = *cspacec::RenderMeshModes_instParamsTargets_get;
+*swig_instParamsTargets_set = *cspacec::RenderMeshModes_instParamsTargets_set;
+*swig_instanceNum_get = *cspacec::RenderMeshModes_instanceNum_get;
+*swig_instanceNum_set = *cspacec::RenderMeshModes_instanceNum_set;
+*swig_instParams_get = *cspacec::RenderMeshModes_instParams_get;
+*swig_instParams_set = *cspacec::RenderMeshModes_instParams_set;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -14970,6 +14981,82 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iAnimatedMeshSocketFactory ##############
+
+package cspace::iAnimatedMeshSocketFactory;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetName = *cspacec::iAnimatedMeshSocketFactory_GetName;
+*GetTransform = *cspacec::iAnimatedMeshSocketFactory_GetTransform;
+*SetTransform = *cspacec::iAnimatedMeshSocketFactory_SetTransform;
+*GetBone = *cspacec::iAnimatedMeshSocketFactory_GetBone;
+*GetFactory = *cspacec::iAnimatedMeshSocketFactory_GetFactory;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iAnimatedMeshSocketFactory($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iAnimatedMeshSocket ##############
+
+package cspace::iAnimatedMeshSocket;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetName = *cspacec::iAnimatedMeshSocket_GetName;
+*GetFactory = *cspacec::iAnimatedMeshSocket_GetFactory;
+*GetTransform = *cspacec::iAnimatedMeshSocket_GetTransform;
+*SetTransform = *cspacec::iAnimatedMeshSocket_SetTransform;
+*GetFullTransform = *cspacec::iAnimatedMeshSocket_GetFullTransform;
+*GetBone = *cspacec::iAnimatedMeshSocket_GetBone;
+*GetMesh = *cspacec::iAnimatedMeshSocket_GetMesh;
+*GetSceneNode = *cspacec::iAnimatedMeshSocket_GetSceneNode;
+*SetSceneNode = *cspacec::iAnimatedMeshSocket_SetSceneNode;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iAnimatedMeshSocket($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iAnimatedMeshFactory ##############
 
 package cspace::iAnimatedMeshFactory;
@@ -15005,6 +15092,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetMorphTargetCount = *cspacec::iAnimatedMeshFactory_GetMorphTargetCount;
 *ClearMorphTargets = *cspacec::iAnimatedMeshFactory_ClearMorphTargets;
 *FindMorphTarget = *cspacec::iAnimatedMeshFactory_FindMorphTarget;
+*CreateSocket = *cspacec::iAnimatedMeshFactory_CreateSocket;
+*GetSocketCount = *cspacec::iAnimatedMeshFactory_GetSocketCount;
+*GetSocket = *cspacec::iAnimatedMeshFactory_GetSocket;
 *scfGetVersion = *cspacec::iAnimatedMeshFactory_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -15078,6 +15168,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetSubMeshCount = *cspacec::iAnimatedMesh_GetSubMeshCount;
 *SetMorphTargetWeight = *cspacec::iAnimatedMesh_SetMorphTargetWeight;
 *GetMorphTargetWeight = *cspacec::iAnimatedMesh_GetMorphTargetWeight;
+*GetSocketCount = *cspacec::iAnimatedMesh_GetSocketCount;
+*GetSocket = *cspacec::iAnimatedMesh_GetSocket;
 *scfGetVersion = *cspacec::iAnimatedMesh_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -22596,6 +22688,8 @@ sub CS_VATTRIB_SPECIFIC_NUM () { $cspacec::CS_VATTRIB_SPECIFIC_NUM }
 sub CS_VATTRIB_GENERIC_FIRST () { $cspacec::CS_VATTRIB_GENERIC_FIRST }
 sub CS_VATTRIB_GENERIC_LAST () { $cspacec::CS_VATTRIB_GENERIC_LAST }
 sub CS_VATTRIB_GENERIC_NUM () { $cspacec::CS_VATTRIB_GENERIC_NUM }
+sub CS_IATTRIB_FIRST () { $cspacec::CS_IATTRIB_FIRST }
+sub CS_IATTRIB_LAST () { $cspacec::CS_IATTRIB_LAST }
 sub CS_VATTRIB_UNUSED () { $cspacec::CS_VATTRIB_UNUSED }
 sub CS_VATTRIB_INVALID () { $cspacec::CS_VATTRIB_INVALID }
 sub CS_VATTRIB_POSITION () { $cspacec::CS_VATTRIB_POSITION }
@@ -22630,6 +22724,7 @@ sub CS_VATTRIB_12 () { $cspacec::CS_VATTRIB_12 }
 sub CS_VATTRIB_13 () { $cspacec::CS_VATTRIB_13 }
 sub CS_VATTRIB_14 () { $cspacec::CS_VATTRIB_14 }
 sub CS_VATTRIB_15 () { $cspacec::CS_VATTRIB_15 }
+sub CS_IATTRIB_OBJECT2WORLD () { $cspacec::CS_IATTRIB_OBJECT2WORLD }
 sub CS_MIXMODE_TYPE_AUTO () { $cspacec::CS_MIXMODE_TYPE_AUTO }
 sub CS_MIXMODE_TYPE_BLENDOP () { $cspacec::CS_MIXMODE_TYPE_BLENDOP }
 sub CS_MIXMODE_FLAG_BLENDOP_ALPHA () { $cspacec::CS_MIXMODE_FLAG_BLENDOP_ALPHA }

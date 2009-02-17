@@ -146,7 +146,12 @@ bool SndSysDriverDirectSound::Open (csSndSysRendererSoftware *pRenderer,
     return false;
   }
   csRef<iWin32Canvas> canvas = scfQueryInterface<iWin32Canvas> (g2d);
-  CS_ASSERT (canvas.IsValid());
+  if (!canvas.IsValid())
+  {
+    RecordEvent(SSEL_ERROR, 
+      "Could not obtain iWin32Canvas from canvas (required for Driver)");
+    return false;
+  }
 
   DirectSoundResult = m_pDirectSoundDevice->SetCooperativeLevel (canvas->GetWindowHandle(),
     DSSCL_PRIORITY);

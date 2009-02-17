@@ -29,136 +29,165 @@
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
-class csXMLShaderCompiler;
-class csXMLShader;
+  class csXMLShaderCompiler;
+  class csXMLShader;
 
-struct CachedPlugin;
-struct CachedPlugins;
-struct PassActionPrecache;
+  struct CachedPlugin;
+  struct CachedPlugins;
+  struct PassActionPrecache;
 
-class csXMLShaderTech
-{
-private:
-  friend class csXMLShader;
-  friend struct PassActionPrecache;
-  
-  struct ShaderPassPerTag : public CS::Memory::CustomAllocated
+  class csXMLShaderTech
   {
-    ShaderPassPerTag ()
-    { 
-      //setup default mappings
-      for (unsigned int i=0; i < CS_VATTRIB_SPECIFIC_NUM; i++)
-        defaultMappings[i] = CS_BUFFER_NONE;
+  private:
+    friend class csXMLShader;
+    friend struct PassActionPrecache;
 
-      defaultMappings[CS_VATTRIB_POSITION] = CS_BUFFER_POSITION;
-    }
-    
-    // buffer mappings
-    // default mapping, index is csVertexAttrib (16 first), value is
-    // csRenderBufferName
-    csRenderBufferName defaultMappings[CS_VATTRIB_SPECIFIC_NUM];
-    csArray<CS::ShaderVarStringID> custommapping_id;
-    csDirtyAccessArray<csVertexAttrib> custommapping_attrib;
-    csArray<csRenderBufferName> custommapping_buffer;
-
-    // texture mappings
-    struct TextureMapping
+    struct ShaderPassPerTag : public CS::Memory::CustomAllocated
     {
-      struct SV
+      ShaderPassPerTag ()
+      { 
+        //setup default mappings
+        for (unsigned int i=0; i < CS_VATTRIB_SPECIFIC_NUM; i++)
+          defaultMappings[i] = CS_BUFFER_NONE;
+
+        defaultMappings[CS_VATTRIB_POSITION] = CS_BUFFER_POSITION;
+      }
+
+      struct InstanceMapping 
+      { 
+        CS::ShaderVarStringID variable; 
+        csVertexAttrib destination; 
+      }; 
+
+      // Instancing mapping 
+      csArray<InstanceMapping> instances_binds; 
+
+
+      // buffer mappings
+      // default mapping, index is csVertexAttrib (16 first), value is
+      // csRenderBufferName
+      csRenderBufferName defaultMappings[CS_VATTRIB_SPECIFIC_NUM];
+      csArray<CS::ShaderVarStringID> custommapping_id;
+      csDirtyAccessArray<csVertexAttrib> custommapping_attrib;
+      csArray<csRenderBufferName> custommapping_buffer;
+
+      // texture mappings
+      struct TextureMapping
       {
-        CS::ShaderVarStringID id;
-        csDirtyAccessArray<size_t, csArrayElementHandler<size_t>,
-	  CS::Memory::LocalBufferAllocator<size_t, 2,
-	    CS::Memory::AllocatorMalloc, true> > indices;
+        struct SV
+        {
+          CS::ShaderVarStringID id;
+          csDirtyAccessArray<size_t, csArrayElementHandler<size_t>,
+            CS::Memory::LocalBufferAllocator<size_t, 2,
+            CS::Memory::AllocatorMalloc, true> > indices;
+        };
+        SV tex, fallback;
+        int textureUnit;
+        CS::Graphics::TextureComparisonMode texCompare;
       };
-      SV tex, fallback;
-      int textureUnit;
-      CS::Graphics::TextureComparisonMode texCompare;
+      csArray<TextureMapping> textures;
+
+      // programs
+      csRef<iShaderProgram> vp;
+      csRef<iShaderProgram> fp;
+      csRef<iShaderProgram> vproc;
+
     };
-    csArray<TextureMapping> textures;
 
-    // programs
-    csRef<iShaderProgram> vp;
-    csRef<iShaderProgram> fp;
-    csRef<iShaderProgram> vproc;
+    struct ShaderPass : public ShaderPassPerTag
+    {
+      //mix and alpha mode
+      uint mixMode;
+      csAlphaMode alphaMode;
+      csZBufMode zMode;
+      bool overrideZmode;
+      CS::Graphics::MeshCullMode cullMode;
+      bool zoffset;
 
-  };
+      ShaderPass () : cullMode (CS::Graphics::cullNormal), zoffset (false), minLights (0)
+      { 
+        mixMode = CS_FX_MESH;
+        overrideZmode = false;
+      }
 
-  struct ShaderPass : public ShaderPassPerTag
-  {
-    //mix and alpha mode
-    uint mixMode;
-    csAlphaMode alphaMode;
-    csZBufMode zMode;
-    bool overrideZmode;
-    bool flipCulling;
-    bool zoffset;
+      // writemasks
+      bool wmRed, wmGreen, wmBlue, wmAlpha;
 
-    ShaderPass () : zoffset (false), minLights (0)
-    { 
-      mixMode = CS_FX_MESH;
-      overrideZmode = false;
-      flipCulling = false;
-    }
+      /// Minimum light
+      int minLights;
+    };
 
-    // writemasks
-    bool wmRed, wmGreen, wmBlue, wmAlpha;
+    //variable context
+    csShaderVariableContext svcontext;
+
+    //keep this so we can reset in deactivate
+    bool orig_wmRed, orig_wmGreen, orig_wmBlue, orig_wmAlpha;
+    csZBufMode oldZmode;
+
+    //Array of passes
+    ShaderPass* passes;
+    size_t passesCount;
+
+    size_t currentPass;
+
+    csXMLShader* parent;
+    const csStringHash& xmltokens;
+    bool do_verbose;
+    csString fail_reason;
+
+    CS_DECLARE_STATIC_CLASSVAR_REF(instParamsTargets, GetInstParamsTargets, 
+      csDirtyAccessArray<csVertexAttrib>); 
+    CS_DECLARE_STATIC_CLASSVAR_REF(instParams, GetInstParams, 
+      csDirtyAccessArray<csShaderVariable*>); 
+    CS_DECLARE_STATIC_CLASSVAR_REF(instParamPtrs, GetInstParamPtrs, 
+      csDirtyAccessArray<csShaderVariable**>); 
+    CS_DECLARE_STATIC_CLASSVAR_REF(instOuterVar, GetInstOuterVars, 
+      csArray<csShaderVariable*>); 
+
+    void SetupInstances (csRenderMeshModes& modes, ShaderPass *thispass, 
+      const csShaderVariableStack& stack); 
+
+    // Parse a vertex attribute specifier 
+    csVertexAttrib ParseVertexAttribute (const char* dest, 
+      iShaderDestinationResolver* resolveVP,  
+      iShaderDestinationResolver* resolveFP); 
+
+    // load one pass, return false if it fails
+    bool LoadPass (iDocumentNode *node, ShaderPass* pass, size_t variant,
+      iFile* cacheFile, iHierarchicalCache* cacheTo);
+    bool PrecachePass (iDocumentNode *node, ShaderPass* pass, size_t variant,
+      iFile* cacheFile, iHierarchicalCache* cacheTo);
+
+    template<typename PassAction>
+    bool LoadPassPrograms (iDocumentNode* passNode, PassAction& action,
+      size_t variant, CachedPlugins& cachedPlugins);
+
+    struct LoadHelpers;
+    bool ParseModes (ShaderPass* pass, iDocumentNode* node, LoadHelpers& helpers);
+    bool ParseBuffers (ShaderPassPerTag& pass, int passNum, iDocumentNode* node, 
+      LoadHelpers& helpers, iShaderDestinationResolver* resolveFP,
+      iShaderDestinationResolver* resolveVP);
+    bool ParseTextures (ShaderPassPerTag& pass, 
+      iDocumentNode* node, LoadHelpers& helpers, iShaderDestinationResolver* resolveFP);
+
+    bool WritePass (ShaderPass* pass, const CachedPlugins& plugins,
+      iFile* cacheFile);
+    iShaderProgram::CacheLoadResult LoadPassFromCache (ShaderPass* pass,
+      iDocumentNode* node, size_t variant, iFile* cacheFile,
+      iHierarchicalCache* cache);
+    bool ReadPass (ShaderPass* pass, iFile* cacheFile,
+      CachedPlugins& plugins);
+
+    bool WritePassPerTag (const ShaderPassPerTag& pass, 
+      iFile* cacheFile);
+    bool ReadPassPerTag (ShaderPassPerTag& pass, iFile* cacheFile);
     
-    /// Minimum light
-    int minLights;
-  };
+    bool WriteShadervarName (CS::ShaderVarStringID svid, iFile* cacheFile);
+    CS::ShaderVarStringID ReadShadervarName (iFile* cacheFile);
 
-  //variable context
-  csShaderVariableContext svcontext;
+    bool LoadBoilerplate (iLoaderContext* ldr_context, iDocumentNode* node,
+      iDocumentNode* parentSV);
 
-  //keep this so we can reset in deactivate
-  bool orig_wmRed, orig_wmGreen, orig_wmBlue, orig_wmAlpha;
-  csZBufMode oldZmode;
-
-  //Array of passes
-  ShaderPass* passes;
-  size_t passesCount;
-
-  size_t currentPass;
-
-  csXMLShader* parent;
-  const csStringHash& xmltokens;
-  bool do_verbose;
-  csString fail_reason;
-
-  // load one pass, return false if it fails
-  bool LoadPass (iDocumentNode *node, ShaderPass* pass, size_t variant,
-    iFile* cacheFile, iHierarchicalCache* cacheTo);
-  bool PrecachePass (iDocumentNode *node, ShaderPass* pass, size_t variant,
-    iFile* cacheFile, iHierarchicalCache* cacheTo);
-    
-  template<typename PassAction>
-  bool LoadPassPrograms (iDocumentNode* passNode, PassAction& action,
-    size_t variant, CachedPlugins& cachedPlugins);
-    
-  struct LoadHelpers;
-  bool ParseModes (ShaderPass* pass, iDocumentNode* node, LoadHelpers& helpers);
-  bool ParseBuffers (ShaderPassPerTag& pass, int passNum, iDocumentNode* node, 
-    LoadHelpers& helpers, iShaderDestinationResolver* resolveFP,
-    iShaderDestinationResolver* resolveVP);
-  bool ParseTextures (ShaderPassPerTag& pass, 
-    iDocumentNode* node, LoadHelpers& helpers, iShaderDestinationResolver* resolveFP);
-  
-  bool WritePass (ShaderPass* pass, const CachedPlugins& plugins,
-    iFile* cacheFile);
-  iShaderProgram::CacheLoadResult LoadPassFromCache (ShaderPass* pass,
-    iDocumentNode* node, size_t variant, iFile* cacheFile,
-    iHierarchicalCache* cache);
-  bool ReadPass (ShaderPass* pass, iFile* cacheFile,
-    CachedPlugins& plugins);
-    
-  bool WritePassPerTag (const ShaderPassPerTag& pass, 
-    iFile* cacheFile);
-  bool ReadPassPerTag (ShaderPassPerTag& pass, iFile* cacheFile);
-  
-  bool LoadBoilerplate (iLoaderContext* ldr_context, iDocumentNode* node,
-    iDocumentNode* parentSV);
-  
   // load a shaderdefinition block
   //bool LoadSVBlock (iDocumentNode *node, iShaderVariableContext *context);
   // load a shaderprogram

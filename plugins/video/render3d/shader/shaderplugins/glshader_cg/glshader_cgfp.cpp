@@ -269,6 +269,7 @@ bool csShaderGLCGFP::TryCompile (uint loadFlags,
 	  if (newUnusedParams.Contains (s))
 	  {
 	    allNewUnusedParams.Add (s);
+	    WriteAdditionalDumpInfo ("Detected unused param", s);
 	  }
 	}
         offset += step;
@@ -284,6 +285,7 @@ bool csShaderGLCGFP::TryCompile (uint loadFlags,
       {
         // Test for that single variable failed ... pretend it's unused
         allNewUnusedParams.Add (testForUnused[offset]);
+	WriteAdditionalDumpInfo ("Detected (single) unused param", testForUnused[offset]);
         offset += step;
         step = maxSteps;
       }

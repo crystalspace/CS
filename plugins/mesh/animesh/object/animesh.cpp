@@ -18,21 +18,22 @@
 
 #include "cssysdef.h"
 
+#include "csgeom/math3d.h"
 #include "csgfx/renderbuffer.h"
 #include "csgfx/vertexlistwalker.h"
 #include "cstool/rviewclipper.h"
+#include "csutil/objreg.h"
 #include "csutil/scf.h"
+#include "csutil/scfarray.h"
 #include "csutil/sysfunc.h"
 #include "iengine/camera.h"
 #include "iengine/material.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
-#include "ivideo/rendermesh.h"
-#include "iutil/strset.h"
-#include "csutil/objreg.h"
 #include "imesh/skeleton2.h"
 #include "imesh/skeleton2anim.h"
-#include "csgeom/math3d.h"
+#include "iutil/strset.h"
+#include "ivideo/rendermesh.h"
 
 #include "animesh.h"
 
@@ -393,6 +394,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return morphTargetNames.Get (name, (uint)~0);
   }
 
+  void AnimeshObjectFactory::CreateSocket (BoneID bone, 
+    const csReversibleTransform& transform, const char* name)
+  {
+    csRef<FactorySocket> socket;
+    socket.AttachNew (new FactorySocket (this, bone, name, transform));
+
+    sockets.Push (socket);
+  }
+
+  size_t AnimeshObjectFactory::GetSocketCount () const
+  {
+    return sockets.GetSize ();
+  }
+
+  iAnimatedMeshSocketFactory* AnimeshObjectFactory::GetSocket (size_t index) const
+  {
+    return sockets[index];
+  }
+
   csFlags& AnimeshObjectFactory::GetFlags ()
   {
     return factoryFlags;
@@ -458,6 +478,41 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     return mixMode;
   }
 
+  FactorySocket::FactorySocket (AnimeshObjectFactory* factory, BoneID bone, 
+    const char* name, csReversibleTransform transform)
+    : scfImplementationType (this), factory (factory), bone (bone), name (name),
+    transform (transform)
+  {}
+
+  const char* FactorySocket::GetName () const
+  {
+    return name.GetData ();
+  }
+
+  const csReversibleTransform& FactorySocket::GetTransform () const
+  {
+    return transform;
+  }
+
+  void FactorySocket::SetTransform (csReversibleTransform& tf)
+  {
+    transform = tf;
+  }
+
+  BoneID FactorySocket::GetBone () const
+  {
+    return bone;
+  }
+  
+  void FactorySocket::SetBone (BoneID bone)
+  {
+    this->bone = bone;
+  }
+
+  iAnimatedMeshFactory* FactorySocket::GetFactory ()
+  {
+    return factory;
+  }
 
 
 
@@ -469,6 +524,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   {
     postMorphVertices = factory->vertexBuffer;
     SetupSubmeshes ();
+    SetupSockets ();
 
     if (factory->skeletonFactory)
     {
@@ -517,6 +573,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       return morphTargetWeights[target];
     else
       return 0.0;
+  }
+
+  size_t AnimeshObject::GetSocketCount () const
+  {
+    return sockets.GetSize ();
+  }
+
+  iAnimatedMeshSocket* AnimeshObject::GetSocket (size_t index) const
+  {
+    return sockets[index];
   }
 
   iMeshObjectFactory* AnimeshObject::GetFactory () const
@@ -821,6 +887,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     }
   }
 
+  void AnimeshObject::SetupSockets ()
+  {
+    sockets.DeleteAll ();
+
+    for (size_t i = 0; i < factory->sockets.GetSize (); ++i)
+    {
+      csRef<Socket> newSocket;
+      newSocket.AttachNew(new Socket(this, factory->sockets[i]));
+      sockets.Push (newSocket);
+    }
+  }
 
   void AnimeshObject::UpdateLocalBoneTransforms ()
   {
@@ -907,6 +984,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         }
       }
 
+    }
+  }
+
+  void AnimeshObject::UpdateSocketTransforms ()
+  {
+    if (!skeleton)
+      return;
+
+    for (size_t i = 0; i < sockets.GetSize (); ++i)
+    {
+      BoneID bone = sockets[i]->bone;
+
+      csQuaternion q;
+      csVector3 v;
+
+      skeleton->GetTransformAbsSpace(bone, q, v);
+
+      sockets[i]->socketBoneTransform.SetO2T (csMatrix3 (q));
+      sockets[i]->socketBoneTransform.SetOrigin (v);
+      sockets[i]->UpdateSceneNode ();
     }
   }
 
@@ -1037,6 +1134,67 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
       SkinVertices ();
       skinVertexVersion = skeletonVersion;
     }
+  }
+
+  AnimeshObject::Socket::Socket (AnimeshObject* object, FactorySocket* factorySocket)
+    : scfImplementationType (this), object (object), factorySocket (factorySocket),
+    bone (factorySocket->bone), transform (factorySocket->transform), sceneNode (0)
+  {
+  }
+
+  const char* AnimeshObject::Socket::GetName () const
+  {
+    return factorySocket->GetName ();
+  }
+
+  iAnimatedMeshSocketFactory* AnimeshObject::Socket::GetFactory ()
+  {
+    return factorySocket;
+  }
+
+  const csReversibleTransform& AnimeshObject::Socket::GetTransform () const
+  {
+    return transform;
+  }
+
+  void AnimeshObject::Socket::SetTransform (csReversibleTransform& tf)
+  {
+    transform = tf;
+  }
+
+  const csReversibleTransform AnimeshObject::Socket::GetFullTransform () const
+  {
+    return socketBoneTransform*transform;
+  }
+
+  BoneID AnimeshObject::Socket::GetBone () const
+  {
+    return bone;
+  }
+
+  iAnimatedMesh* AnimeshObject::Socket::GetMesh () const
+  {
+    return object;
+  }
+
+  iSceneNode* AnimeshObject::Socket::GetSceneNode () const
+  {
+    return sceneNode;
+  }
+
+  void AnimeshObject::Socket::SetSceneNode (iSceneNode* sn)
+  {
+    sceneNode = sn;
+  }
+
+  void AnimeshObject::Socket::UpdateSceneNode ()
+  {
+    if (!sceneNode)
+      return;
+
+    iMovable* mov = sceneNode->GetMovable ();
+    mov->SetTransform (GetFullTransform ());
+    mov->UpdateMove ();
   }
 
 }

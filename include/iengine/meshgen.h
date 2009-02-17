@@ -49,7 +49,7 @@ struct iTerraFormer;
  */
 struct iMeshGeneratorGeometry : public virtual iBase
 {
-  SCF_INTERFACE(iMeshGeneratorGeometry, 1, 0, 0);
+  SCF_INTERFACE(iMeshGeneratorGeometry, 1, 1, 0);
 
   /**
    * Add a factory and the maximum distance after which this factory
@@ -144,6 +144,13 @@ struct iMeshGeneratorGeometry : public virtual iBase
 
   virtual void AddPositionsFromMap (iTerraFormer* map, const csBox2 &region,
     uint resx, uint resy, float value, const csStringID & type) = 0;
+
+  /**
+   * Set the direction that simulated wind will blow towards.
+   * \param x is the x coordinate direction.
+   * \param z is the z coordinate direction.
+   */
+  virtual void SetWindDirection (float x, float z) = 0;
 };
 
 /**

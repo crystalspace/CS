@@ -81,8 +81,8 @@ namespace Graphics
   struct RenderMeshModes
   {
     RenderMeshModes () : z_buf_mode ((csZBufMode)~0), mixmode (CS_FX_COPY),
-      renderPrio (-1), flipCulling (false), cullMode (cullNormal),
-      alphaType (csAlphaMode::alphaNone), zoffset (false)
+      renderPrio (-1), cullMode (cullNormal),
+      alphaType (csAlphaMode::alphaNone), zoffset (false), doInstancing (false)
     {
     }
 
@@ -90,11 +90,15 @@ namespace Graphics
       z_buf_mode (x.z_buf_mode),
       mixmode (x.mixmode),
       renderPrio (x.renderPrio),
-      flipCulling (x.flipCulling),
       cullMode (x.cullMode),
       alphaType (x.alphaType),
       zoffset (x.zoffset),
-      buffers (x.buffers)
+      buffers (x.buffers),
+      doInstancing (x.doInstancing),
+      instParamNum (x.instParamNum),
+      instParamsTargets (x.instParamsTargets),
+      instanceNum (x.instanceNum),
+      instParams (x.instParams)	
     {
     }
 
@@ -109,27 +113,6 @@ namespace Graphics
     /// Mesh render priority
     RenderPriority renderPrio;
 
-    // Deprecated in 1.3.
-    // ***NOTE*** Though deprecated, actual compiler-based deprecation is not
-    // presently enabled since the inline constructors references this variable
-    // and cause a Niagara of warnings to flood the build. Worse, even if
-    // external projects fix their own code to avoid this variable, they still
-    // get penalized by warnings because of the constructors (over which code
-    // external projects have no control). One way to avoid this problem would be
-    // to un-inline the constructors and then disable the deprecation warning
-    // only when compiling the implementation file containing the constructors. A
-    // potential difficulty with this approach, however, is that there is no
-    // obvious location in the CS/libs hierarchy for such an implementation file
-    // to reside.  Since it is considered very unlikely that external projects
-    // will be accessing this variable, and since un-inlining the constructors is
-    // perhaps unnecessarily complicated, the decision was made instead to remove
-    // the compiler-based deprecation attribute, but retain the
-    // documentation-based deprecation warning. If real-world experience shows
-    // that removing the compiler attribute was the wrong approach, then the
-    // un-inlining approach can instead be implemented.
-    // CS_DEPRECATED_VAR_MSG("Use cullMode instead", bool flipCulling );
-    bool flipCulling;
-    
     /// Mesh culling mode
     MeshCullMode cullMode;
 
@@ -141,6 +124,12 @@ namespace Graphics
 
     /// Holder of default render buffers
     csRef<csRenderBufferHolder> buffers;
+
+    bool doInstancing; 
+    size_t instParamNum; 
+    const csVertexAttrib* instParamsTargets; 
+    size_t instanceNum; 
+    csShaderVariable** const * instParams;
   };
 
   /**

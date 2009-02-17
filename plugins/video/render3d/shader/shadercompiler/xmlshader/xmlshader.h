@@ -74,6 +74,7 @@ public:
   bool PrecacheShader(iDocumentNode*, iHierarchicalCache*);
   
   void Report (int severity, const char* msg, ...);
+  void Report (int severity, iDocumentNode* node, const char* msg, ...);
 
   bool LoadSVBlock (iLoaderContext* ldr_context,
       iDocumentNode *node, iShaderVariableContext *context);

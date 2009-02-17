@@ -200,13 +200,15 @@ platforms = [
     name => 'Win32',
     suffix => '',
     targetmachine => 1,
-    debugformat => 4
+    debugformat_debug => 4,
+    debugformat_release => 3
   },
   {
     name => 'x64',
     suffix => '-x64',
     targetmachine => 17,
-    debugformat => 3
+    debugformat_debug => 3,
+    debugformat_release => 3
   }
 ];
 

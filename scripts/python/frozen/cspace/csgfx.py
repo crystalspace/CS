@@ -195,6 +195,7 @@ class csShaderVariable(core.csRefCount):
     def GetArraySize(*args): return _csgfx.csShaderVariable_GetArraySize(*args)
     def GetArrayElement(*args): return _csgfx.csShaderVariable_GetArrayElement(*args)
     def SetArrayElement(*args): return _csgfx.csShaderVariable_SetArrayElement(*args)
+    def FindArrayElement(*args): return _csgfx.csShaderVariable_FindArrayElement(*args)
     def GetValue(*args): return _csgfx.csShaderVariable_GetValue(*args)
 csShaderVariable_swigregister = _csgfx.csShaderVariable_swigregister
 csShaderVariable_swigregister(csShaderVariable)

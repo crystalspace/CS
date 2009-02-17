@@ -27,10 +27,18 @@
 
 class csGLCanvas;
 
+#ifdef WIN32
+class csGraphics2DWX : public scfImplementationExt3<csGraphics2DWX,
+                  csGraphics2DGLCommon,
+                  iWxWindow,
+		  iWin32Canvas,
+                  iOpenGLInterface>
+#else
 class csGraphics2DWX : public scfImplementationExt2<csGraphics2DWX,
                   csGraphics2DGLCommon,
                   iWxWindow,
                   iOpenGLInterface>
+#endif
 {
   wxWindow* myParent;
   csGLCanvas* theCanvas;
@@ -89,6 +97,10 @@ public:
   virtual wxWindow* GetWindow();
   /** @} */
 
+#ifdef WIN32
+  virtual HWND GetWindowHandle();
+#endif
+  
   void *GetProcAddress (const char *funcname);
 };
 

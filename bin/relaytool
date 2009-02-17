@@ -197,7 +197,7 @@ static void *handle = 0;
   #elif defined( __x86_64__ )
     #define ASM_VAR(x)      #x "@GOTPCREL(%rip)"
     #define ASM_FUNC(x)     #x "@PLT"
-    #define ASM_FIXUPVAR(x) #x "@GOT(%%rbx)"
+    #define ASM_FIXUPVAR(x) #x "@GOTPCREL(%%rip)"
   #endif
 #endif
 
@@ -539,7 +539,10 @@ while (( i <= $# )); do
 			CFLAGS=$( echo $CFLAGS | sed 's/-include .*\.h//g' )
                         # ${CC:-gcc} ${CFLAGS} -fPIC -DPIC -c -o "$stubobj" "$stubfile" 2>/dev/tty
 			${CC:-gcc} ${CFLAGS} -fPIC -DPIC -c -o "$stubobj" "$stubfile"
-                        echo -n "$stubobj "
+			# We may have to patch the GOT at runtime; instruct
+			# linker to not mark it as RELRO, which will cause it
+			# to be read-only after the loader performed relocation.
+                        echo -n "$stubobj -Wl,-z,norelro "
                     fi
 
                     echo -n "-l$lib "
