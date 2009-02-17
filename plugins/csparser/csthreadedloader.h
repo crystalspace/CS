@@ -548,9 +548,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       iStreamSource* ssource, iMissingLoaderData* missingdata, csRefArray<iThreadReturn>& threadReturns,
       csRefArray<iDocumentNode>& libs, csArray<csString>& libIDs, bool loadProxyTex = true, bool do_verbose = false);
 
-    THREADED_CALLABLE_DECL4(csThreadedLoader, LoadLibraryFromNode, csLoaderReturn,
+    THREADED_CALLABLE_DECL5(csThreadedLoader, LoadLibraryFromNode, csLoaderReturn,
       csRef<iLoaderContext>, ldr_context, csRef<iDocumentNode>, child, 
-      csRefArray<iDocumentNode>*, libs, csArray<csString>*, libIDs, THREADED, false, false);
+      csRefArray<iDocumentNode>*, libs, csArray<csString>*, libIDs, const char*, cwd, THREADED, false, false);
 
     /// Lock on pushing lib nodes and id to lists.
     CS::Threading::Mutex preParseLibsLock;
