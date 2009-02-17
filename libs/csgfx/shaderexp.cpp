@@ -2601,8 +2601,8 @@ static csStringID GetTokenID (const TokenTabEntry* tokenTab,
       do
       {
         pos++;
-      } while ((d = (tabTok[pos] - p[pos])) == 0);
-      if (pos == tokenLen+1)
+      } while ((d = (tabTok[pos] - p[pos])) == 0 && tabTok[pos] != 0);
+      if (pos == tokenLen)
         return tokenTab[m].id;
     }
     if (d < 0)

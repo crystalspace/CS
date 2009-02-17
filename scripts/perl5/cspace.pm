@@ -18569,6 +18569,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetParameterSet = *cspacec::iParticleBuiltinEffectorLinear_SetParameterSet;
 *GetParameterSet = *cspacec::iParticleBuiltinEffectorLinear_GetParameterSet;
 *GetParameterSetCount = *cspacec::iParticleBuiltinEffectorLinear_GetParameterSetCount;
+*scfGetVersion = *cspacec::iParticleBuiltinEffectorLinear_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

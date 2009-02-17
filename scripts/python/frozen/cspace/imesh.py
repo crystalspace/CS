@@ -2376,10 +2376,12 @@ class iParticleBuiltinEffectorLinear(iParticleEffector):
     def SetParameterSet(*args): return _imesh.iParticleBuiltinEffectorLinear_SetParameterSet(*args)
     def GetParameterSet(*args): return _imesh.iParticleBuiltinEffectorLinear_GetParameterSet(*args)
     def GetParameterSetCount(*args): return _imesh.iParticleBuiltinEffectorLinear_GetParameterSetCount(*args)
+    scfGetVersion = staticmethod(_imesh.iParticleBuiltinEffectorLinear_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iParticleBuiltinEffectorLinear
     __del__ = lambda self : None;
 iParticleBuiltinEffectorLinear_swigregister = _imesh.iParticleBuiltinEffectorLinear_swigregister
 iParticleBuiltinEffectorLinear_swigregister(iParticleBuiltinEffectorLinear)
+iParticleBuiltinEffectorLinear_scfGetVersion = _imesh.iParticleBuiltinEffectorLinear_scfGetVersion
 
 class iParticleBuiltinEffectorFactory(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
