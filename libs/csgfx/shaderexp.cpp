@@ -285,8 +285,10 @@ static const op_args_info optimize_arg_table[] =
 };
 
 // Comparison mixins
-
-namespace
+/* Used to be an anonymous namespaces, but that caused trouble on MinGW shared
+   builds. Use a reasonably unique name instead (derived from a UUID). */
+#define CMPNS   __c4444fec_124f_4500_a9ec_cbcff16718f5
+namespace CMPNS
 {
   struct LT
   {
@@ -313,6 +315,7 @@ namespace
     bool operator() (float a, float b) const { return a != b; }
   };
 }
+using namespace CMPNS;
 
 /* Note on vector default values:
 * - Constant vectors should default to x=0,y=0,z=0,w=1 for unspecified fields.
