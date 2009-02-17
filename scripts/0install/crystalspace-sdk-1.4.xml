@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<?xml-stylesheet type='text/xsl' href='interface.xsl'?>
+<interface uri="http://crystalspace3d.org/0install/crystalspace-sdk-1.4.xml" xmlns="http://zero-install.sourceforge.net/2004/injector/interface">
+  <name>crystalspace-sdk-1.4</name>
+  <summary>CrystalSpace SDK</summary>
+  <description>
+Headers and libraries needed to build CrystalSpace applications.</description>
+  <homepage>http.//www.crystalspace3d.org/</homepage>
+  <category>Development</category>
+  <icon href="http://crystalspace3d.org/mediawiki/images/thumb/3/3e/Cs-compact.png/120px-Cs-compact.png" type="image/png"/>
+  <group license="OSI Approved :: GNU Lesser General Public License (LGPL)" main="bin/cs-config-1.4">
+    <implementation arch="Linux-x86_64" id="sha1new=48b2ce16c202f322b2debe2c5bf37581583e9a89" released="2009-01-16" stability="testing" version="1.4.0.31900">
+      <archive extract="crystalspace-sdk-1.4.0.31900" href="http://crystalspace3d.org/downloads/binary/1.4/linux-x86_64/crystalspace-sdk-1.4.0.31900.tar.lzma" size="1561790" type="application/x-lzma-compressed-tar"/>
+      <requires interface="http://crystalspace3d.org/0install/crystalspace-sdk-1.4.xml">
+	<environment insert="" mode="prepend" name="CRYSTAL_1_4"/>
+      </requires>
+    </implementation>
+  </group>
+</interface>
+<!-- Base64 Signature
+iEYEABECAAYFAklwoCcACgkQnCws0dQa9buZxwCfQiZvvqPqVYIicxG5XBfARvuWtTUAnjptVclr
+m4teeI8GB5UaF8fqPh38
+
+-->

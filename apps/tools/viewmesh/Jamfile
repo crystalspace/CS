@@ -30,13 +30,13 @@ if $(CEGUI.AVAILABLE) = "yes"
     VIEWMESH.PLUGINLIST =
       animesh
       animeshldr
-      bezier
-      bezierldr
+      bindoc
       bruteblock
       bugplug
       csbmpimg
       cscegui
       csddsimg
+      csfont
       csgifimg
       csopcode
       csparser
@@ -46,9 +46,11 @@ if $(CEGUI.AVAILABLE) = "yes"
       emit
       emitldr
       engine
+      fontplex
       frustvis
       genmesh
       gmeshanim
+      gmeshanimpdl
       gmeshldr
       gmeshskelanim2
       haze
@@ -64,6 +66,9 @@ if $(CEGUI.AVAILABLE) = "yes"
       rendstep_std
       rendstep_stencil
       reporter
+      rm_rlcompat
+      rm_unshadowed
+      rm_shadow_pssm
       sequence
       shadermgr
       shaderweaver
@@ -109,7 +114,7 @@ if $(CEGUI.AVAILABLE) = "yes"
     # Plugins needed by renderers
     if $(X11.AVAILABLE) = "yes"
     {
-      VIEWMESH.PLUGINLIST += xwin xextshm ;
+      VIEWMESH.PLUGINLIST += xwin ;
       if $(XFREE86VM.AVAILABLE) = "yes" { VIEWMESH.PLUGINLIST += xext86vm ; }
     }
     if $(GL.AVAILABLE) = "yes"

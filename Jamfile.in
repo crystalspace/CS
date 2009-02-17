@@ -95,6 +95,7 @@ SubInclude TOP apps ;
 SubInclude TOP docs ;
 SubInclude TOP include ;
 SubInclude TOP scripts ;
+SubInclude TOP bin ;
 
 # When build directory differs from source directory, also arrange for
 # 'distclean' to remove the $(BUILDDIR)/include directory created by
