@@ -192,6 +192,7 @@ mutators = [
   }
 ];
 
+    min_vc_version => 70,
 #------------------------------------------------------------------------------
 # "Platforms" create seperate platform configurations.
 #------------------------------------------------------------------------------
@@ -200,6 +201,7 @@ platforms = [
     name => 'Win32',
     suffix => '',
     targetmachine => 1,
+    min_vc_version => 80,
     debugformat_debug => 4,
     debugformat_release => 3
   },
