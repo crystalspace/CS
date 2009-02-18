@@ -7,16 +7,17 @@ import sys, time, traceback, math
 from cspace import *
 
 def CreateRoom (matname):
-    engine = CS_QUERY_REGISTRY(object_reg, iEngine)
+    engine = object_reg.Get(iEngine)
     room = engine.GetSectors().FindByName("room")
-    walls = engine.CreateSectorWallsMesh(room, "walls")
-    thingstate = SCF_QUERY_INTERFACE(walls.GetMeshObject(), iThingState)
+    mapper = DensityTextureMapper(0.3)
+    box = TesselatedBox(csVector3(-5, 0, -5), csVector3(5, 20, 5))
+    box.SetLevel(3)
+    box.SetMapper(mapper)
+    box.SetFlags(Primitives.CS_PRIMBOX_INSIDE)
+    walls = GeneralMeshBuilder.CreateFactoryAndMesh (engine, room, \
+        "walls", "walls_factory", box)
     material = engine.GetMaterialList().FindByName(matname)
-    thingstate = SCF_QUERY_INTERFACE(walls.GetMeshObject(), iThingState)
-    walls_state = thingstate.GetFactory()
-    walls_state.AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5))
-    walls_state.SetPolygonMaterial (CS_POLYRANGE_LAST, material);
-    walls_state.SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+    walls.GetMeshObject().SetMaterialWrapper(material)
 
 
 rot1_direction = 1.
@@ -45,9 +46,7 @@ def SetupFrame ():
     cd = cdsys.Collide(sprite1_col, ft1, sprite2_col, ft2)
     if cd:
         if snd and boom:
-            sndsrc = boom.CreateSource(SOUND3D_ABSOLUTE)
-            if sndsrc:
-                sndsrc.Play()
+            boom.Unpause()
         sprite1.GetMovable().SetTransform(old_trans1)
         sprite1.GetMovable().UpdateMove()
         sprite2.GetMovable().SetTransform(old_trans2)
@@ -80,31 +79,19 @@ def FinishFrame ():
     myG3D.Print(None)
 
 def HandleEvent (ev):
-    if ((ev.Type  == csevKeyboard ) and
-        (csKeyEventHelper.GetEventType(ev) == csKeyEventTypeDown) and
+    if ((ev.Name  == KeyboardDown) and
         (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
-        
-        q  = CS_QUERY_REGISTRY(object_reg, iEventQueue)
+        q  = object_reg.Get(iEventQueue)
         if q:
-            q.GetEventOutlet().Broadcast(cscmdQuit)
+            q.GetEventOutlet().Broadcast(csevQuit(object_reg))
             return 1
     return 0
 
 def EventHandler (ev):
-    if ev.Type == csevBroadcast and csCommandEventHelper.GetCode(ev) == cscmdProcess:
-        try:
-            SetupFrame()
-        except:
-            traceback.print_exc()
-        return 1
-    elif ev.Type == csevBroadcast and csCommandEventHelper.GetCode(ev) == cscmdFinalProcess:
-        try:
-            FinishFrame()
-        except:
-            traceback.print_exc()
-        return 1
-    elif ev.Type == csevBroadcast and csCommandEventHelper.GetCode(ev) == cscmdCommandLineHelp:
-        print 'No help today...'
+    #print 'EventHandler called'
+    if ev.Name == Frame:
+        SetupFrame()
+        FinishFrame()
         return 1
     else:
         try:
@@ -114,11 +101,15 @@ def EventHandler (ev):
     return 0
 
 def InitCollider (mesh):
-    polmesh = SCF_QUERY_INTERFACE(mesh.GetMeshObject(), iPolygonMesh)
-    if polmesh:
-        wrap = csColliderWrapper(mesh.QueryObject(), cdsys, polmesh)
-        if 1: # Not needed in C++, but necessary here... strange... TODO
-            wrap.GetCollider().IncRef()
+    stringset = object_reg.Get('crystalspace.shared.stringset', iStringSet)
+    tridata = mesh.GetMeshObject().GetObjectModel().GetTriangleData( \
+        stringset.Request('base'))
+    if tridata:
+        wrap = csColliderWrapper(mesh.QueryObject(), cdsys, tridata)
+
+        # Not needed in C++, but necessary here... strange... TODO
+        wrap.GetCollider().IncRef()
+
         return wrap.GetCollider()
     else:
         csReport(object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -137,13 +128,12 @@ if not csInitializer.SetupConfigManager(object_reg):
 
 plugin_requests = [
     CS_REQUEST_VFS,
-    CS_REQUEST_SOFTWARE3D,
+    CS_REQUEST_OPENGL3D,
     CS_REQUEST_ENGINE,
     CS_REQUEST_FONTSERVER,
     CS_REQUEST_IMAGELOADER,
-    CS_REQUEST_PLUGIN("crystalspace.sound.loader.wav", iSoundLoader),
-    CS_REQUEST_PLUGIN("crystalspace.sound.driver.oss", iSoundDriver),
-    CS_REQUEST_PLUGIN("crystalspace.sound.render.software", iSoundRender),
+    CS_REQUEST_PLUGIN("crystalspace.sndsys.element.wav", iSndSysLoader),
+    CS_REQUEST_PLUGIN("crystalspace.sndsys.renderer.software", iSndSysRenderer),
     CS_REQUEST_LEVELLOADER,
     CS_REQUEST_REPORTER, 
     CS_REQUEST_REPORTERLISTENER,
@@ -161,43 +151,43 @@ if csCommandLineHelper.CheckHelp(object_reg):
     csCommandLineHelper.Help(object_reg)
     sys.exit(0)
   
-cdsys = CS_QUERY_REGISTRY(object_reg, iCollideSystem);
+cdsys = object_reg.Get(iCollideSystem)
 if not cdsys:
     csReport(object_reg, CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.application.pysimpcd",
-        "Can't find the collision detection system!");
+        "Can't find the collision detection system!")
     sys.exit(1)
  
-vc = CS_QUERY_REGISTRY(object_reg, iVirtualClock)
+vc = object_reg.Get(iVirtualClock)
 if not vc:
     csReport(object_reg, CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.application.pysimpcd",
-        "Can't find the virtual clock!");
+        "Can't find the virtual clock!")
     sys.exit(1)
 
-engine = CS_QUERY_REGISTRY(object_reg, iEngine)
+engine = object_reg.Get(iEngine)
 if not engine:
     Report(CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!")
     sys.exit(1)
 
-myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D)
+myG3D = object_reg.Get(iGraphics3D)
 if not myG3D:
     Report(CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D loader plugin!")
     sys.exit(1)
 
-LevelLoader = CS_QUERY_REGISTRY(object_reg, iLoader)
+LevelLoader = object_reg.Get(iLoader)
 if not LevelLoader:
     Report(CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!")
     sys.exit(1)
 
-kbd = CS_QUERY_REGISTRY(object_reg, iKeyboardDriver)
+kbd = object_reg.Get(iKeyboardDriver)
 if not kbd:
     Report(CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver!")
     sys.exit(1)
 
-snd = CS_QUERY_REGISTRY(object_reg, iSoundRender)
+snd = object_reg.Get(iSndSysRenderer)
 if not snd:
-    Report(CS_REPORTER_SEVERITY_ERROR, "No iSoundRender!")
+    Report(CS_REPORTER_SEVERITY_ERROR, "No iSndSysRenderer!")
 
 # Open the main system. This will open all the previously loaded plug-ins.
 nw = myG3D.GetDriver2D().GetNativeWindow()
@@ -214,9 +204,6 @@ Report(
     "Simple Crystal Space Python Application version 0.1."
 )
 txtmgr = myG3D.GetTextureManager()
-
-# First disable the lighting cache. Our app is simple enough not to need this.
-engine.SetLightingCacheMode(0)
 
 # Create our world.
 Report(CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...")
@@ -235,6 +222,8 @@ ll.Add(light)
 
 engine.Prepare()
 
+SimpleStaticLighter.ShineLights(room, engine, 4)
+
 Report(CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------")
 
 # csView is a view encapsulating both a camera and a clipper.
@@ -247,7 +236,7 @@ view.GetCamera().GetTransform().SetOrigin(csVector3(0, 5, -6))
 g2d = myG3D.GetDriver2D()
 view.SetRectangle(0, 0, g2d.GetWidth(), g2d.GetHeight())
 
-loader = CS_QUERY_REGISTRY(object_reg, iLoader)
+loader = object_reg.Get(iLoader)
 txt = loader.LoadTexture(
     'spark', '/lib/std/spark.png', CS_TEXTURE_3D, txtmgr, 1
 )
@@ -270,7 +259,7 @@ if not imeshfact:
 parent_sprite = engine.CreateMeshWrapper(
     imeshfact, "Parent", room, csVector3(0, 5, 3.5)
 )
-spstate = SCF_QUERY_INTERFACE(parent_sprite.GetMeshObject(), iSprite3DState)
+spstate = parent_sprite.GetMeshObject().QueryInterface(iSprite3DState)
 spstate.SetAction("default")
 parent_sprite.GetMovable().Transform(csZRotMatrix3(math.pi/2.))
 parent_sprite.GetMovable().UpdateMove()
@@ -280,18 +269,18 @@ sprite1 = engine.CreateMeshWrapper(imeshfact, "Rotater1")
 sprite1.GetMovable().SetPosition(csVector3(0, -.5, -.5))
 sprite1.GetMovable().Transform(csZRotMatrix3(math.pi/2.))
 sprite1.GetMovable().UpdateMove() 
-spstate = SCF_QUERY_INTERFACE(sprite1.GetMeshObject(), iSprite3DState)
+spstate = sprite1.GetMeshObject().QueryInterface(iSprite3DState)
 spstate.SetAction("default")
-parent_sprite.GetChildren().Add(sprite1)
+sprite1.QuerySceneNode().SetParent(parent_sprite.QuerySceneNode())
 
 # Now create the second child.
 sprite2 = engine.CreateMeshWrapper(imeshfact, "Rotater2")
 sprite2.GetMovable().SetPosition(csVector3(0, .5, -.5))
 sprite2.GetMovable().Transform(csZRotMatrix3(math.pi/2.))
 sprite2.GetMovable().UpdateMove()
-spstate = SCF_QUERY_INTERFACE(sprite2.GetMeshObject(), iSprite3DState)
+spstate = sprite2.GetMeshObject().QueryInterface(iSprite3DState)
 spstate.SetAction("default")
-parent_sprite.GetChildren().Add(sprite2)
+sprite2.QuerySceneNode().SetParent(parent_sprite.QuerySceneNode())
     
 # We only do collision detection for the rotating children
 # so that's the only colliders we have to create.
@@ -303,14 +292,19 @@ if not sprite2_col:
     sys.exit(1)
 
 if snd:
-    w = LevelLoader.LoadSound('boom', '/lib/std/whoosh.wav')
-    if w:
-        boom = w.GetSound()
+    boom = LevelLoader.LoadSoundStream('/lib/std/whoosh.wav', CS_SND3D_ABSOLUTE)
+    if boom:
+        src = snd.CreateSource(boom)
+        src.SetVolume(0.8)
     else:
         csReport(object_reg, CS_REPORTER_SEVERITY_ERROR,
             "crystalspace.application.pysimpcd", "Error getting sound!"
         )
         boom = None
+
+# Get some often used event IDs
+KeyboardDown = csevKeyboardDown(object_reg)
+Frame = csevFrame(object_reg)
 
 csDefaultRunLoop(object_reg)
 
