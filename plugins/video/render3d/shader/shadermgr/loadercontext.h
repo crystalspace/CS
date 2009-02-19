@@ -54,7 +54,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
       const char *filename, bool dontWaitForLoad = false);
     iLight* FindLight (const char *name) { return 0; }
     iShader* FindShader (const char *name) { return 0; }
-    iGeneralMeshSubMesh* FindSubmesh(iGeneralMeshState* state, const char* name) { return 0; }
+    iGeneralMeshSubMesh* FindSubmesh(iGeneralMeshState* state, const char* factname, const char* name) { return 0; }
     bool CheckDupes () const { return false; }
     iCollection* GetCollection() const { return 0; }
     bool CurrentCollectionOnly() const { return false; }

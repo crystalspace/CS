@@ -291,16 +291,19 @@ enum
  *   parameter is 0, the paths returned by csGetPluginPaths() will be scanned.
  * \param verbose One or more of the \c SCF_VERBOSE_FOO flags combined with
  *   bitwise-or which control SCF verbosity.
- * \remark The path list is ignored for static builds.
  */
 CS_CRYSTALSPACE_EXPORT void scfInitialize(csPathsList const* pluginPaths,
   unsigned int verbose = SCF_VERBOSE_NONE);
 
 /**
  * This function should be called to initialize client SCF library.
- * It uses the default plugin paths provided by csGetPluginPaths().
+ * If \a scanDefaultPluginPaths is true the default plugin paths provided by
+ * csGetPluginPaths() are scanned. Otherwise, no plugin scanning is done.
+ * In this case the csPathsList* version of scfInitialize() should be used if
+ * some paths should be scanned for plugins.
  */
-CS_CRYSTALSPACE_EXPORT void scfInitialize(int argc, const char* const argv[]);
+CS_CRYSTALSPACE_EXPORT void scfInitialize(int argc, const char* const argv[],
+  bool scanDefaultPluginPaths = true);
 
 //@{
 /**

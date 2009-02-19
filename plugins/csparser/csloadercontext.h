@@ -81,7 +81,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
     virtual iLight* FindLight(const char *name);
     virtual iShader* FindShader(const char *name);
-    virtual iGeneralMeshSubMesh* FindSubmesh(iGeneralMeshState* state, const char* name);
+    virtual iGeneralMeshSubMesh* FindSubmesh(iGeneralMeshState* state, const char* factname, const char* name);
     virtual bool CheckDupes() const { return true; }
     virtual iCollection* GetCollection() const { return collection; }
     virtual bool CurrentCollectionOnly() const { return false; }
@@ -96,7 +96,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     void ParseAvailableTextures(iDocumentNode* doc);
     void ParseAvailableMaterials(iDocumentNode* doc);
     void ParseAvailableMeshfacts(iDocumentNode* doc);
-    void ParseAvailableSubmeshes(iDocumentNode* doc);
+    void ParseAvailableSubmeshes(iDocumentNode* doc, const char* factname);
     void ParseAvailableMeshes(iDocumentNode* doc, const char* prefix);
     void ParseAvailableLights(iDocumentNode* doc);
 

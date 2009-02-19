@@ -87,7 +87,6 @@
       <connection from="position" to="surface" />
       <connection from="position" to="lighting" />
       <connection from="position" to="staticspecular" />
-      <connection from="surface" to="specular" />
       <connection from="surface" to="apply_mixmode_alpha" />
       <connection from="apply_mixmode_alpha" to="apply_alpha" />
       <connection from="normalmap" to="fresnel" />

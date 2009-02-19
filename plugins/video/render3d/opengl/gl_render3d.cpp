@@ -1821,7 +1821,9 @@ void csGLGraphics3D::SetupInstance (size_t instParamNum,
           if ((target >= CS_VATTRIB_TEXCOORD0) 
             && (target <= CS_VATTRIB_TEXCOORD7))
           {
-            size_t maxN = csMin (3, numTCUnits - (target - CS_VATTRIB_TEXCOORD0));
+            // numTCUnits is type GLint, while target is an enumerated
+            // type. These are not necessarily the same.
+            size_t maxN = csMin (3,csVertexAttrib(numTCUnits) - (target - CS_VATTRIB_TEXCOORD0));
             GLenum tu = GL_TEXTURE0 + (target - CS_VATTRIB_TEXCOORD0);
             for (size_t n = 0; n < maxN; n++)
             {

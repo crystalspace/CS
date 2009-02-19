@@ -1819,10 +1819,10 @@ bool ConditionsReader::ReadCondition (iFile* cacheFile,
   cond.right.type = (OperandType)head.rightType;
     
   if (!ReadCondOperand (cacheFile, strStore, cond.left,
-      head.flags & ConditionHeader::leftHasIndices))
+      (head.flags & ConditionHeader::leftHasIndices) != 0))
     return false;
   if (!ReadCondOperand (cacheFile, strStore, cond.right,
-      head.flags & ConditionHeader::rightHasIndices))
+      (head.flags & ConditionHeader::rightHasIndices) != 0))
     return false;
   return true;
 }
