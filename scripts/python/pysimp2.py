@@ -10,10 +10,6 @@ To use this, just run the pysimp program which the name of this script
 
     pysimp pysimp2
 
-Or, to select a different renderer, you could use:
-
-    pysimp --video=software pysimp2
-
 This script demonstrates the same features as the C++ tutorial2.
 It creates a room and a 3D sprite.
 
@@ -65,29 +61,36 @@ def CreateRoom(matname):
     print 'Finished!'
 
 def CreateTheRoom(matname):
-    """This is just the original code from pysimp.py"""
+    """This is derived from pysimp.py code"""
 
     # Note: When using CsPython as a plugin,
     # the variable object_reg (cspace.object_reg actually)
     # is defined as a pointer/reference to the C++ iObjectRegistry
     # with this we can do just about everything.
     
-    # as you can see, CS_QUERY_REGISTRY() works
-    # as does SCF_QUERY_INTERFACE()
     engine = object_reg.Get(iEngine)
 
     room = engine.GetSectors().FindByName("room")
-    walls = engine.CreateSectorWallsMesh(room,"walls")
+    mapper = DensityTextureMapper(0.3)
+    box = TesselatedBox(csVector3(-5, 0, -5), csVector3(5, 20, 5))
+    box.SetLevel(3)
+    box.SetMapper(mapper)
+    box.SetFlags(Primitives.CS_PRIMBOX_INSIDE)
+    walls = GeneralMeshBuilder.CreateFactoryAndMesh (engine, room, \
+        "walls", "walls_factory", box)
+    material = engine.GetMaterialList().FindByName(matname)
+    walls.GetMeshObject().SetMaterialWrapper(material)
 
-    walls_factory = walls.GetMeshObject().GetFactory()
-    material=engine.GetMaterialList().FindByName(matname)
-    walls_state = walls_factory.QueryInterface(iThingFactoryState)
-    walls_state.AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5))
-    walls_state.SetPolygonMaterial (CS_POLYRANGE_LAST, material);
-    walls_state.SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
-
-    # note: it is no longer neccesary to DecRef() & IncRef() objects, or to
-    # use csRef<> since reference counting is handled automatically.
+    # Add some lights, otherwise it gets really dark, here
+    ll = room.GetLights()
+    light = engine.CreateLight("", csVector3(-3, 5, 0), 10, csColor(1, 0, 0), \
+        CS_LIGHT_DYNAMICTYPE_STATIC)
+    ll.Add(light)
+    light = engine.CreateLight("", csVector3(3, 5,  0), 10, csColor(0, 0, 1), \
+        CS_LIGHT_DYNAMICTYPE_STATIC)
+    ll.Add (light)
+    engine.Prepare()
+    SimpleStaticLighter.ShineLights(room, engine, 22)
 
 def FatalError(msg="FatalError"):
     "A 'Panic & die' routine"

@@ -832,7 +832,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iDocumentNodeIterator> it = doc->GetNodes("library");
     while(it->HasNext())
     {
-      threadReturns.Push(LoadLibraryFromNode (ldr_context, it->Next(), &libs, &libIDs));
+      threadReturns.Push(LoadLibraryFromNode (ldr_context, it->Next(), &libs, &libIDs, vfs->GetCwd()));
     }
 
     csRef<iDocumentNodeIterator> itr = doc->GetNodes("textures");
@@ -1049,10 +1049,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return threadman->Wait(threadReturns);
   }
 
-  THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadLibraryFromNode,
+  THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadLibraryFromNode,
     csRef<iLoaderContext> ldr_context, csRef<iDocumentNode> lib,
-    csRefArray<iDocumentNode>* libs, csArray<csString>* libIDs)
+    csRefArray<iDocumentNode>* libs, csArray<csString>* libIDs,
+    const char* cwd)
   {
+    csVfsDirectoryChanger dirChange(vfs);
+    dirChange.ChangeTo(cwd);
+
     const char* file = lib->GetAttributeValue("file");
     const char* path = 0;
     if(file)
@@ -1060,8 +1064,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       path = lib->GetAttributeValue("path");
       if(path)
       {
-        vfs->PushDir();
-        vfs->ChDir(path);
+        dirChange.ChangeToFull(path);
       }
     }
     else
@@ -1086,11 +1089,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iDocument> doc;
     bool er = LoadStructuredDoc(file, buf, doc);
 
-    if(path)
-    {
-      vfs->PopDir();
-    }
-
     if(er && doc)
     {
       // Do the quick pre-parse.
@@ -1104,6 +1102,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
       return true;
     }
+
     return false;
   }
 
