@@ -1,5 +1,4 @@
 <cgvp>
-<profile>arbvp1</profile>
 <variablemap variable="bones" destination="Bones"/>
 <variablemap variable="light ambient" destination="Ambient"/>
 <program>
