@@ -183,7 +183,7 @@
 [% END %]
 
 [% MACRO library_outfile(suffix) BLOCK -%]
-				OutputFile="[% worklibout %]\[% platform.name %]\[% my.doc.project.0 %][% suffix %].lib"
+				OutputFile="[% worklibout %]\[% my.doc.project.0 %][% suffix %].lib"
 [% END %]
 [% MACRO librarian_library_release GET library_outfile('') %]
 [% MACRO librarian_library_debug   GET library_outfile('_d') %]

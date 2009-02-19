@@ -38,7 +38,7 @@
     
     <snippet id="specular_static">
       <technique priority="150"
-		 condition='(vars."tex lightmap dir 1".texture || vars."static color dir 1".buffer) &amp;&amp; vars."tex spec directions 1".texture'>
+		 condition='(vars."pass number".int == 0) &amp;&amp; (vars."pass do_ambient") &amp;&amp; (vars."tex lightmap dir 1".texture || vars."static color dir 1".buffer) &amp;&amp; vars."tex spec directions 1".texture'>
 	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 	
 	<input name="color_dir1" type="rgb" default="complex" private="yes">

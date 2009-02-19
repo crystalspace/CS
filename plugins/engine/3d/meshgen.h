@@ -23,6 +23,7 @@
 #include "csutil/array.h"
 #include "csutil/weakref.h"
 #include "csutil/parray.h"
+#include "csutil/randomgen.h"
 #include "csutil/refarr.h"
 #include "csutil/hash.h"
 #include "csutil/set.h"
@@ -62,6 +63,7 @@ struct csMGInstVertexInfo
   csRef<csShaderVariable> transformVar;
   csRef<csShaderVariable> fadeFactorVar;
   csRef<csShaderVariable> windVar;
+  csRef<csShaderVariable> windSpeedVar;
   float windRandVar;
 };
 
@@ -115,7 +117,9 @@ private:
   int celldim;
 
   /// For wind.
-  csVector2 wind_direction;
+  csVector3 wind_direction;
+  float wind_bias;
+  float wind_speed;
 
   csStringID colldetID;
 
@@ -166,8 +170,14 @@ public:
     default_material_factor = factor;
   }
 
-  const csVector2& GetWindDirection() const { return wind_direction; }
+  const csVector3& GetWindDirection() const { return wind_direction; }
   virtual void SetWindDirection (float x, float z);
+
+  const float& GetWindBias() const { return wind_bias; }
+  virtual void SetWindBias (float bias);
+
+  const float& GetWindSpeed() const { return wind_speed; }
+  virtual void SetWindSpeed (float speed);
 
   void AddPosition (const csVector2 &pos);
 
@@ -288,6 +298,27 @@ struct csMGPositionBlock
 };
 
 /**
+ * A map of available positions.
+ */
+class PositionMap
+{
+public:
+  PositionMap(const csBox2& box);
+
+  /**
+   * Get a random available position. 
+   * \param xpos X position.
+   * \param zpos Z position.
+   * \param radius The radius from the (x, z) coordinates to mark off as used.
+   */
+  bool GetRandomPosition(float& xpos, float& zpos, float& radius);
+
+private:
+  csArray<csVector4> freeAreas;
+  csRandomGen posGen;
+};
+
+/**
  * The 2D x/z plane of the box used by the mesh generator is divided
  * in cells.
  */
@@ -302,12 +333,17 @@ struct csMGCell
   csMGPositionBlock* block;
 
   /**
+   * A map of all available positions.
+   */
+  PositionMap* positionMap;
+
+  /**
    * An array of meshes that are relevant in this cell (for calculating the
    * beam downwards).
    */
   csRefArray<iMeshWrapper> meshes;
 
-  csMGCell () : block (0) { }
+  csMGCell () : block (0), positionMap (0) { }
 };
 
 /**
@@ -451,6 +487,7 @@ public:
   CS::ShaderVarStringID varTransform;
   CS::ShaderVarStringID varFadeFactor;
   CS::ShaderVarStringID varWind;
+  CS::ShaderVarStringID varWindSpeed;
 
   csMeshGenerator (csEngine* engine);
   virtual ~csMeshGenerator ();

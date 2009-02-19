@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject Haze, , MeshObject Emit, MeshObject
+@node MeshObject Haze, MeshObject Watermesh, MeshObject Emit, MeshObject
 @subsection Haze Mesh Object
 @cindex MeshObject
 @cindex Haze

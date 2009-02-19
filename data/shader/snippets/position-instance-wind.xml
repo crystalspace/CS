@@ -42,10 +42,10 @@
       </block>
     </input>
 
-    <!-- Direction (x,z), random factor. -->
-    <input name="wind_data" type="float3" default="complex">
+    <!-- Direction (x,z), random factor, bias. -->
+    <input name="wind_data" type="float4" default="complex">
       <block location="cg:vertexIn">
-        <varying type="float3" name="wind_data" />
+        <varying type="float4" name="wind_data" />
       </block>
   
       <block location="cg:vertexMain">
@@ -54,6 +54,20 @@
 
       <block location="pass">
         <instanceparam source="wind data" destination="vertexIn.wind_data" />
+      </block>
+    </input>
+
+    <input name="wind_speed" type="float" default="complex">
+      <block location="cg:vertexIn">
+        <varying type="float" name="wind_speed" />
+      </block>
+  
+      <block location="cg:vertexMain">
+        wind_speed = vertexIn.wind_speed;
+      </block>
+
+      <block location="pass">
+        <instanceparam source="wind speed" destination="vertexIn.wind_speed" />
       </block>
     </input>
 
@@ -97,14 +111,14 @@
     </block>
 	
     <block location="cg:vertexMain">
-      if(Hposition.y == 1.0)
-      {
-        float2 offset = wind_data.xy * sin(standard_time-wind_data.z);
-        Hposition.x += offset.x;
-        Hposition.z += offset.y;
-      }
-
       position_world = mul (instancingTransforms, Hposition);
+
+      float posOffset = dot(position_world.xz, wind_data.xy) + wind_data.z;
+      float2 offset = clamp(Hposition.y, 0.0, Hposition.y) * (wind_data.xy * ((wind_data.w-1)/wind_data.w + sin(wind_speed*standard_time+posOffset)/(wind_data.w)));
+      Hposition.x += offset.x;
+      Hposition.z += offset.y;
+      position_world = mul (instancingTransforms, Hposition);
+
       position_object = Hposition;
       position_screen = position = mul (ModelViewProj, position_world);
       position_camera = mul (ModelView, position_world);

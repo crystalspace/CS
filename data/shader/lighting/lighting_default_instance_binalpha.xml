@@ -388,5 +388,5 @@
   <?endif?>
   
   <!-- If PPL is not available, try PVL -->
-  <fallbackshader name="lighting_default_pvl_binalpha" file="/shader/lighting/lighting_default_pvl_binalpha.xml" />
+  <fallbackshader name="lighting_default_instance_pvl_binalpha" file="/shader/lighting/lighting_default_instance_pvl_binalpha.xml" />
 </shader>

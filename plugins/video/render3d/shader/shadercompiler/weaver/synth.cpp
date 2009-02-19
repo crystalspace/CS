@@ -139,6 +139,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	
 	if (!skipTech)
 	{
+	  current = currentTech;
 	  csRefArray<SynthesizeTechnique> techPasses;
 	  csArray<size_t> techGraphIndices;
 	  for (size_t g = 0; g < graphs.GetSize(); g++)
@@ -210,6 +211,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
           }
         }
       
+        csSet<csString> techConditions;
 	bool aPassSucceeded = false;
 	for (size_t p = 0; p < synthTechs[t].GetSize(); p++)
 	{
@@ -252,18 +254,47 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  {
 	    synthTech->WriteToPass (passNode);
 	    aPassSucceeded = true;
+	    
+	    const char* techCond = synthTech->GetTechniqueConditions();
+	    if (techCond && *techCond)
+	     techConditions.Add (techCond);
 	  }
 	}
 	if (!aPassSucceeded)
 	  shaderNode->RemoveNode (techniqueNode);
 	else
 	{
+	  if (techConditions.GetSize() > 0)
+	  {
+	    csString condStr;
+	    csSet<csString>::GlobalIterator condIt (
+	      techConditions.GetIterator());
+	    while (condIt.HasNext())
+	    {
+	      const csString& cond = condIt.Next();
+	      if (!condStr.IsEmpty())
+	        condStr.Append (" && ");
+	      condStr.AppendFmt ("(%s)", cond.GetData());
+	    }
+	  
+	    csRef<iDocumentNode> condNode (
+	      shaderNode->CreateNodeBefore (CS_NODE_UNKNOWN,
+	        techniqueNode));
+	    condNode->SetValue (csString().Format ("?if %s ?",
+	      condStr.GetData()));
+	  }
 	  for (size_t i = 0; i < postPassesNodes.GetSize(); i++)
 	  {
 	    iDocumentNode* copyFrom = postPassesNodes.Get (i);
 	    csRef<iDocumentNode> newNode =
 	      techniqueNode->CreateNodeBefore (copyFrom->GetType());
 	    CS::DocSystem::CloneNode (copyFrom, newNode);
+	  }
+	  if (techConditions.GetSize() > 0)
+	  {
+	    csRef<iDocumentNode> condNode (
+	      shaderNode->CreateNodeBefore (CS_NODE_UNKNOWN));
+	    condNode->SetValue ("?endif?");
 	  }
 	}
 	
@@ -662,6 +693,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     // Writing
     {
+      techniqueConditions.Empty();
+      
       CS::Utility::ScopedDelete<BasicIterator<SynthesizeNodeTree::Node> > nodeIt (
         synthTree.GetNodesReverse());
       while (nodeIt->HasNext())
@@ -671,7 +704,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         const char* snippetAnnotate = GetAnnotation ("snippet \"%s<%d>\"\n\n%s",
           node.tech->snippetName, node.tech->priority,
           node.annotation.GetData());
-        csString nodeCondition (node.tech->GetCondition());
+        csString nodeCondition (node.tech->GetInnerCondition());
+        {
+          const char* techCond = node.tech->GetOuterCondition();
+          if (techCond && *techCond)
+          {
+            if (!techniqueConditions.IsEmpty())
+              techniqueConditions.Append (" && ");
+            techniqueConditions.AppendFmt ("(%s)", techCond);
+          }
+        }
         defaultCombiner->BeginSnippet (snippetAnnotate);
         combiner->BeginSnippet (snippetAnnotate);
        

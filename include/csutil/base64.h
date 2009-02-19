@@ -20,6 +20,7 @@
 #define __CS_CSUTIL_BASE64_H__
 
 #include "csextern.h"
+#include "iutil/databuff.h"
 #include "csutil/csstring.h"
 
 struct iDataBuffer;
@@ -28,8 +29,15 @@ namespace CS
 {
   namespace Utility
   {
+    //@{
     /// Base64-encode the given data buffer.
-    CS_CRYSTALSPACE_EXPORT csString EncodeBase64 (iDataBuffer* data);
+    CS_CRYSTALSPACE_EXPORT csString EncodeBase64 (void* data, size_t size);
+    inline csString EncodeBase64 (iDataBuffer* data)
+    {
+      if (!data) return "";
+      return EncodeBase64 (data->GetData(), data->GetSize());
+    }
+    //@}
   } // namespace Utility
 } // namespace CS
 
