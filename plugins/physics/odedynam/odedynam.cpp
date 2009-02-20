@@ -46,20 +46,22 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "odedynam.h"
 
-// Some macros for passing matrix from cs to ode and back
-#define CS2ODEMATRIX(csmat, odemat)  \
-{  \
-  odemat[0] = csmat.m11; odemat[4] = csmat.m12; odemat[8] = csmat.m13; odemat[3] = 0; \
-  odemat[1] = csmat.m21; odemat[5] = csmat.m22; odemat[9] = csmat.m23; odemat[7] = 0; \
-  odemat[2] = csmat.m31; odemat[6] = csmat.m32; odemat[10] = csmat.m33; odemat[11] = 0; \
+// Some helpers for passing matrix from cs to ode and back
+static void CS2ODEMatrix (const csMatrix3& csmat, dMatrix3& odemat)
+{
+  odemat[0] = csmat.m11; odemat[4] = csmat.m12; odemat[8] = csmat.m13;
+  odemat[1] = csmat.m21; odemat[5] = csmat.m22; odemat[9] = csmat.m23;
+  odemat[2] = csmat.m31; odemat[6] = csmat.m32; odemat[10] = csmat.m33;
+  odemat[3] = 0; odemat[7] = 0; odemat[11] = 0;
 }
 
-#define ODE2CSMATRIX(odemat, csmat) \
-{   \
-  csmat.m11 = odemat[0]; csmat.m12 = odemat[4]; csmat.m13 = odemat[8]; \
-  csmat.m21 = odemat[1]; csmat.m22 = odemat[5]; csmat.m23 = odemat[9]; \
-  csmat.m31 = odemat[2]; csmat.m32 = odemat[6]; csmat.m33 = odemat[10]; \
+static void ODE2CSMatrix (const dReal* odemat, csMatrix3& csmat)
+{
+  csmat.m11 = odemat[0]; csmat.m12 = odemat[4]; csmat.m13 = odemat[8];
+  csmat.m21 = odemat[1]; csmat.m22 = odemat[5]; csmat.m23 = odemat[9];
+  csmat.m31 = odemat[2]; csmat.m32 = odemat[6]; csmat.m33 = odemat[10];
 }
+
 
 CS_IMPLEMENT_PLUGIN
 
@@ -448,7 +450,7 @@ csReversibleTransform GetGeomTransform (dGeomID id)
   const dReal* mat = dGeomGetRotation (id);
   /* Need to use the inverse in this case */
   csMatrix3 rot;
-  ODE2CSMATRIX(mat,rot);
+  ODE2CSMatrix(mat,rot);
   return csReversibleTransform (rot, csVector3 (pos[0], pos[1], pos[2]));
 }
 
@@ -1364,14 +1366,6 @@ bool csODECollider::CreateBoxGeometry (const csVector3& size)
   return true;
 }
 
-void csODECollider::CS2ODEMatrix (const csMatrix3& csmat, dMatrix3& odemat)
-{
-  CS2ODEMATRIX(csmat,odemat);
-}
-void csODECollider::ODE2CSMatrix (const dReal* odemat, csMatrix3& csmat)
-{
-  ODE2CSMATRIX(odemat,csmat);
-}
 void csODECollider::SetTransform (const csOrthoTransform& transform)
 {
   // can't set plane's transform b/c it causes non placeable geom run-time
@@ -1791,7 +1785,7 @@ const csVector3 csODERigidBody::GetPosition () const
 void csODERigidBody::SetOrientation (const csMatrix3& rot)
 {
   dMatrix3 mat;
-  CS2ODEMATRIX(rot,mat);
+  CS2ODEMatrix(rot,mat);
   dBodySetRotation (bodyID, mat);
 }
 
@@ -1799,7 +1793,7 @@ const csMatrix3 csODERigidBody::GetOrientation () const
 {
   const dReal* mat = dBodyGetRotation (bodyID);
   csMatrix3 rot;
-  ODE2CSMATRIX(mat,rot);
+  ODE2CSMatrix (mat,rot);
   return rot;
 }
 
@@ -1809,7 +1803,7 @@ void csODERigidBody::SetTransform (const csOrthoTransform& trans)
   dBodySetPosition (bodyID, pos.x, pos.y, pos.z);
   csMatrix3 rot = trans.GetO2T ();
   dMatrix3 mat;
-  CS2ODEMATRIX(rot,mat);
+  CS2ODEMatrix (rot,mat);
   dBodySetRotation (bodyID, mat);
 }
 
@@ -1818,7 +1812,7 @@ const csOrthoTransform csODERigidBody::GetTransform () const
   const dReal* pos = dBodyGetPosition (bodyID);
   const dReal* mat = dBodyGetRotation (bodyID);
   csMatrix3 rot;
-  ODE2CSMATRIX(mat,rot);
+  ODE2CSMatrix (mat,rot);
   return csOrthoTransform (rot, csVector3 (pos[0], pos[1], pos[2]));
 }
 

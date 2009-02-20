@@ -505,8 +505,6 @@ public:
 
 private:
 
-  inline void CS2ODEMatrix (const csMatrix3& csmat, dMatrix3& odemat);
-  inline void ODE2CSMatrix (const dReal* odemat, csMatrix3& csmat);
   void MassUpdate ();
   void ClearContents ();
   void KillGeoms ();
