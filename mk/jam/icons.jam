@@ -15,9 +15,8 @@ if $(CMD.RSVG) != ""
   {
     local icon = $(1) ;
     local iconfile = $(icon).svg ;
-    local svgscalabledir = [ ConcatDirs $(TOP) $(SUBDIR) icons-src scalable ] ;
+    local svgscalabledir = [ ConcatDirs $(SUBDIR) icons-src scalable ] ;
     local svgsource = $(iconfile:G=$(svgscalabledir)) ;
-    LOCATE on $(svgsource) = $(svgscalabledir) ;
     SEARCH on $(svgsource) = $(svgscalabledir) ;
     
     NotFile generateicons ;
