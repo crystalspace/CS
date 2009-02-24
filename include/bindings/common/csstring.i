@@ -20,6 +20,8 @@
  */
 TYPEMAP_STRING(csStringFast)
 TYPEMAP_STRING(csString)
+TYPEMAP_STRING(csStringBase)
+%apply csStringBase * { const csStringBase& };
 TYPEMAP_STRING(scfString)
 TYPEMAP_STRING_PTR(iString,scfString)
 
