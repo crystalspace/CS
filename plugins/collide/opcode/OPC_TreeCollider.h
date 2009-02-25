@@ -227,6 +227,7 @@
 			inline_			bool			TriBoxOverlap(const Point& center, const Point& extents);
 			inline_			bool			TriTriOverlap(const Point& V0, const Point& V1, const Point& V2, const Point& U0, const Point& U1, const Point& U2);
 			// Init methods
+      using CS::Plugin::csOpcode::Opcode::Collider::InitQuery;
 							void			InitQuery(const Matrix4x4* world0=null, const Matrix4x4* world1=null);
 							bool			CheckTemporalCoherence(Pair* cache);
 

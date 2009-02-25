@@ -437,6 +437,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
 
   // Redirect some iEmitState functions to the csParticleSystem implemenation
+  using csParticleSystem::SetParticleCount;
   virtual void SetParticleCount (int num)
   { csParticleSystem::SetParticleCount (num); }
   virtual size_t GetParticleCount () const

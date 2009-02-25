@@ -524,6 +524,7 @@ public:
     return Persp().PerspectiveImpl::GetInvFOV() / (float)vp_width; 
   }
 
+  using iCamera::SetFOVAngle;
   void SetFOVAngle (float a, float width)
   {
     CS_ASSERT_MSG("SetViewportSize() not called",

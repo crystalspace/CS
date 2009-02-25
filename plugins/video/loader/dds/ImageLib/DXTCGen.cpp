@@ -60,8 +60,6 @@ void DXTCGen::BuildCodes3(cbVector *pVects, cbVector &v1, cbVector &v2)
 	//*(long *)&pVects[1] = r1;
 }
 
-const int64 ScaleOneThird = CONST_INT64(0x5500550055005500);
-
 // ----------------------------------------------------------------------------
 // Build palette for a 4 color block
 // ----------------------------------------------------------------------------

@@ -158,11 +158,11 @@ protected:
   csAlphaMode::AlphaType alphaType;
   bool IsTexupdateNeeded() const
   {
-    return texFlags.Check (flagTexupdateNeeded);
+    return texFlags.Check ((uint32)flagTexupdateNeeded);
   }
   void SetTexupdateNeeded (bool b)
   {
-    texFlags.SetBool (flagTexupdateNeeded, b);
+    texFlags.SetBool ((uint32)flagTexupdateNeeded, b);
   }
   bool IsPrepared() const { return texFlags.Check (flagPrepared); }
   void SetPrepared (bool b) { texFlags.SetBool (flagPrepared, b); }

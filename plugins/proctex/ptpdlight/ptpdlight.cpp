@@ -365,7 +365,7 @@ ProctexPDLight::ProctexPDLight (ProctexPDLightLoader* loader, iImage* img) :
 {
   mat_w = img->GetWidth();
   mat_h = img->GetHeight();
-  if (loader->doMMX) state.Set (stateDoMMX);
+  if (loader->doMMX) state.Set ((uint32)stateDoMMX);
 }
 
 ProctexPDLight::ProctexPDLight (ProctexPDLightLoader* loader, int w, int h) : 
@@ -376,7 +376,7 @@ ProctexPDLight::ProctexPDLight (ProctexPDLightLoader* loader, int w, int h) :
 {
   mat_w = w;
   mat_h = h;
-  if (loader->doMMX) state.Set (stateDoMMX);
+  if (loader->doMMX) state.Set ((uint32)stateDoMMX);
 }
 
 ProctexPDLight::~ProctexPDLight ()
@@ -484,7 +484,7 @@ void ProctexPDLight::Animate (csTicks current_time)
 
     CS_PROFILER_ZONE(ProctexPDLight_Animate)
 #ifdef CS_SUPPORTS_MMX
-    if (state.Check (stateDoMMX))
+    if (state.Check ((uint32)stateDoMMX))
       Animate_MMX ();
     else
 #endif

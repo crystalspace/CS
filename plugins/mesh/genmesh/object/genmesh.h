@@ -413,7 +413,7 @@ public:
   };
   LegacyBuffers legacyBuffers;
   void CreateLegacyBuffers();
-  void ClearLegacyBuffers (uint mask = CS_BUFFER_ALL_MASK);
+  void ClearLegacyBuffers (uint mask = (uint)CS_BUFFER_ALL_MASK);
   void UpdateFromLegacyBuffers();
   
   SubMeshesContainer subMeshes;

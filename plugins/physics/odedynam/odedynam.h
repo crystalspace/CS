@@ -553,6 +553,7 @@ public:
   csODERigidBody (csODEDynamicSystem* sys);
   virtual ~csODERigidBody ();
 
+  using iObject::GetID;
   inline dBodyID GetID() { return bodyID; }
 
   iObject* QueryObject () { return this; }
