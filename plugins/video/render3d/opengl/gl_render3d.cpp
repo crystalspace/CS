@@ -1575,16 +1575,12 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
     statecache->Disable_GL_VERTEX_ARRAY ();
     statecache->Disable_GL_NORMAL_ARRAY ();
     statecache->Disable_GL_COLOR_ARRAY ();
-    statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
     if (ext->CS_GL_EXT_secondary_color)
       statecache->Disable_GL_SECONDARY_COLOR_ARRAY_EXT ();
-    if (ext->CS_GL_ARB_multitexture)
+    for (i = numTCUnits; i-- > 0;)
     {
-      for (i = numTCUnits; i-- > 0;)
-      {
-        statecache->SetCurrentTU (i);
-        statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
-      }
+      statecache->SetCurrentTU (i);
+      statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
     }
     if (ext->glDisableVertexAttribArrayARB)
     {
