@@ -114,7 +114,8 @@ void csGLStateCacheContext::InitCache()
   enabled_GL_FOG = (glIsEnabled (GL_FOG) == GL_TRUE);
 
   memset (boundtexture.p, 0, numImageUnits * sizeof (GLuint));
-  currentUnit = 0;
+  currentImageUnit = 0;
+  currentTCUnit = 0;
   memset (activeUnit, 0, sizeof (activeUnit));
   if (extmgr->CS_GL_ARB_multitexture)
   {

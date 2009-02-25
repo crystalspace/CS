@@ -64,33 +64,33 @@
     return currentContext->enabled_##name; \
   }
 
-#define DECLARE_CACHED_BOOL_CURRENTLAYER(name) \
+#define DECLARE_CACHED_BOOL_IMAGEUNIT(name) \
   AutoArray<bool> enabled_##name;
 
-#define IMPLEMENT_CACHED_BOOL_CURRENTLAYER(name)                              \
+#define IMPLEMENT_CACHED_BOOL_IMAGEUNIT(name)                       \
   void Enable_##name ()                                                       \
   {                                                                           \
-    const int currentUnit = currentContext->currentUnit;                      \
+    const int currentUnit = currentContext->currentImageUnit;                 \
     if (!currentContext->enabled_##name[currentUnit] || FORCE_STATE_CHANGE)   \
     {                                                                         \
-      ActivateTU (activateTexEnable);                                         \
+      ActivateImageUnit ();                                                   \
       currentContext->enabled_##name[currentUnit] = true;                     \
       glEnable (name);                                                        \
     }                                                                         \
   }                                                                           \
   void Disable_##name ()                                                      \
   {                                                                           \
-    const int currentUnit = currentContext->currentUnit;                      \
+    const int currentUnit = currentContext->currentImageUnit;                 \
     if (currentContext->enabled_##name[currentUnit] || FORCE_STATE_CHANGE)    \
     {                                                                         \
-      ActivateTU (activateTexEnable);                                         \
+      ActivateImageUnit ();                                                   \
       currentContext->enabled_##name[currentUnit] = false;                    \
       glDisable (name);                                                       \
     }                                                                         \
   }                                                                           \
   bool IsEnabled_##name () const                                              \
   {                                                                           \
-    const int currentUnit = currentContext->currentUnit;                      \
+    const int currentUnit = currentContext->currentImageUnit;                 \
     return currentContext->enabled_##name[currentUnit];                       \
   }
 
@@ -290,54 +290,56 @@
     return currentContext->enabled_##name; \
   }
 
-#define DECLARE_CACHED_CLIENT_STATE_LAYER(name)	                              \
+#define DECLARE_CACHED_CLIENT_STATE_TCS(name)	                              \
   AutoArray<bool> enabled_##name;
 
-#define IMPLEMENT_CACHED_CLIENT_STATE_LAYER(name)	                      \
+#define IMPLEMENT_CACHED_CLIENT_STATE_TCS(name)                      \
   void Enable_##name ()                                                       \
   {                                                                           \
-    const int currentUnit = currentContext->currentUnit;                      \
+    const int currentUnit = currentContext->currentTCUnit;                    \
     if (!currentContext->enabled_##name[currentUnit] || FORCE_STATE_CHANGE)   \
     {                                                                         \
-      ActivateTU (activateTexCoord);                                          \
+      ActivateTCUnit (activateTexCoord);                                      \
       currentContext->enabled_##name[currentUnit] = true;                     \
       glEnableClientState (name);                                             \
     }                                                                         \
   }                                                                           \
   void Disable_##name ()                                                      \
   {                                                                           \
-    const int currentUnit = currentContext->currentUnit;                      \
+    const int currentUnit = currentContext->currentTCUnit;                    \
     if (currentContext->enabled_##name[currentUnit] || FORCE_STATE_CHANGE)    \
     {                                                                         \
-      ActivateTU (activateTexCoord);                                          \
+      ActivateTCUnit (activateTexCoord);                                      \
       currentContext->enabled_##name[currentUnit] = false;                    \
       glDisableClientState (name);                                            \
     }                                                                         \
   }                                                                           \
   bool IsEnabled_##name () const                                              \
   {                                                                           \
-    const int currentUnit = currentContext->currentUnit;                      \
+    const int currentUnit = currentContext->currentTCUnit;                    \
     return currentContext->enabled_##name[currentUnit];                       \
   }
 
 #define DECLARE_CACHED_PARAMETER_1_LAYER(func, name, type1, param1) \
   AutoArray<type1> parameter_##param1;
 
-#define IMPLEMENT_CACHED_PARAMETER_1_LAYER(func, name, type1, param1) \
+#define IMPLEMENT_CACHED_PARAMETER_1_LAYER(func, name, type1, param1, limit) \
   void Set##name (type1 param1, bool forced = false) \
   { \
+    const int currentUnit = currentContext->currentUnit;                      \
     if (forced || \
-        (param1 != currentContext->parameter_##param1[currentContext->currentUnit] \
+        (param1 != currentContext->parameter_##param1[currentUnit] \
         || FORCE_STATE_CHANGE)) \
     { \
       ActivateTU (); \
-      currentContext->parameter_##param1[currentContext->currentUnit] = param1;  \
+      currentContext->parameter_##param1[currentUnit] = param1;  \
       func (param1); \
     } \
   } \
   void Get##name (type1 &param1) const\
   { \
-    param1 = currentContext->parameter_##param1[currentContext->currentUnit];  \
+    const int currentUnit = currentContext->currentUnit;                      \
+    param1 = currentContext->parameter_##param1[currentUnit];  \
   }
 
 #define DECLARE_CACHED_PARAMETER_2_LAYER(func, name, type1, param1, \
@@ -346,25 +348,27 @@
   AutoArray<type2> parameter_##param2;
 
 #define IMPLEMENT_CACHED_PARAMETER_2_LAYER(func, name, type1, param1, \
-  type2, param2) \
+  type2, param2, limit) \
   void Set##name (type1 param1, type2 param2, bool forced = false) \
   { \
+    const int currentUnit = currentContext->currentUnit;                      \
     if (forced || (param1 != currentContext->parameter_##param1[ \
-                    currentContext->currentUnit]) || \
+                    currentUnit]) || \
                   (param2 != currentContext->parameter_##param2[ \
-                    currentContext->currentUnit]) \
+                    currentUnit]) \
                || FORCE_STATE_CHANGE) \
     { \
       ActivateTU (); \
-      currentContext->parameter_##param1[currentContext->currentUnit] = param1;  \
-      currentContext->parameter_##param2[currentContext->currentUnit] = param2;  \
+      currentContext->parameter_##param1[currentUnit] = param1;  \
+      currentContext->parameter_##param2[currentUnit] = param2;  \
       func (param1, param2); \
     } \
   } \
   void Get##name (type1 &param1, type2 & param2) const\
   { \
-    param1 = currentContext->parameter_##param1[currentContext->currentUnit];  \
-    param2 = currentContext->parameter_##param2[currentContext->currentUnit];  \
+    const int currentUnit = currentContext->currentUnit;                      \
+    param1 = currentContext->parameter_##param1[currentUnit];  \
+    param2 = currentContext->parameter_##param2[currentUnit];  \
   }
 
 #define DECLARE_CACHED_PARAMETER_3_LAYER(func, name, type1, param1, \
@@ -375,34 +379,36 @@
 
 
 #define IMPLEMENT_CACHED_PARAMETER_3_LAYER(func, name, type1, param1, \
-  type2, param2, type3, param3) \
+  type2, param2, type3, param3, limit) \
   void Set##name (type1 param1, type2 param2, type3 param3,\
     bool forced = false) \
   { \
+    const int currentUnit = currentContext->currentUnit;                      \
     if (forced || (param1 != currentContext->parameter_##param1[ \
-                    currentContext->currentUnit]) || \
+                    currentUnit]) || \
                   (param2 != currentContext->parameter_##param2[ \
-                    currentContext->currentUnit]) || \
+                    currentUnit]) || \
                   (param3 != currentContext->parameter_##param3[ \
-                    currentContext->currentUnit]) \
+                    currentUnit]) \
                || FORCE_STATE_CHANGE) \
     { \
       ActivateTU (); \
-      currentContext->parameter_##param1[currentContext->currentUnit] = param1;  \
-      currentContext->parameter_##param2[currentContext->currentUnit] = param2;  \
-      currentContext->parameter_##param3[currentContext->currentUnit] = param3;  \
+      currentContext->parameter_##param1[currentUnit] = param1;  \
+      currentContext->parameter_##param2[currentUnit] = param2;  \
+      currentContext->parameter_##param3[currentUnit] = param3;  \
       func (param1, param2, param3); \
     } \
   } \
   void Get##name (type1 &param1, type2 & param2, type3 & param3) const\
   { \
-    param1 = currentContext->parameter_##param1[currentContext->currentUnit];  \
-    param2 = currentContext->parameter_##param2[currentContext->currentUnit];  \
-    param3 = currentContext->parameter_##param3[currentContext->currentUnit];  \
+    const int currentUnit = currentContext->currentUnit;                      \
+    param1 = currentContext->parameter_##param1[currentUnit];  \
+    param2 = currentContext->parameter_##param2[currentUnit];  \
+    param3 = currentContext->parameter_##param3[currentUnit];  \
   }
 
 
-#define DECLARE_CACHED_PARAMETER_4_BUF_LAYER(func, name, type1, param1,       \
+#define DECLARE_CACHED_PARAMETER_4_BUF_TCS(func, name, type1, param1,       \
   type2, param2, type3, param3, type4, param4, vbo)                           \
   AutoArray<type1> parameter_##param1;                                        \
   AutoArray<type2> parameter_##param2;                                        \
@@ -410,12 +416,12 @@
   AutoArray<type4> parameter_##param4;                                        \
   AutoArray<GLuint> parameter_##vbo;
 
-#define IMPLEMENT_CACHED_PARAMETER_4_BUF_LAYER(func, name, type1, param1,     \
-    type2, param2, type3, param3, type4, param4, vbo)                         \
+#define IMPLEMENT_CACHED_PARAMETER_4_BUF_TCS(func, name, type1, param1,     \
+    type2, param2, type3, param3, type4, param4, vbo)                  \
   void Set##name (type1 param1, type2 param2, type3 param3, type4 param4,     \
     bool forced = false)                                                      \
   {                                                                           \
-    const int currentUnit = currentContext->currentUnit;                      \
+    const int currentUnit = currentContext->currentTCUnit;                    \
     if (forced                                                                \
       || (param1 != currentContext->parameter_##param1[currentUnit])          \
       || (param2 != currentContext->parameter_##param2[currentUnit])          \
@@ -425,7 +431,7 @@
         != currentContext->parameter_##vbo[currentUnit])                      \
       || FORCE_STATE_CHANGE)                                                  \
     {                                                                         \
-      ActivateTU (activateTexCoord);                                          \
+      ActivateTCUnit (activateTexCoord);                                      \
       currentContext->parameter_##param1[currentUnit] = param1;               \
       currentContext->parameter_##param2[currentUnit] = param2;               \
       currentContext->parameter_##param3[currentUnit] = param3;               \
@@ -442,7 +448,7 @@
   void Get##name (type1 &param1, type2 & param2, type3 & param3,              \
     type4& param4) const                                                      \
   {                                                                           \
-    const int currentUnit = currentContext->currentUnit;                      \
+    const int currentUnit = currentContext->currentTCUnit;                    \
     param1 = currentContext->parameter_##param1[currentUnit];                 \
     param2 = currentContext->parameter_##param2[currentUnit];                 \
     param3 = currentContext->parameter_##param3[currentUnit];                 \
@@ -480,7 +486,7 @@ public:
   AutoArray<GLuint> boundtexture;
   GLint numImageUnits;
   GLint numTexCoords;
-  int currentUnit;
+  int currentImageUnit, currentTCUnit;
   int activeUnit[2];
   enum
   {
@@ -555,11 +561,11 @@ public:
   DECLARE_CACHED_BOOL (GL_COLOR_SUM_EXT)
   DECLARE_CACHED_BOOL (GL_VERTEX_PROGRAM_POINT_SIZE_ARB)
   DECLARE_CACHED_BOOL (GL_POINT_SPRITE_ARB)
-  DECLARE_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_1D)
-  DECLARE_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_2D)
-  DECLARE_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_3D)
-  DECLARE_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_CUBE_MAP)
-  DECLARE_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_RECTANGLE_ARB)
+  DECLARE_CACHED_BOOL_IMAGEUNIT (GL_TEXTURE_1D)
+  DECLARE_CACHED_BOOL_IMAGEUNIT (GL_TEXTURE_2D)
+  DECLARE_CACHED_BOOL_IMAGEUNIT (GL_TEXTURE_3D)
+  DECLARE_CACHED_BOOL_IMAGEUNIT (GL_TEXTURE_CUBE_MAP)
+  DECLARE_CACHED_BOOL_IMAGEUNIT (GL_TEXTURE_RECTANGLE_ARB)
   DECLARE_CACHED_PARAMETER_2 (glAlphaFunc, AlphaFunc, GLenum, alpha_func, GLclampf, alpha_ref)
   DECLARE_CACHED_PARAMETER_1 (glCullFace, CullFace, GLenum, cull_mode)
   DECLARE_CACHED_PARAMETER_1 (glDepthFunc, DepthFunc, GLenum, depth_func)
@@ -575,7 +581,7 @@ public:
   DECLARE_CACHED_CLIENT_STATE (GL_COLOR_ARRAY)
   DECLARE_CACHED_CLIENT_STATE (GL_SECONDARY_COLOR_ARRAY_EXT)
   DECLARE_CACHED_CLIENT_STATE (GL_NORMAL_ARRAY)
-  DECLARE_CACHED_CLIENT_STATE_LAYER (GL_TEXTURE_COORD_ARRAY)
+  DECLARE_CACHED_CLIENT_STATE_TCS (GL_TEXTURE_COORD_ARRAY)
 
   DECLARE_CACHED_PARAMETER_1 (glMatrixMode, MatrixMode, GLenum, matrixMode)
   
@@ -588,7 +594,7 @@ public:
   DECLARE_CACHED_PARAMETER_4_BUF (extmgr->glSecondaryColorPointerEXT, 
     SecondaryColorPointerEXT, GLint, scsize, GLenum, sctype, GLsizei, scstride, 
     GLvoid*, scpointer, scvbo);
-  DECLARE_CACHED_PARAMETER_4_BUF_LAYER (glTexCoordPointer, TexCoordPointer, GLint, tsize,
+  DECLARE_CACHED_PARAMETER_4_BUF_TCS (glTexCoordPointer, TexCoordPointer, GLint, tsize,
     GLenum, ttype, GLsizei, tstride, GLvoid*, tpointer, tvbo)
   
   csGLStateCacheContext (csGLExtensionManager* extmgr);
@@ -651,11 +657,11 @@ public:
   IMPLEMENT_CACHED_BOOL (GL_COLOR_SUM_EXT)
   IMPLEMENT_CACHED_BOOL (GL_VERTEX_PROGRAM_POINT_SIZE_ARB)
   IMPLEMENT_CACHED_BOOL (GL_POINT_SPRITE_ARB)
-  IMPLEMENT_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_1D)
-  IMPLEMENT_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_2D)
-  IMPLEMENT_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_3D)
-  IMPLEMENT_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_CUBE_MAP)
-  IMPLEMENT_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_RECTANGLE_ARB)
+  IMPLEMENT_CACHED_BOOL_IMAGEUNIT (GL_TEXTURE_1D)
+  IMPLEMENT_CACHED_BOOL_IMAGEUNIT (GL_TEXTURE_2D)
+  IMPLEMENT_CACHED_BOOL_IMAGEUNIT (GL_TEXTURE_3D)
+  IMPLEMENT_CACHED_BOOL_IMAGEUNIT (GL_TEXTURE_CUBE_MAP)
+  IMPLEMENT_CACHED_BOOL_IMAGEUNIT (GL_TEXTURE_RECTANGLE_ARB)
   IMPLEMENT_CACHED_PARAMETER_2 (glAlphaFunc, AlphaFunc, GLenum, alpha_func, GLclampf, alpha_ref)
   IMPLEMENT_CACHED_PARAMETER_1 (glCullFace, CullFace, GLenum, cull_mode)
   IMPLEMENT_CACHED_PARAMETER_1 (glDepthFunc, DepthFunc, GLenum, depth_func)
@@ -671,7 +677,7 @@ public:
   IMPLEMENT_CACHED_CLIENT_STATE (GL_COLOR_ARRAY)
   IMPLEMENT_CACHED_CLIENT_STATE (GL_SECONDARY_COLOR_ARRAY_EXT)
   IMPLEMENT_CACHED_CLIENT_STATE (GL_NORMAL_ARRAY)
-  IMPLEMENT_CACHED_CLIENT_STATE_LAYER (GL_TEXTURE_COORD_ARRAY)
+  IMPLEMENT_CACHED_CLIENT_STATE_TCS (GL_TEXTURE_COORD_ARRAY)
 
   IMPLEMENT_CACHED_PARAMETER_1 (glMatrixMode, MatrixMode, GLenum, matrixMode)
   
@@ -684,47 +690,82 @@ public:
   IMPLEMENT_CACHED_PARAMETER_4_BUF (extmgr->glSecondaryColorPointerEXT, 
     SecondaryColorPointerExt, GLint, scsize, GLenum, sctype, GLsizei, scstride, 
     GLvoid*, scpointer, scvbo);
-  IMPLEMENT_CACHED_PARAMETER_4_BUF_LAYER (glTexCoordPointer, TexCoordPointer, GLint, tsize,
+  IMPLEMENT_CACHED_PARAMETER_4_BUF_TCS (glTexCoordPointer, TexCoordPointer, GLint, tsize,
     GLenum, ttype, GLsizei, tstride, GLvoid*, tpointer, tvbo);
   
   // Special caches
   void SetTexture (GLenum target, GLuint texture)
   {
-    const int currentUnit = currentContext->currentUnit;
+    const int currentUnit = currentContext->currentImageUnit;
     if (texture != currentContext->boundtexture[currentUnit])
     {
-      ActivateTU (activateImage);
+      ActivateImageUnit ();
       currentContext->boundtexture[currentUnit] = texture;
       glBindTexture (target, texture);
     }
   }
   GLuint GetTexture (GLenum /*target*/)
   {
-    const int currentUnit = currentContext->currentUnit;
+    const int currentUnit = currentContext->currentImageUnit;
     return currentContext->boundtexture[currentUnit];
   }
   GLuint GetTexture (GLenum /*target*/, int unit)
   {
     return currentContext->boundtexture[unit];
   }
+  
   /**
-   * Select the currently active texture unit. 
+   * Select the currently active image unit. 
    * \remarks Doesn't check whether the  multitexture extension is actually 
    * supported, this must be done in calling code.
    */
-  void SetCurrentTU (int unit)
+  void SetCurrentImageUnit (int unit)
   {
-    currentContext->currentUnit = unit;   
+    CS_ASSERT(unit < currentContext->numImageUnits);
+    currentContext->currentImageUnit = unit;   
   }
-  /// Query active texture unit.
-  int GetCurrentTU ()
+  /// Query active image unit.
+  int GetCurrentImageUnit ()
   {
-    return currentContext->currentUnit;
+    return currentContext->currentImageUnit;
+  }
+  /**
+   * Activate the currently selected image unit. 
+   * Use this to bind textures.
+   * \remarks Doesn't check whether the  multitexture extension is actually 
+   *   supported, this must be done in calling code.
+   */
+  void ActivateImageUnit ()
+  {
+    int currentUnit = currentContext->currentImageUnit;
+    if (currentContext->activeUnit[texServer] != currentUnit)
+    {
+      GLuint tu = GL_TEXTURE0_ARB + currentUnit;
+      extmgr->glActiveTextureARB (tu);
+      currentContext->activeUnit[texServer] = currentUnit;
+    }
+  }
+  
+  /**
+   * Select the currently active texture coordinate unit. 
+   * Use this to change state of texture coordinate arrays, 
+   * change texture matrices, texture environments,
+   * texture coord generation and enabling/disabling textures.
+   * \remarks Doesn't check whether the  multitexture extension is actually 
+   * supported, this must be done in calling code.
+   */
+  void SetCurrentTCUnit (int unit)
+  {
+    CS_ASSERT(unit < currentContext->numTexCoords);
+    currentContext->currentTCUnit = unit;   
+  }
+  /// Query active texture coordinate set.
+  int GetCurrentTCUnit ()
+  {
+    return currentContext->currentTCUnit;
   }
   /// Flag that the active TU should be used for setting texture coords
   static const int activateTexCoord = 1 << texClient;
-  /// Flag that the active TU should be used for binding textures
-  static const int activateImage = 1 << texServer;
   /// Flag that the active TU should be used when changing the texture matrix
   static const int activateMatrix = 1 << texServer;
   /// Flag that the active TU should be used when changing the texture environment
@@ -734,18 +775,14 @@ public:
    * generation parameters.
    */
   static const int activateTexGen = 1 << texServer;
-  /// Flag that the active TU should be used when enabling/disabling texturing
-  static const int activateTexEnable = 1 << texServer;
   /**
-   * Activate the currently selected TU. 
-   * \a usage is a combination of UnitTexCoord and UnitImage and specifies,
-   * for what the current unit is to be used.
+   * Activate the currently selected coordinate set. 
    * \remarks Doesn't check whether the  multitexture extension is actually 
    *   supported, this must be done in calling code.
    */
-  void ActivateTU (uint usage)
+  void ActivateTCUnit (uint usage)
   {
-    int currentUnit = currentContext->currentUnit;
+    int currentUnit = currentContext->currentTCUnit;
     for (int i = 0; i < 2; i++)
     {
       if (currentContext->activeUnit[i] != currentUnit)
@@ -908,7 +945,7 @@ public:
 };
 
 #undef IMPLEMENT_CACHED_BOOL
-#undef IMPLEMENT_CACHED_BOOL_CURRENTLAYER
+#undef IMPLEMENT_CACHED_BOOL_IMAGEUNIT
 #undef IMPLEMENT_CACHED_PARAMETER_1
 #undef IMPLEMENT_CACHED_PARAMETER_2
 #undef IMPLEMENT_CACHED_PARAMETER_3
@@ -921,7 +958,7 @@ public:
 #undef IMPLEMENT_CACHED_CLIENT_STATE_LAYER
 
 #undef DECLARE_CACHED_BOOL
-#undef DECLARE_CACHED_BOOL_CURRENTLAYER
+#undef DECLARE_CACHED_BOOL_IMAGEUNIT
 #undef DECLARE_CACHED_PARAMETER_1
 #undef DECLARE_CACHED_PARAMETER_2
 #undef DECLARE_CACHED_PARAMETER_3
