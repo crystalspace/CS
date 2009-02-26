@@ -42,4 +42,14 @@
 		       data for that, too -->
 		</staticlights>
 	</layer>
+      <layer>
+		<shadervar name="pass do_ambient" type="integer">1</shadervar>
+		<ambient />
+		<staticlights>
+		  <nodraw />
+		</staticlights>
+            <maxlightpasses>1</maxlightpasses>
+            <shadertype>splatting ambient</shadertype>
+		<shadertype>terrain splat</shadertype>
+      </layer>
 </layerconfig>
