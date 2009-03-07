@@ -222,7 +222,7 @@ bool csPlatformStartup(iObjectRegistry* r)
   /* Mark program as DPI aware on Vista to prevent automatic scaling
      by the system on high resolution screens */
   {
-    cswinCacheDLL hUser32 ("user32.dll");
+    CS::Platform::Win32::CacheDLL hUser32 ("user32.dll");
     CS_ASSERT (hUser32 != 0);
     LPFNSETPROCESSDPIAWARE SetProcessDPIAware =
       (LPFNSETPROCESSDPIAWARE)GetProcAddress (hUser32, "SetProcessDPIAware");

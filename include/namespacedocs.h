@@ -93,7 +93,12 @@ namespace CS
    * Platform specific code and wrappers
    */
   namespace Platform
-  {}
+  {
+    /**
+     * Win32-specific classes and functions
+     */
+    namespace Win32 {}
+  }
 
   /**
    * Implementation of all plugins

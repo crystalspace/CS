@@ -108,7 +108,7 @@ static DWORD STDAPICALLTYPE MyGetLPN (LPCSTR lpszShortPath, LPSTR lpszLongPath,
 
 // Can't put this inside the function because Cygwin would segfault
 // on the destructor for some unknown reason.
-static cswinCacheDLL hKernel32 ("kernel32.dll");
+static CS::Platform::Win32::CacheDLL hKernel32 ("kernel32.dll");
 
 char* csPathsUtilities::ExpandPath (const char* path)
 {

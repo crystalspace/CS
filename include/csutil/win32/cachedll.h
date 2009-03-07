@@ -20,34 +20,39 @@
 #ifndef __CS_UTIL_WIN32_CACHEDLL_H__
 #define __CS_UTIL_WIN32_CACHEDLL_H__
 
-#include "csextern.h"
-
 /**\file
  * Helper to avoid repeated loading/unloading of DLLs
  */
+
+namespace CS
+{
+namespace Platform
+{
+namespace Win32
+{
 
 /**
  * Small helper to avoid repeated loading/unloading of DLLs loaded at 
  * runtime. Loads a DLL when needed and unloads it on destruction.
  * Usage example:
  * \code
- * static cswinCacheDLL hKernel32 ("kernel32.dll");
+ * static CS::Platform::Win32::CacheDLL hKernel32 ("kernel32.dll");
  * if (hKernel32 != 0)
  * {
  *   ...
  * }
  * \endcode
  */
-class CS_CRYSTALSPACE_EXPORT cswinCacheDLL
+class CacheDLL
 {
   const char* dllName;
   HMODULE dllHandle;
 public:
-  cswinCacheDLL (const char* dll) : dllName(dll), dllHandle (0)
+  CacheDLL (const char* dll) : dllName(dll), dllHandle (0)
   {
   }
   
-  ~cswinCacheDLL ()
+  ~CacheDLL ()
   {
     if (dllHandle != 0)
       FreeLibrary (dllHandle);
@@ -65,5 +70,9 @@ public:
     return GetHandle ();
   }
 };
+
+} // namespace CS
+} // namespace Platform
+} // namespace Win32
 
 #endif // __CS_UTIL_WIN32_CACHEDLL_H__
