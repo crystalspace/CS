@@ -50,7 +50,7 @@ namespace CS
 	 * mechanisms to obtain an icon of a certain size either don't
 	 * provide different sizes or deliver bad quality icons.)
 	 *
-	 * Stock icons are likely available in the sizes 16x16, 32x32 and 484x48.
+	 * Stock icons are likely available in the sizes 16x16, 32x32 and 48x48.
 	 * Asking for a size other than that will actually return an icon with the
 	 * size closest (well, what Windows deems to be close) to the requested
 	 * size.
