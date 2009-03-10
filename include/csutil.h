@@ -174,6 +174,7 @@
 #if defined(CS_PLATFORM_MACOSX)
 #include "csutil/macosx/OSXAssistant.h"
 #elif defined(CS_PLATFORM_WIN32)
+#include "csutil/win32/cachedll.h"
 #include "csutil/win32/callstack.h"
 #include "csutil/win32/csconfig-msvc.h"
 #include "csutil/win32/DbgHelpAPI.h"

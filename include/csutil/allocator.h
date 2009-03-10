@@ -299,7 +299,7 @@ namespace CS
         }
         else
         {
-          if ((newSize <= localSize) && !localBuf[localSize])
+          if ((newSize <= localSize) && (SingleAllocation || !localBuf[localSize]))
 	  {
 	    memcpy (localBuf, p, newSize);
 	    ExcessAllocator::Free (p);

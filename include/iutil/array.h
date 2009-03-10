@@ -115,8 +115,10 @@ template<typename T>
 struct iArrayChangeElements : public virtual iArrayReadOnly<T>
 {
   /// Get an element (non-const).
+  using iArrayReadOnly<T>::Get;
   virtual T& Get (size_t n) = 0;
   /// Return the top element but do not remove it (non-const).
+  using iArrayReadOnly<T>::Top;
   virtual T& Top () = 0;
 };
 

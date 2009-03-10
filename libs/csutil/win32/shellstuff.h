@@ -52,7 +52,7 @@ GetShellFolderPath (int CSIDL, char* path)
   bool result = false;
 
   // ShFolder.dll can 'emulate' special folders on older Windowses.
-  static cswinCacheDLL shFolder ("shfolder.dll");
+  static CS::Platform::Win32::CacheDLL shFolder ("shfolder.dll");
 	
   if (shFolder)
   {
@@ -92,8 +92,8 @@ static inline bool GetShellFolderPath (int CSIDL, csString& path)
   char buf[MAX_PATH];
 
   // ShFolder.dll can 'emulate' special folders on older Windowses.
-  static cswinCacheDLL shell32 ("shell32.dll");
-  static cswinCacheDLL shFolder ("shfolder.dll");
+  static CS::Platform::Win32::CacheDLL shell32 ("shell32.dll");
+  static CS::Platform::Win32::CacheDLL shFolder ("shfolder.dll");
 	
   SHGETFOLDERPATHAPROC SHGetFolderPathA;
   SHGetFolderPathA = 

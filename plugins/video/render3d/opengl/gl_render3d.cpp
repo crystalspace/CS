@@ -992,8 +992,8 @@ bool csGLGraphics3D::Open ()
     {
       for (int u = numImageUnits - 1; u >= 0; u--)
       {
-        statecache->SetCurrentTU (u);
-        statecache->ActivateTU (csGLStateCache::activateTexEnv);
+        statecache->SetCurrentImageUnit (u);
+        statecache->ActivateImageUnit ();
         glTexEnvf (GL_TEXTURE_FILTER_CONTROL_EXT, 
 	        GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); 
       }
@@ -1394,9 +1394,10 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       statecache->Disable_GL_ALPHA_TEST ();
       if (ext->CS_GL_ARB_multitexture)
       {
-        statecache->SetCurrentTU (0);
-        statecache->ActivateTU (csGLStateCache::activateImage
-          | csGLStateCache::activateTexCoord);
+        statecache->SetCurrentImageUnit (0);
+        statecache->ActivateImageUnit ();
+        statecache->SetCurrentTCUnit (0);
+        statecache->ActivateTCUnit (csGLStateCache::activateTexCoord);
       }
       statecache->Disable_GL_POLYGON_OFFSET_FILL ();
 
@@ -1575,16 +1576,12 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
     statecache->Disable_GL_VERTEX_ARRAY ();
     statecache->Disable_GL_NORMAL_ARRAY ();
     statecache->Disable_GL_COLOR_ARRAY ();
-    statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
     if (ext->CS_GL_EXT_secondary_color)
       statecache->Disable_GL_SECONDARY_COLOR_ARRAY_EXT ();
-    if (ext->CS_GL_ARB_multitexture)
+    for (i = numTCUnits; i-- > 0;)
     {
-      for (i = numTCUnits; i-- > 0;)
-      {
-        statecache->SetCurrentTU (i);
-        statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
-      }
+      statecache->SetCurrentTCUnit (i);
+      statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
     }
     if (ext->glDisableVertexAttribArrayARB)
     {
@@ -1628,8 +1625,8 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
 {
   if (ext->CS_GL_ARB_multitexture)
   {
-    statecache->SetCurrentTU (unit);
-    statecache->ActivateTU (csGLStateCache::activateTexEnable);
+    statecache->SetCurrentImageUnit (unit);
+    statecache->ActivateImageUnit ();
   }
   else if (unit != 0) return false;
 
@@ -1672,7 +1669,7 @@ void csGLGraphics3D::DeactivateTexture (int unit)
 {
   if (ext->CS_GL_ARB_multitexture)
   {
-    statecache->SetCurrentTU (unit);
+    statecache->SetCurrentImageUnit (unit);
   }
   else if (unit != 0) return;
 
@@ -1724,8 +1721,8 @@ void csGLGraphics3D::SetTextureComparisonModes (int* units,
       
       if (ext->CS_GL_ARB_multitexture)
       {
-	statecache->SetCurrentTU (unit);
-	statecache->ActivateTU (csGLStateCache::activateImage);
+	statecache->SetCurrentImageUnit (unit);
+	statecache->ActivateImageUnit ();
       }
       else if (unit != 0) continue;
       
@@ -1741,8 +1738,8 @@ void csGLGraphics3D::SetTextureComparisonModes (int* units,
       
       if (ext->CS_GL_ARB_multitexture)
       {
-	statecache->SetCurrentTU (unit);
-	statecache->ActivateTU (csGLStateCache::activateTexEnv);
+	statecache->SetCurrentImageUnit (unit);
+	statecache->ActivateImageUnit ();
       }
       else if (unit != 0) continue;
       
@@ -2602,7 +2599,7 @@ void csGLGraphics3D::ApplyBufferChanges()
           unsigned int unit = att- CS_VATTRIB_TEXCOORD0;
           if (ext->CS_GL_ARB_multitexture)
           {
-            statecache->SetCurrentTU (unit);
+            statecache->SetCurrentTCUnit (unit);
           } 
 	  // @@@ FIXME: How to deal with normalized buffers?
 	  statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
@@ -2655,7 +2652,7 @@ void csGLGraphics3D::ApplyBufferChanges()
           unsigned int unit = att- CS_VATTRIB_TEXCOORD0;
           if (ext->CS_GL_ARB_multitexture)
           {
-            statecache->SetCurrentTU (unit);
+            statecache->SetCurrentTCUnit (unit);
           }
           statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
         }
@@ -3317,9 +3314,10 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
     }
     if (ext->CS_GL_ARB_multitexture)
     {
-      statecache->SetCurrentTU (0);
-      statecache->ActivateTU (csGLStateCache::activateImage
-        | csGLStateCache::activateTexCoord);
+      statecache->SetCurrentImageUnit (0);
+      statecache->ActivateImageUnit ();
+      statecache->SetCurrentTCUnit (0);
+      statecache->ActivateTCUnit (csGLStateCache::activateTexCoord);
     }
     if (mesh.texture)
     {
@@ -3521,8 +3519,8 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB,
   // Create handle
   glGenTextures (1, &halohandle);
   // Activate handle
-  csGLGraphics3D::statecache->SetCurrentTU (0);
-  csGLGraphics3D::statecache->ActivateTU (csGLStateCache::activateImage);
+  csGLGraphics3D::statecache->SetCurrentImageUnit (0);
+  csGLGraphics3D::statecache->ActivateImageUnit ();
   csGLGraphics3D::statecache->SetTexture (GL_TEXTURE_2D, halohandle);
 
   // Jaddajaddajadda
@@ -3607,11 +3605,12 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   float hw = (float)G3D->GetWidth() * 0.5f;
   float hh = (float)G3D->GetHeight() * 0.5f;
 
-  int oldTU = G3D->statecache->GetCurrentTU ();
-  if (G3D->ext->CS_GL_ARB_multitexture)
-    G3D->statecache->SetCurrentTU (0);
-  G3D->statecache->ActivateTU (csGLStateCache::activateImage
-    | csGLStateCache::activateTexCoord);
+  int oldIU = G3D->statecache->GetCurrentImageUnit ();
+  int oldTCU = G3D->statecache->GetCurrentTCUnit ();
+  G3D->statecache->SetCurrentImageUnit (0);
+  G3D->statecache->ActivateImageUnit ();
+  G3D->statecache->SetCurrentTCUnit (0);
+  G3D->statecache->ActivateTCUnit (csGLStateCache::activateTexCoord);
 
   
   //csGLGraphics3D::SetGLZBufferFlags (CS_ZBUF_NONE);
@@ -3655,10 +3654,10 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   csGLGraphics3D::statecache->SetTexture (GL_TEXTURE_2D, 0);
   if (!texEnabled)
     csGLGraphics3D::statecache->Disable_GL_TEXTURE_2D ();
-  if (G3D->ext->CS_GL_ARB_multitexture)
-    G3D->statecache->SetCurrentTU (oldTU);
-  G3D->statecache->ActivateTU (csGLStateCache::activateImage
-    | csGLStateCache::activateTexCoord);
+  G3D->statecache->SetCurrentImageUnit (oldIU);
+  G3D->statecache->ActivateImageUnit ();
+  G3D->statecache->SetCurrentTCUnit (oldTCU);
+  G3D->statecache->ActivateTCUnit (csGLStateCache::activateTexCoord);
 }
 
 iHalo *csGLGraphics3D::CreateHalo (float iR, float iG, float iB,

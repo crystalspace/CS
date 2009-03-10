@@ -102,7 +102,7 @@
 		#endif
 
 
-	#ifdef COMPILER_VISUAL_CPP
+	#if !defined(__INTEL_COMPILER) && defined(COMPILER_VISUAL_CPP)
 		// Down the hatch
 		#pragma inline_depth( 255 )
 		#pragma intrinsic(labs)

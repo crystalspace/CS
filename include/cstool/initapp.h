@@ -196,16 +196,26 @@ public:
    * should be retained when doing so.
    * \param argc argc argument from main().
    * \param argv argv argument from main().
+   * \param scanDefaultPluginPaths Whether the default plugin paths are scanned.
+   *   Forwarded to InitializeSCF(), see there for more information.
    * \return This function will return the pointer to the object registry where
    * all the created objects will be registered.
    */
-  static iObjectRegistry* CreateEnvironment(int argc, char const* const argv[]);
+  static iObjectRegistry* CreateEnvironment(int argc, char const* const argv[],
+    bool scanDefaultPluginPaths = true);
 
   /**
    * This very important function initializes the SCF sub-system.
    * Without this you can do almost nothing in CS.
+   * \param argc argc argument from main().
+   * \param argv argv argument from main().
+   * \param scanDefaultPluginPaths Whether the default plugin paths provided by
+   *   csGetPluginPaths() are scanned. Otherwise, no plugin scanning is done.
+   *   In this case the csPathsList* version of scfInitialize() should be
+   *   invoked manually if some paths should be scanned for plugins.
    */
-  static bool InitializeSCF (int argc, char const* const argv[]);
+  static bool InitializeSCF (int argc, char const* const argv[],
+    bool scanDefaultPluginPaths = true);
 
   /**
    * This function should be called second. It will create the object

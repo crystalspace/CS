@@ -166,6 +166,7 @@ protected:
 public:
   /// Constructor.
   csPortalContainer (iEngine* engine, iObjectRegistry *object_reg);
+  using iMeshObject::SetMeshWrapper;
   void SetMeshWrapper (csMeshWrapper* meshwrapper)
   {
     csPortalContainer::meshwrapper = meshwrapper;
