@@ -44,7 +44,7 @@
 
 #include "csutil/win32/wintools.h"
 #include "win32kbd.h"
-#include "cachedll.h"
+#include "csutil/win32/cachedll.h"
 
 #include <stdio.h>
 #include <time.h>

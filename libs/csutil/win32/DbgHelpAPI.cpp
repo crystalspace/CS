@@ -18,7 +18,7 @@
 */	
 
 #include "cssysdef.h"
-#include "cachedll.h"
+#include "csutil/win32/cachedll.h"
 #include "csutil/win32/DbgHelpAPI.h"
 
 #define CS_API_DLL		"dbghelp.dll"

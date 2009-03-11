@@ -22,7 +22,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <shlobj.h>
 #include "csutil/csstring.h"
-#include "cachedll.h"
+#include "csutil/win32/cachedll.h"
 
 // This file contains some newer SHELL32 stuff, for example not found
 // in MinGW Win32 headers.
