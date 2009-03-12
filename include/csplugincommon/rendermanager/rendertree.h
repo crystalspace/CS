@@ -186,7 +186,13 @@ namespace RenderManager
     typedef RenderTree<TreeTraitsType> RealTreeType;
 
     //---- Internal types
-    typedef csRedBlackTreeMap<typename TreeTraitsType::MeshNodeKeyType, MeshNode*> MeshNodeTreeType;
+    typedef csFixedSizeAllocator<
+      csRedBlackTreeMap<typename TreeTraitsType::MeshNodeKeyType,
+        MeshNode*>::allocationUnitSize> MeshNodeTreeBlockAlloc;
+    typedef CS::Memory::AllocatorRef<MeshNodeTreeBlockAlloc>
+      MeshNodeTreeBlockRefAlloc;
+    typedef csRedBlackTreeMap<typename TreeTraitsType::MeshNodeKeyType, MeshNode*,
+      MeshNodeTreeBlockRefAlloc> MeshNodeTreeType;
     typedef typename MeshNodeTreeType::Iterator MeshNodeTreeIteratorType;
     typedef csArray<ContextNode*> ContextNodeArrayType;
     typedef typename ContextNodeArrayType::Iterator ContextNodeArrayIteratorType;
@@ -226,7 +232,7 @@ namespace RenderManager
 
       csBlockAllocator<MeshNode> meshNodeAllocator;
       csBlockAllocator<ContextNode> contextNodeAllocator;
-      
+      MeshNodeTreeBlockAlloc meshNodeTreeAlloc;
 
       CS::ShaderVarStringID svObjectToWorldName;
       CS::ShaderVarStringID svObjectToWorldInvName;
@@ -370,8 +376,10 @@ namespace RenderManager
       /// Total number of render meshes within the context
       size_t totalRenderMeshes;
       
-      ContextNode(TreeType& owner) 
-        : owner (owner), drawFlags (0), totalRenderMeshes (0) 
+      ContextNode(TreeType& owner, MeshNodeTreeBlockAlloc& meshNodeAlloc) 
+        : owner (owner), drawFlags (0), 
+          meshNodes (MeshNodeTreeBlockRefAlloc (meshNodeAlloc)),
+          totalRenderMeshes (0) 
       {}
       
       /**
@@ -491,7 +499,8 @@ namespace RenderManager
     ContextNode* CreateContext (RenderView* rw, ContextNode* insertAfter = 0)
     {
       // Create an initial context
-      ContextNode* newCtx = persistentData.contextNodeAllocator.Alloc (*this);
+      ContextNode* newCtx = persistentData.contextNodeAllocator.Alloc (*this,
+        persistentData.meshNodeTreeAlloc);
       newCtx->renderView = rw;
       newCtx->cameraTransform = rw->GetCamera ()->GetTransform ();
       newCtx->sector = rw->GetThisSector();
