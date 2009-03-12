@@ -96,7 +96,7 @@ static void ReportCalError (iObjectRegistry* objreg, const char* msgId,
     text << "]";
 
   csReport (objreg, CS_REPORTER_SEVERITY_ERROR, msgId,
-    text);
+    "%s", text.GetData());
 }
 
 //--------------------------------------------------------------------------
