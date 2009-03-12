@@ -475,6 +475,7 @@ namespace CS
       
       ~GenericResourceCache()
       {
+        availableResources.Destroy ();
       }
 
       /**
