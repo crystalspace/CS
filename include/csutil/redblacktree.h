@@ -36,6 +36,56 @@
 
 /**\addtogroup util_containers
  * @{ */
+ 
+template <typename K, typename Allocator> class csRedBlackTree;
+
+namespace CS
+{
+  namespace Container
+  {
+    /**\internal
+    * A node in a red black tree
+    */
+    template <typename K>
+    class RedBlackTreeNode
+    {
+    protected:
+      enum Color { Black = 0, Red = 1 };
+      
+      template <class _T, class _A> friend class csRedBlackTree;
+      
+      RedBlackTreeNode* left;
+      RedBlackTreeNode* right;
+      uint8 key[sizeof(K)];
+      
+      RedBlackTreeNode() : parent(0) {}
+      ~RedBlackTreeNode() { ((K*)&key)->~K(); }
+      inline RedBlackTreeNode* GetParent() const
+      { return (RedBlackTreeNode*)((uintptr_t)parent & (uintptr_t)~1); }
+      void SetParent(RedBlackTreeNode* p)
+      { parent = (RedBlackTreeNode*)(((uintptr_t)p & (uintptr_t)~1) | (uint)GetColor()); }
+      Color GetColor() const
+      { // Expression split over two statements to pacify some broken gcc's which
+	// barf saying "can't convert Node* to NodeColor".
+	uintptr_t const v = ((uintptr_t)parent & 1); 
+	return (Color)v;
+      }
+      void SetColor (Color color)
+      { parent = (RedBlackTreeNode*)(((uintptr_t)parent & (uintptr_t)~1) | (uint)color); }
+    private:
+      /// Pointer to parent, but also stores color in LSB.
+      RedBlackTreeNode* parent;
+    public:
+      //@{
+      /// Accessor for node field.
+      inline RedBlackTreeNode* GetLeft() const { return left; }
+      inline RedBlackTreeNode* GetRight() const { return right; }
+      inline K& GetKey () { return *((K*)&key); }
+      inline const K& GetKey () const { return *((K*)&key); }
+      //@}
+    };
+  } // namespace Container
+} // namespace CS
 
 /**
  * A red-black-tree.
@@ -43,52 +93,48 @@
  * \remark Uses csComparator<> for key comparisons.
  * \remark Only stores keys. If you need a key-value-map, look at 
  *  csRedBlackTreeMap.
+ * \remark The allocator has to return memory blocks at least aligned to
+ *  two byte boundaries. (This usually already the case.)
+ * \remark Allocation requests to the allocator have a size of
+ *  <tt>csRedBlackTree&lt;K&gt;::allocationUnitSize</tt>.
  */
-template <typename K>
+template <typename K,
+          typename Allocator =
+            csFixedSizeAllocator<sizeof(CS::Container::RedBlackTreeNode<K>)> >
 class csRedBlackTree
 {
 protected:
-  enum NodeColor { Black = 0, Red = 1 };
-  /// A node in the tree
-  struct Node
-  {
-  private:
-    /// Pointer to parent, but also stores color in LSB.
-    Node* parent;
-  public:
-    Node* left;
-    Node* right;
-    uint8 key[sizeof(K)];
-    
-    Node() : parent(0) {}
-    ~Node() { ((K*)&key)->~K(); }
-    inline Node* GetParent() const
-    { return (Node*)((uintptr_t)parent & (uintptr_t)~1); }
-    void SetParent(Node* p)
-    { parent = (Node*)(((uintptr_t)p & (uintptr_t)~1) | (uint)GetColor()); }
-    NodeColor GetColor() const
-    { // Expression split over two statements to pacify some broken gcc's which
-      // barf saying "can't convert Node* to NodeColor".
-      uintptr_t const v = ((uintptr_t)parent & 1); 
-      return (NodeColor)v;
-    }
-    void SetColor (NodeColor color)
-    { parent = (Node*)(((uintptr_t)parent & (uintptr_t)~1) | (uint)color); }
-  };
-  csBlockAllocator<Node, CS::Memory::AllocatorAlign<2> > nodeAlloc;
+  typedef CS::Container::RedBlackTreeNode<K> Node;
+public:
+  enum { allocationUnitSize = sizeof (Node) };
+protected:
+  CS::Memory::AllocatorPointerWrapper<Node, Allocator> root;
   
-  Node* root;
+  Node* AllocNode ()
+  {
+    Node* p = (Node*)root.Alloc (allocationUnitSize);
+    CS_ASSERT_MSG("Allocator returned block that is not 2-byte-aligned",
+      (uintptr_t(p) & 1) == 0);
+    new (p) Node;
+    return p;
+  }
+  
+  void FreeNode (Node* p)
+  {
+    p->~Node();
+    root.Free (p);
+  }
   
   /// Locate the place where a new node needs to be inserted.
   Node* RecursiveInsert (Node* parent, Node*& node, const K& key)
   {
     if (node == 0)
     {
-      node = nodeAlloc.Alloc();
+      node = AllocNode();
       node->SetParent (parent);
       node->left = node->right = 0;
       new ((K*)&node->key) K (key);
-      node->SetColor (Red);
+      node->SetColor (Node::Red);
       return node;
     }
     else
@@ -109,7 +155,7 @@ protected:
       pivotReplace->left->SetParent (pivot);
     pivotReplace->SetParent (pivot->GetParent());
     if (pivot->GetParent() == 0)
-      root = pivotReplace;
+      root.p = pivotReplace;
     else
     {
       if (pivot == pivot->GetParent()->left)
@@ -129,7 +175,7 @@ protected:
       pivotReplace->right->SetParent (pivot);
     pivotReplace->SetParent (pivot->GetParent());
     if (pivot->GetParent() == 0)
-      root = pivotReplace;
+      root.p = pivotReplace;
     else
     {
       if (pivot == pivot->GetParent()->left)
@@ -142,10 +188,10 @@ protected:
   }
   /// Check whether a node is black. Note that 0 nodes are by definition black.
   bool IsBlack (Node* node) const
-  { return (node == 0) || (node->GetColor() == Black); }
+  { return (node == 0) || (node->GetColor() == Node::Black); }
   /// Check whether a node is red.
   bool IsRed (Node* node) const
-  { return (node != 0) && (node->GetColor() == Red); }
+  { return (node != 0) && (node->GetColor() == Node::Red); }
   /// Fix up the RB tree after an insert.
   void InsertFixup (Node* node)
   {
@@ -160,9 +206,9 @@ protected:
 	if (IsRed (y))
 	{
 	  // Uncle of 'node' is red
-	  p->SetColor (Black);
-	  y->SetColor (Black);
-	  pp->SetColor (Red);
+	  p->SetColor (Node::Black);
+	  y->SetColor (Node::Black);
+	  pp->SetColor (Node::Red);
 	  node = pp;
 	}
 	else 
@@ -176,8 +222,8 @@ protected:
 	    pp = p->GetParent();
 	  }
 	  // Uncle of 'node' is black, node is left child
-	  p->SetColor (Black);
-	  pp->SetColor (Red);
+	  p->SetColor (Node::Black);
+	  pp->SetColor (Node::Red);
 	  RotateRight (pp);
 	}
       }
@@ -187,9 +233,9 @@ protected:
 	if (IsRed (y))
 	{
 	  // Uncle of 'node' is red
-	  p->SetColor (Black);
-	  y->SetColor (Black);
-	  pp->SetColor (Red);
+	  p->SetColor (Node::Black);
+	  y->SetColor (Node::Black);
+	  pp->SetColor (Node::Red);
 	  node = pp;
 	}
 	else 
@@ -203,13 +249,13 @@ protected:
 	    pp = p->GetParent();
 	  }
 	  // Uncle of 'node' is black, node is right child
-	  p->SetColor (Black);
-	  pp->SetColor (Red);
+	  p->SetColor (Node::Black);
+	  pp->SetColor (Node::Red);
 	  RotateLeft (pp);
 	}
       }
     }
-    root->SetColor (Black);
+    root.p->SetColor (Node::Black);
   }
   
   /// Delete a node from the tree.
@@ -231,7 +277,7 @@ protected:
     else
       nilParent = y->GetParent();
     if (y->GetParent() == 0)
-      root = x;
+      root.p = x;
     else
     {
       if (y == y->GetParent()->left)
@@ -244,14 +290,14 @@ protected:
       // Copy key
       *((K*)&node->key) = *((K*)&y->key);
     }
-    if (y->GetColor() == Black)
+    if (y->GetColor() == Node::Black)
       DeleteFixup (x, nilParent);
-    nodeAlloc.Free (y);
+    FreeNode (y);
   }
   /// Fix up the RB tree after a deletion.
   void DeleteFixup (Node* node, Node* nilParent)
   {
-    while ((node != root) && IsBlack (node))
+    while ((node != root.p) && IsBlack (node))
     {
       Node* p = node ? node->GetParent() : nilParent;
       if (node == p->left)
@@ -259,32 +305,32 @@ protected:
 	Node* w = p->right;
 	if (IsRed (w))
 	{
-	  w->SetColor (Black);
-	  p->SetColor (Red);
+	  w->SetColor (Node::Black);
+	  p->SetColor (Node::Red);
 	  RotateLeft (p);
 	  p = node ? node->GetParent() : nilParent;
 	  w = p->right;
 	}
 	if (IsBlack (w->left) && IsBlack (w->right))
 	{
-	  w->SetColor (Red);
+	  w->SetColor (Node::Red);
 	  node = p;
 	}
 	else
 	{
 	  if (IsBlack (w->right))
 	  {
-	    w->left->SetColor (Red);
-	    w->SetColor (Red);
+	    w->left->SetColor (Node::Red);
+	    w->SetColor (Node::Red);
 	    RotateRight (w);
 	    p = node ? node->GetParent() : nilParent;
 	    w = p->right;
 	  }
 	  w->SetColor (p->GetColor ());
-	  p->SetColor (Black);
-	  w->right->SetColor (Black);
+	  p->SetColor (Node::Black);
+	  w->right->SetColor (Node::Black);
 	  RotateLeft (p);
-	  node = root;
+	  node = root.p;
 	}
       }
       else
@@ -292,36 +338,36 @@ protected:
 	Node* w = p->left;
 	if (IsRed (w))
 	{
-	  w->SetColor (Black);
-	  p->SetColor (Red);
+	  w->SetColor (Node::Black);
+	  p->SetColor (Node::Red);
 	  RotateRight (p);
 	  p = node ? node->GetParent() : nilParent;
 	  w = p->left;
 	}
 	if (IsBlack (w->left) && IsBlack (w->right))
 	{
-	  w->SetColor (Red);
+	  w->SetColor (Node::Red);
 	  node = p;
 	}
 	else
 	{
 	  if (IsBlack (w->left))
 	  {
-	    w->right->SetColor (Red);
-	    w->SetColor (Red);
+	    w->right->SetColor (Node::Red);
+	    w->SetColor (Node::Red);
 	    RotateLeft (w);
 	    p = node ? node->GetParent() : nilParent;
 	    w = p->left;
 	  }
 	  w->SetColor (p->GetColor ());
-	  p->SetColor (Black);
-	  w->left->SetColor (Black);
+	  p->SetColor (Node::Black);
+	  w->left->SetColor (Node::Black);
 	  RotateRight (p);
-	  node = root;
+	  node = root.p;
 	}
       }
     }
-    if (node != 0) node->SetColor (Black);
+    if (node != 0) node->SetColor (Node::Black);
   }
   /// Find the node for a key.
   Node* LocateNode (Node* node, const K& key) const
@@ -514,12 +560,21 @@ protected:
       to = 0; 
       return;
     }
-    to = nodeAlloc.Alloc();
+    to = AllocNode ();
     to->SetParent (parent);
     to->SetColor (from->GetColor());
     new ((K*)&to->key) K (*((K*)&from->key));
     RecursiveCopy (to->left, to, from->left);
     RecursiveCopy (to->right, to, from->right);
+  }
+  
+  /// Recursively delete a subtree
+  void RecursiveDelete (Node* node)
+  {
+    if (node == 0) return;
+    RecursiveDelete (node->left);
+    RecursiveDelete (node->right);
+    FreeNode (node);
   }
 public:
   /**
@@ -527,13 +582,13 @@ public:
    * \param allocatorBlockSize Block size in bytes used by the internal block
    *  allocator for nodes.
    */
-  csRedBlackTree (size_t allocatorBlockSize = 4096) : 
-    nodeAlloc (allocatorBlockSize / sizeof(Node)), root(0) { }
-  csRedBlackTree (const csRedBlackTree& other) : 
-    nodeAlloc (other.nodeAlloc.GetBlockElements())
+  csRedBlackTree (const Allocator& alloc = Allocator()) : root(alloc, 0) { }
+  csRedBlackTree (const csRedBlackTree& other) : root (other.root, 0)
   {
-    RecursiveCopy (root, 0, other.root);
+    RecursiveCopy (root.p, 0, other.root.p);
   }
+  /// Destroy the tree
+  ~csRedBlackTree() { RecursiveDelete (root.p); }
 
   /**
    * Insert a key.
@@ -542,7 +597,7 @@ public:
    */
   const K* Insert (const K& key)
   {
-    Node* n = RecursiveInsert (0, root, key);
+    Node* n = RecursiveInsert (0, root.p, key);
     if (n == 0) return 0;
     InsertFixup (n);
     return (K*)&n->key;
@@ -554,7 +609,7 @@ public:
    */
   bool Delete (const K& key)
   {
-    Node* n = LocateNode (root, key);
+    Node* n = LocateNode (root.p, key);
     if (n == 0) return false;
     DeleteNode (n);
     return true;
@@ -566,7 +621,7 @@ public:
    */
   bool DeleteExact (const K* key)
   {
-    Node* n = LocateNodeExact (root, key);
+    Node* n = LocateNodeExact (root.p, key);
     if (n == 0) return false;
     DeleteNode (n);
     return true;
@@ -574,7 +629,7 @@ public:
   /// Check whether a key is in the tree.
   bool In (const K& key) const
   {
-    return (LocateNode (root, key) != 0);
+    return (LocateNode (root.p, key) != 0);
   }
   /**
    * Check whether a key is in the tree.
@@ -588,12 +643,12 @@ public:
   template<typename K2>
   const K* Find (const K2& other) const
   {
-    return RecursiveFind<K2> (root, other);
+    return RecursiveFind<K2> (root.p, other);
   }
   template<typename K2>
   const K& Find (const K2& other, const K& fallback) const
   {
-    return RecursiveFind<K2>  (root, other, fallback);
+    return RecursiveFind<K2>  (root.p, other, fallback);
   }
   //@}
   
@@ -602,33 +657,33 @@ public:
   template<typename K2>
   const K* FindSmallestGreaterEqual (const K2& other) const
   {
-    return RecursiveFindSGE<K2> (root, other);
+    return RecursiveFindSGE<K2> (root.p, other);
   }
   template<typename K2>
   const K& FindSmallestGreaterEqual (const K2& other, 
                                      const K& fallback) const
   {
-    return RecursiveFindSGE<K2>  (root, other, fallback);
+    return RecursiveFindSGE<K2>  (root.p, other, fallback);
   }
   //@}
   
   /// Delete all keys.
   void DeleteAll()
   {
-    nodeAlloc.Empty();
-    root = 0;
+    RecursiveDelete (root.p);
+    root.p = 0;
   }
   /// Delete all the keys. (Idiomatic alias for DeleteAll().)
   void Empty() { DeleteAll(); }
   /// Returns whether this tree has no nodes.
-  bool IsEmpty() const { return (root == 0); }
+  bool IsEmpty() const { return (root.p == 0); }
 
   //@{
   /// Traverse tree.
   template <typename CB>
   void TraverseInOrder (CB& callback) const
   {
-    if (root != 0) RecursiveTraverseInOrder (root, callback);
+    if (root.p != 0) RecursiveTraverseInOrder (root.p, callback);
   }
   //@}
 
@@ -741,7 +796,7 @@ public:
 
   protected:
     friend class csRedBlackTree;
-    Iterator (csRedBlackTree<K>* tree) : currentNode (tree->root)
+    Iterator (csRedBlackTree<K>* tree) : currentNode (tree->root.p)
     {
       while (currentNode && currentNode->left != 0)
         currentNode = currentNode->left;
@@ -773,7 +828,7 @@ public:
     Node* newNode;
     if (nPred == 0)
     {
-      newNode = root;
+      newNode = root.p;
       if (newNode != 0)
       {
         while (newNode->left != 0) newNode = newNode->left;
@@ -824,10 +879,14 @@ public:
  * Key-value-map, backed by csRedBlackTree.
  * \remark As with csRedBlackTree, every key must be unique.
  */
-template <typename K, typename T>
-class csRedBlackTreeMap : protected csRedBlackTree<csRedBlackTreePayload<K, T> >
+template <typename K, typename T,
+          typename Allocator =
+            csFixedSizeAllocator<
+              sizeof(CS::Container::RedBlackTreeNode<
+                      csRedBlackTreePayload<K, T> >)> >
+class csRedBlackTreeMap : protected csRedBlackTree<csRedBlackTreePayload<K, T>, Allocator>
 {
-  typedef csRedBlackTree<csRedBlackTreePayload<K, T> > supahclass;
+  typedef csRedBlackTree<csRedBlackTreePayload<K, T>, Allocator > supahclass;
 
   template<typename CB>
   class TraverseCB
@@ -841,6 +900,11 @@ class csRedBlackTreeMap : protected csRedBlackTree<csRedBlackTreePayload<K, T> >
     }
   };
 public:
+  enum { allocationUnitSize = supahclass::allocationUnitSize };
+
+  csRedBlackTreeMap (const Allocator& alloc = Allocator())
+   : supahclass (alloc) {}
+
   /**
    * Add element to map,
    * \return A pointer to the copy of the value stored in the tree, or 0 if the
@@ -947,14 +1011,14 @@ public:
   protected:
     friend class csRedBlackTreeMap;
     ConstIterator (const csRedBlackTreeMap<K, T>* tree)
-      : currentNode (tree->root)
+      : currentNode (tree->root.p)
     {
-      while (currentNode && currentNode->left != 0)
-        currentNode = currentNode->left;
+      while (currentNode && currentNode->GetLeft() != 0)
+        currentNode = currentNode->GetLeft();
     }
 
   private:
-    const typename csRedBlackTreeMap<K, T>::Node *currentNode;
+    const typename csRedBlackTreeMap<K, T, Allocator>::Node *currentNode;
   };
   friend class ConstIterator;
 
@@ -971,7 +1035,7 @@ public:
     /// Get the next element's value.
     T& Next (K& key)
     {
-      csRedBlackTreePayload<K, T>& d = *((csRedBlackTreePayload<K, T>*)&currentNode->key);
+      csRedBlackTreePayload<K, T>& d = currentNode->GetKey();
       currentNode = Successor (currentNode);
       key = d.GetKey ();
       return d.GetValue ();
@@ -979,22 +1043,22 @@ public:
 
     T& Next ()
     {
-      csRedBlackTreePayload<K, T>& d = *((csRedBlackTreePayload<K, T>*)&currentNode->key);
+      csRedBlackTreePayload<K, T>& d = currentNode->GetKey();
       currentNode = Successor (currentNode);
       return d.GetValue ();
     }
 
   protected:
     friend class csRedBlackTreeMap;
-    Iterator (csRedBlackTreeMap<K, T>* tree)
-      : currentNode (tree->root)
+    Iterator (csRedBlackTreeMap<K, T, Allocator>* tree)
+      : currentNode (tree->root.p)
     {
-      while (currentNode && currentNode->left != 0)
-        currentNode = currentNode->left;
+      while (currentNode && currentNode->GetLeft() != 0)
+        currentNode = currentNode->GetLeft();
     }
 
   private:
-    typename csRedBlackTreeMap<K, T>::Node *currentNode;
+    typename csRedBlackTreeMap<K, T, Allocator>::Node *currentNode;
   };
   friend class Iterator;
 
@@ -1011,7 +1075,7 @@ public:
     /// Get the next element's value.
     const T& Next (K& key)
     {
-      const csRedBlackTreePayload<K, T>& d = *((const csRedBlackTreePayload<K, T>*)&currentNode->key);
+      const csRedBlackTreePayload<K, T>& d = currentNode->GetKey();
       currentNode = Predecessor (currentNode);
       key = d.GetKey ();
       return d.GetValue ();
@@ -1020,22 +1084,22 @@ public:
     /// Get the next element's value.
     const T& Next ()
     {
-      const csRedBlackTreePayload<K, T>& d = *((const csRedBlackTreePayload<K, T>*)&currentNode->key);
+      const csRedBlackTreePayload<K, T>& d = currentNode->GetKey();
       currentNode = Predecessor (currentNode);      
       return d.GetValue ();
     }
 
   protected:
     friend class csRedBlackTreeMap;
-    ConstReverseIterator (const csRedBlackTreeMap<K, T>* tree)
-      : currentNode (tree->root)
+    ConstReverseIterator (const csRedBlackTreeMap<K, T, Allocator>* tree)
+      : currentNode (tree->root.p)
     {
-      while (currentNode->right != 0)
-        currentNode = currentNode->right;
+      while (currentNode->GetRight() != 0)
+        currentNode = currentNode->GetRight();
     }
 
   private:
-    const typename csRedBlackTreeMap<K, T>::Node *currentNode;
+    const typename csRedBlackTreeMap<K, T, Allocator>::Node *currentNode;
   };
   friend class ConstReverseIterator;
 
@@ -1067,15 +1131,15 @@ public:
 
   protected:
     friend class csRedBlackTreeMap;
-    ReverseIterator (csRedBlackTreeMap<K, T>* tree)
-      : currentNode (tree->root)
+    ReverseIterator (csRedBlackTreeMap<K, T, Allocator>* tree)
+      : currentNode (tree->root.p)
     {
-      while (currentNode && currentNode->right != 0)
-        currentNode = currentNode->right;
+      while (currentNode && currentNode->GetRight() != 0)
+        currentNode = currentNode->GetRight();
     }
 
   private:
-    typename csRedBlackTreeMap<K, T>::Node *currentNode;
+    typename csRedBlackTreeMap<K, T, Allocator>::Node *currentNode;
   };
   friend class ReverseIterator;
 
