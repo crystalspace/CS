@@ -187,7 +187,7 @@ THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadTexture, const char* fname,
   }
 
   csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-  LoadImageTC (itr, fname, Format, do_verbose);
+  LoadImageTC (itr, false, fname, Format, do_verbose);
   csRef<iImage> Image = scfQueryInterfaceSafe<iImage>(itr->GetResultRefPtr());
   if (!Image)
   {
@@ -275,6 +275,12 @@ THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadTexture, csRef<iDataBuffer> buf, i
   }
 
   ret->SetResult(csRef<iBase>(TexHandle));
+
+  if(sync)
+  {
+    Engine->SyncEngineListsNow(this);
+  }
+
   return true;
 }
 
@@ -289,7 +295,7 @@ THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadTexture, const char* Name,
 
   csRef<iImage> img;
   csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-  if (!LoadTextureTC (itr, buf, Flags, texman, &img, do_verbose))
+  if (!LoadTextureTC (itr, false, buf, Flags, texman, &img, do_verbose))
   {
     return false;
   }
@@ -321,6 +327,12 @@ THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadTexture, const char* Name,
   }
 
   ret->SetResult(csRef<iBase>(TexWrapper));
+
+  if(sync)
+  {
+    Engine->SyncEngineListsNow(this);
+  }
+
   return true;
 }
 
@@ -335,7 +347,7 @@ THREADED_CALLABLE_IMPL10(csThreadedLoader, LoadTexture, const char* name,
 
   csRef<iImage> img;
   csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-  if (!LoadTextureTC (itr, FileName, Flags, texman, &img, do_verbose))
+  if (!LoadTextureTC (itr, false, FileName, Flags, texman, &img, do_verbose))
   {
     return false;
   }
@@ -375,6 +387,12 @@ THREADED_CALLABLE_IMPL10(csThreadedLoader, LoadTexture, const char* name,
   }
 
   ret->SetResult(csRef<iBase>(TexWrapper));
+
+  if(sync)
+  {
+    Engine->SyncEngineListsNow(this);
+  }
+
   return true;
 }
 
@@ -666,7 +684,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
             return 0;
           }
 
-          cstldr->LoadImageTC (ret, fname, Format, false);
+          cstldr->LoadImageTC (ret, false, fname, Format, false);
           cube->SetSubImage (4, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
           break;
         }    
@@ -681,7 +699,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
               child, "Expected VFS filename for 'file'!");
             return 0;
           }
-          cstldr->LoadImageTC (ret, fname, Format, false);
+          cstldr->LoadImageTC (ret, false, fname, Format, false);
           cube->SetSubImage (5, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
           break;
         }    
@@ -696,7 +714,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-  cstldr->LoadImageTC (ret, fname, Format, false);
+  cstldr->LoadImageTC (ret, false, fname, Format, false);
 	cube->SetSubImage (0, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
         break;
     
@@ -711,7 +729,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-  cstldr->LoadImageTC (ret, fname, Format, false);
+  cstldr->LoadImageTC (ret, false, fname, Format, false);
 	cube->SetSubImage (1, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
         break;
     
@@ -726,7 +744,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-  cstldr->LoadImageTC (ret, fname, Format, false);
+  cstldr->LoadImageTC (ret, false, fname, Format, false);
 	cube->SetSubImage (2, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
         break;
     
@@ -741,7 +759,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-  cstldr->LoadImageTC (ret, fname, Format, false);
+  cstldr->LoadImageTC (ret, false, fname, Format, false);
 	cube->SetSubImage (3, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
         break;
     }
@@ -834,7 +852,7 @@ csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-  cstldr->LoadImageTC (ret, fname, Format, false);
+  cstldr->LoadImageTC (ret, false, fname, Format, false);
 	vol->AddImage (csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
         break;
     }

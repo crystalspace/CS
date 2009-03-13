@@ -37,22 +37,6 @@ public:
   
   virtual iObjectRegistry* GetObjectRegistry() const = 0;
 
-  template<typename A1>
-  void RunMethod1(bool (T::*method)(A1), void const** &args)
-  {
-      T* mySelf = (T*)this;
-      A1* a1 = (A1*)args[1];
-      if((mySelf->*method)(*a1))
-      {
-        (*a1)->MarkSuccessful();
-      }
-      (*a1)->MarkFinished();
-      TEventMemPool* mempool = (TEventMemPool*)args[0];
-      a1->Invalidate();
-      delete mempool;
-      delete[] args;
-  }
-
   template<typename A1, typename A2>
   void RunMethod2(bool (T::*method)(A1, A2), void const** &args)
   {

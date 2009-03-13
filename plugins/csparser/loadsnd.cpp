@@ -67,6 +67,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     ret->SetResult(csRef<iBase>(Sound));
+
+    if(sync)
+    {
+      Engine->SyncEngineListsNow(this);
+    }
+
     return true;
   }
 
@@ -79,7 +85,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-    if (!LoadSoundSysDataTC (itr, fname, do_verbose))
+    if (!LoadSoundSysDataTC (itr, false, fname, do_verbose))
     {
       return false;
     }
@@ -96,6 +102,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     ret->SetResult(csRef<iBase>(stream));
+
+    if(sync)
+    {
+      Engine->SyncEngineListsNow(this);
+    }
+
     return true;
   }
 
@@ -109,7 +121,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     // load the sound handle
     csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-    if (!LoadSoundSysDataTC (itr, fname, do_verbose))
+    if (!LoadSoundSysDataTC (itr, false, fname, do_verbose))
     {
       return false;
     }
@@ -119,6 +131,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iSndSysData> data = scfQueryInterface<iSndSysData>(itr->GetResultRefPtr());
     wrapper->SetData(data);
     ret->SetResult(csRef<iBase>(wrapper));
+
+    if(sync)
+    {
+      Engine->SyncEngineListsNow(this);
+    }
+
     return true;
   }
 }

@@ -435,7 +435,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         name);
       csRef<iThreadManager> tman = csQueryRegistry<iThreadManager>(object_reg);
       csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(tman));
-      loader->LoadTextureTC(itr, name, name, CS_TEXTURE_3D, tm, true, false, true, collection,
+      loader->LoadTextureTC(itr, false, name, name, CS_TEXTURE_3D, tm, true, false, true, collection,
         KEEP_ALL, do_verbose);
       result = scfQueryInterfaceSafe<iTextureWrapper>(itr->GetResultRefPtr());
     }

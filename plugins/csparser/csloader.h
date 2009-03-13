@@ -107,9 +107,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       const char* override_name = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL);
 
   private:
-    csRef<iEngine> engine;
     csRef<iThreadedLoader> loader;
-    csWeakRef<iThreadManager> threadman;
   };
 
 #include "csutil/deprecated_warn_on.h"

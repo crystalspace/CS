@@ -674,23 +674,18 @@ void WalkTest::InitCollDet (iEngine* engine, iCollection* collection)
 
 void WalkTest::LoadLibraryData (iCollection* collection)
 {
-  csRef<iThreadReturn> itr = LevelLoader->LoadTexture ("cslogo2", "/lib/std/cslogo2.png",
+  csRef<iThreadReturn> itr = LevelLoader->LoadTextureWait ("cslogo2", "/lib/std/cslogo2.png",
     CS_TEXTURE_2D, 0, true, true, true, csRef<iCollection>(collection));
-  csRef<iThreadReturn> itr2 = LevelLoader->LoadLibraryFile ("/lib/std/library", collection);
-  
-  itr->Wait();
   if(!itr->WasSuccessful())
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "logo failed to load!\n");
   }
 
-  itr2->Wait();
+  csRef<iThreadReturn> itr2 = LevelLoader->LoadLibraryFileWait ("/lib/std/library", collection);
   if(!itr2->WasSuccessful())
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "std library failed to load!\n");
   }
-
-  Engine->SyncEngineListsNow(LevelLoader);
 }
 
 bool WalkTest::Create2DSprites ()
@@ -1036,15 +1031,15 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     {
       collection = Engine->CreateCollection (map->map_dir);
     }
-    csRef<iThreadReturn> ret = LevelLoader->LoadMapFile ("world", false, collection,
+
+    csRef<iThreadReturn> ret = LevelLoader->LoadMapFileWait ("world", false, collection,
       0, 0, KEEP_ALL, cmdline->GetBoolOption("verbose", false));
-    ret->Wait();
+
     if(!ret->WasSuccessful())
     {
       Report (CS_REPORTER_SEVERITY_ERROR, "Failing to load map!");
       return false;
     }
-    Engine->SyncEngineListsNow(LevelLoader);
 
     if (do_collections)
     {

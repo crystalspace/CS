@@ -662,7 +662,7 @@ public:
   {
     csRef<iThreadReturn> itr;
     itr.AttachNew(new csThreadReturn(tman));
-    SyncEngineListsTC(itr, loader, true);
+    SyncEngineListsTC(itr, false, loader, true);
   }
 
 private:
