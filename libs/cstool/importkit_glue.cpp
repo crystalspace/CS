@@ -91,8 +91,8 @@ namespace Utility
       csRef<iEngine> engine = csQueryRegistryOrLoad<iEngine> (objectReg,
 	"crystalspace.engine.3d");
       if (!engine.IsValid()) return false;
-      csRef<iLoader> loader = csQueryRegistryOrLoad<iLoader> (objectReg,
-	"crystalspace.level.loader");
+      csRef<iThreadedLoader> loader = csQueryRegistryOrLoad<iThreadedLoader> (objectReg,
+	"crystalspace.level.threadedloader");
       if (!loader.IsValid()) return false;
 
       csString collectionName;
@@ -111,8 +111,8 @@ namespace Utility
 	if (error != 0)
 	  return false;
 
-	csLoadResult rc = loader->Load (doc->GetRoot(), loadCollection);
-	if (!rc.success)
+	csRef<iThreadReturn> rc = loader->LoadNodeWait (doc->GetRoot(), loadCollection);
+  if (!rc->WasSuccessful())
 	  return false;
       }
 

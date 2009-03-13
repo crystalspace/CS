@@ -1142,8 +1142,8 @@ bool csEngine::Prepare (iProgressMeter *meter)
 
 void csEngine::RemoveLight (iLight* light)
 {
-  if (light->GetSector ())
-    light->GetSector ()->GetLights ()->Remove (light);
+  if (light->GetMovable ()->GetSectors ()->GetCount() > 0)
+    light->GetMovable ()->GetSectors ()->Get(0)->GetLights ()->Remove (light);
 }
 
 void csEngine::SetVFSCacheManager (const char* vfspath)

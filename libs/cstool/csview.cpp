@@ -136,10 +136,10 @@ void csView::UpdateView ()
   float scale_x = ((float)G3D->GetWidth ())  / ((float)OldWidth);
   float scale_y = ((float)G3D->GetHeight ()) / ((float)OldHeight);
 
-  Camera->SetPerspectiveCenter (Camera->GetShiftX() * scale_x,
-                                Camera->GetShiftY() * scale_y);
+  GetPerspectiveCamera()->SetPerspectiveCenter (GetPerspectiveCamera()->GetShiftX() * scale_x,
+                                GetPerspectiveCamera()->GetShiftY() * scale_y);
 
-  Camera->SetFOVAngle (Camera->GetFOVAngle(), G3D->GetWidth());
+  GetPerspectiveCamera()->SetFOVAngle (GetPerspectiveCamera()->GetFOVAngle(), G3D->GetWidth());
 
   OldWidth = G3D->GetWidth ();
   OldHeight = G3D->GetHeight ();

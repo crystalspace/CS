@@ -811,7 +811,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
                     target->GetValue());
                   if (light)
                   {
-                    offset = light->GetCenter();
+                    offset = light->GetMovable()->GetPosition();
                   }
                 }
               }

@@ -73,10 +73,10 @@ namespace CS
       else
 	svHdrScale->SetValue (csVector4 (1, 1, 0, 0));
 	
-      csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
+      csRef<iThreadedLoader> loader (csQueryRegistry<iThreadedLoader> (objectReg));
       if (!loader) return false;
-      csRef<iShader> map =
-	loader->LoadShader ("/shader/postproc/hdr/default-map.xml");
+      csRef<iThreadReturn> itr = loader->LoadShaderWait ("/shader/postproc/hdr/default-map.xml");
+      csRef<iShader> map = scfQueryInterface<iShader>(itr->GetResultRefPtr());
       if (!map) return false;
       measureLayer = postEffects.GetLastLayer();
       mappingLayer = postEffects.AddLayer (map);

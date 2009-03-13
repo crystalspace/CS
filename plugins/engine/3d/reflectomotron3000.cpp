@@ -127,16 +127,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
       {
         csRef<iView> sideView;
         sideView.AttachNew (new csView (engine, engine->G3D));
-        iCamera* cam = sideView->GetCamera();
-        cam->SetViewportSize (textureSize, textureSize);
-        cam->SetSector (meshSector);
-        cam->GetTransform().SetOrigin (meshPos);
+        iPerspectiveCamera* cam = sideView->GetPerspectiveCamera();
+        cam->GetCamera()->SetViewportSize (textureSize, textureSize);
+        cam->GetCamera()->SetSector (meshSector);
+        cam->GetCamera()->GetTransform().SetOrigin (meshPos);
         cam->SetFOVAngle (90, textureSize);
         cam->SetPerspectiveCenter (textureSize / 2, textureSize/ 2);
         sideView->SetRectangle (0, 0, textureSize, textureSize);
         sideView->GetMeshFilter ().AddFilterMesh (meshwrap);
 
-        csOrthoTransform& camTF = cam->GetTransform();
+        csOrthoTransform& camTF = cam->GetCamera()->GetTransform();
         camTF.LookAt (lookAtVecs[i*2], lookAtVecs[i*2 + 1]);
 
         rmTargets->RegisterRenderTarget (envTex, sideView, i, 

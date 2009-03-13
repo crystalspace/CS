@@ -41,10 +41,10 @@ namespace CS
       measureOpts.noTextureReuse = true;
       measureLayer->SetOptions (measureOpts);
       
-      csRef<iLoader> loader (csQueryRegistry<iLoader> (objReg));
+      csRef<iThreadedLoader> loader (csQueryRegistry<iThreadedLoader> (objReg));
       CS_ASSERT(loader);
-      csRef<iShader> tonemap =
-	loader->LoadShader ("/shader/postproc/hdr/identity-map.xml");
+      csRef<iThreadReturn> itr = loader->LoadShaderWait ("/shader/postproc/hdr/identity-map.xml");
+      csRef<iShader> tonemap = scfQueryInterface<iShader>(itr->GetResultRefPtr());
       hdr.SetMappingShader (tonemap);
     
       csRef<iShaderManager> shaderManager =

@@ -514,7 +514,7 @@ PostEffectLayersParser::PostEffectLayersParser (iObjectRegistry* objReg)
 {
   InitTokenTable (xmltokens);
   synldr = csQueryRegistry<iSyntaxService> (objReg);
-  loader = csQueryRegistry<iLoader> (objReg);
+  loader = csQueryRegistry<iThreadedLoader> (objReg);
 }
 
 bool PostEffectLayersParser::ParseInputs (iDocumentNode* node, 
@@ -612,7 +612,8 @@ bool PostEffectLayersParser::ParseLayer (iDocumentNode* node,
   csRef<iShader> shaderObj = shaders.Get (shader, 0);
   if (!shaderObj.IsValid())
   {
-    shaderObj = loader->LoadShader (shader);
+    csRef<iThreadReturn> itr = loader->LoadShaderWait (shader);
+    shaderObj = scfQueryInterface<iShader>(itr->GetResultRefPtr());
     if (!shaderObj.IsValid()) return false;
     shaders.Put (shader, shaderObj);
   }

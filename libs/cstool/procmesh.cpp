@@ -50,7 +50,7 @@ void csMeshOnTexture::ScaleCamera (iMeshWrapper* mesh, int txtw, int txth)
   UpdateView (txtw, txth);
   csBox3 mesh_box = mesh->GetWorldBoundingBox ();
   csVector3 mesh_center = mesh_box.GetCenter ();
-  iCamera* camera = view->GetCamera ();
+  iPerspectiveCamera* camera = view->GetPerspectiveCamera ();
   float aspect = float (camera->GetFOV ());
   float shift_x = camera->GetShiftX ();
   float shift_y = camera->GetShiftY ();
@@ -75,11 +75,11 @@ void csMeshOnTexture::ScaleCamera (iMeshWrapper* mesh, int txtw, int txth)
   for (i = 0 ; i < 8 ; i++)
   {
     csVector3 corner = mesh_box.GetCorner (i) - cam_pos;
-    csVector2 p = camera->Perspective (corner);
+    csVector2 p = view->GetCamera()->Perspective (corner);
   }
 
-  camera->GetTransform ().Identity ();
-  camera->GetTransform ().SetOrigin (cam_pos);
+  view->GetCamera()->GetTransform ().Identity ();
+  view->GetCamera()->GetTransform ().SetOrigin (cam_pos);
 }
 
 void csMeshOnTexture::ScaleCamera (iMeshWrapper* mesh, float distance)
@@ -102,8 +102,8 @@ void csMeshOnTexture::UpdateView (int w, int h)
     view->GetCamera ()->SetViewportSize (w, h);
     view->SetRectangle (0, 0, w, h);
     view->UpdateClipper ();
-    view->GetCamera ()->SetPerspectiveCenter (w/2, h/2);
-    view->GetCamera ()->SetFOV (h, w);
+    view->GetPerspectiveCamera ()->SetPerspectiveCenter (w/2, h/2);
+    view->GetPerspectiveCamera ()->SetFOV (h, w);
     cur_w = w;
     cur_h = h;
   }

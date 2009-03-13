@@ -287,11 +287,11 @@ bool RMShadowedPSSM::RenderView (iView* view)
   rview.AttachNew (new (treePersistent.renderViewPool) 
     CS::RenderManager::RenderView(view));
 #include "csutil/custom_new_enable.h"
-  iCamera* c = view->GetCamera ();
+  iPerspectiveCamera* c = view->GetPerspectiveCamera ();
   iGraphics3D* G3D = rview->GetGraphics3D ();
   int frameWidth = G3D->GetWidth ();
   int frameHeight = G3D->GetHeight ();
-  c->SetViewportSize (frameWidth, frameHeight);
+  c->GetCamera()->SetViewportSize (frameWidth, frameHeight);
   view->GetEngine ()->UpdateNewFrame ();  
   view->GetEngine ()->FireStartFrame (rview);
 
@@ -449,10 +449,10 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   else
     renderLayerRefract = renderLayer;
   
-  csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
+  csRef<iThreadedLoader> loader (csQueryRegistry<iThreadedLoader> (objectReg));
   if (!layersValid)
   {
-    if (!loader->LoadShader ("/shader/lighting/lighting_default.xml"))
+    if (!loader->LoadShaderWait ("/shader/lighting/lighting_default.xml")->WasSuccessful())
     {
       csReport (objectReg, CS_REPORTER_SEVERITY_WARNING,
 	"crystalspace.rendermanager.test1",
