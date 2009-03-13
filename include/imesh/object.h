@@ -262,17 +262,6 @@ struct iMeshObject : public virtual iBase
   virtual uint GetMixMode () const = 0;
 
   /**
-   * Material changed. This is an 'event' that the engine (or another
-   * party managing materials) will send out as soon as the material
-   * handles are changed in some way which requires the mesh object
-   * to fetch it again (i.e. to call materialwrapper->GetMaterialHandle())
-   * again.
-   * \deprecated Deprecated in 1.3. Obsolete and unused.
-   */
-  CS_DEPRECATED_METHOD_MSG("Obsolete and unused.")
-  virtual void InvalidateMaterialHandles () = 0;
-
-  /**
    * The engine asks this mesh object to place one of his hierarchical
    * children. It must be placed where it should be at the given time.
    * This object might or might not have been drawn, so you can't use 

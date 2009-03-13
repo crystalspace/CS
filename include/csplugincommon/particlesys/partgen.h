@@ -53,8 +53,6 @@ struct iObjectRegistry;
 struct iEngine;
 struct iMeshWrapper;
 
-#include "csutil/deprecated_warn_off.h"
-
 /**
  * This class represents a particle system. It is a set of iParticles.
  * Subclasses of this class may be of more interest to users.
@@ -373,7 +371,7 @@ public:
     SetupMixMode ();
   }
   virtual uint GetMixMode () const { return MixMode; }
-  virtual void InvalidateMaterialHandles () { }
+
   /**
    * see imesh/object.h for specification. The default implementation
    * does nothing.
@@ -426,8 +424,6 @@ public:
   void SetAccel (int idx, const csVector3& acl)
   { part_accel[idx] = acl; }
 };
-
-#include "csutil/deprecated_warn_on.h"
 
 /** @} */
 

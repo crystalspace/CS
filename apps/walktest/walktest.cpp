@@ -239,7 +239,7 @@ void WalkTest::Help ()
   csRef<iConfigManager> cfg (csQueryRegistry<iConfigManager> (object_reg));
   csPrintf ("Options for WalkTest:\n");
   csPrintf ("  -exec=<script>     execute given script at startup\n");
-  csPrintf ("  -threaded          use threaded loading (default no)\n");
+  csPrintf ("  -threaded          use threaded loading (default yes)\n");
   csPrintf ("  -[no]colldet       collision detection system (default '%scolldet')\n", collider_actor.HasCD () ? "" : "no");
   csPrintf ("  -[no]logo          draw logo (default '%slogo')\n", do_logo ? "" : "no");
   csPrintf ("  -[no]collections   load every map in a separate collection (default no)\n");

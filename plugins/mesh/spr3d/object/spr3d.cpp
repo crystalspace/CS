@@ -1133,7 +1133,8 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n,
     level_of_detail = GetLodLevel (csQsqrt (wor_sq_dist));
 
     // reduce LOD based on field-of-view
-    float aspect = 2 * (float) tan (camera->GetFOVAngle () * PI / 360);
+    csRef<iPerspectiveCamera> pcam = scfQueryInterfaceSafe<iPerspectiveCamera>(camera);
+    float aspect = 2 * (float) tan (pcam->GetFOVAngle () * PI / 360);
     level_of_detail *= aspect;
 
     if (level_of_detail < 0) level_of_detail = 0;

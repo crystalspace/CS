@@ -1901,11 +1901,6 @@ void csThing::DrawPolygonArrayDPM (
 
 }
 
-void csThing::InvalidateMaterialHandles ()
-{
-
-}
-
 void csThing::GetBoundingBox (iMovable *movable, csBox3 &box)
 {
   if (wor_bbox_movablenr != movable->GetUpdateNumber ())
