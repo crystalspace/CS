@@ -110,6 +110,8 @@ namespace CS
       
       dbgDrawPortalOutlines =
         dbgPersist.RegisterDebugFlag ("draw.portals.outline");
+      dbgDrawPortalPlanes =
+        dbgPersist.RegisterDebugFlag ("draw.portals.planes");
       dbgShowPortalTextures =
         dbgPersist.RegisterDebugFlag ("textures.portals");
     }
