@@ -16988,7 +16988,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetMaterialWrapper = *cspacec::iMeshObject_GetMaterialWrapper;
 *SetMixMode = *cspacec::iMeshObject_SetMixMode;
 *GetMixMode = *cspacec::iMeshObject_GetMixMode;
-*InvalidateMaterialHandles = *cspacec::iMeshObject_InvalidateMaterialHandles;
 *PositionChild = *cspacec::iMeshObject_PositionChild;
 *BuildDecal = *cspacec::iMeshObject_BuildDecal;
 *scfGetVersion = *cspacec::iMeshObject_scfGetVersion;
