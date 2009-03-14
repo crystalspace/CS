@@ -449,10 +449,10 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   else
     renderLayerRefract = renderLayer;
   
-  csRef<iThreadedLoader> loader (csQueryRegistry<iThreadedLoader> (objectReg));
+  csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
   if (!layersValid)
   {
-    if (!loader->LoadShaderWait ("/shader/lighting/lighting_default.xml")->WasSuccessful())
+    if (!loader->LoadShader ("/shader/lighting/lighting_default.xml").IsValid())
     {
       csReport (objectReg, CS_REPORTER_SEVERITY_WARNING,
 	"crystalspace.rendermanager.test1",

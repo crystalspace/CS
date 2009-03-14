@@ -674,15 +674,14 @@ void WalkTest::InitCollDet (iEngine* engine, iCollection* collection)
 
 void WalkTest::LoadLibraryData (iCollection* collection)
 {
-  csRef<iThreadReturn> itr = LevelLoader->LoadTextureWait ("cslogo2", "/lib/std/cslogo2.png",
+  csRef<iTextureWrapper> tex = LevelLoader->LoadTexture ("cslogo2", "/lib/std/cslogo2.png",
     CS_TEXTURE_2D, 0, true, true, true, csRef<iCollection>(collection));
-  if(!itr->WasSuccessful())
+  if(!tex.IsValid())
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "logo failed to load!\n");
   }
 
-  csRef<iThreadReturn> itr2 = LevelLoader->LoadLibraryFileWait ("/lib/std/library", collection);
-  if(!itr2->WasSuccessful())
+  if(!LevelLoader->LoadLibraryFile ("/lib/std/library", collection))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "std library failed to load!\n");
   }
@@ -952,9 +951,10 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   Engine->SetSaveableFlag (doSave);
 
   // Find the level loader plugin
-  LevelLoader = csQueryRegistry<iThreadedLoader>(object_reg);
+  LevelLoader = csQueryRegistry<iLoader>(object_reg);
+  TLevelLoader = csQueryRegistry<iThreadedLoader>(object_reg);
 
-  if (!LevelLoader)
+  if (!LevelLoader || !TLevelLoader)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No level loader plugin!");
     return false;
@@ -1032,7 +1032,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       collection = Engine->CreateCollection (map->map_dir);
     }
 
-    csRef<iThreadReturn> ret = LevelLoader->LoadMapFileWait ("world", false, collection,
+    csRef<iThreadReturn> ret = TLevelLoader->LoadMapFileWait (myVFS->GetCwd(), "world", false, collection,
       0, 0, KEEP_ALL, cmdline->GetBoolOption("verbose", false));
 
     if(!ret->WasSuccessful())

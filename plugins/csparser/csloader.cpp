@@ -53,31 +53,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   csPtr<iImage> csLoader::LoadImage (iDataBuffer* buf, int Format)
   {
-    vfs->SetSyncDir(vfs->GetCwd());
-    csRef<iThreadReturn> itr = loader->LoadImageWait(buf, Format);
+    csRef<iThreadReturn> itr = loader->LoadImageWait(vfs->GetCwd(), buf, Format);
     return scfQueryInterfaceSafe<iImage>(itr->GetResultRefPtr());
   }
 
   csPtr<iImage> csLoader::LoadImage (const char *fname, int Format)
   {
-    vfs->SetSyncDir(vfs->GetCwd());
-    csRef<iThreadReturn> itr = loader->LoadImageWait(fname, Format);
+    csRef<iThreadReturn> itr = loader->LoadImageWait(vfs->GetCwd(), fname, Format);
     return scfQueryInterfaceSafe<iImage>(itr->GetResultRefPtr());
   }
 
   csPtr<iTextureHandle> csLoader::LoadTexture (iDataBuffer* buf,
     int Flags, iTextureManager *tm , csRef<iImage>* img)
   {
-    vfs->SetSyncDir(vfs->GetCwd());
-    csRef<iThreadReturn> itr = loader->LoadTextureWait(buf, Flags, tm, img);
+    csRef<iThreadReturn> itr = loader->LoadTextureWait(vfs->GetCwd(), buf, Flags, tm, img);
     return scfQueryInterfaceSafe<iTextureHandle>(itr->GetResultRefPtr());
   }
 
   iTextureWrapper* csLoader::LoadTexture (const char *name, iDataBuffer* buf,
     int Flags, iTextureManager *tm, bool reg, bool create_material, bool free_image)
   {
-    vfs->SetSyncDir(vfs->GetCwd());
-    csRef<iThreadReturn> itr = loader->LoadTextureWait(name, buf, Flags, tm, reg, create_material, free_image);
+    csRef<iThreadReturn> itr = loader->LoadTextureWait(vfs->GetCwd(), name, buf, Flags, tm, reg, create_material, free_image);
     csRef<iTextureWrapper> ret = scfQueryInterfaceSafe<iTextureWrapper>(itr->GetResultRefPtr());
     return ret;
   }
@@ -85,51 +81,44 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   csPtr<iTextureHandle> csLoader::LoadTexture (const char* fname,
     int Flags, iTextureManager *tm, csRef<iImage>* img)
   {
-    vfs->SetSyncDir(vfs->GetCwd());
-    csRef<iThreadReturn> itr = loader->LoadTextureWait(fname, Flags, tm, img);
+    csRef<iThreadReturn> itr = loader->LoadTextureWait(vfs->GetCwd(), fname, Flags, tm, img);
     return scfQueryInterfaceSafe<iTextureHandle>(itr->GetResultRefPtr());
   }
 
   csPtr<iSndSysData> csLoader::LoadSoundSysData (const char *fname)
   {
-    vfs->SetSyncDir(vfs->GetCwd());
-    csRef<iThreadReturn> itr = loader->LoadSoundSysDataWait(fname);
+    csRef<iThreadReturn> itr = loader->LoadSoundSysDataWait(vfs->GetCwd(), fname);
     return scfQueryInterfaceSafe<iSndSysData>(itr->GetResultRefPtr());
   }
 
   csPtr<iSndSysStream> csLoader::LoadSoundStream (const char *fname, int mode3d)
   {
-    vfs->SetSyncDir(vfs->GetCwd());
-    csRef<iThreadReturn> itr = loader->LoadSoundStreamWait(fname, mode3d);
+    csRef<iThreadReturn> itr = loader->LoadSoundStreamWait(vfs->GetCwd(), fname, mode3d);
     return scfQueryInterfaceSafe<iSndSysStream>(itr->GetResultRefPtr());
   }
 
   iSndSysWrapper* csLoader::LoadSoundWrapper (const char *name, const char *fname)
   {
-    vfs->SetSyncDir(vfs->GetCwd());
-    csRef<iThreadReturn> itr = loader->LoadSoundWrapperWait(name, fname);
+    csRef<iThreadReturn> itr = loader->LoadSoundWrapperWait(vfs->GetCwd(), name, fname);
     csRef<iSndSysWrapper> ret = scfQueryInterfaceSafe<iSndSysWrapper>(itr->GetResultRefPtr());
     return ret;
   }
 
   csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname, iStreamSource* ssource)
   {
-    vfs->SetSyncDir(vfs->GetCwd());
-    csRef<iThreadReturn> itr = loader->LoadMeshObjectFactoryWait(fname, ssource);
+    csRef<iThreadReturn> itr = loader->LoadMeshObjectFactoryWait(vfs->GetCwd(), fname, ssource);
     return scfQueryInterfaceSafe<iMeshFactoryWrapper>(itr->GetResultRefPtr());
   }
 
   csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname, iStreamSource* ssource)
   {
-    vfs->SetSyncDir(vfs->GetCwd());
-    csRef<iThreadReturn> itr = loader->LoadMeshObjectWait(fname, ssource);
+    csRef<iThreadReturn> itr = loader->LoadMeshObjectWait(vfs->GetCwd(), fname, ssource);
     return scfQueryInterfaceSafe<iMeshWrapper>(itr->GetResultRefPtr());
   }
 
   csRef<iShader> csLoader::LoadShader (const char* filename, bool registerShader)
   {
-    vfs->SetSyncDir(vfs->GetCwd());
-    csRef<iThreadReturn> itr = loader->LoadShaderWait(filename, registerShader);
+    csRef<iThreadReturn> itr = loader->LoadShaderWait(vfs->GetCwd(), filename, registerShader);
     return scfQueryInterfaceSafe<iShader>(itr->GetResultRefPtr());
   }
 
@@ -137,8 +126,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     iTextureManager *tm, bool reg, bool create_material, bool free_image,
     iCollection* collection, uint keepFlags)
   {
-    vfs->SetSyncDir(vfs->GetCwd());
-    csRef<iThreadReturn> itr = loader->LoadTextureWait(Name, FileName, Flags, tm, reg,
+    csRef<iThreadReturn> itr = loader->LoadTextureWait(vfs->GetCwd(), Name, FileName, Flags, tm, reg,
       create_material, free_image, collection, keepFlags);
     csRef<iTextureWrapper> ret = scfQueryInterfaceSafe<iTextureWrapper>(itr->GetResultRefPtr());
     return ret;
@@ -148,8 +136,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource, iMissingLoaderData* missingdata,
     uint keepFlags)
   {
-    vfs->SetSyncDir(vfs->GetCwd());
-    csRef<iThreadReturn> itr = loader->LoadMapFileWait(filename, clearEngine, collection,
+    csRef<iThreadReturn> itr = loader->LoadMapFileWait(vfs->GetCwd(), filename, clearEngine, collection,
       ssource, missingdata, keepFlags);
     return itr->WasSuccessful();
   }
@@ -158,8 +145,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool searchCollectionOnly, bool checkDupes, iStreamSource* ssource, iMissingLoaderData* missingdata,
     uint keepFlags)
   {
-    vfs->SetSyncDir(vfs->GetCwd());
-    csRef<iThreadReturn> itr = loader->LoadMapWait(world_node, clearEngine, collection,
+    csRef<iThreadReturn> itr = loader->LoadMapWait(vfs->GetCwd(), world_node, clearEngine, collection,
       ssource, missingdata, keepFlags);
     return itr->WasSuccessful();
   }
@@ -167,16 +153,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   bool csLoader::LoadLibraryFile (const char* filename, iCollection* collection, bool searchCollectionOnly,
     bool checkDupes, iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags)
   {
-    vfs->SetSyncDir(vfs->GetCwd());
-    csRef<iThreadReturn> itr = loader->LoadLibraryFileWait(filename, collection, ssource, missingdata, keepFlags);
+    csRef<iThreadReturn> itr = loader->LoadLibraryFileWait(vfs->GetCwd(), filename, collection, ssource, missingdata, keepFlags);
     return itr->WasSuccessful();
   }
 
   bool csLoader::LoadLibrary (iDocumentNode* lib_node, iCollection* collection, bool searchCollectionOnly,
     bool checkDupes, iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags)
   {
-    vfs->SetSyncDir(vfs->GetCwd());
-    csRef<iThreadReturn> itr = loader->LoadLibraryWait(lib_node, collection, ssource, missingdata, keepFlags);
+    csRef<iThreadReturn> itr = loader->LoadLibraryWait(vfs->GetCwd(), lib_node, collection, ssource, missingdata, keepFlags);
     return itr->WasSuccessful();
   }
 
@@ -184,8 +168,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool checkDupes, iStreamSource* ssource, const char* override_name, iMissingLoaderData* missingdata,
     uint keepFlags)
   {
-    vfs->SetSyncDir(vfs->GetCwd());
-    csRef<iThreadReturn> itr = loader->LoadFileWait(fname, collection, ssource, missingdata, keepFlags);
+    csRef<iThreadReturn> itr = loader->LoadFileWait(vfs->GetCwd(), fname, collection, ssource, missingdata, keepFlags);
     csLoadResult ret;
     ret.success = itr->WasSuccessful();
     ret.result = itr->GetResultRefPtr();
@@ -196,8 +179,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool checkDupes, iStreamSource* ssource, const char* override_name, iMissingLoaderData* missingdata,
     uint keepFlags)
   {
-    vfs->SetSyncDir(vfs->GetCwd());
-    csRef<iThreadReturn> itr = loader->LoadBufferWait(buffer, collection, ssource, missingdata, keepFlags);
+    csRef<iThreadReturn> itr = loader->LoadBufferWait(vfs->GetCwd(), buffer, collection, ssource, missingdata, keepFlags);
     csLoadResult ret;
     ret.success = itr->WasSuccessful();
     ret.result = itr->GetResultRefPtr();
@@ -208,8 +190,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool checkDupes, iStreamSource* ssource, const char* override_name, iMissingLoaderData* missingdata,
     uint keepFlags)
   {
-    vfs->SetSyncDir(vfs->GetCwd());
-    csRef<iThreadReturn> itr = loader->LoadNodeWait(node, collection, ssource, missingdata, keepFlags);
+    csRef<iThreadReturn> itr = loader->LoadNodeWait(vfs->GetCwd(), node, collection, ssource, missingdata, keepFlags);
     csLoadResult ret;
     ret.success = itr->WasSuccessful();
     ret.result = itr->GetResultRefPtr();

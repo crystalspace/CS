@@ -249,7 +249,8 @@ public:
    */
   csRef<iEngine> Engine;
   /// The level loaders
-  csRef<iThreadedLoader> LevelLoader;
+  csRef<iLoader> LevelLoader;
+  csRef<iThreadedLoader> TLevelLoader;
   ///
   csRef<iGraphics2D> myG2D;
   csRef<iGraphics3D> myG3D;

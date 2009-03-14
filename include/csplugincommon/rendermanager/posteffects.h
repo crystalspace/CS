@@ -33,7 +33,7 @@
 #include "ivideo/shader/shader.h"
 
 struct iGraphics3D;
-struct iThreadedLoader;
+struct iLoader;
 struct iObjectRegistry;
 struct iRenderView;
 struct iShader;
@@ -380,7 +380,7 @@ namespace RenderManager
     csStringHash xmltokens;
     iObjectRegistry* objReg;
     csRef<iSyntaxService> synldr;
-    csRef<iThreadedLoader> loader;
+    csRef<iLoader> loader;
     
     typedef csHash<PostEffectManager::Layer*, csString> ParsedLayers;
     typedef csDirtyAccessArray<PostEffectManager::LayerInputMap> InputsArray;

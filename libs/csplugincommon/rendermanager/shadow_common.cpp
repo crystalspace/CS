@@ -46,9 +46,8 @@ namespace CS
 	  csString().Format ("RenderManager.Shadows.%s.Shader.Default", shadowType));
       if (defaultShader != 0)
       {
-	csRef<iThreadedLoader> loader (csQueryRegistry<iThreadedLoader> (objReg));
-  csRef<iThreadReturn> itr = loader->LoadShaderWait (defaultShader);
-  shadowDefaultShader = scfQueryInterface<iShader>(itr->GetResultRefPtr());
+	csRef<iLoader> loader (csQueryRegistry<iLoader> (objReg));
+  shadowDefaultShader = loader->LoadShader (defaultShader);
       }
       
       const char* postEffectsLayers = cfg->GetStr (

@@ -399,7 +399,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if (!filename.IsEmpty ())
     {
       csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-      if(!LoadImageTC (ret, false, filename, Format, false))
+      if(!LoadImageTC (ret, false, vfs->GetCwd(), filename, Format, false))
       {
         SyntaxService->Report("crystalspace.maploader.parse.texture",
           CS_REPORTER_SEVERITY_WARNING, node, "Could not load image %s!", filename.GetData());
@@ -609,7 +609,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           if (!texh)
           {
             csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-            LoadTextureTC(itr, false, txtname, txtname, CS_TEXTURE_3D, 0, true, false, true,
+            LoadTextureTC(itr, false, vfs->GetCwd(), txtname, txtname, CS_TEXTURE_3D, 0, true, false, true,
               ldr_context->GetCollection(), ldr_context->GetKeepFlags(), true);
             texh = scfQueryInterface<iTextureWrapper>(itr->GetResultRefPtr());
             if(!texh)

@@ -1004,7 +1004,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   if(tm->RunNow(queueType, Wait || wait, forceQueue)) \
   { \
     type* objTC = const_cast<type*>(this); \
-    if(objTC->function##TC(ret, Wait || wait, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11) \
+    if(objTC->function##TC(ret, Wait || wait, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11)) \
     { \
       ret->MarkSuccessful(); \
     } \
