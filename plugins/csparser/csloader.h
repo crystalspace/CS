@@ -108,6 +108,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   private:
     csRef<iThreadedLoader> loader;
+    csRef<iVFS> vfs;
   };
 
 #include "csutil/deprecated_warn_on.h"
