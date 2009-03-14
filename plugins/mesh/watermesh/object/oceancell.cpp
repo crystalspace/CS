@@ -51,19 +51,19 @@ void csOceanCell::SetupVertices()
     {
       default:
       case LOD_LEVEL_1:
-        gran = 0.1;
+        gran = 0.1f;
         break;
       case LOD_LEVEL_2:
-        gran = 0.2;
+        gran = 0.2f;
         break;
       case LOD_LEVEL_3:
-        gran = 0.5;
+        gran = 0.5f;
         break;
       case LOD_LEVEL_4:
-        gran = 1.0;
+        gran = 1.0f;
         break;
       case LOD_LEVEL_5:
-        gran = 2.0;
+        gran = 2.0f;
         break;
     }
   
@@ -73,7 +73,7 @@ void csOceanCell::SetupVertices()
       {
         verts.Push(csVector3 ((i * wid / (wid * gran - 1)), oHeight, (j * len / (len * gran - 1))));
         norms.Push(csVector3 (0, 1, 0));
-        cols.Push(csColor (0.17,0.27,0.26));
+        cols.Push(csColor (0.17f,0.27f,0.26f));
         //texs.Push(csVector2(i, j));
         texs.Push(csVector2((i * wid / (wid * gran - 1)) / 1.5, (j * len / (len * gran - 1)) / 1.5));
       }
