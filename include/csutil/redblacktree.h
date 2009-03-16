@@ -782,14 +782,14 @@ public:
     /// Get the next element's value without advancing the iterator.
     const K& PeekNext ()
     {
-      const K& ret = *((const K*)&currentNode->GetKey());
+      const K& ret = currentNode->GetKey();
       return ret;
     }
 
     /// Get the next element's value.
     const K& Next ()
     {
-      const K& ret = *((const K*)&currentNode->GetKey());
+      const K& ret = currentNode->GetKey();
       currentNode = Successor (currentNode);
       return ret;
     }
