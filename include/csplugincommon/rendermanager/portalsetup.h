@@ -271,9 +271,12 @@ namespace RenderManager
           // Finish up the sector
           if (!portal->CompleteSector (rview))
             continue;
-
+	  
           size_t count = allPortalVertsNums[pi];
           if (count == 0) continue;
+	  
+	  iSector* sector = portal->GetSector ();
+	  bool skipRec = sector->GetRecLevel() >= portal->GetMaximumSectorVisit();
 
 	  if (debugDraw)
 	  {
@@ -288,7 +291,8 @@ namespace RenderManager
 		v1.y = screenH - v1.y;
 		v2.y = screenH - v2.y;
 		renderTree.AddDebugLineScreen (v1, v2,
-		  isSimple ? csRGBcolor (0, 255, 0) : csRGBcolor (255, 0, 0));
+		  isSimple ? csRGBcolor (0, 255, int(skipRec) * 255)
+				: csRGBcolor (255, 0, int (skipRec) * 255));
 	      }
 	    }
 	    if (renderTree.IsDebugFlagEnabled (persistentData.dbgDrawPortalPlanes))
@@ -304,21 +308,26 @@ namespace RenderManager
 	      guessedCenter /= numOrgVerts;
 	      csTransform identity;
 	      renderTree.AddDebugPlane (portal->GetWorldPlane(), identity,
-		isSimple ? csColor (0, 1, 0) : csColor (1, 0, 0),
+		isSimple ? csColor (0, 1, int (skipRec)) : csColor (1, 0, int (skipRec)),
 		guessedCenter);
 	    }
 	  }
-
-          if (IsSimplePortal (portalFlags))
-          {
-	    SetupSimplePortal (context, setupData, portal, portalVerts2d, count,
-		screenW, screenH, holder);
-          }
-          else
-          {
-	    SetupHeavyPortal (context, setupData, portal, portalVerts2d, portalVerts3d, count,
-		screenW, screenH, holder);
-          }
+	  
+	  if (!skipRec)
+	  {
+	    sector->IncRecLevel();
+	    if (IsSimplePortal (portalFlags))
+	    {
+	      SetupSimplePortal (context, setupData, portal, sector,
+		  portalVerts2d, count, screenW, screenH, holder);
+	    }
+	    else
+	    {
+	      SetupHeavyPortal (context, setupData, portal, sector,
+		  portalVerts2d, portalVerts3d, count, screenW, screenH, holder);
+	    }
+	    sector->DecRecLevel();
+	  }
 
 	  portalVerts2d += count;
           portalVerts3d += count;
@@ -363,7 +372,7 @@ namespace RenderManager
 
     void SetupSimplePortal (
       typename RenderTreeType::ContextNode& context,
-      ContextSetupData& setupData, iPortal* portal,
+      ContextSetupData& setupData, iPortal* portal, iSector* sector,
       csVector2* portalVerts2d, size_t count,
       int screenW, int screenH,
       typename RenderTreeType::ContextNode::PortalHolder& holder)
@@ -376,7 +385,7 @@ namespace RenderManager
       rview->CreateRenderContext ();
       rview->SetLastPortal (portal);
       rview->SetPreviousSector (rview->GetThisSector ());
-      rview->SetThisSector (portal->GetSector ());
+      rview->SetThisSector (sector);
       csPolygonClipper newView (portalVerts2d, count);
       rview->SetViewDimensions (screenW, screenH);
       rview->SetClipper (&newView);
@@ -403,7 +412,7 @@ namespace RenderManager
 
     void SetupHeavyPortal (
       typename RenderTreeType::ContextNode& context,
-      ContextSetupData& setupData, iPortal* portal,
+      ContextSetupData& setupData, iPortal* portal, iSector* sector,
       csVector2* portalVerts2d, csVector3* portalVerts3d, size_t count,
       int screenW, int screenH,
       typename RenderTreeType::ContextNode::PortalHolder& holder)
@@ -538,7 +547,7 @@ namespace RenderManager
       // Setup simple portal
       newRenderView->SetLastPortal (portal);
       newRenderView->SetPreviousSector (rview->GetThisSector ());
-      newRenderView->SetThisSector (portal->GetSector ());
+      newRenderView->SetThisSector (sector);
       newRenderView->SetViewDimensions (real_w, real_h);
       /* @@@ FIXME Without the +1 pixels of the portal stay unchanged upon
        * rendering */
@@ -629,7 +638,7 @@ namespace RenderManager
 		created,  rview->GetCurrentFrameNumber());
       nameStr.Format ("[portal from %s to %s]",
 		rview->GetThisSector()->QueryObject()->GetName(),
-		portal->GetSector()->QueryObject()->GetName());
+		sector->QueryObject()->GetName());
       rm->db_mesh_name = nameStr;
 #else
       rm->db_mesh_name = "[portal]";
