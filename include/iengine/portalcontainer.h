@@ -82,6 +82,8 @@ struct iPortalContainer : public virtual iBase
    * \remarks The polygon vertices are stored in a flat fashion. To obtain
    *  the vertices for a certain polygon, sum up the vertex numbers for all
    *  previous polygons and use that as an index into the vertices array.
+   * \remarks Portals that face away from the camera, are culled etc. will
+   *  result in polygons with 0 vertices.
    */
   virtual void ComputeScreenPolygons (iRenderView* rview,
     csVector2* verts2D, csVector3* verts3D, size_t vertsSize,
