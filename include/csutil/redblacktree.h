@@ -36,7 +36,7 @@
 
 /**\addtogroup util_containers
  * @{ */
- 
+
 template <typename K, typename Allocator> class csRedBlackTree;
 
 namespace CS
@@ -51,13 +51,13 @@ namespace CS
     {
     protected:
       enum Color { Black = 0, Red = 1 };
-      
+
       template <class _T, class _A> friend class csRedBlackTree;
-      
+
       RedBlackTreeNode* left;
       RedBlackTreeNode* right;
       uint8 key[sizeof(K)];
-      
+
       RedBlackTreeNode() : parent(0) {}
       ~RedBlackTreeNode() { ((K*)&key)->~K(); }
       inline RedBlackTreeNode* GetParent() const
@@ -67,7 +67,7 @@ namespace CS
       Color GetColor() const
       { // Expression split over two statements to pacify some broken gcc's which
 	// barf saying "can't convert Node* to NodeColor".
-	uintptr_t const v = ((uintptr_t)parent & 1); 
+	uintptr_t const v = ((uintptr_t)parent & 1);
 	return (Color)v;
       }
       void SetColor (Color color)
@@ -91,7 +91,7 @@ namespace CS
  * A red-black-tree.
  * \remark Does not allow duplicate keys.
  * \remark Uses csComparator<> for key comparisons.
- * \remark Only stores keys. If you need a key-value-map, look at 
+ * \remark Only stores keys. If you need a key-value-map, look at
  *  csRedBlackTreeMap.
  * \remark The allocator has to return memory blocks at least aligned to
  *  two byte boundaries. (This usually already the case.)
@@ -109,7 +109,7 @@ public:
   enum { allocationUnitSize = sizeof (Node) };
 protected:
   CS::Memory::AllocatorPointerWrapper<Node, Allocator> root;
-  
+
   Node* AllocNode ()
   {
     Node* p = (Node*)root.Alloc (allocationUnitSize);
@@ -118,13 +118,13 @@ protected:
     new (p) Node;
     return p;
   }
-  
+
   void FreeNode (Node* p)
   {
     p->~Node();
     root.Free (p);
   }
-  
+
   /// Locate the place where a new node needs to be inserted.
   Node* RecursiveInsert (Node* parent, Node*& node, const K& key)
   {
@@ -211,7 +211,7 @@ protected:
 	  pp->SetColor (Node::Red);
 	  node = pp;
 	}
-	else 
+	else
 	{
 	  if (node == p->right)
 	  {
@@ -238,7 +238,7 @@ protected:
 	  pp->SetColor (Node::Red);
 	  node = pp;
 	}
-	else 
+	else
 	{
 	  if (node == p->left)
 	  {
@@ -257,7 +257,7 @@ protected:
     }
     root.p->SetColor (Node::Black);
   }
-  
+
   /// Delete a node from the tree.
   void DeleteNode (Node* node)
   {
@@ -272,7 +272,7 @@ protected:
     else
       x = y->right;
     Node* nilParent = 0;
-    if (x != 0) 
+    if (x != 0)
       x->SetParent (y->GetParent());
     else
       nilParent = y->GetParent();
@@ -373,9 +373,9 @@ protected:
   Node* LocateNode (Node* node, const K& key) const
   {
     if (node == 0) return 0;
-      
+
     int r = csComparator<K, K>::Compare (key, *((K*)&node->key));
-    if (r == 0) 
+    if (r == 0)
       return node;
     else if (r < 0)
       return LocateNode (node->left, key);
@@ -386,7 +386,7 @@ protected:
   Node* LocateNodeExact (Node* node, const K* key) const
   {
     if (node == 0) return 0;
-      
+
     if (key == (K*)&node->key) return node;
     int r = csComparator<K, K>::Compare (*key, *((K*)&node->key));
     if (r == 0)
@@ -488,7 +488,7 @@ protected:
       return RecursiveFind (node->right, other, fallback);
   }
   //@}
-  
+
   //@{
   /// Locate key that is equal to 'other'.
   template<typename K2>
@@ -528,7 +528,7 @@ protected:
       return RecursiveFindSGE<K2> (node->right, other);
   }
   //@}
-  
+
   /// Traverse tree.
   template <typename CB>
   void RecursiveTraverseInOrder (Node* node, CB& callback) const
@@ -557,7 +557,7 @@ protected:
   {
     if (from == 0)
     {
-      to = 0; 
+      to = 0;
       return;
     }
     to = AllocNode ();
@@ -567,7 +567,7 @@ protected:
     RecursiveCopy (to->left, to, from->left);
     RecursiveCopy (to->right, to, from->right);
   }
-  
+
   /// Recursively delete a subtree
   void RecursiveDelete (Node* node)
   {
@@ -604,7 +604,7 @@ public:
   }
   /**
    * Delete a key.
-   * \return Whether the deletion was successful. Fails if the key is not 
+   * \return Whether the deletion was successful. Fails if the key is not
    *  in the tree.
    */
   bool Delete (const K& key)
@@ -616,7 +616,7 @@ public:
   }
   /**
    * Delete a specific instance of a key.
-   * \return Whether the deletion was successful. Fails if the key is not 
+   * \return Whether the deletion was successful. Fails if the key is not
    *  in the tree.
    */
   bool DeleteExact (const K* key)
@@ -637,7 +637,7 @@ public:
    *   considered more idiomatic by some.
    */
   bool Contains (const K& key) const { return In (key); }
-  
+
   //@{
   /// Locate key that is equal to \a other
   template<typename K2>
@@ -651,7 +651,7 @@ public:
     return RecursiveFind<K2>  (root.p, other, fallback);
   }
   //@}
-  
+
   //@{
   /// Locate smallest key greater or equal to \a other
   template<typename K2>
@@ -660,13 +660,13 @@ public:
     return RecursiveFindSGE<K2> (root.p, other);
   }
   template<typename K2>
-  const K& FindSmallestGreaterEqual (const K2& other, 
+  const K& FindSmallestGreaterEqual (const K2& other,
                                      const K& fallback) const
   {
     return RecursiveFindSGE<K2>  (root.p, other, fallback);
   }
   //@}
-  
+
   /// Delete all keys.
   void DeleteAll()
   {
@@ -782,14 +782,14 @@ public:
     /// Get the next element's value without advancing the iterator.
     const K& PeekNext ()
     {
-      const K& ret = *((const K*)&currentNode->key);
+      const K& ret = *((const K*)&currentNode->GetKey());
       return ret;
     }
 
     /// Get the next element's value.
     const K& Next ()
     {
-      const K& ret = *((const K*)&currentNode->key);
+      const K& ret = *((const K*)&currentNode->GetKey());
       currentNode = Successor (currentNode);
       return ret;
     }
@@ -798,8 +798,8 @@ public:
     friend class csRedBlackTree;
     Iterator (csRedBlackTree<K>* tree) : currentNode (tree->root.p)
     {
-      while (currentNode && currentNode->left != 0)
-        currentNode = currentNode->left;
+      while (currentNode && currentNode->GetLeft() != 0)
+        currentNode = currentNode->GetLeft();
     }
 
   private:
@@ -814,7 +814,7 @@ public:
   {
     return Iterator (this);
   }
-  
+
   /**
    * Delete the 'next' element pointed at by the iterator.
    * \remarks Will repoint the iterator to the following element.
@@ -853,7 +853,7 @@ class csRedBlackTreePayload
   T value;
 public:
   csRedBlackTreePayload (const K& k, const T& v) : key(k), value(v) {}
-  csRedBlackTreePayload (const csRedBlackTreePayload& other) : 
+  csRedBlackTreePayload (const csRedBlackTreePayload& other) :
     key(other.key), value(other.value) {}
 
   const K& GetKey() const { return key; }
@@ -929,7 +929,7 @@ public:
   }
   //@{
   /**
-   * Get a pointer to the element matching the given key, or 0 if there is 
+   * Get a pointer to the element matching the given key, or 0 if there is
    * none.
    */
   const T* GetElementPointer (const K& key) const
@@ -1004,7 +1004,7 @@ public:
     const T& Next ()
     {
       const csRedBlackTreePayload<K, T>& d = *((const csRedBlackTreePayload<K, T>*)&currentNode->key);
-      currentNode = Successor (currentNode);      
+      currentNode = Successor (currentNode);
       return d.GetValue ();
     }
 
@@ -1085,7 +1085,7 @@ public:
     const T& Next ()
     {
       const csRedBlackTreePayload<K, T>& d = currentNode->GetKey();
-      currentNode = Predecessor (currentNode);      
+      currentNode = Predecessor (currentNode);
       return d.GetValue ();
     }
 
