@@ -222,7 +222,7 @@ bool RMUnshadowed::RenderView (iView* view)
 
     contextSetup (*startContext, portalData);
   
-    targets.PrepareQueues (shaderManager);
+    targets.StartRendering (shaderManager);
     targets.EnqueueTargets (renderTree, shaderManager, renderLayer, contextsScannedForTargets);
   }
 
@@ -235,8 +235,8 @@ bool RMUnshadowed::RenderView (iView* view)
     HandleTarget (renderTree, ts);
   }
 
+  targets.FinishRendering ();
 
-  targets.PostCleanupQueues ();
   // Render all contexts, back to front
   {
     view->GetContext()->SetZMode (CS_ZBUF_MESH);

@@ -58,6 +58,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
     {
       targets.UnregisterRenderTarget (target, subtexture);
     }
+    virtual void MarkAsUsed (iTextureHandle* target)
+    {
+      targets.MarkAsUsed (target);
+    }
   
     void ClearLayers() { postEffects.ClearLayers(); }
     bool AddLayersFromDocument (iDocumentNode* node)

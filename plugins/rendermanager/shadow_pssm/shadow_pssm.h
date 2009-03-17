@@ -66,7 +66,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
     {
       targets.UnregisterRenderTarget (target, subtexture);
     }
-  
+    virtual void MarkAsUsed (iTextureHandle* target)
+    {
+      targets.MarkAsUsed (target);
+    }
+
     //---- iRenderManagerPostEffects ----
     void ClearLayers() { postEffects.ClearLayers(); }
     bool AddLayersFromDocument (iDocumentNode* node)
