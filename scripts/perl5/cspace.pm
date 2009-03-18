@@ -21139,8 +21139,10 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *updateOnce = *cspacec::iRenderManagerTargets_updateOnce;
+*assumeAlwaysUsed = *cspacec::iRenderManagerTargets_assumeAlwaysUsed;
 *RegisterRenderTarget = *cspacec::iRenderManagerTargets_RegisterRenderTarget;
 *UnregisterRenderTarget = *cspacec::iRenderManagerTargets_UnregisterRenderTarget;
+*MarkAsUsed = *cspacec::iRenderManagerTargets_MarkAsUsed;
 *scfGetVersion = *cspacec::iRenderManagerTargets_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

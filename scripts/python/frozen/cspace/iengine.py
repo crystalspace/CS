@@ -1342,8 +1342,10 @@ class iRenderManagerTargets(core.iBase):
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     updateOnce = _iengine.iRenderManagerTargets_updateOnce
+    assumeAlwaysUsed = _iengine.iRenderManagerTargets_assumeAlwaysUsed
     def RegisterRenderTarget(*args): return _iengine.iRenderManagerTargets_RegisterRenderTarget(*args)
     def UnregisterRenderTarget(*args): return _iengine.iRenderManagerTargets_UnregisterRenderTarget(*args)
+    def MarkAsUsed(*args): return _iengine.iRenderManagerTargets_MarkAsUsed(*args)
     scfGetVersion = staticmethod(_iengine.iRenderManagerTargets_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iRenderManagerTargets
     __del__ = lambda self : None;
