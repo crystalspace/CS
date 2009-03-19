@@ -275,6 +275,20 @@ namespace RenderManager
 
         /// "Local ID" in the context; used for array indexing
         size_t contextLocalId;
+        
+        /**\name Copying render target contents before rendering the mesh.
+         * Setting these fields has the render target contents copied to the
+         * given texture just before the mesh is rendered.
+         * @{ */
+        /// Number of attachment/texture pairs.
+        size_t preCopyNum;
+        /// Array of attachments to be copied.
+        csRenderTargetAttachment preCopyAttachments[rtaNumAttachments];
+        /// Array of textures to be copied to.
+        iTextureHandle* preCopyTextures[rtaNumAttachments];
+        /** @} */
+        
+        SingleMesh () : preCopyNum (0) {}
       };
 
       //-- Types
