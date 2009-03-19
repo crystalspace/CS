@@ -144,10 +144,20 @@ public:
         rmanager->renderLayerRefract);
       RMUnshadowed::AutoReflectRefractType fxRR (
         rmanager->reflectRefractPersistent, ctxRefl, ctxRefr);
+        
+      RMUnshadowed::AutoFramebufferTexType fxFB (
+        rmanager->framebufferTexPersistent);
+      
+      // Set up a functor that combines the AutoFX functors
+      typedef CS::Meta::CompositeFunctorType2<
+        RMUnshadowed::AutoReflectRefractType,
+        RMUnshadowed::AutoFramebufferTexType> FXFunctor;
+      FXFunctor fxf (fxRR, fxFB);
+      
       typedef TraverseUsedSVSets<RenderTreeType,
-        RMUnshadowed::AutoReflectRefractType> SVTraverseType;
+        FXFunctor> SVTraverseType;
       SVTraverseType svTraverser
-        (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+        (fxf, shaderManager->GetSVNameStringset ()->GetSize ());
       // And do the iteration
       ForEachMeshNode (context, svTraverser);
     }
@@ -183,11 +193,11 @@ bool RMUnshadowed::RenderView (iView* view)
   rview.AttachNew (new (treePersistent.renderViewPool) 
     CS::RenderManager::RenderView(view));
 #include "csutil/custom_new_enable.h"
-  iPerspectiveCamera* c = view->GetPerspectiveCamera ();
+  iCamera* c = view->GetCamera ();
   iGraphics3D* G3D = rview->GetGraphics3D ();
   int frameWidth = G3D->GetWidth ();
   int frameHeight = G3D->GetHeight ();
-  c->GetCamera()->SetViewportSize (frameWidth, frameHeight);
+  c->SetViewportSize (frameWidth, frameHeight);
   view->GetEngine ()->UpdateNewFrame ();  
   view->GetEngine ()->FireStartFrame (rview);
 
@@ -201,6 +211,7 @@ bool RMUnshadowed::RenderView (iView* view)
   portalPersistent.UpdateNewFrame ();
   lightPersistent.UpdateNewFrame ();
   reflectRefractPersistent.UpdateNewFrame ();
+  framebufferTexPersistent.UpdateNewFrame ();
 
   iSector* startSector = rview->GetThisSector ();
 
@@ -347,7 +358,7 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
   csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
   if (!layersValid)
   {
-    if (!loader->LoadShader ("/shader/lighting/lighting_default.xml").IsValid())
+    if (!loader->LoadShader ("/shader/lighting/lighting_default.xml"))
     {
       csReport (objectReg, CS_REPORTER_SEVERITY_WARNING,
 	"crystalspace.rendermanager.test1",
@@ -392,6 +403,8 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
     treePersistent.debugPersist);
   lightPersistent.Initialize (objectReg, treePersistent.debugPersist);
   reflectRefractPersistent.Initialize (objectReg, treePersistent.debugPersist,
+    &postEffects);
+  framebufferTexPersistent.Initialize (objectReg,
     &postEffects);
   
   return true;

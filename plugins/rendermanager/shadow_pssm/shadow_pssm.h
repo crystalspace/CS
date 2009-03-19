@@ -19,6 +19,7 @@
 #ifndef __CS_RM_UNSHADOWED_H__
 #define __CS_RM_UNSHADOWED_H__
 
+#include "csplugincommon/rendermanager/autofx_framebuffertex.h"
 #include "csplugincommon/rendermanager/autofx_reflrefr.h"
 #include "csplugincommon/rendermanager/debugcommon.h"
 #include "csplugincommon/rendermanager/hdrexposure.h"
@@ -124,6 +125,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
       ContextSetupType_Unshadowed, ContextSetupType_Unshadowed>
       AutoReflectRefractType_UU;
 
+    typedef CS::RenderManager::AutoFX_FramebufferTex<RenderTreeType>
+      AutoFramebufferTexType;
   public:
     iObjectRegistry* objectReg;
 
@@ -136,6 +139,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
     LightSetupType_Unshadowed::PersistentData lightPersistent_unshadowed;
     CS::RenderManager::AutoFX_ReflectRefract_Base::PersistentData
       reflectRefractPersistent;
+    AutoFramebufferTexType::PersistentData framebufferTexPersistent;
 
     CS::RenderManager::PostEffectManager       postEffects;
     CS::RenderManager::HDRHelper hdr;

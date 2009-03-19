@@ -177,6 +177,10 @@ public:
     SetupStandardTicket (context, shaderManager,
       lightSetup.GetPostLightingLayers());
   
+  
+    RMShadowedPSSM::AutoFramebufferTexType fxFB (
+      rmanager->framebufferTexPersistent);
+    
     switch (rmanager->refrRefrShadows)
     {
       case 0:
@@ -189,10 +193,17 @@ public:
 	   rmanager->renderLayerRefract);
 	  RMShadowedPSSM::AutoReflectRefractType_UU fxRR (
 	    rmanager->reflectRefractPersistent, ctxRefl, ctxRefr);
+	    
+	  // Set up a functor that combines the AutoFX functors
+	  typedef CS::Meta::CompositeFunctorType2<
+	    RMShadowedPSSM::AutoReflectRefractType_UU,
+	    RMShadowedPSSM::AutoFramebufferTexType> FXFunctor;
+	  FXFunctor fxf (fxRR, fxFB);
+	  
 	  typedef TraverseUsedSVSets<RenderTreeType,
-	    RMShadowedPSSM::AutoReflectRefractType_UU> SVTraverseType;
+	    FXFunctor> SVTraverseType;
 	  SVTraverseType svTraverser
-	    (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+	    (fxf, shaderManager->GetSVNameStringset ()->GetSize ());
 	  // And do the iteration
 	  ForEachMeshNode (context, svTraverser);
 	}
@@ -207,10 +218,17 @@ public:
 	   rmanager->renderLayerRefract);
 	  RMShadowedPSSM::AutoReflectRefractType_SU fxRR (
 	    rmanager->reflectRefractPersistent, ctxRefl, ctxRefr);
+	    
+	  // Set up a functor that combines the AutoFX functors
+	  typedef CS::Meta::CompositeFunctorType2<
+	    RMShadowedPSSM::AutoReflectRefractType_SU,
+	    RMShadowedPSSM::AutoFramebufferTexType> FXFunctor;
+	  FXFunctor fxf (fxRR, fxFB);
+	  
 	  typedef TraverseUsedSVSets<RenderTreeType,
-	    RMShadowedPSSM::AutoReflectRefractType_SU> SVTraverseType;
+	    FXFunctor> SVTraverseType;
 	  SVTraverseType svTraverser
-	    (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+	    (fxf, shaderManager->GetSVNameStringset ()->GetSize ());
 	  // And do the iteration
 	  ForEachMeshNode (context, svTraverser);
 	}
@@ -225,10 +243,17 @@ public:
 	   rmanager->renderLayerRefract);
 	  RMShadowedPSSM::AutoReflectRefractType_US fxRR (
 	    rmanager->reflectRefractPersistent, ctxRefl, ctxRefr);
+	    
+	  // Set up a functor that combines the AutoFX functors
+	  typedef CS::Meta::CompositeFunctorType2<
+	    RMShadowedPSSM::AutoReflectRefractType_US,
+	    RMShadowedPSSM::AutoFramebufferTexType> FXFunctor;
+	  FXFunctor fxf (fxRR, fxFB);
+	  
 	  typedef TraverseUsedSVSets<RenderTreeType,
-	    RMShadowedPSSM::AutoReflectRefractType_US> SVTraverseType;
+	    FXFunctor> SVTraverseType;
 	  SVTraverseType svTraverser
-	    (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+	    (fxf, shaderManager->GetSVNameStringset ()->GetSize ());
 	  // And do the iteration
 	  ForEachMeshNode (context, svTraverser);
 	}
@@ -243,10 +268,17 @@ public:
 	   rmanager->renderLayerRefract);
 	  RMShadowedPSSM::AutoReflectRefractType_SS fxRR (
 	    rmanager->reflectRefractPersistent, ctxRefl, ctxRefr);
+	    
+	  // Set up a functor that combines the AutoFX functors
+	  typedef CS::Meta::CompositeFunctorType2<
+	    RMShadowedPSSM::AutoReflectRefractType_SS,
+	    RMShadowedPSSM::AutoFramebufferTexType> FXFunctor;
+	  FXFunctor fxf (fxRR, fxFB);
+	  
 	  typedef TraverseUsedSVSets<RenderTreeType,
-	    RMShadowedPSSM::AutoReflectRefractType_SS> SVTraverseType;
+	    FXFunctor> SVTraverseType;
 	  SVTraverseType svTraverser
-	    (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+	    (fxf, shaderManager->GetSVNameStringset ()->GetSize ());
 	  // And do the iteration
 	  ForEachMeshNode (context, svTraverser);
 	}
@@ -499,6 +531,8 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   lightPersistent.Initialize (objectReg, treePersistent.debugPersist);
   lightPersistent_unshadowed.Initialize (objectReg, treePersistent.debugPersist);
   reflectRefractPersistent.Initialize (objectReg, treePersistent.debugPersist,
+    &postEffects);
+  framebufferTexPersistent.Initialize (objectReg,
     &postEffects);
     
   refrRefrShadows = 0;
