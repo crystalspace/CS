@@ -27,14 +27,9 @@
 #       normalizing all Intel x86 CPU names to the canonical "x86".  Also takes
 #       the normalized name, uppercases it to form a name suitable for the C
 #       preprocessor and publishes it as shell variable cs_host_cpu_normalized.
-#
-#       DEPRECATED: For backward compatibility, additionally sets the
-#       TARGET.PROCESSOR build property to the value of cs_host_cpu_normalized
-#       via the supplied EMITTER. If EMITTER is omitted, then
-#       CS_EMIT_BUILD_PROPERTY()'s default emitter is employed. This feature is
-#       deprecated because the client typically is in a better position to know
-#       to which destinations and under what name the value of
-#       cs_host_cpu_normalized should be emitted.
+#       Additionally, sets the TARGET.PROCESSOR build property to the value of
+#       cs_host_cpu_normalized via the supplied EMITTER. If EMITTER is omitted,
+#       then CS_EMIT_BUILD_PROPERTY()'s default emitter is employed.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_HOST_CPU],
     [AC_REQUIRE([AC_CANONICAL_HOST])
