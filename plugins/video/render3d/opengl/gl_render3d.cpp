@@ -1285,6 +1285,88 @@ void csGLGraphics3D::UnsetRenderTargets()
   needViewportUpdate = true;
 }
 
+void csGLGraphics3D::CopyFromRenderTargets (size_t num,
+  csRenderTargetAttachment* attachments,
+  iTextureHandle** textures,
+  int* subtextures)
+{
+  for (size_t i = 0; i < num; i++)
+  {
+    /* CopyTex(Sub)Image 'chooses' the attachment accorings of the format
+       of the texture copied to; thus, ignore the specified attachment
+       for now ... */
+    iTextureHandle* tex = textures[i];
+    int subtexture = subtextures ? subtextures[i] : 0;
+  
+    csGLBasicTextureHandle* tex_mm = static_cast<csGLBasicTextureHandle*> (tex);
+    tex_mm->Precache ();
+    // Texture is in tha cache, update texture directly.
+    ActivateTexture (tex_mm);
+  
+    GLenum internalFormat = 0;
+  
+    GLenum textarget = tex_mm->GetGLTextureTarget();
+    if ((textarget != GL_TEXTURE_2D)
+	&& (textarget != GL_TEXTURE_3D)  
+	&& (textarget != GL_TEXTURE_RECTANGLE_ARB) 
+	&& (textarget != GL_TEXTURE_CUBE_MAP))
+      return;
+      
+    int txt_w, txt_h;
+    tex_mm->GetRendererDimensions (txt_w, txt_h);
+
+    bool handle_subtexture = (textarget == GL_TEXTURE_CUBE_MAP);
+    bool handle_3d = (textarget == GL_TEXTURE_3D);
+    /* Reportedly, some drivers crash if using CopyTexImage on a texture
+      * size larger than the framebuffer. Use CopyTexSubImage then. */
+    bool needSubImage = (txt_w > viewwidth) 
+      || (txt_h > viewheight);
+    // Texture was not used as a render target before.
+    // Make some necessary adjustments.
+    if (needSubImage)
+    {
+      int orgX = 0;
+      int orgY = scrheight - (csMin (txt_h, viewheight));
+    
+      if (handle_subtexture)
+	glCopyTexSubImage2D (
+	  GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + subtexture,
+	  0, 0, 0, orgX, orgY, 
+	  csMin (txt_w, viewwidth), 
+	  csMin (txt_h, viewheight));
+      else if (handle_3d)
+	ext->glCopyTexSubImage3D (textarget, 0, 0, 0, orgX, orgY,
+	  subtexture,
+	  csMin (txt_w, viewwidth),
+	  csMin (txt_h, viewheight));
+      else
+	glCopyTexSubImage2D (textarget, 0, 0, 0, orgX, orgY, 
+	  csMin (txt_w, viewwidth),
+	  csMin (txt_h, viewheight));
+    }
+    else
+    {
+      int orgX = 0;
+      int orgY = scrheight - txt_h;
+    
+      glGetTexLevelParameteriv ((textarget == GL_TEXTURE_CUBE_MAP) 
+	  ? GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB : textarget, 
+	0, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&internalFormat);
+      
+      if (handle_subtexture)
+	glCopyTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + subtexture, 
+	  0, 0, 0, orgX, orgY, txt_w, txt_h);
+      else if (handle_3d)
+	ext->glCopyTexSubImage3D (textarget, 0, 0, 0, orgX, orgY,
+	  subtexture, txt_w, txt_h);
+      else
+	glCopyTexSubImage2D (textarget, 0,
+	  0, 0, orgX, orgY, txt_w, txt_h);
+    }
+    tex_mm->RegenerateMipmaps();
+  }
+}
+
 bool csGLGraphics3D::BeginDraw (int drawflags)
 {
   (void)drawflagNames; // Pacify compiler when CS_DEBUG not defined.
