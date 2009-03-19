@@ -13057,11 +13057,6 @@ fi
 #------------------------------------------------------------------------------
 # Determine host platform.  Recognized platforms: Unix, Windows, Mac OS X.
 # Recognized families: Unix, Windows.
-#
-# CS_CHECK_HOST
-#	Sets the shell variables cs_host_target and cs_host_family.  Client
-#	code can use these variables to emit appropriate Jam variables and
-#	CS_PLATFORM_FOO header define.
 #------------------------------------------------------------------------------
 
 
@@ -13279,9 +13274,12 @@ fi
 fi
 
 
+
 case $cs_host_target in
     macosx)
-        # We assume that we always have CoreAudio available on MacOS/X.
+        cs_header_text="${cs_header_text}#define CS_PLATFORM_MACOSX
+"
+        # Assume that CoreAudio is always available on Mac OS X.
         cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then
@@ -13296,8 +13294,7 @@ fi
 "
 fi
 
-        cs_header_text="${cs_header_text}#define CS_PLATFORM_MACOSX
-"
+        # Processor-specific optimizations.
         if test -n "$cs_cv_prog_cc_msse"; then
   cs_build_prop_val="$cs_cv_prog_cc_msse"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -75568,32 +75565,21 @@ cs_header_text="${cs_header_text}#define CS_LONG_SIZE $ac_cv_sizeof_long
 
 #------------------------------------------------------------------------------
 # Determine host CPU.
-#
-# CS_CHECK_HOST_CPU
-#	Set the shell variable cs_host_cpu to a normalized form of the CPU name
-#	returned by config.guess/config.sub.  Also takes the normalized name,
-#	uppercases and appends it to the string "CS_PROCESSOR_" to form a name
-#	suitable for the C preprocessor.  Assigns this value to the shell
-#	variable cs_host_cpu_cpp_define.  Typically, Crystal Space's conception
-#	of CPU name is the same as that returned by config.guess/config.sub,
-#	but there may be exceptions as seen in the `case' statement.
 #------------------------------------------------------------------------------
 
-
-
     case $host_cpu in
-	[Ii][3-9]86*|[Xx]86*) cs_host_cpu=x86 ;;
-	powerpc*) cs_host_cpu=powerpc ;;
-	sparc*) cs_host_cpu=sparc ;;
-	*) cs_host_cpu=$host_cpu ;;
+        [Ii][3-9]86*|[Xx]86*) cs_host_cpu=x86 ;;
+        *) cs_host_cpu=$host_cpu ;;
     esac
     cs_host_cpu_normalized="`echo "$cs_host_cpu" | $as_tr_cpp`"
-cs_build_prop_val="$cs_host_cpu_normalized"
+    cs_build_prop_val="$cs_host_cpu_normalized"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}TARGET.PROCESSOR ?= $cs_build_prop_val ;
 "
 fi
+
+
 
 cs_header_text="${cs_header_text}#define CS_PROCESSOR_$cs_host_cpu_normalized
 "
