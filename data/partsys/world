@@ -526,6 +526,106 @@
                 <e c0="4" c1="1" />
                 <e c0="4" c1="4" />
             </renderbuffer>
+            <renderbuffer name="tangent" components="3" type="float">
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+            </renderbuffer>
+            <renderbuffer name="bitangent" components="3" type="float">
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+            </renderbuffer>
             <mixmode>
                 <copy />
             </mixmode>
@@ -533,11 +633,11 @@
                 <material>abstract</material>
                 <indexbuffer components="1" type="uint" indices="yes">
                     <e c0="42" />
-                    <e c0="25" />
-                    <e c0="34" />
-                    <e c0="42" />
                     <e c0="29" />
                     <e c0="25" />
+                    <e c0="42" />
+                    <e c0="25" />
+                    <e c0="34" />
                     <e c0="29" />
                     <e c0="17" />
                     <e c0="25" />
@@ -551,11 +651,11 @@
                     <e c0="9" />
                     <e c0="1" />
                     <e c0="10" />
-                    <e c0="3" />
-                    <e c0="2" />
-                    <e c0="10" />
                     <e c0="11" />
                     <e c0="3" />
+                    <e c0="10" />
+                    <e c0="3" />
+                    <e c0="2" />
                     <e c0="11" />
                     <e c0="4" />
                     <e c0="3" />
@@ -569,11 +669,11 @@
                     <e c0="15" />
                     <e c0="7" />
                     <e c0="13" />
-                    <e c0="18" />
-                    <e c0="5" />
-                    <e c0="13" />
                     <e c0="22" />
                     <e c0="18" />
+                    <e c0="13" />
+                    <e c0="18" />
+                    <e c0="5" />
                     <e c0="30" />
                     <e c0="46" />
                     <e c0="38" />
@@ -581,11 +681,11 @@
                     <e c0="38" />
                     <e c0="26" />
                     <e c0="45" />
-                    <e c0="36" />
-                    <e c0="37" />
-                    <e c0="45" />
                     <e c0="44" />
                     <e c0="36" />
+                    <e c0="45" />
+                    <e c0="36" />
+                    <e c0="37" />
                     <e c0="43" />
                     <e c0="40" />
                     <e c0="32" />
@@ -598,11 +698,11 @@
                 <material>wood</material>
                 <indexbuffer components="1" type="uint" indices="yes">
                     <e c0="0" />
-                    <e c0="19" />
-                    <e c0="16" />
-                    <e c0="0" />
                     <e c0="6" />
                     <e c0="19" />
+                    <e c0="0" />
+                    <e c0="19" />
+                    <e c0="16" />
                     <e c0="16" />
                     <e c0="19" />
                     <e c0="27" />
@@ -616,11 +716,11 @@
                     <e c0="39" />
                     <e c0="33" />
                     <e c0="14" />
-                    <e c0="20" />
-                    <e c0="23" />
-                    <e c0="14" />
                     <e c0="8" />
                     <e c0="20" />
+                    <e c0="14" />
+                    <e c0="20" />
+                    <e c0="23" />
                     <e c0="23" />
                     <e c0="20" />
                     <e c0="28" />
@@ -650,11 +750,23 @@
                 </mixmode>
                 <submesh name="abstract_0">
                     <material>abstract</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
                     <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
                 </submesh>
                 <submesh name="wood_0">
                     <material>wood</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
                     <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
                 </submesh>
                 <renderbuffer name="texture coordinate lightmap" components="2" type="float">
                     <e c0="0.00146484" c1="0.00292969" />
@@ -946,6 +1058,106 @@
                 <e c0="4" c1="1" />
                 <e c0="4" c1="4" />
             </renderbuffer>
+            <renderbuffer name="tangent" components="3" type="float">
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+            </renderbuffer>
+            <renderbuffer name="bitangent" components="3" type="float">
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+            </renderbuffer>
             <mixmode>
                 <copy />
             </mixmode>
@@ -953,11 +1165,11 @@
                 <material>abstract</material>
                 <indexbuffer components="1" type="uint" indices="yes">
                     <e c0="45" />
-                    <e c0="36" />
-                    <e c0="37" />
-                    <e c0="45" />
                     <e c0="44" />
                     <e c0="36" />
+                    <e c0="45" />
+                    <e c0="36" />
+                    <e c0="37" />
                     <e c0="44" />
                     <e c0="35" />
                     <e c0="36" />
@@ -971,11 +1183,11 @@
                     <e c0="40" />
                     <e c0="32" />
                     <e c0="10" />
-                    <e c0="3" />
-                    <e c0="2" />
-                    <e c0="10" />
                     <e c0="11" />
                     <e c0="3" />
+                    <e c0="10" />
+                    <e c0="3" />
+                    <e c0="2" />
                     <e c0="11" />
                     <e c0="4" />
                     <e c0="3" />
@@ -989,11 +1201,11 @@
                     <e c0="15" />
                     <e c0="7" />
                     <e c0="13" />
-                    <e c0="18" />
-                    <e c0="5" />
-                    <e c0="13" />
                     <e c0="22" />
                     <e c0="18" />
+                    <e c0="13" />
+                    <e c0="18" />
+                    <e c0="5" />
                     <e c0="30" />
                     <e c0="46" />
                     <e c0="38" />
@@ -1001,11 +1213,11 @@
                     <e c0="38" />
                     <e c0="26" />
                     <e c0="42" />
-                    <e c0="25" />
-                    <e c0="34" />
-                    <e c0="42" />
                     <e c0="29" />
                     <e c0="25" />
+                    <e c0="42" />
+                    <e c0="25" />
+                    <e c0="34" />
                     <e c0="21" />
                     <e c0="9" />
                     <e c0="1" />
@@ -1018,11 +1230,11 @@
                 <material>wood</material>
                 <indexbuffer components="1" type="uint" indices="yes">
                     <e c0="0" />
-                    <e c0="19" />
-                    <e c0="16" />
-                    <e c0="0" />
                     <e c0="6" />
                     <e c0="19" />
+                    <e c0="0" />
+                    <e c0="19" />
+                    <e c0="16" />
                     <e c0="16" />
                     <e c0="19" />
                     <e c0="27" />
@@ -1036,11 +1248,11 @@
                     <e c0="39" />
                     <e c0="33" />
                     <e c0="14" />
-                    <e c0="20" />
-                    <e c0="23" />
-                    <e c0="14" />
                     <e c0="8" />
                     <e c0="20" />
+                    <e c0="14" />
+                    <e c0="20" />
+                    <e c0="23" />
                     <e c0="23" />
                     <e c0="20" />
                     <e c0="28" />
@@ -1070,11 +1282,23 @@
                 </mixmode>
                 <submesh name="abstract_0">
                     <material>abstract</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
                     <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
                 </submesh>
                 <submesh name="wood_0">
                     <material>wood</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
                     <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
                 </submesh>
                 <renderbuffer name="texture coordinate lightmap" components="2" type="float">
                     <e c0="0.319824" c1="0.00292969" />
@@ -1570,6 +1794,106 @@
                 <e c0="4" c1="1" />
                 <e c0="4" c1="4" />
             </renderbuffer>
+            <renderbuffer name="tangent" components="3" type="float">
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+            </renderbuffer>
+            <renderbuffer name="bitangent" components="3" type="float">
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+            </renderbuffer>
             <mixmode>
                 <copy />
             </mixmode>
@@ -1577,11 +1901,11 @@
                 <material>abstract</material>
                 <indexbuffer components="1" type="uint" indices="yes">
                     <e c0="13" />
-                    <e c0="18" />
-                    <e c0="5" />
-                    <e c0="13" />
                     <e c0="22" />
                     <e c0="18" />
+                    <e c0="13" />
+                    <e c0="18" />
+                    <e c0="5" />
                     <e c0="22" />
                     <e c0="26" />
                     <e c0="18" />
@@ -1595,11 +1919,11 @@
                     <e c0="46" />
                     <e c0="38" />
                     <e c0="45" />
-                    <e c0="36" />
-                    <e c0="37" />
-                    <e c0="45" />
                     <e c0="44" />
                     <e c0="36" />
+                    <e c0="45" />
+                    <e c0="36" />
+                    <e c0="37" />
                     <e c0="44" />
                     <e c0="35" />
                     <e c0="36" />
@@ -1613,11 +1937,11 @@
                     <e c0="40" />
                     <e c0="32" />
                     <e c0="42" />
-                    <e c0="25" />
-                    <e c0="34" />
-                    <e c0="42" />
                     <e c0="29" />
                     <e c0="25" />
+                    <e c0="42" />
+                    <e c0="25" />
+                    <e c0="34" />
                     <e c0="21" />
                     <e c0="9" />
                     <e c0="1" />
@@ -1625,11 +1949,11 @@
                     <e c0="1" />
                     <e c0="17" />
                     <e c0="10" />
-                    <e c0="3" />
-                    <e c0="2" />
-                    <e c0="10" />
                     <e c0="11" />
                     <e c0="3" />
+                    <e c0="10" />
+                    <e c0="3" />
+                    <e c0="2" />
                     <e c0="12" />
                     <e c0="15" />
                     <e c0="7" />
@@ -1642,11 +1966,11 @@
                 <material>wood</material>
                 <indexbuffer components="1" type="uint" indices="yes">
                     <e c0="0" />
-                    <e c0="19" />
-                    <e c0="16" />
-                    <e c0="0" />
                     <e c0="6" />
                     <e c0="19" />
+                    <e c0="0" />
+                    <e c0="19" />
+                    <e c0="16" />
                     <e c0="16" />
                     <e c0="19" />
                     <e c0="27" />
@@ -1660,11 +1984,11 @@
                     <e c0="39" />
                     <e c0="33" />
                     <e c0="14" />
-                    <e c0="20" />
-                    <e c0="23" />
-                    <e c0="14" />
                     <e c0="8" />
                     <e c0="20" />
+                    <e c0="14" />
+                    <e c0="20" />
+                    <e c0="23" />
                     <e c0="23" />
                     <e c0="20" />
                     <e c0="28" />
@@ -1694,11 +2018,23 @@
                 </mixmode>
                 <submesh name="abstract_0">
                     <material>abstract</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
                     <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
                 </submesh>
                 <submesh name="wood_0">
                     <material>wood</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
                     <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
                 </submesh>
                 <renderbuffer name="texture coordinate lightmap" components="2" type="float">
                     <e c0="0.160645" c1="0.321289" />
@@ -2113,6 +2449,106 @@
                 <e c0="4" c1="1" />
                 <e c0="4" c1="4" />
             </renderbuffer>
+            <renderbuffer name="tangent" components="3" type="float">
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+            </renderbuffer>
+            <renderbuffer name="bitangent" components="3" type="float">
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+            </renderbuffer>
             <mixmode>
                 <copy />
             </mixmode>
@@ -2120,11 +2556,11 @@
                 <material>abstract</material>
                 <indexbuffer components="1" type="uint" indices="yes">
                     <e c0="13" />
-                    <e c0="18" />
-                    <e c0="5" />
-                    <e c0="13" />
                     <e c0="22" />
                     <e c0="18" />
+                    <e c0="13" />
+                    <e c0="18" />
+                    <e c0="5" />
                     <e c0="22" />
                     <e c0="26" />
                     <e c0="18" />
@@ -2138,11 +2574,11 @@
                     <e c0="46" />
                     <e c0="38" />
                     <e c0="42" />
-                    <e c0="25" />
-                    <e c0="34" />
-                    <e c0="42" />
                     <e c0="29" />
                     <e c0="25" />
+                    <e c0="42" />
+                    <e c0="25" />
+                    <e c0="34" />
                     <e c0="29" />
                     <e c0="17" />
                     <e c0="25" />
@@ -2156,11 +2592,11 @@
                     <e c0="9" />
                     <e c0="1" />
                     <e c0="10" />
-                    <e c0="3" />
-                    <e c0="2" />
-                    <e c0="10" />
                     <e c0="11" />
                     <e c0="3" />
+                    <e c0="10" />
+                    <e c0="3" />
+                    <e c0="2" />
                     <e c0="11" />
                     <e c0="4" />
                     <e c0="3" />
@@ -2174,11 +2610,11 @@
                     <e c0="15" />
                     <e c0="7" />
                     <e c0="45" />
-                    <e c0="36" />
-                    <e c0="37" />
-                    <e c0="45" />
                     <e c0="44" />
                     <e c0="36" />
+                    <e c0="45" />
+                    <e c0="36" />
+                    <e c0="37" />
                     <e c0="43" />
                     <e c0="40" />
                     <e c0="32" />
@@ -2191,11 +2627,11 @@
                 <material>wood</material>
                 <indexbuffer components="1" type="uint" indices="yes">
                     <e c0="0" />
-                    <e c0="19" />
-                    <e c0="16" />
-                    <e c0="0" />
                     <e c0="6" />
                     <e c0="19" />
+                    <e c0="0" />
+                    <e c0="19" />
+                    <e c0="16" />
                     <e c0="16" />
                     <e c0="19" />
                     <e c0="27" />
@@ -2209,11 +2645,11 @@
                     <e c0="39" />
                     <e c0="33" />
                     <e c0="14" />
-                    <e c0="20" />
-                    <e c0="23" />
-                    <e c0="14" />
                     <e c0="8" />
                     <e c0="20" />
+                    <e c0="14" />
+                    <e c0="20" />
+                    <e c0="23" />
                     <e c0="23" />
                     <e c0="20" />
                     <e c0="28" />
@@ -2243,11 +2679,23 @@
                 </mixmode>
                 <submesh name="abstract_0">
                     <material>abstract</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
                     <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
                 </submesh>
                 <submesh name="wood_0">
                     <material>wood</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
                     <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
                 </submesh>
                 <renderbuffer name="texture coordinate lightmap" components="2" type="float">
                     <e c0="0.319824" c1="0.321289" />
@@ -2793,6 +3241,106 @@
                 <e c0="4" c1="1" />
                 <e c0="4" c1="4" />
             </renderbuffer>
+            <renderbuffer name="tangent" components="3" type="float">
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+            </renderbuffer>
+            <renderbuffer name="bitangent" components="3" type="float">
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+            </renderbuffer>
             <mixmode>
                 <copy />
             </mixmode>
@@ -2800,11 +3348,11 @@
                 <material>abstract</material>
                 <indexbuffer components="1" type="uint" indices="yes">
                     <e c0="13" />
-                    <e c0="18" />
-                    <e c0="5" />
-                    <e c0="13" />
                     <e c0="22" />
                     <e c0="18" />
+                    <e c0="13" />
+                    <e c0="18" />
+                    <e c0="5" />
                     <e c0="22" />
                     <e c0="26" />
                     <e c0="18" />
@@ -2818,11 +3366,11 @@
                     <e c0="46" />
                     <e c0="38" />
                     <e c0="42" />
-                    <e c0="25" />
-                    <e c0="34" />
-                    <e c0="42" />
                     <e c0="29" />
                     <e c0="25" />
+                    <e c0="42" />
+                    <e c0="25" />
+                    <e c0="34" />
                     <e c0="29" />
                     <e c0="17" />
                     <e c0="25" />
@@ -2836,11 +3384,11 @@
                     <e c0="9" />
                     <e c0="1" />
                     <e c0="45" />
-                    <e c0="36" />
-                    <e c0="37" />
-                    <e c0="45" />
                     <e c0="44" />
                     <e c0="36" />
+                    <e c0="45" />
+                    <e c0="36" />
+                    <e c0="37" />
                     <e c0="43" />
                     <e c0="40" />
                     <e c0="32" />
@@ -2848,11 +3396,11 @@
                     <e c0="32" />
                     <e c0="35" />
                     <e c0="10" />
-                    <e c0="3" />
-                    <e c0="2" />
-                    <e c0="10" />
                     <e c0="11" />
                     <e c0="3" />
+                    <e c0="10" />
+                    <e c0="3" />
+                    <e c0="2" />
                     <e c0="12" />
                     <e c0="15" />
                     <e c0="7" />
@@ -2865,11 +3413,11 @@
                 <material>wood</material>
                 <indexbuffer components="1" type="uint" indices="yes">
                     <e c0="0" />
-                    <e c0="19" />
-                    <e c0="16" />
-                    <e c0="0" />
                     <e c0="6" />
                     <e c0="19" />
+                    <e c0="0" />
+                    <e c0="19" />
+                    <e c0="16" />
                     <e c0="16" />
                     <e c0="19" />
                     <e c0="27" />
@@ -2883,11 +3431,11 @@
                     <e c0="39" />
                     <e c0="33" />
                     <e c0="14" />
-                    <e c0="20" />
-                    <e c0="23" />
-                    <e c0="14" />
                     <e c0="8" />
                     <e c0="20" />
+                    <e c0="14" />
+                    <e c0="20" />
+                    <e c0="23" />
                     <e c0="23" />
                     <e c0="20" />
                     <e c0="28" />
@@ -2917,11 +3465,23 @@
                 </mixmode>
                 <submesh name="abstract_0">
                     <material>abstract</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
                     <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
                 </submesh>
                 <submesh name="wood_0">
                     <material>wood</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
                     <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
                 </submesh>
                 <renderbuffer name="texture coordinate lightmap" components="2" type="float">
                     <e c0="0.319824" c1="0.639648" />
@@ -3249,6 +3809,106 @@
                 <e c0="4" c1="1" />
                 <e c0="4" c1="4" />
             </renderbuffer>
+            <renderbuffer name="tangent" components="3" type="float">
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="1" c1="0" c2="0" />
+                <e c0="1" c1="0" c2="0" />
+            </renderbuffer>
+            <renderbuffer name="bitangent" components="3" type="float">
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="1" c2="0" />
+                <e c0="0" c1="0" c2="1" />
+            </renderbuffer>
             <mixmode>
                 <copy />
             </mixmode>
@@ -3256,11 +3916,11 @@
                 <material>abstract</material>
                 <indexbuffer components="1" type="uint" indices="yes">
                     <e c0="13" />
-                    <e c0="18" />
-                    <e c0="5" />
-                    <e c0="13" />
                     <e c0="22" />
                     <e c0="18" />
+                    <e c0="13" />
+                    <e c0="18" />
+                    <e c0="5" />
                     <e c0="22" />
                     <e c0="26" />
                     <e c0="18" />
@@ -3274,11 +3934,11 @@
                     <e c0="46" />
                     <e c0="38" />
                     <e c0="42" />
-                    <e c0="25" />
-                    <e c0="34" />
-                    <e c0="42" />
                     <e c0="29" />
                     <e c0="25" />
+                    <e c0="42" />
+                    <e c0="25" />
+                    <e c0="34" />
                     <e c0="29" />
                     <e c0="17" />
                     <e c0="25" />
@@ -3292,11 +3952,11 @@
                     <e c0="9" />
                     <e c0="1" />
                     <e c0="45" />
-                    <e c0="36" />
-                    <e c0="37" />
-                    <e c0="45" />
                     <e c0="44" />
                     <e c0="36" />
+                    <e c0="45" />
+                    <e c0="36" />
+                    <e c0="37" />
                     <e c0="44" />
                     <e c0="35" />
                     <e c0="36" />
@@ -3310,11 +3970,11 @@
                     <e c0="40" />
                     <e c0="32" />
                     <e c0="10" />
-                    <e c0="3" />
-                    <e c0="2" />
-                    <e c0="10" />
                     <e c0="11" />
                     <e c0="3" />
+                    <e c0="10" />
+                    <e c0="3" />
+                    <e c0="2" />
                     <e c0="12" />
                     <e c0="15" />
                     <e c0="7" />
@@ -3327,11 +3987,11 @@
                 <material>wood</material>
                 <indexbuffer components="1" type="uint" indices="yes">
                     <e c0="0" />
-                    <e c0="19" />
-                    <e c0="16" />
-                    <e c0="0" />
                     <e c0="6" />
                     <e c0="19" />
+                    <e c0="0" />
+                    <e c0="19" />
+                    <e c0="16" />
                     <e c0="16" />
                     <e c0="19" />
                     <e c0="27" />
@@ -3345,11 +4005,11 @@
                     <e c0="39" />
                     <e c0="33" />
                     <e c0="14" />
-                    <e c0="20" />
-                    <e c0="23" />
-                    <e c0="14" />
                     <e c0="8" />
                     <e c0="20" />
+                    <e c0="14" />
+                    <e c0="20" />
+                    <e c0="23" />
                     <e c0="23" />
                     <e c0="20" />
                     <e c0="28" />
@@ -3379,11 +4039,23 @@
                 </mixmode>
                 <submesh name="abstract_0">
                     <material>abstract</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
                     <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
                 </submesh>
                 <submesh name="wood_0">
                     <material>wood</material>
+                    <shadervar name="tex lightmap dir 1" type="texture">lightmaps_partsys_0_d1_png</shadervar>
+                    <shadervar name="tex spec directions 1" type="texture">lightmaps_partsys_0_sd0_dds</shadervar>
                     <shadervar name="tex lightmap" type="texture">lightmaps_partsys_0_png</shadervar>
+                    <shadervar name="tex lightmap dir 2" type="texture">lightmaps_partsys_0_d2_png</shadervar>
+                    <shadervar name="tex lightmap dir 3" type="texture">lightmaps_partsys_0_d3_png</shadervar>
+                    <shadervar name="tex spec directions 2" type="texture">lightmaps_partsys_0_sd1_dds</shadervar>
+                    <shadervar name="tex spec directions 3" type="texture">lightmaps_partsys_0_sd2_dds</shadervar>
                 </submesh>
                 <renderbuffer name="texture coordinate lightmap" components="2" type="float">
                     <e c0="0.638184" c1="0.00292969" />
