@@ -73,6 +73,11 @@ void PostEffectManager::SetIntermediateTargetFormat (const char* textureFmt)
   this->textureFmt = textureFmt;
 }
 
+const char* PostEffectManager::GetIntermediateTargetFormat ()
+{
+  return textureFmt;
+}
+
 bool PostEffectManager::SetupView (iView* view)
 {
   unsigned int width = view->GetContext ()->GetWidth ();

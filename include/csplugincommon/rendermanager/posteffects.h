@@ -195,6 +195,8 @@ namespace RenderManager
     
     /// Set the texture format for the intermediate textures used.
     void SetIntermediateTargetFormat (const char* textureFmt);
+    /// Get the texture format for the intermediate textures used.
+    const char* GetIntermediateTargetFormat ();
 
     //@{
     /**
