@@ -115,17 +115,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
     typedef CS::RenderManager::DependentTargetManager<RenderTreeType, RMShadowedPSSM>
       TargetManagerType;
 
-    typedef CS::RenderManager::AutoFX_ReflectRefract<RenderTreeType, 
+    typedef CS::RenderManager::AutoFX::ReflectRefract<RenderTreeType, 
       ContextSetupType, ContextSetupType> AutoReflectRefractType_SS;
-    typedef CS::RenderManager::AutoFX_ReflectRefract<RenderTreeType, 
+    typedef CS::RenderManager::AutoFX::ReflectRefract<RenderTreeType, 
       ContextSetupType_Unshadowed, ContextSetupType> AutoReflectRefractType_US;
-    typedef CS::RenderManager::AutoFX_ReflectRefract<RenderTreeType, 
+    typedef CS::RenderManager::AutoFX::ReflectRefract<RenderTreeType, 
       ContextSetupType, ContextSetupType_Unshadowed> AutoReflectRefractType_SU;
-    typedef CS::RenderManager::AutoFX_ReflectRefract<RenderTreeType, 
+    typedef CS::RenderManager::AutoFX::ReflectRefract<RenderTreeType, 
       ContextSetupType_Unshadowed, ContextSetupType_Unshadowed>
       AutoReflectRefractType_UU;
 
-    typedef CS::RenderManager::AutoFX_FramebufferTex<RenderTreeType>
+    typedef CS::RenderManager::AutoFX::FramebufferTex<RenderTreeType>
       AutoFramebufferTexType;
   public:
     iObjectRegistry* objectReg;
@@ -137,7 +137,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
     PortalSetupType::PersistentData portalPersistent;
     LightSetupType::PersistentData lightPersistent;
     LightSetupType_Unshadowed::PersistentData lightPersistent_unshadowed;
-    CS::RenderManager::AutoFX_ReflectRefract_Base::PersistentData
+    CS::RenderManager::AutoFX::ReflectRefract_Base::PersistentData
       reflectRefractPersistent;
     AutoFramebufferTexType::PersistentData framebufferTexPersistent;
 

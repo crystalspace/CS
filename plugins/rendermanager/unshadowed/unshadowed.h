@@ -98,10 +98,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
     typedef CS::RenderManager::LightSetup<RenderTreeType, 
       CS::RenderManager::MultipleRenderLayer> LightSetupType;
 
-    typedef CS::RenderManager::AutoFX_ReflectRefract<RenderTreeType, 
+    typedef CS::RenderManager::AutoFX::ReflectRefract<RenderTreeType, 
       ContextSetupType> AutoReflectRefractType;
 
-    typedef CS::RenderManager::AutoFX_FramebufferTex<RenderTreeType>
+    typedef CS::RenderManager::AutoFX::FramebufferTex<RenderTreeType>
       AutoFramebufferTexType;
   public:
     iObjectRegistry* objectReg;

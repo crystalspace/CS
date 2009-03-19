@@ -28,76 +28,79 @@ namespace CS
 {
   namespace RenderManager
   {
-#define AFFTBPD   AutoFX_FramebufferTex_Base::PersistentData
+    namespace AutoFX
+    {
+#define FTBPD   FramebufferTex_Base::PersistentData
   
-    AFFTBPD::PersistentData() :
-      texCacheColor (csimg2D, "abgr8",
-	CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP
-	  | CS_TEXTURE_NPOTS | CS_TEXTURE_SCALE_UP,
-	"target", 0,
-	CS::Utility::ResourceCache::ReuseAlways ()),
-      texCacheDepth (csimg2D, "d32",
-	CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP
-	  | CS_TEXTURE_NPOTS | CS_TEXTURE_SCALE_UP | CS_TEXTURE_NOFILTER,
-	"target", 0,
-	CS::Utility::ResourceCache::ReuseAlways ()),
-      svAlloc (1024)
-    {
-    }
-
-    void AFFTBPD::Initialize (iObjectRegistry* objReg,
-		              PostEffectManager* postEffects)
-    {
-      csRef<iShaderManager> shaderManager =
-	csQueryRegistry<iShaderManager> (objReg);
-      
-      iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
-      const char* const svNames[rtaNumAttachments] = {"depth", "color"};
-      for (size_t i = 0; i < rtaNumAttachments; i++)
+      FTBPD::PersistentData() :
+	texCacheColor (csimg2D, "abgr8",
+	  CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP
+	    | CS_TEXTURE_NPOTS | CS_TEXTURE_SCALE_UP,
+	  "target", 0,
+	  CS::Utility::ResourceCache::ReuseAlways ()),
+	texCacheDepth (csimg2D, "d32",
+	  CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP
+	    | CS_TEXTURE_NPOTS | CS_TEXTURE_SCALE_UP | CS_TEXTURE_NOFILTER,
+	  "target", 0,
+	  CS::Utility::ResourceCache::ReuseAlways ()),
+	svAlloc (1024)
       {
-        csString svName;
-        svName.Format ("tex framebuffer %s", svNames[i]);
-        svTexFramebuffer[i] = strings->Request (svName);
       }
-      svFramebufferCoordXform = strings->Request ("framebuffer coord xform");
-      
-      if (postEffects)
-        texCacheColor.SetFormat (postEffects->GetIntermediateTargetFormat());
-      csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objReg);
+  
+      void FTBPD::Initialize (iObjectRegistry* objReg,
+				PostEffectManager* postEffects)
+      {
+	csRef<iShaderManager> shaderManager =
+	  csQueryRegistry<iShaderManager> (objReg);
 	
-      texCacheColor.SetG3D (g3d);
-      texCacheDepth.SetG3D (g3d);
-    }
-
-    iTextureHandle* AFFTBPD::GetFramebufferTex (size_t n, int width,
-                                                int height)
-    {
-      if (!framebufferTex[n].IsValid())
-      {
-        csRef<iTextureHandle> newTex;
-        switch (n)
-        {
-        case rtaColor0:
-          newTex = texCacheColor.QueryUnusedTexture (width, height);
-          break;
-        case rtaDepth: 
-          newTex = texCacheDepth.QueryUnusedTexture (width, height);
-          break;
-        default:
-          CS_ASSERT(false);
-        }
-      
-        framebufferTex[n] = newTex;
+	iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
+	const char* const svNames[rtaNumAttachments] = {"depth", "color"};
+	for (size_t i = 0; i < rtaNumAttachments; i++)
+	{
+	  csString svName;
+	  svName.Format ("tex framebuffer %s", svNames[i]);
+	  svTexFramebuffer[i] = strings->Request (svName);
+	}
+	svFramebufferCoordXform = strings->Request ("framebuffer coord xform");
+	
+	if (postEffects)
+	  texCacheColor.SetFormat (postEffects->GetIntermediateTargetFormat());
+	csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objReg);
+	  
+	texCacheColor.SetG3D (g3d);
+	texCacheDepth.SetG3D (g3d);
       }
-      return framebufferTex[n];
-    }
-
-    void AFFTBPD::UpdateNewFrame ()
-    {
-      svKeeper.Empty();
-      csTicks currentTicks = csGetTicks ();
-      texCacheColor.AdvanceFrame (currentTicks);
-      texCacheDepth.AdvanceFrame (currentTicks);
-    }
+  
+      iTextureHandle* FTBPD::GetFramebufferTex (size_t n, int width,
+						  int height)
+      {
+	if (!framebufferTex[n].IsValid())
+	{
+	  csRef<iTextureHandle> newTex;
+	  switch (n)
+	  {
+	  case rtaColor0:
+	    newTex = texCacheColor.QueryUnusedTexture (width, height);
+	    break;
+	  case rtaDepth: 
+	    newTex = texCacheDepth.QueryUnusedTexture (width, height);
+	    break;
+	  default:
+	    CS_ASSERT(false);
+	  }
+	
+	  framebufferTex[n] = newTex;
+	}
+	return framebufferTex[n];
+      }
+  
+      void FTBPD::UpdateNewFrame ()
+      {
+	svKeeper.Empty();
+	csTicks currentTicks = csGetTicks ();
+	texCacheColor.AdvanceFrame (currentTicks);
+	texCacheDepth.AdvanceFrame (currentTicks);
+      }
+    } // namespace AutoFX
   } // namespace RenderManager
 } // namespace CS

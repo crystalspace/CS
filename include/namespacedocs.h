@@ -134,7 +134,14 @@ namespace CS
    * Classes for render manager plugin implementation
    */
   namespace RenderManager
-  {}
+  {
+    /**
+     * Classes for "automatic effects" (usually providing special textures or
+     * similar on an if-uses basis).
+     */
+    namespace AutoFX
+    {}
+  }
 
   /**
    * Sound system classes
