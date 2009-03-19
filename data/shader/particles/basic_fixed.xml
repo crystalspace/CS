@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!-- Simple, no-frills particle shader.
+     Modulates the texture with the vertex colors.
+     Mixmode is set by mesh. -->
+<shader compiler="xmlshader" name="particles_basic_fixed">
+  <technique priority="100">
+    <pass>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <buffer source="color" destination="color" />
+      <texture name="tex diffuse" destination="unit 0" />
+      <vp plugin="glfixed">
+	<fixedvp>
+	  <constantcolor layer="mixmode" type="shadervar">mixmode alpha</constantcolor>
+	</fixedvp>
+      </vp>
+      <fp plugin="glfixed">
+	<fixedfp>
+	  <layer>
+	    <colorsource num="0" source="primary color" modifier="color"/>
+	    <colorsource num="1" source="texture" modifier="color"/>
+	    <coloroperation operation="modulate"/>
+	    <alphasource num="0" source="primary color" modifier="alpha"/>
+	    <alphasource num="1" source="texture" modifier="alpha"/>
+	    <alphaoperation operation="modulate"/>
+	  </layer>
+	  <layer name="mixmode">
+	    <colorsource num="0" source="previous layer" modifier="color"/>
+	    <coloroperation operation="replace"/>
+	    <alphasource num="0" source="previous layer" modifier="alpha"/>
+	    <alphasource num="1" source="constant color" modifier="alpha"/>
+	    <alphaoperation operation="modulate"/>
+	  </layer>
+	</fixedfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>
