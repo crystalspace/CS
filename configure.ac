@@ -240,29 +240,26 @@ AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
 #------------------------------------------------------------------------------
 # Determine host platform.  Recognized platforms: Unix, Windows, Mac OS X.
 # Recognized families: Unix, Windows.
-#
-# CS_CHECK_HOST
-#	Sets the shell variables cs_host_target and cs_host_family.  Client
-#	code can use these variables to emit appropriate Jam variables and
-#	CS_PLATFORM_FOO header define.
 #------------------------------------------------------------------------------
 CS_CHECK_HOST
+
 case $cs_host_target in
     macosx)
-        # We assume that we always have CoreAudio available on MacOS/X.
+        CS_HEADER_PROPERTY([CS_PLATFORM_MACOSX])
+        # Assume that CoreAudio is always available on Mac OS X.
         CS_EMIT_BUILD_PROPERTY([COREAUDIO.AVAILABLE], [yes])
         CS_EMIT_BUILD_PROPERTY([COREAUDIO.LFLAGS],
 	    [-framework CoreAudio -framework AudioToolbox])
-        CS_HEADER_PROPERTY([CS_PLATFORM_MACOSX])
+        # Processor-specific optimizations.
         AS_IF([test -n "$cs_cv_prog_cc_msse"],
             [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
-             [$cs_cv_prog_cc_msse], [+])])
+             [$cs_cv_prog_cc_msse], [append])])
         AS_IF([test -n "$cs_cv_prog_cc_msse2"],
             [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
-             [$cs_cv_prog_cc_msse2], [+])])
+             [$cs_cv_prog_cc_msse2], [append])])
         AS_IF([test -n "$cs_cv_prog_cc_mfpmath_sse"],
             [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
-             [$cs_cv_prog_cc_mfpmath_sse], [+])])
+             [$cs_cv_prog_cc_mfpmath_sse], [append])])
         ;;
 esac
 case $cs_host_family in
@@ -1963,28 +1960,9 @@ CS_HEADER_PROPERTY([CS_LONG_SIZE], [$ac_cv_sizeof_long])
 
 #------------------------------------------------------------------------------
 # Determine host CPU.
-#
-# CS_CHECK_HOST_CPU
-#	Set the shell variable cs_host_cpu to a normalized form of the CPU name
-#	returned by config.guess/config.sub.  Also takes the normalized name,
-#	uppercases and appends it to the string "CS_PROCESSOR_" to form a name
-#	suitable for the C preprocessor.  Assigns this value to the shell
-#	variable cs_host_cpu_cpp_define.  Typically, Crystal Space's conception
-#	of CPU name is the same as that returned by config.guess/config.sub,
-#	but there may be exceptions as seen in the `case' statement.
 #------------------------------------------------------------------------------
-AC_DEFUN([CS_CHECK_HOST_CPU],
-    [AC_REQUIRE([AC_CANONICAL_HOST])
-    case $host_cpu in
-	[[Ii][3-9]86*|[Xx]86*]) cs_host_cpu=x86 ;;
-	powerpc*) cs_host_cpu=powerpc ;;
-	sparc*) cs_host_cpu=sparc ;;
-	*) cs_host_cpu=$host_cpu ;;
-    esac
-    cs_host_cpu_normalized="AS_TR_CPP([$cs_host_cpu])"])
-
 CS_CHECK_HOST_CPU
-CS_EMIT_BUILD_PROPERTY([TARGET.PROCESSOR], [$cs_host_cpu_normalized])
+
 CS_HEADER_PROPERTY([CS_PROCESSOR_$cs_host_cpu_normalized])
 CS_HEADER_PROPERTY([CS_PROCESSOR_NAME],
     [AS_ESCAPE(["])$cs_host_cpu[]AS_ESCAPE(["])])
