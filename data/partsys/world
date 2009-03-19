@@ -73,6 +73,9 @@
         <shader>
             <file>/shader/particles/basic.xml</file>
         </shader>
+        <shader>
+            <file>/shader/particles/soft-alpha.xml</file>
+        </shader>
     </shaders>
     <materials>
         <material name="wood">
@@ -109,7 +112,7 @@
         <material name="andrew_marble4">
             <texture>andrew_marble4</texture>
             <shader type="diffuse">*null</shader>
-            <shader type="ambient">particles_basic</shader>
+            <shader type="ambient">particles_soft-alpha</shader>
         </material>
         <material name="sky">
             <texture>sky</texture>
