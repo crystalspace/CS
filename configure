@@ -13070,8 +13070,13 @@ fi
         *) cs_host_cpu=$host_cpu ;;
     esac
     cs_host_cpu_normalized="`echo "$cs_host_cpu" | $as_tr_cpp`"
-    cs_jamconfig_text="${cs_jamconfig_text}TARGET.PROCESSOR ?= $cs_host_cpu_normalized ;
+    cs_build_prop_val="$cs_host_cpu_normalized"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}TARGET.PROCESSOR ?= $cs_build_prop_val ;
 "
+fi
+
 
     cs_host_os_normalized=''
     case $host_os in
@@ -13083,11 +13088,11 @@ fi
 
 
 
-    # Both MacOS/X and Darwin are identified via $host_os as "darwin".  We need
-    # a way to distinguish between the two.  If Carbon.h is present, then
-    # assume MacOX/S; if not, assume Darwin.  If --with-x=yes was invoked, and
+    # Both Mac OS X and Darwin are identified via $host_os as "darwin".  We
+    # need a way to distinguish between the two.  If Carbon.h is present, then
+    # assume Mac OX S; if not, assume Darwin.  If --with-x=yes was invoked, and
     # Carbon.h is present, then assume that user wants to cross-build for
-    # Darwin even though build host is MacOS/X.
+    # Darwin even though build host is Mac OS X.
     # IMPLEMENTATION NOTE *1*
     # The QuickTime 7.0 installer removes <CarbonSound/CarbonSound.h>, which
     # causes #include <Carbon/Carbon.h> to fail unconditionally. Re-installing
@@ -13096,7 +13101,7 @@ fi
     # CarbonSound.h by #defining __CARBONSOUND__ in the test in order to
     # prevent Carbon.h from attempting to #include the missing header.
     # IMPLEMENTATION NOTE *2*
-    # At least one MacOS/X user switches between gcc 2.95 and gcc 3.3 with a
+    # At least one Mac OS X user switches between gcc 2.95 and gcc 3.3 with a
     # script which toggles the values of CC, CXX, and CPP.  Unfortunately, CPP
     # was being set to run the preprocessor directly ("cpp", for instance)
     # rather than running it via the compiler ("gcc -E", for instance).  The
@@ -13197,8 +13202,13 @@ else
 fi
 { echo "$as_me:$LINENO: result: $cs_cv_prog_objc" >&5
 echo "${ECHO_T}$cs_cv_prog_objc" >&6; }
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC ?= $cs_cv_prog_objc ;
+	cs_build_prop_val="$cs_cv_prog_objc"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC ?= $cs_build_prop_val ;
 "
+fi
+
 	{ echo "$as_me:$LINENO: checking for Objective-C++ compiler" >&5
 echo $ECHO_N "checking for Objective-C++ compiler... $ECHO_C" >&6; }
 if test "${cs_cv_prog_objcxx+set}" = set; then
@@ -13208,8 +13218,13 @@ else
 fi
 { echo "$as_me:$LINENO: result: $cs_cv_prog_objcxx" >&5
 echo "${ECHO_T}$cs_cv_prog_objcxx" >&6; }
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC++ ?= $cs_cv_prog_objcxx ;
+	cs_build_prop_val="$cs_cv_prog_objcxx"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC++ ?= $cs_build_prop_val ;
 "
+fi
+
 else
   cs_host_target=unix
 	cs_host_family=unix
@@ -13249,10 +13264,20 @@ fi
     esac
 
     cs_host_os_normalized_uc="`echo "$cs_host_os_normalized" | $as_tr_cpp`"
-    cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS ?= $cs_host_os_normalized_uc ;
+    cs_build_prop_val="$cs_host_os_normalized_uc"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS ?= $cs_build_prop_val ;
 "
-    cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS.NORMALIZED ?= $cs_host_os_normalized ;
+fi
+
+    cs_build_prop_val="$cs_host_os_normalized"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS.NORMALIZED ?= $cs_build_prop_val ;
 "
+fi
+
 
 case $cs_host_target in
     macosx)
