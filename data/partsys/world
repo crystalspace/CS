@@ -69,6 +69,11 @@
             <file>dot.png</file>
         </texture>
     </textures>
+    <shaders>
+        <shader>
+            <file>/shader/particles/basic.xml</file>
+        </shader>
+    </shaders>
     <materials>
         <material name="wood">
             <texture>andrew_wood.jpg</texture>
@@ -79,77 +84,77 @@
         <material name="raindrop">
             <texture>raindrop</texture>
             <shader type="diffuse">*null</shader>
-            <shader type="ambient">std_lighting</shader>
+            <shader type="ambient">particles_basic</shader>
         </material>
         <material name="snow">
             <texture>snow</texture>
             <shader type="diffuse">*null</shader>
-            <shader type="ambient">std_lighting</shader>
+            <shader type="ambient">particles_basic</shader>
         </material>
         <material name="spark">
             <texture>spark</texture>
             <shader type="diffuse">*null</shader>
-            <shader type="ambient">std_lighting</shader>
+            <shader type="ambient">particles_basic</shader>
         </material>
         <material name="flare_picir">
             <texture>flare_picir</texture>
             <shader type="diffuse">*null</shader>
-            <shader type="ambient">std_lighting</shader>
+            <shader type="ambient">particles_basic</shader>
         </material>
         <material name="flare_center">
             <texture>flare_center</texture>
             <shader type="diffuse">*null</shader>
-            <shader type="ambient">std_lighting</shader>
+            <shader type="ambient">particles_basic</shader>
         </material>
         <material name="andrew_marble4">
             <texture>andrew_marble4</texture>
             <shader type="diffuse">*null</shader>
-            <shader type="ambient">std_lighting</shader>
+            <shader type="ambient">particles_basic</shader>
         </material>
         <material name="sky">
             <texture>sky</texture>
             <shader type="diffuse">*null</shader>
-            <shader type="ambient">std_lighting</shader>
+            <shader type="ambient">particles_basic</shader>
         </material>
         <material name="fpart">
             <texture>fpart</texture>
             <shader type="diffuse">*null</shader>
-            <shader type="ambient">std_lighting</shader>
+            <shader type="ambient">particles_basic</shader>
         </material>
         <material name="fp2">
             <texture>fp2</texture>
             <shader type="diffuse">*null</shader>
-            <shader type="ambient">std_lighting</shader>
+            <shader type="ambient">particles_basic</shader>
         </material>
         <material name="hazecirc">
             <texture>hazecirc</texture>
             <shader type="diffuse">*null</shader>
-            <shader type="ambient">std_lighting</shader>
+            <shader type="ambient">particles_basic</shader>
         </material>
         <material name="hazebasic">
             <texture>hazebasic</texture>
             <shader type="diffuse">*null</shader>
-            <shader type="ambient">std_lighting</shader>
+            <shader type="ambient">particles_basic</shader>
         </material>
         <material name="plasma">
             <texture>plasma</texture>
             <shader type="diffuse">*null</shader>
-            <shader type="ambient">std_lighting</shader>
+            <shader type="ambient">particles_basic</shader>
         </material>
         <material name="flamelet">
             <texture>flamelet</texture>
             <shader type="diffuse">*null</shader>
-            <shader type="ambient">std_lighting</shader>
+            <shader type="ambient">particles_basic</shader>
         </material>
         <material name="particle">
             <texture>dot</texture>
             <shader type="diffuse">*null</shader>
-            <shader type="ambient">std_lighting</shader>
+            <shader type="ambient">particles_basic</shader>
         </material>
         <material name="dot">
             <texture>dot</texture>
             <shader type="diffuse">*null</shader>
-            <shader type="ambient">std_lighting</shader>
+            <shader type="ambient">particles_basic</shader>
         </material>
     </materials>
     <plugins>
