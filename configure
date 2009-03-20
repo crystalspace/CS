@@ -12237,7 +12237,7 @@ else
 	cs_host_family=unix
 fi
 
-	    if test "$cs_host_target" = macosx &&
+            if test "$cs_host_target" = macosx &&
 	   test "$cross_compiling" != yes &&
 	   test -d "/Developer/SDKs/MacOSX10.4u.sdk"; then
   cs_universal_binary_default=yes
@@ -12262,26 +12262,26 @@ cat >>confdefs.h <<\_ACEOF
 #define CS_UNIVERSAL_BINARY 1
 _ACEOF
 
-	CFLAGS="$CFLAGS -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc "
-	CXXFLAGS="$CXXFLAGS -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc "
-	LDFLAGS="$LDFLAGS -Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch i386 -arch ppc "
+	CFLAGS="$CFLAGS -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch i386 -arch ppc "
+	CXXFLAGS="$CXXFLAGS -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch i386 -arch ppc "
+	LDFLAGS="$LDFLAGS -Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc "
 	cs_header_text="${cs_header_text}#define CS_UNIVERSAL_BINARY
 "
-	cs_build_prop_val="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc "
+	cs_build_prop_val="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch i386 -arch ppc "
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
 "
 fi
 
-	cs_build_prop_val="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc "
+	cs_build_prop_val="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch i386 -arch ppc "
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += $cs_build_prop_val ;
 "
 fi
 
-	cs_build_prop_val="-Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch i386 -arch ppc "
+	cs_build_prop_val="-Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc "
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
