@@ -55,6 +55,26 @@
 	  </block>
 	</input>
 	
+	<input name="textureToScreen" type="float2" default="complex" private="yes">
+	  <block location="cg:fragmentIn">
+	    <uniform type="float2" name="textureToScreen" />
+	  </block>
+	  
+	  <block location="cg:variablemap">
+	    <variablemap destination="fragmentIn.textureToScreen" type="expr">
+	      <sexp>(make-vector
+		(/ 1 (elt1 "framebuffer coord xform"))
+		(/ 1 (elt2 "framebuffer coord xform"))
+		)
+	      </sexp>
+	    </variablemap>
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    textureToScreen = fragmentIn.textureToScreen;
+	  </block>
+	</input>
+	
 	<block location="cg:vertexToFragment">
 	  <varying type="texcoord3" name="framebufferTC" />
 	</block>
@@ -66,7 +86,12 @@
 	  framebufferTC.xy = framebufferTC.xy * scale + xlate;
 	</block>
 	
+	<block location="cg:fragmentMain">
+	  tcToScreen = textureToScreen;
+	</block>
+	
 	<output name="framebufferTC" type="texcoord3" />
+	<output name="tcToScreen" type="float2" />
       </technique>
     </snippet>
     
@@ -107,6 +132,7 @@
 	</input>
 	
 	<input name="fbTC" type="texcoord3" />
+	<input name="fbTC2screen" type="float2" />
 	
 	<block location="cg:vertexMain">
 	  dist = 0;
@@ -117,7 +143,7 @@
 	  float inv_reflW = 1 / fbTC.z;
 	  
 	  float camDepth = tex2Dproj (texFramebufferDepth, fbTC).x*-2 + 1;
-	  float2 screenPos = (fbTC.xy * inv_reflW)*float2(2)-float2(1);
+	  float2 screenPos = (fbTC.xy * fbTC2screen * inv_reflW)-float2(1);
 	  float4 positionProjected = float4 (
 	    screenPos.x, screenPos.y, camDepth, 1);
 	  float4 positionUnprojectedW = mul (projectedToWorld, positionProjected);
