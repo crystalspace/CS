@@ -496,9 +496,7 @@ CS_COMPILER_IGNORE_NON_VIRTUAL_DTOR([C++],
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD_FLAGS([for flag to disable string-aliasing],
     [cs_cv_prog_cxx_no_strict_aliasing],
-    [CS_CREATE_TUPLE([-fno-strict-aliasing])], [C++])
-
-AS_IF([test $cs_cv_prog_cxx_no_strict_aliasing != no],
+    [CS_CREATE_TUPLE([-fno-strict-aliasing])], [C++],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS.STRICTALIASING.DISABLE],
 	[$cs_cv_prog_cxx_no_strict_aliasing], [+])])
 
