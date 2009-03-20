@@ -404,6 +404,7 @@ class iGraphics3D(core.iBase):
     def GetProjectionMatrix(*args): return _ivideo.iGraphics3D_GetProjectionMatrix(*args)
     def SetProjectionMatrix(*args): return _ivideo.iGraphics3D_SetProjectionMatrix(*args)
     def SetTextureComparisonModes(*args): return _ivideo.iGraphics3D_SetTextureComparisonModes(*args)
+    def CopyFromRenderTargets(*args): return _ivideo.iGraphics3D_CopyFromRenderTargets(*args)
     scfGetVersion = staticmethod(_ivideo.iGraphics3D_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iGraphics3D
     __del__ = lambda self : None;

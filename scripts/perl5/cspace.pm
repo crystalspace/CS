@@ -9780,6 +9780,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetProjectionMatrix = *cspacec::iGraphics3D_GetProjectionMatrix;
 *SetProjectionMatrix = *cspacec::iGraphics3D_SetProjectionMatrix;
 *SetTextureComparisonModes = *cspacec::iGraphics3D_SetTextureComparisonModes;
+*CopyFromRenderTargets = *cspacec::iGraphics3D_CopyFromRenderTargets;
 *scfGetVersion = *cspacec::iGraphics3D_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
