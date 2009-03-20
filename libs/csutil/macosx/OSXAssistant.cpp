@@ -240,6 +240,9 @@ void OSXAssistant::mouse_up(int b, int x, int y)
 void OSXAssistant::mouse_moved(int x, int y)
 { /* printf("OSX Assistant: mouse moved\n");*/ event_outlet->Mouse(csmbNone, false, x, y); }
 
+void OSXAssistant::wheel_moved(int b, int x, int y)
+{ event_outlet->Mouse(b, true, x, y); }
+
 
 //-----------------------------------------------------------------------------
 // Pure-C iOSXAssistant Interface (for use from Objective-C world)
@@ -276,6 +279,8 @@ NSD_PROTO(void,mouse_up)(OSXAssistantHandle h, int button, int x, int y)
     { NSD_ASSIST(h)->mouse_up(button, x, y); }
 NSD_PROTO(void,mouse_moved)(OSXAssistantHandle h, int x, int y)
     { NSD_ASSIST(h)->mouse_moved(x, y); }
+NSD_PROTO(void,wheel_moved)(OSXAssistantHandle h, int button, int x, int y)
+    { NSD_ASSIST(h)->wheel_moved(button, x, y); }
 NSD_PROTO(void,application_hidden)(OSXAssistantHandle h)
     { NSD_ASSIST(h)->application_hidden(); }
 NSD_PROTO(void,application_unhidden)(OSXAssistantHandle h)
