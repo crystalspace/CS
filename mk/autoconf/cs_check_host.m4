@@ -66,6 +66,7 @@ AC_DEFUN([CS_CHECK_HOST],
             ;;
         darwin*)
             _CS_CHECK_HOST_DARWIN
+            _CS_CHECK_UNIVERSAL_BINARY
             ;;
         *)
             # Everything else is assumed to be Unix or Unix-like.
@@ -96,33 +97,38 @@ AC_DEFUN([CS_CHECK_HOST],
         [], [], [$1])
 ])
 
+#------------------------------------------------------------------------------
 # _CS_CHECK_HOST_DARWIN([EMITTER])
+#       Both Mac OS X and Darwin are identified via $host_os as "darwin".  We
+#       need a way to distinguish between the two.  If Carbon.h is present,
+#       then assume Mac OX S; if not, assume Darwin.  If --with-x=yes was
+#       invoked, and Carbon.h is present, then assume that user wants to
+#       cross-build for Darwin even though build host is Mac OS X.
+#
+# IMPLEMENTATION NOTES
+#
+#       1. The QuickTime 7.0 installer removes <CarbonSound/CarbonSound.h>,
+#       which causes #include <Carbon/Carbon.h> to fail
+#       unconditionally. Re-installing the QuickTime SDK should restore the
+#       header, however not all developers know to do this, so we work around
+#       the problem of the missing CarbonSound.h by #defining __CARBONSOUND__
+#       in the test in order to prevent Carbon.h from attempting to #include
+#       the missing header.
+#
+#       2. At least one Mac OS X user switches between gcc 2.95 and gcc 3.3
+#       with a script which toggles the values of CC, CXX, and CPP.
+#       Unfortunately, CPP was being set to run the preprocessor directly
+#       ("cpp", for instance) rather than running it via the compiler ("gcc
+#       -E", for instance).  The problem with running the preprocessor directly
+#       is that __APPLE__ and __GNUC__ are not defined, which causes the
+#       Carbon.h check to fail.  We avoid this problem by supplying a non-empty
+#       fourth argument to AC_CHECK_HEADER(), which causes it to test compile
+#       the header only (which is a more robust test), rather than also testing
+#       it via the preprocessor.
+#------------------------------------------------------------------------------
 AC_DEFUN([_CS_CHECK_HOST_DARWIN],
     [AC_REQUIRE([CS_PROG_CC])
     AC_REQUIRE([CS_PROG_CXX])
-
-    # Both Mac OS X and Darwin are identified via $host_os as "darwin".  We
-    # need a way to distinguish between the two.  If Carbon.h is present, then
-    # assume Mac OX S; if not, assume Darwin.  If --with-x=yes was invoked, and
-    # Carbon.h is present, then assume that user wants to cross-build for
-    # Darwin even though build host is Mac OS X.
-    # IMPLEMENTATION NOTE *1*
-    # The QuickTime 7.0 installer removes <CarbonSound/CarbonSound.h>, which
-    # causes #include <Carbon/Carbon.h> to fail unconditionally. Re-installing
-    # the QuickTime SDK should restore the header, however not all developers
-    # know to do this, so we work around the problem of the missing
-    # CarbonSound.h by #defining __CARBONSOUND__ in the test in order to
-    # prevent Carbon.h from attempting to #include the missing header.
-    # IMPLEMENTATION NOTE *2*
-    # At least one Mac OS X user switches between gcc 2.95 and gcc 3.3 with a
-    # script which toggles the values of CC, CXX, and CPP.  Unfortunately, CPP
-    # was being set to run the preprocessor directly ("cpp", for instance)
-    # rather than running it via the compiler ("gcc -E", for instance).  The
-    # problem with running the preprocessor directly is that __APPLE__ and
-    # __GNUC__ are not defined, which causes the Carbon.h check to fail.  We
-    # avoid this problem by supplying a non-empty fourth argument to
-    # AC_CHECK_HEADER(), which causes it to test compile the header only (which
-    # is a more robust test), rather than also testing it via the preprocessor.
 
     AC_DEFINE([__CARBONSOUND__], [],
 	[Avoid problem caused by missing <Carbon/CarbonSound.h>])
@@ -153,3 +159,52 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
 
 	[cs_host_target=unix
 	cs_host_family=unix])])
+
+
+#------------------------------------------------------------------------------
+# _CS_CHECK_UNIVERSAL_BINARY([EMITTER])
+#       Check if Mac OS X universal binaries should be built. This option is
+#       enabled by default on Mac OS X only if the MacOSX10.4u universal SDK is
+#       installed and if not cross-compiling. Otherwise, it is disabled.  Emits
+#       CS_UNIVERSAL_BINARY via AC_DEFINE() and CS_HEADER_PROPERTY(), and
+#       augments CFLAGS, CXXFLAGS, and LDFLAGS appropriately when universal
+#       binaries are enabled. Also emits augmented build properties
+#       COMPILER.CFLAGS, COMPILER.C++FLAGS, and COMPILER.LFLAGS via
+#       CS_EMIT_BUILD_PROPERTY() using the optional EMITTER or
+#       CS_EMIT_BUILD_PROPERTY()'s default emitter if EMITTER is omitted.
+#------------------------------------------------------------------------------
+m4_define([CS_UNIVERSAL_ARCHS], [i386, ppc])
+m4_define([CS_UNIVERSAL_SDK], [/Developer/SDKs/MacOSX10.4u.sdk])
+m4_define([CS_UNIVERSAL_ARCHS_LIST],
+    m4_foreach([arch], [CS_UNIVERSAL_ARCHS], [[-arch] arch ]))
+m4_define([CS_UNIVERSAL_CFLAGS], [-isysroot CS_UNIVERSAL_SDK])
+m4_define([CS_UNIVERSAL_CXXFLAGS], [CS_UNIVERSAL_CFLAGS])
+m4_define([CS_UNIVERSAL_LDFLAGS],
+    [-Wl,-syslibroot,CS_UNIVERSAL_SDK -mmacosx-version-min=10.4])
+
+AC_DEFUN([_CS_CHECK_UNIVERSAL_BINARY],
+    [AS_IF([test "$cs_host_target" = macosx &&
+	   test "$cross_compiling" != yes &&
+	   test -d "CS_UNIVERSAL_SDK"],
+	[cs_universal_binary_default=yes], [cs_universal_binary_default=no])
+    AC_MSG_CHECKING([whether to build universal binaries])
+    AC_ARG_ENABLE([universal-binary],
+	[AC_HELP_STRING([--enable-universal-binary],
+	    [build Mac OS X universal binaries (default YES on Mac OS X with
+            universal SDK installed, else NO)])],
+	[cs_universal_binary=$enableval],
+	[cs_universal_binary=$cs_universal_binary_default])
+    AC_MSG_RESULT([$cs_universal_binary])
+    AS_IF([test "$cs_universal_binary" = yes],
+	[AC_DEFINE([CS_UNIVERSAL_BINARY], [1],
+	    [Define if building universal binaries on MacOSX.])
+	CFLAGS="$CFLAGS CS_UNIVERSAL_CFLAGS CS_UNIVERSAL_ARCHS_LIST"
+	CXXFLAGS="$CXXFLAGS CS_UNIVERSAL_CXXFLAGS CS_UNIVERSAL_ARCHS_LIST"
+	LDFLAGS="$LDFLAGS CS_UNIVERSAL_LDFLAGS CS_UNIVERSAL_ARCHS_LIST"
+	CS_HEADER_PROPERTY([CS_UNIVERSAL_BINARY])
+	CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
+            [CS_UNIVERSAL_CFLAGS CS_UNIVERSAL_ARCHS_LIST], [append])
+	CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS],
+            [CS_UNIVERSAL_CXXFLAGS CS_UNIVERSAL_ARCHS_LIST], [append])
+	CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS],
+            [CS_UNIVERSAL_LDFLAGS CS_UNIVERSAL_ARCHS_LIST], [append])])])
