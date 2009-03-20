@@ -319,7 +319,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function##Wait() const \
 { \
-  return function##T<true>(); \
+  return function##T(true); \
 } \
   inline csRef<iThreadReturn> function() \
 { \
@@ -328,10 +328,9 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function() const \
 { \
-  return function##T<false>(); \
+  return function##T(false); \
 } \
-  template<bool Wait> \
-  inline csRef<iThreadReturn> function##T() const \
+  inline csRef<iThreadReturn> function##T(bool Wait) const \
 { \
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
@@ -374,7 +373,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function##Wait(T1 A1) const \
 { \
-  return function##T<true>(A1); \
+  return function##T(true, A1); \
 } \
   inline csRef<iThreadReturn> function(T1 A1) \
 { \
@@ -383,10 +382,9 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function(T1 A1) const \
 { \
-  return function##T<false>(A1); \
+  return function##T(false, A1); \
 } \
-  template<bool Wait> \
-  inline csRef<iThreadReturn> function##T(T1 A1) const \
+  inline csRef<iThreadReturn> function##T(bool Wait, T1 A1) const \
 { \
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
@@ -430,7 +428,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function##Wait(T1 A1, T2 A2) const \
 { \
-  return function##T<true>(A1, A2); \
+  return function##T(true, A1, A2); \
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2) \
 { \
@@ -439,10 +437,9 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2) const \
 { \
-  return function##T<false>(A1, A2); \
+  return function##T(false, A1, A2); \
 } \
-  template<bool Wait> \
-  inline csRef<iThreadReturn> function##T(T1 A1, T2 A2) const \
+  inline csRef<iThreadReturn> function##T(bool Wait, T1 A1, T2 A2) const \
 { \
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
@@ -487,7 +484,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function##Wait(T1 A1, T2 A2, T3 A3) const \
 { \
-  return function##T<true>(A1, A2, A3); \
+  return function##T(true, A1, A2, A3); \
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3) \
 { \
@@ -496,10 +493,9 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3) const \
 { \
-  return function##T<false>(A1, A2, A3); \
+  return function##T(false, A1, A2, A3); \
 } \
-  template<bool Wait> \
-  inline csRef<iThreadReturn> function##T(T1 A1, T2 A2, T3 A3) const \
+  inline csRef<iThreadReturn> function##T(bool Wait, T1 A1, T2 A2, T3 A3) const \
 { \
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
@@ -545,7 +541,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function##Wait(T1 A1, T2 A2, T3 A3, T4 A4) const \
 { \
-  return function##T<true>(A1, A2, A3, A4); \
+  return function##T(true, A1, A2, A3, A4); \
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4) \
 { \
@@ -554,10 +550,9 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4) const \
 { \
-  return function##T<false>(A1, A2, A3, A4); \
+  return function##T(false, A1, A2, A3, A4); \
 } \
-  template<bool Wait> \
-  inline csRef<iThreadReturn> function##T(T1 A1, T2 A2, T3 A3, T4 A4) const \
+  inline csRef<iThreadReturn> function##T(bool Wait, T1 A1, T2 A2, T3 A3, T4 A4) const \
 { \
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
@@ -604,7 +599,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function##Wait(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5) const \
 { \
-  return function##T<true>(A1, A2, A3, A4, A5); \
+  return function##T(true, A1, A2, A3, A4, A5); \
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5) \
 { \
@@ -613,10 +608,9 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5) const \
 { \
-  return function##T<false>(A1, A2, A3, A4, A5); \
+  return function##T(false, A1, A2, A3, A4, A5); \
 } \
-  template<bool Wait> \
-  inline csRef<iThreadReturn> function##T(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5) const \
+  inline csRef<iThreadReturn> function##T(bool Wait, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5) const \
 { \
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
@@ -664,7 +658,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function##Wait(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6) const \
 { \
-  return function##T<true>(A1, A2, A3, A4, A5, A6); \
+  return function##T(true, A1, A2, A3, A4, A5, A6); \
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6) \
 { \
@@ -673,10 +667,9 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6) const \
 { \
-  return function##T<false>(A1, A2, A3, A4, A5, A6); \
+  return function##T(false, A1, A2, A3, A4, A5, A6); \
 } \
-  template<bool Wait> \
-  inline csRef<iThreadReturn> function##T(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6) const \
+  inline csRef<iThreadReturn> function##T(bool Wait, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6) const \
 { \
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
@@ -725,7 +718,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function##Wait(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7) const \
 { \
-  return function##T<true>(A1, A2, A3, A4, A5, A6, A7); \
+  return function##T(true, A1, A2, A3, A4, A5, A6, A7); \
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7) \
 { \
@@ -734,10 +727,9 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7) const \
 { \
-  return function##T<false>(A1, A2, A3, A4, A5, A6, A7); \
+  return function##T(false, A1, A2, A3, A4, A5, A6, A7); \
 } \
-  template<bool Wait> \
-  inline csRef<iThreadReturn> function##T(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7) const \
+  inline csRef<iThreadReturn> function##T(bool Wait, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7) const \
 { \
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
@@ -787,7 +779,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function##Wait(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8) const \
 { \
-  return function##T<true>(A1, A2, A3, A4, A5, A6, A7, A8); \
+  return function##T(true, A1, A2, A3, A4, A5, A6, A7, A8); \
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8) \
 { \
@@ -796,10 +788,9 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8) const \
 { \
-  return function##T<false>(A1, A2, A3, A4, A5, A6, A7, A8); \
+  return function##T(false, A1, A2, A3, A4, A5, A6, A7, A8); \
 } \
-  template<bool Wait> \
-  inline csRef<iThreadReturn> function##T(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8) const \
+  inline csRef<iThreadReturn> function##T(bool Wait, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8) const \
 { \
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
@@ -850,7 +841,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function##Wait(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9) const \
 { \
-  return function##T<true>(A1, A2, A3, A4, A5, A6, A7, A8, A9); \
+  return function##T(true, A1, A2, A3, A4, A5, A6, A7, A8, A9); \
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9) \
 { \
@@ -859,10 +850,9 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9) const \
 { \
-  return function##T<false>(A1, A2, A3, A4, A5, A6, A7, A8, A9); \
+  return function##T(false, A1, A2, A3, A4, A5, A6, A7, A8, A9); \
 } \
-  template<bool Wait> \
-  inline csRef<iThreadReturn> function##T(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9) const \
+  inline csRef<iThreadReturn> function##T(bool Wait, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9) const \
 { \
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
@@ -914,7 +904,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function##Wait(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10) const \
 { \
-  return function##T<true>(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10); \
+  return function##T(true, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10); \
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10) \
 { \
@@ -923,10 +913,9 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10) const \
 { \
-  return function##T<false>(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10); \
+  return function##T(false, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10); \
 } \
-  template<bool Wait> \
-  inline csRef<iThreadReturn> function##T(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10) const \
+  inline csRef<iThreadReturn> function##T(bool Wait, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10) const \
 { \
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
@@ -979,7 +968,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function##Wait(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11) const \
 { \
-  return function##T<true>(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11); \
+  return function##T(true, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11); \
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11) \
 { \
@@ -988,10 +977,9 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11) const \
 { \
-  return function##T<false>(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11); \
+  return function##T(false, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11); \
 } \
-  template<bool Wait> \
-  inline csRef<iThreadReturn> function##T(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11) const \
+  inline csRef<iThreadReturn> function##T(bool Wait, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11) const \
 { \
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
@@ -1045,7 +1033,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function##Wait(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12) const \
 { \
-  return function##T<true>(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12); \
+  return function##T(true, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12); \
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12) \
 { \
@@ -1054,10 +1042,9 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12) const \
 { \
-  return function##T<false>(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12); \
+  return function##T(false, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12); \
 } \
-  template<bool Wait> \
-  inline csRef<iThreadReturn> function##T(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12) const \
+  inline csRef<iThreadReturn> function##T(bool Wait, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12) const \
 { \
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
@@ -1112,7 +1099,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function##Wait(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12, T13 A13) const \
 { \
-  return function##T<true>(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13); \
+  return function##T(true, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13); \
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12, T13 A13) \
 { \
@@ -1121,10 +1108,9 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12, T13 A13) const \
 { \
-  return function##T<false>(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13); \
+  return function##T(false, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13); \
 } \
-  template<bool Wait> \
-  inline csRef<iThreadReturn> function##T(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12, T13 A13) const \
+  inline csRef<iThreadReturn> function##T(bool Wait, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12, T13 A13) const \
 { \
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
@@ -1180,7 +1166,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function##Wait(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12, T13 A13, T14 A14) const \
 { \
-  return function##T<true>(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14); \
+  return function##T(true, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14); \
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12, T13 A13, T14 A14) \
 { \
@@ -1189,10 +1175,9 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12, T13 A13, T14 A14) const \
 { \
-  return function##T<false>(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14); \
+  return function##T(false, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14); \
 } \
-  template<bool Wait> \
-  inline csRef<iThreadReturn> function##T(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12, T13 A13, T14 A14) const \
+  inline csRef<iThreadReturn> function##T(bool Wait, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12, T13 A13, T14 A14) const \
 { \
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
@@ -1249,7 +1234,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function##Wait(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12, T13 A13, T14 A14, T15 A15) const \
 { \
-  return function##T<true>(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15); \
+  return function##T(true, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15); \
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12, T13 A13, T14 A14, T15 A15) \
 { \
@@ -1258,10 +1243,9 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
 } \
   inline csRef<iThreadReturn> function(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12, T13 A13, T14 A14, T15 A15) const \
 { \
-  return function##T<false>(A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15); \
+  return function##T(false, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15); \
 } \
-  template<bool Wait> \
-  inline csRef<iThreadReturn> function##T(T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12, T13 A13, T14 A14, T15 A15) const \
+  inline csRef<iThreadReturn> function##T(bool Wait, T1 A1, T2 A2, T3 A3, T4 A4, T5 A5, T6 A6, T7 A7, T8 A8, T9 A9, T10 A10, T11 A11, T12 A12, T13 A13, T14 A14, T15 A15) const \
 { \
   csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(GetObjectRegistry()); \
   csRef<iThreadReturn> ret; \
