@@ -29,7 +29,7 @@ AC_PREREQ([2.56])
 #	CS_EMIT_BUILD_PROPERTY() is invoked with EMITTER in order to record the
 #	value of the TTREE variable in an output file. As a convenience, if
 #	EMITTER is the literal value "emit" or "yes", then
-#	CS_EMIT_BUILD_RESULT()'s default emitter will be used.
+#	CS_EMIT_BUILD_PROPERTY()'s default emitter will be used.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_TEMPLATE_TOOLKIT2],
     [CS_CHECK_PROGS([PERL], [perl5 perl])
