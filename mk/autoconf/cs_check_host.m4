@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
-# Determine host platform.  Recognized families: Unix, Windows, MacOS/X.
-# Orginial Macros Copyright (C)2003 Eric Sunshine <sunshine@sunshineco.com>
+# Determine host platform.  Recognized families: Unix, Windows, Mac OS X.
+# Copyright (C)2003-2009 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -19,16 +19,17 @@
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-# Determine host CPU.
-#
-# CS_CHECK_HOST_CPU
+# CS_CHECK_HOST_CPU([EMITTER])
 #       Set the shell variable cs_host_cpu to a normalized form of the CPU name
 #       returned by config.guess/config.sub.  Typically, Crystal Space's
 #       conception of CPU name is the same as that returned by
-#       config.guess/config.sub, but there may be exceptions as seen in the
-#       `case' statement.  Also takes the normalized name, uppercases it to
-#       form a name suitable for the C preprocessor.  Additionally sets the
-#       TARGET.PROCESSOR Jamconfig property.
+#       config.guess/config.sub, but there may be exceptions, such as
+#       normalizing all Intel x86 CPU names to the canonical "x86".  Also takes
+#       the normalized name, uppercases it to form a name suitable for the C
+#       preprocessor and publishes it as shell variable cs_host_cpu_normalized.
+#       Additionally, sets the TARGET.PROCESSOR build property to the value of
+#       cs_host_cpu_normalized via the supplied EMITTER. If EMITTER is omitted,
+#       then CS_EMIT_BUILD_PROPERTY()'s default emitter is employed.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_HOST_CPU],
     [AC_REQUIRE([AC_CANONICAL_HOST])
@@ -37,16 +38,22 @@ AC_DEFUN([CS_CHECK_HOST_CPU],
         *) cs_host_cpu=$host_cpu ;;
     esac
     cs_host_cpu_normalized="AS_TR_CPP([$cs_host_cpu])"
-    CS_JAMCONFIG_PROPERTY([TARGET.PROCESSOR], [$cs_host_cpu_normalized])
+    CS_EMIT_BUILD_PROPERTY([TARGET.PROCESSOR], [$cs_host_cpu_normalized],
+        [], [], [$1])
     ])
 
 
 #------------------------------------------------------------------------------
-# CS_CHECK_HOST
-#       Sets the shell variables cs_host_target cs_host_family,
-#       cs_host_os_normalized, and cs_host_os_normalized_uc.  Emits appropriate
-#       CS_PLATFORM_UNIX, CS_PLATFORM_WIN32, CS_PLATFORM_MACOSX via
-#       AC_DEFINE(), and TARGET.OS and TARGET.OS.NORMALIZED to Jamconfig.
+# CS_CHECK_HOST([EMITTER])
+#       Sets the shell variables cs_host_target, cs_host_family,
+#       cs_host_os_normalized, and cs_host_os_normalized_uc (normalized and
+#       uppercase).  Emits appropriate CS_PLATFORM_UNIX, CS_PLATFORM_WIN32,
+#       CS_PLATFORM_MACOSX via AC_DEFINE(). Note that these are not necessarily
+#       mutually exclusive. For instance, on Mac OS X, both CS_PLATFORM_MACOSX
+#       and CS_PLATFORM_UNIX are defined.  Furthermore, emits build variables
+#       TARGET.OS and TARGET.OS.NORMALIZED via CS_EMIT_BUILD_PROPERTY() using
+#       the provided EMITTER or CS_EMIT_BUILD_PROPERTY()'s default emitter if
+#       EMITTER is omitted.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_HOST],
     [AC_REQUIRE([AC_CANONICAL_HOST])
@@ -76,26 +83,29 @@ AC_DEFUN([CS_CHECK_HOST],
 	    ;;
 	unix)
             AC_DEFINE([CS_PLATFORM_UNIX], [],
-		[Define when compiling for Unix and Unix-like (i.e. MacOS/X)])
+		[Define when compiling for Unix and Unix-like (i.e. Mac OS X)])
 	    AS_IF([test -z "$cs_host_os_normalized"],
 		[cs_host_os_normalized='Unix'])
 	    ;;
     esac
 
     cs_host_os_normalized_uc="AS_TR_CPP([$cs_host_os_normalized])"
-    CS_JAMCONFIG_PROPERTY([TARGET.OS], [$cs_host_os_normalized_uc])
-    CS_JAMCONFIG_PROPERTY([TARGET.OS.NORMALIZED], [$cs_host_os_normalized])
+    CS_EMIT_BUILD_PROPERTY([TARGET.OS], [$cs_host_os_normalized_uc],
+        [], [], [$1])
+    CS_EMIT_BUILD_PROPERTY([TARGET.OS.NORMALIZED], [$cs_host_os_normalized],
+        [], [], [$1])
 ])
 
+# _CS_CHECK_HOST_DARWIN([EMITTER])
 AC_DEFUN([_CS_CHECK_HOST_DARWIN],
     [AC_REQUIRE([CS_PROG_CC])
     AC_REQUIRE([CS_PROG_CXX])
 
-    # Both MacOS/X and Darwin are identified via $host_os as "darwin".  We need
-    # a way to distinguish between the two.  If Carbon.h is present, then
-    # assume MacOX/S; if not, assume Darwin.  If --with-x=yes was invoked, and
+    # Both Mac OS X and Darwin are identified via $host_os as "darwin".  We
+    # need a way to distinguish between the two.  If Carbon.h is present, then
+    # assume Mac OX S; if not, assume Darwin.  If --with-x=yes was invoked, and
     # Carbon.h is present, then assume that user wants to cross-build for
-    # Darwin even though build host is MacOS/X.
+    # Darwin even though build host is Mac OS X.
     # IMPLEMENTATION NOTE *1*
     # The QuickTime 7.0 installer removes <CarbonSound/CarbonSound.h>, which
     # causes #include <Carbon/Carbon.h> to fail unconditionally. Re-installing
@@ -104,7 +114,7 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
     # CarbonSound.h by #defining __CARBONSOUND__ in the test in order to
     # prevent Carbon.h from attempting to #include the missing header.
     # IMPLEMENTATION NOTE *2*
-    # At least one MacOS/X user switches between gcc 2.95 and gcc 3.3 with a
+    # At least one Mac OS X user switches between gcc 2.95 and gcc 3.3 with a
     # script which toggles the values of CC, CXX, and CPP.  Unfortunately, CPP
     # was being set to run the preprocessor directly ("cpp", for instance)
     # rather than running it via the compiler ("gcc -E", for instance).  The
@@ -135,10 +145,11 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
 
 	AC_CACHE_CHECK([for Objective-C compiler], [cs_cv_prog_objc],
 	    [cs_cv_prog_objc="$CC"])
-	CS_JAMCONFIG_PROPERTY([CMD.OBJC], [$cs_cv_prog_objc])
+	CS_EMIT_BUILD_PROPERTY([CMD.OBJC], [$cs_cv_prog_objc], [], [], [$1])
 	AC_CACHE_CHECK([for Objective-C++ compiler], [cs_cv_prog_objcxx],
 	    [cs_cv_prog_objcxx="$CXX"])
-	CS_JAMCONFIG_PROPERTY([CMD.OBJC++], [$cs_cv_prog_objcxx])],
+	CS_EMIT_BUILD_PROPERTY([CMD.OBJC++], [$cs_cv_prog_objcxx],
+            [], [], [$1])],
 
 	[cs_host_target=unix
 	cs_host_family=unix])])
