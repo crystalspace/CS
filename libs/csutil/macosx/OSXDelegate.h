@@ -63,6 +63,7 @@
 - (void)rightMouseDown:   (NSEvent*)p forView:(NSView*)v;
 - (void)rightMouseUp:     (NSEvent*)p forView:(NSView*)v;
 - (void)rightMouseDragged:(NSEvent*)p forView:(NSView*)v;
+- (void)scrollWheel:      (NSEvent*)p forView:(NSView*)v;
 
 @end
 

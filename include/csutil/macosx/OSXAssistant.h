@@ -168,6 +168,14 @@ struct iOSXAssistant : public virtual iBase
    * bottom.
    */
   virtual void mouse_moved(int x, int y) = 0;
+
+  /**
+   * Post a wheel-moved event to the Crystal Space event queue.  The
+   * coordinates are specified in terms of the Crystal Space coordinate system
+   * where `x' increases from left to right, and `y' increases from top to
+   * bottom.
+   */
+  virtual void wheel_moved(int button, int x, int y) = 0;
 };
 
 #endif // __CSSYS_MACOSX_OSXAssistant_h

@@ -83,6 +83,7 @@ public:
   virtual void mouse_down(int button, int x, int y);
   virtual void mouse_up(int button, int x, int y);
   virtual void mouse_moved(int x, int y);
+  virtual void wheel_moved(int b, int x, int y);
 
   virtual uint GetPotentiallyConflictingEvents();
   virtual uint QueryEventPriority(uint type);
@@ -118,6 +119,7 @@ NSD_PROTO(void,key_up)(OSXAssistant, unsigned int raw, unsigned int cooked);
 NSD_PROTO(void,mouse_down)(OSXAssistant, int button, int x, int y);
 NSD_PROTO(void,mouse_up)(OSXAssistant, int button, int x, int y);
 NSD_PROTO(void,mouse_moved)(OSXAssistant, int x, int y);
+NSD_PROTO(void,wheel_moved)(OSXAssistant, int button, int x, int y);
 
 #undef NSD_PROTO
 

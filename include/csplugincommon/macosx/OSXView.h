@@ -43,5 +43,6 @@
 - (void) otherMouseDown:(NSEvent *) ev;
 - (void) otherMouseUp:(NSEvent *) ev;
 - (void) otherMouseDragged:(NSEvent *) ev;
+- (void) scrollWheel:(NSEvent *) ev;
 
 @end
