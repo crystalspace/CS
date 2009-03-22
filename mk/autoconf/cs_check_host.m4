@@ -177,10 +177,10 @@ m4_define([CS_UNIVERSAL_ARCHS], [i386, ppc])
 m4_define([CS_UNIVERSAL_SDK], [/Developer/SDKs/MacOSX10.4u.sdk])
 m4_define([CS_UNIVERSAL_ARCHS_LIST],
     m4_foreach([arch], [CS_UNIVERSAL_ARCHS], [[-arch] arch ]))
-m4_define([CS_UNIVERSAL_CFLAGS], [-isysroot CS_UNIVERSAL_SDK])
+m4_define([CS_UNIVERSAL_CFLAGS],
+    [-isysroot CS_UNIVERSAL_SDK -mmacosx-version-min=10.4])
 m4_define([CS_UNIVERSAL_CXXFLAGS], [CS_UNIVERSAL_CFLAGS])
-m4_define([CS_UNIVERSAL_LDFLAGS],
-    [-Wl,-syslibroot,CS_UNIVERSAL_SDK -mmacosx-version-min=10.4])
+m4_define([CS_UNIVERSAL_LDFLAGS], [-Wl,-syslibroot,CS_UNIVERSAL_SDK])
 
 AC_DEFUN([_CS_CHECK_UNIVERSAL_BINARY],
     [AS_IF([test "$cs_host_target" = macosx &&
