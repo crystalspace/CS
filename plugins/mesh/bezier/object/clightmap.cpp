@@ -208,7 +208,7 @@ const char* csCurveLightMap::ReadFromCache (
 
   SetSize (w, h);
 
-  strcpy (pswanted.header, LMMAGIC);
+  memcpy (pswanted.header, LMMAGIC, 4);
   pswanted.lm_size = lm_size;
   pswanted.lm_cnt = 111;
 
@@ -382,7 +382,7 @@ void csCurveLightMap::Cache (
 
   PolySave ps;
 
-  strcpy (ps.header, LMMAGIC);
+  memcpy (ps.header, LMMAGIC, 4);
 
   if (file->Write ("lmpn", 4) != 4)
     return;
@@ -415,7 +415,7 @@ void csCurveLightMap::Cache (
     uint8 have_dyn = 1;
     file->Write ((char*)&have_dyn, sizeof (have_dyn));
 
-    strcpy (lh.header, "DYNL");
+    memcpy (lh.header, "DYNL", 4);
     lh.dyn_cnt = 0;
     while (smap)
     {
