@@ -452,7 +452,7 @@ void csLightMap::Cache (
 
   PolySave ps;
 
-  strcpy (ps.header, LMMAGIC);
+  memcpy (ps.header, LMMAGIC, 4);
   if (poly)
   {
     ps.x1 = csLittleEndian::Convert (csFloatToShort (spoly->Vobj (0).x));
@@ -497,7 +497,7 @@ void csLightMap::Cache (
     uint8 have_dyn = 1;
     file->Write ((char*)&have_dyn, sizeof (have_dyn));
 
-    strcpy (lh.header, "DYNL");
+    memcpy (lh.header, "DYNL", 4);
     lh.dyn_cnt = 0;
     while (smap)
     {
