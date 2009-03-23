@@ -268,8 +268,8 @@ NSD_PROTO(void,show_mouse_pointer)(OSXAssistantHandle h)
 NSD_PROTO(void,dispatch_event)(OSXAssistantHandle h, OSXEvent e, OSXView v)
     { NSD_ASSIST(h)->dispatch_event(e, v); }
 NSD_PROTO(void,key_down)(OSXAssistantHandle h,
-    unsigned int raw, unsigned int cooked, bool repeat)
-    { NSD_ASSIST(h)->key_down(raw, cooked, repeat); }
+    unsigned int raw, unsigned int cooked, int is_repeat)
+    { NSD_ASSIST(h)->key_down(raw, cooked, is_repeat); }
 NSD_PROTO(void,key_up)(OSXAssistantHandle h,
     unsigned int raw, unsigned int cooked)
     { NSD_ASSIST(h)->key_up(raw, cooked); }
