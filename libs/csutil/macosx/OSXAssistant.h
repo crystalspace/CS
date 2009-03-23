@@ -78,7 +78,7 @@ public:
   virtual void hide_mouse_pointer();
   virtual void show_mouse_pointer();
   virtual void dispatch_event(OSXEvent, OSXView);
-  virtual void key_down(unsigned int raw, unsigned int cooked);
+  virtual void key_down(unsigned int raw, unsigned int cooked, bool repeat);
   virtual void key_up(unsigned int raw, unsigned int cooked);
   virtual void mouse_down(int button, int x, int y);
   virtual void mouse_up(int button, int x, int y);
@@ -114,7 +114,7 @@ NSD_PROTO(void,flush_graphics_context)(OSXAssistant);
 NSD_PROTO(void,hide_mouse_pointer)(OSXAssistant);
 NSD_PROTO(void,show_mouse_pointer)(OSXAssistant);
 NSD_PROTO(void,dispatch_event)(OSXAssistant, OSXEvent, OSXView);
-NSD_PROTO(void,key_down)(OSXAssistant, unsigned int raw, unsigned int cooked);
+NSD_PROTO(void,key_down)(OSXAssistant, unsigned int raw, unsigned int cooked, bool repeat);
 NSD_PROTO(void,key_up)(OSXAssistant, unsigned int raw, unsigned int cooked);
 NSD_PROTO(void,mouse_down)(OSXAssistant, int button, int x, int y);
 NSD_PROTO(void,mouse_up)(OSXAssistant, int button, int x, int y);

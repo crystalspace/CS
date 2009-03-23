@@ -429,7 +429,7 @@ ND_PROTO(void,flush_graphics_context)(OSXDelegateHandle handle)
     if (new_state)
     {
       modifiers |= csmask;
-      OSXAssistant_key_down(assistant, key, key);
+      OSXAssistant_key_down(assistant, key, key, FALSE);
     }
     else
     {
@@ -451,10 +451,10 @@ ND_PROTO(void,flush_graphics_context)(OSXDelegateHandle handle)
     if ([self classifyKeyDown:p raw:&raw cooked:&cooked])
     {
       if (flag)
-        OSXAssistant_key_down(assistant, raw, cooked);
+        OSXAssistant_key_down(assistant, raw, cooked, [p isARepeat]);
       else
         OSXAssistant_key_up(assistant, raw, cooked);
-    }
+    }	
   }
 }
 
