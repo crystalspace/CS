@@ -135,9 +135,10 @@ struct iOSXAssistant : public virtual iBase
 
   /**
    * Post a key-down event to the Crystal Space event queue.  The first number
-   * is the raw key code, and the second is the cooked character code.
+   * is the raw key code, and the second is the cooked character code. The third
+   * argument is a boolean indicating if the keys were previously used.
    */
-  virtual void key_down(unsigned int raw, unsigned int cooked) = 0;
+  virtual void key_down(unsigned int raw, unsigned int cooked, bool repeat) = 0;
 
   /**
    * Post a key-up event to the Crystal Space event queue.  The first number is
