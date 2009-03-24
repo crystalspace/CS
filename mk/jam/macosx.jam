@@ -46,10 +46,12 @@ NOARSCAN = true ;
 # "update" a static library when one or more object files have changed.  To
 # work around the problem, we force the library to be created from scratch by
 # removing it and re-populating it with all object files (rather than with only
-# those which changed).  An alternate approach would be to use Apple 'libtool',
-# but it too can only create libraries from scratch, and is unable to update
-# them, thus libtool also requires deleting the old library and entirely
-# re-populating it.
+# those which changed).  The alternate approach of using Apple 'libtool' is
+# unsuitable for two reasons. First, libtool can only create libraries from
+# scratch; it is unable to update them. Second, the libtool can not be invoked
+# piecemeal, which means that a response file would instead have to be created
+# piecemeal and libtool invoked afterward. Such an approach requires much more
+# effort than the 'ar' workaround.
 
 CRELIB = true ;
 actions CreLib
