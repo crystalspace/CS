@@ -388,8 +388,16 @@ void csSndSysRendererOpenAL::Update()
   // Update the sources
   size_t iMax = m_Sources.GetSize();
   for (size_t i=0;i<iMax;i++)
+  {
     m_Sources[i]->PerformUpdate( ExternalUpdates );
-
+	if (m_Sources[i]->GetStream()->GetAutoUnregisterRequested() == true) // sound has finished and is not looping
+	{
+	  RemoveStream(m_Sources[i]->GetStream());
+	  RemoveSource(m_Sources[i]);
+	  i--;    // changing the vector in mid-loop means we back up here
+	  iMax--; // array is also one shorter now
+	}
+  }
   // Check for any errors
   ALCenum err = alcGetError (m_Device);
   if (err != ALC_NO_ERROR)
