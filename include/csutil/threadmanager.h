@@ -42,22 +42,29 @@ public:
   void Init(iConfigManager* config);
 
   void Process(uint num = 1);
-  void Wait(csRef<iThreadReturn> ret);
   bool Wait(csRefArray<iThreadReturn>& threadReturns);
 
   inline void PushToQueue(QueueType queueType, iJob* job)
   {
-    if(queueType == THREADED)
+    if(queueType == THREADED || queueType == THREADEDL)
     {
-      threadQueue->Enqueue(job);
-    }
-    else if(queueType == THREADEDL)
-    {
-      threadQueue->Enqueue(job, true);
+      {
+        CS::Threading::MutexScopedLock lock(waitingThreadsLock);
+        threadQueue->Enqueue(job, queueType == THREADEDL);
+      }
+
+      for(size_t i=0; i<waitingThreads.GetSize(); ++i)
+      {
+        waitingThreads[i]->NotifyAll();
+      }
     }
     else
     {
-      listQueue->Enqueue(job, queueType);
+      {
+        CS::Threading::MutexScopedLock lock(waitingMainLock);
+        listQueue->Enqueue(job, queueType);
+      }
+      waitingMain.NotifyOne();
     }
   }
 
@@ -96,7 +103,6 @@ public:
 
 protected:
   csEventID ProcessPerFrame;
-  csEventID ProcessWhileWait;
 
 private:
 
@@ -106,6 +112,12 @@ private:
   {
     return tid == CS::Threading::Thread::GetThreadID();
   }
+
+  CS::Threading::Mutex waitingMainLock;
+  CS::Threading::Condition waitingMain;
+
+  CS::Threading::Mutex waitingThreadsLock;
+  csArray<CS::Threading::Condition*> waitingThreads;
 
   int32 waiting;
   int32 threadCount;
@@ -133,8 +145,7 @@ private:
 
     bool HandleEvent(iEvent& Event)
     {
-      if(Event.Name == parent->ProcessPerFrame ||
-         Event.Name == parent->ProcessWhileWait)
+      if(Event.Name == parent->ProcessPerFrame)
       {
         if(!parent->alwaysRunNow)
         {
@@ -152,13 +163,12 @@ private:
   csRef<iEventHandler> tMEventHandler;
 };
 
-class csThreadReturn : public iThreadReturn
+class csThreadReturn : public scfImplementation1<csThreadReturn, iThreadReturn>
 {
 public:
-  csThreadReturn(iThreadManager* tm) : tm(tm)
+  csThreadReturn(iThreadManager* tm) : scfImplementationType(this),
+    tm(tm), finished(false), result(0), waitLock(0), wait(0)
   {
-    finished = false;
-    result = NULL;
   }
 
   virtual ~csThreadReturn()
@@ -171,7 +181,21 @@ public:
   void* GetResultPtr() { return result; }
   csRef<iBase> GetResultRefPtr() { return refResult; }
 
-  void MarkFinished() { finished = true; }
+  void MarkFinished()
+  {
+    CS::Threading::MutexScopedLock lock(updateLock);
+    if(waitLock && wait)
+    {
+      CS::Threading::MutexScopedLock lock(*waitLock);
+      finished = true;
+      wait->NotifyAll();
+    }
+    else
+    {
+      finished = true;
+    }
+  }
+
   void MarkSuccessful() { return; }
   void SetResult(void* result) { this->result = result; }
   void SetResult(csRef<iBase> result) { refResult = result; }
@@ -187,8 +211,17 @@ public:
   {
     if(tm.IsValid())
     {
-      tm->Wait(this);
+      csRefArray<iThreadReturn> rets;
+      rets.Push(this);
+      tm->Wait(rets);
     }
+  }
+
+  void SetWaitPtrs(CS::Threading::Condition* c, CS::Threading::Mutex* m)
+  {
+    CS::Threading::MutexScopedLock lock(updateLock);
+    wait = c;
+    waitLock = m;
   }
 
 private:
@@ -196,6 +229,9 @@ private:
   void* result;
   csRef<iBase> refResult;
   csWeakRef<iThreadManager> tm;
+  CS::Threading::Mutex* waitLock;
+  CS::Threading::Condition* wait;
+  CS::Threading::Mutex updateLock;
 };
 
 template<class T, typename A1, typename A2>

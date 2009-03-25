@@ -29,6 +29,7 @@
 #include "csutil/refarr.h"
 #include "csutil/refcount.h"
 #include "csutil/scf_interface.h"
+#include "csutil/threading/condition.h"
 
 #include "igraphic/image.h"
 #include "ivideo/txtmgr.h"
@@ -154,13 +155,12 @@ struct csLoadResult
 /**
  * Return structure for threaded loader functions.
  */
-class csLoaderReturn : public iThreadReturn
+class csLoaderReturn : public scfImplementation1<csLoaderReturn, iThreadReturn>
 {
 public:
-  csLoaderReturn(iThreadManager* tm) : tm(tm)
+  csLoaderReturn(iThreadManager* tm) : scfImplementationType(this),
+    tm(tm), finished(false), success(false), waitLock(0), wait(0)
   {
-    finished = false;
-    success = false;
   }
 
   virtual ~csLoaderReturn()
@@ -169,12 +169,30 @@ public:
 
   bool IsFinished() { return finished; }
   bool WasSuccessful() { return success; }
-  void* GetResultPtr() { CS_ASSERT_MSG("csLoaderReturn does not implement a void* result", false); return NULL; }
+  void* GetResultPtr()
+  { CS_ASSERT_MSG("csLoaderReturn does not implement a void* result", false); return NULL; }
+
   csRef<iBase> GetResultRefPtr() { return result; }
 
-  void MarkFinished() { finished = true; }
+  void MarkFinished()
+  {
+    CS::Threading::MutexScopedLock lock(updateLock);
+    if(waitLock && wait)
+    {
+      CS::Threading::MutexScopedLock lock(*waitLock);
+      finished = true;
+      wait->NotifyAll();
+    }
+    else
+    {
+      finished = true;
+    }
+  }
+
   void MarkSuccessful() { success = true; }
-  void SetResult(void* result) { CS_ASSERT_MSG("csLoaderReturn does not implement a void* result", false); }
+  void SetResult(void* result)
+  { CS_ASSERT_MSG("csLoaderReturn does not implement a void* result", false); }
+
   void SetResult(csRef<iBase> result) { this->result = result; }
 
   void Copy(iThreadReturn* other)
@@ -184,7 +202,19 @@ public:
 
   void Wait()
   {
-    tm->Wait(this);
+    if(tm.IsValid())
+    {
+      csRefArray<iThreadReturn> rets;
+      rets.Push(this);
+      tm->Wait(rets);
+    }
+  }
+
+  void SetWaitPtrs(CS::Threading::Condition* c, CS::Threading::Mutex* m)
+  {
+    CS::Threading::MutexScopedLock lock(updateLock);
+    wait = c;
+    waitLock = m;
   }
 
 private:
@@ -193,6 +223,11 @@ private:
 
   /// True if the object was loaded successfully.
   bool success;
+
+  /// Wait condition.
+  CS::Threading::Mutex* waitLock;
+  CS::Threading::Condition* wait;
+  CS::Threading::Mutex updateLock;
 
   /**
   * The object that was loaded. Depending on the file you load this

@@ -99,8 +99,8 @@ namespace Threading
 
     if (jobUnqued)
     {
-      job->Run ();
       CS::Threading::AtomicOperations::Decrement (&outstandingJobs);
+      job->Run ();
       return;
     }
 
@@ -147,8 +147,8 @@ namespace Threading
     
     if(job.IsValid())
     {
-      job->Run ();
       CS::Threading::AtomicOperations::Decrement (&outstandingJobs);
+      job->Run ();
     }
   }
 
@@ -278,8 +278,8 @@ namespace Threading
       // Execute it
       if (threadState->currentJob)
       {
-        threadState->currentJob->Run ();
         CS::Threading::AtomicOperations::Decrement (&(ownerQueue->outstandingJobs));
+        threadState->currentJob->Run ();
       }
 
       // Clean up

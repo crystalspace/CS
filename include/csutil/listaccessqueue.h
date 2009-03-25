@@ -29,7 +29,7 @@
 class CS_CRYSTALSPACE_EXPORT ListAccessQueue : public csRefCount
 {
 public:
-  ListAccessQueue() : total(0)
+  ListAccessQueue() : total(0), total_medhigh(0)
   {
   }
 
@@ -44,11 +44,13 @@ public:
     {
       CS::Threading::RecursiveMutexScopedLock lock(highQueueLock);
       highqueue.Push(job);
+      CS::Threading::AtomicOperations::Increment(&total_medhigh);
     }
     else if(type == MED)
     {
       CS::Threading::RecursiveMutexScopedLock lock(medQueueLock);
       medqueue.Push(job);
+      CS::Threading::AtomicOperations::Increment(&total_medhigh);
     }
     else if(type == LOW)
     {
@@ -76,14 +78,18 @@ public:
     }
   }
 
+  int32 GetQueueCount() const { return total; }
+  int32 GetMedHighQueueCount() const { return total_medhigh; }
+
 private:
   inline void ProcessHighQueue(uint& i, uint& num)
   {
     CS::Threading::RecursiveMutexScopedLock lock(highQueueLock);
     for(; i<num && highqueue.GetSize() != 0; i++)
     {
-      highqueue.PopTop()->Run();
       CS::Threading::AtomicOperations::Decrement(&total);
+      CS::Threading::AtomicOperations::Decrement(&total_medhigh);
+      highqueue.PopTop()->Run();
     }
   }
 
@@ -93,8 +99,9 @@ private:
     CS::Threading::RecursiveMutexScopedLock lock(medQueueLock);
     for(; i<num && medqueue.GetSize() != 0; i++)
     {
-      medqueue.PopTop()->Run();
       CS::Threading::AtomicOperations::Decrement(&total);
+      CS::Threading::AtomicOperations::Decrement(&total_medhigh);
+      medqueue.PopTop()->Run();
       ProcessHighQueue(i, num);
     }
   }
@@ -105,8 +112,8 @@ private:
     CS::Threading::RecursiveMutexScopedLock lock(lowQueueLock);
     for(; i<num && lowqueue.GetSize() != 0; i++)
     {
-      lowqueue.PopTop()->Run();
       CS::Threading::AtomicOperations::Decrement(&total);
+      lowqueue.PopTop()->Run();
       ProcessHighQueue(i, num);
       ProcessMedQueue(i, num);
     }
@@ -119,6 +126,7 @@ private:
   csFIFO<csRef<iJob> > medqueue;
   csFIFO<csRef<iJob> > lowqueue;
   int32 total;
+  int32 total_medhigh;
 };
 
 #endif // __CS_CSUTIL_LISTACCESSQUEUE_H__
