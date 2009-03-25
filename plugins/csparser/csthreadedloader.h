@@ -71,16 +71,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
                                                      Interface>
   {
   public:
-    csLoaderIterator(csRefArray<T>* objects, CS::Threading::Mutex* lock) :
+    csLoaderIterator(csRefArray<T>* objects, CS::Threading::ReadWriteMutex* lock) :
         scfImplementation1<csLoaderIterator<T, Interface>,
                            Interface> (this),
-        lock(*lock), objects(objects), itr(objects->GetIterator())
+        rwl(lock), lk(*lock), objects(objects), itr(objects->GetIterator())
         {
         }
 
         virtual ~csLoaderIterator()
         {
+          rwl->UpgradeUnlockAndWriteLock();
           objects->Empty();
+          rwl->WriteUnlockAndUpgradeLock();
         }
 
         T* Next()
@@ -94,7 +96,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         }
 
   private:
-    CS::Threading::MutexScopedLock lock;
+    CS::Threading::ReadWriteMutex* rwl;
+    CS::Threading::ScopedUpgradeableLock lk;
     csRefArray<T>* objects;
     typename csRefArray<T>::Iterator itr;
   };
@@ -229,50 +232,50 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     void AddSectorToList(iSector* obj)
     {
-      CS::Threading::MutexScopedLock lock(sectorsLock);
+      CS::Threading::ScopedWriteLock lock(sectorsLock);
       loaderSectors.Push(obj);
       obj->DecRef(); // Compensate for CreateSector IncRef().
     }
 
     void AddMeshFactToList(iMeshFactoryWrapper* obj)
     {
-      CS::Threading::MutexScopedLock lock(meshfactsLock);
+      CS::Threading::ScopedWriteLock lock(meshfactsLock);
       loaderMeshFactories.Push(obj);
     }
 
     void AddMeshToList(iMeshWrapper* obj)
     {
-      CS::Threading::MutexScopedLock lock(meshesLock);
+      CS::Threading::ScopedWriteLock lock(meshesLock);
       loaderMeshes.Push(obj);
     }
 
     void AddCamposToList(iCameraPosition* obj)
     {
-      CS::Threading::MutexScopedLock lock(camposLock);
+      CS::Threading::ScopedWriteLock lock(camposLock);
       loaderCameraPositions.Push(obj);
     }
 
     void AddTextureToList(iTextureWrapper* obj)
     {
-      CS::Threading::MutexScopedLock lock(texturesLock);
+      CS::Threading::ScopedWriteLock lock(texturesLock);
       loaderTextures.Push(obj);
     }
 
     void AddMaterialToList(iMaterialWrapper* obj)
     {
-      CS::Threading::MutexScopedLock lock(materialsLock);
+      CS::Threading::ScopedWriteLock lock(materialsLock);
       loaderMaterials.Push(obj);
     }
 
     void AddSharedVarToList(iSharedVariable* obj)
     {
-      CS::Threading::MutexScopedLock lock(sharedvarLock);
+      CS::Threading::ScopedWriteLock lock(sharedvarLock);
       loaderSharedVariables.Push(obj);
     }
 
     void AddLightToList(iLight* obj, const char* name)
     {
-      CS::Threading::MutexScopedLock lock(lightsLock);
+      CS::Threading::ScopedWriteLock lock(lightsLock);
       loadedLights.Put(csString(name), obj);
     }
 
@@ -283,14 +286,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     friend class csLoaderContext;
 
     // Shared lists and locks.
-    CS::Threading::Mutex sectorsLock;
-    CS::Threading::Mutex meshfactsLock;
-    CS::Threading::Mutex meshesLock;
-    CS::Threading::Mutex camposLock;
-    CS::Threading::Mutex texturesLock;
-    CS::Threading::Mutex materialsLock;
-    CS::Threading::Mutex sharedvarLock;
-    CS::Threading::Mutex lightsLock;
+    CS::Threading::ReadWriteMutex sectorsLock;
+    CS::Threading::ReadWriteMutex meshfactsLock;
+    CS::Threading::ReadWriteMutex meshesLock;
+    CS::Threading::ReadWriteMutex camposLock;
+    CS::Threading::ReadWriteMutex texturesLock;
+    CS::Threading::ReadWriteMutex materialsLock;
+    CS::Threading::ReadWriteMutex sharedvarLock;
+    CS::Threading::ReadWriteMutex lightsLock;
 
     // Final objects.
     csRefArray<iSector> loaderSectors;
@@ -317,7 +320,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     bool FindLoadedMeshObject(const char* name)
     {
-      CS::Threading::MutexScopedLock lock(meshesLock);
+      CS::Threading::ScopedReadLock lock(meshesLock);
       for(size_t i=0; i<loaderMeshes.GetSize(); i++)
       {
         if(csString(name).Compare(loaderMeshes[i]->QueryObject()->GetName()))

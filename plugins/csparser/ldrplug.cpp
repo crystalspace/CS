@@ -25,6 +25,8 @@
 
 #include "ldrplug.h"
 
+using namespace CS::Threading;
+
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
   csLoadedPluginVector::csLoadedPluginVector ()
@@ -39,7 +41,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   void csLoadedPluginVector::DeleteAll ()
   {
-    CS::Threading::RecursiveMutexScopedLock lock (mutex);
+    ScopedWriteLock lock(mutex);
     size_t i;
     for (i = 0 ; i < vector.GetSize () ; i++)
     {
@@ -58,7 +60,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   csLoaderPluginRec* csLoadedPluginVector::FindPluginRec (
     const char* name)
   {
-    CS::Threading::RecursiveMutexScopedLock lock (mutex);
+    ScopedReadLock lock(mutex);
     size_t i;
     for (i=0 ; i<vector.GetSize () ; i++)
     {
@@ -100,7 +102,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     const char* Name, iLoaderPlugin*& plug,
     iBinaryLoaderPlugin*& binplug, iDocumentNode*& defaults)
   {
-    CS::Threading::RecursiveMutexScopedLock lock (mutex);
     // look if there is already a loading record for this plugin
     csLoaderPluginRec* pl = FindPluginRec (Name);
     if (pl)
@@ -110,7 +111,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     // create a new loading record
-    vector.Push (new csLoaderPluginRec (0, Name, 0, 0, 0));
+    {
+      ScopedWriteLock lock(mutex);
+      vector.Push (new csLoaderPluginRec (0, Name, 0, 0, 0));
+    }
+
     defaults = 0;
     return GetPluginFromRec (vector.Get(vector.GetSize ()-1),
       plug, binplug);
@@ -118,7 +123,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   const char* csLoadedPluginVector::FindPluginClassID (const char* Name)
   {
-    CS::Threading::RecursiveMutexScopedLock lock (mutex);
     // look if there is already a loading record for this plugin
     csLoaderPluginRec* pl = FindPluginRec (Name);
     if (pl)
@@ -131,7 +135,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   void csLoadedPluginVector::NewPlugin
     (const char *ShortName, iDocumentNode* child)
   {
-    CS::Threading::RecursiveMutexScopedLock lock (mutex);
     csRef<iDocumentNode> id = child->GetNode ("id");
     csRef<iDocumentNode> defaults = child->GetNode ("defaults");
 
@@ -147,6 +150,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         const char* ClassID = id->GetContentsValue ();
         if (pl->ClassID != ClassID)
         {
+          ScopedWriteLock lock(mutex);
           vector.Delete (pl);
           pl = new csLoaderPluginRec (ShortName, ClassID, 0, 0, 0);
           vector.Push (pl);
@@ -158,6 +162,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         const char* ClassID = child->GetContentsValue ();
         if (pl->ClassID != ClassID)
         {
+          ScopedWriteLock lock(mutex);
           vector.Delete (pl);
           vector.Push (new csLoaderPluginRec (ShortName, ClassID, 0, 0, 0));
         }
@@ -171,11 +176,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         csLoaderPluginRec* pr = new csLoaderPluginRec (ShortName, ClassID, 0, 0, 0);
         csRef<iDocumentNode> defaults = child->GetNode ("defaults");
         pr->SetDefaults (defaults);
+        ScopedWriteLock lock(mutex);
         vector.Push (pr);
       }
       else
       {
         const char* ClassID = child->GetContentsValue ();
+        ScopedWriteLock lock(mutex);
         vector.Push (new csLoaderPluginRec (ShortName, ClassID, 0, 0, 0));
       }
     }
