@@ -71,7 +71,7 @@
       <snippet id="fake_light_diffuse" file="/shader/snippets/rgba-black.xml" />
       <snippet id="specular_limit" file="/shader/snippets/modulate_rgb.xml" />
       <snippet id="ambient" file="/shader/snippets/lighting/ambient-one.xml" />
-      <snippet id="specular" file="/shader/snippets/surface/specular-default.xml" />
+      <snippet id="specular" file="/shader/snippets/surface/specular-default-nodiffuse.xml" />
       <snippet id="staticspecular" filealias="staticspecular" />
       <snippet id="add_specular" file="/shader/snippets/add.xml" />
       <snippet id="apply_lighting" file="/shader/snippets/lighting/apply-lighting.xml" />
