@@ -157,7 +157,7 @@
 	  float inv_reflW = 1 / reflTC.w;
 	  
 	  float camDepth = tex2Dproj (texReflectDepth, tc).x*-2 + 1;
-	  float2 screenPos = (reflTC.xy * reflTC2screen * inv_reflW)-float2(1);
+	  float2 screenPos = (reflTC.xy * reflTC2screen * inv_reflW)+float2(-1,1);
 	  float4 positionProjected = float4 (
 	    screenPos.x, screenPos.y, camDepth, 1);
 	  float4 positionUnprojectedW = mul (projectedToWorld, positionProjected);
