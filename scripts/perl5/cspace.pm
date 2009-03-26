@@ -4796,6 +4796,7 @@ sub DESTROY {
 *SetResult = *cspacec::csLoaderReturn_SetResult;
 *Copy = *cspacec::csLoaderReturn_Copy;
 *Wait = *cspacec::csLoaderReturn_Wait;
+*SetWaitPtrs = *cspacec::csLoaderReturn_SetWaitPtrs;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

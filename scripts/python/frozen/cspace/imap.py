@@ -121,6 +121,7 @@ class csLoaderReturn(object):
     def SetResult(*args): return _imap.csLoaderReturn_SetResult(*args)
     def Copy(*args): return _imap.csLoaderReturn_Copy(*args)
     def Wait(*args): return _imap.csLoaderReturn_Wait(*args)
+    def SetWaitPtrs(*args): return _imap.csLoaderReturn_SetWaitPtrs(*args)
 csLoaderReturn_swigregister = _imap.csLoaderReturn_swigregister
 csLoaderReturn_swigregister(csLoaderReturn)
 
