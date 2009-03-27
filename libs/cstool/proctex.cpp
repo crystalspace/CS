@@ -146,20 +146,24 @@ csProcTexture::~csProcTexture ()
 
 }
 
-iEventHandler* csProcTexture::SetupProcEventHandler (
+THREADED_CALLABLE_IMPL1(csProcTexture, SetupProcEventHandler,
 	iObjectRegistry* object_reg)
 {
   csRef<iEventHandler> proceh = csQueryRegistryTagInterface<iEventHandler>
   	(object_reg, "crystalspace.proctex.eventhandler");
-  if (proceh) return proceh;
-  proceh = csPtr<iEventHandler> (new csProcTexEventHandler (object_reg));
-  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
-  if (q != 0)
+  if (!proceh)
   {
-    q->RegisterListener (proceh, csevFrame(object_reg));
-    object_reg->Register (proceh, "crystalspace.proctex.eventhandler");
+    proceh = csPtr<iEventHandler> (new csProcTexEventHandler (object_reg));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
+    if (q != 0)
+    {
+      q->RegisterListener (proceh, csevFrame(object_reg));
+      object_reg->Register (proceh, "crystalspace.proctex.eventhandler");
+    }
   }
-  return proceh;
+
+  ret->SetResult(csRef<iBase>(proceh));
+  return true;
 }
 
 struct csProcTexCallback : 
@@ -223,7 +227,8 @@ iTextureWrapper* csProcTexture::CreateTexture (iObjectRegistry* object_reg)
 bool csProcTexture::Initialize (iObjectRegistry* object_reg)
 {
   csProcTexture::object_reg = object_reg;
-  proceh = SetupProcEventHandler (object_reg);
+  csRef<iThreadReturn> itr = SetupProcEventHandler (object_reg);
+  proceh = scfQueryInterface<iEventHandler>(itr->GetResultRefPtr());
 
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
   g2d = csQueryRegistry<iGraphics2D> (object_reg);
