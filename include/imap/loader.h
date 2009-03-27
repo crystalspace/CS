@@ -159,7 +159,7 @@ class csLoaderReturn : public scfImplementation1<csLoaderReturn, iThreadReturn>
 {
 public:
   csLoaderReturn(iThreadManager* tm) : scfImplementationType(this),
-    tm(tm), finished(false), success(false), waitLock(0), wait(0)
+    finished(false), success(false), waitLock(0), wait(0), tm(tm)
   {
   }
 
@@ -316,7 +316,7 @@ struct iSharedVarLoaderIterator : public virtual iBase
 */
 struct iThreadedLoader : public virtual iBase
 {
-  SCF_INTERFACE (iThreadedLoader, 2, 0, 0);
+  SCF_INTERFACE (iThreadedLoader, 2, 1, 0);
 
  /**
   * Get the loader sector list.
@@ -807,6 +807,8 @@ struct iThreadedLoader : public virtual iBase
   virtual void AddTextureToList(iTextureWrapper* obj) = 0;
   virtual void AddMaterialToList(iMaterialWrapper* obj) = 0;
   virtual void AddSharedVarToList(iSharedVariable* obj) = 0;
+
+  virtual void MarkSyncDone() = 0;
 };
 
 /**

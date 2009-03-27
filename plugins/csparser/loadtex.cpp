@@ -34,6 +34,7 @@
 #include "csgfx/shadervar.h"
 #include "csgfx/xorpat.h"
 #include "cstool/unusedresourcehelper.h"
+#include "cstool/vfsdirchange.h"
 #include "csutil/cscolor.h"
 #include "csutil/scfstr.h"
 #include "iengine/collection.h"
@@ -148,7 +149,8 @@ csPtr<iImage> csThreadedLoader::LoadImage (iDataBuffer* buf, const char* fname,
 
 THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadImage, const char* cwd, const char* fname, int Format, bool do_verbose)
 {
-  vfs->ChDir(cwd);
+  csVfsDirectoryChanger dirChange(vfs);
+  dirChange.ChangeToFull(cwd);
 
   csRef<iDataBuffer> buf = vfs->ReadFile (fname, false);
   csRef<iImage> image = LoadImage (buf, fname, Format, do_verbose);
@@ -162,7 +164,8 @@ THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadImage, const char* cwd, const char
 
 THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadImage, const char* cwd, csRef<iDataBuffer> buf, int Format, bool do_verbose)
 {
-  vfs->ChDir(cwd);
+  csVfsDirectoryChanger dirChange(vfs);
+  dirChange.ChangeToFull(cwd);
 
   csRef<iImage> image = LoadImage (buf, 0, Format, do_verbose);
   if(image.IsValid())
@@ -176,7 +179,8 @@ THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadImage, const char* cwd, csRef<iDat
 THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadTexture, const char* cwd, const char* fname,
   int Flags, csRef<iTextureManager> texman, csRef<iImage>* image, bool do_verbose)
 {
-  vfs->ChDir(cwd);
+  csVfsDirectoryChanger dirChange(vfs);
+  dirChange.ChangeToFull(cwd);
 
   if (!texman && g3d)
   {
@@ -234,7 +238,8 @@ THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadTexture, const char* cwd, const ch
 THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadTexture, const char* cwd, csRef<iDataBuffer> buf, int Flags,
                         csRef<iTextureManager> texman, csRef<iImage>* image, bool do_verbose)
 {
-  vfs->ChDir(cwd);
+  csVfsDirectoryChanger dirChange(vfs);
+  dirChange.ChangeToFull(cwd);
 
   if (!texman && g3d)
   {
@@ -287,7 +292,7 @@ THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadTexture, const char* cwd, csRef<iD
 
   if(sync)
   {
-    Engine->SyncEngineListsNow(this);
+    Engine->SyncEngineListsWait(this);
   }
 
   return true;
@@ -297,7 +302,8 @@ THREADED_CALLABLE_IMPL9(csThreadedLoader, LoadTexture, const char* cwd, const ch
                         csRef<iDataBuffer> buf, int Flags, csRef<iTextureManager> texman, bool reg, bool create_material,
                         bool free_image, bool do_verbose)
 {
-  vfs->ChDir(cwd);
+  csVfsDirectoryChanger dirChange(vfs);
+  dirChange.ChangeToFull(cwd);
 
   if (!texman && g3d)
   {
@@ -341,7 +347,7 @@ THREADED_CALLABLE_IMPL9(csThreadedLoader, LoadTexture, const char* cwd, const ch
 
   if(sync)
   {
-    Engine->SyncEngineListsNow(this);
+    Engine->SyncEngineListsWait(this);
   }
 
   return true;
@@ -351,7 +357,8 @@ THREADED_CALLABLE_IMPL11(csThreadedLoader, LoadTexture, const char* cwd, const c
                         const char* FileName, int Flags, csRef<iTextureManager> texman, bool reg, bool create_material,
                         bool free_image, csRef<iCollection> collection, uint keepFlags, bool do_verbose)
 {
-  vfs->ChDir(cwd);
+  csVfsDirectoryChanger dirChange(vfs);
+  dirChange.ChangeToFull(cwd);
 
   if (!texman && g3d)
   {
@@ -403,7 +410,7 @@ THREADED_CALLABLE_IMPL11(csThreadedLoader, LoadTexture, const char* cwd, const c
 
   if(sync)
   {
-    Engine->SyncEngineListsNow(this);
+    Engine->SyncEngineListsWait(this);
   }
 
   return true;

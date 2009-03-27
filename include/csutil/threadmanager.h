@@ -167,7 +167,7 @@ class csThreadReturn : public scfImplementation1<csThreadReturn, iThreadReturn>
 {
 public:
   csThreadReturn(iThreadManager* tm) : scfImplementationType(this),
-    tm(tm), finished(false), result(0), waitLock(0), wait(0)
+    finished(false), result(0), tm(tm), waitLock(0), wait(0)
   {
   }
 

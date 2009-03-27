@@ -29,7 +29,7 @@
 class CS_CRYSTALSPACE_EXPORT ListAccessQueue : public csRefCount
 {
 public:
-  ListAccessQueue() : total(0), total_medhigh(0)
+  ListAccessQueue() : total(0)
   {
   }
 
@@ -44,13 +44,11 @@ public:
     {
       CS::Threading::RecursiveMutexScopedLock lock(highQueueLock);
       highqueue.Push(job);
-      CS::Threading::AtomicOperations::Increment(&total_medhigh);
     }
     else if(type == MED)
     {
       CS::Threading::RecursiveMutexScopedLock lock(medQueueLock);
       medqueue.Push(job);
-      CS::Threading::AtomicOperations::Increment(&total_medhigh);
     }
     else if(type == LOW)
     {
@@ -79,7 +77,6 @@ public:
   }
 
   int32 GetQueueCount() const { return total; }
-  int32 GetMedHighQueueCount() const { return total_medhigh; }
 
 private:
   inline void ProcessHighQueue(uint& i, uint& num)
@@ -88,7 +85,6 @@ private:
     for(; i<num && highqueue.GetSize() != 0; i++)
     {
       CS::Threading::AtomicOperations::Decrement(&total);
-      CS::Threading::AtomicOperations::Decrement(&total_medhigh);
       highqueue.PopTop()->Run();
     }
   }
@@ -100,7 +96,6 @@ private:
     for(; i<num && medqueue.GetSize() != 0; i++)
     {
       CS::Threading::AtomicOperations::Decrement(&total);
-      CS::Threading::AtomicOperations::Decrement(&total_medhigh);
       medqueue.PopTop()->Run();
       ProcessHighQueue(i, num);
     }
@@ -126,7 +121,6 @@ private:
   csFIFO<csRef<iJob> > medqueue;
   csFIFO<csRef<iJob> > lowqueue;
   int32 total;
-  int32 total_medhigh;
 };
 
 #endif // __CS_CSUTIL_LISTACCESSQUEUE_H__

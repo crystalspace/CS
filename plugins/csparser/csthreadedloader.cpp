@@ -86,7 +86,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
   SCF_IMPLEMENT_FACTORY(csThreadedLoader)
 
-  csThreadedLoader::csThreadedLoader(iBase *p) : scfImplementationType (this, p)
+  csThreadedLoader::csThreadedLoader(iBase *p)
+  : scfImplementationType (this, p), listSync(false)
   {
   }
 
@@ -114,19 +115,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     {
       ReportError("crystalspace.level.threadedloader", "Failed to find the engine plugin!");
       return false;
-    }
-
-    // Start up list sync.
-    if(!threadman->GetAlwaysRunNow())
-    {
-      Engine->SyncEngineLists(this, false);
-
-      csRef<iEventQueue> eventQueue = csQueryRegistry<iEventQueue>(object_reg);
-      if(eventQueue)
-      {
-        ProcessPerFrame = csevFrame(object_reg);
-        eventQueue->RegisterListener(this, ProcessPerFrame);
-      }
     }
 
     vfs = csQueryRegistry<iVFS>(object_reg);
@@ -176,15 +164,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return true;
   }
 
-  bool csThreadedLoader::HandleEvent(iEvent& Event)
-  {
-    if(Event.Name == ProcessPerFrame)
-    {
-      Engine->SyncEngineListsNow(this);
-    }
-    return false;
-  }
-
   iEngineSequenceManager* csThreadedLoader::GetEngineSequenceManager ()
   {
     if (!eseqmgr)
@@ -199,7 +178,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadMeshObjectFactory, const char* cwd, const char* fname,
     csRef<iStreamSource> ssource, bool do_verbose)
   {
-    vfs->ChDir(cwd);
+    csVfsDirectoryChanger dirChange(vfs);
+    dirChange.ChangeToFull(cwd);
 
     csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
       new csLoaderContext (object_reg, Engine, this, 0, 0, KEEP_USED, do_verbose));
@@ -241,7 +221,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
         if(sync)
         {
-          Engine->SyncEngineListsNow(this);
+          Engine->SyncEngineListsWait(this);
         }
 
         return true;
@@ -258,7 +238,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadMeshObject, const char* cwd, const char* fname,
     csRef<iStreamSource> ssource, bool do_verbose)
   {
-    vfs->ChDir(cwd);
+    csVfsDirectoryChanger dirChange(vfs);
+    dirChange.ChangeToFull(cwd);
 
     csRef<iFile> databuff (vfs->Open (fname, VFS_FILE_READ));
     csRef<iMeshWrapper> mesh;
@@ -299,7 +280,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
         if(sync)
         {
-          Engine->SyncEngineListsNow(this);
+          Engine->SyncEngineListsWait(this);
         }
 
         return true;
@@ -316,7 +297,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadShader, const char* cwd, const char* filename,
     bool registerShader, bool do_verbose)
   {
-    vfs->ChDir(cwd);
+    csVfsDirectoryChanger dirChange(vfs);
+    dirChange.ChangeToFull(cwd);
 
     csRef<iShaderManager> shaderMgr = csQueryRegistry<iShaderManager> (
       object_reg);
@@ -374,7 +356,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
       if(sync)
       {
-        Engine->SyncEngineListsNow(this);
+        Engine->SyncEngineListsWait(this);
       }
 
       return true;
@@ -386,7 +368,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool clearEngine, csRef<iCollection> collection, csRef<iStreamSource> ssource,
     csRef<iMissingLoaderData> missingdata, uint keepFlags, bool do_verbose)
   {
-    vfs->ChDir(cwd);
+    csVfsDirectoryChanger dirChange(vfs);
+    dirChange.ChangeToFull(cwd);
 
     csRef<iFile> buf = vfs->Open (filename, VFS_FILE_READ);
 
@@ -428,7 +411,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
       if(sync && res)
       {
-        Engine->SyncEngineListsNow(this);
+        Engine->SyncEngineListsWait(this);
       }
 
       return res;
@@ -445,7 +428,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool clearEngine, csRef<iCollection> collection, csRef<iStreamSource> ssource,
     csRef<iMissingLoaderData> missingdata, uint keepFlags, bool do_verbose)
   {
-    vfs->ChDir(cwd);
+    csVfsDirectoryChanger dirChange(vfs);
+    dirChange.ChangeToFull(cwd);
 
     if (clearEngine)
     {
@@ -456,11 +440,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       new csLoaderContext (object_reg, Engine, this, collection,
       missingdata, keepFlags, do_verbose));
 
-    bool res =  LoadMap (ldr_context, world_node, ssource, missingdata, do_verbose);
+    bool res = LoadMap (ldr_context, world_node, ssource, missingdata, do_verbose);
 
     if(sync && res)
     {
-      Engine->SyncEngineListsNow(this);
+      Engine->SyncEngineListsWait(this);
     }
 
     return res;
@@ -470,7 +454,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iCollection> collection, csRef<iStreamSource> ssource, csRef<iMissingLoaderData> missingdata,
     uint keepFlags, bool do_verbose)
   {
-    vfs->ChDir(cwd);
+    csVfsDirectoryChanger dirChange(vfs);
+    dirChange.ChangeToFull(cwd);
 
     csRef<iFile> buf = vfs->Open (filename, VFS_FILE_READ);
 
@@ -507,7 +492,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
       if(sync && res)
       {
-        Engine->SyncEngineListsNow(this);
+        Engine->SyncEngineListsWait(this);
       }
 
       return res;
@@ -524,7 +509,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iCollection> collection, csRef<iStreamSource> ssource, csRef<iMissingLoaderData> missingdata,
     uint keepFlags, bool do_verbose)
   {
-    vfs->ChDir(cwd);
+    csVfsDirectoryChanger dirChange(vfs);
+    dirChange.ChangeToFull(cwd);
 
     csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext>
       (new csLoaderContext (object_reg, Engine, this, collection,
@@ -546,7 +532,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     if(sync && success)
     {
-      Engine->SyncEngineListsNow(this);
+      Engine->SyncEngineListsWait(this);
     }
 
     // Wait for all jobs to finish.
@@ -557,7 +543,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iCollection> collection, csRef<iStreamSource> ssource, csRef<iMissingLoaderData> missingdata,
     uint keepFlags, bool do_verbose)
   {
-    vfs->ChDir(cwd);
+    csVfsDirectoryChanger dirChange(vfs);
+    dirChange.ChangeToFull(cwd);
 
     csRef<iDataBuffer> buf = vfs->ReadFile (fname);
 
@@ -571,7 +558,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     if(sync && res)
     {
-      Engine->SyncEngineListsNow(this);
+      Engine->SyncEngineListsWait(this);
     }
 
     return res;
@@ -581,13 +568,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iCollection> collection, csRef<iStreamSource> ssource, csRef<iMissingLoaderData> missingdata,
     uint keepFlags, bool do_verbose)
   {
-    vfs->ChDir(cwd);
+    csVfsDirectoryChanger dirChange(vfs);
+    dirChange.ChangeToFull(cwd);
 
     bool res = Load(buffer, 0, collection, ssource, missingdata, keepFlags, do_verbose);
 
     if(sync && res)
     {
-      Engine->SyncEngineListsNow(this);
+      Engine->SyncEngineListsWait(this);
     }
 
     return res;
@@ -597,7 +585,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csRef<iCollection> collection, csRef<iStreamSource> ssource,
       csRef<iMissingLoaderData> missingdata, uint keepFlags, bool do_verbose)
   {
-    vfs->ChDir(cwd);
+    csVfsDirectoryChanger dirChange(vfs);
+    dirChange.ChangeToFull(cwd);
 
     csRef<iLoaderContext> ldr_context;
     ldr_context.AttachNew(new csLoaderContext(object_reg, Engine, this, collection,
@@ -622,7 +611,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         bool res = ParseTextureTC(ret, false, ldr_context, texturenode, &proxyTextures, vfs->GetCwd());
         if(sync && res)
         {
-          Engine->SyncEngineListsNow(this);
+          Engine->SyncEngineListsWait(this);
         }
         return res;
       }
@@ -643,7 +632,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         bool res = FindOrLoadMeshFactoryTC(ret, false, ldr_context, meshfactnode, 0, 0, ssource, 0);
         if(sync && res)
         {
-          Engine->SyncEngineListsNow(this);
+          Engine->SyncEngineListsWait(this);
         }
         return res;
       }
@@ -667,7 +656,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         bool res = LoadMeshObjectTC(ret, false, ldr_context, mesh, 0, meshobjnode, ssource, 0, name, vfs->GetCwd());
         if(sync && res)
         {
-          Engine->SyncEngineListsNow(this);
+          Engine->SyncEngineListsWait(this);
         }
         return res;
       }
@@ -688,7 +677,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         bool res = LoadMap (ldr_context, worldnode, ssource, missingdata, do_verbose);
         if(sync && res)
         {
-          Engine->SyncEngineListsNow(this);
+          Engine->SyncEngineListsWait(this);
         }
         return res;
       }
@@ -709,7 +698,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         bool res = LoadLibraryTC(ret, false, cwd, libnode, collection, ssource, missingdata, keepFlags, do_verbose);
         if(sync && res)
         {
-          Engine->SyncEngineListsNow(this);
+          Engine->SyncEngineListsWait(this);
         }
         return res;
       }
@@ -741,7 +730,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
               ret->SetResult(csRef<iBase>(mw));
               if(sync)
               {
-                Engine->SyncEngineListsNow(this);
+                Engine->SyncEngineListsWait(this);
               }
               return true;
             }
@@ -759,7 +748,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             ret->SetResult(csRef<iBase>(mw));
             if(sync)
             {
-              Engine->SyncEngineListsNow(this);
+              Engine->SyncEngineListsWait(this);
             }
             return true;
           }
@@ -789,7 +778,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           ret->SetResult(csRef<iBase>(light));
           if(sync)
           {
-            Engine->SyncEngineListsNow(this);
+            Engine->SyncEngineListsWait(this);
           }
           return true;
         }
@@ -820,7 +809,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             ret->SetResult(csRef<iBase>(mw));
             if(sync)
             {
-              Engine->SyncEngineListsNow(this);
+              Engine->SyncEngineListsWait(this);
             }
             return true;
           }
@@ -832,7 +821,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           ret->SetResult(csRef<iBase>(mw));
           if(sync)
           {
-            Engine->SyncEngineListsNow(this);
+            Engine->SyncEngineListsWait(this);
           }
           return true;
         }
@@ -854,7 +843,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         LoadPlugins(pluginsnode);
         if(sync)
         {
-          Engine->SyncEngineListsNow(this);
+          Engine->SyncEngineListsWait(this);
         }
         return true;
       }
@@ -869,10 +858,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iDocumentNode> meshfactnode, csRef<iMeshFactoryWrapper> parent, csReversibleTransform* transf,
     csRef<iStreamSource> ssource, const char* path)
   {
-    csVfsDirectoryChanger dirchange(vfs);
+    csVfsDirectoryChanger dirChange(vfs);
     if(path)
     {
-      dirchange.ChangeTo(path);
+      dirChange.ChangeTo(path);
     }
 
     const char* meshfactname = meshfactnode->GetAttributeValue("name");
@@ -1181,7 +1170,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     const char* cwd)
   {
     csVfsDirectoryChanger dirChange(vfs);
-    dirChange.ChangeTo(cwd);
+    dirChange.ChangeToFull(cwd);
 
     const char* file = lib->GetAttributeValue("file");
     const char* path = 0;
@@ -1954,7 +1943,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iMeshWrapper> mesh, csRef<iMeshWrapper> parent, csRef<iDocumentNode> node, 
     csRef<iStreamSource> ssource, csRef<iSector> sector, csString name, const char* cwd)
   {
-    vfs->ChDir(cwd);
+    csVfsDirectoryChanger dirChange(vfs);
+    dirChange.ChangeToFull(cwd);
 
     csString priority;
 

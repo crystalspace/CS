@@ -30,8 +30,8 @@ namespace Threading
       bool exclusive_waiting_blocked;
 
       StateData() : shared_count(0),
-        exclusive(false), exclusive_waiting_blocked(false),
-        upgrade(false)
+        exclusive(false), upgrade(false),
+        exclusive_waiting_blocked(false)
       {
       }
     };

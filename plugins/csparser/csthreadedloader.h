@@ -103,19 +103,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   };
 
   class csThreadedLoader : public ThreadedCallable<csThreadedLoader>,
-                           public scfImplementation3<csThreadedLoader,
+                           public scfImplementation2<csThreadedLoader,
                                                      iThreadedLoader,
-                                                     iComponent,
-                                                     iEventHandler>
+                                                     iComponent>
   {
-    typedef csThreadedLoader ThisType;
   public:
     csThreadedLoader(iBase *p);
     virtual ~csThreadedLoader();
-
-    bool HandleEvent(iEvent&);
-    CS_EVENTHANDLER_NAMES("crystalspace.level.loader.threaded")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
 
     virtual bool Initialize(iObjectRegistry *object_reg);
 
@@ -232,51 +226,81 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     void AddSectorToList(iSector* obj)
     {
-      CS::Threading::ScopedWriteLock lock(sectorsLock);
-      loaderSectors.Push(obj);
-      obj->DecRef(); // Compensate for CreateSector IncRef().
+      {
+        CS::Threading::ScopedWriteLock lock(sectorsLock);
+        loaderSectors.Push(obj);
+        obj->DecRef(); // Compensate for CreateSector IncRef().
+      }
+      MarkSyncNeeded();
     }
 
     void AddMeshFactToList(iMeshFactoryWrapper* obj)
     {
-      CS::Threading::ScopedWriteLock lock(meshfactsLock);
-      loaderMeshFactories.Push(obj);
+      {
+        CS::Threading::ScopedWriteLock lock(meshfactsLock);
+        loaderMeshFactories.Push(obj);
+      }
+      MarkSyncNeeded();
     }
 
     void AddMeshToList(iMeshWrapper* obj)
     {
-      CS::Threading::ScopedWriteLock lock(meshesLock);
-      loaderMeshes.Push(obj);
+      {
+        CS::Threading::ScopedWriteLock lock(meshesLock);
+        loaderMeshes.Push(obj);
+      }
+      MarkSyncNeeded();
     }
 
     void AddCamposToList(iCameraPosition* obj)
     {
-      CS::Threading::ScopedWriteLock lock(camposLock);
-      loaderCameraPositions.Push(obj);
+      {
+        CS::Threading::ScopedWriteLock lock(camposLock);
+        loaderCameraPositions.Push(obj);
+      }
+      MarkSyncNeeded();
     }
 
     void AddTextureToList(iTextureWrapper* obj)
     {
-      CS::Threading::ScopedWriteLock lock(texturesLock);
-      loaderTextures.Push(obj);
+      {
+        CS::Threading::ScopedWriteLock lock(texturesLock);
+        loaderTextures.Push(obj);
+      }
+      MarkSyncNeeded();
     }
 
     void AddMaterialToList(iMaterialWrapper* obj)
     {
-      CS::Threading::ScopedWriteLock lock(materialsLock);
-      loaderMaterials.Push(obj);
+      {
+        CS::Threading::ScopedWriteLock lock(materialsLock);
+        loaderMaterials.Push(obj);
+      }
+      MarkSyncNeeded();
     }
 
     void AddSharedVarToList(iSharedVariable* obj)
     {
-      CS::Threading::ScopedWriteLock lock(sharedvarLock);
-      loaderSharedVariables.Push(obj);
+      {
+        CS::Threading::ScopedWriteLock lock(sharedvarLock);
+        loaderSharedVariables.Push(obj);
+      }
+      MarkSyncNeeded();
     }
 
     void AddLightToList(iLight* obj, const char* name)
     {
-      CS::Threading::ScopedWriteLock lock(lightsLock);
-      loadedLights.Put(csString(name), obj);
+      {
+        CS::Threading::ScopedWriteLock lock(lightsLock);
+        loadedLights.Put(csString(name), obj);
+      }
+      MarkSyncNeeded();
+    }
+
+    void MarkSyncDone()
+    {
+      CS::Threading::ScopedWriteLock lock(listSyncLock);
+      listSync = false;
     }
 
     iVFS* GetVFS() const { return vfs; }
@@ -448,8 +472,31 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iSndSysManager> SndSysManager;
     // Sound renderer
     csRef<iSndSysRenderer> SndSysRenderer;
-    // Frame event.
-    csEventID ProcessPerFrame;
+
+    // For checking whether to schedule a engine list sync.
+    CS::Threading::ReadWriteMutex listSyncLock;
+    bool listSync;
+
+    void MarkSyncNeeded()
+    {
+      bool syncNow = false;
+      {
+        CS::Threading::ScopedUpgradeableLock sLock(listSyncLock);
+        if(!listSync)
+        {
+          listSyncLock.UpgradeUnlockAndWriteLock();
+          if(!listSync)
+          {
+            listSync = true;
+            syncNow = true;
+          }
+          listSyncLock.WriteUnlockAndUpgradeLock();
+        }
+      }
+
+      if(syncNow)
+        Engine->SyncEngineLists(this);
+    }
 
     // ----------------------------------------------- //
     struct ProxyKeyColour

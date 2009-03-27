@@ -23,6 +23,7 @@
 
 #include "cssysdef.h"
 
+#include "cstool/vfsdirchange.h"
 #include "iengine/engine.h"
 #include "isndsys/ss_loader.h"
 #include "isndsys/ss_manager.h"
@@ -39,7 +40,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadSoundSysData, const char* cwd, const char* filename,
     bool do_verbose)
   {
-    vfs->ChDir(cwd);
+    csVfsDirectoryChanger dirChange(vfs);
+    dirChange.ChangeToFull(cwd);
 
     if (!SndSysLoader)
     {
@@ -72,7 +74,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     if(sync)
     {
-      Engine->SyncEngineListsNow(this);
+      Engine->SyncEngineListsWait(this);
     }
 
     return true;
@@ -81,7 +83,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadSoundStream, const char* cwd, const char* fname, int mode3d,
     bool do_verbose)
   {
-    vfs->ChDir(cwd);
+    csVfsDirectoryChanger dirChange(vfs);
+    dirChange.ChangeToFull(cwd);
 
     if (!SndSysRenderer)
     {
@@ -109,7 +112,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     if(sync)
     {
-      Engine->SyncEngineListsNow(this);
+      Engine->SyncEngineListsWait(this);
     }
 
     return true;
@@ -118,7 +121,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadSoundWrapper, const char* cwd, const char* name,
     const char* fname, bool do_verbose)
   {
-    vfs->ChDir(cwd);
+    csVfsDirectoryChanger dirChange(vfs);
+    dirChange.ChangeToFull(cwd);
 
     if (!SndSysManager)
     {
@@ -127,7 +131,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     // load the sound handle
     csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-    if (!LoadSoundSysDataTC (itr, false, cwd, fname, do_verbose))
+    if (!LoadSoundSysDataTC (itr, false, vfs->GetCwd(), fname, do_verbose))
     {
       return false;
     }
@@ -140,7 +144,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     if(sync)
     {
-      Engine->SyncEngineListsNow(this);
+      Engine->SyncEngineListsWait(this);
     }
 
     return true;

@@ -110,7 +110,7 @@ bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns)
       if(IsMainThread())
       {
         MutexScopedLock lock(waitingMainLock);
-        if(listQueue->GetMedHighQueueCount() > 0)
+        if(listQueue->GetQueueCount() > 0)
         {
           waitingMainLock.Unlock();
           listQueue->ProcessQueue(1);

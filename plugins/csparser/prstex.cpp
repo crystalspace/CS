@@ -114,8 +114,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   THREADED_CALLABLE_IMPL4(csThreadedLoader, ParseTexture, csRef<iLoaderContext> ldr_context,
     csRef<iDocumentNode> node, csSafeCopyArray<ProxyTexture>* proxyTextures, const char* path)
   {
-    csVfsDirectoryChanger dirchange(vfs);
-    dirchange.ChangeTo(path);
+    csVfsDirectoryChanger dirChange(vfs);
+    dirChange.ChangeTo(path);
 
     const char* txtname = node->GetAttributeValue ("name");
 
