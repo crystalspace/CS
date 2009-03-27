@@ -220,6 +220,7 @@ class iThreadedLoader(core.iBase):
     def AddTextureToList(*args): return _imap.iThreadedLoader_AddTextureToList(*args)
     def AddMaterialToList(*args): return _imap.iThreadedLoader_AddMaterialToList(*args)
     def AddSharedVarToList(*args): return _imap.iThreadedLoader_AddSharedVarToList(*args)
+    def MarkSyncDone(*args): return _imap.iThreadedLoader_MarkSyncDone(*args)
     __swig_destroy__ = _imap.delete_iThreadedLoader
     __del__ = lambda self : None;
 iThreadedLoader_swigregister = _imap.iThreadedLoader_swigregister

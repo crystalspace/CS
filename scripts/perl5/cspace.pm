@@ -5062,6 +5062,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *AddTextureToList = *cspacec::iThreadedLoader_AddTextureToList;
 *AddMaterialToList = *cspacec::iThreadedLoader_AddMaterialToList;
 *AddSharedVarToList = *cspacec::iThreadedLoader_AddSharedVarToList;
+*MarkSyncDone = *cspacec::iThreadedLoader_MarkSyncDone;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

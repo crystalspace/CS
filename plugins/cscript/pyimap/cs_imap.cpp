@@ -4909,6 +4909,27 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iThreadedLoader_MarkSyncDone(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iThreadedLoader *arg1 = (iThreadedLoader *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iThreadedLoader_MarkSyncDone",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iThreadedLoader, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iThreadedLoader_MarkSyncDone" "', argument " "1"" of type '" "iThreadedLoader *""'"); 
+  }
+  arg1 = reinterpret_cast< iThreadedLoader * >(argp1);
+  (arg1)->MarkSyncDone();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_iThreadedLoader(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iThreadedLoader *arg1 = (iThreadedLoader *) 0 ;
@@ -14145,6 +14166,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iThreadedLoader_AddTextureToList", _wrap_iThreadedLoader_AddTextureToList, METH_VARARGS, NULL},
 	 { (char *)"iThreadedLoader_AddMaterialToList", _wrap_iThreadedLoader_AddMaterialToList, METH_VARARGS, NULL},
 	 { (char *)"iThreadedLoader_AddSharedVarToList", _wrap_iThreadedLoader_AddSharedVarToList, METH_VARARGS, NULL},
+	 { (char *)"iThreadedLoader_MarkSyncDone", _wrap_iThreadedLoader_MarkSyncDone, METH_VARARGS, NULL},
 	 { (char *)"delete_iThreadedLoader", _wrap_delete_iThreadedLoader, METH_VARARGS, NULL},
 	 { (char *)"iThreadedLoader_swigregister", iThreadedLoader_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iLoader_LoadSoundSysData", _wrap_iLoader_LoadSoundSysData, METH_VARARGS, NULL},
