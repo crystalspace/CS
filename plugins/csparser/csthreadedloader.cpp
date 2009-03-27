@@ -333,8 +333,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       return false;
     }
 
-    csVfsDirectoryChanger dirChanger (vfs);
-    dirChanger.ChangeTo (filename);
+    dirChange.ChangeTo (filename);
 
     const char* type = shaderNode->GetAttributeValue ("compiler");
     if (type == 0)

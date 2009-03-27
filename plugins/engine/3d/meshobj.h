@@ -29,6 +29,7 @@
 #include "csutil/weakref.h"
 #include "csutil/leakguard.h"
 #include "csutil/hash.h"
+#include "csutil/threading/rwmutex.h"
 #include "iutil/selfdestruct.h"
 #include "csgfx/shadervarcontext.h"
 #include "imesh/object.h"
@@ -44,6 +45,7 @@
 #include "scenenode.h"
 #include "light.h"
 
+struct iMeshLoaderIterator;
 struct iMeshWrapper;
 struct iMovable;
 struct iRenderView;
@@ -66,7 +68,7 @@ private:
   csRefArrayObject<iMeshWrapper, CS::Container::ArrayAllocDefault,
     csArrayCapacityVariableGrow> list;
   csHash<iMeshWrapper*, csString> meshes_hash;
-  mutable CS::Threading::RecursiveMutex removeLock;
+  mutable CS::Threading::ReadWriteMutex meshLock;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>
@@ -104,9 +106,10 @@ public:
   /// Override FreeMesh
   virtual void FreeMesh (iMeshWrapper*) { }
 
-  virtual int GetCount () const { return (int)list.GetSize () ; }
-  virtual iMeshWrapper *Get (int n) const { return list.Get (n); }
+  virtual int GetCount () const;
+  virtual iMeshWrapper *Get (int n) const;
   virtual int Add (iMeshWrapper *obj);
+  void AddBatch (csRef<iMeshLoaderIterator> itr);
   virtual bool Remove (iMeshWrapper *obj);
   virtual bool Remove (int n);
   virtual void RemoveAll ();

@@ -272,6 +272,7 @@ void csMeshFactoryList::NameChanged (iObject* object, const char* oldname,
   csRef<iMeshFactoryWrapper> mesh = 
     scfQueryInterface<iMeshFactoryWrapper> (object);
   CS_ASSERT (mesh != 0);
+  CS::Threading::ScopedWriteLock lock(meshFactLock);
   if (oldname) factories_hash.Delete (oldname, mesh);
   if (newname) factories_hash.Put (newname, mesh);
 }
@@ -280,17 +281,33 @@ int csMeshFactoryList::Add (iMeshFactoryWrapper *obj)
 {
   PrepareFactory (obj);
   const char* name = obj->QueryObject ()->GetName ();
+  CS::Threading::ScopedWriteLock lock(meshFactLock);
   if (name)
     factories_hash.Put (name, obj);
   obj->QueryObject ()->AddNameChangeListener (listener);
   return (int)list.Push (obj);
 }
 
+void csMeshFactoryList::AddBatch (csRef<iMeshFactLoaderIterator> itr)
+{
+  CS::Threading::ScopedWriteLock lock(meshFactLock);
+  while(itr->HasNext())
+  {
+    iMeshFactoryWrapper* obj = itr->Next();
+    PrepareFactory (obj);
+    const char* name = obj->QueryObject ()->GetName ();
+    if (name)
+      factories_hash.Put (name, obj);
+    obj->QueryObject ()->AddNameChangeListener (listener);
+    list.Push (obj);
+  }
+}
+
 bool csMeshFactoryList::Remove (iMeshFactoryWrapper *obj)
 {
-  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   FreeFactory (obj);
   const char* name = obj->QueryObject ()->GetName ();
+  CS::Threading::ScopedWriteLock lock(meshFactLock);
   if (name)
     factories_hash.Delete (name, obj);
   obj->QueryObject ()->RemoveNameChangeListener (listener);
@@ -300,13 +317,12 @@ bool csMeshFactoryList::Remove (iMeshFactoryWrapper *obj)
 
 bool csMeshFactoryList::Remove (int n)
 {
-  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return Remove (Get (n));
 }
 
 void csMeshFactoryList::RemoveAll ()
 {
-  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
+  CS::Threading::ScopedWriteLock lock(meshFactLock);
   size_t i;
   for (i = 0 ; i < list.GetSize () ; i++)
   {
@@ -317,15 +333,28 @@ void csMeshFactoryList::RemoveAll ()
   list.DeleteAll ();
 }
 
+int csMeshFactoryList::GetCount () const 
+{
+  CS::Threading::ScopedReadLock lock(meshFactLock);
+  return (int)list.GetSize ();
+}
+
+iMeshFactoryWrapper* csMeshFactoryList::Get (int n) const
+{
+  CS::Threading::ScopedReadLock lock(meshFactLock);
+  return list.Get (n);
+}
+
 int csMeshFactoryList::Find (iMeshFactoryWrapper *obj) const
 {
+  CS::Threading::ScopedReadLock lock(meshFactLock);
   return (int)list.Find (obj);
 }
 
 iMeshFactoryWrapper *csMeshFactoryList::FindByName (
   const char *Name) const
 {
-  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
+  CS::Threading::ScopedReadLock lock(meshFactLock);
   if (!Name) return 0;
   return factories_hash.Get (Name, 0);
 }

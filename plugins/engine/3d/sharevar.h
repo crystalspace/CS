@@ -27,10 +27,12 @@
 #include "csutil/nobjvec.h"
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/threading/rwmutex.h"
 #include "iutil/selfdestruct.h"
 #include "iengine/sharevar.h"
 
 class csSharedVariableList;
+struct iSharedVarLoaderIterator;
 
 /**
  * A SharedVariable is a refcounted floating point value.
@@ -153,7 +155,7 @@ public:
 class csSharedVariableList : public scfImplementation1<csSharedVariableList,
                                                        iSharedVariableList>
 {
-  mutable CS::Threading::RecursiveMutex removeLock;
+  mutable CS::Threading::ReadWriteMutex shvarLock;
 public:
   
   /// constructor
@@ -167,6 +169,7 @@ public:
   virtual int GetCount () const;
   virtual iSharedVariable *Get (int n) const;
   virtual int Add (iSharedVariable *obj);
+  void AddBatch (csRef<iSharedVarLoaderIterator> itr);
   virtual bool Remove (iSharedVariable *obj);
   virtual bool Remove (int n);
   virtual void RemoveAll ();
