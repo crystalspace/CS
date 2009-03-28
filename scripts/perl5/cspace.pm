@@ -22378,6 +22378,7 @@ sub DESTROY {
 
 *GetG3D = *cspacec::csProcTexture_GetG3D;
 *GetG2D = *cspacec::csProcTexture_GetG2D;
+*GetObjectRegistry = *cspacec::csProcTexture_GetObjectRegistry;
 *DisableAutoUpdate = *cspacec::csProcTexture_DisableAutoUpdate;
 *Initialize = *cspacec::csProcTexture_Initialize;
 *PrepareAnim = *cspacec::csProcTexture_PrepareAnim;
