@@ -1163,6 +1163,12 @@ iMeshGenerator* csSector::GetMeshGeneratorByName (const char* name)
   return meshGenerators.FindByName (name);
 }
 
+void csSector::RemoveMeshGenerator (const char* name)
+{
+  csMeshGenerator* m = static_cast<csMeshGenerator*>(GetMeshGeneratorByName (name));
+  meshGenerators.Delete (m);
+}
+
 void csSector::RemoveMeshGenerator (size_t idx)
 {
   meshGenerators.DeleteIndex (idx);

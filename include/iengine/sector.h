@@ -206,7 +206,7 @@ struct csSectorVisibleRenderMeshes
  */
 struct iSector : public virtual iBase
 {
-  SCF_INTERFACE(iSector,3,0,0);
+  SCF_INTERFACE(iSector,4,0,0);
   /// Get the iObject for this sector.
   virtual iObject *QueryObject () = 0;
 
@@ -317,6 +317,11 @@ struct iSector : public virtual iBase
    * Remove a mesh generator.
    */
   virtual void RemoveMeshGenerator (size_t idx) = 0;
+
+  /**
+   * Remove a mesh generator.
+   */
+  virtual void RemoveMeshGenerator (const char* name) = 0;
 
   /**
    * Remove all mesh generators.

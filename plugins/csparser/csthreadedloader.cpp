@@ -580,8 +580,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return res;
   }
 
-  THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadNode, const char* cwd, csRef<iDocumentNode> node,
-      csRef<iCollection> collection, csRef<iStreamSource> ssource,
+  THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadNode, const char* cwd, csRef<iDocumentNode> node,
+      csRef<iCollection> collection, csRef<iSector> sector, csRef<iStreamSource> ssource,
       csRef<iMissingLoaderData> missingdata, uint keepFlags, bool do_verbose)
   {
     csVfsDirectoryChanger dirChange(vfs);
@@ -636,6 +636,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         return res;
       }
 
+      // Meshgen
+      csRef<iDocumentNode> meshgennode;
+      if(attempt == 1)
+      {
+        if(csString("meshgen").Compare(node->GetValue()))
+          meshgennode = node;
+      }
+      if(attempt == 2)
+      {
+        meshgennode = node->GetNode ("meshgen");
+      }
+      if (meshgennode)
+      {
+        return LoadMeshGen(ldr_context, meshgennode, sector);
+      }
+
       // Mesh Object
       csRef<iDocumentNode> meshobjnode;
       if(attempt == 1)
@@ -652,7 +668,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         const char* name = meshobjnode->GetAttributeValue ("name");
         csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (name, false);
         ret->SetResult(scfQueryInterfaceSafe<iBase>(mesh));
-        bool res = LoadMeshObjectTC(ret, false, ldr_context, mesh, 0, meshobjnode, ssource, 0, name, vfs->GetCwd());
+        bool res = LoadMeshObjectTC(ret, false, ldr_context, mesh, 0, meshobjnode, ssource, sector, name, vfs->GetCwd());
         if(sync && res)
         {
           Engine->SyncEngineListsWait(this);
@@ -4165,7 +4181,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
         csRef<iDocumentNode> node = doc->GetRoot ();
         csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-        return LoadNodeTC(itr, false, vfs->GetCwd(), node, collection, ssource, missingdata, keepFlags, do_verbose);
+        return LoadNodeTC(itr, false, vfs->GetCwd(), node, collection, 0, ssource, missingdata, keepFlags, do_verbose);
       }
       else
       {

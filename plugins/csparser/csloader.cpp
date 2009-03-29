@@ -21,6 +21,7 @@
 
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
+#include "iengine/sector.h"
 #include "iengine/texture.h"
 #include "isndsys/ss_manager.h"
 #include "iutil/databuff.h"
@@ -190,7 +191,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool checkDupes, iStreamSource* ssource, const char* override_name, iMissingLoaderData* missingdata,
     uint keepFlags)
   {
-    csRef<iThreadReturn> itr = loader->LoadNodeWait(vfs->GetCwd(), node, collection, ssource, missingdata, keepFlags);
+    csRef<iThreadReturn> itr = loader->LoadNodeWait(vfs->GetCwd(), node, collection, 0, ssource, missingdata, keepFlags);
     csLoadResult ret;
     ret.success = itr->WasSuccessful();
     ret.result = itr->GetResultRefPtr();

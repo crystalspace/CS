@@ -306,6 +306,7 @@ public:
   }
   iMeshGenerator* GetMeshGeneratorByName (const char* name);
   void RemoveMeshGenerator (size_t idx);
+  void RemoveMeshGenerator (const char* name);
   void RemoveMeshGenerators ();
   /** @} */
 

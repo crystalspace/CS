@@ -220,8 +220,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>, missingdata, uint,
     keepFlags, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadNode, csLoaderReturn, const char*, cwd, csRef<iDocumentNode>,
-    node, csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>,
+    THREADED_CALLABLE_DECL8(csThreadedLoader, LoadNode, csLoaderReturn, const char*, cwd, csRef<iDocumentNode>,
+    node, csRef<iCollection>, collection, csRef<iSector>, sector, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>,
     missingdata, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
     void AddSectorToList(iSector* obj)
