@@ -92,8 +92,8 @@ void csSectorLightList::PrepareLight (iLight* item)
 void csSectorLightList::FreeLight (iLight* item)
 {
   csLight* clight = static_cast<csLight*> (item);
-  clight->SetSector (0); 
   lightTree.RemoveObject (clight);
+  clight->SetSector (0); 
 }
 
 void csSectorLightList::UpdateLightBounds (csLight* light, const csBox3& oldBox)
