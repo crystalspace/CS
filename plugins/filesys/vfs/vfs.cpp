@@ -35,6 +35,7 @@
 #include "csutil/strset.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
+#include "csutil/threading/rwmutex.h"
 #include "csutil/util.h"
 #include "csutil/vfsplat.h"
 #include "iutil/databuff.h"
@@ -213,12 +214,13 @@ public:
   }
 };
 
-/// This class is thread-safe because it is global.
 class VfsArchiveCache : public CS::Memory::CustomAllocated
 {
 private:
   csPDelArray<VfsArchive, CS::Container::ArrayAllocDefault,
     csArrayCapacityFixedGrow<8> > array;
+
+  CS::Threading::ReadWriteMutex m;
 
 public:
   VfsArchiveCache () : array (8)
@@ -226,12 +228,16 @@ public:
   }
   virtual ~VfsArchiveCache ()
   {
-    array.DeleteAll ();
+    {
+      CS::Threading::ScopedWriteLock lock(m);
+      array.DeleteAll ();
+    }
   }
 
   /// Find a given archive file.
-  size_t FindKey (const char* Key) const
+  size_t FindKey (const char* Key)
   {
+    CS::Threading::ScopedReadLock lock(m);
     size_t i;
     for (i = 0; i < array.GetSize (); i++)
       if (strcmp (array[i]->GetName (), Key) == 0)
@@ -241,43 +247,49 @@ public:
 
   VfsArchive *Get (size_t iIndex)
   {
+    CS::Threading::ScopedReadLock lock(m);
     return array.Get (iIndex);
   }
 
-  size_t Length () const
+  size_t Length ()
   {
+    CS::Threading::ScopedReadLock lock(m);
     return array.GetSize ();
   }
 
   void Push (VfsArchive* ar)
   {
+    CS::Threading::ScopedWriteLock lock(m);
     array.Push (ar);
   }
 
   void DeleteAll ()
   {
+    CS::Threading::ScopedWriteLock lock(m);
     array.DeleteAll ();
   }
 
   void FlushAll ()
   {
+    CS::Threading::ScopedWriteLock lock(m);
     size_t i = 0;
     while (i < array.GetSize ())
     {
       array[i]->Flush ();
       if (array[i]->RefCount == 0)
       {
-	array.DeleteIndex (i);
+        array.DeleteIndex (i);
       }
       else
       {
-	i++;
+        i++;
       }
     }
   }
 
   void CheckUp ()
   {
+    CS::Threading::ScopedWriteLock lock(m);
     size_t i = array.GetSize ();
     while (i > 0)
     {
