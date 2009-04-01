@@ -547,51 +547,17 @@ namespace CS
      * Threadsafe allocator wrapper.
      */
     template <class Allocator>
-    class AllocatorSafe : public Allocator
+    class AllocatorSafe : protected Allocator
     {
     private:
       CS::Threading::Mutex m;
 
     public:
-
-      AllocatorSafe (size_t arg) : Allocator(arg)
+      template<typename A1>
+      AllocatorSafe (const A1& a1) : Allocator (a1)
       {
       }
 
-      AllocatorSafe (AllocatorSafe const& other) :  Allocator(other)
-      {
-      }
-
-
-      ~AllocatorSafe()
-      {
-        Allocator::~Allocator();
-      }
-
-
-      void Empty()
-      {
-        CS::Threading::MutexScopedLock lock(m);
-        Allocator::Empty();
-      }
-
-      void Compact()
-      {
-        CS::Threading::MutexScopedLock lock(m);
-        Allocator::Compact();
-      }
-
-      size_t GetAllocatedElems() const
-      {
-        CS::Threading::MutexScopedLock lock(m);
-        return Allocator::GetAllocatedElems();
-      }
-
-      void* Alloc ()
-      {
-        CS::Threading::MutexScopedLock lock(m);
-        return Allocator::Alloc();
-      }
 
       void Free (void* p)
       {
@@ -599,28 +565,16 @@ namespace CS
         return Allocator::Free(p);
       }
 
-      bool TryFree (void* p)
-      {
-        CS::Threading::MutexScopedLock lock(m);
-        return Allocator::TryFree(p);
-      }
-
-      size_t GetBlockElements() const
-      {
-        CS::Threading::MutexScopedLock lock(m);
-        return Allocator::GetBlockElements();
-      }
-
-      void* Alloc (size_t n)
+      CS_ATTRIBUTE_MALLOC void* Alloc (const size_t n)
       {
         CS::Threading::MutexScopedLock lock(m);
         return Allocator::Alloc(n);
       }
 
-      void* Alloc (void* p, size_t newSize)
+      void* Realloc (void* p, size_t newSize)
       {
         CS::Threading::MutexScopedLock lock(m);
-        return Allocator::Alloc(p, newSize);
+        return Allocator::Realloc(p, newSize);
       }
 
       void SetMemTrackerInfo (const char* info)
