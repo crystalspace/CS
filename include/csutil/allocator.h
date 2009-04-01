@@ -25,6 +25,7 @@
 
 #include "csutil/alignedalloc.h"
 #include "csutil/memdebug.h"
+#include "csutil/threading/mutex.h"
 
 /**\addtogroup util_memory
  * @{ */
@@ -540,6 +541,93 @@ namespace CS
       /// Set the information used for memory tracking.
       void SetMemTrackerInfo (const char* info)
       { alloc.SetMemTrackerInfo (info); }
+    };
+
+    /**
+     * Threadsafe allocator wrapper.
+     */
+    template <class Allocator>
+    class AllocatorSafe : public Allocator
+    {
+    private:
+      CS::Threading::Mutex m;
+
+    public:
+
+      AllocatorSafe (size_t arg) : Allocator(arg)
+      {
+      }
+
+      AllocatorSafe (AllocatorSafe const& other) :  Allocator(other)
+      {
+      }
+
+
+      ~AllocatorSafe()
+      {
+        Allocator::~Allocator();
+      }
+
+
+      void Empty()
+      {
+        CS::Threading::MutexScopedLock lock(m);
+        Allocator::Empty();
+      }
+
+      void Compact()
+      {
+        CS::Threading::MutexScopedLock lock(m);
+        Allocator::Compact();
+      }
+
+      size_t GetAllocatedElems() const
+      {
+        CS::Threading::MutexScopedLock lock(m);
+        return Allocator::GetAllocatedElems();
+      }
+
+      void* Alloc ()
+      {
+        CS::Threading::MutexScopedLock lock(m);
+        return Allocator::Alloc();
+      }
+
+      void Free (void* p)
+      {
+        CS::Threading::MutexScopedLock lock(m);
+        return Allocator::Free(p);
+      }
+
+      bool TryFree (void* p)
+      {
+        CS::Threading::MutexScopedLock lock(m);
+        return Allocator::TryFree(p);
+      }
+
+      size_t GetBlockElements() const
+      {
+        CS::Threading::MutexScopedLock lock(m);
+        return Allocator::GetBlockElements();
+      }
+
+      void* Alloc (size_t n)
+      {
+        CS::Threading::MutexScopedLock lock(m);
+        return Allocator::Alloc(n);
+      }
+
+      void* Alloc (void* p, size_t newSize)
+      {
+        CS::Threading::MutexScopedLock lock(m);
+        return Allocator::Alloc(p, newSize);
+      }
+
+      void SetMemTrackerInfo (const char* info)
+      {
+        CS::Threading::MutexScopedLock lock(m);
+        Allocator::SetMemTrackerInfo(info);
+      }
     };
   } // namespace Memory
 } // namespace CS
