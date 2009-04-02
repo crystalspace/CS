@@ -89,7 +89,7 @@ void Tri3DTest::Frame()
   // individual rotations on each axis together to get a single
   // rotation matrix.  The rotations are applied in right to left
   // order .
-  csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
+  csMatrix3 rot = csXRotMatrix3 (rotX + 90) * csYRotMatrix3 (rotY);
   csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
   rMeshObj.object2world *= ot;
 
@@ -204,6 +204,13 @@ bool Tri3DTest::Application()
 
   if (SetupModules())
   {
+    iCamera* c = view->GetCamera();
+
+    // camera at 0.00000, -1.5, 15.225 initially
+    csOrthoTransform camTransf = c->GetTransform();
+    camTransf.SetOrigin(csVector3(0.0, -1.5, 15.225));
+    c->SetTransform(camTransf);
+
     // This calls the default runloop. This will basically just keep
     // broadcasting process events to keep the game going.
     Run();
