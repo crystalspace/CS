@@ -222,6 +222,8 @@ public:
   virtual void GetMaxTextureSize (int& w, int& h, int& aspect);
 
   void DumpTextures (iVFS* VFS, iImageIO* iio, const char* dir);
+
+  iObjectRegistry* GetObjectRegistry() const { return object_reg; }
 };
 
 }

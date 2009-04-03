@@ -142,6 +142,11 @@ csGLBasicTextureHandle::~csGLBasicTextureHandle()
   }
 }
 
+iObjectRegistry* csGLBasicTextureHandle::GetObjectRegistry() const 
+{ 
+  return txtmgr->GetObjectRegistry();
+}
+
 bool csGLBasicTextureHandle::SynthesizeUploadData (
   const CS::StructuredTextureFormat& format,
   iString* fail_reason)
@@ -619,9 +624,9 @@ void csGLBasicTextureHandle::Load ()
   delete uploadData; uploadData = 0;
 }
 
-void csGLBasicTextureHandle::Unload ()
+THREADED_CALLABLE_IMPL(csGLBasicTextureHandle, Unload)
 {
-  if ((Handle == 0) || IsForeignHandle()) return;
+  if ((Handle == 0) || IsForeignHandle()) return false;
   if (texType == texType1D)
     csGLTextureManager::UnsetTexture (GL_TEXTURE_1D, Handle);
   else if (texType == texType2D)
@@ -634,6 +639,7 @@ void csGLBasicTextureHandle::Unload ()
     csGLTextureManager::UnsetTexture (GL_TEXTURE_RECTANGLE_ARB, Handle);
   glDeleteTextures (1, &Handle);
   Handle = 0;
+  return true;
 }
 
 void csGLBasicTextureHandle::Precache ()

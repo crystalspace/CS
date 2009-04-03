@@ -119,6 +119,7 @@ public:
 #include "csutil/deprecated_warn_off.h"
 
 class csGLBasicTextureHandle :
+  public ThreadedCallable<csGLBasicTextureHandle>,
   public scfImplementation1<csGLBasicTextureHandle,
 			    iTextureHandle>
 {
@@ -209,7 +210,8 @@ protected:
   GLuint pbo;
   /// Upload the texture to GL.
   void Load ();
-  void Unload ();
+  // Needs to be done in the main thread.
+  THREADED_CALLABLE_DECL(csGLBasicTextureHandle, Unload, csThreadReturn, HIGH, true, false);
   
   CS::Graphics::TextureComparisonMode texCompare;
 public:
@@ -220,6 +222,9 @@ public:
   csArray<csGLUploadData>* uploadData;
   csWeakRef<csGLGraphics3D> G3D;
   TextureType texType;
+
+  iObjectRegistry* GetObjectRegistry() const;
+
   /// Format used for last Blit() call
   TextureBlitDataFormat texFormat;
   bool IsWasRenderTarget() const
