@@ -63,9 +63,6 @@ csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory
   material = factory->GetMaterialWrapper ();
   lighting = factory->HasLighting ();
   MixMode = factory->GetMixMode ();
-
-  scfVertices.AttachNew (new scfArrayWrap<iColoredVertices, 
-    csColoredVertices> (vertices));
 }
 
 csSprite2DMeshObject::~csSprite2DMeshObject ()
@@ -75,13 +72,13 @@ csSprite2DMeshObject::~csSprite2DMeshObject ()
 
 iColoredVertices* csSprite2DMeshObject::GetVertices ()
 {
-  if (scfVertices->GetSize () < 1)
+  if (!scfVertices.IsValid())
     return factory->GetVertices ();
   return scfVertices;
 }
 csColoredVertices* csSprite2DMeshObject::GetCsVertices ()
 {
-  if (vertices.GetSize () < 1)
+  if (!scfVertices.IsValid())
     return factory->GetCsVertices ();
   return &vertices;
 }
@@ -576,6 +573,16 @@ iSprite2DUVAnimation *csSprite2DMeshObject::GetUVAnimation (
   return factory->GetUVAnimation (idx);
 }
 
+
+void csSprite2DMeshObject::EnsureVertexCopy ()
+{
+  if (!scfVertices.IsValid())
+  {
+    scfVertices.AttachNew (new scfArrayWrap<iColoredVertices, 
+      csColoredVertices> (vertices));
+    vertices = *(factory->GetCsVertices());
+  }
+}
 
 void csSprite2DMeshObject::uvAnimationControl::Advance (csTicks current_time)
 {

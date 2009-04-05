@@ -144,6 +144,7 @@ void csParticleSystem::AppendRectSprite (float width, float height,
   csRef<iMeshObject> sprmesh (spr_factory->NewInstance ());
   csRef<iParticle> part (scfQueryInterface<iParticle> (sprmesh));
   csRef<iSprite2DState> state (scfQueryInterface<iSprite2DState> (sprmesh));
+  state->EnsureVertexCopy();
   csRef<iColoredVertices> vs = state->GetVertices();
 
   vs->SetSize (4);
@@ -173,6 +174,7 @@ void csParticleSystem::AppendRegularSprite (int n, float radius,
   csRef<iMeshObject> sprmesh (spr_factory->NewInstance ());
   csRef<iParticle> part (scfQueryInterface<iParticle> (sprmesh));
   csRef<iSprite2DState> state (scfQueryInterface<iSprite2DState> (sprmesh));
+  state->EnsureVertexCopy();
   state->CreateRegularVertices (n, true);
   part->ScaleBy (radius);
   if (mat) sprmesh->SetMaterialWrapper (mat);

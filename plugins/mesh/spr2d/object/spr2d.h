@@ -272,6 +272,8 @@ public:
   virtual iSprite2DUVAnimation *GetUVAnimation (int idx) const;
   virtual iSprite2DUVAnimation *GetUVAnimation (int idx, int &style,
   	bool &loop) const;
+
+  virtual void EnsureVertexCopy ();
   /** @} */
 
   /**\name iParticle implementation
