@@ -601,7 +601,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
       if(attempt == 2)
       {
-        if(csString("texture").Compare(node->GetValue()))
+        if(csString("texture") == csString(node->GetValue()))
           texturenode = node;
       }
       if (texturenode)
@@ -623,7 +623,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
       if(attempt == 2)
       {
-        if(csString("meshfact").Compare(node->GetValue()))
+        if(csString("meshfact") == csString(node->GetValue()))
           meshfactnode = node;
       }
       if (meshfactnode)
@@ -640,7 +640,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csRef<iDocumentNode> meshgennode;
       if(attempt == 1)
       {
-        if(csString("meshgen").Compare(node->GetValue()))
+        if(csString("meshgen") == csString(node->GetValue()))
           meshgennode = node;
       }
       if(attempt == 2)
@@ -660,7 +660,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
       if(attempt == 2)
       {
-        if(csString("meshobj").Compare(node->GetValue()))
+        if(csString("meshobj") == csString(node->GetValue()))
           meshobjnode = node;
       }
       if (meshobjnode)
@@ -684,7 +684,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
       if(attempt == 2)
       {
-        if(csString("world").Compare(node->GetValue()))
+        if(csString("world") == csString(node->GetValue()))
           worldnode = node;
       }
       if (worldnode)
@@ -705,7 +705,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
       if(attempt == 2)
       {
-        if(csString("library").Compare(node->GetValue()))
+        if(csString("library") == csString(node->GetValue()))
           libnode = node;
       }
       if (libnode)
@@ -726,7 +726,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
       if(attempt == 2)
       {
-        if(csString("portals").Compare(node->GetValue()))
+        if(csString("portals") == csString(node->GetValue()))
           portalsnode = node;
       }
       if (portalsnode)
@@ -780,7 +780,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
       if(attempt == 2)
       {
-        if(csString("light").Compare(node->GetValue()))
+        if(csString("light") == csString(node->GetValue()))
           lightnode = node;
       }
       if (lightnode)
@@ -809,7 +809,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
       if(attempt == 2)
       {
-        if(csString("meshref").Compare(node->GetValue()))
+        if(csString("meshref") == csString(node->GetValue()))
           meshrefnode = node;
       }
       if (meshrefnode)
@@ -850,7 +850,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
       if(attempt == 2)
       {
-        if(csString("plugins").Compare(node->GetValue()))
+        if(csString("plugins") == csString(node->GetValue()))
           pluginsnode = node;
       }
       if (pluginsnode)
