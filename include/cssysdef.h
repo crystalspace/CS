@@ -347,7 +347,7 @@ typedef void (*csStaticVarCleanupFN) (void (*p)());
 extern csStaticVarCleanupFN csStaticVarCleanup;
 
 #include "csutil/threading/mutex.h"
-static CS::Threading::Mutex staticVarLock = CS::Threading::Mutex();
+static CS::Threading::Mutex staticVarLock;
 
 #ifndef CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION
 #  define CS_IMPLEMENT_STATIC_VARIABLE_REGISTRATION(Name)              \
