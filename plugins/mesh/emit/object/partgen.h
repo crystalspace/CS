@@ -24,7 +24,6 @@
  * Particle system
  */
 
-#include "csextern.h"
 #include "csgeom/box.h"
 #include "cstool/objmodel.h"
 #include "csgeom/vector3.h"
@@ -58,7 +57,7 @@ struct iMeshWrapper;
  * Subclasses of this class may be of more interest to users.
  * More specialised particle systems can be found below.
  */
-class CS_CRYSTALSPACE_EXPORT csParticleSystem :
+class csParticleSystem :
   public scfImplementationExt2<csParticleSystem,
     csObjectModel, iMeshObject, iParticleState>
 {
@@ -392,7 +391,7 @@ public:
  * This class has a set of particles that behave with physics.
  * They each have a speed and an acceleration.
  */
-class CS_CRYSTALSPACE_EXPORT csNewtonianParticleSystem :
+class csNewtonianParticleSystem :
   public scfImplementationExt0<csNewtonianParticleSystem, csParticleSystem>
 {
 protected:

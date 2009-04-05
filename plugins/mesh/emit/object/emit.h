@@ -25,11 +25,12 @@
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
-#include "csplugincommon/particlesys/partgen.h"
 #include "imesh/emit.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iengine/movable.h"
+
+#include "partgen.h"
 
 struct iMaterialWrapper;
 class csEmitMeshObject;

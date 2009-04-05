@@ -25,7 +25,6 @@
 #include "csgeom/matrix3.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/tri.h"
-#include "csplugincommon/particlesys/partgen.h"
 #include "cstool/rbuflock.h"
 #include "cstool/rviewclipper.h"
 #include "csutil/scfarray.h"
@@ -44,6 +43,8 @@
 #include "iutil/objreg.h"
 #include "iutil/strset.h"
 #include "ivideo/rendermesh.h"
+
+#include "partgen.h"
 
 csParticleSystem::csParticleSystem (
   iObjectRegistry* object_reg, iMeshObjectFactory* factory) :
