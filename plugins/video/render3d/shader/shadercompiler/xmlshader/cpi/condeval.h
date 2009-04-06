@@ -454,8 +454,8 @@ protected:
   class CowBlockAllocator
   {
   public:
-    typedef csFixedSizeAllocator<ValuesArrayWrapper::allocSize, 
-      TempHeapAlloc> BlockAlloc;
+    typedef CS::Memory::AllocatorSafe<csFixedSizeAllocator<ValuesArrayWrapper::allocSize, 
+      TempHeapAlloc> > BlockAlloc;
   private:
     CS_DECLARE_STATIC_CLASSVAR_REF (allocator,
       Allocator, BlockAlloc);

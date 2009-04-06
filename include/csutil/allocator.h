@@ -558,6 +558,11 @@ namespace CS
       {
       }
 
+      void Compact()
+      {
+        CS::Threading::MutexScopedLock lock(m);
+        Allocator::Compact();
+      }
 
       void Free (void* p)
       {
@@ -569,6 +574,12 @@ namespace CS
       {
         CS::Threading::MutexScopedLock lock(m);
         return Allocator::Alloc(n);
+      }
+
+      CS_ATTRIBUTE_MALLOC void* Alloc ()
+      {
+        CS::Threading::MutexScopedLock lock(m);
+        return Allocator::Alloc();
       }
 
       void* Realloc (void* p, size_t newSize)
