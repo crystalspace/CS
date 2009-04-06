@@ -16416,6 +16416,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetUVAnimation = *cspacec::iSprite2DState_GetUVAnimation;
 *StopUVAnimation = *cspacec::iSprite2DState_StopUVAnimation;
 *PlayUVAnimation = *cspacec::iSprite2DState_PlayUVAnimation;
+*EnsureVertexCopy = *cspacec::iSprite2DState_EnsureVertexCopy;
 *GetVertexByIndex = *cspacec::iSprite2DState_GetVertexByIndex;
 *GetVertexCount = *cspacec::iSprite2DState_GetVertexCount;
 *scfGetVersion = *cspacec::iSprite2DState_scfGetVersion;

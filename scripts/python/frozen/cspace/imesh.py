@@ -1272,6 +1272,7 @@ class iSprite2DState(iSprite2DFactoryState):
     def GetUVAnimation(*args): return _imesh.iSprite2DState_GetUVAnimation(*args)
     def StopUVAnimation(*args): return _imesh.iSprite2DState_StopUVAnimation(*args)
     def PlayUVAnimation(*args): return _imesh.iSprite2DState_PlayUVAnimation(*args)
+    def EnsureVertexCopy(*args): return _imesh.iSprite2DState_EnsureVertexCopy(*args)
     def GetVertexByIndex(*args): return _imesh.iSprite2DState_GetVertexByIndex(*args)
     def GetVertexCount(*args): return _imesh.iSprite2DState_GetVertexCount(*args)
     scfGetVersion = staticmethod(_imesh.iSprite2DState_scfGetVersion)

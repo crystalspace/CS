@@ -24020,6 +24020,27 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iSprite2DState_EnsureVertexCopy(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSprite2DState *arg1 = (iSprite2DState *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DState_EnsureVertexCopy",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DState, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DState_EnsureVertexCopy" "', argument " "1"" of type '" "iSprite2DState *""'"); 
+  }
+  arg1 = reinterpret_cast< iSprite2DState * >(argp1);
+  (arg1)->EnsureVertexCopy();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iSprite2DState_GetVertexByIndex(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iSprite2DState *arg1 = (iSprite2DState *) 0 ;
@@ -48569,6 +48590,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSprite2DState_GetUVAnimation", _wrap_iSprite2DState_GetUVAnimation, METH_VARARGS, NULL},
 	 { (char *)"iSprite2DState_StopUVAnimation", _wrap_iSprite2DState_StopUVAnimation, METH_VARARGS, NULL},
 	 { (char *)"iSprite2DState_PlayUVAnimation", _wrap_iSprite2DState_PlayUVAnimation, METH_VARARGS, NULL},
+	 { (char *)"iSprite2DState_EnsureVertexCopy", _wrap_iSprite2DState_EnsureVertexCopy, METH_VARARGS, NULL},
 	 { (char *)"iSprite2DState_GetVertexByIndex", _wrap_iSprite2DState_GetVertexByIndex, METH_VARARGS, NULL},
 	 { (char *)"iSprite2DState_GetVertexCount", _wrap_iSprite2DState_GetVertexCount, METH_VARARGS, NULL},
 	 { (char *)"iSprite2DState_scfGetVersion", _wrap_iSprite2DState_scfGetVersion, METH_VARARGS, NULL},
