@@ -549,8 +549,11 @@ namespace CS
     template <class Allocator>
     class AllocatorSafe : protected Allocator
     {
-    private:
-      CS::Threading::Mutex m;
+    protected:
+      typedef Allocator WrappedAllocatorType;
+      typedef AllocatorSafe<Allocator> AllocatorSafeType;
+      /// Mutex to lock the wrapped allocator.
+      CS::Threading::Mutex mutex;
 
     public:
       template<typename A1>
@@ -558,39 +561,27 @@ namespace CS
       {
       }
 
-      void Compact()
-      {
-        CS::Threading::MutexScopedLock lock(m);
-        Allocator::Compact();
-      }
-
       void Free (void* p)
       {
-        CS::Threading::MutexScopedLock lock(m);
+        CS::Threading::MutexScopedLock lock(mutex);
         return Allocator::Free(p);
       }
 
       CS_ATTRIBUTE_MALLOC void* Alloc (const size_t n)
       {
-        CS::Threading::MutexScopedLock lock(m);
+        CS::Threading::MutexScopedLock lock(mutex);
         return Allocator::Alloc(n);
-      }
-
-      CS_ATTRIBUTE_MALLOC void* Alloc ()
-      {
-        CS::Threading::MutexScopedLock lock(m);
-        return Allocator::Alloc();
       }
 
       void* Realloc (void* p, size_t newSize)
       {
-        CS::Threading::MutexScopedLock lock(m);
+        CS::Threading::MutexScopedLock lock(mutex);
         return Allocator::Realloc(p, newSize);
       }
 
       void SetMemTrackerInfo (const char* info)
       {
-        CS::Threading::MutexScopedLock lock(m);
+        CS::Threading::MutexScopedLock lock(mutex);
         Allocator::SetMemTrackerInfo(info);
       }
     };
