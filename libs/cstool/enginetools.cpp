@@ -180,11 +180,11 @@ csShortestDistanceResult csEngineTools::FindShortestDistance (
   return rc;
 }
 
+#include "csutil/deprecated_warn_off.h"
 csScreenTargetResult csEngineTools::FindScreenTarget (const csVector2& pos,
       float maxdist, iCamera* camera, iCollideSystem* cdsys)
 {
-  csRef<iPerspectiveCamera> pcam = scfQueryInterfaceSafe<iPerspectiveCamera>(camera);
-  csVector2 p (pos.x, pcam->GetShiftY () * 2 - pos.y);
+  csVector2 p (pos.x, camera->GetShiftY () * 2 - pos.y);
   csVector3 v = camera->InvPerspective (p, 1.0f);
   csVector3 end = camera->GetTransform ().This2Other (v);
   iSector* sector = camera->GetSector ();
@@ -224,6 +224,7 @@ csScreenTargetResult csEngineTools::FindScreenTarget (const csVector2& pos,
   }
   return result;
 }
+#include "csutil/deprecated_warn_on.h"
 
 //----------------------------------------------------------------------
 
