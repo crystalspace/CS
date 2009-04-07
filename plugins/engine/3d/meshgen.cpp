@@ -25,43 +25,53 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iengine/material.h"
 #include "igraphic/image.h"
 
+static int AreaCompare(csVector4 const& r, csVector4 const& k)
+{
+  float a = (r.z - r.x) * (r.w - r.y);
+  float b = (k.z - k.x) * (k.w - k.y);
+  return (a < b) ? 1 : (a - b) > 0.01 ? -1 : 0;
+}
+
 PositionMap::PositionMap(const csBox2& box)
 {
+  posGen.Initialize();
   freeAreas.Push(csVector4(box.MinX(), box.MinY(), box.MaxX(), box.MaxY()));
 }
 
-bool PositionMap::GetRandomPosition(float& xpos, float& zpos, float& radius)
+bool PositionMap::GetRandomPosition(float& xpos, float& zpos, float& radius, float& minRadius)
 {
-  posGen.Initialize();
-  csArray<size_t> notAttempted;
-
-  for(size_t i=0; i<freeAreas.GetSize(); i++)
-  {
-    notAttempted.Push(i);
-  }
-
   // Do a quick search.
-  while(notAttempted.GetSize() != 0)
+  for(size_t i=0; i<freeAreas.GetSize(); ++i)
   {
-    uint32 idx = posGen.Get(notAttempted.GetSize());
+    csVector4 freeArea = freeAreas[i];
 
-    csVector4 freeArea = freeAreas[notAttempted[idx]];
-    if(fabs(freeArea.x - freeArea.z) < radius ||
-       fabs(freeArea.y - freeArea.w) < radius)
+    if(freeArea.z - freeArea.x < radius*2 ||
+       freeArea.w - freeArea.y < radius*2)
     {
-      notAttempted.DeleteIndexFast(idx);
       continue;
     }
 
-    xpos = (freeArea.x + freeArea.z)/2;
-    zpos = (freeArea.y + freeArea.w)/2;
+    float xAvail = freeArea.x + radius/2;
+    float yAvail = freeArea.y + radius/2;
+    float zAvail = freeArea.z - radius/2;
+    float wAvail = freeArea.w - radius/2;
 
-    freeAreas.DeleteIndexFast(notAttempted[idx]);
+    xpos = freeArea.x + radius + posGen.Get(zAvail - xAvail);
+    zpos = freeArea.y + radius + posGen.Get(wAvail - yAvail);
 
-    freeAreas.Push(csVector4(freeArea.x, freeArea.y, xpos+radius, zpos-radius));
-    freeAreas.Push(csVector4(xpos+radius, freeArea.y, freeArea.z, zpos+radius));
-    freeAreas.Push(csVector4(xpos-radius, zpos+radius, freeArea.z, freeArea.w));
-    freeAreas.Push(csVector4(freeArea.x, zpos-radius, xpos-radius, freeArea.w));
+    freeAreas.DeleteIndex(i);
+
+    if(minRadius*2 <= (zpos-radius) - freeArea.y)
+      freeAreas.InsertSorted(csVector4(freeArea.x, freeArea.y, xpos+radius, zpos-radius), AreaCompare);
+
+    if(minRadius*2 <= freeArea.z - (xpos+radius))
+      freeAreas.InsertSorted(csVector4(xpos+radius, freeArea.y, freeArea.z, zpos+radius), AreaCompare);
+
+    if(minRadius*2 <= freeArea.w - (zpos+radius))
+      freeAreas.InsertSorted(csVector4(xpos-radius, zpos+radius, freeArea.z, freeArea.w), AreaCompare);
+
+    if(minRadius*2 <= (xpos-radius) - freeArea.x)
+      freeAreas.InsertSorted(csVector4(freeArea.x, zpos-radius, xpos-radius, freeArea.w), AreaCompare);
 
     return true;
   }
@@ -241,7 +251,6 @@ void csMeshGeneratorGeometry::AddFactory (iMeshFactoryWrapper* factory,
   factories.InsertSorted (g, CompareGeom);
 
   if (maxdist > total_max_dist) total_max_dist = maxdist;
-  
 }
 
 void csMeshGeneratorGeometry::RemoveFactory (size_t idx)
@@ -409,7 +418,7 @@ void csMeshGeneratorGeometry::UpdatePosition (const csVector3& pos)
 //--------------------------------------------------------------------------
 
 csMeshGenerator::csMeshGenerator (csEngine* engine) : 
-  scfImplementationType (this), total_max_dist (-1.0f), 
+  scfImplementationType (this), minRadius(-1.0f), total_max_dist (-1.0f), 
   use_density_scaling (false), use_alpha_scaling (false),
   last_pos (0, 0, 0), setup_cells (false),
   cell_dim (50), inuse_blocks (0), inuse_blocks_last (0),
@@ -688,8 +697,19 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
   const csBox2& box = cell.box;
   float box_area = box.Area ();
 
-  size_t i, j, g;
-  for (g = 0 ; g < geometries.GetSize () ; g++)
+  if(minRadius < 0.0f)
+  {
+    for (size_t i = 0 ; i < geometries.GetSize () ; i++)
+    {
+      if(geometries[i]->GetRadius() < minRadius || minRadius < 0.0f)
+      {
+        minRadius = geometries[i]->GetRadius();
+      }
+    }
+  }
+
+  size_t i, j;
+  for (size_t g = 0 ; g < geometries.GetSize () ; g++)
   {
     csMGPosition pos;
     pos.geom_type = g;
@@ -712,7 +732,7 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
       if (mpos_count == 0)
       {
         float r = geometries[g]->GetRadius();
-        if(!cell.positionMap->GetRandomPosition(x, z, r))
+        if(!cell.positionMap->GetRandomPosition(x, z, r, minRadius))
         {
           // Ran out of room in this cell.
           return;
@@ -1122,6 +1142,7 @@ iMeshGeneratorGeometry* csMeshGenerator::CreateGeometry ()
 {
   csMeshGeneratorGeometry* geom = new csMeshGeneratorGeometry (this);
   geometries.Push (geom);
+  minRadius = -1.0f; // Requires a recalculate.
   total_max_dist = -1.0f;	// Requires a recalculate.
   geom->DecRef ();
   return geom;
