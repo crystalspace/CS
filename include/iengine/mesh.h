@@ -225,6 +225,10 @@ struct csHitBeamResult
    * For all except HitBeamBBox: true if hit, false otherwise.
    */
   bool hit;
+
+  csHitBeamResult() : material(0), hit(false)
+  {
+  }
 };
 
 /**
