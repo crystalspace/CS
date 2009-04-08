@@ -342,7 +342,29 @@ public:
     }
   };
 protected:
-  typedef csBlockAllocator<Values, TempHeapAlloc> ValBlockAlloc;
+  struct ValBlockAlloc : public CS::Memory::AllocatorSafe<csBlockAllocator<Values,
+    TempHeapAlloc> >
+  {
+    ValBlockAlloc (size_t n) : AllocatorSafeType (n) {}
+
+    CS_ATTRIBUTE_MALLOC Values* Alloc ()
+    {
+      CS::Threading::MutexScopedLock lock(mutex);
+      return WrappedAllocatorType::Alloc ();
+    }
+
+    void Free (Values* p)
+    {
+      CS::Threading::MutexScopedLock lock(mutex);
+      WrappedAllocatorType::Free (p);
+    }
+
+    void Compact()
+    {
+      CS::Threading::MutexScopedLock lock(mutex);
+      WrappedAllocatorType::Compact ();
+    }
+  };
   DECLARE_STATIC_CLASSVAR_DIRECT(ValAlloc, ValBlockAlloc, ValAllocKill,
     (1024));
   static void ValAllocKill();

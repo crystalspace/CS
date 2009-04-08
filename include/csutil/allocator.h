@@ -564,7 +564,7 @@ namespace CS
       void Free (void* p)
       {
         CS::Threading::MutexScopedLock lock(mutex);
-        return Allocator::Free(p);
+        Allocator::Free(p);
       }
 
       CS_ATTRIBUTE_MALLOC void* Alloc (const size_t n)

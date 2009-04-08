@@ -157,7 +157,7 @@ CS_IMPLEMENT_STATIC_CLASSVAR_REF(SliceAllocatorBool, sliceAlloc,
 IMPLEMENT_STATIC_CLASSVAR_DIRECT(Variables, ValAlloc);
 void Variables::ValAllocKill()
 {
-  ValAlloc().~csBlockAllocator();
+  ValAlloc().~ValBlockAlloc();
 }
 
 CS_IMPLEMENT_STATIC_CLASSVAR(Variables, def,
