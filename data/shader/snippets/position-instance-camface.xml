@@ -42,46 +42,13 @@
       </block>
     </input>
 
-    <!-- Direction (x,z), random factor, bias. -->
-    <input name="wind_data" type="float4" default="complex">
+    <input name="Proj" type="float4x4" default="complex">
       <block location="cg:vertexIn">
-        <varying type="float4" name="wind_data" />
-      </block>
-  
-      <block location="cg:vertexMain">
-        wind_data= vertexIn.wind_data;
-      </block>
-
-      <block location="pass">
-        <instanceparam source="wind data" destination="vertexIn.wind_data" />
-      </block>
-    </input>
-
-    <input name="wind_speed" type="float" default="complex">
-      <block location="cg:vertexIn">
-        <varying type="float" name="wind_speed" />
-      </block>
-  
-      <block location="cg:vertexMain">
-        wind_speed = vertexIn.wind_speed;
-      </block>
-
-      <block location="pass">
-        <instanceparam source="wind speed" destination="vertexIn.wind_speed" />
-      </block>
-    </input>
-
-    <input name="standard_time" type="float" default="complex" private="yes">
-      <block location="cg:variablemap">
-	  <variablemap variable="standard time" destination="vertexIn.standard_time" />
-      </block>
-      
-      <block location="cg:vertexIn">
-	  <uniform type="float" name="standard_time" />
+	<uniform type="float4x4" name="Proj" binding="state.matrix.projection" />
       </block>
       
       <block location="cg:vertexMain">
-	  standard_time = vertexIn.standard_time;
+	Proj = vertexIn.Proj;
       </block>
     </input>
 
@@ -109,18 +76,14 @@
     <block location="cg:definitions">
       <?Include /shader/snippets/cg-global_objectToWorld.cginc?>
     </block>
-	
-    <block location="cg:vertexMain">
-      position_world = mul (instancingTransforms, Hposition);
-      float posOffset = dot(position_world.xz, wind_data.xy) + wind_data.z;
-      float2 offset = clamp(Hposition.y, 0.0, Hposition.y) * (wind_data.xy * ((wind_data.w-1)/wind_data.w + sin(wind_speed*standard_time+posOffset)/(wind_data.w)));
-      Hposition.x += offset.x;
-      Hposition.z += offset.y;
 
+    <block location="cg:vertexMain">
       position_object = Hposition;
       position_world = mul (instancingTransforms, position_object);
-      position_screen = position = mul (ModelViewProj, position_world);
-      position_camera = mul (ModelView, position_world);
+      float4 offset = mul (instancingTransforms, float4(0, 0, 0, 1));
+      offset = mul (ModelView, offset);
+      position_camera = position_object + offset;
+      position_screen = position = mul (Proj, position_camera);
       
       APPLY_CLIPPING_VP(position_camera, position_world, position_object);
       
