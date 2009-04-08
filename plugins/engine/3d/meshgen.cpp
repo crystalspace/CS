@@ -289,15 +289,17 @@ iMeshWrapper* csMeshGeneratorGeometry::AllocMesh (
       geom.mesh->GetMovable ()->UpdateMove ();
     }
     vertexInfo.transformVar.AttachNew (new csShaderVariable);
- 	  vertexInfo.fadeFactorVar.AttachNew (new csShaderVariable);
+ 	vertexInfo.fadeFactorVar.AttachNew (new csShaderVariable);
     vertexInfo.windVar.AttachNew (new csShaderVariable);
     vertexInfo.windSpeedVar.AttachNew (new csShaderVariable);
     csRandomGen rng (csGetTicks ());
     vertexInfo.windRandVar = rng.Get();
- 	  geom.vertexInfoArray.transformVar->AddVariableToArray (vertexInfo.transformVar);
- 	  geom.vertexInfoArray.fadeFactorVar->AddVariableToArray (vertexInfo.fadeFactorVar);
+ 	geom.vertexInfoArray.transformVar->AddVariableToArray (vertexInfo.transformVar);
+ 	geom.vertexInfoArray.fadeFactorVar->AddVariableToArray (vertexInfo.fadeFactorVar);
     geom.vertexInfoArray.windVar->AddVariableToArray (vertexInfo.windVar);
     geom.vertexInfoArray.windSpeedVar->AddVariableToArray (vertexInfo.windSpeedVar);
+    vertexInfo.fadeFactorVar->SetValue(1.0f);
+
     return geom.mesh;
   }
 }
@@ -925,7 +927,10 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
             + density_maxfactor;
           if (factor < 0) factor = 0;
           else if (factor > 1) factor = 1;
-          if (p.random > factor) show = false;
+          if (p.random > factor)
+              show = false;
+          else
+              p.addedDist = dist;
         }
 
         if (show)
@@ -938,17 +943,6 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
             p.last_mixmode = ~0;
             geometries[p.geom_type]->MoveMesh (cidx, mesh, p.lod,
               p.vertexInfo, p.position, rotation_matrices[p.rotation]);
-
-/*
-  csRef<iImposter> imposter = scfQueryInterface<iImposter> (mesh);
-    imposter->SetImposterActive (true);
-  iSharedVariable *var = engine->GetVariableList()->FindByName 
-    ("Std Thing Range");
-  imposter->SetMinDistance (var);
-  var = engine->GetVariableList()->FindByName
-    ("Std Thing Angle");
-  imposter->SetRotationTolerance (var);
-*/
           }
         }
       }
@@ -970,7 +964,7 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
               p.position, rotation_matrices[p.rotation]);
           }
         }
-        else 
+        else if(!delta.IsZero())
         { 
           // LOD level is fine, adjust for new pos 
           geometries[p.geom_type]->MoveMesh (cidx, p.mesh, p.lod, p.vertexInfo, 
@@ -981,33 +975,35 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
       {
         SetWindData(p);
       }
-      if (p.mesh && use_alpha_scaling)
+      if (!delta.IsZero() && p.mesh && use_alpha_scaling)
       {
-        // This is used only if we have both density scaling and
-        // alpha scaling. It is the offset to correct the distance at which
-        // the object will disappear. We can adapt alpha scaling to scale
-        // based on that new distance.
-        float correct_dist = 0;
+        // These are used when we have both density and alpha scaling.
+        // The alpha limits are adjusted for the density added mesh.
+        float correct_alpha_maxdist = alpha_maxdist;
         float correct_sq_alpha_mindist = sq_alpha_mindist;
+        float correct_scale = alpha_scale;
 
-#if 0
-        if (use_density_scaling && sqdist > sq_density_mindist)
+        if (use_density_scaling && p.addedDist > 0)
         {
-          correct_dist = (p.random - density_maxfactor) / density_scale;
-          if (correct_dist < 0) correct_dist = 0;
-          correct_sq_alpha_mindist = alpha_mindist-correct_dist;
-          correct_sq_alpha_mindist *= correct_sq_alpha_mindist;
-          //printf ("p.mesh='%s' sqdist=%g dist=%g correct_sq_alpha_mindist=%g correct_dist=%g p.random=%g", p.mesh->QueryObject ()->GetName (), sqdist, sqrt (sqdist), correct_sq_alpha_mindist, correct_dist, p.random); fflush (stdout);
+          correct_alpha_maxdist = p.addedDist;
+          float correct_alpha_mindist = p.addedDist*(alpha_mindist/alpha_maxdist);
+          correct_sq_alpha_mindist = correct_alpha_mindist*correct_alpha_mindist;
+          correct_scale = 1.0f/(correct_alpha_maxdist-correct_alpha_mindist);
         }
-#endif
 
         float factor = 1.0;
         if (sqdist > correct_sq_alpha_mindist)
         {
           float dist = sqrt (sqdist);
-          factor = (alpha_maxdist-correct_dist - dist) * alpha_scale;
+          factor = (correct_alpha_maxdist - dist) * correct_scale;
+          if(factor < 0) factor = 0.0f;
         }
-        //printf (" -> factor=%g\n", factor); fflush (stdout);
+
+        if(use_density_scaling && p.addedDist > 0 && (1.0f - factor) < 0.01)
+        {
+            p.addedDist = 0;
+        }
+ 
         SetFade (p, factor);
       }
     }
@@ -1018,6 +1014,7 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
         geometries[p.geom_type]->SetAsideMesh (cidx, p.mesh, p.lod,
           p.vertexInfo);
         p.mesh = 0;
+        p.addedDist = 0;
       }
     }
   }

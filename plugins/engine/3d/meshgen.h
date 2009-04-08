@@ -259,6 +259,11 @@ struct csMGPosition
   float random;
 
   /**
+   * The distance at which we were added. Used for density scaling.
+   */
+  float addedDist;
+
+  /**
    * Last used mixmode.
    */
   uint last_mixmode;
