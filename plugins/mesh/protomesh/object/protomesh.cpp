@@ -222,7 +222,7 @@ bool csProtoMeshObject::HitBeamOutline (const csVector3& start,
 
 bool csProtoMeshObject::HitBeamObject (const csVector3& start,
                                        const csVector3& end, csVector3& isect, float *pr, int* polygon_idx,
-                                       iMaterialWrapper** material)
+                                       iMaterialWrapper** material, csArray<iMaterialWrapper*>* materials)
 {
   if (material) *material = csProtoMeshObject::material;
   if (polygon_idx) *polygon_idx = -1;

@@ -89,7 +89,7 @@ public:
   virtual void SetMaterialPalette (const csRefArray<iMaterialWrapper>& array);
 
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
-    bool oneHit, iTerrainVector3Array* points);
+    bool oneHit, iTerrainVector3Array* points, csArray<iMaterialWrapper*>* materials);
   virtual csTerrainColliderCollideSegmentResult CollideSegment (
       const csVector3& start, const csVector3& end, bool use_ray);
 
@@ -139,8 +139,8 @@ public:
         const csVector3& end, csVector3& isect, float* pr);
 
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-        csVector3& isect, float* pr, int* polygon_idx ,
-        iMaterialWrapper** material );
+        csVector3& isect, float* pr, int* polygon_idx,
+        iMaterialWrapper** material, csArray<iMaterialWrapper*>* materials);
 
   // ------------ iObjectModel implementation ------------
   virtual iTerrainSystem* GetTerrainColldet () { return this; }
@@ -167,6 +167,10 @@ private:
   bool autoPreload, bbStarted;
 
   void ComputeBBox();
+
+  bool HitBeamOutline (const csVector3& start,
+    const csVector3& end, csVector3& isect, float* pr,
+    csArray<iMaterialWrapper*>* materials);
 };
 
 }

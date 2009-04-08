@@ -783,7 +783,7 @@ csHitBeamResult csMeshWrapper::HitBeam (
   {
     if (do_material)
     {
-      rc.hit = meshobj->HitBeamObject (startObj, endObj, rc.isect, &rc.r, 0, &rc.material);
+      rc.hit = meshobj->HitBeamObject (startObj, endObj, rc.isect, &rc.r, 0, &rc.material, &rc.materials);
     }
     else
     {

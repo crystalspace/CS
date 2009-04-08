@@ -561,7 +561,7 @@ bool csWaterMeshObject::HitBeamOutline (const csVector3& start,
 
 bool csWaterMeshObject::HitBeamObject (const csVector3& start,
                                        const csVector3& end, csVector3& isect, float *pr, int* polygon_idx,
-                                       iMaterialWrapper** material)
+                                       iMaterialWrapper** material, csArray<iMaterialWrapper*>* materials)
 {
   
   if (material) *material = csWaterMeshObject::material;
