@@ -31913,6 +31913,7 @@ SWIGINTERN PyObject *_wrap_iMeshObject_HitBeamObject(PyObject *SWIGUNUSEDPARM(se
   float *arg5 = (float *) 0 ;
   int *arg6 = (int *) 0 ;
   iMaterialWrapper **arg7 = (iMaterialWrapper **) 0 ;
+  csArray<iMaterialWrapper * > *arg8 = (csArray<iMaterialWrapper * > *) 0 ;
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -31928,15 +31929,18 @@ SWIGINTERN PyObject *_wrap_iMeshObject_HitBeamObject(PyObject *SWIGUNUSEDPARM(se
   int res6 = SWIG_TMPOBJ ;
   void *argp7 = 0 ;
   int res7 = 0 ;
+  void *argp8 = 0 ;
+  int res8 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
   
   arg5 = &temp5;
   arg6 = &temp6;
-  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_HitBeamObject",4,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_HitBeamObject",4,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_HitBeamObject" "', argument " "1"" of type '" "iMeshObject *""'"); 
@@ -31973,7 +31977,14 @@ SWIGINTERN PyObject *_wrap_iMeshObject_HitBeamObject(PyObject *SWIGUNUSEDPARM(se
     }
     arg7 = reinterpret_cast< iMaterialWrapper ** >(argp7);
   }
-  result = (bool)(arg1)->HitBeamObject((csVector3 const &)*arg2,(csVector3 const &)*arg3,*arg4,arg5,arg6,arg7);
+  if (obj5) {
+    res8 = SWIG_ConvertPtr(obj5, &argp8,SWIGTYPE_p_csArrayTiMaterialWrapper_p_csArrayElementHandlerTiMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT16_t_t, 0 |  0 );
+    if (!SWIG_IsOK(res8)) {
+      SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "iMeshObject_HitBeamObject" "', argument " "8"" of type '" "csArray<iMaterialWrapper * > *""'"); 
+    }
+    arg8 = reinterpret_cast< csArray<iMaterialWrapper * > * >(argp8);
+  }
+  result = (bool)(arg1)->HitBeamObject((csVector3 const &)*arg2,(csVector3 const &)*arg3,*arg4,arg5,arg6,arg7,arg8);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   if (SWIG_IsTmpObj(res5)) {
     resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_From_float((*arg5)));
@@ -38967,6 +38978,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment__SWIG_0(PyObject *SWIGU
   csVector3 *arg3 = 0 ;
   bool arg4 ;
   iTerrainVector3Array *arg5 = (iTerrainVector3Array *) 0 ;
+  csArray<iMaterialWrapper * > *arg6 = (csArray<iMaterialWrapper * > *) 0 ;
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -38978,13 +38990,16 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment__SWIG_0(PyObject *SWIGU
   int ecode4 = 0 ;
   void *argp5 = 0 ;
   int res5 = 0 ;
+  void *argp6 = 0 ;
+  int res6 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   PyObject * obj3 = 0 ;
   PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_CollideSegment",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iTerrainSystem_CollideSegment",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iTerrainSystem, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iTerrainSystem_CollideSegment" "', argument " "1"" of type '" "iTerrainSystem *""'"); 
@@ -39016,7 +39031,12 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment__SWIG_0(PyObject *SWIGU
     SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iTerrainSystem_CollideSegment" "', argument " "5"" of type '" "iTerrainVector3Array *""'"); 
   }
   arg5 = reinterpret_cast< iTerrainVector3Array * >(argp5);
-  result = (bool)(arg1)->CollideSegment((csVector3 const &)*arg2,(csVector3 const &)*arg3,arg4,arg5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6,SWIGTYPE_p_csArrayTiMaterialWrapper_p_csArrayElementHandlerTiMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT16_t_t, 0 |  0 );
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "iTerrainSystem_CollideSegment" "', argument " "6"" of type '" "csArray<iMaterialWrapper * > *""'"); 
+  }
+  arg6 = reinterpret_cast< csArray<iMaterialWrapper * > * >(argp6);
+  result = (bool)(arg1)->CollideSegment((csVector3 const &)*arg2,(csVector3 const &)*arg3,arg4,arg5,arg6);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -39127,12 +39147,12 @@ fail:
 
 SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment(PyObject *self, PyObject *args) {
   int argc;
-  PyObject *argv[6];
+  PyObject *argv[7];
   int ii;
   
   if (!PyTuple_Check(args)) SWIG_fail;
   argc = (int)PyObject_Length(args);
-  for (ii = 0; (ii < argc) && (ii < 5); ii++) {
+  for (ii = 0; (ii < argc) && (ii < 6); ii++) {
     argv[ii] = PyTuple_GET_ITEM(args,ii);
   }
   if (argc == 3) {
@@ -39175,7 +39195,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment(PyObject *self, PyObjec
       }
     }
   }
-  if (argc == 5) {
+  if (argc == 6) {
     int _v;
     void *vptr = 0;
     int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iTerrainSystem, 0);
@@ -39196,7 +39216,12 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment(PyObject *self, PyObjec
             int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_iTerrainVector3Array, 0);
             _v = SWIG_CheckState(res);
             if (_v) {
-              return _wrap_iTerrainSystem_CollideSegment__SWIG_0(self, args);
+              void *vptr = 0;
+              int res = SWIG_ConvertPtr(argv[5], &vptr, SWIGTYPE_p_csArrayTiMaterialWrapper_p_csArrayElementHandlerTiMaterialWrapper_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT16_t_t, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                return _wrap_iTerrainSystem_CollideSegment__SWIG_0(self, args);
+              }
             }
           }
         }
@@ -39205,7 +39230,7 @@ SWIGINTERN PyObject *_wrap_iTerrainSystem_CollideSegment(PyObject *self, PyObjec
   }
   
 fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iTerrainSystem_CollideSegment'.\n  Possible C/C++ prototypes are:\n""    CollideSegment(iTerrainSystem *,csVector3 const &,csVector3 const &,bool,iTerrainVector3Array *)\n""    CollideSegment(iTerrainSystem *,csVector3 const &,csVector3 const &,bool)\n""    CollideSegment(iTerrainSystem *,csVector3 const &,csVector3 const &)\n");
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iTerrainSystem_CollideSegment'.\n  Possible C/C++ prototypes are:\n""    CollideSegment(iTerrainSystem *,csVector3 const &,csVector3 const &,bool,iTerrainVector3Array *,csArray<iMaterialWrapper * > *)\n""    CollideSegment(iTerrainSystem *,csVector3 const &,csVector3 const &,bool)\n""    CollideSegment(iTerrainSystem *,csVector3 const &,csVector3 const &)\n");
   return NULL;
 }
 

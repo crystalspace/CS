@@ -61563,8 +61563,8 @@ SWIGEXPORT void SWIG_init(void) {
   
   SWIG_Python_SetConstant(d, "CS_COMPILER_NAME",SWIG_FromCharPtr("GCC"));
   SWIG_Python_SetConstant(d, "CS_PLATFORM_NAME",SWIG_FromCharPtr("Unix"));
-  SWIG_Python_SetConstant(d, "CS_PROCESSOR_SIZE",SWIG_From_int(static_cast< int >(32)));
-  SWIG_Python_SetConstant(d, "CS_LONG_SIZE",SWIG_From_int(static_cast< int >(4)));
+  SWIG_Python_SetConstant(d, "CS_PROCESSOR_SIZE",SWIG_From_int(static_cast< int >(64)));
+  SWIG_Python_SetConstant(d, "CS_LONG_SIZE",SWIG_From_int(static_cast< int >(8)));
   SWIG_Python_SetConstant(d, "CS_PROCESSOR_NAME",SWIG_FromCharPtr("x86"));
   SWIG_Python_SetConstant(d, "CS_WCHAR_T_SIZE",SWIG_From_int(static_cast< int >(4)));
   SWIG_Python_SetConstant(d, "CS_PACKAGE_NAME",SWIG_FromCharPtr("crystalspace"));
