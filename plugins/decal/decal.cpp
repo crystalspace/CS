@@ -330,6 +330,7 @@ void csDecal::EndMesh ()
   csDecalRenderMeshInfo renderMeshInfo;
   renderMeshInfo.pRenderMesh = pRenderMesh;
   renderMeshInfo.mesh = currMesh;
+  renderMeshInfo.mesh->SetZBufMode(decalTemplate->GetZBufMode());
   renderMeshInfos.Push (renderMeshInfo);
 
   pRenderMesh->mixmode = decalTemplate->GetMixMode ();
