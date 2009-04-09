@@ -20260,6 +20260,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *swig_polygon_idx_set = *cspacec::csHitBeamResult_polygon_idx_set;
 *swig_material_get = *cspacec::csHitBeamResult_material_get;
 *swig_material_set = *cspacec::csHitBeamResult_material_set;
+*swig_materials_get = *cspacec::csHitBeamResult_materials_get;
+*swig_materials_set = *cspacec::csHitBeamResult_materials_set;
 *swig_facehit_get = *cspacec::csHitBeamResult_facehit_get;
 *swig_facehit_set = *cspacec::csHitBeamResult_facehit_set;
 *swig_hit_get = *cspacec::csHitBeamResult_hit_get;
