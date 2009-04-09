@@ -37,7 +37,7 @@
 #include "csutil/ref.h"
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
-#include "csutil/threading/mutex.h"
+#include "csutil/threading/rwmutex.h"
 #include "csutil/weakref.h"
 #include "csutil/eventhandlers.h"
 #include "iutil/eventh.h"
@@ -98,6 +98,9 @@ private:
   csPoolEvent* EventPool;
   /// Registered event handler (used for proper cleanup in RemoveAllListeners())
   csRefArray<iEventHandler> handlers;
+  /// Mutex for thread safety.
+  CS::Threading::ReadWriteMutex mutex;
+  CS::Threading::ReadWriteMutex etreeMutex;
 
   // Enlarge the queue size.
   void Resize (size_t iLength);  
