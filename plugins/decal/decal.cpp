@@ -330,10 +330,10 @@ void csDecal::EndMesh ()
   csDecalRenderMeshInfo renderMeshInfo;
   renderMeshInfo.pRenderMesh = pRenderMesh;
   renderMeshInfo.mesh = currMesh;
-  renderMeshInfo.mesh->SetZBufMode(decalTemplate->GetZBufMode());
   renderMeshInfos.Push (renderMeshInfo);
 
   pRenderMesh->mixmode = decalTemplate->GetMixMode ();
+  pRenderMesh->z_buf_mode = decalTemplate->GetZBufMode ();
   pRenderMesh->meshtype = CS_MESHTYPE_TRIANGLES;
   pRenderMesh->indexstart = firstIndex;
   pRenderMesh->indexend = indexCount;
