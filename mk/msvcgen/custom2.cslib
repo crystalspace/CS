@@ -52,7 +52,16 @@ buildreftrack.import({
     defines => builddebug.defines.merge(['CS_REF_TRACKER']),
     priority => 500
   });
+# Likewise for ThreadChecker.
+buildthreadcheck = {};
+buildthreadcheck.import(builddebug);
+buildthreadcheck.import({
+    name => 'ThreadChecker',
+    defines => builddebug.defines.merge(['CS_THREAD_CHECKER']),
+    libs => builddebug.libs.merge(['libittnotify.lib']),
+    priority => 600
+  });
 # Merge into the builds array
-builds = builds.merge([buildmemtrack, buildreftrack]);
+builds = builds.merge([buildmemtrack, buildreftrack, buildthreadcheck]);
 
 END %]

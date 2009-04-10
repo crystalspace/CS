@@ -108,14 +108,24 @@ typedef struct {
 #endif
 #pragma intrinsic (_InterlockedExchange)
 
+#ifdef CS_THREAD_CHECKER
+#include <libittnotify.h>
+#endif
+
 #define MUTEX_INITIALIZER          { 0 }
 #define mutex_init(m)              ((m)->lock = 0)
 static __inline int mutex_lock(mutex_t *m) {
   int cnt = 0;
 
   int spins = 0;
+#ifdef CS_THREAD_CHECKER
+      __itt_notify_sync_prepare((void *)m);
+#endif
   for (;;) {
     if (!_InterlockedExchange(&m->lock, 1)) {
+#ifdef CS_THREAD_CHECKER
+      __itt_notify_sync_acquired((void *)m);
+#endif
       return 0;
     }
     if(++cnt > 50) {
@@ -125,10 +135,28 @@ static __inline int mutex_lock(mutex_t *m) {
   }
 }
 static __inline int mutex_trylock(mutex_t *m) {
+#ifdef CS_THREAD_CHECKER
+      int lock;
+      __itt_notify_sync_prepare((void *)m);
+      lock = _InterlockedExchange (&m->lock, 1);
+      if(lock == 0)
+        __itt_notify_sync_acquired((void *)m);
+      else
+        __itt_notify_sync_cancel((void *)m);
+      return lock;
+#else
   return _InterlockedExchange (&m->lock, 1);
+#endif
 }
 static __inline int mutex_unlock(mutex_t *m) {
+#ifdef CS_THREAD_CHECKER
+  __itt_notify_sync_releasing((void *)m);
+  __itt_thr_mode_set(__itt_thr_prop_quiet, __itt_thr_state_set);
+#endif
   m->lock = 0;
+#ifdef CS_THREAD_CHECKER
+  __itt_thr_mode_set(__itt_thr_prop_quiet, __itt_thr_state_clr);
+#endif
   return 0;
 }
 
