@@ -561,6 +561,11 @@ namespace CS
       {
       }
 
+      template<typename A1, typename A2>
+      AllocatorSafe (const A1& a1, const A2& a2) : Allocator (a1, a2)
+      {
+      }
+
       void Free (void* p)
       {
         CS::Threading::MutexScopedLock lock(mutex);
