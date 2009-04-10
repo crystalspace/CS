@@ -57,10 +57,11 @@ namespace Threading
       MutexScopedLock lock (jobMutex);
       jobQueue.DeleteAll ();
       jobQueueL.DeleteAll ();
+
+      // Wait for all threads to finish their current job
+      shutdownQueue = true;
     }
 
-    // Wait for all threads to finish their current job
-    shutdownQueue = true;
     newJob.NotifyAll ();
     allThreads.WaitAll ();
 

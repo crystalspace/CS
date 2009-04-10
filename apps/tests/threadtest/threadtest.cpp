@@ -108,7 +108,7 @@ THREADED_CALLABLE_IMPL(csThreadTest, Test5Real)
 
 void csThreadTest::Test5() const
 {
-  csRef<iThreadReturn> ret = Test5Real();
+  csRef<iThreadReturn> ret = Test5RealWait();
   if(ret->WasSuccessful())
   {
     printf("Test 5 passed!\n");
@@ -141,7 +141,7 @@ THREADED_CALLABLE_IMPL1(csThreadTest, Test6, csRef<Data> stuff)
     csWeakRef<iThreadTest> t2 = t.Pop();
     passed &= (t1 == t2 && t1 == this &&
                t1->GetRefCount() == 1 &&
-               stuff->GetRefCount() == 4);
+               stuff->GetRefCount() == 6);
   }
   else
   {
@@ -213,7 +213,7 @@ int main(int argc, char* argv[])
   threadTest->Test5();
 
   csRef<Data> dat;
-  dat.AttachNew(new Data);
+  dat.AttachNew(new Data());
 
   dat->i = 42;
   dat->f = 3.14159f;

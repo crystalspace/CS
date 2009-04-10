@@ -167,8 +167,18 @@ public:
   {
   }
 
-  bool IsFinished() { return finished; }
-  bool WasSuccessful() { return success; }
+  bool IsFinished()
+  {
+    CS::Threading::MutexScopedLock lock(updateLock);
+    return finished;
+  }
+
+  bool WasSuccessful()
+  {
+    CS::Threading::MutexScopedLock lock(updateLock);
+    return success;
+  }
+
   void* GetResultPtr()
   { CS_ASSERT_MSG("csLoaderReturn does not implement a void* result", false); return NULL; }
 
@@ -189,7 +199,12 @@ public:
     }
   }
 
-  void MarkSuccessful() { success = true; }
+  void MarkSuccessful()
+  {
+    CS::Threading::MutexScopedLock lock(updateLock);
+    success = true;
+  }
+
   void SetResult(void* result)
   { CS_ASSERT_MSG("csLoaderReturn does not implement a void* result", false); }
 
