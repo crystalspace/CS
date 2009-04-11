@@ -420,7 +420,7 @@ void csMeshGeneratorGeometry::UpdatePosition (const csVector3& pos)
 //--------------------------------------------------------------------------
 
 csMeshGenerator::csMeshGenerator (csEngine* engine) : 
-  scfImplementationType (this), minRadius(-1.0f), total_max_dist (-1.0f), 
+  scfImplementationType (this), total_max_dist (-1.0f), minRadius(-1.0f),
   use_density_scaling (false), use_alpha_scaling (false),
   last_pos (0, 0, 0), setup_cells (false),
   cell_dim (50), inuse_blocks (0), inuse_blocks_last (0),
