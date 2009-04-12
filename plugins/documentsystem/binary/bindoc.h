@@ -548,13 +548,13 @@ private:
 
     CS_ATTRIBUTE_MALLOC T* Alloc ()
     {
-      CS::Threading::MutexScopedLock lock (mutex);
+      CS::Threading::RecursiveMutexScopedLock lock (mutex);
       return WrappedAllocatorType::Alloc ();
     }
 
     void Free (T* p)
     {
-      CS::Threading::MutexScopedLock lock (mutex);
+      CS::Threading::RecursiveMutexScopedLock lock (mutex);
       WrappedAllocatorType::Free(p);
     }
   };

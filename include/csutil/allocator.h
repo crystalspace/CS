@@ -553,7 +553,7 @@ namespace CS
       typedef Allocator WrappedAllocatorType;
       typedef AllocatorSafe<Allocator> AllocatorSafeType;
       /// Mutex to lock the wrapped allocator.
-      CS::Threading::Mutex mutex;
+      CS::Threading::RecursiveMutex mutex;
 
     public:
       template<typename A1>
@@ -568,25 +568,25 @@ namespace CS
 
       void Free (void* p)
       {
-        CS::Threading::MutexScopedLock lock(mutex);
+        CS::Threading::RecursiveMutexScopedLock lock(mutex);
         Allocator::Free(p);
       }
 
       CS_ATTRIBUTE_MALLOC void* Alloc (const size_t n)
       {
-        CS::Threading::MutexScopedLock lock(mutex);
+        CS::Threading::RecursiveMutexScopedLock lock(mutex);
         return Allocator::Alloc(n);
       }
 
       void* Realloc (void* p, size_t newSize)
       {
-        CS::Threading::MutexScopedLock lock(mutex);
+        CS::Threading::RecursiveMutexScopedLock lock(mutex);
         return Allocator::Realloc(p, newSize);
       }
 
       void SetMemTrackerInfo (const char* info)
       {
-        CS::Threading::MutexScopedLock lock(mutex);
+        CS::Threading::RecursiveMutexScopedLock lock(mutex);
         Allocator::SetMemTrackerInfo(info);
       }
     };

@@ -349,19 +349,19 @@ protected:
 
     CS_ATTRIBUTE_MALLOC Values* Alloc ()
     {
-      CS::Threading::MutexScopedLock lock(mutex);
+      CS::Threading::RecursiveMutexScopedLock lock(mutex);
       return WrappedAllocatorType::Alloc ();
     }
 
     void Free (Values* p)
     {
-      CS::Threading::MutexScopedLock lock(mutex);
+      CS::Threading::RecursiveMutexScopedLock lock(mutex);
       WrappedAllocatorType::Free (p);
     }
 
     void Compact()
     {
-      CS::Threading::MutexScopedLock lock(mutex);
+      CS::Threading::RecursiveMutexScopedLock lock(mutex);
       WrappedAllocatorType::Compact ();
     }
   };
@@ -484,13 +484,13 @@ protected:
       
       CS_ATTRIBUTE_MALLOC void* Alloc ()
       {
-        CS::Threading::MutexScopedLock lock(mutex);
+        CS::Threading::RecursiveMutexScopedLock lock(mutex);
         return WrappedAllocatorType::Alloc ();
       }
       
       void Compact()
       {
-        CS::Threading::MutexScopedLock lock(mutex);
+        CS::Threading::RecursiveMutexScopedLock lock(mutex);
         WrappedAllocatorType::Compact ();
       }
     };
