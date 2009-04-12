@@ -218,32 +218,36 @@ namespace RenderManager
     size_t GetSize (bool skipStatic)
     {
       csArray<LightInfo>& putBackLights = persist.putBackLights;
-    
+
       size_t n = 0;
       while (n < lightLimit + putBackLights.GetSize())
       {
         if (n < putBackLights.GetSize())
         {
           size_t j = putBackLights.GetSize()-1-n;
-	  if (!skipStatic || !putBackLights[j].isStatic)
-	    n++;
-	  else
-	    putBackLights.DeleteIndex (j);
+          if (!skipStatic || !putBackLights[j].isStatic)
+            n++;
+          else
+            putBackLights.DeleteIndex (j);
         }
         else
         {
           size_t i = n - putBackLights.GetSize();
-	  if (!skipStatic || !persist.lightTypeScratch[i].isStatic)
-	    n++;
-	  else
-	  {
-	    persist.lightTypeScratch.DeleteIndex (i);
-	    lightLimit = csMin (persist.lightTypeScratch.GetSize(), lightLimit);
-	  }
-	}
+          if (!skipStatic || !persist.lightTypeScratch[i].isStatic)
+            n++;
+          else
+          {
+            persist.lightTypeScratch.DeleteIndex (i);
+            lightLimit = csMin (persist.lightTypeScratch.GetSize(), lightLimit);
+          }
+        }
       }
       return n;
     }
+
+    /// Set the expected number of lights to be added.
+    void SetNumLights (size_t numLights);
+
     /// Set the maximum number of lights to keep in the sorter.
     void SetLightsLimit (size_t limit)
     {
@@ -787,67 +791,66 @@ namespace RenderManager
       const LayerConfigType& layerConfig = newLayers.GetOriginalLayers();
 
       /* This step will insert layers, keep track of the new indices of
-       * the original layer as well as how often a layer has been
-       * duplicated */
+      * the original layer as well as how often a layer has been
+      * duplicated */
       LayerHelper<RenderTree, LayerConfigType,
         PostLightingLayers> layerHelper (
-	static_cast<RenderTreeLightingTraits::ContextNodeExtraDataType&> (
-	  node->owner).layerHelperData, layerConfig, newLayers);
+        static_cast<RenderTreeLightingTraits::ContextNodeExtraDataType&> (
+        node->owner).layerHelperData, layerConfig, newLayers);
       ShadowHandler shadows (persist.shadowPersist, layerConfig,
         node, shadowParam);
       ShadowNone<RenderTree, LayerConfigType> noShadows;
 
       for (size_t i = 0; i < node->meshes.GetSize (); ++i)
       {
-      
         typename RenderTree::MeshNode::SingleMesh& mesh = node->meshes[i];
 
-        size_t numLights;
-        csLightInfluence* influences;
-	lightmgr->GetRelevantLightsSorted (node->owner.sector,
-	  mesh.renderMesh->bbox, influences, numLights, allMaxLights,
-	  &mesh.renderMesh->object2world);
-	
-	LightingSorter sortedLights (persist.lightSorterPersist,  numLights);
-	for (size_t l = 0; l < numLights; l++)
-	{
-	  iLight* light = influences[l].light;
-	  CachedLightData* thisLightSVs =
-	    persist.lightDataCache.GetElementPointer (light);
-	  if (thisLightSVs == 0)
-	  {
-	    CachedLightData newCacheData;
-	    newCacheData.shaderVars =
-	      &(light->GetSVContext()->GetShaderVariables());
-	    thisLightSVs = &persist.lightDataCache.Put (
-	      light, newCacheData);
-	    light->SetLightCallback (persist.GetLightCallback());
-	  }
-          thisLightSVs->SetupFrame (node->owner.owner, shadows, light);
-          csFlags lightFlagsMask;
-          if (mesh.meshFlags.Check (CS_ENTITY_NOSHADOWS))
-            lightFlagsMask = noShadows.GetLightFlagsMask();
-          else
-            lightFlagsMask = shadows.GetLightFlagsMask();
-	  sortedLights.AddLight (influences[l], thisLightSVs->GetSublightNum(),
-	    ~lightFlagsMask);
-	}
-        
-        size_t lightOffset = 0;
-	for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
+        size_t numLights = 0;
+        csLightInfluence* influences = 0;
+        LightingSorter sortedLights (persist.lightSorterPersist, 0);
+
+        if (!mesh.meshFlags.Check(CS_ENTITY_NOLIGHTING))
         {
-          // Get the subset of lights for this layer
-          size_t layerLights;
-          if (mesh.meshFlags.Check (CS_ENTITY_NOLIGHTING))
-            layerLights = 0;
-          else
-            layerLights = csMin (layerConfig.GetMaxLightNum (layer),
-              numLights - lightOffset);
-          if ((layerLights == 0)
-            && (!layerConfig.IsAmbientLayer (layer)))
+          lightmgr->GetRelevantLightsSorted (node->owner.sector,
+            mesh.renderMesh->bbox, influences, numLights, allMaxLights,
+            &mesh.renderMesh->object2world);
+
+          sortedLights.SetNumLights (numLights);
+          for (size_t l = 0; l < numLights; ++l)
+          {
+            iLight* light = influences[l].light;
+            CachedLightData* thisLightSVs =
+              persist.lightDataCache.GetElementPointer (light);
+            if (thisLightSVs == 0)
+            {
+              CachedLightData newCacheData;
+              newCacheData.shaderVars =
+                &(light->GetSVContext()->GetShaderVariables());
+              thisLightSVs = &persist.lightDataCache.Put (
+                light, newCacheData);
+              light->SetLightCallback (persist.GetLightCallback());
+            }
+            thisLightSVs->SetupFrame (node->owner.owner, shadows, light);
+            csFlags lightFlagsMask;
+            if (mesh.meshFlags.Check (CS_ENTITY_NOSHADOWS))
+              lightFlagsMask = noShadows.GetLightFlagsMask();
+            else
+              lightFlagsMask = shadows.GetLightFlagsMask();
+            sortedLights.AddLight (influences[l], thisLightSVs->GetSublightNum(),
+              ~lightFlagsMask);
+          }
+        }
+
+        size_t lightOffset = 0;
+        for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
+        {
+          size_t layerLights = (numLights == 0) ? 0 :
+            csMin (layerConfig.GetMaxLightNum (layer), numLights - lightOffset);
+
+          if (layerLights == 0 && !layerConfig.IsAmbientLayer (layer))
           {
             /* Layer has no lights and is no ambient layer - prevent it from
-             * being drawn completely */
+            * being drawn completely */
             node->owner.shaderArray[layerHelper.GetNewLayerIndex (layer, 0) 
               * node->owner.totalRenderMeshes + mesh.contextLocalId] = 0;
             continue;
@@ -856,12 +859,12 @@ namespace RenderManager
           sortedLights.SetLightsLimit (layerLights);
           size_t handledLights;
           if (mesh.meshFlags.CheckAll (CS_ENTITY_NOSHADOWCAST
-              | CS_ENTITY_NOSHADOWRECEIVE))
-	    handledLights = HandleLights (noShadows, sortedLights,
-	      layer, layerHelper, layerConfig, mesh, node);
-	  else
-	    handledLights = HandleLights (shadows, sortedLights,
-	      layer, layerHelper, layerConfig, mesh, node);
+            | CS_ENTITY_NOSHADOWRECEIVE))
+            handledLights = HandleLights (noShadows, sortedLights,
+            layer, layerHelper, layerConfig, mesh, node);
+          else
+            handledLights = HandleLights (shadows, sortedLights,
+            layer, layerHelper, layerConfig, mesh, node);
           if ((handledLights == 0)
             && (!layerConfig.IsAmbientLayer (layer)))
           {
@@ -871,22 +874,22 @@ namespace RenderManager
             continue;
           }
           lightOffset += handledLights;
-	}
+        }
 
         lightmgr->FreeInfluenceArray (influences);
       }
-      
+
       if (shadows.NeedFinalHandleLight())
       {
-	typename PersistentData::LightDataCache::GlobalIterator lightDataIt (
-	  persist.lightDataCache.GetIterator());
-	while (lightDataIt.HasNext())
-	{
-	  csPtrKey<iLight> light;
-	  CachedLightData& data = lightDataIt.Next (light);
-	  shadows.FinalHandleLight (light, data);
+        typename PersistentData::LightDataCache::GlobalIterator lightDataIt (
+          persist.lightDataCache.GetIterator());
+        while (lightDataIt.HasNext())
+        {
+          csPtrKey<iLight> light;
+          CachedLightData& data = lightDataIt.Next (light);
+          shadows.FinalHandleLight (light, data);
           data.ClearFrameData();
-	}
+        }
       }
     }
 
