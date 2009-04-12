@@ -23,9 +23,7 @@
 		<maxlightpasses>1</maxlightpasses>
 		<shadertype>base</shadertype>
 		<shadertype>ambient</shadertype>
-		<shadertype>splatting ambient</shadertype>
 		<shadertype>standard</shadertype>
-		<shadertype>terrain splat</shadertype>
 	</layer>
 	<layer>
 	        <defaultshader name="lighting_default_pvl" file="/shader/lighting/lighting_default_pvl.xml" />
