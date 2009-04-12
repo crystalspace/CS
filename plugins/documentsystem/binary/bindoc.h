@@ -537,9 +537,30 @@ private:
   csBdNode* root;	
   csBinaryDocNode::Pool nodePool;
   csBinaryDocAttribute::Pool attrPool;
-  
-  csBlockAllocator<csBdAttr>* attrAlloc;
-  csBlockAllocator<csBdNode>* nodeAlloc;
+
+  template<typename T>
+  struct csBdAllocator :
+    public CS::Memory::AllocatorSafe<csBlockAllocator<T> >
+  {
+    csBdAllocator (const size_t& a1) : AllocatorSafeType (a1)
+    {
+    }
+
+    CS_ATTRIBUTE_MALLOC T* Alloc ()
+    {
+      CS::Threading::MutexScopedLock lock (mutex);
+      return WrappedAllocatorType::Alloc ();
+    }
+
+    void Free (T* p)
+    {
+      CS::Threading::MutexScopedLock lock (mutex);
+      WrappedAllocatorType::Free(p);
+    }
+  };
+
+  csBdAllocator<csBdAttr> attrAlloc;
+  csBdAllocator<csBdNode> nodeAlloc;
 
   csStringHash* outStrHash;
   iFile* outStrStorage;
