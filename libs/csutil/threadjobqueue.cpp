@@ -195,47 +195,48 @@ namespace Threading
     while (true)
     {
       {
-	// Check the running threads
-	MutexScopedLock lock (threadStateMutex);
-  
-	bool isRunning = false;
-	size_t index;
-  
-	for (size_t i = 0; i < numWorkerThreads; ++i)
-	{
-	  if (allThreadState[i]->currentJob == job)
-	  {
-	    isRunning = true;
-	    index = i;
-	    break;
-	  }
-	}
-  
-	if (isRunning)
-	{
-	  /* The job is currently running, so wait until it finished */
-	  while (allThreadState[index]->currentJob == job)
-	    allThreadState[index]->jobFinished.Wait (threadStateMutex);
-	  return;
-	}
+        // Check the running threads
+        MutexScopedLock lock (threadStateMutex);
+
+        bool isRunning = false;
+        size_t index;
+
+        for (size_t i = 0; i < numWorkerThreads; ++i)
+        {
+          if (allThreadState[i]->currentJob == job)
+          {
+            isRunning = true;
+            index = i;
+            break;
+          }
+        }
+
+        if (isRunning)
+        {
+          /* The job is currently running, so wait until it finished */
+          while (allThreadState[index]->currentJob == job)
+            allThreadState[index]->jobFinished.Wait (threadStateMutex);
+          return;
+        }
       }
-      
+
       {
-	MutexScopedLock lock (jobMutex);
-	// Check if in queue
-	bool jobUnqued = jobQueue.Contains (job) || jobQueueL.Contains (job);
-  
-	if (!jobUnqued)
-	  // Not queued or running at all (any more)
-	  return;
+        MutexScopedLock lock (jobMutex);
+        // Check if in queue
+        bool jobUnqued = jobQueue.Contains (job) || jobQueueL.Contains (job);
+
+        if (!jobUnqued)
+          // Not queued or running at all (any more)
+          return;
       }
-  
+
       /* The job is somewhere in a queue.
-       * Just wait for any job to finish and check everything again...
-       */
+      * Just wait for any job to finish and check everything again...
+      */
       if (!IsFinished())
       {
-	jobFinished.Wait (jobFinishedMutex);
+        MutexScopedLock lock(jobFinishedMutex);
+        jobFinished.Wait (jobFinishedMutex);
       }
     }
   }
