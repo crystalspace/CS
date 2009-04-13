@@ -542,19 +542,22 @@ private:
   struct csBdAllocator :
     public CS::Memory::AllocatorSafe<csBlockAllocator<T> >
   {
+    typedef csBlockAllocator<T> WrappedAllocatorType;
+    typedef CS::Memory::AllocatorSafe<WrappedAllocatorType> AllocatorSafeType;
+
     csBdAllocator (const size_t& a1) : AllocatorSafeType (a1)
     {
     }
 
     CS_ATTRIBUTE_MALLOC T* Alloc ()
     {
-      CS::Threading::RecursiveMutexScopedLock lock (mutex);
+      CS::Threading::RecursiveMutexScopedLock lock (AllocatorSafeType::mutex);
       return WrappedAllocatorType::Alloc ();
     }
 
     void Free (T* p)
     {
-      CS::Threading::RecursiveMutexScopedLock lock (mutex);
+      CS::Threading::RecursiveMutexScopedLock lock (AllocatorSafeType::mutex);
       WrappedAllocatorType::Free(p);
     }
   };
