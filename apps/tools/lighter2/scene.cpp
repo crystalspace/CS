@@ -165,7 +165,7 @@ namespace lighter
 
     for (unsigned int i = 0; i < sceneFiles.GetSize (); i++)
     {
-      //Change path
+      // Change path
       csStringArray paths;
       paths.Push ("/lev/");
       if (!globalLighter->vfs->ChDirAuto (sceneFiles[i].directory, &paths, 0, "world"))
@@ -176,8 +176,33 @@ namespace lighter
       // Load it
       csRef<iFile> buf = globalLighter->vfs->Open (
         sceneFiles[i].fileName, VFS_FILE_READ);
-      if (!buf) return globalLighter->Report ("Error opening file '%s'!",
-        sceneFiles[i].fileName.GetData());
+      if (!buf)
+      {
+        // Check if the file was part of the path.
+        csString directory = sceneFiles[i].directory;
+        csString filename = sceneFiles[i].directory;
+        size_t start = filename.FindLast('\\')+1;
+        directory = directory.Slice(0, start);
+        filename = filename.Slice(start);
+
+        if (!globalLighter->vfs->ChDirAuto (directory, &paths, 0, filename))
+        {
+          return globalLighter->Report ("Error setting directory '%s'!", 
+            sceneFiles[i].directory.GetData());
+        }
+
+        buf = globalLighter->vfs->Open (filename, VFS_FILE_READ);
+        if(buf)
+        {
+          sceneFiles[i].directory = directory;
+          sceneFiles[i].fileName = filename;
+        }
+        else
+        {
+          return globalLighter->Report ("Error opening file '%s'!",
+            sceneFiles[i].fileName.GetData());
+        }
+      }
       
       csRef<iDocument> doc = globalLighter->docSystem->CreateDocument ();
       const char* error = doc->Parse (buf, true);
@@ -753,6 +778,16 @@ namespace lighter
           if (!obj) continue;
           fileInfo->fileObjects.Push (obj);
         }
+      }
+    }
+    else
+    {
+      // Not a world file, so just parse meshfacts.
+      iMeshFactoryList* mflist = globalLighter->engine->GetMeshFactories();
+      for(int m=0; m<mflist->GetCount(); ++m)
+      {
+        csRef<ObjectFactory> factory;
+        ParseMeshFactory(fileInfo, mflist->Get(m), factory);
       }
     }
 
