@@ -41,6 +41,14 @@ AC_DEFUN([CS_PROG_CC],[
 	# Check if compiler recognizes -pipe directive.
 	CS_EMIT_BUILD_FLAGS([if $CC accepts -pipe], [cs_cv_prog_cc_pipe],
 	  [CS_CREATE_TUPLE([-pipe])], [C], [COMPILER.CFLAGS], [+])
+
+        # Check if compiler recognizes Sparc v9 CPU. Ugly to pollute
+        # project-agnostic C compiler check, but it is needed by assembly code
+        # implementing Sparc atomic threading operations, and it should not
+        # hurt if the option is not recognized.
+	CS_EMIT_BUILD_FLAGS([if $CC handles Sparc v9],
+            [cs_cv_prog_cc_sparc_v9],
+            [CS_CREATE_TUPLE([-mcpu=v9])], [C], [COMPILER.CFLAGS], [+])
     ])
 ])
 
