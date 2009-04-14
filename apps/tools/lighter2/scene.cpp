@@ -867,9 +867,58 @@ namespace lighter
 
       bool isPD = light->GetDynamicType() == CS_LIGHT_DYNAMICTYPE_PSEUDO;
 
-      // Atm, only point light
-      csRef<PointLight> intLight;
-      intLight.AttachNew (new PointLight (radSector));
+      // IneQuation was here
+      csRef<Light> intLight;
+
+      switch (light->GetType ()) {
+        // directional light
+        case CS_LIGHT_DIRECTIONAL:
+          {
+            csRef<DirectionalLight> dirLight;
+            dirLight.AttachNew (new DirectionalLight (radSector));
+
+            dirLight->SetRadius (light->GetDirectionalCutoffRadius ());
+            dirLight->SetLength (light->GetCutoffDistance ());
+
+            // light's Z axis
+            dirLight->SetDirection (light->GetMovable ()->GetFullTransform ().GetO2T ().Row3 ());
+
+            intLight = dirLight;
+          }
+          break;
+
+        // spotlight
+        case CS_LIGHT_SPOTLIGHT:
+          {
+            csRef<SpotLight> spotLight;
+            spotLight.AttachNew (new SpotLight (radSector));
+
+            spotLight->SetRadius (light->GetCutoffDistance ());
+
+            float in, out;
+            light->GetSpotLightFalloff (in, out);
+            spotLight->SetFalloff (in, out);
+
+            // light's Z axis
+            spotLight->SetDirection (light->GetMovable ()->GetFullTransform ().GetO2T ().Row3 ());
+
+            intLight = spotLight;
+          }
+          break;
+
+        // by default assume point light
+        case CS_LIGHT_POINTLIGHT:
+        default:
+          {
+            csRef<PointLight> pointLight;
+            pointLight.AttachNew (new PointLight (radSector));
+
+            pointLight->SetRadius (light->GetCutoffDistance ());
+
+            intLight = pointLight;
+          }
+          break;
+      }
 
       intLight->SetPosition (light->GetMovable ()->GetFullPosition ());
       intLight->SetColor (isPD ? csColor (1.0f) : light->GetColor ());
@@ -879,8 +928,6 @@ namespace lighter
       intLight->SetPDLight (isPD);
       intLight->SetLightID (light->GetLightID());
       intLight->SetName (lightName);
-
-      intLight->SetRadius (light->GetCutoffDistance ());
 
       if (isPD)
         radSector->allPDLights.Push (intLight);
