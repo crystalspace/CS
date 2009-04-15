@@ -361,7 +361,7 @@ private:
   friend struct csBinaryDocument;
 
   /// Owning node.
-  csBinaryDocNode* parentNode;
+  csRef<csBinaryDocNode> parentNode;
   /**
    * Where we are in the children list.
    */
