@@ -86,22 +86,26 @@ public:
       layerConfig (layerConfig),
     recurseCount (0)
   {
-
+      csConfigAccess cfg (rmanager->objectReg);
+      maxPortalRecurse = cfg->GetInt("RenderManager.ShadowPSSM.MaxPortalRecurse", 30);
   }
+
   StandardContextSetup (const StandardContextSetup& other)
     : rmanager (other.rmanager), 
       lightPersistent (other.lightPersistent),
       layerConfig (other.layerConfig),
-      recurseCount (other.recurseCount)
+      recurseCount (other.recurseCount),
+      maxPortalRecurse (other.maxPortalRecurse)
   {
   }
+
   template<typename T2>
   StandardContextSetup (const T2& other,
     typename LightSetupType::PersistentData& lightPersistent,
     const LayerConfigType& layerConfig)
     : rmanager (other.rmanager), 
       lightPersistent (lightPersistent), layerConfig (layerConfig),
-      recurseCount (other.recurseCount)
+      recurseCount (other.recurseCount), maxPortalRecurse(other.maxPortalRecurse)
   {
   }
   
@@ -111,8 +115,7 @@ public:
     CS::RenderManager::RenderView* rview = context.renderView;
     iSector* sector = rview->GetThisSector ();
 
-    // @@@ FIXME: Of course, don't hardcode.
-    if (recurseCount > 30) return;
+    if (recurseCount > maxPortalRecurse) return;
     
     typename ShadowType::ShadowParameters shadowViewSetup (
       WrapShadowParams<ShadowType>::Create (
@@ -300,6 +303,7 @@ public:
   typename LightSetupType::PersistentData& lightPersistent;
   const LayerConfigType& layerConfig;
   int recurseCount;
+  int maxPortalRecurse;
 };
 
 

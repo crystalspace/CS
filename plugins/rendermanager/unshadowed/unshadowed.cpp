@@ -56,15 +56,15 @@ public:
     : rmanager (rmanager), layerConfig (layerConfig),
     recurseCount (0)
   {
-
+    csConfigAccess cfg (rmanager->objectReg);
+    maxPortalRecurse = cfg->GetInt("RenderManager.Unshadowed.MaxPortalRecurse", 30);
   }
 
   StandardContextSetup (const StandardContextSetup& other,
       const LayerConfigType& layerConfig)
     : rmanager (other.rmanager), layerConfig (layerConfig),
-      recurseCount (other.recurseCount)
+      recurseCount (other.recurseCount), maxPortalRecurse(other.maxPortalRecurse)
   {
-
   }
 
 
@@ -74,8 +74,7 @@ public:
     CS::RenderManager::RenderView* rview = context.renderView;
     iSector* sector = rview->GetThisSector ();
 
-    // @@@ FIXME: Of course, don't hardcode.
-    if (recurseCount > 30) return;
+    if (recurseCount > maxPortalRecurse) return;
     
     iShaderManager* shaderManager = rmanager->shaderManager;
 
@@ -174,6 +173,7 @@ private:
   RMUnshadowed* rmanager;
   const LayerConfigType& layerConfig;
   int recurseCount;
+  int maxPortalRecurse;
 };
 
 
