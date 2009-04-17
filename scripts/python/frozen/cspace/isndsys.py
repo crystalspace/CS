@@ -307,25 +307,6 @@ class iSndSysSource3DDoppler(core.iBase):
 iSndSysSource3DDoppler_swigregister = _isndsys.iSndSysSource3DDoppler_swigregister
 iSndSysSource3DDoppler_swigregister(iSndSysSource3DDoppler)
 
-class iSndSysSourceSoftware3D(iSndSysSourceSoftware):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def SetPosition(*args): return _isndsys.iSndSysSourceSoftware3D_SetPosition(*args)
-    def GetPosition(*args): return _isndsys.iSndSysSourceSoftware3D_GetPosition(*args)
-    def SetDirection(*args): return _isndsys.iSndSysSourceSoftware3D_SetDirection(*args)
-    def GetDirection(*args): return _isndsys.iSndSysSourceSoftware3D_GetDirection(*args)
-    def SetDirectionalRadiation(*args): return _isndsys.iSndSysSourceSoftware3D_SetDirectionalRadiation(*args)
-    def GetDirectionalRadiation(*args): return _isndsys.iSndSysSourceSoftware3D_GetDirectionalRadiation(*args)
-    def SetMinimumDistance(*args): return _isndsys.iSndSysSourceSoftware3D_SetMinimumDistance(*args)
-    def SetMaximumDistance(*args): return _isndsys.iSndSysSourceSoftware3D_SetMaximumDistance(*args)
-    def GetMinimumDistance(*args): return _isndsys.iSndSysSourceSoftware3D_GetMinimumDistance(*args)
-    def GetMaximumDistance(*args): return _isndsys.iSndSysSourceSoftware3D_GetMaximumDistance(*args)
-    __swig_destroy__ = _isndsys.delete_iSndSysSourceSoftware3D
-    __del__ = lambda self : None;
-iSndSysSourceSoftware3D_swigregister = _isndsys.iSndSysSourceSoftware3D_swigregister
-iSndSysSourceSoftware3D_swigregister(iSndSysSourceSoftware3D)
-
 CSSNDSYS_SAMPLE_LITTLE_ENDIAN = _isndsys.CSSNDSYS_SAMPLE_LITTLE_ENDIAN
 CSSNDSYS_SAMPLE_BIG_ENDIAN = _isndsys.CSSNDSYS_SAMPLE_BIG_ENDIAN
 CSSNDSYS_SAMPLE_ENDIAN_MASK = _isndsys.CSSNDSYS_SAMPLE_ENDIAN_MASK

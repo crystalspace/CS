@@ -2594,36 +2594,35 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_iSndSysSource3DDoppler swig_types[95]
 #define SWIGTYPE_p_iSndSysSourceOpenAL swig_types[96]
 #define SWIGTYPE_p_iSndSysSourceSoftware swig_types[97]
-#define SWIGTYPE_p_iSndSysSourceSoftware3D swig_types[98]
-#define SWIGTYPE_p_iSndSysStream swig_types[99]
-#define SWIGTYPE_p_iSndSysStreamCallback swig_types[100]
-#define SWIGTYPE_p_iSndSysWrapper swig_types[101]
-#define SWIGTYPE_p_iString swig_types[102]
-#define SWIGTYPE_p_iStringArray swig_types[103]
-#define SWIGTYPE_p_iStringSet swig_types[104]
-#define SWIGTYPE_p_iStringSetBaseTCS__StringSetTag__General_t swig_types[105]
-#define SWIGTYPE_p_iTriangleMesh swig_types[106]
-#define SWIGTYPE_p_iVFS swig_types[107]
-#define SWIGTYPE_p_iVirtualClock swig_types[108]
-#define SWIGTYPE_p_int swig_types[109]
-#define SWIGTYPE_p_int16_t swig_types[110]
-#define SWIGTYPE_p_int64_t swig_types[111]
-#define SWIGTYPE_p_int8_t swig_types[112]
-#define SWIGTYPE_p_long_long swig_types[113]
-#define SWIGTYPE_p_p_void swig_types[114]
-#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[115]
-#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[116]
-#define SWIGTYPE_p_scfImplementationExt1TcsPath_csObject_iPath_t swig_types[117]
-#define SWIGTYPE_p_size_t swig_types[118]
-#define SWIGTYPE_p_uint16_t swig_types[119]
-#define SWIGTYPE_p_uint32_t swig_types[120]
-#define SWIGTYPE_p_uint64_t swig_types[121]
-#define SWIGTYPE_p_uint8_t swig_types[122]
-#define SWIGTYPE_p_unsigned_int swig_types[123]
-#define SWIGTYPE_p_unsigned_long swig_types[124]
-#define SWIGTYPE_p_unsigned_long_long swig_types[125]
-static swig_type_info *swig_types[127];
-static swig_module_info swig_module = {swig_types, 126, 0, 0, 0, 0};
+#define SWIGTYPE_p_iSndSysStream swig_types[98]
+#define SWIGTYPE_p_iSndSysStreamCallback swig_types[99]
+#define SWIGTYPE_p_iSndSysWrapper swig_types[100]
+#define SWIGTYPE_p_iString swig_types[101]
+#define SWIGTYPE_p_iStringArray swig_types[102]
+#define SWIGTYPE_p_iStringSet swig_types[103]
+#define SWIGTYPE_p_iStringSetBaseTCS__StringSetTag__General_t swig_types[104]
+#define SWIGTYPE_p_iTriangleMesh swig_types[105]
+#define SWIGTYPE_p_iVFS swig_types[106]
+#define SWIGTYPE_p_iVirtualClock swig_types[107]
+#define SWIGTYPE_p_int swig_types[108]
+#define SWIGTYPE_p_int16_t swig_types[109]
+#define SWIGTYPE_p_int64_t swig_types[110]
+#define SWIGTYPE_p_int8_t swig_types[111]
+#define SWIGTYPE_p_long_long swig_types[112]
+#define SWIGTYPE_p_p_void swig_types[113]
+#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[114]
+#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[115]
+#define SWIGTYPE_p_scfImplementationExt1TcsPath_csObject_iPath_t swig_types[116]
+#define SWIGTYPE_p_size_t swig_types[117]
+#define SWIGTYPE_p_uint16_t swig_types[118]
+#define SWIGTYPE_p_uint32_t swig_types[119]
+#define SWIGTYPE_p_uint64_t swig_types[120]
+#define SWIGTYPE_p_uint8_t swig_types[121]
+#define SWIGTYPE_p_unsigned_int swig_types[122]
+#define SWIGTYPE_p_unsigned_long swig_types[123]
+#define SWIGTYPE_p_unsigned_long_long swig_types[124]
+static swig_type_info *swig_types[126];
+static swig_module_info swig_module = {swig_types, 125, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -6458,311 +6457,6 @@ SWIGINTERN PyObject *iSndSysSource3DDoppler_swigregister(PyObject *SWIGUNUSEDPAR
   return SWIG_Py_Void();
 }
 
-SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware3D_SetPosition(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iSndSysSourceSoftware3D *arg1 = (iSndSysSourceSoftware3D *) 0 ;
-  csVector3 arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware3D_SetPosition",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware3D_SetPosition" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
-  }
-  arg1 = reinterpret_cast< iSndSysSourceSoftware3D * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSndSysSourceSoftware3D_SetPosition" "', argument " "2"" of type '" "csVector3""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSndSysSourceSoftware3D_SetPosition" "', argument " "2"" of type '" "csVector3""'");
-    } else {
-      csVector3 * temp = reinterpret_cast< csVector3 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
-  (arg1)->SetPosition(arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware3D_GetPosition(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iSndSysSourceSoftware3D *arg1 = (iSndSysSourceSoftware3D *) 0 ;
-  csVector3 result;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware3D_GetPosition",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware3D_GetPosition" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
-  }
-  arg1 = reinterpret_cast< iSndSysSourceSoftware3D * >(argp1);
-  result = (arg1)->GetPosition();
-  resultobj = SWIG_NewPointerObj((new csVector3(static_cast< const csVector3& >(result))), SWIGTYPE_p_csVector3, SWIG_POINTER_OWN |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware3D_SetDirection(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iSndSysSourceSoftware3D *arg1 = (iSndSysSourceSoftware3D *) 0 ;
-  csVector3 arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware3D_SetDirection",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware3D_SetDirection" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
-  }
-  arg1 = reinterpret_cast< iSndSysSourceSoftware3D * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSndSysSourceSoftware3D_SetDirection" "', argument " "2"" of type '" "csVector3""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iSndSysSourceSoftware3D_SetDirection" "', argument " "2"" of type '" "csVector3""'");
-    } else {
-      csVector3 * temp = reinterpret_cast< csVector3 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
-  (arg1)->SetDirection(arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware3D_GetDirection(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iSndSysSourceSoftware3D *arg1 = (iSndSysSourceSoftware3D *) 0 ;
-  csVector3 result;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware3D_GetDirection",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware3D_GetDirection" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
-  }
-  arg1 = reinterpret_cast< iSndSysSourceSoftware3D * >(argp1);
-  result = (arg1)->GetDirection();
-  resultobj = SWIG_NewPointerObj((new csVector3(static_cast< const csVector3& >(result))), SWIGTYPE_p_csVector3, SWIG_POINTER_OWN |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware3D_SetDirectionalRadiation(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iSndSysSourceSoftware3D *arg1 = (iSndSysSourceSoftware3D *) 0 ;
-  float arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  float val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware3D_SetDirectionalRadiation",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware3D_SetDirectionalRadiation" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
-  }
-  arg1 = reinterpret_cast< iSndSysSourceSoftware3D * >(argp1);
-  ecode2 = SWIG_AsVal_float(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSndSysSourceSoftware3D_SetDirectionalRadiation" "', argument " "2"" of type '" "float""'");
-  } 
-  arg2 = static_cast< float >(val2);
-  (arg1)->SetDirectionalRadiation(arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware3D_GetDirectionalRadiation(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iSndSysSourceSoftware3D *arg1 = (iSndSysSourceSoftware3D *) 0 ;
-  float result;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware3D_GetDirectionalRadiation",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware3D_GetDirectionalRadiation" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
-  }
-  arg1 = reinterpret_cast< iSndSysSourceSoftware3D * >(argp1);
-  result = (float)(arg1)->GetDirectionalRadiation();
-  resultobj = SWIG_From_float(static_cast< float >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware3D_SetMinimumDistance(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iSndSysSourceSoftware3D *arg1 = (iSndSysSourceSoftware3D *) 0 ;
-  float arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  float val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware3D_SetMinimumDistance",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware3D_SetMinimumDistance" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
-  }
-  arg1 = reinterpret_cast< iSndSysSourceSoftware3D * >(argp1);
-  ecode2 = SWIG_AsVal_float(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSndSysSourceSoftware3D_SetMinimumDistance" "', argument " "2"" of type '" "float""'");
-  } 
-  arg2 = static_cast< float >(val2);
-  (arg1)->SetMinimumDistance(arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware3D_SetMaximumDistance(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iSndSysSourceSoftware3D *arg1 = (iSndSysSourceSoftware3D *) 0 ;
-  float arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  float val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware3D_SetMaximumDistance",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware3D_SetMaximumDistance" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
-  }
-  arg1 = reinterpret_cast< iSndSysSourceSoftware3D * >(argp1);
-  ecode2 = SWIG_AsVal_float(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iSndSysSourceSoftware3D_SetMaximumDistance" "', argument " "2"" of type '" "float""'");
-  } 
-  arg2 = static_cast< float >(val2);
-  (arg1)->SetMaximumDistance(arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware3D_GetMinimumDistance(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iSndSysSourceSoftware3D *arg1 = (iSndSysSourceSoftware3D *) 0 ;
-  float result;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware3D_GetMinimumDistance",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware3D_GetMinimumDistance" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
-  }
-  arg1 = reinterpret_cast< iSndSysSourceSoftware3D * >(argp1);
-  result = (float)(arg1)->GetMinimumDistance();
-  resultobj = SWIG_From_float(static_cast< float >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware3D_GetMaximumDistance(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iSndSysSourceSoftware3D *arg1 = (iSndSysSourceSoftware3D *) 0 ;
-  float result;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware3D_GetMaximumDistance",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware3D_GetMaximumDistance" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
-  }
-  arg1 = reinterpret_cast< iSndSysSourceSoftware3D * >(argp1);
-  result = (float)(arg1)->GetMaximumDistance();
-  resultobj = SWIG_From_float(static_cast< float >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_delete_iSndSysSourceSoftware3D(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iSndSysSourceSoftware3D *arg1 = (iSndSysSourceSoftware3D *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"delete_iSndSysSourceSoftware3D",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, SWIG_POINTER_DISOWN |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSndSysSourceSoftware3D" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
-  }
-  arg1 = reinterpret_cast< iSndSysSourceSoftware3D * >(argp1);
-  delete arg1;
-  
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *iSndSysSourceSoftware3D_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *obj;
-  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
-  SWIG_TypeNewClientData(SWIGTYPE_p_iSndSysSourceSoftware3D, SWIG_NewClientData(obj));
-  return SWIG_Py_Void();
-}
-
 SWIGINTERN PyObject *_wrap_csSndSysSoundFormat_Freq_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csSndSysSoundFormat *arg1 = (csSndSysSoundFormat *) 0 ;
@@ -8821,18 +8515,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSndSysSource3DDoppler_GetVelocity", _wrap_iSndSysSource3DDoppler_GetVelocity, METH_VARARGS, NULL},
 	 { (char *)"delete_iSndSysSource3DDoppler", _wrap_delete_iSndSysSource3DDoppler, METH_VARARGS, NULL},
 	 { (char *)"iSndSysSource3DDoppler_swigregister", iSndSysSource3DDoppler_swigregister, METH_VARARGS, NULL},
-	 { (char *)"iSndSysSourceSoftware3D_SetPosition", _wrap_iSndSysSourceSoftware3D_SetPosition, METH_VARARGS, NULL},
-	 { (char *)"iSndSysSourceSoftware3D_GetPosition", _wrap_iSndSysSourceSoftware3D_GetPosition, METH_VARARGS, NULL},
-	 { (char *)"iSndSysSourceSoftware3D_SetDirection", _wrap_iSndSysSourceSoftware3D_SetDirection, METH_VARARGS, NULL},
-	 { (char *)"iSndSysSourceSoftware3D_GetDirection", _wrap_iSndSysSourceSoftware3D_GetDirection, METH_VARARGS, NULL},
-	 { (char *)"iSndSysSourceSoftware3D_SetDirectionalRadiation", _wrap_iSndSysSourceSoftware3D_SetDirectionalRadiation, METH_VARARGS, NULL},
-	 { (char *)"iSndSysSourceSoftware3D_GetDirectionalRadiation", _wrap_iSndSysSourceSoftware3D_GetDirectionalRadiation, METH_VARARGS, NULL},
-	 { (char *)"iSndSysSourceSoftware3D_SetMinimumDistance", _wrap_iSndSysSourceSoftware3D_SetMinimumDistance, METH_VARARGS, NULL},
-	 { (char *)"iSndSysSourceSoftware3D_SetMaximumDistance", _wrap_iSndSysSourceSoftware3D_SetMaximumDistance, METH_VARARGS, NULL},
-	 { (char *)"iSndSysSourceSoftware3D_GetMinimumDistance", _wrap_iSndSysSourceSoftware3D_GetMinimumDistance, METH_VARARGS, NULL},
-	 { (char *)"iSndSysSourceSoftware3D_GetMaximumDistance", _wrap_iSndSysSourceSoftware3D_GetMaximumDistance, METH_VARARGS, NULL},
-	 { (char *)"delete_iSndSysSourceSoftware3D", _wrap_delete_iSndSysSourceSoftware3D, METH_VARARGS, NULL},
-	 { (char *)"iSndSysSourceSoftware3D_swigregister", iSndSysSourceSoftware3D_swigregister, METH_VARARGS, NULL},
 	 { (char *)"csSndSysSoundFormat_Freq_set", _wrap_csSndSysSoundFormat_Freq_set, METH_VARARGS, NULL},
 	 { (char *)"csSndSysSoundFormat_Freq_get", _wrap_csSndSysSoundFormat_Freq_get, METH_VARARGS, NULL},
 	 { (char *)"csSndSysSoundFormat_Bits_set", _wrap_csSndSysSoundFormat_Bits_set, METH_VARARGS, NULL},
@@ -8916,24 +8598,6 @@ static PyMethodDef SwigMethods[] = {
 
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
-static void *_p_iSndSysSourceSoftware3DTo_p_iSndSysSourceSoftware(void *x) {
-    return (void *)((iSndSysSourceSoftware *)  ((iSndSysSourceSoftware3D *) x));
-}
-static void *_p_scfImplementation1TcsObject_iObject_tTo_p_iObject(void *x) {
-    return (void *)((iObject *)  ((scfImplementation1<csObject,iObject > *) x));
-}
-static void *_p_csObjectTo_p_iObject(void *x) {
-    return (void *)((iObject *) (scfImplementation1<csObject,iObject > *) ((csObject *) x));
-}
-static void *_p_scfImplementationExt1TcsPath_csObject_iPath_tTo_p_iObject(void *x) {
-    return (void *)((iObject *) (scfImplementation1<csObject,iObject > *)(csObject *) ((scfImplementationExt1<csPath,csObject,iPath > *) x));
-}
-static void *_p_iSndSysSourceSoftware3DTo_p_iSndSysSource(void *x) {
-    return (void *)((iSndSysSource *) (iSndSysSourceSoftware *) ((iSndSysSourceSoftware3D *) x));
-}
-static void *_p_iSndSysSourceSoftwareTo_p_iSndSysSource(void *x) {
-    return (void *)((iSndSysSource *)  ((iSndSysSourceSoftware *) x));
-}
 static void *_p_iDocumentNodeIteratorTo_p_iBase(void *x) {
     return (void *)((iBase *)  ((iDocumentNodeIterator *) x));
 }
@@ -9111,17 +8775,14 @@ static void *_p_iImageTo_p_iBase(void *x) {
 static void *_p_iSndSysWrapperTo_p_iBase(void *x) {
     return (void *)((iBase *)  ((iSndSysWrapper *) x));
 }
-static void *_p_iSndSysSourceSoftware3DTo_p_iBase(void *x) {
-    return (void *)((iBase *) (iSndSysSource *)(iSndSysSourceSoftware *) ((iSndSysSourceSoftware3D *) x));
-}
 static void *_p_iSndSysRendererTo_p_iBase(void *x) {
     return (void *)((iBase *)  ((iSndSysRenderer *) x));
 }
-static void *_p_iSndSysLoaderTo_p_iBase(void *x) {
-    return (void *)((iBase *)  ((iSndSysLoader *) x));
-}
 static void *_p_iSndSysStreamCallbackTo_p_iBase(void *x) {
     return (void *)((iBase *)  ((iSndSysStreamCallback *) x));
+}
+static void *_p_iSndSysLoaderTo_p_iBase(void *x) {
+    return (void *)((iBase *)  ((iSndSysLoader *) x));
 }
 static void *_p_iSndSysRendererCallbackTo_p_iBase(void *x) {
     return (void *)((iBase *)  ((iSndSysRendererCallback *) x));
@@ -9173,6 +8834,18 @@ static void *_p_iFileTo_p_iBase(void *x) {
 }
 static void *_p_iDocumentAttributeTo_p_iBase(void *x) {
     return (void *)((iBase *)  ((iDocumentAttribute *) x));
+}
+static void *_p_iSndSysSourceSoftwareTo_p_iSndSysSource(void *x) {
+    return (void *)((iSndSysSource *)  ((iSndSysSourceSoftware *) x));
+}
+static void *_p_scfImplementation1TcsObject_iObject_tTo_p_iObject(void *x) {
+    return (void *)((iObject *)  ((scfImplementation1<csObject,iObject > *) x));
+}
+static void *_p_csObjectTo_p_iObject(void *x) {
+    return (void *)((iObject *) (scfImplementation1<csObject,iObject > *) ((csObject *) x));
+}
+static void *_p_scfImplementationExt1TcsPath_csObject_iPath_tTo_p_iObject(void *x) {
+    return (void *)((iObject *) (scfImplementation1<csObject,iObject > *)(csObject *) ((scfImplementationExt1<csPath,csObject,iPath > *) x));
 }
 static swig_type_info _swigt__p_AllocatorType = {"_p_AllocatorType", "AllocatorType *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Memory__AllocatorMalloc = {"_p_CS__Memory__AllocatorMalloc", "CS::Container::ArrayAllocDefault *|CS::Memory::AllocatorMalloc *", 0, 0, (void*)0, 0};
@@ -9282,7 +8955,6 @@ static swig_type_info _swigt__p_iSndSysSource3DDirectionalSimple = {"_p_iSndSysS
 static swig_type_info _swigt__p_iSndSysSource3DDoppler = {"_p_iSndSysSource3DDoppler", "iSndSysSource3DDoppler *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iSndSysSourceOpenAL = {"_p_iSndSysSourceOpenAL", "iSndSysSourceOpenAL *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iSndSysSourceSoftware = {"_p_iSndSysSourceSoftware", "iSndSysSourceSoftware *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_iSndSysSourceSoftware3D = {"_p_iSndSysSourceSoftware3D", "iSndSysSourceSoftware3D *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iSndSysStream = {"_p_iSndSysStream", "iSndSysStream *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iSndSysStreamCallback = {"_p_iSndSysStreamCallback", "iSndSysStreamCallback *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iSndSysWrapper = {"_p_iSndSysWrapper", "iSndSysWrapper *", 0, 0, (void*)0, 0};
@@ -9400,7 +9072,6 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_iSndSysSource3DDoppler,
   &_swigt__p_iSndSysSourceOpenAL,
   &_swigt__p_iSndSysSourceSoftware,
-  &_swigt__p_iSndSysSourceSoftware3D,
   &_swigt__p_iSndSysStream,
   &_swigt__p_iSndSysStreamCallback,
   &_swigt__p_iSndSysWrapper,
@@ -9514,7 +9185,7 @@ static swig_cast_info _swigc__p_iObjectNameChangeListener[] = {{&_swigt__p_iObje
 static swig_cast_info _swigc__p_iFile[] = {{&_swigt__p_iFile, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iDocumentAttribute[] = {{&_swigt__p_iDocumentAttribute, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iImage[] = {{&_swigt__p_iImage, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_iBase[] = {  {&_swigt__p_iDocumentNodeIterator, _p_iDocumentNodeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttributeIterator, _p_iDocumentAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iConfigIterator, _p_iConfigIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iReporterIterator, _p_iReporterIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectIterator, _p_iObjectIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistryIterator, _p_iObjectRegistryIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iEventAttributeIterator, _p_iEventAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iPluginIterator, _p_iPluginIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocument, _p_iDocumentTo_p_iBase, 0, 0},  {&_swigt__p_iImageIO, _p_iImageIOTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNode, _p_iDocumentNodeTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistry, _p_iObjectRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iEventNameRegistry, _p_iEventNameRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iEventCord, _p_iEventCordTo_p_iBase, 0, 0},  {&_swigt__p_iStringSet, _p_iStringSetTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementationExt1TcsPath_csObject_iPath_t, _p_scfImplementationExt1TcsPath_csObject_iPath_tTo_p_iBase, 0, 0},  {&_swigt__p_iFactory, _p_iFactoryTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysData, _p_iSndSysDataTo_p_iBase, 0, 0},  {&_swigt__p_iClipper2D, _p_iClipper2DTo_p_iBase, 0, 0},  {&_swigt__p_csConfigFile, _p_csConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_iConfigFile, _p_iConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_iDebugHelper, _p_iDebugHelperTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentSystem, _p_iDocumentSystemTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysSourceSoftware, _p_iSndSysSourceSoftwareTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysRendererSoftware, _p_iSndSysRendererSoftwareTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysSource3DDoppler, _p_iSndSysSource3DDopplerTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysListenerDoppler, _p_iSndSysListenerDopplerTo_p_iBase, 0, 0},  {&_swigt__p_iKeyComposer, _p_iKeyComposerTo_p_iBase, 0, 0},  {&_swigt__p_iEventOutlet, _p_iEventOutletTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsConfigFile_iConfigFile_t, _p_scfImplementation1TcsConfigFile_iConfigFile_tTo_p_iBase, 0, 0},  {&_swigt__p_iVirtualClock, _p_iVirtualClockTo_p_iBase, 0, 0},  {&_swigt__p_iPath, _p_iPathTo_p_iBase, 0, 0},  {&_swigt__p_iReporter, _p_iReporterTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysSoftwareFilter3D, _p_iSndSysSoftwareFilter3DTo_p_iBase, 0, 0},  {&_swigt__p_iObject, _p_iObjectTo_p_iBase, 0, 0},  {&_swigt__p_csObject, _p_csObjectTo_p_iBase, 0, 0},  {&_swigt__p_iSCF, _p_iSCFTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysStream, _p_iSndSysStreamTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysSource, _p_iSndSysSourceTo_p_iBase, 0, 0},  {&_swigt__p_iEventQueue, _p_iEventQueueTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysSource3DDirectional, _p_iSndSysSource3DDirectionalTo_p_iBase, 0, 0},  {&_swigt__p_iEvent, _p_iEventTo_p_iBase, 0, 0},  {&_swigt__p_iString, _p_iStringTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysSourceOpenAL, _p_iSndSysSourceOpenALTo_p_iBase, 0, 0},  {&_swigt__p_iComponent, _p_iComponentTo_p_iBase, 0, 0},  {&_swigt__p_iCommandLineParser, _p_iCommandLineParserTo_p_iBase, 0, 0},  {&_swigt__p_iJoystickDriver, _p_iJoystickDriverTo_p_iBase, 0, 0},  {&_swigt__p_iMouseDriver, _p_iMouseDriverTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysSoftwareDriver, _p_iSndSysSoftwareDriverTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysSoftwareOutputFilter, _p_iSndSysSoftwareOutputFilterTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysSource3DDirectionalSimple, _p_iSndSysSource3DDirectionalSimpleTo_p_iBase, 0, 0},  {&_swigt__p_iStringArray, _p_iStringArrayTo_p_iBase, 0, 0},  {&_swigt__p_iEventHandler, _p_iEventHandlerTo_p_iBase, 0, 0},  {&_swigt__p_iProcTexture, _p_iProcTextureTo_p_iBase, 0, 0},  {&_swigt__p_iEventPlug, _p_iEventPlugTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysWrapper, _p_iSndSysWrapperTo_p_iBase, 0, 0},  {&_swigt__p_iVFS, _p_iVFSTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysSourceSoftware3D, _p_iSndSysSourceSoftware3DTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysRenderer, _p_iSndSysRendererTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysStreamCallback, _p_iSndSysStreamCallbackTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysRendererCallback, _p_iSndSysRendererCallbackTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysLoader, _p_iSndSysLoaderTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysManager, _p_iSndSysManagerTo_p_iBase, 0, 0},  {&_swigt__p_iConfigManager, _p_iConfigManagerTo_p_iBase, 0, 0},  {&_swigt__p_iCacheManager, _p_iCacheManagerTo_p_iBase, 0, 0},  {&_swigt__p_iPluginManager, _p_iPluginManagerTo_p_iBase, 0, 0},  {&_swigt__p_iTriangleMesh, _p_iTriangleMeshTo_p_iBase, 0, 0},  {&_swigt__p_iAnimatedImage, _p_iAnimatedImageTo_p_iBase, 0, 0},  {&_swigt__p_iDataBuffer, _p_iDataBufferTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysRendererOpenAL, _p_iSndSysRendererOpenALTo_p_iBase, 0, 0},  {&_swigt__p_iKeyboardDriver, _p_iKeyboardDriverTo_p_iBase, 0, 0},  {&_swigt__p_iStringSetBaseTCS__StringSetTag__General_t, _p_iStringSetBaseTCS__StringSetTag__General_tTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsObject_iObject_t, _p_scfImplementation1TcsObject_iObject_tTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysSource3D, _p_iSndSysSource3DTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysListener, _p_iSndSysListenerTo_p_iBase, 0, 0},  {&_swigt__p_iReporterListener, _p_iReporterListenerTo_p_iBase, 0, 0},  {&_swigt__p_iObjectNameChangeListener, _p_iObjectNameChangeListenerTo_p_iBase, 0, 0},  {&_swigt__p_iBase, 0, 0, 0},  {&_swigt__p_iFile, _p_iFileTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttribute, _p_iDocumentAttributeTo_p_iBase, 0, 0},  {&_swigt__p_iImage, _p_iImageTo_p_iBase, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iBase[] = {  {&_swigt__p_iDocumentNodeIterator, _p_iDocumentNodeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttributeIterator, _p_iDocumentAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iConfigIterator, _p_iConfigIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iReporterIterator, _p_iReporterIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectIterator, _p_iObjectIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistryIterator, _p_iObjectRegistryIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iEventAttributeIterator, _p_iEventAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iPluginIterator, _p_iPluginIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocument, _p_iDocumentTo_p_iBase, 0, 0},  {&_swigt__p_iImageIO, _p_iImageIOTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNode, _p_iDocumentNodeTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistry, _p_iObjectRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iEventNameRegistry, _p_iEventNameRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iEventCord, _p_iEventCordTo_p_iBase, 0, 0},  {&_swigt__p_iStringSet, _p_iStringSetTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementationExt1TcsPath_csObject_iPath_t, _p_scfImplementationExt1TcsPath_csObject_iPath_tTo_p_iBase, 0, 0},  {&_swigt__p_iFactory, _p_iFactoryTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysData, _p_iSndSysDataTo_p_iBase, 0, 0},  {&_swigt__p_iClipper2D, _p_iClipper2DTo_p_iBase, 0, 0},  {&_swigt__p_csConfigFile, _p_csConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_iConfigFile, _p_iConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_iDebugHelper, _p_iDebugHelperTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentSystem, _p_iDocumentSystemTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysSourceSoftware, _p_iSndSysSourceSoftwareTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysRendererSoftware, _p_iSndSysRendererSoftwareTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysSource3DDoppler, _p_iSndSysSource3DDopplerTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysListenerDoppler, _p_iSndSysListenerDopplerTo_p_iBase, 0, 0},  {&_swigt__p_iKeyComposer, _p_iKeyComposerTo_p_iBase, 0, 0},  {&_swigt__p_iEventOutlet, _p_iEventOutletTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsConfigFile_iConfigFile_t, _p_scfImplementation1TcsConfigFile_iConfigFile_tTo_p_iBase, 0, 0},  {&_swigt__p_iVirtualClock, _p_iVirtualClockTo_p_iBase, 0, 0},  {&_swigt__p_iPath, _p_iPathTo_p_iBase, 0, 0},  {&_swigt__p_iReporter, _p_iReporterTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysSoftwareFilter3D, _p_iSndSysSoftwareFilter3DTo_p_iBase, 0, 0},  {&_swigt__p_iObject, _p_iObjectTo_p_iBase, 0, 0},  {&_swigt__p_csObject, _p_csObjectTo_p_iBase, 0, 0},  {&_swigt__p_iSCF, _p_iSCFTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysStream, _p_iSndSysStreamTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysSource, _p_iSndSysSourceTo_p_iBase, 0, 0},  {&_swigt__p_iEventQueue, _p_iEventQueueTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysSource3DDirectional, _p_iSndSysSource3DDirectionalTo_p_iBase, 0, 0},  {&_swigt__p_iEvent, _p_iEventTo_p_iBase, 0, 0},  {&_swigt__p_iString, _p_iStringTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysSourceOpenAL, _p_iSndSysSourceOpenALTo_p_iBase, 0, 0},  {&_swigt__p_iComponent, _p_iComponentTo_p_iBase, 0, 0},  {&_swigt__p_iCommandLineParser, _p_iCommandLineParserTo_p_iBase, 0, 0},  {&_swigt__p_iJoystickDriver, _p_iJoystickDriverTo_p_iBase, 0, 0},  {&_swigt__p_iMouseDriver, _p_iMouseDriverTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysSoftwareDriver, _p_iSndSysSoftwareDriverTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysSoftwareOutputFilter, _p_iSndSysSoftwareOutputFilterTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysSource3DDirectionalSimple, _p_iSndSysSource3DDirectionalSimpleTo_p_iBase, 0, 0},  {&_swigt__p_iStringArray, _p_iStringArrayTo_p_iBase, 0, 0},  {&_swigt__p_iEventHandler, _p_iEventHandlerTo_p_iBase, 0, 0},  {&_swigt__p_iProcTexture, _p_iProcTextureTo_p_iBase, 0, 0},  {&_swigt__p_iEventPlug, _p_iEventPlugTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysWrapper, _p_iSndSysWrapperTo_p_iBase, 0, 0},  {&_swigt__p_iVFS, _p_iVFSTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysRenderer, _p_iSndSysRendererTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysStreamCallback, _p_iSndSysStreamCallbackTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysRendererCallback, _p_iSndSysRendererCallbackTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysLoader, _p_iSndSysLoaderTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysManager, _p_iSndSysManagerTo_p_iBase, 0, 0},  {&_swigt__p_iConfigManager, _p_iConfigManagerTo_p_iBase, 0, 0},  {&_swigt__p_iCacheManager, _p_iCacheManagerTo_p_iBase, 0, 0},  {&_swigt__p_iPluginManager, _p_iPluginManagerTo_p_iBase, 0, 0},  {&_swigt__p_iTriangleMesh, _p_iTriangleMeshTo_p_iBase, 0, 0},  {&_swigt__p_iAnimatedImage, _p_iAnimatedImageTo_p_iBase, 0, 0},  {&_swigt__p_iDataBuffer, _p_iDataBufferTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysRendererOpenAL, _p_iSndSysRendererOpenALTo_p_iBase, 0, 0},  {&_swigt__p_iKeyboardDriver, _p_iKeyboardDriverTo_p_iBase, 0, 0},  {&_swigt__p_iStringSetBaseTCS__StringSetTag__General_t, _p_iStringSetBaseTCS__StringSetTag__General_tTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsObject_iObject_t, _p_scfImplementation1TcsObject_iObject_tTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysSource3D, _p_iSndSysSource3DTo_p_iBase, 0, 0},  {&_swigt__p_iSndSysListener, _p_iSndSysListenerTo_p_iBase, 0, 0},  {&_swigt__p_iReporterListener, _p_iReporterListenerTo_p_iBase, 0, 0},  {&_swigt__p_iObjectNameChangeListener, _p_iObjectNameChangeListenerTo_p_iBase, 0, 0},  {&_swigt__p_iBase, 0, 0, 0},  {&_swigt__p_iFile, _p_iFileTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttribute, _p_iDocumentAttributeTo_p_iBase, 0, 0},  {&_swigt__p_iImage, _p_iImageTo_p_iBase, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iDataBuffer[] = {  {&_swigt__p_iDataBuffer, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iObject[] = {  {&_swigt__p_scfImplementationExt1TcsPath_csObject_iPath_t, _p_scfImplementationExt1TcsPath_csObject_iPath_tTo_p_iObject, 0, 0},  {&_swigt__p_iObject, 0, 0, 0},  {&_swigt__p_csObject, _p_csObjectTo_p_iObject, 0, 0},  {&_swigt__p_scfImplementation1TcsObject_iObject_t, _p_scfImplementation1TcsObject_iObject_tTo_p_iObject, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iSCF[] = {  {&_swigt__p_iSCF, 0, 0, 0},{0, 0, 0, 0}};
@@ -9531,14 +9202,13 @@ static swig_cast_info _swigc__p_iSndSysSoftwareDriver[] = {  {&_swigt__p_iSndSys
 static swig_cast_info _swigc__p_iSndSysSoftwareFilter3D[] = {  {&_swigt__p_iSndSysSoftwareFilter3D, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iSndSysSoftwareFilter3DProperties[] = {  {&_swigt__p_iSndSysSoftwareFilter3DProperties, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iSndSysSoftwareOutputFilter[] = {  {&_swigt__p_iSndSysSoftwareOutputFilter, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_iSndSysSource[] = {  {&_swigt__p_iSndSysSourceSoftware3D, _p_iSndSysSourceSoftware3DTo_p_iSndSysSource, 0, 0},  {&_swigt__p_iSndSysSource, 0, 0, 0},  {&_swigt__p_iSndSysSourceSoftware, _p_iSndSysSourceSoftwareTo_p_iSndSysSource, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iSndSysSource[] = {  {&_swigt__p_iSndSysSource, 0, 0, 0},  {&_swigt__p_iSndSysSourceSoftware, _p_iSndSysSourceSoftwareTo_p_iSndSysSource, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iSndSysSource3D[] = {  {&_swigt__p_iSndSysSource3D, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iSndSysSource3DDirectional[] = {  {&_swigt__p_iSndSysSource3DDirectional, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iSndSysSource3DDirectionalSimple[] = {  {&_swigt__p_iSndSysSource3DDirectionalSimple, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iSndSysSource3DDoppler[] = {  {&_swigt__p_iSndSysSource3DDoppler, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iSndSysSourceOpenAL[] = {  {&_swigt__p_iSndSysSourceOpenAL, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_iSndSysSourceSoftware[] = {  {&_swigt__p_iSndSysSourceSoftware3D, _p_iSndSysSourceSoftware3DTo_p_iSndSysSourceSoftware, 0, 0},  {&_swigt__p_iSndSysSourceSoftware, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_iSndSysSourceSoftware3D[] = {  {&_swigt__p_iSndSysSourceSoftware3D, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iSndSysSourceSoftware[] = {  {&_swigt__p_iSndSysSourceSoftware, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iSndSysStream[] = {  {&_swigt__p_iSndSysStream, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iSndSysStreamCallback[] = {  {&_swigt__p_iSndSysStreamCallback, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iSndSysWrapper[] = {  {&_swigt__p_iSndSysWrapper, 0, 0, 0},{0, 0, 0, 0}};
@@ -9656,7 +9326,6 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_iSndSysSource3DDoppler,
   _swigc__p_iSndSysSourceOpenAL,
   _swigc__p_iSndSysSourceSoftware,
-  _swigc__p_iSndSysSourceSoftware3D,
   _swigc__p_iSndSysStream,
   _swigc__p_iSndSysStreamCallback,
   _swigc__p_iSndSysWrapper,
