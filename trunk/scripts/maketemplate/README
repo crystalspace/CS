@@ -1,0 +1,4 @@
+The files in this directory can be used to set up a skeleton build system based
+upon `make' for external Crystal Space projects.  See the HOWTO named "Creating
+an External Crystal Space Application" in the Crystal Space manual for
+instructions.

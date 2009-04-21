@@ -1,0 +1,6 @@
+@c -*-texinfo-*-
+@node GenMesh Animation, Sequence Manager, Socket Animation, Animation
+@subsection GenMesh Animation
+@cindex GenMesh
+
+@sc{todo}!

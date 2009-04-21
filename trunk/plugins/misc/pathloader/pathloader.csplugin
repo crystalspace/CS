@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- pathloader.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.addons.pathloader</name>
+        <implementation>csPathLoader</implementation>
+        <description>CS Path loader</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

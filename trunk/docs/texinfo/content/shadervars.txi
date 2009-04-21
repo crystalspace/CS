@@ -1,0 +1,64 @@
+@c -*-texinfo-*-
+@node Default Lighting Shader Variables, Blender, Simple Map Example, Working with Engine Content
+@section Default Lighting Shader Variables
+@cindex Default Lighting Shader Variables
+
+@cindex Shader variables
+
+Below are details on some of the shader variables available for use with the default lighting shaders.
+These can be attached either in code or in the xml definition of your model.
+
+@subheading Variables on Materials
+
+@table @samp
+@item tex diffuse
+@quotation Type
+Texture
+@end quotation
+Diffuse (colour) texture.
+
+@item tex normal
+@quotation Type
+Texture
+@end quotation
+Normal map texture.
+
+@item tex normal compressed
+@quotation Type
+Texture
+@end quotation
+DXT5nm normal map texture.
+Note that @samp{tex normal compressed} is preferred over @samp{tex normal}.
+
+@item tex height
+@quotation Type
+Texture
+@end quotation
+Height map texture for parallax shading
+
+@item tex specular
+@quotation Type
+Texture
+@end quotation
+Specular color map.
+
+@item tex ambient occlusion
+@quotation Type
+Texture
+@end quotation
+Ambient occlusion map.
+
+@item color modulation
+@quotation Type
+RGB
+@end quotation
+Values used to set the colour of a material. The change in colour depends on the existing pixels in the material.
+The lower (darker) the value of the pixel, the less it's affected by the colour change.
+
+@item tex glow
+@quotation Type
+Texture
+@end quotation
+Glow map.
+
+@end table

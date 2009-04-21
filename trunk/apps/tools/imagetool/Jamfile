@@ -1,0 +1,6 @@
+SubDir TOP apps tools imagetool ;
+
+Description csimagetool : "image manipulator" ;
+Application csimagetool : [ Wildcard *.cpp *.h ] : console ;
+LinkWith csimagetool : crystalspace ;
+FileListEntryApplications csimagetool : app-tool ;

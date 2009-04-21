@@ -1,0 +1,92 @@
+<library>
+    <meshfact name="genCube.542">
+        <plugin>genmeshfact</plugin>
+        <priority>object</priority>
+        <zuse />
+        <params>
+            <renderbuffer name="position" checkelementcount="no" file="bindata/genCube_542_v" />
+            <renderbuffer name="normal" file="bindata/genCube_542_n" />
+            <renderbuffer name="texture coordinate 0" file="bindata/genCube_542_tc" />
+            <renderbuffer name="tangent" file="bindata/genCube_542_tng" />
+            <renderbuffer name="bitangent" file="bindata/genCube_542_btg" />
+            <renderbuffer name="lit color" components="4" type="float">
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+            </renderbuffer>
+            <material>parallaxAtt_concrete6-parallaxconcrete_floor6_d.jpg</material>
+            <mixmode>
+                <copy />
+            </mixmode>
+            <submesh name="">
+                <material>parallaxAtt_concrete6-parallaxconcrete_floor6_d.jpg</material>
+                <indexbuffer file="bindata/genCube_542_i0" />
+            </submesh>
+        </params>
+    </meshfact>
+</library>

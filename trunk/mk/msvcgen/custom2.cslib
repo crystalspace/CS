@@ -1,0 +1,67 @@
+[% FILTER null;
+#==============================================================================
+# TemplateToolkit2 CrystalSpace customizations for MSVC project generation
+# Copyright (C) 2004 by Eric Sunshine <sunshine@sunshineco.com>
+#
+#    This library is free software; you can redistribute it and/or modify it
+#    under the terms of the GNU Library General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or (at your
+#    option) any later version.
+#
+#    This library is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public
+#    License for more details.
+#
+#    You should have received a copy of the GNU Library General Public License
+#    along with this library; if not, write to the Free Software Foundation,
+#    Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#==============================================================================
+
+#------------------------------------------------------------------------------
+# Search the default 'debug' build configuration since the RefTracker and 
+# MemoryTracker configurations are based on the 'debug' one.
+#------------------------------------------------------------------------------
+builddebug = {};
+FOREACH build IN builds;
+  IF build.tag == 'debug';
+    builddebug = build;
+    BREAK;
+  END;
+END;
+
+#------------------------------------------------------------------------------
+# Crystal Space adds additional build configurations to the default set
+# provided by the generic, project-agnostic builds[] array (control.tlib).
+#------------------------------------------------------------------------------
+# Build MemoryTracker config by copying the default debug config and changing
+# some fields.
+buildmemtrack = {};
+buildmemtrack.import(builddebug);
+buildmemtrack.import({
+    name => 'MemoryTracker',
+    defines => builddebug.defines.merge(['CS_MEMORY_TRACKER']),
+    priority => 400
+  });
+# Likewise for RefTracker.
+buildreftrack = {};
+buildreftrack.import(builddebug);
+buildreftrack.import({
+    name => 'RefTracker',
+    defines => builddebug.defines.merge(['CS_REF_TRACKER']),
+    priority => 500
+  });
+# Likewise for ThreadChecker.
+buildthreadcheck = {};
+buildthreadcheck.import(builddebug);
+buildthreadcheck.import({
+    name => 'ThreadChecker',
+    defines => builddebug.defines.merge(['CS_THREAD_CHECKER']),
+    libs => builddebug.libs.merge(['libittnotify.lib']),
+    priority => 600
+  });
+# Merge into the builds array
+builds = builds.merge([buildmemtrack, buildreftrack, buildthreadcheck]);
+
+END %]

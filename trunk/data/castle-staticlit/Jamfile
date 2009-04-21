@@ -1,0 +1,9 @@
+SubDir TOP data castle-staticlit ;
+
+InstallData world [ Wildcard *.txt *.zip ] : data maps castle-staticlit ;
+InstallData [ Wildcard factories : thing* gen* ] : data maps castle-staticlit factories ;
+InstallData [ Wildcard lightmaps : *.png *.dds ] : data maps castle-staticlit lightmaps ;
+
+FileListEntriesData world [ Wildcard *.txt *.zip ] : castle-staticlit : data-demo-maps ;
+FileListEntriesData [ Wildcard factories : thing* gen* ] : castle-staticlit factories : data-demo-maps ;
+FileListEntriesData [ Wildcard lightmaps : *.png *.dds ] : castle-staticlit lightmaps : data-demo-maps ;

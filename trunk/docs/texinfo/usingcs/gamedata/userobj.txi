@@ -1,0 +1,129 @@
+@c -*-texinfo-*-
+@node User Objects, User Objects in Maps, csObject, Game Data
+@subsection Attaching User Objects to CS Objects
+@cindex user objects
+@cindex @code{iObject}
+@cindex @code{csObject}
+
+This section explains how you can assign your own game specific data
+to Crystal Space objects (i.e. like meshes and sectors). In this section
+we explain how to do it from within code. In the next howto
+(@pxref{User Objects in Maps}) we explain how you can do this from
+a map file.
+
+@subsubheading The Crystal Space Object System
+
+Almost all objects in the Crystal Space engine implement the
+@code{iObject} interface. Because of this you can attach your own
+objects to them. This can be very useful to attach game specific
+data to Crystal Space objects. For example, you may want to attach
+the state of an actor to the mesh object representing that actor (like
+current amount of ammunition, health, @dots{}).
+
+@subsubheading Defining Game Data
+
+To define data that you can attach to any other Crystal Space
+object (or any object implementing @code{iObject}) you also have to
+create an object that implements @code{iObject}. The easiest way to do
+that is to inherit from @code{csObject} which implements @code{iObject}
+for you. Here is an example on how you can do this easily:
+
+@example
+class MyOwnData : public scfImplementationExt1<MyOwnData, csObject,
+	scfFakeInterface<MyOwnData> >
+@{
+private:
+  int myDataInt;
+
+public:
+  SCF_INTERFACE (MyOwnData, 1, 0, 0);
+  @dots{}
+  MyOwnData () : scfImplementationType (this)
+  @{
+    @dots{}
+  @}
+  virtual ~MyOwnData ()
+  @{
+    @dots{}
+  @}
+  
+  @dots{}
+  
+  int GetMyData () const @{ return myDataInt; @}
+  void SetMyData (int newData) @{ myDataInt = newData; @}
+@};
+@end example
+
+In this example you must use some @sc{scf} templates so that your
+own class becomes a valid @sc{scf} object that inherits from @code{csObject}
+properly.
+
+Basically you create a class called @samp{MyOwnData} which inherits
+from @code{csObject}. In that class you can do whatever you want
+with respect to your own game data. In the example above we only
+have a variable @samp{myDataInt} but of course you can do whatever
+you want. The @sc{scf} templates make sure that you can later query for
+that object (using @code{scfQueryInterface} for example).
+
+@subsubheading Attaching Game Data
+
+To attach your own data to some Crystal Space object you can use
+@code{iObject::ObjAdd()}. The example below shows how you can attach
+an instance of @code{MyOwnData} to a mesh:
+
+@example
+csRef<MyOwnData> mydata; mydata.AttachNew (new MyOwnData ());
+mydata->SetMyData (@dots{});
+iMeshWrapper* mesh = @dots{};
+mesh->QueryObject ()->ObjAdd (mydata);
+@end example
+
+@code{mesh->QueryObject()} is interesting. Many Crystal Space objects
+that implement @code{iObject} have a convenience function called
+@code{QueryObject()} which will return a reference to the @code{iObject}
+implementation. This code is equivalent to:
+
+@example
+csRef<iObject> obj = scfQueryInterface<iObject> (mesh);
+@end example
+
+with the important difference that @code{QueryObject()} does not increment
+the reference count. If an object doesn't have this convenience function you
+must use @code{scfQueryInterface} instead.
+
+@subsubheading Finding Game Data
+
+To find if some object has your data attached to it you can use the
+following code:
+
+@example
+csRef<MyOwnData> mydata =
+  CS_GET_CHILD_OBJECT(mesh->QueryObject(), MyOwnData);
+if (mydata)
+@{
+  @dots{} (use mydata)
+@}
+@end example
+
+@subsubheading Removing Game Data
+
+To remove your data you can use:
+
+@example
+csRef<MyOwnData> mydata =
+  CS_GET_CHILD_OBJECT(mesh->QueryObject(), MyOwnData);
+if (mydata)
+@{
+  mesh->QueryObject ()->ObjRemove (mydata);
+@}
+@end example
+
+@subsubheading Include Files
+
+The include files useful for this section are:
+
+@example
+#include <iutil/object.h>
+#include <csutil/csobject.h>
+@end example
+

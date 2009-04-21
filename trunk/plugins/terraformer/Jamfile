@@ -1,0 +1,4 @@
+SubDir TOP plugins terraformer ;
+
+SubInclude TOP plugins terraformer simpleformer ;
+SubInclude TOP plugins terraformer pagingformer ;

@@ -1,0 +1,3 @@
+SubDir TOP plugins console input ;
+
+SubInclude TOP plugins console input standard ;

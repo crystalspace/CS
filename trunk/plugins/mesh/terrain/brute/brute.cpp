@@ -1,0 +1,2577 @@
+/*
+    Copyright (C) 1999-2001 by Jorrit Tyberghein
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#include "cssysdef.h"
+#include "csqsqrt.h"
+#include "csqint.h"
+
+#include "csgeom/math.h"
+#include "csgeom/math2d.h"
+#include "csgeom/math3d.h"
+#include "csgeom/segment.h"
+#include "csgeom/trimesh.h"
+#include "csgeom/trimeshlod.h"
+#include "csgeom/vector3.h"
+#include "csgfx/imagememory.h"
+#include "csgfx/renderbuffer.h"
+#include "csgfx/shadervarcontext.h"
+#include "cstool/rviewclipper.h"
+#include "csutil/csendian.h"
+#include "csutil/csmd5.h"
+#include "csutil/memfile.h"
+#include "csutil/util.h"
+#include "csutil/csstring.h"
+#include "iengine/camera.h"
+#include "iengine/engine.h"
+#include "iengine/material.h"
+#include "iengine/movable.h"
+#include "iengine/rview.h"
+#include "iengine/sector.h"
+#include "igraphic/image.h"
+#include "iutil/cache.h"
+#include "iutil/cmdline.h"
+#include "iutil/object.h"
+#include "iutil/objreg.h"
+#include "iutil/verbositymanager.h"
+#include "iutil/vfs.h"
+#include "ivaria/reporter.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/material.h"
+#include "ivideo/rendermesh.h"
+#include "ivideo/rndbuf.h"
+#include "ivideo/txtmgr.h"
+#include "csgeom/poly3d.h"
+#include "ivaria/decal.h"
+
+#include "ivaria/simpleformer.h"
+
+#include "brute.h"
+
+/* #include "cstool/debugimagewriter.h" */
+
+CS_IMPLEMENT_PLUGIN
+
+CS_PLUGIN_NAMESPACE_BEGIN(BruteBlock)
+{
+
+CS_LEAKGUARD_IMPLEMENT (csTerrBlock);
+CS_LEAKGUARD_IMPLEMENT (csTerrainObject);
+CS_LEAKGUARD_IMPLEMENT (csTerrainFactory);
+
+csTerrBlock::csTerrBlock (csTerrainObject *terr)
+{
+  parent = 0;
+  child = 0;
+  children[0] = 0;
+  children[1] = 0;
+  children[2] = 0;
+  children[3] = 0;
+  neighbours[0] = 0;
+  neighbours[1] = 0;
+  neighbours[2] = 0;
+  neighbours[3] = 0;
+
+  vertex_data = 0;
+  normal_data = 0;
+  texcoord_data = 0;
+  color_data = 0;
+  last_colorVersion = (uint)~0;
+
+  built = false;
+  terrasampler = 0;
+  size = 0;
+
+  bufferHolder.AttachNew (new csRenderBufferHolder);
+
+  detach = false;
+
+  csTerrBlock::terr = terr;
+}
+
+csTerrBlock::~csTerrBlock ()
+{
+
+  delete [] vertex_data;
+  delete [] normal_data;
+  delete [] texcoord_data;
+  delete [] color_data;
+}
+
+void csTerrBlock::Detach ()
+{
+  detach = true;
+
+  if (!IsLeaf ())
+  {
+    children[0]->Detach ();
+    children[1]->Detach ();
+    children[2]->Detach ();
+    children[3]->Detach ();
+    children[0] = 0;
+    children[1] = 0;
+    children[2] = 0;
+    children[3] = 0;
+  }
+
+  if (neighbours[0] && ((child==0 || child==1) || !parent))
+    neighbours[0]->ReplaceChildNeighbours(this, parent);
+
+  if (neighbours[1] && ((child==1 || child==3) || !parent))
+    neighbours[1]->ReplaceChildNeighbours(this, parent);
+
+  if (neighbours[2] && ((child==0 || child==2) || !parent))
+    neighbours[2]->ReplaceChildNeighbours(this, parent);
+
+  if (neighbours[3] && ((child==2 || child==3) || !parent))
+    neighbours[3]->ReplaceChildNeighbours(this, parent);
+}
+
+void csTerrBlock::ReplaceChildNeighbours(csTerrBlock *a, csTerrBlock *b)
+{
+  for(int i = 0; i < 4; ++i)
+    if(neighbours[i] && neighbours[i]==a) neighbours[i]=b;
+  
+  if(!IsLeaf())
+    for(int i = 0; i < 4; ++i)
+	  children[i]->ReplaceChildNeighbours(a,b);
+}
+
+void csTerrBlock::LoadData ()
+{
+  res = terr->GetBlockResolution () + 1;
+
+  delete[] vertex_data;
+  vertex_data = new csVector3[res * res];
+  delete[] texcoord_data;
+  texcoord_data = new csVector2[res * res];
+  delete[] normal_data;
+  normal_data = new csVector3[res * res];
+  delete[] color_data;
+  color_data = new csColor[res * res];
+
+  if (!terrasampler)
+  {
+    terrasampler = terr->terraformer->GetSampler (
+      csBox2 (center.x - size / 2.0, center.z - size / 2.0, 
+      center.x + size / 2.0, center.z + size / 2.0), res);
+  }
+
+  memcpy (vertex_data, terrasampler->SampleVector3 (terr->vertices_name),
+    res * res * sizeof (csVector3));
+  memcpy (normal_data, terrasampler->SampleVector3 (terr->normals_name),
+    res * res * sizeof (csVector3));
+  memcpy (texcoord_data, terrasampler->SampleVector2 (terr->texcoords_name),
+    res * res * sizeof (csVector2));
+
+  terrasampler->Cleanup ();
+}
+
+void csTerrBlock::SetupMesh ()
+{
+  
+  //@@@ have a method to set this from world
+  float cullsize = terr->block_maxsize;
+  
+  if (size < cullsize )
+  {
+  
+    res = terr->GetBlockResolution () + 1;
+  
+    LoadData ();
+  
+    bbox.Empty ();
+  
+    int totres = res * res;
+    bbox.StartBoundingBox (vertex_data[0]);
+    color_data[0].Set (0.5, 0.5, 0.5);
+    for (int i = 1 ; i < totres ; i++)
+    {
+      bbox.AddBoundingVertexSmart (vertex_data[i]);
+      color_data[i].Set (0.5, 0.5, 0.5);
+    }
+    built = true;
+    last_colorVersion = (uint)~0;
+  }
+  else
+  {
+    bbox = csBox3(center.x - size / 2.0, center.y - size / 2.0,
+	center.z - size / 2.0, center.x + size / 2.0,
+	center.y + size / 2.0, center.z + size / 2.0);
+  
+    if (size <= cullsize * 1.5 + 0.5) //only for the smallest culled
+    {
+      csVector2 mapRes;
+
+      csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+ 	  terr->object_reg, "crystalspace.shared.stringset");
+
+      if (terr->materialAlphaMaps)
+	mapRes = terr->terraformer->GetIntegerMapSize(
+	      strings->Request("alphamap 0"));
+      else
+        mapRes = terr->terraformer->GetIntegerMapSize(
+	      strings->Request("materialmap"));
+      //@@@
+      //    res = (int)(size / (terr->block_maxsize /
+      //                  terr->block_minsize)) * terr->GetBlockResolution();
+    
+      csRef<iTerraSampler> mapsampler = terr->terraformer->GetSampler (
+	csBox2 (center.x - size / 2.0, center.z - size / 2.0, 
+	center.x + size / 2.0, center.z + size / 2.0), int (mapRes.x),
+	int (mapRes.y));
+  
+      if (terr->materialAlphaMaps)
+      {
+	csArray< csArray<char> > alphamaps = csArray< csArray<char> >();
+	for (int i = 0; i < (int)terr->palette.GetSize () - 1; i++)
+	{
+	  csString alphaname = csString("alphamap ");
+	  alphaname += i;
+  
+	  alphamaps.Push(csArray<char>());
+	  const int* alphadata =  
+	    mapsampler->SampleInteger(strings->Request(alphaname));
+	  assert(alphadata != 0);
+	  for (int j = 0; j < mapRes.x*mapRes.y; j++)
+	  {
+	    alphamaps[i].Push(alphadata[j]);
+	  }
+	}
+	terr->SetCurrentMaterialAlphaMaps(alphamaps, int (mapRes.x),
+	    int (mapRes.y));
+      }
+      else
+      {
+	csArray<char> materialmap = csArray<char>();
+  
+	const int* materialdata =  
+	    mapsampler->SampleInteger(strings->Request("materialmap"));
+	assert(materialdata != 0);
+	for (int j = 0; j < mapRes.x*mapRes.y; j++)
+	{
+	  materialmap.Push(materialdata[j]);
+	}
+	terr->SetCurrentMaterialMap(materialmap,
+	    int (mapRes.x), int (mapRes.y));
+      }
+    }
+  
+  }
+  
+}
+
+static void FillEdge (bool halfres, int res, uint16* indices, int &indexcount,
+               int offs, int xadd, int zadd)
+{
+  int x;
+  // This triangulation scheme could probably be better.
+  for (x=0; x<res; x+=2)
+  {
+    if (x>0)
+    {
+      indices[indexcount++] = offs+x*xadd+zadd;
+      indices[indexcount++] = offs+x*xadd;
+    }
+    else
+    {
+      indices[indexcount++] = offs+x*xadd;
+      indices[indexcount++] = offs+x*xadd;
+      indices[indexcount++] = offs+x*xadd;
+    }
+
+    indices[indexcount++] = offs+(x+1)*xadd+zadd;
+    if (!halfres)
+      indices[indexcount++] = offs+(x+1)*xadd;
+    else
+      indices[indexcount++] = offs+x*xadd;
+
+    if (x<res-2)
+    {
+      indices[indexcount++] = offs+(x+2)*xadd+zadd;
+      indices[indexcount++] = offs+(x+2)*xadd;
+    }
+    else
+    {
+      indices[indexcount++] = offs+(x+2)*xadd;
+      indices[indexcount++] = offs+(x+2)*xadd;
+      indices[indexcount++] = offs+(x+2)*xadd;
+    }
+  }
+}
+
+bool csTerrBlock::Split ()
+{
+  int i;
+
+  if(!IsLeaf())
+    return false;
+
+  for (i=0; i<4; i++)
+  {
+    if (neighbours[i] && neighbours[i]->size>size && neighbours[i]->IsLeaf ())
+    {
+      if(neighbours[i]->terr == terr)
+      {
+        if(!neighbours[i]->Split ())
+          return false;
+      }
+      else
+        return false;
+    }
+  }
+
+  children[0].AttachNew (new csTerrBlock (terr));
+  children[0]->parent = this;
+  children[0]->size = size/2.0;
+  children[0]->center = center + csVector3 (-size/4.0, 0, -size/4.0);
+  children[0]->material = material;
+  children[0]->child = 0;
+
+  children[1].AttachNew (new csTerrBlock (terr));
+  children[1]->parent = this;
+  children[1]->size = size/2.0;
+  children[1]->center = center + csVector3 ( size/4.0, 0, -size/4.0);
+  children[1]->material = material;
+  children[1]->child = 1;
+
+  children[2].AttachNew (new csTerrBlock (terr));
+  children[2]->parent = this;
+  children[2]->size = size/2.0;
+  children[2]->center = center + csVector3 (-size/4.0, 0,  size/4.0);
+  children[2]->material = material;
+  children[2]->child = 2;
+
+  children[3].AttachNew (new csTerrBlock (terr));
+  children[3]->parent = this;
+  children[3]->size = size/2.0;
+  children[3]->center = center + csVector3 ( size/4.0, 0,  size/4.0);
+  children[3]->material = material;
+  children[3]->child = 3;
+
+  if (neighbours[0])
+  {
+    if (!neighbours[0]->IsLeaf ())
+    {
+      children[0]->neighbours[0] = neighbours[0]->children[2];
+      children[1]->neighbours[0] = neighbours[0]->children[3];
+      children[0]->neighbours[0]->neighbours[3] = children[0];
+      children[1]->neighbours[0]->neighbours[3] = children[1];
+	  neighbours[0]->neighbours[3] = this;
+    }
+    else
+    {
+      children[0]->neighbours[0] = neighbours[0];
+      children[1]->neighbours[0] = neighbours[0];
+      neighbours[0]->neighbours[3] = this;
+    }
+  }
+  if (neighbours[1])
+  {
+    if (!neighbours[1]->IsLeaf ())
+    {
+      children[1]->neighbours[1] = neighbours[1]->children[0];
+      children[3]->neighbours[1] = neighbours[1]->children[2];
+      children[1]->neighbours[1]->neighbours[2] = children[1];
+      children[3]->neighbours[1]->neighbours[2] = children[3];
+	  neighbours[1]->neighbours[2] = this;
+    }
+    else
+    {
+      children[1]->neighbours[1] = neighbours[1];
+      children[3]->neighbours[1] = neighbours[1];
+      neighbours[1]->neighbours[2] = this;
+    }
+  }
+  if (neighbours[2])
+  {
+    if (!neighbours[2]->IsLeaf ())
+    {
+      children[0]->neighbours[2] = neighbours[2]->children[1];
+      children[2]->neighbours[2] = neighbours[2]->children[3];
+      children[0]->neighbours[2]->neighbours[1] = children[0];
+      children[2]->neighbours[2]->neighbours[1] = children[2];
+	  neighbours[2]->neighbours[1] = this;
+    }
+    else
+    {
+      children[0]->neighbours[2] = neighbours[2];
+      children[2]->neighbours[2] = neighbours[2];
+      neighbours[2]->neighbours[1] = this;
+    }
+  }
+  if (neighbours[3])
+  {
+    if (!neighbours[3]->IsLeaf ())
+    {
+      children[2]->neighbours[3] = neighbours[3]->children[0];
+      children[3]->neighbours[3] = neighbours[3]->children[1];
+      children[2]->neighbours[3]->neighbours[0] = children[2];
+      children[3]->neighbours[3]->neighbours[0] = children[3];
+	  neighbours[3]->neighbours[0] = this;
+    }
+    else
+    {
+      children[2]->neighbours[3] = neighbours[3];
+      children[3]->neighbours[3] = neighbours[3];
+      neighbours[3]->neighbours[0] = this;
+    }
+  }
+  children[0]->neighbours[1] = children[1];
+  children[0]->neighbours[3] = children[2];
+
+  children[1]->neighbours[2] = children[0];
+  children[1]->neighbours[3] = children[3];
+
+  children[2]->neighbours[0] = children[0];
+  children[2]->neighbours[1] = children[3];
+
+  children[3]->neighbours[0] = children[1];
+  children[3]->neighbours[2] = children[2];
+
+  /*terr->builder->BuildBlock (children[0]);
+  terr->builder->BuildBlock (children[1]);
+  terr->builder->BuildBlock (children[2]);
+  terr->builder->BuildBlock (children[3]);*/
+  children[0]->SetupMesh ();
+  children[1]->SetupMesh ();
+  children[2]->SetupMesh ();
+  children[3]->SetupMesh ();
+
+  return true;
+}
+
+bool csTerrBlock::Merge ()
+{
+  if (IsLeaf ())
+    return false;
+
+  if(!children[0]->IsLeaf() || !children[1]->IsLeaf()
+	  || !children[2]->IsLeaf() || !children[3]->IsLeaf())
+	  return false;
+
+  if (neighbours[0] && (!neighbours[0]->IsLeaf () && 
+                       (!neighbours[0]->children[2]->IsLeaf () ||
+                        !neighbours[0]->children[3]->IsLeaf ())))
+      return false;
+  if (neighbours[1] && (!neighbours[1]->IsLeaf () && 
+                       (!neighbours[1]->children[0]->IsLeaf () ||
+                        !neighbours[1]->children[2]->IsLeaf ())))
+    return false;
+  if (neighbours[2] && (!neighbours[2]->IsLeaf () && 
+                       (!neighbours[2]->children[1]->IsLeaf () ||
+                        !neighbours[2]->children[3]->IsLeaf ())))
+    return false;
+  if (neighbours[3] && (!neighbours[3]->IsLeaf () && 
+                       (!neighbours[3]->children[0]->IsLeaf () ||
+                        !neighbours[3]->children[1]->IsLeaf ())))
+    return false;
+
+  children[0]->Detach ();
+  children[1]->Detach ();
+  children[2]->Detach ();
+  children[3]->Detach ();
+  children[0] = 0;
+  children[1] = 0;
+  children[2] = 0;
+  children[3] = 0;
+
+  return true;
+}
+
+void csTerrBlock::CalcLOD ()
+{
+  int res = terr->GetBlockResolution ();
+
+  csVector3 cam = terr->tr_o2c.GetOrigin ();
+  csBox3 cambox (bbox.Min ()-cam, bbox.Max ()-cam);
+
+  //cambox.SetCenter(csVector3(cambox.GetCenter().x,0,cambox.GetCenter().z));
+  /*csVector3 radii = (bbox.Max ()-bbox.Min ())*0.5;
+  radii *= (1.0/res)*terr->lod_lcoeff;
+  float maxradius = MAX(MAX(radii.x, radii.y), radii.z);
+  cam.x *= maxradius/radii.x;
+  cam.y *= maxradius/radii.y;
+  cam.z *= maxradius/radii.z;
+  radii.x = radii.x;
+  if (cam.SquaredNorm ()<maxradius*maxradius &&
+      size > terr->block_minsize)*/
+
+  for(int i = 0; i < 4; ++i)
+  {
+    if(IsLeaf() && neighbours[i] && neighbours[i]->terr != terr && !neighbours[i]->IsLeaf())
+    {
+      if(!neighbours[i]->children[0]->IsLeaf()
+        || !neighbours[i]->children[1]->IsLeaf()
+        || !neighbours[i]->children[2]->IsLeaf()
+        || !neighbours[i]->children[3]->IsLeaf())
+      {
+        Split();
+        i = 4;
+      }
+      else
+      {
+        if(neighbours[0] && !neighbours[0]->IsLeaf())
+        {
+          neighbours[0]->children[2]->neighbours[3]=this;
+          neighbours[0]->children[3]->neighbours[3]=this;
+        }
+
+        if(neighbours[1] && !neighbours[1]->IsLeaf())
+        {
+          neighbours[1]->children[0]->neighbours[2]=this;
+          neighbours[1]->children[2]->neighbours[2]=this;
+        }
+
+        if(neighbours[2] && !neighbours[2]->IsLeaf())
+        {
+          neighbours[2]->children[1]->neighbours[1]=this;
+          neighbours[2]->children[3]->neighbours[1]=this;
+        }
+
+        if(neighbours[3] && !neighbours[3]->IsLeaf())
+        {
+          neighbours[3]->children[0]->neighbours[0]=this;
+          neighbours[3]->children[1]->neighbours[0]=this;
+        }
+      }
+    }
+  }
+
+  float splitdist = size*terr->lod_lcoeff / float (res);
+  if (cambox.SquaredOriginDist()<splitdist*splitdist &&
+    size > terr->block_minsize)
+  {
+    if (IsLeaf ())
+      Split ();
+  }
+  else
+  {
+    if (!IsLeaf ())
+      Merge ();
+  }
+
+  if(IsLeaf() && size >= terr->block_maxsize)
+	  Split();
+
+  if (!IsLeaf ())
+    for (int i=0; i<4; i++)
+      children[i]->CalcLOD ();
+}
+
+void csTerrBlock::UpdateBlockColors ()
+{
+  const csDirtyAccessArray<csColor>& colors = terr->GetStaticColors ();
+  int lmres = terr->GetLightMapResolution ();
+  int res = terr->GetBlockResolution ();
+  const csBox3& gb = terr->global_bbox;
+  // @@@
+  // Opt by moving some precalced fields in object?
+  float lm_minx = ((bbox.MinX ()-gb.MinX ()) / (gb.MaxX ()-gb.MinX ())) * float (lmres);
+  float lm_miny = ((bbox.MinZ ()-gb.MinZ ()) / (gb.MaxZ ()-gb.MinZ ())) * float (lmres);
+  float lm_maxx = ((bbox.MaxX ()-gb.MinX ()) / (gb.MaxX ()-gb.MinX ())) * float (lmres);
+  float lm_maxy = ((bbox.MaxZ ()-gb.MinZ ()) / (gb.MaxZ ()-gb.MinZ ())) * float (lmres);
+  if (lm_minx < 0) lm_minx = 0;
+  else if (lm_minx > lmres-1) lm_minx = lmres-1;
+  if (lm_maxx < lm_minx) lm_maxx = lm_minx;
+  else if (lm_maxx > lmres-1) lm_maxx = lmres-1;
+  if (lm_miny < 0) lm_miny = 0;
+  else if (lm_miny > lmres-1) lm_miny = lmres-1;
+  if (lm_maxy < lm_miny) lm_maxy = lm_miny;
+  else if (lm_maxy > lmres-1) lm_maxy = lmres-1;
+  int x, y;
+  csColor* c = color_data;
+  for (y = 0 ; y <= res ; y++)
+  {
+    int lmy = int ((float (y) / float (res)) * (lm_maxy - lm_miny)
+      	+ lm_miny);
+    lmy *= lmres;
+    for (x = 0 ; x <= res ; x++)
+    {
+      int lmx = int ((float (x) / float (res)) * (lm_maxx - lm_minx)
+      	+ lm_minx);
+      *c++ = colors[lmy + lmx];
+    }
+  }
+}
+
+void csTerrBlock::UpdateStaticLighting ()
+{
+  if (IsLeaf ())
+  {
+    if (last_colorVersion == terr->colorVersion)
+      return;
+    last_colorVersion = terr->colorVersion;
+
+    int res = terr->GetBlockResolution ();
+    int num_mesh_vertices = (res+1)*(res+1);
+    if (!color_data)
+      color_data = new csColor[num_mesh_vertices];
+    UpdateBlockColors ();
+    if (mesh_colors)
+      mesh_colors->CopyInto (color_data, num_mesh_vertices);
+  }
+  else
+  {
+    if (children[0]->built) children[0]->UpdateStaticLighting ();
+    if (children[1]->built) children[1]->UpdateStaticLighting ();
+    if (children[2]->built) children[2]->UpdateStaticLighting ();
+    if (children[3]->built) children[3]->UpdateStaticLighting ();
+  }
+}
+
+void csTerrBlock::DrawTest (iGraphics3D* g3d,
+			    iRenderView *rview, uint32 frustum_mask,
+                            csReversibleTransform &transform,
+                            iMovable *movable)
+{
+  if(detach)
+	  return;
+
+  int clip_portal, clip_plane, clip_z_plane;
+  if (!CS::RenderViewClipper::CullBBox (rview->GetRenderContext (),
+	terr->planes, frustum_mask, bbox,
+	clip_portal, clip_plane, clip_z_plane))
+    return;
+
+  if (!IsLeaf () && children[0]->built &&
+                    children[1]->built &&
+                    children[2]->built &&
+                    children[3]->built)
+  {
+    children[0]->DrawTest (g3d, rview, frustum_mask, transform, movable);
+    children[1]->DrawTest (g3d, rview, frustum_mask, transform, movable);
+    children[2]->DrawTest (g3d, rview, frustum_mask, transform, movable);
+    children[3]->DrawTest (g3d, rview, frustum_mask, transform, movable);
+	
+    return;
+  }
+
+  if (!built)
+    return;
+
+  int res = terr->GetBlockResolution ();
+
+  if (!mesh_vertices)
+  {
+    int num_mesh_vertices = (res+1)*(res+1);
+    mesh_vertices = 
+      csRenderBuffer::CreateRenderBuffer (
+      num_mesh_vertices, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
+      3);
+    mesh_vertices->CopyInto (vertex_data, num_mesh_vertices);
+    //delete[] vertex_data;@@@ CD
+    //vertex_data = 0;
+
+    mesh_normals = 
+      csRenderBuffer::CreateRenderBuffer (num_mesh_vertices,
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
+      3);
+    mesh_normals->CopyInto (normal_data, num_mesh_vertices);
+    delete[] normal_data;
+    normal_data = 0;
+
+    mesh_texcoords = 
+    csRenderBuffer::CreateRenderBuffer (num_mesh_vertices,
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
+      2);
+    mesh_texcoords->CopyInto (texcoord_data, num_mesh_vertices);
+    delete[] texcoord_data;
+    texcoord_data = 0;
+
+    mesh_colors = 
+      csRenderBuffer::CreateRenderBuffer (num_mesh_vertices,
+      CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
+      3);
+    mesh_colors->CopyInto (color_data,num_mesh_vertices);
+    if (!terr->staticlighting)
+    {
+      delete[] color_data;
+      color_data = 0;
+    }
+    bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, mesh_vertices);
+    bufferHolder->SetRenderBuffer (CS_BUFFER_NORMAL, mesh_normals);
+    bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, mesh_texcoords);
+    bufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, mesh_colors);
+  }
+
+  //csVector3 cam = rview->GetCamera ()->GetTransform ().GetOrigin ();
+  csVector3 cam = transform.GetOrigin ();
+
+
+
+  csBox3 cambox (bbox.Min ()-cam, bbox.Max ()-cam);
+  bool baseonly = cambox.SquaredOriginDist () > 
+                  terr->lod_distance*terr->lod_distance;
+//@@@
+  //baseonly = true;
+  int idx = ((neighbours[0] && neighbours[0]->size>size)?1:0)+
+            (((neighbours[1] && neighbours[1]->size>size)?1:0)<<1)+
+            (((neighbours[2] && neighbours[2]->size>size)?1:0)<<2)+
+            (((neighbours[3] && neighbours[3]->size>size)?1:0)<<3);
+
+  bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, terr->mesh_indices[idx]);
+
+  const csReversibleTransform o2wt = movable->GetFullTransform ();
+  const csVector3& wo = o2wt.GetOrigin ();
+  bool isMirrored = rview->GetCamera()->IsMirrored();
+
+  for (int i=0; i<=(baseonly?0:(int)terr->palette.GetSize ()); ++i)
+  {
+//@@@ fix
+    //if ((i > 0) && !IsMaterialUsed (i - 1)) continue;
+
+    bool meshCreated;
+    csRenderMesh*& rm = terr->rmHolder.GetUnusedMesh (meshCreated,
+      rview->GetCurrentFrameNumber ());
+    rm->meshtype = CS_MESHTYPE_TRIANGLESTRIP;
+    rm->buffers = bufferHolder;
+    rm->clip_portal = clip_portal;
+    rm->clip_plane = clip_plane;
+    rm->clip_z_plane = clip_z_plane;
+    rm->indexstart = 0;
+    rm->indexend = terr->numindices[idx];
+    if (i==0)
+    {
+      rm->material = material;
+      rm->variablecontext = terr->baseContext;
+    } 
+    else 
+    {
+      rm->material = terr->palette[i-1];
+      rm->variablecontext = terr->paletteContexts[i-1];
+    }
+    rm->object2world = o2wt;
+    rm->bbox = bbox;
+    rm->worldspace_origin = wo;
+    rm->do_mirror = isMirrored;
+    terr->returnMeshes->Push (rm);
+  }
+}
+
+bool csTerrBlock::IsMaterialUsed (int index)
+{
+  if (size_t (index) >= materialsChecked.GetSize ())
+  {
+    materialsChecked.SetSize (index+1);
+    materialsUsed.SetSize (index+1);
+  }
+
+  if (!materialsChecked[index])
+  {
+    materialsChecked[index] = true;
+
+    // Slightly overexagerate the heightmap Space so that
+    // we don't miss materials due to just being at the border
+    // of a block.
+    csBox2 heightmapSpace (
+    	center.x - size / 2.0 - 1.0,
+	center.z - size / 2.0 - 1.0,
+	center.x + size / 2.0 + 1.0,
+	center.z + size / 2.0 + 1.0);
+    const csBox2& terrRegion = terr->region;
+
+    float wm = terr->wm;
+    float hm = terr->hm;
+    int mmLeft = 
+      (int)floor ((heightmapSpace.MinX() - terrRegion.MinX()) * wm);
+    // account for decreasing TCs with increasing Y
+    int mmBottom = terr->materialMapH - 
+      (int)ceil ((heightmapSpace.MinY() - terrRegion.MinY()) * hm);
+    int mmRight = 
+      (int)ceil ((heightmapSpace.MaxX() - terrRegion.MinX()) * wm);
+    int mmTop = terr->materialMapH -
+      (int)floor ((heightmapSpace.MaxY() - terrRegion.MinY()) * hm);
+
+    // Jorrit: for some reason we must cap mmRight and mmBottom.
+    if (mmRight >= terr->materialMapW) mmRight = terr->materialMapW-1;
+    if (mmBottom >= terr->materialMapH) mmBottom = terr->materialMapH-1;
+    // res: and mmLeft/mmTop... :)
+    if (mmLeft < 0) mmLeft = 0;
+    if (mmTop < 0) mmTop = 0;
+
+    bool matUsed = false;
+    const csBitArray& bits = terr->globalMaterialsUsed[index];
+    int y_ofs = mmTop * terr->materialMapW;
+    for (int y = mmTop; y <= mmBottom; y++)
+    {
+      int ofs = mmLeft + y_ofs;
+      for (int x = mmLeft; x <= mmRight; x++)
+      {
+	if (bits[ofs])
+	{
+	  matUsed = true;
+	  break;
+	}
+	ofs++;
+      }
+      if (matUsed) break;
+      y_ofs += terr->materialMapW;
+    }
+
+    materialsUsed[index] = matUsed;
+  }
+  return materialsUsed[index];
+}
+
+// ---------------------------------------------------------------
+
+
+class csTriangleLODAlgoHM : public csTriangleLODAlgo
+{
+public:
+  csVector3* normals;
+  // Per vertex: -1 for corner, 0 for center, 1, 2, 3, 4 for specific edge.
+  int* edgedata;
+  float min_max_cost;	// 1-max_cost
+  csTriangleMesh* mesh;
+
+public:
+  virtual ~csTriangleLODAlgoHM () { }
+
+  virtual void CalculateCost (csTriangleVerticesCost* vertices,
+  	csTriangleVertexCost* vertex)
+  {
+    size_t i, j;
+    vertex->to_vertex = -1;
+    if (vertex->deleted)
+    {
+      // If the vertex is deleted we have a very high cost.
+      // The cost is higher than the maximum cost you can get for
+      // a non-deleted vertex. This is to make sure that we get
+      // the last non-deleted vertex at the end of the LOD algorithm.
+      vertex->cost = 1000000.0;
+      return;
+    }
+    int idx = vertex->idx;
+    int edge = edgedata[idx];
+    if (edge == -1)
+    {
+      // If we are on a corner then we can't collapse this vertex
+      // at all. Very high cost.
+      vertex->cost = 1000000.0;
+      return;
+    }
+
+    // Calculate the minimum cos(angle) for all normals adjacent to this
+    // vertex. That's the worst value for cos(angle) and so that will be
+    // the cost of removing this vertex.
+    const csVector3& n = normals[idx];
+    const csVector3& this_pos = vertex->pos;
+    float min_cosa = 1000.0;
+    float min_sq_dist = 1000000.;
+    for (i = 0 ; i < vertex->con_vertices.GetSize () ; i++)
+    {
+      int connected_i = vertex->con_vertices[i];
+      float cur_cosa = n * normals[connected_i];
+      if (cur_cosa < min_cosa)
+      {
+        if (cur_cosa < min_max_cost)
+	{
+	  // We can already stop here. We are too bad.
+          vertex->cost = 1000000.0;
+          return;
+	}
+        min_cosa = cur_cosa;
+      }
+
+      // Check if we can collapse this edge. We can collapse this
+      // edge if this vertex is a center vertex or if it is on the same edge
+      // as the other vertex.
+      if (edge == 0 || edge == edgedata[connected_i])
+      {
+	const csVector3& other_pos = vertices->GetVertex (connected_i).pos;
+	csTriangle* tris = mesh->GetTriangles ();
+
+        // We will not collapse an edge if it means that the
+	// 'y' orientation of the triangle changes (i.e. the
+	// normals of the adjacent triangles no longer point
+	// upwards). We test this by checking all connected triangles
+	// that are not empty, then it projects them to 2D (with x
+	// and z) and it will see if their direction changes.
+	bool bad = false;
+	csVector3 v3[3];
+	csVector2 v[3];
+	for (j = 0 ; j < vertex->con_triangles.GetSize () ; j++)
+	{
+	  csTriangle& tri = tris[vertex->con_triangles[j]];
+	  v3[0] = vertices->GetVertex (tri.a).pos; v[0].Set (v3[0].x, v3[0].z);
+	  v3[1] = vertices->GetVertex (tri.b).pos; v[1].Set (v3[1].x, v3[1].z);
+	  v3[2] = vertices->GetVertex (tri.c).pos; v[2].Set (v3[2].x, v3[2].z);
+	  int sameidx;
+	  if (tri.a == idx) sameidx = 0;
+	  else if (tri.b == idx) sameidx = 1;
+	  else sameidx = 2;
+	  float dir_before = csMath2::Area2 (v[0], v[1], v[2]);
+	  v[sameidx].Set (other_pos.x, other_pos.z);
+	  float dir_after = csMath2::Area2 (v[0], v[1], v[2]);
+	  bad = (dir_before < -.0001 && dir_after > .0001) ||
+	    	(dir_before > .0001 && dir_after < -.0001);
+	  if (bad) break;
+	}
+
+	if (!bad)
+	{
+          // We prefer collapsing along the shortest edge.
+          float sq_dist = csSquaredDist::PointPoint (this_pos, other_pos);
+	  if (sq_dist < min_sq_dist)
+	  {
+            min_sq_dist = sq_dist;
+            vertex->to_vertex = connected_i;
+          }
+        }
+      }
+    }
+
+    // If we found no edge to collapse then we can't collapse and we
+    // pick a high cost.
+    if (vertex->to_vertex == -1)
+    {
+      vertex->cost = 1000000.0;
+      return;
+    }
+
+    vertex->cost = 1 - min_cosa;
+  }
+};
+
+#define CDLODMAGIC	    "CD01" // must be 4 chars!
+
+bool csTerrainObject::ReadCDLODFromCache ()
+{
+  csRef<iCommandLineParser> cmdline = 
+  	csQueryRegistry<iCommandLineParser> (object_reg);
+  if (cmdline->GetOption ("recalc"))
+  {
+    static bool reportit = true;
+    if (reportit)
+    {
+      reportit = false;
+      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.mesh.bruteblock",
+	  "Forced recalculation of terrain LOD!");
+    }
+    return false;
+  }
+
+  csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
+  if (!engine) return false;
+  iCacheManager* cache_mgr = engine->GetCacheManager ();
+
+  char* cachename = GenerateCacheName ();
+  csRef<iDataBuffer> db = cache_mgr->ReadCache ("bruteblock_lod",
+      	cachename, 0);
+  delete[] cachename;
+  if (!db) return false;
+
+  csRef<csMemFile> cf;
+  cf.AttachNew (new csMemFile ((char*)db->GetData (), db->GetSize (),
+  	    csMemFile::DISPOSITION_IGNORE));
+
+  char header[5];
+  cf->Read (header, 4);
+  header[4] = 0;
+  if (strcmp (header, CDLODMAGIC))
+  {
+    if (verbose)
+      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.mesh.bruteblock",
+    	  "Forced recalculation of terrain LOD: magic number mismatch!");
+    return false;	// Mismatch.
+  }
+
+  uint32 cache_cd_res;
+  cf->Read ((char*)&cache_cd_res, 4);
+  cache_cd_res = csLittleEndian::Convert (cache_cd_res);
+  if ((int)cache_cd_res != cd_resolution)
+  {
+    if (verbose)
+      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.mesh.bruteblock",
+    	  "Forced recalculation of terrain LOD: resolution mismatch!");
+    return false;	// Mismatch.
+  }
+
+  uint32 ptc;
+  cf->Read ((char*)&ptc, 4);
+  polymesh_tri_count = (int)csLittleEndian::Convert (ptc);
+  polymesh_triangles = new csTriangle [polymesh_tri_count];
+
+  for (int i = 0 ; i < polymesh_tri_count ; i++)
+  {
+    uint32 a, b, c;
+    cf->Read ((char*)&a, 4); a = csLittleEndian::Convert (a);
+    cf->Read ((char*)&b, 4); b = csLittleEndian::Convert (b);
+    cf->Read ((char*)&c, 4); c = csLittleEndian::Convert (c);
+    polymesh_triangles[i].a = a;
+    polymesh_triangles[i].b = b;
+    polymesh_triangles[i].c = c;
+  }
+  return true;
+}
+
+void csTerrainObject::WriteCDLODToCache ()
+{
+  csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
+  if (!engine) return;
+  iCacheManager* cache_mgr = engine->GetCacheManager ();
+  if (!cache_mgr) return;
+
+  char* cachename = GenerateCacheName ();
+
+  csMemFile m;
+  csRef<iFile> mf = scfQueryInterface<iFile> ((&m));
+
+  char header[5];
+  strcpy (header, CDLODMAGIC);
+  mf->Write ((char const*) header, 4);
+
+  uint32 cd_res = (uint32)cd_resolution;
+  cd_res = csLittleEndian::Convert (cd_res);
+  mf->Write ((char const*) &cd_res, 4);
+
+  uint32 tri_count = (uint32)polymesh_tri_count;
+  tri_count = csLittleEndian::Convert (tri_count);
+  mf->Write ((char const*) &tri_count, 4);
+
+  int i;
+  for (i = 0 ; i < polymesh_tri_count ; i++)
+  {
+    uint32 a, b, c;
+    a = (uint32)polymesh_triangles[i].a; a = csLittleEndian::Convert (a);
+    b = (uint32)polymesh_triangles[i].b; b = csLittleEndian::Convert (b);
+    c = (uint32)polymesh_triangles[i].c; c = csLittleEndian::Convert (c);
+    mf->Write ((char const*) &a, 4);
+    mf->Write ((char const*) &b, 4);
+    mf->Write ((char const*) &c, 4);
+  }
+
+  cache_mgr->CacheData ((void*)(m.GetData ()), m.GetSize (),
+  	  "bruteblock_lod", cachename, 0);
+  delete[] cachename;
+  cache_mgr->Flush ();
+}
+
+void csTerrainObject::SetupPolyMeshData ()
+{
+  if (polymesh_valid) return;
+  SetupObject ();
+  polymesh_valid = true;
+  delete[] polymesh_vertices;
+  delete[] polymesh_triangles;
+
+  int res = cd_resolution;
+  csRef<iTerraSampler> terrasampler = terraformer->GetSampler (
+      csBox2 (rootblock->center.x - rootblock->size / 2.0,
+      	      rootblock->center.z - rootblock->size / 2.0, 
+	      rootblock->center.x + rootblock->size / 2.0,
+	      rootblock->center.z + rootblock->size / 2.0), res);
+
+  // We get the vertices and normals from the sampler. We will
+  // use the normals for Level of Detail reduction on the collision
+  // detection mesh.
+  polymesh_vertices = new csVector3 [res * res];
+  polymesh_vertex_count = res * res;
+  memcpy (polymesh_vertices, terrasampler->SampleVector3 (vertices_name),
+    res * res * sizeof (csVector3));
+
+  if (cd_lod_cost > 0.00001)
+  {
+    // We use LOD. First see if we can get it from the cache.
+    if (ReadCDLODFromCache ())
+      return;
+  }
+
+  // First we make the base triangle mesh with highest detail.
+  polymesh_tri_count = 2 * (res-1) * (res-1);
+  polymesh_triangles = new csTriangle [polymesh_tri_count];
+  int x, y;
+  csTriangle* tri = polymesh_triangles;
+  for (y = 0 ; y < res-1 ; y++)
+  {
+    int yr = y * res;
+    for (x = 0 ; x < res-1 ; x++)
+    {
+      (tri++)->Set (yr + x, yr+res + x, yr + x+1);
+      (tri++)->Set (yr + x+1, yr+res + x, yr+res + x+1);
+    }
+  }
+
+  if (cd_lod_cost <= 0.00001)
+  {
+    // We do no lod on the CD mesh.
+    return;
+  }
+
+  csVector3* normals = new csVector3[res * res];
+  memcpy (normals, terrasampler->SampleVector3 (normals_name),
+    res * res * sizeof (csVector3));
+
+  if (verbose)
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.mesh.bruteblock",
+    	  "Optimizing CD Mesh for Terrain: tris %d ...",
+    	  polymesh_tri_count);
+
+  // Set up the base mesh which will be used in the LOD
+  // reduction algorithm. After setting up this mesh we
+  // can discard our triangle array since a copy is made.
+  csTriangleMesh mesh;
+  mesh.SetTriangles (polymesh_triangles, polymesh_tri_count);
+  delete[] polymesh_triangles;	// SetTriangles() makes a copy.
+
+  // Set up the LOD algorithm that we will use.
+  // This is basically the cost calculation function.
+  csTriangleLODAlgoHM lodalgo;
+  lodalgo.normals = normals;
+  lodalgo.edgedata = new int[res*res];	//@@@ Delete in csTriangleLODAlgoHM?
+  lodalgo.min_max_cost = 1.0 - cd_lod_cost;
+  lodalgo.mesh = &mesh;
+
+  // Set up edge data. We have to be careful when collapsing
+  // vertices that are on a border. For example, a vertex on a left
+  // border can only be collapsed to another vertex on the left
+  // border. To detect that quickly in our lod algorithm we fill
+  // the edgedata table with the relevant information here.
+  int i = 0;
+  for (y = 0 ; y < res ; y++)
+  {
+    bool u = y == 0;
+    bool d = y == res-1;
+    for (x = 0 ; x < res ; x++)
+    {
+      bool l = x == 0;
+      bool r = x == res-1;
+      lodalgo.edgedata[i] =
+        ((l && u) || (l && d) || (r && u) || (r && d)) ? -1 :
+      	l ? 1 : u ? 2 : r ? 3 : d ? 4 : 0;
+      i++;
+    }
+  }
+
+  // This class will maintain the cost of all vertices.
+  // It is used by CalculateLODFast() below.
+  csTriangleVerticesCost mesh_verts (&mesh, polymesh_vertices,
+      polymesh_vertex_count);
+
+  // Do the triangle reduction.
+  polymesh_tri_count = 0;
+  polymesh_triangles = csTriangleMeshLOD::CalculateLODFast (&mesh,
+  	&mesh_verts, cd_lod_cost, polymesh_tri_count,
+	&lodalgo);
+
+  if (verbose)
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.mesh.bruteblock",
+    	  "Optimizing done: result %d", polymesh_tri_count);
+
+  WriteCDLODToCache ();
+
+  delete[] lodalgo.edgedata;
+  delete[] normals;
+  terrasampler->Cleanup ();
+}
+
+void csTerrainObject::CleanPolyMeshData ()
+{
+  delete[] polymesh_vertices;
+  polymesh_vertices = 0;
+  delete[] polymesh_triangles;
+  polymesh_triangles = 0;
+}
+
+size_t csTerrainObject::TriMesh::GetVertexCount ()
+{
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_vertex_count;
+}
+
+csVector3* csTerrainObject::TriMesh::GetVertices ()
+{
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_vertices;
+}
+
+size_t csTerrainObject::TriMesh::GetTriangleCount ()
+{
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_tri_count;
+}
+
+csTriangle* csTerrainObject::TriMesh::GetTriangles ()
+{
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_triangles;
+}
+
+//----------------------------------------------------------------------
+
+
+csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
+                                    csTerrainFactory *pFactory) :
+  scfImplementationType (this)
+{
+  csTerrainObject::object_reg = object_reg;
+  csTerrainObject::pFactory = pFactory;
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
+
+  csRef<TriMesh> trimesh;
+  trimesh.AttachNew (new TriMesh ());
+  trimesh->SetTerrain (this);
+  csRef<iStringSet> strset = csQueryRegistryTagInterface<iStringSet> (
+      object_reg, "crystalspace.shared.stringset");
+  csStringID base_id = strset->Request ("base");
+  stringVertices = strset->Request("vertices");
+  SetTriangleData (base_id, trimesh);
+
+  polymesh_valid = false;
+  polymesh_vertices = 0;
+  polymesh_triangles = 0;
+  cd_resolution = 256;
+  cd_lod_cost = -1; //0.02;
+
+  logparent = 0;
+  initialized = false;
+
+  region = ((csTerrainFactory*)pFactory)->samplerRegion;
+  rootblock = 0;
+    
+  block_res = 32;
+
+  lod_distance = 200;
+
+  lod_lcoeff = 16;
+  lod_qcoeff = 0;
+  block_maxsize = region.MaxX () - region.MinX ();
+  block_minsize = block_maxsize;
+
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
+  
+  vertices_name = strings->Request ("vertices");
+  normals_name = strings->Request ("normals");
+  texcoords_name = strings->Request ("texture coordinates");
+  colors_name = strings->Request ("colors");
+
+  //terr_func = &((csTerrainFactory*)pFactory)->terr_func;
+  terraformer = ((csTerrainFactory*)pFactory)->terraformer;
+
+  staticlighting = false;
+  castshadows = false;
+  lmres = 257;
+
+  colorVersion = (uint)~0;
+  last_colorVersion = (uint)~0;
+  dynamic_ambient_version = (uint)~0;
+
+  baseContext = new csShaderVariableContext();
+
+  neighbor[0]=0;
+  neighbor[1]=0;
+  neighbor[2]=0;
+  neighbor[3]=0;
+
+  csRef<iVerbosityManager> verbosemgr (
+    csQueryRegistry<iVerbosityManager> (object_reg));
+  verbose = verbosemgr.IsValid() ? verbosemgr->Enabled ("bruteblock") : false;
+}
+
+csTerrainObject::~csTerrainObject ()
+{  
+  if(neighbor[0]) neighbor[0]->neighbor[3]=0;
+  if(neighbor[1]) neighbor[1]->neighbor[2]=0;
+  if(neighbor[2]) neighbor[2]->neighbor[1]=0;
+  if(neighbor[3]) neighbor[3]->neighbor[0]=0;
+
+  if (rootblock) rootblock->Detach();
+  rootblock=0;
+
+  //builder->Stop ();
+  delete[] polymesh_vertices;
+  delete[] polymesh_triangles;
+}
+
+void csTerrainObject::SetTopNeighbor(iTerrainObjectState *top)
+{
+  neighbor[0]=(csTerrainObject *)top;
+  neighbor[0]->neighbor[3]=this;
+}
+
+void csTerrainObject::SetRightNeighbor(iTerrainObjectState *right)
+{
+  neighbor[1]=(csTerrainObject *)right;
+  neighbor[1]->neighbor[2]=this;
+}
+
+void csTerrainObject::SetLeftNeighbor(iTerrainObjectState *left)
+{
+  neighbor[2]=(csTerrainObject *)left;
+  neighbor[2]->neighbor[1]=this;
+}
+
+void csTerrainObject::SetBottomNeighbor(iTerrainObjectState *bottom)
+{
+  neighbor[3]=(csTerrainObject *)bottom;
+  neighbor[3]->neighbor[0]=this;
+}
+
+void csTerrainObject::SetStaticLighting (bool enable)
+{
+  csRef<iCommandLineParser> cmdline = 
+  	csQueryRegistry<iCommandLineParser> (object_reg);
+  if (cmdline->GetOption ("fullbright"))
+  {
+    staticlighting = false;
+    staticLights.DeleteAll ();
+    return;
+  }
+
+  staticlighting = enable;
+  if (staticlighting)
+  {
+    staticLights.SetSize (lmres * lmres);
+  }
+  else
+  {
+    staticLights.DeleteAll ();
+  }
+}
+
+void csTerrainObject::FireListeners ()
+{
+  size_t i;
+  for (i = 0 ; i < listeners.GetSize () ; i++)
+    listeners[i]->ObjectModelChanged (this);
+}
+
+void csTerrainObject::AddListener (iObjectModelListener *listener)
+{
+  RemoveListener (listener);
+  listeners.Push (listener);
+}
+
+void csTerrainObject::RemoveListener (iObjectModelListener *listener)
+{
+  int idx = (int)listeners.Find (listener);
+  if (idx == -1) return ;
+  listeners.DeleteIndex (idx);
+}
+
+void csTerrainObject::SetupObject ()
+{
+
+  if (!initialized)
+  {
+    initialized = true;
+
+    csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
+
+    for (int t=0; t<=1; t++)
+    {
+      for (int r=0; r<=1; r++)
+      {
+        for (int l=0; l<=1; l++)
+        {
+          for (int b=0; b<=1; b++)
+          {
+            int idx = t+(r<<1)+(l<<2)+(b<<3);
+            mesh_indices[idx] = 
+	        csRenderBuffer::CreateIndexRenderBuffer (
+              block_res*block_res*2*3, 
+              CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_SHORT,
+              0, (block_res+1) * (block_res+1) - 1);
+            uint16 *indices = 
+              (uint16*)mesh_indices[idx]->Lock (CS_BUF_LOCK_NORMAL);
+
+            numindices[idx] = 0;
+            int x, z;
+            for (z=1; z<(block_res-1); z++)
+            {
+              indices[numindices[idx]++] = 1+z*(block_res+1);
+              indices[numindices[idx]++] = 1+z*(block_res+1);
+              for (x=1; x<(block_res); x++)
+              { 
+                indices[numindices[idx]++] = x+(z+0)*(block_res+1);
+                indices[numindices[idx]++] = x+(z+1)*(block_res+1);
+              }
+              indices[numindices[idx]++] = x-1+(z+1)*(block_res+1);
+              indices[numindices[idx]++] = x-1+(z+1)*(block_res+1);
+            }
+
+            FillEdge (t==1,
+              block_res, indices, numindices[idx], 
+              0, 1, (block_res+1));
+
+            FillEdge (r==1,
+              block_res, indices, numindices[idx],
+              block_res, (block_res+1), -1);
+
+            FillEdge (l==1,
+              block_res, indices, numindices[idx], 
+              block_res*(block_res+1), -(block_res+1), 1);
+
+            FillEdge (b==1, 
+              block_res, indices, numindices[idx],
+              block_res*(block_res+1)+block_res, -1, -(block_res+1));
+
+            mesh_indices[idx]->Release ();
+          }
+        }
+      }
+    }
+
+    csRef<iStringSet> strings =
+      csQueryRegistryTagInterface<iStringSet>
+      (object_reg, "crystalspace.shared.stringset");
+
+    int a;
+    materialAlphaMaps = !terraformer->SampleInteger(
+      strings->Request("materialmap"),0,0,a);
+
+	if(!rootblock)
+	{
+      rootblock.AttachNew (new csTerrBlock (this));
+      rootblock->material = matwrap;
+      csVector2 center = (region.Max()+region.Min())*0.5;
+      rootblock->center = csVector3 (center.x, 0, center.y);
+      rootblock->size = block_maxsize;   
+	}
+
+    rootblock->SetupMesh ();
+	    
+    global_bbox = rootblock->bbox;
+
+    for(int i = 0; i < 4; ++i)
+      if(neighbor[i])
+	  {
+	    if (!neighbor[i]->rootblock) neighbor[i]->SetupObject();
+        rootblock->neighbours[i]=neighbor[i]->rootblock;
+		neighbor[i]->rootblock->neighbours[3 - i] = rootblock;
+	  }
+
+  }
+}
+
+iMeshObjectFactory* csTerrainObject::GetFactory () const
+{
+  return pFactory;
+}
+
+char* csTerrainObject::GenerateCacheName ()
+{
+  csMemFile mf;
+  mf.Write ("bruteblock", 8);
+  uint32 l;
+  l = csLittleEndian::Convert ((uint32)pFactory->hm_x);
+  mf.Write ((char*)&l, 4);
+  l = csLittleEndian::Convert ((uint32)pFactory->hm_y);
+  mf.Write ((char*)&l, 4);
+
+  if (logparent)
+  {
+    if (logparent->QueryObject ()->GetName ())
+      mf.Write (logparent->QueryObject ()->GetName (),
+        strlen (logparent->QueryObject ()->GetName ()));
+    iMovable* movable = logparent->GetMovable ();
+    iSector* sect = movable->GetSectors ()->Get (0);
+    if (sect && sect->QueryObject ()->GetName ())
+      mf.Write (sect->QueryObject ()->GetName (),
+        strlen (sect->QueryObject ()->GetName ()));
+  }
+
+  csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
+  csString hex(digest.HexString());
+  return hex.Detach();
+}
+
+void csTerrainObject::UpdateColors (iMovable* movable)
+{
+  if (!staticlighting) return;
+
+  // First check if dynamic ambient has changed.
+  iSector* s = movable->GetSectors ()->Get (0);
+  csColor baseColor = s->GetDynamicAmbientLight ();
+  if (dynamic_ambient_version != s->GetDynamicAmbientVersion ())
+  {
+    dynamic_ambient_version = s->GetDynamicAmbientVersion ();
+    colorVersion++;
+  }
+
+  if (colorVersion == last_colorVersion) return;
+  last_colorVersion = colorVersion;
+      
+  staticColors.SetSize (staticLights.GetSize ());
+  size_t i;
+  for (i = 0; i < staticLights.GetSize (); i++)
+  {
+    staticColors[i] = staticLights[i] + baseColor;
+  }
+
+  csHash<csShadowArray*, csPtrKey<iLight> >::GlobalIterator pdlIt =
+	pseudoDynInfo.GetIterator ();
+  while (pdlIt.HasNext ())
+  {
+    csPtrKey<iLight> light;
+    csShadowArray* shadowArr = pdlIt.Next (light);
+    float* intensities = shadowArr->shadowmap;
+    const csColor& lightcol = light->GetColor ();
+
+    if (lightcol.red > EPSILON || lightcol.green > EPSILON
+        || lightcol.blue > EPSILON)
+    {
+      for (i = 0; i < staticLights.GetSize (); i++)
+      {
+        staticColors[i] += lightcol * intensities[i];
+      }
+    }
+  }
+}
+
+bool csTerrainObject::SetMaterialPalette (
+  const csArray<iMaterialWrapper*>& pal)
+{
+  palette.SetSize (pal.GetSize ());
+  paletteContexts.SetSize (pal.GetSize ());
+  for (size_t i = 0; i < pal.GetSize (); i++)
+  {
+      palette[i] = pal[i];
+      refPalette.Put(i, pal.Get(i));
+      paletteContexts[i] = new csShaderVariableContext();
+  }
+
+  return true;
+}
+
+csArray<iMaterialWrapper*> csTerrainObject::GetMaterialPalette ()
+{
+  return palette;
+}
+
+
+CS_DEPRECATED_METHOD bool csTerrainObject::SetMaterialAlphaMaps (
+	const csArray<csArray<char> >& data, int w, int h)
+{
+  csRef<iSimpleFormerState> state = 
+    scfQueryInterface<iSimpleFormerState> (terraformer);
+  if (!state)
+  {
+    csReport(object_reg, CS_REPORTER_SEVERITY_BUG, 
+             "crystalspace.terraformer.paging",
+             "SetMaterialAlphaMaps can only be used with SimpleFormers."
+             " Use adequate method in the formers for others.");
+    return false;
+  }
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
+
+  for (uint a = 0; a < data.GetSize(); a++)
+  {
+    csString id = csString("alphamap ");
+    id += a;
+
+    csRef<iImage> alpha = csPtr<iImage> (new csImageMemory (w, h,
+      CS_IMGFMT_PALETTED8));
+
+    csRGBpixel *map = (csRGBpixel *)alpha->GetImageData ();
+    
+    for (uint b = 0; b < data[a].GetSize(); b++)
+    {
+      int v = data[a][b];
+      map[b].Set(v,v,v,v);
+    }
+
+    state->SetIntegerMap(strings->Request(id), alpha);
+  }  
+  
+  return SetCurrentMaterialAlphaMaps(data, w, h);
+}
+
+bool csTerrainObject::SetCurrentMaterialAlphaMaps (
+	const csArray<csArray<char> >& data, int w, int h)
+{
+  if (data.GetSize () != palette.GetSize ()-1)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	  "crystalspace.mesh.bruteblock",
+	  "There are %zd palette entries. That means there must be %zd alpha "
+	  "maps!", palette.GetSize (), palette.GetSize ()-1);
+    return false;
+  }
+  //use_singlemap = false;
+  //materialMaps = data;
+  materialMapW = w;
+  materialMapH = h;
+  wm = ((float)(materialMapW - 1)) / (region.MaxX() - region.MinX());
+  hm = ((float)(materialMapH - 1)) / (region.MaxY() - region.MinY());
+
+  csRef<iGraphics3D> g3d = 
+    csQueryRegistry<iGraphics3D> (object_reg);
+  csRef<iShaderVarStringSet> stringsSvName = 
+    csQueryRegistryTagInterface<iShaderVarStringSet>
+    (object_reg, "crystalspace.shader.variablenameset");
+  csRef<iTextureManager> mgr = g3d->GetTextureManager ();
+
+  csRef<csShaderVariable> lod_var = 
+    new csShaderVariable (stringsSvName->Request ("texture lod distance"));
+  lod_var->SetType (csShaderVariable::VECTOR3);
+  lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
+  baseContext->AddVariable (lod_var);
+
+  csArray<char> total;
+  total.SetSize (w * h);
+  size_t i;
+  for (i = 0 ; i < size_t (w * h) ; i++) total[i] = 0;
+
+  int count_overflow = 0;
+  globalMaterialsUsed.SetSize (0);
+  for (i = 0 ; i < palette.GetSize () ; i++)
+  {
+    csRef<iImage> alpha = csPtr<iImage> (new csImageMemory (w, h, 
+      CS_IMGFMT_ALPHA | CS_IMGFMT_TRUECOLOR));
+
+    csRGBpixel *map = (csRGBpixel *)alpha->GetImageData ();
+    csBitArray matused;
+    matused.SetSize (w * h);
+    int y, x;
+    size_t idx = 0;
+    for (y = 0; y < h; y ++) 
+      for (x = 0; x < w; x ++) 
+      {
+	int v;
+        if (i < palette.GetSize ()-1)
+	{
+          v = (unsigned char)data[i][idx];
+	  int vv = total[idx];
+	  vv += v;
+	  if (vv > 255)
+	  {
+	    count_overflow++;
+	    v -= vv-255;
+	    vv = 255;
+	  }
+	  total[idx] = vv;
+	}
+	else
+	{
+          v = 255 - (unsigned char)total[idx];
+	}
+        map[idx].Set (v, v, v, v);
+	matused[idx] = (v != 0);
+	idx++;
+      }
+    globalMaterialsUsed.Push (matused);
+
+//@@@
+/*
+  csDebugImageWriter a = csDebugImageWriter();
+  csString fn = csString();
+  fn += "alpha";
+  fn += "-";
+  fn += rand();
+  fn += ".png";
+  a.DebugImageWrite(alpha,fn);
+printf("%s\n",fn.GetData());
+*/
+
+    csRef<iTextureHandle> hdl = mgr->RegisterTexture (alpha, 
+      CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
+    csRef<csShaderVariable> var = 
+      new csShaderVariable (stringsSvName->Request ("splat alpha map"));
+    var->SetType (csShaderVariable::TEXTURE);
+    var->SetValue (hdl);
+    paletteContexts[i]->AddVariable (var);
+
+    csRef<csShaderVariable> lod_var = 
+      new csShaderVariable (stringsSvName->Request ("texture lod distance"));
+    lod_var->SetType (csShaderVariable::VECTOR3);
+    lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
+    paletteContexts[i]->AddVariable (lod_var);
+  }
+  if (count_overflow > 0)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+	  "crystalspace.mesh.bruteblock",
+	  "There were %d overflows in the alpha maps!", count_overflow);
+  }
+  materialAlphaMaps = true;
+  return true;
+}
+
+CS_DEPRECATED_METHOD bool csTerrainObject::SetMaterialAlphaMaps (const 
+csArray<iImage*>& maps)
+{
+  csRef<iSimpleFormerState> state = 
+    scfQueryInterface<iSimpleFormerState> (terraformer);
+  if (!state)
+  {
+    csReport(object_reg, CS_REPORTER_SEVERITY_BUG, 
+             "crystalspace.terraformer.paging",
+             "SetMaterialAlphaMaps can only be used with SimpleFormers."
+             " Use adequate method in the formers for others.");
+    return false;
+  }
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
+
+  if (maps.GetSize () != palette.GetSize ()-1)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	  "crystalspace.mesh.bruteblock",
+	  "There are %zd palette entries. That means there must be %zd alpha "
+	  "maps!", palette.GetSize (), palette.GetSize ()-1);
+    return false;
+  }
+  size_t idx;
+  csArray<csArray<char> > image_datas;
+  int w = -1, h = -1;
+  for (idx = 0 ; idx < palette.GetSize ()-1 ; idx++)
+  {
+    iImage* map = maps[idx];
+    int mw = map->GetWidth ();
+    int mh = map->GetHeight ();
+    if (w == -1) w = mw;
+    else if (w != mw)
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	  "crystalspace.mesh.bruteblock",
+	  "All alpha maps must have the same size!");
+      return false;
+    }
+    if (h == -1) h = mh;
+    else if (h != mh)
+    {
+      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	  "crystalspace.mesh.bruteblock",
+	  "All alpha maps must have the same size!");
+      return false;
+    }
+    const size_t mapSize = w * h;
+    csArray<char> image_data;
+    image_data.SetSize (mapSize);
+    if (map->GetFormat () & CS_IMGFMT_PALETTED8)
+    {
+      uint8 *data = (uint8 *)map->GetImageData ();
+      for (size_t i = 0; i < mapSize; i ++)
+        image_data[i] = data[i];
+    }
+    else
+    {
+      csRGBpixel *data = (csRGBpixel *)map->GetImageData ();
+      for (size_t i = 0; i < mapSize; i ++)
+        image_data[i] = data[i].Intensity();
+    }
+    image_datas.Push (image_data);
+  }
+
+  for (uint a = 0; a < maps.GetSize(); a++)
+  {
+    csString id = csString("alphamap ");
+    id += a;
+
+    state->SetIntegerMap(strings->Request(id), maps[a]);
+  }  
+
+  return SetCurrentMaterialAlphaMaps (image_datas, w, h);
+}
+
+
+CS_DEPRECATED_METHOD bool csTerrainObject::SetMaterialMap (const 
+csArray<char>& data, int w, int h)
+{
+  csRef<iSimpleFormerState> state = 
+    scfQueryInterface<iSimpleFormerState> (terraformer);
+  if (!state)
+  {
+    csReport(object_reg, CS_REPORTER_SEVERITY_NOTIFY, 
+             "crystalspace.terraformer.paging",
+             "SetMaterialMap can only be used with SimpleFormers."
+             " Use adequate method in the formers for others.");
+    return false;
+  }
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
+
+  csRef<iImage> material = csPtr<iImage> (new csImageMemory (w, h,
+    CS_IMGFMT_PALETTED8));
+
+  csRGBpixel *map = (csRGBpixel *)material->GetImageData ();
+  
+  for (uint a = 0; a < data.GetSize(); a++)
+  {
+    int v = data[a];
+    map->Set(v,v,v,v);
+  }
+
+  state->SetIntegerMap(strings->Request("materialmap"), material);
+
+  return SetCurrentMaterialMap(data, w, h);
+}
+
+
+bool csTerrainObject::SetCurrentMaterialMap (const csArray<char>& data, 
+                                             int w, int h)
+{
+  //use_singlemap = true;
+  //materialMaps.Push (data);
+  materialMapW = w;
+  materialMapH = h;
+  wm = ((float)(materialMapW - 1)) / (region.MaxX() - region.MinX());
+  hm = ((float)(materialMapH - 1)) / (region.MaxY() - region.MinY());
+
+  csRef<iGraphics3D> g3d = 
+    csQueryRegistry<iGraphics3D> (object_reg);
+  csRef<iShaderVarStringSet> stringsSvName = 
+    csQueryRegistryTagInterface<iShaderVarStringSet>
+    (object_reg, "crystalspace.shader.variablenameset");
+  iTextureManager* mgr = g3d->GetTextureManager ();
+
+  csRef<csShaderVariable> lod_var = 
+    new csShaderVariable (stringsSvName->Request ("texture lod distance"));
+  lod_var->SetType (csShaderVariable::VECTOR3);
+  lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
+  baseContext->AddVariable (lod_var);
+
+  globalMaterialsUsed.SetSize (0);
+  for (size_t i = 0; i < palette.GetSize (); i ++) 
+  {
+    csRef<iImage> alpha = csPtr<iImage> (new csImageMemory (w, h, 
+      CS_IMGFMT_ALPHA | CS_IMGFMT_TRUECOLOR));
+
+    csRGBpixel *map = (csRGBpixel *)alpha->GetImageData ();
+    size_t muidx = globalMaterialsUsed.Push (csBitArray ());
+    csBitArray& matused = globalMaterialsUsed[muidx];
+    matused.SetSize (w * h);
+    int y, x;
+    size_t idx = 0;
+    for (y = 0; y < h; y ++) 
+      for (x = 0; x < w; x ++) 
+      {
+        int v = ((unsigned char)data[idx] == i) ? 255 : 0;
+        map[idx].Set (v, v, v, v);
+	matused[idx] = (v != 0);
+	idx++;
+      }
+
+//@@@
+/*
+  csDebugImageWriter a = csDebugImageWriter();
+  csString fn = csString();
+  fn += "material";
+  fn += "-";
+  fn += rand();
+  fn += ".png";
+  a.DebugImageWrite(alpha,fn);
+printf("%s\n",fn.GetData());
+*/
+
+    csRef<iTextureHandle> hdl = mgr->RegisterTexture (alpha, 
+      CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
+    csRef<csShaderVariable> var = 
+      new csShaderVariable (stringsSvName->Request ("splat alpha map"));
+    var->SetType (csShaderVariable::TEXTURE);
+    var->SetValue (hdl);
+    paletteContexts[i]->AddVariable (var);
+
+    csRef<csShaderVariable> lod_var = 
+      new csShaderVariable (stringsSvName->Request ("texture lod distance"));
+    lod_var->SetType (csShaderVariable::VECTOR3);
+    lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
+    paletteContexts[i]->AddVariable (lod_var);
+  }
+  materialAlphaMaps = false;
+
+  return true;
+}
+
+CS_DEPRECATED_METHOD bool csTerrainObject::SetMaterialMap (iImage* map)
+{
+  csRef<iSimpleFormerState> state = 
+    scfQueryInterface<iSimpleFormerState> (terraformer);
+  if (!state)
+  {
+    csReport(object_reg, CS_REPORTER_SEVERITY_NOTIFY, 
+             "crystalspace.terraformer.paging",
+             "SetMaterialMap can only be used with SimpleFormers."
+             " Use adequate method in the formers for others.");
+    return false;
+  }
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
+
+  const size_t mapSize = map->GetWidth() * map->GetHeight();
+  csArray<char> image_data;
+  image_data.SetSize (mapSize);
+  if (map->GetFormat () & CS_IMGFMT_PALETTED8)
+  {
+    uint8 *data = (uint8 *)map->GetImageData ();
+    for (size_t i = 0; i < mapSize; i ++)
+    {
+      image_data[i] = data[i];
+    }
+  }
+  else
+  {
+    csRGBpixel *data = (csRGBpixel *)map->GetImageData ();
+    for (size_t i = 0; i < mapSize; i ++)
+    {
+      image_data[i] = data[i].Intensity();
+    }
+  }
+
+  state->SetIntegerMap(strings->Request("materialmap"), map);
+  return SetCurrentMaterialMap (image_data, map->GetWidth(), map->GetHeight());
+}
+
+void csTerrainObject::SetMaterialMapFile (const char* file, int width,
+  int height, bool raw)
+{
+  materialMapFile = file;
+  materialMapW = width;
+  materialMapH = height;
+  materialMapRaw = raw;
+}
+
+const char* csTerrainObject::GetMaterialMapFile (int& width, int& height,
+  bool& raw)
+{
+  width = materialMapW;
+  height = materialMapH;
+  raw = materialMapRaw;
+  return materialMapFile;
+}
+
+bool csTerrainObject::SetLODValue (const char* parameter, float value)
+{
+  if (strcmp (parameter, "splatting distance") == 0)
+  {
+    lod_distance = value;
+    return true;
+  }
+  else if (strcmp (parameter, "block split distance") == 0)
+  {
+    lod_lcoeff = value;
+    return true;
+  }
+  else if (strcmp (parameter, "minimum block size") == 0)
+  {
+    block_minsize = value;
+    return true;
+  }
+  else if (strcmp (parameter, "block resolution") == 0)
+  {
+    // Make the resolution conform to n^2
+    block_res = csLog2 ((int) value);
+    block_res = (int) ((float)pow (2.0f, block_res));
+    return true;
+  }
+  else if (strcmp (parameter, "cd resolution") == 0)
+  {
+    cd_resolution = int (value);
+    return true;
+  }
+  else if (strcmp (parameter, "cd lod cost") == 0)
+  {
+    cd_lod_cost = value;
+    return true;
+  }
+  else if (strcmp (parameter, "lightmap resolution") == 0)
+  {
+    lmres = int (value);
+    if (staticlighting)
+      staticLights.SetSize (lmres * lmres);
+    return true;
+  }
+  return false;
+}
+
+float csTerrainObject::GetLODValue (const char* parameter) const
+{
+  if (strcmp (parameter, "splatting distance") == 0)
+  {
+    return lod_distance;
+  }
+  else if (strcmp (parameter, "block split distance") == 0)
+  {
+    return lod_lcoeff;
+  }
+  else if (strcmp (parameter, "minimum block size") == 0)
+  {
+    return block_minsize;
+  }
+  else if (strcmp (parameter, "block resolution") == 0)
+  {
+    return block_res;
+  }
+  else if (strcmp (parameter, "cd resolution") == 0)
+  {
+    return float (cd_resolution);
+  }
+  else if (strcmp (parameter, "cd lod cost") == 0)
+  {
+    return cd_lod_cost;
+  }
+  else if (strcmp (parameter, "lightmap resolution") == 0)
+  {
+    return float (lmres);
+  }
+  return 0;
+}
+
+
+/*static void Perspective (const csVector3& v, csVector2& p, float fov,
+                         float sx, float sy)
+{
+  float iz = fov / v.z;
+  p.x = v.x * iz + sx;
+  p.y = v.y * iz + sy;
+}*/
+
+/*bool csTerrainObject::BBoxVisible (const csBox3& bbox,
+                                    iRenderView* rview, iCamera* camera,
+                                    int& clip_portal, 
+                                    int& clip_plane, 
+                                    int& clip_z_plane)
+{
+  csReversibleTransform& camtrans = camera->GetTransform ();
+  float fov = camera->GetFOV ();
+  float sx = camera->GetShiftX ();
+  float sy = camera->GetShiftY ();
+
+  // first compute camera and screen space bounding boxes.
+  csBox3 cbox;
+  cbox.StartBoundingBox (camtrans * bbox.GetCorner (0));
+  cbox.AddBoundingVertexSmart (camtrans * bbox.GetCorner (1));
+  cbox.AddBoundingVertexSmart (camtrans * bbox.GetCorner (2));
+  cbox.AddBoundingVertexSmart (camtrans * bbox.GetCorner (3));
+  cbox.AddBoundingVertexSmart (camtrans * bbox.GetCorner (4));
+  cbox.AddBoundingVertexSmart (camtrans * bbox.GetCorner (5));
+  cbox.AddBoundingVertexSmart (camtrans * bbox.GetCorner (6));
+  cbox.AddBoundingVertexSmart (camtrans * bbox.GetCorner (7));
+
+  // if the entire bounding box is behind the camera, we're done.
+  if ((cbox.MinZ () < 0) && (cbox.MaxZ () < 0))
+    return false;
+
+  // Transform from camera to screen space.
+  csBox2 sbox;
+  if (cbox.MinZ () <= 0)
+  {
+    // Bbox is very close to camera.
+    // Just return a maximum bounding box.
+    sbox.Set (-10000, -10000, 10000, 10000);
+  }
+  else
+  {
+    csVector2 oneCorner;
+    Perspective (cbox.Max (), oneCorner, fov, sx, sy);
+    sbox.StartBoundingBox (oneCorner);
+    csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
+    Perspective (v, oneCorner, fov, sx, sy);
+    sbox.AddBoundingVertexSmart (oneCorner);
+    Perspective (cbox.Min (), oneCorner, fov, sx, sy);
+    sbox.AddBoundingVertexSmart (oneCorner);
+    v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
+    Perspective (v, oneCorner, fov, sx, sy);
+    sbox.AddBoundingVertexSmart (oneCorner);
+  }
+
+  return rview->ClipBBox (sbox, cbox, clip_portal, 
+                                      clip_plane, 
+                                      clip_z_plane);
+}
+
+void csTerrainObject::TestVisibility (iRenderView* rview)
+{
+
+  //iCamera* camera = rview->GetCamera ();
+  const csReversibleTransform& camtrans = camera->GetTransform ();
+  const csVector3& origin = camtrans.GetOrigin ();
+  //quadtree->ComputeVisibility (origin, global_bbox, horizon, CS_HORIZON_SIZE);
+}*/
+
+
+bool csTerrainObject::DrawTest (iRenderView* rview, iMovable* movable, 
+                                uint32 /*frustummask*/)
+{
+  if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
+
+  bool rmCreated;
+  returnMeshes = &returnMeshesHolder.GetUnusedData (rmCreated, 
+    rview->GetCurrentFrameNumber ());
+  returnMeshes->Empty ();
+
+  iCamera* cam = rview->GetCamera ();
+  tr_o2c = cam->GetTransform ();
+  
+  if (!movable->IsFullTransformIdentity ())
+    tr_o2c /= movable->GetFullTransform ();
+  
+  UpdateColors (movable);
+
+  rootblock->CalcLOD ();
+
+  uint32 frustum_mask;
+  CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext (),
+      tr_o2c, planes, frustum_mask);
+
+  //rendermeshes.Empty ();
+  rootblock->DrawTest (g3d, rview, frustum_mask, tr_o2c, movable);
+  if (staticlighting)
+    rootblock->UpdateStaticLighting ();
+
+  if (returnMeshes->GetSize () == 0)
+    return false;
+
+  return true;
+}
+
+void csTerrainObject::UpdateLighting (iLight**, int,
+                                       iMovable*)
+{
+  // @@@ Can we do something more sensible here?
+  return;
+}
+
+csRenderMesh** csTerrainObject::GetRenderMeshes (int &n,
+                                                 iRenderView* rview,
+                                                 iMovable* movable, 
+                                                 uint32 frustum_mask)
+{
+  SetupObject();
+  DrawTest (rview, movable, frustum_mask);
+  n = (int)returnMeshes->GetSize ();
+  return returnMeshes->GetArray ();
+}
+
+const csBox3& csTerrainObject::GetObjectBoundingBox ()
+{
+  SetupObject ();
+  return global_bbox;
+}
+
+void csTerrainObject::SetObjectBoundingBox (const csBox3& bbox)
+{
+  global_bbox = bbox;
+  ShapeChanged ();
+}
+
+void csTerrainObject::GetRadius (float& rad, csVector3& cent)
+{
+  const csBox3& bbox = GetObjectBoundingBox ();
+  cent = bbox.GetCenter ();
+  rad = csQsqrt (csSquaredDist::PointPoint (bbox.Max (), bbox.Min ()));
+}
+
+int csTerrainObject::CollisionDetect (iMovable* m, csTransform* transform)
+{
+  csVector3 p = transform->GetOrigin() - m->GetPosition ();
+
+  csVector3 d;
+  terraformer->SampleVector3 (vertices_name, p.x, p.z, d);
+
+  // @@@ The +2 seems pretty ugly, but seems to be needed, at least for
+  // walktest
+  d.y -= 2;
+  if (d.y > p.y)
+  {
+    transform->SetOrigin (d + m->GetPosition ());
+    return 1;
+  } 
+  else 
+  {
+    return 0;
+  }
+}
+
+static bool VertSegmentPlane (
+  const csVector3 &u,
+  const csVector3 &v,
+  const csPlane3 &p,
+  csVector3 &isect,
+  float &dist)
+{
+  float uv = u.y - v.y;
+  float denom = p.norm.y * uv;
+  if (denom == 0)
+  {
+    // they are parallel
+    dist = 0; //'dist' is an output arg, so it must be initialized.
+    isect = v;
+    return false;
+  }
+  dist = (p.norm * u + p.DD) / denom;
+  if (dist < -SMALL_EPSILON || dist > 1 + SMALL_EPSILON) 
+  {
+    isect = 0;//'isect' is an output arg, so it must be initialized.
+    return false;
+  }
+
+  isect.Set (u.x, u.y - dist * uv, u.z);
+  return true;
+}
+
+static int VertWhichSide3D (const csVector2& v,
+                          const csVector3& s1, const csVector3& s2)
+{
+  float k  = (s1.z - v.y)*(s2.x - s1.x);
+  float k1 = (s1.x - v.x)*(s2.z - s1.z);
+  if (k < k1) return -1;
+  else if (k > k1) return 1;
+  else return 0;
+}
+
+static bool VertSegmentTriangle (
+  const csSegment3 &seg,
+  const csVector3 &tr1,
+  const csVector3 &tr2,
+  const csVector3 &tr3,
+  csVector3 &isect)
+{
+  csVector2 loc (seg.Start ().x, seg.Start ().z);
+  int test1 = VertWhichSide3D (loc, tr3, tr1);
+  int test2 = VertWhichSide3D (loc, tr1, tr2);
+  if (test1 != test2 && test1 != 0 && test2 != 0) return false;
+  int test3 = VertWhichSide3D (loc, tr2, tr3);
+  if (test3 != 0 && (test3 == -test1 || test3 == -test2)) return false;
+
+  csPlane3 plane (tr1, tr2, tr3);
+  float dist;
+  if (!VertSegmentPlane (seg.Start (), seg.End (), plane, isect, dist))
+    return false;
+
+  return true;
+}
+
+bool csTerrainObject::HitBeamVertical (csTerrBlock* block,
+	const csSegment3& seg,
+	csVector3& isect, float* pr)
+{
+  const csVector3& start = seg.Start ();
+  const csVector3& end = seg.End ();
+  const csBox3& b = block->bbox;
+  if (start.x < b.MinX ()) return false;
+  if (start.x > b.MaxX ()) return false;
+  if (start.z < b.MinZ ()) return false;
+  if (start.z > b.MaxZ ()) return false;
+
+  // We have a hit.
+  if (block->IsLeaf ())
+  {
+    // Check the triangles.
+    if (block->built == false) block->LoadData();
+    csVector3* vt = block->vertex_data;
+    int res = block->res;
+    int x, y;
+    float tot_dist = fabs (end.y-start.y);
+    float dist, temp;
+    float itot_dist = 1 / tot_dist;
+    dist = temp = tot_dist;
+    csVector3 tmp;
+    for (y = 0 ; y < res-1 ; y++)
+    {
+      int yr = y * res;
+      for (x = 0 ; x < res-1 ; x++)
+      {
+        if (VertSegmentTriangle (seg, vt[yr+x],
+		vt[yr+res+x], vt[yr+x+1], tmp))
+	{
+          temp = fabs (tmp.y-start.y);
+          if (temp < dist)
+          {
+            isect = tmp;
+	    dist = temp;
+	    goto done;
+          }
+	}
+        if (VertSegmentTriangle (seg, vt[yr+x+1],
+		vt[yr+res+x], vt[yr+res+x+1], tmp))
+	{
+          temp = fabs (tmp.y-start.y);
+          if (temp < dist)
+          {
+            isect = tmp;
+	    dist = temp;
+	    goto done;
+          }
+	}
+      }
+    }
+done:
+    if (pr) *pr = dist * itot_dist;
+    if (dist >= tot_dist)
+      return false;
+    return true;
+  }
+  else
+  {
+    // Check the children.
+    if (HitBeamVertical (block->children[0], seg, isect, pr))
+      return true;
+    if (HitBeamVertical (block->children[1], seg, isect, pr))
+      return true;
+    if (HitBeamVertical (block->children[2], seg, isect, pr))
+      return true;
+    if (HitBeamVertical (block->children[3], seg, isect, pr))
+      return true;
+  }
+  return false;
+}
+
+bool csTerrainObject::HitBeam (csTerrBlock* block,
+	const csSegment3& seg,
+	csVector3& isect, float* pr)
+{
+  if (csIntersect3::BoxSegment (block->bbox, seg, isect) == -1)
+  {
+    return false;
+  }
+
+  // We have a hit.
+  if (block->IsLeaf ())
+  {
+    // Check the triangles.
+    if (block->built == false) block->LoadData();
+    csVector3* vt = block->vertex_data;
+    int res = block->res;
+    int x, y;
+    float tot_dist = csSquaredDist::PointPoint (seg.Start (), seg.End ());
+    float dist, temp;
+    float itot_dist = 1 / tot_dist;
+    dist = temp = tot_dist;
+    csVector3 tmp;
+    for (y = 0 ; y < res-1 ; y++)
+    {
+      int yr = y * res;
+      for (x = 0 ; x < res-1 ; x++)
+      {
+        if (csIntersect3::SegmentTriangle (seg, vt[yr+x],
+		vt[yr+res+x], vt[yr+x+1], tmp))
+	{
+          temp = csSquaredDist::PointPoint (seg.Start (), tmp);
+          if (temp < dist)
+          {
+            isect = tmp;
+	    dist = temp;
+          }
+	}
+        if (csIntersect3::SegmentTriangle (seg, vt[yr+x+1],
+		vt[yr+res+x], vt[yr+res+x+1], tmp))
+	{
+          temp = csSquaredDist::PointPoint (seg.Start (), tmp);
+          if (temp < dist)
+          {
+            isect = tmp;
+	    dist = temp;
+          }
+	}
+      }
+    }
+    if (pr) *pr = csQsqrt (dist * itot_dist);
+    if (dist >= tot_dist)
+      return false;
+    return true;
+  }
+  else
+  {
+    // Check the children.
+    if (HitBeam (block->children[0], seg, isect, pr))
+      return true;
+    if (HitBeam (block->children[1], seg, isect, pr))
+      return true;
+    if (HitBeam (block->children[2], seg, isect, pr))
+      return true;
+    if (HitBeam (block->children[3], seg, isect, pr))
+      return true;
+  }
+  return false;
+}
+
+bool csTerrainObject::HitBeamOutline (const csVector3& start,
+                                       const csVector3& end, 
+                                       csVector3& isect, float* pr)
+{
+  csSegment3 seg (start, end);
+
+  if(!rootblock)
+	  SetupObject();
+
+  if (fabs (start.x-end.x) < .00001 && fabs (start.z-end.z) < .00001)
+  {
+    // We're dealing with a vertical segment. For that we have a more optimal
+    // way to check intersection.
+    return HitBeamVertical (rootblock, seg, isect, pr);
+  }
+  else
+  {
+    return HitBeam (rootblock, seg, isect, pr);
+  }
+}
+
+bool csTerrainObject::HitBeamObject (const csVector3& start,
+                                     const csVector3& end, 
+                                     csVector3& isect, float* pr,
+                                     int* polygon_idx,
+				                             iMaterialWrapper** material,
+                                     csArray<iMaterialWrapper*>* materials)
+{
+  if (polygon_idx) *polygon_idx = -1;
+  csSegment3 seg (start, end);
+  bool rc;
+
+  if(!rootblock)
+	  SetupObject();
+
+  if (fabs (start.x-end.x) < .00001 && fabs (start.z-end.z) < .00001)
+  {
+    // We're dealing with a vertical segment. For that we have a more optimal
+    // way to check intersection.
+    rc = HitBeamVertical (rootblock, seg, isect, pr);
+  }
+  else
+  {
+    rc = HitBeam (rootblock, seg, isect, pr);
+  }
+  if (material && rc)
+  {
+    int x = int ((isect.x - region.MinX ()) * wm);
+    int y = materialMapH - int ((isect.z - region.MinY ()) * hm);
+    if (x < 0) x = 0; else if (x > materialMapW-1) x = materialMapW-1;
+    if (y < 0) y = 0; else if (y > materialMapH-1) y = materialMapH-1;
+    size_t i;
+    int idx = y * materialMapW + x;
+    for (i = 0 ; i < globalMaterialsUsed.GetSize () ; i++)
+    {
+      const csBitArray& bits = globalMaterialsUsed[i];
+      if (bits[idx])
+      {
+        *material = palette[i];
+	return rc;
+      }
+    }
+    *material = 0;
+  }
+  return rc;
+}
+
+void csTerrainObject::BuildDecal(const csVector3* pos, float decalRadius,
+          iDecalBuilder* decalBuilder)
+{
+  const int res = ((int)(decalRadius * 2.0f * (float)block_res / block_minsize) + 1) * 3;
+  const float heightAdjust = decalRadius * 0.01f; 
+  csBox2 region(pos->x - decalRadius, pos->z - decalRadius, pos->x + decalRadius, pos->z + decalRadius);
+  csRef<iTerraSampler> s = terraformer->GetSampler(region, res, res);
+  const csVector3 * verts = s->SampleVector3(stringVertices);
+
+  csPoly3D poly;
+  poly.SetVertexCount(4);
+
+  for (int y=0; y<res-1; ++y)
+  {
+    for (int x=0; x<res-1; ++x)
+    {
+      const int bottomLeft = (y+1)*res + x;
+      const int topLeft = y*res + x;
+      poly[0] = verts[bottomLeft];
+      poly[1] = verts[bottomLeft+1];
+      poly[2] = verts[topLeft+1];
+      poly[3] = verts[topLeft];
+
+      poly[0].y += heightAdjust;
+      poly[1].y += heightAdjust;
+      poly[2].y += heightAdjust;
+      poly[3].y += heightAdjust;
+
+      decalBuilder->AddStaticPoly(poly);
+    }
+  }
+}
+
+//----------------------------------------------------------------------
+
+csTerrainFactory::csTerrainFactory (iObjectRegistry* object_reg,
+	iMeshObjectType* parent) : scfImplementationType (this)
+{
+  csTerrainFactory::object_reg = object_reg;
+  logparent = 0;
+  brute_type = parent;
+				
+  /*terraformer = 
+    csQueryRegistryTagInterface<iTerraFormer> (object_reg, "terrain");*/
+
+  scale = csVector3(1);
+  light_mgr = csQueryRegistry<iLightManager> (object_reg);
+  engine = csQueryRegistry<iEngine> (object_reg);
+}
+
+csTerrainFactory::~csTerrainFactory ()
+{
+}
+
+csPtr<iMeshObject> csTerrainFactory::NewInstance ()
+{
+  csTerrainObject* pTerrObj = new csTerrainObject (object_reg, this);
+  return csPtr<iMeshObject> (pTerrObj);
+}
+
+void csTerrainFactory::SetTerraFormer (iTerraFormer* form)
+{
+  terraformer = form;
+}
+
+iTerraFormer* csTerrainFactory::GetTerraFormer ()
+{
+  return terraformer;
+}
+
+void csTerrainFactory::SetSamplerRegion (const csBox2& region)
+{
+  samplerRegion = region;
+  // @@@ Add better control over resolution?
+  int resolution = (int)(region.MaxX () - region.MinX ());
+  // Make the resolution conform to 2^n+1
+  resolution = csLog2 (resolution);
+  resolution = (1 << resolution) + 1;
+
+  hm_x = hm_y = resolution;
+}
+
+const csBox2& csTerrainFactory::GetSamplerRegion ()
+{
+  return samplerRegion;
+}
+
+//----------------------------------------------------------------------
+
+SCF_IMPLEMENT_FACTORY (csTerrainObjectType)
+
+csTerrainObjectType::csTerrainObjectType (iBase* pParent) :
+  scfImplementationType(this, pParent)
+{
+}
+
+csTerrainObjectType::~csTerrainObjectType ()
+{
+}
+
+csPtr<iMeshObjectFactory> csTerrainObjectType::NewFactory()
+{
+  csTerrainFactory *pFactory = new csTerrainFactory (object_reg, this);
+  return csPtr<iMeshObjectFactory> (pFactory);
+}
+
+}
+CS_PLUGIN_NAMESPACE_END(BruteBlock)

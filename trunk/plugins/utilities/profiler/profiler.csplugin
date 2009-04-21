@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- profiler.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.utilities.profiler</name>
+        <implementation>ProfilerFactory</implementation>
+        <description>Profiling utility</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

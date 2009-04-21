@@ -1,0 +1,10 @@
+SubDir TOP plugins video canvas ;
+
+SubInclude TOP plugins video canvas embedgl ;
+SubInclude TOP plugins video canvas macosx ;
+SubInclude TOP plugins video canvas null2d ;
+SubInclude TOP plugins video canvas openglwin ;
+SubInclude TOP plugins video canvas openglx ;
+SubInclude TOP plugins video canvas wxgl ;
+SubInclude TOP plugins video canvas xextf86vm ;
+SubInclude TOP plugins video canvas xwindow ;

@@ -1,0 +1,18 @@
+<shader compiler="xmlshader" name="postproc_gauss_v">
+  <technique priority="200">
+    <pass>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <texture destination="Texture1" name="tex diffuse" />
+      <fp plugin="glcg">
+	<cgfp>
+	  <variablemap variable="pixel size" destination="pixelSize" />
+	  <variablemap name="direction" destination="direction" type="vector2">0,1</variablemap>
+	  <variablemap name="radius" destination="radius" type="float">6</variablemap>
+	  <program>
+	    <?Include gauss.cginc ?>
+	  </program>
+	</cgfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>

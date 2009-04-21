@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- spr3d.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.sprite.cal3d</name>
+        <implementation>csSpriteCal3DMeshObjectType</implementation>
+        <description>Crystal Space SpriteCal3D Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

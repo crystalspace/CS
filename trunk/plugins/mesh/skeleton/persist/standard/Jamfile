@@ -1,0 +1,11 @@
+SubDir TOP plugins mesh skeleton persist standard ;
+
+Description skelldr : "Skeleton object loader" ;
+
+Plugin skelldr
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith skelldr : crystalspace ;
+
+CompileGroups skelldr :  meshes ;
+

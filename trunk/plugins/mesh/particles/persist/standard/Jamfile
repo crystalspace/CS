@@ -1,0 +1,11 @@
+SubDir TOP plugins mesh particles persist standard ;
+
+Description particlesldr : "Particle system object loader" ;
+
+Plugin particlesldr
+	: [ Wildcard *.cpp *.h ]
+;
+Includes particlesldr.h : $(SUBDIR)/particlesldr.tok ;
+LinkWith particlesldr : crystalspace ;
+
+CompileGroups particlesldr :  meshes ;

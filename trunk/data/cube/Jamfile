@@ -1,0 +1,4 @@
+SubDir TOP data cube ;
+
+InstallData [ Wildcard *.jpg ] : data cube ;
+FileListEntriesData [ Wildcard *.jpg ] : cube : data-demo ;

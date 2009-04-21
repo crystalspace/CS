@@ -1,0 +1,8 @@
+SubDir TOP plugins sequence ;
+
+Description sequence : "Sequence Manager plugin" ;
+
+Plugin sequence
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith sequence : crystalspace ;

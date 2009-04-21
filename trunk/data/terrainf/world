@@ -1,0 +1,454 @@
+<?xml ?>
+<world>
+    <variables>
+        <variable name="LodM" value="-0.00666667" />
+        <variable name="LodA" value="1.33333" />
+    </variables>
+    <plugins>
+        <plugin name="genmeshFactory">crystalspace.mesh.loader.factory.genmesh</plugin>
+        <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
+        <!--<plugin name="terrainFact">crystalspace.mesh.loader.factory.terrain</plugin>
+	<plugin name="terrain">crystalspace.mesh.loader.terrain</plugin>-->
+        <plugin name="terrainFact">crystalspace.mesh.loader.factory.terrain2</plugin>
+        <plugin name="terrain">crystalspace.mesh.loader.terrain2</plugin>
+        <plugin name="foliageFact">crystalspace.mesh.loader.factory.foliage</plugin>
+        <plugin name="foliage">crystalspace.mesh.loader.foliage</plugin>
+        <!--
+    <plugin name="instFact">crystalspace.mesh.loader.factory.instmesh</plugin>
+    <plugin name="inst">crystalspace.mesh.loader.instmesh</plugin>
+    -->
+    </plugins>
+    <library>lightmaps.cslib</library>
+    <textures>
+        <texture name="andrew_marble4.jpg">
+            <file>/lib/stdtex/andrew_marble4.jpg</file>
+        </texture>
+        <texture name="stone4.gif">
+            <file>/lib/std/stone4.gif</file>
+        </texture>
+        <texture name="grass.png">
+            <file>/lev/terrain/grass.png</file>
+        </texture>
+        <texture name="materialmap_base.png">
+            <file>materialmap_base.png</file>
+        </texture>
+        <texture name="clouds">
+            <file>clouddome.jpg</file>
+        </texture>
+        <texture name="sky_up">
+            <file>skybox_u.jpg</file>
+        </texture>
+        <texture name="sky_down">
+            <file>skybox_d.jpg</file>
+        </texture>
+        <texture name="sky_left">
+            <file>skybox_l.jpg</file>
+        </texture>
+        <texture name="sky_right">
+            <file>skybox_r.jpg</file>
+        </texture>
+        <texture name="sky_front">
+            <file>skybox_f.jpg</file>
+        </texture>
+        <texture name="sky_back">
+            <file>skybox_b.jpg</file>
+        </texture>
+    </textures>
+    <shaders>
+        <shader>
+            <file>/shader/terrain_fixed_base.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/terrain_fixed_splatting.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/lighting/fullbright.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/lighting/lighting_default_instance.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/lighting/lighting_default_instance_binalpha.xml</file>
+        </shader>
+    </shaders>
+    <materials>
+        <material name="ScatterSky">
+            <color red="0" green="0" blue="0" />
+        </material>
+        <material name="Base">
+            <texture>materialmap_base.png</texture>
+            <shader type="ambient">terrain_fixed_base</shader>
+        </material>
+        <material name="Marble">
+            <texture>andrew_marble4.jpg</texture>
+            <shadervar name="texture scale" type="vector2">32,32</shadervar>
+            <shader type="terrain splat">terrain_fixed_splatting</shader>
+        </material>
+        <material name="Stone">
+            <texture>stone4.gif</texture>
+            <shadervar name="texture scale" type="vector2">128,128</shadervar>
+            <shader type="terrain splat">terrain_fixed_splatting</shader>
+        </material>
+        <material name="Grass">
+            <texture>grass.png</texture>
+            <shadervar name="texture scale" type="vector2">256,256</shadervar>
+            <shader type="terrain splat">terrain_fixed_splatting</shader>
+        </material>
+        <material name="box1">
+            <texture>grass.png</texture>
+        </material>
+        <material name="box2">
+            <texture>andrew_marble4.jpg</texture>
+        </material>
+        <material name="clouds">
+            <texture>clouds</texture>
+	    <shader type="base">lighting_fullbright</shader>
+        </material>
+        <material name="sky_up">
+            <texture>sky_up</texture>
+	    <shader type="base">lighting_fullbright</shader>
+        </material>
+        <material name="sky_down">
+            <texture>sky_down</texture>
+	    <shader type="base">lighting_fullbright</shader>
+        </material>
+        <material name="sky_left">
+            <texture>sky_left</texture>
+	    <shader type="base">lighting_fullbright</shader>
+        </material>
+        <material name="sky_right">
+            <texture>sky_right</texture>
+	    <shader type="base">lighting_fullbright</shader>
+        </material>
+        <material name="sky_front">
+            <texture>sky_front</texture>
+	    <shader type="base">lighting_fullbright</shader>
+        </material>
+        <material name="sky_back">
+            <texture>sky_back</texture>
+	    <shader type="base">lighting_fullbright</shader>
+        </material>
+    </materials>
+    <library>grass.lib</library>
+    <library>rock.lib</library>
+    <library>tree.lib</library>
+    <library>tree_skimp.lib</library>
+    <library>treebark_bare.lib</library>
+    <library>bush2.lib</library>
+    <addon>
+        <plugin>crystalspace.renderloop.loop.loader</plugin>
+        <paramsfile>/shader/std_rloop_terrainfixed.xml</paramsfile>
+    </addon>
+    <settings>
+        <clearzbuf>yes</clearzbuf>
+        <renderloop>std_rloop_terrainfixed</renderloop>
+    </settings>
+    <start>
+        <sector>room</sector>
+        <position x="0" y="30" z="0" />
+        <forward x="0" y="0" z="1" />
+        <up x="0" y="1" z="0" />
+    </start>
+    <meshfact name="skydome">
+        <plugin>genmeshFactory</plugin>
+        <nolighting />
+        <params>
+            <sphere rimvertices="6" reversed="true">
+                <radius x="1000" y="1000" z="1000" />
+            </sphere>
+        </params>
+    </meshfact>
+    <!--
+    <addon plugin="crystalspace.terraformer.simple.loader">
+        <name>simple</name>
+        <heightmap>/lev/terrain/heightmap_257x257.png</heightmap>
+        <scale x="256" y="32" z="256" />
+        <materialmap image="/lev/terrain/materialmap.png" />
+    </addon>
+    -->
+    <meshfact name="TerrainFact">
+        <plugin>terrainFact</plugin>
+        <params>
+            <renderer>crystalspace.mesh.object.terrain2.bruteblockrenderer</renderer>
+            <collider>crystalspace.mesh.object.terrain2.collider</collider>
+            <feeder>crystalspace.mesh.object.terrain2.simpledatafeeder</feeder>
+            <maxloadedcells>-1</maxloadedcells>
+            <cells>
+                <celldefault>
+                    <gridsize width="257" height="257" />
+                    <materialmapsize width="512" height="512" />
+                    <size x="256" y="15" z="256" />
+                </celldefault>
+                <cell>
+                    <name>0</name>
+                    <position x="-127" y="-127" />
+                    <basematerial>Base</basematerial>
+                    <feederproperties>
+                        <param name="heightmap source">/lev/terrain/heightmap.png</param>
+                        <param name="materialmap source">/lev/terrain/materialmap.png</param>
+                    </feederproperties>
+                </cell>
+            </cells>
+        </params>
+    </meshfact>
+    <meshfact name="factory_room_sky">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <nolighting />
+        <params>
+            <numvt>24</numvt>
+            <v x="-1000" y="1000" z="-1000" u="0.005" v="0.005" />
+            <v x="-1000" y="1000" z="1000" u="0.995" v="0.005" />
+            <v x="-1000" y="-1000" z="1000" u="0.995" v="0.995" />
+            <v x="-1000" y="-1000" z="-1000" u="0.00500003" v="0.995" />
+            <v x="-1000" y="1000" z="1000" u="0.005" v="0.005" />
+            <v x="1000" y="1000" z="1000" u="0.995" v="0.005" />
+            <v x="1000" y="-1000" z="1000" u="0.995" v="0.995" />
+            <v x="-1000" y="-1000" z="1000" u="0.00500003" v="0.995" />
+            <v x="-1000" y="1000" z="-1000" u="0.005" v="0.005" />
+            <v x="1000" y="1000" z="-1000" u="0.995" v="0.005" />
+            <v x="1000" y="1000" z="1000" u="0.995" v="0.995" />
+            <v x="-1000" y="1000" z="1000" u="0.00500003" v="0.995" />
+            <v x="1000" y="-1000" z="-1000" u="0.005" v="0.005" />
+            <v x="-1000" y="-1000" z="-1000" u="0.995" v="0.005" />
+            <v x="-1000" y="-1000" z="1000" u="0.995" v="0.995" />
+            <v x="1000" y="-1000" z="1000" u="0.00500003" v="0.995" />
+            <v x="1000" y="1000" z="1000" u="0.005" v="0.005" />
+            <v x="1000" y="1000" z="-1000" u="0.995" v="0.005" />
+            <v x="1000" y="-1000" z="-1000" u="0.995" v="0.995" />
+            <v x="1000" y="-1000" z="1000" u="0.00500003" v="0.995" />
+            <v x="1000" y="1000" z="-1000" u="0.005" v="0.005" />
+            <v x="-1000" y="1000" z="-1000" u="0.995" v="0.005" />
+            <v x="-1000" y="-1000" z="-1000" u="0.995" v="0.995" />
+            <v x="1000" y="-1000" z="-1000" u="0.00500003" v="0.995" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="0" y="0" z="-1" />
+            <n x="0" y="0" z="-1" />
+            <n x="0" y="0" z="-1" />
+            <n x="0" y="0" z="-1" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <submesh name="0">
+                <material>sky_left</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="0">
+                <material>sky_front</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="4" />
+                    <e c0="5" />
+                    <e c0="6" />
+                    <e c0="4" />
+                    <e c0="6" />
+                    <e c0="7" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="0">
+                <material>sky_down</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="12" />
+                    <e c0="13" />
+                    <e c0="14" />
+                    <e c0="12" />
+                    <e c0="14" />
+                    <e c0="15" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="0">
+                <material>sky_back</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="20" />
+                    <e c0="21" />
+                    <e c0="22" />
+                    <e c0="20" />
+                    <e c0="22" />
+                    <e c0="23" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="0">
+                <material>sky_right</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="16" />
+                    <e c0="17" />
+                    <e c0="18" />
+                    <e c0="16" />
+                    <e c0="18" />
+                    <e c0="19" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="0">
+                <material>sky_up</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="8" />
+                    <e c0="9" />
+                    <e c0="10" />
+                    <e c0="8" />
+                    <e c0="10" />
+                    <e c0="11" />
+                </indexbuffer>
+            </submesh>
+        </params>
+    </meshfact>
+    <sector name="room">
+        <light name="sun">
+            <center x="-50000" y="86030" z="0" />
+            <color red="1.25903" green="1.20995" blue="1.10420" />
+            <radius>1000000</radius>
+        </light>
+        <meshobj name="Terrain">
+            <plugin>terrain</plugin>
+            <params>
+                <factory>TerrainFact</factory>
+                <materialpalette>
+                    <material>Grass</material>
+                    <material>Marble</material>
+                    <material>Stone</material>
+                </materialpalette>
+                <cells>
+                    <cell>
+                        <name>0</name>
+                        <renderproperties>
+                            <shadervar name="texture lod distance" type="vector3">200.000000,200.000000,200.000000</shadervar>
+                            <shadervar name="tex lightmap" type="texture">lightmaps_terrainf_0_png</shadervar>
+                        </renderproperties>
+                    </cell>
+                </cells>
+            </params>
+            <move>
+                <v x="0" y="0" z="0" />
+            </move>
+            <priority>wall</priority>
+            <staticlit />
+        </meshobj>
+        <meshobj name="clouds">
+            <plugin>genmesh</plugin>
+            <params>
+                <factory>skydome</factory>
+                <mixmode>
+                    <add />
+                </mixmode>
+                <material>clouds</material>
+                <lighting>no</lighting>
+                <color red="0.5" green="0.5" blue="0.5" />
+            </params>
+            <znone />
+            <priority>portal</priority>
+            <noshadows />
+            <camera />
+        </meshobj>
+        <meshobj name="sky">
+            <noshadows />
+            <plugin>crystalspace.mesh.loader.genmesh</plugin>
+            <params>
+                <factory>factory_room_sky</factory>
+                <color red="1" green="1" blue="1" />
+                <manualcolors />
+                <mixmode>
+                    <copy />
+                </mixmode>
+            </params>
+            <camera />
+            <zfill />
+            <priority>sky</priority>
+        </meshobj>
+        <key name="cmd_AnimateSky" value="clouds,y,.005" />
+        <meshgen name="grass">
+            <geometry>
+                <factory maxdist="30" name="treebark_bare" />
+                <radius>1</radius>
+                <density>0.02</density>
+                <materialfactor material="Grass" factor=".4" />
+                <defaultmaterialfactor>.7</defaultmaterialfactor>
+            </geometry>
+            <geometry>
+                <factory maxdist="30" name="tree" />
+                <radius>1</radius>
+                <density>0.02</density>
+                <materialfactor material="Grass" factor="1" />
+                <defaultmaterialfactor>.1</defaultmaterialfactor>
+            </geometry>
+            <geometry>
+                <factory maxdist="30" name="tree_skimp" />
+                <radius>1</radius>
+                <density>0.01</density>
+                <materialfactor material="Grass" factor="1" />
+                <defaultmaterialfactor>.1</defaultmaterialfactor>
+            </geometry>
+            <geometry>
+                <factory maxdist="10" name="Grass" />
+                <factory maxdist="30" name="GrassLow" />
+                <radius>10</radius>
+                <density>1</density>
+                <!-- bugged? <materialfactor material="Grass" factor="1" /> -->
+                <defaultmaterialfactor>.1</defaultmaterialfactor>
+            </geometry>
+            <geometry>
+                <factory maxdist="30" name="bush2" />
+                <radius>1</radius>
+                <density>0.4</density>
+                <materialfactor material="Marble" factor="1" />
+                <materialfactor material="Stone" factor="1" />
+                <defaultmaterialfactor>.1</defaultmaterialfactor>
+            </geometry>
+            <geometry>
+                <factory maxdist="10" name="TallGrass" />
+                <factory maxdist="30" name="TallGrassLow" />
+                <radius>10</radius>
+                <density>.1</density>
+                <!-- bugged? <materialfactor material="Grass" factor="1" /> -->
+                <defaultmaterialfactor>.1</defaultmaterialfactor>
+            </geometry>
+            <geometry>
+                <factory maxdist="30" name="Rock" />
+                <radius>1</radius>
+                <density>.01</density>
+                <materialfactor material="Marble" factor="1" />
+                <materialfactor material="Stone" factor="0" />
+                <defaultmaterialfactor>.3</defaultmaterialfactor>
+            </geometry>
+            <geometry>
+                <factory maxdist="30" name="RockSmall" />
+                <radius>1</radius>
+                <density>.10</density>
+                <materialfactor material="Marble" factor="1" />
+                <materialfactor material="Stone" factor="0" />
+                <defaultmaterialfactor>.3</defaultmaterialfactor>
+            </geometry>
+            <!--<densityscale mindist="26" maxdist="30" maxfactor="0" />-->
+            <alphascale mindist="22" maxdist="30" />
+            <samplebox>
+                <min x="-256" y="-200" z="-256" />
+                <max x="256" y="200" z="256" />
+            </samplebox>
+            <meshobj>Terrain</meshobj>
+        </meshgen>
+        <!-- Uncomment for ...fog: -->
+        <!--fog red=".3" green=".27" blue=".27" density="0.002" /-->
+    </sector>
+</world>

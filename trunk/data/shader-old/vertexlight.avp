@@ -1,0 +1,143 @@
+<arbvp>
+  <description>Simple Vertex Lighting Program</description>
+
+  <variablemap variable="light 0 position" destination="register 0"/>
+  <variablemap variable="light 0 diffuse" destination="register 1"/>
+  <variablemap variable="light 0 specular" destination="register 2"/>
+  <variablemap variable="light 0 attenuation" destination="register 3"/>
+  
+  <variablemap variable="mat diffuse" destination="register 4"/>
+  <variablemap variable="mat ambient" destination="register 5"/>
+  <variablemap variable="mat reflection" destination="register 6"/>
+  <variablemap variable="mat flatcolor" destination="register 7"/>
+  
+  <variablemap variable="mat specular" destination="register 8"/>
+  <program>
+    <![CDATA[
+      !!ARBvp1.0
+      #---------------------------------------
+      # Simple Vertex Lighting Program
+      #---------------------------------------
+      #Parameter definition
+      PARAM mv[4]	     	= { state.matrix.modelview };
+      PARAM mvi[4]	 	= { state.matrix.modelview.invtrans };
+      PARAM mvp[4]	     	= { state.matrix.mvp };
+      PARAM lightPos   		= program.local[0];
+      PARAM lightDiffuse 	= program.local[1];
+      PARAM lightSpecular 	= program.local[2];
+      PARAM lightAttenuation 	= program.local[3];
+      
+      PARAM materialDiffuse	= program.local[4];
+      PARAM materialAmbient	= program.local[5];
+      PARAM materialReflection	= program.local[6];
+      PARAM materialFlatColor 	= program.local[7];
+      PARAM materialSpecular 	= program.local[8];
+      # Per vertex inputs
+      ATTRIB iPos		= vertex.position;
+      ATTRIB iCol0		= vertex.color;
+      ATTRIB iNorm		= vertex.normal;
+      ATTRIB iTex0		= vertex.texcoord;
+      # Outputs
+      OUTPUT oPos		= result.position;
+      OUTPUT oCol0		= result.color;
+      OUTPUT oTex0		= result.texcoord;
+      # Temporaries
+      TEMP eyeVertex;
+      TEMP eyeNormal;
+      TEMP normalEyeToVertex;
+      TEMP vertToLight;
+      TEMP temp;
+      TEMP temp2;
+      TEMP lightAtnFinal;
+      TEMP lightFactors;
+      TEMP halfVector;
+      TEMP lightConsts;
+      
+      TEMP diffuse;
+      
+      #Transform vertex to viewspace
+      DP4 oPos.x, mvp[0], iPos;
+      DP4 oPos.y, mvp[1], iPos;
+      DP4 oPos.z, mvp[2], iPos;
+      DP4 oPos.w, mvp[3], iPos;
+      
+      #Just pass on texture-coordinate
+      MOV oTex0, iTex0;
+      
+      #Transform position to eye
+      DP4 eyeVertex.x, mv[0], iPos;
+      DP4 eyeVertex.y, mv[1], iPos;
+      DP4 eyeVertex.z, mv[2], iPos;
+      DP4 eyeVertex.w, mv[3], iPos;
+      
+      #Transform normal
+      DP4 eyeNormal.x, mvi[0], iNorm;
+      DP4 eyeNormal.y, mvi[1], iNorm;
+      DP4 eyeNormal.z, mvi[2], iNorm;
+      DP4 eyeNormal.w, mvi[3], iNorm;
+      
+      #normalize the normal
+      DP3 eyeNormal.w, eyeNormal, eyeNormal;
+      RSQ eyeNormal.w, eyeNormal.w;
+      MUL eyeNormal, eyeNormal, eyeNormal.w;
+      
+      #calculate vector from vertex to light in eye-space
+      ADD vertToLight, lightPos, -eyeVertex;
+      
+      # compute light attenuation factor
+      # attenuation = 1/(c + l*d + q*d^2)
+      DP3 temp.yz, vertToLight, vertToLight;
+      RSQ temp2.yw, temp.y;
+      DST temp, temp, temp2;
+      DP4 lightAtnFinal, temp, lightAttenuation;
+      RCP lightAtnFinal, lightAtnFinal.w;
+      
+      # Normalize vertex to light vector
+      DP3 vertToLight.w, vertToLight, vertToLight;
+      RSQ vertToLight.w, vertToLight.w;
+      MUL vertToLight, vertToLight, vertToLight.w;
+      
+      # Normalize eyeVertex to temp.
+      # temp is then the normalized vertex->camera vector.
+      DP3 temp.w, eyeVertex, eyeVertex;
+      RSQ temp.w, temp.w;
+      MUL temp, eyeVertex, temp.w;
+      
+      SUB halfVector, vertToLight, temp;
+      
+      # Normalize halfVector
+      DP3 halfVector.w, halfVector, halfVector;
+      RSQ halfVector.w, halfVector.w;
+      MUL halfVector, halfVector, halfVector.w;
+      
+      #Dot normal with lightvector (vertex to light)
+      #diffuse lighting
+      DP3 lightFactors.x, eyeNormal, vertToLight;
+      #specular lighting
+      DP3 lightFactors.y, eyeNormal, halfVector;
+      #specular exponent
+      MOV lightFactors.w, materialReflection.x;
+      # poof, the lighting coefficients
+      LIT lightFactors, lightFactors;
+      # apply distance-based attenuation
+      MUL lightFactors.y, lightFactors.y, lightAtnFinal.x;
+      MUL lightFactors.z, lightFactors.z, lightAtnFinal.x;
+      
+      #MUL ambient, materialAmbient, lightAmbient;
+      # next line can be omitted; lightFactors.x is always 1.0 per spec
+      #MUL ambient, ambient, lightFactors.x;
+      
+      #MUL specular, materialSpecular, lightSpecular;
+      #MUL specular, specular, lightFactors.z;
+      
+      MUL diffuse, materialFlatColor, lightDiffuse;
+      MUL oCol0.xyz, lightDiffuse, lightFactors.y;
+      #MOV oCol0.xyz, diffuse;
+      #MUL oCol0.xyz, diffuse, lightAtnFinal.w;
+      #MUL oCol0.xyz, lightAtnFinal.x, 10;
+      MOV oCol0.w, lightDiffuse.w;
+      
+      END
+    ]]>
+  </program>
+</arbvp>

@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh genmesh object ;
+
+Description genmesh : "General mesh object plugin" ;
+
+Plugin genmesh
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith genmesh : crystalspace ;
+
+CompileGroups genmesh :  meshes ;

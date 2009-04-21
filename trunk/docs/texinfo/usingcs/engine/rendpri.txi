@@ -1,0 +1,191 @@
+@c -*-texinfo-*-
+@node HOWTO Render Priorities, Portal Engine, Renderloops, Engine
+@subsection Render Priorities and Objects in Sectors
+@cindex @code{iMeshWrapper}
+@cindex mesh objects
+@cindex render priorities
+@cindex z-buffer mode
+@cindex @code{iSector}
+@cindex @code{iMovable}
+
+Renderpriorities give the map creator some extra control over when objects
+have to be rendered. In this section the basic
+rendering algorithm is explained. This is a more theoretical explanation.
+Later some examples are given of some commonly used configurations.
+
+@subsubheading Meshes and Sectors
+
+One of the most fundamental concepts in Crystal Space is a sector (interface
+@code{iSector}). A sector is basically empty
+space which needs to be filled with geometry.
+
+To put geometry in a sector you use one or more mesh objects
+(@pxref{MeshObject}).  Note that a mesh object can also be in several sectors
+at once.  This happens when some object is busy traversing some portal from one
+sector to another.  The list of sectors that a mesh object is in and also the
+position (i.e. transform) is kept by an instance of @code{iMovable}
+(@pxref{HOWTO Mesh Movement}).
+
+@subsubheading Render Priorities
+
+The engine supports the notion of render priorities. There is usually
+a limited set of render priority slots available. By default these are:
+
+@enumerate
+@item
+@samp{init}
+@item
+@samp{sky}
+@item
+@samp{sky2}
+@item
+@samp{portal}
+@item
+@samp{wall}
+@item
+@samp{wall2}
+@item
+@samp{object}
+@item
+@samp{object2}
+@item
+@samp{transp}
+@item
+@samp{alpha}
+@item
+@samp{final}
+@end enumerate
+
+But you can setup your own render priorities by calling the engine
+@sc{api}. Objects which are in a lower
+render priority (i.e. @samp{sky} is lower than @samp{wall}) will be rendered
+before objects with a higher priority. So using the render priority system
+you can choose in which order to render objects.
+
+The @samp{alpha} render priority is a bit special. Objects in that
+render priority will be rendered from back to front. This is needed for
+objects that use alpha transparency and also if you need a mix of different
+kinds of transparencies. If you use a single other kind of transparency
+like add or mult (but not both) then you can use the @samp{transp} render
+priority. That one is not sorted from back to front so it is only usable for
+transparencies that are correct even if rendered in other order.
+
+For keycolor objects (@pxref{Alpha Textures}) you can use the normal
+@samp{object} render priority with @samp{ZUSE} z-buffer mode. This is also
+true for objects that have textures using binary alpha.
+
+To set up render priorities from within your application you can use
+the @code{engine->RegisterRenderPriority()} function.
+
+To set the render priority for an object you can use the following
+in a map file:
+
+@example
+<meshobj name="myObject">
+  <plugin>@dots{}</plugin>
+  <params>
+    @dots{}
+  </params>
+  <priority>object</priority>
+</meshobj>
+@end example
+
+To set the render priority from within the code you can do:
+
+@example
+iMeshWrapper* mesh;
+mesh->SetRenderPriority (engine->GetRenderPriority ("object"));
+@end example
+
+By default objects will be put in the @samp{object} render queue.
+
+@subsubheading Z-Buffer Render Mode
+
+In addition to render priorities you can also choose how the object
+will be rendered with regards to the Z-buffer. There are four possibilities:
+
+@itemize
+@item
+@samp{ZUSE}: use the Z-buffer to see where the object has to be rendered and
+also update the Z-buffer wherever the object is actually rendered.
+@item
+@samp{ZFILL}: only update the Z-buffer where the object is rendered but don't
+check against the existing Z-buffer contents.
+@item
+@samp{ZTEST}: use the Z-buffer to see where the object has to be rendered
+but don't update the Z-buffer.
+@item
+@samp{ZNONE}: don't update or read the Z-buffer when rendering this object.
+@end itemize
+
+To set the Z-buffer mode from a map file you can do the following:
+
+@example
+<meshobj name="myObject">
+  <plugin>@dots{}</plugin>
+  <params>
+    @dots{}
+  </params>
+  <priority>object</priority>
+  <zuse />
+</meshobj>
+@end example
+
+To set the Z-buffer mode from the code you can use the following example:
+
+@example
+  iMeshWrapper* mesh;
+  mesh->SetZBufMode (CS_ZBUF_USE);
+@end example
+
+@samp{ZUSE} is the default Z-buffer mode for objects created from within
+an application.
+
+By using the z-buffer mode in combination with the render priorities we
+now have a very powerful system to control object rendering in a sector.
+In the following sections we will show some popular examples. But first
+we show in a table what the common usage is of the render priorities in
+combination with the Z-buffer modes:
+
+@itemize
+@item
+@samp{sky}: This render priority is used for rendering the object that
+represents the sky. This can be a skybox, or a skydome, or something else.
+Usually these objects have @samp{ZNONE} or @samp{ZFILL} render mode. If
+you want to use @samp{ZNONE} you have to make sure that the Z-buffer
+is cleared every frame.
+@item
+@samp{portal}: Sometimes portals need to be put here.
+@item
+@samp{wall}: Sector walls are put in this queue. They are usually rendered
+using @samp{ZFILL}.
+@item
+@samp{object}: After sector walls the normal objects are rendered. Usually
+these have @samp{ZUSE} Z-buffer mode. You can also use this render priority
+for objects using keycolor transparency.
+@item
+@samp{transp}: Non-alpha transparent objects need to be rendered after all other
+objects. The best Z-buffer mode for these kinds of objects is @samp{ZTEST}.
+@item
+@samp{alpha}: Alpha transparent objects need to be rendered after all other
+objects (and in back to front render mode as seen from the camera). The
+best Z-buffer mode for these kinds of objects is @samp{ZTEST}.
+@end itemize
+
+Note that sky objects are usually created with the @samp{CAMERA} keyword
+(in map file) or the @code{CS_ENTITY_CAMERA} flag (in
+@code{iMeshWrapper::GetFlags()}). The camera keyword makes sure that the
+camera will always be in the center of that object. So you can move forever
+in some direction without ever reaching the bounds of the sky.
+
+@subsubheading Include Files
+
+The include files useful for this section are:
+
+@example
+#include <iengine/mesh.h>
+#include <iengine/sector.h>
+#include <iengine/engine.h>
+#include <ivideo/graph3d.h>
+@end example
+

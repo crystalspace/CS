@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- stdrep.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.utilities.stdrep</name>
+        <implementation>csReporterListener</implementation>
+        <description>Standard Reporter Listener</description>
+        <requires>
+          <class>crystalspace.utilities.reporter</class>
+          <class>crystalspace.console.output.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -1,0 +1,5 @@
+SubDir TOP data config-plugins ;
+
+InstallData [ Wildcard *.cfg *.key *.xml ] : data config-plugins ;
+FileListEntriesData [ Wildcard *.cfg *.key *.xml ] : config-plugins : data-runtime ;
+

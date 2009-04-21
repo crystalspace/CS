@@ -1,0 +1,8 @@
+SubDir TOP plugins sndsys renderer software ;
+
+Plugin sndsyssoft : [ Wildcard *.cpp *.h ] ;
+Description sndsyssoft : "Software sound renderer for sndsys" ;
+LinkWith sndsyssoft : crystalspace ;
+CompileGroups sndsyssoft : sndsys ;
+
+SubInclude TOP plugins sndsys renderer software drivers ;

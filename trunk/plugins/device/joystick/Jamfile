@@ -1,0 +1,4 @@
+SubDir TOP plugins device joystick ;
+
+SubInclude TOP plugins device joystick linux ;
+SubInclude TOP plugins device joystick windows ;

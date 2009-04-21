@@ -1,0 +1,7 @@
+SubDir TOP data frankie ;
+
+{
+local files = franky_frankie skelfrankie_rig [ Wildcard *.png *.xml ] ;
+InstallData $(files) : data frankie ;
+FileListEntriesData $(files) : frankie : data-demo ;
+}

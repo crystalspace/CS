@@ -1,0 +1,196 @@
+@c -*-texinfo-*-
+@node BugPlug, HOWTO, Distributing Own Project, Using Crystal Space
+@section Using the BugPlug Debugging Plugin
+@cindex BugPlug
+@cindex debugging
+
+BugPlug is a small plugin that you can automatically load with
+every application that uses Crystal Space. It provides a number of
+useful debugging tools and also some useful tools for taking screenshots,
+displaying framerate and so on.
+
+@menu
+* Using BugPlug::
+* Controlling BugPlug::
+* Basic Tools::
+* Working with Meshes::
+* Various Tools::
+@end menu
+
+@node Using BugPlug, Controlling BugPlug, BugPlug, BugPlug
+@subsection Using BugPlug
+
+There are several ways to load BugPlug in memory:
+
+@itemize @bullet
+
+@item
+@samp{Load it manually}: You can load BugPlug manually in code by
+adding an entry to your @code{RequestPlugins()} call (using the
+@code{CS_REQUEST_PLUGIN("crystalspace.utilities.bugplug", iBugPlug)} macro)
+or using @code{csLoadPlugin<iBugPlug> (plugin_mgr,
+"crystalspace.utilities.bugplug")}.
+
+@item
+@samp{Load it via commandline}: If you only need to use BugPlug
+occasionally then the best way may be to just put it on the commandline
+of your application whenever you need it: @samp{app -plugin=bugplug:iBugPlug}.
+
+@item
+@samp{bugplug console command}: In walktest there is a @samp{bugplug}
+console command that loads BugPlug.
+
+@item
+@samp{Load it via config file}: You can also add a line to the configuration
+file of your application like this:
+@samp{System.Plugins.iBugPlug = crystalspace.utilities.bugplug}.
+
+@item
+@samp{Load it all the time}: If you want BugPlug to be in memory all
+the time for all Crystal Space applications then you can modify the
+system wide Crystal Space configuration file. On Windows this is usually
+@file{c:\Documents and Settings\<username>\Application Data\CrystalSpace\Global.cfg}.
+On GNU/Linux this is usually
+@file{$HOME/.crystalspace/CrystalSpace.Global.cfg}. To that file you add
+@samp{System.Plugins.iBugPlug = crystalspace.utilities.bugplug}.
+@end itemize
+
+@node Controlling BugPlug, Basic Tools, Using BugPlug, BugPlug
+@subsection Controlling BugPlug
+
+There are two important keys in BugPlug. First is @samp{ctrl-d}. When you
+press this key the next key you press will be treated as a special command
+for BugPlug. The second key is @samp{ctrl-s}. When you press this key then
+the next mouse click you do will be treated as a special command for
+BugPlug. If you accidently press either of those keys then you can simply
+press it again to return to normal operation.
+
+To get a complete list of keys and commands that BugPlug supports you can
+look at @file{data/config-plugins/bugplug.key}.
+
+@node Basic Tools, Working with Meshes, Controlling BugPlug, BugPlug
+@subsection Basic Tools
+@cindex framerate
+@cindex screenshot
+@cindex wireframe
+
+The first thing you notice when you start your application using
+BugPlug is the current framerate at the lower-left corner of the display.
+If you don't want to see this you can always press @samp{ctrl-d ctrl-alt-p}.
+To toggle between fps and frame time display, press 
+@samp{ctrl-d ctrl-alt-shift-p}.
+
+Another useful feature is the screenshot feature. Just press @samp{ctrl-d
+f12} and BugPlug will save a screenshot of the current display to the
+current directory. By default this will be a @sc{png} file called
+@file{crystal000.png}. The digits will automatically be incremented so that
+previous screenshots are not overwritten. You can change the file format,
+filename, and path in @file{data/config-plugins/bugplug.cfg}.
+
+If you press @samp{ctrl-d e} then BugPlug will render the 3D world in
+wireframe mode. This is useful to see how many triangles there are and can
+also help to see geometry that you can otherwise not see because there is
+not enough light or some materials/shaders are not working properly.
+
+If you run BugPlug and in addition add @samp{-verbose} or @samp{-verbose=-scf}
+on the commandline then BugPlug will show additional debugging information
+at the top-left of the display. The first line of this debugging information
+is the number of sectors that are being displayed. With every number
+you get a current number (what was being rendered last frame), a total number
+and an average number. The second line is the number of triangles. Note
+that what you think of as a single triangle may actually be multiple
+triangles in reality because of lighting and multi-pass effects. The last
+debugging line is the number of meshes that are being rendered. Again
+this number can be higher then you expect. A single mesh object with two
+different materials actually represents two meshes for the renderer.
+
+@node Working with Meshes, Various Tools, Basic Tools, BugPlug
+@subsection Working with Meshes
+
+BugPlug has various nice tools to work with meshes. If you press
+@samp{ctrl-s} then you can select a mesh with your left mouse button.
+Immediatelly you'll notice a blue box and a green 3D cross. On standard
+output you will see output representing the name of the selected mesh
+and the coordinate where you actually hit the mesh. The box
+represents the bounding box of that mesh. The green cross represents
+the three axes of the bounding sphere. You can disable the display
+of the box using @samp{ctrl-d b} and you can disable the display of the
+radius using @samp{ctrl-d r}.
+
+Now with this mesh selected there are a number of things you can do:
+
+@itemize @bullet
+
+@item
+Show normals (@samp{ctrl-d n}): if you enable visualization of normals
+then BugPlug will show normals (in blue), tangents (in red) and
+bitangents (in green) for every triangle of the selected mesh.
+
+@item
+Show collision detection mesh (@samp{ctrl-d crtl-alt-c}): show the
+triangle mesh that will be used for collision detection with this mesh.
+
+@item
+Show visibility culling mesh (@samp{ctrl-d crtl-alt-v}): show the
+triangle mesh that will be used for visibility culling with this mesh.
+Basically this is the mesh that will occlude other meshes. It will not
+be used to test visibility.
+
+@item
+Show shadow casting mesh (@samp{ctrl-d crtl-alt-s}): show the
+triangle mesh that will be used for shadow casting.
+
+@item
+Show base mesh (@samp{ctrl-d crtl-alt-b}): show the base triangle
+mesh.
+
+@item
+Hide mesh (@samp{ctrl-d h}): hide the current selected mesh.
+
+@item
+Undo hide mesh (@samp{ctrl-d shift-h}): unhide the current selected mesh.
+
+@end itemize
+
+If you can't find a mesh but you know the name then you can also select
+a mesh using @samp{ctrl-d ctrl-alt-m}. You'll be presented with a dialog
+in which you can type a regexp pattern. Using this you can also select
+multiple meshes. Typing @samp{.*} here will select all meshes. Note that
+this feature only works for meshes in the current sector.
+
+@node Various Tools, , Working with Meshes, BugPlug
+@subsection Various Tools
+
+BugPlug can do a lot more. Here is a summary of some of the more useful
+features:
+
+@itemize @bullet
+
+@item
+Colorize sectors (@samp{ctrl-d ctrl-shift-c}): with this feature BugPlug
+will give every sector a random color. That way when you walk around your
+world it is easy to see where a new sector starts.
+
+@item
+Dump engine (@samp{ctrl-d d}): dump all materials, meshes, sectors,
+factories, and lights that are loaded. This can be a useful tool to see
+what the engine currently contains. Note that it produces a lot of output.
+
+@item
+Dump camera (@samp{ctrl-d shift-c}): dump the contents of the current
+camera (orientation, position, and @sc{fov}).
+
+@item
+Change @sc{fov} (@samp{ctrl-d f}): change the Field Of Vision setting.
+
+@item
+List plugins (@samp{ctrl-d ctrl-alt-l}): list all currently loaded plugins.
+
+@item
+Click mesh (@samp{ctrl-s right-mouse-button}): this doesn't select a mesh
+but instead it prints out the mesh that was hit and the distance between
+the camera and that mesh.
+
+@end itemize
+
+

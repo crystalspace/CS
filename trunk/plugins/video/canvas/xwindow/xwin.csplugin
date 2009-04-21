@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- xwin.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.window.x</name>
+        <implementation>csXWindow</implementation>
+        <description>X-Window plugin for Crystal Space</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

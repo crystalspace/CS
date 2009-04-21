@@ -1,0 +1,152 @@
+SubDir TOP apps walktest ;
+
+Description walktest : "WalkTest demo" ;
+Application walktest : [ Wildcard *.cpp *.h ] ;
+LinkWith walktest : crystalspace ;
+FileListEntryApplications walktest : app-demo ;
+
+# Some external projects use gcc's -ansi and -pedantic options. We need to
+# ensure that CS's public headers are usable when these options are enabled,
+# Unfortunately, we can not enable these options globally since CS uses some
+# features (such as `long long') which are not available in the present
+# language standard. As a compromise, we enable these restrictions on an
+# individual module basis so as to ensure that the CS headers are tested
+# against these options on a regular basis.
+if $(COMPILER.C++FLAGS.PEDANTIC.ENABLE)
+{
+  CFlags walktest : $(COMPILER.C++FLAGS.PEDANTIC.ENABLE) ;
+}
+
+# List of plugins which should be go into walkall.
+WALKALL.PLUGINLIST =
+  animesh
+  animeshldr
+  bindoc
+  bugplug
+  csconin
+  csconout
+  csddsimg
+  csfont
+  csgifimg
+  csopcode
+  csparser
+  cssynldr
+  decal
+  dsplex
+  dynavis
+  particles
+  particlesldr
+  ptpdlight
+  emit
+  emitldr
+  engine
+  engseq
+  fontplex
+  frustvis
+  genmesh
+  gmeshanim
+  gmeshanimpdl
+  gmeshldr
+  gmeshskelanim2
+  skeleton
+  skeleton2
+  skeleton2ldr
+  skelldr
+  vproc_std
+  haze
+  hazeldr
+  imgplex
+  nullmesh
+  protomesh
+  protomeshldr
+  rendloop_loader
+  rendstep_std
+  reporter
+  rm_rlcompat
+  rm_unshadowed
+  rm_shadow_pssm
+  sequence
+  shadermgr
+  simpleformer
+  simpleformerldr
+  bruteblock
+  terrainldr
+  terrain2
+  terrain2ldr
+  shaderweaver
+  spr2d
+  spr2dldr
+  spr3d
+  spr3dldr
+  stdpt
+  stdrep
+  xmlread
+  xmlshader
+  ;
+
+if $(ZLIB.AVAILABLE) = "yes"
+{
+  WALKALL.PLUGINLIST += vfs ;
+}
+if $(JPEG.AVAILABLE) = "yes"
+{
+  WALKALL.PLUGINLIST += csjpgimg ;
+}
+if $(PNG.AVAILABLE) = "yes"
+{
+  WALKALL.PLUGINLIST += cspngimg ;
+}
+if $(CAL3D.AVAILABLE) = "yes"
+{
+  ;WALKALL.PLUGINLIST += sprcal3d sprcal3dldr ;
+}
+
+# Plugins needed by GL renderer
+if $(X11.AVAILABLE) = "yes"
+{
+  WALKALL.PLUGINLIST += xwin ;
+  if $(XFREE86VM.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += xext86vm ; }
+}
+
+if $(GL.AVAILABLE) = "yes"
+{
+  WALKALL.PLUGINLIST += gl3d glshader_arb glshader_fixed ;
+  
+  # GL canvases
+  if $(GLX.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += glx2d ; }
+  if $(TARGET.OS) = "WIN32" { WALKALL.PLUGINLIST += glwin32 ; }
+  if $(TARGET.OS) = "MACOS_X" { WALKALL.PLUGINLIST += glosx2d ; }
+
+  if $(CG.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += glshader_cg ; }
+}
+
+for p in $(WALKALL.PLUGINLIST)
+{
+  CompileGroups $(p) : walkall ;
+}
+CompileGroups walktest : walkall ;
+
+if [ Property build : projgen_version ] != 6
+{
+# Plugins that are linked statically into walktest_static.
+WALKTEST_STATIC.PLUGINLIST =
+  $(WALKALL.PLUGINLIST)
+  bruteblock
+  bindoc
+  csbmpimg
+  rendstep_stencil
+  ;
+
+Description walktest_static : "WalkTest demo (static build)" ;
+
+SubVariant static ;
+Application walktest_static : [ Wildcard *.cpp *.h ] :
+  independent noinstall nohelp ;
+CFlags walktest_static : [ FDefines CS_STATIC_LINKED ] ;
+MsvcDefine walktest_static : CS_STATIC_LINKED ;
+LinkWith walktest_static : crystalspace ;
+LinkStaticPlugins walktest_static : $(WALKTEST_STATIC.PLUGINLIST) ;
+FileListEntryApplications walktest_static : app-demo-static ;
+
+SubVariant ;
+}

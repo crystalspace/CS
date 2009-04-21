@@ -1,0 +1,59 @@
+@c -*-texinfo-*-
+@node Common Command Line Options, Configuration File, Options, Options
+@subsection Common Command Line Options
+@cindex Common Command Line Options
+@cindex Command Line Options
+@cindex Options, Command Line
+
+All Crystal Space applications respond to a common set of command line
+options.  Many applications define additional options which are specific
+to that particular application.
+
+The most immediately useful command line option which all applications
+respond to is @samp{-help}.  This command list all of the other options to
+which an application responds.
+
+The default setting for each command line option is set internally in the 
+program unless there is a corresponding line for it in the configuration file.  
+Command line options always override default values.  
+
+Some interesting options to play with are:
+
+@table @code
+@item -mode=640x480
+Use this option to set the size of the display.
+
+@item -canvas=sdl2d
+Use this option to select the type of 2D canvas to use. You
+don't often have to use this as the 3D driver normally automatically selects
+the appropriate canvas plugin.
+
+@item -video=opengl
+Use this option to select type of display driver to use.
+
+@item -fs
+Open in fullscreen mode (default is windowed).
+
+@item -verbose
+This enable very verbose output. This is useful for debugging why
+Crystal Space isn't behaving as it should. If you just specify @samp{-verbose}
+you will get a lot of output. If your problem is not @sc{scf} related
+you can also do: @samp{-verbose=-scf}.
+
+@item -fullbright
+Use this option to get fullbright rendering of all objects. This is useful
+for debugging maps if you don't want to spend time relighting them first.
+
+@item -plugin=@dots{}
+This is a general commandline option with which you can load any plugin
+into your application. One common option is to use this for loading
+the @samp{bugplug} debugging plugin like this: @samp{-plugin=bugplug}.
+@xref{BugPlug}.
+
+@item -cfgset=@dots{}
+With this commandline option you can set a configuration option on
+the commandline. For example: @samp{-cfgset=Video.OpenGL.DelaySwap=yes}.
+
+@item -cfgfile=@dots{}
+This option loads an entire file to the configuration manager.
+@end table

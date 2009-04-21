@@ -1,0 +1,37 @@
+<cgvp>
+<!--compilerargs>-posinv</compilerargs-->
+<program>
+<![CDATA[
+
+struct app2vertex {
+	float4 Position : POSITION;
+	float4 TexCoord : TEXCOORD0;
+};
+
+struct vertex2fragment { 
+	float4 Position : POSITION;
+	float4 TexCoord : TEXCOORD0;
+};
+
+vertex2fragment main (app2vertex IN,
+	uniform float4x4 ModelView : state.matrix.modelview,
+	uniform float4x4 Projection : state.matrix.projection
+	)
+{
+	vertex2fragment OUT;
+	float4 view_pos = mul (ModelView, IN.Position);
+	float4x4 proj_mat;
+
+	proj_mat[0] = float4(1, 0, 0, 0);
+	proj_mat[1] = float4(0, -1, 0, 0);
+	proj_mat[2] = float4(0, 0, 0, 0);
+	proj_mat[3] = float4(0, 0, 1, 0);
+
+	OUT.Position = mul (proj_mat, view_pos);
+	OUT.TexCoord = view_pos;
+	return OUT;
+}
+
+]]>
+</program>
+</cgvp>

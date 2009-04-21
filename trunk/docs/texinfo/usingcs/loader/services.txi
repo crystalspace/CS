@@ -1,0 +1,107 @@
+@c -*-texinfo-*-
+@node XML Syntax Services, Binary XML, HOWTO Level Loading, Map Loader
+@subsection @sc{xml} Syntax Services
+@cindex Syntax Services
+@cindex @code{iSyntaxService}
+
+Various loaders in Crystal Space require the parsing of several common
+idioms (like vectors, matrices, @dots{}). To help with this there is
+the syntax services plugin. This section is mainly useful for people who
+want to write their own loader plugin or people who want to know the @sc{xml}
+syntax for one of the items parsed by this plugin.
+
+@menu
+* XMLServices Intro:: Getting the Plugin and Intro
+* XMLServices Mixmode:: Parsing Mixmode
+@end menu
+
+@node XMLServices Intro, XMLServices Mixmode, XML Syntax Services, XML Syntax Services
+@subsubsection Getting the Plugin and Intro
+
+@subsubheading Getting the Plugin
+
+This plugin has @samp{crystalspace.syntax.loader.service.text} as plugin id.
+Usually this plugin is already loaded if you also use the main loader plugin.
+In that case you can get this plugin from the object registry by doing:
+
+@example
+csRef<iSyntaxService> services = csQueryRegistry<iSyntaxService> (object_reg);
+@end example
+
+If you need to load the plugin yourselves then the following code would
+work. This code will first check if the plugin is already loaded. If not
+it will load it:
+
+@example
+csRef<iSyntaxService> services = csLoadPluginCheck<iSyntaxService> (
+  object_reg, "crystalspace.syntax.loader.service.text");
+@end example
+
+@subsubheading Introduction
+
+This plugin implements the @code{iSyntaxService} interface. The definition
+of this interface can be found in @file{imap/services.h}. There are
+basically three kinds of functions in this interface:
+
+@itemize @bullet
+@item @samp{Reporting Helpers}
+These are functions that make it easier for a plugin writer to report
+an error to the user.
+@item @samp{Parsing Helpers}
+These functions are the main part of this plugin. They all start with
+@samp{Parse} and help with parsing a small part of the @sc{xml} format.
+They all expect a node (@code{iDocumentNode}) to be parsed as the input
+and they return the parsed result or an error.
+@item @samp{Writing Helpers}
+These functions create @sc{xml} (in the given @code{iDocumentNode} parameter)
+for some basic Crystal Space object. They are useful if you ware making
+a plugin that saves @sc{xml}.
+@end itemize
+
+In this document we explain a few of the more important parsing functions
+present in this plugin.
+
+@node XMLServices Mixmode, , XMLServices Intro, XML Syntax Services
+@subsubsection Parsing Mixmode
+@cindex parsing mixmode
+
+The @code{iSyntaxService::ParseMixmode()} function parses a @samp{mixmode}
+node which is used for defining transparency or how the source (usually
+a texture) is blended with the destination (usually a screen buffer). For
+more information about mixmodes check @ref{Renderer Mixmodes}.
+
+The following children are supported for mixmode:
+
+@itemize @bullet
+@item @samp{copy}
+Copy blending. This mode is usually default.
+@item @samp{multiply}
+Multiplicative blending.
+@item @samp{multiply2}
+Double multiplicative blending. Often used for lighting.
+@item @samp{add}
+Additive blending. Used for transparency effects that don't require
+back to front sorting.
+@item @samp{alpha}
+Alpha blending. Expects and additional parameter between 0 and 1 that indicates
+the alpha value. This kind of blending requires back to front sorting to look
+right.
+@item @samp{premultalpha}
+Premultiplied alpha blending.
+@item @samp{destalphaadd}
+@@@@TODO
+@item @samp{srcalphaadd}
+@@@@TODO
+@item @samp{transparent}
+Fully transparent but still affect Z-buffer.
+@item @samp{mesh}
+@@@@TODO
+@item @samp{alphatest}
+One of: @samp{auto}, @samp{enable}, or @samp{disable}. @@@@TODO
+@item @samp{blendop}
+This child expects two attributes: @samp{src} and @samp{dest}. Both can have one of the following as a value: @samp{dstalpha}, @samp{dstalpha_inv},
+@samp{dstcolor}, @samp{dstcolor_inv}, @samp{one}, @samp{srcalpha},
+@samp{srcalpha_inv}, @samp{scrcolor}, @samp{srccolor_inv}, or @samp{zero}.
+@@@@TODO
+@end itemize
+

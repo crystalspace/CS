@@ -1,0 +1,32 @@
+<cgvp>
+<program>
+<![CDATA[
+
+struct app2vertex {
+	float4 Position : POSITION;
+	float2 TexCoord : TEXCOORD0;
+};
+
+struct vertex2fragment { 
+	float4 Hposition : POSITION;
+	float2 TexCoord0 : TEXCOORD0;
+	float2 TexCoord1 : TEXCOORD1;
+	float4 Color : COLOR0;
+};
+
+vertex2fragment main (app2vertex IN,
+	uniform float4x4 ModelViewProj : state.matrix.mvp)
+{
+	vertex2fragment OUT;
+
+	OUT.Hposition = mul (ModelViewProj, IN.Position);
+	OUT.TexCoord0 = IN.TexCoord;
+	OUT.TexCoord1 = IN.TexCoord;
+	OUT.Color = 1;
+	
+	return OUT;
+}
+
+]]>
+</program>
+</cgvp>

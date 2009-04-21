@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- sndmanager.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sndsys.manager</name>
+        <implementation>csSndSysManager</implementation>
+        <description>Sound Manager</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

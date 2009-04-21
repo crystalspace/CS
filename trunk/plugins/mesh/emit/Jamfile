@@ -1,0 +1,4 @@
+SubDir TOP plugins mesh emit ;
+
+SubInclude TOP plugins mesh emit object ;
+SubInclude TOP plugins mesh emit persist ;

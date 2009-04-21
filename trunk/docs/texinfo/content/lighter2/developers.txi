@@ -1,0 +1,49 @@
+@c -*-texinfo-*-
+@node lighter2 Developer's Manual, , lighter2 User's Manual, Using lighter2
+@subsection @code{lighter2} Developer's Manual
+@cindex Using @code{lighter2} Developer's Manual
+
+@heading Introduction
+
+This section describes how @code{lighter2} options can be set from inside a
+Crystal Space @file{world} file or library.  The effect of options will not 
+be described in detail; refer to the ``User's Manual'' for a that.
+
+@heading General Syntax
+
+@code{lighter2} options are set with the help of key-value-pairs:
+
+@example
+    @dots{}
+    <key name="lighter2" editoronly="yes" @emph{option}=@emph{value} @dots{} />
+    @dots{}
+@end example
+
+Such a @samp{key} node must be placed inside a @samp{meshobj} node for mesh
+object options respectively a @samp{meshfact} node for mesh factory options.
+
+Here, @samp{name="lighter2"} is used by @code{lighter2} to identify keys 
+containing options.  @samp{editoronly="yes"} instructs the engine to discard
+the key-value-pair during normal execution in order to conserve memory (since
+the @code{lighter2}-specific settings are simply not needed).  The actual
+options are specified by a number of @samp{@emph{option}=@emph{value}} pairs.
+
+@heading Available options
+
+@table @code
+@item vertexlight
+Values: @samp{yes}, @samp{no}
+
+Enable per-vertex lighting.
+
+@item lmscale
+Values: floating point values
+
+Control lightmap density.
+
+@item noselfshadow
+Values: @samp{yes}, @samp{no}
+
+Disables casting of shadows from an object onto itself.
+
+@end table

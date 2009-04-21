@@ -1,0 +1,108 @@
+#============================================================================
+# Rules for creating python modules.
+# Copyright (C) 2006 by Jorrit Tyberghein
+#
+#    This library is free software; you can redistribute it and/or modify it
+#    under the terms of the GNU Library General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or (at your
+#    option) any later version.
+#
+#    This library is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public
+#    License for more details.
+#
+#    You should have received a copy of the GNU Library General Public License
+#    along with this library; if not, write to the Free Software Foundation,
+#    Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#============================================================================
+# PythMod rule
+# Can be used to create cspace python modules.
+
+# Auxiliary rule
+rule InstallPythMod
+{
+  InstallBindingsModule $(1) : $(2) ;
+}
+
+rule FileListEntryPythMod
+{
+  local target = $($(<)_TARGET) ;
+  SEARCH on $(target) = [ on $(target) GetVar LOCATE ] ;
+  Depends filelists : [ DoFileListEntries $(target) : $(2) : $(3) ] ;
+}
+
+# USAGE:
+# Pythmod targetname : module name : src files : install dir : LinkWith : ExternalLibs : desc
+#
+# EXAMPLES:
+# PythMod ceguimod : _cscegui : ceguimod.cpp cs_cegui.cpp : bindings python cspace : : CEGUI : desc
+# PythMod pythmod : _cspace : pythmod.cpp : bindings python cspace : : desc
+rule PythMod
+{
+  local modname = $(2) ;
+  local desc = $(7) ;
+  local cleantarget ;
+  if [ Property build : projgen ]
+  {
+    RegisterCompileGroups bindings ;
+    
+    Description py$(2) : $(desc) ;
+    DLL py$(2) : $(3) : $(2).pyd ;
+    LinkWith py$(2) : $(5) ;
+    ExternalLibs py$(2) : PYTHON $(6) ;
+    Depends py$(2) : $(1) ;
+    CompileGroups py$(2) : all bindings ;
+  }
+  else
+  {
+    Description $(<) : $(desc) ;
+    Help $(<) : "Build the $(desc)" ;
+    local sources = [ DoSourceGrist $(3) ] ;
+    local objects = [ CompileObjects $(sources) ] ;
+    if $(PYTHON.MODULE_EXT)
+    {
+      modname = $(modname:S=$(PYTHON.MODULE_EXT)) ;
+    }
+    else
+    {
+      modname = [ ConstructPluginTarget $(modname) ] ;
+    }
+    $(<)_TARGET = $(modname) ;
+    $(<)_SOURCES = $(sources) ;
+    $(<)_OBJECTS = $(objects) ;
+    LinkWith $(<) : $(5) ;
+    ExternalLibs $(<) : PYTHON $(6) ;
+    CFlags $(<) : $(PLUGIN.CFLAGS) ;
+    LFlags $(<) : $(PLUGIN.LFLAGS) $(LINKLIBS) ;
+    NotFile $(<) ;
+    Depends $(<) : $(modname) ;
+    Depends bindings : $(<) ;
+    MakeLocate $(modname) : [ ConcatDirs $(LOCATE.OBJECTS) $(4) ] ;
+    Depends $(modname) : $(objects) ;
+    LinkPlugin $(modname) : $(objects) ;
+    InstallBindingsModule $(modname) : $(4) ;
+    if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
+    {
+      local debugfile = [ SplitDebugInfo $(modname) ] ;
+      MakeLocate $(debugfile) : [ ConcatDirs $(LOCATE.OBJECTS) $(4) ] ;
+      cleantarget += $(debugfile) ;
+      NoCare $(debugfile) ;
+      Depends install_bindings :
+      	  [ DoInstall $(debugfile) : $(appdatadir) $(4) : $(INSTALL_DATA) ] ;
+    }
+  }
+
+  Always $(<)clean ;
+  NotFile $(<)clean ;
+  Clean $(<)clean : $(modname) $(objects) $(cleantarget) ;
+  Depends clean : $(<)clean ;
+}
+
+
+# Construct pseudo target plugins
+# @@@ Here?
+Depends exe : bindings ;
+NotFile bindings ;
+Help bindings : "Build all bindings for other languages" ;

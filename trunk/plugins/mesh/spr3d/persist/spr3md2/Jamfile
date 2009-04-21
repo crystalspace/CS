@@ -1,0 +1,9 @@
+SubDir TOP plugins mesh spr3d persist spr3md2 ;
+
+Description spr3md2 : "Sprite 3D MD2 mesh object loader" ;
+
+Plugin spr3md2
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith spr3md2 : crystalspace ;
+CompileGroups spr3md2 : meshes ;

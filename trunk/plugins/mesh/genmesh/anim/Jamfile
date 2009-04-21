@@ -1,0 +1,11 @@
+SubDir TOP plugins mesh genmesh anim ;
+
+Description gmeshanim : "General mesh animation plugin" ;
+
+Plugin gmeshanim
+	: [ Wildcard *.cpp *.h ]
+;
+Includes gmeshanim.h : $(SUBDIR)/gmeshanim.tok ;
+LinkWith gmeshanim : crystalspace ;
+
+CompileGroups gmeshanim :  meshes ;

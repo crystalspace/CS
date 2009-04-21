@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!-- spr3dbin.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.loader.factory.sprite.3d.binary</name>
+        <implementation>csSprite3DBinFactoryLoader</implementation>
+        <description>Crystal Space Sprite3DBin Mesh Factory Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.factory.sprite.3d.binary</name>
+        <implementation>csSprite3DBinFactorySaver</implementation>
+        <description>Crystal Space Sprite3DBin Mesh Factory Saver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

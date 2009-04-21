@@ -1,0 +1,86 @@
+@c -*-texinfo-*-
+@node Console Boolean, Console Value, Console General, Console
+@subsubsection Boolean Commands
+
+Boolean commands have either an @code{on} or @code{off} state. When you just
+type the command without arguments it will show you the current state of the
+command (@code{on} or @code{off}). To turn the state on just use: @code{on},
+@code{yes}, @code{true}, or @code{1} as the first argument of the command. To
+turn it off use: @code{off}, @code{no}, @code{false}, or @code{0}. To toggle
+a state use @code{toggle}. Example (the @code{fps} command doesn't really exist
+anymore, so this is only an example):
+
+@itemize @bullet
+@item
+@samp{fps}: show current setting for FPS display
+@item
+@samp{fps on}: enable FPS display
+@item
+@samp{fps 0}: disable FPS display
+@item
+@samp{fps toggle}: toggle FPS display
+@end itemize
+
+The following boolean commands are available :
+
+@table @code
+@item colldet
+Enable/disable collision detection.  Corresponds to @code{-colldet} and
+@code{-nocolldet} commandline options.
+
+@item debug
+Enable/disable more debug information (which is written in @file{debug.txt}
+if the program crashes provided your system can catch crashes).
+
+@item stats
+Enable/disable statistics display. Corresponds to
+@code{-stats}/@code{-nostats} commandline options and
+@samp{Walktest.Settings.Stats} configuration option. Note that enabling the
+statistics counter automatically disables the display of the coordinates.
+
+@item portals
+Enable/disable drawing through portals. If this is off, a portal will just
+draw as the default texture on the polygon.
+
+@item console
+Open/close console (is done automatically by @key{TAB} key).
+
+@item coordshow
+Enable/disable display of coordinate at runtime. Note that enabling the
+coordinates display automatically disables the statistics display.
+
+@item zbuf
+For debugging. When enabled this will show an alternate view where far away
+objects are rendered in another color. In other words: it tests the Z
+buffer. It works best in 16-bit mode.
+
+@item debug0
+Debug command. The function of this command is undefined but it serves as a
+place-holder for some debugging functionality. A particular version of
+Crystal Space may assign some action to this command but another version
+may remove this action again.
+
+@item move3d
+Toggle between between pure 3D movement (Descent-like) and
+@samp{comfortable} movement (Quake-like). The latter is now default. This
+basically affects the left and right arrow keys which now rotate the camera
+how you would expect it and also includes a gravity system. When you enable
+3D movement the gravity system is also disabled.
+
+@item do_gravity
+Enable/disable gravity (enabled by default).
+
+@item freelook
+If freelook is enabled the mouse moves around like in Quake. By default
+freelook is disabled.
+
+@item sprlight
+Change quality setting of sprite lighting.  If yes every vertex will be lit
+according to the correct distance with the light.  If no then the distances
+for all vertices are calculated to the center of the sprite.  Default is
+@samp{no}.
+
+@item fullscreen
+Toggle fullscreen mode on/off.
+
+@end table
