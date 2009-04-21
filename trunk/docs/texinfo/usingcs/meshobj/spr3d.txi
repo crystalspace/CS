@@ -1,0 +1,140 @@
+@c -*-texinfo-*-
+@node MeshObject Spr3D, MeshObject Emit, MeshObject Spr2D, MeshObject
+@subsection Sprite3D Mesh Object
+@cindex MeshObject
+@cindex 3D Sprite
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iSprite3DState}
+@cindex @code{iSprite3DFactoryState}
+@cindex @code{iConfig}
+@cindex @code{iSpriteFrame}
+@cindex @code{iSpriteAction}
+
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@gmail.com}.}
+
+A 3D Sprite is a complex set of 3D triangles that supports animation through
+frames.
+
+@subsubheading Basic Structure
+
+The following @sc{scf} class names are used (for @code{csLoadPlugin}):
+
+@itemize @bullet
+@item
+Type plugin: @samp{crystalspace.mesh.object.sprite.3d}
+@item
+Loader plugin: @samp{crystalspace.mesh.loader.sprite.3d}
+@item
+Factory loader plugin: @samp{crystalspace.mesh.loader.factory.sprite.3d}
+@end itemize
+
+Objects in this plugin implement the following @sc{scf} interfaces (get
+with @code{scfQueryInterface}):
+
+@itemize @bullet
+@item
+@emph{MeshObject}
+@itemize @bullet
+@item
+Implements @samp{iMeshObject}
+@item
+Implements @samp{iSprite3DState}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectFactory}
+@item
+Implements @samp{iSprite3DFactoryState}
+@end itemize
+@item
+@emph{MeshObjectType}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectType}
+@item
+Implements @samp{iConfig}
+@end itemize
+@end itemize
+
+@subsubheading Factory State Interface
+
+Use the @samp{iSprite3DFactoryState} @sc{scf} interface to access settings for
+a 3D sprite factory.  The definition of this interface can be found in
+@file{CS/include/imesh/sprite3d.h} and that is also the include file you need
+to include in your applications to use this plugin.  Using this interface you
+can access the material, triangles, vertices, texture coordinates, normals,
+frames, actions, and various other configuration parameters for a 3D
+sprite factory.
+
+For frame based animation you need to access the @samp{iSpriteFrame} and
+@samp{iSpriteAction} interfaces (defined in @file{CS/include/imesh/sprite3d.h}).
+
+@subsubheading Factory Loader
+
+@table @code
+@item <material>materialname</material>
+Material to use for the sprite.
+@item <frame name="framename"><v x="" y="" z="" u="" v="" /> @dots{}
+Define one frame.  A frame is a list of vertices which are specified using the
+@samp{v} tag.  Every vertex has a 3D position in object space and (u,v)
+coordinates in the given texture (from 0 to 1).  Note that every frame needs to
+have the same number of vertices.
+@item <action name="actionname"><f name="framename"><delay>
+Define one action.  An action is a list of frames.  Every frame is annotated
+with the @samp{f} tag which contains the name of the frame to use and a
+delay.
+@item <t v1="" v2="" v3="" />
+Define one triangle.  The three parameters are the indices for the three
+triangle vertices.
+@item <smooth>base/frame</smooth>
+Defines how to apply normal smoothing on the sprite.
+@item <tween>yes/no</tween>
+Set to yes if you want to enable frame tweening.  Default is false.
+@end table
+
+@subsubheading Object State Interface
+
+@samp{iSprite3DState} is the @sc{scf} interface that you can
+use to set/get settings for a 3D Sprite object. The definition of this
+interface can be found in @file{CS/include/imesh/sprite3d.h} and that's also the
+include file you need to include in your applications to use this plugin.
+Using this interface you can access the material, blending mode (mixmode),
+current frame and action, and various other configuration parameters for an
+3D sprite object.
+
+@subsubheading Object Loader
+
+@table @code
+@item <factory>factoryname</factory>
+Name of the factory to use for creation of this instance.
+@item <mixmode><mode \></mixmode>
+Blending mode. @pxref{XMLServices Mixmode}.
+@item <material>materialname</material>
+Material to use for the sprite.
+@item <tween>yes/no</tween>
+Set to yes if you want to enable frame tweening.  Default is false.
+@item <lighting>yes/no</lighting>
+Set to yes if you want to enable lighting.  Default is true.
+@item <basecolor red="" green="" blue="" />
+Base color that will be added to all vertex colors. Default 0,0,0.
+@item <action name="actionname">
+The default action to use for this sprite instance.
+@end table
+
+@subsubheading Configuration Parameters
+
+The @file{sprite3d} plugin supports the following configuration parameters
+via the @samp{iConfig} interface in the mesh object type plugin:
+
+@table @code
+@item sprlod
+Set the sprite level-of-detail (@sc{lod}) level.
+@item sprlq
+Set the sprite lighting quality.
+@end table
+

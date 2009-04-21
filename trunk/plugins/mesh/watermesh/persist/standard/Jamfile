@@ -1,0 +1,8 @@
+SubDir TOP plugins mesh watermesh persist standard ;
+
+Description watermeshldr : "Water mesh object loader" ;
+Plugin watermeshldr : [ Wildcard *.cpp *.h ] ;
+Includes watermeshldr.h : $(SUBDIR)/watermesh_factory.tok ;
+Includes watermeshldr.h : $(SUBDIR)/watermesh_meshobject.tok ;
+LinkWith watermeshldr : crystalspace ;
+CompileGroups watermeshldr : meshes ;

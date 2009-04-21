@@ -1,0 +1,25 @@
+SubDir TOP libs csplugincommon ;
+
+if $(CSLIB.DECLARED) != yes
+{
+SubInclude TOP libs csplugincommon canvas ;
+SubInclude TOP libs csplugincommon imageloader ;
+SubInclude TOP libs csplugincommon render3d ;
+SubInclude TOP libs csplugincommon rendermanager ;
+SubInclude TOP libs csplugincommon renderstep ;
+SubInclude TOP libs csplugincommon script ;
+SubInclude TOP libs csplugincommon shader ;
+SubInclude TOP libs csplugincommon sndsys ;
+}
+else
+{
+# NOTE: Currently shared libs require that the "Library" statements appear in
+# depedency order (ie when Y depends on X, the directory for X must be stated
+# before Y's). Certain subdirectories of csplugincommon depend upon the main
+# Crystal Space library built above. Therefore, we include these Jamfiles on
+# the second pass.
+SubInclude TOP libs csplugincommon directx ;
+SubInclude TOP libs csplugincommon macosx ;
+SubInclude TOP libs csplugincommon opengl ;
+SubInclude TOP libs csplugincommon win32 ;
+}

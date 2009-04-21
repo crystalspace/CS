@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- sndsysoss.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sndsys.software.driver.jackasyn</name>
+        <implementation>SndSysDriverJackasyn</implementation>
+        <description>Sound System Jackasyn Software Driver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
+

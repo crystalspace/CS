@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- emit.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.emit</name>
+        <implementation>csEmitMeshObjectType</implementation>
+        <description>Crystal Space Emit Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

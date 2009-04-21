@@ -1,0 +1,61 @@
+SubDir TOP libs csutil ;
+
+{
+  local rejects ;
+  if $(LIBBFD.AVAILABLE) != "yes"
+  {
+    rejects += bfdsymbols.cpp bfdsymbols.h ;
+  }
+  else
+  {
+    CSLIB.EXTERNAL_LIBS += LIBBFD ;
+  }
+  if $(ZLIB.AVAILABLE) != "yes"
+  {
+    rejects += archive.cpp ;
+  }
+  else
+  {
+    CSLIB.EXTERNAL_LIBS += ZLIB ;
+  }
+
+  CsLibAddModule $(rejects) ;
+}
+
+CSUTIL.GENERIC = ;
+
+switch $(TARGET.OS)
+{
+case WIN32 :				# Windows 
+  SubInclude TOP libs csutil win32 ;
+case MACOS_X :				# MacOS/X
+  SubInclude TOP libs csutil macosx ;
+case * :				# Posix, Unix, GNU/Linux, etc.
+  SubInclude TOP libs csutil unix ;
+}
+
+if $(TARGET.OS) != "WIN32"
+{
+  if $(BACKTRACE.AVAILABLE) = "yes"
+  {
+    CSUTIL.GENERIC += callstack-backtrace.cpp ;
+  }
+}
+
+if $(REGEX.AVAILABLE) != "yes"
+{
+  CSUTIL.GENERIC += regex.c ;
+}
+
+SubInclude TOP libs csutil generic ;
+SubInclude TOP libs csutil ptmalloc ;
+SubInclude TOP libs csutil threading ;
+SubInclude TOP libs csutil processor ;
+
+CSLIB.CFLAGS +=
+  [ FDefines CS_CONFIGDIR='\"$(appconfdir)\"' ]
+  [ FDefines CS_PLUGINDIR='\"$(plugindir)\"'  ] ;
+CSLIB.EXTERNAL_LIBS += PTHREAD ;
+
+# Uncomment to build the tool to generate the Unicode mapping tables.
+#SubInclude TOP libs csutil ucmapgen ;

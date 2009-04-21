@@ -1,0 +1,6 @@
+SubDir TOP plugins cscript pycore ;
+
+if $(PYTHON.AVAILABLE) = "yes"
+{
+  PyBindingModule coremod : core : coremod.cpp : : : "core cs Python module" ;
+}

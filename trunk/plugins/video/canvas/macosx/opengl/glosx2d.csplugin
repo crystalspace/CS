@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- glosx2d.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics2d.glosx</name>
+        <implementation>GLOSXDriver2D</implementation>
+        <description>Crystal Space 2D driver for MacOS/X (OpenGL)</description>
+        <requires>
+          <class>crystalspace.font.server.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

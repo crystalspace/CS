@@ -1,0 +1,8 @@
+SubDir TOP plugins video render3d shader shadermgr ;
+
+Description shadermgr : "shader manager" ;
+Plugin shadermgr : [ Wildcard *.cpp *.h ] ;
+Includes shadermgr.h : $(SUBDIR)/shadermgr.tok ;
+MsvcExtraFile shadermgr : $(SUBDIR)/shadermgr.tok ;
+LinkWith shadermgr : crystalspace ;
+CompileGroups shadermgr : shaders renderers renderall openglrenderer ;

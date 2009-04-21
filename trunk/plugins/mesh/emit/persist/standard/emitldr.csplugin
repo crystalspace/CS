@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- emitldr.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.loader.emit</name>
+        <implementation>csEmitLoader</implementation>
+        <description>Crystal Space Emit Mesh Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.loader.factory.emit</name>
+        <implementation>csEmitFactoryLoader</implementation>
+        <description>Crystal Space Emit Factory Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.emit</name>
+        <implementation>csEmitSaver</implementation>
+        <description>Crystal Space Emit Mesh Saver</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.factory.emit</name>
+        <implementation>csEmitFactorySaver</implementation>
+        <description>Crystal Space Emit Factory Saver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

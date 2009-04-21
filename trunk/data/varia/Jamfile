@@ -1,0 +1,4 @@
+SubDir TOP data varia ;
+
+InstallData [ Wildcard *.def *.cam ] physmesh : data varia ;
+FileListEntriesData [ Wildcard *.def *.cam ] physmesh : varia : data-demo ;

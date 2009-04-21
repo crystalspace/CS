@@ -1,0 +1,609 @@
+<world>
+    <addon>
+        <plugin>crystalspace.renderloop.loop.loader</plugin>
+        <params>
+            <name>ourloop</name>
+            <steps>
+                <step plugin="crystalspace.renderloop.step.generic">
+                    <shadertype>diffuse</shadertype>
+                    <zoffset>yes</zoffset>
+                    <portaltraversal />
+                    <zuse />
+                </step>
+                <step plugin="crystalspace.renderloop.step.lightiter">
+                    <steps>
+                        <!-- diffuse lighting -->
+                        <step plugin="crystalspace.renderloop.step.generic">
+                            <shadertype>light</shadertype>
+                            <zoffset>no</zoffset>
+                            <ztest />
+                        </step>
+                    </steps>
+                </step>
+            </steps>
+        </params>
+    </addon>
+    <settings>
+        <clearzbuf>yes</clearzbuf>
+        <clearscreen>yes</clearscreen>
+        <lightmapcellsize>16</lightmapcellsize>
+        <renderloop>ourloop</renderloop>
+    </settings>
+    <plugins />
+    <shaders>
+        <shader>
+            <file>/shader/std_lighting.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/light.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/ambient.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/parallax/parallax.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/reflect/glass.xml</file>
+        </shader>      
+    </shaders>
+    <textures>
+        <texture name="walls.jpg">
+            <file>walls.jpg</file>
+        </texture>
+        <texture name="floor.jpg">
+            <file>floor.jpg</file>
+        </texture>
+        <texture name="box.jpg">
+            <file>box.jpg</file>
+        </texture>
+        <texture name="boxn.jpg">
+            <file>boxn.png</file>
+            <class>normalmap</class>
+        </texture>
+        <texture name="boxh.jpg">
+            <file>boxh.jpg</file>
+        </texture>
+        <texture name="bricks_n.png">
+            <file>/lev/stenciltest/bricks_n.png</file>
+            <class>normalmap</class>
+        </texture>
+    </textures>
+    <library>lightmaps.cslib</library>
+    <materials>
+        <material name="walls.jpg">
+            <texture>walls.jpg</texture>
+            <shader type="diffuse">light</shader>
+        </material>
+        <material name="floor.jpg">
+            <texture>floor.jpg</texture>
+            <shader type="diffuse">light</shader>
+        </material>
+        <material name="box.jpg">
+            <texture>box.jpg</texture>
+            <shadervar name="tex normal" type="texture">boxn.jpg</shadervar>
+            <shadervar name="tex height" type="texture">boxh.jpg</shadervar>
+            <shader type="light">parallax</shader>
+            <shader type="diffuse">ambient</shader>
+        </material>
+        <material name="box_spec.jpg">
+            <texture>box.jpg</texture>
+            <shadervar name="tex normal" type="texture">boxn.jpg</shadervar>
+            <shadervar name="tex height" type="texture">boxh.jpg</shadervar>
+            <shadervar name="specular" type="vector4">0.6, 0.8, 1, 1</shadervar>
+            <shader type="light">parallax</shader>
+            <shader type="diffuse">ambient</shader>
+        </material>
+    </materials>
+    <start name="Camera">
+        <sector>Scene</sector>
+        <position x="0.00333691" y="-0.00952018" z="-0.00766289" />
+    </start>
+    <library>/lib/teapot/teapot.lib</library>
+    <materials>
+        <material name="Teapot_reflect">
+            <texture>xygyw.tga</texture>
+            <shader type="standard">glass</shader>
+            <shadervar name="refraction index" type="float">1.1</shadervar>
+            <shadervar name="tex normal" type="texture">bricks_n.png</shadervar>
+        </material>
+    </materials>
+    <meshfact name="factory_Scene_Cube">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <numvt>24</numvt>
+            <v x="6.51433" y="-2.10426" z="-3.51433" u="0" v="1" />
+            <v x="-3.51433" y="-2.10426" z="-3.51433" u="1" v="1" />
+            <v x="-3.51433" y="-2.10426" z="3.51433" u="1" v="0" />
+            <v x="6.51433" y="-2.10426" z="3.51433" u="0" v="0" />
+            <v x="6.51433" y="2.10426" z="-3.51433" u="0" v="1" />
+            <v x="-3.51433" y="2.10426" z="-3.51433" u="1" v="1" />
+            <v x="-3.51433" y="-2.10426" z="-3.51433" u="1" v="0" />
+            <v x="6.51433" y="-2.10426" z="-3.51433" u="0" v="0" />
+            <v x="-3.51433" y="2.10426" z="-3.51433" u="0" v="1" />
+            <v x="-3.51433" y="2.10426" z="3.51433" u="1" v="1" />
+            <v x="-3.51433" y="-2.10426" z="3.51433" u="1" v="0" />
+            <v x="-3.51433" y="-2.10426" z="-3.51433" u="0" v="0" />
+            <v x="-3.51433" y="2.10426" z="3.51433" u="1" v="0" />
+            <v x="6.51433" y="2.10426" z="3.51433" u="0" v="0" />
+            <v x="6.51433" y="-2.10426" z="3.51433" u="0" v="1" />
+            <v x="-3.51433" y="-2.10426" z="3.51433" u="1" v="1" />
+            <v x="6.51433" y="2.10426" z="3.51433" u="0" v="1" />
+            <v x="6.51433" y="2.10426" z="-3.51433" u="1" v="1" />
+            <v x="6.51433" y="-2.10426" z="-3.51433" u="1" v="0" />
+            <v x="6.51433" y="-2.10426" z="3.51433" u="0" v="0" />
+            <v x="-3.51433" y="2.10426" z="3.51433" u="0" v="1" />
+            <v x="-3.51433" y="2.10426" z="-3.51433" u="1" v="1" />
+            <v x="6.51433" y="2.10426" z="-3.51433" u="1" v="0" />
+            <v x="6.51433" y="2.10426" z="3.51433" u="0" v="0" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="0" y="1" z="2.98398e-009" />
+            <n x="0" y="1" z="2.98398e-009" />
+            <n x="0" y="1" z="2.98398e-009" />
+            <n x="0" y="1" z="2.98398e-009" />
+            <n x="6.31434e-009" y="0" z="1" />
+            <n x="6.31434e-009" y="0" z="1" />
+            <n x="6.31434e-009" y="0" z="1" />
+            <n x="6.31434e-009" y="0" z="1" />
+            <n x="1" y="-2.07132e-008" z="0" />
+            <n x="1" y="-2.07132e-008" z="0" />
+            <n x="1" y="-2.07132e-008" z="0" />
+            <n x="1" y="-2.07132e-008" z="0" />
+            <n x="-6.31434e-009" y="0" z="-1" />
+            <n x="-6.31434e-009" y="0" z="-1" />
+            <n x="-6.31434e-009" y="0" z="-1" />
+            <n x="-6.31434e-009" y="0" z="-1" />
+            <n x="-1" y="4.37673e-008" z="0" />
+            <n x="-1" y="4.37673e-008" z="0" />
+            <n x="-1" y="4.37673e-008" z="0" />
+            <n x="-1" y="4.37673e-008" z="0" />
+            <n x="0" y="-1" z="-2.98398e-009" />
+            <n x="0" y="-1" z="-2.98398e-009" />
+            <n x="0" y="-1" z="-2.98398e-009" />
+            <n x="0" y="-1" z="-2.98398e-009" />
+            <submesh name="floor.jpg_1">
+                <material>floor.jpg</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="walls.jpg_0">
+                <material>walls.jpg</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="20" />
+                    <e c0="22" />
+                    <e c0="23" />
+                    <e c0="20" />
+                    <e c0="21" />
+                    <e c0="22" />
+                    <e c0="12" />
+                    <e c0="14" />
+                    <e c0="15" />
+                    <e c0="12" />
+                    <e c0="13" />
+                    <e c0="14" />
+                    <e c0="4" />
+                    <e c0="6" />
+                    <e c0="7" />
+                    <e c0="4" />
+                    <e c0="5" />
+                    <e c0="6" />
+                    <e c0="16" />
+                    <e c0="18" />
+                    <e c0="19" />
+                    <e c0="16" />
+                    <e c0="17" />
+                    <e c0="18" />
+                    <e c0="8" />
+                    <e c0="10" />
+                    <e c0="11" />
+                    <e c0="8" />
+                    <e c0="9" />
+                    <e c0="10" />
+                </indexbuffer>
+            </submesh>
+        </params>
+    </meshfact>
+    <meshfact name="factory_Scene_Cube.001">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <numvt>24</numvt>
+            <v x="-0.493757" y="-0.493757" z="0.493757" u="1" v="0" />
+            <v x="-0.493757" y="-0.493757" z="-0.493757" u="1" v="1" />
+            <v x="0.493757" y="-0.493757" z="-0.493757" u="0" v="1" />
+            <v x="0.493757" y="-0.493757" z="0.493757" u="0" v="0" />
+            <v x="0.493757" y="0.493757" z="-0.493757" u="1" v="0" />
+            <v x="-0.493757" y="0.493757" z="-0.493757" u="1" v="1" />
+            <v x="-0.493757" y="0.493757" z="0.493757" u="0" v="1" />
+            <v x="0.493757" y="0.493757" z="0.493757" u="0" v="0" />
+            <v x="0.493757" y="-0.493757" z="-0.493757" u="1" v="0" />
+            <v x="0.493757" y="0.493757" z="-0.493757" u="1" v="1" />
+            <v x="0.493757" y="0.493757" z="0.493757" u="0" v="1" />
+            <v x="0.493757" y="-0.493757" z="0.493757" u="0" v="0" />
+            <v x="-0.493757" y="-0.493757" z="0.493757" u="0.5" v="0.5" />
+            <v x="-0.493757" y="0.493757" z="0.493757" u="0.5" v="0" />
+            <v x="-0.493757" y="0.493757" z="-0.493757" u="1" v="0" />
+            <v x="-0.493757" y="-0.493757" z="-0.493757" u="1" v="0.5" />
+            <v x="-0.493757" y="0.493757" z="0.493757" u="0.5" v="0" />
+            <v x="-0.493757" y="-0.493757" z="0.493757" u="0.5" v="0.5" />
+            <v x="0.493757" y="-0.493757" z="0.493757" u="0" v="0.5" />
+            <v x="0.493757" y="0.493757" z="0.493757" u="0" v="0" />
+            <v x="-0.493757" y="-0.493757" z="-0.493757" u="1" v="0" />
+            <v x="-0.493757" y="0.493757" z="-0.493757" u="1" v="1" />
+            <v x="0.493757" y="0.493757" z="-0.493757" u="0" v="1" />
+            <v x="0.493757" y="-0.493757" z="-0.493757" u="0" v="0" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="0" y="-1" z="-1.33459e-008" />
+            <n x="0" y="-1" z="-1.33459e-008" />
+            <n x="0" y="-1" z="-1.33459e-008" />
+            <n x="0" y="-1" z="-1.33459e-008" />
+            <n x="0" y="1" z="1.33459e-008" />
+            <n x="0" y="1" z="1.33459e-008" />
+            <n x="0" y="1" z="1.33459e-008" />
+            <n x="0" y="1" z="1.33459e-008" />
+            <n x="1" y="1.33459e-008" z="0" />
+            <n x="1" y="1.33459e-008" z="0" />
+            <n x="1" y="1.33459e-008" z="0" />
+            <n x="1" y="1.33459e-008" z="0" />
+            <n x="-1" y="1.33459e-008" z="0" />
+            <n x="-1" y="1.33459e-008" z="0" />
+            <n x="-1" y="1.33459e-008" z="0" />
+            <n x="-1" y="1.33459e-008" z="0" />
+            <n x="1.33459e-008" y="0" z="1" />
+            <n x="1.33459e-008" y="0" z="1" />
+            <n x="1.33459e-008" y="0" z="1" />
+            <n x="1.33459e-008" y="0" z="1" />
+            <n x="1.33459e-008" y="0" z="-1" />
+            <n x="1.33459e-008" y="0" z="-1" />
+            <n x="1.33459e-008" y="0" z="-1" />
+            <n x="1.33459e-008" y="0" z="-1" />
+            <submesh name="box.jpg_0">
+                <material>box.jpg</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="4" />
+                    <e c0="6" />
+                    <e c0="7" />
+                    <e c0="4" />
+                    <e c0="5" />
+                    <e c0="6" />
+                    <e c0="8" />
+                    <e c0="10" />
+                    <e c0="11" />
+                    <e c0="8" />
+                    <e c0="9" />
+                    <e c0="10" />
+                    <e c0="12" />
+                    <e c0="14" />
+                    <e c0="15" />
+                    <e c0="12" />
+                    <e c0="13" />
+                    <e c0="14" />
+                    <e c0="16" />
+                    <e c0="18" />
+                    <e c0="19" />
+                    <e c0="16" />
+                    <e c0="17" />
+                    <e c0="18" />
+                    <e c0="20" />
+                    <e c0="22" />
+                    <e c0="23" />
+                    <e c0="20" />
+                    <e c0="21" />
+                    <e c0="22" />
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                </indexbuffer>
+            </submesh>
+        </params>
+    </meshfact>
+    <meshfact name="factory_Scene_Cube.002">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <numvt>24</numvt>
+            <v x="-0.493757" y="-0.493757" z="0.493757" u="1" v="0" />
+            <v x="-0.493757" y="-0.493757" z="-0.493757" u="1" v="1" />
+            <v x="0.493757" y="-0.493757" z="-0.493757" u="0" v="1" />
+            <v x="0.493757" y="-0.493757" z="0.493757" u="0" v="0" />
+            <v x="0.493757" y="0.493757" z="-0.493757" u="1" v="0" />
+            <v x="-0.493757" y="0.493757" z="-0.493757" u="1" v="1" />
+            <v x="-0.493757" y="0.493757" z="0.493757" u="0" v="1" />
+            <v x="0.493757" y="0.493757" z="0.493757" u="0" v="0" />
+            <v x="0.493757" y="-0.493757" z="-0.493757" u="1" v="0" />
+            <v x="0.493757" y="0.493757" z="-0.493757" u="1" v="1" />
+            <v x="0.493757" y="0.493757" z="0.493757" u="0" v="1" />
+            <v x="0.493757" y="-0.493757" z="0.493757" u="0" v="0" />
+            <v x="-0.493757" y="-0.493757" z="-0.493757" u="1" v="0" />
+            <v x="-0.493757" y="0.493757" z="-0.493757" u="1" v="1" />
+            <v x="0.493757" y="0.493757" z="-0.493757" u="0" v="1" />
+            <v x="0.493757" y="-0.493757" z="-0.493757" u="0" v="0" />
+            <v x="-0.493757" y="-0.493757" z="0.493757" u="0.5" v="0.5" />
+            <v x="-0.493757" y="0.493757" z="0.493757" u="0.5" v="0" />
+            <v x="-0.493757" y="0.493757" z="-0.493757" u="1" v="0" />
+            <v x="-0.493757" y="-0.493757" z="-0.493757" u="1" v="0.5" />
+            <v x="-0.493757" y="0.493757" z="0.493757" u="0.5" v="0" />
+            <v x="-0.493757" y="-0.493757" z="0.493757" u="0.5" v="0.5" />
+            <v x="0.493757" y="-0.493757" z="0.493757" u="0" v="0.5" />
+            <v x="0.493757" y="0.493757" z="0.493757" u="0" v="0" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="0" y="-1" z="-1.33459e-008" />
+            <n x="0" y="-1" z="-1.33459e-008" />
+            <n x="0" y="-1" z="-1.33459e-008" />
+            <n x="0" y="-1" z="-1.33459e-008" />
+            <n x="0" y="1" z="1.33459e-008" />
+            <n x="0" y="1" z="1.33459e-008" />
+            <n x="0" y="1" z="1.33459e-008" />
+            <n x="0" y="1" z="1.33459e-008" />
+            <n x="1" y="1.33459e-008" z="0" />
+            <n x="1" y="1.33459e-008" z="0" />
+            <n x="1" y="1.33459e-008" z="0" />
+            <n x="1" y="1.33459e-008" z="0" />
+            <n x="1.33459e-008" y="0" z="-1" />
+            <n x="1.33459e-008" y="0" z="-1" />
+            <n x="1.33459e-008" y="0" z="-1" />
+            <n x="1.33459e-008" y="0" z="-1" />
+            <n x="-1" y="1.33459e-008" z="0" />
+            <n x="-1" y="1.33459e-008" z="0" />
+            <n x="-1" y="1.33459e-008" z="0" />
+            <n x="-1" y="1.33459e-008" z="0" />
+            <n x="1.33459e-008" y="0" z="1" />
+            <n x="1.33459e-008" y="0" z="1" />
+            <n x="1.33459e-008" y="0" z="1" />
+            <n x="1.33459e-008" y="0" z="1" />
+            <submesh name="box_spec.jpg_0">
+                <material>box_spec.jpg</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="8" />
+                    <e c0="10" />
+                    <e c0="11" />
+                    <e c0="8" />
+                    <e c0="9" />
+                    <e c0="10" />
+                    <e c0="12" />
+                    <e c0="14" />
+                    <e c0="15" />
+                    <e c0="12" />
+                    <e c0="13" />
+                    <e c0="14" />
+                    <e c0="16" />
+                    <e c0="18" />
+                    <e c0="19" />
+                    <e c0="16" />
+                    <e c0="17" />
+                    <e c0="18" />
+                    <e c0="20" />
+                    <e c0="22" />
+                    <e c0="23" />
+                    <e c0="20" />
+                    <e c0="21" />
+                    <e c0="22" />
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                    <e c0="4" />
+                    <e c0="6" />
+                    <e c0="7" />
+                    <e c0="4" />
+                    <e c0="5" />
+                    <e c0="6" />
+                </indexbuffer>
+            </submesh>
+        </params>
+    </meshfact>
+    <sector name="Scene">
+        <meshobj name="teapot1">
+            <zuse />
+            <plugin>crystalspace.mesh.loader.genmesh</plugin>
+            <params>
+                <factory>Teapot</factory>
+                <lighting>no</lighting>
+                <color red="0" green="0" blue="0" />
+                <manualcolors />
+                <material>Teapot_reflect</material>
+                <mixmode>
+                    <copy />
+                </mixmode>
+            </params>
+            <move>
+                <v x="0" y="-2.10426" z="1" />
+            </move>
+        </meshobj>
+        <meshobj name="Cube">
+            <plugin>crystalspace.mesh.loader.genmesh</plugin>
+            <params>
+                <factory>factory_Scene_Cube</factory>
+                <lighting>no</lighting>
+                <color red="1" green="1" blue="1" />
+                <manualcolors />
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <submesh name="floor.jpg_1">
+                    <material>floor.jpg</material>
+                    <shadervar name="tex lightmap" type="texture">lightmaps_0_png</shadervar>
+                </submesh>
+                <submesh name="walls.jpg_0">
+                    <material>walls.jpg</material>
+                    <shadervar name="tex lightmap" type="texture">lightmaps_0_png</shadervar>
+                </submesh>
+                <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                    <e c0="0.261271" c1="0.332479" />
+                    <e c0="0.261271" c1="0.0190834" />
+                    <e c0="0.480917" c1="0.0190834" />
+                    <e c0="0.480917" c1="0.332479" />
+                    <e c0="0.632164" c1="0.332479" />
+                    <e c0="0.632164" c1="0.0190834" />
+                    <e c0="0.500648" c1="0.0190834" />
+                    <e c0="0.500648" c1="0.332479" />
+                    <e c0="0.944664" c1="0.0190834" />
+                    <e c0="0.944664" c1="0.238729" />
+                    <e c0="0.813148" c1="0.238729" />
+                    <e c0="0.813148" c1="0.0190834" />
+                    <e c0="0.788414" c1="0.0190834" />
+                    <e c0="0.788414" c1="0.332479" />
+                    <e c0="0.656898" c1="0.332479" />
+                    <e c0="0.656898" c1="0.0190834" />
+                    <e c0="0.944664" c1="0.480917" />
+                    <e c0="0.944664" c1="0.261271" />
+                    <e c0="0.813148" c1="0.261271" />
+                    <e c0="0.813148" c1="0.480917" />
+                    <e c0="0.238729" c1="0.0190834" />
+                    <e c0="0.0190834" c1="0.0190834" />
+                    <e c0="0.0190834" c1="0.332479" />
+                    <e c0="0.238729" c1="0.332479" />
+                </renderbuffer>
+            </params>
+            <zuse />
+            <move>
+                <v x="0.00333691" y="-0.00952018" z="0.000414791" />
+            </move>
+        </meshobj>
+        <meshobj name="Cube.001">
+            <plugin>crystalspace.mesh.loader.genmesh</plugin>
+            <params>
+                <factory>factory_Scene_Cube.001</factory>
+                <lighting>no</lighting>
+                <color red="1" green="1" blue="1" />
+                <manualcolors />
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <submesh name="box.jpg_0">
+                    <material>box.jpg</material>
+                    <shadervar name="tex lightmap" type="texture">lightmaps_0_png</shadervar>
+                </submesh>
+                <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                    <e c0="0.738086" c1="0.347851" />
+                    <e c0="0.707226" c1="0.347851" />
+                    <e c0="0.707226" c1="0.378711" />
+                    <e c0="0.738086" c1="0.378711" />
+                    <e c0="0.652539" c1="0.488086" />
+                    <e c0="0.652539" c1="0.457226" />
+                    <e c0="0.683399" c1="0.457226" />
+                    <e c0="0.683399" c1="0.488086" />
+                    <e c0="0.0119138" c1="0.402539" />
+                    <e c0="0.0427737" c1="0.402539" />
+                    <e c0="0.0427737" c1="0.433399" />
+                    <e c0="0.0119138" c1="0.433399" />
+                    <e c0="0.652539" c1="0.433399" />
+                    <e c0="0.683399" c1="0.433399" />
+                    <e c0="0.683399" c1="0.402539" />
+                    <e c0="0.652539" c1="0.402539" />
+                    <e c0="0.0666013" c1="0.378711" />
+                    <e c0="0.0666013" c1="0.347851" />
+                    <e c0="0.0974612" c1="0.347851" />
+                    <e c0="0.0974612" c1="0.378711" />
+                    <e c0="0.566601" c1="0.347851" />
+                    <e c0="0.566601" c1="0.378711" />
+                    <e c0="0.597461" c1="0.378711" />
+                    <e c0="0.597461" c1="0.347851" />
+                </renderbuffer>
+            </params>
+            <zuse />
+            <move>
+                <v x="3.79896" y="0.0553295" z="-2.0295588" />
+            </move>
+        </meshobj>
+        <meshobj name="Cube.002">
+            <plugin>crystalspace.mesh.loader.genmesh</plugin>
+            <params>
+                <factory>factory_Scene_Cube.002</factory>
+                <lighting>no</lighting>
+                <color red="1" green="1" blue="1" />
+                <manualcolors />
+                <mixmode>
+                    <copy />
+                </mixmode>
+                <submesh name="box_spec.jpg_0">
+                    <material>box_spec.jpg</material>
+                    <shadervar name="tex lightmap" type="texture">lightmaps_0_png</shadervar>
+                </submesh>
+                <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                    <e c0="0.0427737" c1="0.347851" />
+                    <e c0="0.0119138" c1="0.347851" />
+                    <e c0="0.0119138" c1="0.378711" />
+                    <e c0="0.0427737" c1="0.378711" />
+                    <e c0="0.0666013" c1="0.433399" />
+                    <e c0="0.0666013" c1="0.402539" />
+                    <e c0="0.0974612" c1="0.402539" />
+                    <e c0="0.0974612" c1="0.433399" />
+                    <e c0="0.0119138" c1="0.457226" />
+                    <e c0="0.0427737" c1="0.457226" />
+                    <e c0="0.0427737" c1="0.488086" />
+                    <e c0="0.0119138" c1="0.488086" />
+                    <e c0="0.652539" c1="0.347851" />
+                    <e c0="0.652539" c1="0.378711" />
+                    <e c0="0.683399" c1="0.378711" />
+                    <e c0="0.683399" c1="0.347851" />
+                    <e c0="0.707226" c1="0.433399" />
+                    <e c0="0.738086" c1="0.433399" />
+                    <e c0="0.738086" c1="0.402539" />
+                    <e c0="0.707226" c1="0.402539" />
+                    <e c0="0.707226" c1="0.488086" />
+                    <e c0="0.707226" c1="0.457226" />
+                    <e c0="0.738086" c1="0.457226" />
+                    <e c0="0.738086" c1="0.488086" />
+                </renderbuffer>
+            </params>
+            <zuse />
+            <move>
+                <v x="3.79896" y="0.0553295" z="2.0295588" />
+            </move>
+        </meshobj>
+        <light name="Lamp">
+            <center x="-.05294" y="0" z="0" />
+            <color red="0.9" green="0.9" blue="1.0" />
+            <radius>50</radius>
+            <attenuation c="0" l="0" q="0.1" />
+        </light>
+    </sector>
+    <sequences>
+        <sequence name="rotateCube">
+            <rotate mesh="Cube.001" duration="2000">
+                <rotx>1.8</rotx>
+                <v x="3.79896" y="0.0553295" z="-2.0295588" />
+            </rotate>
+            <delay time="2000" />
+            <rotate mesh="Cube.001" duration="2000">
+                <roty>1.4</roty>
+                <v x="3.79896" y="0.0553295" z="-2.0295588" />
+            </rotate>
+            <delay time="2000" />
+            <enable trigger="rotateCube" />
+        </sequence>
+        <sequence name="moveCube">
+            <move mesh="Cube.002" duration="2000" x="-6" y="0" z="0" />
+            <delay time="2000" />
+            <move mesh="Cube.002" duration="2000" x="6" y="0" z="0" />
+            <delay time="2000" />
+            <enable trigger="moveCube" />
+        </sequence>
+    </sequences>
+    <triggers>
+        <trigger name="rotateCube">
+            <sectorvis sector="Scene" />
+            <fire delay="20" sequence="rotateCube" />
+        </trigger>
+        <trigger name="moveCube">
+            <sectorvis sector="Scene" />
+            <fire delay="20" sequence="moveCube" />
+        </trigger>
+    </triggers>
+</world>

@@ -1,0 +1,19 @@
+;;; This is your application' specific Virtual File System mount table
+
+;;;
+;;; $/ -- path delimiter (i.e. "/" on Unix; "\" on Windows)
+;;; $@ -- installation directory of Crystal Space
+;;; $* -- application resource directory; same as csGetResourceDir()
+;;; $^ -- directory in which application resides; same as csGetAppDir()
+;;; The expansions of $@, $*, and $^ always have a trailing path delimiter.
+
+;;; Beware, /data/ mount point is already used internally by Crystal Space !
+
+; Creates a mount point named after your project's name, pointing to app dir
+VFS.Mount.#PROJECTNAME# = $^
+
+; The data directory is mounted at /appdata/ VFS path
+VFS.Mount.appdata  = $^data$/
+
+; The /cache/ mount point is needed for lightmaps and other generated files
+VFS.Mount.cache = $^data$/cache$/

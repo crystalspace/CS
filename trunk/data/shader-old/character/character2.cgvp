@@ -1,0 +1,54 @@
+<cgvp>
+<variablemap variable="bones" destination="Bones"/>
+<variablemap variable="light ambient" destination="Ambient"/>
+<program>
+<![CDATA[
+
+struct app2vertex {
+	float3 Position : POSITION;
+	float2 TexCoord : TEXCOORD0;
+	short4 BonesIndices;
+	float4 BonesWeights;
+};
+
+struct vertex2fragment { 
+	float4 Position : POSITION;
+	float2 TexCoord : TEXCOORD0;
+	float3 Col : COLOR;
+};
+
+float3 QuatMultVert( float4 q1, float3 v )
+{
+   float4 r1 = float4(q1.w*v.xyz + cross( q1.xyz, v.xyz ), - dot( q1.xyz, v.xyz));
+   float4 r2 = float4(-q1.xyz, q1.w);
+   return r1.w*r2.xyz + r2.w*r1.xyz + cross( r1.xyz, r2.xyz );
+}
+
+vertex2fragment main (app2vertex IN,
+	uniform float4x4 ModelViewProj : state.matrix.mvp,
+	uniform float3 Ambient,
+	uniform float4 Bones[78])
+{
+	vertex2fragment OUT;
+	short idx1 = IN.BonesIndices.x*2;
+	short idx2 = IN.BonesIndices.y*2;
+	short idx3 = IN.BonesIndices.z*2;
+	short idx4 = IN.BonesIndices.w*2;
+
+	float4 position;
+	position.xyz =  (QuatMultVert(Bones[idx1], IN.Position.xyz) + Bones[idx1+1].xyz)*IN.BonesWeights.x;
+	position.xyz += (QuatMultVert(Bones[idx2], IN.Position.xyz) + Bones[idx2+1].xyz)*IN.BonesWeights.y;
+	position.xyz += (QuatMultVert(Bones[idx3], IN.Position.xyz) + Bones[idx3+1].xyz)*IN.BonesWeights.z;
+	position.xyz += (QuatMultVert(Bones[idx4], IN.Position.xyz) + Bones[idx4+1].xyz)*IN.BonesWeights.w;
+	position.w = 1;
+
+	OUT.Position = mul (ModelViewProj, position);
+	OUT.TexCoord = IN.TexCoord;
+	OUT.Col.xyz = Ambient;
+	
+	return OUT;
+}
+
+]]>
+</program>
+</cgvp>

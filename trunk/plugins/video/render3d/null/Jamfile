@@ -1,0 +1,10 @@
+SubDir TOP plugins video render3d null ;
+
+Description null3d : "3D null (do-nothing) renderer" ;
+Plugin null3d : [ Wildcard *.cpp *.h ] ;
+LinkWith null3d : crystalspace ;
+CompileGroups null3d : renderers renderall ;
+
+# Historic alias.
+NotFile nullrender3d ;
+Depends nullrender3d null3d ;

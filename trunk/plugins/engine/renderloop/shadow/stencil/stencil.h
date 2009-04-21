@@ -1,0 +1,228 @@
+/* 
+    Copyright (C) 2003 by Jorrit Tyberghein, Daniel Duhprey
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#ifndef __CS_STENCIL_H
+#define __CS_STENCIL_H
+
+#include "csutil/ref.h"
+
+#include "iutil/objreg.h"
+#include "iutil/comp.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/rndbuf.h"
+#include "ivideo/shader/shader.h"
+#include "iengine/rendersteps/irenderstep.h"
+#include "iengine/rendersteps/icontainer.h"
+#include "iengine/rendersteps/ilightiter.h"
+#include "iengine/viscull.h"
+#include "imesh/objmodel.h"
+#include "igeom/trimesh.h"
+#include "csutil/hash.h"
+#include "csutil/csstring.h"
+#include "csutil/strhash.h"
+#include "csutil/scf_implementation.h"
+#include "csutil/dirtyaccessarray.h"
+#include "csutil/weakref.h"
+#include "csgfx/shadervarcontext.h"
+#include "csplugincommon/renderstep/basesteptype.h"
+#include "csplugincommon/renderstep/basesteploader.h"
+#include "csplugincommon/renderstep/parserenderstep.h"
+
+class csStencilShadowStep;
+class csStencilShadowType;
+
+class csStencilShadowCacheEntry :
+  public scfImplementation1<csStencilShadowCacheEntry, iObjectModelListener>
+{
+private:
+  csStencilShadowStep* parent;
+  iObjectModel* model;
+  iMeshWrapper* meshWrapper;
+
+  // If true we use the new triangle mesh system.
+  bool use_trimesh;
+
+  struct csLightCacheEntry 
+  {
+    iLight* light;
+    csVector3 meshLightPos;
+    csRef<iRenderBuffer> shadow_index_buffer;
+    int edge_start, index_range;
+  };
+  csHash<csLightCacheEntry*, csPtrKey<iLight> > lightcache;
+
+  csRef<iRenderBuffer> shadow_vertex_buffer;
+  csRef<iRenderBuffer> shadow_normal_buffer;
+  csRef<iRenderBuffer> active_index_buffer;
+
+  struct EdgeInfo 
+  {
+    csVector3 a, b;
+    csVector3 norm;
+    int ind_a, ind_b;
+    EdgeInfo() : a(0), b(0), norm(0), ind_a(0), ind_b(0) {}
+  };
+
+  size_t vertex_count, triangle_count;
+  size_t edge_count;
+  csDirtyAccessArray<csVector3> face_normals;
+  csDirtyAccessArray<int> edge_indices;
+  csArray<csVector3> edge_midpoints;
+  csArray<csVector3> edge_normals;
+
+  // Mesh that was created when the original shadow mesh was auto-closed.
+  // Kept so that a new one isn't alloced every time.
+  csStencilTriangleMesh* closedMesh;
+
+  bool enable_caps;
+
+  bool meshShadows;
+
+  inline void HandlePoly (const csVector3* vertices, const int* polyVertices, 
+    const int numVerts, csArray<EdgeInfo>& edge_array, 
+    csHash<EdgeInfo*>& edge_stack, int& NextEdge, int& TriIndex);
+  void HandleEdge (EdgeInfo* e, csHash<EdgeInfo*>& edge_stack);
+public:
+  csRef<csRenderBufferHolder> bufferHolder;
+
+  csStencilShadowCacheEntry (csStencilShadowStep* parent, 
+    iMeshWrapper* mesh);
+  virtual ~csStencilShadowCacheEntry ();
+
+  void SetActiveLight (iLight *light, csVector3 meshlightpos, 
+    int& active_index_range, int& active_edge_start);
+  virtual void ObjectModelChanged (iObjectModel* model);
+  void EnableShadowCaps () { enable_caps = true; }
+  void DisableShadowCaps () { enable_caps = false; }
+  bool ShadowCaps () { return enable_caps; }
+
+  bool MeshCastsShadow () { return meshShadows; }
+
+  void UpdateBuffers() ;
+};
+
+class csStencilShadowStep : 
+  public scfImplementation4<csStencilShadowStep,
+    iRenderStep, iLightRenderStep, iRenderStepContainer,
+    iVisibilityCullerListener>
+{
+private:
+  friend class csStencilShadowCacheEntry;
+
+  iObjectRegistry* object_reg;
+  csWeakRef<iGraphics3D> g3d;
+  csWeakRef<iShaderManager> shmgr;
+  csRef<csStencilShadowType> type;
+  csRef<iShaderVarStringSet> svNameStringset;
+
+  // ID's for the triangle mesh system.
+  csStringID base_id;
+  csStringID shadows_id;
+
+  bool enableShadows;
+  csRefArray<iLightRenderStep> steps;
+
+  csArray<iMeshWrapper*, csArrayElementHandler<iMeshWrapper*>,
+    CS::Container::ArrayAllocDefault, csArrayCapacityFixedGrow<128> >
+    shadowMeshes;
+  csHash< csRef<csStencilShadowCacheEntry>, csPtrKey<iMeshWrapper> > 
+    shadowcache;
+
+  void DrawShadow (iRenderView* rview, iLight* light, iMeshWrapper *mesh, 
+    iShader *shader, size_t shaderTicket, size_t pass);
+
+  void Report (int severity, const char* msg, ...);
+
+public:
+  csStencilShadowStep (csStencilShadowType* type);
+  virtual ~csStencilShadowStep ();
+
+  bool Initialize (iObjectRegistry* objreg);
+
+  csStringID GetBaseID () const { return base_id; }
+  csStringID GetShadowsID () const { return shadows_id; }
+  
+  void Perform (iRenderView* rview, iSector* sector,
+    csShaderVariableStack& stack);
+  void Perform (iRenderView* rview, iSector* sector, iLight* light,
+    csShaderVariableStack& stack);
+
+  virtual size_t AddStep (iRenderStep* step);
+  virtual bool DeleteStep (iRenderStep* step);
+  virtual iRenderStep* GetStep (size_t n) const;
+  virtual size_t Find (iRenderStep* step) const;
+  virtual size_t GetStepCount () const;
+
+  virtual void ObjectVisible (iVisibilityObject *visobject, 
+    iMeshWrapper *mesh, uint32 frustum_mask);
+};
+
+class csStencilShadowFactory :
+  public scfImplementation1<csStencilShadowFactory, iRenderStepFactory>
+{
+  iObjectRegistry* object_reg;
+  csRef<csStencilShadowType> type;
+
+public:
+  csStencilShadowFactory (iObjectRegistry* object_reg,
+      csStencilShadowType* type);
+  virtual ~csStencilShadowFactory ();
+
+  virtual csPtr<iRenderStep> Create ();
+
+};
+
+class csStencilShadowType :
+  public scfImplementationExt0<csStencilShadowType, csBaseRenderStepType>
+{
+  csRef<iShader> shadow;
+  bool shadowLoaded;
+
+  void Report (int severity, const char* msg, ...);
+public:
+  csStencilShadowType (iBase* p);
+  virtual ~csStencilShadowType ();
+
+  virtual csPtr<iRenderStepFactory> NewFactory ();
+
+  iShader* GetShadow ();
+};
+
+class csStencilShadowLoader :
+  public scfImplementationExt0<csStencilShadowLoader, csBaseRenderStepLoader>
+{
+  csRenderStepParser rsp;
+
+  csStringHash tokens; 
+ #define CS_TOKEN_ITEM_FILE "plugins/engine/renderloop/shadow/stencil/stencil.tok"
+ #include "cstool/tokenlist.h"
+
+public:
+  csStencilShadowLoader (iBase *p);
+  virtual ~csStencilShadowLoader ();
+
+  virtual bool Initialize (iObjectRegistry* object_reg);
+
+  virtual csPtr<iBase> Parse (iDocumentNode* node,
+    iStreamSource*, iLoaderContext* ldr_context,
+    iBase* context);
+
+  virtual bool IsThreadSafe() { return true; }
+};
+
+#endif // __CS_STENCIL_H

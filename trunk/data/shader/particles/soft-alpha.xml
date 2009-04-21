@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+  Copyright (C) 2009 by Frank Richter
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<shader compiler="shaderweaver" name="particles_soft-alpha">
+  <technique priority="100">
+    <pass>
+      <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+
+      <!-- Snippets - the building blocks of this shader. -->
+      <snippet id="position" file="/shader/snippets/position.xml" />
+      <snippet id="color" file="/shader/snippets/primary_color.xml" />
+      <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
+      <snippet id="distance" file="/shader/snippets/particles/fragment-dist.xml" />
+      <snippet id="fade" file="/shader/snippets/particles/fade-alpha-linear.xml" />
+      <snippet id="diffuse" file="/shader/snippets/surface/surface-classic.xml" />
+      <snippet id="mod_diffuse" file="/shader/snippets/modulate.xml" />
+      <snippet id="hdrscale" file="/shader/snippets/hdr-postscale.xml" />
+      <!-- "connections" describe what snippets take input from what other
+           snippets (ie the "data flow" is modeled). The exact resolution of
+	   what output is linked to what input is done automatically. -->
+      <connection from="position" to="distance" />
+      <connection from="position" to="fade" />
+      <connection from="color" to="apply_mixmode_alpha" />
+      <connection from="apply_mixmode_alpha" to="mod_diffuse" />
+      <connection from="distance" to="fade" />
+      <connection from="diffuse" to="fade" />
+      <connection from="fade" to="mod_diffuse" />
+      <connection from="mod_diffuse" to="hdrscale" />
+    </pass>
+  </technique>
+  
+  <fallbackshader name="particles_basic" file="/shader/particles/basic.xml" />
+</shader>

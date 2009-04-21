@@ -1,0 +1,32 @@
+<h3> Portals</h3>
+<p>Portals are a very important tool to speed up the rendering of levels. Well 
+  defined sectors can greatly speed up rendering and allow various tricks, to 
+  understand what they are, read <a href="sectors.htm">this</a> guide.</p>
+<p>CS uses portals to connect different <a href="sectors.htm">sectors</a>. A portal 
+  can be for example a door or a window that connects the interior of an house 
+  to the exterior. In that case the interior will be one sector, the exterior 
+  another one.<br>
+  <br>
+  To add a portal to a 3dsmax scene follow this guidelines:</p>
+<ul>
+  <li>the object name must start with "_p_" . For example "_p_laanx1" 
+    is a valid portal name.</li>
+  <li>it MUST be a mesh with 2 planar triangle polygons (a square similar to a 
+    door is perfect).</li>
+  <li>add a property to the object (see 'Objects' chapter for details on how to 
+    add a property) called "PORTAL" that points to the roomname of the 
+    sector where that portal will lead to.<br>
+    Example: PORTAL=plaza</li>
+</ul>
+<p><br>
+  Please note than the exporter will produce 1 sector per exported scene , so 
+  if you want to make a level with many sectors: </p>
+<ul>
+  <li>Create different max scene (one per sector ) </li>
+  <li>Merge them to see if they fit correctly toghether </li>
+  <li>Export each one separatly</li>
+  <li>Merge the exported files. (PS team developed a simple tool for merging).<br>
+  </li>
+</ul>
+<p align=right>Next: <a href="samples.htm">Samples</a></p>
+</body></html>

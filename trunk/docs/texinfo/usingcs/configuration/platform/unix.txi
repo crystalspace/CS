@@ -1,0 +1,18 @@
+@c -*-texinfo-*-
+@subsubheading Unix User-Specific Settings
+@cindex Unix User-Specific Settings
+
+On Unix and Unix-like platforms, user-specific settings are stored in files in
+the hidden directory @file{$HOME/.crystalspace}.  The actual name of a
+configuration file is generated from the @emph{unique application identifier}
+with a @file{.cfg} suffix.  For example, the configuration for the application
+which has a unique identifier @samp{MyGames.ClickFrenzy2} will be stored as:
+
+@example
+$HOME/.crystalspace/MyGames.ClickFrenzy2.cfg
+@end example
+
+User-specific, application-neutral settings, on the other hand, will be stored
+as @file{$HOME/.crystalspace/CrystalSpace.Global.cfg}.  The configuration file
+format is described in the configuration file section,
+@ref{Configuration File}.

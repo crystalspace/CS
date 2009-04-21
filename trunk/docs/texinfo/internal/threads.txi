@@ -1,0 +1,259 @@
+@c -*-texinfo-*-
+@node Threads in CS, Engine Internal Workings, Platform Details, Internals
+@section Threads in Crystal Space
+@cindex Threads
+
+@noindent
+@emph{Written by Jorrit Tyberghein and Michael Gist.}
+
+The Crystal Space project as such is not thread-safe. So when using
+threads in combination with Crystal Space you have to be careful. However,
+several parts of Crystal Space are thread-safe to some degree. This is
+documented in this section. However, by default you must assume that some
+Crystal Space plugin or module is not thread-safe unless it is mentioned here.
+
+@subheading Threadsafe parts of Crystal Space
+
+@itemize @bullet
+@item
+@sc{scf} (@pxref{SCF}) class loading/unloading is safe. This means that
+@code{SCF_CREATE_INSTANCE()} and all the routines in @samp{iSCF} that have
+to do with loaded classes are safe.
+
+@item
+The plugin manager is safe, thus functions such as @code{csLoadPlugin},
+@code{csLoadPluginAlways}, and @code{csQueryPluginClass} are safe.
+
+@item
+The object registry is safe, thus macros like @code{csQueryRegistry}
+are safe. The @code{iObjectRegistryIterator} takes a copy of the data
+over which it iterates so it will not even lock.
+
+@item
+@sc{vfs} (@pxref{VFS}) is thread-safe for most operations.  But do not work on
+the same @samp{iFile} from different threads!  That is not thread-safe.  Also
+the concept of the current directory is not really valid with threads.
+
+@item
+The TinyXML, XMLRead, and BinaryXML parsers are thread safe in the sense
+that it is okay to create and work on separate documents in separate threads.
+However it is @emph{not} okay to work on the same document in different
+threads.
+
+@item
+The syntax services plugin is safe for the basic parsing tools (vectors,
+matrices, reporting errors, etc.).
+
+@item
+The @samp{simpcon} and @samp{csconout} output consoles are thread-safe provided
+auto-updating is disabled which you can set like this:
+
+@example
+csRef<iConsoleOutput> con = ...;
+con->AutoUpdate(false);
+@end example
+
+@noindent
+Note that by default auto-updating is enabled!
+
+@item
+The reporter plugin is fully thread-safe.
+
+@item
+The standard reporter listener plugin is thread-safe for basic operations
+but not for initialization. That should be done from the main thread.
+Also note that thread-safety of the standard reporter listener depends
+on thread-safety of the output console that is being used.
+
+@item
+The following mesh object and factory loaders are thread-safe provided that the
+implementation of @samp{iLoaderContext} is thread-safe.  Please note that the
+default @samp{iLoaderContext} is @emph{not} thread-safe which makes all loader
+plugins unsafe by default.
+
+@itemize @bullet
+@item
+@emph{Genmesh loader}: Aside from a small design mistake with streams in
+case the new renderer is used, the genmesh loader plugin is perfectly
+thread-safe.
+@end itemize
+
+@end itemize
+
+@subheading Thread Manager
+
+Crystal Space provides a thread manager and macros to make multi-threading as
+easy as possible for the user. The thread manager is a powerful and generic system
+which supports safe scaling of threads and importantly allows non-main threads to safely
+dispatch method calls to be executed by other non-main threads.
+In essence, if you write a plugin which correctly uses this system it will increase in
+parallelism as time goes by (cpus increasingly being released with larger numbers of cores)
+without you having to change anything to compensate (up to some point which depends on your plugin).
+
+@subsubheading Interfaces
+
+To declare that you want a method in your interface to be run in a thread other
+than the main thread, you need to make use of the @samp{THREADED_INTERFACE}
+macro. This is rather straightforward as shown;
+
+@example
+#include "iutil/threadmanager.h"
+
+struct iThreadTest : public virtual iBase
+@{
+  THREADED_INTERFACE(Test1);
+  THREADED_INTERFACE1(Test2, bool b);
+  THREADED_INTERFACE2(Test3, int i, float f);
+@}
+@end example
+
+This will add extra information to your method, such as a special return type.
+
+@subsubheading Class and Method declaration
+
+Inside your class, to declare a method as being threaded you need to do two things:
+
+@itemize @bullet
+@item Inherit from the class @samp{ThreadedCallable<>}. This adds some extra required functionality
+to your class and forces you to implement some needed methods. Currently, you are only required
+to implement @samp{GetObjectRegistry()}.
+@item Make use of the @samp{THREADED_CALLABLE_DECL} macro. This is explained below. 
+@end itemize
+
+The @samp{THREADED_CALLABLE_DECL} macro is what kicks everything off. It creates extra functions to
+dispatch the method call off to the thread manager, and provides a declaration to your function.
+It takes multiple parameters:
+
+@itemize @bullet
+@item The first parameter is the name of the class your method is in.
+@item The second parameter is the name of your method.
+@item The third parameter is the class of the return object, this will be explained in more detail below.
+@item All of the next parameters except the last two are the type followed by the name of the variables that will be passed.
+@item The penultimate parameter is a boolean value which determines if the method call is dispatched to the main thread(false) or a non-main thread(true).
+@item The final parameter is a boolean value which determines whether or not the method will return immediately (false), or if it will wait until the call is finished(true).
+@end itemize
+
+Be very careful when dispatching to the main thread and waiting on it to finish.
+E.g. If you're holding a lock which the main thread is currently waiting on, you will cause a deadlock by calling such a method.
+
+@example
+#include "csutil/threadmanager.h"
+
+class csThreadTest :
+  public ThreadedCallable<csThreadTest>,
+  public scfImplementation1<csThreadTest, iThreadTest>
+@{
+public:
+  csThreadTest(iObjectRegistry* objReg);
+
+  iObjectRegistry* GetObjectRegistry() const
+  @{ return objReg; @}
+
+  THREADED_CALLABLE_DECL(
+    csThreadTest, Test1, csThreadReturn, true, false)
+  THREADED_CALLABLE_DECL1(
+    csThreadTest, Test2, csThreadReturn, bool, b, true, false)
+  THREADED_CALLABLE_DECL2(
+    csThreadTest, Test3, csThreadReturn, int, in, float, flo,
+    true, false)
+
+private:
+  iObjectRegistry* objReg;
+@}
+@end example
+
+@subsubheading Method definition
+
+Now that you have your class set up and methods declared, you need to define them. You do this using the @samp{THREADED_CALLABLE_IMPL} macro.
+The first parameter is the class name. The second is the method name and the rest are your variables as normal.
+
+The @samp{return} here is actually a provided object, as you will read more about below. This is called @samp{ret}.
+
+@example
+THREADED_CALLABLE_IMPL(csThreadTest, Test1)
+@{
+@}
+
+THREADED_CALLABLE_IMPL1(csThreadTest, Test2, bool b)
+@{
+@}
+
+THREADED_CALLABLE_IMPL2(csThreadTest, Test3, int i, float f)
+@{
+@}
+@end example
+
+@subsubheading Return types
+
+As mentioned above, you specify the class of the return object in the method declaration.
+There a restriction here; The object must implement the @samp{iThreadReturn} interface.
+This is already implemented in @file{csutil/threadmanager.h} (@samp{csThreadReturn}), or you may implement this yourself.
+
+This return object basically tells/gives you three things:
+
+@itemize @bullet
+@item Whether or not the method call has finished yet.
+@item Whether or not the method call succeeded.
+@item The return data from that method call.
+@end itemize
+
+You set the return data yourself using the provided @samp{ret} @samp{iThreadReturn} object interface in your method definition.
+The return data is in the form of a @code{csRef<iBase>} or a @samp{void*}. It is up to you which you choose to use.
+To indicate whether or not your function has succeeded, return a boolean value (true for success).
+Your return object will automatically be updated when your method has finished executing to mark that this is the case.
+
+An example of this:
+
+@example
+THREADED_CALLABLE_IMPL(csClassName, MethodName2)
+@{
+  csRef<iInterface> obj = csPtr<iInterface>(new csImpl())
+  ret->SetData(csRef<iBase>(obj));
+  return true;
+@}
+
+csClassName::MethodName()
+@{
+  csRef<iThreadReturn> ret = MethodName2();
+  ret->Wait();
+  if(ret->WasSuccessful())
+  @{
+    csRef<iInterface> obj;
+    ret->GetData(obj);
+  @}
+@}
+@end example
+
+@subsubheading Waiting
+
+You may have noticed something new in the example above:
+
+@example
+ret->Wait();
+@end example
+
+The majority of the time you will want your method call to return immediately so you can continue onwards.
+At some point you might want to check and wait for your method to finish before continuing.
+The thread manager provides a simple way to do this. Call @code{Wait()}, on your @samp{iThreadReturn} and it will send
+a message to the thread manager and then wait until your method has finished executing, at which point it will return.
+
+@subheading Threaded Loading
+
+One important threaded section of Crystal Space is the threaded loader.  In
+order to ensure that the threaded loader works correctly you must make sure
+that you use thread-safe versions of the following modules in Crystal Space:
+
+@itemize
+@item
+@code{iReporter} (the standard reporter is okay).
+@item
+@code{iReporterListener} (the standard reporter listener is okay).
+@item
+@code{iConsoleOutput} (@file{simpcon} and @file{csconout} are okay provided
+auto-updating is disabled).
+@item
+@code{iLoaderContext} (the threaded loader provides a thread-safe version
+of this one).
+@item
+@code{iDocumentSystem} (TinyXML, XMLRead, and BinaryXML are all okay).
+@end itemize

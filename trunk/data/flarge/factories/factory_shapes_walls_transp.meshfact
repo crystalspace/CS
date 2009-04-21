@@ -1,0 +1,53 @@
+<library>
+    <textures>
+        <texture name="yellowcheckers">
+            <!-- Our favorite 'not found' texture - 
+	         just yellow & wanted this time :) -->
+            <type>crystalspace.texture.loader.checkerboard</type>
+            <size width="16" height="16" />
+            <params>
+                <depth>4</depth>
+                <color red="1" green="0.8" blue="0.1" />
+            </params>
+        </texture>
+    </textures>
+    <materials>
+        <material name="yellowcheckers">
+            <texture>yellowcheckers</texture>
+        </material>
+    </materials>
+    <meshfact name="factory_shapes_walls_transp">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <numvt>4</numvt>
+            <v x="-20" y="-3" z="40" u="0" v="0" />
+            <v x="0" y="-3" z="40" u="3.33334" v="0" />
+            <v x="0" y="-3" z="20.5" u="3.33334" v="3.25001" />
+            <v x="-20" y="-3" z="20.5" u="0" v="3.25001" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <submesh name="yellowcheckers_0">
+                <material>yellowcheckers</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                </indexbuffer>
+            </submesh>
+            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                <e c0="0.0625" c1="0.0625" />
+                <e c0="0.5" c1="0.0625" />
+                <e c0="0.5" c1="0.5" />
+                <e c0="0.0625" c1="0.5" />
+            </renderbuffer>
+        </params>
+    </meshfact>
+</library>

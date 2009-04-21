@@ -1,0 +1,810 @@
+/*
+  Copyright (C) 2002-2005 by Marten Svanfeldt
+			     Anders Stenberg
+			     Frank Richter
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#include "cssysdef.h"
+#include "csgeom/vector3.h"
+#include "csplugincommon/opengl/glextmanager.h"
+#include "csplugincommon/opengl/glstates.h"
+#include "csutil/objreg.h"
+#include "csutil/ref.h"
+#include "csutil/scf.h"
+#include "iutil/comp.h"
+#include "iutil/document.h"
+#include "iutil/plugin.h"
+#include "ivaria/reporter.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/material.h"
+#include "ivideo/shader/shader.h"
+#include "glshader_ffp.h"
+#include "glshader_fixed.h"
+
+////////////////////////////////////////////////////////////////////
+//                          csGLShaderFFP
+////////////////////////////////////////////////////////////////////
+
+CS_LEAKGUARD_IMPLEMENT (csGLShaderFFP);
+
+csGLShaderFFP::csGLShaderFFP(csGLShader_FIXED* shaderPlug) :
+  csShaderProgram (shaderPlug->object_reg), colorSum (false)
+{
+  csGLShaderFFP::shaderPlug = shaderPlug;
+  validProgram = false;
+
+  BuildTokenHash();
+}
+
+csGLShaderFFP::~csGLShaderFFP ()
+{
+}
+
+void csGLShaderFFP::Report (int severity, const char* msg, ...)
+{
+  va_list args;
+  va_start (args, msg);
+  csReportV (objectReg, severity, "crystalspace.graphics3d.shader.fixed.fp", 
+    msg, args);
+  va_end (args);
+}
+
+void csGLShaderFFP::Report (int severity, iDocumentNode* node, 
+                            const char* msg, ...)
+{
+  va_list args;
+  va_start (args, msg);
+  csString s;
+  s.FormatV (msg, args);
+  va_end (args);
+  synsrv->Report ("crystalspace.graphics3d.shader.fixed.fp", severity, node, 
+    "%s", s.GetData());
+}
+
+void csGLShaderFFP::BuildTokenHash()
+{
+  InitTokenTable (tokens);
+
+  tokens.Register("primary color", GL_PRIMARY_COLOR);
+  tokens.Register("texture", GL_TEXTURE);
+  tokens.Register("constant color", GL_CONSTANT_ARB);
+  tokens.Register("previous layer", GL_PREVIOUS_ARB);
+  
+  tokens.Register("color", GL_SRC_COLOR);
+  tokens.Register("invertcolor", GL_ONE_MINUS_SRC_COLOR);
+  tokens.Register("one minus color", GL_ONE_MINUS_SRC_COLOR);
+  tokens.Register("alpha", GL_SRC_ALPHA);
+  tokens.Register("invertalpha", GL_ONE_MINUS_SRC_ALPHA);
+  tokens.Register("one minus alpha", GL_ONE_MINUS_SRC_ALPHA);
+
+  tokens.Register("replace", GL_REPLACE);
+  tokens.Register("modulate", GL_MODULATE);
+  tokens.Register("add", GL_ADD);
+  tokens.Register("add signed", GL_ADD_SIGNED_ARB);
+  tokens.Register("interpolate", GL_INTERPOLATE_ARB);
+  tokens.Register("subtract", GL_SUBTRACT_ARB);
+  tokens.Register("dot3", GL_DOT3_RGB_ARB);
+  tokens.Register("dot3 alpha", GL_DOT3_RGBA_ARB);
+}
+
+
+////////////////////////////////////////////////////////////////////
+//                          iShaderProgram
+////////////////////////////////////////////////////////////////////
+
+bool csGLShaderFFP::Load (iShaderDestinationResolver*, iDocumentNode* node)
+{
+  if(!node)
+    return false;
+
+  csRef<iDocumentNode> mtexnode = node->GetNode("fixedfp");
+  if(mtexnode)
+  {
+    {
+      size_t idx = 0;
+      csRef<iDocumentNodeIterator> layerIt = mtexnode->GetNodes ("layer");
+      while(layerIt->HasNext())
+      {
+        csRef<iDocumentNode> child = layerIt->Next();
+        if(child->GetType() != CS_NODE_ELEMENT) continue;
+	const char* name = child->GetAttributeValue ("name");
+	if (name != 0)
+	  layerNames.Put (name, (int)idx);
+        idx++;
+      }
+    }
+
+    csRef<iDocumentNodeIterator> it = mtexnode->GetNodes();
+    while(it->HasNext())
+    {
+      csRef<iDocumentNode> child = it->Next();
+      if(child->GetType() != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = tokens.Request (value);
+      switch(id)
+      {
+        case XMLTOKEN_LAYER:
+          {
+            mtexlayer ml;
+            if (!LoadLayer(&ml, child))
+              return false;
+            texlayers.Push (ml);
+          }
+          break;
+	case XMLTOKEN_FOG:
+	  {
+	    if (!ParseFog (child, fog))
+	      return false;
+	  }
+	  break;
+	case XMLTOKEN_COLORSUM:
+	  {
+	    bool b;
+	    if (!synsrv->ParseBool (child, b, true))
+	      return false;
+	    colorSum = b;
+	  }
+	  break;
+        default:
+	  {
+	    switch (commonTokens.Request (value))
+	    {
+	      case XMLTOKEN_PROGRAM:
+	      case XMLTOKEN_VARIABLEMAP:
+		// Don't want those
+		synsrv->ReportBadToken (child);
+		return false;
+		break;
+	      default:
+		if (!ParseCommon (child))
+		  return false;
+	    }
+	  }
+      }
+    }
+    CompactLayers();
+    texlayers.ShrinkBestFit();
+  }
+  else
+  {
+    synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.fp",
+      node, "<fixedfp> node missing");
+    return false;
+  }
+  return true;
+}
+
+int csGLShaderFFP::GetCrossbarSource (const char* str)
+{
+  if (strncmp (str, "texture ", 8) != 0) return 0;
+
+  const char* layer = str + 8;
+  int layerNum = layerNames.Get (layer, -1);
+  if (layerNum == -1)
+  {
+    char dummy;
+    if (sscanf (layer, "%d%c", &layerNum, &dummy) != 1) return 0;
+  }
+  return GL_TEXTURE0 + layerNum;
+}
+
+bool csGLShaderFFP::LoadLayer (mtexlayer* layer, iDocumentNode* node)
+{
+  if(layer == 0 || node == 0)
+    return false;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes();
+
+  while(it->HasNext())
+  {
+    csRef<iDocumentNode> child = it->Next();
+    if(child->GetType() != CS_NODE_ELEMENT) continue;
+    csStringID id = tokens.Request(child->GetValue());
+    switch (id)
+    {
+      case XMLTOKEN_COLORSOURCE:
+        {
+          int num = child->GetAttributeValueAsInt("num");
+
+          if(num < 0 || num >= 3 ) continue;
+
+          const char* str = child->GetAttributeValue("source");
+          if (str)
+          {
+            int i = tokens.Request(str);
+            if(i == GL_PRIMARY_COLOR_ARB || i == GL_TEXTURE
+	      || i == GL_CONSTANT_ARB || i==GL_PREVIOUS_ARB
+              || ((i = GetCrossbarSource (str)) != 0))
+            {
+              layer->color.source[num] = i;
+            }
+            else
+            {
+              Report (CS_REPORTER_SEVERITY_WARNING,
+                child, "Invalid color source: %s", str);
+            }
+          }
+
+          str = child->GetAttributeValue("modifier");
+          if (str)
+          {
+            int m = tokens.Request(str);
+            if(m == GL_SRC_COLOR ||m == GL_ONE_MINUS_SRC_COLOR
+	    	||m == GL_SRC_ALPHA||m == GL_ONE_MINUS_SRC_ALPHA)
+            {
+              layer->color.mod[num] = m;
+            }
+            else
+            {
+              Report (CS_REPORTER_SEVERITY_WARNING,
+                child, "Invalid color modifier: %s", str);
+            }
+          }
+        }
+        break;
+      case XMLTOKEN_ALPHASOURCE:
+        {
+          int num = child->GetAttributeValueAsInt("num");
+
+          if(num < 0 || num >= 3 )
+            continue;
+
+          const char* str = child->GetAttributeValue("source");
+          int i = tokens.Request (str);
+          if(i == GL_PRIMARY_COLOR_ARB||i == GL_TEXTURE
+  	    || i == GL_CONSTANT_ARB || i==GL_PREVIOUS_ARB
+            || ((i = GetCrossbarSource (str)) != 0))
+          {
+            layer->alpha.source[num] = i;
+          }
+          else
+          {
+            Report (CS_REPORTER_SEVERITY_WARNING,
+              child, "Invalid alpha source: %s", str);
+          }
+
+          str = child->GetAttributeValue("modifier");
+          int m = tokens.Request (str);
+          if(m == GL_SRC_ALPHA||m == GL_ONE_MINUS_SRC_ALPHA)
+          {
+            layer->alpha.mod[num] = m;
+          }
+          else
+          {
+            Report (CS_REPORTER_SEVERITY_WARNING,
+              child, "Invalid alpha modifier: %s", str);
+          }
+        }
+        break;
+      case XMLTOKEN_COLOROPERATION:
+        {
+          const char* str = child->GetAttributeValue("operation");
+          int o = tokens.Request (str);
+          if(o == GL_REPLACE|| o == GL_MODULATE||o == GL_ADD
+	    ||o == GL_ADD_SIGNED_ARB|| o == GL_INTERPOLATE_ARB
+	    ||o == GL_SUBTRACT_ARB||o == GL_DOT3_RGB_ARB
+	    ||o == GL_DOT3_RGBA_ARB)
+          {
+            layer->color.op = o;
+          }
+          else
+          {
+            Report (CS_REPORTER_SEVERITY_WARNING,
+              child, "Invalid color operation: %s", str);
+          }
+          if(child->GetAttribute("scale") != 0)
+            layer->color.scale = child->GetAttributeValueAsFloat ("scale");
+        }
+        break;
+      case XMLTOKEN_ALPHAOPERATION:
+        {
+          const char* str = child->GetAttributeValue("operation");
+          int o = tokens.Request (str);
+          if(o == GL_REPLACE|| o == GL_MODULATE||o == GL_ADD
+	    ||o == GL_ADD_SIGNED_ARB|| o == GL_INTERPOLATE_ARB
+	    ||o == GL_SUBTRACT_ARB||o == GL_DOT3_RGB_ARB
+	    ||o == GL_DOT3_RGBA_ARB)
+          {
+	    layer->alpha.op = o;
+          }
+          else
+          {
+            Report (CS_REPORTER_SEVERITY_WARNING,
+              child, "Invalid alpha operation: %s", str);
+          }
+          if(child->GetAttribute("scale") != 0)
+	    layer->alpha.scale = child->GetAttributeValueAsFloat ("scale");
+        }
+        break;
+      default:
+	synsrv->ReportBadToken (child);
+        return false;
+    }
+  }
+  return true;
+}
+
+bool csGLShaderFFP::ParseFog (iDocumentNode* node, FogInfo& fog)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes();
+
+  while(it->HasNext())
+  {
+    csRef<iDocumentNode> child = it->Next();
+    if(child->GetType() != CS_NODE_ELEMENT) continue;
+    csStringID id = tokens.Request(child->GetValue());
+    switch (id)
+    {
+      case XMLTOKEN_MODE:
+	{
+	  const char* type = child->GetContentsValue ();
+	  if (type == 0)
+	  {
+	    Report (CS_REPORTER_SEVERITY_WARNING,
+	      child,
+	      "Node has no contents");
+	    return false;
+	  }
+	  if (strcmp (type, "linear") == 0)
+	  {
+	    fog.mode = CS_FOG_MODE_LINEAR;
+	  }
+	  else if (strcmp (type, "exp") == 0)
+	  {
+	    fog.mode = CS_FOG_MODE_EXP;
+	  }
+	  else if (strcmp (type, "exp2") == 0)
+	  {
+	    fog.mode = CS_FOG_MODE_EXP2;
+	  }
+	}
+	break;
+      case XMLTOKEN_DENSITY:
+	{
+	  if (!ParseProgramParam (child, fog.density, ParamFloat))
+	    return false;
+	}
+	break;
+      case XMLTOKEN_START:
+	{
+	  if (!ParseProgramParam (child, fog.start, ParamFloat))
+	    return false;
+	}
+	break;
+      case XMLTOKEN_END:
+	{
+	  if (!ParseProgramParam (child, fog.end, ParamFloat))
+	    return false;
+	}
+	break;
+      case XMLTOKEN_FOGCOLOR:
+	{
+	  if (!ParseProgramParam (child, fog.color, ParamFloat | ParamVector3 |
+	    ParamVector4))
+	    return false;
+	}
+	break;
+      default:
+	synsrv->ReportBadToken (child);
+        return false;
+    }
+  }
+  return true;
+}
+
+//#define DUMP_LAYERS
+
+#ifdef DUMP_LAYERS
+#include "csplugincommon/opengl/glenum_identstrs.h"
+#endif
+
+void csGLShaderFFP::DumpTexFunc (const mtexlayer::TexFunc& tf)
+{
+#ifdef DUMP_LAYERS
+  csString srcStr, modStr, opStr;
+  int j;
+  for (j = 0; j < 2; j++)
+  {
+    srcStr = csOpenGLEnums.StringForIdent (tf.source[j]);
+    if (srcStr.IsEmpty()) srcStr.Format ("%.4x", tf.source[j]);
+    modStr = csOpenGLEnums.StringForIdent (tf.mod[j]);
+    if (modStr.IsEmpty()) modStr.Format ("%.4x", tf.mod[j]);
+    csPrintf (" %-23s %-23s\n", srcStr.GetData(), modStr.GetData());
+  }
+  opStr = csOpenGLEnums.StringForIdent (tf.op);
+  if (opStr.IsEmpty()) opStr.Format ("%.4x", tf.op);
+  csPrintf (" %s %f\n\n", opStr.GetData(), tf.scale);
+#else
+  (void) tf; // unused except for the above block so silence the warning
+#endif
+}
+
+static int GetUsedLayersCount (GLenum op)
+{
+  switch (op)
+  {
+    case GL_REPLACE:
+      return 1;
+    case GL_MODULATE:
+    case GL_ADD:
+    case GL_ADD_SIGNED_ARB:
+    case GL_SUBTRACT_ARB:
+    case GL_DOT3_RGB_ARB:
+    case GL_DOT3_RGBA_ARB:
+      return 2;
+    case GL_INTERPOLATE_ARB:
+      return 3;
+    default:
+      return 0;
+  }
+}
+
+static uint LayerSourceToFlag (GLenum source)
+{
+  switch (source)
+  {
+    case GL_TEXTURE:		return 1;
+    case GL_CONSTANT_ARB:	return 2;
+    //case GL_PRIMARY_COLOR_ARB:  return 4;
+    default:			return 0;
+  }
+}
+
+void csGLShaderFFP::CompactLayers()
+{
+  if (texlayers.GetSize () >= 2)
+  {
+    CS_ALLOC_STACK_ARRAY(uint, layerUseFlags, texlayers.GetSize ());
+    CS_ALLOC_STACK_ARRAY(int, layerMap, texlayers.GetSize ());
+    memset (layerUseFlags, 0, sizeof (uint) * texlayers.GetSize ());
+    size_t p;
+    for (p = 0; p < texlayers.GetSize (); p++)
+    {
+      const mtexlayer& tl = texlayers[p];
+      int i;
+      for (i = 0; i < GetUsedLayersCount (tl.color.op); i++)
+      {
+	layerUseFlags[p] |= LayerSourceToFlag (tl.color.source[i]);
+      }
+      for (i = 0; i < GetUsedLayersCount (tl.alpha.op); i++)
+      {
+	layerUseFlags[p] |= LayerSourceToFlag (tl.alpha.source[i]);
+      }
+    }
+
+    csArray<mtexlayer> newlayers;
+    mtexlayer nextlayer = texlayers[0];
+    p = 0;
+    size_t layerOfs = 0;
+    while (p+1 < texlayers.GetSize ())
+    {
+      // Check if used resources overlap
+      if ((layerUseFlags[p] & layerUseFlags[p+1]) == 0)
+      {
+	// No, possibility to merge
+	const mtexlayer& tl1 = nextlayer;
+	const mtexlayer& tl2 = texlayers[p+1];
+	mtexlayer newlayer;
+	bool newColor = TryMergeTexFuncs (newlayer.color, tl1.color, 
+	  tl2.color);
+	bool newAlpha = TryMergeTexFuncs (newlayer.alpha, tl1.alpha, 
+	  tl2.alpha);
+
+	if (newColor && newAlpha)
+	{
+	  nextlayer = newlayer;
+	  layerMap[p] = (int)(p - layerOfs);
+	  p++;
+	  layerOfs++;
+	  continue;
+	}
+      }
+
+      newlayers.Push (nextlayer);
+      layerMap[p] = (int)(p - layerOfs);
+      p++;
+      nextlayer = texlayers[p];
+    }
+    newlayers.Push (nextlayer);
+    layerMap[p] = (int)(p - layerOfs);
+    texlayers = newlayers;
+    for (size_t l = 0; l < texlayers.GetSize(); l++)
+    {
+      mtexlayer& layer = texlayers[l];
+      for (int i = 0; i < GetUsedLayersCount (layer.color.op); i++)
+      {
+        if ((layer.color.source[i] >= GL_TEXTURE0) 
+          && (layer.color.source[i] <= GL_TEXTURE31))
+          layer.color.source[i] = GL_TEXTURE0 + layerMap[layer.color.source[i] - GL_TEXTURE0];
+      }
+      for (int i = 0; i < GetUsedLayersCount (layer.alpha.op); i++)
+      {
+        if ((layer.alpha.source[i] >= GL_TEXTURE0) 
+          && (layer.alpha.source[i] <= GL_TEXTURE31))
+          layer.alpha.source[i] = GL_TEXTURE0 + layerMap[layer.alpha.source[i] - GL_TEXTURE0];
+      }
+    }
+
+    csHash<int, csString>::GlobalIterator layerNameIt 
+      = layerNames.GetIterator();
+    while (layerNameIt.HasNext())
+    {
+      csString key;
+      int layerNum = layerNameIt.Next (key);
+      layerNames.PutUnique (key, layerMap[layerNum]);
+    }
+  }
+
+#ifdef DUMP_LAYERS
+  {
+    for (size_t i = 0; i < texlayers.GetSize (); i++)
+    {
+      csPrintf ("Layer %zu:\n", i);
+      const mtexlayer& tl = texlayers[i];
+      DumpTexFunc (tl.color);
+      DumpTexFunc (tl.alpha);
+    }
+  }
+#endif
+}
+
+bool csGLShaderFFP::TryMergeTexFuncs (mtexlayer::TexFunc& newTF, 
+				      const mtexlayer::TexFunc& tf1, 
+				      const mtexlayer::TexFunc& tf2)
+{
+  // TF2 is just a replace with TF1: merge to TF1
+  if ((tf2.op == GL_REPLACE) 
+    && (tf2.source[0] == GL_PREVIOUS_ARB))
+  {
+    newTF = tf1;
+    return true;
+  }
+  /* TF1 is a simple replace, and TF2 uses "previous layer" somewhere:
+   * insert TF1 where "previous layer" is used. */
+  else if ((tf1.op == GL_REPLACE) 
+    && (fabsf (tf1.scale - 1.0f) < EPSILON))
+  {
+    int prevLayIdx = 0;
+    for (int i = 0; i < GetUsedLayersCount (tf2.op); i++)
+    {
+      if (tf2.source[i] == GL_PREVIOUS_ARB)
+      {
+	prevLayIdx |= 1 << i;
+	break;
+      }
+    }
+    if (prevLayIdx != 0)
+    {
+      newTF = tf2;
+      for (int i = 0; i < 2; i++)
+      {
+        if (prevLayIdx && (1 << i))
+          newTF.source[i] = tf1.source[0];
+      }
+      return true;
+    }
+  }
+  /* If "previous layer" is not referenced in TF2, "merge" to just TF2. */
+  {
+    bool usePrevious = false;
+    for (int i = 0; i < GetUsedLayersCount (tf2.op); i++)
+      if (tf2.source[i] == GL_PREVIOUS_ARB)
+	usePrevious = true;
+    if (!usePrevious)
+    {
+      newTF = tf2;
+      return true;
+    }
+  }
+  return false;
+}
+
+bool csGLShaderFFP::Compile (iHierarchicalCache*, csRef<iString>* tag)
+{
+  shaderPlug->Open ();
+  ext = shaderPlug->ext;
+
+  maxlayers = shaderPlug->texUnits;
+
+  //get a statecache
+  csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (objectReg);
+  g2d->PerformExtension ("getstatecache", &statecache);
+
+  if (texlayers.GetSize () > (size_t)maxlayers)
+    return false;
+
+  // Don't support layers if the COMBINE ext isn't present
+  if ((!shaderPlug->enableCombine) && (texlayers.GetSize () > 0))
+    return false;
+
+  const bool hasDOT3 = ext->CS_GL_ARB_texture_env_dot3 || 
+    ext->CS_GL_EXT_texture_env_dot3;
+
+  for(size_t i = 0; i < texlayers.GetSize (); ++i)
+  {
+    const mtexlayer& layer = texlayers[i];
+    if (((layer.color.op == GL_DOT3_RGB_ARB) || 
+        (layer.color.op == GL_DOT3_RGBA_ARB)) && 
+        !(hasDOT3))
+      return false;
+    if (((layer.alpha.op == GL_DOT3_RGB_ARB) || 
+        (layer.alpha.op == GL_DOT3_RGBA_ARB)) && 
+        !(hasDOT3))
+      return false;
+    for (int i = 0; i < GetUsedLayersCount (layer.color.op); i++)
+    {
+      if ((layer.color.source[i] >= GL_TEXTURE0) 
+        && (layer.color.source[i] <= GL_TEXTURE31)
+        && !shaderPlug->enableCrossbar)
+        return false;
+    }
+    for (int i = 0; i < GetUsedLayersCount (layer.alpha.op); i++)
+    {
+      if ((layer.alpha.source[i] >= GL_TEXTURE0) 
+        && (layer.alpha.source[i] <= GL_TEXTURE31)
+        && !shaderPlug->enableCrossbar)
+        return false;
+    }
+  }
+
+  if (colorSum && !ext->CS_GL_EXT_secondary_color)
+    return false;
+
+  validProgram = true;
+  tag->AttachNew (new scfString ("default"));
+
+  return true;
+}
+
+void csGLShaderFFP::GetUsedShaderVars (csBitArray& bits) const
+{
+  TryAddUsedShaderVarProgramParam (fog.density, bits);
+  TryAddUsedShaderVarProgramParam (fog.start, bits);
+  TryAddUsedShaderVarProgramParam (fog.end, bits);
+  TryAddUsedShaderVarProgramParam (fog.color, bits);
+}
+
+void csGLShaderFFP::ActivateTexFunc (const mtexlayer::TexFunc& tf, 
+				     GLenum sourceP, GLenum operandP, 
+				     GLenum combineP, GLenum scaleP)
+{
+  for (int i = 0; i < 3; i++)
+  {
+    if (tf.source[i] != -1)
+    {
+      glTexEnvi (GL_TEXTURE_ENV, sourceP + i, tf.source[i]);
+      glTexEnvi (GL_TEXTURE_ENV, operandP + i, tf.mod[i]);
+    }
+  }
+  glTexEnvi (GL_TEXTURE_ENV, combineP, tf.op);
+  glTexEnvf (GL_TEXTURE_ENV, scaleP, tf.scale);
+}
+
+void csGLShaderFFP::Activate ()
+{
+  for(size_t i = 0; i < texlayers.GetSize (); ++i)
+  {
+    statecache->SetCurrentTCUnit ((int)i);
+    statecache->ActivateTCUnit (csGLStateCache::activateTexEnv);
+
+    if (shaderPlug->enableCombine)
+    {
+      const mtexlayer& layer = texlayers[i];
+
+      ActivateTexFunc (layer.color, GL_SOURCE0_RGB_ARB, GL_OPERAND0_RGB_ARB,
+	GL_COMBINE_RGB_ARB, GL_RGB_SCALE_ARB);
+      ActivateTexFunc (layer.alpha, GL_SOURCE0_ALPHA_ARB, GL_OPERAND0_ALPHA_ARB,
+	GL_COMBINE_ALPHA_ARB, GL_ALPHA_SCALE);
+    }
+  }
+  if (fog.mode != CS_FOG_MODE_NONE)
+  {
+    statecache->Enable_GL_FOG ();
+  }
+  else
+  {
+    if (shaderPlug->fixedFunctionForcefulEnable)
+    {
+      const GLenum state = GL_FOG;
+      GLboolean s = glIsEnabled (state);
+      if (s) glDisable (state); else glEnable (state);
+      glBegin (GL_TRIANGLES);  glEnd ();
+      if (s) glEnable (state); else glDisable (state);
+    }
+  }
+  if (colorSum)
+    statecache->Enable_GL_COLOR_SUM_EXT ();
+}
+
+void csGLShaderFFP::Deactivate()
+{
+  statecache->SetCurrentTCUnit (0);
+  statecache->ActivateTCUnit (csGLStateCache::activateTexEnv);
+  if (shaderPlug->enableCombine)
+  {
+    glTexEnvi  (GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_TEXTURE);
+    glTexEnvi  (GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
+    glTexEnvi  (GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_PRIMARY_COLOR);
+    glTexEnvi  (GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, GL_SRC_COLOR);
+    glTexEnvi  (GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE);
+    glTexEnvi  (GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 1);
+
+    glTexEnvi  (GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_TEXTURE);
+    glTexEnvi  (GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, GL_SRC_ALPHA);
+    glTexEnvi  (GL_TEXTURE_ENV, GL_SOURCE1_ALPHA_ARB, GL_PRIMARY_COLOR);
+    glTexEnvi  (GL_TEXTURE_ENV, GL_OPERAND1_ALPHA_ARB, GL_SRC_ALPHA);
+    glTexEnvi  (GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_MODULATE);
+    glTexEnvi  (GL_TEXTURE_ENV, GL_ALPHA_SCALE, 1);
+  }
+
+  if (fog.mode != CS_FOG_MODE_NONE)
+  {
+    statecache->Disable_GL_FOG ();
+  }
+  if (colorSum)
+    statecache->Disable_GL_COLOR_SUM_EXT ();
+}
+
+static const csVector4 defVector (0.0f, 0.0f, 0.0f, 1.0f);
+
+void csGLShaderFFP::SetupState (const CS::Graphics::RenderMesh* /*mesh*/, 
+                                CS::Graphics::RenderMeshModes& /*modes*/,
+                                const csShaderVariableStack& stack)
+{
+  if (fog.mode != CS_FOG_MODE_NONE)
+  {
+    csVector4 fc = GetParamVectorVal (stack, fog.color, defVector);
+    glFogfv (GL_FOG_COLOR, (float*)&fc.x);
+
+    switch (fog.mode)
+    {
+      case CS_FOG_MODE_LINEAR:
+	{
+          float start = GetParamFloatVal (stack, fog.start, 0.0f);
+          float end = GetParamFloatVal (stack, fog.end, 0.0f);
+
+          end = (end == start) ? start + 0.001f : end;
+
+	  glFogi (GL_FOG_MODE, GL_LINEAR);
+	  glFogf (GL_FOG_START, start);
+	  glFogf (GL_FOG_END, end);
+	}
+	break;
+      case CS_FOG_MODE_EXP:
+	{
+	  glFogi (GL_FOG_MODE, GL_EXP);
+	  glFogf (GL_FOG_DENSITY, 
+	    GetParamFloatVal (stack, fog.density, 0.0f));
+	}
+	break;
+      case CS_FOG_MODE_EXP2:
+	{
+	  glFogi (GL_FOG_MODE, GL_EXP2);
+	  glFogf (GL_FOG_DENSITY, 
+	    GetParamFloatVal (stack, fog.density, 0.0f));
+	}
+	break;
+      default:
+	break;
+    }
+  }
+}
+
+void csGLShaderFFP::ResetState ()
+{
+}

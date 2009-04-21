@@ -1,0 +1,50 @@
+SubDir TOP libs csutil unix ;
+
+{
+  local rejects ;
+  if $(EMBED_META) != "yes"
+  {
+    rejects += embedplugins.cpp elfplugins.cpp bfdplugins.cpp ;
+    CSUTIL.GENERIC += scanplugins.cpp ;
+  }
+  else
+  {
+    if $(ELF.AVAILABLE) = "yes"
+    {
+      rejects += bfdplugins.cpp ;
+    }
+    else if $(LIBBFD.AVAILABLE) = "yes"
+    {
+      rejects += elfplugins.cpp ;
+    }
+  }
+  CsLibAddModule $(rejects) ;
+}
+
+if $(LIBBFD.AVAILABLE) = "yes"
+{
+  CSUTIL.GENERIC += callstack-bfd.cpp ;
+}
+
+CSUTIL.GENERIC +=
+  appdir.cpp
+  apppath.cpp
+  appfilename.cpp
+  expandname.cpp
+  findlib.cpp
+  getopt.cpp
+  loadlib.cpp
+  mmap.cpp
+  pathutil.cpp
+  platformconfig.cpp 
+  platformconfigpath.cpp
+  printf.cpp
+  resdir.cpp
+  runloop.cpp 
+  setenv.cpp
+  sysroot.cpp 
+  vfsplat.cpp ;
+
+CSLIB.CFLAGS +=
+  [ FDefines CS_PLUGIN_META_EXT='\".csplugin\"' ]
+  [ FDefines CS_PLUGIN_EXT='\".so\"' ] ;

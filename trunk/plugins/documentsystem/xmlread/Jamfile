@@ -1,0 +1,8 @@
+SubDir TOP plugins documentsystem xmlread ;
+
+Description xmlread : "XMLRead document system" ;
+
+Plugin xmlread
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith xmlread : crystalspace ;

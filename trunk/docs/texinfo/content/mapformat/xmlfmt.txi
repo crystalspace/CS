@@ -1,0 +1,719 @@
+@c -*-texinfo-*-
+@node XML File Format, , General Renderbuffers Format, Map Format Reference
+@subsection Format of Map File (@sc{xml})
+@cindex Format of Map File
+@cindex Map File Format
+@cindex @sc{xml}
+
+This section describes the Crystal Space map, which uses @sc{xml}, and is a
+companion to the @sc{xml} schema file residing at:
+
+@noindent
+@file{CS/scripts/xml/cs_world.xsd}
+
+This document is not yet complete but it should give you sufficient information
+to get started.  For the format of the mesh object loaders you should look at
+the appropriate mesh object documentation (@pxref{MeshObject}).  There is also
+a @sc{howto} on loading a map file (@pxref{HOWTO Level Loading}) and a
+@sc{howto} with a simple map example (@pxref{Simple Map Example}).
+
+The Crystal Space engine, itself, does not care about the external format of
+world data, nor does it care about how that information was obtained.  It is
+possible to create additional map loaders as plug-in modules which understand
+world data stored in other formats, such as binary.  A map loading plug-in
+module could even load maps over the network from a map file server, or
+generate worlds randomly based upon some set of input properties.  There are
+many possibilities.
+
+The map file syntax described in this section, however, is that which is
+understood by the standard map file loader which accompanies Crystal Space.
+It deals strictly with plain-text @sc{xml}-format files.
+
+@menu
+* XML Init Section:: Initalization Section
+* XML World Element Section:: World Element Section
+* XML World Definition Section:: World Definition Section
+* XML Action Section:: Action Section
+@end menu
+
+@subsubheading Basic Structure
+
+The basic structure of a map file for Crystal Space is as follows:
+
+@example
+<world>
+  initialization part:
+    one texture specification section.
+    one material specification section.
+    one shader section.
+    one sounds section.
+    one variable section.
+    one plugin section.
+    one settings section.
+    zero or more start locations.
+    zero or more library specifications.
+    zero or more keys.
+  world elements:
+    zero or more add-ons.
+    zero or more mesh factories.
+  world definition:
+    zero or more sectors.
+    zero or more collections.
+  action section:
+    one sequence section.
+    one trigger section.
+</world>
+@end example
+
+The structure above divides the world into roughly four sections.  This is only
+a logical division for explanatory purposes; in reality there are no such
+divisions.
+
+The initialization part contains everything that is related to
+setting up the map except for geometry-related data. The textures,
+materials, and other required parts are defined there.
+
+The world elements section defines objects (mesh factories) and optional
+additional features (add-on's) which will be used throughout the
+actual world definition. Thus, geometry-templates are defined here, though
+instantiated later.
+
+In the world definition section the actual geometry is defined. At the
+highest level you have sectors. In every sector the actual objects reside
+(see later for more information about this).
+
+Finally there is the action section. In this section sequences and
+triggers are used to define interactions and other special actions on
+objects and other objects in the world.
+
+@node XML Init Section, XML World Element Section, XML File Format, XML File Format
+@subsubsection Initalization Section
+
+This section describes the initialization section.
+
+@subsubheading Texture Specification Section
+@cindex textures Specification (Map File)
+
+Here is an example texture specification section:
+
+@example
+<textures>
+  <texture name="wood">
+    <file>/mygamedata/wood.png</file>
+  </texture>
+  <texture name="transp">
+    <file>/mygamedata/stripes.png</file>
+    <transparent red="1" green="0" blue="0"/>
+  </texture>
+  <proctex name="plasma">
+    <type>plasma</type>
+  </proctex>
+</textures>
+@end example
+
+In this example we define three textures. The first one is called
+@samp{wood} and will be loaded from the @sc{vfs} file
+@file{/mygamedata/wood.png}. @xref{VFS}.
+
+The second texture, @samp{transp}, is loaded from
+@file{/mygamedata/stripes.png}. The red color will be made fully
+transparent. If you want to use an alpha channel then this is supported
+too. In that case simply load a @sc{png} image that has an alpha channel (or
+any other type of image that supports an alpha channel).
+
+The third texture is a procedural texture. There are four types of
+procedural textures predefined in Crystal Space: @samp{fire}, @samp{water},
+@samp{dots}, and @samp{plasma}.
+
+Subcommands allowed for a texture specification are:
+
+@itemize
+@item @samp{key}
+@samp{Key/value node}. Specifies a generic key/value.
+@item @samp{for2d}
+@samp{Boolean}. Texture is for 2D usage.
+@item @samp{for3d}
+@samp{Boolean}. Texture is for 3D usage (default).
+@item @samp{transparent}
+@samp{Color}. Texture uses keycolor with the given color.
+@item @samp{file}
+@samp{String}. @sc{vfs} filename for the texture.
+@item @samp{mipmap}
+@samp{Boolean}. Texture uses mipmaps (default on). For 2D textures it is
+usually better to disable this. Also skybox textures should probably disable
+this.
+@item @samp{npots}
+@samp{Boolean}. Texture doesn't have to be power of two and it will
+not be scaled to power of two dimensions. (default off). Note that not all
+hardware supports this, and sometimes this only works if mipmaps are 
+disabled as well as clamping enabled.
+@item @samp{clamp}
+@samp{Boolean}. If set the texture will not be tiled and color lookups
+outside the 0..1 range will be clamped to the edge of the texture. Default off.
+@item @samp{filter}
+@samp{Boolean}. If disabled then no texture filtering will occur. This usually
+looks worse. Default is on.
+@item @samp{keepimage}
+@samp{Boolean}. If this is set then the loaded image will be kept
+and attached to the texture for later usage. With this flag off (which is
+default) the image will be freed after the texture is given to the
+3D renderer (to conserve memory).
+@item @samp{type}
+@samp{String}. Name of the texture plugin. Some examples of texture
+plugins are @samp{crystalspace.texture.loader.water},
+@samp{crystalspace.texture.loader.plasma},
+@samp{crystalspace.texture.loader.checkerboard},
+@samp{crystalspace.texture.loader.cubemap}, @dots{}
+@item @samp{params}
+@samp{Node}. Parameters for the optional texture plugin.
+@item @samp{size}
+@samp{Attributes 'width' and 'height'}. Desired size of the texture. This
+is mainly useful in case you use one of the texture plugins. If you use a
+normal file then the width and height is fetched from the image.
+@item @samp{alwaysanimate}
+@samp{Boolean}. If this is an animated texture then this flag will
+make sure the texture keeps animating even if out of view. This is less
+performant but in some cases it is more correct. Default off.
+@item @samp{class}
+@samp{String}. This is used to specify the class of the texture. One
+common example is @samp{normalmap} which is used by many shaders.
+@item @samp{alpha}
+@samp{String}. One of @samp{none}, @samp{binary}, @samp{smooth}, or @samp{auto}.
+@samp{binary} is often used to force binary alpha for an alpha mapped texture. 
+In short, by using this flag the texture can be used on regular objects using 
+@samp{zuse} and @samp{object} render priority. This greatly helps performance 
+and correct visual appearance of objects. For a more detailed explanation
+@pxref{Alpha Textures}.
+@end itemize
+
+@subsubheading Material Specification Section
+@cindex materials (Map File)
+
+Materials are very important in Crystal Space. Almost all objects will
+use materials to define the surface characteristics of their geometry.
+A material itself is usually made from one or more textures.
+
+Here is an example material section. It uses the textures defined
+in the previous section:
+
+@example
+<materials>
+  <material name="table_material">
+    <texture>wood</texture>
+  </material>
+  <material name="fence_material">
+    <texture>transp</texture>
+  </material>
+  <material name="plasma_wood">
+    <texture>wood</texture>
+    <shader type="standard">std_lighting_detail_alpha</shader>
+    <shadervar name="tex detail" type="texture">plasma</shadervar>
+    <shadervar name="detail texture scale"
+               type="vector2">10,10</shadervar>
+    <shadervar name="detail texture color"
+               type="vector4">1,1,1,0.25</shadervar>
+  </material>
+</materials>
+@end example
+
+When defining materials you usually use a name that indicates the use of that
+material.  That way you can easily replace how the material looks like (by
+swapping textures) without having to change the material name itself.
+
+In the example above we first define a @samp{table_material} which uses only
+the @samp{wood} texture.  The second material is @samp{fence_material} which
+uses the semi-transparent @samp{transp} texture.
+
+The last material is interesting. The base of the material is the
+@samp{wood} texture. On top of that there is an additional texture layer
+that uses the @samp{plasma} texture. The layer is scaled 10 times in both
+@emph{u} and @emph{v} direction and it is added to the original texture
+(i.e. the colors are added). This ``special effect'' is achieved by attaching
+the @samp{std_lighting_detail} shader to this material. Different shaders
+allow different effects - the additive blending of a second texture in this
+case.
+
+Subcommands allowed for a material specification are:
+
+@itemize
+@item @samp{key}
+@samp{Key/value node}. Specifies a generic key/value.
+@item @samp{texture}
+@samp{String}. Name of the texture.
+@item @samp{color}
+@samp{Color}. A color instead of a texture. If you use this then @samp{texture}
+should not be used.
+@item @samp{shader}
+@samp{String}. A shader to use for this material. The value of this should
+be the name of the shader to use. In addition you also need to specify
+the @samp{type} (as an attribute) of this shader. This will be used in combination
+with the renderloop to control when this material will be used in the rendering
+steps.
+@item @samp{shadervar}
+@samp{Value}. This defines a variable for the shader attached to this material.
+The meaning of a variable as well as the required type depends on the specific
+shader A shader variable has two attributes: @samp{name} and @samp{type}. 
+@samp{name} is the name as used in the shader. The type can be anything like
+@samp{texture}, @samp{vector2}, @samp{vector3}, @samp{vector4}, @samp{integer},
+@samp{float},  @samp{expr}, @samp{expression}, or @samp{array}.
+@c FIXME: Link to more detailed docs, if we have some.
+@c FIXME: Probably good idea to list or link to a list of "common" shader
+@c 	  variables (e.g. "tex diffuse").
+@end itemize
+
+@subsubheading Shader Section
+@cindex shaders (Map File)
+
+With shaders you can describe more advanced texture and material
+effects. Here is an example:
+
+@example
+<shaders>
+  <shader><file>/shader/reflect.xml</file></shader>
+</shaders>
+@end example
+
+Most of the times you simply refer to shaders from a file.
+
+@subsubheading Sounds Section
+@cindex sounds (Map File)
+
+The @samp{sounds} Section of the map file format allows you to encode
+information about the sound effects, background music, or pre-recorded
+dialogues that you want to include in the map. Here is an example of
+a 'sounds' section of a map file:
+
+@example
+<sounds>
+  <sound name="ear-joy.mp3" mode3d="relative" />
+  <sound name="waterfall.mp3"
+    file="waterfall_179384.mp3"
+    mode3d="absolute" />
+</sounds>
+@end example
+
+As you can see, you can include multiple @samp{sound} nodes within a
+@samp{sounds} node, and there are three attributes that determine the
+behavior of each @samp{sound} node. Here is an overview of what each of
+the attributes do:
+
+@itemize
+@item @samp{name}
+@samp{String}. The @samp{name} attribute is the internal Crystal
+Space @sc{vfs} identifier for the sound object. This is usually identical to
+the filename for the object.
+@item @samp{file}
+@samp{String}. The @samp{file} attribute is the external filename for the
+sound object, which may be different than the sound object's Crystal Space
+name. Most of the time, though, the @samp{file} attribute will be left
+blank, and its default value will be the value of the @samp{name} attribute.
+@item @samp{mode3d}
+@samp{Enum}.  The @samp{mode3d} attribute can be one of: @samp{absolute},
+@samp{disable}, or @samp{relative}. If @samp{mode3d} is not one of these
+three values or empty, then the @samp{crystalspace.maploader.parse.sound}
+error is reported.
+@end itemize
+
+As mentioned above, it is possible to omit, the @samp{file} attribute and
+let it default to @samp{name}, because @samp{name} is required. However,
+if you want the Crystal Space name to be different than the filename,
+use the @samp{file} attribute as well. An alternative to using @samp{file}
+attribute (for example: @samp{file="mysound.wav"} to indicate the filename
+of a sound object, you may instead use a @samp{file} element (for example
+@samp{<file>mysong.wav</file>}) within a @samp{sound} node to load a
+sound from a filename. Here is an example of how it would look:
+
+@example
+<sounds>
+  <sound name="mysong.wav" mode3d="disable">
+    <file>mysong.wav</file>
+  </sound>
+</sounds>
+@end example
+
+As mentioned earlier, The @samp{mode3d} enumeration is one of:
+@samp{absolute}, @samp{disable}, or @samp{relative}. The following is a
+breakdown of what each of these options implies:
+
+@itemize
+@item @samp{disable}
+When @samp{mode3d} is @samp{disable} then no signal processing is done
+to the sound object. This mode allows stereo audio to be stored in a
+sound object. Both other modes only allow one channel.
+@item @samp{relative}
+When @samp{mode3d} is @samp{relative} then some level of signal processing
+is done to ensure that the sound being played will have different volumes
+depending on the @samp{position} parameter of the sound object. Note that
+only one-channel sound objects are allowed.
+@item @samp{absolute}
+When @samp{mode3d} is @samp{absolute} then the highest level of signal
+processing is performed. Like @samp{relative} this mode only works with
+one-channel sound objects. Unlike @samp{relative}, this mode translates
+absolute coordinates into relative listener coordinates, allowing the
+calculation of the sound output by finding the difference between the
+user and the sound object, so the volume of the sound object will seem
+to vary as you move about.
+@end itemize
+
+@subsubheading Variable Section
+@cindex variables (Map File)
+
+The @code{variables} section of a map file format allows you to define
+variables, and make shortcuts for common strings, colors, and vectors.
+Here is an example of a @code{variables} section of a map file:
+
+@example
+<variables>
+  <variable name="avatar_age" value="21.0" />
+  <variable name="sky_color">
+    <color red="0.0" green="0.0" blue="1.0" alpha="1.0" />
+  </variable>
+  <variable name="that_way">
+    <v x="-0.5" y="3.5" z="0.5" />
+  </variable>
+</variables>
+@end example
+
+As you can see, the @code{variables} section can contain multiple
+@code{variable} elements, each of them defining a variable definition.
+Within each variable definition, depending on the type, you can specify
+different attributes. Here is an overview of the attributes and
+elements that can be found within a @code{variable} element:
+
+@itemize
+@item @samp{name} @samp{String} attribute,
+The name of the variable.
+@item @samp{value} @samp{String} attribute
+A string value associated with the variable name.
+@item @samp{color} element
+A color value associated with the variable name. A @samp{color} element
+can have @samp{red}, @samp{green}, @samp{blue}, and optionally
+@samp{alpha} attributes, where each attribute can be assigned a value
+between 0 and 1. If the @samp{alpha} attribute is omitted, then it is
+assumed to have a value of 1.
+@item @samp{v} element
+A vector value associated with the variable name. A @samp{vector} element
+can have @samp{x}, @samp{y}, and optionally @samp{z} attributes, where
+each attribute is any floating point number. If the @samp{z} attribute
+is omitted, then it is assumed to have a value of 0.
+@end itemize
+
+@subsubheading Plugin Section
+@cindex plugin section (Map File)
+
+The plugin section is purely for convenience later. Normally when creating
+mesh objects you have to specify the @sc{scf} class name of the loader
+which will parse the @sc{xml} data for that mesh object. This is a long
+name. The plugin section allows you to define shorter names for those
+plugins. Here is an example where names are defined for the genmesh,
+spr3d, and spr3dfact plugins:
+
+@example
+<plugins>
+    <plugin name="genmesh">
+        crystalspace.mesh.loader.genmesh
+    </plugin>
+    <plugin name="spr3dFact">
+        crystalspace.mesh.loader.factory.sprite.3d
+    </plugin>
+    <plugin name="spr3d">
+        crystalspace.mesh.loader.sprite.3d
+    </plugin>
+</plugins>
+@end example
+
+@subsubheading Settings Section
+@cindex settings (Map File)
+
+In the settings section there are a few configuration options that you can
+specify. Here is a complete settings example:
+
+@example
+<settings>
+  <clearzbuf />
+  <clearscreen />
+  <ambient red=".1" green=".1" blue=".1" />
+</settings>
+@end example
+
+By default Crystal Space does not clear the z-buffer not the screen every
+frame. For the z-buffer it depends on objects to fill the z-buffer. In a
+typical Crystal Space world every sector would have an outer hull (either
+a skybox or else the walls of the room) which would use @samp{zfill} mode
+so that the z-buffer is updated but not read. Objects in the room can then
+use @samp{zuse}. If you don't want this (i.e. you want to use @samp{zuse}
+for all objects) then you can use @samp{clearzbuf}. Similar for
+@samp{clearscreen}.
+
+In addition to the lighting information given by all lights in the system,
+every object will also get ambient lighting. Ambient lighting is global to
+the engine (at least static ambient lighting). You can set the ambient
+for a level in the settings block. Default ambient is 0.078 for all color
+components.
+
+@subsubheading Start Location Section
+@cindex start location (Map File)
+
+A map file can contain zero or more start locations for the camera. How
+these start locations are interpreted is up to the application. Typically
+there is one start location that has no name and which is considered the
+default. But you can have multiple start locations and refer to them by
+name in your application. Here is an example:
+
+@example
+<start>
+    <sector>room</sector>
+    <position x="0" y="0" z="0" />
+</start>
+<start name="alternate">
+    <sector>other_room</sector>
+    <position x="0" y="0" z="0" />
+    <up x="0" y="-1" z="0" />
+    <forward x="0" y="0" z="-1" />
+    <farplane a="0" b="0" c="1" d="100" />
+</start>
+@end example
+
+If there is no start location then by convention many applications assume
+that the default start is in sector called @samp{room} at location
+@samp{0,0,0}.
+
+The first example above is easy. It just defines the same starting location
+as specifying nothing would have done.
+
+The second example is more complicated. It defines a start location called
+@samp{alternate}. The up-vector is specified as @samp{0,-1,0} which is just
+the reverse of the default @samp{0,1,0}. This means that the camera will
+be upside down. The forward vector is @samp{0,0,-1} which means that
+the camera will be looking to the negative z axis. By default the camera
+looks in the positive z direction.
+
+The last @samp{farplane} option is interesting. It indicates that all
+geometry beyond @samp{z=100} will be clipped away. You can use this if
+you want to speed up rendering and you know that objects further away than
+the specified distance are not interesting or you use fog that would have
+made them invisible anyway. Note that fog alone doesn't do that. By default
+there is no farplane. If you use the farplane option it is usually recommended
+to let the engine clear the z-buffer every frame (see the @samp{settings}
+section above) because you can no longer depend on geometry to do it for you
+if it is culled away.
+
+@subsubheading Library Specification Section
+@cindex libraries (Map File)
+
+It is possible to define libraries that contain objects like mesh factories,
+textures, materials, and so on and then include those libraries in your
+map files. Creating a library file is very easy. It is basically the same
+as creating a map file but instead of @code{<world>} you would use
+@code{<library>}. To use a library you can simply put the following in
+your map file:
+
+@example
+<library>/mygamedata/library</library>
+@end example
+
+@subsubheading Keys
+@cindex keys (Map File)
+
+Crystal Space has a system with which you can attach user data to almost
+all Crystal Space objects. This user data has a name and several values (string
+based) and in code you can query for those name/value pairs. Crystal Space
+itself doesn't use this. It only stores the information.
+
+When you specify name/value pairs in the world section itself you are
+essentially adding information to the engine class. Here is an example:
+
+@example
+<key name="spawn_monster" type="ghost" location="mainhall"
+  pos="10,1,12" />
+<key name="spawn_monster" type="goblin" location="corridor"
+  pos="15,3,10" />
+@end example
+
+@node XML World Element Section, XML World Definition Section, XML Init Section, XML File Format
+@subsubsection World Element Section
+
+This section describes the world element section.
+
+@subsubheading Addon Section
+@cindex addons (Map File)
+@cindex @code{iLoaderPlugin}
+
+Addons are loader plugins that can be used to extend the loading
+capabilities. Like keys, addons can also be loaded from almost any
+Crystal Space object. The difference is that the loaded information
+is not automatically attached to the object. Instead the object in which
+the addon is called is given as a @emph{context} to the addon loader
+so that it can choose to do with it whatever it wants. For example, you
+could make an addon plugin for your own game that sets up a physics
+object for a mesh object. To do that you would have to create a plugin
+that implements the @samp{iLoaderPlugin} interface. In the plugin
+implementation you can examine the context and based on that create some
+information that you can attach to that context (if it is a mesh object
+for example). The addon plugin will also get an @sc{xml} node that it
+can parse for additional parameters.
+
+@subsubheading Mesh Factory Section
+@cindex mesh factories (Map File)
+
+In a map file you can define zero or more mesh factories. A mesh factory
+itself is not an object that you can see. It only defines a blue-print
+for creating mesh objects later. How a mesh factory and mesh object
+interact depends on the specific type of mesh object. For some types
+factories are required but for others you can just define the object
+directly as a mesh object (@pxref{MeshObject}).
+
+Here is an example mesh factory:
+
+@example
+<meshfact name="square">
+    <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+    <params>
+        <numvt>4</numvt>
+        <numtri>4</numtri>
+        <v x="-2" y="0" z="-2" u="0" v="0" />
+        <v x="2" y="0" z="-2" u="1" v="0" />
+        <v x="2" y="0" z="2" u="1" v="1" />
+        <v x="-2" y="0" z="2" u="0" v="1" />
+        <t v1="3" v2="0" v3="1" />
+        <t v1="1" v2="2" v3="3" />
+        <t v1="1" v2="0" v3="3" />
+        <t v1="3" v2="2" v3="1" />
+        <autonormals />
+    </params>
+</meshfact>
+@end example
+
+In the example above we use the @samp{genmesh} factory loader plugin.
+Everything inside the @samp{params} block is specific to that loader. If
+you use other loaders you will need other stuff in there.
+It is also possible to specify the parameters of a plugin in another
+@sc{xml} file in which case you can use @samp{paramsfile}. The use
+of @samp{paramsfile} is required if the other file is binary or not
+@sc{xml}.
+
+The example above defines a factory called @samp{square}. When you later
+define mesh objects you can create them from that factory. In case of
+@samp{genmesh} which is used here you must use factories.
+
+Mesh factories can contain keys and addons.
+
+@node XML World Definition Section, XML Action Section, XML World Element Section, XML File Format
+@subsubsection World Definition Section
+
+This section describes the world definition section.
+
+@subsubheading Sector Section
+@cindex sectors (Map File)
+
+A map file usually contains at least one sector. A sector is an infinite
+area of space which you can populate with mesh objects and lights. Using
+portals you can connect different sectors.
+
+Note that while a sector is in fact infinite, in practice it is usually
+bounded by some geometry. For an outside level there is usually
+a sky box or sky dome which marks the outermost geometry. In case of indoor
+type levels there are usually sector walls.
+
+Here is an example sector:
+
+@example
+<sector name="room">
+  <meshobj name="walls">
+    <plugin>crystalspace.mesh.loader.genmesh</plugin>
+    <zfill />
+    <params>
+      @dots{}
+    </params>
+  </meshobj>
+  <light>
+    <center x="0" y="3" z="0"/>
+    <radius>40</radius>
+    <color red="1" green="1" blue="1"/>
+  </light>
+</sector>
+@end example
+
+In the above example we create a sector called @samp{room} which contains
+one mesh object (the outer walls of the sector) and one light. Any type
+of mesh object can be placed in a sector. In this example we use the
+@samp{genmesh} mesh object.
+
+There are some other things you can specify in a sector. By default a
+sector will use the @samp{frustvis} visibility culler. This visibility culler
+will only do frustum culling. For small sectors (i.e. a small number of
+objects) this is usually sufficient. If you have a large sector with lots
+of objects then you should probably use @samp{dynavis} instead. Like this:
+
+@example
+<cullerp>crystalspace.culling.dynavis</cullerp>
+@end example
+
+In addition to using @samp{meshobj} for specifying mesh objects in a sector
+there are also some other techniques that you can use.
+
+@itemize
+@item
+@samp{meshref}: with @samp{meshref} you can directly create a mesh object
+from a factory. This sounds similar to @samp{meshobj} but the main difference
+is that you can create hierarchical mesh objects from hierarchical mesh
+factories with this. The disadvantage is that it is not possible to supply
+mesh object specific parameters to the created mesh objects (i.e. you cannot
+supply a @samp{params} or @samp{paramsfile} with @samp{meshref}).
+
+@item
+@samp{meshlib:} normally a library contains mesh factories. But it is possible
+to define mesh objects in libraries too. These mesh objects will be placed
+in the engine but not in any sector. To actually link such an object to
+a sector you have to use @samp{meshlib} then. It is possible to supply
+additional parameters using @samp{params} or @samp{paramsfile} with
+@samp{meshlib}. These will be used in addition to the parameters already
+supplied to the mesh object as defined in the library. Note that once you
+added an object to a sector using @samp{meshlib} you cannot add it to other
+sectors. This technique is not an alternative for using mesh factories.
+@end itemize
+
+A sector can also contain fog like this:
+
+@example
+<fog red=".5" green=".5" blue=".5" density=".01" />
+@end example
+
+Finally a sector can contain nodes. A node represents something that has
+a position. In addition a node can contain keys and addons. Crystal Space
+itself doesn't use nodes but an application using Crystal Space can use
+them for whatever purpose it needs. Here is an example:
+
+@example
+<node name="monster">
+    <position x="10" y="3" z="12" />
+    <key name="spawn" value="100" />
+</node>
+@end example
+
+Sectors can contain keys and addons.
+
+@subsubheading Collection Specification
+@cindex collections (Map File)
+
+With collections it is possible to group related objects (like textures,
+materials, mesh objects, mesh factories, sectors, sequences, triggers,
+shared variables, @dots{}).
+Collections are not a geometrical concept. It is possible to define a collection which
+contains all wall geometry and a collection which contains all moving geometry.
+Usually though, collections represent some area in the world. You can use
+collections to dynamically load/unload parts of the world. This is useful
+if you have really big worlds that don't fit in memory at once.
+
+@node XML Action Section, , XML World Definition Section, XML File Format
+@subsubsection Action Section
+
+This section describes the action section.
+
+@subsubheading Sequences and Triggers
+@cindex sequences (Map File)
+@cindex triggers (Map File)
+
+With the sequences and triggers section you can define actions and
+interactions on objects in your map file. These sections are used to drive
+the engine sequence manager (@pxref{Sequence Manager}).

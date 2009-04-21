@@ -1,0 +1,27 @@
+
+<h3>Terrain</h3>
+<p>Any object in Max can be set as a terrain object. The geometry of the object 
+  is not important and will not be exported. Only the position is relevant and 
+  some properties.</p>
+<p>To set one object as a terrain object name it &quot;_terr_something&quot;. 
+  The object must have all these properties:</p>
+<p> &quot;CELLSIZEX&quot; : how many meters (X axis) will be one pixel of the 
+  heightmap when rendered in game. 1=1 meter<br>
+  &quot;CELLSIZEY&quot; : how many meters (Y axis) will be one pixel of the heightmap 
+  when rendered in game. 1=1 meter<br>
+  &quot;MAXHEIGHT&quot; : is the max height of a white pixel on the heightmap 
+  in meters.<br>
+  &quot;HEIGHTMAP&quot; : is the name of the heightmap file used to displace the 
+  terrain <br>
+  &quot;MATERIALMAP&quot; : is the name of the materialmap file used to paint 
+  the texture on the terrain<br>
+  &quot;LODDISTANCE&quot; : is the distance where it ends doing lod, and just 
+  uses a flat texture</p>
+<p>&nbsp;</p>
+<p>You have to export the level with &quot;Export as Terrain Level&quot; in exporter 
+  GUI<br>
+  You have to use gfxpackage enabled for NR. it will never work on OR<br>
+  Copy the world file in the gfxpackage/levels/something dir as always. Plus you 
+  need two files in the same dir: the heightmap and the materialmap</p>
+<p align=right>Next: <a href="lod.htm">Level Of Detail</a></p>
+</body></html>

@@ -1,0 +1,31 @@
+<Include>
+  <Property Id="CSSDK$(var.VERSION_MAJORMINOR)" Value="C:\CrystalSpaceSDK" />
+  <Feature Title="Crystal Space SDK" Id="CS.sdk" Level="1" ConfigurableDirectory="CSSDK$(var.VERSION_MAJORMINOR)" AllowAdvertise="no">
+    <Feature Title="Development Files" Id="CS.sdk.base" Level="1">
+      <Feature Title="Register Environment Variable" Id="CS.sdk.register" Level="1" Display="hidden">
+        <ComponentRef Id="CS.sdk.register"/>
+      </Feature>
+      <Feature Title="Tools" Id="CS.arch.executable.sdk" Level="1" Display="hidden">
+        <MergeRef Id="CS.arch.executable.sdk"/>
+        <?if $(var.ARCH) = GCC_3.4 ?>
+          <MergeRef Id="CS.arch.csconfig"/>
+        <?endif?>
+      </Feature>
+      <Feature Title="Headers" Id="CS.include" Level="1" Display="hidden">
+        <MergeRef Id="CS.include.8F1B7996-BF93-11DC-B42B-0015582877AD"/>
+        <MergeRef Id="CS.arch.include"/>
+      </Feature>
+      <Feature Title="Data" Id="CS.data.sdk" Level="1" Display="hidden">
+        <MergeRef Id="CS.data.sdk"/>
+      </Feature>
+      <Feature Title="Libraries" Id="CS.arch.linklibs" Level="1" Display="hidden">
+        <MergeRef Id="CS.arch.link"/>
+        <MergeRef Id="winlibs.common.link"/>
+        <MergeRef Id="winlibs.arch.link"/>
+      </Feature>
+    </Feature>
+    <Feature Title="Documentation" Id="CS.doc" Level="1" ConfigurableDirectory="CSDOCS" AllowAdvertise="no">
+      <MergeRef Id="CS.doc.88888F92-BF93-11DC-B42B-0015582877AD"/>
+    </Feature>
+  </Feature>
+</Include>

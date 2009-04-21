@@ -1,0 +1,7 @@
+SubDir TOP plugins cscript pycscegui ;
+
+if $(PYTHON.AVAILABLE) = "yes" && $(CEGUI.AVAILABLE) = "yes"
+{
+  PyBindingModule pyceguimod : pycscegui : ceguimod.cpp : : CEGUI : "cegui cs Python module" ;
+  CFlags pyceguimod : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+}

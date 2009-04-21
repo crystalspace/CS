@@ -1,0 +1,53 @@
+;;; This is your application' specific configuration file
+;;; Here you can set Crystal Space settings, plugins to load,
+;;; and custom kvp (key-value pairs) for your project.
+
+; Specify the render manager we want. Use rlcompat for pre-1.9 rendering style.
+;Engine.RenderManager.Default = crystalspace.rendermanager.rlcompat
+Engine.RenderManager.Default = crystalspace.rendermanager.unshadowed
+;Engine.RenderManager.Default = crystalspace.rendermanager.shadow_pssm
+
+;;; Plugin load examples:
+
+; Load bugplug plugin
+;System.Plugins.iBugPlug = crystalspace.utilities.bugplug
+
+; Specify alternative documentsystem plugins
+; xmlread offers better performances, but doesn't permit writing XML documents
+; binary XML also gives better performances (see 'Binary XML' manual chapter)
+;System.Plugins.iDocumentSystem = crystalspace.documentsystem.multiplexer
+;System.Plugins.iDocumentSystem.1 = crystalspace.documentsystem.xmlread
+;System.Plugins.iDocumentSystem.2 = crystalspace.documentsystem.binary
+
+; Tell Crystal Space we want freetype support (for TTF fonts)
+;System.Plugins.iFontServer = crystalspace.font.server.multiplexer
+;System.Plugins.iFontServer.1 = crystalspace.font.server.freetype2
+;System.Plugins.iFontServer.2 = crystalspace.font.server.default
+
+;;; Crystal Space settings: default window size and fullscreen-ness
+
+;Video.ScreenWidth = 800
+;Video.ScreenHeight = 600
+;Video.FullScreen = no
+
+;;; Application-specific settings
+
+WindowTitle = #LONGNAME#
+
+;; Those are setting for the actor collider
+Actor.Legs  = 0.2,0.3,0.2
+Actor.Body  = 0.2,1.2,0.2
+Actor.Shift = 0,-1,0
+
+;; This is used as default starting position when it's not defined in the map
+DefaultStartPos = 0,2,0
+
+;; This is the VFS path to the map to be loaded by default
+DefaultMap = /appdata/defaultmap
+
+;; Settings for the SimpleStaticLighter, used in PostLoadMap()
+StaticLighter.Enabled = true
+StaticLighter.NumLights = 4
+;; ShadowType: 0 -> none, 1 -> center, 2 -> boundingbox, 3 -> full
+StaticLighter.ShadowType = 0
+

@@ -1,0 +1,197 @@
+#==============================================================================
+# TemplateToolkit2 template extension for MSVC7 project (vcproj) file.
+# Copyright (C) 2004 by Eric Sunshine <sunshine@sunshineco.com>
+#
+#    This library is free software; you can redistribute it and/or modify it
+#    under the terms of the GNU Library General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or (at your
+#    option) any later version.
+#
+#    This library is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public
+#    License for more details.
+#
+#    You should have received a copy of the GNU Library General Public License
+#    along with this library; if not, write to the Free Software Foundation,
+#    Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#==============================================================================
+#------------------------------------------------------------------------------
+# This file, projectx7.tlib, provides additional support for the main MSVC7
+# project file template, project7.tlib, in the form of macros which customize
+# the file generation based upon combinations of build mode and target type.
+#
+# project7.tlib will look for macros named "tag_build", "tag_type", and
+# "tag_type_build".  `tag' is an arbitrary name, such as "compiler" or "linker"
+# which project7.tlib will use when looking for customizations for a particular
+# section of the project file (such as the compiler or linker sections, for
+# instance).  `build' is one of the build mode tag names (typically "release"
+# or "debug") from the build[] array (control.tlib).  `type' is one of the
+# project types (typically "appcon", "appgui", "group", "library", or "plugin")
+# named by the projtypes[] array (control.tlib).
+#
+# For example, to add customization entries to the compiler portion of the
+# project file in release mode for all project types, provide a macro named
+# "compiler_release".  To customize linker for plugins only but for all build
+# modes, provide the macro "linker_plugin".  To add customizations for the
+# compiler in debug mode for GUI application projects only, provide a macro
+# named "compiler_appgui_debug".
+#------------------------------------------------------------------------------
+
+# Construct a shared lib file name that contains the VC version
+[% MACRO library_dll_versuffix GET 
+  ('-' _ my.doc.packageversion.0) IF my.doc.packageversion.0 -%]
+[% MACRO library_dll_outfile(suffix) GET
+  my.doc.rawtarget.0 _ library_dll_versuffix _ '-vc' _ my.doc.msvcversion.0 _ platform.suffix _ suffix
+%]
+
+[% MACRO global_app BLOCK -%]
+			ConfigurationType="1"
+			CharacterSet="2"
+[% END %]
+[% MACRO global_app_release BLOCK -%]
+			WholeProgramOptimization="1"
+[% END %]
+[% MACRO global_appcon GET global_app %]
+[% MACRO global_appcon_release GET global_app_release %]
+[% MACRO global_appgui GET global_app %]
+[% MACRO global_appgui_release GET global_app_release %]
+
+[% MACRO global_group BLOCK -%]
+			ConfigurationType="4"
+[% END %]
+
+[% MACRO global_library BLOCK -%]
+			ConfigurationType="4"
+[% END %]
+[% MACRO global_library_shared BLOCK -%]
+			ConfigurationType="2"
+[% END %]
+[% MACRO global_library_shared_release BLOCK -%]
+			WholeProgramOptimization="1"
+[% END %]
+
+[% MACRO global_plugin BLOCK -%]
+			ConfigurationType="2"
+[% END %]
+[% MACRO global_plugin_release BLOCK -%]
+			WholeProgramOptimization="1"
+[% END %]
+
+[% MACRO global_dll BLOCK -%]
+			ConfigurationType="2"
+[% END %]
+[% MACRO global_dll_release BLOCK -%]
+			WholeProgramOptimization="1"
+[% END %]
+
+[% MACRO precompiled_header BLOCK -%]
+[%- IF my.doc.pch.0 -%]
+				UsePrecompiledHeader="1"
+				PrecompiledHeaderThrough="[% my.doc.pch.0 %]"
+[% END %]
+[% END %]
+
+[% MACRO compiler_release BLOCK -%]
+				Optimization="2"
+				StringPooling="TRUE"
+				EnableFunctionLevelLinking="TRUE"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="FALSE"
+[% END %]
+
+[% MACRO compiler_debug BLOCK -%]
+				Optimization="0"
+				MinimalRebuild="TRUE"
+				RuntimeTypeInfo="TRUE"
+				RuntimeLibrary="3"
+[% precompiled_header -%]
+[% END %]
+
+# The default PDB file name
+[% MACRO compiler_default_pdb BLOCK -%]
+				ProgramDataBaseFileName="[% workbuild([platform.name, '\\', my.doc.rawtarget.0, '.pdb']) %]"
+[% END %]
+[% MACRO compiler_appcon  GET compiler_default_pdb %]
+[% MACRO compiler_appgui  GET compiler_default_pdb %]
+[% MACRO compiler_library GET compiler_default_pdb %]
+[% MACRO compiler_plugin  GET compiler_default_pdb %]
+[% MACRO compiler_dll     GET compiler_default_pdb %]
+
+# For shared libraries, use a different PDB name (resembling the shared lib
+# file name)
+[% MACRO compiler_library_shared_release BLOCK -%]
+				ProgramDatabaseFileName="[% workbuild([platform.name, '\\', library_dll_outfile('.pdb')]) %]"
+[% END %]
+
+[% MACRO compiler_library_shared_debug BLOCK -%]
+[% precompiled_header -%]
+				ProgramDatabaseFileName="[% workbuild([platform.name, '\\', library_dll_outfile('_d.pdb')]) %]"
+[% END %]
+
+
+[% MACRO linker_release BLOCK -%]
+				LinkIncremental="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				GenerateDebugInformation="TRUE"
+				IgnoreDefaultLibraryNames="LIBC,LIBCD,LIBCMT,LIBCMTD"
+[% END %]
+[% MACRO linker_debug BLOCK -%]
+				LinkIncremental="2"
+				GenerateDebugInformation="TRUE"
+				IgnoreDefaultLibraryNames="LIBC,LIBCD,LIBCMT,LIBCMTD,MSVCRT"
+[% END %]
+
+[% MACRO linker_common BLOCK -%]
+				OutputFile="[% path([my.doc.buildroot.0, my.doc.target.0]) %]"
+				ProgramDatabaseFile="[% workbuild([platform.name, '\\', my.doc.rawtarget.0, '.pdb']) %]"
+[% END %]
+
+[% MACRO linker_app(subsys) BLOCK -%]
+[% linker_common -%]
+				SubSystem="[% subsys %]"
+[% END %]
+[% MACRO linker_appcon GET linker_app(1) %]
+[% MACRO linker_appgui_release GET linker_app(2) %]
+[% MACRO linker_appgui_debug GET linker_app(1) %]
+
+[% MACRO linker_library_shared_release BLOCK -%]
+                        OutputFile="[% path([my.doc.buildroot.0, library_dll_outfile('.dll')]) %]"
+				ImportLibrary="[% worklibout %]\[% my.doc.project.0 %].lib"
+				ProgramDatabaseFile="[% workbuild([platform.name, '\\', library_dll_outfile('.pdb')]) %]"
+[% END %]
+
+[% MACRO linker_library_shared_debug BLOCK -%]
+                        OutputFile="[% path([my.doc.buildroot.0, library_dll_outfile('_d.dll')]) %]"
+				ImportLibrary="[% worklibout %]\[% my.doc.project.0 %]_d.lib"
+				ProgramDatabaseFile="[% workbuild([platform.name, '\\', library_dll_outfile('_d.pdb')]) %]"
+[% END %]
+
+[% MACRO linker_plugin BLOCK -%]
+[% linker_common -%]
+				IgnoreImportLibrary="TRUE"
+				DelayLoadDLLs="[% glue(my.doc.librarydelay,';','','.dll') %]"
+				ImportLibrary="[% workbuild([platform.name, '\\', my.doc.project.0, '.lib']) %]"
+[% END %]
+
+[% MACRO linker_dll BLOCK -%]
+[% linker_common -%]
+				DelayLoadDLLs="[% glue(my.doc.librarydelay,';','','.dll') %]"
+				ImportLibrary="[% workbuild([platform.name, '\\', my.doc.project.0, '.lib']) %]"
+[% END %]
+
+[% MACRO library_outfile(suffix) BLOCK -%]
+				OutputFile="[% worklibout %]\[% my.doc.project.0 %][% suffix %].lib"
+[% END %]
+[% MACRO librarian_library_release GET library_outfile('') %]
+[% MACRO librarian_library_debug   GET library_outfile('_d') %]
+[% MACRO librarian_group	   GET library_outfile('') %]
+
+[% MACRO postbuild_common BLOCK -%]
+				CommandLine="md [% path([workroot, 'bin']) %] 2&gt; nul&#x0D;&#x0A;copy /y &quot;$(TargetPath)&quot; [% path([workroot, 'bin\\']) %]&#x0D;&#x0A;"
+[% END %]
+
+[% MACRO postbuild_release GET postbuild_common %]
+[% MACRO postbuild_debug   GET postbuild_common %]

@@ -1,0 +1,225 @@
+SubDir TOP include ;
+
+#------------------------------------------------------------------------------
+# Installation
+#------------------------------------------------------------------------------
+Recurse InstallHeader : .h .i .inc .fun .tok ;
+
+rule FilelistEntryHeader
+{
+  if "$(2)" != "" || $(1) != "csconfig.h"
+  { 
+    local listdir = $(2:E=.) ;
+    local file_gristed = $(1:G=$(listdir:J=!)) ;
+    FileListEntriesData $(file_gristed) : $(2) : headers ;
+  }
+}
+Recurse FilelistEntryHeader : .h .i .inc .fun .tok ;
+{
+  local SUBDIR = [ ConcatDirs $(BUILDTOP) include ] ; # Temporary for Recurse.
+  FileListEntriesData csconfig.h : : headers-platform ;
+}
+
+#------------------------------------------------------------------------------
+# Master-header creation / automation
+#------------------------------------------------------------------------------
+
+# A list of headers which should not appear in any master-header, either
+# because they reference external resources (which causes build-time problems
+# if the preprocessor does not know where to find those resources) or because
+# they are specialized polymorphic files intended for inclusion several times
+# under different contexts.
+CS_MASTER_HEADER_REJECTS =
+  [ Wildcard [ ConcatDirs csplugincommon directx       ] : *.h ]
+  [ Wildcard [ ConcatDirs csplugincommon macosx        ] : *.h ]
+  [ Wildcard [ ConcatDirs csplugincommon opengl        ] : *.h ]
+  [ Wildcard [ ConcatDirs csplugincommon win32         ] : *.h ]
+  [ Wildcard [ ConcatDirs csplugincommon rendermanager ] : *.h ]
+  [ ConcatDirs cstool   tokenlist.h  ]
+  [ ConcatDirs csutil   archive.h    ]
+  [ ConcatDirs csutil   csosdefs.h   ]
+  [ ConcatDirs csutil   custom_new_disable.h ]
+  [ ConcatDirs csutil   custom_new_enable.h ]
+  [ ConcatDirs csutil   deprecated_warn_off.h ]
+  [ ConcatDirs csutil   deprecated_warn_on.h ]
+  [ ConcatDirs csutil   getopt.h     ]
+  [ ConcatDirs csutil   mmap_dummy.h ]
+  [ ConcatDirs csutil   mmap_posix.h ]
+  [ ConcatDirs csutil   scf_impl.h   ]
+  [ ConcatDirs csutil   scf_implgen.h ]
+  [ ConcatDirs csutil   scf_implgen_p.h ]
+  [ ConcatDirs csutil   scf_implgen_p_template.h ]
+  [ ConcatDirs csutil   win32 mmap.h ]
+  [ ConcatDirs csutil   win32 psdk-compat.h ]
+  [ ConcatDirs csutil   zip.h        ]
+  [ ConcatDirs imap     parser.h     ]
+  [ ConcatDirs inetwork vosapi.h     ]
+  [ ConcatDirs ivaria   icegui.h     ]
+  [ ConcatDirs ivaria   xwindow.h    ]
+  [ ConcatDirs ivideo   wxwin.h      ]
+  ;
+
+# List of headers that should not appear in the master-headers because they 
+# are deprecated.
+CS_MASTER_HEADER_REJECTS +=
+  [ ConcatDirs iengine collectn.h     ]
+  [ ConcatDirs csutil   scopedmutexlock.h ]
+  [ ConcatDirs csutil   win32 msvc_deprecated_warn_off.h ]
+  [ ConcatDirs csutil   win32 msvc_deprecated_warn_on.h ]
+  ;
+  
+# List of headers that should not appear in the master-headers because they 
+# are platform-specific.
+CS_MASTER_HEADER_REJECTS +=
+  [ ConcatDirs csutil generic   regex.h             ]
+  [ ConcatDirs csutil threading atomicops_gcc_ppc.h ]
+  [ ConcatDirs csutil threading atomicops_gcc_x86.h ]
+  [ ConcatDirs csutil threading atomicops_msvc.h    ]
+  [ ConcatDirs csutil threading atomicops_sparc.h   ]
+  [ ConcatDirs csutil threading pthread_condition.h ]
+  [ ConcatDirs csutil threading pthread_mutex.h     ]
+  [ ConcatDirs csutil threading pthread_thread.h    ]
+  [ ConcatDirs csutil threading pthread_tls.h       ]
+  [ ConcatDirs csutil threading win32_apifuncs.h    ]
+  [ ConcatDirs csutil threading win32_condition.h   ]
+  [ ConcatDirs csutil threading win32_mutex.h       ]
+  [ ConcatDirs csutil threading win32_thread.h      ] 
+  [ ConcatDirs csutil threading win32_tls.h         ]
+  ;
+
+{
+  local CSWIN32LIBS_REJECTS =
+    CEGUI*.h
+    d3d.h
+    d3dcaps.h
+    d3dtypes.h
+    ddraw.h
+    dinput.h
+    dsound.h
+    ft2build.h
+    jconfig.h
+    jerror.h
+    jinclude.h
+    jmorecfg.h
+    jpeglib.h
+    libmng*.h
+    mikmod.h
+    png.h
+    pngconf.h
+    zconf.h
+    zlib.h
+    ;
+  local h ;
+  for h in $(CSWIN32LIBS_REJECTS)
+  {
+    CS_MASTER_HEADER_REJECTS += 
+      [ Wildcard [ ConcatDirs csutil win32 ] : $(h) ] ;
+  }
+}
+
+CS_MASTER_HEADER_BOILERPLATE =
+"/*
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+  
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+  
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+" ;
+
+CS_MASTER_HEADER_DOC_DIRECTORY =
+"/**@file 
+ * Directory master header. This header file includes all headers in a
+ * subdirectory of the top Crystal Space include directory.
+ */" ;
+
+CS_MASTER_HEADER_INCLUDE_CSSYSDEF_H = 
+"#include \"cssysdef.h\"" ;
+
+rule MasterHeaderCsUtil
+{
+  local rejects = $(1) ;
+
+  # Order of platforms is significant: MacOS/X must appear before Unix since
+  # it is also Unix, but we want only the MacOS/X-specific headers.
+  local platforms = macosx unix win32 ;
+
+  local cond = "if" ;
+  local lines ;
+  local p ;
+  for p in $(platforms)
+  {
+    local local_rejects = $(rejects)
+      [ ConcatDirs csutil $(p) csosdefs.h ]
+      [ ConcatDirs csutil $(p) csconfig.h ] ;
+    local files = [ Filter [ Sort
+      [ Wildcard [ ConcatDirs csutil $(p) ] : *.h ] ] : $(local_rejects) ] ;
+    if $(files)
+    {
+      lines +=
+        "#$(cond) defined(CS_PLATFORM_$(p:U))"
+        "#include \"$(files)\"" ;
+      cond = "elif" ;
+    }
+  }
+  if $(cond) != "if"
+  {
+    lines += "#endif" ;
+  }
+  return [ MasterHeader csutil :
+    [ Filter [ Wildcard csutil : *.h ] : $(rejects) ] 
+    [ Filter [ Wildcard [ ConcatDirs csutil threading ] : *.h ] : $(rejects) ] :
+    $(CS_MASTER_HEADER_BOILERPLATE)
+    $(CS_MASTER_HEADER_DOC_DIRECTORY) 
+    $(CS_MASTER_HEADER_INCLUDE_CSSYSDEF_H) : 
+    $(lines) ] ;
+}
+
+CS_MASTER_HEADERS =
+  [ MasterHeaderCsUtil $(CS_MASTER_HEADER_REJECTS) ]
+  [ DirectoryMasterHeaders
+      csgeom
+      csgfx
+      csplugincommon
+      cstool
+      iengine
+      igeom
+      igraphic
+      imap
+      imesh
+      inetwork
+      isndsys
+      itexture
+      iutil
+      ivaria
+      ivideo :
+      $(CS_MASTER_HEADER_BOILERPLATE) 
+      $(CS_MASTER_HEADER_DOC_DIRECTORY) 
+      $(CS_MASTER_HEADER_INCLUDE_CSSYSDEF_H) : 
+      : : 
+      $(CS_MASTER_HEADER_REJECTS) ] ;
+
+CS_MASTER_HEADER_DOC_MASTER_MASTER =
+"/**@file 
+ * Crystal Space master header. This header file essentially causes most of 
+ * the Crystal Space header files to be included, providing a convenient way 
+ * to use any feature of Crystal Space without having to worry about including 
+ * the exact right header file(s).
+ */" ;
+
+MasterHeader $(PACKAGE_NAME) :
+  csqint.h
+  csqsqrt.h
+  csver.h
+  $(CS_MASTER_HEADERS:G=) :
+  $(CS_MASTER_HEADER_BOILERPLATE)
+  $(CS_MASTER_HEADER_DOC_MASTER_MASTER)
+  $(CS_MASTER_HEADER_INCLUDE_CSSYSDEF_H) ;

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- spr3d.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.sprite.3d</name>
+        <implementation>csSprite3DMeshObjectType</implementation>
+        <description>Crystal Space Sprite3D Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

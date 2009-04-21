@@ -1,0 +1,11 @@
+SubDir TOP plugins video loader bmp ;
+
+Description csbmpimg : "bmp image loader" ;
+
+Plugin csbmpimg
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith csbmpimg : crystalspace ;
+
+CompileGroups csbmpimg :  imageloaders ;
+

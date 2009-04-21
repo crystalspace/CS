@@ -1,0 +1,3 @@
+SubDir TOP libs csutil generic ;
+
+CsLibAddFiles $(CSUTIL.GENERIC) : csutil generic ;

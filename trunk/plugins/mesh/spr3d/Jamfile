@@ -1,0 +1,4 @@
+SubDir TOP plugins mesh spr3d ;
+
+SubInclude TOP plugins mesh spr3d object ;
+SubInclude TOP plugins mesh spr3d persist ;

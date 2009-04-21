@@ -1,0 +1,8 @@
+<library>
+    <textures />
+    <materials />
+    <meshfact name="paramsFileTest">
+        <plugin>spr3dFact</plugin>
+        <paramsfile>/lib/std/sprite3</paramsfile>
+    </meshfact>
+</library>

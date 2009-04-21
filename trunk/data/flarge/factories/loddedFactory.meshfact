@@ -1,0 +1,58 @@
+<library>
+    <textures>
+        <texture name="bricks.gif">
+            <file>/lib/stdtex/bricks.jpg</file>
+        </texture>
+        <texture name="white.gif">
+            <file>/lib/std/white.gif</file>
+        </texture>
+        <texture name="spark">
+            <file>/lib/std/spark.png</file>
+        </texture>
+    </textures>
+    <materials>
+        <material name="bricks">
+            <texture>bricks.gif</texture>
+            <shader type="standard">std_lighting_detail_alpha_scroll</shader>
+            <shadervar name="tex detail" type="texture">spark</shadervar>
+            <shadervar name="tex detail scale" type="vector2">10,10</shadervar>
+            <shadervar name="tex detail color" type="vector4">1,1,1,0.25</shadervar>
+        </material>
+        <material name="white">
+            <texture>white.gif</texture>
+        </material>
+    </materials>
+    <meshfact name="loddedFactory">
+        <nullmesh>
+            <min x="-9.72084" y="-10.2708" z="-6.56839" />
+            <max x="9.72084" y="10.2708" z="6.56839" />
+        </nullmesh>
+        <staticlod>
+            <distance d0="2" d1="6" />
+        </staticlod>
+        <meshfact name="lod_0">
+            <lodlevel>0</lodlevel>
+            <plugin>meshFact</plugin>
+            <params>
+                <box>
+                    <min x="-0.1" y="-0.1" z="-0.1" />
+                    <max x="0.1" y="0.1" z="0.1" />
+                </box>
+                <material>bricks</material>
+                <autonormals />
+            </params>
+        </meshfact>
+        <meshfact name="lod_1">
+            <lodlevel>1</lodlevel>
+            <plugin>meshFact</plugin>
+            <params>
+                <box>
+                    <min x="-0.1" y="-0.1" z="-0.1" />
+                    <max x="0.1" y="0.1" z="0.1" />
+                </box>
+                <material>white</material>
+                <autonormals />
+            </params>
+        </meshfact>
+    </meshfact>
+</library>

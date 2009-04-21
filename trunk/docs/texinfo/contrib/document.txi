@@ -1,0 +1,160 @@
+@c -*-texinfo-*-
+@node Writing Documentation, Portability, Contributing, Contributing
+@section Writing Documentation
+@cindex Writing Documentation
+@cindex Documentation, Writing
+
+This section contains guidelines and instructions for writing documentation
+for the Crystal Space project.  Read this section if you are interested in
+contributing to the documentation project.
+
+These guidelines deal with subdivision of the documentation into files, into
+chapters and sections, and with node placing and linking.  To understand this
+document, you should know that @dfn{chapters} is the general division of a
+Texinfo file into several parts, and @dfn{sections} is the next subdivision.
+@dfn{ToC} means ``Table of Contents''.  ``folder'' and ``directory'' have the
+expected meaning.
+
+Please follow these guidelines when writing documentation for Crystal Space.
+
+@subsubheading General
+
+Write documentation using the Texinfo mark-up language. You can get more
+information at @uref{http://www.texinfo.org/}.
+
+The documentation is converted from Texinfo to other formats, such as
+@sc{html}. Conversion to most important formats happens automatically within
+the @sc{svn} repository by an automated mechanism, so you only have to commit
+the Texinfo docs if you make any changes.
+
+To make writing the documentation easier, @samp{@@node} and @samp{@@menu}
+directives in the Texinfo sources can be repaired, which means that the
+links to the previous, next and top nodes are generated automatically. So you
+can safely write the following line, omitting the various links which the
+@samp{@@node} directive normally requires:
+
+@example
+@@node MySection
+@@section My Section Title
+@end example
+
+The repair occurs automatically within the @sc{svn} repository by an automated
+mechanism, however you can also repair the files manually if you use the
+@sc{gnu} makefile system by invoking the following command:
+
+@example
+make repairdoc
+@end example
+
+@subsubheading Conversion and Maintenance via Makefile Targets
+
+If you are using the @sc{gnu} makefile system, you can use the following
+makefile targets to convert the Texinfo documents to different formats.
+The output will be placed in subdirectories of @file{$@{builddir@}/out/docs/}.
+
+@table @code
+@item make apihtml
+Generate @sc{html} version of public @sc{api} reference via Doxygen.  This is
+the reference manual for people using Crystal Space in their own projects.  It
+only documents public classes and functions.
+
+@item make apidevhtml
+Generate @sc{html} version of developer @sc{api} reference via Doxygen.  This
+is the reference manual for people actually working on Crystal Space itself. 
+It documents all classes and functions.
+
+@item make manualhtml
+Convert the Crystal Space manual to @sc{html} format.
+
+@item make manualdvi
+Convert the Crystal Space manual to @sc{dvi} format.
+
+@item make manualps
+Convert the Crystal Space manual to PostScript format.
+
+@item make manualpdf
+Convert the Crystal Space manual to @sc{pdf} format.
+
+@item make manualinfo
+Convert the Crystal Space manual to @sc{gnu} Info format.
+
+@item make repairdoc
+Repair all @samp{@@node} and @samp{@@menu} directives in the Texinfo sources.
+
+@item make cleandoc
+Delete all converted documents.
+@end table
+
+@subsubheading Directory Structure
+
+The @file{CS/docs/texinfo} directory contains:
+
+@itemize @bullet
+@item
+A table-of-contents file named @file{cs.txi}.  This is the platform-independent
+root of the entire documentation hierarchy.
+
+@item
+Platform-dependent configuration files, such as @file{unixdef.txi},
+@file{macdef.txi}, etc.
+
+@item
+Platform-dependent wrapper files, such as @file{cs-unix.txi},
+@file{cs-mac.txi}, etc.  These are the platform-specific root files for the
+entire documentation hierarchy.  They import the platform-dependent
+configuration (i.e. @file{unixdef.txi} and then the @sc{ToC} file
+@file{cs.txi}.
+
+@item
+Other configuration files, like @file{version.txi}, @file{cpyright.txi}, etc.,
+and helper files for conversion to other formats, like @file{texinfo.tex}.
+
+@item
+One subdirectory for each chapter. Each chapter directory contains at least
+one file called @file{chapter.txi}, which is the root import file for this
+chapter. The @sc{ToC} file will only include @file{chapter.txi}, which then
+includes one file in this directory for every section.
+
+If one section in a chapter is too big for a single file, this section is split
+into several files by subsections.  These files are again often placed into a
+subdirectory.
+@end itemize
+
+@subsubheading Formatting Conventions
+
+Here are some general formatting conventions.
+
+@itemize @bullet
+@item
+When creating @code{@@itemize} lists, one blank line should separate each
+@code{@@item} except for short lists of items with short descriptions.  Also
+remember to use the @code{@@bullet} directive after the @code{@@itemize}
+directive, as in @code{@@itemize @@bullet}.
+
+@item
+Do not indent the text of items within @code{@@itemize} or
+@code{@@table} blocks.  Allow the formatting tools to perform the indentation
+automatically. This also applies to @code{@@example} blocks, but here you
+may indent sub-blocks. For example, you may want to create a block like this:
+
+@example
+@@example
+int Increment(int n)
+@@@{
+  return n + 1;
+@@@}
+@@end example
+@end example
+
+Then you may, of course, indent the @samp{return} line, but not the other
+lines.
+
+@item
+Do not use tabs to indent code in @code{@@example} blocks since the formatting
+tools do not faithfully reproduce the tab's indentation.  Instead, always
+indent using spaces.
+
+@item
+Attempt to keep the content of Texinfo source files under 80-columns in width
+if possible.  This is a general guidelines rather than a hard rule.
+@end itemize

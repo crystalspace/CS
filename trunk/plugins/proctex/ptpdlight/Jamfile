@@ -1,0 +1,29 @@
+SubDir TOP plugins proctex ptpdlight ;
+
+Description ptpdlight : "pseudo-dynamic lightmap procedural texture" ;
+
+PTPDLIGHT_MMX = ;
+if [ Property build : projgen ]
+{
+  PTPDLIGHT_MMX = ptpdlight_mmx.cpp ;
+}
+else if "$(CS_SUPPORTS_MMX)" = "yes"
+{
+  local source = [ DoSourceGrist ptpdlight_mmx.cpp ] ;
+  PTPDLIGHT_MMX = $(source) ;
+}
+
+
+Plugin ptpdlight
+	: [ Filter [ Wildcard *.cpp *.h ] : ptpdlight_mmx.cpp ]
+	  $(PTPDLIGHT_MMX)
+;
+LinkWith ptpdlight : crystalspace ;
+Includes ptpdlight_loader.h : $(SUBDIR)/ptpdlight_loader.tok ;
+MsvcExtraFile ptpdlight : $(SUBDIR)/ptpdlight_loader.tok ;
+if "$(CS_SUPPORTS_MMX)" = "yes"
+{
+  CFlags $(PTPDLIGHT_MMX) : $(COMPILER.CFLAGS.MMX) ;
+}
+
+CompileGroups ptpdlight : proctexes ;

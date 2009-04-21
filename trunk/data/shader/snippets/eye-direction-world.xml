@@ -1,0 +1,63 @@
+<!--
+  Copyright (C) 2008 by Frank Richter
+	    (C) 2008 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<!-- Direction from vertex to eye, in world space -->
+<snippet>
+  <technique priority="100">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+  
+    <input name="position" type="position4_world" />
+    
+    <input name="eyePosWorld" type="float4" default="complex" private="yes">
+      <block location="cg:vertexIn">
+	<uniform type="float4" name="eyePosWorld" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="float4" name="eyePosWorld" />
+      </block>
+      
+      <block location="cg:vertexMain">
+	eyePosWorld = vertexIn.eyePosWorld;
+      </block>
+      
+      <block location="cg:fragmentMain">
+	eyePosWorld = fragmentIn.eyePosWorld;
+      </block>
+      
+      <block location="cg:variablemap">
+	<variablemap destination="fragmentIn.eyePosWorld" type="expr">
+	  <sexp>(matrix-column (matrix2gl "world2camera transform inverse") 3)</sexp>
+	</variablemap>
+	<variablemap destination="vertexIn.eyePosWorld" type="expr">
+	  <sexp>(matrix-column (matrix2gl "world2camera transform inverse") 3)</sexp>
+	</variablemap>
+      </block>
+    </input>
+    
+    <block location="cg:vertexMain">
+      eyeDirectionWorld = (position - eyePosWorld).xyz;
+    </block>
+  
+    <block location="cg:fragmentMain">
+      eyeDirectionWorld = (position - eyePosWorld).xyz;
+    </block>
+  
+    <output name="eyeDirectionWorld" type="direction_world" />
+  </technique>
+</snippet>

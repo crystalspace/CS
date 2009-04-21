@@ -1,0 +1,7 @@
+SubDir TOP plugins mesh animesh persist skeleton2 ;
+
+Description skeleton2ldr : "Skeleton2 loader" ;
+Plugin skeleton2ldr : [ Wildcard *.cpp *.h ] ;
+Includes skeleton2ldr.h : $(SUBDIR)/skeleton2ldr.tok ;
+LinkWith skeleton2ldr : crystalspace ;
+CompileGroups skeleton2ldr : meshes ;

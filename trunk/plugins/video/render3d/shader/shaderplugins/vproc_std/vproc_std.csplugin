@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- vproc_std.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics3d.shader.vproc_std</name>
+        <implementation>csVProc_Std</implementation>
+        <description>Standard vertex preprocessor plugin</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

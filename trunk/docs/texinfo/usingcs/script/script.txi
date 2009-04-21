@@ -1,0 +1,55 @@
+@node Scripting Languages, CEGUI, Sound System, Using Crystal Space
+@section Scripting Languages
+@cindex Scripting
+@cindex Script
+
+@noindent
+@emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
+
+Crystal Space features bindings for several popular scripting and higher-level
+languages. The list of languages includes Java, Perl, and Python.
+
+Some scripting language bindings also have corresponding Crystal Space plugins.
+These can be loaded like any other plugins, and allow your C++ program to
+interact with scripting code. Such plugins implement the @samp{iScript}
+interface (@pxref{iScript Interface}), and it is by this interface that C++
+code communicates with the scripting side. Conversely, scripting code can
+interact with Crystal Space itself since most of the Crystal Space classes and
+interfaces have been @dfn{exported} to the scripting side with the bindings.
+
+Some of the bindings are available as @dfn{pure} scripting modules which can
+be @dfn{imported} directly into scripting code. This particularly powerful
+facility allows you to create Crystal Space applications entirely in the
+scripting language without writing any C++ code at all. Examples of these
+types of scripts can be found in the installed scripting support directories
+at:
+
+@noindent
+@code{$@{prefix@}/share/crystalspace/bindings}
+
+@noindent
+where $@{prefix@} is the installation location (typically, @file{/usr/local}).
+If you have not installed Crystal Space, then see the various subdirectories
+of @file{CS/scripts}.
+
+Crystal Space uses Swig (@uref{http://www.swig.org/}) to generate its
+language bindings. The technology has been generalized enough that the
+supported languages share a common Swig interface definition
+(@file{include/bindings/cspace.i}).  Each language also has its own specific
+definition files (@file{include/bindings/*/*.i}).  Because the binding
+definitions are generalized, it should be possible to leverage off of
+@file{include/bindings/cspace.i} to create additional Crystal Space bindings
+for any of the other languages supported by Swig with a minimal amount of
+effort.
+
+@menu
+* iScript Interface:: The iScript Interface
+* Java Bindings::
+* Perl Bindings::
+* Python Bindings::
+@end menu
+
+@importss{usingcs,script,iscript.txi}
+@importsss{usingcs,script,java,java.txi}
+@importsss{usingcs,script,perl,perl.txi}
+@importsss{usingcs,script,python,python.txi}
