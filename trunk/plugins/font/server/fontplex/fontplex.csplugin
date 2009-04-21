@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- fontplex.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.font.server.multiplexer</name>
+        <implementation>csFontServerMultiplexer</implementation>
+        <description>Crystal Space font server multiplexer</description>
+        <requires>
+          <class>crystalspace.font.server.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

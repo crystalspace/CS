@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- sndsysoss.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sndsys.software.driver.oss</name>
+        <implementation>SndSysDriverOSS</implementation>
+        <description>Sound System OSS Software Driver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
+

@@ -1,0 +1,72 @@
+#!/bin/sh
+
+if [ "x$MSYSTEM" = "xmsys" ] ; then
+  PATH_SEPARATOR=";"
+else
+  PATH_SEPARATOR=":"
+fi
+
+# Poor man's (portable) 'dirname' command.
+dirpart()
+{
+   expr "$1" : '\(..*\)[/\\].*'
+}
+
+BASE_DIR=`dirpart "$0"`
+TEMP_PREFIX=/tmp/cs-config$$
+
+# On MinGW, CRYSTAL may contain the path in one of two flavors:
+# MSYS paths, separated by $PATH_SEPARATOR, or Win32 paths, separated
+# by ';'. Since for the configure check we need MSYS paths, CRYSTAL
+# is first treated like a Win32-style list. If that yields sensible
+# results these are used subsequently. Otherwise use CRYSTAL as-is.
+if test "`uname -s | sed -e 's+\(.*\)_.*+\1+'`" = "MINGW32" ; then
+    NEW_CRYSTAL=''
+    my_IFS=$IFS; IFS=\;
+    for win32_dir in $CRYSTAL; do
+        win32_dir=`echo $win32_dir | tr '\\\\' '/'  | sed "s/\(.\):/\\/\\1/"`
+        if test -d "$win32_dir"; then
+            if test -n "$NEW_CRYSTAL"; then
+                NEW_CRYSTAL="$NEW_CRYSTAL$PATH_SEPARATOR"
+            fi
+            NEW_CRYSTAL="$NEW_CRYSTAL$win32_dir"
+        fi
+    done
+    IFS=$my_IFS
+    if test -n "$NEW_CRYSTAL"; then
+        CRYSTAL="$NEW_CRYSTAL"
+    fi
+fi
+
+# Collect executables starting with 'cs-config-' from $CRYSTAL and $PATH
+# @@@ FIXME: What about $CRYSTAL_x_y env vars?
+OLD_IFS="$IFS"
+IFS=$PATH_SEPARATOR
+for p in $CRYSTAL$PATH_SEPARATOR$BASE_DIR$PATH_SEPARATOR$PATH ; do
+  if [ -d "$p" ] ; then
+    for s in "$p"/cs-config-* "$p"/bin/cs-config-* ; do
+      if [ -x "$s" ] ; then
+	echo "$s" >> ${TEMP_PREFIX}_find
+      fi
+    done
+  fi
+done
+IFS="$OLD_IFS"
+
+if [ ! -e ${TEMP_PREFIX}_find ] ; then
+  echo "No cs-config-* scripts found" >&2
+  exit -1
+fi
+
+# Reorder for sorting
+cat ${TEMP_PREFIX}_find | sed 's!\(.*\)/cs-config-\(.*\)\.\(.*\)!\2:\3:\1!g' >> ${TEMP_PREFIX}_split
+# Sort by version number
+cat ${TEMP_PREFIX}_split | sort -u -t : -k 1,1nr -k 2,2nr >> ${TEMP_PREFIX}_sorted
+# Extract first entry (highest version)
+command=`cat ${TEMP_PREFIX}_sorted | head -n 1 | sed 's!\(.*\):\(.*\):\(.*\)!\3/cs-config-\1\.\2!'`
+# cleanup
+rm ${TEMP_PREFIX}*
+# ...and execute.
+"$command" $@
+
+

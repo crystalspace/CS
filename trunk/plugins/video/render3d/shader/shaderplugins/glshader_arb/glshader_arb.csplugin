@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- glshader_arb.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics3d.shader.glarb</name>
+        <implementation>csGLShader_ARB</implementation>
+        <description>OpenGL specific shaderprogram provider for Graphics3D</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

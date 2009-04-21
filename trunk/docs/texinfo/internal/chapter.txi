@@ -1,0 +1,20 @@
+@node Internals, Contributing, Working with Engine Content, Top
+@chapter Internal Project Structure
+@cindex Internal Structure
+
+This chapter describes how Crystal Space works internally.  This information is
+not necessary to utilize Crystal Space in your own project.  Instead, it is
+intended for developers of Crystal Space itself, as well as for those who are
+merely curious about the internal workings of the project.
+
+@menu
+* Platform Details:: Platform-Specific Details
+* Threads in CS:: Threads in Crystal Space
+* Engine Internal Workings:: The Engine Internals Explained
+* Rendering Loop::
+@end menu
+
+@importss{internal,platform,details.txi}
+@imports{internal,threads.txi}
+@imports{internal,engine.txi}
+@imports{internal,render.txi}

@@ -1,0 +1,16 @@
+@c -*-texinfo-*-
+@node Platform Details, Threads in CS, Internals, Internals
+@section Platform-Specific Details
+@cindex Platform-Specific Details
+@cindex Details, Platform-Specific
+
+This section contains in-depth and detailed platform-specific documentation.
+If you have questions about the port of Crystal Space for a particular
+platform or merely wish to know how it works, this is the information which
+you should read.
+
+@menu
+* MacOS/X Details:: MacOS/X
+@end menu
+
+@importss{internal,platform,macosx.txi}

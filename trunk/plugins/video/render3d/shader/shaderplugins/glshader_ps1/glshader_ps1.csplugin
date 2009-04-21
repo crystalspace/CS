@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- glshader_ps1.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics3d.shader.glps1</name>
+        <implementation>csGLShader_PS1</implementation>
+		<description>OpenGL specific shaderprogram provider for Graphics3D which compiles PS 1.x programs into OpenGL equivalents</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

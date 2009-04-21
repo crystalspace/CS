@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<world>
+  <variables>
+    <variable name="LodM" value="-0.00666667" />
+    <variable name="LodA" value="1.33333" />
+  </variables>
+
+  <plugins>
+    <plugin name="genmeshFactory">crystalspace.mesh.loader.factory.genmesh</plugin>
+    <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
+    <plugin name="terrainFact">crystalspace.mesh.loader.factory.terrain2</plugin>
+    <plugin name="terrain">crystalspace.mesh.loader.terrain2</plugin>    
+  </plugins>
+
+  <textures>
+    <texture name="andrew_marble4.jpg">
+      <file>/lib/stdtex/andrew_marble4.jpg</file>
+    </texture>
+    <texture name="stone4.gif">
+      <file>/lib/std/stone4.gif</file>
+    </texture>
+    <texture name="grass.png">
+      <file>/lev/terrain/grass.png</file>
+    </texture>
+    <texture name="materialmap_base.png">
+      <file>materialmap_base.png</file>
+    </texture>
+  </textures>
+
+  <shaders>
+    <shader><file>/shader/terrain_fixed_base.xml</file></shader>
+    <shader><file>/shader/terrain_fixed_splatting.xml</file></shader>
+  </shaders>
+
+  <materials>
+    <material name="ScatterSky">
+      <color red="0" green="0" blue="0" /> 
+    </material>
+    <material name="Base">
+      <texture>materialmap_base.png</texture>
+      <shader type="ambient">terrain_fixed_base</shader>
+    </material>
+    <material name="Marble">
+      <texture>andrew_marble4.jpg</texture>
+      <shadervar name="texture scale" type="vector2">16,16</shadervar>
+      <shader type="terrain splat">terrain_fixed_splatting</shader>
+    </material>
+    <material name="Stone">
+      <texture>stone4.gif</texture>
+      <shadervar name="texture scale" type="vector2">16,16</shadervar>
+      <shader type="terrain splat">terrain_fixed_splatting</shader>
+    </material>
+    <material name="Grass">
+      <texture>grass.png</texture>
+      <shadervar name="texture scale" type="vector2">16,16</shadervar>
+      <shader type="terrain splat">terrain_fixed_splatting</shader>
+    </material>
+  </materials>
+
+  <addon>
+    <plugin>crystalspace.renderloop.loop.loader</plugin>
+    <paramsfile>/shader/std_rloop_terrainfixed.xml</paramsfile>
+  </addon>
+    
+  <settings>
+    <clearzbuf>yes</clearzbuf>
+    <renderloop>std_rloop_terrainfixed</renderloop>
+  </settings>
+
+  <start>
+    <sector>room</sector>
+    <position x="0" y="30" z="0" />
+    <forward x="0" y="0" z="1" />
+    <up x="0" y="1" z="0" />
+  </start>
+
+  <meshfact name="skydome">
+    <plugin>genmeshFactory</plugin>
+    <params>
+      <sphere rimvertices="8" reversed="true">
+	<radius x="500000" y="500000" z="500000" />
+      </sphere>
+    </params>
+  </meshfact>
+
+  <meshfact name="TerrainFact">
+    <plugin>terrainFact</plugin>
+    <params>
+      <renderer>crystalspace.mesh.object.terrain2.bruteblockrenderer</renderer>
+      <collider>crystalspace.mesh.object.terrain2.collider</collider>
+      <feeder>crystalspace.mesh.object.terrain2.simpledatafeeder</feeder>
+
+      <cells>
+        <celldefault>
+          <gridsize width="257" height="257" />
+          <materialmapsize width="32" height="32" />
+          <size x="256" y="32" z="256" />
+        </celldefault>
+        
+        <cell>
+          <name>0</name>
+          <position x="-127" y="-127" />
+          <basematerial>Base</basematerial>
+          <feederproperties>
+            <param name="heightmap source">/lev/terrain/heightmap_257x257.png</param>
+            <alphamap material="Marble">/lev/terraina/alpha_marble.png</alphamap>
+            <alphamap material="Stone">/lev/terraina/alpha_stone.png</alphamap>
+          </feederproperties>
+        </cell>
+      </cells>
+    </params>
+  </meshfact>
+
+  <sector name="room">
+     <light name="sun">
+       <center x="-50000" y="86030" z="0" />
+       <color red="0.85903" green="0.80995" blue="0.70420" />
+       <radius>1000000</radius>
+     </light>
+
+    <meshobj name="sky">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>skydome</factory>
+        <material>ScatterSky</material>
+        <color red="0" green="0" blue="0" />
+      </params>
+      <zfill />
+      <priority>sky</priority>
+      <camera />
+      <trimesh> <id>colldet</id> </trimesh>
+    </meshobj>
+
+    <meshobj name="Terrain">
+      <plugin>terrain</plugin>
+      <params>
+        <factory>TerrainFact</factory>
+      </params>
+      <move> 
+        <v x="0" y="0" z="0" /> 
+      </move>
+    </meshobj>
+
+  </sector>
+</world>

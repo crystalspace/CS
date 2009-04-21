@@ -1,0 +1,94 @@
+@c -*-texinfo-*-
+@node Model Loading, , Binary XML, Map Loader
+@subsection Loading @sc{3ds} and @sc{md2} Models
+@cindex @code{iModelLoader}
+@cindex @sc{3ds}
+@cindex @sc{md2}
+
+Crystal Space can read @sc{3ds} and @sc{md2} models natively.
+
+@subsubheading Loading Models From World File
+
+From a world file you can do it as follows:
+
+@example
+<meshfact name="my3ds">
+  <plugin>crystalspace.mesh.loader.factory.genmesh.3ds</plugin>
+  <paramsfile>/data/my3ds.3ds</paramsfile>
+</meshfact>
+<meshfact name="mymd2">
+  <plugin>crystalspace.mesh.loader.factory.sprite.3d.md2</plugin>
+  <paramsfile>/data/mymd2.md2</paramsfile>
+</meshfact>
+@dots{}
+<sector name="room">
+  <meshobj name="my3dsMesh">
+    <plugin>crystalspace.mesh.loader.genmesh</plugin>
+    <params> <factory>my3ds</factory> </params>
+    <move> <v x="0" y="0.3" z="15" /> </move>
+  </meshobj>
+  <meshobj name="mymd2Mesh">
+    <plugin>crystalspace.mesh.loader.sprite.3d</plugin>
+    <params>
+      <factory>mymd2</factory>
+      <action>wave</action>
+      <material>mymd2_material</material>
+    </params>
+    <move> <v x="-2" y="0.3" z="15" /> </move>
+  </meshobj>
+</sector>
+@end example
+
+The @sc{3ds} loader will create genmesh factories. It supports multiple materials
+(will be converted to genmesh submeshes). The @sc{md2} loader will create 3D
+sprite factories with animation (actions and frames). Note that in both cases
+you must load the materials used in the models seperatelly (in the textures/materials
+section of the world file). Note that in case of the @sc{md2} loader there will
+be no material associated with the factory so you need to set a material (and
+usually an action too) in the mesh object.
+
+@subsubheading Loading Models From Code
+
+Both model loading plugins above support the @code{iModelLoader} interface. Using
+that interface it is very easy to load a @sc{3ds} or @sc{md2} model from code.
+Here is an example using the @sc{3ds} model loader:
+
+@example
+#include "imap/modelload.h"
+
+void LoadModel ()
+@{
+  csRef<iPluginManager> plugin_mgr = csQueryRegistry<iPluginManager> (object_reg);
+  csRef<iModelLoader> loader = csLoadPlugin<iModelLoader> (plugin_mgr,
+			"crystalspace.mesh.loader.factory.genmesh.3ds");
+  iMeshFactoryWrapper* ff = loader->Load ("model", "/lib/model.3ds");
+  if (!ff)
+  @{
+    @dots{}
+  @}
+@}
+@end example
+
+Or you can use the @code{iLoader->Load()} method which will automatically
+recognize the model and can also load Crystal Space @sc{xml} files:
+
+@example
+#include "imap/loader.h"
+
+void LoadModel ()
+@{
+  csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
+  iBase* result;
+  if (!loader->Load ("/lib/model.3ds", result))
+  @{
+    // Error!
+    @dots{}
+  @}
+  csRef<iMeshFactoryWrapper> ff = scfQueryInterface<iMeshFactoryWrapper> (result);
+  if (ff)
+  @{
+    @dots{}
+  @}
+@}
+@end example
+

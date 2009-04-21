@@ -1,0 +1,147 @@
+<library>
+    <textures>
+        <texture name="mosaic.gif">
+            <file>/lib/stdtex/mosaic.jpg</file>
+        </texture>
+        <texture name="mosaic-detail">
+            <file>mosaic-detail.dds</file>
+        </texture>
+        <texture name="mosaic-detail">
+            <file>mosaic-detail.dds</file>
+        </texture>
+    </textures>
+    <materials>
+        <material name="mosaic">
+            <texture>mosaic.gif</texture>
+            <shader type="standard">std_lighting_detail</shader>
+            <shadervar name="tex detail" type="texture">mosaic-detail</shadervar>
+            <shadervar name="tex detail scale" type="vector2">10,10</shadervar>
+            <shadervar name="tex height" type="texture">mosaic-detail</shadervar>
+            <shadervar name="tex height scale" type="vector2">10,10</shadervar>
+        </material>
+    </materials>
+    <meshfact name="factory_large2_walls">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <numvt>24</numvt>
+            <v x="-20" y="19" z="20" u="0" v="-0.4" />
+            <v x="20" y="19" z="20" u="8" v="-0.4" />
+            <v x="20" y="15" z="20" u="8" v="0.4" />
+            <v x="-20" y="15" z="20" u="0" v="0.4" />
+            <v x="20" y="19" z="20" u="0" v="-0.4" />
+            <v x="20" y="19" z="6" u="2.8" v="-0.4" />
+            <v x="20" y="15" z="6" u="2.8" v="0.4" />
+            <v x="20" y="15" z="20" u="0" v="0.4" />
+            <v x="20" y="19" z="6" u="0" v="-0.4" />
+            <v x="-20" y="19" z="6" u="8" v="-0.4" />
+            <v x="-20" y="15" z="6" u="8" v="0.4" />
+            <v x="20" y="15" z="6" u="0" v="0.4" />
+            <v x="-20" y="19" z="6" u="0" v="-0.4" />
+            <v x="-20" y="19" z="20" u="2.8" v="-0.4" />
+            <v x="-20" y="15" z="20" u="2.8" v="0.4" />
+            <v x="-20" y="15" z="6" u="0" v="0.4" />
+            <v x="-20" y="19" z="6" u="0" v="0" />
+            <v x="20" y="19" z="6" u="8" v="0" />
+            <v x="20" y="19" z="20" u="8" v="2.8" />
+            <v x="-20" y="19" z="20" u="0" v="2.8" />
+            <v x="-20" y="15" z="14" u="0" v="1.2" />
+            <v x="20" y="15" z="14" u="8" v="1.2" />
+            <v x="20" y="15" z="12" u="8" v="1.6" />
+            <v x="-20" y="15" z="12" u="0" v="1.6" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="0" y="0" z="-1" />
+            <n x="0" y="0" z="-1" />
+            <n x="0" y="0" z="-1" />
+            <n x="0" y="0" z="-1" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <submesh name="mosaic_0">
+                <material>mosaic</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                    <e c0="4" />
+                    <e c0="5" />
+                    <e c0="6" />
+                    <e c0="4" />
+                    <e c0="6" />
+                    <e c0="7" />
+                    <e c0="8" />
+                    <e c0="9" />
+                    <e c0="10" />
+                    <e c0="8" />
+                    <e c0="10" />
+                    <e c0="11" />
+                    <e c0="12" />
+                    <e c0="13" />
+                    <e c0="14" />
+                    <e c0="12" />
+                    <e c0="14" />
+                    <e c0="15" />
+                    <e c0="16" />
+                    <e c0="17" />
+                    <e c0="18" />
+                    <e c0="16" />
+                    <e c0="18" />
+                    <e c0="19" />
+                    <e c0="20" />
+                    <e c0="21" />
+                    <e c0="22" />
+                    <e c0="20" />
+                    <e c0="22" />
+                    <e c0="23" />
+                </indexbuffer>
+            </submesh>
+            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                <e c0="0.00390625" c1="0.507813" />
+                <e c0="0.5" c1="0.507813" />
+                <e c0="0.5" c1="0.609375" />
+                <e c0="0.00390625" c1="0.609375" />
+                <e c0="0.511719" c1="0.132813" />
+                <e c0="0.6875" c1="0.132813" />
+                <e c0="0.6875" c1="0.234375" />
+                <e c0="0.511719" c1="0.234375" />
+                <e c0="0.00390625" c1="0.382812" />
+                <e c0="0.5" c1="0.382812" />
+                <e c0="0.5" c1="0.484375" />
+                <e c0="0.00390625" c1="0.484375" />
+                <e c0="0.511719" c1="0.0078125" />
+                <e c0="0.6875" c1="0.0078125" />
+                <e c0="0.6875" c1="0.109375" />
+                <e c0="0.511719" c1="0.109375" />
+                <e c0="0.00390625" c1="0.0078125" />
+                <e c0="0.5" c1="0.0078125" />
+                <e c0="0.5" c1="0.359375" />
+                <e c0="0.00390625" c1="0.359375" />
+                <e c0="0.00390625" c1="0.632813" />
+                <e c0="0.5" c1="0.632813" />
+                <e c0="0.5" c1="0.6875" />
+                <e c0="0.00390625" c1="0.6875" />
+            </renderbuffer>
+        </params>
+    </meshfact>
+</library>

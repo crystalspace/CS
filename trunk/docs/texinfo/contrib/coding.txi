@@ -1,0 +1,176 @@
+@c -*-texinfo-*-
+@node Coding Style, SVN Guide, Portability, Contributing
+@section Coding Style
+
+For consistency and ease of future maintenance, when working on Crystal Space
+source code, please follow the following guidelines.  Also be sure to read
+important portability guidelines presented in the @cite{Portability} section.
+@xref{Portability}.
+
+@enumerate
+@item
+@emph{Indentation}
+
+Indent with two (2) spaces. If you use tabs then they must be interpreted as
+eight (8) spaces. This means that you should not use the tab character for
+indentation since that would indent by eight characters rather than two. Also
+consider avoiding tabs altogether in order to eliminate tab-related problems.
+Here is an example of proper indentation:
+
+@example
+void foo()
+@{
+  int a;
+  for (a = 0; a < 10; a++)
+  @{
+    int b = bar();
+    if (a < b)
+      printf ("Hello\n");
+  @}
+@}
+@end example
+
+This example also illustrates how to place curly braces and where to add
+spaces, for example @samp{for_(} rather than @samp{for(_}, where @samp{_}
+represents whitespace in this context.  Also add sufficient whitespace between
+tokens.
+
+In cases you are unsure what specific coding style to employ, just follow the
+style in the code you're editing or your personal preference. Always try to 
+keep it both readable and consistent. 
+
+@item
+@emph{Class and Method Naming}
+
+Classes should be named in this fashion: @code{csThisIsAClass}. The name
+starts with lower-case @samp{cs} and has every word capitalized (also known
+as "CamelCase").
+
+Methods and functions should be named in this fashion: @code{ThisIsAMethod()}.
+Each word in the name is capitalized.
+
+@item
+@emph{@sc{scf} Interfaces}
+
+@sc{scf} interfaces always start with a lower @samp{i}, as in
+@code{iThisIsAnInterface}.  @xref{SCF}.
+
+@item
+@emph{Doxygen and Comments}
+
+Use Doxygen comments in header files to document classes, methods, and
+functions. These comments are extracted with the Doxygen tool and @sc{html}
+documentation is generated from them.
+
+@strong{Warning}: Always use Doxygen comments for a class. If you fail to do so
+then Doxygen will ignore comments for methods within the class itself.
+
+However, it is not required to document (re)implementations of methods (such
+as for implementations of the virtual abstract methods of interfaces) since
+Doxygen will automatically copy the documentation from the superclass.
+Additionally, in practice, the documentation for the subclass is often only
+copied from the superclass anyway, and most likely those two will get out of
+sync over time; hence, save the effort of copying the Doxygen documentation
+for a subclass, as the inherited documentation will likely also be more 
+accurate in the long run. Obvious exceptions are when a subclass method has
+significant or important differences in functionality to the superclass method.
+In this case, investigate Doxygen commands such as @samp{\copydoc}.
+
+A one line Doxygen comment uses three slashes (@samp{///}) rather than two as
+is typical for normal C++ comments.  Multi-line Doxygen comments are specified
+with @samp{/** @dots{} */} rather than @samp{/* @dots{} */}.  Here is an
+example:
+
+@example
+/// Namespace for potentially bouncy classes.
+namespace Bouncy
+@{
+
+/**\file
+ * This is an include file.
+ * Put a \\file block in headers so macros and global symbols get documented.
+ */
+
+/// Ball states
+enum
+@{
+  /// Ball is limpy
+  Limpy,
+  /// Ball is floppy
+  Floppy
+@};
+
+/**
+ * This class represents a blue ball.
+ * Blue balls bounce higher than red balls.
+ */
+class csBlueBall
+@{
+private:
+  /**
+   * A private function - does not show up in the public documentation, but
+   * but still commented for readers of the header file or the developer
+   * documentation.
+   */
+  void PrivateFunction();
+
+public:
+  /// This is the constructor which initializes the blue ball.
+  csBlueBall();
+
+  /**
+   * This is a multi-line comment.
+   * And this is the second line of the multi-line comment.
+   * \param speed How fast the ball is to be deflated.
+   *   <i>Document parameters that way.</i>
+   * \return State of the ball - #Limpy or #Floppy.
+   *   <i>Document return parameters that way. Also shows how to refer to enum
+   *   entries.</i>
+   */
+  int Deflate(int speed);
+@};
+
+@} // namespace Bouncy
+@end example
+
+@item
+@emph{Maximum Line Length}
+
+There used to be a strict line length of 78 characters. However, this restriction
+has been lifted. But it is still recommended to not overdo it. Split a line if it
+becomes too long to read comfortably.
+
+@item
+@emph{Multiple-Inclusion Protection for Headers}
+
+Be certain to insert multiple-inclusion protection in all header files.  These
+controls should take this form:
+
+@example
+#ifndef __CS_FILENAME_H__
+#define __CS_FILENAME_H__
+@dots{}
+#endif // __CS_FILENAME_H__
+@end example
+
+@item
+@emph{Include @file{cssysdef.h}}
+
+Always include @file{cssysdef.h} in each source or header file as the very 
+first file included.  The latter is recommended, as it makes headers more
+self-contained.
+
+@item
+@emph{Module and Facility Dependencies}
+
+Although most facilities from @file{CS/libs} end up in the same link library
+(@file{crystalspace.lib}), you should not introduce unnecessary dependencies
+between these facilities. There are clean lines between the various libraries
+and their levels of generality or specialization which we prefer to maintain.
+Absolutely avoid introducing circular dependencies.
+
+For instance, code in the ``csutil'' module should never refer to code
+from the ``cstool'' module.  The other way around is okay, however,
+since ``cstool'' is at a higher level within the dependency hierarchy than
+``csutil''.
+@end enumerate

@@ -1,0 +1,2496 @@
+@c -*-texinfo-*-
+@node Release Notes 1_0, Release Notes 98, Release Notes 1_2, Release Notes
+@appendixsec Release Notes from 0.98 to 1.0
+@cindex Release Notes
+
+@noindent
+@emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com},
+Frank Richter, @email{res@@crystalspace3d.org} and
+Marten Svanfeldt, @email{developer@@svanfeldt.com},
+with contributions from Adam D. Bradley @email{artdodge@@cs.bu.edu} and others.}
+
+This section documents the major changes between versions 0.98 and 1.00 of
+Crystal Space.
+
+@menu
+* Api1_0 New Event System:: New Event System
+* Api1_0 iEvent Changes:: @code{iEvent} Changes
+* Api1_0 Input Helper Changes:: Input Helper Changes
+* Api1_0 Container Changes:: Container Templates Changes
+* Api1_0 String Changes:: String Changes
+* Api1_0 Identifier Changes:: Identifier Changes
+* Api1_0 Texture and Material Related Changes:: Texture and Material Related Changes
+* Api1_0 Libraries and Headers:: Libraries and Headers Changes
+* Api1_0 Rendering and Drawing:: Rendering and Drawing Changes
+* Api1_0 Java Bindings:: Java Bindings
+* Api1_0 vfs Changes:: @sc{vfs} Changes
+* Api1_0 Interface Changes:: Interface Changes
+* Api1_0 Random Number Generator Changes:: Random Number Generator Changes
+* Api1_0 new csQueryRegistryOrLoad:: New @code{csQueryRegistryOrLoad} Function
+* Api1_0 Reference Count Automation:: Reference Count Automation
+* Api1_0 64-Bit Portability Changes:: 64-Bit Portability Changes
+* Api1_0 aws Changes:: @sc{aws} Changes
+* Api1_0 Particle system changes:: Particle system changes
+* Api1_0 Changes for Mesh Object Writers:: Changes for Mesh Object Writers
+* Api1_0 Changes for hierarchical objects:: Changes for hierarchical objects
+* Api1_0 Model Importing:: Model Importing
+* Api1_0 Removed Features:: Removed Features
+@end menu
+
+@node Api1_0 New Event System, Api1_0 iEvent Changes, Release Notes 1_0, Release Notes 1_0
+@subsection New Event System
+
+The event system has undergone a major rewrite, and most client applications
+will need to make changes in order to adapt to the new architecture.
+
+@subsubheading Event Names
+
+The old system of 32 static event "types" has been replaced with an extensible 
+tree-structured event naming layer.  This system allows event names to be 
+drilled down to arbitrary levels of specificity while simultaneously allowing 
+event subscribers to express interest in general categories or precise event 
+varieties.
+
+For an example: under the old system, any motion of any joystick would produce 
+a @samp{csevJoystickMove} event, and all subscribers to the corresponding 
+@samp{CSMASK_JoystickMove} mask would receive all such events.  Under the new 
+system, each joystick is individually named, so event consumers can listen 
+only to particular devices, or to particular flavors of events.  For example, 
+the fourth joystick can produce the event 
+@samp{crystalspace.input.joystick.3.button.down}; an event handler may wish 
+to subscribe to @samp{crystalspace.input.joystick.3.button.down} to only 
+receive down events from that joystick, to 
+@samp{crystalspace.input.joystick.3.button} to receive all button events from 
+that joystick, to @samp{crystalspace.input.joystick.3} to receive all events 
+(buttons and moves) from that joystick, to @samp{crystalspace.input.joystick} 
+to receive all events from all joysticks, and so on.
+
+This also means that the concept of Command Codes has been obsoleted.  Rather 
+than describing particular command events with a combination of the 
+@samp{csevCommand} event type and a command-event-specific command code 
+property, each of the old command codes now has its own event name.  
+For example, @samp{cscmdQuit} is now @samp{crystalspace.application.quit}, and 
+the @samp{cscmdPreProcess}/@samp{cscmdProcess}/@samp{cscmdPostProcess}/
+@samp{cscmdFinalProcess} events have been deprecated in favor of the new 
+single @samp{csevFrame} event and six frame ``phases'' within which it can
+be received (see below).
+
+Event names are translated into an efficient internal representation, the 
+@samp{csEventID}, using a singleton event name registry object 
+(@samp{csEventNameRegistry}, implementing the @samp{iEventNameRegistry} 
+interface) which can always be retrieved using the 
+@code{csEventNameRegistry::GetRegistry(iObjectRegistry*)} method.  The actual 
+name translation is performed by the @code{GetID()} method, which takes string 
+or @samp{csString} arguments and returns @samp{csEventID}s.  
+These @samp{csEventID}s are then used in calls to subscribe to event queues 
+and in comparisons to determine the type of an event.  Many common event 
+types' @samp{csEventID}s can be accessed using macros defined in 
+@file{include/csutil/eventnames.h}, e.g., @samp{crystalspace.application.quit} 
+is @samp{csevQuit()}, which must be called with an argument of either an 
+@samp{iObjectRegistry} pointer or a @samp{iEventNameRegistry} reference.  
+Since referencing an event ID via one of these macros will consume several 
+cycles, performance-sensitive code should cache the results; see, for example, 
+the @samp{CS_DECLARE_EVENT_SHORTCUTS} and 
+@samp{CS_INITIALIZE_EVENT_SHORTCUTS()} macros in 
+@file{include/csutil/eventnames.h}.
+
+The most intrusive change needed to handle the new event names is in the event 
+demultiplexing you do in event handlers.  For example, code that used to look 
+like this:
+
+@example
+ static bool DemoEventHandler (iEvent& ev)
+ @{
+   if (ev.Type == csevBroadcast 
+    && csCommandEventHelper::GetCode(&ev) == cscmdProcess)
+   @{
+       @dots{}
+   @}
+   else if (ev.Type == csevBroadcast 
+    && csCommandEventHelper::GetCode(&ev) == cscmdFinalProcess)
+   @{
+       @dots{}
+   @}
+   else @dots{}
+ @}
+@end example
+
+should be re-written as:
+
+@example
+ static bool DemoEventHandler (iEvent& ev)
+ @{
+   if (ev.Name == csevProcess (object_reg))
+   @{
+       @dots{}
+   @}
+   else if (ev.Name == csevFinalProcess (object_reg))
+   @{
+       @dots{}
+   @}
+   else @dots{}
+ @}
+@end example
+
+More interestingly, you can also catch entire event hierarchies with a single 
+test:
+@example
+ if (name_reg->IsKindOf(ev.Name, csevKeyboardEvent (name_reg)))
+ @{
+     HandleKeyboardEvent(ev)
+ @}
+@end example
+
+
+
+@subsubheading Event Scheduling
+
+An even more interesting change to the event system is the introduction of a 
+schedulable event subscription system.  In the old system, event handlers 
+subscribed to event types on a first-come, first-served basis.  This begot an 
+increasing number of event types to represent different points in the frame 
+processing chain that a client might want to hook onto: PreProcess, Process, 
+PostProcess, and FinalProcess.  What was really needed was a generic mechanism 
+for representing the order in which handlers of particular events should be 
+invoked, regardless of the order in which they are initialized or in which 
+their respective plugins are loaded.
+
+The new event scheduler takes advantage of properties exposed by a new, 
+enriched @code{iEventHandler} interface to do exactly this.  Under the new 
+system, for each event name that an event handler subscribes to, it may also 
+specify essentially arbitrary @emph{happens-before} and @emph{happens-after} 
+relationships with other event handlers, both abstractly ('I want to handle 
+all input events before any instance of the @samp{crystalspace.aws} handler') 
+and specifically ('I want to handle the mouse event only after the 
+@samp{crystalspace.cel} event handler').
+
+Specifically, the new functions that all @code{iEventHandler} implementations 
+must provide are:
+
+@itemize @bullet
+@item
+@code{const char *GenericName()} Returns a simple text name common to all 
+instances of this event handler.
+@item
+@code{csHandlerID GenericID()} A csHandlerID is a lightweight way to manage 
+generic handler names.  Under almost all circumstances, the implementation of 
+this method simply returns @code{csHandlerRegistry::GetID(this->GenericName())}.
+@item
+@code{const csHandlerID[] GenericPrec(csEventID)} Returns an array 
+(terminated by @code{CS_EVENTLIST_END}) of @samp{csHandlerID}s of generic 
+event handlers which, for the event name identified by the argument, should 
+always handle events with that name @emph{before} instances of the current handler.
+@item
+@code{const csHandlerID[] GenericSucc(csEventID)} Returns an array 
+(terminated by @code{CS_EVENTLIST_END}) of @samp{csHandlerID}s of generic 
+event handlers which, for the event name identified by the argument, should 
+always handle events with that name @emph{after} instances of the current 
+handler.
+@item
+@code{const csHandlerID[] InstancePrec(csEventID)} Returns an array 
+(terminated by @code{CS_EVENTLIST_END}) of @samp{csHandlerID}s of both generic 
+event handlers and event handler instances which, for the event name 
+identified by the argument, should always handle event with that name 
+@emph{before} this @emph{particular} instance of the event handler.
+@item
+@code{const csHandlerID[] InstanceSucc(csEventID)} Returns an array 
+(terminated by @code{CS_EVENTLIST_END}) of @samp{csHandlerID}s of both generic 
+event handlers and event handler instances which, for the event name 
+identified by the argument, should always handle event with that name 
+@emph{after} this @emph{particular} instance of the event handler.
+@end itemize
+
+In many simple cases, you will want to use default implementations of these 
+functions provided by the @code{CS_EVENTHANDLER_NAMES()} and 
+@code{CS_EVENTHANDLER_NIL_CONSTRAINTS} macros, like so:
+@example
+ struct myEventHandler : public iEventHandler
+ @{
+   virtual bool HandleEvent (iEvent &Event)
+   @{
+     foo();
+     bar();
+     return baz();
+   @}
+   CS_EVENTHANDLER_NAMES("crystalspace.module.name")
+   CS_EVENTHANDLER_NIL_CONSTRAINTS
+ @}
+@end example
+
+As a convention, most csEventHandlers will implement a static method, 
+@code{const char *StaticHandlerName()}, which can be retrieved and converted 
+without instantiating the handler.  This name string can then be converted 
+into a @samp{csHandlerID} by calling 
+@code{csHandlerRegistry::GetID(myHandlerClass::StaticHandlerName())}.  
+The @samp{csHandlerID} of an instance of an event handler class can be 
+retrieved by passing a pointer to that class to 
+@code{csHandlerRegistry::GetID()}, e.g., 
+@code{csHandlerRegistry::GetID(new myHandlerClass())}.
+
+
+@subsubheading Event Subscription
+
+The event scheduling system is invoked by calling the 
+@code{csEventQueue::RegisterListener()} or @code{csEventQueue::Subscribe()} 
+methods (or, if you are inheriting from @code{csBaseEventHandler}, 
+@code{csBaseEventHandler::RegisterQueue}).  For each of these, the arguments 
+of interest are the @code{csEventID} and @code{csEventID[]} parameters.  
+(Note that the @samp{RegisterListener} form with no @samp{csEventID} argument 
+does not subscribe the listener to anything, and must be followed by a call to 
+@code{Subscribe()} if you ever want the handler to receive any events.)  
+For each @code{csEventID} (arrays are terminated by @code{CS_EVENTLIST_END}), 
+these functions will subscribe the event handler to that event name 
+@emph{as well as all of its children}.  Note, however, that it will only 
+retrieve from the event handler the ordering lists (the Prec and Succ methods) 
+for the event name to which it is @emph{explicitly} subscribed; if you wish to 
+have one set of ordering constraints for both @samp{crystalspace.input.keyboard} 
+and @samp{crystalspace.input.mouse} but a different set for 
+@samp{crystalspace.input.joystick}, you SHOULD NOT simply subscribe to 
+@samp{crystalspace.input} and have the Prec/Succ functions return different 
+values for each of @samp{.keyboard}, @samp{.mouse}, and @samp{.joystick}; 
+rather, you should subscribe to each of those three event names individually.  
+This restriction helps us avoid the introduction of hard-to-detect 
+circular ordering rules.
+
+Also note that you should use the @code{Subscribe()} and @code{Unsubscribe()} 
+methods to add and remove events from the set an event handler wishes to 
+receive.  You should only @code{Unsubscribe()} from the particular 
+events to which you have @code{Subscribe()}d; the behavior is undefined 
+otherwise (e.g., if you subscribe to @samp{crystalspace.input} and 
+subsequently unsubscribe from @samp{crystalspace.input.joystick}).
+
+
+@subsubheading Other porting Issues
+
+Since the @samp{csBaseEventHandler} object's operation is now linked with 
+having a functional event name registry, any derived class must be sure to 
+call the @samp{Initialize(iObjectRegistry*)} method before calling any of 
+the @samp{RegisterQueue(...)} methods.
+
+
+@subsubheading The @code{csevFrame} Transition
+
+Under the old static event model, CrystalSpace would render each frame by
+dispatching four events in sequence: PreProcess, Process, PostProcess, and
+FinalProcess.  The new event handler scheduling mechanisms enable a more
+flexible and extensible paradigm in which there is only a single event, 
+@samp{csevFrame}, and each handler orders its handling of that event with 
+respect to other handler types and handlers.
+
+However, since it is difficult to plan for (or even imagine) the set of all
+handler types that may appear in a CrystalSpace application, handlers of
+@samp{csevFrame} can use simple helper macros to classify themselves as 
+belonging to any of six ``phases'' of frame creation.
+@itemize @bullet
+@item 
+@emph{Logic} - game logic to be performed before any rendering is done.
+Use the @samp{CS_EVENTHANDLER_PHASE_LOGIC(x)} macro.
+@item 
+@emph{3D} - rendering of the 3D view.
+Use the @samp{CS_EVENTHANDLER_PHASE_3D(x)} macro.
+@item 
+@emph{2D} - rendering of 2D overlays.
+See the @samp{CS_EVENTHANDLER_PHASE_LOGIC(x)} macro.
+@item 
+@emph{Console} - used by CEL.
+See the @samp{CS_EVENTHANDLER_PHASE_LOGIC(x)} macro.
+@item 
+@emph{Debug} - used by bugplug.
+See the @samp{CS_EVENTHANDLER_PHASE_LOGIC(x)} macro.
+@item 
+@emph{Frame} - final rendering to the screen.
+See the @samp{CS_EVENTHANDLER_PHASE_LOGIC(x)} macro.
+@end itemize
+
+These macros, included in the declaration of an event handler class, 
+provide all of the naming and constraint methods to make instances of
+that handler class schedule their subscriptions to @samp{csevFrame}
+within the appropriate phase.  (You will not be able to use these macros
+if you need to subscribe the handler to events besides @samp{csevFrame}
+and apply ordering constraints for those events.)
+
+The old PreProcess event corresponded with the Logic phase, 
+Process with the 3D phase, PostProcess with the 2D, Console, and
+Debug phases, and FinalProcess with the Frame phase.  You should 
+update your event handlers which used to subscribe to the old
+Process events to instead subscribe to the @samp{csevFrame} event
+either using the event phase macros listed above or explicitly
+calling out your own subscription ordering constraints.
+
+
+@subsubheading A Few Common Idioms to Change
+
+If you use @code{csBaseEventHandler} you should add this line after
+@code{RequestPlugins()}:
+
+@example
+  csBaseEventHandler::Initialize(GetObjectRegistry());
+@end example
+
+The call to @code{RegisterQueue()} should be changed too:
+
+@example
+  if (!RegisterQueue(object_reg, csevAllEvents(object_reg)))
+    return ReportError("Failed to set up event handler!");
+@end example
+
+To quit the application you should now use:
+
+@example
+  q->GetEventOutlet ()->Broadcast (csevQuit (object_reg));
+@end example
+
+Handling a broadcast event can be done like this (note that this will
+be removed in the near future):
+
+@example
+  if (event.Name == csevProcess (object_reg))
+@end example
+
+Handling a keyboard event can be done like this:
+
+@example
+  if (event.Name == csevKeyboardDown (object_reg))
+@end example
+
+
+@node Api1_0 iEvent Changes, Api1_0 Input Helper Changes, Api1_0 New Event System, Release Notes 1_0
+@subsection @code{iEvent} Changes
+
+@subsubheading Property Bags
+
+The @code{iEvent::Find()} method was renamed to @code{Retrieve()} and exhibits
+different return value semantics. Rather than returning a mere boolean result,
+it now returns one of the @samp{csEventError} enumeration constants.  Of
+particular note, in the case of success, @code{csEventErrNone} is returned,
+which has a value of 0. This success value could be misinterpreted as ``false''
+by the unwary when fixing code to deal with this semantic change. Conditionals
+which test if retrieval of an attribute succeeded must be changed to take this
+new semantic into account. For instance, code such as the following:
+
+@example
+iEvent* ev = @dots{};
+if (ev->Find(@dots{}))
+@{
+  @dots{}
+@}
+@end example
+
+@noindent
+must be changed to perform an explicit test on the return value of
+@code{Retrieve()}, rather than relying upon default boolean semantics:
+
+@example
+if (ev->Retrieve(@dots{}) == csEventErrNone)
+@{
+  @dots{}
+@}
+@end example
+
+@subsubheading Mouse, Joystick, and Command event properties
+
+The @samp{union} containing the @samp{Mouse}, @samp{Joystick}, and @samp{Command}
+structures has been removed; all event attributes are now stored and accessed
+using the @code{Add()} and @code{Retrieve()} mechanisms.  To ease access to
+event data, use the static methods of the @samp{csMouseEventHelper}, 
+@samp{csJoystickEventHelper}, and @samp{csCommandEventHelper} classes.  
+For example, code such as the following:
+
+@example
+iEvent* ev = @dots{};
+let X = ev->Mouse.X;
+@end example
+
+@noindent
+should be changed to:
+
+@example
+iEvent* ev = @dots{};
+let X = csMouseEventHelper::GetX(ev);
+@end example
+
+@noindent
+See the @sc{api} documentation for details.
+
+@subsubheading Multiple mice
+
+There is now support for handling input from more than one mouse.
+You can retrieve the identity (basis 0) of the mouse producing a 
+mouse event with @code{csMouseEventHelper::GetNumber()}.
+
+@subsubheading Joystick and Mouse axes
+
+Joysticks can now have up to @samp{CS_MAX_JOYSTICK_AXES} axes,
+and mice can have up to @samp{CS_MAX_MOUSE_AXES}.  Their values should
+be accessed using the @code{csJoystickEventHelper::GetAxis()}
+and @code{csMouseEventHelper::GetAxis()} functions, respectively,
+where both devices and axes are enumerated basis 0.
+Each helper class also has @code{GetX()} and @code{GetY()} methods
+available; for joystick events, these are deprecated.
+
+@node Api1_0 Input Helper Changes, Api1_0 Container Changes, Api1_0 iEvent Changes, Release Notes 1_0
+@subsection Input Helper Changes
+
+@subsubheading Input Definitions
+
+The file @file{csutil/inpnames.h} has been renamed to
+@file{inputdef.h}, and the following functions have been removed:
+
+@itemize @bullet
+@item
+@code{csTypeOfInputDef()}
+@item
+@code{csParseKeyDef()}
+@item
+@code{csGetKeyDesc()}
+@item
+@code{csParseMouseDef()}
+@item
+@code{csGetMouseDesc()}
+@item
+@code{csParseJoystickDef()}
+@item
+@code{csGetJoystickDesc()}
+@end itemize
+
+These functions allowed you to convert a string such as @kbd{@key{Ctrl}+A},
+@samp{JoystickX} or @samp{Alt+Mouse1} into values describing input events
+and vice versa.
+
+The way to do this is now, however, is to use @samp{csInputDefinition}, which
+resides in @file{csutil/inputdef.h}. The preferred way to convert a string to a
+definition is to construct a @samp{csInputDefinition} from a
+@samp{char const*}; and the preferred way to convert a definition back to a
+string (perhaps constructed some other way) is via
+@code{csInputDefinition::ToString()}.
+
+There are also static helper methods in @samp{csInputDefinition} which accept
+arguments in a similar way to the old functions. These are convenience methods
+which perform the work of instantiating the object for you:
+
+@itemize @bullet
+@item
+@code{csInputDefinition::ParseKey()}
+@item
+@code{csInputDefinition::GetKeyString()}
+@item
+@code{csInputDefinition::ParseOther()}
+@item
+@code{csInputDefinition::GetOtherString()}
+@end itemize
+
+@subsubheading Mouse Corrections
+
+Mouse buttons and axes used to be enumerated basis 1 (first mouse button was 1,
+Y axis was 2, etc).  In keeping with good C/C++/Java/etc coding style, they are now 
+basis-0 (first mouse button is 0, Y axis is 1, etc).
+
+@subsubheading Joystick Corrections
+
+The implementation of @samp{iJoystickDriver} has been fixed to treat joystick
+numbers consistently. Previously, on account of buggy implementation, some
+parts of the driver considered joystick numbers 0-based, while other parts
+considered them 1-based.  It now uniformly treats joystick numbers as
+0-based. This is consistent with button numbers for joysticks and mice, which
+are also basis-0.
+
+@node Api1_0 Container Changes, Api1_0 String Changes, Api1_0 Input Helper Changes, Release Notes 1_0
+@subsection Container Templates Changes
+
+@subheading @code{csArray<>} Index and Size Type Change
+
+@code{csArray<>} has been changed to use @samp{size_t} instead of
+@samp{int} for array sizes and indices.  Probably, the most significant
+semantic difference of this change is that @samp{size_t} is usually
+@emph{unsigned} as opposed to @samp{int} which is @emph{signed}.
+
+@strong{Read this paragraph carefully.} In actual code, this change may result
+in nothing more than simple-looking compiler warnings. However, it may have
+caused @emph{semantics} to change subtly.
+
+This has the greatest impact in the areas discussed below.
+
+@subsubheading Iterating Over @code{csArray<>} Contents
+
+For this purpose, usually, @samp{int} typed variables were used for keeping
+track of the index of the current item of an array iteration.  Fixing forward
+iteration over a @code{csArray<>} to instead use @samp{size_t} is simple:
+
+@example
+csArray<@dots{}> a;
+for (int i = 0, n = a.Length(); i < n; i++)
+@{
+  @dots{}
+@}
+@end example
+
+@noindent
+Is changed to:
+
+@example
+@dots{}
+for (size_t i = 0, n = a.Length(); i < n; i++)
+@dots{}
+@end example
+
+Backward iteration is a bit more problematic. As mentioned before,
+@samp{size_t} typically is unsigned, so you do not have negative values. This
+can be a problem in constructs like:
+
+@example
+csArray<@dots{}> a;
+for (int i = a.Length() - 1; i >= 0; i--)
+@{
+  @dots{}
+@}
+@end example
+
+If the @samp{int} is changed simply to a @samp{size_t}, this 
+@code{for}-loop misbehaves unexpectedly. When @samp{i} becomes 0, the body 
+of the loop is executed correctly. However, decrementing @samp{i} will 
+@strong{not} cause @samp{i} to have a negative value---after all, @samp{size_t}
+is unsigned. Instead, decrementing will make @samp{i} wrap around from 0 to
+0xffffffff (on 32-bit machines). Clearly, this is greater
+than 0, effectively causing an infinite loop. The same thing also happens when
+@samp{a} has no items (i.e. @samp{a.Length() == 0}). Here the
+-1 in the initialization of @samp{i} causes wrap-around.
+
+Possible solutions include:
+
+@itemize @bullet
+@item
+Use an @code{int}-typed counter variable and cast the array length to
+@samp{int}.  This is not entirely elegant, but it does the job in most cases.
+
+@item
+Re-write the loop to deal properly with the unsigned nature of @samp{size_t}:
+
+@example
+csArray<@dots{}> a;
+for (size_t i = a.Length(); i-- > 0;)
+@{
+  @dots{}
+@}
+@end example
+
+This code does the same as the @samp{int} version above, iterating from 
+@samp{a.Length() - 1} to 0, inclusively. It also correctly works
+in the case @samp{a.Length() == 0}. The ``trick'' is to place the 
+modification of @samp{i} as a post-decrement in the loop condition. This 
+way, as soon as @samp{i} becomes 0, the loop is terminated. The 
+post-decrement ensures that @samp{i} has the expected value in the loop body.
+
+@end itemize
+
+@subsubheading Searching
+
+Functions like @code{csArray<>::FindSortedKey()} and @code{csArray<>::Find()}
+used to return -1 to signify that an item was not found.  This is still the
+case, but with a twist.  Now, @samp{(size_t)-1} is returned.  For convenience,
+a constant, @samp{csArrayItemNotFound}, has been added, which has this exact
+value.  It can be used in comparisons to make it clear what is actually being
+checked.
+
+Apropros comparisons: Recall that @samp{size_t} is @emph{unsigned}, so checking
+whether an index returned by @samp{FindSortedKey()} or @samp{Find()} is 
+actually a valid index by testing with @samp{>= 0} no longer works since
+@samp{(size_t)-1} is always @code{>= 0}. Replace such checks with tests of
+equality against @samp{csArrayItemNotFound}:
+
+@example
+csArray<@dots{}> a;
+int index = a.Find (@dots{});
+if (index >= 0)
+@{
+  /* Item found */
+  @dots{}
+@}
+else
+@{
+  /* Item not found */
+  @dots{}
+@}
+@end example
+
+Must be replaced with:
+
+@example
+csArray<@dots{}> a;
+size_t index = a.Find (@dots{});
+if (index != csArrayItemNotFound)
+@{
+  /* Item found */
+  @dots{}
+@}
+else
+@{
+  /* Item not found */
+  @dots{}
+@}
+@end example
+
+@subheading @file{csutil/garray.h} Deprecated
+
+The @file{csutil/garray.h} file, containing the class 
+@code{csDirtyAccessArray<>}, has been deprecated in favor of the more sensible
+file name @file{csutil/dirtyaccessarray.h}. No functional changes have been
+made to the class.
+
+@subheading @code{csList<>::Iterator} Normalization
+
+The behavior of @code{csList<>::Iterator} has been normalized so that it
+functions identically to all other iterators in Crystal Space.  In the past, a
+newly created @code{csList<>::Iterator} already pointed at the first element in
+the container.  This differed from all other iterator implementations, in which
+the first element, like all other elements, is accessed by an invocation of
+@code{Next()}.
+
+Old code which accessed the elements of a @code{csList<>::Iterator} required a
+non-standard idiom, such as:
+
+@example
+csList<sometype> list = @dots{};
+csList<sometype>::Iterator it(list);
+if (it.HasCurrent())
+@{
+  do_something(*it);         // First value.
+  while (it.HasNext())
+  @{
+    do_something(it.Next()); // Remaining values.
+  @}
+@}
+@end example
+
+@noindent
+Or, the slightly less complicated, though still somewhat convoluted:
+
+@example
+csList<sometype>::Iterator it(list);
+while (it.HasCurrent())
+@{
+  do_something(*it);
+  it.Next();
+@}
+@end example
+
+Following normalization, @code{csList<>::Iterator} now works like all other
+iterators throughout the toolkit.  In particular, for forward iteration, all
+elements can be accessed via the standard @code{HasNext()} / @code{Next()}
+idiom:
+
+@example
+csList<sometype>::Iterator it(list);
+while (it.HasNext())
+@{
+  do_something(it.Next());
+@}
+@end example
+
+@noindent
+Likewise, for backward iteration, the @code{HasPrevious()} / @code{Previous()}
+idiom works in the obvious and expected inverse fashion.
+
+Finally, @code{csList<>::Iterator::Next()} and @code{Previous()} now return
+references to contained elements, rather than pointers.  This makes the
+interface of @code{csList<>::Iterator} internally consistent, as well as
+consistent with other iterators throughout the toolkit, in which these methods
+return references.
+
+@subheading @code{csSet<>} Relocation and Changes
+
+The declaration of @code{csSet<>} was moved out from @file{csutil/hash.h} and
+into its own header file, @file{csutil/set.h}. The method
+@code{csSet<>::GetHash()} has likewise been removed since it unnecessarily
+exposed an underlying implementation detail of @code{csSet<>}.
+
+However, this implementation detail still affects the use of @code{csSet<>} as
+for storage of pointers in a @code{csSet<>} the @code{csPtrKey<>} wrapper must
+be used.
+
+@subheading @code{csHash<>} Changes
+
+The way @code{csHash<>} handles support for arbitrary key types has been
+changed. Previously, a so-called ``hash key handler'' was passed as an optional
+third template parameter that computed hash keys and was able to compare
+keys. Now, the hash computation is handled through the new
+@code{csHashComputer<>} template, and key comparison through
+@code{csComparator<>}. To provide hash computation and comparisons for specific
+types used as hash keys, specializations of the templates mentioned above are
+needed. Alternatively the default comparator uses the @samp{operator <} and
+@samp{operator >} operators, so you can also implement those operators instead
+of a @code{csComparator<>} specialization. The default @code{csHashComputer<>}
+implementation assumes that a type provides a @samp{GetHash()} method that
+computes the hash value for an object. However, this means that integral types 
+need a specialization. As a convenience, Crystal Space already provides 
+specializations of @code{csHashComputer<>} for a number of commonly used 
+intergrals. Further, @code{csComparator<>} and/or @code{csHashComputer<>} 
+specializations are provided for the commonly used types @samp{csString}, 
+@samp{const char*} and @samp{csStrKey}; and the default comparison semantics of 
+@samp{operator <} and @samp{operator >} handle the remaining fundamental types 
+and any composite types which provide these operators. Pointers (other than 
+@samp{void*} for which exists a specialization) as hash keys are a special 
+case: to use a pointer of type @samp{Foo*} as a hash key, employ 
+@samp{csPtrKey<Foo>} as the key type in the hash declaration. 
+
+@subheading Default @code{csHash<>} (and @code{csHashReversible<>}) Table Size
+
+The default hash table size and grow rate has been reduced from 257 and 64 to
+23 and 5, respectively, to have hashes use less memory.  If a hash is expected
+to contain a large quantity of elements, those two parameters can be tweaked
+upon construction of a @code{csHash<>} or @code{csHashReversible<>}.  Consult
+the Public @sc{api} Documentation of @code{csHash<>} for more information.
+
+@subheading @samp{csHashMap} and @samp{csHashSet} Removal
+
+The long-deprecated @samp{csHashMap}, @samp{csHashMapReversible}, and
+@samp{csHashSet} classes have been removed. Instead, use the templated classes
+@code{csHash<>}, @code{csHashReversible<>}, and @code{csSet<>}.  For
+string-related @dfn{set} functionality, you may also want to consider using
+@samp{csStringHash} and @samp{csStringSet}.
+
+@subheading @code{csObjectPool<>} Removal
+
+The @code{csObjectPool<>} utility class has been removed since it managed
+memory poorly, and failed to invoke the destructor of contained objects at the
+time they were recycled via @code{csObjectPool<>::Free()}, which meant that the
+objects might not release their own resources in a timely fashion.  (It did
+correctly destroy the freed objects when the pool itself was destroyed, but
+should have been doing so at @code{Free()}-time.)
+
+You can use @code{csBlockAllocator<>} (see @file{csutil/blockallocator.h}) as a
+drop-in replacement for @code{csObjectPool<>} since the @sc{api} of
+@code{csBlockAllocator<>} is a proper superset of the @code{csObjectPool<>}
+@sc{api}. A global search and replace should be sufficient to account for this
+change.
+
+@subheading @samp{csStringSetIterator} and @samp{csStringHashIterator} Removal
+
+@samp{csStringSetIterator} and @samp{csStringHashIterator} have been replaced
+with the iterator classes @samp{csStringSet::GlobalIterator} and
+@samp{csStringHash::GlobalIterator}, respectively.  Rather than instantiating
+iterators directly, you now ask the set or hash for an iterator. This brings
+the @samp{csStringSet} and @samp{csStringHash} @sc{api}'s in line with other
+container classes which vend iterators. Given old code which is using
+@samp{csStringSetIterator}:
+
+@example
+csStringSet set;
+// ...populate set...
+csStringSetIterator iter(&set);
+while (iter.HasNext())
+@{
+  char const* s = iter.Next();
+  // ...do something with `s'...
+@}
+@end example
+
+@noindent
+Convert it like this:
+
+@example
+csStringSet::GlobalIterator iter = set.GetIterator();
+while (iter.HasNext())
+@{
+@end example
+
+@noindent
+Code using @samp{csStringHashIterator} can be fixed using the same simple
+transformation.
+
+@node Api1_0 String Changes, Api1_0 Identifier Changes, Api1_0 Container Changes, Release Notes 1_0
+@subsection String Changes
+
+The class hierarchy of @samp{csString} has changed. Most functionality is now
+provided by the new superclass @samp{csStringBase}. From this,
+@code{csStringFast<>} is subclassed, and @samp{csString} descends from
+@code{csStringFast<>}. @code{csStringFast<>} is a templated class featuring an
+internal character buffer which is used instead of dynamically heap-allocated
+memory when the string length is sufficently short (as controlled by the class
+template argument). This generalization can make @samp{csStringFast<>} (and its
+subclass @samp{csString}) much faster when used as automatic (stack-allocated)
+variables, even when declared inside @samp{for@{@}}-loops, since slow
+heap-allocation often can be avoided.
+
+For simplification purposes, several methods have been removed from
+@samp{csString} and @samp{iString} (when present):
+
+@itemize @bullet
+@item
+Static @code{PadFoo()} methods. The same functionality can be achieved with
+the remaining instance @code{PadFoo()} methods.
+
+@item
+@code{AsPadFoo()} instance methods. The same functionality can be achieved with
+the remaining instance @code{PadFoo()} methods.
+
+@item
+Static integer and float @code{Format()} methods.  The same functionality can
+be achieved by utilizing the remaining @code{Replace()} or @code{Format()}
+methods.
+
+@item
+@code{SetGrowsExponentially()} and @code{GetGrowsExponentially()}. The same
+functionality is provided by @code{SetGrowsBy(0)} and @code{GetGrowsBy()}.
+@end itemize
+
+@node Api1_0 Identifier Changes, Api1_0 Texture and Material Related Changes, Api1_0 String Changes, Release Notes 1_0
+@subsection Identifier Changes
+
+@subheading Naming Normalization
+
+The following @sc{scf} class names have been normalized in order to be
+consistent with the names of all other available ``null'' and ``multiplexer''
+plugins:
+
+@itemize @bullet
+@item
+@code{crystalspace.mesh.object.nullmesh} @result{}
+@code{crystalspace.mesh.object.null}
+@item
+@code{crystalspace.graphics2d.null2d} @result{}
+@code{crystalspace.graphics2d.null}
+@item
+@code{crystalspace.documentsystem.multiplex} @result{}
+@iftex
+@*
+@end iftex
+@code{crystalspace.documentsystem.multiplexer}
+@item
+@code{crystalspace.graphic.image.io.multiplex} @result{}
+@iftex
+@*
+@end iftex
+@code{crystalspace.graphic.image.io.multiplexer}
+@end itemize
+
+For @sc{api} consistency and uniformity between container classes, the
+following methods have been renamed:
+
+@itemize @bullet
+@item
+@code{csArray<>::Length()} @result{} @code{csArray<>::GetSize()}
+@item
+@code{csArray<>::SetLength()} @result{} @code{csArray<>::SetSize()}
+@item
+@code{csHash<>::DeleteAll()} @result{} @code{csHash<>::Empty()}
+@item
+@code{csHash<>::In()} @result{} @code{csHash<>::Contains()}
+@item
+@code{csHash<>::PutFirst()} @result{} @code{csHash<>::PutUnique()}
+@item
+@code{csList<>::FetchPrev()} @result{} @code{csList<>::FetchPrevious()}
+@item
+@code{csList<>::HasPrev()} @result{} @code{csList<>::HasPrevious()}
+@item
+@code{csSet<>::DeleteAll()} @result{} @code{csSet<>::Empty()}
+@item
+@code{csSet<>::In()} @result{} @code{csSet<>::Contains()}
+@item
+@code{csString::Clear()} @result{} @code{csString::Empty()}
+@item
+@code{csString::FindReplace()} @result{} @code{csString::ReplaceAll()}
+@item
+@code{csString::FindStr()} @result{} @code{csString::Find()}
+@item
+@code{csString::Reclaim()} @result{} @code{csString::ShrinkBestFit()}
+@item
+@code{iString::FindReplace()} @result{} @code{iString::ReplaceAll()}
+@item
+@code{iString::FindStr()} @result{} @code{iString::Find()}
+@item
+@code{iStringArray::DeleteAll()} @result{} @code{iStringArray::Empty()}
+@item
+@code{iStringSet::Clear()} @result{} @code{iStringSet::Empty()}
+@end itemize
+
+@noindent
+In most cases, the old names listed above are still recognized for backward
+compatibility, but they are deprecated, so you probably ought to convert to the
+new @sc{api} at some point. The @sc{api} of most of the container classes also
+has been expanded, so you may want to study the @sc{api} reference manual to
+learn about newly available functionality.
+
+Likewise, the following global functions have been renamed:
+
+@itemize @bullet
+@item
+@code{csFindReplace()} @result{} @code{csReplaceAll()}
+@end itemize
+
+For consistency with like-named methods in other @sc{scf} interfaces, the
+following @samp{iImage} methods have been renamed:
+
+@itemize @bullet
+@item
+@code{GetKeycolor()} @result{} @code{GetKeyColor()}
+@item
+@code{HasKeycolor()} @result{} @code{HasKeyColor()}
+@end itemize
+
+Various methods in @samp{csIntersect3} have been renamed in order to improve
+consistency and clarity.  In addition, some arguments have been reversed order
+so that, for example, a method named @code{SegmentTriangle()} will receive
+first the segment argument followed by the triangle argument.
+
+@itemize @bullet
+@item
+@code{AxisPlane()} @result{} @code{SegmentAxisPlane()}
+@item
+@code{IntersectPolygon()} @result{} @code{PlanePolygon()} (plane version)
+@item
+@code{IntersectPolygon()} @result{} @code{SegmentPolygon()} (segment version)
+@item
+@code{IntersectSegment()} @result{} @code{SegmentFrustum()}
+@item
+@code{IntersectTriangle()} @result{} @code{SegmentTriangle()}
+@item
+@code{Plane()} @result{} @code{SegmentPlane()}
+@item
+@code{Planes()} @result{} @code{SegmentPlanes()} (segment version)
+@item
+@code{Planes()} @result{} @code{ThreePlanes()} (three planes version)
+@item
+@code{XFrustum()} @result{} @code{SegmentXFrustum()}
+@item
+@code{XPlane()} @result{} @code{SegmentXPlane()}
+@item
+@code{YFrustum()} @result{} @code{SegmentYFrustum()}
+@item
+@code{YPlane()} @result{} @code{SegmentYPlane()}
+@item
+@code{Z0Plane()} @result{} @code{SegmentZ0Plane()}
+@item
+@code{ZPlane()} @result{} @code{SegmentZPlane()}
+@end itemize
+
+In addition to that the function @code{csMath3::FindIntersection()} has been
+removed and is replaced with a new @code{csIntersect3::TriangleTriangle()}
+routine which is faster and more correct.
+
+@noindent
+The same improvements have been made to @code{csIntersect2}:
+
+@itemize @bullet
+@item
+@code{IntersectPolygon()} @result{} @code{PlanePolygon()} (plane version)
+@item
+@code{Lines()} @result{} @code{LineLine()} (plane version)
+@item
+@code{Plane()} @result{} @code{SegmentPlane()}
+@item
+@code{PlaneNoTest()} @result{} @code{SegmentPlaneNoTest()}
+@item
+@code{Planes()} @result{} @code{PlanePlane()}
+@item
+@code{Segments()} @result{} @code{SegmentSegment()} (plane version)
+@end itemize
+
+The following configuration control macros (most of which are emitted to
+@file{csconfig.h} by the Crystal Space @file{configure} script) have been
+renamed in order to improve internal naming consistency, and to conform more
+closely to naming scheme used by Autoconf.
+
+@itemize @bullet
+@item
+@code{CS_HAS_CAL3D} @result{} @code{CS_HAVE_CAL3D}
+@item
+@code{CS_HAS_CMATH_H} @result{} @code{CS_HAVE_CMATH_H}
+@item
+@code{CS_HAS_GLHANDLEARB_T} @result{} @code{CS_HAVE_GLHANDLEARB_T}
+@item
+@code{CS_HAS_INT64_C} @result{} @code{CS_HAVE_INT64_C}
+@item
+@code{CS_HAS_INTMAX_T} @result{} @code{CS_HAVE_INTMAX_T}
+@item
+@code{CS_HAS_INTPTR_T} @result{} @code{CS_HAVE_INTPTR_T}
+@item
+@code{CS_HAS_INTTYPES_H} @result{} @code{CS_HAVE_INTTYPES_H}
+@item
+@code{CS_HAS_MACHINE_SOUNDCARD_H} @result{} @code{CS_HAVE_MACHINE_SOUNDCARD_H}
+@item
+@code{CS_HAS_MEMORY_MAPPED_IO} @result{} @code{CS_HAVE_MEMORY_MAPPED_IO}
+@item
+@code{CS_HAS_POSIX_MMAP} @result{} @code{CS_HAVE_POSIX_MMAP}
+@item
+@code{CS_HAS_REGEX} @result{} @code{CS_HAVE_REGEX}
+@item
+@code{CS_HAS_SOUNDCARD_H} @result{} @code{CS_HAVE_SOUNDCARD_H}
+@item
+@code{CS_HAS_STDINT_H} @result{} @code{CS_HAVE_STDINT_H}
+@item
+@code{CS_HAS_SYS_PARAM_H} @result{} @code{CS_HAVE_SYS_PARAM_H}
+@item
+@code{CS_HAS_SYS_SOUNDCARD_H} @result{} @code{CS_HAVE_SYS_SOUNDCARD_H}
+@item
+@code{CS_HAS_WCHAR_H} @result{} @code{CS_HAVE_WCHAR_H}
+@item
+@code{CS_RTLD_NOW_AVAILABLE} @result{} @code{CS_HAVE_RTLD_NOW}
+@end itemize
+
+@noindent
+Likewise, the same normalization has been applied to the
+@samp{CS_USE_FAKE_feature} macros published by the @file{configure} script, and
+the boolean sense of these control macros has been reversed to account for the
+name change.
+
+@itemize @bullet
+@item
+@code{CS_USE_FAKE_EXPLICIT_KEYWORD} @result{}
+@code{CS_HAVE_CXX_KEYWORD_EXPLICIT}
+@item
+@code{CS_USE_FAKE_MATH_H_FLOAT_FUNCS} @result{}
+@code{CS_HAVE_MATH_H_FLOAT_FUNCS}
+@item
+@code{CS_USE_FAKE_SOCKLEN_TYPE} @result{} @code{CS_HAVE_SOCKLEN_T}
+@item
+@code{CS_USE_FAKE_TYPENAME_KEYWORD} @result{}
+@code{CS_HAVE_CXX_KEYWORD_TYPENAME}
+@item
+@code{CS_USE_FAKE_WCHAR_TYPE} @result{} @code{CS_HAVE_WCHAR_T}
+@item
+@code{CS_USE_FAKE_WCSLEN} @result{} @code{CS_HAVE_WCSLEN}
+@end itemize
+
+For consistency with like-named macros (such as @samp{CS_PROCESSOR_NAME} and
+@samp{CS_PROCESSOR_arch}), the following control macros have been renamed:
+
+@itemize @bullet
+@item
+@code{CS_PROCSIZE} @result{} @code{CS_PROCESSOR_SIZE}
+@end itemize
+
+The @code{csOrdering<>} template has been renamed to the more general
+@code{csComparator<>} to reflect the fact that this template can perform both
+ordering and equality comparisons.
+
+@subheading Pollution Reduction
+
+In order to avoid polluting the top-level system include directory, the Crystal
+Space header tree is now installed (via @samp{make install} or
+@samp{jam install}) in a subdirectory named @file{crystalspace}, rather than
+being installed directly in the top-level system directory. For example,
+assuming the default installation location, the Crystal Space headers are now
+installed in @file{/usr/local/include/crystalspace}. Previously, they would
+have been deposited directly into @file{/usr/local/include}. The
+@samp{cs-config} utility script properly returns the new header location in
+response to the @samp{--includedir}, @samp{--cflags}, and @samp{--cxxflags}
+options, so this relocation should be mostly transparent to external projects.
+
+The following global header files have been renamed in order to avoid possible
+conflict with headers installed by other packages.
+
+@itemize @bullet
+@item
+@code{platform.h} @result{} @code{csplatform.h}
+@item
+@code{qint.h} @result{} @code{csqint.h}
+@item
+@code{qsqrt.h} @result{} @code{csqsqrt.h}
+@item
+@code{volatile.h} @result{} @code{csconfig.h}
+@end itemize
+
+The following symbols have been renamed in order to avoid pollution of the
+global namespace.
+
+@itemize @bullet
+@item
+@code{BadBraces} @result{} @code{csrxBadBraces}
+@item
+@code{BadPattern} @result{} @code{csrxBadPattern}
+@item
+@code{BadRepetition} @result{} @code{csrxBadRepetition}
+@item
+@code{big_endian_float()} @result{} @code{csBigEndianFloat()}
+@item
+@code{big_endian_long()} @result{} @code{csBigEndianLong()}
+@item
+@code{big_endian_longlong()} @result{} @code{csBigEndianLongLong()}
+@item
+@code{big_endian_short()} @result{} @code{csBigEndianShort()}
+@item
+@code{COMP_BC} @result{} @code{CS_COMPILER_BCC}
+@item
+@code{COMP_GCC} @result{} @code{CS_COMPILER_GCC}
+@item
+@code{COMP_VC} @result{} @code{CS_COMPILER_MSVC}
+@item
+@code{convert_endian()} @result{} @code{csConvertEndian()}
+@item
+@code{DO_MMX} @result{} @code{CS_HAVE_MMX}
+@item
+@code{DO_NASM} @result{} @code{CS_HAVE_NASM}
+@item
+@code{double2longlong()} @result{} @code{csDoubleToLongLong()}
+@item
+@code{ErrBraces} @result{} @code{csrxErrBraces}
+@item
+@code{ErrBrackets} @result{} @code{csrxErrBrackets}
+@item
+@code{ErrCharType} @result{} @code{csrxErrCharType}
+@item
+@code{ErrCollate} @result{} @code{csrxErrCollate}
+@item
+@code{ErrEscape} @result{} @code{csrxErrEscape}
+@item
+@code{ErrParentheses} @result{} @code{csrxErrParentheses}
+@item
+@code{ErrRange} @result{} @code{csrxErrRange}
+@item
+@code{ErrSpace} @result{} @code{csrxErrSpace}
+@item
+@code{ErrSubReg} @result{} @code{csrxErrSubReg}
+@item
+@code{ErrUnknown} @result{} @code{csrxErrUnknown}
+@item
+@code{float2long()} @result{} @code{csFloatToLong()}
+@item
+@code{float2short()} @result{} @code{csFloatToShort()}
+@item
+@code{get_le_float16()} @result{} @code{csGetLittleEndianFloat16()}
+@item
+@code{get_le_float32()} @result{} @code{csGetLittleEndianFloat32()}
+@item
+@code{get_le_long()} @result{} @code{csGetLittleEndianLong()}
+@item
+@code{get_le_short()} @result{} @code{csGetLittleEndianShort()}
+@item
+@code{IgnoreCase} @result{} @code{csrxIgnoreCase}
+@item
+@code{little_endian_float()} @result{} @code{csLittleEndianFloat()}
+@item
+@code{little_endian_long()} @result{} @code{csLittleEndianLong()}
+@item
+@code{little_endian_longlong()} @result{} @code{csLittleEndianLongLong()}
+@item
+@code{little_endian_short()} @result{} @code{csLittleEndianShort()}
+@item
+@code{long2float()} @result{} @code{csLongToFloat()}
+@item
+@code{longlong2double()} @result{} @code{csLongLongToDouble()}
+@item
+@code{MemEntry} @result{} @code{csMemTrackerEntry}
+@item
+@code{MemoryMapFile()} @result{} @code{csMemoryMapFile()}
+@item
+@code{MemoryMapWindow()} @result{} @code{csMemoryMapWindow()}
+@item
+@code{MemTrackerInfo} @result{} @code{csMemTrackerInfo}
+@item
+@code{MemTrackerModule} @result{} @code{csMemTrackerModule}
+@item
+@code{MemTrackerRegistry} @result{} @code{csMemTrackerRegistry}
+@item
+@code{MKDIR()} @result{} @code{CS_MKDIR()}
+@item
+@code{mmioInfo} @result{} @code{csMemMapInfo}
+@item
+@code{__NEED_GENERIC_ISDIR} @result{} @code{CS_USE_CUSTOM_ISDIR}
+@item
+@code{__NEED_OPENDIR_PROTOTYPE} @result{} @code{CS_WIN32_USE_CUSTOM_OPENDIR}
+@item
+@code{NewLine} @result{} @code{csrxNewLine}
+@item
+@code{NoError} @result{} @code{csrxNoError}
+@item
+@code{NoMatch} @result{} @code{csrxNoMatch}
+@item
+@code{NotBOL} @result{} @code{csrxNotBOL}
+@item
+@code{NotEOL} @result{} @code{csrxNotEOL}
+@item
+@code{OS_DOS} @result{} @code{CS_PLATFORM_DOS}
+@item
+@code{OS_MACOSX} @result{} @code{CS_PLATFORM_MACOSX}
+@item
+@code{OS_UNIX} @result{} @code{CS_PLATFORM_UNIX}
+@item
+@code{OS_WIN32} @result{} @code{CS_PLATFORM_WIN32}
+@item
+@code{PATH_DELIMITER} @result{} @code{CS_PATH_DELIMITER}
+@item
+@code{PATH_SEPARATOR} @result{} @code{CS_PATH_SEPARATOR}
+@item
+@code{PROC_arch} @result{} @code{CS_PROCESSOR_arch} (where @samp{arch} is
+@samp{X86}, @samp{M68K}, etc.)
+@item
+@code{ProcEventHandler()} @result{} @code{csProcTexEventHandler}
+@item
+@code{QInt()} @result{} @code{csQint()}
+@item
+@code{QInt16()} @result{} @code{csQfixed16()}
+@item
+@code{QInt24()} @result{} @code{csQfixed24()}
+@item
+@code{QInt8()} @result{} @code{csQfixed8()}
+@item
+@code{qisqrt()} @result{} @code{csQisqrt()}
+@item
+@code{QRound()} @result{} @code{csQround()}
+@item
+@code{qsqrt()} @result{} @code{csQsqrt()}
+@item
+@code{RegisterMemoryTrackerModule()} @result{} @code{mtiRegisterModule()}
+@item
+@code{set_le_float16()} @result{} @code{csSetLittleEndianFloat16()}
+@item
+@code{set_le_float32()} @result{} @code{csSetLittleEndianFloat32()}
+@item
+@code{set_le_long()} @result{} @code{csSetLittleEndianLong()}
+@item
+@code{set_le_short()} @result{} @code{csSetLittleEndianShort()}
+@item
+@code{short2float()} @result{} @code{csShortToFloat()}
+@item
+@code{TEMP_DIR} @result{} @code{CS_TEMP_DIR}
+@item
+@code{TEMP_FILE} @result{} @code{CS_TEMP_FILE}
+@item
+@code{UnMemoryMapFile()} @result{} @code{csUnMemoryMapFile()}
+@item
+@code{WIN32_VOLATILE} @result{} @code{CS_WIN32_CSCONFIG}
+@end itemize
+
+@subsubheading @samp{iConfig} Renamed
+
+The @samp{iConfig} interface has been renamed to the more fitting 
+@samp{iPluginConfig}, and the containing header from @file{iutil/config.h} to
+@code{iutil/pluginconfig.h}. Other changes have not been made.
+
+@subsubheading @code{csRenderMeshHolderSingle} Renamed
+
+@samp{csRenderMeshHolderSingle} has been renamed to @samp{csRenderMeshHolder}
+as a consequence of the removal of @samp{csRenderMeshHolderMultiple}.
+
+@node Api1_0 Texture and Material Related Changes, Api1_0 Libraries and Headers, Api1_0 Identifier Changes, Release Notes 1_0
+@subsection Texture and Material Related Changes
+
+@subsubheading Texture and Material Preparation
+
+Texture and material preparation is now fully automatic. It is no longer
+necessary to @dfn{prepare} a texture or a material before you can use it. It is
+sufficient simply to register the texture or material. This means that the
+following functions have been removed (and you can just remove invocations of
+them from your applications if you used them):
+
+@itemize @bullet
+@item
+@code{iMaterialHandle::Prepare()}
+@item
+@code{iTextureHandle::Prepare()}
+@item
+@code{iTextureManager::PrepareMaterials()}
+@item
+@code{iTextureManager::PrepareTextures()}
+@end itemize
+
+@subsubheading Material Registration
+
+Registering an @samp{iMaterialWrapper} with the texture manager is no longer
+necessary; any such calls can be removed.
+
+@subsubheading Procedural Texture Relocation
+ 
+Implementations of the standard procedural textures (dots, fire, plasma, etc.)
+now reside directly in the @file{stdpt} plugin
+(@file{CS/plugins/proctex/standard}), rather than in the @file{cstool}
+module. Consequently, the following previously public headers are no longer
+available:
+ 
+@itemize @bullet
+@item
+@code{cstool/prdots.h}
+@item
+@code{cstool/prfire.h}
+@item
+@code{cstool/prplasma.h}
+@item
+@code{cstool/prsky.h}
+@item
+@code{cstool/prwater.h}
+@end itemize
+ 
+Likewise, procedural textures can no longer be allocated directly (for
+instance, via @samp{new csProcFire}).  Instead, you must now use the plugin
+system to create such textures. For example:
+ 
+@example
+csRef<iTextureType> type = csLoadPluginCheck<iTextureType> (object_reg,
+  "crystalspace.texture.type.fire"));
+if (!type) return false;	// Error
+csRef<iTextureFactory> fireFact = type->NewFactory();
+csRef<iTextureWrapper> tex = fireFact->Generate();
+csRef<iFireTexture> fire = scfQueryInterface<iFireTexture> (tex);
+@end example
+ 
+Various procedural textures may or may not implement their own custom @sc{scf}
+interfaces beyond the normal interfaces implemented by all procedural
+textures. In the example above, the ``fire'' texture implements the specialized
+@samp{iFireTexture}.
+
+@node Api1_0 Libraries and Headers, Api1_0 Rendering and Drawing, Api1_0 Texture and Material Related Changes, Release Notes 1_0
+@subsection Libraries and Headers Changes
+
+@subsubheading Library Consolidation
+
+In order to simplify end-user documentation and client usage, the Crystal Space
+link libraries @file{csutil}, @file{csgeom}, @file{csgfx}, and @file{cstool}
+have been merged into a single master library named @file{crystalspace} 
+(i.e. @file{libcrystalspace.a} or @samp{crystalspace.lib}).
+
+The tools @samp{cs-config} and @samp{jamtemplate} (@pxref{HOWTO CS Project}),
+documentation, and all other client-oriented utilities have been updated
+appropriately to reflect this change. If you had installed Crystal Space
+previously, you should manually removed the now obsolete installed libraries
+from the installation location (typically, @file{$@{prefix@}/lib}).
+
+Developers of Crystal Space itself should note that the sources and headers
+continue to reside in their separate @file{csutil}, @file{csgeom}, etc.,
+directories; and (importantly) the modules themselves remain conceptually
+distinct. This will not change. The consolidation of the physical link library
+was an end-user convenience.
+
+@subsubheading Convenience Classes and Libraries
+
+Crystal Space now publishes several convenience classes and libraries which
+eliminate much of the drudgery associated with implementing @sc{scf} interfaces
+in certain types of common plugin modules. For example, the @samp{csGraphics2D}
+class implements the @samp{iGraphics2D} interface and provides much of the
+functionality common to most canvases.  Likewise, the @samp{csGraphics3D} class
+implements the @samp{iGraphics3D} interface and provides much functionality
+common to renderers. You are not required to utilize these implementations when
+authoring your own plugins, but they are available for your convenience.
+
+Most of these newly published facilities are bundled in the consolidated master
+@file{crystalspace} library, but a few are provided in separate libraries
+because they rely upon external resources which may not be present on all
+platforms or in all installations. The convenience libraries are:
+
+@table @code
+@item crystalspace
+Canvas, image loader, particle system, renderer, shader, sound loader, and
+sound renderer support, in addition to the normal Crystal Space classes and
+utilities.
+@item crystalspace_directx
+DirectX support.
+@item crystalspace_macosx
+MacOS/X canvas support.
+@item crystalspace_opengl
+OpenGL support.
+@item crystalspace_python
+Python support.
+@item crystalspace_windows
+Windows support.
+@end table
+
+For a complete list of available convenience classes, consult the header files
+in the subdirectories of @file{CS/include/csplugincommon}.
+
+@subsubheading Convenience Headers
+
+For convenience, several top-level @dfn{master header} files have been added to
+the project. These should simplify client usage by allowing users to choose the
+level of granularity which suits them best.  The list of new header files
+follows.
+
+@table @code
+@item crystalspace.h
+Nearly all public headers in entire Crystal Space @sc{sdk}.
+@item csgeom.h
+Content of @file{CS/include/csgeom}.
+@item csgfx.h
+Content of @file{CS/include/csgfx}.
+@item csplugincommon.h
+Content of @file{CS/include/csplugincommon}.
+@item cstool.h
+Content of @file{CS/include/cstool}.
+@item csutil.h
+Content of @file{CS/include/csutil}.
+@item iaws.h
+Content of @file{CS/include/iaws}.
+@item iengine.h
+Content of @file{CS/include/iengine}.
+@item igeom.h
+Content of @file{CS/include/igeom}.
+@item igraphic.h
+Content of @file{CS/include/igraphic}.
+@item imap.h
+Content of @file{CS/include/imap}.
+@item imesh.h
+Content of @file{CS/include/imesh}.
+@item inetwork.h
+Content of @file{CS/include/inetwork}.
+@item isound.h
+Content of @file{CS/include/isound}.
+@item itexture.h
+Content of @file{CS/include/itexture}.
+@item iutil.h
+Content of @file{CS/include/iutil}.
+@item ivaria.h
+Content of @file{CS/include/ivaria}.
+@item ivideo.h
+Content of @file{CS/include/ivideo}.
+@end table
+
+Users new to the @sc{sdk} will probably want to include @file{crystalspace.h}
+since it is simplest; whereas more advanced users may want to include
+@file{csutil.h}, @file{cstool.h}, etc.; and power users can continue to include
+only the individual headers required by a particular piece of code.
+
+As a corollary, the old @file{CS/include/css.h} header, which included many,
+though not all Crystal Space header files, has been removed. If you require
+this type functionality from a header, then include the new
+@file{crystalspace.h} instead.
+
+Be aware that there is a very small set of public headers not included in any
+of the master headers. These are omitted from the master headers because they
+reference external resources which might not be known or available to all
+clients of the master headers. Clients requiring these special-case headers
+will need to include them manually, on an as-needed basis, and arrange that the
+build system has sufficient knowledge about the external resources to satisfy
+the dependencies at build time.  The list of headers which are excluded from
+the master headers follows.
+
+@table @code
+@item csplugincommon/directx/*.h
+DirectX-specific.
+@item csplugincommon/macosx/*.h
+MacOS/X-specific.
+@item csplugincommon/opengl/*.h
+OpenGL-specific.
+@item csplugincommon/win32/*.h
+Windows-specific.
+@item csutil/archive.h
+Requires zlib indirectly via @file{csutil/zip.h}.
+@item csutil/getopt.h
+Conflicts with platform-supplied @file{<getopt.h>}.
+@item csutil/zip.h
+Requires zlib; @uref{http://www.gzip.org/zlib/}
+@item inetwork/vosapi.h
+Requires @sc{vos}; @uref{http://www.interreality.org/}
+@item ivaria/ode.h
+Requires @sc{ode}; @uref{http://www.ode.org/}
+@item ivideo/wxwin.h
+Requires wxWidgets; @uref{http://www.wxwidgets.org/}
+@end table
+
+As an example, if you need access to the @samp{iWxWindow} interface, then you
+must include @file{ivideo/wxwin.h} manually; it will not be included as part of
+@file{crystalspace.h} or @file{ivideo.h}. Furthermore, you will need
+to let the build system know where it can find the wxWidgets resources (headers
+and libraries). Typically, this is done by adding a wxWidgets check to your
+project's @file{configure} script; emitting the results of the check to your
+@file{Jamconfig} file with the @code{CS_EMIT_BUILD_RESULT()} Autoconf macro;
+and finally utilizing the result of that check in your project's @file{Jamfile}
+by invoking the Jam rule @samp{ExternalLibs}. For @sc{msvc} project files, the
+location of the wxWidgets resources will have to be added as @dfn{additional
+include directories} and @dfn{additional library directories}, in the project
+settings or globally, to ensure that @sc{msvc} will be able to find them.
+
+@subheading @file{cssysdef.h} Changes
+
+The @samp{CS_SYSDEF_PROVIDE_FACILITY} macros, which clients would
+@code{#define} before including @file{cssysdef.h} in order to alter the
+behavior of @file{cssysdef.h}, have been removed. Retirement of these macros
+eliminates the polymorphic behavior of @file{cssysdef.h}, thus helping to pave
+the way toward eventually pre-compiling Crystal Space's headers in order to
+reduce overall compilation time.  In addition to removing these macros from
+your code, the following table explains what else (if anything) needs to be
+done to account for the removal.
+
+@table @code
+@item CS_SYSDEF_PROVIDE_ACCESS
+No additional changes.
+@item CS_SYSDEF_PROVIDE_ALLOCA
+Use the @samp{CS_ALLOC_STACK_ARRAY()} macro, rather than @code{alloca()}.
+@item CS_SYSDEF_PROVIDE_CASE
+No additional changes.
+@item CS_SYSDEF_PROVIDE_DIR
+No additional changes.
+@item CS_SYSDEF_PROVIDE_EXPAND_PATH
+No additional changes.
+@item CS_SYSDEF_PROVIDE_GETCWD
+No additional changes.
+@item CS_SYSDEF_PROVIDE_GETOPT
+Include @file{csutil/getopt.h}.
+@item CS_SYSDEF_PROVIDE_MKDIR
+Use the @samp{CS_MKDIR(path)} macro to create the directory, rather than the
+obsolete @samp{MKDIR()} macro.
+@item CS_SYSDEF_PROVIDE_PATH
+No additional changes.
+@item CS_SYSDEF_PROVIDE_SELECT
+No additional changes.
+@item CS_SYSDEF_PROVIDE_SOCKETS
+Include @file{csutil/sockets.h}.
+@item CS_SYSDEF_PROVIDE_SOFTWARE2D
+No additional changes.
+@item CS_SYSDEF_PROVIDE_TEMP
+Use the @samp{CS_TEMP_DIR} and @samp{CS_TEMP_FILE} macros, rather than the
+obsolete @samp{TEMP_DIR} and @samp{TEMP_FILE} macros.
+@item CS_SYSDEF_PROVIDE_UNLINK
+No additional changes.
+@item CS_SYSDEF_VFS_PROVIDE_CHECK_VAR
+No additional changes.
+@end table
+
+The age-old restriction that @file{cssysdef.h} could be included only by source
+files (@file{.cpp}) has been lifted. This restriction was an unfortunate
+side-effect of the polymorphic behavior of @file{cssysdef.h} in the presence
+of various @samp{CS_SYSDEF_PROVIDE_FACILITY} macros. It is now safe, even
+recommended, to include @file{cssysdef.h} in header files (@file{.h}). Doing so
+helps to make header files more self-contained, thus reducing the burden of
+clients of those headers.
+
+@subsubheading C++ Standard Conformance
+
+Crystal Space's public header files are now C++ Language Standard
+conformant. This means that Crystal Space-based projects which choose to adhere
+strictly to the C++ Language Standard (such as those which employ @emph{gcc}'s
+@samp{-ansi} and @samp{-pedantic} options) can now include Crystal Space
+headers safely.
+
+@subsubheading @file{imap/parser.h} Deprecated
+
+All functionality in the header @file{imap/parser.h} was long ago moved to
+@file{imap/loader.h}, which declares interfaces to access the Crystal Space
+map loader. At that time, @file{imap/parser.h} became a very thin wrapper which
+merely included @file{imap/loader.h} and did nothing more. Since
+@file{imap/parser.h} has no useful purpose, it is now officially deprecated,
+and deprecation warnings have been added. Use @file{imap/loader.h} instead.
+
+@node Api1_0 Rendering and Drawing, Api1_0 Java Bindings, Api1_0 Libraries and Headers, Release Notes 1_0
+@subsection Rendering and Drawing Changes
+
+@subsubheading @code{iGraphics2D} Alpha Color Support
+
+@samp{iGraphics2D} now supports an alpha channel. @code{iGraphics2D::FindRGB()}
+accepts an optional alpha value (0 being completely transparent, and
+255 being fully opaque) which defaults to 255. All canvases will then blend 
+the pixels appropriately if the color depth is 15 bpp or higher. Furthermore, 
+as @code{iGraphics2D::Write()} also handles alpha in both foreground and 
+background colors, it is recommended for transparent backgrounds, instead 
+of using @samp{-1} as the color value, to obtain a color value from 
+@code{FindRGB()} that has the same R, G, B components as the foreground color, 
+but an alpha component of 0.
+
+@subsubheading Render Buffer Changes
+
+The @samp{iRenderBuffer} interface was made renderer-independant. Consequently,
+creation was moved out of @samp{iGraphics3D} and into @samp{csRenderBuffer} in
+the @file{csgfx} module (see @file{csgfx/renderbuffer.h}).  The semantics of
+the parameters have changed too: notably, instead of specifying the byte size
+of a buffer, the element count is specified. The same change has been made to
+@code{CopyToBuffer()} (which has been renamed to @code{CopyInto()} to enforce
+human correction of the arguments).
+
+More serious changes involve the publication of render buffers by renderers.
+Previously meshes provided render buffers via name, and these were mapped using
+@emph{name} <-> @emph{OpenGL} name mapping. But most meshes only provided a few
+standard-named buffers (such as, @samp{vertices}, @samp{texcoords}, etc.), and
+the mapping itself took some time (5%+ per frame). This has been reworked.
+
+Now, meshes can provide a set of 16 buffers in a fixed structure. Meshes can
+provide @samp{index}, @samp{position} (vertices), @samp{normal}, @samp{color},
+@samp{color_lighting} (pre-lit colors), @samp{texcoord0}, @samp{texcoord1},
+@samp{texcoord2}, @samp{texcoord3}, @samp{texcoord_lightmap}, @samp{generic0},
+@samp{generic1}, @samp{generic2}, @samp{generic3}, @samp{tangent} and
+@samp{binormal} buffers.  At the very least, meshes @emph{should} provide
+@samp{index}, @samp{position}, and if possible @samp{texcoord@emph{n}}. The old
+system with custom named buffers is also supported.
+
+Both kinds of buffers can be mapped, and the destinations for both kinds of
+buffers are the same (listed here): @samp{position}, @samp{normal},
+@samp{color}, @samp{primary color} (alias for @samp{color}), @samp{secondary
+color}, @samp{texture coordinate n} (where 0 <= n < texture units;
+@samp{texture coordinate} is alias for n = 0), and @samp{attribute n} (where 0
+<= n < 16).  Note that you can not map buffers of different kinds (the
+@samp{normal} and the custom buffers) to same destination; the result is
+undefined).
+
+The normal buffers are named @samp{position}, @samp{normal}, @samp{color},
+@samp{primary color}, @samp{lit color}, @samp{texture coordinate n} (where 0 <=
+n < 3), @samp{texture coordinate lightmap}, @samp{generic n} (where 0 <= n <
+3), @samp{binormal}, and @samp{tangent}. These appear in the
+@samp{source="@dots{}"} tag within the @sc{xml} shader description.
+
+Mapping of custom buffers is accomplished as so:
+
+@example
+<buffer
+  customsource="custombuffername"
+  destination="texture coordinate 1"
+/>
+@end example
+
+@noindent
+And, mapping of a normal buffer is done this way:
+
+@example
+<buffer
+  source="tangent"
+  destination="texture coordinate 2"
+/>
+@end example
+
+As a convenience, three buffers are mapped automatically by default (as long as
+the mesh provides them). They are:
+
+@itemize @bullet
+@item
+@samp{position} @result{} @samp{position}
+@item
+@samp{color} @result{} @samp{primary color}
+@item
+@samp{texture coordinate 0} @result{} @samp{texture coordinate 0}
+@end itemize
+
+@subsubheading Render Priority System
+
+It is no longer possible to define render priorities in a map file. You can
+now only redefine render priorities from the engine @sc{api}.
+@xref{HOWTO Render Priorities}.
+
+@subsubheading Cg Matrix Bindings
+
+Previously, the semantics of a Cg vertex program matrix parameter were
+determined through the variable name; e.g. a name of @samp{ModelViewProj} bound
+the combined model view and projection matrix to the variable. This is still
+supported but deprecated. Crystal Space now requires Cg 1.3 which allows the
+matrix semantics specification in a way similar to other semantics
+specification. For example:
+
+@example
+uniform float4x4 ModelViewProj
+@end example
+
+@noindent
+Becomes:
+
+@example
+uniform float4x4 ModelViewProj : state.matrix.mvp
+@end example
+
+Check the @file{data/shaders/} directory for further examples. For more
+detailed information, consult the Cg and @samp{ARB_vertex_program}
+documentations.
+
+@subsubheading Transform Split
+
+To allow more control over how geometry is transformed when using shaders the
+@samp{csRenderMesh::object2camera} has been split into two transforms:
+@samp{object2world} and @samp{world2camera}. The @samp{object2world} transform
+is sent via a shader variable, while @samp{world2camera} is specified via
+@code{iGraphics3D::SetWorldToCamera()} (but it is also available as a shader
+variable to shader programs).
+
+@node Api1_0 Java Bindings, Api1_0 vfs Changes, Api1_0 Rendering and Drawing, Release Notes 1_0
+@subsection Java Bindings
+@cindex Java
+
+The Java bindings for Crystal Space have been fully integrated into the project
+and are now well-supported. It is now possible to write Crystal Space program
+entirely in Java. @xref{Java Bindings}.
+
+The Crystal Space Java classes now reside in a package named
+@samp{org.crystalspace3d} in order to reflect Crystal Space's new official
+domain name ``crystalspace3d.org''. This replaces the older package name
+@samp{com.crystalspace}, which itself replaced the much older name
+@samp{net.sourceforge.crystal}.
+
+@node Api1_0 vfs Changes, Api1_0 Interface Changes, Api1_0 Java Bindings, Release Notes 1_0
+@subsection @sc{vfs} Changes
+@cindex @sc{vfs} Configuration File
+@cindex @file{vfs.cfg}, @sc{vfs} Configuration File
+
+At initialization time, @sc{vfs} now merges all @file{vfs.cfg} files located
+during its start-up scan.  Previously, @sc{vfs} stopped scanning at the first
+discovered @file{vfs.cfg}, and loaded only that file.  During the start-up
+scan, it searches for a file named @file{vfs.cfg} in the application resource
+directory (@code{csGetResourceDir()}), then in the directory containing the
+application (@code{csGetAppDir()}), and finally in the Crystal Space
+installation directory (@code{csGetConfigPath()}).  The full set of directories
+mounted by @sc{vfs} following the initial configuration file scan is the union
+of the entries in all of the discovered @file{vfs.cfg} files.  If there are
+conflicting entries, then mounts and variable assignments specified in
+configuration files discovered earlier in the scan take precedence over those
+discovered later.
+
+@node Api1_0 Interface Changes, Api1_0 Random Number Generator Changes, Api1_0 vfs Changes, Release Notes 1_0
+@subsection Interface Changes
+
+@subsubheading @samp{iDocument} Changes
+
+The @code{iDocument::Parse()} method now accepts an optional argument
+indicating whether or not extraneous whitespace in @samp{CS_NODE_TEXT} nodes
+should be condensed.  Most implementations of @samp{iDocument} will attempt to
+respect this option if possible.  For implementations where it does not make
+sense, the option will be ignored.
+
+Previously, @sc{xml}-based implementations of the @samp{iDocument} interface
+condensed whitespace in @samp{CS_NODE_TEXT} nodes at @code{Parse()} time.  This
+is no longer the case.  Whitespace is now preserved by default.  If the new
+behavior is unsuitable for your case, use the new argument to
+@code{iDocument::Parse()} to indicate that whitespace should be condensed.
+This change was made in order to conform to the latest @sc{xml} specification
+which states that @sc{xml} scanners must preserve whitespace by default.
+Consult the following documents for more information regarding this issue.
+
+@noindent
+@uref{http://www.w3.org/TR/REC-xml/#sec-white-space}@*
+@uref{http://www.xml.com/axml/notes/AllWSAlways.html}
+
+@subsubheading Mesh Factory Changes
+
+The mesh factory interfaces (@samp{iGeneralFactoryState},
+@samp{iHazeFactoryState}, @samp{iInstancingFactoryState},
+@samp{iLightningFactoryState}, @samp{iSprite2DFactoryState},
+@samp{iThingFactoryState} and @samp{iSprite3DFactoryState} no longer have the 
+following methods. Use the methods with same name from 
+@samp{iMeshObjectFactory} instead:
+
+@itemize @bullet
+@item
+@code{SetMaterialWrapper()}
+@item
+@code{GetMaterialWrapper()}
+@item
+@code{SetMixMode()}
+@item
+@code{GetMixMode()}
+@end itemize
+
+@subsubheading @samp{iGeneralMeshState}, @samp{iRainState}, @samp{iInstancingMeshState} Changes
+
+From @samp{iGeneralMeshState}, @samp{iInstancingMeshState}, 
+@samp{iRainState} and @samp{iParticle} the following methods have been 
+removed. Use the methods with the same name from @samp{iMeshObject} instead.
+
+@itemize @bullet
+@item
+@code{SetColor()}
+@item
+@code{GetColor()}
+@item
+@code{SetMaterialWrapper()}
+@item
+@code{GetMaterialWrapper()}
+@item
+@code{SetMixMode()}
+@item
+@code{GetMixMode()}
+@item
+@code{GetRenderMeshes()}
+@end itemize
+
+@subsubheading @samp{iImage} Changes
+
+The @samp{iImage} interface has been reduced to a level where it merely serves
+as a container for pixel data; however, the image editing functionality was
+only relocated, not removed.
+
+Forbidding direct manipulation of an @samp{iImage}'s pixel data has the 
+following consequences:
+
+@itemize @bullet
+@item
+The @code{Clone()} function was removed. The
+@samp{csImageMemory} class provides a constructor that copies the pixel data
+from another @samp{iImage} object, providing a functionality equal to 
+@code{Clone()}.
+
+@item
+To edit the pixel data of an image, create a clone of an image (e.g. a
+@samp{csImageMemory} as mentioned above) and manipulate the data in the newly
+cerated instance.
+
+@item
+If the image data is needed in another
+format, as the @code{SetFormat()} call has been removed from the interface.
+
+@item
+The image editing functionality found in methods such as @code{Rescale()},
+@code{Sharpen()} was moved into the @samp{csImageManipulate} class.
+
+@item
+The @code{CopyXXX()} method that copied an image into another are now provided
+by @samp{csImageMemory}.
+@end itemize
+
+As a side-effect of these changes, the @samp{csImageFile} and 
+@samp{csImageMemory} were merged and the former removed.
+
+@subsubheading @code{iImageIO::Load()} Parameter Change
+
+@code{iImageIO::Load()} now requires the image source data in an 
+@samp{iDataBuffer} object, instead of separate @samp{buffer} and @samp{size}
+parameters.
+
+@subsubheading @samp{iLight} Changes
+
+The @samp{iLight} and its implementation (@samp{csLight}) have been extended to
+also handle spot- and directional-lights. Note that the accual computation of
+lighting does not yet support these, however the engine can now store and
+handle the required data.
+
+There have also been two smaller changes to the interface to make it more
+coherent. The influence radius have been renamed @dfn{cut-off} distance, and
+thus the methods @code{GetInfluenceRadius()} and @code{SetInfluenceRadius()}
+have been renamed accordingly to @code{GetCutoffDistance()} and
+@code{SetCutoffDistance()}, respectively.  Also, @code{SetAttenuation()} has
+been renamed to @code{SetAttenuationMode()} in order to avoid confusion with
+other similary named methods.  For the @code{CS_ATTN_LINEAR} attenuation type
+the specification has changed slightly. As a default, the distance where light
+goes out is same as the cut-off distance, but this can be changed by altering
+the first attenuation constant. See comments in
+@file{CS/include/iengine/light.h} for exact details of the different
+attenuation modes.
+
+@subsubheading @samp{iParticleState} Changes
+
+From @samp{iParticleState}, the following methods have been removed.
+Use the methods with the same name from @samp{iMeshObject} instead.
+
+@itemize @bullet
+@item
+@code{SetColor()}
+@item
+@code{GetColor()}
+@item
+@code{SetMaterialWrapper()}
+@item
+@code{GetMaterialWrapper()}
+@end itemize
+
+@subsubheading @samp{iMaterialList} Change
+
+The function @code{iMaterialList::NewMaterial()} now needs an additional
+name parameter. It is not recommended to change the name later.
+
+@subsubheading @samp{iObjectModel} Change
+
+The function @samp{iObjectModel::GetObjectBoundingBox()} only has one
+parameter now. The optional @samp{type} parameter has been removed as it
+was not implemented anywhere. In addition to that the constants
+@code{CS_BBOX_NORMAL}, @code{CS_BBOX_ACCURATE}, and @code{CS_BBOX_MAX}
+are also removed.
+
+@subsubheading @samp{iSprite3DState} Changes
+
+Some methods from @samp{iSprite3DState} have been removed that basically 
+provided functionality which was also already available through 
+@samp{iMeshObject}:
+
+@itemize @bullet
+@item
+@code{SetBaseColor()}. Use @code{SetColor()} from @samp{iMeshObject}.
+@item
+@code{GetBaseColor()}. Use @code{GetColor()} from @samp{iMeshObject}.
+@end itemize
+
+Likewise, the @code{GetFactory()} method has been removed from 
+@samp{iThingState}. Equivalent functionality can be achieved by using
+@code{GetFactory()} from @samp{iMeshObject} and querying the returned object
+for the @samp{iThingFactoryState} interface. Example:
+
+@example
+  csRef<iThingFactoryState> thing_fact_state =
+  	scfQueryInterface<iThingFactoryState> (mesh->GetMeshObject ()
+	->GetFactory ());
+@end example
+
+@subsubheading @code{iTextureManager::FreeImages()} Removal
+
+@code{iTextureManager::FreeImages()} has been removed.  It was used to release
+the @samp{iImage} objects associated with textures with the purpose of freeing
+up memory.  This happens automatically now; the images associated with a
+texture are released by the renderer as soon as the image data is converted
+into the internal texture format (that is, uploaded to the graphics hardware).
+
+@node Api1_0 Random Number Generator Changes, Api1_0 new csQueryRegistryOrLoad, Api1_0 Interface Changes, Release Notes 1_0
+@subsection Random Number Generator Changes
+
+The global function @code{csFastRandFloat()} has been retired.  In its stead is
+the new instantiable class @samp{csRandomFloatGen}, which is modeled after the
+@samp{csRandomGen} class.  Unlike the old @code{csFastRandFloat()} function
+which was shared by all clients, instances of @samp{csRandomFloatGen} can be
+controlled and seeded individually, thus making it far more flexible and
+useful.  (Note that the more general-purpose @samp{csRandomGen} class is also
+able to vend floating point numbers.)
+
+@node Api1_0 new csQueryRegistryOrLoad, Api1_0 Reference Count Automation, Api1_0 Random Number Generator Changes, Release Notes 1_0
+@subsection New @code{csQueryRegistryOrLoad} Function
+
+The function @code{csQueryRegistryOrLoad()} has been added to
+@file{iutil/plugin.h}. This is a convenience function which embodies the common
+idiom of first querying the object-registry for an object implementing some
+interface, and then asking the plugin manager to load a plugin supplying the
+desired object if it was not found in the object-registry. It also registers
+the object with the object-registry if the plugin manager loads it
+successfully:
+
+@example
+csRef<iEngine> engine = csQueryRegistryOrLoad<iEngine> (object_reg,
+  "crystalspace.engine.3d");
+@end example
+
+@node Api1_0 Reference Count Automation, Api1_0 64-Bit Portability Changes, Api1_0 new csQueryRegistryOrLoad, Release Notes 1_0
+@subsection Reference Count Automation
+
+For consistency with the bulk of the Crystal Space @sc{api}, and in order to
+simplify reference-count management, the following methods have been changed
+to return @code{csRef<>} rather than raw pointers of which the client had to
+dispose manually via @code{DecRef()}.
+
+@itemize @bullet
+@item
+@code{iEmitFactoryState::CreateBox()}
+@item
+@code{iEmitFactoryState::CreateCone()}
+@item
+@code{iEmitFactoryState::CreateCylinder()}
+@item
+@code{iEmitFactoryState::CreateCylinderTangent()}
+@item
+@code{iEmitFactoryState::CreateFixed()}
+@item
+@code{iEmitFactoryState::CreateLine()}
+@item
+@code{iEmitFactoryState::CreateMix()}
+@item
+@code{iEmitFactoryState::CreateSphere()}
+@item
+@code{iEmitFactoryState::CreateSphereTangent()}
+@item
+@code{iHazeHullCreation::CreateBox()}
+@item
+@code{iHazeHullCreation::CreateCone()}
+@end itemize
+
+@node Api1_0 64-Bit Portability Changes, Api1_0 aws Changes, Api1_0 Reference Count Automation, Release Notes 1_0
+@subsection 64-Bit Portability Changes
+
+Some changes have been made to the Crystal Space @sc{api} in order to better
+support 64-bit hardware, which is now becoming common. Additional changes to
+improve 64-bit support have also been made internally, but the internal changes
+essentially are transparent to external clients.
+
+The most significant change to the @sc{api} involves methods and classes
+dealing with data opaquely. Historically, opaque data has been handled using
+@samp{void*}, and programmers would cast numbers, booleans, and pointers to
+@samp{void*} when it was necessary to deal with the data in an opaque fashion.
+This technique, however, is not portable to 64-bit platforms. For this reason,
+the new standard type @samp{intptr_t} was introduced. This type is guaranteed
+to be large enough to store any integral numeric or pointer value regardless of
+the machine's word size.
+
+Crystal Space now uniformly uses @samp{intptr_t}, rather than @samp{void*},
+when dealing with opaque data. Upgrading your code to reflect this change is
+usually quite simple. Where your code presently declares a variable or casts a
+value to @samp{void*}, change it to @samp{intptr_t}. Likewise, @samp{void**}
+becomes @samp{intptr_t*}. For example:
+
+@example
+iGraphics2D canvas = @dots{};
+iEventOutlet* outlet = @dots{};
+outlet->Broadcast(cscmdCanvasExposed, (void*)canvas);
+@end example
+
+@noindent
+Becomes:
+
+@example
+outlet->Broadcast(cscmdCanvasExposed, (intptr_t)canvas);
+@end example
+
+The event system is impacted by this change. Specifically, the following
+methods and data members now deal with @samp{intptr_t} rather than @samp{void*}
+for the opaque ``info'' member of @code{csevCommand}-type events.
+
+@itemize @bullet
+@item
+@code{csEvent::csEvent()}
+@item
+@code{csEventCommandData::Info}
+@item
+@code{iEventOutlet::Broadcast()}
+@item
+@code{iEventOutlet::ImmediateBroadcast()}
+@end itemize
+
+The @sc{aws} plugin (Alternate Windowing System) and its interfaces have been
+been updated for 64-bit platform conformance.  Specifically, the following
+methods now deal with @samp{intptr_t} rather than @samp{void*} for all of
+@sc{aws}'s opaque data needs.
+
+@itemize @bullet
+@item
+@code{iAwsComponent::GetProperty()}
+@item
+@code{iAwsComponent::SetProperty()}
+@item
+@code{iAwsParmList::AddOpaque()}
+@item
+@code{iAwsParmList::GetOpaque()}
+@item
+@code{iAwsSink::RegisterTrigger()}
+@item
+@code{iAwsSinkManager::CreateSink()}
+@end itemize
+
+@sc{aws} callback functions (@dfn{triggers}) are likewise impacted. You need to
+change the declaration of your triggers to use @samp{intptr_t} rather than
+@samp{void*}. For example:
+
+@example
+void MyTrigger(void* sink, iAwsSource* source);
+@end example
+
+@noindent
+Becomes:
+
+@example
+void MyTrigger(intptr_t sink, iAwsSource* source);
+@end example
+
+Since converting client @sc{aws} code to the new @sc{api} can be rather onerous
+on account of the amount of repetitious manual labor involved, the old
+@samp{void*} @sc{api} is still present in @sc{aws}, though heavily
+deprecated. In the interests of 64-bit portability, the old @sc{api} will be
+removed at some point in the future.  You are encouraged, therefore, to convert
+your code to the new @sc{api}. As an aid to clients in upgrading their code to
+the new @sc{api}, one of two control macros can be defined which will help to
+isolate code which needs to be updated.  Defining @samp{AWS_OBSOLETE_VOIDP}
+(via @samp{#define} before including @file{iaws/aws.h}) removes from the
+@sc{api} all methods dealing with @samp{void*}, thus invocations of any such
+methods will result in compilation errors. Alternately, defining
+@samp{AWS_DEPRECATE_VOIDP}, will cause invocations of methods dealing with
+@samp{void*} to generate compilation warnings, assuming that the compiler
+supports such deprecation warnings. (Presently, only modern version of the
+@sc{gnu} compiler are so configured.)
+
+@node Api1_0 aws Changes, Api1_0 Particle system changes, Api1_0 64-Bit Portability Changes, Release Notes 1_0
+@subsection @sc{aws} Changes
+
+The trigger system in @sc{aws} has changed. The trigger callback function
+now has an additional @samp{unsigned long} parameter like this:
+
+@example
+static void TriggerFunc (unsigned long, intptr_t, iAwsSource*);
+@end example
+
+This extra parameter is the id of the given trigger name as returned by the
+standard string set (@samp{crystalspace.shared.stringset}).
+
+@node Api1_0 Particle system changes, Api1_0 Changes for Mesh Object Writers, Api1_0 aws Changes, Release Notes 1_0
+@subsection Particle system changes
+
+The @sc{particles} mesh object have been rewritten.
+
+@code{iParticlesStateBase}, @code{iParticlesObjectState}, 
+@code{iParticlesFactoryState} and @code{iParticlesPhysics} have been removed
+in favour of the new @code{iParticleSystemBase}, @code{iParticleSystemFactory}
+and @code{iParticleSystem}. 
+Particle emission is controlled via instances of @code{iParticleEmitter},
+physical effects controlled via @code{iParticleEffector}.
+
+The full documentation for the new particle systems can be found at 
+@xref{MeshObject Particles}.
+
+@imports{appendix,apimod10part.txi}
+
+@node Api1_0 Changes for Mesh Object Writers, Api1_0 Changes for hierarchical objects, Api1_0 Particle system changes, Release Notes 1_0
+@subsection Changes for Mesh Object Writers
+
+@code{iMeshObject::SetLogicalParent()} has been renamed to
+@code{iMeshObject::SetMeshWrapper()}. Same for @code{GetLogicalParent()}.
+It also uses a @code{iMeshWrapper} instead of @code{iBase} as the type
+of the parameter.
+@code{iMeshObjectFactory::SetLogicalParent()} has been renamed to
+@code{iMeshObjectFactory::SetMeshFactoryWrapper()}.
+Same for @code{GetLogicalParent()}. It also uses a @code{iMeshFactoryWrapper}
+instead of @code{iBase} as the type of the parameter.
+
+@node Api1_0 Changes for hierarchical objects, Api1_0 Model Importing, Api1_0 Changes for Mesh Object Writers, Release Notes 1_0
+@subsection Changes for hierarchical objects
+
+Meshes and lights can now properly be used as hierarchical objects with the
+same API. Here is how it works: meshes and lights implement the new
+@code{iSceneNode} interface. You can do @code{QuerySceneNode()} to get the
+scene object from the mesh, light, or camera without having to do
+@code{scfQueryInterface<>}. To make some object a child of another you simply
+do:
+
+@example
+object_child->QuerySceneNode ()->SetParent (
+	    	  object_parent->QuerySceneNode ());
+@end example
+
+To remove some object from a parent you do:
+
+@example
+object_child->QuerySceneNode ()->SetParent (0);
+@end example
+
+You can get the children by calling @code{iSceneNode->GetChildren()}.
+
+The following methods have been removed:
+@itemize @bullet
+@item
+@code{iMeshWrapper->GetChildren()}
+@item
+@code{iMeshWrapper->GetParentContainer()}
+@item
+@code{iMeshWrapper->SetParentContainer()}
+@item
+@code{iMovable->GetParent()}
+@item
+@code{iMovable->SetParent()}
+@end itemize
+
+@node Api1_0 Model Importing, Api1_0 Removed Features, Api1_0 Changes for hierarchical objects, Release Notes 1_0
+@subsection Model Importing
+
+The old model importing system has been completely removed. That means
+the following interfaces and classes are gone:
+
+@itemize @bullet
+@item
+@code{csSingleIndexVertexSet}
+@item
+@code{csModelDataTools}
+@item
+@code{csModelConverterFormat}
+@item
+@code{iModelConverter}
+@item
+@code{iModelDataTexture}
+@item
+@code{iModelDataMaterial}
+@item
+@code{iModelDataVertices}
+@item
+@code{iModelDataAction}
+@item
+@code{iModelDataPolygon}
+@item
+@code{iModelDataObject}
+@item
+@code{iModelDataCamera}
+@item
+@code{iModelDataLight}
+@item
+@code{iModelData}
+@item
+@code{csModelDataTexture}
+@item
+@code{csModelDataMaterial}
+@item
+@code{csModelDataVertices}
+@item
+@code{csModelDataAction}
+@item
+@code{csModelDataPolygon}
+@item
+@code{csModelDataObject}
+@item
+@code{csModelDataCamera}
+@item
+@code{csModelDataLight}
+@item
+@code{csModelData}
+@item
+@code{iCrossBuilder}
+@end itemize
+
+Instead it is now possible to load @sc{3ds} models as genmesh mesh
+objects and @sc{md2} models as 3D sprites. @xref{Model Loading}.
+
+@node Api1_0 Removed Features, , Api1_0 Model Importing, Release Notes 1_0
+@subsection Removed Features
+
+In order to clean up the codebase and simplify maintenance, a couple of 
+features and plugins have been removed.
+
+@subheading Ball Mesh Removed
+
+The ball mesh has been removed. The genmesh mesh can now be used to generate
+spheres instead. Here is an example how you would have to change the map file. 
+First here is the old way:
+
+@example
+<meshfact name="ballFact">
+  <plugin>crystalspace.mesh.loader.factory.ball</plugin>
+  <params />
+</meshfact>
+@dots{}
+<sector name="room">
+  <meshobj name="ball">
+    <plugin>crystalspace.mesh.loader.ball</plugin>
+    <params>
+      <factory>ballFact</factory>
+      <material>plasma</material>
+      <numrim>16</numrim>
+      <radius x="2" y="1" z=".5" />
+      <shift x="0" y=".5" z="0" />
+      <reversed />
+      <toponly />
+      <cylindrical />
+    </params>
+    <move> <v x="15" y="4" z="14" /> </move>
+  </meshobj>
+</sector>
+@end example
+
+And here is the new way:
+
+@example
+<meshfact name="ballFact">
+  <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+  <params>
+    <sphere rimvertices="16" reversed="true" toponly="true" cylindrical="true" >
+      <radius x="2" y="1" z=".5" />
+      <center x="0" y=".5" z="0" />
+    </sphere>
+  </params>
+</meshfact>
+@dots{}
+<sector name="room">
+  <meshobj name="transpBall">
+    <plugin>crystalspace.mesh.loader.genmesh</plugin>
+    <params>
+      <factory>ballFact</factory>
+      <material>plasma</material>
+    </params>
+    <move> <v x="15" y="4" z="14" /> </move>
+  </meshobj>
+</sector>
+@end example
+
+It is important to note that the geometry defining the sphere is now in the
+factory (as with all genmeshes).
+
+If you want to create them from code then you have to get rid of using the
+@code{iBallState} and instead use @code{iGeneralFactoryState->GenerateSphere()}
+to generate the desired sphere in a genmesh factory.
+
+@subheading Stars Mesh Removed
+
+Due to limited use (and it having been broken for more then a year) the
+stars mesh has been removed.
+
+@subheading Simple Console Removed
+
+The simple console (@samp{crystalspace.console.output.simple} has been
+removed. Instead use @samp{crystalspace.console.output.standard}.
+
+@subheading Old Renderer Architecture Removal
+
+The old rendering architecture along with the old renderer plugins have been
+removed. Additionally, a few plugins, applications, classes, and methods have
+been deprecated because they are not applicable to the new rendering
+architecture. The results of the old renderer removal are summarized below.
+
+@subsubheading Removed Plugins
+
+The following plugin modules have been removed:
+
+@itemize @bullet
+@item
+@code{terrfunc} (@code{crystalspace.mesh.object.terrfunc})
+@item
+Old @code{gl3d} (@file{plugins/video/renderer/opengl})
+@item
+Old @code{soft3d} (@file{plugins/video/renderer/software})
+@item
+Old @code{null3d} (@file{plugins/video/renderer/null})
+@end itemize
+
+@subsubheading Removed Application
+
+The @samp{perftest} application has been removed, since it is no longer has any
+purpose.  For the future the @samp{csbench} application should be extended to
+provide more information.
+
+@subsubheading Removed and Renamed Files
+
+The following files were removed:
+
+@itemize @bullet
+@item
+@code{include/ivideo/vbufmgr.h}
+@end itemize
+
+The following files in @file{data/shader} were renamed:
+
+@itemize @bullet
+@item
+@code{or_lighting.xml} @result{} @code{std_lighting.xml}
+@item
+@code{or_lighting_detail.xml} @result{} @code{std_lighting_detail.xml}
+@item
+@code{or_lighting_detail_add.xml} @result{} @code{std_lighting_detail_add.xml}
+@item
+@code{or_lighting_detail_alpha.xml} @result{}
+@code{std_lighting_detail_alpha.xml}
+@item
+@code{or_lighting_portal.xml} @result{} @code{std_lighting_portal.xml}
+@end itemize
+
+@subsubheading Removed Methods and Classes
+
+The following methods have been removed from the @samp{iGraphics3D} interface:
+
+@itemize @bullet
+@item
+@code{ClearCache()}
+@item
+@code{CloseFogObject()}
+@item
+@code{DrawFogPolygon()}
+@item
+@code{DrawPolygonDebug()}
+@item
+@code{DrawPolygonFX()}
+@item
+@code{DrawPolygonMesh()}
+@item
+@code{DrawTriangleMesh()}
+@item
+@code{DumpCache()}
+@item
+@code{GetVertexBufferManager()}
+@item
+@code{GetZBuffAt()}
+@item
+@code{OpenFogObject()}
+@end itemize
+
+From @samp{iRenderView}, the following fog-related methods have been removed.
+Fog is now calculated within the renderer.
+
+@itemize @bullet
+@item
+@code{CalculateFogMesh()}
+@item
+@code{CalculateFogPolygon()}
+@end itemize
+
+From @samp{iMeshObject} and @samp{iParticle}, the following rendering-related
+methods have been removed:
+
+@itemize @bullet
+@item
+@code{Draw()}
+@item
+@code{DrawTest()}
+@end itemize
+
+Apart from these methods, the following classes and structures have been
+removed or have become private, and are no longer available to client code:
+
+@itemize @bullet
+@item
+@code{G3DFogInfo}
+@item
+@code{G3DPolygonDFP}
+@item
+@code{G3DPolygonDPFX}
+@item
+@code{G3DPolygonDPF}
+@item
+@code{G3DPolygonDP}
+@item
+@code{G3DPolygonMesh}
+@item
+@code{G3DTriangleMesh}
+@end itemize
+
+@subheading @sc{csws} Removal
+
+The long-deprecated Crystal Space Windowing System (@sc{csws}) was removed. 
+Instead use @sc{aws}.
+
+@subheading @sc{rapid} Collision Detection Plugin Removal
+
+The @sc{rapid} collision detection plugin has been removed. In addition to
+being slower than the @sc{opcode} plugin and consuming more memory, its license
+prevented its use in commercial applications.  You should instead now use the
+@sc{opcode} plugin.
+
+@subheading @code{CS_DECLARE_OBJECT_ITERATOR()} Removal
+
+The @samp{iObject} iterator creation macro @code{CS_DECLARE_OBJECT_ITERATOR()}
+has been replaced by the templated class @code{csTypedObjectIterator<>}. Given
+existing code, such as:
+
+@example
+iObject* parent = @dots{};
+CS_DECLARE_OBJECT_ITERATOR(MyFooIter, iFoo);
+MyFooIter iter(parent);
+while (iter.HasNext())
+@{
+  iFoo* foo = iter.Next();
+  @dots{}
+@}
+@end example
+
+@noindent
+Revise the code by instantiating the new template class:
+
+@example
+typedef csTypedObjectIterator<iFoo> MyFooIter;
+MyFooIter iter(parent);
+while (iter.HasNext())
+@{
+@end example
+
+@noindent
+Or, even simpler without the @samp{typedef}:
+
+@example
+csTypedObjectIterator<iFoo> iter(parent);
+while (iter.HasNext())
+@{
+@end example
+
+@subheading @samp{chunklod} Terrain Removal
+
+The @samp{chunklod} terrain plugin has been removed:
+
+@noindent
+@code{crystalspace.mesh.object.terrain.chunklod}
+
+@noindent
+Instead use the @samp{bruteblock} terrain engine.
+
+@noindent
+@code{crystalspace.mesh.object.terrain.bruteblock}
+
+@subheading @code{csRGBVector} Removed
+
+The @code{csRGBVector} class has been removed. A @code{csComparator<>} 
+specialization has been provided, so equivalent functionality can be achieved
+by simply using @code{csArray<csRGBcolor*>}.
+
+@subheading Miscellaneous Removals
+
+The following facilities have been removed because they were unused and/or of
+questionable use.
+
+@itemize @bullet
+@item
+@code{csCrystalBall} and @file{csgeom/crysball.h}
+@item
+@code{csIndPrint} and @file{csutil/indprint.h}
+@item
+@code{iMaterialHandle}.  Use @samp{iTextureHandle} or @samp{iMaterial} directly
+(whichever is more appropriate) to achieve equivalent functionality.
+@item
+@code{csRenderMeshHolderMultiple}. Equivalent functionality can be achieved by 
+using @samp{csFrameDataHolder<csDirtyAccessArray<csRenderMesh*> >}.
+@end itemize
+
+The casting macros (e.g. @code{CS_STATIC_CAST}) have been removed. Any compiler
+that does not support proper C++-style casts is likely also incapable of
+correctly supporting other advanced C++ features, e.g the use of complex
+templates in CrystalSpace.

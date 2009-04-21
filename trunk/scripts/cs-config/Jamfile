@@ -1,0 +1,265 @@
+#============================================================================
+# Rules for creating cs-config compile help script
+#============================================================================
+
+SubDir TOP scripts cs-config ;
+
+rule csConfigGen
+{
+  NotFile $(>) ;
+  LOCATE on cs-config.temppre cs-config.temppost = $(SUBDIR) ;
+  Depends $(<) : Jamconfig cs-config.temppre cs-config.temppost 
+  		 [ ConcatDirs $(TOP) scripts cs-config Jamfile ] ;
+
+  local l d e s liblist libdep libdepstr libstrings libaddstrings libbasestrs libbase libswitchcase ;
+  
+  for l in $(INSTALLEDLIBS) $(INSTALLEDLIBS_OPTIONAL)
+  {
+    libbase = [ LibraryBaseName $(l) ] ;
+    libaddstrings += "    $(l)) \
+	addlib \"-l$(libbase)\" 	\
+	;;			\
+" ;
+    libdep = ;
+    for d in $($(l)_depends)
+    {
+      local depbase = [ LibraryBaseName $(d) ] ;
+      libdep += -l$(depbase) ;
+    }
+    for e in $($(l).EXTERNALLIBS)
+    {
+      libdep += $($(e).LFLAGS) ;
+    }
+    libdepstr = "" ;
+    for s in $(libdep)
+    {
+      libdepstr = "$(libdepstr) $(s)" ;
+    }
+    libstrings += "       -l$(libbase)) DEPS=\"$(libdepstr)\" ;;\
+" ;
+    libbasestrs += "lib$(l)=$(libbase)
+" ;
+  }
+
+  # Hack to have cs-config fake indirection on ubuntu dash
+  for l in $(INSTALLEDLIBS) $(INSTALLEDLIBS_OPTIONAL)
+  {
+    # split this up since it seems impossible to escape \$
+    libbase = [ LibraryBaseName $(l) ] ;
+    libswitchcase += "   \"$(l)\"):
+      libbase=$(libbase) ;;
+" ;
+  }
+
+  # Hack to produce a makevars output similar to the 'make' build system.
+  switch $(TARGET.OS)
+  {
+  case WIN32 :
+    MAKEVARS = makevar.win32 ;
+  case MACOS_X :
+    MAKEVARS = makevar.macosx ;
+  case * :
+    MAKEVARS = makevar.unix ;
+  }
+  MAKEVARS = $(MAKEVARS:R=$(SUBDIR)) ;
+  Depends $(<) : $(MAKEVARS) ;
+
+  liblist on $(<) = [ Sort $(INSTALLEDLIBS) ] ;
+  liblist_opt on $(<) = [ Sort $(INSTALLEDLIBS_OPTIONAL) ] ;
+  libstrings on $(<) = $(libstrings) ;
+  libaddstrings on $(<) = $(libaddstrings) ;
+  libbasestrs on $(<) = $(libbasestrs) ;
+  libswitchcase on $(<) = $(libswitchcase) ;
+  ENV_VERSION on $(<) = $(PACKAGE_VERSION_LIST[1])_$(PACKAGE_VERSION_LIST[2]) ;
+
+  csConfigGen1 $(<) : $(>) ;
+}
+
+actions csConfigGen1
+{
+  cat $(SUBDIR)/cs-config.temppre > $(<)
+
+  cat >> $(<) << __END__
+# From autoconf:
+# The user is always right.
+if test "\${PATH_SEPARATOR+set}" != set; then
+  echo "#! /bin/sh" >conf\$\$.sh
+  echo  "exit 0"   >>conf\$\$.sh
+  chmod +x conf\$\$.sh
+  if (PATH="/nonexistent;."; conf\$\$.sh) >/dev/null 2>&1; then
+    PATH_SEPARATOR=';'
+  else
+    PATH_SEPARATOR=:
+  fi
+  rm -f conf\$\$.sh
+fi
+
+CS_VERSION=$(PACKAGE_VERSION_SIGNIFICANT)
+CRYSTAL="\${CRYSTAL-$(prefix)\$PATH_SEPARATOR.}"
+CRYSTAL_$(ENV_VERSION)="\${CRYSTAL_$(ENV_VERSION)-\$CRYSTAL}"
+_CRYSTAL_ACTUAL="\$CRYSTAL_$(ENV_VERSION)"
+
+# On MinGW, CRYSTAL may contain the path in one of two flavors:
+# MSYS paths, separated by $PATH_SEPARATOR, or Win32 paths, separated
+# by ';'. Since for the configure check we need MSYS paths, CRYSTAL
+# is first treated like a Win32-style list. If that yields sensible
+# results these are used subsequently. Otherwise use CRYSTAL as-is.
+if test "\`uname -s | sed -e 's+\(.*\)_.*+\1+'\`" = "MINGW32" ; then
+    NEW_CRYSTAL=''
+    my_IFS=\$IFS; IFS=\;
+    for win32_dir in \$_CRYSTAL_ACTUAL; do
+        win32_dir=\`echo \$win32_dir | tr '\\\\\\\\' '/'  | sed "s/\(.\):/\\\\/\\\\1/"\`
+        if test -d "\$win32_dir"; then
+            if test -n "\$NEW_CRYSTAL"; then
+                NEW_CRYSTAL="\$NEW_CRYSTAL\$PATH_SEPARATOR"
+            fi
+            NEW_CRYSTAL="\$NEW_CRYSTAL\$win32_dir"
+        fi
+    done
+    IFS=\$my_IFS
+    if test -n "\$NEW_CRYSTAL"; then
+        _CRYSTAL_ACTUAL="\$NEW_CRYSTAL"
+    fi
+fi
+
+my_IFS=\$IFS; IFS=\$PATH_SEPARATOR
+for p in \$_CRYSTAL_ACTUAL
+do
+  prefix="\${p}"
+  exec_prefix="\${prefix}"
+  makeout="$(LOCATE.OBJECTS)"
+  version="$(PACKAGE_VERSION)"
+  longversion="$(PACKAGE_STRING)"
+  newincdir=""
+  # try to determine if we're in a source or installed CS version
+  if test "x\$includedir_main" = "x"
+  then
+    if [ -r \${prefix}/include/$(PACKAGE_NAME)-$(PACKAGE_VERSION_SIGNIFICANT)/cssysdef.h ] ; then
+      newincdir="\${prefix}/include/$(PACKAGE_NAME)-$(PACKAGE_VERSION_SIGNIFICANT)"
+      includedir_main=\$newincdir
+    elif [ -r \${prefix}/include/cssysdef.h ] ; then
+      newincdir="\${prefix}/include"
+      includedir_main=\$newincdir
+    fi
+  fi
+  if test "x\$includedir_config" = "x"
+  then
+    if [ -r \${prefix}/include/$(PACKAGE_NAME)-$(PACKAGE_VERSION_SIGNIFICANT)/csconfig.h ] ; then
+      newincdir="\${prefix}/include/$(PACKAGE_NAME)-$(PACKAGE_VERSION_SIGNIFICANT)"
+      includedir_config=\$newincdir
+    elif [ -r \${prefix}/include/csconfig.h ] ; then
+      newincdir="\${prefix}/include"
+      includedir_config=\$newincdir
+    fi
+  fi
+  if test -n "\$newincdir"
+  then
+    if test "x\$includedir" = "x"
+    then
+      includedir="\$newincdir"
+    else
+      includedir="\$includedir\$PATH_SEPARATOR\$newincdir"
+    fi
+  fi
+done
+IFS=\$my_IFS
+if test "x\$includedir" = "x"
+then
+  includedir="$(appincdir)"
+fi
+syslibs=" $(COMPILER.LFLAGS) "
+common_cflags=" $(COMPILER.CFLAGS.MANDATORY) "
+common_cxxflags=" $(COMPILER.CFLAGS.MANDATORY) $(COMPILER.C++FLAGS.MANDATORY) "
+staticdeps="$(STATICPLUGINS.DEPENDENCIES)"
+
+makevars()
+{
+cat << "__EOF__"
+__END__
+
+  cat $(MAKEVARS) >> $(<)
+
+  echo "__EOF__" >> $(<) 
+  echo "}" >> $(<)
+
+  cat >> $(<) << __END__
+# dependencies of CS
+depends()
+{
+    case \$1 in
+ $(libstrings)
+	*)
+	    CEXFILE=`echo "\$1.cex" | sed -e "s/\-l//"`
+	    findcexfile "\$CEXFILE"
+	    if test -r "\$CEXFILE"; then
+		DEPS=\`/bin/sh \$CEXFILE --deps\`
+	    else
+		DEPS=''
+	    fi
+	    ;;                                        	    
+    esac
+}
+
+checklibname()
+{
+    case \$1 in
+ $(libaddstrings)
+    *)
+	findcexfile "\$1"
+	if test -z "\$CEXFILE"; then
+	    echo "Unknown library: \$1; consult --help for library list" 1>&2
+	    exit 1
+	fi
+	
+	addexlib "\$CEXFILE"
+        ;;
+    esac
+}
+
+liblist="\
+ $(liblist)
+"
+liblist_opt="\
+ $(liblist_opt)
+"
+
+$(libbasestrs)
+
+__END__
+
+  cat >> $(<) << __END__
+
+# Hack to do variable indirection for posix compliant systems that don't use bash (like ubuntu)
+give_libbase()
+{
+  case \$1 in
+ $(libswitchcase)
+    *)
+      # should never ever happen
+      echo "Internal error, due to unspecified libbase."
+      exit;;
+    esac
+}
+
+__END__
+
+  cat $(SUBDIR)/cs-config.temppost >> $(<)
+}
+
+
+CSCONFIGNAME = cs-config-$(PACKAGE_VERSION_SIGNIFICANT) ;
+ShellScript $(CSCONFIGNAME) : csConfigGen : nohelp ;
+
+Depends cs-config : $(CSCONFIGNAME) ;
+CS_CONFIG_GRISTED = [ DoSourceGrist cs-config ] ;
+SEARCH on $(CS_CONFIG_GRISTED) = $(SUBDIR) ;
+Depends cs-config : $(CS_CONFIG_GRISTED) ;
+Copy cs-config : $(CS_CONFIG_GRISTED) ;
+Clean clean : cs-config $(CSCONFIGNAME) ;
+Clean cs-configclean : cs-config $(CSCONFIGNAME) ;
+Depends apps : cs-config ;
+Help cs-config : "Build the cs-config script" ;
+Depends install_bin : [ DoInstall cs-config : $(bindir) : $(INSTALL_PROGRAM) ] ;
+
+Depends filelists :
+  [ DoFileListEntries $(CS_CONFIG_GRISTED) $(CSCONFIGNAME) : : cs-config ] ;

@@ -1,0 +1,33 @@
+
+<h3>Level of Detail</h3>
+<p>In PlaneShift we can use Level Of Detail (LOD) to reduce the number of polygons 
+  rendered when a model is very far from the player. This is achieved by having 
+  different models for the same object that have a decreasing number of polygons. 
+  So you can have a tree modeled in 3 versions, one with 80 polygons, a second 
+  with 40 polygons and a third with 16 polygons. The engine will calculate the 
+  distance between the player and the object and it will render the correct version 
+  accordingly. The idea behind is that at far distance the 16 polygons tree will 
+  look very similar (if not identical) to the high poly one.</p>
+<p><b>NOTE</b>: Right now LOD works only with genmeshes, do not use with other 
+  type of objects.</p>
+<p>To implement LOD in your level follow these steps:</p>
+<p>1) Create a genmesh factory and some instances as explained <a href="thinggenmesh.htm">here</a>.</p>
+<p>2) Create two lower poly version of the genmesh factory. Those must be positioned 
+  as other factories (check the genmesh chapter). Name those _n_something so those 
+  will not be exported as normal objects.</p>
+<p>3) Set these properties on the first genmesh factory (the one at higher res)</p>
+<p>LODLOW: it's the name of the genmesh factory model with low polygons<br>
+  LODMED: it's the name of the genmesh factory model with medium polygons</p>
+<p>Example:<br>
+  LODLOW=_n_newtree_lodlow<br>
+  LODMED=_n_newtree_lodmed</p>
+<p>If you want you can specify &quot;null&quot; for one of the two variables. 
+  In that case the mesh will disappear at that distance.</p>
+<p>4) Set two custom properties on the Max scene:</p>
+<p>lodmax: is the distance at which will be rendered the model with max number 
+  of polygons. If you don't specify it the default is 50<br>
+  lodmin: is the distance at which will be rendered the model with min number 
+  of polygons. If you don't specify it the default is 200<br>
+</p>
+<p align=right>Next: <a href="samples.htm">Samples</a></p>
+</body></html>

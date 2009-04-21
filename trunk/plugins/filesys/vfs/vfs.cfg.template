@@ -1,0 +1,98 @@
+;;; Virtual File System mount table
+;;;
+;;; $/ -- path delimiter (i.e. "/" on Unix; "\" on Windows)
+;;; $@ -- installation directory of Crystal Space
+;;; $* -- application resource directory; same as csGetResourceDir()
+;;; $^ -- directory in which application resides; same as csGetAppDir()
+;;; The expansions of $@, $*, and $^ always have a trailing path delimiter.
+
+; Some basic mount points
+VFS.Mount.~ = $(HOME)$/
+VFS.Mount.this = $.$/
+VFS.Mount.cdrom = $(CS_CDROM)$/
+VFS.Mount.tmp = $(CS_TMP)$/
+
+; Configuration repository
+VFS.Mount.config = $(CS_DATADIR)$/config-app$/, $(CS_DATADIR)$/config-plugins$/
+VFS.Mount.data = $(CS_DATADIR)$/
+
+; Miscellaneous resources.
+VFS.Mount.varia = $(CS_DATADIR)$/varia$/
+VFS.Mount.scripts = $(CS_SHAREDIR)$/bindings$/
+
+; Shaders
+VFS.Mount.shader = $(CS_DATADIR)$/shader$/,$(CS_DATADIR)$/shader-old$/
+; Per-user shader cache
+; Global shader cache
+VFS.Mount.shadercache/global = $(CS_DATADIR)$/shadercache.zip
+; Per-user shader cache
+VFS.Mount.shadercache/user = $(CS_LOCALAPPDATA)$/shadercache$/
+
+; The Unifont
+VFS.Mount.fonts/unifont = $(CS_DATADIR)$/unifont.zip
+; The TTF font library
+VFS.Mount.fonts/ttf   = $(CS_DATADIR)$/ttf$/, $(TTF_PATH:$.$/), $(CS_DATADIR)$/ttf-dejavu.zip, $(CS_DATADIR)$/ttf-vera.zip
+
+VFS.Mount.lev/flarge   = $(CS_MAPDIR)$/flarge$/
+VFS.Mount.lev/r3dtest  = $(CS_MAPDIR)$/r3dtest$/
+VFS.Mount.lev/projectortest  = $(CS_MAPDIR)$/projectortest$/
+VFS.Mount.lev/parallaxtest = $(CS_MAPDIR)$/parallaxtest$/
+VFS.Mount.lev/stenciltest = $(CS_MAPDIR)$/stenciltest$/
+VFS.Mount.lev/isomap   = $(CS_MAPDIR)$/isomap.zip, $(CS_MAPDIR)$/isomap$/
+VFS.Mount.lev/partsys  = $(CS_MAPDIR)$/partsys$/
+VFS.Mount.lev/terrain  = $(CS_MAPDIR)$/terrain$/
+VFS.Mount.lev/terrainf = $(CS_MAPDIR)$/terrainf$/
+VFS.Mount.lev/terraina = $(CS_MAPDIR)$/terraina$/
+VFS.Mount.lev/terrainp = $(CS_MAPDIR)$/terrainp$/
+VFS.Mount.lev/r3dsmtest = $(CS_MAPDIR)$/r3dsmtest$/
+VFS.Mount.lev/castle   = $(CS_MAPDIR)$/castle$/
+VFS.Mount.lev/castle-staticlit = $(CS_MAPDIR)$/castle-staticlit$/
+VFS.Mount.lev/castle-staticlit/bindata = $(CS_MAPDIR)$/castle-staticlit$/bindata.zip
+
+; Mount all libraries under the /lib/ directory
+VFS.Mount.lib/std/castle = $(CS_DATADIR)$/castle-tex.zip
+VFS.Mount.lib/std      = $(CS_DATADIR)$/standard.zip
+VFS.Mount.lib/stdtex   = $(CS_DATADIR)$/standard.zip
+VFS.Mount.lib/cubemap  = $(CS_DATADIR)$/cube$/
+VFS.Mount.lib/teapot   = $(CS_DATADIR)$/teapot.zip
+VFS.Mount.lib/kwartz   = $(CS_DATADIR)$/kwartz.zip
+VFS.Mount.lib/frankie  = $(CS_DATADIR)$/frankie$/
+VFS.Mount.lib/startme  = $(CS_DATADIR)$/startme.zip
+
+; CEgui test
+VFS.Mount.ceguitest  = $(CS_DATADIR)$/ceguitest$/
+
+; Mount for unittest
+VFS.Mount.lev/unittest = $(CS_DATADIR)$/unittest$/
+; Data for g2dtest
+VFS.Mount.lib/g2dtest  = $(CS_DATADIR)$/g2dtest$/
+
+; The following should not change too often...
+; The idea is that everything that should be changed (such as CDROM variable)
+; is set by some sort of setup (installation) program.
+; Note that variables in VFS.Platform. section will override any
+; variables in VFS.PlatformAlias. section.
+VFS.Alias.Unix = VFS.Unix
+VFS.Alias.MacOS/X = VFS.Unix
+VFS.Alias.Win32 = VFS.CP/M
+
+; strange key names follow:
+; VFS.Unix.. means key '.' in section VFS.Unix.*
+; VFS.Unix... means key '..' in section VFS.Unix.*
+VFS.Unix.. = .
+VFS.Unix... = ..
+VFS.Unix.CS_CDROM = /mnt/cdrom
+VFS.Unix.CS_TMP = /tmp
+; This is true at least for systems using XFree86
+VFS.Unix.TTF_PATH = /usr/X11R6/lib/X11/fonts/Truetype/, /usr/X11R6/lib/X11/fonts/TTF/
+VFS.Unix.CS_LOCALAPPDATA = $(HOME)$/.crystalspace
+
+VFS.CP/M.. = .
+VFS.CP/M... = ..
+VFS.CP/M.HOME = $(HOMEDIR:$(HOMEPATH:.))
+VFS.CP/M.CDROM = x:
+VFS.CP/M.TMP = $(TEMP:$(TMP:$(SYSTEMROOT)$/temp))
+
+; The standard location of TTF fonts is the X:\Windows\fonts directory
+VFS.Win32.TTF_PATH = $(SYSTEMROOT)$/fonts$/
+VFS.Win32.CS_LOCALAPPDATA = $(LOCALAPPDATA)$/CrystalSpace

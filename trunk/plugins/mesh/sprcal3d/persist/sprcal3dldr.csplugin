@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- sprcal3dldr.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.loader.factory.sprite.cal3d</name>
+        <implementation>csSpriteCal3DFactoryLoader</implementation>
+        <description>Crystal Space SpriteCal3D Mesh Factory Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.loader.sprite.cal3d</name>
+        <implementation>csSpriteCal3DLoader</implementation>
+        <description>Crystal Space SpriteCal3D Mesh Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.factory.sprite.cal3d</name>
+        <implementation>csSpriteCal3DFactorySaver</implementation>
+        <description>Crystal Space SpriteCal3D Mesh Factory Saver</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.sprite.cal3d</name>
+        <implementation>csSpriteCal3DSaver</implementation>
+        <description>Crystal Space SpriteCal3D Mesh Saver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

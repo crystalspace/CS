@@ -1,0 +1,18 @@
+<shader compiler="xmlshader" name="postproc_shadow_vsm_gauss_5x5_h">
+  <technique priority="200">
+    <pass>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <texture destination="Texture1" name="tex diffuse" />
+      <fp plugin="glcg">
+	<cgfp>
+	  <variablemap variable="pixel size" destination="pixelSize" />
+	  <variablemap name="direction" destination="direction" type="vector2">1,0</variablemap>
+	  <variablemap name="radius" destination="radius" type="float">2</variablemap>
+	  <program>
+	    <?Include /shader/postproc/gauss.cginc ?>
+	  </program>
+	</cgfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>

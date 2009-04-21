@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- terrain2ldr.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.loader.factory.terrain2</name>
+        <implementation>csTerrain2FactoryLoader</implementation>
+        <description>Terrain Factory Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.loader.terrain2</name>
+        <implementation>csTerrain2ObjectLoader</implementation>
+        <description>Terrain Object Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.factory.terrain2</name>
+        <implementation>Terrain2FactorySaver</implementation>
+        <description>Terrain Factory Saver</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.terrain2</name>
+        <implementation>Terrain2ObjectSaver</implementation>
+        <description>Terrain Object Saver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

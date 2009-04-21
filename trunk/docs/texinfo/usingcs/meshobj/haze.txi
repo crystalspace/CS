@@ -1,0 +1,125 @@
+@c -*-texinfo-*-
+@node MeshObject Haze, MeshObject Watermesh, MeshObject Emit, MeshObject
+@subsection Haze Mesh Object
+@cindex MeshObject
+@cindex Haze
+@cindex Volumetric Light
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iHazeState}
+@cindex @code{iHazeFactoryState}
+
+This mesh object represents a 'haze' which is a bit like
+volumetric light. For example you can show this way moody
+rays from church windows.
+
+@subsubheading Basic Structure
+
+The following @sc{scf} class names are used (for @code{csLoadPlugin}):
+
+@itemize @bullet
+@item
+Type plugin: @code{crystalspace.mesh.object.haze}
+@item
+Loader plugin: @code{crystalspace.mesh.loader.haze}
+@item
+Factory loader plugin: @code{crystalspace.mesh.loader.factory.haze}
+@end itemize
+
+Objects in this plugin implement the following @sc{scf} interfaces, which you
+can retrieve with @code{scfQueryInterface}:
+
+@itemize @bullet
+@item
+@emph{MeshObject}
+@itemize @bullet
+@item
+Implements @samp{iMeshObject}
+@item
+Implements @samp{iHazeState}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectFactory}
+@item
+Implements @samp{iHazeFactoryState}
+@end itemize
+@item
+@emph{MeshObjectType}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectType}
+@end itemize
+@end itemize
+
+@subsubheading Factory State Interface
+
+Use the @samp{iHazeFactoryState} @sc{scf} interface to access settings for
+a haze factory.  The definition of this interface can be found in
+@file{CS/include/imesh/haze.h} and that is also the include file you need
+to include in your applications to use this plugin.  Using this interface you
+can access the direction, origin, layers, scale and various other 
+configuration parameters for a haze factory.
+
+@subsubheading Factory Loader
+
+The haze mesh factory loader has no parameters.
+
+@subsubheading Object State Interface
+
+@samp{iHazeState} (residing in @file{CS/include/imesh/haze.h}) is
+an empty @sc{scf} interface.
+
+@subsubheading Object Loader
+
+@table @code
+@item <material> @dots{} </material>
+Material name.
+@item <mixmode> @dots{} </mixmode>
+Color mixing mode.
+@item <origin x="" y="" z="" />
+Set the origin of the texture.
+@item <directional x="" y="" z="" />
+Set the direction of the texture.
+@item <layer> @dots{} </layer>
+Layer of the haze mesh.
+Inside layer:
+@item <scale> @dots{} </scale>
+Scale of the texture.
+@item <hazebox> @dots{} </hazebox>
+Draws box shape.
+Inside hazebox:
+@item <min x="" y="" z="" />
+First corner of the box.
+@item <max x="" y="" z="" />
+Last corner if the box.
+@example
+<layer>
+  <scale></scale>
+  <hazebox>
+    <min x="" y="" z="" />
+    <max x="" y="" z="" />
+  </hazecone>
+</layer>
+@end example
+@item <hazecone p="" q="" number=""> @dots{} </hazecone>
+Draws cone shape. Give p - radius of the top, q - radius of the bottom
+and number of faces to create cone mesh.
+Inside hazecone:
+@item <min x="" y="" z="" />
+Position of the cone's tip.
+@item <max x="" y="" z="" />
+Position of the cone's bottom.
+@example
+<layer>
+  <scale></scale>
+  <hazecone p="" q="" number="">
+    <min x="" y="" z="" />
+    <max x="" y="" z="" />
+  </hazecone>
+</layer>
+@end example
+@end table

@@ -1,0 +1,4 @@
+SubDir TOP data shader water ;
+
+InstallData [ Wildcard *.afp *.avp *.cgfp *.cgvp *.xml ] :
+  data shader water ;

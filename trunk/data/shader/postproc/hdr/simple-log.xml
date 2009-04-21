@@ -1,0 +1,35 @@
+<shader compiler="xmlshader" name="postproc_hdr_simple_log">
+   <shadervars>
+	<shadervar name="hdr scale" type="vector2">1,1</shadervar>
+   </shadervars>
+  <technique priority="200">
+    <pass>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <!-- vp plugin="glfixed" / -->
+      <texture destination="Texture1" name="tex diffuse" />
+      <fp plugin="glcg">
+	<cgfp>
+	  <variablemap variable="hdr scale" destination="hdrScale" assumeconst="yes" />
+	  <program>
+	      <![CDATA[
+
+	      float4 main (in float2 TexCoord : TEXCOORD0,
+			uniform sampler2D Texture1, uniform float2 hdrScale) : COLOR
+	      {
+		float4 inCol = tex2D (Texture1, TexCoord)*hdrScale.x;
+		float lum = dot (inCol.rgb, float3 (0.2126, 0.7152, 0.0722));
+		float prescale = 2;
+		float postscale = 0.5;
+		float base = 4; // higher means darker
+		float newLum = (log2 (lum * prescale + 1) / log2 (base)) * postscale;
+
+		return float4 (inCol.rgb*(newLum/lum), inCol.a);
+	      }
+
+	      ]]>
+	  </program>
+	</cgfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>

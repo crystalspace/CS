@@ -1,0 +1,37 @@
+@c -*-texinfo-*-
+@node Genesis, Authors, Feedback, CS Introduction
+@section Genesis of Crystal Space
+@cindex Genesis
+
+The Crystal Space project was initiated by Jorrit Tyberghein.  Here are a few
+words from Jorrit, himself.
+
+@quotation
+I created this project by accident.  I was always fascinated by games like
+Doom, Hexen, Duke Nukem 3D and later Quake and I wondered how one would write
+such a game.  My first effort was a Doom like engine.  It had some nice
+features (like static lighting with shadows and sectors above other sectors)
+but it was @emph{very slow}! I abandoned the project (it became a bit clumsy)
+and forgot about 3D for a short while.  But the urge was still there.  Every
+now and then I would think about 3D engines.  But I wasn't thinking about Doom
+anymore.  I wanted something more.  After months of thinking I still wasn't
+planning to start writing code.  But then I read an article about portals.  I
+wasn't sure what they were but from the little explanation in that article
+things started to become clear.  Portals were the perfect way for me to write
+a 3D engine quickly.  It was a very easy technique with which I could achieve
+real 6@sc{dof} 3D! At that point the knowledge I gathered during the past few
+months had to get out of my head.  In a bit more than one month I wrote the
+first version of Crystal Space (during my free time).  At that point I had a
+portal engine with 6@sc{dof}, colored static lighting with shadows, primitive
+scripting, mipmapping and moving objects.  Since time became a precious
+resource I decided to release Crystal Space to the general public and put an
+announcement on the newsgroup @samp{comp.graphics.algorithms}.  And this was
+the start of the Crystal Space project.
+
+I must say that I didn't expect the kind of response that I got (I received
+mails from hundreds of people and all were very positive).  Many thanks to all
+of you.
+@end quotation
+
+@noindent
+Jorrit can be reached via email at @email{jorrit.tyberghein@@gmail.com}.

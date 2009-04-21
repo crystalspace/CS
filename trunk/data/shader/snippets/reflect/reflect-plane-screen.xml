@@ -1,0 +1,187 @@
+<!--
+  Copyright (C) 2008 by Frank Richter
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet type="compound">
+  <!-- Render a reflection of the current view -->
+  <technique priority="100">
+    
+    <!-- Put the computation of the reflection TC into a separate snippet
+	 so weaver only emits it once. -->
+    <snippet id="reflTC">
+      <technique priority="100">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+	
+	<input name="positionO" type="position4_object" />
+	
+	<input name="ModelViewProj" type="float4x4" default="complex" private="yes">
+	  <block location="cg:vertexIn">
+	    <uniform type="float4x4" name="ModelViewProj" binding="state.matrix.mvp" />
+	  </block>
+	  
+	  <block location="cg:vertexMain">
+	    ModelViewProj = vertexIn.ModelViewProj;
+	  </block>
+	</input>
+	
+	<input name="reflectXform" type="float4" default="complex" private="yes">
+	  <block location="cg:vertexIn">
+	    <uniform type="float4" name="reflectXform" />
+	  </block>
+	  
+	  <block location="cg:variablemap">
+	    <variablemap variable="reflection coord xform" destination="vertexIn.reflectXform" />
+	  </block>
+	  
+	  <block location="cg:vertexMain">
+	    reflectXform = vertexIn.reflectXform;
+	  </block>
+	</input>
+	
+	<input name="textureToScreen" type="float2" default="complex" private="yes">
+	  <block location="cg:fragmentIn">
+	    <uniform type="float2" name="textureToScreen" />
+	  </block>
+	  
+	  <block location="cg:variablemap">
+	    <variablemap destination="fragmentIn.textureToScreen" type="expr">
+	      <sexp>(make-vector
+		(/ 1 (elt1 "reflection coord xform"))
+		(/ 1 (elt2 "reflection coord xform"))
+		)
+	      </sexp>
+	    </variablemap>
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    textureToScreen = fragmentIn.textureToScreen;
+	  </block>
+	</input>
+	
+	<block location="cg:vertexToFragment">
+	  <varying type="texcoord4" name="reflectionTC" />
+	</block>
+	
+	<block location="cg:vertexMain">
+	  reflectionTC = mul (ModelViewProj, positionO); // == position_screen
+	  float3 reflScale = float3 (reflectXform.xy, 0.5);
+	  float3 reflXlate = float3 (reflectXform.zw, -0.5) * reflectionTC.w;
+	  reflectionTC.xyz = reflectionTC.xyz * reflScale + reflXlate;
+	</block>
+	
+	<block location="cg:fragmentMain">
+	  tcToScreen = textureToScreen;
+	</block>
+	
+	<output name="reflectionTC" type="texcoord4" />
+	<output name="tcToScreen" type="float2" />
+      </technique>
+    </snippet>
+    
+    <snippet id="actualReflect">
+      <technique priority="100">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+	
+	<input name="positionW" type="position4_world" />
+	
+	<input name="texReflect" type="tex2d" default="complex">
+	  <block location="pass">
+	    <texture name="tex plane reflect" destination="fragmentIn.texReflect" />
+	  </block>
+	  
+	  <block location="cg:fragmentIn">
+	    <uniform type="tex2d" name="texReflect" />
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    texReflect = fragmentIn.texReflect;
+	  </block>
+	</input>
+	<input name="texReflectDepth" type="tex2d" default="complex">
+	  <block location="pass">
+	    <texture name="tex plane reflect depth" destination="fragmentIn.texReflectDepth" />
+	  </block>
+	  
+	  <block location="cg:fragmentIn">
+	    <uniform type="tex2d" name="texReflectDepth" />
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    texReflectDepth = fragmentIn.texReflectDepth;
+	  </block>
+	</input>
+	
+	<input name="projectedToWorld" type="float4x4" default="complex" private="yes">
+	  <block location="cg:fragmentIn">
+	    <uniform type="float4x4" name="projectedToWorld" />
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    projectedToWorld = fragmentIn.projectedToWorld;
+	  </block>
+	  
+	  <block location="cg:variablemap">
+	    <variablemap destination="fragmentIn.projectedToWorld" type="expr">
+	      <sexp>(* "world2camera transform" "projection transform inverse")</sexp>
+	    </variablemap>
+	  </block>
+	</input>
+	
+	<input name="reflTC" type="texcoord4" />
+	<input name="reflTC2screen" type="float2" />
+	
+	<input name="perturb" type="float2" default="value" defval="0,0" />
+	
+	<block location="cg:vertexMain">
+	  surfaceColor = float4 (0, 0, 0, 1);
+	  surfaceColor_attr_perfragment = true;
+	  mirroredPointDist = 0;
+	  mirroredPointDistSat = 0;
+	</block>
+	
+	<block location="cg:fragmentMain">
+	  float3 tc = reflTC.xyw;
+	  float inv_reflW = 1 / reflTC.w;
+	  
+	  float camDepth = tex2Dproj (texReflectDepth, tc).x*-2 + 1;
+	  float2 screenPos = (reflTC.xy * reflTC2screen * inv_reflW)+float2(-1,1);
+	  float4 positionProjected = float4 (
+	    screenPos.x, screenPos.y, camDepth, 1);
+	  float4 positionUnprojectedW = mul (projectedToWorld, positionProjected);
+	  positionUnprojectedW /= positionUnprojectedW.w;
+	  
+	  mirroredPointDist = length (positionW.xyz - positionUnprojectedW.xyz);
+	  
+	  float perturbWeight = saturate (mirroredPointDist);
+	  tc.xy += perturb * perturbWeight;
+	  surfaceColor = tex2Dproj (texReflect, tc);
+	  surfaceColor_attr_perfragment = true;
+	  
+	  mirroredPointDist = max (mirroredPointDist, 0);
+	  mirroredPointDistSat = saturate (mirroredPointDist);
+	</block>
+	
+	<output name="surfaceColor" type="rgba">
+	  <attribute name="perfragment" type="bool" />
+	</output>
+	<output name="mirroredPointDist" type="float" />
+	<output name="mirroredPointDistSat" type="float" />
+      </technique>
+    </snippet>
+    
+    <connection from="reflTC" to="actualReflect" />
+  </technique>
+</snippet>

@@ -1,0 +1,12 @@
+SubDir TOP docs doxygen ;
+
+if $(CMD.DOXYGEN)
+{
+CSDOXY_FILES = [ Wildcard *.css *.png ] ;
+Doxygen apihtml    : pubapi.dox $(CSDOXY_FILES) : html api    : index.html ;
+DoxyTag apitags    : pubapi.dox : doxytag : crystalspace.tag ;
+Doxygen apidevhtml : devapi.dox $(CSDOXY_FILES) : html apidev : index.html ;
+Help apihtml    : "Build the public API reference manual"    ;
+Help apitags    : "Build a Doxygen tagfile for the public API reference"    ;
+Help apidevhtml : "Build the developer API reference manual" ;
+}

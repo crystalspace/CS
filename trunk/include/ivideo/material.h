@@ -1,0 +1,95 @@
+/*
+    Copyright (C) 2000 by Jorrit Tyberghein
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#ifndef __CS_IVIDEO_MATERIAL_H__
+#define __CS_IVIDEO_MATERIAL_H__
+
+/**\file
+ * Material interface
+ */
+/**
+ * \addtogroup gfx3d
+ * @{ */
+ 
+#include "csutil/scf_interface.h"
+#include "csutil/strset.h"
+
+#include "ivideo/shader/shader.h"
+
+
+/// Name string for the material "flat color" shader var
+#define CS_MATERIAL_VARNAME_FLATCOLOR		"mat flatcolor"
+/// Name string for the material "diffuse" texture
+#define CS_MATERIAL_TEXTURE_DIFFUSE		"tex diffuse"
+
+struct iTextureHandle;
+struct csRGBpixel;
+
+/**
+ * This class represents a material as seen from the engine
+ * view. Because it is also a shader variable context it can be used directly 
+ * for rendering.
+ *
+ * Main creators of instances implementing this interface:
+ * - iEngine::CreateBaseMaterial()
+ *
+ * Main ways to get pointers to this interface:
+ * - iMaterialWrapper::GetMaterial()
+ *
+ * Main users of this interface:
+ * - 3D renderer implementations (iGraphics3D).
+ */
+struct iMaterial : public virtual iShaderVariableContext
+{
+  SCF_INTERFACE (iMaterial, 2, 2, 1);
+
+  /**
+   * Associate a shader with a shader type
+   */
+  virtual void SetShader (csStringID type, iShader* shader) = 0;
+
+  /**
+   * Get shader associated with a shader type
+   */
+  virtual iShader* GetShader (csStringID type) = 0;
+
+  /**
+   * Get all Shaders.
+   */
+  virtual const csHash<csRef<iShader>, csStringID>& GetShaders() const =0;
+
+  /**
+   * Get the base ("tex diffuse") texture from the material.
+   */
+  virtual iTextureHandle *GetTexture () = 0;
+
+  /**
+   * Get a texture from the material.
+   */
+  virtual iTextureHandle* GetTexture (CS::ShaderVarStringID name) = 0;
+
+  /**
+   * Get shader for the first type from \a types that as a shader attached.
+   */
+  virtual iShader* GetFirstShader (const csStringID* types,
+    size_t numTypes) = 0;
+};
+
+/** @} */
+
+#endif // __CS_IVIDEO_MATERIAL_H__

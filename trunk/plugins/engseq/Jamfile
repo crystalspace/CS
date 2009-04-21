@@ -1,0 +1,8 @@
+SubDir TOP plugins engseq ;
+
+Description engseq : "Engine Sequence Manager plugin" ;
+
+Plugin engseq
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith engseq : crystalspace ;

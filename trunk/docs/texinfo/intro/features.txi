@@ -1,0 +1,184 @@
+@c -*-texinfo-*-
+@node Feature List, Where to Get, DocGuide, CS Introduction
+@section Feature List
+@cindex Features
+
+The first feature to mention here is that Crystal Space is an Open Source
+project (or a Free Software project, depending on your religion) that is
+freely available under the @sc{gnu} Lesser General Public License
+(@sc{gnu lgpl}). @xref{Licenses}. This means a number of things for developers,
+but perhaps most important is that any program you write may freely link to the
+Crystal Space libraries.
+
+The second important feature of Crystal Space is that it is written to run
+under a wide variety of hardware and software platforms. As of this writing
+Crystal Space has been known to run on the following systems. Note that if a
+system is listed here it does not necessarily mean that it is 100% supported:
+
+@itemize @bullet
+@item
+Microsoft@registeredsymbol{} Windows (9x/@sc{nt}/@sc{me}/2000/@sc{xp})
+
+@item
+Unix@registeredsymbol{} like Operating Systems (@sc{gnu}
+Linux@registeredsymbol{}, FreeBSD@registeredsymbol{}, etc.)
+
+@item
+Apple@registeredsymbol{} Mac OS@registeredsymbol{} X
+@end itemize
+
+@noindent
+Here are some of just some of Crystal Space's features in no particular order.
+Whenever there is some documentation on the subject this is marked after
+the feature. The most useful documentation comes first.
+
+@c This used to be listed by library and plug-in, but I found that organization
+@c redundant after looking at some other sections of the documentation,
+@c namely the directory hierarchy section
+
+@itemize @bullet
+@item
+Geometric utility library with handy classes such as 2D and 3D vectors,
+matrices, transforms, quaternions, kdtree, axis aligned and oriented bounding
+box routines, rectangle subdivision, etc. @xref{csGeom}.
+
+@item
+General utility library with stuff like templated arrays, smart pointers,
+hash maps, object registry, plugin manager, radix sort, bit array, optimized
+allocators, strings, command-line parsing, configuration files, and more. 
+@xref{csUtil}. @xref{The Basics}. @xref{Configuration File}.
+
+@item
+Higher level tool library containing things like some example procedural
+textures (plasma, fire, and water), full screen effects, collider support,
+texture generation tools, etc.
+
+@item
+Graphics utility library with simple tools to compute mipmaps, color 
+quantization, calculation of color gradients, and more.
+
+@item
+Shared Class Facility @sc{scf} allowing for proper decoupling of interface
+and implementation and also allows for dynamically loadable modules 
+It provides a flexible plug-in system which is used extensively by Crystal 
+Space itself but also allows third-party creation of plugins. @xref{SCF}.
+@xref{SCF}. @xref{The Basics}. @xref{HOWTO Create Your Own Plugin}.
+
+@item
+Virtual file system and transparent support for @sc{zip} files. This
+allows cross-platform access to game data files. @xref{VFS}.
+
+@item
+Flexible and extensible event system.
+
+@item
+Full screen effects (fading, whiteout, etc).
+
+@item
+Level of Detail @sc{lod}. @xref{Level of Detail}.
+
+@item
+Various types of mesh objects: particle meshes, terrain mesh, triangle meshes,
+haze mesh (bit like volumetric light), @dots{}.
+@dots{}.
+@xref{MeshObject}.  @xref{MeshObject Genmesh}.
+@xref{HOWTO Create Genmesh}.
+
+@item
+Animated 3D models (3D sprites) using frame based animation. @xref{Animation}.
+@xref{MeshObject Spr3D}.
+
+@item
+Animated 3D models (AniMesh) using a skeletal animation system with good support
+for hardware skinning.
+
+@item
+Animated Cal3D models using skeletal based animation using the 
+@file{sprcal3d} plugin. @xref{MeshObject SprCal3D}.
+
+@item
+2D animations.
+
+@item
+Quake @sc{md3} and @sc{mdl} to Crystal Space convertor.
+@xref{md32spr Tutorial}. Additionally Crystal Space can read @sc{md2}
+and @sc{3ds} models directly.
+
+@item
+Crystal Space native windowing system using CEGUI.
+
+@item
+Cross-platform support for hardware rendering via OpenGL as well as a special
+``null'' renderer for applications like game servers. @xref{3D Renderer}.
+
+@item
+Supports various common image formats (@sc{bmp}, @sc{dds}, @sc{gif}, @sc{jpg}, 
+@sc{mng}, @sc{png}, @sc{tga}).
+
+@item
+Portals and sectors which allow for flexible world creation.
+@xref{Portal Engine}.
+
+@item
+Visibility culling based on kd-tree with coverage buffers (Dynavis).
+@xref{Visibility Culling}.
+
+@item
+Lighting: static, pseudo-dynamic, dynamic, halos, shadows, stencil shadows.
+@xref{Lighting}. @xref{HOWTO Pseudo DynLight}.
+
+@item
+Multiple cameras. @xref{HOWTO Camera Movement}.
+
+@item
+Powerful material support. Shaders and textures can be assigned arbitrarily 
+to materials allowing great flexibility. Shaders support @sc{cg}, @sc{arb}, and
+@samp{fixed function} language. @xref{Texture Mapping}.
+
+@item
+Procedural textures. @xref{ProcTextures}. @xref{Texture Mapping}.
+
+@item
+Cross-platform support for sound rendering. Supports @sc{wav} and @sc{ogg}
+sounds. @xref{Sound Drivers}.
+
+@item
+Terrain engine with support for texture splatting (blending multiple materials 
+on a terrain) and Level Of Detail @sc{lod}. @xref{MeshObject TerrFunc}.
+
+@item
+Particle system to make fire, explosions, rain, snow, fountains, and much
+more. @xref{MeshObject Particles}.
+
+@item
+Collision detection (using @sc{opcode}) or full physics using
+the @sc{ode} or @sc{bullet} external libraries.
+@xref{Basic Collision Detection}. @xref{Physics ODE}.
+
+@item
+Powerful sequence manager to control movement, animation and other
+features in a world. @xref{Sequence Manager}.
+
+@item
+Built-in support for TrueType fonts. @xref{HOWTO Use custom font}.
+
+@item
+Unicode text output.
+
+@item
+@sc{xml}-based map format. @xref{XML File Format},
+@xref{Tutorial Simple Map}.
+
+@item
+Scripting bindings (Python, Perl, Java). @xref{Scripting Languages}.
+
+@item
+Plugin for integrated movie recording. @xref{HOWTO Recording Movies}.
+
+@item
+Pull-down console that you can integrate in your own games.
+@xref{Config Console}.
+
+@item
+Debugging systems.
+@end itemize

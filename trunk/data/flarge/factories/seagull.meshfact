@@ -1,0 +1,22 @@
+<library>
+    <textures />
+    <materials />
+    <meshfact name="seagull">
+        <plugin>spr2dFact</plugin>
+        <params>
+            <v x="-4" y="0.5" />
+            <v x="1" y="0.5" />
+            <v x="1" y="-0.5" />
+            <v x="-4" y="-0.5" />
+            <uv u="0" v="0" />
+            <uv u="1" v="0" />
+            <uv u="1" v="1" />
+            <uv u="0" v="1" />
+            <color red="1" green="1" blue="1" />
+            <color red="1" green="1" blue="1" />
+            <color red="1" green="1" blue="1" />
+            <color red="1" green="1" blue="1" />
+            <lighting>no</lighting>
+        </params>
+    </meshfact>
+</library>

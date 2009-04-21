@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh haze object ;
+
+Description haze : "Haze mesh object plugin" ;
+
+Plugin haze
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith haze : crystalspace ;
+
+CompileGroups haze :  meshes ;

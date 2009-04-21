@@ -1,0 +1,202 @@
+@c -*-texinfo-*-
+@node lighter2 User's Manual, lighter2 Developer's Manual, Using lighter2, Using lighter2
+@subsection @code{lighter2} User's Manual
+@cindex Using @code{lighter2} User's Manual
+
+@heading Introduction
+
+@code{lighter2} is a tool to compute @emph{static lighting} for a CrystalSpace
+world. 
+
+@emph{Static} means that the lighting effects on objects in the world
+are precomputed in a preprocessing step during and after modelling of the 
+world. The benefit is that it is very cheap to render; it makes no difference
+if a world uses one or one thousand lights, the runtime performance is the
+same. Shadows are supported as well. However, as the name ``static'' implies,
+the lighting can't be changed at runtime - that is, moving a light source
+won't have an effect on statically lit geometry.
+
+@c Mention GI and alpha shadows once we have them
+
+The opposite is @emph{dynamic lighting} which is computed entirely at runtime.
+This means that light sources can be moved as desired, with changes immediately
+being reflected; however, shadows and multiple light sources all increase the
+runtime cost of lighting.
+
+In practice, static and dynamic light can be mixed: lights sources that don't
+change their position (e.g. a streetlight) can be computed statically, while
+moving light sources (e.g. a flashlight held by the player) are computed
+dynamically.
+
+@heading Basic Usage
+
+@code{lighter2} is usually invoked from the command line:
+
+@example
+lighter2 [options] <map file>
+@end example
+
+@code{options} optionally specify one or more command-line options (which are
+described in the course of this section). @code{map file} specifies the path to
+a directory or @sc{zip} file containing an @sc{xml} map file named @file{world}
+or the direct file name of an @sc{xml} map file. @emph{Note:} it is recommended
+to extract worlds in @sc{zip} files before lighting as this will result in
+noticeably faster disk input/output, especially when the results are saved.
+
+Once started, lighting will be computed for the world without further user
+intervention being necessary.
+
+@heading Light computation
+
+Lighting for objects is either computed as a @emph{lightmap} or
+@emph{per-vertex}.
+
+@emph{Lightmap lighting} can be thought of as a grid being laid over surfaces
+in the world and the lighting for a surface being computed at the grid points.
+
+The distribution of lighting grid points for a surface is controlled by the
+@emph{lightmap density}. This density specifies the amount of sample points 
+in u- respectively v-direction of the surface, measured in points per world 
+unit. E.g. a density of 2 means 2 by 2 sample points for a square of 
+1 by 1 world units of a surface. If a world unit equals one meter, this would 
+mean a lighting value is computed every 0.5m.
+
+Increasing the lightmap density means shadows get more detailed, but lightmaps
+also get bigger (and more lightmaps may be produced).  Decreasing the lightmap
+density reduces lightmap sizes and amounts, but also means less detailed and
+blurrier shadows. However, it may make sense for cases where shadows are not
+very detailed anyway (such as large outdoor surfaces).
+
+The default lightmap density is 2x2, which can usually be considered ``low'' 
+quality. A density of 8x8 can be considered ``medium'' quality and 16x16 as
+``high'' quality and sufficient in most cases.
+
+@emph{Per-Vertex lighting} means that lighting for surfaces is computed at
+its vertices.
+
+@subheading When to Use Per-vertex Lighting
+
+For objects that consist of relatively large and few surfaces lightmap lighting
+is great: light is sampled at a lot of points distributed over the surfaces,
+giving good light and shadow details. Using per-vertex lighting for such kind
+of objects would mean that lighting is only sampled at the surface corner
+and interpolated over the surface, meaning much detail is lost.
+
+However, on highly tesselated objects (ie lots of small surfaces) lightmap 
+lighting usually produces sub-par results. Due to the way the lightmapper 
+works it can happen that a lot of seams are visible (especially when surfaces 
+are smaller than the spacing of the lightmap grid). But if an object is
+highly tesselated it usually means that there are so many vertices so close
+together that sampling lighting at these can already give sufficient light
+and shadow detail, giving results as good as lightmaps, even though lighting
+for individual surfaces is only interpolated over them.
+
+@ifnotinfo
+Below is a comparison between different lightmap densities and per-vertex
+lighting on a relatively highly tesselated, round object:
+
+@picturess{content,lighter2,pvlcompare}
+
+At the lowest used density (4x4), the object appears rather un-smooth with a
+number of visible edges and shadow issues. At the next density -- 16x16,
+a 16-fold increase from the lowest lightmap resolution -- the appearance is
+smoother, but still some visible artifacts remain.  With the highest density
+-- 64x64 -- the object looks acceptable, but the price being a ridiculously
+high lightmap density which is directly reflected in a hight number of lightmaps
+needed, high runtime memory usage and, ultimatively, lower runtime performance. 
+In comparison, the vertex-lit variant has a bit less detailed shadows, but
+looks more smooth overall with zero visible edges. Per-vertex lighting also has
+only low memory requirements.
+@end ifnotinfo
+
+Per-vertex lighting can also be beneficial on objects quite the opposite: when
+surfaces are extremely large, lightmaps will also be. If a large object is
+lit in such a way that very few shadows are cast on it, meaning that the
+lighting is very smooth on the surfaces and varies only little, there is
+no benefit from using lightmaps, as the shadowing detail they can possible 
+provide is not present. Using per-vertex lighting on such an object can save
+resources by omitting the lightmaps with little visual difference.
+
+@heading Setting Global Options
+
+Some options are ``global'' and affect all meshes or factories or the execution
+of @code{lighter2} itself. These options can be set in two ways: the command
+line and a configuration file.
+
+For example, the global option @samp{foo} can be set to the value @samp{bar} 
+in any of the following ways:
+@itemize @bullet
+@item On the command line by specifying @code{-foo=bar}.
+@item In a configuration file by setting the key @samp{Lighter2.foo=bar}.
+The configuration file can be utilized via CrystalSpace's @code{-cfgfile}
+command line option.
+@item In @file{lighter2.cfg} by setting the key @samp{Lighter2.foo=bar}.
+@end itemize
+
+Note that this is list is ordered by precedence -- e.g. a command line option
+will always override an option set in a configuration file, and a
+user-specified configuration file will always override options from
+@file{lighter2.cfg}.
+
+@heading List of Options
+
+@subheading Lightmap Density
+
+Please see the ``Light computation'' section above for an explanation of
+lightmap density.
+
+@itemize @bullet
+@item Can be set on mesh factories.
+@item Can be set globally: @code{lmdensity}
+@end itemize
+
+@subheading Per-Vertex Lighting
+
+Per-vertex lighting means that lighting is not computed on a grid laid over the
+surfaces but at the vertices of a mesh.
+
+For a discussion of cases where using per-vertex lighting can be beneficial
+read the paragraph ``When to Use Per-vertex Lighting''.
+
+@itemize @bullet
+@item Can be set on mesh factories.
+@item Can be set on mesh objects. Note that if per-vertex lighting has been
+  enabled for a factory it can't be disabled for objects of that factory.
+@end itemize
+
+@subheading Disable self shadows
+
+Disables casting of shadows from an object onto itself.
+
+@itemize @bullet
+@item Can be set on mesh factories.
+@item Can be set on mesh objects.
+@end itemize
+
+@subheading Advanced Options
+
+@subsubheading Black Threshold
+
+This controls the threshold of a lightmap pixel below which it is considered
+black. Can be used to "cull" away lightmaps that have only very, very low
+lighting values. However, while setting this value high may cause less 
+lightmaps to be produced, it may also cause visible lighting artifacts
+(as low lightmap values are actually amplified at runtime).
+
+@itemize @bullet
+@item Can be set globally: @code{blackthreshold}.
+@end itemize
+
+@subsubheading Normals Tolerance
+
+When computing the lightmap layout (that is, determining the area of the
+lightmap onto which a surface is mapped), coplanar surfaces are layouted
+adjacent to each other.  However, in practice, due to inaccuracies etc.
+some surfaces may not be exactly coplanar, but close enough to be
+practically considered as such.  The normals tolerance specifies the
+maximum angle between two surface normals (in degrees) at which the
+surfaces are still considered coplanar. 
+
+@itemize @bullet
+@item Can be set globally: @code{normalstolerance}.
+@end itemize

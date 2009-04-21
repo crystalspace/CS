@@ -1,0 +1,55 @@
+<cgvp>
+<variablemap variable="bones" destination="Bones"/>
+<variablemap variable="light ambient" destination="Ambient"/>
+<program>
+<![CDATA[
+
+struct app2vertex {
+	float3 Position : POSITION;
+	float2 TexCoord : TEXCOORD0;
+	float4 BoneData;
+};
+
+struct vertex2fragment { 
+	float4 Position : POSITION;
+	float2 TexCoord : TEXCOORD0;
+	float3 Col : COLOR;
+};
+
+float3x3 Quat2Matrix(float4 quat)
+{
+  float4 xx_yy_zz_yw = quat.xyzy*quat.xyzw;
+  float4 xy_yz_xz_zw = quat.xyxz*quat.yzzw;
+  float xw = quat.x * quat.w;
+
+  return float3x3(1.0 - 2*(xx_yy_zz_yw.y + xx_yy_zz_yw.z), 2*(xy_yz_xz_zw.x - xy_yz_xz_zw.w), 2*(xy_yz_xz_zw.z + xx_yy_zz_yw.w), 
+				  2*(xy_yz_xz_zw.x + xy_yz_xz_zw.w), 1.0 - 2*(xx_yy_zz_yw.x + xx_yy_zz_yw.z), 2*(xy_yz_xz_zw.y - xw), 
+				  2*(xy_yz_xz_zw.z - xx_yy_zz_yw.w), 2*(xy_yz_xz_zw.y + xw), 1.0 - 2*(xx_yy_zz_yw.x + xx_yy_zz_yw.y));
+}
+
+vertex2fragment main (app2vertex IN,
+	uniform float4x4 ModelViewProj : state.matrix.mvp,
+	uniform float3 Ambient,
+	uniform float4 Bones[90])
+{
+	vertex2fragment OUT;
+	int idx1 = int(IN.BoneData.x)*2;
+	int idx2 = int(IN.BoneData.y)*2;
+	float3x3 mat_x = Quat2Matrix(Bones[idx1]);
+	float3x3 mat_y = Quat2Matrix(Bones[idx2]);
+
+	float4 position;
+	position.xyz = (mul(mat_x, IN.Position) + Bones[idx1+1].xyz)*IN.BoneData.z;
+	position.xyz += (mul(mat_y, IN.Position) + Bones[idx2+1].xyz)*IN.BoneData.w;
+	position.w = 1;
+
+	OUT.Position = mul (ModelViewProj, position);
+	OUT.TexCoord = IN.TexCoord;
+	OUT.Col.xyz = Ambient;
+	
+	return OUT;
+}
+
+]]>
+</program>
+</cgvp>

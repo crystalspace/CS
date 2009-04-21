@@ -1,0 +1,15 @@
+<!--Created with CrystalSpace COLLADA Convertor v1.0-->
+<!--FILE GENERATED AUTOMATICALLY - DO NOT EDIT-->
+<library>
+    <meshfact name="Plane-Geometry">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <v x="3.435410" y="3.435410" z="0.000000" />
+            <v x="3.435410" y="-3.435410" z="0.000000" />
+            <v x="-3.435410" y="-3.435410" z="0.000000" />
+            <v x="-3.435400" y="3.435410" z="0.000000" />
+            <t v1="0" v2="3" v3="2" />
+            <t v1="2" v2="1" v3="0" />
+        </params>
+    </meshfact>
+</library>

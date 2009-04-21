@@ -1,0 +1,8 @@
+SubDir TOP apps tests perl5tst ;
+
+if $(PERL5.AVAILABLE) = "yes"
+{
+Description perl5test : "Perl5 scripting test" ;
+Application perl5test : [ Wildcard *.cpp *.h ] : noinstall ;
+LinkWith perl5test : crystalspace ;
+}

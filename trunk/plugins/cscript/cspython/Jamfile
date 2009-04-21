@@ -1,0 +1,36 @@
+SubDir TOP plugins cscript cspython ;
+
+if $(PYTHON.AVAILABLE) = "yes"
+{
+  #--------
+  # cspython -- Crystal Space plugin
+  #--------
+  local swigruntime = swigpyruntime.h ;
+  if $(DO_SWIG_PYTHON)
+  {
+    SwigExternalRuntime $(swigruntime) :
+      python :
+      -c++ -shadow -modern :
+      $(SEARCH_SOURCE) [ ConcatDirs $(TOP) scripts python ] :
+      cspython ;
+    Depends cspythonclean : cspythonswigclean ;
+  }
+  else
+  {
+    SEARCH on $(swigruntime) = $(SEARCH_SOURCE) ;
+  }
+  
+  # Hack to get header output dir before "." in includes
+  save_HDRS = $(HDRS) ;
+  HDRS = [ on $(swigruntime) GetVar LOCATE ] $(SEARCH_SOURCE) $(HDRS) ;
+  Description cspython : "Python plugin" ;
+  Plugin cspython : cspython.h cspython.cpp pytocs.h pytocs.cpp : nodefaultfilelist ;
+  LinkWith cspython : crystalspace ;
+  ExternalLibs cspython : PYTHON ;
+  CFlags cspython : $(CSPYTHON.CFLAGS) ;
+  local bindingspath = [ ConcatDirs $(LOCATE.OBJECTS) bindings python ] ;
+  CFlags cspython : [ FDefines "DEFAULT_PYTHMOD_PATH=\\\"$(bindingspath)\\\"" ] ;
+  MsvcCFlags cspython : "/DDEFAULT_PYTHMOD_PATH=\\\".\\\"" ;
+  FileListEntryPlugin cspython : plugin-python ;
+  HDRS = $(save_HDRS) ;
+}

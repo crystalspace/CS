@@ -1,0 +1,26 @@
+export MACOSX_DEPLOYMENT_TARGET = 10.2
+LFLAGS.L = -L
+LFLAGS.l = -l
+CFLAGS.D = -D
+CFLAGS.I = -I
+EXE = .app
+DLL = .csbundle
+MACOSX.APP_EXE  = $@/Contents/MacOS/$(notdir $(basename $@))
+MACOSX.APP_DIR  = .
+CFLAGS.GENERAL = -force_cpusubtype_ALL -Wno-precomp -fno-common -pipe
+LFLAGS.GENERAL =
+LFLAGS.EXE =
+LFLAGS.CONSOLE.EXE =
+LFLAGS.DLL = -bundle -framework AppKit -framework Foundation
+LIBS.EXE.PLATFORM=$(LFLAGS.GENERAL) -framework AppKit -framework Foundation
+AR = libtool
+ARFLAGS = -static -o
+ifeq (,$(RANLIB))
+RANLIB = ranlib
+endif
+RANLIB += -s
+define DO.EXE
+  sh $(SRCDIR)/appwrap.sh $(notdir $(basename $@)) $(MACOSX.APP_DIR) "$(VERSION)" "$(RELEASE_DATE)"
+  $(NEWLINE)$(LINK) $(LFLAGS) $(LFLAGS.EXE) -o $(MACOSX.APP_EXE) $(^) $(L^) $(LIBS) $(LINKFLAGS) $(LIBS.EXE.PLATFORM)
+  touch $@
+endef

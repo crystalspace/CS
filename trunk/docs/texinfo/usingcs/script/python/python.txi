@@ -1,0 +1,241 @@
+@node Python Bindings, , Perl Bindings, Scripting Languages
+@subsection Python Bindings
+@cindex Python
+@cindex @code{csPython}
+
+@noindent
+@emph{Originally written by Eric Sunshine, @email{sunshine@@sunshineco.com}}.
+
+Crystal Space is accessible from Python in two ways: 
+
+@enumerate
+@item
+as a Crystal Space plugin module in which C++ code can call upon Python code, and in which Python code can call upon Crystal Space. This approach requires good knowledge of both c++ and python, but is good for projects which want to keep their main binaries in c++.
+
+@item
+as a pure Python module named @file{cspace} which one can @samp{import} from within Python programs. Using this approach you can make applications entirely in python.
+@end enumerate
+
+In the following sections you will find information about how to get ready to use the bindings, how to use both of the above approaches, plus some General Information on how the cs api is translated to python and some Basics on handling the typical crystalspace idioms from python.
+
+There is also a wiki with more documentation at the crystalspace web site @uref{http://crystalspace3d.org/main/PyCrystal}
+
+@menu
+* Configuration::
+* Embedding in a c++ application::
+* Python bindings as a stand alone module for python::
+* General Information::
+* Basics::
+@end menu
+
+@node Configuration, Embedding in a c++ application, Python Bindings, Python Bindings
+@subsubsection Configuration
+
+Once Crystal Space is built and optionally installed, you can use the Python
+bindings. 
+
+If you installed, you should be ready to go. Because of this, it is recommended to at least install the bindings, so you dont have to mess with the pythonpath so much, by doing:
+
+ @code{jam install_bindings}
+
+If you dont want to install you need to make sure that Python can locate the
+appropriate Crystal Space resources.
+
+@enumerate
+@item
+Tell Python where to find @file{cspace} package (it will be a directory with many .py and shared library files) by setting your @samp{PYTHONPATH}
+environment variable to mention the directory where @file{cspace} package
+resides.
+
+@noindent
+After successfully building crystalspace, the python @file{cspace} package it will be under CS/out/<buildsystem>/<buildmode>/bindings/python/. For example in linux 386, optimize build, it will be at CS/out/linuxx86/optimize/bindings/python/. Where CS
+means the top-level build directory (this will be the @file{CS} directory if you
+configured and built in the @file{CS} directory).
+
+Note it is recommended to at least install the bindings, so you dont have to mess with pythonpath so much, by doing:
+
+ @code{jam install_bindings}
+
+
+Note, if building with msvc, the files are elsewhere.
+
+@item
+If necessary, set your @samp{CRYSTAL} environment variable to allow Crystal
+Space to locate its plugin modules and other resources.
+@end enumerate
+
+
+@node Embedding in a c++ application, Python bindings as a stand alone module for python, Configuration, Python Bindings
+@subsubsection Embedding in a c++ application
+
+You can access Python from a C++ program by loading the @file{cspython}
+Crystal Space plugin module and interacting with it via the @sc{scf}
+@samp{iScript} interface (@pxref{iScript Interface}).
+
+The @file{pysimp} example program (@file{CS/apps/pysimp}) illustrates how to do so. In addition to loading the @file{cspython} plugin, it loads and executes Python code from a sample script (which resides along with the other Python examples).
+
+@node Python bindings as a stand alone module for python, General Information, Embedding in a c++ application, Python Bindings
+@subsubsection Python bindings as a stand alone module for python
+
+There are a number of examples illustrating how to @samp{import} the
+@samp{cspace} module and utilize Crystal Space from within pure Python scripts.
+
+These scripts are installed at:
+
+@noindent
+@code{$@{prefix@}/share/crystalspace-X.Y/bindings/python}
+
+@noindent
+If you did not install Crystal Space, then you can find the scripts within the
+source tree at @file{CS/scripts/python}. In particular, the @file{tutorial#.py}
+scripts should be of interest since they mirror the first several C++ tutorial
+programs (@pxref{Tutorial Simple}).
+
+@node General Information, Basics, Python bindings as a stand alone module for python, Python Bindings
+@subsubsection General Information
+
+CrystalSpace is a big library with an extensive api. There is currently no specific python api documentation, but it works like the c++ api with some key differences due to how the languages are used.
+
+In general, you have to keep the following in mind when using cs python api:
+
+ * Most interfaces and classes should be wrapped, but some might not be and need to be added to the bindings. When an interface is wrapped it should mimic the cs api closely. If you think something you need might be missing, ask in the mailing list.
+
+ * In general, python callbacks built on other than iEventHandler won't work, this is still being worked on. 
+
+ * csString types can always be handled as python strings. 
+
+ * Most list and iterator classes/interfaces can be handled as python dicts or lists (means they support dict/list notation, not that you can use dicts or lists in place of the cs classes.
+
+ * Output parameters for functions are converted into returned parameters. This is so because python doesnt handle references or pointers, so the parameters are more naturally returned. 
+
+Check the next section for how to actually use the cs python api.
+
+@node Basics, , General Information, Python Bindings
+@subsubsection Basics
+
+This section instructs you on how "the crystal way" works from python. This is, how you can access interfaces, query object registry plugins, access engine lists and so on.
+
+@subheading Accessing the object registry
+
+In crystalspace there is a central registry that keeps track of loaded plugins. You will normally use it for just one thing: getting pointers to loaded plugins.
+
+So, the first thing you need will be to get the object registry handle (or at least know where it is).
+
+In situations when you didnt initialize crystalspace yourself, it will be stored in the cspace module as: cspace.object_reg.
+
+@example
+# cs is already loaded.
+import cspace
+ObjectRegistry = cspace.object_reg
+@end example
+
+If you created the cs environment from python, it will be the returned value from csInitializer.CreateEnvironment().
+
+@example
+import cspace
+import sys
+ObjectRegistry = cspace.csInitializer.CreateEnvironment(sys.argv)
+
+if not ObjectRegistry:
+    print "Fatal error! Couldn't create the environment"
+
+# Note at this point you still have to initialize a lot of things to make
+# crystalspace load all its plugins, maybe load a world and so on, check
+# the tutorials for information about this.
+@end example
+
+@subheading Querying from the object registry
+
+Once you have the object registry handle, you can query it by using its Get function.
+
+Here follows an example where object registry is used to query the engine:
+
+@example
+import cspace
+
+# Get a nice handle for the registry
+ObjectRegistry = cspace.object_reg # assumes environment was setup by cspython
+
+# Query the iEngine plugin
+engine = ObjectRegistry.Get(cspace.iEngine)
+
+@end example
+
+If you are familiar with the c++ api, you know it's done with a special template for convenience. In python the original api becomes usable, plus the template syntax doesnt translate nicely, so you just use @code{ObjectRegistry.Get}.
+
+@subheading Engine object lists
+Normally, you will need to use the engine to query meshes, factories and so on.
+
+You do this by using its api to get the list, and then use the list as a python list that you can query by name, index, or iterate.
+
+Building on the previous example:
+
+@example
+from cspace import csVector3
+from random import random
+
+# iterate all meshes, and print their names
+meshes = engine.GetMeshes()
+for mesh in meshes:
+    print " * a mesh",mesh.QueryObject().GetName()
+
+# get a certain mesh, and set its position.
+if "Cube" in meshes:
+    amesh = meshes["Cube"]
+
+    # Set the mesh position to some random value
+    v = csVector3(random(),random(),random())
+    amesh.GetMovable().SetPosition(v)
+
+@end example
+
+
+@subheading Querying an interface from an object
+Finally, cs objects usually implement many interfaces, and sometimes you need
+to access them in order to control specific functionality from a generic handle.
+
+This is done by using the QueryInterface function in the object:
+
+@example
+sub_obj = some_cs_obj.QueryInterface(iSomeInterface)
+@end example
+
+Note in c++ this is done using a special template for convenience, but in python the original interface already works nicely.
+
+For example, a mesh from the engine mesh list can be a particle system, or a general mesh, both with very different capabilities, normally you get an @code{iMeshWrapper} from the engine list, which is a generic interface for all mesh types the engine handles.
+
+In this case, the mesh would implement @code{iGeneralMeshState} if it is a general mesh, or @code{iParticleSystem} for a particle system (or none of both if it belongs to neither group).
+
+The following is a example illustrating how to look through all meshes in the engine, check if they are particles or genmesh, and for each use a function from the api, note, again, we are reusing symbols from the previous examples, and only importing new ones, in order to keep the new ideas easier to see:
+
+@example
+from cspace import iParticleSystem, iGeneralMeshState
+
+for mesh in meshes:
+    # cant really be both, but favouring clarity over efficiency
+    # both queries are done anyways
+    partsys = mesh.QueryInterface(iParticleSystem)
+    genstate = mesh.QueryInterface(iGeneralMeshState)
+
+    # if its a particle system, get the first emitter, and sets its
+    # rate to 10000
+    if partsys:
+        if partsys.GetEmitterCount ():
+            emitter = partsys.GetEmitter(0)
+            emitter.SetEmissionRate(1000)
+    elif genstate:
+        genstate.SetLighting(False)
+    # this is advanced part for this example, you can ignore:
+    else:
+        print "This is not a particle system or genmesh"
+        print "Supports the following interfaces:"
+        for iface_metadata in mesh.GetInterfaceMetadata():
+            print " * "+iface_metadata.interfaceName
+
+@end example
+
+Note how you can use iBase's GetInterfaceMetadata to find out interfaces an
+object supports, although you generally don't need to do this.
+
+
+

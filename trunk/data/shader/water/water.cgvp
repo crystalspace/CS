@@ -1,0 +1,67 @@
+//---------------------------------------------------------------------------------
+//Input
+//---------------------------------------------------------------------------------
+
+struct app2vert
+{
+	float4 Position  : POSITION;   
+	float4 Normal    : NORMAL;
+	float4 Color	 : COLOR;
+	float2 TexCoord  : TEXCOORD0;
+};
+
+//---------------------------------------------------------------------------------
+//Output
+//---------------------------------------------------------------------------------
+
+struct vert2frag
+{
+	float4 Position    	: POSITION;	
+	float4 Color	   	: COLOR;
+	float3 CamVec		: TEXCOORD0;
+	float4 TexCoord2	: TEXCOORD1;
+	float4 TexCoord3	: TEXCOORD2;
+};
+
+//---------------------------------------------------------------------------------
+//Shader entry
+//---------------------------------------------------------------------------------
+
+vert2frag main (app2vert IN,
+			 uniform float time,
+			 uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
+			 uniform float4x4 ModelViewProj : state.matrix.mvp,
+			 uniform float4x4 o2w)
+{
+    vert2frag OUT;
+
+	float4 inPos = IN.Position;
+  	float4 camera = ModelViewIT[3];
+
+	//Get real position again.
+	OUT.Position = mul (ModelViewProj, inPos);
+
+	OUT.Color = IN.Color;
+	OUT.CamVec = (camera - IN.Position).xzy;
+
+	//float4 texCoord = mul(float4(IN.TexCoord.x, 0, IN.TexCoord.y, 1), o2w);
+	float s1, cs1, s2, cs2;
+	sincos (time, s1, cs1);
+	sincos (time + 1.41, s2, cs2);
+
+	OUT.TexCoord2.x = IN.TexCoord.x  - s1 * 0.1;
+	OUT.TexCoord2.y = IN.TexCoord.y  + cs1 * 0.1;
+	OUT.TexCoord2.z = 0.0;
+	OUT.TexCoord2.w = 1.0;
+		
+	OUT.TexCoord3.x = IN.TexCoord.x + s2 * 0.1;
+	OUT.TexCoord3.y = IN.TexCoord.y - cs2 * 0.1;
+	OUT.TexCoord3.z = 0.0;
+	OUT.TexCoord3.w = 1.0;
+		
+    return OUT;
+}
+
+//---------------------------------------------------------------------------------
+//end
+//---------------------------------------------------------------------------------

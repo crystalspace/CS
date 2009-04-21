@@ -1,0 +1,13 @@
+<shader compiler="xmlshader" name="desaturate">
+  <shadervars>
+    <shadervar name="amount" type="float">0.25</shadervar>
+  </shadervars>
+  <technique priority="200">
+    <pass>
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <!-- vp plugin="glfixed" / -->
+      <texture destination="Texture1" name="tex diffuse" />
+      <fp plugin="glcg" file="/shader/postproc/desaturate.cgfp" />
+    </pass>
+  </technique>
+</shader>

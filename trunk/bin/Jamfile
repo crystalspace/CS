@@ -1,0 +1,6 @@
+SubDir TOP bin ;
+
+FileListEntriesData relaytool : : bin-tool ;
+# @@@ FIXME: Should also be installed
+# @@@ Where? Perhaps not /usr/bin or so, as 'relaytool' potentially clashes
+# with the original from apbuild

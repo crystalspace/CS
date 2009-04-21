@@ -1,0 +1,51 @@
+<cgvp>
+<variablemap variable="light 0 position" destination="LightPos" />
+<variablemap variable="light 0 attenuation" destination="Attenuation" />
+<variablemap variable="light 0 diffuse" destination="LightColor" />
+<program>
+<![CDATA[
+
+struct app2vertex {
+	float4 Position : POSITION;
+	float4 Color : COLOR;
+	float2 TexCoord : TEXCOORD0;
+	float4 Normal : NORMAL;
+};
+
+struct vertex2fragment { 
+	float4 Hposition : POSITION;
+	float2 TexCoord : TEXCOORD0;
+	float4 Color : COLOR0;
+};
+
+vertex2fragment main (app2vertex IN,
+	uniform float4x4 ModelView : state.matrix.modelview,
+	  /* The matrices are bound with the state.matrix.... semantics.
+	     For more info see the Cg and ARB_vertex_program docs.
+	     */
+	uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
+	uniform float4x4 ModelViewProj : state.matrix.mvp,
+	uniform float4 LightPos,
+	uniform float4 Attenuation,
+	uniform float3 LightColor)
+{
+	vertex2fragment OUT;
+
+	float3 eyeNormal = normalize (mul (ModelViewIT, IN.Normal).xyz);
+	float3 eyeVertex = mul (ModelView, IN.Position).xyz;
+
+	float3 vertToLight = LightPos.xyz - eyeVertex;
+	float d = length (vertToLight);
+	vertToLight = normalize(vertToLight);
+	// this seems to be the attenuation used in cs
+        float att = 1.0 - (d/Attenuation.x);
+	OUT.Hposition = mul (ModelViewProj, IN.Position);
+	OUT.TexCoord = IN.TexCoord;
+	OUT.Color.rgb = LightColor * max(dot (eyeNormal, vertToLight),0) * att;
+	
+	return OUT;
+}
+
+]]>
+</program>
+</cgvp>

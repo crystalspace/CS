@@ -1,0 +1,49 @@
+<!--
+  Copyright (C) 2007 by Frank Richter
+	    (C) 2007 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<!-- Direction from vertex to eye, in object space -->
+<snippet>
+  <technique priority="100">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+  
+    <input name="position" type="position4_object" />
+    
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input name="ModelViewIT" type="float4x4" default="complex">
+      <block location="cg:vertexIn">
+	<uniform type="float4x4" name="ModelViewIT" 
+	  binding="state.matrix.modelview.invtrans" />
+      </block>
+      
+      <block location="cg:vertexMain">
+	ModelViewIT = vertexIn.ModelViewIT;
+      </block>
+    </input>
+    
+    <block location="cg:vertexToFragment">
+      <varying type="direction_object" name="eyeDirectionObj" />
+    </block>
+    
+    <block location="cg:vertexMain">
+      eyeDirectionObj = float3 (position - ModelViewIT[3]);
+    </block>
+    
+    <output name="eyeDirectionObj" type="direction_object" />
+  </technique>
+</snippet>
