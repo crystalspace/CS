@@ -1,0 +1,165 @@
+<!--
+  Copyright (C) 2009 by Frank Richter
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet type="compound">
+  <!-- Fetch distance of current fragment to framebuffer depth
+       
+       FIXME: lots of this is similar to the planar reflection snippet,
+              try to share stuff
+       -->
+  <technique priority="100">
+    
+    <!-- Put the computation of the framebuffer TC into a separate snippet
+	 so weaver only emits it once. -->
+    <snippet id="framebufferTC">
+      <technique priority="100">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+	
+	<input name="positionO" type="position4_object" />
+	
+	<input name="ModelViewProj" type="float4x4" default="complex" private="yes">
+	  <block location="cg:vertexIn">
+	    <uniform type="float4x4" name="ModelViewProj" binding="state.matrix.mvp" />
+	  </block>
+	  
+	  <block location="cg:vertexMain">
+	    ModelViewProj = vertexIn.ModelViewProj;
+	  </block>
+	</input>
+	
+	<input name="fbTexXform" type="float4" default="complex" private="yes">
+	  <block location="cg:vertexIn">
+	    <uniform type="float4" name="fbTexXform" />
+	  </block>
+	  
+	  <block location="cg:variablemap">
+	    <variablemap variable="framebuffer coord xform" destination="vertexIn.fbTexXform" />
+	  </block>
+	  
+	  <block location="cg:vertexMain">
+	    fbTexXform = vertexIn.fbTexXform;
+	  </block>
+	</input>
+	
+	<input name="textureToScreen" type="float2" default="complex" private="yes">
+	  <block location="cg:fragmentIn">
+	    <uniform type="float2" name="textureToScreen" />
+	  </block>
+	  
+	  <block location="cg:variablemap">
+	    <variablemap destination="fragmentIn.textureToScreen" type="expr">
+	      <sexp>(make-vector
+		(/ 1 (elt1 "framebuffer coord xform"))
+		(/ 1 (elt2 "framebuffer coord xform"))
+		)
+	      </sexp>
+	    </variablemap>
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    textureToScreen = fragmentIn.textureToScreen;
+	  </block>
+	</input>
+	
+	<block location="cg:vertexToFragment">
+	  <varying type="texcoord3" name="framebufferTC" />
+	</block>
+	
+	<block location="cg:vertexMain">
+	  framebufferTC = mul (ModelViewProj, positionO).xyw; // == position_screen
+	  float2 scale = fbTexXform.xy;
+	  float2 xlate = fbTexXform.zw * framebufferTC.z;
+	  framebufferTC.xy = framebufferTC.xy * scale + xlate;
+	</block>
+	
+	<block location="cg:fragmentMain">
+	  tcToScreen = textureToScreen;
+	</block>
+	
+	<output name="framebufferTC" type="texcoord3" />
+	<output name="tcToScreen" type="float2" />
+      </technique>
+    </snippet>
+    
+    <snippet id="actualDist">
+      <technique priority="100">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+	
+	<input name="positionW" type="position4_world" />
+	
+	<input name="texFramebufferDepth" type="tex2d" default="complex">
+	  <block location="pass">
+	    <texture name="tex framebuffer depth" destination="fragmentIn.texFramebufferDepth" />
+	  </block>
+	  
+	  <block location="cg:fragmentIn">
+	    <uniform type="tex2d" name="texFramebufferDepth" />
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    texFramebufferDepth = fragmentIn.texFramebufferDepth;
+	  </block>
+	</input>
+	
+	<input name="projectedToWorld" type="float4x4" default="complex" private="yes">
+	  <block location="cg:fragmentIn">
+	    <uniform type="float4x4" name="projectedToWorld" />
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    projectedToWorld = fragmentIn.projectedToWorld;
+	  </block>
+	  
+	  <block location="cg:variablemap">
+	    <variablemap destination="fragmentIn.projectedToWorld" type="expr">
+	      <sexp>(* "world2camera transform" "projection transform inverse")</sexp>
+	    </variablemap>
+	  </block>
+	</input>
+	
+	<input name="fbTC" type="texcoord3" />
+	<input name="fbTC2screen" type="float2" />
+	
+	<block location="cg:vertexMain">
+	  dist = 0;
+	  distSat = dist;
+	</block>
+	
+	<block location="cg:fragmentMain">
+	  float inv_reflW = 1 / fbTC.z;
+	  
+	  float camDepth = tex2Dproj (texFramebufferDepth, fbTC).x*-2 + 1;
+	  float2 screenPos = (fbTC.xy * fbTC2screen * inv_reflW)-float2(1);
+	  float4 positionProjected = float4 (
+	    screenPos.x, screenPos.y, camDepth, 1);
+	  float4 positionUnprojectedW = mul (projectedToWorld, positionProjected);
+	  positionUnprojectedW /= positionUnprojectedW.w;
+	  
+	  dist = length (positionW.xyz - positionUnprojectedW.xyz);
+	  
+	  dist = max (dist, 0);
+	  distSat = saturate (dist);
+	</block>
+	
+	<output name="dist" type="float" />
+	<output name="distSat" type="float" />
+      </technique>
+    </snippet>
+    
+    <connection from="framebufferTC" to="actualDist" />
+  </technique>
+</snippet>

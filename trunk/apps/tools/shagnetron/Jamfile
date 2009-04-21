@@ -1,0 +1,6 @@
+SubDir TOP apps tools shagnetron ;
+
+Description shagnetron : "Shader cache warming utility" ;
+Application shagnetron : [ Wildcard *.cpp *.h ] : console ;
+LinkWith shagnetron : crystalspace ;
+FileListEntryApplications shagnetron : app-tool ;

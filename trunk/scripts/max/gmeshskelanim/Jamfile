@@ -1,0 +1,3 @@
+SubDir TOP scripts max gmeshskelanim ;
+
+InstallData [ Wildcard *.gup *.mcr ] README : conversion max gmeshskelanim ;

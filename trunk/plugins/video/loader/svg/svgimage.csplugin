@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- svgimage.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphic.image.io.svg</name>
+        <implementation>SVGImageIO</implementation>
+        <description>CrystalSpace SVG image loader</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

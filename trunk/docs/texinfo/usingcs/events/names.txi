@@ -1,0 +1,68 @@
+@c -*-texinfo-*-
+@node Event Names, Event Scheduling, Event System, Event System
+@subsection Names
+@cindex Events, Names
+
+Events are identified with the help of an extensible hierarchically-structured
+event naming layer.  This system allows event names to be drilled down to
+arbitrary levels of specificity while simultaneously allowing event subscribers
+to express interest in general categories or precise event varieties.
+
+For example: Each joystick is individually named, so event consumers can listen
+only to particular devices, or to particular flavors of events.  For instance,
+the fourth joystick can produce the event
+@samp{crystalspace.input.joystick.3.button.down}; an event handler may wish to
+subscribe to @samp{crystalspace.input.joystick.3.button.down} to only receive
+down events from that joystick, to @samp{crystalspace.input.joystick.3.button}
+to receive all button events from that joystick, to
+@samp{crystalspace.input.joystick.3} to receive all events (buttons and moves)
+from that joystick, to @samp{crystalspace.input.joystick} to receive all events
+from all joysticks, and so on. @emph{Note}: A consequence of this behaviour is
+that subscribing to event names which themselves @emph{are never used for
+actual events} is possible. Read on to see how to deal with this.
+
+Event names are translated into an efficient internal representation, the
+@samp{csEventID}, using a singleton event name registry object
+(@samp{csEventNameRegistry}, implementing the @samp{iEventNameRegistry}
+interface) which can always be retrieved using the
+@code{csEventNameRegistry::GetRegistry(iObjectRegistry*)} method.  The actual
+name translation is performed by the @code{GetID()} method, which takes a
+string or @samp{csString} argument and returns a @samp{csEventID}.  The
+@samp{csEventID}s are then used in calls to subscribe to event queues and in
+comparisons to determine the type of an event.  Many common event types'
+@samp{csEventID}s can be accessed using macros defined in
+@file{include/csutil/eventnames.h}, e.g., @samp{crystalspace.application.quit}
+is @samp{csevQuit()}, which must be called with an argument of either an
+@samp{iObjectRegistry} pointer or a @samp{iEventNameRegistry} reference.  Since
+referencing an event @sc{id} via one of these macros will consume several
+cycles, performance-sensitive code should cache the results; see, for example,
+the @samp{CS_DECLARE_EVENT_SHORTCUTS} and
+@samp{CS_INITIALIZE_EVENT_SHORTCUTS()} macros in
+@file{include/csutil/eventnames.h}.
+
+Demultiplexing in event handlers is handled like this:
+
+@example
+static bool DemoEventHandler (iEvent& ev)
+@{
+  if (ev.Name == csevMouseButton (object_reg, 0))
+    @dots{}
+  else if (ev.Name == csevMouseMove (object_reg, 0))
+    @dots{}
+  else
+    @dots{}
+@}
+@end example
+
+This will handle mouse button and mouse move events for the first mouse.
+
+You can also catch entire event hierarchies with a single test:
+
+@example
+if (name_reg->IsKindOf(ev.Name, csevKeyboardEvent (name_reg)))
+@{
+  HandleKeyboardEvent(ev)
+@}
+@end example
+
+This will catch all keyboard events.

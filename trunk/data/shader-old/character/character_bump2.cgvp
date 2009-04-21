@@ -1,0 +1,80 @@
+<cgvp>
+<variablemap variable="bones" destination="Bones"/>
+<variablemap variable="light 0 position" destination="LightPos" />
+<variablemap variable="light 0 attenuation" destination="Attenuation" />
+<program>
+<![CDATA[
+
+struct app2vertex {
+	float3 Normal : NORMAL;
+	float3 Position : POSITION;
+	float3 TexCoord : TEXCOORD0;
+	float3 Tangent : TEXCOORD1;
+	short4 BonesIndices;
+	float4 BonesWeights;
+};
+
+struct vertex2fragment { 
+	float4 Position : POSITION;
+	float3 TexCoord : TEXCOORD0;
+	float3 oLightDir : TEXCOORD1;
+	float3 oEyeVec : TEXCOORD2;
+	float4 Attenuation : TEXCOORD3;
+};
+
+float3 QuatMultVert(float4 q, float3 v)
+{
+   float4 r1 = float4(q.w*v.xyz + cross( q.xyz, v.xyz ), - dot( q.xyz, v.xyz));
+   float4 r2 = float4(-q.xyz, q.w);
+   return r1.w*r2.xyz + r2.w*r1.xyz + cross( r1.xyz, r2.xyz );
+}
+
+vertex2fragment main (app2vertex IN,
+	uniform float4x4 ModelViewProj : state.matrix.mvp,
+	uniform float4x4 ModelViewI : state.matrix.modelview.inverse,
+	uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
+	uniform float4 LightPos,
+	uniform float4 Attenuation,
+	uniform float4 Bones[78])
+{
+	vertex2fragment OUT;
+
+	short idx1 = IN.BonesIndices.x*2;
+	short idx2 = IN.BonesIndices.y*2;
+	short idx3 = IN.BonesIndices.z*2;
+	short idx4 = IN.BonesIndices.w*2;
+
+	float4 position;
+	position.xyz =  (QuatMultVert(Bones[idx1], IN.Position.xyz) + Bones[idx1+1].xyz)*IN.BonesWeights.x;
+	position.xyz += (QuatMultVert(Bones[idx2], IN.Position.xyz) + Bones[idx2+1].xyz)*IN.BonesWeights.y;
+	position.xyz += (QuatMultVert(Bones[idx3], IN.Position.xyz) + Bones[idx3+1].xyz)*IN.BonesWeights.z;
+	position.xyz += (QuatMultVert(Bones[idx4], IN.Position.xyz) + Bones[idx4+1].xyz)*IN.BonesWeights.w;
+	position.w = 1;
+
+	float3 norm = (QuatMultVert(Bones[idx1], IN.Normal))*IN.BonesWeights.x;
+	norm.xyz += (QuatMultVert(Bones[idx2], IN.Normal))*IN.BonesWeights.y;
+
+	float3 tangent = (QuatMultVert(Bones[idx1], IN.Tangent))*IN.BonesWeights.x;
+	tangent.xyz += (QuatMultVert(Bones[idx2], IN.Tangent))*IN.BonesWeights.y;
+
+	float3 bitangent = cross(norm, tangent);
+
+	float4 obLight = mul(ModelViewI, LightPos);
+	float4 objLight = obLight - position;
+	float3x3 mat;
+	mat[0] = tangent;
+	mat[1] = bitangent;
+	mat[2] = norm;;
+	float3 eye = (ModelViewIT[3] - position).xyz;
+	OUT.oLightDir = mul(mat, objLight.xyz);
+	OUT.oEyeVec = mul(mat, eye);
+	OUT.Position = mul (ModelViewProj, position);
+	OUT.TexCoord = IN.TexCoord;
+	OUT.Attenuation = -objLight*Attenuation.y*0.4 + 0.5;
+	OUT.Attenuation.w = 0.5;
+	return OUT;
+}
+
+]]>
+</program>
+</cgvp>

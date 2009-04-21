@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<!-- stdpt.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.texture.loader.dots</name>
+        <implementation>csPtDotsLoader</implementation>
+        <description>'Dots' procedural texture loader</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.loader.fire</name>
+        <implementation>csPtFireLoader</implementation>
+        <description>'Fire' procedural texture loader</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.loader.plasma</name>
+        <implementation>csPtPlasmaLoader</implementation>
+        <description>'Plasma' procedural texture loader</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.loader.sky</name>
+        <implementation>csPtSkyLoader</implementation>
+        <description>'Sky' procedural texture loader</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.loader.water</name>
+        <implementation>csPtWaterLoader</implementation>
+        <description>'Water' procedural texture loader</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.type.dots</name>
+        <implementation>csPtDotsType</implementation>
+        <description>'Dots' procedural texture factory</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.type.fire</name>
+        <implementation>csPtFireType</implementation>
+        <description>'Fire' procedural texture factory</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.type.plasma</name>
+        <implementation>csPtPlasmaType</implementation>
+        <description>'Plasma' procedural texture factory</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.type.sky</name>
+        <implementation>csPtSkyType</implementation>
+        <description>'Sky' procedural texture factory</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.type.water</name>
+        <implementation>csPtWaterType</implementation>
+        <description>'Water' procedural texture factory</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.saver.dots</name>
+        <implementation>csPtDotsSaver</implementation>
+        <description>'Dots' procedural texture saver</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.saver.fire</name>
+        <implementation>csPtFireSaver</implementation>
+        <description>'Fire' procedural texture saver</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.saver.plasma</name>
+        <implementation>csPtPlasmaSaver</implementation>
+        <description>'Plasma' procedural texture saver</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.saver.sky</name>
+        <implementation>csPtSkySaver</implementation>
+        <description>'Sky' procedural texture saver</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.saver.water</name>
+        <implementation>csPtWaterSaver</implementation>
+        <description>'Water' procedural texture saver</description>
+        <requires>
+          <class>crystalspace.graphics3d.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

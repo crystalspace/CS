@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<?xml-stylesheet type='text/xsl' href='interface.xsl'?>
+<interface uri="http://crystalspace3d.org/0install/crystalspace-sdk-staticplugins-1.4.xml" xmlns="http://zero-install.sourceforge.net/2004/injector/interface">
+  <name>crystalspace-sdk-static-1.4</name>
+  <summary>CrystalSpace SDK (with static plugins lib)</summary>
+  <description>
+Headers and libraries needed to build CrystalSpace. Contains libraries for
+linking plugins statically into applications.</description>
+  <homepage>http://www.crystalspace3d.org/</homepage>
+  <category>Development</category>
+  <icon href="http://crystalspace3d.org/mediawiki/images/thumb/3/3e/Cs-compact.png/120px-Cs-compact.png" type="image/png"/>
+  <group license="OSI Approved :: GNU Lesser General Public License (LGPL)" main="bin/cs-config-1.4">
+    <implementation arch="Linux-x86_64" id="sha1new=c1f6974a1aa6cc2c7569fe54385bf9b7633c2f74" released="2009-01-16" stability="testing" version="1.4.0.31900">
+      <archive extract="crystalspace-sdk-staticplugins-1.4.0.31900" href="http://crystalspace3d.org/downloads/binary/1.4/linux-x86_64/crystalspace-sdk-staticplugins-1.4.0.31900.tar.lzma" size="30428562" type="application/x-lzma-compressed-tar"/>
+      <requires interface="http://crystalspace3d.org/0install/crystalspace-sdk-staticplugins-1.4.xml">
+	<environment insert="" mode="prepend" name="CRYSTAL_1_4"/>
+      </requires>
+    </implementation>
+  </group>
+</interface>
+<!-- Base64 Signature
+iEYEABECAAYFAklwpn0ACgkQnCws0dQa9bvchQCguObl30pphfiGatzKMGYaJym6j8IAoK3G+U8z
+bt0zL+ZUXw7onmpAQ9po
+
+-->

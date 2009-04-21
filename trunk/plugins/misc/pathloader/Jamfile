@@ -1,0 +1,7 @@
+SubDir TOP plugins misc pathloader ;
+
+Plugin pathloader
+       : pathloader.cpp pathloader.h ;
+
+LinkWith pathloader : crystalspace ;
+

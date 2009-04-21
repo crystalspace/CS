@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- movierecorder.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.utilities.movierecorder</name>
+        <implementation>csMovieRecorder</implementation>
+        <description>Realtime movie recorder</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

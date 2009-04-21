@@ -1,0 +1,182 @@
+/*
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+/**
+ * \mainpage
+ *
+ * This is the Application Programmer's Interface (API) reference for
+ * Crystal Space.  This manual documents the abstract interfaces, classes, and
+ * functions available to clients of the Crystal Space software development
+ * kit (SDK).
+ *
+ * A complementary Crystal Space user and developer manual is available
+ * at: http://www.crystalspace3d.org/docs/online/manual/
+ *
+ * The Crystal Space home page is at: http://www.crystalspace3d.org/
+ *
+ * \htmlonly
+ The API reference consists of the following sections:
+ 
+ <ul>
+ <li><a href="classes.html">Alphabetical List</a></li>
+ <li><a href="hierarchy.html">Class Hierarchy</a></li>
+ <li><a href="annotated.html">Compound List</a></li>
+ <li><a href="functions.html">Compound Members</a></li>
+ <li><a href="files.html">File List</a></li>
+ <li><a href="globals.html">File Members</a></li>
+ <li><a href="modules.html">Module List</a></li>
+ <li><a href="pages.html">Related Pages</a></li>
+ </ul>
+ \endhtmlonly
+ */
+
+/*
+ * Doxygen group(aka "Module") definitions.
+ * These are here, in their own file, rather than the includes because:
+ *  a) Module names aren't sorted; so we can do that here
+ *  b) It's easier to see what Modules there are and what identifiers they
+ *     have.
+ *  c) It's easier to change a description.
+ *
+ * Not much else interesting here.
+ */
+ 
+/**
+ * \defgroup appframe Application Framework
+ */
+ 
+/**
+ * \defgroup aws AWS
+ * @{ */
+
+	/** 
+ 	 * \defgroup aws_comp_flags Component flags
+ 	 */
+ 
+	/**
+	 * \defgroup aws_sink_errors Sink error codes
+	 */
+ 
+	/** 
+	 * \defgroup aws_sys_flags Window manager flags
+	 */
+ 
+	/**
+	 * \defgroup aws_window_trans Window transitions
+	 */
+ 
+/** @} */
+ 
+/**
+ * \defgroup plugincommon Common Plugin Classes
+ */
+ 
+/**
+ * \defgroup engine3d Crystal Space 3D Engine
+ * @{ */
+
+	/**
+	 * \defgroup engine3d_light Lighting
+	 */
+ 
+	/**
+	 * \defgroup engine3d_meshes Mesh support
+	 * @{ */
+	 
+		/**
+		 * \defgroup meshplugins Mesh plugins
+		 */
+		 
+	/** @} */
+ 
+	/**
+	 * \defgroup engine3d_rloop Renderloops & Rendersteps
+	 */
+ 
+	/**
+	 * \defgroup engine3d_textures Textures & Materials
+	 */
+ 
+	/**
+	 * \defgroup engine3d_views Views & Cameras
+	 */
+ 
+	/**
+	 * \defgroup engine3d_vis Visibility
+	 */
+	 
+/** @} */
+ 
+/**
+ * \defgroup event_handling Event handling
+ */
+ 
+/**
+ * \defgroup floating_point Floating point utility routines
+ */
+ 
+/**
+ * \defgroup geom_utils Geometry utilities
+ */
+
+/**
+ * \defgroup gfx Graphics
+ * @{
+ */
+ 
+	/**
+	 * \defgroup gfx2d 2D
+	 */
+	 
+	/** 
+	 * \defgroup gfx3d 3D
+	 */ 
+ 
+/** @} */ 
+ 
+/**
+ * \defgroup loadsave Loading & Saving support
+ */
+ 
+/**
+ * \defgroup scf Shared Class Facility (SCF)
+ */
+
+/**
+ * \defgroup sndsys Sound system
+ */
+
+/**
+ * \defgroup util Utilities
+ * @{
+ */
+ 
+	/**
+	 * \defgroup util_containers Containers
+	 */
+	 
+	/**
+	 * \defgroup util_memory Memory Management
+	 */
+	 
+/** @} */ 
+ 
+/**
+ * \defgroup vfs Virtual File System (VFS)
+ */
+

@@ -1,0 +1,270 @@
+@c -*-texinfo-*-
+@node Portability, Coding Style, Writing Documentation, Contributing
+@section Portability
+@cindex Portability
+@cindex Coding Portability
+
+@noindent
+@emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}, with
+contributions by others.}
+
+Crystal Space is a highly portable cross-platform 3D engine and toolkit.  As a
+contributor to the project, you should familiarize yourself with the issues
+discussed in this section in order to ensure maximum portability of code which
+you write and resources which you create.
+
+@enumerate
+@item
+@emph{Endian-ness}
+
+Beware of code that is endian-specific.  To facilitate writing portable code,
+key off of the @samp{CS_BIG_ENDIAN} or @samp{CS_LITTLE_ENDIAN} macros if
+necessary.
+
+Avoid casting a @samp{long*} or @samp{int*} to a @samp{short*} or @samp{char*}
+as a slick way of checking the value of a particular sub-byte of the number
+since this trick will fail on platforms with different endian-ness.  In other
+words, given the declaration @samp{long n = 1}, and the expression @samp{short
+p = *((short*)&n)}, on a little-endian platform, @samp{p} will equal 1, but on
+a big-endian platform, @samp{p} will equal 0.
+
+Avoid using C ``unions'' to represent bit-sets since they can result in
+endian-related problems if improperly used or stored as persistent data.
+Using bit-masks is a much better and far more portable solution.
+
+Beware of reading and writing data to binary format files and sending such
+information over the network.  Unless special care is taken to ensure
+portability, these files and network related facilities will suffer
+endian-related problems.  Use the network functions @code{ntohl()},
+@code{ntohs()}, @code{htonl()}, and @code{htons()} to convert numbers to
+canonical format before transmitting them over the network.  You can also make
+use of the Crystal Space endian-related conversion functions found in
+@file{CS/include/csutil/csendian.h}.
+
+@item
+@emph{Data Alignment}
+
+Some platforms require data values to be strictly aligned in memory.  For
+instance, some processors can not access a @samp{long} value at an odd memory
+address or at an address which is not a multiple of four (which is the size in
+bytes of the @samp{long} data type).  In such cases, the program may crash.
+Other processors may be able to access misaligned values, but at greatly
+reduced speed, which can slow down program execution significantly if done
+frequently enough.
+
+In most cases, the compiler ensures that values are properly aligned for the
+given processor, but this problem can crop up when reading byte-streams from
+external sources such as binary files or network connections.  In such cases,
+it is up to you to ensure the proper alignment of the data before accessing
+it.
+
+For instance, if you are reading elements from a byte-stream and the next
+element to be read is a @samp{long}, then the following code to extract the
+value is @emph{incorrect} and @emph{non-portable} since it does not ensure
+that the data is aligned properly for @samp{long} access:
+
+@example
+long extract_long(unsigned char const* stream)
+@{
+  return *((long*)stream);
+@}
+@end example
+
+The correct way to code this example would be as follows:
+
+@example
+long extract_long(unsigned char const* stream)
+@{
+  long n;
+  memcpy(&n, stream, sizeof(n));
+  return n;
+@}
+@end example
+
+@item
+@emph{Data type sizes}
+
+Don't make any assumptions about the size of @samp{int}, @samp{long}, 
+@samp{size_t}, @samp{void*} etc such as @code{sizeof(int)==4}, 
+@code{sizeof(int)==sizeof(void*)}, @code{sizeof(long)==sizeof(void*)} and so 
+on. If a specifically sized type is needed (for example, when reading a file
+and the format specification dictates a certain word size) use the sized types
+from @file{cstypes.h} (e.g. @samp{int32}, @samp{uint8}). Consequently, also 
+avoid constructs such as casting pointers to @samp{int}s. If there's a rare 
+case that no other way than casting a pointer to/from an integral type, use the 
+value of the @samp{CS_PROCESSOR_SIZE} macro (usually 32 or 64) to determine an 
+appropriate sized type.
+
+@item
+@emph{Floating Points}
+
+Depending upon the accuracy and representation of floating point values on
+some platforms, a number may successfully compare to (and equal) 0.0 on one
+platform or processor but fail on another.  In order to avoid such problems,
+compare numbers to a small value such as @samp{EPSILON}.  In other words, if
+@samp{EPSILON} is defined as a very small value, use @samp{(val < EPSILON)}
+rather than @samp{(val == 0.0)}.
+
+As a corollary.  when comparing two floating point values, employ the
+@samp{EPSILON} trick to ensure that they compare properly over a wide variety
+of platforms.  In other words, instead of @samp{(float1 < float2)}, use
+@samp{(float1 < float2 + EPSILON)}.
+
+@item
+@emph{Scope of @samp{for} Statements}
+
+Some compilers do not properly scope a variable declared in a @code{for(;;)}
+statement to the loop itself.  In other words, some compilers treat the
+following code:
+
+@example
+for (int i = 0; @dots{}) @dots{}
+@end example
+
+@noindent
+As though @samp{i} was declared outside of the @samp{for} statement, as in:
+
+@example
+int i;
+for (i = 0; @dots{}) @dots{}
+@end example
+
+This can be a problem when several @samp{for} loops exists at the same scoping
+level in a single block since some compilers will complain that @samp{i} is
+being redeclared by all @samp{for} loops following the first one.  In other
+words, the following code will generate a ``variable redeclaration'' warning
+with some compilers:
+
+@example
+for (int i = 0; @dots{}) @dots{}
+@dots{} other code @dots{}
+for (int i = 5; @dots{}) @dots{}
+@end example
+
+In cases where the variable appears in only a single @samp{for} loop, declaring
+it directly in the @samp{for} statement is perfectly safe, but in cases where
+many such loops may want to use the same variable name, the variable should
+be declared once outside of all loops, as in the following example:
+
+@example
+int i;
+for (i = 0; @dots{}) @dots{}
+@dots{} other code @dots{}
+for (i = 5; @dots{}) @dots{}
+@end example
+
+The Microsoft Visual C++ compiler is known to suffer from this problem,
+however most modern C++ compilers properly scope variables declared in the
+@samp{for} statement.
+
+@item
+@emph{Avoid Global Objects With Constructors in Plug-In Modules}
+
+Avoid placing global objects which require automatic construction in
+dynamically loaded libraries (plug-in modules).  Some platforms fail to call
+the object's constructor at the time the library is loaded.  Therefore it is
+unsafe to rely on such objects.
+
+@item
+@emph{Avoid Initializing Global Variables via Functions in Plug-In Modules}
+
+Avoid initializing global variables within a plug-in module via function
+call.  In other words, in the following example, the function @code{foo()}
+should not rely upon the variable @samp{angle} as having been properly
+initialized, assuming that this code fragment appears in a plug-in module.
+
+@example
+static float angle = cos(0.23);
+void foo() @{ printf("angle=%g\n", angle); @}
+@end example
+
+Instead, you should arrange for such variables to be initialized manually by
+some other mechanism.  Here is one possible (though not ideal) way to ensure
+that @samp{angle} is initialized before it is accessed.
+
+@example
+static float angle = 0;
+void foo()
+@{
+  static bool angle_ok = false;
+  if (!angle_ok)
+  @{
+    angle = cos(0.23);
+    angle_ok = true;
+  @}
+  printf("angle=%g\n", angle);
+@}
+@end example
+
+An even better solution is to utilize the initialization hooks provided by the
+@sc{scf} system to initialize global variables at the time that the plug-in
+module is loaded.  @xref{SCF}.
+
+@item
+@emph{Pathname Syntax}
+
+Pathname syntax varies widely from platform to platform.  For instance, a
+Unix-style pathname such as @file{/mnt/home/zoop.c} might appear as
+@file{C:\home\zoop.c} on @sc{dos} and Windows, and @file{vol:home:zoop.c} on
+Macintosh.
+
+When programming you should always use Unix-style pathname syntax in your
+@code{#include} directives; that is, always use the forward slash @samp{/}, as
+in @code{#include "csutil/scf.h"}.  The forward slash is understood by
+compilers on all platforms including Unix, Windows, and Macintosh.  Never use
+@samp{\} or @samp{:} in filenames mentioned by an @code{#include} directive.
+Even though your Windows or Macintosh compiler might accept these characters,
+the Unix compilers will not.  The obvious exception to this rule is for source
+files which are intended only for a specific platform.  Such files may use the
+prohibited characters, but in general there is no reason to do so.
+
+At the application level, when writing a program or library which utilizes
+Crystal Space you should make use of the @sc{vfs} facility which provides a
+unified way of referring to files by hiding platform-specific pathname syntax
+details.  Under @sc{vfs}'s unified naming scheme, all pathnames use the
+Unix-style syntax and @sc{vfs} translates such pathnames to a form appropriate
+for the host platform.  @xref{VFS}.
+
+@item
+@emph{Filesystem Case Sensitivity}
+
+Some operating systems have case sensitive filenames, whereas others do not.
+Undesirable things happen if you capitalize a file one way in an
+@code{#include} directive and a different way for the actual filename.  This
+problem may not even be apparent on your platform if you are using a
+case-insensitive file system such as @sc{dos}, Windows, or Macintosh (HFS).  In
+general, it is preferable to use entirely lower-case filenames for files which
+are shared between ports.
+
+@item
+@emph{@file{Jamfile}s and Project Files}
+
+Some platforms use custom project files, whereas other platforms use the
+Crystal Space Jam-based build system.  If you change a @file{Jamfile} and then 
+change the code so that it depends on this change, ports for other platforms 
+will probably break.  This may be unavoidable to some extent, but try to 
+minimize the breakage.  For example, devise a @file{configure} check for the
+feature and wrap the dependent code in an @code{#ifdef} for a definition emitted
+when the feature was detected, or at least for operating systems that 
+@emph{do} support the change.   This will allow other systems to continue to 
+work without your change.  After committing your change to the @sc{svn} 
+repository, be sure to  inform port maintainers that their projects may need 
+to be updated in order to support your modifications.
+
+@item
+@emph{Ensuring Rendering}
+
+Some renderers and video drivers depend on the @code{BeginDraw()} and
+@code{FinishDraw()} calls to @samp{iGraphics3D} or @samp{iGraphics2D}.  Thus
+every @code{BeginDraw()} must be followed by a @code{FinishDraw()} or nothing
+will be rendered.  Microsoft's DirectX renderer is known to have this
+requirement, so be sure to follow this guideline for maximum portability.
+
+@item
+@emph{Template precautions}
+
+These days, C++ compilers used with Crystal Space support templates, and the
+project makes use of templates for several utility classes.  For portability
+reasons, however, the entire template implementation should be placed into the
+header file.  There should be no associated source code file.
+@end enumerate

@@ -1,0 +1,14 @@
+SubDir TOP apps tools genmeshify ;
+
+Description genmeshify : "Thing-to-GenMesh converter" ;
+
+Application genmeshify
+	: [ Wildcard *.cpp *.h ]
+	  [ Wildcard [ ConcatDirs thing object ] : *.cpp *.h ]
+	  [ Wildcard [ ConcatDirs thing persist ] : *.cpp *.h ]
+	: console
+;
+Includes processor.h : $(SUBDIR)/processor.tok ;
+MsvcExtraFile genmeshify : $(SUBDIR)/processor.tok ;
+LinkWith genmeshify  : crystalspace ;
+FileListEntryApplications genmeshify : app-tool ;

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- glshader_fixed.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics3d.shader.glfixed</name>
+        <implementation>csGLShader_FIXED</implementation>
+        <description>OpenGL fixed function shader provider for Render3D</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

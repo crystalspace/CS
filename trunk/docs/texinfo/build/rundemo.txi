@@ -1,0 +1,65 @@
+@c -*-texinfo-*-
+@node Quick Start, , Problems, Building
+@section Quick Start
+@cindex Walktest
+@cindex Quick Start
+
+Once you have built the Crystal Space system and its demonstration applications
+you may be eager to test them out.  This section will give you the opportunity
+to do so without forcing you to wade through an overabundance of explanations.
+Later sections will describe options and applications in more detail, but
+for now, sit back and have some fun.
+
+Typically, the executable for each application and its support files will be
+located in the same directory, though this is not strictly necessary.  The map
+files are generally placed in the @file{CS/data} directory, but this not
+required.  Please note that the map @sc{zip} files should @emph{not} be
+unpacked.  Crystal Space can read these files directly.
+
+On @sc{gnu} Linux:
+
+If you see the following error @samp{error while loading shared libraries:
+libcrystalspace-1.x.so: cannot open shared object file: No such file or
+directory}
+
+Crystal Space now creates and uses shared libraries. Inorder to run the demo
+applications you need to export the @emph{LD_LIBRARY_PATH} to where the Crystal
+Space root folder is currently located e.g.
+
+@example
+export LD_LIBRARY_PATH=/home/me/CS_latest
+@end example
+
+In the following examples we will run @samp{walktest}, the quintessential
+Crystal Space demonstration program in various ways.
+
+In this example, we will run @samp{walktest} and specify the map it should load
+and use.
+
+On Windows:
+
+@example
+walktest.exe @var{map}
+@end example
+
+On other Operating Systems:
+
+@example
+./walktest @var{map}
+@end example
+
+Replace @var{map} with any map file name which you have downloaded and
+placed in your @file{CS/data} directory.  For instance:
+
+@example
+walktest partsys
+@end example
+
+If your map is not one of those from the @sc{cs} homepage, you may also
+have to add it to @file{vfs.cfg}.  Look at the entries for the other maps
+to see how to do this.
+
+You can use command line parameters when running Crystal Space
+applications.  @xref{Common Command Line Options}.  Detailed setup can be done
+in the configuration file.  @xref{Configuration File}.  For Walktest, in-game
+setup can be done via the console.  @xref{Walktest Console Commands}.

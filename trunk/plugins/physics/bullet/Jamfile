@@ -1,0 +1,9 @@
+SubDir TOP plugins physics bullet ;
+
+if $(BULLET.AVAILABLE) = "yes"
+{
+  Description bullet : "Bullet physics plugin" ;
+  Plugin bullet : [ Wildcard *.cpp *.h ] ;
+  LinkWith bullet : crystalspace ;
+  ExternalLibs bullet : BULLET ;
+}

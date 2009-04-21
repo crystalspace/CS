@@ -1,0 +1,11 @@
+SubDir TOP plugins video loader gif ;
+
+Description csgifimg : "gif image loader" ;
+
+Plugin csgifimg
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith csgifimg : crystalspace ;
+
+CompileGroups csgifimg :  imageloaders ;
+

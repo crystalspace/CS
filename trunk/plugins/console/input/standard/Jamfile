@@ -1,0 +1,8 @@
+SubDir TOP plugins console input standard ;
+
+Description csconin : "standard input console" ;
+
+Plugin csconin
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith csconin : crystalspace ;

@@ -1,0 +1,4 @@
+@c -*-texinfo-*-
+@set UPDATED 21 October 2008
+@set EDITION 1.9.0
+@set VERSION 1.9.0

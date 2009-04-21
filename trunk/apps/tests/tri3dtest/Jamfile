@@ -1,0 +1,6 @@
+SubDir TOP apps tests tri3dtest ;
+
+Description tri3dtest : "3D Triangulation Test Application" ;
+Application tri3dtest : [ Wildcard *.cpp *.h ] : noinstall ;
+LinkWith tri3dtest : crystalspace ;
+ExternalLibs tri3dtest : CEGUI ;

@@ -1,0 +1,11 @@
+SubDir TOP apps import md22spr ;
+
+Description mdl2spr : "Quake model MDL conversion tool" ;
+
+Application mdl2spr
+	: [ Wildcard *.cpp *.h ]
+	: console
+;
+LinkWith mdl2spr : crystalspace ;
+FileListEntryApplications mdl2spr : app-tool ;
+

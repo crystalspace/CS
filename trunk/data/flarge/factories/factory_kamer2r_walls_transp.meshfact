@@ -1,0 +1,46 @@
+<library>
+    <textures>
+        <texture name="plasma">
+            <type>crystalspace.texture.loader.plasma</type>
+        </texture>
+    </textures>
+    <materials>
+        <material name="plasma">
+            <texture>plasma</texture>
+        </material>
+    </materials>
+    <meshfact name="factory_kamer2r_walls_transp">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <numvt>4</numvt>
+            <v x="34" y="-14" z="16" u="0" v="0" />
+            <v x="34" y="-14" z="11" u="1" v="0" />
+            <v x="34" y="-19" z="11" u="1" v="1" />
+            <v x="34" y="-19" z="16" u="0" v="1" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <submesh name="0">
+                <material>plasma</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                </indexbuffer>
+            </submesh>
+            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                <e c0="0" c1="0" />
+                <e c0="0" c1="0" />
+                <e c0="0" c1="0" />
+                <e c0="0" c1="0" />
+            </renderbuffer>
+        </params>
+    </meshfact>
+</library>

@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+  Copyright (C) 2006 by Frank Richter
+	    (C) 2006 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<shader compiler="xmlshader" name="std_lighting">
+  
+  <inputs>
+    <texture name="tex diffuse" short="Diffuse texture">
+      Diffuse texture. If not provided, 'mat flatcolor' is used.
+    </texture>
+    <texture name="tex lightmap" hidden="yes" />
+  </inputs>
+  
+
+  <!-- Standard lighting shader. Supports "classic" surfaces (a diffuse 
+       texture or a flat color), "classic" lighting (lightmap or mesh-provided
+       per-vertex lighting), sector fog, parallax mapping, glow texture.
+  -->
+       
+  <?! Include the shader framework. Contains a number of helper templates.
+      The Cg shader framework adds some Cg-specific helpers on that. ?>
+  <?Include /shader/snippets/shaderframework-cg.inc ?>
+
+  <?! Include snippets. Each one provides a specific bit of functionality. ?>
+  <?! Instanced positions support ?>
+  <?Include /shader/snippets/cg-instancing.inc ?>
+  <?! "Classic" surface ?>
+  <?Include /shader/surface/cg-surface-classic.inc ?>
+  <?! "Classic" lighting ?>
+  <?Include /shader/lighting/cg-light-classic.inc ?>
+  <?! Sector fog ?>
+  <?Include /shader/fog/cg-fog-sector.inc ?>
+  <?! Parallax mapping ?>
+  <?Include /shader/surface/cg-parallax.inc ?>
+  <?! Support for alpha from the mixmode ?>
+  <?Include /shader/snippets/cg-mixmode-alpha.inc ?>
+
+  <?! Resource sharing.
+      Certain resources, e.g. texture coordinates, can be utilized by multiple
+      snippets. To remove redundancies in the buffer mappings and data 
+      transfered from VP to FP, the Cg framework provides helpers to share
+      common resources. ?>
+  <?! Glow texture support will be implemented "on foot" without snippets.
+      We want to use the "texCoord" resource, which provides texture 
+      coordinates in the "texCoord" global variable, under the condition that
+      there is a texture "tex glow". ?>
+  <?CgUseSharedCond texCoord "vars.\"tex glow\".texture" ?>
+  <?! Texture coordinates should be transfered from the VP to the FP. ?>
+  <?CgUseSharedCond texCoordV2F "vars.\"tex glow\".texture" ?>
+
+  <?! The program itself. "CgProgram" is a 'magic' name, and the Cg shader
+      framework will invoke it at the right place(s). ?>
+  <?Template CgProgram?>
+  /* For a shader, information needs to flow from the application to the vertex
+     program, the application to the fragment program and the vertex program
+     to the fragment program:
+       +-----+       +------------------+
+       | App |------>|  Vertex Program  |
+       +-----+\      +------------------+
+	       \		    |
+		\		    v
+		 \   +------------------+
+		  \->| Fragment Program |
+		     +------------------+
+    
+    Currently, the VP->FP direction is realized with a structure returned from 
+    the VP entry point (VertToFrag) and the app->FP and app->VP directions by 
+    global variables of the snippets (they are mapped invisibly to the user).
+   */
+  
+  /* This structure contains the information passed from the VP to the FP.
+   */
+  struct VertToFrag
+  {
+    /// The projected vertex position.
+    float4 Hposition : POSITION;
+    
+    /**
+     * Data from the framework itself. Always required, otherwise the snippets
+     * won't work correctly! 
+     */
+    VertToFrag_Framework framework;
+    
+    //@{
+    /// Structures provided by the used snippets
+    SurfaceClassic surfClassic;
+    LightingClassic lightClassic;
+    FogSector fog;
+    Parallax parallax;
+    //@}
+  };
+  
+  // The vertex program.
+  VertToFrag VertexMain (float4 Position : POSITION,
+			 /* The matrices are bound with the state.matrix.... semantics.
+			  * For more info see the Cg and ARB_vertex_program docs.
+			  */
+			  uniform float4x4 ModelViewProj : state.matrix.mvp)
+  {
+    VertToFrag V2F;
+  
+    V2F.Hposition = mul (ModelViewProj, GetInstancedPosition (Position));
+    // Let the snippets setup themselves
+    V2F.surfClassic.SetupVert();
+    V2F.lightClassic.SetupVert();
+    V2F.fog.SetupVert();
+    V2F.parallax.SetupVert();
+  
+    /**
+     * Statement to set up the framework's sharing of vertex-to-fragment data.
+     * Must always be the _last_ statement in the vertex program!
+     */
+    V2F.framework.SetupVert();
+  
+    return V2F;
+  }
+  
+  // The fragment program.
+  float4 FragmentMain (VertToFrag V2F, uniform sampler2D texGlow) : COLOR
+  {
+    /**
+     * Statement to set up the framework's sharing of vertex-to-fragment data.
+     * Must always be the _first_ statement in the fragment program!
+     */
+    V2F.framework.SetupFrag();
+    
+    /**
+     * Compute lit color: fetch diffuse from surface, multiply with lighting
+     * value, and apply mixmode alpha.
+     */
+    float4 color = V2F.surfClassic.GetDiffuse (V2F.parallax.GetTCOffset()) *
+      float4 (V2F.lightClassic.IllumAmbient()+V2F.lightClassic.IllumDiffuse(), 
+	GetMixmodeAlpha());
+    /// If we have fog, apply it.
+    if (V2F.fog.HasFog())
+    {
+      color = lerp(color, V2F.fog.GetColor(), V2F.fog.GetIntensity());
+    }
+    <?! If a glow texture is present ... ?>
+    <?if vars."tex glow".texture ?>
+      // Apply the glow.
+      color.rgb += tex2D (texGlow, texCoord).rgb;
+    <?endif?>
+    return color;
+  }
+  <?Endtemplate?>
+  
+  <?! For the glow, we need some per-pass data (the glow texture must be
+      bound). We add that bindings to the "PassMappings" list, and the
+      framework inserts all pass mappings at the right spot(s). ?>
+  <?Template MyPass ?>
+    <?if vars."tex glow".texture ?>
+      <texture name="tex glow" destination="texGlow" />
+    <?endif?>
+  <?Endtemplate?>
+  <?AddToList PassMappings MyPass?>
+  
+  <?! We can also set options for Cg programs. ?>
+  <?Template CgVertexOptions?>
+    <?! FIXME: check should be elsewhere ?>
+    <?if !vars."instancing transforms" ?>
+      <!-- We want position invariance here -->
+      <compilerargs>-posinv</compilerargs>
+    <?endif?>
+  <?Endtemplate?>
+  <?! Set the vertex program function. ?>
+  <?CgSetVertexFunc VertexMain ?>
+  <?! Set the fragment program function. ?>
+  <?CgSetFragmentFunc FragmentMain ?>
+
+  <?! Finally, this will write the technique with the given priority (150). ?>
+  <?WriteShaderTechnique 150?>
+  
+  <?! Now, basically the same, just without parallax mapping. ?>
+  <?Template CgProgram?>
+  struct VertToFrag
+  {
+    float4 Hposition : POSITION;
+    
+    VertToFrag_Framework framework;
+    
+    SurfaceClassic surfClassic;
+    LightingClassic lightClassic;
+    FogSector fog;
+  };
+  
+  VertToFrag VertexMain (float4 Position : POSITION,
+			 /* The matrices are bound with the state.matrix.... semantics.
+			  * For more info see the Cg and ARB_vertex_program docs.
+			  */
+			  uniform float4x4 ModelViewProj : state.matrix.mvp)
+  {
+    VertToFrag V2F;
+  
+    V2F.Hposition = mul (ModelViewProj, GetInstancedPosition (Position));
+    V2F.surfClassic.SetupVert();
+    V2F.lightClassic.SetupVert();
+    V2F.fog.SetupVert();
+  
+    V2F.framework.SetupVert();
+  
+    return V2F;
+  }
+  
+  // The fragment program.
+  float4 FragmentMain (VertToFrag V2F, uniform sampler2D texGlow) : COLOR
+  {
+    V2F.framework.SetupFrag();
+
+    float4 color = V2F.surfClassic.GetDiffuse () * 
+      float4 (V2F.lightClassic.IllumAmbient()+V2F.lightClassic.IllumDiffuse(), 
+	GetMixmodeAlpha());
+    if (V2F.fog.HasFog())
+    {
+      color = lerp(color, V2F.fog.GetColor(), V2F.fog.GetIntensity());
+    }
+    <?if vars."tex glow".texture ?>
+      color.rgb += tex2D (texGlow, texCoord).rgb;
+    <?endif?>
+    return color;
+  }
+  <?Endtemplate?>
+  <?WriteShaderTechnique 100?>
+
+  <?! Shader variables that might be used by snippets must be written out
+      as well. ?>
+  <?WriteShaderVars?>
+
+  <!-- Last but not least, fall back to a fixed function version, for older
+       hardware. -->
+  <fallbackshader name="std_lighting_fixed" file="/shader/std_lighting_fixed.xml" />
+</shader>

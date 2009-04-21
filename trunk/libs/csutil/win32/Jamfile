@@ -1,0 +1,32 @@
+SubDir TOP libs csutil win32 ;
+
+{
+  local rejects ;
+  if $(LIBBFD.AVAILABLE) != "yes"
+  {
+    rejects += bfd-module-win32.h ;
+  }
+  if $(ZLIB.AVAILABLE) != "yes"
+  {
+    rejects += minidump.cpp ;
+  }
+  else
+  {
+    CSLIB.EXTERNAL_LIBS += ZLIB ;
+  }
+
+  CsLibAddModule $(rejects) ;
+}
+
+if $(LIBBFD.AVAILABLE) = "yes"
+{
+  CSUTIL.GENERIC += callstack-bfd.cpp ;
+}
+
+CSUTIL.GENERIC +=
+  appdir.cpp
+  findlib.cpp
+  getopt.cpp
+  pluginpaths.cpp
+  resdir.cpp
+  runloop.cpp ;

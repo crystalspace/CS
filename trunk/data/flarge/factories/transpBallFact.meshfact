@@ -1,0 +1,19 @@
+<library>
+    <textures>
+        <texture name="plasma">
+            <type>crystalspace.texture.loader.plasma</type>
+        </texture>
+    </textures>
+    <materials>
+        <material name="plasma">
+            <texture>plasma</texture>
+        </material>
+    </materials>
+    <meshfact name="transpBallFact">
+        <plugin>meshFact</plugin>
+        <params>
+            <material>plasma</material>
+            <sphere rimvertices="16" />
+        </params>
+    </meshfact>
+</library>

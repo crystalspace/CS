@@ -1,0 +1,235 @@
+@node Threading, , Typed Arrays, csUtil
+@subsubsection Threading library
+@cindex Threading library
+
+The threading library is a collection of routines and classes for creating
+multithreaded and thread safe code and programs.
+
+Remember that just because you can make something multithreaded and threading
+safe does not mean you should do so, or doing so is a good idea and will give
+you a lot of benefit. Use with care, when appropriate.
+
+All threading related classes and operations are in the @code{CS::Threading}
+namespace.
+
+@subsubheading Atomic operations
+Atomic operations are the basic and smallest operations behind threading safe
+code. Atomic in this context means that they are guaranteed to complete with a
+deterministic result in relation to other threads and even cores doing other
+atomic operations on the same data.
+
+Atomic operations in Crystal Space is found in @code{CS::Threading::AtomicOperations}
+class in @file{csutil/threading/atomicops.h}. There are a few different atomic
+operations, namely:
+
+@multitable @columnfractions .3 .3 .4
+@item Operation @tab Function @tab Description
+@item Set
+@tab @code{AtomicOperations::Set}
+@tab Atomically set the content of a pointer or 32 bit integer variable and 
+return the value it had before setting it.
+
+@item Read
+@tab @code{AtomicOperations::Read}
+@tab Read content of pointer or 32 bit integer variable.
+
+@item Compare and Set (CAS)
+@tab @code{AtomicOperations::CompareAndSet}
+@tab Atomically compare current content of pointer or 32 bit integer variable
+and if it is equal to a given value exchange it. Returns the value of the
+variable before comparison.
+Atomic CAS operations are among the most used and most useful when it comes to
+building locking primitives or lock-free data structures.
+
+@item Increment
+@tab @code{AtomicOperations::Increment}
+@tab Atomically increment 32 bit integer variable and return its value prior
+to incrementation.
+
+@item Decrement
+@tab @code{AtomicOperations::Decrement}
+@tab Atomically decrement 32 bit integer variable and return its value prior
+to decrementation.
+@end multitable
+
+
+@subsubheading Threads
+A thread is the smallest unit of execution when looking at multithreaded
+execution. Each thread is a "lane" of sequential execution and by having multiple
+threads executing at the same time you get the effect of simultaneous 
+execution.
+
+As this concept of simultaneous execution can be a bit confusing at first there
+are two important things to remember
+
+@enumerate
+@item
+The operating system have full control over how and when threads are executed.
+This means that you can never be certain of if two threads are executed on
+same or different processors or cores if you have dual processor/core system,
+you cannot rely on different threads executing a specific order.
+
+A more important result of this is that you cannot rely on or even know when
+one thread is interrupted to let another one execute. This means that whenever
+you operate on data shared between two or more threads you must use one of the
+syncronization primitives or atomic operations.
+
+@item
+Threading is not always the answer. Wisely used in the correct cases it can 
+provide a significant speedup and/or make the code easier, however in the wrong
+spots it can make the code buggy, slow and complicated. Use with care!
+@end enumerate
+
+To create a thread you first need to implement the interface 
+@code{CS::Threading::Runnable} and instance it. Then create an instance of
+@code{CS::Threading::Thread} to start a new thread executing the runnable
+instance.
+
+Use the @code{Start()} and @code{Stop()} methods of the thread to control its
+execution and @code{Wait()} to wait until it finishes execution.
+
+Here is an example of a simple thread and creation
+
+@example
+#include "crystalspace.h"
+
+using namespace CS::Threading;
+
+class MyRunner : public Runnable
+@{
+  void Run ()
+  @{
+    int i = 0;
+    while (i < 100)
+    @{
+      // Wait for a while
+      csSleep (1000);
+      
+      // Print a message. Notice that this is potentially not thread safe!
+      csPrintf ("Thread printing\n");
+    @}
+  @}
+@};
+
+int main (int argc, char* argv[])
+@{
+  // Instance runnable and thread
+  csRef<Runnable> r; r.AttachNew (new MyRunner);
+  csRef<Thread> thread; thread.AttachNew (new Thread (r));
+  
+  // Start the thread
+  thread->Start ();
+  
+  // Wait for a while to let it run
+  csSleep (500);
+  
+  // Wait for the thread to finish running
+  thread->Wait ();
+@}
+@end example
+
+As you can see in this example it is not doing anything useful while the thread
+is running. In a real application you would do something useful while the thread
+is for example waiting for IO.
+
+@subsubheading Syncronization primitives
+The threading library provides two different thread syncronization primitives.
+The two works differently and do not have the same purpose. Which primitive
+to use depends on the situation at hand.
+
+@multitable @columnfractions .3 .3 .4
+@item Type @tab Class @tab Usage
+
+@item Mutex
+@tab @code{Mutex}
+@tab Mutually exclusive access to a shared resource. N threads share a common
+buffer and only one thread should be allowed to modify it at a time.
+
+@item Condition
+@tab @code{Condition}
+@tab Signal that a condition is fullfilled. One or more threads wait for a 
+condition to be signaled by a source.
+@end multitable
+
+To note is that a condition always is used together with a mutex, which also
+should be shared between the threads.
+
+The example below shows how a mutex and a condition can be used to distribute
+work units between two threads. Note, this sample works but is not fully complete.
+For a better implementation, look at @code{CS::Threading::ThreadedJobQueue}
+
+@example
+#include "crystalspace.h"
+
+using namespace CS::Threading;
+
+// Shared data
+csFIFO<int> queue;
+
+// Mutex to protect it
+Mutex queueMutex;
+Condition newItemInQueue;
+
+
+class MyRunner : Runnable
+@{
+  void Run ()
+  @{
+    while (true)
+    @{
+      // Get an item from queue
+      int myData;
+      
+      @{
+        // Make sure we lock the queue before trying to access it
+        MutexScopedLock lock (queueMutex);
+		
+        // Wait until we have an item
+        while (queue.Length() == 0)
+          newItemInQueue.Wait (queueMutex);
+		  
+        // When we get here we know that:
+        // 1. newItemInQueue have been signaled
+        // 2. We have the queueMutex locked
+        // 3. The queue is not empty
+        
+        // Get the data
+        myData = queue.PopTop ();
+      @}
+      
+      // Process it
+      csPrintf ("Processing data: %d\n", myData);
+      csSleep (400);
+    @}
+  @}
+@};
+
+int main (int argc, char* argv[])
+@{
+  // Instance runnable and thread
+  csRef<Runnable> r; r.AttachNew (new MyRunner);
+  csRef<Thread> thread; thread.AttachNew (new Thread (r));
+  
+  // Start the thread
+  thread->Start ();
+  
+  // Give it some data
+  for (int i = 0; i < 100; ++i)
+  @{
+    // Prepare the data
+    int myData = (i * 10 + 31)  % 47;
+    
+    @{
+      //Lock the queue and insert our data
+      MutexScopedLock lock (queueMutex);
+      queue.Push (myData);
+    @}
+    
+    // Notify one waiting threads, let them compete over who takes it
+    newItemInQueue.NotifyOne ();
+  @}
+  
+  ...
+@}
+
+@end example

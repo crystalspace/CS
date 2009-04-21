@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- cssynldr.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.syntax.loader.service.text</name>
+        <implementation>csTextSyntaxService</implementation>
+        <description>Crystal Space loader services for textual CS syntax</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

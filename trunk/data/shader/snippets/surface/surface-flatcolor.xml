@@ -1,0 +1,62 @@
+<!--
+  Copyright (C) 2007 by Frank Richter
+	    (C) 2007 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet>
+  <technique priority="100">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <input name="flatColor" type="rgba" default="complex">
+      <block location="cg:variablemap">
+        <variablemap variable="mat flatcolor" 
+	  destination="fragmentIn.flatColor" />
+        <variablemap variable="mat flatcolor" 
+	  destination="vertexIn.flatColor" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="rgba" name="flatColor" />
+      </block>
+      
+      <block location="cg:vertexIn">
+	<uniform type="rgba" name="flatColor" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	flatColor = fragmentIn.flatColor;
+      </block>
+
+      <block location="cg:vertexMain">
+	flatColor = vertexIn.flatColor;
+      </block>
+    </input>
+      
+    <block location="cg:vertexMain">
+      surfaceColor = flatColor;
+      surfaceColor_attr_perfragment = false;
+    </block>
+    
+    <block location="cg:fragmentMain">
+      surfaceColor = flatColor;
+      surfaceColor_attr_perfragment = false;
+    </block>
+    
+    <output name="surfaceColor" type="rgba">
+      <attribute name="perfragment" type="bool" />
+    </output>
+  </technique>
+</snippet>

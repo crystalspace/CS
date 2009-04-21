@@ -1,0 +1,43 @@
+<cgvp>
+<compilerargs>-posinv</compilerargs>
+<variablemap variable="light position[0]" destination="LightPos" />
+<variablemap variable="light attenuation[0]" destination="Attenuation" />
+
+<program>
+<![CDATA[
+
+struct app2vertex {
+	float4 Position : POSITION;
+};
+
+struct vertex2fragment { 
+	float4 Position : POSITION;
+	float2 Attenuation1 : TEXCOORD0;
+	float2 Attenuation2 : TEXCOORD1;
+};
+
+vertex2fragment main (app2vertex IN,
+	uniform float4x4 ModelViewI : state.matrix.modelview.inverse,
+	  /* The matrices are bound with the state.matrix.... semantics.
+	     For more info see the Cg and ARB_vertex_program docs.
+	     */
+	uniform float4x4 ModelViewProj : state.matrix.mvp,
+	uniform float4 LightPos,
+	uniform float4 Attenuation)
+{
+	vertex2fragment OUT;
+	
+	float4 objLight = mul(ModelViewI, LightPos);
+	objLight.xyz -= IN.Position.xyz;
+	
+	OUT.Position = mul (ModelViewProj, IN.Position);
+	OUT.Attenuation1.xy = -objLight.xy*Attenuation.y*0.4 + 0.5; 
+	OUT.Attenuation2.x = -objLight.z*Attenuation.y*0.4 + 0.5; 
+	OUT.Attenuation2.y = 0.5;
+
+	return OUT;
+}
+
+]]>
+</program>
+</cgvp>

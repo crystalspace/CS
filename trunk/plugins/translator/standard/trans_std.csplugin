@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!-- trans_std.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.translator.standard</name>
+        <implementation>csTranslator</implementation>
+        <description>Standard Translator</description>
+      </class>
+      <class>
+        <name>crystalspace.translator.loader.xml</name>
+        <implementation>csTranslatorLoaderXml</implementation>
+        <description>Xml Translator Loader</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

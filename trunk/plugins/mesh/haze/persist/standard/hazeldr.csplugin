@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- hazeldr.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.loader.factory.haze</name>
+        <implementation>csHazeFactoryLoader</implementation>
+        <description>Crystal Space Haze Factory Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.loader.haze</name>
+        <implementation>csHazeLoader</implementation>
+        <description>Crystal Space Haze Mesh Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.factory.haze</name>
+        <implementation>csHazeFactorySaver</implementation>
+        <description>Crystal Space Haze Factory Saver</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.haze</name>
+        <implementation>csHazeSaver</implementation>
+        <description>Crystal Space Haze Mesh Saver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

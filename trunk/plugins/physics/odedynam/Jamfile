@@ -1,0 +1,9 @@
+SubDir TOP plugins physics odedynam ;
+
+if $(ODE.AVAILABLE) = "yes"
+{
+  Description odedynam : "ODE physics plugin" ;
+  Plugin odedynam : [ Wildcard *.cpp *.h ] ;
+  LinkWith odedynam : crystalspace ;
+  ExternalLibs odedynam : ODE ;
+}

@@ -1,0 +1,117 @@
+/*
+ * app#PROJECTNAME#.h
+ *
+ * Declaration of App#PROJECTNAMECAP#, the main application object.
+ */
+
+#ifndef __app#PROJECTNAME#_h
+#define __app#PROJECTNAME#_h
+
+#include "#PROJECTNAME#.h"
+#include <crystalspace.h>
+
+class App#PROJECTNAMECAP# :
+  public csApplicationFramework, public csBaseEventHandler
+{
+private:
+
+  /// A pointer to the 3D renderer plugin.
+  csRef<iGraphics3D> g3d;
+
+  /// A pointer to the keyboard driver.
+  csRef<iKeyboardDriver> kbd;
+
+  /// A pointer to the 3D engine plugin.
+  csRef<iEngine> engine;
+  
+  /// A pointer to the loader plugin.
+  csRef<iLoader> loader;
+
+  /// A pointer to the virtual clock.
+  csRef<iVirtualClock> vc;
+
+  /// A pointer to the collision detection system.
+  csRef<iCollideSystem> cdsys;
+
+  /// A pointer to the view which contains the camera.
+  csRef<iView> view;
+
+  /// A pointer to the frame printer.
+  csRef<FramePrinter> printer;
+
+  /// A pointer to the configuration manager.
+  csRef<iConfigManager> cfgmgr;
+
+  /// A pointer to the sector the camera will be in.
+  iSector* sector;
+
+  /// Our collider used for gravity and CD (collision detection).
+  csColliderActor collider_actor;
+
+  /// Load the 'world' file in the given VFS map directory.
+  bool LoadMap (const char* path);
+
+  /// Setup stuff after map loading.
+  bool PostLoadMap ();
+
+  /// Load a library file with the given VFS path.
+  bool LoadLibrary (const char* path);
+
+  /**
+   * Set up everything that needs to be rendered on screen.  This routine is
+   * called from the event handler in response to a csevFrame event.
+   */
+  virtual void Frame();
+  
+  /**
+   * Handle keyboard events, such as key presses and releases.  This routine is
+   * called from the event handler in response to a csevKeyboard event.
+   */
+  virtual bool OnKeyboard(iEvent&);
+
+  /**
+   * This method is called by Frame ().
+   * It was separated so it's easy to remove or customize it.
+   */
+  void DoStuffOncePerFrame ();
+
+public:
+  /**
+   * Constructor.
+   */
+  App#PROJECTNAMECAP#();
+
+  /**
+   * Destructor.
+   */
+  virtual ~App#PROJECTNAMECAP#();
+
+  /**
+   * Final cleanup.
+   */
+  virtual void OnExit();
+
+  /**
+   * Main initialization routine.  This routine should set up basic facilities
+   * (such as loading startup-time plugins, etc.).  In case of failure this
+   * routine will return false.  You can assume that the error message has been
+   * reported to the user.
+   */
+  virtual bool OnInitialize(int argc, char* argv[]);
+
+  /**
+   * Run the application.  Performs additional initialization (if needed), and
+   * then fires up the main run/event loop.  The loop will fire events which
+   * actually causes Crystal Space to "run".  Only when the program exits does
+   * this function return.
+   */
+  virtual bool Application();
+  
+  /* Declare the name by which this class is identified to the event scheduler.
+   * Declare that we want to receive the frame event in the "LOGIC" phase,
+   * and that we're not terribly interested in having other events
+   * delivered to us before or after other modules, plugins, etc. */
+  CS_EVENTHANDLER_PHASE_LOGIC("application.#PROJECTNAME#")    
+};
+
+#endif // __app#PROJECTNAME#_h

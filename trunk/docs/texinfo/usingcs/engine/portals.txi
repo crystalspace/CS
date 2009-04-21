@@ -1,0 +1,195 @@
+@c -*-texinfo-*-
+@node Portal Engine, Cameras and Matrices, HOWTO Render Priorities, Engine
+@subsection Portal Engine
+@cindex Portal Engine
+@cindex @code{iPortal}
+@cindex @code{iSector}
+
+@noindent
+@emph{Written by Jorrit Tyberghein,
+@email{jorrit.tyberghein@@gmail.com}.}
+
+The world in Crystal Space is defined with @dfn{Sectors}. A sector is
+an infinite area of space that itself does not represent geometry but can
+contain objects that represent geometry. There are various types of
+objects that you can put in a sector (@pxref{MeshObject}).
+
+A sector is in principle an infinite area of space. But usually the
+sector has logical bounds which are made from some mesh object. In this
+discussion we will use the genmesh mesh object to make sector boundaries.
+
+You can define multiple sectors and connect them together by using
+portals in a portal container (@pxref{MeshObject Portal Container}).
+
+Assume that you want to define a large room with a pillar in the middle of the
+room.  You can do this two ways; either with four sectors, or with one sector.
+First let us define it with four sectors.
+
+@noindent
+As seen from above, the sectors would look something like this:
+
+@picturess{usingcs,engine,portal1}
+
+@noindent
+Sector S1 is composed of eight polygons (including the top and bottom polygon
+for its roof and floor, as well as the three polygons at the east side).  The
+two polygons adjacent to sectors S2 and S4 are portals to the respective
+sectors.  All the other polygons are texture mapped as normal.
+
+@noindent
+Sectors S2 and S4 have six polygons each.  Their west polygons are again
+portals to sector S1.  Their east polygons are portals to sector S3.
+
+@noindent
+Sector S3 is defined as is sector S1.
+
+Another way to define this room using just the same four sectors could be done
+as follows:
+
+@picturess{usingcs,engine,portal2}
+
+@noindent
+To the person standing in this room this makes no difference at all.
+
+There are many other ways to define this room using the four sectors.  One
+important thing to note is that four is the minimum number of Sectors that you
+need to define this room if you want to render the polygons using Z-fill
+mode (this means that the Z-buffer is updated but not tested). If you want
+to be able to render using Z-fill mode a sector has to be @dfn{convex}.
+
+An easier way to define this room is by using only one Sector and one GenMesh
+to define the pillar, as shown below.
+
+@picturess{usingcs,engine,thing}
+
+Again this makes no difference for the person standing in this room. For a
+simple situation like this you should avoid the overhead of portals as 3D
+hardware is fast enough to just render everything anyway. Portals are mainly
+useful when you are creating complicated and large worlds. For example, if you
+have a large outside world with buildings then you could model the outside
+as one sector and the inside of every building as another sector.
+
+Using Things like this make it easier to define worlds. If they are small
+enough they will also enhance performance.
+
+With Sectors, Portals, and GenMeshes you can describe virtually any world that
+you want.
+
+@subsubheading Sectors
+@cindex Sectors
+@cindex visibility culler
+
+In this section I will describe Sectors a bit more thoroughly.  As stated
+before sectors represent infinite space. You can fill a sector with geometry
+by using mesh objects (@pxref{MeshObject}).
+
+With a sector there is always an associated visibility culler. Currently
+Crystal Space supports two cullers:
+@itemize
+@item
+@samp{frustvis}: This is the default visibility culler that is used if no
+other is specified. It only does frustum culling. It is the best culler to
+use for simple sectors that don't have a lot of objects or else for sectors
+that are big but where all objects are small. For such sectors it doesn't
+make much sense to try to do more complicated visibility culling so
+frustum cullling (testing if an object is visible in the current view)
+is more than enough.
+@item
+@samp{dynavis}: This is a more advanced visibility culler that does
+frustum culling in addition to trying to avoid rendering objects that
+are obscured by other objects (@pxref{Visibility Culling}). This culler
+is mainly useful when you have big complex sectors with lots of objects
+and when objects have a good chance of occluding (hiding) other objects.
+@end itemize
+
+@subsubheading GenMeshes
+@cindex GenMeshes
+
+A GenMesh is one of the basic building blocks to create geometry in
+Crystal Space. A GenMesh is basically a triangle mesh.
+
+GenMeshes (and other mesh objects for that matter) can be rendered using
+Z-fill or Z-use mode. With Z-fill the previous contents of the Z-buffer
+(where that GenMesh is rendered) is just overwritten. With Z-use the
+previous contents is checked in order to see if the GenMesh is in front
+or behind the polygons that are already on screen. If you have a convex
+object (like the outer polygons of a room) then you can use Z-fill because
+the polygons will not overlap. GenMeshes which are then inside those walls
+will need to use Z-use in order not to overwrite each other.
+
+Note that polygons have a visible side and an invisible side (backface
+culling).
+
+@subsubheading Polygons
+@cindex Polygons
+
+GenMeshes are made of 3D triangles. The vertices of triangles are oriented
+clockwise.  This fact is used for backface culling; a
+triangle has only one visible side.
+
+Triangles are drawn with a texture.  How the texture is mapped on the polygon
+depends on a the uv mapping.  This is general enough so that you can
+translate, rotate, scale, and mirror the texture in every possible direction.
+The texture is tiled across the polygon surface.
+
+@subsubheading Portal Containers
+@cindex Portal Container
+
+A special kind of object is the portal container. It also has polygons
+but every polygon is a portal to another sector (or the same sector in case of
+a mirror or other space warping transformation).
+
+@subsubheading Portals
+@cindex Portals
+
+A Portal is a special kind of polygon.
+
+Instead of texture mapping a portal polygon, the engine will recursively
+draw the sector that this portal points to.  After this, if the texture is
+semi-transparent, the texture will be mapped over the already rendered
+sector.
+
+Portals can also transform space.  This feature can be used to implement
+mirrors or reflecting surfaces.
+
+Note that when there is a portal from sector A to sector B you should probably
+also define a portal from sector B to sector A.  Adjacent polygons of
+different sectors are not shared so you need to set a portal on each of them.
+Otherwise you will have the effect that you can see from sector A to sector B
+but not the other way around.
+
+A special feature of portals is that you could (in theory) have a portal from
+sector A to sector B, but instead of going back to sector A from sector B you
+could set the portal to point at sector C which (in this example) would be a
+sector which has the same world space coordinates as sector A.  This is
+perfectly possible (although maybe not desirable) with Crystal Space.  An
+important result of this is that a given world space coordinate can belong to
+more than one sector!  A corollary of this is that you always need a current
+sector reference together with a world space coordinate to really know where
+you are.
+
+Portals in Crystal Space can solve the problem of polygon sorting if you
+structure your world strictly with convex sectors (not really recommended for
+practical worlds).  All polygons
+in the current sector are certainly visible (unless they are behind the view
+plane) and do not overlap, so they can just be drawn in any order without
+overdraw and without conflicts.  If a portal polygon is reached, all polygons
+in that other sector are behind all the polygons in the current sector.  In
+fact portals are an explicit form of @sc{bsp} tree.  The advantages of this
+approach are summarized below.
+
+@itemize @bullet
+@item
+Space warping can be used as described above.
+
+@item
+In theory it would be rather easy to make dynamic worlds.  Because the portals
+are explicit it is easy to define them so that certain sectors can move and
+transform in certain ways.
+Note that static lighting makes this a bit difficult in some cases.
+@end itemize
+
+One disadvantage a portal engine is that it can be more difficult to define
+worlds. If you want to be able to use @sc{zfill} mode you must make all
+sectors convex. If you don't care about that then you can use @sc{zuse} too.
+

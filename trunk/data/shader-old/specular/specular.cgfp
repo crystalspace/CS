@@ -1,0 +1,44 @@
+<include>
+<variablemap variable="light 0 diffuse" destination="lightcolor"/>
+<variablemap variable="specular" destination="specular"/>
+<program>
+ 
+struct vertex2fragment { 
+	float4 Position : POSITION;
+	float3 TexCoord : TEXCOORD0;
+	float4 LightDir : TEXCOORD1;
+	float4 EyeVec : TEXCOORD2;
+	float4 Attenuation : TEXCOORD3;
+};
+ 
+ 
+float4 main (vertex2fragment IN,
+			uniform float4 lightcolor,
+			uniform float4 specular,
+			uniform sampler2D TexDiffuse,
+ 			uniform sampler2D TexNormal,
+ 			uniform sampler2D TexAttn
+			) : COLOR
+{
+	float3 normEye = normalize(IN.EyeVec);
+	float3 normLight = normalize(IN.LightDir);
+	float4 diffuseCol = tex2D(TexDiffuse, IN.TexCoord.xy);
+	float4 bumpNormal = 2*tex2D(TexNormal, IN.TexCoord.xy) - 1;
+	float3 normBumpNormal = normalize(bumpNormal.xyz);
+	float bump = dot(normLight, normBumpNormal);
+	float3 half = normalize(normLight + normEye);
+	<?if vars."specular" ?>
+		float spec = pow(max(dot(half, normBumpNormal), 0), 32) * (bumpNormal.a+1)/2;;
+	<?endif?>
+	float4 outCol = lightcolor*bump.xxxx;
+	<?if vars."specular" ?>
+		float4 result = saturate(outCol*diffuseCol + spec*lightcolor*specular);
+	<?else?>
+		float4 result = saturate(outCol*diffuseCol);
+	<?endif?>
+	result.a = 2*tex2D(TexAttn, IN.Attenuation.xy).a*tex2D(TexAttn, IN.Attenuation.zw).a;
+	return result;
+}
+</program>
+</include>
+

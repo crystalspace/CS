@@ -1,0 +1,129 @@
+<library>
+    <textures>
+        <texture name="fire">
+            <type>fireTxt</type>
+        </texture>
+        <texture name="asphalt.gif">
+            <file>/lib/stdtex/asphalt.jpg</file>
+        </texture>
+    </textures>
+    <materials>
+        <material name="fire">
+            <texture>fire</texture>
+        </material>
+        <material name="asphalt">
+            <texture>asphalt.gif</texture>
+        </material>
+    </materials>
+    <meshfact name="factory_kamer2d_walls">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <numvt>20</numvt>
+            <v x="10" y="-14" z="-13" u="0.98" v="0.0200001" />
+            <v x="5" y="-14" z="-13" u="0.02" v="0.0199999" />
+            <v x="5" y="-19" z="-13" u="0.02" v="0.98" />
+            <v x="10" y="-19" z="-13" u="0.98" v="0.98" />
+            <v x="10" y="-14" z="6" u="0" v="0" />
+            <v x="10" y="-14" z="-13" u="3.8" v="0" />
+            <v x="10" y="-19" z="-13" u="3.8" v="1" />
+            <v x="10" y="-19" z="6" u="0" v="1" />
+            <v x="5" y="-14" z="-13" u="0" v="0" />
+            <v x="5" y="-14" z="6" u="3.8" v="0" />
+            <v x="5" y="-19" z="6" u="3.8" v="1" />
+            <v x="5" y="-19" z="-13" u="0" v="1" />
+            <v x="5" y="-14" z="-13" u="0" v="0" />
+            <v x="10" y="-14" z="-13" u="1" v="0" />
+            <v x="10" y="-14" z="6" u="1" v="3.8" />
+            <v x="5" y="-14" z="6" u="0" v="3.8" />
+            <v x="5" y="-19" z="6" u="0" v="0" />
+            <v x="10" y="-19" z="6" u="1" v="0" />
+            <v x="10" y="-19" z="-13" u="1" v="3.8" />
+            <v x="5" y="-19" z="-13" u="0" v="3.8" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <n x="0" y="0" z="1" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="-1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <n x="0" y="1" z="0" />
+            <submesh name="0">
+                <material>fire</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                </indexbuffer>
+            </submesh>
+            <submesh name="asphalt_0">
+                <material>asphalt</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="4" />
+                    <e c0="5" />
+                    <e c0="6" />
+                    <e c0="4" />
+                    <e c0="6" />
+                    <e c0="7" />
+                    <e c0="8" />
+                    <e c0="9" />
+                    <e c0="10" />
+                    <e c0="8" />
+                    <e c0="10" />
+                    <e c0="11" />
+                    <e c0="12" />
+                    <e c0="13" />
+                    <e c0="14" />
+                    <e c0="12" />
+                    <e c0="14" />
+                    <e c0="15" />
+                    <e c0="16" />
+                    <e c0="17" />
+                    <e c0="18" />
+                    <e c0="16" />
+                    <e c0="18" />
+                    <e c0="19" />
+                </indexbuffer>
+            </submesh>
+            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                <e c0="0" c1="0" />
+                <e c0="0" c1="0" />
+                <e c0="0" c1="0" />
+                <e c0="0" c1="0" />
+                <e c0="0.289063" c1="0.296875" />
+                <e c0="0.765625" c1="0.296875" />
+                <e c0="0.765625" c1="0.53125" />
+                <e c0="0.289063" c1="0.53125" />
+                <e c0="0.289063" c1="0.015625" />
+                <e c0="0.765625" c1="0.015625" />
+                <e c0="0.765625" c1="0.25" />
+                <e c0="0.289063" c1="0.25" />
+                <e c0="0.0078125" c1="0.015625" />
+                <e c0="0.125" c1="0.015625" />
+                <e c0="0.125" c1="0.96875" />
+                <e c0="0.0078125" c1="0.96875" />
+                <e c0="0.148438" c1="0.015625" />
+                <e c0="0.265625" c1="0.015625" />
+                <e c0="0.265625" c1="0.96875" />
+                <e c0="0.148438" c1="0.96875" />
+            </renderbuffer>
+        </params>
+    </meshfact>
+</library>

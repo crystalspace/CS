@@ -1,0 +1,3 @@
+SubDir TOP plugins video canvas macosx ;
+
+SubInclude TOP plugins video canvas macosx opengl ;

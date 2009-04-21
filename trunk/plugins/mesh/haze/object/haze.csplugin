@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- haze.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.haze</name>
+        <implementation>csHazeMeshObjectType</implementation>
+        <description>Crystal Space Haze Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- cspython.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.script.python</name>
+        <implementation>csPython</implementation>
+        <description>Crystal Space Script Python</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

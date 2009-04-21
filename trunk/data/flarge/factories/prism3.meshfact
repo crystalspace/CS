@@ -1,0 +1,76 @@
+<library>
+    <textures>
+        <texture name="parket.gif">
+            <file>/lib/stdtex/parket.jpg</file>
+        </texture>
+    </textures>
+    <materials>
+        <material name="parket">
+            <texture>parket.gif</texture>
+        </material>
+    </materials>
+    <meshfact name="prism3">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <numvt>12</numvt>
+            <v x="0" y="0.5" z="0" u="0" v="0" />
+            <v x="0.7" y="-0.5" z="-0.5" u="0.659545" v="-2.54954e-008" />
+            <v x="-0.7" y="-0.5" z="-0.5" u="0.288077" v="0.593306" />
+            <v x="0" y="0.5" z="0" u="0" v="0" />
+            <v x="-0.7" y="-0.5" z="-0.5" u="0.659545" v="-5.58242e-009" />
+            <v x="0" y="-0.5" z="0.5" u="0.284287" v="0.481333" />
+            <v x="0" y="0.5" z="0" u="0" v="0" />
+            <v x="0" y="-0.5" z="0.5" u="0.559017" v="0" />
+            <v x="0.7" y="-0.5" z="-0.5" u="0.33541" v="0.567891" />
+            <v x="-0.7" y="-0.5" z="-0.5" u="-0.35" v="-0.25" />
+            <v x="0.7" y="-0.5" z="-0.5" u="0.35" v="-0.25" />
+            <v x="0" y="-0.5" z="0.5" u="0" v="0.25" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="0" y="0.447214" z="-0.894427" />
+            <n x="0" y="0.447214" z="-0.894427" />
+            <n x="0" y="0.447214" z="-0.894427" />
+            <n x="-0.787499" y="0.275625" z="0.551249" />
+            <n x="-0.787499" y="0.275625" z="0.551249" />
+            <n x="-0.787499" y="0.275625" z="0.551249" />
+            <n x="0.787499" y="0.275625" z="0.551249" />
+            <n x="0.787499" y="0.275625" z="0.551249" />
+            <n x="0.787499" y="0.275625" z="0.551249" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <n x="0" y="-1" z="0" />
+            <submesh name="parket_0">
+                <material>parket</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                    <e c0="3" />
+                    <e c0="4" />
+                    <e c0="5" />
+                    <e c0="6" />
+                    <e c0="7" />
+                    <e c0="8" />
+                    <e c0="9" />
+                    <e c0="10" />
+                    <e c0="11" />
+                </indexbuffer>
+            </submesh>
+            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                <e c0="0.03125" c1="0.03125" />
+                <e c0="0.375" c1="0.03125" />
+                <e c0="0.181394" c1="0.3125" />
+                <e c0="0.03125" c1="0.71875" />
+                <e c0="0.375" c1="0.71875" />
+                <e c0="0.179418" c1="0.9375" />
+                <e c0="0.46875" c1="0.03125" />
+                <e c0="0.75" c1="0.03125" />
+                <e c0="0.6375" c1="0.3125" />
+                <e c0="0.03125" c1="0.40625" />
+                <e c0="0.375" c1="0.40625" />
+                <e c0="0.203125" c1="0.625" />
+            </renderbuffer>
+        </params>
+    </meshfact>
+</library>

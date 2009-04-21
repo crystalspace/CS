@@ -1,0 +1,6 @@
+SubDir TOP plugins cscript pycsgfx ;
+
+if $(PYTHON.AVAILABLE) = "yes"
+{
+  PyBindingModule csgfxmod : csgfx : csgfxmod.cpp : : : "csgfx cs Python module" ;
+}

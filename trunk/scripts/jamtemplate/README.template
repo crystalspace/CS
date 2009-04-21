@@ -1,0 +1,73 @@
+#LONGNAME#
+#HOMEPAGE#
+
+By #AUTHOR# <#EMAIL#>
+#COPYRIGHT#
+
+XXX WARNING: This is a sample README file it seems that the author of the
+XXX          project has not yet modified it. You will only find generic
+XXX	     information here.
+
+Contents
+1. Introduction
+2. Building and Installing
+3. Usage
+4. Contact
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Introduction
+
+XXX Fill in some text
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+2. Building and installing
+
+You can build the project on Unix, Msys/Mingw, and Cygwin using the Jam build
+tool. Microsoft Visual-C++ users can build the project using the project files
+in the #PROJECTNAME#/msvc directory.
+
+2.1 Jam
+
+ The build system is based upon Jam rather than 'make'.  If you do not yet have
+ jam installed, then check your distribution for a Jam package or download the
+ source and compile/install Jam yourself.  You can find the source here:
+
+    ftp://ftp.perforce.com/pub/jam/
+
+ You will need at least version 2.4.
+
+2.1.1 Building
+
+ 1. Go to the top-level directory in the project tree.
+ 2. Run "./configure", possibly with some options, if you wish.  You can see a
+    list of available options by invoking configure with the "--help" option.
+ 3. Run "jam".
+
+2.1.2 Installing
+
+ 1. Build the project.
+ 2. Ensure that you have write permissions to the install directories. On Unix
+    (GNU/Linux, MacOS/X, Darwin, BSD) this usually means that you need to be
+    the 'root' user.
+ 3. Run "jam install".
+
+2.2 Microsoft Visual-C++
+
+ 1. Open the workspace file #PROJECTNAME#/msvc/wks#PROJECTNAME#.
+ 2. Set "grpall_#PROJECTNAME#" as the active project.
+ 3. Choose "Release" or "Debug" build mode.
+ 4. Build the project.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+3. Usage
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+4. Contact
+
+Bug-Reports, suggestions, requests, and greeting cards should be send to
+#EMAIL#

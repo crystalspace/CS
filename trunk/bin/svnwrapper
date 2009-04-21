@@ -1,0 +1,46 @@
+#!/bin/sh
+
+# Special SVN wrapper to ease operations against SF.
+# Pass through all options to normal SVN, however when doing a 
+# checkout it also runs a number of updates afterwards to 
+# compensate for SFs sometimes broken SVN.
+
+MAXITER=2
+
+if [[ "$1" == "co" || "$1" == "checkout" ]]
+then
+  # First do a normal checkout, pass on all options to SVN
+  # Then if it fails, do at most MAXITER updates
+  DIRNAME=`basename $2`
+  
+  svn $@
+
+  if [[ $? ]]
+  then
+    echo "Connection lost; retrying..."
+
+    # Set some variables
+    # Shift away co and url
+    shift 2
+    
+    var0=0
+    while [ "$var0" -lt "$MAXITER" ]
+    do
+      svn up $@ $DIRNAME
+
+      if [[ $? = 0 ]]
+      then
+        break
+      fi
+      var0=$(($var0+1))
+    done
+    
+    exit 0
+  fi
+  
+  exit 0
+fi
+
+# Just pass stuff on to SVN
+
+svn $@

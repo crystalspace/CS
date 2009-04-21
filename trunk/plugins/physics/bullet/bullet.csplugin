@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- bullet.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.dynamics.bullet</name>
+        <implementation>csBulletDynamics</implementation>
+        <description>Bullet physics</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

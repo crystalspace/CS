@@ -1,0 +1,134 @@
+@c -*-texinfo-*-
+@node Requirements, External Libraries, Directory Hierarchy, Building
+@section Requirements
+@cindex Requirements
+
+To utilize Crystal Space you need at least the following resources.
+
+@strong{Hardware}: To fully utilize the 3D engine a 3D-accelerated graphics
+card is highly recommended. The minimum recommended processor on the
+x86 architecture is one of the i586 family (Pentium).
+
+@strong{Operating System}: You will need to be running a supported Operating
+System.  Currently Crystal Space supports: Windows (32 bit), Unix
+(@sc{gnu}/Linux, FreeBSD, etc.), and MacOS/X.
+
+@strong{Development Environment}: You may build Crystal Space yourself, or you
+may download a pre-built @sc{sdk} package.  If you are using the @sc{svn}
+version of Crystal Space, then you will need to build it yourself.  To do so
+you will need a supported C++ compiler such as the @sc{gnu} Compiler Collection
+(@sc{gcc} - versions known to work well are 3.4 and above, with the exception
+of versions 4.0.0 and 4.0.1 which produce buggy code for Crystal Space) or 
+Microsoft Visual C++, version 7.0 (aka .net 2002) and above (version 6 is not
+supported).  If you plan to use the scripting
+capabilities of Crystal Space you will also need an interpreter for each
+scripting language you use.
+
+@strong{Crystal Space Package}: The latest release of Crystal Space can be
+downloaded from:
+
+@noindent
+@uref{http://www.crystalspace3d.org/main/Download}
+
+The release includes all of the source code, some pre-generated documentation,
+and a few example data files.  Alternately, you can download the latest
+@sc{svn} snapshot, which is often a great improvement over the latest release,
+and often as, or more, stable.
+
+@noindent
+@uref{http://www.crystalspace3d.org/cvs-snapshots/}
+
+You can also checkout the source directly from the @sc{svn} repository.
+Directions for doing this can be found here:
+
+@noindent
+@uref{http://www.crystalspace3d.org/main/Subversion}
+
+@strong{External Dependencies}: Crystal Space can use a number of optional
+libraries and tools to provide a more robust set of features.  A brief list of
+the most important dependencies is presented here.  @xref{External Libraries}.
+
+@table @asis
+@item Z Library
+zlib is used for compression and archiving.
+
+@noindent
+@uref{http://www.gzip.org/zlib/}
+
+@item @sc{png} Library
+libpng is used for loading Portable Network Graphics image files.
+
+@noindent
+@uref{http://www.libpng.org/pub/png/libpng.html}
+
+@item @sc{jpeg} Library
+libjpeg is used for loading @emph{Joint Photographics Experts Group} image
+files.
+
+@noindent
+@uref{http://www.ijg.org/files/}
+
+@item X Window System
+This is needed to enable graphical output on a number of Unix-like operating 
+systems, most prominently @sc{gnu}/Linux. It is @emph{not} needed for Windows
+or MacOS/X.
+
+@item OpenGL
+OpenGL is needed to provide accelerated 3D graphics @emph{on all platforms}.
+
+Note that no special effort is usually needed to install the development 
+components on Windows or MacOS/X.
+
+@item Jam
+@anchor{GettingJam}
+Jam is a @file{make} replacement with a much more intuitive and expressive file
+format.  Internally, the Crystal Space build system is predicated upon Jam,
+however Crystal Space also features a @file{make} @dfn{emulation} layer which
+allows you to build and install the project using @file{make}, so there is no
+strict need to download or install Jam.  If, however, you plan to work on the
+Crystal Space build system or create your own external project based upon Jam,
+then you can download it from this location:
+
+@noindent
+@uref{ftp://ftp.perforce.com/jam/}
+
+@noindent
+Jam documentation can be found at the Jam home page; see @file{Jam.html},
+@file{Jambase.html}, and @file{Jamfile.html}.
+
+@noindent
+@uref{http://www.perforce.com/jam/jam.html}
+
+Jam is included pre-built in the @file{cs-win32libs} convenience package
+(@pxref{cs-win32libs}), so Mingw and Cygwin users who use that package get Jam
+for free.  Other users will want to build it from source code.  For such users,
+once Jam has been downloaded, follow these simple steps to build and install
+it.  These instructions illustrate Jam 2.5, which is current as of this
+writing.
+
+@example
+unzip jam-2.5.zip
+cd jam-2.5
+make
+./jam0 install
+@end example
+
+If you are a Unix user, then you will probably need to have administrator
+privilege to install the executable since it will be installed as
+@file{/usr/local/bin/jam}.  To gain administrator privilege, you can use the
+@samp{sudo} command:
+
+@example
+sudo ./jam0 install
+@end example
+
+If you want to install Jam at a location other than the default, then set the
+@samp{BINDIR} variable to the directory in which you want it installed (this
+example shows it being installed in the user's private @file{$HOME/bin}
+directory):
+
+@example
+./jam0 -sBINDIR=$HOME/bin install
+@end example
+
+@end table

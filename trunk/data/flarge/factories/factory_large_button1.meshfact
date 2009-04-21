@@ -1,0 +1,46 @@
+<library>
+    <textures>
+        <texture name="oldmetal.gif">
+            <file>/lib/stdtex/oldmetal.jpg</file>
+        </texture>
+    </textures>
+    <materials>
+        <material name="oldmetal">
+            <texture>oldmetal.gif</texture>
+        </material>
+    </materials>
+    <meshfact name="factory_large_button1">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <numvt>4</numvt>
+            <v x="-19.9" y="0.8" z="8.8" u="0" v="0" />
+            <v x="-19.9" y="1.2" z="8.8" u="0.2" v="0" />
+            <v x="-19.9" y="1.2" z="9.2" u="0.2" v="0.2" />
+            <v x="-19.9" y="0.8" z="9.2" u="0" v="0.2" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <n x="1" y="0" z="0" />
+            <submesh name="oldmetal_0">
+                <material>oldmetal</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                </indexbuffer>
+            </submesh>
+            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                <e c0="0.125" c1="0.125" />
+                <e c0="0.5" c1="0.125" />
+                <e c0="0.5" c1="0.5" />
+                <e c0="0.125" c1="0.5" />
+            </renderbuffer>
+        </params>
+    </meshfact>
+</library>

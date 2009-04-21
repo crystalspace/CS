@@ -1,0 +1,274 @@
+@c -*-texinfo-*-
+@node Cygwin, MacOS/X, MinGW, Platform Instructions
+@subsection Windows using Cygwin
+
+@noindent
+Originally written by Philip Wyett @email{philwyett@@gmx.com}.
+@noindent
+@emph{Last updated 20 May 2007.}
+
+These instructions are for building Crystal Space with Cygwin a @sc{gnu}
+compiler for Windows created by Red Hat Inc. and other third party
+contributors.
+
+@subsubheading A Warning About Cygwin
+
+A full or extensive Cygwin installation can take up alot of hard disk space.
+Please be careful if installing on low free space disks.  A typical install can
+be around 400@sc{mb} and large above 700@sc{mb}.  Note, however, that a full
+installation of Cygwin is not required for building Crystal Space.  It is
+possible to get by with a fairly minimal installation consisting of the
+@sc{gcc} compiler and linker suite and related tools, and several support
+libraries as discussed below.
+
+@subsubheading Obtaining Cygwin
+
+Cygwin uses a custom setup application for installation of Cygwin which can be
+obtained from their official website.
+
+@noindent
+@uref{http://www.cygwin.com/}
+
+The installation program @file{setup.exe} must be downloaded to your computer.
+
+@noindent
+@uref{http://www.cygwin.com/setup.exe}
+
+@subsubheading Installing Cygwin
+
+First, go to the location where you downloaded the Cygwin @file{setup.exe}.  It
+is suggested that you download it into a directory of its own since it will
+place additional files in that directory later on when it downloads the actual
+Cygwin packages.
+
+@ifnotinfo
+@picturessss{build,platform,win32,cygwin,cygshot1}
+
+@end ifnotinfo
+Launch @file{setup.exe} to begin the installation process.
+
+You will first be prompted with a Cygwin welcome dialog.  It provides basic
+information about the setup program, such as its version number.
+
+@ifnotinfo
+@picturessss{build,platform,win32,cygwin,cygshot2}
+
+@end ifnotinfo
+Click on the @emph{Next} button to continue.
+
+The next dialog you will see is the @emph{Choose a Download Source} dialog.
+Here you need to choose if you wish to download and install directly from the
+internet or download to your system so you can install it later.  Cygwin
+can install, uninstall, and update using this program.  So, the decision
+is whether or not you want to download and keep the downloaded files around in
+order to avoid a large download at a later date if you re-install.  If you have
+a fast Internet connection, then you can download and install directly without
+saving the packages to your disk drive.  This is a matter of personal
+preference.
+
+@ifnotinfo
+@picturessss{build,platform,win32,cygwin,cygshot3}
+
+@end ifnotinfo
+After deciding, click on the @emph{Next} button to continue.
+
+Note: For the purposes of this discussion, it is assumed that you are
+installing directly from the Internet.
+
+The next dialog you will see is the @emph{Select Root Install Directory}
+dialog.  The first thing to choose is the location of where Cygwin should be
+installed.  It is suggested that you install in a directory named @file{cygwin}
+at the location of your choice.  Point the installer at that directory.
+
+The next thing to decide, if you are a system administrator, is if you want any
+other users of that computer to have access to Cygwin.  Also you are asked if
+you wish to use @sc{dos} text file line-ending format (@sc{cr/lf}) or Unix
+format (@sc{lf}).  This is all a matter of preference for the user.  If you are
+a pure Windows users it is suggested that you choose the @sc{dos} option.
+However, if you might move files to a Unix machine, for instance, it could be
+favorable to use the Unix option.
+
+@ifnotinfo
+@picturessss{build,platform,win32,cygwin,cygshot4}
+
+@end ifnotinfo
+After deciding upon a root install location and other options, click on the
+@emph{Next} button to continue.
+
+The next dialog you will see is the @emph{Select Local Package Directory}
+dialog.  This directory is corresponds to the location where you placed the
+Cygwin @file{setup.exe} program.
+
+@ifnotinfo
+@picturessss{build,platform,win32,cygwin,cygshot5}
+
+@end ifnotinfo
+If they correspond, click on the @emph{Next} button to continue.
+
+The next dialog is the @emph{Select Your Internet Connection}
+dialog.  This lets you specify the type of connection you have.  Most of the
+time it will be a @emph{Direct Connection}.  However, if you access
+the Internet via proxy server, then select that option and enter the necessary
+information.
+
+@ifnotinfo
+@picturessss{build,platform,win32,cygwin,cygshot6}
+
+@end ifnotinfo
+After choosing your internet connection type, click on the @emph{Next} button
+to continue.
+
+The next dialog you will see is the @emph{Choose A Download Site} dialog.
+Choose a download location in or as close to your own geographical location as
+possible.
+
+@ifnotinfo
+@picturessss{build,platform,win32,cygwin,cygshot7}
+
+@end ifnotinfo
+After choosing the closest download site, click on the @emph{Next} button
+to continue.
+
+The next dialog is the @emph{Select Packages To Install} dialog.
+This shows a tree with selectable packages in the branches.  If you have
+sufficient disk space and a high-speed Internet connection, you may wish to
+install the majority of the tools.  On the other hand, if you want to install
+only a minimum set of tools, choose the packages in the @emph{Devel} branch
+and, at a minimum, @emph{jpeg}, @emph{libpng}, @emph{opengl}, @emph{python},
+@emph{w32api}, and @emph{zlib} from the @emph{Libs} branch.
+
+@ifnotinfo
+@picturessss{build,platform,win32,cygwin,cygshot8}
+
+@end ifnotinfo
+Note: You do not need to install the @emph{Apache server}, @emph{XFree} or
+@emph{Games} packages.  Also if you miss anything first time round you can
+simply repeat the install process and install the package(s) you missed.
+
+Important: The above @emph{Select Packages To Install} section is subject to
+change as Cygwin makes additional packages available.
+
+After choosing the packages for installing, click on the @emph{Next} button to
+continue.
+
+At this point the installer will download and install the selected packages and
+perform post build steps, such as the generation of documentation, etc.
+
+The next dialog is the @emph{Create Icons} dialog.  If you are
+performing a fresh install and want these icons, then check the boxes.  If you
+are updating you need not check the boxes if you already have the icons.
+
+@ifnotinfo
+@picturessss{build,platform,win32,cygwin,cygshot9}
+
+@end ifnotinfo
+After making your selection, click on the @emph{Finish} button to continue.
+
+After all this, you will be prompted with a dialog to tell you that the
+installation is complete.  Click on the @emph{Ok} button to finish the
+installation process.
+
+@subsubheading Using ``cs-win32libs''
+
+It is recommended to use the ``cs-win32libs'' package to obtain the required
+and optional third-party libraries needed to build Crystal Space.  
+@xref{cs-win32libs}.
+
+Crystal Space can also be built using some of the libraries from Cygwin (basic
+libraries like @file{zlib}, @file{libpng}, @dots{}) and/or custom-built third
+party libraries.  However you need to take into account that Crystal Space is
+by default built using the @samp{-mno-cygwin} flag; you must either built
+Crystal Space without that flag or build the third party libraries
+accordingly. See the @file{configure} help for details on how to disable the
+flag.
+
+You may want to select ``Cygwin typical'' in the ``Select Components'' screen
+when installing @file{cs-win32libs}.  You can further adjust the selection of
+installed components depending upon your actual set up (e.g. install
+MinGW-related components if you plan to also use CrystalSpace with MinGW/MSYS).
+
+After the installation, if you opted to set up support for the Cygwin
+development environment, the Cygwin shell startup file will be augmented so a
+helper script named @file{cslibs-config} can be found when configuring Crystal
+Space.  The Crystal Space configure script queries @file{cslibs-config} to
+determine where the @file{cs-win32libs} resources are located.
+
+@subsubheading Building Crystal Space
+@anchor{Cygwin: Building Crystal Space}
+
+Crystal Space can be built with either @file{make} or Jam (@pxref{GettingJam}).
+Both tools work equally well.  The @file{cs-win32libs} package contains a
+pre-built version of Jam which you can invoke simply by typing @samp{jam} at
+the Cygwin Bash prompt.  These instructions assume you have installed the
+``cs-win32libs'' and are using @file{jam}.  However, if you don't, you can
+substitute @samp{make -k} wherever @samp{jam} is used in the examples below.
+
+Open a Cygwin Bash prompt via the desktop shortcut or the via item in the
+Programs menu.  Navigate to the @file{CS/} directory and issue the following
+commands:
+
+@example
+./configure
+jam all
+@end example
+
+Alternately, if you wish to use Jam to build the project:
+
+@example
+./configure
+make -k all
+@end example
+
+The @samp{-k} option used in the @samp{make -k all} command instructs the
+project builder to ignore errors and continue compiling regardless.  This can
+be useful in cases when localized errors appear in the project since often they
+affect only a single module.
+
+If you prefer to build a @dfn{debug} version of Crystal Space, substitute
+the following commands for those shown above:
+
+@example
+./configure --enable-debug
+jam
+@end example
+
+If the Crystal Space source directory is read-only, if it is shared between
+several developers, or if you simply dislike building a project within its
+source tree, you can instead configure and build from a different directory.
+For instance:
+
+@example
+mkdir $HOME/builddir
+cd $HOME/builddir
+/path/to/CS/configure --enable-debug
+jam
+@end example
+
+Finally, if you want to utilize Crystal Space as a software development kit
+(@sc{sdk}), you can install it and then clean up the detritus of the build
+process:
+
+@example
+jam install
+jam distclean
+@end example
+
+@subsubheading Additional Build Options
+
+Sometimes it is a good idea to remove all of the built programs and executable
+files and start from scratch.  You can do this with the following commands:
+
+@example
+jam clean
+jam
+@end example
+
+Once in a while it is even a good idea to completely clean and re-configure the
+project.  This may be required if you are using the bleeding-edge version of
+Crystal Space from the @sc{svn} repository after some radical change.
+
+@example
+jam distclean
+./configure
+jam
+@end example

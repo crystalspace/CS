@@ -1,0 +1,13 @@
+SubDir TOP plugins mesh genmesh persist standard ;
+
+Description gmeshldr : "General mesh object loader" ;
+
+Plugin gmeshldr
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith gmeshldr : crystalspace ;
+Includes gmeshldr.h : $(SUBDIR)/gmeshldr.tok ;
+MsvcExtraFile gmeshldr : $(SUBDIR)/gmeshldr.tok ;
+
+CompileGroups gmeshldr :  meshes ;
+

@@ -1,0 +1,30 @@
+@c -*-texinfo-*-
+@node Console Multi-Choice, , Console Value, Console
+@subsubsection Multi-Choice Commands
+
+A multi-choice command has one or more possible values. Typing the command
+without arguments will show the current value. Just type the new value after
+the command to change it. Use @samp{next} to switch to the next value and
+@samp{prev} to switch to the previous value.  Example:
+
+@itemize @bullet
+@item
+@samp{lightmap}: show the current lightmap setting
+
+@item
+@samp{lightmap reasonable}: set lightmap setting to @samp{reasonable}
+
+@item
+@samp{lightmap next}: use the next value for lightmap setting
+@end itemize
+
+The following multi-choice command is available:
+
+@table @code
+@item map
+Control the display of the map. @samp{off} (default) is off. @samp{overlay}
+shows the map on top of the current display. @samp{on} shows the map on its
+own. While the map is active, moving with the arrow keys will move the map
+instead of the display. Currently broken!
+
+@end table

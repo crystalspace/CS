@@ -1,0 +1,60 @@
+<!--
+  Copyright (C) 2007 by Frank Richter
+	    (C) 2007 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet>
+  <technique priority="100">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <input name="inputColor" type="rgba" />
+    
+    <input name="mixModeAlpha" type="float" default="complex" private="yes">
+      <block location="cg:variablemap">
+	<variablemap variable="mixmode alpha" destination="vertexIn.mixModeAlpha" />
+	<variablemap variable="mixmode alpha" destination="fragmentIn.mixModeAlpha" />
+      </block>
+      
+      <block location="cg:vertexIn">
+	<uniform type="float" name="mixModeAlpha" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="float" name="mixModeAlpha" />
+      </block>
+      
+      <block location="cg:vertexMain">
+	mixModeAlpha = vertexIn.mixModeAlpha;
+      </block>
+      
+      <block location="cg:fragmentMain">
+	mixModeAlpha = fragmentIn.mixModeAlpha;
+      </block>
+    </input>
+    
+    <block location="cg:vertexMain">
+      outputColor.rgb = inputColor.rgb;
+      outputColor.a = inputColor.a * mixModeAlpha;
+    </block>
+    
+    <block location="cg:fragmentMain">
+      outputColor.rgb = inputColor.rgb;
+      outputColor.a = inputColor.a * mixModeAlpha;
+    </block>
+    
+    <output name="outputColor" type="rgba" />
+  </technique>
+</snippet>

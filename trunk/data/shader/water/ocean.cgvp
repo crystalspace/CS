@@ -1,0 +1,115 @@
+//---------------------------------------------------------------------------------
+//Input
+//---------------------------------------------------------------------------------
+
+struct app2vert
+{
+	float4 Position  : POSITION;   
+	float4 Normal    : NORMAL;
+	float4 Color	 : COLOR;
+	float2 TexCoord  : TEXCOORD0;
+};
+
+//---------------------------------------------------------------------------------
+//Output
+//---------------------------------------------------------------------------------
+
+struct vert2frag
+{
+	float4 Position    	: POSITION;	
+	float4 Color	   	: COLOR;
+	float3 CamVec		: TEXCOORD0;
+	float4 TexCoord2	: TEXCOORD1;
+	float4 TexCoord3	: TEXCOORD2;
+};
+
+/**
+	Wave displacement functions as outlined in section 4.1 of
+	http://www.finelightvisualtechnology.com/docs/coursenotes2004.pdf
+**/
+
+//Wave displacement x-z
+float2 WaveDisp(float2 k, float amp, float2 pos, float freq, float phase, float time) 
+{ 
+    float2 normk = normalize(k);
+	return normk * amp * sin(dot(k, pos) - (freq * time) + phase);
+}
+
+//Wave displacement y
+float WaveDispVert(float2 k, float amp, float2 pos, float freq, float phase, float time)
+{
+	return amp * cos(dot(k, pos) - (freq * time) + phase);
+}
+
+//---------------------------------------------------------------------------------
+//Shader entry
+//---------------------------------------------------------------------------------
+
+vert2frag main (app2vert IN, 
+			 uniform float time,
+			 uniform float3 amps,
+			 uniform float3 kxs,
+			 uniform float3 kys,
+			 uniform float3 freqs,
+			 uniform float3 phases,
+			 uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans,
+			 uniform float4x4 ModelViewProj : state.matrix.mvp,
+			 uniform float4x4 o2w)
+{
+    vert2frag OUT;
+
+	float4 inPos = IN.Position;
+	
+  	float4 camera = ModelViewIT[3];
+
+	//Grab xz position
+	float2 xzpos = mul(o2w, IN.Position).xz;
+
+	//Displace once
+	float2 k = float2(kxs.x, kys.x);
+	float2 wdxz1 = WaveDisp(k, amps.x, xzpos, freqs.x, phases.x, time);
+	float wdy1 = WaveDispVert(k, amps.x, xzpos, freqs.x, phases.x, time);
+	
+	//Displace twice
+	k = float2(kxs.y, kys.y);
+	float2 wdxz2 = WaveDisp(k, amps.y, xzpos, freqs.y, phases.y, time);
+	float wdy2 = WaveDispVert(k, amps.y, xzpos, freqs.y, phases.y, time);
+	
+	//Displace thrice, three times displacement!
+	k = float2(kxs.z, kys.z);
+	float2 wdxz3 = WaveDisp(k, amps.z, xzpos, freqs.z, phases.z, time);
+	float wdy3 = WaveDispVert(k, amps.z, xzpos, freqs.z, phases.z, time);
+
+	//Add all the displacements
+	inPos.x -= wdxz1.x + wdxz2.x + wdxz3.x;
+	inPos.z -= wdxz1.y + wdxz2.y + wdxz3.y;
+	inPos.y = wdy1 + wdy2 + wdy3;
+
+	//Get real position again.
+	OUT.Position = mul (ModelViewProj, inPos);
+
+	OUT.Color = IN.Color;
+	OUT.CamVec = (camera - IN.Position).xzy;
+	//OUT.CamVec = inPos.xyz;
+
+	float s1, cs1, s2, cs2;
+	float4 texCoord = mul(o2w, float4(IN.TexCoord.x, 0, IN.TexCoord.y, 1));
+	sincos (time, s1, cs1);
+	sincos (time + 1.41, s2, cs2);
+
+	OUT.TexCoord2.x = texCoord.x  - s1 * 0.1;
+	OUT.TexCoord2.y = texCoord.z  + cs1 * 0.1;
+	OUT.TexCoord2.z = 0.0;
+	OUT.TexCoord2.w = 1.0;
+		
+	OUT.TexCoord3.x = texCoord.x + s2 * 0.1;
+	OUT.TexCoord3.y = texCoord.z - cs2 * 0.1;
+	OUT.TexCoord3.z = 0.0;
+	OUT.TexCoord3.w = 1.0;
+		
+    return OUT;
+}
+
+//---------------------------------------------------------------------------------
+//end
+//---------------------------------------------------------------------------------

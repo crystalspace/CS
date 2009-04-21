@@ -1,0 +1,18 @@
+@c -*-texinfo-*-
+@node Physics Bullet, Physics ODE, Basic Collision Detection, Collision Detection
+@subsection Physics using Bullet
+@cindex physics
+@cindex Bullet
+
+The @samp{bullet} plugin implements physics for Crystal Space using
+the Bullet library (@url{http://www.bulletphysics.com/Bullet/}).
+
+@subsubheading Doing the Timed Physics Simulation
+
+To make sure the physics simulation proceeds correctly in time you must
+tell Bullet how much time has elapsed since previous frame so that
+it can calculate the collisions and physical interactions that happened
+during that time. The @code{iDynamics->Step()} function is responsable for
+that. As a parameter it has a delta which is a floating point number that
+represents the number of seconds to calculate.
+

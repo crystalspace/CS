@@ -1,0 +1,8 @@
+SubDir TOP plugins sndsys renderer software drivers null ;
+
+Description sndsysnull : "No output driver for the software sound renderer for sndsys" ;
+Plugin sndsysnull : [ Wildcard *.cpp *.h ] ;
+LinkWith sndsysnull : crystalspace ;
+CompileGroups sndsysnull : sndsys ;
+
+

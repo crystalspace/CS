@@ -1,0 +1,9 @@
+SubDir TOP plugins sndsys element loader ;
+
+Plugin sndsysloader :
+	[ Wildcard *.cpp *.h ]
+;
+Description sndsysloader : "Generic sound loader for sndsys" ;
+LinkWith sndsysloader : crystalspace ;
+CompileGroups sndsysloader : sndsys ;
+

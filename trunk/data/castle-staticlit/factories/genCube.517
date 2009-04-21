@@ -1,0 +1,47 @@
+<library>
+    <meshfact name="genCube.517">
+        <plugin>genmeshfact</plugin>
+        <zuse />
+        <params>
+            <renderbuffer name="position" checkelementcount="no" file="bindata/genCube_517_v" />
+            <renderbuffer name="normal" file="bindata/genCube_517_n" />
+            <renderbuffer name="texture coordinate 0" file="bindata/genCube_517_tc" />
+            <renderbuffer name="tangent" file="bindata/genCube_517_tng" />
+            <renderbuffer name="bitangent" file="bindata/genCube_517_btg" />
+            <renderbuffer name="lit color" components="4" type="float">
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+                <e c0="0" c1="0" c2="0" c3="1" />
+            </renderbuffer>
+            <material>parallaxAtt_concrete4_3-parallaconcrete_floor4_3.png</material>
+            <mixmode>
+                <copy />
+            </mixmode>
+            <submesh name="">
+                <material>parallaxAtt_concrete4_3-parallaconcrete_floor4_3.png</material>
+                <indexbuffer file="bindata/genCube_517_i0" />
+            </submesh>
+        </params>
+    </meshfact>
+</library>

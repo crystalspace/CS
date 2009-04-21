@@ -1,0 +1,68 @@
+<arbvp>
+  <variablemap variable="light 0 position" destination="register 0"/>
+  <variablemap variable="light 0 attenuation" destination="register 1"/>
+  <program>
+    <![CDATA[
+      !!ARBvp1.0
+      #---------------------------------------
+      # Simple Vertex Lighting Program
+      #---------------------------------------
+      #Parameter definition
+      PARAM mv[4]	     	= { state.matrix.modelview };
+      PARAM mvi[4]	 	= { state.matrix.modelview.inverse };
+      PARAM mvp[4]	     	= { state.matrix.mvp };
+      PARAM lightPos   		= program.local[0];
+      PARAM lightAtt 	    = program.local[1];
+      PARAM const = {0.5, 0.16666666666667, 1, 1};
+      
+      PARAM materialDiffuse	= program.local[4];
+      PARAM materialAmbient	= program.local[5];
+      PARAM materialReflection	= program.local[6];
+      PARAM materialFlatColor 	= program.local[7];
+      PARAM materialSpecular 	= program.local[8];
+      # Per vertex inputs
+      ATTRIB iPos		= vertex.position;
+      # Outputs
+      OUTPUT oPos		= result.position;
+      OUTPUT oCol0		= result.color;
+      OUTPUT oAttMapXY          = result.texcoord[0];
+      OUTPUT oAttMapZ           = result.texcoord[1];
+      # Temporaries
+      TEMP objLight;
+      TEMP oLightDir;
+      TEMP invRadius;
+      
+      #Transform vertex to viewspace
+      DP4 oPos.x, mvp[0], iPos;
+      DP4 oPos.y, mvp[1], iPos;
+      DP4 oPos.z, mvp[2], iPos;
+      DP4 oPos.w, mvp[3], iPos;
+      
+      #Transform light to object
+      DP4 objLight.x, mvi[0], lightPos;
+      DP4 objLight.y, mvi[1], lightPos;
+      DP4 objLight.z, mvi[2], lightPos;
+      DP4 objLight.w, mvi[3], lightPos;
+      
+      #calculate vector from vertex to light in object-space
+      ADD oLightDir, objLight, -iPos;
+      
+      #Calculate attenuation map coordinates
+      #Assume .y or .z contains 1/radius
+      ADD invRadius.x, lightAtt.y, lightAtt.z;
+      MUL invRadius.x, invRadius.x, const.y;
+      MAD oAttMapXY, oLightDir, invRadius.xxxx, const.xxxx;
+      MOV oAttMapXY.z, const.w;
+      MOV oAttMapXY.w, const.w;
+      MAD oAttMapZ.x, oLightDir.z, invRadius.x, const.x;
+      MOV oAttMapZ.y, const.x;
+      MOV oAttMapZ.z, const.w;
+      MOV oAttMapZ.w, const.w;
+      
+      #Just pass on diffuse color
+      MOV oCol0, const.wwww;
+      
+      END
+    ]]>
+  </program>
+</arbvp>

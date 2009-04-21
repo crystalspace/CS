@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+  Copyright (C) 2007 by Frank Richter
+	    (C) 2007 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+     verbatim -->
+<input name="instancingTransforms" type="float4x4" default="complex">
+  <block location="cg:vertexIn">
+    <varying type="float3x4" name="instancingTransforms" />
+  </block>
+  
+  <block location="cg:vertexMain">
+    instancingTransforms = float4x4 (vertexIn.instancingTransforms[0],
+      vertexIn.instancingTransforms[1],
+      vertexIn.instancingTransforms[2],
+      float4 (0, 0, 0, 1));
+  </block>
+
+  <block location="pass">
+    <instanceparam source="instancing transforms"
+      destination="vertexIn.instancingTransforms" />
+  </block>
+</input>
+

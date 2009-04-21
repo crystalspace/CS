@@ -1,0 +1,46 @@
+<library>
+    <textures>
+        <texture name="window.gif">
+            <file>/lib/stdtex/window.jpg</file>
+        </texture>
+    </textures>
+    <materials>
+        <material name="window">
+            <texture>window.gif</texture>
+        </material>
+    </materials>
+    <meshfact name="factory_win4_walls_transp">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <numvt>4</numvt>
+            <v x="-20.5" y="3.5" z="-10" u="0" v="0" />
+            <v x="-19" y="3.5" z="-10" u="0.499999" v="0" />
+            <v x="-19" y="1" z="-10" u="0.499999" v="0.833332" />
+            <v x="-20.5" y="1" z="-10" u="0" v="0.833332" />
+            <mixmode>
+                <copy />
+            </mixmode>
+            <n x="0" y="0" z="-1" />
+            <n x="0" y="0" z="-1" />
+            <n x="0" y="0" z="-1" />
+            <n x="0" y="0" z="-1" />
+            <submesh name="window_0">
+                <material>window</material>
+                <indexbuffer components="1" type="uint" indices="yes">
+                    <e c0="0" />
+                    <e c0="1" />
+                    <e c0="2" />
+                    <e c0="0" />
+                    <e c0="2" />
+                    <e c0="3" />
+                </indexbuffer>
+            </submesh>
+            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
+                <e c0="0.125" c1="0.0625" />
+                <e c0="0.5" c1="0.0625" />
+                <e c0="0.5" c1="0.5" />
+                <e c0="0.125" c1="0.5" />
+            </renderbuffer>
+        </params>
+    </meshfact>
+</library>

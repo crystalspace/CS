@@ -1,0 +1,14 @@
+<Include>
+  <Media EmbedCab="yes" Id="30020" Cabinet="CS_demo.cab"/>
+  <Media EmbedCab="yes" Id="30021" Cabinet="CS_demo_$(var.ARCH).cab"/>
+  <DirectoryRef Id="CSDIR">
+    <Directory Name="Demos $(var.VERSION_MAJORMINOR) ($(var.ARCH))" Id="CSDEMOS$(var.VERSION_MAJORMINOR)">
+      <Merge DiskId="30021" SourceFile="$(var.CRYSTAL_MSM_PATH)/CS.arch.$(var.ARCH).executable.demo.msm" Id="CS.arch.executable.demo" Language="1033" FileCompression="yes"/>
+    </Directory>
+  </DirectoryRef>
+  <DirectoryRef Id="CSVERSION$(var.VERSION_MAJORMINOR)">
+    <Directory Name="data" Id="CS.data.demo">
+      <Merge DiskId="30020" SourceFile="$(var.CRYSTAL_MSM_PATH)/CS.data.demo.msm" Id="CS.data.demo" Language="1033" FileCompression="yes"/>
+    </Directory>
+  </DirectoryRef>
+</Include>

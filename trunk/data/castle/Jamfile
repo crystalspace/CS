@@ -1,0 +1,9 @@
+SubDir TOP data castle ;
+
+InstallData world [ Wildcard *.txt ] : data maps castle ;
+InstallData [ Wildcard factories : thing* gen* ] : data maps castle factories ;
+InstallData [ Wildcard lightmaps : *.png ] : data maps castle lightmaps ;
+
+FileListEntriesData world [ Wildcard *.txt ] : castle : data-demo-maps ;
+FileListEntriesData [ Wildcard factories : thing* gen* ] : castle factories : data-demo-maps ;
+FileListEntriesData [ Wildcard lightmaps : *.png ] : castle lightmaps : data-demo-maps ;
