@@ -31,31 +31,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(DDSImageIO)
 namespace dds
 {
 
-bool Loader::ProbeDXT1Alpha (const uint8* source, int w, int h, int depth, 
-			     size_t /*size*/)
+bool Loader::ProbeDXT1C (const uint8* source, int w, int h, int depth, 
+  size_t /*size*/)
 {
-  int          x, y, z;
-  unsigned char *Temp;
-  uint16       color_0, color_1;
+  unsigned char *Temp = (unsigned char*) source;
 
-  Temp = (unsigned char*) source;
-  for (z = 0; z < depth; z++) 
+  for (int z = 0; z < depth; z++) 
   {
-    for (y = 0; y < w; y += 4) 
+    for (int y = 0; y < w; y += 4) 
     {
-      for (x = 0; x < h; x += 4) 
+      for (int x = 0; x < h; x += 4) 
       {
-	color_0 = csLittleEndian::Convert (*((uint16*)Temp)); 
-	color_1 = csLittleEndian::Convert (*((uint16*)Temp+1));
-	Temp += 8;
+        uint32 bitmask = csLittleEndian::Convert (((uint32*)Temp)[1]);
+        Temp += 8;
 
-	if (color_0 <= color_1) 
-	{
-	  return false;
-	}
+        if (bitmask == 0xFFFFFFFF) 
+        {
+          return false;
+        }
       }
     }
   }
+
   return true;
 }
 
