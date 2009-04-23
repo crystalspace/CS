@@ -42,10 +42,11 @@ bool Loader::ProbeDXT1C (const uint8* source, int w, int h, int depth,
     {
       for (int x = 0; x < h; x += 4) 
       {
-        uint32 bitmask = csLittleEndian::Convert (((uint32*)Temp)[1]);
+        uint16 color_0 = csLittleEndian::Convert (*((uint16*)Temp));
+        uint16 color_1 = csLittleEndian::Convert (*((uint16*)Temp+1));
         Temp += 8;
 
-        if (bitmask == 0xFFFFFFFF) 
+        if (color_0 <= color_1) 
         {
           return false;
         }
