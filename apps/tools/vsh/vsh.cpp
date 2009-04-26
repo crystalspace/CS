@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include <ctype.h>
+#include <errno.h>
 
 #include "cstool/initapp.h"
 #include "csutil/ansicommand.h"
@@ -219,7 +220,11 @@ static void cmd_cat (char *args)
       return;
     }
 
-    fwrite (**data, data->GetSize (), 1, stdout);
+    const size_t size = data->GetSize ();
+    const size_t res = fwrite (**data, size, 1, stdout);
+    if (res != size)
+      csPrintfErr ("cat: could only write %zu of %zu bytes (errno = %d)!\n",
+        res, size, errno);
   }
   else
   {
