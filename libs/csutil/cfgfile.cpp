@@ -30,6 +30,7 @@
 #include "iutil/cmdline.h"
 #include "iutil/vfs.h"
 #include <ctype.h>
+#include <errno.h>
 
 /* config node */
 
@@ -572,16 +573,26 @@ bool csConfigFile::SaveNow(const char *file, iVFS *vfs) const
   // write end-of-file comment
   WriteComment(Filedata, EOFComment);
 
+  const size_t length = Filedata.Length ();
+
   if (vfs)
   {
-    return vfs->WriteFile(file, Filedata.GetData(), Filedata.Length());
+    return vfs->WriteFile(file, Filedata.GetData(), length);
   }
   else
   {
     FILE *fp = fopen(file, "wb");
     if (!fp) return false;
-    fwrite(Filedata.GetData(), sizeof(char), Filedata.Length(), fp);
+    const size_t res = fwrite(Filedata.GetData(), sizeof(char), length, fp);
+    const int errcode = errno;
     fclose(fp);
+    if (res != length)
+    {
+      csPrintfErr (
+        "csConfigFile::SaveNow(): fwrite() error for %s (errno = %d)!\n",
+          file, errcode);
+      return false;
+    }
     return true;
   }
 }

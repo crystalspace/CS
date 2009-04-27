@@ -19,9 +19,11 @@
 
 #include "cssysdef.h"
 #include <ctype.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include "csutil/sysfunc.h"
 #include "csutil/util.h"
 
 // Generic csExpandName for all platforms.
@@ -77,7 +79,12 @@ char *csExpandName (const char *iName)
 #endif
         )
     {
-      getcwd (outname, sizeof (outname));
+      if (getcwd (outname, sizeof (outname)) == 0)
+      {
+        csPrintfErr ("csExpandName(): getcwd() error for %s (errno = %d)!\n",
+          outname, errno);
+        return 0;
+      }
       outp = strlen (outname);
       if (strcmp (tmp, "."))
         outname [outp++] = CS_PATH_SEPARATOR;

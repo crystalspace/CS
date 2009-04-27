@@ -454,8 +454,8 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
 	|| (!cgGLIsProgramLoaded (program)))
     {
       if (shaderPlug->doVerbose
-	  && ((type == CG_GL_VERTEX) && (profile >= CG_PROFILE_ARBVP1))
-	    || ((type == CG_GL_FRAGMENT) && (profile >= CG_PROFILE_ARBFP1)))
+	  && (((type == CG_GL_VERTEX) && (profile >= CG_PROFILE_ARBVP1))
+	    || ((type == CG_GL_FRAGMENT) && (profile >= CG_PROFILE_ARBFP1))))
       {
 	//const char* err = (char*)glGetString (GL_PROGRAM_ERROR_STRING_ARB);
 	const char* err = "";

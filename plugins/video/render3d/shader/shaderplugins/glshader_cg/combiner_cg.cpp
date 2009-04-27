@@ -885,7 +885,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     if (!globalIDs.Contains (name))
     {
       globalIDs.AddNoTest (name);
-      if (annotation) globals.AppendFmt (MakeComment (annotation));
+      if (annotation) globals.Append (MakeComment (annotation));
       globals.AppendFmt ("%s %s;\n", CgType (type).GetData(), name);
     }
   }
@@ -894,7 +894,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
                                     const char* annotation)
   {
     outputAssign.Empty();
-    if (annotation) outputAssign.AppendFmt (MakeComment (annotation));
+    if (annotation) outputAssign.Append (MakeComment (annotation));
     outputAssign.AppendFmt ("outputColor = %s;\n", name);
   }
   

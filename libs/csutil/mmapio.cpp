@@ -18,12 +18,15 @@
 */
 
 #include "cssysdef.h"
+#include "csgeom/math.h"
 #include "csutil/mmapio.h"
 #include "csutil/ref.h"
-#include "csgeom/math.h"
+#include "csutil/sysfunc.h"
 
 #include "iutil/databuff.h"
 #include "iutil/vfs.h"
+
+#include <errno.h>
 
 csMemoryMappedIO::csMemoryMappedIO(char const *filename, iVFS* vfs)
 {
@@ -69,9 +72,21 @@ csRef<csMemoryMapping> csMemoryMappedIO::GetData (size_t offset, size_t length)
     mapping.AttachNew (new PlatformMapping (this));
     if (!valid_platform)
     {
+      if (fseek (hMappedFile, (long)offset, SEEK_SET) != 0)
+      {
+        csPrintfErr (
+          "csMemoryMappedIO::GetData(): fseek error (errno = %d)!\n", errno);
+        return 0;
+      }
       p = new uint8[length];
-      fseek (hMappedFile, (long)offset, SEEK_SET);
-      fread (p, 1, length, hMappedFile);
+      const size_t res = fread (p, 1, length, hMappedFile);
+      if (res != length)
+      {
+        csPrintfErr (
+          "csMemoryMappedIO::GetData(): fread error (errno = %d)!\n", errno);
+        delete[] p;
+        return 0;
+      }
     }
     else
     {
