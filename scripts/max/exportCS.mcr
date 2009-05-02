@@ -647,7 +647,7 @@ rollout Test1 "Export Level to CS" width:226 height:450
                                     (
 							if(classof reflectionMap == CompositeTexturemap) then
                               		(
-								format "      <shadervar type=\"texture\" name=\"tex reflection\">reflection_%</shadervar>\n" m.name to:outFile
+								format "      <shadervar type=\"texture\" name=\"tex environment\">reflection_%</shadervar>\n" m.name to:outFile
 							)
 							else
 							(
@@ -775,7 +775,7 @@ rollout Test1 "Export Level to CS" width:226 height:450
                                     	(
 								if(classof reflectionMap == CompositeTexturemap) then
                               			(
-									format "      <shadervar type=\"texture\" name=\"tex reflection\">reflection_%</shadervar>\n" subm.name to:outFile
+									format "      <shadervar type=\"texture\" name=\"tex environment\">reflection_%</shadervar>\n" subm.name to:outFile
 								)
 								else
 								(
