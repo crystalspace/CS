@@ -340,6 +340,58 @@ rollout Test1 "Export Level to CS" width:226 height:450
                     
 				append materialsWrittenToWorld diffuseImage
 			  )
+
+                    -- Reflection Map Texture:
+                    if (m.mapEnables[10]) then
+                    (
+			      reflectionMap = m.reflectionMap
+				if (reflectionMap!=undefined) then
+				(
+                              if(classof reflectionMap == CompositeTexturemap) then
+                              (
+						format "    <texture name=\"reflection_%\">\n" diffuseImage to:outFile
+			 			format "      <type>crystalspace.texture.loader.cubemap</type>\n" to:outFile
+			 			format "      <params>\n" to:outFile
+
+						if(reflectionMap.mapList.count == 6) then
+						(
+							indx = tokenize reflectionMap.mapList[1].filename "\\"
+							format "        <north>%</north>\n" indx[indx.count] to:outFile
+
+							indx = tokenize reflectionMap.mapList[2].filename "\\"
+           						format "        <south>%</south>\n" indx[indx.count] to:outFile
+
+							indx = tokenize reflectionMap.mapList[3].filename "\\"
+  							format "        <east>%</east>\n" indx[indx.count] to:outFile
+
+							indx = tokenize reflectionMap.mapList[4].filename "\\"
+     							format "        <west>%</west>\n" indx[indx.count] to:outFile
+
+							indx = tokenize reflectionMap.mapList[5].filename "\\"
+         						format "        <top>%</top>\n" indx[indx.count] to:outFile
+
+							indx = tokenize reflectionMap.mapList[6].filename "\\"
+         						format "        <bottom>%</bottom>\n" indx[indx.count] to:outFile
+						)
+						else
+						(
+							message = "ERROR: Reflection map must have six bitmaps."
+							messageBox message
+							return 1
+						)
+
+			 			format "      </params>\n" to:outFile
+						format "    </texture>\n" to:outFile
+					)
+                              else
+                              (
+                              	message = "ERROR: Reflection map must be a composite material."
+						messageBox message
+						return 1
+                              )
+				)
+                    )
+
 			  -- Spec Map Texture:
 			  specMapImage = getMatSpecMapFilename m
 			  if (findItem materialsWrittenToWorld specMapImage==0 and specMapImage!="materialnotdefined") then
@@ -400,6 +452,58 @@ rollout Test1 "Export Level to CS" width:226 height:450
            	         
 					append materialsWrittenToWorld diffuseImage
 				  )
+
+    	      	        -- Reflection Map Texture:
+     		              if (subm.mapEnables[10]) then
+                   	  (
+			     		reflectionMap = subm.reflectionMap
+					if (reflectionMap!=undefined) then
+					(
+                              	if(classof reflectionMap == CompositeTexturemap) then
+                              	(
+							format "    <texture name=\"reflection_%\">\n" diffuseImage to:outFile
+			 				format "      <type>crystalspace.texture.loader.cubemap</type>\n" to:outFile
+			 				format "      <params>\n" to:outFile
+
+							if(reflectionMap.mapList.count == 6) then
+							(
+								indx = tokenize reflectionMap.mapList[1].filename "\\"
+								format "        <north>%</north>\n" indx[indx.count] to:outFile
+
+								indx = tokenize reflectionMap.mapList[2].filename "\\"
+           							format "        <south>%</south>\n" indx[indx.count] to:outFile
+
+								indx = tokenize reflectionMap.mapList[3].filename "\\"
+  								format "        <east>%</east>\n" indx[indx.count] to:outFile
+
+								indx = tokenize reflectionMap.mapList[4].filename "\\"
+     								format "        <west>%</west>\n" indx[indx.count] to:outFile
+
+								indx = tokenize reflectionMap.mapList[5].filename "\\"
+         							format "        <top>%</top>\n" indx[indx.count] to:outFile
+
+								indx = tokenize reflectionMap.mapList[6].filename "\\"
+      	   						format "        <bottom>%</bottom>\n" indx[indx.count] to:outFile
+							)
+							else
+							(
+								message = "ERROR: Reflection map must have six bitmaps."
+								messageBox message
+								return 1
+							)
+
+			 				format "      </params>\n" to:outFile
+							format "    </texture>\n" to:outFile
+						)
+                              	else
+                              	(
+                              		message = "ERROR: Reflection map must be a composite material."
+							messageBox message
+							return 1
+                              	)
+					 )
+                    	  )
+
 				  -- Spec Map Texture:
 				  specMapImage = getMatSpecMapFilename subm
 				  if (findItem materialsWrittenToWorld specMapImage==0 and specMapImage!="materialnotdefined") then
@@ -478,8 +582,24 @@ rollout Test1 "Export Level to CS" width:226 height:450
 						format "      <shader type=\"diffuse\">lighting_default_binalpha</shader>\n" to:outFile
 					)
 
-                              -- handles diffuse maps
-                              format "      <shadervar type=\"texture\" name=\"tex diffuse\">%</shadervar>\n" diffuseMapImage to:outFile
+					-- handles reflection materials
+					if (m.mapEnables[10]) then
+                              (
+						format "      <shader type=\"standard\">reflect_water_plane</shader>\n" to:outFile
+						format "      <shader type=\"diffuse\">reflect_water_plane</shader>\n" to:outFile
+						format "      <shadervar type=\"texture\" name=\"tex normal\">%</shadervar>\n" diffuseMapImage to:outFile
+
+						reflectionMap = m.reflectionMap
+						if (reflectionMap!=undefined) then
+                                    (
+							format "      <shadervar type=\"texture\" name=\"tex reflection\">reflection_%</shadervar>\n" diffuseMapImage to:outFile
+						)
+					)
+                              else
+                              (
+                              	-- handles diffuse maps
+                              	format "      <shadervar type=\"texture\" name=\"tex diffuse\">%</shadervar>\n" diffuseMapImage to:outFile
+					)
 
                               -- handles normal maps
                               normalMapImage = getMatNormalMapFilename m
@@ -566,8 +686,24 @@ rollout Test1 "Export Level to CS" width:226 height:450
 						) else
 							append materialsWrittenToWorld imagetemp
 
-            	                  -- handles diffuse maps
-                 		            format "      <shadervar type=\"texture\" name=\"tex diffuse\">%</shadervar>\n" diffuseMapImage to:outFile
+						-- handles reflection materials
+						if (subm.mapEnables[10]) then
+                              	(
+							format "      <shader type=\"standard\">reflect_water_plane</shader>\n" to:outFile
+							format "      <shader type=\"diffuse\">reflect_water_plane</shader>\n" to:outFile
+							format "      <shadervar type=\"texture\" name=\"tex normal\">%</shadervar>\n" diffuseMapImage to:outFile
+
+							reflectionMap = subm.reflectionMap
+							if (reflectionMap!=undefined) then
+                                    	(
+								format "      <shadervar type=\"texture\" name=\"tex reflection\">reflection_%</shadervar>\n" diffuseMapImage to:outFile
+							)
+						)
+                              	else
+                              	(
+                              		-- handles diffuse maps
+                              		format "      <shadervar type=\"texture\" name=\"tex diffuse\">%</shadervar>\n" diffuseMapImage to:outFile
+						)
 
                         	      -- handles normal maps
                                     normalMapImage = getMatNormalMapFilename subm
@@ -627,8 +763,11 @@ rollout Test1 "Export Level to CS" width:226 height:450
 		(
 		  format "<shaders>\n" to:outFile
 
-          -- always write shader for alpha binary
+              -- always write shader for alpha binary
 		  format " <shader><file>/shader/lighting/lighting_default_binalpha.xml</file></shader>\n" to:outFile
+
+		  -- shader for reflection
+              format " <shader><file>/shader/reflect/water_plane.xml</file></shader>\n" to:outFile
 
 		  -- add shaders for particles
 		  format "     <shader><file>/shader/particles/basic.xml</file></shader>\n" to:outFile
