@@ -323,8 +323,8 @@ rollout Test1 "Export Level to CS" width:226 height:450
                   (
 			  -- For each material, if not written then add it.				
 			  -- Diffuse Texture:
-			  diffuseImage = getMatDiffuseMapFilename m				
-			  if (findItem materialsWrittenToWorld diffuseImage==0 and diffuseImage!="materialnotdefined") then
+			  diffuseImage = getMatDiffuseMapFilename m			
+			  if (not m.mapEnables[10] and findItem materialsWrittenToWorld diffuseImage==0 and diffuseImage!="materialnotdefined") then
 			  (
 			    format "m: % \n" m
 				format "    <texture name=\"%\">\n" diffuseImage to:outFile
@@ -341,7 +341,7 @@ rollout Test1 "Export Level to CS" width:226 height:450
 				append materialsWrittenToWorld diffuseImage
 			  )
 
-                    -- Reflection Map Texture:
+                    -- Reflection/Environment Map Texture:
                     if (m.mapEnables[10]) then
                     (
 			      reflectionMap = m.reflectionMap
@@ -349,7 +349,7 @@ rollout Test1 "Export Level to CS" width:226 height:450
 				(
                               if(classof reflectionMap == CompositeTexturemap) then
                               (
-						format "    <texture name=\"reflection_%\">\n" diffuseImage to:outFile
+						format "    <texture name=\"reflection_%\">\n" m.name to:outFile
 			 			format "      <type>crystalspace.texture.loader.cubemap</type>\n" to:outFile
 			 			format "      <params>\n" to:outFile
 
@@ -385,47 +385,66 @@ rollout Test1 "Export Level to CS" width:226 height:450
 					)
                               else
                               (
-                              	message = "ERROR: Reflection map must be a composite material."
-						messageBox message
-						return 1
+                                          indx = tokenize reflectionMap.filename "\\" 
+                              		format "    <texture name=\"%\">\n" indx[indx.count] to:outFile
+							format "      <file>%</file>\n" indx[indx.count] to:outFile
+							format "    </texture>\n" to:outFile
+							append materialsWrittenToWorld indx[indx.count]
                               )
 				)
-                    )
 
-			  -- Spec Map Texture:
-			  specMapImage = getMatSpecMapFilename m
-			  if (findItem materialsWrittenToWorld specMapImage==0 and specMapImage!="materialnotdefined") then
+				-- Normal Map Texture:
+			  	normalMapImage = getMatNormalMapFilename m
+			  	if (findItem materialsWrittenToWorld normalMapImage==0 and normalMapImage!="materialnotdefined") then
+			  	(
+			  	  format "m: % \n" m
+			  	  format "    <texture name=\"%\">\n" normalMapImage to:outFile
+			  	  format "      <file>%</file>\n" normalMapImage to:outFile
+			  	  format "      <class>normalmap</class>\n" to:outFile
+				  format "      <mipmap>no</mipmap>\n" to:outFile
+			  	  format "    </texture>\n" to:outFile
+						
+				  append materialsWrittenToWorld normalMapImage
+				)
+
+                    )
+			  else
 			  (
-			    format "m: % \n" m
-				format "    <texture name=\"%\">\n" specMapImage to:outFile
-				format "      <file>%</file>\n" specMapImage to:outFile
-				format "    </texture>\n" to:outFile
+			  	-- Spec Map Texture:
+			  	specMapImage = getMatSpecMapFilename m
+			  	if (findItem materialsWrittenToWorld specMapImage==0 and specMapImage!="materialnotdefined") then
+			  	(
+					  format "m: % \n" m
+						format "    <texture name=\"%\">\n" specMapImage to:outFile
+						format "      <file>%</file>\n" specMapImage to:outFile
+						format "    </texture>\n" to:outFile
 					
-				append materialsWrittenToWorld dispMapImage
-			  )
-			  -- Normal Map Texture:
-			  normalMapImage = getMatNormalMapFilename m
-			  if (findItem materialsWrittenToWorld normalMapImage==0 and normalMapImage!="materialnotdefined") then
-			  (
-			    format "m: % \n" m
-			    format "    <texture name=\"%\">\n" normalMapImage to:outFile
-			    format "      <file>%</file>\n" normalMapImage to:outFile
-			    format "      <class>normalmap</class>\n" to:outFile
-			    format "    </texture>\n" to:outFile
-					
-			    append materialsWrittenToWorld normalMapImage
-			  )
-			  -- Displacement Map Texture:
-			  dispMapImage = getMatDispMapFilename m
-			  if (findItem materialsWrittenToWorld dispMapImage==0 and dispMapImage!="materialnotdefined") then
-			  (
-			    format "m: % \n" m
-				format "    <texture name=\"%\">\n" dispMapImage to:outFile
-				format "      <file>%</file>\n" dispMapImage to:outFile
-				format "    </texture>\n" to:outFile
-					
-				append materialsWrittenToWorld dispMapImage
-			  )
+					append materialsWrittenToWorld dispMapImage
+			  	)
+			  	-- Normal Map Texture:
+			  	normalMapImage = getMatNormalMapFilename m
+			  	if (findItem materialsWrittenToWorld normalMapImage==0 and normalMapImage!="materialnotdefined") then
+			  	(
+			  	  format "m: % \n" m
+			  	  format "    <texture name=\"%\">\n" normalMapImage to:outFile
+			  	  format "      <file>%</file>\n" normalMapImage to:outFile
+			  	  format "      <class>normalmap</class>\n" to:outFile
+			  	  format "    </texture>\n" to:outFile
+						
+				    append materialsWrittenToWorld normalMapImage
+				  )
+				  -- Displacement Map Texture:
+				  dispMapImage = getMatDispMapFilename m
+				  if (findItem materialsWrittenToWorld dispMapImage==0 and dispMapImage!="materialnotdefined") then
+				  (
+				    format "m: % \n" m
+					format "    <texture name=\"%\">\n" dispMapImage to:outFile
+					format "      <file>%</file>\n" dispMapImage to:outFile
+					format "    </texture>\n" to:outFile
+						
+					append materialsWrittenToWorld dispMapImage
+				  )
+			    )
 			)
 	
 		    -- handle Multi/materials
@@ -436,7 +455,7 @@ rollout Test1 "Export Level to CS" width:226 height:450
 				  -- For each material, if not written then add it.				
 				  -- Diffuse Texture:
 				  diffuseImage = getMatDiffuseMapFilename subm				
-				  if (findItem materialsWrittenToWorld diffuseImage==0 and diffuseImage!="materialnotdefined") then
+				  if (not subm.mapEnables[10] and findItem materialsWrittenToWorld diffuseImage==0 and diffuseImage!="materialnotdefined") then
 				  (
 				    format "m: % \n" m
 					format "    <texture name=\"%\">\n" diffuseImage to:outFile
@@ -453,37 +472,37 @@ rollout Test1 "Export Level to CS" width:226 height:450
 					append materialsWrittenToWorld diffuseImage
 				  )
 
-    	      	        -- Reflection Map Texture:
-     		              if (subm.mapEnables[10]) then
-                   	  (
-			     		reflectionMap = subm.reflectionMap
+				  -- Reflection/Environment Map Texture:
+            	        if (subm.mapEnables[10]) then
+                  	  (
+			      	reflectionMap = subm.reflectionMap
 					if (reflectionMap!=undefined) then
 					(
                               	if(classof reflectionMap == CompositeTexturemap) then
                               	(
-							format "    <texture name=\"reflection_%\">\n" diffuseImage to:outFile
+							format "    <texture name=\"reflection_%\">\n" subm.name to:outFile
 			 				format "      <type>crystalspace.texture.loader.cubemap</type>\n" to:outFile
 			 				format "      <params>\n" to:outFile
-
+	
 							if(reflectionMap.mapList.count == 6) then
 							(
 								indx = tokenize reflectionMap.mapList[1].filename "\\"
 								format "        <north>%</north>\n" indx[indx.count] to:outFile
-
+	
 								indx = tokenize reflectionMap.mapList[2].filename "\\"
-           							format "        <south>%</south>\n" indx[indx.count] to:outFile
-
+	           						format "        <south>%</south>\n" indx[indx.count] to:outFile
+	
 								indx = tokenize reflectionMap.mapList[3].filename "\\"
-  								format "        <east>%</east>\n" indx[indx.count] to:outFile
-
+	  							format "        <east>%</east>\n" indx[indx.count] to:outFile
+	
 								indx = tokenize reflectionMap.mapList[4].filename "\\"
-     								format "        <west>%</west>\n" indx[indx.count] to:outFile
-
+	     							format "        <west>%</west>\n" indx[indx.count] to:outFile
+	
 								indx = tokenize reflectionMap.mapList[5].filename "\\"
-         							format "        <top>%</top>\n" indx[indx.count] to:outFile
-
+	         						format "        <top>%</top>\n" indx[indx.count] to:outFile
+	
 								indx = tokenize reflectionMap.mapList[6].filename "\\"
-      	   						format "        <bottom>%</bottom>\n" indx[indx.count] to:outFile
+	         						format "        <bottom>%</bottom>\n" indx[indx.count] to:outFile
 							)
 							else
 							(
@@ -491,54 +510,72 @@ rollout Test1 "Export Level to CS" width:226 height:450
 								messageBox message
 								return 1
 							)
-
-			 				format "      </params>\n" to:outFile
+	
+				 			format "      </params>\n" to:outFile
 							format "    </texture>\n" to:outFile
 						)
-                              	else
-                              	(
-                              		message = "ERROR: Reflection map must be a composite material."
-							messageBox message
-							return 1
-                              	)
-					 )
-                    	  )
+	                              else
+	                              (
+                                          indx = tokenize reflectionMap.filename "\\" 
+                              		format "    <texture name=\"%\">\n" indx[indx.count] to:outFile
+							format "      <file>%</file>\n" indx[indx.count] to:outFile
+							format "    </texture>\n" to:outFile
+                                          append materialsWrittenToWorld indx[indx.count]
+      	                        )
+					)
 
-				  -- Spec Map Texture:
-				  specMapImage = getMatSpecMapFilename subm
-				  if (findItem materialsWrittenToWorld specMapImage==0 and specMapImage!="materialnotdefined") then
-				  (
-				    format "m: % \n" m
-					format "    <texture name=\"%\">\n" specMapImage to:outFile
-					format "      <file>%</file>\n" specMapImage to:outFile
-					format "    </texture>\n" to:outFile
+					-- Normal Map Texture:
+				  	normalMapImage = getMatNormalMapFilename subm
+				  	if (findItem materialsWrittenToWorld normalMapImage==0 and normalMapImage!="materialnotdefined") then
+				  	(
+				  	  format "m: % \n" subm
+				  	  format "    <texture name=\"%\">\n" normalMapImage to:outFile
+				  	  format "      <file>%</file>\n" normalMapImage to:outFile
+				  	  format "      <class>normalmap</class>\n" to:outFile
+					  format "      <mipmap>no</mipmap>\n" to:outFile
+				  	  format "    </texture>\n" to:outFile
+							
+					  append materialsWrittenToWorld normalMapImage
+					)
+                   	 )
+			 	 else
+			 	 (
+			 	 	-- Spec Map Texture:
+			 	 	specMapImage = getMatSpecMapFilename subm
+			 	 	if (findItem materialsWrittenToWorld specMapImage==0 and specMapImage!="materialnotdefined") then
+			 	 	(
+						  format "m: % \n" subm
+							format "    <texture name=\"%\">\n" specMapImage to:outFile
+							format "      <file>%</file>\n" specMapImage to:outFile
+							format "    </texture>\n" to:outFile
 						
-					append materialsWrittenToWorld dispMapImage
-				  )
-				  -- Normal Map Texture:
-				  normalMapImage = getMatNormalMapFilename subm
-				  if (findItem materialsWrittenToWorld normalMapImage==0 and normalMapImage!="materialnotdefined") then
-				  (
-				    format "m: % \n" m
-				    format "    <texture name=\"%\">\n" normalMapImage to:outFile
-				    format "      <file>%</file>\n" normalMapImage to:outFile
-				    format "      <class>normalmap</class>\n" to:outFile
-				    format "    </texture>\n" to:outFile
-						
-				    append materialsWrittenToWorld normalMapImage
-				  )
-				  -- Displacement Map Texture:
-				  dispMapImage = getMatDispMapFilename subm
-				  if (findItem materialsWrittenToWorld dispMapImage==0 and dispMapImage!="materialnotdefined") then
-				  (
-				    format "m: % \n" m
-					format "    <texture name=\"%\">\n" dispMapImage to:outFile
-					format "      <file>%</file>\n" dispMapImage to:outFile
-					format "    </texture>\n" to:outFile
-						
-					append materialsWrittenToWorld dispMapImage
-				  )
-				)
+						append materialsWrittenToWorld dispMapImage
+				  	)
+				  	-- Normal Map Texture:
+				  	normalMapImage = getMatNormalMapFilename subm
+				  	if (findItem materialsWrittenToWorld normalMapImage==0 and normalMapImage!="materialnotdefined") then
+				  	(
+				  	  format "m: % \n" subm
+				  	  format "    <texture name=\"%\">\n" normalMapImage to:outFile
+			  		  format "      <file>%</file>\n" normalMapImage to:outFile
+			  		  format "      <class>normalmap</class>\n" to:outFile
+			  		  format "    </texture>\n" to:outFile
+							
+					    append materialsWrittenToWorld normalMapImage
+					  )
+					  -- Displacement Map Texture:
+					  dispMapImage = getMatDispMapFilename subm
+					  if (findItem materialsWrittenToWorld dispMapImage==0 and dispMapImage!="materialnotdefined") then
+					  (
+					    format "m: % \n" subm
+						format "    <texture name=\"%\">\n" dispMapImage to:outFile
+						format "      <file>%</file>\n" dispMapImage to:outFile
+						format "    </texture>\n" to:outFile
+							
+						append materialsWrittenToWorld dispMapImage
+					  )
+				    	)
+			      )
 			)
 		
 		  )
@@ -570,9 +607,20 @@ rollout Test1 "Export Level to CS" width:226 height:450
                   (
 				-- if material not written, add it
 				diffuseMapImage = getMatDiffuseMapFilename m
-				if (findItem materialsWrittenToWorld diffuseMapImage==0 and diffuseMapImage!="materialnotdefined") then
+				if (findItem materialsWrittenToWorld diffuseMapImage==0) then
                         (
-                             format "    <material name=\"%\">\n" diffuseMapImage to:outFile
+                              if(diffuseMapImage!="materialnotdefined") then
+					(
+                             		format "    <material name=\"%\">\n" diffuseMapImage to:outFile
+					)
+					else if(m.mapEnables[10]) then
+					(
+						format "    <material name=\"%\">\n" m.name to:outFile
+					)
+					else
+					(
+						continue;
+					)
 
 					-- handles transparent materials
 					if (m.mapEnables[7]) then
@@ -583,48 +631,63 @@ rollout Test1 "Export Level to CS" width:226 height:450
 					)
 
 					-- handles reflection materials
+					normalMapImage = getMatNormalMapFilename m
 					if (m.mapEnables[10]) then
                               (
 						format "      <shader type=\"standard\">reflect_water_plane</shader>\n" to:outFile
 						format "      <shader type=\"diffuse\">reflect_water_plane</shader>\n" to:outFile
-						format "      <shadervar type=\"texture\" name=\"tex normal\">%</shadervar>\n" diffuseMapImage to:outFile
+
+						if(normalMapImage!="materialnotdefined") then
+                                    (
+							format "      <shadervar type=\"texture\" name=\"tex normal\">%</shadervar>\n" normalMapImage to:outFile
+						)
 
 						reflectionMap = m.reflectionMap
 						if (reflectionMap!=undefined) then
                                     (
-							format "      <shadervar type=\"texture\" name=\"tex reflection\">reflection_%</shadervar>\n" diffuseMapImage to:outFile
+							if(classof reflectionMap == CompositeTexturemap) then
+                              		(
+								format "      <shadervar type=\"texture\" name=\"tex reflection\">reflection_%</shadervar>\n" m.name to:outFile
+							)
+							else
+							(
+								indx = tokenize reflectionMap.filename "\\"
+								format "      <shadervar type=\"texture\" name=\"tex environment\">%</shadervar>\n" indx[indx.count] to:outFile
+							)
 						)
 					)
                               else
                               (
                               	-- handles diffuse maps
                               	format "      <shadervar type=\"texture\" name=\"tex diffuse\">%</shadervar>\n" diffuseMapImage to:outFile
+
+                              	-- handles normal maps
+                              	if(normalMapImage!="materialnotdefined") then
+                              	(
+                              	  format "      <shadervar type=\"texture\" name=\"tex normal compressed\">%</shadervar>\n" normalMapImage to:outFile
+                              	)
+
+                              	-- handles displacement(height) maps
+                              	dispMapImage = getMatDispMapFilename m
+                              	if(dispMapImage!="materialnotdefined") then
+                              	(
+                              	  format "      <shadervar type=\"texture\" name=\"tex height\">%</shadervar>\n" dispMapImage to:outFile
+                              	)
+
+                              	-- handles specular maps
+                              	specMapImage = getMatSpecMapFilename m
+                              	if(specMapImage!="materialnotdefined") then
+                              	(
+                              	  format "      <shadervar type=\"texture\" name=\"tex specular\">%</shadervar>\n" specMapImage to:outFile
+                              	)
 					)
-
-                              -- handles normal maps
-                              normalMapImage = getMatNormalMapFilename m
-                              if(normalMapImage!="materialnotdefined") then
-                              (
-                                format "      <shadervar type=\"texture\" name=\"tex normal compressed\">%</shadervar>\n" normalMapImage to:outFile
-                              )
-
-                              -- handles displacement(height) maps
-                              dispMapImage = getMatDispMapFilename m
-                              if(dispMapImage!="materialnotdefined") then
-                              (
-                                format "      <shadervar type=\"texture\" name=\"tex height\">%</shadervar>\n" dispMapImage to:outFile
-                              )
-
-                              -- handles specular maps
-                              specMapImage = getMatSpecMapFilename m
-                              if(specMapImage!="materialnotdefined") then
-                              (
-                                format "      <shadervar type=\"texture\" name=\"tex specular\">%</shadervar>\n" specMapImage to:outFile
-                              )
                               
                               format "    </material>\n" to:outFile
 
-					append materialsWrittenToWorld image
+					if(diffuseMapImage!="materialnotdefined") then
+					(
+						append materialsWrittenToWorld diffuseMapImage
+					)
 				)
 			)
 
@@ -635,7 +698,7 @@ rollout Test1 "Export Level to CS" width:226 height:450
 					isshader = false
 
 					-- skip wrong materials
-					if ( diffuseMapImage=="materialnotdefined") then
+					if ( diffuseMapImage=="materialnotdefined" and not subm.mapEnables[10]) then
 						continue;
 
 					-- determine if it's a shader material
@@ -656,7 +719,14 @@ rollout Test1 "Export Level to CS" width:226 height:450
 					
 					if (not found) then
                               (
-  	      	                  format "    <material name=\"%\">\n" diffuseMapImage to:outFile			
+  	      	                  if(diffuseMapImage!="materialnotdefined") then
+						(
+                             			format "    <material name=\"%\">\n" diffuseMapImage to:outFile
+						)
+						else if(m.mapEnables[10]) then
+						(
+							format "    <material name=\"%\">\n" subm.name to:outFile
+						)
 
 						-- handles transparent materials
 						if (subm.mapEnables[7]) then
@@ -683,51 +753,64 @@ rollout Test1 "Export Level to CS" width:226 height:450
 								return 1
 							)
 
-						) else
+						) else if(imagetemp!="materialnotdefined") then
+						(
 							append materialsWrittenToWorld imagetemp
+						)
 
 						-- handles reflection materials
+						normalMapImage = getMatNormalMapFilename subm
 						if (subm.mapEnables[10]) then
                               	(
 							format "      <shader type=\"standard\">reflect_water_plane</shader>\n" to:outFile
 							format "      <shader type=\"diffuse\">reflect_water_plane</shader>\n" to:outFile
-							format "      <shadervar type=\"texture\" name=\"tex normal\">%</shadervar>\n" diffuseMapImage to:outFile
+
+							if(normalMapImage!="materialnotdefined") then
+                              		(
+								format "      <shadervar type=\"texture\" name=\"tex normal\">%</shadervar>\n" normalMapImage to:outFile
+							)
 
 							reflectionMap = subm.reflectionMap
 							if (reflectionMap!=undefined) then
                                     	(
-								format "      <shadervar type=\"texture\" name=\"tex reflection\">reflection_%</shadervar>\n" diffuseMapImage to:outFile
+								if(classof reflectionMap == CompositeTexturemap) then
+                              			(
+									format "      <shadervar type=\"texture\" name=\"tex reflection\">reflection_%</shadervar>\n" subm.name to:outFile
+								)
+								else
+								(
+									indx = tokenize reflectionMap.filename "\\"
+									format "      <shadervar type=\"texture\" name=\"tex environment\">%</shadervar>\n" indx[indx.count] to:outFile
+								)
 							)
 						)
                               	else
                               	(
                               		-- handles diffuse maps
                               		format "      <shadervar type=\"texture\" name=\"tex diffuse\">%</shadervar>\n" diffuseMapImage to:outFile
+
+                              		-- handles normal maps
+                              		if(normalMapImage!="materialnotdefined") then
+                              		(
+                              		  format "      <shadervar type=\"texture\" name=\"tex normal compressed\">%</shadervar>\n" normalMapImage to:outFile
+                              		)
+
+                              		-- handles displacement(height) maps
+                              		dispMapImage = getMatDispMapFilename subm
+                              		if(dispMapImage!="materialnotdefined") then
+                              		(
+                              		  format "      <shadervar type=\"texture\" name=\"tex height\">%</shadervar>\n" dispMapImage to:outFile
+                              		)
+
+                              		-- handles specular maps
+                              		specMapImage = getMatSpecMapFilename subm
+                              		if(specMapImage!="materialnotdefined") then
+                              		(
+                              		  format "      <shadervar type=\"texture\" name=\"tex specular\">%</shadervar>\n" specMapImage to:outFile
+                              		)
 						)
 
-                        	      -- handles normal maps
-                                    normalMapImage = getMatNormalMapFilename subm
-                                    if(normalMapImage!="materialnotdefined") then
-                                    (
-                                      format "      <shadervar type=\"texture\" name=\"tex normal compressed\">%</shadervar>\n" normalMapImage to:outFile
-                                    )
-
-                                    -- handles displacement(height) maps
-                                    dispMapImage = getMatDispMapFilename subm
-                                    if(dispMapImage!="materialnotdefined") then
-                                    (
-                                      format "      <shadervar type=\"texture\" name=\"tex height\">%</shadervar>\n" dispMapImage to:outFile
-                                    )
-
-                                    -- handles specular maps
-                                    specMapImage = getMatSpecMapFilename subm
-                                    if(specMapImage!="materialnotdefined") then
-                                    (
-                                      format "      <shadervar type=\"texture\" name=\"tex specular\">%</shadervar>\n" specMapImage to:outFile
-                                    )
-
 						format "    </material>\n" to:outFile
-
 					)
 				)
 			)
@@ -1779,7 +1862,12 @@ rollout Test1 "Export Level to CS" width:226 height:450
 				facesmaterialfaces=#()
                 -- if standard material, then 1 submesh only
 				if ((classOf obj.mat)==Standardmaterial) then (
-				    append facesmaterial (getMatDiffuseMapFilename (obj.mat))
+                            matname = getMatDiffuseMapFilename (obj.mat)
+                            if(matname=="materialnotdefined") then
+					(
+						matname = obj.mat.name
+					)
+				      append facesmaterial (matname)
 					facesmaterialfaces[1]=#()
 					for i =1 to obj.numFaces do
 					(
@@ -1794,6 +1882,10 @@ rollout Test1 "Export Level to CS" width:226 height:450
 						)
 						m = obj.mat[textid]
 	   					mname = getMatDiffuseMapFilename(m)
+						if(mname=="materialnotdefined") then
+						(
+							mname = m.name
+						)
 						if (findItem facesmaterial mname==0) then (
 							append facesmaterial mname
 						)
@@ -2836,7 +2928,12 @@ rollout Test1 "Export Level to CS" width:226 height:450
 					facesmaterial=#()
 	                -- if standard material, then 1 submesh only
 					if ((classOf obj.mat)==Standardmaterial) then (
-					    append facesmaterial (getMatDiffuseMapFilename (obj.mat))
+					    mname = getMatDiffuseMapFilename (obj.mat)
+						if(mname=="materialnotdefined") then
+						(
+							mname = obj.mat.name
+						)
+					    append facesmaterial (mname)
 					) else (
 						for i =1 to obj.numFaces do
 						(
@@ -2846,6 +2943,10 @@ rollout Test1 "Export Level to CS" width:226 height:450
 							)
 							m = obj.mat[textid]
 		   					mname = getMatDiffuseMapFilename(m)
+							if(mname=="materialnotdefined") then
+							(
+								mname = m.name
+							)
 							if (findItem facesmaterial mname==0) then (
 								append facesmaterial mname
 							)
