@@ -1,7 +1,7 @@
 ------------------------------------------------------------
 -- Author: Luca Pancallo <pancallo@netscape.net>
 --
--- Copyright (C) 2008 Atomic Blue (info@planeshift.it,
+-- Copyright (C) 2009 Atomic Blue (info@planeshift.it,
 -- http://www.atomicblue.org)
 --
 -- This program is free software; you can redistribute it and/or
@@ -18,6 +18,7 @@
 ------------------------------------------------------------
 
 
+
 macroScript Export_Level_CS
 category:"PlaneShift"
 internalcategory:"PlaneShift"
@@ -25,7 +26,7 @@ ButtonText:"Export Level to CS"
 tooltip:"Export Level to CS" Icon:#("Maxscript",1)
 (
 
-rollout Test1 "Export Level to CS" width:226 height:350
+rollout Test1 "Export Level to CS" width:226 height:450
 (
 	edittext edt3 "" pos:[17,32] width:192 height:21
 	label lbl1 "Export Level To:" pos:[21,7] width:142 height:20
@@ -40,12 +41,15 @@ rollout Test1 "Export Level to CS" width:226 height:350
 	checkbox chkSanity "Check Only, no Deletion" pos:[22,267] width:159 height:23 enabled:true checked:true
 	button sanity "SanityCheck!" pos:[32,297] width:145 height:31
 	label lblVersion "V." pos:[180,5] width:40 height:21
-	
+
+	groupBox grp3 "Terrain" pos:[13,348] width:189 height:89
+	checkbox chkTerrain "Export as Terrain Level" pos:[22,372] width:168 height:26
 	on Test1 open do
 	(
-	   version = 70 as String
+	   version = 52 as String
 	   lblVersion.text = "V."+version
-	
+	   
+
 		-- get room name from custom property
 		customPropNumber = fileProperties.findProperty #custom "roomname"
 		if (customPropNumber==0) then (
@@ -62,9 +66,10 @@ rollout Test1 "Export Level to CS" width:226 height:350
 		)
 		defaultScale = fileProperties.getPropertyValue #custom customPropNumber 
 	
-	   edt3.text = "C:\CS\\"+roomName+"\world"
+	   edt3.text = "D:\Luca\PS\gfxpackage3.4\levels\\"+roomName+"\world"
 	   edtScale.text = defaultScale
 	)
+
 	on btn2 pressed do
 	(
 	
@@ -97,23 +102,25 @@ rollout Test1 "Export Level to CS" width:226 height:350
 		global tokenize
 		global lowercase
 		global getMatDiffuseMapFilename
-		global getMatGlossMapFilename
+		global getMatSpecMapFilename
 		global getMatNormalMapFilename
 		global getMatDispMapFilename
 		global getMatDiffuseMapFullPath
-		global getMatGlossMapFullPath
+		global getMatSpecMapFullPath
 		global getMatNormalMapFullPath
 		global getMatDispMapFullPath
+		global OutputOldParticle
+		global OutputNewParticle
 	
 		-- particle variables
 		global fireNeeded = false
 
 		global emitNeeded = false
+		global particleNeeded = false
 		global partMaterials = #()
-		
-		-- Shader include booleans
-		global rloop_diffuse = false
-		global rloop_terrainfixed = false
+
+		-- terrain
+		global base_material = ""
 
 		-- get room name from custom property
 		customPropNumber = fileProperties.findProperty #custom "roomname"
@@ -181,12 +188,12 @@ rollout Test1 "Export Level to CS" width:226 height:350
 			)
 		)
 
-          fn getMatGlossMapFilename m = 
+          fn getMatSpecMapFilename m = 
 		(
 		    if (m==undefined) then
 				image="materialnotdefined"
 			else (
-			    mat = m.glossinessMap
+			    mat = m.specularMap
 				if (mat!=undefined) then
 				(
 					image = mat.filename
@@ -235,7 +242,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 			)
 		)
 	
-		-- get fullpath of a materials
+		-- get fullpath of materials
 		fn getMatDiffuseMapFullPath m = 
 		(
 		    if (m==undefined) then
@@ -251,12 +258,12 @@ rollout Test1 "Export Level to CS" width:226 height:350
 			)
 		)
 
-		fn getMatGlossMapFullPath m = 
+		fn getMatSpecMapFullPath m = 
 		(
 		    if (m==undefined) then
 				image="materialnotdefined"
 			else (
-			    mat = m.glossinessMap
+			    mat = m.specularMap
 				if (mat!=undefined) then
 				(
 					image = mat.filename
@@ -274,7 +281,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 			    mat = m.bumpMap
 				if (mat!=undefined) then
 				(
-					image = mat.filename
+					image = mat.normal_map.filename
 				) else
 					image="materialnotdefined"
 			    image = lowercase(image)
@@ -313,7 +320,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 		  (
 		    -- handle Standardmaterials
 			if ((classOf m)==Standardmaterial) then
-			(
+                  (
 			  -- For each material, if not written then add it.				
 			  -- Diffuse Texture:
 			  diffuseImage = getMatDiffuseMapFilename m				
@@ -333,17 +340,16 @@ rollout Test1 "Export Level to CS" width:226 height:350
                     
 				append materialsWrittenToWorld diffuseImage
 			  )
-			  -- Gloss Map Texture:
-			  glossMapImage = getMatGlossMapFilename m
-			  if (findItem materialsWrittenToWorld glossMapImage==0 and glossMapImage!="materialnotdefined") then
+			  -- Spec Map Texture:
+			  specMapImage = getMatSpecMapFilename m
+			  if (findItem materialsWrittenToWorld specMapImage==0 and specMapImage!="materialnotdefined") then
 			  (
 			    format "m: % \n" m
-				format "    <texture name=\"%\">\n" glossMapImage to:outFile
-				format "      <file>%</file>\n" glossMapImage to:outFile
-				format "      <class>normalmap</class>\n" to:outFile
+				format "    <texture name=\"%\">\n" specMapImage to:outFile
+				format "      <file>%</file>\n" specMapImage to:outFile
 				format "    </texture>\n" to:outFile
 					
-				append materialsWrittenToWorld glossMapImage
+				append materialsWrittenToWorld dispMapImage
 			  )
 			  -- Normal Map Texture:
 			  normalMapImage = getMatNormalMapFilename m
@@ -364,7 +370,6 @@ rollout Test1 "Export Level to CS" width:226 height:350
 			    format "m: % \n" m
 				format "    <texture name=\"%\">\n" dispMapImage to:outFile
 				format "      <file>%</file>\n" dispMapImage to:outFile
-				format "      <class>normalmap</class>\n" to:outFile
 				format "    </texture>\n" to:outFile
 					
 				append materialsWrittenToWorld dispMapImage
@@ -373,52 +378,79 @@ rollout Test1 "Export Level to CS" width:226 height:350
 	
 		    -- handle Multi/materials
 			if ((classOf m)==Multimaterial) then
-			(
-		      for subm in m do
-			  (
-				image = getMatDiffuseMapFilename subm
-				if (findItem materialsWrittenToWorld image==0 and image!="materialnotdefined") then
-				(
-				  format "m: % subm: % \n" m subm
-				  if (subm.mapEnables[7]) then
+                  (
+				for subm in m do
+                        (
+				  -- For each material, if not written then add it.				
+				  -- Diffuse Texture:
+				  diffuseImage = getMatDiffuseMapFilename subm				
+				  if (findItem materialsWrittenToWorld diffuseImage==0 and diffuseImage!="materialnotdefined") then
 				  (
-					format "    <texture name=\"%\">\n" image to:outFile
-                    format "      <file>%</file>\n" image to:outFile
-					format "      <alpha>\n" to:outFile
-					format "        <binary/>\n" to:outFile
-				    format "      </alpha>\n" to:outFile
-                    format "    </texture>\n" to:outFile
+				    format "m: % \n" m
+					format "    <texture name=\"%\">\n" diffuseImage to:outFile
+					format "      <file>%</file>\n" diffuseImage to:outFile
+					-- handles transparent materials					
+					if (subm.mapEnables[7]) then
+					(
+					  format "      <alpha>\n" to:outFile
+					  format "        <binary/>\n" to:outFile
+					  format "      </alpha>\n" to:outFile
+					)
+					format "    </texture>\n" to:outFile
+           	         
+					append materialsWrittenToWorld diffuseImage
 				  )
-				  else
+				  -- Spec Map Texture:
+				  specMapImage = getMatSpecMapFilename subm
+				  if (findItem materialsWrittenToWorld specMapImage==0 and specMapImage!="materialnotdefined") then
 				  (
-					format "    <texture name=\"%\">\n" image to:outFile
-                    format "      <file>%</file>\n" image to:outFile
-                    format "    </texture>\n" to:outFile
+				    format "m: % \n" m
+					format "    <texture name=\"%\">\n" specMapImage to:outFile
+					format "      <file>%</file>\n" specMapImage to:outFile
+					format "    </texture>\n" to:outFile
+						
+					append materialsWrittenToWorld dispMapImage
 				  )
-				  append materialsWrittenToWorld image
+				  -- Normal Map Texture:
+				  normalMapImage = getMatNormalMapFilename subm
+				  if (findItem materialsWrittenToWorld normalMapImage==0 and normalMapImage!="materialnotdefined") then
+				  (
+				    format "m: % \n" m
+				    format "    <texture name=\"%\">\n" normalMapImage to:outFile
+				    format "      <file>%</file>\n" normalMapImage to:outFile
+				    format "      <class>normalmap</class>\n" to:outFile
+				    format "    </texture>\n" to:outFile
+						
+				    append materialsWrittenToWorld normalMapImage
+				  )
+				  -- Displacement Map Texture:
+				  dispMapImage = getMatDispMapFilename subm
+				  if (findItem materialsWrittenToWorld dispMapImage==0 and dispMapImage!="materialnotdefined") then
+				  (
+				    format "m: % \n" m
+					format "    <texture name=\"%\">\n" dispMapImage to:outFile
+					format "      <file>%</file>\n" dispMapImage to:outFile
+					format "    </texture>\n" to:outFile
+						
+					append materialsWrittenToWorld dispMapImage
+				  )
 				)
-			  )
-			)		
+			)
+		
 		  )
 		
-		  if (fireNeeded or emitNeeded) then
-		  (
-		    format "m: raindrop\n"
-			format "    <texture name=\"raindrop\">\n" to:outFile
-            format "      <file>raindrop.png</file>\n" to:outFile
-            format "    </texture>\n" to:outFile 
+		  if (fireNeeded or emitNeeded) then (
+			    format "    <texture name=\"raindrop\">\n      <file>raindrop.png</file>\n    </texture>\n" to:outFile  
 		  )
 	
 		  -- handle additional textures for particles  
 		  for m in partMaterials do
 		  (
-		    format "m: % \n" m
-		    format "    <texture name=\"%\">\n" m to:outFile
-            format "      <file>%</file>\n" m to:outFile
-            format "    </texture>\n" to:outFile
+			    format "    <texture name=\"%\">\n      <file>%</file>\n    </texture>\n" m m to:outFile
 		  )
 
-		  format "  </textures>\n\n" to:outFile
+
+		  format "  </textures>\n" to:outFile
 	
 	
 		  --/// MATERIALS
@@ -430,39 +462,60 @@ rollout Test1 "Export Level to CS" width:226 height:350
 		  for m in sceneMaterials do
 		  (
 		    -- handle Standardmaterials
-			if ((classOf m)==Standardmaterial) then (
+			if ((classOf m)==Standardmaterial) then
+                  (
 				-- if material not written, add it
-				diffuseImage = getMatDiffuseMapFilename m
-				if (findItem materialsWrittenToWorld diffuseImage==0 and diffuseImage!="materialnotdefined") then (
-				    format "    <material name=\"%\">\n" diffuseImage to:outFile
-                    format "      <texture>%</texture>\n" diffuseImage to:outFile
-					
-					normalMapImage = getMatNormalMapFilename m
-					dispMapImage = getMatDispMapFilename m
-					if(normalMapImage!="materialnotdefined" and dispMapImage!="materialnotdefined") then (
-					  format "      <shader type=\"diffuse\">parallaxAtt</shader>\n" to:outFile
-					  format "      <shader type=\"ambient\">ambient</shader>\n" to:outFile
-					  format "      <shadervar type=\"texture\" name=\"tex normal compressed\">%</shadervar>\n" normalMapImage to:outFile
-					  format "      <shadervar type=\"texture\" name=\"tex height\">%</shadervar>\n" dispMapImage to:outFile
+				diffuseMapImage = getMatDiffuseMapFilename m
+				if (findItem materialsWrittenToWorld diffuseMapImage==0 and diffuseMapImage!="materialnotdefined") then
+                        (
+                             format "    <material name=\"%\">\n" diffuseMapImage to:outFile
+
+					-- handles transparent materials
+					if (m.mapEnables[7]) then
+                              (
+						format "      <shader type=\"depthwrite\">*null</shader>\n" to:outFile
+						format "      <shader type=\"base\">lighting_default_binalpha</shader>\n" to:outFile
+						format "      <shader type=\"diffuse\">lighting_default_binalpha</shader>\n" to:outFile
 					)
-                              glossMapImage = getMatGlossMapFilename m
-                              if(glossMapImage!="materialnotdefined") then (
-                                format "      <shadervar type=\"texture\" name=\"tex specular\">%</shadervar>\n" glossMapImage to:outFile
+
+                              -- handles diffuse maps
+                              format "      <shadervar type=\"texture\" name=\"tex diffuse\">%</shadervar>\n" diffuseMapImage to:outFile
+
+                              -- handles normal maps
+                              normalMapImage = getMatNormalMapFilename m
+                              if(normalMapImage!="materialnotdefined") then
+                              (
+                                format "      <shadervar type=\"texture\" name=\"tex normal compressed\">%</shadervar>\n" normalMapImage to:outFile
                               )
-					
-                    format "    </material>\n" to:outFile
+
+                              -- handles displacement(height) maps
+                              dispMapImage = getMatDispMapFilename m
+                              if(dispMapImage!="materialnotdefined") then
+                              (
+                                format "      <shadervar type=\"texture\" name=\"tex height\">%</shadervar>\n" dispMapImage to:outFile
+                              )
+
+                              -- handles specular maps
+                              specMapImage = getMatSpecMapFilename m
+                              if(specMapImage!="materialnotdefined") then
+                              (
+                                format "      <shadervar type=\"texture\" name=\"tex specular\">%</shadervar>\n" specMapImage to:outFile
+                              )
+                              
+                              format "    </material>\n" to:outFile
+
 					append materialsWrittenToWorld image
 				)
 			)
-		
+
 		    -- handle Multi/materials
 			if ((classOf m)==Multimaterial) then (
 				for subm in m do (
-					image = getMatDiffuseMapFilename subm
+					diffuseMapImage = getMatDiffuseMapFilename subm
 					isshader = false
 
 					-- skip wrong materials
-					if ( image=="materialnotdefined") then
+					if ( diffuseMapImage=="materialnotdefined") then
 						continue;
 
 					-- determine if it's a shader material
@@ -471,39 +524,73 @@ rollout Test1 "Export Level to CS" width:226 height:350
 
 					-- check if already written
 					found = false
-					imagetemp = image
+					imagetemp = diffuseMapImage
 					if (isshader) then (
-						imagetemp = image + "sshhaaddeerr"
+						imagetemp = diffuseMapImage + "sshhaaddeerr"
 						if(findItem materialsWrittenToWorld imagetemp!=0) then
 							found=true
 					) else (
-						if(findItem materialsWrittenToWorld image!=0) then
+						if(findItem materialsWrittenToWorld diffuseMapImage!=0) then
 							found=true
 					)
 					
-					if (not found) then (
-						format "    <material name=\"%\">\n" imagetemp to:outFile
-                        format "      <texture>%</texture>\n" image to:outFile
+					if (not found) then
+                              (
+  	      	                  format "    <material name=\"%\">\n" diffuseMapImage to:outFile			
+
+						-- handles transparent materials
+						if (subm.mapEnables[7]) then
+     		                        (
+							format "      <shader type=\"depthwrite\">*null</shader>\n" to:outFile
+							format "      <shader type=\"base\">lighting_default_binalpha</shader>\n" to:outFile
+							format "      <shader type=\"diffuse\">lighting_default_binalpha</shader>\n" to:outFile
+						)
+
 						-- manage shaders
 						if (findString subm.name "_shader_" != undefined) then (
 							if (findString subm.name "_shader_terrain" !=undefined) then (
-								format "      <shadervar name=\"texture scale\" type=\"vector2\">96,96</shadervar>\n" to:outFile
-								format "      <shader type=\"terrain splat\">terrain_fixed_splatting</shader>\n" to:outFile
+								format "     <shader type=\"terrain splat\">terrain_fixed_splatting</shader>\n" to:outFile
+								format "     <shadervar name=\"texture scale\" type=\"vector2\">32,32</shadervar>\n" to:outFile
 							)
 							else if (findString subm.name "_shader_ambient" !=undefined) then (
-								format "      <shader type=\"ambient\">terrain_fixed_base</shader>\n" to:outFile
+								format "     <shader type=\"ambient\">terrain_fixed_base</shader>\n" to:outFile
+								base_material = imagetemp
 							) else (
 								message = "ERROR: Found terrain's material "+m.name+" with submat "+subm.name+" defining a shader of unsupported type!\n"
 								message = message + "Supported types are: _shader_terrain , _shader_ambient"
 								messageBox message
-								format "    </material>\n" to:outFile
+								format "     </material>\n" to:outFile
 								return 1
 							)
 
 						) else
 							append materialsWrittenToWorld imagetemp
 
-						format "    </material>\n" image image to:outFile
+            	                  -- handles diffuse maps
+                 		            format "      <shadervar type=\"texture\" name=\"tex diffuse\">%</shadervar>\n" diffuseMapImage to:outFile
+
+                        	      -- handles normal maps
+                                    normalMapImage = getMatNormalMapFilename subm
+                                    if(normalMapImage!="materialnotdefined") then
+                                    (
+                                      format "      <shadervar type=\"texture\" name=\"tex normal compressed\">%</shadervar>\n" normalMapImage to:outFile
+                                    )
+
+                                    -- handles displacement(height) maps
+                                    dispMapImage = getMatDispMapFilename subm
+                                    if(dispMapImage!="materialnotdefined") then
+                                    (
+                                      format "      <shadervar type=\"texture\" name=\"tex height\">%</shadervar>\n" dispMapImage to:outFile
+                                    )
+
+                                    -- handles specular maps
+                                    specMapImage = getMatSpecMapFilename subm
+                                    if(specMapImage!="materialnotdefined") then
+                                    (
+                                      format "      <shadervar type=\"texture\" name=\"tex specular\">%</shadervar>\n" specMapImage to:outFile
+                                    )
+
+						format "    </material>\n" to:outFile
 
 					)
 				)
@@ -512,13 +599,20 @@ rollout Test1 "Export Level to CS" width:226 height:350
 
 	
 		  if (fireNeeded or emitNeeded) then (
-			    format "    <material name=\"raindrop\">\n      <texture>raindrop</texture>\n    </material>\n" to:outFile  
+			    format "    <material name=\"raindrop\">\n" to:outFile
+                      format "      <shadervar type=\"texture\" name=\"tex diffuse\">raindrop</shadervar>\n" to:outFile
+                      format "    </material>\n" to:outFile
 		  )
 	
 		  -- handle additional materials for particles
 		  for m in partMaterials do
 		  (
-			    format "    <material name=\"%\">\n      <texture>%</texture>\n    </material>\n" m m to:outFile
+		      format "    <material name=\"%\">\n" m to:outFile
+			format "      <shader type=\"diffuse\">*null</shader>\n" to:outFile
+                  format "      <shader type=\"ambient\">particles_basic</shader>\n" to:outFile
+			format "      <shader type=\"standard\">particles_basic</shader>\n" to:outFile
+                  format "      <shadervar type=\"texture\" name=\"tex diffuse\">%</shadervar>\n" m to:outFile
+			format "    </material>\n" to:outFile
 		  )
 
 		  format "  </materials>\n\n" to:outFile
@@ -531,67 +625,230 @@ rollout Test1 "Export Level to CS" width:226 height:350
 		
 		fn WriteShaders outFile =
 		(
-		  for m in sceneMaterials do
-		  (
-		    -- Do a shader check on the materials.
-			if(rloop_diffuse and rloop_terrainfixed) then
-			(
-			  break;
-			)
-			 
-			if ((not rloop_diffuse) and (classOf m)==Standardmaterial) then
-			(
-			  normalMapImage = getMatNormalMapFilename m
-			  if(normalMapImage!="materialnotdefined") then
-			  (
-			    rloop_diffuse=true
-			    continue;
-			  )
-			)
-			   
-			if ((not rloop_terrainfixed) and (classOf m)==Multimaterial) then
-			(
-			  for subm in m do
-			  (
-			    if (subm!=undefined and findString subm.name "_shader_"!=undefined) then
-			    (
-			      rloop_terrainfixed=true
-			      continue;
-			    )
-			  )
-			)
+		  format "<shaders>\n" to:outFile
+
+          -- always write shader for alpha binary
+		  format " <shader><file>/shader/lighting/lighting_default_binalpha.xml</file></shader>\n" to:outFile
+
+		  -- add shaders for particles
+		  format "     <shader><file>/shader/particles/basic.xml</file></shader>\n" to:outFile
+		  format "     <shader><file>/shader/particles/soft-alpha.xml</file></shader>\n" to:outFile
+
+		  -- add shaders needed for terrain
+		  if (chkTerrain.checked) then (
+		   filestr = openFile "ps_terrain.shaders.txt"
+		   if (filestr==undefined) then (
+				message = "ERROR: ps_terrain.shaders.txt not found!"
+				messageBox message
+				return 1
+		   )
+		   while (not eof filestr) do
+		   (
+		   	line = readLine filestr
+			format "%\n" line to:outFile
+		   )
 		  )
 
-		  format "  <shaders>\n" to:outFile
-
-		  -- Include shaders needed for terrain.
-		  if (rloop_terrainfixed) then
-		  (
-		    format "    <shader>\n" to:outFile
-			format "      <file>/shader/terrain_fixed_base.xml</file>\n" to:outFile
-			format "    </shader>\n" to:outFile
-			format "    <shader>\n" to:outFile
-			format "      <file>/shader/terrain_fixed_splatting.xml</file>\n" to:outFile
-			format "    </shader>\n" to:outFile
-		  )
-		  
-		  -- Include all other shaders used with realtime lighting.
-		  if (rloop_diffuse) then
-		  (
-		    format "    <shader>\n" to:outFile
-            format "      <file>/shader/parallaxAtt/parallaxAtt.xml</file>\n" to:outFile
-            format "    </shader>\n" to:outFile
-		  )
-		  
-		  format "  </shaders>\n\n" to:outFile
+		  format "</shaders>\n" to:outFile
 		)
 		
 
 		-- ////////////////////////
-		-- Output Particle function
+		-- Output Particles function
 		-- ////////////////////////
-		fn OutputParticle obj allObjects outFile =
+		fn OutputParticle obj allObjects meshfact outFile =
 		(
+				type = getUserProp obj "TYPE"
+				format "Exporting Particle: % % % % \n" obj.name meshfact type allObjects 
+				if ( type == "hidden") then
+					continue;
+				else if ( type == "fire" or type == "emit" ) then (
+				    if (not meshfact) then 
+						OutputOldParticle obj allObjects outFile
+				) else
+					OutputNewParticle obj allObjects meshfact outFile
+		)
+
+
+		-- ////////////////////////
+		-- Output New Particles function
+		-- ////////////////////////
+		fn OutputNewParticle obj allObjects meshfact outFile =
+		(
+		        format "Exporting New Particle: % \n" obj.name
+				type = getUserProp obj "TYPE"
+				partMaterial = getUserProp obj "MATERIAL"
+				mixmode = getUserProp obj "MIXMODE"
+				if (mixmode==undefined) then (
+					mixmode = "add"
+				)
+	
+				xpart = (obj.pos.x * xscale) + xrelocate
+				ypart = (obj.pos.y * yscale) + yrelocate
+				zpart = (obj.pos.z * zscale) + zrelocate
+
+				renderorientation = getUserProp obj "RENDERORIENTATION"
+				rotationmode = getUserProp obj "ROTATION"
+				sortmode = getUserProp obj "SORT"
+				integrationmode = getUserProp obj "INTEGRATION"
+
+				particlesize = getUserProp obj "PARTICLESIZE"
+				particlesize2 = tokenize particlesize ","
+
+				emittype = getUserProp obj "EMITTYPE"
+				-- sphere
+				emissionrate = getUserProp obj "EMISSIONRATE"
+				radius = getUserProp obj "RADIUS"
+				velocity = getUserProp obj "VELOCITY"
+				velocity2 = tokenize velocity ","
+				mass = getUserProp obj "MASS"
+				mass2 = tokenize mass ","
+				ttl = getUserProp obj "TTL"
+				ttl2 = tokenize ttl ","
+				placement = getUserProp obj "PLACEMENT"
+				effectorforce = getUserProp obj "EFFECTORFORCE"
+				effectorrandacc = getUserProp obj "EFFECTORRANDACC"
+
+				uniformvel = getUserProp obj "UNIFORMVEL"
+				if (uniformvel==undefined) then (
+					uniformvel = "yes"
+				)
+
+				colors = #()
+				color0 = getUserProp obj "COLOR0"
+				if (color0!=undefined) then (
+					color0 = tokenize color0 ","
+					append colors color0
+				)
+				color1 = getUserProp obj "COLOR1"
+				if (color1!=undefined) then (
+					color1 = tokenize color1 ","
+					append colors color1
+				)
+				color2 = getUserProp obj "COLOR2"
+				if (color2!=undefined) then (
+					color2 = tokenize color2 ","
+					append colors color2
+				)
+				color3 = getUserProp obj "COLOR3"
+				if (color3!=undefined) then (
+					color3 = tokenize color3 ","
+					append colors color3
+				)
+				color4 = getUserProp obj "COLOR4"
+				if (color4!=undefined) then (
+					color4 = tokenize color4 ","
+					append colors color4
+				)
+					
+				if (type == "particle" and meshfact) then (
+					format "  <meshfact name='%'>\n" ("fact"+obj.name) to:outFile
+					format "  <plugin>crystalspace.mesh.loader.factory.particles</plugin> \n" to:outFile
+					format "  <priority>alpha</priority> \n" to:outFile
+					format "  <ztest/> \n" to:outFile
+					format "  <params> \n" to:outFile
+					format "  <mixmode><% /></mixmode> \n" mixmode to:outFile
+					format "  <material>%</material> \n" partMaterial to:outFile
+					format "  <renderorientation>%</renderorientation> \n" renderorientation to:outFile
+					format "  <rotationmode>%</rotationmode> \n" rotationmode to:outFile
+					format "  <sortmode>%</sortmode> \n" sortmode to:outFile
+					format "  <integrationmode>%</integrationmode>\n" integrationmode to:outFile
+					format "  <particlesize y='%' x='%'/> \n" particlesize2[1] particlesize2[2] to:outFile
+					format "  <individualsize>yes</individualsize><transformmode>local</transformmode> \n" to:outFile
+
+					if (emittype=="sphere") then (
+						format "  <emitter type='sphere'> \n" to:outFile
+						format "    <radius>%</radius> \n" radius to:outFile
+
+					) else if (emittype=="box") then (
+						emitbox = getUserProp obj "EMITBOX"
+						emitbox = tokenize emitbox ","
+						format "  <emitter type='box'> \n" to:outFile
+						format "    <box><min x=\"%\" y=\"%\" z=\"%\" /><max x=\"%\" y=\"%\" z=\"%\" /></box> \n" emitbox[1] emitbox[2] emitbox[3] emitbox[4] emitbox[5] emitbox[6] to:outFile
+					) else if (emittype=="cone") then (
+						emitcone = getUserProp obj "EMITCONE"
+						emitcone = tokenize emitcone ","
+						format "  <emitter type='cone'> \n" to:outFile
+						format "    <coneangle>%</coneangle> <extent x=\"%\" y=\"%\" z=\"%\" /> \n" emitcone[1] emitcone[2] emitcone[3] emitcone[4] emitcone[5] emitcone[6] to:outFile
+					)
+
+					format "    <enabled>yes</enabled> \n" to:outFile
+					format "    <uniformvelocity>%</uniformvelocity> \n" uniformvel to:outFile
+					format "    <emissionrate>%</emissionrate> \n" emissionrate to:outFile
+					format "    <position y='0' x='0' z='0'/> \n" to:outFile
+					format "    <initialvelocity x='%' y='%' z='%'/> \n" velocity2[1] velocity2[2] velocity2[3] to:outFile
+					format "    <mass max='%' min='%'/> \n" mass2[1] mass2[2] to:outFile
+					format "    <initialttl max='%' min='%'/> \n" ttl2[1] ttl2[2] to:outFile
+					format "    <placement>%</placement> \n" placement to:outFile
+					format "  </emitter> \n" to:outFile
+
+					if (effectorrandacc!=undefined) then (
+					    effectorrandacc = tokenize effectorrandacc ","
+						format "  <effector type='force'> \n" to:outFile
+						format "    <randomacceleration x='%' y='%' z='%'/> \n" effectorrandacc[1] effectorrandacc[2] effectorrandacc[3] to:outFile
+						format "  </effector> \n" to:outFile
+					)
+
+					if (effectorforce!=undefined) then (
+						effectorforce = tokenize effectorforce ","
+						format "  <effector type='force'> \n" to:outFile
+						format "    <force x='%' y='%' z='%'/> \n" effectorforce[1] effectorforce[2] effectorforce[3] to:outFile
+						format "  </effector> \n" to:outFile
+					)
+					
+					velocity = getUserProp obj "VELOCITYFIELD"
+					if (velocity!=undefined) then (
+						velocity = tokenize velocity ","
+					    format "  <effector type=\"velocityfield\">\n" to:outFile
+	                	format "   <type>radialpoint</type><vparam x=\"%\" y=\"%\" z=\"%\"/>\n" velocity[1] velocity[2] velocity[3] to:outFile
+                		format "   <fparam>%</fparam>\n" velocity[4] to:outFile
+            			format "  </effector>\n" to:outFile
+					)
+					spiral = getUserProp obj "SPIRALFIELD"
+					if (spiral!=undefined) then (
+						spiral = tokenize spiral ","
+					    format "  <effector type=\"velocityfield\">\n" to:outFile
+	                	format "   <type>spiral</type><vparam x=\"%\" y=\"%\" z=\"%\"/><vparam x=\"%\" y=\"%\" z=\"%\"/>\n" spiral[1] spiral[2] spiral[3] spiral[4] spiral[5] spiral[6] to:outFile
+                		format "   <vparam x=\"%\" y=\"%\" z=\"%\"/><fparam>%</fparam>\n" spiral[7] spiral[8] spiral[9] spiral[10] to:outFile
+            			format "  </effector>\n" to:outFile
+					)
+
+					format "  <effector type=\"linear\"> \n" to:outFile
+					for color in colors do (
+						format "  <param time=\"%\">\n" color[1] to:outFile
+						format "  <color red=\"%\" green=\"%\" blue=\"%\" />\n " color[2] color[3] color[4] to:outFile
+						format "  <particlesize x=\"%\" y=\"%\" />\n" color[5] color[6] to:outFile
+						format "  <angularvelocity y=\"%\" /> \n" color[7] to:outFile
+						format "  </param> \n" to:outFile
+					)
+
+					format "  </effector> \n" to:outFile
+
+					format "  </params> \n" to:outFile
+					format "  </meshfact> \n" to:outFile
+				) else if (type == "particle" and not meshfact) then (
+					format "  <meshobj name='%'>\n" obj.name to:outFile
+				    format "  <plugin>particles</plugin>\n" to:outFile
+				    format "  <priority>alpha</priority>\n" to:outFile
+				    format "  <params>\n" to:outFile
+				    format "    <factory>%</factory>\n" ("fact"+obj.name) to:outFile
+				    format "    <material>%</material>\n" partMaterial to:outFile
+				    format "  </params>\n" to:outFile
+				    format "  <trimesh><id>shadows</id></trimesh>\n" to:outFile
+					format "  <ztest/><noshadows/>\n" to:outFile
+				    format "  <move><v x='%' y='%' z='%'/></move>\n" xpart zpart ypart to:outFile
+				    format " </meshobj>\n" to:outFile
+				)
+
+		)
+
+
+		-- ////////////////////////
+		-- Output Old Particle function
+		-- ////////////////////////
+		fn OutputOldParticle obj allObjects outFile =
+		(
+		        format "Exporting Old Particle: % \n" obj.name to:outFile
 				type = getUserProp obj "TYPE"
 				partMaterial = getUserProp obj "MATERIAL"
 				mixmode = getUserProp obj "MIXMODE"
@@ -840,60 +1097,29 @@ rollout Test1 "Export Level to CS" width:226 height:350
 		  for m in sceneMaterials do
 		  (
 		    -- handle Standardmaterials
-			if ((classOf m)==Standardmaterial) then
-			(
+			if ((classOf m)==Standardmaterial) then (
 				-- if material not written, add it
-				diffuseImage = getMatDiffuseMapFullPath m
-				if (diffuseImage!="materialnotdefined" and findItem materialsWrittenToWorld diffuseImage==0) then
-				(
-					destFile2 = filenameFromPath diffuseImage
+				image = getMatDiffuseMapFullPath m
+				if (findItem materialsWrittenToWorld image==0) then (
+					destFile2 = filenameFromPath image
 					destFile2 = destDir + "\\" + destFile2
-					Format "copy from % to % \n" image destFile2
-					copyFile diffuseImage destFile2
-					append materialsWrittenToWorld diffuseImage
-				)
-				glossMapImage = getMatGlossMapFullPath m
-				if (glossMapImage!="materialnotdefined" and findItem materialsWrittenToWorld glossMapImage==0) then
-				(
-					destFile2 = filenameFromPath glossMapImage
-					destFile2 = destDir + "\\" + destFile2
-					Format "copy from % to % \n" glossMapImage destFile2
-					copyFile glossMapImage destFile2
-					append materialsWrittenToWorld glossMapImage 
-				)
-				normalMapImage = getMatNormalMapFullPath m
-				if (normalMapImage!="materialnotdefined" and findItem materialsWrittenToWorld normalMapImage==0) then
-				(
-					destFile2 = filenameFromPath normalMapImage
-					destFile2 = destDir + "\\" + destFile2
-					Format "copy from % to % \n" normalMapImage destFile2
-					copyFile normalMapImage destFile2
-					append materialsWrittenToWorld normalMapImage
-				)
-				dispMapImage = getMatDispMapFullPath m
-				if (dispMapImage!="materialnotdefined" and findItem materialsWrittenToWorld dispMapImage==0) then
-				(
-					destFile2 = filenameFromPath dispMapImage
-					destFile2 = destDir + "\\" + destFile2
-					Format "copy from % to % \n" dispMapImage destFile2
-					copyFile dispMapImage destFile2
-					append materialsWrittenToWorld dispMapImage
+					format "copy from % to % \n" image destFile2
+					copyFile image destFile2
+					append materialsWrittenToWorld image
 				)
 			)
+	
 
 		    -- handle Multi/materials
-			else if ((classOf m)==Multimaterial) then
-			(
-				for subm in m do
-				(
-					diffuseImage = getMatDiffuseMapFullPath subm
-					if (diffuseImage!="materialnotdefined" and findItem materialsWrittenToWorld image==0) then
-					(
-						destFile2 = filenameFromPath diffuseImage
+			if ((classOf m)==Multimaterial) then (
+				for subm in m do (
+					image = getMatDiffuseMapFullPath subm
+					if (findItem materialsWrittenToWorld image==0) then (
+						destFile2 = filenameFromPath image
 						destFile2 = destDir + "\\" + destFile2
-						Format "copy from % to % \n" diffuseImage destFile2
-						copyFile diffuseImage destFile2
-						append materialsWrittenToWorld diffuseImage
+						format "copy from % to % \n" image destFile2
+						copyFile image destFile2
+						append materialsWrittenToWorld image
 					)
 				)
 			)
@@ -907,10 +1133,10 @@ rollout Test1 "Export Level to CS" width:226 height:350
 		-- ////////////////////////
 		fn OutputPortal obj debug outFile =
 		(
-			format "    <portals>\n      <portal name=\"%\">\n" obj.name to:outFile
+			format "    <portals><portal name=\"%\">\n" obj.name to:outFile
 
 			-- all portals as autoresolve
-			format "        <autoresolve />\n" to:outFile
+			format "    <autoresolve />\n" to:outFile
 
 			-- check if poly is valid: for now should be 2 faces or have VERTS specified
 			faces = getNumFaces obj
@@ -1033,8 +1259,8 @@ rollout Test1 "Export Level to CS" width:226 height:350
 				scaledx = (currVert.x * xscale) + xrelocate
 				scaledy = (currVert.y * yscale) + yrelocate
 				scaledz = (currVert.z * zscale) + zrelocate
-				format "        <v x=\"%\" y=\"%\" z=\"%\" /> \n" scaledx scaledz scaledy to:outFile
-				--format "        <v x=\"%\" y=\"%\" z=\"%\" /> \n" currVert.x currVert.z currVert.y to:outFile
+				format "      <v x=\"%\" y=\"%\" z=\"%\" /> \n" scaledx scaledz scaledy to:outFile
+				--format "      <v x=\"%\" y=\"%\" z=\"%\" /> \n" currVert.x currVert.z currVert.y to:outFile
 			)
 	
 			-- search displacement target
@@ -1058,32 +1284,32 @@ rollout Test1 "Export Level to CS" width:226 height:350
 	            -- check portal rotation compared to target rotation
 	            if (obj.rotation.x!=warptarget.rotation.x or obj.rotation.y!=warptarget.rotation.y or obj.rotation.z!=warptarget.rotation.z) then (
 				   -- move the target to 0,0,0 for a clean rotation
-				   format "        <wv x=\"%\" y=\"%\" z=\"%\" /> \n" warptarget.pos.x warptarget.pos.z warptarget.pos.y to:outFile
+				   format "      <wv x=\"%\" y=\"%\" z=\"%\" /> \n" warptarget.pos.x warptarget.pos.z warptarget.pos.y to:outFile
 
 				   -- rotate
 				   rotmatrix = (warptarget.rotation - obj.rotation) as eulerAngles
 				   rotmatrixcs = (eulerAngles rotmatrix.x rotmatrix.z rotmatrix.y) as matrix3
-				   format "        <matrix>\n" to:outFile
-				   format "          <m11>%</m11><m12>%</m12><m13>%</m13>\n" rotmatrixcs[1][1] rotmatrixcs[1][2] rotmatrixcs[1][3] to:outFile
-				   format "          <m21>%</m21><m22>%</m22><m23>%</m23>\n" rotmatrixcs[2][1] rotmatrixcs[2][2] rotmatrixcs[2][3] to:outFile
-				   format "          <m31>%</m31><m32>%</m32><m33>%</m33>\n" rotmatrixcs[3][1] rotmatrixcs[3][2] rotmatrixcs[3][3] to:outFile
-				   format "        </matrix> \n" to:outFile
+				   format "      <matrix>\n" to:outFile
+				   format "        <m11>%</m11><m12>%</m12><m13>%</m13>\n" rotmatrixcs[1][1] rotmatrixcs[1][2] rotmatrixcs[1][3] to:outFile
+				   format "        <m21>%</m21><m22>%</m22><m23>%</m23>\n" rotmatrixcs[2][1] rotmatrixcs[2][2] rotmatrixcs[2][3] to:outFile
+				   format "        <m31>%</m31><m32>%</m32><m33>%</m33>\n" rotmatrixcs[3][1] rotmatrixcs[3][2] rotmatrixcs[3][3] to:outFile
+				   format "      </matrix> \n" to:outFile
 
 				   -- move it back in the right spot
-				   format "        <ww x=\"%\" y=\"%\" z=\"%\" /> \n" obj.pos.x obj.pos.z obj.pos.y to:outFile
+				   format "      <ww x=\"%\" y=\"%\" z=\"%\" /> \n" obj.pos.x obj.pos.z obj.pos.y to:outFile
 
 				) else (
-				  format "        <ww x=\"%\" y=\"%\" z=\"%\" /> \n" warpx warpz warpy to:outFile
+				  format "      <ww x=\"%\" y=\"%\" z=\"%\" /> \n" warpx warpz warpy to:outFile
 				)
 			)
 			
 			arrives = getUserProp obj "ARRIVESINTHEMIDDLE"
 			if (arrives=="yes") then
-				format "        <clip/>\n" to:outFile
+				format "      <clip/>" to:outFile
 
 			starts = getUserProp obj "STARTSINTHEMIDDLE"
 			if (starts=="yes") then
-				format "        <zfill/>\n" to:outFile
+				format "      <zfill/>" to:outFile
 
 			portalname = getUserProp obj "PORTAL"
 			if (portalname==undefined) then
@@ -1092,10 +1318,11 @@ rollout Test1 "Export Level to CS" width:226 height:350
 				messageBox message
 				return 1
 			)
-			format "        <sector>%</sector>\n" portalname to:outFile
-			format "      </portal>\n" to:outFile
+			format "	  <sector>%</sector>\n" portalname to:outFile
+			format "    </portal>\n" to:outFile
 
 			-- now displace by the pivot position
+			--format "      <move><v x=\"%\" y=\"%\" z=\"%\" /></move> \n" piv.x piv.z piv.y to:outFile
 			format "    </portals>\n" to:outFile
 	
 		)
@@ -1258,7 +1485,16 @@ rollout Test1 "Export Level to CS" width:226 height:350
 
 				if (lodobjects.count!=1) then
 					format "<lodlevel>%</lodlevel>\n" (k-1) to:outFile
-				format "    <plugin>meshFact</plugin>\n    <params>\n      <numvt>%</numvt>\n" (getNumTVerts obj) to:outFile
+
+				format "  <plugin>meshFact</plugin>\n" to:outFile
+
+                -- exports bounding box
+				format "      <key editoronly=\"yes\" name=\"bbox\">\n" to:outFile
+                format "      <v x=\"%\" y=\"%\" z=\"%\" />\n " obj.min.x obj.min.z obj.min.y to:outFile
+                format "      <v x=\"%\" y=\"%\" z=\"%\" />\n " obj.max.x obj.max.z obj.max.y to:outFile
+                format "      </key> \n" to:outFile
+
+				format "  <params><numvt>%</numvt>\n" (getNumTVerts obj) to:outFile
 
 				-- just for LOD hierarchical objects material must be speficied in the factory
 				if (lodlow!=undefined) then (
@@ -1267,7 +1503,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 						matUsed = getFaceMatID obj 1
 						m = obj.mat[matUsed];
 					)
-					format "      <material>%</material>\n" (getMatFilename m) to:outFile
+					format "      <material>%</material>\n" (getMatDiffuseMapFilename m) to:outFile
 				)
 
 				-- check texture
@@ -1418,7 +1654,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 						  format "ERROR!!! Object % uses more material ID than the materials defined. \n" obj.name
 						)
 						m = obj.mat[textid]
-	   					mname = getMatDiffuseMapFilename (m)
+	   					mname = getMatDiffuseMapFilename(m)
 						if (findItem facesmaterial mname==0) then (
 							append facesmaterial mname
 						)
@@ -1428,17 +1664,17 @@ rollout Test1 "Export Level to CS" width:226 height:350
 					    append facesmaterialfaces[pos] i
 					)
 				)
-				format "\n facesmaterial: % \n" facesmaterial
-				format "\n facesmaterialid: % \n" facesmaterialfaces
+				--format "\n facesmaterial: % \n" facesmaterial
+				--format "\n facesmaterialid: % \n" facesmaterialfaces
 
 				-- write one submesh for each material
 				for i =1 to facesmaterial.count do
 				(
 					mname = facesmaterial[i];
 
-					format "      <submesh name=\"%\">\n" ("submesh"+i as String) to:outFile
-                    format "        <material>%</material>\n" mname to:outFile
-                    format "        <indexbuffer components=\"1\" type=\"uint\" indices=\"yes\">\n" to:outFile
+					format "    <submesh name=\"%\">\n" ("submesh"+i as String) to:outFile
+                    format "    <material>%</material>\n" mname to:outFile
+                    format "    <indexbuffer components=\"1\" type=\"uint\" indices=\"yes\">\n" to:outFile
 
                     -- cycle on all faces using same material
                     for j=1 to facesmaterialfaces[i].count do
@@ -1457,14 +1693,14 @@ rollout Test1 "Export Level to CS" width:226 height:350
 	
 						-- exclude collision detection on low lod versions
 						if (k!=lodobjects.count) then (
-							format "          <e c0=\"%\" /><e c0=\"%\" /><e c0=\"%\" />\n" a b c to:outFile
+							format "    <e c0=\"%\" /><e c0=\"%\" /><e c0=\"%\" />\n" a b c to:outFile
 							--if (colldet=="no") then format "<colldet>no</colldet>" to:outFile
 						) else (
 							--if (colldet=="no") then format "<t v1=\"%\" v2=\"%\" v3=\"%\"><colldet>no</colldet></t>"  a b c to:outFile
-							format "          <e c0=\"%\" /><e c0=\"%\" /><e c0=\"%\" />\n" a b c to:outFile
+							format "    <e c0=\"%\" /><e c0=\"%\" /><e c0=\"%\" />\n" a b c to:outFile
 						)
 					)
-					format "        </indexbuffer>\n      </submesh>\n" to:outFile
+					format "    </indexbuffer></submesh>\n" to:outFile
 			    )
 
 
@@ -1506,75 +1742,81 @@ rollout Test1 "Export Level to CS" width:226 height:350
 				istrasparent=false
 				-- check if object is a range alpha trasparent
 				rangetrasp = getUserProp obj "RANGETRASP"
+				trasp = getUserProp obj "TRASPARENT"
 				if (rangetrasp=="yes") then (
 				  istrasparent=true
+				  format "      <priority>alpha</priority>\n" to:outFile
+				  format "      <ztest />\n" to:outFile
 				)
 
-				-- check if object is a binary alpha trasparent
-				trasp = getUserProp obj "TRASPARENT"
-				if (trasp=="yes") then (
+				-- check if object is a binary alpha trasparent (in this case just use normal object setting!)
+				else if (trasp=="yes") then (
 				  istrasparent=true
+				  format "      <priority>object</priority>\n" to:outFile
+				  format "      <zuse />\n" to:outFile
 				)
 
-				-- handles transparent objects
-				if (istrasparent) then (
-				  format "    <priority>alpha</priority>\n" to:outFile
-				  format "    <ztest />\n" to:outFile
-				)
 			    -- handles sky objects
 				else if (findString obj.name "_sky_" !=undefined) then (
-				  format "    <priority>sky</priority>\n" to:outFile
-				  format "    <zuse />\n" to:outFile
+				  format "      <priority>object2</priority>\n" to:outFile
+				  format "      <zuse />\n" to:outFile
 				)
 			    -- handles zfill objects
 				else if (findString obj.name "_s_" !=undefined) then (
-				  format "    <priority>object</priority>\n" to:outFile
-				  format "    <zuse />\n" to:outFile
+				  format "      <priority>object</priority>\n" to:outFile
+				  format "      <zuse />\n" to:outFile
 				)
 				else if (culleronly=="yes" or playerbarrier=="yes" or (occluder and (classOf obj)!=Box)) then (
-					format "    <mesh>\n" to:outFile
+					format "      <mesh>\n" to:outFile
 				) else if (occluder and (classOf obj)==Box) then (
-					format "    <box>\n" to:outFile
+					format "      <box>\n" to:outFile
 				) else (
-				  format "    <priority>object</priority>\n" to:outFile
-				  format "    <zuse />\n" to:outFile
+				  format "      <priority>object</priority>\n" to:outFile
+				  format "      <zuse />\n" to:outFile
 				)
 
 				-- check for no shadow setting
 				noshadows = getUserProp obj "NOSHADOWS"
 				if (noshadows=="yes") then
-					format "    <noshadows />\n" to:outFile
+					format "      <noshadows />\n" to:outFile
 
 
 				if (colldet=="no") then format "<trimesh><id>colldet</id></trimesh>\n" to:outFile
 
+				-- check for no shadow setting
+				-- NO MORE WORKING??
+				noshadows = getUserProp obj "NOSHADOWS"
+				if (noshadows=="yes") then
+					format "      <noshadows />\n" to:outFile
+
+
 				-- check if object is a range alpha trasparent
 				rangetrasp = getUserProp obj "RANGETRASP"
 				if (rangetrasp=="yes") then (
-				  format "    <ztest/><priority>alpha</priority>\n" to:outFile
+				  format "      <ztest/><priority>alpha</priority>\n" to:outFile
 				)
 
 				-- check if object uses a binary alpha texture
 			    if ((classOf obj.mat)==Standardmaterial) then (
 					if (obj.mat.mapEnables[7]) then (
-					  format "    <trimesh><id>viscull</id></trimesh>\n" to:outFile
-					  format "    <trimesh><default /><id>colldet</id></trimesh>\n" to:outFile
+					  format "      <trimesh><id>viscull</id></trimesh>\n" to:outFile
+					  format "      <trimesh><default /><id>colldet</id></trimesh>\n" to:outFile
 					)
 				) else (
 					if (obj.mat[1].mapEnables[7]) then (
-					  format "    <trimesh><id>viscull</id></trimesh>\n" to:outFile
-					  format "    <trimesh><default /><id>colldet</id></trimesh>\n" to:outFile
+					  format "      <trimesh><id>viscull</id></trimesh>\n" to:outFile
+					  format "      <trimesh><default /><id>colldet</id></trimesh>\n" to:outFile
 					)
 				)
 
 
 
-				format "  </meshfact>\n\n" to:outFile
+				format "    </meshfact>\n" to:outFile
 
 			) -- end for each lodobject
 
 			if (lodobjects.count!=1) then
-				format "  </meshfact>\n\n" to:outFile
+				format "  </meshfact>\n" to:outFile
 
         )	
 	
@@ -1587,14 +1829,40 @@ rollout Test1 "Export Level to CS" width:226 height:350
 		format "makedir % \n" destDir
 		makeDir destDir	-- If output folder does not exist...
 		outFile = createFile filename
+
+		-- get ambient light
+		customPropNumber = fileProperties.findProperty #custom "red"
+		if (customPropNumber!=0) then
+			ambRed = fileProperties.getPropertyValue #custom customPropNumber
+		customPropNumber = fileProperties.findProperty #custom "green"
+		if (customPropNumber!=0) then
+			ambGreen = fileProperties.getPropertyValue #custom customPropNumber
+		customPropNumber = fileProperties.findProperty #custom "blue"
+		if (customPropNumber!=0) then
+			ambBlue = fileProperties.getPropertyValue #custom customPropNumber
+
+		-- get room name from custom property
+		customPropNumber = fileProperties.findProperty #custom "roomname"
+		if (customPropNumber==0) then (
+			messageBox "Please click on File>File Properties and add a Custom Property called roomname with the name of the sector."
+			return 1
+		)
+		roomName = fileProperties.getPropertyValue #custom customPropNumber 
+
+		if (roomName==undefined) then (
+		   messageBox "ERROR: Please set a custom property named roomname"
+		   return 1
+		) else (
+		   format "Roomname: %\n" roomName
+		)
 	
 		-- write header
 		
-		format "<world>\n\n" to:outFile
+		format "<world>\n" to:outFile
 	
 		-- write variables tag
-		format "  <variables>\n" to:outFile
-		format "    <variable name=\"lightning reset\">\n      <color red=\"0\" green=\"0\" blue=\"0\"/>\n    </variable>\n" to:outFile
+		format " <variables>\n" to:outFile
+		format "  <variable name=\"lightning reset\"><color red=\"0\" green=\"0\" blue=\"0\"/></variable>\n" to:outFile
 
 		-- lod variables
 		customPropNumber = fileProperties.findProperty #custom "lodmax"
@@ -1614,9 +1882,9 @@ rollout Test1 "Export Level to CS" width:226 height:350
 		lodm = 1.0 / (lodmax-lodmin) as float
 		loda = -lodm * lodmin as float
 
-		format "    <variable name=\"LodM\" value=\"%\" />\n    <variable name=\"LodA\" value=\"%\" />\n" lodm loda to:outFile
+		format "  <variable name=\"LodM\" value=\"%\" /><variable name=\"LodA\" value=\"%\" />\n" lodm loda to:outFile
 
-		format "  </variables>\n\n" to:outFile
+		format " </variables>\n" to:outFile
 	
 		-- create a new array with objects present in groups
 		allObjects = #()
@@ -1678,6 +1946,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 				format "Found Particle Object: %   Type: % \n" obj.name type
 				if (type == "fire") then ( fireNeeded = true )
 				else if (type == "emit") then ( emitNeeded = true )
+				else if (type == "particle") then ( particleNeeded = true )
 	
 				-- check for additional materials
 				addMaterial = getUserProp obj "MATERIAL"
@@ -1691,56 +1960,58 @@ rollout Test1 "Export Level to CS" width:226 height:350
 				)
 			)
 			
-			if (findString obj.name "_terr_" !=undefined) then
+			if (findString obj.name "_terr_" !=undefined) then (
 				terrainobject = obj
+				format "Terrain object found: %\n" obj.name
+			)
 		)
-		
+
 		-- write shaders
 		WriteShaders outFile
-		
-		-- Write renderloop info
-		format "  <addon>\n" to:outFile
-		if (rloop_terrainfixed or rloop_diffuse) then
-		(
-		  format "    <plugin>crystalspace.renderloop.loop.loader</plugin>\n" to:outFile
-		)		
-		if (rloop_terrainfixed) then
-		(
-		  format "    <paramsfile>/shader/std_rloop_terrainfixed.xml</paramsfile>\n" to:outFile
-		)
-		if (rloop_diffuse) then
-		(
-		  format "    <paramsfile>/shader/std_rloop_diffuse.xml</paramsfile>\n" to:outFile
-		)
-		format "  </addon>\n\n" to:outFile
-		
+	
 		-- write materials		
 	    WriteMaterials terrainobject outFile
+		--return 1
 
 		-- write plugins
 	    format "  <plugins>\n" to:outFile
 	    format "    <plugin name=\"meshFact\">crystalspace.mesh.loader.factory.genmesh</plugin>\n" to:outFile
 	    format "    <plugin name=\"mesh\">crystalspace.mesh.loader.genmesh</plugin>\n" to:outFile
 
+		-- Obsolete
+	    --format "    <plugin name=\"thing\">crystalspace.mesh.loader.thing</plugin>\n" to:outFile
+		--format "    <plugin name=\"thingFact\">crystalspace.mesh.loader.factory.thing</plugin>\n" to:outFile
+
 	  	--if (fireNeeded) then (
 		--    format "    <plugin name=\"fireFact\">crystalspace.mesh.loader.factory.fire</plugin>\n" to:outFile  
 		--	format "    <plugin name=\"fire\">crystalspace.mesh.loader.fire</plugin>\n" to:outFile  
 	  	--)
 
-	  	if (fireNeeded or emitNeeded) then
-		(
-	      format "    <plugin name=\"emitFact\">crystalspace.mesh.loader.factory.emit</plugin>\n" to:outFile 
-	      format "    <plugin name=\"emit\">crystalspace.mesh.loader.emit</plugin>\n" to:outFile 
+	  	if (fireNeeded or emitNeeded) then (
+	    	format "    <plugin name=\"emitFact\">crystalspace.mesh.loader.factory.emit</plugin>\n" to:outFile 
+	    	format "    <plugin name=\"emit\">crystalspace.mesh.loader.emit</plugin>\n" to:outFile 
+	  	)
+
+	  	if (particleNeeded) then (
+	    	format "    <plugin name=\"particles\">crystalspace.mesh.loader.particles</plugin>\n" to:outFile 
+	    	format "    <plugin name=\"particlesfact\">crystalspace.mesh.loader.factory.particles</plugin>\n" to:outFile 
 	  	)
 
 		  -- add plugins needed for terrain
-		if (rloop_terrainfixed) then
-		(
-		  format "    <plugin name=\"terrainFact\">crystalspace.mesh.loader.factory.terrain</plugin>\n" to:outFile 
-		  format "    <plugin name=\"terrain\">crystalspace.mesh.loader.terrain</plugin>\n" to:outFile 
-		)
+		  if (chkTerrain.checked) then (
+		      format "    <plugin name=\"terrainFact\">crystalspace.mesh.loader.factory.terrain2</plugin>\n" to:outFile 
+			  format "    <plugin name=\"terrain\">crystalspace.mesh.loader.terrain2</plugin>\n" to:outFile 
+		  )
 
 	    format "  </plugins>\n\n" to:outFile
+
+		-- write renderpriorities and renderloop for terrain
+		  if (chkTerrain.checked) then (
+			format "<addon>" to:outFile
+			format "<plugin>crystalspace.renderloop.loop.loader</plugin>" to:outFile
+			format "<paramsfile>/shader/std_rloop_terrainfixed.xml</paramsfile>" to:outFile
+			format "</addon>" to:outFile
+		  )
 
 		-- write particles declarations
 	  	--if (fireNeeded) then (
@@ -1765,19 +2036,23 @@ rollout Test1 "Export Level to CS" width:226 height:350
 				if (libs != undefined) then (
 					toks = tokenize libs ","
 					for item in toks do (
-						format "    <library>%</library>\n\n" item to:outFile  
+						format "    <library>%</library>\n" item to:outFile  
 					)
 				)
 			)
 		)
+		format "\n" to:outFile
+
 
 		-- search and write meshfacts and thingfacts and terrain
 		factoryMeshes = #()
+		factoryThingMeshes = #()
 		for obj in allObjects do
 		(
+		    format "checking : %\n" obj.name
 			-- skip lights, dummy, camera
 			if ( (classOf obj)==Omnilight or (classOf obj)==Dummy or (classOf obj)==Targetcamera or
-			    (classOf obj)==Targetobject or (classOf obj)==line or (classOf obj)==Point) then (
+			    (classOf obj)==Targetobject or (classOf obj)==line ) then (
 				continue
 			)
 
@@ -1802,6 +2077,11 @@ rollout Test1 "Export Level to CS" width:226 height:350
 				return 1
 			)
 
+			-- export particles meshfacts
+			if ( (classOf obj)==Point ) then (
+				OutputParticle obj allObjects true outFile
+				continue;
+			)
 
 	        -- ****************************************
 			-- Check for explicit genmeshes factories
@@ -1824,6 +2104,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 
 			-- check for terrain
 			if (findString objName "_terr_" !=undefined) then (
+  			   format "Checking _terr_: %\n" roomName
 			
 			  terrx = getUserProp obj "CELLSIZEX"
 			  terrz = getUserProp obj "CELLSIZEY"
@@ -1835,34 +2116,74 @@ rollout Test1 "Export Level to CS" width:226 height:350
 				return 1
 			  )
 
-			  -- output terraformer
-			  format " <addon plugin=\"crystalspace.terraformer.simple.loader\"> \n" to:outFile
-			  format "   <name>%</name><heightmap>%</heightmap>\n" roomName terrimage to:outFile
-			  format "   <scale x=\"%\" y=\"%\" z=\"%\" />\n" terrx terry terrz to:outFile
-			  format "   <offset x=\"%\" y=\"%\" z=\"%\" />\n" obj.pos.x obj.pos.z obj.pos.y to:outFile
 			  materialmap = getUserProp obj "MATERIALMAP"
-			  if (materialmap!="alpha") then
-  			      format "   <materialmap image=\"%\" />\n" materialmap to:outFile
-			  else (
-			     materialmapa = getUserProp obj "MATERIALMAPA"
-				 toks = tokenize materialmapa "|"
-				for a in toks do (
-                    format "   <materialalphamap image=\"%\" />\n" a to:outFile
-				)
+			  materialmapa = getUserProp obj "MATERIALMAPA"
+
+			  if (obj.parent==undefined) then (
+			  	  sectorname = roomName
+			  format "Checking _terr_1.1: % % \n" sectorname roomName
+			  ) else (
+				  sectorname = obj.parent.name
+				  toks = tokenize sectorname "_"
+				  sectorname = toks[3]
+				  format "Checking _terr_1.2: % % \n"  sectorname roomName
 			  )
-			  
+			  format "Checking _terr_1.3: % \n"  sectorname
+			  format " <meshfact name=\"tFact%\">\n" sectorname to:outFile
+			  format "   <plugin>terrainFact</plugin>\n" to:outFile
+			  format "   <params><renderer>crystalspace.mesh.object.terrain2.bruteblockrenderer</renderer>\n" to:outFile
+			  format "   <collider>crystalspace.mesh.object.terrain2.collider</collider>\n" to:outFile
+			  format "   <feeder>crystalspace.mesh.object.terrain2.simpledatafeeder</feeder>\n" to:outFile
+			  format "   <maxloadedcells>20</maxloadedcells>\n" to:outFile
+			  format "   <cells><celldefault><gridsize width=\"257\" height=\"257\" />\n" to:outFile
 
-			  format " </addon>\n" to:outFile
+			  -- output materialmap
+			  mymaterials= #()
+			  m = obj.mat
+			  if (classOf m!=Multimaterial) then (
+				message = "Your terrain object doesn't have a multimaterial associated."
+				messageBox message
+			  ) else (
+			      c = 0
+			  	  for subm in m do (
+				  	  image = getMatDiffuseMapFilename subm
 
-			  sectorname = obj.parent.name
-			  toks = tokenize sectorname "_"
-			  sectorname = toks[3]
-			  format "  <meshfact name=\"tFact%\">\n" sectorname to:outFile
-			  format "    <plugin>terrainFact</plugin>\n" to:outFile
-			  format "    <params>\n      <plugin>crystalspace.mesh.object.terrain.bruteblock</plugin>\n" to:outFile
-			  format "      <terraformer>%</terraformer>\n      <sampleregion>\n" roomName to:outFile
-			  format "        <min x=\"-%\" y=\"-%\" />\n        <max x=\"%\" y=\"%\" />\n      </sampleregion>\n" terrx terrz terrx terrz to:outFile
-			  format "    </params>\n  </meshfact>\n\n" to:outFile
+
+					  if (image=="materialnotdefined") then
+					  	continue
+						
+					  imagetemp = image + "sshhaaddeerr"
+
+				  	  if (c!=0) then
+					  	append mymaterials imagetemp 
+					  c = c + 1
+				  )
+		      )
+
+			  format "      <size x=\"1280\" y=\"256\" z=\"1280\" />\n" to:outFile
+			  format "      <basematerial>%</basematerial>\n" base_material to:outFile
+			  format "      <renderproperties><param name=\"block resolution\">16</param><param name=\"lod splitcoeff\">8</param></renderproperties>\n" to:outFile
+			  format "      <feederproperties><param name=\"heightmap source\">%</param> \n" terrimage  to:outFile
+			  format "      <param name=\"smooth heightmap\">yes</param></feederproperties>\n" to:outFile
+			  format "  </celldefault><cell><feederproperties>\n" to:outFile
+
+			  if (materialmap!="alpha") then (
+  			      format "   <materialmap image=\"%\" />\n" materialmap to:outFile
+			  ) else (
+			     materialmapa = getUserProp obj "MATERIALMAPA"
+			    toks = tokenize materialmapa "|"
+				c=1
+			    for a in toks do (
+                    format "   <alphamap material=\"%\">%</alphamap> \n" mymaterials[c] a to:outFile
+					c = c + 1
+			    )
+			  )
+
+			  format "  </feederproperties><position x=\"-640\" y=\"-640\" /></cell></cells>\n" to:outFile
+
+			  --format "   <terraformer>%</terraformer><sampleregion>\n" roomName to:outFile
+			  --format "   <min x=\"-%\" y=\"-%\" /> <max x=\"%\" y=\"%\" /></sampleregion>\n" terrx terrz terrx terrz to:outFile
+			  format " </params></meshfact>\n" to:outFile
 			  continue;
   			)
 
@@ -1885,9 +2206,17 @@ rollout Test1 "Export Level to CS" width:226 height:350
 					  istrasparent=true
 					)
 					
+					-- no shadow not supported on meshfact
+					-- no more used??
+					--noshadows = getUserProp obj "NOSHADOWS"
+					--if (noshadows=="yes") then
+					--	format "      <noshadows />\n" to:outFile
+	
 					-- check for no lighting setting
 					lighting = getUserProp obj "LIGHTING"
 	
+					-- check for colldet based on groups
+					--colldet = doesCollide obj collvisInfo
 					--check simple colldet setting
 					colldet = getUserProp obj "COLLDET"
 
@@ -1896,38 +2225,28 @@ rollout Test1 "Export Level to CS" width:226 height:350
 
 					-- check for culleronly setting
 					culleronly = getUserProp obj "CULLERONLY"
-
 			
 		) -- end for obj in allObjects
 	
-		-- get ambient light
-		customPropNumber = fileProperties.findProperty #custom "red"
-		if (customPropNumber!=0) then
-			ambRed = fileProperties.getPropertyValue #custom customPropNumber
-		customPropNumber = fileProperties.findProperty #custom "green"
-		if (customPropNumber!=0) then
-			ambGreen = fileProperties.getPropertyValue #custom customPropNumber
-		customPropNumber = fileProperties.findProperty #custom "blue"
-		if (customPropNumber!=0) then
-			ambBlue = fileProperties.getPropertyValue #custom customPropNumber
-	
-		-- Settings
-		format "  <settings>\n" to:outFile
-		if (ambRed!=undefined and ambGreen!=undefined and ambBlue!=undefined) then
-			format "    <clearzbuf>yes</clearzbuf>\n    <ambient red=\"%\" green=\"%\" blue=\"%\" />\n" ambRed ambGreen ambBlue to:outFile
-		else
-		    format "    <clearzbuf>yes</clearzbuf>\n" to:outFile
-	
-		-- Setting for lightmaps cell size
-		customPropNumber = fileProperties.findProperty #custom "lightmapsize"
-		if (customPropNumber!=0) then
-			lightmapsize = fileProperties.getPropertyValue #custom customPropNumber
-		if (lightmapsize!=undefined) then
-			format "    <lightmapcellsize>%</lightmapcellsize>\n" lightmapsize to:outFile
-		else
-			format "    <lightmapcellsize>32</lightmapcellsize>\n" to:outFile
 
-		format "  </settings>\n\n" to:outFile
+		-- Settings
+		format "  <settings>" to:outFile
+		format "<clearzbuf>yes</clearzbuf>" to:outFile
+
+		-- Setting for lightmaps cell size (obsolete used for thingmeshes only)
+		--customPropNumber = fileProperties.findProperty #custom "lightmapsize"
+		--if (customPropNumber!=0) then
+		--	lightmapsize = fileProperties.getPropertyValue #custom customPropNumber
+		--if (lightmapsize!=undefined) then
+		--	format "<lightmapcellsize>%</lightmapcellsize>" lightmapsize to:outFile
+		--else
+		--	format "<lightmapcellsize>32</lightmapcellsize>" to:outFile
+
+		-- terrain renderloop
+		if (chkTerrain.checked) then (
+			format "<renderloop>std_rloop_terrainfixed</renderloop>" to:outFile
+		)
+		format "</settings>\n\n" to:outFile
 	
 	
 	
@@ -1958,21 +2277,6 @@ rollout Test1 "Export Level to CS" width:226 height:350
 		if (sectors.count==0) then (
 			append sectors objects[1]; --trick to have the following "for" loop execute one time
 			nosectors=true;
-	
-			-- get room name from custom property
-			customPropNumber = fileProperties.findProperty #custom "roomname"
-			if (customPropNumber==0) then (
-				messageBox "Please click on File>File Properties and add a Custom Property called roomname with the name of the sector."
-				return 1
-			)
-			roomName = fileProperties.getPropertyValue #custom customPropNumber 
-	
-			if (roomName==undefined) then (
-			   messageBox "ERROR: Please set a custom property named roomname"
-			   return 1
-			) else (
-			   format "Roomname: %\n" roomName
-			)
 		) else
 			nosectors = false;
 	
@@ -2012,21 +2316,19 @@ rollout Test1 "Export Level to CS" width:226 height:350
 			-- start sector
 		    format "  <sector name=\"%\">\n" roomName to:outFile
 
-			-- renderloop selection
-			renderloop_type = getUserProp sector "RENDERLOOP_TYPE"
-			if (renderloop_type=="terrainfixed" and rloop_terrainfixed) then (
-		      format "    <renderloop>std_rloop_terrainfixed</renderloop>\n" to:outFile
-			)
-			else if (renderloop_type=="diffuse" and rloop_diffuse) then (
-			  format "    <renderloop>std_rloop_diffuse</renderloop>\n" to:outFile
-			)
-			
+			-- (DISABLED for testing purposes, cacn be re-enabled later on)
 			-- choose culler type
 			sector_type = getUserProp sector "SECTOR_TYPE"
-			if (sector_type=="simple" or renderloop_type=="terrainfixed") then (
+			--if (sector_type=="simple" or chkTerrain.checked) then (
 				format "    <cullerp>crystalspace.culling.frustvis</cullerp>\n" to:outFile
-			) else (
-				format "    <cullerp>crystalspace.culling.dynavis</cullerp>\n" to:outFile
+			--) else (
+			--	format "    <cullerp>crystalspace.culling.dynavis</cullerp>\n" to:outFile
+			--)
+
+			-- renderloop for terrain level
+			renderloop_type = getUserProp sector "TERRAIN"
+			if (renderloop_type=="yes") then (
+				format "<renderloop>std_rloop_terrainfixed</renderloop>\n" to:outFile
 			)
 
 			format "IF YOU GET ANY ERROR convert to editable mesh and collapse stack of offending object\n"
@@ -2110,7 +2412,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 				-- convert particles
 				if ( (classOf obj)==Point) then (
 					format "Found particle Object: %\n" obj.name
-					OutputParticle obj allObjects outFile
+					OutputParticle obj allObjects false outFile
 					continue
 				)
 			
@@ -2134,7 +2436,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 				objName = obj.name
 				if (findString objName "_terr_" != undefined) then (
 
-				  if (not rloop_terrainfixed) then
+				  if (not chkTerrain.checked) then
 				  (
 					message = "You have one terrain object, but the level is not exported as terrain."
 					messageBox message
@@ -2146,12 +2448,10 @@ rollout Test1 "Export Level to CS" width:226 height:350
 				  terry = (obj.pos.y * yscale) + yrelocate
 				  terrz = (obj.pos.z * zscale) + zrelocate
 				
-				  format "    <meshobj name=\"Terrain_%\">\n" roomName to:outFile
-				  format "      <plugin>terrain</plugin>\n" to:outFile
-                  format "      <params>\n" to:outFile
-                  format "        <factory>tFact%</factory>\n" roomName to:outFile
-				  format "        <staticlighting>yes</staticlighting>\n" to:outFile
-                  format "        <castshadows>yes</castshadows>\n" to:outFile
+				  format "      <meshobj name=\"Terrain_%\">\n" roomName to:outFile
+				  format "      <plugin>terrain</plugin><params><factory>tFact%</factory>\n" roomName to:outFile
+				  --format "      <staticlighting>yes</staticlighting><castshadows>yes</castshadows>\n"  to:outFile
+
 				  -- output materialmap
 				  m = obj.mat
 				  if (classOf m!=Multimaterial) then (
@@ -2162,36 +2462,30 @@ rollout Test1 "Export Level to CS" width:226 height:350
 				  	  for subm in m do (
 					  	  image = getMatDiffuseMapFilename subm
 
+
 						  if (image=="materialnotdefined") then
 						  	continue
 							
 						  imagetemp = image + "sshhaaddeerr"
 
 					  	  if (c==0) then
-						  (
-							  format "        <material>%</material>\n" imagetemp to:outFile
-                              format "        <materialpalette>\n" to:outFile
-					      )
+							  format "      <materialpalette>\n" imagetemp to:outFile
 						  else
-						  	format "          <material>%</material>\n" imagetemp to:outFile
+						  	format "      <material>%</material>\n" imagetemp to:outFile
 						  c = c + 1
 					  )
-					  format "        </materialpalette>\n" to:outFile
+					  format "    </materialpalette>\n"  to:outFile
 
 				  )
-				  format "        <lodvalue name=\"splatting distance\">%</lodvalue>\n" loddistance to:outFile
-                  format "        <lodvalue name=\"error tolerance\">4</lodvalue>\n" to:outFile
-				  format "        <!--For bruteblock-->\n" to:outFile
-  				  format "        <lodvalue name=\"block resolution\">64</lodvalue>\n" to:outFile
-  				  format "        <lodvalue name=\"block split distance\">64</lodvalue>\n" to:outFile
-  				  format "        <lodvalue name=\"minimum block size\">32</lodvalue>\n" to:outFile
-  				  format "        <lodvalue name=\"cd resolution\">256</lodvalue>\n" to:outFile
-  				  format "        <lodvalue name=\"lightmap resolution\">513</lodvalue>\n" to:outFile
-                  format "      </params>\n" to:outFile
-				  format "      <move>\n" to:outFile
-                  format "        <v x=\"0\" y=\"0\" z=\"0\" />\n" to:outFile
-                  format "      </move>\n" to:outFile
-                  format "    </meshobj>\n" to:outFile
+				  --format "      	<lodvalue name=\"splatting distance\">%</lodvalue><lodvalue name=\"error tolerance\">4</lodvalue>\n" loddistance to:outFile
+				  --format "      	<!--For bruteblock-->" to:outFile
+  				  --format "          <lodvalue name=\"block resolution\">64</lodvalue>\n" to:outFile
+  				  --format "          <lodvalue name=\"block split distance\">64</lodvalue>\n" to:outFile
+  				  --format "          <lodvalue name=\"minimum block size\">32</lodvalue>\n" to:outFile
+  				  --format "          <lodvalue name=\"cd resolution\">256</lodvalue>\n" to:outFile
+  				  --format "          <lodvalue name=\"lightmap resolution\">513</lodvalue></params>\n" to:outFile
+				  -- format "      <move><v x=\"%\" y=\"%\" z=\"%\" /></move></meshobj>\n" terrx terrz terry to:outFile
+				  format "      </params><move><v x=\"%\" y=\"%\" z=\"%\" /></move><priority>wall</priority></meshobj>\n" terrx terrz terry to:outFile
 				  continue;
 				) -- end manage terrain
 
@@ -2279,8 +2573,10 @@ rollout Test1 "Export Level to CS" width:226 height:350
 					 -- close mesh object
 				--	 format "    </meshobj>\n" to:outFile
 				--)
+		
+			 	format "\n" to:outFile
 
-                        --------------------
+                --------------------
 				-- manage genmeshes
 				--------------------
 				isExplicitGenMesh = false
@@ -2329,39 +2625,63 @@ rollout Test1 "Export Level to CS" width:226 height:350
 					)
 
 					istrasparent=false
-	    
+	
+					-- NO MORE USED, DONE IN THE FACTORY
+					-- handles transparent objects
+					--if (findString obj.name "_t_" !=undefined) then (
+					--  format "      <priority>alpha</priority>\n" to:outFile
+					--  format "      <ztest />\n" to:outFile
+					--  istrasparent=true
+					--)
+				    
 					-- handles sky objects
 					if (findString obj.name "_sky_" !=undefined) then (
-					  format "      <priority>sky</priority>\n" to:outFile
+					  format "      <priority>object2</priority>\n" to:outFile
 					  format "      <zuse />\n" to:outFile
 					  format "      <key name=\"lighter2\" editoronly=\"yes\" vertexlight=\"yes\" />\n" to:outFile
 					)
+				    -- handles zfill objects
+					--else if (findString obj.name "_s_" !=undefined) then (
+					--  format "      <priority>object</priority>\n" to:outFile
+					--  format "      <zuse />\n" to:outFile
+					--)
 					else if (culleronly=="yes" or playerbarrier=="yes" or (occluder and (classOf obj)!=Box)) then (
 						format "      <mesh>\n" to:outFile
 					) else if (occluder and (classOf obj)==Box) then (
 						format "      <box>\n" to:outFile
 					)
 
+					-- NO MORE USED, DEFINED ON GENMESH FACTORY
+					-- else (
+					--  format "      <priority>object</priority>\n" to:outFile
+					--  format "      <zuse />\n" to:outFile
+					--)
+	
 					-- check for no shadow setting
 					noshadows = getUserProp obj "NOSHADOWS"
 					if (noshadows=="yes") then
 						format "      <noshadows />\n" to:outFile
 			
+					-- manage skydome as genmesh
+					--if (findString objName "_skydome" != undefined or findString objName "_skybox" != undefined) then (
+					--	format "      <priority>sky</priority>\n" to:outFile
+					--)
+
 					-- for meshref <factory> must go outisde <params>
 					if (lodlow!=undefined and isExplicitGenMesh) then
 						format "      <factory>%</factory>\n" toks[3] to:outFile
 
 					-- meshref doesn't have <params> tag
 					if (lodlow==undefined and isExplicitGenMesh) then (
-						format "      <params>\n" to:outFile
+						format "      <params>" to:outFile
 						-- for meshref <factory> must go outisde <params>
-						format "        <factory>%</factory>\n" toks[3] to:outFile
+						format "      <factory>%</factory>\n" toks[3] to:outFile
 					)
 					
 					-- factory for auto genmeshes
 					if (not isExplicitGenMesh) then (
 						factoryName = "_auto_" + obj.name
-						format "      <params>\n        <factory>%</factory>\n" factoryName to:outFile
+						format "      <params><factory>%</factory>\n" factoryName to:outFile
 					)
 
 
@@ -2386,7 +2706,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 							  format "ERROR!!! Object % uses more material ID than the materials defined. \n" obj.name
 							)
 							m = obj.mat[textid]
-		   					mname = getMatDiffuseMapFilename (m)
+		   					mname = getMatDiffuseMapFilename(m)
 							if (findItem facesmaterial mname==0) then (
 								append facesmaterial mname
 							)
@@ -2398,12 +2718,13 @@ rollout Test1 "Export Level to CS" width:226 height:350
 					for i=1 to facesmaterial.count do
 					(
 					   mname = facesmaterial[i]
-					   format "        <submesh name=\"%\">\n          <material>%</material>\n        </submesh>\n" ("submesh"+i as String) mname to:outFile
+					   format " <submesh name=\"%\"><material>%</material></submesh>\n" ("submesh"+i as String) mname to:outFile
 					)
 	
 					if (lodlow==undefined) then (
 						-- localshadows no more needed for lighter2 levels.
 						-- format "      <localshadows />\n" to:outFile
+						--format "      <material>%</material></params>\n" (getMatDiffuseMapFilename m) to:outFile
 						format "      </params>\n" to:outFile
 					)
 		
@@ -2434,7 +2755,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 					yMove = (obj.pos.y * yscale) + yrelocate
 					zMove = (obj.pos.z * zscale) + zrelocate
 		
-					format "      <move>\n        <v x=\"%\" y=\"%\" z=\"%\" />\n" xMove zMove yMove to:outFile
+					format "      <move><v x=\"%\" y=\"%\" z=\"%\" />\n" xMove zMove yMove to:outFile
 					--if (flipModel) then
 					--	rotvalues = quattoeuler obj.rotation
 					--else
@@ -2454,7 +2775,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 					
 					-- if it's an genmesh with autogenerated factory then we don't need to check rotation
 					if (isExplicitGenMesh) then 
-						format "        <matrix><rotx>%</rotx><roty>%</roty><rotz>%</rotz></matrix>\n" rotx roty rotz to:outFile
+						format "      <matrix><rotx>%</rotx><roty>%</roty><rotz>%</rotz></matrix>\n" rotx roty rotz to:outFile
 
 					format "      </move>\n"  to:outFile
 
@@ -2472,24 +2793,24 @@ rollout Test1 "Export Level to CS" width:226 height:350
 						factory1 = getUserProp meshgen "FACTORY1"
 						toks = tokenize factory1 ","
 						format "    <meshgen name=\"%\">\n" obj.name to:outFile
-						format "      <geometry>\n" to:outFile
-						format "	  <factory maxdist=\"%\" name=\"%\" />\n" toks[1] toks[2] to:outFile
-						format "	  <radius>%</radius>\n" toks[3] to:outFile
-						format "	  <density>%</density>\n" toks[4] to:outFile
-						format "	  <materialfactor material=\"%\" factor=\"0\" />\n" toks[5] to:outFile
-						format "	  <defaultmaterialfactor>1</defaultmaterialfactor>\n" to:outFile
-						format "      </geometry>\n" to:outFile
+						format "        <geometry>\n" to:outFile
+						format "	    <factory maxdist=\"%\" name=\"%\" />\n" toks[1] toks[2] to:outFile
+						format "	    <radius>%</radius>\n" toks[3] to:outFile
+						format "	    <density>%</density>\n" toks[4] to:outFile
+						format "	    <materialfactor material=\"%\" factor=\"0\" />\n" toks[5] to:outFile
+						format "	    <defaultmaterialfactor>1</defaultmaterialfactor>\n" to:outFile
+						format "        </geometry>\n" to:outFile
 						
 						factory2 = getUserProp meshgen "FACTORY2"
 						if (factory2!=undefined) then (
 							toks = tokenize factory2 ","
-							format "      <geometry>\n" to:outFile
-							format "	  <factory maxdist=\"%\" name=\"%\" />\n" toks[1] toks[2] to:outFile
-							format "	  <radius>%</radius>\n" toks[3] to:outFile
-							format "	  <density>%</density>\n" toks[4] to:outFile
-							format "	  <materialfactor material=\"%\" factor=\"0\" />\n" toks[5] to:outFile
-							format "	  <defaultmaterialfactor>1</defaultmaterialfactor>\n" to:outFile
-							format "      </geometry>\n" to:outFile
+							format "        <geometry>\n" to:outFile
+							format "	    <factory maxdist=\"%\" name=\"%\" />\n" toks[1] toks[2] to:outFile
+							format "	    <radius>%</radius>\n" toks[3] to:outFile
+							format "	    <density>%</density>\n" toks[4] to:outFile
+							format "	    <materialfactor material=\"%\" factor=\"0\" />\n" toks[5] to:outFile
+							format "	    <defaultmaterialfactor>1</defaultmaterialfactor>\n" to:outFile
+							format "        </geometry>\n" to:outFile
 						)
 						celldim = getUserProp meshgen "CELLDIM"
 						density = getUserProp meshgen "DENSITY"
@@ -2512,6 +2833,131 @@ rollout Test1 "Export Level to CS" width:226 height:350
 					continue;
 		
 				--)
+
+				-- SHOULD NOT BE USED ANYMORE
+				-- manage thingmeshes
+				isThingMesh = false
+
+				objName = obj.name
+				if (findString objName "_f_" != undefined) then (
+					isThingMesh = true
+					-- skip factories
+					toks = tokenize objName "_"
+					if (toks.count == 4 and objName[objName.count-1] == "_" and objName[objName.count] == "0") then
+						continue;
+		
+					format "    <meshobj name=\"%\">\n" obj.name to:outFile
+					-- check for no shadow setting
+					noshadows = getUserProp obj "NOSHADOWS"
+					if (noshadows=="yes") then
+						format "      <noshadows />\n" to:outFile
+		
+					format "      <plugin>thing</plugin>\n" obj.name to:outFile
+	
+					-- search factory
+					genFactObj=null
+					for genFact in factoryThingMeshes do
+					(
+						genFactName = "_f_"+toks[3]+"_0"
+						if (genFact.name==genFactName) then genFactObj=genFact 
+					)
+					if (genFactObj==null) then (
+						message = "Export aborted: NO OBJECT FOUND AS THINGMESH FACTORY OF " + obj.name
+						messageBox message
+	
+						close outFile
+						return 1
+					)
+		
+					format "      <params><factory>%</factory>\n" toks[3] to:outFile
+		
+		
+					-- check that instance and factory have same number of faces
+					if (genFactObj.numfaces!=obj.numfaces) then (
+						message = "Export aborted. thingmesh "+obj.name+ " and thingfactory "+genFactObj.name + " have a different number of faces";
+						messageBox message
+						close outFile
+						return 1
+					)
+					-- change material if necessary
+					-- cycle on all faces of object
+					matReplaced = #()
+					for i =1 to obj.numFaces do
+					(
+						matIDOld = getFaceMatID genFactObj i
+						matIDNew = getFaceMatID obj i
+					    if ((classOf obj.mat)==Standardmaterial) then
+					    	currentNewMat = obj.mat
+						else
+							currentNewMat = obj.mat[matIDOld]
+					    if ((classOf genFactObj.mat)==Standardmaterial) then
+					    	currentOldMat = genFactObj.mat
+						else
+							currentOldMat = genFactObj.mat[matIDNew]
+		
+						if (currentOldMat.name!=currentNewMat.name) then
+						(
+
+							-- check it has not been already replaced
+							oldMatName = getMatDiffuseMapFilename currentOldMat
+							newMatName = getMatDiffuseMapFilename currentNewMat
+							if (findItem matReplaced oldMatName==0) then (
+								format "<replacematerial old=\"%\" new=\"%\" />\n" oldMatName newMatName to:outFile
+								append matReplaced oldMatName
+								format "%\n" matReplaced
+		
+							)
+						)
+					)
+					-- format "      <material>%</material></params>\n" (getMatDiffuseMapFilename obj.mat) to:outFile NO MATERIAL CHANGE FOR NOW
+					format "      </params>\n" to:outFile
+		
+					-- checks if model has left-oriented system or not
+					face = getface obj 1
+					v1= getvert obj face[1]
+					v2 = getvert obj face[2]
+					v3 = getvert obj face[3]
+					
+					vect1 = v1-v2
+					vect2 = v3-v2
+					normal1 = cross vect1 vect2
+					facenorm = normal1/(length normal1)
+					maxnorm = getfacenormal obj 1
+					flipModel = false
+		
+					dotProd = dot facenorm maxnorm
+					if (dotProd>0) then (
+						flipModel = true
+					)
+		
+				   if (flipModel) then (
+				    format "\n ThingMesh Instance Object needs flipping: %\n" obj.name
+				   )
+		
+					xMove = (obj.pos.x * xscale) + xrelocate
+					yMove = (obj.pos.y * yscale) + yrelocate
+					zMove = (obj.pos.z * zscale) + zrelocate
+		
+					format "      <move><v x=\"%\" y=\"%\" z=\"%\" />\n" xMove zMove yMove to:outFile
+					rotvalues = quattoeuler obj.rotation order:2
+		
+					if (flipModel) then (
+						rotx = ((rotvalues.x) * pi)/180
+						roty = -((rotvalues.y) * pi)/180
+						rotz = ((rotvalues.z) * pi)/180
+					) else (
+						rotx = (rotvalues.x * pi)/180
+						roty = -((rotvalues.y * pi)/180)
+						rotz = (rotvalues.z * pi)/180
+					)
+		
+					format "      <matrix><rotx>%</rotx><roty>%</roty><rotz>%</rotz></matrix>\n" rotx roty rotz to:outFile
+					format "      </move>\n"  to:outFile
+					format "    </meshobj>\n" to:outFile
+					continue;
+		
+				)
+
 		
 			  	--print (getUserPropBuffer obj) to:outFile -- output buffer as a string literal 
 			  	gc()
@@ -2597,6 +3043,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 		
 			-- outputs lights
 			lcount = 1
+			sectorambient=undefined;
 			for ll in lightsFound do
 			(
 	
@@ -2604,6 +3051,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 				-- skip ambient light
 				if (ll.name=="ambient") then (
 					lcount = lcount + 1
+					sectorambient=ll;
 					continue
 				)
 		 		    --format " ;Light: % \n" ll.name to:outFile
@@ -2622,9 +3070,9 @@ rollout Test1 "Export Level to CS" width:226 height:350
 				format "LIGHTDEBUG: % % %\n" ll.name (lightColors[12][lcount][1]) multiplier
 		
 				if (ll.useFarAtten==false) then
-					format "      <attenuation>none</attenuation>\n" to:outFile
+					format "    <attenuation>none</attenuation>\n" to:outFile
 				else
-					format "      <attenuation>linear</attenuation>\n" to:outFile
+					format "    <attenuation>linear</attenuation>\n" to:outFile
 		
 				xlight = (ll.pos.x * xscale) + xrelocate
 				ylight = (ll.pos.y * yscale) + yrelocate
@@ -2641,10 +3089,21 @@ rollout Test1 "Export Level to CS" width:226 height:350
 				format "    </light>\n"  to:outFile
 				lcount = lcount + 1
 			)
-		
+
+		-- output ambient light on sector
+		if (sectorambient!=undefined) then
+		(
+			llred = ((sectorambient.rgb.r)/255) 
+			llgreen = ((sectorambient.rgb.g)/255) 
+			llblue = ((sectorambient.rgb.b)/255) 
+			format " <ambient red=\"%\" green=\"%\" blue=\"%\" />\n" llred llgreen llblue to:outFile
+		-- or output ambient light defined on level
+		) else if (ambRed!=undefined and ambGreen!=undefined and ambBlue!=undefined) then
+			format " <ambient red=\"%\" green=\"%\" blue=\"%\" />\n" ambRed ambGreen ambBlue to:outFile
+
 	
 		-- close sector object
-		format "  </sector>\n\n" to:outFile
+		format "  </sector>\n" to:outFile
 	
 		) -- end of sectors loop
 
@@ -2655,7 +3114,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 			ystart = (startingPos.pos.y * yscale) + yrelocate
 			zstart = (startingPos.pos.z * zscale) + zrelocate
 	
-			format "  <start name=\"%\">\n    <sector>%</sector>\n    <position x=\"%\" y=\"%\" z=\"%\" />\n  </start>\n\n" startingPos.name startingPosSect xstart zstart ystart to:outFile
+			format "  <start name=\"%\"><sector>%</sector><position x=\"%\" y=\"%\" z=\"%\" /></start>\n" startingPos.name startingPosSect xstart zstart ystart to:outFile
 		) else (
 			message = "No starting position found. Level exported anyway. To add a starting position add a Camera object called Camera01."
 			messageBox message
@@ -2772,7 +3231,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 		)
 	
 		-- end sequences (if any)
-		format "   </sequences>\n\n" to:outFile
+		format "   </sequences>\n" to:outFile
 	
 		-- start triggers (if any)
 		format "   <triggers>\n" to:outFile
@@ -2812,7 +3271,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 	
 		-- end triggers (if any)
 	
-		format "   </triggers>\n\n" to:outFile
+		format "   </triggers>\n" to:outFile
 	
 		-- close world object
 
@@ -2843,7 +3302,7 @@ rollout Test1 "Export Level to CS" width:226 height:350
 		deleteFaces = not chkSanity.checked
 		include "sanityCheck.ms"
 	)
-)gw = newRolloutFloater "Export Level" 300 400 
+)gw = newRolloutFloater "Export Level to CS" 300 400 
 addRollout Test1 gw 
 
 )
