@@ -874,6 +874,8 @@ bool csBox3::ProjectBox (const csTransform& trans, float fov,
   const Outline &ol = outlines[idx];
   int num_array = MIN (ol.num, 6);
 
+  min_z = 100000000.0;
+  max_z = 0;
   csBox3 cbox (trans * GetCorner (ol.vertices[0]));
   int i;
   // We go to 8 so that we can calculate the correct min_z/max_z.
@@ -1072,12 +1074,13 @@ bool csBox3::ProjectBox (const csTransform& trans,
   const CS::Math::Matrix4& projection, csBox2& sbox,
   float& min_z, float& max_z, int screenWidth, int screenHeight) const
 {
-  max_z = min_z = 0.0f;
   const csVector3& origin = trans.GetOrigin ();
   int idx = CalculatePointSegment (origin);
   const Outline &ol = outlines[idx];
   int num_array = MIN (ol.num, 6);
 
+  min_z = 100000000.0;
+  max_z = 0;
   csBox3 cbox (trans * GetCorner (ol.vertices[0]));
   int i;
   // We go to 8 so that we can calculate the correct min_z/max_z.
