@@ -158,7 +158,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine, 6, 1, 0);
+  SCF_INTERFACE(iEngine, 6, 2, 0);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -1197,7 +1197,7 @@ struct iEngine : public virtual iBase
   virtual void RemoveDelayedRemoves (bool remove = false) = 0;
  
   /// Delete everything in the engine.
-  virtual void DeleteAll () = 0;
+  THREADED_INTERFACE(DeleteAll);
 
   /**
    * Reset a subset of flags/settings (which may differ from one world/map to 
