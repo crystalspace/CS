@@ -23,6 +23,10 @@
 #include "isndsys/ss_stream.h"
 #include "ivaria/reporter.h"
 
+// Sounds under this size are played using an OpenAL static buffer, not streamed
+// When streaming is used, it's the length FillBuffer() will request.
+#define ADVANCE_LENGTH 65536
+
 /*
  * 2D Sound source
  */
@@ -35,9 +39,29 @@ SndSysSourceOpenAL2D::SndSysSourceOpenAL2D (csRef<iSndSysStream> stream, csSndSy
   // Get an OpenAL source
   alGenSources( 1, &m_Source );
 
-  // Allocate and get the OpenAL buffers
-  m_Buffers = new ALuint[s_NumberOfBuffers];
-  alGenBuffers( s_NumberOfBuffers, m_Buffers );
+  // Calculate the number of bytes per frame
+  m_BytesPerSample = m_Stream->GetRenderedFormat()->Bits / 8
+    * m_Stream->GetRenderedFormat()->Channels;
+  streamSize = m_Stream->GetFrameCount () * m_BytesPerSample;
+
+  if (streamSize < ADVANCE_LENGTH)
+  {
+    // This is a short sample, don't use streaming
+    useStaticBuffer = true;
+    isStaticBufferEmpty = true;
+    requestedLength =  streamSize;
+    // Allocate only one OpenAL buffer
+    m_Buffers = new ALuint[1];
+    alGenBuffers( 1, m_Buffers );
+  }
+  else
+  {
+    useStaticBuffer = isStaticBufferEmpty = false;
+    requestedLength = ADVANCE_LENGTH;
+    // Allocate and get the OpenAL buffers
+    m_Buffers = new ALuint[s_NumberOfBuffers];
+    alGenBuffers( s_NumberOfBuffers, m_Buffers );
+  }
 
   // Set some initial settings
   alSource3f (m_Source, AL_POSITION, 0, 0, -1);
@@ -57,9 +81,6 @@ SndSysSourceOpenAL2D::SndSysSourceOpenAL2D (csRef<iSndSysStream> stream, csSndSy
     else
       m_Format = AL_FORMAT_STEREO16;
 
-  // Calculate the number of bytes per frame
-  //m_BytesPerSample = m_Stream->GetRenderedFormat()->Bits / 8 * m_Stream->GetRenderedFormat()->Channels; // (vk) unused
-
   // Save the sample rate locally
   m_SampleRate = m_Stream->GetRenderedFormat()->Freq;
 
@@ -67,14 +88,17 @@ SndSysSourceOpenAL2D::SndSysSourceOpenAL2D (csRef<iSndSysStream> stream, csSndSy
   m_Stream->InitializeSourcePositionMarker (&m_PositionMarker);
 
   // Perform an initial update
-  //PerformUpdate();
+  //PerformUpdate(m_Update);
 }
 
 SndSysSourceOpenAL2D::~SndSysSourceOpenAL2D ()
 {
   // Release out OpenAL resources
   alDeleteSources( 1, &m_Source );
-  alDeleteBuffers( s_NumberOfBuffers, m_Buffers );
+  if (useStaticBuffer)
+    alDeleteBuffers( 1, m_Buffers);
+  else
+    alDeleteBuffers( s_NumberOfBuffers, m_Buffers );
 
   // Release the allocated buffers
   delete[] m_Buffers;
@@ -122,21 +146,31 @@ void SndSysSourceOpenAL2D::PerformUpdate ( bool ExternalUpdates )
   // Did OpenAL finish processing some buffers?
   if (processedBuffers > 0)
   {
-    // Unqueue any processed buffers
-    CS_ALLOC_STACK_ARRAY(ALuint, unqueued, s_NumberOfBuffers);
-    alSourceUnqueueBuffers (m_Source, processedBuffers, unqueued);
-    CS_ASSERT (unqueued[0] == m_Buffers[m_EmptyBuffer]);
+    if (useStaticBuffer)
+    {
+      alSourcei (m_Source, AL_BUFFER, 0);
+      isStaticBufferEmpty = true;
+    }
+    else
+    {
+      // Unqueue any processed buffers
+      CS_ALLOC_STACK_ARRAY(ALuint, unqueued, s_NumberOfBuffers);
+      alSourceUnqueueBuffers (m_Source, processedBuffers, unqueued);
+      // (vk) This assert doesn't seem appropriate anymore now
+      //      with static buffers being potentially used in parallel
+      //CS_ASSERT (unqueued[0] == m_Buffers[m_EmptyBuffer]);
+      // Update the current buffer index.
+      m_CurrentBuffer = (m_CurrentBuffer + processedBuffers) % s_NumberOfBuffers;
 
-    // Update the current buffer index.
-    m_CurrentBuffer = (m_CurrentBuffer + processedBuffers) % s_NumberOfBuffers;
+    }
   }
 
   // Are there any empty buffers?
   ALint queuedBuffers = 0;
   alGetSourcei (m_Source, AL_BUFFERS_QUEUED, &queuedBuffers);
-  if (queuedBuffers < static_cast<ALint>(s_NumberOfBuffers))
+  if (!useStaticBuffer && (queuedBuffers < static_cast<ALint>(s_NumberOfBuffers)))
   {
-    // Fill any emptied buffers
+    // We're using streaming, fill any emptied buffers
     do
     {
       if (FillBuffer (m_Buffers[m_EmptyBuffer]) == true)
@@ -152,6 +186,15 @@ void SndSysSourceOpenAL2D::PerformUpdate ( bool ExternalUpdates )
         break;
       }
     } while (m_EmptyBuffer != ( m_CurrentBuffer + 1 ) % s_NumberOfBuffers);
+  }
+  else if (useStaticBuffer && isStaticBufferEmpty)
+  {
+    // Just fill our static buffer
+    if (FillBuffer (m_Buffers[0]) == true)
+    {
+      alSourcei (m_Source, AL_BUFFER, m_Buffers[0]);
+      isStaticBufferEmpty = false;
+    }
   }
 
   // Do we need to update attributes?
@@ -188,13 +231,14 @@ void SndSysSourceOpenAL2D::Configure( csConfigAccess config ) {
 size_t SndSysSourceOpenAL2D::s_NumberOfBuffers = 4;
 
 bool SndSysSourceOpenAL2D::FillBuffer (ALuint buffer) {
+
   // Advance the stream a bit
-  m_Stream->AdvancePosition (65536);
+  m_Stream->AdvancePosition (requestedLength);
 
   // Get some data from the stream
   void *data1, *data2;
   size_t length1, length2;
-  m_Stream->GetDataPointers (&m_PositionMarker, 65536, &data1, &length1, &data2, &length2);
+  m_Stream->GetDataPointers (&m_PositionMarker, requestedLength, &data1, &length1, &data2, &length2);
 
   // Determine if/how the data must be combined.
   if (length1 == 0)
