@@ -861,7 +861,7 @@ void csEngine::DeleteAllForce ()
   lightAttenuationTexture.Invalidate ();
 }
 
-void csEngine::DeleteAll ()
+THREADED_CALLABLE_IMPL(csEngine, DeleteAll)
 {
   DeleteAllForce ();
 
@@ -874,7 +874,7 @@ void csEngine::DeleteAll ()
     if (!shaderManager)
     {
       Warn ("Shader manager is missing!");
-      return;
+      return false;
     }
 
     // Load default shaders
@@ -912,8 +912,8 @@ void csEngine::DeleteAll ()
       defaultRenderLoop = renderLoopManager->Load (override_renderloop);
       if (!defaultRenderLoop)
       {
-	Warn ("Default renderloop couldn't be created!");
-	return;
+        Warn ("Default renderloop couldn't be created!");
+        return false;
       }
     }
     else if (!configLoop)
@@ -925,8 +925,8 @@ void csEngine::DeleteAll ()
       defaultRenderLoop = renderLoopManager->Load (configLoop);
       if (!defaultRenderLoop)
       {
-	Warn ("Default renderloop couldn't be created!");
-	return;
+        Warn ("Default renderloop couldn't be created!");
+        return false;
       }
     }
 

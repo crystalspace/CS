@@ -518,6 +518,8 @@ void csGraphics2DGLCommon::DrawLine (
   // but csQint(y1) == y1 is too coarse a test.
   if (fabs(float(int(y1))-y1) < 0.1f) { y1 += 0.05f; }
   if (fabs(float(int(y2))-y2) < 0.1f) { y2 += 0.05f; }
+  if (fabs(float(int(x1))-x1) < 0.1f) { x1 += 0.05f; }
+  if (fabs(float(int(x2))-x2) < 0.1f) { x2 += 0.05f; }  
 
   // Notice: using height-y has range 1..height, but this is OK.
   //    This is because on opengl y=0.0 is off screen, as is y=height.
@@ -562,9 +564,11 @@ void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
   // The whole pixels get rounded up, shifting the drawpixel.
   float y1 = y;
   if (fabs(float(int(y1))-y1) < 0.1f) { y1 += 0.05f; }
+  float x1 = x;
+  if (fabs(float(int(x1))-x1) < 0.1f) { x1 += 0.05f; }  
   setGLColorfromint (color);
   glBegin (GL_POINTS);
-  glVertex2f (x, vpHeight - y1);
+  glVertex2f (x1, vpHeight - y1);
   glEnd ();
 }
 

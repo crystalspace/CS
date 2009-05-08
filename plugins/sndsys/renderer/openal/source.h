@@ -98,6 +98,14 @@ private:
   csSndSysRendererOpenAL *m_Renderer;
   /// Do we need to tell OpenAL about changes to this source
   bool m_Update;
+  /// Use static AL buffer instead of streaming
+  bool useStaticBuffer;
+  /// Do wee need to fill the static AL buffer ?
+  bool isStaticBufferEmpty;
+  /// Remember the stream size
+  size_t streamSize;
+  /// Buffer length to be filled
+  size_t requestedLength;
 
   /// The number of OpenAL buffers to maintain.
   static size_t s_NumberOfBuffers;
@@ -118,7 +126,7 @@ private:
   /// The sampling rate of the stream
   ALuint m_SampleRate;
   // The number of bytes per sample in the stream
-  //size_t m_BytesPerSample; // (vk) unused
+  size_t m_BytesPerSample;
 
   /// Helper function to fill an OpenAL buffer with data.
   bool FillBuffer (ALuint buffer);
