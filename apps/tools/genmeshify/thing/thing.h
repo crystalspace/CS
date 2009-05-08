@@ -49,9 +49,7 @@ class csVector3;
  * A range structure for specifing polygon ranges.
  * \deprecated Deprecated in 1.3. csPolygonRange is deprecated.
  */
-struct
-  CS_DEPRECATED_TYPE_MSG ("csPolygonRange is deprecated")
-  csPolygonRange
+struct csPolygonRange
 {
   int start, end;
   csPolygonRange (int start, int end)
@@ -155,9 +153,7 @@ struct
  *
  * \deprecated Deprecated in 1.3. iPolygonHandle is deprecated.
  */
-struct
-  CS_DEPRECATED_TYPE_MSG ("iPolygonHandle is deprecated")
-  iPolygonHandle : public virtual iBase
+struct iPolygonHandle : public virtual iBase
 {
   SCF_INTERFACE (iPolygonHandle, 1, 0, 0);
 
@@ -210,9 +206,7 @@ struct
  * \deprecated Deprecated in 1.3. iThingFactoryState is deprecated. Use
  * genmesh instead (iGeneralFactoryState).
  */
-struct
-  CS_DEPRECATED_TYPE_MSG ("iThingFactoryState is deprecated. Use genmesh instead (iGeneralFactoryState)")
-  iThingFactoryState : public virtual iBase
+struct iThingFactoryState : public virtual iBase
 {
   SCF_INTERFACE(iThingFactoryState, 2, 0, 1);
 
@@ -705,9 +699,7 @@ struct
  * \deprecated Deprecated in 1.3. iThingState is deprecated. Use
  * genmesh instead (iGeneralMeshState).
  */
-struct
-  CS_DEPRECATED_TYPE_MSG ("iThingState is deprecated. Use genmesh instead (iGeneralMeshState)")
-  iThingState : public virtual iBase
+struct iThingState : public virtual iBase
 {
   SCF_INTERFACE (iThingState, 1, 0, 2);
 
@@ -831,9 +823,7 @@ struct
  * \deprecated Deprecated in 1.3. iThingEnvironment is deprecated. Use
  * genmesh instead.
  */
-struct
-  CS_DEPRECATED_TYPE_MSG ("iThingEnvironment is deprecated. Use genmesh instead")
-  iThingEnvironment : public virtual iBase
+struct iThingEnvironment : public virtual iBase
 {
   SCF_INTERFACE (iThingEnvironment, 1, 0, 0);
 
