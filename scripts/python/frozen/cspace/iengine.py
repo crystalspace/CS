@@ -500,7 +500,6 @@ class iEngine(core.iBase):
     def RemoveObject(*args): return _iengine.iEngine_RemoveObject(*args)
     def DelayedRemoveObject(*args): return _iengine.iEngine_DelayedRemoveObject(*args)
     def RemoveDelayedRemoves(*args): return _iengine.iEngine_RemoveDelayedRemoves(*args)
-    def DeleteAll(*args): return _iengine.iEngine_DeleteAll(*args)
     def ResetWorldSpecificSettings(*args): return _iengine.iEngine_ResetWorldSpecificSettings(*args)
     def FireStartFrame(*args): return _iengine.iEngine_FireStartFrame(*args)
     def CreatePerspectiveCamera(*args): return _iengine.iEngine_CreatePerspectiveCamera(*args)

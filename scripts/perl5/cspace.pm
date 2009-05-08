@@ -19529,7 +19529,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *RemoveObject = *cspacec::iEngine_RemoveObject;
 *DelayedRemoveObject = *cspacec::iEngine_DelayedRemoveObject;
 *RemoveDelayedRemoves = *cspacec::iEngine_RemoveDelayedRemoves;
-*DeleteAll = *cspacec::iEngine_DeleteAll;
 *ResetWorldSpecificSettings = *cspacec::iEngine_ResetWorldSpecificSettings;
 *FireStartFrame = *cspacec::iEngine_FireStartFrame;
 *CreatePerspectiveCamera = *cspacec::iEngine_CreatePerspectiveCamera;
