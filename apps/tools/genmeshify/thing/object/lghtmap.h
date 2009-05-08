@@ -182,12 +182,6 @@ public:
     csPolygon3D* poly, csPolygon3DStatic* spoly, iEngine*);
 
   /**
-   * Write lightmap to a file.
-   */
-  void Cache (iFile* file, csPolygon3D* poly,
-  	csPolygon3DStatic* spoly, iEngine*);
-
-  /**
    * Set the size of one lightmap cell (default = 16).
    * Do not directly assign to the lightcell_size variable, as
    * lightmap_shift also has to be updated.
