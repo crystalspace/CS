@@ -936,6 +936,8 @@ THREADED_CALLABLE_IMPL(csEngine, DeleteAll)
 
     csEngine::ReloadRenderManager();
   }
+
+  return true;
 }
 
 iObject *csEngine::QueryObject ()
