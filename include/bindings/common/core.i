@@ -558,6 +558,8 @@ void SetCoreSCFPointer(iSCF *scf_pointer)
 // hand made scf template wrappers
 %include "bindings/common/scf.i"
 
+// Needed to resolve THREADED_INTERFACE macros
+%include "iutil/threadmanager.h"
 %include "iutil/dbghelp.h"
 %include "iutil/cmdline.h"
 
