@@ -197,6 +197,7 @@ iCameraPosition *csCameraPositionList::NewCameraPosition (const char *name)
   csVector3 v (0);
   csRef<csCameraPosition> cp;
   cp.AttachNew (new csCameraPosition (this, name, "", v, v, v));
+  CS::Threading::ScopedWriteLock lock(camLock);
   positions.Push (cp);
   return cp;
 }
@@ -211,47 +212,60 @@ csPtr<iCameraPosition> csCameraPositionList::CreateCameraPosition (const char *n
 
 int csCameraPositionList::GetCount () const
 {
+  CS::Threading::ScopedReadLock lock(camLock);
   return (int)positions.GetSize ();
 }
 
 iCameraPosition *csCameraPositionList::Get (int n) const
 {
+  CS::Threading::ScopedReadLock lock(camLock);
   return positions.Get (n);
 }
 
 int csCameraPositionList::Add (iCameraPosition *obj)
 {
+  CS::Threading::ScopedWriteLock lock(camLock);
   return (int)positions.Push (obj);
+}
+
+void csCameraPositionList::AddBatch (csRef<iCamposLoaderIterator> itr)
+{
+  CS::Threading::ScopedWriteLock lock(camLock);
+  while(itr->HasNext())
+  {
+    positions.Push(itr->Next());
+  }
 }
 
 bool csCameraPositionList::Remove (iCameraPosition *obj)
 {
-  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
+  CS::Threading::ScopedWriteLock lock(camLock);
   return positions.Delete (obj);
 }
 
 bool csCameraPositionList::Remove (int n)
 {
-  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
+  CS::Threading::ScopedWriteLock lock(camLock);
   return positions.DeleteIndex (n);
 }
 
 void csCameraPositionList::RemoveAll ()
 {
-  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
+  CS::Threading::ScopedWriteLock lock(camLock);
   positions.DeleteAll ();
 }
 
 int csCameraPositionList::Find (
   iCameraPosition *obj) const
 {
+  CS::Threading::ScopedReadLock lock(camLock);
   return (int)positions.Find (obj);
 }
 
 iCameraPosition *csCameraPositionList::FindByName (
   const char *Name) const
 {
-  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
+  CS::Threading::ScopedReadLock lock(camLock);
   return positions.FindByName (Name);
 }
 
@@ -553,76 +567,13 @@ void csEngine::HandleImposters ()
 
 THREADED_CALLABLE_IMPL1(csEngine, SyncEngineLists, csRef<iThreadedLoader> loader)
 {
-  {
-    csRef<iSectorLoaderIterator> loaderSectors = loader->GetLoaderSectors();
-    while(loaderSectors->HasNext())
-    {
-      sectors.Add(loaderSectors->Next());
-    }
-  }
-
-  {
-    csRef<iMeshFactLoaderIterator> loaderMeshFactories = loader->GetLoaderMeshFactories();
-    while(loaderMeshFactories->HasNext())
-    {
-      meshFactories.Add(loaderMeshFactories->Next());
-    }
-  }
-
-  {
-    csRef<iMeshLoaderIterator> loaderMeshes = loader->GetLoaderMeshes();
-    while(loaderMeshes->HasNext())
-    {
-      meshes.Add(loaderMeshes->Next());
-    }
-  }
-
-  {
-    csRef<iCamposLoaderIterator> loaderCameraPositions = loader->GetLoaderCameraPositions();
-    while(loaderCameraPositions->HasNext())
-    {
-      cameraPositions.Add(loaderCameraPositions->Next());
-    }
-  }
-
-  {
-    csRef<iMaterialLoaderIterator> loaderMaterials = loader->GetLoaderMaterials();
-    while(loaderMaterials->HasNext())
-    {
-      materials->Add(loaderMaterials->Next());
-    }
-  }
-
-  {
-    csRef<iSharedVarLoaderIterator> loaderSharedVariables = loader->GetLoaderSharedVariables();
-    while(loaderSharedVariables->HasNext())
-    {
-      sharedVariables->Add(loaderSharedVariables->Next());
-    }
-  }
-
-  {
-    csRef<iTextureLoaderIterator> loaderTextures = loader->GetLoaderTextures();
-    while(loaderTextures->HasNext())
-    {
-      iTextureWrapper* txt = loaderTextures->Next();
-      textures->Add(txt);
-      newTextures.Push(txt);
-    }
-  }
-
-  if(precache)
-  {
-    // Precache a texture.
-    while(!newTextures.IsEmpty())
-    {
-      csRef<iTextureWrapper> tex = newTextures.Pop();
-      if(tex->GetTextureHandle())
-      {
-        tex->GetTextureHandle()->Precache();
-      }
-    }
-  }
+  sectors.AddBatch(loader->GetLoaderSectors());
+  meshFactories.AddBatch(loader->GetLoaderMeshFactories());
+  meshes.AddBatch(loader->GetLoaderMeshes());
+  cameraPositions.AddBatch(loader->GetLoaderCameraPositions());
+  materials->AddBatch(loader->GetLoaderMaterials());
+  sharedVariables->AddBatch(loader->GetLoaderSharedVariables());
+  textures->AddBatch(loader->GetLoaderTextures(), precache);
 
   loader->MarkSyncDone();
 
@@ -910,7 +861,7 @@ void csEngine::DeleteAllForce ()
   lightAttenuationTexture.Invalidate ();
 }
 
-void csEngine::DeleteAll ()
+THREADED_CALLABLE_IMPL(csEngine, DeleteAll)
 {
   DeleteAllForce ();
 
@@ -923,7 +874,7 @@ void csEngine::DeleteAll ()
     if (!shaderManager)
     {
       Warn ("Shader manager is missing!");
-      return;
+      return false;
     }
 
     // Load default shaders
@@ -961,8 +912,8 @@ void csEngine::DeleteAll ()
       defaultRenderLoop = renderLoopManager->Load (override_renderloop);
       if (!defaultRenderLoop)
       {
-	Warn ("Default renderloop couldn't be created!");
-	return;
+        Warn ("Default renderloop couldn't be created!");
+        return false;
       }
     }
     else if (!configLoop)
@@ -974,8 +925,8 @@ void csEngine::DeleteAll ()
       defaultRenderLoop = renderLoopManager->Load (configLoop);
       if (!defaultRenderLoop)
       {
-	Warn ("Default renderloop couldn't be created!");
-	return;
+        Warn ("Default renderloop couldn't be created!");
+        return false;
       }
     }
 
@@ -1276,15 +1227,6 @@ void csEngine::PrecacheDraw (iCollection* collection)
     iSector* s = sectors.Get (sn);
     if (!collection || collection->IsParentOf(s->QueryObject ()))
       s->PrecacheDraw ();
-  }
-
-  while(!newTextures.IsEmpty())
-  {
-    csRef<iTextureWrapper> tex = newTextures.Pop();
-    if(tex->GetTextureHandle() && (!collection || collection->IsParentOf(tex->QueryObject())))
-    {
-      tex->GetTextureHandle()->Precache();
-    }
   }
 }
 

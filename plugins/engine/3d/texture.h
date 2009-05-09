@@ -23,6 +23,7 @@
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/threading/rwmutex.h"
 #include "csutil/leakguard.h"
 #include "iutil/selfdestruct.h"
 #include "ivideo/graph2d.h"
@@ -32,6 +33,7 @@
 
 class csEngine;
 class csTextureWrapper;
+struct iTextureLoaderIterator;
 struct iTextureManager;
 struct iTextureHandle;
 struct iImage;
@@ -216,7 +218,7 @@ class csTextureList :
   public csRefArrayObject<iTextureWrapper>
 {
   csEngine* engine;
-  mutable CS::Threading::RecursiveMutex removeLock;
+  mutable CS::Threading::ReadWriteMutex texLock;
 public:
   /// Initialize the array
   csTextureList (csEngine* engine);
@@ -238,6 +240,7 @@ public:
   virtual int GetCount () const;
   virtual iTextureWrapper *Get (int n) const;
   virtual int Add (iTextureWrapper *obj);
+  void AddBatch (csRef<iTextureLoaderIterator> itr, bool precache);
   virtual bool Remove (iTextureWrapper *obj);
   virtual bool Remove (int n);
   virtual void RemoveAll ();

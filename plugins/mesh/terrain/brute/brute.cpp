@@ -2422,10 +2422,11 @@ bool csTerrainObject::HitBeamOutline (const csVector3& start,
 }
 
 bool csTerrainObject::HitBeamObject (const csVector3& start,
-                                      const csVector3& end, 
-                                      csVector3& isect, float* pr,
-                                      int* polygon_idx,
-				      iMaterialWrapper** material)
+                                     const csVector3& end, 
+                                     csVector3& isect, float* pr,
+                                     int* polygon_idx,
+				                             iMaterialWrapper** material,
+                                     csArray<iMaterialWrapper*>* materials)
 {
   if (polygon_idx) *polygon_idx = -1;
   csSegment3 seg (start, end);

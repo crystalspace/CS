@@ -363,8 +363,8 @@ bool csShaderGLCGCommon::DefaultLoadProgram (iShaderProgramCG* cgResolve,
 	DoDebugDump();
 
       if (shaderPlug->doVerbose
-	  && ((type == CG_GL_VERTEX) && (profile >= CG_PROFILE_ARBVP1))
-	    || ((type == CG_GL_FRAGMENT) && (profile >= CG_PROFILE_ARBFP1)))
+	  && (((type == CG_GL_VERTEX) && (profile >= CG_PROFILE_ARBVP1))
+	    || ((type == CG_GL_FRAGMENT) && (profile >= CG_PROFILE_ARBFP1))))
       {
 	csString err = (char*)glGetString (GL_PROGRAM_ERROR_STRING_ARB);
 	if (!err.IsEmpty())
@@ -934,8 +934,8 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
 	"Cg error %s", errStr);
   
       if (shaderPlug->doVerbose
-	  && ((programType == progVP) && (programProfile >= CG_PROFILE_ARBVP1))
-	    || ((programType == progFP) && (programProfile >= CG_PROFILE_ARBFP1)))
+	  && (((programType == progVP) && (programProfile >= CG_PROFILE_ARBVP1))
+	    || ((programType == progFP) && (programProfile >= CG_PROFILE_ARBFP1))))
       {
 	const char* err = (char*)glGetString (GL_PROGRAM_ERROR_STRING_ARB);
 	shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING,

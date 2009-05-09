@@ -30,7 +30,6 @@
 #include "csplugincommon/imageloader/optionsparser.h"
 #include "csplugincommon/iopengl/driverdb.h"
 #include "csplugincommon/iopengl/openglinterface.h"
-#include "csplugincommon/particlesys/partgen.h"
 #include "csplugincommon/render3d/normalizationcube.h"
 #include "csplugincommon/renderstep/basesteploader.h"
 #include "csplugincommon/renderstep/basesteptype.h"

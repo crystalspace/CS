@@ -384,18 +384,29 @@ public:
       fCharRanges.Write ((char*)&ui, sizeof (ui));
     }
 
-    fwrite (fCharRanges.GetData (), 1, fCharRanges.GetSize (),
-      out);
-    fwrite (fBitmapMetrics.GetData (), 1, fBitmapMetrics.GetSize (),
-      out);
-    fwrite (fAlphaMetrics.GetData (), 1, fAlphaMetrics.GetSize (),
-      out);
-    fwrite (fGlyphAdvances.GetData (), 1, fGlyphAdvances.GetSize (),
-      out);
-    fwrite (fBitmapData.GetData (), 1, fBitmapData.GetSize (),
-      out);
-    fwrite (fAlphaData.GetData (), 1, fAlphaData.GetSize (),
-      out);
+    if ((!fwritecheck (fCharRanges, out, "fCharRanges"))
+      || (!fwritecheck (fBitmapMetrics, out, "fBitmapMetrics"))
+      || (!fwritecheck (fAlphaMetrics, out, "fAlphaMetrics"))
+      || (!fwritecheck (fGlyphAdvances, out, "fGlyphAdvances"))
+      || (!fwritecheck (fBitmapData, out, "fBitmapData"))
+      || (!fwritecheck (fAlphaData, out, "fAlphaData")))
+    {
+      csPrintf ("You should delete the resulting .csf file, it's corrupted!\n");
+      return;
+    }
+  }
+
+  bool fwritecheck (csMemFile& data, FILE* fout, const char* description)
+  {
+    const size_t size = data.GetSize ();
+    const size_t res = fwrite (data.GetData (), 1, size, fout);
+    if (res != size)
+    {
+      csPrintf ("Could only write %zu of %zu bytes for %s (errno = %d)!\n",
+        res, size, description, errno);
+      return false;
+    }
+    return true;
   }
 };
 

@@ -4,7 +4,6 @@ if $(CSLIB.DECLARED) != yes
 {
 SubInclude TOP libs csplugincommon canvas ;
 SubInclude TOP libs csplugincommon imageloader ;
-SubInclude TOP libs csplugincommon particlesys ;
 SubInclude TOP libs csplugincommon render3d ;
 SubInclude TOP libs csplugincommon rendermanager ;
 SubInclude TOP libs csplugincommon renderstep ;

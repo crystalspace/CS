@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 
+#include <errno.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -343,7 +344,11 @@ void SndSysDriverOSS::ClearBuffer()
 
 void SndSysDriverOSS::WriteBuffer(size_t Frames)
 {
-  write(m_OutputFileDescriptor, m_pSoundBuffer, Frames * m_PlaybackFormat.Channels * m_PlaybackFormat.Bits/8);
+  const size_t size = Frames * m_PlaybackFormat.Channels * m_PlaybackFormat.Bits/8;
+  const size_t res = write(m_OutputFileDescriptor, m_pSoundBuffer, size);
+  if (res != size)
+    RecordEvent(SSEL_WARNING, "WriteBuffer could only write %zu of %zu bytes"
+      " (errno = %d)!", res, size, errno);
 }
 
 }

@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+  <style type="text/css">
+<!-- 
+form {
+background-color:#FAFAFA;
+padding:10px;
+width:650px;
+font-family:"trebuchet ms",sans-serif;
+}
+fieldset {
+padding:20px;
+margin-bottom:10px;
+}
+legend {
+color:#a0522d;
+font-weight:bold
+}
+label {
+margin-top:20px;
+display:block;
+font-size:90%;
+}
+label.inline {
+display:inline;
+}
+input {
+border:1px solid black;
+background-color:#A6BEDE;
+font-family:"trebuchet ms",sans-serif;
+}
+input[type=radio] {
+margin-right:50px;
+background-color:transparent;
+border:none;
+}
+select, option {
+background-color:#A6BEDE;
+font-family:"trebuchet ms",sans-serif;
+}
+textarea {
+border:1px solid black;
+background-color:#A6BEDE;
+font-family:"trebuchet ms",sans-serif;
+}
+
+-->
+</style>
+
+    <title>CS Project Generator</title>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+	<meta name="description" content="Web front-end for Crystal Space jamtemplate" />
+    <meta name="keywords" content="createproject.sh, jamtemplate" />
+  </head>
+
+  <body>
+
+    <h2>Crystal Space External Project Template Creation</h2>
+    <p>This form will generate a basic
+	   <a href="http://www.crystalspace3d.org/">Crystal Space</a> project for you,
+       complete with configuration (Autoconf) and build system (Jam and MSVC).<br />
+	   You can achieve the same using $CRYSTAL/scripts/jamtemplate/createproject.sh
+	   from your CS copy.<br />
+	   The resulting archive is in tar.bz2 format; if you can't open it,
+	   use for example <a href="http://www.7-zip.org/">7-zip</a>.
+    </p>
+
+    <form method="post" action="/cgi-bin/progen.py">
+
+<fieldset>
+<legend>Project</legend>
+Choose a project name.  We need a short form of the name for use in directory
+and file names.  The short name should be lowercase (though not strictly
+required) and must not contain any special characters or spaces.  We also need
+a long name for use in help messages and the README file.  For example, if you
+project is called "Space Fighters - Revenge for Ducky", then you may want to
+choose a short name "spacefighters", and a long name "Space Fighters - Revenge
+for Ducky".  You may also provide an address for the project's home page.
+Please specify a complete URI.  For example: http://www.spacefighter.org/
+      <label for="shortname">Short name</label>
+      <input type="text" id="shortname" name="shortname" value="ShortName" maxlength="24" />
+      <label for="longname">Long name</label>
+      <input type="text" id="longname" name="longname" value="Long Name" maxlength="79" />
+      <label for="version">Version</label>
+      <input type="text" id="version" name="version" value="0.1.0" maxlength="16" />
+      <label for="homepage">Homepage</label>
+      <input type="text" id="homepage" name="homepage" value="http://" maxlength="79" />
+      <br/>
+</fieldset>
+
+<fieldset>
+<legend>Contact</legend>
+The information about the author is mentioned in the README file and in the
+configuration script so that people see a support address when they invoke
+"./configure --help".  When asked for the copyright information, type the full
+copyright notice as you wish it to appear in the generated files. For instance:
+<br />
+Copyright (C)2009 by Duffer McFluffer
+      <label for="author">Author</label>
+      <input type="text" id="author" name="author" value="" maxlength="79" />
+      <label for="email">E-mail</label>
+      <input type="text" id="email" name="email" value="" maxlength="79" />
+      <label for="copyright">Copyright</label>
+      <input type="text" id="copyright" name="copyright" value="Copyright (C)2009 by " maxlength="79" size="42" />
+</fieldset>
+
+<fieldset>
+<legend>License</legend>
+The meta-information which describes a plugin module can be embedded directly
+into the plugin itself on some platforms or laid down alongside the plugin in a
+separate *.csplugin file. On Unix, Crystal Space utilizes its own ELF-based
+reader to extract embedded meta-information from plugin modules.  If the
+ELF-based reader is not available for some reason (such as missing elf.h), then
+Crystal Space falls back to using the libbfd library for reading embedded
+meta-information.  The libbfd library carries a
+<a href="http://www.gnu.org/licenses/gpl.html">GPL license</a>, therefore it can
+be used legally only with projects also carrying a GPL or GPL-compatible
+license. If your project is not compatible with GPL, then Crystal Space needs
+to be instructed not to fallback to using libbfd for extracting
+meta-information if the built-in ELF reader is unavailable. Avoding libbfd, in
+this case, will prevent its GPL license from infecting your non-GPL project.
+Your response to this question controls whether or not it is safe to fall back
+to using libbfd in the event that the ELF-based reader is unusable.  (Note,
+though, that the end-user can manually override the embedding default via the
+configure script's --enable-meta-info-embedding option.)<br />
+<em>If you are unsure of the answer, then respond "no"</em>.
+
+      <label>GPL-compatible ?</label>
+	  yes <input type="radio" name="gplcompat" value="yes" />
+	  no  <input type="radio" name="gplcompat" value="no" checked="checked" />
+</fieldset>
+
+<fieldset>
+<legend>Dependencies</legend>
+The <a href="http://cel.crystalspace3d.org/">Crystal Entity Layer (CEL)</a>
+is a set of classes and modules which layer game-oriented facilities atop Crystal Space.
+The Autoconf configuration script and Jam build system can be set up to work
+with CEL if your project will utilize this SDK.
+      <label>Utilize CEL ?</label>
+	  yes <input type="radio" name="usecel" value="yes" />
+	  no  <input type="radio" name="usecel" value="no" checked="checked" />
+      <label>Which CS/CEL version to use ?</label>
+	  trunk <input type="radio" name="csversion" value="trunk" />
+	  1.4  <input type="radio" name="csversion" value="1.4" checked="checked" />
+	  1.2.1 <input type="radio" name="csversion" value="1.2.1" />
+</fieldset>
+      <p>
+        <input type="submit" />
+	  </p>
+    </form>
+  </body>
+</html>

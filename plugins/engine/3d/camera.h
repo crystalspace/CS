@@ -48,7 +48,8 @@ protected:
   csMovable movable;
 
   /// The sector the camera is in.
-  iSector* sector;
+  csWeakRef<iSector> sector;
+
   /// If true we are in a mirrored world.
   bool mirror;
 
@@ -455,8 +456,8 @@ public:
   csVector2 Perspective (const csVector3& v) const
   {
     csVector2 p;
-    float iz = aspect / v.z;
-    p.x = v.x * iz + shift_x;
+    float iz = 1.0 / v.z;
+    p.x = v.x * aspect * iz + shift_x;
     p.y = v.y * iz + shift_y;
     return p;
   }
@@ -467,7 +468,7 @@ public:
     csVector3 v;
     v.z = z;
     v.x = (p.x - shift_x) * z * inv_aspect;
-    v.y = (p.y - shift_y) * z * inv_aspect;
+    v.y = (p.y - shift_y) * z;
     return v;
   }
   

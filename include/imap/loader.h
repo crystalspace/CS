@@ -167,8 +167,18 @@ public:
   {
   }
 
-  bool IsFinished() { return finished; }
-  bool WasSuccessful() { return success; }
+  bool IsFinished()
+  {
+    CS::Threading::MutexScopedLock lock(updateLock);
+    return finished;
+  }
+
+  bool WasSuccessful()
+  {
+    CS::Threading::MutexScopedLock lock(updateLock);
+    return success;
+  }
+
   void* GetResultPtr()
   { CS_ASSERT_MSG("csLoaderReturn does not implement a void* result", false); return NULL; }
 
@@ -189,7 +199,12 @@ public:
     }
   }
 
-  void MarkSuccessful() { success = true; }
+  void MarkSuccessful()
+  {
+    CS::Threading::MutexScopedLock lock(updateLock);
+    success = true;
+  }
+
   void SetResult(void* result)
   { CS_ASSERT_MSG("csLoaderReturn does not implement a void* result", false); }
 
@@ -316,7 +331,7 @@ struct iSharedVarLoaderIterator : public virtual iBase
 */
 struct iThreadedLoader : public virtual iBase
 {
-  SCF_INTERFACE (iThreadedLoader, 2, 1, 0);
+  SCF_INTERFACE (iThreadedLoader, 2, 2, 0);
 
  /**
   * Get the loader sector list.
@@ -794,9 +809,9 @@ struct iThreadedLoader : public virtual iBase
   * when you are loading from a shared library containing more resources than you
   * actually need (a world file loading from a shared library of textures for example).
   */
-  THREADED_INTERFACE7(LoadNode, const char* cwd, csRef<iDocumentNode> node, csRef<iCollection> collection = 0,
-  csRef<iStreamSource> ssource = 0, csRef<iMissingLoaderData> missingdata = 0, uint keepFlags = KEEP_ALL,
-  bool do_verbose = false);
+  THREADED_INTERFACE8(LoadNode, const char* cwd, csRef<iDocumentNode> node, csRef<iCollection> collection = 0,
+  csRef<iSector> sector = 0, csRef<iStreamSource> ssource = 0, csRef<iMissingLoaderData> missingdata = 0,
+  uint keepFlags = KEEP_ALL, bool do_verbose = false);
   //@}
 
   /// Add object to the transfer list.

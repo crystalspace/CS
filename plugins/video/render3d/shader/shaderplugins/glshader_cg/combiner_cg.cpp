@@ -1121,7 +1121,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     if (!globalIDs.Contains (name))
     {
       globalIDs.AddNoTest (name);
-      if (annotation) globals.AppendFmt (MakeComment (annotation));
+      if (annotation) globals.Append (MakeComment (annotation));
       globals.AppendFmt ("%s %s;\n", CgType (type).GetData(), name);
     }
   }
@@ -1138,7 +1138,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       default: CS_ASSERT_MSG ("Unsupported program output target", false);
     }
     outputAssign[target].Empty();
-    if (annotation) outputAssign[target].AppendFmt (MakeComment (annotation));
+    if (annotation) outputAssign[target].Append (MakeComment (annotation));
     outputAssign[target].AppendFmt ("OUT.%s = %s;\n", outputName, name);
   }
   

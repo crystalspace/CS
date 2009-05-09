@@ -167,7 +167,7 @@ class csThreadReturn : public scfImplementation1<csThreadReturn, iThreadReturn>
 {
 public:
   csThreadReturn(iThreadManager* tm) : scfImplementationType(this),
-    finished(false), result(0), tm(tm), waitLock(0), wait(0)
+    finished(false), success(false), result(0), tm(tm), waitLock(0), wait(0)
   {
   }
 
@@ -175,9 +175,18 @@ public:
   {
   }
 
-  bool IsFinished() { return finished; }
+  bool IsFinished()
+  {
+    CS::Threading::MutexScopedLock lock(updateLock);
+    return finished;
+  }
 
-  bool WasSuccessful() { return true; }
+  bool WasSuccessful()
+  {
+    CS::Threading::MutexScopedLock lock(updateLock);
+    return success;
+  }
+
   void* GetResultPtr() { return result; }
   csRef<iBase> GetResultRefPtr() { return refResult; }
 
@@ -196,7 +205,12 @@ public:
     }
   }
 
-  void MarkSuccessful() { return; }
+  void MarkSuccessful()
+  {
+    CS::Threading::MutexScopedLock lock(updateLock);
+    success = true;
+  }
+
   void SetResult(void* result) { this->result = result; }
   void SetResult(csRef<iBase> result) { refResult = result; }
 
@@ -226,6 +240,7 @@ public:
 
 private:
   bool finished;
+  bool success;
   void* result;
   csRef<iBase> refResult;
   csWeakRef<iThreadManager> tm;
@@ -393,7 +408,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[1] = mempool->Store<csRef<iThreadReturn> >(&ret); \
   argsTC[2] = mempool->Store<bool>(&sync); \
   QueueEvent<type, csRef<iThreadReturn>, bool>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
-  if(Wait) \
+  if(Wait || wait) \
   { \
     ret->Wait(); \
   } \
@@ -448,7 +463,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[2] = mempool->Store<bool>(&sync); \
   argsTC[3] = mempool->Store<T1>(&A1); \
   QueueEvent<type, csRef<iThreadReturn>, bool, T1>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
-  if(Wait) \
+  if(Wait || wait) \
   { \
     ret->Wait(); \
   } \
@@ -504,7 +519,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[3] = mempool->Store<T1>(&A1); \
   argsTC[4] = mempool->Store<T2>(&A2); \
   QueueEvent<type, csRef<iThreadReturn>, bool, T1, T2>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
-  if(Wait) \
+  if(Wait || wait) \
   { \
     ret->Wait(); \
   } \
@@ -561,7 +576,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[4] = mempool->Store<T2>(&A2); \
   argsTC[5] = mempool->Store<T3>(&A3); \
   QueueEvent<type, csRef<iThreadReturn>, bool, T1, T2, T3>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
-  if(Wait) \
+  if(Wait || wait) \
   { \
     ret->Wait(); \
   } \
@@ -619,7 +634,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[5] = mempool->Store<T3>(&A3); \
   argsTC[6] = mempool->Store<T4>(&A4); \
   QueueEvent<type, csRef<iThreadReturn>, bool, T1, T2, T3, T4>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
-  if(Wait) \
+  if(Wait || wait) \
   { \
     ret->Wait(); \
   } \
@@ -678,7 +693,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[6] = mempool->Store<T4>(&A4); \
   argsTC[7] = mempool->Store<T5>(&A5); \
   QueueEvent<type, csRef<iThreadReturn>, bool, T1, T2, T3, T4, T5>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
-  if(Wait) \
+  if(Wait || wait) \
   { \
     ret->Wait(); \
   } \
@@ -738,7 +753,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[7] = mempool->Store<T5>(&A5); \
   argsTC[8] = mempool->Store<T6>(&A6); \
   QueueEvent<type, csRef<iThreadReturn>, bool, T1, T2, T3, T4, T5, T6>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
-  if(Wait) \
+  if(Wait || wait) \
   { \
     ret->Wait(); \
   } \
@@ -799,7 +814,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[8] = mempool->Store<T6>(&A6); \
   argsTC[9] = mempool->Store<T7>(&A7); \
   QueueEvent<type, csRef<iThreadReturn>, bool, T1, T2, T3, T4, T5, T6, T7>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
-  if(Wait) \
+  if(Wait || wait) \
   { \
     ret->Wait(); \
   } \
@@ -861,7 +876,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[9] = mempool->Store<T7>(&A7); \
   argsTC[10] = mempool->Store<T8>(&A8); \
   QueueEvent<type, csRef<iThreadReturn>, bool, T1, T2, T3, T4, T5, T6, T7, T8>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
-  if(Wait) \
+  if(Wait || wait) \
   { \
     ret->Wait(); \
   } \
@@ -924,7 +939,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[10] = mempool->Store<T8>(&A8); \
   argsTC[11] = mempool->Store<T9>(&A9); \
   QueueEvent<type, csRef<iThreadReturn>, bool, T1, T2, T3, T4, T5, T6, T7, T8, T9>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
-  if(Wait) \
+  if(Wait || wait) \
   { \
     ret->Wait(); \
   } \
@@ -988,7 +1003,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[11] = mempool->Store<T9>(&A9); \
   argsTC[12] = mempool->Store<T10>(&A10); \
   QueueEvent<type, csRef<iThreadReturn>, bool, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
-  if(Wait) \
+  if(Wait || wait) \
   { \
     ret->Wait(); \
   } \
@@ -1053,7 +1068,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[12] = mempool->Store<T10>(&A10); \
   argsTC[13] = mempool->Store<T11>(&A11); \
   QueueEvent<type, csRef<iThreadReturn>, bool, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
-  if(Wait) \
+  if(Wait || wait) \
   { \
     ret->Wait(); \
   } \
@@ -1119,7 +1134,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[13] = mempool->Store<T11>(&A11); \
   argsTC[14] = mempool->Store<T12>(&A12); \
   QueueEvent<type, csRef<iThreadReturn>, bool, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
-  if(Wait) \
+  if(Wait || wait) \
   { \
     ret->Wait(); \
   } \
@@ -1186,7 +1201,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[14] = mempool->Store<T12>(&A12); \
   argsTC[15] = mempool->Store<T13>(&A13); \
   QueueEvent<type, csRef<iThreadReturn>, bool, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
-  if(Wait) \
+  if(Wait || wait) \
   { \
     ret->Wait(); \
   } \
@@ -1254,7 +1269,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[15] = mempool->Store<T13>(&A13); \
   argsTC[16] = mempool->Store<T14>(&A14); \
   QueueEvent<type, csRef<iThreadReturn>, bool, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
-  if(Wait) \
+  if(Wait || wait) \
   { \
     ret->Wait(); \
   } \
@@ -1323,7 +1338,7 @@ void QueueEvent(csRef<iThreadManager> tm, ThreadedCallable<T>* object, bool (T::
   argsTC[16] = mempool->Store<T14>(&A14); \
   argsTC[17] = mempool->Store<T15>(&A15); \
   QueueEvent<type, csRef<iThreadReturn>, bool, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(tm, (ThreadedCallable<type>*)this, &type::function##TC, argsTC, queueType); \
-  if(Wait) \
+  if(Wait || wait) \
   { \
     ret->Wait(); \
   } \

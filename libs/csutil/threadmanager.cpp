@@ -107,18 +107,18 @@ bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns)
 
     while(!threadReturns[0]->IsFinished())
     {
+      MutexScopedLock lock(*m);
       if(IsMainThread())
       {
-        MutexScopedLock lock(waitingMainLock);
         if(listQueue->GetQueueCount() > 0)
         {
-          waitingMainLock.Unlock();
+          m->Unlock();
           listQueue->ProcessQueue(1);
-          waitingMainLock.Lock();
+          m->Lock();
         }
         else
         {
-          waitingMain.Wait(waitingMainLock);
+          c->Wait(*m);
         }
       }
       else
@@ -127,7 +127,9 @@ bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns)
         if(threadQueue->GetQueueCount() > 0)
         {
           waitingThreadsLock.Unlock();
+          m->Unlock();
           threadQueue->PopAndRun();
+          m->Lock();
           waitingThreadsLock.Lock();
         }
         else
@@ -136,7 +138,6 @@ bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns)
           waitingThreadsLock.Unlock();
 
           {
-            MutexScopedLock lock(*m);
             c->Wait(*m);
           }
 

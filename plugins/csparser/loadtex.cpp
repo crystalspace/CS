@@ -120,7 +120,6 @@ csPtr<iImage> csThreadedLoader::LoadImage (iDataBuffer* buf, const char* fname,
 
   if (!buf || !buf->GetSize ())
   {
-    printf("%s\n", vfs->GetCwd());
     ReportWarning (
       "crystalspace.maploader.parse.image",
       "Could not open image file '%s' on VFS!", fname ? fname : "<unknown>");

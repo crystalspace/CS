@@ -220,8 +220,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>, missingdata, uint,
     keepFlags, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadNode, csLoaderReturn, const char*, cwd, csRef<iDocumentNode>,
-    node, csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>,
+    THREADED_CALLABLE_DECL8(csThreadedLoader, LoadNode, csLoaderReturn, const char*, cwd, csRef<iDocumentNode>,
+    node, csRef<iCollection>, collection, csRef<iSector>, sector, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>,
     missingdata, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
     void AddSectorToList(iSector* obj)
@@ -532,10 +532,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool LoadProxyTextures(csSafeCopyArray<ProxyTexture> &proxyTextures,
       csWeakRefArray<iMaterialWrapper> &materialArray);
 
-    THREADED_CALLABLE_DECL6(csThreadedLoader, FindOrLoadMeshFactory, csLoaderReturn, csRef<iLoaderContext>,
-      ldr_context, csRef<iDocumentNode>, meshfactnode, csRef<iMeshFactoryWrapper>, parent,
-      csReversibleTransform*, transf, csRef<iStreamSource>, ssource, const char*, path,
-      THREADED, false, false);
+    THREADED_CALLABLE_DECL7(csThreadedLoader, FindOrLoadMeshFactory, csLoaderReturn,
+      const char*, name, csRef<iLoaderContext>, ldr_context, csRef<iDocumentNode>,
+      meshfactnode, csRef<iMeshFactoryWrapper>, parent, csReversibleTransform*,
+      transf, csRef<iStreamSource>, ssource, const char*, path, THREADED, false, false);
 
     /**
     * Load a Mesh Object Factory from the map file.

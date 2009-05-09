@@ -92,8 +92,8 @@ void csSectorLightList::PrepareLight (iLight* item)
 void csSectorLightList::FreeLight (iLight* item)
 {
   csLight* clight = static_cast<csLight*> (item);
-  clight->SetSector (0); 
   lightTree.RemoveObject (clight);
+  clight->SetSector (0); 
 }
 
 void csSectorLightList::UpdateLightBounds (csLight* light, const csBox3& oldBox)
@@ -1163,6 +1163,12 @@ iMeshGenerator* csSector::GetMeshGeneratorByName (const char* name)
   return meshGenerators.FindByName (name);
 }
 
+void csSector::RemoveMeshGenerator (const char* name)
+{
+  csMeshGenerator* m = static_cast<csMeshGenerator*>(GetMeshGeneratorByName (name));
+  meshGenerators.Delete (m);
+}
+
 void csSector::RemoveMeshGenerator (size_t idx)
 {
   meshGenerators.DeleteIndex (idx);
@@ -1255,6 +1261,7 @@ void csSectorList::NameChanged (iObject* object, const char* oldname,
 {
   csRef<iSector> sector = scfQueryInterface<iSector> (object);
   CS_ASSERT (sector != 0);
+  CS::Threading::ScopedWriteLock lock(sectorLock);
   if (oldname) sectors_hash.Delete (oldname, sector);
   if (newname) sectors_hash.Put (newname, sector);
 }
@@ -1269,18 +1276,33 @@ void csSectorList::FreeSector (iSector* item)
 int csSectorList::Add (iSector *obj)
 {
   const char* name = obj->QueryObject ()->GetName ();
+  CS::Threading::ScopedWriteLock lock(sectorLock);
   if (name)
     sectors_hash.Put (name, obj);
   obj->QueryObject ()->AddNameChangeListener (listener);
   return (int)list.Push (obj);
 }
 
+void csSectorList::AddBatch (csRef<iSectorLoaderIterator> itr)
+{
+  CS::Threading::ScopedWriteLock lock(sectorLock);
+  while(itr->HasNext())
+  {
+    iSector* obj = itr->Next();
+    const char* name = obj->QueryObject ()->GetName ();
+    if (name)
+      sectors_hash.Put (name, obj);
+    obj->QueryObject ()->AddNameChangeListener (listener);
+    list.Push (obj);
+  }
+}
+
 bool csSectorList::Remove (iSector *obj)
 {
-  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   engine->FireRemoveSector (obj);
   FreeSector (obj);
   const char* name = obj->QueryObject ()->GetName ();
+  CS::Threading::ScopedWriteLock lock(sectorLock);
   if (name)
     sectors_hash.Delete (name, obj);
   obj->QueryObject ()->RemoveNameChangeListener (listener);
@@ -1289,7 +1311,7 @@ bool csSectorList::Remove (iSector *obj)
 
 bool csSectorList::Remove (int n)
 {
-  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
+  CS::Threading::ScopedWriteLock lock(sectorLock);
   iSector* obj = list[n];
   FreeSector (obj);
   const char* name = obj->QueryObject ()->GetName ();
@@ -1301,7 +1323,7 @@ bool csSectorList::Remove (int n)
 
 void csSectorList::RemoveAll ()
 {
-  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
+  CS::Threading::ScopedWriteLock lock(sectorLock);
   size_t i;
   for (i = 0 ; i < list.GetSize () ; i++)
   {
@@ -1312,14 +1334,27 @@ void csSectorList::RemoveAll ()
   sectors_hash.DeleteAll ();
 }
 
+int csSectorList::GetCount () const
+{
+  CS::Threading::ScopedReadLock lock(sectorLock);
+  return (int)list.GetSize ();
+}
+
+iSector* csSectorList::Get (int n) const
+{
+  CS::Threading::ScopedReadLock lock(sectorLock);
+  return list.Get (n);
+}
+
 int csSectorList::Find (iSector *obj) const
 {
+  CS::Threading::ScopedReadLock lock(sectorLock);
   return (int)list.Find (obj);
 }
 
 iSector *csSectorList::FindByName (const char *Name) const
 {
-  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
+  CS::Threading::ScopedReadLock lock(sectorLock);
   return sectors_hash.Get (Name, 0);
 }
 

@@ -221,7 +221,7 @@ public:
   /// 2D sprites have no depth, so this is equivalent to HitBeamOutline.
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr, int* polygon_idx = 0,
-	iMaterialWrapper** material = 0)
+	iMaterialWrapper** material = 0, csArray<iMaterialWrapper*>* materials = 0)
   {
     if (material) *material = csSprite2DMeshObject::material;
     if (polygon_idx) *polygon_idx = -1;
@@ -272,6 +272,8 @@ public:
   virtual iSprite2DUVAnimation *GetUVAnimation (int idx) const;
   virtual iSprite2DUVAnimation *GetUVAnimation (int idx, int &style,
   	bool &loop) const;
+
+  virtual void EnsureVertexCopy ();
   /** @} */
 
   /**\name iParticle implementation

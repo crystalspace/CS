@@ -26,6 +26,10 @@
 #error "This file is only for Windows and requires you to include csysdefs.h before"
 #else
 
+#ifdef CS_THREAD_CHECKER
+#include <libittnotify.h>
+#endif
+
 namespace CS
 {
 namespace Threading
@@ -57,20 +61,39 @@ namespace Implementation
 
     bool Lock ()
     {
+#ifdef CS_THREAD_CHECKER
+      __itt_notify_sync_prepare((void *)this);
+#endif
       if (AtomicOperations::Increment (&activeFlag) != 1)
       {
         Implementation::WaitForSingleObject (GetSemaphore (), INFINITE);
       }
+#ifdef CS_THREAD_CHECKER
+      __itt_notify_sync_acquired((void *)this);
+#endif
       return IsLocked ();
     }
 
     bool TryLock ()
     {
+#ifdef CS_THREAD_CHECKER
+      __itt_notify_sync_prepare((void *)this);
+      bool locked = !AtomicOperations::CompareAndSet (&activeFlag, 1, 0);
+      if(locked)
+        __itt_notify_sync_acquired((void *)this);
+      else
+        __itt_notify_sync_cancel((void *)this);
+      return locked;
+#else
       return !AtomicOperations::CompareAndSet (&activeFlag, 1, 0);
+#endif
     }
 
     void Unlock ()
     {
+#ifdef CS_THREAD_CHECKER
+      __itt_notify_sync_releasing((void *)this);
+#endif
       if (AtomicOperations::Decrement (&activeFlag) > 0)
       {
         Implementation::ReleaseSemaphore (GetSemaphore (), 1, 0);

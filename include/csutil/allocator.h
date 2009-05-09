@@ -25,6 +25,7 @@
 
 #include "csutil/alignedalloc.h"
 #include "csutil/memdebug.h"
+#include "csutil/threading/mutex.h"
 
 /**\addtogroup util_memory
  * @{ */
@@ -540,6 +541,54 @@ namespace CS
       /// Set the information used for memory tracking.
       void SetMemTrackerInfo (const char* info)
       { alloc.SetMemTrackerInfo (info); }
+    };
+
+    /**
+     * Threadsafe allocator wrapper.
+     */
+    template <class Allocator>
+    class AllocatorSafe : protected Allocator
+    {
+    protected:
+      typedef Allocator WrappedAllocatorType;
+      typedef AllocatorSafe<Allocator> AllocatorSafeType;
+      /// Mutex to lock the wrapped allocator.
+      CS::Threading::RecursiveMutex mutex;
+
+    public:
+      template<typename A1>
+      AllocatorSafe (const A1& a1) : Allocator (a1)
+      {
+      }
+
+      template<typename A1, typename A2>
+      AllocatorSafe (const A1& a1, const A2& a2) : Allocator (a1, a2)
+      {
+      }
+
+      void Free (void* p)
+      {
+        CS::Threading::RecursiveMutexScopedLock lock(mutex);
+        Allocator::Free(p);
+      }
+
+      CS_ATTRIBUTE_MALLOC void* Alloc (const size_t n)
+      {
+        CS::Threading::RecursiveMutexScopedLock lock(mutex);
+        return Allocator::Alloc(n);
+      }
+
+      void* Realloc (void* p, size_t newSize)
+      {
+        CS::Threading::RecursiveMutexScopedLock lock(mutex);
+        return Allocator::Realloc(p, newSize);
+      }
+
+      void SetMemTrackerInfo (const char* info)
+      {
+        CS::Threading::RecursiveMutexScopedLock lock(mutex);
+        Allocator::SetMemTrackerInfo(info);
+      }
     };
   } // namespace Memory
 } // namespace CS

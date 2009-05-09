@@ -146,7 +146,7 @@ public:
           : conditionValueAndRefCount & ~conditionValueMask;
     }
     bool GetConditionValue () const
-    { return conditionValueAndRefCount & conditionValueMask; }
+    { return (conditionValueAndRefCount & conditionValueMask) != 0; }
 
     //typedef csFixedSizeAllocator<sizeof(WrappedChild)> WrappedChildAlloc;
     //CS_DECLARE_STATIC_CLASSVAR_REF (childAlloc, ChildAlloc, WrappedChildAlloc);

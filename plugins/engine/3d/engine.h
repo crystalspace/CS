@@ -33,6 +33,7 @@
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/stringarray.h"
+#include "csutil/threading/rwmutex.h"
 #include "csutil/weakref.h"
 #include "csutil/weakrefarr.h"
 #include "csutil/eventnames.h"
@@ -165,6 +166,7 @@ public:
   virtual int GetCount () const;
   virtual iCameraPosition *Get (int n) const;
   virtual int Add (iCameraPosition *obj);
+  void AddBatch (csRef<iCamposLoaderIterator> itr);
   virtual bool Remove (iCameraPosition *obj);
   virtual bool Remove (int n);
   virtual void RemoveAll ();
@@ -172,7 +174,7 @@ public:
   virtual iCameraPosition *FindByName (const char *Name) const;
 private:
   csRefArrayObject<iCameraPosition> positions;
-  mutable CS::Threading::RecursiveMutex removeLock;
+  mutable CS::Threading::ReadWriteMutex camLock;
 };
 
 /**
@@ -552,7 +554,7 @@ public:
   virtual void DelayedRemoveObject (csTicks delay, iBase *object);
   virtual void RemoveDelayedRemoves (bool remove = false);
 
-  virtual void DeleteAll ();
+  THREADED_CALLABLE_DECL(csEngine, DeleteAll, csThreadReturn, HIGH, true, false);
   void DeleteAllForce ();
 
   virtual void ResetWorldSpecificSettings(); 
@@ -1028,9 +1030,6 @@ private:
 
   /// Pointer to the thread manager.
   csWeakRef<iThreadManager> tman;
-
-  /// Array of new textures to be precached.
-  csRefArray<iTextureWrapper> newTextures;
 
   /// To precache or not to precache....
   bool precache;

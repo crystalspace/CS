@@ -259,6 +259,11 @@ struct csMGPosition
   float random;
 
   /**
+   * The distance at which we were added. Used for density scaling.
+   */
+  float addedDist;
+
+  /**
    * Last used mixmode.
    */
   uint last_mixmode;
@@ -310,8 +315,9 @@ public:
    * \param xpos X position.
    * \param zpos Z position.
    * \param radius The radius from the (x, z) coordinates to mark off as used.
+   * \param minRadius The minimum radius used by all geometries.
    */
-  bool GetRandomPosition(float& xpos, float& zpos, float& radius);
+  bool GetRandomPosition(float& xpos, float& zpos, float& radius, float& minRadius);
 
 private:
   csArray<csVector4> freeAreas;
@@ -360,6 +366,9 @@ private:
   /// The maximum radius for all geometries.
   float total_max_dist;
   float sq_total_max_dist;
+
+  /// The minimum radius of all geometries.
+  float minRadius;
 
   /// Random generator.
   csRandomFloatGen random;

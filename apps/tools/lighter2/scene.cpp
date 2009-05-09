@@ -165,7 +165,7 @@ namespace lighter
 
     for (unsigned int i = 0; i < sceneFiles.GetSize (); i++)
     {
-      //Change path
+      // Change path
       csStringArray paths;
       paths.Push ("/lev/");
       if (!globalLighter->vfs->ChDirAuto (sceneFiles[i].directory, &paths, 0, "world"))
@@ -176,8 +176,33 @@ namespace lighter
       // Load it
       csRef<iFile> buf = globalLighter->vfs->Open (
         sceneFiles[i].fileName, VFS_FILE_READ);
-      if (!buf) return globalLighter->Report ("Error opening file '%s'!",
-        sceneFiles[i].fileName.GetData());
+      if (!buf)
+      {
+        // Check if the file was part of the path.
+        csString directory = sceneFiles[i].directory;
+        csString filename = sceneFiles[i].directory;
+        size_t start = filename.FindLast('\\')+1;
+        directory = directory.Slice(0, start);
+        filename = filename.Slice(start);
+
+        if (!globalLighter->vfs->ChDirAuto (directory, &paths, 0, filename))
+        {
+          return globalLighter->Report ("Error setting directory '%s'!", 
+            sceneFiles[i].directory.GetData());
+        }
+
+        buf = globalLighter->vfs->Open (filename, VFS_FILE_READ);
+        if(buf)
+        {
+          sceneFiles[i].directory = directory;
+          sceneFiles[i].fileName = filename;
+        }
+        else
+        {
+          return globalLighter->Report ("Error opening file '%s'!",
+            sceneFiles[i].fileName.GetData());
+        }
+      }
       
       csRef<iDocument> doc = globalLighter->docSystem->CreateDocument ();
       const char* error = doc->Parse (buf, true);
@@ -755,6 +780,16 @@ namespace lighter
         }
       }
     }
+    else
+    {
+      // Not a world file, so just parse meshfacts.
+      iMeshFactoryList* mflist = globalLighter->engine->GetMeshFactories();
+      for(int m=0; m<mflist->GetCount(); ++m)
+      {
+        csRef<ObjectFactory> factory;
+        ParseMeshFactory(fileInfo, mflist->Get(m), factory);
+      }
+    }
 
     progress.SetProgress (1);
     return true;
@@ -867,9 +902,58 @@ namespace lighter
 
       bool isPD = light->GetDynamicType() == CS_LIGHT_DYNAMICTYPE_PSEUDO;
 
-      // Atm, only point light
-      csRef<PointLight> intLight;
-      intLight.AttachNew (new PointLight (radSector));
+      // IneQuation was here
+      csRef<Light> intLight;
+
+      switch (light->GetType ()) {
+        // directional light
+        case CS_LIGHT_DIRECTIONAL:
+          {
+            csRef<DirectionalLight> dirLight;
+            dirLight.AttachNew (new DirectionalLight (radSector));
+
+            dirLight->SetRadius (light->GetDirectionalCutoffRadius ());
+            dirLight->SetLength (light->GetCutoffDistance ());
+
+            // light's Z axis
+            dirLight->SetDirection (light->GetMovable ()->GetFullTransform ().GetO2T ().Row3 ());
+
+            intLight = dirLight;
+          }
+          break;
+
+        // spotlight
+        case CS_LIGHT_SPOTLIGHT:
+          {
+            csRef<SpotLight> spotLight;
+            spotLight.AttachNew (new SpotLight (radSector));
+
+            spotLight->SetRadius (light->GetCutoffDistance ());
+
+            float in, out;
+            light->GetSpotLightFalloff (in, out);
+            spotLight->SetFalloff (in, out);
+
+            // light's Z axis
+            spotLight->SetDirection (light->GetMovable ()->GetFullTransform ().GetO2T ().Row3 ());
+
+            intLight = spotLight;
+          }
+          break;
+
+        // by default assume point light
+        case CS_LIGHT_POINTLIGHT:
+        default:
+          {
+            csRef<PointLight> pointLight;
+            pointLight.AttachNew (new PointLight (radSector));
+
+            pointLight->SetRadius (light->GetCutoffDistance ());
+
+            intLight = pointLight;
+          }
+          break;
+      }
 
       intLight->SetPosition (light->GetMovable ()->GetFullPosition ());
       intLight->SetColor (isPD ? csColor (1.0f) : light->GetColor ());
@@ -879,8 +963,6 @@ namespace lighter
       intLight->SetPDLight (isPD);
       intLight->SetLightID (light->GetLightID());
       intLight->SetName (lightName);
-
-      intLight->SetRadius (light->GetCutoffDistance ());
 
       if (isPD)
         radSector->allPDLights.Push (intLight);

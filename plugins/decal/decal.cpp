@@ -333,6 +333,7 @@ void csDecal::EndMesh ()
   renderMeshInfos.Push (renderMeshInfo);
 
   pRenderMesh->mixmode = decalTemplate->GetMixMode ();
+  pRenderMesh->z_buf_mode = decalTemplate->GetZBufMode ();
   pRenderMesh->meshtype = CS_MESHTYPE_TRIANGLES;
   pRenderMesh->indexstart = firstIndex;
   pRenderMesh->indexend = indexCount;
