@@ -167,6 +167,37 @@ namespace CS
       };
       
       /**
+       * Reuse condition: allow immediate reuse.
+       */
+      class ReuseAlways
+      {
+      public:
+	struct AddParameter
+	{
+	  AddParameter () {}
+	};
+	struct StoredAuxiliaryInfo
+	{
+	  template<typename ResourceCacheType>
+	  StoredAuxiliaryInfo (const ResourceCacheType& cache, 
+	    const AddParameter& param) {}
+	};
+	
+	template<typename ResourceCacheType>
+	void MarkActive (const ResourceCacheType& cache,
+	    StoredAuxiliaryInfo& elementInfo)
+	{ }
+  
+	template<typename ResourceCacheType>
+	bool IsReusable (const ResourceCacheType& cache,
+	  const StoredAuxiliaryInfo& elementInfo,
+	  const typename ResourceCacheType::CachedType& data)
+	{
+	  return true;
+	}
+      };
+      
+      /**
        * Purge condition: a resource is purged after a certain time has passed
        */
       template<typename TimeType = uint>
@@ -475,6 +506,7 @@ namespace CS
       
       ~GenericResourceCache()
       {
+        availableResources.Destroy ();
       }
 
       /**

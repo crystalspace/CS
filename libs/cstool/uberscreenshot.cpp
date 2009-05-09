@@ -36,7 +36,7 @@ namespace CS
     
     shotView->SetRectangle (0, screenH - tileH, tileW, tileH);
     
-    shotView->GetCamera()->SetPerspectiveCenter (
+    shotView->GetPerspectiveCamera()->SetPerspectiveCenter (
       ((int)ubershotW / 2) - (int)tileLeft, 
       (int)tileH - (((int)ubershotH / 2) - (int)tileTop) + (int)(screenH - tileH)); 
     if (!g3d->BeginDraw (engine->GetBeginDrawFlags () 
@@ -67,7 +67,7 @@ namespace CS
     return img;
   }
   
-  void UberScreenshotMaker::Setup (iCamera* camera, iEngine* engine, 
+  void UberScreenshotMaker::Setup (iPerspectiveCamera* camera, iEngine* engine, 
     iGraphics3D* g3d)
   {
     this->g3d = g3d;
@@ -78,10 +78,11 @@ namespace CS
     screenW = g3d->GetWidth();
     screenH = g3d->GetHeight();
     
-    csRef<iCamera> oldCam (camera);
-    csRef<iCamera> newCam (shotView->GetCamera());
-    newCam->SetSector (oldCam->GetSector());
-    newCam->SetTransform (oldCam->GetTransform());
+    csRef<iPerspectiveCamera> oldCam (camera);
+    csRef<iPerspectiveCamera> newCam (shotView->GetPerspectiveCamera());
+    newCam->GetCamera()->SetSector (oldCam->GetCamera()->GetSector());
+    newCam->GetCamera()->SetTransform (oldCam->GetCamera()->GetTransform());
+
     newCam->SetFOVAngle (oldCam->GetFOVAngle(), ubershotW);
   }
   
@@ -89,13 +90,14 @@ namespace CS
     iCamera* camera, iEngine* engine, iGraphics3D* g3d) : ubershotW (width), 
     ubershotH (height)
   {
-    Setup (camera, engine, g3d);
+    csRef<iPerspectiveCamera> pcam = scfQueryInterfaceSafe<iPerspectiveCamera>(camera);
+    Setup (pcam, engine, g3d);
   }
     
   UberScreenshotMaker::UberScreenshotMaker (uint width, uint height, 
     iView* view) : ubershotW (width), ubershotH (height)
   {
-    Setup (view->GetCamera(), view->GetEngine(), view->GetContext());
+    Setup (view->GetPerspectiveCamera(), view->GetEngine(), view->GetContext());
   }
   
   csPtr<iImage> UberScreenshotMaker::Shoot ()

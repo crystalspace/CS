@@ -2590,13 +2590,11 @@ static csStringID GetTokenID (const TokenTabEntry* tokenTab,
   size_t tokenCount, const char* token)
 {
   const char* p = token;
-  const size_t tokenLen = strlen (token);
-  size_t pos = 0;
   size_t l = 0, h = tokenCount;
   while (l < h)
   {
     size_t m = (l+h) / 2;
-    if (pos > tokenTab[m].tokenLen) return csInvalidStringID;
+    size_t pos = 0;
     const char* tabTok = tokenTab[m].token;
     int d = *tabTok - *p;
     if (d == 0)
@@ -2604,19 +2602,19 @@ static csStringID GetTokenID (const TokenTabEntry* tokenTab,
       do
       {
         pos++;
-      } while ((d = (tabTok[pos] - p[pos])) == 0 && tabTok[pos] != 0);
-      if (pos == tokenLen)
+      } while ((d = (tabTok[pos] - p[pos])) == 0
+          && (tabTok[pos] != 0)
+          && (token[pos] != 0));
+      if ((d == 0) && (tabTok[pos] == 0) && (token[pos] == 0))
         return tokenTab[m].id;
     }
     if (d < 0)
     {
       l = m+1;
-      pos = 0;
     }
     else
     {
       h = m;
-      pos = 0;
     }
   }
   return csInvalidStringID;

@@ -39,8 +39,6 @@
 struct iMaterialWrapper;
 class csLightningMeshObjectFactory;
 
-#include "csutil/deprecated_warn_off.h"
-
 /**
  * Lightning mesh object.
  */
@@ -122,7 +120,7 @@ public:
   virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
   virtual void SetMixMode (uint mode) { MixMode = mode; }
   virtual uint GetMixMode () const { return MixMode; }
-  virtual void InvalidateMaterialHandles () { }
+
   /**
    * see imesh/object.h for specification. The default implementation
    * does nothing.
@@ -153,8 +151,6 @@ public:
   virtual float GetBandWidth () const { return this->bandwidth; }
   virtual void SetBandWidth (float /*value*/) { }
 };
-
-#include "csutil/deprecated_warn_on.h"
 
 /**
  * Factory for 2D sprites. This factory also implements iLightningFactoryState.

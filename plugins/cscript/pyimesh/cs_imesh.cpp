@@ -32219,27 +32219,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iMeshObject_InvalidateMaterialHandles(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iMeshObject *arg1 = (iMeshObject *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_InvalidateMaterialHandles",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_InvalidateMaterialHandles" "', argument " "1"" of type '" "iMeshObject *""'"); 
-  }
-  arg1 = reinterpret_cast< iMeshObject * >(argp1);
-  (arg1)->InvalidateMaterialHandles();
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_iMeshObject_PositionChild(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iMeshObject *arg1 = (iMeshObject *) 0 ;
@@ -48806,7 +48785,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iMeshObject_GetMaterialWrapper", _wrap_iMeshObject_GetMaterialWrapper, METH_VARARGS, NULL},
 	 { (char *)"iMeshObject_SetMixMode", _wrap_iMeshObject_SetMixMode, METH_VARARGS, NULL},
 	 { (char *)"iMeshObject_GetMixMode", _wrap_iMeshObject_GetMixMode, METH_VARARGS, NULL},
-	 { (char *)"iMeshObject_InvalidateMaterialHandles", _wrap_iMeshObject_InvalidateMaterialHandles, METH_VARARGS, NULL},
 	 { (char *)"iMeshObject_PositionChild", _wrap_iMeshObject_PositionChild, METH_VARARGS, NULL},
 	 { (char *)"iMeshObject_BuildDecal", _wrap_iMeshObject_BuildDecal, METH_VARARGS, NULL},
 	 { (char *)"iMeshObject_scfGetVersion", _wrap_iMeshObject_scfGetVersion, METH_VARARGS, NULL},

@@ -517,6 +517,30 @@ namespace CS
 	(void)info;
       }
     };
+
+    /**
+     * Memory allocator forwarding to another allocator.
+     */
+    template<typename OtherAllocator>
+    class AllocatorRef
+    {
+      OtherAllocator& alloc;
+    public:
+      AllocatorRef (OtherAllocator& referencedAlloc)
+       : alloc (referencedAlloc) {}
+    
+      /// Allocate a block of memory of size \p n.
+      CS_ATTRIBUTE_MALLOC void* Alloc (const size_t n)
+      { return alloc.Alloc (n); }
+      /// Free the block \p p.
+      void Free (void* p) { alloc.Free (p); }
+      /// Resize the allocated block \p p to size \p newSize.
+      void* Realloc (void* p, size_t newSize)
+      { return alloc.Realloc (p, newSize); }
+      /// Set the information used for memory tracking.
+      void SetMemTrackerInfo (const char* info)
+      { alloc.SetMemTrackerInfo (info); }
+    };
   } // namespace Memory
 } // namespace CS
 

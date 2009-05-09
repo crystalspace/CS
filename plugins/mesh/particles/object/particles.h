@@ -311,8 +311,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     csRefArray<iParticleEffector> effectors;
   };
 
-#include "csutil/deprecated_warn_off.h"
-
   /**
   * Particle mesh object
   */
@@ -446,9 +444,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     {
       return mixMode;
     }
-
-    virtual void InvalidateMaterialHandles ()
-    {}
 
     virtual void PositionChild (iMeshObject* child,csTicks current_time)
     {}
@@ -718,9 +713,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     csRef<RenderBufferAccessor> renderBufferAccessor;
 
   };
-
-#include "csutil/deprecated_warn_on.h"
-
 }
 CS_PLUGIN_NAMESPACE_END(Particles)
 

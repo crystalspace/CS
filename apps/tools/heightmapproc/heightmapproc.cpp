@@ -62,8 +62,7 @@ void HeightMapProc::ReadHeightmap()
     return;
   }
 
-  csRef<iThreadReturn> ret = loader->LoadImage(path, CS_IMGFMT_ANY);
-  ret->Wait();
+  csRef<iThreadReturn> ret = loader->LoadImageWait(vfs->GetCwd(), path, CS_IMGFMT_ANY);
   image = scfQueryInterfaceSafe<iImage>(ret->GetResultRefPtr());
 
   if(!image.IsValid())

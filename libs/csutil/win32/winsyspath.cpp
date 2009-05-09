@@ -28,7 +28,7 @@
 #ifdef __CYGWIN__
 #include <sys/cygwin.h>
 #endif
-#include "cachedll.h"
+#include "csutil/win32/cachedll.h"
 
 typedef DWORD (STDAPICALLTYPE* PFNGETLONGPATHNAMEA) (LPCSTR lpszShortPath, 
 						     LPSTR lpszLongPath,

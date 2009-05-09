@@ -239,7 +239,7 @@ void WalkTest::Help ()
   csRef<iConfigManager> cfg (csQueryRegistry<iConfigManager> (object_reg));
   csPrintf ("Options for WalkTest:\n");
   csPrintf ("  -exec=<script>     execute given script at startup\n");
-  csPrintf ("  -threaded          use threaded loading (default no)\n");
+  csPrintf ("  -threaded          use threaded loading (default yes)\n");
   csPrintf ("  -[no]colldet       collision detection system (default '%scolldet')\n", collider_actor.HasCD () ? "" : "no");
   csPrintf ("  -[no]logo          draw logo (default '%slogo')\n", do_logo ? "" : "no");
   csPrintf ("  -[no]collections   load every map in a separate collection (default no)\n");
@@ -674,23 +674,17 @@ void WalkTest::InitCollDet (iEngine* engine, iCollection* collection)
 
 void WalkTest::LoadLibraryData (iCollection* collection)
 {
-  csRef<iThreadReturn> itr = LevelLoader->LoadTexture ("cslogo2", "/lib/std/cslogo2.png",
+  csRef<iTextureWrapper> tex = LevelLoader->LoadTexture ("cslogo2", "/lib/std/cslogo2.png",
     CS_TEXTURE_2D, 0, true, true, true, csRef<iCollection>(collection));
-  csRef<iThreadReturn> itr2 = LevelLoader->LoadLibraryFile ("/lib/std/library", collection);
-  
-  itr->Wait();
-  if(!itr->WasSuccessful())
+  if(!tex.IsValid())
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "logo failed to load!\n");
   }
 
-  itr2->Wait();
-  if(!itr2->WasSuccessful())
+  if(!LevelLoader->LoadLibraryFile ("/lib/std/library", collection))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "std library failed to load!\n");
   }
-
-  Engine->SyncEngineListsNow(LevelLoader);
 }
 
 bool WalkTest::Create2DSprites ()
@@ -957,9 +951,10 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   Engine->SetSaveableFlag (doSave);
 
   // Find the level loader plugin
-  LevelLoader = csQueryRegistry<iThreadedLoader>(object_reg);
+  LevelLoader = csQueryRegistry<iLoader>(object_reg);
+  TLevelLoader = csQueryRegistry<iThreadedLoader>(object_reg);
 
-  if (!LevelLoader)
+  if (!LevelLoader || !TLevelLoader)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No level loader plugin!");
     return false;
@@ -1036,15 +1031,15 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     {
       collection = Engine->CreateCollection (map->map_dir);
     }
-    csRef<iThreadReturn> ret = LevelLoader->LoadMapFile ("world", false, collection,
+
+    csRef<iThreadReturn> ret = TLevelLoader->LoadMapFileWait (myVFS->GetCwd(), "world", false, collection,
       0, 0, KEEP_ALL, cmdline->GetBoolOption("verbose", false));
-    ret->Wait();
+
     if(!ret->WasSuccessful())
     {
       Report (CS_REPORTER_SEVERITY_ERROR, "Failing to load map!");
       return false;
     }
-    Engine->SyncEngineListsNow(LevelLoader);
 
     if (do_collections)
     {

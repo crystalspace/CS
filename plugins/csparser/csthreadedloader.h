@@ -71,16 +71,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
                                                      Interface>
   {
   public:
-    csLoaderIterator(csRefArray<T>* objects, CS::Threading::Mutex* lock) :
+    csLoaderIterator(csRefArray<T>* objects, CS::Threading::ReadWriteMutex* lock) :
         scfImplementation1<csLoaderIterator<T, Interface>,
                            Interface> (this),
-        lock(*lock), objects(objects), itr(objects->GetIterator())
+        rwl(lock), lk(*lock), objects(objects), itr(objects->GetIterator())
         {
         }
 
         virtual ~csLoaderIterator()
         {
+          rwl->UpgradeUnlockAndWriteLock();
           objects->Empty();
+          rwl->WriteUnlockAndUpgradeLock();
         }
 
         T* Next()
@@ -94,25 +96,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         }
 
   private:
-    CS::Threading::MutexScopedLock lock;
+    CS::Threading::ReadWriteMutex* rwl;
+    CS::Threading::ScopedUpgradeableLock lk;
     csRefArray<T>* objects;
     typename csRefArray<T>::Iterator itr;
   };
 
   class csThreadedLoader : public ThreadedCallable<csThreadedLoader>,
-                           public scfImplementation3<csThreadedLoader,
+                           public scfImplementation2<csThreadedLoader,
                                                      iThreadedLoader,
-                                                     iComponent,
-                                                     iEventHandler>
+                                                     iComponent>
   {
-    typedef csThreadedLoader ThisType;
   public:
     csThreadedLoader(iBase *p);
     virtual ~csThreadedLoader();
-
-    bool HandleEvent(iEvent&);
-    CS_EVENTHANDLER_NAMES("crystalspace.level.loader.threaded")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
 
     virtual bool Initialize(iObjectRegistry *object_reg);
 
@@ -161,134 +158,166 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       return csPtr<iSharedVarLoaderIterator>(itr);
     }
 
-    THREADED_CALLABLE_DECL3(csThreadedLoader, LoadImage, csLoaderReturn, const char*, fname,
-      int, Format, bool, do_verbose, THREADED, false, false)
+    THREADED_CALLABLE_DECL4(csThreadedLoader, LoadImage, csLoaderReturn, const char*, cwd,
+      const char*, fname, int, Format, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL3(csThreadedLoader, LoadImage, csLoaderReturn, csRef<iDataBuffer>, buf,
-      int, Format, bool, do_verbose, THREADED, false, false)
+    THREADED_CALLABLE_DECL4(csThreadedLoader, LoadImage, csLoaderReturn, const char*, cwd,
+    csRef<iDataBuffer>, buf, int, Format, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL5(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, Filename,
+    THREADED_CALLABLE_DECL6(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, cwd, const char*, Filename,
     int, Flags, csRef<iTextureManager>, texman, csRef<iImage>*, image, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL5(csThreadedLoader, LoadTexture, csLoaderReturn, csRef<iDataBuffer>, buf,
+    THREADED_CALLABLE_DECL6(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, cwd, csRef<iDataBuffer>, buf,
     int, Flags, csRef<iTextureManager>, texman, csRef<iImage>*, image, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL8(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, Name,
+    THREADED_CALLABLE_DECL9(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, cwd, const char*, Name,
     csRef<iDataBuffer>, buf, int, Flags, csRef<iTextureManager>, texman, bool, reg, bool, create_material, bool,
     free_image, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL10(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, Name,
+    THREADED_CALLABLE_DECL11(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, cwd, const char*, Name,
     const char*, FileName, int, Flags, csRef<iTextureManager>, texman, bool, reg, bool, create_material,
     bool, free_image, csRef<iCollection>, collection, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL2(csThreadedLoader, LoadSoundSysData, csLoaderReturn, const char*, fname,
+    THREADED_CALLABLE_DECL3(csThreadedLoader, LoadSoundSysData, csLoaderReturn, const char*, cwd, const char*, fname,
     bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL3(csThreadedLoader, LoadSoundStream, csLoaderReturn, const char*, fname,
+    THREADED_CALLABLE_DECL4(csThreadedLoader, LoadSoundStream, csLoaderReturn, const char*, cwd, const char*, fname,
     int, mode3d, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL3(csThreadedLoader, LoadSoundWrapper, csLoaderReturn, const char*, name,
+    THREADED_CALLABLE_DECL4(csThreadedLoader, LoadSoundWrapper, csLoaderReturn, const char*, cwd, const char*, name,
     const char*, fname, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL3(csThreadedLoader, LoadMeshObjectFactory, csLoaderReturn, const char*, fname,
+    THREADED_CALLABLE_DECL4(csThreadedLoader, LoadMeshObjectFactory, csLoaderReturn, const char*, cwd, const char*, fname,
     csRef<iStreamSource>, ssource, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL3(csThreadedLoader, LoadMeshObject, csLoaderReturn, const char*, fname,
+    THREADED_CALLABLE_DECL4(csThreadedLoader, LoadMeshObject, csLoaderReturn, const char*, cwd, const char*, fname,
     csRef<iStreamSource>, ssource, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL3(csThreadedLoader, LoadShader, csLoaderReturn, const char*, filename,
+    THREADED_CALLABLE_DECL4(csThreadedLoader, LoadShader, csLoaderReturn, const char*, cwd, const char*, filename,
     bool, registerShader, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadMapFile, csLoaderReturn, const char*, filename,
+    THREADED_CALLABLE_DECL8(csThreadedLoader, LoadMapFile, csLoaderReturn, const char*, cwd, const char*, filename,
     bool, clearEngine, csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>,
     missingdata, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadMap, csLoaderReturn, csRef<iDocumentNode>, world_node,
+    THREADED_CALLABLE_DECL8(csThreadedLoader, LoadMap, csLoaderReturn, const char*, cwd, csRef<iDocumentNode>, world_node,
     bool, clearEngine, csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>,
     missingdata, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL6(csThreadedLoader, LoadLibraryFile, csLoaderReturn, const char*, filename,
+    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadLibraryFile, csLoaderReturn, const char*, cwd, const char*, filename,
     csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>, missingdata, uint,
     keepFlags, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL6(csThreadedLoader, LoadLibrary, csLoaderReturn, csRef<iDocumentNode>, lib_node,
+    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadLibrary, csLoaderReturn, const char*, cwd, csRef<iDocumentNode>, lib_node,
     csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>, missingdata, uint,
     keepFlags, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL6(csThreadedLoader, LoadFile, csLoaderReturn, const char*, fname,
+    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadFile, csLoaderReturn, const char*, cwd, const char*, fname,
     csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>, missingdata, uint,
     keepFlags, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL6(csThreadedLoader, LoadBuffer, csLoaderReturn, csRef<iDataBuffer>, buffer,
+    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadBuffer, csLoaderReturn, const char*, cwd, csRef<iDataBuffer>, buffer,
     csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>, missingdata, uint,
     keepFlags, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL6(csThreadedLoader, LoadNode, csLoaderReturn, csRef<iDocumentNode>,
+    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadNode, csLoaderReturn, const char*, cwd, csRef<iDocumentNode>,
     node, csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>,
     missingdata, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
     void AddSectorToList(iSector* obj)
     {
-      CS::Threading::MutexScopedLock lock(sectorsLock);
-      loaderSectors.Push(obj);
-      obj->DecRef(); // Compensate for CreateSector IncRef().
+      {
+        CS::Threading::ScopedWriteLock lock(sectorsLock);
+        loaderSectors.Push(obj);
+        obj->DecRef(); // Compensate for CreateSector IncRef().
+      }
+      MarkSyncNeeded();
     }
 
     void AddMeshFactToList(iMeshFactoryWrapper* obj)
     {
-      CS::Threading::MutexScopedLock lock(meshfactsLock);
-      loaderMeshFactories.Push(obj);
+      {
+        CS::Threading::ScopedWriteLock lock(meshfactsLock);
+        loaderMeshFactories.Push(obj);
+      }
+      MarkSyncNeeded();
     }
 
     void AddMeshToList(iMeshWrapper* obj)
     {
-      CS::Threading::MutexScopedLock lock(meshesLock);
-      loaderMeshes.Push(obj);
+      {
+        CS::Threading::ScopedWriteLock lock(meshesLock);
+        loaderMeshes.Push(obj);
+      }
+      MarkSyncNeeded();
     }
 
     void AddCamposToList(iCameraPosition* obj)
     {
-      CS::Threading::MutexScopedLock lock(camposLock);
-      loaderCameraPositions.Push(obj);
+      {
+        CS::Threading::ScopedWriteLock lock(camposLock);
+        loaderCameraPositions.Push(obj);
+      }
+      MarkSyncNeeded();
     }
 
     void AddTextureToList(iTextureWrapper* obj)
     {
-      CS::Threading::MutexScopedLock lock(texturesLock);
-      loaderTextures.Push(obj);
+      {
+        CS::Threading::ScopedWriteLock lock(texturesLock);
+        loaderTextures.Push(obj);
+      }
+      MarkSyncNeeded();
     }
 
     void AddMaterialToList(iMaterialWrapper* obj)
     {
-      CS::Threading::MutexScopedLock lock(materialsLock);
-      loaderMaterials.Push(obj);
+      {
+        CS::Threading::ScopedWriteLock lock(materialsLock);
+        loaderMaterials.Push(obj);
+      }
+      MarkSyncNeeded();
     }
 
     void AddSharedVarToList(iSharedVariable* obj)
     {
-      CS::Threading::MutexScopedLock lock(sharedvarLock);
-      loaderSharedVariables.Push(obj);
+      {
+        CS::Threading::ScopedWriteLock lock(sharedvarLock);
+        loaderSharedVariables.Push(obj);
+      }
+      MarkSyncNeeded();
     }
 
     void AddLightToList(iLight* obj, const char* name)
     {
-      CS::Threading::MutexScopedLock lock(lightsLock);
-      loadedLights.Put(csString(name), obj);
+      {
+        CS::Threading::ScopedWriteLock lock(lightsLock);
+        loadedLights.Put(csString(name), obj);
+      }
+      MarkSyncNeeded();
     }
+
+    void MarkSyncDone()
+    {
+      CS::Threading::ScopedWriteLock lock(listSyncLock);
+      listSync = false;
+    }
+
+    iVFS* GetVFS() const { return vfs; }
 
   protected:
 
     friend class csLoaderContext;
 
     // Shared lists and locks.
-    CS::Threading::Mutex sectorsLock;
-    CS::Threading::Mutex meshfactsLock;
-    CS::Threading::Mutex meshesLock;
-    CS::Threading::Mutex camposLock;
-    CS::Threading::Mutex texturesLock;
-    CS::Threading::Mutex materialsLock;
-    CS::Threading::Mutex sharedvarLock;
-    CS::Threading::Mutex lightsLock;
+    CS::Threading::ReadWriteMutex sectorsLock;
+    CS::Threading::ReadWriteMutex meshfactsLock;
+    CS::Threading::ReadWriteMutex meshesLock;
+    CS::Threading::ReadWriteMutex camposLock;
+    CS::Threading::ReadWriteMutex texturesLock;
+    CS::Threading::ReadWriteMutex materialsLock;
+    CS::Threading::ReadWriteMutex sharedvarLock;
+    CS::Threading::ReadWriteMutex lightsLock;
 
     // Final objects.
     csRefArray<iSector> loaderSectors;
@@ -315,7 +344,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     bool FindLoadedMeshObject(const char* name)
     {
-      CS::Threading::MutexScopedLock lock(meshesLock);
+      CS::Threading::ScopedReadLock lock(meshesLock);
       for(size_t i=0; i<loaderMeshes.GetSize(); i++)
       {
         if(csString(name).Compare(loaderMeshes[i]->QueryObject()->GetName()))
@@ -443,8 +472,31 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iSndSysManager> SndSysManager;
     // Sound renderer
     csRef<iSndSysRenderer> SndSysRenderer;
-    // Frame event.
-    csEventID ProcessPerFrame;
+
+    // For checking whether to schedule a engine list sync.
+    CS::Threading::ReadWriteMutex listSyncLock;
+    bool listSync;
+
+    void MarkSyncNeeded()
+    {
+      bool syncNow = false;
+      {
+        CS::Threading::ScopedUpgradeableLock sLock(listSyncLock);
+        if(!listSync)
+        {
+          listSyncLock.UpgradeUnlockAndWriteLock();
+          if(!listSync)
+          {
+            listSync = true;
+            syncNow = true;
+          }
+          listSyncLock.WriteUnlockAndUpgradeLock();
+        }
+      }
+
+      if(syncNow)
+        Engine->SyncEngineLists(this);
+    }
 
     // ----------------------------------------------- //
     struct ProxyKeyColour
@@ -480,7 +532,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool LoadProxyTextures(csSafeCopyArray<ProxyTexture> &proxyTextures,
       csWeakRefArray<iMaterialWrapper> &materialArray);
 
-    THREADED_CALLABLE_DECL6(csThreadedLoader, FindOrLoadMeshFactory, csLoaderReturn,csRef<iLoaderContext>,
+    THREADED_CALLABLE_DECL6(csThreadedLoader, FindOrLoadMeshFactory, csLoaderReturn, csRef<iLoaderContext>,
       ldr_context, csRef<iDocumentNode>, meshfactnode, csRef<iMeshFactoryWrapper>, parent,
       csReversibleTransform*, transf, csRef<iStreamSource>, ssource, const char*, path,
       THREADED, false, false);
@@ -511,10 +563,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     * The parent is not 0 if this mesh is going to be part of a hierarchical
     * mesh.
     */
-    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadMeshObject, csLoaderReturn,
+    THREADED_CALLABLE_DECL8(csThreadedLoader, LoadMeshObject, csLoaderReturn,
       csRef<iLoaderContext>, ldr_context, csRef<iMeshWrapper>, mesh, csRef<iMeshWrapper>, parent,
       csRef<iDocumentNode>, node, csRef<iStreamSource>, ssource, csRef<iSector>, sector, csString,
-      name, THREADED, false, false);
+      name, const char*, cwd, THREADED, false, false);
 
     THREADED_CALLABLE_DECL2(csThreadedLoader, AddObjectToSector, csLoaderReturn,
       csRef<iMovable>, movable, csRef<iSector>, sector, MED, false, false);

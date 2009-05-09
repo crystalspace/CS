@@ -788,7 +788,7 @@ namespace CS
  */
 struct iGraphics3D : public virtual iBase
 {
-  SCF_INTERFACE(iGraphics3D, 4, 0, 0);
+  SCF_INTERFACE(iGraphics3D, 4, 0, 1);
   
   /// Open the 3D graphics display.
   virtual bool Open () = 0;
@@ -1156,6 +1156,21 @@ struct iGraphics3D : public virtual iBase
   virtual void SetTextureComparisonModes (int* units, 
     CS::Graphics::TextureComparisonMode* texCompare,
     int count) = 0;
+  
+  /**
+   * Copy the contents of the given render target attachments to the specified
+   * textures.
+   * \param num Number of attachment/texture pairs.
+   * \param attachments Array of attachments from which to copy.
+   * \param textures Array of texture to copy to.
+   * \param subtextures Optional array of subtextures
+   *   (cube map faces/volume slices) to copy to. If none is given a
+   *   subtexture 0 is assumed for all targets.
+   */
+  virtual void CopyFromRenderTargets (size_t num, 
+    csRenderTargetAttachment* attachments,
+    iTextureHandle** textures,
+    int* subtextures = 0) = 0;
 };
 
 /** @} */

@@ -24,25 +24,61 @@
 
 struct iTextureHandle;
 
+/**
+ * Common render manager interface.
+ */
 struct iRenderManager : public virtual iBase
 {
   SCF_INTERFACE(iRenderManager,2,0,0);
 
+  /// Render the given view into the framebuffer.
   virtual bool RenderView (iView* view) = 0;
 };
 
+/**
+ * Interface for automatic view-to-texture rendering. Exposed by render
+ * managers which support this functionality.
+ */
 struct iRenderManagerTargets : public virtual iBase
 {
-  SCF_INTERFACE(iRenderManagerTargets,1,0,0);
+  SCF_INTERFACE(iRenderManagerTargets,1,0,1);
 
+  /// Flags for target registration
   enum TargetFlags
   {
-    updateOnce = 1
+    /// Only render to the target once
+    updateOnce = 1,
+    /**
+     * Assumes the target is used every frame - means it is rendered to
+     * every frame.
+     * \remark If this flag is set, but the texture is actually not used,
+     *   this is a waste of cycles. Consider manual marking with MarkAsUsed()
+     *   if the texture is only used some times.
+     */
+    assumeAlwaysUsed = 2
   };
+  /**
+   * Register a texture and view that should be rendered to the texture.
+   * The view is rendered automatically when the texture is used.
+   * \param target The texture to render to.
+   * \param view The view to render.
+   * \param subtexture The subtexture. Typically the face of a cube map
+   *   texture.
+   * \param flags Combination of TargetFlags.
+   * \remark If the combination \a target, \a subtexture was mapped to another
+   * view before that mapping is removed.
+   */
   virtual void RegisterRenderTarget (iTextureHandle* target, 
     iView* view, int subtexture = 0, uint flags = 0) = 0;
+  /// Unregister a texture to automatically render to.
   virtual void UnregisterRenderTarget (iTextureHandle* target,
     int subtexture = 0) = 0;
+  /**
+   * Manually mark a texture as used.
+   * Useful when the texture isn't used in the world itself (e.g. for HUD
+   * rendering) and thus is not detected as used by the render manager.
+   */
+  virtual void MarkAsUsed (iTextureHandle* target) = 0;
 };
 
 struct iRenderManagerPostEffects : public virtual iBase

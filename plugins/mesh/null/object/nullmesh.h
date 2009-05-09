@@ -76,8 +76,6 @@ private:
   csFlags factory_flags;
 };
 
-#include "csutil/deprecated_warn_off.h"
-
 /**
  * Nullmesh version of mesh object.
  */
@@ -145,7 +143,7 @@ public:
   virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
   virtual void SetMixMode (uint) { }
   virtual uint GetMixMode () const { return CS_FX_COPY; }
-  virtual void InvalidateMaterialHandles () { }
+
   /**
   * see imesh/object.h for specification. The default implementation
   * does nothing.
@@ -166,8 +164,6 @@ private:
   csBox3 box;
   csFlags object_flags;
 };
-
-#include "csutil/deprecated_warn_on.h"
 
 /**
  * Genmesh type. This is the plugin you have to use to create instances

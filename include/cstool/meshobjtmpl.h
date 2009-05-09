@@ -59,9 +59,6 @@ struct iMaterialWrapper;
     { return new factclass (Engine, object_reg, this); }                    \
   };
 
-// For InvalidateMaterialHandles
-#include "csutil/deprecated_warn_off.h"
-
 /**
  * This is an abstract implementation of iMeshObject. It can be used to
  * write custom mesh object implementations more easily. Currently it
@@ -228,12 +225,6 @@ public:
    * see imesh/object.h for specification. The default implementation
    * does nothing.
    */
-  virtual void InvalidateMaterialHandles () { }
-
-  /**
-   * see imesh/object.h for specification. The default implementation
-   * does nothing.
-   */
   virtual void PositionChild (iMeshObject* /*child*/,csTicks /*current_time*/) { }
 
   /**
@@ -271,8 +262,6 @@ public:
 
   virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 };
-
-#include "csutil/deprecated_warn_on.h"
 
 /**
  * This is the abstract implementation of iMeshObjectFactory. Like

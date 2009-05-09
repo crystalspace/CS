@@ -657,12 +657,14 @@ public:
   /**
    * Sync engine lists with loader lists.
    */
-  THREADED_CALLABLE_DECL2(csEngine, SyncEngineLists, csThreadReturn, csRef<iThreadedLoader>, loader, bool, runNow, LOW, false, true);
+  THREADED_CALLABLE_DECL1(csEngine, SyncEngineLists, csThreadReturn, csRef<iThreadedLoader>,
+    loader, LOW, false, true);
+
   void SyncEngineListsNow(csRef<iThreadedLoader> loader)
   {
     csRef<iThreadReturn> itr;
     itr.AttachNew(new csThreadReturn(tman));
-    SyncEngineListsTC(itr, loader, true);
+    SyncEngineListsTC(itr, false, loader);
   }
 
 private:

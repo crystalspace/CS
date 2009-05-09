@@ -114,7 +114,7 @@ struct iMeshObjectDrawCallback : virtual public iBase
  */
 struct iMeshObject : public virtual iBase
 {
-  SCF_INTERFACE(iMeshObject, 2,1,0);
+  SCF_INTERFACE(iMeshObject, 3,0,0);
   /**
    * Get the reference to the factory that created this mesh object.
    */
@@ -260,17 +260,6 @@ struct iMeshObject : public virtual iBase
   virtual void SetMixMode (uint mode) = 0;
   /// Get mix mode.
   virtual uint GetMixMode () const = 0;
-
-  /**
-   * Material changed. This is an 'event' that the engine (or another
-   * party managing materials) will send out as soon as the material
-   * handles are changed in some way which requires the mesh object
-   * to fetch it again (i.e. to call materialwrapper->GetMaterialHandle())
-   * again.
-   * \deprecated Deprecated in 1.3. Obsolete and unused.
-   */
-  CS_DEPRECATED_METHOD_MSG("Obsolete and unused.")
-  virtual void InvalidateMaterialHandles () = 0;
 
   /**
    * The engine asks this mesh object to place one of his hierarchical

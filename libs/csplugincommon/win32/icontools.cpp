@@ -27,6 +27,14 @@
 #include <windows.h>
 #include "csutil/win32/psdk-compat.h"
 
+/* HACK: The IDI_ values are macros defined to use MAKEINTRESOURCE.
+   MAKEINTRESOURCE is a cast to a string pointer; these can't be used as case
+   values in switches.
+   In order to nevertheless be able to use the IDI_ values in case labels
+   define MAKEINTRESOURCE to be a no-op. */
+#undef MAKEINTRESOURCE
+#define MAKEINTRESOURCE(X)      X
+
 namespace CS
 {
   namespace Platform
@@ -59,28 +67,28 @@ namespace CS
 	   (typically 32x32) and resizes uglily. */
 	switch (id)
 	{
-	  case uintptr_t(IDI_APPLICATION):  resID = 100; break;
-	  case uintptr_t(IDI_WARNING):      resID = 101; break;
-	  case uintptr_t(IDI_QUESTION):     resID = 102; break;
-	  case uintptr_t(IDI_ERROR):	    resID = 103; break;
-	  case uintptr_t(IDI_INFORMATION):  resID = 104; break;
-	  case uintptr_t(IDI_WINLOGO):      resID = 105; break;
-	  case uintptr_t(IDI_SHIELD):       resID = 106; break;
+	  case IDI_APPLICATION:  resID = 100; break;
+	  case IDI_WARNING:      resID = 101; break;
+	  case IDI_QUESTION:     resID = 102; break;
+	  case IDI_ERROR:        resID = 103; break;
+	  case IDI_INFORMATION:  resID = 104; break;
+	  case IDI_WINLOGO:      resID = 105; break;
+	  case IDI_SHIELD:       resID = 106; break;
 	  default: return 0;
 	}
 
 	HICON loadedIcon = 0;
 
-	void* groupData = GetResourceData (hUser32, MAKEINTRESOURCE(resID),
-	  RT_GROUP_ICON);
+	void* groupData = GetResourceData (hUser32, (TCHAR*)(uintptr_t)(resID),
+	  (TCHAR*)RT_GROUP_ICON);
 	if (groupData)
 	{
 	  int iconID = LookupIconIdFromDirectoryEx ((PBYTE)groupData, true, desiredSize, desiredSize, 0);
 	  if (iconID != 0)
 	  {
 	    DWORD iconDataSize;
-	    void* iconData = GetResourceData (hUser32, MAKEINTRESOURCE(iconID),
-	      RT_ICON, &iconDataSize);
+	    void* iconData = GetResourceData (hUser32, (const TCHAR*)(iconID),
+	      (TCHAR*)RT_ICON, &iconDataSize);
 	    if (iconData)
 	    {
 	      return CreateIconFromResourceEx ((PBYTE)iconData, iconDataSize, true,

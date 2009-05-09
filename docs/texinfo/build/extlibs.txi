@@ -76,11 +76,11 @@ location:
 
 @noindent
 @ifnottex
-@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-win32libs-1.3_004.exe}
+@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-win32libs-1.4_001.exe}
 @end ifnottex
 @iftex
 @code{http://www.crystalspace3d.org/downloads/cs-win32libs/}@*
-@code{cs-win32libs-1.3_004.exe}
+@code{cs-win32libs-1.4_001.exe}
 @end iftex
 
 @subheading zlib

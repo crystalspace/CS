@@ -20,6 +20,7 @@
 
 #include "iutil/databuff.h"
 #include "iutil/objreg.h"
+#include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
@@ -43,7 +44,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csThreadedLoader* cstldr = dynamic_cast<csThreadedLoader*>((iThreadedLoader*)loader);
       csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(object_reg);
       csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(tm));
-      cstldr->LoadImageTC (ret, filename, Format, false);
+      cstldr->LoadImageTC (ret, false, cstldr->GetVFS()->GetCwd(), filename, Format, false);
       img = scfQueryInterface<iImage>(ret->GetResultRefPtr());
 
       if (!img.IsValid())

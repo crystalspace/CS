@@ -41,7 +41,7 @@ csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationTyp
 
   // Have 'processor count' extra processing threads.
   size_t threadCountHalf = size_t (ceil (threadCount/2.0f));
-  threadQueue.AttachNew(new ThreadedJobQueue(threadCountHalf, THREAD_PRIO_NORMAL,
+  threadQueue.AttachNew(new ThreadedJobQueue(threadCountHalf, THREAD_PRIO_LOW,
     threadCount == 1 ? 0 : threadCountHalf));
   listQueue.AttachNew(new ListAccessQueue());
 
@@ -52,9 +52,7 @@ csThreadManager::csThreadManager(iObjectRegistry* objReg) : scfImplementationTyp
   if(eventQueue.IsValid())
   {
     ProcessPerFrame = csevFrame(objReg);
-    ProcessWhileWait = csevThreadWait(objReg);
     eventQueue->RegisterListener(tMEventHandler, ProcessPerFrame);
-    eventQueue->RegisterListener(tMEventHandler, ProcessWhileWait);
   }
 }
 
@@ -81,54 +79,88 @@ void csThreadManager::Process(uint num)
   listQueue->ProcessQueue(num);  
 }
 
-void csThreadManager::Wait(csRef<iThreadReturn> result)
-{
-  if(!result->IsFinished())
-  {
-    if(!IsMainThread())
-    {
-      AtomicOperations::Increment(&waiting);
-    }
-
-    while(!result->IsFinished())
-    {
-      if(IsMainThread())
-      {
-        csRef<iEvent> evt = eventQueue->CreateBroadcastEvent(ProcessWhileWait);
-        eventQueue->Dispatch(*evt);
-      }
-    }
-
-    if(!IsMainThread())
-    {
-      AtomicOperations::Decrement(&waiting);
-    }
-  }
-}
-
 bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns)
 {
   bool success = true;
 
+  if(!IsMainThread())
+  {
+    AtomicOperations::Increment(&waiting);
+  }
+
   while(threadReturns.GetSize() != 0)
   {
-    if(threadReturns[0]->IsFinished())
+    Condition* c;
+    Mutex* m;
+    if(IsMainThread())
     {
-      success &= threadReturns[0]->WasSuccessful();
-      threadReturns.DeleteIndexFast(0);
+      c = &waitingMain;
+      m = &waitingMainLock;
     }
     else
     {
+      c = new Condition();
+      m = new Mutex();
+    }
+
+    threadReturns[0]->SetWaitPtrs(c, m);
+
+    while(!threadReturns[0]->IsFinished())
+    {
       if(IsMainThread())
       {
-        csRef<iEvent> evt = eventQueue->CreateBroadcastEvent(ProcessWhileWait);
-        eventQueue->Dispatch(*evt);
+        MutexScopedLock lock(waitingMainLock);
+        if(listQueue->GetQueueCount() > 0)
+        {
+          waitingMainLock.Unlock();
+          listQueue->ProcessQueue(1);
+          waitingMainLock.Lock();
+        }
+        else
+        {
+          waitingMain.Wait(waitingMainLock);
+        }
       }
       else
       {
-        threadQueue->PopAndRun();
+        MutexScopedLock lock(waitingThreadsLock);
+        if(threadQueue->GetQueueCount() > 0)
+        {
+          waitingThreadsLock.Unlock();
+          threadQueue->PopAndRun();
+          waitingThreadsLock.Lock();
+        }
+        else
+        {
+          waitingThreads.Push(c);
+          waitingThreadsLock.Unlock();
+
+          {
+            MutexScopedLock lock(*m);
+            c->Wait(*m);
+          }
+
+          waitingThreadsLock.Lock();
+          waitingThreads.Delete(c);
+        }
       }
     }
+
+    threadReturns[0]->SetWaitPtrs(0, 0);
+
+    if(!IsMainThread())
+    {
+      delete c;
+      delete m;
+    }
+
+    success &= threadReturns[0]->WasSuccessful();
+    threadReturns.DeleteIndexFast(0);
+  }
+
+  if(!IsMainThread())
+  {
+    AtomicOperations::Decrement(&waiting);
   }
 
   return success;

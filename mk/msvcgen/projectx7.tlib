@@ -159,13 +159,13 @@
 
 [% MACRO linker_library_shared_release BLOCK -%]
                         OutputFile="[% path([my.doc.buildroot.0, library_dll_outfile('.dll')]) %]"
-				ImportLibrary="[% worklibout %]\[% platform.name %]\[% my.doc.project.0 %].lib"
+				ImportLibrary="[% worklibout %]\[% my.doc.project.0 %].lib"
 				ProgramDatabaseFile="[% workbuild([platform.name, '\\', library_dll_outfile('.pdb')]) %]"
 [% END %]
 
 [% MACRO linker_library_shared_debug BLOCK -%]
                         OutputFile="[% path([my.doc.buildroot.0, library_dll_outfile('_d.dll')]) %]"
-				ImportLibrary="[% worklibout %]\[% platform.name %]\[% my.doc.project.0 %]_d.lib"
+				ImportLibrary="[% worklibout %]\[% my.doc.project.0 %]_d.lib"
 				ProgramDatabaseFile="[% workbuild([platform.name, '\\', library_dll_outfile('_d.pdb')]) %]"
 [% END %]
 

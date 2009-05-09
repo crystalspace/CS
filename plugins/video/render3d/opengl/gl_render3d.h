@@ -649,6 +649,10 @@ public:
     int* subtexture = 0) const;
   void UnsetRenderTargets();
 
+  void CopyFromRenderTargets (size_t num, 
+    csRenderTargetAttachment* attachments,
+    iTextureHandle** textures,
+    int* subtextures = 0);
 
   /// Begin drawing in the renderer
   bool BeginDraw (int drawflags);

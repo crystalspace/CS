@@ -227,6 +227,36 @@ namespace RenderManager
     const char* GetFormat() const { return format; }
     /// Return flags of textures created by a cache
     int GetFlags() const { return textureFlags; }
+    /// Return class of textures created by a cache
+    const char* GetClass() const { return texClass; }
+    
+    /**
+     * Set format of textures created by a cache.
+     * \remark Will only affect newly created textures. Cache will be cleared.
+     */
+    void SetFormat (const char* format)
+    {
+      this->format = format;
+      Clear();
+    }
+    /**
+     * Set flags of textures created by a cache.
+     * \remark Will only affect newly created textures. Cache will be cleared.
+     */
+    void SetFlags (int flags)
+    {
+      textureFlags = flags;
+      Clear();
+    }
+    /**
+     * Set class of textures created by a cache.
+     * \remark Will only affect newly created textures. Cache will be cleared.
+     */
+    void SetClass (const char* texClass)
+    {
+      this->texClass = texClass;
+      Clear();
+    }
   private:
     csRef<iGraphics3D> g3d;
 

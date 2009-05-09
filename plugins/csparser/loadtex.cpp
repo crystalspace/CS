@@ -34,6 +34,7 @@
 #include "csgfx/shadervar.h"
 #include "csgfx/xorpat.h"
 #include "cstool/unusedresourcehelper.h"
+#include "cstool/vfsdirchange.h"
 #include "csutil/cscolor.h"
 #include "csutil/scfstr.h"
 #include "iengine/collection.h"
@@ -119,6 +120,7 @@ csPtr<iImage> csThreadedLoader::LoadImage (iDataBuffer* buf, const char* fname,
 
   if (!buf || !buf->GetSize ())
   {
+    printf("%s\n", vfs->GetCwd());
     ReportWarning (
       "crystalspace.maploader.parse.image",
       "Could not open image file '%s' on VFS!", fname ? fname : "<unknown>");
@@ -145,8 +147,11 @@ csPtr<iImage> csThreadedLoader::LoadImage (iDataBuffer* buf, const char* fname,
   return csPtr<iImage> (image);
 }
 
-THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadImage, const char* fname, int Format, bool do_verbose)
+THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadImage, const char* cwd, const char* fname, int Format, bool do_verbose)
 {
+  csVfsDirectoryChanger dirChange(vfs);
+  dirChange.ChangeToFull(cwd);
+
   csRef<iDataBuffer> buf = vfs->ReadFile (fname, false);
   csRef<iImage> image = LoadImage (buf, fname, Format, do_verbose);
   if(image.IsValid())
@@ -157,8 +162,11 @@ THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadImage, const char* fname, int Form
   return false;
 }
 
-THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadImage, csRef<iDataBuffer> buf, int Format, bool do_verbose)
+THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadImage, const char* cwd, csRef<iDataBuffer> buf, int Format, bool do_verbose)
 {
+  csVfsDirectoryChanger dirChange(vfs);
+  dirChange.ChangeToFull(cwd);
+
   csRef<iImage> image = LoadImage (buf, 0, Format, do_verbose);
   if(image.IsValid())
   {
@@ -168,9 +176,12 @@ THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadImage, csRef<iDataBuffer> buf, int
   return false;
 }
 
-THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadTexture, const char* fname,
+THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadTexture, const char* cwd, const char* fname,
   int Flags, csRef<iTextureManager> texman, csRef<iImage>* image, bool do_verbose)
 {
+  csVfsDirectoryChanger dirChange(vfs);
+  dirChange.ChangeToFull(cwd);
+
   if (!texman && g3d)
   {
     texman = g3d->GetTextureManager();
@@ -187,7 +198,7 @@ THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadTexture, const char* fname,
   }
 
   csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-  LoadImageTC (itr, fname, Format, do_verbose);
+  LoadImageTC (itr, false, vfs->GetCwd(), fname, Format, do_verbose);
   csRef<iImage> Image = scfQueryInterfaceSafe<iImage>(itr->GetResultRefPtr());
   if (!Image)
   {
@@ -224,9 +235,12 @@ THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadTexture, const char* fname,
   return true;
 }
 
-THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadTexture, csRef<iDataBuffer> buf, int Flags,
+THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadTexture, const char* cwd, csRef<iDataBuffer> buf, int Flags,
                         csRef<iTextureManager> texman, csRef<iImage>* image, bool do_verbose)
 {
+  csVfsDirectoryChanger dirChange(vfs);
+  dirChange.ChangeToFull(cwd);
+
   if (!texman && g3d)
   {
     texman = g3d->GetTextureManager();
@@ -275,13 +289,22 @@ THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadTexture, csRef<iDataBuffer> buf, i
   }
 
   ret->SetResult(csRef<iBase>(TexHandle));
+
+  if(sync)
+  {
+    Engine->SyncEngineListsWait(this);
+  }
+
   return true;
 }
 
-THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadTexture, const char* Name,
+THREADED_CALLABLE_IMPL9(csThreadedLoader, LoadTexture, const char* cwd, const char* Name,
                         csRef<iDataBuffer> buf, int Flags, csRef<iTextureManager> texman, bool reg, bool create_material,
                         bool free_image, bool do_verbose)
 {
+  csVfsDirectoryChanger dirChange(vfs);
+  dirChange.ChangeToFull(cwd);
+
   if (!texman && g3d)
   {
     texman = g3d->GetTextureManager();
@@ -289,7 +312,7 @@ THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadTexture, const char* Name,
 
   csRef<iImage> img;
   csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-  if (!LoadTextureTC (itr, buf, Flags, texman, &img, do_verbose))
+  if (!LoadTextureTC (itr, false, cwd, buf, Flags, texman, &img, do_verbose))
   {
     return false;
   }
@@ -321,13 +344,22 @@ THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadTexture, const char* Name,
   }
 
   ret->SetResult(csRef<iBase>(TexWrapper));
+
+  if(sync)
+  {
+    Engine->SyncEngineListsWait(this);
+  }
+
   return true;
 }
 
-THREADED_CALLABLE_IMPL10(csThreadedLoader, LoadTexture, const char* name,
+THREADED_CALLABLE_IMPL11(csThreadedLoader, LoadTexture, const char* cwd, const char* name,
                         const char* FileName, int Flags, csRef<iTextureManager> texman, bool reg, bool create_material,
                         bool free_image, csRef<iCollection> collection, uint keepFlags, bool do_verbose)
 {
+  csVfsDirectoryChanger dirChange(vfs);
+  dirChange.ChangeToFull(cwd);
+
   if (!texman && g3d)
   {
     texman = g3d->GetTextureManager();
@@ -335,7 +367,7 @@ THREADED_CALLABLE_IMPL10(csThreadedLoader, LoadTexture, const char* name,
 
   csRef<iImage> img;
   csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-  if (!LoadTextureTC (itr, FileName, Flags, texman, &img, do_verbose))
+  if (!LoadTextureTC (itr, false, cwd, FileName, Flags, texman, &img, do_verbose))
   {
     return false;
   }
@@ -375,6 +407,12 @@ THREADED_CALLABLE_IMPL10(csThreadedLoader, LoadTexture, const char* name,
   }
 
   ret->SetResult(csRef<iBase>(TexWrapper));
+
+  if(sync)
+  {
+    Engine->SyncEngineListsWait(this);
+  }
+
   return true;
 }
 
@@ -666,7 +704,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
             return 0;
           }
 
-          cstldr->LoadImageTC (ret, fname, Format, false);
+          cstldr->LoadImageTC (ret, false, cstldr->GetVFS()->GetCwd(), fname, Format, false);
           cube->SetSubImage (4, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
           break;
         }    
@@ -681,7 +719,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
               child, "Expected VFS filename for 'file'!");
             return 0;
           }
-          cstldr->LoadImageTC (ret, fname, Format, false);
+          cstldr->LoadImageTC (ret, false, cstldr->GetVFS()->GetCwd(), fname, Format, false);
           cube->SetSubImage (5, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
           break;
         }    
@@ -696,7 +734,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-  cstldr->LoadImageTC (ret, fname, Format, false);
+  cstldr->LoadImageTC (ret, false, cstldr->GetVFS()->GetCwd(), fname, Format, false);
 	cube->SetSubImage (0, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
         break;
     
@@ -711,7 +749,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-  cstldr->LoadImageTC (ret, fname, Format, false);
+  cstldr->LoadImageTC (ret, false, cstldr->GetVFS()->GetCwd(), fname, Format, false);
 	cube->SetSubImage (1, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
         break;
     
@@ -726,7 +764,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-  cstldr->LoadImageTC (ret, fname, Format, false);
+  cstldr->LoadImageTC (ret, false, cstldr->GetVFS()->GetCwd(), fname, Format, false);
 	cube->SetSubImage (2, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
         break;
     
@@ -741,7 +779,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-  cstldr->LoadImageTC (ret, fname, Format, false);
+  cstldr->LoadImageTC (ret, false, cstldr->GetVFS()->GetCwd(), fname, Format, false);
 	cube->SetSubImage (3, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
         break;
     }
@@ -834,7 +872,7 @@ csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-  cstldr->LoadImageTC (ret, fname, Format, false);
+  cstldr->LoadImageTC (ret, false, cstldr->GetVFS()->GetCwd(), fname, Format, false);
 	vol->AddImage (csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
         break;
     }

@@ -4796,6 +4796,7 @@ sub DESTROY {
 *SetResult = *cspacec::csLoaderReturn_SetResult;
 *Copy = *cspacec::csLoaderReturn_Copy;
 *Wait = *cspacec::csLoaderReturn_Wait;
+*SetWaitPtrs = *cspacec::csLoaderReturn_SetWaitPtrs;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -5061,6 +5062,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *AddTextureToList = *cspacec::iThreadedLoader_AddTextureToList;
 *AddMaterialToList = *cspacec::iThreadedLoader_AddMaterialToList;
 *AddSharedVarToList = *cspacec::iThreadedLoader_AddSharedVarToList;
+*MarkSyncDone = *cspacec::iThreadedLoader_MarkSyncDone;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -9780,6 +9782,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetProjectionMatrix = *cspacec::iGraphics3D_GetProjectionMatrix;
 *SetProjectionMatrix = *cspacec::iGraphics3D_SetProjectionMatrix;
 *SetTextureComparisonModes = *cspacec::iGraphics3D_SetTextureComparisonModes;
+*CopyFromRenderTargets = *cspacec::iGraphics3D_CopyFromRenderTargets;
 *scfGetVersion = *cspacec::iGraphics3D_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -16988,7 +16991,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetMaterialWrapper = *cspacec::iMeshObject_GetMaterialWrapper;
 *SetMixMode = *cspacec::iMeshObject_SetMixMode;
 *GetMixMode = *cspacec::iMeshObject_GetMixMode;
-*InvalidateMaterialHandles = *cspacec::iMeshObject_InvalidateMaterialHandles;
 *PositionChild = *cspacec::iMeshObject_PositionChild;
 *BuildDecal = *cspacec::iMeshObject_BuildDecal;
 *scfGetVersion = *cspacec::iMeshObject_scfGetVersion;
@@ -21140,8 +21142,10 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *updateOnce = *cspacec::iRenderManagerTargets_updateOnce;
+*assumeAlwaysUsed = *cspacec::iRenderManagerTargets_assumeAlwaysUsed;
 *RegisterRenderTarget = *cspacec::iRenderManagerTargets_RegisterRenderTarget;
 *UnregisterRenderTarget = *cspacec::iRenderManagerTargets_UnregisterRenderTarget;
+*MarkAsUsed = *cspacec::iRenderManagerTargets_MarkAsUsed;
 *scfGetVersion = *cspacec::iRenderManagerTargets_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

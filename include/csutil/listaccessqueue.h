@@ -76,14 +76,16 @@ public:
     }
   }
 
+  int32 GetQueueCount() const { return total; }
+
 private:
   inline void ProcessHighQueue(uint& i, uint& num)
   {
     CS::Threading::RecursiveMutexScopedLock lock(highQueueLock);
     for(; i<num && highqueue.GetSize() != 0; i++)
     {
-      highqueue.PopTop()->Run();
       CS::Threading::AtomicOperations::Decrement(&total);
+      highqueue.PopTop()->Run();
     }
   }
 
@@ -93,8 +95,8 @@ private:
     CS::Threading::RecursiveMutexScopedLock lock(medQueueLock);
     for(; i<num && medqueue.GetSize() != 0; i++)
     {
-      medqueue.PopTop()->Run();
       CS::Threading::AtomicOperations::Decrement(&total);
+      medqueue.PopTop()->Run();
       ProcessHighQueue(i, num);
     }
   }
@@ -105,8 +107,8 @@ private:
     CS::Threading::RecursiveMutexScopedLock lock(lowQueueLock);
     for(; i<num && lowqueue.GetSize() != 0; i++)
     {
-      lowqueue.PopTop()->Run();
       CS::Threading::AtomicOperations::Decrement(&total);
+      lowqueue.PopTop()->Run();
       ProcessHighQueue(i, num);
       ProcessMedQueue(i, num);
     }

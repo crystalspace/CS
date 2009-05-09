@@ -617,7 +617,8 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL
+ac_subst_vars='CRYSTAL_TOOLS_PREFIX
+SHELL
 PATH_SEPARATOR
 PACKAGE_NAME
 PACKAGE_TARNAME
@@ -1431,6 +1432,9 @@ Optional Features:
                           with caution; enabling this option may cause issues
                           when dynamically linking against other C++ modules.
                           (default NO)
+  --enable-universal-binary
+                          build Mac OS X universal binaries (default YES on
+                          Mac OS X with universal SDK installed, else NO)
   --enable-cpu-specific-optimizations=level
                           enable CPU-specific optimizations; recognized levels
                           are `no', `minimum' or `min', `maximum' or `max'
@@ -12086,7 +12090,328 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Check for SIMD flags
+# Determine host platform.  Recognized platforms: Unix, Windows, Mac OS X.
+# Recognized families: Unix, Windows.
+#------------------------------------------------------------------------------
+
+
+    case $host_cpu in
+        [Ii][3-9]86*|[Xx]86*) cs_host_cpu=x86 ;;
+        *) cs_host_cpu=$host_cpu ;;
+    esac
+    cs_host_cpu_normalized="`echo "$cs_host_cpu" | $as_tr_cpp`"
+    cs_build_prop_val="$cs_host_cpu_normalized"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}TARGET.PROCESSOR ?= $cs_build_prop_val ;
+"
+fi
+
+
+    cs_host_os_normalized=''
+    case $host_os in
+        mingw*|cygwin*)
+            cs_host_target=win32gcc
+            cs_host_family=windows
+            ;;
+        darwin*)
+
+
+
+
+cat >>confdefs.h <<\_ACEOF
+#define __CARBONSOUND__
+_ACEOF
+
+    { echo "$as_me:$LINENO: checking for Carbon/Carbon.h" >&5
+echo $ECHO_N "checking for Carbon/Carbon.h... $ECHO_C" >&6; }
+if test "${ac_cv_header_Carbon_Carbon_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+/* force compile */
+
+#include <Carbon/Carbon.h>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_cv_header_Carbon_Carbon_h=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_header_Carbon_Carbon_h=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_header_Carbon_Carbon_h" >&5
+echo "${ECHO_T}$ac_cv_header_Carbon_Carbon_h" >&6; }
+if test $ac_cv_header_Carbon_Carbon_h = yes; then
+  cs_host_macosx=yes
+else
+  cs_host_macosx=no
+fi
+
+
+
+    if test $cs_host_macosx = yes; then
+  { echo "$as_me:$LINENO: checking for --with-x" >&5
+echo $ECHO_N "checking for --with-x... $ECHO_C" >&6; }
+	if test "${with_x+set}" = set && test "$with_x" = "yes"; then
+  { echo "$as_me:$LINENO: result: yes (assume Darwin)" >&5
+echo "${ECHO_T}yes (assume Darwin)" >&6; }
+	    cs_host_macosx=no
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+fi
+
+
+    if test $cs_host_macosx = yes; then
+  cs_host_target=macosx
+	cs_host_family=unix
+	cs_host_os_normalized='MacOS/X'
+
+cat >>confdefs.h <<\_ACEOF
+#define CS_PLATFORM_MACOSX
+_ACEOF
+
+
+	{ echo "$as_me:$LINENO: checking for Objective-C compiler" >&5
+echo $ECHO_N "checking for Objective-C compiler... $ECHO_C" >&6; }
+if test "${cs_cv_prog_objc+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cs_cv_prog_objc="$CC"
+fi
+{ echo "$as_me:$LINENO: result: $cs_cv_prog_objc" >&5
+echo "${ECHO_T}$cs_cv_prog_objc" >&6; }
+	cs_build_prop_val="$cs_cv_prog_objc"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC ?= $cs_build_prop_val ;
+"
+fi
+
+	{ echo "$as_me:$LINENO: checking for Objective-C++ compiler" >&5
+echo $ECHO_N "checking for Objective-C++ compiler... $ECHO_C" >&6; }
+if test "${cs_cv_prog_objcxx+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cs_cv_prog_objcxx="$CXX"
+fi
+{ echo "$as_me:$LINENO: result: $cs_cv_prog_objcxx" >&5
+echo "${ECHO_T}$cs_cv_prog_objcxx" >&6; }
+	cs_build_prop_val="$cs_cv_prog_objcxx"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC++ ?= $cs_build_prop_val ;
+"
+fi
+
+else
+  cs_host_target=unix
+	cs_host_family=unix
+fi
+
+            if test "$cs_host_target" = macosx &&
+	   test "$cross_compiling" != yes &&
+	   test -d "/Developer/SDKs/MacOSX10.4u.sdk"; then
+  cs_universal_binary_default=yes
+else
+  cs_universal_binary_default=no
+fi
+
+    { echo "$as_me:$LINENO: checking whether to build universal binaries" >&5
+echo $ECHO_N "checking whether to build universal binaries... $ECHO_C" >&6; }
+    # Check whether --enable-universal-binary was given.
+if test "${enable_universal_binary+set}" = set; then
+  enableval=$enable_universal_binary; cs_universal_binary=$enableval
+else
+  cs_universal_binary=$cs_universal_binary_default
+fi
+
+    { echo "$as_me:$LINENO: result: $cs_universal_binary" >&5
+echo "${ECHO_T}$cs_universal_binary" >&6; }
+    if test "$cs_universal_binary" = yes; then
+
+cat >>confdefs.h <<\_ACEOF
+#define CS_UNIVERSAL_BINARY 1
+_ACEOF
+
+	CFLAGS="$CFLAGS -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch i386 -arch ppc "
+	CXXFLAGS="$CXXFLAGS -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch i386 -arch ppc "
+	LDFLAGS="$LDFLAGS -Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc "
+	cs_header_text="${cs_header_text}#define CS_UNIVERSAL_BINARY
+"
+	cs_build_prop_val="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch i386 -arch ppc "
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
+"
+fi
+
+	cs_build_prop_val="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch i386 -arch ppc "
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS += $cs_build_prop_val ;
+"
+fi
+
+	cs_build_prop_val="-Wl,-syslibroot,/Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc "
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += $cs_build_prop_val ;
+"
+fi
+
+fi
+
+            ;;
+        *)
+            # Everything else is assumed to be Unix or Unix-like.
+            cs_host_target=unix
+            cs_host_family=unix
+	    ;;
+    esac
+
+    case $cs_host_family in
+	windows)
+
+cat >>confdefs.h <<\_ACEOF
+#define CS_PLATFORM_WIN32
+_ACEOF
+
+	    if test -z "$cs_host_os_normalized"; then
+  cs_host_os_normalized='Win32'
+fi
+
+	    ;;
+	unix)
+
+cat >>confdefs.h <<\_ACEOF
+#define CS_PLATFORM_UNIX
+_ACEOF
+
+	    if test -z "$cs_host_os_normalized"; then
+  cs_host_os_normalized='Unix'
+fi
+
+	    ;;
+    esac
+
+    cs_host_os_normalized_uc="`echo "$cs_host_os_normalized" | $as_tr_cpp`"
+    cs_build_prop_val="$cs_host_os_normalized_uc"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS ?= $cs_build_prop_val ;
+"
+fi
+
+    cs_build_prop_val="$cs_host_os_normalized"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS.NORMALIZED ?= $cs_build_prop_val ;
+"
+fi
+
+
+
+case $cs_host_target in
+    macosx)
+        cs_header_text="${cs_header_text}#define CS_PLATFORM_MACOSX
+"
+        # Assume that CoreAudio is always available on Mac OS X.
+        cs_build_prop_val="yes"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COREAUDIO.AVAILABLE ?= $cs_build_prop_val ;
+"
+fi
+
+        cs_build_prop_val="-framework CoreAudio -framework AudioToolbox"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COREAUDIO.LFLAGS ?= $cs_build_prop_val ;
+"
+fi
+
+        # Processor-specific optimizations.
+        if test -n "$cs_cv_prog_cc_msse"; then
+  cs_build_prop_val="$cs_cv_prog_cc_msse"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
+"
+fi
+
+fi
+
+        if test -n "$cs_cv_prog_cc_msse2"; then
+  cs_build_prop_val="$cs_cv_prog_cc_msse2"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
+"
+fi
+
+fi
+
+        if test -n "$cs_cv_prog_cc_mfpmath_sse"; then
+  cs_build_prop_val="$cs_cv_prog_cc_mfpmath_sse"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
+"
+fi
+
+fi
+
+        ;;
+esac
+case $cs_host_family in
+    windows)
+	cs_header_text="${cs_header_text}#define CS_PLATFORM_WIN32
+"
+	;;
+    unix)
+	cs_header_text="${cs_header_text}#define CS_PLATFORM_UNIX
+"
+        ;;
+    esac
+cs_header_text="${cs_header_text}#define CS_PLATFORM_NAME \"$cs_host_os_normalized\"
+"
+
+
+
+#------------------------------------------------------------------------------
+# Check for SIMD flags. These checks are performed after CS_CHECK_HOST() since
+# CS_CHECK_HOST() may alter the build environment in a way which affects these
+# tests. For instance, these tests might be impacted on Mac OS X by a universal
+# binary build.
 #------------------------------------------------------------------------------
 { echo "$as_me:$LINENO: checking for -mmmx flag" >&5
 echo $ECHO_N "checking for -mmmx flag... $ECHO_C" >&6; }
@@ -13050,272 +13375,6 @@ fi
 
 fi
 
-
-
-
-#------------------------------------------------------------------------------
-# Determine host platform.  Recognized platforms: Unix, Windows, Mac OS X.
-# Recognized families: Unix, Windows.
-#
-# CS_CHECK_HOST
-#	Sets the shell variables cs_host_target and cs_host_family.  Client
-#	code can use these variables to emit appropriate Jam variables and
-#	CS_PLATFORM_FOO header define.
-#------------------------------------------------------------------------------
-
-
-    case $host_cpu in
-        [Ii][3-9]86*|[Xx]86*) cs_host_cpu=x86 ;;
-        *) cs_host_cpu=$host_cpu ;;
-    esac
-    cs_host_cpu_normalized="`echo "$cs_host_cpu" | $as_tr_cpp`"
-    cs_jamconfig_text="${cs_jamconfig_text}TARGET.PROCESSOR ?= $cs_host_cpu_normalized ;
-"
-
-    cs_host_os_normalized=''
-    case $host_os in
-        mingw*|cygwin*)
-            cs_host_target=win32gcc
-            cs_host_family=windows
-            ;;
-        darwin*)
-
-
-
-    # Both MacOS/X and Darwin are identified via $host_os as "darwin".  We need
-    # a way to distinguish between the two.  If Carbon.h is present, then
-    # assume MacOX/S; if not, assume Darwin.  If --with-x=yes was invoked, and
-    # Carbon.h is present, then assume that user wants to cross-build for
-    # Darwin even though build host is MacOS/X.
-    # IMPLEMENTATION NOTE *1*
-    # The QuickTime 7.0 installer removes <CarbonSound/CarbonSound.h>, which
-    # causes #include <Carbon/Carbon.h> to fail unconditionally. Re-installing
-    # the QuickTime SDK should restore the header, however not all developers
-    # know to do this, so we work around the problem of the missing
-    # CarbonSound.h by #defining __CARBONSOUND__ in the test in order to
-    # prevent Carbon.h from attempting to #include the missing header.
-    # IMPLEMENTATION NOTE *2*
-    # At least one MacOS/X user switches between gcc 2.95 and gcc 3.3 with a
-    # script which toggles the values of CC, CXX, and CPP.  Unfortunately, CPP
-    # was being set to run the preprocessor directly ("cpp", for instance)
-    # rather than running it via the compiler ("gcc -E", for instance).  The
-    # problem with running the preprocessor directly is that __APPLE__ and
-    # __GNUC__ are not defined, which causes the Carbon.h check to fail.  We
-    # avoid this problem by supplying a non-empty fourth argument to
-    # AC_CHECK_HEADER(), which causes it to test compile the header only (which
-    # is a more robust test), rather than also testing it via the preprocessor.
-
-
-cat >>confdefs.h <<\_ACEOF
-#define __CARBONSOUND__
-_ACEOF
-
-    { echo "$as_me:$LINENO: checking for Carbon/Carbon.h" >&5
-echo $ECHO_N "checking for Carbon/Carbon.h... $ECHO_C" >&6; }
-if test "${ac_cv_header_Carbon_Carbon_h+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-/* force compile */
-
-#include <Carbon/Carbon.h>
-_ACEOF
-rm -f conftest.$ac_objext
-if { (ac_try="$ac_compile"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_compile") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest.$ac_objext; then
-  ac_cv_header_Carbon_Carbon_h=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_cv_header_Carbon_Carbon_h=no
-fi
-
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-fi
-{ echo "$as_me:$LINENO: result: $ac_cv_header_Carbon_Carbon_h" >&5
-echo "${ECHO_T}$ac_cv_header_Carbon_Carbon_h" >&6; }
-if test $ac_cv_header_Carbon_Carbon_h = yes; then
-  cs_host_macosx=yes
-else
-  cs_host_macosx=no
-fi
-
-
-
-    if test $cs_host_macosx = yes; then
-  { echo "$as_me:$LINENO: checking for --with-x" >&5
-echo $ECHO_N "checking for --with-x... $ECHO_C" >&6; }
-	if test "${with_x+set}" = set && test "$with_x" = "yes"; then
-  { echo "$as_me:$LINENO: result: yes (assume Darwin)" >&5
-echo "${ECHO_T}yes (assume Darwin)" >&6; }
-	    cs_host_macosx=no
-else
-  { echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
-fi
-
-fi
-
-
-    if test $cs_host_macosx = yes; then
-  cs_host_target=macosx
-	cs_host_family=unix
-	cs_host_os_normalized='MacOS/X'
-
-cat >>confdefs.h <<\_ACEOF
-#define CS_PLATFORM_MACOSX
-_ACEOF
-
-
-	{ echo "$as_me:$LINENO: checking for Objective-C compiler" >&5
-echo $ECHO_N "checking for Objective-C compiler... $ECHO_C" >&6; }
-if test "${cs_cv_prog_objc+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cs_cv_prog_objc="$CC"
-fi
-{ echo "$as_me:$LINENO: result: $cs_cv_prog_objc" >&5
-echo "${ECHO_T}$cs_cv_prog_objc" >&6; }
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC ?= $cs_cv_prog_objc ;
-"
-	{ echo "$as_me:$LINENO: checking for Objective-C++ compiler" >&5
-echo $ECHO_N "checking for Objective-C++ compiler... $ECHO_C" >&6; }
-if test "${cs_cv_prog_objcxx+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cs_cv_prog_objcxx="$CXX"
-fi
-{ echo "$as_me:$LINENO: result: $cs_cv_prog_objcxx" >&5
-echo "${ECHO_T}$cs_cv_prog_objcxx" >&6; }
-	cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJC++ ?= $cs_cv_prog_objcxx ;
-"
-else
-  cs_host_target=unix
-	cs_host_family=unix
-fi
-
-            ;;
-        *)
-            # Everything else is assumed to be Unix or Unix-like.
-            cs_host_target=unix
-            cs_host_family=unix
-	    ;;
-    esac
-
-    case $cs_host_family in
-	windows)
-
-cat >>confdefs.h <<\_ACEOF
-#define CS_PLATFORM_WIN32
-_ACEOF
-
-	    if test -z "$cs_host_os_normalized"; then
-  cs_host_os_normalized='Win32'
-fi
-
-	    ;;
-	unix)
-
-cat >>confdefs.h <<\_ACEOF
-#define CS_PLATFORM_UNIX
-_ACEOF
-
-	    if test -z "$cs_host_os_normalized"; then
-  cs_host_os_normalized='Unix'
-fi
-
-	    ;;
-    esac
-
-    cs_host_os_normalized_uc="`echo "$cs_host_os_normalized" | $as_tr_cpp`"
-    cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS ?= $cs_host_os_normalized_uc ;
-"
-    cs_jamconfig_text="${cs_jamconfig_text}TARGET.OS.NORMALIZED ?= $cs_host_os_normalized ;
-"
-
-case $cs_host_target in
-    macosx)
-        # We assume that we always have CoreAudio available on MacOS/X.
-        cs_build_prop_val="yes"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    	        if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COREAUDIO.AVAILABLE ?= $cs_build_prop_val ;
-"
-fi
-
-        cs_build_prop_val="-framework CoreAudio -framework AudioToolbox"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    	        if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COREAUDIO.LFLAGS ?= $cs_build_prop_val ;
-"
-fi
-
-        cs_header_text="${cs_header_text}#define CS_PLATFORM_MACOSX
-"
-        if test -n "$cs_cv_prog_cc_msse"; then
-  cs_build_prop_val="$cs_cv_prog_cc_msse"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    	        if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
-"
-fi
-
-fi
-
-        if test -n "$cs_cv_prog_cc_msse2"; then
-  cs_build_prop_val="$cs_cv_prog_cc_msse2"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    	        if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
-"
-fi
-
-fi
-
-        if test -n "$cs_cv_prog_cc_mfpmath_sse"; then
-  cs_build_prop_val="$cs_cv_prog_cc_mfpmath_sse"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    	        if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
-"
-fi
-
-fi
-
-        ;;
-esac
-case $cs_host_family in
-    windows)
-	cs_header_text="${cs_header_text}#define CS_PLATFORM_WIN32
-"
-	;;
-    unix)
-	cs_header_text="${cs_header_text}#define CS_PLATFORM_UNIX
-"
-        ;;
-    esac
-cs_header_text="${cs_header_text}#define CS_PLATFORM_NAME \"$cs_host_os_normalized\"
-"
 
 
 
@@ -17095,9 +17154,7 @@ fi
 fi
 { echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_no_strict_aliasing_ok" >&5
 echo "${ECHO_T}$cs_cv_prog_cxx_no_strict_aliasing_ok" >&6; }
-
-
-if test $cs_cv_prog_cxx_no_strict_aliasing != no; then
+    if test "$cs_cv_prog_cxx_no_strict_aliasing_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_no_strict_aliasing"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then
@@ -48641,11 +48698,13 @@ fi
 fi
 
 
+
+
 #------------------------------------------------------------------------------
 # Check for Speex.  In addition to the standard installed locations, we
 # also search CS/libs/libspeex*
 #------------------------------------------------------------------------------
-if test $cs_cv_libogg = yes; then
+if test "$cs_cv_libogg" = yes; then
 
 # Check whether --with-speex was given.
 if test "${with_speex+set}" = set; then
@@ -49466,10 +49525,7 @@ fi
 fi
 
 
-#------------------------------------------------------------------------------
-# Check for speex_header_free().
-#------------------------------------------------------------------------------
-if test $cs_cv_libspeex = yes; then
+if test "$cs_cv_libspeex" = yes; then
   if test "" != yes; then
   { echo "$as_me:$LINENO: checking for speex_header_free()" >&5
 echo $ECHO_N "checking for speex_header_free()... $ECHO_C" >&6; }
@@ -49783,6 +49839,8 @@ else
 fi
 
 fi
+
+
 
 
 #------------------------------------------------------------------------------
@@ -59154,7 +59212,169 @@ fi
 
 
 if test $cs_cv_libwx = yes; then
-  if test -z "$cs_cv_libwx_opengl"; then
+  if test $cs_host_family = windows; then
+  { echo "$as_me:$LINENO: checking if defining UNICODE is needed for WX" >&5
+echo $ECHO_N "checking if defining UNICODE is needed for WX... $ECHO_C" >&6; }
+if test "${cs_cv_libwx_needs_UNICODE+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    cs_cflags_save="$CXXFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @$cs_cv_libwx_cflags@$cs_cv_libwx_lflags@$cs_cv_libwx_libs   $cs_cv_libwx_gllibs | sed 'y% %#%'` \
+		`echo @$cs_cv_libwx_cflags $cs_cv_libglu_cflags@$cs_cv_libwx_lflags $cs_cv_libglu_lflags@$cs_cv_libwx_libs   $cs_cv_libglu_libs | sed 'y% %#%'`  \
+		`echo @$cs_cv_libwx_cflags $cs_cv_libglu_cflags@$cs_cv_libwx_lflags $cs_cv_libglu_lflags@$cs_cv_libwx_libs   $cs_cv_libwx_gllibs $cs_cv_libglu_libs | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CXXFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <windows.h>
+		    #include "wx/wxprec.h"
+		    #ifdef __BORLANDC__
+		    #pragma hdrstop
+		    #endif
+		    #ifndef WX_PRECOMP
+		    #include "wx/wx.h"
+		    #endif
+
+int
+main ()
+{
+wxString s
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_cxx_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CXXFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libwx_needs_UNICODE=no
+else
+  cs_cv_libwx_cflags="$cs_cv_libwx_cflags -DUNICODE -D_UNICODE"
+		cs_cv_libwx_needs_UNICODE=yes
+fi
+
+fi
+{ echo "$as_me:$LINENO: result: $cs_cv_libwx_needs_UNICODE" >&5
+echo "${ECHO_T}$cs_cv_libwx_needs_UNICODE" >&6; }
+fi
+
+    if test -z "$cs_cv_libwx_opengl"; then
   if test -n "$CONFIG_WX"; then
   cs_cv_libwx_gllibs=`{ (echo "$as_me:$LINENO: \$CONFIG_WX --gl-libs") >&5
   ($CONFIG_WX --gl-libs) 2>&5
@@ -75379,32 +75599,21 @@ cs_header_text="${cs_header_text}#define CS_LONG_SIZE $ac_cv_sizeof_long
 
 #------------------------------------------------------------------------------
 # Determine host CPU.
-#
-# CS_CHECK_HOST_CPU
-#	Set the shell variable cs_host_cpu to a normalized form of the CPU name
-#	returned by config.guess/config.sub.  Also takes the normalized name,
-#	uppercases and appends it to the string "CS_PROCESSOR_" to form a name
-#	suitable for the C preprocessor.  Assigns this value to the shell
-#	variable cs_host_cpu_cpp_define.  Typically, Crystal Space's conception
-#	of CPU name is the same as that returned by config.guess/config.sub,
-#	but there may be exceptions as seen in the `case' statement.
 #------------------------------------------------------------------------------
 
-
-
     case $host_cpu in
-	[Ii][3-9]86*|[Xx]86*) cs_host_cpu=x86 ;;
-	powerpc*) cs_host_cpu=powerpc ;;
-	sparc*) cs_host_cpu=sparc ;;
-	*) cs_host_cpu=$host_cpu ;;
+        [Ii][3-9]86*|[Xx]86*) cs_host_cpu=x86 ;;
+        *) cs_host_cpu=$host_cpu ;;
     esac
     cs_host_cpu_normalized="`echo "$cs_host_cpu" | $as_tr_cpp`"
-cs_build_prop_val="$cs_host_cpu_normalized"
+    cs_build_prop_val="$cs_host_cpu_normalized"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}TARGET.PROCESSOR ?= $cs_build_prop_val ;
 "
 fi
+
+
 
 cs_header_text="${cs_header_text}#define CS_PROCESSOR_$cs_host_cpu_normalized
 "
@@ -88599,6 +88808,7 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+CRYSTAL_TOOLS_PREFIX!$CRYSTAL_TOOLS_PREFIX$ac_delim
 SHELL!$SHELL$ac_delim
 PATH_SEPARATOR!$PATH_SEPARATOR$ac_delim
 PACKAGE_NAME!$PACKAGE_NAME$ac_delim
@@ -88695,7 +88905,6 @@ BISON!$BISON$ac_delim
 HHC!$HHC$ac_delim
 ac_ct_HHC!$ac_ct_HHC$ac_delim
 SWIG!$SWIG$ac_delim
-RSVG!$RSVG$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -88737,6 +88946,7 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+RSVG!$RSVG$ac_delim
 ICOTOOL!$ICOTOOL$ac_delim
 CONVERT!$CONVERT$ac_delim
 RELAYTOOL!$RELAYTOOL$ac_delim
@@ -88833,7 +89043,6 @@ CONFIG_GTK!$CONFIG_GTK$ac_delim
 ac_ct_CONFIG_GTK!$ac_ct_CONFIG_GTK$ac_delim
 CONFIG_GTKP_2_0!$CONFIG_GTKP_2_0$ac_delim
 ac_ct_CONFIG_GTKP_2_0!$ac_ct_CONFIG_GTKP_2_0$ac_delim
-CONFIG_CG!$CONFIG_CG$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -88875,6 +89084,7 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+CONFIG_CG!$CONFIG_CG$ac_delim
 ac_ct_CONFIG_CG!$ac_ct_CONFIG_CG$ac_delim
 CONFIG_CGGL!$CONFIG_CGGL$ac_delim
 ac_ct_CONFIG_CGGL!$ac_ct_CONFIG_CGGL$ac_delim
@@ -88891,7 +89101,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 14; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 15; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

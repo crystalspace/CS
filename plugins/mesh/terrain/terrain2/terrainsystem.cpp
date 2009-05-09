@@ -594,10 +594,6 @@ bool csTerrainSystem::HitBeamObject (const csVector3& start,
   return HitBeamOutline (start, end, isect, pr);
 }
 
-void csTerrainSystem::InvalidateMaterialHandles ()
-{
-}
-
 csColliderType csTerrainSystem::GetColliderType ()
 {
   return CS_TERRAIN_COLLIDER;

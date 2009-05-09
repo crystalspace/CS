@@ -23,7 +23,7 @@
 #include "csutil/array.h"
 #include "csutil/csstring.h"
 #include "csutil/ref.h"
-#include "csutil/threading/mutex.h"
+#include "csutil/threading/rwmutex.h"
 #include "imap/reader.h"
 #include "iutil/document.h"
 
@@ -90,7 +90,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   private:
     /// Mutex to make the plugin vector thread-safe.
-    CS::Threading::RecursiveMutex mutex;
+    CS::Threading::ReadWriteMutex mutex;
+
     iObjectRegistry* object_reg;
 
     csArray<csLoaderPluginRec*> vector;

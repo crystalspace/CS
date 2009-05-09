@@ -112,7 +112,7 @@ namespace Utility
 	  return false;
 
 	csLoadResult rc = loader->Load (doc->GetRoot(), loadCollection);
-	if (!rc.success)
+  if (!rc.success)
 	  return false;
       }
 

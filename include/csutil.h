@@ -152,6 +152,7 @@
 #include "csutil/threading/barrier.h"
 #include "csutil/threading/condition.h"
 #include "csutil/threading/mutex.h"
+#include "csutil/threading/rwmutex.h"
 #include "csutil/threading/thread.h"
 #include "csutil/threading/tls.h"
 #include "csutil/threadjobqueue.h"

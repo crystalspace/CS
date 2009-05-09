@@ -28,96 +28,99 @@ namespace CS
 {
   namespace RenderManager
   {
-#define AFRRBPD   AutoFX_ReflectRefract_Base::PersistentData
+    namespace AutoFX
+    {
+#define RRBPD   ReflectRefract_Base::PersistentData
   
-    AFRRBPD::PersistentData() :
-      currentFrame (0),
-      texCache (csimg2D, "rgb8",  // @@@ FIXME: Use same format as main view ...
-	CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP
-	  | CS_TEXTURE_NPOTS | CS_TEXTURE_CLAMP | CS_TEXTURE_SCALE_UP,
-	"target", 0,
-	CS::Utility::ResourceCache::ReuseIfOnlyOneRef ()),
-      texCacheDepth (csimg2D, "d32",
-	CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP
-	  | CS_TEXTURE_NPOTS | CS_TEXTURE_CLAMP | CS_TEXTURE_SCALE_UP | CS_TEXTURE_NOFILTER,
-	"target", 0,
-	CS::Utility::ResourceCache::ReuseIfOnlyOneRef ())
-    {
-    }
-
-    void AFRRBPD::Initialize (iObjectRegistry* objReg,
-		              RenderTreeBase::DebugPersistent& dbgPersist,
-		              PostEffectManager* postEffects)
-    {
-      dbgReflRefrTex = dbgPersist.RegisterDebugFlag ("textures.reflrefr");
-    
-      csRef<iShaderManager> shaderManager =
-	csQueryRegistry<iShaderManager> (objReg);
-      
-      iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
-      svTexPlaneRefl = strings->Request ("tex plane reflect");
-      svTexPlaneRefr = strings->Request ("tex plane refract");
-      svTexPlaneReflDepth = strings->Request ("tex plane reflect depth");
-      svTexPlaneRefrDepth = strings->Request ("tex plane refract depth");
-      
-      svPlaneRefl = strings->Request ("plane reflection");
-      svClipPlaneReflRefr = strings->Request ("clip plane reflection");
-      
-      csConfigAccess config (objReg);
-      resolutionReduceRefl = config->GetInt (
-	"RenderManager.Reflections.Downsample", 1);
-      resolutionReduceRefr = config->GetInt (
-	"RenderManager.Refractions.Downsample", resolutionReduceRefl);
-      texUpdateInterval = config->GetInt (
-	"RenderManager.Reflections.UpdateInterval", 0);
-      maxUpdatesPerFrame = config->GetInt (
-	"RenderManager.Reflections.MaxUpdatesPerFrame", 0);
-      mappingStretch = config->GetFloat (
-	"RenderManager.Reflections.MappingStretch", 1.0f);
-      cameraChangeThresh = config->GetFloat (
-	"RenderManager.Reflections.CameraChangeThreshold", 0.01f);
-      
-      svReflXform = strings->Request ("reflection coord xform");
-      reflXformSV.AttachNew (new csShaderVariable (svReflXform));
-      screenFlipped = postEffects ? postEffects->ScreenSpaceYFlipped() : false;
-	
-      csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objReg);
-      texCache.SetG3D (g3d);
-      texCacheDepth.SetG3D (g3d);
-    }
-
-    void AFRRBPD::UpdateNewFrame ()
-    {
-      csTicks currentTicks = csGetTicks ();
-      ReflRefrCache::GlobalIterator reflRefrIt (
-	reflRefrCache.GetIterator ());
-      while (reflRefrIt.HasNext())
+      RRBPD::PersistentData() :
+	currentFrame (0),
+	texCache (csimg2D, "rgb8",  // @@@ FIXME: Use same format as main view ...
+	  CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP
+	    | CS_TEXTURE_NPOTS | CS_TEXTURE_CLAMP | CS_TEXTURE_SCALE_UP,
+	  "target", 0,
+	  CS::Utility::ResourceCache::ReuseIfOnlyOneRef ()),
+	texCacheDepth (csimg2D, "d32",
+	  CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP
+	    | CS_TEXTURE_NPOTS | CS_TEXTURE_CLAMP | CS_TEXTURE_SCALE_UP | CS_TEXTURE_NOFILTER,
+	  "target", 0,
+	  CS::Utility::ResourceCache::ReuseIfOnlyOneRef ())
       {
-	ReflectRefractSVs& meshReflectRefract = reflRefrIt.NextNoAdvance();
-	// Don't remove if update interval hasn't passed yet
-	if ((texUpdateInterval > 0)
-	  && ((currentTicks - meshReflectRefract.lastUpdate) <=
-	    texUpdateInterval))
-	{
-	  reflRefrIt.Next();
-	  continue;
-	}
-	// Don't remove if not in line for round-robin update
-	if ((maxUpdatesPerFrame > 0)
-	  && (currentFrame - meshReflectRefract.lastUpdateFrame < 
-	    ((reflRefrCache.GetSize()+maxUpdatesPerFrame-1) / maxUpdatesPerFrame)))
-	{
-	  reflRefrIt.Next();
-	  continue;
-	}
-	reflRefrCache.DeleteElement (reflRefrIt);
       }
+  
+      void RRBPD::Initialize (iObjectRegistry* objReg,
+				RenderTreeBase::DebugPersistent& dbgPersist,
+				PostEffectManager* postEffects)
+      {
+	dbgReflRefrTex = dbgPersist.RegisterDebugFlag ("textures.reflrefr");
       
-      currentFrame++;
-      updatesThisFrame = 0;
-    
-      texCache.AdvanceFrame (currentTicks);
-      texCacheDepth.AdvanceFrame (currentTicks);
-    }
+	csRef<iShaderManager> shaderManager =
+	  csQueryRegistry<iShaderManager> (objReg);
+	
+	iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
+	svTexPlaneRefl = strings->Request ("tex plane reflect");
+	svTexPlaneRefr = strings->Request ("tex plane refract");
+	svTexPlaneReflDepth = strings->Request ("tex plane reflect depth");
+	svTexPlaneRefrDepth = strings->Request ("tex plane refract depth");
+	
+	svPlaneRefl = strings->Request ("plane reflection");
+	svClipPlaneReflRefr = strings->Request ("clip plane reflection");
+	
+	csConfigAccess config (objReg);
+	resolutionReduceRefl = config->GetInt (
+	  "RenderManager.Reflections.Downsample", 1);
+	resolutionReduceRefr = config->GetInt (
+	  "RenderManager.Refractions.Downsample", resolutionReduceRefl);
+	texUpdateInterval = config->GetInt (
+	  "RenderManager.Reflections.UpdateInterval", 0);
+	maxUpdatesPerFrame = config->GetInt (
+	  "RenderManager.Reflections.MaxUpdatesPerFrame", 0);
+	mappingStretch = config->GetFloat (
+	  "RenderManager.Reflections.MappingStretch", 1.0f);
+	cameraChangeThresh = config->GetFloat (
+	  "RenderManager.Reflections.CameraChangeThreshold", 0.01f);
+	
+	svReflXform = strings->Request ("reflection coord xform");
+	reflXformSV.AttachNew (new csShaderVariable (svReflXform));
+	screenFlipped = postEffects ? postEffects->ScreenSpaceYFlipped() : false;
+	  
+	csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objReg);
+	texCache.SetG3D (g3d);
+	texCacheDepth.SetG3D (g3d);
+      }
+  
+      void RRBPD::UpdateNewFrame ()
+      {
+	csTicks currentTicks = csGetTicks ();
+	ReflRefrCache::GlobalIterator reflRefrIt (
+	  reflRefrCache.GetIterator ());
+	while (reflRefrIt.HasNext())
+	{
+	  ReflectRefractSVs& meshReflectRefract = reflRefrIt.NextNoAdvance();
+	  // Don't remove if update interval hasn't passed yet
+	  if ((texUpdateInterval > 0)
+	    && ((currentTicks - meshReflectRefract.lastUpdate) <=
+	      texUpdateInterval))
+	  {
+	    reflRefrIt.Next();
+	    continue;
+	  }
+	  // Don't remove if not in line for round-robin update
+	  if ((maxUpdatesPerFrame > 0)
+	    && (currentFrame - meshReflectRefract.lastUpdateFrame < 
+	      ((reflRefrCache.GetSize()+maxUpdatesPerFrame-1) / maxUpdatesPerFrame)))
+	  {
+	    reflRefrIt.Next();
+	    continue;
+	  }
+	  reflRefrCache.DeleteElement (reflRefrIt);
+	}
+	
+	currentFrame++;
+	updatesThisFrame = 0;
+      
+	texCache.AdvanceFrame (currentTicks);
+	texCacheDepth.AdvanceFrame (currentTicks);
+      }
+    } // namespace AutoFX
   } // namespace RenderManager
 } // namespace CS

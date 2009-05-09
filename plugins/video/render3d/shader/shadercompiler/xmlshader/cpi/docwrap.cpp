@@ -682,7 +682,7 @@ static void GetNextArg (const char*& p, TempString<>& arg)
 
 struct WrapperStackEntry
 {
-  csWrappedDocumentNode::WrappedChild* child;
+  csRef<csWrappedDocumentNode::WrappedChild> child;
 
   WrapperStackEntry () : child (0) {}
 };
@@ -733,7 +733,7 @@ void csWrappedDocumentNode::ParseCondition (WrapperStackEntry& newWrapper,
 					    size_t condLen, 
 					    iDocumentNode* node)
 {
-  newWrapper.child = new WrappedChild;
+  newWrapper.child.AttachNew (new WrappedChild);
   const char* result = resolver->ParseCondition (cond,
     condLen, newWrapper.child->condition);
   if (result)
@@ -755,9 +755,9 @@ void csWrappedDocumentNode::CreateElseWrapper (NodeProcessingState* state,
   WrapperStackEntry oldCurrentWrapper = state->currentWrapper;
   state->currentWrapper = state->wrapperStack.Pop ();
   elseWrapper = oldCurrentWrapper;
-  elseWrapper.child = new WrappedChild;
+  elseWrapper.child.AttachNew (new WrappedChild);
   elseWrapper.child->condition = oldCurrentWrapper.child->condition;
-  elseWrapper.child->conditionValue = false;
+  elseWrapper.child->SetConditionValue (false);
   
   if (!oldCurrentWrapper.child->childNode.IsValid()
       && (oldCurrentWrapper.child->childrenWrappers.GetSize() == 0))
@@ -1343,9 +1343,9 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
               csConditionID condition = newWrapper.child->condition;
               // If the parent condition is always false, so is this
               if ((((currentWrapper.child->condition == csCondAlwaysFalse)
-                && (currentWrapper.child->conditionValue == true))
+                && (currentWrapper.child->GetConditionValue() == true))
                   || ((currentWrapper.child->condition == csCondAlwaysTrue)
-                && (currentWrapper.child->conditionValue == false))))
+                && (currentWrapper.child->GetConditionValue() == false))))
               {
                 condition = csCondAlwaysFalse;
               }
@@ -1466,9 +1466,9 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
                 csConditionID condition = newWrapper.child->condition;
                 // If the parent condition is always false, so is this
                 if ((((currentWrapper.child->condition == csCondAlwaysFalse)
-                  && (currentWrapper.child->conditionValue == true))
+                  && (currentWrapper.child->GetConditionValue() == true))
                     || ((currentWrapper.child->condition == csCondAlwaysTrue)
-                  && (currentWrapper.child->conditionValue == false))))
+                  && (currentWrapper.child->GetConditionValue() == false))))
                 {
                   condition = csCondAlwaysFalse;
                 }
@@ -1702,12 +1702,13 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
   }
   if (!handled
     && !(((currentWrapper.child->condition == csCondAlwaysFalse)
-        && (currentWrapper.child->conditionValue == true))
+        && (currentWrapper.child->GetConditionValue() == true))
       || ((currentWrapper.child->condition == csCondAlwaysTrue)
-        && (currentWrapper.child->conditionValue == false))))
+        && (currentWrapper.child->GetConditionValue() == false))))
   {
     eval.Commit();
-    WrappedChild* newWrapper = new WrappedChild;
+    csRef<WrappedChild> newWrapper;
+    newWrapper.AttachNew (new WrappedChild);
     if (parseOpts & wdnfpoOnlyOneLevelConditions)
     {
       parseOpts &= ~wdnfpoHandleConditions;
@@ -1743,7 +1744,7 @@ template<typename T>
 void csWrappedDocumentNode::ProcessWrappedNode (T& eval, uint parseOpts)
 {
   NodeProcessingState state;
-  state.currentWrapper.child = new WrappedChild;
+  state.currentWrapper.child.AttachNew (new WrappedChild);
   wrappedChildren.Push (state.currentWrapper.child);
   ProcessWrappedNode (eval, &state, wrappedNode, parseOpts);
 }
@@ -2122,7 +2123,7 @@ enum
 };
 
 bool csWrappedDocumentNode::StoreWrappedChildren (iFile* file, 
-  ForeignNodeStorage& foreignNodes, const csPDelArray<WrappedChild>& children,
+  ForeignNodeStorage& foreignNodes, const csRefArray<WrappedChild>& children,
   const ConditionsWriter& condWriter)
 {
   uint32 numChildrenLE = csLittleEndian::UInt32 (children.GetSize());
@@ -2132,7 +2133,7 @@ bool csWrappedDocumentNode::StoreWrappedChildren (iFile* file,
   for (size_t i = 0; i < children.GetSize(); i++)
   {
     uint32 flags = 0;
-    if (children[i]->conditionValue) flags |= childValue;
+    if (children[i]->GetConditionValue()) flags |= childValue;
     
     csRef<iWrappedDocumentNode> wrapper;
     if (!children[i]->childNode.IsValid())
@@ -2169,7 +2170,7 @@ bool csWrappedDocumentNode::StoreWrappedChildren (iFile* file,
 }
   
 void csWrappedDocumentNode::CollectUsedConditions (
-  const csPDelArray<WrappedChild>& children, ConditionsWriter& condWriter)
+  const csRefArray<WrappedChild>& children, ConditionsWriter& condWriter)
 {
   for (size_t i = 0; i < children.GetSize(); i++)
   {
@@ -2191,7 +2192,7 @@ void csWrappedDocumentNode::CollectUsedConditions (
 }
 
 bool csWrappedDocumentNode::ReadWrappedChildren (iFile* file,
-  ForeignNodeReader& foreignNodes, csPDelArray<WrappedChild>& children,
+  ForeignNodeReader& foreignNodes, csRefArray<WrappedChild>& children,
   const ConditionsReader& condReader)
 {
   uint32 numChildrenLE;
@@ -2207,8 +2208,9 @@ bool csWrappedDocumentNode::ReadWrappedChildren (iFile* file,
 	!= sizeof (flagsLE)) return false;
     uint32 flags = csLittleEndian::UInt32 (flagsLE);
     
-    WrappedChild* child = new WrappedChild;
-    child->conditionValue = (flags & childValue) != 0;
+    csRef<WrappedChild> child;
+    child.AttachNew (new WrappedChild);
+    child->SetConditionValue ((flags & childValue) != 0);
     
     uint32 condLE;
     if (file->Read ((char*)&condLE, sizeof (condLE))
@@ -2234,7 +2236,7 @@ bool csWrappedDocumentNode::ReadWrappedChildren (iFile* file,
 //---------------------------------------------------------------------------
 
 csWrappedDocumentNode::WrapperWalker::WrapperWalker (
-  csPDelArray<WrappedChild>& wrappedChildren, iConditionResolver* resolver)
+  csRefArray<WrappedChild>& wrappedChildren, iConditionResolver* resolver)
 {
   SetData (wrappedChildren, resolver);
 }
@@ -2244,7 +2246,7 @@ csWrappedDocumentNode::WrapperWalker::WrapperWalker ()
 }
 
 void csWrappedDocumentNode::WrapperWalker::SetData (
-  csPDelArray<WrappedChild>& wrappedChildren, iConditionResolver* resolver)
+  csRefArray<WrappedChild>& wrappedChildren, iConditionResolver* resolver)
 {
   currentPos = &posStack.GetExtend (0);
   currentPos->currentIndex = 0;
@@ -2272,7 +2274,7 @@ void csWrappedDocumentNode::WrapperWalker::SeekNext()
       else
       {
         if ((wrapper.condition == csCondAlwaysTrue)
-          || (resolver->Evaluate (wrapper.condition) == wrapper.conditionValue))
+          || (resolver->Evaluate (wrapper.condition) == wrapper.GetConditionValue()))
 	{
 	  currentPos = &posStack.GetExtend (posStack.GetSize ());
 	  currentPos->currentIndex = 0;
@@ -2541,7 +2543,8 @@ struct EvalStatic
 };
 
 csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapperStatic (
-  iDocumentNode* wrappedNode, iConditionResolver* resolver, csString* dumpOut)
+  iDocumentNode* wrappedNode, iConditionResolver* resolver, csString* dumpOut,
+  uint parseOptions)
 {
   currentOut = dumpOut;
 
@@ -2553,8 +2556,7 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapperStatic (
     CS_ASSERT (globalState->vfs);
     EvalStatic eval (resolver);
     node = new csWrappedDocumentNode (eval, 0, wrappedNode, resolver, this, 
-      globalState,
-      wdnfpoExpandTemplates | wdnfpoHandleConditions);
+      globalState, parseOptions);
     CS_ASSERT(globalState->GetRefCount() == 1);
   }
   return node;

@@ -183,8 +183,6 @@ public:
   }
 };
 
-#include "csutil/deprecated_warn_off.h"
-
 /**
  * Haze mesh object.
  */
@@ -343,7 +341,7 @@ public:
   virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
   virtual void SetMixMode (uint mode) { MixMode = mode; }
   virtual uint GetMixMode () const { return MixMode; }
-  virtual void InvalidateMaterialHandles () { }
+
   /**
    * see imesh/object.h for specification. The default implementation
    * does nothing.
@@ -381,8 +379,6 @@ public:
   virtual float GetLayerScale(int layer) const
   { return this->layers[layer]->scale; }
 };
-
-#include "csutil/deprecated_warn_on.h"
 
 /**
  * Factory for 2D sprites. This factory also implements iHazeFactoryState.

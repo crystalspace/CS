@@ -307,7 +307,7 @@ public:
   virtual bool SetMaterialWrapper (iMaterialWrapper* mat);
   virtual iMaterialWrapper* GetMaterialWrapper () const
   { return subMeshes.GetDefaultSubmesh()->SubMeshProxy::GetMaterial(); }
-  virtual void InvalidateMaterialHandles () { }
+
   /**
    * see imesh/object.h for specification. The default implementation
    * does nothing.

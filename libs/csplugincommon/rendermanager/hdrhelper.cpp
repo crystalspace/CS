@@ -75,8 +75,7 @@ namespace CS
 	
       csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
       if (!loader) return false;
-      csRef<iShader> map =
-	loader->LoadShader ("/shader/postproc/hdr/default-map.xml");
+      csRef<iShader> map = loader->LoadShader ("/shader/postproc/hdr/default-map.xml");
       if (!map) return false;
       measureLayer = postEffects.GetLastLayer();
       mappingLayer = postEffects.AddLayer (map);

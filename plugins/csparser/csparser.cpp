@@ -1317,7 +1317,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             return 0;
           }
           csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (meshname, false);
-          csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, 0, child, ssource, sector, meshname);
+          csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, 0, child, ssource, sector, meshname, vfs->GetCwd());
           AddLoadingMeshObject(meshname, itr);
           threadReturns.Push(itr);
         }
@@ -1343,7 +1343,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
               meshname, secname ? secname : "<noname>");
             return 0;
           }
-          csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, 0, child, ssource, sector, meshname);
+          csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, 0, child, ssource, sector, meshname, vfs->GetCwd());
           AddLoadingMeshObject(meshname, itr);
           threadReturns.Push(itr);
         }
@@ -1353,7 +1353,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           iLight* sl = ParseStatlight (ldr_context, child);
           if (!sl) return 0;
           AddLightToList(sl, sl->QueryObject()->GetName());
-          sector->AddLight (sl);
+          threadReturns.Push(sector->AddLight (sl));
           sl->DecRef ();
         }
         break;

@@ -18,7 +18,7 @@
 */	
 
 #include "csutil/sysfunc.h"
-#include "cachedll.h"
+#include "csutil/win32/cachedll.h"
 
 CS::Platform::Win32::CacheDLL* CS_API_NAME::dll = 0;
 bool CS_API_NAME::dllLoaded = false;

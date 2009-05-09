@@ -1594,7 +1594,6 @@ class iMeshObject(core.iBase):
     def GetMaterialWrapper(*args): return _imesh.iMeshObject_GetMaterialWrapper(*args)
     def SetMixMode(*args): return _imesh.iMeshObject_SetMixMode(*args)
     def GetMixMode(*args): return _imesh.iMeshObject_GetMixMode(*args)
-    def InvalidateMaterialHandles(*args): return _imesh.iMeshObject_InvalidateMaterialHandles(*args)
     def PositionChild(*args): return _imesh.iMeshObject_PositionChild(*args)
     def BuildDecal(*args): return _imesh.iMeshObject_BuildDecal(*args)
     scfGetVersion = staticmethod(_imesh.iMeshObject_scfGetVersion)

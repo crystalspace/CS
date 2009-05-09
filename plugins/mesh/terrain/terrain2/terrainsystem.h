@@ -142,8 +142,6 @@ public:
         csVector3& isect, float* pr, int* polygon_idx ,
         iMaterialWrapper** material );
 
-  virtual void InvalidateMaterialHandles ();
-
   // ------------ iObjectModel implementation ------------
   virtual iTerrainSystem* GetTerrainColldet () { return this; }
   

@@ -135,9 +135,10 @@ struct iOSXAssistant : public virtual iBase
 
   /**
    * Post a key-down event to the Crystal Space event queue.  The first number
-   * is the raw key code, and the second is the cooked character code.
+   * is the raw key code, and the second is the cooked character code. The third
+   * argument is a boolean indicating if the keys were previously used.
    */
-  virtual void key_down(unsigned int raw, unsigned int cooked) = 0;
+  virtual void key_down(unsigned int raw, unsigned int cooked, bool repeat) = 0;
 
   /**
    * Post a key-up event to the Crystal Space event queue.  The first number is
@@ -168,6 +169,14 @@ struct iOSXAssistant : public virtual iBase
    * bottom.
    */
   virtual void mouse_moved(int x, int y) = 0;
+
+  /**
+   * Post a wheel-moved event to the Crystal Space event queue.  The
+   * coordinates are specified in terms of the Crystal Space coordinate system
+   * where `x' increases from left to right, and `y' increases from top to
+   * bottom.
+   */
+  virtual void wheel_moved(int button, int x, int y) = 0;
 };
 
 #endif // __CSSYS_MACOSX_OSXAssistant_h

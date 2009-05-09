@@ -551,7 +551,7 @@ void csEngine::HandleImposters ()
   imposterUpdateQueue.Empty ();
 }
 
-THREADED_CALLABLE_IMPL2(csEngine, SyncEngineLists, csRef<iThreadedLoader> loader, bool runNow)
+THREADED_CALLABLE_IMPL1(csEngine, SyncEngineLists, csRef<iThreadedLoader> loader)
 {
   {
     csRef<iSectorLoaderIterator> loaderSectors = loader->GetLoaderSectors();
@@ -611,24 +611,20 @@ THREADED_CALLABLE_IMPL2(csEngine, SyncEngineLists, csRef<iThreadedLoader> loader
     }
   }
 
-  if(!runNow)
+  if(precache)
   {
-    if(precache && tman->GetThreadCount() > 1)
+    // Precache a texture.
+    while(!newTextures.IsEmpty())
     {
-      // Precache a texture.
-      if(!newTextures.IsEmpty())
+      csRef<iTextureWrapper> tex = newTextures.Pop();
+      if(tex->GetTextureHandle())
       {
-        csRef<iTextureWrapper> tex = newTextures.Pop();
-        if(tex->GetTextureHandle())
-        {
-          tex->GetTextureHandle()->Precache();
-        }
+        tex->GetTextureHandle()->Precache();
       }
     }
-  
-    // Schedule another run.
-    SyncEngineLists(loader, false);
   }
+
+  loader->MarkSyncDone();
 
   return true;
 }
@@ -1142,8 +1138,8 @@ bool csEngine::Prepare (iProgressMeter *meter)
 
 void csEngine::RemoveLight (iLight* light)
 {
-  if (light->GetSector ())
-    light->GetSector ()->GetLights ()->Remove (light);
+  if (light->GetMovable ()->GetSectors ()->GetCount() > 0)
+    light->GetMovable ()->GetSectors ()->Get(0)->GetLights ()->Remove (light);
 }
 
 void csEngine::SetVFSCacheManager (const char* vfspath)

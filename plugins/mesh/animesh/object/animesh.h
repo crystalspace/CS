@@ -306,8 +306,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     virtual void SetMixMode (uint mode);
     virtual uint GetMixMode () const;
 
-    virtual void InvalidateMaterialHandles ();
-
     virtual void PositionChild (iMeshObject* child,csTicks current_time);
 
     virtual void BuildDecal(const csVector3* pos, float decalRadius,
