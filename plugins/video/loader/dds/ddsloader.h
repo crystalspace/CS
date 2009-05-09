@@ -83,7 +83,7 @@ private:
   iObjectRegistry* object_reg;
 
   csDDSRawDataType IdentifyPixelFormat (const dds::PixelFormat& pf, 
-    uint& bpp);
+    uint32 dxgiFormat, bool isDX10, uint& bpp);
 };
 
 #include "csutil/deprecated_warn_on.h"

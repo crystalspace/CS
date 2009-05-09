@@ -20,6 +20,7 @@
 */
 
 #include "cssysdef.h"
+#include <errno.h>
 #include <string.h>
 
 #include "csgfx/bakekeycolor.h"
@@ -227,9 +228,15 @@ static bool output_picture (const char *fname, const char *suffix, iImage* ifile
   csRef<iDataBuffer> db (ImageLoader->Save (ifile, output_mime, output_opts));
   if (db)
   {
+    const size_t size = db->GetSize ();
     FILE *f = fopen (outname, "wb");
     if (f)
-      fwrite (db->GetData (), 1, db->GetSize (), f);
+    {
+      const size_t res = fwrite (db->GetData (), 1, size, f);
+      if (res != size)
+        csPrintf ("Could only write %zu of %zu bytes for %s (errno = %d)!\n",
+          res, size, outname, errno);
+    }
     fclose (f);
   }
   else

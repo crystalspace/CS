@@ -28,7 +28,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(SndSysWav)
 // Keep these as integer values or the stream may feed portions of a sample to the higher layer which may cause problems
 // 1 , 1 will decode 1/1 or 1 second of audio in advance
 #define WAV_BUFFER_LENGTH_MULTIPLIER  1
-#define WAV_BUFFER_LENGTH_DIVISOR     5
+#define WAV_BUFFER_LENGTH_DIVISOR     2
 
 /// The size in bytes of the buffer in which is used if PCM conversion is necessary
 #define WAV_DECODE_BUFFER_SIZE 4096
