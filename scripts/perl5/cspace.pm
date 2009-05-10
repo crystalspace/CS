@@ -927,6 +927,87 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iThreadReturn ##############
+
+package cspace::iThreadReturn;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*IsFinished = *cspacec::iThreadReturn_IsFinished;
+*WasSuccessful = *cspacec::iThreadReturn_WasSuccessful;
+*GetResultPtr = *cspacec::iThreadReturn_GetResultPtr;
+*GetResultRefPtr = *cspacec::iThreadReturn_GetResultRefPtr;
+*MarkFinished = *cspacec::iThreadReturn_MarkFinished;
+*MarkSuccessful = *cspacec::iThreadReturn_MarkSuccessful;
+*SetResult = *cspacec::iThreadReturn_SetResult;
+*Copy = *cspacec::iThreadReturn_Copy;
+*Wait = *cspacec::iThreadReturn_Wait;
+*SetWaitPtrs = *cspacec::iThreadReturn_SetWaitPtrs;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iThreadReturn($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iThreadManager ##############
+
+package cspace::iThreadManager;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*Init = *cspacec::iThreadManager_Init;
+*Process = *cspacec::iThreadManager_Process;
+*PushToQueue = *cspacec::iThreadManager_PushToQueue;
+*Wait = *cspacec::iThreadManager_Wait;
+*RunNow = *cspacec::iThreadManager_RunNow;
+*GetThreadCount = *cspacec::iThreadManager_GetThreadCount;
+*SetAlwaysRunNow = *cspacec::iThreadManager_SetAlwaysRunNow;
+*GetAlwaysRunNow = *cspacec::iThreadManager_GetAlwaysRunNow;
+*Exiting = *cspacec::iThreadManager_Exiting;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iThreadManager($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iDebugHelper ##############
 
 package cspace::iDebugHelper;
@@ -1681,6 +1762,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::iBase cspace );
 %OWNER = ();
 %ITERATORS = ();
+*Report = *cspacec::iReporterListener_Report;
+*ReportWait = *cspacec::iReporterListener_ReportWait;
 *scfGetVersion = *cspacec::iReporterListener_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -5071,6 +5154,36 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetLoaderTextures = *cspacec::iThreadedLoader_GetLoaderTextures;
 *GetLoaderMaterials = *cspacec::iThreadedLoader_GetLoaderMaterials;
 *GetLoaderSharedVariables = *cspacec::iThreadedLoader_GetLoaderSharedVariables;
+*LoadImage = *cspacec::iThreadedLoader_LoadImage;
+*LoadImageWait = *cspacec::iThreadedLoader_LoadImageWait;
+*LoadTexture = *cspacec::iThreadedLoader_LoadTexture;
+*LoadTextureWait = *cspacec::iThreadedLoader_LoadTextureWait;
+*LoadSoundSysData = *cspacec::iThreadedLoader_LoadSoundSysData;
+*LoadSoundSysDataWait = *cspacec::iThreadedLoader_LoadSoundSysDataWait;
+*LoadSoundStream = *cspacec::iThreadedLoader_LoadSoundStream;
+*LoadSoundStreamWait = *cspacec::iThreadedLoader_LoadSoundStreamWait;
+*LoadSoundWrapper = *cspacec::iThreadedLoader_LoadSoundWrapper;
+*LoadSoundWrapperWait = *cspacec::iThreadedLoader_LoadSoundWrapperWait;
+*LoadMeshObjectFactory = *cspacec::iThreadedLoader_LoadMeshObjectFactory;
+*LoadMeshObjectFactoryWait = *cspacec::iThreadedLoader_LoadMeshObjectFactoryWait;
+*LoadMeshObject = *cspacec::iThreadedLoader_LoadMeshObject;
+*LoadMeshObjectWait = *cspacec::iThreadedLoader_LoadMeshObjectWait;
+*LoadShader = *cspacec::iThreadedLoader_LoadShader;
+*LoadShaderWait = *cspacec::iThreadedLoader_LoadShaderWait;
+*LoadMapFile = *cspacec::iThreadedLoader_LoadMapFile;
+*LoadMapFileWait = *cspacec::iThreadedLoader_LoadMapFileWait;
+*LoadMap = *cspacec::iThreadedLoader_LoadMap;
+*LoadMapWait = *cspacec::iThreadedLoader_LoadMapWait;
+*LoadLibraryFile = *cspacec::iThreadedLoader_LoadLibraryFile;
+*LoadLibraryFileWait = *cspacec::iThreadedLoader_LoadLibraryFileWait;
+*LoadLibrary = *cspacec::iThreadedLoader_LoadLibrary;
+*LoadLibraryWait = *cspacec::iThreadedLoader_LoadLibraryWait;
+*LoadFile = *cspacec::iThreadedLoader_LoadFile;
+*LoadFileWait = *cspacec::iThreadedLoader_LoadFileWait;
+*LoadBuffer = *cspacec::iThreadedLoader_LoadBuffer;
+*LoadBufferWait = *cspacec::iThreadedLoader_LoadBufferWait;
+*LoadNode = *cspacec::iThreadedLoader_LoadNode;
+*LoadNodeWait = *cspacec::iThreadedLoader_LoadNodeWait;
 *AddSectorToList = *cspacec::iThreadedLoader_AddSectorToList;
 *AddMeshFactToList = *cspacec::iThreadedLoader_AddMeshFactToList;
 *AddMeshToList = *cspacec::iThreadedLoader_AddMeshToList;
@@ -19231,6 +19344,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetRecLevel = *cspacec::iSector_GetRecLevel;
 *IncRecLevel = *cspacec::iSector_IncRecLevel;
 *DecRecLevel = *cspacec::iSector_DecRecLevel;
+*SetRenderLoop = *cspacec::iSector_SetRenderLoop;
+*SetRenderLoopWait = *cspacec::iSector_SetRenderLoopWait;
 *GetRenderLoop = *cspacec::iSector_GetRenderLoop;
 *CreateMeshGenerator = *cspacec::iSector_CreateMeshGenerator;
 *GetMeshGeneratorCount = *cspacec::iSector_GetMeshGeneratorCount;
@@ -19243,6 +19358,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetFog = *cspacec::iSector_SetFog;
 *DisableFog = *cspacec::iSector_DisableFog;
 *GetLights = *cspacec::iSector_GetLights;
+*AddLight = *cspacec::iSector_AddLight;
+*AddLightWait = *cspacec::iSector_AddLightWait;
 *SetDynamicAmbientLight = *cspacec::iSector_SetDynamicAmbientLight;
 *GetDynamicAmbientLight = *cspacec::iSector_GetDynamicAmbientLight;
 *GetDynamicAmbientVersion = *cspacec::iSector_GetDynamicAmbientVersion;
@@ -19252,6 +19369,10 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *HitBeamPortals = *cspacec::iSector_HitBeamPortals;
 *HitBeam = *cspacec::iSector_HitBeam;
 *FollowSegment = *cspacec::iSector_FollowSegment;
+*SetSectorCallback = *cspacec::iSector_SetSectorCallback;
+*SetSectorCallbackWait = *cspacec::iSector_SetSectorCallbackWait;
+*RemoveSectorCallback = *cspacec::iSector_RemoveSectorCallback;
+*RemoveSectorCallbackWait = *cspacec::iSector_RemoveSectorCallbackWait;
 *GetSectorCallbackCount = *cspacec::iSector_GetSectorCallbackCount;
 *GetSectorCallback = *cspacec::iSector_GetSectorCallback;
 *SetLightCulling = *cspacec::iSector_SetLightCulling;
@@ -19480,6 +19601,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *RemoveEngineSectorCallback = *cspacec::iEngine_RemoveEngineSectorCallback;
 *CreateMeshWrapper = *cspacec::iEngine_CreateMeshWrapper;
 *LoadMeshWrapper = *cspacec::iEngine_LoadMeshWrapper;
+*AddMeshAndChildren = *cspacec::iEngine_AddMeshAndChildren;
+*AddMeshAndChildrenWait = *cspacec::iEngine_AddMeshAndChildrenWait;
 *GetNearbyMeshes = *cspacec::iEngine_GetNearbyMeshes;
 *GetMeshes = *cspacec::iEngine_GetMeshes;
 *FindMeshObject = *cspacec::iEngine_FindMeshObject;
@@ -19529,6 +19652,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *RemoveObject = *cspacec::iEngine_RemoveObject;
 *DelayedRemoveObject = *cspacec::iEngine_DelayedRemoveObject;
 *RemoveDelayedRemoves = *cspacec::iEngine_RemoveDelayedRemoves;
+*DeleteAll = *cspacec::iEngine_DeleteAll;
+*DeleteAllWait = *cspacec::iEngine_DeleteAllWait;
 *ResetWorldSpecificSettings = *cspacec::iEngine_ResetWorldSpecificSettings;
 *FireStartFrame = *cspacec::iEngine_FireStartFrame;
 *CreatePerspectiveCamera = *cspacec::iEngine_CreatePerspectiveCamera;
@@ -19536,6 +19661,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetRenderManager = *cspacec::iEngine_GetRenderManager;
 *SetRenderManager = *cspacec::iEngine_SetRenderManager;
 *ReloadRenderManager = *cspacec::iEngine_ReloadRenderManager;
+*SyncEngineLists = *cspacec::iEngine_SyncEngineLists;
+*SyncEngineListsWait = *cspacec::iEngine_SyncEngineListsWait;
 *SyncEngineListsNow = *cspacec::iEngine_SyncEngineListsNow;
 *scfGetVersion = *cspacec::iEngine_scfGetVersion;
 sub DESTROY {
@@ -22530,6 +22657,11 @@ sub SCF_VERBOSE_PLUGIN_LOAD () { $cspacec::SCF_VERBOSE_PLUGIN_LOAD }
 sub SCF_VERBOSE_PLUGIN_REGISTER () { $cspacec::SCF_VERBOSE_PLUGIN_REGISTER }
 sub SCF_VERBOSE_CLASS_REGISTER () { $cspacec::SCF_VERBOSE_CLASS_REGISTER }
 sub SCF_VERBOSE_ALL () { $cspacec::SCF_VERBOSE_ALL }
+sub THREADED () { $cspacec::THREADED }
+sub THREADEDL () { $cspacec::THREADEDL }
+sub HIGH () { $cspacec::HIGH }
+sub MED () { $cspacec::MED }
+sub LOW () { $cspacec::LOW }
 sub CS_DBGHELP_BENCHMARK () { $cspacec::CS_DBGHELP_BENCHMARK }
 sub CS_DBGHELP_TXTDUMP () { $cspacec::CS_DBGHELP_TXTDUMP }
 sub CS_DBGHELP_GFXDUMP () { $cspacec::CS_DBGHELP_GFXDUMP }
