@@ -87,12 +87,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
     };
     uint32 lightTypes;
     
-    uint GetLightType (csLight* light)
+    static uint GetLightType (csLightDynamicType dynType)
     {
-      if (light->csLight::GetDynamicType() == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
+      if (dynType == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
         return ltDynamic;
       else
         return ltStatic;
+    }
+    static uint GetLightType (csLight* light)
+    {
+      return GetLightType (light->csLight::GetDynamicType());
     }
     
     LightExtraAABBNodeData() : lightTypes (0) {}

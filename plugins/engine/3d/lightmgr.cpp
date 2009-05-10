@@ -178,10 +178,8 @@ struct LightCollectArray
       
       csLightInfluence newInfluence = MakeInfluence (light,
         testBox, lightSphere.GetCenter());
-      if ((newInfluence.dynamicType == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
-          && ((lightFilter & LightExtraAABBNodeData::ltDynamic) == 0))
-        continue;
-      else if ((lightFilter & LightExtraAABBNodeData::ltStatic) == 0)
+      if ((lightFilter
+          & LightExtraAABBNodeData::GetLightType (newInfluence.dynamicType)) == 0)
         continue;
       lightArray->Push (newInfluence);
     }
@@ -228,10 +226,8 @@ struct LightCollectCallback
       
       csLightInfluence newInfluence = MakeInfluence (light,
         testBox, lightSphere.GetCenter());
-      if ((newInfluence.dynamicType == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
-          && ((lightFilter & LightExtraAABBNodeData::ltDynamic) == 0))
-        continue;
-      else if ((lightFilter & LightExtraAABBNodeData::ltStatic) == 0)
+      if ((lightFilter
+          & LightExtraAABBNodeData::GetLightType (newInfluence.dynamicType)) == 0)
         continue;
       lightCallback->LightInfluence (newInfluence);
     }
@@ -382,10 +378,8 @@ struct LightCollectArrayPtr
       {
         csLightInfluence newInfluence = MakeInfluence (light,
           testBox, lightSphere.GetCenter());
-	if ((newInfluence.dynamicType == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
-	    && ((lightFilter & LightExtraAABBNodeData::ltDynamic) == 0))
-	  continue;
-	else if ((lightFilter & LightExtraAABBNodeData::ltStatic) == 0)
+	if ((lightFilter
+	    & LightExtraAABBNodeData::GetLightType (newInfluence.dynamicType)) == 0)
 	  continue;
         arr.Push (newInfluence);
       }
