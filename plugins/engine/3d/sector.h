@@ -75,12 +75,58 @@ private:
   csSector* sector;
 };
 
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
+{
+  struct LightExtraAABBNodeData
+  {
+    /// Light types flags
+    enum
+    {
+      ltStatic = 1,
+      ltDynamic = 2
+    };
+    uint32 lightTypes;
+    
+    uint GetLightType (csLight* light)
+    {
+      if (light->csLight::GetDynamicType() == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
+        return ltDynamic;
+      else
+        return ltStatic;
+    }
+    
+    LightExtraAABBNodeData() : lightTypes (0) {}
+  
+    void LeafAddObject (csLight* light)
+    {
+      lightTypes |= GetLightType (light);
+    }
+    
+    void LeafUpdateObjects (csLight** lights, uint numLights)
+    {
+      lightTypes = 0;
+      for (uint i = 0; i < numLights; i++)
+      {
+        lightTypes |= GetLightType (lights[i]);
+      }
+    }
+    
+    void NodeUpdate (const LightExtraAABBNodeData& child1,
+      const LightExtraAABBNodeData& child2)
+    {
+      lightTypes = child1.lightTypes | child2.lightTypes;
+    }
+  };
+}
+CS_PLUGIN_NAMESPACE_END(Engine)
+
 /// A list of lights for a sector.
 class csSectorLightList : public csLightList
 {
 public:
   typedef CS::Geometry::AABBTree<
-    CS_PLUGIN_NAMESPACE_NAME(Engine)::csLight, 2>  LightAABBTree;
+    CS_PLUGIN_NAMESPACE_NAME(Engine)::csLight, 2,
+    CS_PLUGIN_NAMESPACE_NAME(Engine)::LightExtraAABBNodeData>  LightAABBTree;
   /// constructor
   csSectorLightList (csSector* s);
   /// destructor
