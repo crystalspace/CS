@@ -10,7 +10,7 @@ Crystal Space.
 * Api1_4 Deprecation of the old event system:: Deprecation of the old event system
 @end menu
 
-@node Api1_4 Deprecation of the old event system, , Api1_4 iGenMeshAnimationControl changes, Release Notes 1_4
+@node Api1_4 Deprecation of the old event system, , Release Notes 1_4, Release Notes 1_4
 @subsection Deprecation of the old event system
 
 The old event system has been deprecated in this release and will be gone in the next version. This means that the frame sub-events @code{csevPreProcess}, @code{csevProcess}, @code{csevPostProcess}, and @code{csevFinalProcess} will no longer be available. At the same time, the corresponding methods from @code{csBaseEventHandler} will be replaced by a single @code{csBaseEventHandler::Frame()} function.
