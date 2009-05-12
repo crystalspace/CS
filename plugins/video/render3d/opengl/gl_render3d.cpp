@@ -1755,11 +1755,31 @@ void csGLGraphics3D::DeactivateTexture (int unit)
   }
   else if (unit != 0) return;
 
-  statecache->Disable_GL_TEXTURE_1D ();
-  statecache->Disable_GL_TEXTURE_2D ();
-  statecache->Disable_GL_TEXTURE_3D ();
-  statecache->Disable_GL_TEXTURE_CUBE_MAP ();
-  statecache->Disable_GL_TEXTURE_RECTANGLE_ARB ();
+  switch (imageUnits[unit].texture->texType)
+  {
+    case iTextureHandle::texType1D:
+      statecache->Disable_GL_TEXTURE_1D ();
+      statecache->SetTexture (GL_TEXTURE_1D, 0);
+      break;
+    case iTextureHandle::texType2D:
+      statecache->Disable_GL_TEXTURE_2D ();
+      statecache->SetTexture (GL_TEXTURE_2D, 0);
+      break;
+    case iTextureHandle::texType3D:
+      statecache->Disable_GL_TEXTURE_3D ();
+      statecache->SetTexture (GL_TEXTURE_3D, 0);
+      break;
+    case iTextureHandle::texTypeCube:
+      statecache->Disable_GL_TEXTURE_CUBE_MAP ();
+      statecache->SetTexture (GL_TEXTURE_CUBE_MAP, 0);
+      break;
+    case iTextureHandle::texTypeRect:
+      statecache->Disable_GL_TEXTURE_RECTANGLE_ARB ();
+      statecache->SetTexture (GL_TEXTURE_RECTANGLE_ARB, 0);
+      break;
+    default:
+      break;
+  }
 
   imageUnits[unit].texture = 0;
 }

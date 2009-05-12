@@ -436,7 +436,7 @@ private:
     GLuint target;    
     csGLBasicTextureHandle* texture;
     
-    ImageUnit (): target (0) {}
+    ImageUnit (): target (0), texture (0) {}
   };
   GLint numImageUnits;
   ImageUnit* imageUnits;
