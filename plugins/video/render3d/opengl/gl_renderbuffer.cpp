@@ -83,7 +83,7 @@ csGLVBOBufferManager::csGLVBOBufferManager (csGLExtensionManager *ext,
 csGLVBOBufferManager::~csGLVBOBufferManager ()
 {
   // Deallocate stuff@@@
-  for (size_t type = 0; type < 1; ++type)
+  for (size_t type = 0; type < VBO_BUFFER_TYPE_COUNT; ++type)
   {
     for (size_t i = 0; i < VBO_NUM_SLOT_SIZES; ++i)
     {
