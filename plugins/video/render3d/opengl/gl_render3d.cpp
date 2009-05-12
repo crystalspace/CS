@@ -1755,6 +1755,8 @@ void csGLGraphics3D::DeactivateTexture (int unit)
   }
   else if (unit != 0) return;
 
+  if (imageUnits[unit].texture == 0) return;
+
   switch (imageUnits[unit].texture->texType)
   {
     case iTextureHandle::texType1D:
