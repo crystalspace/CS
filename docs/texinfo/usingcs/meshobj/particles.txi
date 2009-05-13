@@ -354,8 +354,8 @@ Add a random acceleration with given magnitude in the form of a vector.
 TTL. It takes a fixed number of "keypoints" and then interpolates between them.
 @samp{Lincolor} effector loader recognize following keywords:
 @table @code
-@item <color red="" green="" blue="" time="">
-Set a keypoint color at given time.
+@item <color red="" green="" blue="" rtime="">
+Set a keypoint color at given remaining time to live.
 @end table
 
 @samp{Velocityfield} effector is a more complicated and resource using way of giving
