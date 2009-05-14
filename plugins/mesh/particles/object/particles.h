@@ -654,7 +654,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     uint mixMode;
 
     csTicks lastUpdateTime;
-    csTicks currentDt;
     uint lastFrameNumber;
     float totalParticleTime;
     
