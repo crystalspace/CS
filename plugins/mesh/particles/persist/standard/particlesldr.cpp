@@ -866,6 +866,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     
     csRef<iMeshObject> meshObj;
     csRef<iParticleSystem> particleSystem;
+    float preAdvanceTime = 0.0f;
 
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
     while (it->HasNext ())
@@ -952,13 +953,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
             return 0;
           }
 
-          float advtime;
-          advtime = child->GetContentsValueAsFloat ();
-          csTicks msec = (csTicks)(advtime*1000.0f + 0.5f);
-
-          particleSystem->Advance (msec);
-
-
+          preAdvanceTime = child->GetContentsValueAsFloat ();
           break;
         }
       default:
@@ -981,6 +976,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
       }
     }
 
+    if (preAdvanceTime > 0)
+    {
+      csTicks msec = (csTicks)(preAdvanceTime*1000.0f + 0.5f);
+      particleSystem->Advance (msec);
+    }
+    
     return csPtr<iBase> (meshObj);
   }
 
