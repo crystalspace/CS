@@ -2053,6 +2053,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     glMultMatrixf (matrix);
   }
 
+  ApplyBufferChanges();
+
   iRenderBuffer* iIndexbuf = (modes.buffers
   	? modes.buffers->GetRenderBuffer(CS_BUFFER_INDEX)
 	: 0);
