@@ -442,12 +442,6 @@ private:
   ImageUnit* imageUnits;
   GLint numTCUnits;
 
-  /// Whether the alpha channel of the color buffer should be scaled.
-  bool needColorFixup;
-  /// Amount to scale alpha channel of color buffer
-  float alphaScale;
-  /// Scrap buffer used for color fixups
-  csRef<iRenderBuffer> colorScrap;
   //@{
   /**
    * Changes to buffer bindings are not immediate but queued and set from 
@@ -462,8 +456,6 @@ private:
   uint activeVertexAttribs;
   void ApplyBufferChanges();
   //@}
-
-  csRef<iRenderBuffer> DoColorFixup (iRenderBuffer* buffer);
 
   // Minimal float depth(z) difference to store
   // different values in depth buffer. Of course, for standard depth

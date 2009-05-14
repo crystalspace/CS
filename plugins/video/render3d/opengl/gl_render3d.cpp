@@ -2053,11 +2053,6 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     glMultMatrixf (matrix);
   }
 
-  needColorFixup = (modes.mixmode & CS_FX_MASK_ALPHA) != 0;
-  if (needColorFixup)
-    alphaScale = 1.0f - (modes.mixmode & CS_FX_MASK_ALPHA) / 255.0f;
-  ApplyBufferChanges();
-
   iRenderBuffer* iIndexbuf = (modes.buffers
   	? modes.buffers->GetRenderBuffer(CS_BUFFER_INDEX)
 	: 0);
@@ -2647,13 +2642,6 @@ void csGLGraphics3D::ApplyBufferChanges()
     if (changeEntry.buffer.IsValid())
     {
       iRenderBuffer *buffer = changeEntry.buffer;
-      csRef<iRenderBuffer> bufferRef;
-
-      if (needColorFixup && (att == CS_VATTRIB_COLOR))
-      {
-        AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, 0);
-        buffer = DoColorFixup (buffer);
-      }
 
       if (CS_VATTRIB_IS_GENERIC (att)) 
         AssignGenericBuffer (att-CS_VATTRIB_GENERIC_FIRST, buffer);
@@ -2796,86 +2784,6 @@ void csGLGraphics3D::ApplyBufferChanges()
     }
   }
   changeQueue.Empty();
-}
-
-template<typename T, typename T2>
-static void DoFixup (iRenderBuffer* src, T* dest, const T2 scales[], 
-                     size_t comps = (size_t)~0, const T* defaultComps = 0)
-{
-  const size_t elems = src->GetElementCount();
-  const size_t srcComps = src->GetComponentCount();
-  if (comps == (size_t)~0) comps = srcComps;
-  csRenderBufferLock<uint8, iRenderBuffer*> srcPtr (src, CS_BUF_LOCK_READ);
-  const size_t srcStride = src->GetElementDistance();
-  for (size_t e = 0; e < elems; e++)
-  {
-    T* s = (T*)(srcPtr + e * srcStride);
-    for (size_t c = 0; c < comps; c++)
-    {
-      *dest++ = (T)((c < srcComps ? *s++ : defaultComps[c]) * scales[c]);
-    }
-  }
-}
-
-csRef<iRenderBuffer> csGLGraphics3D::DoColorFixup (iRenderBuffer* buffer)
-{
-  if (!colorScrap.IsValid()
-    || (colorScrap->GetElementCount() < buffer->GetElementCount())
-    || (colorScrap->GetComponentType() != buffer->GetComponentType()))
-  {
-    colorScrap = csRenderBuffer::CreateRenderBuffer (buffer->GetElementCount(),
-      CS_BUF_STREAM, buffer->GetComponentType(), 4);
-  }
-
-  const float componentScale[] = {1.0f, 1.0f, 1.0f, alphaScale};
-  const char defComponentsB[] = {0, 0, 0, 0x7f};
-  const unsigned char defComponentsUB[] = {0, 0, 0, 0xff};
-  const short defComponentsS[] = {0, 0, 0, 0x7fff};
-  const unsigned short defComponentsUS[] = {0, 0, 0, 0xffff};
-  const int defComponentsI[] = {0, 0, 0, 0x7fffffff};
-  const unsigned int defComponentsUI[] = {0, 0, 0, 0xffffffff};
-  const float defComponentsF[] = {0.0f, 0.0f, 0.0f, 1.0f};
-  const double defComponentsD[] = {0.0, 0.0, 0.0, 1.0};
-
-  switch (colorScrap->GetComponentType())
-  {
-    case CS_BUFCOMP_BYTE:
-      DoFixup (buffer, csRenderBufferLock<char> (colorScrap).Lock(),
-        componentScale, 4, defComponentsB);
-      break;
-    case CS_BUFCOMP_UNSIGNED_BYTE:
-      DoFixup (buffer, csRenderBufferLock<unsigned char> (colorScrap).Lock(),
-        componentScale, 4, defComponentsUB);
-      break;
-    case CS_BUFCOMP_SHORT:
-      DoFixup (buffer, csRenderBufferLock<short> (colorScrap).Lock(),
-        componentScale, 4, defComponentsS);
-      break;
-    case CS_BUFCOMP_UNSIGNED_SHORT:
-      DoFixup (buffer, csRenderBufferLock<unsigned short> (colorScrap).Lock(),
-        componentScale, 4, defComponentsUS);
-      break;
-    case CS_BUFCOMP_INT:
-      DoFixup (buffer, csRenderBufferLock<int> (colorScrap).Lock(),
-        componentScale, 4, defComponentsI);
-      break;
-    case CS_BUFCOMP_UNSIGNED_INT:
-      DoFixup (buffer, csRenderBufferLock<unsigned int> (colorScrap).Lock(),
-        componentScale, 4, defComponentsUI);
-      break;
-    case CS_BUFCOMP_FLOAT:
-      DoFixup (buffer, csRenderBufferLock<float> (colorScrap).Lock(),
-        componentScale, 4, defComponentsF);
-      break;
-    case CS_BUFCOMP_DOUBLE:
-      DoFixup (buffer, csRenderBufferLock<double> (colorScrap).Lock(),
-        componentScale, 4, defComponentsD);
-      break;
-    default:
-      CS_ASSERT(false); // Should never happen.
-      break;
-  }
-  return colorScrap;
 }
 
 void csGLGraphics3D::Draw2DPolygon (csVector2* poly, int num_poly,
