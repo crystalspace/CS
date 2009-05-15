@@ -257,7 +257,7 @@ void csKDTree::DumpNode ()
 
 void csKDTree::DumpNode (const char* msg)
 {
-  csPrintfErr (msg);
+  csPrintfErr ("%s\n", msg);
   DumpNode ();
 }
 
