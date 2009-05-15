@@ -175,7 +175,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   //-- Object
   ParticlesMeshObject::ParticlesMeshObject (ParticlesMeshFactory* factory)
     : scfImplementationType (this), 
-    factory (factory), vertexSetup (0),
+    factory (factory), vertexSetup (0), delayedAdvance(0), executeDelayedAdvance(false),
     meshWrapper (0), mixMode (CS_FX_COPY), lastUpdateTime (0),
     lastFrameNumber (0), totalParticleTime (0.0f),
     radius (1.0f), minRadius (1.0f), rawBuffer (0), particleAllocatedSize (0),
@@ -680,6 +680,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   void ParticlesMeshObject::NextFrame (csTicks current_time, const csVector3& pos,
     uint currentFrame)
   {
+    // Check for delayed advance.
+    if(executeDelayedAdvance)
+    {
+      Advance(delayedAdvance);
+      delayedAdvance = 0;
+      executeDelayedAdvance = false;
+    }
+
     // Update the particle buffers etc
     if (lastFrameNumber == currentFrame)
       return;
@@ -781,6 +789,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   
   void ParticlesMeshObject::Advance (csTicks time)
   {
+    // Check that we have a meshwrapper.
+    if(!meshWrapper)
+    {
+      // Delay the advance until we do.
+      executeDelayedAdvance = true;
+      delayedAdvance += time;
+      return;
+    }
+
     // Advance particle system in slices of that duration
     const csTicks advanceSlice = 50;
   

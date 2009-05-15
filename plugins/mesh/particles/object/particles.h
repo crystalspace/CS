@@ -633,6 +633,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     ParticlesMeshFactory* factory;
 
     iVertexSetup* vertexSetup; //Helper object
+
+    // For delayed advance.
+    csTicks delayedAdvance;
+    bool executeDelayedAdvance;
     
     /**
      * Advance particle system by given amount of seconds.
