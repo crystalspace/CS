@@ -403,11 +403,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       meshWrapper = logparent;
 
       // Check for delayed advance.
-      if(executeDelayedAdvance)
+      if(delayedAdvance > 0)
       {
         Advance(delayedAdvance);
         delayedAdvance = 0;
-        executeDelayedAdvance = false;
       }
     }
 
@@ -644,7 +643,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
     // For delayed advance.
     csTicks delayedAdvance;
-    bool executeDelayedAdvance;
     
     /**
      * Advance particle system by given amount of seconds.

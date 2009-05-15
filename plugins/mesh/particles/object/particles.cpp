@@ -175,7 +175,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   //-- Object
   ParticlesMeshObject::ParticlesMeshObject (ParticlesMeshFactory* factory)
     : scfImplementationType (this), 
-    factory (factory), vertexSetup (0), delayedAdvance(0), executeDelayedAdvance(false),
+    factory (factory), vertexSetup (0), delayedAdvance(0),
     meshWrapper (0), mixMode (CS_FX_COPY), lastUpdateTime (0),
     lastFrameNumber (0), totalParticleTime (0.0f),
     radius (1.0f), minRadius (1.0f), rawBuffer (0), particleAllocatedSize (0),
@@ -785,7 +785,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     if(!meshWrapper)
     {
       // Delay the advance until we do.
-      executeDelayedAdvance = true;
       delayedAdvance += time;
       return;
     }
