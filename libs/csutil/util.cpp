@@ -208,6 +208,7 @@ void csSplitPath (const char *iPathName, char *oPath, size_t iPathSize,
     sl--;
 
   if (iPathSize)
+  {
     if (sl >= iPathSize)
     {
       memcpy (oPath, iPathName, iPathSize - 1);
@@ -218,8 +219,10 @@ void csSplitPath (const char *iPathName, char *oPath, size_t iPathSize,
       memcpy (oPath, iPathName, sl);
       oPath [sl] = 0;
     }
+  }
 
   if (iNameSize)
+  {
     if (maxl - sl >= iNameSize)
     {
       memcpy (oName, &iPathName [sl], iNameSize - 1);
@@ -227,6 +230,7 @@ void csSplitPath (const char *iPathName, char *oPath, size_t iPathSize,
     }
     else
       memcpy (oName, &iPathName [sl], maxl - sl + 1);
+  }
 }
 
 bool csGlobMatches (const char *fName, const char *fMask)

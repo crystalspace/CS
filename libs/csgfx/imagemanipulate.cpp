@@ -268,26 +268,28 @@ csRef<iImage> csImageManipulate::Mipmap2D (iImage* source, int steps,
     {
       case CS_IMGFMT_NONE:
       case CS_IMGFMT_PALETTED8:
-	if (simg->GetImageData())
-	  if (transpidx < 0)
-	    mipmap_1_p (cur_w, cur_h, 
-	      (uint8 *)simg->GetImageData(), mipmap, simg->GetPalette());
-	  else
-	    mipmap_1_pt (cur_w, cur_h, (uint8*)simg->GetImageData(), mipmap,
-	      simg->GetPalette(), transpidx);
-	nimg->ConvertFromRGBA (mipmap);
-	if (simg->GetAlpha ())
-	{
-	  mipmap_1_a (cur_w, cur_h, (uint8 *)simg->GetAlpha (), Alpha);
-	}
-	break;
+    if (simg->GetImageData())
+    {
+      if (transpidx < 0)
+        mipmap_1_p (cur_w, cur_h, 
+          (uint8 *)simg->GetImageData(), mipmap, simg->GetPalette());
+      else
+        mipmap_1_pt (cur_w, cur_h, (uint8*)simg->GetImageData(), mipmap,
+          simg->GetPalette(), transpidx);
+    }
+    nimg->ConvertFromRGBA (mipmap);
+    if (simg->GetAlpha ())
+    {
+      mipmap_1_a (cur_w, cur_h, (uint8 *)simg->GetAlpha (), Alpha);
+    }
+    break;
       case CS_IMGFMT_TRUECOLOR:
-	if (!transp)
-	  mipmap_1 (cur_w, cur_h, (csRGBpixel *)simg->GetImageData (), mipmap);
-	else
-	  mipmap_1_t (cur_w, cur_h, (csRGBpixel *)simg->GetImageData (), mipmap, *transp);
-	nimg->ConvertFromRGBA (mipmap);
-	break;
+    if (!transp)
+      mipmap_1 (cur_w, cur_h, (csRGBpixel *)simg->GetImageData (), mipmap);
+    else
+      mipmap_1_t (cur_w, cur_h, (csRGBpixel *)simg->GetImageData (), mipmap, *transp);
+    nimg->ConvertFromRGBA (mipmap);
+    break;
     }
 
     simg = nimg;
@@ -452,27 +454,29 @@ csRef<iImage> csImageManipulate::Blur (iImage* source, csRGBpixel* transp)
     case CS_IMGFMT_NONE:
     case CS_IMGFMT_PALETTED8:
       if (source->GetImageData())
-	if (transpidx < 0)
-	  mipmap_0_p (source->GetWidth(), source->GetHeight(), 
-	    (uint8 *)source->GetImageData(), mipmap, source->GetPalette());
-	else
-	  mipmap_0_pt(source->GetWidth(), source->GetHeight(), 
-	    (uint8*)source->GetImageData(), mipmap, source->GetPalette(),
-	    transpidx);
+      {
+        if (transpidx < 0)
+          mipmap_0_p (source->GetWidth(), source->GetHeight(), 
+            (uint8 *)source->GetImageData(), mipmap, source->GetPalette());
+        else
+          mipmap_0_pt(source->GetWidth(), source->GetHeight(), 
+            (uint8*)source->GetImageData(), mipmap, source->GetPalette(),
+            transpidx);
+      }
       nimg->ConvertFromRGBA (mipmap);
       if (source->GetAlpha())
       {
-	mipmap_0_a (source->GetWidth(), source->GetHeight(), 
-	  (uint8 *)source->GetAlpha(), Alpha);
+        mipmap_0_a (source->GetWidth(), source->GetHeight(), 
+          (uint8 *)source->GetAlpha(), Alpha);
       }
       break;
     case CS_IMGFMT_TRUECOLOR:
       if (!transp)
-	mipmap_0 (source->GetWidth(), source->GetHeight(), 
-	  (csRGBpixel *)source->GetImageData(), mipmap);
+        mipmap_0 (source->GetWidth(), source->GetHeight(), 
+          (csRGBpixel *)source->GetImageData(), mipmap);
       else
-	mipmap_0_t (source->GetWidth(), source->GetHeight(), 
-	  (csRGBpixel *)source->GetImageData(), mipmap, *transp);
+        mipmap_0_t (source->GetWidth(), source->GetHeight(), 
+          (csRGBpixel *)source->GetImageData(), mipmap, *transp);
       nimg->ConvertFromRGBA (mipmap);
       break;
   }
