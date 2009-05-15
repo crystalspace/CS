@@ -401,6 +401,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual void SetMeshWrapper (iMeshWrapper* logparent)
     {
       meshWrapper = logparent;
+
+      // Check for delayed advance.
+      if(executeDelayedAdvance)
+      {
+        Advance(delayedAdvance);
+        delayedAdvance = 0;
+        executeDelayedAdvance = false;
+      }
     }
 
     virtual iMeshWrapper* GetMeshWrapper () const 

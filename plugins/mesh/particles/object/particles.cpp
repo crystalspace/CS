@@ -680,14 +680,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   void ParticlesMeshObject::NextFrame (csTicks current_time, const csVector3& pos,
     uint currentFrame)
   {
-    // Check for delayed advance.
-    if(executeDelayedAdvance)
-    {
-      Advance(delayedAdvance);
-      delayedAdvance = 0;
-      executeDelayedAdvance = false;
-    }
-
     // Update the particle buffers etc
     if (lastFrameNumber == currentFrame)
       return;
