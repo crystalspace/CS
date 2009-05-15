@@ -2691,7 +2691,7 @@ void csGLGraphics3D::ApplyBufferChanges()
         AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, buffer);      
 
       csRenderBufferComponentType compType = buffer->GetComponentType();
-      csRenderBufferComponentType compTypeBase = (compType & ~CS_BUFCOMP_NORMALIZED);
+      csRenderBufferComponentType compTypeBase = csRenderBufferComponentType(compType & ~CS_BUFCOMP_NORMALIZED);
       bool isFloat = (compType == CS_BUFCOMP_FLOAT) 
 	|| (compType == CS_BUFCOMP_DOUBLE);
       bool normalized = !isFloat && (compType & CS_BUFCOMP_NORMALIZED);
