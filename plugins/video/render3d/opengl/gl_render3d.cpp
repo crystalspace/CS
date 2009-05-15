@@ -79,6 +79,9 @@ iRenderBuffer* csGLGraphics3D::BufferShadowDataHelper::GetSupportedRenderBuffer 
   if (!shadowData.shadowBuffer
       || (shadowData.originalBufferVersion != originalBuffer->GetVersion()))
   {
+    if (shadowData.IsNew())
+      originalBuffer->SetCallback (this);
+  
     if (!shadowData.shadowBuffer
         || (shadowData.shadowBuffer->GetComponentCount()
 	  != originalBuffer->GetComponentCount())

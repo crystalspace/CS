@@ -471,6 +471,7 @@ private:
       uint originalBufferVersion;
       
       ShadowedBuffer() : originalBufferVersion(~0) {}
+      bool IsNew() const { return originalBufferVersion == uint (~0); }
     };
     typedef csHash<ShadowedBuffer, csPtrKey<iRenderBuffer>,
       CS::Memory::AllocatorMalloc,
