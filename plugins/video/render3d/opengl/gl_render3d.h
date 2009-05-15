@@ -427,8 +427,7 @@ private:
     gen_renderBuffers[attr] = buffer;
   }
 
-  void* RenderLock (iRenderBuffer* buffer, csGLRenderBufferLockType type, 
-    GLenum& compGLType, bool& normalized);
+  void* RenderLock (iRenderBuffer* buffer, csGLRenderBufferLockType type);
   void RenderRelease (iRenderBuffer* buffer);
 
   struct ImageUnit : public CS::Memory::CustomAllocated
@@ -456,6 +455,41 @@ private:
   uint activeVertexAttribs;
   void ApplyBufferChanges();
   //@}
+
+  /**
+   * Helper class for render buffer shadow data (ie when the buffer actually
+   * used is different from the originally provided one, usually do data
+   * conversion).
+   */
+  class BufferShadowDataHelper :
+    public scfImplementation1<BufferShadowDataHelper,
+                              iRenderBufferCallback>
+  {
+    struct ShadowedBuffer
+    {
+      csRef<iRenderBuffer> shadowBuffer;
+      uint originalBufferVersion;
+      
+      ShadowedBuffer() : originalBufferVersion(~0) {}
+    };
+    typedef csHash<ShadowedBuffer, csPtrKey<iRenderBuffer>,
+      CS::Memory::AllocatorMalloc,
+      csArraySafeCopyElementHandler<
+        CS::Container::HashElement<ShadowedBuffer, csPtrKey<iRenderBuffer> > >
+      > ShadowedBuffersHash;
+    ShadowedBuffersHash shadowedBuffers;
+  public:
+    BufferShadowDataHelper() : scfImplementationType (this) {}
+    
+    /**\name iRenderBufferCallback implementation
+     * @{ */
+    virtual void RenderBufferDestroyed (iRenderBuffer* buffer);
+    /** @} */
+    
+    iRenderBuffer* GetSupportedRenderBuffer (
+      iRenderBuffer* originalBuffer);
+  };
+  csRef<BufferShadowDataHelper> bufferShadowDataHelper;
 
   // Minimal float depth(z) difference to store
   // different values in depth buffer. Of course, for standard depth

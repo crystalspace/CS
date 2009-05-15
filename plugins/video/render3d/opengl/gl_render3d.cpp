@@ -38,6 +38,7 @@
 #include "csgeom/projections.h"
 #include "csgfx/imagememory.h"
 #include "csgfx/renderbuffer.h"
+#include "csgfx/vertexlistwalker.h"
 #include "csplugincommon/opengl/assumedstate.h"
 #include "csplugincommon/opengl/glhelper.h"
 #include "csplugincommon/opengl/glstates.h"
@@ -62,6 +63,51 @@ CS_IMPLEMENT_PLUGIN
 
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
+
+void csGLGraphics3D::BufferShadowDataHelper::RenderBufferDestroyed (
+  iRenderBuffer* buffer)
+{
+  shadowedBuffers.DeleteAll (buffer);
+}
+    
+iRenderBuffer* csGLGraphics3D::BufferShadowDataHelper::GetSupportedRenderBuffer (
+  iRenderBuffer* originalBuffer)
+{
+  CS_ASSERT(!originalBuffer->IsIndexBuffer());
+
+  ShadowedBuffer& shadowData = shadowedBuffers.GetOrCreate (originalBuffer);
+  if (!shadowData.shadowBuffer
+      || (shadowData.originalBufferVersion != originalBuffer->GetVersion()))
+  {
+    if (!shadowData.shadowBuffer
+        || (shadowData.shadowBuffer->GetComponentCount()
+	  != originalBuffer->GetComponentCount())
+	|| (shadowData.shadowBuffer->GetElementCount()
+	  != originalBuffer->GetElementCount()))
+    {
+      shadowData.shadowBuffer = csRenderBuffer::CreateRenderBuffer (
+        originalBuffer->GetElementCount(),
+        originalBuffer->GetBufferType(),
+        CS_BUFCOMP_FLOAT,
+        originalBuffer->GetComponentCount());
+    }
+    shadowData.originalBufferVersion = originalBuffer->GetVersion();
+    
+    // The vertex list walker actually already does all the conversion we need
+    csVertexListWalker<float> src (originalBuffer);
+    csRenderBufferLock<float> dst (shadowData.shadowBuffer);
+    size_t copySize = sizeof(float) * shadowData.shadowBuffer->GetComponentCount();
+    for (size_t i = 0; i < dst.GetSize(); i++)
+    {
+      memcpy ((float*)(dst++), (const float*)src, copySize);
+      ++src;
+    }
+  }
+  
+  return shadowData.shadowBuffer;
+}
+
+//---------------------------------------------------------------------------
 
 CS_DECLARE_PROFILER
 CS_DECLARE_PROFILER_ZONE(csGLGraphics3D_DrawMesh);
@@ -129,6 +175,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) :
   cliptype = CS_CLIPPER_NONE;
 
   r2tbackend = 0;
+  bufferShadowDataHelper.AttachNew (new BufferShadowDataHelper);
 }
 
 csGLGraphics3D::~csGLGraphics3D()
@@ -2212,10 +2259,9 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   else
     statecache->Disable_GL_POLYGON_OFFSET_FILL ();
 
-  GLenum compType;
-  bool normalized;
+  GLenum compType = compGLtypes[iIndexbuf->GetComponentType()];
   void* bufData =
-    RenderLock (iIndexbuf, CS_GLBUF_RENDERLOCK_ELEMENTS, compType, normalized);
+    RenderLock (iIndexbuf, CS_GLBUF_RENDERLOCK_ELEMENTS);
   statecache->ApplyBufferBinding (csGLStateCacheContext::boIndexArray);
   if (bufData != (void*)-1)
   {
@@ -2593,14 +2639,8 @@ void csGLGraphics3D::ClosePortal ()
 }
 
 void* csGLGraphics3D::RenderLock (iRenderBuffer* buffer, 
-				  csGLRenderBufferLockType type, 
-                                  GLenum& compGLType, bool& normalized)
+				  csGLRenderBufferLockType type)
 {
-  csRenderBufferComponentType compType = buffer->GetComponentType();
-  normalized = (compType != CS_BUFCOMP_FLOAT) 
-    && (compType != CS_BUFCOMP_DOUBLE)
-    && (compType & CS_BUFCOMP_NORMALIZED);
-  compGLType = compGLtypes[compType];
   if (vboManager.IsValid())
     return vboManager->RenderLock (buffer, type);
   else
@@ -2650,40 +2690,102 @@ void csGLGraphics3D::ApplyBufferChanges()
       else               
         AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, buffer);      
 
-      GLenum compType;
-      bool normalized;
-      void *data =
-	RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType, normalized);
+      csRenderBufferComponentType compType = buffer->GetComponentType();
+      csRenderBufferComponentType compTypeBase = (compType & ~CS_BUFCOMP_NORMALIZED);
+      bool isFloat = (compType == CS_BUFCOMP_FLOAT) 
+	|| (compType == CS_BUFCOMP_DOUBLE);
+      bool normalized = !isFloat && (compType & CS_BUFCOMP_NORMALIZED);
+
+      /* Normalization/data type fixup:
+         Specialized attribs treat vertex data as generally either normalized
+         or not normalized. If the actual data doesn't fit that conversion
+         is needed.
+         The specialized vertex array functions also don't support all data
+         types. */
+      const uint wants_short_int =
+        (1 << CS_BUFCOMP_SHORT) | (1 << CS_BUFCOMP_INT);
+      const uint wants_byte_short_int = wants_short_int |
+        (1 << CS_BUFCOMP_BYTE);
+      switch (att)
+      {
+      case CS_VATTRIB_POSITION:
+	if (!isFloat && (normalized
+	    || (((1 << compTypeBase) & wants_short_int) == 0)))
+        {
+          // Set up shadow buffer
+          buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+          compType = buffer->GetComponentType();
+        }
+        break;
+      case CS_VATTRIB_NORMAL:
+	if (!isFloat && (!normalized
+	    || (((1 << compTypeBase) & wants_byte_short_int) == 0)))
+        {
+          // Set up shadow buffer
+          buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+          compType = buffer->GetComponentType();
+        }
+        break;
+      case CS_VATTRIB_COLOR:
+        if (!isFloat && !normalized)
+        {
+          // Set up shadow buffer
+          buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+          compType = buffer->GetComponentType();
+        }
+        break;
+      case CS_VATTRIB_SECONDARY_COLOR:
+        if (ext->CS_GL_EXT_secondary_color)
+        {
+	  if (!isFloat && !normalized)
+	  {
+	    // Set up shadow buffer
+	    buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+	    compType = buffer->GetComponentType();
+	  }
+        }
+        break;
+      default:
+        if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
+        {
+	if (!isFloat && (normalized
+	    || (((1 << compTypeBase) & wants_short_int) == 0)))
+	  {
+	    // Set up shadow buffer
+	    buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+	    compType = buffer->GetComponentType();
+	  }
+        }
+      }
+	
+      GLenum compGLType = compGLtypes[compType];
+      void *data = RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY);
 
       if (data == (void*)-1) continue;
 
       switch (att)
       {
       case CS_VATTRIB_POSITION:
-	// @@@ FIXME: How to deal with normalized buffers?
         statecache->Enable_GL_VERTEX_ARRAY ();
         statecache->SetVertexPointer (buffer->GetComponentCount (),
-          compType, (GLsizei)buffer->GetStride (), data);
+          compGLType, (GLsizei)buffer->GetStride (), data);
         break;
       case CS_VATTRIB_NORMAL:
-	// @@@ FIXME: How to deal with unnormalized buffers?
 	statecache->Enable_GL_NORMAL_ARRAY ();
-        statecache->SetNormalPointer (compType, (GLsizei)buffer->GetStride (), 
+        statecache->SetNormalPointer (compGLType, (GLsizei)buffer->GetStride (), 
           data);
         break;
       case CS_VATTRIB_COLOR:
-	// @@@ FIXME: How to deal with unnormalized buffers?
 	statecache->Enable_GL_COLOR_ARRAY ();
         statecache->SetColorPointer (buffer->GetComponentCount (),
-          compType, (GLsizei)buffer->GetStride (), data);
+          compGLType, (GLsizei)buffer->GetStride (), data);
         break;
       case CS_VATTRIB_SECONDARY_COLOR:
         if (ext->CS_GL_EXT_secondary_color)
         {
-	  // @@@ FIXME: How to deal with unnormalized buffers?
 	  statecache->Enable_GL_SECONDARY_COLOR_ARRAY_EXT ();
 	  statecache->SetSecondaryColorPointerExt (buffer->GetComponentCount (),
-	    compType, (GLsizei)buffer->GetStride (), data);
+	    compGLType, (GLsizei)buffer->GetStride (), data);
         }
         break;
       default:
@@ -2695,10 +2797,9 @@ void csGLGraphics3D::ApplyBufferChanges()
           {
             statecache->SetCurrentTCUnit (unit);
           } 
-	  // @@@ FIXME: How to deal with normalized buffers?
 	  statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
           statecache->SetTexCoordPointer (buffer->GetComponentCount (),
-            compType, (GLsizei)buffer->GetStride (), data);
+            compGLType, (GLsizei)buffer->GetStride (), data);
         }
         else if (CS_VATTRIB_IS_GENERIC(att))
         {
@@ -2712,7 +2813,7 @@ void csGLGraphics3D::ApplyBufferChanges()
 	      activeVertexAttribs |= (1 << index);
 	    }
 	    ext->glVertexAttribPointerARB(index, buffer->GetComponentCount (),
-              compType, normalized, (GLsizei)buffer->GetStride (), data);
+              compGLType, normalized, (GLsizei)buffer->GetStride (), data);
 	  }
         }
         else
