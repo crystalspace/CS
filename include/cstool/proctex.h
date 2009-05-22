@@ -83,7 +83,7 @@ protected:
   int texFlags;
 
   // Texture wrapper.
-  iTextureWrapper* tex;
+  csRef<iTextureWrapper> tex;
   // Dimensions of texture.
   int mat_w, mat_h;
   csRef<iImage> proc_image;
