@@ -44,6 +44,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
 class csXMLShaderCompiler;
+class ForeignNodeStorage;
+class ForeignNodeReader;
 
 class csWrappedDocumentNodeIterator;
 struct WrapperStackEntry;
@@ -310,9 +312,6 @@ protected:
   csWrappedDocumentNode (csWrappedDocumentNode* parent,
     iConditionResolver* resolver,
     csWrappedDocumentNodeFactory* shared);
-    
-  class ForeignNodeStorage;
-  class ForeignNodeReader;
   
   bool StoreToCache (iFile* cacheFile, ForeignNodeStorage& foreignNodes,
     const ConditionsWriter& condWriter);

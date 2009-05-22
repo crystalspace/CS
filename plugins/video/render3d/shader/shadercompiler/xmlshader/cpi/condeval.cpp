@@ -934,6 +934,11 @@ bool csConditionEvaluator::Evaluate (csConditionID condition,
 				     const CS::Graphics::RenderMeshModes& modes,
 				     const csShaderVariableStack* stack)
 {
+  /* Assert we don't evaluate without an EnterEvaluation()
+     (otherwise, evaluation cache won't be cleared, causing problems down
+     the road) */
+  CS_ASSERT(evalDepth > 0);
+
   if (condition == csCondAlwaysTrue)
     return true;
   else if (condition == csCondAlwaysFalse)
@@ -1784,7 +1789,7 @@ ConditionsReader::ConditionsReader (csConditionEvaluator& evaluator,
   savedConds.SetPos (savedConds.GetSize() - sizeof (uint32));
   uint32 numCondsLE;
   if (savedConds.Read ((char*)&numCondsLE, sizeof (numCondsLE))
-    != sizeof (sizeof (numCondsLE))) return;
+    != sizeof (numCondsLE)) return;
   numCondsLE = csLittleEndian::UInt32 (numCondsLE);
   savedConds.SetPos (0);
   
