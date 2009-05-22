@@ -857,6 +857,125 @@ public:
     return SetBitIterator (*this);
   }
   //@}
+  
+  /**\name Serialization
+   * @{ */
+  /**
+   * Get byte stream with the contents of the bit array.
+   * \param numBytes Number of bytes in the returned buffer.
+   * \return A byte stream with the contents of the bit array.
+   *  May be 0. Must be freed with cs_free().
+   */
+  uint8* Serialize (size_t& numBytes) const
+  {
+    if (mNumBits == 0)
+    {
+      numBytes = 0;
+      return 0;
+    }
+  
+    struct SerializeHelper
+    {
+      uint8* buf;
+      size_t bufSize, bufUsed;
+      
+      SerializeHelper () : buf (0), bufSize (0), bufUsed (0) {}
+      void PushByte (uint8 b)
+      {
+        if (bufUsed >= bufSize)
+        {
+          bufSize += 4;
+          buf = (uint8*)cs_realloc (buf, bufSize);
+        }
+        buf[bufUsed++] = b;
+      }
+      void TruncZeroes ()
+      {
+        while ((bufUsed > 0) && (buf[bufUsed-1] == 0))
+          bufUsed--;
+      }
+    } serHelper;
+    
+    // Write out bits number
+    {
+      size_t remainder = mNumBits;
+      
+      while (remainder >= 128)
+      {
+        uint8 b = (remainder & 0x7f) | 0x80;
+        serHelper.PushByte (b);
+        remainder >>= 7;
+      }
+      serHelper.PushByte (uint8 (remainder));
+    }
+  
+    const size_t ui8Count = sizeof (csBitArrayStorageType) / sizeof (uint8);
+    uint8 ui8[ui8Count];
+    csBitArrayStorageType const* p = GetStore();
+    for (size_t i = 0; i < mLength; i++)
+    {
+      memcpy (ui8, &p[i], sizeof (ui8));
+#ifdef CS_LITTLE_ENDIAN
+      for (size_t j = 0; j < ui8Count; j++)
+#else
+      for (size_t j = ui8Count; j-- > 0; )
+#endif
+      {
+	serHelper.PushByte (ui8[j]);
+      }
+    }
+    
+    serHelper.TruncZeroes();
+    numBytes = serHelper.bufUsed;
+    return serHelper.buf;
+  }
+  /**
+   * Create a new instance of a bit array with the contents as given
+   * in the byte stream.
+   */
+  static ThisType Unserialize (uint8* bytes, size_t numBytes)
+  {
+    if ((bytes == 0) || (numBytes == 0))
+      return ThisType(); // empty bit array
+  
+    size_t bufPos = 0;
+  
+    // Read the bits number
+    size_t numBits = 0;
+    int shift = 0;
+    while (bufPos < numBytes)
+    {
+      uint8 b = bytes[bufPos++];
+      numBits |= (b & 0x7f) << shift;
+      if ((b & 0x80) == 0) break;
+      shift += 7;
+    }
+    
+    ThisType newArray (numBits);
+    
+    // Read the actual bits
+    csBitArrayStorageType* p = newArray.GetStore();
+    size_t storeIndex = 0;
+    while (bufPos < numBytes)
+    {
+      const size_t ui8Count = sizeof (csBitArrayStorageType) / sizeof (uint8);
+      uint8 ui8[ui8Count];
+      memset (ui8, 0, sizeof (ui8));
+#ifdef CS_LITTLE_ENDIAN
+      for (size_t j = 0; j < ui8Count; j++)
+#else
+      for (size_t j = ui8Count; j-- > 0; )
+#endif
+      {
+        ui8[j] = bytes[bufPos++];
+        if (bufPos >= numBytes) break;
+      }
+      memcpy (p + (storeIndex++), ui8, sizeof (ui8));
+    }
+    
+    return newArray;
+  }
+  /** @} */
 };
 
 /**
