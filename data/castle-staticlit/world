@@ -14,7 +14,7 @@
         </texture>
         <texture name="BUMPcastle-detail1_h.jpg">
             <file>/lib/std/castle/castle-detail1_h.jpg</file>
-            <class>normalmap</class>
+            <class>heightmap</class>
         </texture>
         <texture name="BUMPcastle-detail1_n.jpg">
             <file>/lib/std/castle/castle-detail1_n.jpg</file>
@@ -28,7 +28,7 @@
         </texture>
         <texture name="BUMPcobblestone_h.jpg">
             <file>/lib/std/castle/cobblestone_h.jpg</file>
-            <class>normalmap</class>
+            <class>heightmap</class>
         </texture>
         <texture name="BUMPcobblestone_n.jpg">
             <file>/lib/std/castle/cobblestone_n.jpg</file>
@@ -36,7 +36,7 @@
         </texture>
         <texture name="BUMPwall-stone2_h.jpg">
             <file>/lib/std/castle/wall-stone2_h.jpg</file>
-            <class>normalmap</class>
+            <class>heightmap</class>
         </texture>
         <texture name="BUMPwall-stone2_n.jpg">
             <file>/lib/std/castle/wall-stone2_n.jpg</file>
@@ -50,7 +50,7 @@
         </texture>
         <texture name="BUMPwood_barrel_h.jpg">
             <file>/lib/std/castle/wood_barrel_h.jpg</file>
-            <class>normalmap</class>
+            <class>heightmap</class>
         </texture>
         <texture name="BUMPwood_barrel_n.png">
             <file>/lib/std/castle/wood_barrel_n.png</file>
@@ -61,7 +61,7 @@
         </texture>
         <texture name="BUMPwood2_h.jpg">
             <file>/lib/std/castle/wood2_h.jpg</file>
-            <class>normalmap</class>
+            <class>heightmap</class>
         </texture>
         <texture name="BUMPwood2_n.jpg">
             <file>/lib/std/castle/wood2_n.jpg</file>
@@ -72,7 +72,7 @@
         </texture>
         <texture name="BUMPmetal_pipes1_h.jpg">
             <file>/lib/std/castle/metal_pipes1_h.jpg</file>
-            <class>normalmap</class>
+            <class>heightmap</class>
         </texture>
         <texture name="BUMPmetal_pipes1_n.png">
             <file>/lib/std/castle/metal_pipes1_n.png</file>
@@ -83,7 +83,7 @@
         </texture>
         <texture name="BUMPcastle-detail3_h.jpg">
             <file>/lib/std/castle/castle-detail3_h.jpg</file>
-            <class>normalmap</class>
+            <class>heightmap</class>
         </texture>
         <texture name="BUMPcastle-detail3_n.jpg">
             <file>/lib/std/castle/castle-detail3_n.jpg</file>
@@ -94,7 +94,7 @@
         </texture>
         <texture name="BUMPwood_h.jpg">
             <file>/lib/std/castle/wood_h.jpg</file>
-            <class>normalmap</class>
+            <class>heightmap</class>
         </texture>
         <texture name="BUMPwood_n.jpg">
             <file>/lib/std/castle/wood_n.jpg</file>
@@ -105,7 +105,7 @@
         </texture>
         <texture name="BUMPconcrete_floor4_3_h.jpg">
             <file>/lib/std/castle/concrete_floor4_3_h.jpg</file>
-            <class>normalmap</class>
+            <class>heightmap</class>
         </texture>
         <texture name="BUMPconcrete_floor4_3_n.jpg">
             <file>/lib/std/castle/concrete_floor4_3_n.jpg</file>
@@ -116,7 +116,7 @@
         </texture>
         <texture name="BUMPcastle-detail2_h.jpg">
             <file>/lib/std/castle/castle-detail2_h.jpg</file>
-            <class>normalmap</class>
+            <class>heightmap</class>
         </texture>
         <texture name="BUMPcastle-detail2_n.jpg">
             <file>/lib/std/castle/castle-detail2_n.jpg</file>
@@ -127,7 +127,7 @@
         </texture>
         <texture name="BUMPbrick1_h.png">
             <file>/lib/std/castle/brick1_h.png</file>
-            <class>normalmap</class>
+            <class>heightmap</class>
         </texture>
         <texture name="BUMPbrick1_n.jpg">
             <file>/lib/std/castle/brick1_n.jpg</file>
@@ -141,7 +141,7 @@
         </texture>
         <texture name="BUMPconcrete_floor6_h.jpg">
             <file>/lib/std/castle/concrete_floor6_h.jpg</file>
-            <class>normalmap</class>
+            <class>heightmap</class>
         </texture>
         <texture name="BUMPconcrete_floor6_n.jpg">
             <file>/lib/std/castle/concrete_floor6_n.jpg</file>
@@ -152,7 +152,7 @@
         </texture>
         <texture name="BUMPpowder_h.jpg">
             <file>/lib/std/castle/powder_h.jpg</file>
-            <class>normalmap</class>
+            <class>heightmap</class>
         </texture>
         <texture name="BUMPpowder_n.jpg">
             <file>/lib/std/castle/powder_n.jpg</file>
@@ -166,7 +166,7 @@
         </texture>
         <texture name="BUMPcastle-brick1_h.jpg">
             <file>/lib/std/castle/castle-brick1_h.jpg</file>
-            <class>normalmap</class>
+            <class>heightmap</class>
         </texture>
         <texture name="BUMPcastle-brick1_n.jpg">
             <file>/lib/std/castle/castle-brick1_n.jpg</file>
@@ -174,7 +174,7 @@
         </texture>
         <texture name="BUMPcastle-window-h.jpg">
             <file>/lib/std/castle/castle-window-h.jpg</file>
-            <class>normalmap</class>
+            <class>heightmap</class>
         </texture>
         <texture name="BUMPcastle-window-n.png">
             <file>/lib/std/castle/castle-window-n.png</file>
@@ -188,7 +188,7 @@
         </texture>
         <texture name="BUMPcredits_h.jpg">
             <file>/lib/std/castle/credits_h.jpg</file>
-            <class>normalmap</class>
+            <class>heightmap</class>
         </texture>
         <texture name="BUMPcredits_n.jpg">
             <file>/lib/std/castle/credits_n.jpg</file>
@@ -199,7 +199,7 @@
         </texture>
         <texture name="BUMPcrystal_h.jpg">
             <file>/lib/std/castle/crystal_h.jpg</file>
-            <class>normalmap</class>
+            <class>heightmap</class>
         </texture>
         <texture name="BUMPcrystal_n.png">
             <file>/lib/std/castle/crystal_n.png</file>
