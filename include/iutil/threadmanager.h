@@ -29,7 +29,7 @@ struct iJob;
 
 struct iThreadReturn : public virtual iBase
 {
-  SCF_INTERFACE(iThreadReturn, 1, 0, 0);
+  SCF_INTERFACE(iThreadReturn, 1, 1, 0);
 
   virtual bool IsFinished() = 0;
   virtual bool WasSuccessful() = 0;
@@ -43,7 +43,7 @@ struct iThreadReturn : public virtual iBase
 
   virtual void Copy(iThreadReturn* other) = 0;
 
-  virtual void Wait() = 0;
+  virtual void Wait(bool process = true) = 0;
   virtual void SetWaitPtrs(CS::Threading::Condition* c, CS::Threading::Mutex* m) = 0;
 };
 
@@ -74,7 +74,7 @@ struct iThreadManager : public virtual iBase
   virtual void Init(iConfigManager* config) = 0;
   virtual void Process(uint num = 1) = 0;
   virtual void PushToQueue(QueueType queueType, iJob* job) = 0;
-  virtual bool Wait(csRefArray<iThreadReturn>& threadReturns) = 0;
+  virtual bool Wait(csRefArray<iThreadReturn>& threadReturns, bool process = true) = 0;
   virtual bool RunNow(QueueType queueType, bool wait, bool forceQueue) = 0;
   virtual int32 GetThreadCount() = 0;
   virtual void SetAlwaysRunNow(bool v) = 0;

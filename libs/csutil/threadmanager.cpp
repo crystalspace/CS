@@ -79,7 +79,7 @@ void csThreadManager::Process(uint num)
   listQueue->ProcessQueue(num);  
 }
 
-bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns)
+bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns, bool process)
 {
   bool success = true;
 
@@ -110,7 +110,7 @@ bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns)
       MutexScopedLock lock(*m);
       if(IsMainThread())
       {
-        if(listQueue->GetQueueCount() > 0)
+        if(process && listQueue->GetQueueCount() > 0)
         {
           m->Unlock();
           listQueue->ProcessQueue(1);
@@ -124,7 +124,7 @@ bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns)
       else
       {
         MutexScopedLock lock(waitingThreadsLock);
-        if(threadQueue->GetQueueCount() > 0)
+        if(process && threadQueue->GetQueueCount() > 0)
         {
           waitingThreadsLock.Unlock();
           m->Unlock();

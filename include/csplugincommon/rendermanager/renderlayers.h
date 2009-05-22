@@ -153,14 +153,12 @@ namespace RenderManager
     }
     //@{
     /// Get settings for handling static lights
-    StaticLightsSettings& GetStaticLightsSettings (size_t layer)
+    StaticLightsSettings& GetStaticLightsSettings ()
     {
-      CS_ASSERT(layer == 0);
       return staticLights;
     }
-    const StaticLightsSettings& GetStaticLightsSettings (size_t layer) const
+    const StaticLightsSettings& GetStaticLightsSettings () const
     {
-      CS_ASSERT(layer == 0);
       return staticLights;
     }
     //@}
@@ -271,7 +269,6 @@ namespace RenderManager
 	newLayer.maxLights = layers.GetMaxLightNum (l);
 	newLayer.isAmbient = layers.IsAmbientLayer (l);
 	newLayer.svContext = layers.GetSVContext (l);
-	newLayer.staticLights = layers.GetStaticLightsSettings (l);
 	newLayer.firstType = layerTypes.GetSize ();
 	const csStringID* copyTypes = layers.GetShaderTypes (l,
 	  newLayer.numTypes);
@@ -340,13 +337,13 @@ namespace RenderManager
     }
     //@{
     /// Get settings for handling static lights
-    StaticLightsSettings& GetStaticLightsSettings (size_t layer)
+    StaticLightsSettings& GetStaticLightsSettings ()
     {
-      return layers[layer].staticLights;
+      return staticLights;
     }
-    const StaticLightsSettings& GetStaticLightsSettings (size_t layer) const
+    const StaticLightsSettings& GetStaticLightsSettings () const
     {
-      return layers[layer].staticLights;
+      return staticLights;
     }
     //@}
 
@@ -357,6 +354,7 @@ namespace RenderManager
       layerTypes.DeleteAll ();
     }
   private:
+    StaticLightsSettings staticLights;
     struct Layer
     {
       csRef<iShader> defaultShader;
@@ -366,7 +364,6 @@ namespace RenderManager
       size_t numTypes;
       bool isAmbient;
       csRef<iShaderVariableContext> svContext;
-      StaticLightsSettings staticLights;
     };
     csArray<Layer> layers;
     csDirtyAccessArray<StringIDValue> layerTypes;

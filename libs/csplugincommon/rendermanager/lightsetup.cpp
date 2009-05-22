@@ -57,30 +57,11 @@ namespace RenderManager
     persist.lightTypeScratch.Push (iltp);
   }
     
-  bool LightingSorter::GetNextLight (bool skipStatic, LightInfo& out)
+  bool LightingSorter::GetNextLight (LightInfo& out)
   {
     csArray<LightInfo>& putBackLights = persist.putBackLights;
     
     size_t i = 0;
-    if (skipStatic)
-    {
-      while (i < lightLimit + putBackLights.GetSize())
-      {
-        if (i < putBackLights.GetSize())
-        {
-          size_t j = putBackLights.GetSize()-1-i;
-	  if (!putBackLights[j].isStatic) break;
-	  putBackLights.DeleteIndex (j);
-        }
-        else
-        {
-          size_t j = i-putBackLights.GetSize();
-	  if (!persist.lightTypeScratch[j].isStatic) break;
-	  persist.lightTypeScratch.DeleteIndex (j);
-	  lightLimit = csMin (persist.lightTypeScratch.GetSize(), lightLimit);
-	}
-      }
-    }
     if (i >= lightLimit + putBackLights.GetSize()) return false;
     if (i < putBackLights.GetSize())
     {
@@ -98,7 +79,6 @@ namespace RenderManager
   }
   
   bool LightingSorter::GetNextLight (const LightSettings& settings, 
-                                     bool skipStatic,
                                      LightInfo& out)
   {
     csArray<LightInfo>& putBackLights = persist.putBackLights;
@@ -109,23 +89,12 @@ namespace RenderManager
       if (i < putBackLights.GetSize())
       {
         size_t j = putBackLights.GetSize()-1-i;
-	if (skipStatic && putBackLights[j].isStatic)
-	{
-	  putBackLights.DeleteIndex (j);
-	  continue;
-	}
 	if (putBackLights[j].settings == settings)
 	  break;
       }
       else
       {
         size_t j = i-putBackLights.GetSize();
-	if (skipStatic && persist.lightTypeScratch[j].isStatic)
-	{
-	  persist.lightTypeScratch.DeleteIndex (j);
-	  lightLimit = csMin (persist.lightTypeScratch.GetSize(), lightLimit);
-	  continue;
-	}
 	if (persist.lightTypeScratch[j].settings == settings)
 	  break;
       }

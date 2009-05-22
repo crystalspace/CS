@@ -401,6 +401,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual void SetMeshWrapper (iMeshWrapper* logparent)
     {
       meshWrapper = logparent;
+
+      // Check for delayed advance.
+      if(delayedAdvance > 0)
+      {
+        Advance(delayedAdvance);
+        delayedAdvance = 0;
+      }
     }
 
     virtual iMeshWrapper* GetMeshWrapper () const 
@@ -633,6 +640,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     ParticlesMeshFactory* factory;
 
     iVertexSetup* vertexSetup; //Helper object
+
+    // For delayed advance.
+    csTicks delayedAdvance;
     
     /**
      * Advance particle system by given amount of seconds.
@@ -649,7 +659,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     uint mixMode;
 
     csTicks lastUpdateTime;
-    csTicks currentDt;
     uint lastFrameNumber;
     float totalParticleTime;
     
