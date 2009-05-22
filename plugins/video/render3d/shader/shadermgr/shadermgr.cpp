@@ -23,6 +23,7 @@
 #include "csgeom/vector3.h"
 #include "csgeom/vector4.h"
 #include "cstypes.h"
+#include "csver.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
 #include "csutil/eventhandlers.h"
@@ -238,7 +239,8 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
     if (cachePath && *cachePath)
     {
       cache.AttachNew (new CS::Utility::VfsHierarchicalCache (objectreg,
-	cachePath));
+	csString().Format ("%s/" CS_VERSION_MAJOR "." CS_VERSION_MINOR,
+	cachePath)));
       shaderCache->AddSubShaderCache (cache, cachePriorityUser);
     }
     
