@@ -138,4 +138,9 @@
     </snippet>
     <connection from="eyeVecT" to="parallax-occlusion" />
   </technique>
+
+  <!-- Fall back to "old" parallax snippet -->
+  <technique priority="50">
+    <snippet id="parallax-old" file="/shader/snippets/surface/parallax.xml" />
+  </technique>
 </snippet>
