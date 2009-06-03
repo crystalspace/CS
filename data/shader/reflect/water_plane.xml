@@ -52,7 +52,7 @@
       <!-- Snippets - the building blocks of this shader. -->
       <snippet id="position" file="/shader/snippets/position.xml" />
       <snippet id="surface" filealias="surface" />
-      <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
+      <snippet id="normalmap" file="/shader/snippets/surface/normalmap-tiled.xml" />
       <snippet id="reflection" file="/shader/snippets/reflect/reflect-plane-screen.xml" />
       <snippet id="refraction" file="/shader/snippets/reflect/reflect-plane-screen.xml" />
       <snippet id="hdrscalerefl" file="/shader/snippets/hdr-prescale.xml" />
