@@ -29,6 +29,7 @@
 
 struct iCamera;
 struct iClipper2D;
+struct iCustomMatrixCamera;
 struct iEngine;
 struct iGraphics3D;
 struct iMeshWrapper;
@@ -50,7 +51,7 @@ struct iPerspectiveCamera;
  */
 struct iView : public virtual iBase
 {
-  SCF_INTERFACE(iView, 2,0,1);
+  SCF_INTERFACE(iView, 2,0,2);
   /// Get engine handle.
   virtual iEngine* GetEngine () = 0;
   /// Set engine handle.
@@ -61,7 +62,10 @@ struct iView : public virtual iBase
   /// Set current camera.
   virtual void SetCamera (iCamera* c) = 0;
 
-  /// Get current perspective camera.
+  /**
+   * Get current perspective camera.
+   * Can return 0 if the current camera is not a perspective camera.
+   */
   virtual iPerspectiveCamera* GetPerspectiveCamera () = 0;
   /// Set current perspective camera.
   virtual void SetPerspectiveCamera (iPerspectiveCamera* c) = 0;
@@ -108,6 +112,14 @@ struct iView : public virtual iBase
   virtual void SetAutoResize (bool state) = 0;
 
   virtual CS::Utility::MeshFilter& GetMeshFilter () = 0;
+
+  /**
+   * Get current custom matrix camera.
+   * Can return 0 if the current camera is not a custom matrix camera.
+   */
+  virtual iCustomMatrixCamera* GetCustomMatrixCamera () = 0;
+  /// Set current perspective camera.
+  virtual void SetCustomMatrixCamera (iCustomMatrixCamera* c) = 0;
 };
 
 #endif // __CS_IVARIA_VIEW_H__
