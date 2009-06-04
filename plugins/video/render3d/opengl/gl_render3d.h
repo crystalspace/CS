@@ -135,7 +135,6 @@ public:
   }
 };
 
-#ifdef CS_DEBUG
 #define GLRENDER3D_OUTPUT_STRING_MARKER(fmtParam)			    \
   if (csGLGraphics3D::DoOutputMarkerString ())                              \
   { MakeAString mas fmtParam; csGLGraphics3D::OutputMarkerString (          \
@@ -144,10 +143,6 @@ public:
   if (csGLGraphics3D::DoOutputMarkerString ())                              \
     csGLGraphics3D::OutputMarkerString (CS_FUNCTION_NAME, 		    \
       CS_STRING_TO_WIDE(__FILE__), __LINE__, "")
-#else
-#define GLRENDER3D_OUTPUT_STRING_MARKER(fmtParam)
-#define GLRENDER3D_OUTPUT_LOCATION_MARKER
-#endif
 
 class csGLGraphics3D;
 class csOpenGLHalo : public scfImplementation1<csOpenGLHalo, iHalo>
