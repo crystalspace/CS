@@ -160,11 +160,11 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) :
   unsigned int i;
   for (i = 0; i < CS_VATTRIB_SPECIFIC_LAST+1; i++)
   {
-    scrapMapping[i] = CS_BUFFER_NONE;
+    defaultBufferMapping[i] = CS_BUFFER_NONE;
   }
-  scrapMapping[CS_VATTRIB_POSITION] = CS_BUFFER_POSITION;
-  scrapMapping[CS_VATTRIB_TEXCOORD0] = CS_BUFFER_TEXCOORD0;
-  scrapMapping[CS_VATTRIB_COLOR] = CS_BUFFER_COLOR;
+  defaultBufferMapping[CS_VATTRIB_POSITION] = CS_BUFFER_POSITION;
+  defaultBufferMapping[CS_VATTRIB_TEXCOORD0] = CS_BUFFER_TEXCOORD0;
+  defaultBufferMapping[CS_VATTRIB_COLOR] = CS_BUFFER_COLOR;
 //  lastUsedShaderpass = 0;
 
   scrapIndicesSize = 0;
@@ -3322,6 +3322,12 @@ bool csGLGraphics3D::SetOption (const char* name, const char* value)
 
 void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh, 
 				     uint flags)
+{
+  csGLGraphics3D::DrawSimpleMeshes (&mesh, 1, flags);
+}
+
+void csGLGraphics3D::DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
+				       size_t numMeshes, uint flags)
 {  
   
   if (current_drawflags & CSDRAW_2DGRAPHICS)
@@ -3329,135 +3335,6 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
     // Try to be compatible with 2D drawing mode
     G2D->PerformExtension ("glflushtext");
   }
-
-  bool useShader = (mesh.shader != 0);
-  uint indexCount = mesh.indices ? mesh.indexCount : mesh.vertexCount;
-  if (!mesh.renderBuffers.IsValid())
-  {
-    if (scrapIndicesSize < indexCount)
-    {
-      scrapIndices = csRenderBuffer::CreateIndexRenderBuffer (indexCount,
-	CS_BUF_STREAM, CS_BUFCOMP_UNSIGNED_INT, 0, mesh.vertexCount - 1);
-      scrapIndicesSize = indexCount;
-    }
-    if (scrapVerticesSize < mesh.vertexCount)
-    {
-      scrapVertices = csRenderBuffer::CreateRenderBuffer (
-	mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
-      scrapTexcoords = csRenderBuffer::CreateRenderBuffer (
-	mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 2);
-      scrapColors = csRenderBuffer::CreateRenderBuffer (
-	mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 4);
-  
-      scrapVerticesSize = mesh.vertexCount;
-    }
-  }
-
-  csShaderVariable* sv;
-  if (!mesh.renderBuffers.IsValid())
-  {
-    sv = scrapContext.GetVariableAdd (string_indices);
-    if (mesh.indices)
-    {
-      scrapIndices->CopyInto (mesh.indices, indexCount);
-    }
-    else
-    {
-      csRenderBufferLock<uint> indexLock (scrapIndices);
-      for (uint i = 0; i < mesh.vertexCount; i++)
-	indexLock[(size_t)i] = i;
-    }
-    sv->SetValue (scrapIndices);
-    scrapBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, scrapIndices);
-  
-    sv = scrapContext.GetVariableAdd (string_vertices);
-    if (mesh.vertices)
-    {
-      scrapVertices->CopyInto (mesh.vertices, mesh.vertexCount);
-      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, scrapVertices);
-      if (useShader)
-	sv->SetValue (scrapVertices);
-    }
-    else
-    {
-      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, 0);
-      if (useShader)
-	sv->SetValue (0);
-    }
-    sv = scrapContext.GetVariableAdd (string_texture_coordinates);
-    if (mesh.texcoords)
-    {
-      scrapTexcoords->CopyInto (mesh.texcoords, mesh.vertexCount);
-      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, scrapTexcoords);
-      if (useShader)
-	sv->SetValue (scrapTexcoords);
-    }
-    else
-    {
-      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, 0);
-      if (useShader)
-	sv->SetValue (0);
-    }
-    sv = scrapContext.GetVariableAdd (string_colors);
-    if (mesh.colors)
-    {
-      scrapColors->CopyInto (mesh.colors, mesh.vertexCount);
-      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, scrapColors);
-      if (useShader)
-	sv->SetValue (scrapColors);
-    }
-    else
-    {
-      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, 0);
-      if (useShader)
-	sv->SetValue (0);
-    }
-  }
-  if (useShader)
-  {
-    sv = scrapContext.GetVariableAdd (string_texture_diffuse);
-    sv->SetValue (mesh.texture);
-  }
-  else
-  {
-    if (fixedFunctionForcefulEnable)
-    {
-      const GLenum state = GL_LIGHTING;
-      GLboolean s = glIsEnabled (state);
-      if (s) glDisable (state); else glEnable (state);
-      glBegin (GL_TRIANGLES);  glEnd ();
-      if (s) glEnable (state); else glDisable (state);
-    }
-    if (ext->CS_GL_ARB_multitexture)
-    {
-      statecache->SetCurrentImageUnit (0);
-      statecache->ActivateImageUnit ();
-      statecache->SetCurrentTCUnit (0);
-      statecache->ActivateTCUnit (csGLStateCache::activateTexCoord);
-    }
-    if (mesh.texture)
-    {
-      ActivateTexture (mesh.texture);
-      imageUnits[0].texture->ChangeTextureCompareMode (
-        CS::Graphics::TextureComparisonMode ());
-    }
-    else
-      DeactivateTexture ();
-  }
-
-  csRenderMesh rmesh;
-  //rmesh.z_buf_mode = mesh.z_buf_mode;
-  rmesh.mixmode = mesh.mixmode;
-  rmesh.clip_portal = 0;
-  rmesh.clip_plane = 0;
-  rmesh.clip_z_plane = 0;
-  rmesh.do_mirror = false;
-  rmesh.meshtype = mesh.meshtype;
-  rmesh.indexstart = 0;
-  rmesh.indexend = indexCount;
-  rmesh.variablecontext = &scrapContext;
-  rmesh.buffers =
-    mesh.renderBuffers.IsValid() ? mesh.renderBuffers : scrapBufferHolder;
 
   bool restoreProjection = false;
   bool wasProjectionExplicit = false;
@@ -3471,8 +3348,8 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
       csReversibleTransform camtrans;
       camtrans.SetO2T (
         csMatrix3 (1.0f, 0.0f, 0.0f,
-                   0.0f, -1.0f, 0.0f,
-                   0.0f, 0.0f, 1.0f));
+      		   0.0f, -1.0f, 0.0f,
+		   0.0f, 0.0f, 1.0f));
       camtrans.SetO2TTranslation (csVector3 (0, viewheight, 0));
       SetWorldToCamera (camtrans.GetInverse ());
     } 
@@ -3484,98 +3361,262 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
       wasProjectionExplicit = explicitProjection;
       explicitProjection = true;
       oldProjection = projectionMatrix;
-      
+    
       projectionMatrix = CS::Math::Projections::Ortho (0, vwf, vhf, 0, -1.0, 10.0);
 
       oldWorld2Camera = world2camera;
       SetWorldToCamera (csReversibleTransform ());
-      
+    
       restoreProjection = true;
       needProjectionUpdate = true;
     }
   }
-  
-  rmesh.object2world = mesh.object2world;
 
-  csShaderVariableStack stack;
-  stack.Setup (strings->GetSize ());
-  if (mesh.shader != 0) mesh.shader->PushVariables (stack);
-  shadermgr->PushVariables (stack);
-  scrapContext.PushVariables (stack);
-  if (mesh.dynDomain != 0) mesh.dynDomain->PushVariables (stack);
-
-  if (mesh.alphaType.autoAlphaMode)
-  {
-    csAlphaMode::AlphaType autoMode = csAlphaMode::alphaNone;
-
-    iTextureHandle* tex = 0;
-    csShaderVariable *texVar = csGetShaderVariableFromStack (stack, 
-      mesh.alphaType.autoModeTexture);
-    if (texVar)
-      texVar->GetValue (tex);
-
-    if (tex == 0)
-      tex = mesh.texture;
-    if (tex != 0)
-      autoMode = tex->GetAlphaType ();
-
-    rmesh.alphaType = autoMode;
-  }
-  else
-  {
-    rmesh.alphaType = mesh.alphaType.alphaType;
-  }
-  
   csZBufMode old_zbufmode = current_zmode;
-  SetZMode (mesh.z_buf_mode);
-  csRenderMeshModes modes (rmesh);
-
-  size_t shaderTicket = 0;
-  size_t passCount = 1;
-  if (mesh.shader != 0)
+  bool needDisableTexture = false;
+  bool needDisableBuffers = false;
+  
+  for (size_t m = 0; m < numMeshes; m++)
   {
-    shaderTicket = mesh.shader->GetTicket (modes, stack);
-    passCount = mesh.shader->GetNumberOfPasses (shaderTicket);
-  }
+    const csSimpleRenderMesh& mesh = meshes[m];
 
-  for (size_t p = 0; p < passCount; p++)
-  {
-    if (mesh.shader != 0)
+    bool useShader = (mesh.shader != 0);
+    uint indexCount = mesh.indices ? mesh.indexCount : mesh.vertexCount;
+    if (!mesh.renderBuffers.IsValid())
     {
-      mesh.shader->ActivatePass (shaderTicket, p);
-      mesh.shader->SetupPass (shaderTicket, &rmesh, modes, stack);
+      if (scrapIndicesSize < indexCount)
+      {
+	scrapIndices = csRenderBuffer::CreateIndexRenderBuffer (indexCount,
+	  CS_BUF_STREAM, CS_BUFCOMP_UNSIGNED_INT, 0, mesh.vertexCount - 1);
+	scrapIndicesSize = indexCount;
+      }
+      if (scrapVerticesSize < mesh.vertexCount)
+      {
+	scrapVertices = csRenderBuffer::CreateRenderBuffer (
+	  mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
+	scrapTexcoords = csRenderBuffer::CreateRenderBuffer (
+	  mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 2);
+	scrapColors = csRenderBuffer::CreateRenderBuffer (
+	  mesh.vertexCount, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 4);
+    
+	scrapVerticesSize = mesh.vertexCount;
+      }
+    }
+
+    csShaderVariable* sv;
+    if (!mesh.renderBuffers.IsValid())
+    {
+      sv = scrapContext.GetVariableAdd (string_indices);
+      if (mesh.indices)
+      {
+	scrapIndices->CopyInto (mesh.indices, indexCount);
+      }
+      else
+      {
+	csRenderBufferLock<uint> indexLock (scrapIndices);
+	for (uint i = 0; i < mesh.vertexCount; i++)
+	  indexLock[(size_t)i] = i;
+      }
+      sv->SetValue (scrapIndices);
+      scrapBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, scrapIndices);
+    
+      sv = scrapContext.GetVariableAdd (string_vertices);
+      if (mesh.vertices)
+      {
+	scrapVertices->CopyInto (mesh.vertices, mesh.vertexCount);
+	scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, scrapVertices);
+	if (useShader)
+	  sv->SetValue (scrapVertices);
+      }
+      else
+      {
+	scrapBufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, 0);
+	if (useShader)
+	  sv->SetValue (0);
+      }
+      sv = scrapContext.GetVariableAdd (string_texture_coordinates);
+      if (mesh.texcoords)
+      {
+	scrapTexcoords->CopyInto (mesh.texcoords, mesh.vertexCount);
+	scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, scrapTexcoords);
+	if (useShader)
+	  sv->SetValue (scrapTexcoords);
+      }
+      else
+      {
+	scrapBufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, 0);
+	if (useShader)
+	  sv->SetValue (0);
+      }
+      sv = scrapContext.GetVariableAdd (string_colors);
+      if (mesh.colors)
+      {
+	scrapColors->CopyInto (mesh.colors, mesh.vertexCount);
+	scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, scrapColors);
+	if (useShader)
+	  sv->SetValue (scrapColors);
+      }
+      else
+      {
+	scrapBufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, 0);
+	if (useShader)
+	  sv->SetValue (0);
+      }
+    }
+    if (useShader)
+    {
+      sv = scrapContext.GetVariableAdd (string_texture_diffuse);
+      sv->SetValue (mesh.texture);
+      needDisableTexture = false;
     }
     else
     {
-      ActivateBuffers (scrapBufferHolder, scrapMapping);
+      if (fixedFunctionForcefulEnable)
+      {
+	const GLenum state = GL_LIGHTING;
+	GLboolean s = glIsEnabled (state);
+	if (s) glDisable (state); else glEnable (state);
+	glBegin (GL_TRIANGLES);  glEnd ();
+	if (s) glEnable (state); else glDisable (state);
+      }
+      if (ext->CS_GL_ARB_multitexture)
+      {
+	statecache->SetCurrentImageUnit (0);
+	statecache->ActivateImageUnit ();
+	statecache->SetCurrentTCUnit (0);
+	statecache->ActivateTCUnit (csGLStateCache::activateTexCoord);
+      }
+      if (mesh.texture)
+      {
+	ActivateTexture (mesh.texture);
+	imageUnits[0].texture->ChangeTextureCompareMode (
+	  CS::Graphics::TextureComparisonMode ());
+      }
+      else
+      {
+	DeactivateTexture ();
+	needDisableTexture = false;
+      }
     }
-    DrawMesh (&rmesh, modes, stack);
-    if (mesh.shader != 0)
+
+    csRenderMesh rmesh;
+#ifdef CS_DEBUG
+    csString meshName;
+    meshName.Format ("SimpleMesh %zu/%zu", m+1, numMeshes);
+    rmesh.db_mesh_name = meshName;
+#endif
+    //rmesh.z_buf_mode = mesh.z_buf_mode;
+    rmesh.mixmode = mesh.mixmode;
+    rmesh.clip_portal = 0;
+    rmesh.clip_plane = 0;
+    rmesh.clip_z_plane = 0;
+    rmesh.do_mirror = false;
+    rmesh.meshtype = mesh.meshtype;
+    if (mesh.indexStart < mesh.indexEnd)
     {
-      mesh.shader->TeardownPass (shaderTicket);
-      mesh.shader->DeactivatePass (shaderTicket);
+      rmesh.indexstart = mesh.indexStart;
+      rmesh.indexend = mesh.indexEnd;
     }
     else
     {
-      DeactivateBuffers (0,0);
+      rmesh.indexstart = 0;
+      rmesh.indexend = indexCount;
     }
-  }
+    rmesh.variablecontext = &scrapContext;
+    rmesh.buffers =
+      mesh.renderBuffers.IsValid() ? mesh.renderBuffers : scrapBufferHolder;
 
-  if (flags & csSimpleMeshScreenspace)
-  {
-    if (current_drawflags & CSDRAW_2DGRAPHICS)
+    rmesh.object2world = mesh.object2world;
+
+    csShaderVariableStack stack;
+    stack.Setup (strings->GetSize ());
+    if (mesh.shader != 0) mesh.shader->PushVariables (stack);
+    shadermgr->PushVariables (stack);
+    scrapContext.PushVariables (stack);
+    if (mesh.dynDomain != 0) mesh.dynDomain->PushVariables (stack);
+
+    if (mesh.alphaType.autoAlphaMode)
     {
-      // Bring it back, that old new york rap! 
-      // Or well, at least that old identity transform
-      SetWorldToCamera (csReversibleTransform ());
+      csAlphaMode::AlphaType autoMode = csAlphaMode::alphaNone;
+
+      iTextureHandle* tex = 0;
+      csShaderVariable *texVar = csGetShaderVariableFromStack (stack, 
+	mesh.alphaType.autoModeTexture);
+      if (texVar)
+	texVar->GetValue (tex);
+
+      if (tex == 0)
+	tex = mesh.texture;
+      if (tex != 0)
+	autoMode = tex->GetAlphaType ();
+
+      rmesh.alphaType = autoMode;
+    }
+    else
+    {
+      rmesh.alphaType = mesh.alphaType.alphaType;
+    }
+    
+    SetZMode (mesh.z_buf_mode);
+    csRenderMeshModes modes (rmesh);
+
+    size_t shaderTicket = 0;
+    size_t passCount = 1;
+    if (mesh.shader != 0)
+    {
+      shaderTicket = mesh.shader->GetTicket (modes, stack);
+      passCount = mesh.shader->GetNumberOfPasses (shaderTicket);
+    }
+
+    for (size_t p = 0; p < passCount; p++)
+    {
+      if (mesh.shader != 0)
+      {
+	mesh.shader->ActivatePass (shaderTicket, p);
+	mesh.shader->SetupPass (shaderTicket, &rmesh, modes, stack);
+      }
+      else if (mesh.renderBuffers)
+      {
+	ActivateBuffers (mesh.renderBuffers, defaultBufferMapping);
+      }
+      else
+      {
+	ActivateBuffers (scrapBufferHolder, defaultBufferMapping);
+      }
+      DrawMesh (&rmesh, modes, stack);
+      if (mesh.shader != 0)
+      {
+	mesh.shader->TeardownPass (shaderTicket);
+	mesh.shader->DeactivatePass (shaderTicket);
+	needDisableBuffers = false;
+      }
+      else
+      {
+	needDisableBuffers = true;
+      }
+    }
+
+    if (flags & csSimpleMeshScreenspace)
+    {
+      if (current_drawflags & CSDRAW_2DGRAPHICS)
+      {
+	// Bring it back, that old new york rap! 
+	// Or well, at least that old identity transform
+	SetWorldToCamera (csReversibleTransform ());
+      }
+    }
+
+    if (!useShader)
+    {
+      if (mesh.texture)
+	needDisableTexture = true;
     }
   }
 
-  if (!useShader)
-  {
-    if (mesh.texture)
-      DeactivateTexture ();
-  }
+  if (needDisableTexture)
+    DeactivateTexture ();
+  if (needDisableBuffers)
+    DeactivateBuffers (0,0);
 
   SetZMode (old_zbufmode);
   

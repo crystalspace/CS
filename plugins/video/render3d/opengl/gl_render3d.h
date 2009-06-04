@@ -360,7 +360,7 @@ private:
   csRef<iRenderBuffer> scrapColors;
   csShaderVariableContext scrapContext;
   csRef<csRenderBufferHolder> scrapBufferHolder;
-  csRenderBufferName scrapMapping [CS_VATTRIB_SPECIFIC_LAST+1]; 
+  csRenderBufferName defaultBufferMapping[CS_VATTRIB_SPECIFIC_LAST+1]; 
 
   ////////////////////////////////////////////////////////////////////
   //                         Private helpers
@@ -771,6 +771,8 @@ public:
 
   virtual void DrawSimpleMesh (const csSimpleRenderMesh& mesh, 
     uint flags = 0);
+  virtual void DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
+    size_t numMeshes, uint flags = 0);
 
   virtual iHalo* CreateHalo (float, float, float,
     unsigned char *, int, int);
