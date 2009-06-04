@@ -1100,13 +1100,8 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
                                        iLoaderContext* ldr_context)
 {
   if(!node) return false;
-
-  csString factname;
-  csRef<iDocumentNode> factory = node->GetParent()->GetNode("factory");
-  if(factory.IsValid())
-    factname = factory->GetContentsValue();
   const char* name = node->GetAttributeValue ("name");
-  csRef<iGeneralMeshSubMesh> subMesh = ldr_context->FindSubmesh (state, factname, name);
+  csRef<iGeneralMeshSubMesh> subMesh = state->FindSubMesh(name);
   if (!subMesh)
   {
     synldr->ReportError (
@@ -1215,159 +1210,159 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-      case XMLTOKEN_MANUALCOLORS:
-	{
-	  bool r;
-	  if (!synldr->ParseBool (child, r, true))
-	    return 0;
-	  CHECK_MESH(meshstate);
-	  meshstate->SetManualColors (r);
-	}
-	break;
-      case XMLTOKEN_NOSHADOWS:
-	{
-	  CHECK_MESH(meshstate);
-	  meshstate->SetShadowCasting (false);
-	}
-	break;
-      case XMLTOKEN_LOCALSHADOWS:
-	{
-	  CHECK_MESH(meshstate);
-	  meshstate->SetShadowReceiving (true);
-	}
-	break;
-      case XMLTOKEN_LIGHTING:
-	{
-	  bool r;
-	  if (!synldr->ParseBool (child, r, true))
-	    return 0;
-	  CHECK_MESH(meshstate);
-	  meshstate->SetLighting (r);
-	}
-	break;
-      case XMLTOKEN_COLOR:
-	{
-	  csColor col;
-	  if (!synldr->ParseColor (child, col))
-	    return 0;
-	  CHECK_MESH(meshstate);
-	  mesh->SetColor (col);
-	}
-	break;
-      case XMLTOKEN_FACTORY:
-	{
-	  const char* factname = child->GetContentsValue ();
-	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
-	  if(!fact)
-	  {
-	    synldr->ReportError (
-	      "crystalspace.genmeshloader.parse.unknownfactory",
-	      child, "Couldn't find factory '%s'!", factname);
-	    return 0;
-	  }
+    case XMLTOKEN_MANUALCOLORS:
+      {
+        bool r;
+        if (!synldr->ParseBool (child, r, true))
+          return 0;
+        CHECK_MESH(meshstate);
+        meshstate->SetManualColors (r);
+      }
+      break;
+    case XMLTOKEN_NOSHADOWS:
+      {
+        CHECK_MESH(meshstate);
+        meshstate->SetShadowCasting (false);
+      }
+      break;
+    case XMLTOKEN_LOCALSHADOWS:
+      {
+        CHECK_MESH(meshstate);
+        meshstate->SetShadowReceiving (true);
+      }
+      break;
+    case XMLTOKEN_LIGHTING:
+      {
+        bool r;
+        if (!synldr->ParseBool (child, r, true))
+          return 0;
+        CHECK_MESH(meshstate);
+        meshstate->SetLighting (r);
+      }
+      break;
+    case XMLTOKEN_COLOR:
+      {
+        csColor col;
+        if (!synldr->ParseColor (child, col))
+          return 0;
+        CHECK_MESH(meshstate);
+        mesh->SetColor (col);
+      }
+      break;
+    case XMLTOKEN_FACTORY:
+      {
+        const char* factname = child->GetContentsValue ();
+        iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+        if(!fact)
+        {
+          synldr->ReportError (
+            "crystalspace.genmeshloader.parse.unknownfactory",
+            child, "Couldn't find factory '%s'!", factname);
+          return 0;
+        }
 
-	  factstate =  
-	    scfQueryInterface<iGeneralFactoryState> (fact->GetMeshObjectFactory());
-	  if (!factstate)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.genmeshloader.parse.badfactory",
-		child, "Factory '%s' doesn't appear to be a genmesh factory!",
-		factname);
-	    return 0;
-	  }
-	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-	  CS_ASSERT (mesh != 0);
-          meshstate = scfQueryInterface<iGeneralMeshState> (mesh);
-	  if (!meshstate)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.genmeshloader.parse.badfactory",
-		child, "Factory '%s' doesn't appear to be a genmesh factory!",
-		factname);
-	    return 0;
-	  }
-	}
-	break;
-      case XMLTOKEN_MATERIAL:
-	{
-	  const char* matname = child->GetContentsValue ();
-    iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-    if (!mat)
-    {
-      synldr->ReportError (
-        "crystalspace.genmeshloader.parse.unknownmaterial",
-        child, "Couldn't find material '%s'!", matname);
+        factstate =  
+          scfQueryInterface<iGeneralFactoryState> (fact->GetMeshObjectFactory());
+        if (!factstate)
+        {
+          synldr->ReportError (
+            "crystalspace.genmeshloader.parse.badfactory",
+            child, "Factory '%s' doesn't appear to be a genmesh factory!",
+            factname);
+          return 0;
+        }
+        mesh = fact->GetMeshObjectFactory ()->NewInstance ();
+        CS_ASSERT (mesh != 0);
+        meshstate = scfQueryInterface<iGeneralMeshState> (mesh);
+        if (!meshstate)
+        {
+          synldr->ReportError (
+            "crystalspace.genmeshloader.parse.badfactory",
+            child, "Factory '%s' doesn't appear to be a genmesh factory!",
+            factname);
+          return 0;
+        }
+      }
+      break;
+    case XMLTOKEN_MATERIAL:
+      {
+        const char* matname = child->GetContentsValue ();
+        iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+        if (!mat)
+        {
+          synldr->ReportError (
+            "crystalspace.genmeshloader.parse.unknownmaterial",
+            child, "Couldn't find material '%s'!", matname);
+          return 0;
+        }
+        CHECK_MESH(meshstate);
+        mesh->SetMaterialWrapper (mat);
+      }
+      break;
+    case XMLTOKEN_MIXMODE:
+      {
+        uint mm;
+        if (!synldr->ParseMixmode (child, mm))
+          return 0;
+        CHECK_MESH(meshstate);
+        mesh->SetMixMode (mm);
+      }
+      break;
+    case XMLTOKEN_RENDERBUFFER:
+      CHECK_MESH(meshstate);
+      ParseRenderBuffer (child, meshstate, factstate);
+      break;
+    case XMLTOKEN_SUBMESH:
+      CHECK_MESH(meshstate);
+      ParseSubMesh (child, meshstate, ldr_context);
+      break;
+    case XMLTOKEN_ANIMCONTROL:
+      {
+        const char* pluginname = child->GetAttributeValue ("plugin");
+        if (!pluginname)
+        {
+          synldr->ReportError (
+            "crystalspace.genmeshfactoryloader.parse",
+            child, "Plugin name missing for <animcontrol>!");
+          return 0;
+        }
+        csRef<iGenMeshAnimationControlType> type =
+          csLoadPluginCheck<iGenMeshAnimationControlType> (
+          object_reg, pluginname, false);
+        if (!type)
+        {
+          synldr->ReportError (
+            "crystalspace.genmeshloader.parse",
+            child, "Could not load animation control plugin '%s'!",
+            pluginname);
+          return 0;
+        }
+        csRef<iGenMeshAnimationControlFactory> anim_ctrl_fact = type->
+          CreateAnimationControlFactory ();
+        const char* error = anim_ctrl_fact->Load (child);
+        if (error)
+        {
+          synldr->ReportError (
+            "crystalspace.genmeshloader.parse",
+            child, "Error loading animation control factory: '%s'!",
+            error);
+          return 0;
+        }
+        csRef<iGenMeshAnimationControl> animctrl = 
+          anim_ctrl_fact->CreateAnimationControl (mesh);
+        if (!type)
+        {
+          synldr->ReportError (
+            "crystalspace.genmeshloader.parse",
+            child, "Could not create animation control");
+          return 0;
+        }
+        meshstate->SetAnimationControl (animctrl);
+      }
+      break;
+    default:
+      synldr->ReportBadToken (child);
       return 0;
-    }
-    CHECK_MESH(meshstate);
-	  mesh->SetMaterialWrapper (mat);
-	}
-	break;
-      case XMLTOKEN_MIXMODE:
-        {
-	  uint mm;
-	  if (!synldr->ParseMixmode (child, mm))
-	    return 0;
-	  CHECK_MESH(meshstate);
-          mesh->SetMixMode (mm);
-	}
-	break;
-      case XMLTOKEN_RENDERBUFFER:
-	CHECK_MESH(meshstate);
-        ParseRenderBuffer (child, meshstate, factstate);
-        break;
-      case XMLTOKEN_SUBMESH:
-	CHECK_MESH(meshstate);
-        ParseSubMesh (child, meshstate, ldr_context);
-        break;
-      case XMLTOKEN_ANIMCONTROL:
-        {
-	  const char* pluginname = child->GetAttributeValue ("plugin");
-	  if (!pluginname)
-	  {
-	    synldr->ReportError (
-		    "crystalspace.genmeshfactoryloader.parse",
-		    child, "Plugin name missing for <animcontrol>!");
-	    return 0;
-	  }
-	  csRef<iGenMeshAnimationControlType> type =
-	  	csLoadPluginCheck<iGenMeshAnimationControlType> (
-		object_reg, pluginname, false);
-	  if (!type)
-	  {
-	    synldr->ReportError (
-		"crystalspace.genmeshloader.parse",
-		child, "Could not load animation control plugin '%s'!",
-		pluginname);
-	    return 0;
-    	  }
-	  csRef<iGenMeshAnimationControlFactory> anim_ctrl_fact = type->
-	  	CreateAnimationControlFactory ();
-	  const char* error = anim_ctrl_fact->Load (child);
-	  if (error)
-	  {
-	    synldr->ReportError (
-		"crystalspace.genmeshloader.parse",
-		child, "Error loading animation control factory: '%s'!",
-		error);
-	    return 0;
-	  }
-          csRef<iGenMeshAnimationControl> animctrl = 
-            anim_ctrl_fact->CreateAnimationControl (mesh);
-	  if (!type)
-	  {
-	    synldr->ReportError (
-		"crystalspace.genmeshloader.parse",
-		child, "Could not create animation control");
-	    return 0;
-    	  }
-          meshstate->SetAnimationControl (animctrl);
-	}
-	break;
-      default:
-        synldr->ReportBadToken (child);
-	return 0;
     }
   }
 

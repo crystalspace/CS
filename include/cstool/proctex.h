@@ -72,7 +72,7 @@ class CS_CRYSTALSPACE_EXPORT csProcTexture :
 private:
   // Setup the procedural event handler (used for updating visible
   // proc textures).
-  THREADED_CALLABLE_DECL1(csProcTexture, SetupProcEventHandler, csThreadReturn, iObjectRegistry*, object_reg, HIGH, true, false);
+  THREADED_CALLABLE_DECL1(csProcTexture, SetupProcEventHandler, csThreadReturn, iObjectRegistry*, object_reg, HIGH, false, false);
   csRef<iEventHandler> proceh;
 
 protected:
@@ -83,7 +83,7 @@ protected:
   int texFlags;
 
   // Texture wrapper.
-  iTextureWrapper* tex;
+  csRef<iTextureWrapper> tex;
   // Dimensions of texture.
   int mat_w, mat_h;
   csRef<iImage> proc_image;

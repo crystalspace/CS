@@ -215,34 +215,10 @@ namespace RenderManager
       uint numSubLights, const csFlags& lightFlagsMask);
 
     /// Query how many lights are in this sorter.
-    size_t GetSize (bool skipStatic)
+    size_t GetSize ()
     {
       csArray<LightInfo>& putBackLights = persist.putBackLights;
-
-      size_t n = 0;
-      while (n < lightLimit + putBackLights.GetSize())
-      {
-        if (n < putBackLights.GetSize())
-        {
-          size_t j = putBackLights.GetSize()-1-n;
-          if (!skipStatic || !putBackLights[j].isStatic)
-            n++;
-          else
-            putBackLights.DeleteIndex (j);
-        }
-        else
-        {
-          size_t i = n - putBackLights.GetSize();
-          if (!skipStatic || !persist.lightTypeScratch[i].isStatic)
-            n++;
-          else
-          {
-            persist.lightTypeScratch.DeleteIndex (i);
-            lightLimit = csMin (persist.lightTypeScratch.GetSize(), lightLimit);
-          }
-        }
-      }
-      return n;
+      return lightLimit + putBackLights.GetSize();
     }
 
     /// Set the expected number of lights to be added.
@@ -255,13 +231,12 @@ namespace RenderManager
     }
 
     /// Get the next light, optionally skipping static lights.
-    bool GetNextLight (bool skipStatic, LightInfo& out);
+    bool GetNextLight (LightInfo& out);
     /**
      * Get the next light if compatible to \a settings, optionally skipping 
      * static lights.
      */
-    bool GetNextLight (const LightSettings& settings, bool skipStatic,
-      LightInfo& out);
+    bool GetNextLight (const LightSettings& settings, LightInfo& out);
     
     /// Put earlier fetched lights back into the list
     void PutInFront (LightInfo* lights, size_t num);
@@ -449,8 +424,6 @@ namespace RenderManager
       typename RenderTree::MeshNode::SingleMesh& mesh,
       typename RenderTree::MeshNode* node)
     {
-      LightingVariablesHelper lightVarsHelper (persist.varsHelperPersist);
-
       /* Get the shader since the number of passes for that layer depend
 	* on it */
       iShader* shaderToUse =
@@ -458,15 +431,14 @@ namespace RenderManager
           * node->owner.totalRenderMeshes + mesh.contextLocalId];
       if (!shaderToUse) return 0;
 
-      UpdateMetadata (shaderToUse);
+      UpdateMetadata (layer, shaderToUse);
+      const csShaderMetadata& lastMetadata = metadataCache[layer].metadata;
       if ((lastMetadata.numberOfLights == 0) 
         && !layerConfig.IsAmbientLayer (layer)) return 0;
 
-      bool meshIsStaticLit = mesh.meshFlags.Check (CS_ENTITY_STATICLIT);
-      bool skipStatic = meshIsStaticLit
-	&& layerConfig.GetStaticLightsSettings (layer).nodraw;
+      LightingVariablesHelper lightVarsHelper (persist.varsHelperPersist);
 
-      size_t layerLights = csMin (sortedLights.GetSize (skipStatic),
+      size_t layerLights = csMin (sortedLights.GetSize (),
         layerConfig.GetMaxLightNum (layer));
       if (lastMetadata.numberOfLights == 0)
         layerLights = 0;
@@ -495,6 +467,8 @@ namespace RenderManager
       }
       else
       {
+	bool meshIsStaticLit = mesh.meshFlags.Check (CS_ENTITY_STATICLIT);
+	  
         // Assume at least 1 light
 	CS_ALLOC_STACK_ARRAY(LightingSorter::LightInfo, renderLights, layerLights);
 	
@@ -514,7 +488,7 @@ namespace RenderManager
 	  //size_t totalLayers = 0;
 	  while (firstLight < layerLights)
 	  {
-	    if (!sortedLights.GetNextLight (skipStatic, renderLights[firstLight]))
+	    if (!sortedLights.GetNextLight (renderLights[firstLight]))
 	      break;
 	    size_t realNum = 1;
 	    LightSettings lightSettings;
@@ -527,7 +501,7 @@ namespace RenderManager
 	    for (; realNum < maxPassLights; realNum++)
 	    {
 	      // Note that GetNextLight already does a selection on light type
-	      if (!sortedLights.GetNextLight (lightSettings, skipStatic, 
+	      if (!sortedLights.GetNextLight (lightSettings, 
 		  renderLights[firstLight + realNum]))
 		break;
 	     totalWithSublights += renderLights[firstLight + realNum].numSubLights;
@@ -716,7 +690,7 @@ namespace RenderManager
 		lightVarsHelper.MergeAsArrayItems (localStacks[actualSpread],
 		  *(thisLightSVs->shaderVars), l);
 		if (isStaticLight && meshIsStaticLit
-		    && layerConfig.GetStaticLightsSettings (layer).specularOnly)
+		    && layerConfig.GetStaticLightsSettings ().specularOnly)
 		{
 		  lightVarsHelper.MergeAsArrayItem (localStacks[actualSpread],
 		    persist.diffuseBlack, l);
@@ -744,15 +718,21 @@ namespace RenderManager
     }
     
     // Simple cache
-    iShader* lastShader;
-    csShaderMetadata lastMetadata;
-    
-    inline void UpdateMetadata (iShader* shaderToUse)
+    struct CachedShaderMetadata
     {
-      if (shaderToUse != lastShader)
+      iShader* shader;
+      csShaderMetadata metadata;
+      
+      CachedShaderMetadata() : shader (0) {}
+    };
+    csArray<CachedShaderMetadata> metadataCache;
+    
+    inline void UpdateMetadata (size_t layer, iShader* shaderToUse)
+    {
+      if (shaderToUse != metadataCache[layer].shader)
       {
-	lastMetadata = shaderToUse->GetMetadata();
-	lastShader = shaderToUse;
+	metadataCache[layer].metadata = shaderToUse->GetMetadata();
+	metadataCache[layer].shader = shaderToUse;
       }
     }
   public:
@@ -767,7 +747,7 @@ namespace RenderManager
     LightSetup (PersistentData& persist, iLightManager* lightmgr,
       SVArrayHolder& svArrays, const LayerConfigType& layerConfig,
       ShadowParamType& shadowParam)
-      : lastShader (0), persist (persist), lightmgr (lightmgr),
+      : persist (persist), lightmgr (lightmgr),
         svArrays (svArrays), allMaxLights (0), newLayers (layerConfig),
         shadowParam (shadowParam)
     {
@@ -789,6 +769,8 @@ namespace RenderManager
     {
       // The original layers
       const LayerConfigType& layerConfig = newLayers.GetOriginalLayers();
+      // Set up metadata cache
+      metadataCache.SetSize (layerConfig.GetLayerCount());
 
       /* This step will insert layers, keep track of the new indices of
       * the original layer as well as how often a layer has been
@@ -811,9 +793,19 @@ namespace RenderManager
 
         if (!mesh.meshFlags.Check(CS_ENTITY_NOLIGHTING))
         {
+	  bool meshIsStaticLit = mesh.meshFlags.Check (CS_ENTITY_STATICLIT);
+	  bool skipStatic = meshIsStaticLit
+	    && layerConfig.GetStaticLightsSettings ().nodraw;
+	    
+          uint relevantLightsFlags =
+            skipStatic ? ((CS_LIGHTQUERY_GET_ALL & ~CS_LIGHTQUERY_GET_TYPE_ALL)
+                            | CS_LIGHTQUERY_GET_TYPE_DYNAMIC)
+                       : CS_LIGHTQUERY_GET_ALL;
+          
           lightmgr->GetRelevantLightsSorted (node->owner.sector,
             mesh.renderMesh->bbox, influences, numLights, allMaxLights,
-            &mesh.renderMesh->object2world);
+            &mesh.renderMesh->object2world,
+            relevantLightsFlags);
 
           sortedLights.SetNumLights (numLights);
           for (size_t l = 0; l < numLights; ++l)

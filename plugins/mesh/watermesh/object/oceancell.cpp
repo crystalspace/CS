@@ -67,28 +67,32 @@ void csOceanCell::SetupVertices()
         break;
     }
   
-    for(float j = 0; j < len * gran; j+=1)
+    uint maxj = len * gran;
+    uint maxjd = maxj - 1;
+    uint maxi = wid * gran;
+    uint maxid = maxi - 1;
+
+    for(uint j = 0; j < maxj; ++j)
     {
-      for(float i = 0; i < wid * gran; i+=1)
+      for(uint i = 0; i < maxi; ++i)
       {
-        verts.Push(csVector3 ((i * wid / (wid * gran - 1)), oHeight, (j * len / (len * gran - 1))));
+        verts.Push(csVector3 ((i * wid / maxid), oHeight, (j * len / maxjd)));
         norms.Push(csVector3 (0, 1, 0));
         cols.Push(csColor (0.17f,0.27f,0.26f));
-        //texs.Push(csVector2(i, j));
-        texs.Push(csVector2((i * wid / (wid * gran - 1)) / 1.5, (j * len / (len * gran - 1)) / 1.5));
+        texs.Push(csVector2((i * wid / maxid) / 1.5, (j * len / maxjd) / 1.5));
       }
     }
 
-    for(uint j = 0; j < (len * gran) - 1; j++)
+    for(uint j = 0; j < maxjd; ++j)
     {
-      for(uint i = 0; i < (wid * gran) - 1; i++)
+      for(uint i = 0; i < maxid; ++i)
       {
-        tris.Push(csTriangle ((int)(j * (wid * gran) + i), 
-                    (int)((j + 1) * (wid * gran) + i), 
-                    (int)(j * (wid * gran) + i + 1)));
-        tris.Push(csTriangle ((int)(j * (wid * gran) + i + 1),
-                    (int)((j + 1) * (wid * gran) + i),
-                    (int)((j + 1) * (wid * gran) + i + 1)));
+        tris.Push(csTriangle ((int)(j * maxi + i), 
+                    (int)((j + 1) * maxi + i), 
+                    (int)(j * maxi + i + 1)));
+        tris.Push(csTriangle ((int)(j * maxi + i + 1),
+                    (int)((j + 1) * maxi + i),
+                    (int)((j + 1) * maxi + i + 1)));
       }
     }
   

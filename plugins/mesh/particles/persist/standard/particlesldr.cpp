@@ -642,7 +642,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
 	      return 0;
 
             float t (0.0f);
+            // 'Old' time attribute
             t = child->GetAttributeValueAsFloat ("time");
+            // Attribute mnemonic for 'remaining time'
+            csRef<iDocumentAttribute> attr = child->GetAttribute ("rtime");
+            if (attr) t = attr->GetValueAsFloat ();
             linEffector->AddParameterSet (param, t);
           }
           break;
@@ -675,7 +679,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
         case XMLTOKEN_COLOR:
           {
             csColor4 c;
-            float t (0.0f);
 
             if (!synldr->ParseColor (child, c))
             {
@@ -683,7 +686,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
                 "Error parsing color!");
             }
 
+            float t (0.0f);
+            // 'Old' time attribute
             t = child->GetAttributeValueAsFloat ("time");
+            // Attribute mnemonic for 'remaining time'
+            csRef<iDocumentAttribute> attr = child->GetAttribute ("rtime");
+            if (attr) t = attr->GetValueAsFloat ();
             colorEffector->AddColor (c, t);
           }
           break;
@@ -858,6 +866,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     
     csRef<iMeshObject> meshObj;
     csRef<iParticleSystem> particleSystem;
+    float preAdvanceTime = 0.0f;
 
     csRef<iDocumentNodeIterator> it = node->GetNodes ();
     while (it->HasNext ())
@@ -944,13 +953,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
             return 0;
           }
 
-          float advtime;
-          advtime = child->GetContentsValueAsFloat ();
-          csTicks msec = (csTicks)(advtime*1000.0f + 0.5f);
-
-          particleSystem->Advance (msec);
-
-
+          preAdvanceTime = child->GetContentsValueAsFloat ();
           break;
         }
       default:
@@ -973,6 +976,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
       }
     }
 
+    if (preAdvanceTime > 0)
+    {
+      csTicks msec = (csTicks)(preAdvanceTime*1000.0f + 0.5f);
+      particleSystem->Advance (msec);
+    }
+    
     return csPtr<iBase> (meshObj);
   }
 
@@ -1362,7 +1371,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
         colorNode->SetValue ("color");
 
         synldr->WriteColor (colorNode, c);
-        colorNode->SetAttributeAsFloat ("time", t);
+        colorNode->SetAttributeAsFloat ("rtime", t);
       }
 
       return true;
@@ -1383,7 +1392,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
         linEffector->GetParameterSet (i, c, t);
         csRef<iDocumentNode> paramNode = effectorNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
         paramNode->SetValue ("param");
-        paramNode->SetAttributeAsFloat ("time", t);
+        paramNode->SetAttributeAsFloat ("rtime", t);
 
 	if (mask & CS_PARTICLE_MASK_COLOR)
 	{

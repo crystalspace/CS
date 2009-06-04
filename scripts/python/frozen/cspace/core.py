@@ -438,6 +438,49 @@ SCF_VERBOSE_CLASS_REGISTER = _core.SCF_VERBOSE_CLASS_REGISTER
 SCF_VERBOSE_ALL = _core.SCF_VERBOSE_ALL
 scfRegisterStaticClasses = _core.scfRegisterStaticClasses
 scfRegisterStaticFactoryFunc = _core.scfRegisterStaticFactoryFunc
+class iThreadReturn(iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def IsFinished(*args): return _core.iThreadReturn_IsFinished(*args)
+    def WasSuccessful(*args): return _core.iThreadReturn_WasSuccessful(*args)
+    def GetResultPtr(*args): return _core.iThreadReturn_GetResultPtr(*args)
+    def GetResultRefPtr(*args): return _core.iThreadReturn_GetResultRefPtr(*args)
+    def MarkFinished(*args): return _core.iThreadReturn_MarkFinished(*args)
+    def MarkSuccessful(*args): return _core.iThreadReturn_MarkSuccessful(*args)
+    def SetResult(*args): return _core.iThreadReturn_SetResult(*args)
+    def Copy(*args): return _core.iThreadReturn_Copy(*args)
+    def Wait(*args): return _core.iThreadReturn_Wait(*args)
+    def SetWaitPtrs(*args): return _core.iThreadReturn_SetWaitPtrs(*args)
+    __swig_destroy__ = _core.delete_iThreadReturn
+    __del__ = lambda self : None;
+iThreadReturn_swigregister = _core.iThreadReturn_swigregister
+iThreadReturn_swigregister(iThreadReturn)
+scfRegisterStaticClass = _core.scfRegisterStaticClass
+
+THREADED = _core.THREADED
+THREADEDL = _core.THREADEDL
+HIGH = _core.HIGH
+MED = _core.MED
+LOW = _core.LOW
+class iThreadManager(iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def Init(*args): return _core.iThreadManager_Init(*args)
+    def Process(*args): return _core.iThreadManager_Process(*args)
+    def PushToQueue(*args): return _core.iThreadManager_PushToQueue(*args)
+    def Wait(*args): return _core.iThreadManager_Wait(*args)
+    def RunNow(*args): return _core.iThreadManager_RunNow(*args)
+    def GetThreadCount(*args): return _core.iThreadManager_GetThreadCount(*args)
+    def SetAlwaysRunNow(*args): return _core.iThreadManager_SetAlwaysRunNow(*args)
+    def GetAlwaysRunNow(*args): return _core.iThreadManager_GetAlwaysRunNow(*args)
+    def Exiting(*args): return _core.iThreadManager_Exiting(*args)
+    __swig_destroy__ = _core.delete_iThreadManager
+    __del__ = lambda self : None;
+iThreadManager_swigregister = _core.iThreadManager_swigregister
+iThreadManager_swigregister(iThreadManager)
+
 CS_DBGHELP_BENCHMARK = _core.CS_DBGHELP_BENCHMARK
 CS_DBGHELP_TXTDUMP = _core.CS_DBGHELP_TXTDUMP
 CS_DBGHELP_GFXDUMP = _core.CS_DBGHELP_GFXDUMP
@@ -456,7 +499,6 @@ class iDebugHelper(iBase):
     __del__ = lambda self : None;
 iDebugHelper_swigregister = _core.iDebugHelper_swigregister
 iDebugHelper_swigregister(iDebugHelper)
-scfRegisterStaticClass = _core.scfRegisterStaticClass
 iDebugHelper_scfGetVersion = _core.iDebugHelper_scfGetVersion
 
 class iCommandLineParser(iBase):
@@ -774,6 +816,8 @@ class iReporterListener(iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
+    def Report(*args): return _core.iReporterListener_Report(*args)
+    def ReportWait(*args): return _core.iReporterListener_ReportWait(*args)
     scfGetVersion = staticmethod(_core.iReporterListener_scfGetVersion)
     __swig_destroy__ = _core.delete_iReporterListener
     __del__ = lambda self : None;

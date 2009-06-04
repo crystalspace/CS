@@ -721,7 +721,7 @@ rollout Test1 "Export Level to CS" width:226 height:450
                               (
   	      	                  if(diffuseMapImage!="materialnotdefined") then
 						(
-                             			format "    <material name=\"%\">\n" diffuseMapImage to:outFile
+                             			format "    <material name=\"%\">\n" imagetemp to:outFile
 						)
 						else if(m.mapEnables[10]) then
 						(
@@ -2391,7 +2391,7 @@ rollout Test1 "Export Level to CS" width:226 height:450
 				  )
 		      )
 
-			  format "      <size x=\"1280\" y=\"256\" z=\"1280\" />\n" to:outFile
+			  format "      <size x=\"%\" y=\"%\" z=\"%\" />\n" terrx terry terrz to:outFile
 			  format "      <basematerial>%</basematerial>\n" base_material to:outFile
 			  format "      <renderproperties><param name=\"block resolution\">16</param><param name=\"lod splitcoeff\">8</param></renderproperties>\n" to:outFile
 			  format "      <feederproperties><param name=\"heightmap source\">%</param> \n" terrimage  to:outFile
