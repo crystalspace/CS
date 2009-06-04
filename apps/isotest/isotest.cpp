@@ -27,10 +27,10 @@ IsoTest::IsoTest ()
   SetApplicationName ("CrystalSpace.IsoTest");
 
   current_view = 0;
-  views[0].SetOrigOffset (csVector3 (-4, 4, -4)); // true isometric perspective.
-  views[1].SetOrigOffset (csVector3 (-9, 9, -9)); // zoomed out.
-  views[2].SetOrigOffset (csVector3 (4, 3, -4)); // diablo style perspective.
-  views[3].SetOrigOffset (csVector3 (0, 4, -4)); // zelda style perspective.
+  views[0].SetOrigOffset (csVector3 (-1, 1, -1), 4); // true isometric perspective.
+  views[1].SetOrigOffset (csVector3 (-1, 1, -1), 9); // zoomed out.
+  views[2].SetOrigOffset (csVector3 (1, 0.75, -1), 4); // diablo style perspective.
+  views[3].SetOrigOffset (csVector3 (0, 1, -1), 4); // zelda style perspective.
 
   actor_is_walking = false;
 }
@@ -55,9 +55,9 @@ void IsoTest::Frame ()
     if (kbd->GetKeyState (CSKEY_LEFT))
       views[current_view].angle -= speed*15.f;
     if (kbd->GetKeyState (CSKEY_UP))
-      views[current_view].distance -= 0.25f*speed;
+      views[current_view].zoom -= 0.25f*speed;
     if (kbd->GetKeyState (CSKEY_DOWN))
-      views[current_view].distance += 0.25f*speed;
+      views[current_view].zoom += 0.25f*speed;
     SetupIsoView(views[current_view]);
   }
   else
@@ -137,7 +137,7 @@ void IsoTest::Frame ()
   // Move the light.
   actor_light->SetCenter (actor_pos+csVector3 (0, 2, -1));
 
-  CameraIsoLookat(view->GetCamera(), views[current_view], actor_pos);
+  CameraIsoLookat(view->GetCustomMatrixCamera(), views[current_view], actor_pos);
 
   rm->RenderView (view);
 
@@ -197,28 +197,22 @@ bool IsoTest::OnKeyboard(iEvent& ev)
   return false;
 }
 
-void IsoTest::CameraIsoLookat(csRef<iCamera> cam, const IsoView& isoview,
+void IsoTest::CameraIsoLookat(iCustomMatrixCamera* customCam, const IsoView& isoview,
                               const csVector3& lookat)
 {
-  // Let the camera look at the actor.
-  // so the camera is set to look at 'actor_pos'
-  //int isofactor = 50; // 98.3% isometric (=GetFovAngle()/180.0)
-  //int isofactor = 100; // 99.2% isometric (=GetFovAngle()/180.0)
-  int isofactor = 200; // 99.6% isometric (=GetFovAngle()/180.0)
-
+  iCamera* cam = customCam->GetCamera();
   cam->SetViewportSize (g3d->GetWidth(), g3d->GetHeight());
   // set center and lookat
   csOrthoTransform& cam_trans = cam->GetTransform ();
-  cam_trans.SetOrigin (lookat + float(isofactor)*isoview.camera_offset);
+  cam_trans.SetOrigin (lookat + isoview.camera_offset);
   cam_trans.LookAt (lookat-cam_trans.GetOrigin (), csVector3 (0, 1, 0));
-  // set fov more isometric, could be done in initialisation once.
-  cam->SetFOV (g3d->GetHeight()*isofactor, g3d->GetWidth());
 
-  // due to moving the camera so far away, depth buffer accuracy is
-  // impaired, repair that by using smaller coordinate system
-  csOrthoTransform repair_trans = cam->GetTransform();
-  repair_trans.SetT2O (repair_trans.GetT2O()/repair_trans.GetOrigin().Norm());
-  cam->SetTransform (repair_trans);
+  CS::Math::Matrix4 orthoMatrix (
+    CS::Math::Projections::Ortho (
+      -1.0f*isoview.zoom, 1.0f*isoview.zoom,
+      -0.75*isoview.zoom, 0.75*isoview.zoom,
+      -100, csVector3::Norm (cam_trans.GetOrigin ())*isoview.zoom));
+  customCam->SetProjectionMatrix (orthoMatrix);
 }
 
 void IsoTest::SetupIsoView(IsoView& isoview)
@@ -226,11 +220,11 @@ void IsoTest::SetupIsoView(IsoView& isoview)
   // clamp
   if(isoview.angle < 0.f) isoview.angle += 360.f;
   if(isoview.angle > 360.f) isoview.angle -= 360.f;
-  if(isoview.distance < 0.05f) isoview.distance = 0.05f;
-  if(views[current_view].distance > 10.f) isoview.distance = 10.f;
+  if(isoview.zoom < 0.05f) isoview.zoom = 0.05f;
+  if(views[current_view].zoom > 10.f) isoview.zoom = 10.f;
   // setup
   csYRotMatrix3 r(isoview.angle * PI / 180.0);
-  isoview.camera_offset = (r*isoview.original_offset)*isoview.distance;
+  isoview.camera_offset = (r*isoview.original_offset);
 }
 
 bool IsoTest::OnInitialize(int /*argc*/, char* /*argv*/ [])
@@ -325,6 +319,9 @@ bool IsoTest::SetupModules ()
 
   // We need a View to the virtual world.
   view.AttachNew(new csView (engine, g3d));
+  // The camera will be an orthographic one, we need a custom matrix cam for that
+  csRef<iCustomMatrixCamera> customCam (engine->CreateCustomMatrixCamera());
+  view->SetCustomMatrixCamera (customCam);
   iGraphics2D* g2d = g3d->GetDriver2D ();
   // We use the full window to draw the world.
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
