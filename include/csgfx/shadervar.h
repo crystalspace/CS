@@ -649,7 +649,7 @@ private:
 
   // Storage for types that can be combined..
   typedef csRefArray<csShaderVariable,
-    CS::Memory::LocalBufferAllocator<csShaderVariable*, 8,
+    CS::Memory::LocalBufferAllocatorUnchecked<csShaderVariable*, 8,
       CS::Memory::AllocatorMalloc, true>,
     csArrayCapacityFixedGrow<8> > SvArrayType;
   union
