@@ -104,7 +104,7 @@ CEGUI::Renderer* csCEGUITexture::getRenderer () const
   return renderer;
 }
 
-iTextureHandle* csCEGUITexture::GetTexHandle () 
+iTextureHandle* csCEGUITexture::GetTexHandle () const
 {
   return hTxt;
 }
