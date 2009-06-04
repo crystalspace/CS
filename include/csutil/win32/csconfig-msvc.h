@@ -110,8 +110,6 @@
 #  ifndef _CRT_NONSTDC_NO_DEPRECATE
 #    define _CRT_NONSTDC_NO_DEPRECATE /* Similar.	*/
 #  endif
-#  undef _SECURE_SCL
-#  define _SECURE_SCL 0
 #endif
 
 // Check for support of native aligned allocation
