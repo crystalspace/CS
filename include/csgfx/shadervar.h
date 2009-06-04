@@ -189,7 +189,8 @@ public:
   /// Get the name of the variable
   CS::ShaderVarStringID GetName () const
   { 
-    uint namePart = nameAndType & nameMask;
+    CS::ShaderVarStringID namePart =
+      static_cast<CS::ShaderVarStringID>(nameAndType & nameMask);
     return namePart == nameMask ? CS::InvalidShaderVarStringID : namePart;
   }
 
