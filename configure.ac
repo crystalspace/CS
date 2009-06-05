@@ -1548,7 +1548,38 @@ CS_CHECK_LIB_WITH([wx],
     [], [C++])
     
 AS_IF([test $cs_cv_libwx = yes],
-    [AS_IF([test -z "$cs_cv_libwx_opengl"],
+    [AS_IF([test $cs_host_family = windows],
+	[AC_CACHE_CHECK([if defining UNICODE is needed for WX],
+	    [cs_cv_libwx_needs_UNICODE],
+	    [CS_BUILD_IFELSE(
+		[AC_LANG_PROGRAM(
+		    [[#include <windows.h>
+		    #include "wx/wxprec.h"
+		    #ifdef __BORLANDC__
+		    #pragma hdrstop
+		    #endif
+		    #ifndef WX_PRECOMP
+		    #include "wx/wx.h"
+		    #endif
+		    ]],
+		    [wxString s])],
+		[CS_CREATE_TUPLE(
+		    [$cs_cv_libwx_cflags],
+		    [$cs_cv_libwx_lflags],
+		    [$cs_cv_libwx_libs   $cs_cv_libwx_gllibs]) \
+		CS_CREATE_TUPLE(
+		    [$cs_cv_libwx_cflags $cs_cv_libglu_cflags],
+		    [$cs_cv_libwx_lflags $cs_cv_libglu_lflags],
+		    [$cs_cv_libwx_libs   $cs_cv_libglu_libs])  \
+		CS_CREATE_TUPLE(
+		    [$cs_cv_libwx_cflags $cs_cv_libglu_cflags],
+		    [$cs_cv_libwx_lflags $cs_cv_libglu_lflags],
+		    [$cs_cv_libwx_libs   $cs_cv_libwx_gllibs $cs_cv_libglu_libs])],
+		[C++],
+		[cs_cv_libwx_needs_UNICODE=no],
+		[cs_cv_libwx_cflags="$cs_cv_libwx_cflags -DUNICODE -D_UNICODE"
+		cs_cv_libwx_needs_UNICODE=yes])])])
+    AS_IF([test -z "$cs_cv_libwx_opengl"],
 	[AS_IF([test -n "$CONFIG_WX"],
 	    [cs_cv_libwx_gllibs=CS_RUN_PATH_NORMALIZE([$CONFIG_WX --gl-libs])],
 	    [cs_cv_libwx_gllibs=''])])
