@@ -7031,6 +7031,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csView_GetCustomMatrixCamera(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csView *arg1 = (csView *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  iCustomMatrixCamera *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csView_GetCustomMatrixCamera",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csView, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csView_GetCustomMatrixCamera" "', argument " "1"" of type '" "csView *""'"); 
+  }
+  arg1 = reinterpret_cast< csView * >(argp1);
+  result = (iCustomMatrixCamera *)(arg1)->GetCustomMatrixCamera();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iCustomMatrixCamera, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csView_SetCustomMatrixCamera(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csView *arg1 = (csView *) 0 ;
+  iCustomMatrixCamera *arg2 = (iCustomMatrixCamera *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csView_SetCustomMatrixCamera",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csView, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csView_SetCustomMatrixCamera" "', argument " "1"" of type '" "csView *""'"); 
+  }
+  arg1 = reinterpret_cast< csView * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iCustomMatrixCamera, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csView_SetCustomMatrixCamera" "', argument " "2"" of type '" "iCustomMatrixCamera *""'"); 
+  }
+  arg2 = reinterpret_cast< iCustomMatrixCamera * >(argp2);
+  (arg1)->SetCustomMatrixCamera(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csView_GetContext(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csView *arg1 = (csView *) 0 ;
@@ -18714,6 +18766,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csView_SetCamera", _wrap_csView_SetCamera, METH_VARARGS, NULL},
 	 { (char *)"csView_GetPerspectiveCamera", _wrap_csView_GetPerspectiveCamera, METH_VARARGS, NULL},
 	 { (char *)"csView_SetPerspectiveCamera", _wrap_csView_SetPerspectiveCamera, METH_VARARGS, NULL},
+	 { (char *)"csView_GetCustomMatrixCamera", _wrap_csView_GetCustomMatrixCamera, METH_VARARGS, NULL},
+	 { (char *)"csView_SetCustomMatrixCamera", _wrap_csView_SetCustomMatrixCamera, METH_VARARGS, NULL},
 	 { (char *)"csView_GetContext", _wrap_csView_GetContext, METH_VARARGS, NULL},
 	 { (char *)"csView_SetContext", _wrap_csView_SetContext, METH_VARARGS, NULL},
 	 { (char *)"csView_SetRectangle", _wrap_csView_SetRectangle, METH_VARARGS, NULL},
@@ -19836,7 +19890,6 @@ static swig_type_info _swigt__p_iShaderPriorityList = {"_p_iShaderPriorityList",
 static swig_type_info _swigt__p_iDataBuffer = {"_p_iDataBuffer", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iBugPlugRenderObject = {"_p_iBugPlugRenderObject", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iScriptObject = {"_p_iScriptObject", 0, 0, 0, 0, 0};
-static swig_type_info _swigt__p_iCustomMatrixCamera = {"_p_iCustomMatrixCamera", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iSequenceTimedOperation = {"_p_iSequenceTimedOperation", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iSequenceOperation = {"_p_iSequenceOperation", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iHalo = {"_p_iHalo", 0, 0, 0, 0, 0};
@@ -19971,6 +20024,7 @@ static swig_type_info _swigt__p_iClipper2D = {"_p_iClipper2D", "iClipper2D *", 0
 static swig_type_info _swigt__p_iCollection = {"_p_iCollection", "iCollection *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iCollideSystem = {"_p_iCollideSystem", "iCollideSystem *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iCollider = {"_p_iCollider", "iCollider *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_iCustomMatrixCamera = {"_p_iCustomMatrixCamera", "iCustomMatrixCamera *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iEngine = {"_p_iEngine", "iEngine *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iFont = {"_p_iFont", "iFont *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_iGeneralFactoryState = {"_p_iGeneralFactoryState", "iGeneralFactoryState *", 0, 0, (void*)0, 0};
@@ -20417,7 +20471,6 @@ static swig_cast_info _swigc__p_iShaderPriorityList[] = {{&_swigt__p_iShaderPrio
 static swig_cast_info _swigc__p_iDataBuffer[] = {{&_swigt__p_iDataBuffer, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iBugPlugRenderObject[] = {{&_swigt__p_iBugPlugRenderObject, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iScriptObject[] = {{&_swigt__p_iScriptObject, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_iCustomMatrixCamera[] = {{&_swigt__p_iCustomMatrixCamera, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iSequenceTimedOperation[] = {{&_swigt__p_iSequenceTimedOperation, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iSequenceOperation[] = {{&_swigt__p_iSequenceOperation, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iHalo[] = {{&_swigt__p_iHalo, 0, 0, 0},{0, 0, 0, 0}};
@@ -20553,6 +20606,7 @@ static swig_cast_info _swigc__p_iClipper2D[] = {  {&_swigt__p_iClipper2D, 0, 0, 
 static swig_cast_info _swigc__p_iCollection[] = {  {&_swigt__p_iCollection, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iCollideSystem[] = {  {&_swigt__p_iCollideSystem, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iCollider[] = {  {&_swigt__p_iCollider, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iCustomMatrixCamera[] = {  {&_swigt__p_iCustomMatrixCamera, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iEngine[] = {  {&_swigt__p_iEngine, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iFont[] = {  {&_swigt__p_iFont, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iGeneralFactoryState[] = {  {&_swigt__p_iGeneralFactoryState, 0, 0, 0},{0, 0, 0, 0}};

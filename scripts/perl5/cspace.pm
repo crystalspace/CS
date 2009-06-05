@@ -6681,6 +6681,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *Draw = *cspacec::iView_Draw;
 *SetAutoResize = *cspacec::iView_SetAutoResize;
 *GetMeshFilter = *cspacec::iView_GetMeshFilter;
+*GetCustomMatrixCamera = *cspacec::iView_GetCustomMatrixCamera;
+*SetCustomMatrixCamera = *cspacec::iView_SetCustomMatrixCamera;
 *scfGetVersion = *cspacec::iView_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -9713,6 +9715,10 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *swig_indexCount_set = *cspacec::csSimpleRenderMesh_indexCount_set;
 *swig_indices_get = *cspacec::csSimpleRenderMesh_indices_get;
 *swig_indices_set = *cspacec::csSimpleRenderMesh_indices_set;
+*swig_indexStart_get = *cspacec::csSimpleRenderMesh_indexStart_get;
+*swig_indexStart_set = *cspacec::csSimpleRenderMesh_indexStart_set;
+*swig_indexEnd_get = *cspacec::csSimpleRenderMesh_indexEnd_get;
+*swig_indexEnd_set = *cspacec::csSimpleRenderMesh_indexEnd_set;
 *swig_vertexCount_get = *cspacec::csSimpleRenderMesh_vertexCount_get;
 *swig_vertexCount_set = *cspacec::csSimpleRenderMesh_vertexCount_set;
 *swig_vertices_get = *cspacec::csSimpleRenderMesh_vertices_get;
@@ -9875,6 +9881,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetProjectionMatrix = *cspacec::iGraphics3D_SetProjectionMatrix;
 *SetTextureComparisonModes = *cspacec::iGraphics3D_SetTextureComparisonModes;
 *CopyFromRenderTargets = *cspacec::iGraphics3D_CopyFromRenderTargets;
+*DrawSimpleMeshes = *cspacec::iGraphics3D_DrawSimpleMeshes;
 *scfGetVersion = *cspacec::iGraphics3D_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -21780,6 +21787,8 @@ sub DESTROY {
 *SetCamera = *cspacec::csView_SetCamera;
 *GetPerspectiveCamera = *cspacec::csView_GetPerspectiveCamera;
 *SetPerspectiveCamera = *cspacec::csView_SetPerspectiveCamera;
+*GetCustomMatrixCamera = *cspacec::csView_GetCustomMatrixCamera;
+*SetCustomMatrixCamera = *cspacec::csView_SetCustomMatrixCamera;
 *GetContext = *cspacec::csView_GetContext;
 *SetContext = *cspacec::csView_SetContext;
 *SetRectangle = *cspacec::csView_SetRectangle;
