@@ -95,71 +95,15 @@ DocConv::~DocConv ()
 #define OP_HELP 0
 #define OP_TRANSLATE 1
 
-void DocConv::Main ()
+void DocConv::ConvertFile(const char* val, csRef<iDocumentSystem> inputDS, csRef<iDocumentSystem> outputDS, int op)
 {
-  cmdline = csQueryRegistry<iCommandLineParser> (object_reg);
-  vfs = csQueryRegistry<iVFS> (object_reg);
-  csRef<iPluginManager> plugin_mgr = 
-    csQueryRegistry<iPluginManager> (object_reg);
-
-  int op = OP_HELP;
-
-  if (cmdline->GetOption ("inds") || cmdline->GetOption ("outds"))
-    op = OP_TRANSLATE;
-
-  if (cmdline->GetOption ("help")) op = OP_HELP;
-
-  if (op == OP_HELP)
-  {
-    csPrintf ("docconv <options> <zipfile|filename>\n");
-    csPrintf ("  -inds=<plugin>:\n");       
-    csPrintf ("     Document system plugin for reading world.\n");
-    csPrintf ("  -outds=<plugin>:\n");       
-    csPrintf ("     Document system plugin for writing world.\n");
-    return;
-  }
-
-  csRef<iDocumentSystem> inputDS;
-  csRef<iDocumentSystem> outputDS;
-  {
-    const char *inds = cmdline->GetOption ("inds");
-    if (inds)
-    {
-      inputDS = csLoadPlugin<iDocumentSystem> (plugin_mgr,
-	  csString().Format ("crystalspace.documentsystem.%s", inds));
-      if (!inputDS)
-      {
-	ReportError ("Unable to load input document system '%s'!",
-	  inds);
-        return;
-      }
-    }
-
-    const char *outds = cmdline->GetOption ("outds");
-    if (outds)
-    {
-      outputDS = csLoadPlugin<iDocumentSystem> (plugin_mgr,
-	  csString().Format ("crystalspace.documentsystem.%s", outds));
-      if (!outputDS)
-      {
-	ReportError ("Unable to load output document system '%s'!",
-	  outds);
-        return;
-      }
-    }
-  }
-
-  const char* val = cmdline->GetName ();
-  if (!val)
-  {
-    ReportError ("Please give VFS world file name or name of the zip archive! "
-      "Use 'docconv -help' to get a list of possible options.");
-    return;
-  }
-
   csString filename;
+  
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Parsing file %s", val);
+  
   if (strstr (val, ".zip"))
   {
+    vfs->Unmount("/tmp/docconv_data", NULL);
     vfs->Mount ("/tmp/docconv_data", val);
     filename = "/tmp/docconv_data/world";
   }
@@ -260,8 +204,83 @@ void DocConv::Main ()
       }
       break;
   }
+  
+}
 
-  //---------------------------------------------------------------
+//---------------------------------------------------------------
+
+
+void DocConv::Main ()
+{
+  cmdline = csQueryRegistry<iCommandLineParser> (object_reg);
+  vfs = csQueryRegistry<iVFS> (object_reg);
+  plugin_mgr = csQueryRegistry<iPluginManager> (object_reg);
+
+  int op = OP_HELP;
+
+  if (cmdline->GetOption ("inds") || cmdline->GetOption ("outds"))
+    op = OP_TRANSLATE;
+
+  if (cmdline->GetOption ("help")) op = OP_HELP;
+
+  if (op == OP_HELP)
+  {
+    csPrintf ("docconv <options> <zipfiles|filenames>\n");
+    csPrintf ("  -inds=<plugin>:\n");       
+    csPrintf ("     Document system plugin for reading world.\n");
+    csPrintf ("  -outds=<plugin>:\n");       
+    csPrintf ("     Document system plugin for writing world.\n");
+    return;
+  }
+
+  csRef<iDocumentSystem> inputDS;
+  csRef<iDocumentSystem> outputDS;
+  {
+    const char *inds = cmdline->GetOption ("inds");
+    if (inds)
+    {
+      inputDS = csLoadPlugin<iDocumentSystem> (plugin_mgr,
+	  csString().Format ("crystalspace.documentsystem.%s", inds));
+      if (!inputDS)
+      {
+	ReportError ("Unable to load input document system '%s'!",
+	  inds);
+        return;
+      }
+    }
+
+    const char *outds = cmdline->GetOption ("outds");
+    if (outds)
+    {
+      outputDS = csLoadPlugin<iDocumentSystem> (plugin_mgr,
+	  csString().Format ("crystalspace.documentsystem.%s", outds));
+      if (!outputDS)
+      {
+	ReportError ("Unable to load output document system '%s'!",
+	  outds);
+        return;
+      }
+    }
+  }
+
+  int filenum = 0;
+  const char* val = cmdline->GetName ();
+  if (!val)
+  {
+    ReportError ("Please give VFS world file name or name of the zip archive! "
+      "Use 'docconv -help' to get a list of possible options.");
+    return;
+  }
+  
+  while (val)
+  {
+      ConvertFile(val, inputDS, outputDS, op);
+      filenum++;
+      val = cmdline->GetName (filenum);
+  }
+   
+
+
 }
 
 /*---------------------------------------------------------------------*

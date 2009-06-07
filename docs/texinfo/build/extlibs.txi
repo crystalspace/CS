@@ -68,7 +68,7 @@ but newer versions are very likely to work as well and can be chosen.
 @anchor{cs-win32libs}
 
 Rather than having to install these components manually, Microsoft Visual C++ 
-7/7.1/8, MinGW/MSYS, and Cygwin users can download a single package which
+7/7.1/8/9, MinGW/MSYS, and Cygwin users can download a single package which
 contains all common headers, pre-built library files, and dynamic link 
 libraries in pre-compiled form, all in versions known to work with this
 particular release of Crystal Space. You can obtain it from the following
@@ -76,11 +76,11 @@ location:
 
 @noindent
 @ifnottex
-@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-win32libs-1.4_001.exe}
+@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-win32libs-1.4_002.exe}
 @end ifnottex
 @iftex
 @code{http://www.crystalspace3d.org/downloads/cs-win32libs/}@*
-@code{cs-win32libs-1.4_001.exe}
+@code{cs-win32libs-1.4_002.exe}
 @end iftex
 
 @subheading zlib
