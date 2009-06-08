@@ -69,7 +69,52 @@ namespace RenderManager
       float aspect;
     };
     csArray<DebugTexture> debugTextures;
+    DebugPersistent& debugPersist;
+    
+    RenderTreeBase (DebugPersistent& debugPersist)
+    : debugPersist (debugPersist) {}
   public:
+    /**\name Debugging helpers: toggling of debugging features
+     * @{ */
+    /**
+     * Register a debug flag, returns a numeric ID.
+     * \remark Flag names are hierarchical. The hierarchy levels are
+     *   separated by dots. If a flag is set or unset, all flags below in the
+     *   hierarchy are set or unset as well.
+     */
+    uint RegisterDebugFlag (const char* string)
+    { return debugPersist.RegisterDebugFlag (string); }
+    /**
+     * Query whether a debug flag was registered and return its ID or
+     * (uint)-1 if not registered.
+     */
+    uint QueryDebugFlag (const char* string)
+    { return debugPersist.QueryDebugFlag (string); }
+    
+    /// Check whether a debug flag is enabled
+    bool IsDebugFlagEnabled (uint flag) const
+    { return debugPersist.IsDebugFlagEnabled (flag); }
+    /**
+     * Enable or disable a debug flag.
+     * \remark Flag names are hierarchical. The hierarchy levels are
+     *   separated by dots. If a flag is set or unset, all flags below in the
+     *   hierarchy are set or unset as well.
+     */
+    void EnableDebugFlag (uint flag, bool state)
+    { debugPersist.EnableDebugFlag (flag, state); }
+    /**
+     * Enable or disable a debug flag.
+     * \remark Flag names are hierarchical. The hierarchy levels are
+     *   separated by dots. If a flag is set or unset, all flags below in the
+     *   hierarchy are set or unset as well.
+     */
+    void EnableDebugFlag (const char* flagStr, bool state)
+    {
+      uint flag = RegisterDebugFlag (flagStr);
+      EnableDebugFlag (flag, state); 
+    }
+    /** @} */
+ 
     //@{
     /**\name Debugging helpers: debugging textures
      */
@@ -494,7 +539,7 @@ namespace RenderManager
 
     //---- Methods
     RenderTree (PersistentData& dataStorage)
-      : persistentData (dataStorage)
+      : RenderTreeBase (dataStorage.debugPersist), persistentData (dataStorage)
     {
     }
 
@@ -582,47 +627,6 @@ namespace RenderManager
       persistentData.meshNodeAllocator.Free (meshNode);
     }
 
-
-    /**\name Debugging helpers: toggling of debugging features
-     * @{ */
-    /**
-     * Register a debug flag, returns a numeric ID.
-     * \remark Flag names are hierarchical. The hierarchy levels are
-     *   separated by dots. If a flag is set or unset, all flags below in the
-     *   hierarchy are set or unset as well.
-     */
-    uint RegisterDebugFlag (const char* string)
-    { return persistentData.debugPersist.RegisterDebugFlag (string); }
-    /**
-     * Query whether a debug flag was registered and return its ID or
-     * (uint)-1 if not registered.
-     */
-    uint QueryDebugFlag (const char* string)
-    { return persistentData.debugPersist.QueryDebugFlag (string); }
-    
-    /// Check whether a debug flag is enabled
-    bool IsDebugFlagEnabled (uint flag) const
-    { return persistentData.debugPersist.IsDebugFlagEnabled (flag); }
-    /**
-     * Enable or disable a debug flag.
-     * \remark Flag names are hierarchical. The hierarchy levels are
-     *   separated by dots. If a flag is set or unset, all flags below in the
-     *   hierarchy are set or unset as well.
-     */
-    void EnableDebugFlag (uint flag, bool state)
-    { persistentData.debugPersist.EnableDebugFlag (flag, state); }
-    /**
-     * Enable or disable a debug flag.
-     * \remark Flag names are hierarchical. The hierarchy levels are
-     *   separated by dots. If a flag is set or unset, all flags below in the
-     *   hierarchy are set or unset as well.
-     */
-    void EnableDebugFlag (const char* flagStr, bool state)
-    {
-      uint flag = RegisterDebugFlag (flag);
-      EnableDebugFlag (flag, state); 
-    }
-    /** @} */
     
     /// Debugging helper: whether debug screen clearing is enabled
     bool IsDebugClearEnabled () const
