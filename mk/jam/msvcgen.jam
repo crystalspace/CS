@@ -1266,15 +1266,12 @@ rule StaticPluginLibrary
   for t in $(targets)
   {
     sources += $(STATICPLUGINS.SOURCES.$(t)) ;
-    extlibs += $($(t).EXTERNALLIBS) ;
-    _MsvcDefine $(name) : $(STATICPLUGINS.$(t).MSVC_DEFINES) ;
   }
 
   $(name)_STATIC = "yes" ;
   # Set up library
   Library $(name) : $(sources) ;
   MsvcDefine $(name) : CS_STATIC_LINKED ;
-  ExternalLibs $(name) : [ RemoveDups $(extlibs) ] ;
 
   # Write out needed CFLAGS, LFLAGS
   local outdir = [ Property msvcgen : outdircommon ] ;

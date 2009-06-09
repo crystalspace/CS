@@ -71,7 +71,7 @@ public:
     CEGUI::uint buffWidth, CEGUI::uint buffHeight, CEGUI::Texture::PixelFormat pixFmt);
 
   /// Get a handle to the texture.
-  iTextureHandle* GetTexHandle();
+  iTextureHandle* GetTexHandle() const;
 
 private:
   /// Returns the renderer

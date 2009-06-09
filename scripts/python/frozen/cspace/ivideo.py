@@ -302,6 +302,8 @@ class csSimpleRenderMesh(object):
     meshtype = _swig_property(_ivideo.csSimpleRenderMesh_meshtype_get, _ivideo.csSimpleRenderMesh_meshtype_set)
     indexCount = _swig_property(_ivideo.csSimpleRenderMesh_indexCount_get, _ivideo.csSimpleRenderMesh_indexCount_set)
     indices = _swig_property(_ivideo.csSimpleRenderMesh_indices_get, _ivideo.csSimpleRenderMesh_indices_set)
+    indexStart = _swig_property(_ivideo.csSimpleRenderMesh_indexStart_get, _ivideo.csSimpleRenderMesh_indexStart_set)
+    indexEnd = _swig_property(_ivideo.csSimpleRenderMesh_indexEnd_get, _ivideo.csSimpleRenderMesh_indexEnd_set)
     vertexCount = _swig_property(_ivideo.csSimpleRenderMesh_vertexCount_get, _ivideo.csSimpleRenderMesh_vertexCount_set)
     vertices = _swig_property(_ivideo.csSimpleRenderMesh_vertices_get, _ivideo.csSimpleRenderMesh_vertices_set)
     texcoords = _swig_property(_ivideo.csSimpleRenderMesh_texcoords_get, _ivideo.csSimpleRenderMesh_texcoords_set)
@@ -405,6 +407,7 @@ class iGraphics3D(core.iBase):
     def SetProjectionMatrix(*args): return _ivideo.iGraphics3D_SetProjectionMatrix(*args)
     def SetTextureComparisonModes(*args): return _ivideo.iGraphics3D_SetTextureComparisonModes(*args)
     def CopyFromRenderTargets(*args): return _ivideo.iGraphics3D_CopyFromRenderTargets(*args)
+    def DrawSimpleMeshes(*args): return _ivideo.iGraphics3D_DrawSimpleMeshes(*args)
     scfGetVersion = staticmethod(_ivideo.iGraphics3D_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iGraphics3D
     __del__ = lambda self : None;
