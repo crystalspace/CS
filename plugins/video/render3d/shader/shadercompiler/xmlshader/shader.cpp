@@ -889,12 +889,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     {
       Technique& tech = techniques[t];
 
+      size_t vc = tech.resolver->GetVariantCount();
+      if (vc == 0) vc = 1;
+      
       if (compiler->do_verbose)
 	compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
 	"Shader '%s': priority %d: %zu variations",
-	GetName(), tech.priority, tech.resolver->GetVariantCount());
+	GetName(), tech.priority, vc);
 
-      totalTechs += tech.resolver->GetVariantCount();
+      totalTechs += vc;
     }
 
     size_t techsHandled = 0;
@@ -909,6 +912,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 	csString().Format ("/%s/%zu", cacheScope_tech.GetData(), t));
 
       size_t vc = tech.resolver->GetVariantCount();
+      if (vc == 0) vc = 1;
       for (size_t vi = 0; vi < vc; vi++)
       {
 	tech.resolver->SetVariant (vi);
