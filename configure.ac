@@ -1,6 +1,6 @@
 # configure.ac                                                 -*- Autoconf -*-
 #==============================================================================
-# Copyright (C)2003-2008 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2003-2009 by Eric Sunshine <sunshine@sunshineco.com>
 #
 # Autoconf input script for Crystal Space.  Process this file with
 # CS/bin/autogen.sh to produce a configure script.
@@ -224,16 +224,6 @@ case $cs_host_target in
         CS_EMIT_BUILD_PROPERTY([COREAUDIO.AVAILABLE], [yes])
         CS_EMIT_BUILD_PROPERTY([COREAUDIO.LFLAGS],
 	    [-framework CoreAudio -framework AudioToolbox])
-        # Processor-specific optimizations.
-        AS_IF([test -n "$cs_cv_prog_cc_msse"],
-            [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
-             [$cs_cv_prog_cc_msse], [append])])
-        AS_IF([test -n "$cs_cv_prog_cc_msse2"],
-            [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
-             [$cs_cv_prog_cc_msse2], [append])])
-        AS_IF([test -n "$cs_cv_prog_cc_mfpmath_sse"],
-            [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
-             [$cs_cv_prog_cc_mfpmath_sse], [append])])
         ;;
 esac
 case $cs_host_family in
@@ -256,16 +246,21 @@ CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
 # binary build.
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx],
-    [CS_CREATE_TUPLE([-mmmx])])
+    [CS_CREATE_TUPLE([-mmmx])], [],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],
+        [append])])
 CS_CHECK_BUILD_FLAGS([for -msse flag], [cs_cv_prog_cc_msse],
-    [CS_CREATE_TUPLE([-msse])])
+    [CS_CREATE_TUPLE([-msse])], [],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$cs_cv_prog_cc_msse],
+        [append])])
 CS_CHECK_BUILD_FLAGS([for -msse2 flag], [cs_cv_prog_cc_msse2],
-    [CS_CREATE_TUPLE([-msse2])])
+    [CS_CREATE_TUPLE([-msse2])], [],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$cs_cv_prog_cc_msse2],
+        [append])])
 CS_CHECK_BUILD_FLAGS([for -mfpmath=sse flag], [cs_cv_prog_cc_mfpmath_sse],
-    [CS_CREATE_TUPLE([-mfpmath=sse])])
-
-AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX], [$cs_cv_prog_cc_mmmx],[+])])
+    [CS_CREATE_TUPLE([-mfpmath=sse])], [],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$cs_cv_prog_cc_mfpmath_sse],
+        [append])])
 
 AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
     [CS_CHECK_BUILD([for mmintrin.h],
