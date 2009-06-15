@@ -329,8 +329,9 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   CS::RenderViewClipper::CalculateClipSettings (rview->GetRenderContext (),
       frustum_mask, clip_portal, clip_plane, clip_z_plane);
 
-  anim_ctrl->Update (vc->GetCurrentTicks (), factory->GetVertexCount(), 
-    factory->GetShapeNumber());
+  if (anim_ctrl)
+    anim_ctrl->Update (vc->GetCurrentTicks (), factory->GetVertexCount(), 
+      factory->GetShapeNumber());
     
   iRenderBuffer* positions = GetPositions();
 
