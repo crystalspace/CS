@@ -171,7 +171,9 @@
 #endif
 
 %{
-#include "crystalspace.h"
+#include "csgeom.h"
+#include "cstool/initapp.h"
+#include "csutil.h"
 %}
 
 %include "bindings/common/allinterfaces.i"
@@ -809,13 +811,6 @@ ARRAY_OBJECT_FUNCTIONS(iStringArray,const char *)
 %include "iutil/databuff.h"
 BUFFER_RW_FUNCTIONS(iDataBuffer,GetData,GetSize,
                 char,AsBuffer)
-%include "igraphic/image.h"
-%immutable csImageIOFileFormatDescription::mime;
-%immutable csImageIOFileFormatDescription::subtype;
-%template (csImageIOFileFormatDescriptions) csArray<csImageIOFileFormatDescription const*>;
-%include "igraphic/imageio.h"
-%include "igraphic/animimg.h"
-%include "itexture/iproctex.h"
 
 %ignore iBase::~iBase(); // We replace iBase dtor with one that calls DecRef().
 			 // Swig already knows not to delete an SCF pointer.
@@ -994,8 +989,6 @@ csEventID _csevJoystickEvent (iObjectRegistry *);
   csColor operator + (const csColor & c) const { return *self + c; }
   csColor operator - (const csColor & c) const { return *self - c; }
 }
-
-%include "cstool/primitives.h"
 
 // functions for returning wrapped iBase objects.
 %include "bindings/common/scfsugar.i"
