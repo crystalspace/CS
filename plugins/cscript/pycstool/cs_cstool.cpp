@@ -2526,291 +2526,296 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_CS__Geometry__DensityTextureMapper swig_types[3]
 #define SWIGTYPE_p_CS__Geometry__GeneralMeshBuilder swig_types[4]
 #define SWIGTYPE_p_CS__Geometry__Primitive swig_types[5]
-#define SWIGTYPE_p_CS__Geometry__Sphere swig_types[6]
-#define SWIGTYPE_p_CS__Geometry__TableTextureMapper swig_types[7]
-#define SWIGTYPE_p_CS__Geometry__TesselatedBox swig_types[8]
-#define SWIGTYPE_p_CS__Geometry__TesselatedQuad swig_types[9]
-#define SWIGTYPE_p_CS__Geometry__TextureMapper swig_types[10]
-#define SWIGTYPE_p_CS__Graphics__CoreRenderMesh swig_types[11]
-#define SWIGTYPE_p_CS__Graphics__RenderMesh swig_types[12]
-#define SWIGTYPE_p_CS__Graphics__RenderMeshModes swig_types[13]
-#define SWIGTYPE_p_CS__Lighting__SimpleStaticLighter swig_types[14]
-#define SWIGTYPE_p_CS__Memory__AllocatorMalloc swig_types[15]
-#define SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t swig_types[16]
-#define SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__ShaderVar_t swig_types[17]
-#define SWIGTYPE_p_CS__Utility__InternalRefCount swig_types[18]
-#define SWIGTYPE_p_CS__Utility__MeshFilter swig_types[19]
-#define SWIGTYPE_p_CS__Utility__StringSetT_CS__StringSetTag__General_t swig_types[20]
-#define SWIGTYPE_p_CapacityHandlerType swig_types[21]
-#define SWIGTYPE_p_ContainedType swig_types[22]
-#define SWIGTYPE_p_ElementHandlerType swig_types[23]
-#define SWIGTYPE_p_FileFormatDescription swig_types[24]
-#define SWIGTYPE_p_HashType swig_types[25]
-#define SWIGTYPE_p_KeyType swig_types[26]
-#define SWIGTYPE_p_TagType swig_types[27]
-#define SWIGTYPE_p_ThisType swig_types[28]
-#define SWIGTYPE_p_ValueType swig_types[29]
-#define SWIGTYPE_p__1_basetype swig_types[30]
-#define SWIGTYPE_p__csKeyCharType swig_types[31]
-#define SWIGTYPE_p__csKeyEventType swig_types[32]
-#define SWIGTYPE_p__csKeyModifierNumType swig_types[33]
-#define SWIGTYPE_p__csKeyModifierType swig_types[34]
-#define SWIGTYPE_p__csKeyModifiers swig_types[35]
-#define SWIGTYPE_p__csMouseCursorID swig_types[36]
-#define SWIGTYPE_p__csMouseEventType swig_types[37]
-#define SWIGTYPE_p_char swig_types[38]
-#define SWIGTYPE_p_csArrayCapacityFixedGrowT_16_t swig_types[39]
-#define SWIGTYPE_p_csArrayCapacityVariableGrow swig_types[40]
-#define SWIGTYPE_p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t swig_types[41]
-#define SWIGTYPE_p_csBox3 swig_types[42]
-#define SWIGTYPE_p_csColliderActor swig_types[43]
-#define SWIGTYPE_p_csColliderHelper swig_types[44]
-#define SWIGTYPE_p_csColliderWrapper swig_types[45]
-#define SWIGTYPE_p_csColor swig_types[46]
-#define SWIGTYPE_p_csColor4 swig_types[47]
-#define SWIGTYPE_p_csConfigFile swig_types[48]
-#define SWIGTYPE_p_csEllipsoid swig_types[49]
-#define SWIGTYPE_p_csEngineTools swig_types[50]
-#define SWIGTYPE_p_csImageBase swig_types[51]
-#define SWIGTYPE_p_csImageMemory swig_types[52]
-#define SWIGTYPE_p_csIntersectingTriangle swig_types[53]
-#define SWIGTYPE_p_csMemoryPen swig_types[54]
-#define SWIGTYPE_p_csObject swig_types[55]
-#define SWIGTYPE_p_csPen swig_types[56]
-#define SWIGTYPE_p_csPixmap swig_types[57]
-#define SWIGTYPE_p_csProcAnimated swig_types[58]
-#define SWIGTYPE_p_csProcTexture swig_types[59]
-#define SWIGTYPE_p_csRefArrayT_iObject_t swig_types[60]
-#define SWIGTYPE_p_csRefT_iTextureHandle_t swig_types[61]
-#define SWIGTYPE_p_csReversibleTransform swig_types[62]
-#define SWIGTYPE_p_csScreenTargetResult swig_types[63]
-#define SWIGTYPE_p_csSetT_csPtrKeyT_iMeshWrapper_t_CS__Memory__AllocatorMalloc_t swig_types[64]
-#define SWIGTYPE_p_csShortestDistanceResult swig_types[65]
-#define SWIGTYPE_p_csSimplePixmap swig_types[66]
-#define SWIGTYPE_p_csTraceBeamResult swig_types[67]
-#define SWIGTYPE_p_csVector2 swig_types[68]
-#define SWIGTYPE_p_csVector3 swig_types[69]
-#define SWIGTYPE_p_csView swig_types[70]
-#define SWIGTYPE_p_iAnimatedImage swig_types[71]
-#define SWIGTYPE_p_iArrayChangeAllT_csCollisionPair_t swig_types[72]
-#define SWIGTYPE_p_iArrayChangeAllT_csShaderVariable_p_t swig_types[73]
-#define SWIGTYPE_p_iArrayChangeElementsT_csCollisionPair_t swig_types[74]
-#define SWIGTYPE_p_iArrayChangeElementsT_csShaderVariable_p_t swig_types[75]
-#define SWIGTYPE_p_iArrayReadOnlyT_csCollisionPair_t swig_types[76]
-#define SWIGTYPE_p_iArrayReadOnlyT_csShaderVariable_p_t swig_types[77]
-#define SWIGTYPE_p_iArrayReadOnlyT_iCollection_p_t swig_types[78]
-#define SWIGTYPE_p_iArrayReadOnlyT_iSceneNode_p_t swig_types[79]
-#define SWIGTYPE_p_iBase swig_types[80]
-#define SWIGTYPE_p_iBodyGroup swig_types[81]
-#define SWIGTYPE_p_iBugPlug swig_types[82]
-#define SWIGTYPE_p_iBugPlugRenderObject swig_types[83]
-#define SWIGTYPE_p_iCacheManager swig_types[84]
-#define SWIGTYPE_p_iCamera swig_types[85]
-#define SWIGTYPE_p_iCameraListener swig_types[86]
-#define SWIGTYPE_p_iCameraPosition swig_types[87]
-#define SWIGTYPE_p_iCameraPositionList swig_types[88]
-#define SWIGTYPE_p_iCameraSectorListener swig_types[89]
-#define SWIGTYPE_p_iClipper2D swig_types[90]
-#define SWIGTYPE_p_iCollection swig_types[91]
-#define SWIGTYPE_p_iCollideSystem swig_types[92]
-#define SWIGTYPE_p_iCollider swig_types[93]
-#define SWIGTYPE_p_iCommandLineParser swig_types[94]
-#define SWIGTYPE_p_iComponent swig_types[95]
-#define SWIGTYPE_p_iConfigFile swig_types[96]
-#define SWIGTYPE_p_iConfigIterator swig_types[97]
-#define SWIGTYPE_p_iConfigManager swig_types[98]
-#define SWIGTYPE_p_iConsoleExecCallback swig_types[99]
-#define SWIGTYPE_p_iConsoleInput swig_types[100]
-#define SWIGTYPE_p_iConsoleOutput swig_types[101]
-#define SWIGTYPE_p_iConsoleWatcher swig_types[102]
-#define SWIGTYPE_p_iCustomMatrixCamera swig_types[103]
-#define SWIGTYPE_p_iDataBuffer swig_types[104]
-#define SWIGTYPE_p_iDebugHelper swig_types[105]
-#define SWIGTYPE_p_iDecalManager swig_types[106]
-#define SWIGTYPE_p_iDecalTemplate swig_types[107]
-#define SWIGTYPE_p_iDocument swig_types[108]
-#define SWIGTYPE_p_iDocumentAttribute swig_types[109]
-#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[110]
-#define SWIGTYPE_p_iDocumentNode swig_types[111]
-#define SWIGTYPE_p_iDocumentNodeIterator swig_types[112]
-#define SWIGTYPE_p_iDocumentSystem swig_types[113]
-#define SWIGTYPE_p_iDynamicSystem swig_types[114]
-#define SWIGTYPE_p_iDynamics swig_types[115]
-#define SWIGTYPE_p_iDynamicsColliderCollisionCallback swig_types[116]
-#define SWIGTYPE_p_iDynamicsCollisionCallback swig_types[117]
-#define SWIGTYPE_p_iDynamicsMoveCallback swig_types[118]
-#define SWIGTYPE_p_iDynamicsStepCallback swig_types[119]
-#define SWIGTYPE_p_iDynamicsSystemCollider swig_types[120]
-#define SWIGTYPE_p_iEngine swig_types[121]
-#define SWIGTYPE_p_iEngineFrameCallback swig_types[122]
-#define SWIGTYPE_p_iEngineSectorCallback swig_types[123]
-#define SWIGTYPE_p_iEngineSequenceManager swig_types[124]
-#define SWIGTYPE_p_iEngineSequenceParameters swig_types[125]
-#define SWIGTYPE_p_iEvent swig_types[126]
-#define SWIGTYPE_p_iEventAttributeIterator swig_types[127]
-#define SWIGTYPE_p_iEventCord swig_types[128]
-#define SWIGTYPE_p_iEventHandler swig_types[129]
-#define SWIGTYPE_p_iEventNameRegistry swig_types[130]
-#define SWIGTYPE_p_iEventOutlet swig_types[131]
-#define SWIGTYPE_p_iEventPlug swig_types[132]
-#define SWIGTYPE_p_iEventQueue swig_types[133]
-#define SWIGTYPE_p_iFactory swig_types[134]
-#define SWIGTYPE_p_iFile swig_types[135]
-#define SWIGTYPE_p_iFont swig_types[136]
-#define SWIGTYPE_p_iFontDeleteNotify swig_types[137]
-#define SWIGTYPE_p_iFontServer swig_types[138]
-#define SWIGTYPE_p_iGeneralFactoryState swig_types[139]
-#define SWIGTYPE_p_iGraphics2D swig_types[140]
-#define SWIGTYPE_p_iGraphics3D swig_types[141]
-#define SWIGTYPE_p_iHalo swig_types[142]
-#define SWIGTYPE_p_iImage swig_types[143]
-#define SWIGTYPE_p_iImageIO swig_types[144]
-#define SWIGTYPE_p_iJoint swig_types[145]
-#define SWIGTYPE_p_iJoystickDriver swig_types[146]
-#define SWIGTYPE_p_iKeyComposer swig_types[147]
-#define SWIGTYPE_p_iKeyboardDriver swig_types[148]
-#define SWIGTYPE_p_iLODControl swig_types[149]
-#define SWIGTYPE_p_iLight swig_types[150]
-#define SWIGTYPE_p_iLightCallback swig_types[151]
-#define SWIGTYPE_p_iLightIterator swig_types[152]
-#define SWIGTYPE_p_iLightList swig_types[153]
-#define SWIGTYPE_p_iLightVisibleCallback swig_types[154]
-#define SWIGTYPE_p_iMapNode swig_types[155]
-#define SWIGTYPE_p_iMaterial swig_types[156]
-#define SWIGTYPE_p_iMaterialEngine swig_types[157]
-#define SWIGTYPE_p_iMaterialList swig_types[158]
-#define SWIGTYPE_p_iMaterialWrapper swig_types[159]
-#define SWIGTYPE_p_iMeshDrawCallback swig_types[160]
-#define SWIGTYPE_p_iMeshFactoryList swig_types[161]
-#define SWIGTYPE_p_iMeshFactoryWrapper swig_types[162]
-#define SWIGTYPE_p_iMeshFactoryWrapperIterator swig_types[163]
-#define SWIGTYPE_p_iMeshList swig_types[164]
-#define SWIGTYPE_p_iMeshWrapper swig_types[165]
-#define SWIGTYPE_p_iMeshWrapperIterator swig_types[166]
-#define SWIGTYPE_p_iMouseDriver swig_types[167]
-#define SWIGTYPE_p_iMovable swig_types[168]
-#define SWIGTYPE_p_iMovableListener swig_types[169]
-#define SWIGTYPE_p_iMovieRecorder swig_types[170]
-#define SWIGTYPE_p_iNativeWindow swig_types[171]
-#define SWIGTYPE_p_iNativeWindowManager swig_types[172]
-#define SWIGTYPE_p_iODEAMotorJoint swig_types[173]
-#define SWIGTYPE_p_iODEBallJoint swig_types[174]
-#define SWIGTYPE_p_iODEDynamicState swig_types[175]
-#define SWIGTYPE_p_iODEDynamicSystemState swig_types[176]
-#define SWIGTYPE_p_iODEFrameUpdateCallback swig_types[177]
-#define SWIGTYPE_p_iODEGeneralJointState swig_types[178]
-#define SWIGTYPE_p_iODEHinge2Joint swig_types[179]
-#define SWIGTYPE_p_iODEHingeJoint swig_types[180]
-#define SWIGTYPE_p_iODEJointState swig_types[181]
-#define SWIGTYPE_p_iODESliderJoint swig_types[182]
-#define SWIGTYPE_p_iODEUniversalJoint swig_types[183]
-#define SWIGTYPE_p_iObject swig_types[184]
-#define SWIGTYPE_p_iObjectIterator swig_types[185]
-#define SWIGTYPE_p_iObjectNameChangeListener swig_types[186]
-#define SWIGTYPE_p_iObjectRegistry swig_types[187]
-#define SWIGTYPE_p_iObjectRegistryIterator swig_types[188]
-#define SWIGTYPE_p_iParameterESM swig_types[189]
-#define SWIGTYPE_p_iPath swig_types[190]
-#define SWIGTYPE_p_iPen swig_types[191]
-#define SWIGTYPE_p_iPerspectiveCamera swig_types[192]
-#define SWIGTYPE_p_iPluginIterator swig_types[193]
-#define SWIGTYPE_p_iPluginManager swig_types[194]
-#define SWIGTYPE_p_iPortal swig_types[195]
-#define SWIGTYPE_p_iPortalCallback swig_types[196]
-#define SWIGTYPE_p_iPortalContainer swig_types[197]
-#define SWIGTYPE_p_iProcTexCallback swig_types[198]
-#define SWIGTYPE_p_iProcTexture swig_types[199]
-#define SWIGTYPE_p_iRenderLoop swig_types[200]
-#define SWIGTYPE_p_iRenderLoopManager swig_types[201]
-#define SWIGTYPE_p_iRenderManager swig_types[202]
-#define SWIGTYPE_p_iRenderManagerPostEffects swig_types[203]
-#define SWIGTYPE_p_iRenderManagerTargets swig_types[204]
-#define SWIGTYPE_p_iRenderStepContainer swig_types[205]
-#define SWIGTYPE_p_iReporter swig_types[206]
-#define SWIGTYPE_p_iReporterIterator swig_types[207]
-#define SWIGTYPE_p_iReporterListener swig_types[208]
-#define SWIGTYPE_p_iRigidBody swig_types[209]
-#define SWIGTYPE_p_iSCF swig_types[210]
-#define SWIGTYPE_p_iSceneNode swig_types[211]
-#define SWIGTYPE_p_iSceneNodeArray swig_types[212]
-#define SWIGTYPE_p_iScript swig_types[213]
-#define SWIGTYPE_p_iScriptObject swig_types[214]
-#define SWIGTYPE_p_iScriptValue swig_types[215]
-#define SWIGTYPE_p_iSector swig_types[216]
-#define SWIGTYPE_p_iSectorCallback swig_types[217]
-#define SWIGTYPE_p_iSectorIterator swig_types[218]
-#define SWIGTYPE_p_iSectorList swig_types[219]
-#define SWIGTYPE_p_iSectorMeshCallback swig_types[220]
-#define SWIGTYPE_p_iSequence swig_types[221]
-#define SWIGTYPE_p_iSequenceCondition swig_types[222]
-#define SWIGTYPE_p_iSequenceManager swig_types[223]
-#define SWIGTYPE_p_iSequenceOperation swig_types[224]
-#define SWIGTYPE_p_iSequenceTimedOperation swig_types[225]
-#define SWIGTYPE_p_iSequenceTrigger swig_types[226]
-#define SWIGTYPE_p_iSequenceWrapper swig_types[227]
-#define SWIGTYPE_p_iShader swig_types[228]
-#define SWIGTYPE_p_iShaderCompiler swig_types[229]
-#define SWIGTYPE_p_iShaderManager swig_types[230]
-#define SWIGTYPE_p_iShaderPriorityList swig_types[231]
-#define SWIGTYPE_p_iShaderVarStringSet swig_types[232]
-#define SWIGTYPE_p_iShaderVariableAccessor swig_types[233]
-#define SWIGTYPE_p_iShaderVariableContext swig_types[234]
-#define SWIGTYPE_p_iSimpleFormerState swig_types[235]
-#define SWIGTYPE_p_iStandardReporterListener swig_types[236]
-#define SWIGTYPE_p_iString swig_types[237]
-#define SWIGTYPE_p_iStringArray swig_types[238]
-#define SWIGTYPE_p_iStringSet swig_types[239]
-#define SWIGTYPE_p_iStringSetBaseT_CS__StringSetTag__General_t swig_types[240]
-#define SWIGTYPE_p_iStringSetBaseT_CS__StringSetTag__ShaderVar_t swig_types[241]
-#define SWIGTYPE_p_iTerraFormer swig_types[242]
-#define SWIGTYPE_p_iTerraSampler swig_types[243]
-#define SWIGTYPE_p_iTerrainSystem swig_types[244]
-#define SWIGTYPE_p_iTextureCallback swig_types[245]
-#define SWIGTYPE_p_iTextureHandle swig_types[246]
-#define SWIGTYPE_p_iTextureList swig_types[247]
-#define SWIGTYPE_p_iTextureManager swig_types[248]
-#define SWIGTYPE_p_iTextureWrapper swig_types[249]
-#define SWIGTYPE_p_iThreadManager swig_types[250]
-#define SWIGTYPE_p_iThreadReturn swig_types[251]
-#define SWIGTYPE_p_iTranslator swig_types[252]
-#define SWIGTYPE_p_iTriangleMesh swig_types[253]
-#define SWIGTYPE_p_iVFS swig_types[254]
-#define SWIGTYPE_p_iView swig_types[255]
-#define SWIGTYPE_p_iVirtualClock swig_types[256]
-#define SWIGTYPE_p_iVisibilityCuller swig_types[257]
-#define SWIGTYPE_p_iVisibilityCullerListener swig_types[258]
-#define SWIGTYPE_p_iVisibilityObject swig_types[259]
-#define SWIGTYPE_p_iVisibilityObjectIterator swig_types[260]
-#define SWIGTYPE_p_int swig_types[261]
-#define SWIGTYPE_p_int16_t swig_types[262]
-#define SWIGTYPE_p_int64_t swig_types[263]
-#define SWIGTYPE_p_int8_t swig_types[264]
-#define SWIGTYPE_p_long_long swig_types[265]
-#define SWIGTYPE_p_p_csReversibleTransform swig_types[266]
-#define SWIGTYPE_p_p_iCollider swig_types[267]
-#define SWIGTYPE_p_p_iMeshWrapper swig_types[268]
-#define SWIGTYPE_p_p_iSector swig_types[269]
-#define SWIGTYPE_p_p_void swig_types[270]
-#define SWIGTYPE_p_scfFakeInterfaceT_csColliderWrapper_t swig_types[271]
-#define SWIGTYPE_p_scfImplementation1T_csConfigFile_iConfigFile_t swig_types[272]
-#define SWIGTYPE_p_scfImplementation1T_csImageBase_iImage_t swig_types[273]
-#define SWIGTYPE_p_scfImplementation1T_csObject_iObject_t swig_types[274]
-#define SWIGTYPE_p_scfImplementation1T_csView_iView_t swig_types[275]
-#define SWIGTYPE_p_scfImplementationExt0T_csImageMemory_csImageBase_t swig_types[276]
-#define SWIGTYPE_p_scfImplementationExt1T_csColliderWrapper_csObject_scfFakeInterfaceT_csColliderWrapper_t_t swig_types[277]
-#define SWIGTYPE_p_scfImplementationExt1T_csPath_csObject_iPath_t swig_types[278]
-#define SWIGTYPE_p_scfImplementationExt2T_csProcTexture_csObject_iTextureWrapper_iProcTexture_t swig_types[279]
-#define SWIGTYPE_p_scfInterfaceMetadataList swig_types[280]
-#define SWIGTYPE_p_uint16_t swig_types[281]
-#define SWIGTYPE_p_uint32_t swig_types[282]
-#define SWIGTYPE_p_uint64_t swig_types[283]
-#define SWIGTYPE_p_uint8_t swig_types[284]
-#define SWIGTYPE_p_unsigned_int swig_types[285]
-#define SWIGTYPE_p_unsigned_long swig_types[286]
-#define SWIGTYPE_p_unsigned_long_long swig_types[287]
-#define SWIGTYPE_p_void swig_types[288]
-static swig_type_info *swig_types[290];
-static swig_module_info swig_module = {swig_types, 289, 0, 0, 0, 0};
+#define SWIGTYPE_p_CS__Geometry__Primitives swig_types[6]
+#define SWIGTYPE_p_CS__Geometry__Sphere swig_types[7]
+#define SWIGTYPE_p_CS__Geometry__TableTextureMapper swig_types[8]
+#define SWIGTYPE_p_CS__Geometry__TesselatedBox swig_types[9]
+#define SWIGTYPE_p_CS__Geometry__TesselatedQuad swig_types[10]
+#define SWIGTYPE_p_CS__Geometry__TextureMapper swig_types[11]
+#define SWIGTYPE_p_CS__Graphics__CoreRenderMesh swig_types[12]
+#define SWIGTYPE_p_CS__Graphics__RenderMesh swig_types[13]
+#define SWIGTYPE_p_CS__Graphics__RenderMeshModes swig_types[14]
+#define SWIGTYPE_p_CS__Lighting__SimpleStaticLighter swig_types[15]
+#define SWIGTYPE_p_CS__Memory__AllocatorMalloc swig_types[16]
+#define SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__General_t swig_types[17]
+#define SWIGTYPE_p_CS__StringIDT_CS__StringSetTag__ShaderVar_t swig_types[18]
+#define SWIGTYPE_p_CS__Utility__InternalRefCount swig_types[19]
+#define SWIGTYPE_p_CS__Utility__MeshFilter swig_types[20]
+#define SWIGTYPE_p_CS__Utility__StringSetT_CS__StringSetTag__General_t swig_types[21]
+#define SWIGTYPE_p_CapacityHandlerType swig_types[22]
+#define SWIGTYPE_p_ContainedType swig_types[23]
+#define SWIGTYPE_p_ElementHandlerType swig_types[24]
+#define SWIGTYPE_p_FileFormatDescription swig_types[25]
+#define SWIGTYPE_p_HashType swig_types[26]
+#define SWIGTYPE_p_KeyType swig_types[27]
+#define SWIGTYPE_p_TagType swig_types[28]
+#define SWIGTYPE_p_ThisType swig_types[29]
+#define SWIGTYPE_p_ValueType swig_types[30]
+#define SWIGTYPE_p__1_basetype swig_types[31]
+#define SWIGTYPE_p__csKeyCharType swig_types[32]
+#define SWIGTYPE_p__csKeyEventType swig_types[33]
+#define SWIGTYPE_p__csKeyModifierNumType swig_types[34]
+#define SWIGTYPE_p__csKeyModifierType swig_types[35]
+#define SWIGTYPE_p__csKeyModifiers swig_types[36]
+#define SWIGTYPE_p__csMouseCursorID swig_types[37]
+#define SWIGTYPE_p__csMouseEventType swig_types[38]
+#define SWIGTYPE_p_char swig_types[39]
+#define SWIGTYPE_p_csArrayCapacityFixedGrowT_16_t swig_types[40]
+#define SWIGTYPE_p_csArrayCapacityVariableGrow swig_types[41]
+#define SWIGTYPE_p_csArrayT_csImageIOFileFormatDescription_const_p_csArrayElementHandlerT_csImageIOFileFormatDescription_const_p_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t swig_types[42]
+#define SWIGTYPE_p_csBox3 swig_types[43]
+#define SWIGTYPE_p_csColliderActor swig_types[44]
+#define SWIGTYPE_p_csColliderHelper swig_types[45]
+#define SWIGTYPE_p_csColliderWrapper swig_types[46]
+#define SWIGTYPE_p_csColor swig_types[47]
+#define SWIGTYPE_p_csColor4 swig_types[48]
+#define SWIGTYPE_p_csConfigFile swig_types[49]
+#define SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t swig_types[50]
+#define SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t swig_types[51]
+#define SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t swig_types[52]
+#define SWIGTYPE_p_csEllipsoid swig_types[53]
+#define SWIGTYPE_p_csEngineTools swig_types[54]
+#define SWIGTYPE_p_csImageBase swig_types[55]
+#define SWIGTYPE_p_csImageMemory swig_types[56]
+#define SWIGTYPE_p_csIntersectingTriangle swig_types[57]
+#define SWIGTYPE_p_csMemoryPen swig_types[58]
+#define SWIGTYPE_p_csObject swig_types[59]
+#define SWIGTYPE_p_csPen swig_types[60]
+#define SWIGTYPE_p_csPixmap swig_types[61]
+#define SWIGTYPE_p_csPrimitives swig_types[62]
+#define SWIGTYPE_p_csProcAnimated swig_types[63]
+#define SWIGTYPE_p_csProcTexture swig_types[64]
+#define SWIGTYPE_p_csRefArrayT_iObject_t swig_types[65]
+#define SWIGTYPE_p_csRefT_iTextureHandle_t swig_types[66]
+#define SWIGTYPE_p_csReversibleTransform swig_types[67]
+#define SWIGTYPE_p_csScreenTargetResult swig_types[68]
+#define SWIGTYPE_p_csSetT_csPtrKeyT_iMeshWrapper_t_CS__Memory__AllocatorMalloc_t swig_types[69]
+#define SWIGTYPE_p_csShortestDistanceResult swig_types[70]
+#define SWIGTYPE_p_csSimplePixmap swig_types[71]
+#define SWIGTYPE_p_csTraceBeamResult swig_types[72]
+#define SWIGTYPE_p_csVector2 swig_types[73]
+#define SWIGTYPE_p_csVector3 swig_types[74]
+#define SWIGTYPE_p_csView swig_types[75]
+#define SWIGTYPE_p_iAnimatedImage swig_types[76]
+#define SWIGTYPE_p_iArrayChangeAllT_csCollisionPair_t swig_types[77]
+#define SWIGTYPE_p_iArrayChangeAllT_csShaderVariable_p_t swig_types[78]
+#define SWIGTYPE_p_iArrayChangeElementsT_csCollisionPair_t swig_types[79]
+#define SWIGTYPE_p_iArrayChangeElementsT_csShaderVariable_p_t swig_types[80]
+#define SWIGTYPE_p_iArrayReadOnlyT_csCollisionPair_t swig_types[81]
+#define SWIGTYPE_p_iArrayReadOnlyT_csShaderVariable_p_t swig_types[82]
+#define SWIGTYPE_p_iArrayReadOnlyT_iCollection_p_t swig_types[83]
+#define SWIGTYPE_p_iArrayReadOnlyT_iSceneNode_p_t swig_types[84]
+#define SWIGTYPE_p_iBase swig_types[85]
+#define SWIGTYPE_p_iBodyGroup swig_types[86]
+#define SWIGTYPE_p_iBugPlug swig_types[87]
+#define SWIGTYPE_p_iBugPlugRenderObject swig_types[88]
+#define SWIGTYPE_p_iCacheManager swig_types[89]
+#define SWIGTYPE_p_iCamera swig_types[90]
+#define SWIGTYPE_p_iCameraListener swig_types[91]
+#define SWIGTYPE_p_iCameraPosition swig_types[92]
+#define SWIGTYPE_p_iCameraPositionList swig_types[93]
+#define SWIGTYPE_p_iCameraSectorListener swig_types[94]
+#define SWIGTYPE_p_iClipper2D swig_types[95]
+#define SWIGTYPE_p_iCollection swig_types[96]
+#define SWIGTYPE_p_iCollideSystem swig_types[97]
+#define SWIGTYPE_p_iCollider swig_types[98]
+#define SWIGTYPE_p_iCommandLineParser swig_types[99]
+#define SWIGTYPE_p_iComponent swig_types[100]
+#define SWIGTYPE_p_iConfigFile swig_types[101]
+#define SWIGTYPE_p_iConfigIterator swig_types[102]
+#define SWIGTYPE_p_iConfigManager swig_types[103]
+#define SWIGTYPE_p_iConsoleExecCallback swig_types[104]
+#define SWIGTYPE_p_iConsoleInput swig_types[105]
+#define SWIGTYPE_p_iConsoleOutput swig_types[106]
+#define SWIGTYPE_p_iConsoleWatcher swig_types[107]
+#define SWIGTYPE_p_iCustomMatrixCamera swig_types[108]
+#define SWIGTYPE_p_iDataBuffer swig_types[109]
+#define SWIGTYPE_p_iDebugHelper swig_types[110]
+#define SWIGTYPE_p_iDecalManager swig_types[111]
+#define SWIGTYPE_p_iDecalTemplate swig_types[112]
+#define SWIGTYPE_p_iDocument swig_types[113]
+#define SWIGTYPE_p_iDocumentAttribute swig_types[114]
+#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[115]
+#define SWIGTYPE_p_iDocumentNode swig_types[116]
+#define SWIGTYPE_p_iDocumentNodeIterator swig_types[117]
+#define SWIGTYPE_p_iDocumentSystem swig_types[118]
+#define SWIGTYPE_p_iDynamicSystem swig_types[119]
+#define SWIGTYPE_p_iDynamics swig_types[120]
+#define SWIGTYPE_p_iDynamicsColliderCollisionCallback swig_types[121]
+#define SWIGTYPE_p_iDynamicsCollisionCallback swig_types[122]
+#define SWIGTYPE_p_iDynamicsMoveCallback swig_types[123]
+#define SWIGTYPE_p_iDynamicsStepCallback swig_types[124]
+#define SWIGTYPE_p_iDynamicsSystemCollider swig_types[125]
+#define SWIGTYPE_p_iEngine swig_types[126]
+#define SWIGTYPE_p_iEngineFrameCallback swig_types[127]
+#define SWIGTYPE_p_iEngineSectorCallback swig_types[128]
+#define SWIGTYPE_p_iEngineSequenceManager swig_types[129]
+#define SWIGTYPE_p_iEngineSequenceParameters swig_types[130]
+#define SWIGTYPE_p_iEvent swig_types[131]
+#define SWIGTYPE_p_iEventAttributeIterator swig_types[132]
+#define SWIGTYPE_p_iEventCord swig_types[133]
+#define SWIGTYPE_p_iEventHandler swig_types[134]
+#define SWIGTYPE_p_iEventNameRegistry swig_types[135]
+#define SWIGTYPE_p_iEventOutlet swig_types[136]
+#define SWIGTYPE_p_iEventPlug swig_types[137]
+#define SWIGTYPE_p_iEventQueue swig_types[138]
+#define SWIGTYPE_p_iFactory swig_types[139]
+#define SWIGTYPE_p_iFile swig_types[140]
+#define SWIGTYPE_p_iFont swig_types[141]
+#define SWIGTYPE_p_iFontDeleteNotify swig_types[142]
+#define SWIGTYPE_p_iFontServer swig_types[143]
+#define SWIGTYPE_p_iGeneralFactoryState swig_types[144]
+#define SWIGTYPE_p_iGraphics2D swig_types[145]
+#define SWIGTYPE_p_iGraphics3D swig_types[146]
+#define SWIGTYPE_p_iHalo swig_types[147]
+#define SWIGTYPE_p_iImage swig_types[148]
+#define SWIGTYPE_p_iImageIO swig_types[149]
+#define SWIGTYPE_p_iJoint swig_types[150]
+#define SWIGTYPE_p_iJoystickDriver swig_types[151]
+#define SWIGTYPE_p_iKeyComposer swig_types[152]
+#define SWIGTYPE_p_iKeyboardDriver swig_types[153]
+#define SWIGTYPE_p_iLODControl swig_types[154]
+#define SWIGTYPE_p_iLight swig_types[155]
+#define SWIGTYPE_p_iLightCallback swig_types[156]
+#define SWIGTYPE_p_iLightIterator swig_types[157]
+#define SWIGTYPE_p_iLightList swig_types[158]
+#define SWIGTYPE_p_iLightVisibleCallback swig_types[159]
+#define SWIGTYPE_p_iMapNode swig_types[160]
+#define SWIGTYPE_p_iMaterial swig_types[161]
+#define SWIGTYPE_p_iMaterialEngine swig_types[162]
+#define SWIGTYPE_p_iMaterialList swig_types[163]
+#define SWIGTYPE_p_iMaterialWrapper swig_types[164]
+#define SWIGTYPE_p_iMeshDrawCallback swig_types[165]
+#define SWIGTYPE_p_iMeshFactoryList swig_types[166]
+#define SWIGTYPE_p_iMeshFactoryWrapper swig_types[167]
+#define SWIGTYPE_p_iMeshFactoryWrapperIterator swig_types[168]
+#define SWIGTYPE_p_iMeshList swig_types[169]
+#define SWIGTYPE_p_iMeshWrapper swig_types[170]
+#define SWIGTYPE_p_iMeshWrapperIterator swig_types[171]
+#define SWIGTYPE_p_iMouseDriver swig_types[172]
+#define SWIGTYPE_p_iMovable swig_types[173]
+#define SWIGTYPE_p_iMovableListener swig_types[174]
+#define SWIGTYPE_p_iMovieRecorder swig_types[175]
+#define SWIGTYPE_p_iNativeWindow swig_types[176]
+#define SWIGTYPE_p_iNativeWindowManager swig_types[177]
+#define SWIGTYPE_p_iODEAMotorJoint swig_types[178]
+#define SWIGTYPE_p_iODEBallJoint swig_types[179]
+#define SWIGTYPE_p_iODEDynamicState swig_types[180]
+#define SWIGTYPE_p_iODEDynamicSystemState swig_types[181]
+#define SWIGTYPE_p_iODEFrameUpdateCallback swig_types[182]
+#define SWIGTYPE_p_iODEGeneralJointState swig_types[183]
+#define SWIGTYPE_p_iODEHinge2Joint swig_types[184]
+#define SWIGTYPE_p_iODEHingeJoint swig_types[185]
+#define SWIGTYPE_p_iODEJointState swig_types[186]
+#define SWIGTYPE_p_iODESliderJoint swig_types[187]
+#define SWIGTYPE_p_iODEUniversalJoint swig_types[188]
+#define SWIGTYPE_p_iObject swig_types[189]
+#define SWIGTYPE_p_iObjectIterator swig_types[190]
+#define SWIGTYPE_p_iObjectNameChangeListener swig_types[191]
+#define SWIGTYPE_p_iObjectRegistry swig_types[192]
+#define SWIGTYPE_p_iObjectRegistryIterator swig_types[193]
+#define SWIGTYPE_p_iParameterESM swig_types[194]
+#define SWIGTYPE_p_iPath swig_types[195]
+#define SWIGTYPE_p_iPen swig_types[196]
+#define SWIGTYPE_p_iPerspectiveCamera swig_types[197]
+#define SWIGTYPE_p_iPluginIterator swig_types[198]
+#define SWIGTYPE_p_iPluginManager swig_types[199]
+#define SWIGTYPE_p_iPortal swig_types[200]
+#define SWIGTYPE_p_iPortalCallback swig_types[201]
+#define SWIGTYPE_p_iPortalContainer swig_types[202]
+#define SWIGTYPE_p_iProcTexCallback swig_types[203]
+#define SWIGTYPE_p_iProcTexture swig_types[204]
+#define SWIGTYPE_p_iRenderLoop swig_types[205]
+#define SWIGTYPE_p_iRenderLoopManager swig_types[206]
+#define SWIGTYPE_p_iRenderManager swig_types[207]
+#define SWIGTYPE_p_iRenderManagerPostEffects swig_types[208]
+#define SWIGTYPE_p_iRenderManagerTargets swig_types[209]
+#define SWIGTYPE_p_iRenderStepContainer swig_types[210]
+#define SWIGTYPE_p_iReporter swig_types[211]
+#define SWIGTYPE_p_iReporterIterator swig_types[212]
+#define SWIGTYPE_p_iReporterListener swig_types[213]
+#define SWIGTYPE_p_iRigidBody swig_types[214]
+#define SWIGTYPE_p_iSCF swig_types[215]
+#define SWIGTYPE_p_iSceneNode swig_types[216]
+#define SWIGTYPE_p_iSceneNodeArray swig_types[217]
+#define SWIGTYPE_p_iScript swig_types[218]
+#define SWIGTYPE_p_iScriptObject swig_types[219]
+#define SWIGTYPE_p_iScriptValue swig_types[220]
+#define SWIGTYPE_p_iSector swig_types[221]
+#define SWIGTYPE_p_iSectorCallback swig_types[222]
+#define SWIGTYPE_p_iSectorIterator swig_types[223]
+#define SWIGTYPE_p_iSectorList swig_types[224]
+#define SWIGTYPE_p_iSectorMeshCallback swig_types[225]
+#define SWIGTYPE_p_iSequence swig_types[226]
+#define SWIGTYPE_p_iSequenceCondition swig_types[227]
+#define SWIGTYPE_p_iSequenceManager swig_types[228]
+#define SWIGTYPE_p_iSequenceOperation swig_types[229]
+#define SWIGTYPE_p_iSequenceTimedOperation swig_types[230]
+#define SWIGTYPE_p_iSequenceTrigger swig_types[231]
+#define SWIGTYPE_p_iSequenceWrapper swig_types[232]
+#define SWIGTYPE_p_iShader swig_types[233]
+#define SWIGTYPE_p_iShaderCompiler swig_types[234]
+#define SWIGTYPE_p_iShaderManager swig_types[235]
+#define SWIGTYPE_p_iShaderPriorityList swig_types[236]
+#define SWIGTYPE_p_iShaderVarStringSet swig_types[237]
+#define SWIGTYPE_p_iShaderVariableAccessor swig_types[238]
+#define SWIGTYPE_p_iShaderVariableContext swig_types[239]
+#define SWIGTYPE_p_iSimpleFormerState swig_types[240]
+#define SWIGTYPE_p_iStandardReporterListener swig_types[241]
+#define SWIGTYPE_p_iString swig_types[242]
+#define SWIGTYPE_p_iStringArray swig_types[243]
+#define SWIGTYPE_p_iStringSet swig_types[244]
+#define SWIGTYPE_p_iStringSetBaseT_CS__StringSetTag__General_t swig_types[245]
+#define SWIGTYPE_p_iStringSetBaseT_CS__StringSetTag__ShaderVar_t swig_types[246]
+#define SWIGTYPE_p_iTerraFormer swig_types[247]
+#define SWIGTYPE_p_iTerraSampler swig_types[248]
+#define SWIGTYPE_p_iTerrainSystem swig_types[249]
+#define SWIGTYPE_p_iTextureCallback swig_types[250]
+#define SWIGTYPE_p_iTextureHandle swig_types[251]
+#define SWIGTYPE_p_iTextureList swig_types[252]
+#define SWIGTYPE_p_iTextureManager swig_types[253]
+#define SWIGTYPE_p_iTextureWrapper swig_types[254]
+#define SWIGTYPE_p_iThreadManager swig_types[255]
+#define SWIGTYPE_p_iThreadReturn swig_types[256]
+#define SWIGTYPE_p_iTranslator swig_types[257]
+#define SWIGTYPE_p_iTriangleMesh swig_types[258]
+#define SWIGTYPE_p_iVFS swig_types[259]
+#define SWIGTYPE_p_iView swig_types[260]
+#define SWIGTYPE_p_iVirtualClock swig_types[261]
+#define SWIGTYPE_p_iVisibilityCuller swig_types[262]
+#define SWIGTYPE_p_iVisibilityCullerListener swig_types[263]
+#define SWIGTYPE_p_iVisibilityObject swig_types[264]
+#define SWIGTYPE_p_iVisibilityObjectIterator swig_types[265]
+#define SWIGTYPE_p_int swig_types[266]
+#define SWIGTYPE_p_int16_t swig_types[267]
+#define SWIGTYPE_p_int64_t swig_types[268]
+#define SWIGTYPE_p_int8_t swig_types[269]
+#define SWIGTYPE_p_long_long swig_types[270]
+#define SWIGTYPE_p_p_csReversibleTransform swig_types[271]
+#define SWIGTYPE_p_p_iCollider swig_types[272]
+#define SWIGTYPE_p_p_iMeshWrapper swig_types[273]
+#define SWIGTYPE_p_p_iSector swig_types[274]
+#define SWIGTYPE_p_p_void swig_types[275]
+#define SWIGTYPE_p_scfFakeInterfaceT_csColliderWrapper_t swig_types[276]
+#define SWIGTYPE_p_scfImplementation1T_csConfigFile_iConfigFile_t swig_types[277]
+#define SWIGTYPE_p_scfImplementation1T_csImageBase_iImage_t swig_types[278]
+#define SWIGTYPE_p_scfImplementation1T_csObject_iObject_t swig_types[279]
+#define SWIGTYPE_p_scfImplementation1T_csView_iView_t swig_types[280]
+#define SWIGTYPE_p_scfImplementationExt0T_csImageMemory_csImageBase_t swig_types[281]
+#define SWIGTYPE_p_scfImplementationExt1T_csColliderWrapper_csObject_scfFakeInterfaceT_csColliderWrapper_t_t swig_types[282]
+#define SWIGTYPE_p_scfImplementationExt1T_csPath_csObject_iPath_t swig_types[283]
+#define SWIGTYPE_p_scfImplementationExt2T_csProcTexture_csObject_iTextureWrapper_iProcTexture_t swig_types[284]
+#define SWIGTYPE_p_scfInterfaceMetadataList swig_types[285]
+#define SWIGTYPE_p_uint16_t swig_types[286]
+#define SWIGTYPE_p_uint32_t swig_types[287]
+#define SWIGTYPE_p_uint64_t swig_types[288]
+#define SWIGTYPE_p_uint8_t swig_types[289]
+#define SWIGTYPE_p_unsigned_int swig_types[290]
+#define SWIGTYPE_p_unsigned_long swig_types[291]
+#define SWIGTYPE_p_unsigned_long_long swig_types[292]
+#define SWIGTYPE_p_void swig_types[293]
+static swig_type_info *swig_types[295];
+static swig_module_info swig_module = {swig_types, 294, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -2908,7 +2913,12 @@ namespace swig {
 }
 
 
-#include "crystalspace.h"
+#include "csgeom.h"
+#include "csgfx.h"
+#include "csutil.h"
+#include "cstool.h"
+#include "iengine.h"
+#include "ivaria.h"
 
 
 /* Funtions to set the modules global SCF pointer, this is needed
@@ -3195,6 +3205,16 @@ SWIG_AsVal_unsigned_SS_int (PyObject * obj, unsigned int *val)
       if (val) *val = static_cast< unsigned int >(v);
     }
   }  
+  return res;
+}
+
+
+SWIGINTERNINLINE int
+SWIG_AsVal_size_t (PyObject * obj, size_t *val)
+{
+  unsigned long v;
+  int res = SWIG_AsVal_unsigned_SS_long (obj, val ? &v : 0);
+  if (SWIG_IsOK(res) && val) *val = static_cast< size_t >(v);
   return res;
 }
 
@@ -11427,6 +11447,2443 @@ SWIGINTERN PyObject *csEngineTools_swigregister(PyObject *SWIGUNUSEDPARM(self), 
   return SWIG_Py_Void();
 }
 
+SWIGINTERN PyObject *_wrap_delete_TextureMapper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Geometry::TextureMapper *arg1 = (CS::Geometry::TextureMapper *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"delete_TextureMapper",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Geometry__TextureMapper, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_TextureMapper" "', argument " "1"" of type '" "CS::Geometry::TextureMapper *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Geometry::TextureMapper * >(argp1);
+  delete arg1;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_TextureMapper_Map(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Geometry::TextureMapper *arg1 = (CS::Geometry::TextureMapper *) 0 ;
+  csVector3 *arg2 = 0 ;
+  csVector3 *arg3 = 0 ;
+  size_t arg4 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  size_t val4 ;
+  int ecode4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  csVector2 result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"TextureMapper_Map",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Geometry__TextureMapper, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "TextureMapper_Map" "', argument " "1"" of type '" "CS::Geometry::TextureMapper *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Geometry::TextureMapper * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "TextureMapper_Map" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "TextureMapper_Map" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "TextureMapper_Map" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "TextureMapper_Map" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  arg3 = reinterpret_cast< csVector3 * >(argp3);
+  ecode4 = SWIG_AsVal_size_t(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "TextureMapper_Map" "', argument " "4"" of type '" "size_t""'");
+  } 
+  arg4 = static_cast< size_t >(val4);
+  result = (arg1)->Map((csVector3 const &)*arg2,(csVector3 const &)*arg3,arg4);
+  resultobj = SWIG_NewPointerObj((new csVector2(static_cast< const csVector2& >(result))), SWIGTYPE_p_csVector2, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *TextureMapper_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_CS__Geometry__TextureMapper, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
+SWIGINTERN PyObject *_wrap_new_TableTextureMapper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csVector2 *arg1 = (csVector2 *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  CS::Geometry::TableTextureMapper *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"new_TableTextureMapper",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csVector2, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_TableTextureMapper" "', argument " "1"" of type '" "csVector2 const *""'"); 
+  }
+  arg1 = reinterpret_cast< csVector2 * >(argp1);
+  result = (CS::Geometry::TableTextureMapper *)new CS::Geometry::TableTextureMapper((csVector2 const *)arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Geometry__TableTextureMapper, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_delete_TableTextureMapper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Geometry::TableTextureMapper *arg1 = (CS::Geometry::TableTextureMapper *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"delete_TableTextureMapper",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Geometry__TableTextureMapper, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_TableTextureMapper" "', argument " "1"" of type '" "CS::Geometry::TableTextureMapper *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Geometry::TableTextureMapper * >(argp1);
+  delete arg1;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_TableTextureMapper_Map(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Geometry::TableTextureMapper *arg1 = (CS::Geometry::TableTextureMapper *) 0 ;
+  csVector3 *arg2 = 0 ;
+  csVector3 *arg3 = 0 ;
+  size_t arg4 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  size_t val4 ;
+  int ecode4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  csVector2 result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"TableTextureMapper_Map",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Geometry__TableTextureMapper, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "TableTextureMapper_Map" "', argument " "1"" of type '" "CS::Geometry::TableTextureMapper *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Geometry::TableTextureMapper * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "TableTextureMapper_Map" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "TableTextureMapper_Map" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "TableTextureMapper_Map" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "TableTextureMapper_Map" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  arg3 = reinterpret_cast< csVector3 * >(argp3);
+  ecode4 = SWIG_AsVal_size_t(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "TableTextureMapper_Map" "', argument " "4"" of type '" "size_t""'");
+  } 
+  arg4 = static_cast< size_t >(val4);
+  result = (arg1)->Map((csVector3 const &)*arg2,(csVector3 const &)*arg3,arg4);
+  resultobj = SWIG_NewPointerObj((new csVector2(static_cast< const csVector2& >(result))), SWIGTYPE_p_csVector2, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *TableTextureMapper_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_CS__Geometry__TableTextureMapper, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
+SWIGINTERN PyObject *_wrap_new_DensityTextureMapper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  float arg1 ;
+  float val1 ;
+  int ecode1 = 0 ;
+  PyObject * obj0 = 0 ;
+  CS::Geometry::DensityTextureMapper *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"new_DensityTextureMapper",1,1,&obj0)) SWIG_fail;
+  ecode1 = SWIG_AsVal_float(obj0, &val1);
+  if (!SWIG_IsOK(ecode1)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_DensityTextureMapper" "', argument " "1"" of type '" "float""'");
+  } 
+  arg1 = static_cast< float >(val1);
+  result = (CS::Geometry::DensityTextureMapper *)new CS::Geometry::DensityTextureMapper(arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Geometry__DensityTextureMapper, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_delete_DensityTextureMapper(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Geometry::DensityTextureMapper *arg1 = (CS::Geometry::DensityTextureMapper *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"delete_DensityTextureMapper",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Geometry__DensityTextureMapper, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_DensityTextureMapper" "', argument " "1"" of type '" "CS::Geometry::DensityTextureMapper *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Geometry::DensityTextureMapper * >(argp1);
+  delete arg1;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_DensityTextureMapper_Map(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Geometry::DensityTextureMapper *arg1 = (CS::Geometry::DensityTextureMapper *) 0 ;
+  csVector3 *arg2 = 0 ;
+  csVector3 *arg3 = 0 ;
+  size_t arg4 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  size_t val4 ;
+  int ecode4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  csVector2 result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"DensityTextureMapper_Map",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Geometry__DensityTextureMapper, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "DensityTextureMapper_Map" "', argument " "1"" of type '" "CS::Geometry::DensityTextureMapper *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Geometry::DensityTextureMapper * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "DensityTextureMapper_Map" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "DensityTextureMapper_Map" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "DensityTextureMapper_Map" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "DensityTextureMapper_Map" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  arg3 = reinterpret_cast< csVector3 * >(argp3);
+  ecode4 = SWIG_AsVal_size_t(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "DensityTextureMapper_Map" "', argument " "4"" of type '" "size_t""'");
+  } 
+  arg4 = static_cast< size_t >(val4);
+  result = (arg1)->Map((csVector3 const &)*arg2,(csVector3 const &)*arg3,arg4);
+  resultobj = SWIG_NewPointerObj((new csVector2(static_cast< const csVector2& >(result))), SWIGTYPE_p_csVector2, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *DensityTextureMapper_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_CS__Geometry__DensityTextureMapper, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
+SWIGINTERN PyObject *_wrap_Primitives_GenerateBox__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csBox3 *arg1 = 0 ;
+  csDirtyAccessArray< csVector3 > *arg2 = 0 ;
+  csDirtyAccessArray< csVector2 > *arg3 = 0 ;
+  csDirtyAccessArray< csVector3 > *arg4 = 0 ;
+  csDirtyAccessArray< csTriangle > *arg5 = 0 ;
+  uint32 arg6 ;
+  CS::Geometry::TextureMapper *arg7 = (CS::Geometry::TextureMapper *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  unsigned long val6 ;
+  int ecode6 = 0 ;
+  void *argp7 = 0 ;
+  int res7 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"Primitives_GenerateBox",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csBox3,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Primitives_GenerateBox" "', argument " "1"" of type '" "csBox3 const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateBox" "', argument " "1"" of type '" "csBox3 const &""'"); 
+  }
+  arg1 = reinterpret_cast< csBox3 * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Primitives_GenerateBox" "', argument " "2"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateBox" "', argument " "2"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg2 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "Primitives_GenerateBox" "', argument " "3"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateBox" "', argument " "3"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  arg3 = reinterpret_cast< csDirtyAccessArray< csVector2 > * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "Primitives_GenerateBox" "', argument " "4"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateBox" "', argument " "4"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg4 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "Primitives_GenerateBox" "', argument " "5"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateBox" "', argument " "5"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  arg5 = reinterpret_cast< csDirtyAccessArray< csTriangle > * >(argp5);
+  ecode6 = SWIG_AsVal_unsigned_SS_long(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "Primitives_GenerateBox" "', argument " "6"" of type '" "uint32""'");
+  } 
+  arg6 = static_cast< uint32 >(val6);
+  res7 = SWIG_ConvertPtr(obj6, &argp7,SWIGTYPE_p_CS__Geometry__TextureMapper, 0 |  0 );
+  if (!SWIG_IsOK(res7)) {
+    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "Primitives_GenerateBox" "', argument " "7"" of type '" "CS::Geometry::TextureMapper *""'"); 
+  }
+  arg7 = reinterpret_cast< CS::Geometry::TextureMapper * >(argp7);
+  CS::Geometry::Primitives::GenerateBox((csBox3 const &)*arg1,*arg2,*arg3,*arg4,*arg5,arg6,arg7);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Primitives_GenerateBox__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csBox3 *arg1 = 0 ;
+  csDirtyAccessArray< csVector3 > *arg2 = 0 ;
+  csDirtyAccessArray< csVector2 > *arg3 = 0 ;
+  csDirtyAccessArray< csVector3 > *arg4 = 0 ;
+  csDirtyAccessArray< csTriangle > *arg5 = 0 ;
+  uint32 arg6 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  unsigned long val6 ;
+  int ecode6 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"Primitives_GenerateBox",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csBox3,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Primitives_GenerateBox" "', argument " "1"" of type '" "csBox3 const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateBox" "', argument " "1"" of type '" "csBox3 const &""'"); 
+  }
+  arg1 = reinterpret_cast< csBox3 * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Primitives_GenerateBox" "', argument " "2"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateBox" "', argument " "2"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg2 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "Primitives_GenerateBox" "', argument " "3"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateBox" "', argument " "3"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  arg3 = reinterpret_cast< csDirtyAccessArray< csVector2 > * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "Primitives_GenerateBox" "', argument " "4"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateBox" "', argument " "4"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg4 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "Primitives_GenerateBox" "', argument " "5"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateBox" "', argument " "5"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  arg5 = reinterpret_cast< csDirtyAccessArray< csTriangle > * >(argp5);
+  ecode6 = SWIG_AsVal_unsigned_SS_long(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "Primitives_GenerateBox" "', argument " "6"" of type '" "uint32""'");
+  } 
+  arg6 = static_cast< uint32 >(val6);
+  CS::Geometry::Primitives::GenerateBox((csBox3 const &)*arg1,*arg2,*arg3,*arg4,*arg5,arg6);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Primitives_GenerateBox__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csBox3 *arg1 = 0 ;
+  csDirtyAccessArray< csVector3 > *arg2 = 0 ;
+  csDirtyAccessArray< csVector2 > *arg3 = 0 ;
+  csDirtyAccessArray< csVector3 > *arg4 = 0 ;
+  csDirtyAccessArray< csTriangle > *arg5 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"Primitives_GenerateBox",5,5,&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csBox3,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Primitives_GenerateBox" "', argument " "1"" of type '" "csBox3 const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateBox" "', argument " "1"" of type '" "csBox3 const &""'"); 
+  }
+  arg1 = reinterpret_cast< csBox3 * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Primitives_GenerateBox" "', argument " "2"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateBox" "', argument " "2"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg2 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "Primitives_GenerateBox" "', argument " "3"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateBox" "', argument " "3"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  arg3 = reinterpret_cast< csDirtyAccessArray< csVector2 > * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "Primitives_GenerateBox" "', argument " "4"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateBox" "', argument " "4"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg4 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "Primitives_GenerateBox" "', argument " "5"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateBox" "', argument " "5"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  arg5 = reinterpret_cast< csDirtyAccessArray< csTriangle > * >(argp5);
+  CS::Geometry::Primitives::GenerateBox((csBox3 const &)*arg1,*arg2,*arg3,*arg4,*arg5);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Primitives_GenerateBox(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[8];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 7); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 5) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csBox3, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          void *vptr = 0;
+          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              return _wrap_Primitives_GenerateBox__SWIG_2(self, args);
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 6) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csBox3, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          void *vptr = 0;
+          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              {
+                int res = SWIG_AsVal_unsigned_SS_long(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                return _wrap_Primitives_GenerateBox__SWIG_1(self, args);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 7) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csBox3, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          void *vptr = 0;
+          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              {
+                int res = SWIG_AsVal_unsigned_SS_long(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
+              if (_v) {
+                void *vptr = 0;
+                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_CS__Geometry__TextureMapper, 0);
+                _v = SWIG_CheckState(res);
+                if (_v) {
+                  return _wrap_Primitives_GenerateBox__SWIG_0(self, args);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'Primitives_GenerateBox'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    GenerateBox(csBox3 const &,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csVector2 > &,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csTriangle > &,uint32,CS::Geometry::TextureMapper *)\n"
+    "    GenerateBox(csBox3 const &,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csVector2 > &,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csTriangle > &,uint32)\n"
+    "    CS::Geometry::Primitives::GenerateBox(csBox3 const &,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csVector2 > &,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csTriangle > &)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Primitives_GenerateQuad__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csVector3 *arg1 = 0 ;
+  csVector3 *arg2 = 0 ;
+  csVector3 *arg3 = 0 ;
+  csVector3 *arg4 = 0 ;
+  csDirtyAccessArray< csVector3 > *arg5 = 0 ;
+  csDirtyAccessArray< csVector2 > *arg6 = 0 ;
+  csDirtyAccessArray< csVector3 > *arg7 = 0 ;
+  csDirtyAccessArray< csTriangle > *arg8 = 0 ;
+  CS::Geometry::TextureMapper *arg9 = (CS::Geometry::TextureMapper *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  void *argp6 = 0 ;
+  int res6 = 0 ;
+  void *argp7 = 0 ;
+  int res7 = 0 ;
+  void *argp8 = 0 ;
+  int res8 = 0 ;
+  void *argp9 = 0 ;
+  int res9 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  PyObject * obj8 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"Primitives_GenerateQuad",9,9,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Primitives_GenerateQuad" "', argument " "1"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateQuad" "', argument " "1"" of type '" "csVector3 const &""'"); 
+  }
+  arg1 = reinterpret_cast< csVector3 * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Primitives_GenerateQuad" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateQuad" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "Primitives_GenerateQuad" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateQuad" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  arg3 = reinterpret_cast< csVector3 * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "Primitives_GenerateQuad" "', argument " "4"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateQuad" "', argument " "4"" of type '" "csVector3 const &""'"); 
+  }
+  arg4 = reinterpret_cast< csVector3 * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "Primitives_GenerateQuad" "', argument " "5"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateQuad" "', argument " "5"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg5 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "Primitives_GenerateQuad" "', argument " "6"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  if (!argp6) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateQuad" "', argument " "6"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  arg6 = reinterpret_cast< csDirtyAccessArray< csVector2 > * >(argp6);
+  res7 = SWIG_ConvertPtr(obj6, &argp7, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res7)) {
+    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "Primitives_GenerateQuad" "', argument " "7"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp7) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateQuad" "', argument " "7"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg7 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp7);
+  res8 = SWIG_ConvertPtr(obj7, &argp8, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res8)) {
+    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "Primitives_GenerateQuad" "', argument " "8"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  if (!argp8) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateQuad" "', argument " "8"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  arg8 = reinterpret_cast< csDirtyAccessArray< csTriangle > * >(argp8);
+  res9 = SWIG_ConvertPtr(obj8, &argp9,SWIGTYPE_p_CS__Geometry__TextureMapper, 0 |  0 );
+  if (!SWIG_IsOK(res9)) {
+    SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "Primitives_GenerateQuad" "', argument " "9"" of type '" "CS::Geometry::TextureMapper *""'"); 
+  }
+  arg9 = reinterpret_cast< CS::Geometry::TextureMapper * >(argp9);
+  CS::Geometry::Primitives::GenerateQuad((csVector3 const &)*arg1,(csVector3 const &)*arg2,(csVector3 const &)*arg3,(csVector3 const &)*arg4,*arg5,*arg6,*arg7,*arg8,arg9);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Primitives_GenerateQuad__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csVector3 *arg1 = 0 ;
+  csVector3 *arg2 = 0 ;
+  csVector3 *arg3 = 0 ;
+  csVector3 *arg4 = 0 ;
+  csDirtyAccessArray< csVector3 > *arg5 = 0 ;
+  csDirtyAccessArray< csVector2 > *arg6 = 0 ;
+  csDirtyAccessArray< csVector3 > *arg7 = 0 ;
+  csDirtyAccessArray< csTriangle > *arg8 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  void *argp6 = 0 ;
+  int res6 = 0 ;
+  void *argp7 = 0 ;
+  int res7 = 0 ;
+  void *argp8 = 0 ;
+  int res8 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"Primitives_GenerateQuad",8,8,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Primitives_GenerateQuad" "', argument " "1"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateQuad" "', argument " "1"" of type '" "csVector3 const &""'"); 
+  }
+  arg1 = reinterpret_cast< csVector3 * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Primitives_GenerateQuad" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateQuad" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "Primitives_GenerateQuad" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateQuad" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  arg3 = reinterpret_cast< csVector3 * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "Primitives_GenerateQuad" "', argument " "4"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateQuad" "', argument " "4"" of type '" "csVector3 const &""'"); 
+  }
+  arg4 = reinterpret_cast< csVector3 * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "Primitives_GenerateQuad" "', argument " "5"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateQuad" "', argument " "5"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg5 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "Primitives_GenerateQuad" "', argument " "6"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  if (!argp6) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateQuad" "', argument " "6"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  arg6 = reinterpret_cast< csDirtyAccessArray< csVector2 > * >(argp6);
+  res7 = SWIG_ConvertPtr(obj6, &argp7, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res7)) {
+    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "Primitives_GenerateQuad" "', argument " "7"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp7) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateQuad" "', argument " "7"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg7 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp7);
+  res8 = SWIG_ConvertPtr(obj7, &argp8, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res8)) {
+    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "Primitives_GenerateQuad" "', argument " "8"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  if (!argp8) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateQuad" "', argument " "8"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  arg8 = reinterpret_cast< csDirtyAccessArray< csTriangle > * >(argp8);
+  CS::Geometry::Primitives::GenerateQuad((csVector3 const &)*arg1,(csVector3 const &)*arg2,(csVector3 const &)*arg3,(csVector3 const &)*arg4,*arg5,*arg6,*arg7,*arg8);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Primitives_GenerateQuad(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[10];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 9); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 8) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csVector3, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csVector3, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_csVector3, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csVector3, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              void *vptr = 0;
+              int res = SWIG_ConvertPtr(argv[5], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                void *vptr = 0;
+                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+                _v = SWIG_CheckState(res);
+                if (_v) {
+                  void *vptr = 0;
+                  int res = SWIG_ConvertPtr(argv[7], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+                  _v = SWIG_CheckState(res);
+                  if (_v) {
+                    return _wrap_Primitives_GenerateQuad__SWIG_1(self, args);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 9) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csVector3, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csVector3, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_csVector3, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_csVector3, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              void *vptr = 0;
+              int res = SWIG_ConvertPtr(argv[5], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                void *vptr = 0;
+                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+                _v = SWIG_CheckState(res);
+                if (_v) {
+                  void *vptr = 0;
+                  int res = SWIG_ConvertPtr(argv[7], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+                  _v = SWIG_CheckState(res);
+                  if (_v) {
+                    void *vptr = 0;
+                    int res = SWIG_ConvertPtr(argv[8], &vptr, SWIGTYPE_p_CS__Geometry__TextureMapper, 0);
+                    _v = SWIG_CheckState(res);
+                    if (_v) {
+                      return _wrap_Primitives_GenerateQuad__SWIG_0(self, args);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'Primitives_GenerateQuad'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    GenerateQuad(csVector3 const &,csVector3 const &,csVector3 const &,csVector3 const &,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csVector2 > &,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csTriangle > &,CS::Geometry::TextureMapper *)\n"
+    "    CS::Geometry::Primitives::GenerateQuad(csVector3 const &,csVector3 const &,csVector3 const &,csVector3 const &,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csVector2 > &,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csTriangle > &)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Primitives_GenerateTesselatedQuad__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csVector3 *arg1 = 0 ;
+  csVector3 *arg2 = 0 ;
+  csVector3 *arg3 = 0 ;
+  int arg4 ;
+  csDirtyAccessArray< csVector3 > *arg5 = 0 ;
+  csDirtyAccessArray< csVector2 > *arg6 = 0 ;
+  csDirtyAccessArray< csVector3 > *arg7 = 0 ;
+  csDirtyAccessArray< csTriangle > *arg8 = 0 ;
+  CS::Geometry::TextureMapper *arg9 = (CS::Geometry::TextureMapper *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  void *argp6 = 0 ;
+  int res6 = 0 ;
+  void *argp7 = 0 ;
+  int res7 = 0 ;
+  void *argp8 = 0 ;
+  int res8 = 0 ;
+  void *argp9 = 0 ;
+  int res9 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  PyObject * obj8 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"Primitives_GenerateTesselatedQuad",9,9,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "1"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "1"" of type '" "csVector3 const &""'"); 
+  }
+  arg1 = reinterpret_cast< csVector3 * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  arg3 = reinterpret_cast< csVector3 * >(argp3);
+  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = static_cast< int >(val4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "5"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "5"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg5 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "6"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  if (!argp6) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "6"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  arg6 = reinterpret_cast< csDirtyAccessArray< csVector2 > * >(argp6);
+  res7 = SWIG_ConvertPtr(obj6, &argp7, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res7)) {
+    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "7"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp7) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "7"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg7 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp7);
+  res8 = SWIG_ConvertPtr(obj7, &argp8, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res8)) {
+    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "8"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  if (!argp8) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "8"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  arg8 = reinterpret_cast< csDirtyAccessArray< csTriangle > * >(argp8);
+  res9 = SWIG_ConvertPtr(obj8, &argp9,SWIGTYPE_p_CS__Geometry__TextureMapper, 0 |  0 );
+  if (!SWIG_IsOK(res9)) {
+    SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "9"" of type '" "CS::Geometry::TextureMapper *""'"); 
+  }
+  arg9 = reinterpret_cast< CS::Geometry::TextureMapper * >(argp9);
+  CS::Geometry::Primitives::GenerateTesselatedQuad((csVector3 const &)*arg1,(csVector3 const &)*arg2,(csVector3 const &)*arg3,arg4,*arg5,*arg6,*arg7,*arg8,arg9);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Primitives_GenerateTesselatedQuad__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csVector3 *arg1 = 0 ;
+  csVector3 *arg2 = 0 ;
+  csVector3 *arg3 = 0 ;
+  int arg4 ;
+  csDirtyAccessArray< csVector3 > *arg5 = 0 ;
+  csDirtyAccessArray< csVector2 > *arg6 = 0 ;
+  csDirtyAccessArray< csVector3 > *arg7 = 0 ;
+  csDirtyAccessArray< csTriangle > *arg8 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  void *argp6 = 0 ;
+  int res6 = 0 ;
+  void *argp7 = 0 ;
+  int res7 = 0 ;
+  void *argp8 = 0 ;
+  int res8 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"Primitives_GenerateTesselatedQuad",8,8,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "1"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "1"" of type '" "csVector3 const &""'"); 
+  }
+  arg1 = reinterpret_cast< csVector3 * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "2"" of type '" "csVector3 const &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csVector3,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "3"" of type '" "csVector3 const &""'"); 
+  }
+  arg3 = reinterpret_cast< csVector3 * >(argp3);
+  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = static_cast< int >(val4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "5"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "5"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg5 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "6"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  if (!argp6) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "6"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  arg6 = reinterpret_cast< csDirtyAccessArray< csVector2 > * >(argp6);
+  res7 = SWIG_ConvertPtr(obj6, &argp7, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res7)) {
+    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "7"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp7) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "7"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg7 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp7);
+  res8 = SWIG_ConvertPtr(obj7, &argp8, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res8)) {
+    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "8"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  if (!argp8) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateTesselatedQuad" "', argument " "8"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  arg8 = reinterpret_cast< csDirtyAccessArray< csTriangle > * >(argp8);
+  CS::Geometry::Primitives::GenerateTesselatedQuad((csVector3 const &)*arg1,(csVector3 const &)*arg2,(csVector3 const &)*arg3,arg4,*arg5,*arg6,*arg7,*arg8);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Primitives_GenerateTesselatedQuad(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[10];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 9); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 8) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csVector3, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csVector3, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_csVector3, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          {
+            int res = SWIG_AsVal_int(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              void *vptr = 0;
+              int res = SWIG_ConvertPtr(argv[5], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                void *vptr = 0;
+                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+                _v = SWIG_CheckState(res);
+                if (_v) {
+                  void *vptr = 0;
+                  int res = SWIG_ConvertPtr(argv[7], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+                  _v = SWIG_CheckState(res);
+                  if (_v) {
+                    return _wrap_Primitives_GenerateTesselatedQuad__SWIG_1(self, args);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 9) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csVector3, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_csVector3, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_csVector3, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          {
+            int res = SWIG_AsVal_int(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              void *vptr = 0;
+              int res = SWIG_ConvertPtr(argv[5], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                void *vptr = 0;
+                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+                _v = SWIG_CheckState(res);
+                if (_v) {
+                  void *vptr = 0;
+                  int res = SWIG_ConvertPtr(argv[7], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+                  _v = SWIG_CheckState(res);
+                  if (_v) {
+                    void *vptr = 0;
+                    int res = SWIG_ConvertPtr(argv[8], &vptr, SWIGTYPE_p_CS__Geometry__TextureMapper, 0);
+                    _v = SWIG_CheckState(res);
+                    if (_v) {
+                      return _wrap_Primitives_GenerateTesselatedQuad__SWIG_0(self, args);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'Primitives_GenerateTesselatedQuad'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    GenerateTesselatedQuad(csVector3 const &,csVector3 const &,csVector3 const &,int,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csVector2 > &,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csTriangle > &,CS::Geometry::TextureMapper *)\n"
+    "    CS::Geometry::Primitives::GenerateTesselatedQuad(csVector3 const &,csVector3 const &,csVector3 const &,int,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csVector2 > &,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csTriangle > &)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Primitives_GenerateCapsule__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  float arg1 ;
+  float arg2 ;
+  uint arg3 ;
+  csDirtyAccessArray< csVector3 > *arg4 = 0 ;
+  csDirtyAccessArray< csVector2 > *arg5 = 0 ;
+  csDirtyAccessArray< csVector3 > *arg6 = 0 ;
+  csDirtyAccessArray< csTriangle > *arg7 = 0 ;
+  CS::Geometry::TextureMapper *arg8 = (CS::Geometry::TextureMapper *) 0 ;
+  float val1 ;
+  int ecode1 = 0 ;
+  float val2 ;
+  int ecode2 = 0 ;
+  unsigned long val3 ;
+  int ecode3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  void *argp6 = 0 ;
+  int res6 = 0 ;
+  void *argp7 = 0 ;
+  int res7 = 0 ;
+  void *argp8 = 0 ;
+  int res8 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"Primitives_GenerateCapsule",8,8,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
+  ecode1 = SWIG_AsVal_float(obj0, &val1);
+  if (!SWIG_IsOK(ecode1)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "Primitives_GenerateCapsule" "', argument " "1"" of type '" "float""'");
+  } 
+  arg1 = static_cast< float >(val1);
+  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Primitives_GenerateCapsule" "', argument " "2"" of type '" "float""'");
+  } 
+  arg2 = static_cast< float >(val2);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "Primitives_GenerateCapsule" "', argument " "3"" of type '" "uint""'");
+  } 
+  arg3 = static_cast< uint >(val3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "Primitives_GenerateCapsule" "', argument " "4"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateCapsule" "', argument " "4"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg4 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "Primitives_GenerateCapsule" "', argument " "5"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateCapsule" "', argument " "5"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  arg5 = reinterpret_cast< csDirtyAccessArray< csVector2 > * >(argp5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "Primitives_GenerateCapsule" "', argument " "6"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp6) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateCapsule" "', argument " "6"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg6 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp6);
+  res7 = SWIG_ConvertPtr(obj6, &argp7, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res7)) {
+    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "Primitives_GenerateCapsule" "', argument " "7"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  if (!argp7) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateCapsule" "', argument " "7"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  arg7 = reinterpret_cast< csDirtyAccessArray< csTriangle > * >(argp7);
+  res8 = SWIG_ConvertPtr(obj7, &argp8,SWIGTYPE_p_CS__Geometry__TextureMapper, 0 |  0 );
+  if (!SWIG_IsOK(res8)) {
+    SWIG_exception_fail(SWIG_ArgError(res8), "in method '" "Primitives_GenerateCapsule" "', argument " "8"" of type '" "CS::Geometry::TextureMapper *""'"); 
+  }
+  arg8 = reinterpret_cast< CS::Geometry::TextureMapper * >(argp8);
+  CS::Geometry::Primitives::GenerateCapsule(arg1,arg2,arg3,*arg4,*arg5,*arg6,*arg7,arg8);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Primitives_GenerateCapsule__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  float arg1 ;
+  float arg2 ;
+  uint arg3 ;
+  csDirtyAccessArray< csVector3 > *arg4 = 0 ;
+  csDirtyAccessArray< csVector2 > *arg5 = 0 ;
+  csDirtyAccessArray< csVector3 > *arg6 = 0 ;
+  csDirtyAccessArray< csTriangle > *arg7 = 0 ;
+  float val1 ;
+  int ecode1 = 0 ;
+  float val2 ;
+  int ecode2 = 0 ;
+  unsigned long val3 ;
+  int ecode3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  void *argp6 = 0 ;
+  int res6 = 0 ;
+  void *argp7 = 0 ;
+  int res7 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"Primitives_GenerateCapsule",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  ecode1 = SWIG_AsVal_float(obj0, &val1);
+  if (!SWIG_IsOK(ecode1)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "Primitives_GenerateCapsule" "', argument " "1"" of type '" "float""'");
+  } 
+  arg1 = static_cast< float >(val1);
+  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Primitives_GenerateCapsule" "', argument " "2"" of type '" "float""'");
+  } 
+  arg2 = static_cast< float >(val2);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "Primitives_GenerateCapsule" "', argument " "3"" of type '" "uint""'");
+  } 
+  arg3 = static_cast< uint >(val3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "Primitives_GenerateCapsule" "', argument " "4"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateCapsule" "', argument " "4"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg4 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "Primitives_GenerateCapsule" "', argument " "5"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateCapsule" "', argument " "5"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  arg5 = reinterpret_cast< csDirtyAccessArray< csVector2 > * >(argp5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "Primitives_GenerateCapsule" "', argument " "6"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp6) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateCapsule" "', argument " "6"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg6 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp6);
+  res7 = SWIG_ConvertPtr(obj6, &argp7, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res7)) {
+    SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "Primitives_GenerateCapsule" "', argument " "7"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  if (!argp7) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateCapsule" "', argument " "7"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  arg7 = reinterpret_cast< csDirtyAccessArray< csTriangle > * >(argp7);
+  CS::Geometry::Primitives::GenerateCapsule(arg1,arg2,arg3,*arg4,*arg5,*arg6,*arg7);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Primitives_GenerateCapsule(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[9];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 8); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 7) {
+    int _v;
+    {
+      int res = SWIG_AsVal_float(argv[0], NULL);
+      _v = SWIG_CheckState(res);
+    }
+    if (_v) {
+      {
+        int res = SWIG_AsVal_float(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_unsigned_SS_long(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          void *vptr = 0;
+          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              void *vptr = 0;
+              int res = SWIG_ConvertPtr(argv[5], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                void *vptr = 0;
+                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+                _v = SWIG_CheckState(res);
+                if (_v) {
+                  return _wrap_Primitives_GenerateCapsule__SWIG_1(self, args);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 8) {
+    int _v;
+    {
+      int res = SWIG_AsVal_float(argv[0], NULL);
+      _v = SWIG_CheckState(res);
+    }
+    if (_v) {
+      {
+        int res = SWIG_AsVal_float(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_unsigned_SS_long(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          void *vptr = 0;
+          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              void *vptr = 0;
+              int res = SWIG_ConvertPtr(argv[5], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                void *vptr = 0;
+                int res = SWIG_ConvertPtr(argv[6], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+                _v = SWIG_CheckState(res);
+                if (_v) {
+                  void *vptr = 0;
+                  int res = SWIG_ConvertPtr(argv[7], &vptr, SWIGTYPE_p_CS__Geometry__TextureMapper, 0);
+                  _v = SWIG_CheckState(res);
+                  if (_v) {
+                    return _wrap_Primitives_GenerateCapsule__SWIG_0(self, args);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'Primitives_GenerateCapsule'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    GenerateCapsule(float,float,uint,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csVector2 > &,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csTriangle > &,CS::Geometry::TextureMapper *)\n"
+    "    CS::Geometry::Primitives::GenerateCapsule(float,float,uint,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csVector2 > &,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csTriangle > &)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Primitives_GenerateSphere__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csEllipsoid *arg1 = 0 ;
+  int arg2 ;
+  csDirtyAccessArray< csVector3 > *arg3 = 0 ;
+  csDirtyAccessArray< csVector2 > *arg4 = 0 ;
+  csDirtyAccessArray< csVector3 > *arg5 = 0 ;
+  csDirtyAccessArray< csTriangle > *arg6 = 0 ;
+  bool arg7 ;
+  bool arg8 ;
+  bool arg9 ;
+  CS::Geometry::TextureMapper *arg10 = (CS::Geometry::TextureMapper *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  void *argp6 = 0 ;
+  int res6 = 0 ;
+  bool val7 ;
+  int ecode7 = 0 ;
+  bool val8 ;
+  int ecode8 = 0 ;
+  bool val9 ;
+  int ecode9 = 0 ;
+  void *argp10 = 0 ;
+  int res10 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  PyObject * obj8 = 0 ;
+  PyObject * obj9 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"Primitives_GenerateSphere",10,10,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8,&obj9)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csEllipsoid,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Primitives_GenerateSphere" "', argument " "1"" of type '" "csEllipsoid const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "1"" of type '" "csEllipsoid const &""'"); 
+  }
+  arg1 = reinterpret_cast< csEllipsoid * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Primitives_GenerateSphere" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "Primitives_GenerateSphere" "', argument " "3"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "3"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg3 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "Primitives_GenerateSphere" "', argument " "4"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "4"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  arg4 = reinterpret_cast< csDirtyAccessArray< csVector2 > * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "Primitives_GenerateSphere" "', argument " "5"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "5"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg5 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "Primitives_GenerateSphere" "', argument " "6"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  if (!argp6) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "6"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  arg6 = reinterpret_cast< csDirtyAccessArray< csTriangle > * >(argp6);
+  ecode7 = SWIG_AsVal_bool(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "Primitives_GenerateSphere" "', argument " "7"" of type '" "bool""'");
+  } 
+  arg7 = static_cast< bool >(val7);
+  ecode8 = SWIG_AsVal_bool(obj7, &val8);
+  if (!SWIG_IsOK(ecode8)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "Primitives_GenerateSphere" "', argument " "8"" of type '" "bool""'");
+  } 
+  arg8 = static_cast< bool >(val8);
+  ecode9 = SWIG_AsVal_bool(obj8, &val9);
+  if (!SWIG_IsOK(ecode9)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "Primitives_GenerateSphere" "', argument " "9"" of type '" "bool""'");
+  } 
+  arg9 = static_cast< bool >(val9);
+  res10 = SWIG_ConvertPtr(obj9, &argp10,SWIGTYPE_p_CS__Geometry__TextureMapper, 0 |  0 );
+  if (!SWIG_IsOK(res10)) {
+    SWIG_exception_fail(SWIG_ArgError(res10), "in method '" "Primitives_GenerateSphere" "', argument " "10"" of type '" "CS::Geometry::TextureMapper *""'"); 
+  }
+  arg10 = reinterpret_cast< CS::Geometry::TextureMapper * >(argp10);
+  CS::Geometry::Primitives::GenerateSphere((csEllipsoid const &)*arg1,arg2,*arg3,*arg4,*arg5,*arg6,arg7,arg8,arg9,arg10);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Primitives_GenerateSphere__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csEllipsoid *arg1 = 0 ;
+  int arg2 ;
+  csDirtyAccessArray< csVector3 > *arg3 = 0 ;
+  csDirtyAccessArray< csVector2 > *arg4 = 0 ;
+  csDirtyAccessArray< csVector3 > *arg5 = 0 ;
+  csDirtyAccessArray< csTriangle > *arg6 = 0 ;
+  bool arg7 ;
+  bool arg8 ;
+  bool arg9 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  void *argp6 = 0 ;
+  int res6 = 0 ;
+  bool val7 ;
+  int ecode7 = 0 ;
+  bool val8 ;
+  int ecode8 = 0 ;
+  bool val9 ;
+  int ecode9 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  PyObject * obj8 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"Primitives_GenerateSphere",9,9,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7,&obj8)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csEllipsoid,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Primitives_GenerateSphere" "', argument " "1"" of type '" "csEllipsoid const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "1"" of type '" "csEllipsoid const &""'"); 
+  }
+  arg1 = reinterpret_cast< csEllipsoid * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Primitives_GenerateSphere" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "Primitives_GenerateSphere" "', argument " "3"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "3"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg3 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "Primitives_GenerateSphere" "', argument " "4"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "4"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  arg4 = reinterpret_cast< csDirtyAccessArray< csVector2 > * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "Primitives_GenerateSphere" "', argument " "5"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "5"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg5 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "Primitives_GenerateSphere" "', argument " "6"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  if (!argp6) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "6"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  arg6 = reinterpret_cast< csDirtyAccessArray< csTriangle > * >(argp6);
+  ecode7 = SWIG_AsVal_bool(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "Primitives_GenerateSphere" "', argument " "7"" of type '" "bool""'");
+  } 
+  arg7 = static_cast< bool >(val7);
+  ecode8 = SWIG_AsVal_bool(obj7, &val8);
+  if (!SWIG_IsOK(ecode8)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "Primitives_GenerateSphere" "', argument " "8"" of type '" "bool""'");
+  } 
+  arg8 = static_cast< bool >(val8);
+  ecode9 = SWIG_AsVal_bool(obj8, &val9);
+  if (!SWIG_IsOK(ecode9)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "Primitives_GenerateSphere" "', argument " "9"" of type '" "bool""'");
+  } 
+  arg9 = static_cast< bool >(val9);
+  CS::Geometry::Primitives::GenerateSphere((csEllipsoid const &)*arg1,arg2,*arg3,*arg4,*arg5,*arg6,arg7,arg8,arg9);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Primitives_GenerateSphere__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csEllipsoid *arg1 = 0 ;
+  int arg2 ;
+  csDirtyAccessArray< csVector3 > *arg3 = 0 ;
+  csDirtyAccessArray< csVector2 > *arg4 = 0 ;
+  csDirtyAccessArray< csVector3 > *arg5 = 0 ;
+  csDirtyAccessArray< csTriangle > *arg6 = 0 ;
+  bool arg7 ;
+  bool arg8 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  void *argp6 = 0 ;
+  int res6 = 0 ;
+  bool val7 ;
+  int ecode7 = 0 ;
+  bool val8 ;
+  int ecode8 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  PyObject * obj7 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"Primitives_GenerateSphere",8,8,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6,&obj7)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csEllipsoid,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Primitives_GenerateSphere" "', argument " "1"" of type '" "csEllipsoid const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "1"" of type '" "csEllipsoid const &""'"); 
+  }
+  arg1 = reinterpret_cast< csEllipsoid * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Primitives_GenerateSphere" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "Primitives_GenerateSphere" "', argument " "3"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "3"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg3 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "Primitives_GenerateSphere" "', argument " "4"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "4"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  arg4 = reinterpret_cast< csDirtyAccessArray< csVector2 > * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "Primitives_GenerateSphere" "', argument " "5"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "5"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg5 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "Primitives_GenerateSphere" "', argument " "6"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  if (!argp6) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "6"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  arg6 = reinterpret_cast< csDirtyAccessArray< csTriangle > * >(argp6);
+  ecode7 = SWIG_AsVal_bool(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "Primitives_GenerateSphere" "', argument " "7"" of type '" "bool""'");
+  } 
+  arg7 = static_cast< bool >(val7);
+  ecode8 = SWIG_AsVal_bool(obj7, &val8);
+  if (!SWIG_IsOK(ecode8)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "Primitives_GenerateSphere" "', argument " "8"" of type '" "bool""'");
+  } 
+  arg8 = static_cast< bool >(val8);
+  CS::Geometry::Primitives::GenerateSphere((csEllipsoid const &)*arg1,arg2,*arg3,*arg4,*arg5,*arg6,arg7,arg8);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Primitives_GenerateSphere__SWIG_3(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csEllipsoid *arg1 = 0 ;
+  int arg2 ;
+  csDirtyAccessArray< csVector3 > *arg3 = 0 ;
+  csDirtyAccessArray< csVector2 > *arg4 = 0 ;
+  csDirtyAccessArray< csVector3 > *arg5 = 0 ;
+  csDirtyAccessArray< csTriangle > *arg6 = 0 ;
+  bool arg7 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  void *argp6 = 0 ;
+  int res6 = 0 ;
+  bool val7 ;
+  int ecode7 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  PyObject * obj6 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"Primitives_GenerateSphere",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csEllipsoid,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Primitives_GenerateSphere" "', argument " "1"" of type '" "csEllipsoid const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "1"" of type '" "csEllipsoid const &""'"); 
+  }
+  arg1 = reinterpret_cast< csEllipsoid * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Primitives_GenerateSphere" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "Primitives_GenerateSphere" "', argument " "3"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "3"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg3 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "Primitives_GenerateSphere" "', argument " "4"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "4"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  arg4 = reinterpret_cast< csDirtyAccessArray< csVector2 > * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "Primitives_GenerateSphere" "', argument " "5"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "5"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg5 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "Primitives_GenerateSphere" "', argument " "6"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  if (!argp6) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "6"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  arg6 = reinterpret_cast< csDirtyAccessArray< csTriangle > * >(argp6);
+  ecode7 = SWIG_AsVal_bool(obj6, &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "Primitives_GenerateSphere" "', argument " "7"" of type '" "bool""'");
+  } 
+  arg7 = static_cast< bool >(val7);
+  CS::Geometry::Primitives::GenerateSphere((csEllipsoid const &)*arg1,arg2,*arg3,*arg4,*arg5,*arg6,arg7);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Primitives_GenerateSphere__SWIG_4(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csEllipsoid *arg1 = 0 ;
+  int arg2 ;
+  csDirtyAccessArray< csVector3 > *arg3 = 0 ;
+  csDirtyAccessArray< csVector2 > *arg4 = 0 ;
+  csDirtyAccessArray< csVector3 > *arg5 = 0 ;
+  csDirtyAccessArray< csTriangle > *arg6 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  void *argp6 = 0 ;
+  int res6 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"Primitives_GenerateSphere",6,6,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1, SWIGTYPE_p_csEllipsoid,  0  | 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Primitives_GenerateSphere" "', argument " "1"" of type '" "csEllipsoid const &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "1"" of type '" "csEllipsoid const &""'"); 
+  }
+  arg1 = reinterpret_cast< csEllipsoid * >(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Primitives_GenerateSphere" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "Primitives_GenerateSphere" "', argument " "3"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "3"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg3 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp3);
+  res4 = SWIG_ConvertPtr(obj3, &argp4, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "Primitives_GenerateSphere" "', argument " "4"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "4"" of type '" "csDirtyAccessArray< csVector2 > &""'"); 
+  }
+  arg4 = reinterpret_cast< csDirtyAccessArray< csVector2 > * >(argp4);
+  res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "Primitives_GenerateSphere" "', argument " "5"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "5"" of type '" "csDirtyAccessArray< csVector3 > &""'"); 
+  }
+  arg5 = reinterpret_cast< csDirtyAccessArray< csVector3 > * >(argp5);
+  res6 = SWIG_ConvertPtr(obj5, &argp6, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,  0 );
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "Primitives_GenerateSphere" "', argument " "6"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  if (!argp6) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Primitives_GenerateSphere" "', argument " "6"" of type '" "csDirtyAccessArray< csTriangle > &""'"); 
+  }
+  arg6 = reinterpret_cast< csDirtyAccessArray< csTriangle > * >(argp6);
+  CS::Geometry::Primitives::GenerateSphere((csEllipsoid const &)*arg1,arg2,*arg3,*arg4,*arg5,*arg6);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Primitives_GenerateSphere(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[11];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 10); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 6) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csEllipsoid, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          void *vptr = 0;
+          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              void *vptr = 0;
+              int res = SWIG_ConvertPtr(argv[5], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                return _wrap_Primitives_GenerateSphere__SWIG_4(self, args);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 7) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csEllipsoid, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          void *vptr = 0;
+          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              void *vptr = 0;
+              int res = SWIG_ConvertPtr(argv[5], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_bool(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  return _wrap_Primitives_GenerateSphere__SWIG_3(self, args);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 8) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csEllipsoid, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          void *vptr = 0;
+          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              void *vptr = 0;
+              int res = SWIG_ConvertPtr(argv[5], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_bool(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  {
+                    int res = SWIG_AsVal_bool(argv[7], NULL);
+                    _v = SWIG_CheckState(res);
+                  }
+                  if (_v) {
+                    return _wrap_Primitives_GenerateSphere__SWIG_2(self, args);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 9) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csEllipsoid, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          void *vptr = 0;
+          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              void *vptr = 0;
+              int res = SWIG_ConvertPtr(argv[5], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_bool(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  {
+                    int res = SWIG_AsVal_bool(argv[7], NULL);
+                    _v = SWIG_CheckState(res);
+                  }
+                  if (_v) {
+                    {
+                      int res = SWIG_AsVal_bool(argv[8], NULL);
+                      _v = SWIG_CheckState(res);
+                    }
+                    if (_v) {
+                      return _wrap_Primitives_GenerateSphere__SWIG_1(self, args);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (argc == 10) {
+    int _v;
+    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_csEllipsoid, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        void *vptr = 0;
+        int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          void *vptr = 0;
+          int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+          _v = SWIG_CheckState(res);
+          if (_v) {
+            void *vptr = 0;
+            int res = SWIG_ConvertPtr(argv[4], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+            _v = SWIG_CheckState(res);
+            if (_v) {
+              void *vptr = 0;
+              int res = SWIG_ConvertPtr(argv[5], &vptr, SWIGTYPE_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0);
+              _v = SWIG_CheckState(res);
+              if (_v) {
+                {
+                  int res = SWIG_AsVal_bool(argv[6], NULL);
+                  _v = SWIG_CheckState(res);
+                }
+                if (_v) {
+                  {
+                    int res = SWIG_AsVal_bool(argv[7], NULL);
+                    _v = SWIG_CheckState(res);
+                  }
+                  if (_v) {
+                    {
+                      int res = SWIG_AsVal_bool(argv[8], NULL);
+                      _v = SWIG_CheckState(res);
+                    }
+                    if (_v) {
+                      void *vptr = 0;
+                      int res = SWIG_ConvertPtr(argv[9], &vptr, SWIGTYPE_p_CS__Geometry__TextureMapper, 0);
+                      _v = SWIG_CheckState(res);
+                      if (_v) {
+                        return _wrap_Primitives_GenerateSphere__SWIG_0(self, args);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'Primitives_GenerateSphere'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    GenerateSphere(csEllipsoid const &,int,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csVector2 > &,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csTriangle > &,bool,bool,bool,CS::Geometry::TextureMapper *)\n"
+    "    GenerateSphere(csEllipsoid const &,int,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csVector2 > &,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csTriangle > &,bool,bool,bool)\n"
+    "    GenerateSphere(csEllipsoid const &,int,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csVector2 > &,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csTriangle > &,bool,bool)\n"
+    "    GenerateSphere(csEllipsoid const &,int,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csVector2 > &,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csTriangle > &,bool)\n"
+    "    CS::Geometry::Primitives::GenerateSphere(csEllipsoid const &,int,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csVector2 > &,csDirtyAccessArray< csVector3 > &,csDirtyAccessArray< csTriangle > &)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_new_Primitives(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Geometry::Primitives *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"new_Primitives",0,0)) SWIG_fail;
+  result = (CS::Geometry::Primitives *)new CS::Geometry::Primitives();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_CS__Geometry__Primitives, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_delete_Primitives(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  CS::Geometry::Primitives *arg1 = (CS::Geometry::Primitives *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"delete_Primitives",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Geometry__Primitives, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_Primitives" "', argument " "1"" of type '" "CS::Geometry::Primitives *""'"); 
+  }
+  arg1 = reinterpret_cast< CS::Geometry::Primitives * >(argp1);
+  delete arg1;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *Primitives_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_CS__Geometry__Primitives, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
+SWIGINTERN PyObject *_wrap_new_csPrimitives(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csPrimitives *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"new_csPrimitives",0,0)) SWIG_fail;
+  result = (csPrimitives *)new csPrimitives();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csPrimitives, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_delete_csPrimitives(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csPrimitives *arg1 = (csPrimitives *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"delete_csPrimitives",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csPrimitives, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csPrimitives" "', argument " "1"" of type '" "csPrimitives *""'"); 
+  }
+  arg1 = reinterpret_cast< csPrimitives * >(argp1);
+  delete arg1;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *csPrimitives_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_csPrimitives, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
 SWIGINTERN PyObject *_wrap_delete_Primitive(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CS::Geometry::Primitive *arg1 = (CS::Geometry::Primitive *) 0 ;
@@ -18834,6 +21291,28 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"new_csEngineTools", _wrap_new_csEngineTools, METH_VARARGS, NULL},
 	 { (char *)"delete_csEngineTools", _wrap_delete_csEngineTools, METH_VARARGS, NULL},
 	 { (char *)"csEngineTools_swigregister", csEngineTools_swigregister, METH_VARARGS, NULL},
+	 { (char *)"delete_TextureMapper", _wrap_delete_TextureMapper, METH_VARARGS, NULL},
+	 { (char *)"TextureMapper_Map", _wrap_TextureMapper_Map, METH_VARARGS, NULL},
+	 { (char *)"TextureMapper_swigregister", TextureMapper_swigregister, METH_VARARGS, NULL},
+	 { (char *)"new_TableTextureMapper", _wrap_new_TableTextureMapper, METH_VARARGS, NULL},
+	 { (char *)"delete_TableTextureMapper", _wrap_delete_TableTextureMapper, METH_VARARGS, NULL},
+	 { (char *)"TableTextureMapper_Map", _wrap_TableTextureMapper_Map, METH_VARARGS, NULL},
+	 { (char *)"TableTextureMapper_swigregister", TableTextureMapper_swigregister, METH_VARARGS, NULL},
+	 { (char *)"new_DensityTextureMapper", _wrap_new_DensityTextureMapper, METH_VARARGS, NULL},
+	 { (char *)"delete_DensityTextureMapper", _wrap_delete_DensityTextureMapper, METH_VARARGS, NULL},
+	 { (char *)"DensityTextureMapper_Map", _wrap_DensityTextureMapper_Map, METH_VARARGS, NULL},
+	 { (char *)"DensityTextureMapper_swigregister", DensityTextureMapper_swigregister, METH_VARARGS, NULL},
+	 { (char *)"Primitives_GenerateBox", _wrap_Primitives_GenerateBox, METH_VARARGS, NULL},
+	 { (char *)"Primitives_GenerateQuad", _wrap_Primitives_GenerateQuad, METH_VARARGS, NULL},
+	 { (char *)"Primitives_GenerateTesselatedQuad", _wrap_Primitives_GenerateTesselatedQuad, METH_VARARGS, NULL},
+	 { (char *)"Primitives_GenerateCapsule", _wrap_Primitives_GenerateCapsule, METH_VARARGS, NULL},
+	 { (char *)"Primitives_GenerateSphere", _wrap_Primitives_GenerateSphere, METH_VARARGS, NULL},
+	 { (char *)"new_Primitives", _wrap_new_Primitives, METH_VARARGS, NULL},
+	 { (char *)"delete_Primitives", _wrap_delete_Primitives, METH_VARARGS, NULL},
+	 { (char *)"Primitives_swigregister", Primitives_swigregister, METH_VARARGS, NULL},
+	 { (char *)"new_csPrimitives", _wrap_new_csPrimitives, METH_VARARGS, NULL},
+	 { (char *)"delete_csPrimitives", _wrap_delete_csPrimitives, METH_VARARGS, NULL},
+	 { (char *)"csPrimitives_swigregister", csPrimitives_swigregister, METH_VARARGS, NULL},
 	 { (char *)"delete_Primitive", _wrap_delete_Primitive, METH_VARARGS, NULL},
 	 { (char *)"Primitive_Append", _wrap_Primitive_Append, METH_VARARGS, NULL},
 	 { (char *)"Primitive_swigregister", Primitive_swigregister, METH_VARARGS, NULL},
@@ -19052,6 +21531,9 @@ static void *_p_scfImplementationExt2T_csProcTexture_csObject_iTextureWrapper_iP
 }
 static void *_p_csProcTextureTo_p_scfImplementation1T_csObject_iObject_t(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((scfImplementation1< csObject,iObject > *) (csObject *)(scfImplementationExt2< csProcTexture,csObject,iTextureWrapper,iProcTexture > *) ((csProcTexture *) x));
+}
+static void *_p_csPrimitivesTo_p_CS__Geometry__Primitives(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((CS::Geometry::Primitives *)  ((csPrimitives *) x));
 }
 static void *_p_csColliderWrapperTo_p_scfImplementationExt1T_csColliderWrapper_csObject_scfFakeInterfaceT_csColliderWrapper_t_t(void *x, int *SWIGUNUSEDPARM(newmemory)) {
     return (void *)((scfImplementationExt1< csColliderWrapper,csObject,scfFakeInterface< csColliderWrapper > > *)  ((csColliderWrapper *) x));
@@ -19788,14 +22270,15 @@ static void *_p_csViewTo_p_scfImplementation1T_csView_iView_t(void *x, int *SWIG
 static swig_type_info _swigt__p_AllocatorType = {"_p_AllocatorType", "AllocatorType *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Geometry__Box = {"_p_CS__Geometry__Box", "CS::Geometry::Box *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Geometry__Capsule = {"_p_CS__Geometry__Capsule", "CS::Geometry::Capsule *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_CS__Geometry__DensityTextureMapper = {"_p_CS__Geometry__DensityTextureMapper", "CS::Geometry::DensityTextureMapper *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Geometry__GeneralMeshBuilder = {"_p_CS__Geometry__GeneralMeshBuilder", "CS::Geometry::GeneralMeshBuilder *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Geometry__Primitive = {"_p_CS__Geometry__Primitive", "CS::Geometry::Primitive *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_CS__Geometry__Primitives = {"_p_CS__Geometry__Primitives", "CS::Geometry::Primitives *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Geometry__Sphere = {"_p_CS__Geometry__Sphere", "CS::Geometry::Sphere *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_CS__Geometry__TableTextureMapper = {"_p_CS__Geometry__TableTextureMapper", "CS::Geometry::TableTextureMapper *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Geometry__TesselatedBox = {"_p_CS__Geometry__TesselatedBox", "CS::Geometry::TesselatedBox *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Geometry__TesselatedQuad = {"_p_CS__Geometry__TesselatedQuad", "CS::Geometry::TesselatedQuad *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Geometry__TextureMapper = {"_p_CS__Geometry__TextureMapper", "CS::Geometry::TextureMapper *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_CS__Geometry__TableTextureMapper = {"_p_CS__Geometry__TableTextureMapper", 0, 0, 0, 0, 0};
-static swig_type_info _swigt__p_CS__Geometry__DensityTextureMapper = {"_p_CS__Geometry__DensityTextureMapper", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_CS__Graphics__CoreRenderMesh = {"_p_CS__Graphics__CoreRenderMesh", "CS::Graphics::CoreRenderMesh *|csCoreRenderMesh *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Graphics__RenderMesh = {"_p_CS__Graphics__RenderMesh", "CS::Graphics::RenderMesh *|csRenderMesh *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_CS__Graphics__RenderMeshModes = {"_p_CS__Graphics__RenderMeshModes", "CS::Graphics::RenderMeshModes *|csRenderMeshModes *", 0, 0, (void*)0, 0};
@@ -19834,6 +22317,9 @@ static swig_type_info _swigt__p_csColliderHelper = {"_p_csColliderHelper", "csCo
 static swig_type_info _swigt__p_csColliderWrapper = {"_p_csColliderWrapper", "csColliderWrapper *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csColor = {"_p_csColor", "csColor *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csColor4 = {"_p_csColor4", "csColor4 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t = {"_p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t", "csDirtyAccessArray< csTriangle > *|csDirtyAccessArray< csTriangle,csArrayElementHandler< csTriangle >,CS::Container::ArrayAllocDefault,CS::Container::ArrayCapacityDefault > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t = {"_p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t", "csDirtyAccessArray< csVector2,csArrayElementHandler< csVector2 >,CS::Container::ArrayAllocDefault,CS::Container::ArrayCapacityDefault > *|csDirtyAccessArray< csVector2 > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t = {"_p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t", "csDirtyAccessArray< csVector3,csArrayElementHandler< csVector3 >,CS::Container::ArrayAllocDefault,CS::Container::ArrayCapacityDefault > *|csDirtyAccessArray< csVector3 > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csEllipsoid = {"_p_csEllipsoid", "csEllipsoid *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csEngineTools = {"_p_csEngineTools", "csEngineTools *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csIntersectingTriangle = {"_p_csIntersectingTriangle", "csIntersectingTriangle *", 0, 0, (void*)0, 0};
@@ -19841,6 +22327,7 @@ static swig_type_info _swigt__p_csMemoryPen = {"_p_csMemoryPen", "csMemoryPen *"
 static swig_type_info _swigt__p_csObject = {"_p_csObject", "csObject *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csPen = {"_p_csPen", "csPen *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csPixmap = {"_p_csPixmap", "csPixmap *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_csPrimitives = {"_p_csPrimitives", "csPrimitives *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csProcAnimated = {"_p_csProcAnimated", "csProcAnimated *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csProcTexture = {"_p_csProcTexture", "csProcTexture *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_csRefArrayT_iObject_t = {"_p_csRefArrayT_iObject_t", "csRefArray< iObject > *|csObjectContainer *", 0, 0, (void*)0, 0};
@@ -20082,6 +22569,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_CS__Geometry__DensityTextureMapper,
   &_swigt__p_CS__Geometry__GeneralMeshBuilder,
   &_swigt__p_CS__Geometry__Primitive,
+  &_swigt__p_CS__Geometry__Primitives,
   &_swigt__p_CS__Geometry__Sphere,
   &_swigt__p_CS__Geometry__TableTextureMapper,
   &_swigt__p_CS__Geometry__TesselatedBox,
@@ -20125,6 +22613,9 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_csColor,
   &_swigt__p_csColor4,
   &_swigt__p_csConfigFile,
+  &_swigt__p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
+  &_swigt__p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
+  &_swigt__p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
   &_swigt__p_csEllipsoid,
   &_swigt__p_csEngineTools,
   &_swigt__p_csImageBase,
@@ -20134,6 +22625,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_csObject,
   &_swigt__p_csPen,
   &_swigt__p_csPixmap,
+  &_swigt__p_csPrimitives,
   &_swigt__p_csProcAnimated,
   &_swigt__p_csProcTexture,
   &_swigt__p_csRefArrayT_iObject_t,
@@ -20370,13 +22862,14 @@ static swig_type_info *swig_type_initial[] = {
 static swig_cast_info _swigc__p_AllocatorType[] = {  {&_swigt__p_AllocatorType, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Geometry__Box[] = {  {&_swigt__p_CS__Geometry__Box, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Geometry__Capsule[] = {  {&_swigt__p_CS__Geometry__Capsule, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_CS__Geometry__DensityTextureMapper[] = {  {&_swigt__p_CS__Geometry__DensityTextureMapper, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Geometry__GeneralMeshBuilder[] = {  {&_swigt__p_CS__Geometry__GeneralMeshBuilder, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Geometry__Primitive[] = {  {&_swigt__p_CS__Geometry__Primitive, 0, 0, 0},  {&_swigt__p_CS__Geometry__TesselatedBox, _p_CS__Geometry__TesselatedBoxTo_p_CS__Geometry__Primitive, 0, 0},  {&_swigt__p_CS__Geometry__Capsule, _p_CS__Geometry__CapsuleTo_p_CS__Geometry__Primitive, 0, 0},  {&_swigt__p_CS__Geometry__TesselatedQuad, _p_CS__Geometry__TesselatedQuadTo_p_CS__Geometry__Primitive, 0, 0},  {&_swigt__p_CS__Geometry__Box, _p_CS__Geometry__BoxTo_p_CS__Geometry__Primitive, 0, 0},  {&_swigt__p_CS__Geometry__Sphere, _p_CS__Geometry__SphereTo_p_CS__Geometry__Primitive, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_CS__Geometry__Primitives[] = {  {&_swigt__p_CS__Geometry__Primitives, 0, 0, 0},  {&_swigt__p_csPrimitives, _p_csPrimitivesTo_p_CS__Geometry__Primitives, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Geometry__Sphere[] = {  {&_swigt__p_CS__Geometry__Sphere, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_CS__Geometry__TableTextureMapper[] = {  {&_swigt__p_CS__Geometry__TableTextureMapper, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Geometry__TesselatedBox[] = {  {&_swigt__p_CS__Geometry__TesselatedBox, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Geometry__TesselatedQuad[] = {  {&_swigt__p_CS__Geometry__TesselatedQuad, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_CS__Geometry__TableTextureMapper[] = {{&_swigt__p_CS__Geometry__TableTextureMapper, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_CS__Geometry__DensityTextureMapper[] = {{&_swigt__p_CS__Geometry__DensityTextureMapper, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Geometry__TextureMapper[] = {  {&_swigt__p_CS__Geometry__TextureMapper, 0, 0, 0},  {&_swigt__p_CS__Geometry__TableTextureMapper, _p_CS__Geometry__TableTextureMapperTo_p_CS__Geometry__TextureMapper, 0, 0},  {&_swigt__p_CS__Geometry__DensityTextureMapper, _p_CS__Geometry__DensityTextureMapperTo_p_CS__Geometry__TextureMapper, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Graphics__CoreRenderMesh[] = {  {&_swigt__p_CS__Graphics__CoreRenderMesh, 0, 0, 0},  {&_swigt__p_CS__Graphics__RenderMesh, _p_CS__Graphics__RenderMeshTo_p_CS__Graphics__CoreRenderMesh, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_CS__Graphics__RenderMesh[] = {  {&_swigt__p_CS__Graphics__RenderMesh, 0, 0, 0},{0, 0, 0, 0}};
@@ -20416,6 +22909,9 @@ static swig_cast_info _swigc__p_csColliderHelper[] = {  {&_swigt__p_csColliderHe
 static swig_cast_info _swigc__p_csColliderWrapper[] = {  {&_swigt__p_csColliderWrapper, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csColor[] = {  {&_swigt__p_csColor, 0, 0, 0},  {&_swigt__p_csColor4, _p_csColor4To_p_csColor, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csColor4[] = {  {&_swigt__p_csColor4, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t[] = {  {&_swigt__p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t[] = {  {&_swigt__p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t[] = {  {&_swigt__p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csEllipsoid[] = {  {&_swigt__p_csEllipsoid, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csEngineTools[] = {  {&_swigt__p_csEngineTools, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csIntersectingTriangle[] = {  {&_swigt__p_csIntersectingTriangle, 0, 0, 0},{0, 0, 0, 0}};
@@ -20423,6 +22919,7 @@ static swig_cast_info _swigc__p_csMemoryPen[] = {  {&_swigt__p_csMemoryPen, 0, 0
 static swig_cast_info _swigc__p_csObject[] = {  {&_swigt__p_csProcAnimated, _p_csProcAnimatedTo_p_csObject, 0, 0},  {&_swigt__p_scfImplementationExt1T_csPath_csObject_iPath_t, _p_scfImplementationExt1T_csPath_csObject_iPath_tTo_p_csObject, 0, 0},  {&_swigt__p_scfImplementationExt2T_csProcTexture_csObject_iTextureWrapper_iProcTexture_t, _p_scfImplementationExt2T_csProcTexture_csObject_iTextureWrapper_iProcTexture_tTo_p_csObject, 0, 0},  {&_swigt__p_csObject, 0, 0, 0},  {&_swigt__p_csColliderWrapper, _p_csColliderWrapperTo_p_csObject, 0, 0},  {&_swigt__p_csProcTexture, _p_csProcTextureTo_p_csObject, 0, 0},  {&_swigt__p_scfImplementationExt1T_csColliderWrapper_csObject_scfFakeInterfaceT_csColliderWrapper_t_t, _p_scfImplementationExt1T_csColliderWrapper_csObject_scfFakeInterfaceT_csColliderWrapper_t_tTo_p_csObject, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csPen[] = {  {&_swigt__p_csPen, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csPixmap[] = {  {&_swigt__p_csPixmap, 0, 0, 0},  {&_swigt__p_csSimplePixmap, _p_csSimplePixmapTo_p_csPixmap, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_csPrimitives[] = {  {&_swigt__p_csPrimitives, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csProcAnimated[] = {  {&_swigt__p_csProcAnimated, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csProcTexture[] = {  {&_swigt__p_csProcAnimated, _p_csProcAnimatedTo_p_csProcTexture, 0, 0},  {&_swigt__p_csProcTexture, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_csRefArrayT_iObject_t[] = {  {&_swigt__p_csRefArrayT_iObject_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -20664,6 +23161,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_CS__Geometry__DensityTextureMapper,
   _swigc__p_CS__Geometry__GeneralMeshBuilder,
   _swigc__p_CS__Geometry__Primitive,
+  _swigc__p_CS__Geometry__Primitives,
   _swigc__p_CS__Geometry__Sphere,
   _swigc__p_CS__Geometry__TableTextureMapper,
   _swigc__p_CS__Geometry__TesselatedBox,
@@ -20707,6 +23205,9 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_csColor,
   _swigc__p_csColor4,
   _swigc__p_csConfigFile,
+  _swigc__p_csDirtyAccessArrayT_csTriangle_csArrayElementHandlerT_csTriangle_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
+  _swigc__p_csDirtyAccessArrayT_csVector2_csArrayElementHandlerT_csVector2_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
+  _swigc__p_csDirtyAccessArrayT_csVector3_csArrayElementHandlerT_csVector3_t_CS__Memory__AllocatorMalloc_csArrayCapacityFixedGrowT_16_t_t,
   _swigc__p_csEllipsoid,
   _swigc__p_csEngineTools,
   _swigc__p_csImageBase,
@@ -20716,6 +23217,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_csObject,
   _swigc__p_csPen,
   _swigc__p_csPixmap,
+  _swigc__p_csPrimitives,
   _swigc__p_csProcAnimated,
   _swigc__p_csProcTexture,
   _swigc__p_csRefArrayT_iObject_t,
@@ -21476,6 +23978,8 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_InstallConstants(d,swig_const_table);
   
   
+  SWIG_Python_SetConstant(d, "Primitives_CS_PRIMBOX_INSIDE",SWIG_From_int(static_cast< int >(CS::Geometry::Primitives::CS_PRIMBOX_INSIDE)));
+  SWIG_Python_SetConstant(d, "Primitives_CS_PRIMBOX_SMOOTH",SWIG_From_int(static_cast< int >(CS::Geometry::Primitives::CS_PRIMBOX_SMOOTH)));
   SWIG_Python_SetConstant(d, "CS_PEN_TA_TOP",SWIG_From_int(static_cast< int >(CS_PEN_TA_TOP)));
   SWIG_Python_SetConstant(d, "CS_PEN_TA_BOT",SWIG_From_int(static_cast< int >(CS_PEN_TA_BOT)));
   SWIG_Python_SetConstant(d, "CS_PEN_TA_LEFT",SWIG_From_int(static_cast< int >(CS_PEN_TA_LEFT)));
