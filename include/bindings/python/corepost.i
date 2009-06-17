@@ -41,7 +41,7 @@
   csInitializer.RequestPlugins = staticmethod(_csInitializer_RequestPlugins)
 
   def _csInitializer_CreateEnvironment (*args):
-    oreg = _core.csInitializer__CreateEnvironment(*args)
+    oreg = csInitializer._CreateEnvironment(*args)
     SyncSCFPointers()
     return oreg
   csInitializer.CreateEnvironment = staticmethod(_csInitializer_CreateEnvironment)
