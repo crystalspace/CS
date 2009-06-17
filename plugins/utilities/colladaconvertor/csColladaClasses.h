@@ -327,6 +327,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
   {
   private:
     csString id;
+    csString name;
     csColladaEffect* instanceEffect;
     csColladaConvertor *parent;
     csRef<iDocumentNode> materialNode;
@@ -336,11 +337,13 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     ~csColladaMaterial();
 
     void SetID(const char* newId);
+    void SetName(const char* newName);
     void SetInstanceEffect(iDocumentNode* effectNode);
     void SetInstanceEffect(csColladaEffect *newInstEffect);
     void SetMaterialNode(iDocumentNode* node);
 
     csString GetID() { return id; }
+    csString GetName() { return name; }
     csColladaEffect* GetInstanceEffect() { return instanceEffect; }
 
     bool operator==(const csColladaMaterial& comp);

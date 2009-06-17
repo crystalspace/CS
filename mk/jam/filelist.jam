@@ -82,6 +82,7 @@ rule FileListEntriesData
 ##  FileListEntryApplications app : list
 rule FileListEntryApplications
 {
+    $($(1)_TARGET)_FILELIST = $(2) ;
     Depends filelists :
       [ SystemDoFileListEntryApplications $(1) : $(2) ] ;
 }
@@ -89,6 +90,7 @@ rule FileListEntryApplications
 ##  FileListEntryPlugin plugin : list
 rule FileListEntryPlugin
 {
+    $($(1)_TARGET)_FILELIST = $(2) ;
     Depends filelists :
       [ SystemDoFileListEntryPlugin $(1) : $(2) ] ;
 }

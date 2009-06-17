@@ -96,6 +96,8 @@ namespace RenderManager
     RenderView (iView* v);
     /// Copy constructor.
     RenderView (const RenderView& other);
+    /// Copy constructor, optionally keeping the camera
+    RenderView (const RenderView& other, bool keepCamera);
 
     virtual ~RenderView ();
 
@@ -284,8 +286,11 @@ namespace RenderManager
     /// Destroy a render context created with CreateRenderContext ().
     virtual void DestroyRenderContext (csRenderContext* context);
 
-    /// Get the mesh fikter for this view.
-    CS::Utility::MeshFilter& GetMeshFilter () { return meshFilter; }
+    /// Get the mesh filter for this view.
+    const CS::Utility::MeshFilter& GetMeshFilter () const { return meshFilter; }
+
+    /// Set the mesh filter for this view.
+    void SetMeshFilter (const CS::Utility::MeshFilter& filter);
   };
 
 }

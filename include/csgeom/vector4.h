@@ -254,7 +254,7 @@ public:
 
   /// Unary - operator.
   inline csVector4T operator- () const 
-  { return csVector4(-x,-y,-z, -w); }
+  { return csVector4T(-x,-y,-z, -w); }
 
   /// Set the value of this vector.
   inline void Set (T sx, T sy, T sz, T sw)

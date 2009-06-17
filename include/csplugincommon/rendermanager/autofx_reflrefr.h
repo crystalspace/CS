@@ -23,68 +23,23 @@
  * Automatic reflection/refraction textures.
  */
 
+#include "iengine/mesh.h"
+#include "csgeom/polyclip.h"
+
 #include "csplugincommon/rendermanager/posteffects.h"
+#include "csplugincommon/rendermanager/rendertree.h"
+#include "csplugincommon/rendermanager/texturecache.h"
 
 namespace CS
 {
   namespace RenderManager
   {
-
     /**
-     * Render manager helper for automatic plane reflection/refraction
-     * textures.
-     *
-     * When some shader used in a render tree context uses a planar
-     * reflection texture (SV name <tt>tex plane reflect</tt>),
-     * refraction texture (<tt>tex plane refract</tt>) or matching
-     * depth textures (<tt>tex plane reflect depth</tt>,
-     * <tt>tex plane refract depth</tt>) new contexts are set up to render
-     * the scene with the appropriate settings to textures.
-     *
-     * The reflection/refraction is planar. The reflection texture will contain
-     * the scene from the context's view, but mirrored at and clipped to the 
-     * reflection plane (everything "above" the reflecting planar surface).
-     * The refraction texture will contain the scene from the context's view, 
-     * but clipped to the reflection plane (everything "below" the reflecting 
-     * planar surface).
-     *
-     * The reflection plane can be specified in object space of a mesh object
-     * by attach an SV <tt>plane reflection</tt> to it. If no such SV is
-     * attached, a reflection plane is computed from the object space bounding
-     * box: the plane's origin is the origin of the mesh, the plane's normal
-     * points into the positive direction of the smallest dimension of the
-     * bounding box.
-     *
-     * Usage: Functor for TraverseUsedSVSets. Application must happen after 
-     * shader and ticket setup (e.g. SetupStandardTicket()).
-     * Example:
-     * \code
-     * // Define type using rendermanager-dependent render tree and context setup
-     * typedef CS::RenderManager::AutoFX_ReflectRefract<RenderTreeType, 
-     *   ContextSetupType> AutoReflectRefractType;
-     *
-     * // Instantiate helper in rendering
-     * RenderManagerType::AutoReflectRefractType fxRR (
-     *   rmanager->reflectRefractPersistent, *this);
-     * // Set up a traverser for the sets of shader vars used over each mesh
-     * typedef TraverseUsedSVSets<RenderTreeType,
-     *   RenderManagerType::AutoReflectRefractType> SVTraverseType;
-     * SVTraverseType svTraverser
-     *   (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
-     * // Do the actual traversal.
-     * ForEachMeshNode (context, svTraverser);
-     * \endcode
-     *
-     * The template parameter \a RenderTree gives the render tree type.
-     * The parameter \a ContextSetup gives a class used to set up the contexts
-     * for the reflection/refraction rendering. It must provide an
-     * implementation of operator() (RenderTree::ContextNode&).
-     *
-     * Automatic reflections and refractions have a number of configuration
-     * settings; see \c data/config-plugins/engine.cfg.
+     * Base class for AutoFX_ReflectRefract, containing types and
+     * members which are independent of the template arguments that can be
+     * provided to AutoFX_ReflectRefract.
      */
-    template<typename RenderTree, typename ContextSetup>
-    class AutoFX_ReflectRefract
+    class AutoFX_ReflectRefract_Base
     {
     public:
       /**
@@ -92,7 +47,7 @@ namespace CS
        * Render managers must store an instance of this class and provide
        * it to the helper upon instantiation.
        */
-      struct PersistentData
+      struct CS_CRYSTALSPACE_EXPORT PersistentData
       {
         CS::ShaderVarStringID svTexPlaneRefl;
         CS::ShaderVarStringID svTexPlaneRefr;
@@ -142,20 +97,7 @@ namespace CS
         uint dbgReflRefrTex;
         
         /// Construct helper
-        PersistentData() :
-          currentFrame (0),
-	  texCache (csimg2D, "rgb8",  // @@@ FIXME: Use same format as main view ...
-	    CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP
-	     | CS_TEXTURE_NPOTS | CS_TEXTURE_CLAMP | CS_TEXTURE_SCALE_UP,
-	    "target", 0,
-	    CS::Utility::ResourceCache::ReuseIfOnlyOneRef ()),
-	  texCacheDepth (csimg2D, "d32",
-	    CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP
-	     | CS_TEXTURE_NPOTS | CS_TEXTURE_CLAMP | CS_TEXTURE_SCALE_UP,
-	    "target", 0,
-	    CS::Utility::ResourceCache::ReuseIfOnlyOneRef ())
-	{
-	}
+        PersistentData();
 	
         /**
          * Initialize helper. Fetches various required values from objects in
@@ -166,87 +108,93 @@ namespace CS
          */
 	void Initialize (iObjectRegistry* objReg,
 			 RenderTreeBase::DebugPersistent& dbgPersist,
-			 PostEffectManager* postEffects)
-	{
-	  dbgReflRefrTex = dbgPersist.RegisterDebugFlag ("textures.reflrefr");
-	
-	  csRef<iShaderManager> shaderManager =
-	    csQueryRegistry<iShaderManager> (objReg);
-	  
-	  iShaderVarStringSet* strings = shaderManager->GetSVNameStringset();
-	  svTexPlaneRefl = strings->Request ("tex plane reflect");
-	  svTexPlaneRefr = strings->Request ("tex plane refract");
-	  svTexPlaneReflDepth = strings->Request ("tex plane reflect depth");
-	  svTexPlaneRefrDepth = strings->Request ("tex plane refract depth");
-	  
-	  svPlaneRefl = strings->Request ("plane reflection");
-	  svClipPlaneReflRefr = strings->Request ("clip plane reflection");
-	  
-	  csConfigAccess config (objReg);
-	  resolutionReduceRefl = config->GetInt (
-	    "RenderManager.Reflections.Downsample", 1);
-	  resolutionReduceRefr = config->GetInt (
-	    "RenderManager.Refractions.Downsample", resolutionReduceRefl);
-	  texUpdateInterval = config->GetInt (
-	    "RenderManager.Reflections.UpdateInterval", 0);
-	  maxUpdatesPerFrame = config->GetInt (
-	    "RenderManager.Reflections.MaxUpdatesPerFrame", 0);
-	  mappingStretch = config->GetFloat (
-	    "RenderManager.Reflections.MappingStretch", 1.0f);
-	  cameraChangeThresh = config->GetFloat (
-	    "RenderManager.Reflections.CameraChangeThreshold", 0.01f);
-	  
-	  svReflXform = strings->Request ("reflection coord xform");
-	  reflXformSV.AttachNew (new csShaderVariable (svReflXform));
-	  screenFlipped = postEffects ? postEffects->ScreenSpaceYFlipped() : false;
-	    
-	  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objReg);
-	  texCache.SetG3D (g3d);
-	  texCacheDepth.SetG3D (g3d);
-	}
+			 PostEffectManager* postEffects);
       
         /**
          * Do per-frame house keeping - \b MUST be called every frame/
          * RenderView() execution.
          */
-	void UpdateNewFrame ()
-	{
-	  csTicks currentTicks = csGetTicks ();
-	  typename ReflRefrCache::GlobalIterator reflRefrIt (
-	    reflRefrCache.GetIterator ());
-	  while (reflRefrIt.HasNext())
-	  {
-	    ReflectRefractSVs& meshReflectRefract = reflRefrIt.NextNoAdvance();
-	    // Don't remove if update interval hasn't passed yet
-	    if ((texUpdateInterval > 0)
-	      && ((currentTicks - meshReflectRefract.lastUpdate) <=
-	        texUpdateInterval))
-	    {
-	      reflRefrIt.Next();
-	      continue;
-	    }
-	    // Don't remove if not in line for round-robin update
-	    if ((maxUpdatesPerFrame > 0)
-	      && (currentFrame - meshReflectRefract.lastUpdateFrame < 
-	        ((reflRefrCache.GetSize()+maxUpdatesPerFrame-1) / maxUpdatesPerFrame)))
-	    {
-	      reflRefrIt.Next();
-	      continue;
-	    }
-	    reflRefrCache.DeleteElement (reflRefrIt);
-	  }
-	  
-	  currentFrame++;
-	  updatesThisFrame = 0;
-	
-	  texCache.AdvanceFrame (currentTicks);
-	  texCacheDepth.AdvanceFrame (currentTicks);
-	}
+	void UpdateNewFrame ();
       };
-      
+    
+      AutoFX_ReflectRefract_Base (PersistentData& persist) : persist (persist)
+      {}
+    protected:
+      PersistentData& persist;
+    };
+    
+    /**
+     * Render manager helper for automatic plane reflection/refraction
+     * textures.
+     *
+     * When some shader used in a render tree context uses a planar
+     * reflection texture (SV name <tt>tex plane reflect</tt>),
+     * refraction texture (<tt>tex plane refract</tt>) or matching
+     * depth textures (<tt>tex plane reflect depth</tt>,
+     * <tt>tex plane refract depth</tt>) new contexts are set up to render
+     * the scene with the appropriate settings to textures.
+     *
+     * The reflection/refraction is planar. The reflection texture will contain
+     * the scene from the context's view, but mirrored at and clipped to the 
+     * reflection plane (everything "above" the reflecting planar surface).
+     * The refraction texture will contain the scene from the context's view, 
+     * but clipped to the reflection plane (everything "below" the reflecting 
+     * planar surface).
+     *
+     * The reflection plane can be specified in object space of a mesh object
+     * by attach an SV <tt>plane reflection</tt> to it. If no such SV is
+     * attached, a reflection plane is computed from the object space bounding
+     * box: the plane's origin is the origin of the mesh, the plane's normal
+     * points into the positive direction of the smallest dimension of the
+     * bounding box.
+     *
+     * Usage: Functor for TraverseUsedSVSets. Application must happen after 
+     * shader and ticket setup (e.g. SetupStandardTicket()).
+     * Example:
+     * \code
+     * // Define type using rendermanager-dependent render tree and context setup
+     * typedef CS::RenderManager::AutoFX_ReflectRefract<RenderTreeType, 
+     *   ContextSetupType> AutoReflectRefractType;
+     *
+     * // Instantiate helper in rendering
+     * RenderManagerType::AutoReflectRefractType fxRR (
+     *   rmanager->reflectRefractPersistent, *this);
+     * // Set up a traverser for the sets of shader vars used over each mesh
+     * typedef TraverseUsedSVSets<RenderTreeType,
+     *   RenderManagerType::AutoReflectRefractType> SVTraverseType;
+     * SVTraverseType svTraverser
+     *   (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+     * // Do the actual traversal.
+     * ForEachMeshNode (context, svTraverser);
+     * \endcode
+     *
+     * The template parameter \a RenderTree gives the render tree type.
+     * The parameter \a ContextSetupReflect and \a ContextSetupRefract give 
+     * classes used to set up the contexts for the reflection resp. refraction
+     * rendering. They must provide an implementation of
+     * operator() (RenderTree::ContextNode&).
+     *
+     * Automatic reflections and refractions have a number of configuration
+     * settings; see \c data/config-plugins/engine.cfg.
+     */
+    template<typename RenderTree,
+      typename ContextSetupReflect,
+      typename ContextSetupRefract = ContextSetupReflect>
+    class AutoFX_ReflectRefract : public AutoFX_ReflectRefract_Base
+    {
+    public:
       AutoFX_ReflectRefract (PersistentData& persist,
-        ContextSetup& contextFunction) : persist (persist),
-        contextFunction (contextFunction)
+        ContextSetupReflect& contextFunction) : 
+        AutoFX_ReflectRefract_Base (persist),
+        contextFunctionRefl (contextFunction),
+        contextFunctionRefr (contextFunction)
+      {}
+      AutoFX_ReflectRefract (PersistentData& persist,
+        ContextSetupReflect& contextFunctionRefl,
+        ContextSetupRefract& contextFunctionRefr) : 
+        AutoFX_ReflectRefract_Base (persist),
+        contextFunctionRefl (contextFunctionRefl),
+        contextFunctionRefr (contextFunctionRefr)
       {}
     
       /**
@@ -522,7 +470,9 @@ namespace CS
 	        *rview));
     #include "csutil/custom_new_enable.h"
             reflView->SetCamera (inewcam);
-            reflView->GetMeshFilter().AddFilterMesh (mesh.meshWrapper);
+	    CS::Utility::MeshFilter meshFilter;
+	    meshFilter.AddFilterMesh (mesh.meshWrapper);
+            reflView->SetMeshFilter(meshFilter);
 	    
 	    // Change the camera transform to be a reflection across reflRefrPlane
 	    csReversibleTransform reflection (csTransform::GetReflect (reflRefrPlane));
@@ -617,9 +567,10 @@ namespace CS
 	    // Create a new view
 	    csRef<CS::RenderManager::RenderView> refrView;
     #include "csutil/custom_new_disable.h"
+            /* Keep old camera to allow shadow map caching  */
 	    refrView.AttachNew (
 	      new (renderTree.GetPersistentData().renderViewPool) RenderView (
-		*rview));
+		*rview, true));
     #include "csutil/custom_new_enable.h"
 	    
 	    csRef<iTextureHandle> tex;
@@ -640,7 +591,9 @@ namespace CS
 	    csRef<iClipper2D> newView;
 	    newView.AttachNew (new csBoxClipper (clipBoxRefr));
 	    refrView->SetClipper (newView);
-            refrView->GetMeshFilter().AddFilterMesh (mesh.meshWrapper);
+	    CS::Utility::MeshFilter meshFilter;
+	    meshFilter.AddFilterMesh (mesh.meshWrapper);
+            refrView->SetMeshFilter(meshFilter);
             refrView->SetClipPlane (reflRefrPlane_cam.Inverse ());
   
 	    refrCtx = renderTree.CreateContext (refrView);
@@ -700,12 +653,12 @@ namespace CS
 	}
 	
         // Setup the new contexts
-	if (reflCtx) contextFunction (*reflCtx);
-	if (refrCtx) contextFunction (*refrCtx);
+	if (reflCtx) contextFunctionRefl (*reflCtx);
+	if (refrCtx) contextFunctionRefr (*refrCtx);
       }
     protected:
-      PersistentData& persist;
-      ContextSetup& contextFunction;
+      ContextSetupReflect& contextFunctionRefl;
+      ContextSetupRefract& contextFunctionRefr;
     };
 
   } // namespace RenderManager

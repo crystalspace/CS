@@ -89,7 +89,10 @@
 %module cspace
 #endif
 */
+
 %include "csconfig.h"
+%include "cstypes.h"
+
 // Ignored macros.
 #undef CS_STRUCT_ALIGN_4BYTE_BEGIN
 #define CS_STRUCT_ALIGN_4BYTE_BEGIN
@@ -170,8 +173,6 @@
 %{
 #include "crystalspace.h"
 %}
-
-typedef unsigned char uint8;
 
 %include "bindings/common/allinterfaces.i"
 
@@ -304,8 +305,6 @@ typedef unsigned char uint8;
 %apply float * INOUT { float & iG };
 %apply float * INOUT { float & iB };
 
-
-%include "cstypes.h"
 
 %define CS_WRAP_PTR_IMPLEMENT(PtrName)
 %immutable PtrName::Type;
@@ -920,20 +919,6 @@ csEventID _csevInput (iObjectRegistry *);
 #define _csevQuit(reg) csevQuit(reg)
 #undef csevQuit
 csEventID _csevQuit (iObjectRegistry *);
-
-/* Process */
-#define _csevProcess(reg) csevProcess(reg)
-#undef csevProcess
-csEventID _csevProcess (iObjectRegistry *);
-#define _csevPreProcess(reg) csevPreProcess(reg)
-#undef csevPreProcess
-csEventID _csevPreProcess (iObjectRegistry *);
-#define _csevPostProcess(reg) csevPostProcess(reg)
-#undef csevPostProcess
-csEventID _csevPostProcess (iObjectRegistry *);
-#define _csevFinalProcess(reg) csevFinalProcess(reg)
-#undef csevFinalProcess
-csEventID _csevFinalProcess (iObjectRegistry *);
 
 /* Canvas */
 #define _csevCanvasClose(reg, g2d) csevCanvasClose(reg, g2d)

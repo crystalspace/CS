@@ -413,8 +413,7 @@ public:
   iTextureHandle* GetRenderTarget (csRenderTargetAttachment attachment, int* subtexture) const;
   
   void BeginDraw (int drawflags);
-  void SetupProjection ();
-  CS::Math::Matrix4 SetupProjection (
+  CS::Math::Matrix4 FixupProjection (
     const CS::Math::Matrix4& projectionMatrix);
   void FinishDraw ();
   void SetClipRect (const csRect& clipRect);

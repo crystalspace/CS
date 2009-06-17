@@ -23,17 +23,130 @@
  * Render manager portal setup.
  */
 
+#include "iengine/movable.h"
+#include "iengine/portal.h"
 #include "iengine/sector.h"
+#include "csgeom/math3d.h"
+#include "csgeom/polyclip.h"
+#include "csgfx/renderbuffer.h"
+#include "csgfx/shadervarcontext.h"
+#include "cstool/rbuflock.h"
 
 #include "csplugincommon/rendermanager/renderview.h"
 #include "csplugincommon/rendermanager/svsetup.h"
 #include "csplugincommon/rendermanager/texturecache.h"
-#include "csutil/sysfunc.h"
 
 namespace CS
 {
 namespace RenderManager
 {
+  /**
+   * Base class for StandardPortalSetup, containing types and
+   * members which are independent of the template arguments that can be
+   * provided to StandardPortalSetup.
+   */
+  class StandardPortalSetup_Base
+  {
+  public:
+    /**
+      * Data used by the helper that needs to persist over multiple frames.
+      * Render managers must store an instance of this class and provide
+      * it to the helper upon instantiation.
+      */
+    struct CS_CRYSTALSPACE_EXPORT PersistentData
+    {
+
+      /**
+       * Cache structure for portal render buffers
+       */
+      struct PortalBuffers
+      {
+        csRef<iRenderBuffer> coordBuf;
+        csRef<iRenderBuffer> tcBuf;
+        csRef<iRenderBuffer> indexBuf;
+        csRef<csRenderBufferHolder> holder;
+      };
+
+      /**
+       * GenericCache-constraints for PortalBuffer caching
+       */
+      struct CS_CRYSTALSPACE_EXPORT PortalBufferConstraint
+      {
+        typedef size_t KeyType;
+
+        static bool IsLargerEqual (const PortalBuffers& b1,
+                                   const PortalBuffers& b2);
+        static bool IsEqual (const PortalBuffers& b1,
+                             const PortalBuffers& b2);
+        static bool IsLargerEqual(const PortalBuffers& b1,
+                                  const KeyType& s2);
+        static bool IsEqual(const PortalBuffers& b1,
+                            const KeyType& s2);
+      };
+      CS::Utility::GenericResourceCache<PortalBuffers, csTicks,
+        PortalBufferConstraint> bufCache;
+
+      /**
+       * Cache-helper for box clipper caching
+       */
+      struct CS_CRYSTALSPACE_EXPORT csBoxClipperCached : public csBoxClipper
+      {
+        PersistentData* owningPersistentData;
+
+        csBoxClipperCached (PersistentData* owningPersistentData,
+          const csBox2& box) : csBoxClipper (box),
+          owningPersistentData (owningPersistentData)
+        { }
+
+        void operator delete (void* p, void* q);
+        void operator delete (void* p);
+      };
+      struct csBoxClipperCachedStore
+      {
+        uint bytes[(sizeof(csBoxClipperCached) + sizeof (uint) - 1)/sizeof(uint)];
+      };
+      CS::Utility::GenericResourceCache<csBoxClipperCachedStore, csTicks,
+        CS::Utility::ResourceCache::SortingNone,
+        CS::Utility::ResourceCache::ReuseConditionFlagged> boxClipperCache;
+
+      void FreeCachedClipper (csBoxClipperCached* bcc);
+
+      CS::ShaderVarStringID svNameTexPortal;
+    #ifdef CS_DEBUG
+      csFrameDataHolder<csStringBase> stringHolder;
+    #endif
+
+      TextureCache texCache;
+
+      /// Construct helper
+      PersistentData();
+
+      /**
+       * Initialize helper. Fetches various required values from objects in
+       * the object registry.
+       */
+      void Initialize (iShaderManager* shmgr, iGraphics3D* g3d);
+
+      /**
+       * Do per-frame house keeping - \b MUST be called every frame/
+       * RenderView() execution.
+       */
+      void UpdateNewFrame ()
+      {
+        csTicks time = csGetTicks ();
+        texCache.AdvanceFrame (time);
+        bufCache.AdvanceTime (time);
+        boxClipperCache.AdvanceTime (time);
+      }
+    };
+  
+    StandardPortalSetup_Base (PersistentData& persistentData)
+      : persistentData (persistentData)
+    {}
+  protected:
+    PersistentData& persistentData;
+  };
+
   /**
    * Standard setup functor for portals.
    * Iterates over all portals in a context and sets up new contexts to
@@ -79,162 +192,10 @@ namespace RenderManager
    * while heavy portals requires render-to-texture.
    */
   template<typename RenderTreeType, typename ContextSetup>
-  class StandardPortalSetup
+  class StandardPortalSetup : public StandardPortalSetup_Base
   {
   public:
     typedef StandardPortalSetup<RenderTreeType, ContextSetup> ThisType;
-
-    /**
-      * Data used by the helper that needs to persist over multiple frames.
-      * Render managers must store an instance of this class and provide
-      * it to the helper upon instantiation.
-      */
-    struct PersistentData
-    {
-
-      /**
-       * Cache structure for portal render buffers
-       */
-      struct PortalBuffers
-      {
-        csRef<iRenderBuffer> coordBuf;
-        csRef<iRenderBuffer> tcBuf;
-        csRef<iRenderBuffer> indexBuf;
-        csRef<csRenderBufferHolder> holder;
-      };
-
-      /**
-       * GenericCache-constraints for PortalBuffer caching
-       */
-      struct PortalBufferConstraint
-      {
-        typedef size_t KeyType;
-
-        static bool IsLargerEqual (const PortalBuffers& b1,
-                                  const PortalBuffers& b2)
-        {
-          size_t s1 = b1.coordBuf->GetElementCount ();
-          size_t s2 = b1.coordBuf->GetElementCount ();
-
-          if (s1 > s2) return true;
-          return false;
-        }
-
-        static bool IsEqual (const PortalBuffers& b1,
-                            const PortalBuffers& b2)
-        {
-          size_t s1 = b1.coordBuf->GetElementCount ();
-          size_t s2 = b1.coordBuf->GetElementCount ();
-
-          if (s1 == s2) return true;
-          return false;
-        }
-
-        static bool IsLargerEqual(const PortalBuffers& b1,
-                                 const KeyType& s2)
-        {
-          size_t s1 = b1.coordBuf->GetElementCount ();
-
-          if (s1 > s2) return true;
-          return false;
-        }
-
-        static bool IsEqual(const PortalBuffers& b1,
-                           const KeyType& s2)
-        {
-          size_t s1 = b1.coordBuf->GetElementCount ();
-
-          if (s1 == s2) return true;
-          return false;
-        }
-
-      };
-      CS::Utility::GenericResourceCache<PortalBuffers, csTicks,
-        PortalBufferConstraint> bufCache;
-
-      /**
-       * Cache-helper for box clipper caching
-       */
-      struct csBoxClipperCached : public csBoxClipper
-      {
-        PersistentData* owningPersistentData;
-
-        csBoxClipperCached (PersistentData* owningPersistentData,
-          const csBox2& box) : csBoxClipper (box),
-          owningPersistentData (owningPersistentData)
-        { }
-
-        void operator delete (void* p, void* q)
-        {
-          csBoxClipperCached* bcc = reinterpret_cast<csBoxClipperCached*> (p);
-          bcc->owningPersistentData->FreeCachedClipper (bcc);
-        }
-        void operator delete (void* p)
-        {
-          csBoxClipperCached* bcc = reinterpret_cast<csBoxClipperCached*> (p);
-          bcc->owningPersistentData->FreeCachedClipper (bcc);
-        }
-      };
-      struct csBoxClipperCachedStore
-      {
-        uint bytes[(sizeof(csBoxClipperCached) + sizeof (uint) - 1)/sizeof(uint)];
-      };
-      CS::Utility::GenericResourceCache<csBoxClipperCachedStore, csTicks,
-        CS::Utility::ResourceCache::SortingNone,
-        CS::Utility::ResourceCache::ReuseConditionFlagged> boxClipperCache;
-
-      void FreeCachedClipper (csBoxClipperCached* bcc)
-      {
-        CS::Utility::ResourceCache::ReuseConditionFlagged::StoredAuxiliaryInfo*
-          reuseAux = boxClipperCache.GetReuseAuxiliary (
-            reinterpret_cast<csBoxClipperCachedStore*> (bcc));
-        reuseAux->reusable = true;
-      }
-
-      CS::ShaderVarStringID svNameTexPortal;
-    #ifdef CS_DEBUG
-      csFrameDataHolder<csStringBase> stringHolder;
-    #endif
-
-      TextureCache texCache;
-
-      /// Construct helper
-      PersistentData() :
-        bufCache (CS::Utility::ResourceCache::ReuseConditionAfterTime<uint> (),
-          CS::Utility::ResourceCache::PurgeConditionAfterTime<uint> (10000)),
-        boxClipperCache (CS::Utility::ResourceCache::ReuseConditionFlagged (),
-          CS::Utility::ResourceCache::PurgeConditionAfterTime<uint> (10000)),
-        texCache (csimg2D, "rgb8", // @@@ FIXME: Use same format as main view ...
-          CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP,
-          "target", TextureCache::tcachePowerOfTwo)
-      {
-        bufCache.agedPurgeInterval = 5000;
-        boxClipperCache.agedPurgeInterval = 5000;
-      }
-
-      /**
-       * Initialize helper. Fetches various required values from objects in
-       * the object registry.
-       */
-      void Initialize (iShaderManager* shmgr, iGraphics3D* g3d)
-      {
-        svNameTexPortal =
-          shmgr->GetSVNameStringset()->Request ("tex portal");
-	texCache.SetG3D (g3d);
-      }
-
-     /**
-      * Do per-frame house keeping - \b MUST be called every frame/
-      * RenderView() execution.
-      */
-     void UpdateNewFrame ()
-      {
-        csTicks time = csGetTicks ();
-        texCache.AdvanceFrame (time);
-        bufCache.AdvanceTime (time);
-        boxClipperCache.AdvanceTime (time);
-      }
-    };
 
     /**
      * Data that needs to be passed between portal setup steps by the
@@ -252,7 +213,7 @@ namespace RenderManager
 
     /// Constructor.
     StandardPortalSetup (PersistentData& persistentData, ContextSetup& cfun)
-      : persistentData (persistentData), contextFunction (cfun)
+      : StandardPortalSetup_Base (persistentData), contextFunction (cfun)
     {}
 
     /**
@@ -322,7 +283,6 @@ namespace RenderManager
     }
 
   private:
-    PersistentData& persistentData;
     ContextSetup& contextFunction;
 
     bool IsSimplePortal (const csFlags& portalFlags)

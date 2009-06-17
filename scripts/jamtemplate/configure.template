@@ -18,6 +18,7 @@ CS_PACKAGEINFO(
 AC_CONFIG_SRCDIR([mk/jam/build.jam])
 AC_CONFIG_AUX_DIR([mk/autoconf])
 AC_CANONICAL_HOST
+CS_PATH_INIT
 
 #----------------------------------------------------------------------------
 # Setup for the configuration header.

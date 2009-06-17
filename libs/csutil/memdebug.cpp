@@ -1051,8 +1051,8 @@ namespace CS
           csMemTrackerModule::BlockInfo newBI;
           newBI.size = newSize;
           newBI.info = bi->info;
-          m->blockSizes.Put (newP, newBI);
 	  m->blockSizes.DeleteAll (p);
+          m->blockSizes.Put (newP, newBI);
 	}
 	void UpdateAmount (csMemTrackerModule* m, const char* info,
 	  int dcount, int dsize)

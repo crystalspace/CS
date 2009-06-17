@@ -509,7 +509,7 @@ void TerrainBlock::SetupGeometry ()
         
         //@@Optimize this!
         *normalData++ = renderData->cell->GetNormal (
-          (int)(x*stepSize), (int)(y*stepSize));
+          gridLeft+(int)(x*stepSize), gridTop+(int)(y*stepSize));
 
         if (height < minHeight)
           minHeight = height;

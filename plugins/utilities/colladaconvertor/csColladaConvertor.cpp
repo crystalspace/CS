@@ -810,6 +810,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
         csColladaMaterial nextMaterial = csColladaMaterial(this);
         nextMaterial.SetID(material->GetAttributeValue("id"));
+        nextMaterial.SetName(material->GetAttributeValue("name"));
         nextMaterial.SetMaterialNode(newMaterial);
         nextMaterial.SetInstanceEffect(effect);
         materialsList.Push(nextMaterial);

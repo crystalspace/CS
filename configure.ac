@@ -28,13 +28,15 @@ CS_PACKAGEINFO([Crystal Space],
 AC_CONFIG_SRCDIR([libs/Jamfile])
 AC_CONFIG_AUX_DIR([mk/autoconf])
 AC_CANONICAL_HOST
-CS_CHECK_MNO_CYGWIN
+CS_PATH_INIT
 
 
 
 #------------------------------------------------------------------------------
 # Check for compilers and linker.
 #------------------------------------------------------------------------------
+CS_CHECK_MNO_CYGWIN
+
 CS_PROG_CC
 CS_PROG_CXX
 CS_PROG_LINK
@@ -1070,7 +1072,13 @@ AS_IF([test $cs_cv_libgl = yes],
         [CS_HEADER_PROPERTY([CS_HAVE_GLHANDLEARB_T])])
     CS_CHECK_OPENGL_TYPE([GLcharARB],
         [CS_HEADER_PROPERTY([CS_HAVE_GLCHARARB_T])]) 
-    CS_CHECK_OPENGL_TYPE([GLchar], [CS_HEADER_PROPERTY([CS_HAVE_GLCHAR_T])])])
+    CS_CHECK_OPENGL_TYPE([GLchar], 
+        [CS_HEADER_PROPERTY([CS_HAVE_GLCHAR_T])])
+    CS_CHECK_OPENGL_TYPE([GLintptr],
+        [CS_HEADER_PROPERTY([CS_HAVE_GLINTPTR_T])])
+    CS_CHECK_OPENGL_TYPE([GLsizeiptr],
+        [CS_HEADER_PROPERTY([CS_HAVE_GLSIZEIPTR_T])])
+    ])
 CS_CHECK_GLU
 CS_CHECK_GLX
 # Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_ present.

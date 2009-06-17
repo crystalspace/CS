@@ -4392,6 +4392,7 @@
           <color red="1" green="1" blue="1" />
           <color red="1" green="1" blue="1" />
           <color red="1" green="1" blue="1" />
+          <lighting>no</lighting>
         </params>
     </meshfact>
     <meshfact name="factory_room_walls">

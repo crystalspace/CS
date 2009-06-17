@@ -37,6 +37,11 @@ AC_DEFUN([CS_PROG_CC],[
 	CS_EMIT_BUILD_PROPERTY([CMD.CC], [$CC])
 	CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$CPPFLAGS $CFLAGS], [+])
 	_CS_COMPILER_NAME([$CC], [C], [$ac_compiler_gnu])
+	AC_MSG_CHECKING([for C compiler version])
+	_CS_COMPILER_VERSION([$CC], [C])
+	AS_IF([test -z "$_CS_COMPILER_VERSION_SH([C])"],
+	    [AC_MSG_RESULT([unknown])],
+	    [AC_MSG_RESULT([$_CS_COMPILER_VERSION_SH([C])])])
 	
 	# Check if compiler recognizes -pipe directive.
 	CS_EMIT_BUILD_FLAGS([if $CC accepts -pipe], [cs_cv_prog_cc_pipe],
@@ -60,6 +65,11 @@ AC_DEFUN([CS_PROG_CXX],[
 	CS_EMIT_BUILD_PROPERTY([CMD.C++], [$CXX])
 	CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS], [$CPPFLAGS $CXXFLAGS], [+])
 	_CS_COMPILER_NAME([$CXX], [C++], [$ac_compiler_gnu])
+	AC_MSG_CHECKING([for C++ compiler version])
+	_CS_COMPILER_VERSION([$CXX], [C++])
+	AS_IF([test -z "$_CS_COMPILER_VERSION_SH([C++])"],
+	    [AC_MSG_RESULT([unknown])],
+	    [AC_MSG_RESULT([$_CS_COMPILER_VERSION_SH([C++])])])
 
         # Check if compiler can be instructed to produce position-independent-code
         # (PIC).  This feature is required by some platforms when building plugin
@@ -111,6 +121,32 @@ AC_DEFUN([_CS_COMPILER_NAME],
 
 AC_DEFUN([_CS_COMPILER_NAME_SH],
     [cs_compiler_name_[]AS_TR_SH(m4_translit([$1],[+A-Z],[xa-z]))])
+
+
+
+#-----------------------------------------------------------------------------
+# _CS_COMPILER_VERSION(COMPILER, LANGUAGE)
+#-----------------------------------------------------------------------------
+AC_DEFUN([_CS_COMPILER_VERSION],
+    [case $_CS_COMPILER_NAME_SH([$2]) in
+        GCC)
+            _CS_COMPILER_VERSION_SH([$2])=`$1 -dumpversion`
+	    CS_EMIT_BUILD_PROPERTY([COMPILER.$2.VERSION],
+	        [$_CS_COMPILER_VERSION_SH([$2])])
+	    CS_EMIT_BUILD_PROPERTY([COMPILER.VERSION],
+	        [$_CS_COMPILER_VERSION_SH([$2])],
+		[], [], [], [Y])
+            _compiler_version_list=`echo $_CS_COMPILER_VERSION_SH([$2]) | sed -e 's/\./ /g'`
+	    CS_EMIT_BUILD_PROPERTY([COMPILER.$2.VERSION_LIST],
+	        [$_compiler_version_list])
+	    CS_EMIT_BUILD_PROPERTY([COMPILER.VERSION_LIST],
+	        [$_compiler_version_list],
+		[], [], [], [Y])
+            ;;
+    esac])
+
+AC_DEFUN([_CS_COMPILER_VERSION_SH],
+    [cs_compiler_version_[]AS_TR_SH(m4_translit([$1],[+A-Z],[xa-z]))])
 
 
 

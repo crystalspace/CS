@@ -25,7 +25,7 @@
 
 half Attenuation_Linear (float d, float invLightRadius)
 {
-  return saturate (1 - d * invLightRadius);
+  return (half)(saturate (1 - d * invLightRadius));
 }
 
 half Attenuation_Inverse (float d)

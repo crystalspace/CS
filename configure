@@ -662,6 +662,8 @@ host
 host_cpu
 host_vendor
 host_os
+CS_TOP_SRCDIR
+CS_TOP_BUILDDIR
 CC
 CFLAGS
 LDFLAGS
@@ -2167,6 +2169,51 @@ IFS=$ac_save_IFS
 case $host_os in *\ *) host_os=`echo "$host_os" | sed 's/ /-/g'`;; esac
 
 
+CS_TOP_SRCDIR=$(
+    cs_indir=`echo "x$srcdir" | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    ac_dir="$cs_indir"
+    pwd -W >/dev/null 2>&1 && ac_pwd_w="pwd -W" || ac_pwd_w=pwd
+    until ac_val=`exec 2>/dev/null; cd "$ac_dir" && $ac_pwd_w`
+    do
+       ac_dir=`$as_dirname -- "$ac_dir" ||
+$as_expr X"$ac_dir" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
+	 X"$ac_dir" : 'X\(//\)[^/]' \| \
+	 X"$ac_dir" : 'X\(//\)$' \| \
+	 X"$ac_dir" : 'X\(/\)' \| . 2>/dev/null ||
+echo X"$ac_dir" |
+    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
+	    s//\1/
+	    q
+	  }
+	  /^X\(\/\/\)[^/].*/{
+	    s//\1/
+	    q
+	  }
+	  /^X\(\/\/\)$/{
+	    s//\1/
+	    q
+	  }
+	  /^X\(\/\).*/{
+	    s//\1/
+	    q
+	  }
+	  s/.*/./; q'`
+    done
+    ac_dir=`echo "$ac_dir" | sed 's?^[./]*??'`
+    ac_val=`echo "$ac_val" | sed 's?/*$??'`
+    cs_outdir=`echo "$cs_indir" | sed "s?^[./]*$ac_dir/*?$ac_val/?"';s?/*$??'`
+    echo $cs_outdir
+    )
+
+    CS_TOP_BUILDDIR=.
+
+
+
+
+
+#------------------------------------------------------------------------------
+# Check for compilers and linker.
+#------------------------------------------------------------------------------
 
     { echo "$as_me:$LINENO: checking whether to enable -mno-cygwin" >&5
 echo $ECHO_N "checking whether to enable -mno-cygwin... $ECHO_C" >&6; }
@@ -2209,11 +2256,6 @@ fi
 echo "${ECHO_T}$cs_mno_cygwin" >&6; }
 
 
-
-
-#------------------------------------------------------------------------------
-# Check for compilers and linker.
-#------------------------------------------------------------------------------
 
 
     CFLAGS="$CFLAGS" # Filter undesired flags
@@ -3172,6 +3214,50 @@ fi
 "
 fi
 
+	{ echo "$as_me:$LINENO: checking for C compiler version" >&5
+echo $ECHO_N "checking for C compiler version... $ECHO_C" >&6; }
+	case $cs_compiler_name_c in
+        GCC)
+            cs_compiler_version_c=`$CC -dumpversion`
+	    cs_build_prop_val="$cs_compiler_version_c"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C.VERSION ?= $cs_build_prop_val ;
+"
+fi
+
+	    cs_build_prop_val="$cs_compiler_version_c"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.VERSION = $cs_build_prop_val ;
+"
+fi
+
+            _compiler_version_list=`echo $cs_compiler_version_c | sed -e 's/\./ /g'`
+	    cs_build_prop_val="$_compiler_version_list"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C.VERSION_LIST ?= $cs_build_prop_val ;
+"
+fi
+
+	    cs_build_prop_val="$_compiler_version_list"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.VERSION_LIST = $cs_build_prop_val ;
+"
+fi
+
+            ;;
+    esac
+	if test -z "$cs_compiler_version_c"; then
+  { echo "$as_me:$LINENO: result: unknown" >&5
+echo "${ECHO_T}unknown" >&6; }
+else
+  { echo "$as_me:$LINENO: result: $cs_compiler_version_c" >&5
+echo "${ECHO_T}$cs_compiler_version_c" >&6; }
+fi
+
 
 	# Check if compiler recognizes -pipe directive.
 	{ echo "$as_me:$LINENO: checking if $CC accepts -pipe" >&5
@@ -3748,6 +3834,50 @@ fi
 "
 fi
 
+	{ echo "$as_me:$LINENO: checking for C++ compiler version" >&5
+echo $ECHO_N "checking for C++ compiler version... $ECHO_C" >&6; }
+	case $cs_compiler_name_cxx in
+        GCC)
+            cs_compiler_version_cxx=`$CXX -dumpversion`
+	    cs_build_prop_val="$cs_compiler_version_cxx"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++.VERSION ?= $cs_build_prop_val ;
+"
+fi
+
+	    cs_build_prop_val="$cs_compiler_version_cxx"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.VERSION = $cs_build_prop_val ;
+"
+fi
+
+            _compiler_version_list=`echo $cs_compiler_version_cxx | sed -e 's/\./ /g'`
+	    cs_build_prop_val="$_compiler_version_list"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++.VERSION_LIST ?= $cs_build_prop_val ;
+"
+fi
+
+	    cs_build_prop_val="$_compiler_version_list"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.VERSION_LIST = $cs_build_prop_val ;
+"
+fi
+
+            ;;
+    esac
+	if test -z "$cs_compiler_version_cxx"; then
+  { echo "$as_me:$LINENO: result: unknown" >&5
+echo "${ECHO_T}unknown" >&6; }
+else
+  { echo "$as_me:$LINENO: result: $cs_compiler_version_cxx" >&5
+echo "${ECHO_T}$cs_compiler_version_cxx" >&6; }
+fi
+
 
         # Check if compiler can be instructed to produce position-independent-code
         # (PIC).  This feature is required by some platforms when building plugin
@@ -4222,18 +4352,21 @@ cs_prog_binutils_min_suffix_done=
 
 
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix= ; }
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0 ; }
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0.0 ; }
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0.0.0 ; }
 
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0.0.0.0 ; }
 
 
 
@@ -4241,30 +4374,37 @@ test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix
 
 
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+
+
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix= ; }
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0 ; }
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0.0 ; }
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0.0.0 ; }
 
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0.0.0.0 ; }
 
-cs_prog_binutils_is_ver_1=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_binutils_is_ver_2=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_binutils_is_ver_3=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-cs_prog_binutils_is_ver_4=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
-cs_prog_binutils_is_ver_5=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
 
-cs_prog_binutils_min_ver_1=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_binutils_min_ver_2=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_binutils_min_ver_3=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-cs_prog_binutils_min_ver_4=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
-cs_prog_binutils_min_ver_5=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_is_ver_1=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_binutils_is_ver_2=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_binutils_is_ver_3=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+cs_prog_binutils_is_ver_4=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
+cs_prog_binutils_is_ver_5=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_is_ver_6=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\6/'`
+
+cs_prog_binutils_min_ver_1=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_binutils_min_ver_2=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_binutils_min_ver_3=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+cs_prog_binutils_min_ver_4=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
+cs_prog_binutils_min_ver_5=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_min_ver_6=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\6/'`
 
 cs_cv_prog_binutils_version_2_17_ok=''
 test -z "$cs_cv_prog_binutils_version_2_17_ok" \
@@ -4296,6 +4436,12 @@ test -z "$cs_cv_prog_binutils_version_2_17_ok" \
     || cs_cv_prog_binutils_version_2_17_ok=no ; }
 test -z "$cs_cv_prog_binutils_version_2_17_ok" \
   && { expr "$cs_prog_binutils_min_ver_5" ">=" "$cs_prog_binutils_is_ver_5" >/dev/null \
+    || cs_cv_prog_binutils_version_2_17_ok=yes ; }
+test -z "$cs_cv_prog_binutils_version_2_17_ok" \
+  && { expr "$cs_prog_binutils_is_ver_6" ">=" "$cs_prog_binutils_min_ver_6" >/dev/null \
+    || cs_cv_prog_binutils_version_2_17_ok=no ; }
+test -z "$cs_cv_prog_binutils_version_2_17_ok" \
+  && { expr "$cs_prog_binutils_min_ver_6" ">=" "$cs_prog_binutils_is_ver_6" >/dev/null \
     || cs_cv_prog_binutils_version_2_17_ok=yes ; }
 
 if test -z "$cs_cv_prog_binutils_version_2_17_ok"; then
@@ -4342,42 +4488,52 @@ cs_prog_binutils_min_suffix_done=
 
 
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix= ; }
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0 ; }
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0.0 ; }
 
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0.0.0 ; }
 
 
 
 
 
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+
+
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix= ; }
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0 ; }
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0.0 ; }
 
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0.0.0 ; }
 
-cs_prog_binutils_is_ver_1=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_binutils_is_ver_2=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_binutils_is_ver_3=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-cs_prog_binutils_is_ver_4=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
-cs_prog_binutils_is_ver_5=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
 
-cs_prog_binutils_min_ver_1=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_binutils_min_ver_2=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_binutils_min_ver_3=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-cs_prog_binutils_min_ver_4=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
-cs_prog_binutils_min_ver_5=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_is_ver_1=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_binutils_is_ver_2=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_binutils_is_ver_3=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+cs_prog_binutils_is_ver_4=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
+cs_prog_binutils_is_ver_5=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_is_ver_6=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\6/'`
+
+cs_prog_binutils_min_ver_1=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_binutils_min_ver_2=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_binutils_min_ver_3=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+cs_prog_binutils_min_ver_4=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
+cs_prog_binutils_min_ver_5=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_min_ver_6=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\6/'`
 
 cs_cv_prog_binutils_version_2_16_91_ok=''
 test -z "$cs_cv_prog_binutils_version_2_16_91_ok" \
@@ -4409,6 +4565,12 @@ test -z "$cs_cv_prog_binutils_version_2_16_91_ok" \
     || cs_cv_prog_binutils_version_2_16_91_ok=no ; }
 test -z "$cs_cv_prog_binutils_version_2_16_91_ok" \
   && { expr "$cs_prog_binutils_min_ver_5" ">=" "$cs_prog_binutils_is_ver_5" >/dev/null \
+    || cs_cv_prog_binutils_version_2_16_91_ok=yes ; }
+test -z "$cs_cv_prog_binutils_version_2_16_91_ok" \
+  && { expr "$cs_prog_binutils_is_ver_6" ">=" "$cs_prog_binutils_min_ver_6" >/dev/null \
+    || cs_cv_prog_binutils_version_2_16_91_ok=no ; }
+test -z "$cs_cv_prog_binutils_version_2_16_91_ok" \
+  && { expr "$cs_prog_binutils_min_ver_6" ">=" "$cs_prog_binutils_is_ver_6" >/dev/null \
     || cs_cv_prog_binutils_version_2_16_91_ok=yes ; }
 
 if test -z "$cs_cv_prog_binutils_version_2_16_91_ok"; then
@@ -9065,23 +9227,23 @@ fi
   ($CSLIBS_CONFIG --cflags $cs_cv_cslibs_compiler) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	       cs_cv_cslibs_lflags=`{ (echo "$as_me:$LINENO: \$CSLIBS_CONFIG --lflags \$cs_cv_cslibs_compiler") >&5
   ($CSLIBS_CONFIG --lflags $cs_cv_cslibs_compiler) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	       cs_cv_cslibs_binpath=`{ (echo "$as_me:$LINENO: \$CSLIBS_CONFIG --binpath \$cs_cv_cslibs_compiler") >&5
   ($CSLIBS_CONFIG --binpath $cs_cv_cslibs_compiler) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
                if $CSLIBS_CONFIG --incpath >/dev/null 2>&1; then
   cs_cv_cslibs_incpath=`{ (echo "$as_me:$LINENO: \$CSLIBS_CONFIG --incpath \$cs_cv_cslibs_compiler") >&5
   ($CSLIBS_CONFIG --incpath $cs_cv_cslibs_compiler) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 else
   cs_cv_cslibs_incpath=''
 fi
@@ -9091,7 +9253,7 @@ fi
   ($CSLIBS_CONFIG --pcpath $cs_cv_cslibs_compiler) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 else
   cs_cv_cslibs_pcpath=''
 fi
@@ -14135,7 +14297,7 @@ else
 		print "-I" + distutils.sysconfig.get_python_inc()') 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	    cs_cv_pybase_cflags="$cs_cv_pybase_cflags \
 		$cs_cv_prog_cxx_ignore_long_double"
 
@@ -14150,14 +14312,14 @@ else
 		print distutils.sysconfig.get_python_lib(0,1)') 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	    cs_cv_pybase_sysprefix=`{ (echo "$as_me:$LINENO: \$PYTHON -c \\
 		'import sys; print sys.prefix'") >&5
   ($PYTHON -c \
 		'import sys; print sys.prefix') 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	    cs_cv_pybase_lflags_base=''
 	    if test -d "$cs_cv_pybase_syslib"; then
   cs_cv_pybase_lflags_base="$cs_cv_pybase_lflags_base -L$cs_cv_pybase_syslib"
@@ -14187,7 +14349,7 @@ fi
 		      (distutils.sysconfig.get_config_var("SYSLIBS") or "")') 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 
 	    cs_cv_python_ext=`{ (echo "$as_me:$LINENO: \$PYTHON -c \\
 		'import distutils.sysconfig; \\
@@ -25549,18 +25711,21 @@ cs_prog_binutils_min_suffix_done=
 
 
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix= ; }
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0 ; }
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0.0 ; }
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0.0.0 ; }
 
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0.0.0.0 ; }
 
 
 
@@ -25568,30 +25733,37 @@ test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix
 
 
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+
+
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix= ; }
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0 ; }
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0.0 ; }
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0.0.0 ; }
 
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.17 | sed '/[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0.0.0.0 ; }
 
-cs_prog_binutils_is_ver_1=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_binutils_is_ver_2=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_binutils_is_ver_3=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-cs_prog_binutils_is_ver_4=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
-cs_prog_binutils_is_ver_5=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
 
-cs_prog_binutils_min_ver_1=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_binutils_min_ver_2=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_binutils_min_ver_3=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-cs_prog_binutils_min_ver_4=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
-cs_prog_binutils_min_ver_5=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_is_ver_1=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_binutils_is_ver_2=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_binutils_is_ver_3=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+cs_prog_binutils_is_ver_4=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
+cs_prog_binutils_is_ver_5=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_is_ver_6=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\6/'`
+
+cs_prog_binutils_min_ver_1=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_binutils_min_ver_2=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_binutils_min_ver_3=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+cs_prog_binutils_min_ver_4=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
+cs_prog_binutils_min_ver_5=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_min_ver_6=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\6/'`
 
 cs_cv_prog_binutils_version_2_17_ok=''
 test -z "$cs_cv_prog_binutils_version_2_17_ok" \
@@ -25623,6 +25795,12 @@ test -z "$cs_cv_prog_binutils_version_2_17_ok" \
     || cs_cv_prog_binutils_version_2_17_ok=no ; }
 test -z "$cs_cv_prog_binutils_version_2_17_ok" \
   && { expr "$cs_prog_binutils_min_ver_5" ">=" "$cs_prog_binutils_is_ver_5" >/dev/null \
+    || cs_cv_prog_binutils_version_2_17_ok=yes ; }
+test -z "$cs_cv_prog_binutils_version_2_17_ok" \
+  && { expr "$cs_prog_binutils_is_ver_6" ">=" "$cs_prog_binutils_min_ver_6" >/dev/null \
+    || cs_cv_prog_binutils_version_2_17_ok=no ; }
+test -z "$cs_cv_prog_binutils_version_2_17_ok" \
+  && { expr "$cs_prog_binutils_min_ver_6" ">=" "$cs_prog_binutils_is_ver_6" >/dev/null \
     || cs_cv_prog_binutils_version_2_17_ok=yes ; }
 
 if test -z "$cs_cv_prog_binutils_version_2_17_ok"; then
@@ -25669,42 +25847,52 @@ cs_prog_binutils_min_suffix_done=
 
 
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix= ; }
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0 ; }
 
-test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0.0 ; }
 
+test -z $cs_cv_prog_binutils_is_version && cs_cv_prog_binutils_is_version=`$LD -v | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_cv_prog_binutils_is_version" && test -z $cs_prog_binutils_is_suffix_done  && { cs_prog_binutils_is_suffix_done=yes ; cs_prog_binutils_is_suffix=.0.0.0 ; }
 
 
 
 
 
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+
+
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix= ; }
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0 ; }
 
-test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
 test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0.0 ; }
 
+test -z $cs_prog_binutils_min_version && cs_prog_binutils_min_version=`echo 2.16.91 | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/;q'`
+test -n "$cs_prog_binutils_min_version" && test -z $cs_prog_binutils_min_suffix_done  && { cs_prog_binutils_min_suffix_done=yes ; cs_prog_binutils_min_suffix=.0.0.0 ; }
 
-cs_prog_binutils_is_ver_1=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_binutils_is_ver_2=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_binutils_is_ver_3=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-cs_prog_binutils_is_ver_4=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
-cs_prog_binutils_is_ver_5=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
 
-cs_prog_binutils_min_ver_1=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
-cs_prog_binutils_min_ver_2=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
-cs_prog_binutils_min_ver_3=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
-cs_prog_binutils_min_ver_4=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
-cs_prog_binutils_min_ver_5=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_is_ver_1=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_binutils_is_ver_2=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_binutils_is_ver_3=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+cs_prog_binutils_is_ver_4=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
+cs_prog_binutils_is_ver_5=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_is_ver_6=`echo ${cs_cv_prog_binutils_is_version}${cs_prog_binutils_is_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\6/'`
+
+cs_prog_binutils_min_ver_1=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\1/'`
+cs_prog_binutils_min_ver_2=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\2/'`
+cs_prog_binutils_min_ver_3=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\3/'`
+cs_prog_binutils_min_ver_4=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\4/'`
+cs_prog_binutils_min_ver_5=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\5/'`
+cs_prog_binutils_min_ver_6=`echo $cs_prog_binutils_min_version${cs_prog_binutils_min_suffix} | sed '/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/!d;s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\)\.\([0-9][0-9]*\).*/\6/'`
 
 cs_cv_prog_binutils_version_2_16_91_ok=''
 test -z "$cs_cv_prog_binutils_version_2_16_91_ok" \
@@ -25736,6 +25924,12 @@ test -z "$cs_cv_prog_binutils_version_2_16_91_ok" \
     || cs_cv_prog_binutils_version_2_16_91_ok=no ; }
 test -z "$cs_cv_prog_binutils_version_2_16_91_ok" \
   && { expr "$cs_prog_binutils_min_ver_5" ">=" "$cs_prog_binutils_is_ver_5" >/dev/null \
+    || cs_cv_prog_binutils_version_2_16_91_ok=yes ; }
+test -z "$cs_cv_prog_binutils_version_2_16_91_ok" \
+  && { expr "$cs_prog_binutils_is_ver_6" ">=" "$cs_prog_binutils_min_ver_6" >/dev/null \
+    || cs_cv_prog_binutils_version_2_16_91_ok=no ; }
+test -z "$cs_cv_prog_binutils_version_2_16_91_ok" \
+  && { expr "$cs_prog_binutils_min_ver_6" ">=" "$cs_prog_binutils_is_ver_6" >/dev/null \
     || cs_cv_prog_binutils_version_2_16_91_ok=yes ; }
 
 if test -z "$cs_cv_prog_binutils_version_2_16_91_ok"; then
@@ -27240,13 +27434,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_x11" >&6; }
   ($PKG_CONFIG --cflags x11) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs x11") >&5
   ($PKG_CONFIG --libs x11) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_x11_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -27382,13 +27576,13 @@ fi
   ($CONFIG_X11 --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_X11 --libs ") >&5
   ($CONFIG_X11 --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_x11_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -28038,13 +28232,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_xext" >&6; }
   ($PKG_CONFIG --cflags xext) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs xext") >&5
   ($PKG_CONFIG --libs xext) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_xext_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -28180,13 +28374,13 @@ fi
   ($CONFIG_XEXT --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_XEXT --libs ") >&5
   ($CONFIG_XEXT --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_xext_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -30195,13 +30389,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_xxf86vm" >&6; }
   ($PKG_CONFIG --cflags xxf86vm) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs xxf86vm") >&5
   ($PKG_CONFIG --libs xxf86vm) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_xxf86vm_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -30337,13 +30531,13 @@ fi
   ($CONFIG_XXF86VM --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_XXF86VM --libs ") >&5
   ($CONFIG_XXF86VM --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_xxf86vm_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -30502,13 +30696,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_Xxf86vm" >&6; }
   ($PKG_CONFIG --cflags Xxf86vm) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs Xxf86vm") >&5
   ($PKG_CONFIG --libs Xxf86vm) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_Xxf86vm_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -30644,13 +30838,13 @@ fi
   ($CONFIG_XXF86VM --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_XXF86VM --libs ") >&5
   ($CONFIG_XXF86VM --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_Xxf86vm_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -31429,13 +31623,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_xaw7" >&6; }
   ($PKG_CONFIG --cflags xaw7) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs xaw7") >&5
   ($PKG_CONFIG --libs xaw7) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_xaw7_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -31571,13 +31765,13 @@ fi
   ($CONFIG_XAW7 --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_XAW7 --libs ") >&5
   ($CONFIG_XAW7 --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_xaw7_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -31736,13 +31930,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_Xaw" >&6; }
   ($PKG_CONFIG --cflags Xaw) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs Xaw") >&5
   ($PKG_CONFIG --libs Xaw) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_Xaw_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -31878,13 +32072,13 @@ fi
   ($CONFIG_XAW --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_XAW --libs ") >&5
   ($CONFIG_XAW --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_Xaw_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -34056,6 +34250,687 @@ else
 	cs_cv_libgl_GLchar_libs=''
 
 fi
+
+    if test "" != yes; then
+  { echo "$as_me:$LINENO: checking for GLintptr" >&5
+echo $ECHO_N "checking for GLintptr... $ECHO_C" >&6; }
+if test "${cs_cv_libgl_GLintptr+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#if HAVE_WINDOWS_H
+    #if !HAVE_TYPE_INT32
+    typedef long int32;
+    #endif
+    #include <windows.h>
+    #endif
+    #ifndef CS_HEADER_GLOBAL
+    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    #endif
+    #ifdef CS_OPENGL_PATH
+    #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+    #else
+    #include <GL/gl.h>
+    #endif
+int
+main ()
+{
+GLintptr x; (void)x;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libgl_GLintptr=yes
+		cs_cv_libgl_GLintptr_cflags=$cs_build_cflags
+		cs_cv_libgl_GLintptr_lflags=$cs_build_lflags
+		cs_cv_libgl_GLintptr_libs=$cs_build_libs
+else
+  cs_cv_libgl_GLintptr=no
+fi
+
+fi
+{ echo "$as_me:$LINENO: result: $cs_cv_libgl_GLintptr" >&5
+echo "${ECHO_T}$cs_cv_libgl_GLintptr" >&6; }
+else
+  { echo "$as_me:$LINENO: checking for GLintptr" >&5
+echo $ECHO_N "checking for GLintptr... $ECHO_C" >&6; }
+	    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#if HAVE_WINDOWS_H
+    #if !HAVE_TYPE_INT32
+    typedef long int32;
+    #endif
+    #include <windows.h>
+    #endif
+    #ifndef CS_HEADER_GLOBAL
+    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    #endif
+    #ifdef CS_OPENGL_PATH
+    #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+    #else
+    #include <GL/gl.h>
+    #endif
+int
+main ()
+{
+GLintptr x; (void)x;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libgl_GLintptr=yes
+		cs_cv_libgl_GLintptr_cflags=$cs_build_cflags
+		cs_cv_libgl_GLintptr_lflags=$cs_build_lflags
+		cs_cv_libgl_GLintptr_libs=$cs_build_libs
+else
+  cs_cv_libgl_GLintptr=no
+fi
+
+	    { echo "$as_me:$LINENO: result: $cs_cv_libgl_GLintptr" >&5
+echo "${ECHO_T}$cs_cv_libgl_GLintptr" >&6; }
+fi
+
+    if test $cs_cv_libgl_GLintptr = yes; then
+  cs_header_text="${cs_header_text}#define CS_HAVE_GLINTPTR_T
+"
+else
+  cs_cv_libgl_GLintptr_cflags=''
+	cs_cv_libgl_GLintptr_lflags=''
+	cs_cv_libgl_GLintptr_libs=''
+
+fi
+
+    if test "" != yes; then
+  { echo "$as_me:$LINENO: checking for GLsizeiptr" >&5
+echo $ECHO_N "checking for GLsizeiptr... $ECHO_C" >&6; }
+if test "${cs_cv_libgl_GLsizeiptr+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#if HAVE_WINDOWS_H
+    #if !HAVE_TYPE_INT32
+    typedef long int32;
+    #endif
+    #include <windows.h>
+    #endif
+    #ifndef CS_HEADER_GLOBAL
+    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    #endif
+    #ifdef CS_OPENGL_PATH
+    #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+    #else
+    #include <GL/gl.h>
+    #endif
+int
+main ()
+{
+GLsizeiptr x; (void)x;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libgl_GLsizeiptr=yes
+		cs_cv_libgl_GLsizeiptr_cflags=$cs_build_cflags
+		cs_cv_libgl_GLsizeiptr_lflags=$cs_build_lflags
+		cs_cv_libgl_GLsizeiptr_libs=$cs_build_libs
+else
+  cs_cv_libgl_GLsizeiptr=no
+fi
+
+fi
+{ echo "$as_me:$LINENO: result: $cs_cv_libgl_GLsizeiptr" >&5
+echo "${ECHO_T}$cs_cv_libgl_GLsizeiptr" >&6; }
+else
+  { echo "$as_me:$LINENO: checking for GLsizeiptr" >&5
+echo $ECHO_N "checking for GLsizeiptr... $ECHO_C" >&6; }
+	    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test $cs_cv_libgl_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libgl_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libgl_libs $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#if HAVE_WINDOWS_H
+    #if !HAVE_TYPE_INT32
+    typedef long int32;
+    #endif
+    #include <windows.h>
+    #endif
+    #ifndef CS_HEADER_GLOBAL
+    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    #endif
+    #ifdef CS_OPENGL_PATH
+    #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+    #else
+    #include <GL/gl.h>
+    #endif
+int
+main ()
+{
+GLsizeiptr x; (void)x;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  cs_build_ok=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+	if test $cs_build_ok = yes; then
+  break
+fi
+
+    done
+
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libgl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libgl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libgl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libgl_GLsizeiptr=yes
+		cs_cv_libgl_GLsizeiptr_cflags=$cs_build_cflags
+		cs_cv_libgl_GLsizeiptr_lflags=$cs_build_lflags
+		cs_cv_libgl_GLsizeiptr_libs=$cs_build_libs
+else
+  cs_cv_libgl_GLsizeiptr=no
+fi
+
+	    { echo "$as_me:$LINENO: result: $cs_cv_libgl_GLsizeiptr" >&5
+echo "${ECHO_T}$cs_cv_libgl_GLsizeiptr" >&6; }
+fi
+
+    if test $cs_cv_libgl_GLsizeiptr = yes; then
+  cs_header_text="${cs_header_text}#define CS_HAVE_GLSIZEIPTR_T
+"
+else
+  cs_cv_libgl_GLsizeiptr_cflags=''
+	cs_cv_libgl_GLsizeiptr_lflags=''
+	cs_cv_libgl_GLsizeiptr_libs=''
+
+fi
+
 
 fi
 
@@ -36452,13 +37327,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_z" >&6; }
   ($PKG_CONFIG --cflags z) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs z") >&5
   ($PKG_CONFIG --libs z) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_z_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -36594,13 +37469,13 @@ fi
   ($CONFIG_Z --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_Z --libs ") >&5
   ($CONFIG_Z --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_z_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -36759,13 +37634,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_zlib" >&6; }
   ($PKG_CONFIG --cflags zlib) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs zlib") >&5
   ($PKG_CONFIG --libs zlib) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_zlib_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -36901,13 +37776,13 @@ fi
   ($CONFIG_ZLIB --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_ZLIB --libs ") >&5
   ($CONFIG_ZLIB --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_zlib_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -37695,13 +38570,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_png" >&6; }
   ($PKG_CONFIG --cflags png) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs png") >&5
   ($PKG_CONFIG --libs png) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_png_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -37837,13 +38712,13 @@ fi
   ($CONFIG_PNG --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_PNG --libs ") >&5
   ($CONFIG_PNG --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_png_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -38002,13 +38877,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_libpng" >&6; }
   ($PKG_CONFIG --cflags libpng) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs libpng") >&5
   ($PKG_CONFIG --libs libpng) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_libpng_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -38144,13 +39019,13 @@ fi
   ($CONFIG_LIBPNG --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_LIBPNG --libs ") >&5
   ($CONFIG_LIBPNG --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_libpng_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -38932,13 +39807,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_jpeg" >&6; }
   ($PKG_CONFIG --cflags jpeg) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs jpeg") >&5
   ($PKG_CONFIG --libs jpeg) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_jpeg_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -39074,13 +39949,13 @@ fi
   ($CONFIG_JPEG --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_JPEG --libs ") >&5
   ($CONFIG_JPEG --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_jpeg_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -39239,13 +40114,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_libjpeg" >&6; }
   ($PKG_CONFIG --cflags libjpeg) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs libjpeg") >&5
   ($PKG_CONFIG --libs libjpeg) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_libjpeg_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -39381,13 +40256,13 @@ fi
   ($CONFIG_LIBJPEG --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_LIBJPEG --libs ") >&5
   ($CONFIG_LIBJPEG --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_libjpeg_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -40173,13 +41048,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_lcms" >&6; }
   ($PKG_CONFIG --cflags lcms) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs lcms") >&5
   ($PKG_CONFIG --libs lcms) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_lcms_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -40315,13 +41190,13 @@ fi
   ($CONFIG_LCMS --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_LCMS --libs ") >&5
   ($CONFIG_LCMS --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_lcms_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -40965,13 +41840,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_mng" >&6; }
   ($PKG_CONFIG --cflags mng) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs mng") >&5
   ($PKG_CONFIG --libs mng) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_mng_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -41107,13 +41982,13 @@ fi
   ($CONFIG_MNG --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_MNG --libs ") >&5
   ($CONFIG_MNG --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_mng_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -41272,13 +42147,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_libmng" >&6; }
   ($PKG_CONFIG --cflags libmng) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs libmng") >&5
   ($PKG_CONFIG --libs libmng) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_libmng_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -41414,13 +42289,13 @@ fi
   ($CONFIG_LIBMNG --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_LIBMNG --libs ") >&5
   ($CONFIG_LIBMNG --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_libmng_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -42199,13 +43074,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_cairo" >&6; }
   ($PKG_CONFIG --cflags cairo) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs cairo") >&5
   ($PKG_CONFIG --libs cairo) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_cairo_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -42341,13 +43216,13 @@ fi
   ($CONFIG_CAIRO --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CAIRO --libs ") >&5
   ($CONFIG_CAIRO --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_cairo_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -43017,13 +43892,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_cairomm" >&6; }
   ($PKG_CONFIG --cflags cairomm) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs cairomm") >&5
   ($PKG_CONFIG --libs cairomm) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_cairomm_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -43159,13 +44034,13 @@ fi
   ($CONFIG_CAIROMM --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CAIROMM --libs ") >&5
   ($CONFIG_CAIROMM --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_cairomm_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -43324,13 +44199,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_cairomm_1" >&6; }
   ($PKG_CONFIG --cflags cairomm-1) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs cairomm-1") >&5
   ($PKG_CONFIG --libs cairomm-1) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_cairomm_1_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -43466,13 +44341,13 @@ fi
   ($CONFIG_CAIROMM_1 --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CAIROMM_1 --libs ") >&5
   ($CONFIG_CAIROMM_1 --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_cairomm_1_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -43631,13 +44506,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_cairomm_1_0" >&6; }
   ($PKG_CONFIG --cflags cairomm-1.0) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs cairomm-1.0") >&5
   ($PKG_CONFIG --libs cairomm-1.0) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_cairomm_1_0_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -43773,13 +44648,13 @@ fi
   ($CONFIG_CAIROMM_1_0 --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CAIROMM_1_0 --libs ") >&5
   ($CONFIG_CAIROMM_1_0 --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_cairomm_1_0_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -44657,13 +45532,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_vgvm" >&6; }
   ($PKG_CONFIG --cflags vgvm) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs vgvm") >&5
   ($PKG_CONFIG --libs vgvm) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_vgvm_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -44799,13 +45674,13 @@ fi
   ($CONFIG_VGVM --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_VGVM --libs ") >&5
   ($CONFIG_VGVM --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_vgvm_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -45481,13 +46356,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_ogg" >&6; }
   ($PKG_CONFIG --cflags ogg) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs ogg") >&5
   ($PKG_CONFIG --libs ogg) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_ogg_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -45623,13 +46498,13 @@ fi
   ($CONFIG_OGG --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_OGG --libs ") >&5
   ($CONFIG_OGG --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_ogg_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -46300,13 +47175,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_vorbis" >&6; }
   ($PKG_CONFIG --cflags vorbis) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs vorbis") >&5
   ($PKG_CONFIG --libs vorbis) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_vorbis_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -46442,13 +47317,13 @@ fi
   ($CONFIG_VORBIS --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_VORBIS --libs ") >&5
   ($CONFIG_VORBIS --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_vorbis_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -47121,13 +47996,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_vorbisfile" >&6; }
   ($PKG_CONFIG --cflags vorbisfile) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs vorbisfile") >&5
   ($PKG_CONFIG --libs vorbisfile) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_vorbisfile_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -47263,13 +48138,13 @@ fi
   ($CONFIG_VORBISFILE --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_VORBISFILE --libs ") >&5
   ($CONFIG_VORBISFILE --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_vorbisfile_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -47953,13 +48828,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_3ds" >&6; }
   ($PKG_CONFIG --cflags 3ds) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs 3ds") >&5
   ($PKG_CONFIG --libs 3ds) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_3ds_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -48095,13 +48970,13 @@ fi
   ($CONFIG_3DS --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_3DS --libs ") >&5
   ($CONFIG_3DS --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_3ds_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -48260,13 +49135,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_lib3ds" >&6; }
   ($PKG_CONFIG --cflags lib3ds) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs lib3ds") >&5
   ($PKG_CONFIG --libs lib3ds) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_lib3ds_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -48402,13 +49277,13 @@ fi
   ($CONFIG_LIB3DS --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_LIB3DS --libs ") >&5
   ($CONFIG_LIB3DS --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_lib3ds_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -48567,13 +49442,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_lib3ds_120" >&6; }
   ($PKG_CONFIG --cflags lib3ds-120) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs lib3ds-120") >&5
   ($PKG_CONFIG --libs lib3ds-120) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_lib3ds_120_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -48709,13 +49584,13 @@ fi
   ($CONFIG_LIB3DS_120 --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_LIB3DS_120 --libs ") >&5
   ($CONFIG_LIB3DS_120 --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_lib3ds_120_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -50233,13 +51108,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_ode" >&6; }
   ($PKG_CONFIG --cflags ode) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs ode") >&5
   ($PKG_CONFIG --libs ode) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_ode_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -50375,13 +51250,13 @@ fi
   ($CONFIG_ODE --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_ODE --libs ") >&5
   ($CONFIG_ODE --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_ode_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -51690,13 +52565,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_bullet" >&6; }
   ($PKG_CONFIG --cflags bullet) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs bullet") >&5
   ($PKG_CONFIG --libs bullet) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_bullet_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -51832,13 +52707,13 @@ fi
   ($CONFIG_BULLET --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_BULLET --libs ") >&5
   ($CONFIG_BULLET --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_bullet_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -51997,13 +52872,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_bulletdynamics" >&6; }
   ($PKG_CONFIG --cflags bulletdynamics) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs bulletdynamics") >&5
   ($PKG_CONFIG --libs bulletdynamics) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_bulletdynamics_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -52139,13 +53014,13 @@ fi
   ($CONFIG_BULLETDYNAMICS --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_BULLETDYNAMICS --libs ") >&5
   ($CONFIG_BULLETDYNAMICS --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_bulletdynamics_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -53624,13 +54499,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_freetype2" >&6; }
   ($PKG_CONFIG --cflags freetype2) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs freetype2") >&5
   ($PKG_CONFIG --libs freetype2) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_freetype2_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -53766,13 +54641,13 @@ fi
   ($CONFIG_FREETYPE2 --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_FREETYPE2 --libs ") >&5
   ($CONFIG_FREETYPE2 --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_freetype2_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -53931,13 +54806,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_freetype" >&6; }
   ($PKG_CONFIG --cflags freetype) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs freetype") >&5
   ($PKG_CONFIG --libs freetype) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_freetype_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -54073,13 +54948,13 @@ fi
   ($CONFIG_FREETYPE --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_FREETYPE --libs ") >&5
   ($CONFIG_FREETYPE --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_freetype_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -55362,13 +56237,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_cal3d" >&6; }
   ($PKG_CONFIG --cflags cal3d) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs cal3d") >&5
   ($PKG_CONFIG --libs cal3d) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_cal3d_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -55504,13 +56379,13 @@ fi
   ($CONFIG_CAL3D --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CAL3D --libs ") >&5
   ($CONFIG_CAL3D --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_cal3d_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -56497,13 +57372,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_sdl" >&6; }
   ($PKG_CONFIG --cflags sdl) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs sdl") >&5
   ($PKG_CONFIG --libs sdl) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_sdl_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -56639,13 +57514,13 @@ fi
   ($CONFIG_SDL --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_SDL --libs ") >&5
   ($CONFIG_SDL --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_sdl_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -57646,13 +58521,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_wx" >&6; }
   ($PKG_CONFIG --cflags wx) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs wx") >&5
   ($PKG_CONFIG --libs wx) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_wx_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -57788,13 +58663,13 @@ fi
   ($CONFIG_WX --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_WX --libs ") >&5
   ($CONFIG_WX --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_wx_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -58268,7 +59143,7 @@ if test $cs_cv_libwx = yes; then
   ($CONFIG_WX --gl-libs) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 else
   cs_cv_libwx_gllibs=''
 fi
@@ -58837,13 +59712,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_CEGUI" >&6; }
   ($PKG_CONFIG --cflags CEGUI) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs CEGUI") >&5
   ($PKG_CONFIG --libs CEGUI) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_CEGUI_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -58979,13 +59854,13 @@ fi
   ($CONFIG_CEGUI --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CEGUI --libs ") >&5
   ($CONFIG_CEGUI --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_CEGUI_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -59144,13 +60019,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_CEGUIBase" >&6; }
   ($PKG_CONFIG --cflags CEGUIBase) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs CEGUIBase") >&5
   ($PKG_CONFIG --libs CEGUIBase) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_CEGUIBase_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -59286,13 +60161,13 @@ fi
   ($CONFIG_CEGUIBASE --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CEGUIBASE --libs ") >&5
   ($CONFIG_CEGUIBASE --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_CEGUIBase_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -60391,13 +61266,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_GTK" >&6; }
   ($PKG_CONFIG --cflags GTK) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs GTK") >&5
   ($PKG_CONFIG --libs GTK) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_GTK_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -60533,13 +61408,13 @@ fi
   ($CONFIG_GTK --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_GTK --libs ") >&5
   ($CONFIG_GTK --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_GTK_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -60698,13 +61573,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_gtkp_2_0" >&6; }
   ($PKG_CONFIG --cflags gtk+-2.0) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs gtk+-2.0") >&5
   ($PKG_CONFIG --libs gtk+-2.0) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_gtkp_2_0_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -60840,13 +61715,13 @@ fi
   ($CONFIG_GTKP_2_0 --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_GTKP_2_0 --libs ") >&5
   ($CONFIG_GTKP_2_0 --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_gtkp_2_0_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -62311,13 +63186,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_Cg" >&6; }
   ($PKG_CONFIG --cflags Cg) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs Cg") >&5
   ($PKG_CONFIG --libs Cg) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_Cg_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -62453,13 +63328,13 @@ fi
   ($CONFIG_CG --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CG --libs ") >&5
   ($CONFIG_CG --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_Cg_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -62618,13 +63493,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_cg" >&6; }
   ($PKG_CONFIG --cflags cg) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs cg") >&5
   ($PKG_CONFIG --libs cg) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_cg_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -62760,13 +63635,13 @@ fi
   ($CONFIG_CG --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CG --libs ") >&5
   ($CONFIG_CG --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_cg_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -62925,13 +63800,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_CG" >&6; }
   ($PKG_CONFIG --cflags CG) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs CG") >&5
   ($PKG_CONFIG --libs CG) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_CG_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -63067,13 +63942,13 @@ fi
   ($CONFIG_CG --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CG --libs ") >&5
   ($CONFIG_CG --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_CG_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -64245,13 +65120,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_CgGL" >&6; }
   ($PKG_CONFIG --cflags CgGL) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs CgGL") >&5
   ($PKG_CONFIG --libs CgGL) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_CgGL_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -64387,13 +65262,13 @@ fi
   ($CONFIG_CGGL --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CGGL --libs ") >&5
   ($CONFIG_CGGL --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_CgGL_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -64552,13 +65427,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_cggl" >&6; }
   ($PKG_CONFIG --cflags cggl) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs cggl") >&5
   ($PKG_CONFIG --libs cggl) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_cggl_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -64694,13 +65569,13 @@ fi
   ($CONFIG_CGGL --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CGGL --libs ") >&5
   ($CONFIG_CGGL --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_cggl_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -64859,13 +65734,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_cgGL" >&6; }
   ($PKG_CONFIG --cflags cgGL) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs cgGL") >&5
   ($PKG_CONFIG --libs cgGL) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_cgGL_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -65001,13 +65876,13 @@ fi
   ($CONFIG_CGGL --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CGGL --libs ") >&5
   ($CONFIG_CGGL --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_cgGL_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -65166,13 +66041,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_CGGL" >&6; }
   ($PKG_CONFIG --cflags CGGL) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs CGGL") >&5
   ($PKG_CONFIG --libs CGGL) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_CGGL_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -65308,13 +66183,13 @@ fi
   ($CONFIG_CGGL --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CGGL --libs ") >&5
   ($CONFIG_CGGL --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_CGGL_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -65473,13 +66348,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_Cg" >&6; }
   ($PKG_CONFIG --cflags Cg) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs Cg") >&5
   ($PKG_CONFIG --libs Cg) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_Cg_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -65615,13 +66490,13 @@ fi
   ($CONFIG_CG --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CG --libs ") >&5
   ($CONFIG_CG --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_Cg_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -65780,13 +66655,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_cg" >&6; }
   ($PKG_CONFIG --cflags cg) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs cg") >&5
   ($PKG_CONFIG --libs cg) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_cg_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -65922,13 +66797,13 @@ fi
   ($CONFIG_CG --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CG --libs ") >&5
   ($CONFIG_CG --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_cg_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -66087,13 +66962,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_CG" >&6; }
   ($PKG_CONFIG --cflags CG) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs CG") >&5
   ($PKG_CONFIG --libs CG) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_CG_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -66229,13 +67104,13 @@ fi
   ($CONFIG_CG --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CG --libs ") >&5
   ($CONFIG_CG --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_CG_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -67976,13 +68851,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_jackasyn" >&6; }
   ($PKG_CONFIG --cflags jackasyn) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs jackasyn") >&5
   ($PKG_CONFIG --libs jackasyn) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_jackasyn_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -68118,13 +68993,13 @@ fi
   ($CONFIG_JACKASYN --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_JACKASYN --libs ") >&5
   ($CONFIG_JACKASYN --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_jackasyn_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -68804,13 +69679,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_asound" >&6; }
   ($PKG_CONFIG --cflags asound) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs asound") >&5
   ($PKG_CONFIG --libs asound) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_asound_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -68946,13 +69821,13 @@ fi
   ($CONFIG_ASOUND --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_ASOUND --libs ") >&5
   ($CONFIG_ASOUND --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_asound_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -69631,13 +70506,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_cucul" >&6; }
   ($PKG_CONFIG --cflags cucul) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs cucul") >&5
   ($PKG_CONFIG --libs cucul) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_cucul_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -69773,13 +70648,13 @@ fi
   ($CONFIG_CUCUL --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CUCUL --libs ") >&5
   ($CONFIG_CUCUL --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_cucul_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -69938,13 +70813,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_libcucul" >&6; }
   ($PKG_CONFIG --cflags libcucul) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs libcucul") >&5
   ($PKG_CONFIG --libs libcucul) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_libcucul_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -70080,13 +70955,13 @@ fi
   ($CONFIG_LIBCUCUL --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_LIBCUCUL --libs ") >&5
   ($CONFIG_LIBCUCUL --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_libcucul_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -70860,13 +71735,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_caca" >&6; }
   ($PKG_CONFIG --cflags caca) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs caca") >&5
   ($PKG_CONFIG --libs caca) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_caca_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -71002,13 +71877,13 @@ fi
   ($CONFIG_CACA --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CACA --libs ") >&5
   ($CONFIG_CACA --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_caca_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -71167,13 +72042,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_libcaca" >&6; }
   ($PKG_CONFIG --cflags libcaca) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs libcaca") >&5
   ($PKG_CONFIG --libs libcaca) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_libcaca_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -71309,13 +72184,13 @@ fi
   ($CONFIG_LIBCACA --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_LIBCACA --libs ") >&5
   ($CONFIG_LIBCACA --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_libcaca_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -75542,13 +76417,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_cppunit" >&6; }
   ($PKG_CONFIG --cflags cppunit) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs cppunit") >&5
   ($PKG_CONFIG --libs cppunit) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_cppunit_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -75684,13 +76559,13 @@ fi
   ($CONFIG_CPPUNIT --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_CPPUNIT --libs ") >&5
   ($CONFIG_CPPUNIT --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_cppunit_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -86697,13 +87572,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_bfd" >&6; }
   ($PKG_CONFIG --cflags bfd) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs bfd") >&5
   ($PKG_CONFIG --libs bfd) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_bfd_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -86839,13 +87714,13 @@ fi
   ($CONFIG_BFD --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_BFD --libs ") >&5
   ($CONFIG_BFD --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_bfd_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -88061,13 +88936,13 @@ echo "${ECHO_T}$cs_cv_prog_pkg_config_bfd" >&6; }
   ($PKG_CONFIG --cflags bfd) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$PKG_CONFIG --libs bfd") >&5
   ($PKG_CONFIG --libs bfd) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_pkg_config_bfd_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -88203,13 +89078,13 @@ fi
   ($CONFIG_BFD --cflags ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_check_lib_lflag=''
 	cs_check_lib_libs=`{ (echo "$as_me:$LINENO: \$CONFIG_BFD --libs ") >&5
   ($CONFIG_BFD --libs ) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_config_bfd_flags=`echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`
 fi
 
@@ -90218,6 +91093,8 @@ host!$host$ac_delim
 host_cpu!$host_cpu$ac_delim
 host_vendor!$host_vendor$ac_delim
 host_os!$host_os$ac_delim
+CS_TOP_SRCDIR!$CS_TOP_SRCDIR$ac_delim
+CS_TOP_BUILDDIR!$CS_TOP_BUILDDIR$ac_delim
 CC!$CC$ac_delim
 CFLAGS!$CFLAGS$ac_delim
 LDFLAGS!$LDFLAGS$ac_delim
@@ -90268,8 +91145,6 @@ HHC!$HHC$ac_delim
 ac_ct_HHC!$ac_ct_HHC$ac_delim
 SWIG!$SWIG$ac_delim
 RSVG!$RSVG$ac_delim
-ICOTOOL!$ICOTOOL$ac_delim
-CONVERT!$CONVERT$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -90311,6 +91186,8 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+ICOTOOL!$ICOTOOL$ac_delim
+CONVERT!$CONVERT$ac_delim
 RELAYTOOL!$RELAYTOOL$ac_delim
 JAM!$JAM$ac_delim
 MAKE!$MAKE$ac_delim
@@ -90406,8 +91283,6 @@ ac_ct_CONFIG_GTK!$ac_ct_CONFIG_GTK$ac_delim
 CONFIG_GTKP_2_0!$CONFIG_GTKP_2_0$ac_delim
 ac_ct_CONFIG_GTKP_2_0!$ac_ct_CONFIG_GTKP_2_0$ac_delim
 CONFIG_CG!$CONFIG_CG$ac_delim
-ac_ct_CONFIG_CG!$ac_ct_CONFIG_CG$ac_delim
-CONFIG_CGGL!$CONFIG_CGGL$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -90449,6 +91324,8 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+ac_ct_CONFIG_CG!$ac_ct_CONFIG_CG$ac_delim
+CONFIG_CGGL!$CONFIG_CGGL$ac_delim
 ac_ct_CONFIG_CGGL!$ac_ct_CONFIG_CGGL$ac_delim
 CONFIG_JACKASYN!$CONFIG_JACKASYN$ac_delim
 ac_ct_CONFIG_JACKASYN!$ac_ct_CONFIG_JACKASYN$ac_delim
@@ -90471,7 +91348,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 20; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 22; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

@@ -356,7 +356,7 @@ int main (int argc, char * argv[])
         // get the numbers in the current mesh
         csFPrintf(stderr, "===================================================\n");
         csFPrintf(stderr, "%-14s  %5ld  %5ld  %5d    %s\n",
-	    mesh->name, mesh->faces, mesh->points, -1, " ");
+	    mesh->name, (long)mesh->faces, (long)mesh->points, -1, " ");
     }
 
     exit(0);

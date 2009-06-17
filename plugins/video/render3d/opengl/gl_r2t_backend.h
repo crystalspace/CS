@@ -94,8 +94,7 @@ public:
     int* subtexture) const = 0;
   
   virtual void BeginDraw (int drawflags) = 0;
-  virtual void SetupProjection () = 0;
-  virtual CS::Math::Matrix4 SetupProjection (
+  virtual CS::Math::Matrix4 FixupProjection (
     const CS::Math::Matrix4& projectionMatrix) = 0;
   virtual void FinishDraw () = 0;
   virtual void SetClipRect (const csRect& clipRect) = 0;

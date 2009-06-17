@@ -52,35 +52,6 @@ csEventQueue::csEventQueue (iObjectRegistry* r, size_t iLength) :
   EventTree = csEventTree::CreateRootNode(HandlerRegistry, NameRegistry, this);
 
   Frame = csevFrame (NameRegistry);
-  PreProcess = csevPreProcess (NameRegistry);
-  ProcessEvent = csevProcess (NameRegistry);
-  PostProcess = csevPostProcess (NameRegistry);
-  FinalProcess = csevFinalProcess (NameRegistry);
-
-  csRef<TypedFrameEventDispatcher> PreProcessEventDispatcher;
-  csRef<TypedFrameEventDispatcher> ProcessEventDispatcher;
-  csRef<TypedFrameEventDispatcher> PostProcessEventDispatcher;
-  csRef<TypedFrameEventDispatcher> FinalProcessEventDispatcher;
-  PreProcessEventDispatcher.AttachNew (
-    new PreProcessFrameEventDispatcher (this));
-  ProcessEventDispatcher.AttachNew (
-    new ProcessFrameEventDispatcher (this));
-  PostProcessEventDispatcher.AttachNew (
-    new PostProcessFrameEventDispatcher (this));
-  FinalProcessEventDispatcher.AttachNew (
-    new FinalProcessFrameEventDispatcher (this));
-
-  if (!RegisterListener (PreProcessEventDispatcher)
-    || !Subscribe (PreProcessEventDispatcher, Frame) 
-    || !RegisterListener (ProcessEventDispatcher)
-    || !Subscribe (ProcessEventDispatcher, Frame) 
-    || !RegisterListener (PostProcessEventDispatcher)
-    || !Subscribe (PostProcessEventDispatcher, Frame) 
-    || !RegisterListener (FinalProcessEventDispatcher)
-    || !Subscribe (FinalProcessEventDispatcher, Frame))
-  {
-    CS_ASSERT(0);
-  }
 }
 
 csEventQueue::~csEventQueue ()

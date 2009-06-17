@@ -695,56 +695,35 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
 }
 */
 
+void csGLGraphics3D::UpdateProjectionSVs ()
+{
+  if (!shadermgr) return;
+
+  CS::Math::Matrix4 actualProjection = csGLGraphics3D::GetProjectionMatrix();
+
+  shadermgr->GetVariableAdd (string_projection)->SetValue (actualProjection);
+  shadermgr->GetVariableAdd (string_projection_inv)->SetValue (
+    actualProjection.GetInverse());
+}
+
 void csGLGraphics3D::SetupProjection ()
 {
   if (!needProjectionUpdate) return;
 
+  GLRENDER3D_OUTPUT_LOCATION_MARKER;
+  
   CS::Math::Matrix4 actualProjection;
+  if (currentAttachments != 0)
+    actualProjection = r2tbackend->FixupProjection (
+      csGLGraphics3D::GetProjectionMatrix());
+  else
+    actualProjection = csGLGraphics3D::GetProjectionMatrix();
 
   statecache->SetMatrixMode (GL_PROJECTION);
-  if (explicitProjection)
-  {
-    if (currentAttachments != 0)
-      actualProjection = r2tbackend->SetupProjection (projectionMatrix);
-    else
-    {
-      GLfloat matrixholder[16];
-      CS::PluginCommon::MakeGLMatrix4x4 (projectionMatrix, matrixholder);
-      glLoadMatrixf (matrixholder);
-      actualProjection = projectionMatrix;
-    }
-  }
-  else
-  {
-    glLoadIdentity ();
-    if (currentAttachments != 0)
-      r2tbackend->SetupProjection();
-    else
-    {
-      SetGlOrtho (false);
-      //glTranslatef (asp_center_x, asp_center_y, 0);
-    }
-    glTranslatef (asp_center_x, asp_center_y, 0);
-  
-    GLfloat matrixholder[16];
-    for (int i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
-    matrixholder[0] = matrixholder[5] = 1.0;
-    matrixholder[11] = 1.0/aspect;
-    matrixholder[14] = -matrixholder[11];
-    glMultMatrixf (matrixholder);
+  GLfloat matrixholder[16];
+  CS::PluginCommon::MakeGLMatrix4x4 (actualProjection, matrixholder);
+  glLoadMatrixf (matrixholder);
     
-    glGetFloatv (GL_PROJECTION_MATRIX, matrixholder);
-    actualProjection = CS::Math::Matrix4 (
-      matrixholder[0], matrixholder[4], matrixholder[8], matrixholder[12],
-      matrixholder[1], matrixholder[5], matrixholder[9], matrixholder[13],
-      matrixholder[2], matrixholder[6], matrixholder[10], matrixholder[14],
-      matrixholder[3], matrixholder[7], matrixholder[11], matrixholder[15]);
-  }
-  
-  shadermgr->GetVariableAdd (string_projection)->SetValue (actualProjection);
-  shadermgr->GetVariableAdd (string_projection_inv)->SetValue (
-    actualProjection.GetInverse());
-  
   statecache->SetMatrixMode (GL_MODELVIEW);
   needProjectionUpdate = false;
 }

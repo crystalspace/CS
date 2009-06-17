@@ -1,5 +1,5 @@
-TOP ?= "@top_srcdir@" ;
-BUILDTOP ?= "@top_builddir@" ;
+TOP ?= "@CS_TOP_SRCDIR@" ;
+BUILDTOP ?= "@CS_TOP_BUILDDIR@" ;
 
 SubDir TOP ;
 
@@ -73,6 +73,17 @@ Depends drivers2d : canvases ;
 NotFile drivers3d ;
 Depends drivers3d : renderers ;
 
+# Create a string combining compiler type and version.
+# Can be used for ABI identification
+if $(COMPILER.C++.VERSION_LIST)
+{
+  CS_COMPILER_NAME_AND_VERSION = "$(COMPILER.C++.TYPE)_$(COMPILER.C++.VERSION_LIST[1]).$(COMPILER.C++.VERSION_LIST[2])" ;
+}
+else
+{
+  CS_COMPILER_NAME_AND_VERSION = "$(COMPILER.C++.TYPE)" ;
+}
+
 # Process subdirectories.  NOTE: Unfortunately, Jam rules are presently
 # order-sensitive; Library targets must be seen by Jam before Application and
 # Plugin targets, thus ordering of these SubInclude invocations is dictated by
@@ -96,6 +107,3 @@ if [ Property build : standalone ]
   local SUBDIR = [ ConcatDirs $(BUILDTOP) include ] ; # Temporary for Recurse.
   Recurse InstallHeader : .h ;
 }
-
-# Create a file list for vfs.cfg
-FileListEntriesData vfs.cfg : : vfs ;

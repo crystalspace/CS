@@ -34,6 +34,7 @@ if $(PYTHON.AVAILABLE) = "yes"
     #--------
     local common = cs_$(modname).cpp ;
     local modulepy = [ DoSourceGrist $(modname).py ] ;
+    local used_py ;
     MakeLocate $(modulepy) : [ ConcatDirs $(LOCATE.OBJECTS) bindings python cspace ] ;
   
     if ! [ Property build : projgen ]
@@ -54,6 +55,7 @@ if $(PYTHON.AVAILABLE) = "yes"
 	  $(modname) :
 	  [ on $(modulepy) GetVar LOCATE ] ;
 	Depends $(modname)clean : $(modname)swigclean ;
+        used_py = $(modulepy) ;
       }
       else
       {
@@ -62,6 +64,7 @@ if $(PYTHON.AVAILABLE) = "yes"
 	SEARCH on $(frozenpy) = [ ConcatDirs $(TOP) scripts python frozen cspace ] ;
 	Copy $(modulepy) : $(frozenpy) ;
 	Depends $(modulepy) : $(frozenpy) ;
+        used_py = $(frozenpy) ;
       }
     }
     Clean $(modname)clean : $(modulepy) ;
@@ -69,8 +72,8 @@ if $(PYTHON.AVAILABLE) = "yes"
     Depends clean : $(modname)clean ;
   
     InstallBindingsData $(modulepy) : [ on $(<) GetVar LOCATE ] : bindings python cspace ;
-  
-  
+    Depends filelists : [ DoFileListEntries $(used_py) : cspace : python-bindings ] ;
+    
     #--------
     # core -- Pure Python module
     #--------
@@ -83,6 +86,8 @@ if $(PYTHON.AVAILABLE) = "yes"
     Depends $(target) : $(modulepy) ;
     CFlags $(target) : [ FDefines SWIG_GLOBAL ] $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) $(COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED) ;
     Depends bindingsclean : $(target)clean ;
+    
+    FileListEntryPythMod $(target) : cspace : python-modules ;
   }
 }
 
@@ -133,6 +138,8 @@ rule CopyCspaceInitPy
   Depends pythmod : $(init_py:G=out) ;
   Depends pythmodclean : $(init_py:G=out) ;
   InstallBindingsData $(init_py:G=src) : $(init_py_dir) : bindings python cspace ;
+
+  Depends filelists : [ DoFileListEntries $(init_py:G=src) : cspace : python-bindings ] ;
 }
 
 # rule to generate a python .pth file on install.

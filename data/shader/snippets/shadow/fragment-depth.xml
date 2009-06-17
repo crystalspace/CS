@@ -20,10 +20,8 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input name="surface" type="rgba" default="value" defval="0,0,0,1"/>
-    
     <block location="cg:fragmentMain">
-      output = float4 (float3(0), surface.a);
+      output = float4 (float3(0), 1);
     </block>
     
     <output name="output" type="rgba" />

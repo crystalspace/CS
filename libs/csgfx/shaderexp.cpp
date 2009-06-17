@@ -89,6 +89,8 @@ enum
   OP_FUNC_MATRIX_COLUMN,
   OP_FUNC_MATRIX_ROW,
   OP_FUNC_MATRIX2GL,
+  OP_FUNC_MATRIX_TRANSP,
+  OP_FUNC_MATRIX_INV,
   
   // Pseudo-ops, special case weird stuff
   OP_PS_MAKE_VECTOR,
@@ -137,6 +139,8 @@ static const char* const opNames[OP_LAST] = {
   "MATRIXCOLUMN",
   "MATRIXROW",
   "MATRIX2GL",
+  "MATRIXTRANSP",
+  "MATRIXINV",
   "!MAKEVECTOR",
   "!LIMIT",
   "!ATOM",
@@ -246,6 +250,8 @@ static const op_args_info optimize_arg_table[] =
   { 2, 2, false }, // OP_FUNC_MATRIX_COLUMN
   { 2, 2, false }, // OP_FUNC_MATRIX_ROW
   { 1, 1, false }, // OP_FUNC_MATRIX2GL
+  { 1, 1, false }, // OP_FUNC_MATRIX_TRANSP
+  { 1, 1, false }, // OP_FUNC_MATRIX_INV
 
   { 2, 4, false }, // OP_PS_MAKE_VECTOR
 
@@ -947,6 +953,8 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg & output)
   case OP_FUNC_NORMAL: return eval_normal(arg1, output);
   case OP_FUNC_FLOOR: return eval_floor(arg1, output);
   case OP_FUNC_MATRIX2GL: return eval_matrix2gl(arg1, output);
+  case OP_FUNC_MATRIX_INV: return eval_matrix_inv(arg1, output);
+  case OP_FUNC_MATRIX_TRANSP: return eval_matrix_transp(arg1, output);
 
   case OP_INT_LOAD: return eval_load(arg1, output);
 
@@ -1522,6 +1530,40 @@ bool csShaderExpression::eval_matrix2gl (const oper_arg & arg1,
   output.matrix.m14 = -matrix_o2t.x;
   output.matrix.m24 = -matrix_o2t.y;
   output.matrix.m34 = -matrix_o2t.z;
+
+  return true;
+  
+}
+  	
+bool csShaderExpression::eval_matrix_inv (const oper_arg & arg1, 
+                                          oper_arg & output) const
+{
+  if (arg1.type != TYPE_MATRIX)
+  {
+    EvalError ("Argument to matrix-inv is not a matrix.");
+
+    return false;
+  }
+
+  output.type = TYPE_MATRIX;
+  output.matrix = arg1.matrix.GetInverse();
+
+  return true;
+  
+}
+  	
+bool csShaderExpression::eval_matrix_transp (const oper_arg & arg1, 
+                                          oper_arg & output) const
+{
+  if (arg1.type != TYPE_MATRIX)
+  {
+    EvalError ("Argument to matrix-transp is not a matrix.");
+
+    return false;
+  }
+
+  output.type = TYPE_MATRIX;
+  output.matrix = arg1.matrix.GetTranspose();
 
   return true;
   
@@ -2441,7 +2483,9 @@ static const TokenTabEntry commonTokens[] = {
   {"frame", 5, OP_FUNC_FRAME},
   {"make-vector", 11, OP_PS_MAKE_VECTOR},
   {"matrix-column", 13, OP_FUNC_MATRIX_COLUMN},
+  {"matrix-inv", 10, OP_FUNC_MATRIX_INV},
   {"matrix-row", 10, OP_FUNC_MATRIX_ROW},
+  {"matrix-transp", 13, OP_FUNC_MATRIX_TRANSP},
   {"matrix2gl", 9, OP_FUNC_MATRIX2GL},
   {"max", 3, OP_FUNC_MAX},
   {"min", 3, OP_FUNC_MIN},

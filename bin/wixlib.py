@@ -425,7 +425,7 @@ def generate_from_file_list(filelist, parent, prefix, dir):
     dirs = DirectoryHelper(parent, prefix, dir)
     
     for file in filelist:
-        (sourcePath, destPath) = file.split(':', 1)
+        (sourcePath, destPath) = file.rsplit(':', 1)
         destSplit = destPath.rsplit ('/', 1)
         if len(destSplit) == 1:
             destFN = destSplit[0].strip()

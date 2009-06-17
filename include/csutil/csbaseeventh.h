@@ -64,10 +64,6 @@ protected:
   iObjectRegistry *object_registry;
   csHandlerID self;
   csEventID FrameEvent;
-  csEventID PreProcess;
-  csEventID Process;
-  csEventID PostProcess;
-  csEventID FinalProcess;
 
   /**
    * Actual iEventHandler implementation.
@@ -310,18 +306,6 @@ protected:
 
   /// Invoked by the handler for the crystalspace.frame event.
   virtual void Frame ();
-
-  /// Invoked by the handler during a pre-process frame broadcast event.
-  virtual void PreProcessFrame ();
-
-  /// Invoked by the handler during a process frame broadcast event.
-  virtual void ProcessFrame ();
-
-  /// Invoked by the handler during a post-process frame broadcast event.
-  virtual void PostProcessFrame ();
-
-  /// Invoked by the handler during a finish frame broadcast event.
-  virtual void FinishFrame ();
 };
 
 /** @} */

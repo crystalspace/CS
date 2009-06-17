@@ -921,11 +921,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    {
 	      sourceTech = tech;
 	      output = &outp;
-	      if (cost == 0)
-	      {
-	        usedOutputs.AddNoTest (output);
-	        return true;
-	      }
 	      coerceCost = cost;
 	    }
             // See if maybe we can just drop a property.
@@ -1026,11 +1021,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	{
 	  sourceTech = tech;
 	  output = &outp;
-	  if (cost == 0)
-	  {
-	    usedOutputs.AddNoTest (output);
-	    return true;
-	  }
 	  coerceCost = cost;
 	}
 	// See if maybe we can just drop a property.

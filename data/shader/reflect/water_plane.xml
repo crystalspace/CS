@@ -21,6 +21,7 @@
   <shadervar name="water perturb scale" type="vector4">0.1,0.1,0,0</shadervar>
   <shadervar name="water fog color" type="vector4">0,0.17,0.49,0.6</shadervar>
   <technique priority="200">
+    <tag>water_complex</tag>
     <pass>
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
@@ -41,7 +42,6 @@
       <!-- Possible future things:
 	   - Tinted reflections/refractions?
 	   - Fresnel for specular?
-	   - Modulate specular by depth (similar to reflection)?
 	-->
       
       <alias name="surface" weak="yes" file="/shader/snippets/surface/surface-clear.xml" />
@@ -68,6 +68,7 @@
       <snippet id="apply_alpha" filealias="apply_alpha" />
       <snippet id="lighting" filealias="lighting" />
       <snippet id="fake_light_diffuse" file="/shader/snippets/rgba-black.xml" />
+      <snippet id="specular_limit" file="/shader/snippets/modulate_rgb.xml" />
       <snippet id="ambient" file="/shader/snippets/lighting/ambient-one.xml" />
       <snippet id="specular" file="/shader/snippets/surface/specular-default.xml" />
       <snippet id="apply_lighting" file="/shader/snippets/lighting/apply-lighting.xml" />
@@ -96,7 +97,10 @@
       <connection from="refraction" to="fresnel_limit">
 	<explicit from="mirroredPointDistSat" to="b" />
       </connection>
-      <connection from="hdrscalerefr" to="fog_refraction" />
+      <connection from="refraction" to="fog_refraction" />
+      <connection from="hdrscalerefr" to="fog_refraction">
+        <explicit from="result" to="unfoggedColor" />
+      </connection>
       <connection from="hdrscalerefl" to="lerp_reflect_refract">
 	<explicit from="result" to="a" />
       </connection>
@@ -120,8 +124,14 @@
       <connection from="fake_light_diffuse" to="apply_lighting">
 	<explicit from="result" to="lightDiffuse" />
       </connection>
-      <connection from="lighting" to="apply_lighting">
-	<explicit from="specularColor" to="lightSpecular" />
+      <connection from="lighting" to="specular_limit">
+	<explicit from="specularColor" to="a" />
+      </connection>
+      <connection from="refraction" to="specular_limit">
+	<explicit from="mirroredPointDistSat" to="b" />
+      </connection>
+      <connection from="specular_limit" to="apply_lighting">
+	<explicit from="result" to="lightSpecular" />
       </connection>
       <connection from="ambient" to="apply_lighting">
 	<explicit from="ambient" to="ambient" />
@@ -150,7 +160,15 @@
       </connection>
       
       <parameter id="refractFogColor" type="shadervar" weavertype="rgba">water fog color</parameter>
-      <connection from="refractFogColor" to="fog_refraction" />
+      <connection from="refractFogColor" to="fog_refraction">
+	<explicit from="output" to="fogColor" />
+      </connection>
+      <!-- @@@ Another workaround: don't pick up saturated distance -->
+      <!-- @@@ And ofc. make an SV/aliasable -->
+      <parameter id="refractFogDensity" type="float">0.3</parameter>
+      <connection from="refractFogDensity" to="fog_refraction">
+	<explicit from="output" to="fogDensity" />
+      </connection>
       
       <parameter id="perturbScaleSV" type="shadervar" weavertype="float4">water perturb scale</parameter>
       <connection from="perturbScaleSV" to="perturb_norm_refl" />
@@ -164,6 +182,7 @@
   </technique>
   
   <technique priority="100">
+    <tag>water_complex</tag>
     <pass>
       <combiner plugin="crystalspace.graphics3d.shader.combiner.glcg" />
       
@@ -350,4 +369,7 @@
       <connection from="maxLights" to="lighting" />
     </pass>
   </technique>
+  
+  <fallbackshader name="water_simple_cube"
+		  file="/shader/reflect/water_simple_cube.xml" />
 </shader>

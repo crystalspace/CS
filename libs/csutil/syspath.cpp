@@ -257,6 +257,9 @@ csPathsList* csInstallationPathsHelper::GetPluginPaths (const char* argv0)
     "lib/" CS_PACKAGE_NAME, 
     CS_PACKAGE_NAME "/lib", 
     CS_PACKAGE_NAME,
+#ifdef CS_COMPILER_NAME_AND_VERSION
+	CS_COMPILER_NAME_AND_VERSION "/bin",
+#endif
     "",
     0};
 

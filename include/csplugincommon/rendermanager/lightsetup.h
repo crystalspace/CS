@@ -379,7 +379,7 @@ namespace RenderManager
                          iLight* light, _CachedLightData& lightData,
                          csShaderVariableStack* lightStacks,
                          uint lightNum, uint sublight)
-    { return 0; }
+    { return 1; }
     
     /**
      * Return whether, at the end of light setup, there should be another pass
@@ -688,24 +688,29 @@ namespace RenderManager
 	      
 	      uint lSpread = shadows.HandleOneLight (mesh, light, *thisLightSVs, 
 	        localStacks, l, renderSublightNums[firstLight + l]);
+	      if (lSpread == 0) continue;
     
+              uint actualSpread = 0;
 	      for (size_t s = 0; s < shadows.GetLightLayerSpread(); s++)
 	      {
-	        if ((s > 0) && (lSpread & (1 << s)))
+	        if (!(lSpread & (1 << s))) continue;
+	        if (actualSpread > 0)
 	        {
 		  node->owner.CopyLayerShader (mesh.contextLocalId,
 		    layers.GetNewLayerIndex (layer, 0),
-		    layers.GetNewLayerIndex (layer, n*shadows.GetLightLayerSpread() + s + totalLayers));
+		    layers.GetNewLayerIndex (layer,
+		      n*shadows.GetLightLayerSpread() + actualSpread + totalLayers));
 	        }
 	      
-		lightVarsHelper.MergeAsArrayItems (localStacks[s],
+		lightVarsHelper.MergeAsArrayItems (localStacks[actualSpread],
 		  *(thisLightSVs->shaderVars), l);
 		if (isStaticLight && meshIsStaticLit
 		    && layerConfig.GetStaticLightsSettings (layer).specularOnly)
 		{
-		  lightVarsHelper.MergeAsArrayItem (localStacks[s],
+		  lightVarsHelper.MergeAsArrayItem (localStacks[actualSpread],
 		    persist.diffuseBlack, l);
 		}
+		actualSpread++;
 	      }
 	    }
 	    firstLight += thisNum;
@@ -736,6 +741,7 @@ namespace RenderManager
   public:
     struct PersistentData;
     typedef csArray<iShader*> ShaderArrayType;
+    typedef ShadowHandler ShadowHandlerType;
     typedef typename ShadowHandler::ShadowParameters ShadowParamType;
 
     /**

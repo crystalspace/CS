@@ -78,8 +78,8 @@ struct ShadowShadowMapDepth : ShadowShadowMap
     shadowMapCoordsProj = shadowMapCoords;
     shadowMapCoordsProj.xyz /= shadowMapCoordsProj.w;
     
-    // @@@ FIXME: Needing such a high bias scale seems ridiculous!
-    bias = (1.0/32768.0);
+    // FWIW, this should prolly be made some kind of setting.
+    bias = 0.0000001;
     //bias *= 1 + (gradient*gradient*256);
   }
   

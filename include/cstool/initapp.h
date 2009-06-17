@@ -377,7 +377,7 @@ public:
    * that are sent through the event manager. Use this function to know
    * about keyboard, mouse and other events. Note that you also have to
    * use this function to be able to render something as rendering
-   * happens as a result of one event (csevProcess).
+   * happens as a result of one event (csevFrame).
    */
   static bool SetupEventHandler (iObjectRegistry*, iEventHandler*, const csEventID[]);
 

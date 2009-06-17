@@ -264,9 +264,9 @@ TrDocumentAttribute& TrXmlElement::GetAttributeRegistered (
   return attributeSet.set[idx];
 }
 
-TrDocument::TrDocument(char* buf) :
-  blk_element (7000),
-  blk_text (100)
+TrDocument::TrDocument(bool largeDoc, char* buf) :
+  blk_element (largeDoc ? 7000 : 100),
+  blk_text (largeDoc ? 100 : 16)
 {
   errorId = TIXML_NO_ERROR;
   //  ignoreWhiteSpace = true;

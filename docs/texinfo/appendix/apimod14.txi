@@ -8,10 +8,20 @@ Crystal Space.
 
 @menu
 * Api1_4 iGenMeshAnimationControl changes:: @code{iGenMeshAnimationControl} changes
+* Api1_4 Deprecation of the old event system:: Deprecation of the old event system
 @end menu
 
-@node Api1_4 iGenMeshAnimationControl changes, , Release Notes 1_4, Release Notes 1_4
+@node Api1_4 iGenMeshAnimationControl changes, Api1_4 Deprecation of the old event system, Release Notes 1_4, Release Notes 1_4
 @subsection @code{iGenMeshAnimationControl} changes
 
 The @code{Update} method of the @code{iGenMeshAnimationControl} interface has
 a different prototype, as more parameters have been added.
+
+@node Api1_4 Deprecation of the old event system, , Api1_4 iGenMeshAnimationControl changes, Release Notes 1_4
+@subsection Deprecation of the old event system
+
+The old event system has been deprecated in this release and will be gone in the next version. This means that the frame sub-events @code{csevPreProcess}, @code{csevProcess}, @code{csevPostProcess}, and @code{csevFinalProcess} will no longer be available. At the same time, the corresponding methods from @code{csBaseEventHandler} will be replaced by a single @code{csBaseEventHandler::Frame()} function.
+
+Applications that rely on the old event system should be changed to use the new event system. If a single event handling class needs to handle the @code{csevFrame} event more than once per frame, embedded event handler classes should be used. These classes should define constraints to receive the event in the correct phase. Examine the code of @code{walktest} for an example.
+
+Applications that only use @code{csevFinalProcess} or @code{csBaseEventHandler::FinishFrame} to update the display via @code{iGraphics3D::Print} should use the helper class @code{FramePrinter} instead. Examine the code of @code{simple1} for an example.

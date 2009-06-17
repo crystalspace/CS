@@ -237,8 +237,9 @@ public:
   virtual const char* Write (iString*) { return "Read-only!"; }
   virtual const char* Write (iVFS*, const char*) { return "Read-only!"; }
 
-  csRef<iDocumentNode> CreateRoot (char* buf);
-  const char* ParseInPlace (char* buf, bool collapse = false);
+  csRef<iDocumentNode> CreateRoot (char* buf, size_t bufSize);
+  const char* Parse (const char* buf, size_t bufSize, bool collapse);
+  const char* ParseInPlace (char* buf, size_t bufSize, bool collapse = false);
 
   virtual int Changeable () { return CS_CHANGEABLE_NEVER; }
 };

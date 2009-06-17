@@ -44,7 +44,7 @@ csTerrainCell::csTerrainCell (csTerrainSystem* terrain, const char* name, int gr
   : scfImplementationType (this), 
   terrain (terrain), name (name), materialMapWidth (materialMapWidth), 
   materialMapHeight (materialMapHeight), position (position), size (size),
-  minHeight (0), maxHeight (0),
+  minHeight (-FLT_MAX*0.9f), maxHeight (FLT_MAX*0.9f),
   renderProperties (renderProperties), collisionProperties (collisionProperties),
   feederProperties (feederProperties), loadState (NotLoaded),
   lruTicks (0)
@@ -66,6 +66,8 @@ csTerrainCell::csTerrainCell (csTerrainSystem* terrain, const char* name, int gr
   const csVector3 size01 = size * 0.1f;
   boundingBox.Set (position.x - size01.x, minHeight - size01.y, position.y - size01.z,
     position.x + size.x + size01.x, maxHeight + size01.y, position.y + size.z + size01.z);
+
+  terrain->CellSizeUpdate (this);
 }
 
 csTerrainCell::~csTerrainCell ()
@@ -189,12 +191,7 @@ void csTerrainCell::SetLoadState(LoadState state)
 }
 
 csBox3 csTerrainCell::GetBBox () const
-{
-  /*const csVector3 size01 = size * 0.1f;
-  csBox3 box;
-  box.Set (position.x - size01.x, minHeight - size01.y, position.y - size01.z,
-    position.x + size.x + size01.x, maxHeight + size01.y, position.y + size.z + size01.z);*/
-
+{  
   return boundingBox;
 }
 

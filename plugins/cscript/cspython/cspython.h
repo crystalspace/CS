@@ -132,6 +132,7 @@ protected:
   bool AddRealPythonPath(csString &path, const char *subpath=0);
   // Load configuration options
   void LoadConfig();
+  void LoadComponents();
 public:
   csPython(iBase *iParent);
   virtual ~csPython();
@@ -195,6 +196,7 @@ public:
   CS_EVENTHANDLER_NAMES("crystalspace.cspython")
   CS_EVENTHANDLER_NIL_CONSTRAINTS
 
+  csRef<iEventHandler> weakeh_open;
 };
 
 }

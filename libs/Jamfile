@@ -96,10 +96,24 @@ Description crystalspace : "Crystal Space library" ;
 Library crystalspace : $(CSLIB.SOURCES) : shared notest ;
 UnitTest crystalspace : $(CSLIB.TESTS) ;
 CFlags crystalspace : [ FDefines CS_CRYSTALSPACE_LIB ] ;
-MsvcDefine crystalspace : CS_CRYSTALSPACE_LIB $(CSLIB.MSVC_DEFINES) ;
+MsvcDefine crystalspace : CS_CRYSTALSPACE_LIB ;
+MsvcDefine crystalspace :
+  CS_COMPILER_NAME_AND_VERSION : "\"VC_$(MSVC_VERSION)\"" ;
+{
+  local def ;
+  for def in $(CSLIB.MSVC_DEFINES)
+  {
+    MsvcDefine crystalspace : $(def) ;
+  }
+}
 if $(CSLIB.CFLAGS)
 {
   CFlags crystalspace : $(CSLIB.CFLAGS) ;
+}
+if [ Property build : projgen ] != msvc
+{
+  CFlags crystalspace :
+    [ FDefines "CS_COMPILER_NAME_AND_VERSION='\"$(CS_COMPILER_NAME_AND_VERSION)\"'" ] ;
 }
 if $(CSLIB.DEPENDS)
 {

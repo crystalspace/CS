@@ -27,6 +27,10 @@ MeshFilter::MeshFilter ()
 
 }
 
+MeshFilter::~MeshFilter ()
+{
+}
+
 void MeshFilter::AddFilterMesh (iMeshWrapper* mesh)
 {
   filteredMeshes.Add (mesh);

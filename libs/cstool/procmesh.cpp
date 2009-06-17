@@ -99,6 +99,7 @@ void csMeshOnTexture::UpdateView (int w, int h)
 {
   if (cur_w != w || cur_h != h)
   {
+    view->GetCamera ()->SetViewportSize (w, h);
     view->SetRectangle (0, 0, w, h);
     view->UpdateClipper ();
     view->GetCamera ()->SetPerspectiveCenter (w/2, h/2);

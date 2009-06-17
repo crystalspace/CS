@@ -34,8 +34,8 @@ if $(CMD.SWIG)
   # (2) We #undefine _DEBUG, to ensure that python23.lib is used by MSVC
   # instead of python23_d.lib.
   #
-  # (3) Delete any lines containing the CVS `Header' keyword to ensure that CVS
-  # does not consider the file changed simply because `Header' expansion
+  # (3) Delete any lines containing the CVS `Header' keyword to ensure that the
+  # SCM does not consider the file changed simply because `Header' expansion
   # differs.
   #
   # (4) Swig 1.3.22 for Perl emits illegal expressions `new (sometype)[n]'
@@ -50,6 +50,11 @@ if $(CMD.SWIG)
   # the CS definitions of dirent, opendir, etc.  So define _DIRENT_H_ to 
   # make dirent.h skip its body.  This is hackish but no better solution
   # has been found.
+  #
+  # (7) Delete any lines containing the auto-generated
+  # /*@SWIG:/path/to/dotifile@*/ typemap comment to ensure that the SCM does
+  # not consider the file as having changed simply because the project source
+  # directory location moved if the actual generated content has not.
   #
   # (Despite the fact that these customizations might seem project-specific,
   # they should be safe for all projects.)
@@ -72,7 +77,8 @@ if $(CMD.SWIG)
     #ifndef _DIRENT_H_\\
     #define _DIRENT_H_\\
     #endif\\
-    \\1/g'" ;
+    \\1/g
+    /\\/\\*@SWIG[^@]*@\\*\\//d'" ;
 
   ## Swig targets : swigfile : language [ : swigflags [ : swigincdirs
   ##     [ : swigfiledir [ : frozendirs [ : tag [ : outdir ]]]]]]

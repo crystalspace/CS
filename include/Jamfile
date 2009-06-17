@@ -9,7 +9,8 @@ rule FilelistEntryHeader
 {
   if "$(2)" != "" || $(1) != "csconfig.h"
   { 
-    local file_gristed = $(1:G=$(2:J=!)) ;
+    local listdir = $(2:E=.) ;
+    local file_gristed = $(1:G=$(listdir:J=!)) ;
     FileListEntriesData $(file_gristed) : $(2) : headers ;
   }
 }

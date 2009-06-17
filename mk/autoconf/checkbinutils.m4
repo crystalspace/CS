@@ -33,13 +33,13 @@ AC_DEFUN([CS_CHECK_BINUTILS_2_17],
         # to stderr rather than stdout. Handle these anomalies.
         AS_IF([echo `ld -v 2>&1` | grep GNU 2>&1 > /dev/null],
 	    [# binutils versions come in the flavors X.Y as well as X.Y.Z
-	    CS_CHECK_PROG_VERSION([binutils], [$LD -v], [2.17], [9.9|.9|.9|.9],
+	    CS_CHECK_PROG_VERSION([binutils], [$LD -v], [2.17], [9.9|.9|.9|.9|.9],
 		[cs_cv_binutils_true_2_17=yes],
 		[cs_cv_binutils_true_2_17=no])
 	    AS_IF([test "$cs_cv_binutils_true_2_17" = yes],
 		[cs_cv_binutils_2_17=yes])
 	    AS_IF([test -z "$cs_cv_binutils_2_17"],
 		[CS_CHECK_PROG_VERSION([binutils], [$LD -v], [2.16.91], 
-		    [9.9.9|.9|.9], [cs_cv_binutils_2_17=yes])])
+		    [9.9.9|.9|.9|.9], [cs_cv_binutils_2_17=yes])])
 	    AS_IF([test -z "$cs_cv_binutils_2_17"],
 		[cs_cv_binutils_2_17=no])])])])

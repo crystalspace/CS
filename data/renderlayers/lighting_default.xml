@@ -26,9 +26,9 @@
 		<maxlightpasses>2147483647</maxlightpasses>
 		<!-- Options to control lighting for static lights -->
 		<staticlights>
-		  <!-- Don't draw static lights for meshes which have the 
+		  <!-- Only draw specular lighting for meshes which have the 
 		       CS_ENTITY_STATICLIGHT flag set -->
-		  <nodraw />
+		  <specularonly />
 		</staticlights>
 	</layer>
 </layerconfig>

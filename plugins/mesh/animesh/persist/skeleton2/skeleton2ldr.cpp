@@ -496,7 +496,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2Ldr)
     if (sync)
     {
       csStringID id = xmltokens.Request (sync);
-      CS::Animation::SynchronizationMode mode;
+      CS::Animation::SynchronizationMode mode = CS::Animation::SYNC_NONE;
 
       switch (id)
       {

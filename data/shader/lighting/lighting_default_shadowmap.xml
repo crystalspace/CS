@@ -25,6 +25,7 @@
   
   <?if vars."light shadow map" && ((vars."light count".int &gt; 1) || (vars."light shadow map[0]".texture)) ?>
   <technique priority="500">
+    <tag>per_pixel_lighting</tag>
     <!-- 1 pass, 6 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
@@ -60,6 +61,7 @@
   </technique>
   
   <technique priority="400">
+    <tag>per_pixel_lighting</tag>
     <!-- 2 passes, 4+2 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
@@ -104,6 +106,7 @@
   </technique>
   
   <technique priority="300">
+    <tag>per_pixel_lighting</tag>
     <!-- 2 passes, 3+3 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
@@ -148,6 +151,7 @@
   </technique>
   
   <technique priority="200">
+    <tag>per_pixel_lighting</tag>
     <!-- 3 passes, 2+2+2 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
@@ -208,6 +212,7 @@
   </technique>
   
   <technique priority="100">
+    <tag>per_pixel_lighting</tag>
     <!-- 6 passes, 1+1+1+1+1+1 lights -->
     <pass>
       <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>

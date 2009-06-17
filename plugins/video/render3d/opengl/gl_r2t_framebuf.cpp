@@ -190,17 +190,9 @@ void csGLRender2TextureFramebuf::BeginDraw (int drawflags)
   G3D->statecache->SetCullFace (GL_BACK);
 }
 
-void csGLRender2TextureFramebuf::SetupProjection ()
-{
-  GLRENDER3D_OUTPUT_LOCATION_MARKER;
-  G3D->SetGlOrtho (true);
-}
-
-CS::Math::Matrix4 csGLRender2TextureFramebuf::SetupProjection (
+CS::Math::Matrix4 csGLRender2TextureFramebuf::FixupProjection (
     const CS::Math::Matrix4& projectionMatrix)
 {
-  GLRENDER3D_OUTPUT_LOCATION_MARKER;
-  
   CS::Math::Matrix4 actual;
   bool needSubImage = (txt_w > viewportHelper.GetVPWidth()) 
     || (txt_h > viewportHelper.GetVPHeight());
@@ -222,9 +214,6 @@ CS::Math::Matrix4 csGLRender2TextureFramebuf::SetupProjection (
 	0, 0, 0, 1);
     actual = flipY * projectionMatrix;
   }
-  GLfloat matrixholder[16];
-  CS::PluginCommon::MakeGLMatrix4x4 (actual, matrixholder);
-  glLoadMatrixf (matrixholder);
   
   return actual;
 }

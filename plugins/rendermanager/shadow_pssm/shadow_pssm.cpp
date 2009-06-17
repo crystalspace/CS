@@ -45,20 +45,66 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
 SCF_IMPLEMENT_FACTORY(RMShadowedPSSM)
 
 
-template<typename RenderTreeType, typename LayerConfigType>
+/* Template magic to deal with different initializers for different
+   ShadowType::ShadowParameter types. */
+template<typename ShadowType>
+struct WrapShadowParams
+{
+  static typename ShadowType::ShadowParameters Create (
+    RMShadowedPSSM::ShadowType::PersistentData& persist,
+    CS::RenderManager::RenderView* rview)
+  {
+    return typename ShadowType::ShadowParameters ();
+  }
+};
+
+template<>
+struct WrapShadowParams<RMShadowedPSSM::ShadowType>
+{
+  static RMShadowedPSSM::ShadowType::ViewSetup Create (
+    RMShadowedPSSM::ShadowType::PersistentData& shadowPersist,
+    CS::RenderManager::RenderView* rview)
+  {
+    return RMShadowedPSSM::ShadowType::ViewSetup (
+      shadowPersist, rview);
+  }
+};
+
+template<typename RenderTreeType, typename LayerConfigType,
+         typename LightSetupType>
 class StandardContextSetup
 {
 public:
-  typedef StandardContextSetup<RenderTreeType, LayerConfigType> ThisType;
+  typedef StandardContextSetup<RenderTreeType, LayerConfigType, LightSetupType> ThisType;
   typedef StandardPortalSetup<RenderTreeType, ThisType> PortalSetupType;
+  typedef typename LightSetupType::ShadowHandlerType ShadowType;
 
-  StandardContextSetup (RMShadowedPSSM* rmanager, const LayerConfigType& layerConfig)
-    : rmanager (rmanager), layerConfig (layerConfig),
+  StandardContextSetup (RMShadowedPSSM* rmanager, 
+    typename LightSetupType::PersistentData& lightPersistent,
+    const LayerConfigType& layerConfig)
+    : rmanager (rmanager), lightPersistent (lightPersistent),
+      layerConfig (layerConfig),
     recurseCount (0)
   {
 
   }
-
+  StandardContextSetup (const StandardContextSetup& other)
+    : rmanager (other.rmanager), 
+      lightPersistent (other.lightPersistent),
+      layerConfig (other.layerConfig),
+      recurseCount (other.recurseCount)
+  {
+  }
+  template<typename T2>
+  StandardContextSetup (const T2& other,
+    typename LightSetupType::PersistentData& lightPersistent,
+    const LayerConfigType& layerConfig)
+    : rmanager (other.rmanager), 
+      lightPersistent (lightPersistent), layerConfig (layerConfig),
+      recurseCount (other.recurseCount)
+  {
+  }
+  
   void operator() (typename RenderTreeType::ContextNode& context,
     typename PortalSetupType::ContextSetupData& portalSetupData)
   {
@@ -68,8 +114,9 @@ public:
     // @@@ FIXME: Of course, don't hardcode.
     if (recurseCount > 30) return;
     
-    RMShadowedPSSM::ShadowType::ViewSetup shadowViewSetup (
-      rmanager->lightPersistent.shadowPersist, rview);
+    typename ShadowType::ShadowParameters shadowViewSetup (
+      WrapShadowParams<ShadowType>::Create (
+        rmanager->lightPersistent.shadowPersist, rview));
     
     iShaderManager* shaderManager = rmanager->shaderManager;
 
@@ -89,7 +136,7 @@ public:
     // Set up all portals
     {
       recurseCount++;
-      PortalSetupType portalSetup (rmanager->portalPersistent, *this);      
+      PortalSetupType portalSetup (rmanager->portalPersistent, *this);
       portalSetup (context, portalSetupData);
       recurseCount--;
     }
@@ -121,26 +168,90 @@ public:
 
     SetupStandardShader (context, shaderManager, layerConfig);
 
-    RMShadowedPSSM::LightSetupType lightSetup (
-      rmanager->lightPersistent, rmanager->lightManager,
+    LightSetupType lightSetup (
+      lightPersistent, rmanager->lightManager,
       context.svArrays, layerConfig, shadowViewSetup);
 
     ForEachMeshNode (context, lightSetup);
-    shadowViewSetup.PostLightSetup (context, layerConfig);
 
     // Setup shaders and tickets
     SetupStandardTicket (context, shaderManager,
       lightSetup.GetPostLightingLayers());
   
+    switch (rmanager->refrRefrShadows)
     {
-      RMShadowedPSSM::AutoReflectRefractType fxRR (
-        rmanager->reflectRefractPersistent, *this);
-      typedef TraverseUsedSVSets<RenderTreeType,
-        RMShadowedPSSM::AutoReflectRefractType> SVTraverseType;
-      SVTraverseType svTraverser
-        (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
-      // And do the iteration
-      ForEachMeshNode (context, svTraverser);
+      case 0:
+	{
+	  RMShadowedPSSM::ContextSetupType_Unshadowed ctxRefl (*this,
+	   rmanager->lightPersistent_unshadowed,
+	   rmanager->renderLayerReflect);
+	  RMShadowedPSSM::ContextSetupType_Unshadowed ctxRefr (*this,
+	   rmanager->lightPersistent_unshadowed,
+	   rmanager->renderLayerRefract);
+	  RMShadowedPSSM::AutoReflectRefractType_UU fxRR (
+	    rmanager->reflectRefractPersistent, ctxRefl, ctxRefr);
+	  typedef TraverseUsedSVSets<RenderTreeType,
+	    RMShadowedPSSM::AutoReflectRefractType_UU> SVTraverseType;
+	  SVTraverseType svTraverser
+	    (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+	  // And do the iteration
+	  ForEachMeshNode (context, svTraverser);
+	}
+        break;
+      case RMShadowedPSSM::rrShadowReflect:
+	{
+	  RMShadowedPSSM::ContextSetupType ctxRefl (*this,
+	   rmanager->lightPersistent,
+	   rmanager->renderLayerReflect);
+	  RMShadowedPSSM::ContextSetupType_Unshadowed ctxRefr (*this,
+	   rmanager->lightPersistent_unshadowed,
+	   rmanager->renderLayerRefract);
+	  RMShadowedPSSM::AutoReflectRefractType_SU fxRR (
+	    rmanager->reflectRefractPersistent, ctxRefl, ctxRefr);
+	  typedef TraverseUsedSVSets<RenderTreeType,
+	    RMShadowedPSSM::AutoReflectRefractType_SU> SVTraverseType;
+	  SVTraverseType svTraverser
+	    (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+	  // And do the iteration
+	  ForEachMeshNode (context, svTraverser);
+	}
+        break;
+      case RMShadowedPSSM::rrShadowRefract:
+	{
+	  RMShadowedPSSM::ContextSetupType_Unshadowed ctxRefl (*this,
+	   rmanager->lightPersistent_unshadowed,
+	   rmanager->renderLayerReflect);
+	  RMShadowedPSSM::ContextSetupType ctxRefr (*this,
+	   rmanager->lightPersistent,
+	   rmanager->renderLayerRefract);
+	  RMShadowedPSSM::AutoReflectRefractType_US fxRR (
+	    rmanager->reflectRefractPersistent, ctxRefl, ctxRefr);
+	  typedef TraverseUsedSVSets<RenderTreeType,
+	    RMShadowedPSSM::AutoReflectRefractType_US> SVTraverseType;
+	  SVTraverseType svTraverser
+	    (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+	  // And do the iteration
+	  ForEachMeshNode (context, svTraverser);
+	}
+        break;
+      case RMShadowedPSSM::rrShadowReflect | RMShadowedPSSM::rrShadowRefract:
+	{
+	  RMShadowedPSSM::ContextSetupType ctxRefl (*this,
+	   rmanager->lightPersistent,
+	   rmanager->renderLayerReflect);
+	  RMShadowedPSSM::ContextSetupType ctxRefr (*this,
+	   rmanager->lightPersistent,
+	   rmanager->renderLayerRefract);
+	  RMShadowedPSSM::AutoReflectRefractType_SS fxRR (
+	    rmanager->reflectRefractPersistent, ctxRefl, ctxRefr);
+	  typedef TraverseUsedSVSets<RenderTreeType,
+	    RMShadowedPSSM::AutoReflectRefractType_SS> SVTraverseType;
+	  SVTraverseType svTraverser
+	    (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+	  // And do the iteration
+	  ForEachMeshNode (context, svTraverser);
+	}
+        break;
     }
   }
 
@@ -153,8 +264,9 @@ public:
     operator() (context, portalData);
   }
 
-private:
+public:
   RMShadowedPSSM* rmanager;
+  typename LightSetupType::PersistentData& lightPersistent;
   const LayerConfigType& layerConfig;
   int recurseCount;
 };
@@ -193,6 +305,7 @@ bool RMShadowedPSSM::RenderView (iView* view)
   contextsScannedForTargets.Empty ();
   portalPersistent.UpdateNewFrame ();
   lightPersistent.UpdateNewFrame ();
+  lightPersistent_unshadowed.UpdateNewFrame ();
   reflectRefractPersistent.UpdateNewFrame ();
 
   iSector* startSector = rview->GetThisSector ();
@@ -210,7 +323,7 @@ bool RMShadowedPSSM::RenderView (iView* view)
 
   // Setup the main context
   {
-    ContextSetupType contextSetup (this, renderLayer);
+    ContextSetupType contextSetup (this, lightPersistent, renderLayer);
     ContextSetupType::PortalSetupType::ContextSetupData portalData (startContext);
 
     contextSetup (*startContext, portalData);
@@ -269,7 +382,7 @@ bool RMShadowedPSSM::HandleTarget (RenderTreeType& renderTree,
   startContext->renderTargets[rtaColor0].texHandle = settings.target;
   startContext->renderTargets[rtaColor0].subtexture = settings.targetSubTexture;
 
-  ContextSetupType contextSetup (this, renderLayer);
+  ContextSetupType contextSetup (this, lightPersistent, renderLayer);
   ContextSetupType::PortalSetupType::ContextSetupData portalData (startContext);
 
   contextSetup (*startContext, portalData);
@@ -310,6 +423,33 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
       renderLayer);
     if (!layersValid) renderLayer.Clear();
   }
+  layersFile = cfg->GetStr (
+    "RenderManager.ShadowPSSM.Layers.Reflections", 0);
+  if (layersFile)
+  {
+    if (doVerbose)
+      csReport (objectReg, CS_REPORTER_SEVERITY_NOTIFY, messageID,
+	"Reading reflection render layers from '%s'", layersFile);
+    layersValid = CS::RenderManager::AddLayersFromFile (objectReg, layersFile,
+      renderLayerReflect);
+    if (!layersValid) renderLayerReflect = renderLayer;
+  }
+  else
+    renderLayerReflect = renderLayer;
+  layersFile = cfg->GetStr (
+    "RenderManager.ShadowPSSM.Layers.Refractions", 0);
+  if (layersFile)
+  {
+    if (doVerbose)
+      csReport (objectReg, CS_REPORTER_SEVERITY_NOTIFY, messageID,
+	"Reading refraction render layers from '%s'", layersFile);
+    layersValid = CS::RenderManager::AddLayersFromFile (objectReg, layersFile,
+      renderLayerRefract);
+    if (!layersValid) renderLayerRefract = renderLayer;
+  }
+  else
+    renderLayerRefract = renderLayer;
+  
   csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
   if (!layersValid)
   {
@@ -357,8 +497,15 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
   portalPersistent.Initialize (shaderManager, g3d);
   lightPersistent.shadowPersist.SetConfigPrefix ("RenderManager.ShadowPSSM");
   lightPersistent.Initialize (objectReg, treePersistent.debugPersist);
+  lightPersistent_unshadowed.Initialize (objectReg, treePersistent.debugPersist);
   reflectRefractPersistent.Initialize (objectReg, treePersistent.debugPersist,
     &postEffects);
+    
+  refrRefrShadows = 0;
+  if (cfg->GetBool ("RenderManager.ShadowPSSM.ShadowsInReflections", true))
+    refrRefrShadows |= rrShadowReflect;
+  if (cfg->GetBool ("RenderManager.ShadowPSSM.ShadowsInRefractions", true))
+    refrRefrShadows |= rrShadowRefract;
   
   return true;
 }
