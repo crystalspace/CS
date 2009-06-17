@@ -64,9 +64,6 @@
        corecvar.iSCF_SCF.GetInterfaceID(intf.__name__),intf.scfGetVersion())
   def CS_REQUEST_VFS ():
     return CS_REQUEST_PLUGIN("crystalspace.kernel.vfs", iVFS)
-  def CS_REQUEST_IMAGELOADER ():
-    return CS_REQUEST_PLUGIN("crystalspace.graphic.image.io.multiplexer",
-      iImageIO)
   def CS_REQUEST_LEVELSAVER ():
     return CS_REQUEST_PLUGIN("crystalspace.level.saver", iSaver)
   def CS_REQUEST_REPORTER ():
