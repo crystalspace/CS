@@ -38,6 +38,7 @@
 #include "csgeom/projections.h"
 #include "csgfx/imagememory.h"
 #include "csgfx/renderbuffer.h"
+#include "csgfx/vertexlistwalker.h"
 #include "csplugincommon/opengl/assumedstate.h"
 #include "csplugincommon/opengl/glhelper.h"
 #include "csplugincommon/opengl/glstates.h"
@@ -62,6 +63,54 @@ const int CS_CLIPPER_EMPTY = 0xf008412;
 
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
+
+void csGLGraphics3D::BufferShadowDataHelper::RenderBufferDestroyed (
+  iRenderBuffer* buffer)
+{
+  shadowedBuffers.DeleteAll (buffer);
+}
+    
+iRenderBuffer* csGLGraphics3D::BufferShadowDataHelper::GetSupportedRenderBuffer (
+  iRenderBuffer* originalBuffer)
+{
+  CS_ASSERT(!originalBuffer->IsIndexBuffer());
+
+  ShadowedBuffer& shadowData = shadowedBuffers.GetOrCreate (originalBuffer);
+  if (!shadowData.shadowBuffer
+      || (shadowData.originalBufferVersion != originalBuffer->GetVersion()))
+  {
+    if (shadowData.IsNew())
+      originalBuffer->SetCallback (this);
+  
+    if (!shadowData.shadowBuffer
+        || (shadowData.shadowBuffer->GetComponentCount()
+	  != originalBuffer->GetComponentCount())
+	|| (shadowData.shadowBuffer->GetElementCount()
+	  != originalBuffer->GetElementCount()))
+    {
+      shadowData.shadowBuffer = csRenderBuffer::CreateRenderBuffer (
+        originalBuffer->GetElementCount(),
+        originalBuffer->GetBufferType(),
+        CS_BUFCOMP_FLOAT,
+        originalBuffer->GetComponentCount());
+    }
+    shadowData.originalBufferVersion = originalBuffer->GetVersion();
+    
+    // The vertex list walker actually already does all the conversion we need
+    csVertexListWalker<float> src (originalBuffer);
+    csRenderBufferLock<float> dst (shadowData.shadowBuffer);
+    size_t copySize = sizeof(float) * shadowData.shadowBuffer->GetComponentCount();
+    for (size_t i = 0; i < dst.GetSize(); i++)
+    {
+      memcpy ((float*)(dst++), (const float*)src, copySize);
+      ++src;
+    }
+  }
+  
+  return shadowData.shadowBuffer;
+}
+
+//---------------------------------------------------------------------------
 
 CS_DECLARE_PROFILER
 CS_DECLARE_PROFILER_ZONE(csGLGraphics3D_DrawMesh);
@@ -129,6 +178,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) :
   cliptype = CS_CLIPPER_NONE;
 
   r2tbackend = 0;
+  bufferShadowDataHelper.AttachNew (new BufferShadowDataHelper);
 }
 
 csGLGraphics3D::~csGLGraphics3D()
@@ -1620,7 +1670,7 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
   queueEntry.attrib = CS_VATTRIB_SECONDARY_COLOR;
   changeQueue.Push (queueEntry);
   
-  for (int i = 0; i < 8; i++)
+  for (int i = 0; i < csMin (numTCUnits, 8); i++)
   {
     queueEntry.buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_TEXCOORD0+i]);
     queueEntry.attrib = (csVertexAttrib)(CS_VATTRIB_TEXCOORD0+i);
@@ -1755,11 +1805,33 @@ void csGLGraphics3D::DeactivateTexture (int unit)
   }
   else if (unit != 0) return;
 
-  statecache->Disable_GL_TEXTURE_1D ();
-  statecache->Disable_GL_TEXTURE_2D ();
-  statecache->Disable_GL_TEXTURE_3D ();
-  statecache->Disable_GL_TEXTURE_CUBE_MAP ();
-  statecache->Disable_GL_TEXTURE_RECTANGLE_ARB ();
+  if (imageUnits[unit].texture == 0) return;
+
+  switch (imageUnits[unit].texture->texType)
+  {
+    case iTextureHandle::texType1D:
+      statecache->Disable_GL_TEXTURE_1D ();
+      statecache->SetTexture (GL_TEXTURE_1D, 0);
+      break;
+    case iTextureHandle::texType2D:
+      statecache->Disable_GL_TEXTURE_2D ();
+      statecache->SetTexture (GL_TEXTURE_2D, 0);
+      break;
+    case iTextureHandle::texType3D:
+      statecache->Disable_GL_TEXTURE_3D ();
+      statecache->SetTexture (GL_TEXTURE_3D, 0);
+      break;
+    case iTextureHandle::texTypeCube:
+      statecache->Disable_GL_TEXTURE_CUBE_MAP ();
+      statecache->SetTexture (GL_TEXTURE_CUBE_MAP, 0);
+      break;
+    case iTextureHandle::texTypeRect:
+      statecache->Disable_GL_TEXTURE_RECTANGLE_ARB ();
+      statecache->SetTexture (GL_TEXTURE_RECTANGLE_ARB, 0);
+      break;
+    default:
+      break;
+  }
 
   imageUnits[unit].texture = 0;
 }
@@ -2031,9 +2103,6 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     glMultMatrixf (matrix);
   }
 
-  needColorFixup = (modes.mixmode & CS_FX_MASK_ALPHA) != 0;
-  if (needColorFixup)
-    alphaScale = 1.0f - (modes.mixmode & CS_FX_MASK_ALPHA) / 255.0f;
   ApplyBufferChanges();
 
   iRenderBuffer* iIndexbuf = (modes.buffers
@@ -2193,10 +2262,9 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   else
     statecache->Disable_GL_POLYGON_OFFSET_FILL ();
 
-  GLenum compType;
-  bool normalized;
+  GLenum compType = compGLtypes[iIndexbuf->GetComponentType()];
   void* bufData =
-    RenderLock (iIndexbuf, CS_GLBUF_RENDERLOCK_ELEMENTS, compType, normalized);
+    RenderLock (iIndexbuf, CS_GLBUF_RENDERLOCK_ELEMENTS);
   statecache->ApplyBufferBinding (csGLStateCacheContext::boIndexArray);
   if (bufData != (void*)-1)
   {
@@ -2574,14 +2642,8 @@ void csGLGraphics3D::ClosePortal ()
 }
 
 void* csGLGraphics3D::RenderLock (iRenderBuffer* buffer, 
-				  csGLRenderBufferLockType type, 
-                                  GLenum& compGLType, bool& normalized)
+				  csGLRenderBufferLockType type)
 {
-  csRenderBufferComponentType compType = buffer->GetComponentType();
-  normalized = (compType != CS_BUFCOMP_FLOAT) 
-    && (compType != CS_BUFCOMP_DOUBLE)
-    && (compType & CS_BUFCOMP_NORMALIZED);
-  compGLType = compGLtypes[compType];
   if (vboManager.IsValid())
     return vboManager->RenderLock (buffer, type);
   else
@@ -2625,53 +2687,108 @@ void csGLGraphics3D::ApplyBufferChanges()
     if (changeEntry.buffer.IsValid())
     {
       iRenderBuffer *buffer = changeEntry.buffer;
-      csRef<iRenderBuffer> bufferRef;
-
-      if (needColorFixup && (att == CS_VATTRIB_COLOR))
-      {
-        AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, 0);
-        buffer = DoColorFixup (buffer);
-      }
 
       if (CS_VATTRIB_IS_GENERIC (att)) 
         AssignGenericBuffer (att-CS_VATTRIB_GENERIC_FIRST, buffer);
       else               
         AssignSpecBuffer (att-CS_VATTRIB_SPECIFIC_FIRST, buffer);      
 
-      GLenum compType;
-      bool normalized;
-      void *data =
-	RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY, compType, normalized);
+      csRenderBufferComponentType compType = buffer->GetComponentType();
+      csRenderBufferComponentType compTypeBase = csRenderBufferComponentType(compType & ~CS_BUFCOMP_NORMALIZED);
+      bool isFloat = (compType == CS_BUFCOMP_FLOAT) 
+	|| (compType == CS_BUFCOMP_DOUBLE);
+      bool normalized = !isFloat && (compType & CS_BUFCOMP_NORMALIZED);
+
+      /* Normalization/data type fixup:
+         Specialized attribs treat vertex data as generally either normalized
+         or not normalized. If the actual data doesn't fit that conversion
+         is needed.
+         The specialized vertex array functions also don't support all data
+         types. */
+      const uint wants_short_int =
+        (1 << CS_BUFCOMP_SHORT) | (1 << CS_BUFCOMP_INT);
+      const uint wants_byte_short_int = wants_short_int |
+        (1 << CS_BUFCOMP_BYTE);
+      switch (att)
+      {
+      case CS_VATTRIB_POSITION:
+	if (!isFloat && (normalized
+	    || (((1 << compTypeBase) & wants_short_int) == 0)))
+        {
+          // Set up shadow buffer
+          buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+          compType = buffer->GetComponentType();
+        }
+        break;
+      case CS_VATTRIB_NORMAL:
+	if (!isFloat && (!normalized
+	    || (((1 << compTypeBase) & wants_byte_short_int) == 0)))
+        {
+          // Set up shadow buffer
+          buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+          compType = buffer->GetComponentType();
+        }
+        break;
+      case CS_VATTRIB_COLOR:
+        if (!isFloat && !normalized)
+        {
+          // Set up shadow buffer
+          buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+          compType = buffer->GetComponentType();
+        }
+        break;
+      case CS_VATTRIB_SECONDARY_COLOR:
+        if (ext->CS_GL_EXT_secondary_color)
+        {
+	  if (!isFloat && !normalized)
+	  {
+	    // Set up shadow buffer
+	    buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+	    compType = buffer->GetComponentType();
+	  }
+        }
+        break;
+      default:
+        if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
+        {
+	if (!isFloat && (normalized
+	    || (((1 << compTypeBase) & wants_short_int) == 0)))
+	  {
+	    // Set up shadow buffer
+	    buffer = bufferShadowDataHelper->GetSupportedRenderBuffer (buffer);
+	    compType = buffer->GetComponentType();
+	  }
+        }
+      }
+	
+      GLenum compGLType = compGLtypes[compType];
+      void *data = RenderLock (buffer, CS_GLBUF_RENDERLOCK_ARRAY);
 
       if (data == (void*)-1) continue;
 
       switch (att)
       {
       case CS_VATTRIB_POSITION:
-	// @@@ FIXME: How to deal with normalized buffers?
         statecache->Enable_GL_VERTEX_ARRAY ();
         statecache->SetVertexPointer (buffer->GetComponentCount (),
-          compType, (GLsizei)buffer->GetStride (), data);
+          compGLType, (GLsizei)buffer->GetStride (), data);
         break;
       case CS_VATTRIB_NORMAL:
-	// @@@ FIXME: How to deal with unnormalized buffers?
 	statecache->Enable_GL_NORMAL_ARRAY ();
-        statecache->SetNormalPointer (compType, (GLsizei)buffer->GetStride (), 
+        statecache->SetNormalPointer (compGLType, (GLsizei)buffer->GetStride (), 
           data);
         break;
       case CS_VATTRIB_COLOR:
-	// @@@ FIXME: How to deal with unnormalized buffers?
 	statecache->Enable_GL_COLOR_ARRAY ();
         statecache->SetColorPointer (buffer->GetComponentCount (),
-          compType, (GLsizei)buffer->GetStride (), data);
+          compGLType, (GLsizei)buffer->GetStride (), data);
         break;
       case CS_VATTRIB_SECONDARY_COLOR:
         if (ext->CS_GL_EXT_secondary_color)
         {
-	  // @@@ FIXME: How to deal with unnormalized buffers?
 	  statecache->Enable_GL_SECONDARY_COLOR_ARRAY_EXT ();
 	  statecache->SetSecondaryColorPointerExt (buffer->GetComponentCount (),
-	    compType, (GLsizei)buffer->GetStride (), data);
+	    compGLType, (GLsizei)buffer->GetStride (), data);
         }
         break;
       default:
@@ -2683,10 +2800,9 @@ void csGLGraphics3D::ApplyBufferChanges()
           {
             statecache->SetCurrentTCUnit (unit);
           } 
-	  // @@@ FIXME: How to deal with normalized buffers?
 	  statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
           statecache->SetTexCoordPointer (buffer->GetComponentCount (),
-            compType, (GLsizei)buffer->GetStride (), data);
+            compGLType, (GLsizei)buffer->GetStride (), data);
         }
         else if (CS_VATTRIB_IS_GENERIC(att))
         {
@@ -2700,7 +2816,7 @@ void csGLGraphics3D::ApplyBufferChanges()
 	      activeVertexAttribs |= (1 << index);
 	    }
 	    ext->glVertexAttribPointerARB(index, buffer->GetComponentCount (),
-              compType, normalized, (GLsizei)buffer->GetStride (), data);
+              compGLType, normalized, (GLsizei)buffer->GetStride (), data);
 	  }
         }
         else
@@ -2774,86 +2890,6 @@ void csGLGraphics3D::ApplyBufferChanges()
     }
   }
   changeQueue.Empty();
-}
-
-template<typename T, typename T2>
-static void DoFixup (iRenderBuffer* src, T* dest, const T2 scales[], 
-                     size_t comps = (size_t)~0, const T* defaultComps = 0)
-{
-  const size_t elems = src->GetElementCount();
-  const size_t srcComps = src->GetComponentCount();
-  if (comps == (size_t)~0) comps = srcComps;
-  csRenderBufferLock<uint8, iRenderBuffer*> srcPtr (src, CS_BUF_LOCK_READ);
-  const size_t srcStride = src->GetElementDistance();
-  for (size_t e = 0; e < elems; e++)
-  {
-    T* s = (T*)(srcPtr + e * srcStride);
-    for (size_t c = 0; c < comps; c++)
-    {
-      *dest++ = (T)((c < srcComps ? *s++ : defaultComps[c]) * scales[c]);
-    }
-  }
-}
-
-csRef<iRenderBuffer> csGLGraphics3D::DoColorFixup (iRenderBuffer* buffer)
-{
-  if (!colorScrap.IsValid()
-    || (colorScrap->GetElementCount() < buffer->GetElementCount())
-    || (colorScrap->GetComponentType() != buffer->GetComponentType()))
-  {
-    colorScrap = csRenderBuffer::CreateRenderBuffer (buffer->GetElementCount(),
-      CS_BUF_STREAM, buffer->GetComponentType(), 4);
-  }
-
-  const float componentScale[] = {1.0f, 1.0f, 1.0f, alphaScale};
-  const char defComponentsB[] = {0, 0, 0, 0x7f};
-  const unsigned char defComponentsUB[] = {0, 0, 0, 0xff};
-  const short defComponentsS[] = {0, 0, 0, 0x7fff};
-  const unsigned short defComponentsUS[] = {0, 0, 0, 0xffff};
-  const int defComponentsI[] = {0, 0, 0, 0x7fffffff};
-  const unsigned int defComponentsUI[] = {0, 0, 0, 0xffffffff};
-  const float defComponentsF[] = {0.0f, 0.0f, 0.0f, 1.0f};
-  const double defComponentsD[] = {0.0, 0.0, 0.0, 1.0};
-
-  switch (colorScrap->GetComponentType())
-  {
-    case CS_BUFCOMP_BYTE:
-      DoFixup (buffer, csRenderBufferLock<char> (colorScrap).Lock(),
-        componentScale, 4, defComponentsB);
-      break;
-    case CS_BUFCOMP_UNSIGNED_BYTE:
-      DoFixup (buffer, csRenderBufferLock<unsigned char> (colorScrap).Lock(),
-        componentScale, 4, defComponentsUB);
-      break;
-    case CS_BUFCOMP_SHORT:
-      DoFixup (buffer, csRenderBufferLock<short> (colorScrap).Lock(),
-        componentScale, 4, defComponentsS);
-      break;
-    case CS_BUFCOMP_UNSIGNED_SHORT:
-      DoFixup (buffer, csRenderBufferLock<unsigned short> (colorScrap).Lock(),
-        componentScale, 4, defComponentsUS);
-      break;
-    case CS_BUFCOMP_INT:
-      DoFixup (buffer, csRenderBufferLock<int> (colorScrap).Lock(),
-        componentScale, 4, defComponentsI);
-      break;
-    case CS_BUFCOMP_UNSIGNED_INT:
-      DoFixup (buffer, csRenderBufferLock<unsigned int> (colorScrap).Lock(),
-        componentScale, 4, defComponentsUI);
-      break;
-    case CS_BUFCOMP_FLOAT:
-      DoFixup (buffer, csRenderBufferLock<float> (colorScrap).Lock(),
-        componentScale, 4, defComponentsF);
-      break;
-    case CS_BUFCOMP_DOUBLE:
-      DoFixup (buffer, csRenderBufferLock<double> (colorScrap).Lock(),
-        componentScale, 4, defComponentsD);
-      break;
-    default:
-      CS_ASSERT(false); // Should never happen.
-      break;
-  }
-  return colorScrap;
 }
 
 void csGLGraphics3D::Draw2DPolygon (csVector2* poly, int num_poly,

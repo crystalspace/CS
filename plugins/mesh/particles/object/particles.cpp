@@ -175,9 +175,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   //-- Object
   ParticlesMeshObject::ParticlesMeshObject (ParticlesMeshFactory* factory)
     : scfImplementationType (this), 
-    factory (factory), vertexSetup (0),
+    factory (factory), vertexSetup (0), delayedAdvance(0),
     meshWrapper (0), mixMode (CS_FX_COPY), lastUpdateTime (0),
-    currentDt (0), lastFrameNumber (0), totalParticleTime (0.0f),
+    lastFrameNumber (0), totalParticleTime (0.0f),
     radius (1.0f), minRadius (1.0f), rawBuffer (0), particleAllocatedSize (0),
     externalControl (false),
     particleOrientation (CS_PARTICLE_CAMERAFACE_APPROX), rotationMode (CS_PARTICLE_ROTATE_NONE), 
@@ -693,17 +693,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     }
 
     lastFrameNumber = currentFrame;
-    currentDt = current_time - lastUpdateTime;
+    csTicks currentDt = current_time - lastUpdateTime;
     lastUpdateTime = current_time;
 
     // Some artificial limiting of dt
     if (currentDt > 500) currentDt = 500;
 
-    float dt = currentDt/1000.0f;
-    float newRadiusSq = 0;
-    Advance (dt, newRadiusSq);
-
-    float newRadius = csMax(sqrtf(newRadiusSq), minRadius);
+    // Advance particle system in slices of that duration
+    const csTicks advanceSlice = 50;
+  
+    float newRadius = minRadius;
+    while (currentDt > 0)
+    {
+      csTicks sliceDt = csMin (currentDt, advanceSlice);
+      float dt = sliceDt/1000.0f;
+      float newRadiusSq = 0;
+      Advance (dt, newRadiusSq);
+      newRadius = csMax(sqrtf(newRadiusSq), newRadius);
+      currentDt -= sliceDt;
+    }
 
     if (newRadius > radius)
     {
@@ -773,6 +781,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   
   void ParticlesMeshObject::Advance (csTicks time)
   {
+    // Check that we have a meshwrapper.
+    if(!meshWrapper)
+    {
+      // Delay the advance until we do.
+      delayedAdvance += time;
+      return;
+    }
+
     // Advance particle system in slices of that duration
     const csTicks advanceSlice = 50;
   

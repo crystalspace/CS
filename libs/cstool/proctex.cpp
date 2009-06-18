@@ -228,6 +228,7 @@ bool csProcTexture::Initialize (iObjectRegistry* object_reg)
 {
   csProcTexture::object_reg = object_reg;
   csRef<iThreadReturn> itr = SetupProcEventHandler (object_reg);
+  itr->Wait(false);
   proceh = scfQueryInterface<iEventHandler>(itr->GetResultRefPtr());
 
   g3d = csQueryRegistry<iGraphics3D> (object_reg);

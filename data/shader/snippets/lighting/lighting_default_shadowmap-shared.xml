@@ -30,13 +30,17 @@
 	but also provide "default" snippets and thus does not require users
 	of this snippets to provide all aliases.
       -->
+    <alias name="position" weak="yes" file="/shader/snippets/position.xml" />
+    <alias name="parallax" weak="yes" file="/shader/snippets/surface/parallax-occlusion.xml" />
+    <alias name="normalmap" weak="yes" file="/shader/snippets/surface/normalmap.xml" />
     <alias name="surface" weak="yes" file="/shader/snippets/surface/surface-classic.xml" />
     <alias name="specular" weak="yes" file="/shader/snippets/surface/specular-weirdold.xml" />
+    <alias name="glow" weak="yes" file="/shader/lighting/glow.xml" />
 
     <!-- Snippets - the building blocks of this shader. -->
-    <snippet id="position" file="/shader/snippets/position.xml" />
-    <snippet id="parallax" file="/shader/snippets/surface/parallax.xml" />
-    <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
+    <snippet id="position" filealias="position" />
+    <snippet id="parallax" filealias="parallax" />
+    <snippet id="normalmap" filealias="normalmap" />
     <snippet id="surface" filealias="surface" />
     <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
     <snippet id="apply_alpha" filealias="apply_alpha" />
@@ -45,7 +49,7 @@
     <snippet id="ambient" filealias="ambient" />
     <snippet id="specular" filealias="specular" />
     <snippet id="apply_lighting" file="/shader/snippets/lighting/apply-lighting.xml" />
-    <snippet id="glow" file="/shader/lighting/glow.xml" />
+    <snippet id="glow" filealias="glow" />
     <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />
     <snippet id="hdrscale" file="/shader/snippets/hdr-postscale.xml" />
     <!-- "connections" describe what snippets take input from what other

@@ -42,7 +42,7 @@ public:
   void Init(iConfigManager* config);
 
   void Process(uint num = 1);
-  bool Wait(csRefArray<iThreadReturn>& threadReturns);
+  bool Wait(csRefArray<iThreadReturn>& threadReturns, bool process = true);
 
   inline void PushToQueue(QueueType queueType, iJob* job)
   {
@@ -221,13 +221,13 @@ public:
     finished = other->IsFinished();
   }
 
-  void Wait()
+  void Wait(bool process = true)
   {
     if(tm.IsValid())
     {
       csRefArray<iThreadReturn> rets;
       rets.Push(this);
-      tm->Wait(rets);
+      tm->Wait(rets, process);
     }
   }
 

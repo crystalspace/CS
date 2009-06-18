@@ -427,8 +427,7 @@ private:
     gen_renderBuffers[attr] = buffer;
   }
 
-  void* RenderLock (iRenderBuffer* buffer, csGLRenderBufferLockType type, 
-    GLenum& compGLType, bool& normalized);
+  void* RenderLock (iRenderBuffer* buffer, csGLRenderBufferLockType type);
   void RenderRelease (iRenderBuffer* buffer);
 
   struct ImageUnit : public CS::Memory::CustomAllocated
@@ -436,18 +435,12 @@ private:
     GLuint target;    
     csGLBasicTextureHandle* texture;
     
-    ImageUnit (): target (0) {}
+    ImageUnit (): target (0), texture (0) {}
   };
   GLint numImageUnits;
   ImageUnit* imageUnits;
   GLint numTCUnits;
 
-  /// Whether the alpha channel of the color buffer should be scaled.
-  bool needColorFixup;
-  /// Amount to scale alpha channel of color buffer
-  float alphaScale;
-  /// Scrap buffer used for color fixups
-  csRef<iRenderBuffer> colorScrap;
   //@{
   /**
    * Changes to buffer bindings are not immediate but queued and set from 
@@ -463,7 +456,41 @@ private:
   void ApplyBufferChanges();
   //@}
 
-  csRef<iRenderBuffer> DoColorFixup (iRenderBuffer* buffer);
+  /**
+   * Helper class for render buffer shadow data (ie when the buffer actually
+   * used is different from the originally provided one, usually do data
+   * conversion).
+   */
+  class BufferShadowDataHelper :
+    public scfImplementation1<BufferShadowDataHelper,
+                              iRenderBufferCallback>
+  {
+    struct ShadowedBuffer
+    {
+      csRef<iRenderBuffer> shadowBuffer;
+      uint originalBufferVersion;
+      
+      ShadowedBuffer() : originalBufferVersion(~0) {}
+      bool IsNew() const { return originalBufferVersion == uint (~0); }
+    };
+    typedef csHash<ShadowedBuffer, csPtrKey<iRenderBuffer>,
+      CS::Memory::AllocatorMalloc,
+      csArraySafeCopyElementHandler<
+        CS::Container::HashElement<ShadowedBuffer, csPtrKey<iRenderBuffer> > >
+      > ShadowedBuffersHash;
+    ShadowedBuffersHash shadowedBuffers;
+  public:
+    BufferShadowDataHelper() : scfImplementationType (this) {}
+    
+    /**\name iRenderBufferCallback implementation
+     * @{ */
+    virtual void RenderBufferDestroyed (iRenderBuffer* buffer);
+    /** @} */
+    
+    iRenderBuffer* GetSupportedRenderBuffer (
+      iRenderBuffer* originalBuffer);
+  };
+  csRef<BufferShadowDataHelper> bufferShadowDataHelper;
 
   // Minimal float depth(z) difference to store
   // different values in depth buffer. Of course, for standard depth

@@ -252,13 +252,14 @@ public:
 
 /// Divide a color by a scalar.
 inline csColor4 operator/ (const csColor4& v, float f)
-{ f = 1.0f/f; return csColor4(v.red*f, v.green*f, v.blue*f); }
+{ f = 1.0f/f; return csColor4(v.red*f, v.green*f, v.blue*f, v.alpha*f); }
 /// Multiply two colors.
 inline csColor4 operator* (const csColor4& v1, const csColor4& v2)
 {
   return csColor4 (v1.red * v2.red,
     v1.green * v2.green,
-    v1.blue * v2.blue);
+    v1.blue * v2.blue,
+    v1.alpha * v2.alpha);
 }
 
 

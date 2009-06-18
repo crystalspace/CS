@@ -79,18 +79,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   {
     if (!rec->Component)
     {
-      rec->Component = csQueryRegistryTag (object_reg, rec->ClassID);
+      ScopedWriteLock lock(mutex);
       if (!rec->Component)
       {
-        csRef<iComponent> comp = csLoadPluginCheck<iComponent> (plugin_mgr,
-          rec->ClassID);
-        rec->Component = comp;
-      }
-      if (rec->Component)
-      {
-        rec->Plugin = scfQueryInterface<iLoaderPlugin> (rec->Component);
-        rec->BinPlugin = 
-          scfQueryInterface<iBinaryLoaderPlugin> (rec->Component);
+        rec->Component = csQueryRegistryTag (object_reg, rec->ClassID);
+        if (!rec->Component)
+        {
+          csRef<iComponent> comp = csLoadPluginCheck<iComponent> (plugin_mgr,
+            rec->ClassID);
+          rec->Component = comp;
+        }
+        if (rec->Component)
+        {
+          rec->Plugin = scfQueryInterface<iLoaderPlugin> (rec->Component);
+          rec->BinPlugin = 
+            scfQueryInterface<iBinaryLoaderPlugin> (rec->Component);
+        }
       }
     }
     plug = rec->Plugin;
