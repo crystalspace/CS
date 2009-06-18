@@ -19318,7 +19318,7 @@ SWIGINTERN PyObject *csPluginRequest_swigregister(PyObject *SWIGUNUSEDPARM(self)
   return SWIG_Py_Void();
 }
 
-SWIGINTERN PyObject *_wrap_csInitializer__CreateEnvironment__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csInitializer__CreateEnvironment2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int arg1 ;
   char **arg2 ;
@@ -19329,7 +19329,7 @@ SWIGINTERN PyObject *_wrap_csInitializer__CreateEnvironment__SWIG_0(PyObject *SW
   PyObject * obj1 = 0 ;
   iObjectRegistry *result = 0 ;
   
-  if(!PyArg_UnpackTuple(args,(char *)"csInitializer__CreateEnvironment",2,2,&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csInitializer__CreateEnvironment2",2,2,&obj0,&obj1)) SWIG_fail;
   {
     if (!PyList_Check(obj0))
     {
@@ -19354,7 +19354,7 @@ SWIGINTERN PyObject *_wrap_csInitializer__CreateEnvironment__SWIG_0(PyObject *SW
   }
   ecode3 = SWIG_AsVal_bool(obj1, &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csInitializer__CreateEnvironment" "', argument " "3"" of type '" "bool""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csInitializer__CreateEnvironment2" "', argument " "3"" of type '" "bool""'");
   } 
   arg3 = static_cast< bool >(val3);
   result = (iObjectRegistry *)csInitializer::CreateEnvironment(arg1,(char const *const (*))arg2,arg3);
@@ -19371,7 +19371,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csInitializer__CreateEnvironment__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csInitializer__CreateEnvironment(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int arg1 ;
   char **arg2 ;
@@ -19411,60 +19411,6 @@ fail:
   {
     delete [] arg2;
   }
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_csInitializer__CreateEnvironment(PyObject *self, PyObject *args) {
-  int argc;
-  PyObject *argv[3];
-  int ii;
-  
-  if (!PyTuple_Check(args)) SWIG_fail;
-  argc = (int)PyObject_Length(args);
-  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
-    argv[ii] = PyTuple_GET_ITEM(args,ii);
-  }
-  if (argc == 1) {
-    int _v;
-    {
-      int res = SWIG_AsVal_int(argv[0], NULL);
-      _v = SWIG_CheckState(res);
-    }
-    if (_v) {
-      if (argc <= 1) {
-        return _wrap_csInitializer__CreateEnvironment__SWIG_1(self, args);
-      }
-      void *vptr = 0;
-      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_p_char, 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        return _wrap_csInitializer__CreateEnvironment__SWIG_1(self, args);
-      }
-    }
-  }
-  if (argc == 2) {
-    int _v;
-    {
-      int res = SWIG_AsVal_int(argv[0], NULL);
-      _v = SWIG_CheckState(res);
-    }
-    if (_v) {
-      {
-        int res = SWIG_AsVal_bool(argv[1], NULL);
-        _v = SWIG_CheckState(res);
-      }
-      if (_v) {
-        return _wrap_csInitializer__CreateEnvironment__SWIG_0(self, args);
-      }
-    }
-  }
-  
-fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csInitializer__CreateEnvironment'.\n"
-    "  Possible C/C++ prototypes are:\n"
-    "    CreateEnvironment(int,char const *const [],bool)\n"
-    "    csInitializer::CreateEnvironment(int,char const *const [])\n");
   return NULL;
 }
 
@@ -55108,6 +55054,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csPluginRequest_GetInterfaceVersion", _wrap_csPluginRequest_GetInterfaceVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_csPluginRequest", _wrap_delete_csPluginRequest, METH_VARARGS, NULL},
 	 { (char *)"csPluginRequest_swigregister", csPluginRequest_swigregister, METH_VARARGS, NULL},
+	 { (char *)"csInitializer__CreateEnvironment2", _wrap_csInitializer__CreateEnvironment2, METH_VARARGS, NULL},
 	 { (char *)"csInitializer__CreateEnvironment", _wrap_csInitializer__CreateEnvironment, METH_VARARGS, NULL},
 	 { (char *)"csInitializer__InitializeSCF", _wrap_csInitializer__InitializeSCF, METH_VARARGS, NULL},
 	 { (char *)"csInitializer_CreateObjectRegistry", _wrap_csInitializer_CreateObjectRegistry, METH_VARARGS, NULL},

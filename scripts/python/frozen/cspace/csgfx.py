@@ -493,5 +493,9 @@ csImageManipulate_TransformColor = _csgfx.csImageManipulate_TransformColor
 csImageManipulate_Gray = _csgfx.csImageManipulate_Gray
 csImageManipulate_RenormalizeNormals = _csgfx.csImageManipulate_RenormalizeNormals
 
+def CS_REQUEST_IMAGELOADER ():
+  return core.CS_REQUEST_PLUGIN("crystalspace.graphic.image.io.multiplexer",
+    iImageIO)
+
 
 
