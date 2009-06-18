@@ -194,31 +194,17 @@ iTextureWrapper* csProcTexture::CreateTexture (iObjectRegistry* object_reg)
   csRef<iTextureManager> texman = csQueryRegistry<iTextureManager> (object_reg);
   if (proc_image)
   {
-    if(tldr.IsValid())
-    {
-      tex = engine->GetTextureList()->CreateTexture (proc_image);
-      tldr->AddTextureToList(tex);
-    }
-    else
-    {
-      tex = engine->GetTextureList()->NewTexture (proc_image);
-    }
+    tex = engine->GetTextureList()->CreateTexture (proc_image);
+    tldr->AddTextureToList(tex);
     tex->SetFlags (CS_TEXTURE_3D | texFlags);
     proc_image = 0;
   }
   else
   {
     csRef<iTextureHandle> texHandle = g3d->GetTextureManager()->CreateTexture (mat_w, mat_h,
-      csimg2D, "rgb8", CS_TEXTURE_3D | texFlags);
-    if(tldr.IsValid())
-    {
-      tex = engine->GetTextureList()->CreateTexture (texHandle);
-      tldr->AddTextureToList(tex);
-    }
-    else
-    {
-      tex = engine->GetTextureList()->NewTexture (texHandle);
-    }
+    csimg2D, "rgb8", CS_TEXTURE_3D | texFlags);
+    tex = engine->GetTextureList()->CreateTexture (texHandle);
+    tldr->AddTextureToList(tex);
   }
 
   return tex;

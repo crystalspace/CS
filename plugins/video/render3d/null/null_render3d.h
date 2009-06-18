@@ -171,6 +171,8 @@ public:
   void SetWorldToCamera (const csReversibleTransform& w2c) { this->w2c = w2c; }
   const csReversibleTransform& GetWorldToCamera () { return w2c; }
   void DrawSimpleMesh (const csSimpleRenderMesh& /*mesh*/, uint /*flags*/ = 0) { }
+  void DrawSimpleMeshes (const csSimpleRenderMesh* /*meshes*/,
+    size_t /*numMeshes*/, uint /*flags*/ = 0) { }
 
   bool PerformExtension (char const* /*command*/, ...) { return false; }
   bool PerformExtensionV (char const* /*command*/, va_list /*args*/)

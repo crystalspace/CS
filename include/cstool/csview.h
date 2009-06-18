@@ -84,10 +84,11 @@ public:
   /// Set current camera.
   virtual void SetCamera (iCamera* c);
 
-    /// Get current perspective camera.
   virtual iPerspectiveCamera* GetPerspectiveCamera ();
-  /// Set current perspective camera.
   virtual void SetPerspectiveCamera (iPerspectiveCamera* c);
+
+  virtual iCustomMatrixCamera* GetCustomMatrixCamera ();
+  virtual void SetCustomMatrixCamera (iCustomMatrixCamera* c);
 
   /// Get Context
   virtual iGraphics3D* GetContext ();

@@ -2807,7 +2807,14 @@ namespace swig {
 }
 
 
-#include "crystalspace.h"
+#include "csgeom.h"
+#include "csgfx.h"
+#include "csutil.h"
+#include "cstool/initapp.h"
+#include "igraphic.h"
+#include "imesh.h"
+#include "itexture.h"
+#include "ivideo.h"
 
 
 /* Funtions to set the modules global SCF pointer, this is needed
@@ -7146,6 +7153,110 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csSimpleRenderMesh_indexStart_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csSimpleRenderMesh *arg1 = (csSimpleRenderMesh *) 0 ;
+  uint arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  unsigned long val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csSimpleRenderMesh_indexStart_set",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSimpleRenderMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSimpleRenderMesh_indexStart_set" "', argument " "1"" of type '" "csSimpleRenderMesh *""'"); 
+  }
+  arg1 = reinterpret_cast< csSimpleRenderMesh * >(argp1);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csSimpleRenderMesh_indexStart_set" "', argument " "2"" of type '" "uint""'");
+  } 
+  arg2 = static_cast< uint >(val2);
+  if (arg1) (arg1)->indexStart = arg2;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csSimpleRenderMesh_indexStart_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csSimpleRenderMesh *arg1 = (csSimpleRenderMesh *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  uint result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csSimpleRenderMesh_indexStart_get",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSimpleRenderMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSimpleRenderMesh_indexStart_get" "', argument " "1"" of type '" "csSimpleRenderMesh *""'"); 
+  }
+  arg1 = reinterpret_cast< csSimpleRenderMesh * >(argp1);
+  result = (uint) ((arg1)->indexStart);
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csSimpleRenderMesh_indexEnd_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csSimpleRenderMesh *arg1 = (csSimpleRenderMesh *) 0 ;
+  uint arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  unsigned long val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csSimpleRenderMesh_indexEnd_set",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSimpleRenderMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSimpleRenderMesh_indexEnd_set" "', argument " "1"" of type '" "csSimpleRenderMesh *""'"); 
+  }
+  arg1 = reinterpret_cast< csSimpleRenderMesh * >(argp1);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csSimpleRenderMesh_indexEnd_set" "', argument " "2"" of type '" "uint""'");
+  } 
+  arg2 = static_cast< uint >(val2);
+  if (arg1) (arg1)->indexEnd = arg2;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csSimpleRenderMesh_indexEnd_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csSimpleRenderMesh *arg1 = (csSimpleRenderMesh *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  uint result;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csSimpleRenderMesh_indexEnd_get",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSimpleRenderMesh, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSimpleRenderMesh_indexEnd_get" "', argument " "1"" of type '" "csSimpleRenderMesh *""'"); 
+  }
+  arg1 = reinterpret_cast< csSimpleRenderMesh * >(argp1);
+  result = (uint) ((arg1)->indexEnd);
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_csSimpleRenderMesh_vertexCount_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   csSimpleRenderMesh *arg1 = (csSimpleRenderMesh *) 0 ;
@@ -11046,6 +11157,159 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iGraphics3D_DrawSimpleMeshes__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGraphics3D *arg1 = (iGraphics3D *) 0 ;
+  csSimpleRenderMesh *arg2 = (csSimpleRenderMesh *) 0 ;
+  size_t arg3 ;
+  uint arg4 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  size_t val3 ;
+  int ecode3 = 0 ;
+  unsigned long val4 ;
+  int ecode4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGraphics3D_DrawSimpleMeshes",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGraphics3D, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGraphics3D_DrawSimpleMeshes" "', argument " "1"" of type '" "iGraphics3D *""'"); 
+  }
+  arg1 = reinterpret_cast< iGraphics3D * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_csSimpleRenderMesh, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iGraphics3D_DrawSimpleMeshes" "', argument " "2"" of type '" "csSimpleRenderMesh const *""'"); 
+  }
+  arg2 = reinterpret_cast< csSimpleRenderMesh * >(argp2);
+  ecode3 = SWIG_AsVal_size_t(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iGraphics3D_DrawSimpleMeshes" "', argument " "3"" of type '" "size_t""'");
+  } 
+  arg3 = static_cast< size_t >(val3);
+  ecode4 = SWIG_AsVal_unsigned_SS_long(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iGraphics3D_DrawSimpleMeshes" "', argument " "4"" of type '" "uint""'");
+  } 
+  arg4 = static_cast< uint >(val4);
+  (arg1)->DrawSimpleMeshes((csSimpleRenderMesh const *)arg2,arg3,arg4);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGraphics3D_DrawSimpleMeshes__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iGraphics3D *arg1 = (iGraphics3D *) 0 ;
+  csSimpleRenderMesh *arg2 = (csSimpleRenderMesh *) 0 ;
+  size_t arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  size_t val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iGraphics3D_DrawSimpleMeshes",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGraphics3D, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGraphics3D_DrawSimpleMeshes" "', argument " "1"" of type '" "iGraphics3D *""'"); 
+  }
+  arg1 = reinterpret_cast< iGraphics3D * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_csSimpleRenderMesh, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iGraphics3D_DrawSimpleMeshes" "', argument " "2"" of type '" "csSimpleRenderMesh const *""'"); 
+  }
+  arg2 = reinterpret_cast< csSimpleRenderMesh * >(argp2);
+  ecode3 = SWIG_AsVal_size_t(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iGraphics3D_DrawSimpleMeshes" "', argument " "3"" of type '" "size_t""'");
+  } 
+  arg3 = static_cast< size_t >(val3);
+  (arg1)->DrawSimpleMeshes((csSimpleRenderMesh const *)arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iGraphics3D_DrawSimpleMeshes(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[5];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 4); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iGraphics3D, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_csSimpleRenderMesh, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        {
+          int res = SWIG_AsVal_size_t(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          return _wrap_iGraphics3D_DrawSimpleMeshes__SWIG_1(self, args);
+        }
+      }
+    }
+  }
+  if (argc == 4) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iGraphics3D, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_csSimpleRenderMesh, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        {
+          int res = SWIG_AsVal_size_t(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          {
+            int res = SWIG_AsVal_unsigned_SS_long(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            return _wrap_iGraphics3D_DrawSimpleMeshes__SWIG_0(self, args);
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iGraphics3D_DrawSimpleMeshes'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    DrawSimpleMeshes(iGraphics3D *,csSimpleRenderMesh const *,size_t,uint)\n"
+    "    DrawSimpleMeshes(iGraphics3D *,csSimpleRenderMesh const *,size_t)\n");
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iGraphics3D_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -13213,10 +13477,10 @@ fail:
 SWIGINTERN PyObject *_wrap_CoreRenderMesh_bbox_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   CS::Graphics::CoreRenderMesh *arg1 = (CS::Graphics::CoreRenderMesh *) 0 ;
-  csBox3 *arg2 = (csBox3 *) 0 ;
+  csBox3 arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 = 0 ;
+  void *argp2 ;
   int res2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -13227,12 +13491,20 @@ SWIGINTERN PyObject *_wrap_CoreRenderMesh_bbox_set(PyObject *SWIGUNUSEDPARM(self
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_bbox_set" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
   arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_csBox3, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "CoreRenderMesh_bbox_set" "', argument " "2"" of type '" "csBox3 *""'"); 
+  {
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csBox3,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "CoreRenderMesh_bbox_set" "', argument " "2"" of type '" "csBox3""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "CoreRenderMesh_bbox_set" "', argument " "2"" of type '" "csBox3""'");
+    } else {
+      csBox3 * temp = reinterpret_cast< csBox3 * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
   }
-  arg2 = reinterpret_cast< csBox3 * >(argp2);
-  if (arg1) (arg1)->bbox = *arg2;
+  if (arg1) (arg1)->bbox = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -13246,7 +13518,7 @@ SWIGINTERN PyObject *_wrap_CoreRenderMesh_bbox_get(PyObject *SWIGUNUSEDPARM(self
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  csBox3 *result = 0 ;
+  csBox3 result;
   
   if(!PyArg_UnpackTuple(args,(char *)"CoreRenderMesh_bbox_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_CS__Graphics__CoreRenderMesh, 0 |  0 );
@@ -13254,8 +13526,8 @@ SWIGINTERN PyObject *_wrap_CoreRenderMesh_bbox_get(PyObject *SWIGUNUSEDPARM(self
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "CoreRenderMesh_bbox_get" "', argument " "1"" of type '" "CS::Graphics::CoreRenderMesh *""'"); 
   }
   arg1 = reinterpret_cast< CS::Graphics::CoreRenderMesh * >(argp1);
-  result = (csBox3 *)& ((arg1)->bbox);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csBox3, 0 |  0 );
+  result =  ((arg1)->bbox);
+  resultobj = SWIG_NewPointerObj((new csBox3(static_cast< const csBox3& >(result))), SWIGTYPE_p_csBox3, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -17541,40 +17813,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iShader_GetMetadata__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iShader *arg1 = (iShader *) 0 ;
-  size_t arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  size_t val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  csShaderMetadata *result = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iShader_GetMetadata",2,2,&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iShader, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iShader_GetMetadata" "', argument " "1"" of type '" "iShader const *""'"); 
-  }
-  arg1 = reinterpret_cast< iShader * >(argp1);
-  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iShader_GetMetadata" "', argument " "2"" of type '" "size_t""'");
-  } 
-  arg2 = static_cast< size_t >(val2);
-  {
-    csShaderMetadata const &_result_ref = ((iShader const *)arg1)->GetMetadata(arg2);
-    result = (csShaderMetadata *) &_result_ref;
-  }
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csShaderMetadata, 0 |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_iShader_GetUsedShaderVars(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iShader *arg1 = (iShader *) 0 ;
@@ -17617,7 +17855,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iShader_GetMetadata__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iShader_GetMetadata(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iShader *arg1 = (iShader *) 0 ;
   void *argp1 = 0 ;
@@ -17638,50 +17876,6 @@ SWIGINTERN PyObject *_wrap_iShader_GetMetadata__SWIG_1(PyObject *SWIGUNUSEDPARM(
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csShaderMetadata, 0 |  0 );
   return resultobj;
 fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iShader_GetMetadata(PyObject *self, PyObject *args) {
-  int argc;
-  PyObject *argv[3];
-  int ii;
-  
-  if (!PyTuple_Check(args)) SWIG_fail;
-  argc = (int)PyObject_Length(args);
-  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
-    argv[ii] = PyTuple_GET_ITEM(args,ii);
-  }
-  if (argc == 1) {
-    int _v;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iShader, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      return _wrap_iShader_GetMetadata__SWIG_1(self, args);
-    }
-  }
-  if (argc == 2) {
-    int _v;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iShader, 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      {
-        int res = SWIG_AsVal_size_t(argv[1], NULL);
-        _v = SWIG_CheckState(res);
-      }
-      if (_v) {
-        return _wrap_iShader_GetMetadata__SWIG_0(self, args);
-      }
-    }
-  }
-  
-fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iShader_GetMetadata'.\n"
-    "  Possible C/C++ prototypes are:\n"
-    "    GetMetadata(iShader const *,size_t)\n"
-    "    GetMetadata(iShader const *)\n");
   return NULL;
 }
 
@@ -23381,6 +23575,10 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csSimpleRenderMesh_indexCount_get", _wrap_csSimpleRenderMesh_indexCount_get, METH_VARARGS, NULL},
 	 { (char *)"csSimpleRenderMesh_indices_set", _wrap_csSimpleRenderMesh_indices_set, METH_VARARGS, NULL},
 	 { (char *)"csSimpleRenderMesh_indices_get", _wrap_csSimpleRenderMesh_indices_get, METH_VARARGS, NULL},
+	 { (char *)"csSimpleRenderMesh_indexStart_set", _wrap_csSimpleRenderMesh_indexStart_set, METH_VARARGS, NULL},
+	 { (char *)"csSimpleRenderMesh_indexStart_get", _wrap_csSimpleRenderMesh_indexStart_get, METH_VARARGS, NULL},
+	 { (char *)"csSimpleRenderMesh_indexEnd_set", _wrap_csSimpleRenderMesh_indexEnd_set, METH_VARARGS, NULL},
+	 { (char *)"csSimpleRenderMesh_indexEnd_get", _wrap_csSimpleRenderMesh_indexEnd_get, METH_VARARGS, NULL},
 	 { (char *)"csSimpleRenderMesh_vertexCount_set", _wrap_csSimpleRenderMesh_vertexCount_set, METH_VARARGS, NULL},
 	 { (char *)"csSimpleRenderMesh_vertexCount_get", _wrap_csSimpleRenderMesh_vertexCount_get, METH_VARARGS, NULL},
 	 { (char *)"csSimpleRenderMesh_vertices_set", _wrap_csSimpleRenderMesh_vertices_set, METH_VARARGS, NULL},
@@ -23472,6 +23670,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iGraphics3D_SetProjectionMatrix", _wrap_iGraphics3D_SetProjectionMatrix, METH_VARARGS, NULL},
 	 { (char *)"iGraphics3D_SetTextureComparisonModes", _wrap_iGraphics3D_SetTextureComparisonModes, METH_VARARGS, NULL},
 	 { (char *)"iGraphics3D_CopyFromRenderTargets", _wrap_iGraphics3D_CopyFromRenderTargets, METH_VARARGS, NULL},
+	 { (char *)"iGraphics3D_DrawSimpleMeshes", _wrap_iGraphics3D_DrawSimpleMeshes, METH_VARARGS, NULL},
 	 { (char *)"iGraphics3D_scfGetVersion", _wrap_iGraphics3D_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iGraphics3D", _wrap_delete_iGraphics3D, METH_VARARGS, NULL},
 	 { (char *)"iGraphics3D_swigregister", iGraphics3D_swigregister, METH_VARARGS, NULL},

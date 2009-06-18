@@ -32,10 +32,7 @@ SubInclude TOP plugins video ;
 if [ Property build : projgen ] = msvc
 {
   StaticPluginLibrary crystalspace_staticplugins : 
-    _cspace
     cspython
-    csvosa3dl
-    wxgl
   ;
 }
 else

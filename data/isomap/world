@@ -1,15 +1,9 @@
 <!-- This file was generated from c:/Transfer/blender/isotest.blend with blend2cs 0.2.4 -->
 <!-- http://projects.blender.org/projects/blend2cs -->
 <world>
-    <addon>
-        <plugin>crystalspace.renderloop.loop.loader</plugin>
-        <paramsfile>/shader/std_rloop_shadowed.xml</paramsfile>
-    </addon>
     <settings>
         <clearzbuf>yes</clearzbuf>
         <clearscreen>yes</clearscreen>
-        <lightmapcellsize>16</lightmapcellsize>
-        <renderloop>std_rloop_shadowed</renderloop>
     </settings>
     <plugins>
         <plugin name="null">crystalspace.mesh.loader.null</plugin>
@@ -78,138 +72,58 @@
         <texture name="andrew_wood.jpg">
             <file>/lib/stdtex/andrew_wood.jpg</file>
         </texture>
-        <texture name="lightmap_Scene_Cube_0">
-            <file>lightmaps/lightmap_Scene_Cube_0.png</file>
-            <class>lightmap</class>
-        </texture>
-        <texture name="lightmap_Scene_Cube.001_0">
-            <file>lightmaps/lightmap_Scene_Cube.001_0.png</file>
-            <class>lightmap</class>
-        </texture>
-        <texture name="lightmap_Scene_Cube.002_0">
-            <file>lightmaps/lightmap_Scene_Cube.002_0.png</file>
-            <class>lightmap</class>
-        </texture>
-        <texture name="lightmap_Scene_Cube.003_0">
-            <file>lightmaps/lightmap_Scene_Cube.003_0.png</file>
-            <class>lightmap</class>
-        </texture>
-        <texture name="lightmap_Scene_Cube.004_0">
-            <file>lightmaps/lightmap_Scene_Cube.004_0.png</file>
-            <class>lightmap</class>
-        </texture>
-        <texture name="lightmap_Scene_Cube.005_0">
-            <file>lightmaps/lightmap_Scene_Cube.005_0.png</file>
-            <class>lightmap</class>
-        </texture>
-        <texture name="lightmap_Scene_Cube.006_0">
-            <file>lightmaps/lightmap_Scene_Cube.006_0.png</file>
-            <class>lightmap</class>
-        </texture>
-        <texture name="lightmap_Scene_Cube.007_0">
-            <file>lightmaps/lightmap_Scene_Cube.007_0.png</file>
-            <class>lightmap</class>
-        </texture>
-        <texture name="lightmap_Scene_Cylinder_0">
-            <file>lightmaps/lightmap_Scene_Cylinder_0.png</file>
-            <class>lightmap</class>
-        </texture>
     </textures>
-    <shaders>
-        <shader>
-            <file>/shader/ambient.xml</file>
-        </shader>
-        <shader>
-            <file>/shader/light.xml</file>
-        </shader>
-        <shader>
-            <file>/shader/light_bumpmap.xml</file>
-        </shader>
-        <shader>
-            <file>/shader/parallax/parallax.xml</file>
-        </shader>
-    </shaders>
     <materials>
         <material name="floormaterial">
             <texture>floortexture</texture>
-            <shader type="ambient">ambient</shader>
             <shadervar name="tex normal" type="texture">floornormal</shadervar>
-            <shader type="diffuse">light_bumpmap</shader>
         </material>
         <material name="andrew_marble4.jpg">
             <texture>andrew_marble4.jpg</texture>
-            <shader type="ambient">ambient</shader>
-            <shader type="diffuse">light</shader>
         </material>
         <material name="spun_brass.jp">
             <texture>spun_brass.jp</texture>
-            <shader type="ambient">ambient</shader>
-            <shader type="diffuse">light</shader>
         </material>
         <material name="bricks.jpg">
             <texture>bricks.jpg</texture>
-            <shader type="ambient">ambient</shader>
             <shadervar name="tex normal" type="texture">bricksDOT3.png</shadervar>
             <shadervar name="texture scale" type="vector2">64,64</shadervar>
-            <shader type="diffuse">light_bumpmap</shader>
         </material>
         <material name="abstract_a032.jpg">
             <texture>abstract_a032.jpg</texture>
-            <shader type="ambient">ambient</shader>
-            <shader type="diffuse">light</shader>
         </material>
         <material name="energy.jpg">
             <texture>energy.jpg</texture>
-            <shader type="ambient">ambient</shader>
-            <shader type="diffuse">light</shader>
         </material>
         <material name="explo.jpg">
             <texture>explo.jpg</texture>
-            <shader type="ambient">ambient</shader>
-            <shader type="diffuse">light</shader>
         </material>
         <material name="flare_pink.jpg">
             <texture>flare_pink.jpg</texture>
-            <shader type="ambient">ambient</shader>
-            <shader type="diffuse">light</shader>
         </material>
         <material name="marble_04_ebps_128.jp">
             <texture>marble_04_ebps_128.jp</texture>
             <shadervar name="specular" type="vector4">1.6, 1.8, 2, 1</shadervar>
             <shadervar name="tex normal" type="texture">shinynormal</shadervar>
             <shadervar name="tex height" type="texture">shinynormal</shadervar>
-            <shader type="ambient">ambient</shader>
-            <shader type="diffuse">parallax</shader>
         </material>
         <material name="marble_08_ao___128.jp">
             <texture>marble_08_ao___128.jp</texture>
-            <shader type="ambient">ambient</shader>
-            <shader type="diffuse">light</shader>
         </material>
         <material name="misc_o023.jpg">
             <texture>misc_o023.jpg</texture>
-            <shader type="ambient">ambient</shader>
-            <shader type="diffuse">light</shader>
         </material>
         <material name="oldmetal.jpg">
             <texture>oldmetal.jpg</texture>
-            <shader type="ambient">ambient</shader>
-            <shader type="diffuse">light</shader>
         </material>
         <material name="snow.jpg">
             <texture>snow.jpg</texture>
-            <shader type="ambient">ambient</shader>
-            <shader type="diffuse">light</shader>
         </material>
         <material name="coolwatr.jpg">
             <texture>coolwatr.jpg</texture>
-            <shader type="ambient">ambient</shader>
-            <shader type="diffuse">light</shader>
         </material>
         <material name="andrew_wood.jpg">
             <texture>andrew_wood.jpg</texture>
-            <shader type="ambient">ambient</shader>
-            <shader type="diffuse">light</shader>
         </material>
     </materials>
     <start name="Camera">
@@ -18352,32 +18266,6 @@
                     <e c0="23" />
                 </indexbuffer>
             </submesh>
-            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
-                <e c0="0.34375" c1="0.8125" />
-                <e c0="0.34375" c1="0.875" />
-                <e c0="0.5625" c1="0.875" />
-                <e c0="0.5625" c1="0.8125" />
-                <e c0="0.25" c1="0.875" />
-                <e c0="0.03125" c1="0.875" />
-                <e c0="0.03125" c1="0.8125" />
-                <e c0="0.25" c1="0.8125" />
-                <e c0="0.34375" c1="0.625" />
-                <e c0="0.34375" c1="0.4375" />
-                <e c0="0.375" c1="0.4375" />
-                <e c0="0.375" c1="0.625" />
-                <e c0="0.03125" c1="0.625" />
-                <e c0="0.03125" c1="0.4375" />
-                <e c0="0.25" c1="0.4375" />
-                <e c0="0.25" c1="0.625" />
-                <e c0="0.375" c1="0.25" />
-                <e c0="0.375" c1="0.0625" />
-                <e c0="0.34375" c1="0.0625" />
-                <e c0="0.34375" c1="0.25" />
-                <e c0="0.03125" c1="0.0625" />
-                <e c0="0.03125" c1="0.25" />
-                <e c0="0.25" c1="0.25" />
-                <e c0="0.25" c1="0.0625" />
-            </renderbuffer>
         </params>
     </meshfact>
     <meshfact name="factory_Scene_Cube.001">
@@ -18644,80 +18532,6 @@
                     <e c0="71" />
                 </indexbuffer>
             </submesh>
-            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
-                <e c0="0.78125" c1="0.28125" />
-                <e c0="0.78125" c1="0.3125" />
-                <e c0="0.875" c1="0.3125" />
-                <e c0="0.875" c1="0.28125" />
-                <e c0="0.75" c1="0.1875" />
-                <e c0="0.65625" c1="0.1875" />
-                <e c0="0.65625" c1="0.15625" />
-                <e c0="0.75" c1="0.15625" />
-                <e c0="0.46875" c1="0.625" />
-                <e c0="0.46875" c1="0.59375" />
-                <e c0="0.5" c1="0.59375" />
-                <e c0="0.5" c1="0.625" />
-                <e c0="0.84375" c1="0.1875" />
-                <e c0="0.84375" c1="0.15625" />
-                <e c0="0.937418" c1="0.15625" />
-                <e c0="0.9375" c1="0.1875" />
-                <e c0="0.5" c1="0.5" />
-                <e c0="0.5" c1="0.46875" />
-                <e c0="0.46875" c1="0.46875" />
-                <e c0="0.46875" c1="0.5" />
-                <e c0="0.59375" c1="0.28125" />
-                <e c0="0.59375" c1="0.3125" />
-                <e c0="0.6875" c1="0.3125" />
-                <e c0="0.687418" c1="0.28125" />
-                <e c0="0.65625" c1="0.03125" />
-                <e c0="0.65625" c1="0.0625" />
-                <e c0="0.875" c1="0.0625" />
-                <e c0="0.875" c1="0.03125" />
-                <e c0="0.5625" c1="0.1875" />
-                <e c0="0.34375" c1="0.1875" />
-                <e c0="0.34375" c1="0.15625" />
-                <e c0="0.5625" c1="0.15625" />
-                <e c0="0.34375" c1="0.6875" />
-                <e c0="0.34375" c1="0.53125" />
-                <e c0="0.375" c1="0.53125" />
-                <e c0="0.375" c1="0.6875" />
-                <e c0="0.03125" c1="0.437499" />
-                <e c0="0.0313072" c1="0.28125" />
-                <e c0="0.25" c1="0.28125" />
-                <e c0="0.249999" c1="0.4375" />
-                <e c0="0.375" c1="0.4375" />
-                <e c0="0.375" c1="0.28125" />
-                <e c0="0.34375" c1="0.28125" />
-                <e c0="0.34375" c1="0.4375" />
-                <e c0="0.0313073" c1="0.0312505" />
-                <e c0="0.03125" c1="0.1875" />
-                <e c0="0.249999" c1="0.1875" />
-                <e c0="0.25" c1="0.03125" />
-                <e c0="0.34375" c1="0.03125" />
-                <e c0="0.34375" c1="0.0625" />
-                <e c0="0.5625" c1="0.0625" />
-                <e c0="0.5625" c1="0.03125" />
-                <e c0="0.25" c1="0.9375" />
-                <e c0="0.03125" c1="0.9375" />
-                <e c0="0.03125" c1="0.90625" />
-                <e c0="0.25" c1="0.90625" />
-                <e c0="0.46875" c1="0.375" />
-                <e c0="0.46875" c1="0.28125" />
-                <e c0="0.5" c1="0.28125" />
-                <e c0="0.5" c1="0.375" />
-                <e c0="0.03125" c1="0.8125" />
-                <e c0="0.03125" c1="0.71875" />
-                <e c0="0.249997" c1="0.71875" />
-                <e c0="0.25" c1="0.8125" />
-                <e c0="0.375" c1="0.875" />
-                <e c0="0.375" c1="0.78125" />
-                <e c0="0.34375" c1="0.78125" />
-                <e c0="0.34375" c1="0.875" />
-                <e c0="0.03125" c1="0.53125" />
-                <e c0="0.03125" c1="0.625" />
-                <e c0="0.25" c1="0.625" />
-                <e c0="0.249997" c1="0.53125" />
-            </renderbuffer>
         </params>
     </meshfact>
     <meshfact name="factory_Scene_Cube.002">
@@ -18816,32 +18630,6 @@
                     <e c0="23" />
                 </indexbuffer>
             </submesh>
-            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
-                <e c0="0.34375" c1="0.8125" />
-                <e c0="0.34375" c1="0.875" />
-                <e c0="0.5625" c1="0.875" />
-                <e c0="0.5625" c1="0.8125" />
-                <e c0="0.25" c1="0.875" />
-                <e c0="0.03125" c1="0.875" />
-                <e c0="0.03125" c1="0.8125" />
-                <e c0="0.25" c1="0.8125" />
-                <e c0="0.34375" c1="0.625" />
-                <e c0="0.34375" c1="0.4375" />
-                <e c0="0.375" c1="0.4375" />
-                <e c0="0.375" c1="0.625" />
-                <e c0="0.03125" c1="0.625" />
-                <e c0="0.03125" c1="0.4375" />
-                <e c0="0.25" c1="0.4375" />
-                <e c0="0.25" c1="0.625" />
-                <e c0="0.375" c1="0.25" />
-                <e c0="0.375" c1="0.0625" />
-                <e c0="0.34375" c1="0.0625" />
-                <e c0="0.34375" c1="0.25" />
-                <e c0="0.03125" c1="0.0625" />
-                <e c0="0.03125" c1="0.25" />
-                <e c0="0.25" c1="0.25" />
-                <e c0="0.25" c1="0.0625" />
-            </renderbuffer>
         </params>
     </meshfact>
     <meshfact name="factory_Scene_Cube.003">
@@ -18940,32 +18728,6 @@
                     <e c0="23" />
                 </indexbuffer>
             </submesh>
-            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
-                <e c0="0.34375" c1="0.8125" />
-                <e c0="0.34375" c1="0.875" />
-                <e c0="0.5625" c1="0.875" />
-                <e c0="0.5625" c1="0.8125" />
-                <e c0="0.25" c1="0.875" />
-                <e c0="0.03125" c1="0.875" />
-                <e c0="0.03125" c1="0.8125" />
-                <e c0="0.25" c1="0.8125" />
-                <e c0="0.34375" c1="0.625" />
-                <e c0="0.34375" c1="0.4375" />
-                <e c0="0.375" c1="0.4375" />
-                <e c0="0.375" c1="0.625" />
-                <e c0="0.03125" c1="0.625" />
-                <e c0="0.03125" c1="0.4375" />
-                <e c0="0.25" c1="0.4375" />
-                <e c0="0.25" c1="0.625" />
-                <e c0="0.375" c1="0.25" />
-                <e c0="0.375" c1="0.0625" />
-                <e c0="0.34375" c1="0.0625" />
-                <e c0="0.34375" c1="0.25" />
-                <e c0="0.03125" c1="0.0625" />
-                <e c0="0.03125" c1="0.25" />
-                <e c0="0.25" c1="0.25" />
-                <e c0="0.25" c1="0.0625" />
-            </renderbuffer>
         </params>
     </meshfact>
     <meshfact name="factory_Scene_Cube.004">
@@ -19064,32 +18826,6 @@
                     <e c0="23" />
                 </indexbuffer>
             </submesh>
-            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
-                <e c0="0.34375" c1="0.8125" />
-                <e c0="0.34375" c1="0.875" />
-                <e c0="0.5625" c1="0.875" />
-                <e c0="0.5625" c1="0.8125" />
-                <e c0="0.25" c1="0.875" />
-                <e c0="0.03125" c1="0.875" />
-                <e c0="0.03125" c1="0.8125" />
-                <e c0="0.25" c1="0.8125" />
-                <e c0="0.34375" c1="0.625" />
-                <e c0="0.34375" c1="0.4375" />
-                <e c0="0.375" c1="0.4375" />
-                <e c0="0.375" c1="0.625" />
-                <e c0="0.03125" c1="0.625" />
-                <e c0="0.03125" c1="0.4375" />
-                <e c0="0.25" c1="0.4375" />
-                <e c0="0.25" c1="0.625" />
-                <e c0="0.375" c1="0.25" />
-                <e c0="0.375" c1="0.0625" />
-                <e c0="0.34375" c1="0.0625" />
-                <e c0="0.34375" c1="0.25" />
-                <e c0="0.03125" c1="0.0625" />
-                <e c0="0.03125" c1="0.25" />
-                <e c0="0.25" c1="0.25" />
-                <e c0="0.25" c1="0.0625" />
-            </renderbuffer>
         </params>
     </meshfact>
     <meshfact name="factory_Scene_Cube.005">
@@ -19356,80 +19092,6 @@
                     <e c0="71" />
                 </indexbuffer>
             </submesh>
-            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
-                <e c0="0.78125" c1="0.28125" />
-                <e c0="0.78125" c1="0.3125" />
-                <e c0="0.875" c1="0.3125" />
-                <e c0="0.875" c1="0.28125" />
-                <e c0="0.75" c1="0.1875" />
-                <e c0="0.65625" c1="0.1875" />
-                <e c0="0.65625" c1="0.15625" />
-                <e c0="0.75" c1="0.15625" />
-                <e c0="0.46875" c1="0.625" />
-                <e c0="0.46875" c1="0.59375" />
-                <e c0="0.5" c1="0.59375" />
-                <e c0="0.5" c1="0.625" />
-                <e c0="0.84375" c1="0.1875" />
-                <e c0="0.84375" c1="0.15625" />
-                <e c0="0.937418" c1="0.15625" />
-                <e c0="0.9375" c1="0.1875" />
-                <e c0="0.5" c1="0.5" />
-                <e c0="0.5" c1="0.46875" />
-                <e c0="0.46875" c1="0.46875" />
-                <e c0="0.46875" c1="0.5" />
-                <e c0="0.59375" c1="0.28125" />
-                <e c0="0.59375" c1="0.3125" />
-                <e c0="0.6875" c1="0.3125" />
-                <e c0="0.687418" c1="0.28125" />
-                <e c0="0.65625" c1="0.03125" />
-                <e c0="0.65625" c1="0.0625" />
-                <e c0="0.875" c1="0.0625" />
-                <e c0="0.875" c1="0.03125" />
-                <e c0="0.5625" c1="0.1875" />
-                <e c0="0.34375" c1="0.1875" />
-                <e c0="0.34375" c1="0.15625" />
-                <e c0="0.5625" c1="0.15625" />
-                <e c0="0.34375" c1="0.6875" />
-                <e c0="0.34375" c1="0.53125" />
-                <e c0="0.375" c1="0.53125" />
-                <e c0="0.375" c1="0.6875" />
-                <e c0="0.03125" c1="0.437499" />
-                <e c0="0.0313072" c1="0.28125" />
-                <e c0="0.25" c1="0.28125" />
-                <e c0="0.249999" c1="0.4375" />
-                <e c0="0.375" c1="0.4375" />
-                <e c0="0.375" c1="0.28125" />
-                <e c0="0.34375" c1="0.28125" />
-                <e c0="0.34375" c1="0.4375" />
-                <e c0="0.0313073" c1="0.0312505" />
-                <e c0="0.03125" c1="0.1875" />
-                <e c0="0.249999" c1="0.1875" />
-                <e c0="0.25" c1="0.03125" />
-                <e c0="0.34375" c1="0.03125" />
-                <e c0="0.34375" c1="0.0625" />
-                <e c0="0.5625" c1="0.0625" />
-                <e c0="0.5625" c1="0.03125" />
-                <e c0="0.25" c1="0.9375" />
-                <e c0="0.03125" c1="0.9375" />
-                <e c0="0.03125" c1="0.90625" />
-                <e c0="0.25" c1="0.90625" />
-                <e c0="0.46875" c1="0.375" />
-                <e c0="0.46875" c1="0.28125" />
-                <e c0="0.5" c1="0.28125" />
-                <e c0="0.5" c1="0.375" />
-                <e c0="0.03125" c1="0.8125" />
-                <e c0="0.03125" c1="0.71875" />
-                <e c0="0.249997" c1="0.71875" />
-                <e c0="0.25" c1="0.8125" />
-                <e c0="0.375" c1="0.875" />
-                <e c0="0.375" c1="0.78125" />
-                <e c0="0.34375" c1="0.78125" />
-                <e c0="0.34375" c1="0.875" />
-                <e c0="0.03125" c1="0.53125" />
-                <e c0="0.03125" c1="0.625" />
-                <e c0="0.25" c1="0.625" />
-                <e c0="0.249997" c1="0.53125" />
-            </renderbuffer>
         </params>
     </meshfact>
     <meshfact name="factory_Scene_Cube.006">
@@ -19696,80 +19358,6 @@
                     <e c0="71" />
                 </indexbuffer>
             </submesh>
-            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
-                <e c0="0.78125" c1="0.28125" />
-                <e c0="0.78125" c1="0.3125" />
-                <e c0="0.875" c1="0.3125" />
-                <e c0="0.875" c1="0.28125" />
-                <e c0="0.75" c1="0.1875" />
-                <e c0="0.65625" c1="0.1875" />
-                <e c0="0.65625" c1="0.15625" />
-                <e c0="0.75" c1="0.15625" />
-                <e c0="0.46875" c1="0.625" />
-                <e c0="0.46875" c1="0.59375" />
-                <e c0="0.5" c1="0.59375" />
-                <e c0="0.5" c1="0.625" />
-                <e c0="0.84375" c1="0.1875" />
-                <e c0="0.84375" c1="0.15625" />
-                <e c0="0.937418" c1="0.15625" />
-                <e c0="0.9375" c1="0.1875" />
-                <e c0="0.5" c1="0.5" />
-                <e c0="0.5" c1="0.46875" />
-                <e c0="0.46875" c1="0.46875" />
-                <e c0="0.46875" c1="0.5" />
-                <e c0="0.59375" c1="0.28125" />
-                <e c0="0.59375" c1="0.3125" />
-                <e c0="0.6875" c1="0.3125" />
-                <e c0="0.687418" c1="0.28125" />
-                <e c0="0.65625" c1="0.03125" />
-                <e c0="0.65625" c1="0.0625" />
-                <e c0="0.875" c1="0.0625" />
-                <e c0="0.875" c1="0.03125" />
-                <e c0="0.5625" c1="0.1875" />
-                <e c0="0.34375" c1="0.1875" />
-                <e c0="0.34375" c1="0.15625" />
-                <e c0="0.5625" c1="0.15625" />
-                <e c0="0.34375" c1="0.6875" />
-                <e c0="0.34375" c1="0.53125" />
-                <e c0="0.375" c1="0.53125" />
-                <e c0="0.375" c1="0.6875" />
-                <e c0="0.03125" c1="0.4375" />
-                <e c0="0.0313073" c1="0.28125" />
-                <e c0="0.25" c1="0.28125" />
-                <e c0="0.249999" c1="0.4375" />
-                <e c0="0.375" c1="0.4375" />
-                <e c0="0.375" c1="0.28125" />
-                <e c0="0.34375" c1="0.28125" />
-                <e c0="0.34375" c1="0.4375" />
-                <e c0="0.0313072" c1="0.0312505" />
-                <e c0="0.03125" c1="0.1875" />
-                <e c0="0.249999" c1="0.1875" />
-                <e c0="0.25" c1="0.03125" />
-                <e c0="0.34375" c1="0.03125" />
-                <e c0="0.34375" c1="0.0625" />
-                <e c0="0.5625" c1="0.0625" />
-                <e c0="0.5625" c1="0.03125" />
-                <e c0="0.25" c1="0.9375" />
-                <e c0="0.03125" c1="0.9375" />
-                <e c0="0.03125" c1="0.90625" />
-                <e c0="0.25" c1="0.90625" />
-                <e c0="0.46875" c1="0.375" />
-                <e c0="0.46875" c1="0.28125" />
-                <e c0="0.5" c1="0.28125" />
-                <e c0="0.5" c1="0.375" />
-                <e c0="0.03125" c1="0.8125" />
-                <e c0="0.03125" c1="0.71875" />
-                <e c0="0.249997" c1="0.71875" />
-                <e c0="0.25" c1="0.8125" />
-                <e c0="0.375" c1="0.875" />
-                <e c0="0.375" c1="0.78125" />
-                <e c0="0.34375" c1="0.78125" />
-                <e c0="0.34375" c1="0.875" />
-                <e c0="0.03125" c1="0.53125" />
-                <e c0="0.03125" c1="0.625" />
-                <e c0="0.25" c1="0.625" />
-                <e c0="0.249997" c1="0.53125" />
-            </renderbuffer>
         </params>
     </meshfact>
     <meshfact name="factory_Scene_Cube.007">
@@ -19868,32 +19456,6 @@
                     <e c0="23" />
                 </indexbuffer>
             </submesh>
-            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
-                <e c0="0.34375" c1="0.8125" />
-                <e c0="0.34375" c1="0.875" />
-                <e c0="0.5625" c1="0.875" />
-                <e c0="0.5625" c1="0.8125" />
-                <e c0="0.25" c1="0.875" />
-                <e c0="0.03125" c1="0.875" />
-                <e c0="0.03125" c1="0.8125" />
-                <e c0="0.25" c1="0.8125" />
-                <e c0="0.34375" c1="0.625" />
-                <e c0="0.34375" c1="0.4375" />
-                <e c0="0.375" c1="0.4375" />
-                <e c0="0.375" c1="0.625" />
-                <e c0="0.03125" c1="0.625" />
-                <e c0="0.03125" c1="0.4375" />
-                <e c0="0.25" c1="0.4375" />
-                <e c0="0.25" c1="0.625" />
-                <e c0="0.375" c1="0.25" />
-                <e c0="0.375" c1="0.0625" />
-                <e c0="0.34375" c1="0.0625" />
-                <e c0="0.34375" c1="0.25" />
-                <e c0="0.03125" c1="0.0625" />
-                <e c0="0.03125" c1="0.25" />
-                <e c0="0.25" c1="0.25" />
-                <e c0="0.25" c1="0.0625" />
-            </renderbuffer>
         </params>
     </meshfact>
     <meshfact name="factory_Scene_Cylinder">
@@ -20425,168 +19987,6 @@
                     <e c0="159" />
                 </indexbuffer>
             </submesh>
-            <renderbuffer name="texture coordinate lightmap" components="2" type="float">
-                <e c0="0.53125" c1="0.670588" />
-                <e c0="0.527584" c1="0.65625" />
-                <e c0="0.515625" c1="0.6875" />
-                <e c0="0.840084" c1="0.03125" />
-                <e c0="0.84375" c1="0.0455876" />
-                <e c0="0.828125" c1="0.0625" />
-                <e c0="0.53125" c1="0.5625" />
-                <e c0="0.530061" c1="0.53125" />
-                <e c0="0.515625" c1="0.5625" />
-                <e c0="0.342561" c1="0.34375" />
-                <e c0="0.34375" c1="0.375" />
-                <e c0="0.328125" c1="0.375" />
-                <e c0="0.780061" c1="0.0625" />
-                <e c0="0.78125" c1="0.03125" />
-                <e c0="0.765625" c1="0.03125" />
-                <e c0="0.34375" c1="0.46875" />
-                <e c0="0.34256" c1="0.5" />
-                <e c0="0.328125" c1="0.46875" />
-                <e c0="0.527584" c1="0.4375" />
-                <e c0="0.53125" c1="0.423162" />
-                <e c0="0.515625" c1="0.40625" />
-                <e c0="0.34375" c1="0.610662" />
-                <e c0="0.340084" c1="0.625" />
-                <e c0="0.328125" c1="0.59375" />
-                <e c0="0.711581" c1="0.0625" />
-                <e c0="0.71875" c1="0.0551677" />
-                <e c0="0.703125" c1="0.03125" />
-                <e c0="0.34375" c1="0.742668" />
-                <e c0="0.336581" c1="0.75" />
-                <e c0="0.328125" c1="0.71875" />
-                <e c0="0.515625" c1="0.3125" />
-                <e c0="0.53125" c1="0.310121" />
-                <e c0="0.515625" c1="0.28125" />
-                <e c0="0.34375" c1="0.872621" />
-                <e c0="0.328125" c1="0.875" />
-                <e c0="0.328125" c1="0.84375" />
-                <e c0="0.640625" c1="0.0601213" />
-                <e c0="0.65625" c1="0.0625" />
-                <e c0="0.65625" c1="0.03125" />
-                <e c0="0.40625" c1="0.0625" />
-                <e c0="0.390625" c1="0.0601213" />
-                <e c0="0.40625" c1="0.03125" />
-                <e c0="0.578125" c1="0.0551677" />
-                <e c0="0.585294" c1="0.0625" />
-                <e c0="0.59375" c1="0.03125" />
-                <e c0="0.397794" c1="0.1875" />
-                <e c0="0.390625" c1="0.180168" />
-                <e c0="0.40625" c1="0.15625" />
-                <e c0="0.515625" c1="0.173162" />
-                <e c0="0.519291" c1="0.1875" />
-                <e c0="0.53125" c1="0.15625" />
-                <e c0="0.394291" c1="0.3125" />
-                <e c0="0.390625" c1="0.298162" />
-                <e c0="0.40625" c1="0.28125" />
-                <e c0="0.515625" c1="0.03125" />
-                <e c0="0.516814" c1="0.0625" />
-                <e c0="0.53125" c1="0.03125" />
-                <e c0="0.391814" c1="0.4375" />
-                <e c0="0.390625" c1="0.40625" />
-                <e c0="0.40625" c1="0.406251" />
-                <e c0="0.454314" c1="0.90625" />
-                <e c0="0.453125" c1="0.9375" />
-                <e c0="0.46875" c1="0.9375" />
-                <e c0="0.390625" c1="0.562499" />
-                <e c0="0.391814" c1="0.53125" />
-                <e c0="0.40625" c1="0.5625" />
-                <e c0="0.456791" c1="0.78125" />
-                <e c0="0.453125" c1="0.795588" />
-                <e c0="0.46875" c1="0.8125" />
-                <e c0="0.390625" c1="0.670588" />
-                <e c0="0.394291" c1="0.65625" />
-                <e c0="0.40625" c1="0.6875" />
-                <e c0="0.460294" c1="0.65625" />
-                <e c0="0.453125" c1="0.663582" />
-                <e c0="0.46875" c1="0.6875" />
-                <e c0="0.390625" c1="0.788582" />
-                <e c0="0.397794" c1="0.78125" />
-                <e c0="0.40625" c1="0.8125" />
-                <e c0="0.46875" c1="0.53125" />
-                <e c0="0.453125" c1="0.533629" />
-                <e c0="0.46875" c1="0.5625" />
-                <e c0="0.390625" c1="0.908629" />
-                <e c0="0.40625" c1="0.90625" />
-                <e c0="0.40625" c1="0.9375" />
-                <e c0="0.46875" c1="0.408629" />
-                <e c0="0.453125" c1="0.40625" />
-                <e c0="0.453125" c1="0.4375" />
-                <e c0="0.453125" c1="0.03125" />
-                <e c0="0.46875" c1="0.0336286" />
-                <e c0="0.453125" c1="0.0625" />
-                <e c0="0.453125" c1="0.3125" />
-                <e c0="0.46875" c1="0.288582" />
-                <e c0="0.461581" c1="0.28125" />
-                <e c0="0.461581" c1="0.15625" />
-                <e c0="0.46875" c1="0.163582" />
-                <e c0="0.453125" c1="0.1875" />
-                <e c0="0.328125" c1="0.25" />
-                <e c0="0.328125" c1="0.03125" />
-                <e c0="0.34375" c1="0.03125" />
-                <e c0="0.34375" c1="0.25" />
-                <e c0="0.015625" c1="0.25" />
-                <e c0="0.015625" c1="0.03125" />
-                <e c0="0.03125" c1="0.03125" />
-                <e c0="0.03125" c1="0.25" />
-                <e c0="0.015625" c1="0.875" />
-                <e c0="0.015625" c1="0.65625" />
-                <e c0="0.03125" c1="0.65625" />
-                <e c0="0.03125" c1="0.875" />
-                <e c0="0.015625" c1="0.5625" />
-                <e c0="0.015625" c1="0.34375" />
-                <e c0="0.0312499" c1="0.34375" />
-                <e c0="0.03125" c1="0.5625" />
-                <e c0="0.140625" c1="0.875" />
-                <e c0="0.140625" c1="0.65625" />
-                <e c0="0.15625" c1="0.65625" />
-                <e c0="0.15625" c1="0.875" />
-                <e c0="0.140625" c1="0.5625" />
-                <e c0="0.140625" c1="0.34375" />
-                <e c0="0.15625" c1="0.34375" />
-                <e c0="0.15625" c1="0.5625" />
-                <e c0="0.140625" c1="0.25" />
-                <e c0="0.140625" c1="0.03125" />
-                <e c0="0.15625" c1="0.03125" />
-                <e c0="0.15625" c1="0.25" />
-                <e c0="0.078125" c1="0.25" />
-                <e c0="0.078125" c1="0.03125" />
-                <e c0="0.09375" c1="0.03125" />
-                <e c0="0.09375" c1="0.25" />
-                <e c0="0.09375" c1="0.875" />
-                <e c0="0.09375" c1="0.65625" />
-                <e c0="0.0781251" c1="0.65625" />
-                <e c0="0.078125" c1="0.875" />
-                <e c0="0.0937497" c1="0.5625" />
-                <e c0="0.09375" c1="0.34375" />
-                <e c0="0.0781253" c1="0.34375" />
-                <e c0="0.078125" c1="0.5625" />
-                <e c0="0.28125" c1="0.875" />
-                <e c0="0.28125" c1="0.65625" />
-                <e c0="0.265625" c1="0.65625" />
-                <e c0="0.265625" c1="0.875" />
-                <e c0="0.21875" c1="0.25" />
-                <e c0="0.21875" c1="0.03125" />
-                <e c0="0.203125" c1="0.03125" />
-                <e c0="0.203125" c1="0.25" />
-                <e c0="0.28125" c1="0.5625" />
-                <e c0="0.28125" c1="0.34375" />
-                <e c0="0.265625" c1="0.34375" />
-                <e c0="0.265625" c1="0.5625" />
-                <e c0="0.28125" c1="0.25" />
-                <e c0="0.28125" c1="0.03125" />
-                <e c0="0.265625" c1="0.03125" />
-                <e c0="0.265625" c1="0.25" />
-                <e c0="0.21875" c1="0.875" />
-                <e c0="0.21875" c1="0.65625" />
-                <e c0="0.203125" c1="0.65625" />
-                <e c0="0.203125" c1="0.875" />
-                <e c0="0.203125" c1="0.34375" />
-                <e c0="0.203125" c1="0.5625" />
-                <e c0="0.21875" c1="0.5625" />
-                <e c0="0.21875" c1="0.34375" />
-            </renderbuffer>
         </params>
     </meshfact>
     <sector name="Scene">
@@ -20601,11 +20001,9 @@
                 </mixmode>
                 <submesh name="bricks.jpg_0">
                     <material>bricks.jpg</material>
-                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube_0</shadervar>
                 </submesh>
                 <submesh name="bricks.jpg_0">
                     <material>bricks.jpg</material>
-                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube_0</shadervar>
                 </submesh>
             </params>
             <zuse />
@@ -20624,7 +20022,6 @@
                 </mixmode>
                 <submesh name="bricks.jpg_0">
                     <material>bricks.jpg</material>
-                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube.001_0</shadervar>
                 </submesh>
             </params>
             <zuse />
@@ -20643,7 +20040,6 @@
                 </mixmode>
                 <submesh name="bricks.jpg_0">
                     <material>bricks.jpg</material>
-                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube.002_0</shadervar>
                 </submesh>
             </params>
             <zuse />
@@ -20662,7 +20058,6 @@
                 </mixmode>
                 <submesh name="bricks.jpg_0">
                     <material>bricks.jpg</material>
-                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube.003_0</shadervar>
                 </submesh>
             </params>
             <zuse />
@@ -20681,7 +20076,6 @@
                 </mixmode>
                 <submesh name="bricks.jpg_0">
                     <material>bricks.jpg</material>
-                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube.004_0</shadervar>
                 </submesh>
             </params>
             <zuse />
@@ -20700,7 +20094,6 @@
                 </mixmode>
                 <submesh name="bricks.jpg_0">
                     <material>bricks.jpg</material>
-                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube.005_0</shadervar>
                 </submesh>
             </params>
             <zuse />
@@ -20719,7 +20112,6 @@
                 </mixmode>
                 <submesh name="bricks.jpg_0">
                     <material>bricks.jpg</material>
-                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube.006_0</shadervar>
                 </submesh>
             </params>
             <zuse />
@@ -20738,7 +20130,6 @@
                 </mixmode>
                 <submesh name="bricks.jpg_0">
                     <material>bricks.jpg</material>
-                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cube.007_0</shadervar>
                 </submesh>
             </params>
             <zuse />
@@ -20903,11 +20294,9 @@
                 </mixmode>
                 <submesh name="energy.jpg_0">
                     <material>energy.jpg</material>
-                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cylinder_0</shadervar>
                 </submesh>
                 <submesh name="energy.jpg_0">
                     <material>energy.jpg</material>
-                    <shadervar name="tex lightmap" type="texture">lightmap_Scene_Cylinder_0</shadervar>
                 </submesh>
             </params>
             <zuse />

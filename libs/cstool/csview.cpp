@@ -75,9 +75,20 @@ iPerspectiveCamera *csView::GetPerspectiveCamera ()
 void csView::SetPerspectiveCamera (iPerspectiveCamera* c)
 {
   CS_ASSERT_MSG("Null camera not allowed.", c != NULL); 
-  Camera = scfQueryInterface<iCamera>(c);
+  Camera = c->GetCamera();
 }
 
+iCustomMatrixCamera* csView::GetCustomMatrixCamera ()
+{
+  csRef<iCustomMatrixCamera> cmcam = scfQueryInterfaceSafe<iCustomMatrixCamera>(Camera);
+  return cmcam;
+}
+
+void csView::SetCustomMatrixCamera (iCustomMatrixCamera* c)
+{
+  CS_ASSERT_MSG("Null camera not allowed.", c != 0); 
+  Camera = c->GetCamera();
+}
 
 iGraphics3D* csView::GetContext ()
 {

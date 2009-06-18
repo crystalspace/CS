@@ -84,10 +84,8 @@ public:
     const LayerConfigType& layerConfig)
     : rmanager (rmanager), lightPersistent (lightPersistent),
       layerConfig (layerConfig),
-    recurseCount (0)
+    recurseCount (0), maxPortalRecurse (rmanager->maxPortalRecurse)
   {
-      csConfigAccess cfg (rmanager->objectReg);
-      maxPortalRecurse = cfg->GetInt("RenderManager.ShadowPSSM.MaxPortalRecurse", 30);
   }
 
   StandardContextSetup (const StandardContextSetup& other)
@@ -501,6 +499,7 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
     CS::RenderManager::AddDefaultBaseLayers (objectReg, renderLayer);
   }
   
+  maxPortalRecurse = cfg->GetInt("RenderManager.ShadowPSSM.MaxPortalRecurse", 30);
   
   csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectReg);
   treePersistent.Initialize (shaderManager);

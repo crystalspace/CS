@@ -12535,37 +12535,6 @@ fi
 "
 fi
 
-        # Processor-specific optimizations.
-        if test -n "$cs_cv_prog_cc_msse"; then
-  cs_build_prop_val="$cs_cv_prog_cc_msse"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    	        if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
-"
-fi
-
-fi
-
-        if test -n "$cs_cv_prog_cc_msse2"; then
-  cs_build_prop_val="$cs_cv_prog_cc_msse2"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    	        if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
-"
-fi
-
-fi
-
-        if test -n "$cs_cv_prog_cc_mfpmath_sse"; then
-  cs_build_prop_val="$cs_cv_prog_cc_mfpmath_sse"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    	        if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
-"
-fi
-
-fi
-
         ;;
 esac
 case $cs_host_family in
@@ -12745,6 +12714,15 @@ fi
 fi
 { echo "$as_me:$LINENO: result: $cs_cv_prog_cc_mmmx_ok" >&5
 echo "${ECHO_T}$cs_cv_prog_cc_mmmx_ok" >&6; }
+    if test "$cs_cv_prog_cc_mmmx_ok" != no; then
+  cs_build_prop_val="$cs_cv_prog_cc_mmmx"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.MMX += $cs_build_prop_val ;
+"
+fi
+
+fi
 
 { echo "$as_me:$LINENO: checking for -msse flag" >&5
 echo $ECHO_N "checking for -msse flag... $ECHO_C" >&6; }
@@ -12902,6 +12880,15 @@ fi
 fi
 { echo "$as_me:$LINENO: result: $cs_cv_prog_cc_msse_ok" >&5
 echo "${ECHO_T}$cs_cv_prog_cc_msse_ok" >&6; }
+    if test "$cs_cv_prog_cc_msse_ok" != no; then
+  cs_build_prop_val="$cs_cv_prog_cc_msse"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
+"
+fi
+
+fi
 
 { echo "$as_me:$LINENO: checking for -msse2 flag" >&5
 echo $ECHO_N "checking for -msse2 flag... $ECHO_C" >&6; }
@@ -13059,6 +13046,15 @@ fi
 fi
 { echo "$as_me:$LINENO: result: $cs_cv_prog_cc_msse2_ok" >&5
 echo "${ECHO_T}$cs_cv_prog_cc_msse2_ok" >&6; }
+    if test "$cs_cv_prog_cc_msse2_ok" != no; then
+  cs_build_prop_val="$cs_cv_prog_cc_msse2"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
+"
+fi
+
+fi
 
 { echo "$as_me:$LINENO: checking for -mfpmath=sse flag" >&5
 echo $ECHO_N "checking for -mfpmath=sse flag... $ECHO_C" >&6; }
@@ -13216,13 +13212,11 @@ fi
 fi
 { echo "$as_me:$LINENO: result: $cs_cv_prog_cc_mfpmath_sse_ok" >&5
 echo "${ECHO_T}$cs_cv_prog_cc_mfpmath_sse_ok" >&6; }
-
-
-if test -n "$cs_cv_prog_cc_mmmx"; then
-  cs_build_prop_val="$cs_cv_prog_cc_mmmx"
+    if test "$cs_cv_prog_cc_mfpmath_sse_ok" != no; then
+  cs_build_prop_val="$cs_cv_prog_cc_mfpmath_sse"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.MMX += $cs_build_prop_val ;
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += $cs_build_prop_val ;
 "
 fi
 

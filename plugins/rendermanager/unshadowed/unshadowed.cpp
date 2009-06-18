@@ -54,10 +54,8 @@ public:
 
   StandardContextSetup (RMUnshadowed* rmanager, const LayerConfigType& layerConfig)
     : rmanager (rmanager), layerConfig (layerConfig),
-    recurseCount (0)
+    recurseCount (0), maxPortalRecurse (rmanager->maxPortalRecurse)
   {
-    csConfigAccess cfg (rmanager->objectReg);
-    maxPortalRecurse = cfg->GetInt("RenderManager.Unshadowed.MaxPortalRecurse", 30);
   }
 
   StandardContextSetup (const StandardContextSetup& other,
@@ -371,6 +369,7 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
     CS::RenderManager::AddDefaultBaseLayers (objectReg, renderLayer);
   }
   
+  maxPortalRecurse = cfg->GetInt("RenderManager.Unshadowed.MaxPortalRecurse", 30);
   
   csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectReg);
   treePersistent.Initialize (shaderManager);

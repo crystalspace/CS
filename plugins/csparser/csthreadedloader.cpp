@@ -3336,6 +3336,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         else
           mesh->GetFlags ().Set (CS_ENTITY_NOSHADOWRECEIVE, CS_ENTITY_NOSHADOWRECEIVE);
       break;
+    case XMLTOKEN_NODECAL:
+      TEST_MISSING_MESH
+        if (recursive)
+          mesh->SetFlagsRecursive (CS_ENTITY_NODECAL, CS_ENTITY_NODECAL);
+        else
+          mesh->GetFlags ().Set (CS_ENTITY_NODECAL, CS_ENTITY_NODECAL);
+      break;
     case XMLTOKEN_NOCLIP:
       TEST_MISSING_MESH
         if (recursive)

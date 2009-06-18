@@ -49,12 +49,16 @@ struct IsoView
   csVector3 original_offset;
   /// angle of rotation, in degrees, 0.0 is the original rotation.
   float angle;
-  /// distance from the lookat spot. 1.0 is original distance.
-  float distance;
+  /// Zoom, used to select ortho projection boundaries
+  float zoom;
 
   /// initialize with original offset of camera from the spot you look at.
-  void SetOrigOffset(const csVector3& v) 
-  { camera_offset = original_offset = v; angle = 0.f; distance = 1.f; }
+  void SetOrigOffset(const csVector3& v, float z) 
+  {
+    camera_offset = original_offset = v; 
+    angle = 0.f; 
+    zoom = z;
+  }
 };
 
 /**
@@ -111,7 +115,7 @@ private:
   bool LoadMap ();
 
   /// make the camera look at given position using isometric viewpoint.
-  void CameraIsoLookat(csRef<iCamera> cam, const IsoView& isoview, 
+  void CameraIsoLookat(iCustomMatrixCamera* customCam, const IsoView& isoview, 
     const csVector3& lookat);
   /// setup an isometric view to be ready for display, call after rotating
   void SetupIsoView(IsoView& isoview);

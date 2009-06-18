@@ -15,15 +15,15 @@
 %include "cstool/cspixmap.h"
 %include "cstool/enginetools.h"
 
+%ignore CS::Geometry::Primitives::boxTable;
+%ignore CS::Geometry::Primitives::quadTable;
+%include "cstool/primitives.h"
+
 %include "cstool/genmeshbuilder.h"
 
 %ignore iPen::Rotate;
 
 %include "cstool/pen.h"
-
-%ignore CS::Geometry::Primitives::boxTable;
-%ignore CS::Geometry::Primitives::quadTable;
-%include "cstool/primitives.h"
 
 %template(scfProcTexture) scfImplementationExt2<csProcTexture, csObject, iTextureWrapper, iProcTexture>;
 %include "cstool/proctex.h"

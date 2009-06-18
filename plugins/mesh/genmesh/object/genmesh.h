@@ -228,7 +228,6 @@ public:
 
   iVirtualClock* vc;
   csRef<iGenMeshAnimationControl> anim_ctrl;
-  csRef<iGenMeshAnimationControl1_4> anim_ctrl2;
   void SetAnimationControl (iGenMeshAnimationControl* anim_ctrl);
   iGenMeshAnimationControl* GetAnimationControl () const { return anim_ctrl; }
   const csVector3* AnimControlGetVertices ();

@@ -98,8 +98,8 @@
         float2 offset = float2(0, 0);
 
 	  <?if vars."tex height".texture ?>
-          float2 dx = dFdx(texCoord);
-          float2 dy = dFdy(texCoord);
+          float2 dx = ddx(texCoord);
+          float2 dy = ddy(texCoord);
 
           float rayheight = 1.0;
           float lheight = 1.0;
@@ -137,5 +137,10 @@
       </technique>
     </snippet>
     <connection from="eyeVecT" to="parallax-occlusion" />
+  </technique>
+
+  <!-- Fall back to "old" parallax snippet -->
+  <technique priority="50">
+    <snippet id="parallax" file="/shader/snippets/surface/parallax.xml" />
   </technique>
 </snippet>

@@ -727,6 +727,7 @@ csGetPlatformConfigPath = _core.csGetPlatformConfigPath
 class csInitializer(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
+    _CreateEnvironment2 = staticmethod(_core.csInitializer__CreateEnvironment2)
     _CreateEnvironment = staticmethod(_core.csInitializer__CreateEnvironment)
     _InitializeSCF = staticmethod(_core.csInitializer__InitializeSCF)
     CreateObjectRegistry = staticmethod(_core.csInitializer_CreateObjectRegistry)
@@ -756,6 +757,7 @@ class csInitializer(object):
     __del__ = lambda self : None;
 csInitializer_swigregister = _core.csInitializer_swigregister
 csInitializer_swigregister(csInitializer)
+csInitializer__CreateEnvironment2 = _core.csInitializer__CreateEnvironment2
 csInitializer__CreateEnvironment = _core.csInitializer__CreateEnvironment
 csInitializer__InitializeSCF = _core.csInitializer__InitializeSCF
 csInitializer_CreateObjectRegistry = _core.csInitializer_CreateObjectRegistry
@@ -2220,133 +2222,6 @@ iDataBuffer_swigregister = _core.iDataBuffer_swigregister
 iDataBuffer_swigregister(iDataBuffer)
 iDataBuffer_scfGetVersion = _core.iDataBuffer_scfGetVersion
 
-CS_IMGFMT_MASK = _core.CS_IMGFMT_MASK
-CS_IMGFMT_NONE = _core.CS_IMGFMT_NONE
-CS_IMGFMT_TRUECOLOR = _core.CS_IMGFMT_TRUECOLOR
-CS_IMGFMT_PALETTED8 = _core.CS_IMGFMT_PALETTED8
-CS_IMGFMT_ANY = _core.CS_IMGFMT_ANY
-CS_IMGFMT_ALPHA = _core.CS_IMGFMT_ALPHA
-CS_IMGFMT_INVALID = _core.CS_IMGFMT_INVALID
-csimg2D = _core.csimg2D
-csimg3D = _core.csimg3D
-csimgCube = _core.csimgCube
-class iImage(iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def GetImageData(*args): return _core.iImage_GetImageData(*args)
-    def GetWidth(*args): return _core.iImage_GetWidth(*args)
-    def GetHeight(*args): return _core.iImage_GetHeight(*args)
-    def GetDepth(*args): return _core.iImage_GetDepth(*args)
-    def SetName(*args): return _core.iImage_SetName(*args)
-    def GetName(*args): return _core.iImage_GetName(*args)
-    def GetFormat(*args): return _core.iImage_GetFormat(*args)
-    def GetPalette(*args): return _core.iImage_GetPalette(*args)
-    def GetAlpha(*args): return _core.iImage_GetAlpha(*args)
-    def HasKeyColor(*args): return _core.iImage_HasKeyColor(*args)
-    def GetKeyColor(*args): return _core.iImage_GetKeyColor(*args)
-    def HasMipmaps(*args): return _core.iImage_HasMipmaps(*args)
-    def GetMipmap(*args): return _core.iImage_GetMipmap(*args)
-    def GetRawFormat(*args): return _core.iImage_GetRawFormat(*args)
-    def GetRawData(*args): return _core.iImage_GetRawData(*args)
-    def GetImageType(*args): return _core.iImage_GetImageType(*args)
-    def HasSubImages(*args): return _core.iImage_HasSubImages(*args)
-    def GetSubImage(*args): return _core.iImage_GetSubImage(*args)
-    def GetCookedImageFormat(*args): return _core.iImage_GetCookedImageFormat(*args)
-    def GetCookedImageData(*args): return _core.iImage_GetCookedImageData(*args)
-    scfGetVersion = staticmethod(_core.iImage_scfGetVersion)
-    __swig_destroy__ = _core.delete_iImage
-    __del__ = lambda self : None;
-iImage_swigregister = _core.iImage_swigregister
-iImage_swigregister(iImage)
-iImage_scfGetVersion = _core.iImage_scfGetVersion
-
-class csImageIOFileFormatDescriptions(CustomAllocated):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    __repr__ = _swig_repr
-    __swig_destroy__ = _core.delete_csImageIOFileFormatDescriptions
-    __del__ = lambda self : None;
-    def __init__(self, *args): 
-        this = _core.new_csImageIOFileFormatDescriptions(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    def GetSize(*args): return _core.csImageIOFileFormatDescriptions_GetSize(*args)
-    def Get(*args): return _core.csImageIOFileFormatDescriptions_Get(*args)
-    def Put(*args): return _core.csImageIOFileFormatDescriptions_Put(*args)
-    def Push(*args): return _core.csImageIOFileFormatDescriptions_Push(*args)
-    def Pop(*args): return _core.csImageIOFileFormatDescriptions_Pop(*args)
-    def Top(*args): return _core.csImageIOFileFormatDescriptions_Top(*args)
-    def Insert(*args): return _core.csImageIOFileFormatDescriptions_Insert(*args)
-    def Contains(*args): return _core.csImageIOFileFormatDescriptions_Contains(*args)
-    def DeleteAll(*args): return _core.csImageIOFileFormatDescriptions_DeleteAll(*args)
-    def Truncate(*args): return _core.csImageIOFileFormatDescriptions_Truncate(*args)
-    def Empty(*args): return _core.csImageIOFileFormatDescriptions_Empty(*args)
-    def IsEmpty(*args): return _core.csImageIOFileFormatDescriptions_IsEmpty(*args)
-    def SetMinimalCapacity(*args): return _core.csImageIOFileFormatDescriptions_SetMinimalCapacity(*args)
-    def DeleteIndex(*args): return _core.csImageIOFileFormatDescriptions_DeleteIndex(*args)
-    def DeleteIndexFast(*args): return _core.csImageIOFileFormatDescriptions_DeleteIndexFast(*args)
-    def DeleteRange(*args): return _core.csImageIOFileFormatDescriptions_DeleteRange(*args)
-    def __eq__(*args): return _core.csImageIOFileFormatDescriptions___eq__(*args)
-    def __ne__(*args): return _core.csImageIOFileFormatDescriptions___ne__(*args)
-    def GetAllocator(*args): return _core.csImageIOFileFormatDescriptions_GetAllocator(*args)
-csImageIOFileFormatDescriptions_swigregister = _core.csImageIOFileFormatDescriptions_swigregister
-csImageIOFileFormatDescriptions_swigregister(csImageIOFileFormatDescriptions)
-
-CS_IMAGEIO_LOAD = _core.CS_IMAGEIO_LOAD
-CS_IMAGEIO_SAVE = _core.CS_IMAGEIO_SAVE
-class csImageIOFileFormatDescription(object):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    __repr__ = _swig_repr
-    mime = _swig_property(_core.csImageIOFileFormatDescription_mime_get)
-    subtype = _swig_property(_core.csImageIOFileFormatDescription_subtype_get)
-    cap = _swig_property(_core.csImageIOFileFormatDescription_cap_get, _core.csImageIOFileFormatDescription_cap_set)
-    def __init__(self, *args): 
-        this = _core.new_csImageIOFileFormatDescription(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    __swig_destroy__ = _core.delete_csImageIOFileFormatDescription
-    __del__ = lambda self : None;
-csImageIOFileFormatDescription_swigregister = _core.csImageIOFileFormatDescription_swigregister
-csImageIOFileFormatDescription_swigregister(csImageIOFileFormatDescription)
-
-class iImageIO(iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def GetDescription(*args): return _core.iImageIO_GetDescription(*args)
-    def Load(*args): return _core.iImageIO_Load(*args)
-    def SetDithering(*args): return _core.iImageIO_SetDithering(*args)
-    def Save(*args): return _core.iImageIO_Save(*args)
-    scfGetVersion = staticmethod(_core.iImageIO_scfGetVersion)
-    __swig_destroy__ = _core.delete_iImageIO
-    __del__ = lambda self : None;
-iImageIO_swigregister = _core.iImageIO_swigregister
-iImageIO_swigregister(iImageIO)
-iImageIO_scfGetVersion = _core.iImageIO_scfGetVersion
-
-class iAnimatedImage(iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def Animate(*args): return _core.iAnimatedImage_Animate(*args)
-    def IsAnimated(*args): return _core.iAnimatedImage_IsAnimated(*args)
-    scfGetVersion = staticmethod(_core.iAnimatedImage_scfGetVersion)
-    __swig_destroy__ = _core.delete_iAnimatedImage
-    __del__ = lambda self : None;
-iAnimatedImage_swigregister = _core.iAnimatedImage_swigregister
-iAnimatedImage_swigregister(iAnimatedImage)
-iAnimatedImage_scfGetVersion = _core.iAnimatedImage_scfGetVersion
-
-class iProcTexture(iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def GetAlwaysAnimate(*args): return _core.iProcTexture_GetAlwaysAnimate(*args)
-    def SetAlwaysAnimate(*args): return _core.iProcTexture_SetAlwaysAnimate(*args)
-    def GetFactory(*args): return _core.iProcTexture_GetFactory(*args)
-iProcTexture_swigregister = _core.iProcTexture_swigregister
-iProcTexture_swigregister(iProcTexture)
-
 CSKEY_SHIFT_NUM = _core.CSKEY_SHIFT_NUM
 CSKEY_CTRL_NUM = _core.CSKEY_CTRL_NUM
 CSKEY_ALT_NUM = _core.CSKEY_ALT_NUM
@@ -2379,80 +2254,6 @@ csevMouseClick = _core.csevMouseClick
 csevMouseDoubleClick = _core.csevMouseDoubleClick
 csevMouseMove = _core.csevMouseMove
 csevJoystickEvent = _core.csevJoystickEvent
-class TextureMapper(object):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    __swig_destroy__ = _core.delete_TextureMapper
-    __del__ = lambda self : None;
-    def Map(*args): return _core.TextureMapper_Map(*args)
-TextureMapper_swigregister = _core.TextureMapper_swigregister
-TextureMapper_swigregister(TextureMapper)
-
-class TableTextureMapper(TextureMapper):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _core.new_TableTextureMapper(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    __swig_destroy__ = _core.delete_TableTextureMapper
-    __del__ = lambda self : None;
-    def Map(*args): return _core.TableTextureMapper_Map(*args)
-TableTextureMapper_swigregister = _core.TableTextureMapper_swigregister
-TableTextureMapper_swigregister(TableTextureMapper)
-
-class DensityTextureMapper(TextureMapper):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _core.new_DensityTextureMapper(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    __swig_destroy__ = _core.delete_DensityTextureMapper
-    __del__ = lambda self : None;
-    def Map(*args): return _core.DensityTextureMapper_Map(*args)
-DensityTextureMapper_swigregister = _core.DensityTextureMapper_swigregister
-DensityTextureMapper_swigregister(DensityTextureMapper)
-
-class Primitives(object):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    __repr__ = _swig_repr
-    boxTable = _swig_property(_core.Primitives_boxTable_get, _core.Primitives_boxTable_set)
-    quadTable = _swig_property(_core.Primitives_quadTable_get, _core.Primitives_quadTable_set)
-    CS_PRIMBOX_INSIDE = _core.Primitives_CS_PRIMBOX_INSIDE
-    CS_PRIMBOX_SMOOTH = _core.Primitives_CS_PRIMBOX_SMOOTH
-    GenerateBox = staticmethod(_core.Primitives_GenerateBox)
-    GenerateQuad = staticmethod(_core.Primitives_GenerateQuad)
-    GenerateTesselatedQuad = staticmethod(_core.Primitives_GenerateTesselatedQuad)
-    GenerateCapsule = staticmethod(_core.Primitives_GenerateCapsule)
-    GenerateSphere = staticmethod(_core.Primitives_GenerateSphere)
-    def __init__(self, *args): 
-        this = _core.new_Primitives(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    __swig_destroy__ = _core.delete_Primitives
-    __del__ = lambda self : None;
-Primitives_swigregister = _core.Primitives_swigregister
-Primitives_swigregister(Primitives)
-Primitives_GenerateBox = _core.Primitives_GenerateBox
-Primitives_GenerateQuad = _core.Primitives_GenerateQuad
-Primitives_GenerateTesselatedQuad = _core.Primitives_GenerateTesselatedQuad
-Primitives_GenerateCapsule = _core.Primitives_GenerateCapsule
-Primitives_GenerateSphere = _core.Primitives_GenerateSphere
-
-class csPrimitives(Primitives):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _core.new_csPrimitives(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    __swig_destroy__ = _core.delete_csPrimitives
-    __del__ = lambda self : None;
-csPrimitives_swigregister = _core.csPrimitives_swigregister
-csPrimitives_swigregister(csPrimitives)
-
 CS_LOAD_PLUGIN_ALWAYS = _core.CS_LOAD_PLUGIN_ALWAYS
 CS_QUERY_REGISTRY = _core.CS_QUERY_REGISTRY
 CS_QUERY_REGISTRY_TAG_INTERFACE = _core.CS_QUERY_REGISTRY_TAG_INTERFACE
@@ -2585,7 +2386,7 @@ def _csInitializer_RequestPlugins (reg, plugins):
 csInitializer.RequestPlugins = staticmethod(_csInitializer_RequestPlugins)
 
 def _csInitializer_CreateEnvironment (*args):
-  oreg = _core.csInitializer__CreateEnvironment(*args)
+  oreg = csInitializer._CreateEnvironment(*args)
   SyncSCFPointers()
   return oreg
 csInitializer.CreateEnvironment = staticmethod(_csInitializer_CreateEnvironment)
@@ -2606,9 +2407,6 @@ def CS_REQUEST_PLUGIN_TAG (name, intf, tag):
      corecvar.iSCF_SCF.GetInterfaceID(intf.__name__),intf.scfGetVersion())
 def CS_REQUEST_VFS ():
   return CS_REQUEST_PLUGIN("crystalspace.kernel.vfs", iVFS)
-def CS_REQUEST_IMAGELOADER ():
-  return CS_REQUEST_PLUGIN("crystalspace.graphic.image.io.multiplexer",
-    iImageIO)
 def CS_REQUEST_LEVELSAVER ():
   return CS_REQUEST_PLUGIN("crystalspace.level.saver", iSaver)
 def CS_REQUEST_REPORTER ():
