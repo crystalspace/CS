@@ -68,6 +68,7 @@ private:
   csRefArrayObject<iMeshWrapper, CS::Container::ArrayAllocDefault,
     csArrayCapacityVariableGrow> list;
   csHash<iMeshWrapper*, csString> meshes_hash;
+  mutable CS::Threading::RecursiveMutex removeLock;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>

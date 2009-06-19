@@ -51,6 +51,7 @@ SubInclude TOP data config-plugins ;
 SubInclude TOP data cube ;
 SubInclude TOP data flarge ;
 SubInclude TOP data frankie ;
+SubInclude TOP data posteffects ;
 SubInclude TOP data renderlayers ;
 SubInclude TOP data shader ;
 SubInclude TOP data shader-old ;

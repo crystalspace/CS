@@ -160,6 +160,8 @@ public:
   virtual ~csCameraPositionList ();
   //-- iCameraPositionList
   virtual iCameraPosition* NewCameraPosition (const char* name);
+  virtual csPtr<iCameraPosition> CreateCameraPosition (const char* name);
+
   virtual int GetCount () const;
   virtual iCameraPosition *Get (int n) const;
   virtual int Add (iCameraPosition *obj);
@@ -170,6 +172,7 @@ public:
   virtual iCameraPosition *FindByName (const char *Name) const;
 private:
   csRefArrayObject<iCameraPosition> positions;
+  mutable CS::Threading::RecursiveMutex removeLock;
 };
 
 /**
@@ -199,7 +202,8 @@ using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
  * This class manages all components which comprise a 3D world including
  * sectors, polygons, curves, mesh objects, etc.
  */
-class csEngine : public scfImplementationExt5<csEngine, csObject,
+class csEngine : public ThreadedCallable<csEngine>,
+  public scfImplementationExt5<csEngine, csObject,
   iEngine, iComponent, iPluginConfig, iDebugHelper, iEventHandler>
 {
   // friends
@@ -236,6 +240,11 @@ public:
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject();
+
+  iObjectRegistry* GetObjectRegistry() const
+  {
+    return objectRegistry;
+  }
 
   //-- Preparation and relighting methods
   virtual bool Prepare (iProgressMeter* meter = 0);
@@ -346,7 +355,7 @@ public:
   
   //-- Sector handling
 
-  virtual iSector *CreateSector (const char *name);
+  virtual iSector *CreateSector (const char *name, bool addToList);
   virtual iSectorList* GetSectors ()
   { return &sectors; }
   virtual iSector* FindSector (const char* name,
@@ -364,24 +373,24 @@ public:
   //-- Mesh handling
 
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (iMeshFactoryWrapper* factory,
-  	const char* name, iSector* sector = 0,
-	const csVector3& pos = csVector3 (0, 0, 0));
+  	const char* name, iSector* sector = 0, const csVector3& pos = csVector3 (0, 0, 0),
+    bool addToList = true);
 
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (iMeshObject* meshobj,
-  	const char* name, iSector* sector = 0,
-	const csVector3& pos = csVector3 (0, 0, 0));
+  	const char* name, iSector* sector = 0, const csVector3& pos = csVector3 (0, 0, 0),
+    bool addToList = true);
 
-  virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* classid,
-  	const char* name, iSector* sector = 0,
-	const csVector3& pos = csVector3 (0, 0, 0));
+  virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* classid,	const char* name,
+    iSector* sector = 0, const csVector3& pos = csVector3 (0, 0, 0), bool addToList = true);
 
-  virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* name);
+  virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* name, bool addToList = true);
 
   virtual csPtr<iMeshWrapper> LoadMeshWrapper (
   	const char* name, const char* loaderClassId,
 	iDataBuffer* input, iSector* sector, const csVector3& pos);
 
-  virtual void AddMeshAndChildren (iMeshWrapper* mesh);
+  THREADED_CALLABLE_DECL1(csEngine, AddMeshAndChildren, csThreadReturn, iMeshWrapper*, mesh,
+    HIGH, false, false);
 
   virtual csPtr<iMeshWrapperIterator> GetNearbyMeshes (iSector* sector,
     const csVector3& pos, float radius, bool crossPortals = true );
@@ -401,16 +410,16 @@ public:
   //-- Mesh factory handling
 
   virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* classId,
-  	const char* name);
+  	const char* name, bool addToList);
 
-  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (
-  	iMeshObjectFactory * factory, const char* name);
+  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (iMeshObjectFactory * factory,
+    const char* name, bool addToList);
 
-  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* name);
+  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* name,
+    bool addToList);
 
   virtual csPtr<iMeshFactoryWrapper> LoadMeshFactory (
-  	const char* name, const char* loaderClassId,
-	iDataBuffer* input);
+  	const char* name, const char* loaderClassId, iDataBuffer* input, bool addToList);
 
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name,
   	iCollection* collection = 0);
@@ -653,6 +662,19 @@ public:
 
   iMaterialWrapper* GetDefaultPortalMaterial () const
   { return defaultPortalMaterial; }
+
+  /**
+   * Sync engine lists with loader lists.
+   */
+  THREADED_CALLABLE_DECL2(csEngine, SyncEngineLists, csThreadReturn, csRef<iThreadedLoader>, loader, bool, runNow, LOW, false, true);
+  void SyncEngineListsNow(csRef<iThreadedLoader> loader)
+  {
+    csRef<iThreadReturn> itr;
+    csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(objectRegistry);
+    itr.AttachNew(new csThreadReturn(tm));
+    SyncEngineListsTC(itr, loader, true);
+  }
+
 private:
   // -- PRIVATE METHODS
 
@@ -783,6 +805,7 @@ public:
 
   csRef<iRenderManager> renderManager;
   EnvTex::Holder envTexHolder;
+  bool enableEnvTex;
 
   /// For triangle meshes.
   csStringID colldet_id;
@@ -1013,6 +1036,9 @@ private:
   csEventID CanvasResize;
   csEventID CanvasClose;
   csRef<iEventHandler> weakEventHandler;
+
+  /// Array of new textures to be precached.
+  csRefArray<iTextureWrapper> newTextures;
 };
 
 #include "csutil/deprecated_warn_on.h"

@@ -18,195 +18,167 @@
 */
 
 #include "cssysdef.h"
-#include "csloader.h"
-#include "imap/reader.h"
-#include "iutil/document.h"
+
+#include "iutil/comp.h"
 #include "iutil/objreg.h"
+#include "iutil/plugin.h"
+
+#include "ldrplug.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
-
-struct csLoaderPluginRec
-{
-  csString ShortName;
-  csString ClassID;
-  csRef<iBase> Component;
-  csRef<iLoaderPlugin> Plugin;
-  csRef<iBinaryLoaderPlugin> BinPlugin;
-  csRef<iDocumentNode> defaults;
-
-  csLoaderPluginRec (const char* shortName,
-	const char *classID,
-	iBase* component,
-	iLoaderPlugin *plugin,
-	iBinaryLoaderPlugin* binPlugin)
+  csLoadedPluginVector::csLoadedPluginVector ()
   {
-    if (shortName) ShortName = shortName;
-    ClassID = classID;
-    Component = component;
-    Plugin = plugin;
-    BinPlugin = binPlugin;
+    plugin_mgr = 0;
   }
 
-  void SetDefaults (iDocumentNode* defaults)
+  csLoadedPluginVector::~csLoadedPluginVector ()
   {
-    csLoaderPluginRec::defaults = defaults;
+    DeleteAll ();
   }
-};
 
-csLoader::csLoadedPluginVector::csLoadedPluginVector ()
-{
-  plugin_mgr = 0;
-}
-
-csLoader::csLoadedPluginVector::~csLoadedPluginVector ()
-{
-  DeleteAll ();
-}
-
-void csLoader::csLoadedPluginVector::DeleteAll ()
-{
-  CS::Threading::RecursiveMutexScopedLock lock (mutex);
-  size_t i;
-  for (i = 0 ; i < vector.GetSize () ; i++)
+  void csLoadedPluginVector::DeleteAll ()
   {
-    csLoaderPluginRec* rec = vector[i];
-    if (rec->Component && plugin_mgr)
+    CS::Threading::RecursiveMutexScopedLock lock (mutex);
+    size_t i;
+    for (i = 0 ; i < vector.GetSize () ; i++)
     {
-      csRef<iComponent> comp = scfQueryInterface<iComponent> (rec->Component);
-      if (comp)
-        plugin_mgr->UnloadPlugin (comp);
+      csLoaderPluginRec* rec = vector[i];
+      if (rec->Component && plugin_mgr)
+      {
+        csRef<iComponent> comp = scfQueryInterface<iComponent> (rec->Component);
+        if (comp)
+          plugin_mgr->UnloadPlugin (comp);
+      }
+      delete rec;
     }
-    delete rec;
+    vector.DeleteAll ();
   }
-  vector.DeleteAll ();
-}
 
-csLoaderPluginRec* csLoader::csLoadedPluginVector::FindPluginRec (
-	const char* name)
-{
-  CS::Threading::RecursiveMutexScopedLock lock (mutex);
-  size_t i;
-  for (i=0 ; i<vector.GetSize () ; i++)
+  csLoaderPluginRec* csLoadedPluginVector::FindPluginRec (
+    const char* name)
   {
-    csLoaderPluginRec* pl = vector.Get (i);
-    if ((!pl->ShortName.IsEmpty ()) && !strcmp (name, pl->ShortName))
-      return pl;
-    if (!strcmp (name, pl->ClassID))
-      return pl;
+    CS::Threading::RecursiveMutexScopedLock lock (mutex);
+    size_t i;
+    for (i=0 ; i<vector.GetSize () ; i++)
+    {
+      csLoaderPluginRec* pl = vector.Get (i);
+      if ((!pl->ShortName.IsEmpty ()) && !strcmp (name, pl->ShortName))
+        return pl;
+      if (!strcmp (name, pl->ClassID))
+        return pl;
+    }
+    return 0;
   }
-  return 0;
-}
 
-bool csLoader::csLoadedPluginVector::GetPluginFromRec (
-	csLoaderPluginRec *rec, iLoaderPlugin*& plug,
-	iBinaryLoaderPlugin*& binplug)
-{
-  if (!rec->Component)
+  bool csLoadedPluginVector::GetPluginFromRec (
+    csLoaderPluginRec *rec, iLoaderPlugin*& plug,
+    iBinaryLoaderPlugin*& binplug)
   {
-    rec->Component = csQueryRegistryTag (object_reg, rec->ClassID);
     if (!rec->Component)
     {
-      csRef<iComponent> comp = csLoadPlugin<iComponent> (plugin_mgr,
-    	  rec->ClassID);
-      rec->Component = comp;
-    }
-    if (rec->Component)
-    {
-      rec->Plugin = scfQueryInterface<iLoaderPlugin> (rec->Component);
-      rec->BinPlugin = 
-      	scfQueryInterface<iBinaryLoaderPlugin> (rec->Component);
-    }
-  }
-  plug = rec->Plugin;
-  binplug = rec->BinPlugin;
-  return rec->Component != 0;
-}
-
-bool csLoader::csLoadedPluginVector::FindPlugin (
-	const char* Name, iLoaderPlugin*& plug,
-	iBinaryLoaderPlugin*& binplug, iDocumentNode*& defaults)
-{
-  CS::Threading::RecursiveMutexScopedLock lock (mutex);
-  // look if there is already a loading record for this plugin
-  csLoaderPluginRec* pl = FindPluginRec (Name);
-  if (pl)
-  {
-    defaults = pl->defaults;
-    return GetPluginFromRec (pl, plug, binplug);
-  }
-
-  // create a new loading record
-  vector.Push (new csLoaderPluginRec (0, Name, 0, 0, 0));
-  defaults = 0;
-  return GetPluginFromRec (vector.Get(vector.GetSize ()-1),
-  	plug, binplug);
-}
-
-const char* csLoader::csLoadedPluginVector::FindPluginClassID (const char* Name)
-{
-  CS::Threading::RecursiveMutexScopedLock lock (mutex);
-  // look if there is already a loading record for this plugin
-  csLoaderPluginRec* pl = FindPluginRec (Name);
-  if (pl)
-    return pl->ClassID;
-  
-  return 0;
-}
-    
-
-void csLoader::csLoadedPluginVector::NewPlugin
-	(const char *ShortName, iDocumentNode* child)
-{
-  CS::Threading::RecursiveMutexScopedLock lock (mutex);
-  csRef<iDocumentNode> id = child->GetNode ("id");
-  csRef<iDocumentNode> defaults = child->GetNode ("defaults");
-
-  csLoaderPluginRec* pl = FindPluginRec (ShortName);
-  if (pl)
-  {
-    // There is already an entry with this name. We check if it has
-    // the same class id. If not we replace it anyway.
-    csRef<iDocumentNode> defaults = child->GetNode ("defaults");
-    pl->SetDefaults (defaults);
-    if (id)
-    {
-      const char* ClassID = id->GetContentsValue ();
-      if (pl->ClassID != ClassID)
+      rec->Component = csQueryRegistryTag (object_reg, rec->ClassID);
+      if (!rec->Component)
       {
-        vector.Delete (pl);
-	pl = new csLoaderPluginRec (ShortName, ClassID, 0, 0, 0);
-	vector.Push (pl);
+        csRef<iComponent> comp = csLoadPlugin<iComponent> (plugin_mgr,
+          rec->ClassID);
+        rec->Component = comp;
       }
+      if (rec->Component)
+      {
+        rec->Plugin = scfQueryInterface<iLoaderPlugin> (rec->Component);
+        rec->BinPlugin = 
+          scfQueryInterface<iBinaryLoaderPlugin> (rec->Component);
+      }
+    }
+    plug = rec->Plugin;
+    binplug = rec->BinPlugin;
+    return rec->Component != 0;
+  }
+
+  bool csLoadedPluginVector::FindPlugin (
+    const char* Name, iLoaderPlugin*& plug,
+    iBinaryLoaderPlugin*& binplug, iDocumentNode*& defaults)
+  {
+    CS::Threading::RecursiveMutexScopedLock lock (mutex);
+    // look if there is already a loading record for this plugin
+    csLoaderPluginRec* pl = FindPluginRec (Name);
+    if (pl)
+    {
+      defaults = pl->defaults;
+      return GetPluginFromRec (pl, plug, binplug);
+    }
+
+    // create a new loading record
+    vector.Push (new csLoaderPluginRec (0, Name, 0, 0, 0));
+    defaults = 0;
+    return GetPluginFromRec (vector.Get(vector.GetSize ()-1),
+      plug, binplug);
+  }
+
+  const char* csLoadedPluginVector::FindPluginClassID (const char* Name)
+  {
+    CS::Threading::RecursiveMutexScopedLock lock (mutex);
+    // look if there is already a loading record for this plugin
+    csLoaderPluginRec* pl = FindPluginRec (Name);
+    if (pl)
+      return pl->ClassID;
+
+    return 0;
+  }
+
+
+  void csLoadedPluginVector::NewPlugin
+    (const char *ShortName, iDocumentNode* child)
+  {
+    CS::Threading::RecursiveMutexScopedLock lock (mutex);
+    csRef<iDocumentNode> id = child->GetNode ("id");
+    csRef<iDocumentNode> defaults = child->GetNode ("defaults");
+
+    csLoaderPluginRec* pl = FindPluginRec (ShortName);
+    if (pl)
+    {
+      // There is already an entry with this name. We check if it has
+      // the same class id. If not we replace it anyway.
+      csRef<iDocumentNode> defaults = child->GetNode ("defaults");
       pl->SetDefaults (defaults);
+      if (id)
+      {
+        const char* ClassID = id->GetContentsValue ();
+        if (pl->ClassID != ClassID)
+        {
+          vector.Delete (pl);
+          pl = new csLoaderPluginRec (ShortName, ClassID, 0, 0, 0);
+          vector.Push (pl);
+        }
+        pl->SetDefaults (defaults);
+      }
+      else
+      {
+        const char* ClassID = child->GetContentsValue ();
+        if (pl->ClassID != ClassID)
+        {
+          vector.Delete (pl);
+          vector.Push (new csLoaderPluginRec (ShortName, ClassID, 0, 0, 0));
+        }
+      }
     }
     else
     {
-      const char* ClassID = child->GetContentsValue ();
-      if (pl->ClassID != ClassID)
+      if (id)
       {
-        vector.Delete (pl);
+        const char* ClassID = id->GetContentsValue ();
+        csLoaderPluginRec* pr = new csLoaderPluginRec (ShortName, ClassID, 0, 0, 0);
+        csRef<iDocumentNode> defaults = child->GetNode ("defaults");
+        pr->SetDefaults (defaults);
+        vector.Push (pr);
+      }
+      else
+      {
+        const char* ClassID = child->GetContentsValue ();
         vector.Push (new csLoaderPluginRec (ShortName, ClassID, 0, 0, 0));
       }
     }
   }
-  else
-  {
-    if (id)
-    {
-      const char* ClassID = id->GetContentsValue ();
-      csLoaderPluginRec* pr = new csLoaderPluginRec (ShortName, ClassID, 0, 0, 0);
-      csRef<iDocumentNode> defaults = child->GetNode ("defaults");
-      pr->SetDefaults (defaults);
-      vector.Push (pr);
-    }
-    else
-    {
-      const char* ClassID = child->GetContentsValue ();
-      vector.Push (new csLoaderPluginRec (ShortName, ClassID, 0, 0, 0));
-    }
-  }
-}
-
 }
 CS_PLUGIN_NAMESPACE_END(csparser)

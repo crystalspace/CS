@@ -34,6 +34,7 @@ struct iSector;
 struct iTextureWrapper;
 struct iLight;
 struct iShader;
+struct iObject;
 
 /**
  * This interface gives the context for the loader.
@@ -50,7 +51,7 @@ struct iShader;
  */
 struct iLoaderContext : public virtual iBase
 {
-  SCF_INTERFACE(iLoaderContext, 3, 0, 0);
+  SCF_INTERFACE(iLoaderContext, 3, 2, 0);
   /// Find a sector.
   virtual iSector* FindSector (const char* name) = 0;
   
@@ -121,6 +122,16 @@ struct iLoaderContext : public virtual iBase
    * Returns the flags to tell us what we want to keep.
    */
   virtual uint GetKeepFlags() const = 0;
+
+  /**
+   * Adds the object to the stored collection.
+   */
+  virtual void AddToCollection(iObject* obj) = 0;
+
+  /**
+   * Get the message verbosity.
+   */
+  virtual bool GetVerbose() = 0;
 };
 
 /** @} */

@@ -41,8 +41,7 @@ private:
 
   csRef<iShaderProgram> pswrap;
   
-  bool TryCompile (CGprofile maxFrag,
-    uint loadFlags, const ProfileLimits* limits);
+  bool TryCompile (uint loadFlags, const ProfileLimitsPair& limits);
 public:
   ProfileLimitsPair cacheLimits;
   
@@ -69,7 +68,7 @@ public:
   /// Compile a program
   virtual bool Compile (iHierarchicalCache* cache, csRef<iString>*);
   
-  bool Precache (const ProfileLimits& limits,
+  bool Precache (const ProfileLimitsPair& limitsPair,
     const char* tag, iHierarchicalCache* cache);
 
   virtual int ResolveTU (const char* binding);

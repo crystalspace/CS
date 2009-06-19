@@ -119,6 +119,8 @@ WalkTest::WalkTest () :
   num_maps = 0;
   cache_map = 0;
   doSave = false;
+  spritesLoaded = false;
+  threaded = false;
 }
 
 WalkTest::~WalkTest ()
@@ -217,6 +219,11 @@ void WalkTest::SetDefaults ()
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Logo disabled.");
   }
 
+  if(cmdline->GetOption("threaded"))
+  {
+    threaded = true;
+  }
+
   doSave = Config->GetBool ("Walktest.Settings.EnableEngineSaving", doSave);
   doSave = cmdline->GetBoolOption ("saveable", doSave);
   Report (CS_REPORTER_SEVERITY_NOTIFY, "World saving %s.", 
@@ -228,10 +235,11 @@ void WalkTest::Help ()
   csRef<iConfigManager> cfg (csQueryRegistry<iConfigManager> (object_reg));
   csPrintf ("Options for WalkTest:\n");
   csPrintf ("  -exec=<script>     execute given script at startup\n");
+  csPrintf ("  -threaded          use threaded loading (default no)\n");
   csPrintf ("  -[no]colldet       collision detection system (default '%scolldet')\n", collider_actor.HasCD () ? "" : "no");
   csPrintf ("  -[no]logo          draw logo (default '%slogo')\n", do_logo ? "" : "no");
-  csPrintf ("  -collections       load every map in a separate collection (default off)\n");
-  csPrintf ("  -dupes             check for duplicate objects in multiple maps (default off)\n");
+  csPrintf ("  -[no]collections   load every map in a separate collection (default no)\n");
+  csPrintf ("  -[no]dupes         check for duplicate objects in multiple maps (default yes)\n");
   csPrintf ("  -noprecache        after loading don't precache to speed up rendering\n");
   csPrintf ("  -bots              allow random generation of bots\n");
   csPrintf ("  -[no]saveable      enable/disable engine 'saveable' flag\n");
@@ -758,18 +766,18 @@ void WalkTest::PrepareFrame (csTicks elapsed_time, csTicks /*current_time*/)
 
   int shift, ctrl;
   float speed = 1;
-  object_move_speed = .01;
+  object_move_speed = 0.01f;
 
   ctrl = kbd->GetKeyState (CSKEY_CTRL);
   shift = kbd->GetKeyState (CSKEY_SHIFT);
   if (ctrl)
   {
-    speed = .5;
+    speed = 0.5f;
   }
   if (shift)
   {
     speed = 2;
-    object_move_speed = 1.0;
+    object_move_speed = 1.0f;
   }
 
   float delta = float (elapsed_time) / 1000.0f;
@@ -850,24 +858,29 @@ void WalkTest::InitCollDet (iEngine* engine, iCollection* collection)
 void WalkTest::LoadLibraryData (iCollection* collection)
 {
   // Load the "standard" library
-  if (!LevelLoader->LoadLibraryFile ("/lib/std/library", collection))
+  if(Sys->threaded)
   {
-    Cleanup ();
-    exit (0);
+    csRef<iThreadReturn> ret = TLevelLoader->LoadTexture ("cslogo2",
+      "/lib/std/cslogo2.png", CS_TEXTURE_2D, 0, true, true,
+      true, collection);
+    ret->Wait();
+    if(!ret->WasSuccessful())
+    {
+      Cleanup ();
+      exit (0);
+    }
+  }
+  else
+  {
+    if (!LevelLoader->LoadLibraryFile ("/lib/std/library", collection))
+    {
+      Cleanup ();
+      exit (0);
+    }
   }
 }
 
-void WalkTest::Inititalize2DTextures ()
-{
-  // Find the Crystal Space logo and set the renderer Flag to for_2d, to allow
-  // the use in the 2D part.
-  iTextureWrapper *texh = Engine->GetTextureList ()->FindByName ("cslogo2");
-  if (texh)
-    texh->SetFlags (CS_TEXTURE_2D);
-}
-
-
-void WalkTest::Create2DSprites ()
+bool WalkTest::Create2DSprites ()
 {
   iTextureWrapper *texh;
   iTextureHandle* phTex;
@@ -880,8 +893,10 @@ void WalkTest::Create2DSprites ()
     if (phTex)
     {
       cslogo = new csSimplePixmap (phTex);
+      return true;
     }
   }
+  return false;
 }
 
 static bool WalkEventHandler (iEvent& ev)
@@ -910,6 +925,7 @@ bool WalkTest::SetMapDir (const char* map_dir)
     	map_dir);
     return false;
   }
+  myVFS->SetSyncDir(myVFS->GetCwd());
   return true;
 }
 
@@ -1112,6 +1128,12 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // Open the startup console
   start_console ();
 
+  tm = csQueryRegistry<iThreadManager>(object_reg);
+  if(!tm)
+  {
+    return false;
+  }
+
   // Find the engine plugin and query the csEngine object from it...
   Engine = csQueryRegistry<iEngine> (object_reg);
   if (!Engine)
@@ -1122,8 +1144,17 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   Engine->SetSaveableFlag (doSave);
 
   // Find the level loader plugin
-  LevelLoader = csQueryRegistry<iLoader> (object_reg);
-  if (!LevelLoader)
+  if(threaded)
+  {
+    // Done this way because unfortunately having both loaded at the same time breaks the old one.
+    TLevelLoader = csQueryRegistryOrLoad<iThreadedLoader>(object_reg, "crystalspace.level.loader.threaded");
+  }
+  else
+  {
+    LevelLoader = csQueryRegistry<iLoader>(object_reg);
+  }
+
+  if (!TLevelLoader && !LevelLoader)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No level loader plugin!");
     return false;
@@ -1172,12 +1203,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // Check if we have to load every separate map in a separate collection.
   csRef<iCommandLineParser> cmdline = 
       csQueryRegistry<iCommandLineParser> (object_reg);
-  bool do_collections = false;
-  if (cmdline->GetOption ("collections"))
-    do_collections = true;
-  bool do_dupes = false;
-  if (cmdline->GetOption ("dupes"))
-    do_dupes = true;
+  bool do_collections = cmdline->GetBoolOption ("collections");
+  bool do_dupes = cmdline->GetBoolOption ("dupes", true);
     
   if ((!do_collections) && cache_map != 0)
   {
@@ -1211,12 +1238,27 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     {
       collection = Engine->CreateCollection (map->map_dir);
     }
-    if (!LevelLoader->LoadMapFile ("world", false, collection, !do_collections,
-	      do_dupes))
+    if(threaded)
     {
-      Report (CS_REPORTER_SEVERITY_ERROR, "Failing to load map!");
-      return false;
+      csRef<iThreadReturn> ret = TLevelLoader->LoadMapFile ("world", false, collection);
+      ret->Wait();
+      if(!ret->WasSuccessful())
+      {
+        Report (CS_REPORTER_SEVERITY_ERROR, "Failing to load map!");
+        return false;
+      }
+      Engine->SyncEngineListsNow(TLevelLoader);
     }
+    else
+    {
+      if (!LevelLoader->LoadMapFile ("world", false, collection, !do_collections,
+        do_dupes))
+      {
+        Report (CS_REPORTER_SEVERITY_ERROR, "Failing to load map!");
+        return false;
+      }
+    }
+
     if (do_collections)
     {
       // Set the cache manager based on current VFS dir.
@@ -1228,7 +1270,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   if (do_collections)
     collection = Engine->CreateCollection ("libdata");
   LoadLibraryData (collection);
-  Inititalize2DTextures ();
   ParseKeyCmds ();
 
   // Prepare the engine. This will calculate all lighting and
@@ -1240,16 +1281,19 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     delete meter;
   }
 
+  csTicks stop_time = csGetTicks ();
+  csPrintf ("\nLevel load time: %g seconds.\n",
+      float (stop_time-start_time) / 1000.0); fflush (stdout);
+
   if (!cmdline->GetOption ("noprecache"))
   {
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "Precaching all things...");
+    csTicks start = csGetTicks ();
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Precaching all things...\n");
     Engine->PrecacheDraw ();
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "Precaching finished...");
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "\nPrecaching finished... took %g seconds.\n", (csGetTicks()-start)/1000.0f);
   }
 
-  csTicks stop_time = csGetTicks ();
-  csPrintf ("Total level load time: %g seconds\n",
-      float (stop_time-start_time) / 1000.0); fflush (stdout);
+  printf("\nTotal load time: %g seconds.\n", (csGetTicks()-start_time)/1000.0f);
 
   Create2DSprites ();
 

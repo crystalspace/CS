@@ -66,16 +66,19 @@ int csSharedVariableList::Add (iSharedVariable *obj)
 
 bool csSharedVariableList::Remove (iSharedVariable *obj)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return list.Delete (obj);
 }
 
 bool csSharedVariableList::Remove (int n)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return list.DeleteIndex (n);
 }
 
 void csSharedVariableList::RemoveAll ()
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   list.Empty ();
 }
 
@@ -87,6 +90,7 @@ int csSharedVariableList::Find (iSharedVariable *obj) const
 iSharedVariable *csSharedVariableList::FindByName (
 	const char *Name) const
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return list.FindByName (Name);
 }
 

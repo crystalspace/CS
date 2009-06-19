@@ -58,7 +58,7 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource* ssource, iLoaderContext* ldr_context,
-  	iBase* context) = 0;
+  	iBase* context, iStringArray* failed) = 0;
 };  
 
 /** @} */

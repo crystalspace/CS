@@ -1,0 +1,8 @@
+<library>
+    <textures />
+    <materials />
+    <meshfact name="billboard">
+        <plugin>spr2dFact</plugin>
+        <params />
+    </meshfact>
+</library>

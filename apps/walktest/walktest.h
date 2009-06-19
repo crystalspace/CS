@@ -63,6 +63,7 @@ struct iKeyboardDriver;
 struct iVirtualClock;
 struct iGraphics3D;
 struct iGraphics2D;
+struct iThreadManager;
 
 // Several map modes.
 #define MAP_OFF 0
@@ -160,6 +161,7 @@ public:
   csRef<iPluginManager> plugin_mgr;
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
+  csRef<iThreadManager> tm;
 
   csRef<iEventNameRegistry> name_reg;
   csEventID CommandLineHelp;
@@ -310,12 +312,17 @@ public:
   csColor fs_shadevert_topcol;
   csColor fs_shadevert_botcol;
 
+  // True if we've loaded all the 2d textures and sprites.
+  bool spritesLoaded;
+
   /**
    * The main engine interface
    */
   csRef<iEngine> Engine;
-  /// The level loader
+  /// The level loaders
+  csRef<iThreadedLoader> TLevelLoader;
   csRef<iLoader> LevelLoader;
+  bool threaded;
   ///
   csRef<iGraphics2D> myG2D;
   csRef<iGraphics3D> myG3D;
@@ -491,8 +498,7 @@ public:
 
   /// Load all the graphics libraries needed
   virtual void LoadLibraryData (iCollection* collection);
-  virtual void Inititalize2DTextures ();
-  virtual void Create2DSprites ();
+  virtual bool Create2DSprites ();
 
   ///
   bool WalkHandleEvent (iEvent &Event);
@@ -613,7 +619,15 @@ public:
       virtual bool HandleEvent (iEvent& ev)
       {
         if (parent && (ev.Name == parent->Frame))
-        {      
+        {
+          if(!parent->spritesLoaded)
+          {
+            if(parent->Create2DSprites())
+            {
+              parent->spritesLoaded = true;
+            }
+          }
+
           parent->FinishFrame ();
 
           return true;

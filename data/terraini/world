@@ -91,7 +91,6 @@
     <settings>
         <clearscreen>yes</clearscreen>
         <clearzbuf>yes</clearzbuf>
-        <lightmapcellsize>16</lightmapcellsize>
         <renderloop>std_rloop_terrainfixed</renderloop>
     </settings>
     <start>

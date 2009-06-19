@@ -1,0 +1,21 @@
+<library>
+    <textures>
+        <texture name="asphalt.gif">
+            <file>/lib/stdtex/asphalt.jpg</file>
+        </texture>
+    </textures>
+    <materials>
+        <material name="asphalt">
+            <texture>asphalt.gif</texture>
+        </material>
+    </materials>
+    <meshfact name="exteriorFact">
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
+        <params>
+            <material>asphalt</material>
+            <sphere rimvertices="12" reversed="true">
+                <radius x="100" y="100" z="100" />
+            </sphere>
+        </params>
+    </meshfact>
+</library>

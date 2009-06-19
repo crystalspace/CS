@@ -1169,8 +1169,8 @@ Nag to Jorrit about this feature if you want it.");
 }
 
 csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
-			     iStreamSource*,
-			     iLoaderContext* ldr_context, iBase* context)
+			     iStreamSource*, iLoaderContext* ldr_context,
+           iBase* context, iStringArray*)
 {
   synldr->Report ("crystalspace.thingloader.parse",
 		CS_REPORTER_SEVERITY_WARNING,
@@ -1237,8 +1237,8 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
 }
 
 csPtr<iBase> csThingFactoryLoader::Parse (iDocumentNode* node,
-			     iStreamSource*,
-			     iLoaderContext* ldr_context, iBase*)
+			     iStreamSource*, iLoaderContext* ldr_context, iBase*,
+           iStringArray*)
 {
   synldr->Report ("crystalspace.thingloader.parse",
 		CS_REPORTER_SEVERITY_WARNING,

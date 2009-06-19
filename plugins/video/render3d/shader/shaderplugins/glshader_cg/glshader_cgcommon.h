@@ -37,6 +37,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 
   class csGLShader_CG;
   struct ProfileLimits;
+  struct ProfileLimitsPair;
 
   struct iShaderProgramCG : public virtual iBase
   {
@@ -75,7 +76,6 @@ protected:
 
   CGprogram program;
   CGprofile programProfile;
-  csString cg_profile;
   csString entrypoint;
   csRefArray<iDocumentNode> cacheKeepNodes;
   csString objectCode;
@@ -103,8 +103,9 @@ protected:
   };
   csArray<Clip> clips;
   // Magic SV names
-  enum { svClipPackedDist0 = ~23, svClipPackedDist1 = ~42 };
+  enum { svClipPackedDist0 = ~23, svClipPackedDist1 = ~42, svClipPlane = ~43 };
   csRef<csShaderVariable> clipPackedDists[2];
+  csRef<csShaderVariable> clipPlane[6];
   bool ParseClip (iDocumentNode* node);
   bool ParseVmap (iDocumentNode* node);
 
@@ -138,10 +139,9 @@ protected:
     loadFlagUnusedV2FForInit = 16
   };
   bool DefaultLoadProgram (iShaderProgramCG* cgResolve,
-    const char* programStr, CGGLenum type, 
-    CGprofile maxProfile,
-    uint flags = loadLoadToGL | loadApplyVmap | loadFlagUnusedV2FForInit,
-    const ProfileLimits* customLimits = 0);
+    const char* programStr, ProgramType type,
+    const ProfileLimitsPair& customLimits, 
+    uint flags = loadLoadToGL | loadApplyVmap | loadFlagUnusedV2FForInit);
   csString GetPreprocessedProgram (const char* programStr,
     const ArgumentArray& args);
   void DoDebugDump ();
@@ -175,7 +175,7 @@ protected:
   void ApplyVariableMapArrays (const csShaderVariableStack& stack);
   
   bool WriteToCache (iHierarchicalCache* cache, const ProfileLimits& limits,
-    const char* tag);
+    const ProfileLimitsPair& limitsPair, const char* tag);
   
   bool TryLoadFromCompileCache (const char* source, const ProfileLimits& limits,
     iHierarchicalCache* cache);
@@ -184,7 +184,7 @@ protected:
   bool WriteToCompileCache (const char* source, const ProfileLimits& limits,
     iHierarchicalCache* cache);
   bool WriteToCompileCache (const ProfileLimits& limits,
-    iHierarchicalCache* cache);
+    const ProfileLimitsPair& limitsPair, iHierarchicalCache* cache);
     
   bool GetProgramNode (iDocumentNode* passProgNode);
 public:
@@ -194,12 +194,9 @@ public:
   virtual ~csShaderGLCGCommon ();
 
   void SetValid(bool val) { validProgram = val; }
-  virtual bool Precache (const ProfileLimits& limits,
+  virtual bool Precache (const ProfileLimitsPair& limitsPair,
     const char* tag, iHierarchicalCache* cache) = 0;
     
-  CGprofile CustomProfile ()
-  { return cg_profile.IsEmpty() ? CG_PROFILE_UNKNOWN : cgGetProfile (cg_profile); }
-
   ////////////////////////////////////////////////////////////////////
   //                      iShaderProgram
   ////////////////////////////////////////////////////////////////////

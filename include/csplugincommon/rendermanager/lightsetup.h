@@ -39,6 +39,20 @@ namespace CS
 {
 namespace RenderManager
 {
+  struct LayerHelperContextData
+  {
+    csArray<size_t> newLayerIndices;
+    csArray<size_t> newLayerCounts;
+  };
+
+  struct RenderTreeLightingTraits : public RenderTreeStandardTraits
+  {
+    struct ContextNodeExtraDataType
+    {
+      LayerHelperContextData layerHelperData;
+    };
+  };
+
   /**
    * Helper to duplicate render layers.
    * Used when meshes have to be rendered multiple times but with the
@@ -51,56 +65,38 @@ namespace RenderManager
   {
   public:
     /**
-     * Data used by the helper that needs to persist over multiple frames.
-     * Users of LayerHelper must store an instance of this class and provide
-     * it to the helper upon instantiation. 
-     */
-    struct PersistentData
-    {
-      csArray<size_t> newLayerIndices;
-      csArray<size_t> newLayerCounts;
-      
-      /**
-       * Do per-frame house keeping - \b MUST be called every frame/
-       * RenderView() execution.
-       */
-      void UpdateNewFrame()
-      {
-        newLayerIndices.DeleteAll();
-        newLayerCounts.DeleteAll();
-      }
-    };
-
-    /**
      * Construct. \a layerConfig is the source layer setup, \a newLayers will
      * be manipulated as layers get duplicated. It needs to provide a method
      * 'InsertLayer (size_t after, size_t oldLayer)' which inserts a copy of
      * layer \c oldLayer after the new layer \a after. \sa PostLightingLayers
      */
-    LayerHelper (PersistentData& persist, 
+    LayerHelper (LayerHelperContextData& contextData, 
       const LayerConfigType& layerConfig,
-      NewLayersType& newLayers) : persist (persist), 
+      NewLayersType& newLayers) : contextData (contextData), 
       layerConfig (layerConfig), newLayers (newLayers)
     {
-      persist.newLayerIndices.SetSize (layerConfig.GetLayerCount ());
-      persist.newLayerCounts.SetSize (layerConfig.GetLayerCount ());
-      for (size_t l = 0; l < layerConfig.GetLayerCount (); l++)
+      if (contextData.newLayerIndices.GetSize() == 0)
       {
-        persist.newLayerIndices[l] = l;
-        persist.newLayerCounts[l] = 1;
+	contextData.newLayerIndices.SetSize (layerConfig.GetLayerCount ());
+	contextData.newLayerCounts.SetSize (layerConfig.GetLayerCount ());
+	for (size_t l = 0; l < layerConfig.GetLayerCount (); l++)
+	{
+	  contextData.newLayerIndices[l] = l;
+	  contextData.newLayerCounts[l] = 1;
+	}
       }
     }
 
     /// Get the 'new' index of \a layer, \a sublayer.
     size_t GetNewLayerIndex (size_t layer, size_t subLayer) const
     {
-      return persist.newLayerIndices[layer] + subLayer;
+      return contextData.newLayerIndices[layer] + subLayer;
     }
 
     /// Get the amount of sublayers \a layer posseses.
     size_t GetSubLayerCount (size_t layer) const
     {
-      return persist.newLayerCounts[layer];
+      return contextData.newLayerCounts[layer];
     }
 
     /**
@@ -109,28 +105,28 @@ namespace RenderManager
      * context.
      */
     void Ensure (size_t layer, size_t neededSubLayers,
-                 typename RenderTree::MeshNode* node)
+                 typename RenderTree::ContextNode& context)
     {
-      if (neededSubLayers > persist.newLayerCounts[layer])
+      if (neededSubLayers > contextData.newLayerCounts[layer])
       {
 	// We need to insert new layers
 
 	// How many?
-	size_t insertLayerNum = neededSubLayers - persist.newLayerCounts[layer];
+	size_t insertLayerNum = neededSubLayers - contextData.newLayerCounts[layer];
 	// The actual insertion
-	for (size_t n = persist.newLayerCounts[layer]; n < neededSubLayers; n++)
+	for (size_t n = contextData.newLayerCounts[layer]; n < neededSubLayers; n++)
 	{
-	  node->owner.InsertLayer (persist.newLayerIndices[layer] + n - 1);
-	  newLayers.InsertLayer (persist.newLayerIndices[layer] + n - 1, layer);
+	  context.InsertLayer (contextData.newLayerIndices[layer] + n - 1);
+	  newLayers.InsertLayer (contextData.newLayerIndices[layer] + n - 1, layer);
 	}
 	// Update indices for in new index table
 	for (size_t l = layer+1; l < layerConfig.GetLayerCount (); l++)
-	  persist.newLayerIndices[l] += insertLayerNum;
-	persist.newLayerCounts[layer] += insertLayerNum;
+	  contextData.newLayerIndices[l] += insertLayerNum;
+	contextData.newLayerCounts[layer] += insertLayerNum;
       }
     }
   protected:
-    PersistentData& persist;
+    LayerHelperContextData& contextData;
     const LayerConfigType& layerConfig;
     NewLayersType& newLayers;
   };
@@ -475,7 +471,7 @@ namespace RenderManager
         if (!layerConfig.IsAmbientLayer (layer)) return 0;
         
         // Render 1 layer only, no lights
-        layers.Ensure (layer, 1, node);
+        layers.Ensure (layer, 1, node->owner);
         
         csShaderVariableStack localStack;
 	node->owner.svArrays.SetupSVStack (localStack, 
@@ -594,7 +590,7 @@ namespace RenderManager
 	  remainingLights -= num;
 	  totalLayers += thisPassLayers * shadows.GetLightLayerSpread();
 	}
-	layers.Ensure (layer, totalLayers, node);
+	layers.Ensure (layer, totalLayers, node->owner);
 	if (remainingLights > 0)
 	{
 	  renderSublights[firstLight]->subLights += renderSublightNums[firstLight];
@@ -680,7 +676,7 @@ namespace RenderManager
     
             CachedLightData* thisLightSVs;
 	    iLight* light = 0;
-	    for (size_t l = 0; l < thisNum; l++)
+	    for (uint l = 0; l < thisNum; l++)
 	    {
 	      bool isStaticLight = renderSublights[firstLight + l]->isStatic;
 	      light = renderSublights[firstLight + l]->light;
@@ -690,7 +686,18 @@ namespace RenderManager
 	        localStacks, l, renderSublightNums[firstLight + l]);
 	      if (lSpread == 0) continue;
     
-              uint actualSpread = 0;
+	      uint initialActualSpread = 0;
+	      if (node->sorting == CS_RENDPRI_SORT_BACK2FRONT)
+	      {
+		/* Hack: to make objects with alpha work w/ shadow_pssm -
+		   if they're drawn with the first 'spread' they can draw over
+		   a split and make that visible (ugly). Drawing them with the
+		   last 'spread' makes sure all splits should be drawn already.
+		 */
+		initialActualSpread = (uint)shadows.GetLightLayerSpread()
+		  - CS::Utility::BitOps::ComputeBitsSet (lSpread);
+	      }
+              uint actualSpread = initialActualSpread;
 	      for (size_t s = 0; s < shadows.GetLightLayerSpread(); s++)
 	      {
 	        if (!(lSpread & (1 << s))) continue;
@@ -711,6 +718,12 @@ namespace RenderManager
 		    persist.diffuseBlack, l);
 		}
 		actualSpread++;
+	      }
+	      if (initialActualSpread != 0)
+	      {
+		node->owner.shaderArray[layers.GetNewLayerIndex (layer,
+		    n*shadows.GetLightLayerSpread() + totalLayers)
+		  * node->owner.totalRenderMeshes + mesh.contextLocalId] = 0;
 	      }
 	    }
 	    firstLight += thisNum;
@@ -777,8 +790,9 @@ namespace RenderManager
        * the original layer as well as how often a layer has been
        * duplicated */
       LayerHelper<RenderTree, LayerConfigType,
-        PostLightingLayers> layerHelper (persist.layerPersist, layerConfig,
-        newLayers);
+        PostLightingLayers> layerHelper (
+	static_cast<RenderTreeLightingTraits::ContextNodeExtraDataType&> (
+	  node->owner).layerHelperData, layerConfig, newLayers);
       ShadowHandler shadows (persist.shadowPersist, layerConfig,
         node, shadowParam);
       ShadowNone<RenderTree, LayerConfigType> noShadows;
@@ -946,8 +960,6 @@ namespace RenderManager
     struct PersistentData
     {
       typename ShadowHandler::PersistentData shadowPersist;
-      typename LayerHelper<RenderTree, LayerConfigType,
-        PostLightingLayers>::PersistentData layerPersist;
       LightingSorter::PersistentData lightSorterPersist;
       csLightShaderVarCache svNames;
       CS::ShaderVarStringID svPassNum;
@@ -989,7 +1001,6 @@ namespace RenderManager
       void UpdateNewFrame ()
       {
         shadowPersist.UpdateNewFrame();
-        layerPersist.UpdateNewFrame();
         lightSorterPersist.UpdateNewFrame();
         varsHelperPersist.UpdateNewFrame();
       }

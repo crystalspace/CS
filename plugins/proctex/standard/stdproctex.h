@@ -60,7 +60,7 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
-  	iBase* context) = 0;
+  	iBase* context, iStringArray* failed) = 0;
 };  
 
 class csBaseProctexSaver :

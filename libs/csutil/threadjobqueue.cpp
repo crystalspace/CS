@@ -31,9 +31,11 @@ namespace Threading
 
   ThreadedJobQueue::ThreadedJobQueue (size_t numWorkers, ThreadPriority priority)
     : scfImplementationType (this), 
-    numWorkerThreads (csMin<size_t> (MAX_WORKER_THREADS, numWorkers)), 
+    numWorkerThreads (numWorkers), 
     shutdownQueue (false), outstandingJobs (0)
   {
+    allThreadState = new ThreadState*[numWorkers];
+
     // Start up the threads
     for (size_t i = 0; i < numWorkerThreads; ++i)
     {
@@ -62,6 +64,7 @@ namespace Threading
     {
       delete allThreadState[i];
     }
+    delete allThreadState;
   }
 
 
@@ -255,6 +258,11 @@ namespace Threading
         ownerQueue->jobFinished.NotifyAll ();
       }
     }
+  }
+
+  int32 ThreadedJobQueue::GetQueueCount()
+  {
+    return CS::Threading::AtomicOperations::Read(&outstandingJobs);
   }
 
 }

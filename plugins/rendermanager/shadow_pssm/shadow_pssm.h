@@ -33,7 +33,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMShadowedPSSM)
            typename LightSetupType>
   class StandardContextSetup;
   
-  class RenderTreeTraits : public CS::RenderManager::RenderTreeStandardTraits
+  class RenderTreeTraits : public CS::RenderManager::RenderTreeLightingTraits
   {
   public:
     typedef CS::RenderManager::ShadowPSSMExtraMeshData MeshExtraDataType;

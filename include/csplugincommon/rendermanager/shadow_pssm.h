@@ -609,6 +609,7 @@ namespace RenderManager
 	      lightFrust.shadowMapUnscaleSV->SetValue (csVector4 (
 		1, 1, 0, 0));
 
+	      f = 1.0f;
 	      n = f - EPSILON;
 	    }
 	    else
@@ -769,6 +770,7 @@ namespace RenderManager
 	    context.owner.GetPersistentData().renderViewPool) RenderView);
 	#include "csutil/custom_new_enable.h"
 	  newRenderView->SetEngine (rview->GetEngine ());
+	  newRenderView->SetViewDimensions (1, 1);
 	  
 	  csRef<iCustomMatrixCamera> shadowViewCam =
 	    newRenderView->GetEngine()->CreateCustomMatrixCamera();

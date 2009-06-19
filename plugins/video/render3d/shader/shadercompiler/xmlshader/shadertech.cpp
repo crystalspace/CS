@@ -46,7 +46,7 @@ CS_LEAKGUARD_IMPLEMENT (csXMLShaderTech);
 /* Magic value for tech + pass cache files.
  * The most significant byte serves as a "version", increase when the
  * cache file format changes. */
-static const uint32 cacheFileMagic = 0x03747863;
+static const uint32 cacheFileMagic = 0x04747863;
 
 //---------------------------------------------------------------------------
 
@@ -1366,7 +1366,7 @@ bool csXMLShaderTech::Load (iLoaderContext* ldr_context,
 	  == csXMLShaderCompiler::XMLTOKEN_PASS) continue;
 	  
 	csRef<iDocumentNode> newNode = techNode->CreateNodeBefore (child->GetType());
-	CS::DocSystem::CloneAttributes (child, newNode);
+	CS::DocSystem::CloneNode (child, newNode);
       }
       
       csRef<iDataBuffer> boilerplateBuf (parent->compiler->WriteNodeToBuf (
@@ -1454,7 +1454,7 @@ bool csXMLShaderTech::Precache (iDocumentNode* node, size_t variant,
 	== csXMLShaderCompiler::XMLTOKEN_PASS) continue;
 	
       csRef<iDocumentNode> newNode = techNode->CreateNodeBefore (child->GetType());
-      CS::DocSystem::CloneAttributes (child, newNode);
+      CS::DocSystem::CloneNode (child, newNode);
     }
     
     csRef<iDataBuffer> boilerplateBuf (parent->compiler->WriteNodeToBuf (

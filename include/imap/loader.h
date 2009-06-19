@@ -25,14 +25,19 @@
  */
 /**\addtogroup loadsave
  * @{ */
+
+#include "csutil/refarr.h"
+#include "csutil/refcount.h"
 #include "csutil/scf_interface.h"
 
 #include "igraphic/image.h"
 #include "ivideo/txtmgr.h"
 #include "imap/streamsource.h"
+#include "iutil/threadmanager.h"
 
 #include "csutil/deprecated_warn_off.h"
 
+struct iCameraPosition;
 struct iCollection;
 struct iDocumentNode;
 struct iImage;
@@ -45,6 +50,7 @@ struct iShader;
 struct iTextureHandle;
 struct iTextureManager;
 struct iTextureWrapper;
+struct iSharedVariable;
 struct iSndSysData;
 struct iSndSysWrapper;
 struct iSndSysStream;
@@ -122,12 +128,13 @@ struct iMissingLoaderData : public virtual iBase
 };
 
 /**
-* Return structure for the iLoader->Load() routines.
-*/
+ * Return structure for the iLoader->Load() routines.
+ */
 struct csLoadResult
 {
-  /// True if loading was succesful
+  /// True if the object was loaded successfully.
   bool success;
+
   /**
   * The object that was loaded. Depending on the file you load this
   * can be anything like:
@@ -141,7 +148,626 @@ struct csLoadResult
   * Note! In case of a light call DecRef() after you added it to a sector.
   * Note! Use scfQueryInterface on 'result' to detect what type was loaded.
   */
-  iBase* result;
+  csRef<iBase> result;
+};
+
+/**
+ * Return structure for threaded loader functions.
+ */
+class csLoaderReturn : public iThreadReturn
+{
+public:
+  csLoaderReturn(iThreadManager* tm) : tm(tm)
+  {
+    finished = false;
+    success = false;
+  }
+
+  bool IsFinished() { return finished; }
+  bool WasSuccessful() { return success; }
+  void* GetResultPtr() { CS_ASSERT_MSG("csLoaderReturn does not implement a void* result", false); return NULL; }
+  csRef<iBase> GetResultRefPtr() { return result; }
+
+  void MarkFinished() { finished = true; }
+  void MarkSuccessful() { success = true; }
+  void SetResult(void* result) { CS_ASSERT_MSG("csLoaderReturn does not implement a void* result", false); }
+  void SetResult(csRef<iBase> result) { this->result = result; }
+
+  void Copy(iThreadReturn* other)
+  {
+    result = other->GetResultRefPtr();
+  }
+
+  void Wait()
+  {
+    tm->Wait(this);
+  }
+
+private:
+  /// True if the loading has finished (should be true at some point).
+  bool finished;
+
+  /// True if the object was loaded successfully.
+  bool success;
+
+  /**
+  * The object that was loaded. Depending on the file you load this
+  * can be anything like:
+  * - 'world' file: in that case 'result' will be set to the engine.
+  * - 'library' file: 'result' will be 0.
+  * - 'meshfact' file: 'result' will be the mesh factory wrapper.
+  * - 'meshobj' file: 'result' will be the mesh wrapper.
+  * - 'meshref' file: 'result' will be the mesh wrapper.
+  * - 'portals' file: 'result' will be the portal's mesh wrapper.
+  * - 'light' file: 'result' will be the light. 
+  * Note! In case of a light call DecRef() after you added it to a sector.
+  * Note! Use scfQueryInterface on 'result' to detect what type was loaded.
+  */
+  csRef<iBase> result;
+
+  // Reference to the thread manager.
+  csRef<iThreadManager> tm;
+};
+
+struct iSectorLoaderIterator : public virtual iBase
+{
+  SCF_INTERFACE (iSectorLoaderIterator, 1, 0, 0);
+
+  virtual iSector* Next() = 0;
+
+  virtual bool HasNext() const = 0;
+};
+
+struct iMeshFactLoaderIterator : public virtual iBase
+{
+  SCF_INTERFACE (iMeshFactLoaderIterator, 1, 0, 0);
+
+  virtual iMeshFactoryWrapper* Next() = 0;
+
+  virtual bool HasNext() const = 0;
+};
+
+struct iMeshLoaderIterator : public virtual iBase
+{
+  SCF_INTERFACE (iMeshLoaderIterator, 1, 0, 0);
+
+  virtual iMeshWrapper* Next() = 0;
+
+  virtual bool HasNext() const = 0;
+};
+
+struct iCamposLoaderIterator : public virtual iBase
+{
+  SCF_INTERFACE (iCamposLoaderIterator, 1, 0, 0);
+
+  virtual iCameraPosition* Next() = 0;
+
+  virtual bool HasNext() const = 0;
+};
+
+struct iTextureLoaderIterator : public virtual iBase
+{
+  SCF_INTERFACE (iTextureLoaderIterator, 1, 0, 0);
+
+  virtual iTextureWrapper* Next() = 0;
+
+  virtual bool HasNext() const = 0;
+};
+
+struct iMaterialLoaderIterator : public virtual iBase
+{
+  SCF_INTERFACE (iMaterialLoaderIterator, 1, 0, 0);
+
+  virtual iMaterialWrapper* Next() = 0;
+
+  virtual bool HasNext() const = 0;
+};
+
+struct iSharedVarLoaderIterator : public virtual iBase
+{
+  SCF_INTERFACE (iSharedVarLoaderIterator, 1, 0, 0);
+
+  virtual iSharedVariable* Next() = 0;
+
+  virtual bool HasNext() const = 0;
+};
+
+/**
+* This interface represents the threaded map loader methods.
+*/
+struct iThreadedLoader : public virtual iBase
+{
+  SCF_INTERFACE (iThreadedLoader, 1, 0, 0);
+
+ /**
+  * Get the loader sector list.
+  */
+  virtual csPtr<iSectorLoaderIterator> GetLoaderSectors() = 0;
+  
+ /**
+  * Get the loader mesh factory list.
+  */
+  virtual csPtr<iMeshFactLoaderIterator> GetLoaderMeshFactories() = 0;
+  
+ /**
+  * Get the loader mesh sector list.
+  */
+  virtual csPtr<iMeshLoaderIterator> GetLoaderMeshes() = 0;
+
+ /**
+  * Get the loader camera list.
+  */
+  virtual csPtr<iCamposLoaderIterator> GetLoaderCameraPositions() = 0;
+  
+ /**
+  * Get the loader texture list.
+  */
+  virtual csPtr<iTextureLoaderIterator> GetLoaderTextures() = 0;
+  
+ /**
+  * Get the loader material list.
+  */
+  virtual csPtr<iMaterialLoaderIterator> GetLoaderMaterials() = 0;
+  
+ /**
+  * Get the loader shared variable list.
+  */
+  virtual csPtr<iSharedVarLoaderIterator> GetLoaderSharedVariables() = 0;
+
+ /**
+  * Load an image file. The image will be loaded in the format requested by
+  * the engine. If no engine exists, the format is taken from the video
+  * renderer. If no video renderer exists, this function fails. You may also
+  * request an alternate format to override the above sequence.
+  * \param result Result of the method call.
+  * \param Filename VFS path to the image file to load.
+  * \param Format The format of the image.
+  */
+  THREADED_INTERFACE3(LoadImage, const char* Filename, int Format = CS_IMGFMT_INVALID,
+    bool do_verbose = false);
+
+ /**
+  * Load an image file. The image will be loaded in the format requested by
+  * the engine. If no engine exists, the format is taken from the video
+  * renderer. If no video renderer exists, this function fails. You may also
+  * request an alternate format to override the above sequence.
+  * This version reads the image from a data buffer.
+  */
+  THREADED_INTERFACE3(LoadImage, iDataBuffer* buf, int Format = CS_IMGFMT_INVALID,
+  bool do_verbose = false);
+
+  /**
+  * Load an image as with LoadImage() and create a texture handle from it.
+  * \param result Result of the method call.
+  * \param Filename VFS path to the image file to load.
+  * \param Flags Accepts the flags described in ivideo/txtmgr.h.
+  *   The texture manager determines the format, so choosing an alternate 
+  *   format doesn't make sense here. Instead you may choose an alternate 
+  *   texture manager.
+  * \param tm Texture manager, used to determine the format the image is to
+  *   be loaded in (defaults to CS_IMGFMT_TRUECOLOR if no texture manager is
+  *   specified).
+  * \param image Optionally returns a reference to the loaded image.
+  */
+  THREADED_INTERFACE5(LoadTexture, const char* Filename, int Flags = CS_TEXTURE_3D, 
+  csRef<iTextureManager> tm = 0, csRef<iImage>* image = 0, bool do_verbose = false);
+
+  /**
+  * Load an image as with LoadImage() and create a texture handle from it.
+  * This version reads the image from a data buffer.
+  * \param buf Buffer containing the image file data.
+  * \param Flags Accepts the flags described in ivideo/txtmgr.h.
+  *   The texture manager determines the format, so choosing an alternate 
+  *   format doesn't make sense here. Instead you may choose an alternate 
+  *   texture manager.
+  * \param tm Texture manager, used to determine the format the image is to
+  *   be loaded in (defaults to CS_IMGFMT_TRUECOLOR if no texture manager is
+  *   specified).
+  * \param image Optionally returns a reference to the loaded image.
+  */
+  THREADED_INTERFACE5(LoadTexture, iDataBuffer* buf, int Flags = CS_TEXTURE_3D,
+  iTextureManager *texman = 0, csRef<iImage>* image = 0, bool do_verbose = false);
+
+  /**
+  * Load a texture as with LoadTexture() above and register it with the
+  * engine. This version reads the image from a data buffer.
+  * 
+  * \param Name The name that the engine will use for the wrapper.
+  * \param buf Buffer containing the image file data.
+  * \param Flags Accepts the flags described in ivideo/txtmgr.h.
+  *   The texture manager determines the format, so choosing an alternate 
+  *   format doesn't make sense here. Instead you may choose an alternate 
+  *   texture manager.
+  * \param tm Texture manager, used to determine the format the image is to
+  *   be loaded in (defaults to CS_IMGFMT_TRUECOLOR if no texture manager is
+  *   specified).
+  * \param reg if true then the texture and material will be registered
+  * to the texture manager. Set 'register' to false if you plan on calling
+  * 'engine->Prepare()' later as that function will take care of registering
+  * too.
+  * \param create_material if true then this function also creates a
+  * material for the texture.
+  * \param free_image if true then after registration the loaded image
+  * will be removed immediatelly. This saves some memory. Set to false
+  * if you want to keep it. free_image is ignored if reg is false.
+  */
+  THREADED_INTERFACE8(LoadTexture, const char *Name, iDataBuffer* buf,
+    int Flags = CS_TEXTURE_3D, iTextureManager *texman = 0, bool reg = true,
+    bool create_material = true, bool free_image = true, bool do_verbose = false);
+
+  //@{
+  /**
+  * Load a texture as with LoadTexture() above and register it with the
+  * engine. 
+  *
+  * \param Name The name that the engine will use for the wrapper.
+  * \param FileName VFS path to the image file to load.
+  * \param Flags Accepts the flags described in ivideo/txtmgr.h.
+  *   The texture manager determines the format, so choosing an alternate 
+  *   format doesn't make sense here. Instead you may choose an alternate 
+  *   texture manager.
+  * \param tm Texture manager, used to determine the format the image is to
+  *   be loaded in (defaults to CS_IMGFMT_TRUECOLOR if no texture manager is
+  *   specified).
+  * \param reg If true then the texture and material will be registered
+  *   to the texture manager. Set 'register' to false if you plan on calling
+  *   'engine->Prepare()' later as that function will take care of registering
+  *   too.
+  * \param create_material If true then this function also creates a
+  *   material for the texture.
+  * \param free_image If true then after registration the loaded image
+  *   will be removed immediatelly. This saves some memory. Set to false
+  *   if you want to keep it. free_image is ignored if reg is false.
+  * \param collection [optional] Collection to register the texture
+  *   and material to.
+  */
+  THREADED_INTERFACE10(LoadTexture, const char *Name, const char *FileName,
+  int Flags = CS_TEXTURE_3D, iTextureManager *texman = 0, bool reg = true,
+  bool create_material = true, bool free_image = true, iCollection* Collection = 0,
+  uint keepFlags = KEEP_ALL, bool do_verbose = false);
+  //@}
+
+  /// New Sound System: Load a sound file and return an iSndSysData object
+  THREADED_INTERFACE2(LoadSoundSysData, const char *fname,
+  bool do_verbose = false);
+
+  /**
+  * New Sound System: Load a sound file and create a stream from it.
+  * \param fname is the VFS filename.
+  * \param mode3d is one of CS_SND3D_DISABLE, CS_SND3D_RELATIVE, or
+  * CS_SND3D_ABSOLUTE.
+  */
+  THREADED_INTERFACE3(LoadSoundStream, const char *fname, int mode3d,
+  bool do_verbose = false);
+
+  /**
+  * New Sound System: Load a sound file, create sound data and create a
+  * wrapper object for it.
+  * \param name of the sound.
+  * \param fname is the VFS filename.
+  */
+  THREADED_INTERFACE3(LoadSoundWrapper, const char *name, const char *fname,
+  bool do_verbose = false);
+
+
+ /**
+  * Load a Mesh Object Factory from a file.
+  * \param fname is the VFS name of the file.
+  * \param ssource is an optional stream source for faster loading.
+  */
+  THREADED_INTERFACE3(LoadMeshObjectFactory, const char* fname, iStreamSource* ssource = 0,
+  bool do_verbose = false);
+
+ /**
+  * Load a mesh object from a file.
+  * The mesh object is not automatically added to any sector.
+  * \param fname is the VFS name of the file.
+  * \param ssource is an optional stream source for faster loading.
+  */
+  THREADED_INTERFACE3(LoadMeshObject, const char* fname, iStreamSource* ssource = 0,
+  bool do_verbose = false);
+
+
+ /**
+  * Load a shader from a file.
+  */
+  THREADED_INTERFACE3(LoadShader, const char* filename, bool registerShader = true,
+  bool do_verbose = false);
+
+  //@}
+  /**
+  * Load a map file. If 'clearEngine' is true then the current contents
+  * of the engine will be deleted before loading.
+  * If 'region' is not 0 then portals will only connect to the
+  * sectors in that region, things will only use thing templates
+  * defined in that region and meshes will only use mesh factories
+  * defined in that region. If the region is not 0 and curRegOnly is true
+  * then objects (materials, factories, ...) will only be found in the
+  * given region.
+  * <p>
+  * \param filename is a VFS filename for the XML file.
+  * \param clearEngine is true by default which means that the previous
+  * contents of the engine is cleared (all objects/sectors/... are removed).
+  * \param collection is 0 by default which means that all loaded
+  * objects are added to the default collection. If you give a collection
+  * here then all loaded objects will be added to that collection (subject
+  * to keepFlags).
+  * \param searchCollectionOnly is true by default which means that it will only
+  * find materials/factories/... from current collection if that is given.
+  * \param checkDupes if true then materials, textures,
+  * and mesh factories will only be loaded if they don't already exist
+  * in the entire engine (ignoring collections). By default this is false because
+  * it is very legal for different world files to have different objects
+  * with the same name. Only use checkDupes == true if you know that your
+  * objects have unique names accross all world files.
+  * \param ssource is an optional stream source for faster loading.
+  * \param missingdata is an optional callback in case data is missing.
+  * The application can then provide that missing data in some other way.
+  * \param Set useProxyTextures to true if you're loading materials and
+  * textures from a library shared with other maps.
+  * \param keepFlags Use these to define whether or not you wish to guarantee
+  * that all loaded resources are kept (default to KEEP_ALL). KEEP_USED is useful
+  * when you are loading from a shared library containing more resources than you
+  * actually need (a world file loading from a shared library of textures for example).
+  * This argument is only used in conjunction with Collections, and overrides the value
+  * of useProxyTextures in that case.
+  */
+  THREADED_INTERFACE7(LoadMapFile, const char* filename, bool clearEngine = true,
+  iCollection* collection = 0, iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0,
+  uint keepFlags = KEEP_ALL, bool do_verbose = false);
+  //@}
+  
+  //@{
+  /**
+  * Load a map from the given 'world' node. If 'clearEngine' is true then
+  * the current contents of the engine will be deleted before loading.
+  * If 'region' is not 0 then portals will only connect to the
+  * sectors in that region, things will only use thing templates
+  * defined in that region and meshes will only use mesh factories
+  * defined in that region. If the region is not 0 and curRegOnly is true
+  * then objects (materials, factories, ...) will only be found in the
+  * given region.
+  * <p>
+  * \param world_node is the 'world' node from an XML document.
+  * \param clearEngine is true by default which means that the previous
+  * contents of the engine is cleared (all objects/sectors/... are removed).
+  * \param collection is 0 by default which means that all loaded objects are not
+  * added to any collection. If you give a collection here then all loaded objects
+  * will be added to that collection.
+  * \param searchCollectionOnly is true by default which means that it will only
+  * find materials/factories/... from current collection if that is given.
+  * \param checkDupes if true then materials, textures,
+  * and mesh factories will only be loaded if they don't already exist
+  * in the entire engine (ignoring regions). By default this is false because
+  * it is very legal for different world files to have different objects
+  * with the same name. Only use checkDupes == true if you know that your
+  * objects have unique names accross all world files.
+  * \param ssource is an optional stream source for faster loading.
+  * \param missingdata is an optional callback in case data is missing.
+  * The application can then provide that missing data in some other way.
+  * \param Set useProxyTextures to true if you're loading materials and
+  * textures from a library shared with other maps.
+  * \param keepFlags Use these to define whether or not you wish to guarantee
+  * that all loaded resources are kept (default to KEEP_ALL). KEEP_USED is useful
+  * when you are loading from a shared library containing more resources than you
+  * actually need (a world file loading from a shared library of textures for example).
+  * This argument is only used in conjunction with Collections, and overrides the value
+  * of useProxyTextures in that case.
+  */
+  THREADED_INTERFACE7(LoadMap, iDocumentNode* world_node, bool clearEngine = true,
+  iCollection* collection = 0, iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0,
+  uint keepFlags = KEEP_ALL, bool do_verbose = false);
+  //@}
+
+  //@{
+  /**
+  * Load library from a VFS file
+  * \param filename is a VFS filename for the XML file.
+  * \param collection is 0 by default which means that all loaded objects are
+  * either added to the default collection or not added to any collection,
+  * depending on the value of the keepFlags argument.
+  * \param searchCollectionOnly is true by default which means that it will only
+  * find materials/factories/... from current collection if that is given.
+  * \param checkDupes if true then materials, textures,
+  * and mesh factories will only be loaded if they don't already exist
+  * in the entire engine (ignoring collections). By default this is false because
+  * it is very legal for different world files to have different objects
+  * with the same name. Only use checkDupes == true if you know that your
+  * objects have unique names accross all world files.
+  * \param ssource is an optional stream source for faster loading.
+  * \param missingdata is an optional callback in case data is missing.
+  * The application can then provide that missing data in some other way.
+  * \param keepFlags Use these to define whether or not you wish to guarantee
+  * that all loaded resources are kept (default to KEEP_ALL). KEEP_USED is useful
+  * when you are loading from a shared library containing more resources than you
+  * actually need (a world file loading from a shared library of textures for example).
+  */
+  THREADED_INTERFACE6(LoadLibraryFile, const char* filename, iCollection* collection = 0,
+  iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL,
+  bool do_verbose = false);
+  //@}
+
+  //@{
+  /**
+  * Load library from a 'library' node.
+  * \param lib_node is the 'library' node from an XML document.
+  * \param collection is 0 by default which means that all loaded objects are
+  * either added to the default collection or not added to any collection,
+  * depending on the value of the keepFlags argument.
+  * \param searchCollectionOnly is true by default which means that it will only
+  * find materials/factories/... from current collection if that is given.
+  * \param checkDupes if true then materials, textures,
+  * and mesh factories will only be loaded if they don't already exist
+  * in the entire engine (ignoring collections). By default this is false because
+  * it is very legal for different world files to have different objects
+  * with the same name. Only use checkDupes == true if you know that your
+  * objects have unique names accross all world files.
+  * \param ssource is an optional stream source for faster loading.
+  * \param missingdata is an optional callback in case data is missing.
+  * The application can then provide that missing data in some other way.
+  * \param keepFlags Use these to define whether or not you wish to guarantee
+  * that all loaded resources are kept (default to KEEP_ALL). KEEP_USED is useful
+  * when you are loading from a shared library containing more resources than you
+  * actually need (a world file loading from a shared library of textures for example).
+  */
+  THREADED_INTERFACE6(LoadLibrary, iDocumentNode* lib_node, iCollection* collection = 0,
+  iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL,
+  bool do_verbose = false);
+  //@)
+
+  //@{
+  /**
+  * Load a file. This is a smart function that will try to recognize
+  * what kind of file it is. It recognizes the following types of
+  * files:
+  * - 'world' file: in that case 'result' will be set to the engine.
+  * - 'library' file: 'result' will be 0.
+  * - 'meshfact' file: 'result' will be the mesh factory wrapper.
+  * - 'meshobj' file: 'result' will be the mesh wrapper.
+  * - 'meshref' file: 'result' will be the mesh wrapper.
+  * - 3ds/md2 models: 'result' will be the mesh factory wrapper.
+  * - 'portals' file: 'result' will be the portal's mesh wrapper.
+  * - 'light' file: 'result' will be the light.
+  *
+  * Returns csLoadResult.
+  * <br>
+  * Note! In case a world file is loaded this function will NOT
+  * clear the engine!
+  * <br>
+  * Note! In case a mesh factory or mesh object is loaded this function
+  * will not actually do anything if checkDupes is true and the mesh or
+  * factory is already in memory (with that name). This function will
+  * still return true in that case and set 'result' to the correct object.
+  * <br>
+  * \param fname is a VFS filename for the XML file.
+  * \param collection is 0 by default which means that all loaded objects are
+  * either added to the default collection or not added to any collection,
+  * depending on the value of the keepFlags argument.
+  * \param searchCollectionOnly is true by default which means that it will only
+  * find materials/factories/... from current collection if that is given.
+  * \param checkDupes if true then materials, textures,
+  * and mesh factories will only be loaded if they don't already exist
+  * in the entire engine (ignoring collections). By default this is false because
+  * it is very legal for different world files to have different objects
+  * with the same name. Only use checkDupes == true if you know that your
+  * objects have unique names accross all world files.
+  * \param ssource is an optional stream source for faster loading.
+  * \param missingdata is an optional callback in case data is missing.
+  * The application can then provide that missing data in some other way.
+  * \param keepFlags Use these to define whether or not you wish to guarantee
+  * that all loaded resources are kept (default to KEEP_ALL). KEEP_USED is useful
+  * when you are loading from a shared library containing more resources than you
+  * actually need (a world file loading from a shared library of textures for example).
+  */
+  THREADED_INTERFACE6(LoadFile, const char* fname, iCollection* collection = 0,
+  iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL,
+  bool do_verbose = false);
+  //@}
+
+  //@{
+  /**
+  * Load a file. This is a smart function that will try to recognize
+  * what kind of file it is. It recognizes the following types of
+  * files:
+  * - 'world' file: in that case 'result' will be set to the engine.
+  * - 'library' file: 'result' will be 0.
+  * - 'meshfact' file: 'result' will be the mesh factory wrapper.
+  * - 'meshobj' file: 'result' will be the mesh wrapper.
+  * - 'meshref' file: 'result' will be the mesh wrapper.
+  * - 3ds/md2 models: 'result' will be the mesh factory wrapper.
+  * - 'portals' file: 'result' will be the portal's mesh wrapper.
+  * - 'light' file: 'result' will be the light.
+  *
+  * Returns csLoadResult.
+  * <br>
+  * Note! In case a world file is loaded this function will NOT
+  * clear the engine!
+  * <br>
+  * Note! In case a mesh factory or mesh object is loaded this function
+  * will not actually do anything if checkDupes is true and the mesh or
+  * factory is already in memory (with that name). This function will
+  * still return true in that case and set 'result' to the correct object.
+  * <br>
+  * \param buffer is a buffer for the model contents.
+  * \param collection is 0 by default which means that all loaded objects are
+  * either added to the default collection or not added to any collection,
+  * depending on the value of the keepFlags argument.
+  * \param searchCollectionOnly is true by default which means that it will only
+  * find materials/factories/... from current collection if that is given.
+  * \param checkDupes if true then materials, textures,
+  * and mesh factories will only be loaded if they don't already exist
+  * in the entire engine (ignoring collections). By default this is false because
+  * it is very legal for different world files to have different objects
+  * with the same name. Only use checkDupes == true if you know that your
+  * objects have unique names accross all world files.
+  * \param ssource is an optional stream source for faster loading.
+  * \param missingdata is an optional callback in case data is missing.
+  * The application can then provide that missing data in some other way.
+  * \param keepFlags Use these to define whether or not you wish to guarantee
+  * that all loaded resources are kept (default to KEEP_ALL). KEEP_USED is useful
+  * when you are loading from a shared library containing more resources than you
+  * actually need (a world file loading from a shared library of textures for example).
+  */
+  THREADED_INTERFACE6(LoadBuffer, iDataBuffer* buffer, iCollection* collection = 0,
+  iStreamSource* ssource = 0, iMissingLoaderData* missingdata = 0, uint keepFlags = KEEP_ALL,
+  bool do_verbose = false);
+  //@}
+
+  //@{
+  /**
+  * Load a node. This is a smart function that will try to recognize
+  * what kind of node it is. It recognizes the following types of
+  * nodes:
+  * - 'world' node: in that case 'result' will be set to the engine.
+  * - 'library' node: 'result' will be 0.
+  * - 'meshfact' node: 'result' will be the mesh factory wrapper.
+  * - 'meshobj' node: 'result' will be the mesh wrapper.
+  * - 'meshref' file: 'result' will be the mesh wrapper.
+  * - 'portals' file: 'result' will be the portal's mesh wrapper.
+  * - 'light' file: 'result' will be the light.
+  *
+  * <br>
+  * Note! In case a world node is loaded this function will NOT
+  * clear the engine!
+  * <br>
+  * Note! In case a mesh factory or mesh object is loaded this function
+  * will not actually do anything if checkDupes is true and the mesh or
+  * factory is already in memory (with that name). This function will
+  * still return true in that case and set 'result' to the correct object.
+  * <br>
+  * \param node is the node from which to read.
+  * \param collection is 0 by default which means that all loaded objects are
+  * either added to the default collection or not added to any collection,
+  * depending on the value of the keepFlags argument.
+  * \param searchCollectionOnly is true by default which means that it will only
+  * find materials/factories/... from current collection if that is given.
+  * \param checkDupes if true then materials, textures,
+  * and mesh factories will only be loaded if they don't already exist
+  * in the entire engine (ignoring collections). By default this is false because
+  * it is very legal for different world files to have different objects
+  * with the same name. Only use checkDupes == true if you know that your
+  * objects have unique names accross all world files.
+  * \param ssource is an optional stream source for faster loading.
+  * \param missingdata is an optional callback in case data is missing.
+  * The application can then provide that missing data in some other way.
+  * \param keepFlags Use these to define whether or not you wish to guarantee
+  * that all loaded resources are kept (default to KEEP_ALL). KEEP_USED is useful
+  * when you are loading from a shared library containing more resources than you
+  * actually need (a world file loading from a shared library of textures for example).
+  */
+  THREADED_INTERFACE6(LoadNode, csRef<iDocumentNode> node, csRef<iCollection> collection = 0,
+  csRef<iStreamSource> ssource = 0, csRef<iMissingLoaderData> missingdata = 0, uint keepFlags = KEEP_ALL,
+  bool do_verbose = false);
+  //@}
+
+  /// Add object to the transfer list.
+  virtual void AddSectorToList(csRef<iSector> obj) = 0;
+  virtual void AddMeshFactToList(csRef<iMeshFactoryWrapper> obj) = 0;
+  virtual void AddMeshToList(csRef<iMeshWrapper> obj) = 0;
+  virtual void AddCamposToList(csRef<iCameraPosition> obj) = 0;
+  virtual void AddTextureToList(csRef<iTextureWrapper> obj) = 0;
+  virtual void AddMaterialToList(csRef<iMaterialWrapper> obj) = 0;
+  virtual void AddSharedVarToList(csRef<iSharedVariable> obj) = 0;
 };
 
 /**

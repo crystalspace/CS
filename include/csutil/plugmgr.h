@@ -28,6 +28,7 @@
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/threading/mutex.h"
+#include "csutil/threadmanager.h"
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "iutil/pluginconfig.h"
@@ -39,7 +40,8 @@ struct iObjectRegistry;
  * The plugin manager is thread-safe.
  */
 class CS_CRYSTALSPACE_EXPORT csPluginManager :
-  public scfImplementation1<csPluginManager, iPluginManager>
+  public scfImplementation1<csPluginManager, iPluginManager>,
+  public ThreadedCallable<csPluginManager>
 {
 private:
   /// Mutex to make the plugin manager thread-safe.
@@ -105,6 +107,8 @@ private:
     }
   };
 
+  iObjectRegistry* GetObjectRegistry() const { return object_reg; }
+
   /// The object registry.
   iObjectRegistry* object_reg;
 
@@ -122,8 +126,8 @@ public:
   virtual ~csPluginManager ();
 
   /// Load a plugin and (optionally) initialize it.
-  virtual iBase *LoadPlugin (const char *iClassID, bool init = true,
-			      bool report = true);
+  THREADED_CALLABLE_DECL3(csPluginManager, LoadPlugin, csThreadReturn,
+    const char*, iClassID, bool, init, bool, report, HIGH, true, false);
 
   /**
    * Get first of the loaded plugins that supports given interface ID.

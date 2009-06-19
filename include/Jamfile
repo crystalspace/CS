@@ -79,10 +79,12 @@ CS_MASTER_HEADER_REJECTS +=
   [ ConcatDirs csutil threading pthread_condition.h ]
   [ ConcatDirs csutil threading pthread_mutex.h     ]
   [ ConcatDirs csutil threading pthread_thread.h    ]
+  [ ConcatDirs csutil threading pthread_tls.h       ]
   [ ConcatDirs csutil threading win32_apifuncs.h    ]
   [ ConcatDirs csutil threading win32_condition.h   ]
   [ ConcatDirs csutil threading win32_mutex.h       ]
-  [ ConcatDirs csutil threading win32_thread.h      ]  
+  [ ConcatDirs csutil threading win32_thread.h      ] 
+  [ ConcatDirs csutil threading win32_tls.h         ]
   ;
 
 {

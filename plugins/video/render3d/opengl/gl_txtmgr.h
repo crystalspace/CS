@@ -21,11 +21,12 @@
 #ifndef __CS_GL_NEWTXTMGR_H__
 #define __CS_GL_NEWTXTMGR_H__
 
+#include "csgfx/textureformatstrings.h"
+#include "csutil/threadmanager.h"
+#include "csutil/weakrefarr.h"
+
 #include "iutil/cfgfile.h"
 #include "ivideo/txtmgr.h"
-
-#include "csgfx/textureformatstrings.h"
-#include "csutil/weakrefarr.h"
 
 #include "gl_txtmgr_basictex.h"
 
@@ -63,6 +64,9 @@ private:
   /// List of textures.
   csTexVector textures;
   bool compactTextures;
+
+  /// Lock on textures vector.
+  CS::Threading::Mutex texturesLock;
 
   csStringSet textureClassIDs;
   csHash<csGLTextureClassSettings, csStringID> textureClasses;

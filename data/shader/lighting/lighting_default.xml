@@ -22,7 +22,7 @@
   <alias name="apply_alpha" file="/shader/snippets/surface/alpha-premult.xml" />
   <alias name="lighting" file="/shader/snippets/lighting/lighting-ppl.xml" />
   
-  <technique priority="500" minlights="6">
+  <technique priority="500" minlights="5">
     <tag>per_pixel_lighting</tag>
     <!-- 1 pass, 6 lights -->
     <pass>
@@ -53,7 +53,7 @@
       
       <parameter id="lightOffset" type="int">0</parameter>
       <parameter id="maxLights" type="int">6</parameter>
-      <parameter id="minLights" type="int">6</parameter>
+      <parameter id="minLights" type="int">5</parameter>
       <connection from="lightOffset" to="shared" />
       <connection from="maxLights" to="shared" />
       <connection from="minLights" to="shared" />
@@ -358,6 +358,7 @@
   <!-- No lights (ie ambient only) technique -->
   <?if (vars."pass number".int == 0) && (vars."pass do_ambient") ?>
   <technique priority="50">
+    <tag>per_pixel_lighting</tag>
     <pass>
       <!-- First(only) pass: blend with alpha -->
       <mixmode>

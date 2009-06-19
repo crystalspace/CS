@@ -204,12 +204,27 @@ iTextureWrapper *csTextureList::NewTexture (iImage *image)
   return tm;
 }
 
+csPtr<iTextureWrapper> csTextureList::CreateTexture (iImage *image)
+{
+  csRef<iTextureWrapper> tm;
+  tm.AttachNew (new csTextureWrapper (engine, image));
+  return csPtr<iTextureWrapper>(tm);
+}
+
+
 iTextureWrapper *csTextureList::NewTexture (iTextureHandle *ith)
 {
   csRef<iTextureWrapper> tm;
   tm.AttachNew (new csTextureWrapper (engine, ith));
   Push (tm);
   return tm;
+}
+
+csPtr<iTextureWrapper> csTextureList::CreateTexture (iTextureHandle *ith)
+{
+  csRef<iTextureWrapper> tm;
+  tm.AttachNew (new csTextureWrapper (engine, ith));
+  return csPtr<iTextureWrapper>(tm);
 }
 
 int csTextureList::GetCount () const
@@ -229,16 +244,19 @@ int csTextureList::Add (iTextureWrapper *obj)
 
 bool csTextureList::Remove (iTextureWrapper *obj)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return this->Delete (obj);
 }
 
 bool csTextureList::Remove (int n)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return this->DeleteIndex (n);
 }
 
 void csTextureList::RemoveAll ()
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   this->DeleteAll ();
 }
 
@@ -249,5 +267,6 @@ int csTextureList::Find (iTextureWrapper *obj) const
 
 iTextureWrapper *csTextureList::FindByName (const char *Name) const
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return csRefArrayObject<iTextureWrapper>::FindByName (Name);
 }

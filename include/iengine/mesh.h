@@ -989,7 +989,27 @@ struct iMeshFactoryList : public virtual iBase
 };
 
 /**
- * This is an iterator mesh wrappers.
+ * This is an iterator mesh factory wrappers.
+ *
+ * Main ways to get pointers to this interface:
+ *   - iEngine::GetNearbyMeshes()
+ *   - iEngine::GetVisibleMeshes()
+ */
+struct iMeshFactoryWrapperIterator : public virtual iBase
+{
+  SCF_INTERFACE(iMeshFactoryWrapperIterator,1,0,0);
+  /// Move forward.
+  virtual iMeshFactoryWrapper* Next () = 0;
+
+  /// Reset the iterator to the beginning.
+  virtual void Reset () = 0;
+
+  /// Check if we have any more meshes.
+  virtual bool HasNext () const = 0;
+};
+
+/**
+ * This is an iterator of mesh wrappers.
  *
  * Main ways to get pointers to this interface:
  *   - iEngine::GetNearbyMeshes()

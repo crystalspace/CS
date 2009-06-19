@@ -48,6 +48,7 @@
 #include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include "iutil/stringarray.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
@@ -116,6 +117,11 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
       {
         const char* matname = child->GetContentsValue ();
         material = ldr_context->FindMaterial (matname);
+        csTicks start = csGetTicks();
+        while(!material.IsValid() && (csGetTicks() - start < 60000))
+        {
+          material = ldr_context->FindMaterial (matname);
+        }
         if (!material.IsValid ())
         {
           synldr->ReportError (
@@ -304,7 +310,8 @@ static void AppendOrSetData (iGeneralFactoryState* factory,
 }
 
 csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
-	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */)
+	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */,
+  iStringArray* failed)
 {
   csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
   	object_reg, "crystalspace.mesh.object.genmesh", false);
@@ -384,17 +391,22 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	break;
       case XMLTOKEN_MATERIAL:
 	{
-	  const char* matname = child->GetContentsValue ();
-          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-	  if (!mat)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.genmeshfactoryloader.parse.unknownmaterial",
-		child, "Couldn't find material '%s'!", matname);
-            return 0;
-	  }
-	  fact->SetMaterialWrapper (mat);
-	}
+    const char* matname = child->GetContentsValue ();
+    iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+    csTicks start = csGetTicks();
+    while(!mat && (csGetTicks() - start < 60000))
+    {
+      mat = ldr_context->FindMaterial (matname);
+    }
+    if (!mat)
+    {
+      synldr->ReportError (
+        "crystalspace.genmeshfactoryloader.parse.unknownmaterial",
+        child, "Couldn't find material '%s'!", matname);
+      return 0;
+    }
+    fact->SetMaterialWrapper (mat);
+  }
 	break;
       case XMLTOKEN_BOX:
         {
@@ -1151,8 +1163,12 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
     case XMLTOKEN_MATERIAL:
       {
         const char* matname = child->GetContentsValue ();
-        csRef<iMaterialWrapper> material = 
-          ldr_context->FindMaterial (matname);
+        csRef<iMaterialWrapper> material = ldr_context->FindMaterial (matname);
+        csTicks start = csGetTicks();
+        while(!material.IsValid() && (csGetTicks() - start < 60000))
+        {
+          material = ldr_context->FindMaterial (matname);
+        }
         if (!material.IsValid ())
         {
           synldr->ReportError (
@@ -1208,7 +1224,8 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
   }
 
 csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
-	iStreamSource*, iLoaderContext* ldr_context, iBase*)
+	iStreamSource*, iLoaderContext* ldr_context, iBase* context,
+  iStringArray* failedMeshFacts)
 {
   csRef<iMeshObject> mesh;
   csRef<iGeneralMeshState> meshstate;
@@ -1265,14 +1282,42 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_FACTORY:
 	{
 	  const char* factname = child->GetContentsValue ();
-	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
-	  if (!fact)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.genmeshloader.parse.unknownfactory",
-		child, "Couldn't find factory '%s'!", factname);
-	    return 0;
-	  }
+    iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+
+    if(failedMeshFacts)
+    {
+      // Check for failed meshfact load.
+      int i = 0;
+      while(!fact)
+      {
+        if(failedMeshFacts->GetSize() != 0 &&
+          !strcmp(failedMeshFacts->Get(i), factname))
+        {
+          synldr->ReportError (
+            "crystalspace.genmeshloader.parse.unknownfactory",
+            child, "Couldn't find factory '%s'!", factname);
+          return 0;
+        }
+
+        if(i >= (int)(failedMeshFacts->GetSize()-1))
+        {
+          fact = ldr_context->FindMeshFactory (factname);
+          i = 0;
+        }
+        else
+        {
+          i++;
+        }
+      }
+    }
+    else if(!fact)
+    {
+      synldr->ReportError (
+        "crystalspace.genmeshloader.parse.unknownfactory",
+        child, "Couldn't find factory '%s'!", factname);
+      return 0;
+    }
+
 	  factstate =  
 	    scfQueryInterface<iGeneralFactoryState> (fact->GetMeshObjectFactory());
 	  if (!factstate)
@@ -1299,15 +1344,20 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_MATERIAL:
 	{
 	  const char* matname = child->GetContentsValue ();
-          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-	  if (!mat)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.genmeshloader.parse.unknownmaterial",
-		child, "Couldn't find material '%s'!", matname);
-            return 0;
-	  }
-	  CHECK_MESH(meshstate);
+    iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+    csTicks start = csGetTicks();
+    while(!mat && (csGetTicks() - start < 60000))
+    {
+      mat = ldr_context->FindMaterial (matname);
+    }
+    if (!mat)
+    {
+      synldr->ReportError (
+        "crystalspace.genmeshloader.parse.unknownmaterial",
+        child, "Couldn't find material '%s'!", matname);
+      return 0;
+    }
+    CHECK_MESH(meshstate);
 	  mesh->SetMaterialWrapper (mat);
 	}
 	break;

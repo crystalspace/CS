@@ -54,47 +54,19 @@ bool csShaderGLCGVP::Compile (iHierarchicalCache* cache, csRef<iString>* tag)
   csString programStr;
   programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
 
-  CGprofile progProf = CG_PROFILE_UNKNOWN;
-  /* @@@ Hack: Make sure at least ARB_v_p is used.
-   * This is done because we don't completely support NV_vertex_program based
-   * profiles - those require "manual" binding of state matrices via 
-   * glTrackMatrixNV() which we don't support right now.
-   */
-  if (!cg_profile.IsEmpty())
-    progProf = cgGetProfile (cg_profile);
-  
-  if(progProf == CG_PROFILE_UNKNOWN)
-    progProf = cgGLGetLatestProfile (CG_GL_VERTEX);
-  if (progProf < CG_PROFILE_ARBVP1)
-    cg_profile = "arbvp1";
-  
-  bool ret = DefaultLoadProgram (cgResolve, programStr, CG_GL_VERTEX, 
-    shaderPlug->maxProfileVertex);
+  bool ret = DefaultLoadProgram (cgResolve, programStr, progVP,
+    shaderPlug->currentLimits);
 
-  if (cgResolve.IsValid())
-  {
-    csShaderGLCGFP* prevFP = static_cast<csShaderGLCGFP*> (
-      (iShaderProgramCG*)cgResolve);
-  
-    ProfileLimits limits (shaderPlug->vendor, programProfile);
-    limits.GetCurrentLimits (shaderPlug->ext);
-    WriteToCache (cache, limits,
-      prevFP->cacheLimits.ToString() /* Inaccurate when VP has custom profile set */
-      );
-    tag->AttachNew (new scfString (prevFP->cacheLimits.ToString()));
-  }
-  else
-  {
-    ProfileLimits limits (shaderPlug->vendor, programProfile);
-    limits.GetCurrentLimits (shaderPlug->ext);
-    tag->AttachNew (new scfString (limits.ToString()));
-  }
+  csString limitsStr (shaderPlug->currentLimits.ToString());
+  WriteToCache (cache, shaderPlug->currentLimits.vp, 
+    shaderPlug->currentLimits, limitsStr);
+  tag->AttachNew (new scfString (limitsStr));
   
   cacheKeepNodes.DeleteAll ();
   return ret;
 }
 
-bool csShaderGLCGVP::Precache (const ProfileLimits& limits,
+bool csShaderGLCGVP::Precache (const ProfileLimitsPair& limits,
                                const char* tag,
                                iHierarchicalCache* cache)
 {
@@ -113,8 +85,8 @@ bool csShaderGLCGVP::Precache (const ProfileLimits& limits,
     programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
     
     ArgumentArray args;
-    shaderPlug->GetProfileCompilerArgs (GetProgramType(),
-      limits.profile, limits.vendor, true, args);
+    shaderPlug->GetProfileCompilerArgs (GetProgramType(), 
+      limits.vp.profile, limits, limits.vp.vendor, true, args);
     for (size_t i = 0; i < compilerArgs.GetSize(); i++) 
       args.Push (compilerArgs[i]);
   
@@ -123,27 +95,26 @@ bool csShaderGLCGVP::Precache (const ProfileLimits& limits,
     if (!sourcePreproc.IsEmpty ())
     {
       // Check preprocessed source against cache
-      if (TryLoadFromCompileCache (sourcePreproc, limits, cache))
+      if (TryLoadFromCompileCache (sourcePreproc, limits.vp, cache))
         needBuild = false;
     }
   }
   
   bool ret;
   if (needBuild)
-    ret = DefaultLoadProgram (cgResolve, programStr, CG_GL_VERTEX, 
-      CG_PROFILE_UNKNOWN,
-      loadApplyVmap | loadIgnoreConfigProgramOpts | loadFlagUnusedV2FForInit,
-      &limits);
+    ret = DefaultLoadProgram (cgResolve, programStr, progVP, 
+      limits,
+      loadApplyVmap | loadIgnoreConfigProgramOpts | loadFlagUnusedV2FForInit);
   else
     ret = true;
 
   // Store program against preprocessed source in cache
   {
     if (needBuild && !sourcePreproc.IsEmpty ())
-      WriteToCompileCache (sourcePreproc, limits, cache);
+      WriteToCompileCache (sourcePreproc, limits.vp, cache);
   }
 
-  WriteToCache (cache, limits, tag);
+  WriteToCache (cache, limits.vp, limits, tag);
 
   return ret;
 }

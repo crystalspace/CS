@@ -288,6 +288,7 @@ int csMeshFactoryList::Add (iMeshFactoryWrapper *obj)
 
 bool csMeshFactoryList::Remove (iMeshFactoryWrapper *obj)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   FreeFactory (obj);
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
@@ -299,11 +300,13 @@ bool csMeshFactoryList::Remove (iMeshFactoryWrapper *obj)
 
 bool csMeshFactoryList::Remove (int n)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   return Remove (Get (n));
 }
 
 void csMeshFactoryList::RemoveAll ()
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   size_t i;
   for (i = 0 ; i < list.GetSize () ; i++)
   {
@@ -322,6 +325,7 @@ int csMeshFactoryList::Find (iMeshFactoryWrapper *obj) const
 iMeshFactoryWrapper *csMeshFactoryList::FindByName (
   const char *Name) const
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   if (!Name) return 0;
   return factories_hash.Get (Name, 0);
 }

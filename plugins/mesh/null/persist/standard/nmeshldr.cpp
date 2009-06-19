@@ -38,6 +38,7 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/stringarray.h"
 #include "imap/services.h"
 #include "imap/ldrctxt.h"
 #include "csgeom/vector2.h"
@@ -216,7 +217,8 @@ bool csNullFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
 }
 
 csPtr<iBase> csNullFactoryLoader::Parse (iDocumentNode* node,
-	iStreamSource*, iLoaderContext* /*ldr_context*/, iBase* /*context*/)
+	iStreamSource*, iLoaderContext* /*ldr_context*/, iBase* /*context*/,
+  iStringArray* failed)
 {
   csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
   	object_reg, "crystalspace.mesh.object.null", false);
@@ -347,7 +349,8 @@ bool csNullMeshLoader::Initialize (iObjectRegistry* object_reg)
   }
 
 csPtr<iBase> csNullMeshLoader::Parse (iDocumentNode* node,
-	iStreamSource*, iLoaderContext* ldr_context, iBase*)
+	iStreamSource*, iLoaderContext* ldr_context, iBase*,
+  iStringArray* failedMeshFacts)
 {
   csRef<iMeshObject> mesh;
   csRef<iNullMeshState> state;
@@ -378,13 +381,41 @@ csPtr<iBase> csNullMeshLoader::Parse (iDocumentNode* node,
 	{
 	  const char* factname = child->GetContentsValue ();
 	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
-	  if (!fact)
-	  {
-      	    synldr->ReportError (
-		"crystalspace.nullmeshloader.parse.unknownfactory",
-		child, "Couldn't find factory '%s'!", factname);
-	    return 0;
-	  }
+
+    if(failedMeshFacts)
+    {
+      // Check for failed meshfact load.
+      int i = 0;
+      while(!fact)
+      {
+        if(failedMeshFacts->GetSize() != 0 &&
+          !strcmp(failedMeshFacts->Get(i), factname))
+        {
+          synldr->ReportError (
+            "crystalspace.nullmeshloader.parse.unknownfactory",
+            child, "Couldn't find factory '%s'!", factname);
+          return 0;
+        }
+
+        if(i >= (int)(failedMeshFacts->GetSize()-1))
+        {
+          fact = ldr_context->FindMeshFactory (factname);
+          i = 0;
+        }
+        else
+        {
+          i++;
+        }
+      }
+    }
+    else if(!fact)
+    {
+      synldr->ReportError (
+        "crystalspace.nullmeshloader.parse.unknownfactory",
+        child, "Couldn't find factory '%s'!", factname);
+      return 0;
+    }
+
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
           state = scfQueryInterface<iNullMeshState> (mesh);
 	  if (!state)

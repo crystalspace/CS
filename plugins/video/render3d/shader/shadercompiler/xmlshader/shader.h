@@ -252,6 +252,7 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
     if (techVar >= techVariants.GetSize()) return 0;
     const csArray<ShaderTechVariant::Technique>& techniques =
       techVariants[techVar].techniques;
+    if (techniques.GetSize() == 0) return 0;
     return techniques[techAndVar % techniques.GetSize()]
       .variants[techAndVar / techniques.GetSize()].tech;
   }

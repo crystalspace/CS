@@ -34,6 +34,7 @@
 
 #include "iengine/collection.h"
 #include "iengine/light.h"
+#include "iutil/threadmanager.h"
 
 class csBox3;
 class csColor;
@@ -78,6 +79,7 @@ struct iSharedVariableList;
 struct iTextureHandle;
 struct iTextureList;
 struct iTextureWrapper;
+struct iThreadedLoader;
 
 struct iEngine;
 
@@ -559,7 +561,7 @@ struct iEngine : public virtual iBase
    * Create a empty sector with given name.
    * \param name the sector name
    */
-  virtual iSector *CreateSector (const char *name) = 0;
+  virtual iSector *CreateSector (const char *name, bool addToList = true) = 0;
 
   /// Get the list of sectors
   virtual iSectorList* GetSectors () = 0;
@@ -642,8 +644,8 @@ struct iEngine : public virtual iBase
    * or 0 on failure.
    */
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (iMeshFactoryWrapper* factory,
-  	const char* name, iSector* sector = 0,
-	const csVector3& pos = csVector3 (0, 0, 0)) = 0;
+  	const char* name, iSector* sector = 0, const csVector3& pos = csVector3 (0, 0, 0),
+    bool addToList = true) = 0;
 
   /**
    * Create a mesh wrapper for an existing mesh object.
@@ -658,8 +660,8 @@ struct iEngine : public virtual iBase
    * or 0 on failure.
    */
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (iMeshObject* meshobj,
-  	const char* name, iSector* sector = 0,
-	const csVector3& pos = csVector3 (0, 0, 0)) = 0;
+  	const char* name, iSector* sector = 0, const csVector3& pos = csVector3 (0, 0, 0),
+    bool addToList = true) = 0;
 
   /**
    * Create a mesh wrapper from a class id.
@@ -680,14 +682,14 @@ struct iEngine : public virtual iBase
    * or 0 on failure.
    */
   virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* classid,
-  	const char* name, iSector* sector = 0,
-	const csVector3& pos = csVector3 (0, 0, 0)) = 0;
+  	const char* name, iSector* sector = 0, const csVector3& pos = csVector3 (0, 0, 0),
+    bool addToList = true) = 0;
 
   /**
    * Create an uninitialized mesh wrapper
    * Assign to a csRef.
    */
-  virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* name) = 0;
+  virtual csPtr<iMeshWrapper> CreateMeshWrapper (const char* name, bool addToList = true) = 0;
 
   /**
    * Convenience function to load a mesh object from a given loader plugin.
@@ -711,7 +713,7 @@ struct iEngine : public virtual iBase
    * Convenience function to add a mesh and all children of that
    * mesh to the engine.
    */
-  virtual void AddMeshAndChildren (iMeshWrapper* mesh) = 0;
+  THREADED_INTERFACE1(AddMeshAndChildren, iMeshWrapper* mesh);
 
   /**
    * This routine returns an iterator to iterate over
@@ -788,7 +790,7 @@ struct iEngine : public virtual iBase
    * use DecRef().
    */
   virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* classId,
-  	const char* name) = 0;
+  	const char* name, bool addToList = true) = 0;
 
   /**
    * Create a mesh factory wrapper for an existing mesh factory
@@ -798,14 +800,16 @@ struct iEngine : public virtual iBase
    * \param name the engine name for the factory wrapper
    */
   virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (
-  	iMeshObjectFactory * factory, const char* name) = 0;
+  	iMeshObjectFactory * factory, const char* name,
+    bool addToList = true) = 0;
 
   /**
    * Create an uninitialized mesh factory wrapper
    * Assign to a csRef.
    * \param name the engine name for the factory wrapper
    */
-  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* name) = 0;
+  virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* name,
+    bool addToList = true) = 0;
 
   /**
    * Convenience function to load a mesh factory from a given loader plugin.
@@ -816,7 +820,7 @@ struct iEngine : public virtual iBase
    */
   virtual csPtr<iMeshFactoryWrapper> LoadMeshFactory (
   	const char* name, const char* loaderClassId,
-	iDataBuffer* input) = 0;
+	iDataBuffer* input, bool addToList = true) = 0;
 
   /**
    * Find the given mesh factory. The name can be a normal
@@ -1293,6 +1297,13 @@ struct iEngine : public virtual iBase
    * settings.
    */
   virtual void ReloadRenderManager() = 0;
+  /** @} */
+
+  /**
+   * Loader List Sync
+   */
+  THREADED_INTERFACE2(SyncEngineLists, csRef<iThreadedLoader> loader, bool runNow);
+  virtual void SyncEngineListsNow(csRef<iThreadedLoader> loader) = 0;
   /** @} */
 };
 

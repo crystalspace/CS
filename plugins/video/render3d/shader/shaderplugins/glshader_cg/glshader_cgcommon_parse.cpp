@@ -189,7 +189,9 @@ bool csShaderGLCGCommon::Load (iShaderDestinationResolver* resolve,
       switch(id)
       {
         case XMLTOKEN_PROFILE:
-          cg_profile = child->GetContentsValue ();
+	  synsrv->Report ("crystalspace.graphics3d.shader.cg",
+	    CS_REPORTER_SEVERITY_WARNING, child,
+	    "<profile> is no longer supported");
           break;
         case XMLTOKEN_ENTRY:
           entrypoint = child->GetContentsValue ();
@@ -256,7 +258,7 @@ bool csShaderGLCGCommon::GetProgramNode (iDocumentNode* passProgNode)
 	      csRef<iFile> file = vfs->Open (filename, VFS_FILE_READ);
 	      if (!file.IsValid())
 	      {
-		synsrv->Report ("crystalspace.graphics3d.shader.common",
+		synsrv->Report ("crystalspace.graphics3d.shader.cg",
 		  CS_REPORTER_SEVERITY_WARNING, child,
 		  "Could not open '%s'", filename);
 		return false;

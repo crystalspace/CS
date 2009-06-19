@@ -67,8 +67,19 @@ void csShaderGLCGCommon::ClipsToVmap ()
     destnamePlane.Format ("_clipPlanes.plane%zu", c);
     
     VariableMapEntry vme (CS::InvalidShaderVarStringID, destnamePlane);
-    vme.mappingParam = clip.plane;
-    vme.name = clip.plane.name;
+    if (clip.plane.IsConstant ())
+    {
+      vme.mappingParam = clip.plane;
+      vme.name = clip.plane.name;
+    }
+    else
+    {
+      CS::ShaderVarStringID svName (svClipPlane - c);
+      clipPlane[c].AttachNew (new csShaderVariable (svName));
+      clipPlane[c]->SetValue (0.0f);
+      vme.name = svName;
+      vme.mappingParam.name = svName;
+    }
     ShaderParameter* sparam = shaderPlug->paramAlloc.Alloc();
     sparam->assumeConstant = false;
     vme.userVal = reinterpret_cast<intptr_t> (sparam);
@@ -80,6 +91,7 @@ void csShaderGLCGCommon::ClipsToVmap ()
     CS::ShaderVarStringID svName (
       (i == 0) ? svClipPackedDist0 : svClipPackedDist1);
     clipPackedDists[i].AttachNew (new csShaderVariable (svName));
+    clipPackedDists[i]->SetValue (0.0f);
   
     csString destnameDist;
     destnameDist.Format ("_clipPlanes.packedDists%d", i);
@@ -93,13 +105,10 @@ void csShaderGLCGCommon::ClipsToVmap ()
 }
 
 #define COND_STYLE_NV     \
-  "defined(PROFILE_VP30) " \
-  "|| defined(PROFILE_VP40) " \
-  "|| defined(PROFILE_GP4VP) " \
-  "|| defined(PROFILE_FP20) " \
-  "|| defined(PROFILE_FP30) " \
-  "|| defined(PROFILE_FP40) " \
-  "|| defined(PROFILE_GP4FP) "
+  "(" \
+  "defined(VERT_PROFILE_VP40) " \
+  "|| defined(VERT_PROFILE_GP4VP)" \
+  ")"
 #define COND_STYLE_ATI    "defined(VENDOR_ATI)"
 
 static const char clipVaryingMacro[] =

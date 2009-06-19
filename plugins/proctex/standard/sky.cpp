@@ -85,7 +85,7 @@ csPtSkyLoader::csPtSkyLoader(iBase *p) :
 
 csPtr<iBase> csPtSkyLoader::Parse (iDocumentNode* /*node*/, 
 				    iStreamSource*, iLoaderContext* /*ldr_context*/,
-  				    iBase* context)
+  				    iBase* context, iStringArray* failed)
 {
   /*
     Going through the plugin manager to retrieve the texture type

@@ -5,7 +5,6 @@
       <Directory Id="INSTALLDIR" >
         <Component Guid="4c44555a-bcb6-3ab7-ad15-9f5ae3498dcb" Id="CS.register.">
           <RegistryValue Name="InstallPath" Key="SOFTWARE\CrystalSpace\1.9" Action="write" Type="string" Root="HKLM" Id="CS.register.reg" Value="[INSTALLDIR]"/>
-          <Environment Action="set" Part="last" Name="CRYSTAL_1_9" Value="[INSTALLDIR]" Id="CS.register.env"/>
         </Component>
       </Directory>
     </Directory>

@@ -45,10 +45,10 @@
 
 #include "loadtex.h"
 #include "csloader.h"
+#include "csthreadedloader.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
-
 #define PLUGIN_LEGACY_TEXTYPE_PREFIX  "crystalspace.texture.loader."
 
   bool csLoader::ParseMaterialList (iLoaderContext* ldr_context,
@@ -329,7 +329,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     // Proxy texture loading if the loader isn't specified
     // and we don't need to load them immediately.
     if(txtname && type.IsEmpty() && ldr_context->GetKeepFlags() == KEEP_USED &&
-       !ldr_context->GetCollection())
+       ldr_context->GetCollection())
     {
       if (filename.IsEmpty())
       {
@@ -341,7 +341,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       filename = absolutePath->GetData();
 
       ProxyTexture proxTex;
-      proxTex.img.AttachNew (new ProxyImage (this, filename));
+      csRef<iLoader> loader = scfQueryInterface<iLoader>(this);
+      proxTex.img.AttachNew (new ProxyImage (loader, filename, object_reg));
       proxTex.always_animate = always_animate;
 
       tex = Engine->GetTextureList()->NewTexture (proxTex.img);
@@ -778,6 +779,5 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     return tex;
   }
-
 }
 CS_PLUGIN_NAMESPACE_END(csparser)

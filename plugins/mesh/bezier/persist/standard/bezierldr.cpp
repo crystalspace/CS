@@ -119,16 +119,21 @@ bool csBezierLoader::ParseCurve (iCurve* curve, iLoaderContext* ldr_context,
       case XMLTOKEN_MATERIAL:
 	{
 	  const char* matname = child->GetContentsValue ();
-          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-          if (mat == 0)
-          {
-	    synldr->ReportError (
-	      "crystalspace.bezierloader.parse.material",
-              child, "Couldn't find material named '%s'!", matname);
-            return false;
-          }
-          curve->SetMaterial (mat);
-	}
+    iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+    csTicks start = csGetTicks();
+    while(!mat && csGetTicks()-start < 60000)
+    {
+      mat = ldr_context->FindMaterial (matname);
+    }
+    if (mat == 0)
+    {
+      synldr->ReportError (
+        "crystalspace.bezierloader.parse.material",
+        child, "Couldn't find material named '%s'!", matname);
+      return false;
+    }
+    curve->SetMaterial (mat);
+  }
         break;
       case XMLTOKEN_V:
         {
@@ -326,7 +331,7 @@ Nag to Jorrit about this feature if you want it.");
 
 csPtr<iBase> csBezierLoader::Parse (iDocumentNode* node,
 			     iStreamSource*, iLoaderContext* ldr_context,
-			     iBase*)
+			     iBase*, iStringArray* failedMeshFacts)
 {
   csRef<iMeshObjectType> type  = csLoadPluginCheck<iMeshObjectType> (
   	object_reg, "crystalspace.mesh.object.bezier", false);

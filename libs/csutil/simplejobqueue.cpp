@@ -46,6 +46,11 @@ namespace Utility
     return true;
   }
 
+  int32 SimpleJobQueue::GetQueueCount()
+  {
+    return 0;
+  }
+
   void SimpleJobQueue::Wait (iJob*) { }
 }
 }

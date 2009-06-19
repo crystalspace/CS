@@ -847,6 +847,8 @@ void csMeshWrapper::UnsetLODFade ()
 
 void csMeshWrapper::SetDefaultEnvironmentTexture ()
 {
+  if (!engine->enableEnvTex) return;
+
   csRef<csShaderVariable> svTexEnvironment;
   svTexEnvironment.AttachNew (new csShaderVariable (engine->svTexEnvironmentName));
   svTexEnvironment->SetType (csShaderVariable::TEXTURE);
@@ -1240,6 +1242,7 @@ int csMeshList::Add (iMeshWrapper *obj)
 
 bool csMeshList::Remove (iMeshWrapper *obj)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   FreeMesh (obj);
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
@@ -1251,6 +1254,7 @@ bool csMeshList::Remove (iMeshWrapper *obj)
 
 bool csMeshList::Remove (int n)
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   FreeMesh (list[n]);
   iMeshWrapper* obj = list[n];
   const char* name = obj->QueryObject ()->GetName ();
@@ -1263,6 +1267,7 @@ bool csMeshList::Remove (int n)
 
 void csMeshList::RemoveAll ()
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   size_t i;
   for (i = 0 ; i < list.GetSize () ; i++)
   {
@@ -1280,6 +1285,7 @@ int csMeshList::Find (iMeshWrapper *obj) const
 
 iMeshWrapper *csMeshList::FindByName (const char *Name) const
 {
+  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   if (strchr (Name, ':'))
     return FindByNameWithChild (Name);
   else

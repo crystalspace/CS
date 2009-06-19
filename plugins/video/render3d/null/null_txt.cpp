@@ -28,6 +28,8 @@
 #include "iutil/string.h"
 #include "igraphic/image.h"
 
+using namespace CS::Threading;
+
 //--------------------------------------------------- csTextureHandleNull ---//
 
 csTextureHandleNull::csTextureHandleNull (csTextureManagerNull *txtmgr,
@@ -105,7 +107,10 @@ csPtr<iTextureHandle> csTextureManagerNull::RegisterTexture (iImage* image,
   }
 
   csTextureHandleNull *txt = new csTextureHandleNull (this, image, flags);
+
+  MutexScopedLock lock(texturesLock);
   textures.Push (txt);
+
   return csPtr<iTextureHandle> (txt);
 }
 
@@ -116,12 +121,16 @@ csPtr<iTextureHandle> csTextureManagerNull::CreateTexture (int w, int h, int d,
   (void)imagetype;
   (void)format;
   csTextureHandleNull *txt = new csTextureHandleNull (this, w, h, d, flags);
+
+  MutexScopedLock lock(texturesLock);
   textures.Push (txt);
+
   return csPtr<iTextureHandle> (txt);
 }
 
 void csTextureManagerNull::UnregisterTexture (csTextureHandleNull* handle)
 {
+  MutexScopedLock lock(texturesLock);
   size_t idx = textures.Find (handle);
   if (idx != csArrayItemNotFound) textures.DeleteIndexFast (idx);
 }

@@ -17,7 +17,6 @@
           
       VertToFrag_Framework framework;
       
-      Skinning vertSkinning;
       SurfaceClassic surfClassic;
       LightingClassic lightClassic;
       FogSector fog;
@@ -25,14 +24,21 @@
     };
 
     VertToFrag VertexMain (uniform float4x4 ModelViewProj : state.matrix.mvp,
-			   varying float4 Position : POSITION)
+    			   uniform float4x4 ModelView : state.matrix.modelview,
+    			   uniform float4x4 objectToWorld,
+			   varying float4 Position)
     {
       VertToFrag V2F;
  
-      // Setup and skin vertex position
-      V2F.vertSkinning.SetupVert();
-      V2F.Hposition = mul (ModelViewProj, 
-			   V2F.vertSkinning.SkinnedPosition(Position));
+      // Vertex skinning is done by vproc.(soft-skinning.inc)
+	
+      float4 position_object = Position;
+      float4 position_camera = mul (ModelView, position_object);
+      float4 position_world = mul (objectToWorld, position_object);
+            
+      APPLY_CLIPPING_VP(position_camera, position_world, position_object);
+      V2F.Hposition = mul (ModelViewProj, Position);
+	
       // Let the snippets setup themselves
       V2F.surfClassic.SetupVert();
       V2F.lightClassic.SetupVert();
@@ -46,7 +52,9 @@
     
     // The fragment program.
     float4 FragmentMain (VertToFrag V2F) : COLOR
-    {
+    { 
+      APPLY_CLIPPING_FP;
+      
       V2F.framework.SetupFrag();
   
       float4 color = V2F.surfClassic.GetDiffuse (V2F.parallax.GetTCOffset()) * 
@@ -56,6 +64,7 @@
       {
         color.rgb = lerp(color.rgb, V2F.fog.GetColor(), V2F.fog.GetIntensity());
       }
+      
       return color;
     }
     <?Endtemplate?>
@@ -63,6 +72,14 @@
    <?Template CgVertexOptions?>
 	<profile>arbvp1</profile>
   <?Endtemplate?>
+  
+  <?Template MyProgram ?>
+      <variablemap variable="object2world transform" destination="objectToWorld" />
+      <clip space="object">
+      	 <plane type="shadervar">clip plane reflection</plane>
+      </clip>
+  <?Endtemplate?>
+  <?AddToList ProgramMappings MyProgram?>
     
   <?CgSetVertexFunc VertexMain ?>   
   <?CgSetFragmentFunc FragmentMain ?>
@@ -72,6 +89,7 @@
   <?! Shader variables that might be used by snippets must be written out
         as well. ?>
   <?WriteShaderVars?>
+  
   
   <!-- Last but not least, fall back to a fixed function version, for older
          hardware.-->

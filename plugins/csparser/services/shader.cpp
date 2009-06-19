@@ -23,6 +23,7 @@
 #include "iengine/engine.h"
 #include "imap/ldrctxt.h"
 #include "iutil/document.h"
+#include "iutil/stringarray.h"
 #include "ivaria/reporter.h"
 #include "ivideo/shader/shader.h"
 
@@ -37,7 +38,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(SyntaxService)
 {
 
 bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
-    	iDocumentNode* node, csShaderVariable& var)
+    	iDocumentNode* node, csShaderVariable& var,
+      iStringArray* failedTextures)
 {
   csRef<iLoaderContext> engineLoaderContext;
   if (ldr_context == 0)
@@ -100,19 +102,48 @@ bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
     case XMLTOKEN_TEXTURE:
       {
         if (!ldr_context) break;
-	csRef<iTextureWrapper> tex;
+        csRef<iTextureWrapper> tex;
         // @@@ This should be done in a better way...
-	//  @@@ E.g. lazy retrieval of the texture with an accessor?
+        //  @@@ E.g. lazy retrieval of the texture with an accessor?
         const char* texname = node->GetContentsValue ();
         tex = ldr_context->FindTexture (texname);
-        if (!tex)
-	{
-          Report (
-              "crystalspace.syntax.shadervariable",
-              CS_REPORTER_SEVERITY_WARNING,
-              node,
-              "Texture '%s' not found.", texname);
+
+        if(failedTextures)
+        {
+          // Check for failed texture load.
+          int i = 0;
+          while(!tex)
+          {
+            if(failedTextures->GetSize() != 0 &&
+              !strcmp(failedTextures->Get(i), texname))
+            {
+              Report (
+                "crystalspace.syntax.shadervariable",
+                CS_REPORTER_SEVERITY_WARNING,
+                node,
+                "Texture '%s' not found.", texname);
+            }
+
+            if(i >= (int)(failedTextures->GetSize()-1))
+            {
+              tex = ldr_context->FindTexture (texname);
+              i = 0;
+            }
+            else
+            {
+              i++;
+            }
+          }
         }
+        else if(!tex)
+        {
+          Report (
+            "crystalspace.syntax.shadervariable",
+            CS_REPORTER_SEVERITY_WARNING,
+            node,
+            "Texture '%s' not found.", texname);
+        }
+
         var.SetValue (tex);
       }
       break;
@@ -182,7 +213,7 @@ bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
           csRef<csShaderVariable> elementVar = 
             csPtr<csShaderVariable> (new csShaderVariable (CS::InvalidShaderVarStringID));
           var.SetArrayElement (varCount, elementVar);
-          ParseShaderVar (ldr_context, varNode, *elementVar);
+          ParseShaderVar (ldr_context, varNode, *elementVar, failedTextures);
           varCount++;
         }
       }

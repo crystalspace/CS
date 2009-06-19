@@ -57,6 +57,8 @@ namespace genmeshify
     virtual iCollection* GetCollection() const { return collection; }
     virtual bool CurrentCollectionOnly() const { return false; }
     virtual uint GetKeepFlags() const { return 0; }
+    virtual void AddToCollection(iObject* obj) { collection->Add(obj); }
+    virtual bool GetVerbose() { return false; }
   };
 
 } // namespace genmeshify

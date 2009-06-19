@@ -133,7 +133,8 @@ public:
   virtual bool ParseGradient (iDocumentNode* node, iGradient* gradient);
   virtual bool WriteGradient (iDocumentNode* node, iGradient* gradient);
   virtual bool ParseShaderVar (iLoaderContext* ldr_context,
-      iDocumentNode* node, csShaderVariable& var);
+      iDocumentNode* node, csShaderVariable& var,
+      iStringArray* failedTextures);
   virtual csRef<iShaderVariableAccessor> ParseShaderVarExpr (
     iDocumentNode* node);
   virtual bool WriteShaderVar (iDocumentNode* node, csShaderVariable& var);

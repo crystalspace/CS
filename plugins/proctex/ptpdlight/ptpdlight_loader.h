@@ -99,7 +99,9 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
-  	iBase* context);
+  	iBase* context, iStringArray* failedMeshFacts);
+
+  virtual bool IsThreadSafe() { return true; }
 
   // PT update "scheduler"
   bool UpdatePT (ProctexPDLight* texture, csTicks time)

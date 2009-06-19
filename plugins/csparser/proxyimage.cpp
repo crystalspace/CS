@@ -18,7 +18,14 @@
 
 #include "cssysdef.h"
 
-#include "csloader.h"
+#include "imap/loader.h"
+#include "iutil/databuff.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/txtmgr.h"
+
+#include "loadtex.h"
 #include "proxyimage.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
@@ -27,18 +34,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   {
     if (!proxiedImage.IsValid ())
     {
-      iTextureManager *tm = loader->G3D->GetTextureManager();
+      csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D>(object_reg);
+      iTextureManager *texman = g3d->GetTextureManager();
 
-      int Format = tm->GetTextureFormat ();
-      csRef<iImage> img = loader->LoadImage (filename, Format);
-      if (!img)
+      int Format = texman->GetTextureFormat ();
+
+      csRef<iImage> img;
+      csRef<iLoader> ldr = scfQueryInterface<iLoader>(loader);
+      if(ldr.IsValid())
       {
-        loader->ReportWarning (
+        img = ldr->LoadImage (filename, Format);
+      }
+      else
+      {
+        csRef<iThreadedLoader> tldr = scfQueryInterface<iThreadedLoader>(loader);
+        csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(object_reg);
+        csRef<iThreadReturn> ret = tldr->LoadImage (filename, Format);
+        ret->Wait();
+        img = scfQueryInterface<iImage>(ret->GetResultRefPtr());
+      }
+      if (!img.IsValid())
+      {
+        csRef<iReporter> reporter = csQueryRegistry<iReporter>(object_reg);
+        reporter->ReportWarning (
           "crystalspace.maploader.parse.texture",
           "Couldn't load image '%s', using error texture instead!",
           filename.GetData());
-        img = csLoader::GenerateErrorTexture (32, 32);
-        CS_ASSERT(img);
+        img = GenerateErrorTexture (32, 32);
+        CS_ASSERT(img.IsValid());
       }
       proxiedImage = img;
     }

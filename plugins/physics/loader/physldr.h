@@ -45,16 +45,20 @@ public:
 
   /// Parse the physics node and setup the environment
   virtual csPtr<iBase> Parse (iDocumentNode *node,
-    iStreamSource*, iLoaderContext* ldr_context, iBase* context);
+    iStreamSource*, iLoaderContext* ldr_context, iBase* context,
+    iStringArray* failed);
+
+  virtual bool IsThreadSafe() { return true; }
+
   /// Parse the system specific sub section
-  virtual bool ParseSystem (iDocumentNode *node, iDynamicSystem* system);
+  virtual bool ParseSystem (iDocumentNode *node, iDynamicSystem* system, iLoaderContext* ldr_context);
   /// Parse the body specific sub section
-  virtual bool ParseBody (iDocumentNode *node, iRigidBody* body);
+  virtual bool ParseBody (iDocumentNode *node, iRigidBody* body, iLoaderContext* ldr_context);
   /// Parse the collider specific sub section
-  virtual bool ParseCollider (iDocumentNode *node, iRigidBody* body);
+  virtual bool ParseCollider (iDocumentNode *node, iRigidBody* body, iLoaderContext* ldr_context);
   /// Parse an anonymous mesh collider in the system
   virtual bool ParseSystemColliderMesh (iDocumentNode *node,
-  	iDynamicSystem* system, bool convex);
+  	iDynamicSystem* system, bool convex, iLoaderContext* ldr_context);
   /// Parse an anonymous sphere collider in the system
   virtual bool ParseSystemColliderSphere (iDocumentNode *node,
   	iDynamicSystem* system);

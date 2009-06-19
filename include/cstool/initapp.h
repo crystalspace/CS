@@ -47,14 +47,15 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
 
-struct iObjectRegistry;
+struct iCommandLineParser;
+struct iConfigManager;
 struct iEvent;
 struct iEventHandler;
 struct iEventQueue;
+struct iObjectRegistry;
 struct iPluginManager;
+struct iThreadManager;
 struct iVirtualClock;
-struct iCommandLineParser;
-struct iConfigManager;
 struct iSystemOpenManager;
 struct iVerbosityManager;
 
@@ -226,6 +227,12 @@ public:
    * the default event queue (using 0 tag).
    */
   static iEventQueue* CreateEventQueue (iObjectRegistry*);
+
+  /**
+   * This function creates the thread manager, which coordinates
+   * the thread queue system in CS.
+   */
+  static iThreadManager* CreateThreadManager (iObjectRegistry*);
 
   /**
    * Create the virtual clock. This clock is responsible for keeping

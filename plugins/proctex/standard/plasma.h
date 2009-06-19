@@ -50,7 +50,10 @@ public:
   csPtPlasmaLoader(iBase *p);
 
   virtual csPtr<iBase> Parse (iDocumentNode* node, 
-    iStreamSource*, iLoaderContext* ldr_context, iBase* context);
+    iStreamSource*, iLoaderContext* ldr_context, iBase* context,
+    iStringArray* failed);
+
+  virtual bool IsThreadSafe() { return true; }
 };
 
 class csPtPlasmaSaver :

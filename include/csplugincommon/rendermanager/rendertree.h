@@ -262,6 +262,9 @@ namespace RenderManager
       /// Our own key
       typename TreeTraitsType::MeshNodeKeyType key;
 
+      /// Sorting
+      int sorting;
+
       /// All the meshes within the meshnode
       MeshArrayType meshes;
 

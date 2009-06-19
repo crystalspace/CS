@@ -271,7 +271,7 @@ namespace CS
       csSimpleRenderMesh mesh;
       mesh.alphaType.alphaType = csAlphaMode::alphaNone;
       mesh.meshtype = CS_MESHTYPE_LINES;
-      mesh.vertexCount = debugLines.verts.GetSize();
+      mesh.vertexCount = (uint)debugLines.verts.GetSize();
       mesh.vertices = debugLines.verts.GetArray();
       mesh.colors = debugLines.colors.GetArray();
       mesh.object2world = view->GetCamera()->GetTransform().GetInverse();

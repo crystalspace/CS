@@ -381,7 +381,6 @@ class iSector(core.iBase):
     def GetRecLevel(*args): return _iengine.iSector_GetRecLevel(*args)
     def IncRecLevel(*args): return _iengine.iSector_IncRecLevel(*args)
     def DecRecLevel(*args): return _iengine.iSector_DecRecLevel(*args)
-    def SetRenderLoop(*args): return _iengine.iSector_SetRenderLoop(*args)
     def GetRenderLoop(*args): return _iengine.iSector_GetRenderLoop(*args)
     def CreateMeshGenerator(*args): return _iengine.iSector_CreateMeshGenerator(*args)
     def GetMeshGeneratorCount(*args): return _iengine.iSector_GetMeshGeneratorCount(*args)
@@ -405,8 +404,6 @@ class iSector(core.iBase):
     def HitBeamPortals(*args): return _iengine.iSector_HitBeamPortals(*args)
     def HitBeam(*args): return _iengine.iSector_HitBeam(*args)
     def FollowSegment(*args): return _iengine.iSector_FollowSegment(*args)
-    def SetSectorCallback(*args): return _iengine.iSector_SetSectorCallback(*args)
-    def RemoveSectorCallback(*args): return _iengine.iSector_RemoveSectorCallback(*args)
     def GetSectorCallbackCount(*args): return _iengine.iSector_GetSectorCallbackCount(*args)
     def GetSectorCallback(*args): return _iengine.iSector_GetSectorCallback(*args)
     def SetLightCulling(*args): return _iengine.iSector_SetLightCulling(*args)
@@ -549,7 +546,6 @@ class iEngine(core.iBase):
     def RemoveEngineSectorCallback(*args): return _iengine.iEngine_RemoveEngineSectorCallback(*args)
     def CreateMeshWrapper(*args): return _iengine.iEngine_CreateMeshWrapper(*args)
     def LoadMeshWrapper(*args): return _iengine.iEngine_LoadMeshWrapper(*args)
-    def AddMeshAndChildren(*args): return _iengine.iEngine_AddMeshAndChildren(*args)
     def GetNearbyMeshes(*args): return _iengine.iEngine_GetNearbyMeshes(*args)
     def GetMeshes(*args): return _iengine.iEngine_GetMeshes(*args)
     def FindMeshObject(*args): return _iengine.iEngine_FindMeshObject(*args)
@@ -607,6 +603,7 @@ class iEngine(core.iBase):
     def GetRenderManager(*args): return _iengine.iEngine_GetRenderManager(*args)
     def SetRenderManager(*args): return _iengine.iEngine_SetRenderManager(*args)
     def ReloadRenderManager(*args): return _iengine.iEngine_ReloadRenderManager(*args)
+    def SyncEngineListsNow(*args): return _iengine.iEngine_SyncEngineListsNow(*args)
     scfGetVersion = staticmethod(_iengine.iEngine_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iEngine
     __del__ = lambda self : None;
@@ -743,6 +740,7 @@ class iCameraPositionList(core.iBase):
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def NewCameraPosition(*args): return _iengine.iCameraPositionList_NewCameraPosition(*args)
+    def CreateCameraPosition(*args): return _iengine.iCameraPositionList_CreateCameraPosition(*args)
     def GetCount(*args): return _iengine.iCameraPositionList_GetCount(*args)
     def Get(*args): return _iengine.iCameraPositionList_Get(*args)
     def Add(*args): return _iengine.iCameraPositionList_Add(*args)
@@ -809,6 +807,7 @@ class iTextureList(core.iBase):
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def NewTexture(*args): return _iengine.iTextureList_NewTexture(*args)
+    def CreateTexture(*args): return _iengine.iTextureList_CreateTexture(*args)
     def GetCount(*args): return _iengine.iTextureList_GetCount(*args)
     def Get(*args): return _iengine.iTextureList_Get(*args)
     def Add(*args): return _iengine.iTextureList_Add(*args)
@@ -867,6 +866,7 @@ class iMaterialList(core.iBase):
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def NewMaterial(*args): return _iengine.iMaterialList_NewMaterial(*args)
+    def CreateMaterial(*args): return _iengine.iMaterialList_CreateMaterial(*args)
     def GetCount(*args): return _iengine.iMaterialList_GetCount(*args)
     def Get(*args): return _iengine.iMaterialList_Get(*args)
     def Add(*args): return _iengine.iMaterialList_Add(*args)
@@ -1143,6 +1143,18 @@ class iMeshFactoryList(core.iBase):
     __del__ = lambda self : None;
 iMeshFactoryList_swigregister = _iengine.iMeshFactoryList_swigregister
 iMeshFactoryList_swigregister(iMeshFactoryList)
+
+class iMeshFactoryWrapperIterator(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def Next(*args): return _iengine.iMeshFactoryWrapperIterator_Next(*args)
+    def Reset(*args): return _iengine.iMeshFactoryWrapperIterator_Reset(*args)
+    def HasNext(*args): return _iengine.iMeshFactoryWrapperIterator_HasNext(*args)
+    __swig_destroy__ = _iengine.delete_iMeshFactoryWrapperIterator
+    __del__ = lambda self : None;
+iMeshFactoryWrapperIterator_swigregister = _iengine.iMeshFactoryWrapperIterator_swigregister
+iMeshFactoryWrapperIterator_swigregister(iMeshFactoryWrapperIterator)
 
 class iMeshWrapperIterator(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')

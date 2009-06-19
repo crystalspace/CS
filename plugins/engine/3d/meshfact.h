@@ -70,6 +70,7 @@ private:
     csArrayCapacityFixedGrow<64> > list;
   csHash<iMeshFactoryWrapper*, csString>
   	factories_hash;
+  mutable CS::Threading::RecursiveMutex removeLock;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>

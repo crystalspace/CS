@@ -28,6 +28,8 @@
 #include "gl_txtmgr_imagetex.h"
 #include "gl_txtmgr_lightmap.h"
 
+using namespace CS::Threading;
+
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
 
@@ -43,6 +45,7 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
 {
   csGLTextureManager::object_reg = object_reg;
 
+  texturesLock.Initialize();
   
   G3D = iG3D;
   max_tex_size = G3D->GetMaxTextureSize ();
@@ -257,6 +260,8 @@ void csGLTextureManager::ReadTextureClasses (iConfigFile* config)
 
 void csGLTextureManager::Clear()
 {
+  MutexScopedLock lock(texturesLock);
+
   size_t i;
   for (i=0; i < textures.GetSize (); i++)
   {
@@ -336,6 +341,8 @@ csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImage *image,
     return 0;
 
   csGLTextureHandle *txt = new csGLTextureHandle (image, flags, G3D);
+
+  MutexScopedLock lock(texturesLock);
   CompactTextures ();
   textures.Push(txt);
   return csPtr<iTextureHandle> (txt);
@@ -371,6 +378,7 @@ csPtr<iTextureHandle> csGLTextureManager::CreateTexture (int w, int h, int d,
     return 0;
   }
 
+  MutexScopedLock lock(texturesLock);
   CompactTextures ();
   textures.Push(txt);
   return csPtr<iTextureHandle> (txt);
@@ -379,7 +387,7 @@ csPtr<iTextureHandle> csGLTextureManager::CreateTexture (int w, int h, int d,
 void csGLTextureManager::CompactTextures ()
 {
   if (!compactTextures) return;
-    
+
   size_t i = 0;
   while (i < textures.GetSize ())
   {
@@ -449,6 +457,9 @@ void csGLTextureManager::DumpTextures (iVFS* VFS, iImageIO* iio,
 				       const char* dir)
 {
   csString outfn;
+
+  MutexScopedLock lock(texturesLock);
+
   for (size_t i = 0; i < textures.GetSize (); i++)
   {
     if (!textures[i]) continue;

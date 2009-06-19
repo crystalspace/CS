@@ -46,7 +46,7 @@ struct iJob : public virtual iBase
  */
 struct iJobQueue : public virtual iBase
 {
-  SCF_INTERFACE(iJobQueue, 2,1,1);
+  SCF_INTERFACE(iJobQueue, 2,2,0);
   
   /// Add a job to the queue.
   virtual void Enqueue (iJob* job) = 0;
@@ -74,6 +74,11 @@ struct iJobQueue : public virtual iBase
    * Wait until a particular job finished running.
    */
   virtual void Wait (iJob* job) = 0;
+
+  /**
+   * Return the number of jobs in the queue.
+   */
+  virtual int32 GetQueueCount() = 0;
 };
 
 #endif // __CS_IUTIL_JOB_H__

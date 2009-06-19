@@ -1272,7 +1272,7 @@ namespace lighter
     if (!hasLightmapsLibrary)
     {
       lightmapsProgress.SetProgress (0);
-      const char* const createNodeBeforeNames[] = { "materials", "meshfact", "sector" };
+      const char* const createNodeBeforeNames[] = { "textures", "materials", "library", "meshfact", "sector" };
 
       csRef<iDocumentNode> createBefore;
       for (size_t n = 0; n < sizeof(createNodeBeforeNames)/sizeof(const char*); 

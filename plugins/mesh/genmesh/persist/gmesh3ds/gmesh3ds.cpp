@@ -343,9 +343,8 @@ Lib3dsFile* csGenmesh3DSFactoryLoader::LoadFileData (uint8* pBuffer, size_t size
 }
 
 csPtr<iBase> csGenmesh3DSFactoryLoader::Parse (iDataBuffer* buf,
-				       iStreamSource*,
-				       iLoaderContext* ldr_context,
-				       iBase* context)
+				       iStreamSource*, iLoaderContext* ldr_context,
+				       iBase* context, iStringArray*)
 {
   materials_and_tris.Empty ();
 
@@ -423,7 +422,7 @@ iMeshFactoryWrapper* csGenmesh3DSFactoryLoader::Load (const char* factname,
   csRef<iMeshFactoryWrapper> ff = engine->CreateMeshFactory (
   	"crystalspace.mesh.object.genmesh", factname);
   csRef<iLoaderContext> ldr_context = engine->CreateLoaderContext ();
-  csRef<iBase> b = Parse (buffer, 0, ldr_context, ff->GetMeshObjectFactory ());
+  csRef<iBase> b = Parse (buffer, 0, ldr_context, ff->GetMeshObjectFactory (), 0);
   if (!b)
   {
     ReportError (object_reg,

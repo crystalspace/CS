@@ -168,17 +168,17 @@ void csPluginManager::QueryOptions (iComponent *obj)
   }
 }
 
-iBase *csPluginManager::LoadPlugin (const char *classID, bool init,
-				    bool report)
+THREADED_CALLABLE_IMPL3(csPluginManager, LoadPlugin, const char *classID,
+                        bool init, bool report)
 {
   csRef<iComponent> p (scfCreateInstance<iComponent> (classID));
-  
+
   if (!p)
   {
     if (report)
       csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-	  "crystalspace.pluginmgr.loadplugin",
-	  "could not load plugin '%s'", classID);
+      "crystalspace.pluginmgr.loadplugin",
+      "could not load plugin '%s'", classID);
   }
   else
   {
@@ -190,10 +190,10 @@ iBase *csPluginManager::LoadPlugin (const char *classID, bool init,
       csPlugin* pl = Plugins.Get (i);
       if (pl->ClassID)
         if (pl->ClassID == classID || !strcmp (pl->ClassID, classID))
-	{
-	  index = i;
-	  break;
-	}
+        {
+          index = i;
+          break;
+        }
     }
 
     if (index == csArrayItemNotFound)
@@ -206,17 +206,18 @@ iBase *csPluginManager::LoadPlugin (const char *classID, bool init,
     {
       p->IncRef();
       if (init) QueryOptions (p);
-      return p;
+      ret->SetResult(csPtr<iBase>(p));
+      return true;
     }
     if (report)
       csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-	  "crystalspace.pluginmgr.loadplugin",
-	  "failed to initialize plugin '%s'", classID);
+      "crystalspace.pluginmgr.loadplugin",
+      "failed to initialize plugin '%s'", classID);
     // If we added this plugin in this call then we remove it here as well.
     if (index != csArrayItemNotFound)
       Plugins.DeleteIndex (index);
   }
-  return 0;
+  return false;
 }
 
 bool csPluginManager::RegisterPlugin (const char *classID,

@@ -17,6 +17,9 @@
       <Directory Name="$(var.ARCH)" Id="CS.arch">
         <Directory Name="bin" Id="CS.arch.bin.runtime">
           <Merge DiskId="30001" SourceFile="$(var.CRYSTAL_MSM_PATH)/CS.arch.$(var.ARCH).executable.runtime.msm" Id="CS.arch.executable.runtime" Language="1033" FileCompression="yes"/>
+          <!-- Copy Cg into plugins dir to avoid name collisions -->
+          <Merge DiskId="30000" SourceFile="$(var.WIN32LIBS_MSM_PATH)/winlibs.common_cg.dlls.msm" Id="winlibs.common_cg.dlls" Language="1033" FileCompression="yes"/>
+          <Merge DiskId="30000" SourceFile="$(var.WIN32LIBS_MSM_PATH)/winlibs.common_openal.msm" Id="winlibs.common_openal" Language="1033" FileCompression="yes"/>
         </Directory>
         <Directory Name="lib" Id="CSLIB_ARCH">
           <Component Guid="60f8c4a1-7439-4312-aa14-a1717c0b07b0" Id="CS.arch.lib.runtime.register">
@@ -43,9 +46,10 @@
           <?if $(var.ARCH) = VC_9 ?>
             <Merge DiskId="30001" SourceFile="$(var.WIN32LIBS_MSM_PATH)/winlibs.vc9.dlls.msm" Id="winlibs.arch.dlls" Language="1033" FileCompression="yes"/>
             <Merge Id="VCRedist" SourceFile="$(env.COMMONPROGRAMFILES)\Merge Modules\Microsoft_VC90_CRT_x86.msm" DiskId="30001" Language="0" FileCompression="yes"/>
+            <Merge Id="VCRedistPol" SourceFile="$(env.COMMONPROGRAMFILES)\Merge Modules\policy_9_0_Microsoft_VC90_CRT_x86.msm" DiskId="30001" Language="0" FileCompression="yes"/>
           <?endif?>
           <Merge Id="VCRedist8" SourceFile="$(env.COMMONPROGRAMFILES)\Merge Modules\Microsoft_VC80_CRT_x86.msm" DiskId="30000" Language="0" FileCompression="yes"/>
-          <Merge DiskId="30000" SourceFile="$(var.CRYSTAL_MSM_PATH)/python.msm" Id="Python.msm" Language="1033" FileCompression="yes"/>
+          <Merge Id="VCRedist8Pol" SourceFile="$(env.COMMONPROGRAMFILES)\Merge Modules\policy_8_0_Microsoft_VC80_CRT_x86.msm" DiskId="30000" Language="0" FileCompression="yes"/>
         </Directory>
       </Directory>
       <Directory Name="scripts" Id="CS.scripts">
@@ -58,5 +62,22 @@
         </Directory>
       </Directory>
     </Directory>
+  </DirectoryRef>
+  <!-- To make SetDLLDirTo* Py MSM actions work. Wonder if that shouldn't be done automatically or so? -->
+  <CustomAction Id="FixPyMSMSysFolder" Property="SystemFolder.6B976ADF_8AE8_434E_B282_A06C7F624D2F" Value="[SystemFolder]" Execute="firstSequence"  />
+  <InstallUISequence>
+    <Custom Action="FixPyMSMSysFolder" Sequence="10" />
+  </InstallUISequence>
+  <InstallExecuteSequence>
+    <Custom Action="FixPyMSMSysFolder" Sequence="10" />
+  </InstallExecuteSequence>
+  <AdminUISequence>
+    <Custom Action="FixPyMSMSysFolder" Sequence="10" />
+  </AdminUISequence>
+  <AdminExecuteSequence>
+    <Custom Action="FixPyMSMSysFolder" Sequence="10" />
+  </AdminExecuteSequence>
+  <DirectoryRef Id="TARGETDIR">
+    <Merge DiskId="30000" SourceFile="$(var.CRYSTAL_MSM_PATH)/python.msm" Id="Python.msm" Language="1033" FileCompression="yes"/>
   </DirectoryRef>
 </Include>

@@ -145,14 +145,15 @@ class CS_CRYSTALSPACE_EXPORT csTextureManager :
   public scfImplementation1<csTextureManager, iTextureManager>
 {
 protected:
-
-  //typedef csArray<csTextureHandle*> csTexVector;
   typedef csWeakRefArray<csTextureHandle> csTexVector;
+
+  /// Lock on textures vector.
+  CS::Threading::Mutex texturesLock;
 
   /// List of textures.
   csTexVector textures;
 
-  ///
+  /// Registry of objects.
   iObjectRegistry *object_reg;
 
   /// Read configuration values from config file.
@@ -173,6 +174,7 @@ public:
   /// Clear (free) all textures
   virtual void Clear ()
   {
+    CS::Threading::MutexScopedLock lock(texturesLock);
     textures.DeleteAll ();
   }
 };

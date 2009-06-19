@@ -126,26 +126,38 @@ Includes CS-sdk.wxs : $(INCL_RUNTIME) $(INCL_SDK) ;
 Includes CS-demos.wxs : $(INCL_RUNTIME) $(INCL_DEMO) ;
 Includes CS-all.wxs : $(INCL_RUNTIME) $(INCL_SDK) $(INCL_DEMO) ;
 
+rule MSIMergeModuleFromList_N
+{
+  MSIMergeModuleFromList $(1) : $(2) : $(3) : $(4) ;
+  Depends mergemodules-neutral : $(1) ;
+}
 # Architecture-independent
-MSIMergeModuleFromList CS.doc : doc-manual doc-api : $(MSM_VERSION) : doc-manual:manual doc-api:api ;
-MSIMergeModuleFromList CS.data.demo : data-demo data-demo-maps : $(MSM_VERSION) ;
-MSIMergeModuleFromList CS.data.runtime : data-runtime : $(MSM_VERSION) ;
-MSIMergeModuleFromList CS.data.sdk : data-tool : $(MSM_VERSION) ;
-MSIMergeModuleFromList CS.include : headers : $(MSM_VERSION) ;
-MSIMergeModuleFromList CS.vfs : vfs : $(MSM_VERSION) ;
-MSIMergeModuleFromList CS.python : python-bindings : $(MSM_VERSION) ;
+MSIMergeModuleFromList_N CS.doc : doc-manual doc-api : $(MSM_VERSION) : doc-manual:manual doc-api:api ;
+MSIMergeModuleFromList_N CS.data.demo : data-demo data-demo-maps : $(MSM_VERSION) ;
+MSIMergeModuleFromList_N CS.data.runtime : data-runtime : $(MSM_VERSION) ;
+MSIMergeModuleFromList_N CS.data.sdk : data-tool : $(MSM_VERSION) ;
+MSIMergeModuleFromList_N CS.include : headers : $(MSM_VERSION) ;
+MSIMergeModuleFromList_N CS.vfs : vfs : $(MSM_VERSION) ;
+MSIMergeModuleFromList_N CS.python : python-bindings : $(MSM_VERSION) ;
 MakeLocate CS.register.msm : $(LOCATE.MSM) ;
 MSIMergeModule CS.register.msm : CS.register.wxs ;
+Depends mergemodules-neutral : CS.register.msm ;
 
+rule MSIMergeModuleFromList_A
+{
+  MSIMergeModuleFromList $(1) : $(2) : $(3) : $(4) ;
+  NotFile mergemodules-$(5) ;
+  Depends mergemodules-$(5) : $(1) ;
+}
 # Architecture-dependent
-MSIMergeModuleFromList CS.arch.$(MSM_ARCH).include : headers-platform : $(MSM_VERSION) ;
-MSIMergeModuleFromList CS.arch.$(MSM_ARCH).lib : libs-shared : $(MSM_VERSION) ;
-MSIMergeModuleFromList CS.arch.$(MSM_ARCH).link : libs-static : $(MSM_VERSION) ;
-MSIMergeModuleFromList CS.arch.$(MSM_ARCH).executable.demo : app-demo : $(MSM_VERSION) ;
-MSIMergeModuleFromList CS.arch.$(MSM_ARCH).executable.runtime : plugin plugin-cg plugin-python : $(MSM_VERSION) ;
-MSIMergeModuleFromList CS.arch.$(MSM_ARCH).executable.sdk : app-tool : $(MSM_VERSION) ;
-MSIMergeModuleFromList CS.arch.$(MSM_ARCH).csconfig : cs-config : $(MSM_VERSION) ;
-MSIMergeModuleFromList CS.arch.$(MSM_ARCH).python : python-modules : $(MSM_VERSION) ;
+MSIMergeModuleFromList_A CS.arch.$(MSM_ARCH).include : headers-platform : $(MSM_VERSION) : : $(MSM_ARCH) ;
+MSIMergeModuleFromList_A CS.arch.$(MSM_ARCH).lib : libs-shared : $(MSM_VERSION) : : $(MSM_ARCH) ;
+MSIMergeModuleFromList_A CS.arch.$(MSM_ARCH).link : libs-static : $(MSM_VERSION) : : $(MSM_ARCH) ;
+MSIMergeModuleFromList_A CS.arch.$(MSM_ARCH).executable.demo : app-demo : $(MSM_VERSION) : : $(MSM_ARCH) ;
+MSIMergeModuleFromList_A CS.arch.$(MSM_ARCH).executable.runtime : plugin plugin-cg plugin-python : $(MSM_VERSION) : : $(MSM_ARCH) ;
+MSIMergeModuleFromList_A CS.arch.$(MSM_ARCH).executable.sdk : app-tool : $(MSM_VERSION) : : $(MSM_ARCH) ;
+MSIMergeModuleFromList_A CS.arch.$(MSM_ARCH).csconfig : cs-config : $(MSM_VERSION) : : $(MSM_ARCH) ;
+MSIMergeModuleFromList_A CS.arch.$(MSM_ARCH).python : python-modules : $(MSM_VERSION) : : $(MSM_ARCH) ;
 
 # Safeguard
 MSI_UPGRADE_CODES_FOR_VERSION = 1.9 ;
@@ -197,6 +209,9 @@ rule MakeMSIsForArchAndKind
   local win32libs_msms = [ GetWin32LibsMSMPath ] ;
   local msi = CS-$(kind)-$(arch).msi ;
 
+  Depends $(msi) : mergemodules-neutral ;
+  Depends $(msi) : mergemodules-$(arch) ;
+
   MakeLocate $(msi) : $(LOCATE.MSI) ;
   MSIPackage $(msi) : CS-$(kind).wxs :
     "CRYSTAL_MSM_PATH=$(LOCATE.MSM)"
@@ -206,7 +221,6 @@ rule MakeMSIsForArchAndKind
     "VERSION_MAJORMINOR=$(MSI_VERSION_MAJORMINOR)"
     "VERSION_PACKAGE=$(MSI_VERSION_PACKAGE)" :
     CS-$(kind)-$(arch) ;
-  #Depends CS-$(kind)-$(arch).msi : mergemodules ;
   Depends msis-$(kind) : $(msi) ;
   Depends msis-$(arch) : $(msi) ;
   Depends msis : $(msi) ;

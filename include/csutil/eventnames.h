@@ -162,6 +162,14 @@ class CS_CRYSTALSPACE_EXPORT csEventNameRegistry :
   (csEventNameRegistry::GetID((reg), "crystalspace.frame"))
 
 /**
+ * Thread wait event. Sent by the main thread while it's waiting for other
+ * threads to finish. This allows it to continue working in parallel with those
+ * threads.
+ */
+#define csevThreadWait(reg)     \
+  (csEventNameRegistry::GetID((reg), "crystalspace.threadwait"))
+
+/**
  * Generic input event.  All actual input events are children of this one.
  */
 #define csevInput(reg)		      \

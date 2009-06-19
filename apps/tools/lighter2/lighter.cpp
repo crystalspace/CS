@@ -111,7 +111,7 @@ namespace lighter
 
     LoadConfiguration ();
     globalConfig.Initialize ();
-    globalTUI.Initialize ();
+    globalTUI.Initialize (objectRegistry);
     {
       // Attempt to detect physical memory installed.
       size_t maxSwapSize = CS::Platform::GetPhysicalMemorySize();
