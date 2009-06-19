@@ -1573,12 +1573,12 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
                 if (okay)
                 {
                   state->generateActive = true;
-		  state->generateNestLevel = 1;
+		              state->generateNestLevel = 1;
                   if (((start > end) && (step >= 0))
-                    || (end >= start) && (step <= 0))
+                    || ((end >= start) && (step <= 0)))
                   {
-	            Report (syntaxErrorSeverity, node,
-		      "Can't reach end value %d starting from %d with step %d", 
+	                  Report (syntaxErrorSeverity, node,
+		                  "Can't reach end value %d starting from %d with step %d", 
                       end, start, step);
                     state->generateValid = false;
                   }

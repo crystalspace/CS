@@ -40,20 +40,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       int Format = texman->GetTextureFormat ();
 
       csRef<iImage> img;
-      csRef<iLoader> ldr = scfQueryInterface<iLoader>(loader);
-      if(ldr.IsValid())
-      {
-        img = ldr->LoadImage (filename, Format);
-      }
-      else
-      {
-        csRef<iThreadedLoader> tldr = scfQueryInterface<iThreadedLoader>(loader);
-        csThreadedLoader* cstldr = dynamic_cast<csThreadedLoader*>((iThreadedLoader*)tldr);
-        csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(object_reg);
-        csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(tm));
-        cstldr->LoadImageTC (ret, filename, Format, false);
-        img = scfQueryInterface<iImage>(ret->GetResultRefPtr());
-      }
+      csThreadedLoader* cstldr = dynamic_cast<csThreadedLoader*>((iThreadedLoader*)loader);
+      csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(object_reg);
+      csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(tm));
+      cstldr->LoadImageTC (ret, filename, Format, false);
+      img = scfQueryInterface<iImage>(ret->GetResultRefPtr());
+
       if (!img.IsValid())
       {
         csRef<iReporter> reporter = csQueryRegistry<iReporter>(object_reg);

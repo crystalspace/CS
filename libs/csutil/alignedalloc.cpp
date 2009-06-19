@@ -104,9 +104,9 @@ namespace CS
       uintptr_t newOffsetToData = ptrInt - (uintptr_t)newPtr;
       if (newOffsetToData != offsetToData)
       {
-	// Ensure realloced data is aligned again
-	memmove ((void*)(ptrInt), (void*)((uintptr_t)newPtr + offsetToData),
-	  size);
+        // Ensure realloced data is aligned again
+        memmove ((void*)(ptrInt), (void*)((uintptr_t)newPtr + offsetToData),
+          size);
       }
       
       *(((void**)ptrInt) - 1) = newPtr;

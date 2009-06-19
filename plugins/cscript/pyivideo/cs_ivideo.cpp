@@ -143,10 +143,19 @@ template <typename T> T SwigValueInit() {
     #ifndef __STDC_LIMIT_MACROS
     #define __STDC_LIMIT_MACROS
     #endif
+    #ifdef _MSC_VER
+    #include <io.h>
+    #include <stdarg.h>
     #ifndef DEBUG_PYTHON
     #undef _DEBUG
+    #define RESTORE__DEBUG
+    #endif
     #endif
     #include <Python.h>
+    #ifdef RESTORE__DEBUG
+    #define _DEBUG
+    #undef RESTORE__DEBUG
+    #endif
 
 /* -----------------------------------------------------------------------------
  * swigrun.swg
@@ -14781,6 +14790,40 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_csShaderVariableStack_Copy(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csShaderVariableStack *arg1 = (csShaderVariableStack *) 0 ;
+  csShaderVariableStack *arg2 = 0 ;
+  bool result;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csShaderVariableStack_Copy",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csShaderVariableStack, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableStack_Copy" "', argument " "1"" of type '" "csShaderVariableStack *""'"); 
+  }
+  arg1 = reinterpret_cast< csShaderVariableStack * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csShaderVariableStack,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csShaderVariableStack_Copy" "', argument " "2"" of type '" "csShaderVariableStack const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csShaderVariableStack_Copy" "', argument " "2"" of type '" "csShaderVariableStack const &""'"); 
+  }
+  arg2 = reinterpret_cast< csShaderVariableStack * >(argp2);
+  result = (bool)(arg1)->Copy((csShaderVariableStack const &)*arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *csShaderVariableStack_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
@@ -22784,6 +22827,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csShaderVariableStack_Clear", _wrap_csShaderVariableStack_Clear, METH_VARARGS, NULL},
 	 { (char *)"csShaderVariableStack_MergeFront", _wrap_csShaderVariableStack_MergeFront, METH_VARARGS, NULL},
 	 { (char *)"csShaderVariableStack_MergeBack", _wrap_csShaderVariableStack_MergeBack, METH_VARARGS, NULL},
+	 { (char *)"csShaderVariableStack_Copy", _wrap_csShaderVariableStack_Copy, METH_VARARGS, NULL},
 	 { (char *)"csShaderVariableStack_swigregister", csShaderVariableStack_swigregister, METH_VARARGS, NULL},
 	 { (char *)"csGetShaderVariableFromStack", _wrap_csGetShaderVariableFromStack, METH_VARARGS, NULL},
 	 { (char *)"iShaderVariableContext_AddVariable", _wrap_iShaderVariableContext_AddVariable, METH_VARARGS, NULL},

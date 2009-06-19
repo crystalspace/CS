@@ -106,7 +106,8 @@ bool csShaderGLCGFP::Compile (iHierarchicalCache* cache, csRef<iString>* tag)
     shaderPlug->GetProfileCompilerArgs ("fragment",
       shaderPlug->currentLimits.fp.profile, 
       shaderPlug->currentLimits,
-      CS::PluginCommon::ShaderProgramPluginGL::Other, false, args);
+      CS::PluginCommon::ShaderProgramPluginGL::Other,
+      csGLShader_CG::argsAll, args);
     for (i = 0; i < compilerArgs.GetSize(); i++) 
       args.Push (compilerArgs[i]);
     args.Push (0);
@@ -165,11 +166,11 @@ bool csShaderGLCGFP::Compile (iHierarchicalCache* cache, csRef<iString>* tag)
     bool ret = TryCompile (loadLoadToGL | loadApplyVmap,
       shaderPlug->currentLimits);
   
-    csString limitsStr (shaderPlug->currentLimits.ToString());
+    csString tagStr (csString("CG") + shaderPlug->currentLimits.ToString());
     WriteToCache (cache, shaderPlug->currentLimits.fp, 
-      shaderPlug->currentLimits, limitsStr);
+      shaderPlug->currentLimits, tagStr);
     cacheKeepNodes.DeleteAll ();
-    tag->AttachNew (new scfString (limitsStr));
+    tag->AttachNew (new scfString (tagStr));
     return ret;
   }
 
@@ -191,14 +192,8 @@ bool csShaderGLCGFP::Precache (const ProfileLimitsPair& limits,
     csString programStr;
     programStr.Append ((char*)programBuffer->GetData(), programBuffer->GetSize());
     
-    ArgumentArray args;
-    shaderPlug->GetProfileCompilerArgs (GetProgramType(), 
-      limits.fp.profile, limits, limits.fp.vendor, true, args);
-    for (size_t i = 0; i < compilerArgs.GetSize(); i++) 
-      args.Push (compilerArgs[i]);
-  
     // Get preprocessed result of pristine source
-    sourcePreproc = GetPreprocessedProgram (programStr, args);
+    sourcePreproc = GetPreprocessedProgram (programStr);
     if (!sourcePreproc.IsEmpty ())
     {
       // Check preprocessed source against cache
@@ -220,7 +215,7 @@ bool csShaderGLCGFP::Precache (const ProfileLimitsPair& limits,
       WriteToCompileCache (sourcePreproc, limits.fp, cache);
   }
 
-  WriteToCache (cache, limits.fp, limits, tag);
+  WriteToCache (cache, limits.fp, limits, csString("CG") + tag);
   
   return ret;
 }

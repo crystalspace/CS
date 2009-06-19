@@ -81,8 +81,6 @@ protected:
   csString objectCode;
   csString objectCodeCachePath;
 
-  bool validProgram;
-
   enum ProgramType
   {
     progVP, progFP
@@ -142,8 +140,7 @@ protected:
     const char* programStr, ProgramType type,
     const ProfileLimitsPair& customLimits, 
     uint flags = loadLoadToGL | loadApplyVmap | loadFlagUnusedV2FForInit);
-  csString GetPreprocessedProgram (const char* programStr,
-    const ArgumentArray& args);
+  csString GetPreprocessedProgram (const char* programStr);
   void DoDebugDump ();
   void WriteAdditionalDumpInfo (const char* description, const char* content);
   const char* GetProgramType()
@@ -193,7 +190,6 @@ public:
   csShaderGLCGCommon (csGLShader_CG* shaderPlug, ProgramType type);
   virtual ~csShaderGLCGCommon ();
 
-  void SetValid(bool val) { validProgram = val; }
   virtual bool Precache (const ProfileLimitsPair& limitsPair,
     const char* tag, iHierarchicalCache* cache) = 0;
     
@@ -216,7 +212,7 @@ public:
   virtual void ResetState ();
 
   /// Check if valid
-  virtual bool IsValid () { return validProgram;} 
+  virtual bool IsValid () { return program != 0;} 
 
   /// Loads from a document-node
   virtual bool Load (iShaderDestinationResolver*, iDocumentNode* node);
@@ -230,7 +226,7 @@ public:
   { return unusedParams; }
   
   virtual iShaderProgram::CacheLoadResult LoadFromCache (
-    iHierarchicalCache* cache, iDocumentNode* programNode,
+    iHierarchicalCache* cache, iBase* previous, iDocumentNode* programNode,
     csRef<iString>* failReason = 0, csRef<iString>* = 0);
 };
 

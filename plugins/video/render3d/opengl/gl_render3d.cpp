@@ -83,7 +83,8 @@ SCF_IMPLEMENT_FACTORY (csGLGraphics3D)
 csGLGraphics3D::csGLGraphics3D (iBase *parent) : 
   scfImplementationType (this, parent), isOpen (false), 
   explicitProjection (false), needMatrixUpdate (true), imageUnits (0),
-  wantToSwap (false), delayClearFlags (0), currentAttachments (0)
+  activeVertexAttribs (0), wantToSwap (false), delayClearFlags (0),
+  currentAttachments (0)
 {
   verbose = false;
   frustum_valid = false;
@@ -925,6 +926,7 @@ bool csGLGraphics3D::Open ()
     stencil_threshold = -1;
   }
   if (verbose)
+  {
     if (broken_stencil)
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Stencil clipping is broken!");
     else if (!stencil_clipping_available)
@@ -933,16 +935,17 @@ bool csGLGraphics3D::Open ()
     {
       if (stencil_threshold >= 0)
       {
-	Report (CS_REPORTER_SEVERITY_NOTIFY, 
-	  "Stencil clipping is used for objects >= %d triangles.", 
-	  stencil_threshold);
+	      Report (CS_REPORTER_SEVERITY_NOTIFY, 
+	        "Stencil clipping is used for objects >= %d triangles.", 
+	      stencil_threshold);
       }
       else
       {
-	Report (CS_REPORTER_SEVERITY_NOTIFY, 
-	  "Plane clipping is preferred.");
+	      Report (CS_REPORTER_SEVERITY_NOTIFY, 
+	        "Plane clipping is preferred.");
       }
     }
+  }
 
   stencilClearWithZ = config->GetBool ("Video.OpenGL.StencilClearWithZ", true);
   if (verbose)
@@ -980,13 +983,13 @@ bool csGLGraphics3D::Open ()
         statecache->SetCurrentTU (u);
         statecache->ActivateTU (csGLStateCache::activateTexEnv);
         glTexEnvf (GL_TEXTURE_FILTER_CONTROL_EXT, 
-	  GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); 
+	        GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); 
       }
     }
     else
     {
       glTexEnvf (GL_TEXTURE_FILTER_CONTROL_EXT, 
-	GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); 
+	      GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); 
     }
   }
 
@@ -1194,6 +1197,8 @@ void csGLGraphics3D::Close ()
   if (G2D)
     G2D->Close ();
   statecache = 0;
+  
+  isOpen = false;
 }
 
 bool csGLGraphics3D::SetRenderTarget (iTextureHandle* handle, bool persistent,
@@ -1559,7 +1564,11 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
     {
       for (i = 0; i < CS_VATTRIB_GENERIC_LAST-CS_VATTRIB_GENERIC_FIRST+1; i++)
       {
-        ext->glDisableVertexAttribArrayARB (i);
+	if (activeVertexAttribs & (1 << i))
+	{
+	  ext->glDisableVertexAttribArrayARB (i);
+	  activeVertexAttribs &= ~(1 << i);
+	}
       }
     }
 
@@ -1638,7 +1647,6 @@ void csGLGraphics3D::DeactivateTexture (int unit)
   if (ext->CS_GL_ARB_multitexture)
   {
     statecache->SetCurrentTU (unit);
-    statecache->ActivateTU (csGLStateCache::activateTexEnable);
   }
   else if (unit != 0) return;
 
@@ -1972,7 +1980,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 	}
 	if (bugplug)
 	{
-	  bugplug->AddCounter ("Triangle Count", num_tri);
+	  bugplug->AddCounter ("Triangle Count", (int)num_tri);
 	  bugplug->AddCounter ("Mesh Count", 1);
 	}
       }
@@ -1981,7 +1989,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 	if (bugplug)
 	{
 	  size_t num_tri = (mymesh->indexend-mymesh->indexstart)/primNum_divider - primNum_sub;
-	  bugplug->AddCounter ("Triangle Count", num_tri);
+	  bugplug->AddCounter ("Triangle Count", (int)num_tri);
 	  bugplug->AddCounter ("Mesh Count", 1);
 	}
 	glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
@@ -2411,7 +2419,11 @@ void csGLGraphics3D::ApplyBufferChanges()
 	  {
 	    GLuint index = att - CS_VATTRIB_GENERIC_FIRST;
 	    statecache->ApplyBufferBinding (csGLStateCacheContext::boElementArray);
-	    ext->glEnableVertexAttribArrayARB (index);
+	    if (!(activeVertexAttribs & (1 << index)))
+	    {
+	      ext->glEnableVertexAttribArrayARB (index);
+	      activeVertexAttribs |= (1 << index);
+	    }
 	    ext->glVertexAttribPointerARB(index, buffer->GetComponentCount (),
               compType, normalized, (GLsizei)buffer->GetStride (), data);
 	  }
@@ -2457,6 +2469,7 @@ void csGLGraphics3D::ApplyBufferChanges()
 	  {
 	    GLuint index = att - CS_VATTRIB_GENERIC_FIRST;
 	    ext->glDisableVertexAttribArrayARB (index);
+	    activeVertexAttribs &= ~(1 << index);
 	  }
         }
         else

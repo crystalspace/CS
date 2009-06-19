@@ -75,7 +75,8 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s, iMeshWrapper* mesh)
     csSector* cs = (csSector*)s;
     cs->SetSingleMesh (mesh);
 
-    csShaderVariableStack& stack = shadermanager->GetShaderVariableStack ();
+    csShaderVariableStack stack;
+    stack.Setup (shadermanager->GetShaderVariableStack ().GetSize());
     size_t i;
     for (i = 0; i < steps.GetSize (); i++)
     {

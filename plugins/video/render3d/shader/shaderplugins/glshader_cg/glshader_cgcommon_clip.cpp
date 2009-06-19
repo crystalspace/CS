@@ -74,7 +74,7 @@ void csShaderGLCGCommon::ClipsToVmap ()
     }
     else
     {
-      CS::ShaderVarStringID svName (svClipPlane - c);
+      CS::ShaderVarStringID svName (svClipPlane - (uint)c);
       clipPlane[c].AttachNew (new csShaderVariable (svName));
       clipPlane[c]->SetValue (0.0f);
       vme.name = svName;

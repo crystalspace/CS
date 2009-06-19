@@ -19,13 +19,14 @@
 #ifndef __CS_GLX2D_H__
 #define __CS_GLX2D_H__
 
+#define GLX_GLXEXT_PROTOTYPES
+#include <GL/glx.h>
+#define CS_GLEXTMANAGER_USE_GLX
+
 #include "csutil/scf.h"
 #include "csplugincommon/opengl/glcommon2d.h"
 #include "csplugincommon/iopengl/openglinterface.h"
 #include "ivaria/xwindow.h"
-
-#define GLX_GLXEXT_PROTOTYPES
-#include <GL/glx.h>
 
 #include "iogldisp.h"
 
@@ -38,8 +39,7 @@
 
 /// XLIB version.
 class csGraphics2DGLX : public scfImplementationExt1<csGraphics2DGLX , 
-						       csGraphics2DGLCommon, 
-						       iOpenGLInterface>
+  csGraphics2DGLCommon, iOpenGLInterface>
 {
   csRef<iXWindow> xwin;
   // The display context
@@ -105,8 +105,7 @@ public:
   { return xwin->SetMouseCursor (iShape);}
 
   virtual bool SetMouseCursor (iImage *image, const csRGBcolor* keycolor, 
-                               int hotspot_x, int hotspot_y,
-			       csRGBcolor fg, csRGBcolor bg)
+    int hotspot_x, int hotspot_y, csRGBcolor fg, csRGBcolor bg)
   { 
     return xwin->SetMouseCursor (image, keycolor, hotspot_x, hotspot_y,
       fg, bg);

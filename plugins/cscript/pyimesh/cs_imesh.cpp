@@ -143,10 +143,19 @@ template <typename T> T SwigValueInit() {
     #ifndef __STDC_LIMIT_MACROS
     #define __STDC_LIMIT_MACROS
     #endif
+    #ifdef _MSC_VER
+    #include <io.h>
+    #include <stdarg.h>
     #ifndef DEBUG_PYTHON
     #undef _DEBUG
+    #define RESTORE__DEBUG
+    #endif
     #endif
     #include <Python.h>
+    #ifdef RESTORE__DEBUG
+    #define _DEBUG
+    #undef RESTORE__DEBUG
+    #endif
 
 /* -----------------------------------------------------------------------------
  * swigrun.swg

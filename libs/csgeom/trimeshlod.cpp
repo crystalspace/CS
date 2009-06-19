@@ -41,9 +41,8 @@ void csTriangleVertexCost::ReplaceVertex (int old, int replace)
 void csTriangleLODAlgoEdge::CalculateCost (csTriangleVerticesCost* vertices,
 	csTriangleVertexCost* vertex)
 {
-  size_t i;
   vertex->to_vertex = -1;
-  float min_sq_dist = 1000000.;
+  float min_sq_dist = 1000000.0f;
   if (vertex->deleted)
   {
     // If the vertex is deleted we have a very high cost.
@@ -54,7 +53,7 @@ void csTriangleLODAlgoEdge::CalculateCost (csTriangleVerticesCost* vertices,
     return;
   }
   const csVector3& this_pos = vertex->pos;
-  for (i = 0 ; i < vertex->con_vertices.GetSize () ; i++)
+  for (size_t i = 0 ; i < vertex->con_vertices.GetSize () ; i++)
   {
     float sq_dist = csSquaredDist::PointPoint (this_pos,
     	vertices->GetVertex (vertex->con_vertices[i]).pos);
@@ -252,7 +251,6 @@ void csTriangleMeshLOD::CalculateLOD (csTriangleMesh* mesh,
 	csTriangleVerticesCost* verts, int* translate, int* emerge_from,
 	csTriangleLODAlgo* lodalgo)
 {
-  size_t i;
   // Calculate the cost for all vertices for the first time.
   // This information will change locally whenever vertices are collapsed.
   verts->CalculateCost (lodalgo);
@@ -293,6 +291,8 @@ void csTriangleMeshLOD::CalculateLOD (csTriangleMesh* mesh,
     col_idx++;
 
     // Fix connectivity information after moving the 'from' vertex to 'to'.
+    size_t i;
+    int id;
     for (i = 0 ; i < vt_from->con_triangles.GetSize () ; i++)
     {
       size_t id = vt_from->con_triangles[i];
@@ -303,11 +303,11 @@ void csTriangleMeshLOD::CalculateLOD (csTriangleMesh* mesh,
     }
     for (i = 0 ; i < vt_from->con_vertices.GetSize () ; i++)
     {
-      int id = vt_from->con_vertices[i];
+      id = vt_from->con_vertices[i];
       if (id != to)
       {
         verts->GetVertex (id).ReplaceVertex (from, to);
-	vt_to->AddVertex (id);
+	      vt_to->AddVertex (id);
       }
     }
     vt_to->DelVertex (from);
@@ -319,7 +319,7 @@ void csTriangleMeshLOD::CalculateLOD (csTriangleMesh* mesh,
     sorted->ChangeCostVertex (vt_to->idx);
     for (i = 0 ; i < vt_to->con_vertices.GetSize () ; i++)
     {
-      int id = vt_to->con_vertices[i];
+      id = vt_to->con_vertices[i];
       lodalgo->CalculateCost (verts, &verts->GetVertex (id));
       sorted->ChangeCostVertex (id);
     }
@@ -423,7 +423,7 @@ csTriangle* csTriangleMeshLOD::CalculateLOD (csTriangleMesh* mesh,
       if (id != to)
       {
         verts->GetVertex (id).ReplaceVertex (from, to);
-	vt_to->AddVertex (id);
+	      vt_to->AddVertex (id);
       }
     }
     bool isdel = vt_to->DelVertex (from);
@@ -476,7 +476,6 @@ csTriangle* csTriangleMeshLOD::CalculateLODFast (csTriangleMesh* mesh,
   verts->CalculateCost (lodalgo);
 
   int num = verts->GetVertexCount ();
-  int from, to;
 
   // Table which keeps information on how the vertices move.
   int* move_table = new int[num];
@@ -489,7 +488,7 @@ csTriangle* csTriangleMeshLOD::CalculateLODFast (csTriangleMesh* mesh,
   // Collapse vertices, one by one until only one remains.
   while (num > 1)
   {
-    from = sorted->GetLowestCostVertex ();
+    int from = sorted->GetLowestCostVertex ();
     csTriangleVertexCost* vt_from = &verts->GetVertex (from);
     float min_cost = vt_from->cost;
     // Recalculation of cost after edge collapse may cause the
@@ -499,8 +498,7 @@ csTriangle* csTriangleMeshLOD::CalculateLODFast (csTriangleMesh* mesh,
     // skip this vertex and continue.
     if (min_cost >= max_cost) { num--; continue; }
 
-    to = verts->GetVertex (from).to_vertex;
-
+    int to = verts->GetVertex (from).to_vertex;
     CS_ASSERT (from != to);
     move_table[from] = to;
 
@@ -530,7 +528,7 @@ csTriangle* csTriangleMeshLOD::CalculateLODFast (csTriangleMesh* mesh,
       if (id != to)
       {
         verts->GetVertex (id).ReplaceVertex (from, to);
-	vt_to->AddVertex (id);
+	      vt_to->AddVertex (id);
       }
     }
     bool isdel = vt_to->DelVertex (from);

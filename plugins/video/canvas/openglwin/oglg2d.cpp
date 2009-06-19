@@ -364,7 +364,7 @@ LRESULT CALLBACK csGraphics2DOpenGL::DummyWindow (HWND hWnd, UINT message,
 	  iAttributes[index++] = GL_TRUE;
 	  iAttributes[index++] = WGL_SAMPLE_BUFFERS_ARB;
 	  iAttributes[index++] = 
-	    (format[glpfvMultiSamples] != 0) ? GL_TRUE : GL_FALSE;
+	    (format[glpfvMultiSamples] != 0) ? 1 : 0;
 	  iAttributes[index++] = WGL_SAMPLES_ARB;
 	  iAttributes[index++] = format[glpfvMultiSamples];
 	  iAttributes[index++] = WGL_COLOR_BITS_ARB;

@@ -940,7 +940,7 @@ class csPrintfFormatter
   {
     struct lconv *locale_data;
     const char *decimal_point;
-    int decimal_point_len;
+    size_t decimal_point_len;
     
     locale_data = localeconv ();
     decimal_point = locale_data->decimal_point;

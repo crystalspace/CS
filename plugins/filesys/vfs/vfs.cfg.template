@@ -26,7 +26,7 @@ VFS.Mount.shader = $(CS_DATADIR)$/shader$/,$(CS_DATADIR)$/shader-old$/
 ; Global shader cache
 VFS.Mount.shadercache/global = $(CS_DATADIR)$/shadercache.zip
 ; Per-user shader cache
-VFS.Mount.shadercache/user = $(LOCALAPPDATA:$(HOME)$/.crystalspace)$/shadercache$/
+VFS.Mount.shadercache/user = $(CS_LOCALAPPDATA)$/shadercache$/
 
 ; The Unifont
 VFS.Mount.fonts/unifont = $(CS_DATADIR)$/unifont.zip
@@ -83,6 +83,7 @@ VFS.Unix.CS_CDROM = /mnt/cdrom
 VFS.Unix.CS_TMP = /tmp
 ; This is true at least for systems using XFree86
 VFS.Unix.TTF_PATH = /usr/X11R6/lib/X11/fonts/Truetype/, /usr/X11R6/lib/X11/fonts/TTF/
+VFS.Unix.CS_LOCALAPPDATA = $(HOME)$/.crystalspace
 
 VFS.CP/M.. = .
 VFS.CP/M... = ..
@@ -92,3 +93,4 @@ VFS.CP/M.TMP = $(TEMP:$(TMP:$(SYSTEMROOT)$/temp))
 
 ; The standard location of TTF fonts is the X:\Windows\fonts directory
 VFS.Win32.TTF_PATH = $(SYSTEMROOT)$/fonts$/
+VFS.Win32.CS_LOCALAPPDATA = $(LOCALAPPDATA)$/CrystalSpace

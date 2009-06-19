@@ -218,6 +218,7 @@
   INTERFACE_APPLY(iDocumentNodeIterator)
   INTERFACE_APPLY(iDocumentSystem)
   INTERFACE_APPLY(iEvent)
+  INTERFACE_APPLY(iEventAttributeIterator)
   INTERFACE_APPLY(iEventHandler)
   INTERFACE_APPLY(iEventPlug)
   INTERFACE_APPLY(iEventQueue)

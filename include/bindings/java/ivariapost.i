@@ -1,32 +1,36 @@
+#ifdef SWIGJAVA
+
+#ifndef CS_MINI_SWIG
+
 %template(scfJConsoleExecCallback) scfImplementation1<csJExecCallback,iConsoleExecCallback>;
 %inline %{
 	struct csJExecCallback : public scfImplementation1<csJExecCallback,iConsoleExecCallback> {
 		csJExecCallback (jobject obj) : scfImplementationType (this), myJobject(0), execute_mid(0) {
-			JNIEnv * m_env = jni_env_getter->getJNIEnv();
-			if ( m_env != 0 ) {
-				myJobject = m_env->NewGlobalRef(obj);
-				jclass callback_class = m_env->GetObjectClass(myJobject);
-				execute_mid = m_env->GetMethodID(callback_class, "Execute", "(Ljava/lang/String;)V");
+			JNIEnv * jenv = getJNIEnv();
+			if ( jenv != 0 ) {
+				myJobject = jenv->NewGlobalRef(obj);
+				jclass callback_class = jenv->GetObjectClass(myJobject);
+				execute_mid = jenv->GetMethodID(callback_class, "Execute", "(Ljava/lang/String;)V");
 			}
 		}
 		virtual ~csJExecCallback () {
-			JNIEnv * m_env = jni_env_getter->getJNIEnv();
-			if ( m_env != 0 ) {
-				m_env->DeleteGlobalRef(myJobject);
+			JNIEnv * jenv = getJNIEnv();
+			if ( jenv != 0 ) {
+				jenv->DeleteGlobalRef(myJobject);
 			}
 		}
 		virtual void Execute (const char* cmd) {
-			JNIEnv * m_env = jni_env_getter->getJNIEnv();
-			if ( m_env != 0 ) {
+			JNIEnv * jenv = getJNIEnv();
+			if ( jenv != 0 ) {
 				try {
-					m_env->CallVoidMethod(
+					jenv->CallVoidMethod(
 						myJobject, 
 						execute_mid,
-						m_env->NewStringUTF(cmd)
+						jenv->NewStringUTF(cmd)
 					);
 				}
 				catch (...) {
-					m_env->ExceptionClear();
+					jenv->ExceptionClear();
 				}
 			}
 		}
@@ -35,3 +39,7 @@
 		jmethodID execute_mid;
 	};
 %}
+
+#endif // CS_MINI_SWIG
+
+#endif // SWIGJAVA

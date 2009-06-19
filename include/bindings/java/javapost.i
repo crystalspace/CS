@@ -20,32 +20,30 @@
 
 #ifndef CS_MINI_SWIG
 
-
 %template(scfJEventHandler) scfImplementation1<_csJEventHandler, iEventHandler >;
 %inline %{
 	struct _csJEventHandler : public scfImplementation1<_csJEventHandler, iEventHandler> 
 	{
 		_csJEventHandler () : scfImplementationType (this), my_jobject(0), event_class(0), event_ctr_mid(0), handle_event_mid(0) 
 		{
-            		JNIEnv * env = jni_env_getter->getJNIEnv();
-			if (env != 0) 
+            		JNIEnv * jenv = getJNIEnv();
+			if (jenv != 0) 
 			{
-				event_class = (jclass)env->NewGlobalRef(env->FindClass("org/crystalspace3d/iEvent"));
-				jclass handler_class = env->FindClass("org/crystalspace3d/csJEventHandler");
-				event_ctr_mid = env->GetMethodID(event_class, "<init>", "(JZ)V");
-				handle_event_mid = env->GetMethodID(handler_class, "HandleEvent", "(Lorg/crystalspace3d/iEvent;)Z");
+				event_class = (jclass)jenv->NewGlobalRef(jenv->FindClass("org/crystalspace3d/iEvent"));
+				jclass handler_class = jenv->FindClass("org/crystalspace3d/csJEventHandler");
+				event_ctr_mid = jenv->GetMethodID(event_class, "<init>", "(JZ)V");
+				handle_event_mid = jenv->GetMethodID(handler_class, "HandleEvent", "(Lorg/crystalspace3d/iEvent;)Z");
 			}
 
 		}
 		virtual ~_csJEventHandler () 
 		{
-            		JNIEnv * env = jni_env_getter->getJNIEnv();
-			if (env != 0) 
+            		JNIEnv * jenv = getJNIEnv();
+			if (jenv != 0) 
 			{
-	            		env->DeleteGlobalRef(my_jobject);
-	            		env->DeleteGlobalRef(event_class);
+	            		jenv->DeleteGlobalRef(my_jobject);
+	            		jenv->DeleteGlobalRef(event_class);
 			}
-			delete jni_env_getter;
 		}
         	static jobject _csJEventHandler_jobject;
         	void _importJEventHandler () 
@@ -60,24 +58,24 @@
             		}
             		catch (...)
             		{
-				JNIEnv * env = jni_env_getter->getJNIEnv();
-                		if (env != 0) {
-					env->ExceptionClear();
+				JNIEnv * jenv = getJNIEnv();
+                		if (jenv != 0) {
+					jenv->ExceptionClear();
 				}
             		}
             		return false;
         	}
         	bool _HandleEvent (iEvent & event) 
 		{
-            		JNIEnv * env = jni_env_getter->getJNIEnv();
-			if (env != 0) 
+            		JNIEnv * jenv = getJNIEnv();
+			if (jenv != 0) 
 			{
 				jlong cptr = 0;
 				*(iEvent **)&cptr = &event; 
-				jobject event_object = env->NewObject(event_class, event_ctr_mid, cptr, false);
+				jobject event_object = jenv->NewObject(event_class, event_ctr_mid, cptr, false);
 				if (!event_object)
 					return false;
-				jboolean result = env->CallBooleanMethod(my_jobject, handle_event_mid, event_object);
+				jboolean result = jenv->CallBooleanMethod(my_jobject, handle_event_mid, event_object);
 				return result;
 			}
 			return false;
@@ -109,9 +107,9 @@
     }
                                                                                                               
     JNIEXPORT void JNICALL Java_org_crystalspace3d_csJEventHandler__1exportJEventHandler
-        (JNIEnv * env, jclass, jobject obj) 
+        (JNIEnv * jenv, jclass, jobject obj) 
     {
-        _csJEventHandler::_csJEventHandler_jobject = env->NewGlobalRef(obj);
+        _csJEventHandler::_csJEventHandler_jobject = jenv->NewGlobalRef(obj);
     }
 
 %}

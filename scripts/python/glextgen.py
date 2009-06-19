@@ -33,7 +33,7 @@ def getTemplateK (template, kind):
 
 def extensionUrl (ext):
   urlPrefix = "http://www.opengl.org/registry/specs/";
-  if ext.startswith("GL_"):
+  if ext.startswith("GL_") or ext.startswith("GLX_"):
     ext = ext[3:];
     extsplit = ext.split ("_", 1);
     return urlPrefix + extsplit[0] + "/" + extsplit[1] + ".txt";

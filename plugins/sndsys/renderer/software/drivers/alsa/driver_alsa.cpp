@@ -133,6 +133,7 @@ bool SndSysDriverALSA::SetupHWParams()
   snd_pcm_hw_params_alloca(&pHWParams);
 
   // Retrieve all current parameters
+  // Ignore GCC warning(s) on systems with alsa pre 1.0.16
   result = snd_pcm_hw_params_any(m_pPCMDevice, pHWParams);
   if (result < 0) 
   {
@@ -304,6 +305,7 @@ bool SndSysDriverALSA::SetupSWParams()
 
 
   // Retrieve all current parameters
+  // Ignore GCC warning(s) on systems with alsa pre 1.0.16
   result = snd_pcm_sw_params_current(m_pPCMDevice, pSWParams);
   if (result < 0) 
   {

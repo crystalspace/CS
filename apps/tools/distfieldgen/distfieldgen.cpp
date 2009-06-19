@@ -136,7 +136,7 @@ public:
 	  {
 	    int real_x = sx;
 	    if (real_x < 0) real_x += hwidth;
-	    else if (real_x >= hheight) real_x -= hwidth;
+	    else if (real_x >= hwidth) real_x -= hwidth;
 	    bool search_state = hiData[real_y * hwidth + real_x].alpha > 0.5f;
 	    if (search_state != state)
 	    {

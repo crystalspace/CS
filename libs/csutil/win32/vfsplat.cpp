@@ -59,7 +59,9 @@ const char* csCheckPlatformVFSVar(const char* VarName)
 
     if (!*localAppDataPath) 
     {
-      csString path (csGetPlatformConfigPath ("CrystalSpace", true));
+      csString path (csGetPlatformConfigPath ("", true));
+      while (path[path.Length()-1] == CS_PATH_SEPARATOR)
+	path.Truncate (path.Length()-1);
       strcpy (localAppDataPath, path);
     }
     return localAppDataPath;

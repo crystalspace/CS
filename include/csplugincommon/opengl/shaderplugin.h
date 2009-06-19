@@ -30,7 +30,7 @@
 #include "csutil/scf_implementation.h"
 
 struct csGLExtensionManager;
-struct csGLStateCache;
+class csGLStateCache;
 
 namespace CS
 {
@@ -115,7 +115,7 @@ namespace CS
       /// Helper class for user defined OpenGL clip planes.
       class CS_CSPLUGINCOMMON_GL_EXPORT ClipPlanes
       {
-        int maxPlanes;
+        size_t maxPlanes;
         uint32 currentPlanes;
         
         CS::ShaderVarStringID svObjectToWorldInv;
@@ -154,7 +154,7 @@ namespace CS
          * Enable the \a n th OpenGL clip plane without setting it. It is up 
          * to the caller to call glClipPlane().
          */
-        bool EnableClipPlane (int n);
+        bool EnableClipPlane (size_t n);
         /**
          * Enable the next available OpenGL clip plane without setting it. 
          * It is up  to the caller to call glClipPlane().

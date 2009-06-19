@@ -2267,6 +2267,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *HasNext = *cspacec::iEventAttributeIterator_HasNext;
 *Next = *cspacec::iEventAttributeIterator_Next;
 *Reset = *cspacec::iEventAttributeIterator_Reset;
+*scfGetVersion = *cspacec::iEventAttributeIterator_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -10314,6 +10315,7 @@ sub DESTROY {
 *Clear = *cspacec::csShaderVariableStack_Clear;
 *MergeFront = *cspacec::csShaderVariableStack_MergeFront;
 *MergeBack = *cspacec::csShaderVariableStack_MergeBack;
+*Copy = *cspacec::csShaderVariableStack_Copy;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

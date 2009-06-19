@@ -247,7 +247,7 @@ const char* csLightMap::ReadFromCache (
   LightSave ls;
   int i;
 
-  csThing* parent = poly->GetParent ();
+  //csThing* parent = poly->GetParent ();
 
   SetSize (w, h);
   size_t lm_size = lwidth * lheight;

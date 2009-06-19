@@ -26,31 +26,31 @@ namespace CS
     namespace GL
     {
       void SetAssumedState (csGLStateCache* statecache,
-			    csGLExtensionManager* ext)
+                             csGLExtensionManager* ext)
       {
-	glClearDepth (1.0);
-	glDepthRange (1.0, 0.0);
-	statecache->SetPixelUnpackAlignment (1);
+        glClearDepth (1.0);
+        glDepthRange (1.0, 0.0);
+        statecache->SetPixelUnpackAlignment (1);
         // The texture format stuff generally assumes little endian
-#ifndef CS_LITTLE_ENDIAN
-	statecache->SetPixelUnpackSwapBytes (true);
-#else
-	statecache->SetPixelUnpackSwapBytes (false);
-#endif
+        #ifndef CS_LITTLE_ENDIAN
+	        statecache->SetPixelUnpackSwapBytes (true);
+        #else
+	        statecache->SetPixelUnpackSwapBytes (false);
+        #endif
 	
-	statecache->Enable_GL_VERTEX_PROGRAM_POINT_SIZE_ARB ();
-	for (int i = statecache->GetNumTexCoords(); i-- > 0; )
-	{
-	  statecache->SetCurrentTU (i);
-	  statecache->ActivateTU (csGLStateCache::activateTexCoord);
-	  glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
-	}
-	if (ext->CS_GL_ARB_point_parameters)
-	{
-	  ext->glPointParameterfARB (GL_POINT_SIZE_MAX_ARB, 9999.0f);
-	  ext->glPointParameterfARB (GL_POINT_SIZE_MIN_ARB, 0.0f);
-	  ext->glPointParameterfARB (GL_POINT_FADE_THRESHOLD_SIZE_ARB, 1.0f);
-	}
+        statecache->Enable_GL_VERTEX_PROGRAM_POINT_SIZE_ARB ();
+        for (int i = statecache->GetNumTexCoords(); i-- > 0;)
+        {
+          statecache->SetCurrentTU (i);
+          statecache->ActivateTU (csGLStateCache::activateTexCoord);
+          glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
+        }
+        if (ext->CS_GL_ARB_point_parameters)
+        {
+          ext->glPointParameterfARB (GL_POINT_SIZE_MAX_ARB, 9999.0f);
+          ext->glPointParameterfARB (GL_POINT_SIZE_MIN_ARB, 0.0f);
+          ext->glPointParameterfARB (GL_POINT_FADE_THRESHOLD_SIZE_ARB, 1.0f);
+        }
       }
     } // namespace GL
   } // namespace PluginCommon

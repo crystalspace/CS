@@ -188,7 +188,7 @@ THREADED_CALLABLE_IMPL5(csThreadedLoader, LoadTexture, const char* fname,
 
   csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
   LoadImageTC (itr, fname, Format, do_verbose);
-  csRef<iImage> Image = scfQueryInterface<iImage>(itr->GetResultRefPtr());
+  csRef<iImage> Image = scfQueryInterfaceSafe<iImage>(itr->GetResultRefPtr());
   if (!Image)
   {
     ReportWarning ("crystalspace.maploader.parse.texture",
@@ -634,7 +634,7 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
   csRef<iEngine> Engine = csQueryRegistry<iEngine> (object_reg);
   csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
   csRef<iTextureManager> tm = G3D->GetTextureManager();
-  csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
+  csRef<iThreadedLoader> loader = csQueryRegistry<iThreadedLoader> (object_reg);
   csRef<iSyntaxService> SyntaxService = 
     csQueryRegistry<iSyntaxService> (object_reg);
 
@@ -644,6 +644,10 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 
   int Format = tm->GetTextureFormat ();
   const char* fname;
+
+  csThreadedLoader* cstldr = dynamic_cast<csThreadedLoader*>((iThreadedLoader*)loader);
+  csRef<iThreadManager> threadman = csQueryRegistry<iThreadManager>(object_reg);
+  csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -656,32 +660,35 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
     {
       case XMLTOKEN_POSZ:
       case XMLTOKEN_NORTH:
-        fname = child->GetContentsValue ();
-	if (!fname)
-	{
-	  SyntaxService->ReportError (
-	       PLUGIN_TEXTURELOADER_CUBEMAP,
-	       child, "Expected VFS filename for 'file'!");
-	  return 0;
-	}
-      
-	cube->SetSubImage (4, csRef<iImage>(loader->LoadImage (fname, Format)));
-        break;
-    
+        {
+          fname = child->GetContentsValue ();
+          if (!fname)
+          {
+            SyntaxService->ReportError (
+              PLUGIN_TEXTURELOADER_CUBEMAP,
+              child, "Expected VFS filename for 'file'!");
+            return 0;
+          }
+
+          cstldr->LoadImageTC (ret, fname, Format, false);
+          cube->SetSubImage (4, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
+          break;
+        }    
       case XMLTOKEN_NEGZ:
       case XMLTOKEN_SOUTH:
-        fname = child->GetContentsValue ();
-	if (!fname)
-	{
-	  SyntaxService->ReportError (
-	       PLUGIN_TEXTURELOADER_CUBEMAP,
-	       child, "Expected VFS filename for 'file'!");
-	  return 0;
-	}
-      
-	cube->SetSubImage (5, csRef<iImage>(loader->LoadImage (fname, Format)));
-        break;
-    
+        {
+          fname = child->GetContentsValue ();
+          if (!fname)
+          {
+            SyntaxService->ReportError (
+              PLUGIN_TEXTURELOADER_CUBEMAP,
+              child, "Expected VFS filename for 'file'!");
+            return 0;
+          }
+          cstldr->LoadImageTC (ret, fname, Format, false);
+          cube->SetSubImage (5, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
+          break;
+        }    
       case XMLTOKEN_POSX:
       case XMLTOKEN_EAST:
         fname = child->GetContentsValue ();
@@ -693,7 +700,8 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-	cube->SetSubImage (0, csRef<iImage>(loader->LoadImage (fname, Format)));
+  cstldr->LoadImageTC (ret, fname, Format, false);
+	cube->SetSubImage (0, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
         break;
     
       case XMLTOKEN_NEGX:
@@ -707,7 +715,8 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-	cube->SetSubImage (1, csRef<iImage>(loader->LoadImage (fname, Format)));
+  cstldr->LoadImageTC (ret, fname, Format, false);
+	cube->SetSubImage (1, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
         break;
     
       case XMLTOKEN_POSY:
@@ -721,7 +730,8 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-	cube->SetSubImage (2, csRef<iImage>(loader->LoadImage (fname, Format)));
+  cstldr->LoadImageTC (ret, fname, Format, false);
+	cube->SetSubImage (2, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
         break;
     
       case XMLTOKEN_NEGY:
@@ -735,7 +745,8 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-	cube->SetSubImage (3, csRef<iImage>(loader->LoadImage (fname, Format)));
+  cstldr->LoadImageTC (ret, fname, Format, false);
+	cube->SetSubImage (3, csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
         break;
     }
   }
@@ -783,7 +794,10 @@ csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node,
   csRef<iEngine> Engine = csQueryRegistry<iEngine> (object_reg);
   csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
   csRef<iTextureManager> tm = G3D->GetTextureManager();
-  csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
+  csRef<iThreadedLoader> loader = csQueryRegistry<iThreadedLoader> (object_reg);
+  csThreadedLoader* cstldr = dynamic_cast<csThreadedLoader*>((iThreadedLoader*)loader);
+  csRef<iThreadManager> threadman = csQueryRegistry<iThreadManager>(object_reg);
+  csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
   csRef<iSyntaxService> SyntaxService = 
     csQueryRegistry<iSyntaxService> (object_reg);
 
@@ -825,7 +839,8 @@ csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node,
 	  return 0;
 	}
       
-	vol->AddImage (csRef<iImage>(loader->LoadImage (fname, Format)));
+  cstldr->LoadImageTC (ret, fname, Format, false);
+	vol->AddImage (csRef<iImage>(scfQueryInterface<iImage>(ret->GetResultRefPtr())));
         break;
     }
   }

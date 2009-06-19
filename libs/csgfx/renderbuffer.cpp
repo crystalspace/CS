@@ -70,8 +70,8 @@ void* csRenderBuffer::Lock (csRenderBufferLockType lockType)
 #if defined(CS_DEBUG) && defined(DEBUG_LOCKING)
       if (lockStack)
       {
-	csPrintf ("Renderbuffer %p Lock() while locked:\n", this);
-	lockStack->Print ();
+        csPrintf ("Renderbuffer %p Lock() while locked:\n", this);
+        lockStack->Print ();
       }
 #endif
       return (void*)-1;

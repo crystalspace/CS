@@ -14958,6 +14958,34 @@ fi
 fi
 
 	    cs_java_cflags=`echo "x$cs_java_cflags" | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    for i in `find "$cs_java_dir/" -name '*jvm.*' -print`; do
+	        echo `$as_dirname -- $i ||
+$as_expr X$i : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
+	 X$i : 'X\(//\)[^/]' \| \
+	 X$i : 'X\(//\)$' \| \
+	 X$i : 'X\(/\)' \| . 2>/dev/null ||
+echo X$i |
+    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
+	    s//\1/
+	    q
+	  }
+	  /^X\(\/\/\)[^/].*/{
+	    s//\1/
+	    q
+	  }
+	  /^X\(\/\/\)$/{
+	    s//\1/
+	    q
+	  }
+	  /^X\(\/\).*/{
+	    s//\1/
+	    q
+	  }
+	  s/.*/./; q'`; done | sort | uniq > conftest.jlib
+	    cs_java_lflags=`sed 's/^\(.*\)$/-L\1/' < conftest.jlib`
+	    cs_java_lflags=`echo "x$cs_java_lflags" | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    rm -f conftest.jlib
+	    cs_java_libs="-ljvm"
 fi
 
 fi
@@ -15060,7 +15088,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-
+JNI_GetCreatedJavaVMs(0,0,0);
   ;
   return 0;
 }
@@ -15220,7 +15248,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-
+JNI_GetCreatedJavaVMs(0,0,0);
   ;
   return 0;
 }

@@ -40,6 +40,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "glshader_cgfp.h"
 #include "glshader_cg.h"
 #include "profile_limits.h"
+#include "stringstore.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -51,7 +52,8 @@ CS_LEAKGUARD_IMPLEMENT (csGLShader_CG);
 SCF_IMPLEMENT_FACTORY (csGLShader_CG)
 
 csGLShader_CG::csGLShader_CG (iBase* parent) : 
-  scfImplementationType (this, parent), compiledProgram (0)
+  scfImplementationType (this, parent), compiledProgram (0),
+  stringStore (0)
 {
   context = cgCreateContext ();
   cgSetErrorHandler (ErrorHandlerObjReg, 0);
@@ -66,6 +68,7 @@ csGLShader_CG::~csGLShader_CG()
   cs_free (dumpDir);
   cgDestroyContext (context);
   cgSetErrorHandler (ErrorHandlerObjReg, object_reg);
+  delete stringStore;
 }
 
 void csGLShader_CG::ErrorHandler (CGcontext context, CGerror error, 
@@ -225,11 +228,11 @@ void csGLShader_CG::GetProfileCompilerArgs (const char* type,
                                             CGprofile profile,
                                             const ProfileLimitsPair& limitsPair,
                                             HardwareVendor vendor,
-                                            bool noConfigArgs,
+                                            uint argsMask,
                                             ArgumentArray& args)
 {
   csString profileStr (cgGetProfileString (profile));
-  if (!noConfigArgs)
+  if (!(argsMask & argsNoConfig))
   {
     csConfigAccess cfg (object_reg);
     csString key ("Video.OpenGL.Shader.Cg.CompilerOptions");
@@ -240,52 +243,59 @@ void csGLShader_CG::GetProfileCompilerArgs (const char* type,
     SplitArgsString (cfg->GetStr (key), args);
   }
 
-  profileStr.Upcase();
-  csString profileMacroArg ("-DPROFILE_");
-  profileMacroArg += profileStr;
-  args.Push (profileMacroArg);
-  
-  profileStr = cgGetProfileString (limitsPair.vp.profile);
-  if (!profileStr.IsEmpty())
+  if (!(argsMask & argsNoProfileLimits))
   {
     profileStr.Upcase();
-    profileMacroArg = "-DVERT_PROFILE_";
+    csString profileMacroArg ("-DPROFILE_");
     profileMacroArg += profileStr;
     args.Push (profileMacroArg);
-  }
-  
-  profileStr = cgGetProfileString (limitsPair.fp.profile);
-  if (!profileStr.IsEmpty())
-  {
-    profileStr.Upcase();
-    profileMacroArg = "-DFRAG_PROFILE_";
-    profileMacroArg += profileStr;
-    args.Push (profileMacroArg);
-  }
-  
-  int profileLevel = GetProfileLevel (profile);
-  if (profileLevel != 0)
-  {
-    profileMacroArg.Format ("-DFRAGMENT_PROGRAM_LEVEL=0x%x", profileLevel);
-    args.Push (profileMacroArg);
-  }
-  csString typeStr (type);
-  typeStr.Upcase();
-  typeStr = "-DPROGRAM_TYPE_" + typeStr;
-  args.Push (typeStr);
-  
-  if (vendor != Invalid)
-  {
-    csString vendorStr;
-    switch (vendor)
+    
+    profileStr = cgGetProfileString (limitsPair.vp.profile);
+    if (!profileStr.IsEmpty())
     {
-      case ATI:     vendorStr = "ATI"; break;
-      case NVIDIA:  vendorStr = "NVIDIA"; break;
-      case Other:   vendorStr = "OTHER"; break;
-      default:      CS_ASSERT(false);
+      profileStr.Upcase();
+      profileMacroArg = "-DVERT_PROFILE_";
+      profileMacroArg += profileStr;
+      args.Push (profileMacroArg);
     }
-    vendorStr = "-DVENDOR_" + vendorStr;
-    args.Push (vendorStr);
+    
+    profileStr = cgGetProfileString (limitsPair.fp.profile);
+    if (!profileStr.IsEmpty())
+    {
+      profileStr.Upcase();
+      profileMacroArg = "-DFRAG_PROFILE_";
+      profileMacroArg += profileStr;
+      args.Push (profileMacroArg);
+    }
+    
+    int profileLevel = GetProfileLevel (profile);
+    if (profileLevel != 0)
+    {
+      profileMacroArg.Format ("-DFRAGMENT_PROGRAM_LEVEL=0x%x", profileLevel);
+      args.Push (profileMacroArg);
+    }
+  
+    if (vendor != Invalid)
+    {
+      csString vendorStr;
+      switch (vendor)
+      {
+	case ATI:     vendorStr = "ATI"; break;
+	case NVIDIA:  vendorStr = "NVIDIA"; break;
+	case Other:   vendorStr = "OTHER"; break;
+	default:      CS_ASSERT(false);
+      }
+      vendorStr = "-DVENDOR_" + vendorStr;
+      args.Push (vendorStr);
+    }
+  }
+  
+  if (!(argsMask & argsNoProgramType))
+  {
+    csString typeStr (type);
+    typeStr.Upcase();
+    typeStr = "-DPROGRAM_TYPE_" + typeStr;
+    args.Push (typeStr);
   }
 }
 
@@ -635,7 +645,7 @@ csPtr<iStringArray> csGLShader_CG::QueryPrecacheTags (const char* type)
   scfStringArray* tags = new scfStringArray;
   for (size_t i = 0; i < precacheLimits.GetSize(); i++)
   {
-    tags->Push (precacheLimits[i].ToString());
+    tags->Push (csString("CG") + precacheLimits[i].ToString());
   }
   return csPtr<iStringArray> (tags);
 }
@@ -651,7 +661,11 @@ bool csGLShader_CG::Precache (const char* type, const char* tag,
     previous));
   csRef<iShaderDestinationResolver> resolve (
     scfQueryInterfaceSafe<iShaderDestinationResolver> (previous));
-    
+  
+  if ((tag == 0) || (tag[0] != 'C') || (tag[1] != 'G'))
+    return false;
+  tag += 2;
+
   ProfileLimitsPair limits;
   if (!limits.FromString (tag))
     return false;
@@ -675,6 +689,7 @@ bool csGLShader_CG::Precache (const char* type, const char* tag,
         (iShaderProgramCG*)prevCG);
       ProfileLimitsPair prevLimits = prevFP->cacheLimits;
       if (limits != prevLimits) return false;
+      if (!prevFP->IsValid()) return false;
     }
     /* Precache for 'tag' */
     if (!prog->Load (resolve, node)) return false;
@@ -683,7 +698,7 @@ bool csGLShader_CG::Precache (const char* type, const char* tag,
   else
     return false;
 
-  if (outObj && result) *outObj = prog;
+  if (outObj) *outObj = prog;
   return result;
 
 }
@@ -696,68 +711,6 @@ bool csGLShader_CG::Precache (csShaderGLCGCommon* prog,
   bool result = false;
   result = prog->Precache (limits, tag, cacheTo);
   return result;
-}
-  
-csPtr<iString> csGLShader_CG::SelectPrecacheTag (const char* type, 
-                                                 iBase* previous,
-                                                 iHierarchicalCache* cacheDir)
-{
-  // @@@ TODO: Prolly good idea: check file magic
-  scfString* result = 0;
-  if (previous != 0)
-  {
-    csRef<iShaderProgramCG> prevCG (scfQueryInterfaceSafe<iShaderProgramCG> (
-      previous));
-    if (!prevCG.IsValid()) return 0;
-    
-    csShaderGLCGFP* prevFP = static_cast<csShaderGLCGFP*> (
-      (iShaderProgramCG*)prevCG);
-        
-    result = new scfString (prevFP->cacheLimits.ToString());
-  }
-  else
-  {
-    ProfileLimitsArray candidates;
-    csRef<iStringArray> availableTags = cacheDir->GetSubItems ("/");
-    for (size_t i = 0; i < availableTags->GetSize(); i++)
-    {
-      csString tag (availableTags->Get (i));
-      if (tag[tag.Length()-1] == '/')\
-	tag.Truncate (tag.Length()-1);
-	
-      ProfileLimitsPair cacheLimits;
-      if (!cacheLimits.FromString (tag)) continue;
-      
-      candidates.Push (cacheLimits);
-    }
-    candidates.Sort ();
-    
-    for (size_t i = candidates.GetSize(); i-- > 0;)
-    {
-      const ProfileLimitsPair& candidate = candidates[i];
-      
-      // TODO: compare vendors
-      bool supportVP = 
-	(ProfileNeedsRouting (candidate.vp.profile)
-	  && IsRoutedProfileSupported (candidate.vp.profile))
-	|| cgGLIsProfileSupported (candidate.vp.profile);
-      bool supportFP = 
-	(ProfileNeedsRouting (candidate.fp.profile)
-	  && IsRoutedProfileSupported (candidate.fp.profile))
-	|| cgGLIsProfileSupported (candidate.fp.profile);
-	
-      if (!supportVP || !supportFP) continue;
-      
-      ProfileLimitsPair currentLimits (candidate);
-      currentLimits.GetCurrentLimits (ext);
-      
-      if (candidate > currentLimits) continue;
-    
-      result = new scfString (candidate.ToString());
-      break;
-    }
-  }
-  return csPtr<iString> (result);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -774,6 +727,24 @@ bool csGLShader_CG::Initialize(iObjectRegistry* reg)
   binDocSys = csLoadPluginCheck<iDocumentSystem> (plugin_mgr,
     "crystalspace.documentsystem.binary");
   xmlDocSys.AttachNew (new csTinyDocumentSystem);
+  
+  csRef<iShaderManager> shaderMgr =
+    csQueryRegistry<iShaderManager> (object_reg);
+  if (!shaderMgr.IsValid())
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING,
+      "Could not obtain iShaderManager");
+  }
+  else
+  {
+    iHierarchicalCache* shaderCache = shaderMgr->GetShaderCache();
+    if (shaderCache != 0)
+    {
+      csRef<iHierarchicalCache> progCache =
+        shaderCache->GetRootedCache ("/CgProgCache");
+      stringStore = new StringStore (progCache);
+    }
+  }
   
   return true;
 }

@@ -106,13 +106,13 @@ void csDecal::Initialize(iDecalTemplate * decalTemplate,
 void csDecal::BeginMesh(iMeshWrapper * mesh)
 {
   currMesh = 0;
-
+  
   // check if InitializePosition has been called with decent parameters
   if (width <= 0.01f || height <= 0.01f)
     return;
 
   // check if we hit our maximum allowed triangles
-  if (indexCount >= CS_DECAL_MAX_TRIS_PER_DECAL*3)
+  if (indexCount >= CS_DECAL_MAX_TRIS_PER_DECAL * 3)
     return;
 
   firstIndex = indexCount;
@@ -153,7 +153,7 @@ void csDecal::BeginMesh(iMeshWrapper * mesh)
   {
     bottomPlaneDist = decalTemplate->GetBottomClippingScale() * radius;
     clipPlanes[numClipPlanes++] = csPlane3( localNormal,
-	-bottomPlaneDist - localNormal * relPos);
+      -bottomPlaneDist - localNormal * relPos);
   }
 #endif // CS_DECAL_CLIP_DECAL
 
@@ -163,17 +163,16 @@ void csDecal::BeginMesh(iMeshWrapper * mesh)
 
 void csDecal::AddStaticPoly(const csPoly3D & p)
 {
+  if (!currMesh)
+    return;
+
   size_t a;
   CS::TriangleT<int> tri;
-
-  if (!currMesh)
-      return;
-
   csPoly3D poly = p;
 
 #ifdef CS_DECAL_CLIP_DECAL
   for (a=0; a<numClipPlanes; ++a)
-      poly.CutToPlane(clipPlanes[a]);
+    poly.CutToPlane(clipPlanes[a]);
 #endif // CS_DECAL_CLIP_DECAL
   
   size_t vertCount = poly.GetVertexCount();
@@ -320,11 +319,11 @@ void csDecal::AddStaticPoly(const csPoly3D & p)
 void csDecal::EndMesh()
 {
   if (!currMesh)
-      return;
+    return;
 
   // make sure we actually added some geometry before we create a rendermesh
   if (indexCount == firstIndex)
-      return;
+    return;
 
   // create a rendermesh for this mesh
   csRenderMesh* pRenderMesh = decalManager->renderMeshAllocator.Alloc();
@@ -347,9 +346,9 @@ void csDecal::EndMesh()
           decalTemplate->GetRenderPriority(), decalTemplate->GetZBufMode());
 }
 
-bool csDecal::Age(csTicks ticks)
+bool csDecal::Age (csTicks ticks)
 {
-  const float lifespan = decalTemplate->GetTimeToLive();
+  const float lifespan = decalTemplate->GetTimeToLive ();
   life += (float)ticks * 0.001f;
 
   if (lifespan <= 0.0f)

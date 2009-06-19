@@ -364,6 +364,7 @@ bool csTerrBlock::Split ()
   children[3]->child = 3;
 
   if (neighbours[0])
+  {
     if (!neighbours[0]->IsLeaf ())
     {
       children[0]->neighbours[0] = neighbours[0]->children[2];
@@ -378,7 +379,9 @@ bool csTerrBlock::Split ()
       children[1]->neighbours[0] = neighbours[0];
       neighbours[0]->neighbours[3] = this;
     }
+  }
   if (neighbours[1])
+  {
     if (!neighbours[1]->IsLeaf ())
     {
       children[1]->neighbours[1] = neighbours[1]->children[0];
@@ -393,7 +396,9 @@ bool csTerrBlock::Split ()
       children[3]->neighbours[1] = neighbours[1];
       neighbours[1]->neighbours[2] = this;
     }
+  }
   if (neighbours[2])
+  {
     if (!neighbours[2]->IsLeaf ())
     {
       children[0]->neighbours[2] = neighbours[2]->children[1];
@@ -408,7 +413,9 @@ bool csTerrBlock::Split ()
       children[2]->neighbours[2] = neighbours[2];
       neighbours[2]->neighbours[1] = this;
     }
+  }
   if (neighbours[3])
+  {
     if (!neighbours[3]->IsLeaf ())
     {
       children[2]->neighbours[3] = neighbours[3]->children[0];
@@ -423,6 +430,7 @@ bool csTerrBlock::Split ()
       children[3]->neighbours[3] = neighbours[3];
       neighbours[3]->neighbours[0] = this;
     }
+  }
   children[0]->neighbours[1] = children[1];
   children[0]->neighbours[3] = children[2];
 

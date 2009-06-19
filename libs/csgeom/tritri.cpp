@@ -204,115 +204,105 @@ static bool coplanar_tri_tri(const csVector3& N, const csVector3 tri1[3],
  * @return true if the triangles intersect, otherwise false
  *
  */
-
-bool csIntersect3::TriangleTriangle(const csVector3 tri1[3],
-                                    const csVector3 tri2[3])
+bool csIntersect3::TriangleTriangle (const csVector3 tri1[3],
+                                     const csVector3 tri2[3])
 {
-  csVector3 E1,E2;
-  csVector3 N1,N2;
-  float d1,d2;
-  float du0,du1,du2,dv0,dv1,dv2;
-  csVector3 D;
-  float isect1[2], isect2[2];
-  float du0du1,du0du2,dv0dv1,dv0dv2;
-  short index;
-  float vp0,vp1,vp2;
-  float up0,up1,up2;
-  float bb,cc,max;
-  float a,b,c,x0,x1;
-  float d,e,f,y0,y1;
-  float xx,yy,xxyy,tmp;
-
   /* compute plane equation of triangle(tri1) */
-  E1 = tri1[1] - tri1[0];
-  E2 = tri1[2] - tri1[0];
-  N1 = E1 % E2;
-  d1=-(N1 * tri1[0]);
-  /* plane equation 1: N1.X+d1=0 */
+  csVector3 E1 = tri1[1] - tri1[0];
+  csVector3 E2 = tri1[2] - tri1[0];
+  csVector3 N1 = E1 % E2;
+  float d1 =- (N1 * tri1[0]);
+  /* plane equation 1: N1.X + d1 = 0 */
 
   /* put tri2 into plane equation 1 to compute signed distances to the plane*/
-  du0=(N1 * tri2[0])+d1;
-  du1=(N1 * tri2[1])+d1;
-  du2=(N1 * tri2[2])+d1;
+  float du0 = (N1 * tri2[0]) + d1;
+  float du1 = (N1 * tri2[1]) + d1;
+  float du2 = (N1 * tri2[2]) + d1;
 
   /* coplanarity robustness check */
 #if USE_EPSILON_TEST==TRUE
-  if(FABS(du0)<SMALL_EPSILON) du0=0.0;
-  if(FABS(du1)<SMALL_EPSILON) du1=0.0;
-  if(FABS(du2)<SMALL_EPSILON) du2=0.0;
+  if (FABS (du0) < SMALL_EPSILON) du0 = 0.0f;
+  if (FABS (du1) < SMALL_EPSILON) du1 = 0.0f;
+  if (FABS (du2) < SMALL_EPSILON) du2 = 0.0f;
 #endif
-  du0du1=du0*du1;
-  du0du2=du0*du2;
 
-  if(du0du1>0.0f && du0du2>0.0f) /* same sign on all of them + not equal 0 ? */
-    return 0;                    /* no intersection occurs */
+  float du0du1 = du0 * du1;
+  float du0du2 = du0 * du2;
+  if (du0du1 > 0.0f && du0du2 > 0.0f) /* same sign on all of them + not equal 0 ? */
+    return false;                     /* no intersection occurs */
 
   /* compute plane of triangle (tri2) */
   E1 = tri2[1] - tri2[0];
   E2 = tri2[2] - tri2[0];
-  N2 = E1 % E2;
-  d2=-(N2 * tri2[0]);
-  /* plane equation 2: N2.X+d2=0 */
+  csVector3 N2 = E1 % E2;
+  float d2 =- (N2 * tri2[0]);
+  /* plane equation 2: N2.X + d2 = 0 */
 
   /* put tri1 into plane equation 2 */
-  dv0=(N2 * tri1[0])+d2;
-  dv1=(N2 * tri1[1])+d2;
-  dv2=(N2 * tri1[2])+d2;
+  float dv0 = (N2 * tri1[0]) + d2;
+  float dv1 = (N2 * tri1[1]) + d2;
+  float dv2 = (N2 * tri1[2]) + d2;
 
 #if USE_EPSILON_TEST==TRUE
-  if(FABS(dv0)<SMALL_EPSILON) dv0=0.0;
-  if(FABS(dv1)<SMALL_EPSILON) dv1=0.0;
-  if(FABS(dv2)<SMALL_EPSILON) dv2=0.0;
+  if (FABS (dv0) < SMALL_EPSILON) dv0 = 0.0f;
+  if (FABS (dv1) < SMALL_EPSILON) dv1 = 0.0f;
+  if (FABS (dv2) < SMALL_EPSILON) dv2 = 0.0f;
 #endif
 
-  dv0dv1=dv0*dv1;
-  dv0dv2=dv0*dv2;
+  float dv0dv1 = dv0 * dv1;
+  float dv0dv2 = dv0 * dv2;
 
-  if(dv0dv1>0.0f && dv0dv2>0.0f) /* same sign on all of them + not equal 0 ? */
-    return 0;                    /* no intersection occurs */
+  if (dv0dv1 > 0.0f && dv0dv2 > 0.0f) /* same sign on all of them + not equal 0 ? */
+    return false;                     /* no intersection occurs */
 
   /* compute direction of intersection line */
-  D = N1 % N2;
+  csVector3 D = N1 % N2;
 
   /* compute and index to the largest component of D */
-  max=(float)FABS(D[0]);
-  index=0;
-  bb=(float)FABS(D[1]);
-  cc=(float)FABS(D[2]);
-  if(bb>max) max=bb,index=1;
-  if(cc>max) max=cc,index=2;
+  float max = (float) FABS (D[0]);
+  short index = 0;
+  float bb = (float) FABS (D[1]);
+  float cc = (float) FABS (D[2]);
+  if (bb > max) max = bb, index = 1;
+  if (cc > max) max = cc, index = 2;
 
   /* this is the simplified projection onto L*/
-  vp0=tri1[0][index];
-  vp1=tri1[1][index];
-  vp2=tri1[2][index];
+  float vp0 = tri1[0][index];
+  float vp1 = tri1[1][index];
+  float vp2 = tri1[2][index];
 
-  up0=tri2[0][index];
-  up1=tri2[1][index];
-  up2=tri2[2][index];
+  float up0 = tri2[0][index];
+  float up1 = tri2[1][index];
+  float up2 = tri2[2][index];
 
+  float a, b, c, x0, x1;
+  float d, e, f, y0, y1;
   /* compute interval for triangle 1 */
-  NEWCOMPUTE_INTERVALS(vp0,vp1,vp2,dv0,dv1,dv2,dv0dv1,dv0dv2,a,b,c,x0,x1);
+  NEWCOMPUTE_INTERVALS (vp0, vp1, vp2, dv0, dv1, dv2, dv0dv1, dv0dv2,
+                          a, b, c, x0, x1);
 
   /* compute interval for triangle 2 */
-  NEWCOMPUTE_INTERVALS(up0,up1,up2,du0,du1,du2,du0du1,du0du2,d,e,f,y0,y1);
+  NEWCOMPUTE_INTERVALS (up0, up1, up2, du0, du1, du2, du0du1, du0du2,
+                          d, e, f, y0, y1);
 
-  xx=x0*x1;
-  yy=y0*y1;
-  xxyy=xx*yy;
+  float xx, yy, xxyy, tmp;
+  float isect1[2], isect2[2];
+  xx = x0 * x1;
+  yy = y0 * y1;
+  xxyy = xx * yy;
 
-  tmp=a*xxyy;
-  isect1[0]=tmp+b*x1*yy;
-  isect1[1]=tmp+c*x0*yy;
+  tmp = a * xxyy;
+  isect1[0] = tmp + b * x1 * yy;
+  isect1[1] = tmp + c * x0 * yy;
 
-  tmp=d*xxyy;
-  isect2[0]=tmp+e*xx*y1;
-  isect2[1]=tmp+f*xx*y0;
+  tmp = d * xxyy;
+  isect2[0] = tmp + e * xx * y1;
+  isect2[1] = tmp + f * xx * y0;
 
-  SORT(isect1[0],isect1[1]);
-  SORT(isect2[0],isect2[1]);
+  SORT (isect1[0], isect1[1]);
+  SORT (isect2[0], isect2[1]);
 
-  if(isect1[1]<isect2[0] || isect2[1]<isect1[0]) return false;
+  if (isect1[1] < isect2[0] || isect2[1] < isect1[0]) return false;
   return true;
 }
 
@@ -329,63 +319,64 @@ bool csIntersect3::TriangleTriangle(const csVector3 tri1[3],
              else smallest=0;
 
 
-static inline void isect2(const csVector3 tri[3],float VV0,float VV1,float VV2,
-	    float D0,float D1,float D2,float *isect0,float *isect1,csVector3 isectline[2])
+static inline void isect2 (const csVector3 tri[3], float VV0, float VV1,
+                           float VV2, float D0, float D1, float D2,
+                           float *isect0, float *isect1, csVector3 isectline[2])
 {
-  float tmp=D0/(D0-D1);          
+  float tmp = D0 / (D0 - D1);
   csVector3 diff;
-  *isect0=VV0+(VV1-VV0)*tmp;         
-  diff = tri[1] - tri[0];              
-  diff = diff * tmp;               
-  isectline[0] = diff + tri[0];        
-  tmp=D0/(D0-D2);                    
-  *isect1=VV0+(VV2-VV0)*tmp;          
-  diff = tri[2] - tri[0];                   
-  diff = diff * tmp;                 
-  isectline[1] = tri[0] + diff;          
+  *isect0 = VV0 + (VV1 - VV0) * tmp;
+  diff = tri[1] - tri[0];
+  diff = diff * tmp;
+  isectline[0] = diff + tri[0];
+  tmp=D0 / (D0 - D2);
+  *isect1 = VV0 + (VV2 - VV0) * tmp;
+  diff = tri[2] - tri[0];
+  diff = diff * tmp;
+  isectline[1] = tri[0] + diff;
 }
 
 
-static inline bool compute_intervals_isectline(const csVector3 tri[3],
+static inline bool compute_intervals_isectline (const csVector3 tri[3],
 				       float VV0,float VV1,float VV2,float D0,float D1,float D2,
 				       float D0D1,float D0D2,float *isect0,float *isect1,
 				       csVector3 isectline[2])
 {
-  if(D0D1>0.0f)                                        
+  if (D0D1 > 0.0f)                                        
   {                                                    
     /* here we know that D0D2<=0.0 */                  
     /* that is D0, D1 are on the same side, D2 on the other or on the plane */
     csVector3 newTri[3] = {tri[2], tri[0], tri[1]};
     isect2(newTri,VV2,VV0,VV1,D2,D0,D1,isect0,isect1,isectline);
   } 
-  else if(D0D2>0.0f)                                   
-    {   
+  else if (D0D2 > 0.0f)                                   
+  {   
     csVector3 newTri[3] = {tri[1], tri[0], tri[2]};
     /* here we know that d0d1<=0.0 */             
-    isect2(newTri,VV1,VV0,VV2,D1,D0,D2,isect0,isect1,isectline);
+    isect2 (newTri, VV1, VV0, VV2, D1, D0, D2, isect0, isect1, isectline);
   }                                                  
-  else if(D1*D2>0.0f || D0!=0.0f)   
+  else if (D1 * D2 > 0.0f || D0 != 0.0f)   
   {        
     csVector3 newTri[3] = {tri[0], tri[1], tri[2]};
     /* here we know that d0d1<=0.0 or that D0!=0.0 */
-    isect2(newTri,VV0,VV1,VV2,D0,D1,D2,isect0,isect1,isectline);   
+    isect2 (newTri, VV0, VV1, VV2, D0, D1, D2, isect0, isect1, isectline);   
   }                                                  
-  else if(D1!=0.0f)                                  
+  else if (D1 != 0.0f)                                  
   {             
     csVector3 newTri[3] = {tri[1], tri[0], tri[2]};
-    isect2(newTri,VV1,VV0,VV2,D1,D0,D2,isect0,isect1,isectline); 
+    isect2 (newTri, VV1, VV0, VV2, D1, D0, D2, isect0, isect1, isectline); 
   }                                         
-  else if(D2!=0.0f)                                  
+  else if (D2 != 0.0f)                                  
   {                  
     csVector3 newTri[3] = {tri[2], tri[0], tri[1]};
-    isect2(newTri,VV2,VV0,VV1,D2,D0,D1,isect0,isect1,isectline);     
+    isect2 (newTri, VV2, VV0, VV1, D2, D0, D1, isect0, isect1, isectline);     
   }                                                 
   else                                               
   {                                                   
     /* triangles are coplanar */    
-    return 1;
+    return true;
   }
-  return 0;
+  return false;
 }
 
 #define COMPUTE_INTERVALS_ISECTLINE(VERT0,VERT1,VERT2,VV0,VV1,VV2,D0,D1,D2,D0D1,D0D2,isect0,isect1,isectpoint0,isectpoint1) \
@@ -434,141 +425,144 @@ static inline bool compute_intervals_isectline(const csVector3 tri[3],
  * @return true if the triangles intersect, otherwise false
  *
  */
-
-bool csIntersect3::TriangleTriangle(const csVector3 tri1[3],
-				     const csVector3 tri2[3],
-				     csSegment3& isectline, bool& coplanar)
+bool csIntersect3::TriangleTriangle (const csVector3 tri1[3],
+				                             const csVector3 tri2[3],
+				                             csSegment3& isectline, bool& coplanar)
 {
-  csVector3 E1,E2;
-  csVector3 N1,N2;
-  float d1,d2;
-  float du0,du1,du2,dv0,dv1,dv2;
-  csVector3 D;
-  float isect1[2] = {0,0}, isect2[2] = {0,0};
-  csVector3 isectpointA[2];
-  csVector3 isectpointB[2];
-  float du0du1,du0du2,dv0dv1,dv0dv2;
-  short index;
-  float vp0,vp1,vp2;
-  float up0,up1,up2;
-  float b,c,max;
-  int smallest1,smallest2;
-  
   /* compute plane equation of triangle(tri1) */
-  E1 = tri1[1] - tri1[0];
-  E2 = tri1[2] - tri1[0];
-  N1 = E1 % E2;
-  d1 =-(N1 * tri1[0]);
-  /* plane equation 1: N1.X+d1=0 */
+  csVector3 E1 = tri1[1] - tri1[0];
+  csVector3 E2 = tri1[2] - tri1[0];
+  csVector3 N1 = E1 % E2;
+  float d1 =- (N1 * tri1[0]);
+  /* plane equation 1: N1.X + d1 = 0 */
 
-  /* put tri2 into plane equation 1 to compute signed distances to the plane*/
-  du0=(N1 * tri2[0])+d1;
-  du1=(N1 * tri2[1])+d1;
-  du2=(N1 * tri2[2])+d1;
+  /* put tri2 into plane equation 1 to compute signed distances to the plane */
+  float du0 = (N1 * tri2[0]) + d1;
+  float du1 = (N1 * tri2[1]) + d1;
+  float du2 = (N1 * tri2[2]) + d1;
 
   /* coplanarity robustness check */
 #if USE_EPSILON_TEST==TRUE
-  if(fabs(du0)<SMALL_EPSILON) du0=0.0;
-  if(fabs(du1)<SMALL_EPSILON) du1=0.0;
-  if(fabs(du2)<SMALL_EPSILON) du2=0.0;
+  if (fabs (du0) < SMALL_EPSILON) du0 = 0.0f;
+  if (fabs (du1) < SMALL_EPSILON) du1 = 0.0f;
+  if (fabs (du2) < SMALL_EPSILON) du2 = 0.0f;
 #endif
-  du0du1=du0*du1;
-  du0du2=du0*du2;
 
-  if(du0du1>0.0f && du0du2>0.0f) /* same sign on all of them + not equal 0 ? */
-    return 0;                    /* no intersection occurs */
+  float du0du1 = du0 * du1;
+  float du0du2 = du0 * du2;
+
+  if (du0du1 > 0.0f && du0du2 > 0.0f) /* same sign on all of them + not equal 0 ? */
+    return false;                     /* no intersection occurs */
 
   /* compute plane of triangle (tri2) */
   E1 = tri2[1] - tri2[0];
   E2 = tri2[2] - tri2[0];
-  N2 = E1 % E2;
-  d2=-(N2 * tri2[0]);
-  /* plane equation 2: N2.X+d2=0 */
+  csVector3 N2 = E1 % E2;
+  float d2 =- (N2 * tri2[0]);
+  /* plane equation 2: N2.X + d2 = 0 */
 
   /* put tri1 into plane equation 2 */
-  dv0=(N2 * tri1[0])+d2;
-  dv1=(N2 * tri1[1])+d2;
-  dv2=(N2 * tri1[2])+d2;
+  float dv0 = (N2 * tri1[0]) + d2;
+  float dv1 = (N2 * tri1[1]) + d2;
+  float dv2 = (N2 * tri1[2]) + d2;
 
 #if USE_EPSILON_TEST==TRUE
-  if(fabs(dv0)<SMALL_EPSILON) dv0=0.0;
-  if(fabs(dv1)<SMALL_EPSILON) dv1=0.0;
-  if(fabs(dv2)<SMALL_EPSILON) dv2=0.0;
+  if (fabs (dv0) < SMALL_EPSILON) dv0 = 0.0f;
+  if (fabs (dv1) < SMALL_EPSILON) dv1 = 0.0f;
+  if (fabs (dv2) < SMALL_EPSILON) dv2 = 0.0f;
 #endif
 
-  dv0dv1=dv0*dv1;
-  dv0dv2=dv0*dv2;
+  float dv0dv1 = dv0 * dv1;
+  float dv0dv2 = dv0 * dv2;
         
-  if(dv0dv1>0.0f && dv0dv2>0.0f) /* same sign on all of them + not equal 0 ? */
-    return 0;                    /* no intersection occurs */
+  if (dv0dv1 > 0.0f && dv0dv2 > 0.0f) /* same sign on all of them + not equal 0 ? */
+    return false;                     /* no intersection occurs */
 
   /* compute direction of intersection line */
-  D = N1 % N2;
+  csVector3 D = N1 % N2;
 
   /* compute and index to the largest component of D */
-  max=fabs(D[0]);
-  index=0;
-  b=fabs(D[1]);
-  c=fabs(D[2]);
-  if(b>max) max=b,index=1;
-  if(c>max) max=c,index=2;
+  float max = fabs (D[0]);
+  short index = 0;
+  float b = fabs (D[1]);
+  float c = fabs (D[2]);
+  if (b > max) max = b, index = 1;
+  if (c > max) max = c, index = 2;
 
   /* this is the simplified projection onto L*/
-  vp0=tri1[0][index];
-  vp1=tri1[1][index];
-  vp2=tri1[2][index];
+  float vp0 = tri1[0][index];
+  float vp1 = tri1[1][index];
+  float vp2 = tri1[2][index];
   
-  up0=tri2[0][index];
-  up1=tri2[1][index];
-  up2=tri2[2][index];
+  float up0 = tri2[0][index];
+  float up1 = tri2[1][index];
+  float up2 = tri2[2][index];
 
+  float isect1[2] = {0,0}, isect2[2] = {0,0};
+  csVector3 isectpointA[2];
+  csVector3 isectpointB[2];
+  
   /* compute interval for triangle 1 */
-  coplanar=compute_intervals_isectline(tri1,vp0,vp1,vp2,dv0,dv1,dv2,
-				       dv0dv1,dv0dv2,&isect1[0],&isect1[1],isectpointA);
-  if(coplanar) return coplanar_tri_tri(N1, tri1, tri2);     
-
+  coplanar = compute_intervals_isectline (tri1, vp0, vp1, vp2, dv0, dv1, dv2,
+				       dv0dv1, dv0dv2, &isect1[0], &isect1[1], isectpointA);
+  if (coplanar)
+    return coplanar_tri_tri (N1, tri1, tri2);     
 
   /* compute interval for triangle 2 */
-  compute_intervals_isectline(tri2,up0,up1,up2,du0,du1,du2,
-			      du0du1,du0du2,&isect2[0],&isect2[1],isectpointB);
+  compute_intervals_isectline (tri2, up0, up1, up2, du0, du1, du2,
+			      du0du1, du0du2, &isect2[0], &isect2[1], isectpointB);
 
-  SORT2(isect1[0],isect1[1],smallest1);
-  SORT2(isect2[0],isect2[1],smallest2);
+  int smallest1, smallest2;
+  SORT2 (isect1[0], isect1[1], smallest1);
+  SORT2 (isect2[0], isect2[1], smallest2);
 
-  if(isect1[1]<isect2[0] || isect2[1]<isect1[0]) return 0;
+  if (isect1[1] < isect2[0] || isect2[1] < isect1[0])
+    return false;
 
   /* at this point, we know that the triangles intersect */
 
-  if(isect2[0]<isect1[0])
+  if (isect2[0] < isect1[0])
   {
-    if(smallest1==0) { isectline.SetStart(isectpointA[0]); }
-    else { isectline.SetStart(isectpointA[1]); }
+    if (smallest1 == 0)
+      isectline.SetStart (isectpointA[0]);
+    else
+      isectline.SetStart (isectpointA[1]);
 
-    if(isect2[1]<isect1[1])
+    if (isect2[1] < isect1[1])
     {
-      if(smallest2==0) { isectline.SetEnd(isectpointB[1]); }
-      else { isectline.SetEnd(isectpointB[0]); }
+      if (smallest2 == 0)
+        isectline.SetEnd (isectpointB[1]);
+      else
+        isectline.SetEnd (isectpointB[0]);
     }
     else
     {
-      if(smallest1==0) { isectline.SetEnd(isectpointA[1]); }
-      else { isectline.SetEnd(isectpointA[0]); }
+      if (smallest1 == 0)
+        isectline.SetEnd(isectpointA[1]);
+      else
+        isectline.SetEnd (isectpointA[0]);
     }
   }
   else
   {
-    if(smallest2==0) { isectline.SetStart(isectpointB[0]); }
-    else { isectline.SetStart(isectpointB[1]); }
+    if (smallest2 == 0)
+      isectline.SetStart (isectpointB[0]);
+    else
+      isectline.SetStart (isectpointB[1]);
 
-    if(isect2[1]>isect1[1])
+    if (isect2[1] > isect1[1])
     {
-      if(smallest1==0) { isectline.SetEnd(isectpointA[1]); }
-      else { isectline.SetEnd(isectpointA[0]); }      
+      if (smallest1 == 0)
+        isectline.SetEnd (isectpointA[1]);
+      else
+        isectline.SetEnd (isectpointA[0]);    
     }
     else
     {
-      if(smallest2==0) { isectline.SetEnd(isectpointB[1]); }
-      else { isectline.SetEnd(isectpointB[0]); } 
+      if (smallest2 == 0)
+        isectline.SetEnd (isectpointB[1]);
+      else
+        isectline.SetEnd (isectpointB[0]);
     }
   }
   return true;
@@ -639,9 +633,7 @@ static inline void ComputerInterval2DProj (const csVector3 tri[3],
                                            csSegment3& isectSeg,
                                            float& t0, float &t1)
 {
-  csVector3 tmp;
-
-  // t_edge = dv1_0 / (dv1_0 - dv1_1), see (4) in Möller
+  // t_edge = dv1_0 / (dv1_0 - dv1_1), see (4) in MÃ¶ller
   float t_edge = d[0] / (d[0] - d[1]);
 
   // Project onto axis
@@ -649,7 +641,6 @@ static inline void ComputerInterval2DProj (const csVector3 tri[3],
 
   // Compute real point of intersection
   isectSeg.SetStart (tri[0] + (tri[1] - tri[0]) * t_edge);
-
 
   // REDO FOR OTHER EDGE
 

@@ -131,7 +131,7 @@ csGraphics2DGLX::~csGraphics2DGLX ()
   Close ();
 }
 
-bool csGraphics2DGLX::Open()
+bool csGraphics2DGLX::Open ()
 {
   if (is_open) return true;
 
@@ -139,6 +139,8 @@ bool csGraphics2DGLX::Open()
   // We now select the visual here as with a mesa bug it is not possible
   // to destroy double buffered contexts and then create a single buffered
   // one.
+  
+  ext.InitGLX_ARB_multisample (dpy, screen_num);
 
   if (!ChooseVisual ())
     return false;
@@ -156,7 +158,7 @@ bool csGraphics2DGLX::Open()
     return false;
   }
   window = xwin->GetWindow ();
-  active_GLContext = glXCreateContext(dpy, xvis, 0, True);
+  active_GLContext = glXCreateContext (dpy, xvis, 0, True);
 
   // this makes the context we just created the current
   // context, so that all subsequent OpenGL calls will set state and
@@ -167,7 +169,7 @@ bool csGraphics2DGLX::Open()
   
   XSync (dpy, False);
   
-  GetCurrentAttributes();
+  GetCurrentAttributes ();
   
   // Open your graphic interface
   if (!csGraphics2DGLCommon::Open ())
@@ -178,7 +180,7 @@ bool csGraphics2DGLX::Open()
   return true;
 }
 
-void csGraphics2DGLX::Close(void)
+void csGraphics2DGLX::Close (void)
 {
   if (!is_open) return;
     
@@ -186,12 +188,12 @@ void csGraphics2DGLX::Close(void)
   csGraphics2DGLCommon::Close ();
   if (active_GLContext != 0)
   {
-    glXDestroyContext(dpy,active_GLContext);
+    glXDestroyContext (dpy,active_GLContext);
     active_GLContext = 0;
   }
 
   if (dispdriver)
-    dispdriver->close();
+    dispdriver->close ();
 
   if (xwin)
     xwin->Close ();
@@ -245,42 +247,63 @@ bool csGraphics2DGLX::ChooseVisual ()
   
   GLPixelFormat format;
   csGLPixelFormatPicker picker (this);
+  csDirtyAccessArray<int> desired_attributes;
   
-  while (picker.GetNextFormat (format))
+  bool tryMultisample = ext.CS_GLX_ARB_multisample;
+  
+  for (int run = (tryMultisample ? 2 : 1); (run-- > 0) && !xvis; )
   {
-    if (do_verbose)
+    while (picker.GetNextFormat (format))
     {
-      csString pfStr;
-      GetPixelFormatString (format, pfStr);
-  
-      Report (CS_REPORTER_SEVERITY_NOTIFY,
-	"Probing pixel format: %s", pfStr.GetData());
+      if (do_verbose)
+      {
+        csString pfStr;
+        GetPixelFormatString (format, pfStr);
+    
+        Report (CS_REPORTER_SEVERITY_NOTIFY,
+          "Probing pixel format: %s", pfStr.GetData ());
+      }
+      const int colorBits = format[glpfvColorBits];
+      const int colorComponentSize = 
+        ((colorBits % 32) == 0) ? colorBits / 4 : colorBits / 3;
+      const int accumBits = format[glpfvAccumColorBits];
+      const int accumComponentSize = 
+        ((accumBits % 32) == 0) ? accumBits / 4 : accumBits / 3;
+      desired_attributes.DeleteAll();
+      desired_attributes.Push (GLX_RGBA);
+      desired_attributes.Push (GLX_DEPTH_SIZE);
+      desired_attributes.Push (format[glpfvDepthBits]);
+      desired_attributes.Push (GLX_RED_SIZE);
+      desired_attributes.Push (colorComponentSize);
+      desired_attributes.Push (GLX_BLUE_SIZE);
+      desired_attributes.Push (colorComponentSize);
+      desired_attributes.Push (GLX_GREEN_SIZE);
+      desired_attributes.Push (colorComponentSize);
+      desired_attributes.Push (GLX_DOUBLEBUFFER);
+      desired_attributes.Push (GLX_ALPHA_SIZE);
+      desired_attributes.Push (format[glpfvAlphaBits]);
+      desired_attributes.Push (GLX_STENCIL_SIZE);
+      desired_attributes.Push (format[glpfvStencilBits]);
+      desired_attributes.Push (GLX_ACCUM_RED_SIZE);
+      desired_attributes.Push (accumComponentSize);
+      desired_attributes.Push (GLX_ACCUM_BLUE_SIZE);
+      desired_attributes.Push (accumComponentSize);
+      desired_attributes.Push (GLX_ACCUM_GREEN_SIZE);
+      desired_attributes.Push (accumComponentSize);
+      desired_attributes.Push (GLX_ACCUM_ALPHA_SIZE);
+      desired_attributes.Push (format[glpfvAccumAlphaBits]);
+      if (run >= 1)
+      {
+        desired_attributes.Push (GLX_SAMPLE_BUFFERS_ARB);
+        desired_attributes.Push ((format[glpfvMultiSamples] != 0) ? 1 : 0);
+        desired_attributes.Push (GLX_SAMPLES_ARB);
+        desired_attributes.Push (format[glpfvMultiSamples]);
+      }
+      desired_attributes.Push (None);
+      // find a visual that supports all the features we need
+      xvis = glXChooseVisual (dpy, screen_num, desired_attributes.GetArray ());
+      if (xvis) break;
     }
-    const int colorBits = format[glpfvColorBits];
-    const int colorComponentSize = 
-	((colorBits % 32) == 0) ? colorBits / 4 : colorBits / 3;
-    const int accumBits = format[glpfvAccumColorBits];
-    const int accumComponentSize = 
-	((accumBits % 32) == 0) ? accumBits / 4 : accumBits / 3;
-    int desired_attributes[] =
-    {
-      GLX_RGBA,
-      GLX_DEPTH_SIZE, format[glpfvDepthBits],
-      GLX_RED_SIZE, colorComponentSize,
-      GLX_BLUE_SIZE, colorComponentSize,
-      GLX_GREEN_SIZE, colorComponentSize,
-      GLX_DOUBLEBUFFER,
-      GLX_ALPHA_SIZE, format[glpfvAlphaBits],
-      GLX_STENCIL_SIZE, format[glpfvStencilBits],
-      GLX_ACCUM_RED_SIZE, accumComponentSize,
-      GLX_ACCUM_BLUE_SIZE, accumComponentSize,
-      GLX_ACCUM_GREEN_SIZE, accumComponentSize,
-      GLX_ACCUM_ALPHA_SIZE, format[glpfvAccumAlphaBits],
-      None
-    };
-    // find a visual that supports all the features we need
-    xvis = glXChooseVisual (dpy, screen_num, desired_attributes);
-    if (xvis) break;
   }
 
   // if a visual was found that we can use, make a graphics context which
@@ -297,29 +320,30 @@ bool csGraphics2DGLX::ChooseVisual ()
     // trying each of the pieces and seeing if any single piece is not provided
 
     // try to get a visual with 12 bit color
-    int generic_attributes [] = {GLX_RGBA, GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, 1, None};
-    if (!(xvis=glXChooseVisual(dpy, screen_num, generic_attributes)) )
+    int generic_attributes [] = { GLX_RGBA, GLX_DOUBLEBUFFER,
+      GLX_DEPTH_SIZE, 1, None };
+    if (!(xvis=glXChooseVisual (dpy, screen_num, generic_attributes)))
     {
       Report (CS_REPORTER_SEVERITY_WARNING,
         "Graphics display does not support a generic visual with double buffer and depth buffer");
 		
-      int doublebuffer_attributes [] = {GLX_RGBA, GLX_DOUBLEBUFFER, None};
+      int doublebuffer_attributes [] = { GLX_RGBA, GLX_DOUBLEBUFFER, None };
       if (!(xvis=glXChooseVisual (dpy, screen_num, doublebuffer_attributes)))
       {
         Report (CS_REPORTER_SEVERITY_WARNING,
           "Graphics display does not provide double buffering");
 
-        int depthbuffer_attributes [] = {GLX_RGBA, GLX_DEPTH_SIZE,1, None};
+        int depthbuffer_attributes [] = { GLX_RGBA, GLX_DEPTH_SIZE, 1, None };
           
         if (!(xvis=glXChooseVisual (dpy, screen_num, depthbuffer_attributes)))
         {
           Report (CS_REPORTER_SEVERITY_WARNING,
             "Graphics display does not support a depth buffer");
 
-          int color_attributes[] =
-            { GLX_RGBA, GLX_RED_SIZE,4, GLX_BLUE_SIZE,4,GLX_GREEN_SIZE,4,None };
+          int color_attributes[] = { GLX_RGBA, GLX_RED_SIZE, 4, GLX_BLUE_SIZE,
+            4, GLX_GREEN_SIZE, 4, None };
 
-          if (!(xvis=glXChooseVisual(dpy, screen_num, color_attributes)))
+          if (!(xvis=glXChooseVisual (dpy, screen_num, color_attributes)))
           {
             Report (CS_REPORTER_SEVERITY_WARNING,
               "Graphics display does not support at least 12 bit color");
@@ -336,8 +360,7 @@ void csGraphics2DGLX::GetCurrentAttributes ()
 {
   hardwareaccelerated = glXIsDirect (dpy, active_GLContext);
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Video driver GL/X version %s",
-    hardwareaccelerated ? "(direct renderer)" : 
-    "(indirect renderer)");
+    hardwareaccelerated ? "(direct renderer)" : "(indirect renderer)");
   if (!hardwareaccelerated)
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
@@ -351,23 +374,23 @@ void csGraphics2DGLX::GetCurrentAttributes ()
     xvis->visualid, Depth, visual_class_name (xvis->c_class));
 
   int ctype, frame_buffer_depth, size_depth_buffer, level;
-  glXGetConfig(dpy, xvis, GLX_RGBA, &ctype);
-  //glXGetConfig(dpy, xvis, GLX_DOUBLEBUFFER, &double_buffer);
-  glXGetConfig(dpy, xvis, GLX_BUFFER_SIZE, &frame_buffer_depth);
-  glXGetConfig(dpy, xvis, GLX_DEPTH_SIZE, &size_depth_buffer);
-  glXGetConfig(dpy, xvis, GLX_LEVEL, &level);
+  glXGetConfig (dpy, xvis, GLX_RGBA, &ctype);
+  //glXGetConfig (dpy, xvis, GLX_DOUBLEBUFFER, &double_buffer);
+  glXGetConfig (dpy, xvis, GLX_BUFFER_SIZE, &frame_buffer_depth);
+  glXGetConfig (dpy, xvis, GLX_DEPTH_SIZE, &size_depth_buffer);
+  glXGetConfig (dpy, xvis, GLX_LEVEL, &level);
 
   int r_bits, g_bits, b_bits, color_bits = 0;
   int alpha_bits = 0;
   if (ctype)
   {
-    glXGetConfig(dpy, xvis, GLX_RED_SIZE, &r_bits);
+    glXGetConfig (dpy, xvis, GLX_RED_SIZE, &r_bits);
     color_bits += r_bits;
-    glXGetConfig(dpy, xvis, GLX_GREEN_SIZE, &g_bits);
+    glXGetConfig (dpy, xvis, GLX_GREEN_SIZE, &g_bits);
     color_bits += g_bits;
-    glXGetConfig(dpy, xvis, GLX_BLUE_SIZE, &b_bits);
+    glXGetConfig (dpy, xvis, GLX_BLUE_SIZE, &b_bits);
     color_bits += b_bits;
-    glXGetConfig(dpy, xvis, GLX_ALPHA_SIZE, &alpha_bits);
+    glXGetConfig (dpy, xvis, GLX_ALPHA_SIZE, &alpha_bits);
   }
 
   // Report Info
@@ -375,22 +398,29 @@ void csGraphics2DGLX::GetCurrentAttributes ()
   currentFormat[glpfvAlphaBits] = alpha_bits;
   currentFormat[glpfvDepthBits] = size_depth_buffer;
   int stencilSize = 0;
-  glXGetConfig(dpy, xvis, GLX_STENCIL_SIZE, &stencilSize);
+  glXGetConfig (dpy, xvis, GLX_STENCIL_SIZE, &stencilSize);
   currentFormat[glpfvStencilBits] = stencilSize;
   int accumBits = 0;
   int accumAlpha = 0;
   {
     int dummy;
-    glXGetConfig(dpy, xvis, GLX_ACCUM_RED_SIZE, &dummy);
+    glXGetConfig (dpy, xvis, GLX_ACCUM_RED_SIZE, &dummy);
     accumBits += dummy;
-    glXGetConfig(dpy, xvis, GLX_ACCUM_GREEN_SIZE, &dummy);
+    glXGetConfig (dpy, xvis, GLX_ACCUM_GREEN_SIZE, &dummy);
     accumBits += dummy;
-    glXGetConfig(dpy, xvis, GLX_ACCUM_BLUE_SIZE, &dummy);
+    glXGetConfig (dpy, xvis, GLX_ACCUM_BLUE_SIZE, &dummy);
     accumBits += dummy;
-    glXGetConfig(dpy, xvis, GLX_ACCUM_ALPHA_SIZE, &accumAlpha);
+    glXGetConfig (dpy, xvis, GLX_ACCUM_ALPHA_SIZE, &accumAlpha);
   }
   currentFormat[glpfvAccumColorBits] = accumBits;
   currentFormat[glpfvAccumAlphaBits] = accumAlpha;
+  
+  if (ext.CS_GLX_ARB_multisample)
+  {
+    int v;
+    glXGetConfig (dpy, xvis, GLX_SAMPLES_ARB, &v);
+    currentFormat[glpfvMultiSamples] = v;
+  }
 
   if (ctype)
   {
@@ -426,7 +456,6 @@ void csGraphics2DGLX::Print (csRect const* /*area*/)
 {
   glXSwapBuffers (dpy,window);
 }
-
 
 void csGraphics2DGLX::SetFullScreen (bool yesno)
 {
