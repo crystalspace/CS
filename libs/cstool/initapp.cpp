@@ -116,11 +116,11 @@ iObjectRegistry* csInitializer::CreateEnvironment (
     {
       if (CreatePluginManager(r) &&
           CreateEventQueue(r) &&
-          CreateThreadManager(r) &&
           CreateVirtualClock(r) &&
           CreateCommandLineParser(r, argc, argv) &&
           CreateVerbosityManager(r) &&
           CreateConfigManager(r) &&
+          CreateThreadManager(r) &&
           CreateInputDrivers(r) &&
 	        CreateStringSet (r) &&
 	  CreateSystemOpenManager (r) &&
@@ -368,6 +368,12 @@ bool csInitializer::SetupConfigManager (
       cmdlineConfig->ParseCommandLine (cmdline, VFS);
       Config->AddDomain (cmdlineConfig, iConfigManager::ConfigPriorityCmdLine);
     }
+  }
+
+  // Init the threadmanager using this config.
+  {
+    csRef<iThreadManager> tman = csQueryRegistry<iThreadManager> (r);
+    tman->Init(Config);
   }
 
   config_done = true;

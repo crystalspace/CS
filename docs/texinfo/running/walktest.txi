@@ -3,7 +3,6 @@
 @section Walktest, the Basic Test Application
 @cindex Walktest
 @cindex Test Application
-@cindex @code{-relight}
 @cindex @file{/lev/flarge/world}
 
 This is the quintessential test application for the project, and the
@@ -31,13 +30,7 @@ Walktest is probably the first program to run once you have compiled Crystal
 Space.  It takes a set of command line options, and the name of a map to open.
 By default, it will open the @file{/lev/castle} directory.
 
-If this is the first time running Walktest (or any Crystal Space application),
-you will need to recalculate the lightmaps for the level.  The option
-@samp{-relight} does this.  Also use this if you modify a map such that its
-geometry has changed.
-
-The other most useful options are @samp{-help} to list available options, and
-@samp{-video=software} or @samp{-video=opengl} to change the renderer used.
+The most useful option is @samp{-help} to list available options.
 
 Once Walktest is running, you can move about the world using the mouse and
 arrow keys, similar to many First Person Shooter games.  The movement commands
@@ -134,15 +127,6 @@ Disable all lightmaps and lighting so that everything is fullbright
 (default off).
 @item -fov=<val>
 Field of Vision (0).
-@item -[no]relight
-Force/inhibit recalculation of lightmaps (no) This must be used the first time
-a map is run, and if there have been enough changes to the geometry to require
-all the lightmaps to be recalculated.  For a large map, this can take a long
-time.  The generated lightmaps are cached in the directory containing the
-@file{world} map, but the engine nolonger automatically regenerates them if
-they are missing.
-@item -lightqual=<val>
-Lighting quality (3).
 @end table
 
 @noindent
@@ -164,7 +148,7 @@ General options:
 @item -help
 Display a help message.
 @item -video=<s>
-The 3D rendering driver (opengl, software, @dots{}).
+The 3D rendering driver (opengl, @dots{}).
 @item -canvas=<s>
 The 2D canvas driver (asciiart, x2d, @dots{})
 @item -plugin=<s>

@@ -37,7 +37,6 @@
 #include "imesh/objmodel.h"
 #include "imap/loader.h"
 #include "imesh/particles.h"
-#include "imesh/lighting.h"
 #include "imesh/object.h"
 #include "imesh/partsys.h"
 #include "imesh/sprite3d.h"
@@ -435,9 +434,6 @@ void WalkTest::add_bot (float size, iSector* where, csVector3 const& pos,
     dyn = Sys->view->GetEngine ()->CreateLight ("",
     	pos, dyn_radius, csColor(r, g, b), CS_LIGHT_DYNAMICTYPE_DYNAMIC);
     where->GetLights ()->Add (dyn);
-    dyn->Setup ();
-    //@@@ BUG! Calling twice is needed.
-    dyn->Setup ();
     Sys->dynamic_lights.Push (dyn);
   }
   iMeshFactoryWrapper* tmpl = Sys->view->GetEngine ()->GetMeshFactories ()
@@ -605,7 +601,6 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
 	dyn->DecRef ();
       }
       dyn->SetCenter (v);
-      dyn->Setup ();
       if (ms->sprite) move_mesh (ms->sprite, s, v);
       if (Sys->mySound && ms->snd)
       {
@@ -639,7 +634,6 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
 	}
       }
       dyn->SetCutoffDistance (es->radius);
-      dyn->Setup ();
       break;
     }
     case DYN_TYPE_RANDOM:
@@ -658,7 +652,6 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
 		(rl->dyn_g1+7.*dyn->GetColor ().green)/8.,
 		(rl->dyn_b1+7.*dyn->GetColor ().blue)/8.));
       dyn->SetCenter (dyn->GetCenter () + csVector3 (0, rl->dyn_move_dir, 0));
-      dyn->Setup ();
       break;
     }
   }
@@ -699,9 +692,6 @@ void fire_missile ()
   	Sys->view->GetEngine ()->CreateLight ("", pos, 4, csColor (r, g, b),
 		CS_LIGHT_DYNAMICTYPE_DYNAMIC);
   Sys->view->GetCamera ()->GetSector ()->GetLights ()->Add (dyn);
-  dyn->Setup ();
-  // @@@ BUG!!! Calling twice is needed.
-  dyn->Setup ();
   Sys->dynamic_lights.Push (dyn);
 
   MissileStruct* ms = new MissileStruct;

@@ -189,8 +189,6 @@ class csGLGraphics3D : public scfImplementation3<csGLGraphics3D,
 private:
   //friend declarations
   friend class csGLBasicTextureHandle;
-  friend class csGLSuperLightmap;
-  friend class csGLRendererLightmap;
   friend class csGLTextureHandle;
   friend class csGLTextureManager;
 
@@ -736,8 +734,6 @@ public:
     unsigned char *, int, int);
   void RemoveHalo (csOpenGLHalo* halo);
   virtual float GetZBuffValue (int, int);
-
-  virtual void RemoveFromCache (iRendererLightmap*) { }  
 
   virtual bool PerformExtension (char const* command, ...);
   virtual bool PerformExtensionV (char const* command, va_list args);

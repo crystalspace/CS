@@ -39,8 +39,8 @@ struct iGraphics2D;
 struct iGraphics3D;
 struct iCacheManager;
 struct iMaterialWrapper;
-class csFrustumView;
-class csFrustumContext;
+//class csFrustumView;
+//class csFrustumContext;
 
 class csPolyTxtPlane;
 class csPolygon3D;
@@ -650,6 +650,7 @@ public:
    */
   bool WriteToCache (iFile* file, csPolygon3DStatic* spoly);
 
+#if 0
   /**
    * Fill the lightmap of this polygon according to the given light and
    * the frustum. The light is given in world space coordinates. The
@@ -704,6 +705,7 @@ public:
 	const csVector3& v_world2tex,
 	const csPlane3& world_plane,
 	csPolygon3DStatic* spoly);
+#endif
 };
 
 #endif // __CS_POLYGON_H__

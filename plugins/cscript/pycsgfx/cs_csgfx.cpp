@@ -3184,29 +3184,6 @@ SWIGINTERN PyObject *csShaderVariable_GetValue__SWIG_14(csShaderVariable *self){
 		return obj;
 	}
 
-SWIGINTERNINLINE PyObject *
-SWIG_From_unsigned_SS_int  (unsigned int value)
-{    
-  return SWIG_From_unsigned_SS_long  (value);
-}
-
-
-SWIGINTERN int
-SWIG_AsVal_unsigned_SS_int (PyObject * obj, unsigned int *val)
-{
-  unsigned long v;
-  int res = SWIG_AsVal_unsigned_SS_long (obj, &v);
-  if (SWIG_IsOK(res)) {
-    if ((v > UINT_MAX)) {
-      return SWIG_OverflowError;
-    } else {
-      if (val) *val = static_cast< unsigned int >(v);
-    }
-  }  
-  return res;
-}
-
-
 SWIGINTERN int
 SWIG_AsVal_bool (PyObject *obj, bool *val)
 {
@@ -8745,7 +8722,7 @@ SWIGINTERN PyObject *_wrap_csImageBase_HasMipmaps(PyObject *SWIGUNUSEDPARM(self)
   }
   arg1 = reinterpret_cast< csImageBase * >(argp1);
   result = (uint)((csImageBase const *)arg1)->HasMipmaps();
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -8759,7 +8736,7 @@ SWIGINTERN PyObject *_wrap_csImageBase_GetMipmap(PyObject *SWIGUNUSEDPARM(self),
   SwigValueWrapper< csRef<iImage > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -8770,7 +8747,7 @@ SWIGINTERN PyObject *_wrap_csImageBase_GetMipmap(PyObject *SWIGUNUSEDPARM(self),
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csImageBase_GetMipmap" "', argument " "1"" of type '" "csImageBase *""'"); 
   }
   arg1 = reinterpret_cast< csImageBase * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csImageBase_GetMipmap" "', argument " "2"" of type '" "uint""'");
   } 
@@ -8830,7 +8807,7 @@ SWIGINTERN PyObject *_wrap_csImageBase_HasSubImages(PyObject *SWIGUNUSEDPARM(sel
   }
   arg1 = reinterpret_cast< csImageBase * >(argp1);
   result = (uint)((csImageBase const *)arg1)->HasSubImages();
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -8844,7 +8821,7 @@ SWIGINTERN PyObject *_wrap_csImageBase_GetSubImage(PyObject *SWIGUNUSEDPARM(self
   SwigValueWrapper< csRef<iImage > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -8855,7 +8832,7 @@ SWIGINTERN PyObject *_wrap_csImageBase_GetSubImage(PyObject *SWIGUNUSEDPARM(self
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csImageBase_GetSubImage" "', argument " "1"" of type '" "csImageBase *""'"); 
   }
   arg1 = reinterpret_cast< csImageBase * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csImageBase_GetSubImage" "', argument " "2"" of type '" "uint""'");
   } 
@@ -10509,7 +10486,7 @@ SWIGINTERN PyObject *_wrap_csImageMemory_HasMipmaps(PyObject *SWIGUNUSEDPARM(sel
   }
   arg1 = reinterpret_cast< csImageMemory * >(argp1);
   result = (uint)((csImageMemory const *)arg1)->HasMipmaps();
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -10523,7 +10500,7 @@ SWIGINTERN PyObject *_wrap_csImageMemory_GetMipmap(PyObject *SWIGUNUSEDPARM(self
   SwigValueWrapper< csRef<iImage > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -10534,7 +10511,7 @@ SWIGINTERN PyObject *_wrap_csImageMemory_GetMipmap(PyObject *SWIGUNUSEDPARM(self
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csImageMemory_GetMipmap" "', argument " "1"" of type '" "csImageMemory *""'"); 
   }
   arg1 = reinterpret_cast< csImageMemory * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csImageMemory_GetMipmap" "', argument " "2"" of type '" "uint""'");
   } 
@@ -10565,7 +10542,7 @@ SWIGINTERN PyObject *_wrap_csImageMemory_SetMipmap(PyObject *SWIGUNUSEDPARM(self
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
@@ -10579,7 +10556,7 @@ SWIGINTERN PyObject *_wrap_csImageMemory_SetMipmap(PyObject *SWIGUNUSEDPARM(self
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csImageMemory_SetMipmap" "', argument " "1"" of type '" "csImageMemory *""'"); 
   }
   arg1 = reinterpret_cast< csImageMemory * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csImageMemory_SetMipmap" "', argument " "2"" of type '" "uint""'");
   } 

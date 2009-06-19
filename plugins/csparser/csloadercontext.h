@@ -47,22 +47,41 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool do_verbose;
     CS::Threading::Mutex collectionLock;
 
+    // Pre-parse data.
+    csArray<csString> availTextures;
+    csArray<csString> availMaterials;
+    csArray<csString> availMeshfacts;
+    csArray<csString> availSubmeshes;
+    csArray<csString> availMeshes;
+    csArray<csString> availLights;
+    CS::Threading::Mutex textureObjects;
+    CS::Threading::Mutex materialObjects;
+    CS::Threading::Mutex meshfactObjects;
+    CS::Threading::Mutex submeshObjects;
+    CS::Threading::Mutex meshObjects;
+    CS::Threading::Mutex lightObjects;
+
   public:
     csLoaderContext(iObjectRegistry* object_reg, iEngine* Engine, csThreadedLoader* loader,
       iCollection* collection,iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose);
     virtual ~csLoaderContext ();
 
     virtual iSector* FindSector (const char* name);
-    virtual iMaterialWrapper* FindMaterial(const char* name);
-    virtual iMaterialWrapper* FindNamedMaterial(const char* name,
-                                                const char *filename);
-    virtual iMeshFactoryWrapper* FindMeshFactory(const char* name);
+    virtual iMaterialWrapper* FindMaterial(const char* name, bool dontWaitForLoad = false);
+    virtual iMaterialWrapper* FindNamedMaterial(const char* name, const char *filename, bool dontWaitForLoad = false)
+    {
+      return FindMaterial(name, dontWaitForLoad);
+    }
+    virtual iMeshFactoryWrapper* FindMeshFactory(const char* name, bool dontWaitForLoad = false);
     virtual iMeshWrapper* FindMeshObject(const char* name);
-    virtual iTextureWrapper* FindTexture(const char* name);
-    virtual iTextureWrapper* FindNamedTexture(const char* name,
-                                              const char *filename);
+    virtual iTextureWrapper* FindTexture(const char* name, bool dontWaitForLoad = false);
+    virtual iTextureWrapper* FindNamedTexture(const char* name, const char *filename, bool dontWaitForLoad = false)
+    {
+      return FindTexture(name, dontWaitForLoad);
+    }
     virtual iLight* FindLight(const char *name);
     virtual iShader* FindShader(const char *name);
+    virtual iGeneralMeshSubMesh* FindSubmesh(iGeneralMeshState* state, const char* name);
     virtual bool CheckDupes() const { return true; }
     virtual iCollection* GetCollection() const { return collection; }
     virtual bool CurrentCollectionOnly() const { return false; }
@@ -71,6 +90,44 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     virtual bool GetVerbose() { return do_verbose; }
 
     void ReportNotify (const char* description, ...);
+
+    // Pre-parse functions.
+    void ParseAvailableTextures(iDocumentNode* doc);
+    void ParseAvailableMaterials(iDocumentNode* doc);
+    void ParseAvailableMeshfacts(iDocumentNode* doc);
+    void ParseAvailableSubmeshes(iDocumentNode* doc);
+    void ParseAvailableMeshes(iDocumentNode* doc, const char* prefix);
+    void ParseAvailableLights(iDocumentNode* doc);
+
+    inline bool FindAvailTexture(const char* name)
+    {
+      return availTextures.Find(name) != csArrayItemNotFound;
+    }
+
+    inline bool FindAvailMaterial(const char* name)
+    {
+      return availMaterials.Find(name) != csArrayItemNotFound;
+    }
+
+    inline bool FindAvailMeshFact(const char* name)
+    {
+      return availMeshfacts.Find(name) != csArrayItemNotFound;
+    }
+
+    inline bool FindAvailSubmesh(const char* name)
+    {
+      return availSubmeshes.Find(name) != csArrayItemNotFound;
+    }
+
+    inline bool FindAvailMeshObj(const char* name)
+    {
+      return availMeshes.Find(name) != csArrayItemNotFound;
+    }
+
+    inline bool FindAvailLight(const char* name)
+    {
+      return availLights.Find(name) != csArrayItemNotFound;
+    }
   };
 }
 CS_PLUGIN_NAMESPACE_END(csparser)

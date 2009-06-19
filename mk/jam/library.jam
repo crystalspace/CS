@@ -299,8 +299,9 @@ rule LibraryShared
   Depends $(target) : $(objects) ;
   $(libname)_CLEANEXTRA += $(target) ;
   Depends $(target) : $(deplibs) ;
-    
-  CFlags $(libname) : [ FDefines CS_$(libname:U)_LIB  ] ;
+  
+  local lib_define_prefix = $(LIBRARY_BUILD_DEFINE_PREFIX:E=$(PACKAGE_NAME:U)) ;
+  CFlags $(libname) : [ FDefines $(lib_define_prefix)_$(libname:U)_LIB  ] ;
   LFlags $(libname) : $(LINKLIBS) ;
     
   SystemLinkSharedLibrary $(libname) : $(target) : $(objects) $(deplibs) : $(linklib) ;

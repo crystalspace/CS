@@ -56,11 +56,6 @@ A @emph{TrueType} to Crystal Space font converter.
 @item csimagetool
 The Crystal Space image manipulator.
 
-@cindex @file{cslight}
-@cindex Applications, @file{cslight}
-@item cslight
-todo
-
 @cindex @file{docconv}
 @cindex Applications, @file{docconv}
 @item docconv

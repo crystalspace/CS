@@ -64,7 +64,7 @@ namespace Threading
     {
       delete allThreadState[i];
     }
-    delete allThreadState;
+    delete[] allThreadState;
   }
 
 
@@ -119,6 +119,24 @@ namespace Threading
           allThreadState[index]->jobFinished.Wait (threadStateMutex);
       }
 
+    }
+  }
+
+  void ThreadedJobQueue::PopAndRun()
+  {
+    csRef<iJob> job;
+    {
+      MutexScopedLock lock (jobMutex);
+      if(jobQueue.GetSize () > 0)
+      {
+        job = jobQueue.PopTop();
+      }
+    }
+    
+    if(job.IsValid())
+    {
+      job->Run ();
+      CS::Threading::AtomicOperations::Decrement (&outstandingJobs);
     }
   }
 

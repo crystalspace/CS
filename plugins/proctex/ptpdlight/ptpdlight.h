@@ -21,7 +21,6 @@
 #define __CS_PTPDLIGHT_H__
 
 #include "iengine/light.h"
-#include "imesh/lighting.h"
 #include "ivideo/texture.h"
 
 #include "csgeom/csrect.h"
@@ -58,9 +57,8 @@ public:
 class ProctexPDLightLoader;
 
 class ProctexPDLight : 
-  public scfImplementationExt1<ProctexPDLight, 
-                               csProcTexture,
-                               iLightingInfo>
+  public scfImplementationExt0<ProctexPDLight, 
+                               csProcTexture>
 {
 public:
   struct Lumel
@@ -315,13 +313,11 @@ public:
 
   /**\name iLightingInfo implementation
    * @{ */
-  void DisconnectAllLights ();
-  void InitializeDefault (bool /*clear*/) {}
-  void LightChanged (iLight* light);
-  void LightDisconnect (iLight* light);
-  void PrepareLighting () {}
-  bool ReadFromCache (iCacheManager* /*cache_mgr*/) { return true; }
-  bool WriteToCache (iCacheManager* /*cache_mgr*/) { return true; }
+  //void DisconnectAllLights ();
+  //void InitializeDefault (bool /*clear*/) {}
+  //void LightChanged (iLight* light);
+  //void LightDisconnect (iLight* light);
+  //void PrepareLighting () {}
   /** @} */
 
   virtual void UseTexture (iTextureWrapper*)

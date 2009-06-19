@@ -42,7 +42,7 @@ iSector* StdLoaderContext::FindSector (const char* name)
   return s;
 }
 
-iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename)
+iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename, bool dontWaitForLoad)
 {
   iMaterialWrapper* mat = Engine->FindMaterial(filename, 0);
   if (mat)
@@ -74,7 +74,8 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename)
 }
 
 iMaterialWrapper* StdLoaderContext::FindNamedMaterial (const char* name, 
-                                                       const char *filename)
+                                                       const char *filename,
+                                                       bool dontWaitForLoad)
 {
   iMaterialWrapper* mat = Engine->FindMaterial (name, 0);
   if (mat)
@@ -106,7 +107,7 @@ iMaterialWrapper* StdLoaderContext::FindNamedMaterial (const char* name,
 }
 
 
-iMeshFactoryWrapper* StdLoaderContext::FindMeshFactory (const char* name)
+iMeshFactoryWrapper* StdLoaderContext::FindMeshFactory (const char* name, bool dontWaitForLoad)
 {
   iMeshFactoryWrapper* fact = Engine->FindMeshFactory (name, 0);
   return fact;
@@ -141,7 +142,7 @@ iShader* StdLoaderContext::FindShader (const char *name)
   return shader;
 }
 
-iTextureWrapper* StdLoaderContext::FindTexture (const char* name)
+iTextureWrapper* StdLoaderContext::FindTexture (const char* name, bool dontWaitForLoad)
 {
   iTextureWrapper* result = Engine->GetTextureList ()->FindByName (name);
 
@@ -157,7 +158,8 @@ iTextureWrapper* StdLoaderContext::FindTexture (const char* name)
 }
 
 iTextureWrapper* StdLoaderContext::FindNamedTexture (const char* name,
-                                                     const char *filename)
+                                                     const char *filename,
+                                                     bool dontWaitForLoad)
 {
   iTextureWrapper* result = Engine->GetTextureList ()->FindByName (name);
 

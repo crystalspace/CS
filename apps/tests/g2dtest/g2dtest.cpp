@@ -73,8 +73,6 @@ class G2DTestSystemDriver
     stWindowResize,
     stCustomCursor,
     stAlphaTest,
-    stBackBufferON,
-    stBackBufferOFF,
     stTestUnicode1,
     stTestUnicode2,
     stTestFreetype,
@@ -96,9 +94,6 @@ class G2DTestSystemDriver
   // State stack top pointer
   int state_sptr;
 
-  // Pixel format
-  csPixelFormat pfmt;
-  bool pfmt_init;
   // Timer
   int timer;
   // some handy colors
@@ -159,9 +154,6 @@ private:
   void DrawWindowResizeScreen ();
   void DrawCustomCursorScreen ();
   void DrawAlphaTestScreen ();
-  void DrawBackBufferText ();
-  void DrawBackBufferON ();
-  void DrawBackBufferOFF ();
   void DrawUnicodeTest1 ();
   void DrawUnicodeTest2 ();
   void DrawFreetypeTest ();
@@ -185,7 +177,6 @@ G2DTestSystemDriver::G2DTestSystemDriver (int argc, char* argv[])
   state_sptr = 0;
   EnterState (stInit);
   SwitchBB = false;
-  pfmt_init = false;
 
   object_reg = csInitializer::CreateEnvironment (argc, argv);
 
@@ -282,20 +273,6 @@ void G2DTestSystemDriver::LeaveState ()
 
 void G2DTestSystemDriver::SetupFrame ()
 {
-  if (!pfmt_init)
-  {
-    pfmt_init = true;
-    pfmt = *myG2D->GetPixelFormat ();
-    white = MakeColor (255, 255, 255);
-    yellow = MakeColor (255, 255, 0);
-    green = MakeColor (0, 255, 0);
-    red = MakeColor (255, 0, 0);
-    blue = MakeColor (0, 0, 255);
-    gray = MakeColor (128, 128, 128);
-    dsteel = MakeColor (80, 100, 112);
-    black = MakeColor (0, 0, 0);
-  }
-
   if (state_sptr == 0)
   {
     EventOutlet->Broadcast (csevQuit (object_reg));
@@ -312,8 +289,6 @@ void G2DTestSystemDriver::SetupFrame ()
     case stWindowResize:
     case stCustomCursor:
     case stAlphaTest:
-    case stBackBufferON:
-    case stBackBufferOFF:
     case stTestUnicode1:
     case stTestUnicode2:
     case stTestFreetype:
@@ -395,28 +370,8 @@ void G2DTestSystemDriver::SetupFrame ()
 	case stAlphaTest:
           SetNormalCursor ();
           DrawAlphaTestScreen ();
-          EnterState (stBackBufferON);
-          EnterState (stWaitKey);
-          break;
-        case stBackBufferON:
-          myG2D->AllowResize (false);
-          EnterState (stBackBufferOFF);
-          if (myG2D->DoubleBuffer (true))
-          {
-            DrawBackBufferON ();
-            SwitchBB = true;
-            EnterState (stWaitKey);
-          }
-          break;
-        case stBackBufferOFF:
           EnterState (stTestUnicode1);
-	  //EnterState (stPixelClipTest);
-          if (myG2D->DoubleBuffer (false))
-          {
-            DrawBackBufferOFF ();
-            SwitchBB = true;
-            EnterState (stWaitKey);
-          }
+          EnterState (stWaitKey);
           break;
 	case stTestUnicode1:
 	  DrawUnicodeTest1 ();
@@ -535,12 +490,14 @@ bool G2DTestSystemDriver::HandleEvent (iEvent &Event)
 {
   if (myG2D && (Event.Name == SystemOpen))
   {
-            // Create a uniform palette: r(3)g(3)b(2)
-            int r,g,b;
-            for (r = 0; r < 8; r++)
-              for (g = 0; g < 8; g++)
-                for (b = 0; b < 4; b++)
-                  myG2D->SetRGB (r * 32 + g * 4 + b, r * 32, g * 32, b * 64);
+    white = MakeColor (255, 255, 255);
+    yellow = MakeColor (255, 255, 0);
+    green = MakeColor (0, 255, 0);
+    red = MakeColor (255, 0, 0);
+    blue = MakeColor (0, 0, 255);
+    gray = MakeColor (128, 128, 128);
+    dsteel = MakeColor (80, 100, 112);
+    black = MakeColor (0, 0, 0);
   }
   else if (myG2D && (Event.Name == CanvasResize))
   {
@@ -735,33 +692,12 @@ void G2DTestSystemDriver::DrawContextInfoScreen ()
 {
   SetFont (fontLarge);
 
-  WriteCentered (0,-16*3, white, -1, "Some information about graphics context");
-  WriteCentered (0,-16*2, gray,  -1, "Screen size: %d x %d", myG2D->GetWidth (), myG2D->GetHeight ());
-  csString pixfmt;
-  if (pfmt.PalEntries)
-    pixfmt.Format ("%d colors (Indexed)", pfmt.PalEntries);
-  else
-    pixfmt.Format ("R%dG%dB%dA%d", pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits, 
-      pfmt.AlphaBits);
-  WriteCentered (0,-16*1, gray,  -1, "Pixel format: %d BPP, %s", pfmt.PixelBytes * 8, 
-    pixfmt.GetData());
-
-  if (pfmt.PalEntries)
-    pixfmt = "not available";
-  else
-    pixfmt.Format (
-      "R[%08" PRIX32 "] "
-      "G[%08" PRIX32 "] "
-      "B[%08" PRIX32 "] "
-      "A[%08" PRIX32 "]",
-      pfmt.RedMask, pfmt.GreenMask, pfmt.BlueMask, pfmt.AlphaMask);
-  WriteCentered (0, 16*0, gray,  -1, "R/G/B/A masks: %s", pixfmt.GetData());
-
-  WriteCentered (0, 16*1, gray,  -1, "More than one backbuffer available: %s",
-    myG2D->GetDoubleBufferState () ? "yes" : "no");
+  WriteCentered (0,-16*2, white, -1, "Some information about graphics context");
+  WriteCentered (0,-16*1, gray,  -1, "Screen size: %d x %d", myG2D->GetWidth (), myG2D->GetHeight ());
+  WriteCentered (0,    0, gray,  -1, "Pixel format: %d BPP", myG2D->GetColorDepth());
   int MinX, MinY, MaxX, MaxY;
   myG2D->GetClipRect (MinX, MinY, MaxX, MaxY);
-  WriteCentered (0, 16*2, gray,  -1, "Current clipping rectangle: %d,%d - %d,%d", MinX, MinY, MaxX, MaxY);
+  WriteCentered (0, 16*1, gray,  -1, "Current clipping rectangle: %d,%d - %d,%d", MinX, MinY, MaxX, MaxY);
 
   SetFont (fontCourier);
   WriteCentered (2, 0, green, -1, "press any key to continue");
@@ -834,55 +770,6 @@ void G2DTestSystemDriver::SetCustomCursor ()
 void G2DTestSystemDriver::SetNormalCursor ()
 {
   myG2D->SetMouseCursor (csmcArrow);
-}
-
-void G2DTestSystemDriver::DrawBackBufferText ()
-{
-  SetFont (fontItalic);
-  WriteCentered (0,-16*5, white, -1, "DOUBLE BACK BUFFER TEST");
-  SetFont (fontLarge);
-  WriteCentered (0,-16*3, gray,  -1, "Now graphics canvas is in double-backbuffer mode");
-  WriteCentered (0,-16*2, gray,  -1, "You should see how background quickly switches");
-  WriteCentered (0,-16*1, gray,  -1, "between yellow and red colors.");
-
-  WriteCentered (0, 16*0, white, -1, "At the same time the text should stay still.");
-  WriteCentered (0, 16*1, gray,  -1, "If all these statements are correct, then the");
-  WriteCentered (0, 16*2, gray,  -1, "current canvas plugin have correctly implemented");
-  WriteCentered (0, 16*3, gray,  -1, "double-backbuffer support.");
-
-  WriteCentered (0, 16*5, green, -1, "BACK BUFFER NUMBER %d", myG2D->GetPage ());
-}
-
-void G2DTestSystemDriver::DrawBackBufferON ()
-{
-  myG2D->Clear (yellow);
-  DrawBackBufferText ();
-  myG2D->FinishDraw ();
-  myG2D->Print (0);
-
-  if (!myG2D->BeginDraw ())
-    return;
-  myG2D->Clear (red);
-  DrawBackBufferText ();
-}
-
-void G2DTestSystemDriver::DrawBackBufferOFF ()
-{
-  myG2D->Clear (white);
-  myG2D->FinishDraw ();
-  myG2D->Print (0);
-  if (!myG2D->BeginDraw ())
-    return;
-
-  myG2D->Clear (black);
-
-  SetFont (fontItalic);
-  WriteCentered (0,-16*3, white, -1, "SINGLE BACK BUFFER TEST");
-  SetFont (fontLarge);
-  WriteCentered (0,-16*1, gray,  -1, "Now graphics canvas is in single-backbuffer mode");
-  WriteCentered (0, 16*0, gray,  -1, "You should not see any flickering now; if this text");
-  WriteCentered (0, 16*1, gray,  -1, "flickers, this means that current canvas plugin has");
-  WriteCentered (0, 16*2, gray,  -1, "wrong support for single-backbuffer mode.");
 }
 
 void G2DTestSystemDriver::DrawCustomCursorScreen ()
@@ -1687,7 +1574,7 @@ int main (int argc, char *argv[])
   {
     csString canvas = cmdline->GetOption ("video");
     if (!canvas || !*canvas)
-      canvas = "crystalspace.graphics3d.software"; //CS_SOFTWARE_2D_DRIVER;
+      canvas = "crystalspace.graphics3d.opengl";
     else if (strncmp ("crystalspace.", canvas, 13))
     {
       canvas = "crystalspace.graphics3d." + canvas;

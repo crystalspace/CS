@@ -65,96 +65,6 @@ struct csPixelCoord
 };
 
 /**
- * Structure describing the pixel format.
- */
-struct csPixelFormat
-{
-  /**
-   * The masks to extract the color information from a pixel (truecolor mode
-   * only). Ignore the Mask and Shift fields of this structure if
-   * PalEntries != 0.
-   */
-  uint32 RedMask, GreenMask, BlueMask, AlphaMask;
-  /**
-   * The shifts to extract the color information from a pixel (truecolor mode
-   * only).
-   */
-  int RedShift, GreenShift, BlueShift, AlphaShift;
-  /// The number of significant bits for every color.
-  int RedBits, GreenBits, BlueBits, AlphaBits;
-
-  /**
-   * Number of palette entries. 0 for truecolor, else the number of palette
-   * entries (this number should be equal to 256 even if not all of these 256
-   * colors can be modified (like is the case in Windows)).
-   * Currently only 0 and 256 are supported here.
-   */
-  int PalEntries;
-
-  /**
-   * Number of bytes for every pixel.
-   * The only supported values currently are:<p>
-   * - 1: for palette mode (256 palette entries)
-   * - 2: for truecolor 15/16-bit mode (no palette entries)
-   * - 4: for truecolor 32-bit mode (no palette entries)
-   */
-  int PixelBytes;
-
-  /**
-   * Little helper function to complete a csPixelFormat
-   * structure given that the masks are correctly filled in.
-   */
-  void complete ()
-  {
-#define COMPUTE(comp)                                                   \
-    {                                                                   \
-      unsigned long i, tmp = comp##Mask;                                \
-      for (i = 0; tmp && !(tmp & 1); tmp >>= 1, i++) {}                 \
-      comp##Shift = i;                                                  \
-      for (i = 0; tmp & 1; tmp >>= 1, i++) {}                           \
-      comp##Bits = i;                                                   \
-    }
-    COMPUTE (Red);
-    COMPUTE (Green);
-    COMPUTE (Blue);
-    COMPUTE (Alpha);
-#undef COMPUTE
-  }
-};
-
-/// This structure is used for saving/restoring areas of screen
-struct csImageArea
-{
-  int x, y, w, h;
-  char *data;
-
-  inline csImageArea (int sx, int sy, int sw, int sh)
-  { x = sx; y = sy; w = sw; h = sh; data = 0; }
-};
-
-/**
- * When you create an offscreen canvas (CreateOffscreenCanvas()) then
- * you can use this callback to get informed when the texture has
- * been modified (FinishDraw() called) or a palette entry is modified.
- * \deprecated Deprecated in 1.3. Offscreen canvases are deprecated, use 
- *   iGraphics3D::SetRenderTarget()
- */
-struct CS_DEPRECATED_TYPE_MSG("Offscreen canvases are deprecated, use "
-  "iGraphics3D::SetRenderTarget()")
-iOffscreenCanvasCallback : public virtual iBase
-{
-  SCF_INTERFACE (iOffscreenCanvasCallback, 1, 0, 0);
-
-  /// FinishDraw has been called.
-  virtual void FinishDraw (iGraphics2D* canvas) = 0;
-  /// Palette entry has been modified.
-  virtual void SetRGB (iGraphics2D* canvas, int idx, int r, int g, int b) = 0;
-};
-
-// For CreateOffscreenCanvas()
-#include "csutil/deprecated_warn_off.h"
-
-/**
  * This is the interface for 2D renderer. The 2D renderer is responsible
  * for all 2D operations such as creating the window, switching pages,
  * returning pixel format and so on.
@@ -162,9 +72,6 @@ iOffscreenCanvasCallback : public virtual iBase
  * Main creators of instances implementing this interface:
  * - OpenGL/Windows canvas plugin (crystalspace.graphics2d.glwin32)
  * - OpenGL/X11 canvas plugin (crystalspace.graphics2d.glx)
- * - DirectDraw canvas plugin (crystalspace.graphics2d.directdraw)
- * - X11 canvas plugin (crystalspace.graphics2d.x2d)
- * - Memory canvas plugin (crystalspace.graphics2d.memory)
  * - Null 2D canvas plugin (crystalspace.graphics2d.null)
  * - Some others.
  * - Note that it is the 3D renderer that will automatically create
@@ -179,7 +86,7 @@ iOffscreenCanvasCallback : public virtual iBase
  */
 struct iGraphics2D : public virtual iBase
 {
-  SCF_INTERFACE (iGraphics2D, 3, 1, 0);
+  SCF_INTERFACE (iGraphics2D, 4, 0, 0);
   
   /// Open the device.
   virtual bool Open () = 0;
@@ -192,59 +99,23 @@ struct iGraphics2D : public virtual iBase
 
   /// Return the height of the framebuffer.
   virtual int GetHeight () = 0;
-
-  /// Get active videopage number (starting from zero)
-  virtual int GetPage () = 0;
-
-  /// Enable or disable double buffering; returns success status
-  virtual bool DoubleBuffer (bool Enable) = 0;
-
-  /// Get the double buffer state
-  virtual bool GetDoubleBufferState () = 0;
-
-  /// Return information about the pixel format.
-  virtual csPixelFormat const* GetPixelFormat () = 0;
+  
+  /// Return color depth of the framebuffer.
+  virtual int GetColorDepth () = 0;
 
   /**
-   * Return the number of bytes for every pixel.
-   * This function is equivalent to the PixelBytes field that
-   * you get from GetPixelFormat().
-   */
-  virtual int GetPixelBytes () = 0;
-
-  /**
-   * Return the number of palette entries that can be modified.
-   * This should return 0 if there is no palette (true color displays).
-   * This function is equivalent to the PalEntries field that you
-   * get from GetPixelFormat(). It is just a little bit easier to obtain
-   * this way.
-   */
-  virtual int GetPalEntryCount () = 0;
-
-  /// Get the palette (if there is one)
-  virtual csRGBpixel *GetPalette () = 0;
-
-  /**
-   * Set a color index to given R,G,B (0..255) values. Only use if there
-   * is a palette.
-   */
-  virtual void SetRGB (int i, int r, int g, int b) = 0;
-  /**
-   * Find an RGB (0..255) color. If there is a palette, this returns an
-   * entry index set with SetRGB(). If the returned value is -1, a
-   * suitable palette entry was not found.
-   * Without a palette, the actual color bytes are returned.
-   * <p>
+   * Find an RGB (0..255) color. The actual color bytes are returned.
+   *
    * Use returned value for color arguments in iGraphics2D.
    */
   virtual int FindRGB (int r, int g, int b, int a = 255) = 0;
 
   /**
-   * Retrieve the R,G,B tuple for a given color index.
+   * Retrieve the R,G,B tuple for a given color number.
    */
   virtual void GetRGB (int color, int& r, int& g, int& b) = 0;
   /**
-   * Retrieve the R,G,B,A tuple for a given color index.
+   * Retrieve the R,G,B,A tuple for a given color number.
    */
   virtual void GetRGB (int color, int& r, int& g, int& b, int& a) = 0;
   
@@ -304,27 +175,11 @@ struct iGraphics2D : public virtual iBase
   virtual void Blit (int x, int y, int width, int height,
     unsigned char const* data) = 0;
 
-  /// Returns the address of the pixel at the specified (x, y) coordinates.
-  virtual unsigned char *GetPixelAt (int x, int y) = 0;
-
   /// Query pixel R,G,B at given screen location
   virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB) = 0;
   /// As GetPixel() above, but with alpha
   virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB,
   	uint8 &oA) = 0;
-
-  /**
-   * Save a subarea of screen and return a handle to saved buffer.
-   * Storage is allocated in this call, you should either FreeArea()
-   * the handle after usage or RestoreArea () it.
-   */
-  virtual csImageArea *SaveArea (int x, int y, int w, int h) = 0;
-
-  /// Restore a subarea of screen saved with SaveArea()
-  virtual void RestoreArea (csImageArea *Area, bool Free) = 0;
-
-  /// Free storage allocated for a subarea of screen
-  virtual void FreeArea (csImageArea *Area) = 0;
 
   /**
    * Write a text string into the back buffer. A value of -1 for \p bg
@@ -423,22 +278,6 @@ struct iGraphics2D : public virtual iBase
   virtual const char* GetName () const = 0;
 
   /**
-   * Create an off-screen canvas so you can render on a given memory
-   * area. If depth==8 then the canvas will use palette mode. In that
-   * case you can do SetRGB() to initialize the palette.
-   * The callback interface (if given) is used to communicate from the
-   * canvas back to the caller. You can use this to detect when the
-   * texture data has changed for example.
-   * \deprecated Deprecated in 1.3. Offscreen canvases are deprecated, use 
-   *   iGraphics3D::SetRenderTarget()
-   */
-  CS_DEPRECATED_METHOD_MSG("Offscreen canvases are deprecated, use "
-    "iGraphics3D::SetRenderTarget()") 
-  virtual csPtr<iGraphics2D> CreateOffscreenCanvas (
-  	void* memory, int width, int height, int depth,
-	iOffscreenCanvasCallback* ofscb) = 0;
-
-  /**
    * Write a text string into the back buffer. A value of -1 for \p bg
    * color will not draw the background.
    * \remarks For transparent backgrounds, it is recommended to obtain a color
@@ -462,8 +301,6 @@ struct iGraphics2D : public virtual iBase
   /// Get the dimensions of the framebuffer.
   virtual void GetFramebufferDimensions (int& width, int& height) = 0;
 };
-
-#include "csutil/deprecated_warn_on.h"
 
 /** @} */
 

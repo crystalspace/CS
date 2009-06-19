@@ -45,7 +45,7 @@ AS_IF([test -n "$2"],
                 win32_dir=`echo $win32_dir | sed "s/\(.\):/\\/\\1/"`
                 AS_IF([test -d "$win32_dir"],
                     [AS_IF([test -n "$$1"], [$1="$$1$PATH_SEPARATOR"])
-                    cs_path="$$1$win32_dir$PATH_SEPARATOR$win32_dir/bin"])
+                    $1="$$1$win32_dir$PATH_SEPARATOR$win32_dir/bin"])
             done
             IFS=$my_IFS
             ;;
@@ -54,7 +54,7 @@ AS_IF([test -n "$2"],
         [my_IFS=$IFS; IFS=$PATH_SEPARATOR
         for cs_dir in $2; do
             AS_IF([test -n "$$1"], [$1="$$1$PATH_SEPARATOR"])
-            cs_path="$$1$cs_dir$PATH_SEPARATOR$cs_dir/bin"
+            $1="$$1$cs_dir$PATH_SEPARATOR$cs_dir/bin"
         done
         IFS=$my_IFS])])])
 

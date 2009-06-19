@@ -29,8 +29,6 @@
  
 #include "csutil/scf.h"
 
-#include "iengine/fview.h"
-
 class csColor;
 class csFlags;
 class csVector3;
@@ -38,7 +36,6 @@ class csVector4;
 class csBox3;
 
 struct iLight;
-struct iLightingInfo;
 struct iMovable;
 struct iObject;
 struct iSector;
@@ -151,7 +148,7 @@ enum csLightType
 
 /**
  * Set a callback which is called when this light color is changed.
- * The given context will be either an instance of iRenderView, iFrustumView,
+ * The given context will be either an instance of iRenderView
  * or else 0.
  *
  * This callback is used by:
@@ -416,24 +413,6 @@ struct iLight : public virtual iBase
   virtual uint32 GetLightNumber () const = 0;
 
   /**
-   * Add a mesh to this light. This is usually
-   * called during Setup() by meshes that are hit by the
-   * light.
-   */
-  virtual void AddAffectedLightingInfo (iLightingInfo* li) = 0; 
-
-  /**
-   * Remove a mesh from this light.
-   */
-  virtual void RemoveAffectedLightingInfo (iLightingInfo* li) = 0; 
-
-  /**
-   * For a dynamic light you need to call this to do the actual
-   * lighting calculations.
-   */
-  virtual void Setup () = 0;
-
-  /**
    * Get the shader variable context of the light.
    */
   virtual iShaderVariableContext* GetSVContext() = 0;
@@ -485,64 +464,6 @@ struct iLightList : public virtual iBase
 
   /// Find a light by its ID value (16-byte MD5).
   virtual iLight *FindByID (const char* id) const = 0;
-};
-
-/**
- * The iLightingProcessData interface can be implemented by a mesh
- * object so that it can attach additional information for the lighting
- * process.
- */
-struct iLightingProcessData : public virtual iBase
-{
-  SCF_INTERFACE (iLightingProcessData, 1, 0, 0);
-
-  /**
-   * Finalize lighting. This function is called by the lighting
-   * routines after performing CheckFrustum().
-   */
-  virtual void FinalizeLighting () = 0;
-};
-
-/**
- * The iLightingProcessInfo interface holds information for the lighting
- * system. You can query the userdata from iFrustumView for this interface
- * while in a 'portal' callback. This way you can get specific information
- * from the lighting system for your null-portal.
- */
-struct iLightingProcessInfo : public iFrustumViewUserdata
-{
-  SCF_INTERFACE(iLightingProcessInfo,2,0,0);
-  /// Get the light.
-  virtual iLight* GetLight () const = 0;
-
-  /// Return true if dynamic.
-  virtual bool IsDynamic () const = 0;
-
-  /// Set the current color.
-  virtual void SetColor (const csColor& col) = 0;
-
-  /// Get the current color.
-  virtual const csColor& GetColor () const = 0;
-
-  /**
-   * Attach some userdata to the process info. You can later query
-   * for this by doing QueryUserdata() with the correct SCF version
-   * number.
-   */
-  virtual void AttachUserdata (iLightingProcessData* userdata) = 0;
-
-  /**
-   * Query for userdata based on SCF type.
-   */
-  virtual csPtr<iLightingProcessData> QueryUserdata (scfInterfaceID id,
-  	int version) = 0;
-
-  /**
-   * Finalize lighting. This function is called by the lighting
-   * routines after performing CheckFrustum(). It will call
-   * FinalizeLighting() on all user datas.
-   */
-  virtual void FinalizeLighting () = 0;
 };
 
 /**

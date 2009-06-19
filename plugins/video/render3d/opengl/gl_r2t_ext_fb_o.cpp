@@ -98,7 +98,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
       initialAttachments |= 1 << a;
 
       csGLBasicTextureHandle* tex_mm = static_cast<csGLBasicTextureHandle*> (
-	attachment.texture->GetPrivateObject ());
+	(iTextureHandle*)attachment.texture);
       const GLenum texTarget = tex_mm->GetGLTextureTarget();
       const GLuint texHandle = tex_mm->GetHandle();
       switch (texTarget)
@@ -257,7 +257,7 @@ bool csGLRender2TextureEXTfbo::SetRenderTarget (iTextureHandle* handle,
                                                 csRenderTargetAttachment attachment)
 {
   csGLBasicTextureHandle* tex_mm = 
-    static_cast<csGLBasicTextureHandle*> (handle->GetPrivateObject ());
+    static_cast<csGLBasicTextureHandle*> ((iTextureHandle*)handle);
   if (!tex_mm->IsWasRenderTarget())
   {
     tex_mm->SetupAutoMipping();
@@ -482,8 +482,8 @@ void csGLRender2TextureEXTfbo::RegenerateTargetMipmaps (const WRTAG::RTA& target
 {
   if (!target.texture) return;
 
-  csGLBasicTextureHandle* tex_mm = 
-    static_cast<csGLBasicTextureHandle*> (target.texture->GetPrivateObject ());
+  csGLBasicTextureHandle* tex_mm = static_cast<csGLBasicTextureHandle*> (
+	(iTextureHandle*)target.texture);
   if (!(tex_mm->GetFlags() & CS_TEXTURE_NOMIPMAPS))
   {
     tex_mm->RegenerateMipmaps();

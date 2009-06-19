@@ -1,4 +1,3 @@
-%include "iengine/fview.h"
 %include "iengine/light.h"
 %include "iengine/sector.h"
 %include "iengine/engine.h"

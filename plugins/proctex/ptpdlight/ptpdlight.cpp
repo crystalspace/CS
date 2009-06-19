@@ -443,8 +443,6 @@ bool ProctexPDLight::PrepareAnim ()
     if (light.light)
     {
       success = true;
-      light.light->AddAffectedLightingInfo (
-        static_cast<iLightingInfo*> (this));
       dirtyLights.Add ((iLight*)light.light);
 
       LightColorState colorState;
@@ -498,50 +496,6 @@ void ProctexPDLight::Animate (csTicks current_time)
 
     csTicks endTime = csGetTicks();
     loader->RecordUpdateTime (endTime-startTime);
-  }
-}
-
-void ProctexPDLight::DisconnectAllLights ()
-{ 
-  lights.DeleteAll ();
-  lightBits.SetSize (0); 
-  tilesDirty.Clear ();
-  tilesDirty.FlipAllBits ();
-  dirtyLights.DeleteAll ();
-  lightColorStates.DeleteAll ();
-}
-
-void ProctexPDLight::LightChanged (iLight* light) 
-{ 
-  dirtyLights.Add (light);
-  const LightColorState& colorState = 
-    *lightColorStates.GetElementPointer (light);
-  const csColor& lightColor = light->GetColor ();
-  /* When the light color difference to the value last used at updating
-     is below the amount needed for a visible difference an update of the
-     texture because of this light isn't needed. */
-  if ((fabsf (colorState.lastColor.red - lightColor.red) 
-      >= colorState.minChangeThresh.red)
-    || (fabsf (colorState.lastColor.green - lightColor.green) 
-      >= colorState.minChangeThresh.green)
-    || (fabsf (colorState.lastColor.blue - lightColor.blue) 
-      >= colorState.minChangeThresh.blue))
-    state.Set (stateDirty); 
-}
-
-void ProctexPDLight::LightDisconnect (iLight* light)
-{
-  for (size_t i = 0; i < lights.GetSize(); i++)
-  {
-    if (lights[i].light == light)
-    {
-      lights.DeleteIndexFast (i);
-      lightColorStates.DeleteAll (light);
-      state.Set (stateDirty);
-      dirtyLights.Add (light);
-      lightBits.SetSize (lights.GetSize ());
-      return;
-    }
   }
 }
 

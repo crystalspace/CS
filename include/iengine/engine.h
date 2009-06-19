@@ -47,7 +47,6 @@ struct iCameraPositionList;
 struct iClipper2D;
 struct iCustomMatrixCamera;
 struct iDataBuffer;
-struct iFrustumView;
 struct iLight;
 struct iLightIterator;
 struct iLoaderContext;
@@ -82,24 +81,6 @@ struct iTextureWrapper;
 struct iThreadedLoader;
 
 struct iEngine;
-
-/** \name SetLightingCacheMode() settings
- * @{ */
-/**
- * Read the cache.
- */
-#define CS_ENGINE_CACHE_READ 1
-
-/**
- * Write the cache.
- */
-#define CS_ENGINE_CACHE_WRITE 2
-
-/**
- * Do not calculate lighting if not up-to-date. On by default.
- */
-#define CS_ENGINE_CACHE_NOUPDATE 4
-/** @} */
 
 /** \name RegisterRenderPriority() flags
  * @{ */
@@ -219,36 +200,6 @@ struct iEngine : public virtual iBase
    * don't have to call it.
    */
   virtual void PrepareMeshes () = 0;
-
-  /**
-   * Calculate all lighting information. Normally you shouldn't call
-   * this function directly, because it will be called by Prepare().
-   * If the optional 'collection' parameter is given then only lights will
-   * be recalculated for the given region.
-   * \param region If supplied, only calculate lighting for lights and objects
-   * in the given region.
-   * \param meter If supplied, the meter object will be called back
-   * periodically to report the progress of engine lighting calculation.
-   */
-  virtual void ShineLights (iCollection* base = 0,
-  	iProgressMeter* meter = 0) = 0;
-
-  /**
-   * Set the mode for the lighting cache (combination of CS_ENGINE_CACHE_???).
-   * Default is #CS_ENGINE_CACHE_READ | #CS_ENGINE_CACHE_NOUPDATE.
-   * \param mode 
-   *  - #CS_ENGINE_CACHE_READ: Read the cache.
-   *  - #CS_ENGINE_CACHE_WRITE: Write the cache.
-   *  - #CS_ENGINE_CACHE_NOUPDATE: Don't update lighting automatically
-   *     if it is not up-to-date. This is on by default. If you disable
-   *     this then lighting will be calculated even if CS_ENGINE_CACHE_WRITE
-   *     is not set which means that the resulting calculation is not
-   *     written to the cache.
-   */
-  virtual void SetLightingCacheMode (int mode) = 0;
-
-  /// Get the mode for the lighting cache.
-  virtual int GetLightingCacheMode () = 0;
 
   /**
    * Set the cache manager that the engine will use. If this is not
@@ -1196,14 +1147,6 @@ struct iEngine : public virtual iBase
    */
   virtual csPtr<iMeshWrapperIterator> GetVisibleMeshes (iSector* sector,
     const csFrustum& frustum) = 0;
-
-  /**
-   * Create a iFrustumView instance that you can give to
-   * iVisibilityCuller->CastShadows(). You can initialize that
-   * instance so that your own function is called for every object
-   * that is being visited.
-   */
-  virtual csPtr<iFrustumView> CreateFrustumView () = 0;
 
   /**
    * Create an object watcher instance that you can use to watch

@@ -92,14 +92,6 @@ csLight::~csLight ()
     engine->RemoveHalo (this);
   delete halo;
   delete[] light_id;
-
-  LightingInfo::GlobalIterator it(lightinginfos.GetIterator());
-  while (it.HasNext ())
-  {
-    csRef<iLightingInfo> linfo = it.Next ();
-    linfo->LightDisconnect (this);
-  }
-  lightinginfos.DeleteAll ();
 }
   
 csShaderVariable* csLight::GetPropertySV (
@@ -113,20 +105,6 @@ void csLight::SelfDestruct ()
 {
   if (GetSector ())
     GetSector ()->GetLights ()->Remove ((iLight*)this);
-}
-
-
-void csLight::AddAffectedLightingInfo (iLightingInfo* li)
-{
-  csRef<iLightingInfo> p(li);
-  if (!lightinginfos.In (p))
-    lightinginfos.AddNoTest(p);
-}
-
-void csLight::RemoveAffectedLightingInfo (iLightingInfo* li)
-{
-  csRef<iLightingInfo> p(li);
-  lightinginfos.Delete (p);
 }
 
 const char* csLight::GenerateUniqueID ()
@@ -340,13 +318,6 @@ void csLight::SetColor (const csColor& col)
     GetPropertySV (csLightShaderVarCache::lightSpecular)->SetValue (col);
   }
   lightnr++;
-
-  LightingInfo::GlobalIterator it(lightinginfos.GetIterator());
-  while (it.HasNext ())
-  {
-    csRef<iLightingInfo> linfo = it.Next ();
-    linfo->LightChanged (this);
-  }
 }
 
 
@@ -461,19 +432,6 @@ iFlareHalo *csLight::CreateFlareHalo ()
 
 //---------------------------------------------------------------------------
 
-static void object_light_func (iMeshWrapper *mesh, iFrustumView *lview,
-  bool vis)
-{
-  // @@@ Note: In case of dynamic light and static lod we probably only want
-  // to calculate lighting on the currently visible mesh. Have to think on
-  // how to do that exactly.
-
-  if (!vis) return;
-  iShadowReceiver* receiver = mesh->GetShadowReceiver ();
-  if (receiver)
-    receiver->CastShadows (mesh->GetMovable (), lview);
-}
-
 iSector* csLight::GetFullSector ()
 {
   iSector* s = GetSector ();
@@ -491,78 +449,6 @@ iSector* csLight::GetFullSector ()
     parent = parent->GetParent ();
   }
   return 0;
-}
-
-void csLight::CalculateLighting ()
-{
-  csFrustumView lview;
-  csFrustumContext *ctxt = lview.GetFrustumContext ();
-
-  LightingInfo::GlobalIterator it(lightinginfos.GetIterator());
-  while (it.HasNext ())
-  {
-    csRef<iLightingInfo> linfo = it.Next ();
-    linfo->LightDisconnect (this);
-  }
-  lightinginfos.Empty ();
-
-  lview.SetObjectFunction (object_light_func);
-  lview.SetRadius (GetCutoffDistance ());
-  lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
-  lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
-
-  csRef<csLightingProcessInfo> lpi;
-  lpi.AttachNew (new csLightingProcessInfo (
-        this, dynamicType == CS_LIGHT_DYNAMICTYPE_DYNAMIC));
-  lview.SetUserdata (lpi);
-
-  ctxt->SetNewLightFrustum (new csFrustum (GetFullCenter ()));
-  ctxt->GetLightFrustum ()->MakeInfinite ();
-
-  iSector* sect = GetFullSector ();
-  if (!sect) return;	// Do nothing.
-
-  if (dynamicType == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
-  {
-    csRef<iMeshWrapperIterator> it = engine->GetNearbyMeshes (
-      sect, GetFullCenter (), GetCutoffDistance ());
-    while (it->HasNext ())
-    {
-      iMeshWrapper* m = it->Next ();
-      iShadowReceiver* receiver = m->GetShadowReceiver ();
-      if (receiver)
-      {
-        receiver->CastShadows (m->GetMovable (), &lview);
-      }
-    }
-  }
-  else
-  {
-    sect->CheckFrustum ((iFrustumView *) &lview);
-    lpi->FinalizeLighting ();
-  }
-}
-
-void csLight::CalculateLighting (iMeshWrapper *th)
-{
-  csFrustumView lview;
-  csFrustumContext *ctxt = lview.GetFrustumContext ();
-  lview.SetObjectFunction (object_light_func);
-  lview.SetRadius (GetCutoffDistance ());
-  lview.SetShadowMask (CS_ENTITY_NOSHADOWS, 0);
-  lview.SetProcessMask (CS_ENTITY_NOLIGHTING, 0);
-
-  csRef<csLightingProcessInfo> lpi;
-  lpi.AttachNew (new csLightingProcessInfo (
-      this, dynamicType == CS_LIGHT_DYNAMICTYPE_DYNAMIC));
-  lview.SetUserdata (lpi);
-
-  ctxt->SetNewLightFrustum (new csFrustum (GetFullCenter ()));
-  ctxt->GetLightFrustum ()->MakeInfinite ();
-
-  lview.CallObjectFunction (th, true);
-
-  lpi->FinalizeLighting ();
 }
 
 csBox3 csLight::GetBBox () const
@@ -679,48 +565,6 @@ int csLightList::Find (iLight *obj) const
 iLight *csLightList::FindByName (const char *Name) const
 {
   return lights_hash.Get (Name, 0);
-}
-
-// --- csLightingProcessInfo --------------------------------------------------
-
-csLightingProcessInfo::csLightingProcessInfo (csLight* light, bool dynamic)
-  : scfImplementationType (this),
-  light (light), dynamic (dynamic), color (light->GetColor ())
-{
-}
-
-csLightingProcessInfo::~csLightingProcessInfo()
-{
-}
-
-void csLightingProcessInfo::AttachUserdata (iLightingProcessData* userdata)
-{
-  userdatas.Push (userdata);
-}
-
-csPtr<iLightingProcessData> csLightingProcessInfo::QueryUserdata (
-  scfInterfaceID id, int version)
-{
-  size_t i;
-  for (i = 0 ; i < userdatas.GetSize () ; i++)
-  {
-    iLightingProcessData* ptr = (iLightingProcessData*)(
-      userdatas[i]->QueryInterface (id, version));
-    if (ptr)
-    {
-      return csPtr<iLightingProcessData> (ptr);
-    }
-  }
-  return 0;
-}
-
-void csLightingProcessInfo::FinalizeLighting ()
-{
-  size_t i;
-  for (i = 0 ; i < userdatas.GetSize () ; i++)
-  {
-    userdatas[i]->FinalizeLighting ();
-  }
 }
 
 // ---------------------------------------------------------------------------

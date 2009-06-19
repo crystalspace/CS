@@ -40,10 +40,8 @@ information, please visit the Related Projects page:
 @code{http://www.crystalspace3d.org/main/Projects_Using_CS}
 @end iftex
 
-Crystal Space includes both a hardware (OpenGL) and software 3D
-renderer.  For decent performance in the software renderer, a reasonably
-modern machine should be used.  With an OpenGL 3D card, Crystal Space can
-really shine.
+Crystal Space includes both a hardware (OpenGL) and null renderer (this
+last one is mostly for server usage).
 
 There is a very active list of developers working to make Crystal Space as
 usable as possible, so things are improving constantly.

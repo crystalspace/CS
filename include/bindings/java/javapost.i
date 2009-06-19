@@ -19,31 +19,40 @@
 #ifdef SWIGJAVA
 
 #ifndef CS_MINI_SWIG
-%{
-    static JavaVM * _the_jvm = 0;
-%}
+
 
 %template(scfJEventHandler) scfImplementation1<_csJEventHandler, iEventHandler >;
 %inline %{
-
-	struct _csJEventHandler : public scfImplementation1<_csJEventHandler, 
-							    iEventHandler>
+	struct _csJEventHandler : public scfImplementation1<_csJEventHandler, iEventHandler> 
 	{
-		_csJEventHandler () : scfImplementationType (this), my_jobject(0)
+		_csJEventHandler () : scfImplementationType (this), my_jobject(0), event_class(0), event_ctr_mid(0), handle_event_mid(0) 
 		{
+            		JNIEnv * env = jni_env_getter->getJNIEnv();
+			if (env != 0) 
+			{
+				event_class = (jclass)env->NewGlobalRef(env->FindClass("org/crystalspace3d/iEvent"));
+				jclass handler_class = env->FindClass("org/crystalspace3d/csJEventHandler");
+				event_ctr_mid = env->GetMethodID(event_class, "<init>", "(JZ)V");
+				handle_event_mid = env->GetMethodID(handler_class, "HandleEvent", "(Lorg/crystalspace3d/iEvent;)Z");
+			}
+
 		}
-		virtual ~_csJEventHandler ()
-        	{
-            		JNIEnv * env = 0;
-            		_the_jvm->AttachCurrentThread((void **)&env, NULL);
-            		env->DeleteGlobalRef(my_jobject);
+		virtual ~_csJEventHandler () 
+		{
+            		JNIEnv * env = jni_env_getter->getJNIEnv();
+			if (env != 0) 
+			{
+	            		env->DeleteGlobalRef(my_jobject);
+	            		env->DeleteGlobalRef(event_class);
+			}
+			delete jni_env_getter;
 		}
         	static jobject _csJEventHandler_jobject;
-        	void _importJEventHandler ()
-        	{
+        	void _importJEventHandler () 
+		{
             		my_jobject = _csJEventHandler_jobject;
         	}
-		virtual bool HandleEvent (iEvent & event)
+		virtual bool HandleEvent (iEvent & event) 
 		{
             		try
             		{
@@ -51,32 +60,35 @@
             		}
             		catch (...)
             		{
-                		JNIEnv * env = 0;
-                		_the_jvm->AttachCurrentThread((void **)&env, NULL);
-                		env->ExceptionClear();
+				JNIEnv * env = jni_env_getter->getJNIEnv();
+                		if (env != 0) {
+					env->ExceptionClear();
+				}
             		}
             		return false;
         	}
-        	bool _HandleEvent (iEvent & event)
-        	{
-            		JNIEnv * env = 0;
-            		_the_jvm->AttachCurrentThread((void **)&env, NULL);
-            		jclass event_class = env->FindClass("org/crystalspace3d/iEvent");
-            		jclass handler_class = env->FindClass("org/crystalspace3d/csJEventHandler");
-            		jmethodID event_ctr_mid = env->GetMethodID(event_class, "<init>", "(JZ)V");
-            		jmethodID handle_event_mid = env->GetMethodID(handler_class, "HandleEvent", "(Lorg/crystalspace3d/iEvent;)Z");
-            		jlong cptr = 0;
-            		*(iEvent **)&cptr = &event; 
-            		jobject event_object = env->NewObject(event_class, event_ctr_mid, cptr, false);
-            		if (!event_object)
-                		return false;
-            		jboolean result = env->CallBooleanMethod(my_jobject, handle_event_mid, event_object);
-            		return result;
+        	bool _HandleEvent (iEvent & event) 
+		{
+            		JNIEnv * env = jni_env_getter->getJNIEnv();
+			if (env != 0) 
+			{
+				jlong cptr = 0;
+				*(iEvent **)&cptr = &event; 
+				jobject event_object = env->NewObject(event_class, event_ctr_mid, cptr, false);
+				if (!event_object)
+					return false;
+				jboolean result = env->CallBooleanMethod(my_jobject, handle_event_mid, event_object);
+				return result;
+			}
+			return false;
 		}
     		CS_EVENTHANDLER_NAMES("crystalspace.java")
     		CS_EVENTHANDLER_NIL_CONSTRAINTS
-	private:
+		private:
 		jobject my_jobject;
+		jclass event_class;
+		jmethodID event_ctr_mid;
+		jmethodID handle_event_mid;
 	};
 %}
 #endif // CS_MINI_SWIG
@@ -97,10 +109,8 @@
     }
                                                                                                               
     JNIEXPORT void JNICALL Java_org_crystalspace3d_csJEventHandler__1exportJEventHandler
-        (JNIEnv * env, jclass, jobject obj)
+        (JNIEnv * env, jclass, jobject obj) 
     {
-        if (!_the_jvm)
-            env->GetJavaVM(&_the_jvm);
         _csJEventHandler::_csJEventHandler_jobject = env->NewGlobalRef(obj);
     }
 

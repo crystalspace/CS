@@ -29,65 +29,21 @@
 #include "lghtmap.h"
 #include "polyrender.h"
 
-struct iFrustumView;
 struct iMaterialHandle;
 struct iPolygon3D;
 struct iLight;
 struct csRGBpixel;
-struct iFrustumView;
 class csMatrix3;
 class csVector3;
 class csVector2;
 class csColor;
 class csFrustumContext;
 
-struct csLightingPolyTexQueue;
 class csPolygon3D;
 class csPolygon3DStatic;
 class csPolyTexture;
 class csLightMap;
 class csLightPatch;
-
-/**
- * This is user-data for iFrustumView for the lighting process.
- * It represents a queue holding references to csPolyTexture
- * for all polygons that were hit by a light during the lighting
- * process.
- */
-struct csLightingPolyTexQueue : 
-  public scfImplementation1<csLightingPolyTexQueue, 
-			    iLightingProcessData>
-{
-private:
-  // Vector containing csPolygonTexture pointers.
-  csArray<csPolyTexture*> polytxts;
-  csArray<csPolygon3D*> polygons;
-  iLight* light;
-
-public:
-  csLightingPolyTexQueue (iLight* light);
-  virtual ~csLightingPolyTexQueue ();
-
-  /**
-   * Add a csPolyTexture to the queue. Only call this when the
-   * polytexture is not already there! A csPolyTexture should be
-   * added to the queue when it gets a shadow_bitmap.
-   */
-  void AddPolyTexture (csPolyTexture* pt, csPolygon3D* polygon);
-
-  /**
-   * Update all lightmaps or shadowmaps mentioned in the queue.
-   */
-  void UpdateMaps (iLight* light, const csVector3& lightpos,
-  	const csColor& lightcolor);
-
-  /// Finalize lighting.
-  virtual void FinalizeLighting ()
-  {
-    UpdateMaps (light, light->GetMovable ()->GetFullPosition (),
-    	light->GetColor ());
-  }
-};
 
 /**
  * This class represents a shadow-bitmap. It is used while calculating
@@ -241,9 +197,6 @@ class csPolyTexture
   friend class csPolygon3D;
 
 private:
-  /// Lightmap for the renderer.
-  csRef<iRendererLightmap> rlm;
-
   /// LightMap.
   csLightMap* lm;
   /**
@@ -273,7 +226,6 @@ public:
   ~csPolyTexture ();
 
   void SetTextureMapping (csPolyTextureMapping* mapping);
-  void SetRendererLightmap (iRendererLightmap* rlm);
 
   /**
    * Set the lightmap for this polytexture . Can also be used to clear
@@ -289,6 +241,7 @@ public:
    */
   void InitLightMaps ();
 
+#if 0
   /**
    * Update the lightmap for the given light.
    * 'vis' will be false if the polygon is totally shadowed. In this
@@ -303,6 +256,7 @@ public:
 	const csVector3& v_world2tex,
 	const csPlane3& subpoly_plane,
 	csPolygon3DStatic* spoly);
+#endif
 
   /**
    * Update the lightmap of this polygon using the current shadow-bitmap
@@ -351,10 +305,6 @@ public:
 	csVector3& v_world2tex);
 
   //iMaterialHandle *GetMaterialHandle ();
-  iRendererLightmap* GetRendererLightmap () const
-  {
-    return rlm;
-  }
 
   /// Get light version.
   uint32 GetLightVersion () const { return light_version; }

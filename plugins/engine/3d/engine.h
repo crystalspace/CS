@@ -251,14 +251,6 @@ public:
   virtual void PrepareTextures ();
   virtual void PrepareMeshes ();
 
-  virtual void ShineLights (iCollection* base = 0, 
-    iProgressMeter* meter = 0);
-
-  virtual void SetLightingCacheMode (int mode)
-  { lightmapCacheMode = mode; }
-  virtual int GetLightingCacheMode ()
-  { return lightmapCacheMode; }
-
   virtual void SetCacheManager (iCacheManager* cache_mgr);
   virtual void SetVFSCacheManager (const char* vfspath = 0);
 
@@ -390,7 +382,7 @@ public:
 	iDataBuffer* input, iSector* sector, const csVector3& pos);
 
   THREADED_CALLABLE_DECL1(csEngine, AddMeshAndChildren, csThreadReturn, iMeshWrapper*, mesh,
-    HIGH, false, false);
+    MED, false, false);
 
   virtual csPtr<iMeshWrapperIterator> GetNearbyMeshes (iSector* sector,
     const csVector3& pos, float radius, bool crossPortals = true );
@@ -551,8 +543,6 @@ public:
   virtual csPtr<iMeshWrapperIterator> GetVisibleMeshes (iSector* sector,
     const csFrustum& frustum);
 
-  virtual csPtr<iFrustumView> CreateFrustumView ();
-
   virtual csPtr<iObjectWatcher> CreateObjectWatcher ();
 
   virtual iSharedVariableList* GetVariableList () const;
@@ -670,8 +660,7 @@ public:
   void SyncEngineListsNow(csRef<iThreadedLoader> loader)
   {
     csRef<iThreadReturn> itr;
-    csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(objectRegistry);
-    itr.AttachNew(new csThreadReturn(tm));
+    itr.AttachNew(new csThreadReturn(tman));
     SyncEngineListsTC(itr, loader, true);
   }
 
@@ -997,9 +986,6 @@ private:
   /// Store the current framenumber. Is incremented every Draw ()
   uint currentFrameNumber;
 
-    /// Option variable: force lightmap recalculation?
-  int lightmapCacheMode;
-
   /// Clear the Z-buffer every frame.
   bool clearZBuf;
 
@@ -1036,6 +1022,9 @@ private:
   csEventID CanvasResize;
   csEventID CanvasClose;
   csRef<iEventHandler> weakEventHandler;
+
+  /// Pointer to the thread manager.
+  csWeakRef<iThreadManager> tman;
 
   /// Array of new textures to be precached.
   csRefArray<iTextureWrapper> newTextures;

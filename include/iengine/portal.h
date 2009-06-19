@@ -37,7 +37,6 @@ class csTransform;
 class csVector3;
 class csSphere;
 
-struct iFrustumView;
 struct iMaterialWrapper;
 struct iMeshWrapper;
 struct iMovable;
@@ -123,7 +122,7 @@ struct iTextureHandle;
  * When a sector is missing this callback will be called. If this callback
  * returns false then this portal will not be traversed. Otherwise this
  * callback has to set up the destination sector and return true.
- * The given context will be either an instance of iRenderView, iFrustumView,
+ * The given context will be either an instance of iRenderView
  * or else 0.
  *
  * This callback is used by:
@@ -368,15 +367,6 @@ struct iPortal : public virtual iBase
    * not be traversed.
    */
   virtual bool CompleteSector (iBase* context) = 0;
-
-  /**
-   * Check frustum visibility of all polygons reachable through this portal.
-   * Alpha is the alpha value you'd like to use to pass through this
-   * portal (0 is no completely transparent, 100 is complete opaque).
-   * 't' is the transform from object to world (this2other).
-   */
-  virtual void CheckFrustum (iFrustumView* lview,
-	  const csReversibleTransform& t, int alpha) = 0;
 
   /**
    * Follow a beam through this portal and return the mesh and polygon index

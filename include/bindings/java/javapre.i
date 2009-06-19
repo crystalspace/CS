@@ -23,6 +23,51 @@
 
 %javaconst(1);
 
+%inline %{
+	struct JNIEnvGetter {
+		JNIEnvGetter() : m_jvm(0) {}
+		virtual ~JNIEnvGetter() {}
+		JNIEnv* getJNIEnv() 
+		{
+			JNIEnv * m_env = 0;
+			jint res = 0;
+			JavaVMInitArgs vm_args;
+			JavaVMOption options[1];
+			options[0].optionString = "";
+			vm_args.version = JNI_VERSION_1_2;
+			vm_args.options = options;
+			vm_args.nOptions = 1;
+			vm_args.ignoreUnrecognized = JNI_TRUE;
+			jint existingJvmReturned = 1;
+			if (m_jvm == 0) 
+			{
+				res = JNI_GetCreatedJavaVMs(&m_jvm, 1, &existingJvmReturned);
+			}
+			if (m_jvm != 0 && res == 0 && existingJvmReturned > 0 ) 
+			{
+				// Jvm already existed, get the env
+				res = m_jvm->GetEnv((void**)&m_env, vm_args.version);
+		
+				if ( res == JNI_EDETACHED )
+				{
+					res = m_jvm->AttachCurrentThread((void**)&m_env, 0);
+				}
+		
+				if ( res >= 0 ) 
+				{
+					return m_env;
+				}
+			}
+			return 0;
+		}
+		private:
+		JavaVM * m_jvm;
+	};
+
+	static JNIEnvGetter* jni_env_getter = new JNIEnvGetter();
+%}
+
+
 // Fill LIST_OBJECT_FUNCTIONS to extend list interfaces.
 #undef LIST_OBJECT_FUNCTIONS
 %define LIST_OBJECT_FUNCTIONS(classname,typename)
@@ -141,6 +186,56 @@ jobject _csRef_to_Java(const csRef<iBase>& ref, void* ptr, const char* name,
 }
 %}
 
+%typemap(in) csEventID[]
+{
+	JNIEnv * env = jni_env_getter->getJNIEnv();
+	if (env != 0) 
+	{
+		jlongArray longEventsArray = (jlongArray)$input;
+		jlong * larray = env->GetLongArrayElements(longEventsArray,0);
+		int totalElem = env->GetArrayLength(longEventsArray);
+		csEventID * csEvents = new csEventID[totalElem];
+		for (int j=0;j<totalElem;j++) 
+		{
+			csEvents[j] = csEventID(larray[j]);
+		}
+		env->ReleaseLongArrayElements(longEventsArray,larray,JNI_ABORT);
+		$1 = csEvents;
+	} else {
+		$1 = 0;
+	}
+}
+%typemap(jni) csEventID[] "jlongArray"
+%typemap(jtype) csEventID[] "long[]"
+%typemap(jstype) csEventID[] "long[]"
+%typemap(javain) csEventID[] "$javainput"
+%typemap(javaout) csEventID[] { return $jnicall; }
+%typemap(freearg) csEventID[]
+{
+  delete($1);
+}
+
+%typemap(in) csEventID
+{
+	JNIEnv * env = jni_env_getter->getJNIEnv();
+	if (env != 0) 
+	{
+		csEventID csEvent = csEventID((long)$input);
+		$1 = csEvent;
+	} else {
+		$1 = 0;
+	}
+}
+%typemap(out) csEventID
+{
+	$result = (jlong)$1.GetHash();
+}
+%typemap(jni) csEventID "jlong"
+%typemap(jtype) csEventID "long"
+%typemap(jstype) csEventID "long"
+%typemap(javain) csEventID "$javainput"
+%typemap(javaout) csEventID { return $jnicall; }
+
 /*
   ptr   : either a csRef<type> or csPtr<type>
   name  : type name, e.g. "iEngine *"
@@ -194,20 +289,23 @@ jobject _csRef_to_Java(const csRef<iBase>& ref, void* ptr, const char* name,
 %define TYPEMAP_OUT_csWrapPtr
   %typemap(out) csWrapPtr
   {
-    iBase * ibase = (iBase *)$1.Ref;
-    void * ptr = ibase->QueryInterface(iSCF::SCF->GetInterfaceID($1.Type), $1.Version);
-    ibase->DecRef(); // Undo IncRef from QueryInterface
-    if (ptr == 0)
-      $result = 0;
-    else
+    iBase * ibase = dynamic_cast<iBase *>((iBase *)$1.Ref);
+    if (ibase != 0) 
     {
-      jlong cptr = 0;
-      *(void **)&cptr = ptr;
-      char cls_name[1024];
-      strcat(strcpy(cls_name, "org/crystalspace3d/"), $1.Type);
-      jclass cls = jenv->FindClass(cls_name);
-      jmethodID mid = jenv->GetMethodID(cls, "<init>", "(JZ)V");
-      $result = jenv->NewObject(cls, mid, cptr, false);
+	void * ptr = ibase->QueryInterface(iSCF::SCF->GetInterfaceID($1.Type), $1.Version);
+	ibase->DecRef(); // Undo IncRef from QueryInterface
+	if (ptr == 0)
+		$result = 0;
+	else
+	{
+		jlong cptr = 0;
+		*(void **)&cptr = ptr;
+		char cls_name[1024];
+		strcat(strcpy(cls_name, "org/crystalspace3d/"), $1.Type);
+		jclass cls = jenv->FindClass(cls_name);
+		jmethodID mid = jenv->GetMethodID(cls, "<init>", "(JZ)V");
+		$result = jenv->NewObject(cls, mid, cptr, false);
+	}
     }
   }
   //%typemap(out) csWrapPtr %{ $result = $1; %}
@@ -363,5 +461,83 @@ CSINITIALIZER_JAVACODE
 %typemap(javain) (int argc, char const * const argv []) "$javainput"
 
 %include "arrays_java.i"
+
+%typemap(javacode) iAnimatedMeshFactory
+%{
+  private long[] _ConvertIRenderBufferArrayToNative(final SWIGTYPE_p_iRenderBuffer [] indices) {
+	if (indices == null) {
+		return new long[0];
+	}
+	final long[] pointers = new long[indices.length];
+	for (int i=0;i<indices.length;i++) {
+		pointers[i] = SWIGTYPE_p_iRenderBuffer.getCPtr(indices[i]);
+	}
+	return pointers;
+  }
+%}
+
+
+%typemap(in) csArray<csArray<unsigned int> >& boneIndices
+{
+	csArray<csArray<unsigned int> > * uiaa = new csArray<csArray<unsigned int> >();
+	JNIEnv * env = jni_env_getter->getJNIEnv();
+	if (env != 0) 
+	{
+		jobjectArray boneIndicesarray = (jobjectArray)$input;
+		int length = env->GetArrayLength(boneIndicesarray);
+		int i = 0;
+		for (i=0;i<length;i++) 
+		{
+			csArray<unsigned int> uia;
+			jlongArray indice = (jlongArray)env->GetObjectArrayElement(boneIndicesarray,i);
+			jlong * larray = env->GetLongArrayElements(indice,0);
+			int lengthinner = env->GetArrayLength(indice);
+			int j = 0;
+			for (j=0;j<lengthinner;j++) 
+			{
+				uia.Push((unsigned int)larray[j]);
+			}
+			uiaa->Push(uia);
+			env->ReleaseLongArrayElements(indice,larray,JNI_ABORT);
+		}
+	}
+	$1 = uiaa;
+}
+%typemap(jni) csArray<csArray<unsigned int> >& boneIndices "jobjectArray"
+%typemap(jtype) csArray<csArray<unsigned int> >& boneIndices "long[][]"
+%typemap(jstype) csArray<csArray<unsigned int> >& boneIndices "long[][]"
+%typemap(javain) csArray<csArray<unsigned int> >& boneIndices "$javainput"
+%typemap(freearg) csArray<csArray<unsigned int> >&
+{
+  delete($1);
+}
+
+%typemap(in) csArray<iRenderBuffer*>& indices
+{
+	csArray<iRenderBuffer*> * ira = new csArray<iRenderBuffer*>();
+	JNIEnv * env = jni_env_getter->getJNIEnv();
+	if (env != 0) 
+	{
+		// Fills the arrays
+		jlongArray indicesarray = (jlongArray)$input;
+		jlong * larray = env->GetLongArrayElements(indicesarray,0);
+		int length = env->GetArrayLength(indicesarray);
+		int i = 0;
+		for (i=0;i<length;i++) 
+		{
+			iRenderBuffer* ir = (iRenderBuffer*)(void*)(long)(larray[i]);
+			ira->Push(ir);
+		}
+	}
+	$1 = ira;
+}
+%typemap(jni) csArray<iRenderBuffer*>& indices "jlongArray"
+%typemap(jtype) csArray<iRenderBuffer*>& indices "long[]"
+%typemap(jstype) csArray<iRenderBuffer*>& indices "SWIGTYPE_p_iRenderBuffer []"
+%typemap(javain) csArray<iRenderBuffer*>& indices "_ConvertIRenderBufferArrayToNative($javainput)"
+%typemap(freearg) csArray<iRenderBuffer*>&
+{
+  delete($1);
+}
 
 #endif // SWIGJAVA

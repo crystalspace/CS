@@ -78,8 +78,8 @@ Full screen effects (fading, whiteout, etc).
 Level of Detail @sc{lod}. @xref{Level of Detail}.
 
 @item
-Various types of mesh objects: bezier curves, polygonal lightmapped
-objects, triangle meshes, haze mesh (bit like volumetric light),
+Various types of mesh objects: particle meshes, terrain mesh, triangle meshes,
+haze mesh (bit like volumetric light), @dots{}.
 @dots{}.
 @xref{MeshObject}.  @xref{MeshObject Genmesh}.
 @xref{HOWTO Create Genmesh}.
@@ -89,7 +89,7 @@ Animated 3D models (3D sprites) using frame based animation. @xref{Animation}.
 @xref{MeshObject Spr3D}.
 
 @item
-Animated 3D models using a skeletal animation system with good support
+Animated 3D models (AniMesh) using a skeletal animation system with good support
 for hardware skinning.
 
 @item
@@ -108,9 +108,8 @@ and @sc{3ds} models directly.
 Crystal Space native windowing system using CEGUI.
 
 @item
-Cross-platform support for hardware rendering via OpenGL and software 
-rendering as well as a special ``null'' renderer for applications like game 
-servers. @xref{3D Renderer}.
+Cross-platform support for hardware rendering via OpenGL as well as a special
+``null'' renderer for applications like game servers. @xref{3D Renderer}.
 
 @item
 Supports various common image formats (@sc{bmp}, @sc{dds}, @sc{gif}, @sc{jpg}, 

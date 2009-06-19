@@ -110,6 +110,8 @@ class csLoaderReturn(object):
         this = _imap.new_csLoaderReturn(*args)
         try: self.this.append(this)
         except: self.this = this
+    __swig_destroy__ = _imap.delete_csLoaderReturn
+    __del__ = lambda self : None;
     def IsFinished(*args): return _imap.csLoaderReturn_IsFinished(*args)
     def WasSuccessful(*args): return _imap.csLoaderReturn_WasSuccessful(*args)
     def GetResultPtr(*args): return _imap.csLoaderReturn_GetResultPtr(*args)
@@ -119,8 +121,6 @@ class csLoaderReturn(object):
     def SetResult(*args): return _imap.csLoaderReturn_SetResult(*args)
     def Copy(*args): return _imap.csLoaderReturn_Copy(*args)
     def Wait(*args): return _imap.csLoaderReturn_Wait(*args)
-    __swig_destroy__ = _imap.delete_csLoaderReturn
-    __del__ = lambda self : None;
 csLoaderReturn_swigregister = _imap.csLoaderReturn_swigregister
 csLoaderReturn_swigregister(csLoaderReturn)
 
@@ -212,6 +212,13 @@ class iThreadedLoader(core.iBase):
     def GetLoaderTextures(*args): return _imap.iThreadedLoader_GetLoaderTextures(*args)
     def GetLoaderMaterials(*args): return _imap.iThreadedLoader_GetLoaderMaterials(*args)
     def GetLoaderSharedVariables(*args): return _imap.iThreadedLoader_GetLoaderSharedVariables(*args)
+    def AddSectorToList(*args): return _imap.iThreadedLoader_AddSectorToList(*args)
+    def AddMeshFactToList(*args): return _imap.iThreadedLoader_AddMeshFactToList(*args)
+    def AddMeshToList(*args): return _imap.iThreadedLoader_AddMeshToList(*args)
+    def AddCamposToList(*args): return _imap.iThreadedLoader_AddCamposToList(*args)
+    def AddTextureToList(*args): return _imap.iThreadedLoader_AddTextureToList(*args)
+    def AddMaterialToList(*args): return _imap.iThreadedLoader_AddMaterialToList(*args)
+    def AddSharedVarToList(*args): return _imap.iThreadedLoader_AddSharedVarToList(*args)
     __swig_destroy__ = _imap.delete_iThreadedLoader
     __del__ = lambda self : None;
 iThreadedLoader_swigregister = _imap.iThreadedLoader_swigregister

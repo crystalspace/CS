@@ -27,6 +27,7 @@
 #include "cstool/unusedresourcehelper.h"
 #include "cstool/vfsdirchange.h"
 
+#include "csutil/documenthelper.h"
 #include "csutil/eventnames.h"
 #include "csutil/scfstr.h"
 #include "csutil/scfstringarray.h"
@@ -75,9 +76,11 @@
 
 #include "ivideo/material.h"
 
-#include "csthreadedloader.h"
 #include "csloadercontext.h"
+#include "csthreadedloader.h"
 #include "loadtex.h"
+
+CS_IMPLEMENT_PLUGIN
 
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
@@ -112,19 +115,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     // Start up list sync.
-    Engine->SyncEngineLists(this, false);
+    if(!threadman->GetAlwaysRunNow())
+    {
+      Engine->SyncEngineLists(this, false);
+
+      csRef<iEventQueue> eventQueue = csQueryRegistry<iEventQueue>(object_reg);
+      if(eventQueue)
+      {
+        ProcessPerFrame = csevFrame(object_reg);
+        eventQueue->RegisterListener(this, ProcessPerFrame);
+      }
+    }
 
     vfs = csQueryRegistry<iVFS>(object_reg);
     if(!vfs.IsValid())
     {
       return false;
-    }
-
-    csRef<iEventQueue> eventQueue = csQueryRegistry<iEventQueue>(object_reg);
-    if(eventQueue)
-    {
-      ProcessPerFrame = csevFrame(object_reg);
-      eventQueue->RegisterListener(this, ProcessPerFrame);
     }
 
     SyntaxService = csQueryRegistryOrLoad<iSyntaxService> (object_reg,
@@ -269,9 +275,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           "File '%s' does not seem to contain a 'meshobj'!", fname);
         return false;
       }
-      mesh = Engine->CreateMeshWrapper (meshobjnode->GetAttributeValue ("name"), false);
+      const char* name = meshobjnode->GetAttributeValue ("name");
+      mesh = Engine->CreateMeshWrapper (name, false);
       csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-      if(LoadMeshObjectTC (itr, ldr_context, mesh, 0, meshobjnode, ssource, 0))
+      if(LoadMeshObjectTC (itr, ldr_context, mesh, 0, meshobjnode, ssource, 0, name))
       {
         ret->Copy(itr);
         return true;
@@ -417,7 +424,45 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     iCollection* collection, iStreamSource* ssource, iMissingLoaderData* missingdata,
     uint keepFlags, bool do_verbose)
   {
-    return LoadMapLibraryFile (filename, collection, ssource, missingdata, keepFlags, do_verbose);
+    csRef<iFile> buf = vfs->Open (filename, VFS_FILE_READ);
+
+    if (!buf)
+    { 
+      ReportError (
+        "crystalspace.maploader.parse.library",
+        "Could not open library file '%s' on VFS!", filename);
+      return false;
+    }
+
+    if(Engine->GetSaveableFlag () && collection)
+    {
+      csRef<iSaverFile> saverFile;
+      saverFile.AttachNew (new csSaverFile (filename, CS_SAVER_FILE_LIBRARY));
+      collection->Add(saverFile->QueryObject());
+    }
+
+    csRef<iDocument> doc;
+    bool er = LoadStructuredDoc (filename, buf, doc);
+    if (!er) return false;
+    if (doc)
+    {
+      csRef<iDocumentNode> lib_node = doc->GetRoot ()->GetNode ("library");
+      if (!lib_node)
+      {
+        SyntaxService->ReportError (
+          "crystalspace.maploader.parse.expectedlib",
+          lib_node, "Expected 'library' token!");
+        return false;
+      }
+
+      return LoadLibraryTC(ret, lib_node, collection, ssource, missingdata, keepFlags, do_verbose);
+    }
+    else
+    {
+      ReportError ("crystalspace.maploader.parse.plugin",
+        "File does not appear to be a structure map library (%s)!", filename);
+    }
+    return false;
   }
 
   THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadLibrary, iDocumentNode* lib_node,
@@ -428,7 +473,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       (new csLoaderContext (object_reg, Engine, this, collection,
       missingdata, keepFlags, do_verbose));
 
-    return LoadLibrary (ldr_context, lib_node, ssource, missingdata, true);
+    // Pre-parse.
+    ParseAvailableObjects(dynamic_cast<csLoaderContext*>((iLoaderContext*)ldr_context), lib_node);
+
+    // Array of all thread jobs created from this parse.
+    csRefArray<iThreadReturn> threadReturns;
+
+    // The actual parse.
+    bool success = LoadLibrary (ldr_context, lib_node, ssource, missingdata, threadReturns);
+
+    // Wait for all jobs to finish.
+    return threadman->Wait(threadReturns);
   }
 
   THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadFile, const char* fname,
@@ -472,11 +527,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iDocumentNode> meshobjnode = node->GetNode ("meshobj");
     if(meshobjnode)
     {
-      csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (
-        meshobjnode->GetAttributeValue ("name"), false);
-      csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-      LoadMeshObjectTC(itr, ldr_context, mesh, 0, meshobjnode, ssource, 0);
-      return itr->WasSuccessful();
+      const char* name = meshobjnode->GetAttributeValue ("name");
+      csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (name, false);
+      return LoadMeshObjectTC(ret, ldr_context, mesh, 0, meshobjnode, ssource, 0, name);
     }
 
     // World node.
@@ -490,7 +543,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iDocumentNode> libnode = node->GetNode ("library");
     if (libnode)
     {
-      return LoadLibrary(ldr_context, libnode, ssource, missingdata, true);
+      return LoadLibraryTC(ret, libnode, collection, ssource, missingdata, keepFlags, do_verbose);
     }
 
     // Portals.
@@ -581,7 +634,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   {
     const char* meshfactname = meshfactnode->GetAttributeValue("name");
 
-    csRef<iMeshFactoryWrapper> mfw = ldr_context->FindMeshFactory(meshfactname);
+    csRef<iMeshFactoryWrapper> mfw = ldr_context->FindMeshFactory(meshfactname, true);
     if(mfw)
     {
       ldr_context->AddToCollection(mfw->QueryObject());
@@ -651,9 +704,44 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return true;
   }
 
+  void csThreadedLoader::ParseAvailableObjects(csLoaderContext* ldr_context, iDocumentNode* doc)
+  {
+   csRef<iDocumentNodeIterator> itr = doc->GetNodes("textures");
+   while(itr->HasNext())
+   {
+     ldr_context->ParseAvailableTextures(itr->Next());
+   }
+
+   itr = doc->GetNodes("materials");
+   while(itr->HasNext())
+   {
+     ldr_context->ParseAvailableMaterials(itr->Next());
+   }
+
+   itr = doc->GetNodes("meshfact");
+   while(itr->HasNext())
+   {
+     ldr_context->ParseAvailableMeshfacts(itr->Next());
+   }
+
+   itr = doc->GetNodes("sector");
+   while(itr->HasNext())
+   {
+     csRef<iDocumentNode> sector = itr->Next();
+     ldr_context->ParseAvailableMeshes(sector, 0);
+     ldr_context->ParseAvailableLights(sector);
+   }
+  }
+
   bool csThreadedLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* world_node,
     iStreamSource* ssource, iMissingLoaderData* missingdata, bool do_verbose)
   {
+    // Parse the map to find all materials and meshfacts.
+    ParseAvailableObjects(dynamic_cast<csLoaderContext*>(ldr_context), world_node);
+
+    // Array of all thread jobs created from this parse.
+    csRefArray<iThreadReturn> threadReturns;
+
     // Will be set to true if we find a <shader> section.
     bool shader_given = false;
 
@@ -712,7 +800,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         }
         break;
       case XMLTOKEN_SECTOR:
-        if (!ParseSector (ldr_context, child, ssource))
+        if (!ParseSector (ldr_context, child, ssource, threadReturns))
           return false;
         break;
       case XMLTOKEN_SEQUENCES:
@@ -745,7 +833,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_LIBRARY:
         {
-          LoadLibraryFromNode (ldr_context, child, ssource, missingdata, false, false);
+          threadReturns.Push(LoadLibraryFromNode (ldr_context, child, ssource, missingdata, false, false, false, 0));
           break;
         }
       case XMLTOKEN_START:
@@ -791,111 +879,91 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         return false;
     }
 
-    return true;
+    // Wait for all jobs to finish.
+    return threadman->Wait(threadReturns);
   }
 
-  THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadLibraryFromNode,
-    csRef<iLoaderContext> ldr_context, csRef<iDocumentNode> child,
+  THREADED_CALLABLE_IMPL8(csThreadedLoader, LoadLibraryFromNode,
+    csRef<iLoaderContext> ldr_context, csRef<iDocumentNode> lib,
     csRef<iStreamSource> ssource, csRef<iMissingLoaderData> missingdata,
-    bool loadProxyTex, bool do_verbose)
+    bool loadProxyTex, bool do_verbose, bool compact, const char* libpath)
   {
-    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
-
-    const char* file = child->GetAttributeValue ("file");
-    if (file)
+    csRef<iDocumentNodeIterator> itr;
+    if(!compact && !lib->GetAttributeValueAsBool("compact"))
     {
-      const char* path = child->GetAttributeValue ("path");
-      if (path)
+      const char* file = lib->GetAttributeValue("file");
+      const char* path = 0;
+      if(file)
       {
-        vfs->PushDir ();
-        vfs->ChDir (path);
+        path = lib->GetAttributeValue("path");
+        if(path)
+        {
+          vfs->PushDir();
+          vfs->ChDir(path);
+        }
+      }
+      else
+      {
+        file = lib->GetContentsValue();
       }
 
       if (Engine->GetSaveableFlag ())
       {
         csRef<iLibraryReference> libraryRef;
         libraryRef.AttachNew (new csLibraryReference (file, path, true));
-        ldr_context->AddToCollection(libraryRef->QueryObject ());
-      }
-
-      bool rc;
-
-      rc = LoadMapLibraryFile (file, ldr_context->GetCollection (),
-        ssource, missingdata, ldr_context->GetKeepFlags(), loadProxyTex, do_verbose);
-
-      if (path)
-      {
-        vfs->PopDir ();
-      }
-      if (!rc)
-        return false;
-    }
-    else
-    {
-      if (Engine->GetSaveableFlag ())
-      {
-        csRef<iLibraryReference> libraryRef;
-        libraryRef.AttachNew (new csLibraryReference (
-          child->GetContentsValue (), 0, true));
         ldr_context->AddToCollection (libraryRef->QueryObject ());
       }
 
-      return LoadMapLibraryFile (child->GetContentsValue (), ldr_context->GetCollection (),
-        ssource, missingdata, ldr_context->GetKeepFlags(), loadProxyTex, do_verbose);
-    }
-    return true;
-  }
+      csRef<iFile> buf = vfs->Open(file, VFS_FILE_READ);
 
-  bool csThreadedLoader::LoadMapLibraryFile (const char* fname, iCollection* collection,
-    iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags, bool loadProxyTex,
-    bool do_verbose)
-  {
-    csRef<iFile> buf = vfs->Open (fname, VFS_FILE_READ);
-
-    if (!buf)
-    { 
-      ReportError (
-        "crystalspace.maploader.parse.library",
-        "Could not open library file '%s' on VFS!", fname);
-      return false;
-    }
-
-    if(Engine->GetSaveableFlag () && collection)
-    {
-      csRef<iSaverFile> saverFile;
-      saverFile.AttachNew (new csSaverFile (fname, CS_SAVER_FILE_LIBRARY));
-      collection->Add(saverFile->QueryObject());
-    }
-
-    csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-      new csLoaderContext (object_reg, Engine, this, collection, missingdata,
-      keepFlags, do_verbose));
-
-    csRef<iDocument> doc;
-    bool er = LoadStructuredDoc (fname, buf, doc);
-    if (!er) return false;
-    if (doc)
-    {
-      csRef<iDocumentNode> lib_node = doc->GetRoot ()->GetNode ("library");
-      if (!lib_node)
+      if(!buf)
       {
-        SyntaxService->ReportError (
-          "crystalspace.maploader.parse.expectedlib",
-          lib_node, "Expected 'library' token!");
-        return false;
+        return true;
       }
-      return LoadLibrary (ldr_context, lib_node, ssource, missingdata, loadProxyTex);
+
+      csRef<iDocument> doc;
+      bool er = LoadStructuredDoc(file, buf, doc);
+
+      if(path)
+      {
+        vfs->PopDir();
+      }
+
+      if(er && doc)
+      {  
+        // Do the quick parse now and put the actual load on the queue for later.
+        csRef<iDocumentNode> lib_node = doc->GetRoot()->GetNode("library");
+        ParseAvailableObjects(dynamic_cast<csLoaderContext*>((iLoaderContext*)ldr_context), lib_node);
+        LoadLibraryFromNode(ldr_context, lib_node, ssource, missingdata, loadProxyTex, do_verbose, true, path);
+        return true;
+      }
+      return false;
     }
     else
     {
-      ReportError ("crystalspace.maploader.parse.plugin",
-        "File does not appear to be a structure map library (%s)!", fname);
+      if(libpath)
+      {
+        vfs->PushDir();
+        vfs->ChDir(libpath);
+      }
+
+      // Array of all thread jobs created from this parse.
+      csRefArray<iThreadReturn> threadReturns;
+
+      bool result = LoadLibrary(ldr_context, lib, ssource, missingdata, threadReturns, loadProxyTex, do_verbose);
+      if(libpath)
+      {
+        vfs->PopDir();
+      }
+
+      // Wait for all jobs to finish.
+      return threadman->Wait(threadReturns);
     }
-    return false;
   }
 
   bool csThreadedLoader::LoadLibrary(iLoaderContext* ldr_context, iDocumentNode* node,
-    iStreamSource* ssource, iMissingLoaderData* missingdata, bool loadProxyTex, bool do_verbose)
+    iStreamSource* ssource, iMissingLoaderData* missingdata, csRefArray<iThreadReturn>& threadReturns,
+    bool loadProxyTex, bool do_verbose)
   {
     if (!Engine)
     {
@@ -929,7 +997,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_LIBRARY:
         {
-          LoadLibraryFromNode(ldr_context, child, ssource, missingdata, true, false);
+          threadReturns.Push(LoadLibraryFromNode(ldr_context, child, ssource, missingdata, true, false, false, 0));
           break;
         }
       case XMLTOKEN_ADDON:
@@ -971,15 +1039,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_MESHREF:
         {
-          LoadMeshRef(child, 0, ldr_context, ssource);
+          threadReturns.Push(LoadMeshRef(child, 0, ldr_context, ssource));
         }
         break;
       case XMLTOKEN_MESHOBJ:
         {
-          csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (
-            child->GetAttributeValue ("name"), false);
-          csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, 0, child, ssource, 0);
-          AddLoadingMeshObject(child->GetAttributeValue("name"), itr);
+          const char* name = child->GetAttributeValue ("name");
+          csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (name, false);
+          csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, 0, child, ssource, 0, name);
+          AddLoadingMeshObject(name, itr);
+          threadReturns.Push(itr);
         }
         break;
       case XMLTOKEN_MESHFACT:
@@ -1586,9 +1655,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return true;
   }
 
-  THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadMeshObject, csRef<iLoaderContext> ldr_context,
+  THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadMeshObject, csRef<iLoaderContext> ldr_context,
     csRef<iMeshWrapper> mesh, csRef<iMeshWrapper> parent, csRef<iDocumentNode> node, 
-    csRef<iStreamSource> ssource, csRef<iSector> sector)
+    csRef<iStreamSource> ssource, csRef<iSector> sector, csString name)
   {
     csString priority;
 
@@ -1622,7 +1691,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         handled, priority, false, staticpos, staticshape, zbufSet, prioSet,
         false, ssource))
       {
-        RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+        RemoveLoadingMeshObject(name, ret);
         return false;
       }
 
@@ -1633,7 +1702,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           iMeshWrapper* container_mesh = 0;
           if (!ParsePortal (ldr_context, child, 0, 0, container_mesh, mesh))
           {
-            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(name, ret);
             return 0;
           }
         }
@@ -1641,7 +1710,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       case XMLTOKEN_PORTALS:
         if (!ParsePortals (ldr_context, child, 0, mesh, ssource))
         {
-          RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+          RemoveLoadingMeshObject(name, ret);
           return 0;
         }
         break;
@@ -1659,9 +1728,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
               child, "Some meshobj has no name!");
             return false;
           }
-          csRef<iMeshWrapper> sp = Engine->CreateMeshWrapper(child->GetAttributeValue ("name"), false);
-          csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, sp, mesh, child, ssource, 0);
-          AddLoadingMeshObject(child->GetAttributeValue("name"), itr);
+          csString childName = csString(name).AppendFmt(":%s", child->GetAttributeValue("name"));
+          csRef<iMeshWrapper> sp = Engine->CreateMeshWrapper(childName, false);
+          csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, sp, mesh, child, ssource, 0, childName);
+          AddLoadingMeshObject(childName, itr);
         }
         break;
       case XMLTOKEN_LIGHT:
@@ -1673,7 +1743,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
           else
           {
-            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(name, ret);
             return false;
           }
         }
@@ -1685,7 +1755,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.load.plugin",
               child, "Don't specify the plugin if you use <nullmesh>!");
-            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(name, ret);
             return false;
           }
           if (mesh->GetMeshObject ())
@@ -1693,7 +1763,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.mesh", child,
               "Please don't use <params> in combination with <nullmesh>!");
-            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(name, ret);
             return false;
           }
           csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
@@ -1703,7 +1773,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.load.plugin",
               child, "Could not find the nullmesh plugin!");
-            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(name, ret);
             return false;
           }
           csRef<iMeshObjectFactory> fact = type->NewFactory ();
@@ -1713,7 +1783,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           csBox3 b;
           if (!SyntaxService->ParseBox (child, b))
           {
-            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(name, ret);
             return false;
           }
           csRef<iNullMeshState> nullmesh = 
@@ -1729,7 +1799,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           SyntaxService->ReportError (
             "crystalspace.maploader.load.plugin",
             child, "Could not load plugin!");
-          RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+          RemoveLoadingMeshObject(name, ret);
           return false;
         }
         else
@@ -1739,7 +1809,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh, zbufSet, 
             prioSet))
           {
-            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(name, ret);
             return false;	// Error already reported.
           }
         }
@@ -1752,7 +1822,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.loadingfile",
               child, "Specify a VFS filename with 'file'!");
-            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(name, ret);
             return false;
           }
           csRef<iFile> buf = vfs->Open (fname, VFS_FILE_READ);
@@ -1761,7 +1831,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.loadingfile",
               child, "Error opening file '%s'!", fname);
-            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(name, ret);
             return false;
           }
           csRef<iDocument> doc;
@@ -1771,7 +1841,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.loadingfile",
               child, "'%s' is not an XML file!", fname);
-            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(name, ret);
             return false;
           }
           csRef<iDocumentNode> paramsnode = doc->GetRoot ()->GetNode ("params");
@@ -1783,7 +1853,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
                 "crystalspace.maploader.load.plugin",
                 child, "Could not load plugin for mesh '%s'!",
                 mesh->QueryObject ()->GetName ());
-              RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+              RemoveLoadingMeshObject(name, ret);
               return false;
             }
             csRef<iBase> mo;
@@ -1798,7 +1868,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             if (!mo || !HandleMeshObjectPluginResult (mo, child, mesh,
               zbufSet, prioSet))
             {
-              RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+              RemoveLoadingMeshObject(name, ret);
               return false;	// Error already reported.
             }
             break;
@@ -1807,8 +1877,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             "meshobj");
           if (meshobjnode)
           {
-            csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, parent, meshobjnode, ssource, 0);
-            AddLoadingMeshObject(child->GetAttributeValue("name"), itr);
+            csString childName = csString(name).AppendFmt(":%s", child->GetAttributeValue("name"));
+            csRef<iThreadReturn> itr = LoadMeshObject (ldr_context, mesh, parent, meshobjnode, ssource,
+              0, childName);
+            AddLoadingMeshObject(childName, itr);
             break;
           }
           csRef<iDocumentNode> meshfactnode = doc->GetRoot ()->GetNode (
@@ -1826,7 +1898,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
                 meshfactnode, 0, ssource))
               {
                 // Error is already reported.
-                RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+                RemoveLoadingMeshObject(name, ret);
                 return false;
               }
               else
@@ -1841,7 +1913,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             "crystalspace.maploader.load.plugin", child,
             "File '%s' doesn't contain <params>, <meshobj>, nor <meshfact>!",
             fname);
-          RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+          RemoveLoadingMeshObject(name, ret);
           return false;
         }
         break;
@@ -1852,7 +1924,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             "crystalspace.maploader.load.plugin",
             child, "Could not load plugin for mesh '%s'!",
             mesh->QueryObject ()->GetName ());
-          RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+          RemoveLoadingMeshObject(name, ret);
           return false;
         }
         else
@@ -1863,7 +1935,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.loadingfile",
               child, "Specify a VFS filename with 'paramsfile'!");
-            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(name, ret);
             return false;
           }
           csRef<iFile> buf (vfs->Open (fname, VFS_FILE_READ));
@@ -1872,7 +1944,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.loadingfile",
               child, "Error opening file '%s'!", fname);
-            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(name, ret);
             return false;
           }
           csRef<iBase> mo;
@@ -1898,7 +1970,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.mesh",
               child, "Please use 'params' before specifying 'trimesh'!");
-            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(name, ret);
             return false;
           }
           iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
@@ -1907,13 +1979,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.mesh", child,
               "This mesh doesn't support setting of other 'trimesh'!");
-            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(name, ret);
             return false;
           }
           if (!ParseTriMesh (child, objmodel))
           {
             // Error already reported.
-            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(name, ret);
             return false;
           }
         }
@@ -1926,7 +1998,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.plugin",
               child, "Please specify only one plugin!");
-            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(name, ret);
             return false;
           }
 
@@ -1936,7 +2008,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.plugin",
               child, "Specify a plugin name with 'plugin'!");
-            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(name, ret);
             return false;
           }
           iDocumentNode* defaults = 0;
@@ -1945,7 +2017,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             SyntaxService->ReportError (
               "crystalspace.maploader.parse.meshobj",
               child, "Error loading plugin '%s'!", plugname);
-            RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+            RemoveLoadingMeshObject(name, ret);
             return false;
           }
           if (defaults)
@@ -1959,7 +2031,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       default:
         {
           SyntaxService->ReportBadToken (child);
-          RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+          RemoveLoadingMeshObject(name, ret);
           return false;
         }
       }
@@ -1984,7 +2056,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     ret->SetResult(csRef<iBase>(mesh));
 
-    RemoveLoadingMeshObject(node->GetAttributeValue("name"), ret);
+    RemoveLoadingMeshObject(name, ret);
 
     return true;
   }
@@ -3180,11 +3252,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           iMeshFactoryWrapper* t = ldr_context->FindMeshFactory (
             child->GetContentsValue ());
-          csTicks start = csGetTicks();
-          while(!t && (csGetTicks() - start < 60000))
-          {
-            t = ldr_context->FindMeshFactory (child->GetContentsValue ());
-          }
           if (!t)
           {
             SyntaxService->ReportError (

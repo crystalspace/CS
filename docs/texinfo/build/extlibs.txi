@@ -36,8 +36,6 @@ libmng
 @sc{cegui}
 @item
 wxWidgets
-@item
-@sc{caca}
 @end itemize
 
 Most of these libraries are optional.  If you do not have them installed, then
@@ -277,16 +275,6 @@ Crystal Space can optionally utilize the @code{libmng} library for reading
 After downloading you can either install the package normally (i.e. @samp{make
 install}) or unpack it into the directory @file{CS/libs/libmng*}.  In general,
 if you have permission to do so, it is best to install the library.
-
-@subheading @sc{caca} Colour AsCii Art Library
-
-@emph{Version:} at least 0.99beta13 required
-
-This library is used for 2D rendering in text mode.  This is optional and only
-needed for fun. libcaca can be downloaded from:
-
-@noindent
-@uref{http://sam.zoy.org/libcaca/}
 
 @subheading @sc{cegui}
 @cindex @sc{cegui}

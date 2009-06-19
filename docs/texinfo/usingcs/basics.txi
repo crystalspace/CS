@@ -133,9 +133,9 @@ How can I register the plug-in library?
 @dfn{Registering} means to tell @sc{scf} the name of the plug-in that was given
 to it by its author, and a class or a dynamic library to associate it with.
 Plugin libraries can contain multiple named @sc{scf} classes.  For example, to
-use the software graphics renderer @sc{scf} must know that the @sc{scf} class
-@samp{crystalspace.graphics3d.software} can be found in @file{soft3d.dll}
-(Windows) or @file{soft3d.so} (Unix).  @sc{scf} determines dynamically which
+use the null graphics renderer @sc{scf} must know that the @sc{scf} class
+@samp{crystalspace.graphics3d.null} can be found in @file{null3d.dll}
+(Windows) or @file{null3d.so} (Unix).  @sc{scf} determines dynamically which
 plugin libraries contain which @sc{scf} classes by consulting meta-information
 associated with each plugin.  Depending upon the platform, the associated
 meta-information may be bundled into the plugin itself, or it might exist in a
@@ -190,7 +190,7 @@ time there can be multiple 3D renderers in memory (for example, for
 procedural textures). But the default 3D renderer will be registered
 with the tag name @samp{iGraphics3D}.
 
-Note that the decision which graphics driver you use (e.g. Software or
+Note that the decision which graphics driver you use (e.g. Null or
 OpenGL) is done at the time you load the plug-in by passing the name of
 that driver. At the time you ask for the plug-in interface and use it in
 your program, this does not make a difference anymore. This makes it possible

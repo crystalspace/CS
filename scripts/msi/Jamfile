@@ -10,6 +10,8 @@ MSI_VERSION_MAJORMINOR ?= $(PACKAGE_VERSION_LIST[1]).$(PACKAGE_VERSION_LIST[2]) 
 # This will become the MSI package version "build" number.
 MSI_VERSION_PACKAGE = 4 ;
 
+WIN32LIBS.MSM_PATH_DEFAULT = "$(BUILDTOP)/win32libs/mergemodules" ;
+
 # Set up file lists for MSVC binaries.
 rule MSVCFileListSharedLibs
 {
@@ -190,24 +192,41 @@ MSI_UPGRADE_CODE.CS.demos.VC_71 = 24ace31c-863a-4e07-b63f-f8b4620f3c4b ;
 MSI_UPGRADE_CODE.CS.demos.VC_8 = be05d5d1-a0e1-47e0-8267-ce081be7cbc7 ;
 MSI_UPGRADE_CODE.CS.demos.VC_9 = dd6a2886-2c83-46f8-a242-5de4b6aa2913 ;
 
-rule GetWin32LibsMSMPath
+rule GetMsiRelatedPath
 {
-  if "$(WIN32LIBS.MSM_PATH)" = ""
+  local env = $(1) ;
+  local target = $(2) ;
+  if ! $($(env))
   {
-    local guess = "$(TOP)/win32libs/mergemodules" ;
-    echo "No path for the cs-win32libs MSMs was set; I'm guessing $(guess)." ;
-    echo "If that is not what you want specify the WIN32LIBS.MSM_PATH Jam variable." ;
-    WIN32LIBS.MSM_PATH = $(guess) ;
+    $(env) = $($(env)_DEFAULT) ;
+
+    local w = $(env).warning ;
+    MakeLocate $(w) : $(LOCATE.MSI) ;
+    ENV on $(w) = $(env) ;
+    GUESS on $(w) = $($(env)) ;
+    WarnMsiPathNotSet $(w) ;
+    Depends $(target) : $(w) ;
+    Clean clean : $(w) ;
   }
-  return $(WIN32LIBS.MSM_PATH) ;
+  return $($(env)) ;
 }
+
+actions WarnMsiPathNotSet
+{
+  echo "*** $(ENV) not set; defaulting to: $(GUESS)" >&2
+  echo "*** If default is undesirable, assign $(ENV) Jam variable." >&2
+  echo "dummy file" > $(1)
+}
+
+rule GetWin32LibsMSMPath
+{ return [ GetMsiRelatedPath WIN32LIBS.MSM_PATH : $(1) ] ; }
 
 rule MakeMSIsForArchAndKind
 {
   local arch = $(1) ;
   local kind = $(2) ;
-  local win32libs_msms = [ GetWin32LibsMSMPath ] ;
   local msi = CS-$(kind)-$(arch).msi ;
+  local win32libs_msms = [ GetWin32LibsMSMPath $(msi) ] ;
 
   Depends $(msi) : mergemodules-neutral ;
   Depends $(msi) : mergemodules-$(arch) ;

@@ -1,5 +1,5 @@
 /*
-    SDL 2d canvas for Crystal Space (header)
+    Null 2D canvas for Crystal Space (header)
     Copyright (C) 2000 by George Yohng <yohng@drivex.dosware.8m.com>
 
     This library is free software; you can redistribute it and/or
@@ -66,6 +66,10 @@ public:
   virtual void DrawBox (int , int , int , int , int )
   { }
  
+  virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB) {}
+  virtual void GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB, uint8 &oA) {}
+
+ 
   virtual void Write (iFont*, int, int, int, int, const char*, unsigned)
   { }
   virtual void WriteBaseline (iFont* , int, int, int, int, const char*)
@@ -73,6 +77,8 @@ public:
 
   virtual unsigned char* GetPixelAt (int, int)
   { return 0; }
+  
+  virtual csPtr<iImage> ScreenShot() { return 0; }
 };
 
 #endif // __CS_NULL2D_H__

@@ -18,13 +18,13 @@
 
 #include "cssysdef.h"
 
-#include "imap/loader.h"
 #include "iutil/databuff.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 
+#include "csthreadedloader.h"
 #include "loadtex.h"
 #include "proxyimage.h"
 
@@ -48,9 +48,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       else
       {
         csRef<iThreadedLoader> tldr = scfQueryInterface<iThreadedLoader>(loader);
+        csThreadedLoader* cstldr = dynamic_cast<csThreadedLoader*>((iThreadedLoader*)tldr);
         csRef<iThreadManager> tm = csQueryRegistry<iThreadManager>(object_reg);
-        csRef<iThreadReturn> ret = tldr->LoadImage (filename, Format);
-        ret->Wait();
+        csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(tm));
+        cstldr->LoadImageTC (ret, filename, Format, false);
         img = scfQueryInterface<iImage>(ret->GetResultRefPtr());
       }
       if (!img.IsValid())

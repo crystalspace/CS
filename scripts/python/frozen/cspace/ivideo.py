@@ -82,61 +82,6 @@ class csPixelCoord(object):
 csPixelCoord_swigregister = _ivideo.csPixelCoord_swigregister
 csPixelCoord_swigregister(csPixelCoord)
 
-class csPixelFormat(object):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    __repr__ = _swig_repr
-    RedMask = _swig_property(_ivideo.csPixelFormat_RedMask_get, _ivideo.csPixelFormat_RedMask_set)
-    GreenMask = _swig_property(_ivideo.csPixelFormat_GreenMask_get, _ivideo.csPixelFormat_GreenMask_set)
-    BlueMask = _swig_property(_ivideo.csPixelFormat_BlueMask_get, _ivideo.csPixelFormat_BlueMask_set)
-    AlphaMask = _swig_property(_ivideo.csPixelFormat_AlphaMask_get, _ivideo.csPixelFormat_AlphaMask_set)
-    RedShift = _swig_property(_ivideo.csPixelFormat_RedShift_get, _ivideo.csPixelFormat_RedShift_set)
-    GreenShift = _swig_property(_ivideo.csPixelFormat_GreenShift_get, _ivideo.csPixelFormat_GreenShift_set)
-    BlueShift = _swig_property(_ivideo.csPixelFormat_BlueShift_get, _ivideo.csPixelFormat_BlueShift_set)
-    AlphaShift = _swig_property(_ivideo.csPixelFormat_AlphaShift_get, _ivideo.csPixelFormat_AlphaShift_set)
-    RedBits = _swig_property(_ivideo.csPixelFormat_RedBits_get, _ivideo.csPixelFormat_RedBits_set)
-    GreenBits = _swig_property(_ivideo.csPixelFormat_GreenBits_get, _ivideo.csPixelFormat_GreenBits_set)
-    BlueBits = _swig_property(_ivideo.csPixelFormat_BlueBits_get, _ivideo.csPixelFormat_BlueBits_set)
-    AlphaBits = _swig_property(_ivideo.csPixelFormat_AlphaBits_get, _ivideo.csPixelFormat_AlphaBits_set)
-    PalEntries = _swig_property(_ivideo.csPixelFormat_PalEntries_get, _ivideo.csPixelFormat_PalEntries_set)
-    PixelBytes = _swig_property(_ivideo.csPixelFormat_PixelBytes_get, _ivideo.csPixelFormat_PixelBytes_set)
-    def complete(*args): return _ivideo.csPixelFormat_complete(*args)
-    def __init__(self, *args): 
-        this = _ivideo.new_csPixelFormat(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    __swig_destroy__ = _ivideo.delete_csPixelFormat
-    __del__ = lambda self : None;
-csPixelFormat_swigregister = _ivideo.csPixelFormat_swigregister
-csPixelFormat_swigregister(csPixelFormat)
-
-class csImageArea(object):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    __repr__ = _swig_repr
-    x = _swig_property(_ivideo.csImageArea_x_get, _ivideo.csImageArea_x_set)
-    y = _swig_property(_ivideo.csImageArea_y_get, _ivideo.csImageArea_y_set)
-    w = _swig_property(_ivideo.csImageArea_w_get, _ivideo.csImageArea_w_set)
-    h = _swig_property(_ivideo.csImageArea_h_get, _ivideo.csImageArea_h_set)
-    data = _swig_property(_ivideo.csImageArea_data_get, _ivideo.csImageArea_data_set)
-    def __init__(self, *args): 
-        this = _ivideo.new_csImageArea(*args)
-        try: self.this.append(this)
-        except: self.this = this
-    __swig_destroy__ = _ivideo.delete_csImageArea
-    __del__ = lambda self : None;
-csImageArea_swigregister = _ivideo.csImageArea_swigregister
-csImageArea_swigregister(csImageArea)
-
-class iOffscreenCanvasCallback(core.iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def FinishDraw(*args): return _ivideo.iOffscreenCanvasCallback_FinishDraw(*args)
-    def SetRGB(*args): return _ivideo.iOffscreenCanvasCallback_SetRGB(*args)
-    __swig_destroy__ = _ivideo.delete_iOffscreenCanvasCallback
-    __del__ = lambda self : None;
-iOffscreenCanvasCallback_swigregister = _ivideo.iOffscreenCanvasCallback_swigregister
-iOffscreenCanvasCallback_swigregister(iOffscreenCanvasCallback)
-
 class iGraphics2D(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
@@ -145,14 +90,7 @@ class iGraphics2D(core.iBase):
     def Close(*args): return _ivideo.iGraphics2D_Close(*args)
     def GetWidth(*args): return _ivideo.iGraphics2D_GetWidth(*args)
     def GetHeight(*args): return _ivideo.iGraphics2D_GetHeight(*args)
-    def GetPage(*args): return _ivideo.iGraphics2D_GetPage(*args)
-    def DoubleBuffer(*args): return _ivideo.iGraphics2D_DoubleBuffer(*args)
-    def GetDoubleBufferState(*args): return _ivideo.iGraphics2D_GetDoubleBufferState(*args)
-    def GetPixelFormat(*args): return _ivideo.iGraphics2D_GetPixelFormat(*args)
-    def GetPixelBytes(*args): return _ivideo.iGraphics2D_GetPixelBytes(*args)
-    def GetPalEntryCount(*args): return _ivideo.iGraphics2D_GetPalEntryCount(*args)
-    def GetPalette(*args): return _ivideo.iGraphics2D_GetPalette(*args)
-    def SetRGB(*args): return _ivideo.iGraphics2D_SetRGB(*args)
+    def GetColorDepth(*args): return _ivideo.iGraphics2D_GetColorDepth(*args)
     def FindRGB(*args): return _ivideo.iGraphics2D_FindRGB(*args)
     def GetRGB(*args): return _ivideo.iGraphics2D_GetRGB(*args)
     def GetRGBA(*args): return _ivideo.iGraphics2D_GetRGBA(*args)
@@ -169,11 +107,7 @@ class iGraphics2D(core.iBase):
     def DrawPixel(*args): return _ivideo.iGraphics2D_DrawPixel(*args)
     def DrawPixels(*args): return _ivideo.iGraphics2D_DrawPixels(*args)
     def Blit(*args): return _ivideo.iGraphics2D_Blit(*args)
-    def GetPixelAt(*args): return _ivideo.iGraphics2D_GetPixelAt(*args)
     def GetPixel(*args): return _ivideo.iGraphics2D_GetPixel(*args)
-    def SaveArea(*args): return _ivideo.iGraphics2D_SaveArea(*args)
-    def RestoreArea(*args): return _ivideo.iGraphics2D_RestoreArea(*args)
-    def FreeArea(*args): return _ivideo.iGraphics2D_FreeArea(*args)
     def AllowResize(*args): return _ivideo.iGraphics2D_AllowResize(*args)
     def Resize(*args): return _ivideo.iGraphics2D_Resize(*args)
     def GetFontServer(*args): return _ivideo.iGraphics2D_GetFontServer(*args)
@@ -187,7 +121,6 @@ class iGraphics2D(core.iBase):
     def SetGamma(*args): return _ivideo.iGraphics2D_SetGamma(*args)
     def GetGamma(*args): return _ivideo.iGraphics2D_GetGamma(*args)
     def GetName(*args): return _ivideo.iGraphics2D_GetName(*args)
-    def CreateOffscreenCanvas(*args): return _ivideo.iGraphics2D_CreateOffscreenCanvas(*args)
     def Write(*args): return _ivideo.iGraphics2D_Write(*args)
     def SetViewport(*args): return _ivideo.iGraphics2D_SetViewport(*args)
     def GetViewport(*args): return _ivideo.iGraphics2D_GetViewport(*args)
@@ -461,7 +394,6 @@ class iGraphics3D(core.iBase):
     def OpenPortal(*args): return _ivideo.iGraphics3D_OpenPortal(*args)
     def ClosePortal(*args): return _ivideo.iGraphics3D_ClosePortal(*args)
     def CreateHalo(*args): return _ivideo.iGraphics3D_CreateHalo(*args)
-    def RemoveFromCache(*args): return _ivideo.iGraphics3D_RemoveFromCache(*args)
     def SetWorldToCamera(*args): return _ivideo.iGraphics3D_SetWorldToCamera(*args)
     def PerformExtension(*args): return _ivideo.iGraphics3D_PerformExtension(*args)
     def GetWorldToCamera(*args): return _ivideo.iGraphics3D_GetWorldToCamera(*args)
@@ -754,6 +686,15 @@ class iShaderManager(iShaderVariableContext):
     def GetActiveLights(*args): return _ivideo.iShaderManager_GetActiveLights(*args)
     def GetSVNameStringset(*args): return _ivideo.iShaderManager_GetSVNameStringset(*args)
     def GetShaderCache(*args): return _ivideo.iShaderManager_GetShaderCache(*args)
+    cachePriorityLowest = _ivideo.iShaderManager_cachePriorityLowest
+    cachePriorityGlobal = _ivideo.iShaderManager_cachePriorityGlobal
+    cachePriorityApp = _ivideo.iShaderManager_cachePriorityApp
+    cachePriorityUser = _ivideo.iShaderManager_cachePriorityUser
+    cachePriorityHighest = _ivideo.iShaderManager_cachePriorityHighest
+    def AddSubShaderCache(*args): return _ivideo.iShaderManager_AddSubShaderCache(*args)
+    def AddSubCacheDirectory(*args): return _ivideo.iShaderManager_AddSubCacheDirectory(*args)
+    def RemoveSubShaderCache(*args): return _ivideo.iShaderManager_RemoveSubShaderCache(*args)
+    def RemoveAllSubShaderCaches(*args): return _ivideo.iShaderManager_RemoveAllSubShaderCaches(*args)
     scfGetVersion = staticmethod(_ivideo.iShaderManager_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iShaderManager
     __del__ = lambda self : None;
@@ -894,11 +835,6 @@ class iTextureHandle(core.iBase):
     def SetKeyColor(*args): return _ivideo.iTextureHandle_SetKeyColor(*args)
     def GetKeyColorStatus(*args): return _ivideo.iTextureHandle_GetKeyColorStatus(*args)
     def GetKeyColor(*args): return _ivideo.iTextureHandle_GetKeyColor(*args)
-    CS_TEX_IMG_1D = _ivideo.iTextureHandle_CS_TEX_IMG_1D
-    CS_TEX_IMG_2D = _ivideo.iTextureHandle_CS_TEX_IMG_2D
-    CS_TEX_IMG_3D = _ivideo.iTextureHandle_CS_TEX_IMG_3D
-    CS_TEX_IMG_CUBEMAP = _ivideo.iTextureHandle_CS_TEX_IMG_CUBEMAP
-    CS_TEX_IMG_RECT = _ivideo.iTextureHandle_CS_TEX_IMG_RECT
     CS_TEXTURE_CUBE_POS_X = _ivideo.iTextureHandle_CS_TEXTURE_CUBE_POS_X
     CS_TEXTURE_CUBE_NEG_X = _ivideo.iTextureHandle_CS_TEXTURE_CUBE_NEG_X
     CS_TEXTURE_CUBE_POS_Y = _ivideo.iTextureHandle_CS_TEXTURE_CUBE_POS_Y
@@ -907,13 +843,10 @@ class iTextureHandle(core.iBase):
     CS_TEXTURE_CUBE_NEG_Z = _ivideo.iTextureHandle_CS_TEXTURE_CUBE_NEG_Z
     def GetRendererDimensions(*args): return _ivideo.iTextureHandle_GetRendererDimensions(*args)
     def GetOriginalDimensions(*args): return _ivideo.iTextureHandle_GetOriginalDimensions(*args)
-    def GetTextureTarget(*args): return _ivideo.iTextureHandle_GetTextureTarget(*args)
     RGBA8888 = _ivideo.iTextureHandle_RGBA8888
     BGRA8888 = _ivideo.iTextureHandle_BGRA8888
     def Blit(*args): return _ivideo.iTextureHandle_Blit(*args)
     def GetImageName(*args): return _ivideo.iTextureHandle_GetImageName(*args)
-    def GetPrivateObject(*args): return _ivideo.iTextureHandle_GetPrivateObject(*args)
-    def GetAlphaMap(*args): return _ivideo.iTextureHandle_GetAlphaMap(*args)
     def GetAlphaType(*args): return _ivideo.iTextureHandle_GetAlphaType(*args)
     def Precache(*args): return _ivideo.iTextureHandle_Precache(*args)
     def IsPrecached(*args): return _ivideo.iTextureHandle_IsPrecached(*args)
@@ -951,37 +884,12 @@ CS_TEXTURE_NOFILTER = _ivideo.CS_TEXTURE_NOFILTER
 CS_TEXTURE_NPOTS = _ivideo.CS_TEXTURE_NPOTS
 CS_TEXTURE_SCALE_UP = _ivideo.CS_TEXTURE_SCALE_UP
 CS_TEXTURE_SCALE_DOWN = _ivideo.CS_TEXTURE_SCALE_DOWN
-class iRendererLightmap(core.iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def GetSLMCoords(*args): return _ivideo.iRendererLightmap_GetSLMCoords(*args)
-    def SetData(*args): return _ivideo.iRendererLightmap_SetData(*args)
-    def SetLightCellSize(*args): return _ivideo.iRendererLightmap_SetLightCellSize(*args)
-    __swig_destroy__ = _ivideo.delete_iRendererLightmap
-    __del__ = lambda self : None;
-iRendererLightmap_swigregister = _ivideo.iRendererLightmap_swigregister
-iRendererLightmap_swigregister(iRendererLightmap)
-
-class iSuperLightmap(core.iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def RegisterLightmap(*args): return _ivideo.iSuperLightmap_RegisterLightmap(*args)
-    def Dump(*args): return _ivideo.iSuperLightmap_Dump(*args)
-    def GetTexture(*args): return _ivideo.iSuperLightmap_GetTexture(*args)
-    __swig_destroy__ = _ivideo.delete_iSuperLightmap
-    __del__ = lambda self : None;
-iSuperLightmap_swigregister = _ivideo.iSuperLightmap_swigregister
-iSuperLightmap_swigregister(iSuperLightmap)
-
 class iTextureManager(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def RegisterTexture(*args): return _ivideo.iTextureManager_RegisterTexture(*args)
     def GetTextureFormat(*args): return _ivideo.iTextureManager_GetTextureFormat(*args)
-    def CreateSuperLightmap(*args): return _ivideo.iTextureManager_CreateSuperLightmap(*args)
     def GetMaxTextureSize(*args): return _ivideo.iTextureManager_GetMaxTextureSize(*args)
     def CreateTexture(*args): return _ivideo.iTextureManager_CreateTexture(*args)
     scfGetVersion = staticmethod(_ivideo.iTextureManager_scfGetVersion)

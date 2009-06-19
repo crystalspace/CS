@@ -26,7 +26,7 @@ automatically by the according 3D driver.
 This component is required by the 3D Engine but is also useful standalone.
 This driver is used to draw 3d graphics and also 2D bitmaps on screen.  It
 automatically loads a 2D driver on startup.  There are currently several
-implementations of this component: Software, OpenGL, and Null (for applications
+implementations of this component: OpenGL and Null (for applications
 that don't need 3D rendering but still want to use Crystal Space).
 
 @item

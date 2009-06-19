@@ -117,11 +117,6 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
       {
         const char* matname = child->GetContentsValue ();
         material = ldr_context->FindMaterial (matname);
-        csTicks start = csGetTicks();
-        while(!material.IsValid() && (csGetTicks() - start < 60000))
-        {
-          material = ldr_context->FindMaterial (matname);
-        }
         if (!material.IsValid ())
         {
           synldr->ReportError (
@@ -393,11 +388,6 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	{
     const char* matname = child->GetContentsValue ();
     iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-    csTicks start = csGetTicks();
-    while(!mat && (csGetTicks() - start < 60000))
-    {
-      mat = ldr_context->FindMaterial (matname);
-    }
     if (!mat)
     {
       synldr->ReportError (
@@ -1125,7 +1115,7 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
   if(!node) return false;
 
   const char* name = node->GetAttributeValue ("name");
-  csRef<iGeneralMeshSubMesh> subMesh = state->FindSubMesh (name);
+  csRef<iGeneralMeshSubMesh> subMesh = ldr_context->FindSubmesh (state, name);
   if (!subMesh)
   {
     synldr->ReportError (
@@ -1164,11 +1154,6 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
       {
         const char* matname = child->GetContentsValue ();
         csRef<iMaterialWrapper> material = ldr_context->FindMaterial (matname);
-        csTicks start = csGetTicks();
-        while(!material.IsValid() && (csGetTicks() - start < 60000))
-        {
-          material = ldr_context->FindMaterial (matname);
-        }
         if (!material.IsValid ())
         {
           synldr->ReportError (
@@ -1345,11 +1330,6 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	{
 	  const char* matname = child->GetContentsValue ();
     iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
-    csTicks start = csGetTicks();
-    while(!mat && (csGetTicks() - start < 60000))
-    {
-      mat = ldr_context->FindMaterial (matname);
-    }
     if (!mat)
     {
       synldr->ReportError (

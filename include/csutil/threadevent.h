@@ -50,7 +50,7 @@ public:
       TEventMemPool* mempool = (TEventMemPool*)args[0];
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2>
@@ -65,9 +65,10 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3>
@@ -83,9 +84,11 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a3->~A3();
+      a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4>
@@ -102,9 +105,12 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5>
@@ -122,9 +128,13 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
@@ -143,9 +153,14 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a6->~A6();
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7>
@@ -165,9 +180,15 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a7->~A7();
+      a6->~A6();
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8>
@@ -188,9 +209,16 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a8->~A8();
+      a7->~A7();
+      a6->~A6();
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9>
@@ -212,9 +240,17 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a9->~A9();
+      a8->~A8();
+      a7->~A7();
+      a6->~A6();
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10>
@@ -237,9 +273,18 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a10->~A10();
+      a9->~A9();
+      a8->~A8();
+      a7->~A7();
+      a6->~A6();
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11>
@@ -263,9 +308,19 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a11->~A11();
+      a10->~A10();
+      a9->~A9();
+      a8->~A8();
+      a7->~A7();
+      a6->~A6();
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12>
@@ -290,9 +345,20 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a12->~A12();
+      a11->~A11();
+      a10->~A10();
+      a9->~A9();
+      a8->~A8();
+      a7->~A7();
+      a6->~A6();
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12, typename A13>
@@ -318,9 +384,21 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a13->~A13();
+      a12->~A12();
+      a11->~A11();
+      a10->~A10();
+      a9->~A9();
+      a8->~A8();
+      a7->~A7();
+      a6->~A6();
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12, typename A13, typename A14>
@@ -347,9 +425,22 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a14->~A14();
+      a13->~A13();
+      a12->~A12();
+      a11->~A11();
+      a10->~A10();
+      a9->~A9();
+      a8->~A8();
+      a7->~A7();
+      a6->~A6();
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 
   template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10, typename A11, typename A12, typename A13, typename A14, typename A15>
@@ -377,9 +468,23 @@ public:
       }
       (*a1)->MarkFinished();
       TEventMemPool* mempool = (TEventMemPool*)args[0];
+      a15->~A15();
+      a14->~A14();
+      a13->~A13();
+      a12->~A12();
+      a11->~A11();
+      a10->~A10();
+      a9->~A9();
+      a8->~A8();
+      a7->~A7();
+      a6->~A6();
+      a5->~A5();
+      a4->~A4();
+      a3->~A3();
+      a2->~A2();
       a1->Invalidate();
       delete mempool;
-      delete args;
+      delete[] args;
   }
 };
 
@@ -718,8 +823,12 @@ inline void const* TEventMemPool::Store<const char*>(const char** p)
     return 0;
   }
 
-  char* ptr = (char*)Alloc(strlen(*p) + 1);
-  strcpy(ptr, *p);
+  char* ptr = 0;
+  if(*p)
+  {
+    ptr = (char*)Alloc(strlen(*p) + 1);
+    strcpy(ptr, *p);
+  }
 
   char** ptrPtr = new (this) char*;
   *ptrPtr = ptr;

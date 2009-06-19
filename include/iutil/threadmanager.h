@@ -20,7 +20,9 @@
 #define __CS_IUTIL_THREADMANAGER_H__
 
 #include "csutil/refcount.h"
+#include "csutil/refarr.h"
 
+struct iConfigManager;
 struct iJob;
 
 struct iThreadReturn : public csRefCount
@@ -44,6 +46,7 @@ enum QueueType
 {
   THREADED = 0,
   HIGH,
+  MED,
   LOW
 };
 
@@ -60,12 +63,18 @@ enum QueueType
 
 struct iThreadManager : public virtual iBase
 {
-  SCF_INTERFACE(iThreadManager, 1, 0, 0);
+  SCF_INTERFACE(iThreadManager, 2, 0, 0);
 
+  virtual void Init(iConfigManager* config) = 0;
   virtual void Process(uint num = 1) = 0;
   virtual void PushToQueue(QueueType queueType, iJob* job) = 0;
   virtual void Wait(csRef<iThreadReturn> result) = 0;
-  virtual bool RunNow(QueueType queueType, bool forceQueue) = 0;
+  virtual bool Wait(csRefArray<iThreadReturn>& threadReturns) = 0;
+  virtual bool RunNow(QueueType queueType, bool wait, bool forceQueue) = 0;
+  virtual int32 GetThreadCount() = 0;
+  virtual void SetAlwaysRunNow(bool v) = 0;
+  virtual bool GetAlwaysRunNow() = 0;
+  virtual bool Exiting() = 0;
 };
 
 // Interface macros

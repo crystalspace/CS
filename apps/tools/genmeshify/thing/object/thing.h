@@ -41,8 +41,6 @@
 #include "cstool/rendermeshholder.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
-#include "iengine/shadcast.h"
-#include "imesh/lighting.h"
 #include "imesh/object.h"
 #include "../thing.h"
 #include "iutil/comp.h"
@@ -58,12 +56,10 @@
 #include "polygon.h"
 #include "polyrender.h"
 
-struct iShadowBlockList;
 struct csVisObjInfo;
 struct iGraphics3D;
 struct iRenderView;
 struct iMovable;
-struct iFrustumView;
 struct iMaterialWrapper;
 struct iPolygonBuffer;
 
@@ -570,12 +566,9 @@ public:
  * oriented such that they are visible from the outside.
  */
 class csThing : 
-  public scfImplementation5<csThing,
+  public scfImplementation2<csThing,
 			    iMeshObject, 
-			    iThingState,
-			    iShadowReceiver,
-			    iLightingInfo, 
-			    iShadowCaster>
+			    iThingState>
 {
   friend class csPolygon3D;
   friend class csPolygonRenderer::BufferAccessor;
@@ -695,8 +688,6 @@ private:
   /// Polys with the same material and the same SLM
   struct csLitPolyGroup : public csPolyGroup
   {
-    csRefArray<iRendererLightmap> lightmaps;
-    csRef<iSuperLightmap> SLM;
   };
 
   csPDelArray<csLitPolyGroup> litPolys;
@@ -849,7 +840,7 @@ public:
   /**
    * Init the lightmaps for all polygons in this thing.
    */
-  virtual void InitializeDefault (bool clear);
+  //virtual void InitializeDefault (bool clear);
 
   /**
    * Read the lightmaps from the cache.
@@ -865,7 +856,7 @@ public:
    * Prepare the lightmaps for all polys so that they are suitable
    * for the 3D rasterizer.
    */
-  virtual void PrepareLighting ();
+  //virtual void PrepareLighting ();
 
   /// Marks the whole object as it is affected by any light.
   void MarkLightmapsDirty ();
@@ -876,7 +867,7 @@ public:
    */
   iTextureHandle* GetPolygonTexture (size_t index)
   {
-    return index < litPolys.GetSize () ? litPolys[index]->SLM->GetTexture() : 0;
+    return 0;
   }
   /// Ensure lightmap textures are up-to-date
   void UpdateDirtyLMs ();
@@ -884,19 +875,6 @@ public:
   //----------------------------------------------------------------------
   // Utility functions
   //----------------------------------------------------------------------
-
-  /**
-   * Check frustum visibility on this thing.
-   * First initialize the 2D culler cube.
-   */
-  virtual void CastShadows (iMovable* movable, iFrustumView* lview);
-
-  /**
-   * Append a list of shadow frustums which extend from
-   * this thing. The origin is the position of the light.
-   */
-  virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
-  	const csVector3& origin);
 
   /**
    * Test a beam with this thing.
@@ -936,9 +914,9 @@ public:
   uint32 GetLightVersion() const
   { return light_version; }
 
-  virtual void LightChanged (iLight* light);
-  virtual void LightDisconnect (iLight* light);
-  virtual void DisconnectAllLights ();
+  //virtual void LightChanged (iLight* light);
+  //virtual void LightDisconnect (iLight* light);
+  //virtual void DisconnectAllLights ();
 
   void SetMixMode (uint mode)
   {

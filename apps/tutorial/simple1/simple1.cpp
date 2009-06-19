@@ -202,21 +202,21 @@ bool Simple::SetupModules ()
   // We use the full window to draw the world.
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
-  // First disable the lighting cache. Our app is simple enough
-  // not to need this.
-  engine->SetLightingCacheMode (0);
-
   // Here we create our world.
   CreateRoom();
 
-  // Let the engine prepare all lightmaps for use and also free all images 
-  // that were loaded for the texture manager.
+  // Let the engine prepare the meshes and textures.
   engine->Prepare ();
+
+  // Now calculate static lighting for our geometry.
+  using namespace CS::Lighting;
+  SimpleStaticLighter::ShineLights (room, engine, 4);
+
   rm = engine->GetRenderManager();
 
   // these are used store the current orientation of the camera
   rotY = rotX = 0;
-  
+ 
   // Now we need to position the camera in our world.
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
@@ -237,34 +237,8 @@ void Simple::CreateRoom ()
   // File System (VFS) plugin.
   if (!loader->LoadTexture ("brick", "/lib/std/castle/brick1_d.jpg"))
     ReportError("Error loading 'brick1_d' texture!");
-
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("brick");
   
-  /* Shader variables are identified by numeric IDs for performance reasons.
-   * The shader var string set translates string IDs to numeric IDs. */
-  csRef<iShaderVarStringSet> svStrings =
-    csQueryRegistryTagInterface<iShaderVarStringSet> (GetObjectRegistry(),
-      "crystalspace.shader.variablenameset");
-  
-  // Add a normal map to the material.
-  {
-    // Load the normal map texture itself
-    csRef<iTextureHandle> normalMap = loader->LoadTexture (
-      "/lib/std/castle/brick1_n.jpg");
-    // Set this to avoid compression - makes for better quality here
-    normalMap->SetTextureClass ("normalmap");
-    // The normal map is attached to the material through a shader variable.
-    csShaderVariable* svNormalMap =
-      tm->GetMaterial()->GetVariableAdd (svStrings->Request ("tex normal"));
-    svNormalMap->SetValue (normalMap);
-  }
-  // Set a specular reflection color.
-  {
-    csShaderVariable* svSpecColor =
-      tm->GetMaterial()->GetVariableAdd (svStrings->Request ("specular"));
-    svSpecColor->SetValue (csColor (0.8f));
-  }
-
   // We create a new sector called "room".
   room = engine->CreateSector ("room");
 
@@ -281,10 +255,6 @@ void Simple::CreateRoom ()
   // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
       engine, room, "walls", "walls_factory", &box);
-
-  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
-    iGeneralMeshState> (walls->GetMeshObject ());
-  mesh_state->SetShadowReceiving (true);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   // Now we need light to see something.

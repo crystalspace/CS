@@ -136,9 +136,9 @@ public:
 @item
 @emph{Maximum Line Length}
 
-In general, lines in source code should be no longer than 78 characters.  This
-facilitates generation of hard-copy and works better with certain tools which
-process code or text files.
+There used to be a strict line length of 78 characters. However, this restriction
+has been lifted. But it is still recommended to not overdo it. Split a line if it
+becomes too long to read comfortably.
 
 @item
 @emph{Multiple-Inclusion Protection for Headers}

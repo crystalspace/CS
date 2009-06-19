@@ -32,11 +32,9 @@
 #include "iutil/selfdestruct.h"
 #include "csgfx/shadervarcontext.h"
 #include "imesh/object.h"
-#include "imesh/lighting.h"
 #include "iengine/mesh.h"
 #include "iengine/imposter.h"
 #include "iengine/viscull.h"
-#include "iengine/shadcast.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 
@@ -209,22 +207,6 @@ protected:
 private:
   /// Mesh object corresponding with this csMeshWrapper.
   csRef<iMeshObject> meshobj;
-  /// For optimization purposes we keep the iLightingInfo interface here.
-  csRef<iLightingInfo> light_info;
-  /**
-   * For optimization purposes we keep the iShadowReceiver interface here.
-   * Also for maintaining the special version of the shadow receiver that
-   * multiplexes in case of static lod.
-   */
-  csRef<iShadowReceiver> shadow_receiver;
-  bool shadow_receiver_valid;
-  /**
-   * For optimization purposes we keep the iShadowCaster interface here.
-   * Also for maintaining the special version of the shadow caster that
-   * multiplexes in case of static lod.
-   */
-  csRef<iShadowCaster> shadow_caster;
-  bool shadow_caster_valid;
 
   /**
    * For optimization purposes we keep the portal container interface here
@@ -321,8 +303,6 @@ public:
 
   virtual iPortalContainer* GetPortalContainer () const
   { return portal_container; }
-  virtual iShadowReceiver* GetShadowReceiver ();
-  virtual iShadowCaster* GetShadowCaster ();
 
   /// For iVisibilityObject: Get the object model.
   virtual iObjectModel* GetObjectModel ()
@@ -572,10 +552,6 @@ public:
     return this;
   }
   virtual iMeshWrapper* FindChildByName (const char* name);
-  virtual iLightingInfo* GetLightingInfo () const
-  {
-    return light_info;
-  }
   virtual csFlags& GetFlags ()
   {
     return flags;

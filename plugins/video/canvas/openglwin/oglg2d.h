@@ -67,10 +67,6 @@ public:
 
   virtual void Print (csRect const* area = 0);
 
-  virtual void SetRGB(int i, int r, int g, int b);
-
-  virtual HRESULT SetColorPalette();
-
   virtual bool SetMouseCursor (csMouseCursorID iShape);
   virtual bool SetMouseCursor (iImage *image, const csRGBcolor* keycolor, 
                                int hotspot_x, int hotspot_y,
@@ -93,12 +89,6 @@ public:
 
   int m_nGraphicsReady;
 
-  /**
-   * Get address of video RAM at given x,y coordinates.
-   * The OpenGL version of this function just returns 0.
-   */
-  static unsigned char* GetPixelAtGL (int x, int y);
-
   virtual void *GetProcAddress (const char *funcname)
   { return (void*)(wglGetProcAddress ((const char *)funcname)); }
 
@@ -114,9 +104,6 @@ protected:
   csDetectDriver detector;
 
   csRef<iWin32Assistant> m_piWin32Assistant;
-
-  bool m_bPalettized;
-  bool m_bPaletteChanged;
 
   bool m_bHardwareCursor;
 

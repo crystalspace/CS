@@ -86,8 +86,7 @@ protected:
     const char* cacheFailReason);
   
   csRef<iDocument> DoSynthesis (iDocumentNode* source,
-    iHierarchicalCache* cacheTo, int forcepriority,
-    bool noCacheRead);
+    iHierarchicalCache* cacheTo, int forcepriority);
 public:
   CS_LEAKGUARD_DECLARE (WeaverShader);
 

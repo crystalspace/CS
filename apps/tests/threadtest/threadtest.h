@@ -59,6 +59,8 @@ public:
   iObjectRegistry* GetObjectRegistry() const { return objReg; }
 
   THREADED_CALLABLE_DECL(csThreadTest, Test1, csThreadReturn, THREADED, false, false)
+  THREADED_CALLABLE_DECL(csThreadTest, Test1Data, csThreadReturn, THREADED, false, false)
+  THREADED_CALLABLE_DECL1(csThreadTest, Test1Data2, csThreadReturn, csRef<iThreadReturn>, itr, THREADED, false, false)
   THREADED_CALLABLE_DECL1(csThreadTest, Test2, csThreadReturn, bool, b, THREADED, false, false)
   THREADED_CALLABLE_DECL2(csThreadTest, Test3, csThreadReturn, int, in, float, flo, THREADED, false, false)
   THREADED_CALLABLE_DECL1(csThreadTest, Test4, csThreadReturn, csWeakRef<iThreadTest>, myself, THREADED, false, false)
@@ -78,7 +80,7 @@ public:
 private:
   iObjectRegistry* objReg;
 
-  Mutex test7lock;
+  CS::Threading::Mutex test7lock;
   uint test7;
 };
 

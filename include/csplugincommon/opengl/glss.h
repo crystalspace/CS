@@ -25,8 +25,8 @@
  */
 
 #include "csextern_gl.h"
-#include "csplugincommon/canvas/scrshot.h"
 #include "csutil/scf_implementation.h"
+#include "csgfx/imagebase.h"
 
 class csGraphics2DGLCommon;
 

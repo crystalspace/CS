@@ -61,12 +61,11 @@ and it is named @samp{crystalspace.kernel.vfs}. @xref{VFS}.
 A 3D renderer.  Some possible values include
 
 @table @code
-@item crystalspace.graphics3d.software
-Uses the platform-specific 2D canvas to perform 3D graphics operations.
-
 @item crystalspace.graphics3d.opengl
 Uses OpenGL for 3D output, and by this takes advantage of hardware
 acceleration. Requires installed OpenGL run-time libraries.
+@item crystalspace.graphics3d.null
+A null renderer useful for servers.
 @end table
 
 @item iBugPlug

@@ -68,7 +68,7 @@ on thread-safety of the output console that is being used.
 @item
 The following mesh object and factory loaders are thread-safe provided that the
 implementation of @samp{iLoaderContext} is thread-safe.  Please note that the
-default @code{iLoaderContext} is @emph{not} thread-safe which makes all loader
+default @samp{iLoaderContext} is @emph{not} thread-safe which makes all loader
 plugins unsafe by default.
 
 @itemize @bullet
@@ -93,35 +93,34 @@ without you having to change anything to compensate (up to some point which depe
 @subsubheading Interfaces
 
 To declare that you want a method in your interface to be run in a thread other
-than the main thread, you need to make use of the THREADED_INTERFACE macro.
-This is rather straightforward as shown;
+than the main thread, you need to make use of the @samp{THREADED_INTERFACE}
+macro. This is rather straightforward as shown;
 
 @example
-
 #include "iutil/threadmanager.h"
 
 struct iThreadTest : public virtual iBase
-{
+@{
   THREADED_INTERFACE(Test1);
   THREADED_INTERFACE1(Test2, bool b);
   THREADED_INTERFACE2(Test3, int i, float f);
-}
+@}
 @end example
 
 This will add extra information to your method, such as a special return type.
 
 @subsubheading Class and Method declaration
 
-Inside your class, to declare a method as being threaded you need to do two things;
+Inside your class, to declare a method as being threaded you need to do two things:
 
 @itemize @bullet
-@item Inherit from the class ThreadedCallable<>; This adds some extra required functionality
+@item Inherit from the class @samp{ThreadedCallable<>}. This adds some extra required functionality
 to your class and forces you to implement some needed methods. Currently, you are only required
-to implement GetObjectRegistry().
-@item Make use of the THREADED_CALLABLE_DECL macro. This is explained below. 
+to implement @samp{GetObjectRegistry()}.
+@item Make use of the @samp{THREADED_CALLABLE_DECL} macro. This is explained below. 
 @end itemize
 
-The THREADED_CALLABLE_DECL macro is what kicks everything off. It creates extra functions to
+The @samp{THREADED_CALLABLE_DECL} macro is what kicks everything off. It creates extra functions to
 dispatch the method call off to the thread manager, and provides a declaration to your function.
 It takes multiple parameters:
 
@@ -137,53 +136,57 @@ It takes multiple parameters:
 @example
 #include "csutil/threadmanager.h"
 
-class csThreadTest : public ThreadedCallable<csThreadTest>,
-                     public scfImplementation1<csThreadTest,
-                                               iThreadTest>
-{
+class csThreadTest :
+  public ThreadedCallable<csThreadTest>,
+  public scfImplementation1<csThreadTest, iThreadTest>
+@{
 public:
-
   csThreadTest(iObjectRegistry* objReg);
 
-  iObjectRegistry* GetObjectRegistry() const { return objReg; }
+  iObjectRegistry* GetObjectRegistry() const
+  @{ return objReg; @}
 
-  THREADED_CALLABLE_DECL(csThreadTest, Test1, csThreadReturn, true, false)
-  THREADED_CALLABLE_DECL1(csThreadTest, Test2, csThreadReturn, bool, b, true, false)
-  THREADED_CALLABLE_DECL2(csThreadTest, Test3, csThreadReturn, int, in, float, flo, true, false)
+  THREADED_CALLABLE_DECL(
+    csThreadTest, Test1, csThreadReturn, true, false)
+  THREADED_CALLABLE_DECL1(
+    csThreadTest, Test2, csThreadReturn, bool, b, true, false)
+  THREADED_CALLABLE_DECL2(
+    csThreadTest, Test3, csThreadReturn, int, in, float, flo,
+    true, false)
 
 private:
   iObjectRegistry* objReg;
-}
+@}
 @end example
 
 @subsubheading Method definition
 
-Now that you have your class set up and methods declared, you need to define them. You do this using the THREADED_CALLABLE_IMPL macro.
+Now that you have your class set up and methods declared, you need to define them. You do this using the @samp{THREADED_CALLABLE_IMPL} macro.
 The first parameter is the class name. The second is the method name and the rest are your variables as normal.
 
-The 'return' here is actually a provided object, as you will read more about below. This is called 'ret'.
+The @samp{return} here is actually a provided object, as you will read more about below. This is called @samp{ret}.
 
 @example
 THREADED_CALLABLE_IMPL(csThreadTest, Test1)
-{
-}
+@{
+@}
 
 THREADED_CALLABLE_IMPL1(csThreadTest, Test2, bool b)
-{
-}
+@{
+@}
 
 THREADED_CALLABLE_IMPL2(csThreadTest, Test3, int i, float f)
-{
-}
+@{
+@}
 @end example
 
 @subsubheading Return types
 
 As mentioned above, you specify the class of the return object in the method declaration.
-There a restriction here; The object must implement the iThreadReturn interface.
-This is already implemented in csutil/threadmanager.h (csThreadReturn), or you may implement this yourself.
+There a restriction here; The object must implement the @samp{iThreadReturn} interface.
+This is already implemented in @file{csutil/threadmanager.h} (@samp{csThreadReturn}), or you may implement this yourself.
 
-This return object basically tells/gives you three things;
+This return object basically tells/gives you three things:
 
 @itemize @bullet
 @item Whether or not the method call has finished yet.
@@ -191,8 +194,8 @@ This return object basically tells/gives you three things;
 @item The return data from that method call.
 @end itemize
 
-You set the return data yourself using the provided 'ret' iThreadReturn object interface in your method definition.
-The return data is in the form of a csRef<iBase> or a void*. It is up to you which you choose to use.
+You set the return data yourself using the provided @samp{ret} @samp{iThreadReturn} object interface in your method definition.
+The return data is in the form of a @code{csRef<iBase>} or a @samp{void*}. It is up to you which you choose to use.
 To indicate whether or not your function has succeeded, return a boolean value (true for success).
 Your return object will automatically be updated when your method has finished executing to mark that this is the case.
 
@@ -200,22 +203,22 @@ An example of this:
 
 @example
 THREADED_CALLABLE_IMPL(csClassName, MethodName2)
-{
+@{
   csRef<iInterface> obj = csPtr<iInterface>(new csImpl())
   ret->SetData(csRef<iBase>(obj));
   return true;
-}
+@}
 
 csClassName::MethodName()
-{
+@{
   csRef<iThreadReturn> ret = MethodName2();
   ret->Wait();
   if(ret->WasSuccessful())
-  {
+  @{
     csRef<iInterface> obj;
     ret->GetData(obj);
-  }
-}
+  @}
+@}
 @end example
 
 @subsubheading Waiting
@@ -228,7 +231,7 @@ ret->Wait();
 
 The majority of the time you will want your method call to return immediately so you can continue onwards.
 At some point you might want to check and wait for your method to finish before continuing.
-The thread manager provides a simple way to do this. Call 'Wait()', on your iThreadReturn and it will send
+The thread manager provides a simple way to do this. Call @code{Wait()}, on your @samp{iThreadReturn} and it will send
 a message to the thread manager and then wait until your method has finished executing, at which point it will return.
 
 @subheading Threaded Loading

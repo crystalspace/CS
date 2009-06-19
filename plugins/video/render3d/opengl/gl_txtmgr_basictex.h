@@ -315,22 +315,6 @@ public:
   void SetupAutoMipping();
   void RegenerateMipmaps();
 
-  /// Get the texture target
-  virtual int GetTextureTarget () const { return int (texType); }
-
-  /**
-   * Query the private object associated with this handle.
-   * For internal usage by the 3D driver.
-   */
-  virtual void *GetPrivateObject ();
-
-  /**
-   * Query if the texture has an alpha channel.<p>
-   * This depends both on whenever the original image had an alpha channel
-   * and of the fact whenever the renderer supports alpha maps at all.
-   */
-  virtual bool GetAlphaMap ();
-
   virtual csAlphaMode::AlphaType GetAlphaType () const
   { return alphaType; }
   virtual void SetAlphaType (csAlphaMode::AlphaType alphaType)

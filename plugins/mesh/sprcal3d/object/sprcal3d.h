@@ -42,7 +42,6 @@
 #include "iengine/lod.h"
 #include "iengine/material.h"
 #include "iengine/mesh.h"
-#include "imesh/lighting.h"
 #include "imesh/object.h"
 #include "imesh/spritecal3d.h"
 #include "imesh/skeleton.h"
@@ -401,10 +400,9 @@ class csCal3dSkeleton;
  * a skeleton).
  */
 class csSpriteCal3DMeshObject :
-  public scfImplementationExt4<csSpriteCal3DMeshObject,
+  public scfImplementationExt3<csSpriteCal3DMeshObject,
 			       csObjectModel,
 			       iMeshObject,
-			       iLightingInfo,
 			       iSpriteCal3DState,
 			       iLODControl>
 {
@@ -462,7 +460,7 @@ private:
       CalMesh* calMesh, size_t vertexCount);
   public:
     iMovable* movable;
-
+	
     MeshAccessor (csSpriteCal3DMeshObject* meshobj, int mesh) :
       scfImplementationType (this)
     {
@@ -588,17 +586,6 @@ public:
 
   /// Get the factory.
   csSpriteCal3DMeshObjectFactory* GetFactory3D () const { return factory; }
-
-  /**\name iLightingInfo interface
-   * @{ */
-  void InitializeDefault (bool /*clear*/) {}
-  bool ReadFromCache (iCacheManager* /*cache_mgr*/) { return true; }
-  bool WriteToCache (iCacheManager* /*cache_mgr*/) { return true; }
-  virtual void PrepareLighting () { }
-  void LightChanged (iLight* light);
-  void LightDisconnect (iLight* light);
-  void DisconnectAllLights ();
-  /** @} */
 
   /**\name iMeshObject implementation
    * @{ */

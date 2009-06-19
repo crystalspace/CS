@@ -31,7 +31,6 @@
 #include "iengine/light.h"
 #include "iengine/material.h"
 #include "iengine/movable.h"
-#include "iengine/shadows.h"
 #include "iengine/texture.h"
 #include "iutil/cache.h"
 #include "iutil/vfs.h"
@@ -391,8 +390,8 @@ iMaterial *csPolygon3DStatic::GetMaterial ()
 bool csPolygon3DStatic::IsTransparent ()
 {
   iTextureHandle *txt_handle = GetMaterial ()->GetTexture ();
-  return txt_handle && ((txt_handle->GetAlphaMap ()
-    || txt_handle->GetKeyColor ()));
+  return txt_handle && ((txt_handle->GetAlphaType ()
+    != csAlphaMode::alphaNone));
 }
 
 int csPolygon3DStatic::Classify (const csPlane3 &pl)
@@ -1142,10 +1141,10 @@ csPolygon3D::~csPolygon3D ()
   {
     while (lightpatches)
     {
-      iLight* dl = lightpatches->GetLight ();
-      if (dl)
-        dl->RemoveAffectedLightingInfo (
-                (iLightingInfo*)thing);
+      //iLight* dl = lightpatches->GetLight ();
+      //if (dl)
+        //dl->RemoveAffectedLightingInfo (
+                //(iLightingInfo*)thing);
       thing->GetStaticData ()->thing_type->lightpatch_pool->Free (lightpatches);
     }
   }
@@ -1153,11 +1152,6 @@ csPolygon3D::~csPolygon3D ()
 
 void csPolygon3D::RemovePolyTexture ()
 {
-  if (GetParent ())
-  {
-    iGraphics3D* G3D = GetParent()->GetStaticData()->thing_type->G3D;
-    if (G3D && txt_info.rlm) G3D->RemoveFromCache (txt_info.rlm);
-  }
   if (txt_info.lm)
   {
     GetParent ()->GetStaticData ()->thing_type->blk_lightmap.Free (txt_info.lm);
@@ -1274,305 +1268,7 @@ const char* csPolygon3D::ReadFromCache (iFile* file, csPolygon3DStatic* spoly)
 
 bool csPolygon3D::WriteToCache (iFile* file, csPolygon3DStatic* spoly)
 {
-  if (txt_info.lm == 0 || txt_info.lm->GetStaticMap () == 0) return true;
-  if ((thing->GetStaticData ()->thing_type->engine->GetLightingCacheMode ()
-       & CS_ENGINE_CACHE_WRITE))
-  {
-    txt_info.lm->Cache (file, this,
-        spoly,
-                        thing->GetStaticData ()->thing_type->engine);
-  }
   return true;
 }
 
-bool csPolygon3D::MarkRelevantShadowFrustums (
-  iFrustumView* lview,
-  csPlane3 &plane,
-  csPolygon3DStatic* spoly)
-{
-  // @@@ Currently this function only checks if a shadow frustum is inside
-  // the light frustum. There is no checking done if shadow frustums obscure
-  // each other.
-  int i, i1, j, j1;
-
-  csFrustumContext *ctxt = lview->GetFrustumContext ();
-  iShadowIterator *shadow_it = ctxt->GetShadows ()->GetShadowIterator ();
-  csFrustum *lf = ctxt->GetLightFrustum ();
-  const csVector3 &center = ctxt->GetLightFrustum ()->GetOrigin ();
-
-  // Precalculate the normals for csFrustum::BatchClassify.
-  csVector3 *lf_verts = lf->GetVertices ();
-  csVector3 lf_normals[100];  // @@@ HARDCODED!
-  i1 = lf->GetVertexCount () - 1;
-  for (i = 0; i < (int)lf->GetVertexCount (); i++)
-  {
-    lf_normals[i1] = lf_verts[i1] % lf_verts[i];
-    i1 = i;
-  }
-
-  int* vt_idx = spoly->GetVertexIndices ();
-
-  // For every shadow frustum...
-  while (shadow_it->HasNext ())
-  {
-    csFrustum *sf = shadow_it->Next ();
-
-    // First check if the plane of the shadow frustum is close to the plane
-    // of the polygon (the input parameter 'plane'). If so then we discard the
-    // frustum as not relevant.
-    if (csMath3::PlanesClose (*sf->GetBackPlane (), plane))
-      shadow_it->MarkRelevant (false);
-    else
-    {
-      csPolygon3D *sfp = (csPolygon3D *) (shadow_it->GetUserData ());
-      if (sfp == 0)
-      {
-        shadow_it->MarkRelevant (true);
-        continue;
-      }
-      csPolygon3DStatic* sfp_static = sfp->GetStaticPoly ();
-      int* sfp_vt_idx = sfp_static->GetVertexIndices ();
-      csThing* sfp_thing = sfp->GetParent ();
-      int sfp_vt_cnt = sfp_static->GetVertexCount ();
-
-      switch (csFrustum::BatchClassify (
-            lf_verts,
-            lf_normals,
-            lf->GetVertexCount (),
-            sf->GetVertices (),
-            sf->GetVertexCount ()))
-      {
-        case CS_FRUST_PARTIAL:
-        case CS_FRUST_INSIDE:
-          shadow_it->MarkRelevant (true);
-
-          // If partial then we first test if the light and shadow
-          // frustums are adjacent. If so then we ignore the shadow
-          // frustum as well (not relevant).
-
-          i1 = spoly->GetVertexCount () - 1;
-          for (i = 0; i < spoly->GetVertexCount (); i++)
-          {
-            j1 = sfp_vt_cnt - 1;
-
-            const csVector3& v_i1 = thing->Vwor (vt_idx[i1]);
-            const csVector3& v_i = thing->Vwor (vt_idx[i]);
-            const csVector3& sfp_v_j1 = sfp_thing->Vwor (sfp_vt_idx[j1]);
-            float a1 = csMath3::Direction3 (v_i1, v_i, sfp_v_j1);
-            for (j = 0 ; j < sfp_vt_cnt ; j++)
-            {
-              const csVector3& sfp_v_j = sfp_thing->Vwor (sfp_vt_idx[j]);
-              float a = csMath3::Direction3 (v_i1, v_i, sfp_v_j);
-              if (ABS (a) < EPSILON && ABS (a1) < EPSILON)
-              {
-                // The two points of the shadow frustum are on the same
-                // edge as the current light frustum edge we are examining.
-                // In this case we test if the orientation of the two edges
-                // is different. If so then the shadow frustum is not
-                // relevant.
-                csVector3 d1 = v_i - v_i1;
-                csVector3 d2 = sfp_v_j - sfp_v_j1;
-                if (
-                  (d1.x < -EPSILON && d2.x > EPSILON) ||
-                  (d1.x > EPSILON && d2.x < -EPSILON) ||
-                  (d1.y < -EPSILON && d2.y > EPSILON) ||
-                  (d1.y > EPSILON && d2.y < -EPSILON) ||
-                  (d1.z < -EPSILON && d2.z > EPSILON) ||
-                  (d1.z > EPSILON && d2.z < -EPSILON))
-                {
-                  shadow_it->MarkRelevant (false);
-                  break;
-                }
-              }
-
-              if (!shadow_it->IsRelevant ()) break;
-              j1 = j;
-              a1 = a;
-            }
-
-            if (!shadow_it->IsRelevant ()) break;
-            i1 = i;
-          }
-          break;
-        case CS_FRUST_OUTSIDE:
-          shadow_it->MarkRelevant (false);
-          break;
-        case CS_FRUST_COVERED:
-          {
-            // To see if we really have a 'covered' case we first
-            // test if the covering polygon isn't behind the first
-            // polygon. To do that we take a ray from the center of
-            // the light to the plane of the other polygon and see
-            // if it intersects.
-            csVector3 isect;
-            float dist;
-            const csPlane3& wor_plane = sfp->GetParent ()
-                ->GetPolygonWorldPlaneNoCheck (sfp->GetPolyIdx ());
-            if (!csIntersect3::SegmentPlane (center, thing->Vwor (vt_idx[0]), wor_plane,
-              isect, dist))
-            {
-              shadow_it->MarkRelevant (false);
-              break;
-            }
-          }
-          shadow_it->DecRef ();
-          return false;
-      }
-    }
-  }
-
-  shadow_it->DecRef ();
-  return true;
-}
-
-bool csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
-    iMovable* /*movable*/, const csPlane3& world_plane,
-    csPolygon3DStatic* spoly)
-{
-  csFrustum *light_frustum = lview->GetFrustumContext ()->GetLightFrustum ();
-  const csVector3 &center = light_frustum->GetOrigin ();
-
-  // If plane is not visible then return (backface culling).
-  if (!csMath3::Visible (center, world_plane)) return false;
-
-  // Compute the distance from the center of the light
-  // to the plane of the polygon.
-  float dist_to_plane = world_plane.Distance (center);
-
-  // If distance is too small or greater than the radius of the light
-  // then we have a trivial case (no hit).
-  if (dist_to_plane < SMALL_EPSILON || dist_to_plane >= lview->GetRadius ())
-    return false;
-
-  csRef<csFrustum> new_light_frustum;
-
-  csVector3 *poly;
-  int num_vertices;
-
-  num_vertices = spoly->polygon_data.num_vertices;
-  if ((size_t)num_vertices > VectorArray->GetSize ())
-    VectorArray->SetSize (num_vertices);
-  poly = VectorArray->GetArray ();
-
-  int j;
-  int* vt_idx = spoly->GetVertexIndices ();
-  if (lview->GetFrustumContext ()->IsMirrored ())
-    for (j = 0; j < num_vertices; j++)
-      poly[j] = thing->Vwor (vt_idx[num_vertices - j - 1]) - center;
-  else
-    for (j = 0; j < num_vertices; j++)
-      poly[j] = thing->Vwor (vt_idx[j]) - center;
-
-  new_light_frustum = light_frustum->Intersect (poly, num_vertices);
-
-  // Check if light frustum intersects with the polygon
-  if (!new_light_frustum) return false;
-
-  // There is an intersection of the current light frustum with the polygon.
-  // This means that the polygon is hit by the light.
-  // The light is close enough to the plane of the polygon. Now we calculate
-  // an accurate minimum squared distance from the light to the polygon. Note
-  // that we use the new_frustum which is relative to the center of the
-  // light.
-  // So this algorithm works with the light position at (0,0,0).
-  csPlane3 poly_plane = csPoly3D::ComputePlane (poly, num_vertices);
-
-  csVector3 o (0, 0, 0);
-  float min_sqdist = csSquaredDist::PointPoly (
-      o,
-      new_light_frustum->GetVertices (),
-      new_light_frustum->GetVertexCount (),
-      poly_plane,
-      dist_to_plane * dist_to_plane);
-
-  if (min_sqdist >= lview->GetSquaredRadius ()) return false;
-
-  // Update the lightmap.
-  return FillLightMapDynamic (lview, new_light_frustum);
-}
-
-bool csPolygon3D::FillLightMapDynamic (iFrustumView* lview,
-        csFrustum* light_frustum)
-{
-  csFrustumContext *ctxt = lview->GetFrustumContext ();
-
-  // We are working for a dynamic light. In this case we create
-  // a light patch for this polygon.
-  // @@@ Lots of pointers to get the lightpatch pool!!!
-  csLightPatch *lp = thing->GetStaticData ()->thing_type->
-    lightpatch_pool->Alloc ();
-  AddLightpatch (lp);
-
-  iFrustumViewUserdata* fvud = lview->GetUserdata ();
-  iLightingProcessInfo* lpi = (iLightingProcessInfo*)fvud;
-  iLight* l = lpi->GetLight ();
-  lp->SetLight (l);
-
-  //csFrustum *light_frustum = ctxt->GetLightFrustum ();
-  lp->Initialize (light_frustum->GetVertexCount ());
-
-  int i, mi;
-  for (i = 0; i < lp->GetVertexCount (); i++)
-  {
-    mi = ctxt->IsMirrored () ? lp->GetVertexCount () - i - 1 : i;
-    lp->GetVertex (i) = light_frustum->GetVertex (mi);
-  }
-  return true;
-}
-
-bool csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
-  iMovable* /*movable*/,
-  csLightingPolyTexQueue* lptq, bool vis,
-  const csMatrix3& m_world2tex,
-  const csVector3& v_world2tex,
-  const csPlane3& world_plane,
-  csPolygon3DStatic* spoly)
-{
-  bool do_smooth = GetParent ()->GetStaticData ()->GetSmoothingFlag ();
-
-  bool maybeItsVisible = false;
-  csFrustum *light_frustum = lview->GetFrustumContext ()->GetLightFrustum ();
-  const csVector3 &center = light_frustum->GetOrigin ();
-
-  // If plane is not visible then return (backface culling).
-  if (!csMath3::Visible (center, world_plane))
-    if (do_smooth)
-      maybeItsVisible = true;
-    else
-      return false;
-
-  // Compute the distance from the center of the light
-  // to the plane of the polygon.
-  float dist_to_plane = world_plane.Distance (center);
-
-  // If distance is too small or greater than the radius of the light
-  // then we have a trivial case (no hit).
-  if ((!do_smooth && dist_to_plane < SMALL_EPSILON)
-    || dist_to_plane >= lview->GetRadius ())
-    return false;
-
-  // In the following algorithm we ignore the light frustum and only
-  // apply shadows on the lightmap.
-  // @@@ TODO: Optimization. Use the light frustum to test if the
-  // polygon falls inside the light frustum (to avoid unneeded work).
-  // Beware of mirroring here.
-  // @@@ TODO: Optimization. Calculate minimum squared distance between
-  // the light center and the polygon to see if we should bother lighting
-  // at all.
-  // @@@ TODO: Optimization. Mark all shadow frustums which are relevant. i.e.
-  // which are inside the light frustum and are not obscured (shadowed)
-  // by other shadow frustums. Maybe only do this for portals.
-  // We should also give the polygon plane to MarkRelevantShadowFrustums so
-  // that all shadow frustums which start at the same plane are discarded as
-  // well.
-  // @@@ TODO: Optimization. Precalculated edge-table to detect polygons
-  // that are adjacent.
-
-  // Update the lightmap given light and shadow frustums in lview.
-  if (txt_info.lm)
-    return txt_info.FillLightMap (lview, lptq, vis, this,
-        m_world2tex, v_world2tex, world_plane, spoly);
-  else
-    return false;
-}
 

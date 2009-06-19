@@ -3404,7 +3404,7 @@ SWIGINTERN int iPluginIterator_scfGetVersion(){ return scfInterfaceTraits<iPlugi
 SWIGINTERN void delete_iPluginIterator(iPluginIterator *self){ if (self) self->DecRef (); }
 SWIGINTERN csWrapPtr iPluginManager_LoadPlugin__SWIG_0(iPluginManager *self,char const *id,char const *iface,int iface_ver,bool init=true,bool report=true){
     return csWrapPtr (iface, iface_ver, csPtr<iBase> (self->LoadPlugin (id,
-                                init,report)->GetResultRefPtr()));
+                                init,report)));
   }
 SWIGINTERN int iPluginManager_scfGetVersion(){ return scfInterfaceTraits<iPluginManager>::GetVersion(); }
 SWIGINTERN void delete_iPluginManager(iPluginManager *self){ if (self) self->DecRef (); }
@@ -3595,7 +3595,7 @@ csWrapPtr CS_LOAD_PLUGIN (iPluginManager *obj, const char *id,
 {
   printf("CS_LOAD_PLUGIN is deprecated, use \
 iPluginManager->LoadPlugin instead\n");
-  return csWrapPtr (iface, iface_ver, csPtr<iBase> (obj->LoadPlugin (id)->GetResultRefPtr()));
+  return csWrapPtr (iface, iface_ver, csPtr<iBase> (obj->LoadPlugin (id)));
 }
 
 csWrapPtr CS_GET_CHILD_OBJECT (iObject *obj, const char *iface, int iface_ver)
@@ -23941,7 +23941,7 @@ SWIGINTERN PyObject *_wrap_iObject_GetID(PyObject *SWIGUNUSEDPARM(self), PyObjec
   }
   arg1 = reinterpret_cast< iObject * >(argp1);
   result = (uint)((iObject const *)arg1)->GetID();
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -26024,7 +26024,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventData_numAxes_set(PyObject *SWIGUNUSEDPARM
   uint arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -26035,7 +26035,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventData_numAxes_set(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMouseEventData_numAxes_set" "', argument " "1"" of type '" "csMouseEventData *""'"); 
   }
   arg1 = reinterpret_cast< csMouseEventData * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csMouseEventData_numAxes_set" "', argument " "2"" of type '" "uint""'");
   } 
@@ -26064,7 +26064,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventData_numAxes_get(PyObject *SWIGUNUSEDPARM
   }
   arg1 = reinterpret_cast< csMouseEventData * >(argp1);
   result = (uint) ((arg1)->numAxes);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -26077,7 +26077,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventData_Button_set(PyObject *SWIGUNUSEDPARM(
   uint arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -26088,7 +26088,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventData_Button_set(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMouseEventData_Button_set" "', argument " "1"" of type '" "csMouseEventData *""'"); 
   }
   arg1 = reinterpret_cast< csMouseEventData * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csMouseEventData_Button_set" "', argument " "2"" of type '" "uint""'");
   } 
@@ -26117,7 +26117,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventData_Button_get(PyObject *SWIGUNUSEDPARM(
   }
   arg1 = reinterpret_cast< csMouseEventData * >(argp1);
   result = (uint) ((arg1)->Button);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -26225,7 +26225,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventData_number_set(PyObject *SWIGUNUSEDPA
   uint arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -26236,7 +26236,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventData_number_set(PyObject *SWIGUNUSEDPA
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csJoystickEventData_number_set" "', argument " "1"" of type '" "csJoystickEventData *""'"); 
   }
   arg1 = reinterpret_cast< csJoystickEventData * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csJoystickEventData_number_set" "', argument " "2"" of type '" "uint""'");
   } 
@@ -26265,7 +26265,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventData_number_get(PyObject *SWIGUNUSEDPA
   }
   arg1 = reinterpret_cast< csJoystickEventData * >(argp1);
   result = (uint) ((arg1)->number);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -26337,7 +26337,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventData_numAxes_set(PyObject *SWIGUNUSEDP
   uint arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -26348,7 +26348,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventData_numAxes_set(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csJoystickEventData_numAxes_set" "', argument " "1"" of type '" "csJoystickEventData *""'"); 
   }
   arg1 = reinterpret_cast< csJoystickEventData * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csJoystickEventData_numAxes_set" "', argument " "2"" of type '" "uint""'");
   } 
@@ -26377,7 +26377,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventData_numAxes_get(PyObject *SWIGUNUSEDP
   }
   arg1 = reinterpret_cast< csJoystickEventData * >(argp1);
   result = (uint) ((arg1)->numAxes);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -26443,7 +26443,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventData_Button_set(PyObject *SWIGUNUSEDPA
   uint arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -26454,7 +26454,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventData_Button_set(PyObject *SWIGUNUSEDPA
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csJoystickEventData_Button_set" "', argument " "1"" of type '" "csJoystickEventData *""'"); 
   }
   arg1 = reinterpret_cast< csJoystickEventData * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csJoystickEventData_Button_set" "', argument " "2"" of type '" "uint""'");
   } 
@@ -26483,7 +26483,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventData_Button_get(PyObject *SWIGUNUSEDPA
   }
   arg1 = reinterpret_cast< csJoystickEventData * >(argp1);
   result = (uint) ((arg1)->Button);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -26591,7 +26591,7 @@ SWIGINTERN PyObject *_wrap_csCommandEventData_Code_set(PyObject *SWIGUNUSEDPARM(
   uint arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -26602,7 +26602,7 @@ SWIGINTERN PyObject *_wrap_csCommandEventData_Code_set(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCommandEventData_Code_set" "', argument " "1"" of type '" "csCommandEventData *""'"); 
   }
   arg1 = reinterpret_cast< csCommandEventData * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csCommandEventData_Code_set" "', argument " "2"" of type '" "uint""'");
   } 
@@ -26631,7 +26631,7 @@ SWIGINTERN PyObject *_wrap_csCommandEventData_Code_get(PyObject *SWIGUNUSEDPARM(
   }
   arg1 = reinterpret_cast< csCommandEventData * >(argp1);
   result = (uint) ((arg1)->Code);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -29216,7 +29216,7 @@ SWIGINTERN PyObject *_wrap_iEventOutlet_Joystick(PyObject *SWIGUNUSEDPARM(self),
   uint arg6 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
@@ -29224,7 +29224,7 @@ SWIGINTERN PyObject *_wrap_iEventOutlet_Joystick(PyObject *SWIGUNUSEDPARM(self),
   int ecode4 = 0 ;
   void *argp5 = 0 ;
   int res5 = 0 ;
-  unsigned int val6 ;
+  unsigned long val6 ;
   int ecode6 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -29239,7 +29239,7 @@ SWIGINTERN PyObject *_wrap_iEventOutlet_Joystick(PyObject *SWIGUNUSEDPARM(self),
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iEventOutlet_Joystick" "', argument " "1"" of type '" "iEventOutlet *""'"); 
   }
   arg1 = reinterpret_cast< iEventOutlet * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iEventOutlet_Joystick" "', argument " "2"" of type '" "uint""'");
   } 
@@ -29259,7 +29259,7 @@ SWIGINTERN PyObject *_wrap_iEventOutlet_Joystick(PyObject *SWIGUNUSEDPARM(self),
     SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iEventOutlet_Joystick" "', argument " "5"" of type '" "int32 const *""'"); 
   }
   arg5 = reinterpret_cast< int32 * >(argp5);
-  ecode6 = SWIG_AsVal_unsigned_SS_int(obj5, &val6);
+  ecode6 = SWIG_AsVal_unsigned_SS_long(obj5, &val6);
   if (!SWIG_IsOK(ecode6)) {
     SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iEventOutlet_Joystick" "', argument " "6"" of type '" "uint""'");
   } 
@@ -30021,7 +30021,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_0(PyObject *SWIGUNU
   int ecode6 = 0 ;
   unsigned long val7 ;
   int ecode7 = 0 ;
-  unsigned int val8 ;
+  unsigned long val8 ;
   int ecode8 = 0 ;
   bool val9 ;
   int ecode9 = 0 ;
@@ -30078,7 +30078,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_0(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csMouseEventHelper_NewEvent" "', argument " "7"" of type '" "uint32""'");
   } 
   arg7 = static_cast< uint32 >(val7);
-  ecode8 = SWIG_AsVal_unsigned_SS_int(obj7, &val8);
+  ecode8 = SWIG_AsVal_unsigned_SS_long(obj7, &val8);
   if (!SWIG_IsOK(ecode8)) {
     SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csMouseEventHelper_NewEvent" "', argument " "8"" of type '" "uint""'");
   } 
@@ -30133,7 +30133,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_1(PyObject *SWIGUNU
   int ecode7 = 0 ;
   unsigned long val8 ;
   int ecode8 = 0 ;
-  unsigned int val9 ;
+  unsigned long val9 ;
   int ecode9 = 0 ;
   bool val10 ;
   int ecode10 = 0 ;
@@ -30204,7 +30204,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_1(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csMouseEventHelper_NewEvent" "', argument " "8"" of type '" "uint32""'");
   } 
   arg8 = static_cast< uint32 >(val8);
-  ecode9 = SWIG_AsVal_unsigned_SS_int(obj8, &val9);
+  ecode9 = SWIG_AsVal_unsigned_SS_long(obj8, &val9);
   if (!SWIG_IsOK(ecode9)) {
     SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csMouseEventHelper_NewEvent" "', argument " "9"" of type '" "uint""'");
   } 
@@ -30259,7 +30259,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_2(PyObject *SWIGUNU
   int res7 = 0 ;
   unsigned long val8 ;
   int ecode8 = 0 ;
-  unsigned int val9 ;
+  unsigned long val9 ;
   int ecode9 = 0 ;
   bool val10 ;
   int ecode10 = 0 ;
@@ -30338,7 +30338,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_2(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csMouseEventHelper_NewEvent" "', argument " "8"" of type '" "uint32""'");
   } 
   arg8 = static_cast< uint32 >(val8);
-  ecode9 = SWIG_AsVal_unsigned_SS_int(obj8, &val9);
+  ecode9 = SWIG_AsVal_unsigned_SS_long(obj8, &val9);
   if (!SWIG_IsOK(ecode9)) {
     SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csMouseEventHelper_NewEvent" "', argument " "9"" of type '" "uint""'");
   } 
@@ -30390,7 +30390,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_3(PyObject *SWIGUNU
   int ecode6 = 0 ;
   unsigned long val7 ;
   int ecode7 = 0 ;
-  unsigned int val8 ;
+  unsigned long val8 ;
   int ecode8 = 0 ;
   bool val9 ;
   int ecode9 = 0 ;
@@ -30447,7 +30447,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_3(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csMouseEventHelper_NewEvent" "', argument " "7"" of type '" "uint32""'");
   } 
   arg7 = static_cast< uint32 >(val7);
-  ecode8 = SWIG_AsVal_unsigned_SS_int(obj7, &val8);
+  ecode8 = SWIG_AsVal_unsigned_SS_long(obj7, &val8);
   if (!SWIG_IsOK(ecode8)) {
     SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csMouseEventHelper_NewEvent" "', argument " "8"" of type '" "uint""'");
   } 
@@ -30504,7 +30504,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_4(PyObject *SWIGUNU
   int ecode7 = 0 ;
   unsigned long val8 ;
   int ecode8 = 0 ;
-  unsigned int val9 ;
+  unsigned long val9 ;
   int ecode9 = 0 ;
   bool val10 ;
   int ecode10 = 0 ;
@@ -30575,7 +30575,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_4(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csMouseEventHelper_NewEvent" "', argument " "8"" of type '" "uint32""'");
   } 
   arg8 = static_cast< uint32 >(val8);
-  ecode9 = SWIG_AsVal_unsigned_SS_int(obj8, &val9);
+  ecode9 = SWIG_AsVal_unsigned_SS_long(obj8, &val9);
   if (!SWIG_IsOK(ecode9)) {
     SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csMouseEventHelper_NewEvent" "', argument " "9"" of type '" "uint""'");
   } 
@@ -30632,7 +30632,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_5(PyObject *SWIGUNU
   int res7 = 0 ;
   unsigned long val8 ;
   int ecode8 = 0 ;
-  unsigned int val9 ;
+  unsigned long val9 ;
   int ecode9 = 0 ;
   bool val10 ;
   int ecode10 = 0 ;
@@ -30711,7 +30711,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent__SWIG_5(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csMouseEventHelper_NewEvent" "', argument " "8"" of type '" "uint32""'");
   } 
   arg8 = static_cast< uint32 >(val8);
-  ecode9 = SWIG_AsVal_unsigned_SS_int(obj8, &val9);
+  ecode9 = SWIG_AsVal_unsigned_SS_long(obj8, &val9);
   if (!SWIG_IsOK(ecode9)) {
     SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csMouseEventHelper_NewEvent" "', argument " "9"" of type '" "uint""'");
   } 
@@ -30785,7 +30785,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
                 }
                 if (_v) {
                   {
-                    int res = SWIG_AsVal_unsigned_SS_int(argv[7], NULL);
+                    int res = SWIG_AsVal_unsigned_SS_long(argv[7], NULL);
                     _v = SWIG_CheckState(res);
                   }
                   if (_v) {
@@ -30850,7 +30850,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
                   }
                   if (_v) {
                     {
-                      int res = SWIG_AsVal_unsigned_SS_int(argv[8], NULL);
+                      int res = SWIG_AsVal_unsigned_SS_long(argv[8], NULL);
                       _v = SWIG_CheckState(res);
                     }
                     if (_v) {
@@ -30913,7 +30913,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
                   }
                   if (_v) {
                     {
-                      int res = SWIG_AsVal_unsigned_SS_int(argv[8], NULL);
+                      int res = SWIG_AsVal_unsigned_SS_long(argv[8], NULL);
                       _v = SWIG_CheckState(res);
                     }
                     if (_v) {
@@ -30976,7 +30976,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
                 }
                 if (_v) {
                   {
-                    int res = SWIG_AsVal_unsigned_SS_int(argv[7], NULL);
+                    int res = SWIG_AsVal_unsigned_SS_long(argv[7], NULL);
                     _v = SWIG_CheckState(res);
                   }
                   if (_v) {
@@ -31047,7 +31047,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
                   }
                   if (_v) {
                     {
-                      int res = SWIG_AsVal_unsigned_SS_int(argv[8], NULL);
+                      int res = SWIG_AsVal_unsigned_SS_long(argv[8], NULL);
                       _v = SWIG_CheckState(res);
                     }
                     if (_v) {
@@ -31116,7 +31116,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_NewEvent(PyObject *self, PyObject 
                   }
                   if (_v) {
                     {
-                      int res = SWIG_AsVal_unsigned_SS_int(argv[8], NULL);
+                      int res = SWIG_AsVal_unsigned_SS_long(argv[8], NULL);
                       _v = SWIG_CheckState(res);
                     }
                     if (_v) {
@@ -31193,7 +31193,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_GetNumber(PyObject *SWIGUNUSEDPARM
   }
   arg1 = reinterpret_cast< iEvent * >(argp1);
   result = (uint)csMouseEventHelper::GetNumber((iEvent const *)arg1);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -31251,7 +31251,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_GetAxis(PyObject *SWIGUNUSEDPARM(s
   int result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -31262,7 +31262,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_GetAxis(PyObject *SWIGUNUSEDPARM(s
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csMouseEventHelper_GetAxis" "', argument " "1"" of type '" "iEvent const *""'"); 
   }
   arg1 = reinterpret_cast< iEvent * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csMouseEventHelper_GetAxis" "', argument " "2"" of type '" "uint""'");
   } 
@@ -31290,7 +31290,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_GetNumAxes(PyObject *SWIGUNUSEDPAR
   }
   arg1 = reinterpret_cast< iEvent * >(argp1);
   result = (uint)csMouseEventHelper::GetNumAxes((iEvent const *)arg1);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -31312,7 +31312,7 @@ SWIGINTERN PyObject *_wrap_csMouseEventHelper_GetButton(PyObject *SWIGUNUSEDPARM
   }
   arg1 = reinterpret_cast< iEvent * >(argp1);
   result = (uint)csMouseEventHelper::GetButton((iEvent const *)arg1);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -31488,7 +31488,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent__SWIG_0(PyObject *SWIG
   int ecode6 = 0 ;
   unsigned long val7 ;
   int ecode7 = 0 ;
-  unsigned int val8 ;
+  unsigned long val8 ;
   int ecode8 = 0 ;
   bool val9 ;
   int ecode9 = 0 ;
@@ -31545,7 +31545,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent__SWIG_0(PyObject *SWIG
     SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "7"" of type '" "uint32""'");
   } 
   arg7 = static_cast< uint32 >(val7);
-  ecode8 = SWIG_AsVal_unsigned_SS_int(obj7, &val8);
+  ecode8 = SWIG_AsVal_unsigned_SS_long(obj7, &val8);
   if (!SWIG_IsOK(ecode8)) {
     SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "8"" of type '" "uint""'");
   } 
@@ -31597,7 +31597,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent__SWIG_1(PyObject *SWIG
   int res6 = 0 ;
   unsigned long val7 ;
   int ecode7 = 0 ;
-  unsigned int val8 ;
+  unsigned long val8 ;
   int ecode8 = 0 ;
   bool val9 ;
   int ecode9 = 0 ;
@@ -31662,7 +31662,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent__SWIG_1(PyObject *SWIG
     SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "7"" of type '" "uint32""'");
   } 
   arg7 = static_cast< uint32 >(val7);
-  ecode8 = SWIG_AsVal_unsigned_SS_int(obj7, &val8);
+  ecode8 = SWIG_AsVal_unsigned_SS_long(obj7, &val8);
   if (!SWIG_IsOK(ecode8)) {
     SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "8"" of type '" "uint""'");
   } 
@@ -31714,7 +31714,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent__SWIG_2(PyObject *SWIG
   int ecode6 = 0 ;
   unsigned long val7 ;
   int ecode7 = 0 ;
-  unsigned int val8 ;
+  unsigned long val8 ;
   int ecode8 = 0 ;
   bool val9 ;
   int ecode9 = 0 ;
@@ -31771,7 +31771,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent__SWIG_2(PyObject *SWIG
     SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "7"" of type '" "uint32""'");
   } 
   arg7 = static_cast< uint32 >(val7);
-  ecode8 = SWIG_AsVal_unsigned_SS_int(obj7, &val8);
+  ecode8 = SWIG_AsVal_unsigned_SS_long(obj7, &val8);
   if (!SWIG_IsOK(ecode8)) {
     SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "8"" of type '" "uint""'");
   } 
@@ -31825,7 +31825,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent__SWIG_3(PyObject *SWIG
   int res6 = 0 ;
   unsigned long val7 ;
   int ecode7 = 0 ;
-  unsigned int val8 ;
+  unsigned long val8 ;
   int ecode8 = 0 ;
   bool val9 ;
   int ecode9 = 0 ;
@@ -31890,7 +31890,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent__SWIG_3(PyObject *SWIG
     SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "7"" of type '" "uint32""'");
   } 
   arg7 = static_cast< uint32 >(val7);
-  ecode8 = SWIG_AsVal_unsigned_SS_int(obj7, &val8);
+  ecode8 = SWIG_AsVal_unsigned_SS_long(obj7, &val8);
   if (!SWIG_IsOK(ecode8)) {
     SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csJoystickEventHelper_NewEvent" "', argument " "8"" of type '" "uint""'");
   } 
@@ -31964,7 +31964,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent(PyObject *self, PyObje
                 }
                 if (_v) {
                   {
-                    int res = SWIG_AsVal_unsigned_SS_int(argv[7], NULL);
+                    int res = SWIG_AsVal_unsigned_SS_long(argv[7], NULL);
                     _v = SWIG_CheckState(res);
                   }
                   if (_v) {
@@ -32023,7 +32023,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent(PyObject *self, PyObje
                 }
                 if (_v) {
                   {
-                    int res = SWIG_AsVal_unsigned_SS_int(argv[7], NULL);
+                    int res = SWIG_AsVal_unsigned_SS_long(argv[7], NULL);
                     _v = SWIG_CheckState(res);
                   }
                   if (_v) {
@@ -32085,7 +32085,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent(PyObject *self, PyObje
                 }
                 if (_v) {
                   {
-                    int res = SWIG_AsVal_unsigned_SS_int(argv[7], NULL);
+                    int res = SWIG_AsVal_unsigned_SS_long(argv[7], NULL);
                     _v = SWIG_CheckState(res);
                   }
                   if (_v) {
@@ -32150,7 +32150,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_NewEvent(PyObject *self, PyObje
                 }
                 if (_v) {
                   {
-                    int res = SWIG_AsVal_unsigned_SS_int(argv[7], NULL);
+                    int res = SWIG_AsVal_unsigned_SS_long(argv[7], NULL);
                     _v = SWIG_CheckState(res);
                   }
                   if (_v) {
@@ -32204,7 +32204,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_GetNumber(PyObject *SWIGUNUSEDP
   }
   arg1 = reinterpret_cast< iEvent * >(argp1);
   result = (uint)csJoystickEventHelper::GetNumber((iEvent const *)arg1);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -32218,7 +32218,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_GetAxis(PyObject *SWIGUNUSEDPAR
   int result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -32229,7 +32229,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_GetAxis(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csJoystickEventHelper_GetAxis" "', argument " "1"" of type '" "iEvent const *""'"); 
   }
   arg1 = reinterpret_cast< iEvent * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csJoystickEventHelper_GetAxis" "', argument " "2"" of type '" "uint""'");
   } 
@@ -32257,7 +32257,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_GetNumAxes(PyObject *SWIGUNUSED
   }
   arg1 = reinterpret_cast< iEvent * >(argp1);
   result = (uint)csJoystickEventHelper::GetNumAxes((iEvent const *)arg1);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -32279,7 +32279,7 @@ SWIGINTERN PyObject *_wrap_csJoystickEventHelper_GetButton(PyObject *SWIGUNUSEDP
   }
   arg1 = reinterpret_cast< iEvent * >(argp1);
   result = (uint)csJoystickEventHelper::GetButton((iEvent const *)arg1);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -32453,7 +32453,7 @@ SWIGINTERN PyObject *_wrap_csInputEventHelper_GetButton(PyObject *SWIGUNUSEDPARM
   }
   arg2 = reinterpret_cast< iEvent * >(argp2);
   result = (uint)csInputEventHelper::GetButton(arg1,(iEvent const *)arg2);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -32700,7 +32700,7 @@ SWIGINTERN PyObject *_wrap_csCommandEventHelper_GetCode(PyObject *SWIGUNUSEDPARM
   }
   arg1 = reinterpret_cast< iEvent * >(argp1);
   result = (uint)csCommandEventHelper::GetCode((iEvent const *)arg1);
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -34915,7 +34915,7 @@ SWIGINTERN PyObject *_wrap_csevMouse__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyO
   SwigValueWrapper< CS::StringID<CS::StringSetTag::General > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -34926,7 +34926,7 @@ SWIGINTERN PyObject *_wrap_csevMouse__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyO
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csevMouse" "', argument " "1"" of type '" "iEventNameRegistry *""'"); 
   }
   arg1 = reinterpret_cast< iEventNameRegistry * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csevMouse" "', argument " "2"" of type '" "uint""'");
   } 
@@ -34949,7 +34949,7 @@ SWIGINTERN PyObject *_wrap_csevMouse__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyO
   SwigValueWrapper< CS::StringID<CS::StringSetTag::General > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -34960,7 +34960,7 @@ SWIGINTERN PyObject *_wrap_csevMouse__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyO
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csevMouse" "', argument " "1"" of type '" "iObjectRegistry *""'"); 
   }
   arg1 = reinterpret_cast< iObjectRegistry * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csevMouse" "', argument " "2"" of type '" "uint""'");
   } 
@@ -34993,7 +34993,7 @@ SWIGINTERN PyObject *_wrap_csevMouse(PyObject *self, PyObject *args) {
     _v = SWIG_CheckState(res);
     if (_v) {
       {
-        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        int res = SWIG_AsVal_unsigned_SS_long(argv[1], NULL);
         _v = SWIG_CheckState(res);
       }
       if (_v) {
@@ -35008,7 +35008,7 @@ SWIGINTERN PyObject *_wrap_csevMouse(PyObject *self, PyObject *args) {
     _v = SWIG_CheckState(res);
     if (_v) {
       {
-        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        int res = SWIG_AsVal_unsigned_SS_long(argv[1], NULL);
         _v = SWIG_CheckState(res);
       }
       if (_v) {
@@ -35031,7 +35031,7 @@ SWIGINTERN PyObject *_wrap_csevMouseOp__SWIG_0(PyObject *SWIGUNUSEDPARM(self), P
   SwigValueWrapper< CS::StringID<CS::StringSetTag::General > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
@@ -35045,7 +35045,7 @@ SWIGINTERN PyObject *_wrap_csevMouseOp__SWIG_0(PyObject *SWIGUNUSEDPARM(self), P
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csevMouseOp" "', argument " "1"" of type '" "iEventNameRegistry *""'"); 
   }
   arg1 = reinterpret_cast< iEventNameRegistry * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csevMouseOp" "', argument " "2"" of type '" "uint""'");
   } 
@@ -35077,7 +35077,7 @@ SWIGINTERN PyObject *_wrap_csevMouseOp__SWIG_1(PyObject *SWIGUNUSEDPARM(self), P
   SwigValueWrapper< CS::StringID<CS::StringSetTag::General > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
@@ -35091,7 +35091,7 @@ SWIGINTERN PyObject *_wrap_csevMouseOp__SWIG_1(PyObject *SWIGUNUSEDPARM(self), P
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csevMouseOp" "', argument " "1"" of type '" "iObjectRegistry *""'"); 
   }
   arg1 = reinterpret_cast< iObjectRegistry * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csevMouseOp" "', argument " "2"" of type '" "uint""'");
   } 
@@ -35132,7 +35132,7 @@ SWIGINTERN PyObject *_wrap_csevMouseOp(PyObject *self, PyObject *args) {
     _v = SWIG_CheckState(res);
     if (_v) {
       {
-        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        int res = SWIG_AsVal_unsigned_SS_long(argv[1], NULL);
         _v = SWIG_CheckState(res);
       }
       if (_v) {
@@ -35151,7 +35151,7 @@ SWIGINTERN PyObject *_wrap_csevMouseOp(PyObject *self, PyObject *args) {
     _v = SWIG_CheckState(res);
     if (_v) {
       {
-        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        int res = SWIG_AsVal_unsigned_SS_long(argv[1], NULL);
         _v = SWIG_CheckState(res);
       }
       if (_v) {
@@ -35177,7 +35177,7 @@ SWIGINTERN PyObject *_wrap_csevJoystick__SWIG_0(PyObject *SWIGUNUSEDPARM(self), 
   SwigValueWrapper< CS::StringID<CS::StringSetTag::General > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -35188,7 +35188,7 @@ SWIGINTERN PyObject *_wrap_csevJoystick__SWIG_0(PyObject *SWIGUNUSEDPARM(self), 
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csevJoystick" "', argument " "1"" of type '" "iEventNameRegistry *""'"); 
   }
   arg1 = reinterpret_cast< iEventNameRegistry * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csevJoystick" "', argument " "2"" of type '" "uint""'");
   } 
@@ -35211,7 +35211,7 @@ SWIGINTERN PyObject *_wrap_csevJoystick__SWIG_1(PyObject *SWIGUNUSEDPARM(self), 
   SwigValueWrapper< CS::StringID<CS::StringSetTag::General > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -35222,7 +35222,7 @@ SWIGINTERN PyObject *_wrap_csevJoystick__SWIG_1(PyObject *SWIGUNUSEDPARM(self), 
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csevJoystick" "', argument " "1"" of type '" "iObjectRegistry *""'"); 
   }
   arg1 = reinterpret_cast< iObjectRegistry * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csevJoystick" "', argument " "2"" of type '" "uint""'");
   } 
@@ -35255,7 +35255,7 @@ SWIGINTERN PyObject *_wrap_csevJoystick(PyObject *self, PyObject *args) {
     _v = SWIG_CheckState(res);
     if (_v) {
       {
-        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        int res = SWIG_AsVal_unsigned_SS_long(argv[1], NULL);
         _v = SWIG_CheckState(res);
       }
       if (_v) {
@@ -35270,7 +35270,7 @@ SWIGINTERN PyObject *_wrap_csevJoystick(PyObject *self, PyObject *args) {
     _v = SWIG_CheckState(res);
     if (_v) {
       {
-        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        int res = SWIG_AsVal_unsigned_SS_long(argv[1], NULL);
         _v = SWIG_CheckState(res);
       }
       if (_v) {
@@ -35293,7 +35293,7 @@ SWIGINTERN PyObject *_wrap_csevJoystickOp__SWIG_0(PyObject *SWIGUNUSEDPARM(self)
   SwigValueWrapper< CS::StringID<CS::StringSetTag::General > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
@@ -35307,7 +35307,7 @@ SWIGINTERN PyObject *_wrap_csevJoystickOp__SWIG_0(PyObject *SWIGUNUSEDPARM(self)
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csevJoystickOp" "', argument " "1"" of type '" "iEventNameRegistry *""'"); 
   }
   arg1 = reinterpret_cast< iEventNameRegistry * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csevJoystickOp" "', argument " "2"" of type '" "uint""'");
   } 
@@ -35339,7 +35339,7 @@ SWIGINTERN PyObject *_wrap_csevJoystickOp__SWIG_1(PyObject *SWIGUNUSEDPARM(self)
   SwigValueWrapper< CS::StringID<CS::StringSetTag::General > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
@@ -35353,7 +35353,7 @@ SWIGINTERN PyObject *_wrap_csevJoystickOp__SWIG_1(PyObject *SWIGUNUSEDPARM(self)
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csevJoystickOp" "', argument " "1"" of type '" "iObjectRegistry *""'"); 
   }
   arg1 = reinterpret_cast< iObjectRegistry * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csevJoystickOp" "', argument " "2"" of type '" "uint""'");
   } 
@@ -35394,7 +35394,7 @@ SWIGINTERN PyObject *_wrap_csevJoystickOp(PyObject *self, PyObject *args) {
     _v = SWIG_CheckState(res);
     if (_v) {
       {
-        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        int res = SWIG_AsVal_unsigned_SS_long(argv[1], NULL);
         _v = SWIG_CheckState(res);
       }
       if (_v) {
@@ -35413,7 +35413,7 @@ SWIGINTERN PyObject *_wrap_csevJoystickOp(PyObject *self, PyObject *args) {
     _v = SWIG_CheckState(res);
     if (_v) {
       {
-        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        int res = SWIG_AsVal_unsigned_SS_long(argv[1], NULL);
         _v = SWIG_CheckState(res);
       }
       if (_v) {
@@ -36001,6 +36001,209 @@ SWIGINTERN PyObject *iPluginIterator_swigregister(PyObject *SWIGUNUSEDPARM(self)
   SWIG_TypeNewClientData(SWIGTYPE_p_iPluginIterator, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
+
+SWIGINTERN PyObject *_wrap_iPluginManager_LoadPluginAlways__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPluginManager *arg1 = (iPluginManager *) 0 ;
+  char *arg2 = (char *) 0 ;
+  bool arg3 ;
+  bool arg4 ;
+  iBase *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  bool val3 ;
+  int ecode3 = 0 ;
+  bool val4 ;
+  int ecode4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPluginManager_LoadPluginAlways",4,4,&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPluginManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPluginManager_LoadPluginAlways" "', argument " "1"" of type '" "iPluginManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iPluginManager * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iPluginManager_LoadPluginAlways" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  ecode3 = SWIG_AsVal_bool(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iPluginManager_LoadPluginAlways" "', argument " "3"" of type '" "bool""'");
+  } 
+  arg3 = static_cast< bool >(val3);
+  ecode4 = SWIG_AsVal_bool(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iPluginManager_LoadPluginAlways" "', argument " "4"" of type '" "bool""'");
+  } 
+  arg4 = static_cast< bool >(val4);
+  result = (iBase *)(arg1)->LoadPlugin((char const *)arg2,arg3,arg4);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iBase, 0 |  0 );
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iPluginManager_LoadPluginAlways__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPluginManager *arg1 = (iPluginManager *) 0 ;
+  char *arg2 = (char *) 0 ;
+  bool arg3 ;
+  iBase *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  bool val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPluginManager_LoadPluginAlways",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPluginManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPluginManager_LoadPluginAlways" "', argument " "1"" of type '" "iPluginManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iPluginManager * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iPluginManager_LoadPluginAlways" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  ecode3 = SWIG_AsVal_bool(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iPluginManager_LoadPluginAlways" "', argument " "3"" of type '" "bool""'");
+  } 
+  arg3 = static_cast< bool >(val3);
+  result = (iBase *)(arg1)->LoadPlugin((char const *)arg2,arg3);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iBase, 0 |  0 );
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iPluginManager_LoadPluginAlways__SWIG_2(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iPluginManager *arg1 = (iPluginManager *) 0 ;
+  char *arg2 = (char *) 0 ;
+  iBase *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iPluginManager_LoadPluginAlways",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iPluginManager, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iPluginManager_LoadPluginAlways" "', argument " "1"" of type '" "iPluginManager *""'"); 
+  }
+  arg1 = reinterpret_cast< iPluginManager * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iPluginManager_LoadPluginAlways" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (iBase *)(arg1)->LoadPlugin((char const *)arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iBase, 0 |  0 );
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iPluginManager_LoadPluginAlways(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[5];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 4); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iPluginManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_iPluginManager_LoadPluginAlways__SWIG_2(self, args);
+      }
+    }
+  }
+  if (argc == 3) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iPluginManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        {
+          int res = SWIG_AsVal_bool(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          return _wrap_iPluginManager_LoadPluginAlways__SWIG_1(self, args);
+        }
+      }
+    }
+  }
+  if (argc == 4) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iPluginManager, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        {
+          int res = SWIG_AsVal_bool(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          {
+            int res = SWIG_AsVal_bool(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            return _wrap_iPluginManager_LoadPluginAlways__SWIG_0(self, args);
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iPluginManager_LoadPluginAlways'.\n  Possible C/C++ prototypes are:\n""    LoadPlugin(iPluginManager *,char const *,bool,bool)\n""    LoadPlugin(iPluginManager *,char const *,bool)\n""    LoadPlugin(iPluginManager *,char const *)\n");
+  return NULL;
+}
+
 
 SWIGINTERN PyObject *_wrap_iPluginManager_UnloadPlugin(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
@@ -36996,7 +37199,7 @@ SWIGINTERN PyObject *_wrap_csObject_GetID(PyObject *SWIGUNUSEDPARM(self), PyObje
   }
   arg1 = reinterpret_cast< csObject * >(argp1);
   result = (uint)((csObject const *)arg1)->GetID();
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -40061,7 +40264,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_GetLastX__SWIG_0(PyObject *SWIGUNUSEDPAR
   int result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -40072,7 +40275,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_GetLastX__SWIG_0(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMouseDriver_GetLastX" "', argument " "1"" of type '" "iMouseDriver const *""'"); 
   }
   arg1 = reinterpret_cast< iMouseDriver * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iMouseDriver_GetLastX" "', argument " "2"" of type '" "uint""'");
   } 
@@ -40133,7 +40336,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_GetLastX(PyObject *self, PyObject *args)
     _v = SWIG_CheckState(res);
     if (_v) {
       {
-        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        int res = SWIG_AsVal_unsigned_SS_long(argv[1], NULL);
         _v = SWIG_CheckState(res);
       }
       if (_v) {
@@ -40155,7 +40358,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_GetLastY__SWIG_0(PyObject *SWIGUNUSEDPAR
   int result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -40166,7 +40369,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_GetLastY__SWIG_0(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMouseDriver_GetLastY" "', argument " "1"" of type '" "iMouseDriver const *""'"); 
   }
   arg1 = reinterpret_cast< iMouseDriver * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iMouseDriver_GetLastY" "', argument " "2"" of type '" "uint""'");
   } 
@@ -40227,7 +40430,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_GetLastY(PyObject *self, PyObject *args)
     _v = SWIG_CheckState(res);
     if (_v) {
       {
-        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        int res = SWIG_AsVal_unsigned_SS_long(argv[1], NULL);
         _v = SWIG_CheckState(res);
       }
       if (_v) {
@@ -40250,9 +40453,9 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_GetLast__SWIG_0(PyObject *SWIGUNUSEDPARM
   int result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
-  unsigned int val3 ;
+  unsigned long val3 ;
   int ecode3 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -40264,12 +40467,12 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_GetLast__SWIG_0(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMouseDriver_GetLast" "', argument " "1"" of type '" "iMouseDriver const *""'"); 
   }
   arg1 = reinterpret_cast< iMouseDriver * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iMouseDriver_GetLast" "', argument " "2"" of type '" "uint""'");
   } 
   arg2 = static_cast< uint >(val2);
-  ecode3 = SWIG_AsVal_unsigned_SS_int(obj2, &val3);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iMouseDriver_GetLast" "', argument " "3"" of type '" "uint""'");
   } 
@@ -40289,7 +40492,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_GetLast__SWIG_1(PyObject *SWIGUNUSEDPARM
   int32 *result = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -40300,7 +40503,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_GetLast__SWIG_1(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMouseDriver_GetLast" "', argument " "1"" of type '" "iMouseDriver const *""'"); 
   }
   arg1 = reinterpret_cast< iMouseDriver * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iMouseDriver_GetLast" "', argument " "2"" of type '" "uint""'");
   } 
@@ -40330,7 +40533,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_GetLast(PyObject *self, PyObject *args) 
     _v = SWIG_CheckState(res);
     if (_v) {
       {
-        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        int res = SWIG_AsVal_unsigned_SS_long(argv[1], NULL);
         _v = SWIG_CheckState(res);
       }
       if (_v) {
@@ -40345,12 +40548,12 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_GetLast(PyObject *self, PyObject *args) 
     _v = SWIG_CheckState(res);
     if (_v) {
       {
-        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        int res = SWIG_AsVal_unsigned_SS_long(argv[1], NULL);
         _v = SWIG_CheckState(res);
       }
       if (_v) {
         {
-          int res = SWIG_AsVal_unsigned_SS_int(argv[2], NULL);
+          int res = SWIG_AsVal_unsigned_SS_long(argv[2], NULL);
           _v = SWIG_CheckState(res);
         }
         if (_v) {
@@ -40374,7 +40577,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_GetLastButton__SWIG_0(PyObject *SWIGUNUS
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
@@ -40388,7 +40591,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_GetLastButton__SWIG_0(PyObject *SWIGUNUS
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMouseDriver_GetLastButton" "', argument " "1"" of type '" "iMouseDriver const *""'"); 
   }
   arg1 = reinterpret_cast< iMouseDriver * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iMouseDriver_GetLastButton" "', argument " "2"" of type '" "uint""'");
   } 
@@ -40469,7 +40672,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_GetLastButton(PyObject *self, PyObject *
     _v = SWIG_CheckState(res);
     if (_v) {
       {
-        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        int res = SWIG_AsVal_unsigned_SS_long(argv[1], NULL);
         _v = SWIG_CheckState(res);
       }
       if (_v) {
@@ -40500,7 +40703,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_DoButton__SWIG_0(PyObject *SWIGUNUSEDPAR
   uint arg6 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
@@ -40508,7 +40711,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_DoButton__SWIG_0(PyObject *SWIGUNUSEDPAR
   int ecode4 = 0 ;
   void *argp5 = 0 ;
   int res5 = 0 ;
-  unsigned int val6 ;
+  unsigned long val6 ;
   int ecode6 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -40523,7 +40726,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_DoButton__SWIG_0(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMouseDriver_DoButton" "', argument " "1"" of type '" "iMouseDriver *""'"); 
   }
   arg1 = reinterpret_cast< iMouseDriver * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iMouseDriver_DoButton" "', argument " "2"" of type '" "uint""'");
   } 
@@ -40543,7 +40746,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_DoButton__SWIG_0(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iMouseDriver_DoButton" "', argument " "5"" of type '" "int32 const *""'"); 
   }
   arg5 = reinterpret_cast< int32 * >(argp5);
-  ecode6 = SWIG_AsVal_unsigned_SS_int(obj5, &val6);
+  ecode6 = SWIG_AsVal_unsigned_SS_long(obj5, &val6);
   if (!SWIG_IsOK(ecode6)) {
     SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iMouseDriver_DoButton" "', argument " "6"" of type '" "uint""'");
   } 
@@ -40663,7 +40866,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_DoButton(PyObject *self, PyObject *args)
     _v = SWIG_CheckState(res);
     if (_v) {
       {
-        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        int res = SWIG_AsVal_unsigned_SS_long(argv[1], NULL);
         _v = SWIG_CheckState(res);
       }
       if (_v) {
@@ -40682,7 +40885,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_DoButton(PyObject *self, PyObject *args)
             _v = SWIG_CheckState(res);
             if (_v) {
               {
-                int res = SWIG_AsVal_unsigned_SS_int(argv[5], NULL);
+                int res = SWIG_AsVal_unsigned_SS_long(argv[5], NULL);
                 _v = SWIG_CheckState(res);
               }
               if (_v) {
@@ -40709,11 +40912,11 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_DoMotion__SWIG_0(PyObject *SWIGUNUSEDPAR
   uint arg4 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
-  unsigned int val4 ;
+  unsigned long val4 ;
   int ecode4 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -40726,7 +40929,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_DoMotion__SWIG_0(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMouseDriver_DoMotion" "', argument " "1"" of type '" "iMouseDriver *""'"); 
   }
   arg1 = reinterpret_cast< iMouseDriver * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iMouseDriver_DoMotion" "', argument " "2"" of type '" "uint""'");
   } 
@@ -40736,7 +40939,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_DoMotion__SWIG_0(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iMouseDriver_DoMotion" "', argument " "3"" of type '" "int32 const *""'"); 
   }
   arg3 = reinterpret_cast< int32 * >(argp3);
-  ecode4 = SWIG_AsVal_unsigned_SS_int(obj3, &val4);
+  ecode4 = SWIG_AsVal_unsigned_SS_long(obj3, &val4);
   if (!SWIG_IsOK(ecode4)) {
     SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iMouseDriver_DoMotion" "', argument " "4"" of type '" "uint""'");
   } 
@@ -40826,7 +41029,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_DoMotion(PyObject *self, PyObject *args)
     _v = SWIG_CheckState(res);
     if (_v) {
       {
-        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        int res = SWIG_AsVal_unsigned_SS_long(argv[1], NULL);
         _v = SWIG_CheckState(res);
       }
       if (_v) {
@@ -40835,7 +41038,7 @@ SWIGINTERN PyObject *_wrap_iMouseDriver_DoMotion(PyObject *self, PyObject *args)
         _v = SWIG_CheckState(res);
         if (_v) {
           {
-            int res = SWIG_AsVal_unsigned_SS_int(argv[3], NULL);
+            int res = SWIG_AsVal_unsigned_SS_long(argv[3], NULL);
             _v = SWIG_CheckState(res);
           }
           if (_v) {
@@ -40922,7 +41125,7 @@ SWIGINTERN PyObject *_wrap_iJoystickDriver_GetLast__SWIG_0(PyObject *SWIGUNUSEDP
   int32 *result = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -40933,7 +41136,7 @@ SWIGINTERN PyObject *_wrap_iJoystickDriver_GetLast__SWIG_0(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iJoystickDriver_GetLast" "', argument " "1"" of type '" "iJoystickDriver const *""'"); 
   }
   arg1 = reinterpret_cast< iJoystickDriver * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iJoystickDriver_GetLast" "', argument " "2"" of type '" "uint""'");
   } 
@@ -40954,9 +41157,9 @@ SWIGINTERN PyObject *_wrap_iJoystickDriver_GetLast__SWIG_1(PyObject *SWIGUNUSEDP
   int result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
-  unsigned int val3 ;
+  unsigned long val3 ;
   int ecode3 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -40968,12 +41171,12 @@ SWIGINTERN PyObject *_wrap_iJoystickDriver_GetLast__SWIG_1(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iJoystickDriver_GetLast" "', argument " "1"" of type '" "iJoystickDriver const *""'"); 
   }
   arg1 = reinterpret_cast< iJoystickDriver * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iJoystickDriver_GetLast" "', argument " "2"" of type '" "uint""'");
   } 
   arg2 = static_cast< uint >(val2);
-  ecode3 = SWIG_AsVal_unsigned_SS_int(obj2, &val3);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iJoystickDriver_GetLast" "', argument " "3"" of type '" "uint""'");
   } 
@@ -41003,7 +41206,7 @@ SWIGINTERN PyObject *_wrap_iJoystickDriver_GetLast(PyObject *self, PyObject *arg
     _v = SWIG_CheckState(res);
     if (_v) {
       {
-        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        int res = SWIG_AsVal_unsigned_SS_long(argv[1], NULL);
         _v = SWIG_CheckState(res);
       }
       if (_v) {
@@ -41018,12 +41221,12 @@ SWIGINTERN PyObject *_wrap_iJoystickDriver_GetLast(PyObject *self, PyObject *arg
     _v = SWIG_CheckState(res);
     if (_v) {
       {
-        int res = SWIG_AsVal_unsigned_SS_int(argv[1], NULL);
+        int res = SWIG_AsVal_unsigned_SS_long(argv[1], NULL);
         _v = SWIG_CheckState(res);
       }
       if (_v) {
         {
-          int res = SWIG_AsVal_unsigned_SS_int(argv[2], NULL);
+          int res = SWIG_AsVal_unsigned_SS_long(argv[2], NULL);
           _v = SWIG_CheckState(res);
         }
         if (_v) {
@@ -41047,7 +41250,7 @@ SWIGINTERN PyObject *_wrap_iJoystickDriver_GetLastButton(PyObject *SWIGUNUSEDPAR
   bool result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
@@ -41061,7 +41264,7 @@ SWIGINTERN PyObject *_wrap_iJoystickDriver_GetLastButton(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iJoystickDriver_GetLastButton" "', argument " "1"" of type '" "iJoystickDriver const *""'"); 
   }
   arg1 = reinterpret_cast< iJoystickDriver * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iJoystickDriver_GetLastButton" "', argument " "2"" of type '" "uint""'");
   } 
@@ -41089,7 +41292,7 @@ SWIGINTERN PyObject *_wrap_iJoystickDriver_DoButton(PyObject *SWIGUNUSEDPARM(sel
   uint arg6 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
@@ -41097,7 +41300,7 @@ SWIGINTERN PyObject *_wrap_iJoystickDriver_DoButton(PyObject *SWIGUNUSEDPARM(sel
   int ecode4 = 0 ;
   void *argp5 = 0 ;
   int res5 = 0 ;
-  unsigned int val6 ;
+  unsigned long val6 ;
   int ecode6 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -41112,7 +41315,7 @@ SWIGINTERN PyObject *_wrap_iJoystickDriver_DoButton(PyObject *SWIGUNUSEDPARM(sel
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iJoystickDriver_DoButton" "', argument " "1"" of type '" "iJoystickDriver *""'"); 
   }
   arg1 = reinterpret_cast< iJoystickDriver * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iJoystickDriver_DoButton" "', argument " "2"" of type '" "uint""'");
   } 
@@ -41132,7 +41335,7 @@ SWIGINTERN PyObject *_wrap_iJoystickDriver_DoButton(PyObject *SWIGUNUSEDPARM(sel
     SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "iJoystickDriver_DoButton" "', argument " "5"" of type '" "int32 const *""'"); 
   }
   arg5 = reinterpret_cast< int32 * >(argp5);
-  ecode6 = SWIG_AsVal_unsigned_SS_int(obj5, &val6);
+  ecode6 = SWIG_AsVal_unsigned_SS_long(obj5, &val6);
   if (!SWIG_IsOK(ecode6)) {
     SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "iJoystickDriver_DoButton" "', argument " "6"" of type '" "uint""'");
   } 
@@ -41153,11 +41356,11 @@ SWIGINTERN PyObject *_wrap_iJoystickDriver_DoMotion(PyObject *SWIGUNUSEDPARM(sel
   uint arg4 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
-  unsigned int val4 ;
+  unsigned long val4 ;
   int ecode4 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -41170,7 +41373,7 @@ SWIGINTERN PyObject *_wrap_iJoystickDriver_DoMotion(PyObject *SWIGUNUSEDPARM(sel
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iJoystickDriver_DoMotion" "', argument " "1"" of type '" "iJoystickDriver *""'"); 
   }
   arg1 = reinterpret_cast< iJoystickDriver * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iJoystickDriver_DoMotion" "', argument " "2"" of type '" "uint""'");
   } 
@@ -41180,7 +41383,7 @@ SWIGINTERN PyObject *_wrap_iJoystickDriver_DoMotion(PyObject *SWIGUNUSEDPARM(sel
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iJoystickDriver_DoMotion" "', argument " "3"" of type '" "int32 const *""'"); 
   }
   arg3 = reinterpret_cast< int32 * >(argp3);
-  ecode4 = SWIG_AsVal_unsigned_SS_int(obj3, &val4);
+  ecode4 = SWIG_AsVal_unsigned_SS_long(obj3, &val4);
   if (!SWIG_IsOK(ecode4)) {
     SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iJoystickDriver_DoMotion" "', argument " "4"" of type '" "uint""'");
   } 
@@ -50330,7 +50533,7 @@ SWIGINTERN PyObject *_wrap_iImage_HasMipmaps(PyObject *SWIGUNUSEDPARM(self), PyO
   }
   arg1 = reinterpret_cast< iImage * >(argp1);
   result = (uint)((iImage const *)arg1)->HasMipmaps();
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -50344,7 +50547,7 @@ SWIGINTERN PyObject *_wrap_iImage_GetMipmap(PyObject *SWIGUNUSEDPARM(self), PyOb
   SwigValueWrapper< csRef<iImage > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -50355,7 +50558,7 @@ SWIGINTERN PyObject *_wrap_iImage_GetMipmap(PyObject *SWIGUNUSEDPARM(self), PyOb
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iImage_GetMipmap" "', argument " "1"" of type '" "iImage *""'"); 
   }
   arg1 = reinterpret_cast< iImage * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iImage_GetMipmap" "', argument " "2"" of type '" "uint""'");
   } 
@@ -50469,7 +50672,7 @@ SWIGINTERN PyObject *_wrap_iImage_HasSubImages(PyObject *SWIGUNUSEDPARM(self), P
   }
   arg1 = reinterpret_cast< iImage * >(argp1);
   result = (uint)((iImage const *)arg1)->HasSubImages();
-  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
+  resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -50483,7 +50686,7 @@ SWIGINTERN PyObject *_wrap_iImage_GetSubImage(PyObject *SWIGUNUSEDPARM(self), Py
   SwigValueWrapper< csRef<iImage > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -50494,7 +50697,7 @@ SWIGINTERN PyObject *_wrap_iImage_GetSubImage(PyObject *SWIGUNUSEDPARM(self), Py
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iImage_GetSubImage" "', argument " "1"" of type '" "iImage *""'"); 
   }
   arg1 = reinterpret_cast< iImage * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iImage_GetSubImage" "', argument " "2"" of type '" "uint""'");
   } 
@@ -53201,7 +53404,7 @@ SWIGINTERN PyObject *_wrap_csevMouseButton(PyObject *SWIGUNUSEDPARM(self), PyObj
   SwigValueWrapper< CS::StringID<CS::StringSetTag::General > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -53212,7 +53415,7 @@ SWIGINTERN PyObject *_wrap_csevMouseButton(PyObject *SWIGUNUSEDPARM(self), PyObj
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csevMouseButton" "', argument " "1"" of type '" "iObjectRegistry *""'"); 
   }
   arg1 = reinterpret_cast< iObjectRegistry * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csevMouseButton" "', argument " "2"" of type '" "uint""'");
   } 
@@ -53235,7 +53438,7 @@ SWIGINTERN PyObject *_wrap_csevMouseUp(PyObject *SWIGUNUSEDPARM(self), PyObject 
   SwigValueWrapper< CS::StringID<CS::StringSetTag::General > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -53246,7 +53449,7 @@ SWIGINTERN PyObject *_wrap_csevMouseUp(PyObject *SWIGUNUSEDPARM(self), PyObject 
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csevMouseUp" "', argument " "1"" of type '" "iObjectRegistry *""'"); 
   }
   arg1 = reinterpret_cast< iObjectRegistry * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csevMouseUp" "', argument " "2"" of type '" "uint""'");
   } 
@@ -53269,7 +53472,7 @@ SWIGINTERN PyObject *_wrap_csevMouseDown(PyObject *SWIGUNUSEDPARM(self), PyObjec
   SwigValueWrapper< CS::StringID<CS::StringSetTag::General > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -53280,7 +53483,7 @@ SWIGINTERN PyObject *_wrap_csevMouseDown(PyObject *SWIGUNUSEDPARM(self), PyObjec
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csevMouseDown" "', argument " "1"" of type '" "iObjectRegistry *""'"); 
   }
   arg1 = reinterpret_cast< iObjectRegistry * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csevMouseDown" "', argument " "2"" of type '" "uint""'");
   } 
@@ -53303,7 +53506,7 @@ SWIGINTERN PyObject *_wrap_csevMouseClick(PyObject *SWIGUNUSEDPARM(self), PyObje
   SwigValueWrapper< CS::StringID<CS::StringSetTag::General > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -53314,7 +53517,7 @@ SWIGINTERN PyObject *_wrap_csevMouseClick(PyObject *SWIGUNUSEDPARM(self), PyObje
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csevMouseClick" "', argument " "1"" of type '" "iObjectRegistry *""'"); 
   }
   arg1 = reinterpret_cast< iObjectRegistry * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csevMouseClick" "', argument " "2"" of type '" "uint""'");
   } 
@@ -53337,7 +53540,7 @@ SWIGINTERN PyObject *_wrap_csevMouseDoubleClick(PyObject *SWIGUNUSEDPARM(self), 
   SwigValueWrapper< CS::StringID<CS::StringSetTag::General > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -53348,7 +53551,7 @@ SWIGINTERN PyObject *_wrap_csevMouseDoubleClick(PyObject *SWIGUNUSEDPARM(self), 
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csevMouseDoubleClick" "', argument " "1"" of type '" "iObjectRegistry *""'"); 
   }
   arg1 = reinterpret_cast< iObjectRegistry * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csevMouseDoubleClick" "', argument " "2"" of type '" "uint""'");
   } 
@@ -53371,7 +53574,7 @@ SWIGINTERN PyObject *_wrap_csevMouseMove(PyObject *SWIGUNUSEDPARM(self), PyObjec
   SwigValueWrapper< CS::StringID<CS::StringSetTag::General > > result;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned int val2 ;
+  unsigned long val2 ;
   int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
@@ -53382,7 +53585,7 @@ SWIGINTERN PyObject *_wrap_csevMouseMove(PyObject *SWIGUNUSEDPARM(self), PyObjec
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csevMouseMove" "', argument " "1"" of type '" "iObjectRegistry *""'"); 
   }
   arg1 = reinterpret_cast< iObjectRegistry * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_int(obj1, &val2);
+  ecode2 = SWIG_AsVal_unsigned_SS_long(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csevMouseMove" "', argument " "2"" of type '" "uint""'");
   } 
@@ -54808,7 +55011,7 @@ SWIGINTERN PyObject *_wrap_Primitives_GenerateCapsule__SWIG_0(PyObject *SWIGUNUS
   int ecode1 = 0 ;
   float val2 ;
   int ecode2 = 0 ;
-  unsigned int val3 ;
+  unsigned long val3 ;
   int ecode3 = 0 ;
   void *argp4 = 0 ;
   int res4 = 0 ;
@@ -54840,7 +55043,7 @@ SWIGINTERN PyObject *_wrap_Primitives_GenerateCapsule__SWIG_0(PyObject *SWIGUNUS
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Primitives_GenerateCapsule" "', argument " "2"" of type '" "float""'");
   } 
   arg2 = static_cast< float >(val2);
-  ecode3 = SWIG_AsVal_unsigned_SS_int(obj2, &val3);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "Primitives_GenerateCapsule" "', argument " "3"" of type '" "uint""'");
   } 
@@ -54903,7 +55106,7 @@ SWIGINTERN PyObject *_wrap_Primitives_GenerateCapsule__SWIG_1(PyObject *SWIGUNUS
   int ecode1 = 0 ;
   float val2 ;
   int ecode2 = 0 ;
-  unsigned int val3 ;
+  unsigned long val3 ;
   int ecode3 = 0 ;
   void *argp4 = 0 ;
   int res4 = 0 ;
@@ -54932,7 +55135,7 @@ SWIGINTERN PyObject *_wrap_Primitives_GenerateCapsule__SWIG_1(PyObject *SWIGUNUS
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Primitives_GenerateCapsule" "', argument " "2"" of type '" "float""'");
   } 
   arg2 = static_cast< float >(val2);
-  ecode3 = SWIG_AsVal_unsigned_SS_int(obj2, &val3);
+  ecode3 = SWIG_AsVal_unsigned_SS_long(obj2, &val3);
   if (!SWIG_IsOK(ecode3)) {
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "Primitives_GenerateCapsule" "', argument " "3"" of type '" "uint""'");
   } 
@@ -55000,7 +55203,7 @@ SWIGINTERN PyObject *_wrap_Primitives_GenerateCapsule(PyObject *self, PyObject *
       }
       if (_v) {
         {
-          int res = SWIG_AsVal_unsigned_SS_int(argv[2], NULL);
+          int res = SWIG_AsVal_unsigned_SS_long(argv[2], NULL);
           _v = SWIG_CheckState(res);
         }
         if (_v) {
@@ -55042,7 +55245,7 @@ SWIGINTERN PyObject *_wrap_Primitives_GenerateCapsule(PyObject *self, PyObject *
       }
       if (_v) {
         {
-          int res = SWIG_AsVal_unsigned_SS_int(argv[2], NULL);
+          int res = SWIG_AsVal_unsigned_SS_long(argv[2], NULL);
           _v = SWIG_CheckState(res);
         }
         if (_v) {
@@ -57963,6 +58166,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iPluginIterator_scfGetVersion", _wrap_iPluginIterator_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iPluginIterator", _wrap_delete_iPluginIterator, METH_VARARGS, NULL},
 	 { (char *)"iPluginIterator_swigregister", iPluginIterator_swigregister, METH_VARARGS, NULL},
+	 { (char *)"iPluginManager_LoadPluginAlways", _wrap_iPluginManager_LoadPluginAlways, METH_VARARGS, NULL},
 	 { (char *)"iPluginManager_UnloadPlugin", _wrap_iPluginManager_UnloadPlugin, METH_VARARGS, NULL},
 	 { (char *)"iPluginManager_RegisterPlugin", _wrap_iPluginManager_RegisterPlugin, METH_VARARGS, NULL},
 	 { (char *)"iPluginManager_GetPlugins", _wrap_iPluginManager_GetPlugins, METH_VARARGS, NULL},

@@ -1,7 +1,5 @@
 <world>
     <plugins>
-        <plugin name="bezier">crystalspace.mesh.loader.bezier</plugin>
-        <plugin name="bezierFact">crystalspace.mesh.loader.factory.bezier</plugin>
         <plugin name="spr3dFact">crystalspace.mesh.loader.factory.sprite.3d</plugin>
         <plugin name="spr3dMD2Fact">crystalspace.mesh.loader.factory.sprite.3d.md2</plugin>
         <plugin name="spr3d">crystalspace.mesh.loader.sprite.3d</plugin>
@@ -321,7 +319,6 @@
     <library>factories/factory_win1_walls.meshfact</library>
     <library>factories/factory_street1_walls_transp.meshfact</library>
     <library>factories/factory_street1_walls.meshfact</library>
-    <library>factories/donut.meshfact</library>
     <library>factories/factory_street1_car.meshfact</library>
     <library>factories/factory_street1_carRoof.meshfact</library>
     <library>factories/factory_street1_tire1.meshfact</library>
@@ -435,7 +432,7 @@
             </params>
             <zfill />
         </meshobj>
-        <light>
+        <light name="l1">
             <center x="0" y="0" z="0" />
             <radius>3</radius>
             <color red="1" green="1" blue="1" />
@@ -480,7 +477,7 @@
                 <viscull />
             </portal>
         </portals>
-        <light>
+        <light name="l1">
             <center x="0" y="0" z="4" />
             <radius>10</radius>
             <color red="1" green="1" blue="1" />
@@ -3814,7 +3811,7 @@
                 <v x="-2.5" y="-1" z="20" />
             </move>
         </meshobj>
-        <light>
+        <light name="l1">
             <center x="-1.5" y="3" z="17" />
             <radius>7</radius>
             <color red="0.4" green="0.4" blue="0.4" />
@@ -4212,7 +4209,7 @@
                 <id>colldet</id>
             </trimesh>
         </meshobj>
-        <light>
+        <light name="l2">
             <center x="3.5" y="2" z="12.5" />
             <radius>5</radius>
             <color red="0.7" green="0.7" blue="0.8" />
@@ -4659,28 +4656,28 @@
                 <v x="-4" y="0" z="12" />
             </move>
         </meshobj>
-        <light name="l1">
+        <light name="l3">
             <center x="-19" y="4" z="16" />
             <radius>10</radius>
             <color red="0.7" green="0.7" blue="0.8" />
             <dynamic />
         </light>
-        <light>
+        <light name="l4">
             <center x="-15" y="3" z="18" />
             <radius>6</radius>
             <color red="0.8" green="0.5" blue="0.5" />
         </light>
-        <light>
+        <light name="l5">
             <center x="-10" y="5" z="9" />
             <radius>8</radius>
             <color red="0.6" green="0.6" blue="0.6" />
         </light>
-        <light>
+        <light name="l6">
             <center x="-10" y="10" z="18" />
             <radius>10</radius>
             <color red="1" green="1" blue="1" />
         </light>
-        <light>
+        <light name="l7">
             <center x="10" y="10" z="18" />
             <radius>10</radius>
             <color red="1" green="1.2" blue="1.4" />
@@ -4691,7 +4688,7 @@
                 <roundness>0.5</roundness>
             </halo>
         </light>
-        <light>
+        <light name="l8">
             <center x="16" y="8" z="8" />
             <radius>20</radius>
             <color red="1" green="0.7" blue="0.7" />
@@ -5161,12 +5158,12 @@
                 <v x="-16" y="-1.85" z="25" />
             </move>
         </meshobj>
-        <light>
+        <light name="l1">
             <center x="-15" y="0" z="30" />
             <radius>17</radius>
             <color red="0.4" green="0.3" blue="0.3" />
         </light>
-        <light>
+        <light name="l2">
             <center x="-5" y="0" z="30" />
             <radius>14</radius>
             <color red="0.3" green="0.3" blue="0.6" />
@@ -5259,12 +5256,12 @@
                 <viscull />
             </portal>
         </portals>
-        <light>
+        <light name="l1">
             <center x="-8" y="2" z="24" />
             <radius>6</radius>
             <color red="0.7" green="0.5" blue="0.5" />
         </light>
-        <light>
+        <light name="l2">
             <center x="-3" y="2" z="24" />
             <radius>6</radius>
             <color red="0.7" green="0.5" blue="0.5" />
@@ -5417,7 +5414,7 @@
                 <viscull />
             </portal>
         </portals>
-        <light>
+        <light name="l1">
             <center x="-15" y="18" z="13" />
             <radius>14</radius>
             <color red="0.7" green="0.6" blue="0.6" />
@@ -5626,27 +5623,27 @@
                 <viscull />
             </portal>
         </portals>
-        <light>
+        <light name="l1">
             <center x="-10" y="6" z="25" />
             <radius>8</radius>
             <color red="1" green="1" blue="1" />
         </light>
-        <light>
+        <light name="l2">
             <center x="0" y="6" z="25" />
             <radius>8</radius>
             <color red="1" green="1" blue="1" />
         </light>
-        <light>
+        <light name="l3">
             <center x="10" y="6" z="25" />
             <radius>8</radius>
             <color red="1" green="1" blue="1" />
         </light>
-        <light>
+        <light name="l4">
             <center x="20" y="6" z="25" />
             <radius>8</radius>
             <color red="1" green="1" blue="1.5" />
         </light>
-        <light>
+        <light name="l5">
             <center x="30" y="6" z="25" />
             <radius>8</radius>
             <color red="0.5" green="0.5" blue="1.2" />
@@ -5863,27 +5860,27 @@
                 <viscull />
             </portal>
         </portals>
-        <light>
+        <light name="l1">
             <center x="-10" y="9" z="25" />
             <radius>8</radius>
             <color red="0.3" green="0.3" blue="0.3" />
         </light>
-        <light>
+        <light name="l2">
             <center x="0" y="9" z="25" />
             <radius>8</radius>
             <color red="0.3" green="0.3" blue="0.3" />
         </light>
-        <light>
+        <light name="l3">
             <center x="10" y="9" z="25" />
             <radius>8</radius>
             <color red="0.3" green="0.3" blue="0.3" />
         </light>
-        <light>
+        <light name="l4">
             <center x="20" y="9" z="25" />
             <radius>8</radius>
             <color red="0.3" green="0.3" blue="0.3" />
         </light>
-        <light>
+        <light name="l5">
             <center x="30" y="9" z="25" />
             <radius>7</radius>
             <color red="1" green="0" blue="0" />
@@ -6552,7 +6549,7 @@
                 <viscull />
             </portal>
         </portals>
-        <light>
+        <light name="l1">
             <center x="-17" y="14" z="51" />
             <radius>50</radius>
             <color red="0.5" green="0.5" blue="0.5" />
@@ -6880,26 +6877,6 @@
             </move>
             <ztest />
             <priority>alpha</priority>
-        </meshobj>
-        <meshobj name="donut_1">
-            <plugin>bezier</plugin>
-            <params>
-                <factory>donut</factory>
-            </params>
-            <hardmove>
-                <matrix>
-                    <m11>0.2</m11>
-                    <m12>0</m12>
-                    <m13>0</m13>
-                    <m21>0</m21>
-                    <m22>0.2</m22>
-                    <m23>0</m23>
-                    <m31>0</m31>
-                    <m32>0</m32>
-                    <m33>0.2</m33>
-                </matrix>
-                <v x="-5" y="3" z="-1" />
-            </hardmove>
         </meshobj>
         <meshobj name="car">
             <plugin>crystalspace.mesh.loader.genmesh</plugin>
@@ -7389,7 +7366,7 @@
                 <viscull />
             </portal>
         </portals>
-        <light>
+        <light name="l1">
             <center x="-30" y="70" z="-75" />
             <radius>10000</radius>
             <color red="0.8" green="0.8" blue="0.8" />
@@ -7403,7 +7380,7 @@
                 <spark5material>flare_spark5</spark5material>
             </halo>
         </light>
-        <light>
+        <light name="l2">
             <center x="-10" y="100" z="0" />
             <radius>10000</radius>
             <color red="0.2" green="0.2" blue="0.25" />
@@ -7610,7 +7587,7 @@
                 <viscull />
             </portal>
         </portals>
-        <light>
+        <light name="l1">
             <center x="3" y="-12" z="19" />
             <radius>9</radius>
             <color red="0.9" green="0.7" blue="0.7" />
@@ -7647,12 +7624,12 @@
                 <viscull />
             </portal>
         </portals>
-        <light>
+        <light name="l1">
             <center x="6" y="-15" z="38" />
             <radius>20</radius>
             <color red="1" green="1" blue="1" />
         </light>
-        <light>
+        <light name="l2">
             <center x="8" y="-12" z="38" />
             <radius>40</radius>
             <color red="0.3" green="0.3" blue="1" />
@@ -8096,7 +8073,7 @@
                 <viscull />
             </portal>
         </portals>
-        <light>
+        <light name="l1">
             <center x="-23" y="2.8" z="15" />
             <radius>7</radius>
             <color red="0.9" green="0.7" blue="0.7" />
@@ -8190,7 +8167,7 @@
                 </submesh>
             </params>
         </meshobj>
-        <light>
+        <light name="l1">
             <center x="-29.8" y="2" z="26" />
             <radius>7</radius>
             <color red="0.7" green="0.7" blue="0.9" />
@@ -8517,7 +8494,7 @@
                 <viscull />
             </portal>
         </portals>
-        <light>
+        <light name="l1">
             <center x="41" y="6" z="35" />
             <radius>28</radius>
             <color red="0.9" green="0.6" blue="0.6" />
@@ -8617,7 +8594,7 @@
                 <viscull />
             </portal>
         </portals>
-        <light>
+        <light name="l1">
             <center x="20" y="900" z="35" />
             <radius>10000</radius>
             <color red="1.3" green="1" blue="1.3" />

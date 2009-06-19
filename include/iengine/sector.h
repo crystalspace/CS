@@ -49,7 +49,6 @@ struct iObject;
 
 struct iRenderView;
 struct iRenderLoop;
-struct iFrustumView;
 struct iSector;
 struct iDocumentNode;
 
@@ -94,7 +93,7 @@ struct csFog
 
 /**
  * Set a callback which is called when this sector is traversed.
- * The given context will be either an instance of iRenderView, iFrustumView,
+ * The given context will be either an instance of iRenderView
  * or else 0.
  *
  * This callback is used by:
@@ -207,7 +206,7 @@ struct csSectorVisibleRenderMeshes
  */
 struct iSector : public virtual iBase
 {
-  SCF_INTERFACE(iSector,2,3,1);
+  SCF_INTERFACE(iSector,3,0,0);
   /// Get the iObject for this sector.
   virtual iObject *QueryObject () = 0;
 
@@ -351,11 +350,6 @@ struct iSector : public virtual iBase
    */
   THREADED_INTERFACE1(AddLight, csRef<iLight> light);
 
-  /// Calculate lighting for all objects in this sector
-  virtual void ShineLights () = 0;
-  /// Version of ShineLights() which only affects one mesh object.
-  virtual void ShineLights (iMeshWrapper*) = 0;
-
   /**
    * Sets dynamic ambient light this sector. This works in addition
    * to the dynamic light you can specify for every object.
@@ -397,12 +391,6 @@ struct iSector : public virtual iBase
    * will be created and used for this sector.
    */
   virtual iVisibilityCuller* GetVisibilityCuller () = 0;
-
-  /**
-   * Check visibility in a frustum way for all things and polygons in
-   * this sector and possibly traverse through portals to other sectors.
-   */
-  virtual void CheckFrustum (iFrustumView* lview) = 0;  
 
   /**
    * Follow a beam from start to end and return the first polygon that

@@ -51,8 +51,7 @@ loaded in the engine before. If you don't want that then you need to
 set the second parameter of @code{LoadMapFile} to @code{false}.
 
 The line @code{engine->Prepare()} will make sure that everything that
-is loaded is correctly set up (i.e. materials and texture will be registered,
-lightmaps will be loaded from the cache, ...).
+is loaded is correctly set up (i.e. materials and texture will be registered).
 
 @subsubheading Include Files
 

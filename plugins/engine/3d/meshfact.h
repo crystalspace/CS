@@ -32,11 +32,9 @@
 #include "iutil/selfdestruct.h"
 #include "csgfx/shadervarcontext.h"
 #include "imesh/object.h"
-#include "imesh/lighting.h"
 #include "iengine/mesh.h"
 #include "iengine/imposter.h"
 #include "iengine/viscull.h"
-#include "iengine/shadcast.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 

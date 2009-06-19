@@ -49,6 +49,8 @@
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
 {
 
+class PlexHierarchicalCache;
+
 typedef csHash<csRef<iShaderVariableAccessor>,csStringBase> csSVAHash;
 
 class csShaderManager : 
@@ -65,7 +67,7 @@ private:
   csRef<iStringSet> strings;
   csRef<iShaderVarStringSet> stringsSvName;
   csRef<iEventHandler> weakEventHandler;
-  csRef<iHierarchicalCache> shaderCache;
+  csRef<PlexHierarchicalCache> shaderCache;
 
   bool do_verbose;
 
@@ -183,8 +185,14 @@ public:
     return stringsSvName;
   }
   
-  iHierarchicalCache* GetShaderCache()
-  { return shaderCache; }
+  iHierarchicalCache* GetShaderCache();
+  
+  void AddSubShaderCache (iHierarchicalCache* cache,
+    int priority = cachePriorityApp);
+  iHierarchicalCache* AddSubCacheDirectory (const char* cacheDir,
+    int priority = cachePriorityApp, bool readOnly = false);
+  void RemoveSubShaderCache (iHierarchicalCache* cache);
+  void RemoveAllSubShaderCaches ();
   /** @} */
 
   /**\name iComponent implementation

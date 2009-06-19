@@ -35,7 +35,6 @@
 #include "ivideo/rendermesh.h"
 
 struct iCamera;
-struct iLightingInfo;
 struct iLODControl;
 struct iMeshFactoryList;
 struct iMeshFactoryWrapper;
@@ -48,8 +47,6 @@ struct iObject;
 struct iPortalContainer;
 struct iRenderView;
 struct iShaderVariableContext;
-struct iShadowCaster;
-struct iShadowReceiver;
 struct iSharedVariable;
 struct iSceneNode;
 struct iMaterialWrapper;
@@ -291,39 +288,6 @@ struct iMeshWrapper : public virtual iBase
    * get the portal container interface.
    */
   virtual iPortalContainer* GetPortalContainer () const = 0;
-
-  /**
-   * Get the optional lighting information that is implemented
-   * by this mesh object. If the mesh object doesn't implement it
-   * then this will return 0. This is similar (but more efficient)
-   * to calling scfQueryInterface<iLightingInfo> on the mesh object.
-   */
-  virtual iLightingInfo* GetLightingInfo () const = 0;
-
-  /**
-   * Get the optional shadow receiver that is implemented
-   * by this mesh object. If the mesh object doesn't implement it
-   * then this will return 0. This is similar (but more efficient)
-   * to calling scfQueryInterface<iShadowReceiver> on the mesh object.
-   * <p>
-   * Note! If the mesh is a static lod mesh (i.e. a parent of a mesh
-   * hierarchy that is used for static lod) then this will return
-   * a shadow receiver that automatically multiplexes the receiving shadows
-   * to all child meshes.
-   */
-  virtual iShadowReceiver* GetShadowReceiver () = 0;
-
-  /**
-   * Get the optional shadow caster that is implemented
-   * by this mesh object. If the mesh object doesn't implement it
-   * then this will return 0. This is similar (but more efficient)
-   * to calling scfQueryInterface<iShadowCaster> on the mesh object.
-   * <p>
-   * Note! If the mesh is a static lod mesh (i.e. a parent of a mesh
-   * hierarchy that is used for static lod) then this will return a
-   * shadow caster that gets shadows from the highest detail objects.
-   */
-  virtual iShadowCaster* GetShadowCaster () = 0;
 
   /// Get the parent factory.
   virtual iMeshFactoryWrapper *GetFactory () const = 0;

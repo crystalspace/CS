@@ -33,7 +33,7 @@ namespace CS
   {
     VfsHierarchicalCache::VfsHierarchicalCache (iObjectRegistry* object_reg,
       const char* vfsdir)
-     : scfImplementationType (this), vfsdir (vfsdir)
+     : scfImplementationType (this), vfsdir (vfsdir), readonly (false)
     {
       vfs = csQueryRegistry<iVFS> (object_reg);
       CS_ASSERT(vfs);
@@ -127,6 +127,7 @@ namespace CS
     bool VfsHierarchicalCache::CacheData (const void* data, size_t size,
                                           const char* path)
     {
+      if (readonly) return false;
       if (!path || !*path || (*path != '/')) return false;
     
       csStringFast<512> fullPath (vfsdir);
@@ -149,6 +150,7 @@ namespace CS
     
     bool VfsHierarchicalCache::ClearCache (const char* path)
     {
+      if (readonly) return false;
       if (!path || !*path || (*path != '/')) return false;
     
       csStringFast<512> fullPath (vfsdir);
@@ -159,6 +161,7 @@ namespace CS
     
     void VfsHierarchicalCache::Flush ()
     {
+      if (readonly) return;
       vfs->Sync();
     }
     
@@ -169,7 +172,9 @@ namespace CS
       csStringFast<512> fullPath (vfsdir);
       fullPath.Append (base);
       
-      return csPtr<iHierarchicalCache> (new VfsHierarchicalCache (this, fullPath));
+      VfsHierarchicalCache* newCache = new VfsHierarchicalCache (this, fullPath);
+      newCache->SetReadOnly (readonly);
+      return csPtr<iHierarchicalCache> (newCache);
     }
     
     csPtr<iStringArray> VfsHierarchicalCache::GetSubItems (const char* path)

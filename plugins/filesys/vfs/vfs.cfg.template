@@ -20,7 +20,14 @@ VFS.Mount.data = $(CS_DATADIR)$/
 VFS.Mount.varia = $(CS_DATADIR)$/varia$/
 VFS.Mount.scripts = $(CS_SHAREDIR)$/bindings$/
 
+; Shaders
 VFS.Mount.shader = $(CS_DATADIR)$/shader$/,$(CS_DATADIR)$/shader-old$/
+; Per-user shader cache
+; Global shader cache
+VFS.Mount.shadercache/global = $(CS_DATADIR)$/shadercache.zip
+; Per-user shader cache
+VFS.Mount.shadercache/user = $(LOCALAPPDATA:$(HOME)$/.crystalspace)$/shadercache$/
+
 ; The Unifont
 VFS.Mount.fonts/unifont = $(CS_DATADIR)$/unifont.zip
 ; The TTF font library

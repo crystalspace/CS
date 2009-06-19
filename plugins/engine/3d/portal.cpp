@@ -23,11 +23,9 @@
 #include "csgeom/polyclip.h"
 #include "csplugincommon/rendermanager/renderview.h"
 #include "iengine/camera.h"
-#include "iengine/fview.h"
 #include "iengine/light.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
-#include "iengine/shadows.h"
 #include "iengine/texture.h"
 #include "ivideo/texture.h"
 #include "plugins/engine/3d/portal.h"
@@ -247,56 +245,6 @@ bool csPortal::PointOnPolygon (const csVector3& v)
   }
 
   return true;
-}
-
-void csPortal::CastShadows (iMovable* movable, iFrustumView* fview)
-{
-  // @@@ Warping portals currently don't support lights that go through.
-  if (flags.Check (CS_PORTAL_WARP)) return;
-
-  csFrustumContext *old_ctxt = fview->GetFrustumContext ();
-  csFrustum *light_frustum = old_ctxt->GetLightFrustum ();
-  const csVector3 &center = light_frustum->GetOrigin ();
-
-  // If plane is not visible then return (backface culling).
-  if (!csMath3::Visible (center, world_plane))
-    return;
-  // Compute the distance from the center of the light
-  // to the plane of the polygon.
-  float dist_to_plane = world_plane.Distance (center);
-  // If distance is too small or greater than the radius of the light
-  // then we have a trivial case (no hit).
-  if ((dist_to_plane < SMALL_EPSILON)
-    || dist_to_plane >= fview->GetRadius ())
-    return ;
-
-  fview->CreateFrustumContext ();
-  csFrustumContext *new_ctxt = fview->GetFrustumContext ();
-
-  size_t num_vertices = vertex_indices.GetSize ();
-  if (num_vertices > VectorArray->GetSize ())
-    VectorArray->SetSize (num_vertices);
-
-  csVector3 *poly = VectorArray->GetArray ();
-
-  csDirtyAccessArray<csVector3>* vt = parent->GetWorldVertices ();
-  size_t j;
-  if (old_ctxt->IsMirrored ())
-    for (j = 0; j < num_vertices; j++)
-      poly[j] = (*vt)[vertex_indices[num_vertices - j - 1]] - center;
-  else
-    for (j = 0; j < num_vertices; j++)
-      poly[j] = (*vt)[vertex_indices[j]] - center;
-
-  // @@@ Check if this isn't a memory leak.
-  new_ctxt->SetNewLightFrustum (light_frustum->Intersect (
-      poly, (int)num_vertices));
-  if (new_ctxt->GetLightFrustum ())
-  {
-    CheckFrustum (fview, movable->GetTransform (), 0);
-  }
-
-  fview->RestoreFrustumContext (old_ctxt);
 }
 
 bool csPortal::IntersectRay (const csVector3 &start,
@@ -539,125 +487,6 @@ iMeshWrapper* csPortal::HitBeamPortals (
       isect = hbresult.isect;
     }
     return hbresult.mesh;
-  }
-}
-
-void csPortal::CheckFrustum (iFrustumView *lview,
-    const csReversibleTransform& t, int alpha)
-{
-  if (!CompleteSector (lview)) return ;
-  if (sector->GetRecLevel () > 1)
-  //@@@@@ if (sector->GetRecLevel () > csSector::cfg_reflections)
-    return ;
-
-  csFrustumContext *old_ctxt = lview->GetFrustumContext ();
-  lview->CreateFrustumContext ();
-
-  csFrustumContext *new_ctxt = lview->GetFrustumContext ();
-  if (old_ctxt->GetLightFrustum ())
-    new_ctxt->SetNewLightFrustum(new csFrustum (*old_ctxt->GetLightFrustum()));
-  lview->StartNewShadowBlock ();
-
-  // If copied_frustums is true we copied the frustums and we need to
-
-  // delete them later.
-  bool copied_frustums = false;
-
-  // If true then we have to restore color.
-  csRef<iLightingProcessInfo> linfo;
-  bool restore_color = false;
-  csColor old_color;
-
-  if (flags.Check (CS_PORTAL_WARP))
-  {
-    csReversibleTransform warp_wor;
-    // @@@ Perhaps can be calculated more efficiently without having
-    // to calculate a new transform?
-    ObjectToWorld (t, warp_wor);
-
-    new_ctxt->GetLightFrustum ()->Transform (&warp_wor);
-
-    if (flags.Check (CS_PORTAL_MIRROR))
-      new_ctxt->SetMirrored (!old_ctxt->IsMirrored ());
-    new_ctxt->GetLightFrustum ()->SetMirrored (new_ctxt->IsMirrored ());
-
-    /*
-     * Transform all shadow frustums. First make a copy.
-     * Note that we only copy the relevant shadow frustums.
-     * We know that csPolygon3D::CalculateLighting() called
-     * csPolygon3D::MarkRelevantShadowFrustums() some time before
-     */
-
-    // calling this function so the 'relevant' flags are still valid.
-    iShadowBlock *slist = old_ctxt->GetShadows ()->GetFirstShadowBlock ();
-    while (slist)
-    {
-      iShadowBlock *copy_slist = new_ctxt->GetShadows ()->NewShadowBlock ();
-      copy_slist->AddRelevantShadows (slist, &warp_wor);
-      slist = old_ctxt->GetShadows ()->GetNextShadowBlock (slist);
-    }
-
-    copied_frustums = true;
-
-    iFrustumViewUserdata *ud = lview->GetUserdata ();
-    if (ud) linfo = scfQueryInterface<iLightingProcessInfo> (ud);
-    if (linfo)
-    {
-      if (alpha)
-      {
-        float fr, fg, fb;
-        fr = filter_r;
-        fg = filter_g;
-        fb = filter_b;
-
-        restore_color = true;
-        old_color = linfo->GetColor ();
-        linfo->SetColor (
-            csColor (
-              linfo->GetColor ().red * fr,
-              linfo->GetColor ().green * fg,
-              linfo->GetColor ().blue * fb));
-      }
-
-      // Don't go further if the light intensity is almost zero.
-      if (
-        linfo->GetColor ().red < SMALL_EPSILON &&
-        linfo->GetColor ().green < SMALL_EPSILON &&
-        linfo->GetColor ().blue < SMALL_EPSILON)
-        goto stop;
-    }
-  }
-  else
-  {
-    // There is no space warping. In this case we still want to
-    // remove all non-relevant shadow frustums if there are any.
-    // We know that csPolygon3D::CalculateLighting() called
-    // csPolygon3D::MarkRelevantShadowFrustums() some time before
-    // calling this function so the 'relevant' flags are still valid.
-    iShadowBlock *slist = old_ctxt->GetShadows ()->GetFirstShadowBlock ();
-    while (slist)
-    {
-      copied_frustums = true; // Only set to true here
-      iShadowBlock *copy_slist = new_ctxt->GetShadows ()->NewShadowBlock ();
-      copy_slist->AddRelevantShadows (slist);
-
-      slist = old_ctxt->GetShadows ()->GetNextShadowBlock (slist);
-    }
-  }
-
-  sector->CheckFrustum (lview);
-
-  if (copied_frustums)
-  {
-    // Delete all copied frustums.
-    new_ctxt->GetShadows ()->DeleteAllShadows ();
-  }
-
-stop:
-  lview->RestoreFrustumContext (old_ctxt);
-  if (restore_color)
-  {
-    linfo->SetColor (old_color);
   }
 }
 

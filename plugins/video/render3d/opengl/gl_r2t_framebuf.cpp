@@ -167,8 +167,8 @@ void csGLRender2TextureFramebuf::BeginDraw (int drawflags)
     G3D->statecache->Disable_GL_BLEND ();
     G3D->SetZMode (CS_ZBUF_NONE);
 
-    csGLBasicTextureHandle* tex_mm = 
-      static_cast<csGLBasicTextureHandle*> (colorTarget.texture->GetPrivateObject ());
+    csGLBasicTextureHandle* tex_mm = static_cast<csGLBasicTextureHandle*> (
+	(iTextureHandle*)colorTarget.texture);
     GLenum textarget = tex_mm->GetGLTextureTarget();
 
     GLint oldMagFilt, oldMinFilt;
@@ -445,7 +445,7 @@ void csGLRender2TextureFramebuf::GrabFramebuffer (const RTAttachment<>& target,
 						  InternalFormatClass fmtClass)
 {
   csGLBasicTextureHandle* tex_mm = 
-    static_cast<csGLBasicTextureHandle*> (target.texture->GetPrivateObject ());
+    static_cast<csGLBasicTextureHandle*> ((iTextureHandle*)target.texture);
   tex_mm->Precache ();
   // Texture is in tha cache, update texture directly.
   G3D->ActivateTexture (tex_mm);

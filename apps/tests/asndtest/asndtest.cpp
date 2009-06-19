@@ -61,10 +61,6 @@ void ASndTest::CreateWorld ()
   // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
       engine, world, "walls", "walls_factory", &box);
-
-  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
-    iGeneralMeshState> (walls->GetMeshObject ());
-  mesh_state->SetShadowReceiving (true);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   // Prepare lighting
@@ -224,6 +220,9 @@ void ASndTest::CreateWorld ()
   listenerdoppler->SetDopplerFactor( 100 );
 
   engine->Prepare ();
+
+  using namespace CS::Lighting;
+  SimpleStaticLighter::ShineLights (world, engine, 4);
 }
 
 void ASndTest::Frame ()
@@ -364,8 +363,6 @@ bool ASndTest::Application()
 
   sndloader = csQueryRegistry<iSndSysLoader> (GetObjectRegistry());
   if (!sndloader) return ReportError("Failed to locate Sound loader!");
-
-  engine->SetLightingCacheMode (0);
 
   CreateWorld ();
 

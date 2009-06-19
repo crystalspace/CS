@@ -303,10 +303,6 @@ bool Simple::Initialize ()
   	
   font = g3d->GetDriver2D()->GetFontServer()->LoadFont (CSFONT_LARGE, 10);
 
-  // First disable the lighting cache. Our app is simple enough
-  // not to need this.
-  engine->SetLightingCacheMode (0);
-
   // Create our world.
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
     	"crystalspace.application.simplept",
@@ -376,9 +372,6 @@ bool Simple::Initialize ()
     scfQueryInterface<iGeneralFactoryState> (
 	walls_factory->GetMeshObjectFactory ());
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
-  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
-    iGeneralMeshState> (walls->GetMeshObject ());
-  mesh_state->SetShadowReceiving (true);
 
   csColor4 black (0, 0, 0);
   walls_state->AddVertex (csVector3 (-8, -8, -5), csVector2 (0, 0),
@@ -415,6 +408,10 @@ bool Simple::Initialize ()
   room->GetLights ()->Add (light);
 
   engine->Prepare ();
+
+  using namespace CS::Lighting;
+  SimpleStaticLighter::ShineLights (room, engine, 4);
+
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
     	"crystalspace.application.simplept",
   	"Created.");

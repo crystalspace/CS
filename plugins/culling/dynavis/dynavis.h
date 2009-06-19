@@ -55,8 +55,6 @@ struct iMovable;
 struct iMeshWrapper;
 struct iBugPlug;
 struct iMeshWrapper;
-struct iShadowCaster;
-struct iShadowReceiver;
 
 #define VIEWMODE_STATS 0
 #define VIEWMODE_STATSOVERLAY 1
@@ -100,7 +98,6 @@ public:
   csVisibilityObjectHistory* history;
   // Optional data for shadows. Both fields can be 0.
   csRef<iMeshWrapper> mesh;
-  csRef<iShadowCaster> caster;
 
   csVisibilityObjectWrapper () :
     scfImplementationType (this)
@@ -350,7 +347,6 @@ public:
     const csVector3& end, csVector3& isect, float* pr = 0,
     iMeshWrapper** p_mesh = 0, int* poly_idx = 0,
     bool accurate = true);
-  virtual void CastShadows (iFrustumView* fview);
   virtual const char* ParseCullerParameters (iDocumentNode*) { return 0; }
 
   // Debugging functions.

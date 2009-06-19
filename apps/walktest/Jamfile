@@ -21,8 +21,6 @@ if $(COMPILER.C++FLAGS.PEDANTIC.ENABLE)
 WALKALL.PLUGINLIST =
   animesh
   animeshldr
-  bezier
-  bezierldr
   bugplug
   csconin
   csconout
@@ -102,10 +100,10 @@ if $(CAL3D.AVAILABLE) = "yes"
   ;WALKALL.PLUGINLIST += sprcal3d sprcal3dldr ;
 }
 
-# Plugins needed by both software & GL renderers
+# Plugins needed by GL renderer
 if $(X11.AVAILABLE) = "yes"
 {
-  WALKALL.PLUGINLIST += xwin xextshm ;
+  WALKALL.PLUGINLIST += xwin ;
   if $(XFREE86VM.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += xext86vm ; }
 }
 
@@ -119,16 +117,6 @@ if $(GL.AVAILABLE) = "yes"
   if $(TARGET.OS) = "MACOS_X" { WALKALL.PLUGINLIST += glosx2d ; }
 
   if $(CG.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += glshader_cg ; }
-}
-else
-{
-  WALKALL.PLUGINLIST += soft3d softshader ;
-
-  # Software canvases.
-  if $(X11.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += x2d ; }
-  if $(DIRECTX.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += ddraw2d ; }
-  if $(TARGET.OS) = "MACOS_X" { WALKALL.PLUGINLIST += cgdriver2d ; }
-  #if $(LIBCACA.AVAILABLE) = "yes" { WALKALL.PLUGINLIST += cacacanvas ; }
 }
 
 for p in $(WALKALL.PLUGINLIST)

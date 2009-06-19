@@ -45,6 +45,7 @@ namespace CS
       csRef<VfsHierarchicalCache> parent;
       csString vfsdir;
       csRef<iVFS> vfs;
+      bool readonly;
       
       VfsHierarchicalCache (VfsHierarchicalCache* parentCache, const char* vfsdir);
     
@@ -62,6 +63,9 @@ namespace CS
       VfsHierarchicalCache (iObjectRegistry* object_reg, const char* vfsdir);
     
       virtual ~VfsHierarchicalCache ();
+    
+      void SetReadOnly (bool ro) { readonly = ro; }
+      bool IsReadOnly () const { return readonly; }
     
       /**\name iHierarchicalCache implementation
        * @{ */

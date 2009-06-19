@@ -28,7 +28,6 @@
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
 #include "iengine/portalcontainer.h"
-#include "iengine/shadcast.h"
 #include "ivideo/rendermesh.h"
 #include "plugins/engine/3d/portal.h"
 
@@ -106,10 +105,9 @@ private:
 /**
  * This is a container class for portals.
  */
-class csPortalContainer : public scfImplementationExt2<csPortalContainer,
+class csPortalContainer : public scfImplementationExt1<csPortalContainer,
                                                        csMeshObject, 
-                                                       iPortalContainer,
-	                                               iShadowReceiver>
+                                                       iPortalContainer>
 {
 private:
   csRefArray<csPortal> portals;
@@ -187,10 +185,6 @@ public:
   /// Transform from world to camera space.
   void WorldToCamera (iCamera* camera, const csReversibleTransform& camtrans);
   bool Draw (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
-
-
-  //-------------------For iShadowReceiver ----------------------------//
-  virtual void CastShadows (iMovable* movable, iFrustumView* fview);
 
   //-------------------For iPortalContainer ----------------------------//
   virtual iPortal* CreatePortal (csVector3* vertices, int num);

@@ -189,10 +189,45 @@ class iConsoleOutput(core.iBase):
     def GetMaxLineWidth(*args): return _ivaria.iConsoleOutput_GetMaxLineWidth(*args)
     def RegisterWatcher(*args): return _ivaria.iConsoleOutput_RegisterWatcher(*args)
     def PerformExtension(*args): return _ivaria.iConsoleOutput_PerformExtension(*args)
+    scfGetVersion = staticmethod(_ivaria.iConsoleOutput_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iConsoleOutput
     __del__ = lambda self : None;
 iConsoleOutput_swigregister = _ivaria.iConsoleOutput_swigregister
 iConsoleOutput_swigregister(iConsoleOutput)
+iConsoleOutput_scfGetVersion = _ivaria.iConsoleOutput_scfGetVersion
+
+class iConsoleExecCallback(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def Execute(*args): return _ivaria.iConsoleExecCallback_Execute(*args)
+    scfGetVersion = staticmethod(_ivaria.iConsoleExecCallback_scfGetVersion)
+    __swig_destroy__ = _ivaria.delete_iConsoleExecCallback
+    __del__ = lambda self : None;
+iConsoleExecCallback_swigregister = _ivaria.iConsoleExecCallback_swigregister
+iConsoleExecCallback_swigregister(iConsoleExecCallback)
+iConsoleExecCallback_scfGetVersion = _ivaria.iConsoleExecCallback_scfGetVersion
+
+class iConsoleInput(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def Bind(*args): return _ivaria.iConsoleInput_Bind(*args)
+    def SetExecuteCallback(*args): return _ivaria.iConsoleInput_SetExecuteCallback(*args)
+    def GetExecuteCallback(*args): return _ivaria.iConsoleInput_GetExecuteCallback(*args)
+    def GetText(*args): return _ivaria.iConsoleInput_GetText(*args)
+    def GetCurLine(*args): return _ivaria.iConsoleInput_GetCurLine(*args)
+    def GetBufferSize(*args): return _ivaria.iConsoleInput_GetBufferSize(*args)
+    def SetBufferSize(*args): return _ivaria.iConsoleInput_SetBufferSize(*args)
+    def Clear(*args): return _ivaria.iConsoleInput_Clear(*args)
+    def SetPrompt(*args): return _ivaria.iConsoleInput_SetPrompt(*args)
+    def HandleEvent(*args): return _ivaria.iConsoleInput_HandleEvent(*args)
+    scfGetVersion = staticmethod(_ivaria.iConsoleInput_scfGetVersion)
+    __swig_destroy__ = _ivaria.delete_iConsoleInput
+    __del__ = lambda self : None;
+iConsoleInput_swigregister = _ivaria.iConsoleInput_swigregister
+iConsoleInput_swigregister(iConsoleInput)
+iConsoleInput_scfGetVersion = _ivaria.iConsoleInput_scfGetVersion
 
 class iStandardReporterListener(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')

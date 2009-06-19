@@ -61,10 +61,10 @@ those plugins in the Crystal Space directory.
 @item
 You should also have the data directory which is included with Crystal
 Space.  This directory contains various texture and data libraries (like
-@file{standard.zip} and @file{stdtex.zip}), data files for some of the
-applications (like the @samp{flarge} world file for @file{walktest}), 
-shader definitions in case you are running with the new renderer architecture,
-configuration files for various plugins in Crystal Space and a lot more.
+@file{standard.zip}), data files for some of the applications (like
+the @samp{castle} world file for @file{walktest}), 
+shader definitions, configuration files for various plugins in Crystal Space
+and a lot more.
 
 @item
 Crystal Space applications also require a @file{vfs.cfg} configuration file
@@ -72,12 +72,10 @@ which tells the virtual file system (@sc{vfs}) where everything is located.
 
 @item
 In addition to maps that are included in the data folder of Crystal Space
-itself (@samp{flarge} and @samp{partsys} for old renderer architecture,
-and @samp{particles}, @samp{terrain}, @samp{terrainf}, @samp{r3dtest},
-@samp{stenciltest}, and @samp{isotest} for the new renderer) you can also
-download additional maps for @file{walktest}.  The map files included with
-Crystal Space are normal directories but Crystal Space can also read
-directly from @sc{zip} archives.
+itself (@samp{castle}, @samp{flarge}, @samp{partsys}, @samp{terrainf}, @dots{})
+you can also download additional maps for @file{walktest}.  The map files
+included with Crystal Space are normal directories but Crystal Space can
+also read directly from @sc{zip} archives.
 @end itemize
 
 @item
@@ -110,10 +108,10 @@ specifying the map file on on the command-line, like this:
 Where @samp{flarge} is the name of the map file you wish to use.  In this case,
 @samp{flarge} corresponds to the @file{flarge} directory which is included
 with @samp{cs}.  Also note that @samp{flarge} itself requires the file
-@file{stdtex.zip} which contains all the textures.
+@file{standard.zip} which contains all the textures.
 
 Alternately, for WalkTest, you can change the @samp{WorldFile} setting in its
-configuration file @file{CS/data/config/walktest.cfg}.  For example:
+configuration file @file{CS/data/config-apps/walktest.cfg}.  For example:
 
 @example
 Walktest.Settings.WorldFile = flarge
@@ -129,47 +127,6 @@ list.  @xref{Mailing Lists}.
 completely up-to-date but we try to do our best in keeping it as up-to-date as
 possible.  Refer to the section in the Crystal Space manual which discusses
 documentation resources.  @xref{Documentation Resources}.
-
-@item
-@strong{Q}: I don't have lots of memory.  Can I still run Crystal Space?
-
-@strong{A1}: You may want to decrease the size of the texture cache with the
-@samp{-cache=<size>} command-line option or the @samp{CACHE} configuration
-option in @file{soft3d.cfg} if you are using the software renderer.  By
-default the size of the texture cache is quite large (typically 5 to eight
-megabytes in size), so adjusting this value might be useful for low-memory
-systems.
-
-@strong{A2}: Using a smaller window size and a lower bit-depth can also
-decrease memory usage.  In addition to the memory used for the actual graphics
-display, Crystal Space uses a Z-buffer containing 4-byte values with the same
-dimensions as the display.  Therefore, a display with dimensions of 640x480
-uses a Z-buffer of 1,228,800 bytes.
-
-@strong{A3}: If you are still low on memory there is only one thing you can
-do: decrease the complexity of the map.  For every polygon in the world a lot
-of memory used.  If you just want to try the engine you can run Crystal Space
-with some of the simpler worlds such as @file{room.zip} or @file{maze.zip}.
-
-@item
-@strong{Q}: Crystal Space is really slow on my computer.  What can I do to
-speed it up?
-
-@strong{A1}: Crystal Space is a 6@sc{dof} engine.  It needs to do
-semi-perspective correct texture mapping to get a nice display and
-calculations to achieve this are slow.  You can expect that Crystal Space will
-probably need the same kind of computer as a game such as Quake 1 or Quake 2,
-at least a Pentium or a very fast 486 with a floating point co-processor.
-Also note that Crystal Space is still in the developmental stage and has not
-yet been fully optimized.  You might try using smaller window dimensions
-with the @samp{-mode=} option.  @xref{Common Command Line Options}.
-
-@strong{A2}: Use a hardware accelerated graphics card and driver.  Such cards
-are quite popular these days and can perform extremely well, especially when
-compared to Crystal Space's software renderer. Framerates of 100 fps and more
-are not uncommon if you have a properly configured OpenGL renderer. Note that
-by default Crystal Space uses OpenGL. You have to use the
-@samp{-video=software} command-line option to go back to Software rendering.
 
 @item
 @strong{Q}: I'm using OpenGL with Crystal Space (via the @samp{-video=opengl}
@@ -225,6 +182,7 @@ together with blender2crystal
 (aka. b2cs, @uref{http://b2cs.delcorp.org/}).  blender2crystal works
 very well and is fully supported by the Crystal Space project.  Using this
 convertor you can make complete maps with support for portals and much more.
+It also supports @samp{AniMesh} models.
 
 @strong{A2}: For animated models using Cal3D (@pxref{MeshObject SprCal3D})
 you can also use Blender, which has support for Cal3D objects.
@@ -311,9 +269,15 @@ you can and cannot do, see the license, @ref{Licenses}.
 @item
 @strong{Q}: How stable is the @sc{api} for Crystal Space?
 
-@strong{A}: The @sc{api} which you can find in the 0.90 release should be about
-95% stable as compared to the 1.0 release. After 1.0 we will make sure
-to keep backwards compatibility (until we release 2.0 :-)
+@strong{A}: Between every subsequence stable release (for example, from 1.0
+to 1.2 or from 1.2 to 1.4) we always try to guarantee backwards compatibility.
+If we want to remove some feature we will @samp{deprecate} it. When something
+is deprecated in version 1.2 (for example) then it means that it will probably
+be removed in 1.4. So make sure to change your applications to avoid using
+the deprecated stuff.
+
+In the future 2.0 release we plan more significant changes for which we will no
+longer be able to guarantee backwards compatibility.
 @end itemize
 
 The following section lists some more technical questions.
@@ -341,35 +305,6 @@ them with @code{HardTransform}.
 @strong{A2}: Another common error is forgetting to call
 @code{movable->UpdateMove()} after moving a model. If you don't call that
 function then the visibility culler doesn't know the object has moved.
-
-@item
-@strong{Q}: Why isn't my polygon lit correctly? It is simply full bright.
-
-@strong{A}: Both the software and OpenGL renderer have a limitation on
-lightmap size.  For the software renderer the limitation is that the
-final resulting lit texture may not exceed 1500000 pixels.  To calculate
-the final resulting lit texture size the easiest way is to take the
-texture size that is used on the polygon (i.e. 64x64 for example) and
-calculate how many times the texture is repeated on that polygon.  If the
-given texture is repeated four times on the polygon then you basically
-have a total texture of 256x256 which will be fine.  For the OpenGL
-renderer the limitation is that a lightmap cannot be bigger than 256x256.
-Note that there will be a lightmap lumel for every 16x16 texels on the
-polygon.  To avoid this limitation you basically have five possible
-solutions: (1) split the polygon into smaller polygons, (2) use a smaller
-base texture (this will also reduce size of lightmap/lit texture), (3)
-decrease the number of times the texture is tiled on the polygon, (4)
-increase the size of the lumels (i.e. 32x32 instead of 16x16) by changing
-the @samp{lightmapcellsize} option in the world file, and finally (5) use a
-low-resolution base texture and a high-resolution detail texture to add detail
-(this only works for OpenGL).
-
-@item
-@strong{Q}: I added lights, and/or moved geometry in my level but they are not
-correctly lit.  What did I do wrong?
-
-@strong{A}: Crystal Space does not automatically recalculate lighting.
-To do that you have to use the @samp{-relight} command-line option.
 
 @item
 @strong{Q}: I'm confused by the Crystal Space coordinate system.  The 3D

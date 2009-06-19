@@ -38,7 +38,6 @@ class csRect;
 
 struct csRGBcolor;
 struct csRGBpixel;
-struct csLightMapMapping;
 struct iImage;
 struct iTextureHandle;
 struct iMaterial;
@@ -112,43 +111,6 @@ struct iString;
 /** @} */
 
 /**
- * A lightmap registered with a renderer.
- */
-struct iRendererLightmap : public virtual iBase
-{
-  SCF_INTERFACE (iRendererLightmap, 2, 1, 0);
-
-  /**
-   * Retrieve the coordinates of this lightmap in the superlightmap, in the
-   * 'absolute' system used by iSuperLightmap::RegisterLightmap().
-   */
-  virtual void GetSLMCoords (int& left, int& top, 
-    int& width, int& height) = 0;
-    
-  /// Set the image data of this lightmap.
-  virtual void SetData (csRGBcolor* data) = 0;
-  
-  virtual void SetLightCellSize (int size) = 0;
-};
-
-/**
- * A super light map.
- */
-struct iSuperLightmap : public virtual iBase
-{
-  SCF_INTERFACE (iSuperLightmap, 2, 0, 0);
-
-  /// Add a lightmap to this SLM.
-  virtual csPtr<iRendererLightmap> RegisterLightmap (int left, int top, 
-    int width, int height) = 0;
-    
-  /// Retrieve an image of the whole SLM (for debugging purposes)
-  virtual csPtr<iImage> Dump () = 0;
-
-  virtual iTextureHandle* GetTexture () = 0;
-};
-
-/**
  * This is the standard texture manager interface.
  * A 3D rasterizer will have to implement a subclass of this one and
  * return a pointer to it in Graphics3D.
@@ -166,7 +128,7 @@ struct iSuperLightmap : public virtual iBase
  */
 struct iTextureManager : public virtual iBase
 {
-  SCF_INTERFACE(iTextureManager, 3,2,1);
+  SCF_INTERFACE(iTextureManager, 4,0,0);
   /**
    * Register a texture. The given input image is IncRef'd and DecRef'ed
    * later when no longer needed. If you want to keep the input image
@@ -229,12 +191,6 @@ struct iTextureManager : public virtual iBase
    */
   virtual int GetTextureFormat () = 0;
   
-  /**
-   * Create a new super lightmap with the specified dimensions.
-   */
-  virtual csPtr<iSuperLightmap> CreateSuperLightmap (int width, 
-    int height) = 0;
-
   /**
    * Request maximum texture dimensions.
    */

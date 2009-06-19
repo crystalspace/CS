@@ -32,8 +32,6 @@
 #include "iengine/engine.h"
 #include "iengine/lightmgr.h"
 #include "iengine/material.h"
-#include "iengine/shadcast.h"
-#include "imesh/lighting.h"
 #include "imesh/object.h"
 #include "imesh/terrain2.h"
 #include "iutil/comp.h"

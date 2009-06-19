@@ -6,6 +6,7 @@
 %ignore iConsoleOutput::PutTextV;
 %ignore iConsoleOutput::PerformExtensionV;
 %include "ivaria/conout.h"
+%include "ivaria/conin.h"
 
 %include "ivaria/stdrep.h"
 %include "ivaria/view.h"

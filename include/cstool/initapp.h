@@ -106,6 +106,7 @@ struct iVerbosityManager;
   CS_REQUEST_PLUGIN("crystalspace.engine.3d", iEngine)
 /// Request map loader.
 #define CS_REQUEST_LEVELLOADER \
+  CS_REQUEST_PLUGIN("crystalspace.level.threadedloader", iThreadedLoader), \
   CS_REQUEST_PLUGIN("crystalspace.level.loader", iLoader)
 /// Request map writer.
 #define CS_REQUEST_LEVELSAVER \

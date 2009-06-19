@@ -102,7 +102,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(BugPlug)
 #define DEBUGCMD_MMX		1012	// Enable MMX
 #define DEBUGCMD_TRANSP		1013	// Enable transparent mode
 #define DEBUGCMD_GAMMA		1016	// Set gamma
-#define DEBUGCMD_DBLBUFF	1017	// Set double buffering (G2D)
 #define DEBUGCMD_DUMPCAM	1018	// Dump the camera
 #define DEBUGCMD_FOV		1019	// Set fov
 #define DEBUGCMD_FOVANGLE	1020	// Set fov in angles

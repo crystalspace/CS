@@ -135,17 +135,15 @@ bool Shagnetron::Run ()
 {
   csRef<iCommandLineParser> cmdline = csQueryRegistry<iCommandLineParser> (object_reg);
   
-  csFIFO<csString> dirsToScan;
+  csFIFO<csString> toScan;
   for (size_t i = 0; ; i++)
   {
     csString dir (cmdline->GetName (i));
     if (dir.IsEmpty()) break;
     
-    if (dir[dir.Length()-1] != '/')
-      dir += "/";
-    dirsToScan.Push (dir);
+    toScan.Push (dir);
   }
-  if (dirsToScan.GetSize() == 0)
+  if (toScan.GetSize() == 0)
   {
     PrintHelp ();
     return false;
@@ -154,22 +152,47 @@ bool Shagnetron::Run ()
   docsys = csQueryRegistry<iDocumentSystem> (object_reg);
   vfs = csQueryRegistry<iVFS> (object_reg);
   shaderMgr = csQueryRegistry<iShaderManager> (object_reg);
-  while (dirsToScan.GetSize() > 0)
+  iHierarchicalCache* shaderCache = shaderMgr->GetShaderCache();
+  if (!shaderCache)
   {
-    csString dir (dirsToScan.PopTop());
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.shagnetron",
+	"Shader cache is disabled. Please enable to use this tool");
+    // @@@ It might be sensible to forcibly enable shader caching
+    return false;
+  }
+  
+  if (cmdline->GetBoolOption ("nodefaultcaches", false))
+    shaderMgr->RemoveAllSubShaderCaches();
+  for (size_t i = 0; ; i++)
+  {
+    const char* opt = cmdline->GetOption ("cachedir", i);
+    if (!opt || !*opt) break;
     
-    csRef<iStringArray> vfsFiles (vfs->FindFiles (dir));
-    for (size_t i = 0; i < vfsFiles->GetSize(); i++)
+    shaderMgr->AddSubCacheDirectory (opt,
+      iShaderManager::cachePriorityHighest);
+  }
+  if (cmdline->GetBoolOption ("cacheclear", false))
+    shaderCache->ClearCache ("/");
+  
+  while (toScan.GetSize() > 0)
+  {
+    csString obj (toScan.PopTop());
+    
+    if (obj[obj.Length()-1] == '/')
     {
-      const char* file = vfsFiles->Get (i);
-      
-      if (FileBlacklisted (file)) continue;
-      
-      if (file[strlen(file)-1] == '/')
-        dirsToScan.Push (file);
-      else
-        PrecacheShaderFile (file);
+      csRef<iStringArray> vfsFiles (vfs->FindFiles (obj));
+      for (size_t i = 0; i < vfsFiles->GetSize(); i++)
+      {
+	const char* file = vfsFiles->Get (i);
+	
+	if (FileBlacklisted (file)) continue;
+	
+	toScan.Push (file);
+      }
     }
+    else
+      PrecacheShaderFile (obj);
   }
 
   return true;
@@ -179,13 +202,19 @@ void Shagnetron::PrintHelp ()
 {
   const char* appname = "shagnetron";
 
-  csPrintf ("Usage: %s <VFS directory> <VFS directory> <...>\n", appname);
+  csPrintf ("Usage: %s [options] <VFS directory | shader file name> <...>\n", appname);
   csPrintf ("\n");
   csPrintf ("Pre-warms a shader cache with all the shaders from the given directories.\n");
   csPrintf ("\n");
   csPrintf ("The name is a portmanteau of 'shader' and 'magnetron'.\n");
   csPrintf ("\n");
-  //csPrintf ("Options:\n");
+  csPrintf ("Available options:\n");
+  csPrintf (" -cachedir         Specify additional cache directories.\n");
+  csPrintf ("                   The later a directory is specified the lower its priority.\n");
+  csPrintf ("                   The first directory is written to.\n");
+  csPrintf (" -nodefaultcaches  Do not use default caches set in config\n");
+  csPrintf (" -cacheclear       Clear used caches\n");
+  csPrintf ("\n");
 }
 
 /*---------------------------------------------------------------------*

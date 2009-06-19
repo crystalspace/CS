@@ -31,16 +31,6 @@ match the given depth of the display. However if you give a negative depth
 it will simulate the given depth as well as possible. This is useful for
 debugging purposes.
 
-@item Video.XSHM = <yes/no>
-This option is only for Crystal Space on the X window system. This option
-is @samp{yes} by default if enabled in the makefile (normally this is the
-case). This option enables the shared memory extension which makes Crystal
-Space considerably faster. This extension is not present on all systems.
-Crystal Space will automatically detect this and disable shm. You can
-manually disable this option by setting it to @samp{no}. The shared memory
-extension can also be enabled/disabled with the @code{-shm}/@code{-noshm}
-commandline options.
-
 @item Video.FullScreen = <yes/no>
 This option is available with some drivers.  It is used to set the Crystal
 Space window to fullscreen.

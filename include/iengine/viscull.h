@@ -30,7 +30,6 @@
 #include "csutil/scf_interface.h"
 
 struct iDocumentNode;
-struct iFrustumView;
 struct iMeshWrapper;
 struct iMovable;
 struct iObjectModel;
@@ -100,7 +99,7 @@ struct iVisibilityCullerListener : public virtual iBase
  */
 struct iVisibilityCuller : public virtual iBase
 {
-  SCF_INTERFACE (iVisibilityCuller, 3, 0, 0);
+  SCF_INTERFACE (iVisibilityCuller, 4, 0, 0);
 
   /**
    * Setup all data for this visibility culler. This needs
@@ -200,18 +199,6 @@ struct iVisibilityCuller : public virtual iBase
     const csVector3& end, csVector3& isect, float* pr = 0,
     iMeshWrapper** p_mesh = 0, int* poly_idx = 0,
     bool accurate = true) = 0;
-
-  /**
-   * Start casting shadows from a given point in space. What this will
-   * do is traverse all objects registered to the visibility culler.
-   * If some object implements iShadowCaster then this function will
-   * use the shadows casted by that object and put them in the frustum
-   * view. This function will then also call the object function which
-   * is assigned to iFrustumView. That object function will (for example)
-   * call iShadowReceiver->CastShadows() to cast the collected shadows
-   * on the shadow receiver.
-   */
-  virtual void CastShadows (iFrustumView* fview) = 0;
 
   /**
    * Parse a document node with additional parameters for this culler.

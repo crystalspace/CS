@@ -328,35 +328,18 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
     return;
   }
 
-  if(Sys->threaded)
+  csRef<iThreadReturn> ret = Sys->LevelLoader->LoadFile(filename);
+  ret->Wait();
+  if (!ret->WasSuccessful())
   {
-    csRef<iThreadReturn> ret = Sys->TLevelLoader->LoadFile(filename);
-    ret->Wait();
-    if (!ret->WasSuccessful())
-    {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-        "There was an error reading model '%s'!", filename);
-      return;
-    }
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "There was an error reading model '%s'!", filename);
+    return;
+  }
 
-    csRef<iMeshFactoryWrapper> wrap = scfQueryInterface<iMeshFactoryWrapper> (ret->GetResultRefPtr());
-    if (wrap)
-      wrap->QueryObject ()->SetName (templatename);
-  }
-  else
-  {
-    csLoadResult rc = Sys->LevelLoader->Load (filename);
-    if (!rc.success)
-    {
-      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-        "There was an error reading model '%s'!", filename);
-      return;
-    }
-    csRef<iMeshFactoryWrapper> wrap = scfQueryInterface<iMeshFactoryWrapper> (
-      rc.result);
-    if (wrap)
-      wrap->QueryObject ()->SetName (templatename);
-  }
+  csRef<iMeshFactoryWrapper> wrap = scfQueryInterface<iMeshFactoryWrapper> (ret->GetResultRefPtr());
+  if (wrap)
+    wrap->QueryObject ()->SetName (templatename);
 }
 
 
@@ -651,21 +634,12 @@ void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
     {
       //Is not registered. We have to do it.
       textFileName = LookForTextureFileName(kp->GetValue());
-      if(Sys->threaded)
+
+      csRef<iThreadReturn> ret = Sys->LevelLoader->LoadTexture(matName, textFileName);
+      ret->Wait();
+      if(!ret->WasSuccessful())
       {
-        csRef<iThreadReturn> ret = Sys->TLevelLoader->LoadTexture(matName, textFileName);
-        ret->Wait();
-        if(!ret->WasSuccessful())
-        {
-          csPrintf("Error loading %s texture!!",textFileName);
-        }
-      }
-      else
-      {
-        if(!Sys->LevelLoader->LoadTexture(matName,textFileName))
-        {
-          csPrintf("Error loading %s texture!!",textFileName);
-        }
+        csPrintf("Error loading %s texture!!",textFileName);
       }
 
       //Material registered, let's go to another one
@@ -960,7 +934,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  addmbot delmbot addbot delbot fire explosion frain decal_test");
     CONPRI("  rain snow fountain flame portal fs_inter fs_fadeout fs_fadecol");
     CONPRI("  fs_fadetxt fs_red fs_green fs_blue fs_whiteout fs_shadevert");
-    CONPRI("  frankie");
+    CONPRI("  frankie cleareffects");
     CONPRI("Debugging:");
     CONPRI("  zbuf debug0 debug1 debug2 palette bugplug");
     CONPRI("  db_boxshow db_boxcam1 db_boxcam2 db_boxsize1 db_boxsize2");
@@ -1519,25 +1493,13 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
       Sys->Engine->DeleteAll ();
       Sys->Engine->SetVFSCacheManager ();
-      if(Sys->threaded)
+      csRef<iThreadReturn> ret = Sys->LevelLoader->LoadMapFile ("world");
+      ret->Wait();
+      if (!ret->WasSuccessful())
       {
-        csRef<iThreadReturn> ret = Sys->TLevelLoader->LoadMapFile ("world");
-        ret->Wait();
-        if (!ret->WasSuccessful())
-        {
-          Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-            "Couldn't load level '%s'!", level);
-          return false;
-        }
-      }
-      else
-      {
-        if (!Sys->LevelLoader->LoadMapFile ("world"))
-        {
-          Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-            "Couldn't load level '%s'!", level);
-          return false;
-        }
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+          "Couldn't load level '%s'!", level);
+        return false;
       }
       Sys->Engine->Prepare ();
       // Look for the start sector in this map.
@@ -2142,8 +2104,9 @@ bool CommandHandler (const char *cmd, const char *arg)
     csRef<iMeshFactoryWrapper> meshfact = Sys->Engine->FindMeshFactory ("franky_frankie");
     if (!meshfact)
     {
-      csLoadResult rc = Sys->LevelLoader->Load ("/lib/frankie/frankie.xml");
-      if (!rc.success)
+      csRef<iThreadReturn> itr = Sys->LevelLoader->LoadFile ("/lib/frankie/frankie.xml");
+      itr->Wait();
+      if (!itr->WasSuccessful())
         Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Can't load frankie!");
       meshfact = Sys->Engine->FindMeshFactory ("franky_frankie");
     }
@@ -2250,10 +2213,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
     ll->Add (dyn);
-    dyn->Setup ();
     Sys->dynamic_lights.Push (dyn);
-    // @@@ BUG: for some reason it is needed to call Setup() twice!!!!
-    dyn->Setup ();
     extern void AttachRandomLight (iLight* light);
     if (rnd)
       AttachRandomLight (dyn);

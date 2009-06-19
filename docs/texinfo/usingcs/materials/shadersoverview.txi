@@ -109,8 +109,7 @@ together to produce a certain effect or appearance.
 Shader programs in Crystal Space are abstracted into plugins.  Plugins exist
 for e.g. @sc{arb} vertex or fragment programs, Cg vertex or fragment programs
 or fixed function pipeline setup (not actually ``true'' programs, but by
-Crystal Space provided by shader program plugins as well).  Even the software
-renderer's rasterization is realized as a shader plugin.
+Crystal Space provided by shader program plugins as well).
 
 A Crystal Space-specific feature grouped into shader programs is the support
 for ``vertex processors''.  These are not shader programs in the sense of being

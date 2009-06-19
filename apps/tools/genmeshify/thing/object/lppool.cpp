@@ -20,7 +20,6 @@
 #include "csgeom/frustum.h"
 #include "lppool.h"
 #include "polygon.h"
-#include "iengine/shadows.h"
 
 csLightPatch::csLightPatch ()
 {

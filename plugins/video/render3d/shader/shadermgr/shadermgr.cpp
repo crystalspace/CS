@@ -52,8 +52,9 @@
 #include "ivideo/texture.h"
 
 #include "shadermgr.h"
-#include "nullshader.h"
 #include "loadercontext.h"
+#include "nullshader.h"
+#include "plexhiercache.h"
 
 // Pluginstuff
 CS_IMPLEMENT_PLUGIN
@@ -227,11 +228,78 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   
   if (config->GetBool ("Video.ShaderManager.EnableShaderCache", false))
   {
-    shaderCache.AttachNew (new CS::Utility::VfsHierarchicalCache (objectreg,
-       "/tmp/shadercache"));
+    shaderCache.AttachNew (new PlexHierarchicalCache ());
+    
+    csRef<CS::Utility::VfsHierarchicalCache> cache;
+    const char* cachePath;
+    
+    cachePath = config->GetStr ("Video.ShaderManager.ShaderCachePath.User",
+      "/shadercache/user");
+    if (cachePath && *cachePath)
+    {
+      cache.AttachNew (new CS::Utility::VfsHierarchicalCache (objectreg,
+	cachePath));
+      shaderCache->AddSubShaderCache (cache, cachePriorityUser);
+    }
+    
+    cachePath = config->GetStr ("Video.ShaderManager.ShaderCachePath.App",
+      0);
+    if (cachePath && *cachePath)
+    {
+      cache.AttachNew (new CS::Utility::VfsHierarchicalCache (objectreg,
+	cachePath));
+      cache->SetReadOnly (true);
+      shaderCache->AddSubShaderCache (cache, cachePriorityApp);
+    }
+      
+    cachePath = config->GetStr ("Video.ShaderManager.ShaderCachePath.Global",
+      "/shadercache/global");
+    if (cachePath && *cachePath)
+    {
+      cache.AttachNew (new CS::Utility::VfsHierarchicalCache (objectreg,
+	cachePath));
+      cache->SetReadOnly (true);
+      shaderCache->AddSubShaderCache (cache, cachePriorityGlobal);
+    }
   }
 
   return true;
+}
+
+iHierarchicalCache* csShaderManager::GetShaderCache()
+{
+  return shaderCache;
+}
+
+
+void csShaderManager::AddSubShaderCache (iHierarchicalCache* cache,
+                                         int priority)
+{
+  if (!shaderCache) return;
+  shaderCache->AddSubShaderCache (cache, priority);
+}
+
+iHierarchicalCache* csShaderManager::AddSubCacheDirectory (
+  const char* cacheDir, int priority, bool readOnly)
+{
+  csRef<CS::Utility::VfsHierarchicalCache> cache;
+  cache.AttachNew (new CS::Utility::VfsHierarchicalCache (objectreg,
+    cacheDir));
+  cache->SetReadOnly (readOnly);
+  shaderCache->AddSubShaderCache (cache, priority);
+  return cache;
+}
+
+void csShaderManager::RemoveSubShaderCache (iHierarchicalCache* cache)
+{
+  if (!shaderCache) return;
+  shaderCache->RemoveSubShaderCache (cache);
+}
+
+void csShaderManager::RemoveAllSubShaderCaches ()
+{
+  if (!shaderCache) return;
+  shaderCache->RemoveAllSubShaderCaches ();
 }
 
 void csShaderManager::AddDefaultVariables()

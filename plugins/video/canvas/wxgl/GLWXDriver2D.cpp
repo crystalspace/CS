@@ -99,9 +99,6 @@ bool csGraphics2DWX::Initialize (iObjectRegistry *object_reg)
   if (!csGraphics2DGLCommon::Initialize (object_reg))
     return false;
 
-  // The texture manager only needs to know this:
-  pfmt.PalEntries = 0;
-
   // Create the event outlet
   csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
@@ -206,21 +203,6 @@ bool csGraphics2DWX::Open()
 
   Depth = pfd.cColorBits; 
 
-  pfmt.PixelBytes = (pfd.cColorBits == 32) ? 4 : (pfd.cColorBits + 7) >> 3;
-  pfmt.RedBits = pfd.cRedBits;
-  pfmt.RedShift = pfd.cRedShift;
-  pfmt.RedMask = ((1 << pfd.cRedBits) - 1) << pfd.cRedShift;
-  pfmt.GreenBits = pfd.cGreenBits;
-  pfmt.GreenShift = pfd.cGreenShift;
-  pfmt.GreenMask = ((1 << pfd.cGreenBits) - 1) << pfd.cGreenShift;
-  pfmt.BlueBits = pfd.cBlueBits;
-  pfmt.BlueShift = pfd.cBlueShift;
-  pfmt.BlueMask = ((1 << pfd.cBlueBits) - 1) << pfd.cBlueShift;
-  pfmt.AlphaBits = pfd.cAlphaBits;
-  pfmt.AlphaShift = pfd.cAlphaShift;
-  pfmt.AlphaMask = ((1 << pfd.cAlphaBits) - 1) << pfd.cAlphaShift;
-  pfmt.PalEntries = 0;
- 
   int desired_attributes[] =
   {
       WX_GL_RGBA,
@@ -292,11 +274,6 @@ bool csGraphics2DWX::Open()
 
     Depth = xvis->depth;
 
-    if (Depth == 24 || Depth == 32)
-      pfmt.PixelBytes = 4;
-    else
-      pfmt.PixelBytes = 2;
-
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Visual ID: %lx, %dbit %s",
       xvis->visualid, Depth, visual_class_name (xvis->c_class));
 
@@ -307,34 +284,17 @@ bool csGraphics2DWX::Open()
     glXGetConfig(dpy, xvis, GLX_DEPTH_SIZE, &size_depth_buffer);
     glXGetConfig(dpy, xvis, GLX_LEVEL, &level);
 
-    int color_bits = 0;
+    int r_bits, g_bits, b_bits, color_bits = 0;
     int alpha_bits = 0;
     if (ctype)
     {
-      pfmt.RedMask = xvis->red_mask;
-      pfmt.GreenMask = xvis->green_mask;
-      pfmt.BlueMask = xvis->blue_mask;
-      glXGetConfig(dpy, xvis, GLX_RED_SIZE, &pfmt.RedBits);
-      color_bits += pfmt.RedBits;
-      glXGetConfig(dpy, xvis, GLX_GREEN_SIZE, &pfmt.GreenBits);
-      color_bits += pfmt.GreenBits;
-      glXGetConfig(dpy, xvis, GLX_BLUE_SIZE, &pfmt.BlueBits);
-      color_bits += pfmt.BlueBits;
+      glXGetConfig(dpy, xvis, GLX_RED_SIZE, &r_bits);
+      color_bits += r_bits;
+      glXGetConfig(dpy, xvis, GLX_GREEN_SIZE, &g_bits);
+      color_bits += g_bits;
+      glXGetConfig(dpy, xvis, GLX_BLUE_SIZE, &b_bits);
+      color_bits += b_bits;
       glXGetConfig(dpy, xvis, GLX_ALPHA_SIZE, &alpha_bits);
-      pfmt.AlphaBits = alpha_bits;
-
-      int bit;
-      // Fun hack, xvis doesn't provide alpha mask
-      bit=0; while (bit < alpha_bits) pfmt.AlphaMask |= (1<<(bit++));
-      pfmt.AlphaMask = pfmt.AlphaMask << color_bits;
-
-      bit=0; while (!(pfmt.RedMask & (1<<bit))) bit++; pfmt.RedShift = bit;
-      bit=0; while (!(pfmt.GreenMask & (1<<bit))) bit++; pfmt.GreenShift = bit;
-      bit=0; while (!(pfmt.BlueMask & (1<<bit))) bit++; pfmt.BlueShift = bit;
-      if (pfmt.AlphaMask)
-      {
-  bit=0; while (!(pfmt.AlphaMask & (1<<bit))) bit++; pfmt.AlphaShift = bit;
-      }
     }
 
     // Report Info
@@ -361,19 +321,9 @@ bool csGraphics2DWX::Open()
 
     if (ctype)
     {
-      if (pfmt.RedMask > pfmt.BlueMask)
-      {
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "R%d:G%d:B%d:A%d, ",
-    pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits, alpha_bits);
-      }
-      else
-      {
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "B%d:G%d:R%d:A%d, ",
-    pfmt.BlueBits, pfmt.GreenBits, pfmt.RedBits, alpha_bits);
-      }
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "R%d:G%d:B%d:A%d, ",
+	r_bits, g_bits, b_bits, alpha_bits);
     }
-
-    pfmt.complete ();
   }
 #endif
 

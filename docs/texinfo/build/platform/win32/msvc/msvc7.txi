@@ -63,7 +63,7 @@ components if you plan to also use CrystalSpace with MinGW/MSYS).
 
 @subsubheading DirectX - Optional
 
-In order to compile Crystal Space at its minimum i.e. the software renderer,
+In order to compile Crystal Space at its minimum
 you must have at least some form of the DirectX Software Development Kit 
 (@sc{sdk}) on your system. 
 
@@ -314,7 +314,7 @@ Q. @emph{I get the following (or similar) errors:}
 
 @example
 WARNING: could not load plugin
-  `crystalspace.graphics3d.software'
+  `crystalspace.graphics3d.opengl'
 WARNING: failed to initialize plugin
   `crystalspace.engine.3d'
 FATAL: No iGraphics3D plug-in loaded!
@@ -324,7 +324,7 @@ Error initializing system!
 
 A. You probably did not compile everything. Compiling only the @file{.exe}
 file is not sufficient!  You must also compile all plug-ins you want to use.
-In the above example the software renderer is missing.
+In the above example the OpenGL renderer is missing.
 
 If you are certain that everything is compiled, make sure your working
 directory is set to @file{CS\}.  To do this go to the @emph{Project} menu.

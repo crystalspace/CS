@@ -24,6 +24,7 @@
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
 #include "cstool/genmeshbuilder.h"
+#include "cstool/simplestaticlighter.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/cscolor.h"
 #include "csutil/event.h"
@@ -194,11 +195,10 @@ iSector* CsBench::CreateRoom (const char* name, const char* meshname,
   // Now we make a factory and a mesh at once.
   csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
       engine, room2, meshname, meshname, &box);
-
-  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
-    iGeneralMeshState> (walls->GetMeshObject ());
-  mesh_state->SetShadowReceiving (true);
   walls->GetMeshObject ()->SetMaterialWrapper (material);
+
+  using namespace CS::Lighting;
+  SimpleStaticLighter::ShineLights (walls, engine, 4);
 
   return room2;
 }
@@ -359,15 +359,14 @@ bool CsBench::Initialize (int argc, const char* const argv[],
   if (!csInitializer::OpenApplication (object_reg))
     return ReportError ("Error opening system!");
 
-  // First disable the lighting cache. Our app is simple enough
-  // not to need this.
-  engine->SetLightingCacheMode (0);
-
   if (!SetupMaterials ()) return false;
   if (!CreateTestCaseSingleBigObject ()) return false;
   if (!CreateTestCaseMultipleObjects ()) return false;
 
   engine->Prepare ();
+
+  using namespace CS::Lighting;
+  SimpleStaticLighter::ShineLights (room_single, engine, 4);
 
   view = csPtr<iView> (new csView (engine, g3d));
   view->GetCamera ()->SetSector (room_single);

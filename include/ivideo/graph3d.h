@@ -42,7 +42,6 @@ struct iClipper2D;
 struct iGraphics2D;
 struct iHalo;
 struct iRenderBuffer;
-struct iRendererLightmap;
 struct iShader;
 struct iShaderVariableContext;
 struct iTextureHandle;
@@ -783,7 +782,7 @@ namespace CS
  */
 struct iGraphics3D : public virtual iBase
 {
-  SCF_INTERFACE(iGraphics3D, 3, 0, 2);
+  SCF_INTERFACE(iGraphics3D, 4, 0, 0);
   
   /// Open the 3D graphics display.
   virtual bool Open () = 0;
@@ -1105,13 +1104,6 @@ struct iGraphics3D : public virtual iBase
   /// Create a halo of the specified color and return a handle.
   virtual iHalo *CreateHalo (float iR, float iG, float iB,
     unsigned char *iAlpha, int iWidth, int iHeight) = 0;
-
-  /**
-   * Remove some polygon from the cache.
-   * You have to call this function before deleting a polygon
-   * (csPolygon3D destructor will do that).
-   */
-  virtual void RemoveFromCache (iRendererLightmap* rlm) = 0;
 
   /**
    * Set the world to camera transform.

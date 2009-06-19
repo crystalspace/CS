@@ -1481,26 +1481,6 @@ AS_IF([test $cs_cv_libcal3d = yes],
 
 
 #------------------------------------------------------------------------------
-# Check for SDL.
-#------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([sdl],
-    [AC_LANG_PROGRAM(
-	[[#include <SDL.h>
-	#undef main]],
-	[SDL_Init(0); SDL_Quit();])])
-
-AS_IF([test $cs_cv_libsdl = yes],
-    [CS_CHECK_BUILD([if SDL is sufficiently recent], [cs_cv_sdl_recent],
-	[AC_LANG_PROGRAM(
-	    [[#include <SDL.h>
-	    #undef main]],
-	    [SDL_EnableKeyRepeat(0,0)])],
-	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_libsdl], [SDL])], [], [],
-	[$cs_cv_libsdl_cflags], [$cs_cv_libsdl_lflags], [$cs_cv_libsdl_libs])])
-
-
-
-#------------------------------------------------------------------------------
 # Check for wxWidgets. Also check if it was built with OpenGL support since it
 # is required by the Crystal Space wxWidgets canvas.
 #
@@ -1736,27 +1716,6 @@ AS_IF([test $cs_host_family != windows],
 	    [[#include <alsa/asoundlib.h>]],
 	    [snd_pcm_hw_params_t* p; snd_pcm_hw_params_alloca(&p);])],
 	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_libasound], [ALSA])])])
-
-
-
-#------------------------------------------------------------------------------
-# Check for Colour Ascii Art library (libcaca).
-#------------------------------------------------------------------------------
-# NOTE: Would solely pkg-config be used for caca detection the separate cucul 
-#  test could be dropped since it would be contained in caca.
-CS_CHECK_LIB_WITH([cucul],
-    [AC_LANG_PROGRAM([[#include <cucul.h>]], [cucul_create_canvas(0,0)])],
-    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcucul], [CUCUL])], [], [], [], [],
-    [libcucul])
-    
-CS_CHECK_LIB_WITH([caca],
-    [AC_LANG_PROGRAM([[#include <caca.h>]], [caca_create_display(0)])],
-    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcaca], [CACA])], [], 
-    [$cs_cv_libcucul_cflags], 
-    [$cs_cv_libcucul_lflags], 
-    [$cs_cv_libcucul_libs],
-    [libcaca])
-
 
 
 

@@ -17,7 +17,7 @@ if $(X11.AVAILABLE) = "yes"
     [ Wildcard *.cpp *.h ] 
     $(ALERT_FILES) ;
   LinkWith xwin : crystalspace ;
-  CompileGroups xwin : canvases softcanvas openglcanvas ;
+  CompileGroups xwin : canvases openglcanvas ;
   if $(XFREE86VM.AVAILABLE) = "yes"
   {
     CFlags xwin : [ FDefines XFREE86VM ] ;

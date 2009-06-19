@@ -432,10 +432,7 @@ specify. Here is a complete settings example:
 <settings>
   <clearzbuf />
   <clearscreen />
-  <lightmapcellsize>16</lightmapcellsize>
-  <maxlightmapsize horizontal="256" vertical="256" />
   <ambient red=".1" green=".1" blue=".1" />
-  <fastmesh>300</fastmesh>
 </settings>
 @end example
 
@@ -447,13 +444,6 @@ so that the z-buffer is updated but not read. Objects in the room can then
 use @samp{zuse}. If you don't want this (i.e. you want to use @samp{zuse}
 for all objects) then you can use @samp{clearzbuf}. Similar for
 @samp{clearscreen}.
-
-The lightmap cellsize defines how many texels (pixels on a texture) there
-are in every lumel (lightmap value). For example, if the lightmap cellsize
-is 16 (default) then for every 16x16 texels there will be one lumel.
-
-The maximum lightmap size is usually 256x256. You can change this value
-here but this usually doesn't make much sense.
 
 In addition to the lighting information given by all lights in the system,
 every object will also get ambient lighting. Ambient lighting is global to
@@ -562,37 +552,6 @@ implementation you can examine the context and based on that create some
 information that you can attach to that context (if it is a mesh object
 for example). The addon plugin will also get an @sc{xml} node that it
 can parse for additional parameters.
-
-Crystal Space itself currently defines two addon loaders itself. The
-first one is useful for defining bezier templates that you can later use
-in a bezier curve. The second one is useful for creating named texture
-planes that can be used to define texture mapping for a number of polygons
-that are all on the same plane. Here is an example of both:
-
-@example
-<addon>
-    <plugin>crystalspace.mesh.loader.thing.bezier</plugin>
-    <params>
-        <name>b1</name>
-        <material>mosaic</material>
-        <v>0</v>
-        <v>1</v>
-        <v>2</v>
-        <v>8</v>
-        <v>9</v>
-        <v>10</v>
-        <v>16</v>
-        <v>17</v>
-        <v>18</v>
-    </params>
-</addon>
-@end example
-
-I will only explain the second example here as bezier curves are likely
-to change in the not-too-distant future. Important in both examples is
-that the part inside the @samp{params} block is parsed by the addon itself.
-It is also possible to specify the parameters of a plugin in another
-@sc{xml} file in which case you can use @samp{paramsfile}.
 
 @subsubheading Mesh Factory Section
 @cindex mesh factories (Map File)

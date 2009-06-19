@@ -64,6 +64,8 @@ struct iVFS;
 
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
+  class csLoaderContext;
+
   template<class T, class Interface>
   class csLoaderIterator : public scfImplementation1<csLoaderIterator<T, Interface>,
                                                      Interface>
@@ -225,47 +227,53 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     node, csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>,
     missingdata, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
-    void AddSectorToList(csRef<iSector> obj)
+    void AddSectorToList(iSector* obj)
     {
-      MutexScopedLock lock(sectorsLock);
+      CS::Threading::MutexScopedLock lock(sectorsLock);
       loaderSectors.Push(obj);
       obj->DecRef(); // Compensate for CreateSector IncRef().
     }
 
-    void AddMeshFactToList(csRef<iMeshFactoryWrapper> obj)
+    void AddMeshFactToList(iMeshFactoryWrapper* obj)
     {
-      MutexScopedLock lock(meshfactsLock);
+      CS::Threading::MutexScopedLock lock(meshfactsLock);
       loaderMeshFactories.Push(obj);
     }
 
-    void AddMeshToList(csRef<iMeshWrapper> obj)
+    void AddMeshToList(iMeshWrapper* obj)
     {
-      MutexScopedLock lock(meshesLock);
+      CS::Threading::MutexScopedLock lock(meshesLock);
       loaderMeshes.Push(obj);
     }
 
-    void AddCamposToList(csRef<iCameraPosition> obj)
+    void AddCamposToList(iCameraPosition* obj)
     {
-      MutexScopedLock lock(camposLock);
+      CS::Threading::MutexScopedLock lock(camposLock);
       loaderCameraPositions.Push(obj);
     }
 
-    void AddTextureToList(csRef<iTextureWrapper> obj)
+    void AddTextureToList(iTextureWrapper* obj)
     {
-      MutexScopedLock lock(texturesLock);
+      CS::Threading::MutexScopedLock lock(texturesLock);
       loaderTextures.Push(obj);
     }
 
-    void AddMaterialToList(csRef<iMaterialWrapper> obj)
+    void AddMaterialToList(iMaterialWrapper* obj)
     {
-      MutexScopedLock lock(materialsLock);
+      CS::Threading::MutexScopedLock lock(materialsLock);
       loaderMaterials.Push(obj);
     }
 
-    void AddSharedVarToList(csRef<iSharedVariable> obj)
+    void AddSharedVarToList(iSharedVariable* obj)
     {
-      MutexScopedLock lock(sharedvarLock);
+      CS::Threading::MutexScopedLock lock(sharedvarLock);
       loaderSharedVariables.Push(obj);
+    }
+
+    void AddLightToList(iLight* obj, const char* name)
+    {
+      CS::Threading::MutexScopedLock lock(lightsLock);
+      loadedLights.Put(csString(name), obj);
     }
 
   protected:
@@ -273,13 +281,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     friend class csLoaderContext;
 
     // Shared lists and locks.
-    Mutex sectorsLock;
-    Mutex meshfactsLock;
-    Mutex meshesLock;
-    Mutex camposLock;
-    Mutex texturesLock;
-    Mutex materialsLock;
-    Mutex sharedvarLock;
+    CS::Threading::Mutex sectorsLock;
+    CS::Threading::Mutex meshfactsLock;
+    CS::Threading::Mutex meshesLock;
+    CS::Threading::Mutex camposLock;
+    CS::Threading::Mutex texturesLock;
+    CS::Threading::Mutex materialsLock;
+    CS::Threading::Mutex sharedvarLock;
+    CS::Threading::Mutex lightsLock;
 
     // Final objects.
     csRefArray<iSector> loaderSectors;
@@ -289,14 +298,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRefArray<iTextureWrapper> loaderTextures;
     csRefArray<iMaterialWrapper> loaderMaterials;
     csRefArray<iSharedVariable> loaderSharedVariables;
+    csWeakRefHash<iLight, csString> loadedLights;
 
     // General loading objects.
     csHash<csRef<iThreadReturn>, const char*> loadingMeshObjects;
-    Mutex loadingMeshObjectsLock;
+    CS::Threading::Mutex loadingMeshObjectsLock;
 
     void AddLoadingMeshObject(const char* name, csRef<iThreadReturn> itr)
     {
-      MutexScopedLock lock(loadingMeshObjectsLock);
+      CS::Threading::MutexScopedLock lock(loadingMeshObjectsLock);
       if(!FindLoadedMeshObject(name))
       {
         loadingMeshObjects.Put(name, itr);
@@ -305,7 +315,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     bool FindLoadedMeshObject(const char* name)
     {
-      MutexScopedLock lock(meshesLock);
+      CS::Threading::MutexScopedLock lock(meshesLock);
       for(size_t i=0; i<loaderMeshes.GetSize(); i++)
       {
         if(csString(name).Compare(loaderMeshes[i]->QueryObject()->GetName()))
@@ -319,17 +329,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     void RemoveLoadingMeshObject(const char* name, csRef<iThreadReturn> itr)
     {
-      MutexScopedLock lock(loadingMeshObjectsLock);
+      CS::Threading::MutexScopedLock lock(loadingMeshObjectsLock);
       loadingMeshObjects.Delete(name, itr);
     }
 
     // Loading texture objects.
     csArray<const char*> loadingTextures;
-    RecursiveMutex loadingTexturesLock;
+    CS::Threading::RecursiveMutex loadingTexturesLock;
 
     bool AddLoadingTexture(const char* name)
     {
-      RecursiveMutexScopedLock lock(loadingTexturesLock);
+      CS::Threading::RecursiveMutexScopedLock lock(loadingTexturesLock);
       if(!FindLoadingTexture(name))
       {
         loadingTextures.Push(name);
@@ -340,13 +350,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     bool FindLoadingTexture(const char* name)
     {
-      RecursiveMutexScopedLock lock(loadingTexturesLock);
+      CS::Threading::RecursiveMutexScopedLock lock(loadingTexturesLock);
       return loadingTextures.Find(name) != csArrayItemNotFound;
     }
 
     void RemoveLoadingTexture(const char* name)
     {
-      RecursiveMutexScopedLock lock(loadingTexturesLock);
+      CS::Threading::RecursiveMutexScopedLock lock(loadingTexturesLock);
       loadingTextures.Delete(name);
     }
 
@@ -357,11 +367,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     // Loading material objects.
     csArray<const char*> loadingMaterials;
-    RecursiveMutex loadingMaterialsLock;
+    CS::Threading::RecursiveMutex loadingMaterialsLock;
 
     bool AddLoadingMaterial(const char* name)
     {
-      RecursiveMutexScopedLock lock(loadingMaterialsLock);
+      CS::Threading::RecursiveMutexScopedLock lock(loadingMaterialsLock);
       if(!FindLoadingMaterial(name))
       {
         loadingMaterials.Push(name);
@@ -372,23 +382,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     bool FindLoadingMaterial(const char* name)
     {
-      RecursiveMutexScopedLock lock(loadingMaterialsLock);
+      CS::Threading::RecursiveMutexScopedLock lock(loadingMaterialsLock);
       return loadingMaterials.Find(name) != csArrayItemNotFound;
     }
 
     void RemoveLoadingMaterial(const char* name)
     {
-      RecursiveMutexScopedLock lock(loadingMaterialsLock);
+      CS::Threading::RecursiveMutexScopedLock lock(loadingMaterialsLock);
       loadingMaterials.Delete(name);
     }
 
     // Loading meshfact objects.
     csArray<const char*> loadingMeshFacts;
-    RecursiveMutex loadingMeshFactsLock;
+    CS::Threading::RecursiveMutex loadingMeshFactsLock;
 
     bool AddLoadingMeshFact(const char* name)
     {
-      RecursiveMutexScopedLock lock(loadingMeshFactsLock);
+      CS::Threading::RecursiveMutexScopedLock lock(loadingMeshFactsLock);
       if(!FindLoadingMeshFact(name))
       {
         return true;
@@ -399,13 +409,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     bool FindLoadingMeshFact(const char* name)
     {
-      RecursiveMutexScopedLock lock(loadingMeshFactsLock);
+      CS::Threading::RecursiveMutexScopedLock lock(loadingMeshFactsLock);
       return loadingMeshFacts.Find(name) != csArrayItemNotFound;
     }
 
     void RemoveLoadingMeshFact(const char* name)
     {
-      RecursiveMutexScopedLock lock(loadingMeshFactsLock);
+      CS::Threading::RecursiveMutexScopedLock lock(loadingMeshFactsLock);
       loadingMeshFacts.Delete(name);
     }
 
@@ -431,7 +441,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     // Pointer to the engine sequencer (optional module).
     csRef<iEngineSequenceManager> eseqmgr;
     // Pointer to the global thread manager.
-    csRef<iThreadManager> threadman;
+    csWeakRef<iThreadManager> threadman;
     // Sound loader
     csRef<iSndSysLoader> SndSysLoader;
     // Sound manager
@@ -457,6 +467,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       ProxyKeyColour keyColour;
     };
 
+    // Parses the data to find all materials and meshfacts.
+    void ParseAvailableObjects(csLoaderContext* ldr_context, iDocumentNode* doc);
+
     // Returns in the 'meshesArray' array all the meshes encountered walking through
     // the hierarchy of meshes starting from 'meshWrapper'.
     void CollectAllChildren (iMeshWrapper* meshWrapper, csRefArray<iMeshWrapper>&
@@ -474,10 +487,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool FindOrLoadMeshFactory(iLoaderContext* ldr_context,
       iDocumentNode* meshfactnode, iMeshFactoryWrapper* parent,
       csReversibleTransform* transf, iStreamSource* ssource);
-
-    bool LoadMapLibraryFile (const char* filename, iCollection* collection,
-      iStreamSource* ssource, iMissingLoaderData* missingdata, uint keepFlags = KEEP_ALL,
-      bool loadProxyTex = true, bool do_verbose = false);
 
     /**
     * Load a Mesh Object Factory from the map file.
@@ -505,12 +514,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     * The parent is not 0 if this mesh is going to be part of a hierarchical
     * mesh.
     */
-    THREADED_CALLABLE_DECL6(csThreadedLoader, LoadMeshObject, csLoaderReturn,
+    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadMeshObject, csLoaderReturn,
       csRef<iLoaderContext>, ldr_context, csRef<iMeshWrapper>, mesh, csRef<iMeshWrapper>, parent,
-      csRef<iDocumentNode>, node, csRef<iStreamSource>, ssource, csRef<iSector>, sector, THREADED, false, false);
+      csRef<iDocumentNode>, node, csRef<iStreamSource>, ssource, csRef<iSector>, sector, csString,
+      name, THREADED, false, false);
 
     THREADED_CALLABLE_DECL2(csThreadedLoader, AddObjectToSector, csLoaderReturn,
-      csRef<iMovable>, movable, csRef<iSector>, sector, HIGH, false, false);
+      csRef<iMovable>, movable, csRef<iSector>, sector, MED, false, false);
 
     THREADED_CALLABLE_DECL4(csThreadedLoader, LoadMeshRef, csLoaderReturn, csRef<iDocumentNode>,
       node, csRef<iSector>, sector, csRef<iLoaderContext>, ldr_context, csRef<iStreamSource>,
@@ -538,13 +548,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     * sounds and textures.
     */
     bool LoadLibrary(iLoaderContext* ldr_context, iDocumentNode* node,
-      iStreamSource* ssource, iMissingLoaderData* missingdata, bool loadProxyTex = true,
-      bool do_verbose = false);
+      iStreamSource* ssource, iMissingLoaderData* missingdata, csRefArray<iThreadReturn>& threadReturns,
+      bool loadProxyTex = true, bool do_verbose = false);
 
-    THREADED_CALLABLE_DECL6(csThreadedLoader, LoadLibraryFromNode, csLoaderReturn,
+    THREADED_CALLABLE_DECL8(csThreadedLoader, LoadLibraryFromNode, csLoaderReturn,
       csRef<iLoaderContext>, ldr_context, csRef<iDocumentNode>, child, csRef<iStreamSource>,
       ssource, csRef<iMissingLoaderData>, missingdata, bool, loadProxyTex, bool, do_verbose,
-      THREADED, false, false);
+      bool, compact, const char*, libpath, THREADED, false, false);
 
     csPtr<iImage> LoadImage (iDataBuffer* buf, const char* fname, int Format, bool do_verbose);
 
@@ -698,11 +708,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     /// Parse a sector definition and add the sector to the engine
     iSector* ParseSector (iLoaderContext* ldr_context, iDocumentNode* node,
-      iStreamSource* ssource);
+      iStreamSource* ssource, csRefArray<iThreadReturn>& threadReturns);
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, SetSectorVisibilityCuller, csLoaderReturn,
       csRef<iSector>, sector, const char*, culplugname, csRef<iDocumentNode>, culler_params,
-      HIGH, false, false)
+      MED, false, false)
 
       // Process the attributes of an <imposter> tag in a mesh specification.
       bool ParseImposterSettings(iImposter* mesh, iDocumentNode *node);

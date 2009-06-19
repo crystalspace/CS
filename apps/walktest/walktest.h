@@ -29,7 +29,6 @@
 #include "csutil/weakref.h"
 #include "wentity.h"
 #include "iengine/engine.h"
-#include "iengine/fview.h"
 #include "ivaria/conout.h"
 #include "ivaria/conin.h"
 #include "iutil/vfs.h"
@@ -161,7 +160,7 @@ public:
   csRef<iPluginManager> plugin_mgr;
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
-  csRef<iThreadManager> tm;
+  csWeakRef<iThreadManager> tm;
 
   csRef<iEventNameRegistry> name_reg;
   csEventID CommandLineHelp;
@@ -320,9 +319,7 @@ public:
    */
   csRef<iEngine> Engine;
   /// The level loaders
-  csRef<iThreadedLoader> TLevelLoader;
-  csRef<iLoader> LevelLoader;
-  bool threaded;
+  csRef<iThreadedLoader> LevelLoader;
   ///
   csRef<iGraphics2D> myG2D;
   csRef<iGraphics3D> myG3D;

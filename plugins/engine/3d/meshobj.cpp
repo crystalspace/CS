@@ -40,85 +40,6 @@ CS_LEAKGUARD_IMPLEMENT (csMeshWrapper);
 using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
 
 // ---------------------------------------------------------------------------
-
-// Implementations of iShadowCaster and iShadowReceiver that are used
-// in case of static lod.
-
-// Static shadow caster will cast shadows from the least detailed object
-// that actually has a shadow caster.
-class csStaticShadowCaster : public scfImplementation1<csStaticShadowCaster,
-                                                       iShadowCaster>
-{
-private:
-  // Pointer back to the mesh with static lod.
-  csMeshWrapper* static_lod_mesh;
-
-public:
-  csStaticShadowCaster (csMeshWrapper* m)
-    : scfImplementationType (this), static_lod_mesh (m)
-  {
-    static_lod_mesh = m;
-  }
-
-  virtual ~csStaticShadowCaster ()
-  {
-  }
-
-  virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
-  	const csVector3& origin)
-  {
-    const csRef<iSceneNodeArray> c = static_lod_mesh->QuerySceneNode ()
-      ->GetChildrenArray ();
-    size_t i = c->GetSize ();
-    while (i-- > 0)
-    {
-      iMeshWrapper* child = c->Get (i)->QueryMesh ();
-      if (child && child->GetShadowCaster ())
-      {
-        child->GetShadowCaster ()->AppendShadows (movable, shadows, origin);
-	return;
-      }
-    }
-  }
-};
-
-
-// Static shadow receiver will send the received shadows to all children
-// of the static lod mesh.
-class csStaticShadowReceiver : public scfImplementation1<csStaticShadowReceiver,
-                                                         iShadowReceiver>
-{
-private:
-  // Pointer back to the mesh with static lod.
-  csMeshWrapper* static_lod_mesh;
-
-public:
-  csStaticShadowReceiver (csMeshWrapper* m)
-    : scfImplementationType (this), static_lod_mesh (m)
-  {
-  }
-
-  virtual ~csStaticShadowReceiver ()
-  {
-  }
-
-  virtual void CastShadows (iMovable* movable, iFrustumView* fview)
-  {
-    const csRef<iSceneNodeArray> c = static_lod_mesh->QuerySceneNode ()
-      ->GetChildrenArray ();
-    size_t cnt = c->GetSize ();
-    size_t i;
-    for (i = 0 ; i < cnt ; i++)
-    {
-      iMeshWrapper* child = c->Get (i)->QueryMesh ();
-      if (child && child->GetShadowReceiver ())
-        child->GetShadowReceiver ()->CastShadows (movable, fview);
-    }
-  }
-};
-
-
-// ---------------------------------------------------------------------------
 // csMeshWrapper
 // ---------------------------------------------------------------------------
 
@@ -133,12 +54,12 @@ csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj)
 
   last_anim_time = 0;
 
-  shadow_receiver_valid = false;
-  shadow_caster_valid = false;
+  //shadow_receiver_valid = false;
+  //shadow_caster_valid = false;
   csMeshWrapper::meshobj = meshobj;
   if (meshobj)
   {
-    light_info = scfQueryInterface<iLightingInfo> (meshobj);
+    //light_info = scfQueryInterface<iLightingInfo> (meshobj);
     portal_container = scfQueryInterface<iPortalContainer> (meshobj);
     // Only if we have a parent can it possibly be useful to call
     // AddToSectorPortalLists. Because if we don't have a parent yet then
@@ -173,44 +94,6 @@ csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj)
 void csMeshWrapper::SelfDestruct ()
 {
   engine->GetMeshes ()->Remove (static_cast<iMeshWrapper*> (this));
-}
-
-iShadowReceiver* csMeshWrapper::GetShadowReceiver ()
-{
-  if (!shadow_receiver_valid)
-  {
-    if (static_lod)
-    {
-      shadow_receiver_valid = true;
-      shadow_receiver = csPtr<iShadowReceiver> (
-      	new csStaticShadowReceiver (this));
-      return shadow_receiver;
-    }
-
-    if (!meshobj) return 0;
-    shadow_receiver_valid = true;
-    shadow_receiver = scfQueryInterface<iShadowReceiver> (meshobj);
-  }
-  return shadow_receiver;
-}
-
-iShadowCaster* csMeshWrapper::GetShadowCaster ()
-{
-  if (!shadow_caster_valid)
-  {
-    if (static_lod)
-    {
-      shadow_caster_valid = true;
-      shadow_caster = csPtr<iShadowCaster> (
-      	new csStaticShadowCaster (this));
-      return shadow_caster;
-    }
-
-    if (!meshobj) return 0;
-    shadow_caster_valid = true;
-    shadow_caster = scfQueryInterface<iShadowCaster> (meshobj);
-  }
-  return shadow_caster;
 }
 
 void csMeshWrapper::AddToSectorPortalLists ()
@@ -260,20 +143,16 @@ void csMeshWrapper::SetMeshObject (iMeshObject *meshobj)
   ClearFromSectorPortalLists ();
 
   csMeshWrapper::meshobj = meshobj;
-  shadow_receiver_valid = false;
-  shadow_caster_valid = false;
-  shadow_receiver = 0;
-  shadow_caster = 0;
 
   if (meshobj)
   {
-    light_info = scfQueryInterface<iLightingInfo> (meshobj);
+    //light_info = scfQueryInterface<iLightingInfo> (meshobj);
     portal_container = scfQueryInterface<iPortalContainer> (meshobj);
     AddToSectorPortalLists ();
   }
   else
   {
-    light_info = 0;
+    //light_info = 0;
     portal_container = 0;
   }
 }
@@ -342,10 +221,6 @@ void csMeshWrapper::MoveToSector (iSector *s)
 
 void csMeshWrapper::RemoveFromSectors (iSector* sector)
 {
-  // First disconnect us from all lights.
-  if (light_info)
-    light_info->DisconnectAllLights ();
-  
   // Fire the remove mesh callbacks in the sector.
   if (sector)
     ((csSector*)sector)->FireRemoveMesh ((iMeshWrapper*)this);
@@ -764,16 +639,12 @@ void csMeshWrapper::SetParent (iSceneNode* parent)
 
 iLODControl* csMeshWrapper::CreateStaticLOD ()
 {
-  shadow_receiver_valid = false;
-  shadow_caster_valid = false;
   static_lod = csPtr<csStaticLODMesh> (new csStaticLODMesh ());
   return static_lod;
 }
 
 void csMeshWrapper::DestroyStaticLOD ()
 {
-  shadow_receiver_valid = false;
-  shadow_caster_valid = false;
   static_lod = 0;
 }
 
@@ -791,8 +662,6 @@ void csMeshWrapper::RemoveMeshFromStaticLOD (iMeshWrapper* mesh)
     csArray<iMeshWrapper*>& meshes_for_lod = static_lod->GetMeshesForLOD (lod);
     meshes_for_lod.Delete (mesh);
   }
-  shadow_receiver_valid = false;
-  shadow_caster_valid = false;
 }
 
 void csMeshWrapper::AddMeshToStaticLOD (int lod, iMeshWrapper* mesh)
@@ -800,8 +669,6 @@ void csMeshWrapper::AddMeshToStaticLOD (int lod, iMeshWrapper* mesh)
   if (!static_lod) return;	// No static lod, nothing to do here.
   csArray<iMeshWrapper*>& meshes_for_lod = static_lod->GetMeshesForLOD (lod);
   meshes_for_lod.Push (mesh);
-  shadow_receiver_valid = false;
-  shadow_caster_valid = false;
 }
 
 //---------------------------------------------------------------------------

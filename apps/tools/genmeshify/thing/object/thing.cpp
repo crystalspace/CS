@@ -41,15 +41,12 @@
 #include "csutil/weakref.h"
 #include "iengine/camera.h"
 #include "iengine/engine.h"
-#include "iengine/fview.h"
 #include "iengine/light.h"
 #include "iengine/material.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "iengine/sector.h"
-#include "iengine/shadcast.h"
-#include "iengine/shadows.h"
 #include "iengine/texture.h"
 #include "igraphic/imageio.h"
 #include "iutil/cache.h"
@@ -1608,32 +1605,6 @@ void csThing::MarkLightmapsDirty ()
   light_version++;
 }
 
-void csThing::LightChanged (iLight*)
-{
-  MarkLightmapsDirty ();
-}
-
-void csThing::LightDisconnect (iLight* light)
-{
-  MarkLightmapsDirty ();
-  int dt = light->GetDynamicType ();
-  int i;
-  for (i = 0 ; i < (int)polygons.GetSize () ; i++)
-  {
-    csPolygon3D *p = GetPolygon3D (i);
-    if (dt == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
-      p->DynamicLightDisconnect (light);
-    else
-      p->StaticLightDisconnect (light);
-  }
-}
-
-void csThing::DisconnectAllLights ()
-{
-  MarkLightmapsDirty ();
-  // @@@?
-}
-
 void csThing::SetMovingOption (int opt)
 {
   cfg_moving = opt;
@@ -1935,22 +1906,6 @@ void csThing::InvalidateMaterialHandles ()
 
 }
 
-// @@@ We need a better algorithm here. We should try
-// to recognize convex sub-parts of a polygonset and return
-// convex shadow frustums for those. This will significantly
-// reduce the number of shadow frustums. There are basically
-// two ways to do this:
-//      - Split object into convex sub-parts in 3D.
-//      - Split object into convex sub-parts in 2D.
-// The first way is probably best because it is more efficient
-// at runtime (important if we plan to use dynamic shadows for things)
-// and also more correct in that a convex 3D object has no internal
-// shadowing while a convex outline may have no correspondance to internal
-// shadows.
-void csThing::AppendShadows (iMovable*, iShadowBlockList*, const csVector3&)
-{
-}
-
 void csThing::GetBoundingBox (iMovable *movable, csBox3 &box)
 {
   if (wor_bbox_movablenr != movable->GetUpdateNumber ())
@@ -2106,20 +2061,6 @@ void TriMeshHelper::ForceCleanup ()
 
 //----------------------------------------------------------------------
 
-void csThing::CastShadows (iMovable*, iFrustumView*)
-{
-}
-
-void csThing::InitializeDefault (bool clear)
-{
-  if (clear) Unprepare();
-  PrepareSomethingOrOther ();
-
-  size_t i;
-  for (i = 0; i < polygons.GetSize (); i++)
-    polygons.Get (i).InitializeDefault (clear);
-}
-
 bool csThing::ReadFromCache (iCacheManager* cache_mgr)
 {
   PrepareSomethingOrOther ();
@@ -2198,27 +2139,6 @@ stop:
   return rc;
 }
 
-void csThing::PrepareLighting ()
-{
-  csColor ambient;
-  static_data->thing_type->engine->GetAmbientLight (ambient);
-  size_t i;
-  for (i = 0 ; i < polygons.GetSize () ; i++)
-  {
-    csPolygon3D& p = polygons.Get (i);
-    csLightMap* lm = p.GetPolyTexture ()->GetLightMap ();
-    if (lm && lm->GetStaticMap ())
-    {
-      lm->CalcMaxStatic (
-          int(ambient.red * 255.0f),
-          int(ambient.green * 255.0f),
-          int(ambient.blue * 255.0f));
-    }
-  }
-  ClearLMs ();
-  PrepareLMs ();
-}
-
 void csThing::PrepareRenderMeshes (
   csDirtyAccessArray<csRenderMesh*>& renderMeshes)
 {
@@ -2279,76 +2199,24 @@ void csThing::PrepareLMs ()
 {
   if (IsLmPrepared()) return;
 
-  csThingObjectType* thing_type = static_data->thing_type;
-  iTextureManager* txtmgr = thing_type->G3D->GetTextureManager ();
-
-  csHash<csRef<iSuperLightmap>,
-    csPtrKey<csThingStatic::StaticSuperLM> > superLMs;
-
   size_t i;
   for (i = 0; i < static_data->litPolys.GetSize (); i++)
   {
     const csThingStatic::csStaticLitPolyGroup& slpg =
       *(static_data->litPolys[i]);
 
-    const csRef<iSuperLightmap>* SLMptr =
-      superLMs.GetElementPointer (slpg.staticSLM);
-    csRef<iSuperLightmap> SLM;
+    csLitPolyGroup* lpg = new csLitPolyGroup;
+    lpg->material = FindRealMaterial (slpg.material);
+    if (lpg->material == 0) lpg->material = slpg.material;
 
-    if (SLMptr == 0)
+    size_t j;
+    lpg->polys.SetSize (slpg.polys.GetSize ());
+    for (j = 0; j < slpg.polys.GetSize (); j++)
     {
-      SLM = txtmgr->CreateSuperLightmap (slpg.staticSLM->width,
-        slpg.staticSLM->height);
-      superLMs.Put (slpg.staticSLM, SLM);
+      lpg->polys.Put (j, slpg.polys[j]);
     }
-    else
-      SLM = *SLMptr;
 
-    // SLM creation failed for some reason. The polys will be drawn unlit.
-    if (SLM == 0)
-    {
-      csPolyGroup* pg = new csPolyGroup;
-      pg->material = FindRealMaterial (slpg.material);
-      if (pg->material == 0) pg->material = slpg.material;
-
-      size_t j;
-      pg->polys.SetSize (slpg.polys.GetSize ());
-      for (j = 0; j < slpg.polys.GetSize (); j++)
-      {
-        pg->polys.Put (j, slpg.polys[j]);
-      }
-      //pg->polys.ShrinkBestFit();
-
-      unlitPolys.Push (pg);
-    }
-    else
-    {
-      csLitPolyGroup* lpg = new csLitPolyGroup;
-      lpg->material = FindRealMaterial (slpg.material);
-      if (lpg->material == 0) lpg->material = slpg.material;
-      lpg->SLM = SLM;
-
-      size_t j;
-      lpg->lightmaps.SetSize (slpg.polys.GetSize ());
-      lpg->polys.SetSize (slpg.polys.GetSize ());
-      for (j = 0; j < slpg.polys.GetSize (); j++)
-      {
-        csPolygon3D* poly = &polygons[slpg.polys[j]];
-
-        lpg->polys.Put (j, slpg.polys[j]);
-        const csRect& r = slpg.lmRects[j];
-        csRef<iRendererLightmap> rlm =
-          SLM->RegisterLightmap (r.xmin, r.ymin, r.Width (), r.Height ());
-
-        csPolyTexture* polytxt = poly->GetPolyTexture ();
-        rlm->SetLightCellSize (polytxt->GetLightCellSize ());
-        polytxt->SetRendererLightmap (rlm);
-
-        lpg->lightmaps.Put (j, rlm);
-      }
-
-      litPolys.Push (lpg);
-    }
+    litPolys.Push (lpg);
   }
 
   for (i = 0; i < static_data->unlitPolys.GetSize (); i++)
@@ -2393,58 +2261,6 @@ void csThing::UpdateDirtyLMs ()
   csColor amb (0, 0, 0);
 
   if (!IsLmDirty()) return;
-
-  bool ident;
-  csReversibleTransform o2c;
-  if (!cached_movable || cached_movable->IsFullTransformIdentity ())
-  {
-    ident = true;
-  }
-  else
-  {
-    ident = false;
-    o2c = cached_movable->GetFullTransform ();
-  }
-
-  csMatrix3 m_world2tex;
-  csVector3 v_world2tex;
-
-  size_t i;
-  for (i = 0; i < litPolys.GetSize (); i++)
-  {
-    size_t j;
-    for (j = 0; j < litPolys[i]->polys.GetSize (); j++)
-    {
-      csPolygon3D& poly = polygons[litPolys[i]->polys[j]];
-      csPolyTexture* lmi = poly.GetPolyTexture ();
-      if (ident)
-      {
-        poly.GetStaticPoly ()->MappingGetTextureSpace (m_world2tex,
-                v_world2tex);
-      }
-      else
-      {
-        csMatrix3 m_obj2tex;
-        csVector3 v_obj2tex;
-        poly.GetStaticPoly ()->MappingGetTextureSpace (m_obj2tex,
-                v_obj2tex);
-        csPolyTexture* lmi = poly.GetPolyTexture ();
-        lmi->ObjectToWorld (m_obj2tex, v_obj2tex,
-                o2c, m_world2tex, v_world2tex);
-      }
-      if (lmi->GetLightVersion () != GetLightVersion ())
-      {
-        const csPlane3& world_plane = GetPolygonWorldPlaneNoCheck (
-                poly.GetPolyIdx ());
-        csLightingScratchBuffer& scratch = static_data->thing_type->lightingScratch;
-        if (lmi->RecalculateDynamicLights (m_world2tex, v_world2tex, &poly,
-                world_plane, amb, scratch))
-        {
-          litPolys[i]->lightmaps[j]->SetData (scratch.GetArray ());
-        }
-      }
-    }
-  }
 
   SetLmDirty (false);
 }

@@ -120,7 +120,6 @@ WalkTest::WalkTest () :
   cache_map = 0;
   doSave = false;
   spritesLoaded = false;
-  threaded = false;
 }
 
 WalkTest::~WalkTest ()
@@ -219,9 +218,11 @@ void WalkTest::SetDefaults ()
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Logo disabled.");
   }
 
-  if(cmdline->GetOption("threaded"))
+  // Set whether to use multi-threading within the loader.
+  if(!cmdline->GetBoolOption("threaded", true) || CS::Platform::GetProcessorCount() == 1)
   {
-    threaded = true;
+    csRef<iThreadManager> tman = csQueryRegistry<iThreadManager> (object_reg);
+    tman->SetAlwaysRunNow(true);
   }
 
   doSave = Config->GetBool ("Walktest.Settings.EnableEngineSaving", doSave);
@@ -402,11 +403,11 @@ void WalkTest::DrawFrameDebug ()
     extern void DrawZbuffer ();
     DrawZbuffer ();
   }
-  if (do_show_palette)
-  {
-    extern void DrawPalette ();
-    DrawPalette ();
-  }
+  //if (do_show_palette)
+  //{
+    //extern void DrawPalette ();
+    //DrawPalette ();
+  //}
   if (do_show_debug_boxes)
   {
     extern void DrawDebugBoxes (iCamera* cam, bool do3d);
@@ -857,27 +858,8 @@ void WalkTest::InitCollDet (iEngine* engine, iCollection* collection)
 
 void WalkTest::LoadLibraryData (iCollection* collection)
 {
-  // Load the "standard" library
-  if(Sys->threaded)
-  {
-    csRef<iThreadReturn> ret = TLevelLoader->LoadTexture ("cslogo2",
-      "/lib/std/cslogo2.png", CS_TEXTURE_2D, 0, true, true,
-      true, collection);
-    ret->Wait();
-    if(!ret->WasSuccessful())
-    {
-      Cleanup ();
-      exit (0);
-    }
-  }
-  else
-  {
-    if (!LevelLoader->LoadLibraryFile ("/lib/std/library", collection))
-    {
-      Cleanup ();
-      exit (0);
-    }
-  }
+  LevelLoader->LoadTexture ("cslogo2", "/lib/std/cslogo2.png",
+    CS_TEXTURE_2D, 0, true, true, true, collection);
 }
 
 bool WalkTest::Create2DSprites ()
@@ -965,6 +947,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   }
 #endif
 
+  SetDefaults ();
+
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_REPORTER,
   	CS_REQUEST_REPORTERLISTENER,
@@ -974,8 +958,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize!");
     return false;
   }
-
-  SetDefaults ();
 
   if (!csInitializer::SetupEventHandler (object_reg, WalkEventHandler))
   {
@@ -1144,17 +1126,9 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   Engine->SetSaveableFlag (doSave);
 
   // Find the level loader plugin
-  if(threaded)
-  {
-    // Done this way because unfortunately having both loaded at the same time breaks the old one.
-    TLevelLoader = csQueryRegistryOrLoad<iThreadedLoader>(object_reg, "crystalspace.level.loader.threaded");
-  }
-  else
-  {
-    LevelLoader = csQueryRegistry<iLoader>(object_reg);
-  }
+  LevelLoader = csQueryRegistry<iThreadedLoader>(object_reg);
 
-  if (!TLevelLoader && !LevelLoader)
+  if (!LevelLoader)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No level loader plugin!");
     return false;
@@ -1238,26 +1212,14 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     {
       collection = Engine->CreateCollection (map->map_dir);
     }
-    if(threaded)
+    csRef<iThreadReturn> ret = LevelLoader->LoadMapFile ("world", false, collection);
+    ret->Wait();
+    if(!ret->WasSuccessful())
     {
-      csRef<iThreadReturn> ret = TLevelLoader->LoadMapFile ("world", false, collection);
-      ret->Wait();
-      if(!ret->WasSuccessful())
-      {
-        Report (CS_REPORTER_SEVERITY_ERROR, "Failing to load map!");
-        return false;
-      }
-      Engine->SyncEngineListsNow(TLevelLoader);
+      Report (CS_REPORTER_SEVERITY_ERROR, "Failing to load map!");
+      return false;
     }
-    else
-    {
-      if (!LevelLoader->LoadMapFile ("world", false, collection, !do_collections,
-        do_dupes))
-      {
-        Report (CS_REPORTER_SEVERITY_ERROR, "Failing to load map!");
-        return false;
-      }
-    }
+    Engine->SyncEngineListsNow(LevelLoader);
 
     if (do_collections)
     {
@@ -1272,6 +1234,10 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   LoadLibraryData (collection);
   ParseKeyCmds ();
 
+  csTicks stop_time = csGetTicks ();
+  csPrintf ("\nLevel load time: %g seconds.\n",
+    float (stop_time-start_time) / 1000.0); fflush (stdout);
+
   // Prepare the engine. This will calculate all lighting and
   // prepare the lightmaps for the 3D rasterizer.
   if (!do_collections)
@@ -1280,10 +1246,6 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Engine->Prepare (meter);
     delete meter;
   }
-
-  csTicks stop_time = csGetTicks ();
-  csPrintf ("\nLevel load time: %g seconds.\n",
-      float (stop_time-start_time) / 1000.0); fflush (stdout);
 
   if (!cmdline->GetOption ("noprecache"))
   {
