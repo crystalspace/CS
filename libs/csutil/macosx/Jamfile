@@ -4,10 +4,10 @@ CsLibAddModule ;
 
 CSUTIL.GENERIC +=
   apppath.cpp
-  csprocessorcap.cpp  
   expandname.cpp
   findlib.cpp
   getopt.cpp
+  loadlib.cpp
   memutil_impl.cpp
   mmap.cpp
   pathutil.cpp 
@@ -18,3 +18,7 @@ CSUTIL.GENERIC +=
   setenv.cpp
   sysroot.cpp 
   vfsplat.cpp ;
+
+CSLIB.CFLAGS +=
+  [ FDefines CS_PLUGIN_META_EXT='\".csplugin\"' ]
+  [ FDefines CS_PLUGIN_EXT='\".csbundle\"' ] ;

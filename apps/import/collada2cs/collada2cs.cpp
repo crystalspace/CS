@@ -57,7 +57,7 @@ int main(int argc, char** argv)
 
   printf("Collada %s to Crystal Space Convertor\n\n", COLLADA_VERSION);
 
-  if(args[0].Compare("--help") || args[0].Compare("-help"))
+  if(argc == 1 || args[0].Compare("--help") || args[0].Compare("-help"))
   {
     printf("Options:\n");
     printf("-library Export the following files as library files.\n");

@@ -200,6 +200,25 @@ void csPluginManager::QueryOptions (iComponent *obj)
 csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
                                                        uint flags)
 {
+  bool isLoading = false;
+  {
+    CS::Threading::MutexScopedLock lock (loading);
+    isLoading = alreadyLoading.Contains (classID);
+
+    if(!isLoading)
+      alreadyLoading.AddNoTest (classID);
+  }
+
+  while(isLoading)
+  {
+    {
+      CS::Threading::MutexScopedLock lock (loading);
+      isLoading = alreadyLoading.Contains (classID);
+    }
+    if(!isLoading && (flags & lpiLoadSingleInstance))
+      return csQueryPluginClass<iComponent> (this, classID);
+  }
+
   if (do_verbose)
     /* LoadPluginInstance() may be called recursively and the lock
      * actually held here */
@@ -298,6 +317,8 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
     if ((!(flags & lpiInitialize)) || p->Initialize (object_reg))
     {
       if (flags & lpiInitialize) QueryOptions (p);
+      CS::Threading::MutexScopedLock lock (loading);
+      alreadyLoading.Delete(classID);
       return csPtr<iComponent> (p);
     }
     // If we added this plugin in this call then we remove it here as well.
@@ -314,6 +335,9 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
       mutex.Lock();
     }
   }
+
+  CS::Threading::MutexScopedLock lock (loading);
+  alreadyLoading.Delete(classID);
   return 0;
 }
 

@@ -54,16 +54,16 @@ private:
   void countBits(Allocator<T> const& a, size_t expect_1, size_t expect_0) const
   {
     csBitArray m(a.get_allocation_map());
-    size_t n = m.Length();
+    size_t n = m.GetSize();
     size_t t = 0, f = 0;
-    CPPUNIT_ASSERT_EQUAL(n, expect_1 + expect_0);
+    CPPUNIT_ASSERT_EQUAL(expect_1 + expect_0, n);
     while (n-- > 0)
       if (m.IsBitSet(n))
 	t++;
       else
 	f++;
-    CPPUNIT_ASSERT_EQUAL(t, expect_1);
-    CPPUNIT_ASSERT_EQUAL(f, expect_0);
+    CPPUNIT_ASSERT_EQUAL(expect_1, t);
+    CPPUNIT_ASSERT_EQUAL(expect_0, f);
   }
 
 public:
@@ -146,7 +146,7 @@ void csBlockAllocatorTest::testMap()
   b.Free(i1);          countBits(b, 0, 4);
   i1 = b.Alloc();      countBits(b, 1, 3);
   i2 = b.Alloc();      countBits(b, 2, 2);
-  b.Empty();           countBits(b, 0, 0);
+  b.DeleteAll();       countBits(b, 0, 0);
 }
 
 void csBlockAllocatorTest::testCompact()
@@ -156,31 +156,33 @@ void csBlockAllocatorTest::testCompact()
   int* i2 = b.Alloc();
   int* i3 = b.Alloc();
   int* i4 = b.Alloc();
-  CPPUNIT_ASSERT_EQUAL(b.get_block_count(), (size_t)2);
+  CPPUNIT_ASSERT_EQUAL((size_t)2, b.get_block_count());
 
   b.Free(i3);
   b.Free(i2);
   b.Compact();
-  CPPUNIT_ASSERT_EQUAL(b.get_block_count(), (size_t)2);
+  CPPUNIT_ASSERT_EQUAL((size_t)2, b.get_block_count());
   countBits(b, 2, 2);
 
   b.Free(i1);
   b.Compact();
-  CPPUNIT_ASSERT_EQUAL(b.get_block_count(), (size_t)1);
+  CPPUNIT_ASSERT_EQUAL((size_t)1, b.get_block_count());
   countBits(b, 1, 1);
 
-  b.Empty();
-  CPPUNIT_ASSERT_EQUAL(b.get_block_count(), (size_t)0);
+  b.Empty(); // does not free allocator memory
+  CPPUNIT_ASSERT_EQUAL((size_t)1, b.get_block_count());
+  b.DeleteAll(); // frees allocator memory
+  CPPUNIT_ASSERT_EQUAL((size_t)0, b.get_block_count());
 
   i1 = b.Alloc();
   i2 = b.Alloc();
   i3 = b.Alloc();
   i4 = b.Alloc();
-  CPPUNIT_ASSERT_EQUAL(b.get_block_count(), (size_t)2);
+  CPPUNIT_ASSERT_EQUAL((size_t)2, b.get_block_count());
 
   b.Free(i3);
   b.Free(i4);
   b.Compact();
-  CPPUNIT_ASSERT_EQUAL(b.get_block_count(), (size_t)1);
+  CPPUNIT_ASSERT_EQUAL((size_t)1, b.get_block_count());
   countBits(b, 2, 0);
 }

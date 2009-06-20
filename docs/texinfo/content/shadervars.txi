@@ -1,0 +1,43 @@
+@c -*-texinfo-*-
+@node Default Lighting Shader Variables, Working with Engine Content, Internals, Using Crystal Space, Top
+@subsubsection Default Lighting Shader Variables
+@cindex Default Lighting Shader Variables
+
+@cindex Shader variables
+
+Below are details on some of the shader variables available for use with the default lighting shaders.
+These can be attached either in code or in the xml definition of your model.
+
+@subheading Variables on Materials
+
+@table @samp
+@item tex diffuse
+Type: Texture
+Diffuse (colour) texture.
+
+@item tex normal
+Type: Texture
+Normal map texture
+
+@item tex normal compressed
+Type: Texture
+DXT5nm normal map texture
+
+@item tex height
+Type: Texture
+Height map texture for parallax shading
+
+@item tex specular
+Type: Texture
+Specular map.
+
+@item tex tex ambient occlusion
+Type: Texture
+Ambient occlusion map.
+
+@item colour modulation
+Type: RGB
+Values used to set the colour of a material. The change in colour depends on the existing pixels in the material.
+The lower (darker) the value of the pixel, the less it's affected by the colour change.
+
+@end table

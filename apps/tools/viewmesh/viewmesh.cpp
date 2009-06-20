@@ -1465,6 +1465,8 @@ bool ViewMesh::SelAnimation (const CEGUI::EventArgs& e)
   CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("Tab2/List");
 
   CEGUI::ListboxItem* item = list->getFirstSelectedItem();
+  if(!item) return false;
+
   const CEGUI::String& text = item->getText();
   if (text.empty()) return false;
 

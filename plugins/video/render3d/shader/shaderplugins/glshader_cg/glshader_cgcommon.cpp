@@ -587,10 +587,9 @@ enum
   cpsInvalid = 0x6b723062
 };
 
-bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache,
-                                       const ProfileLimits& limits,
-                                       const ProfileLimitsPair& limitsPair, 
-                                       const char* tag)
+bool csShaderGLCGCommon::WriteToCacheWorker (iHierarchicalCache* cache,
+  const ProfileLimits& limits, const ProfileLimitsPair& limitsPair, 
+  const char* tag, csString& failReason)
 {
   if (!cache) return false;
 
@@ -598,13 +597,21 @@ bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache,
   
   uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagic);
   if (cacheFile.Write ((char*)&diskMagic, sizeof (diskMagic))
-      != sizeof (diskMagic)) return false;
+      != sizeof (diskMagic))
+  {
+    failReason = "write error (magic)";
+    return false;
+  }
   
   csRef<iDataBuffer> programBuffer = GetProgramData();
   csMD5::Digest progHash = csMD5::Encode (
     programBuffer->GetData(), programBuffer->GetSize());
   if (cacheFile.Write ((char*)&progHash, sizeof (progHash))
-      != sizeof (progHash)) return false;
+      != sizeof (progHash))
+  {
+    failReason = "write error (hash)";
+    return false;
+  }
   
   csString objectCode (this->objectCode);
   if ((program != 0) && objectCode.IsEmpty())
@@ -617,14 +624,22 @@ bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache,
   {
     uint32 diskState = csLittleEndian::UInt32 (cpsInvalid);
     if (cacheFile.Write ((char*)&diskState, sizeof (diskState))
-	!= sizeof (diskState)) return false;
+	!= sizeof (diskState))
+    {
+      failReason = "write error (state-invalid)";
+      return false;
+    }
   }
   else
   {
     {
       uint32 diskState = csLittleEndian::UInt32 (cpsValid);
       if (cacheFile.Write ((char*)&diskState, sizeof (diskState))
-	  != sizeof (diskState)) return false;
+	  != sizeof (diskState))
+      {
+	failReason = "write error (state-valid)";
+	return false;
+      }
     }
     
     CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile, description);
@@ -645,22 +660,29 @@ bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache,
       const char* err = doc->Write (&docFile);
       if (err != 0)
       {
-	csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
-	  "crystalspace.graphics3d.shader.glcg",
-	  "Error writing document: %s", err);
+	failReason.Format ("error creting document: %s", err);
+	return false;
       }
       csRef<iDataBuffer> docBuf = docFile.GetAllData (false);
       if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (&cacheFile,
 	  docBuf))
+      {
+	failReason = "write error (document buffer)";
 	return false;
+      }
     }
     
     if (objectCodeCachePathArc.IsEmpty() || objectCodeCachePathItem.IsEmpty())
     {
       csString preprocSource (GetPreprocessedProgram (
         cgGetProgramString (program, CG_PROGRAM_SOURCE)));
-      if (!WriteToCompileCache (preprocSource, limits, cache))
-        return false;
+      csString failReason2;
+      if (!WriteToCompileCache (preprocSource, limits, cache, failReason2))
+      {
+	failReason.Format ("failed compile cache writing: %s",
+	  failReason2.GetData());
+	return false;
+      }
     }
     
     CS_ASSERT(!objectCodeCachePathArc.IsEmpty());
@@ -673,8 +695,34 @@ bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache,
   
   csString cacheName ("/");
   cacheName += tag;
-  return cache->CacheData (cacheFile.GetData(), cacheFile.GetSize(),
-    cacheName);
+  if (!cache->CacheData (cacheFile.GetData(), cacheFile.GetSize(),
+    cacheName))
+  {
+    failReason = "failed writing to cache";
+    return false;
+  }
+  return true;
+}
+
+bool csShaderGLCGCommon::WriteToCache (iHierarchicalCache* cache,
+                                       const ProfileLimits& limits,
+                                       const ProfileLimitsPair& limitsPair, 
+                                       const char* tag)
+{
+  csString failReason;
+  if (!WriteToCacheWorker (cache, limits, limitsPair, tag, failReason))
+  {
+    if (shaderPlug->doVerbose)
+    {
+      csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
+	"crystalspace.graphics3d.shader.glcg",
+	"Error writing %s program for %s to cache: %s",
+	GetProgramType(), tag,
+	failReason.GetData());
+    }
+    return false;
+  }
+  return true;
 }
 
 struct CachedShaderWrapper
@@ -711,7 +759,7 @@ iShaderProgram::CacheLoadResult csShaderGLCGCommon::LoadFromCache (
   else
     allCachedPrograms = cache->GetSubItems ("/");
 
-  if (!allCachedPrograms.IsValid())
+  if (!allCachedPrograms.IsValid() || (allCachedPrograms->GetSize() == 0))
   {
     if (failReason) failReason->AttachNew (
       new scfString ("no cached programs found"));
@@ -1194,7 +1242,8 @@ bool csShaderGLCGCommon::LoadObjectCodeFromCompileCache (
 
 bool csShaderGLCGCommon::WriteToCompileCache (const char* source,
                                               const ProfileLimits& limits,
-                                              iHierarchicalCache* cache)
+                                              iHierarchicalCache* cache,
+                                              csString& failReason)
 {
   CS_ASSERT(objectCodeCachePathArc.IsEmpty());
   CS_ASSERT(objectCodeCachePathItem.IsEmpty());
@@ -1219,12 +1268,14 @@ bool csShaderGLCGCommon::WriteToCompileCache (const char* source,
   cacheArcPath.Format ("/CgProgCache/%s",
     sourceMD5.HexString().GetData());
   
-  csRef<iDataBuffer> cacheArcBuf = rootCache->ReadCache (cacheArcPath);
   CS::PluginCommon::ShaderCacheHelper::MicroArchive cacheArc;
-  if (cacheArcBuf.IsValid())
   {
-    csMemFile cacheArcFile (cacheArcBuf, true);
-    cacheArc.Read (&cacheArcFile);
+    csRef<iDataBuffer> cacheArcBuf = rootCache->ReadCache (cacheArcPath);
+    if (cacheArcBuf.IsValid())
+    {
+      csMemFile cacheArcFile (cacheArcBuf, true);
+      cacheArc.Read (&cacheArcFile);
+    }
   }
   
 #if PROG_CACHE_STORE_SOURCE
@@ -1277,19 +1328,30 @@ bool csShaderGLCGCommon::WriteToCompileCache (const char* source,
   
   uint32 diskMagic = csLittleEndian::UInt32 (cacheFileMagicCC);
   if (cacheFile.Write ((char*)&diskMagic, sizeof (diskMagic))
-      != sizeof (diskMagic)) return false;
+      != sizeof (diskMagic))
+  {
+    failReason = "write error (magic)";
+    return false;
+  }
   
 #if PROG_CACHE_STORE_SOURCE
   {
     csRef<iDataBuffer> idsBuffer (stringIDs.GetAllData());
     if (!CS::PluginCommon::ShaderCacheHelper::WriteDataBuffer (&cacheFile,
         idsBuffer))
+    {
+      failReason = "write error (source)";
       return false;
+    }
   }
 #else
   uint32 diskSize = csLittleEndian::UInt32 (strlen (source));
   if (cacheFile.Write ((char*)&diskSize, sizeof (diskSize))
-      != sizeof (diskSize)) return false;
+      != sizeof (diskSize))
+  {
+    failReason = "write error (source size)";
+    return false;
+  }
 #endif
   
   const char* object;
@@ -1299,29 +1361,46 @@ bool csShaderGLCGCommon::WriteToCompileCache (const char* source,
   {
     uint32 diskState = csLittleEndian::UInt32 (cpsInvalid);
     if (cacheFile.Write ((char*)&diskState, sizeof (diskState))
-	!= sizeof (diskState)) return false;
+	!= sizeof (diskState))
+    {
+      failReason = "write error (state-invalid)";
+      return false;
+    }
   }
   else
   {
     {
       uint32 diskState = csLittleEndian::UInt32 (cpsValid);
       if (cacheFile.Write ((char*)&diskState, sizeof (diskState))
-	  != sizeof (diskState)) return false;
+	  != sizeof (diskState))
+      {
+	failReason = "write error (state-valid)";
+	return false;
+      }
     }
     
     if (!CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile, object))
+    {
+      failReason = "write error (object code)";
       return false;
+    }
     
     csSet<csString>::GlobalIterator iter (unusedParams.GetIterator());
     while (iter.HasNext())
     {
       const csString& s = iter.Next();
       if (!CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile, s))
+      {
+	failReason = "write error (unused param)";
 	return false;
+      }
     }
 
     if (!CS::PluginCommon::ShaderCacheHelper::WriteString (&cacheFile, 0))
+    {
+      failReason = "write error (empty string)";
       return false;
+    }
   }
   
   csRef<iDataBuffer> cacheData = cacheFile.GetAllData();
@@ -1333,18 +1412,25 @@ bool csShaderGLCGCommon::WriteToCompileCache (const char* source,
   if (!cacheArc.WriteEntry (objectCodeCachePathItem, cacheData))
   {
     objectCodeCachePathItem.Empty();
+    failReason = "failed writing cache entry";
     return false;
   }
   objectCodeCachePathArc.Format ("/%s",
     sourceMD5.HexString().GetData());
   
   csMemFile cacheArcFile;
-  if ((!cacheArc.Write (&cacheArcFile))
+  bool cacheArcWrite;
+  if ((!(cacheArcWrite = cacheArc.Write (&cacheArcFile)))
     || !(rootCache->CacheData (cacheArcFile.GetData(), cacheArcFile.GetSize(),
       cacheArcPath)))
   {
     objectCodeCachePathArc.Empty();
     objectCodeCachePathItem.Empty();
+
+    if (!cacheArcWrite)
+      failReason = "failed writing archive";
+    else
+      failReason = "failed caching archive";
     return false;
   }
   

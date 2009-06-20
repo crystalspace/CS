@@ -45,7 +45,8 @@ namespace CS
   
     VfsHierarchicalCache::VfsHierarchicalCache (VfsHierarchicalCache* parentCache,
       const char* vfsdir)
-     : scfImplementationType (this), parent (parentCache), vfsdir (vfsdir)
+     : scfImplementationType (this), parent (parentCache), vfsdir (vfsdir),
+       readonly (false)
     {
       vfs = parentCache->vfs;
       

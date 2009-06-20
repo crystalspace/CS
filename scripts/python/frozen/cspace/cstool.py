@@ -600,5 +600,27 @@ class csProcAnimated(csProcTexture):
 csProcAnimated_swigregister = _cstool.csProcAnimated_swigregister
 csProcAnimated_swigregister(csProcAnimated)
 
+class SimpleStaticLighter(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    CS_SHADOW_NONE = _cstool.SimpleStaticLighter_CS_SHADOW_NONE
+    CS_SHADOW_CENTER = _cstool.SimpleStaticLighter_CS_SHADOW_CENTER
+    CS_SHADOW_BOUNDINGBOX = _cstool.SimpleStaticLighter_CS_SHADOW_BOUNDINGBOX
+    CS_SHADOW_FULL = _cstool.SimpleStaticLighter_CS_SHADOW_FULL
+    ConstantColor = staticmethod(_cstool.SimpleStaticLighter_ConstantColor)
+    ShineLight = staticmethod(_cstool.SimpleStaticLighter_ShineLight)
+    ShineLights = staticmethod(_cstool.SimpleStaticLighter_ShineLights)
+    def __init__(self, *args): 
+        this = _cstool.new_SimpleStaticLighter(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cstool.delete_SimpleStaticLighter
+    __del__ = lambda self : None;
+SimpleStaticLighter_swigregister = _cstool.SimpleStaticLighter_swigregister
+SimpleStaticLighter_swigregister(SimpleStaticLighter)
+SimpleStaticLighter_ConstantColor = _cstool.SimpleStaticLighter_ConstantColor
+SimpleStaticLighter_ShineLight = _cstool.SimpleStaticLighter_ShineLight
+SimpleStaticLighter_ShineLights = _cstool.SimpleStaticLighter_ShineLights
+
 
 

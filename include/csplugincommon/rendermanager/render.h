@@ -28,6 +28,8 @@
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/svarrayholder.h"
 
+#include "ivideo/graph2d.h"
+
 namespace CS
 {
 namespace RenderManager
@@ -279,11 +281,19 @@ namespace RenderManager
       iCamera* cam = rview->GetCamera ();
       iClipper2D* clipper = rview->GetClipper ();
 
+      if (context->owner.IsDebugClearEnabled())
+      {
+        iGraphics2D* G2D = g3d->GetDriver2D();
+        g3d->BeginDraw (CSDRAW_2DGRAPHICS | CSDRAW_CLEARZBUFFER);
+	int bgcolor_clear = G2D->FindRGB (0, 255, 255);
+	G2D->Clear (bgcolor_clear);
+      }
+      
       // Setup the camera etc.. @@should be delayed as well
       g3d->SetProjectionMatrix (cam->GetProjectionMatrix ());
       g3d->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
 
-      BeginFinishDrawScope bd (g3d, drawFlags);      
+      BeginFinishDrawScope bd (g3d, drawFlags);
 
       /* Different contexts may have different numbers of layers,
        * so determine the upper layer number */

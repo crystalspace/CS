@@ -72,6 +72,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       s = Engine->FindSector(name, collection);
     }
 
+    if(!s.IsValid() && collection)
+    {
+      s = Engine->FindSector(name);
+    }
+
     return s;
   }
 
@@ -105,6 +110,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           mat = Engine->FindMaterial(name, collection);
         }
 
+        if(!mat.IsValid() && collection)
+        {
+            mat = Engine->FindMaterial(name);
+        }
+
         if(dontWaitForLoad)
         {
           break;
@@ -122,6 +132,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     {
       mat = Engine->FindMaterial(name, collection);
     }
+
+    if(!mat.IsValid() && collection)
+    {
+      mat = Engine->FindMaterial(name);
+    }
     
     // *** This is deprecated behaviour ***
     if(!dontWaitForLoad && !mat.IsValid())
@@ -136,7 +151,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         }
       }
 
-      iTextureWrapper* tex = FindTexture (name, true);
+      iTextureWrapper* tex = FindTexture (name, false);
       if (tex)
       {
         // Add a default material with the same name as the texture
@@ -197,6 +212,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           fact = Engine->FindMeshFactory(name, collection);
         }
 
+        if(!fact.IsValid() && collection)
+        {
+            fact = Engine->FindMeshFactory(name);
+        }
+
         if(dontWaitForLoad)
         {
           break;
@@ -222,6 +242,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if(!fact.IsValid())
     {
       fact = Engine->FindMeshFactory(name, collection);
+    }
+
+    if(!fact.IsValid() && collection)
+    {
+      fact = Engine->FindMeshFactory(name);
     }
 
     if(!fact.IsValid() && !dontWaitForLoad && do_verbose)
@@ -272,6 +297,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           mesh = Engine->FindMeshObject(name, collection);
         }
+
+        if(!mesh.IsValid() && collection)
+        {
+            mesh = Engine->FindMeshObject(name);
+        }
       }
     }
 
@@ -284,6 +314,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if(!mesh.IsValid())
     {
       mesh = Engine->FindMeshObject(name, collection);
+    }
+
+    if(!mesh.IsValid() && collection)
+    {
+      mesh = Engine->FindMeshObject(name);
     }
 
     if(!mesh.IsValid() && do_verbose)
@@ -324,6 +359,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             }
           }
         }
+
+        if(!light.IsValid() && collection)
+        {
+          csRef<iLightIterator> li = Engine->GetLightIterator();
+
+          while(li->HasNext())
+          {
+            light = li->Next();
+            if(!strcmp(light->QueryObject()->GetName(), name))
+            {
+              break;
+            }
+          }
+        }
       }
     }
 
@@ -336,6 +385,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if(!light.IsValid())
     {
       csRef<iLightIterator> li = Engine->GetLightIterator(collection);
+
+      while(li->HasNext())
+      {
+        light = li->Next();
+        if(!strcmp(light->QueryObject()->GetName(), name))
+        {
+          break;
+        }
+      }
+    }
+
+    if(!light.IsValid() && collection)
+    {
+      csRef<iLightIterator> li = Engine->GetLightIterator();
 
       while(li->HasNext())
       {
@@ -444,6 +507,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           result = Engine->FindTexture(name, collection);
         }
 
+        if(!result.IsValid() && collection)
+        {
+          result = Engine->FindTexture(name);
+        }
+
         if(dontWaitForLoad)
         {
           break;
@@ -460,6 +528,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     if(!result.IsValid())
     {
       result = Engine->FindTexture(name, collection);
+    }
+
+    if(!result.IsValid() && collection)
+    {
+      result = Engine->FindTexture(name);
     }
 
     // *** This is deprecated behaviour ***
@@ -501,7 +574,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   {
     if(collection)
     {
-      CS::Threading::MutexScopedLock lock(collectionLock);
       collection->Add(obj);
     }
   }

@@ -121,8 +121,7 @@ public:
     iShaderManager* shaderManager = rmanager->shaderManager;
 
     // @@@ This is somewhat "boilerplate" sector/rview setup.
-    rview->SetThisSector (sector);
-    sector->CallSectorCallbacks (rview);
+    sector->PrepareDraw (rview);
     // Make sure the clip-planes are ok
     CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext ());
     
@@ -494,7 +493,8 @@ bool RMShadowedPSSM::Initialize(iObjectRegistry* objectReg)
     hdrExposure.Initialize (objectReg, hdr);
   }
   
-  portalPersistent.Initialize (shaderManager, g3d);
+  portalPersistent.Initialize (shaderManager, g3d,
+    treePersistent.debugPersist);
   lightPersistent.shadowPersist.SetConfigPrefix ("RenderManager.ShadowPSSM");
   lightPersistent.Initialize (objectReg, treePersistent.debugPersist);
   lightPersistent_unshadowed.Initialize (objectReg, treePersistent.debugPersist);

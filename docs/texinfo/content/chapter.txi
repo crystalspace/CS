@@ -7,6 +7,7 @@
 * Map Creation:: How to Create Optimal Maps for Crystal Space
 * Map Creation Tips:: Some Tips for Efficient Maps
 * Simple Map Example::
+* Default lighting shader variables:: How to make use of features available in the default lighting shaders.
 * Blender:: Making Levels and Models in Blender
 * 3DSMax:: Making Levels and Models in 3DSMax
 * Using lighter2:: Using @code{lighter2}
@@ -20,6 +21,7 @@
 @imports{content,levbuilding.txi}
 @imports{content,maptips.txi}
 @imports{content,simpmap.txi}
+@imports{content,shadervars.txi}
 @imports{content,blender.txi}
 @imports{content,3dsmax.txi}
 @importss{content,lighter2,lighter2.txi}

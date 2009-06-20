@@ -173,7 +173,6 @@ private:
   {
     csColor4* lit_mesh_colors;
     int num_lit_mesh_colors;	// Should be equal to factory number.
-    csColor4* static_mesh_colors;
     
     csRef<iRenderBuffer> color_buffer;
     
@@ -182,7 +181,7 @@ private:
     
     void SetColorNum (int num);
     void Free();
-    void Clear();
+    void Clear(const csColor4& base_color);
   };
   LegacyLightingData legacyLighting;
 

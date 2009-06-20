@@ -117,6 +117,9 @@ namespace RenderManager
     #endif
 
       TextureCache texCache;
+      
+      uint dbgDrawPortalOutlines;
+      uint dbgShowPortalTextures;
 
       /// Construct helper
       PersistentData();
@@ -125,7 +128,8 @@ namespace RenderManager
        * Initialize helper. Fetches various required values from objects in
        * the object registry.
        */
-      void Initialize (iShaderManager* shmgr, iGraphics3D* g3d);
+      void Initialize (iShaderManager* shmgr, iGraphics3D* g3d,
+                       RenderTreeBase::DebugPersistent& dbgPersist);
 
       /**
        * Do per-frame house keeping - \b MUST be called every frame/
@@ -328,6 +332,19 @@ namespace RenderManager
       RenderTreeType& renderTree = context.owner;
       const csFlags portalFlags (portal->GetFlags());
 
+      if (renderTree.IsDebugFlagEnabled (persistentData.dbgDrawPortalOutlines))
+      {
+	for (size_t i = 0; i < count; i++)
+	{
+	  size_t next = (i+1)%count;
+	  csVector2 v1 (portalVerts2d[i]);
+	  csVector2 v2 (portalVerts2d[next]);
+	  v1.y = screenH - v1.y;
+	  v2.y = screenH - v2.y;
+	  renderTree.AddDebugLineScreen (v1, v2, csRGBcolor (0, 255, 0));
+	}
+      }
+
       // Setup simple portal
       rview->CreateRenderContext ();
       rview->SetLastPortal (portal);
@@ -371,6 +388,19 @@ namespace RenderManager
       // Setup a bounding box, in screen-space
       csBox2 screenBox;
       ComputeVector2BoundingBox (portalVerts2d, count, screenBox);
+      
+      if (renderTree.IsDebugFlagEnabled (persistentData.dbgDrawPortalOutlines))
+      {
+	for (size_t i = 0; i < count; i++)
+	{
+	  size_t next = (i+1)%count;
+	  csVector2 v1 (portalVerts2d[i]);
+	  csVector2 v2 (portalVerts2d[next]);
+	  v1.y = screenH - v1.y;
+	  v2.y = screenH - v2.y;
+	  renderTree.AddDebugLineScreen (v1, v2, csRGBcolor (255, 0, 0));
+	}
+      }
 
       // Obtain a texture handle for the portal to render to
       int sb_minX = int (screenBox.MinX());
@@ -380,6 +410,9 @@ namespace RenderManager
       int real_w, real_h;
       csRef<iTextureHandle> tex = persistentData.texCache.QueryUnusedTexture (txt_w, txt_h,
 		  real_w, real_h);
+		  
+      if (renderTree.IsDebugFlagEnabled (persistentData.dbgShowPortalTextures))
+        renderTree.AddDebugTexture (tex, (float)real_w/(float)real_h);
 		
       iCamera* cam = rview->GetCamera();
       // Create a new view
@@ -398,19 +431,38 @@ namespace RenderManager
       }
 
       {
-	// Old top right coords, transformed to 1,1
-	float xr = ((float)(sb_minX + real_w)/(float)screenW)*2-1;
-	float yt = ((float)(sb_minY)/(float)screenH)*2-1;
-	// Old bottom left coords, transformed to -1,-1
-	float xl = ((float)(sb_minX)/(float)screenW)*2-1;
-	float yb = ((float)(sb_minY + real_h)/(float)screenH)*2-1;
+        /* Shift projection.
+        
+           What we want is to render the sector behind the portal, as seen
+           from the current camera's viewpoint. The portal has a bounding
+           rectangle. For reasons of efficiency we only want to render this
+           rectangular region of the view. Also, the texture is only large
+           enough to cover this rectangle, so the view needs to be offset
+           to align the upper left corner of the portal rectangle with the
+           upper left corner of the render target texture. This can be done
+           by manipulating the projection matrix.
+           
+           The matrix 'projShift' below does:
+           - Transform projection matrix from normalized space to screen
+             space.
+           - Translate the post-projection space so the upper left corner
+             of the rectangle covering the the portal is in the upper left
+             corner of the render target.
+           - Transform projection matrix from (now) render target space to
+             normalized space.
+           (Each step can be represented as a matrix, and the matrix below
+           is just the result of pre-concatenating these matrices.)
+         */
+      
+	float irw = 1.0f/real_w;
+	float irh = 1.0f/real_h;
 	CS::Math::Matrix4 projShift (
-		  2.0f/(xr-xl), 0, 0, -(0.5f*(xl+xr))/(xr-xl),
-		  0, 2.0f/(yb-yt), 0, -(0.5f*(yt+yb))/(yb-yt),
-		  0, 0, 1, 0,
-		  0, 0, 0, 1);
-
-	newCam->SetProjectionMatrix (inewcam->GetProjectionMatrix() * projShift);
+	  screenW*irw, 0, 0, irw * (screenW-2*sb_minX) - 1,
+	  0, screenH*irh, 0, irh * (screenH+2*((real_h - txt_h) - sb_minY)) - 1,
+	  0, 0, 1, 0,
+	  0, 0, 0, 1);
+	
+	newCam->SetProjectionMatrix (projShift * inewcam->GetProjectionMatrix());
       }
       /* Visible cracks can occur on portal borders when the geometry
 	 behind the portal is supposed to fit seamlessly into geometry
@@ -435,20 +487,32 @@ namespace RenderManager
 	  }
 	}
 	// - Find inverse perspective point of pMZ plus some offset (pMZ2)
-	const CS::Math::Matrix4& inverseProj (inewcam->GetInvProjectionMatrix());
+	csVector4 zToPostProject (0, 0, maxz, 1.0f);
+	zToPostProject = cam->GetProjectionMatrix() * zToPostProject;
+	
+	const CS::Math::Matrix4& inverseProj (cam->GetInvProjectionMatrix());
 	csVector2 p (portalVerts2d[maxc]);
 	p.x += 1.5f;
 	p.y += 1.5f;
-	csVector4 p_proj (p.x, p.y, 1.0f/maxz, 1.0f);
+	p.x /= 0.5f*screenW;
+	p.y /= 0.5f*screenH;
+	p.x -= 1;
+	p.y -= 1;
+	csVector4 p_proj (p.x*zToPostProject.w, p.y*zToPostProject.w,
+	  zToPostProject.z, zToPostProject.w);
 	csVector4 p_proj_inv = inverseProj * p_proj;
 	csVector3 pMZ2 (p_proj_inv[0], p_proj_inv[1], p_proj_inv[2]);
 	// - d = distance pMZ, pMZ2
 	float d = sqrtf (csSquaredDist::PointPoint (portalVerts3d[maxc], pMZ2));
 	// - Get portal target plane in target world space
-	csReversibleTransform warp;
+	csVector3 portalDir;
 	if (portalFlags.Check (CS_PORTAL_WARP))
-	  warp = portal->GetWarp();
-	csVector3 portalDir (warp.Other2ThisRelative (portal->GetWorldPlane().Normal()));
+	{
+	  portalDir = portal->GetWarp().Other2ThisRelative (
+	    portal->GetWorldPlane().Normal());
+	}
+	else
+	  portalDir = portal->GetWorldPlane().Normal();
 	/* - Offset target camera into portal direction in target sector,
 	     amount of offset 'd' */
 	csVector3 camorg (inewcam->GetTransform().GetOrigin());
@@ -462,7 +526,9 @@ namespace RenderManager
       newRenderView->SetPreviousSector (rview->GetThisSector ());
       newRenderView->SetThisSector (portal->GetSector ());
       newRenderView->SetViewDimensions (real_w, real_h);
-      csBox2 clipBox (0, real_h - txt_h, txt_w, real_h);
+      /* @@@ FIXME Without the +1 pixels of the portal stay unchanged upon
+       * rendering */
+      csBox2 clipBox (0, real_h - (txt_h+1), txt_w+1, real_h);
       csRef<iClipper2D> newView;
       /* @@@ Consider PolyClipper?
 	A box has an advantage when the portal tex is rendered
@@ -529,9 +595,9 @@ namespace RenderManager
 	for (size_t c = 0; c < count; c++)
 	{
 	  float z = portalVerts3d[c].z;
-	  csVector2 p2 ((portalVerts2d[c].x+1) * screenW/2, (portalVerts2d[c].y+1) * screenH/2);
+	  const csVector2& p2 = portalVerts2d[c];
 	  tcoords[c].Set ((p2.x - sb_minX) * xscale * z,
-	    (real_h - (p2.y - sb_minY)) * yscale * z, 0, z);
+	    (txt_h - (p2.y - sb_minY)) * yscale * z, 0, z);
 	}
       }
       {

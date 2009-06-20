@@ -101,11 +101,17 @@ namespace CS
       boxClipperCache.agedPurgeInterval = 5000;
     }
 
-    void SPSBPD::Initialize (iShaderManager* shmgr, iGraphics3D* g3d)
+    void SPSBPD::Initialize (iShaderManager* shmgr, iGraphics3D* g3d,
+                             RenderTreeBase::DebugPersistent& dbgPersist)
     {
       svNameTexPortal =
 	shmgr->GetSVNameStringset()->Request ("tex portal");
       texCache.SetG3D (g3d);
+      
+      dbgDrawPortalOutlines =
+        dbgPersist.RegisterDebugFlag ("draw.portals.outline");
+      dbgShowPortalTextures =
+        dbgPersist.RegisterDebugFlag ("textures.portals");
     }
     
   } // namespace RenderManager

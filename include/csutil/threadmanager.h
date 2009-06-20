@@ -59,9 +59,15 @@ public:
 
   inline bool RunNow(QueueType queueType, bool wait, bool forceQueue)
   {
-    return alwaysRunNow || (IsMainThread() && queueType != THREADED && !forceQueue) ||
-      (queueType == THREADED && (((!IsMainThread() || waiting) && waiting >= threadCount-1) ||
-      threadQueue->GetQueueCount() > 2*threadCount-1 || wait));
+    // True if we're executing something to be run in the main thread,
+    // and we are the main thread, and we're not forcing it to be put on a queue for later.
+    bool noThread = alwaysRunNow || (IsMainThread() && queueType != THREADED && !forceQueue);
+
+    // True if we're executing something to not be run in the main thread, while all other threads are busy.
+    bool runNow = noThread || ((queueType == THREADED) && !IsMainThread() && ((waiting >= threadCount-1) ||
+        (threadQueue->GetQueueCount() > 2*threadCount-1) || wait));
+
+    return runNow;
   }
 
   inline int32 GetThreadCount()

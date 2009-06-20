@@ -821,7 +821,7 @@ bool csBulletRigidBody::AttachColliderMesh (iMeshWrapper* mesh,
   for (size_t i=0; i<vt_num;i++)
   {
     csVector3 *curr = c_vertex+i;
-    shape->addPoint(btPoint3(curr->x,curr->y,curr->z));
+    shape->addPoint(btVector3(curr->x,curr->y,curr->z));
   }
 
   btVector3 localInertia (0, 0, 0);

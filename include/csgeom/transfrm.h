@@ -506,7 +506,7 @@ public:
 
   /**
    * Rotate the transform by the angle (radians) around the given vector,
-   * in these coordinates. Note: this function rotates the tranform,
+   * in these coordinates. Note: this function rotates the transform,
    * not the coordinate system.
    */
   void RotateThis (const csVector3& v, float angle);

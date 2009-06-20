@@ -27,59 +27,55 @@
 
 namespace CS
 {
-namespace Geometry
-{
-	typedef csDirtyAccessArray< csVector3 > csContour3;
+  namespace Geometry
+  {
+    typedef csDirtyAccessArray< csVector3 > csContour3;
 
-	/** @class Triangulate3D 3D Triangulation Functions
-	 * @brief A collection of functions for 3D triangulation.
-	 * 
-	 * This only includes functions for planar triangulation of 3D surfaces.
-	 * That is, it does not triangulate a 3D object into tetrahedra, but
-	 * finds and triangulates the surfaces of a polygon in 3D.
-	 */
-	class CS_CRYSTALSPACE_EXPORT Triangulate3D 
-	{
-		public:
-			Triangulate3D() {};
-			~Triangulate3D() {};
+    /** @class Triangulate3D 3D Triangulation Functions
+    * @brief A collection of functions for 3D triangulation.
+    * 
+    * This only includes functions for planar triangulation of 3D surfaces.
+    * That is, it does not triangulate a 3D object into tetrahedra, but
+    * finds and triangulates the surfaces of a polygon in 3D.
+    */
+    class CS_CRYSTALSPACE_EXPORT Triangulate3D 
+    {
+    public:
+      Triangulate3D() {};
+      ~Triangulate3D() {};
 
-			/** @brief Triangulate a 3D polygon.
-			 *
-			 * Triangulates a 3D polygon into a csTriangleMesh object.  The polygon
-			 * may contain holes.
-			 *
-			 * @returns true on success; false otherwise
-			 *
-			 * @param polygon A contour representing a counter-clockwise traversal 
-			 *                of the polygon's edge.
-			 * @param result The csTriangleMesh into which the resulting triangulation 
-			 *               should be placed.
-			 * @param report2 A reporter to which errors are sent.
-			 * @param holes A pointer to (possibly many) holes, each defined by the 
-			 *              edge of the sub-polygon (a csContour3), in clockwise order.
-			 * 
-			 * @warning This function does not yet work correctly.  Do not use until 
-			 *			this message is removed.
-			 */
-			static bool Process(csContour3& polygon, csTriangleMesh& result, iReporter* report2, csContour3* holes = 0);
+      /** @brief Triangulate a 3D polygon.
+      *
+      * Triangulates a 3D polygon into a csTriangleMesh object.  The polygon
+      * may contain holes.
+      *
+      * @returns true on success; false otherwise
+      *
+      * @param polygon A contour representing a counter-clockwise traversal 
+      *                of the polygon's edge.
+      * @param result The csTriangleMesh into which the resulting triangulation 
+      *               should be placed.
+      * @param report2 A reporter to which errors are sent.
+      * 
+      * @warning This function does not yet work correctly.  Do not use until 
+      *			this message is removed.
+      */
+      static bool Process(csContour3& polygon, csTriangleMesh& result);
 
-		private:
-			
-			static csContour3 MapToPlanar(const csContour3& poly);
+    private:
 
-			/*
-			static bool FindVertexGroups(csContour3& poly, csContour3& reflex, csContour3& convex, csArray<size_t>& ears);
-			static bool Snip(csContour3& polygon, csArray<size_t>& ears, const size_t earPoint, csTriangleMesh& addTo);
-			static bool IsConvex(const csContour3& polygon, const int index);
-			static bool IsContained(const csVector3& testVertex, const csVector3& a, const csVector3& b, const csVector3& c);
-			static bool IsSameSide(const csVector3& p1, const csVector3& p2, const csVector3& a, const csVector3& b);
-			*/
+      static csContour3 MapToPlanar(const csContour3& poly, csVector3& normal);
+      static bool FindVertexGroups(csContour3& poly, csArray<bool>& isReflex, csArray<size_t>& ears);
+      static bool IsConvex(const csContour3& polygon, const int index);
+      static bool IsContained(const csVector3& testVertex, const csVector3& a, const csVector3& b, const csVector3& c);
+      static bool IsSameSide(const csVector3& p1, const csVector3& p2, const csVector3& a, const csVector3& b);
+      //static bool Snip(csContour3& polygon, csArray<size_t>& ears, const size_t earPoint, csTriangleMesh& addTo);
 
-	}; /* End class Triangulate3D */
+    }; /* End class Triangulate3D */
 
-} // namespace Geometry
+  } // namespace Geometry
 } // namespace CS
 
 #endif // __CS_GEOM_TRIANGULATE_3D_H_
+
 

@@ -164,22 +164,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     THREADED_CALLABLE_DECL3(csThreadedLoader, LoadImage, csLoaderReturn, const char*, fname,
       int, Format, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL3(csThreadedLoader, LoadImage, csLoaderReturn, iDataBuffer*, buf,
+    THREADED_CALLABLE_DECL3(csThreadedLoader, LoadImage, csLoaderReturn, csRef<iDataBuffer>, buf,
       int, Format, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL5(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, Filename,
     int, Flags, csRef<iTextureManager>, texman, csRef<iImage>*, image, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL5(csThreadedLoader, LoadTexture, csLoaderReturn, iDataBuffer*, buf,
-    int, Flags, iTextureManager*, texman, csRef<iImage>*, image, bool, do_verbose, THREADED, false, false)
+    THREADED_CALLABLE_DECL5(csThreadedLoader, LoadTexture, csLoaderReturn, csRef<iDataBuffer>, buf,
+    int, Flags, csRef<iTextureManager>, texman, csRef<iImage>*, image, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL8(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, Name,
-    iDataBuffer*, buf, int, Flags, iTextureManager*, texman, bool, reg, bool, create_material, bool,
+    csRef<iDataBuffer>, buf, int, Flags, csRef<iTextureManager>, texman, bool, reg, bool, create_material, bool,
     free_image, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL10(csThreadedLoader, LoadTexture, csLoaderReturn, const char*, Name,
-    const char*, FileName, int, Flags, iTextureManager*, texman, bool, reg, bool, create_material,
-    bool, free_image, iCollection*, Collection, uint, keepFlags, bool, do_verbose, THREADED, false, false)
+    const char*, FileName, int, Flags, csRef<iTextureManager>, texman, bool, reg, bool, create_material,
+    bool, free_image, csRef<iCollection>, collection, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL2(csThreadedLoader, LoadSoundSysData, csLoaderReturn, const char*, fname,
     bool, do_verbose, THREADED, false, false)
@@ -191,36 +191,36 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     const char*, fname, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, LoadMeshObjectFactory, csLoaderReturn, const char*, fname,
-    iStreamSource*, ssource, bool, do_verbose, THREADED, false, false)
+    csRef<iStreamSource>, ssource, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, LoadMeshObject, csLoaderReturn, const char*, fname,
-    iStreamSource*, ssource, bool, do_verbose, THREADED, false, false)
+    csRef<iStreamSource>, ssource, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL3(csThreadedLoader, LoadShader, csLoaderReturn, const char*, filename,
     bool, registerShader, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL7(csThreadedLoader, LoadMapFile, csLoaderReturn, const char*, filename,
-    bool, clearEngine, iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*,
+    bool, clearEngine, csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>,
     missingdata, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadMap, csLoaderReturn, iDocumentNode*, world_node,
-    bool, clearEngine, iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*,
+    THREADED_CALLABLE_DECL7(csThreadedLoader, LoadMap, csLoaderReturn, csRef<iDocumentNode>, world_node,
+    bool, clearEngine, csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>,
     missingdata, uint, keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL6(csThreadedLoader, LoadLibraryFile, csLoaderReturn, const char*, filename,
-    iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint,
+    csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>, missingdata, uint,
     keepFlags, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL6(csThreadedLoader, LoadLibrary, csLoaderReturn, iDocumentNode*, lib_node,
-    iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint,
+    THREADED_CALLABLE_DECL6(csThreadedLoader, LoadLibrary, csLoaderReturn, csRef<iDocumentNode>, lib_node,
+    csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>, missingdata, uint,
     keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL6(csThreadedLoader, LoadFile, csLoaderReturn, const char*, fname,
-    iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint,
+    csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>, missingdata, uint,
     keepFlags, bool, do_verbose, THREADED, false, false)
 
-    THREADED_CALLABLE_DECL6(csThreadedLoader, LoadBuffer, csLoaderReturn, iDataBuffer*, buffer,
-    iCollection*, collection, iStreamSource*, ssource, iMissingLoaderData*, missingdata, uint,
+    THREADED_CALLABLE_DECL6(csThreadedLoader, LoadBuffer, csLoaderReturn, csRef<iDataBuffer>, buffer,
+    csRef<iCollection>, collection, csRef<iStreamSource>, ssource, csRef<iMissingLoaderData>, missingdata, uint,
     keepFlags, bool, do_verbose, THREADED, false, false)
 
     THREADED_CALLABLE_DECL6(csThreadedLoader, LoadNode, csLoaderReturn, csRef<iDocumentNode>,
@@ -301,7 +301,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csWeakRefHash<iLight, csString> loadedLights;
 
     // General loading objects.
-    csHash<csRef<iThreadReturn>, const char*> loadingMeshObjects;
+    csHash<csRef<iThreadReturn>, csString> loadingMeshObjects;
     CS::Threading::Mutex loadingMeshObjectsLock;
 
     void AddLoadingMeshObject(const char* name, csRef<iThreadReturn> itr)
@@ -334,7 +334,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     // Loading texture objects.
-    csArray<const char*> loadingTextures;
+    csArray<csString> loadingTextures;
     CS::Threading::RecursiveMutex loadingTexturesLock;
 
     bool AddLoadingTexture(const char* name)
@@ -361,7 +361,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     // Loading material objects.
-    csArray<const char*> loadingMaterials;
+    csArray<csString> loadingMaterials;
     CS::Threading::RecursiveMutex loadingMaterialsLock;
 
     bool AddLoadingMaterial(const char* name)
@@ -388,7 +388,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     // Loading meshfact objects.
-    csArray<const char*> loadingMeshFacts;
+    csArray<csString> loadingMeshFacts;
     CS::Threading::RecursiveMutex loadingMeshFactsLock;
 
     bool AddLoadingMeshFact(const char* name)
@@ -480,9 +480,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool LoadProxyTextures(csSafeCopyArray<ProxyTexture> &proxyTextures,
       csWeakRefArray<iMaterialWrapper> &materialArray);
 
-    THREADED_CALLABLE_DECL5(csThreadedLoader, FindOrLoadMeshFactory, csLoaderReturn,csRef<iLoaderContext>,
+    THREADED_CALLABLE_DECL6(csThreadedLoader, FindOrLoadMeshFactory, csLoaderReturn,csRef<iLoaderContext>,
       ldr_context, csRef<iDocumentNode>, meshfactnode, csRef<iMeshFactoryWrapper>, parent,
-      csReversibleTransform*, transf, csRef<iStreamSource>, ssource, THREADED, false, false);
+      csReversibleTransform*, transf, csRef<iStreamSource>, ssource, const char*, path,
+      THREADED, false, false);
 
     /**
     * Load a Mesh Object Factory from the map file.
@@ -612,9 +613,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       csWeakRefArray<iMaterialWrapper> &materialArray, const char* prefix = 0);
 
     /// Parse a texture definition and add the texture to the engine
-    THREADED_CALLABLE_DECL3(csThreadedLoader, ParseTexture, csLoaderReturn,
+    THREADED_CALLABLE_DECL4(csThreadedLoader, ParseTexture, csLoaderReturn,
       csRef<iLoaderContext>, ldr_context, csRef<iDocumentNode>, node,
-      csSafeCopyArray<ProxyTexture>*, proxyTextures, THREADED, false, false);
+      csSafeCopyArray<ProxyTexture>*, proxyTextures, const char*, path,
+      THREADED, false, false);
 
     /// Parse a Cubemap texture definition and add the texture to the engine
     iTextureWrapper* ParseCubemap (iLoaderContext* ldr_context,

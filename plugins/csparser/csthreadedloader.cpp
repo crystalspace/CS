@@ -17,9 +17,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <ctype.h>
-
 #include "cssysdef.h"
+
+#include <ctype.h>
 #include "csqint.h"
 
 #include "cstool/saverref.h"
@@ -169,7 +169,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     // Optional
     SndSysManager = csQueryRegistryOrLoad<iSndSysManager> (object_reg,
       "crystalspace.sndsys.manager", false);
-    SndSysLoader = csQueryRegistry<iSndSysLoader> (object_reg);
+    SndSysLoader = csQueryRegistryOrLoad<iSndSysLoader> (object_reg,
+        "crystalspace.sndsys.element.loader", false);
     SndSysRenderer = csQueryRegistry<iSndSysRenderer> (object_reg);
 
     return true;
@@ -196,7 +197,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   }
 
   THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadMeshObjectFactory, const char* fname,
-    iStreamSource* ssource, bool do_verbose)
+    csRef<iStreamSource> ssource, bool do_verbose)
   {
     csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
       new csLoaderContext (object_reg, Engine, this, 0, 0, KEEP_USED, do_verbose));
@@ -247,7 +248,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   }
 
   THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadMeshObject, const char* fname,
-    iStreamSource* ssource, bool do_verbose)
+    csRef<iStreamSource> ssource, bool do_verbose)
   {
     csRef<iFile> databuff (vfs->Open (fname, VFS_FILE_READ));
     csRef<iMeshWrapper> mesh;
@@ -359,8 +360,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   }
 
   THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadMapFile, const char* filename,
-    bool clearEngine, iCollection* collection, iStreamSource* ssource,
-    iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose)
+    bool clearEngine, csRef<iCollection> collection, csRef<iStreamSource> ssource,
+    csRef<iMissingLoaderData> missingdata, uint keepFlags, bool do_verbose)
   {
     csRef<iFile> buf = vfs->Open (filename, VFS_FILE_READ);
 
@@ -408,9 +409,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return false;
   }
 
-  THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadMap, iDocumentNode* world_node,
-    bool clearEngine, iCollection* collection, iStreamSource* ssource,
-    iMissingLoaderData* missingdata, uint keepFlags, bool do_verbose)
+  THREADED_CALLABLE_IMPL7(csThreadedLoader, LoadMap, csRef<iDocumentNode> world_node,
+    bool clearEngine, csRef<iCollection> collection, csRef<iStreamSource> ssource,
+    csRef<iMissingLoaderData> missingdata, uint keepFlags, bool do_verbose)
   {
     if (clearEngine)
     {
@@ -425,7 +426,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   }
 
   THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadLibraryFile, const char* filename,
-    iCollection* collection, iStreamSource* ssource, iMissingLoaderData* missingdata,
+    csRef<iCollection> collection, csRef<iStreamSource> ssource, csRef<iMissingLoaderData> missingdata,
     uint keepFlags, bool do_verbose)
   {
     csRef<iFile> buf = vfs->Open (filename, VFS_FILE_READ);
@@ -469,8 +470,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return false;
   }
 
-  THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadLibrary, iDocumentNode* lib_node,
-    iCollection* collection, iStreamSource* ssource, iMissingLoaderData* missingdata,
+  THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadLibrary, csRef<iDocumentNode> lib_node,
+    csRef<iCollection> collection, csRef<iStreamSource> ssource, csRef<iMissingLoaderData> missingdata,
     uint keepFlags, bool do_verbose)
   {
     csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext>
@@ -496,7 +497,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   }
 
   THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadFile, const char* fname,
-    iCollection* collection, iStreamSource* ssource, iMissingLoaderData* missingdata,
+    csRef<iCollection> collection, csRef<iStreamSource> ssource, csRef<iMissingLoaderData> missingdata,
     uint keepFlags, bool do_verbose)
   {
     csRef<iDataBuffer> buf = vfs->ReadFile (fname);
@@ -510,8 +511,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return Load (buf, fname, collection, ssource, missingdata, keepFlags, do_verbose);
   }
 
-  THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadBuffer, iDataBuffer* buffer,
-    iCollection* collection, iStreamSource* ssource, iMissingLoaderData* missingdata,
+  THREADED_CALLABLE_IMPL6(csThreadedLoader, LoadBuffer, csRef<iDataBuffer> buffer,
+    csRef<iCollection> collection, csRef<iStreamSource> ssource, csRef<iMissingLoaderData> missingdata,
     uint keepFlags, bool do_verbose)
   {
     return Load(buffer, 0, collection, ssource, missingdata, keepFlags, do_verbose);
@@ -525,11 +526,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     ldr_context.AttachNew(new csLoaderContext(object_reg, Engine, this, collection,
       missingdata, keepFlags, do_verbose));
 
+    // texture.
+    csRef<iDocumentNode> texturenode = node->GetNode ("texture");
+    if (texturenode)
+    {
+      csSafeCopyArray<ProxyTexture> proxyTextures;
+      return ParseTextureTC(ret, ldr_context, texturenode, &proxyTextures, vfs->GetCwd());
+    }
+
     // Mesh Factory
     csRef<iDocumentNode> meshfactnode = node->GetNode("meshfact");
     if(meshfactnode)
     {
-      return FindOrLoadMeshFactoryTC(ret, ldr_context, meshfactnode, 0, 0, ssource);
+      return FindOrLoadMeshFactoryTC(ret, ldr_context, meshfactnode, 0, 0, ssource, 0);
     }
 
     // Mesh Object
@@ -638,10 +647,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return false;
   }
 
-  THREADED_CALLABLE_IMPL5(csThreadedLoader, FindOrLoadMeshFactory, csRef<iLoaderContext> ldr_context,
+  THREADED_CALLABLE_IMPL6(csThreadedLoader, FindOrLoadMeshFactory, csRef<iLoaderContext> ldr_context,
     csRef<iDocumentNode> meshfactnode, csRef<iMeshFactoryWrapper> parent, csReversibleTransform* transf,
-    csRef<iStreamSource> ssource)
+    csRef<iStreamSource> ssource, const char* path)
   {
+    csVfsDirectoryChanger dirchange(vfs);
+    if(path)
+    {
+      dirchange.ChangeTo(path);
+    }
+
     const char* meshfactname = meshfactnode->GetAttributeValue("name");
 
     csRef<iMeshFactoryWrapper> mfw = ldr_context->FindMeshFactory(meshfactname, true);
@@ -826,7 +841,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
               ldr_context->GetVerbose());
           }
 
-          threadReturns.Push(FindOrLoadMeshFactory(ldr_context, child, 0, 0, ssource));
+          threadReturns.Push(FindOrLoadMeshFactory(ldr_context, child, 0, 0, ssource, vfs->GetCwd()));
         }
         break;
       case XMLTOKEN_SECTOR:
@@ -870,8 +885,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             path = child->GetAttributeValue("path");
             if(path)
             {
-              vfs->PushDir();
-              vfs->ChDir(path);
+              vfs->PushDir(path);
             }
           }
           else
@@ -879,14 +893,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             file = child->GetContentsValue();
           }
 
-          csRef<iDocumentNode> lib = libs.Get(libIDs.Find(file));
-          if(!lib.IsValid())
+          csRef<iDocumentNode> lib = child;
+          size_t idx = libIDs.Find(file);
+          if(idx != csArrayItemNotFound)
           {
-            lib = child;
+              lib = libs.Get(idx);
           }
 
           if(!LoadLibrary(ldr_context, lib, ssource, missingdata, threadReturns, libs, libIDs, false, do_verbose))
             return false;
+
+          if(path)
+          {
+            vfs->PopDir();
+          }
+
           break;
         }
       case XMLTOKEN_START:
@@ -1109,7 +1130,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         break;
       case XMLTOKEN_MESHFACT:
         {
-          threadReturns.Push(FindOrLoadMeshFactory(ldr_context, child, 0, 0, ssource));
+          threadReturns.Push(FindOrLoadMeshFactory(ldr_context, child, 0, 0, ssource, vfs->GetCwd()));
         }
         break;
       case XMLTOKEN_PLUGINS:
@@ -1504,7 +1525,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
       case XMLTOKEN_MESHFACT:
         {
-          FindOrLoadMeshFactory(ldr_context, child, stemp, 0, ssource);
+          csReversibleTransform child_transf;
+          csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
+          if(!FindOrLoadMeshFactoryTC(ret, ldr_context, child, stemp, &child_transf, ssource, vfs->GetCwd()))
+          {
+            return false;
+          }
         }
         break;
 
@@ -3705,8 +3731,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       case XMLTOKEN_MESHOBJ:
         {
           const char* meshname = child->GetContentsValue ();
-          iMeshList* meshes = sector->GetMeshes ();
-          iMeshWrapper* mesh = meshes->FindByName (meshname);
+          iMeshWrapper* mesh = ldr_context->FindMeshObject (meshname);
           if (!mesh)
           {
             SyntaxService->ReportError (

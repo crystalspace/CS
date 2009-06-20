@@ -38,6 +38,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton2)
   {
   public:
     virtual void NewAnimation (size_t data) = 0;
+  protected:
+    virtual ~AnimationFifoCb() {}
   };
 
   class AnimationFifo

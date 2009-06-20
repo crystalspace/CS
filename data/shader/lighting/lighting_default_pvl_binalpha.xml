@@ -21,6 +21,7 @@
   <alias name="ambient" file="/shader/snippets/lighting/ambient-static.xml" />
   <alias name="apply_alpha" file="/shader/snippets/surface/alpha-nochange.xml" />
   <alias name="lighting" file="/shader/snippets/lighting/lighting-pvl.xml" />
+  <alias name="surface" file="/shader/snippets/surface/surface-modulate.xml" />
   
   <technique priority="500" minlights="5">
     <!-- 1 pass, 6 lights -->

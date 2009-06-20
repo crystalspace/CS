@@ -182,6 +182,7 @@ public:
    * - CreateCommandLineParser()
    * - CreateVerbosityManager()
    * - CreateConfigManager()
+   * - CreateThreadManager()
    * - CreateInputDrivers()
    * - CreateStringSet()
    * - csPlatformStartup()

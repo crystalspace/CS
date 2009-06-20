@@ -23,6 +23,7 @@
 #include "iengine/mesh.h"
 #include "iengine/texture.h"
 #include "isndsys/ss_manager.h"
+#include "iutil/databuff.h"
 #include "iutil/document.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"

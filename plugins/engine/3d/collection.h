@@ -56,6 +56,7 @@ public:
    */
   void Add(iObject *obj)
   {
+    CS::Threading::MutexScopedLock lock(collectionLock);
     if(!IsParentOf(obj))
     {
       ObjAdd(obj);
@@ -69,6 +70,7 @@ public:
    */
   void Remove(iObject *obj)
   {
+    CS::Threading::MutexScopedLock lock(collectionLock);
     csObject* object = (csObject*)obj;
     object->InternalDecRef();
     ObjRemove(obj);
@@ -124,6 +126,7 @@ public:
    */
   inline iSector* FindSector(const char *name)
   {
+    CS::Threading::MutexScopedLock lock(collectionLock);
     csRef<iSector> s (CS::GetNamedChildObject<iSector>(this, name));
     return s;
   }
@@ -134,6 +137,7 @@ public:
    */
   inline iMeshWrapper* FindMeshObject(const char *name)
   {
+    CS::Threading::MutexScopedLock lock(collectionLock);
     csRef<iMeshWrapper> mw (CS::GetNamedChildObject<iMeshWrapper>(this, name));
     return mw;
   }
@@ -144,6 +148,7 @@ public:
    */
   inline iMeshFactoryWrapper* FindMeshFactory (const char *name)
   {
+    CS::Threading::MutexScopedLock lock(collectionLock);
     csRef<iMeshFactoryWrapper> mfw (CS::GetNamedChildObject<iMeshFactoryWrapper>(this, name));
     return mfw;
   }
@@ -154,6 +159,7 @@ public:
    */
   inline iTextureWrapper* FindTexture(const char *name)
   {
+    CS::Threading::MutexScopedLock lock(collectionLock);
     csRef<iTextureWrapper> tw (CS::GetNamedChildObject<iTextureWrapper>(this, name));
     return tw;
   }
@@ -164,6 +170,7 @@ public:
    */
   inline iMaterialWrapper* FindMaterial(const char *name)
   {
+    CS::Threading::MutexScopedLock lock(collectionLock);
     csRef<iMaterialWrapper> mw (CS::GetNamedChildObject<iMaterialWrapper>(this, name));
     return mw;
   }
@@ -174,6 +181,7 @@ public:
    */
   inline iShader* FindShader (const char *name)
   {
+    CS::Threading::MutexScopedLock lock(collectionLock);
     csRef<iShader> s (CS::GetNamedChildObject<iShader>(this, name));
     return s;
   }
@@ -184,9 +192,13 @@ public:
    */
   inline iCameraPosition* FindCameraPosition(const char *name)
   {
+    CS::Threading::MutexScopedLock lock(collectionLock);
     csRef<iCameraPosition> cp (CS::GetNamedChildObject<iCameraPosition>(this, name));
     return cp;
   }
+
+  private:
+    CS::Threading::Mutex collectionLock;
 };
 
 #endif // __COLLECTION_H__

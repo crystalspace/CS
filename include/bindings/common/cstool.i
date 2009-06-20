@@ -29,6 +29,8 @@
 %include "cstool/proctex.h"
 %include "cstool/proctxtanim.h"
 
+%include "cstool/simplestaticlighter.h"
+
 /* POST */
 #ifndef SWIGIMPORTED
 #undef APPLY_FOR_ALL_INTERFACES_POST

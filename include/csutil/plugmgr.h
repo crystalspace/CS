@@ -25,6 +25,7 @@
 
 #include "csextern.h"
 #include "csutil/parray.h"
+#include "csutil/set.h"
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/threading/mutex.h"
@@ -46,6 +47,12 @@ private:
   /// Mutex to make the plugin manager thread-safe.
   CS::Threading::RecursiveMutex mutex;
   bool do_verbose;
+
+  /// Mutex on 'already loading' array.
+  CS::Threading::Mutex loading;
+
+  /// Stores already loading plugins (by classID).
+  csSet<csString> alreadyLoading;
 
   /**
    * This is a private structure used to keep the list of plugins.

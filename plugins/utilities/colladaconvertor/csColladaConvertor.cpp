@@ -44,7 +44,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
   SCF_IMPLEMENT_FACTORY(csColladaConvertor)
 
     // =============== Error Reporting and Handling Functions ===============
-  void csColladaConvertor::Report(int severity, const char* msg, ...)
+    void csColladaConvertor::Report(int severity, const char* msg, ...)
   {
     va_list argList;
     va_start(argList, msg);
@@ -105,7 +105,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
   // =============== Constructors/ Destructors ===============
 
   csColladaConvertor::csColladaConvertor(iBase* parent) :
-    scfImplementationType(this, parent), 
+  scfImplementationType(this, parent), 
     docSys(0),
     warningsOn(false),
     sectorScene(false),
@@ -178,7 +178,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     if (!fileSys.IsValid())
     {
       Report(CS_REPORTER_SEVERITY_WARNING,
-	  "Unable to access file system.  File not loaded.");
+        "Unable to access file system.  File not loaded.");
       return "Unable to access file system";
     }
 
@@ -213,7 +213,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     if (!rootNode.IsValid())
     {
       Report(CS_REPORTER_SEVERITY_ERROR,
-	  "Error: Unable to find COLLADA node.  File not loaded.");
+        "Error: Unable to find COLLADA node.  File not loaded.");
       return "Unable to find COLLADA node";
     }
 
@@ -233,7 +233,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     if (!rootNode.IsValid())
     {
       Report(CS_REPORTER_SEVERITY_ERROR,
-	  "Error: Unable to find COLLADA node.  File not loaded.");
+        "Error: Unable to find COLLADA node.  File not loaded.");
       return "Unable to find COLLADA node";
     }  
 
@@ -853,7 +853,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
         // Point lights.
         if(lightNode &&
-           lightNode->GetNode("point"))
+          lightNode->GetNode("point"))
         {
           csColladaLight light;
 
@@ -1003,7 +1003,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
       {
         culler->SetValue("crystalspace.culling.frustvis");
       }
-      
+
       // Write children.
       csRef<iDocumentNodeIterator> sectorNodes = sector->GetNodes("node");
       while(sectorNodes->HasNext())
@@ -1028,32 +1028,32 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
           csRef<iDocumentNode> newPortalSectorContents = newPortalSector->CreateNodeBefore(CS_NODE_TEXT);
           newPortalSectorContents->SetValue(portalTargets[portalNum-1]);
 
-            csRef<iDocumentNodeIterator> facts = colladaElement->GetNode("library_geometries")->GetNodes("geometry");
-            while(facts->HasNext())
+          csRef<iDocumentNodeIterator> facts = colladaElement->GetNode("library_geometries")->GetNodes("geometry");
+          while(facts->HasNext())
+          {
+            csRef<iDocumentNode> fact = facts->Next();
+            if(csString(fact->GetAttributeValue("name")).Compare(object->GetAttributeValue("name")))
             {
-              csRef<iDocumentNode> fact = facts->Next();
-              if(csString(fact->GetAttributeValue("name")).Compare(object->GetAttributeValue("name")))
+              fact = fact->GetNode("mesh")->GetNode("source")->GetNode("float_array");
+              csStringArray vertices;
+              vertices.SplitString(fact->GetContentsValue(), " ");
+
+              for(int i=0; i<12; i+=3)
               {
-                fact = fact->GetNode("mesh")->GetNode("source")->GetNode("float_array");
-                csStringArray vertices;
-                vertices.SplitString(fact->GetContentsValue(), " ");
+                csRef<iDocumentNode> vertex = newPortal->CreateNodeBefore(CS_NODE_ELEMENT);
+                vertex->SetValue("v");
 
-                for(int i=0; i<12; i+=3)
-                {
-                  csRef<iDocumentNode> vertex = newPortal->CreateNodeBefore(CS_NODE_ELEMENT);
-                  vertex->SetValue("v");
+                float x = CS::Utility::strtof(vertices[i]);
+                float y = CS::Utility::strtof(vertices[i+1]);
+                float z = CS::Utility::strtof(vertices[i+2]);
 
-                  float x = CS::Utility::strtof(vertices[i]);
-                  float y = CS::Utility::strtof(vertices[i+1]);
-                  float z = CS::Utility::strtof(vertices[i+2]);
-
-                  vertex->SetAttributeAsFloat("x", x);
-                  vertex->SetAttributeAsFloat("y", y);
-                  vertex->SetAttributeAsFloat("z", z);
-                }
-                break;
+                vertex->SetAttributeAsFloat("x", x);
+                vertex->SetAttributeAsFloat("y", y);
+                vertex->SetAttributeAsFloat("z", z);
               }
+              break;
             }
+          }
 
           continue;
         }
@@ -1099,7 +1099,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
           continue;
         }
 
-         // Write genmesh meshobj (TODO: Other mesh types).
+        // Write genmesh meshobj (TODO: Other mesh types).
         csRef<iDocumentNode> meshObj = currentSectorElement->CreateNodeBefore(CS_NODE_ELEMENT);
         meshObj->SetValue("meshobj");
         meshObj->SetAttribute("name", object->GetAttributeValue("name"));

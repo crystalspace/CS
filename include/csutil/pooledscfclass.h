@@ -29,6 +29,7 @@
  * @{ */
 
 #include "csutil/scf.h"
+#include "csutil/threading/atomicops.h"
 #include "csutil/threading/mutex.h"
 
 #include "csutil/custom_new_disable.h"
@@ -153,8 +154,7 @@ public:
   void DecRef ()
   {
     csRefTrackerAccess::TrackDecRef (this->GetSCFObject(), this->scfRefCount);
-    this->scfRefCount--;
-    if (this->scfRefCount == 0)
+    if (CS::Threading::AtomicOperations::Decrement (&this->scfRefCount) == 0)
     {
       delete this->GetSCFObject();
     }

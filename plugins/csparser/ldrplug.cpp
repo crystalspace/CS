@@ -48,7 +48,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
         csRef<iComponent> comp = scfQueryInterface<iComponent> (rec->Component);
         if (comp)
-          plugin_mgr->UnloadPlugin (comp);
+          plugin_mgr->UnloadPluginInstance (comp);
       }
       delete rec;
     }

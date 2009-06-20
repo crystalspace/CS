@@ -50,6 +50,12 @@ csPtr<iSndSysData> SndSysLoader::LoadSound (iDataBuffer* Buffer, const char *pDe
     if (data.IsValid())
       return csPtr<iSndSysData> (data);
   }
+  if (m_pSpeexLoader)
+  {
+    data=m_pSpeexLoader->LoadSound(Buffer, pDescription);
+    if (data.IsValid())
+      return csPtr<iSndSysData> (data);
+  }
   return 0;
 }
 
@@ -61,6 +67,8 @@ bool SndSysLoader::Initialize (iObjectRegistry *reg)
     "crystalspace.sndsys.element.wav");
   m_pOggLoader=csLoadPlugin<iSndSysLoader> (mgr,
     "crystalspace.sndsys.element.ogg");
+  m_pSpeexLoader=csLoadPlugin<iSndSysLoader> (mgr,
+    "crystalspace.sndsys.element.speex", false);
   return true;
 }
 

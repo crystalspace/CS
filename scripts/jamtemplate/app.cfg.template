@@ -2,6 +2,11 @@
 ;;; Here you can set Crystal Space settings, plugins to load,
 ;;; and custom kvp (key-value pairs) for your project.
 
+; Specify the render manager we want. Use rlcompat for pre-1.9 rendering style.
+;Engine.RenderManager.Default = crystalspace.rendermanager.rlcompat
+Engine.RenderManager.Default = crystalspace.rendermanager.unshadowed
+;Engine.RenderManager.Default = crystalspace.rendermanager.shadow_pssm
+
 ;;; Plugin load examples:
 
 ; Load bugplug plugin
@@ -25,6 +30,8 @@
 ;Video.ScreenHeight = 600
 ;Video.FullScreen = no
 
+;;; Application-specific settings
+
 WindowTitle = #LONGNAME#
 
 ;; Those are setting for the actor collider
@@ -37,4 +44,10 @@ DefaultStartPos = 0,2,0
 
 ;; This is the VFS path to the map to be loaded by default
 DefaultMap = /appdata/defaultmap
+
+;; Settings for the SimpleStaticLighter, used in PostLoadMap()
+StaticLighter.Enabled = true
+StaticLighter.NumLights = 4
+;; ShadowType: 0 -> none, 1 -> center, 2 -> boundingbox, 3 -> full
+StaticLighter.ShadowType = 0
 

@@ -100,18 +100,6 @@ bool OSXDriver2D::Open()
     origWidth = canvas->fbWidth;
     origHeight = canvas->fbHeight;
 
-        // Set up pixel format
-    if (canvas->Depth == 32)
-        Initialize32();
-    else if (canvas->Depth == 16)
-        Initialize16();
-    else
-    {
-        csFPrintf(stderr, "Depth %d not supported in CGDriver2D yet",
-	    canvas->Depth);
-        return false;
-    }
-
     // Switch to fullscreen mode if necessary
     if (canvas->FullScreen == true)
         if ((inFullscreenMode = EnterFullscreenMode()) == false)
@@ -195,34 +183,6 @@ void OSXDriver2D::HideMouse()
 void OSXDriver2D::ShowMouse()
 {
     assistant->show_mouse_pointer();
-}
-
-
-// Initialize16
-// Initialize pixel format for 16 bit depth
-void OSXDriver2D::Initialize16()
-{
-    canvas->pfmt.PalEntries = 0;
-    canvas->pfmt.PixelBytes = 2;
-    canvas->pfmt.RedMask = 0x1F << 10;
-    canvas->pfmt.GreenMask = 0x1F << 5;
-    canvas->pfmt.BlueMask = 0x1F;
-    canvas->pfmt.AlphaMask = 0;
-    canvas->pfmt.complete();
-}
-
-
-// Initialize32
-// Initialize pixel format for 32 bit depth
-void OSXDriver2D::Initialize32()
-{
-    canvas->pfmt.PalEntries = 0;
-    canvas->pfmt.PixelBytes = 4;
-    canvas->pfmt.RedMask = 0xFF0000;
-    canvas->pfmt.GreenMask = 0x00FF00;
-    canvas->pfmt.BlueMask = 0x0000FF;
-    canvas->pfmt.AlphaMask = 0xFF000000;
-    canvas->pfmt.complete();
 }
 
 

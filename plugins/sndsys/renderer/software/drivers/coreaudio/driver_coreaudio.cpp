@@ -38,6 +38,14 @@
 #include "isndsys/ss_renderer.h"
 #include "driver_coreaudio.h"
 
+#if defined(MAC_OS_X_VERSION_10_5) && (MAC_OS_X_VERSION_MIN_REQUIRED>=MAC_OS_X_VERSION_10_5)
+#define CS_AUDIO_CREATE_PROC(DEV,PROC,DATA) AudioDeviceCreateIOProcID(DEV,PROC,DATA,0)
+#define CS_AUDIO_DESTROY_PROC(DEV,PROC) AudioDeviceDestroyIOProcID(DEV,PROC)
+#else
+#define CS_AUDIO_CREATE_PROC(DEV,PROC,DATA) AudioDeviceAddIOProc(DEV,PROC,DATA)
+#define CS_AUDIO_DESTROY_PROC(DEV,PROC) AudioDeviceRemoveIOProc(DEV,PROC)
+#endif
+
 CS_IMPLEMENT_PLUGIN
 
 CS_PLUGIN_NAMESPACE_BEGIN(SndSysCOREAUDIO)
@@ -204,7 +212,7 @@ bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
   memcpy(&playback_format, requested_format, sizeof(csSndSysSoundFormat));
 
   // Add a callback and begin playback
-  status = AudioDeviceAddIOProc(outputDeviceID, StaticAudioProc, this);
+  status = CS_AUDIO_CREATE_PROC(outputDeviceID, StaticAudioProc, this);
   if (status != 0)
   {
     Report(CS_REPORTER_SEVERITY_ERROR,
@@ -219,7 +227,7 @@ bool csSndSysDriverCoreAudio::Open (csSndSysRendererSoftware *renderer,
 void csSndSysDriverCoreAudio::Close ()
 {
   StopThread();
-  AudioDeviceRemoveIOProc(outputDeviceID, StaticAudioProc);
+  CS_AUDIO_DESTROY_PROC(outputDeviceID, StaticAudioProc);
   cs_free(convert_buffer);
   convert_buffer = 0;
 }

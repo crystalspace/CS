@@ -1,37 +1,193 @@
 /*
-    Copyright (C) 2007 by Scott Johnson
+    Copyright (C) 2008 by Scott Johnson
 
-    This application is free software; you can redistribute it and/or
+    This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
 
-    This application is distributed in the hope that it will be useful,
+    This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
 
     You should have received a copy of the GNU Library General Public
-    License along with this application; if not, write to the Free
+    License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "tri3dtest.h"
-#include "csgeom/plane3.h"
-
-using namespace std;
-using CS::Geometry::Triangulate3D;
-using CS::Geometry::csContour3;
 
 CS_IMPLEMENT_APPLICATION
 
+using CS::Geometry::csContour3;
+
 Tri3DTest::Tri3DTest()
 {
-	SetApplicationName("crystalspace.tri3dtest");
+    SetApplicationName ("CrystalSpace.Tri3DTest");
+    triangulate = false;
+    untrimesh = NULL;
 }
 
-bool Tri3DTest::OnInitialize(int argc, char* argv[])
+Tri3DTest::~Tri3DTest()
 {
+}
+
+void Tri3DTest::Frame()
+{
+  csSimpleRenderMesh rMeshObj;
+  rMeshObj.vertexCount = 0;
+  rMeshObj = ConvertToRenderMesh(tm);
+
+  csSimpleRenderMesh utMeshObj;
+  utMeshObj.vertexCount = 0;
+  utMeshObj = ConvertToRenderMesh(untrimesh);
+ 
+    // First get elapsed time from the virtual clock.
+  csTicks elapsed_time = vc->GetElapsedTicks ();
+  // Now rotate the camera according to keyboard state
+  float speed = (elapsed_time / 1000.0) * (0.06 * 20);
+
+  iCamera* c = view->GetCamera();
+
+  if (kbd->GetKeyState (CSKEY_SHIFT))
+  {
+    // If the user is holding down shift, the arrow keys will cause
+    // the camera to strafe up, down, left or right from it's
+    // current position.
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      c->Move (CS_VEC_RIGHT * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_LEFT))
+      c->Move (CS_VEC_LEFT * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_UP))
+      c->Move (CS_VEC_UP * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_DOWN))
+      c->Move (CS_VEC_DOWN * 4 * speed);
+  }
+  else
+  {
+    // left and right cause the camera to rotate on the global Y
+    // axis; page up and page down cause the camera to rotate on the
+    // _camera's_ X axis (more on this in a second) and up and down
+    // arrows cause the camera to go forwards and backwards.
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+    {
+      rotY += speed;
+    }
+    if (kbd->GetKeyState (CSKEY_LEFT))
+      rotY -= speed;
+    if (kbd->GetKeyState (CSKEY_PGUP))
+      rotX += speed;
+    if (kbd->GetKeyState (CSKEY_PGDN))
+      rotX -= speed;
+    if (kbd->GetKeyState (CSKEY_UP))
+      c->Move (CS_VEC_FORWARD * 4 * speed);
+    if (kbd->GetKeyState (CSKEY_DOWN))
+      c->Move (CS_VEC_BACKWARD * 4 * speed);
+  }
+
+  // We now assign a new rotation transformation to the camera.  You
+  // can think of the rotation this way: starting from the zero
+  // position, you first rotate "rotY" radians on your Y axis to get
+  // the first rotation.  From there you rotate "rotX" radians on the
+  // your X axis to get the final rotation.  We multiply the
+  // individual rotations on each axis together to get a single
+  // rotation matrix.  The rotations are applied in right to left
+  // order .
+  csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
+  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
+  utMeshObj.object2world *= ot;
+  rMeshObj.object2world *= ot;
+
+  //c->SetTransform (ot);
+  //g3d->SetWorldToCamera(csReversibleTransform());
+
+  rm->RenderView (view);
+
+  // if the user wants the item to be displayed triangulated, 
+  // then do so
+  if (triangulate)
+  {
+    if (!g3d->BeginDraw(engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
+    {
+      ReportError("Cannot prepare renderer for 3D drawing.");
+    }
+
+    if (rMeshObj.vertexCount > 0)
+    {
+      g3d->DrawSimpleMesh(rMeshObj, 0);
+    }
+
+    g3d->FinishDraw();
+  }
+
+  // otherwise, display the basic item, untriangulated
+  else
+  {
+    if (!g3d->BeginDraw(engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
+    {
+      ReportError("Cannot prepare renderer for 3D drawing.");
+    }
+
+    if (utMeshObj.vertexCount > 0)
+    {
+      g3d->DrawSimpleMesh(utMeshObj, 0);
+    }
+
+    g3d->FinishDraw();
+  }
+
+  if (rMeshObj.vertices != NULL)
+  {
+    delete[] rMeshObj.vertices;
+    rMeshObj.vertices = NULL;
+  }
+
+  if (rMeshObj.colors != NULL)
+  {
+    delete[] rMeshObj.colors;
+    rMeshObj.colors = NULL;
+  }
+}
+
+bool Tri3DTest::OnKeyboard(iEvent& ev)
+{
+    // We got a keyboard event.
+  csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
+  if (eventtype == csKeyEventTypeDown)
+  {
+    // The user pressed a key (as opposed to releasing it).
+    utf32_char code = csKeyEventHelper::GetCookedCode(&ev);
+    if (code == CSKEY_ESC)
+    {
+      // The user pressed escape to exit the application.
+      // The proper way to quit a Crystal Space application
+      // is by broadcasting a csevQuit event. That will cause the
+      // main runloop to stop. To do that we get the event queue from
+      // the object registry and then post the event.
+      csRef<iEventQueue> q = 
+        csQueryRegistry<iEventQueue> (GetObjectRegistry());
+      if (q.IsValid()) q->GetEventOutlet()->Broadcast(
+      	csevQuit(GetObjectRegistry()));
+    }
+
+    // if the user hit the t key, then toggle between triangulated and
+    // non-triangulated mode
+    else if (code == 't')
+    {
+      triangulate = !triangulate;
+    }
+  }
+  return false;
+}
+
+bool Tri3DTest::OnInitialize(int /*argc*/, char* /*argv*/ [])
+{
+    // RequestPlugins() will load all plugins we specify. In addition
+  // it will also check if there are plugins that need to be loaded
+  // from the config system (both the application config and CS or
+  // global configs). In addition it also supports specifying plugins
+  // on the commandline.
   if (!csInitializer::RequestPlugins(GetObjectRegistry(),
     CS_REQUEST_VFS,
     CS_REQUEST_OPENGL3D,
@@ -41,159 +197,265 @@ bool Tri3DTest::OnInitialize(int argc, char* argv[])
     CS_REQUEST_LEVELLOADER,
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
-//		CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
-		CS_REQUEST_END))
-		return ReportError("Failed to initialize plugins!");
+    CS_REQUEST_END))
+    return ReportError("Failed to initialize plugins!");
 
-	object_reg = GetObjectRegistry();
+  // "Warm up" the event handler so it can interact with the world
+  csBaseEventHandler::Initialize(GetObjectRegistry());
 
-  csBaseEventHandler::Initialize(object_reg);
-  if (!RegisterQueue(object_reg, csevAllEvents(GetObjectRegistry())))
+  // Now we need to register the event handler for our application.
+  // Crystal Space is fully event-driven. Everything (except for this
+  // initialization) happens in an event.
+  // Rather than simply handling all events, we subscribe to the
+  // particular events we're interested in.
+  csEventID events[] = {
+    csevFrame (GetObjectRegistry()),
+    csevKeyboardEvent (GetObjectRegistry()),
+    CS_EVENTLIST_END
+  };
+  if (!RegisterQueue(GetObjectRegistry(), events))
     return ReportError("Failed to set up event handler!");
 
-		plugManager = csQueryRegistry<iPluginManager> (object_reg);
-	
-		g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
-		if (!g3d) return ReportError("Failed to locate 3D renderer!");
-
-		engine = csQueryRegistry<iEngine> (GetObjectRegistry());
-		if (!engine) return ReportError("Failed to locate 3D engine!");
-
-		report = csQueryRegistry<iReporter> (GetObjectRegistry());
-		if (!report) return ReportError("Unable to load reporter!");
-
+  // Report success
   return true;
+}
+
+void Tri3DTest::OnExit()
+{
+  // Shut down the event handlers we spawned earlier.
+  drawer.Invalidate();
+  printer.Invalidate();
 }
 
 bool Tri3DTest::Application()
 {
-	if (!OpenApplication(GetObjectRegistry()))
-		return ReportError("Error: Unable to fetch Object Registry!");
+  // Open the main system. This will open all the previously loaded plug-ins.
+  // i.e. all windows will be opened.
+  if (!OpenApplication(GetObjectRegistry()))
+    return ReportError("Error opening system!");
 
-	/* csPlane3 testing code
-
-	csVector3 norm(1, 0, 0);
-
-	csPlane3 myPlane(norm);
-
-	csVector3 p (3, 4, 16);
-	csVector3 newVector = myPlane.ProjectOnto(p);
-
-	ReportWarning("Projected vector: (%f, %f, %f)", newVector.x, newVector.y, newVector.z);
-	
-	End of csPlane3 testing code */
-
-	/* Old Testing Code -- Will be reinserted later */
-	csContour3 polygon;
-
-	csVector3 point1(1, 1, 1);
-	csVector3 point2(1, 2, 1);
-	csVector3 point3(1, 3, 1);
-	csVector3 point4 (1, 4, 1);
-
-	polygon.Insert(0, point1);
-	polygon.Insert(1, point2);
-	polygon.Insert(2, point3);
-	polygon.Insert(3, point4);
-
-	/*
-	csVector3 point1(0, 10.0, 10.0);
-	csVector3 point2(0, -10.0, 10.0);
-	csVector3 point3(0.0, -10.0, -10.0);
-	csVector3 point4(20.0, 5.0, -10.0);
-	csVector3 point5(10.0, 0.0, -10.0);
-	csVector3 point6(0, 10.0, -10.0);
-
-	polygon.Insert(0, point1);
-	polygon.Insert(1, point2);
-	polygon.Insert(2, point3);
-	polygon.Insert(3, point4);
-	polygon.Insert(4, point5);
-	polygon.Insert(5, point6);
-	*/
-
-	csContour3 result_vertices;
-	csTriangleMesh result;
-
-	Triangulate3D::Process(polygon, result, report);
-	/* End of Old testing code */
-
-	/* Testing Code for new addition to csTriangleMesh: AddTriangleMesh()
-
-	csTriangleMesh mesh1, mesh2;
-	csVector3 *verts1, *verts2;
-	csTriangle *tris1, *tris2;
-
-	mesh1.AddVertex(csVector3(0.0, 0.0, 0.0));
-	mesh1.AddVertex(csVector3(1.0, 1.0, 1.0));
-	mesh1.AddVertex(csVector3(2.0, 2.0, 2.0));
-	mesh1.AddTriangle(0, 1, 2);
-
-	verts1 = mesh1.GetVertices();
-	tris1 = mesh1.GetTriangles();
-
-	mesh2.AddVertex(csVector3(11.0, 11.0, 11.0));
-	mesh2.AddVertex(csVector3(15.0, 15.0, 15.0));
-	mesh2.AddVertex(csVector3(20.0, 20.0, 20.0));
-	mesh2.AddTriangle(0, 1, 2);
-	
-	verts2 = mesh2.GetVertices();
-	tris2 = mesh2.GetTriangles();
-
-	ReportWarning("Mesh 1 contains %d vertices.  Mesh 2 contains %d vertices", mesh1.GetVertexCount(), mesh2.GetVertexCount());
-	ReportWarning("Mesh 1 contains %d triangles.  Mesh 2 contains %d triangles", mesh1.GetTriangleCount(), mesh2.GetTriangleCount());
-
-	for (int i = 0; i < (int)mesh1.GetVertexCount(); i++)
-	{
-		ReportWarning("Mesh 1 vertex number %d: (%f, %f, %f)", i, verts1[i].x, verts1[i].y, verts1[i].z);
-	}
-	
-	for (int i = 0; i < (int)mesh2.GetVertexCount(); i++)
-	{
-		ReportWarning("Mesh 2 vertex number %d: (%f, %f, %f)", i, verts2[i].x, verts2[i].y, verts2[i].z);
-	}
-
-	for (int i = 0; i < (int)mesh1.GetTriangleCount(); i++)
-	{
-		ReportWarning("Mesh 1 Triangle number %d connects vertices %d, %d, and %d", i, tris1[i].a, tris1[i].b, tris1[i].c);
-	}
-
-	for (int i = 0; i < (int)mesh2.GetTriangleCount(); i++)
-	{
-		ReportWarning("Mesh 2 Triangle number %d connects vertices %d, %d, and %d", i, tris2[i].a, tris2[i].b, tris2[i].c);
-	}
-
-	ReportWarning("Merging mesh 1 into mesh2...");
-
-	mesh2.AddTriangleMesh(mesh1);
-	
-	for (int i = 0; i < (int)mesh2.GetVertexCount(); i++)
-	{
-		ReportWarning("Mesh 2 vertex number %d: (%f, %f, %f)", i, verts2[i].x, verts2[i].y, verts2[i].z);
-	}
-
-	for (int i = 0; i < (int)mesh2.GetTriangleCount(); i++)
-	{
-		ReportWarning("Mesh 2 Triangle number %d connects vertices %d, %d, and %d", i, tris2[i].a, tris2[i].b, tris2[i].c);
-	}
-	*/
-
-	view.AttachNew(new csView (engine, g3d));
-  iGraphics2D* g2d = g3d->GetDriver2D ();
-  view->SetRectangle(0, 0, g2d->GetWidth(), g2d->GetHeight ());
-
-	//csTriangle tri = result.GetTriangle(0);
-
-	//size_t numTris = result.GetTriangleCount();
-
-	//ReportWarning("Number of Triangles: %d", numTris);
-
-	Run();
+  if (SetupModules())
+  {
+    // This calls the default runloop. This will basically just keep
+    // broadcasting process events to keep the game going.
+    Run();
+  }
 
   return true;
 }
 
-int main(int argc, char** argv)
+bool Tri3DTest::SetupModules ()
 {
-	return csApplicationRunner<Tri3DTest>::Run (argc, argv);
+  // Now get the pointer to various modules we need. We fetch them
+  // from the object registry. The RequestPlugins() call we did earlier
+  // registered all loaded plugins with the object registry.
+  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
+  if (!g3d) return ReportError("Failed to locate 3D renderer!");
+
+  engine = csQueryRegistry<iEngine> (GetObjectRegistry());
+  if (!engine) return ReportError("Failed to locate 3D engine!");
+
+  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
+  if (!vc) return ReportError("Failed to locate Virtual Clock!");
+
+  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry());
+  if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
+
+  loader = csQueryRegistry<iLoader> (GetObjectRegistry());
+  if (!loader) return ReportError("Failed to locate Loader!");
+\
+  // We need a View to the virtual world.
+  view.AttachNew(new csView (engine, g3d));
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  // We use the full window to draw the world.
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
+  // Setup our basic sector
+  room = engine->CreateSector("room");
+
+  // First disable the lighting cache. Our app is simple enough
+  // not to need this.
+  //engine->SetLightingCacheMode (0);
+
+  // Now we need light to see something.
+  //csRef<iLight> light;
+  //iLightList* ll = room->GetLights ();
+
+  //light = engine->CreateLight(0, csVector3(-3, 5, 0), 10, csColor(2, 0, 0));
+  //ll->Add (light);
+
+  // Let the engine prepare all lightmaps for use and also free all images 
+  // that were loaded for the texture manager.
+  engine->Prepare ();
+  rm = engine->GetRenderManager();
+
+  // these are used store the current orientation of the camera
+  rotY = rotX = 0;
+  
+  // Now we need to position the camera in our world.
+  view->GetCamera ()->SetSector (room);
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, 0));
+
+  // We use some other "helper" event handlers to handle 
+  // pushing our work into the 3D engine and rendering it
+  // to the screen.
+  //drawer.AttachNew(new FrameBegin3DDraw (GetObjectRegistry (), view));
+  printer.AttachNew(new FramePrinter (GetObjectRegistry ()));
+
+  // create our simple box
+  CreateBox(untrimesh);
+
+  return true;
+}
+
+bool Tri3DTest::CreateBox(csContour3& mesh)
+{
+  mesh.DeleteAll();
+
+  // setup our untriangulated mesh
+  mesh.Push(csVector3(-3, 0, -3));
+  mesh.Push(csVector3(-3, 0, 3));
+  mesh.Push(csVector3(0, 0, 5));
+  mesh.Push(csVector3(3, 0, 3));
+  mesh.Push(csVector3(3, 0, -3));
+
+  // triangulate the mesh
+  CS::Geometry::Triangulate3D::Process(mesh, tm);
+
+  /*
+  // setup our triangulated mesh
+  tm.Clear();
+
+  // origin for our scene is at (0, 5, -3)
+
+  // create a square in front
+  // verts are: 
+  // (-3, 8, 0) - upper left
+  csVector3 ul(-3, -3, 10);
+  tm.AddVertex(ul);
+
+  // (3, 8, 0)  - upper right
+  csVector3 ur(-3, 3, 10);
+  tm.AddVertex(ur);
+
+  // (-3, 2, 0) - lower left
+  csVector3 ll(3, -3, 10);
+  tm.AddVertex(ll);
+
+  // (3, 2, 0)  - lower right
+  csVector3 lr(3, 3, 10);
+  tm.AddVertex(lr);
+
+  // now add the triangles to complete it
+  tm.AddTriangle(0, 1, 2);
+  tm.AddTriangle(2, 1, 3);
+  */
+
+  return true;
+}
+
+/*-------------------------------------------------------------------------*
+ * Main function
+ *-------------------------------------------------------------------------*/
+int main (int argc, char* argv[])
+{
+  /* Runs the application. 
+   *
+   * csApplicationRunner<> is a small wrapper to support "restartable" 
+   * applications (ie where CS needs to be completely shut down and loaded 
+   * again). Simple1 does not use that functionality itself, however, it
+   * allows you to later use "Simple.Restart();" and it'll just work.
+   */
+  return csApplicationRunner<Tri3DTest>::Run (argc, argv);
+}
+
+csSimpleRenderMesh Tri3DTest::ConvertToRenderMesh(const csTriangleMesh& t)
+{
+  csVector3* verts = NULL;
+  csVector3* tmVerts;
+  csVector4* cols = NULL;
+  csSimpleRenderMesh rendMesh;
+  rendMesh.vertexCount = 0;
+  rendMesh.vertices = NULL;
+  rendMesh.colors = NULL;
+
+  if (triangulate)
+  {
+    verts = new csVector3[tm.GetTriangleCount() * 3];
+    tmVerts = tm.GetVertices();
+
+    csArray<csVector4> availableColors;
+    availableColors.Push(csVector4(1.0, 0.0, 0.0, 1.0)); // red
+    availableColors.Push(csVector4(1.0, 0.5, 0.0, 1.0)); // orange
+    availableColors.Push(csVector4(1.0, 1.0, 0.0, 1.0)); // yellow
+    availableColors.Push(csVector4(0.0, 1.0, 0.0, 1.0)); // green
+    availableColors.Push(csVector4(0.0, 0.0, 1.0, 1.0)); // blue
+    availableColors.Push(csVector4(0.4, 0.0, 1.0, 1.0)); // indigo
+    availableColors.Push(csVector4(1.0, 0.0, 1.0, 1.0)); // violet
+
+    int numAvabColors = (int)availableColors.GetSize();
+
+    // also color each triangle differently
+    cols = new csVector4[3*tm.GetTriangleCount()];
+
+    for (size_t i = 0; i < tm.GetTriangleCount(); i++)
+    {
+      csTriangle curTri = tm.GetTriangle((int)i);
+
+      int colorNumber = ((int)i)%numAvabColors;
+      verts[3*i] = tmVerts[curTri.a];
+      verts[3*i + 1] = tmVerts[curTri.b];
+      verts[3*i + 2] = tmVerts[curTri.c];
+
+      cols[3*i] = availableColors[colorNumber];
+      cols[3*i + 1] = availableColors[colorNumber];
+      cols[3*i + 2] = availableColors[colorNumber];
+    }
+
+    rendMesh.vertexCount = (uint)(3 * tm.GetTriangleCount());
+    rendMesh.vertices = verts;
+
+    rendMesh.colors = cols;
+
+    rendMesh.meshtype = CS_MESHTYPE_TRIANGLES;
+    csAlphaMode alf;
+    alf.alphaType = alf.alphaSmooth;
+    alf.autoAlphaMode = false;
+    rendMesh.alphaType = alf;
+  }
+
+  return rendMesh;
+}
+
+csSimpleRenderMesh Tri3DTest::ConvertToRenderMesh(const csContour3& c)
+{
+  csVector3* verts = NULL;
+  csVector4* cols = NULL;
+
+  csSimpleRenderMesh rendMesh;
+  rendMesh.vertexCount = 0;
+  rendMesh.vertices = NULL;
+  rendMesh.colors = NULL;
+
+  verts = new csVector3[c.GetSize()];
+  cols = new csVector4[c.GetSize()];
+
+  for (size_t i = 0; i < c.GetSize(); i++)
+  {
+    verts[i].Set(c[i]);
+    cols[i].Set(1.0, 0.0, 0.0, 1.0);
+  }
+
+  rendMesh.vertexCount = (uint)(c.GetSize());
+  rendMesh.vertices = verts;
+  rendMesh.colors = cols;
+
+  // ok, so this doesn't exactly work, since if we have a pentagon, it's not a quad
+  rendMesh.meshtype = CS_MESHTYPE_QUADS;
+  csAlphaMode alf;
+  alf.alphaType = alf.alphaSmooth;
+  alf.autoAlphaMode = false;
+  rendMesh.alphaType = alf;
+
+  return rendMesh;
 }

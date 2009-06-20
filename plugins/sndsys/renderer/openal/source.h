@@ -86,7 +86,7 @@ public:
 protected:
   /// Retrieve the OpenAL source identifier for this source
   inline ALuint GetSource() { return m_Source; };
-  /// Retrieve the OpenAL source identifier for this source
+  /// Retrieve the OpenAL renderer this source is attached to
   inline csSndSysRendererOpenAL *GetRenderer() { return m_Renderer; };
 
 private:
@@ -207,7 +207,7 @@ public:
    * particular direction.
    *
    * Directional sounds have two cones, with the apexs at the sound source,
-   * termed the inner cone and the outer cone. When the listener is with the
+   * termed the inner cone and the outer cone. When the listener is within the
    * inner cone, the sound is played at a normal volume. Outside the outer cone
    * the sound is played at the outer gaim times normal volume. Between the
    * inner and outer cones, the volume is interpolated.
@@ -215,8 +215,8 @@ public:
    * This value is expressed in radians and describes the half-angle of the
    * inner cone.
    *
-   * @note Unlike iSndSysSource3DDirectionalSimple setting the to 0.0f will not
-   *       make an omni directional source
+   * @note Unlike iSndSysSource3DDirectionalSimple setting the half-angle to
+   *       0.0f will not make an omni directional source
    */
   virtual void SetDirectionalRadiationInnerCone(float rad);
 

@@ -445,14 +445,15 @@ case `uname -m` in
     i386 | i486 | i586 | i686 )
         arch_ok=true
         arch_ptr_size=4
+        searchpath=( "/usr/lib" "/usr/local/lib" "/lib" `pwd` )
         ;;
     x86_64)
         arch_ok=true
         arch_ptr_size=8
+        searchpath=( "/usr/lib" "/usr/local/lib" "/lib" "/usr/lib64" "/usr/local/lib64" "/lib64" `pwd` )
         ;;                                   
 esac
 
-searchpath=( "/usr/lib" "/usr/local/lib" "/lib" `pwd` )
 multilinklist=( )
 relaylist=( )
 

@@ -429,47 +429,30 @@ class PerspectiveOutlet2D
 protected:
   CS::Math::Matrix4 camProj;
   csPoly2D& dest;
-  float iw, ih;
+  float hw, hh;
   
-  static void Perspective (const csVector3& v, csVector2& p,
-    const CS::Math::Matrix4& camProj)
-  {
-    csVector4 v_proj (camProj * csVector4 (v, 1));
-    p.x = v_proj.x / v_proj.w;
-    p.y = v_proj.y / v_proj.w;
-  }
   static void PerspectiveScreen (const csVector3& v, csVector2& p,
-    const CS::Math::Matrix4& camProj, float iw, float ih)
+    const CS::Math::Matrix4& camProj, float hw, float hh)
   {
     csVector4 v_proj (camProj * csVector4 (v, 1));
-    p.x = (v_proj.x / v_proj.w + 1.0f) / iw;
-    p.y = (v_proj.y / v_proj.w + 1.0f) / ih;
+    p.x = (v_proj.x / v_proj.w + 1.0f) * hw;
+    p.y = (v_proj.y / v_proj.w + 1.0f) * hh;
   }
 
 public:
   PerspectiveOutlet2D (const CS::Math::Matrix4& camProj,
     csPoly2D& dest, int viewWidth, int viewHeight)
-    : camProj (camProj), dest (dest)
+    : camProj (camProj), dest (dest), hw (viewWidth*0.5f),
+      hh (viewHeight*0.5f)
   {
-    if (viewWidth > 0 && viewHeight > 0)
-    {
-      iw = 2.0f/viewWidth;
-      ih = 2.0f/viewHeight;
-    }
-    else
-    {
-      iw = ih = 0.0f;
-    }
+    CS_ASSERT(viewWidth > 0 && viewHeight > 0);
   }
 
   void MakeEmpty () { dest.MakeEmpty(); }
   void Add (const csVector3 &v)
   {
     csVector2 p;
-    if (iw != 0.0f)
-      PerspectiveScreen (v, p, camProj, iw, ih);
-    else
-      Perspective (v, p, camProj);
+    PerspectiveScreen (v, p, camProj, hw, hh);
     dest.AddVertex (p);
   }
   void AddVertex (float x, float y)
@@ -479,10 +462,7 @@ public:
   const csVector2* GetLast() { return dest.GetLast(); }
   void Perspective (const csVector3& v, csVector2& p)
   {
-    if (iw != 0.0f)
-      PerspectiveScreen (v, p, camProj, iw, ih);
-    else
-      Perspective (v, p, camProj);
+    PerspectiveScreen (v, p, camProj, hw, hh);
   }
   bool ClipAgainst (iClipper2D* clipper)
   {
@@ -1106,7 +1086,6 @@ class PerspectiveOutlet2D3D : public PerspectiveOutlet2D
 private:
   csPoly3D& dest3D;
   iCamera* cam;
-  int viewWidth, viewHeight;
   
   static csVector3 LerpPC (const csVector3& v1, const csVector3& v2, float t)
   {
@@ -1120,7 +1099,7 @@ public:
   PerspectiveOutlet2D3D (iCamera* cam, csPoly2D& dest2D, csPoly3D& dest3D,
     int viewWidth, int viewHeight)
     : PerspectiveOutlet2D (cam->GetProjectionMatrix(), dest2D, viewWidth, viewHeight),
-    dest3D (dest3D), cam (cam), viewWidth (viewWidth), viewHeight (viewHeight) { }
+    dest3D (dest3D), cam (cam) { }
 
   void MakeEmpty () 
   { 
@@ -1135,8 +1114,9 @@ public:
   void AddVertex (float x, float y)
   {
     PerspectiveOutlet2D::AddVertex (x, y);
-    csVector4 p (x, y, 1.0f/Z_NEAR, 1);
+    csVector4 p (x/hw-1, y/hh-1, 1.0f, 1.0f);
     csVector4 p3d (cam->GetInvProjectionMatrix() * p);
+    p3d *= p3d.w;
     dest3D.AddVertex (csVector3 (p3d[0], p3d[1], p3d[2]));
   }
   bool ClipAgainst (iClipper2D* clipper)

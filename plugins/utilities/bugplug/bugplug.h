@@ -90,7 +90,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(BugPlug)
 #define DEBUGCMD_DUMPENG	1000	// Dump structure of world
 #define DEBUGCMD_DUMPSEC	1001	// Dump structure of current sector
 #define DEBUGCMD_EDGES		1002	// Enable edge drawing
-#define DEBUGCMD_CLEAR		1003	// Clear screen every frame
 #define DEBUGCMD_CACHEDUMP	1004	// Dump texture cache
 #define DEBUGCMD_CACHECLEAR	1005	// Clear texture cache
 #define DEBUGCMD_TEXTURE	1006	// Enable texture mapping
@@ -263,9 +262,6 @@ private:
   int fps_frame_count;
   int fps_tottime;
   float fps_cur;
-
-  // For 'clear' command.
-  bool do_clear;
 
   // For profiling
   bool do_profiler_reset;

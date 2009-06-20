@@ -60,7 +60,7 @@ struct iPluginIterator : public virtual iBase
  */
 struct iPluginManager : public virtual iBase
 {
-  SCF_INTERFACE(iPluginManager, 4, 0, 1);
+  SCF_INTERFACE(iPluginManager, 4, 1, 0);
   
   /**
    * LoadPluginInstance flags.
@@ -73,7 +73,9 @@ struct iPluginManager : public virtual iBase
     /// Report loading errors
     lpiReportErrors = 2,
     /// Load dependent plugins
-    lpiLoadDependencies = 4
+    lpiLoadDependencies = 4,
+    /// Load only a single instance
+    lpiLoadSingleInstance = 8
   };
   
   /**
@@ -100,7 +102,7 @@ struct iPluginManager : public virtual iBase
     if (init) flags |= lpiInitialize;
     if (report) flags |= lpiReportErrors;
     csRef<iComponent> comp (LoadPluginInstance (classID, flags));
-    comp->IncRef();
+    if (comp) comp->IncRef();
     return (iBase*)comp;
   }
 
@@ -118,7 +120,7 @@ struct iPluginManager : public virtual iBase
   inline iBase* QueryPlugin (const char *iInterface, int iVersion)
   {
     csRef<iComponent> comp (QueryPluginInstance (iInterface, iVersion));
-    comp->IncRef();
+    if (comp) comp->IncRef();
     return (iBase*)comp;
   }
   
@@ -134,7 +136,7 @@ struct iPluginManager : public virtual iBase
   	const char *iInterface, int iVersion)
   {
     csRef<iComponent> comp (QueryPluginInstance (classID, iInterface, iVersion));
-    comp->IncRef();
+    if (comp) comp->IncRef();
     return (iBase*)comp;
   }
   
@@ -239,12 +241,13 @@ inline csPtr<Interface> csQueryPluginClass (iPluginManager *mgr,
 template<class Interface>
 inline csPtr<Interface> csLoadPlugin (iPluginManager *mgr,
                                       const char* ClassID,
-				      bool report = true)
+                                      bool report = true,
+                                      bool singleInstance = false)
 {
   csRef<iComponent> base;
-  uint flags =
-    iPluginManager::lpiInitialize | iPluginManager::lpiLoadDependencies;
+  uint flags = iPluginManager::lpiInitialize | iPluginManager::lpiLoadDependencies;
   if (report) flags |= iPluginManager::lpiReportErrors;
+  if (singleInstance) flags |= iPluginManager::lpiLoadSingleInstance;
   base = mgr->LoadPluginInstance (ClassID, flags);
   return scfQueryInterfaceSafe<Interface> (base);
 }
@@ -258,7 +261,7 @@ inline csPtr<Interface> csLoadPlugin (iPluginManager *mgr,
 template<class Interface>
 inline csPtr<Interface> csLoadPlugin (iObjectRegistry* object_reg,
                                       const char* ClassID,
-				      bool report = true)
+                                      bool report = true)
 {
   csRef<iPluginManager> mgr = csQueryRegistry<iPluginManager> (object_reg);
   if (!mgr) return 0;
@@ -274,12 +277,12 @@ inline csPtr<Interface> csLoadPlugin (iObjectRegistry* object_reg,
  */
 template<class Interface>
 inline csPtr<Interface> csLoadPluginCheck (iPluginManager *mgr,
-                                      const char* ClassID,
-				      bool report = true)
+                                           const char* ClassID,
+                                           bool report = true)
 {
   csRef<Interface> i = csQueryPluginClass<Interface> (mgr, ClassID);
   if (i) return (csPtr<Interface>) i;
-  i = csLoadPlugin<Interface> (mgr, ClassID, report);
+  i = csLoadPlugin<Interface> (mgr, ClassID, report, true);
   if (!i) return 0;
   return (csPtr<Interface>) i;
 }

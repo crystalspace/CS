@@ -18503,6 +18503,91 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csParticleParameterSet ##############
+
+package cspace::csParticleParameterSet;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_mass_get = *cspacec::csParticleParameterSet_mass_get;
+*swig_mass_set = *cspacec::csParticleParameterSet_mass_set;
+*swig_linearVelocity_get = *cspacec::csParticleParameterSet_linearVelocity_get;
+*swig_linearVelocity_set = *cspacec::csParticleParameterSet_linearVelocity_set;
+*swig_angularVelocity_get = *cspacec::csParticleParameterSet_angularVelocity_get;
+*swig_angularVelocity_set = *cspacec::csParticleParameterSet_angularVelocity_set;
+*swig_color_get = *cspacec::csParticleParameterSet_color_get;
+*swig_color_set = *cspacec::csParticleParameterSet_color_set;
+*swig_particleSize_get = *cspacec::csParticleParameterSet_particleSize_get;
+*swig_particleSize_set = *cspacec::csParticleParameterSet_particleSize_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csParticleParameterSet(@_);
+    bless $self, $pkg if defined($self);
+}
+
+*Clear = *cspacec::csParticleParameterSet_Clear;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csParticleParameterSet($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iParticleBuiltinEffectorLinear ##############
+
+package cspace::iParticleBuiltinEffectorLinear;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iParticleEffector cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetMask = *cspacec::iParticleBuiltinEffectorLinear_SetMask;
+*GetMask = *cspacec::iParticleBuiltinEffectorLinear_GetMask;
+*AddParameterSet = *cspacec::iParticleBuiltinEffectorLinear_AddParameterSet;
+*SetParameterSet = *cspacec::iParticleBuiltinEffectorLinear_SetParameterSet;
+*GetParameterSet = *cspacec::iParticleBuiltinEffectorLinear_GetParameterSet;
+*GetParameterSetCount = *cspacec::iParticleBuiltinEffectorLinear_GetParameterSetCount;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iParticleBuiltinEffectorLinear($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iParticleBuiltinEffectorFactory ##############
 
 package cspace::iParticleBuiltinEffectorFactory;
@@ -18513,6 +18598,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *CreateForce = *cspacec::iParticleBuiltinEffectorFactory_CreateForce;
 *CreateLinColor = *cspacec::iParticleBuiltinEffectorFactory_CreateLinColor;
 *CreateVelocityField = *cspacec::iParticleBuiltinEffectorFactory_CreateVelocityField;
+*CreateLinear = *cspacec::iParticleBuiltinEffectorFactory_CreateLinear;
 *scfGetVersion = *cspacec::iParticleBuiltinEffectorFactory_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -22170,6 +22256,50 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::SimpleStaticLighter ##############
+
+package cspace::SimpleStaticLighter;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*CS_SHADOW_NONE = *cspacec::SimpleStaticLighter_CS_SHADOW_NONE;
+*CS_SHADOW_CENTER = *cspacec::SimpleStaticLighter_CS_SHADOW_CENTER;
+*CS_SHADOW_BOUNDINGBOX = *cspacec::SimpleStaticLighter_CS_SHADOW_BOUNDINGBOX;
+*CS_SHADOW_FULL = *cspacec::SimpleStaticLighter_CS_SHADOW_FULL;
+*ConstantColor = *cspacec::SimpleStaticLighter_ConstantColor;
+*ShineLight = *cspacec::SimpleStaticLighter_ShineLight;
+*ShineLights = *cspacec::SimpleStaticLighter_ShineLights;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_SimpleStaticLighter(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_SimpleStaticLighter($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 # ------- CONSTANT STUBS -------
 
 package cspace;
@@ -22671,6 +22801,12 @@ sub CS_PARTICLE_BUILTIN_VOLUME () { $cspacec::CS_PARTICLE_BUILTIN_VOLUME }
 sub CS_PARTICLE_BUILTIN_SURFACE () { $cspacec::CS_PARTICLE_BUILTIN_SURFACE }
 sub CS_PARTICLE_BUILTIN_SPIRAL () { $cspacec::CS_PARTICLE_BUILTIN_SPIRAL }
 sub CS_PARTICLE_BUILTIN_RADIALPOINT () { $cspacec::CS_PARTICLE_BUILTIN_RADIALPOINT }
+sub CS_PARTICLE_MASK_MASS () { $cspacec::CS_PARTICLE_MASK_MASS }
+sub CS_PARTICLE_MASK_LINEARVELOCITY () { $cspacec::CS_PARTICLE_MASK_LINEARVELOCITY }
+sub CS_PARTICLE_MASK_ANGULARVELOCITY () { $cspacec::CS_PARTICLE_MASK_ANGULARVELOCITY }
+sub CS_PARTICLE_MASK_COLOR () { $cspacec::CS_PARTICLE_MASK_COLOR }
+sub CS_PARTICLE_MASK_PARTICLESIZE () { $cspacec::CS_PARTICLE_MASK_PARTICLESIZE }
+sub CS_PARTICLE_MASK_ALL () { $cspacec::CS_PARTICLE_MASK_ALL }
 sub CS_LIGHT_NOSHADOWS () { $cspacec::CS_LIGHT_NOSHADOWS }
 sub CS_LIGHT_ACTIVEHALO () { $cspacec::CS_LIGHT_ACTIVEHALO }
 sub CS_LIGHT_DYNAMICTYPE_STATIC () { $cspacec::CS_LIGHT_DYNAMICTYPE_STATIC }

@@ -72,6 +72,9 @@ protected:
 
   /// Ogg Vorbis audio loader interface
   csRef<iSndSysLoader> m_pOggLoader;
+
+  /// Speex audio loader interface
+  csRef<iSndSysLoader> m_pSpeexLoader;
 };
 
 #endif // #ifndef SNDSYS_GENLOADER_H

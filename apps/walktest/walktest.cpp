@@ -859,7 +859,7 @@ void WalkTest::InitCollDet (iEngine* engine, iCollection* collection)
 void WalkTest::LoadLibraryData (iCollection* collection)
 {
   LevelLoader->LoadTexture ("cslogo2", "/lib/std/cslogo2.png",
-    CS_TEXTURE_2D, 0, true, true, true, collection);
+    CS_TEXTURE_2D, 0, true, true, true, csRef<iCollection>(collection));
 }
 
 bool WalkTest::Create2DSprites ()

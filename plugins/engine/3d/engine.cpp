@@ -45,6 +45,7 @@
 #include "imap/loader.h"
 #include "imap/reader.h"
 #include "iutil/cfgmgr.h"
+#include "iutil/cmdline.h"
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
 #include "iutil/event.h"
@@ -606,16 +607,13 @@ THREADED_CALLABLE_IMPL2(csEngine, SyncEngineLists, csRef<iThreadedLoader> loader
     {
       iTextureWrapper* txt = loaderTextures->Next();
       textures->Add(txt);
-      if(tman->GetThreadCount() > 1)
-      {
-        newTextures.Push(txt);
-      }
+      newTextures.Push(txt);
     }
   }
 
-  if(tman->GetThreadCount() > 1)
+  if(!runNow)
   {
-    if(!runNow)
+    if(precache && tman->GetThreadCount() > 1)
     {
       // Precache a texture.
       if(!newTextures.IsEmpty())
@@ -626,10 +624,10 @@ THREADED_CALLABLE_IMPL2(csEngine, SyncEngineLists, csRef<iThreadedLoader> loader
           tex->GetTextureHandle()->Precache();
         }
       }
-
-      // Schedule another run.
-      SyncEngineLists(loader, false);
     }
+  
+    // Schedule another run.
+    SyncEngineLists(loader, false);
   }
 
   return true;
@@ -768,6 +766,9 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
   csLightManager* light_mgr = new csLightManager ();
   objectRegistry->Register (light_mgr, "iLightManager");
   light_mgr->DecRef ();
+
+  csRef<iCommandLineParser> cmdline = csQueryRegistry<iCommandLineParser> (objectRegistry);
+  precache = cmdline->GetBoolOption ("precache", true);
 
   return true;
 }
@@ -1268,20 +1269,12 @@ void csEngine::PrecacheDraw (iCollection* collection)
       s->PrecacheDraw ();
   }
 
-  csRef<iThreadedLoader> tloader = csQueryRegistry<iThreadedLoader>(objectRegistry);
-  if(!tloader.IsValid() || tman->GetThreadCount() == 1)
+  while(!newTextures.IsEmpty())
   {
-    size_t i;
-    for (i = 0 ; i < textures->GetSize () ; i++)
+    csRef<iTextureWrapper> tex = newTextures.Pop();
+    if(tex->GetTextureHandle() && (!collection || collection->IsParentOf(tex->QueryObject())))
     {
-      iTextureWrapper* txt = textures->Get ((int)i);
-      if (txt->GetTextureHandle ())
-      {
-        if (!collection || collection->IsParentOf(txt->QueryObject ()))
-        {
-          txt->GetTextureHandle ()->Precache ();
-        }
-      }
+      tex->GetTextureHandle()->Precache();
     }
   }
 }

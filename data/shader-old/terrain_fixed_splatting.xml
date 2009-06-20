@@ -111,7 +111,7 @@
             <colorsource num="0" source="previous layer" modifier="color"/>
             <colorsource num="1" source="texture" modifier="alpha"/>
             <coloroperation operation="replace"/>
-	    <alphasource num="0" source="texture" modifier="replace"/>
+	    <alphasource num="0" source="texture" modifier="alpha"/>
             <alphaoperation operation="replace"/>
           </layer>
         </fixedfp>

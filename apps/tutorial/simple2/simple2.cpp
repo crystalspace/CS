@@ -15,7 +15,6 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#include "cssysdef.h"
 
 #include "simple2.h"
 
@@ -39,7 +38,7 @@ void Simple::Frame ()
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.06 * 20);
 
-  iCamera* c = view->GetCamera();
+  iCamera* c = view->GetCamera ();
 
   if (kbd->GetKeyState (CSKEY_SHIFT))
   {
@@ -84,7 +83,7 @@ void Simple::Frame ()
   // rotation matrix.  The rotations are applied in right to left
   // order .
   csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
-  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
+  csOrthoTransform ot (rot, c->GetTransform ().GetOrigin ());
   c->SetTransform (ot);
 
   // Tell 3D driver we're going to display 3D things.
@@ -95,14 +94,14 @@ void Simple::Frame ()
   view->Draw ();
 }
 
-bool Simple::OnKeyboard(iEvent& ev)
+bool Simple::OnKeyboard (iEvent& ev)
 {
   // We got a keyboard event.
-  csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
+  csKeyEventType eventtype = csKeyEventHelper::GetEventType (&ev);
   if (eventtype == csKeyEventTypeDown)
   {
     // The user pressed a key (as opposed to releasing it).
-    utf32_char code = csKeyEventHelper::GetCookedCode(&ev);
+    utf32_char code = csKeyEventHelper::GetCookedCode (&ev);
     if (code == CSKEY_ESC)
     {
       // The user pressed escape to exit the application.
@@ -111,22 +110,22 @@ bool Simple::OnKeyboard(iEvent& ev)
       // main runloop to stop. To do that we get the event queue from
       // the object registry and then post the event.
       csRef<iEventQueue> q = 
-        csQueryRegistry<iEventQueue> (GetObjectRegistry());
-      if (q.IsValid()) q->GetEventOutlet()->Broadcast(
-	  csevQuit(GetObjectRegistry()));
+        csQueryRegistry<iEventQueue> (GetObjectRegistry ());
+      if (q.IsValid ()) q->GetEventOutlet ()->Broadcast (
+	    csevQuit (GetObjectRegistry ()));
     }
   }
   return false;
 }
 
-bool Simple::OnInitialize(int /*argc*/, char* /*argv*/ [])
+bool Simple::OnInitialize (int /*argc*/, char* /*argv*/ [])
 {
   // RequestPlugins() will load all plugins we specify. In addition
   // it will also check if there are plugins that need to be loaded
   // from the config system (both the application config and CS or
   // global configs). In addition it also supports specifying plugins
   // on the commandline.
-  if (!csInitializer::RequestPlugins(GetObjectRegistry(),
+  if (!csInitializer::RequestPlugins (GetObjectRegistry (),
     CS_REQUEST_VFS,
     CS_REQUEST_OPENGL3D,
     CS_REQUEST_ENGINE,
@@ -136,72 +135,73 @@ bool Simple::OnInitialize(int /*argc*/, char* /*argv*/ [])
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
     CS_REQUEST_END))
-    return ReportError("Failed to initialize plugins!");
+    return ReportError ("Failed to initialize plugins!");
 
-  csBaseEventHandler::Initialize(GetObjectRegistry());
+  csBaseEventHandler::Initialize (GetObjectRegistry ());
 
   // Now we need to setup an event handler for our application.
   // Crystal Space is fully event-driven. Everything (except for this
   // initialization) happens in an event.
-  if (!RegisterQueue(GetObjectRegistry(), csevAllEvents(GetObjectRegistry())))
-    return ReportError("Failed to set up event handler!");
+  if (!RegisterQueue (GetObjectRegistry (),
+      csevAllEvents (GetObjectRegistry ())))
+    return ReportError ("Failed to set up event handler!");
 
   return true;
 }
 
-void Simple::OnExit()
+void Simple::OnExit ()
 {
   printer.Invalidate ();
 }
 
-bool Simple::Application()
+bool Simple::Application ()
 {
   // Open the main system. This will open all the previously loaded plug-ins.
   // i.e. all windows will be opened.
-  if (!OpenApplication(GetObjectRegistry()))
-    return ReportError("Error opening system!");
+  if (!OpenApplication (GetObjectRegistry ()))
+    return ReportError ("Error opening system!");
 
-  if (SetupModules())
+  if (SetupModules ())
   {
     // This calls the default runloop. This will basically just keep
     // broadcasting process events to keep the game going.
-    Run();
+    Run ();
   }
   return true;
 }
 
-bool Simple::SetupModules()
+bool Simple::SetupModules ()
 {
   // Now get the pointer to various modules we need. We fetch them
   // from the object registry. The RequestPlugins() call we did earlier
   // registered all loaded plugins with the object registry.
   // The virtual clock.
-  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
-  if (!g3d) return ReportError("Failed to locate 3D renderer!");
+  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry ());
+  if (!g3d) return ReportError ("Failed to locate 3D renderer!");
 
-  engine = csQueryRegistry<iEngine> (GetObjectRegistry());
-  if (!engine) return ReportError("Failed to locate 3D engine!");
+  engine = csQueryRegistry<iEngine> (GetObjectRegistry ());
+  if (!engine) return ReportError ("Failed to locate 3D engine!");
 
-  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
-  if (!vc) return ReportError("Failed to locate Virtual Clock!");
+  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry ());
+  if (!vc) return ReportError ("Failed to locate Virtual Clock!");
 
-  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry());
-  if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
+  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry ());
+  if (!kbd) return ReportError ("Failed to locate Keyboard Driver!");
 
-  loader = csQueryRegistry<iLoader> (GetObjectRegistry());
-  if (!loader) return ReportError("Failed to locate Loader!");
+  loader = csQueryRegistry<iLoader> (GetObjectRegistry ());
+  if (!loader) return ReportError ("Failed to locate Loader!");
 
   // We need a View to the virtual world.
-  view.AttachNew(new csView (engine, g3d));
+  view.AttachNew (new csView (engine, g3d));
   iGraphics2D* g2d = g3d->GetDriver2D ();
   // We use the full window to draw the world.
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   // Here we create our world.
-  CreateRoom();
+  CreateRoom ();
 
   // Here we create our world.
-  CreateSprites();
+  CreateSprites ();
 
   // Let the engine prepare all lightmaps for use and also free all images 
   // that were loaded for the texture manager.
@@ -229,7 +229,7 @@ void Simple::CreateRoom ()
   // CS/data/standard.zip and mounted as /lib/std using the Virtual
   // File System (VFS) plugin.
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-    ReportError("Error loading 'stone4' texture!");
+    ReportError ("Error loading 'stone4' texture!");
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   // We create a new sector called "room".
@@ -254,21 +254,20 @@ void Simple::CreateRoom ()
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();
 
-  light = engine->CreateLight(0, csVector3(-3, 5, 0), 10, csColor(1, 0, 0));
+  light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10, csColor (1, 0, 0));
   ll->Add (light);
 
-  light = engine->CreateLight(0, csVector3(3, 5,  0), 10, csColor(0, 0, 1));
+  light = engine->CreateLight (0, csVector3 (3, 5,  0), 10, csColor (0, 0, 1));
   ll->Add (light);
 
-  light = engine->CreateLight(0, csVector3(0, 5, -3), 10, csColor(0, 1, 0));
+  light = engine->CreateLight (0, csVector3 (0, 5, -3), 10, csColor (0, 1, 0));
   ll->Add (light);
 }
 
 void Simple::CreateSprites ()
 {
   // Load a texture for our sprite.
-  iTextureWrapper* txt = loader->LoadTexture ("spark",
-    "/lib/std/spark.png");
+  iTextureWrapper* txt = loader->LoadTexture ("spark", "/lib/std/spark.png");
   if (txt == 0)
     ReportError("Error loading texture!");
 

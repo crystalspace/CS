@@ -42,6 +42,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     //-- iParticleBuiltinEffectorFactory
     virtual csPtr<iParticleBuiltinEffectorForce> CreateForce () const;
     virtual csPtr<iParticleBuiltinEffectorLinColor> CreateLinColor () const;
+    virtual csPtr<iParticleBuiltinEffectorLinear> CreateLinear () const;
     virtual csPtr<iParticleBuiltinEffectorVelocityField> 
       CreateVelocityField () const;
 
@@ -165,6 +166,72 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     {
       csColor4 mult;
       csColor4 add;
+      float maxTTL;
+    };
+    bool precalcInvalid;
+    csArray<PrecalcEntry> precalcList;
+  };
+
+  class ParticleEffectorLinear : public
+    scfImplementation2<ParticleEffectorLinear,
+                       iParticleBuiltinEffectorLinear,
+                       scfFakeInterface<iParticleEffector> >
+  {
+  public:
+    //-- ParticleEffectorLinear
+    ParticleEffectorLinear ();
+
+    //-- iParticleEffector
+    virtual csPtr<iParticleEffector> Clone () const;
+
+    virtual void EffectParticles (iParticleSystemBase* system,
+      const csParticleBuffer& particleBuffer, float dt, float totalTime);
+
+    //-- iParticleBuiltinEffectorLinear
+    virtual void SetMask (int mask)
+    {
+      ParticleEffectorLinear::mask = mask;
+    }
+
+    virtual int GetMask () const
+    {
+      return mask;
+    }
+
+    virtual size_t AddParameterSet (const csParticleParameterSet& param, float endTTL);
+    virtual void SetParameterSet (size_t index, const csParticleParameterSet& param);
+    virtual void GetParameterSet (size_t index, csParticleParameterSet& param, float& maxTTL) const
+    {
+      if (index >= paramList.GetSize ())
+        return;
+
+      param = paramList[index].param;
+      maxTTL = paramList[index].maxTTL;
+    }
+
+    virtual size_t GetParameterSetCount () const
+    {
+      return paramList.GetSize ();
+    }
+
+  private:
+    void Precalc ();
+
+    int mask;
+
+    struct ParamEntry
+    {
+      csParticleParameterSet param;
+      float maxTTL;
+    };
+    csArray<ParamEntry> paramList;
+
+    static int ParamEntryCompare(const ParamEntry& e0, const ParamEntry& e1);
+
+    struct PrecalcEntry
+    {
+      csParticleParameterSet mult;
+      csParticleParameterSet add;
       float maxTTL;
     };
     bool precalcInvalid;

@@ -57,6 +57,13 @@ namespace lighter
 
   bool ObjectFactory::PrepareLightmapUV (LightmapUVFactoryLayouter* uvlayout)
   {
+    if (factoryWrapper->GetFlags().Check (CS_ENTITY_NOLIGHTING))
+    {
+      unlayoutedPrimitives.DeleteAll();
+      noModify = true;
+      return true;
+    }
+    
     BeginSubmeshRemap ();
     if (lightPerVertex)
     {
@@ -254,46 +261,49 @@ namespace lighter
     }
     ComputeBoundingSphere ();
 
-    const LightRefArray& allPDLights = sector->allPDLights;
-    csBitArray pdBits;
-    pdBits.SetSize (allPDLights.GetSize());
-    for (size_t i = 0; i < allPDLights.GetSize(); i++)
+    if (!objFlags.Check (OBJECT_FLAG_NOLIGHT))
     {
-      if (bsphere.TestIntersect (allPDLights[i]->GetBoundingSphere()))
-        pdBits.SetBit (i);
-    }
-
-    unsigned int i = 0;
-    this->allPrimitives.SetCapacity (factory->layoutedPrimitives.GetSize ());
-    for(size_t j = 0; j < factory->layoutedPrimitives.GetSize (); ++j)
-    {
-      FactoryPrimitiveArray& factPrims = factory->layoutedPrimitives[j].primitives;
-      PrimitiveArray& allPrimitives =
-        this->allPrimitives.GetExtend (j);
-
-      allPrimitives.SetCapacity (allPrimitives.GetSize() + factPrims.GetSize());
-      for (i = 0; i < factPrims.GetSize(); i++)
+      const LightRefArray& allPDLights = sector->allPDLights;
+      csBitArray pdBits;
+      pdBits.SetSize (allPDLights.GetSize());
+      for (size_t i = 0; i < allPDLights.GetSize(); i++)
       {
-        Primitive newPrim (vertexData);
-        
-        Primitive& prim = allPrimitives[allPrimitives.Push (newPrim)];
-        //prim.SetOriginalPrimitive (&factPrims[i]);
-        prim.SetTriangle (factPrims[i].GetTriangle ()); 
-        prim.ComputePlane ();
+	if (bsphere.TestIntersect (allPDLights[i]->GetBoundingSphere()))
+	  pdBits.SetBit (i);
       }
 
-      if (!lightPerVertex)
+      unsigned int i = 0;
+      this->allPrimitives.SetCapacity (factory->layoutedPrimitives.GetSize ());
+      for(size_t j = 0; j < factory->layoutedPrimitives.GetSize (); ++j)
       {
-        // FIXME: probably separate out to allow for better progress display
-        LightmapUVObjectLayouter* layout = 
-          factory->layoutedPrimitives[j].factory;
-        const size_t group = factory->layoutedPrimitives[j].group;
-        size_t layoutID = layout->LayoutUVOnPrimitives (allPrimitives, 
-          group, sector, pdBits);
-        if (layoutID == (size_t)~0) return false;
-        lmLayouts.Push (LMLayoutingInfo (layout, layoutID, group));
-      }
+	FactoryPrimitiveArray& factPrims = factory->layoutedPrimitives[j].primitives;
+	PrimitiveArray& allPrimitives =
+	  this->allPrimitives.GetExtend (j);
 
+	allPrimitives.SetCapacity (allPrimitives.GetSize() + factPrims.GetSize());
+	for (i = 0; i < factPrims.GetSize(); i++)
+	{
+	  Primitive newPrim (vertexData);
+	  
+	  Primitive& prim = allPrimitives[allPrimitives.Push (newPrim)];
+	  //prim.SetOriginalPrimitive (&factPrims[i]);
+	  prim.SetTriangle (factPrims[i].GetTriangle ()); 
+	  prim.ComputePlane ();
+	}
+
+	if (!lightPerVertex)
+	{
+	  // FIXME: probably separate out to allow for better progress display
+	  LightmapUVObjectLayouter* layout = 
+	    factory->layoutedPrimitives[j].factory;
+	  const size_t group = factory->layoutedPrimitives[j].group;
+	  size_t layoutID = layout->LayoutUVOnPrimitives (allPrimitives, 
+	    group, sector, pdBits);
+	  if (layoutID == (size_t)~0) return false;
+	  lmLayouts.Push (LMLayoutingInfo (layout, layoutID, group));
+	}
+
+      }
     }
 
     factory.Invalidate();
@@ -368,7 +378,8 @@ namespace lighter
     const csFlags& meshFlags = wrapper->GetFlags ();
     if (meshFlags.Check (CS_ENTITY_NOSHADOWS))
       objFlags.Set (OBJECT_FLAG_NOSHADOW);
-    if (meshFlags.Check (CS_ENTITY_NOLIGHTING))
+    if (meshFlags.Check (CS_ENTITY_NOLIGHTING)
+	|| factory->factoryWrapper->GetFlags().Check (CS_ENTITY_NOLIGHTING))
       objFlags.Set (OBJECT_FLAG_NOLIGHT);
 
     if (globalLighter->rayDebug.EnableForMesh (meshName))
@@ -390,7 +401,7 @@ namespace lighter
             strcmp (vNoSelfShadow, "yes") == 0);
 	}
 
-        if (!factory->lightPerVertex)
+        if (!factory->lightPerVertex && !objFlags.Check (OBJECT_FLAG_NOLIGHT))
         {
           /* Disallow "disabling" of per-vertex lighting in an object when
            * it's enabled for the factory. */
@@ -474,7 +485,7 @@ namespace lighter
 
   void Object::FillLightmapMask (LightmapMaskPtrDelArray& masks)
   {
-    if (lightPerVertex) return;
+    if (lightPerVertex || objFlags.Check (OBJECT_FLAG_NOLIGHT)) return;
 
     // And fill it with data
     for (size_t i = 0; i < allPrimitives.GetSize(); i++)

@@ -20,7 +20,7 @@
 #==============================================================================
 AC_PREREQ([2.56])
 
-m4_define([cel_min_version_default], [1.3])
+m4_define([cel_min_version_default], [1.9])
 
 #------------------------------------------------------------------------------
 # CS_PATH_CEL_CHECK([MINIMUM-VERSION], [ACTION-IF-FOUND],
@@ -91,7 +91,7 @@ sed_expr_base=[\\\([0-9]\\\+\\\)\.\\\([0-9]\\\+\\\).*]
 cel_version_major=`echo $cel_version_desired | sed "s/$sed_expr_base/\1/"`
 cel_version_minor=`echo $cel_version_desired | sed "s/$sed_expr_base/\2/"`
 
-cel_version_sequence="$cel_version_major.$cels_version_minor"
+cel_version_sequence="$cel_version_major.$cel_version_minor"
 
 cel_version_desired_is_unstable=`expr $cel_version_minor % 2`
 

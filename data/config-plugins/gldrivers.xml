@@ -738,11 +738,12 @@
       * 2006-11-24: S3TC support in Intel DRI (at least in Mesa 6.5.1) is 
                     broken. Since S3TC may also be used through generic
 		    compression formats, disable TC completely.
+      * 2008-11-18: Still broken on 7.0.4
       -->
     <rule description="Intel DRI: Disable texture compression">
       <conditions>
         <regexp string="renderer" pattern="Mesa.*Intel" />
-        <regexp string="glversion" pattern="Mesa 6\.5\.." />
+        <comparever string="glvendor" relation="ge Mesa 6.5" />
       </conditions>
       <applicable>
         <usecfg>disableTC</usecfg>
@@ -796,7 +797,10 @@
     <rule description="Mesa 6.5.2: garbled text">
       <conditions>
         <regexp string="renderer" pattern="Mesa.*" />
-        <comparever version="glvendor" relation="ge Mesa 6.5.2" />
+        <conditions fulfill="all">
+          <comparever version="glvendor" relation="ge Mesa 6.5.2" />
+          <comparever version="glvendor" relation="lt Mesa 7.0" />
+        </conditions>
       </conditions>
       <applicable>
         <usecfg>disableMTtext</usecfg>
