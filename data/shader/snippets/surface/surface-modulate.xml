@@ -26,26 +26,26 @@
 
         <input name="inputColor" type="rgba" />
 
-        <input name="colour_modulation" type="rgb" default="complex">
+        <input name="color_modulation" type="rgb" default="complex">
           <block location="shadervars">
-             <shadervar name="colour modulation" type="vector3">1,1,1</shadervar>
+             <shadervar name="color modulation" type="vector3">1,1,1</shadervar>
           </block>
 
           <block location="cg:variablemap">
-	      <variablemap variable="colour modulation" destination="fragmentIn.colour_modulation" />
+	      <variablemap variable="color modulation" destination="fragmentIn.color_modulation" />
           </block>
       
           <block location="cg:fragmentIn">
-	      <uniform type="rgb" name="colour_modulation" />
+	      <uniform type="rgb" name="color_modulation" />
           </block>
       
           <block location="cg:fragmentMain">
-	      colour_modulation = fragmentIn.colour_modulation;
+	      color_modulation = fragmentIn.color_modulation;
           </block>
         </input>
     
         <block location="cg:fragmentMain">
-          outputColor.rgb = inputColor.rgb * colour_modulation.rgb;
+          outputColor.rgb = inputColor.rgb * color_modulation.rgb;
           outputColor.a = inputColor.a;
         </block>
 

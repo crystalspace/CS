@@ -70,13 +70,6 @@ public:
   virtual bool Compile (iHierarchicalCache*, csRef<iString>*);
 
   virtual void GetUsedShaderVars (csBitArray& bits) const;
-  
-  virtual iShaderProgram::CacheLoadResult LoadFromCache (
-    iHierarchicalCache* cache, iBase* previous, iDocumentNode* programNode,
-    csRef<iString>* failReason = 0, csRef<iString>* = 0)
-  { return iShaderProgram::loadFail; }
-  
-  csPtr<iString> GetCacheTag () { return 0; }
 private:
   csVProc_Std *shaderPlugin;
 

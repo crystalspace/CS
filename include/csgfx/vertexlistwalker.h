@@ -108,6 +108,14 @@ public:
   
   /// Get number of elements in the iterated buffer.
   size_t GetSize() const { return elements; }
+  
+  /// Set position to a specific element
+  void SetElement (size_t newElement)
+  {
+    CS_ASSERT(newElement < elements);
+    currElement = newElement;
+    FetchCurrentElement();
+  }
 private:
   /// Number of elements
   size_t elements;

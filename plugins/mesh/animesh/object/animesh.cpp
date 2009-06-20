@@ -595,6 +595,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
         meshPtr->buffers = sm->bufferHolders[j];
 
         meshPtr->object2world = o2wt;
+        meshPtr->bbox = GetObjectBoundingBox();
         meshPtr->geometryInstance = factory;
         meshPtr->variablecontext = sm->svContexts[j];
 

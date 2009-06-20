@@ -39,7 +39,6 @@
 #include "csutil/scfarray.h"
 #include "csutil/weakref.h"
 #include "iengine/light.h"
-#include "iengine/lightmgr.h"
 #include "imesh/genmesh.h"
 #include "imesh/object.h"
 #include "iutil/comp.h"
@@ -146,8 +145,6 @@ private:
 
   size_t factory_user_rb_state;
 
-  iMovable* lighting_movable;
-
   csDirtyAccessArray<csRenderMesh*> renderMeshes;
   mutable SubMeshProxiesContainer subMeshes;
   mutable uint factorySubMeshesChangeNum;
@@ -159,15 +156,11 @@ private:
   csGenmeshMeshObjectFactory* factory;
   iMeshWrapper* logparent;
   csRef<iMeshObjectDrawCallback> vis_cb;
-  bool do_lighting;
   bool do_manual_colors;
   csColor4 base_color;
   float current_lod;
   uint32 current_features;
   csFlags flags;
-
-  bool do_shadows;
-  bool do_shadow_rec;
 
   struct LegacyLightingData
   {
@@ -185,62 +178,18 @@ private:
   };
   LegacyLightingData legacyLighting;
 
-  /**
-   * Global sector wide dynamic ambient version.
-   */
-  uint32 dynamic_ambient_version;
-
-  csHash<csShadowArray*, csPtrKey<iLight> > pseudoDynInfo;
-
-  // If we are using the iLightingInfo lighting system then this
-  // is an array of lights that affect us right now.
-  //csSet<csPtrKey<iLight> > affecting_lights;
-  // In case we are not using the iLightingInfo system then we
-  // GetRenderMeshes() will updated the following array:
-  csSafeCopyArray<csLightInfluence> relevant_lights;
-
-  // If the following flag is dirty then some of the affecting lights
-  // has changed and we need to recalculate.
-  bool lighting_dirty;
-
-  // choose whether to draw shadow caps or not
-  bool shadow_caps;
-
   bool initialized;
 
   /// Current movable number.
   long cur_movablenr;
 
   /**
-   * Clears out the pseudoDynInfo hash and frees the memory allocated by the
-   * shadow maps.
-   */
-  void ClearPseudoDynLights ();
-
-  /**
    * Setup this object. This function will check if setup is needed.
    */
   void SetupObject ();
 
-  /**
-   * Make sure the 'lit_mesh_colors' array has the right size.
-   * Also clears the pseudo-dynamic light hash if the vertex count
-   * changed!
-   */
-  void CheckLitColors ();
-
-  /**
-   * Process one light and add the values to the genmesh light table.
-   * The given transform is the full movable transform.
-   */
-  void UpdateLightingOne (const csReversibleTransform& trans, iLight* light);
-
-  /**
-   * Update lighting using the iLightingInfo system.
-   */
-  void UpdateLighting (
-      const csSafeCopyArray<csLightInfluence>& lights, iMovable* movable);
-
+  /// Get positions buffer
+  iRenderBuffer* GetPositions();
 public:
   /// Constructor.
   csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory);
@@ -263,17 +212,17 @@ public:
   
   /**\name iGeneralMeshState implementation
    * @{ */
-  void SetLighting (bool l) { do_lighting = l; }
-  bool IsLighting () const { return do_lighting; }
+  void SetLighting (bool l) { }
+  bool IsLighting () const { return false; }
   void SetManualColors (bool m) { do_manual_colors = m; }
   bool IsManualColors () const { return do_manual_colors; }
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
-  void SetShadowCasting (bool m) { do_shadows = m; }
-  bool IsShadowCasting () const { return do_shadows; }
-  void SetShadowReceiving (bool m) { do_shadow_rec = m; }
-  bool IsShadowReceiving () const { return do_shadow_rec; }
+  void SetShadowCasting (bool m) { }
+  bool IsShadowCasting () const { return true; }
+  void SetShadowReceiving (bool m) { }
+  bool IsShadowReceiving () const { return false; }
   iGeneralMeshSubMesh* FindSubMesh (const char* name) const; 
   /** @} */
 
@@ -352,7 +301,6 @@ public:
   virtual bool SetColor (const csColor& col)
   {
     base_color.Set (col);
-    lighting_dirty = true;
     return true;
   }
   virtual bool GetColor (csColor& col) const { col = base_color; return true; }
@@ -502,6 +450,9 @@ public:
 
   /// Update tangent and bitangent buffers
   void UpdateTangentsBitangents ();
+  
+  /// Get positions buffer
+  iRenderBuffer* GetPositions();
 public:
   CS_LEAKGUARD_DECLARE (csGenmeshMeshObjectFactory);
 
@@ -515,7 +466,6 @@ public:
   iObjectRegistry* object_reg;
   iMeshFactoryWrapper* logparent;
   csRef<csGenmeshMeshObjectType> genmesh_type;
-  csRef<iLightManager> light_mgr;
   csFlags flags;
 
   iEngine* engine;

@@ -475,3 +475,16 @@ void csShaderProgram::GetUsedShaderVars (csBitArray& bits) const
 {
   GetUsedShaderVarsFromVariableMappings (bits);
 }
+
+iShaderProgram::CacheLoadResult csShaderProgram::LoadFromCache (
+  iHierarchicalCache* cache, iBase* previous, iDocumentNode* programNode,
+  csRef<iString>* failReason, csRef<iString>*)
+{
+  csRef<iShaderDestinationResolver> resolver =
+    scfQueryInterfaceSafe<iShaderDestinationResolver> (previous);
+  
+  if (Load (resolver, programNode))
+    return loadSuccessShaderValid;
+  else
+    return loadSuccessShaderInvalid;
+}

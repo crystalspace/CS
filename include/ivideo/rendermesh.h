@@ -28,6 +28,7 @@
  * \addtogroup gfx3d
  * @{ */
 
+#include "csgeom/box.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 
@@ -231,6 +232,9 @@ namespace Graphics
      * \remarks 'this' space is object space, 'other' space is world space
      */
     csReversibleTransform object2world;
+    
+    /// Render mesh bounding box, object space
+    csBox3 bbox;
   };
 
   /**

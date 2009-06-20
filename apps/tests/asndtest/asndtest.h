@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2006 by Søren Bøg
+    Copyright (C) 2006 by SÃ¸ren BÃ¸g
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -26,8 +26,6 @@
 #include <isndsys/ss_stream.h>
 #include <isndsys/ss_data.h>
 #include <isndsys/ss_listener.h>
-
-#include <crystalspace.h>
 
 class ASndTest : public csApplicationFramework, public csBaseEventHandler
 {
@@ -70,4 +68,5 @@ public:
   CS_EVENTHANDLER_NAMES("application.asndtest")
   CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
+
 #endif // __ASNDTEST_H__

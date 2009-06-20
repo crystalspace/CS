@@ -19,7 +19,6 @@
 #ifndef __SIMPLEPT_H__
 #define __SIMPLEPT_H__
 
-#include <stdarg.h>
 #include <crystalspace.h>
 
 class csEngineProcTex : public csProcTexture

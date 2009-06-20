@@ -25,7 +25,7 @@
 
 #include "csextern.h"
 #include "csutil/parray.h"
-#include "csutil/set.h"
+#include "csutil/hash.h"
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/threading/mutex.h"
@@ -49,10 +49,18 @@ private:
   bool do_verbose;
 
   /// Mutex on 'already loading' array.
-  CS::Threading::Mutex loading;
+  CS::Threading::Mutex loadingLock;
 
-  /// Stores already loading plugins (by classID).
-  csSet<csString> alreadyLoading;
+  /**
+   * Ref counted plugin load condition.
+   */
+  class PluginLoadCondition : public CS::Threading::Condition,
+    public CS::Utility::FastRefCount<PluginLoadCondition>
+  {
+  };
+
+  /// Hash of loading plugins and their conditions.
+  csHash<csRef<PluginLoadCondition>, csString> alreadyLoading;
 
   /**
    * This is a private structure used to keep the list of plugins.

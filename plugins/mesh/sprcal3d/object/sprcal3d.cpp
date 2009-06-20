@@ -1467,6 +1467,7 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
     rm->do_mirror = camera->IsMirrored ();
     rm->worldspace_origin = wo;
     rm->object2world = o2wt;
+    rm->bbox = GetObjectBoundingBox(); // @@@ FIXME: could be tighter (submesh bbox)
 
     // @@@ Hacky.
     ((MeshAccessor*)rm->buffers->GetAccessor())->movable = movable;

@@ -27,16 +27,38 @@
 // Also update CS/configure.ac, CS/docs/texinfo/version.txi, and
 // CS/mk/autoconf/crystal.m4 when updating the version number.
 
+/**\name Version number definitions (numeric)
+ * @{ */
 /// Major version
-#define CS_VERSION_MAJOR CS_VER_QUOTE(1)
+#define CS_VERSION_NUM_MAJOR  1
 /// Minor version (even are stable versions, odd are development versions)
-#define CS_VERSION_MINOR CS_VER_QUOTE(9)
+#define CS_VERSION_NUM_MINOR  9
 /// Maintenance release / RC
-#define CS_VERSION_BUILD CS_VER_QUOTE(0)
-/// Date of release
-#define CS_RELEASE_DATE  CS_VER_QUOTE(Mon 9-Jun-2008)
+#define CS_VERSION_NUM_BUILD  0
 
-#define CS_VER_QUOTE(X) #X
+/// Encode a version into a single number comparable using <, > etc.
+#define CS_VERSION_NUM_COMPARABLE(Major,Minor,Build)  \
+  ((Major)*10000 + (Minor)*100 + (Build))
+/// Current version, encode into a single number comparable using <, > etc.
+#define CS_VERSION_NUM_COMPARABLE_CURRENT         \
+  CS_VERSION_NUM_COMPARABLE(CS_VERSION_NUM_MAJOR, \
+    CS_VERSION_NUM_MINOR, CS_VERSION_NUM_BUILD)
+/** @} */
+
+/**\name Version number definitions (strings)
+ * @{ */
+/// Major version
+#define CS_VERSION_MAJOR CS_VER_QUOTE(CS_VERSION_NUM_MAJOR)
+/// Minor version (even are stable versions, odd are development versions)
+#define CS_VERSION_MINOR CS_VER_QUOTE(CS_VERSION_NUM_MINOR)
+/// Maintenance release / RC
+#define CS_VERSION_BUILD CS_VER_QUOTE(CS_VERSION_NUM_BUILD)
+/// Date of release
+#define CS_RELEASE_DATE  CS_VER_QUOTE_(Mon 9-Jun-2008)
+/** @} */
+
+#define CS_VER_QUOTE_(X) #X
+#define CS_VER_QUOTE(X) CS_VER_QUOTE_(X)
 
 #if !defined(CS_PLATFORM_NAME)
 /// Name of the platform CS is compiled for (i.e. Win32)

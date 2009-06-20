@@ -616,7 +616,7 @@ public:
     
   csPtr<iCamera> Clone () const
   {
-    return new csCameraCustomMatrix (*this);
+    return new csCameraCustomMatrix ((csCameraBase*)this);
   }
   
   iCamera* GetCamera() { return this; }

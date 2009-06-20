@@ -1,5 +1,5 @@
 --- texi2html.pl.orig	2006-05-21 16:16:05.000000000 +0200
-+++ texi2html.pl	2007-04-11 16:09:38.000000000 +0200
++++ texi2html.pl	2008-12-11 13:33:00.000000000 +0100
 @@ -58,7 +58,7 @@
  #--##############################################################################
  
@@ -80,7 +80,17 @@
  	}
          # find the previous section
          if (defined($previous_sections[$section->{'level'}]))
-@@ -7616,6 +7630,11 @@
+@@ -5105,7 +5119,8 @@
+                              'nodeprev' => $back,
+                              'place' => [],
+                              'seen' => 1,
+-                             'page' => $page
++                             'page' => $page,
++                             'file' => "${docu_name}_index$index_num.$docu_ext"
+                             };
+                             $index_page->{'node'} = 1 if ($element->{'node'});
+                             while ($nodes{$index_page->{'texi'}})
+@@ -7616,6 +7631,11 @@
      my $text = shift;
      my $state = shift;
      return $text if ($state->{'keep_texi'});
@@ -92,7 +102,7 @@
      if (defined($state) and !$state->{'preformatted'} and !$state->{'code_style'})
      {
          # in normal text `` and '' serve as quotes, --- is for a long dash 
-@@ -7623,11 +7642,7 @@
+@@ -7623,11 +7643,7 @@
          # (see texinfo.txi, @node Conventions)
          $text = &$Texi2HTML::Config::normal_text($text);
      }

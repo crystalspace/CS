@@ -1,4 +1,8 @@
 <layerconfig>
+      <layer>
+            <defaultshader name="z_only" file="/shader/early_z/z_only.xml" />
+            <ambient />
+      </layer>
 	<layer>
 		<defaultshader name="lighting_default" file="/shader/lighting/lighting_default.xml" />
 		<!-- Tells the shader ambient should be taken into account -
@@ -26,9 +30,9 @@
 		<maxlightpasses>2147483647</maxlightpasses>
 		<!-- Options to control lighting for static lights -->
 		<staticlights>
-		  <!-- Only draw specular lighting for meshes which have the 
+		  <!-- Don't draw static lights for meshes which have the 
 		       CS_ENTITY_STATICLIGHT flag set -->
-		  <specularonly />
+		  <nodraw />
 		</staticlights>
 	</layer>
 </layerconfig>

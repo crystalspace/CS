@@ -26,7 +26,7 @@
       <snippet id="position" file="/shader/snippets/position.xml" />
       <snippet id="parallax" file="/shader/snippets/surface/parallax.xml" />
       <snippet id="normalmap" file="/shader/snippets/surface/normalmap.xml" />
-      <snippet id="surface" file="/shader/snippets/surface/surface-classic.xml" />
+      <snippet id="surface" file="/shader/snippets/surface/surface-modulate.xml" />
       <snippet id="apply_mixmode_alpha" file="/shader/snippets/mixmode-alpha.xml" />
       <snippet id="glow" file="/shader/lighting/glow.xml" />
       <snippet id="sectorfog" file="/shader/snippets/fog/fog-sector.xml" />

@@ -7,7 +7,7 @@
 * Map Creation:: How to Create Optimal Maps for Crystal Space
 * Map Creation Tips:: Some Tips for Efficient Maps
 * Simple Map Example::
-* Default lighting shader variables:: How to make use of features available in the default lighting shaders.
+* Default Lighting Shader Variables::
 * Blender:: Making Levels and Models in Blender
 * 3DSMax:: Making Levels and Models in 3DSMax
 * Using lighter2:: Using @code{lighter2}

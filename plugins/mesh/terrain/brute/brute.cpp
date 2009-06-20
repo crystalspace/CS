@@ -756,6 +756,7 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
       rm->variablecontext = terr->paletteContexts[i-1];
     }
     rm->object2world = o2wt;
+    rm->bbox = bbox;
     rm->worldspace_origin = wo;
     rm->do_mirror = isMirrored;
     terr->returnMeshes->Push (rm);

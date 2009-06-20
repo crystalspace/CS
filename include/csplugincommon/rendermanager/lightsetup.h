@@ -805,7 +805,8 @@ namespace RenderManager
         size_t numLights;
         csLightInfluence* influences;
 	lightmgr->GetRelevantLights (node->owner.sector,
-	  mesh.bbox, influences, numLights, allMaxLights);
+	  mesh.renderMesh->bbox, influences, numLights, allMaxLights,
+	  &mesh.renderMesh->object2world);
 	
 	LightingSorter sortedLights (persist.lightSorterPersist,  numLights);
 	for (size_t l = 0; l < numLights; l++)

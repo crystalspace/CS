@@ -85,7 +85,6 @@ namespace RenderManager
 	    sm.meshWrapper = meshList[m].imesh;
 	    sm.meshObjSVs = meshList[m].imesh->GetSVContext();
 	    sm.zmode = zmode;
-	    sm.bbox = meshList[m].imesh->GetWorldBoundingBox(); // @@@ Use RM bbox
 	    sm.meshFlags = meshList[m].imesh->GetFlags();
 	    
 	    // Add it to the appropriate meshnode

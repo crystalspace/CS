@@ -1533,6 +1533,34 @@ static inline void BugplugBox (iGraphics2D* G2D,
   G2D->DrawLine (x, y+h, x, y, bordercolor);
 }
 
+static inline void DrawBox3D (iGraphics3D* G3D, 
+                              const csBox3& box,
+                              const csReversibleTransform& tr,
+                              int color)
+{
+  csVector3 vxyz = tr * box.GetCorner (CS_BOX_CORNER_xyz);
+  csVector3 vXyz = tr * box.GetCorner (CS_BOX_CORNER_Xyz);
+  csVector3 vxYz = tr * box.GetCorner (CS_BOX_CORNER_xYz);
+  csVector3 vxyZ = tr * box.GetCorner (CS_BOX_CORNER_xyZ);
+  csVector3 vXYz = tr * box.GetCorner (CS_BOX_CORNER_XYz);
+  csVector3 vXyZ = tr * box.GetCorner (CS_BOX_CORNER_XyZ);
+  csVector3 vxYZ = tr * box.GetCorner (CS_BOX_CORNER_xYZ);
+  csVector3 vXYZ = tr * box.GetCorner (CS_BOX_CORNER_XYZ);
+  float fov = G3D->GetPerspectiveAspect ();
+  G3D->DrawLine (vxyz, vXyz, fov, color);
+  G3D->DrawLine (vXyz, vXYz, fov, color);
+  G3D->DrawLine (vXYz, vxYz, fov, color);
+  G3D->DrawLine (vxYz, vxyz, fov, color);
+  G3D->DrawLine (vxyZ, vXyZ, fov, color);
+  G3D->DrawLine (vXyZ, vXYZ, fov, color);
+  G3D->DrawLine (vXYZ, vxYZ, fov, color);
+  G3D->DrawLine (vxYZ, vxyZ, fov, color);
+  G3D->DrawLine (vxyz, vxyZ, fov, color);
+  G3D->DrawLine (vxYz, vxYZ, fov, color);
+  G3D->DrawLine (vXyz, vXyZ, fov, color);
+  G3D->DrawLine (vXYz, vXYZ, fov, color);
+}
+
 bool csBugPlug::HandleFrame (iEvent& /*event*/)
 {
   SetupPlugin ();
@@ -1623,31 +1651,27 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
       if (!selected_meshes[k]) continue;
       iMovable* mov = selected_meshes[k]->GetMovable ();
       csReversibleTransform tr_o2c = tr_w2c / mov->GetFullTransform ();
+      csRenderMesh** rmeshes = 0;
+      int rmesh_num = 0;
       if (do_bbox)
       {
-        int bbox_color = G3D->GetDriver2D ()->FindRGB (0, 255, 255);
+        int bbox_color;
+        if (!rmeshes) rmeshes = 
+          selected_meshes[k]->GetMeshObject()->GetRenderMeshes (rmesh_num, rview, 
+            mov, ~0/*frustum_mask*/);
+        if (rmeshes != 0)
+        {
+	  bbox_color = G3D->GetDriver2D ()->FindRGB (255, 0, 255);
+          for (int n = 0; n < rmesh_num; n++)
+          {
+            DrawBox3D (G3D, rmeshes[n]->bbox, tr_o2c, bbox_color);
+          }
+        }
+        
+        bbox_color = G3D->GetDriver2D ()->FindRGB (0, 255, 255);
         const csBox3& bbox = selected_meshes[k]->GetMeshObject ()
 	  ->GetObjectModel ()->GetObjectBoundingBox ();
-        csVector3 vxyz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xyz);
-        csVector3 vXyz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_Xyz);
-        csVector3 vxYz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xYz);
-        csVector3 vxyZ = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xyZ);
-        csVector3 vXYz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_XYz);
-        csVector3 vXyZ = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_XyZ);
-        csVector3 vxYZ = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xYZ);
-        csVector3 vXYZ = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_XYZ);
-        G3D->DrawLine (vxyz, vXyz, fov, bbox_color);
-        G3D->DrawLine (vXyz, vXYz, fov, bbox_color);
-        G3D->DrawLine (vXYz, vxYz, fov, bbox_color);
-        G3D->DrawLine (vxYz, vxyz, fov, bbox_color);
-        G3D->DrawLine (vxyZ, vXyZ, fov, bbox_color);
-        G3D->DrawLine (vXyZ, vXYZ, fov, bbox_color);
-        G3D->DrawLine (vXYZ, vxYZ, fov, bbox_color);
-        G3D->DrawLine (vxYZ, vxyZ, fov, bbox_color);
-        G3D->DrawLine (vxyz, vxyZ, fov, bbox_color);
-        G3D->DrawLine (vxYz, vxYZ, fov, bbox_color);
-        G3D->DrawLine (vXyz, vXyZ, fov, bbox_color);
-        G3D->DrawLine (vXYz, vXYZ, fov, bbox_color);
+	DrawBox3D (G3D, bbox, tr_o2c, bbox_color);
       }
       if (do_rad)
       {
@@ -1670,14 +1694,13 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
         int denorm_color = G3D->GetDriver2D ()->FindRGB (128, 0, 255);
         int tang_color = G3D->GetDriver2D ()->FindRGB (255, 0, 0);
         int bitang_color = G3D->GetDriver2D ()->FindRGB (0, 255, 0);
-        int num;
         
-        csRenderMesh** rmeshes = 
-          selected_meshes[k]->GetMeshObject()->GetRenderMeshes (num, rview, 
-            selected_meshes[k]->GetMovable(), ~0/*frustum_mask*/);
+        if (!rmeshes) rmeshes = 
+          selected_meshes[k]->GetMeshObject()->GetRenderMeshes (rmesh_num, rview, 
+            mov, ~0/*frustum_mask*/);
         if (rmeshes != 0)
         {
-          for (int n = 0; n < num; n++)
+          for (int n = 0; n < rmesh_num; n++)
           {
             iRenderBuffer* bufPos = rmeshes[n]->buffers->GetRenderBuffer (
               CS_BUFFER_POSITION);

@@ -22,9 +22,13 @@
 #include "plugins/engine/3d/meshobj.h"
 #include "plugins/engine/3d/sector.h"
 
+#include "csgeom/sphere.h"
+
 using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
 
-static csLightInfluence MakeInfluence (csLight* light)
+static csLightInfluence MakeInfluence (csLight* light,
+                                       const csBox3& box,
+                                       const csVector3& lightCenter)
 {
   csLightInfluence l;
   l.light = light;
@@ -33,6 +37,16 @@ static csLightInfluence MakeInfluence (csLight* light)
     l.type = light->csLight::GetType();
     l.flags = light->csLight::GetFlags();
     l.dynamicType = light->csLight::GetDynamicType();
+    
+    float distAttn;
+    if (box.In (lightCenter))
+      distAttn = 1.0f;
+    else
+    {
+      distAttn = csMin (light->GetBrightnessAtDistance (
+        sqrt (box.SquaredPosDist (lightCenter))), 1.0f);
+    }
+    l.perceivedIntensity = light->GetColor().Luminance() * distAttn;
   }
   return l;
 }
@@ -51,11 +65,15 @@ csLightManager::~csLightManager ()
 void csLightManager::GetRelevantLights (iMeshWrapper* meshObject, 
     iLightInfluenceArray* lightArray, int maxLights, uint flags)
 {
-  const csBox3& meshBox = meshObject->GetWorldBoundingBox ();
+  const csBox3& meshBox = meshObject->GetMeshObject()
+    ->GetObjectModel()->GetObjectBoundingBox();
+  csReversibleTransform objectToWorld =
+    meshObject->GetMovable()->GetFullTransform();
   iSectorList* sectors = meshObject->GetMovable ()->GetSectors ();
   if (sectors && sectors->GetCount() > 0)
   {
-    GetRelevantLights (sectors->Get (0), meshBox, lightArray, maxLights, flags);
+    GetRelevantLights (sectors->Get (0), meshBox, lightArray, maxLights,
+      &objectToWorld, flags);
   }
 }
 
@@ -63,11 +81,15 @@ void csLightManager::GetRelevantLights (iMeshWrapper* meshObject,
   iLightInfluenceCallback* lightCallback, int maxLights, 
   uint flags)
 {
-  const csBox3& meshBox = meshObject->GetWorldBoundingBox ();
+  const csBox3& meshBox = meshObject->GetMeshObject()
+    ->GetObjectModel()->GetObjectBoundingBox();
+  csReversibleTransform objectToWorld =
+    meshObject->GetMovable()->GetFullTransform();
   iSectorList* sectors = meshObject->GetMovable ()->GetSectors ();
   if (sectors && sectors->GetCount() > 0)
   {
-    GetRelevantLights (sectors->Get (0), meshBox, lightCallback, maxLights, flags);
+    GetRelevantLights (sectors->Get (0), meshBox, lightCallback, maxLights,
+      &objectToWorld, flags);
   }
 }
 
@@ -78,7 +100,7 @@ void csLightManager::GetRelevantLights (iSector* sector,
 {
   const csBox3 bigBox (csVector3 (-CS_BOUNDINGBOX_MAXVALUE),
     csVector3 (CS_BOUNDINGBOX_MAXVALUE));
-  GetRelevantLights (sector, bigBox, lightArray, maxLights, flags);
+  GetRelevantLights (sector, bigBox, lightArray, maxLights, 0, flags);
 }
 
 void csLightManager::GetRelevantLights (iSector* sector, 
@@ -87,8 +109,26 @@ void csLightManager::GetRelevantLights (iSector* sector,
 {
   const csBox3 bigBox (csVector3 (-CS_BOUNDINGBOX_MAXVALUE),
     csVector3 (CS_BOUNDINGBOX_MAXVALUE));
-  GetRelevantLights (sector, bigBox, lightCallback, maxLights, flags);
+  GetRelevantLights (sector, bigBox, lightCallback, maxLights, 0, flags);
 }
+
+struct BoxSpaceIdentity
+{
+  csSphere FromWorld (const csSphere& sphere) const { return sphere; }
+  csBox3 ToWorld (const csBox3& box) const { return box; }
+};
+
+struct BoxSpaceTransform
+{
+  BoxSpaceTransform (const csReversibleTransform& tf) : tf (tf) {}
+
+  csSphere FromWorld (const csSphere& sphere) const
+  { return tf.Other2This (sphere); }
+  csBox3 ToWorld (const csBox3& box) const
+  { return tf.This2Other (box); }
+protected:
+  const csReversibleTransform& tf;
+};
 
 struct IntersectInnerBBox
 {
@@ -104,82 +144,143 @@ struct IntersectInnerBBox
   const csBox3& testBox;
 };
 
+template<typename BoxSpace>
 struct LightCollectArray
 {
-  LightCollectArray (const csBox3& box, iLightInfluenceArray* lightArray)
-    : testBox (box), lightArray (lightArray)
+  LightCollectArray (const BoxSpace& boxSpace,
+    const csBox3& box, const csBox3& boxWorld,
+    iLightInfluenceArray* lightArray)
+    : boxSpace (boxSpace), testBox (box), testBoxWorld (boxWorld),
+      lightArray (lightArray)
   {}
 
   bool operator() (const csSectorLightList::LightAABBTree::Node* node)
   {
-    if (!testBox.TestIntersect (node->GetBBox ()))
+    if (!testBoxWorld.TestIntersect (node->GetBBox ()))
       return true;
 
     for (size_t i = 0; i < node->GetObjectCount (); ++i)
     {
-      csLightInfluence newInfluence = MakeInfluence (node->GetLeafData (i));
+      csLight* light = node->GetLeafData (i);
+      
+      csSphere lightSphere (light->GetMovable()->GetFullPosition(),
+        light->GetCutoffDistance());
+      lightSphere = boxSpace.FromWorld (lightSphere);
+      if (!csIntersect3::BoxSphere (testBox, lightSphere.GetCenter(),
+          lightSphere.GetRadius()*lightSphere.GetRadius()))
+        continue;
+      
+      csLightInfluence newInfluence = MakeInfluence (light,
+        testBox, lightSphere.GetCenter());
       lightArray->Push (newInfluence);
     }
       
     return true;
   }
 
+  const BoxSpace& boxSpace;
   const csBox3& testBox;
+  const csBox3& testBoxWorld;
   iLightInfluenceArray* lightArray;
 };
 
+template<typename BoxSpace>
 struct LightCollectCallback
 {
-  LightCollectCallback (const csBox3& box, iLightInfluenceCallback* lightCallback)
-    : testBox (box), lightCallback (lightCallback)
+  LightCollectCallback (const BoxSpace& boxSpace,
+    const csBox3& box, const csBox3& boxWorld,
+    iLightInfluenceCallback* lightCallback)
+    : boxSpace (boxSpace), testBox (box), testBoxWorld (boxWorld),
+      lightCallback (lightCallback)
   {}
 
   bool operator() (const csSectorLightList::LightAABBTree::Node* node)
   {
-    if (!testBox.TestIntersect (node->GetBBox ()))
+    if (!testBoxWorld.TestIntersect (node->GetBBox ()))
       return true;
 
     for (size_t i = 0; i < node->GetObjectCount (); ++i)
     {
-      csLightInfluence newInfluence = MakeInfluence (node->GetLeafData (i));
+      csLight* light = node->GetLeafData (i);
+      
+      csSphere lightSphere (light->GetMovable()->GetFullPosition(),
+        light->GetCutoffDistance());
+      lightSphere = boxSpace.FromWorld (lightSphere);
+      if (!csIntersect3::BoxSphere (testBox, lightSphere.GetCenter(),
+          lightSphere.GetRadius()*lightSphere.GetRadius()))
+        continue;
+      
+      csLightInfluence newInfluence = MakeInfluence (light,
+        testBox, lightSphere.GetCenter());
       lightCallback->LightInfluence (newInfluence);
     }
     return true;
   }
 
+  const BoxSpace& boxSpace;
   const csBox3& testBox;
+  const csBox3& testBoxWorld;
   iLightInfluenceCallback* lightCallback;
 };
 
 
 void csLightManager::GetRelevantLights (iSector* sector, const csBox3& boundingBox,
   iLightInfluenceArray* lightArray, int maxLights, 
-  uint flags)
+  const csReversibleTransform* bboxToWorld, uint flags)
 {
   iLightList* llist = sector->GetLights ();
   csSectorLightList* sectorLightList = static_cast<csSectorLightList*> (llist);
 
   // Get the primary lights from same sector
   const csSectorLightList::LightAABBTree& aabbTree = sectorLightList->GetLightAABBTree ();
-  IntersectInnerBBox inner (boundingBox);
-  LightCollectArray leaf (boundingBox, lightArray);
-  aabbTree.Traverse (inner, leaf);
+  if (!bboxToWorld || bboxToWorld->IsIdentity())
+  {
+    BoxSpaceIdentity boxSpace;
+    IntersectInnerBBox inner (boundingBox);
+    LightCollectArray<BoxSpaceIdentity> leaf (boxSpace, boundingBox, 
+      boundingBox, lightArray);
+    aabbTree.Traverse (inner, leaf);
+  }
+  else
+  {
+    BoxSpaceTransform boxSpace (*bboxToWorld);
+    csBox3 boxWorld (boxSpace.ToWorld (boundingBox));
+    IntersectInnerBBox inner (boxWorld);
+    LightCollectArray<BoxSpaceTransform> leaf (boxSpace, boundingBox, 
+      boxWorld, lightArray);
+    aabbTree.Traverse (inner, leaf);
+  } 
 
   //@@TODO: Implement cross-sector lookups
 }
 
 void csLightManager::GetRelevantLights (iSector* sector, const csBox3& boundingBox,
   iLightInfluenceCallback* lightCallback, int maxLights, 
-  uint flags)
+  const csReversibleTransform* bboxToWorld, uint flags)
 {
   iLightList* llist = sector->GetLights ();
   csSectorLightList* sectorLightList = static_cast<csSectorLightList*> (llist);
 
   // Get the primary lights from same sector
   const csSectorLightList::LightAABBTree& aabbTree = sectorLightList->GetLightAABBTree ();
-  IntersectInnerBBox inner (boundingBox);
-  LightCollectCallback leaf (boundingBox, lightCallback);
-  aabbTree.Traverse (inner, leaf);
+  if (!bboxToWorld || bboxToWorld->IsIdentity())
+  {
+    BoxSpaceIdentity boxSpace;
+    IntersectInnerBBox inner (boundingBox);
+    LightCollectCallback<BoxSpaceIdentity> leaf (boxSpace, boundingBox, 
+      boundingBox, lightCallback);
+    aabbTree.Traverse (inner, leaf);
+  }
+  else
+  {
+    BoxSpaceTransform boxSpace (*bboxToWorld);
+    csBox3 boxWorld (boxSpace.ToWorld (boundingBox));
+    IntersectInnerBBox inner (boxWorld);
+    LightCollectCallback<BoxSpaceTransform> leaf (boxSpace, boundingBox, 
+      boxWorld, lightCallback);
+    aabbTree.Traverse (inner, leaf);
+  } 
+
 }
 
 // ---------------------------------------------------------------------------
@@ -213,23 +314,36 @@ public:
 
 typedef csDirtyAccessArrayDetach<csLightInfluence> LightInfluenceArray;
 
-template<typename ArrayType>
+template<typename ArrayType, typename BoxSpace>
 struct LightCollectArrayPtr
 {
-  LightCollectArrayPtr (const csBox3& box, ArrayType& arr, size_t max)
-    : testBox (box), arr (arr), max (max)
+  LightCollectArrayPtr (const BoxSpace& boxSpace,
+    const csBox3& box, const csBox3& boxWorld,
+    ArrayType& arr, size_t max)
+    : boxSpace (boxSpace), testBox (box), testBoxWorld (boxWorld),
+      arr (arr), max (max)
   {}
 
   bool operator() (const csSectorLightList::LightAABBTree::Node* node)
   {
-    if (!testBox.TestIntersect (node->GetBBox ()))
+    if (!testBoxWorld.TestIntersect (node->GetBBox ()))
       return true;
 
     for (size_t i = 0; i < node->GetObjectCount (); ++i)
     {
+      csLight* light = node->GetLeafData (i);
+      
+      csSphere lightSphere (light->GetMovable()->GetFullPosition(),
+        light->GetCutoffDistance());
+      lightSphere = boxSpace.FromWorld (lightSphere);
+      if (!csIntersect3::BoxSphere (testBox, lightSphere.GetCenter(),
+          lightSphere.GetRadius()*lightSphere.GetRadius()))
+        continue;
+      
       if (arr.GetSize() < max)
       {
-        csLightInfluence newInfluence = MakeInfluence (node->GetLeafData (i));
+        csLightInfluence newInfluence = MakeInfluence (light,
+          testBox, lightSphere.GetCenter());
         arr.Push (newInfluence);
       }
       else
@@ -238,7 +352,9 @@ struct LightCollectArrayPtr
     return true;
   }
 
+  const BoxSpace& boxSpace;
   const csBox3& testBox;
+  const csBox3& testBoxWorld;
   ArrayType& arr;
   size_t max;
 };
@@ -249,20 +365,26 @@ void csLightManager::GetRelevantLights (iMeshWrapper* meshObject,
                                         size_t& numLights, 
                                         size_t maxLights, uint flags)
 {
-  const csBox3& meshBox = meshObject->GetWorldBoundingBox ();
+  const csBox3& meshBox = meshObject->GetMeshObject()
+    ->GetObjectModel()->GetObjectBoundingBox();
+  csReversibleTransform objectToWorld =
+    meshObject->GetMovable()->GetFullTransform();
   iSectorList* sectors = meshObject->GetMovable ()->GetSectors ();
   if (sectors && sectors->GetCount() > 0)
   {
     csLightManager::GetRelevantLights (sectors->Get (0), meshBox, lightArray,
-      numLights, maxLights, flags);
+      numLights, maxLights, &objectToWorld, flags);
   }
 }
 
-void csLightManager::GetRelevantLights (iSector* sector, 
-                                        const csBox3& boundingBox, 
-                                        csLightInfluence*& lightArray, 
-                                        size_t& numLights, 
-                                        size_t maxLights, uint flags)
+template<typename BoxSpace>
+void csLightManager::GetRelevantLightsWorker (const BoxSpace& boxSpace,
+                                              iSector* sector, 
+                                              const csBox3& boundingBox,
+                                              csLightInfluence*& lightArray, 
+                                              size_t& numLights,
+                                              size_t maxLights,
+                                              uint flags)
 {
   iLightList* llist = sector->GetLights ();
   csSectorLightList* sectorLightList = static_cast<csSectorLightList*> (llist);
@@ -270,11 +392,13 @@ void csLightManager::GetRelevantLights (iSector* sector,
   // Get the primary lights from same sector
   //@@TODO: Implement cross-sector lookups
   const csSectorLightList::LightAABBTree& aabbTree = sectorLightList->GetLightAABBTree ();
-  IntersectInnerBBox inner (boundingBox);
+  csBox3 boxWorld (boxSpace.ToWorld (boundingBox));
+  IntersectInnerBBox inner (boxWorld);
   if (!tempInfluencesUsed)
   {
     tempInfluencesUsed = true;
-    LightCollectArrayPtr<TempInfluences> leaf (boundingBox, tempInfluences, maxLights);
+    LightCollectArrayPtr<TempInfluences, BoxSpace> leaf (boxSpace,
+      boundingBox, boxWorld, tempInfluences, maxLights);
     aabbTree.Traverse (inner, leaf);
     
     numLights = tempInfluences.GetSize();
@@ -289,7 +413,8 @@ void csLightManager::GetRelevantLights (iSector* sector,
   else
   {
     LightInfluenceArray tmpLightArray;
-    LightCollectArrayPtr<LightInfluenceArray> leaf (boundingBox, tmpLightArray, maxLights);
+    LightCollectArrayPtr<LightInfluenceArray, BoxSpace> leaf (boxSpace,
+      boundingBox, boxWorld, tmpLightArray, maxLights);
     aabbTree.Traverse (inner, leaf);
     
     numLights = tmpLightArray.GetSize();
@@ -299,6 +424,28 @@ void csLightManager::GetRelevantLights (iSector* sector,
       lightArray = 0;
   }
 }
+
+void csLightManager::GetRelevantLights (iSector* sector, 
+                                        const csBox3& boundingBox, 
+                                        csLightInfluence*& lightArray, 
+                                        size_t& numLights, 
+                                        size_t maxLights,
+                                        const csReversibleTransform* bboxToWorld,
+                                        uint flags)
+{
+  if (!bboxToWorld || bboxToWorld->IsIdentity())
+  {
+    BoxSpaceIdentity boxspace;
+    GetRelevantLightsWorker (boxspace, sector, boundingBox, lightArray, numLights,
+      maxLights, flags);
+  }
+  else
+  {
+    BoxSpaceTransform boxspace (*bboxToWorld);
+    GetRelevantLightsWorker (boxspace, sector, boundingBox, lightArray, numLights,
+      maxLights, flags);
+  } 
+}
   
 void csLightManager::GetRelevantLights (iSector* sector, 
                                         csLightInfluence*& lightArray, 
@@ -307,5 +454,35 @@ void csLightManager::GetRelevantLights (iSector* sector,
 {
   const csBox3 bigBox;  
   csLightManager::GetRelevantLights (sector, bigBox, lightArray, numLights,
-    maxLights, flags);
+    maxLights, 0, flags);
+}
+
+static int SortInfluenceByIntensity (const void* a, const void* b)
+{
+  float d = reinterpret_cast<const csLightInfluence*>(a)->perceivedIntensity
+    - reinterpret_cast<const csLightInfluence*>(b)->perceivedIntensity;
+  if (d < 0)
+    return 1;
+  else if (d > 0)
+    return -1;
+  else
+    return 0;
+}
+
+void csLightManager::GetRelevantLightsSorted (iSector* sector,
+                                              const csBox3& boundingBox,
+                                              csLightInfluence*& lightArray, 
+                                              size_t& numLights,
+                                              size_t maxLights,
+                                              const csReversibleTransform* bboxToWorld,
+                                              uint flags)
+{
+  // Get all lights,
+  csLightManager::GetRelevantLights (sector, boundingBox, lightArray, numLights,
+    (size_t)~0, bboxToWorld, flags);
+  // sort,
+  qsort (lightArray, numLights, sizeof (csLightInfluence),
+    SortInfluenceByIntensity);
+  // return only first numLights lights
+  numLights = csMin (numLights, maxLights);
 }
