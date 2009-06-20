@@ -22,8 +22,10 @@
 #include <stdlib.h>
 
 #include "csutil/array.h"
+#include "csutil/plugldr.h"
 #include "csutil/plugmgr.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/scfstringarray.h"
 #include "csutil/stringconv.h"
 #include "csutil/util.h"
 
@@ -31,21 +33,16 @@
 #include "iutil/objreg.h"
 #include "iutil/cmdline.h"
 #include "iutil/cfgmgr.h"
+#include "iutil/verbositymanager.h"
 #include "ivaria/reporter.h"
 
 //------------------------------------------------------ csPlugin class -----//
+csPluginManager::csPlugin::csPlugin ()
+{
+}
 
 csPluginManager::csPlugin::csPlugin (iComponent *obj, const char *classID)
-{
-  Plugin = obj;
-  ClassID = CS::StrDup (classID);
-}
-
-csPluginManager::csPlugin::~csPlugin ()
-{
-  //csPrintf ("DecRef %08p/'%s' ref=%d\n", Plugin, ClassID, Plugin->GetRefCount ()); fflush (stdout);
-  cs_free (ClassID);
-}
+  : Plugin (obj), ClassID (classID) { }
 
 //------------------------------------------------------------------------
 /**
@@ -55,7 +52,7 @@ class csPluginIterator : public scfImplementation1<csPluginIterator,
                                                    iPluginIterator>
 {
 public:
-  csArray<iBase*> pointers;
+  csArray<iComponent*> pointers;
   size_t idx;
 
 public:
@@ -72,9 +69,9 @@ public:
   {
     return idx < pointers.GetSize ();
   }
-  virtual iBase* Next ()
+  virtual iComponent* Next ()
   {
-    iBase* p = pointers[idx];
+    iComponent* p = pointers[idx];
     idx++;
     return p;
   }
@@ -85,14 +82,46 @@ public:
 
 
 csPluginManager::csPluginManager (iObjectRegistry* object_reg) 
-  : scfImplementationType (this), object_reg (object_reg),
+  : scfImplementationType (this), do_verbose (false), object_reg (object_reg),
   Plugins (8), OptionList (16)
 {
+  csRef<iVerbosityManager> verbosity = csQueryRegistry<iVerbosityManager> (
+    object_reg);
+  if (verbosity.IsValid())
+    do_verbose = verbosity->Enabled ("plugins");
 }
 
 csPluginManager::~csPluginManager ()
 {
   Clear ();
+}
+
+void csPluginManager::Report (int severity, const char* subMsgID,
+                              const char* message, ...)
+{
+  va_list args;
+  va_start (args, message);
+  ReportV (severity, subMsgID, message, args);
+  va_end (args);
+}
+
+void csPluginManager::ReportV (int severity, const char* subMsgID,
+                               const char* message, va_list args)
+{
+  csStringFast<64> msgId ("crystalspace.pluginmgr.");
+  msgId.Append (subMsgID);
+  csReportV (object_reg, severity, msgId, message, args);
+}
+
+void csPluginManager::ReportInLock (int severity, const char* subMsgID,
+				    const char* message, ...)
+{
+  va_list args;
+  va_start (args, message);
+  csStringFast<64> msgId ("crystalspace.pluginmgr.");
+  msgId.Append (subMsgID);
+  csReportV (0/*deliberate, force printf*/, severity, msgId, message, args);
+  va_end (args);
 }
 
 void csPluginManager::Clear ()
@@ -103,7 +132,7 @@ void csPluginManager::Clear ()
 
   // Free all plugins.
   for (size_t i = Plugins.GetSize () ; i > 0 ; i--)
-    UnloadPlugin ((iComponent *)Plugins.Get(i - 1)->Plugin);
+    UnloadPluginInstance (Plugins.Get(i - 1).Plugin);
 }
 
 void csPluginManager::QueryOptions (iComponent *obj)
@@ -168,61 +197,131 @@ void csPluginManager::QueryOptions (iComponent *obj)
   }
 }
 
-iBase* csPluginManager::LoadPlugin(const char *classID, bool init, bool report)
+csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
+                                                       uint flags)
 {
+  if (do_verbose)
+    /* LoadPluginInstance() may be called recursively and the lock
+     * actually held here */
+    ReportInLock (CS_REPORTER_SEVERITY_NOTIFY,
+      "verbose",
+      "loading plugin instance for %s", classID);
+  
   csRef<iComponent> p (scfCreateInstance<iComponent> (classID));
 
   if (!p)
   {
-    if (report)
-      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-      "crystalspace.pluginmgr.loadplugin",
-      "could not load plugin '%s'", classID);
+    if (flags & lpiReportErrors)
+      Report (CS_REPORTER_SEVERITY_WARNING,
+        "loadplugin",
+        "could not load plugin '%s'", classID);
   }
   else
   {
     CS::Threading::RecursiveMutexScopedLock lock (mutex);
-    size_t index = csArrayItemNotFound;
     // See if the plugin is already in our plugin list.
-    for (size_t i = 0 ; i < Plugins.GetSize () ; i++)
-    {
-      csPlugin* pl = Plugins.Get (i);
-      if (pl->ClassID)
-        if (pl->ClassID == classID || !strcmp (pl->ClassID, classID))
-        {
-          index = i;
-          break;
-        }
-    }
+    csPlugin* pl = FindPluginByClassID (classID);
+    size_t index = pl ? Plugins.GetIndex (pl) : csArrayItemNotFound;
 
     if (index == csArrayItemNotFound)
     {
       // The plugin wasn't in our plugin list yet. Add it here.
-      index = Plugins.Push (new csPlugin (p, classID));
+      index = Plugins.Push (csPlugin (p, classID));
     }
 
-    if ((!init) || p->Initialize (object_reg))
+    if (flags & lpiLoadDependencies)
     {
-      p->IncRef();
-      if (init) QueryOptions (p);
-      return p;
+      // Grab dependencies of plugin to load.
+      const char *dep = iSCF::SCF->GetClassDependencies (classID);
+      
+      csStringFast<128> tmp;
+      // For each dependency:
+      while (dep && *dep)
+      {
+	const char *comma = strchr (dep, ',');
+	if (!comma)
+	  comma = strchr (dep, 0);
+	size_t sl = comma - dep;
+	tmp.Replace (dep, sl);
+	
+	dep = comma;
+	while (*dep == ',' || *dep == ' ' || *dep == '\t')
+	  dep++;
+  
+	tmp.Trim();
+	if (tmp.IsEmpty())
+	  continue;
+	  
+	if (do_verbose)
+	  ReportInLock (CS_REPORTER_SEVERITY_NOTIFY,
+	    "verbose",
+	    "found dependency on %s", tmp.GetData());
+      
+	// Check if tags are associated with class IDs.
+	csStringArray tags (GetClassIDTagsLocal (tmp));
+	if (tags.GetSize() > 0)
+	{
+	  // If tags are associated check if object reg has something registered
+	  //  with the(se) tag(s).
+	  for (size_t t = 0; t < tags.GetSize(); t++)
+	  {
+	    if (do_verbose)
+	      ReportInLock (CS_REPORTER_SEVERITY_NOTIFY,
+		"verbose",
+		"  found tag for dependency: %s", tags[t]);
+	    csRef<iBase> b = csPtr<iBase> (object_reg->Get (tags[t]));
+	    if (b == 0)
+	    {
+	      const char* classForTag =
+		GetTagClassIDMapping (tags[t]); // tmp might be wildcard
+	      csPlugin* pl = FindPluginByClassID (classForTag);
+	      if (pl != 0) continue; // Plugin is currently being loaded
+	      csRef<iComponent> p = LoadPluginInstance (classForTag, flags);
+	      if (p.IsValid())
+	      {
+		object_reg->Register (p, tags[t]);
+	      }
+	      else
+	      {
+	        /* Ignore load error (like csPluginLoader did) */
+	      }
+	    }
+	  }
+	}
+	else
+	{
+	  /* If no tags, ignore dependency (like csPluginLoader did) */
+	}
+      }
     }
-    if (report)
-      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-      "crystalspace.pluginmgr.loadplugin",
-      "failed to initialize plugin '%s'", classID);
+  
+    if ((!(flags & lpiInitialize)) || p->Initialize (object_reg))
+    {
+      if (flags & lpiInitialize) QueryOptions (p);
+      return csPtr<iComponent> (p);
+    }
     // If we added this plugin in this call then we remove it here as well.
     if (index != csArrayItemNotFound)
       Plugins.DeleteIndex (index);
+
+    if (flags & lpiReportErrors)
+    {
+      mutex.Unlock(); // Lock is not needed here any more ...
+      Report (CS_REPORTER_SEVERITY_WARNING,
+        "loadplugin",
+        "failed to initialize plugin '%s'", classID);
+      // ... but must be retaken to make 'lock' destruction work
+      mutex.Lock();
+    }
   }
-  return NULL;
+  return 0;
 }
 
-bool csPluginManager::RegisterPlugin (const char *classID,
+bool csPluginManager::RegisterPluginInstance (const char *classID,
   iComponent *obj)
 {
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
-  size_t index = Plugins.Push (new csPlugin (obj, classID));
+  size_t index = Plugins.Push (csPlugin (obj, classID));
   if (obj->Initialize (object_reg))
   {
     QueryOptions (obj);
@@ -230,64 +329,117 @@ bool csPluginManager::RegisterPlugin (const char *classID,
   }
   else
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-    	"crystalspace.pluginmgr.registerplugin",
-    	"failed to initialize plugin '%s'", classID);
     Plugins.DeleteIndex (index);
+    mutex.Unlock(); // Lock is not needed here any more ...
+    Report (CS_REPORTER_SEVERITY_WARNING,
+      "registerplugin",
+      "failed to initialize plugin '%s'", classID);
+    // ... but must be retaken to make 'lock' destruction work
+    mutex.Lock();
     return false;
   }
 }
 
-csPtr<iPluginIterator> csPluginManager::GetPlugins ()
+csPtr<iPluginIterator> csPluginManager::GetPluginInstances ()
 {
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
   csPluginIterator* it = new csPluginIterator ();
   size_t i;
   for (i = 0 ; i < Plugins.GetSize () ; i++)
   {
-    it->pointers.Push (Plugins.Get (i)->Plugin);
+    it->pointers.Push (Plugins[i].Plugin);
   }
   return csPtr<iPluginIterator> (it);
 }
 
-iBase *csPluginManager::QueryPlugin (const char *iInterface, int iVersion)
+csPluginManager::csPlugin* csPluginManager::FindPluginByClassID (
+  const char* classID, csPlugin* startAfter)
+{
+  size_t i;
+  if (startAfter)
+    i = Plugins.GetIndex (startAfter) + 1;
+  else
+    i = 0;
+    
+  size_t classIDLen = strlen (classID);
+  bool wildcard = classID[classIDLen-1] == '.';
+  if (wildcard)
+  {
+    for (; i < Plugins.GetSize () ; i++)
+    {
+      csPlugin& pl = Plugins.Get (i);
+      if (strncmp (pl.ClassID, classID, classIDLen))
+      {
+	return &pl;
+      }
+    }
+  }
+  else
+  {
+    for (; i < Plugins.GetSize () ; i++)
+    {
+      csPlugin& pl = Plugins.Get (i);
+      if (pl.ClassID == classID)
+      {
+	return &pl;
+      }
+    }
+  }
+  return 0;
+}
+
+
+csPtr<iComponent> csPluginManager::QueryPluginInstance (const char* classID)
+{
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
+  csPlugin* pl = FindPluginByClassID (classID);
+  if (pl) return csPtr<iComponent> (pl->Plugin);
+  return 0;
+}
+
+csPtr<iComponent> csPluginManager::QueryPluginInstance (const char *iInterface, int iVersion)
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
   for (size_t i = 0; i < Plugins.GetSize (); i++)
   {
-    iBase *ret = Plugins.Get (i)->Plugin;
+    iComponent* ret = Plugins[i].Plugin;
     if (ret->QueryInterface (ifID, iVersion))
+      // QI does an implicit IncRef()
       return ret;
   }
   return 0;
 }
 
-iBase *csPluginManager::QueryPlugin (const char* classID,
-				     const char *iInterface, 
-                                     int iVersion)
+csPtr<iComponent> csPluginManager::QueryPluginInstance (const char* classID,
+				                        const char *iInterface, 
+                                                        int iVersion)
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
+  
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
-  for (size_t i = 0 ; i < Plugins.GetSize () ; i++)
+  csPlugin* lastPlugin = 0;
+  do
   {
-    csPlugin* pl = Plugins.Get (i);
-    if (pl->ClassID)
-      if (pl->ClassID == classID || !strcmp (pl->ClassID, classID))
-      {
-        iBase *p = Plugins.Get(i)->Plugin;
-        if (p->QueryInterface(ifID,iVersion))
-          return p;
-      }
+    csPlugin* pl = FindPluginByClassID (classID, lastPlugin);
+    if (pl)
+    {
+      iComponent* p = pl->Plugin;
+      if (p->QueryInterface(ifID, iVersion))
+        // QI does an implicit IncRef()
+	return p;
+    }
+    lastPlugin = pl;
   }
+  while (lastPlugin != 0);
   return 0;
 }
 
-bool csPluginManager::UnloadPlugin (iComponent* obj)
+bool csPluginManager::UnloadPluginInstance (iComponent* obj)
 {
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
   size_t idx = Plugins.FindKey (
-    csArrayCmp<csPlugin*,iComponent*>(obj, csPluginsVector::CompareAddress));
+    csArrayCmp<csPlugin,iComponent*>(obj, csPluginsVector::CompareAddress));
   if (idx == csArrayItemNotFound)
     return false;
 
@@ -306,3 +458,27 @@ bool csPluginManager::UnloadPlugin (iComponent* obj)
   return Plugins.DeleteIndex (idx);
 }
 
+csStringArray csPluginManager::GetClassIDTagsLocal (const char* classID)
+{
+  csStringArray result;
+  bool wildcard = classID[strlen (classID)-1] == '.';
+  
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
+  TagToClassHash::GlobalIterator it (tagToClassMap.GetIterator());
+  while (it.HasNext())
+  {
+    csString tag;
+    csString& id = it.Next (tag);
+    bool match =
+      wildcard ? id.StartsWith (classID, false) : id == classID;
+    if (match) result.Push (tag);
+  }
+  return result;
+}
+
+csPtr<iStringArray> csPluginManager::GetClassIDTags (const char* classID)
+{
+  csRef<iStringArray> result;
+  result.AttachNew (new scfStringArray (GetClassIDTagsLocal (classID)));
+  return csPtr<iStringArray> (result);
+}

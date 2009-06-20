@@ -2,12 +2,12 @@
   <Media EmbedCab="yes" Id="30010" Cabinet="CS_sdk.cab"/>
   <Media EmbedCab="yes" Id="30011" Cabinet="CS_sdk_$(var.ARCH).cab"/>
   <DirectoryRef Id="TARGETDIR">
-    <Directory Name="CrystalSpaceSDK" Id="CSSDK1.9">
+    <Directory Name="CrystalSpaceSDK" Id="CSSDK$(var.VERSION_MAJORMINOR)">
       <Directory Name="$(var.ARCH)" Id="CSSDK_ARCH">
         <?if $(var.ARCH) = GCC_3.4 ?>
           <!-- GCC SDK: Add SDK dir to environment so configure checks can pick it up -->
           <Component Guid="56d062bb-f775-4e43-a718-8c8f301a996e" Id="CS.sdk.register">
-            <Environment Action="set" Part="first" Name="CRYSTAL_1_9" Value="[CSSDK_ARCH]" Id="CS.sdk.register.env1" Permanent="no"/>
+            <Environment Action="set" Part="first" Name="CRYSTAL_$(var.VERSION_MAJOR)_$(var.VERSION_MINOR)" Value="[CSSDK_ARCH]" Id="CS.sdk.register.env1" Permanent="no"/>
             <Environment Action="set" Part="first" Name="CRYSTAL" Value="[CSSDK_ARCH]" Id="CS.sdk.register.env2" Permanent="no"/>
           </Component>
         <?endif?>
@@ -47,7 +47,7 @@
       </Directory>
     </Directory>
   </DirectoryRef>
-  <DirectoryRef Id="CSVERSION1.9">
+  <DirectoryRef Id="CSVERSION$(var.VERSION_MAJORMINOR)">
     <Directory Name="data" Id="CS.data.sdk">
       <Merge DiskId="30010" SourceFile="$(var.CRYSTAL_MSM_PATH)/CS.data.sdk.msm" Id="CS.data.sdk" Language="1033" FileCompression="yes"/>
     </Directory>

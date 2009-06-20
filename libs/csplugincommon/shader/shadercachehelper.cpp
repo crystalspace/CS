@@ -25,6 +25,8 @@
 #include "csutil/databuf.h"
 #include "csutil/documenthelper.h"
 #include "csutil/parasiticdatabuffer.h"
+#include "csutil/rootedhiercache.h"
+#include "csutil/scfstringarray.h"
 #include "csutil/sysfunc.h"
 #include "csutil/xmltiny.h"
 #include "cstool/vfsdirchange.h"
@@ -421,6 +423,248 @@ namespace CS
         return stringBlock + id;
       }
       
+      //---------------------------------------------------------------------
+      
+      iDataBuffer* MicroArchive::GetEntryData (Entry& entry)
+      {
+        if (!entry.data.IsValid())
+        {
+          csRef<csParasiticDataBuffer> pdb;
+          pdb.AttachNew (new csParasiticDataBuffer (originalData,
+            entry.offset, entry.size));
+          entry.data = pdb;
+        }
+        return entry.data;
+      }
+      
+      MicroArchive::Entry* MicroArchive::FindEntry (const char* id)
+      {
+        for (size_t i = 0; i < entries.GetSize(); i++)
+        {
+          Entry& entry = entries[i];
+          if (strcmp (entry.name, id) == 0) return &entry;
+        }
+        return 0;
+      }
+      
+      static const uint32 microArcMagic = 0x007261b5;
+      
+      bool MicroArchive::Read (iFile* file)
+      {
+        entries.Empty();
+        addedNames.Empty();
+        originalData.Invalidate();
+        if (file == 0) return true;
+        
+        csRef<iDataBuffer> fileData = file->GetAllData (false);
+        const char* fileDataP = fileData->GetData ();
+        file->SetPos (0);
+        
+        uint32 diskMagic;
+        if (file->Read ((char*)&diskMagic, sizeof (diskMagic))
+            != sizeof (diskMagic))
+          return false;
+        if (csLittleEndian::UInt32 (diskMagic) != microArcMagic)
+          return false;
+          
+        while (!file->AtEOF())
+        {
+          const char* fileName = fileDataP + file->GetPos();
+          size_t skip = (strlen (fileName) + 4) & ~3;
+          file->SetPos (file->GetPos() + skip);
+          uint32 diskSize;
+	  if (file->Read ((char*)&diskSize, sizeof (diskSize))
+	      != sizeof (diskSize))
+	    return false;
+	  Entry newEntry;
+	  newEntry.name = fileName;
+	  newEntry.offset = file->GetPos ();
+	  newEntry.size = csLittleEndian::UInt32 (diskSize);
+	  entries.Push (newEntry);
+	  file->SetPos (file->GetPos() + ((newEntry.size+3) & ~3));
+        }
+        
+        originalData = fileData;
+        return true;
+      }
+      
+      bool MicroArchive::Write (iFile* file)
+      {
+	if (!dirty) return false;
+        uint32 diskMagic = csLittleEndian::UInt32 (microArcMagic);
+        if (file->Write ((char*)&diskMagic, sizeof (diskMagic))
+            != sizeof (diskMagic))
+          return false;
+        
+        static const char pad[] = {0, 0, 0, 0};
+        
+        csArray<Entry> newentries;
+        csArray<size_t> nameOffsets;
+        for (size_t i = 0; i < entries.GetSize(); i++)
+        {
+          nameOffsets.Push (file->GetPos ());
+          Entry& entry = entries[i];
+          size_t slen = strlen (entry.name);
+          if (file->Write (entry.name, slen) != slen) return false;
+          size_t padlen = 4 - (slen & 3);
+          if (file->Write (pad, padlen) != padlen) return false;
+          uint32 diskSize = csLittleEndian::UInt32 (entry.size);
+	  if (file->Write ((char*)&diskSize, sizeof (diskSize))
+	      != sizeof (diskSize))
+	    return false;
+	      
+          Entry newEntry;
+          newEntry.size = entry.size;
+          newEntry.offset = file->GetPos ();
+	      
+	  const char* dataP = GetEntryData (entry)->GetData();
+          if (file->Write (dataP, entry.size) != entry.size) return false;
+          padlen = (4 - (entry.size & 3)) & 3;
+          if (file->Write (pad, padlen) != padlen) return false;
+          
+          newentries.Push (newEntry);
+        }
+        originalData = file->GetAllData ();
+        const char* fileDataP = originalData->GetData ();
+        for (size_t i = 0; i < newentries.GetSize(); i++)
+        {
+          newentries[i].name = fileDataP + nameOffsets[i];
+        }
+        entries = newentries;
+        addedNames.Empty();
+	dirty = false;
+        return true;
+      }
+
+      iDataBuffer* MicroArchive::ReadEntry (const char* id)
+      {
+        Entry* entry = FindEntry (id);
+        if (entry == 0) return 0;
+        return GetEntryData (*entry);
+      }
+      
+      bool MicroArchive::WriteEntry (const char* id, iDataBuffer* data)
+      {
+        Entry* entry = FindEntry (id);
+        if (entry == 0) entry = &entries.GetExtend (entries.GetSize());
+        entry->name = addedNames.Store (id);
+        entry->data = data;
+        entry->size = data->GetSize();
+	dirty = true;
+        return true;
+      }
+      
+      bool MicroArchive::DeleteEntry (const char* id)
+      {
+        Entry* entry = FindEntry (id);
+        if (entry == 0) return false;
+	dirty = true;
+        return entries.DeleteIndex (entries.GetIndex (entry));
+      }
+      
+      void MicroArchive::DeleteAllEntries ()
+      {
+        entries.Empty();
+        addedNames.Empty();
+        originalData.Invalidate();
+	dirty = true;
+      }
+      
+      //---------------------------------------------------------------------
+      
+      MicroArchiveCache::MicroArchiveCache (iHierarchicalCache* parentCache,
+	const char* cacheItem) : scfImplementationType (this),
+	parentCache (parentCache), cacheItem (cacheItem)
+      {
+        csRef<iDataBuffer> arcInCache = parentCache->ReadCache (
+          cacheItem);
+        if (arcInCache.IsValid())
+        {
+          csMemFile arcFile (arcInCache, true);
+          archive.Read (&arcFile);
+        }
+      }
+      
+      MicroArchiveCache::~MicroArchiveCache()
+      {
+        Flush();
+      }
+      
+      bool MicroArchiveCache::CacheData (const void* data, size_t size,
+	const char* path)
+      {
+        csRef<CS::DataBuffer<> > dbuf;
+        dbuf.AttachNew (new CS::DataBuffer<> (size));
+        memcpy (dbuf->GetData(), data, size);
+        return archive.WriteEntry (path, dbuf);
+      }
+      
+      csPtr<iDataBuffer> MicroArchiveCache::ReadCache (const char* path)
+      {
+        csRef<iDataBuffer> buf (archive.ReadEntry (path));
+        return csPtr<iDataBuffer> (buf);
+      }
+      
+      bool MicroArchiveCache::ClearCache (const char* path)
+      {
+        if (!path || !*path || (*path != '/')) return false;
+        
+        size_t pathLen = strlen(path);
+        if (path[pathLen-1] == '/')
+        {
+          size_t i = archive.GetEntriesNum();
+          while (i-- > 0)
+          {
+            const char* arcEntry = archive.GetEntryName (i);
+            if (strncmp (arcEntry, path, pathLen) == 0)
+              archive.DeleteEntry (i);
+          }
+          return true;
+        }
+        else
+          return archive.DeleteEntry (path);
+      }
+      
+      void MicroArchiveCache::Flush ()
+      {
+        csMemFile mf;
+        if (archive.Write (&mf))
+        {
+          parentCache->CacheData (mf.GetData(), mf.GetSize(), cacheItem);
+        }
+      }
+      
+      csPtr<iHierarchicalCache> MicroArchiveCache::GetRootedCache (const char* base)
+      {
+	if (!base || !*base || (*base != '/')) return 0;
+      
+	return csPtr<iHierarchicalCache> (
+	  new CS::Utility::RootedHierarchicalCache (this, base));
+      }
+      
+      csPtr<iStringArray> MicroArchiveCache::GetSubItems (const char* path)
+      {
+	scfStringArray* newArray = new scfStringArray;
+	
+	csStringFast<512> fullPath (path);
+	
+	if (fullPath.GetAt (fullPath.Length()-1) != '/')
+	  fullPath.Append ("/");
+	
+	for (size_t i = 0; i < archive.GetEntriesNum(); i++)
+	{
+	  const char* arcEntry = archive.GetEntryName (i);
+	  if (strncmp (arcEntry, fullPath, fullPath.Length()) == 0)
+	    newArray->Push (arcEntry+fullPath.Length());
+	}
+	return csPtr<iStringArray> (newArray);
+      }
+      
+      iHierarchicalCache* MicroArchiveCache::GetTopCache()
+      {
+        return parentCache->GetTopCache();
+      }
+
     } // namespace ShaderCacheHelper
   } // namespace PluginCommon
 } // namespace CS

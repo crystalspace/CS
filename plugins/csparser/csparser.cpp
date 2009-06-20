@@ -834,7 +834,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           const char* varname = child->GetAttributeValue ("name");
           csRef<csShaderVariable> var;
           var.AttachNew (new csShaderVariable (stringSetSvName->Request (varname)));
-          if (!SyntaxService->ParseShaderVar (ldr_context, child, *var, failedTextures))
+          if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
           {
             SyntaxService->ReportError (
               "crystalspace.maploader.load.meshobject", child,
@@ -1523,7 +1523,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     {
       vfs->ChDir(dir);
     }
-    csRef<iBase> base = plugin->Parse(node, ssource, ldr_context, context, failedMeshFacts);
+    csRef<iBase> base = plugin->Parse(node, ssource, ldr_context, context);
     ret->SetResult(base);
     return base.IsValid();    
   }
@@ -1532,7 +1532,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iDataBuffer> dbuf, csRef<iStreamSource> ssource, csRef<iLoaderContext> ldr_context,
     csRef<iBase> context)
   {
-    csRef<iBase> base = plugin->Parse(dbuf, ssource, ldr_context, context, failedMeshFacts);
+    csRef<iBase> base = plugin->Parse(dbuf, ssource, ldr_context, context);
     ret->SetResult(base);
     return base.IsValid(); 
   }

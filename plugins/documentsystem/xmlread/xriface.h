@@ -34,7 +34,6 @@ class TrDocumentNode;
 class csXmlReadDocumentSystem :
   public scfImplementation1<csXmlReadDocumentSystem, iDocumentSystem>
 {
-  csRef<iBase> parent;
 public:
   csXmlReadDocumentSystem (iBase* parent);
   virtual ~csXmlReadDocumentSystem ();

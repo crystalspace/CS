@@ -20,7 +20,7 @@
 #include <math.h>
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
-#include "csgeom/textrans.h"
+#include "textrans.h"
 #include "csqsqrt.h"
 
 //---------------------------------------------------------------------------

@@ -79,7 +79,7 @@ protected:
   csString entrypoint;
   csRefArray<iDocumentNode> cacheKeepNodes;
   csString objectCode;
-  csString objectCodeCachePath;
+  csString objectCodeCachePathArc, objectCodeCachePathItem;
 
   enum ProgramType
   {
@@ -180,8 +180,6 @@ protected:
     iHierarchicalCache* cache);
   bool WriteToCompileCache (const char* source, const ProfileLimits& limits,
     iHierarchicalCache* cache);
-  bool WriteToCompileCache (const ProfileLimits& limits,
-    const ProfileLimitsPair& limitsPair, iHierarchicalCache* cache);
     
   bool GetProgramNode (iDocumentNode* passProgNode);
 public:

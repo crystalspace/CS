@@ -66,6 +66,15 @@ class CS_CRYSTALSPACE_EXPORT csRefTracker :
     };
 
     RefInfo() : refCount (0), flags (0), descr(0) { }
+  
+    bool CorrectlyDestructed() const
+    {
+      return (refCount == 0)
+	/* The next check is to "let through" objects that have been 
+	* destructed with a refcount of 1 remaining
+	* (e.g. ref counted objects created on the stack). */
+	|| ((flags & flagDestructed) && (refCount == 1));
+    }
   };
   csBlockAllocator<RefInfo> riAlloc;
   csHash<void*, void*> aliases;

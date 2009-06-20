@@ -24,7 +24,6 @@
 #include "csqint.h"
 #include "csqsqrt.h"
 
-#include "csgeom/polyaa.h"
 #include "csgeom/vector2.h"
 #include "cstool/initapp.h"
 #include "csutil/cmdhelp.h"

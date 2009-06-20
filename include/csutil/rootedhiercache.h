@@ -28,9 +28,18 @@
 struct iObjectRegistry;
 struct iVFS;
 
-CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
+namespace CS
 {
-  class RootedHierarchicalCache : 
+namespace Utility
+{
+  /**
+   * iHierarchicalCache providing a 'view' into a path of another cache.
+   * This cache takes a 'wrapped' cache and a cache path which serves as
+   * the root path of all accesses to this cache. In other words, the
+   * given cache path is prepended before passing all cache requests to
+   * the 'wrapped' cache.
+   */
+  class CS_CRYSTALSPACE_EXPORT RootedHierarchicalCache : 
     public scfImplementation1<RootedHierarchicalCache, iHierarchicalCache>
   {
   private:
@@ -39,6 +48,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
     
     csString AdjustPath (const char* org);
   public:
+    /**
+     * Construct.
+     * \param cache The cache to wrap.
+     * \param root The root directory in \a cache for this cache.
+     */
     RootedHierarchicalCache (iHierarchicalCache* cache, const char* root)
      : scfImplementationType (this), wrappedCache (cache), rootdir (root) {}
   
@@ -59,11 +73,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
     virtual csPtr<iStringArray> GetSubItems (const char* path)
     { return wrappedCache->GetSubItems (AdjustPath (path)); }
     virtual iHierarchicalCache* GetTopCache()
-    { return wrappedCache; }
+    { return wrappedCache->GetTopCache(); }
     /** @} */
   };
-}
-CS_PLUGIN_NAMESPACE_END(ShaderManager)
+} // namespace Utility
+} // namespace CS
 
 #endif // __CS_UTIL_ROOTEDHIERCACHE_H__
 

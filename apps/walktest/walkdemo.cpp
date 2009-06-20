@@ -834,9 +834,9 @@ void AttachRandomLight (iLight* light)
 
 //===========================================================================
 
+#if 0
 static csPtr<iMeshWrapper> CreateMeshWrapper (const char* name)
 {
-#if 0
   csRef<iMeshObjectType> ThingType = csLoadPluginCheck<iMeshObjectType> (
   	Sys->object_reg, "crystalspace.mesh.object.thing");
   if (!ThingType)
@@ -848,14 +848,13 @@ static csPtr<iMeshWrapper> CreateMeshWrapper (const char* name)
   csRef<iMeshWrapper> mesh_wrap =
   	Sys->Engine->CreateMeshWrapper (mesh_obj, name);
   return csPtr<iMeshWrapper> (mesh_wrap);
-#endif
-  return 0;
 }
+#endif
 
+#if 0
 static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
     	iMaterialWrapper* tm, int& portalPoly)
 {
-#if 0
   csRef<iMeshWrapper> thing = CreateMeshWrapper (name);
   csRef<iThingFactoryState> thing_fact_state = 
     scfQueryInterface<iThingFactoryState> (
@@ -1022,9 +1021,8 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
   linfo->PrepareLighting ();
 
   return csPtr<iMeshWrapper> (thing);
-#endif
-  return 0;
 }
+#endif
 
 void OpenPortal (iView* view, char* lev)
 {

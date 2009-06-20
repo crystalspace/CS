@@ -42,6 +42,11 @@ public:
     : scfImplementationType (this), v (limit, delta)
   { }
 
+  /// Create a string array by copying from a csStringArray
+  scfStringArray (const csStringArray& other) 
+    : scfImplementationType (this), v (other)
+  { }
+  
   /// Destructor - nothing to do.
   virtual ~scfStringArray ()
   { }

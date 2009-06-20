@@ -47,8 +47,10 @@ CS_LEAKGUARD_IMPLEMENT (csXMLShader);
 //---------------------------------------------------------------------------
 
 csShaderConditionResolver::csShaderConditionResolver (
-  csConditionEvaluator& evaluator)
-  : rootNode (0), nextVariant (0), evaluator (evaluator)
+  csConditionEvaluator& evaluator, bool keepVariantToConditionsMap)
+  : rootNode (0), nextVariant (0),
+    keepVariantToConditionsMap (keepVariantToConditionsMap),
+    evaluator (evaluator)
 {
   SetEvalParams (0, 0);
 }
@@ -141,8 +143,17 @@ size_t csShaderConditionResolver::GetVariant (csConditionNode* node)
 void csShaderConditionResolver::AddNode (csConditionNode* parent,
 					 csConditionID condition, 
 					 csConditionNode*& trueNode,
-					 csConditionNode*& falseNode)
+					 csConditionNode*& falseNode,
+                                         const MyBitArrayTemp& conditionResults)
 {
+  if (condition == csCondUnknown)
+  {
+    CS_ASSERT(parent->variant != csArrayItemNotFound);
+    if (keepVariantToConditionsMap)
+      variantConditions.PutUnique (parent->variant, conditionResults);
+    return;
+  }
+
   if (rootNode == 0)
   {
     // This is the first condition, new node gets root
@@ -222,36 +233,24 @@ size_t csShaderConditionResolver::GetVariant ()
   }
 }
 
-bool csShaderConditionResolver::SetVariantRecursive (size_t variant, 
-                                                     csConditionNode* node, 
-                                                     csBitArray& conditionResults)
-{
-  if (node->variant != csArrayItemNotFound)
-  {
-    return node->variant == variant;
-  }
-
-  if (SetVariantRecursive (variant, node->trueNode, conditionResults))
-  {
-    conditionResults.SetBit (node->condition);
-    return true;
-  }
-  else if (SetVariantRecursive (variant, node->falseNode, conditionResults))
-    return true;
-  else
-    return false;
-}
-
 void csShaderConditionResolver::SetVariant (size_t variant)
 {
   if (rootNode == 0) return;
+  CS_ASSERT(keepVariantToConditionsMap);
 
   csBitArray conditionResults (evaluator.GetNumConditions());
-  if (SetVariantRecursive (variant, rootNode->trueNode, conditionResults))
-    conditionResults.SetBit (rootNode->condition);
-  else
-    SetVariantRecursive (variant, rootNode->falseNode, conditionResults);
-  evaluator.ForceConditionResults (conditionResults);
+  csBitArray conditionSet (evaluator.GetNumConditions());
+  MyBitArrayTemp* conditionResultsPtr = variantConditions.GetElementPointer (
+    variant);
+  CS_ASSERT(conditionResultsPtr);
+  
+  size_t i = 0;
+  for (; i < conditionResultsPtr->GetSize(); i++)
+  {
+    conditionResults.Set (i, (*conditionResultsPtr)[i]);
+    conditionSet.SetBit (i);
+  }
+  evaluator.ForceConditionResults (conditionSet, conditionResults);
 }
 
 void csShaderConditionResolver::DumpConditionTree (csString& out)
@@ -488,9 +487,10 @@ csXMLShader::~csXMLShader ()
  * cache file format changes. */
 static const uint32 cacheFileMagic = 0x06737863;
 
-void csXMLShader::Load (iDocumentNode* source, bool noCacheRead)
+void csXMLShader::Load (iDocumentNode* source, bool forPrecache)
 {
-  techsResolver = new csShaderConditionResolver (*sharedEvaluator);
+  techsResolver = new csShaderConditionResolver (*sharedEvaluator,
+    forPrecache);
   
   CS::PluginCommon::ShaderCacheHelper::ShaderDocHasher hasher (
     compiler->objectreg, source);
@@ -513,7 +513,7 @@ void csXMLShader::Load (iDocumentNode* source, bool noCacheRead)
   bool cacheValid = (shaderCache != 0) && !cacheType.IsEmpty()
     && !cacheID_header.IsEmpty();
   if (!cacheValid) shaderCache.Invalidate();
-  bool readFromCache = cacheValid && !noCacheRead;
+  bool readFromCache = cacheValid && !forPrecache;
   
   csRef<iFile> cacheFile;
   if (cacheValid)
@@ -570,8 +570,8 @@ void csXMLShader::Load (iDocumentNode* source, bool noCacheRead)
   {
     csRef<iDataBuffer> hashStream = hasher.GetHashStream ();
     /* @@@ Actually, the cache tag wouldn't have to be that large.
-       In theory, anything would work as long as (a) it changes when the
-       shader or some file it uses changes (b) the tag is reasonably
+       In theory, anything would work as long as (a) it changes when
+       some file the shader uses changes (b) the tag is reasonably
        unique (also over multiple program runs).
        E.g. a UUID, recomputed when the shader is 'touched',
        could do as well. */
@@ -620,7 +620,8 @@ void csXMLShader::Load (iDocumentNode* source, bool noCacheRead)
     {
       // Make sure resolver is pristine
       delete techsResolver;
-      techsResolver = new csShaderConditionResolver (*sharedEvaluator);
+      techsResolver = new csShaderConditionResolver (*sharedEvaluator,
+        forPrecache);
     }
   }
   
@@ -706,14 +707,14 @@ bool csXMLShader::Precache (iDocumentNode* source, iHierarchicalCache* cacheTo)
     for (size_t t = 0; t < techVar.techniques.GetSize(); t++)
     {
       ShaderTechVariant::Technique& tech = techVar.techniques[t];
-      tech.resolver = new csShaderConditionResolver (*sharedEvaluator);
+      tech.resolver = new csShaderConditionResolver (*sharedEvaluator, true);
       tech.resolver->SetVariant (t);
       
       csRef<iHierarchicalCache> techCache;
       techCache = shaderCache->GetRootedCache (
 	csString().Format ("/%s/%zu/%zu", cacheScope_tech.GetData(), tvi, t));
 	
-      LoadTechnique (tech, techCache, tvi);
+      LoadTechnique (tech, techCache, tvi, true);
 	
       if (compiler->do_verbose)
 	compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -758,8 +759,9 @@ bool csXMLShader::Precache (iDocumentNode* source, iHierarchicalCache* cacheTo)
 	}
   
 	csRef<iHierarchicalCache> varCache;
-	varCache = techCache->GetRootedCache (
-	  csString().Format ("/%zu", vi));
+	varCache.AttachNew (
+	  new CS::PluginCommon::ShaderCacheHelper::MicroArchiveCache (
+	    techCache, csString().Format ("/%zu", vi)));
 	
 	// So external files are found correctly
 	csVfsDirectoryChanger dirChange (compiler->vfs);
@@ -1017,8 +1019,9 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	csRef<iHierarchicalCache> varCache;
 	if (techCache)
 	{
-	  varCache = techCache->GetRootedCache (
-	    csString().Format ("/%zu", vi));
+	  varCache.AttachNew (
+	    new CS::PluginCommon::ShaderCacheHelper::MicroArchiveCache (
+	      techCache, csString().Format ("/%zu", vi)));
 	}
     
 	if (!var.prepared)
@@ -1195,7 +1198,7 @@ bool csXMLShader::LoadTechniqueFromCache (ShaderTechVariant::Technique& tech,
   
   ConditionsReader condReader (*sharedEvaluator, conditionsBuf);
   
-  tech.resolver = new csShaderConditionResolver (*sharedEvaluator);
+  tech.resolver = new csShaderConditionResolver (*sharedEvaluator, false);
   if (!tech.resolver->ReadFromCache (cacheFile, condReader))
   {
     delete tech.resolver;
@@ -1214,9 +1217,10 @@ bool csXMLShader::LoadTechniqueFromCache (ShaderTechVariant::Technique& tech,
 
 void csXMLShader::LoadTechnique (ShaderTechVariant::Technique& tech,
                                  iHierarchicalCache* cacheTo,
-                                 size_t dbgTechNum)
+                                 size_t dbgTechNum, bool forPrecache)
 {
-  tech.resolver = new csShaderConditionResolver (*sharedEvaluator);
+  tech.resolver = new csShaderConditionResolver (*sharedEvaluator,
+    forPrecache);
         
   csRefArray<iDocumentNode> extraNodes;
   static const char* const extraNodeNames[] = { "vp", "fp", "vproc", 0 };

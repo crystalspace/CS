@@ -1,5 +1,5 @@
 <Include>
-  <Feature Title="Crystal Space Demos" Id="CS.demo" Level="1" ConfigurableDirectory="CSDEMOS1.9" AllowAdvertise="no">
+  <Feature Title="Crystal Space Demos" Id="CS.demo" Level="1" ConfigurableDirectory="CSDEMOS$(var.VERSION_MAJORMINOR)" AllowAdvertise="no">
     <Feature Title="Demo Applications" Id="CS.arch.executable.demo" Level="1" Display="hidden">
       <MergeRef Id="CS.arch.executable.demo"/>
     </Feature>

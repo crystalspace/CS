@@ -97,8 +97,7 @@ bool csEmitFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csEmitFactoryLoader::Parse (iDocumentNode* /*node*/,
-	iStreamSource*, iLoaderContext*, iBase* /* context */,
-  iStringArray* failed)
+	iStreamSource*, iLoaderContext*, iBase* /* context */)
 {
   csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
   	object_reg, "crystalspace.mesh.object.emit");
@@ -346,7 +345,7 @@ csRef<iEmitGen3D> csEmitLoader::ParseEmit (iDocumentNode* node,
 
 csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 			    iStreamSource*, iLoaderContext* ldr_context,
-			    iBase*, iStringArray* failedMeshFacts)
+			    iBase*)
 {
   csRef<iEmitGen3D> emit;
   csRef<iMeshObject> mesh;
@@ -368,32 +367,7 @@ csPtr<iBase> csEmitLoader::Parse (iDocumentNode* node,
 	  const char* factname = child->GetContentsValue ();
 	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
 
-    if(failedMeshFacts)
-    {
-      // Check for failed meshfact load.
-      int i = 0;
-      while(!fact)
-      {
-        if(failedMeshFacts->GetSize() != 0 &&
-          !strcmp(failedMeshFacts->Get(i), factname))
-        {
-          synldr->ReportError ("crystalspace.emitloader.parse",
-            child, "Cannot find factory '%s' for emit!", factname);
-            return 0;
-        }
-
-        if(i >= (int)(failedMeshFacts->GetSize()-1))
-        {
-          fact = ldr_context->FindMeshFactory (factname);
-          i = 0;
-        }
-        else
-        {
-          i++;
-        }
-      }
-    }
-    else if(!fact)
+    if(!fact)
     {
       synldr->ReportError ("crystalspace.emitloader.parse",
         child, "Cannot find factory '%s' for emit!", factname);

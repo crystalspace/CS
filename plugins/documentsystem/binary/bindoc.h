@@ -454,7 +454,14 @@ private:
   char* vstr;
   /// nodeData for which vstr is valid
   csBdNode* vsptr;
-  csRef<csBinaryDocNode> Parent; 
+  csRef<csBinaryDocNode> Parent;
+  /**
+   * Attribute values returned by csBinaryDocAttribute are only valid as
+   * long as the attribute instance exists; to make GetAttributeValue()
+   * methods work correctly we have to keep around the attribute we last
+   * requested a value from.
+   */
+  csRef<iDocumentAttribute> getAttributeValueStrKeeper;
 
   void Store (csMemFile* nodesFile);
   int IndexOfAttr (const char* attr);

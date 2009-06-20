@@ -24,7 +24,9 @@
 #include "imap/loader.h"
 #include "imesh/genmesh.h"
 #include "iutil/object.h"
+#include "iutil/stringarray.h"
 #include "ivaria/reporter.h"
+#include "ivideo/material.h"
 
 #include "csloadercontext.h"
 
@@ -38,6 +40,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     : scfImplementationType (this), object_reg(object_reg), Engine(Engine), loader(loader),
     collection(collection), missingdata(missingdata), keepFlags(keepFlags), do_verbose(do_verbose)
   {
+    tm = csQueryRegistry<iTextureManager>(object_reg);
   }
 
   csLoaderContext::~csLoaderContext ()
@@ -58,30 +61,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         }
       }
     }
-    
-    if(!s.IsValid() && collection)
-    {
-      s = Engine->FindSector(name, collection);
-    }
-
-    if(!s.IsValid())
-    {
-      s = Engine->FindSector(name);
-    }
 
     if(!s.IsValid() && missingdata)
     {
       s = missingdata->MissingSector(name);
     }
+    
+    if(!s.IsValid())
+    {
+      s = Engine->FindSector(name, collection);
+    }
 
     return s;
   }
 
-  iMaterialWrapper* csLoaderContext::FindMaterial(const char* filename, bool dontWaitForLoad)
+  iMaterialWrapper* csLoaderContext::FindMaterial(const char* name, bool dontWaitForLoad)
   {
     csRef<iMaterialWrapper> mat;
 
-    if(FindAvailMaterial(filename))
+    if(FindAvailMaterial(name))
     {
       while(!mat.IsValid())
       {
@@ -89,7 +87,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           CS::Threading::MutexScopedLock lock(loader->materialsLock);
           for(size_t i=0; i<loader->loaderMaterials.GetSize(); i++)
           {
-            if(!strcmp(loader->loaderMaterials[i]->QueryObject()->GetName(), filename))
+            if(!strcmp(loader->loaderMaterials[i]->QueryObject()->GetName(), name))
             {
               mat = loader->loaderMaterials[i];
               return mat;
@@ -97,14 +95,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
         }
 
-        if(!mat.IsValid())
-        {
-          mat = Engine->FindMaterial(filename, collection);
-        }
-
         if(!mat.IsValid() && missingdata)
         {
-          mat = missingdata->MissingMaterial(0, filename);
+          mat = missingdata->MissingMaterial(name, name);
+        }
+
+        if(!mat.IsValid())
+        {
+          mat = Engine->FindMaterial(name, collection);
         }
 
         if(dontWaitForLoad)
@@ -115,14 +113,55 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     // General search, as the object may not have been added via the loader.
-    if(!mat.IsValid())
+    if(!mat.IsValid() && missingdata)
     {
-      mat = Engine->FindMaterial(filename, collection);
+      mat = missingdata->MissingMaterial(name, name);
     }
 
-    if(!mat.IsValid() && do_verbose)
+    if(!mat.IsValid())
     {
-      ReportNotify("Could not find material '%s'.", filename);
+      mat = Engine->FindMaterial(name, collection);
+    }
+    
+    // *** This is deprecated behaviour ***
+    if(!dontWaitForLoad && !mat.IsValid())
+    {
+      ReportWarning("Could not find material '%s'. Creating material. This behaviour is deprecated.", name);
+      if(missingdata)
+      {
+        mat = missingdata->MissingMaterial(name, name);
+        if(mat)
+        {
+          return mat;
+        }
+      }
+
+      iTextureWrapper* tex = FindTexture (name, true);
+      if (tex)
+      {
+        // Add a default material with the same name as the texture
+        csRef<iMaterial> material = Engine->CreateBaseMaterial (tex);
+        // First we have to extract the optional region name from the name:
+        char const* n = strchr (name, '/');
+        if (!n) n = name;
+        else n++;
+        csRef<iMaterialWrapper> mat = Engine->GetMaterialList()->CreateMaterial (material, n);
+        loader->AddMaterialToList(mat);
+
+        if(collection)
+        {
+          collection->Add(mat->QueryObject());
+        }
+
+        tex->Register(tm);
+        return mat;
+      }
+    }
+    /// ***
+
+    if(!mat.IsValid() && !dontWaitForLoad && do_verbose)
+    {
+      ReportNotify("Could not find material '%s'.", name);
     }
 
     return mat;
@@ -148,30 +187,44 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
         }
 
-        if(!fact.IsValid())
-        {
-          fact = Engine->FindMeshFactory(name, collection);
-        }
-
         if(!fact.IsValid() && missingdata)
         {
           fact = missingdata->MissingFactory(name);
+        }
+
+        if(!fact.IsValid())
+        {
+          fact = Engine->FindMeshFactory(name, collection);
         }
 
         if(dontWaitForLoad)
         {
           break;
         }
+
+        for(size_t i=0; i<loader->failedMeshFacts->GetSize(); i++)
+        {
+          if(!strcmp(loader->failedMeshFacts->Get(i), name))
+          {
+            // Break out of the loop, it's never going to be loaded.
+            break;
+          }
+        }
       }
     }
 
     // General search, as the object may not have been added via the loader.
+    if(!fact.IsValid() && missingdata)
+    {
+      fact = missingdata->MissingFactory(name);
+    }
+
     if(!fact.IsValid())
     {
       fact = Engine->FindMeshFactory(name, collection);
     }
 
-    if(!fact.IsValid() && do_verbose)
+    if(!fact.IsValid() && !dontWaitForLoad && do_verbose)
     {
       ReportNotify("Could not find mesh factory '%s'.", name);
     }
@@ -210,19 +263,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
         }
 
-        if(!mesh.IsValid())
-        {
-          mesh = Engine->FindMeshObject(name, collection);
-        }
-
         if (!mesh.IsValid() && missingdata)
         {
           mesh = missingdata->MissingMesh(name);
+        }
+
+        if(!mesh.IsValid())
+        {
+          mesh = Engine->FindMeshObject(name, collection);
         }
       }
     }
 
     // General search, as the object may not have been added via the loader.
+    if (!mesh.IsValid() && missingdata)
+    {
+      mesh = missingdata->MissingMesh(name);
+    }
+
     if(!mesh.IsValid())
     {
       mesh = Engine->FindMeshObject(name, collection);
@@ -248,6 +306,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           light = loader->loadedLights.Get(csString(name), 0);
         }
 
+        if(!light.IsValid() && missingdata)
+        {
+          light = missingdata->MissingLight(name);
+        }
+
         if(!light.IsValid())
         {
           csRef<iLightIterator> li = Engine->GetLightIterator(collection);
@@ -261,15 +324,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             }
           }
         }
-
-        if(!light.IsValid() && missingdata)
-        {
-          light = missingdata->MissingLight(name);
-        }
       }
     }
 
     // General search, as the object may not have been added via the loader.
+    if(!light.IsValid() && missingdata)
+    {
+      light = missingdata->MissingLight(name);
+    }
+
     if(!light.IsValid())
     {
       csRef<iLightIterator> li = Engine->GetLightIterator(collection);
@@ -306,32 +369,39 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     // Always look up builtin shaders globally
     if(!collection || (name && *name == '*'))
     {
-      shader = shaderMgr->GetShader(name);
-      if(!shader && missingdata)
+      if(missingdata)
       {
         shader = missingdata->MissingShader(name);
+      }
+
+      if(!shader)
+      {
+        shader = shaderMgr->GetShader(name);
       }
     }
     else
     {
-      csRefArray<iShader> shaders = shaderMgr->GetShaders();
-      for(size_t i=0; i<shaders.GetSize(); i++)
-      {
-        shader = shaders[i];
-        if(collection)
-        {
-          if((collection->IsParentOf(shader->QueryObject()) ||
-            collection->FindShader(shader->QueryObject()->GetName())) &&
-            !strcmp(name, shader->QueryObject()->GetName()))
-          {
-            break;
-          }
-        }
-      }
-
       if(missingdata)
       {
         shader = missingdata->MissingShader(name);
+      }
+
+      if(!shader)
+      {
+        csRefArray<iShader> shaders = shaderMgr->GetShaders();
+        for(size_t i=0; i<shaders.GetSize(); i++)
+        {
+          shader = shaders[i];
+          if(collection)
+          {
+            if((collection->IsParentOf(shader->QueryObject()) ||
+              collection->FindShader(shader->QueryObject()->GetName())) &&
+              !strcmp(name, shader->QueryObject()->GetName()))
+            {
+              break;
+            }
+          }
+        }
       }
     }
 
@@ -364,14 +434,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
         }
 
+        if(!result.IsValid() && missingdata)
+        {
+          result = missingdata->MissingTexture (name, name);
+        }
+
         if(!result.IsValid())
         {
           result = Engine->FindTexture(name, collection);
-        }
-
-        if(!result.IsValid() && missingdata)
-        {
-          result = missingdata->MissingTexture (name, 0);
         }
 
         if(dontWaitForLoad)
@@ -382,12 +452,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     // General search, as the object may not have been added via the loader.
+    if(!result.IsValid() && missingdata)
+    {
+      result = missingdata->MissingTexture (name, name);
+    }
+
     if(!result.IsValid())
     {
       result = Engine->FindTexture(name, collection);
     }
 
-    if(!result.IsValid() && do_verbose)
+    // *** This is deprecated behaviour ***
+    if(!dontWaitForLoad && !result.IsValid())
+    {
+      ReportWarning("Could not find texture '%s'. Loading texture. This is deprecated behaviour.", 
+        name);
+      csRef<iThreadManager> tman = csQueryRegistry<iThreadManager>(object_reg);
+      csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(tman));
+      loader->LoadTextureTC(itr, name, name, CS_TEXTURE_3D, tm, true, false, true, collection,
+        KEEP_ALL, do_verbose);
+      result = scfQueryInterfaceSafe<iTextureWrapper>(itr->GetResultRefPtr());
+    }
+    // ***
+
+    if(!result.IsValid() && !dontWaitForLoad && do_verbose)
     {
       ReportNotify ("Could not find texture '%s'. Attempting to load.", name);
     }
@@ -423,6 +511,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     va_list arg;
     va_start (arg, description);
     csReportV (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.maploader", description, arg);
+    va_end (arg);
+  }
+
+  void csLoaderContext::ReportWarning (const char* description, ...)
+  {
+    va_list arg;
+    va_start (arg, description);
+    csReportV (object_reg, CS_REPORTER_SEVERITY_WARNING, "crystalspace.maploader", description, arg);
     va_end (arg);
   }
 

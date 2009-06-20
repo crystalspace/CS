@@ -238,6 +238,8 @@ rule MakeMSIsForArchAndKind
     "ARCH=$(arch)" "TOP=$(TOP)"
     "UPGRADE_CODE=$(MSI_UPGRADE_CODE.CS.$(kind).$(arch))" 
     "VERSION_MAJORMINOR=$(MSI_VERSION_MAJORMINOR)"
+    "VERSION_MAJOR=$(PACKAGE_VERSION_LIST[1])"
+    "VERSION_MINOR=$(PACKAGE_VERSION_LIST[2])"
     "VERSION_PACKAGE=$(MSI_VERSION_PACKAGE)" :
     CS-$(kind)-$(arch) ;
   Depends msis-$(kind) : $(msi) ;

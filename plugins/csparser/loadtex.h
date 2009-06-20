@@ -94,7 +94,7 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
-  	iBase* context, iStringArray* failed = 0) = 0;
+  	iBase* context) = 0;
 
   virtual bool IsThreadSafe() { return true; }
 };  
@@ -108,7 +108,7 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
-  	iBase* context, iStringArray* failed = 0);
+  	iBase* context);
 
   virtual bool IsThreadSafe() { return true; }
 };
@@ -122,23 +122,26 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
-  	iBase* context, iStringArray* failed = 0);
+  	iBase* context);
 
   virtual bool IsThreadSafe() { return true; }
 };
 
 /// Error-texture loader pseudo-plugin
 class csMissingTextureLoader :
-  public scfImplementationExt0<csMissingTextureLoader, csBaseTextureLoader>
+  public scfImplementation1<csMissingTextureLoader, iLoaderPlugin>
 {
 public:
-  csMissingTextureLoader (iBase *p);
+  csMissingTextureLoader (iObjectRegistry *object_reg);
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iStreamSource*, iLoaderContext* ldr_context,
-    iBase* context, iStringArray* failed = 0);
+    iBase* context);
 
   virtual bool IsThreadSafe() { return true; }
+
+private:
+  iObjectRegistry* object_reg;
 };
 
 /// Cubemap texture loader pseudo-plugin
@@ -154,7 +157,7 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
-    	iBase* context, iStringArray* failed = 0);
+    	iBase* context);
 
   virtual bool IsThreadSafe() { return true; }
 };
@@ -172,7 +175,7 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
-	iBase* context, iStringArray* failed = 0);
+	iBase* context);
 
   virtual bool IsThreadSafe() { return true; }
 };

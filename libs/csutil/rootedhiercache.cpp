@@ -18,10 +18,13 @@
 
 #include "cssysdef.h"
 
+#include "csutil/rootedhiercache.h"
 
-#include "rootedhiercache.h"
+#include "csutil/csstring.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
+namespace CS
+{
+namespace Utility
 {
   csString RootedHierarchicalCache::AdjustPath (const char* org)
   {
@@ -38,6 +41,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
     return csPtr<iHierarchicalCache> (newCache);
   }
 
-}
-CS_PLUGIN_NAMESPACE_END(ShaderManager)
+} // namespace Utility
+} // namespace CS
 

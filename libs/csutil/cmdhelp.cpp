@@ -94,7 +94,7 @@ void csCommandLineHelper::Help (iObjectRegistry* object_reg,
   }
 
   csRef<iPluginManager> plgmgr = csQueryRegistry<iPluginManager> (object_reg);
-  csRef<iPluginIterator> it = plgmgr->GetPlugins ();
+  csRef<iPluginIterator> it = plgmgr->GetPluginInstances ();
   while (it->HasNext ())
   {
     iBase* plug = it->Next ();

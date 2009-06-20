@@ -69,7 +69,7 @@ bool csPagingFormerLoader::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iBase> csPagingFormerLoader::Parse (iDocumentNode* node,
 		iStreamSource*, iLoaderContext* /*ldr_context*/,
-		iBase* /*context*/, iStringArray* failed)
+		iBase* /*context*/)
 {
   csRef<iTerraFormer> former = csLoadPlugin<iTerraFormer> (pluginmgr, 
   	"crystalspace.terraformer.paging");

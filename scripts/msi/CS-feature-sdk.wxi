@@ -1,6 +1,6 @@
 <Include>
-  <Property Id="CSSDK1.9" Value="C:\CrystalSpaceSDK" />
-  <Feature Title="Crystal Space SDK" Id="CS.sdk" Level="1" ConfigurableDirectory="CSSDK1.9" AllowAdvertise="no">
+  <Property Id="CSSDK$(var.VERSION_MAJORMINOR)" Value="C:\CrystalSpaceSDK" />
+  <Feature Title="Crystal Space SDK" Id="CS.sdk" Level="1" ConfigurableDirectory="CSSDK$(var.VERSION_MAJORMINOR)" AllowAdvertise="no">
     <Feature Title="Development Files" Id="CS.sdk.base" Level="1">
       <Feature Title="Register Environment Variable" Id="CS.sdk.register" Level="1" Display="hidden">
         <ComponentRef Id="CS.sdk.register"/>

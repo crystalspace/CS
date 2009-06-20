@@ -182,6 +182,14 @@ jobject _csRef_to_Java(const csRef<iBase>& ref, void* ptr, const char* name,
 }
 %}
 
+%{
+jlong _cs_get_swig_pointer(jobject obj,JNIEnv* jenv)
+{
+	jclass clazz = jenv->GetObjectClass(obj);
+	jfieldID field = jenv->GetFieldID(clazz,"swigCPtr","J");
+	return jenv->GetLongField(obj,field);
+}
+%}
 /*
   ptr   : either a csRef<type> or csPtr<type>
   name  : type name, e.g. "iEngine *"

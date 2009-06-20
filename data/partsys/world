@@ -189,6 +189,9 @@
         <material name="particle">
             <texture>dot</texture>
         </material>
+        <material name="dot">
+            <texture>dot</texture>
+        </material>
     </materials>
     <plugins>
         <plugin name="emitFact">crystalspace.mesh.loader.factory.emit</plugin>

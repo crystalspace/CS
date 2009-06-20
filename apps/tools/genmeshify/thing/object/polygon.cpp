@@ -22,7 +22,7 @@
 #include "csgeom/frustum.h"
 #include "csgeom/matrix2.h"
 #include "csgeom/poly3d.h"
-#include "csgeom/textrans.h"
+#include "textrans.h"
 #include "csutil/csendian.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/memfile.h"

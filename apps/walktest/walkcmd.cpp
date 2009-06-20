@@ -1312,9 +1312,9 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!csStrCaseCmp (cmd, "bugplug"))
   {
-    csRef<iBase> plug = csLoadPluginAlways (Sys->plugin_mgr,
+    csRef<iComponent> plug = csLoadPluginAlways (Sys->plugin_mgr,
     	"crystalspace.utilities.bugplug");
-    plug->IncRef ();	// Avoid smart pointer release (@@@)
+    plug->IncRef ();	// Avoid smart pointer release (@@@ leak)
   }
   else if (!csStrCaseCmp (cmd, "do_logo"))
     csCommandProcessor::change_boolean (arg, &Sys->do_logo, "do_logo");

@@ -76,8 +76,7 @@ bool csPathLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 csPtr<iBase> csPathLoader::Parse (iDocumentNode* node,
-	iStreamSource*, iLoaderContext* ldr_context, iBase* context,
-  iStringArray* failed)
+	iStreamSource*, iLoaderContext* ldr_context, iBase* context)
 {
   csRef<iSector> sector = scfQueryInterface<iSector>(context);
   if (!sector)

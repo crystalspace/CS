@@ -233,13 +233,13 @@ public:
   virtual const char* Parse (iDataBuffer* buf, bool collapse = false);
   virtual const char* Parse (iString* str,     bool collapse = false);
   virtual const char* Parse (const char* buf,  bool collapse = false);
-  virtual const char* Write (iFile*) { return "Read-only!"; }
-  virtual const char* Write (iString*) { return "Read-only!"; }
-  virtual const char* Write (iVFS*, const char*) { return "Read-only!"; }
+  virtual const char* Write (iFile*);
+  virtual const char* Write (iString*);
+  virtual const char* Write (iVFS*, const char*);
 
   csRef<iDocumentNode> CreateRoot (char* buf, size_t bufSize);
   const char* Parse (const char* buf, size_t bufSize, bool collapse);
-  const char* ParseInPlace (char* buf, size_t bufSize, bool collapse = false);
+  const char* ParseInPlace (char* buf, size_t bufSize, bool collapse);
 
   virtual int Changeable () { return CS_CHANGEABLE_NEVER; }
 };

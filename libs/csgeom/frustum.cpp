@@ -22,8 +22,6 @@
 #include "csgeom/math3d.h"
 #include "csutil/blockallocator.h"
 
-// --------------------------------------------------------------------------
-
 namespace {
 
 struct vecar3 { csVector3 ar[3]; };
@@ -44,12 +42,13 @@ public:
   csBlockAllocator<vecar10>* blk_vecar10;
   csVertexArrayAlloc () :
   	blk_vecar3 (400),
-	blk_vecar4 (400),
-	blk_vecar5 (100),
-	blk_vecar6 (100),
-	blk_vecar10 (0)
+	  blk_vecar4 (400),
+	  blk_vecar5 (100),
+	  blk_vecar6 (100),
+	  blk_vecar10 (0)
   {
   }
+
   ~csVertexArrayAlloc ()
   {
     delete blk_vecar10;
@@ -66,16 +65,16 @@ public:
       case 6: return blk_vecar6.Alloc ()->ar;
       default:
         if (n <= 10)
-	{
-	  if (!blk_vecar10) blk_vecar10 = new csBlockAllocator<vecar10> (100);
-	  return blk_vecar10->Alloc ()->ar;
-	}
+        {
+          if (!blk_vecar10) blk_vecar10 = new csBlockAllocator<vecar10> (100);
+          return blk_vecar10->Alloc ()->ar;
+        }
         else
-	{
+        {
           csVector3* p = 
             static_cast<csVector3*> (cs_malloc (sizeof (csVector3) * n));
           for (size_t v = 0; v < n; v++) new (p + v) csVector3;
-	  return p;
+          return p;
         }
     }
     return 0;
@@ -93,11 +92,12 @@ public:
       case 6: blk_vecar6.Free ((vecar6*)ar); break;
       default:
         if (n <= 10)
-	  blk_vecar10->Free ((vecar10*)ar);
+          blk_vecar10->Free ((vecar10*)ar);
         else
         {
-          for (size_t v = 0; v < n; v++) ar[v].~csVector3();
-	  cs_free (ar);
+          for (size_t v = 0; v < n; v++)
+            ar[v].~csVector3();
+          cs_free (ar);
         }
         break;
     }
@@ -294,13 +294,13 @@ void csFrustum::ClipPolyToPlane (csPlane3 *plane)
     // None of the vertices of the new polygon are in front of the back
     // plane of this frustum. So intersection is empty.
     MakeEmpty ();
-    return ;
+    return;
   }
 
   if (count_front == num_vertices)
   {
     // All vertices are in front. So nothing happens.
-    return ;
+    return;
   }
 
   // Some of the vertices are in front, others are behind. So we
@@ -353,7 +353,7 @@ void csFrustum::ClipPolyToPlane (csPlane3 *plane)
   if (num_clipped_verts < 3)
   {
     MakeEmpty ();
-    return ;
+    return;
   }
 
   // Copy the clipped vertices. @@@ Is this efficient? Can't we clip in place?
@@ -418,19 +418,19 @@ void csFrustum::ClipToPlane (csVector3 &v1, csVector3 &v2)
 
   float dummy;
   csIntersect3::SegmentPlane (
-      vertices[cw_offset],
-      vertices[i],
-      Plane_Normal,
-      v1,
-      isect_cw,
-      dummy);
+    vertices[cw_offset],
+    vertices[i],
+    Plane_Normal,
+    v1,
+    isect_cw,
+    dummy);
   csIntersect3::SegmentPlane (
-      vertices[ccw_offset],
-      vertices[ccw_offset + 1],
-      Plane_Normal,
-      v1,
-      isect_ccw,
-      dummy);
+    vertices[ccw_offset],
+    vertices[ccw_offset + 1],
+    Plane_Normal,
+    v1,
+    isect_ccw,
+    dummy);
 
   // Remove the obsolete point and insert the intersection points.
   if (first_vertex_side)
@@ -492,7 +492,7 @@ void csFrustum::ClipToPlane (
       num_vertices = 0;  // The whole polygon is behind the plane.
 
     // because the first is.
-    return ;
+    return;
   }
 
   //for (ccw_offset = num_vertices - 2; ccw_offset >= 0; ccw_offset--)
@@ -510,15 +510,14 @@ void csFrustum::ClipToPlane (
 
   float dist_cw, dist_ccw;
   csIntersect3::SegmentPlane (
-      vertices[cw_offset],
-      vertices[i],
-      plane,
-      isect_cw,
-      dist_cw);
+    vertices[cw_offset],
+    vertices[i],
+    plane,
+    isect_cw,
+    dist_cw);
 
   csClipInfo clip_cw;
-  if (
-    clipinfo[cw_offset].type != CS_CLIPINFO_ORIGINAL ||
+  if (clipinfo[cw_offset].type != CS_CLIPINFO_ORIGINAL ||
     clipinfo[i].type != CS_CLIPINFO_ORIGINAL)
   {
     clip_cw.type = CS_CLIPINFO_INSIDE;
@@ -537,15 +536,14 @@ void csFrustum::ClipToPlane (
   }
 
   csIntersect3::SegmentPlane (
-      vertices[ccw_offset],
-      vertices[ccw_offset + 1],
-      plane,
-      isect_ccw,
-      dist_ccw);
+    vertices[ccw_offset],
+    vertices[ccw_offset + 1],
+    plane,
+    isect_ccw,
+    dist_ccw);
 
   csClipInfo clip_ccw;
-  if (
-    clipinfo[ccw_offset].type != CS_CLIPINFO_ORIGINAL ||
+  if (clipinfo[ccw_offset].type != CS_CLIPINFO_ORIGINAL ||
     clipinfo[ccw_offset + 1].type != CS_CLIPINFO_ORIGINAL)
   {
     clip_ccw.type = CS_CLIPINFO_INSIDE;
@@ -660,12 +658,12 @@ void csFrustum::ClipToPlane (
 
   float dist_cw, dist_ccw;
   csIntersect3::SegmentPlane (
-      vertices[cw_offset],
-      vertices[i],
-      Plane_Normal,
-      v1,
-      isect_cw,
-      dist_cw);
+    vertices[cw_offset],
+    vertices[i],
+    Plane_Normal,
+    v1,
+    isect_cw,
+    dist_cw);
 
   csClipInfo clip_cw;
   if (
@@ -688,16 +686,15 @@ void csFrustum::ClipToPlane (
   }
 
   csIntersect3::SegmentPlane (
-      vertices[ccw_offset],
-      vertices[ccw_offset + 1],
-      Plane_Normal,
-      v1,
-      isect_ccw,
-      dist_ccw);
+    vertices[ccw_offset],
+    vertices[ccw_offset + 1],
+    Plane_Normal,
+    v1,
+    isect_ccw,
+    dist_ccw);
 
   csClipInfo clip_ccw;
-  if (
-    clipinfo[ccw_offset].type != CS_CLIPINFO_ORIGINAL ||
+  if (clipinfo[ccw_offset].type != CS_CLIPINFO_ORIGINAL ||
     clipinfo[ccw_offset + 1].type != CS_CLIPINFO_ORIGINAL)
   {
     clip_ccw.type = CS_CLIPINFO_INSIDE;

@@ -356,9 +356,6 @@ public:
   iColoredVertices* GetVertices () { return scfVertices; }
   csColoredVertices* GetCsVertices () { return &vertices; }
 
-  void SetBlaa (int x) { ax = x; }
-  int GetBlaa () const { return ax; }
-
   /// Has this sprite lighting?
   bool HasLighting () const { return lighting; }
 

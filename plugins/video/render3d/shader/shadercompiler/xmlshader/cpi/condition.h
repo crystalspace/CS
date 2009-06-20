@@ -70,6 +70,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
   typedef size_t csConditionID;
   const csConditionID csCondAlwaysFalse = (csConditionID)~0;
   const csConditionID csCondAlwaysTrue = (csConditionID)~1;
+  const csConditionID csCondUnknown = (csConditionID)~2;
 
   /// An actual operand.
   struct CondOperand

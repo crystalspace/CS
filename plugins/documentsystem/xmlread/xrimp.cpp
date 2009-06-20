@@ -37,7 +37,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLRead)
 //------------------------------------------------------------------------
 
 csXmlReadDocumentSystem::csXmlReadDocumentSystem (iBase* parent) :
-  scfImplementationType(this), parent(parent)
+  scfImplementationType(this, parent)
 {
 }
 
@@ -401,6 +401,12 @@ bool csXmlReadNode::GetAttributeValueAsBool (const char* name,bool defaultvalue)
 
 //------------------------------------------------------------------------
 
+static inline bool HasUTF8Bom (const char* buf)
+{
+  unsigned char* ub = (unsigned char*)buf; //Need for test...
+  return (ub[0] == 0xEF && ub[1] == 0xBB && ub[2] == 0xBF);
+}
+
 csXmlReadDocument::csXmlReadDocument (csXmlReadDocumentSystem* sys) :
   scfImplementationType(this), root (0), sys (sys)
 {
@@ -432,9 +438,7 @@ csRef<iDocumentNode> csXmlReadDocument::CreateRoot (char* buf, size_t bufSize)
 
 csRef<iDocumentNode> csXmlReadDocument::CreateRoot ()
 {
-  Clear ();
-  root = new TrDocument (false);
-  return csPtr<iDocumentNode> (Alloc (root, false));
+  return 0;
 }
 
 csRef<iDocumentNode> csXmlReadDocument::GetRoot ()
@@ -446,21 +450,47 @@ const char* csXmlReadDocument::Parse (iFile* file, bool collapse)
 {
   size_t want_size = file->GetSize ();
   char *data = (char*)cs_malloc (want_size + 1);
+  char* parse_data = data;
+  if (want_size >= 3)
+  {
+    if (file->Read (data, 3) != 3)
+    {
+      cs_free (parse_data);
+      return "Unexpected EOF encountered";
+    }
+    want_size -= 3;
+    if (!HasUTF8Bom (data))
+      // Not a BOM - keep the read sata
+      data += 3;
+  }
   size_t real_size = file->Read (data, want_size);
   if (want_size != real_size)
   {
-    cs_free (data);
+    cs_free (parse_data);
     return "Unexpected EOF encountered";
   }
   data[real_size] = '\0';
 #ifdef CS_DEBUG
   if (strlen (data) != real_size)
   {
-    cs_free (data);
+    cs_free (parse_data);
     return "File contains one or more null characters";
   }
 #endif
-  return ParseInPlace (data, want_size, collapse);
+
+  const char* b = parse_data;
+  while ((*b == ' ') || (*b == '\n') || (*b == '\t') || 
+    (*b == '\r')) b++;
+  if (*b != '<')
+  {
+    cs_free (parse_data);
+    return "Data does not seem to be XML.";
+  }
+  
+  /* Note: it's okay if want_size is a bit too small;
+   * it's not used as the actual data size in ParseInPlace,
+   * only to choose between 'small' and 'large' docs. */
+  return ParseInPlace (parse_data, want_size, collapse);
 }
 
 const char* csXmlReadDocument::Parse (iDataBuffer* buf, bool collapse)
@@ -481,6 +511,21 @@ const char* csXmlReadDocument::Parse (const char* buf, bool collapse)
 
 const char* csXmlReadDocument::Parse (const char* buf, size_t bufSize, bool collapse)
 {
+  // Skip any UTF8 BOM
+  if ((bufSize >= 3) && HasUTF8Bom (buf))
+  {
+    buf += 3;
+    bufSize -= 3;
+  }
+
+  const char* b = buf;
+  while ((*b == ' ') || (*b == '\n') || (*b == '\t') || 
+    (*b == '\r')) b++;
+  if (*b != '<')
+  {
+    return "Data does not seem to be XML.";
+  }
+
   size_t want_size = bufSize;
   char *data = (char*)cs_malloc (want_size + 1);
   memcpy (data, buf, bufSize);
@@ -496,6 +541,21 @@ const char* csXmlReadDocument::ParseInPlace (char* buf, size_t bufSize, bool col
   if (root->Error ())
     return root->ErrorDesc ();
   return 0;
+}
+
+const char* csXmlReadDocument::Write (iFile*)
+{
+  return "Writing not supported by this plugin!";
+}
+
+const char* csXmlReadDocument::Write (iString*)
+{
+  return "Writing not supported by this plugin!";
+}
+
+const char* csXmlReadDocument::Write (iVFS*, const char*)
+{
+  return "Writing not supported by this plugin!";
 }
 
 #include "csutil/custom_new_disable.h"

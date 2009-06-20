@@ -400,6 +400,14 @@ void csXWindow::SetVideoMode (bool full, bool up, bool down)
       }
     }
   }
+  else
+  {
+    if (Canvas)
+      Report (CS_REPORTER_SEVERITY_WARNING,
+        "Unable to set video mode: xf86vm extension support was not found!");
+    else
+      csPrintf ("WARNING: Unable to set video mode: xf86vm extension support was not found!\n");
+  }
 }
 
 void csXWindow::Close ()

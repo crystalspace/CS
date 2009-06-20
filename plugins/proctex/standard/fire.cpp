@@ -84,7 +84,7 @@ csPtFireLoader::csPtFireLoader(iBase *p) :
 
 csPtr<iBase> csPtFireLoader::Parse (iDocumentNode* node, 
 				    iStreamSource*, iLoaderContext* /*ldr_context*/,
-  				    iBase* context, iStringArray* failed)
+  				    iBase* context)
 {
   /*
     Going through the plugin manager to retrieve the texture type

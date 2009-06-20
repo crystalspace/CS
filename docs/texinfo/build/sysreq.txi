@@ -42,7 +42,7 @@ You can also checkout the source directly from the @sc{svn} repository.
 Directions for doing this can be found here:
 
 @noindent
-@uref{http://sourceforge.net/svn/?group_id=649}
+@uref{http://www.crystalspace3d.org/main/Subversion}
 
 @strong{External Dependencies}: Crystal Space can use a number of optional
 libraries and tools to provide a more robust set of features.  A brief list of

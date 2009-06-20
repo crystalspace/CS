@@ -26,7 +26,6 @@
 
 #include "csutil/csstring.h"
 
-//---------------------------------------------------------------------------
 const csBox2::bEdge csBox2::edges[8] =
 {
   { CS_BOX_CORNER_xy, CS_BOX_CORNER_Xy },
@@ -39,10 +38,10 @@ const csBox2::bEdge csBox2::edges[8] =
   { CS_BOX_CORNER_xy, CS_BOX_CORNER_xY }
 };
 
-csString csBox2::Description() const
+csString csBox2::Description () const
 {
   csString s;
-  s.Format("(%g,%g)-(%g,%g)", MinX(), MinY(), MaxX(), MaxY());
+  s.Format ("(%g,%g)-(%g,%g)", MinX (), MinY (), MaxX (), MaxY ());
   return s;
 }
 
@@ -325,8 +324,6 @@ float csBox2::SquaredPosMaxDist (const csVector2& pos) const
   return res;
 }
 
-//---------------------------------------------------------------------------
-
 /*
  * We have a coordinate system around our box which is
  * divided into 27 regions. The center region at coordinate (1,1,1)
@@ -456,11 +453,11 @@ const csBox3::bFace csBox3:: faces[6] =
       CS_BOX_EDGE_XyZ_XYZ }
 };
 
-csString csBox3::Description() const
+csString csBox3::Description () const
 {
   csString s;
   s.Format("(%g,%g,%g)-(%g,%g,%g)",
-    MinX(), MinY(), MinZ(), MaxX(), MaxY(), MaxZ());
+    MinX (), MinY (), MinZ (), MaxX (), MaxY (), MaxZ ());
   return s;
 }
 
@@ -854,7 +851,7 @@ float csBox3::SquaredPosMaxDist (const csVector3& pos) const
 // it is used below the result is acceptable because it generates a
 // conservative result (i.e. a box or outline that is bigger then reality).
 static void PerspectiveWrong (const csVector3& v, csVector2& p, float fov,
-    	float sx, float sy)
+  float sx, float sy)
 {
   float iz = fov * 10;
   p.x = v.x * iz + sx;
@@ -937,8 +934,7 @@ bool csBox3::ProjectBox (const csTransform& trans, float fov,
 }
 
 bool csBox3::ProjectOutline (const csVector3& origin,
-	int axis, float where,
-  	csArray<csVector2>& poly) const
+	int axis, float where, csArray<csVector2>& poly) const
 {
   int idx = CalculatePointSegment (origin);
   const Outline &ol = outlines[idx];
@@ -964,8 +960,7 @@ bool csBox3::ProjectOutline (const csVector3& origin,
 }
 
 bool csBox3::ProjectOutline (const csVector3& origin,
-	int axis, float where,
-  	csPoly2D& poly) const
+	int axis, float where, csPoly2D& poly) const
 {
   int idx = CalculatePointSegment (origin);
   const Outline &ol = outlines[idx];
@@ -990,8 +985,7 @@ bool csBox3::ProjectOutline (const csVector3& origin,
 }
 
 bool csBox3::ProjectOutline (const csTransform& trans, float fov,
-	float sx, float sy,
-  	csPoly2D& poly, float& min_z, float& max_z) const
+	float sx, float sy, csPoly2D& poly, float& min_z, float& max_z) const
 {
   const csVector3& origin = trans.GetOrigin ();
   int idx = CalculatePointSegment (origin);
@@ -1022,8 +1016,8 @@ bool csBox3::ProjectOutline (const csTransform& trans, float fov,
 }
 
 bool csBox3::ProjectBoxAndOutline (const csTransform& trans, float fov,
-	float sx, float sy, csBox2& sbox,
-  	csPoly2D& poly, float& min_z, float& max_z) const
+	float sx, float sy, csBox2& sbox, csPoly2D& poly,
+  float& min_z, float& max_z) const
 {
   const csVector3& origin = trans.GetOrigin ();
   int idx = CalculatePointSegment (origin);
@@ -1202,23 +1196,23 @@ csBox3 operator+ (const csBox3 &box1, const csBox3 &box2)
 csBox3 operator+ (const csBox3 &box, const csVector3 &point)
 {
   return csBox3 (
-      MIN (box.minbox.x, point.x),
-      MIN (box.minbox.y, point.y),
-      MIN (box.minbox.z, point.z),
-      MAX (box.maxbox.x, point.x),
-      MAX (box.maxbox.y, point.y),
-      MAX (box.maxbox.z, point.z));
+    MIN (box.minbox.x, point.x),
+    MIN (box.minbox.y, point.y),
+    MIN (box.minbox.z, point.z),
+    MAX (box.maxbox.x, point.x),
+    MAX (box.maxbox.y, point.y),
+    MAX (box.maxbox.z, point.z));
 }
 
 csBox3 operator * (const csBox3 &box1, const csBox3 &box2)
 {
   return csBox3 (
-      MAX (box1.minbox.x, box2.minbox.x),
-      MAX (box1.minbox.y, box2.minbox.y),
-      MAX (box1.minbox.z, box2.minbox.z),
-      MIN (box1.maxbox.x, box2.maxbox.x),
-      MIN (box1.maxbox.y, box2.maxbox.y),
-      MIN (box1.maxbox.z, box2.maxbox.z));
+    MAX (box1.minbox.x, box2.minbox.x),
+    MAX (box1.minbox.y, box2.minbox.y),
+    MAX (box1.minbox.z, box2.minbox.z),
+    MIN (box1.maxbox.x, box2.maxbox.x),
+    MIN (box1.maxbox.y, box2.maxbox.y),
+    MIN (box1.maxbox.z, box2.maxbox.z));
 }
 
 bool operator== (const csBox3 &box1, const csBox3 &box2)
@@ -1264,7 +1258,5 @@ bool operator < (const csVector3 &point, const csBox3 &box)
 {
   return (point.x >= box.minbox.x) && (point.x <= box.maxbox.x) &&
     (point.y >= box.minbox.y) && (point.y <= box.maxbox.y) &&
-      (point.z >= box.minbox.z) && (point.z <= box.maxbox.z);
+    (point.z >= box.minbox.z) && (point.z <= box.maxbox.z);
 }
-
-//---------------------------------------------------------------------------

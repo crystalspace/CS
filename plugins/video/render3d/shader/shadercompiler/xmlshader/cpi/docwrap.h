@@ -75,7 +75,8 @@ struct iConditionResolver
    */
   virtual void AddNode (csConditionNode* parent,
     csConditionID condition, csConditionNode*& trueNode, 
-    csConditionNode*& falseNode) = 0;
+    csConditionNode*& falseNode,
+    const MyBitArrayTemp& conditionResults) = 0;
   /// Finish adding of nodes. Frees up some tempoarily used resources.
   virtual void FinishAdding () = 0;
 

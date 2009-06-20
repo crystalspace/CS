@@ -8,7 +8,7 @@
     <Directory Name="CrystalSpace" Id="CSINSTALLDIR"/>
   </DirectoryRef>
   <DirectoryRef Id="CSINSTALLDIR">
-    <Directory Name="CS-1.9" Id="CSVERSION1.9">
+    <Directory Name="CS-$(var.VERSION_MAJORMINOR)" Id="CSVERSION$(var.VERSION_MAJORMINOR)">
       <Merge DiskId="30000" SourceFile="$(var.CRYSTAL_MSM_PATH)/CS.register.msm" Id="CS.register.8E4AB45A-BF93-11DC-B42B-0015582877AD" Language="1033" FileCompression="yes"/>
       <Merge DiskId="30000" SourceFile="$(var.CRYSTAL_MSM_PATH)/CS.vfs.msm" Id="CS.vfs.8DDFD4F0-BF93-11DC-B42B-0015582877AD" Language="1033" FileCompression="yes"/>
       <Directory Name="data" Id="CS.data">

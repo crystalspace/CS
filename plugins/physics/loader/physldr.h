@@ -45,8 +45,7 @@ public:
 
   /// Parse the physics node and setup the environment
   virtual csPtr<iBase> Parse (iDocumentNode *node,
-    iStreamSource*, iLoaderContext* ldr_context, iBase* context,
-    iStringArray* failed);
+    iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 
   virtual bool IsThreadSafe() { return true; }
 
