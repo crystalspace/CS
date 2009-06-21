@@ -21,7 +21,9 @@
 
 #include "csgeom/math3d.h"
 #include "iengine/mesh.h"
+#include "csutil/parray.h"
 
+class WalkTest;
 struct iMeshObject;
 struct iSector;
 struct iLight;
@@ -55,12 +57,36 @@ public:
   virtual ~Bot ();
 
   /// Time-base move.
-  void move (csTicks elapsed_time);
+  void Move (csTicks elapsed_time);
 
   /// Set movement vector.
-  void set_bot_move (const csVector3& v);
+  void SetBotMove (const csVector3& v);
   /// Set bot's sector.
-  void set_bot_sector (iSector* s) { f_sector = s; }
+  void SetBotSector (iSector* s) { f_sector = s; }
+};
+
+/**
+ * Bot manager.
+ */
+class BotManager
+{
+private:
+  WalkTest* walktest;
+
+  csPDelArray<Bot> bots;
+  csPDelArray<Bot> manual_bots;
+
+public:
+  BotManager (WalkTest* walktest);
+
+  /// Create a bot.
+  Bot* CreateBot (iSector* where, const csVector3& pos, float dyn_radius, bool manual);
+
+  /// Delete the oldest bot.
+  void DeleteOldestBot (bool manual);
+
+  /// Move the bots.
+  void MoveBots (csTicks elapsed_time);
 };
 
 #endif // __BOT_H__

@@ -491,6 +491,7 @@ public:
   virtual iRenderView* GetTopLevelClipper () const
   { return (iRenderView*)topLevelClipper; }
 
+  virtual void PrecacheMesh (iMeshWrapper* s);
   virtual void PrecacheDraw (iCollection* collection = 0);
   virtual void Draw (iCamera* c, iClipper2D* clipper, iMeshWrapper* mesh = 0);
 

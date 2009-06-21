@@ -58,11 +58,7 @@ struct LightingClassic
   
   float3 IllumAmbient ()
   {
-  <?if vars."tex lightmap".texture ?>
     return lightingClassicFrag.ambient;
-  <?else?>
-    return float3 (0, 0, 0);
-  <?endif?>
   }
   
   float3 IllumDiffuse ()

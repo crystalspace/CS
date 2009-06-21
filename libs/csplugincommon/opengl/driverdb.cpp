@@ -233,43 +233,8 @@ bool csDriverDBReader::ParseRegexp (iDocumentNode* node, bool& result)
   return true;
 }
 
-enum Relation
-{
-  eq = 0,
-  neq,
-  lt,
-  le,
-  gt,
-  ge
-};
-static const Relation nonLastDigitRels[6] = {eq, neq, le, le, ge, ge};
-
-static bool Compare (int a, int b, Relation rel)
-{
-  switch (rel)
-  {
-    case eq: return a == b;
-    case neq: return a != b;
-    case lt: return a < b;
-    case le: return a <= b;
-    case gt: return a > b;
-    case ge: return a >= b;
-  }
-  return false;
-}
-
-/* Returns the offset to the next block of characters with chars from
- * charSet. e.g. NextBlock ("123abc456", "123456") returns 6. */
-static size_t NextBlock (const char* str, const char* charSet)
-{
-  size_t spnpos = strspn (str, charSet);
-  return spnpos + strcspn (str + spnpos, charSet);
-}
-
 bool csDriverDBReader::ParseCompareVer (iDocumentNode* node, bool& result)
 {
-  static const char digits[] = "0123456789";
-
   const char* version = node->GetAttributeValue ("version");
   if (version == 0)
   {
@@ -303,19 +268,19 @@ bool csDriverDBReader::ParseCompareVer (iDocumentNode* node, bool& result)
   }
   int rellen = space - relation;
 
-  Relation rel;
+  csGLDriverDatabase::Relation rel;
   if (strncmp (relation, "eq", rellen) == 0)
-    rel = eq;
+    rel = csGLDriverDatabase::eq;
   else if (strncmp (relation, "neq", rellen) == 0)
-    rel = neq;
+    rel = csGLDriverDatabase::neq;
   else if (strncmp (relation, "lt", rellen) == 0)
-    rel = lt;
+    rel = csGLDriverDatabase::lt;
   else if (strncmp (relation, "le", rellen) == 0)
-    rel = le;
+    rel = csGLDriverDatabase::le;
   else if (strncmp (relation, "gt", rellen) == 0)
-    rel = gt;
+    rel = csGLDriverDatabase::gt;
   else if (strncmp (relation, "ge", rellen) == 0)
-    rel = ge;
+    rel = csGLDriverDatabase::ge;
   else
   {
     csString relstr;
@@ -330,49 +295,16 @@ bool csDriverDBReader::ParseCompareVer (iDocumentNode* node, bool& result)
   }
 
   result = false;
-  const char* curpos1 = db->ogl2d->GetVersionString (version);
-  if (curpos1 == 0)
+  const char* verStr1 = db->ogl2d->GetVersionString (version);
+  if (verStr1 == 0)
   {
     /* @@@ Hmm... a version may just be unknown on some platforms...
        (e.g. win32_driver on Linux), so we leave result as false (check failed)
        and return true, indicating the parsing was successful. */
     return true;
   }
-  const char* curpos2 = relation + rellen + 1;
-  // Skip leading non-digits
-  curpos1 += strcspn (curpos1, digits);
-  curpos2 += strcspn (curpos2, digits);
-
-  if (curpos1 && (*curpos1 != 0) && curpos2 && (*curpos2 != 0))
-  {
-    while (1)
-    {
-      size_t nextpos1 = NextBlock (curpos1, digits);
-      if (nextpos1 == 0) break;
-      size_t nextnextpos1 = NextBlock (curpos1 + nextpos1, digits);
-      size_t nextpos2 = NextBlock (curpos2, digits);
-      if (nextpos2 == 0) break;
-      size_t nextnextpos2 = NextBlock (curpos2 + nextpos2, digits);
-
-      bool last = (nextnextpos1 == 0) || (nextnextpos2 == 0);
-
-      int v1, v2;
-      if (sscanf (curpos1, "%d", &v1) != 1) break;
-      if (sscanf (curpos2, "%d", &v2) != 1) break;
-
-      if (!Compare (v1, v2, last ? rel : nonLastDigitRels[rel]))
-	break;
-
-      if (last) 
-      {
-	result = true;
-	break;
-      }
-
-      curpos1 += nextpos1;
-      curpos2 += nextpos2;
-    }
-  }
+  const char* verStr2 = relation + rellen + 1;
+  result = csGLDriverDatabase::VersionCompare (verStr1, verStr2, rel);
 
   return true;
 }
@@ -485,6 +417,94 @@ bool csDriverDBReader::ParseRules (iDocumentNode* node)
 }
 
 //-------------------------------------------------------------------------//
+
+bool csGLDriverDatabase::Compare (int a, int b, Relation rel)
+{
+  switch (rel)
+  {
+    case eq: return a == b;
+    case neq: return a != b;
+    case lt: return a < b;
+    case le: return a <= b;
+    case gt: return a > b;
+    case ge: return a >= b;
+  }
+  return false;
+}
+
+/* Returns the offset to the next block of characters with chars from
+ * charSet. e.g. NextBlock ("123abc456", "123456") returns 6. */
+static size_t NextBlock (const char* str, const char* charSet)
+{
+  size_t spnpos = strspn (str, charSet);
+  return spnpos + strcspn (str + spnpos, charSet);
+}
+
+bool csGLDriverDatabase::VersionCompare (const char* verStr1, const char* verStr2,
+                                         Relation rel)
+{
+  static const Relation earlyExitRels[6] = {eq, neq, lt, lt, gt, gt};
+  static const Relation nonLastDigitRels[6] = {eq, neq, le, le, ge, ge};
+  static const char digits[] = "0123456789";
+
+  bool result = false;
+  // Skip leading non-digits
+  const char* curpos1 = verStr1 + strcspn (verStr1, digits);
+  const char* curpos2 = verStr2 + strcspn (verStr2, digits);
+
+  while ((curpos1 && (*curpos1 != 0)) || (curpos2 && (*curpos2 != 0)))
+  {
+    const char* nextpos1 = 0;
+    const char* nextpos2 = 0;
+  
+    bool last1 = true, last2 = true;
+    if (curpos1 && *curpos1)
+    {
+      size_t nextpos1dist = NextBlock (curpos1, digits);
+      if (nextpos1dist != 0)
+      {
+        nextpos1 = curpos1 + nextpos1dist;
+        last1 = NextBlock (nextpos1, digits) == 0;
+      }
+    }
+    if (curpos2 && *curpos2)
+    {
+      size_t nextpos2dist = NextBlock (curpos2, digits);
+      if (nextpos2dist != 0)
+      {
+        nextpos2 = curpos2 + nextpos2dist;
+        last2 = NextBlock (nextpos2, digits) == 0;
+      }
+    }
+
+    bool last = last1 && last2;
+
+    int v1 = 0, v2 = 0;
+    // If a version component is missing, treat as 0
+    if (curpos1 && *curpos1 && (sscanf (curpos1, "%d", &v1) != 1)) break;
+    if (curpos2 && *curpos2 && (sscanf (curpos2, "%d", &v2) != 1)) break;
+
+    if (Compare (v1, v2, earlyExitRels[rel]))
+    {
+      result = true;
+      break;
+    }
+    
+    if (!Compare (v1, v2, last ? rel : nonLastDigitRels[rel]))
+      break;
+
+    if (last) 
+    {
+      result = true;
+      break;
+    }
+
+    curpos1 = nextpos1;
+    curpos2 = nextpos2;
+  }
+
+  return result;
+}
 
 void csGLDriverDatabase::Report (int severity, const char* msg, ...)
 {

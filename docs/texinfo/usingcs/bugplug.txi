@@ -66,7 +66,7 @@ BugPlug. If you accidently press either of those keys then you can simply
 press it again to return to normal operation.
 
 To get a complete list of keys and commands that BugPlug supports you can
-look at @file{data/config/bugplug.key}.
+look at @file{data/config-plugins/bugplug.key}.
 
 @node Basic Tools, Working with Meshes, Controlling BugPlug, BugPlug
 @subsection Basic Tools
@@ -85,7 +85,7 @@ f12} and BugPlug will save a screenshot of the current display to the
 current directory. By default this will be a @sc{png} file called
 @file{crystal000.png}. The digits will automatically be incremented so that
 previous screenshots are not overwritten. You can change the file format,
-filename, and path in @file{data/config/bugplug.cfg}.
+filename, and path in @file{data/config-plugins/bugplug.cfg}.
 
 If you press @samp{ctrl-d e} then BugPlug will render the 3D world in
 wireframe mode. This is useful to see how many triangles there are and can

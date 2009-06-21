@@ -26,68 +26,68 @@
 #include "csutil/cscolor.h"
 
 class csDecalTemplate : public scfImplementation1<csDecalTemplate,
-                                                 iDecalTemplate>
+  iDecalTemplate>
 {
 private:
-  float                 timeToLive;
+  float timeToLive;
   csRef<iMaterialWrapper> material;
-  long                  renderPriority;
-  csZBufMode            zBufMode;
-  float                 polygonNormalThreshold;
-  float                 decalOffset;
-  bool                  hasTopClip;
-  float                 topClipScale;
-  bool                  hasBottomClip;
-  float                 bottomClipScale;
-  csVector2             minTexCoord;
-  csVector2             maxTexCoord;
-  uint                  mixMode;
-  float                 perpendicularFaceThreshold;
-  float                 perpendicularFaceOffset;
-  csColor4              mainColor;
-  csColor4              topColor;
-  csColor4              bottomColor;
+  long renderPriority;
+  csZBufMode zBufMode;
+  float polygonNormalThreshold;
+  float decalOffset;
+  bool hasTopClip;
+  float topClipScale;
+  bool hasBottomClip;
+  float bottomClipScale;
+  csVector2 minTexCoord;
+  csVector2 maxTexCoord;
+  uint mixMode;
+  float perpendicularFaceThreshold;
+  float perpendicularFaceOffset;
+  csColor4 mainColor;
+  csColor4 topColor;
+  csColor4 bottomColor;
 
 public:
 
-  csDecalTemplate();
-  csDecalTemplate(iBase* parent);
-  virtual ~csDecalTemplate();
+  csDecalTemplate ();
+  csDecalTemplate (iBase* parent);
+  virtual ~csDecalTemplate ();
 
-  virtual float GetTimeToLive() const;
-  virtual iMaterialWrapper* GetMaterialWrapper();
-  virtual long GetRenderPriority() const;
-  virtual csZBufMode GetZBufMode() const;
-  virtual float GetPolygonNormalThreshold() const;
-  virtual float GetDecalOffset() const;
-  virtual bool HasTopClipping() const;
-  virtual float GetTopClippingScale() const;
-  virtual bool HasBottomClipping() const;
-  virtual float GetBottomClippingScale() const;
-  virtual const csVector2 & GetMinTexCoord() const;
-  virtual const csVector2 & GetMaxTexCoord() const;
-  virtual const uint GetMixMode() const;
-  virtual float GetPerpendicularFaceThreshold() const;
-  virtual float GetPerpendicularFaceOffset() const;
-  virtual const csColor4 & GetMainColor() const;
-  virtual const csColor4 & GetTopColor() const;
-  virtual const csColor4 & GetBottomColor() const;
+  virtual float GetTimeToLive () const;
+  virtual iMaterialWrapper* GetMaterialWrapper ();
+  virtual long GetRenderPriority () const;
+  virtual csZBufMode GetZBufMode () const;
+  virtual float GetPolygonNormalThreshold () const;
+  virtual float GetDecalOffset () const;
+  virtual bool HasTopClipping () const;
+  virtual float GetTopClippingScale () const;
+  virtual bool HasBottomClipping () const;
+  virtual float GetBottomClippingScale () const;
+  virtual const csVector2& GetMinTexCoord () const;
+  virtual const csVector2& GetMaxTexCoord() const;
+  virtual const uint GetMixMode () const;
+  virtual float GetPerpendicularFaceThreshold () const;
+  virtual float GetPerpendicularFaceOffset () const;
+  virtual const csColor4& GetMainColor () const;
+  virtual const csColor4& GetTopColor () const;
+  virtual const csColor4& GetBottomColor () const;
 
-  virtual void SetTimeToLive(float timeToLive);
-  virtual void SetMaterialWrapper(iMaterialWrapper* material);
-  virtual void SetRenderPriority(long renderPriority);
-  virtual void SetZBufMode(csZBufMode mode);
-  virtual void SetPolygonNormalThreshold(float polygonNormalThreshold);
-  virtual void SetDecalOffset(float decalOffset);
-  virtual void SetTopClipping(bool enabled, float topPlaneScale);
-  virtual void SetBottomClipping(bool enabled, float bottomPlaneScale);
-  virtual void SetTexCoords(const csVector2 & min, const csVector2 & max);
-  virtual void SetMixMode(uint mixMode);
-  virtual void SetPerpendicularFaceThreshold(float threshold);
-  virtual void SetPerpendicularFaceOffset(float offset);
-  virtual void SetMainColor(const csColor4 & color);
-  virtual void SetTopColor(const csColor4 & color);
-  virtual void SetBottomColor(const csColor4 & color);
+  virtual void SetTimeToLive (float timeToLive);
+  virtual void SetMaterialWrapper (iMaterialWrapper* material);
+  virtual void SetRenderPriority (long renderPriority);
+  virtual void SetZBufMode (csZBufMode mode);
+  virtual void SetPolygonNormalThreshold (float polygonNormalThreshold);
+  virtual void SetDecalOffset (float decalOffset);
+  virtual void SetTopClipping (bool enabled, float topPlaneScale);
+  virtual void SetBottomClipping (bool enabled, float bottomPlaneScale);
+  virtual void SetTexCoords (const csVector2& min, const csVector2& max);
+  virtual void SetMixMode (uint mixMode);
+  virtual void SetPerpendicularFaceThreshold (float threshold);
+  virtual void SetPerpendicularFaceOffset (float offset);
+  virtual void SetMainColor (const csColor4& color);
+  virtual void SetTopColor (const csColor4& color);
+  virtual void SetBottomColor (const csColor4& color);
 };
 
 #endif // __CS_DECAL_TEMPLATE_H__

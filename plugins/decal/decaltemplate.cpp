@@ -19,206 +19,205 @@
 #include "cssysdef.h"
 #include "decaltemplate.h"
 
-SCF_IMPLEMENT_FACTORY(csDecalTemplate)
+SCF_IMPLEMENT_FACTORY (csDecalTemplate)
 
-csDecalTemplate::csDecalTemplate()
-    : scfImplementationType (this),
-      timeToLive (-1.0f),
-      material(0),
-      renderPriority (0),
-      zBufMode (CS_ZBUF_TEST),
-      polygonNormalThreshold (0.01f),
-      decalOffset (0.05f),
-      hasTopClip (true), 
-      topClipScale (0.5f),
-      hasBottomClip (true), 
-      bottomClipScale (0.5f),
-      minTexCoord (0,0),
-      maxTexCoord (1,1),
-      mixMode (CS_FX_COPY),
-      perpendicularFaceThreshold (0.05f),
-      perpendicularFaceOffset (0.01f),
-      mainColor (1,1,1,1),
-      topColor (1,1,1,1),
-      bottomColor (1,1,1,1)
+csDecalTemplate::csDecalTemplate ()
+  : scfImplementationType (this),
+    timeToLive (-1.0f),
+    material (0),
+    renderPriority (0),
+    zBufMode (CS_ZBUF_TEST),
+    polygonNormalThreshold (0.01f),
+    decalOffset (0.05f),
+    hasTopClip (true), 
+    topClipScale (0.5f),
+    hasBottomClip (true), 
+    bottomClipScale (0.5f),
+    minTexCoord (0, 0),
+    maxTexCoord (1, 1),
+    mixMode (CS_FX_COPY),
+    perpendicularFaceThreshold (0.05f),
+    perpendicularFaceOffset (0.01f),
+    mainColor (1, 1, 1, 1),
+    topColor (1, 1, 1, 1),
+    bottomColor (1, 1, 1, 1)
 {
 }
 
-csDecalTemplate::csDecalTemplate(iBase* parent)
-    : scfImplementationType(this, parent)
+csDecalTemplate::csDecalTemplate (iBase* parent)
+  : scfImplementationType (this, parent)
 {
 }
 
-csDecalTemplate::~csDecalTemplate()
+csDecalTemplate::~csDecalTemplate ()
 {
 }
 
-float csDecalTemplate::GetTimeToLive() const
+float csDecalTemplate::GetTimeToLive () const
 {
-    return timeToLive;
+  return timeToLive;
 }
 
-iMaterialWrapper* csDecalTemplate::GetMaterialWrapper()
+iMaterialWrapper* csDecalTemplate::GetMaterialWrapper ()
 {
-    return material;
+  return material;
 }
 
-long csDecalTemplate::GetRenderPriority() const
+long csDecalTemplate::GetRenderPriority () const
 {
     return renderPriority;
 }
 
 csZBufMode csDecalTemplate::GetZBufMode() const
 {
-    return zBufMode;
+  return zBufMode;
 }
 
-float csDecalTemplate::GetPolygonNormalThreshold() const
+float csDecalTemplate::GetPolygonNormalThreshold () const
 {
-    return polygonNormalThreshold;
+  return polygonNormalThreshold;
 }
 
-float csDecalTemplate::GetDecalOffset() const
+float csDecalTemplate::GetDecalOffset () const
 {
-    return decalOffset;
+  return decalOffset;
 }
 
-bool csDecalTemplate::HasTopClipping() const
+bool csDecalTemplate::HasTopClipping () const
 {
   return hasTopClip;
 }
 
-float csDecalTemplate::GetTopClippingScale() const
+float csDecalTemplate::GetTopClippingScale () const
 {
   return topClipScale;
 }
 
-bool csDecalTemplate::HasBottomClipping() const
+bool csDecalTemplate::HasBottomClipping () const
 {
   return hasBottomClip;
 }
 
-float csDecalTemplate::GetBottomClippingScale() const
+float csDecalTemplate::GetBottomClippingScale () const
 {
   return bottomClipScale;
 }
 
-const csVector2 & csDecalTemplate::GetMinTexCoord() const
+const csVector2& csDecalTemplate::GetMinTexCoord () const
 {
-    return minTexCoord;
+  return minTexCoord;
 }
 
-const csVector2 & csDecalTemplate::GetMaxTexCoord() const
+const csVector2& csDecalTemplate::GetMaxTexCoord () const
 {
-    return maxTexCoord;
+  return maxTexCoord;
 }
 
-const uint csDecalTemplate::GetMixMode() const
+const uint csDecalTemplate::GetMixMode () const
 {
   return mixMode;
 }
 
-float csDecalTemplate::GetPerpendicularFaceThreshold() const
+float csDecalTemplate::GetPerpendicularFaceThreshold () const
 {
   return perpendicularFaceThreshold;
 }
 
-float csDecalTemplate::GetPerpendicularFaceOffset() const
+float csDecalTemplate::GetPerpendicularFaceOffset () const
 {
   return perpendicularFaceOffset;
 }
 
-const csColor4 & csDecalTemplate::GetMainColor() const
+const csColor4& csDecalTemplate::GetMainColor () const
 {
-	return mainColor;
+  return mainColor;
 }
 
-const csColor4 & csDecalTemplate::GetTopColor() const
+const csColor4& csDecalTemplate::GetTopColor () const
 {
-	return topColor;
+  return topColor;
 }
 
-const csColor4 & csDecalTemplate::GetBottomColor() const
+const csColor4& csDecalTemplate::GetBottomColor () const
 {
-	return bottomColor;
+  return bottomColor;
 }
 
-void csDecalTemplate::SetTimeToLive(float timeToLive)
+void csDecalTemplate::SetTimeToLive (float timeToLive)
 {
-    this->timeToLive = timeToLive;
+  this->timeToLive = timeToLive;
 }
 
-void csDecalTemplate::SetMaterialWrapper(iMaterialWrapper* material)
+void csDecalTemplate::SetMaterialWrapper (iMaterialWrapper* material)
 {
-    this->material = material;
+  this->material = material;
 }
 
-void csDecalTemplate::SetRenderPriority(long renderPriority)
+void csDecalTemplate::SetRenderPriority (long renderPriority)
 {
-    this->renderPriority = renderPriority;
+  this->renderPriority = renderPriority;
 }
 
-void csDecalTemplate::SetZBufMode(csZBufMode mode)
+void csDecalTemplate::SetZBufMode (csZBufMode mode)
 {
-    this->zBufMode = mode;
+  this->zBufMode = mode;
 }
 
-void csDecalTemplate::SetPolygonNormalThreshold(float polygonNormalThreshold)
+void csDecalTemplate::SetPolygonNormalThreshold (float polygonNormalThreshold)
 {
-    this->polygonNormalThreshold = polygonNormalThreshold;
+  this->polygonNormalThreshold = polygonNormalThreshold;
 }
 
-void csDecalTemplate::SetDecalOffset(float decalOffset)
+void csDecalTemplate::SetDecalOffset (float decalOffset)
 {
-    this->decalOffset = decalOffset;
+  this->decalOffset = decalOffset;
 }
 
-void csDecalTemplate::SetTopClipping(bool enabled, float topPlaneScale)
+void csDecalTemplate::SetTopClipping (bool enabled, float topPlaneScale)
 {
   hasTopClip = enabled;
   topClipScale = topPlaneScale;
 }
 
-void csDecalTemplate::SetBottomClipping(bool enabled, float bottomPlaneScale)
+void csDecalTemplate::SetBottomClipping (bool enabled, float bottomPlaneScale)
 {
   hasBottomClip = enabled;
   bottomClipScale = bottomPlaneScale;
 }
 
-void csDecalTemplate::SetTexCoords(const csVector2 & min, 
-    const csVector2 & max)
+void csDecalTemplate::SetTexCoords (const csVector2& min, 
+  const csVector2 & max)
 {
   this->minTexCoord = min;
   this->maxTexCoord = max;
 }
 
-void csDecalTemplate::SetMixMode(uint mixMode)
+void csDecalTemplate::SetMixMode (uint mixMode)
 {
   this->mixMode = mixMode;
 }
 
-void csDecalTemplate::SetPerpendicularFaceThreshold(float threshold)
+void csDecalTemplate::SetPerpendicularFaceThreshold (float threshold)
 {
   perpendicularFaceThreshold = threshold;
 }
 
-void csDecalTemplate::SetPerpendicularFaceOffset(float offset)
+void csDecalTemplate::SetPerpendicularFaceOffset (float offset)
 {
   perpendicularFaceOffset = offset;
 }
 
-void csDecalTemplate::SetMainColor(const csColor4 & color)
+void csDecalTemplate::SetMainColor (const csColor4& color)
 {
-	mainColor = color;
+  mainColor = color;
 }
 
-void csDecalTemplate::SetTopColor(const csColor4 & color)
+void csDecalTemplate::SetTopColor (const csColor4& color)
 {
-	topColor = color;
+  topColor = color;
 }
 
-void csDecalTemplate::SetBottomColor(const csColor4 & color)
+void csDecalTemplate::SetBottomColor (const csColor4& color)
 {
-	bottomColor = color;
+  bottomColor = color;
 }
-

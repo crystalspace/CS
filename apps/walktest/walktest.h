@@ -38,11 +38,19 @@
 #include "iutil/eventnames.h"
 #include "csutil/eventhandlers.h"
 #include "ivideo/fontserv.h"
-#include "bot.h"
-
 #include "iengine/engine.h"
 
+#include "bot.h"
+#include "walktest.h"
+#include "fullscreenfx.h"
+
 class WalkTest;
+class WalkTestViews;
+class WalkTestRecorder;
+class WalkTestMissileLauncher;
+class WalkTestLights;
+class WalkTestAnimateSky;
+class BotManager;
 class csPixmap;
 class csWireFrameCam;
 class InfiniteMaze;
@@ -113,38 +121,6 @@ struct csKeyMap
   bool need_status,is_on;
 };
 
-/**
- * An entry for the record function.
- */
-struct csRecordedCamera
-{
-  csMatrix3 mat;
-  csVector3 vec;
-  bool mirror;
-  iSector* sector;
-  char *cmd;
-  char *arg;
-  ~csRecordedCamera ()
-  { delete [] cmd; delete [] arg; }
-};
-
-/**
- * A recorded entry saved in a file.
- */
-struct csRecordedCameraFile
-{
-  int32 m11, m12, m13;
-  int32 m21, m22, m23;
-  int32 m31, m32, m33;
-  int32 x, y, z;
-  unsigned char mirror;
-};
-
-/**
- * A vector which holds the recorded items and cleans them up if needed.
- */
-typedef csPDelArray<csRecordedCamera> csRecordVector;
-
 struct csMapToLoad
 {
   /// The startup directory on VFS with needed map file
@@ -168,7 +144,8 @@ public:
   csEventID CanvasExposed;
   csEventID CanvasResize;
 
-  csRefArray<iLight> dynamic_lights;
+  WalkTestMissileLauncher* missiles;
+  WalkTestLights* lights;
 
   int FrameWidth, FrameHeight;
 
@@ -202,22 +179,11 @@ public:
   csArray<csWalkEntity*> busy_entities;
   /// A vector that is used to temporarily store references to busy entities.
   csArray<csWalkEntity*> busy_vector;
-  /// Vector with recorded camera transformations and commands.
-  csRecordVector recording;
-  /// This frames current recorded cmd and arg
-  char *recorded_cmd;
-  char *recorded_arg;
-  /// Time when we started playing back the recording.
-  csTicks record_start_time;
-  /// Number of frames that have passed since we started playing back recording.
-  int record_frame_count;
+
+  // For recording.
+  WalkTestRecorder* recorder;
+
   // Various configuration values for collision detection.
-  /// If >= 0 then we're recording. The value is the current frame entry.
-  int cfg_recording;
-  /// If >= 0 then we're playing a recording.
-  int cfg_playrecording;
-  /// If true the demo recording loops.
-  bool cfg_playloop;
   /// Initial speed of jumping.
   float cfg_jumpspeed;
   /// Walk acceleration.
@@ -273,46 +239,10 @@ public:
    */
   bool do_edges;
 
-  // Various settings for fullscreen effects.
-  bool do_fs_inter;
-  float fs_inter_amount;
-  float fs_inter_anim;
-  float fs_inter_length;
-
-  bool do_fs_fadeout;
-  float fs_fadeout_fade;
-  bool fs_fadeout_dir;
-
-  bool do_fs_fadecol;
-  float fs_fadecol_fade;
-  bool fs_fadecol_dir;
-  csColor fs_fadecol_color;
-
-  bool do_fs_fadetxt;
-  float fs_fadetxt_fade;
-  bool fs_fadetxt_dir;
-  iTextureHandle* fs_fadetxt_txt;
-
-  bool do_fs_red;
-  float fs_red_fade;
-  bool fs_red_dir;
-  bool do_fs_green;
-  float fs_green_fade;
-  bool fs_green_dir;
-  bool do_fs_blue;
-  float fs_blue_fade;
-  bool fs_blue_dir;
-
-  bool do_fs_whiteout;
-  float fs_whiteout_fade;
-  bool fs_whiteout_dir;
-
-  bool do_fs_shadevert;
-  csColor fs_shadevert_topcol;
-  csColor fs_shadevert_botcol;
-
   // True if we've loaded all the 2d textures and sprites.
   bool spritesLoaded;
+
+  WalkTestFullScreenFX* fsfx;
 
   /**
    * The main engine interface
@@ -327,18 +257,8 @@ public:
   csRef<iVFS> myVFS;
   csRef<iSndSysRenderer> mySound;
 
-  /// The view on the world.
-  iView* view;
-
-  /// A pointer to a skybox to animate (if any).
-  iMeshWrapper* anim_sky;
-  /// Speed of this animation (with 1 meaning 1 full rotation in a second).
-  float anim_sky_speed;
-  /// Rotation direction (0=x, 1=y, 2=z)
-  int anim_sky_rot;
-
-  /// A pointer to the terrain for which we animate the dirlight.
-  iMeshWrapper* anim_dirlight;
+  WalkTestViews* views;
+  WalkTestAnimateSky* sky;
 
   /// A sprite to display the Crystal Space Logo
   csPixmap* cslogo;
@@ -394,11 +314,6 @@ public:
 
   /// The font we'll use for writing
   csRef<iFont> Font;
-
-  /// Value to indicate split state
-  /// -1 = not split, other value is index of current view
-  int split;
-  csRef<iView> views[2];
 
   /// is actually anything visible on the canvas?
   bool canvas_exposed;
@@ -488,10 +403,6 @@ public:
   virtual void DrawFrame3D (int drawflags, csTicks current_time);
   /// Draws 2D objects to screen
   virtual void DrawFrame2D (void);
-  /// Draw 3D fullscreen effects.
-  virtual void DrawFullScreenFX3D (csTicks elapsed_time, csTicks current_time);
-  /// Draw 2D fullscreen effects.
-  virtual void DrawFullScreenFX2D (csTicks elapsed_time, csTicks current_time);
 
   /// Load all the graphics libraries needed
   virtual void LoadLibraryData (iCollection* collection);
@@ -555,13 +466,8 @@ public:
 
   void GfxWrite (int x, int y, int fg, int bg, const char *str, ...);
 
-  // Bot stuff
-  csPDelArray<Bot> bots;
-  csPDelArray<Bot> manual_bots;
-  void add_bot (float size, iSector* where, csVector3 const& pos,
-    float dyn_radius, bool manual = false);
-  void del_bot (bool manual = true);
-  void move_bots (csTicks);
+  bool do_bots;
+  BotManager* bots;
 
   //@{
   /// Save/load camera functions
@@ -647,9 +553,6 @@ extern csVector2 coord_check_vector;
 extern void perf_test (int num);
 extern void CaptureScreen ();
 extern void free_keymap ();
-
-// Use a view's clipping rect to calculate a bounding box
-void BoundingBoxForView(iView *view, csBox2 *box);
 
 // The global system driver
 extern WalkTest *Sys;

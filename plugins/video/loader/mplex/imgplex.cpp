@@ -133,6 +133,7 @@ void csImageIOMultiplexer::SetDithering (bool iEnable)
 
 csPtr<iImage> csImageIOMultiplexer::Load (iDataBuffer* buf, int iFormat)
 {
+  CS::Threading::MutexScopedLock slock(lock);
   bool consecutive = false; // set to true if we searched the list completely.
   do
   {

@@ -33,6 +33,8 @@ namespace lighter
 #if CS_PROCESSOR_SIZE == 32
     //@@ Try to make sure we don't run out of virtual address space, don't use above 1GB for swapcache
     maxCacheSize = csMin (maxSize, size_t (1u<<30));
+#else
+    maxCacheSize = maxSize;
 #endif
   }
 

@@ -83,59 +83,39 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   iMaterialWrapper* csLoaderContext::FindMaterial(const char* name, bool dontWaitForLoad)
   {
     csRef<iMaterialWrapper> mat;
-
-    if(FindAvailMaterial(name))
+    while(!mat.IsValid())
     {
-      while(!mat.IsValid())
       {
+        CS::Threading::MutexScopedLock lock(loader->materialsLock);
+        for(size_t i=0; i<loader->loaderMaterials.GetSize(); i++)
         {
-          CS::Threading::MutexScopedLock lock(loader->materialsLock);
-          for(size_t i=0; i<loader->loaderMaterials.GetSize(); i++)
+          if(!strcmp(loader->loaderMaterials[i]->QueryObject()->GetName(), name))
           {
-            if(!strcmp(loader->loaderMaterials[i]->QueryObject()->GetName(), name))
-            {
-              mat = loader->loaderMaterials[i];
-              return mat;
-            }
+            mat = loader->loaderMaterials[i];
+            return mat;
           }
         }
-
-        if(!mat.IsValid() && missingdata)
-        {
-          mat = missingdata->MissingMaterial(name, name);
-        }
-
-        if(!mat.IsValid())
-        {
-          mat = Engine->FindMaterial(name, collection);
-        }
-
-        if(!mat.IsValid() && collection)
-        {
-            mat = Engine->FindMaterial(name);
-        }
-
-        if(dontWaitForLoad)
-        {
-          break;
-        }
       }
-    }
 
-    // General search, as the object may not have been added via the loader.
-    if(!mat.IsValid() && missingdata)
-    {
-      mat = missingdata->MissingMaterial(name, name);
-    }
+      if(!mat.IsValid() && missingdata)
+      {
+        mat = missingdata->MissingMaterial(name, name);
+      }
 
-    if(!mat.IsValid())
-    {
-      mat = Engine->FindMaterial(name, collection);
-    }
+      if(!mat.IsValid())
+      {
+        mat = Engine->FindMaterial(name, collection);
+      }
 
-    if(!mat.IsValid() && collection)
-    {
-      mat = Engine->FindMaterial(name);
+      if(!mat.IsValid() && collection)
+      {
+        mat = Engine->FindMaterial(name);
+      }
+
+      if(dontWaitForLoad || !FindAvailMaterial(name))
+      {
+        break;
+      }
     }
     
     // *** This is deprecated behaviour ***
@@ -185,68 +165,48 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   iMeshFactoryWrapper* csLoaderContext::FindMeshFactory(const char* name, bool dontWaitForLoad)
   {
     csRef<iMeshFactoryWrapper> fact;
-    
-    if(FindAvailMeshFact(name))
+    while(!fact.IsValid())
     {
-      while(!fact.IsValid())
       {
+        CS::Threading::MutexScopedLock lock(loader->meshfactsLock);
+        for(size_t i=0; i<loader->loaderMeshFactories.GetSize(); i++)
         {
-          CS::Threading::MutexScopedLock lock(loader->meshfactsLock);
-          for(size_t i=0; i<loader->loaderMeshFactories.GetSize(); i++)
+          if(!strcmp(loader->loaderMeshFactories[i]->QueryObject()->GetName(), name))
           {
-            if(!strcmp(loader->loaderMeshFactories[i]->QueryObject()->GetName(), name))
-            {
-              fact = loader->loaderMeshFactories[i];
-              return fact;
-            }
-          }
-        }
-
-        if(!fact.IsValid() && missingdata)
-        {
-          fact = missingdata->MissingFactory(name);
-        }
-
-        if(!fact.IsValid())
-        {
-          fact = Engine->FindMeshFactory(name, collection);
-        }
-
-        if(!fact.IsValid() && collection)
-        {
-            fact = Engine->FindMeshFactory(name);
-        }
-
-        if(dontWaitForLoad)
-        {
-          break;
-        }
-
-        for(size_t i=0; i<loader->failedMeshFacts->GetSize(); i++)
-        {
-          if(!strcmp(loader->failedMeshFacts->Get(i), name))
-          {
-            // Break out of the loop, it's never going to be loaded.
-            break;
+            fact = loader->loaderMeshFactories[i];
+            return fact;
           }
         }
       }
-    }
 
-    // General search, as the object may not have been added via the loader.
-    if(!fact.IsValid() && missingdata)
-    {
-      fact = missingdata->MissingFactory(name);
-    }
+      if(!fact.IsValid() && missingdata)
+      {
+        fact = missingdata->MissingFactory(name);
+      }
 
-    if(!fact.IsValid())
-    {
-      fact = Engine->FindMeshFactory(name, collection);
-    }
+      if(!fact.IsValid())
+      {
+        fact = Engine->FindMeshFactory(name, collection);
+      }
 
-    if(!fact.IsValid() && collection)
-    {
-      fact = Engine->FindMeshFactory(name);
+      if(!fact.IsValid() && collection)
+      {
+        fact = Engine->FindMeshFactory(name);
+      }
+
+      if(dontWaitForLoad || !FindAvailMeshFact(name))
+      {
+        break;
+      }
+
+      for(size_t i=0; i<loader->failedMeshFacts->GetSize(); i++)
+      {
+        if(!strcmp(loader->failedMeshFacts->Get(i), name))
+        {
+          // Break out of the loop, it's never going to be loaded.
+          break;
+        }
+      }
     }
 
     if(!fact.IsValid() && !dontWaitForLoad && do_verbose)
@@ -260,65 +220,50 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   iMeshWrapper* csLoaderContext::FindMeshObject(const char* name)
   {
     csRef<iMeshWrapper> mesh;
-
-    if(FindAvailMeshObj(name))
+    while(!mesh.IsValid())
     {
-      while(!mesh.IsValid())
+      csRef<iThreadReturn> itr = loader->loadingMeshObjects.Get(name, NULL);
+      if(itr.IsValid())
       {
-        csRef<iThreadReturn> itr = loader->loadingMeshObjects.Get(name, NULL);
-        if(itr.IsValid())
+        itr->Wait();
+        if(itr->WasSuccessful())
         {
-          itr->Wait();
-          if(itr->WasSuccessful())
-          {
-            mesh = scfQueryInterface<iMeshWrapper>(itr->GetResultRefPtr());
-            return mesh;
-          }            
-        }
+          mesh = scfQueryInterface<iMeshWrapper>(itr->GetResultRefPtr());
+          return mesh;
+        }            
+      }
 
+      {
+        CS::Threading::MutexScopedLock lock(loader->meshesLock);
+        for(size_t i=0; i<loader->loaderMeshes.GetSize(); i++)
         {
-          CS::Threading::MutexScopedLock lock(loader->meshesLock);
-          for(size_t i=0; i<loader->loaderMeshes.GetSize(); i++)
+          if(!strcmp(loader->loaderMeshes[i]->QueryObject()->GetName(), name))
           {
-            if(!strcmp(loader->loaderMeshes[i]->QueryObject()->GetName(), name))
-            {
-              mesh = loader->loaderMeshes[i];
-              return mesh;
-            }
+            mesh = loader->loaderMeshes[i];
+            return mesh;
           }
         }
-
-        if (!mesh.IsValid() && missingdata)
-        {
-          mesh = missingdata->MissingMesh(name);
-        }
-
-        if(!mesh.IsValid())
-        {
-          mesh = Engine->FindMeshObject(name, collection);
-        }
-
-        if(!mesh.IsValid() && collection)
-        {
-            mesh = Engine->FindMeshObject(name);
-        }
       }
-    }
 
-    // General search, as the object may not have been added via the loader.
-    if (!mesh.IsValid() && missingdata)
-    {
-      mesh = missingdata->MissingMesh(name);
-    }
+      if (!mesh.IsValid() && missingdata)
+      {
+        mesh = missingdata->MissingMesh(name);
+      }
 
-    if(!mesh.IsValid())
-    {
-      mesh = Engine->FindMeshObject(name, collection);
-    }
+      if(!mesh.IsValid())
+      {
+        mesh = Engine->FindMeshObject(name, collection);
+      }
 
-    if(!mesh.IsValid() && collection)
-    {
-      mesh = Engine->FindMeshObject(name);
+      if(!mesh.IsValid() && collection)
+      {
+        mesh = Engine->FindMeshObject(name);
+      }
+
+      if(!FindAvailMeshObj(name))
+      {
+        break;
+      }
     }
 
     if(!mesh.IsValid() && do_verbose)
@@ -332,81 +277,49 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   iLight* csLoaderContext::FindLight(const char *name)
   {
     csRef<iLight> light;
-    if(FindAvailLight(name))
+    while(!light.IsValid())
     {
-      while(!light.IsValid())
       {
-        {
-          CS::Threading::MutexScopedLock lock(loader->lightsLock);
-          light = loader->loadedLights.Get(csString(name), 0);
-        }
+        CS::Threading::MutexScopedLock lock(loader->lightsLock);
+        light = loader->loadedLights.Get(csString(name), 0);
+      }
 
-        if(!light.IsValid() && missingdata)
-        {
-          light = missingdata->MissingLight(name);
-        }
+      if(!light.IsValid() && missingdata)
+      {
+        light = missingdata->MissingLight(name);
+      }
 
-        if(!light.IsValid())
-        {
-          csRef<iLightIterator> li = Engine->GetLightIterator(collection);
+      if(!light.IsValid())
+      {
+        csRef<iLightIterator> li = Engine->GetLightIterator(collection);
 
-          while(li->HasNext())
+        while(li->HasNext())
+        {
+          light = li->Next();
+          if(!strcmp(light->QueryObject()->GetName(), name))
           {
-            light = li->Next();
-            if(!strcmp(light->QueryObject()->GetName(), name))
-            {
-              break;
-            }
-          }
-        }
-
-        if(!light.IsValid() && collection)
-        {
-          csRef<iLightIterator> li = Engine->GetLightIterator();
-
-          while(li->HasNext())
-          {
-            light = li->Next();
-            if(!strcmp(light->QueryObject()->GetName(), name))
-            {
-              break;
-            }
+            break;
           }
         }
       }
-    }
 
-    // General search, as the object may not have been added via the loader.
-    if(!light.IsValid() && missingdata)
-    {
-      light = missingdata->MissingLight(name);
-    }
-
-    if(!light.IsValid())
-    {
-      csRef<iLightIterator> li = Engine->GetLightIterator(collection);
-
-      while(li->HasNext())
+      if(!light.IsValid() && collection)
       {
-        light = li->Next();
-        if(!strcmp(light->QueryObject()->GetName(), name))
+        csRef<iLightIterator> li = Engine->GetLightIterator();
+
+        while(li->HasNext())
         {
-          break;
+          light = li->Next();
+          if(!strcmp(light->QueryObject()->GetName(), name))
+          {
+            break;
+          }
         }
       }
-    }
 
-    if(!light.IsValid() && collection)
-    {
-      csRef<iLightIterator> li = Engine->GetLightIterator();
-
-      while(li->HasNext())
+      if(!FindAvailLight(name))
       {
-        light = li->Next();
-        if(!strcmp(light->QueryObject()->GetName(), name))
-        {
-          break;
-        }
+        break;
       }
     }
 
@@ -479,60 +392,40 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   iTextureWrapper* csLoaderContext::FindTexture(const char* name, bool dontWaitForLoad)
   {
     csRef<iTextureWrapper> result;
-
-    if(FindAvailTexture(name))
+    while(!result.IsValid())
     {
-      while(!result.IsValid())
       {
+        CS::Threading::MutexScopedLock lock(loader->texturesLock);
+        for(size_t i=0; i<loader->loaderTextures.GetSize(); i++)
         {
-          CS::Threading::MutexScopedLock lock(loader->texturesLock);
-          for(size_t i=0; i<loader->loaderTextures.GetSize(); i++)
+          if(loader->loaderTextures[i]->QueryObject()->GetName() &&
+            !strcmp(loader->loaderTextures[i]->QueryObject()->GetName(), name))
           {
-            if(loader->loaderTextures[i]->QueryObject()->GetName() &&
-              !strcmp(loader->loaderTextures[i]->QueryObject()->GetName(), name))
-            {
-              result = loader->loaderTextures[i];
-              return result;
-            }
+            result = loader->loaderTextures[i];
+            return result;
           }
         }
-
-        if(!result.IsValid() && missingdata)
-        {
-          result = missingdata->MissingTexture (name, name);
-        }
-
-        if(!result.IsValid())
-        {
-          result = Engine->FindTexture(name, collection);
-        }
-
-        if(!result.IsValid() && collection)
-        {
-          result = Engine->FindTexture(name);
-        }
-
-        if(dontWaitForLoad)
-        {
-          break;
-        }
       }
-    }
 
-    // General search, as the object may not have been added via the loader.
-    if(!result.IsValid() && missingdata)
-    {
-      result = missingdata->MissingTexture (name, name);
-    }
+      if(!result.IsValid() && missingdata)
+      {
+        result = missingdata->MissingTexture (name, name);
+      }
 
-    if(!result.IsValid())
-    {
-      result = Engine->FindTexture(name, collection);
-    }
+      if(!result.IsValid())
+      {
+        result = Engine->FindTexture(name, collection);
+      }
 
-    if(!result.IsValid() && collection)
-    {
-      result = Engine->FindTexture(name);
+      if(!result.IsValid() && collection)
+      {
+        result = Engine->FindTexture(name);
+      }
+
+      if(dontWaitForLoad || !FindAvailTexture(name))
+      {
+        break;
+      }
     }
 
     // *** This is deprecated behaviour ***
@@ -558,7 +451,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
   iGeneralMeshSubMesh* csLoaderContext::FindSubmesh(iGeneralMeshState* state, const char* name)
   {
-    csRef<iGeneralMeshSubMesh> submesh;
+    csRef<iGeneralMeshSubMesh> submesh = state->FindSubMesh(name);
     if(FindAvailSubmesh(name))
     {
       while(!submesh.IsValid())

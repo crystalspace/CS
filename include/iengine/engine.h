@@ -158,7 +158,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine, 6, 0, 0);
+  SCF_INTERFACE(iEngine, 6, 1, 0);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -971,6 +971,11 @@ struct iEngine : public virtual iBase
    * Get the top-level clipper.
    */
   virtual iRenderView* GetTopLevelClipper () const = 0;
+
+  /**
+   * Precache a single mesh.
+   */
+  virtual void PrecacheMesh (iMeshWrapper* s) = 0;
 
   /**
    * This function precaches all meshes by calling GetRenderMeshes()

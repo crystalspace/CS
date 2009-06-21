@@ -36,6 +36,7 @@
 #include "ivaria/view.h"
 
 #include "walktest.h"
+#include "splitview.h"
 
 extern WalkTest *Sys;
 
@@ -78,7 +79,7 @@ void WalkTest::CreateColliders ()
   csVector3 legs (DX_2L * 2, DYL, DZ_2L * 2);
   csVector3 body (DX_2 * 2, DY, DZ_2 * 2);
   csVector3 shift (0, OYL, 0);
-  collider_actor.InitializeColliders (view->GetCamera (),
+  collider_actor.InitializeColliders (views->GetCamera (),
   	legs, body, shift);
 }
 

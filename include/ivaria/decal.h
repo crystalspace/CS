@@ -59,25 +59,25 @@ struct iDecalTemplate : public virtual iBase
    * killed.
    *  \return The time to live in seconds.
    */
-  virtual float GetTimeToLive() const = 0;
+  virtual float GetTimeToLive () const = 0;
 
   /**
    * Retrieves the material wrapper to use for this decal.
    *  \return the material wrapper.
    */
-  virtual iMaterialWrapper* GetMaterialWrapper() = 0;
+  virtual iMaterialWrapper* GetMaterialWrapper () = 0;
 
   /**
    * Retrieves the rendering priority for this decal
    *  \return the rendering priority.
    */
-  virtual long GetRenderPriority() const = 0;
+  virtual long GetRenderPriority () const = 0;
 
   /** 
    * Retrieves the z-buffer mode for this decal.
    *  \return the z-buffer mode.
    */
-  virtual csZBufMode GetZBufMode() const = 0;
+  virtual csZBufMode GetZBufMode () const = 0;
 
   /** 
    * Retrieves the polygon normal threshold for this decal.  
@@ -102,48 +102,48 @@ struct iDecalTemplate : public virtual iBase
    *
    *  \return the decal offset.
    */
-  virtual float GetDecalOffset() const = 0;
+  virtual float GetDecalOffset () const = 0;
 
   /**
    * Determines whether or not this type of decal will have its geometry
    * clipped against a plane above the decal.
    *  \return True if top clipping is enabled.
    */
-  virtual bool HasTopClipping() const = 0;
+  virtual bool HasTopClipping () const = 0;
 
   /**
    * Gets the distance between the decal position and the top clipping plane
    * as a multiple of decal size.
    *  \return The top clipping plane scale.
    */
-  virtual float GetTopClippingScale() const = 0;
+  virtual float GetTopClippingScale () const = 0;
 
   /**
    * Determines whether or not this type of decal will have its geometry
    * clipped against a plane below the decal.
    *  \return True if bottom clipping is enabled.
    */
-  virtual bool HasBottomClipping() const = 0;
+  virtual bool HasBottomClipping () const = 0;
 
   /**
    * Gets the distance between the decal position and the bottom clipping
    * plane as a multiple of decal size.
    *  \return The bottom clipping plane scale.
    */
-  virtual float GetBottomClippingScale() const = 0;
+  virtual float GetBottomClippingScale () const = 0;
   
   /**
    * The min tex coord is the uv coordinate of the top-left corner of the
    * decal.
    *  \return The min tex coordinate.
    */
-  virtual const csVector2 & GetMinTexCoord() const = 0;
+  virtual const csVector2& GetMinTexCoord () const = 0;
 
   /**
    * The main color of the decal.
    *  \return The main color of the decal.
    */
-  virtual const csColor4 & GetMainColor() const = 0;
+  virtual const csColor4& GetMainColor () const = 0;
 
   /**
    * The color to give vertices close to the top of the decal.  The color of
@@ -151,7 +151,7 @@ struct iDecalTemplate : public virtual iBase
    * between this color and the main color based on distance from the top plane.
    *  \return The top color of the decal.
    */
-  virtual const csColor4 & GetTopColor() const = 0;
+  virtual const csColor4& GetTopColor () const = 0;
 
   /**
    * The color to give vertices close to the bottom of the decal.  The color of
@@ -159,20 +159,20 @@ struct iDecalTemplate : public virtual iBase
    * between this color and the main color based on distance from the bottom plane.
    *  \return The top color of the decal.
    */
-  virtual const csColor4 & GetBottomColor() const = 0;
+  virtual const csColor4& GetBottomColor () const = 0;
 
   /**
    * The max tex coord is the uv coordinate of the bottom-right corner of the
    * decal.
    *  \return The max tex coordinate.
    */
-  virtual const csVector2 & GetMaxTexCoord() const = 0;
+  virtual const csVector2& GetMaxTexCoord () const = 0;
 
   /**
    * The mixmode of the decal.
    *  \return The mixmode.
    */
-  virtual const uint GetMixMode() const = 0;
+  virtual const uint GetMixMode () const = 0;
   
   /**
    * The perpendicular face threshold specifies which faces are considered
@@ -180,7 +180,7 @@ struct iDecalTemplate : public virtual iBase
    * outwards by an amount relative to the perpendicular face offset.
    *  \return The perpendicular face threshold.
    */
-  virtual float GetPerpendicularFaceThreshold() const = 0;
+  virtual float GetPerpendicularFaceThreshold () const = 0;
 
   /**
    * The perpendicular face offset specifies how much perpendicular faces in
@@ -189,32 +189,32 @@ struct iDecalTemplate : public virtual iBase
    * will not taper at all.
    *  \return The perpendicular face offset.
    */
-  virtual float GetPerpendicularFaceOffset() const = 0;
+  virtual float GetPerpendicularFaceOffset () const = 0;
       
   /**
    * Sets the time the decal will have to live in seconds before it is 
    * killed.
    *  \param timeToLive	The time to live in seconds.
    */
-  virtual void SetTimeToLive(float timeToLive) = 0;
+  virtual void SetTimeToLive (float timeToLive) = 0;
   
   /**
    * Sets the material wrapper to use for this decal.
    *  \param material	The material wrapper of the decal.
    */
-  virtual void SetMaterialWrapper(iMaterialWrapper* material) = 0;
+  virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
 
   /**
    * Sets the rendering priority for this decal
    *  \param renderPriority	The render priority of the decal.
    */
-  virtual void SetRenderPriority(long renderPriority) = 0;
+  virtual void SetRenderPriority (long renderPriority) = 0;
 
   /** 
    * Sets the z-buffer mode for this decal.
    *  \param mode	The z-buffer mode for the decal.
    */
-  virtual void SetZBufMode(csZBufMode mode) = 0;
+  virtual void SetZBufMode (csZBufMode mode) = 0;
 
   /** 
    * Sets the polygon normal threshold for this decal.  
@@ -228,7 +228,7 @@ struct iDecalTemplate : public virtual iBase
    *
    *  \param polygonNormalThreshold	The polygon normal threshold.
    */
-  virtual void SetPolygonNormalThreshold(float polygonNormalThreshold) = 0;
+  virtual void SetPolygonNormalThreshold (float polygonNormalThreshold) = 0;
   
   /**
    * A decal will be offset a bit from the geometry it wraps around in order
@@ -239,21 +239,21 @@ struct iDecalTemplate : public virtual iBase
    *
    *  \param decalOffset	The distance between decal and the geometry.
    */
-  virtual void SetDecalOffset(float decalOffset) = 0;
+  virtual void SetDecalOffset (float decalOffset) = 0;
 
   /** Enables or disables clipping geometry above the decal.
    *   \param enabled		True if top clipping should be enabled.
    *   \param topPlaneScale	The distance from the decal position to the
    *                            top plane as a multiple of decal size.
    */
-  virtual void SetTopClipping(bool enabled, float topPlaneScale=0.0f) = 0;
+  virtual void SetTopClipping (bool enabled, float topPlaneScale = 0.0f) = 0;
 
   /** Enables or disables clipping geometry below the decal.
    *   \param enabled		True if bottom clipping should be enabled.
    *   \param bottomPlaneScale	The distance from the decal position to the
    *                            bottom plane as a multiple of decal size.
    */
-  virtual void SetBottomClipping(bool enabled, float bottomPlaneScale) = 0;
+  virtual void SetBottomClipping (bool enabled, float bottomPlaneScale) = 0;
 
   /**
    * The tex coords are the uv coordinate of the top-left and bottom-right 
@@ -261,13 +261,13 @@ struct iDecalTemplate : public virtual iBase
    *  \param min	The top-left corner of the decal.
    *  \param max	The bottom-right corner of the decal.
    */
-  virtual void SetTexCoords(const csVector2 & min, const csVector2 & max) = 0;
+  virtual void SetTexCoords (const csVector2& min, const csVector2& max) = 0;
 
   /**
    * The mixmode of the decal.
    *  \param mixMode	 The mixmode of the decal.
    */
-  virtual void SetMixMode(uint mixMode) = 0;
+  virtual void SetMixMode (uint mixMode) = 0;
   
   /**
    * The perpendicular face threshold specifies which faces are considered
@@ -275,7 +275,7 @@ struct iDecalTemplate : public virtual iBase
    * outwards by an amount relative to the perpendicular face offset.
    *  \param threshold The new perpendicular face threshold.
    */
-  virtual void SetPerpendicularFaceThreshold(float threshold) = 0;
+  virtual void SetPerpendicularFaceThreshold (float threshold) = 0;
 
   /**
    * The perpendicular face offset specifies how much perpendicular faces in
@@ -284,13 +284,13 @@ struct iDecalTemplate : public virtual iBase
    * will not taper at all.
    *  \param offset The new perpendicular face offset.
    */
-  virtual void SetPerpendicularFaceOffset(float offset) = 0;
+  virtual void SetPerpendicularFaceOffset (float offset) = 0;
 
   /**
   * The main color of the decal.
   *  \param color The main color of the decal.
   */
-  virtual void SetMainColor(const csColor4 & color) = 0;
+  virtual void SetMainColor (const csColor4& color) = 0;
 
   /**
   * The color to give vertices close to the top of the decal.  The color of
@@ -298,7 +298,7 @@ struct iDecalTemplate : public virtual iBase
   * between this color and the main color based on distance from the top plane.
   *  \param color The top color of the decal.
   */
-  virtual void SetTopColor(const csColor4 & color) = 0;
+  virtual void SetTopColor (const csColor4& color) = 0;
 
   /**
   * The color to give vertices close to the bottom of the decal.  The color of
@@ -306,7 +306,7 @@ struct iDecalTemplate : public virtual iBase
   * between this color and the main color based on distance from the bottom plane.
   *  \param color The top color of the decal.
   */
-  virtual void SetBottomColor(const csColor4 & color) = 0;
+  virtual void SetBottomColor (const csColor4& color) = 0;
 };
 
 /**
@@ -315,7 +315,7 @@ struct iDecalTemplate : public virtual iBase
  */
 struct iDecalBuilder
 {
-  virtual ~iDecalBuilder() {}
+  virtual ~iDecalBuilder () {}
 
   /**
    * Adds a static polygon to the decal.  The decal builder
@@ -323,7 +323,7 @@ struct iDecalBuilder
    * the mesh's extra rendermesh list.
    * \param p   The polygon to add to the decal.
    */
-  virtual void AddStaticPoly(const csPoly3D & p) = 0;
+  virtual void AddStaticPoly (const csPoly3D& p) = 0;
     
 };
 
@@ -338,7 +338,7 @@ struct iDecalBuilder
  */
 struct iDecalManager : public virtual iBase
 {
-  SCF_INTERFACE(iDecalManager, 1, 0, 0);
+  SCF_INTERFACE (iDecalManager, 1, 0, 0);
 
   /**
    * Creates a decal.
@@ -352,37 +352,37 @@ struct iDecalManager : public virtual iBase
    * \param oldDecal An existing decal that can be reused for efficiency.
    * \return True if the decal is created.
    */
-  virtual iDecal * CreateDecal(iDecalTemplate * decalTemplate, 
-    iSector * sector, const csVector3 & pos, const csVector3 & up, 
-    const csVector3 & normal, float width=1.0f, float height=1.0f,
-    iDecal * oldDecal = 0) = 0;
+  virtual iDecal* CreateDecal (iDecalTemplate* decalTemplate, 
+    iSector* sector, const csVector3& pos, const csVector3& up, 
+    const csVector3& normal, float width = 1.0f, float height = 1.0f,
+    iDecal* oldDecal = 0) = 0;
 
   /**
    * Creates a decal template and fills it with default values.
    *  \param material The material wrapper for this decal template.
    *  \return The newly created decal template.
    */
-  virtual csRef<iDecalTemplate> CreateDecalTemplate(
-          iMaterialWrapper* material) = 0;
+  virtual csRef<iDecalTemplate> CreateDecalTemplate (
+    iMaterialWrapper* material) = 0;
 
   /**
    * Deletes the given decal.
    *  \param decal The decal to be deleted.
    */
-  virtual void DeleteDecal(const iDecal * decal) = 0;
+  virtual void DeleteDecal (const iDecal* decal) = 0;
   
   /**
    * Gets the number of decals.
    * \return The number of decals.
    */
-  virtual size_t GetDecalCount() const = 0;
+  virtual size_t GetDecalCount () const = 0;
 
   /**
    * Gets the specified decal.
    *  \param idx The index of the decal to get, must be between 0 and
    *    GetDecalCount()-1
    */
-  virtual iDecal * GetDecal(size_t idx) const = 0;
+  virtual iDecal* GetDecal (size_t idx) const = 0;
 };
 /** @} */
 

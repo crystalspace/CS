@@ -63,6 +63,13 @@ void csCameraBase::FireCameraSectorListeners (iSector* sector)
     listeners[i]->NewSector ((iCamera*)this, sector);
 }
 
+void csCameraBase::FireCameraMovedListeners ()
+{
+  size_t i;
+  for (i = 0 ; i < listeners.GetSize () ; i++)
+    listeners[i]->CameraMoved ((iCamera*)this);
+}
+
 void csCameraBase::SetFarPlane (csPlane3 *farplane)
 {
   delete fp;
@@ -94,6 +101,8 @@ void csCameraBase::MoveWorld (const csVector3 &v, bool cd)
       FireCameraSectorListeners (sector);
     }
   }
+
+  FireCameraMovedListeners ();
 
   SetOrigin (new_position);
   cameranr = cur_cameranr++;

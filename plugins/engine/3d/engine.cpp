@@ -1225,6 +1225,18 @@ void csEngine::StartEngine ()
   }
 }
 
+void csEngine::PrecacheMesh (iMeshWrapper* s)
+{
+  csRef<iCamera> c = CreateCamera ();
+  csRef<iClipper2D> view;
+  view.AttachNew (new csBoxClipper (0.0, 0.0, float (G3D->GetWidth ()),
+    float (G3D->GetHeight ())));
+
+  CS::RenderManager::RenderView rview (c, view, G3D, G2D);
+  StartDraw (c, view, rview);
+  PrecacheMesh (s, &rview);
+}
+
 void csEngine::PrecacheMesh (iMeshWrapper* s, iRenderView* rview)
 {
   int num;

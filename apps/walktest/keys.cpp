@@ -22,6 +22,7 @@
 #include "walktest.h"
 #include "bot.h"
 #include "command.h"
+#include "splitview.h"
 #include "iengine/camera.h"
 #include "iengine/mesh.h"
 #include "iengine/sector.h"
@@ -340,141 +341,141 @@ void WalkTest::RotateCam (float x, float y)
 void WalkTest::imm_forward (float speed, bool slow, bool fast)
 {
   if (slow)
-    view->GetCamera ()->Move (speed * 0.01 * CS_VEC_FORWARD, collider_actor.HasCD ());
+    views->GetCamera ()->Move (speed * 0.01 * CS_VEC_FORWARD, collider_actor.HasCD ());
   else if (fast)
-    view->GetCamera ()->Move (speed * 4.0 * CS_VEC_FORWARD, collider_actor.HasCD ());
+    views->GetCamera ()->Move (speed * 4.0 * CS_VEC_FORWARD, collider_actor.HasCD ());
   else
-    view->GetCamera ()->Move (speed * 1.0 * CS_VEC_FORWARD, collider_actor.HasCD ());
+    views->GetCamera ()->Move (speed * 1.0 * CS_VEC_FORWARD, collider_actor.HasCD ());
 }
 
 void WalkTest::imm_backward (float speed, bool slow, bool fast)
 {
   if (slow)
-    view->GetCamera ()->Move (speed*.01*CS_VEC_BACKWARD, collider_actor.HasCD ());
+    views->GetCamera ()->Move (speed*.01*CS_VEC_BACKWARD, collider_actor.HasCD ());
   else if (fast)
-    view->GetCamera ()->Move (speed*1.2*CS_VEC_BACKWARD, collider_actor.HasCD ());
+    views->GetCamera ()->Move (speed*1.2*CS_VEC_BACKWARD, collider_actor.HasCD ());
   else
-    view->GetCamera ()->Move (speed*.6*CS_VEC_BACKWARD, collider_actor.HasCD ());
+    views->GetCamera ()->Move (speed*.6*CS_VEC_BACKWARD, collider_actor.HasCD ());
 }
 
 void WalkTest::imm_left (float speed, bool slow, bool fast)
 {
   if (slow)
-    view->GetCamera ()->Move (speed * 0.01 * CS_VEC_LEFT, collider_actor.HasCD ());
+    views->GetCamera ()->Move (speed * 0.01 * CS_VEC_LEFT, collider_actor.HasCD ());
   else if (fast)
-    view->GetCamera ()->Move (speed * 4.0 * CS_VEC_LEFT, collider_actor.HasCD ());
+    views->GetCamera ()->Move (speed * 4.0 * CS_VEC_LEFT, collider_actor.HasCD ());
   else
-    view->GetCamera ()->Move (speed * 1.0 * CS_VEC_LEFT, collider_actor.HasCD ());
+    views->GetCamera ()->Move (speed * 1.0 * CS_VEC_LEFT, collider_actor.HasCD ());
 }
 
 void WalkTest::imm_right (float speed, bool slow, bool fast)
 {
   if (slow)
-    view->GetCamera ()->Move (speed * 0.01 * CS_VEC_RIGHT, collider_actor.HasCD ());
+    views->GetCamera ()->Move (speed * 0.01 * CS_VEC_RIGHT, collider_actor.HasCD ());
   else if (fast)
-    view->GetCamera ()->Move (speed * 4.0 * CS_VEC_RIGHT, collider_actor.HasCD ());
+    views->GetCamera ()->Move (speed * 4.0 * CS_VEC_RIGHT, collider_actor.HasCD ());
   else
-    view->GetCamera ()->Move (speed * 1.0 * CS_VEC_RIGHT, collider_actor.HasCD ());
+    views->GetCamera ()->Move (speed * 1.0 * CS_VEC_RIGHT, collider_actor.HasCD ());
 }
 
 void WalkTest::imm_up (float speed, bool slow, bool fast)
 {
   if (slow)
-    view->GetCamera ()->Move (speed * 0.01 * CS_VEC_UP, collider_actor.HasCD ());
+    views->GetCamera ()->Move (speed * 0.01 * CS_VEC_UP, collider_actor.HasCD ());
   else if (fast)
-    view->GetCamera ()->Move (speed * 4.0 * CS_VEC_UP, collider_actor.HasCD ());
+    views->GetCamera ()->Move (speed * 4.0 * CS_VEC_UP, collider_actor.HasCD ());
   else
-    view->GetCamera ()->Move (speed * 1.0 * CS_VEC_UP, collider_actor.HasCD ());
+    views->GetCamera ()->Move (speed * 1.0 * CS_VEC_UP, collider_actor.HasCD ());
 }
 
 void WalkTest::imm_down (float speed, bool slow, bool fast)
 {
   if (slow)
-    view->GetCamera ()->Move (speed * 0.01 * CS_VEC_DOWN, collider_actor.HasCD ());
+    views->GetCamera ()->Move (speed * 0.01 * CS_VEC_DOWN, collider_actor.HasCD ());
   else if (fast)
-    view->GetCamera ()->Move (speed * 4.0 * CS_VEC_DOWN, collider_actor.HasCD ());
+    views->GetCamera ()->Move (speed * 4.0 * CS_VEC_DOWN, collider_actor.HasCD ());
   else
-    view->GetCamera ()->Move (speed * 1.0 * CS_VEC_DOWN, collider_actor.HasCD ());
+    views->GetCamera ()->Move (speed * 1.0 * CS_VEC_DOWN, collider_actor.HasCD ());
 }
 
 void WalkTest::imm_rot_left_camera (float speed, bool slow, bool fast)
 {
   if (slow)
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed * .01);
+    views->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed * .01);
   else if (fast)
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed * .4);
+    views->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed * .4);
   else
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed * .2);
+    views->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed * .2);
 }
 
 void WalkTest::imm_rot_left_world (float speed, bool slow, bool fast)
 {
   if (slow)
-    view->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_LEFT, speed * .01);
+    views->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_LEFT, speed * .01);
   else if (fast)
-    view->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_LEFT, speed * .4);
+    views->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_LEFT, speed * .4);
   else
-    view->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_LEFT, speed * .2);
+    views->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_LEFT, speed * .2);
 }
 
 void WalkTest::imm_rot_right_camera (float speed, bool slow, bool fast)
 {
   if (slow)
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed * .01);
+    views->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed * .01);
   else if (fast)
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed * .4);
+    views->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed * .4);
   else
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed * .2);
+    views->GetCamera ()->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed * .2);
 }
 
 void WalkTest::imm_rot_right_world (float speed, bool slow, bool fast)
 {
   if (slow)
-    view->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_RIGHT, speed * .01);
+    views->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_RIGHT, speed * .01);
   else if (fast)
-    view->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_RIGHT, speed * .4);
+    views->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_RIGHT, speed * .4);
   else
-    view->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_RIGHT, speed * .2);
+    views->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_RIGHT, speed * .2);
 }
 
 void WalkTest::imm_rot_left_xaxis (float speed, bool slow, bool fast)
 {
   if (slow)
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed * .01);
+    views->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed * .01);
   else if (fast)
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed * .4);
+    views->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed * .4);
   else
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed * .2);
+    views->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed * .2);
 }
 
 void WalkTest::imm_rot_right_xaxis (float speed, bool slow, bool fast)
 {
   if (slow)
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed * .01);
+    views->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed * .01);
   else if (fast)
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed * .4);
+    views->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed * .4);
   else
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed * .2);
+    views->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed * .2);
 }
 
 void WalkTest::imm_rot_left_zaxis (float speed, bool slow, bool fast)
 {
   if (slow)
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_LEFT, speed * .01);
+    views->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_LEFT, speed * .01);
   else if (fast)
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_LEFT, speed * .4);
+    views->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_LEFT, speed * .4);
   else
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_LEFT, speed * .2);
+    views->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_LEFT, speed * .2);
 }
 
 void WalkTest::imm_rot_right_zaxis (float speed, bool slow, bool fast)
 {
   if (slow)
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_RIGHT, speed * .01);
+    views->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_RIGHT, speed * .01);
   else if (fast)
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_RIGHT, speed * .4);
+    views->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_RIGHT, speed * .4);
   else
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_RIGHT, speed * .2);
+    views->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_RIGHT, speed * .2);
 }
 
 void WalkTest::eatkeypress (iEvent* Event)
@@ -553,12 +554,12 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
   int mx = csMouseEventHelper::GetX (&Event);
   int my = csMouseEventHelper::GetY (&Event);
   csScreenTargetResult result = csEngineTools::FindScreenTarget (
-      csVector2 (mx, my), 100.0f, view->GetCamera ());
+      csVector2 (mx, my), 100.0f, views->GetCamera ());
   iMeshWrapper* mesh = result.mesh;
   int sel = result.polygon_idx;
 
   csVector3 vw = result.isect;
-  csVector3 v = view->GetCamera ()->GetTransform ().Other2This (vw);
+  csVector3 v = views->GetCamera ()->GetTransform ().Other2This (vw);
   Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
   	"RMB down : cam:(%f,%f,%f) world:(%f,%f,%f)",
 	v.x, v.y, v.z, vw.x, vw.y, vw.z);
@@ -594,7 +595,7 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
   extern bool check_light;
   extern void select_object (iRenderView* rview, int type, void* entity);
   check_light = true;
-  //view->GetEngine ()->DrawFunc (view->GetCamera (),
+  //view->GetEngine ()->DrawFunc (views->GetCamera (),
     //view->GetClipper (), select_object);
 }
 
@@ -606,7 +607,7 @@ void WalkTest::MouseClick3Handler(iEvent &Event)
   screenPoint.x = csMouseEventHelper::GetX(&Event);
   screenPoint.y = csMouseEventHelper::GetY(&Event);
   csScreenTargetResult st = csEngineTools::FindScreenTarget (
-      screenPoint, 100.0f, view->GetCamera ());
+      screenPoint, 100.0f, views->GetCamera ());
   closestMesh = st.mesh;
   if (closestMesh)
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,

@@ -663,6 +663,20 @@ public:
   }
 
   /**
+   * Return true if this box contains invalid numbers (NaN).
+   */
+  bool IsNaN () const
+  {
+    if (csNaN (minbox.x)) return true;
+    if (csNaN (minbox.y)) return true;
+    if (csNaN (minbox.z)) return true;
+    if (csNaN (maxbox.x)) return true;
+    if (csNaN (maxbox.y)) return true;
+    if (csNaN (maxbox.z)) return true;
+    return false;
+  }
+
+  /**
    * Return every corner of this bounding box from 0
    * to 7. This contrasts with Min() and Max() because
    * those are only the min and max corners.

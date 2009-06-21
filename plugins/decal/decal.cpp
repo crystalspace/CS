@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csqsqrt.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "iutil/object.h"
@@ -41,40 +42,40 @@
 #include "decaltemplate.h"
 
 csDecal::csDecal(iObjectRegistry * objectReg, csDecalManager * decalManager)
-       : objectReg(objectReg), decalManager(decalManager),
-         indexCount(0), vertexCount(0), width(0), height(0), currMesh(0)
+  : objectReg(objectReg), decalManager(decalManager),
+  indexCount(0), vertexCount(0), width(0), height(0), currMesh(0)
 	 
 {
-  engine = csQueryRegistry<iEngine>(objectReg);
+  engine = csQueryRegistry<iEngine> (objectReg);
 
-  vertexBuffer = csRenderBuffer::CreateRenderBuffer(
-          CS_DECAL_MAX_VERTS_PER_DECAL, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
-  texCoordBuffer = csRenderBuffer::CreateRenderBuffer(
-          CS_DECAL_MAX_VERTS_PER_DECAL, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
-  normalBuffer = csRenderBuffer::CreateRenderBuffer(
-          CS_DECAL_MAX_VERTS_PER_DECAL, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
-  colorBuffer = csRenderBuffer::CreateRenderBuffer(
-          CS_DECAL_MAX_VERTS_PER_DECAL, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 4);
-  indexBuffer = csRenderBuffer::CreateIndexRenderBuffer(
-          CS_DECAL_MAX_TRIS_PER_DECAL*3, CS_BUF_STATIC, 
-          CS_BUFCOMP_UNSIGNED_INT, 0, CS_DECAL_MAX_TRIS_PER_DECAL*3-1);
+  vertexBuffer = csRenderBuffer::CreateRenderBuffer (
+    CS_DECAL_MAX_VERTS_PER_DECAL, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+  texCoordBuffer = csRenderBuffer::CreateRenderBuffer (
+    CS_DECAL_MAX_VERTS_PER_DECAL, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
+  normalBuffer = csRenderBuffer::CreateRenderBuffer (
+    CS_DECAL_MAX_VERTS_PER_DECAL, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+  colorBuffer = csRenderBuffer::CreateRenderBuffer (
+    CS_DECAL_MAX_VERTS_PER_DECAL, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 4);
+  indexBuffer = csRenderBuffer::CreateIndexRenderBuffer (
+    CS_DECAL_MAX_TRIS_PER_DECAL*3, CS_BUF_STATIC, 
+    CS_BUFCOMP_UNSIGNED_INT, 0, CS_DECAL_MAX_TRIS_PER_DECAL*3-1);
 
-  bufferHolder.AttachNew(new csRenderBufferHolder);
-  bufferHolder->SetRenderBuffer(CS_BUFFER_INDEX, indexBuffer);
-  bufferHolder->SetRenderBuffer(CS_BUFFER_POSITION, vertexBuffer);
-  bufferHolder->SetRenderBuffer(CS_BUFFER_TEXCOORD0, texCoordBuffer);
-  bufferHolder->SetRenderBuffer(CS_BUFFER_NORMAL, normalBuffer);
-  bufferHolder->SetRenderBuffer(CS_BUFFER_COLOR, colorBuffer);
+  bufferHolder.AttachNew (new csRenderBufferHolder);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, indexBuffer);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, vertexBuffer);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texCoordBuffer);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_NORMAL, normalBuffer);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_COLOR, colorBuffer);
 }
 
-csDecal::~csDecal()
+csDecal::~csDecal ()
 {
-  ClearRenderMeshes();
+  ClearRenderMeshes ();
 }
 
-void csDecal::Initialize(iDecalTemplate * decalTemplate, 
-    const csVector3 & normal, const csVector3 & pos, const csVector3 & up, 
-    const csVector3 & right, float width, float height)
+void csDecal::Initialize (iDecalTemplate * decalTemplate, 
+  const csVector3 & normal, const csVector3 & pos, const csVector3 & up, 
+  const csVector3 & right, float width, float height)
 {
   this->indexCount = 0;
   this->vertexCount = 0;
@@ -87,7 +88,7 @@ void csDecal::Initialize(iDecalTemplate * decalTemplate,
   this->width = width;
   this->height = height;
 
-  radius = sqrt(width*width + height*height);
+  radius = csQsqrt (width * width + height * height);
 
   invWidth = 1.0f / width;
   invHeight = 1.0f / height;
@@ -100,7 +101,7 @@ void csDecal::Initialize(iDecalTemplate * decalTemplate,
   topPlaneDist = 0.0f;
   bottomPlaneDist = 0.0f;
 
-  ClearRenderMeshes();
+  ClearRenderMeshes ();
 }
 
 void csDecal::BeginMesh(iMeshWrapper * mesh)
@@ -116,43 +117,40 @@ void csDecal::BeginMesh(iMeshWrapper * mesh)
     return;
 
   firstIndex = indexCount;
-  const csReversibleTransform& trans = 
-      mesh->GetMovable()->GetFullTransform();
+  const csReversibleTransform& trans =
+    mesh->GetMovable ()->GetFullTransform ();
 
-  localNormal = trans.Other2ThisRelative(normal);
-  localUp = trans.Other2ThisRelative(up);
-  localRight = trans.Other2ThisRelative(right);
-  vertOffset = localNormal * decalTemplate->GetDecalOffset();
-  relPos = trans.Other2This(pos);
+  localNormal = trans.Other2ThisRelative (normal);
+  localUp = trans.Other2ThisRelative (up);
+  localRight = trans.Other2ThisRelative (right);
+  vertOffset = localNormal * decalTemplate->GetDecalOffset ();
+  relPos = trans.Other2This (pos);
 
 #ifdef CS_DECAL_CLIP_DECAL
   // up 
-  clipPlanes[0] = csPlane3(-localUp, -height*0.5f + localUp * relPos);
-  
+  clipPlanes[0] = csPlane3 (-localUp, -height*0.5f + localUp * relPos);
   // down
-  clipPlanes[1] = csPlane3( localUp, -height*0.5f - localUp * relPos);
-
+  clipPlanes[1] = csPlane3 (localUp, -height*0.5f - localUp * relPos);
   // left
-  clipPlanes[2] = csPlane3(-localRight, -width*0.5f + localRight * relPos);
-
+  clipPlanes[2] = csPlane3 (-localRight, -width*0.5f + localRight * relPos);
   // right
-  clipPlanes[3] = csPlane3( localRight, -width*0.5f - localRight * relPos);
+  clipPlanes[3] = csPlane3 (localRight, -width*0.5f - localRight * relPos);
 
   numClipPlanes = 4;
 
   // top
-  if (decalTemplate->HasTopClipping())
+  if (decalTemplate->HasTopClipping ())
   {
-    topPlaneDist = decalTemplate->GetTopClippingScale() * radius;
-    clipPlanes[numClipPlanes++] = csPlane3(-localNormal,
-	-topPlaneDist + localNormal * relPos);
+    topPlaneDist = decalTemplate->GetTopClippingScale () * radius;
+    clipPlanes[numClipPlanes++] = csPlane3 (-localNormal,
+      -topPlaneDist + localNormal * relPos);
   }
 
   // bottom
-  if (decalTemplate->HasBottomClipping())
+  if (decalTemplate->HasBottomClipping ())
   {
-    bottomPlaneDist = decalTemplate->GetBottomClippingScale() * radius;
-    clipPlanes[numClipPlanes++] = csPlane3( localNormal,
+    bottomPlaneDist = decalTemplate->GetBottomClippingScale () * radius;
+    clipPlanes[numClipPlanes++] = csPlane3 (localNormal,
       -bottomPlaneDist - localNormal * relPos);
   }
 #endif // CS_DECAL_CLIP_DECAL
@@ -161,7 +159,7 @@ void csDecal::BeginMesh(iMeshWrapper * mesh)
   currMesh = mesh;
 }
 
-void csDecal::AddStaticPoly(const csPoly3D & p)
+void csDecal::AddStaticPoly (const csPoly3D & p)
 {
   if (!currMesh)
     return;
@@ -171,20 +169,20 @@ void csDecal::AddStaticPoly(const csPoly3D & p)
   csPoly3D poly = p;
 
 #ifdef CS_DECAL_CLIP_DECAL
-  for (a=0; a<numClipPlanes; ++a)
-    poly.CutToPlane(clipPlanes[a]);
+  for (a = 0; a < numClipPlanes; ++a)
+    poly.CutToPlane (clipPlanes[a]);
 #endif // CS_DECAL_CLIP_DECAL
   
-  size_t vertCount = poly.GetVertexCount();
+  size_t vertCount = poly.GetVertexCount ();
 
   // only support triangles and up
   if (vertCount < 3)
     return;
     
   // ensure the polygon isn't facing away from the decal's normal too much
-  csVector3 polyNorm = poly.ComputeNormal();
+  csVector3 polyNorm = poly.ComputeNormal ();
   float polyNormThresholdValue = -polyNorm * localNormal;
-  if (polyNormThresholdValue < decalTemplate->GetPolygonNormalThreshold())
+  if (polyNormThresholdValue < decalTemplate->GetPolygonNormalThreshold ())
     return;
 
   // check if we hit our maximum allowed vertices
@@ -196,7 +194,7 @@ void csDecal::AddStaticPoly(const csPoly3D & p)
 
   // check if we hit our maximum allowed indecies
   size_t idxCount = (vertCount - 2) * 3;
-  if (indexCount + idxCount > CS_DECAL_MAX_TRIS_PER_DECAL*3)
+  if (indexCount + idxCount > CS_DECAL_MAX_TRIS_PER_DECAL * 3)
     return;
 
   // if this face is too perpendicular, then we'll need to push it out a bit
@@ -208,47 +206,47 @@ void csDecal::AddStaticPoly(const csPoly3D & p)
   float invHighLowFaceDist = 0.0f;
   csVector3 faceBottomOffset;
   csVector3 faceCenter;
-  if (fabs(polyNormThresholdValue) 
-        < decalTemplate->GetPerpendicularFaceThreshold())
+  if (fabs (polyNormThresholdValue) 
+    < decalTemplate->GetPerpendicularFaceThreshold ())
   {
     doFaceOffset = true;
 
     csVector3 faceHighVert, faceLowVert;
     float faceLowDot;
 
-    faceLowVert = faceHighVert = *poly.GetVertex(0);
+    faceLowVert = faceHighVert = *poly.GetVertex (0);
     faceLowDot = faceHighDot = (faceLowVert - relPos) * localNormal;
     faceCenter = faceLowVert;
-    for (a=1; a<vertCount; ++a)
+    for (a = 1; a < vertCount; ++a)
     {
-      const csVector3 * vertPos = poly.GetVertex(a);
+      const csVector3 * vertPos = poly.GetVertex (a);
       faceCenter += *vertPos;
       float dot = (*vertPos - relPos) * localNormal;
       if (dot > faceHighDot)
       {
-	faceHighVert = *vertPos;
-	faceHighDot = dot;
+        faceHighVert = *vertPos;
+        faceHighDot = dot;
       }
       if (dot < faceLowDot)
       {
-	faceLowVert = *vertPos;
-	faceLowDot = dot;
+        faceLowVert = *vertPos;
+        faceLowDot = dot;
       }
     }
     invHighLowFaceDist = 1.0f / (faceHighDot - faceLowDot);
-    faceBottomOffset = -decalTemplate->GetPerpendicularFaceOffset() * polyNorm;
+    faceBottomOffset = -decalTemplate->GetPerpendicularFaceOffset () * polyNorm;
     faceCenter /= (float)vertCount;
   }
 #endif // CS_DECAL_CLIP_DECAL
 
-  const csVector2 & minTexCoord = decalTemplate->GetMinTexCoord();
-  csVector2 texCoordRange = decalTemplate->GetMaxTexCoord() - minTexCoord;
+  const csVector2 & minTexCoord = decalTemplate->GetMinTexCoord ();
+  csVector2 texCoordRange = decalTemplate->GetMaxTexCoord () - minTexCoord;
 
   tri[0] = vertexCount;
-  for (a=0; a<vertCount; ++a)
+  for (a = 0; a < vertCount; ++a)
   {
 #ifdef CS_DECAL_CLIP_DECAL
-    csVector3 vertPos = *poly.GetVertex(a);
+    csVector3 vertPos = *poly.GetVertex (a);
 
 	float distToPos = (vertPos - relPos) * localNormal;
     if (doFaceOffset)
@@ -259,20 +257,20 @@ void csDecal::AddStaticPoly(const csPoly3D & p)
       vertPos += offsetVal * faceBottomOffset;
 
       // spread out the base to avoid vertical seams
-      vertPos += (vertPos - faceCenter).Unit() 
-	* (decalTemplate->GetPerpendicularFaceOffset() * 2.0f); 
+      vertPos += (vertPos - faceCenter).Unit () 
+        * (decalTemplate->GetPerpendicularFaceOffset () * 2.0f); 
     }
 
     vertPos += vertOffset;
 #else
-    csVector3 vertPos = *poly.GetVertex(a);
+    csVector3 vertPos = *poly.GetVertex (a);
 #endif // CS_DECAL_CLIP_DECAL
 
     csVector3 relVert = vertPos - relPos;
     size_t vertIdx = vertexCount+a;
 
     // copy over vertex data
-    vertexBuffer->CopyInto(&vertPos, 1, vertIdx);
+    vertexBuffer->CopyInto (&vertPos, 1, vertIdx);
 
     // copy over color
     csColor4 color;
@@ -281,42 +279,43 @@ void csDecal::AddStaticPoly(const csPoly3D & p)
       float t = 0.0f;
       if (topPlaneDist >= 0.01f)
         t = -distToPos / topPlaneDist;
-      color = decalTemplate->GetMainColor() * (1.0f - t) + decalTemplate->GetTopColor() * t;
+      color = decalTemplate->GetMainColor () * (1.0f - t) +
+        decalTemplate->GetTopColor () * t;
     }
     else
     {
       float t = 0.0f;
       if (bottomPlaneDist >= 0.01f)
         t = distToPos / bottomPlaneDist;
-      color = decalTemplate->GetMainColor() * (1.0f - t) + decalTemplate->GetBottomColor() * t;
+      color = decalTemplate->GetMainColor () * (1.0f - t) +
+        decalTemplate->GetBottomColor () * t;
     }
-    colorBuffer->CopyInto(&color, 1, vertIdx);
+    colorBuffer->CopyInto (&color, 1, vertIdx);
         
     // create the index buffer for each triangle in the poly
     if (a >= 2)
     {
       tri[1] = vertIdx-1;
       tri[2] = vertIdx;
-      indexBuffer->CopyInto(&tri, 3, indexCount);
+      indexBuffer->CopyInto (&tri, 3, indexCount);
       indexCount += 3;
     }
 
     // generate uv coordinates
-    csVector2 texCoord(
-      minTexCoord.x + texCoordRange.x * 0.5f + 
-        texCoordRange.x * localRight * invWidth * relVert,
-      minTexCoord.y + texCoordRange.y * 0.5f - 
-        texCoordRange.y * localUp * invHeight * relVert);
-    texCoordBuffer->CopyInto(&texCoord, 1, vertIdx);
+    csVector2 texCoord ( minTexCoord.x + texCoordRange.x * 0.5f +
+      texCoordRange.x * localRight * invWidth * relVert,
+      minTexCoord.y + texCoordRange.y * 0.5f -
+      texCoordRange.y * localUp * invHeight * relVert);
+    texCoordBuffer->CopyInto (&texCoord, 1, vertIdx);
      
     // copy over normal
-    normalBuffer->CopyInto(&localNormal, 1, vertIdx);
+    normalBuffer->CopyInto (&localNormal, 1, vertIdx);
   }
 
   vertexCount += vertCount;
 }
 
-void csDecal::EndMesh()
+void csDecal::EndMesh ()
 {
   if (!currMesh)
     return;
@@ -326,24 +325,24 @@ void csDecal::EndMesh()
     return;
 
   // create a rendermesh for this mesh
-  csRenderMesh* pRenderMesh = decalManager->renderMeshAllocator.Alloc();
+  csRenderMesh* pRenderMesh = decalManager->renderMeshAllocator.Alloc ();
   
   csDecalRenderMeshInfo renderMeshInfo;
   renderMeshInfo.pRenderMesh = pRenderMesh;
   renderMeshInfo.mesh = currMesh;
-  renderMeshInfos.Push(renderMeshInfo);
+  renderMeshInfos.Push (renderMeshInfo);
 
-  pRenderMesh->mixmode = decalTemplate->GetMixMode();
+  pRenderMesh->mixmode = decalTemplate->GetMixMode ();
   pRenderMesh->meshtype = CS_MESHTYPE_TRIANGLES;
   pRenderMesh->indexstart = firstIndex;
   pRenderMesh->indexend = indexCount;
-  pRenderMesh->material = decalTemplate->GetMaterialWrapper();
+  pRenderMesh->material = decalTemplate->GetMaterialWrapper ();
   pRenderMesh->buffers = bufferHolder;
   pRenderMesh->geometryInstance = (void *)bufferHolder;
   //variableContext.AttachNew(new csShaderVariableContext);
   //pRenderMesh->variablecontext = variableContext;
   currMesh->AddExtraRenderMesh(pRenderMesh, 
-          decalTemplate->GetRenderPriority(), decalTemplate->GetZBufMode());
+    decalTemplate->GetRenderPriority (), decalTemplate->GetZBufMode ());
 }
 
 bool csDecal::Age (csTicks ticks)
@@ -357,14 +356,14 @@ bool csDecal::Age (csTicks ticks)
   return life < lifespan;
 }
 
-void csDecal::ClearRenderMeshes()
+void csDecal::ClearRenderMeshes ()
 {
-  const size_t len = renderMeshInfos.GetSize();
-  for (size_t a=0; a<len; ++a)
+  const size_t len = renderMeshInfos.GetSize ();
+  for (size_t a = 0; a < len; ++a)
   {
-    renderMeshInfos[a].mesh->RemoveExtraRenderMesh(
-	renderMeshInfos[a].pRenderMesh);
-    decalManager->renderMeshAllocator.Free(renderMeshInfos[a].pRenderMesh);
+    renderMeshInfos[a].mesh->RemoveExtraRenderMesh (
+      renderMeshInfos[a].pRenderMesh);
+    decalManager->renderMeshAllocator.Free (renderMeshInfos[a].pRenderMesh);
   }
-  renderMeshInfos.Empty();
+  renderMeshInfos.Empty ();
 }

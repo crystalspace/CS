@@ -2,6 +2,7 @@
       <layer>
             <defaultshader name="z_only" file="/shader/early_z/z_only.xml" />
             <ambient />
+            <shadertype>depthwrite</shadertype>
       </layer>
 	<layer>
 	        <defaultshader name="lighting_default_shadowmap" file="/shader/lighting/lighting_default_shadowmap.xml" />

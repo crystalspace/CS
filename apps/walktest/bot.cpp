@@ -23,8 +23,14 @@
 #include "iengine/light.h"
 #include "iengine/movable.h"
 #include "iengine/sector.h"
+#include "iengine/mesh.h"
+#include "imesh/sprite3d.h"
+#include "imesh/object.h"
 
 #include "bot.h"
+#include "walktest.h"
+#include "missile.h"
+#include "lights.h"
 
 Bot::Bot (iEngine *Engine, iMeshWrapper* botmesh)
 {
@@ -44,17 +50,19 @@ Bot::~Bot ()
 {
 }
 
-void Bot::set_bot_move (const csVector3& v)
+void Bot::SetBotMove (const csVector3& v)
 {
   mesh->GetMovable()->SetPosition (v);
   follow = v;
   mesh->GetMovable()->UpdateMove ();
 }
 
-void Bot::move (csTicks elapsed_time)
+void Bot::Move (csTicks elapsed_time)
 {
   csOrthoTransform old_pos (mesh->GetMovable()->GetTransform ().GetO2T (), follow);
   csVector3 rd = (8.*(float)elapsed_time)/1000. * d;
+  if (fabs (rd.x) < .00001 && fabs (rd.y) < .00001 && fabs (rd.z) < .00001)
+    return;
   follow += rd;
   csVector3 new_pos = follow;
   iSector* s = f_sector;
@@ -84,7 +92,10 @@ void Bot::move (csTicks elapsed_time)
   csVector3 old_p = mesh->GetMovable()->GetPosition ();
   csVector3 dir = follow-old_p;
   dir.Normalize ();
-  csVector3 new_p = old_p + ((3.*(float)elapsed_time)/1000.)*dir;
+  csVector3 d = ((3.*(float)elapsed_time)/1000.)*dir;
+  if (fabs (d.x) < .00001 && fabs (d.y) < .00001 && fabs (d.z) < .00001)
+    return;
+  csVector3 new_p = old_p + d;
   mesh->GetMovable()->SetPosition (new_p);
 
   //@@@
@@ -109,3 +120,61 @@ void Bot::move (csTicks elapsed_time)
   }
   mesh->GetMovable()->UpdateMove ();
 }
+
+BotManager::BotManager (WalkTest* walktest) : walktest (walktest)
+{
+}
+
+Bot* BotManager::CreateBot (iSector* where, const csVector3& pos, float dyn_radius, bool manual)
+{
+  csRef<iLight> dyn;
+  if (dyn_radius)
+  {
+    dyn = walktest->lights->CreateRandomLight (pos, where, dyn_radius);
+  }
+  iMeshFactoryWrapper* tmpl = walktest->Engine->GetMeshFactories ()
+  	->FindByName ("bot");
+  if (!tmpl) return 0;
+  csRef<iMeshObject> botmesh (tmpl->GetMeshObjectFactory ()->NewInstance ());
+  csRef<iMeshWrapper> botWrapper = walktest->Engine->CreateMeshWrapper (botmesh, "bot",
+    where);
+
+  botWrapper->GetMovable ()->UpdateMove ();
+  csRef<iSprite3DState> state (scfQueryInterface<iSprite3DState> (botmesh));
+  state->SetAction ("default");
+  
+  Bot* bot = new Bot (walktest->Engine, botWrapper);
+  bot->SetBotMove (pos);
+  bot->SetBotSector (where);
+  bot->light = dyn;
+  if (manual)
+    manual_bots.Push (bot);
+  else
+    bots.Push (bot);
+  return bot;
+}
+
+void BotManager::DeleteOldestBot (bool manual)
+{
+  if (manual)
+  {
+    if (manual_bots.GetSize () > 0)
+      manual_bots.DeleteIndex (0);
+  }
+  else
+  {
+    if (bots.GetSize () > 0)
+      bots.DeleteIndex (0);
+  }
+}
+
+void BotManager::MoveBots (csTicks elapsed_time)
+{
+  size_t i;
+  for (i = 0; i < bots.GetSize (); i++)
+  {
+    bots[i]->Move (elapsed_time);
+  }
+
+}
+

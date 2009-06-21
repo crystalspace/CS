@@ -804,7 +804,7 @@ namespace RenderManager
 
         size_t numLights;
         csLightInfluence* influences;
-	lightmgr->GetRelevantLights (node->owner.sector,
+	lightmgr->GetRelevantLightsSorted (node->owner.sector,
 	  mesh.renderMesh->bbox, influences, numLights, allMaxLights,
 	  &mesh.renderMesh->object2world);
 	

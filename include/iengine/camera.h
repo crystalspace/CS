@@ -56,17 +56,39 @@ struct iSceneNode;
 
 /**
  * Implement this interface if you are interested in learning when
+ * the camera changes sector or moves.
+ *
+ * This callback is used by:
+ * - iCamera
+ */
+struct iCameraListener : public virtual iBase
+{
+  SCF_INTERFACE (iCameraListener, 0, 0, 1);
+
+  /// Fired when the sector changes.
+  virtual void NewSector (iCamera* camera, iSector* sector) = 0;
+
+  /// Fired when the camera moves.
+  virtual void CameraMoved (iCamera* camera) = 0;
+};
+
+/**
+ * Implement this interface if you are interested in learning when
  * the camera changes sector.
  *
  * This callback is used by:
  * - iCamera
  */
-struct iCameraSectorListener : public virtual iBase
+CS_DEPRECATED_TYPE_MSG("Use iCameraListener instead")
+struct iCameraSectorListener : public iCameraListener
 {
-  SCF_INTERFACE (iCameraSectorListener, 0, 0, 1);
+  SCF_INTERFACE (iCameraSectorListener, 1, 0, 0);
 
   /// Fired when the sector changes.
   virtual void NewSector (iCamera* camera, iSector* sector) = 0;
+
+  // Make it compile.
+  void CameraMoved (iCamera* camera) {}
 };
 
 /**
@@ -103,7 +125,7 @@ struct iCameraSectorListener : public virtual iBase
  */
 struct iCamera : public virtual iBase
 {
-  SCF_INTERFACE(iCamera, 2,1,3);
+  SCF_INTERFACE(iCamera, 3,0,0);
   /**
    * Create a clone of this camera. Note that the array of listeners
    * is not cloned.
@@ -280,9 +302,16 @@ struct iCamera : public virtual iBase
   virtual bool GetOnlyPortals () = 0;
 
   /// Add a listener to this camera.
+  CS_DEPRECATED_METHOD_MSG("Use iCameraListener instead")
   virtual void AddCameraSectorListener (iCameraSectorListener* listener) = 0;
   /// Remove a listener from this camera.
+  CS_DEPRECATED_METHOD_MSG("Use iCameraListener instead")
   virtual void RemoveCameraSectorListener (iCameraSectorListener* listener) = 0;
+
+  /// Add a listener to this camera.
+  virtual void AddCameraListener (iCameraListener* listener) = 0;
+  /// Remove a listener from this camera.
+  virtual void RemoveCameraListener (iCameraListener* listener) = 0;
   
   /// Get the projection matrix for this camera
   virtual const CS::Math::Matrix4& GetProjectionMatrix () = 0;
