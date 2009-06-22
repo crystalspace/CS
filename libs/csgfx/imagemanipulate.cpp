@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2005 by Jorrit Tyberghein
-	      (C) 2005 by Frank Richter
+	      (C) 2005-2008 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,6 +20,9 @@
 #include "cssysdef.h"
 #include "csqint.h"
 #include "csutil/refarr.h"
+#include "csgeom/math.h"
+#include "csgeom/vector3.h"
+#include "csgfx/imageautoconvert.h"
 #include "csgfx/imagememory.h"
 
 #include "csgfx/imagemanipulate.h"
@@ -596,6 +599,44 @@ csRef<iImage> csImageManipulate::Sharpen (iImage* source, int strength,
   csRef<csImageMemory> resimg;
   resimg.AttachNew (new csImageMemory (source->GetWidth(), source->GetHeight(),
     result, true));
+
+  return resimg;
+}
+
+csRef<iImage> csImageManipulate::RenormalizeNormals (iImage* source)
+{
+  const int Width = source->GetWidth();
+  const int Height = source->GetHeight();
+  const int Depth = source->GetDepth();
+
+  CS::ImageAutoConvert imageRGB (source,
+    (source->GetFormat() & ~CS_IMGFMT_MASK) | CS_IMGFMT_TRUECOLOR);
+  
+  csRef<csImageMemory> resimg;
+  resimg.AttachNew (new csImageMemory (Width, Height, Depth,
+    imageRGB->GetFormat()));
+  csRGBpixel *src = (csRGBpixel*)imageRGB->GetImageData ();
+  csRGBpixel *dest = (csRGBpixel*)resimg->GetImageData ();
+ 
+  for (int n = Width * Height * Depth; n > 0; n--)
+  {
+    csRGBpixel n_biased (*src);
+    csVector3 nCurrent (
+      n_biased.red*(2.0f/255.0f)-1.0f,
+      n_biased.green*(2.0f/255.0f)-1.0f,
+      n_biased.blue*(2.0f/255.0f)-1.0f);
+    nCurrent.Normalize();
+    
+    csRGBpixel n_new (
+      csClamp (int(nCurrent.x*127.5f+127.5f), 255, 0),
+      csClamp (int(nCurrent.y*127.5f+127.5f), 255, 0),
+      csClamp (int(nCurrent.z*127.5f+127.5f), 255, 0),
+      n_biased.alpha);
+    *dest = n_new;
+
+    dest++;
+    src++;
+  }
 
   return resimg;
 }

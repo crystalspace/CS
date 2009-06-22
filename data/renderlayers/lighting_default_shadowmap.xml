@@ -13,9 +13,12 @@
 		<ambient />
 		<!-- Options to control lighting for static lights -->
 		<staticlights>
-		  <!-- Only draw specular lighting for meshes which have the 
+		  <!-- Don't draw static lights for meshes which have the 
 		       CS_ENTITY_STATICLIGHT flag set -->
-		  <specularonly />
+		  <nodraw />
+		  <!-- We could use <specularonly/> to only get specular
+		       lighting from static lights, but lighter2 can provide
+		       data for that, too -->
 		</staticlights>
 		<maxlightpasses>1</maxlightpasses>
 		<shadertype>base</shadertype>
@@ -33,6 +36,9 @@
 		  <!-- Don't draw static lights for meshes which have the 
 		       CS_ENTITY_STATICLIGHT flag set -->
 		  <nodraw />
+		  <!-- We could use <specularonly/> to only get specular
+		       lighting from static lights, but lighter2 can provide
+		       data for that, too -->
 		</staticlights>
 	</layer>
 	<layer>

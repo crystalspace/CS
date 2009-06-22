@@ -79,8 +79,8 @@ struct iCameraListener : public virtual iBase
  * This callback is used by:
  * - iCamera
  */
-CS_DEPRECATED_TYPE_MSG("Use iCameraListener instead")
-struct iCameraSectorListener : public iCameraListener
+struct CS_DEPRECATED_TYPE_MSG("Use iCameraListener instead")
+iCameraSectorListener : public iCameraListener
 {
   SCF_INTERFACE (iCameraSectorListener, 1, 0, 0);
 
@@ -301,12 +301,16 @@ struct iCamera : public virtual iBase
   /// Get the hit-only-portals flag.
   virtual bool GetOnlyPortals () = 0;
 
+#include "csutil/deprecated_warn_off.h"
+
   /// Add a listener to this camera.
   CS_DEPRECATED_METHOD_MSG("Use iCameraListener instead")
   virtual void AddCameraSectorListener (iCameraSectorListener* listener) = 0;
   /// Remove a listener from this camera.
   CS_DEPRECATED_METHOD_MSG("Use iCameraListener instead")
   virtual void RemoveCameraSectorListener (iCameraSectorListener* listener) = 0;
+
+#include "csutil/deprecated_warn_on.h"
 
   /// Add a listener to this camera.
   virtual void AddCameraListener (iCameraListener* listener) = 0;

@@ -68,9 +68,6 @@ class Tri3DTest : public csApplicationFramework, public csBaseEventHandler
   //csSimpleRenderMesh* untrimesh;
   CS::Geometry::csContour3 untrimesh;
 
-  /// Whether or not we want to display the triangulated version
-  bool triangulate;
-
  public:
   bool SetupModules ();
 

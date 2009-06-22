@@ -118,6 +118,8 @@ namespace lighter
 
       colorArray = (csColor*)data;      
     }
+  
+    static csString GetTextureNameFromFilename (const csString& file);
   protected:
     // The color data itself
     mutable csColor *colorArray;
@@ -131,7 +133,6 @@ namespace lighter
     csString filename;
 
     iTextureWrapper* texture;
-    csString GetTextureNameFromFilename (const csString& file);
 
     inline csColor* BogusPointer () const 
     { return ((csColor*)~0) - (GetWidth() * GetHeight()); }
@@ -201,6 +202,162 @@ namespace lighter
   };
   typedef csPDelArray<LightmapMask> LightmapMaskPtrDelArray;
 
+  /// Records the influences of a light on a primitive group
+  class LightInfluences : public Swappable
+  {
+  protected:
+    struct LightInfluence
+    {
+      csVector3 direction;
+      float intensity;
+    };
+    mutable LightInfluence* mapData;
+    uint width, height;
+    uint xOffs, yOffs;
+    
+    inline LightInfluence* BogusPointer () const 
+    { return ((LightInfluence*)~0) - (width * height); }
+    inline LightInfluence* AllocMap () const
+    { 
+      return (LightInfluence*)SwappableHeap::Alloc (width * height * 
+        sizeof (LightInfluence));
+    }
+  public:
+    LightInfluences (uint w, uint h, uint xOffs, uint yOffs) : mapData (0),
+      width (w), height (h), xOffs (xOffs), yOffs (yOffs)
+    {
+    }
+    ~LightInfluences ()
+    {
+      Lock();
+      SwappableHeap::Free (mapData);
+    }
+    
+    inline uint GetWidth () const { return width; }
+    inline uint GetHeight () const { return height; }
+    inline uint GetXOffset () const { return xOffs; }
+    inline uint GetYOffset () const { return yOffs; }
+
+    inline void AddDirection (size_t u, size_t v,
+      const csVector3& d, float intensity)
+    {
+      LightInfluence& i = mapData[(u-xOffs)+(v-yOffs)*width];
+      i.direction += d*intensity;
+      i.intensity += intensity;
+    }
+    
+    inline const csVector3& GetDirectionForLocalCoord (size_t u, size_t v) const
+    {
+      return mapData[u + width * v].direction;
+    }
+    inline float GetIntensityForLocalCoord (size_t u, size_t v) const
+    {
+      return mapData[u + width * v].intensity;
+    }
+    inline float GetTotalIntensity() const
+    {
+      float sum = 0;
+      for (uint i = 0; i < width*height; i++)
+        sum += mapData[i].intensity;
+      return sum;
+    }
+    
+    void Lock () const
+    {
+      if (!IsLocked() && (mapData == 0))
+      {
+	mapData = AllocMap();
+      }
+      Swappable::Lock();
+    }
+    
+    virtual void GetSwapData (void*& data, size_t& size)
+    {
+      if (mapData == 0) mapData = AllocMap ();
+      data = mapData;
+      size = width * height * sizeof (LightInfluence);
+      // Set a bogus pointer so accesses to swapped data causes a segfault
+      mapData = BogusPointer ();
+    }
+    virtual size_t GetSwapSize()
+    {
+      return width * height * sizeof (LightInfluence);
+    }
+    virtual void SwapIn (void* data, size_t size)
+    {
+      CS_ASSERT (size == width * height * sizeof (LightInfluence));
+      CS_ASSERT (mapData == BogusPointer ());
+      mapData = (LightInfluence*)data;
+    }
+  };
+  
+
+  class DirectionMap : public Swappable
+  {
+  protected:
+    mutable csVector3* mapData;
+    uint width, height;
+    
+    inline csVector3* BogusPointer () const 
+    { return ((csVector3*)~0) - (width * height); }
+    inline csVector3* AllocMap () const
+    { 
+      return (csVector3*)SwappableHeap::Alloc (width * height * 
+        sizeof (csVector3));
+    }
+  public:
+    DirectionMap (const Lightmap &lm) : mapData (0),
+      width (lm.GetWidth ()), height (lm.GetHeight ())
+    {
+    }
+    ~DirectionMap ()
+    {
+      Lock();
+      SwappableHeap::Free (mapData);
+    }
+    
+    inline uint GetWidth () const { return width; }
+    inline uint GetHeight () const { return height; }
+
+    inline const csVector3* GetDirections () const
+    {     
+      return mapData;
+    }
+    
+    void Normalize ();
+    
+    void AddFromLightInfluences (const LightInfluences& influences);
+
+    void Lock () const
+    {
+      if (!IsLocked() && (mapData == 0))
+      {
+	mapData = AllocMap();
+      }
+      Swappable::Lock();
+    }
+    
+    virtual void GetSwapData (void*& data, size_t& size)
+    {
+      if (mapData == 0) mapData = AllocMap ();
+      data = mapData;
+      size = width * height * sizeof (csVector3);
+      // Set a bogus pointer so accesses to swapped data causes a segfault
+      mapData = BogusPointer ();
+    }
+    virtual size_t GetSwapSize()
+    {
+      return width * height * sizeof (csVector3);
+    }
+    virtual void SwapIn (void* data, size_t size)
+    {
+      CS_ASSERT (size == width * height * sizeof (csVector3));
+      CS_ASSERT (mapData == BogusPointer ());
+      mapData = (csVector3*)data;
+    }
+  };
+  typedef csPDelArray<DirectionMap> DirectionMapPtrDelArray;
+  
   class LightmapPostProcess
   {
   public:

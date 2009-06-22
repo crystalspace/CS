@@ -46,10 +46,10 @@ struct iJob : public virtual iBase
  */
 struct iJobQueue : public virtual iBase
 {
-  SCF_INTERFACE(iJobQueue, 3,0,0);
+  SCF_INTERFACE(iJobQueue, 3,1,0);
   
   /// Add a job to the queue.
-  virtual void Enqueue (iJob* job) = 0;
+  virtual void Enqueue (iJob* job, bool lowPriority = false) = 0;
   
   /**
    * Check if a job is still in the queue. If yes, remove it from the queue

@@ -53,15 +53,12 @@ public:
   void ChangeTo (const char* filename)
   {
     if (!vfs) return;
-    const char* slash = strrchr (filename, '/');
-    if (slash != 0)
-    {
-      csString dir;
-      dir.Replace (filename, slash - filename);
-      vfs->PushDir ();
-      vfs->ChDir (dir);
-      popCount++;
-    }
+
+    csString dir(filename);
+    dir.Truncate(dir.FindLast('/'));
+    vfs->PushDir ();
+    vfs->ChDir (dir);
+    popCount++;
   }
   /**
    * Just pushes the current directory, but doesn't change it in anyway - 

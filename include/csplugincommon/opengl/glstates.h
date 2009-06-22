@@ -764,12 +764,18 @@ public:
         (glIsEnabled (GL_SECONDARY_COLOR_ARRAY_EXT) == GL_TRUE);
     else
       enabled_GL_SECONDARY_COLOR_ARRAY_EXT = false;
+    enabled_GL_NORMAL_ARRAY = (glIsEnabled (GL_NORMAL_ARRAY) == GL_TRUE);
+    
     if (extmgr->CS_GL_ARB_vertex_program)
       enabled_GL_VERTEX_PROGRAM_POINT_SIZE_ARB =
         (glIsEnabled (GL_VERTEX_PROGRAM_POINT_SIZE_ARB) == GL_TRUE);
     else
       enabled_GL_VERTEX_PROGRAM_POINT_SIZE_ARB = false;
-    enabled_GL_NORMAL_ARRAY = (glIsEnabled (GL_NORMAL_ARRAY) == GL_TRUE);
+    if (extmgr->CS_GL_ARB_point_sprite)
+      enabled_GL_POINT_SPRITE_ARB =
+        (glIsEnabled (GL_POINT_SPRITE_ARB) == GL_TRUE);
+    else
+      enabled_GL_POINT_SPRITE_ARB = false;
 
     memset (currentBufferID, 0, sizeof (currentBufferID));
     {

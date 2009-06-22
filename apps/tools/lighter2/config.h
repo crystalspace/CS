@@ -40,6 +40,8 @@ namespace lighter
       bool doDirectLight;
       // HL2-style directional LMs
       bool directionalLMs;
+      // Whether to generate maps containing light directions for specular
+      bool specularDirectionMaps;
       // Indirect Illumination through photon mapping
       bool indirectLMs;
       // Number of threads to use for multicore parts

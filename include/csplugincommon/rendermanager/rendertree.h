@@ -211,6 +211,8 @@ namespace RenderManager
           shmgr->GetSVNameStringset()->Request ("object2world transform");
         svObjectToWorldInvName = 
           shmgr->GetSVNameStringset()->Request ("object2world transform inverse");
+        svFogplaneName = 
+          shmgr->GetSVNameStringset()->Request ("fogplane");
           
         dbgDebugClearScreen = debugPersist.RegisterDebugFlag ("debugclear");
       }
@@ -228,6 +230,7 @@ namespace RenderManager
 
       CS::ShaderVarStringID svObjectToWorldName;
       CS::ShaderVarStringID svObjectToWorldInvName;
+      CS::ShaderVarStringID svFogplaneName;
     
       RenderView::Pool renderViewPool;
       csRenderMeshHolder rmHolder;
@@ -342,6 +345,8 @@ namespace RenderManager
       int drawFlags;
       /// Sector to render
       iSector* sector;
+      /// Holds fog plane for sector+view
+      csRef<csShaderVariable> svFogplane;
       /// Context-specific shader variables
       csRef<iShaderVariableContext> shadervars;
       

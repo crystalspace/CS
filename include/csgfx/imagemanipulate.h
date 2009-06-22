@@ -95,6 +95,13 @@ public:
    * This function works for RGBA and paletted images.
    */
   static csRef<iImage> Gray (iImage* source);
+  
+  /**
+   * Renormalizes a normal map (ie RGB triplets represent XYZ directions,
+   * stored biased and scaled so that the value 0 is mapped to -1, 
+   * the value 255 is mapped to 1). 
+   */
+  static csRef<iImage> RenormalizeNormals (iImage* source);
 };
 
 /** @} */

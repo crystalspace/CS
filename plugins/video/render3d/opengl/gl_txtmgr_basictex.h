@@ -368,10 +368,12 @@ public:
   void SetMipmapLimits (int maxMip, int minMip = 0);
   void GetMipmapLimits (int& maxMip, int& minMip);
   
+  csPtr<iDataBuffer> Readback (GLenum textarget,
+    const CS::StructuredTextureFormat&, int);
   csPtr<iDataBuffer> Readback (const CS::StructuredTextureFormat&, int);
   
-  /// Dump the contents onto an image.
-  csPtr<iImage> Dump ();
+  /// Download texture from GL as an image
+  csPtr<iImage> GetTextureFromGL ();
 };
 
 #include "csutil/deprecated_warn_on.h"

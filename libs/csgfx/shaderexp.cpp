@@ -92,8 +92,17 @@ enum
   OP_FUNC_MATRIX_TRANSP,
   OP_FUNC_MATRIX_INV,
   
+  // Comparisons
+  OP_LT,
+  OP_GT,
+  OP_LE,
+  OP_GE,
+  OP_EQ,
+  OP_NE,
+  
   // Pseudo-ops, special case weird stuff
   OP_PS_MAKE_VECTOR,
+  OP_PS_IF,
 
   // Highest internal op number
   OP_LIMIT,
@@ -106,6 +115,7 @@ enum
   OP_INT_SELT12,
   OP_INT_SELT34,
   OP_INT_LOAD,
+  OP_INT_SELECT,
   
   OP_LAST
 };
@@ -141,13 +151,21 @@ static const char* const opNames[OP_LAST] = {
   "MATRIX2GL",
   "MATRIXTRANSP",
   "MATRIXINV",
+  "LT",
+  "GT",
+  "LE",
+  "GE",
+  "EQ",
+  "NE",
   "!MAKEVECTOR",
+  "!IF",
   "!LIMIT",
   "!ATOM",
   "!SEXP",
   "SELT12",
   "SELT34",
-  "LOAD"
+  "LOAD",
+  "SELECT"
 };
 
 enum 
@@ -253,10 +271,48 @@ static const op_args_info optimize_arg_table[] =
   { 1, 1, false }, // OP_FUNC_MATRIX_TRANSP
   { 1, 1, false }, // OP_FUNC_MATRIX_INV
 
+  { 2, 2, false }, // OP_LT
+  { 2, 2, false }, // OP_GT
+  { 2, 2, false }, // OP_LE
+  { 2, 2, false }, // OP_GE
+  { 2, 2, false }, // OP_EQ
+  { 2, 2, false }, // OP_NE
+  
   { 2, 4, false }, // OP_PS_MAKE_VECTOR
+  { 3, 3, false }, // OP_PS_IF
 
   { 0, 0, false }, //  OP_LIMIT
 };
+
+// Comparison mixins
+
+namespace
+{
+  struct LT
+  {
+    bool operator() (float a, float b) const { return a < b; }
+  };
+  struct GT
+  {
+    bool operator() (float a, float b) const { return a > b; }
+  };
+  struct LE
+  {
+    bool operator() (float a, float b) const { return a <= b; }
+  };
+  struct GE
+  {
+    bool operator() (float a, float b) const { return a >= b; }
+  };
+  struct EQ
+  {
+    bool operator() (float a, float b) const { return a == b; }
+  };
+  struct NE
+  {
+    bool operator() (float a, float b) const { return a != b; }
+  };
+}
 
 /* Note on vector default values:
 * - Constant vectors should default to x=0,y=0,z=0,w=1 for unspecified fields.
@@ -906,8 +962,15 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg arg2, oper_
   case OP_FUNC_MAX: return eval_max(arg1, arg2, output);
   case OP_FUNC_MATRIX_COLUMN: return eval_matrix_column(arg1, arg2, output);
   case OP_FUNC_MATRIX_ROW: return eval_matrix_row(arg1, arg2, output);
+  case OP_LE: return eval_compare(LE(), arg1, arg2, output);
+  case OP_LT: return eval_compare(LT(), arg1, arg2, output);
+  case OP_GE: return eval_compare(GE(), arg1, arg2, output);
+  case OP_GT: return eval_compare(GT(), arg1, arg2, output);
+  case OP_EQ: return eval_compare(EQ(), arg1, arg2, output);
+  case OP_NE: return eval_compare(NE(), arg1, arg2, output);
   case OP_INT_SELT12: return eval_selt12(arg1, arg2, output);
   case OP_INT_SELT34: return eval_selt34(arg1, arg2, output);
+  case OP_INT_SELECT: return eval_select(arg1, arg2, output);
 
   default:
     EvalError ("Unknown multi-arg operator %s (%d).", GetOperName (oper), oper);
@@ -1445,6 +1508,28 @@ bool csShaderExpression::eval_frame(oper_arg & output) const
   return true;
 }
 
+template<typename Comparator>
+bool csShaderExpression::eval_compare (const Comparator& cmp,
+                                       const oper_arg & arg1,
+                                       const oper_arg & arg2,
+                                        oper_arg & output) const
+{
+  if (arg1.type == TYPE_NUMBER && arg2.type == TYPE_NUMBER)
+  {
+    output.type = TYPE_NUMBER;
+    output.num = cmp (arg1.num, arg2.num) ? 1 : 0;
+  } 
+  else 
+  {
+    EvalError ("Invalid types for comparison operator, (%s, %s).", 
+      GetTypeName (arg1.type), GetTypeName (arg2.type));
+
+    return false;
+  }
+
+  return true;
+}
+      
 bool csShaderExpression::eval_matrix_column(const oper_arg & arg1, 
                                             const oper_arg & arg2,
   	                                    oper_arg & output) const
@@ -1619,6 +1704,20 @@ bool csShaderExpression::eval_load(const oper_arg & arg1, oper_arg & output) con
   /* I really hope this is optimized by the compiler. */
 
   output = arg1;
+
+  return true;
+}
+
+bool csShaderExpression::eval_select(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const 
+{
+  if (output.type != TYPE_NUMBER)
+  {
+    EvalError ("Selector is not a number.");
+
+    return false;
+  }
+
+  output = (output.num != 0) ? arg1 : arg2;
 
   return true;
 }
@@ -2039,8 +2138,13 @@ bool csShaderExpression::compile_cons(const cons * cell, int & acc_top)
     accstack_max = this_acc;
 
   /* Special cases */
-  if (op == OP_PS_MAKE_VECTOR)
-    return compile_make_vector(cptr, acc_top, this_acc);
+  switch (op)
+  {
+    case OP_PS_MAKE_VECTOR:
+      return compile_make_vector(cptr, acc_top, this_acc);
+    case OP_PS_IF:
+      return compile_if(cptr, acc_top, this_acc);
+  }
 
   if (!cptr)
   { /* zero arg func */
@@ -2227,6 +2331,53 @@ bool csShaderExpression::compile_make_vector(const cons * cptr, int & acc_top, i
 
   acc_top = this_acc + 1;
   opcodes.Push(tmp);
+
+  return true;
+}
+
+bool csShaderExpression::compile_if (const cons * cptr, int & acc_top, int this_acc)
+{
+  if (!compile_cons(cptr->car.cell, acc_top))
+    return false;
+
+  oper tmp;
+
+  tmp.opcode = OP_INT_SELECT;
+  tmp.acc = this_acc;
+
+  cptr = cptr->cdr;
+
+  if (cptr->car.type == TYPE_CONS)
+  {
+    tmp.arg1.type = TYPE_ACCUM;
+    tmp.arg1.acc = acc_top;
+
+    if (!compile_cons(cptr->car.cell, acc_top))
+      return false;
+  }
+  else
+  {
+    tmp.arg1 = cptr->car;
+  }
+
+  cptr = cptr->cdr;
+
+  if (cptr->car.type == TYPE_CONS)
+  {
+    tmp.arg2.type = TYPE_ACCUM;
+    tmp.arg2.acc = acc_top;
+
+    if (!compile_cons(cptr->car.cell, acc_top))
+      return false;
+  }
+  else
+  {
+    tmp.arg2 = cptr->car;
+  }
+
+  opcodes.Push(tmp);
+
+  acc_top = this_acc + 1;
 
   return true;
 }
@@ -2450,8 +2601,8 @@ static csStringID GetTokenID (const TokenTabEntry* tokenTab,
       do
       {
         pos++;
-      } while ((d = (tabTok[pos] - p[pos])) == 0);
-      if (pos >= tokenLen)
+      } while ((d = (tabTok[pos] - p[pos])) == 0 && tabTok[pos] != 0);
+      if (pos == tokenLen)
         return tokenTab[m].id;
     }
     if (d < 0)
@@ -2481,6 +2632,7 @@ static const TokenTabEntry commonTokens[] = {
   {"elt4", 4, OP_VEC_ELT4},
   {"floor", 5, OP_FUNC_FLOOR},
   {"frame", 5, OP_FUNC_FRAME},
+  {"if", 2, OP_PS_IF},
   {"make-vector", 11, OP_PS_MAKE_VECTOR},
   {"matrix-column", 13, OP_FUNC_MATRIX_COLUMN},
   {"matrix-inv", 10, OP_FUNC_MATRIX_INV},
@@ -2507,7 +2659,13 @@ static const TokenTabEntry xmlTokens[] = {
   {"add", 3, OP_ADD},
   {"atom", 4, OP_XML_ATOM},
   {"div", 3, OP_DIV},
+  {"eq", 2, OP_EQ},
+  {"ge", 2, OP_GE},
+  {"gt", 2, OP_GT},
+  {"le", 2, OP_LE},
+  {"lt", 2, OP_LT},
   {"mul", 3, OP_MUL},
+  {"ne", 2, OP_NE},
   {"sexp", 4, OP_XML_SEXP},
   {"sub", 4, OP_SUB}
 };
@@ -2524,7 +2682,13 @@ static const TokenTabEntry sexpTokens[] = {
   {"*", 1, OP_MUL},
   {"+", 1, OP_ADD},
   {"-", 1, OP_SUB},
-  {"/", 1, OP_DIV}
+  {"/", 1, OP_DIV},
+  {"/=", 2, OP_NE},
+  {"<", 1, OP_LT},
+  {"<=", 2, OP_LE},
+  {"=", 1, OP_EQ},
+  {">", 1, OP_GT},
+  {">=", 2, OP_GE}
 };
 const size_t sexpTokenNum = sizeof(sexpTokens)/sizeof(TokenTabEntry);
 

@@ -51,6 +51,10 @@ public:
     {
       threadQueue->Enqueue(job);
     }
+    else if(queueType == THREADEDL)
+    {
+      threadQueue->Enqueue(job, true);
+    }
     else
     {
       listQueue->Enqueue(job, queueType);
@@ -61,10 +65,10 @@ public:
   {
     // True if we're executing something to be run in the main thread,
     // and we are the main thread, and we're not forcing it to be put on a queue for later.
-    bool noThread = alwaysRunNow || (IsMainThread() && queueType != THREADED && !forceQueue);
+    bool noThread = alwaysRunNow || (IsMainThread() && queueType != THREADED && queueType != THREADEDL && !forceQueue);
 
     // True if we're executing something to not be run in the main thread, while all other threads are busy.
-    bool runNow = noThread || ((queueType == THREADED) && !IsMainThread() && ((waiting >= threadCount-1) ||
+    bool runNow = noThread || ((queueType == THREADED || queueType == THREADEDL) && !IsMainThread() && ((waiting >= threadCount-1) ||
         (threadQueue->GetQueueCount() > 2*threadCount-1) || wait));
 
     return runNow;

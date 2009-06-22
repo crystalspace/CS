@@ -74,7 +74,7 @@ namespace lighter
 
   protected:
     // Cleanup and prepare for shutdown
-    void CleanUp ();
+    void CleanUp (Statistics::Progress& progress);
 
     // Parse the commandline and load any files specified
     bool LoadFiles (Statistics::Progress& progress);
@@ -132,8 +132,10 @@ namespace lighter
     Statistics::Progress progPostproc;
     Statistics::Progress progPostprocSector;
     Statistics::Progress progPostprocLM;
-    Statistics::Progress progSaveResult;
     Statistics::Progress progSaveMeshesPostLight;
+    Statistics::Progress progSpecMaps;
+    Statistics::Progress progSaveResult;
+    Statistics::Progress progCleanLightingData;
     Statistics::Progress progApplyWorldChanges;
     Statistics::Progress progCleanup;
     Statistics::Progress progFinished;

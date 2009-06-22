@@ -1,19 +1,19 @@
 /*
-    Copyright (C) 2007 by Scott Johnson
+  Copyright (C) 2007-2008 by Scott Johnson
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Library General Public License for more details.
 
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
@@ -26,6 +26,124 @@ namespace CS
 {
   namespace Geometry
   {
+    csEarClipper::csEarClipper(csContour3 polygon)
+    {
+      for (int i = 0; i < (int)polygon.GetSize(); i++)
+      {
+        clipPoly.Push(polygon[i]);
+        originalIndices.Push(i);
+      }
+
+      ClassifyVertices();
+    }
+
+    bool csEarClipper::IsConvex(const int index)
+    {
+      int polyLength = (int)clipPoly.GetSize();
+      int nextIndex = (index+1)%polyLength;
+      int prevIndex = (index-1);
+
+      if (prevIndex < 0)
+      {
+        prevIndex = polyLength + prevIndex;
+      }
+
+      csPlane3 plane(clipPoly[index], clipPoly[nextIndex], clipPoly[prevIndex]);
+
+      // detect clockwise movement, and invert plane in that case
+      csVector3 temp1 = clipPoly[index] - clipPoly[nextIndex];
+      csVector3 temp2 = clipPoly[index] - clipPoly[prevIndex];
+
+      csVector3 crossProd = temp1%temp2;
+      csVector3 crossAtVert = crossProd + clipPoly[index];
+
+      float indicator = plane.Classify(crossAtVert);
+      if (indicator > 0)
+      {
+        return true;
+      }
+
+      else
+      {
+        return false;
+      }
+
+    }
+
+    void csEarClipper::ClassifyVertices()
+    {
+      ears.DeleteAll();
+
+      int length = (int)clipPoly.GetSize();
+      isVertexReflex.SetSize(length);
+
+      for (int x = 0; x < length; x++)
+      {
+        if (!IsConvex(x))
+        {
+          // add to reflex set
+          isVertexReflex[x] = true;
+        }
+        else
+        {
+          // add to convex set
+          isVertexReflex[x] = false;
+          ears.Push(x);
+        }
+      }
+    }
+
+    bool csEarClipper::IsFinished()
+    {
+      if (clipPoly.GetSize() <= 3)
+      {
+        return true;
+      }
+
+      return false;
+    }
+
+    csVertexSet csEarClipper::ClipEar()
+    {
+      csVertexSet resultingSet;
+
+      // clip the first ear in ears
+      int earIndex = ears.Top();
+      ears.Pop();
+      
+      // get the index in the clip poly array of the ear
+      size_t indexInPoly = originalIndices[earIndex];
+
+      // this vertex is the one we want to remove
+      size_t indexToReturn = originalIndices[earIndex];
+
+      // build the set of vertices that make up the triangle we just
+      // clipped
+      int prevIndex = (int)earIndex - 1;
+      while (prevIndex < 0)
+      {
+        prevIndex += originalIndices.GetSize();
+      }
+
+      int nextIndex = earIndex + 1;
+      while (nextIndex >= (int)originalIndices.GetSize())
+      {
+        nextIndex -= originalIndices.GetSize();
+      }
+
+      resultingSet.Push(originalIndices[prevIndex]);
+      resultingSet.Push(indexToReturn);
+      resultingSet.Push(originalIndices[nextIndex]);
+
+      // now, remove the ear and reclassify the vertices
+      clipPoly.DeleteIndex(indexInPoly);
+      originalIndices.DeleteIndex(indexInPoly);
+
+      ClassifyVertices();
+
+      return resultingSet;
+    }
+
     bool Triangulate3D::Process(csContour3& polygon, csTriangleMesh& result)
     {
       int n = (int)polygon.GetSize();
@@ -48,21 +166,23 @@ namespace CS
         return true;
       }
 
+      // Removed for debugging algorithm    
+      /*
       if (n == 4)
       {
-        // special case of quadrilateral
+      // special case of quadrilateral
 
-        for (int i = 0; i < (int)polygon.GetSize(); i++)
-        {
-          result.AddVertex(polygon[i]);
-        }
-
-        result.AddTriangle(0, 1, 3);
-        result.AddTriangle(1, 2, 3);
-
-        return true;
+      for (int i = 0; i < (int)polygon.GetSize(); i++)
+      {
+      result.AddVertex(polygon[i]);
       }
 
+      result.AddTriangle(0, 1, 3);
+      result.AddTriangle(1, 2, 3);
+
+      return true;
+      }
+      */
       result.Clear();
 
       // add all of the vertices from the polygon into the triangle mesh
@@ -107,31 +227,45 @@ namespace CS
         }
       }
 
-      // debugging test
-      //for (size_t i = 0; i < polygon.GetSize(); i++)
-      //{
-      //  polygon[i] = planarPolygon[i];
-      //  csPrintf("planarPolygon: %f, %f, %f\n", planarPolygon[i].x, planarPolygon[i].y, planarPolygon[i].z);
-      //}
-
       // triangulate the (now) 2D planar polygon in the XY plane using an 
       // ear clipping method
       // note that we will actually be triangulating the original 3D polygon
       // by using vertex indices.  this allows us to skip the reverse mapping
       // step.
 
-      // we first classify all of the vertices by determining if they are reflex
-      // and create a list of ears of the polygon
-      csArray<bool> isReflex;
-      isReflex.SetCapacity(polygon.GetSize());
-      csArray<size_t> earIndices;
+      // utilize a csEarClipper data structure and remove all of the ears from it
+      csEarClipper clipper(planarPolygon);
 
-      Triangulate3D::FindVertexGroups(planarPolygon, isReflex, earIndices);
+      while (!clipper.IsFinished())
+      {
+        // grab the next index of the vertex to be clipped
+        csVertexSet clippedTri = clipper.ClipEar();
 
-      // while the polygon isn't triangulated yet
-      // find an ear
-      // clip it
-      // remove the vertices from the set of those to be considered
+        // connect the vertices to the left and right of this index
+        size_t leftIndex = clippedTri.Get(0);
+        size_t earIndex = clippedTri.Get(1);
+        size_t rightIndex = clippedTri.Get(2);
+
+        // do a check, just to make sure that the polygon is sided
+        // correctly
+        if (leftIndex > rightIndex)
+        {
+          result.AddTriangle(leftIndex, earIndex, rightIndex);
+        }
+
+        else
+        {
+          result.AddTriangle(rightIndex, earIndex, leftIndex);
+        }
+      }
+
+      // if we're done, then make sure to add the remainder to
+      // the triangle mesh
+      int firstIndex = clipper.GetOriginalIndex(0);
+      int secondIndex = clipper.GetOriginalIndex(1);
+      int thirdIndex = clipper.GetOriginalIndex(2);
+
+      result.AddTriangle(firstIndex, secondIndex, thirdIndex);
 
       // @@@FIXME: Finish implementing.
       return true;
@@ -256,28 +390,6 @@ namespace CS
       return poly;
     }
 
-    bool Triangulate3D::FindVertexGroups(csContour3& poly, csArray<bool>& isReflex, csArray<size_t>& ears)
-    {
-      int length = (int)poly.GetSize();
-
-      for (int x = 0; x < length; x++)
-      {
-        if (!IsConvex(poly, x))
-        {
-          // add to reflex set
-          isReflex[x] = true;
-        }
-        else
-        {
-          // add to convex set
-          isReflex[x] = false;
-          ears.Push(x);
-        }
-      }
-
-      return true;
-    }
-
     /*
     bool Triangulate3D::Snip(csContour3& polygon, csArray<size_t>& ears, const size_t earPoint, csTriangleMesh& addTo)
     {
@@ -296,38 +408,6 @@ namespace CS
     }
     */
 
-    bool Triangulate3D::IsConvex(const csContour3& polygon, const int index)
-    {
-      int polyLength = (int)polygon.GetSize();
-      int nextIndex = (index+1)%polyLength;
-      int prevIndex = (index-1);
-
-      if (prevIndex < 0)
-      {
-        prevIndex = polyLength + prevIndex;
-      }
-
-      csPlane3 plane(polygon[index], polygon[nextIndex], polygon[prevIndex]);
-
-      // detect clockwise movement, and invert plane in that case
-      csVector3 temp1 = polygon[index] - polygon[nextIndex];
-      csVector3 temp2 = polygon[index] - polygon[prevIndex];
-
-      csVector3 crossProd = temp1%temp2;
-      csVector3 crossAtVert = crossProd + polygon[index];
-
-      float indicator = plane.Classify(crossAtVert);
-      if (indicator > 0)
-      {
-        return true;
-      }
-
-      else
-      {
-        return false;
-      }
-
-    }
 
     bool Triangulate3D::IsContained(const csVector3& testVertex, const csVector3& a, const csVector3& b, const csVector3& c)
     {

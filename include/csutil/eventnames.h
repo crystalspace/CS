@@ -137,7 +137,15 @@ class CS_CRYSTALSPACE_EXPORT csEventNameRegistry :
 /** \name Common system events
  * These are the names of some of the most commonly-used system-generated
  * events.
- * <p>
+ *
+ * Some events are "umbrella events", that is, subscribing to them means that
+ * all events of a certain kind are received (e.g. csevMouse for mouse events),
+ * but the "umbrella events" themselves are <em>not</em> sent to event
+ * handlers! In the mouse events examples, you would have to check for the
+ * names of "leaf events" in the event handler, such as csevMouseDown,
+ * csevMouseMove etc. For information on event names see the 
+ * <a href="../manual/Event-Names.html">user manual, section "Event Names"</a>.
+ *
  * Third-party applications can define their own event names.  You should
  * avoid using the "crystalspace." prefix (which is reserved for 
  * internally-generated events).
@@ -149,6 +157,7 @@ class CS_CRYSTALSPACE_EXPORT csEventNameRegistry :
  * make subscription computationally expensive and may cause lots of
  * spurious events to be delivered to your handler.  Only subscribe to
  * this event if you know what you're doing!
+ * \remarks "Umbrella" event.
  */
 #define csevAllEvents(reg)	      \
   (csEventNameRegistry::GetID((reg), ""))
@@ -171,6 +180,7 @@ class CS_CRYSTALSPACE_EXPORT csEventNameRegistry :
 
 /**
  * Generic input event.  All actual input events are children of this one.
+ * \remarks "Umbrella" event.
  */
 #define csevInput(reg)		      \
   (csEventNameRegistry::GetID((reg), "crystalspace.input"))
@@ -178,6 +188,7 @@ class CS_CRYSTALSPACE_EXPORT csEventNameRegistry :
 /**
  * Generic keyboard event.  All actual keyboard events are children of this 
  * one.
+ * \remarks "Umbrella" event.
  */
 #define csevKeyboardEvent(reg)	      \
   (csEventNameRegistry::GetID((reg), "crystalspace.input.keyboard"))
@@ -190,7 +201,10 @@ class CS_CRYSTALSPACE_EXPORT csEventNameRegistry :
 #define csevKeyboardUp(reg)	      \
   (csEventNameRegistry::GetID((reg), "crystalspace.input.keyboard.up"))
 
-/// Generic mouse event.  All actual mouse events are children of this one.
+/**
+ * Generic mouse event.  All actual mouse events are children of this one.
+ * \remarks "Umbrella" event.
+ */
 #define csevMouseEvent(reg)	      \
   (csEventNameRegistry::GetID((reg), "crystalspace.input.mouse"))
 
@@ -227,6 +241,7 @@ static inline csEventID csevMouseOp(
 /**
  * Generic button event from mouse x.  All button events from mouse x
  * are children of this one.  The default system mouse is 0.
+ * \remarks "Umbrella" event.
  */
 #define csevMouseButton(reg,x)	      \
   csevMouseOp ((reg), (x), "button")
@@ -264,6 +279,7 @@ static inline csEventID csevMouseOp(
 /**
  * Generic joystick event.  All actual joystick events are children of
  * this one.
+ * \remarks "Umbrella" event.
  */
 #define csevJoystickEvent(reg)	      \
   (csEventNameRegistry::GetID((reg), "crystalspace.input.joystick"))
@@ -303,6 +319,7 @@ static inline csEventID csevJoystickOp (
  * Generic joystick button event from joystick x.  All actual joystick 
  * button events are children of this one.  The first system joystick
  * is 0.
+ * \remarks "Umbrella" event.
  */
 #define csevJoystickButton(reg,x)     \
   csevJoystickOp((reg),(x),"button")
@@ -365,6 +382,7 @@ static inline csEventID csevJoystickOp (
 /**
  * Children of this event are generated whenever application (as a whole)
  * receives or loses focus.
+ * \remarks "Umbrella" event.
  */
 #define csevFocusChanged(reg)	      \
   (csEventNameRegistry::GetID((reg), "crystalspace.application.focus"))

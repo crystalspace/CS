@@ -39,7 +39,7 @@ class CS_CRYSTALSPACE_EXPORT SimpleJobQueue :
 public:
   SimpleJobQueue ();
 
-  virtual void Enqueue (iJob* job);
+  virtual void Enqueue (iJob* job, bool lowPriority = false);
   virtual void PullAndRun (iJob* job);
   virtual void Unqueue (iJob* job, bool waitIfCurrent = true);
   virtual bool IsFinished ();

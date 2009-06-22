@@ -1457,10 +1457,12 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     csRef<iDocumentNode> nextPass;
 
     // Parse 'newparams' nodes.
+    bool settexture = false; //only one texture, the others are shaders
     csRef<iDocumentNodeIterator> newparams = profileElement->GetNodes("newparam");
-    while(newparams->HasNext())
+    while(newparams->HasNext() && !settexture)
     {
-      csRef<iDocumentNode> surface = newparams->Next()->GetNode("surface");
+      csRef<iDocumentNode> newparam = newparams->Next();
+      csRef<iDocumentNode> surface = newparam->GetNode("surface");
       if(!surface)
       {
         continue;
@@ -1472,6 +1474,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
         texture->SetValue("texture");
         csRef<iDocumentNode> textureContents = texture->CreateNodeBefore(CS_NODE_TEXT);
         textureContents->SetValue(surface->GetNode("init_from")->GetContentsValue());
+        settexture = true;
       }
     }
 
@@ -1715,5 +1718,6 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
 } /* End of ColladaConvertor namespace */
 CS_PLUGIN_NAMESPACE_END(ColladaConvertor)
+
 
 

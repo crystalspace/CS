@@ -47,6 +47,7 @@ struct csGLTextureClassSettings
   bool forceDecompress;
   bool allowDownsample;
   bool allowMipSharpen;
+  bool renormalizeGeneratedMips;
 };
 
 /*

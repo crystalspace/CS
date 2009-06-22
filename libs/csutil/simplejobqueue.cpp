@@ -28,7 +28,7 @@ namespace Utility
     : scfImplementationType (this)
   {}
 
-  void SimpleJobQueue::Enqueue (iJob* job)
+  void SimpleJobQueue::Enqueue (iJob* job, bool lowPriority)
   {
     job->Run ();
   }

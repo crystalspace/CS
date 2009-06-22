@@ -64,10 +64,14 @@ private:
     // texture mappings
     struct TextureMapping
     {
-      CS::ShaderVarStringID id;
-      csDirtyAccessArray<size_t, csArrayElementHandler<size_t>,
-	CS::Memory::LocalBufferAllocator<size_t, 2,
-	  CS::Memory::AllocatorMalloc, true> > indices;
+      struct SV
+      {
+        CS::ShaderVarStringID id;
+        csDirtyAccessArray<size_t, csArrayElementHandler<size_t>,
+	  CS::Memory::LocalBufferAllocator<size_t, 2,
+	    CS::Memory::AllocatorMalloc, true> > indices;
+      };
+      SV tex, fallback;
       int textureUnit;
       CS::Graphics::TextureComparisonMode texCompare;
     };

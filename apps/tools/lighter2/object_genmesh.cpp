@@ -528,6 +528,12 @@ namespace lighter
       CS::ShaderVarName (globalLighter->svStrings, "tex lightmap dir 2"),
       CS::ShaderVarName (globalLighter->svStrings, "tex lightmap dir 3")
     };
+    CS::ShaderVarName specDirName[Scene::specDirectionMapCount];
+    for (int i = 0; i < Scene::specDirectionMapCount; i++)
+    {
+      specDirName[i] = CS::ShaderVarName (globalLighter->svStrings,
+        csString().Format ("tex spec directions %d", i+1));
+    }
     int numLMs = globalConfig.GetLighterProperties().directionalLMs ? 4 : 1;
 
     bool noSubmeshes = allPrimitives.GetSize () == 1; // @@@ insufficient test
@@ -556,14 +562,26 @@ namespace lighter
           scfQueryInterface<iShaderVariableContext> (
             subMesh ? (iBase*)subMesh : (iBase*)meshWrapper);
 
+	uint lmID = uint (lightmapIDs[i]);
         for (int l = 0; l < numLMs; l++)
         {
-          uint lmID = uint (lightmapIDs[i]);
           Lightmap* lm = sector->scene->GetLightmap(lmID, l);
           csRef<csShaderVariable> svLightmap;
           svLightmap.AttachNew (new csShaderVariable (lightmapName[l]));
           svLightmap->SetValue (lm->GetTexture());
           svc->AddVariable (svLightmap);
+        }
+        
+        if (globalConfig.GetLighterProperties().specularDirectionMaps)
+        {
+          csRef<csShaderVariable> svInfluence;
+          for (int i = 0; i < Scene::specDirectionMapCount; i++)
+          {
+            svInfluence.AttachNew (new csShaderVariable (specDirName[i]));
+            svInfluence->SetValue (sector->scene->GetSpecDirectionMapTexture (
+              lmID, i));
+            svc->AddVariable (svInfluence);
+          }
         }
       }
     }

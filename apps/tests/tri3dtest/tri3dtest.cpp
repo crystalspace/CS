@@ -25,7 +25,6 @@ using CS::Geometry::csContour3;
 Tri3DTest::Tri3DTest()
 {
     SetApplicationName ("CrystalSpace.Tri3DTest");
-    triangulate = false;
     untrimesh = NULL;
 }
 
@@ -39,11 +38,7 @@ void Tri3DTest::Frame()
   rMeshObj.vertexCount = 0;
   rMeshObj = ConvertToRenderMesh(tm);
 
-  csSimpleRenderMesh utMeshObj;
-  utMeshObj.vertexCount = 0;
-  utMeshObj = ConvertToRenderMesh(untrimesh);
- 
-    // First get elapsed time from the virtual clock.
+  // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.06 * 20);
@@ -96,7 +91,6 @@ void Tri3DTest::Frame()
   // order .
   csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
   csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
-  utMeshObj.object2world *= ot;
   rMeshObj.object2world *= ot;
 
   //c->SetTransform (ot);
@@ -106,36 +100,17 @@ void Tri3DTest::Frame()
 
   // if the user wants the item to be displayed triangulated, 
   // then do so
-  if (triangulate)
+  if (!g3d->BeginDraw(engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
   {
-    if (!g3d->BeginDraw(engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
-    {
-      ReportError("Cannot prepare renderer for 3D drawing.");
-    }
-
-    if (rMeshObj.vertexCount > 0)
-    {
-      g3d->DrawSimpleMesh(rMeshObj, 0);
-    }
-
-    g3d->FinishDraw();
+    ReportError("Cannot prepare renderer for 3D drawing.");
   }
 
-  // otherwise, display the basic item, untriangulated
-  else
+  if (rMeshObj.vertexCount > 0)
   {
-    if (!g3d->BeginDraw(engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
-    {
-      ReportError("Cannot prepare renderer for 3D drawing.");
-    }
-
-    if (utMeshObj.vertexCount > 0)
-    {
-      g3d->DrawSimpleMesh(utMeshObj, 0);
-    }
-
-    g3d->FinishDraw();
+    g3d->DrawSimpleMesh(rMeshObj, 0);
   }
+
+  g3d->FinishDraw();
 
   if (rMeshObj.vertices != NULL)
   {
@@ -169,13 +144,6 @@ bool Tri3DTest::OnKeyboard(iEvent& ev)
         csQueryRegistry<iEventQueue> (GetObjectRegistry());
       if (q.IsValid()) q->GetEventOutlet()->Broadcast(
       	csevQuit(GetObjectRegistry()));
-    }
-
-    // if the user hit the t key, then toggle between triangulated and
-    // non-triangulated mode
-    else if (code == 't')
-    {
-      triangulate = !triangulate;
     }
   }
   return false;
@@ -263,7 +231,7 @@ bool Tri3DTest::SetupModules ()
 
   loader = csQueryRegistry<iLoader> (GetObjectRegistry());
   if (!loader) return ReportError("Failed to locate Loader!");
-\
+
   // We need a View to the virtual world.
   view.AttachNew(new csView (engine, g3d));
   iGraphics2D* g2d = g3d->GetDriver2D ();
@@ -322,35 +290,6 @@ bool Tri3DTest::CreateBox(csContour3& mesh)
   // triangulate the mesh
   CS::Geometry::Triangulate3D::Process(mesh, tm);
 
-  /*
-  // setup our triangulated mesh
-  tm.Clear();
-
-  // origin for our scene is at (0, 5, -3)
-
-  // create a square in front
-  // verts are: 
-  // (-3, 8, 0) - upper left
-  csVector3 ul(-3, -3, 10);
-  tm.AddVertex(ul);
-
-  // (3, 8, 0)  - upper right
-  csVector3 ur(-3, 3, 10);
-  tm.AddVertex(ur);
-
-  // (-3, 2, 0) - lower left
-  csVector3 ll(3, -3, 10);
-  tm.AddVertex(ll);
-
-  // (3, 2, 0)  - lower right
-  csVector3 lr(3, 3, 10);
-  tm.AddVertex(lr);
-
-  // now add the triangles to complete it
-  tm.AddTriangle(0, 1, 2);
-  tm.AddTriangle(2, 1, 3);
-  */
-
   return true;
 }
 
@@ -379,50 +318,48 @@ csSimpleRenderMesh Tri3DTest::ConvertToRenderMesh(const csTriangleMesh& t)
   rendMesh.vertices = NULL;
   rendMesh.colors = NULL;
 
-  if (triangulate)
+
+  verts = new csVector3[tm.GetTriangleCount() * 3];
+  tmVerts = tm.GetVertices();
+
+  csArray<csVector4> availableColors;
+  availableColors.Push(csVector4(1.0, 0.0, 0.0, 1.0)); // red
+  availableColors.Push(csVector4(1.0, 0.5, 0.0, 1.0)); // orange
+  availableColors.Push(csVector4(1.0, 1.0, 0.0, 1.0)); // yellow
+  availableColors.Push(csVector4(0.0, 1.0, 0.0, 1.0)); // green
+  availableColors.Push(csVector4(0.0, 0.0, 1.0, 1.0)); // blue
+  availableColors.Push(csVector4(0.4, 0.0, 1.0, 1.0)); // indigo
+  availableColors.Push(csVector4(1.0, 0.0, 1.0, 1.0)); // violet
+
+  int numAvabColors = (int)availableColors.GetSize();
+
+  // also color each triangle differently
+  cols = new csVector4[3*tm.GetTriangleCount()];
+
+  for (size_t i = 0; i < tm.GetTriangleCount(); i++)
   {
-    verts = new csVector3[tm.GetTriangleCount() * 3];
-    tmVerts = tm.GetVertices();
+    csTriangle curTri = tm.GetTriangle((int)i);
 
-    csArray<csVector4> availableColors;
-    availableColors.Push(csVector4(1.0, 0.0, 0.0, 1.0)); // red
-    availableColors.Push(csVector4(1.0, 0.5, 0.0, 1.0)); // orange
-    availableColors.Push(csVector4(1.0, 1.0, 0.0, 1.0)); // yellow
-    availableColors.Push(csVector4(0.0, 1.0, 0.0, 1.0)); // green
-    availableColors.Push(csVector4(0.0, 0.0, 1.0, 1.0)); // blue
-    availableColors.Push(csVector4(0.4, 0.0, 1.0, 1.0)); // indigo
-    availableColors.Push(csVector4(1.0, 0.0, 1.0, 1.0)); // violet
+    int colorNumber = ((int)i)%numAvabColors;
+    verts[3*i] = tmVerts[curTri.a];
+    verts[3*i + 1] = tmVerts[curTri.b];
+    verts[3*i + 2] = tmVerts[curTri.c];
 
-    int numAvabColors = (int)availableColors.GetSize();
-
-    // also color each triangle differently
-    cols = new csVector4[3*tm.GetTriangleCount()];
-
-    for (size_t i = 0; i < tm.GetTriangleCount(); i++)
-    {
-      csTriangle curTri = tm.GetTriangle((int)i);
-
-      int colorNumber = ((int)i)%numAvabColors;
-      verts[3*i] = tmVerts[curTri.a];
-      verts[3*i + 1] = tmVerts[curTri.b];
-      verts[3*i + 2] = tmVerts[curTri.c];
-
-      cols[3*i] = availableColors[colorNumber];
-      cols[3*i + 1] = availableColors[colorNumber];
-      cols[3*i + 2] = availableColors[colorNumber];
-    }
-
-    rendMesh.vertexCount = (uint)(3 * tm.GetTriangleCount());
-    rendMesh.vertices = verts;
-
-    rendMesh.colors = cols;
-
-    rendMesh.meshtype = CS_MESHTYPE_TRIANGLES;
-    csAlphaMode alf;
-    alf.alphaType = alf.alphaSmooth;
-    alf.autoAlphaMode = false;
-    rendMesh.alphaType = alf;
+    cols[3*i] = availableColors[colorNumber];
+    cols[3*i + 1] = availableColors[colorNumber];
+    cols[3*i + 2] = availableColors[colorNumber];
   }
+
+  rendMesh.vertexCount = (uint)(3 * tm.GetTriangleCount());
+  rendMesh.vertices = verts;
+
+  rendMesh.colors = cols;
+
+  rendMesh.meshtype = CS_MESHTYPE_TRIANGLES;
+  csAlphaMode alf;
+  alf.alphaType = alf.alphaSmooth;
+  alf.autoAlphaMode = false;
+  rendMesh.alphaType = alf;
 
   return rendMesh;
 }

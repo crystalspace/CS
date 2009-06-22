@@ -54,6 +54,23 @@ AC_DEFUN([CS_CHECK_COMMON_TOOLS_LINK],
 
 
 #------------------------------------------------------------------------------
+# CS_CHECK_COMMON_TOOLS_RELAYTOOL([PATH], [EMITTER])
+#	Checks for relaytool. Prepends PATH to the search path.
+#	The result of the check is recorded with CS_EMIT_BUILD_PROPERTY() via 
+#	the optional EMITTER. If EMITTER is omitted, then
+#	CS_EMIT_BUILD_PROPERTY()'s default emitter is employed.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_COMMON_TOOLS_RELAYTOOL],
+    [AC_ARG_ENABLE([relaytool], [AC_HELP_STRING([--enable-relaytool],
+	[enable use of relaytool for some libraries (default YES)])])
+	AS_IF([test -z "$enable_relaytool"], 
+	    [enable_relaytool=yes])
+    AS_IF([test "$enable_relaytool" != "no"],
+	[CS_PATH_TOOL([RELAYTOOL], [relaytool], [], [$1])
+	CS_EMIT_BUILD_PROPERTY([CMD.RELAYTOOL], [$RELAYTOOL], [], [], [$2])])])
+
+
+#------------------------------------------------------------------------------
 # CS_CHECK_COMMON_TOOLS_BASIC([EMITTER])
 #	Checks for basic tools for building things. Results of the checks are
 #	recorded with CS_EMIT_BUILD_PROPERTY() via the optional EMITTER. If

@@ -351,6 +351,7 @@ class csImageManipulate(object):
     Sharpen = staticmethod(_csgfx.csImageManipulate_Sharpen)
     TransformColor = staticmethod(_csgfx.csImageManipulate_TransformColor)
     Gray = staticmethod(_csgfx.csImageManipulate_Gray)
+    RenormalizeNormals = staticmethod(_csgfx.csImageManipulate_RenormalizeNormals)
     def __init__(self, *args): 
         this = _csgfx.new_csImageManipulate(*args)
         try: self.this.append(this)
@@ -366,6 +367,7 @@ csImageManipulate_Crop = _csgfx.csImageManipulate_Crop
 csImageManipulate_Sharpen = _csgfx.csImageManipulate_Sharpen
 csImageManipulate_TransformColor = _csgfx.csImageManipulate_TransformColor
 csImageManipulate_Gray = _csgfx.csImageManipulate_Gray
+csImageManipulate_RenormalizeNormals = _csgfx.csImageManipulate_RenormalizeNormals
 
 
 

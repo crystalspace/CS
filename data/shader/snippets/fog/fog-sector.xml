@@ -37,67 +37,61 @@
     </block>
     
     <block location="cg:vertexToFragment">
-      <?if vars."fog density".float &gt; 0 ?>
-	float2 fogTC;
-      <?endif?>
+      <varying type="texcoord2" name="fogTC" />
     </block>
     
     <block location="cg:vertexMain">
-      <?if vars."fog density".float &gt; 0 ?>
-	vertexToFragment.fogTC.x = dot (eyePos, vertexIn.fogPlaneS);
-	vertexToFragment.fogTC.y = dot (eyePos, vertexIn.fogPlaneT);
-      <?endif?>
+      fogTC.x = dot (eyePos, vertexIn.fogPlaneS);
+      fogTC.y = dot (eyePos, vertexIn.fogPlaneT);
     </block>
     
     <block location="cg:variablemap">
       <?if vars."fog density".float &gt; 0 ?>
 	<variablemap variable="fog color" destination="fragmentIn.fogColor" />
-      <variablemap variable="fog fade start" destination="fragmentIn.fogFadeStart" />
-      <variablemap variable="fog fade end" destination="fragmentIn.fogFadeEnd" />
-      <variablemap variable="fog limit" destination="fragmentIn.fogLimit" />
+	<variablemap variable="fog fade start" destination="fragmentIn.fogFadeStart" />
+	<variablemap variable="fog fade end" destination="fragmentIn.fogFadeEnd" />
+	<variablemap variable="fog limit" destination="fragmentIn.fogLimit" />
 	<!-- See the glshader_fixed plugin source for a detailed explanation 
-	     of the formular below. -->
-	<?if vars."fogplane".z &gt; 0 ?>
-	  <variablemap destination="vertexIn.fogPlaneS" type="expr">
-	    <sexp>
+	      of the formular below. -->
+	<variablemap destination="vertexIn.fogPlaneS" type="expr">
+	  <sexp>
+	  (if (&gt; (elt3 fogplane) 0)
 	    (make-vector 
 	      0 
 	      0 
 	      "fog density" 
 	      (- (min (max (* (elt4 fogplane) "fog density") -1) 0) (* 0.1 "fog density"))
-	    )</sexp>
-	  </variablemap>
-	  <variablemap destination="vertexIn.fogPlaneT" type="expr">
-	    <sexp>
+	    )
+	    (make-vector 0 0 "fog density" (* -0.1 "fog density"))
+	  )
+	  </sexp>
+	</variablemap>
+	<variablemap destination="vertexIn.fogPlaneT" type="expr">
+	  <sexp>
+	  (if (&gt; (elt3 fogplane) 0)
 	    (make-vector
 	      (/ (* (elt1 fogplane) "fog density") (elt3 fogplane))
 	      (/ (* (elt2 fogplane) "fog density") (elt3 fogplane))
 	      "fog density"
 	      (+ (min (max (pow (+ 1 (* (elt4 fogplane) 0.2)) 5) 0) 1)
-		 (* "fog density" (- (/ (elt4 fogplane) (elt3 fogplane)) 0.1)))
+		  (* "fog density" (- (/ (elt4 fogplane) (elt3 fogplane)) 0.1)))
 	    )
-	    </sexp>
-	  </variablemap>
-	<?else?>
-	  <variablemap destination="vertexIn.fogPlaneS" type="expr">
-	    <sexp>(make-vector 0 0 "fog density" (* -0.1 "fog density"))</sexp>
-	  </variablemap>
-	  <variablemap destination="vertexIn.fogPlaneT" type="vector4">0,0,0,1</variablemap>
-	<?endif?>
+	    (make-vector 0 0 0 1)
+	  )
+	  </sexp>
+	</variablemap>
       <?endif?>
     </block>
     
     <block location="pass">
-      <?if vars."fog density".float &gt; 0 ?>
-	<!-- We need the fog lookup texture -->
-	<texture name="standardtex fog" destination="fragmentIn.fogTex" />
-      <?endif?>
+      <!-- We need the fog lookup texture -->
+      <texture name="standardtex fog" destination="fragmentIn.fogTex" />
     </block>
     
     <block location="cg:fragmentMain">
       foggedColor = litColor;
       <?if vars."fog density".float &gt; 0 ?>
-        float intensity = tex2D (fragmentIn.fogTex, vertexToFragment.fogTC).a;
+        float intensity = tex2D (fragmentIn.fogTex, fogTC).a;
         float distance = length(eyePos);
         /* CS_FOG_MODE_LINEAR */
         <?if vars."fog mode".int == consts.CS_FOG_MODE_LINEAR ?>

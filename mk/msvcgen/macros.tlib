@@ -301,7 +301,8 @@ END;
 #        "..\out\build\myapp", and workbuild(['myapp/test','.obj']) would
 #        return "..\out\build\myapp\test.obj".
 #------------------------------------------------------------------------------
-MACRO workroot GET path([my.doc.buildroot.0, 'out', glue([build.tag, my.doc.msvcversion.0])]);
+MACRO workroot
+  GET path([my.doc.buildroot.0, 'out', glue([build.tag, my.doc.msvcversion.0, platform.suffix])]);
 MACRO worklibout GET path([workroot, 'libs']);
 MACRO workbuild(tail)
   GET path([workroot, 'build', my.doc.project.0, tail.join('')]);

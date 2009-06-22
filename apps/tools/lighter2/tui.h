@@ -45,6 +45,7 @@ namespace lighter
       TUI_DRAW_RAYCORE = (1<<5),
       TUI_DRAW_SETTINGS = (1<<6),
       TUI_DRAW_STATS = (1<<7),
+      TUI_DRAW_SWAPCACHE = (1<<8),
       TUI_DRAW_ALL = 0xFFFFFFFF
     };
 
@@ -78,6 +79,10 @@ namespace lighter
 
     //Draw stats
     void DrawStats () const;
+
+    //Draw swap cache stats
+    static csString FormatByteSize (uint64 size);
+    void DrawSwapCacheStats () const;
 
     //Update simple output, if anything to update
     void DrawSimple ();

@@ -46,7 +46,7 @@ CS_LEAKGUARD_IMPLEMENT (csXMLShaderTech);
 /* Magic value for tech + pass cache files.
  * The most significant byte serves as a "version", increase when the
  * cache file format changes. */
-static const uint32 cacheFileMagic = 0x04747863;
+static const uint32 cacheFileMagic = 0x05747863;
 
 //---------------------------------------------------------------------------
 
@@ -760,8 +760,17 @@ bool csXMLShaderTech::ParseTextures (ShaderPassPerTag& pass,
       
       CS::Graphics::ShaderVarNameParser parser (
         mapping->GetAttributeValue("name"));
-      texMap.id = h.stringsSvName->Request (parser.GetShaderVarName ());
-      parser.FillArrayWithIndices (texMap.indices);
+      texMap.tex.id = h.stringsSvName->Request (parser.GetShaderVarName ());
+      parser.FillArrayWithIndices (texMap.tex.indices);
+      const char* fallbackName = mapping->GetAttributeValue("fallback");
+      if (fallbackName && *fallbackName)
+      {
+	CS::Graphics::ShaderVarNameParser fbparser (
+	  fallbackName);
+	texMap.fallback.id = h.stringsSvName->Request (
+	  fbparser.GetShaderVarName ());
+	fbparser.FillArrayWithIndices (texMap.fallback.indices);
+      }
       texMap.textureUnit = texUnit;
       pass.textures.Push (texMap);
     }
@@ -887,18 +896,34 @@ bool csXMLShaderTech::WritePassPerTag (const ShaderPassPerTag& pass,
   for (size_t i = 0; i < pass.textures.GetSize(); i++)
   {
     const char* svStr = parent->compiler->stringsSvName->Request (
-      pass.textures[i].id);
+      pass.textures[i].tex.id);
     if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, svStr))
       return false;
       
     uint32 diskNumIndices = csLittleEndian::UInt32 (
-      (uint)pass.textures[i].indices.GetSize());
+      (uint)pass.textures[i].tex.indices.GetSize());
     if (cacheFile->Write ((char*)&diskNumIndices, sizeof (diskNumIndices))
 	!= sizeof (diskNumIndices)) return false;
-    for (size_t n = 0; n < pass.textures[i].indices.GetSize(); n++)
+    for (size_t n = 0; n < pass.textures[i].tex.indices.GetSize(); n++)
     {
       uint32 diskIndex = csLittleEndian::UInt32 (
-	(uint)pass.textures[i].indices[n]);
+	(uint)pass.textures[i].tex.indices[n]);
+      if (cacheFile->Write ((char*)&diskIndex, sizeof (diskIndex))
+	  != sizeof (diskIndex)) return false;
+    }
+    
+    svStr = parent->compiler->stringsSvName->Request (pass.textures[i].fallback.id);
+    if (!CS::PluginCommon::ShaderCacheHelper::WriteString (cacheFile, svStr))
+      return false;
+      
+    diskNumIndices = csLittleEndian::UInt32 (
+      (uint)pass.textures[i].fallback.indices.GetSize());
+    if (cacheFile->Write ((char*)&diskNumIndices, sizeof (diskNumIndices))
+	!= sizeof (diskNumIndices)) return false;
+    for (size_t n = 0; n < pass.textures[i].fallback.indices.GetSize(); n++)
+    {
+      uint32 diskIndex = csLittleEndian::UInt32 (
+	(uint)pass.textures[i].fallback.indices[n]);
       if (cacheFile->Write ((char*)&diskIndex, sizeof (diskIndex))
 	  != sizeof (diskIndex)) return false;
     }
@@ -968,7 +993,12 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadPassFromCache (
   csRef<iDataBuffer> perTagData = cache->ReadCache (
     csString().Format ("/pass%ddata/%s_%s_%s", GetPassNumber (pass),
       tagFP.GetDataSafe(), tagVP.GetDataSafe(), tagVPr.GetDataSafe()));
-  if (!perTagData.IsValid()) return iShaderProgram::loadFail;
+  if (!perTagData.IsValid())
+  {
+    SetFailReason("Per tag data failed to be read from cache.");
+    return iShaderProgram::loadFail;
+  }
+
   csMemFile perTagCacheFile (perTagData, true);
   if (!ReadPassPerTag (*pass, &perTagCacheFile))
     return iShaderProgram::loadFail;
@@ -1097,8 +1127,11 @@ bool csXMLShaderTech::ReadPassPerTag (ShaderPassPerTag& pass,
     for (size_t i = 0; i < numTextures; i++)
     {
       ShaderPass::TextureMapping mapping;
-      mapping.id = parent->compiler->stringsSvName->Request (
-        CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile));
+      const char* texSvName = 
+        CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+      mapping.tex.id =
+        texSvName ? parent->compiler->stringsSvName->Request (texSvName)
+                  : CS::InvalidShaderVarStringID;
 	
       size_t numIndices;
       uint32 diskNumIndices;
@@ -1110,7 +1143,24 @@ bool csXMLShaderTech::ReadPassPerTag (ShaderPassPerTag& pass,
 	uint32 diskIndex;
 	if (cacheFile->Read ((char*)&diskIndex, sizeof (diskIndex))
 	    != sizeof (diskIndex)) return false;
-	mapping.indices.Push (csLittleEndian::UInt32 (diskIndex));
+	mapping.tex.indices.Push (csLittleEndian::UInt32 (diskIndex));
+      }
+      
+      texSvName = 
+        CS::PluginCommon::ShaderCacheHelper::ReadString (cacheFile);
+      mapping.fallback.id =
+        texSvName ? parent->compiler->stringsSvName->Request (texSvName)
+                  : CS::InvalidShaderVarStringID;
+	
+      if (cacheFile->Read ((char*)&diskNumIndices, sizeof (diskNumIndices))
+	  != sizeof (diskNumIndices)) return false;
+      numIndices = csLittleEndian::UInt32 (diskNumIndices);
+      for (size_t n = 0; n < numIndices; n++)
+      {
+	uint32 diskIndex;
+	if (cacheFile->Read ((char*)&diskIndex, sizeof (diskIndex))
+	    != sizeof (diskIndex)) return false;
+	mapping.fallback.indices.Push (csLittleEndian::UInt32 (diskIndex));
       }
       
       int32 diskTU;
@@ -1557,7 +1607,11 @@ iShaderProgram::CacheLoadResult csXMLShaderTech::LoadFromCache (
   iHierarchicalCache* cache, iDocumentNode* parentSV, size_t variant)
 {
   csRef<iDataBuffer> cacheData (cache->ReadCache ("/passes"));
-  if (!cacheData.IsValid()) return iShaderProgram::loadFail;
+  if (!cacheData.IsValid())
+  {
+    SetFailReason("Failed to load cache data from '/passes'");
+    return iShaderProgram::loadFail;
+  }
 
   csMemFile cacheFile (cacheData, true);
   
@@ -1722,29 +1776,37 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   for (size_t j = 0; j < textureCount; j++)
   {
     textureUnits[j] = thispass->textures[j].textureUnit;
-    if (size_t (thispass->textures[j].id) < stack.GetSize ())
+    csShaderVariable* var = 0;
+    if (size_t (thispass->textures[j].tex.id) < stack.GetSize ())
     {
-      csShaderVariable* var = 0;
-      var = csGetShaderVariableFromStack (stack, thispass->textures[j].id);
+      var = csGetShaderVariableFromStack (stack, thispass->textures[j].tex.id);
       if (var != 0)
         var = CS::Graphics::ShaderVarArrayHelper::GetArrayItem (var, 
-          thispass->textures[j].indices.GetArray(),
-          thispass->textures[j].indices.GetSize(),
+          thispass->textures[j].tex.indices.GetArray(),
+          thispass->textures[j].tex.indices.GetSize(),
           CS::Graphics::ShaderVarArrayHelper::maFail);
-      if (var)
-      {
-        iTextureWrapper* wrap;
-        var->GetValue (wrap);
-        if (wrap) 
-        {
-          wrap->Visit ();
-          textureHandles[j] = wrap->GetTextureHandle ();
-        } else 
-          var->GetValue (textureHandles[j]);
-      } else
-        textureHandles[j] = 0;
     }
-    else
+    if (!var && (size_t (thispass->textures[j].fallback.id) < stack.GetSize ()))
+    {
+      var = csGetShaderVariableFromStack (stack,
+        thispass->textures[j].fallback.id);
+      if (var != 0)
+        var = CS::Graphics::ShaderVarArrayHelper::GetArrayItem (var, 
+          thispass->textures[j].fallback.indices.GetArray(),
+          thispass->textures[j].fallback.indices.GetSize(),
+          CS::Graphics::ShaderVarArrayHelper::maFail);
+    }
+    if (var)
+    {
+      iTextureWrapper* wrap;
+      var->GetValue (wrap);
+      if (wrap) 
+      {
+	wrap->Visit ();
+	textureHandles[j] = wrap->GetTextureHandle ();
+      } else 
+	var->GetValue (textureHandles[j]);
+    } else
       textureHandles[j] = 0;
     texCompare[j] = thispass->textures[j].texCompare;
   }
@@ -1827,7 +1889,12 @@ void csXMLShaderTech::GetUsedShaderVars (csBitArray& bits) const
     }
     for (size_t j = 0; j < thispass->textures.GetSize(); j++)
     {
-      CS::ShaderVarStringID id = thispass->textures[j].id;
+      CS::ShaderVarStringID id = thispass->textures[j].tex.id;
+      if ((id != CS::InvalidShaderVarStringID) && (bits.GetSize() > id))
+      {
+        bits.SetBit (id);
+      }
+      id = thispass->textures[j].fallback.id;
       if ((id != CS::InvalidShaderVarStringID) && (bits.GetSize() > id))
       {
         bits.SetBit (id);

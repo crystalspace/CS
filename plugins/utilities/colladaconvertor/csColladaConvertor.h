@@ -255,6 +255,16 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
     virtual bool ConvertPhysics(iDocumentNode *physicsSection);
     virtual bool ConvertScene(iDocumentNode *camerasSection, iDocumentNode *lightsSection, iDocumentNode *visualScenesSection);
 
+    // =============== Shader functions ===================
+    virtual int CheckForNormalMap(csRef<iDocumentNode> texture);
+    virtual bool CheckForNormalMap3DSMaxVersion(csRef<iDocumentNode> texture);
+    virtual void CreateShaderVarNodes(csRef<iDocumentNode> newMaterial, csRef<iDocumentNode> effect);
+    virtual void CreateShaderVarNode(csRef<iDocumentNode> newMaterial, csString name, csString value);
+    virtual bool HasNormalMap(csRef<iDocumentNode> effect, csString samplerID);
+    virtual bool HasHeightMap(csRef<iDocumentNode> effect, csString samplerID);
+    virtual bool HasSpecMap(csRef<iDocumentNode> effect, csString samplerID);
+
+
   }; /* End of class csColladaConvertor */
 
 
@@ -262,4 +272,5 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 CS_PLUGIN_NAMESPACE_END(ColladaConvertor)
 
 #endif
+
 

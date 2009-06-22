@@ -46,6 +46,8 @@ VFS.Mount.lev/terraina = $(CS_MAPDIR)$/terraina$/
 VFS.Mount.lev/terrainp = $(CS_MAPDIR)$/terrainp$/
 VFS.Mount.lev/r3dsmtest = $(CS_MAPDIR)$/r3dsmtest$/
 VFS.Mount.lev/castle   = $(CS_MAPDIR)$/castle$/
+VFS.Mount.lev/castle-staticlit = $(CS_MAPDIR)$/castle-staticlit$/
+VFS.Mount.lev/castle-staticlit/bindata = $(CS_MAPDIR)$/castle-staticlit$/bindata.zip
 
 ; Mount all libraries under the /lib/ directory
 VFS.Mount.lib/std/castle = $(CS_DATADIR)$/castle-tex.zip

@@ -146,6 +146,12 @@ namespace CS
   public:
     /// Construct an invalid texture format.
     StructuredTextureFormat ();
+    /// Construct a texture format with the given components and sizes.
+    StructuredTextureFormat (char cmp1, int size1,
+      char cmp2 = 0, int size2 = 0,
+      char cmp3 = 0, int size3 = 0,
+      char cmp4 = 0, int size4 = 0,
+      TextureFormat fmt = Integer);
 
     /**
      * A special format (like '*dxt1').

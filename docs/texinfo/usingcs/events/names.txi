@@ -17,7 +17,9 @@ down events from that joystick, to @samp{crystalspace.input.joystick.3.button}
 to receive all button events from that joystick, to
 @samp{crystalspace.input.joystick.3} to receive all events (buttons and moves)
 from that joystick, to @samp{crystalspace.input.joystick} to receive all events
-from all joysticks, and so on.
+from all joysticks, and so on. @emph{Note}: A consequence of this behaviour is
+that subscribing to event names which themselves @emph{are never used for
+actual events} is possible. Read on to see how to deal with this.
 
 Event names are translated into an efficient internal representation, the
 @samp{csEventID}, using a singleton event name registry object

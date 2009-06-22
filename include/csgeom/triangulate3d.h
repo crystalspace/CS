@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2007 by Scott Johnson
+    Copyright (C) 2007-2008 by Scott Johnson
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -30,6 +30,65 @@ namespace CS
   namespace Geometry
   {
     typedef csDirtyAccessArray< csVector3 > csContour3;
+
+    typedef csDirtyAccessArray< size_t > csVertexSet;
+    
+/** @class csEarClipper A data structure for clipping polygon ears
+  *
+  * A polygon ear is defined as three consecutive ears of a polygon, for
+  * which no other vertices are within the triangle formed by these three
+  * vertices.  A ear is clipped by connecting the two end vertices (on either
+  * side of the ear vertex), and removing the ear vertex from the vertices
+  * left to be clipped.  Ear clipping is used to triangulate polygons.
+  *
+  * @note This ear clipper requires a planar polygon that is located in the 
+  * x-y plane.  If this is not the case, you will need to use the 3D
+  * triangulator class to map the polygon to a planar polygon and then 
+  * rotate it to coincide with the x-y plane.
+  */
+
+    class CS_CRYSTALSPACE_EXPORT csEarClipper
+    {
+      private:
+
+        /// The polygon we are currently in the process of clipping ears from
+        csContour3 clipPoly;
+
+        /// The original indices of the vertices in the polygon
+        csDirtyAccessArray<size_t> originalIndices;
+
+        /// An array indicating whether the specified vertex is reflex or convex
+        csDirtyAccessArray<bool> isVertexReflex;
+
+        /// An array indicating which vertices are ears
+        csDirtyAccessArray<size_t> ears;
+
+        /// A function to classify polygon vertices as either convex or reflex
+        void ClassifyVertices();
+
+        /// A function which determines if a specified vertex is convex
+        bool IsConvex(int x);
+
+      public:
+
+        /** @brief Constructor
+          *
+          * @param polygon A 2D planar polygon within the x-y plane.  See the note at the 
+          * top of the class description for more information.
+          */
+        csEarClipper(csContour3 polygon);
+        ~csEarClipper() {}
+
+        /// Returns whether the ear clipper is finished or not
+        bool IsFinished();
+
+        /// Returns the index of the vertex clipped
+        csVertexSet ClipEar();
+
+        /// Returns the original index of a vertex
+        size_t GetOriginalIndex(size_t at) { return originalIndices[at]; }
+
+    }; // End class csEarClipper
 
     /** @class Triangulate3D 3D Triangulation Functions
     * @brief A collection of functions for 3D triangulation.
