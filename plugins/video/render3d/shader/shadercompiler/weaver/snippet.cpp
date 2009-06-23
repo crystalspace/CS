@@ -81,7 +81,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
   //-------------------------------------------------------------------
   
-  csString Snippet::Technique::GetCondition() const
+  csString Snippet::Technique::GetInnerCondition() const
   {
     if (owner != 0) return owner->GetCondition();
     return (char*)0;
@@ -298,6 +298,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       csMD5::Encode (CS::DocSystem::FlattenNode (node)));
     
     newTech.priority = node->GetAttributeValueAsInt ("priority");
+    newTech.outerCondition = node->GetAttributeValue ("condition");
     
     // Aliases
     {

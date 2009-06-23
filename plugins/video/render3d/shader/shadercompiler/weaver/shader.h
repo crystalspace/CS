@@ -71,7 +71,7 @@ class WeaverShader : public scfImplementationExt3<WeaverShader,
 
 protected:
   void InternalRemove() { SelfDestruct(); }
-
+  
   bool GeneratePasses (iDocumentNode* passgenNode,
     const FileAliases& aliases, 
     Synthesizer::DocNodeArray& nonPassNodes,
@@ -87,6 +87,8 @@ protected:
   
   csRef<iDocument> DoSynthesis (iDocumentNode* source,
     iHierarchicalCache* cacheTo, int forcepriority);
+
+  csRef<iDocumentNode> GetNodeOrFromFile (iDocumentNode* node);
 public:
   CS_LEAKGUARD_DECLARE (WeaverShader);
 

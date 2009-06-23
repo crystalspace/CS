@@ -466,7 +466,7 @@ struct csAlphaMode
   {
     /// Ignore alpha
     alphaNone = 1,
-    /// Binary alpha (pixels with alpha >0.5 are drawn, all others not)
+    /// Binary alpha (alpha test is used)
     alphaBinary,
     /// 'Smooth' alpha (colors are mixed based on a pixel's alpha value)
     alphaSmooth

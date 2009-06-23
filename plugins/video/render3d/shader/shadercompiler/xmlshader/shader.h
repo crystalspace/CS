@@ -105,9 +105,6 @@ class csShaderConditionResolver : public iConditionResolver
     csConditionNode* parent, csConditionNode*& node);
   bool WriteNode (iFile* cacheFile, csConditionNode* node,
     const ConditionsWriter& condWrite);
-    
-  bool SetVariantRecursive (size_t variant, csConditionNode* node,
-    csBitArray& condSet, csBitArray& conditionResults);
 public:
   csConditionEvaluator& evaluator;
 
@@ -125,7 +122,8 @@ public:
   virtual void AddNode (csConditionNode* parent,
     csConditionID condition, csConditionNode*& trueNode, 
     csConditionNode*& falseNode,
-    const MyBitArrayTemp& conditionResults);
+    const MyBitArrayTemp& conditionResultsTrue,
+    const MyBitArrayTemp& conditionResultsFalse);
   virtual void FinishAdding ();
 
   void SetEvalParams (const CS::Graphics::RenderMeshModes* modes,

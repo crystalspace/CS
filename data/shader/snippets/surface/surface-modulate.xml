@@ -46,13 +46,31 @@
           </block>
         </input>
 
+        <input name="alpha_factor" type="float" default="complex">
+          <block location="shadervars">
+             <shadervar name="alpha factor" type="float">1</shadervar>
+          </block>
+
+          <block location="cg:variablemap">
+	      <variablemap variable="alpha factor" destination="fragmentIn.alpha_factor" />
+          </block>
+      
+          <block location="cg:fragmentIn">
+	      <uniform type="float" name="alpha_factor" />
+          </block>
+      
+          <block location="cg:fragmentMain">
+	      alpha_factor = fragmentIn.alpha_factor;
+          </block>
+        </input>
+
         <block location="cg:vertexMain">
           surfaceColorOut_attr_perfragment = surfaceColorIn_attr_perfragment;
         </block>
     
         <block location="cg:fragmentMain">
           surfaceColorOut.rgb = surfaceColorIn.rgb * color_modulation.rgb;
-          surfaceColorOut.a = surfaceColorIn.a;
+          surfaceColorOut.a = surfaceColorIn.a * alpha_factor;
           surfaceColorOut_attr_perfragment = surfaceColorIn_attr_perfragment;
         </block>
 

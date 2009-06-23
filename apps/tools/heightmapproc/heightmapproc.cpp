@@ -129,7 +129,7 @@ void HeightMapProc::ProcessHeightmap()
         const unsigned char p = *data++;
         const int h = palette[p].Intensity (); 
 
-        *heightData++ = float(h<<16) + ~(unsigned short(0));
+        *heightData++ = float(h*0x010101);
       }
     }
   }

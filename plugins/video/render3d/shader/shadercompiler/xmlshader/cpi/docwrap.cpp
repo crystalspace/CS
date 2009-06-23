@@ -62,24 +62,31 @@ class ConditionTree
     Node* branches[2];
     Variables values;
     MyBitArrayTemp conditionAffectedSVs;
-    MyBitArrayTemp conditionResults;
+    MyBitArrayTemp conditionResults[2];
 
-    Node (Node* p) : parent (p), condition (csCondUnknown)
+    Node (Node* p, int parentBranch) : parent (p), condition (csCondUnknown)
     {
-      if (p != 0) conditionResults = p->conditionResults;
+      if (p != 0)
+      {
+	conditionResults[bTrue] = conditionResults[bFalse] =
+	  p->conditionResults[parentBranch];
+      }
       branches[bTrue] = 0;
       branches[bFalse] = 0;
     }
     
-    void SetConditionResult (csConditionID cond, bool val)
+    void SetConditionResult (int _branches, csConditionID cond, bool val)
     {
-      if (conditionResults.GetSize() <= cond)
-        conditionResults.SetSize (cond+1);
-      if (val)
-        conditionResults.SetBit (cond);
-        
-      if (branches[bTrue]) branches[bTrue]->SetConditionResult (cond, val);
-      if (branches[bFalse]) branches[bFalse]->SetConditionResult (cond, val);
+      for (int b = 0; b < 2; b++)
+      {
+	if (!(_branches & (1 << b))) continue;
+	if (conditionResults[b].GetSize() <= cond)
+	  conditionResults[b].SetSize (cond+1);
+	if (val)
+	  conditionResults[b].SetBit (cond);
+	
+	if (branches[b]) branches[b]->SetConditionResult (0x3, cond, val);
+      }
     }
   };
 
@@ -132,7 +139,7 @@ public:
   ConditionTree (csConditionEvaluator& evaluator) : nodeAlloc (256), evaluator (evaluator)
   {
     root = (Node*)nodeAlloc.Alloc();
-    new (root) Node (0);
+    new (root) Node (0, 0);
     currentBranch = bTrue;
     NodeStackEntry* newPair = nodeStackEntryAlloc.Alloc();
     newPair->branches[bTrue].Push (root);
@@ -218,11 +225,11 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
     switch (r.state)
     {
       case Logic3::Truth:
-        node->SetConditionResult (condition, true);
+        node->SetConditionResult (0x3, condition, true);
 	newCurrent.branches[bTrue].Push (node);
 	break;
       case Logic3::Lie:
-        node->SetConditionResult (condition, false);
+        node->SetConditionResult (0x3, condition, false);
 	newCurrent.branches[bFalse].Push (node);
 	break;
       case Logic3::Uncertain:
@@ -251,7 +258,7 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
 	  for (int b = 0; b < 2; b++)
 	  {
 	    Node* nn = (Node*)nodeAlloc.Alloc();
-	    new (nn) Node (node);
+	    new (nn) Node (node, b);
 	    if (hasContainer)
 	    {
 	      /* If this condition is part of a "composite condition"
@@ -285,7 +292,6 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
 	    {
 	      nn->values = (b == bTrue) ? trueVals : falseVals;
 	    }
-	    nn->SetConditionResult (condition, b == bTrue);
 	    //node->branches[b] = nn;
 	    CommitNode commitNode;
 	    commitNode.owner = node;
@@ -309,11 +315,11 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
     switch (r.state)
     {
       case Logic3::Truth:
-        node->SetConditionResult (condition, true);
+        node->SetConditionResult (0x3, condition, true);
 	newCurrent.branches[bTrue].Push (node);
 	break;
       case Logic3::Lie:
-        node->SetConditionResult (condition, false);
+        node->SetConditionResult (0x3, condition, false);
 	newCurrent.branches[bFalse].Push (node);
 	break;
       case Logic3::Uncertain:
@@ -405,7 +411,10 @@ void ConditionTree::Commit ()
     CommitArray& ca = commitArrays[c];
     for (size_t n = 0; n < ca.GetSize(); n++)
     {
-      ca[n].owner->branches[ca[n].branch] = ca[n].newNode;
+      Node* node = ca[n].owner;
+      node->branches[ca[n].branch] = ca[n].newNode;
+      node->SetConditionResult (1 << ca[n].branch, node->condition,
+	ca[n].branch == bTrue);
     }
   }
   commitArrays.Empty();
@@ -414,11 +423,13 @@ void ConditionTree::Commit ()
 void ConditionTree::ToResolver (iConditionResolver* resolver, 
                                 Node* node, csConditionNode* parent)
 {
+  if (node->condition == csCondUnknown) return;
+  
   csConditionNode* trueNode;
   csConditionNode* falseNode;
 
   resolver->AddNode (parent, node->condition, trueNode, falseNode,
-    node->conditionResults);
+    node->conditionResults[bTrue], node->conditionResults[bFalse]);
   if (node->branches[bTrue] != 0)
     ToResolver (resolver, node->branches[bTrue], trueNode);
   if (node->branches[bFalse] != 0)
@@ -2369,7 +2380,8 @@ csRef<iDocumentNode> csWrappedDocumentNodeIterator::Next ()
 //---------------------------------------------------------------------------
 
 csWrappedDocumentNodeFactory::csWrappedDocumentNodeFactory (
-  csXMLShaderCompiler* plugin) : plugin (plugin), objreg (plugin->objectreg)
+  csXMLShaderCompiler* plugin) : plugin (plugin), objreg (plugin->objectreg),
+  currentEval (0)
 {
   InitTokenTable (pitokens);
   pitokens.Register ("Template", PITOKEN_TEMPLATE_NEW);
@@ -2394,6 +2406,8 @@ void csWrappedDocumentNodeFactory::DumpCondition (size_t id,
 {
   if (currentOut)
   {
+    if ((seenConds.GetSize() > id) && (seenConds[id])) return;
+    
     switch (id)
     {
       case csCondAlwaysTrue:
@@ -2403,6 +2417,24 @@ void csWrappedDocumentNodeFactory::DumpCondition (size_t id,
 	currentOut->AppendFmt ("condition \"always false\" = '");
 	break;
       default:
+	{
+	  if (seenConds.GetSize() <= id) seenConds.SetSize (id+1);
+	  seenConds.SetBit (id);
+	  
+	  const CondOperation& condOp = currentEval->GetCondition (id);
+	  if (condOp.left.type == operandOperation)
+	  {
+	    csString condStr;
+	    condStr = currentEval->GetConditionString (condOp.left.operation);
+	    DumpCondition (condOp.left.operation, condStr, condStr.Length ());
+	  }
+	  if (condOp.right.type == operandOperation)
+	  {
+	    csString condStr;
+	    condStr = currentEval->GetConditionString (condOp.right.operation);
+	    DumpCondition (condOp.right.operation, condStr, condStr.Length ());
+	  }
+	}
         currentOut->AppendFmt ("condition %zu = '", id);
     }
     currentOut->Append (condStr, condLen);
@@ -2440,6 +2472,7 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
   uint parseOpts)
 {
   currentOut = dumpOut;
+  currentEval = &evaluator;
 
   csWrappedDocumentNode* node;
   {
@@ -2474,6 +2507,8 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
   }
   evaluator.CompactMemory();
   TempHeap::Trim();
+  currentEval = 0;
+  seenConds.SetSize (0);
   return node;
 }
 

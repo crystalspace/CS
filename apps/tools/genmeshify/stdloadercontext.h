@@ -53,7 +53,7 @@ namespace genmeshify
       const char *filename, bool dontWaitForLoad = false);
     virtual iLight* FindLight (const char *name);
     virtual iShader* FindShader (const char *name);
-    virtual iGeneralMeshSubMesh* FindSubmesh(iGeneralMeshState *,const char *) { return 0; }
+    virtual iGeneralMeshSubMesh* FindSubmesh(iGeneralMeshState *,const char*,const char *) { return 0; }
     virtual bool CheckDupes () const { return checkDupes; }
     virtual iCollection* GetCollection() const { return collection; }
     virtual bool CurrentCollectionOnly() const { return false; }

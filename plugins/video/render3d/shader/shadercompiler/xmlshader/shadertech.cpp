@@ -329,9 +329,14 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, ShaderPass* pass,
     {
       if (attrib != CS_VATTRIB_UNUSED)
       {
-        parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
-          "Shader '%s', pass %d: invalid instanceparam destination '%s'",
-          parent->GetName (), GetPassNumber (pass), dest);
+        SetFailReason ("invalid instanceparam destination.");
+        if(do_verbose)
+        {
+          parent->compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+            "Shader '%s', pass %d: invalid instanceparam destination '%s'",
+            parent->GetName (), GetPassNumber (pass), dest);
+        }
+        return false;
       }
     }
   }

@@ -20,24 +20,22 @@
 
 #include "csutil/base64.h"
 
-#include "iutil/databuff.h"
-
 namespace CS
 {
   namespace Utility
   {
-    csString EncodeBase64 (iDataBuffer* data)
+    csString EncodeBase64 (void* data, size_t size)
     {
       // Empty buffer is encoded to empty string.
-      if (!data || (data->GetSize() == 0))
+      if (!data || (size == 0))
         return "";
     
       static const char encodeChars[] =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     
       csString ret;
-      uint8* ptr = data->GetUint8();
-      size_t bytes = data->GetSize();
+      uint8* ptr = (uint8*)data;
+      size_t bytes = size;
       ret.SetCapacity (((bytes+2)/3)*4);
       while (bytes >= 3)
       {
@@ -54,8 +52,6 @@ namespace CS
 	uint v = (ptr[0] << 16);
 	if (bytes > 1)
 	  v |= (ptr[1] << 8);
-	data += 3;
-	bytes -= 3;
 	ret << encodeChars[(v >> 18)];
 	ret << encodeChars[(v >> 12) & 0x3f];
 	if (bytes > 1)

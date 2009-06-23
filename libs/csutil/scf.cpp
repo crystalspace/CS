@@ -678,15 +678,6 @@ static unsigned int parse_verbosity(int argc, const char* const argv[])
   return v;
 }
 
-/* Flag indicating whether external linkage was used when building the 
- * application. Determines whether SCF scans for plugins at startup.
- */
-#ifdef CS_BUILD_SHARED_LIBS
-const bool scfStaticallyLinked = false;
-#else
-extern bool scfStaticallyLinked;
-#endif
-
 void scfInitialize (csPathsList const* pluginPaths, unsigned int verbose)
 {
   if (!PrivateSCF)
@@ -696,10 +687,11 @@ void scfInitialize (csPathsList const* pluginPaths, unsigned int verbose)
   PrivateSCF->ScanPluginsInt (pluginPaths, 0);
 }
 
-void scfInitialize (int argc, const char* const argv[])
+void scfInitialize (int argc, const char* const argv[],
+		    bool scanDefaultPluginPaths)
 {
   unsigned int const verbosity = parse_verbosity(argc, argv);
-  if (scfStaticallyLinked)
+  if (!scanDefaultPluginPaths)
     scfInitialize (0, verbosity);
   else
   {

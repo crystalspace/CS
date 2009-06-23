@@ -53,7 +53,7 @@ struct iObject;
  */
 struct iLoaderContext : public virtual iBase
 {
-  SCF_INTERFACE(iLoaderContext, 4, 0, 0);
+  SCF_INTERFACE(iLoaderContext, 4, 1, 0);
   /// Find a sector.
   virtual iSector* FindSector (const char* name) = 0;
   
@@ -105,7 +105,7 @@ struct iLoaderContext : public virtual iBase
   /**
    * Find a genmesh submesh.
    */
-  virtual iGeneralMeshSubMesh* FindSubmesh(iGeneralMeshState* state, const char* name) = 0;
+  virtual iGeneralMeshSubMesh* FindSubmesh(iGeneralMeshState* state, const char* factname, const char* name) = 0;
 
   /**
    * Return true if we check for dupes (to avoid objects with same name

@@ -190,17 +190,24 @@ bool csMeshWrapper::SomeParentHasStaticLOD () const
 
 void csMeshWrapper::MoveToSector (iSector *s)
 {
+  // Only move if the meshwrapper is valid.
+  iMeshWrapper* mw = (iMeshWrapper*)this;
+  if(!mw->GetMeshObject())
+    return;
+
   // Only add this mesh to a sector if the parent is the engine.
   // Otherwise we have a hierarchical object and in that case
   // the parent object controls this.
-  if (!movable.GetParent ()) s->GetMeshes ()->Add ((iMeshWrapper*)this);
+  if (!movable.GetParent ())
+    s->GetMeshes ()->Add (mw);
+
   // If we are a portal container then we have to register ourselves
   // to the sector.
   if (portal_container)
-    ((csSector*)s)->RegisterPortalMesh ((iMeshWrapper*)this);
+    ((csSector*)s)->RegisterPortalMesh (mw);
 
   // Fire the new mesh callbacks in the sector.
-  ((csSector*)s)->FireNewMesh ((iMeshWrapper*)this);
+  ((csSector*)s)->FireNewMesh (mw);
 
   const csRefArray<iSceneNode>& children = movable.GetChildren ();
   size_t i;

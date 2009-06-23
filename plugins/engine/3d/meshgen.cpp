@@ -25,6 +25,51 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iengine/material.h"
 #include "igraphic/image.h"
 
+PositionMap::PositionMap(const csBox2& box)
+{
+  freeAreas.Push(csVector4(box.MinX(), box.MinY(), box.MaxX(), box.MaxY()));
+}
+
+bool PositionMap::GetRandomPosition(float& xpos, float& zpos, float& radius)
+{
+  posGen.Initialize();
+  csArray<size_t> notAttempted;
+
+  for(size_t i=0; i<freeAreas.GetSize(); i++)
+  {
+    notAttempted.Push(i);
+  }
+
+  // Do a quick search.
+  while(notAttempted.GetSize() != 0)
+  {
+    uint32 idx = posGen.Get(notAttempted.GetSize());
+
+    csVector4 freeArea = freeAreas[notAttempted[idx]];
+    if(abs(freeArea.x - freeArea.z) < radius ||
+       abs(freeArea.y - freeArea.w) < radius)
+    {
+      notAttempted.DeleteIndexFast(idx);
+      continue;
+    }
+
+    xpos = (freeArea.x + freeArea.z)/2;
+    zpos = (freeArea.y + freeArea.w)/2;
+
+    freeAreas.DeleteIndexFast(notAttempted[idx]);
+
+    freeAreas.Push(csVector4(freeArea.x, freeArea.y, xpos+radius, zpos-radius));
+    freeAreas.Push(csVector4(xpos+radius, freeArea.y, freeArea.z, zpos+radius));
+    freeAreas.Push(csVector4(xpos-radius, zpos+radius, freeArea.z, freeArea.w));
+    freeAreas.Push(csVector4(freeArea.x, zpos-radius, xpos-radius, freeArea.w));
+
+    return true;
+  }
+
+  // No space found.. we could do a more thorough search if this case happens often.
+  return false;
+}
+
 csMeshGeneratorGeometry::csMeshGeneratorGeometry (
   csMeshGenerator* generator) : scfImplementationType (this),
   generator (generator)
@@ -36,7 +81,9 @@ csMeshGeneratorGeometry::csMeshGeneratorGeometry (
   default_material_factor = 0.0f;
   celldim = 0;
   positions = 0;
-  wind_direction = csVector2(0, 0);
+  wind_direction = csVector3(0, 0, 0);
+  wind_bias = 1.0f;
+  wind_speed = 1.0f;
 }
 
 csMeshGeneratorGeometry::~csMeshGeneratorGeometry ()
@@ -179,10 +226,14 @@ void csMeshGeneratorGeometry::AddFactory (iMeshFactoryWrapper* factory,
   g.vertexInfoArray.fadeFactorVar->SetArraySize (0); 
   g.vertexInfoArray.windVar.AttachNew (new csShaderVariable (generator->varWind)); 
   g.vertexInfoArray.windVar->SetType (csShaderVariable::ARRAY);
-  g.vertexInfoArray.windVar->SetArraySize (0); 
+  g.vertexInfoArray.windVar->SetArraySize (0);
+  g.vertexInfoArray.windSpeedVar.AttachNew (new csShaderVariable (generator->varWindSpeed)); 
+  g.vertexInfoArray.windSpeedVar->SetType (csShaderVariable::ARRAY);
+  g.vertexInfoArray.windSpeedVar->SetArraySize (0); 
   AddSVToMesh (g.mesh, g.vertexInfoArray.transformVar); 
   AddSVToMesh (g.mesh, g.vertexInfoArray.fadeFactorVar); 
   AddSVToMesh (g.mesh, g.vertexInfoArray.windVar); 
+  AddSVToMesh (g.mesh, g.vertexInfoArray.windSpeedVar); 
   csBox3 bbox;
   bbox.SetSize (csVector3 (maxdist, maxdist, maxdist));
   SetMeshBBox (g.mesh, bbox);
@@ -231,11 +282,13 @@ iMeshWrapper* csMeshGeneratorGeometry::AllocMesh (
     vertexInfo.transformVar.AttachNew (new csShaderVariable);
  	  vertexInfo.fadeFactorVar.AttachNew (new csShaderVariable);
     vertexInfo.windVar.AttachNew (new csShaderVariable);
+    vertexInfo.windSpeedVar.AttachNew (new csShaderVariable);
     csRandomGen rng (csGetTicks ());
     vertexInfo.windRandVar = rng.Get();
  	  geom.vertexInfoArray.transformVar->AddVariableToArray (vertexInfo.transformVar);
  	  geom.vertexInfoArray.fadeFactorVar->AddVariableToArray (vertexInfo.fadeFactorVar);
     geom.vertexInfoArray.windVar->AddVariableToArray (vertexInfo.windVar);
+    geom.vertexInfoArray.windSpeedVar->AddVariableToArray (vertexInfo.windSpeedVar);
     return geom.mesh;
   }
 }
@@ -255,7 +308,19 @@ void csMeshGeneratorGeometry::MoveMesh (int cidx, iMeshWrapper* mesh,
 void csMeshGeneratorGeometry::SetWindDirection (float x, float z)
 {
   wind_direction.x = x;
-  wind_direction.y = z;
+  wind_direction.z = z;
+}
+
+void csMeshGeneratorGeometry::SetWindBias (float bias)
+{
+  if(bias >= 1.0f)
+    wind_bias = bias;
+}
+
+void csMeshGeneratorGeometry::SetWindSpeed (float speed)
+{
+  if(speed >= 0.0f)
+    wind_speed = speed;
 }
 
 void csMeshGeneratorGeometry::SetAsideMesh (int cidx, iMeshWrapper* mesh,
@@ -293,6 +358,13 @@ void csMeshGeneratorGeometry::FreeSetAsideMeshes ()
       if (idx != csArrayItemNotFound) 
       { 
         geom.vertexInfoArray.windVar->RemoveFromArray (idx); 
+        varRemoved = true; 
+      } 
+
+      idx = geom.vertexInfoArray.windSpeedVar->FindArrayElement (vertexInfo.windSpeedVar); 
+      if (idx != csArrayItemNotFound) 
+      { 
+        geom.vertexInfoArray.windSpeedVar->RemoveFromArray (idx); 
         varRemoved = true; 
       } 
     } 
@@ -367,6 +439,7 @@ csMeshGenerator::csMeshGenerator (csEngine* engine) :
   varTransform = SVstrings->Request ("instancing transforms");
   varFadeFactor = SVstrings->Request ("alpha factor");
   varWind = SVstrings->Request ("wind data");
+  varWindSpeed = SVstrings->Request ("wind speed");
 }
 
 csMeshGenerator::~csMeshGenerator ()
@@ -525,12 +598,13 @@ void csMeshGenerator::SetupSampleBox ()
   int idx = 0;
   for (z = 0 ; z < cell_dim ; z++)
   {
-    float wz = GetWorldX (z);
+    float wz = GetWorldZ (z);
     for (x = 0 ; x < cell_dim ; x++)
     {
       float wx = GetWorldX (x);
-      cells[idx].box.Set (wx, wz, wx + samplecellwidth_x,
-        wz + samplecellheight_z);
+      cells[idx].box.Set (wx, wz, wx + samplecellwidth_x, wz + samplecellheight_z);
+      delete cells[idx].positionMap;
+      cells[idx].positionMap = new PositionMap(cells[idx].box);
       // Here we need to calculate the meshes relevant for this cell (i.e.
       // meshes that intersect this cell as seen in 2D space).
       // @@@ For now we just copy the list of meshes from csMeshGenerator.
@@ -638,8 +712,12 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
       float z;
       if (mpos_count == 0)
       {
-        x = random.Get (box.MinX (), box.MaxX ());
-        z = random.Get (box.MinY (), box.MaxY ());
+        float r = geometries[g]->GetRadius();
+        if(!cell.positionMap->GetRandomPosition(x, z, r))
+        {
+          // Ran out of room in this cell.
+          return;
+        }
         geometries[g]->GetDensityMapFactor (x, z, pos_factor);
       }
       else
@@ -740,6 +818,8 @@ void csMeshGenerator::AllocateBlock (int cidx, csMGCell& cell)
     else inuse_blocks_last = block;
     inuse_blocks = block;
 
+    delete cell.positionMap;
+    cell.positionMap = new PositionMap(cell.box);
     GeneratePositions (cidx, cell, block);
   }
   else
@@ -763,6 +843,8 @@ void csMeshGenerator::AllocateBlock (int cidx, csMGCell& cell)
     inuse_blocks->prev = block;
     inuse_blocks = block;
 
+    delete cell.positionMap;
+    cell.positionMap = new PositionMap(cell.box);
     GeneratePositions (cidx, cell, block);
   }
 }
@@ -786,7 +868,14 @@ void csMeshGenerator::SetFade (csMGPosition& p, float factor)
 void csMeshGenerator::SetWindData (csMGPosition& p)
 {
   csMeshGeneratorGeometry* geom = geometries[p.geom_type];
-  p.vertexInfo.windVar->SetValue (csVector3(geom->GetWindDirection().x, geom->GetWindDirection().y, p.vertexInfo.windRandVar));
+  if(!geom->GetWindDirection().IsZero())
+  {
+    csReversibleTransform transform;
+    p.vertexInfo.transformVar->GetValue(transform);
+    csVector3 windDirection = transform.Other2ThisRelative(geom->GetWindDirection());
+    p.vertexInfo.windVar->SetValue (csVector4(windDirection.x, windDirection.z, p.vertexInfo.windRandVar, geom->GetWindBias()));
+    p.vertexInfo.windSpeedVar->SetValue (geom->GetWindSpeed());
+  }
 }
 
 void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,

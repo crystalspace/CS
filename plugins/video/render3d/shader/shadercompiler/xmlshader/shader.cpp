@@ -144,16 +144,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
     csConditionID condition, 
     csConditionNode*& trueNode,
     csConditionNode*& falseNode,
-    const MyBitArrayTemp& conditionResults)
+    const MyBitArrayTemp& conditionResultsTrue,
+    const MyBitArrayTemp& conditionResultsFalse)
   {
-    if (condition == csCondUnknown)
-    {
-      CS_ASSERT(parent->variant != csArrayItemNotFound);
-      if (keepVariantToConditionsMap)
-        variantConditions.PutUnique (parent->variant, conditionResults);
-      return;
-    }
-
     if (rootNode == 0)
     {
       // This is the first condition, new node gets root
@@ -164,9 +157,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
       parent->trueNode = trueNode = NewNode (parent);
       trueNode->variant = GetVariant (trueNode);
+      if (keepVariantToConditionsMap)
+      {
+        variantConditions.PutUnique (trueNode->variant, conditionResultsTrue);
+      }
 
       parent->falseNode = falseNode = NewNode (parent);
       falseNode->variant = GetVariant (falseNode);
+      if (keepVariantToConditionsMap)
+      {
+        variantConditions.PutUnique (falseNode->variant, conditionResultsFalse);
+      }
     }
     else
     {
@@ -181,10 +182,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       parent->condition = condition;
 
       trueNode->variant = GetVariant (trueNode);
+      if (keepVariantToConditionsMap)
+      {
+        variantConditions.PutUnique (trueNode->variant, conditionResultsTrue);
+      }
 
       falseNode->variant = parent->variant;
       falseNode->FillConditionArray (bits);
-      variantIDs.PutUnique (bits, parent->variant);
+      variantIDs.PutUnique (bits, falseNode->variant);
+      if (keepVariantToConditionsMap)
+      {
+        variantConditions.PutUnique (falseNode->variant, conditionResultsFalse);
+      }
 
       parent->variant = csArrayItemNotFound;
     }

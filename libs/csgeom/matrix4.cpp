@@ -19,6 +19,8 @@
 
 #include "cssysdef.h"
 #include "csgeom/matrix4.h"
+#include "csgeom/matrix3.h"
+#include "csgeom/vector3.h"
 
 namespace CS
 {
@@ -34,6 +36,18 @@ namespace CS
 		m41, m42, m43, m44);
       return s;
     }
+
+    csTransform Matrix4::GetTransform() const
+	{
+		csMatrix3 tm (m11, m12, m13, m21, m22, m23, m31, m32, m33);
+		csVector3 o_o2t = ((-tm).GetInverse()) * csVector3(m14, m24, m34);
+		
+		csTransform trans;
+		trans.SetO2T(tm);
+		trans.SetO2TTranslation(o_o2t);
+		
+		return trans;
+	}
     
     Matrix4 operator * (const Matrix4 &m1, const Matrix4 &m2)
     {

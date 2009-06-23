@@ -44,5 +44,6 @@
 #include "imesh/spritecal3d.h"
 #include "imesh/terrain.h"
 #include "imesh/terrain2.h"
+#include "imesh/watermesh.h"
 #endif /* __IMESH_H__ */
 

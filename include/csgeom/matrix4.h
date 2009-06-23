@@ -101,6 +101,9 @@ namespace CS
     
       /// Return a textual representation of the matrix
       csString Description() const;
+	
+	  /// Return a csTransform object representation of the matrix
+	  csTransform GetTransform() const;
       
       /// Get the first row of this matrix as a vector.
       inline csVector4 Row1() const { return csVector4 (m11,m12,m13,m14); }

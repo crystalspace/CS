@@ -203,10 +203,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  switch (xmltokens.Request (child->GetValue ()))
 	  {
 	    case WeaverCompiler::XMLTOKEN_PASS:
-	      passSnippets.Push (new Snippet (compiler, child, 0, aliases, 0));
-	      prePassNodes.Push (nonPassNodes);
-	      nonPassNodes.Empty();
-	      handled = true;
+	      {
+	        csRef<iDocumentNode> passNode (GetNodeOrFromFile (child));
+	        passSnippets.Push (new Snippet (compiler, passNode, 0, aliases, 0));
+	        prePassNodes.Push (nonPassNodes);
+	        nonPassNodes.Empty();
+	        handled = true;
+	      }
 	      break;
 	    case WeaverCompiler::XMLTOKEN_PASSGEN:
 	      GeneratePasses (child, aliases, nonPassNodes, prePassNodes, passSnippets);
@@ -460,14 +463,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (!synthShader.IsValid())
     {
       csRef<iDataBuffer> hashStream = hasher.GetHashStream ();
-      /* @@@ Actually, the cache tag wouldn't have to be that large.
-	 In theory, anything would work as long as (a) it changes when the
-	 shader or some file it uses changes (b) the tag is reasonably
-	 unique (also over multiple program runs).
-	 E.g. a UUID, recomputed when the shader is 'touched',
-	 could do as well. */
-      csString cacheTag = CS::Utility::EncodeBase64 (hashStream);
-    
+      // Hash hash stream (to get a smaller ID)
+      csMD5::Digest hashDigest (csMD5::Encode (hashStream->GetData(),
+        hashStream->GetSize()));
+      /* In theory, anything would work as long as (a) it changes when
+      some file the shader uses changes (b) the tag is reasonably
+      unique (also over multiple program runs).
+      E.g. a UUID, recomputed when the shader is 'touched',
+      could do as well. */
+      
+      csString cacheTag (CS::Utility::EncodeBase64 (
+        &hashDigest, sizeof (hashDigest)));
+      
       csRef<iString> cacheState;
       csMemFile cacheFile;
       synthShader = LoadTechsFromDoc (techniques, aliases, 
@@ -519,7 +526,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
     return synthShader;
   }
-  
+    
+  csRef<iDocumentNode> WeaverShader::GetNodeOrFromFile (iDocumentNode* node)
+  {
+    const char* fileAttr = node->GetAttributeValue ("file");
+    if (!fileAttr || !*fileAttr) return node;
+    
+    csRef<iDocumentNode> newRoot (compiler->LoadDocumentFromFile (
+      fileAttr, node));
+    if (!newRoot.IsValid()) return 0;
+    
+    const char* wantNode = node->GetValue();
+    csRef<iDocumentNode> newNode = newRoot->GetNode (wantNode);
+    if (!newNode.IsValid())
+    {
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
+	"'%s' does not have a '%s' node", fileAttr, wantNode);
+      return 0;
+    }
+    
+    return newNode;
+  }
+
   bool WeaverShader::Load (iLoaderContext* ldr_context, iDocumentNode* source,
                            int forcepriority)
   {

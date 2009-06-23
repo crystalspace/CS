@@ -450,6 +450,24 @@ cullNormal = _ivideo.cullNormal
 cullFlipped = _ivideo.cullFlipped
 cullDisabled = _ivideo.cullDisabled
 GetFlippedCullMode = _ivideo.GetFlippedCullMode
+atfGreaterEqual = _ivideo.atfGreaterEqual
+atfGreater = _ivideo.atfGreater
+atfLowerEqual = _ivideo.atfLowerEqual
+atfLower = _ivideo.atfLower
+class AlphaTestOptions(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    __repr__ = _swig_repr
+    threshold = _swig_property(_ivideo.AlphaTestOptions_threshold_get, _ivideo.AlphaTestOptions_threshold_set)
+    func = _swig_property(_ivideo.AlphaTestOptions_func_get, _ivideo.AlphaTestOptions_func_set)
+    def __init__(self, *args): 
+        this = _ivideo.new_AlphaTestOptions(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _ivideo.delete_AlphaTestOptions
+    __del__ = lambda self : None;
+AlphaTestOptions_swigregister = _ivideo.AlphaTestOptions_swigregister
+AlphaTestOptions_swigregister(AlphaTestOptions)
+
 class RenderMeshModes(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
@@ -464,6 +482,7 @@ class RenderMeshModes(object):
     renderPrio = _swig_property(_ivideo.RenderMeshModes_renderPrio_get, _ivideo.RenderMeshModes_renderPrio_set)
     cullMode = _swig_property(_ivideo.RenderMeshModes_cullMode_get, _ivideo.RenderMeshModes_cullMode_set)
     alphaType = _swig_property(_ivideo.RenderMeshModes_alphaType_get, _ivideo.RenderMeshModes_alphaType_set)
+    alphaTest = _swig_property(_ivideo.RenderMeshModes_alphaTest_get, _ivideo.RenderMeshModes_alphaTest_set)
     zoffset = _swig_property(_ivideo.RenderMeshModes_zoffset_get, _ivideo.RenderMeshModes_zoffset_set)
     buffers = _swig_property(_ivideo.RenderMeshModes_buffers_get, _ivideo.RenderMeshModes_buffers_set)
     doInstancing = _swig_property(_ivideo.RenderMeshModes_doInstancing_get, _ivideo.RenderMeshModes_doInstancing_set)

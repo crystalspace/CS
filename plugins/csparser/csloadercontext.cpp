@@ -449,10 +449,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return result;
   }
 
-  iGeneralMeshSubMesh* csLoaderContext::FindSubmesh(iGeneralMeshState* state, const char* name)
+  iGeneralMeshSubMesh* csLoaderContext::FindSubmesh(iGeneralMeshState* state, const char* factname, const char* name)
   {
     csRef<iGeneralMeshSubMesh> submesh = state->FindSubMesh(name);
-    if(FindAvailSubmesh(name))
+    if(FindAvailSubmesh(csString(factname).AppendFmt(":%s", name)))
     {
       while(!submesh.IsValid())
       {
@@ -525,7 +525,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     if(doc->GetNode("params"))
     {
-      ParseAvailableSubmeshes(doc->GetNode("params"));
+      ParseAvailableSubmeshes(doc->GetNode("params"), doc->GetAttributeValue("name"));
     }
 
     csRef<iDocumentNodeIterator> itr = doc->GetNodes("meshfact");
@@ -535,7 +535,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
   }
 
-  void csLoaderContext::ParseAvailableSubmeshes(iDocumentNode* doc)
+  void csLoaderContext::ParseAvailableSubmeshes(iDocumentNode* doc, const char* factname)
   {
     csRef<iDocumentNodeIterator> itr = doc->GetNodes("submesh");
     while(itr->HasNext())
@@ -544,7 +544,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       if(submesh->GetAttributeValue("name"))
       {
         CS::Threading::MutexScopedLock lock(submeshObjects);
-        availSubmeshes.Push(submesh->GetAttributeValue("name"));
+        availSubmeshes.Push(csString(factname).AppendFmt(":%s", submesh->GetAttributeValue("name")));
       }
     }
   }

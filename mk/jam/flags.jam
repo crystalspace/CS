@@ -241,8 +241,13 @@ actions WriteRelayLibStub
 {
   echo "" > $(<)
   whatever=`echo "$(WHATEVER)" | tr '-' '_' | tr '.' '_' `
-  echo "int lib${whatever}_is_present = 1;" >> $(<)
-  echo "int lib${whatever}_symbol_is_present (char* s) { return 1; }" >> $(<)
+  my_IFS=$IFS; IFS=" "
+  for w in ${whatever}
+  do
+    echo "int lib${w}_is_present = 1;" >> $(<)
+    echo "int lib${w}_symbol_is_present (char* s) { return 1; }" >> $(<)
+  done
+  IFS=$my_IFS
 }
 
 ##  MergeLFlags flags1 : flags2

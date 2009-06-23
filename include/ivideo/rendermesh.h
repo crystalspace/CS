@@ -71,6 +71,62 @@ namespace Graphics
     // Should not happen ...
     return cullNormal;
   }
+  
+  /**
+   * Alpha test function.
+   * The alpha test function specifies how the source pixel alpha value 
+   * (left side of comparison) and alpha test threshold value (right side of
+   * comparison) are compared. If the comparison is \c true, the pixel is
+   * drawn; otherwise, it is discarded.
+   */
+  enum AlphaTestFunction
+  {
+    /**
+     * Draw pixel if source alpha value is greater or equal than the threshold
+     * value.
+     */
+    atfGreaterEqual,
+    /**
+     * Draw pixel if source alpha value is greater than the threshold
+     * value.
+     */
+    atfGreater,
+    /**
+     * Draw pixel if source alpha value is lower or equal than the threshold
+     * value.
+     */
+    atfLowerEqual,
+    /**
+     * Draw pixel if source alpha value is lower than the threshold
+     * value.
+     */
+    atfLower
+  };
+  
+  /**
+   * Alpha test options.
+   * These options take effect if:
+   * - The mixmode alpha test type (bits #CS_MIXMODE_ALPHATEST_MASK)
+   *   is #CS_MIXMODE_ALPHATEST_ENABLE.
+   * - The alpha test type (bits #CS_MIXMODE_ALPHATEST_MASK)
+   *   is #CS_MIXMODE_ALPHATEST_AUTO and the alpha type used is 
+   *   csAlphaMode::alphaBinary.
+   */
+  struct AlphaTestOptions
+  {
+    /**
+     * Threshold value the source pixel alpha is compared against.
+     * Default is 0.5
+     */
+    float threshold;
+    /**
+     * Comparison between source pixel alpha and threshold value.
+     * Default atfGreaterEqual
+     */
+    AlphaTestFunction func;
+    
+    AlphaTestOptions() : threshold (0.5f), func (atfGreaterEqual) {}
+  };
 
   /**
    * Mesh render mode information. Contains the Z, mix and alpha modes to use
@@ -92,6 +148,7 @@ namespace Graphics
       renderPrio (x.renderPrio),
       cullMode (x.cullMode),
       alphaType (x.alphaType),
+      alphaTest (x.alphaTest),
       zoffset (x.zoffset),
       buffers (x.buffers),
       doInstancing (x.doInstancing),
@@ -116,8 +173,19 @@ namespace Graphics
     /// Mesh culling mode
     MeshCullMode cullMode;
 
-    /// Alpha mode this mesh is drawn.
+    /**
+     * Alpha mode this mesh is drawn.
+     * 
+     * - If the mixmode mode type (bits #CS_MIXMODE_TYPE_MASK) is
+     *   #CS_MIXMODE_TYPE_AUTO, the alpha type affects blending.
+     * - If the mixmode alpha test type (bits #CS_MIXMODE_ALPHATEST_MASK)
+     *   is #CS_MIXMODE_ALPHATEST_AUTO, the alpha type affects whether alpha
+     *   test is used or not.
+     */
     csAlphaMode::AlphaType alphaType;
+    
+    /// Alpha test setting (take effect when mixmode enables alpha test)
+    AlphaTestOptions alphaTest;
     
     /// Whether Z value offsetting should be enabled.
     bool zoffset;

@@ -294,7 +294,8 @@ static GLenum CSblendOpToGLblendOp (uint csop)
   }
 }
 
-void csGLGraphics3D::SetMixMode (uint mode, csAlphaMode::AlphaType alphaType)
+void csGLGraphics3D::SetMixMode (uint mode, csAlphaMode::AlphaType alphaType,
+				 const CS::Graphics::AlphaTestOptions& alphaTest)
 {
   bool doAlphaTest;
   switch (mode & CS_MIXMODE_ALPHATEST_MASK)
@@ -347,7 +348,15 @@ void csGLGraphics3D::SetMixMode (uint mode, csAlphaMode::AlphaType alphaType)
   if (doAlphaTest)
   {
     statecache->Enable_GL_ALPHA_TEST ();
-    statecache->SetAlphaFunc (GL_GEQUAL, 0.5f);
+    GLenum alphaFunc = GL_GEQUAL;
+    switch (alphaTest.func)
+    {
+      case CS::Graphics::atfGreaterEqual:	/* already set */ break;
+      case CS::Graphics::atfGreater:		alphaFunc = GL_GREATER; break;
+      case CS::Graphics::atfLowerEqual:	alphaFunc = GL_LEQUAL; break;
+      case CS::Graphics::atfLower:		alphaFunc = GL_LESS; break;
+    }
+    statecache->SetAlphaFunc (alphaFunc, alphaTest.threshold);
   }
   else
     statecache->Disable_GL_ALPHA_TEST ();
@@ -1409,7 +1418,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
       SetZMode (CS_ZBUF_NONE);
       
-      SetMixMode (CS_FX_ALPHA, csAlphaMode::alphaSmooth); 
+      SetMixMode (CS_FX_ALPHA, csAlphaMode::alphaSmooth,
+	CS::Graphics::AlphaTestOptions ()); 
       // So alpha blending works w/ 2D drawing
       glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
     }
@@ -1811,7 +1821,9 @@ void csGLGraphics3D::SetupInstance (size_t instParamNum,
           if ((target >= CS_VATTRIB_TEXCOORD0) 
             && (target <= CS_VATTRIB_TEXCOORD7))
           {
-            size_t maxN = csMin (3, numTCUnits - (target - CS_VATTRIB_TEXCOORD0));
+            // numTCUnits is type GLint, while target is an enumerated
+            // type. These are not necessarily the same.
+            size_t maxN = csMin (3,csVertexAttrib(numTCUnits) - (target - CS_VATTRIB_TEXCOORD0));
             GLenum tu = GL_TEXTURE0 + (target - CS_VATTRIB_TEXCOORD0);
             for (size_t n = 0; n < maxN; n++)
             {
@@ -2109,7 +2121,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   statecache->ApplyBufferBinding (csGLStateCacheContext::boIndexArray);
   if (bufData != (void*)-1)
   {
-    SetMixMode (mixmode, modes.alphaType);
+    SetMixMode (mixmode, modes.alphaType, modes.alphaTest);
 
     if ((current_zmode == CS_ZBUF_MESH) || (current_zmode == CS_ZBUF_MESH2))
     {
@@ -2245,9 +2257,11 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   // OpenGL blend mode so that it handles the transparent pixels correctly
   if ((hTex->GetKeyColor () || Alpha) ||
     (current_drawflags & CSDRAW_2DGRAPHICS)) // In 2D mode we always want to blend
-    SetMixMode (CS_FX_ALPHA, hTex->GetAlphaType());
+    SetMixMode (CS_FX_ALPHA, hTex->GetAlphaType(),
+      CS::Graphics::AlphaTestOptions());
   else
-    SetMixMode (CS_FX_COPY, hTex->GetAlphaType());
+    SetMixMode (CS_FX_COPY, hTex->GetAlphaType(),
+      CS::Graphics::AlphaTestOptions());
 
   glColor4f (1.0, 1.0, 1.0, Alpha ? (1.0 - BYTE_TO_FLOAT (Alpha)) : 1.0);
   ActivateTexture (hTex);
@@ -3616,7 +3630,8 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   G3D->SetGlOrtho (false);
   //glTranslatef (0, 0, 0);
 
-  G3D->SetMixMode (dstblend, csAlphaMode::alphaSmooth);
+  G3D->SetMixMode (dstblend, csAlphaMode::alphaSmooth,
+    CS::Graphics::AlphaTestOptions());
 
   glColor4f (R, G, B, iIntensity);
 

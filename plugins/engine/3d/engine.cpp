@@ -2848,7 +2848,7 @@ public:
   	const char* filename, bool dontWaitForLoad = false);
   virtual iLight* FindLight (const char *name);
   virtual iShader* FindShader (const char* name);
-  virtual iGeneralMeshSubMesh* FindSubmesh(iGeneralMeshState* state, const char* name)
+  virtual iGeneralMeshSubMesh* FindSubmesh(iGeneralMeshState* state, const char* factname, const char* name)
   { return 0; }
   virtual bool CheckDupes () const { return false; }
   virtual iCollection* GetCollection () const { return collection; }

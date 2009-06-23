@@ -76,7 +76,8 @@ struct iConditionResolver
   virtual void AddNode (csConditionNode* parent,
     csConditionID condition, csConditionNode*& trueNode, 
     csConditionNode*& falseNode,
-    const MyBitArrayTemp& conditionResults) = 0;
+    const MyBitArrayTemp& conditionResultsTrue,
+    const MyBitArrayTemp& conditionResultsFalse) = 0;
   /// Finish adding of nodes. Frees up some tempoarily used resources.
   virtual void FinishAdding () = 0;
 
@@ -428,6 +429,8 @@ class csWrappedDocumentNodeFactory
   };
 
   csString* currentOut;
+  csConditionEvaluator* currentEval;
+  MyBitArrayTemp seenConds;
   void DumpCondition (size_t id, const char* condStr, size_t condLen);
 
   void DebugProcessing (const char* msg, ...) CS_GNUC_PRINTF (2, 3);

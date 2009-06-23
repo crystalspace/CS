@@ -294,7 +294,7 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
   visobj_wrap->visobj = visobj;
   iMovable* movable = visobj->GetMovable ();
   visobj_wrap->update_number = movable->GetUpdateNumber ();
-  visobj_wrap->shape_number = visobj->GetObjectModel ()->GetShapeNumber ();
+  visobj_wrap->shape_number = visobj->GetObjectModel () ? visobj->GetObjectModel ()->GetShapeNumber () : 0;
 
   csBox3 bbox;
   CalculateVisObjBBox (visobj, bbox);

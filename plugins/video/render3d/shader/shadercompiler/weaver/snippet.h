@@ -45,6 +45,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       const Snippet* owner;
       const char* snippetName;
       int priority;
+      csString outerCondition;
       struct CombinerPlugin
       {
         csString name;
@@ -98,7 +99,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         snippetName (snippetName), priority (0) {}
       virtual ~Technique() {}
       
-      csString GetCondition() const;
+      // Inner condition: put around blocks from the technique
+      csString GetInnerCondition() const;
+      // Outer condition: put around xmlshader techniques
+      const char* GetOuterCondition() const { return outerCondition; }
       
       virtual bool IsCompound() const = 0;
       
