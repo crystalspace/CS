@@ -281,6 +281,35 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animeshldr)
         if (!ParseMorphTarget (child, amfact))
 	  return 0;
 	break;
+      case XMLTOKEN_SOCKET:
+        {
+          csReversibleTransform transform;
+          BoneID bone = child->GetAttributeValueAsInt ("bone");
+          const char* name = child->GetAttributeValue ("name");
+
+          csRef<iDocumentNode> tnode = child->GetNode ("transform");
+          if (tnode)
+          {
+            csRef<iDocumentNode> vnode = tnode->GetNode ("vector");
+            if (vnode)
+            {
+              csVector3 v;
+              synldr->ParseVector (vnode, v);
+              transform.SetOrigin (v);
+            }
+          
+            csRef<iDocumentNode> mnode = tnode->GetNode ("matrix");
+            if (mnode)
+            {
+              csMatrix3 m;
+              synldr->ParseMatrix (mnode, m);
+              transform.SetO2T (m);
+            }
+          }
+          
+          amfact->CreateSocket (bone, transform, name);
+        }
+        break;
       default:
         synldr->ReportBadToken (child);
         return 0;

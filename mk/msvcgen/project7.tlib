@@ -24,6 +24,7 @@
 
   MACRO composedefs(defs) GET compose('defines', defs, ';').replace('"', '\\&quot;');
   MACRO composedirs(tag, seed) GET composepaths(${"build.${tag}key"},seed,';');
+  MACRO debugformat(platform,tag) GET ${"platform.debugformat_${tag}"};
 
   my = {};
   load(respfile, 'doc');
@@ -71,7 +72,7 @@ END -%]
 				Detect64BitPortabilityProblems="false"
 				TreatWChar_tAsBuiltInType="false"
 				ForceConformanceInForLoopScope="true"
-				DebugInformationFormat="[% platform.debugformat %]"
+				DebugInformationFormat="[% debugformat(platform, build.tag) %]"
 				CompileAs="0"/>
 			<Tool
 				Name="VCCustomBuildTool"/>

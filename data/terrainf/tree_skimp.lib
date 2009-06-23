@@ -17,9 +17,13 @@
     <materials>
         <material name="materialbark">
             <texture>bark.png</texture>
+            <shader type="base">lighting_default_instance</shader>
+            <shader type="diffuse">lighting_default_instance</shader>
         </material>
         <material name="branch">
             <texture>branch.png</texture>
+            <shader type="base">lighting_default_instance_binalpha</shader>
+            <shader type="diffuse">lighting_default_instance_binalpha</shader>
         </material>
     </materials>
     <meshfact name="tree_skimp">

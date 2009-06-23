@@ -37,6 +37,8 @@
   <?Include /shader/snippets/shaderframework-cg.inc ?>
 
   <?! Include snippets. Each one provides a specific bit of functionality. ?>
+  <?! Instanced positions support ?>
+  <?Include /shader/snippets/cg-instancing.inc ?>
   <?! "Classic" surface ?>
   <?Include /shader/surface/cg-surface-classic.inc ?>
   <?! "Classic" lighting ?>
@@ -112,7 +114,7 @@
   {
     VertToFrag V2F;
   
-    V2F.Hposition = mul (ModelViewProj, Position);
+    V2F.Hposition = mul (ModelViewProj, GetInstancedPosition (Position));
     // Let the snippets setup themselves
     V2F.surfClassic.SetupVert();
     V2F.lightClassic.SetupVert();
@@ -170,8 +172,11 @@
   
   <?! We can also set options for Cg programs. ?>
   <?Template CgVertexOptions?>
-    <!-- We want position invariance here -->
-    <compilerargs>-posinv</compilerargs>
+    <?! FIXME: check should be elsewhere ?>
+    <?if !vars."instancing transforms" ?>
+      <!-- We want position invariance here -->
+      <compilerargs>-posinv</compilerargs>
+    <?endif?>
   <?Endtemplate?>
   <?! Set the vertex program function. ?>
   <?CgSetVertexFunc VertexMain ?>
@@ -202,7 +207,7 @@
   {
     VertToFrag V2F;
   
-    V2F.Hposition = mul (ModelViewProj, Position);
+    V2F.Hposition = mul (ModelViewProj, GetInstancedPosition (Position));
     V2F.surfClassic.SetupVert();
     V2F.lightClassic.SetupVert();
     V2F.fog.SetupVert();

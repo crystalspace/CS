@@ -117,6 +117,13 @@ wxWindow* csGraphics2DWX::GetWindow()
   return theCanvas;
 }
 
+#ifdef WIN32
+HWND csGraphics2DWX::GetWindowHandle()
+{
+  return (HWND)myParent->GetHWND();
+}
+#endif
+
 void* csGraphics2DWX::GetProcAddress (const char *funcname)
 {
 #ifdef WIN32

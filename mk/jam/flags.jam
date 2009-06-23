@@ -135,7 +135,7 @@ rule ExtraObjects
   Clean clean : $(>) ;
 }
 
-##  RelayLFlags lflags : relaylibs
+##  RelayLFlags lflags : relaylibs [: minimal-objects ]
 ##    Get LFLAGS for relay-linking libraries. See RelayLibs for
 ##    more information.
 rule RelayLFlags
@@ -147,7 +147,13 @@ rule RelayLFlags
   else
   {
     local relayparamslist = "--relay $(2)" ;
-    local lflags = $(1) ;
+    local lflags = $(1[1]) ;
+    # Concatenate arrays into single strings
+    local lf ;
+    for lf in $(1[2-])
+    {
+      lflags = "$(lflags) $(lf)" ;
+    }
     local relayparam = $(relayparamslist[1]) ;
     local r ;
     for r in $(relayparamslist[2-])
@@ -160,9 +166,14 @@ rule RelayLFlags
     {
       cflags = "$(cflags) $(c)" ;
     }
+    local minimalparam = "" ;
+    if "$(3)" != ""
+    {
+      minimalparam = "--minimal-list \"$(3)\"" ;
+    }
     local extlib result_lflags ;
     result_lflags +=  
-      "`CFLAGS=\"$(cflags)\" $(CMD.RELAYTOOL) --out-dir $(LOCATE_TARGET) $(relayparam) $(lflags)`"  ; 
+      "`CFLAGS=\"$(cflags)\" $(CMD.RELAYTOOL) --out-dir $(LOCATE_TARGET) $(minimalparam) $(relayparam) $(lflags)`"  ; 
     return $(result_lflags) ;
   }
 }
@@ -208,9 +219,18 @@ rule RelayLibs
   local extlib ;
   for extlib in $(>)
   {
+    # Construct list of object files for target.
+    # Used by relaytool to compute a minimal set of symbols that need relaying.
+    local minimal_list = "" ;
+    local o ;
+    for o in $($(<)_OBJECTS)
+    {
+      minimal_list = "$(minimal_list) $(LOCATE_TARGET)/$(o:G=)" ;
+    }
+    
     ExtraObjects $(<) : [ RelayObjs $(<) : $(3) : $(2) ] ;
     CFlags $(<) : $($(extlib).CFLAGS) ;
-    LFlags $(<) : [ RelayLFlags $($(extlib).LFLAGS) : $(3) ] : noexternal ;
+    LFlags $(<) : [ RelayLFlags $($(extlib).LFLAGS) : $(3) : $(minimal_list) ] : noexternal ;
     
     $(<).RELAYDEPS += $(extlib) ;
     $(<).RELAYLIBS.$(extlib) = $(3) ;

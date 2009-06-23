@@ -161,6 +161,8 @@ CS_VATTRIB_SPECIFIC_NUM = _ivideo.CS_VATTRIB_SPECIFIC_NUM
 CS_VATTRIB_GENERIC_FIRST = _ivideo.CS_VATTRIB_GENERIC_FIRST
 CS_VATTRIB_GENERIC_LAST = _ivideo.CS_VATTRIB_GENERIC_LAST
 CS_VATTRIB_GENERIC_NUM = _ivideo.CS_VATTRIB_GENERIC_NUM
+CS_IATTRIB_FIRST = _ivideo.CS_IATTRIB_FIRST
+CS_IATTRIB_LAST = _ivideo.CS_IATTRIB_LAST
 CS_VATTRIB_UNUSED = _ivideo.CS_VATTRIB_UNUSED
 CS_VATTRIB_INVALID = _ivideo.CS_VATTRIB_INVALID
 CS_VATTRIB_POSITION = _ivideo.CS_VATTRIB_POSITION
@@ -195,6 +197,7 @@ CS_VATTRIB_12 = _ivideo.CS_VATTRIB_12
 CS_VATTRIB_13 = _ivideo.CS_VATTRIB_13
 CS_VATTRIB_14 = _ivideo.CS_VATTRIB_14
 CS_VATTRIB_15 = _ivideo.CS_VATTRIB_15
+CS_IATTRIB_OBJECT2WORLD = _ivideo.CS_IATTRIB_OBJECT2WORLD
 CS_MIXMODE_TYPE_AUTO = _ivideo.CS_MIXMODE_TYPE_AUTO
 CS_MIXMODE_TYPE_BLENDOP = _ivideo.CS_MIXMODE_TYPE_BLENDOP
 CS_MIXMODE_FLAG_BLENDOP_ALPHA = _ivideo.CS_MIXMODE_FLAG_BLENDOP_ALPHA
@@ -463,6 +466,11 @@ class RenderMeshModes(object):
     alphaType = _swig_property(_ivideo.RenderMeshModes_alphaType_get, _ivideo.RenderMeshModes_alphaType_set)
     zoffset = _swig_property(_ivideo.RenderMeshModes_zoffset_get, _ivideo.RenderMeshModes_zoffset_set)
     buffers = _swig_property(_ivideo.RenderMeshModes_buffers_get, _ivideo.RenderMeshModes_buffers_set)
+    doInstancing = _swig_property(_ivideo.RenderMeshModes_doInstancing_get, _ivideo.RenderMeshModes_doInstancing_set)
+    instParamNum = _swig_property(_ivideo.RenderMeshModes_instParamNum_get, _ivideo.RenderMeshModes_instParamNum_set)
+    instParamsTargets = _swig_property(_ivideo.RenderMeshModes_instParamsTargets_get, _ivideo.RenderMeshModes_instParamsTargets_set)
+    instanceNum = _swig_property(_ivideo.RenderMeshModes_instanceNum_get, _ivideo.RenderMeshModes_instanceNum_set)
+    instParams = _swig_property(_ivideo.RenderMeshModes_instParams_get, _ivideo.RenderMeshModes_instParams_set)
 RenderMeshModes_swigregister = _ivideo.RenderMeshModes_swigregister
 RenderMeshModes_swigregister(RenderMeshModes)
 

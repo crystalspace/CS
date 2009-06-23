@@ -1025,13 +1025,14 @@ void csEngine::UpdateStandardRenderPriorities ()
 {
   if (!renderPrioritiesDirty)
     return;
-  renderPrioritiesDirty = false;
 
   renderPrioritySky = GetRenderPriority ("sky");
   renderPriorityPortal = GetRenderPriority ("portal");
   renderPriorityWall = GetRenderPriority ("wall");
   renderPriorityObject = GetRenderPriority ("object");
   renderPriorityAlpha = GetRenderPriority ("alpha");
+
+  renderPrioritiesDirty = false;
 }
 
 long csEngine::GetRenderPriority (const char *name) const

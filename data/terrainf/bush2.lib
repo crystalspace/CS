@@ -14,6 +14,8 @@
     <materials>
         <material name="sage2.png">
             <texture>sage2.png</texture>
+            <shader type="base">lighting_default_instance_binalpha</shader>
+            <shader type="diffuse">lighting_default_instance_binalpha</shader>
         </material>
     </materials>
     <meshfact name="bush2">

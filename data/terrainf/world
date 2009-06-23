@@ -64,6 +64,12 @@
         <shader>
             <file>/shader/lighting/fullbright.xml</file>
         </shader>
+        <shader>
+            <file>/shader/lighting/lighting_default_instance.xml</file>
+        </shader>
+        <shader>
+            <file>/shader/lighting/lighting_default_instance_binalpha.xml</file>
+        </shader>
     </shaders>
     <materials>
         <material name="ScatterSky">
@@ -397,14 +403,15 @@
             <geometry>
                 <factory maxdist="10" name="Grass" />
                 <factory maxdist="30" name="GrassLow" />
-                <radius>1</radius>
-                <density>0.4</density>
-                <materialfactor material="Grass" factor="1" />
+                <radius>10</radius>
+                <density>1</density>
+                <!-- bugged? <materialfactor material="Grass" factor="1" /> -->
+                <defaultmaterialfactor>.1</defaultmaterialfactor>
             </geometry>
             <geometry>
                 <factory maxdist="30" name="bush2" />
                 <radius>1</radius>
-                <density>0.04</density>
+                <density>0.4</density>
                 <materialfactor material="Marble" factor="1" />
                 <materialfactor material="Stone" factor="1" />
                 <defaultmaterialfactor>.1</defaultmaterialfactor>
@@ -412,14 +419,15 @@
             <geometry>
                 <factory maxdist="10" name="TallGrass" />
                 <factory maxdist="30" name="TallGrassLow" />
-                <radius>1</radius>
-                <density>.08</density>
-                <materialfactor material="Grass" factor="1" />
+                <radius>10</radius>
+                <density>.1</density>
+                <!-- bugged? <materialfactor material="Grass" factor="1" /> -->
+                <defaultmaterialfactor>.1</defaultmaterialfactor>
             </geometry>
             <geometry>
                 <factory maxdist="30" name="Rock" />
                 <radius>1</radius>
-                <density>.010</density>
+                <density>.01</density>
                 <materialfactor material="Marble" factor="1" />
                 <materialfactor material="Stone" factor="0" />
                 <defaultmaterialfactor>.3</defaultmaterialfactor>
@@ -432,13 +440,6 @@
                 <materialfactor material="Stone" factor="0" />
                 <defaultmaterialfactor>.3</defaultmaterialfactor>
             </geometry>
-            <!--
-        <geometry>
-	    <factory maxdist="30" name="squareInst" />
-	    <radius>1</radius>
-	    <density>.3</density>
-        </geometry>
-	-->
             <!--<densityscale mindist="26" maxdist="30" maxfactor="0" />-->
             <alphascale mindist="22" maxdist="30" />
             <samplebox>

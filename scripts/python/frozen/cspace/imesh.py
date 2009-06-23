@@ -642,6 +642,38 @@ class csAnimatedMeshBoneInfluence(object):
 csAnimatedMeshBoneInfluence_swigregister = _imesh.csAnimatedMeshBoneInfluence_swigregister
 csAnimatedMeshBoneInfluence_swigregister(csAnimatedMeshBoneInfluence)
 
+class iAnimatedMeshSocketFactory(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetName(*args): return _imesh.iAnimatedMeshSocketFactory_GetName(*args)
+    def GetTransform(*args): return _imesh.iAnimatedMeshSocketFactory_GetTransform(*args)
+    def SetTransform(*args): return _imesh.iAnimatedMeshSocketFactory_SetTransform(*args)
+    def GetBone(*args): return _imesh.iAnimatedMeshSocketFactory_GetBone(*args)
+    def GetFactory(*args): return _imesh.iAnimatedMeshSocketFactory_GetFactory(*args)
+    __swig_destroy__ = _imesh.delete_iAnimatedMeshSocketFactory
+    __del__ = lambda self : None;
+iAnimatedMeshSocketFactory_swigregister = _imesh.iAnimatedMeshSocketFactory_swigregister
+iAnimatedMeshSocketFactory_swigregister(iAnimatedMeshSocketFactory)
+
+class iAnimatedMeshSocket(core.iBase):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetName(*args): return _imesh.iAnimatedMeshSocket_GetName(*args)
+    def GetFactory(*args): return _imesh.iAnimatedMeshSocket_GetFactory(*args)
+    def GetTransform(*args): return _imesh.iAnimatedMeshSocket_GetTransform(*args)
+    def SetTransform(*args): return _imesh.iAnimatedMeshSocket_SetTransform(*args)
+    def GetFullTransform(*args): return _imesh.iAnimatedMeshSocket_GetFullTransform(*args)
+    def GetBone(*args): return _imesh.iAnimatedMeshSocket_GetBone(*args)
+    def GetMesh(*args): return _imesh.iAnimatedMeshSocket_GetMesh(*args)
+    def GetSceneNode(*args): return _imesh.iAnimatedMeshSocket_GetSceneNode(*args)
+    def SetSceneNode(*args): return _imesh.iAnimatedMeshSocket_SetSceneNode(*args)
+    __swig_destroy__ = _imesh.delete_iAnimatedMeshSocket
+    __del__ = lambda self : None;
+iAnimatedMeshSocket_swigregister = _imesh.iAnimatedMeshSocket_swigregister
+iAnimatedMeshSocket_swigregister(iAnimatedMeshSocket)
+
 class iAnimatedMeshFactory(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
@@ -674,6 +706,9 @@ class iAnimatedMeshFactory(core.iBase):
     def GetMorphTargetCount(*args): return _imesh.iAnimatedMeshFactory_GetMorphTargetCount(*args)
     def ClearMorphTargets(*args): return _imesh.iAnimatedMeshFactory_ClearMorphTargets(*args)
     def FindMorphTarget(*args): return _imesh.iAnimatedMeshFactory_FindMorphTarget(*args)
+    def CreateSocket(*args): return _imesh.iAnimatedMeshFactory_CreateSocket(*args)
+    def GetSocketCount(*args): return _imesh.iAnimatedMeshFactory_GetSocketCount(*args)
+    def GetSocket(*args): return _imesh.iAnimatedMeshFactory_GetSocket(*args)
     scfGetVersion = staticmethod(_imesh.iAnimatedMeshFactory_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iAnimatedMeshFactory
     __del__ = lambda self : None;
@@ -705,6 +740,8 @@ class iAnimatedMesh(core.iBase):
     def GetSubMeshCount(*args): return _imesh.iAnimatedMesh_GetSubMeshCount(*args)
     def SetMorphTargetWeight(*args): return _imesh.iAnimatedMesh_SetMorphTargetWeight(*args)
     def GetMorphTargetWeight(*args): return _imesh.iAnimatedMesh_GetMorphTargetWeight(*args)
+    def GetSocketCount(*args): return _imesh.iAnimatedMesh_GetSocketCount(*args)
+    def GetSocket(*args): return _imesh.iAnimatedMesh_GetSocket(*args)
     scfGetVersion = staticmethod(_imesh.iAnimatedMesh_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iAnimatedMesh
     __del__ = lambda self : None;

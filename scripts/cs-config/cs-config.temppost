@@ -16,7 +16,7 @@ for libname in lib${libcrystalspace}.so \
 	lflags="-L${exec_prefix}/lib"
     else
 	my_IFS=$IFS; IFS=$PATH_SEPARATOR
-	for p in $CRYSTAL
+	for p in $_CRYSTAL_ACTUAL
 	  do
 	  if test -r "$p/Jamfile" && \
 	      test -r "$p/$makeout/libs/$libname"; then
@@ -147,13 +147,13 @@ findcexfile()
 	fi
     done
 
-    if test -f "$CRYSTAL/bin/$1.cex"; then
-	CEXFILE="$CRYSTAL/bin/$1.cex"
+    if test -f "$_CRYSTAL_ACTUAL/bin/$1.cex"; then
+	CEXFILE="$_CRYSTAL_ACTUAL/bin/$1.cex"
 	return
     fi
     
-    if test -f "$CRYSTAL/$1.cex"; then
-	CEXFILE="$CRYSTAL/$1.cex"
+    if test -f "$_CRYSTAL_ACTUAL/$1.cex"; then
+	CEXFILE="$_CRYSTAL_ACTUAL/$1.cex"
 	return
     fi
 

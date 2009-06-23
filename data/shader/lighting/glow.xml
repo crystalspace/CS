@@ -43,7 +43,7 @@
     <block location="cg:fragmentMain">
       surfaceWithGlow = surfaceColor;
       <?if vars."tex glow".texture ?>
-	surfaceWithGlow.rgb += tex2D (texGlow, texCoord);
+	surfaceWithGlow.rgb += tex2D (texGlow, texCoord).rgb;
       <?endif?>
     </block>
     
@@ -82,7 +82,7 @@
     <block location="cg:fragmentMain">
       surfaceWithGlow = surfaceColor;
       <?if vars."tex glow".texture ?>
-	surfaceWithGlow.rgb += tex2D (texGlow, texcoordGlow);
+	surfaceWithGlow.rgb += tex2D (texGlow, texcoordGlow).rgb;
       <?endif?>
     </block>
     

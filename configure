@@ -8702,20 +8702,20 @@ done
 fi
 
 
+# Note that CS comes with a copy of relaytool that, compared to the
+# current (as of 2007-09-18) version from apbuild-2.0.5, has some
+# additions and small fixes applied. Thus, prefer the version that
+# ships with CS.
 # Check whether --enable-relaytool was given.
 if test "${enable_relaytool+set}" = set; then
   enableval=$enable_relaytool;
 fi
 
-    if test -z "$enable_relaytool"; then
+	if test -z "$enable_relaytool"; then
   enable_relaytool=yes
 fi
 
-if test "$enable_relaytool" != "no"; then
-  # Note that CS comes with a copy of relaytool that, compared to the
-    # current (as of 2007-09-18) version from apbuild-2.0.5, has some
-    # additions and small fixes applied. Thus, prefer the version that
-    # ships with CS.
+    if test "$enable_relaytool" != "no"; then
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -8737,7 +8737,7 @@ else
   ;;
   *)
   as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in     ${srcdir}/bin$PATH_SEPARATOR$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin
+for as_dir in     ${srcdir}/bin$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin
 do
   IFS=$as_save_IFS
   test -z "$as_dir" && as_dir=.
@@ -8780,7 +8780,7 @@ else
   ;;
   *)
   as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in     ${srcdir}/bin$PATH_SEPARATOR$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin
+for as_dir in     ${srcdir}/bin$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin
 do
   IFS=$as_save_IFS
   test -z "$as_dir" && as_dir=.
@@ -8825,7 +8825,7 @@ else
   RELAYTOOL="$ac_cv_path_RELAYTOOL"
 fi
 
-    cs_build_prop_val="$RELAYTOOL"
+	cs_build_prop_val="$RELAYTOOL"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     	        if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}CMD.RELAYTOOL ?= $cs_build_prop_val ;

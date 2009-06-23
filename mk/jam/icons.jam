@@ -36,7 +36,7 @@ if $(CMD.RSVG) != ""
     # ** - Cause icon files to be really large. Vista supports PNG compression
     #      in icons and uses it for the 256x256 versions. Problem: resource
     #      compilers don't support that yet.
-    for size in 16 22 32 48
+    for size in 16 22 32 48 128 256
     {
       local pngdir = [ ConcatDirs $(SUBDIR) icons $(size) ] ;
       local pngfile = $(icon:G=$(pngdir)).png ;
@@ -155,7 +155,7 @@ if $(CMD.ICOTOOL) != ""
     if [ -e $ICONSSRC/\${ICONBASE}_8.png ] ; then
       $(CP) $ICONSSRC/\${ICONBASE}_8.png $(<)
     else
-      # Makes transparency binary and reduces colors to 256-
+      # Makes transparency binary and reduces colors to 256
       $(CMD.CONVERT) $(>) \( +clone -fx a +matte -monochrome \) -compose CopyOpacity -composite -colors 256 -dither $(<)
     fi
   }

@@ -22,8 +22,6 @@ LinkWith lighter2_static : crystalspace ;
 FileListEntryApplications lighter2_static : app-tool-static ;
 
 LIGHTER2.PLUGINLIST =
-  bezier
-  bezierldr
   bindoc
   csbmpimg
   csddsimg

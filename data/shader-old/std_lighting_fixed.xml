@@ -27,6 +27,9 @@
 	  <buffer source="static color" destination="color" />
 	<?else?>
 	  <buffer source="color" destination="color" />
+      <?endif?> 
+	<?if vars."instancing transforms" ?> 
+        <instanceparam source="instancing transforms" destination="matrix object2world" /> 
 	<?endif?>
 	<?Include snippets/fog-mappings.inc ?>
 	<vp plugin="glfixed">

@@ -19,27 +19,21 @@
 -->
 <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
      verbatim -->
-<input name="objectToWorld" type="float4x4" default="complex">
+<input name="instancingTransforms" type="float4x4" default="complex">
   <block location="cg:vertexIn">
-    <uniform type="float4x4" name="objectToWorld" />
-  </block>
-  
-  <block location="cg:fragmentIn">
-    <uniform type="float4x4" name="objectToWorld" />
+    <varying type="float3x4" name="instancingTransforms" />
   </block>
   
   <block location="cg:vertexMain">
-    objectToWorld = vertexIn.objectToWorld;
+    instancingTransforms = float4x4 (vertexIn.instancingTransforms[0],
+      vertexIn.instancingTransforms[1],
+      vertexIn.instancingTransforms[2],
+      float4 (0, 0, 0, 1));
   </block>
 
-  <block location="cg:fragmentMain">
-    objectToWorld = fragmentIn.objectToWorld;
-  </block>
-
-  <block location="cg:variablemap">
-    <variablemap variable="object2world transform" 
-      destination="vertexIn.objectToWorld" />
-    <variablemap variable="object2world transform" 
-      destination="fragmentIn.objectToWorld" />
+  <block location="pass">
+    <instanceparam source="instancing transforms"
+      destination="vertexIn.instancingTransforms" />
   </block>
 </input>
+

@@ -3990,6 +3990,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       case XMLTOKEN_DENSITY:
         geom->SetDensity (child->GetContentsValueAsFloat ());
         break;
+      case XMLTOKEN_WINDDIRECTION:
+        geom->SetWindDirection(child->GetAttributeValueAsFloat("x"),
+          child->GetAttributeValueAsFloat("y"));
+        break;
       default:
         SyntaxService->ReportBadToken (child);
         return false;
