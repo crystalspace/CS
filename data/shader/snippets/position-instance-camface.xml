@@ -78,11 +78,10 @@
     </block>
 
     <block location="cg:vertexMain">
-      position_object = Hposition;
-      position_world = mul (instancingTransforms, position_object);
       float4 offset = mul (instancingTransforms, float4(0, 0, 0, 1));
-      offset = mul (ModelView, offset);
-      position_camera = position_object + offset;
+      position_camera = position_world = position_object = Hposition;
+      position_world.xyz += offset.xyz;
+      position_camera.xyz += mul (ModelView, offset).xyz;
       position_screen = position = mul (Proj, position_camera);
       
       APPLY_CLIPPING_VP(position_camera, position_world, position_object);
