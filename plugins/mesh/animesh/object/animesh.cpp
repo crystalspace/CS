@@ -719,7 +719,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
     iMaterialWrapper** material)
   {
     return csIntersect3::BoxSegment (factory->factoryBB, csSegment3 (start, end),
-      isect, pr);
+      isect, pr) != 0;
   }
 
   void AnimeshObject::SetMeshWrapper (iMeshWrapper* lp)
@@ -766,10 +766,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Animesh)
   uint AnimeshObject::GetMixMode () const
   {
     return mixMode;
-  }
-
-  void AnimeshObject::InvalidateMaterialHandles ()
-  {
   }
 
   void AnimeshObject::PositionChild (iMeshObject* child,csTicks current_time)

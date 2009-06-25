@@ -69,10 +69,6 @@
     }
     <?Endtemplate?>
   
-   <?Template CgVertexOptions?>
-	<profile>arbvp1</profile>
-  <?Endtemplate?>
-  
   <?Template MyProgram ?>
       <variablemap variable="object2world transform" destination="objectToWorld" />
       <clip space="object">

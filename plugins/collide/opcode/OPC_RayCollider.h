@@ -219,6 +219,7 @@
 		inline_				bool			SegmentAABBOverlap(const Point& center, const Point& extents);
 		inline_				bool			RayTriOverlap(const Point& vert0, const Point& vert1, const Point& vert2);
 			// Init methods
+    using CS::Plugin::csOpcode::Opcode::Collider::InitQuery;
 							bool			InitQuery(const Ray& world_ray, const Matrix4x4* world=null, udword* face_id=null);
 	};
 

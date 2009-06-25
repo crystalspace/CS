@@ -992,8 +992,8 @@ bool csGLGraphics3D::Open ()
     {
       for (int u = numImageUnits - 1; u >= 0; u--)
       {
-        statecache->SetCurrentTU (u);
-        statecache->ActivateTU (csGLStateCache::activateTexEnv);
+        statecache->SetCurrentImageUnit (u);
+        statecache->ActivateImageUnit ();
         glTexEnvf (GL_TEXTURE_FILTER_CONTROL_EXT, 
 	        GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); 
       }
@@ -1285,6 +1285,88 @@ void csGLGraphics3D::UnsetRenderTargets()
   needViewportUpdate = true;
 }
 
+void csGLGraphics3D::CopyFromRenderTargets (size_t num,
+  csRenderTargetAttachment* attachments,
+  iTextureHandle** textures,
+  int* subtextures)
+{
+  for (size_t i = 0; i < num; i++)
+  {
+    /* CopyTex(Sub)Image 'chooses' the attachment accorings of the format
+       of the texture copied to; thus, ignore the specified attachment
+       for now ... */
+    iTextureHandle* tex = textures[i];
+    int subtexture = subtextures ? subtextures[i] : 0;
+  
+    csGLBasicTextureHandle* tex_mm = static_cast<csGLBasicTextureHandle*> (tex);
+    tex_mm->Precache ();
+    // Texture is in tha cache, update texture directly.
+    ActivateTexture (tex_mm);
+  
+    GLenum internalFormat = 0;
+  
+    GLenum textarget = tex_mm->GetGLTextureTarget();
+    if ((textarget != GL_TEXTURE_2D)
+	&& (textarget != GL_TEXTURE_3D)  
+	&& (textarget != GL_TEXTURE_RECTANGLE_ARB) 
+	&& (textarget != GL_TEXTURE_CUBE_MAP))
+      return;
+      
+    int txt_w, txt_h;
+    tex_mm->GetRendererDimensions (txt_w, txt_h);
+
+    bool handle_subtexture = (textarget == GL_TEXTURE_CUBE_MAP);
+    bool handle_3d = (textarget == GL_TEXTURE_3D);
+    /* Reportedly, some drivers crash if using CopyTexImage on a texture
+      * size larger than the framebuffer. Use CopyTexSubImage then. */
+    bool needSubImage = (txt_w > viewwidth) 
+      || (txt_h > viewheight);
+    // Texture was not used as a render target before.
+    // Make some necessary adjustments.
+    if (needSubImage)
+    {
+      int orgX = 0;
+      int orgY = scrheight - (csMin (txt_h, viewheight));
+    
+      if (handle_subtexture)
+	glCopyTexSubImage2D (
+	  GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + subtexture,
+	  0, 0, 0, orgX, orgY, 
+	  csMin (txt_w, viewwidth), 
+	  csMin (txt_h, viewheight));
+      else if (handle_3d)
+	ext->glCopyTexSubImage3D (textarget, 0, 0, 0, orgX, orgY,
+	  subtexture,
+	  csMin (txt_w, viewwidth),
+	  csMin (txt_h, viewheight));
+      else
+	glCopyTexSubImage2D (textarget, 0, 0, 0, orgX, orgY, 
+	  csMin (txt_w, viewwidth),
+	  csMin (txt_h, viewheight));
+    }
+    else
+    {
+      int orgX = 0;
+      int orgY = scrheight - txt_h;
+    
+      glGetTexLevelParameteriv ((textarget == GL_TEXTURE_CUBE_MAP) 
+	  ? GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB : textarget, 
+	0, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&internalFormat);
+      
+      if (handle_subtexture)
+	glCopyTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + subtexture, 
+	  0, 0, 0, orgX, orgY, txt_w, txt_h);
+      else if (handle_3d)
+	ext->glCopyTexSubImage3D (textarget, 0, 0, 0, orgX, orgY,
+	  subtexture, txt_w, txt_h);
+      else
+	glCopyTexSubImage2D (textarget, 0,
+	  0, 0, orgX, orgY, txt_w, txt_h);
+    }
+    tex_mm->RegenerateMipmaps();
+  }
+}
+
 bool csGLGraphics3D::BeginDraw (int drawflags)
 {
   (void)drawflagNames; // Pacify compiler when CS_DEBUG not defined.
@@ -1394,9 +1476,10 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       statecache->Disable_GL_ALPHA_TEST ();
       if (ext->CS_GL_ARB_multitexture)
       {
-        statecache->SetCurrentTU (0);
-        statecache->ActivateTU (csGLStateCache::activateImage
-          | csGLStateCache::activateTexCoord);
+        statecache->SetCurrentImageUnit (0);
+        statecache->ActivateImageUnit ();
+        statecache->SetCurrentTCUnit (0);
+        statecache->ActivateTCUnit (csGLStateCache::activateTexCoord);
       }
       statecache->Disable_GL_POLYGON_OFFSET_FILL ();
 
@@ -1575,16 +1658,12 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
     statecache->Disable_GL_VERTEX_ARRAY ();
     statecache->Disable_GL_NORMAL_ARRAY ();
     statecache->Disable_GL_COLOR_ARRAY ();
-    statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
     if (ext->CS_GL_EXT_secondary_color)
       statecache->Disable_GL_SECONDARY_COLOR_ARRAY_EXT ();
-    if (ext->CS_GL_ARB_multitexture)
+    for (i = numTCUnits; i-- > 0;)
     {
-      for (i = numTCUnits; i-- > 0;)
-      {
-        statecache->SetCurrentTU (i);
-        statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
-      }
+      statecache->SetCurrentTCUnit (i);
+      statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
     }
     if (ext->glDisableVertexAttribArrayARB)
     {
@@ -1628,8 +1707,8 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
 {
   if (ext->CS_GL_ARB_multitexture)
   {
-    statecache->SetCurrentTU (unit);
-    statecache->ActivateTU (csGLStateCache::activateTexEnable);
+    statecache->SetCurrentImageUnit (unit);
+    statecache->ActivateImageUnit ();
   }
   else if (unit != 0) return false;
 
@@ -1672,7 +1751,7 @@ void csGLGraphics3D::DeactivateTexture (int unit)
 {
   if (ext->CS_GL_ARB_multitexture)
   {
-    statecache->SetCurrentTU (unit);
+    statecache->SetCurrentImageUnit (unit);
   }
   else if (unit != 0) return;
 
@@ -1724,8 +1803,8 @@ void csGLGraphics3D::SetTextureComparisonModes (int* units,
       
       if (ext->CS_GL_ARB_multitexture)
       {
-	statecache->SetCurrentTU (unit);
-	statecache->ActivateTU (csGLStateCache::activateImage);
+	statecache->SetCurrentImageUnit (unit);
+	statecache->ActivateImageUnit ();
       }
       else if (unit != 0) continue;
       
@@ -1741,8 +1820,8 @@ void csGLGraphics3D::SetTextureComparisonModes (int* units,
       
       if (ext->CS_GL_ARB_multitexture)
       {
-	statecache->SetCurrentTU (unit);
-	statecache->ActivateTU (csGLStateCache::activateTexEnv);
+	statecache->SetCurrentImageUnit (unit);
+	statecache->ActivateImageUnit ();
       }
       else if (unit != 0) continue;
       
@@ -2602,7 +2681,7 @@ void csGLGraphics3D::ApplyBufferChanges()
           unsigned int unit = att- CS_VATTRIB_TEXCOORD0;
           if (ext->CS_GL_ARB_multitexture)
           {
-            statecache->SetCurrentTU (unit);
+            statecache->SetCurrentTCUnit (unit);
           } 
 	  // @@@ FIXME: How to deal with normalized buffers?
 	  statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
@@ -2655,7 +2734,7 @@ void csGLGraphics3D::ApplyBufferChanges()
           unsigned int unit = att- CS_VATTRIB_TEXCOORD0;
           if (ext->CS_GL_ARB_multitexture)
           {
-            statecache->SetCurrentTU (unit);
+            statecache->SetCurrentTCUnit (unit);
           }
           statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
         }
@@ -3317,9 +3396,10 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
     }
     if (ext->CS_GL_ARB_multitexture)
     {
-      statecache->SetCurrentTU (0);
-      statecache->ActivateTU (csGLStateCache::activateImage
-        | csGLStateCache::activateTexCoord);
+      statecache->SetCurrentImageUnit (0);
+      statecache->ActivateImageUnit ();
+      statecache->SetCurrentTCUnit (0);
+      statecache->ActivateTCUnit (csGLStateCache::activateTexCoord);
     }
     if (mesh.texture)
     {
@@ -3521,8 +3601,8 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB,
   // Create handle
   glGenTextures (1, &halohandle);
   // Activate handle
-  csGLGraphics3D::statecache->SetCurrentTU (0);
-  csGLGraphics3D::statecache->ActivateTU (csGLStateCache::activateImage);
+  csGLGraphics3D::statecache->SetCurrentImageUnit (0);
+  csGLGraphics3D::statecache->ActivateImageUnit ();
   csGLGraphics3D::statecache->SetTexture (GL_TEXTURE_2D, halohandle);
 
   // Jaddajaddajadda
@@ -3607,11 +3687,12 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   float hw = (float)G3D->GetWidth() * 0.5f;
   float hh = (float)G3D->GetHeight() * 0.5f;
 
-  int oldTU = G3D->statecache->GetCurrentTU ();
-  if (G3D->ext->CS_GL_ARB_multitexture)
-    G3D->statecache->SetCurrentTU (0);
-  G3D->statecache->ActivateTU (csGLStateCache::activateImage
-    | csGLStateCache::activateTexCoord);
+  int oldIU = G3D->statecache->GetCurrentImageUnit ();
+  int oldTCU = G3D->statecache->GetCurrentTCUnit ();
+  G3D->statecache->SetCurrentImageUnit (0);
+  G3D->statecache->ActivateImageUnit ();
+  G3D->statecache->SetCurrentTCUnit (0);
+  G3D->statecache->ActivateTCUnit (csGLStateCache::activateTexCoord);
 
   
   //csGLGraphics3D::SetGLZBufferFlags (CS_ZBUF_NONE);
@@ -3655,10 +3736,10 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   csGLGraphics3D::statecache->SetTexture (GL_TEXTURE_2D, 0);
   if (!texEnabled)
     csGLGraphics3D::statecache->Disable_GL_TEXTURE_2D ();
-  if (G3D->ext->CS_GL_ARB_multitexture)
-    G3D->statecache->SetCurrentTU (oldTU);
-  G3D->statecache->ActivateTU (csGLStateCache::activateImage
-    | csGLStateCache::activateTexCoord);
+  G3D->statecache->SetCurrentImageUnit (oldIU);
+  G3D->statecache->ActivateImageUnit ();
+  G3D->statecache->SetCurrentTCUnit (oldTCU);
+  G3D->statecache->ActivateTCUnit (csGLStateCache::activateTexCoord);
 }
 
 iHalo *csGLGraphics3D::CreateHalo (float iR, float iG, float iB,

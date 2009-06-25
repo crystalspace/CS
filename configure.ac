@@ -212,7 +212,48 @@ CS_CHECK_RTLD
 
 
 #------------------------------------------------------------------------------
-# Check for SIMD flags
+# Determine host platform.  Recognized platforms: Unix, Windows, Mac OS X.
+# Recognized families: Unix, Windows.
+#------------------------------------------------------------------------------
+CS_CHECK_HOST
+
+case $cs_host_target in
+    macosx)
+        CS_HEADER_PROPERTY([CS_PLATFORM_MACOSX])
+        # Assume that CoreAudio is always available on Mac OS X.
+        CS_EMIT_BUILD_PROPERTY([COREAUDIO.AVAILABLE], [yes])
+        CS_EMIT_BUILD_PROPERTY([COREAUDIO.LFLAGS],
+	    [-framework CoreAudio -framework AudioToolbox])
+        # Processor-specific optimizations.
+        AS_IF([test -n "$cs_cv_prog_cc_msse"],
+            [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
+             [$cs_cv_prog_cc_msse], [append])])
+        AS_IF([test -n "$cs_cv_prog_cc_msse2"],
+            [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
+             [$cs_cv_prog_cc_msse2], [append])])
+        AS_IF([test -n "$cs_cv_prog_cc_mfpmath_sse"],
+            [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
+             [$cs_cv_prog_cc_mfpmath_sse], [append])])
+        ;;
+esac
+case $cs_host_family in
+    windows)
+	CS_HEADER_PROPERTY([CS_PLATFORM_WIN32])
+	;;
+    unix)
+	CS_HEADER_PROPERTY([CS_PLATFORM_UNIX])
+        ;;
+    esac
+CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
+    [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
+
+
+
+#------------------------------------------------------------------------------
+# Check for SIMD flags. These checks are performed after CS_CHECK_HOST() since
+# CS_CHECK_HOST() may alter the build environment in a way which affects these
+# tests. For instance, these tests might be impacted on Mac OS X by a universal
+# binary build.
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx],
     [CS_CREATE_TUPLE([-mmmx])])
@@ -234,47 +275,6 @@ AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
         [C++],
         [CS_HEADER_PROPERTY([CS_SUPPORTS_MMX])
         CS_EMIT_BUILD_PROPERTY([CS_SUPPORTS_MMX], [yes])])])
-
-
-
-#------------------------------------------------------------------------------
-# Determine host platform.  Recognized platforms: Unix, Windows, Mac OS X.
-# Recognized families: Unix, Windows.
-#
-# CS_CHECK_HOST
-#	Sets the shell variables cs_host_target and cs_host_family.  Client
-#	code can use these variables to emit appropriate Jam variables and
-#	CS_PLATFORM_FOO header define.
-#------------------------------------------------------------------------------
-CS_CHECK_HOST
-case $cs_host_target in
-    macosx)
-        # We assume that we always have CoreAudio available on MacOS/X.
-        CS_EMIT_BUILD_PROPERTY([COREAUDIO.AVAILABLE], [yes])
-        CS_EMIT_BUILD_PROPERTY([COREAUDIO.LFLAGS],
-	    [-framework CoreAudio -framework AudioToolbox])
-        CS_HEADER_PROPERTY([CS_PLATFORM_MACOSX])
-        AS_IF([test -n "$cs_cv_prog_cc_msse"],
-            [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
-             [$cs_cv_prog_cc_msse], [+])])
-        AS_IF([test -n "$cs_cv_prog_cc_msse2"],
-            [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
-             [$cs_cv_prog_cc_msse2], [+])])
-        AS_IF([test -n "$cs_cv_prog_cc_mfpmath_sse"],
-            [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS],
-             [$cs_cv_prog_cc_mfpmath_sse], [+])])
-        ;;
-esac
-case $cs_host_family in
-    windows)
-	CS_HEADER_PROPERTY([CS_PLATFORM_WIN32])
-	;;
-    unix)
-	CS_HEADER_PROPERTY([CS_PLATFORM_UNIX])
-        ;;
-    esac
-CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
-    [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
 
 
 
@@ -499,9 +499,7 @@ CS_COMPILER_IGNORE_NON_VIRTUAL_DTOR([C++],
 #------------------------------------------------------------------------------
 CS_CHECK_BUILD_FLAGS([for flag to disable string-aliasing],
     [cs_cv_prog_cxx_no_strict_aliasing],
-    [CS_CREATE_TUPLE([-fno-strict-aliasing])], [C++])
-
-AS_IF([test $cs_cv_prog_cxx_no_strict_aliasing != no],
+    [CS_CREATE_TUPLE([-fno-strict-aliasing])], [C++],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS.STRICTALIASING.DISABLE],
 	[$cs_cv_prog_cxx_no_strict_aliasing], [+])])
 
@@ -1266,30 +1264,33 @@ AS_IF([test "$cs_cv_libvorbis" = yes],
 	[$cs_cv_libogg_lflags $cs_cv_libvorbis_lflags],
 	[$cs_cv_libogg_libs $cs_cv_libvorbis_libs])])
 
+
+
 #------------------------------------------------------------------------------
 # Check for Speex.  In addition to the standard installed locations, we
 # also search CS/libs/libspeex*
 #------------------------------------------------------------------------------
-AS_IF([test $cs_cv_libogg = yes],
+AS_IF([test "$cs_cv_libogg" = yes],
     [CS_CHECK_LIB_WITH([speex],
 	[AC_LANG_PROGRAM([[#include <speex/speex.h>]],
-	  [SpeexBits bits; speex_bits_init(&bits);])],
+            [SpeexBits bits; speex_bits_init(&bits);])],
 	[$srcdir/libs/libspeex.*], [],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libspeex], [SPEEX])], [],
 	[$cs_cv_libogg_cflags],
 	[$cs_cv_libogg_lflags],
 	[$cs_cv_libogg_libs])])
 
-#------------------------------------------------------------------------------
-# Check for speex_header_free().
-#------------------------------------------------------------------------------
-AS_IF([test $cs_cv_libspeex = yes],
+AS_IF([test "$cs_cv_libspeex" = yes],
     [CS_CHECK_BUILD([for speex_header_free()], [cs_cv_speex_header_free],
 	[AC_LANG_PROGRAM([[#include <speex/speex_header.h>]],
-	  [SpeexHeader* header = 0; speex_header_free(header);])],
+            [SpeexHeader* header = 0; speex_header_free(header);])],
 	[], [C++],
 	[CS_HEADER_PROPERTY([CS_HAVE_SPEEX_HEADER_FREE])], [], [],
-	[$cs_cv_libspeex_cflags], [$cs_cv_libspeex_lflags], [$cs_cv_libspeex_libs])])
+	[$cs_cv_libspeex_cflags],
+        [$cs_cv_libspeex_lflags],
+        [$cs_cv_libspeex_libs])])
+
+
 
 #------------------------------------------------------------------------------
 # Check for lib3ds.  In addition to the standard installed locations, we also
@@ -1530,7 +1531,38 @@ CS_CHECK_LIB_WITH([wx],
     [], [C++])
     
 AS_IF([test $cs_cv_libwx = yes],
-    [AS_IF([test -z "$cs_cv_libwx_opengl"],
+    [AS_IF([test $cs_host_family = windows],
+	[AC_CACHE_CHECK([if defining UNICODE is needed for WX],
+	    [cs_cv_libwx_needs_UNICODE],
+	    [CS_BUILD_IFELSE(
+		[AC_LANG_PROGRAM(
+		    [[#include <windows.h>
+		    #include "wx/wxprec.h"
+		    #ifdef __BORLANDC__
+		    #pragma hdrstop
+		    #endif
+		    #ifndef WX_PRECOMP
+		    #include "wx/wx.h"
+		    #endif
+		    ]],
+		    [wxString s])],
+		[CS_CREATE_TUPLE(
+		    [$cs_cv_libwx_cflags],
+		    [$cs_cv_libwx_lflags],
+		    [$cs_cv_libwx_libs   $cs_cv_libwx_gllibs]) \
+		CS_CREATE_TUPLE(
+		    [$cs_cv_libwx_cflags $cs_cv_libglu_cflags],
+		    [$cs_cv_libwx_lflags $cs_cv_libglu_lflags],
+		    [$cs_cv_libwx_libs   $cs_cv_libglu_libs])  \
+		CS_CREATE_TUPLE(
+		    [$cs_cv_libwx_cflags $cs_cv_libglu_cflags],
+		    [$cs_cv_libwx_lflags $cs_cv_libglu_lflags],
+		    [$cs_cv_libwx_libs   $cs_cv_libwx_gllibs $cs_cv_libglu_libs])],
+		[C++],
+		[cs_cv_libwx_needs_UNICODE=no],
+		[cs_cv_libwx_cflags="$cs_cv_libwx_cflags -DUNICODE -D_UNICODE"
+		cs_cv_libwx_needs_UNICODE=yes])])])
+    AS_IF([test -z "$cs_cv_libwx_opengl"],
 	[AS_IF([test -n "$CONFIG_WX"],
 	    [cs_cv_libwx_gllibs=CS_RUN_PATH_NORMALIZE([$CONFIG_WX --gl-libs])],
 	    [cs_cv_libwx_gllibs=''])])
@@ -1929,28 +1961,9 @@ CS_HEADER_PROPERTY([CS_LONG_SIZE], [$ac_cv_sizeof_long])
 
 #------------------------------------------------------------------------------
 # Determine host CPU.
-#
-# CS_CHECK_HOST_CPU
-#	Set the shell variable cs_host_cpu to a normalized form of the CPU name
-#	returned by config.guess/config.sub.  Also takes the normalized name,
-#	uppercases and appends it to the string "CS_PROCESSOR_" to form a name
-#	suitable for the C preprocessor.  Assigns this value to the shell
-#	variable cs_host_cpu_cpp_define.  Typically, Crystal Space's conception
-#	of CPU name is the same as that returned by config.guess/config.sub,
-#	but there may be exceptions as seen in the `case' statement.
 #------------------------------------------------------------------------------
-AC_DEFUN([CS_CHECK_HOST_CPU],
-    [AC_REQUIRE([AC_CANONICAL_HOST])
-    case $host_cpu in
-	[[Ii][3-9]86*|[Xx]86*]) cs_host_cpu=x86 ;;
-	powerpc*) cs_host_cpu=powerpc ;;
-	sparc*) cs_host_cpu=sparc ;;
-	*) cs_host_cpu=$host_cpu ;;
-    esac
-    cs_host_cpu_normalized="AS_TR_CPP([$cs_host_cpu])"])
-
 CS_CHECK_HOST_CPU
-CS_EMIT_BUILD_PROPERTY([TARGET.PROCESSOR], [$cs_host_cpu_normalized])
+
 CS_HEADER_PROPERTY([CS_PROCESSOR_$cs_host_cpu_normalized])
 CS_HEADER_PROPERTY([CS_PROCESSOR_NAME],
     [AS_ESCAPE(["])$cs_host_cpu[]AS_ESCAPE(["])])

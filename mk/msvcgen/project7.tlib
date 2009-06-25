@@ -25,6 +25,13 @@
   MACRO composedefs(defs) GET compose('defines', defs, ';').replace('"', '\\&quot;');
   MACRO composedirs(tag, seed) GET composepaths(${"build.${tag}key"},seed,';');
   MACRO debugformat(platform,tag) GET ${"platform.debugformat_${tag}"};
+  MACRO comparable_msvc_version BLOCK;
+    IF my.doc.msvcversion.0 < 71;
+      GET my.doc.msvcversion.0 * 10;
+    ELSE;
+      GET my.doc.msvcversion.0;
+    END;
+  END;
 
   my = {};
   load(respfile, 'doc');
@@ -42,13 +49,16 @@ END -%]
 	SccLocalPath="">
 	<Platforms>
 [% FOREACH platform IN platforms -%]
+  [% IF comparable_msvc_version >= platform.min_vc_version -%]
 		<Platform Name="[% platform.name %]"/>
+  [% END -%]
 [% END -%]
 	</Platforms>
 	<Configurations>
 [% FOREACH platform IN platforms -%]
-  [% FOREACH build IN builds -%]
-    [% FOREACH mutator IN mutators -%]
+  [% IF comparable_msvc_version >= platform.min_vc_version -%]
+    [% FOREACH build IN builds -%]
+      [% FOREACH mutator IN mutators -%]
 		<Configuration
 			Name="[% build.name %][% mutator.namesuffix %]|[% platform.name %]"
 			OutputDirectory="[% workbuild([]) %]"
@@ -113,6 +123,7 @@ END -%]
 			<Tool
 				Name="VCWebDeploymentTool"/>
 		</Configuration>
+      [% END -%]
     [% END -%]
   [% END -%]
 [% END -%]

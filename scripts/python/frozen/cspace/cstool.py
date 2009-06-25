@@ -574,6 +574,7 @@ class csProcTexture(scfProcTexture):
     __del__ = lambda self : None;
     def GetG3D(*args): return _cstool.csProcTexture_GetG3D(*args)
     def GetG2D(*args): return _cstool.csProcTexture_GetG2D(*args)
+    def GetObjectRegistry(*args): return _cstool.csProcTexture_GetObjectRegistry(*args)
     def DisableAutoUpdate(*args): return _cstool.csProcTexture_DisableAutoUpdate(*args)
     def Initialize(*args): return _cstool.csProcTexture_Initialize(*args)
     def PrepareAnim(*args): return _cstool.csProcTexture_PrepareAnim(*args)

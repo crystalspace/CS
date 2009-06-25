@@ -306,6 +306,7 @@ public:
   }
   iMeshGenerator* GetMeshGeneratorByName (const char* name);
   void RemoveMeshGenerator (size_t idx);
+  void RemoveMeshGenerator (const char* name);
   void RemoveMeshGenerators ();
   /** @} */
 
@@ -555,7 +556,7 @@ class csSectorList : public scfImplementation1<csSectorList, iSectorList>
 private:
   csRefArrayObject<iSector> list;
   csHash<iSector*, csString> sectors_hash;
-  mutable CS::Threading::RecursiveMutex removeLock;
+  mutable CS::Threading::ReadWriteMutex sectorLock;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>
@@ -592,9 +593,10 @@ public:
   /// Override FreeSector.
   virtual void FreeSector (iSector* item);
 
-  virtual int GetCount () const { return (int)list.GetSize (); }
-  virtual iSector *Get (int n) const { return list.Get (n); }
+  virtual int GetCount () const;
+  virtual iSector *Get (int n) const;
   virtual int Add (iSector *obj);
+  void AddBatch (csRef<iSectorLoaderIterator> itr);
   virtual bool Remove (iSector *obj);
   virtual bool Remove (int n);
   virtual void RemoveAll ();

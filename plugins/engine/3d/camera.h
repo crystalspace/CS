@@ -48,7 +48,8 @@ protected:
   csMovable movable;
 
   /// The sector the camera is in.
-  iSector* sector;
+  csWeakRef<iSector> sector;
+
   /// If true we are in a mirrored world.
   bool mirror;
 
@@ -524,6 +525,7 @@ public:
     return Persp().PerspectiveImpl::GetInvFOV() / (float)vp_width; 
   }
 
+  using iCamera::SetFOVAngle;
   void SetFOVAngle (float a, float width)
   {
     CS_ASSERT_MSG("SetViewportSize() not called",

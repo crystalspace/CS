@@ -41,8 +41,8 @@ namespace CS
         statecache->Enable_GL_VERTEX_PROGRAM_POINT_SIZE_ARB ();
         for (int i = statecache->GetNumTexCoords(); i-- > 0;)
         {
-          statecache->SetCurrentTU (i);
-          statecache->ActivateTU (csGLStateCache::activateTexCoord);
+          statecache->SetCurrentTCUnit (i);
+          statecache->ActivateTCUnit (csGLStateCache::activateTexEnv);
           glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
         }
         if (ext->CS_GL_ARB_point_parameters)

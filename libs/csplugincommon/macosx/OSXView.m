@@ -119,4 +119,9 @@
     [delegate dispatchEvent:ev forView:self];
 }
 
+- (void) scrollWheel:(NSEvent *) ev
+{
+    [delegate dispatchEvent:ev forView:self];
+}
+
 @end

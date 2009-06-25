@@ -49,16 +49,18 @@
   #pragma warning(disable:4355)   // 'this' used in base member initializer list
 
 
+#if !defined(__INTEL_COMPILER)
   #pragma inline_depth (255)
   #pragma inline_recursion (on)
-  #pragma auto_inline (on)
-  
-  #define CS_FORCEINLINE __forceinline
-
   #pragma intrinsic (memset, memcpy, memcmp)
   #pragma intrinsic (strcpy, strcmp, strlen, strcat)
   #pragma intrinsic (abs, fabs)
   #pragma intrinsic (_byteswap_ushort, _byteswap_ulong, _byteswap_uint64)
+#endif
+
+  #pragma auto_inline (on)
+  
+  #define CS_FORCEINLINE __forceinline
   
   #if _MSC_VER >= 1400
     /* Work around an apparent incompatibility between VC8's intrin.h and
@@ -80,12 +82,14 @@
     extern "C" unsigned char _BitScanForward (unsigned long* Index, unsigned long Mask);
     extern "C" unsigned char _BitScanReverse (unsigned long* Index, unsigned long Mask);
   #endif
+#if !defined(__INTEL_COMPILER)
   #pragma intrinsic (_InterlockedCompareExchange)
   #pragma intrinsic (_InterlockedDecrement)
   #pragma intrinsic (_InterlockedExchange)
   #pragma intrinsic (_InterlockedIncrement)
   #pragma intrinsic (_BitScanForward)
   #pragma intrinsic (_BitScanReverse)
+#endif
 
   #define CS_HAVE_BITSCAN_INTRINSICS
 

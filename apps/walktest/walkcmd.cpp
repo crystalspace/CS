@@ -185,16 +185,15 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
     return;
   }
 
-  csRef<iThreadReturn> ret = Sys->LevelLoader->LoadFile(filename);
-  ret->Wait();
-  if (!ret->WasSuccessful())
+  csLoadResult rc = Sys->LevelLoader->Load(filename);
+  if (!rc.success)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       "There was an error reading model '%s'!", filename);
     return;
   }
 
-  csRef<iMeshFactoryWrapper> wrap = scfQueryInterface<iMeshFactoryWrapper> (ret->GetResultRefPtr());
+  csRef<iMeshFactoryWrapper> wrap = scfQueryInterface<iMeshFactoryWrapper> (rc.result);
   if (wrap)
     wrap->QueryObject ()->SetName (templatename);
 }
@@ -492,9 +491,8 @@ void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
       //Is not registered. We have to do it.
       textFileName = LookForTextureFileName(kp->GetValue());
 
-      csRef<iThreadReturn> ret = Sys->LevelLoader->LoadTexture(matName, textFileName);
-      ret->Wait();
-      if(!ret->WasSuccessful())
+      csRef<iTextureWrapper> ret = Sys->LevelLoader->LoadTexture(matName, textFileName);
+      if(!ret.IsValid())
       {
         csPrintf("Error loading %s texture!!",textFileName);
       }
@@ -1161,9 +1159,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
       Sys->Engine->DeleteAll ();
       Sys->Engine->SetVFSCacheManager ();
-      csRef<iThreadReturn> ret = Sys->LevelLoader->LoadMapFile ("world");
-      ret->Wait();
-      if (!ret->WasSuccessful())
+      if (!Sys->LevelLoader->LoadMapFile ("world"))
       {
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
           "Couldn't load level '%s'!", level);
@@ -1614,9 +1610,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     csRef<iMeshFactoryWrapper> meshfact = Sys->Engine->FindMeshFactory ("franky_frankie");
     if (!meshfact)
     {
-      csRef<iThreadReturn> itr = Sys->LevelLoader->LoadFile ("/lib/frankie/frankie.xml");
-      itr->Wait();
-      if (!itr->WasSuccessful())
+      csLoadResult rc = Sys->LevelLoader->Load ("/lib/frankie/frankie.xml");
+      if (!rc.success)
         Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Can't load frankie!");
       meshfact = Sys->Engine->FindMeshFactory ("franky_frankie");
     }

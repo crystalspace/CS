@@ -699,8 +699,8 @@ void csGLShaderFFP::Activate ()
 {
   for(size_t i = 0; i < texlayers.GetSize (); ++i)
   {
-    statecache->SetCurrentTU ((int)i);
-    statecache->ActivateTU (csGLStateCache::activateTexEnv);
+    statecache->SetCurrentTCUnit ((int)i);
+    statecache->ActivateTCUnit (csGLStateCache::activateTexEnv);
 
     if (shaderPlug->enableCombine)
     {
@@ -733,8 +733,8 @@ void csGLShaderFFP::Activate ()
 
 void csGLShaderFFP::Deactivate()
 {
-  statecache->SetCurrentTU (0);
-  statecache->ActivateTU (csGLStateCache::activateTexEnv);
+  statecache->SetCurrentTCUnit (0);
+  statecache->ActivateTCUnit (csGLStateCache::activateTexEnv);
   if (shaderPlug->enableCombine)
   {
     glTexEnvi  (GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_TEXTURE);

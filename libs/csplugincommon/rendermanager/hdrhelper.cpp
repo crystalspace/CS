@@ -38,8 +38,17 @@ namespace CS
 	  * alpha. But without is prolly faster, and post proc shaders are less
 	  * likely to need it. So perhaps allow different formats in one post
 	  * effect manager ... */
+	// Should work everywhere
 	case qualInt8:    textureFmt = "argb8"; break;
-	case qualInt10:   textureFmt = "rgb10"; break;
+	/* NV G80: works. (Note: 'Pure' rgb10 does *not* work well)
+	   ATI: presumably also, minimum HW unknown.
+	   Others: unknown. Probably not.
+	   */
+	case qualInt10:   textureFmt = "a2rgb10"; break;
+	/* NV G80: Does not work. (Variations in component order or adding
+	           alpha does not improve things. 
+	   ATI: posibbly. Must be tested.
+	   Others: unknown.*/
 	case qualInt16:   textureFmt = "rgb16"; break;
 	case qualFloat16: textureFmt = "bgr16_f"; break;
 	case qualFloat32: textureFmt = "bgr32_f"; break;
@@ -58,15 +67,15 @@ namespace CS
       csShaderVariable* svHdrScale =
 	shaderManager->GetVariableAdd (svNameStringSet->Request (
 	  "hdr scale"));
-      if ((quality == qualInt8) || (quality == qualInt16))
+      if ((quality == qualInt8) || (quality == qualInt10)
+          || (quality == qualInt16))
 	svHdrScale->SetValue (csVector4 (colorRange, 1.0f/colorRange, 0, 0));
       else
 	svHdrScale->SetValue (csVector4 (1, 1, 0, 0));
 	
       csRef<iLoader> loader (csQueryRegistry<iLoader> (objectReg));
       if (!loader) return false;
-      csRef<iShader> map =
-	loader->LoadShader ("/shader/postproc/hdr/default-map.xml");
+      csRef<iShader> map = loader->LoadShader ("/shader/postproc/hdr/default-map.xml");
       if (!map) return false;
       measureLayer = postEffects.GetLastLayer();
       mappingLayer = postEffects.AddLayer (map);
@@ -102,7 +111,7 @@ namespace CS
     
     HDRHelper::Quality HDRSettings::GetQuality()
     {
-      HDRHelper::Quality qual = HDRHelper::qualInt8;
+      HDRHelper::Quality qual = HDRHelper::qualInt10;
       
       const char* qualStr = config->GetStr (
         csString ().Format ("%s.HDR.Quality", prefix.GetData()), 0);

@@ -19,6 +19,7 @@
 #ifndef __CS_RM_UNSHADOWED_H__
 #define __CS_RM_UNSHADOWED_H__
 
+#include "csplugincommon/rendermanager/autofx_framebuffertex.h"
 #include "csplugincommon/rendermanager/autofx_reflrefr.h"
 #include "csplugincommon/rendermanager/debugcommon.h"
 #include "csplugincommon/rendermanager/hdrexposure.h"
@@ -58,6 +59,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
     {
       targets.UnregisterRenderTarget (target, subtexture);
     }
+    virtual void MarkAsUsed (iTextureHandle* target)
+    {
+      targets.MarkAsUsed (target);
+    }
   
     void ClearLayers() { postEffects.ClearLayers(); }
     bool AddLayersFromDocument (iDocumentNode* node)
@@ -93,9 +98,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
     typedef CS::RenderManager::LightSetup<RenderTreeType, 
       CS::RenderManager::MultipleRenderLayer> LightSetupType;
 
-    typedef CS::RenderManager::AutoFX_ReflectRefract<RenderTreeType, 
+    typedef CS::RenderManager::AutoFX::ReflectRefract<RenderTreeType, 
       ContextSetupType> AutoReflectRefractType;
 
+    typedef CS::RenderManager::AutoFX::FramebufferTex<RenderTreeType>
+      AutoFramebufferTexType;
   public:
     iObjectRegistry* objectReg;
 
@@ -106,6 +113,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMUnshadowed)
     PortalSetupType::PersistentData portalPersistent;
     LightSetupType::PersistentData lightPersistent;
     AutoReflectRefractType::PersistentData reflectRefractPersistent;
+    AutoFramebufferTexType::PersistentData framebufferTexPersistent;
 
     CS::RenderManager::PostEffectManager       postEffects;
     CS::RenderManager::HDRHelper hdr;

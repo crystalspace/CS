@@ -41,7 +41,7 @@ typedef void* OSXEventHandle;
 typedef void* OSXViewHandle;
 #define ND_PROTO(RET,FUNC) RET OSXDelegate_##FUNC
 
-static NSAutoreleasePool* CS_GLOBAL_POOL = 0;
+static NSAutoreleasePool* CS_GLOBAL_POOL = nil;
 
 //-----------------------------------------------------------------------------
 // For each keystroke, Crystal Space expects a raw key code and a cooked
@@ -429,7 +429,7 @@ ND_PROTO(void,flush_graphics_context)(OSXDelegateHandle handle)
     if (new_state)
     {
       modifiers |= csmask;
-      OSXAssistant_key_down(assistant, key, key);
+      OSXAssistant_key_down(assistant, key, key, FALSE);
     }
     else
     {
@@ -451,10 +451,10 @@ ND_PROTO(void,flush_graphics_context)(OSXDelegateHandle handle)
     if ([self classifyKeyDown:p raw:&raw cooked:&cooked])
     {
       if (flag)
-        OSXAssistant_key_down(assistant, raw, cooked);
+        OSXAssistant_key_down(assistant, raw, cooked, [p isARepeat]);
       else
         OSXAssistant_key_up(assistant, raw, cooked);
-    }
+    }	
   }
 }
 
@@ -512,6 +512,16 @@ ND_PROTO(void,flush_graphics_context)(OSXDelegateHandle handle)
   }
 }
 
+- (void)scrollWheel:(NSEvent*)p forView:(NSView*)v button:(int)button
+{ 
+  if (!paused)
+  {
+    int x, y;
+    [self localize:p toView:v x:&x y:&y];
+    OSXAssistant_wheel_moved(assistant, button, x, y);
+  }
+}
+
 - (void)mouseDragged:(NSEvent*)p forView:(NSView*)v
   { [self mouseMoved:p forView:v]; }
 
@@ -534,7 +544,12 @@ ND_PROTO(void,flush_graphics_context)(OSXDelegateHandle handle)
   else
     [self mouseDown:p forView:v button:csmbRight];
 }
-
+- (void)scrollWheel:(NSEvent*)p forView:(NSView*)v
+{
+  [self scrollWheel:p forView:v
+    button:([p deltaY] > 0.0 ? csmbWheelUp : csmbWheelDown)];
+}
+				
 - (void)dispatchEvent:(NSEvent*)e forView:(NSView*)v
 {
   switch ([e type])
@@ -549,6 +564,7 @@ ND_PROTO(void,flush_graphics_context)(OSXDelegateHandle handle)
     case NSRightMouseDown:    [self rightMouseDown:e    forView:v]; break;
     case NSRightMouseUp:      [self rightMouseUp:e      forView:v]; break;
     case NSRightMouseDragged: [self rightMouseDragged:e forView:v]; break;
+    case NSScrollWheel:       [self scrollWheel:e       forView:v]; break;
     default:                                                        break;
   }
 }

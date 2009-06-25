@@ -1268,6 +1268,7 @@ void csPortalContainer::ComputeScreenPolygons (iRenderView* rview,
 	  csPoly3D::Classify (*farplane, verts, num_verts) != CS_POL_FRONT)
         && DoPerspective (outlet, verts, num_verts, mirrored,
 	  camera_planes[i]) 
+	&& (poly2D.GetSignedArea() < 0)
         && outlet.ClipAgainst (rview->GetClipper ()))
       {
         outHelper.AddPoly (poly2D, poly3D);
@@ -1287,7 +1288,10 @@ void csPortalContainer::ComputeScreenPolygons (iRenderView* rview,
       int j;
       for (j = 0 ; j < num_vertices ; j++)
 	outlet.Add (camera_vertices[vt[j]]);
-      outHelper.AddPoly (poly2D, poly3D);
+      if (poly2D.GetSignedArea() < 0)
+	outHelper.AddPoly (poly2D, poly3D);
+      else
+	outHelper.AddEmpty ();
     }
   }
 }

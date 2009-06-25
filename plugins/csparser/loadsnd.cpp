@@ -23,6 +23,7 @@
 
 #include "cssysdef.h"
 
+#include "cstool/vfsdirchange.h"
 #include "iengine/engine.h"
 #include "isndsys/ss_loader.h"
 #include "isndsys/ss_manager.h"
@@ -36,9 +37,12 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 {
-  THREADED_CALLABLE_IMPL2(csThreadedLoader, LoadSoundSysData, const char* filename,
+  THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadSoundSysData, const char* cwd, const char* filename,
     bool do_verbose)
   {
+    csVfsDirectoryChanger dirChange(vfs);
+    dirChange.ChangeToFull(cwd);
+
     if (!SndSysLoader)
     {
       return false;
@@ -67,19 +71,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     ret->SetResult(csRef<iBase>(Sound));
+
+    if(sync)
+    {
+      Engine->SyncEngineListsWait(this);
+    }
+
     return true;
   }
 
-  THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadSoundStream, const char* fname, int mode3d,
+  THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadSoundStream, const char* cwd, const char* fname, int mode3d,
     bool do_verbose)
   {
+    csVfsDirectoryChanger dirChange(vfs);
+    dirChange.ChangeToFull(cwd);
+
     if (!SndSysRenderer)
     {
       return false;
     }
 
     csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-    if (!LoadSoundSysDataTC (itr, fname, do_verbose))
+    if (!LoadSoundSysDataTC (itr, false, cwd, fname, do_verbose))
     {
       return false;
     }
@@ -96,12 +109,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     }
 
     ret->SetResult(csRef<iBase>(stream));
+
+    if(sync)
+    {
+      Engine->SyncEngineListsWait(this);
+    }
+
     return true;
   }
 
-  THREADED_CALLABLE_IMPL3(csThreadedLoader, LoadSoundWrapper, const char* name,
+  THREADED_CALLABLE_IMPL4(csThreadedLoader, LoadSoundWrapper, const char* cwd, const char* name,
     const char* fname, bool do_verbose)
   {
+    csVfsDirectoryChanger dirChange(vfs);
+    dirChange.ChangeToFull(cwd);
+
     if (!SndSysManager)
     {
       return false;
@@ -109,7 +131,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     // load the sound handle
     csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
-    if (!LoadSoundSysDataTC (itr, fname, do_verbose))
+    if (!LoadSoundSysDataTC (itr, false, vfs->GetCwd(), fname, do_verbose))
     {
       return false;
     }
@@ -119,6 +141,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     csRef<iSndSysData> data = scfQueryInterface<iSndSysData>(itr->GetResultRefPtr());
     wrapper->SetData(data);
     ret->SetResult(csRef<iBase>(wrapper));
+
+    if(sync)
+    {
+      Engine->SyncEngineListsWait(this);
+    }
+
     return true;
   }
 }

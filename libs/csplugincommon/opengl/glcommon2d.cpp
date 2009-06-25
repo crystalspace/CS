@@ -166,15 +166,12 @@ bool csGraphics2DGLCommon::Open ()
     (ext.CS_GL_ARB_texture_env_combine || ext.CS_GL_EXT_texture_env_combine);
   if (useCombineTE)
   {
-    GLint texUnits;
-    glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &texUnits);
-    for (GLint u = texUnits - 1; u >= 0; u--)
+    for (GLint u = statecache->GetNumTexCoords(); u-- > 0; )
     {
-      statecache->SetCurrentTU (u);
-      statecache->ActivateTU (csGLStateCache::activateTexEnv);
+      statecache->SetCurrentTCUnit (u);
+      statecache->ActivateTCUnit (csGLStateCache::activateTexEnv);
       glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
     }
-    statecache->ActivateTU (csGLStateCache::activateTexCoord);
   }
   ext.InitGL_ARB_multisample();
 

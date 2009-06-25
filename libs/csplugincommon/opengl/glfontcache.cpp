@@ -894,12 +894,13 @@ void csGLFontCache::BeginText ()
 {
   if (textWriting) return;
 
+  statecache->SetCurrentTCUnit (0);
+  statecache->ActivateTCUnit (csGLStateCache::activateTexCoord);
+  
   vaEnabled = statecache->IsEnabled_GL_VERTEX_ARRAY ();
   tcaEnabled = statecache->IsEnabled_GL_TEXTURE_COORD_ARRAY ();
   caEnabled = statecache->IsEnabled_GL_COLOR_ARRAY ();
 
-  statecache->SetCurrentTU (0);
-  statecache->ActivateTU (csGLStateCache::activateTexCoord);
   statecache->Enable_GL_VERTEX_ARRAY();
   statecache->Enable_GL_TEXTURE_COORD_ARRAY();
   statecache->Disable_GL_COLOR_ARRAY();

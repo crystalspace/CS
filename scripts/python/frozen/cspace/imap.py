@@ -121,6 +121,7 @@ class csLoaderReturn(object):
     def SetResult(*args): return _imap.csLoaderReturn_SetResult(*args)
     def Copy(*args): return _imap.csLoaderReturn_Copy(*args)
     def Wait(*args): return _imap.csLoaderReturn_Wait(*args)
+    def SetWaitPtrs(*args): return _imap.csLoaderReturn_SetWaitPtrs(*args)
 csLoaderReturn_swigregister = _imap.csLoaderReturn_swigregister
 csLoaderReturn_swigregister(csLoaderReturn)
 
@@ -219,6 +220,7 @@ class iThreadedLoader(core.iBase):
     def AddTextureToList(*args): return _imap.iThreadedLoader_AddTextureToList(*args)
     def AddMaterialToList(*args): return _imap.iThreadedLoader_AddMaterialToList(*args)
     def AddSharedVarToList(*args): return _imap.iThreadedLoader_AddSharedVarToList(*args)
+    def MarkSyncDone(*args): return _imap.iThreadedLoader_MarkSyncDone(*args)
     __swig_destroy__ = _imap.delete_iThreadedLoader
     __del__ = lambda self : None;
 iThreadedLoader_swigregister = _imap.iThreadedLoader_swigregister

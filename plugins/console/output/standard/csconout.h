@@ -218,14 +218,20 @@ private:
       return parent ? parent->HandleEvent(e) : false; 
     }
     CS_EVENTHANDLER_NAMES("crystalspace.console")
-      virtual const csHandlerID * GenericPrec(
+    virtual const csHandlerID * GenericPrec(
       csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,
       csEventID e) const
     {
       if (e == csevSystemOpen (r2)) {
         /* TODO : not thread-safe */
         static csHandlerID precs[2] =
-        { r1->GetGenericID("crystalspace.graphics3d"), CS_HANDLERLIST_END };
+        { CS_HANDLERLIST_END, CS_HANDLERLIST_END };
+	static bool precs_init;
+	if (!precs_init)
+	{
+	  precs_init = true;
+	  precs[0] = r1->GetGenericID("crystalspace.graphics3d");
+	}
         return precs;
       } else {
         return 0;

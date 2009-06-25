@@ -82,7 +82,7 @@ bool csPluginRequest::operator==(csPluginRequest const& r) const
 }
 
 iObjectRegistry* csInitializer::CreateEnvironment (
-  int argc, char const* const argv[])
+  int argc, char const* const argv[], bool scanDefaultPluginPaths)
 {
   CS_INITIALIZE_PLATFORM_APPLICATION;
 
@@ -109,7 +109,7 @@ iObjectRegistry* csInitializer::CreateEnvironment (
   }
   
   iObjectRegistry* reg = 0;
-  if (InitializeSCF (argc, argv))
+  if (InitializeSCF (argc, argv, scanDefaultPluginPaths))
   {
     iObjectRegistry* r = CreateObjectRegistry();
     if (r != 0)
@@ -137,9 +137,10 @@ iObjectRegistry* csInitializer::CreateEnvironment (
   return reg;
 }
 
-bool csInitializer::InitializeSCF (int argc, const char* const argv[])
+bool csInitializer::InitializeSCF (int argc, const char* const argv[],
+                                   bool scanDefaultPluginPaths)
 {
-  scfInitialize (argc, argv);
+  scfInitialize (argc, argv, scanDefaultPluginPaths);
 
   return true;
 }

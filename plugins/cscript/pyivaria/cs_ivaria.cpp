@@ -146,7 +146,7 @@ template <typename T> T SwigValueInit() {
     #ifdef _MSC_VER
     #include <io.h>
     #include <stdarg.h>
-    #ifndef DEBUG_PYTHON
+    #if defined(_DEBUG) && !defined(DEBUG_PYTHON)
     #undef _DEBUG
     #define RESTORE__DEBUG
     #endif
@@ -11859,7 +11859,41 @@ SWIGINTERN PyObject *csCollisionPairArrayReadOnly_swigregister(PyObject *SWIGUNU
   return SWIG_Py_Void();
 }
 
-SWIGINTERN PyObject *_wrap_csCollisionPairArrayChangeElements_Get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csCollisionPairArrayChangeElements_Get__SWIG_0_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iArrayChangeElements<csCollisionPair > *arg1 = (iArrayChangeElements<csCollisionPair > *) 0 ;
+  size_t arg2 ;
+  csCollisionPair *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csCollisionPairArrayChangeElements_Get",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeElementsTcsCollisionPair_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCollisionPairArrayChangeElements_Get" "', argument " "1"" of type '" "iArrayChangeElements<csCollisionPair > const *""'"); 
+  }
+  arg1 = reinterpret_cast< iArrayChangeElements<csCollisionPair > * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csCollisionPairArrayChangeElements_Get" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  {
+    csCollisionPair const &_result_ref = ((iArrayChangeElements<csCollisionPair > const *)arg1)->Get(arg2);
+    result = (csCollisionPair *) &_result_ref;
+  }
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csCollisionPair, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csCollisionPairArrayChangeElements_Get__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iArrayChangeElements<csCollisionPair > *arg1 = (iArrayChangeElements<csCollisionPair > *) 0 ;
   size_t arg2 ;
@@ -11893,7 +11927,79 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csCollisionPairArrayChangeElements_Top(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csCollisionPairArrayChangeElements_Get(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[3];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iArrayChangeElementsTcsCollisionPair_t, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        return _wrap_csCollisionPairArrayChangeElements_Get__SWIG_1(self, args);
+      }
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iArrayChangeElementsTcsCollisionPair_t, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        return _wrap_csCollisionPairArrayChangeElements_Get__SWIG_0_0(self, args);
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csCollisionPairArrayChangeElements_Get'.\n  Possible C/C++ prototypes are:\n""    Get(iArrayChangeElements<csCollisionPair > const *,size_t)\n""    Get(iArrayChangeElements<csCollisionPair > *,size_t)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csCollisionPairArrayChangeElements_Top__SWIG_0_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iArrayChangeElements<csCollisionPair > *arg1 = (iArrayChangeElements<csCollisionPair > *) 0 ;
+  csCollisionPair *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csCollisionPairArrayChangeElements_Top",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeElementsTcsCollisionPair_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csCollisionPairArrayChangeElements_Top" "', argument " "1"" of type '" "iArrayChangeElements<csCollisionPair > const *""'"); 
+  }
+  arg1 = reinterpret_cast< iArrayChangeElements<csCollisionPair > * >(argp1);
+  {
+    csCollisionPair const &_result_ref = ((iArrayChangeElements<csCollisionPair > const *)arg1)->Top();
+    result = (csCollisionPair *) &_result_ref;
+  }
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csCollisionPair, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csCollisionPairArrayChangeElements_Top__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iArrayChangeElements<csCollisionPair > *arg1 = (iArrayChangeElements<csCollisionPair > *) 0 ;
   csCollisionPair *result = 0 ;
@@ -11914,6 +12020,41 @@ SWIGINTERN PyObject *_wrap_csCollisionPairArrayChangeElements_Top(PyObject *SWIG
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csCollisionPair, 0 |  0 );
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csCollisionPairArrayChangeElements_Top(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[2];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 1); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iArrayChangeElementsTcsCollisionPair_t, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_csCollisionPairArrayChangeElements_Top__SWIG_1(self, args);
+    }
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iArrayChangeElementsTcsCollisionPair_t, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_csCollisionPairArrayChangeElements_Top__SWIG_0_0(self, args);
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csCollisionPairArrayChangeElements_Top'.\n  Possible C/C++ prototypes are:\n""    Top(iArrayChangeElements<csCollisionPair > const *)\n""    Top(iArrayChangeElements<csCollisionPair > *)\n");
   return NULL;
 }
 

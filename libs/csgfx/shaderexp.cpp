@@ -285,8 +285,10 @@ static const op_args_info optimize_arg_table[] =
 };
 
 // Comparison mixins
-
-namespace
+/* Used to be an anonymous namespaces, but that caused trouble on MinGW shared
+   builds. Use a reasonably unique name instead (derived from a UUID). */
+#define CMPNS   __c4444fec_124f_4500_a9ec_cbcff16718f5
+namespace CMPNS
 {
   struct LT
   {
@@ -313,6 +315,7 @@ namespace
     bool operator() (float a, float b) const { return a != b; }
   };
 }
+using namespace CMPNS;
 
 /* Note on vector default values:
 * - Constant vectors should default to x=0,y=0,z=0,w=1 for unspecified fields.
@@ -2587,13 +2590,11 @@ static csStringID GetTokenID (const TokenTabEntry* tokenTab,
   size_t tokenCount, const char* token)
 {
   const char* p = token;
-  const size_t tokenLen = strlen (token);
-  size_t pos = 0;
   size_t l = 0, h = tokenCount;
   while (l < h)
   {
     size_t m = (l+h) / 2;
-    if (pos > tokenTab[m].tokenLen) return csInvalidStringID;
+    size_t pos = 0;
     const char* tabTok = tokenTab[m].token;
     int d = *tabTok - *p;
     if (d == 0)
@@ -2601,19 +2602,19 @@ static csStringID GetTokenID (const TokenTabEntry* tokenTab,
       do
       {
         pos++;
-      } while ((d = (tabTok[pos] - p[pos])) == 0 && tabTok[pos] != 0);
-      if (pos == tokenLen)
+      } while ((d = (tabTok[pos] - p[pos])) == 0
+          && (tabTok[pos] != 0)
+          && (token[pos] != 0));
+      if ((d == 0) && (tabTok[pos] == 0) && (token[pos] == 0))
         return tokenTab[m].id;
     }
     if (d < 0)
     {
       l = m+1;
-      pos = 0;
     }
     else
     {
       h = m;
-      pos = 0;
     }
   }
   return csInvalidStringID;

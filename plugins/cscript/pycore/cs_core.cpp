@@ -146,7 +146,7 @@ template <typename T> T SwigValueInit() {
     #ifdef _MSC_VER
     #include <io.h>
     #include <stdarg.h>
-    #ifndef DEBUG_PYTHON
+    #if defined(_DEBUG) && !defined(DEBUG_PYTHON)
     #undef _DEBUG
     #define RESTORE__DEBUG
     #endif
@@ -18235,7 +18235,60 @@ SWIGINTERN PyObject *csPluginRequest_swigregister(PyObject *SWIGUNUSEDPARM(self)
   return SWIG_Py_Void();
 }
 
-SWIGINTERN PyObject *_wrap_csInitializer__CreateEnvironment(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csInitializer__CreateEnvironment__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int arg1 ;
+  char **arg2 ;
+  bool arg3 ;
+  iObjectRegistry *result = 0 ;
+  bool val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csInitializer__CreateEnvironment",2,2,&obj0,&obj1)) SWIG_fail;
+  {
+    if (!PyList_Check(obj0))
+    {
+      PyErr_SetString(PyExc_TypeError, "not a list");
+      return 0;
+    }
+    arg1 = PyList_Size(obj0);
+    typedef char * Char_Ptr;
+    arg2 = new Char_Ptr[arg1 + 1];
+    for (int i = 0; i < arg1; ++i)
+    {
+      PyObject * o = PyList_GetItem(obj0, i);
+      if (!PyString_Check(o))
+      {
+        PyErr_SetString(PyExc_TypeError, "list must contain strings");
+        delete [] arg2;
+        return 0;
+      }
+      arg2[i] = PyString_AsString(o);
+    }
+    arg2[arg1] = 0;
+  }
+  ecode3 = SWIG_AsVal_bool(obj1, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csInitializer__CreateEnvironment" "', argument " "3"" of type '" "bool""'");
+  } 
+  arg3 = static_cast< bool >(val3);
+  result = (iObjectRegistry *)csInitializer::CreateEnvironment(arg1,(char const *const (*))arg2,arg3);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iObjectRegistry, 0 |  0 );
+  {
+    delete [] arg2;
+  }
+  return resultobj;
+fail:
+  {
+    delete [] arg2;
+  }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csInitializer__CreateEnvironment__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int arg1 ;
   char **arg2 ;
@@ -18279,7 +18332,111 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csInitializer__InitializeSCF(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csInitializer__CreateEnvironment(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[3];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 1) {
+    int _v;
+    {
+      int res = SWIG_AsVal_int(argv[0], NULL);
+      _v = SWIG_CheckState(res);
+    }
+    if (_v) {
+      if (argc <= 1) {
+        return _wrap_csInitializer__CreateEnvironment__SWIG_1(self, args);
+      }
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_p_char, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_csInitializer__CreateEnvironment__SWIG_1(self, args);
+      }
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    {
+      int res = SWIG_AsVal_int(argv[0], NULL);
+      _v = SWIG_CheckState(res);
+    }
+    if (_v) {
+      {
+        int res = SWIG_AsVal_bool(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        return _wrap_csInitializer__CreateEnvironment__SWIG_0(self, args);
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csInitializer__CreateEnvironment'.\n  Possible C/C++ prototypes are:\n""    CreateEnvironment(int,char const *const [],bool)\n""    csInitializer::CreateEnvironment(int,char const *const [])\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csInitializer__InitializeSCF__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int arg1 ;
+  char **arg2 ;
+  bool arg3 ;
+  bool result;
+  bool val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csInitializer__InitializeSCF",2,2,&obj0,&obj1)) SWIG_fail;
+  {
+    if (!PyList_Check(obj0))
+    {
+      PyErr_SetString(PyExc_TypeError, "not a list");
+      return 0;
+    }
+    arg1 = PyList_Size(obj0);
+    typedef char * Char_Ptr;
+    arg2 = new Char_Ptr[arg1 + 1];
+    for (int i = 0; i < arg1; ++i)
+    {
+      PyObject * o = PyList_GetItem(obj0, i);
+      if (!PyString_Check(o))
+      {
+        PyErr_SetString(PyExc_TypeError, "list must contain strings");
+        delete [] arg2;
+        return 0;
+      }
+      arg2[i] = PyString_AsString(o);
+    }
+    arg2[arg1] = 0;
+  }
+  ecode3 = SWIG_AsVal_bool(obj1, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "csInitializer__InitializeSCF" "', argument " "3"" of type '" "bool""'");
+  } 
+  arg3 = static_cast< bool >(val3);
+  result = (bool)csInitializer::InitializeSCF(arg1,(char const *const (*))arg2,arg3);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  {
+    delete [] arg2;
+  }
+  return resultobj;
+fail:
+  {
+    delete [] arg2;
+  }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csInitializer__InitializeSCF__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int arg1 ;
   char **arg2 ;
@@ -18319,6 +18476,57 @@ fail:
   {
     delete [] arg2;
   }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csInitializer__InitializeSCF(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[3];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 1) {
+    int _v;
+    {
+      int res = SWIG_AsVal_int(argv[0], NULL);
+      _v = SWIG_CheckState(res);
+    }
+    if (_v) {
+      if (argc <= 1) {
+        return _wrap_csInitializer__InitializeSCF__SWIG_1(self, args);
+      }
+      void *vptr = 0;
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_p_char, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_csInitializer__InitializeSCF__SWIG_1(self, args);
+      }
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    {
+      int res = SWIG_AsVal_int(argv[0], NULL);
+      _v = SWIG_CheckState(res);
+    }
+    if (_v) {
+      {
+        int res = SWIG_AsVal_bool(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        return _wrap_csInitializer__InitializeSCF__SWIG_0(self, args);
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csInitializer__InitializeSCF'.\n  Possible C/C++ prototypes are:\n""    InitializeSCF(int,char const *const [],bool)\n""    csInitializer::InitializeSCF(int,char const *const [])\n");
   return NULL;
 }
 

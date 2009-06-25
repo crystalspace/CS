@@ -25,11 +25,12 @@
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
-#include "csplugincommon/particlesys/partgen.h"
 #include "imesh/emit.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iengine/movable.h"
+
+#include "partgen.h"
 
 struct iMaterialWrapper;
 class csEmitMeshObject;
@@ -437,6 +438,7 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
 
   // Redirect some iEmitState functions to the csParticleSystem implemenation
+  using csParticleSystem::SetParticleCount;
   virtual void SetParticleCount (int num)
   { csParticleSystem::SetParticleCount (num); }
   virtual size_t GetParticleCount () const

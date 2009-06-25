@@ -107,6 +107,10 @@ public:
   iTextureHandle* GetRenderTarget (csRenderTargetAttachment attachment = rtaColor0,
     int* subtexture = 0) const;
   void UnsetRenderTargets();
+  void CopyFromRenderTargets (size_t num, 
+    csRenderTargetAttachment* attachments,
+    iTextureHandle** textures,
+    int* subtextures = 0) {}
   
   bool BeginDraw (int DrawFlags);
   void FinishDraw ();

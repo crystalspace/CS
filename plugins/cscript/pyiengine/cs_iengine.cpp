@@ -146,7 +146,7 @@ template <typename T> T SwigValueInit() {
     #ifdef _MSC_VER
     #include <io.h>
     #include <stdarg.h>
-    #ifndef DEBUG_PYTHON
+    #if defined(_DEBUG) && !defined(DEBUG_PYTHON)
     #undef _DEBUG
     #define RESTORE__DEBUG
     #endif
@@ -7112,7 +7112,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_iSector_RemoveMeshGenerator(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_iSector_RemoveMeshGenerator__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iSector *arg1 = (iSector *) 0 ;
   size_t arg2 ;
@@ -7138,6 +7138,84 @@ SWIGINTERN PyObject *_wrap_iSector_RemoveMeshGenerator(PyObject *SWIGUNUSEDPARM(
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSector_RemoveMeshGenerator__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSector *arg1 = (iSector *) 0 ;
+  char *arg2 = (char *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSector_RemoveMeshGenerator",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSector, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSector_RemoveMeshGenerator" "', argument " "1"" of type '" "iSector *""'"); 
+  }
+  arg1 = reinterpret_cast< iSector * >(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iSector_RemoveMeshGenerator" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  (arg1)->RemoveMeshGenerator((char const *)arg2);
+  resultobj = SWIG_Py_Void();
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSector_RemoveMeshGenerator(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[3];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iSector, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        return _wrap_iSector_RemoveMeshGenerator__SWIG_0(self, args);
+      }
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iSector, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = SWIG_AsCharPtrAndSize(argv[1], 0, NULL, 0);
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        return _wrap_iSector_RemoveMeshGenerator__SWIG_1(self, args);
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'iSector_RemoveMeshGenerator'.\n  Possible C/C++ prototypes are:\n""    RemoveMeshGenerator(iSector *,size_t)\n""    RemoveMeshGenerator(iSector *,char const *)\n");
   return NULL;
 }
 
@@ -34729,6 +34807,36 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iRenderManagerTargets_MarkAsUsed(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iRenderManagerTargets *arg1 = (iRenderManagerTargets *) 0 ;
+  iTextureHandle *arg2 = (iTextureHandle *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iRenderManagerTargets_MarkAsUsed",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iRenderManagerTargets, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iRenderManagerTargets_MarkAsUsed" "', argument " "1"" of type '" "iRenderManagerTargets *""'"); 
+  }
+  arg1 = reinterpret_cast< iRenderManagerTargets * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_iTextureHandle, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iRenderManagerTargets_MarkAsUsed" "', argument " "2"" of type '" "iTextureHandle *""'"); 
+  }
+  arg2 = reinterpret_cast< iTextureHandle * >(argp2);
+  (arg1)->MarkAsUsed(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iRenderManagerTargets_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -36439,6 +36547,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iRenderManager_swigregister", iRenderManager_swigregister, METH_VARARGS, NULL},
 	 { (char *)"iRenderManagerTargets_RegisterRenderTarget", _wrap_iRenderManagerTargets_RegisterRenderTarget, METH_VARARGS, NULL},
 	 { (char *)"iRenderManagerTargets_UnregisterRenderTarget", _wrap_iRenderManagerTargets_UnregisterRenderTarget, METH_VARARGS, NULL},
+	 { (char *)"iRenderManagerTargets_MarkAsUsed", _wrap_iRenderManagerTargets_MarkAsUsed, METH_VARARGS, NULL},
 	 { (char *)"iRenderManagerTargets_scfGetVersion", _wrap_iRenderManagerTargets_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iRenderManagerTargets", _wrap_delete_iRenderManagerTargets, METH_VARARGS, NULL},
 	 { (char *)"iRenderManagerTargets_swigregister", iRenderManagerTargets_swigregister, METH_VARARGS, NULL},
@@ -38460,5 +38569,6 @@ SWIGEXPORT void SWIG_init(void) {
   SWIG_Python_SetConstant(d, "CS_PORTAL_VISCULL",SWIG_From_int(static_cast< int >(0x00000100)));
   SWIG_Python_SetConstant(d, "CS_DEFAULT_RENDERLOOP_NAME",SWIG_FromCharPtr("*default"));
   SWIG_Python_SetConstant(d, "iRenderManagerTargets_updateOnce",SWIG_From_int(static_cast< int >(iRenderManagerTargets::updateOnce)));
+  SWIG_Python_SetConstant(d, "iRenderManagerTargets_assumeAlwaysUsed",SWIG_From_int(static_cast< int >(iRenderManagerTargets::assumeAlwaysUsed)));
 }
 

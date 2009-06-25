@@ -200,6 +200,7 @@ platforms = [
     name => 'Win32',
     suffix => '',
     targetmachine => 1,
+    min_vc_version => 70,
     debugformat_debug => 4,
     debugformat_release => 3
   },
@@ -207,6 +208,7 @@ platforms = [
     name => 'x64',
     suffix => '-x64',
     targetmachine => 17,
+    min_vc_version => 80,
     debugformat_debug => 3,
     debugformat_release => 3
   }

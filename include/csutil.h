@@ -152,6 +152,7 @@
 #include "csutil/threading/barrier.h"
 #include "csutil/threading/condition.h"
 #include "csutil/threading/mutex.h"
+#include "csutil/threading/rwmutex.h"
 #include "csutil/threading/thread.h"
 #include "csutil/threading/tls.h"
 #include "csutil/threadjobqueue.h"
@@ -174,6 +175,7 @@
 #if defined(CS_PLATFORM_MACOSX)
 #include "csutil/macosx/OSXAssistant.h"
 #elif defined(CS_PLATFORM_WIN32)
+#include "csutil/win32/cachedll.h"
 #include "csutil/win32/callstack.h"
 #include "csutil/win32/csconfig-msvc.h"
 #include "csutil/win32/DbgHelpAPI.h"

@@ -47,7 +47,7 @@ namespace CS
       if (defaultShader != 0)
       {
 	csRef<iLoader> loader (csQueryRegistry<iLoader> (objReg));
-	shadowDefaultShader = loader->LoadShader (defaultShader);
+  shadowDefaultShader = loader->LoadShader (defaultShader);
       }
       
       const char* postEffectsLayers = cfg->GetStr (

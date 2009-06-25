@@ -69,10 +69,6 @@ void csGLShaderFVP::Deactivate()
 {
 }
 
-const uint tuFlags = csGLStateCache::activateMatrix
-  | csGLStateCache::activateTexGen
-  | csGLStateCache::activateTexEnable;
-
 void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/, 
                                 csRenderMeshModes& /*modes*/,
 				const csShaderVariableStack& stack)
@@ -164,8 +160,9 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
 
   for (i=0; i<layers.GetSize (); i++)
   {
-    statecache->SetCurrentTU ((int)i);
-    statecache->ActivateTU (tuFlags);
+    statecache->SetCurrentTCUnit ((int)i);
+    statecache->ActivateTCUnit (csGLStateCache::activateTexGen
+      | csGLStateCache::activateMatrix);
     if (layers[i].texgen == TEXGEN_PROJECTION)
     {
         if (!lights.GetSize ())
@@ -538,8 +535,8 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
 
   if (shaderPlug->ext->CS_GL_ARB_multitexture)
   {
-    statecache->SetCurrentTU (0);
-    statecache->ActivateTU (tuFlags);
+    statecache->SetCurrentTCUnit (0);
+    statecache->ActivateTCUnit (csGLStateCache::activateTexGen);
   }
 
   var = csGetShaderVariableFromStack (stack, primcolvar);
@@ -571,8 +568,9 @@ void csGLShaderFVP::ResetState ()
   i = layers.GetSize ();
   while (i-- > 0)
   {
-    statecache->SetCurrentTU ((int)i);
-    statecache->ActivateTU (tuFlags);
+    statecache->SetCurrentTCUnit ((int)i);
+    statecache->ActivateTCUnit (csGLStateCache::activateTexGen
+      | csGLStateCache::activateMatrix);
     if ((layers[i].texgen != TEXGEN_NONE) ||
       (layers[i].texMatrixOps.GetSize () > 0))
     {
@@ -587,8 +585,8 @@ void csGLShaderFVP::ResetState ()
   }
   if (shaderPlug->ext->CS_GL_ARB_multitexture)
   {
-    statecache->SetCurrentTU (0);
-    statecache->ActivateTU (tuFlags);
+    statecache->SetCurrentImageUnit (0);
+    statecache->ActivateImageUnit ();
   }
 }
 

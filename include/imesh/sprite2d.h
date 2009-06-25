@@ -222,9 +222,13 @@ struct iSprite2DFactoryState : public virtual iBase
  */
 struct iSprite2DState : public iSprite2DFactoryState
 {
-  SCF_INTERFACE (iSprite2DState, 1, 1, 0);
+  SCF_INTERFACE (iSprite2DState, 1, 1, 1);
 
-  /// Get the vertex array.
+  /**
+   * Get the vertex array.
+   * \warning This may actually be the factory's vertices! If you want to
+   *  modify the vertices call EnsureVertexCopy() first.
+   */
   virtual iColoredVertices* GetVertices () = 0;
 
   /**
@@ -281,6 +285,14 @@ struct iSprite2DState : public iSprite2DFactoryState
    * false .. after last frame the normal texture is shown
    */
   virtual void PlayUVAnimation (int idx, int style, bool loop) = 0;
+  
+  /**
+   * Copies the vertices from the factory the mesh object if the mesh object
+   * doesn't own the vertices.
+   * This is necessary if vertices are to be changed in the mesh object: without
+   * copying, changing  the vertices affects the mesh factory.
+   */
+  virtual void EnsureVertexCopy () = 0;
 };
 
 /** @} */

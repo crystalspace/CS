@@ -146,7 +146,7 @@ template <typename T> T SwigValueInit() {
     #ifdef _MSC_VER
     #include <io.h>
     #include <stdarg.h>
-    #ifndef DEBUG_PYTHON
+    #if defined(_DEBUG) && !defined(DEBUG_PYTHON)
     #undef _DEBUG
     #define RESTORE__DEBUG
     #endif
@@ -17511,10 +17511,10 @@ SWIGINTERN PyObject *_wrap_csProcTexture_GetG3D(PyObject *SWIGUNUSEDPARM(self), 
   if(!PyArg_UnpackTuple(args,(char *)"csProcTexture_GetG3D",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csProcTexture, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csProcTexture_GetG3D" "', argument " "1"" of type '" "csProcTexture *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csProcTexture_GetG3D" "', argument " "1"" of type '" "csProcTexture const *""'"); 
   }
   arg1 = reinterpret_cast< csProcTexture * >(argp1);
-  result = (iGraphics3D *)(arg1)->GetG3D();
+  result = (iGraphics3D *)((csProcTexture const *)arg1)->GetG3D();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iGraphics3D, 0 |  0 );
   return resultobj;
 fail:
@@ -17533,11 +17533,33 @@ SWIGINTERN PyObject *_wrap_csProcTexture_GetG2D(PyObject *SWIGUNUSEDPARM(self), 
   if(!PyArg_UnpackTuple(args,(char *)"csProcTexture_GetG2D",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csProcTexture, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csProcTexture_GetG2D" "', argument " "1"" of type '" "csProcTexture *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csProcTexture_GetG2D" "', argument " "1"" of type '" "csProcTexture const *""'"); 
   }
   arg1 = reinterpret_cast< csProcTexture * >(argp1);
-  result = (iGraphics2D *)(arg1)->GetG2D();
+  result = (iGraphics2D *)((csProcTexture const *)arg1)->GetG2D();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iGraphics2D, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csProcTexture_GetObjectRegistry(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  csProcTexture *arg1 = (csProcTexture *) 0 ;
+  iObjectRegistry *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csProcTexture_GetObjectRegistry",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csProcTexture, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csProcTexture_GetObjectRegistry" "', argument " "1"" of type '" "csProcTexture const *""'"); 
+  }
+  arg1 = reinterpret_cast< csProcTexture * >(argp1);
+  result = (iObjectRegistry *)((csProcTexture const *)arg1)->GetObjectRegistry();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iObjectRegistry, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -18773,6 +18795,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"delete_csProcTexture", _wrap_delete_csProcTexture, METH_VARARGS, NULL},
 	 { (char *)"csProcTexture_GetG3D", _wrap_csProcTexture_GetG3D, METH_VARARGS, NULL},
 	 { (char *)"csProcTexture_GetG2D", _wrap_csProcTexture_GetG2D, METH_VARARGS, NULL},
+	 { (char *)"csProcTexture_GetObjectRegistry", _wrap_csProcTexture_GetObjectRegistry, METH_VARARGS, NULL},
 	 { (char *)"csProcTexture_DisableAutoUpdate", _wrap_csProcTexture_DisableAutoUpdate, METH_VARARGS, NULL},
 	 { (char *)"csProcTexture_Initialize", _wrap_csProcTexture_Initialize, METH_VARARGS, NULL},
 	 { (char *)"csProcTexture_PrepareAnim", _wrap_csProcTexture_PrepareAnim, METH_VARARGS, NULL},

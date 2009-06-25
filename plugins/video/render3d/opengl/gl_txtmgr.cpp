@@ -281,21 +281,21 @@ void csGLTextureManager::UnsetTexture (GLenum target, GLuint texture)
 
   if (csGLGraphics3D::ext->CS_GL_ARB_multitexture)
   {
-    int oldTU = -1;
+    int oldIU = -1;
     for (int u = 0; u < statecache->GetNumImageUnits(); u++)
     {
       if (statecache->GetTexture (target, u) == texture)
       {
-	if (oldTU == -1)
-          oldTU = statecache->GetCurrentTU ();
-        statecache->SetCurrentTU (u);
+	if (oldIU == -1)
+          oldIU = statecache->GetCurrentImageUnit ();
+        statecache->SetCurrentImageUnit (u);
 	statecache->SetTexture (target, 0);
       }
     }
-    if (oldTU != -1)
+    if (oldIU != -1)
     {
-      statecache->SetCurrentTU (oldTU);
-      statecache->ActivateTU (csGLStateCache::activateImage);
+      statecache->SetCurrentImageUnit (oldIU);
+      statecache->ActivateImageUnit ();
     }
   }
   else

@@ -320,6 +320,7 @@ public:
   //void PrepareLighting () {}
   /** @} */
 
+  using csProcTexture::UseTexture;
   virtual void UseTexture (iTextureWrapper*)
   { 
     if (!PrepareAnim ()) return;

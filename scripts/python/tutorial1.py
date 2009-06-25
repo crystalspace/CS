@@ -47,14 +47,17 @@ def CreateRoom (matname):
     if DEBUG: print 'loader=',loader
     matname = 'mystone'
     loader.LoadTexture (matname, "/lib/stdtex/bricks.jpg")
+    tm = engine.GetMaterialList().FindByName(matname)
     room = engine.GetSectors().FindByName("room")
-    walls = engine.CreateSectorWallsMesh(room, "walls")
-    if DEBUG: print 'walls=',walls
-    material=engine.GetMaterialList().FindByName(matname)
-    walls_state = walls.GetMeshObject().GetFactory().QueryInterface(iThingFactoryState)
-    walls_state.AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5))
-    walls_state.SetPolygonMaterial (CS_POLYRANGE_LAST, material);
-    walls_state.SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+
+    mapper = DensityTextureMapper(0.3)
+    box = TesselatedBox(csVector3(-5, 0, -5), csVector3(5, 20, 5))
+    box.SetLevel(3)
+    box.SetMapper(mapper)
+    box.SetFlags(Primitives.CS_PRIMBOX_INSIDE)
+    walls = GeneralMeshBuilder.CreateFactoryAndMesh (engine, room, "walls", \
+        "walls_factory", box)
+    walls.GetMeshObject().SetMaterialWrapper(tm)
     if DEBUG: print 'Finished!'
 
 def SetupFrame ():
@@ -193,9 +196,6 @@ Report(
 )
 txtmgr = myG3D.GetTextureManager()
 
-# First disable the lighting cache. Our app is simple enough not to need this.
-engine.SetLightingCacheMode(0)
-
 # Create our world.
 Report(CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...")
   
@@ -232,6 +232,8 @@ room.GetLights().Add(light)
 if DEBUG: print 'calling engine.Prepare()'
 
 engine.Prepare()
+
+SimpleStaticLighter.ShineLights(room, engine, 4)
 
 Report(CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------")
 

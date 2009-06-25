@@ -307,7 +307,7 @@ public:
   virtual bool SetMaterialWrapper (iMaterialWrapper* mat);
   virtual iMaterialWrapper* GetMaterialWrapper () const
   { return subMeshes.GetDefaultSubmesh()->SubMeshProxy::GetMaterial(); }
-  virtual void InvalidateMaterialHandles () { }
+
   /**
    * see imesh/object.h for specification. The default implementation
    * does nothing.
@@ -413,7 +413,7 @@ public:
   };
   LegacyBuffers legacyBuffers;
   void CreateLegacyBuffers();
-  void ClearLegacyBuffers (uint mask = CS_BUFFER_ALL_MASK);
+  void ClearLegacyBuffers (uint mask = (uint)CS_BUFFER_ALL_MASK);
   void UpdateFromLegacyBuffers();
   
   SubMeshesContainer subMeshes;

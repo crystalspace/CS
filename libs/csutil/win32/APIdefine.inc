@@ -18,9 +18,9 @@
 */	
 
 #include "csutil/sysfunc.h"
-#include "cachedll.h"
+#include "csutil/win32/cachedll.h"
 
-cswinCacheDLL* CS_API_NAME::dll = 0;
+CS::Platform::Win32::CacheDLL* CS_API_NAME::dll = 0;
 bool CS_API_NAME::dllLoaded = false;
 int CS_API_NAME::refCount = 0;
 #define FUNC_GROUP_BEGIN(name)	    \
@@ -61,7 +61,7 @@ bool CS_API_NAME::Available ()
   if (!dllLoaded)
   {
     dllLoaded = true;
-    dll = new cswinCacheDLL (CS_API_DLL);
+    dll = new CS::Platform::Win32::CacheDLL (CS_API_DLL);
     if ((dll != 0) && (*dll != 0))
     {
 #define STRINGIZE2(x)   #x

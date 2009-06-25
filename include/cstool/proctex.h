@@ -29,6 +29,7 @@
 #include "csutil/csobject.h"
 #include "csutil/ref.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/threadmanager.h"
 #include "itexture/iproctex.h"
 #include "itexture/itexfact.h"
 #include "iengine/texture.h"
@@ -63,7 +64,7 @@ struct iProcTexCallback : public virtual iBase
  */
 class CS_CRYSTALSPACE_EXPORT csProcTexture : 
   public scfImplementationExt2<csProcTexture, csObject, iTextureWrapper,
-  iProcTexture>
+  iProcTexture>, public ThreadedCallable<csProcTexture>
 {
   friend struct csProcTexCallback;
   friend class csProcTexEventHandler;
@@ -71,7 +72,7 @@ class CS_CRYSTALSPACE_EXPORT csProcTexture :
 private:
   // Setup the procedural event handler (used for updating visible
   // proc textures).
-  static iEventHandler* SetupProcEventHandler (iObjectRegistry* object_reg);
+  THREADED_CALLABLE_DECL1(csProcTexture, SetupProcEventHandler, csThreadReturn, iObjectRegistry*, object_reg, HIGH, true, false);
   csRef<iEventHandler> proceh;
 
 protected:
@@ -151,8 +152,9 @@ public:
   csProcTexture (iTextureFactory* p = 0, iImage* image = 0);
   virtual ~csProcTexture ();
 
-  iGraphics3D* GetG3D () { return g3d; }
-  iGraphics2D* GetG2D () { return g2d; }
+  iGraphics3D* GetG3D () const { return g3d; }
+  iGraphics2D* GetG2D () const { return g2d; }
+  iObjectRegistry* GetObjectRegistry () const { return object_reg; }
 
   /**
    * Disable auto-update. By default csProcTexture will register

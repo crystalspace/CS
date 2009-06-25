@@ -820,8 +820,6 @@ public:
   void ReplaceMaterial (iMaterialWrapper* oldmat, iMaterialWrapper* newmat);
   void ClearReplacedMaterials ();
 
-  virtual void InvalidateMaterialHandles ();
-
   void PrepareForUse ();
 
   //----------------------------------------------------------------------

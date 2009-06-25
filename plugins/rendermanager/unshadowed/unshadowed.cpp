@@ -144,10 +144,20 @@ public:
         rmanager->renderLayerRefract);
       RMUnshadowed::AutoReflectRefractType fxRR (
         rmanager->reflectRefractPersistent, ctxRefl, ctxRefr);
+        
+      RMUnshadowed::AutoFramebufferTexType fxFB (
+        rmanager->framebufferTexPersistent);
+      
+      // Set up a functor that combines the AutoFX functors
+      typedef CS::Meta::CompositeFunctorType2<
+        RMUnshadowed::AutoReflectRefractType,
+        RMUnshadowed::AutoFramebufferTexType> FXFunctor;
+      FXFunctor fxf (fxRR, fxFB);
+      
       typedef TraverseUsedSVSets<RenderTreeType,
-        RMUnshadowed::AutoReflectRefractType> SVTraverseType;
+        FXFunctor> SVTraverseType;
       SVTraverseType svTraverser
-        (fxRR, shaderManager->GetSVNameStringset ()->GetSize ());
+        (fxf, shaderManager->GetSVNameStringset ()->GetSize ());
       // And do the iteration
       ForEachMeshNode (context, svTraverser);
     }
@@ -201,6 +211,7 @@ bool RMUnshadowed::RenderView (iView* view)
   portalPersistent.UpdateNewFrame ();
   lightPersistent.UpdateNewFrame ();
   reflectRefractPersistent.UpdateNewFrame ();
+  framebufferTexPersistent.UpdateNewFrame ();
 
   iSector* startSector = rview->GetThisSector ();
 
@@ -222,7 +233,7 @@ bool RMUnshadowed::RenderView (iView* view)
 
     contextSetup (*startContext, portalData);
   
-    targets.PrepareQueues (shaderManager);
+    targets.StartRendering (shaderManager);
     targets.EnqueueTargets (renderTree, shaderManager, renderLayer, contextsScannedForTargets);
   }
 
@@ -235,8 +246,8 @@ bool RMUnshadowed::RenderView (iView* view)
     HandleTarget (renderTree, ts);
   }
 
+  targets.FinishRendering ();
 
-  targets.PostCleanupQueues ();
   // Render all contexts, back to front
   {
     view->GetContext()->SetZMode (CS_ZBUF_MESH);
@@ -392,6 +403,8 @@ bool RMUnshadowed::Initialize(iObjectRegistry* objectReg)
     treePersistent.debugPersist);
   lightPersistent.Initialize (objectReg, treePersistent.debugPersist);
   reflectRefractPersistent.Initialize (objectReg, treePersistent.debugPersist,
+    &postEffects);
+  framebufferTexPersistent.Initialize (objectReg,
     &postEffects);
   
   return true;

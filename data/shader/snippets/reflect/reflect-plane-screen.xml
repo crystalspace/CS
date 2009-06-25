@@ -51,6 +51,26 @@
 	  </block>
 	</input>
 	
+	<input name="textureToScreen" type="float2" default="complex" private="yes">
+	  <block location="cg:fragmentIn">
+	    <uniform type="float2" name="textureToScreen" />
+	  </block>
+	  
+	  <block location="cg:variablemap">
+	    <variablemap destination="fragmentIn.textureToScreen" type="expr">
+	      <sexp>(make-vector
+		(/ 1 (elt1 "reflection coord xform"))
+		(/ 1 (elt2 "reflection coord xform"))
+		)
+	      </sexp>
+	    </variablemap>
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    textureToScreen = fragmentIn.textureToScreen;
+	  </block>
+	</input>
+	
 	<block location="cg:vertexToFragment">
 	  <varying type="texcoord4" name="reflectionTC" />
 	</block>
@@ -62,7 +82,12 @@
 	  reflectionTC.xyz = reflectionTC.xyz * reflScale + reflXlate;
 	</block>
 	
+	<block location="cg:fragmentMain">
+	  tcToScreen = textureToScreen;
+	</block>
+	
 	<output name="reflectionTC" type="texcoord4" />
+	<output name="tcToScreen" type="float2" />
       </technique>
     </snippet>
     
@@ -71,7 +96,6 @@
 	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 	
 	<input name="positionW" type="position4_world" />
-	<input name="perturb" type="float2" default="value" defval="0,0" />
 	
 	<input name="texReflect" type="tex2d" default="complex">
 	  <block location="pass">
@@ -117,11 +141,15 @@
 	</input>
 	
 	<input name="reflTC" type="texcoord4" />
+	<input name="reflTC2screen" type="float2" />
+	
+	<input name="perturb" type="float2" default="value" defval="0,0" />
 	
 	<block location="cg:vertexMain">
 	  surfaceColor = float4 (0, 0, 0, 1);
 	  surfaceColor_attr_perfragment = true;
 	  mirroredPointDist = 0;
+	  mirroredPointDistSat = 0;
 	</block>
 	
 	<block location="cg:fragmentMain">
@@ -129,9 +157,9 @@
 	  float inv_reflW = 1 / reflTC.w;
 	  
 	  float camDepth = tex2Dproj (texReflectDepth, tc).x*-2 + 1;
-	  float2 screenPos = (reflTC.xy * inv_reflW)*float2(2)-float2(1);
+	  float2 screenPos = (reflTC.xy * reflTC2screen * inv_reflW)+float2(-1,1);
 	  float4 positionProjected = float4 (
-	    screenPos.x, -screenPos.y, camDepth, 1);
+	    screenPos.x, screenPos.y, camDepth, 1);
 	  float4 positionUnprojectedW = mul (projectedToWorld, positionProjected);
 	  positionUnprojectedW /= positionUnprojectedW.w;
 	  

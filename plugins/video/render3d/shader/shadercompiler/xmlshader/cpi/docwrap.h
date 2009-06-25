@@ -119,14 +119,34 @@ public:
     csRef<iDocumentNode> childNode;
 
     csConditionID condition;
-    bool conditionValue;
-    csPDelArray<WrappedChild> childrenWrappers;
+    uint conditionValueAndRefCount;
+    csRefArray<WrappedChild> childrenWrappers;
 
-    WrappedChild()
+    WrappedChild() : condition (csCondAlwaysTrue), 
+      conditionValueAndRefCount (conditionValueMask | 1)
     {
-      condition = csCondAlwaysTrue;
-      conditionValue = true;
     }
+    
+    void IncRef() { conditionValueAndRefCount++; }
+    void DecRef()
+    {
+      CS_ASSERT (GetRefCount() > 0);
+      conditionValueAndRefCount--;
+      if (GetRefCount() == 0)
+        delete this;
+    }
+    int GetRefCount() const
+    { return conditionValueAndRefCount & ~conditionValueMask; }
+    
+    enum { conditionValueMask = 0x80000000 };
+    void SetConditionValue (bool b)
+    { 
+      conditionValueAndRefCount = 
+        b ? conditionValueAndRefCount | conditionValueMask
+          : conditionValueAndRefCount & ~conditionValueMask;
+    }
+    bool GetConditionValue () const
+    { return (conditionValueAndRefCount & conditionValueMask) != 0; }
 
     //typedef csFixedSizeAllocator<sizeof(WrappedChild)> WrappedChildAlloc;
     //CS_DECLARE_STATIC_CLASSVAR_REF (childAlloc, ChildAlloc, WrappedChildAlloc);
@@ -139,9 +159,11 @@ public:
     inline void operator delete (void* p, void*, int)
     { WrappedChild::operator delete (p); }
 #endif
+  protected:
+    ~WrappedChild() {}
   };
 protected:
-  csPDelArray<WrappedChild> wrappedChildren;
+  csRefArray<WrappedChild> wrappedChildren;
 
   /**
    * Helper class to go over the wrapped children in a linear fashion,
@@ -153,7 +175,7 @@ protected:
     struct WrapperPosition
     {
       size_t currentIndex;
-      csPDelArray<WrappedChild>* currentWrappers;
+      csRefArray<WrappedChild>* currentWrappers;
     };
     csArray<WrapperPosition> posStack;
     WrapperPosition* currentPos;
@@ -162,10 +184,10 @@ protected:
 
     void SeekNext ();
   public:
-    WrapperWalker (csPDelArray<WrappedChild>& wrappedChildren,
+    WrapperWalker (csRefArray<WrappedChild>& wrappedChildren,
       iConditionResolver* resolver);
     WrapperWalker ();
-    void SetData (csPDelArray<WrappedChild>& wrappedChildren,
+    void SetData (csRefArray<WrappedChild>& wrappedChildren,
       iConditionResolver* resolver);
 
     bool HasNext ();
@@ -296,15 +318,15 @@ protected:
     const ConditionsWriter& condWriter);
   bool StoreWrappedChildren (iFile* file, 
     ForeignNodeStorage& foreignNodes,
-    const csPDelArray<WrappedChild>& children,
+    const csRefArray<WrappedChild>& children,
     const ConditionsWriter& condWriter);
-  void CollectUsedConditions (const csPDelArray<WrappedChild>& children,
+  void CollectUsedConditions (const csRefArray<WrappedChild>& children,
     ConditionsWriter& condWrite);
   bool ReadFromCache (iFile* cacheFile, ForeignNodeReader& foreignNodes,
     const ConditionsReader& condReader);
   bool ReadWrappedChildren (iFile* file, 
     ForeignNodeReader& foreignNodes,
-    csPDelArray<WrappedChild>& children,
+    csRefArray<WrappedChild>& children,
     const ConditionsReader& condReader);
 public:
   CS_LEAKGUARD_DECLARE(csWrappedDocumentNode);
@@ -335,6 +357,8 @@ public:
   bool ReadFromCache (iFile* cacheFile, const ConditionsReader& condReader);
   bool StoreToCache (iFile* cacheFile, const ConditionsWriter& condWriter);
   void CollectUsedConditions (ConditionsWriter& condWrite);
+  
+  inline iDocumentNode* GetWrappedNode() const { return wrappedNode; }
 };
 
 class csTextNodeWrapper : 
@@ -451,7 +475,8 @@ public:
     const csRefArray<iDocumentNode>& extraNodes, csString* dumpOut,
     uint parseOptions);
   csWrappedDocumentNode* CreateWrapperStatic (iDocumentNode* wrappedNode,
-    iConditionResolver* resolver, csString* dumpOut);
+    iConditionResolver* resolver, csString* dumpOut,
+    uint parseOptions = wdnfpoExpandTemplates | wdnfpoHandleConditions);
     
   csWrappedDocumentNode* CreateWrapperFromCache (iFile* cacheFile,
     iConditionResolver* resolver, csConditionEvaluator& evaluator,

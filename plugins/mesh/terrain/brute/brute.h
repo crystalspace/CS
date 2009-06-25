@@ -412,7 +412,6 @@ public:
   virtual void BuildDecal(const csVector3* pos, float decalRadius,
           iDecalBuilder* decalBuilder);
 
-  virtual void InvalidateMaterialHandles () { }
   virtual void PositionChild (iMeshObject* /*child*/,
   	csTicks /*current_time*/) { }
 

@@ -25,7 +25,6 @@
 #include "csgeom/matrix3.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/tri.h"
-#include "csplugincommon/particlesys/partgen.h"
 #include "cstool/rbuflock.h"
 #include "cstool/rviewclipper.h"
 #include "csutil/scfarray.h"
@@ -44,6 +43,8 @@
 #include "iutil/objreg.h"
 #include "iutil/strset.h"
 #include "ivideo/rendermesh.h"
+
+#include "partgen.h"
 
 csParticleSystem::csParticleSystem (
   iObjectRegistry* object_reg, iMeshObjectFactory* factory) :
@@ -144,6 +145,7 @@ void csParticleSystem::AppendRectSprite (float width, float height,
   csRef<iMeshObject> sprmesh (spr_factory->NewInstance ());
   csRef<iParticle> part (scfQueryInterface<iParticle> (sprmesh));
   csRef<iSprite2DState> state (scfQueryInterface<iSprite2DState> (sprmesh));
+  state->EnsureVertexCopy();
   csRef<iColoredVertices> vs = state->GetVertices();
 
   vs->SetSize (4);
@@ -173,6 +175,7 @@ void csParticleSystem::AppendRegularSprite (int n, float radius,
   csRef<iMeshObject> sprmesh (spr_factory->NewInstance ());
   csRef<iParticle> part (scfQueryInterface<iParticle> (sprmesh));
   csRef<iSprite2DState> state (scfQueryInterface<iSprite2DState> (sprmesh));
+  state->EnsureVertexCopy();
   state->CreateRegularVertices (n, true);
   part->ScaleBy (radius);
   if (mat) sprmesh->SetMaterialWrapper (mat);

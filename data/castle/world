@@ -256,8 +256,8 @@
         </material>
         <material name="std_lighting_explo_firefire1.png">
             <texture>fire1.png</texture>
-            <shader type="diffuse">std_lighting</shader>
-            <shader type="ambient">*null</shader>
+            <shader type="diffuse">*null</shader>
+            <shader type="ambient">std_lighting</shader>
         </material>
         <material name="parallaxAtt_barrel2-parallaxwood_barrel2_d.jpg">
             <texture>wood_barrel2_d.jpg</texture>

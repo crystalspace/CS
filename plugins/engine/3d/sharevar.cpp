@@ -51,46 +51,59 @@ csSharedVariableList::~csSharedVariableList ()
 
 int csSharedVariableList::GetCount () const
 {
+  CS::Threading::ScopedReadLock lock(shvarLock);
   return (int)list.GetSize ();
 }
 
 iSharedVariable *csSharedVariableList::Get (int n) const
 {
+  CS::Threading::ScopedReadLock lock(shvarLock);
   return list.Get (n);
 }
 
 int csSharedVariableList::Add (iSharedVariable *obj)
 {
+  CS::Threading::ScopedWriteLock lock(shvarLock);
   return (int)list.Push (obj);
+}
+
+void csSharedVariableList::AddBatch (csRef<iSharedVarLoaderIterator> itr)
+{
+  CS::Threading::ScopedWriteLock lock(shvarLock);
+  while(itr->HasNext())
+  {
+    list.Push (itr->Next());
+  }
 }
 
 bool csSharedVariableList::Remove (iSharedVariable *obj)
 {
-  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
+  CS::Threading::ScopedWriteLock lock(shvarLock);
   return list.Delete (obj);
 }
 
 bool csSharedVariableList::Remove (int n)
 {
-  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
+  CS::Threading::ScopedWriteLock lock(shvarLock);
   return list.DeleteIndex (n);
 }
 
 void csSharedVariableList::RemoveAll ()
 {
-  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
+  CS::Threading::ScopedWriteLock lock(shvarLock);
   list.Empty ();
 }
 
 int csSharedVariableList::Find (iSharedVariable *obj) const
 {
+  CS::Threading::ScopedReadLock lock(shvarLock);
   return (int)list.Find (obj);
 }
 
 iSharedVariable *csSharedVariableList::FindByName (
 	const char *Name) const
 {
-  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
+  CS::Threading::ScopedReadLock lock(shvarLock);
   return list.FindByName (Name);
 }
 

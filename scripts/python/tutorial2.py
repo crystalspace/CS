@@ -9,7 +9,7 @@ To use this, ensure that your PYTHONPATH, CRYSTAL, and LD_LIBRARY_PATH
 (or DYLD_LIBRARY_PATH for MacOS/X; or PATH for Windows) variables are set
 approrpriately, and then run the script with the command:
 
-    python scripts/python/tutorial1.py
+    python scripts/python/tutorial2.py
 
 This performs the same features as the C++ tutorial2.
 It creates a room and a 3D sprite.
@@ -80,27 +80,27 @@ class MyCsApp:
         self.CreateCamera(room,csVector3(0, 5, -3))       
 
         self.engine.Prepare()
+        SimpleStaticLighter.ShineLights(room, self.engine, 4)
         Log('MyCsApp.Init() finished')
 
     def SetupRoom(self):
-        # First disable the lighting cache. Our app is simple enough
-        # not to need this.
-        self.engine.SetLightingCacheMode(0)
-        
         # load a texture
-        if self.loader.LoadTexture("stone", "/lib/std/stone4.gif")==None:
+        if self.loader.LoadTexture("stone", "/lib/std/stone4.gif") == None:
             FatalError("Error: unable to load texture")
 
         # now get it as a material from the engine
-        material=self.engine.GetMaterialList().FindByName("stone")
+        material = self.engine.GetMaterialList().FindByName("stone")
 
         # create the 'room'  
         room = self.engine.CreateSector("room")
-        walls = self.engine.CreateSectorWallsMesh(room,"walls")
-        walls_state = walls.GetMeshObject().GetFactory().QueryInterface(iThingFactoryState)
-        walls_state.AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5))
-        walls_state.SetPolygonMaterial (CS_POLYRANGE_LAST, material);
-        walls_state.SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);        
+        mapper = DensityTextureMapper(0.3)
+        box = TesselatedBox(csVector3(-5, 0, -5), csVector3(5, 20, 5))
+        box.SetLevel(3)
+        box.SetMapper(mapper)
+        box.SetFlags(Primitives.CS_PRIMBOX_INSIDE)
+        walls = GeneralMeshBuilder.CreateFactoryAndMesh (self.engine, room, \
+            "walls", "walls_factory", box)
+        walls.GetMeshObject().SetMaterialWrapper(material)
         return room
 
     def CreateLights(self,room):

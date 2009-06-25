@@ -1,8 +1,6 @@
-#ifndef __OSX_csosdefs_h
-#define __OSX_csosdefs_h
 //=============================================================================
 //
-//	Copyright (C)1999-2005 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2009 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -12,11 +10,13 @@
 //
 //=============================================================================
 //-----------------------------------------------------------------------------
-// csosdefs.h
+// csutil/macosx/csosdefs.h
 //
 //	MacOS/X-specific interface to common functionality.
 //
 //-----------------------------------------------------------------------------
+#ifndef CSUTIL_MACOSX_CSOSDEFS_H
+#define CSUTIL_MACOSX_CSOSDEFS_H
 
 #include <unistd.h>
 #include <string.h>
@@ -25,6 +25,33 @@
 #include <sys/select.h>
 #include <sys/stat.h>
 #include <dirent.h>
+
+#if defined(CS_UNIVERSAL_BINARY)
+#undef CS_BIG_ENDIAN
+#undef CS_LITTLE_ENDIAN
+#if defined(__BIG_ENDIAN__)
+#define CS_BIG_ENDIAN
+#elif defined(__LITTLE_ENDIAN__)
+#define CS_LITTLE_ENDIAN
+#else
+#error Unknown endianess for Mac OS X universal binary build
+#endif
+#endif
+
+#if defined(CS_UNIVERSAL_BINARY)
+#undef CS_PROCESSOR_X86
+#undef CS_PROCESSOR_POWERPC
+#undef CS_PROCESSOR_NAME
+#if defined(__ppc__)
+#define CS_PROCESSOR_POWERPC
+#define CS_PROCESSOR_NAME "powerpc"
+#elif defined(__i386__)
+#define CS_PROCESSOR_X86
+#define CS_PROCESSOR_NAME "x86"
+#else
+#error Unknown host CPU type for Mac OS X universal binary build
+#endif
+#endif
 
 #define CS_HAVE_POSIX_MMAP
 #define CS_USE_CUSTOM_ISDIR
@@ -42,4 +69,4 @@
 #undef  CS_SNDSYS_DRIVER
 #define CS_SNDSYS_DRIVER "crystalspace.sndsys.software.driver.coreaudio"
 
-#endif // __OSX_csosdefs_h
+#endif // CSUTIL_MACOSX_CSOSDEFS_H

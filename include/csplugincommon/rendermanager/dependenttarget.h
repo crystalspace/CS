@@ -68,27 +68,24 @@ namespace RenderManager
 
     /// Construct
     DependentTargetManager (TargetHandler& targetHandler)
-      : targetHandler (targetHandler)
+      : targetHandler (targetHandler), rendering (false)
     {}
 
-    /**
-     * Add a mapping between the texture \a target and the view \a view so
-     * \a view is rendered to \a target whenever \a target is used.
-     * If the combination \a target, \a subtexture was mapped to another view 
-     * before that mapping is removed.
-     * \a subtexture specifies the cube map face for cube maps or the depth
-     * slice for volume textures.
-     */
     void RegisterRenderTarget (iTextureHandle* target, 
       iView* view, int subtexture = 0, uint flags = 0)
     {
       typename RenderTargetInfo::ViewInfo newView;
       newView.view = view;
-      newView.flags = flags & ~iRenderManagerTargets::updateOnce;
+      newView.flags = flags &
+        ~(iRenderManagerTargets::updateOnce | iRenderManagerTargets::assumeAlwaysUsed);
       TargetsHash* targets;
       if (flags & iRenderManagerTargets::updateOnce)
       {
         targets = &oneTimeTargets;
+      }
+      else if (flags & iRenderManagerTargets::assumeAlwaysUsed)
+      {
+        targets = &alwaysUsedTargets;
       }
       else
       {
@@ -107,9 +104,6 @@ namespace RenderManager
       }
     }
 
-    /**
-     * Remove the mapping of a view to \a target.
-     */
     void UnregisterRenderTarget (iTextureHandle* target,
       int subtexture = 0)
     {
@@ -127,20 +121,54 @@ namespace RenderManager
         targetInfo->views.DeleteAll (subtexture);
         if (targetInfo->views.IsEmpty()) oneTimeTargets.DeleteAll (target);
       }
+      targetInfo = alwaysUsedTargets.GetElementPointer (target);
+      if (targetInfo != 0)
+      {
+        targetInfo->views.DeleteAll (subtexture);
+        if (targetInfo->views.IsEmpty()) alwaysUsedTargets.DeleteAll (target);
+      }
+    }
+    
+    void MarkAsUsed (iTextureHandle* target)
+    {
+      if (rendering)
+        HandleTexture (target, CS::InvalidShaderVarStringID, 0);
+      else
+        forciblyUsedTextures.Push (target);
     }
 
     /**
      * Prepare enqueuing of render targets, must be called before
      * EnqueueTargets().
      */
-    void PrepareQueues (iShaderManager* shaderManager)
+    void StartRendering (iShaderManager* shaderManager)
     {
+      CS_ASSERT(!rendering);
+      rendering = true;
+    
       size_t numSVs = shaderManager->GetSVNameStringset()->GetSize();
       names.SetSize (numSVs);
       handledTargets.Empty();
-      handledTargets.SetCapacity (targets.GetSize() + oneTimeTargets.GetSize());
+      handledTargets.SetCapacity (targets.GetSize() + oneTimeTargets.GetSize()
+        + alwaysUsedTargets.GetSize());
 
       targetQueue.DeleteAll ();
+      
+      typename TargetsHash::GlobalIterator alwaysUsedIt (
+        alwaysUsedTargets.GetIterator());
+      while (alwaysUsedIt.HasNext())
+      {
+        csRef<iTextureHandle> target;
+        RenderTargetInfo& targetInfo (alwaysUsedIt.Next (target));
+        
+        HandleTarget (target, &targetInfo, 0);
+      }
+      
+      for (size_t i = 0; i < forciblyUsedTextures.GetSize(); i++)
+      {
+        HandleTexture (forciblyUsedTextures[i], CS::InvalidShaderVarStringID, 0);
+      }
+      forciblyUsedTextures.DeleteAll();
     }
 
     /**
@@ -194,8 +222,11 @@ namespace RenderManager
     /**
      * Cleanup after rendering to targets is finished.
      */
-    void PostCleanupQueues ()
+    void FinishRendering ()
     {
+      CS_ASSERT(rendering);
+      rendering = false;
+      
       oneTimeTargets.DeleteAll ();
       targetQueue.DeleteAll ();
     }
@@ -217,6 +248,7 @@ namespace RenderManager
     typedef csHash<RenderTargetInfo, csRef<iTextureHandle> > TargetsHash;
     TargetsHash targets;
     TargetsHash oneTimeTargets;
+    TargetsHash alwaysUsedTargets;
     
     class HandledTargetsSet
     {
@@ -250,6 +282,9 @@ namespace RenderManager
     // 
     TargetHandler& targetHandler;
 
+    bool rendering;
+    csArray<iTextureHandle*> forciblyUsedTextures;
+
     // Storage for used SV names
     csBitArray names;
     // Storage for handled targets
@@ -257,6 +292,76 @@ namespace RenderManager
 
     // Queue of contexts to setup
     csFIFO<TargetSettings> targetQueue;
+    
+    void HandleTexture (iTextureHandle* textureHandle,
+                        CS::ShaderVarStringID svName,
+                        csShaderVariable* sv)
+    {
+      iView* localView = 0;
+      bool handleTarget = false;
+
+      // Check any of the explicit targets
+      RenderTargetInfo* targetInfo;
+      targetInfo = targets.GetElementPointer (textureHandle);
+      handleTarget = (targetInfo != 0);
+      targetInfo = oneTimeTargets.GetElementPointer (textureHandle);
+      handleTarget |= (targetInfo != 0);
+
+      // Dispatch upwards
+      if (!handleTarget && sv)
+      {
+	handleTarget = targetHandler.HandleTargetSetup (svName, sv, 
+	  textureHandle, localView);
+      }
+
+      if (handleTarget)
+      {
+	HandleTarget (textureHandle, targetInfo, localView);
+      }
+    }
+
+    void HandleTarget (iTextureHandle* textureHandle,
+		       RenderTargetInfo* targetInfo,
+		       iView* localView)
+    {
+      size_t insertPos;
+      if (handledTargets.Find (textureHandle, insertPos)) return;
+      handledTargets.Insert (insertPos, textureHandle);
+
+      if (targetInfo)
+      {
+	typename RenderTargetInfo::ViewsHash::GlobalIterator viewsIt (
+	  targetInfo->views.GetIterator());
+
+	while (viewsIt.HasNext ())
+	{
+	  int subtexture;
+	  const typename RenderTargetInfo::ViewInfo& viewInfo (
+	    viewsIt.Next (subtexture));
+	  HandleView (viewInfo.view, textureHandle, subtexture);
+	}
+      }
+      else
+      {
+	HandleView (localView, textureHandle, 0);
+      }
+    }
+
+    void HandleView (iView* targetView,
+      iTextureHandle* texh, int subtexture)
+    {
+      if (!targetView) return;
+
+      targetView->UpdateClipper ();
+
+      // Setup a target info struct
+      TargetSettings settings;
+      settings.target = texh;
+      settings.targetSubTexture = subtexture;
+      settings.view = targetView;
+
+      targetQueue.Push (settings);
+    }
 
     struct NewTargetFn
     {
@@ -272,66 +377,8 @@ namespace RenderManager
         iTextureHandle* textureHandle;
         sv->GetValue (textureHandle);
 
-        iView* localView = 0;
-        bool handleTarget = false;
-
-        // Check any of the explicit targets
-        RenderTargetInfo* targetInfo;
-        targetInfo = parent.targets.GetElementPointer (textureHandle);
-        handleTarget = (targetInfo != 0);
-        targetInfo = parent.oneTimeTargets.GetElementPointer (textureHandle);
-        handleTarget |= (targetInfo != 0);
-
-        // Dispatch upwards
-        if (!handleTarget)
-        {
-          handleTarget = parent.targetHandler.HandleTargetSetup (name, sv, 
-            textureHandle, localView);          
-        }
-
-        if (handleTarget)
-        {
-          size_t insertPos;
-          if (parent.handledTargets.Find (textureHandle, insertPos)) return;
-          parent.handledTargets.Insert (insertPos, textureHandle);
-
-          if (targetInfo)
-          {
-            typename RenderTargetInfo::ViewsHash::GlobalIterator viewsIt (
-              targetInfo->views.GetIterator());
-
-            while (viewsIt.HasNext ())
-            {
-              int subtexture;
-              const typename RenderTargetInfo::ViewInfo& viewInfo (
-                viewsIt.Next (subtexture));
-              HandleView (viewInfo.view, textureHandle, subtexture);
-            }
-          }
-          else
-          {
-            HandleView (localView, textureHandle, 0);
-          }
-        }
+        parent.HandleTexture (textureHandle, name, sv);
       }
-
-
-      void HandleView (iView* targetView,
-        iTextureHandle* texh, int subtexture)
-      {
-        if (!targetView) return;
-
-        targetView->UpdateClipper ();
-
-        // Setup a target info struct
-        TargetSettings settings;
-        settings.target = texh;
-        settings.targetSubTexture = subtexture;
-        settings.view = targetView;        
-
-        parent.targetQueue.Push (settings);        
-      }
-
 
       DependentTargetManager& parent;
       RenderTree& renderTree;

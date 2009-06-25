@@ -44,7 +44,7 @@
 
 #include "csutil/win32/wintools.h"
 #include "win32kbd.h"
-#include "cachedll.h"
+#include "csutil/win32/cachedll.h"
 
 #include <stdio.h>
 #include <time.h>
@@ -222,7 +222,7 @@ bool csPlatformStartup(iObjectRegistry* r)
   /* Mark program as DPI aware on Vista to prevent automatic scaling
      by the system on high resolution screens */
   {
-    cswinCacheDLL hUser32 ("user32.dll");
+    CS::Platform::Win32::CacheDLL hUser32 ("user32.dll");
     CS_ASSERT (hUser32 != 0);
     LPFNSETPROCESSDPIAWARE SetProcessDPIAware =
       (LPFNSETPROCESSDPIAWARE)GetProcAddress (hUser32, "SetProcessDPIAware");

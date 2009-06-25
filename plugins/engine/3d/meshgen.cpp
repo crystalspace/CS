@@ -46,8 +46,8 @@ bool PositionMap::GetRandomPosition(float& xpos, float& zpos, float& radius)
     uint32 idx = posGen.Get(notAttempted.GetSize());
 
     csVector4 freeArea = freeAreas[notAttempted[idx]];
-    if(abs(freeArea.x - freeArea.z) < radius ||
-       abs(freeArea.y - freeArea.w) < radius)
+    if(fabs(freeArea.x - freeArea.z) < radius ||
+       fabs(freeArea.y - freeArea.w) < radius)
     {
       notAttempted.DeleteIndexFast(idx);
       continue;
@@ -298,7 +298,6 @@ void csMeshGeneratorGeometry::MoveMesh (int cidx, iMeshWrapper* mesh,
                                         const csVector3& position,
                                         const csMatrix3& matrix)
 {
-  csMGGeom& geom = factories[lod];
   csVector3 meshpos = mesh->GetMovable ()->GetFullPosition ();
   csVector3 pos = position - meshpos;
   csReversibleTransform tr (matrix, pos);

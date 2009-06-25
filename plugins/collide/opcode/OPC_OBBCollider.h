@@ -124,6 +124,7 @@
 		inline_				bool			BoxBoxOverlap(const Point& extents, const Point& center);
 		inline_				bool			TriBoxOverlap();
 			// Init methods
+    using CS::Plugin::csOpcode::Opcode::Collider::InitQuery;
 							bool			InitQuery(OBBCache& cache, const OBB& box, const Matrix4x4* worldb=null, const Matrix4x4* worldm=null);
 	};
 

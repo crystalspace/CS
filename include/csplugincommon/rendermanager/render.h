@@ -136,7 +136,8 @@ namespace RenderManager
         
         size_t ticket = context.ticketArray[mesh.contextLocalId+layerOffset];
 
-        if (shader != lastShader || ticket != lastTicket)
+        if (shader != lastShader || ticket != lastTicket
+            || (mesh.preCopyNum != 0))
         {
           // Render the latest batch of meshes
           RenderMeshes (node, lastShader, lastTicket, lastRenderedMesh, m);
@@ -144,6 +145,12 @@ namespace RenderManager
 
           lastShader = shader;
           lastTicket = ticket;
+        }
+        
+        if (mesh.preCopyNum != 0)
+        {
+          g3d->CopyFromRenderTargets (mesh.preCopyNum,
+            mesh.preCopyAttachments, mesh.preCopyTextures);
         }
       }
 

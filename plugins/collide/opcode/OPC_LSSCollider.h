@@ -81,6 +81,7 @@
 		inline_				bool			LSSAABBOverlap(const Point& center, const Point& extents);
 		inline_				bool			LSSTriOverlap(const Point& vert0, const Point& vert1, const Point& vert2);
 			// Init methods
+    using CS::Plugin::csOpcode::Opcode::Collider::InitQuery;
 							bool			InitQuery(LSSCache& cache, const LSS& lss, const Matrix4x4* worldl=null, const Matrix4x4* worldm=null);
 	};
 

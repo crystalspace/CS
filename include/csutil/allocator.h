@@ -25,6 +25,7 @@
 
 #include "csutil/alignedalloc.h"
 #include "csutil/memdebug.h"
+#include "csutil/threading/mutex.h"
 
 /**\addtogroup util_memory
  * @{ */
@@ -299,7 +300,7 @@ namespace CS
         }
         else
         {
-          if ((newSize <= localSize) && !localBuf[localSize])
+          if ((newSize <= localSize) && (SingleAllocation || !localBuf[localSize]))
 	  {
 	    memcpy (localBuf, p, newSize);
 	    ExcessAllocator::Free (p);
@@ -515,6 +516,73 @@ namespace CS
       void SetMemTrackerInfo (const char* info)
       {
 	(void)info;
+      }
+    };
+
+    /**
+     * Memory allocator forwarding to another allocator.
+     */
+    template<typename OtherAllocator>
+    class AllocatorRef
+    {
+      OtherAllocator& alloc;
+    public:
+      AllocatorRef (OtherAllocator& referencedAlloc)
+       : alloc (referencedAlloc) {}
+    
+      /// Allocate a block of memory of size \p n.
+      CS_ATTRIBUTE_MALLOC void* Alloc (const size_t n)
+      { return alloc.Alloc (n); }
+      /// Free the block \p p.
+      void Free (void* p) { alloc.Free (p); }
+      /// Resize the allocated block \p p to size \p newSize.
+      void* Realloc (void* p, size_t newSize)
+      { return alloc.Realloc (p, newSize); }
+      /// Set the information used for memory tracking.
+      void SetMemTrackerInfo (const char* info)
+      { alloc.SetMemTrackerInfo (info); }
+    };
+
+    /**
+     * Threadsafe allocator wrapper.
+     */
+    template <class Allocator>
+    class AllocatorSafe : protected Allocator
+    {
+    protected:
+      typedef Allocator WrappedAllocatorType;
+      typedef AllocatorSafe<Allocator> AllocatorSafeType;
+      /// Mutex to lock the wrapped allocator.
+      CS::Threading::Mutex mutex;
+
+    public:
+      template<typename A1>
+      AllocatorSafe (const A1& a1) : Allocator (a1)
+      {
+      }
+
+      void Free (void* p)
+      {
+        CS::Threading::MutexScopedLock lock(mutex);
+        return Allocator::Free(p);
+      }
+
+      CS_ATTRIBUTE_MALLOC void* Alloc (const size_t n)
+      {
+        CS::Threading::MutexScopedLock lock(mutex);
+        return Allocator::Alloc(n);
+      }
+
+      void* Realloc (void* p, size_t newSize)
+      {
+        CS::Threading::MutexScopedLock lock(mutex);
+        return Allocator::Realloc(p, newSize);
+      }
+
+      void SetMemTrackerInfo (const char* info)
+      {
+        CS::Threading::MutexScopedLock lock(mutex);
+        Allocator::SetMemTrackerInfo(info);
       }
     };
   } // namespace Memory

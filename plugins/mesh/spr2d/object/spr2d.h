@@ -53,8 +53,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Spr2D)
 
 class csSprite2DMeshObjectFactory;
 
-#include "csutil/deprecated_warn_off.h"
-
 typedef csDirtyAccessArray<csSprite2DVertex> csColoredVertices;
 
 /**
@@ -244,7 +242,7 @@ public:
   virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
   virtual void SetMixMode (uint mode) { MixMode = mode; }
   virtual uint GetMixMode () const { return MixMode; }
-  virtual void InvalidateMaterialHandles () { }
+
   /**
    * see imesh/object.h for specification. The default implementation
    * does nothing.
@@ -274,6 +272,8 @@ public:
   virtual iSprite2DUVAnimation *GetUVAnimation (int idx) const;
   virtual iSprite2DUVAnimation *GetUVAnimation (int idx, int &style,
   	bool &loop) const;
+
+  virtual void EnsureVertexCopy ();
   /** @} */
 
   /**\name iParticle implementation
@@ -290,8 +290,6 @@ public:
 	const csReversibleTransform& transform);
   /** @} */
 };
-
-#include "csutil/deprecated_warn_on.h"
 
 /**
  * Factory for 2D sprites. This factory also implements iSprite2DFactoryState.

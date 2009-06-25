@@ -43,8 +43,7 @@ namespace CS
       
       csRef<iLoader> loader (csQueryRegistry<iLoader> (objReg));
       CS_ASSERT(loader);
-      csRef<iShader> tonemap =
-	loader->LoadShader ("/shader/postproc/hdr/identity-map.xml");
+      csRef<iShader> tonemap = loader->LoadShader ("/shader/postproc/hdr/identity-map.xml");
       hdr.SetMappingShader (tonemap);
     
       csRef<iShaderManager> shaderManager =

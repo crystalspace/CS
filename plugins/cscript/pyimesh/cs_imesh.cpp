@@ -146,7 +146,7 @@ template <typename T> T SwigValueInit() {
     #ifdef _MSC_VER
     #include <io.h>
     #include <stdarg.h>
-    #ifndef DEBUG_PYTHON
+    #if defined(_DEBUG) && !defined(DEBUG_PYTHON)
     #undef _DEBUG
     #define RESTORE__DEBUG
     #endif
@@ -21538,7 +21538,41 @@ SWIGINTERN PyObject *csSprite2DVertexArrayReadOnly_swigregister(PyObject *SWIGUN
   return SWIG_Py_Void();
 }
 
-SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeElements_Get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeElements_Get__SWIG_0_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iArrayChangeElements<csSprite2DVertex > *arg1 = (iArrayChangeElements<csSprite2DVertex > *) 0 ;
+  size_t arg2 ;
+  csSprite2DVertex *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  size_t val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayChangeElements_Get",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeElementsTcsSprite2DVertex_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayChangeElements_Get" "', argument " "1"" of type '" "iArrayChangeElements<csSprite2DVertex > const *""'"); 
+  }
+  arg1 = reinterpret_cast< iArrayChangeElements<csSprite2DVertex > * >(argp1);
+  ecode2 = SWIG_AsVal_size_t(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csSprite2DVertexArrayChangeElements_Get" "', argument " "2"" of type '" "size_t""'");
+  } 
+  arg2 = static_cast< size_t >(val2);
+  {
+    csSprite2DVertex const &_result_ref = ((iArrayChangeElements<csSprite2DVertex > const *)arg1)->Get(arg2);
+    result = (csSprite2DVertex *) &_result_ref;
+  }
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csSprite2DVertex, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeElements_Get__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iArrayChangeElements<csSprite2DVertex > *arg1 = (iArrayChangeElements<csSprite2DVertex > *) 0 ;
   size_t arg2 ;
@@ -21572,7 +21606,79 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeElements_Top(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeElements_Get(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[3];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 2); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iArrayChangeElementsTcsSprite2DVertex_t, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        return _wrap_csSprite2DVertexArrayChangeElements_Get__SWIG_1(self, args);
+      }
+    }
+  }
+  if (argc == 2) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iArrayChangeElementsTcsSprite2DVertex_t, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      {
+        int res = SWIG_AsVal_size_t(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
+      if (_v) {
+        return _wrap_csSprite2DVertexArrayChangeElements_Get__SWIG_0_0(self, args);
+      }
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csSprite2DVertexArrayChangeElements_Get'.\n  Possible C/C++ prototypes are:\n""    Get(iArrayChangeElements<csSprite2DVertex > const *,size_t)\n""    Get(iArrayChangeElements<csSprite2DVertex > *,size_t)\n");
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeElements_Top__SWIG_0_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iArrayChangeElements<csSprite2DVertex > *arg1 = (iArrayChangeElements<csSprite2DVertex > *) 0 ;
+  csSprite2DVertex *result = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"csSprite2DVertexArrayChangeElements_Top",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeElementsTcsSprite2DVertex_t, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSprite2DVertexArrayChangeElements_Top" "', argument " "1"" of type '" "iArrayChangeElements<csSprite2DVertex > const *""'"); 
+  }
+  arg1 = reinterpret_cast< iArrayChangeElements<csSprite2DVertex > * >(argp1);
+  {
+    csSprite2DVertex const &_result_ref = ((iArrayChangeElements<csSprite2DVertex > const *)arg1)->Top();
+    result = (csSprite2DVertex *) &_result_ref;
+  }
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csSprite2DVertex, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeElements_Top__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iArrayChangeElements<csSprite2DVertex > *arg1 = (iArrayChangeElements<csSprite2DVertex > *) 0 ;
   csSprite2DVertex *result = 0 ;
@@ -21593,6 +21699,41 @@ SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeElements_Top(PyObject *SWI
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csSprite2DVertex, 0 |  0 );
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_csSprite2DVertexArrayChangeElements_Top(PyObject *self, PyObject *args) {
+  int argc;
+  PyObject *argv[2];
+  int ii;
+  
+  if (!PyTuple_Check(args)) SWIG_fail;
+  argc = (int)PyObject_Length(args);
+  for (ii = 0; (ii < argc) && (ii < 1); ii++) {
+    argv[ii] = PyTuple_GET_ITEM(args,ii);
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iArrayChangeElementsTcsSprite2DVertex_t, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_csSprite2DVertexArrayChangeElements_Top__SWIG_1(self, args);
+    }
+  }
+  if (argc == 1) {
+    int _v;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_iArrayChangeElementsTcsSprite2DVertex_t, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      return _wrap_csSprite2DVertexArrayChangeElements_Top__SWIG_0_0(self, args);
+    }
+  }
+  
+fail:
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csSprite2DVertexArrayChangeElements_Top'.\n  Possible C/C++ prototypes are:\n""    Top(iArrayChangeElements<csSprite2DVertex > const *)\n""    Top(iArrayChangeElements<csSprite2DVertex > *)\n");
   return NULL;
 }
 
@@ -23872,6 +24013,27 @@ SWIGINTERN PyObject *_wrap_iSprite2DState_PlayUVAnimation(PyObject *SWIGUNUSEDPA
   } 
   arg4 = static_cast< bool >(val4);
   (arg1)->PlayUVAnimation(arg2,arg3,arg4);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iSprite2DState_EnsureVertexCopy(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iSprite2DState *arg1 = (iSprite2DState *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iSprite2DState_EnsureVertexCopy",1,1,&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSprite2DState, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSprite2DState_EnsureVertexCopy" "', argument " "1"" of type '" "iSprite2DState *""'"); 
+  }
+  arg1 = reinterpret_cast< iSprite2DState * >(argp1);
+  (arg1)->EnsureVertexCopy();
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -32072,27 +32234,6 @@ SWIGINTERN PyObject *_wrap_iMeshObject_GetMixMode(PyObject *SWIGUNUSEDPARM(self)
   arg1 = reinterpret_cast< iMeshObject * >(argp1);
   result = (uint)((iMeshObject const *)arg1)->GetMixMode();
   resultobj = SWIG_From_unsigned_SS_long(static_cast< unsigned long >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_iMeshObject_InvalidateMaterialHandles(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  iMeshObject *arg1 = (iMeshObject *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if(!PyArg_UnpackTuple(args,(char *)"iMeshObject_InvalidateMaterialHandles",1,1,&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshObject, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshObject_InvalidateMaterialHandles" "', argument " "1"" of type '" "iMeshObject *""'"); 
-  }
-  arg1 = reinterpret_cast< iMeshObject * >(argp1);
-  (arg1)->InvalidateMaterialHandles();
-  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -48449,6 +48590,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iSprite2DState_GetUVAnimation", _wrap_iSprite2DState_GetUVAnimation, METH_VARARGS, NULL},
 	 { (char *)"iSprite2DState_StopUVAnimation", _wrap_iSprite2DState_StopUVAnimation, METH_VARARGS, NULL},
 	 { (char *)"iSprite2DState_PlayUVAnimation", _wrap_iSprite2DState_PlayUVAnimation, METH_VARARGS, NULL},
+	 { (char *)"iSprite2DState_EnsureVertexCopy", _wrap_iSprite2DState_EnsureVertexCopy, METH_VARARGS, NULL},
 	 { (char *)"iSprite2DState_GetVertexByIndex", _wrap_iSprite2DState_GetVertexByIndex, METH_VARARGS, NULL},
 	 { (char *)"iSprite2DState_GetVertexCount", _wrap_iSprite2DState_GetVertexCount, METH_VARARGS, NULL},
 	 { (char *)"iSprite2DState_scfGetVersion", _wrap_iSprite2DState_scfGetVersion, METH_VARARGS, NULL},
@@ -48665,7 +48807,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iMeshObject_GetMaterialWrapper", _wrap_iMeshObject_GetMaterialWrapper, METH_VARARGS, NULL},
 	 { (char *)"iMeshObject_SetMixMode", _wrap_iMeshObject_SetMixMode, METH_VARARGS, NULL},
 	 { (char *)"iMeshObject_GetMixMode", _wrap_iMeshObject_GetMixMode, METH_VARARGS, NULL},
-	 { (char *)"iMeshObject_InvalidateMaterialHandles", _wrap_iMeshObject_InvalidateMaterialHandles, METH_VARARGS, NULL},
 	 { (char *)"iMeshObject_PositionChild", _wrap_iMeshObject_PositionChild, METH_VARARGS, NULL},
 	 { (char *)"iMeshObject_BuildDecal", _wrap_iMeshObject_BuildDecal, METH_VARARGS, NULL},
 	 { (char *)"iMeshObject_scfGetVersion", _wrap_iMeshObject_scfGetVersion, METH_VARARGS, NULL},

@@ -25,6 +25,7 @@
 #include "imesh/genmesh.h"
 #include "iutil/object.h"
 #include "iutil/stringarray.h"
+#include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "ivideo/material.h"
 
@@ -51,7 +52,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
   {
     csRef<iSector> s;
     {
-      CS::Threading::MutexScopedLock lock(loader->sectorsLock);
+      CS::Threading::ScopedReadLock lock(loader->sectorsLock);
       for(size_t i=0; i<loader->loaderSectors.GetSize(); i++)
       {
         if(!strcmp(loader->loaderSectors[i]->QueryObject()->GetName(), name))
@@ -86,7 +87,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     while(!mat.IsValid())
     {
       {
-        CS::Threading::MutexScopedLock lock(loader->materialsLock);
+        CS::Threading::ScopedReadLock lock(loader->materialsLock);
         for(size_t i=0; i<loader->loaderMaterials.GetSize(); i++)
         {
           if(!strcmp(loader->loaderMaterials[i]->QueryObject()->GetName(), name))
@@ -168,7 +169,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     while(!fact.IsValid())
     {
       {
-        CS::Threading::MutexScopedLock lock(loader->meshfactsLock);
+        CS::Threading::ScopedReadLock lock(loader->meshfactsLock);
         for(size_t i=0; i<loader->loaderMeshFactories.GetSize(); i++)
         {
           if(!strcmp(loader->loaderMeshFactories[i]->QueryObject()->GetName(), name))
@@ -234,7 +235,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       }
 
       {
-        CS::Threading::MutexScopedLock lock(loader->meshesLock);
+        CS::Threading::ScopedReadLock lock(loader->meshesLock);
         for(size_t i=0; i<loader->loaderMeshes.GetSize(); i++)
         {
           if(!strcmp(loader->loaderMeshes[i]->QueryObject()->GetName(), name))
@@ -280,7 +281,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     while(!light.IsValid())
     {
       {
-        CS::Threading::MutexScopedLock lock(loader->lightsLock);
+        CS::Threading::ScopedReadLock lock(loader->lightsLock);
         light = loader->loadedLights.Get(csString(name), 0);
       }
 
@@ -395,7 +396,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     while(!result.IsValid())
     {
       {
-        CS::Threading::MutexScopedLock lock(loader->texturesLock);
+        CS::Threading::ScopedReadLock lock(loader->texturesLock);
         for(size_t i=0; i<loader->loaderTextures.GetSize(); i++)
         {
           if(loader->loaderTextures[i]->QueryObject()->GetName() &&
@@ -435,7 +436,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         name);
       csRef<iThreadManager> tman = csQueryRegistry<iThreadManager>(object_reg);
       csRef<iThreadReturn> itr = csPtr<iThreadReturn>(new csLoaderReturn(tman));
-      loader->LoadTextureTC(itr, name, name, CS_TEXTURE_3D, tm, true, false, true, collection,
+      loader->LoadTextureTC(itr, false, loader->GetVFS()->GetCwd(), name, name, CS_TEXTURE_3D, tm, true, false, true, collection,
         KEEP_ALL, do_verbose);
       result = scfQueryInterfaceSafe<iTextureWrapper>(itr->GetResultRefPtr());
     }

@@ -24,7 +24,6 @@
  * Particle system
  */
 
-#include "csextern.h"
 #include "csgeom/box.h"
 #include "cstool/objmodel.h"
 #include "csgeom/vector3.h"
@@ -53,14 +52,12 @@ struct iObjectRegistry;
 struct iEngine;
 struct iMeshWrapper;
 
-#include "csutil/deprecated_warn_off.h"
-
 /**
  * This class represents a particle system. It is a set of iParticles.
  * Subclasses of this class may be of more interest to users.
  * More specialised particle systems can be found below.
  */
-class CS_CRYSTALSPACE_EXPORT csParticleSystem :
+class csParticleSystem :
   public scfImplementationExt2<csParticleSystem,
     csObjectModel, iMeshObject, iParticleState>
 {
@@ -373,7 +370,7 @@ public:
     SetupMixMode ();
   }
   virtual uint GetMixMode () const { return MixMode; }
-  virtual void InvalidateMaterialHandles () { }
+
   /**
    * see imesh/object.h for specification. The default implementation
    * does nothing.
@@ -394,7 +391,7 @@ public:
  * This class has a set of particles that behave with physics.
  * They each have a speed and an acceleration.
  */
-class CS_CRYSTALSPACE_EXPORT csNewtonianParticleSystem :
+class csNewtonianParticleSystem :
   public scfImplementationExt0<csNewtonianParticleSystem, csParticleSystem>
 {
 protected:
@@ -426,8 +423,6 @@ public:
   void SetAccel (int idx, const csVector3& acl)
   { part_accel[idx] = acl; }
 };
-
-#include "csutil/deprecated_warn_on.h"
 
 /** @} */
 

@@ -93,7 +93,12 @@ namespace CS
    * Platform specific code and wrappers
    */
   namespace Platform
-  {}
+  {
+    /**
+     * Win32-specific classes and functions
+     */
+    namespace Win32 {}
+  }
 
   /**
    * Implementation of all plugins
@@ -129,7 +134,14 @@ namespace CS
    * Classes for render manager plugin implementation
    */
   namespace RenderManager
-  {}
+  {
+    /**
+     * Classes for "automatic effects" (usually providing special textures or
+     * similar on an if-uses basis).
+     */
+    namespace AutoFX
+    {}
+  }
 
   /**
    * Sound system classes

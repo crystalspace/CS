@@ -1,5 +1,4 @@
 <cgvp>
-<profile>arbvp1</profile> 
 <compilerargs>-posinv</compilerargs>
 <variablemap variable="light position[0]" destination="LightPos" />
 <variablemap variable="light attenuation[0]" destination="Attenuation" />

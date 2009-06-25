@@ -192,8 +192,6 @@ public:
 
 class csSpriteCal3DMeshObject;
 
-#include "csutil/deprecated_warn_off.h"
-
 class csCal3dSkeletonFactory;
 
 /**
@@ -608,7 +606,7 @@ public:
   }
   virtual void SetMixMode (uint) { }
   virtual uint GetMixMode () const { return CS_FX_COPY; }
-  virtual void InvalidateMaterialHandles () { }
+
   /**
    * See imesh/object.h for specification. The default implementation
    * does nothing.
@@ -1020,8 +1018,6 @@ public:
   void UpdateNotify (const csTicks &current_ticks);
 
 };
-
-#include "csutil/deprecated_warn_on.h"
 
 /**
  * Sprite Cal3D type. This is the plugin you have to use to create instances

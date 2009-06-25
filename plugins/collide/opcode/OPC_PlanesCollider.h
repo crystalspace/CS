@@ -103,6 +103,7 @@
 		inline_				bool			PlanesAABBOverlap(const Point& center, const Point& extents, udword& out_clip_mask, udword in_clip_mask);
 		inline_				bool			PlanesTriOverlap(udword in_clip_mask);
 			// Init methods
+    using CS::Plugin::csOpcode::Opcode::Collider::InitQuery;
 							bool			InitQuery(PlanesCache& cache, const Plane* planes, udword nb_planes, const Matrix4x4* worldm=null);
 	};
 

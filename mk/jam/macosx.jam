@@ -20,7 +20,9 @@
 SHELL ?= "/bin/sh" ;
 
 MACOSX_ENVIRONMENT = "export MACOSX_DEPLOYMENT_TARGET=10.2" ;
+
 PLUGIN.LFLAGS += "-bundle" ;
+
 # We use the ugly -Wl form, which does not contain embedded whitespace (unlike
 # "-framework AppKit"), to help external projects which use the result of
 # "cs-config --libs" in conjunction with GNU libtool, since libtool likes to
@@ -39,6 +41,29 @@ RANLIB += "-s" ;
 # Experience seems to indicate that library scanning misbehaves on MacOS/X with
 # Jam 2.4, consequently we disable it.
 NOARSCAN = true ;
+
+# Standard 'ar' command is incompatible with universal binaries and can not
+# "update" a static library when one or more object files have changed.  To
+# work around the problem, we force the library to be created from scratch by
+# removing it and re-populating it with all object files (rather than with only
+# those which changed).  The alternate approach of using Apple 'libtool' is
+# unsuitable for two reasons. First, libtool can only create libraries from
+# scratch; it is unable to update them. Second, the libtool can not be invoked
+# piecemeal, which means that a response file would instead have to be created
+# piecemeal and libtool invoked afterward. Such an approach requires much more
+# effort than the 'ar' workaround.
+
+CRELIB = true ;
+actions CreLib
+{
+  $(RM) $(<)
+}
+
+actions together piecemeal Archive
+{
+  $(AR) $(<) $(>)
+}
+
 
 #------------------------------------------------------------------------------
 # Public rules.

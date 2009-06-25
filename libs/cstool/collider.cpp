@@ -984,12 +984,12 @@ bool csColliderActor::AdjustForCollisions (
   // find distance we can travel
   if (cd)
   {
-      if(onground)
-          hits = CollisionDetect (topCollider, current_sector,
-      &transform_newpos, &transform_oldpos);
-      else
-          hits = CollisionDetect (bottomCollider, current_sector,
-                                           &transform_newpos, &transform_oldpos);
+    if(onground)
+      hits = CollisionDetect (topCollider, current_sector,
+                              &transform_newpos, &transform_oldpos);
+    else
+      hits = CollisionDetect (bottomCollider, current_sector,
+                              &transform_newpos, &transform_oldpos);
   }
   else
   {
@@ -1002,53 +1002,46 @@ bool csColliderActor::AdjustForCollisions (
   //localvel -= maxmove - oldpos;
   csVector3 correctedVel(localvel);
     
-    bool bounced = false;
-    csVector3 bestBounce;
+  bool bounced = false;
+  csVector3 bestBounce;
   for (i = 0; i < our_cd_contact.GetSize () ; i++ )
   {
     csCollisionPair& cd = our_cd_contact[i];
     csPlane3 obstacle (cd.a2, cd.b2, cd.c2);
     csVector3 normal = obstacle.Normal ();
       
-      // Check, have we collided against an 'inner' face
-      if (normal * localvel > 0)
-      {
-           
-          continue;
-      }
+    // Check, have we collided against an 'inner' face
+    if (normal * localvel > 0)
+    {
+       continue;
+    }
     float norm = normal.Norm ();
     if (fabs (norm) < SMALL_EPSILON) continue;
 
-      
     csVector3 unit = normal / norm;
 
     // No sliding forces from ground-like surfaces
     // sin(Pi/4) == 0.7
     if(unit.y >= 0.7) continue;
     
-
     csVector3 bounce(unit * (unit * localvel));
     
     if((localvel - bounce).y > 0)
     {
-        unit.y = 0;
-        bounce = unit * (unit * localvel);
+      unit.y = 0;
+      bounce = unit * (unit * localvel);
     }
       
     // Bounce back
-    if(bounced && (localvel - bounce).SquaredNorm() < (localvel - bestBounce).SquaredNorm())
-        bestBounce = bounce;
+    if(!bounced || (localvel - bounce).SquaredNorm() < (localvel - bestBounce).SquaredNorm())
+      bestBounce = bounce; // Find the smallest bounce (displacement) possible
     
     bounced = true;
-      
-    correctedVel = localvel - 1.1 * bestBounce; //(-(localvel % unit) % unit);    
-
-      
   }
 
-    localvel = correctedVel;
+  if(bounced) localvel = localvel - 1.1 * bestBounce;
   //newpos = maxmove + localvel;
-    newpos = oldpos + localvel;
+  newpos = oldpos + localvel;
     
   // Part2: legs
   our_cd_contact.Empty ();
@@ -1065,34 +1058,33 @@ bool csColliderActor::AdjustForCollisions (
 
   bool stepDown = true;
     
-    for (i = 0; i < our_cd_contact.GetSize (); i++ )
+  for (i = 0; i < our_cd_contact.GetSize (); i++ )
+  {
+    csCollisionPair cd = our_cd_contact[i];
+    csPlane3 obstacle (cd.a2, cd.b2, cd.c2);
+    csVector3 normal = obstacle.Normal();
+    float norm = normal.Norm ();
+    
+    // Ensure this is a big-enough triangle to count as a collision.
+    if (fabs (norm) < 1e-4f ) continue;
+    
+    csVector3 n = normal / norm;
+    
+    csVector3 line[2];
+    
+    // This needs to be done for numerical inaccuracies in this test
+    // versus the collision system test.
+    if(!FindIntersection (cd,line))  continue;
+    
+    // Is it a collision with a ground polygon?
+    //  (this tests for the angle between ground and colldet
+    //  triangle)
+    // sin(Pi/4) == 0.7
+    if(n.y >= 0.7)
     {
-        csCollisionPair cd = our_cd_contact[i];
-        csPlane3 obstacle (cd.a2, cd.b2, cd.c2);
-        csVector3 normal = obstacle.Normal();
-        float norm = normal.Norm ();
-        
-        // Ensure this is a big-enough triangle to count as a collision.
-        if (fabs (norm) < 1e-4f ) continue;
-        
-        csVector3 n = normal / norm;
-        
-        csVector3 line[2];
-        
-        // This needs to be done for numerical inaccuracies in this test
-        // versus the collision system test.
-        if(!FindIntersection (cd,line))
-            continue;
-        
-        // Is it a collision with a ground polygon?
-        //  (this tests for the angle between ground and colldet
-        //  triangle)
-        // sin(Pi/4) == 0.7
-        if(n.y >= 0.7)
-        {
-            stepDown = false;
-        }
+      stepDown = false;
     }
+  }
     
     
   // Only able to step down if we aren't jumping or falling
@@ -1120,7 +1112,7 @@ bool csColliderActor::AdjustForCollisions (
 
   float maxJump = newpos.y + bottomSize.y;
   float max_y = -1e9;
-    float max_y_steep = -1e9;
+  float max_y_steep = -1e9;
 
   // Keep moving the model up until it no longer collides
   while (hits > 0 && newpos.y < maxJump)
@@ -1151,24 +1143,24 @@ bool csColliderActor::AdjustForCollisions (
       // sin(Pi/4) == 0.7
       if((fabs(n.y) >= 0.7))
       {
-          onground = true;
-          // This is a ground triangle so we can move on top of it
-          max_y = MAX(MAX(line[0].y, line[1].y)+shift.y,max_y);
+        onground = true;
+        // This is a ground triangle so we can move on top of it
+        max_y = MAX(MAX(line[0].y, line[1].y)+shift.y,max_y);
       }
      
-          // This is not a ground polygon so we can move down to rest on it
-          max_y_steep = MAX(MAX(line[0].y, line[1].y)+shift.y, max_y_steep);
+      // This is not a ground polygon so we can move down to rest on it
+      max_y_steep = MAX(MAX(line[0].y, line[1].y)+shift.y, max_y_steep);
       hitsurface = true;
     }
 
     // This prevents us from going up if there is no surface to rest on.
     if(!onground && max_y_steep > oldpos.y)
     {
-        // in this case we do not accept the move
-        // hitsurface must be true so this will be adjusted down later
-        newpos = oldpos;
-        newpos.y = oldpos.y + 0.01f;
-        break;
+      // in this case we do not accept the move
+      // hitsurface must be true so this will be adjusted down later
+      newpos = oldpos;
+      newpos.y = oldpos.y + 0.01f;
+      break;
     }
         
     if (hitsurface)

@@ -1086,6 +1086,7 @@ void csMeshList::NameChanged (iObject* object, const char* oldname,
 {
   csRef<iMeshWrapper> mesh = scfQueryInterface<iMeshWrapper> (object);
   CS_ASSERT (mesh != 0);
+  CS::Threading::ScopedWriteLock lock(meshLock);
   if (oldname) meshes_hash.Delete (oldname, mesh);
   if (newname) meshes_hash.Put (newname, mesh);
 }
@@ -1094,17 +1095,33 @@ int csMeshList::Add (iMeshWrapper *obj)
 {
   PrepareMesh (obj);
   const char* name = obj->QueryObject ()->GetName ();
+  CS::Threading::ScopedWriteLock lock(meshLock);
   if (name)
     meshes_hash.Put (name, obj);
   obj->QueryObject ()->AddNameChangeListener (listener);
   return (int)list.Push (obj);
 }
 
+void csMeshList::AddBatch (csRef<iMeshLoaderIterator> itr)
+{
+  CS::Threading::ScopedWriteLock lock(meshLock);
+  while(itr->HasNext())
+  {
+    iMeshWrapper* obj = itr->Next();
+    PrepareMesh (obj);
+    const char* name = obj->QueryObject ()->GetName ();
+    if (name)
+      meshes_hash.Put (name, obj);
+    obj->QueryObject ()->AddNameChangeListener (listener);
+    list.Push (obj);
+  }
+}
+
 bool csMeshList::Remove (iMeshWrapper *obj)
 {
-  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
   FreeMesh (obj);
   const char* name = obj->QueryObject ()->GetName ();
+  CS::Threading::ScopedWriteLock lock(meshLock);
   if (name)
     meshes_hash.Delete (name, obj);
   obj->QueryObject ()->RemoveNameChangeListener (listener);
@@ -1114,7 +1131,7 @@ bool csMeshList::Remove (iMeshWrapper *obj)
 
 bool csMeshList::Remove (int n)
 {
-  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
+  CS::Threading::ScopedWriteLock lock(meshLock);
   FreeMesh (list[n]);
   iMeshWrapper* obj = list[n];
   const char* name = obj->QueryObject ()->GetName ();
@@ -1127,7 +1144,7 @@ bool csMeshList::Remove (int n)
 
 void csMeshList::RemoveAll ()
 {
-  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
+  CS::Threading::ScopedWriteLock lock(meshLock);
   size_t i;
   for (i = 0 ; i < list.GetSize () ; i++)
   {
@@ -1138,14 +1155,26 @@ void csMeshList::RemoveAll ()
   list.DeleteAll ();
 }
 
+int csMeshList::GetCount () const
+{
+  CS::Threading::ScopedReadLock lock(meshLock);
+  return (int)list.GetSize ();
+}
+iMeshWrapper* csMeshList::Get (int n) const
+{
+  CS::Threading::ScopedReadLock lock(meshLock);
+  return list.Get (n);
+}
+
 int csMeshList::Find (iMeshWrapper *obj) const
 {
+  CS::Threading::ScopedReadLock lock(meshLock);
   return (int)list.Find (obj);
 }
 
 iMeshWrapper *csMeshList::FindByName (const char *Name) const
 {
-  CS::Threading::RecursiveMutexScopedLock lock(removeLock);
+  CS::Threading::ScopedReadLock lock(meshLock);
   return meshes_hash.Get (Name, 0);
 }
 
