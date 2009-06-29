@@ -2861,7 +2861,14 @@ namespace swig {
 }
 
 
-#include "crystalspace.h"
+#include "csgeom.h"
+#include "csgfx.h"
+#include "csutil.h"
+#include "cstool.h"
+#include "iengine.h"
+#include "igraphic.h"
+#include "imap.h"
+#include "ivideo.h"
 
 
 /* Funtions to set the modules global SCF pointer, this is needed

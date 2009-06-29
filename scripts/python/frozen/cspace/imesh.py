@@ -260,16 +260,6 @@ class iGenMeshAnimationControl(core.iBase):
 iGenMeshAnimationControl_swigregister = _imesh.iGenMeshAnimationControl_swigregister
 iGenMeshAnimationControl_swigregister(iGenMeshAnimationControl)
 
-class iGenMeshAnimationControl1_4(core.iBase):
-    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
-    def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
-    __repr__ = _swig_repr
-    def Update(*args): return _imesh.iGenMeshAnimationControl1_4_Update(*args)
-    __swig_destroy__ = _imesh.delete_iGenMeshAnimationControl1_4
-    __del__ = lambda self : None;
-iGenMeshAnimationControl1_4_swigregister = _imesh.iGenMeshAnimationControl1_4_swigregister
-iGenMeshAnimationControl1_4_swigregister(iGenMeshAnimationControl1_4)
-
 class iGenMeshAnimationControlFactory(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"

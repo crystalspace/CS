@@ -340,11 +340,6 @@ public:
   virtual bool DeactivatePass (size_t ticket);	
 
   /// Get shader metadata
-  virtual const csShaderMetadata& GetMetadata (size_t ticket) const
-  {
-    return GetMetadata();
-  }
-
   virtual const csShaderMetadata& GetMetadata () const
   {
     return allShaderMeta;

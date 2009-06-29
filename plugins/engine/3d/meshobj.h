@@ -234,6 +234,9 @@ private:
   iCamera* last_camera;
   uint last_frame_number;
 
+  // Shadervar for alpha fading.
+  csRef<csShaderVariable> fadeFactors;
+
 public:
   CS_LEAKGUARD_DECLARE (csMeshWrapper);
 
@@ -285,11 +288,8 @@ public:
   csMeshWrapper (csEngine* engine, iMeshObject* meshobj = 0);
 
   /// Set the mesh factory.
-  virtual void SetFactory (iMeshFactoryWrapper* factory)
-  {
-    csMeshWrapper::factory = factory;
-    SetParentContext (factory ? factory->GetSVContext() : 0);
-  }
+  virtual void SetFactory (iMeshFactoryWrapper* factory);
+
   /// Get the mesh factory.
   virtual iMeshFactoryWrapper* GetFactory () const
   {
