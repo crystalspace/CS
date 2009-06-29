@@ -69,7 +69,14 @@ const size_t csGLVBOBufferManager::VBO_SLOT_PER_BUFFER[] =
 
 static const GLenum VBO_BUFFER_GL_TYPE[] = {
   GL_ARRAY_BUFFER_ARB, 
+  GL_ELEMENT_ARRAY_BUFFER,
+  GL_ARRAY_BUFFER_ARB, 
   GL_ELEMENT_ARRAY_BUFFER};
+static const GLenum VBO_BUFFER_GL_USAGE[] = {
+  GL_DYNAMIC_DRAW_ARB, 
+  GL_DYNAMIC_DRAW_ARB,
+  GL_STATIC_DRAW_ARB,
+  GL_STATIC_DRAW_ARB};
 
 csGLVBOBufferManager::csGLVBOBufferManager (csGLExtensionManager *ext, 
                                             csGLStateCache *state,
@@ -83,7 +90,7 @@ csGLVBOBufferManager::csGLVBOBufferManager (csGLExtensionManager *ext,
 csGLVBOBufferManager::~csGLVBOBufferManager ()
 {
   // Deallocate stuff@@@
-  for (size_t type = 0; type < 1; ++type)
+  for (size_t type = 0; type < VBO_BUFFER_TYPE_COUNT; ++type)
   {
     for (size_t i = 0; i < VBO_NUM_SLOT_SIZES; ++i)
     {
@@ -180,8 +187,10 @@ csGLVBOBufferManager::VBOSlot* csGLVBOBufferManager::GetVBOSlot (
 
   slot = renderBufferMappings.Get (buffer, 0);
   const bool isIndexBuffer = buffer->IsIndexBuffer ();
-  const size_t slotType = isIndexBuffer ?
-    VBO_BUFFER_INDEX : VBO_BUFFER_VERTEX;
+  size_t slotType =
+    isIndexBuffer ? VBO_BUFFER_IS_INDEX : VBO_BUFFER_IS_VERTEX;
+  if (buffer->GetBufferType() == CS_BUF_STATIC)
+    slotType |= VBO_BUFFER_IS_STATIC;
 
   if (!slot)
   {
@@ -464,11 +473,12 @@ csGLVBOBufferManager::VBOBuffer* csGLVBOBufferManager::GetNewVBOBuffer (
   extensionManager->glGenBuffersARB (1, &(buffer->vboID));
   CS_ASSERT(buffer->vboID);
   stateCache->SetBufferARB (VBO_BUFFER_GL_TYPE[slotType], buffer->vboID);
-  stateCache->ApplyBufferBinding (slotType == VBO_BUFFER_INDEX
+  stateCache->ApplyBufferBinding ((slotType & VBO_BUFFER_IS_INDEX)
     ? csGLStateCacheContext::boIndexArray
     : csGLStateCacheContext::boElementArray);
   extensionManager->glBufferDataARB (VBO_BUFFER_GL_TYPE[slotType], 
-    (GLsizei)(buffer->slotSize*buffer->numberOfSlots), 0, GL_DYNAMIC_DRAW_ARB);
+    (GLsizei)(buffer->slotSize*buffer->numberOfSlots), 0,
+    VBO_BUFFER_GL_USAGE[slotType]);
   stateCache->SetBufferARB (VBO_BUFFER_GL_TYPE[slotType], 0);
 
   currentVBOAllocation += buffer->slotSize*buffer->numberOfSlots;
@@ -478,7 +488,7 @@ csGLVBOBufferManager::VBOBuffer* csGLVBOBufferManager::GetNewVBOBuffer (
 
 void csGLVBOBufferManager::FreeVBOBuffer (VBOBuffer* buffer)
 {
-  for (size_t i = 0; i < 1; ++i)
+  for (size_t i = 0; i < VBO_BUFFER_TYPE_COUNT; ++i)
   {
     if (stateCache->GetBufferARB (VBO_BUFFER_GL_TYPE[i]) == buffer->vboID)
       stateCache->SetBufferARB (VBO_BUFFER_GL_TYPE[i], 0);
@@ -518,10 +528,14 @@ void csGLVBOBufferManager::DumpStats ()
 {
   csPrintf ("VBO memory statistics:\n");
   csPrintf ("VB Buffers\n");
-  DumpStatsBufferType (VBO_BUFFER_VERTEX);
+  DumpStatsBufferType (VBO_BUFFER_IS_VERTEX);
+  csPrintf ("Static VB Buffers\n");
+  DumpStatsBufferType (VBO_BUFFER_IS_VERTEX | VBO_BUFFER_IS_STATIC);
 
   csPrintf ("IB Buffers\n");
-  DumpStatsBufferType (VBO_BUFFER_INDEX);
+  DumpStatsBufferType (VBO_BUFFER_IS_INDEX);
+  csPrintf ("Static IB Buffers\n");
+  DumpStatsBufferType (VBO_BUFFER_IS_INDEX | VBO_BUFFER_IS_STATIC);
 
   csPrintf ("VBO allocation: %s / %s (%3u %%)\n", 
     ByteFormat (currentVBOAllocation).GetDataSafe (),

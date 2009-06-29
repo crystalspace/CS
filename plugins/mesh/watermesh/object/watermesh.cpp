@@ -417,7 +417,8 @@ csRenderMesh** csWaterMeshObject::GetRenderMeshes (
   if(factory->isOcean())
   {
     csOrthoTransform c2ot = rview->GetCamera ()->GetTransform ();
-    c2ot /= movable->GetFullTransform ();
+    if (!o2wt.IsIdentity ())
+      c2ot /= o2wt;
 
     csPlane3 planes[10];
 

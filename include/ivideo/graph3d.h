@@ -677,6 +677,14 @@ struct csSimpleRenderMesh
    * and only used once.
    */
   const uint* indices;
+  //@{
+  /**
+   * (optional) Range of indices to draw.
+   * If \a indexStart < indexEnd, this range is used. Otherwise,
+   * the default range (0..indexCount or all vertices) is used.
+   */
+  uint indexStart, indexEnd;
+  //@}
 
   /// Number of vertices
   uint vertexCount;
@@ -724,7 +732,8 @@ struct csSimpleRenderMesh
   /// (Optional) Buffer holder with all vertex buffers.
   csRef<csRenderBufferHolder> renderBuffers;
 
-  csSimpleRenderMesh () : indexCount(0), indices(0), texcoords(0), colors(0), 
+  csSimpleRenderMesh () : indexCount(0), indices(0), indexStart (0),
+    indexEnd (0), texcoords(0), colors(0), 
     texture (0), shader (0), dynDomain (0), z_buf_mode (CS_ZBUF_NONE), 
     mixmode (CS_FX_COPY)
   {  
@@ -788,7 +797,7 @@ namespace CS
  */
 struct iGraphics3D : public virtual iBase
 {
-  SCF_INTERFACE(iGraphics3D, 4, 0, 1);
+  SCF_INTERFACE(iGraphics3D, 4, 0, 2);
   
   /// Open the 3D graphics display.
   virtual bool Open () = 0;
@@ -1171,6 +1180,13 @@ struct iGraphics3D : public virtual iBase
     csRenderTargetAttachment* attachments,
     iTextureHandle** textures,
     int* subtextures = 0) = 0;
+
+  /**
+   * Draw multiple csSimpleRenderMeshes.
+   * \sa DrawSimpleMesh
+   */
+  virtual void DrawSimpleMeshes (const csSimpleRenderMesh* meshes,
+    size_t numMeshes, uint flags = 0) = 0;
 };
 
 /** @} */

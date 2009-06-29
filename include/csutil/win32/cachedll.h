@@ -61,7 +61,7 @@ public:
   HMODULE GetHandle ()
   {
     if (dllHandle == 0)
-      dllHandle = LoadLibrary (dllName);
+      dllHandle = LoadLibraryA (dllName);
     return dllHandle;
   }
   

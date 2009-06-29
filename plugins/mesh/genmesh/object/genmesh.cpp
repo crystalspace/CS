@@ -155,7 +155,6 @@ void csGenmeshMeshObject::SetAnimationControl (
 	iGenMeshAnimationControl* ac)
 {
   anim_ctrl = ac;
-  anim_ctrl2 = scfQueryInterfaceSafe<iGenMeshAnimationControl1_4> (anim_ctrl);
   if (ac)
   {
     anim_ctrl_verts = ac->AnimatesVertices ();
@@ -330,11 +329,9 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   CS::RenderViewClipper::CalculateClipSettings (rview->GetRenderContext (),
       frustum_mask, clip_portal, clip_plane, clip_z_plane);
 
-  if (anim_ctrl2)
-    anim_ctrl2->Update (vc->GetCurrentTicks (), factory->GetVertexCount(), 
+  if (anim_ctrl)
+    anim_ctrl->Update (vc->GetCurrentTicks (), factory->GetVertexCount(), 
       factory->GetShapeNumber());
-  else if (anim_ctrl)
-    anim_ctrl->Update (vc->GetCurrentTicks ());
     
   iRenderBuffer* positions = GetPositions();
 

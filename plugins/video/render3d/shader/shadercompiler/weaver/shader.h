@@ -138,11 +138,6 @@ public:
     return realShader->DeactivatePass (ticket);
   }
 
-  virtual const csShaderMetadata& GetMetadata (size_t ticket) const
-  {
-    return realShader->GetMetadata (ticket);
-  }
-
   virtual const csShaderMetadata& GetMetadata () const
   {
     return realShader->GetMetadata ();

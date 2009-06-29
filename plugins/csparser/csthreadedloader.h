@@ -443,11 +443,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       loadingMeshFacts.Delete(name);
     }
 
-    // List of meshfacts that we know failed to load.
-    // This is used by the meshfact search to determine
-    // if it should continue waiting or just fail.
-    csRef<iStringArray> failedMeshFacts;
-
   private:
     csRef<iEngine> Engine;
     csRef<iVFS> vfs;
@@ -598,7 +593,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     */
     bool LoadLibrary(iLoaderContext* ldr_context, iDocumentNode* node,
       iStreamSource* ssource, iMissingLoaderData* missingdata, csRefArray<iThreadReturn>& threadReturns,
-      csRefArray<iDocumentNode>& libs, csArray<csString>& libIDs, bool loadProxyTex = true, bool do_verbose = false);
+      csRefArray<iDocumentNode>& libs, csArray<csString>& libIDs, bool loadProxyTex = true, bool mapload = false,
+      bool do_verbose = false);
 
     THREADED_CALLABLE_DECL5(csThreadedLoader, LoadLibraryFromNode, csLoaderReturn,
       csRef<iLoaderContext>, ldr_context, csRef<iDocumentNode>, child, 
@@ -633,8 +629,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     /// Get the engine sequence manager (load it if not already present).
     iEngineSequenceManager* GetEngineSequenceManager ();
 
+    bool LoadDeferredLibs(csRefArray<iDocumentNode>& defLibs,
+    iLoaderContext* ldr_context, iStreamSource* ssource, iMissingLoaderData* missingdata,
+    csRefArray<iThreadReturn>& threadReturns, csRefArray<iDocumentNode>& libs,
+    csArray<csString>& libIDs, bool do_verbose);
+
     /// Parse a shaderlist
-    bool ParseShaderList (iLoaderContext* ldr_context, iDocumentNode* node);
+    bool ParseShaderList (csLoaderContext* ldr_context);
     bool ParseShader (iLoaderContext* ldr_context, iDocumentNode* node,
       iShaderManager* shaderMgr);
 
@@ -653,30 +654,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     */
     bool ParseKey (iDocumentNode* node, iObject* obj);
 
-    /// Parse a list of textures and add them to the engine.
-    bool ParseTextureList (iLoaderContext* ldr_context, iDocumentNode* node,
-      csSafeCopyArray<ProxyTexture> &proxyTextures);
-
-    /**
-    * Parse a list of materials and add them to the engine. If a prefix is
-    * given, all material names will be prefixed with the corresponding string.
-    */
-    bool ParseMaterialList (iLoaderContext* ldr_context, iDocumentNode* node,
-      csWeakRefArray<iMaterialWrapper> &materialArray, const char* prefix = 0);
-
     /// Parse a texture definition and add the texture to the engine
     THREADED_CALLABLE_DECL4(csThreadedLoader, ParseTexture, csLoaderReturn,
       csRef<iLoaderContext>, ldr_context, csRef<iDocumentNode>, node,
       csSafeCopyArray<ProxyTexture>*, proxyTextures, const char*, path,
       THREADED, false, false);
-
-    /// Parse a Cubemap texture definition and add the texture to the engine
-    iTextureWrapper* ParseCubemap (iLoaderContext* ldr_context,
-      iDocumentNode* node);
-
-    /// Parse a 3D Texture definition and add the texture to the engine
-    iTextureWrapper* ParseTexture3D (iLoaderContext* ldr_context,
-      iDocumentNode* node);
 
     /// Parse a material definition and add the material to the engine
     bool ParseMaterial (iLoaderContext* ldr_context,
@@ -729,9 +711,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     bool LoadPlugins (iDocumentNode* node);
 
     /**
+    * Load a single plugin.
+    */
+    void LoadPlugin (iDocumentNode* node);
+
+    /**
     * Load the settings section.
     */
     bool LoadSettings (iDocumentNode* node);
+
+    bool LoadTextures (csLoaderContext* ldr_context,
+      csSafeCopyArray<ProxyTexture>* proxyTextures);
+
+    bool LoadMaterials (csLoaderContext* ldr_context,
+      csSafeCopyArray<ProxyTexture>* proxyTextures,
+      csWeakRefArray<iMaterialWrapper> &materialArray);
+
+    bool LoadMeshfacts (csLoaderContext* ldr_context,
+      iStreamSource* ssource, csSafeCopyArray<ProxyTexture>* proxyTextures,
+    csWeakRefArray<iMaterialWrapper> &materialArray);
 
     /**
     * Load a mesh generator geometry.

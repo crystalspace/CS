@@ -41,6 +41,7 @@
 #include "imesh/objmodel.h"
 #include "iutil/object.h"
 #include "ivaria/reporter.h"
+#include "csloadercontext.h"
 #include "csthreadedloader.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(csparser)
@@ -951,33 +952,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     return l;
   }
 
-  bool csThreadedLoader::ParseShaderList (iLoaderContext* ldr_context,
-    iDocumentNode* node)
+  bool csThreadedLoader::ParseShaderList (csLoaderContext* ldr_context)
   {
-    csRef<iShaderManager> shaderMgr (
-      csQueryRegistry<iShaderManager> (object_reg));
-
-    if(!shaderMgr)
+    if(!ldr_context->availShaders.IsEmpty())
     {
-      ReportNotify ("iShaderManager not found, ignoring shaders!");
-      return true;
-    }
+      csRef<iShaderManager> shaderMgr (
+        csQueryRegistry<iShaderManager> (object_reg));
 
-    csRef<iDocumentNodeIterator> it = node->GetNodes ();
-    while (it->HasNext ())
-    {
-      csRef<iDocumentNode> child = it->Next ();
-      if (child->GetType () != CS_NODE_ELEMENT) continue;
-      const char* value = child->GetValue ();
-      csStringID id = xmltokens.Request (value);
-      switch (id)
+      if(!shaderMgr)
       {
-      case XMLTOKEN_SHADER:
-        {
-          ParseShader (ldr_context, child, shaderMgr);
-        }
-        break;
+        ReportNotify ("iShaderManager not found, ignoring shaders!");
+        return true;
       }
+
+      for(size_t i=0; i<ldr_context->availShaders.GetSize(); ++i)
+      {
+        if(!ParseShader (ldr_context, ldr_context->availShaders[i].node, shaderMgr))
+          return false;
+      }
+
+      ldr_context->availShaders.DeleteAll();
     }
     return true;
   }

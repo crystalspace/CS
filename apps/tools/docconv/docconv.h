@@ -54,6 +54,7 @@ public:
   iObjectRegistry* object_reg;
   csRef<iVFS> vfs;
   csRef<iCommandLineParser> cmdline;
+  csRef<iPluginManager> plugin_mgr;
 
   void ReportError (const char* description, ...);
   void Report (int severity, const char* description, ...);
@@ -68,7 +69,7 @@ public:
 public:
   DocConv ();
   ~DocConv ();
-
+  void ConvertFile (const char* val, csRef<iDocumentSystem> inputDS, csRef<iDocumentSystem> outputDS, int op);
   void Main ();
 };
 

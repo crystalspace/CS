@@ -52,7 +52,11 @@ struct iCommandLineParser : public virtual iBase
   /// Query specific commandline option (you can query second etc. such option)
   virtual const char *GetOption (const char *iName, size_t iIndex = 0)
     const = 0;
-  /// Query filename specified on commandline (that is, without leading '-')
+  /**
+   *  Query filename specified on commandline (that is, without leading '-').
+   *  \param iIndex position of the filename in the list of file names.
+   *  \return Pointer to the filename or 0 if the index is out of bound.
+   */
   virtual const char *GetName (size_t iIndex = 0) const = 0;
   /// Add a command-line option to the command-line option array
   virtual void AddOption (const char *iName, const char *iValue) = 0;

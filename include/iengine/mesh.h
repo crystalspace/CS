@@ -712,7 +712,7 @@ struct iMeshWrapper : public virtual iBase
  */
 struct iMeshFactoryWrapper : public virtual iBase
 {
-  SCF_INTERFACE(iMeshFactoryWrapper, 2,0,0);
+  SCF_INTERFACE(iMeshFactoryWrapper, 2, 1, 0);
   /// Get the iObject for this mesh factory.
   virtual iObject *QueryObject () = 0;
   /// Get the iMeshObjectFactory.
@@ -879,6 +879,26 @@ struct iMeshFactoryWrapper : public virtual iBase
    * Get the shader variable context of the mesh factory.
    */
   virtual iShaderVariableContext* GetSVContext() = 0;
+
+  /**
+   * Sets the instance factory.
+   */
+  virtual void SetInstanceFactory(iMeshFactoryWrapper* meshfact) = 0;
+
+  /**
+   * Returns the instance factory.
+   */
+  virtual iMeshFactoryWrapper* GetInstanceFactory() const = 0;
+
+  /**
+   * Adds a (pseudo-)instance of the instance factory at the given position.
+   */
+  virtual void AddInstance(csVector3& position, csMatrix3& rotation) = 0;
+
+  /**
+   * Returns the instancing transforms array shadervar/
+   */
+  virtual csShaderVariable* GetInstances() const = 0;
 };
 
 /**
