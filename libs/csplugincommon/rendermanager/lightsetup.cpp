@@ -33,6 +33,11 @@ namespace RenderManager
     persist.sublightNumMem.Empty();
     persist.putBackLights.Empty();
   }
+
+  void LightingSorter::SetNumLights (size_t numLights)
+  {
+    persist.lightTypeScratch.SetMinimalCapacity (numLights);
+  }
     
   void LightingSorter::AddLight (const csLightInfluence& influence,
                                  uint numSubLights,

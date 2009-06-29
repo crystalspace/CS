@@ -28,6 +28,7 @@
 #include "csutil/csstring.h"
 #include "csutil/eventnames.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/threading/rwmutex.h"
 #include "csutil/hash.h"
 #include "csutil/strset.h"
 #include "csutil/ref.h"
@@ -202,6 +203,7 @@ public:
   csHash<csHandlerID, csHandlerID> handlerPres;
   csHash<csHandlerID, csHandlerID> handlerPosts;
   uint32 instanceCounter;
+  CS::Threading::ReadWriteMutex mutex;
 };
 
 /* @} */

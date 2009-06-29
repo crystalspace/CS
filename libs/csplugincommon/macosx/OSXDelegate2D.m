@@ -218,20 +218,24 @@
     {
         [window setAcceptsMouseMovedEvents:YES];
 
+        // Mouse has entered the tracking rect, so hide the cursor if required
         if (hideMouse == YES)
             OSXDriver2D_HideMouse(driver);
     }
 }
 
 
-
 // mouseExited
-// Mouse has left tracking rect, so stop listening for mouse movement
+// Handle mouse leaving the tracking area by not accepting movement events
 - (void) mouseExited:(NSEvent *) ev
 {
     if ([ev trackingNumber] == trackingMouseTag)
     {
         [window setAcceptsMouseMovedEvents:NO];
+
+        // Mouse has left the tracking rect, so display the cursor if required
+        if(hideMouse == YES)
+            OSXDriver2D_ShowMouse(driver);		
     }
 }
 

@@ -68,33 +68,65 @@ void csDDSImageIO::SetDithering (bool)
 }
 
 csDDSRawDataType csDDSImageIO::IdentifyPixelFormat (const dds::PixelFormat& pf, 
-						    uint& bpp)
+                                                    uint32 dxgiFormat, bool isDX10,
+                                                    uint& bpp)
 {
   csDDSRawDataType type = csrawUnsupported;
-  if (pf.flags & dds::DDPF_FOURCC)
+  if(isDX10)
+  {
+    switch(dxgiFormat)
+    {
+    case 71:
+      {
+        if(pf.flags & dds::DDPF_ALPHAPIXEL)
+        {
+          type = csrawDXT1Alpha;
+        }
+        else
+        {
+          type = csrawDXT1;
+        }
+        bpp = 4;
+        break;
+      }
+    case 74:
+      {
+        type = csrawDXT3;
+        bpp = 8;
+        break;
+      }
+    case 77:
+      {
+        type = csrawDXT5;
+        bpp = 8; 
+        break;
+      }
+    }
+  }
+  else if (pf.flags & dds::DDPF_FOURCC)
   {
     switch (pf.fourcc)
     {
-      case MakeFourCC ('D','X','T','1'):
-	type = csrawDXT1;
-	bpp = 4; 
-	break;
-      case MakeFourCC ('D','X','T','2'):
-	type = csrawDXT2;
-	bpp = 8; 
-	break;
-      case MakeFourCC ('D','X','T','3'):
-	type = csrawDXT3;
-	bpp = 8; 
-	break;
-      case MakeFourCC ('D','X','T','4'):
-	type = csrawDXT4;
-	bpp = 8; 
-	break;
-      case MakeFourCC ('D','X','T','5'):
-	type = csrawDXT5;
-	bpp = 8; 
-	break;
+    case MakeFourCC ('D','X','T','1'):
+      type = csrawDXT1Alpha;
+      bpp = 4; 
+      break;
+    case MakeFourCC ('D','X','T','2'):
+      type = csrawDXT2;
+      bpp = 8; 
+      break;
+    case MakeFourCC ('D','X','T','3'):
+      type = csrawDXT3;
+      bpp = 8; 
+      break;
+    case MakeFourCC ('D','X','T','4'):
+      type = csrawDXT4;
+      bpp = 8; 
+      break;
+    case MakeFourCC ('D','X','T','5'):
+      type = csrawDXT5;
+      bpp = 8; 
+      break;
     }
   }
   else
@@ -105,36 +137,36 @@ csDDSRawDataType csDDSImageIO::IdentifyPixelFormat (const dds::PixelFormat& pf,
     {
       if (pf.redmask == 0xff)
       {
-	if ((pf.flags & dds::DDPF_LUMINANCE) 
-	  && !(pf.flags & dds::DDPF_ALPHAPIXEL))
-	  type = csrawLum8;
+        if ((pf.flags & dds::DDPF_LUMINANCE) 
+          && !(pf.flags & dds::DDPF_ALPHAPIXEL))
+          type = csrawLum8;
       }
     }
     else if (pf.bitdepth == 16)
     {
       if ((pf.redmask == 0xf800) && (pf.greenmask == 0x07e0) 
-	&& (pf.bluemask == 0x001f))
+        && (pf.bluemask == 0x001f))
       {
-	if (!(pf.flags & dds::DDPF_ALPHAPIXEL))
-	  type = csrawR5G6B5;
+        if (!(pf.flags & dds::DDPF_ALPHAPIXEL))
+          type = csrawR5G6B5;
       }
     }
     else if (pf.bitdepth == 24)
     {
       if ((pf.redmask == 0x00ff0000) && (pf.greenmask == 0x0000ff00) 
-	&& (pf.bluemask == 0x00000ff))
+        && (pf.bluemask == 0x00000ff))
       {
-	if (!(pf.flags & dds::DDPF_ALPHAPIXEL))
-	  type = csrawR8G8B8;
+        if (!(pf.flags & dds::DDPF_ALPHAPIXEL))
+          type = csrawR8G8B8;
       }
     }
     else if (pf.bitdepth == 32)
     {
       if ((pf.redmask == 0x00ff0000) && (pf.greenmask == 0x0000ff00) 
-	&& (pf.bluemask == 0x00000ff))
+        && (pf.bluemask == 0x00000ff))
       {
-	if ((pf.flags & dds::DDPF_ALPHAPIXEL) && (pf.alphamask == 0xff000000))
-	  type = csrawA8R8G8B8;
+        if ((pf.flags & dds::DDPF_ALPHAPIXEL) && (pf.alphamask == 0xff000000))
+          type = csrawA8R8G8B8;
       }
     }
   }
@@ -173,6 +205,15 @@ csPtr<iImage> csDDSImageIO::Load (iDataBuffer* buf, int format)
   if (head.magic != dds::Magic)
     return 0;
 
+  // Check for DX10 format.
+  bool isDX10 = false;
+  dds::Header10 head10;
+  if (head.pixelformat.fourcc == MakeFourCC('D', 'X', '1', '0'))
+  {
+    isDX10 = true;
+    CopyLEUI32s (&head10, buf->GetData()+sizeof (head), sizeof (head10) / sizeof (uint32));
+  }
+
   const uint32 minimumflags = dds::DDSD_CAPS | dds::DDSD_HEIGHT | 
     dds::DDSD_WIDTH | dds::DDSD_PIXELFORMAT;
   if ((head.flags & minimumflags) != minimumflags)
@@ -180,7 +221,7 @@ csPtr<iImage> csDDSImageIO::Load (iDataBuffer* buf, int format)
 
   uint bpp = 0;
   csDDSRawDataType dataType = IdentifyPixelFormat (head.pixelformat,
-    bpp);
+  head10.dxgiFormat, isDX10, bpp);
   if (dataType == csrawUnsupported)
     return 0;
 
@@ -198,11 +239,11 @@ csPtr<iImage> csDDSImageIO::Load (iDataBuffer* buf, int format)
   size_t imgOffset = sizeof (dds::Header);
   size_t dataSize;
 
-  if ((dataType == csrawDXT1) && 
-    (dds::Loader::ProbeDXT1Alpha (buf->GetUint8() + imgOffset,
+  if (!isDX10 && (dataType == csrawDXT1Alpha) && 
+    (dds::Loader::ProbeDXT1C (buf->GetUint8() + imgOffset,
     head.width, head.height, Depth, 
     DataSize (dataType, bpp, head.width, head.height, Depth))))
-    dataType = csrawDXT1Alpha;
+    dataType = csrawDXT1;
 
   if ((dataType < csrawAlphaFirst) || (dataType > csrawAlphaLast))
     format &= ~CS_IMGFMT_ALPHA;

@@ -27,13 +27,22 @@ namespace CS
 {
 namespace Geometry //@@Right?
 {
+  template<typename ObjectType>
+  struct AABBTreeNodeExtraDataNone
+  {
+    void LeafAddObject (ObjectType*) {}
+    void LeafUpdateObjects (ObjectType**, uint) {}
+    void NodeUpdate (const AABBTreeNodeExtraDataNone& child1,
+      const AABBTreeNodeExtraDataNone& child2) {}
+  };
 
   /**
    * 
    */
   template<
     typename ObjectType, 
-    unsigned int objectsPerLeaf = 1
+    unsigned int objectsPerLeaf = 1,
+    typename NodeExtraData = AABBTreeNodeExtraDataNone<ObjectType>
   >
   class AABBTree
   {
@@ -249,6 +258,7 @@ namespace Geometry //@@Right?
         if (node->IsObjectSlotFree ())
         {
           node->AddLeafData (object);
+          static_cast<NodeExtraData*> (node)->LeafAddObject (object);
         }
         else
         {
@@ -296,6 +306,7 @@ namespace Geometry //@@Right?
           node->SetLeaf (false);
           node->SetChild1 (node1);
           node->SetChild2 (node2);
+          static_cast<NodeExtraData*> (node)->NodeUpdate (*node1, *node2);
         }
       }
       else
@@ -314,6 +325,7 @@ namespace Geometry //@@Right?
           AddObjectRecursive (node->GetChild2 (), object);
           node->GetBBox ().AddBoundingBox (node->GetChild2 ()->GetBBox ());
         }
+        static_cast<NodeExtraData*> (node)->NodeUpdate (*node->GetChild1(), *node->GetChild2());
       }
     }
 
@@ -523,6 +535,8 @@ namespace Geometry //@@Right?
         {
           root->AddLeafData (objects[i]);
         }
+        static_cast<NodeExtraData*> (root)->LeafUpdateObjects (
+          root->GetLeafObjects (), root->GetObjectCount());
       }
       else
       {
@@ -544,6 +558,7 @@ namespace Geometry //@@Right?
           
           BuildTree (left, objects, objectStart, median);
           BuildTree (right, objects, median + 1, objectEnd);
+          static_cast<NodeExtraData*> (root)->NodeUpdate (*left, *right);
         }
 
       }
@@ -671,6 +686,8 @@ namespace Geometry //@@Right?
               }
               node->SetBBox (newNodeBB);
 	      node->RemoveLeafData (i);
+	      static_cast<NodeExtraData*> (node)->LeafUpdateObjects (
+	        node->GetLeafObjects(), node->GetObjectCount());
 
               return true; // Found it
             }
@@ -694,6 +711,7 @@ namespace Geometry //@@Right?
             if (left->GetObjectCount () > 0)
             {
               newNodeBB += left->GetBBox ();
+              static_cast<NodeExtraData*> (node)->NodeUpdate (*left, *right);
             }
             else
             {
@@ -709,6 +727,7 @@ namespace Geometry //@@Right?
 	      else
 	      {
                 node->SetChild1 (0);
+                static_cast<NodeExtraData*> (node)->LeafUpdateObjects (0, 0);
 	      }
             }
 
@@ -730,6 +749,7 @@ namespace Geometry //@@Right?
             if (right->GetObjectCount () > 0)
             {
               newNodeBB += right->GetBBox ();
+              static_cast<NodeExtraData*> (node)->NodeUpdate (*left, *right);
             }
             else
             {
@@ -744,7 +764,8 @@ namespace Geometry //@@Right?
 	      }
 	      else
 	      {
-                node->SetChild1 (0);
+                node->SetChild2 (0);
+                static_cast<NodeExtraData*> (node)->LeafUpdateObjects (0, 0);
 	      }
             }
 
@@ -804,9 +825,10 @@ namespace Geometry //@@Right?
    */
   template<
     typename ObjectType, 
-    unsigned int objectsPerLeaf
+    unsigned int objectsPerLeaf,
+    typename NodeExtraData
   >
-  class AABBTree<ObjectType, objectsPerLeaf>::Node
+  class AABBTree<ObjectType, objectsPerLeaf, NodeExtraData>::Node : public NodeExtraData
   {
   public:
     Node ()
@@ -934,6 +956,7 @@ namespace Geometry //@@Right?
       leafObjCount = source->leafObjCount;
       typeAndFlags = source->typeAndFlags;
       SetBBox (source->GetBBox ());
+      NodeExtraData::operator= (*source);
     }
 
     // Accessor for leaf node data
@@ -944,6 +967,12 @@ namespace Geometry //@@Right?
       CS_ASSERT(index < objectsPerLeaf);
 
       return leafStorage[index];
+    }
+
+    ObjectType** GetLeafObjects ()
+    {
+      CS_ASSERT(IsLeaf ());
+      return leafStorage;
     }
 
     ///

@@ -551,7 +551,7 @@ struct iTerrainCellLoadCallback : public virtual iBase
  */
 struct iTerrainSystem : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainSystem, 2, 0, 0);
+  SCF_INTERFACE (iTerrainSystem, 2, 1, 0);
 
   /**
    * Query a cell by name
@@ -622,7 +622,8 @@ struct iTerrainSystem : public virtual iBase
    * property set to false
    */
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
-                           bool oneHit, iTerrainVector3Array* points) = 0;
+                           bool oneHit, iTerrainVector3Array* points,
+                           csArray<iMaterialWrapper*>* materials) = 0;
 
   /**
    * Collide segment with the terrain

@@ -24,8 +24,11 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 struct iThreadTest;
 
-struct Data : public csRefCount
+class Data : public scfImplementation0<Data>
 {
+public:
+  Data() : scfImplementationType(this) {}
+
   int i;
   float f;
   double d[10000000];
@@ -74,13 +77,14 @@ public:
 
   bool Test7Passed() const
   {
+    CS::Threading::MutexScopedLock lock(test7lock);
     return test7 == 10;
   }
 
 private:
   iObjectRegistry* objReg;
 
-  CS::Threading::Mutex test7lock;
+  mutable CS::Threading::Mutex test7lock;
   uint test7;
 };
 

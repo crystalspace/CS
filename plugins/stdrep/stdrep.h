@@ -135,7 +135,7 @@ public:
 
   THREADED_CALLABLE_DECL4(csReporterListener, Report, csThreadReturn,
     iReporter*, reporter, int, severity, const char*, msgId, const char*,
-    description, HIGH, true, false);
+    description, HIGH, false, false);
 
   // This is not an embedded interface in order to avoid
   // a circular reference between this registered event handler

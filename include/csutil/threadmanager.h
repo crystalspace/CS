@@ -167,7 +167,7 @@ class csThreadReturn : public scfImplementation1<csThreadReturn, iThreadReturn>
 {
 public:
   csThreadReturn(iThreadManager* tm) : scfImplementationType(this),
-    finished(false), result(0), tm(tm), waitLock(0), wait(0)
+    finished(false), success(false), result(0), tm(tm), waitLock(0), wait(0)
   {
   }
 
@@ -175,9 +175,18 @@ public:
   {
   }
 
-  bool IsFinished() { return finished; }
+  bool IsFinished()
+  {
+    CS::Threading::MutexScopedLock lock(updateLock);
+    return finished;
+  }
 
-  bool WasSuccessful() { return true; }
+  bool WasSuccessful()
+  {
+    CS::Threading::MutexScopedLock lock(updateLock);
+    return success;
+  }
+
   void* GetResultPtr() { return result; }
   csRef<iBase> GetResultRefPtr() { return refResult; }
 
@@ -196,7 +205,12 @@ public:
     }
   }
 
-  void MarkSuccessful() { return; }
+  void MarkSuccessful()
+  {
+    CS::Threading::MutexScopedLock lock(updateLock);
+    success = true;
+  }
+
   void SetResult(void* result) { this->result = result; }
   void SetResult(csRef<iBase> result) { refResult = result; }
 
@@ -226,6 +240,7 @@ public:
 
 private:
   bool finished;
+  bool success;
   void* result;
   csRef<iBase> refResult;
   csWeakRef<iThreadManager> tm;

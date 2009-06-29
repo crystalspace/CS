@@ -169,7 +169,7 @@ THREADED_CALLABLE_IMPL1(csProcTexture, SetupProcEventHandler,
 struct csProcTexCallback : 
   public scfImplementation2<csProcTexCallback, iTextureCallback, iProcTexCallback>
 {
-  csRef<csProcTexture> pt;
+  csWeakRef<csProcTexture> pt;
   csProcTexCallback () : scfImplementationType (this) { }
   virtual ~csProcTexCallback () { }
   virtual void UseTexture (iTextureWrapper*);

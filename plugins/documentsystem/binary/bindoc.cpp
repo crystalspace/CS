@@ -1510,7 +1510,7 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
 // =================================================
 
 csBinaryDocument::csBinaryDocument () : scfImplementationType (this),
-  root (0), attrAlloc (0), nodeAlloc (0), outStrHash (0)
+  root (0), attrAlloc (2000), nodeAlloc (2000), outStrHash (0)
 {
 }
 
@@ -1518,32 +1518,26 @@ csBinaryDocument::~csBinaryDocument ()
 {
   if (root && (root->flags & BD_NODE_MODIFIED))
     delete root;
-  delete attrAlloc;
-  delete nodeAlloc;
 }
 
 csBdAttr* csBinaryDocument::AllocBdAttr ()
 {
-  if (!attrAlloc) attrAlloc = new csBlockAllocator<csBdAttr> (2000);
-  return attrAlloc->Alloc();
+  return attrAlloc.Alloc();
 }
 
 void csBinaryDocument::FreeBdAttr (csBdAttr* attr)
 {
-  CS_ASSERT(attrAlloc);
-  attrAlloc->Free (attr);
+  attrAlloc.Free (attr);
 }
 
 csBdNode* csBinaryDocument::AllocBdNode ()
 {
-  if (!nodeAlloc) nodeAlloc = new csBlockAllocator<csBdNode> (2000);
-  return nodeAlloc->Alloc();
+  return nodeAlloc.Alloc();
 }
 
 void csBinaryDocument::FreeBdNode (csBdNode* node)
 {
-  CS_ASSERT(nodeAlloc);
-  nodeAlloc->Free (node);
+  nodeAlloc.Free (node);
 }
 
 #include "csutil/custom_new_disable.h"

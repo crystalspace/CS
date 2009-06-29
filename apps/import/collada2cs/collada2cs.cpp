@@ -93,7 +93,7 @@ int main(int argc, char** argv)
       }
       else
       {
-        printf("File %u of %u:\n", i+1, args.GetSize());
+        printf("File %zu of %zu:\n", i + 1, args.GetSize());
         csString fileIn = "/this/";
         fileIn.Append(args[i]);
 

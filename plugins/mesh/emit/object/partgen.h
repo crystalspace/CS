@@ -332,10 +332,10 @@ public:
   { return false; }
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
     csVector3& isect, float* pr, int* polygon_idx = 0, 
-    iMaterialWrapper** material = 0) 
+    iMaterialWrapper** material = 0, csArray<iMaterialWrapper*>* materials = 0) 
   { 
     (void)start; (void)end; (void)isect; (void)pr; (void)polygon_idx;
-    (void)material;
+    (void)material; (void)materials;
     return false; 
   }
   virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }

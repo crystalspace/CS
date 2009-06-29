@@ -20,35 +20,62 @@
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
 
+#include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <limits.h>
+
+bool getcwdcheck (char* path, size_t size)
+{
+  if (getcwd (path, size) == 0)
+  {
+      csPrintfErr ("csPathUtilities: getcwd() error for '%s' (errno = %d)!\n",
+        path, errno);
+    return false;
+  }
+  return true;
+}
+
+bool chdircheck (const char* path)
+{
+  if (chdir (path) != 0)
+  {
+    const int errcode = errno;
+    // some "file not found" errors are to be expected, so filter them out.
+    if (errcode != ENOENT)
+      csPrintfErr ("csPathUtilities: chdir() error for %s (errno = %d)!\n",
+        path, errcode);
+    return false;
+  }
+  return true;
+}
 
 char* csPathsUtilities::ExpandPath (const char* path)
 {
   // Remember where we are.
   char old_path[CS_MAXPATHLEN];
-  if (getcwd (old_path, sizeof (old_path)) == 0)
-  {
+  if (!getcwdcheck (old_path, sizeof (old_path)))
     // In case of an error return 0.
     return 0;
-  }
 
   // Normalize `path'.
-  if (chdir (path) != 0)
+  if (!chdircheck (path))
   {
-    chdir (old_path);
+    if (!chdircheck (old_path))
+      return 0;
     return 0;
   }
   char normalized_path[CS_MAXPATHLEN];
-  if (getcwd (normalized_path, sizeof (normalized_path)) == 0)
+  if (!getcwdcheck (normalized_path, sizeof (normalized_path)))
   {
-    chdir (old_path);
+    if (!chdircheck (old_path))
+      return 0;
     return 0;
   }
 
   // Restore working directory.
-  chdir (old_path);
+  if (!chdircheck (old_path))
+    return (csStrNew (normalized_path)); // return normalized path nevertheless
 
   return (csStrNew (normalized_path));
 }

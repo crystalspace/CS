@@ -35,6 +35,10 @@ AC_DEFUN([CS_CHECK_HOST_CPU],
     [AC_REQUIRE([AC_CANONICAL_HOST])
     case $host_cpu in
         [[Ii][3-9]86*|[Xx]86*]) cs_host_cpu=x86 ;;
+        powerpc*) cs_host_cpu=powerpc ;;
+        sparc*) cs_host_cpu=sparc ;;
+        mips*) cs_host_cpu=mips ;;
+        alpha*) cs_host_cpu=alpha ;;
         *) cs_host_cpu=$host_cpu ;;
     esac
     cs_host_cpu_normalized="AS_TR_CPP([$cs_host_cpu])"

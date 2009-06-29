@@ -208,9 +208,14 @@ struct csHitBeamResult
   int polygon_idx;
   /**
    * Only for HitBeamObject and HitBeam: the material that was hit. Can be 0
-   * in case the meshobject doesn't support getting the material.
+   * in the case that the meshobject doesn't support getting the material.
    */
   iMaterialWrapper* material;
+  /**
+   * Only for HitBeamObject and HitBeam: the materials that were hit. Can be
+   * empty in the case that the meshobject doesn't support getting the material.
+   */
+  csArray<iMaterialWrapper*> materials;
   /**
    * Only for HitBeamBBox: Face number that was hit.
    * \sa csIntersect3::BoxSegment
@@ -220,6 +225,10 @@ struct csHitBeamResult
    * For all except HitBeamBBox: true if hit, false otherwise.
    */
   bool hit;
+
+  csHitBeamResult() : material(0), hit(false)
+  {
+  }
 };
 
 /**

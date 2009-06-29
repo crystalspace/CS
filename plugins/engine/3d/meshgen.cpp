@@ -25,43 +25,53 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iengine/material.h"
 #include "igraphic/image.h"
 
+static int AreaCompare(csVector4 const& r, csVector4 const& k)
+{
+  float a = (r.z - r.x) * (r.w - r.y);
+  float b = (k.z - k.x) * (k.w - k.y);
+  return (a < b) ? 1 : (a - b) > 0.01 ? -1 : 0;
+}
+
 PositionMap::PositionMap(const csBox2& box)
 {
+  posGen.Initialize();
   freeAreas.Push(csVector4(box.MinX(), box.MinY(), box.MaxX(), box.MaxY()));
 }
 
-bool PositionMap::GetRandomPosition(float& xpos, float& zpos, float& radius)
+bool PositionMap::GetRandomPosition(float& xpos, float& zpos, float& radius, float& minRadius)
 {
-  posGen.Initialize();
-  csArray<size_t> notAttempted;
-
-  for(size_t i=0; i<freeAreas.GetSize(); i++)
-  {
-    notAttempted.Push(i);
-  }
-
   // Do a quick search.
-  while(notAttempted.GetSize() != 0)
+  for(size_t i=0; i<freeAreas.GetSize(); ++i)
   {
-    uint32 idx = posGen.Get(notAttempted.GetSize());
+    csVector4 freeArea = freeAreas[i];
 
-    csVector4 freeArea = freeAreas[notAttempted[idx]];
-    if(fabs(freeArea.x - freeArea.z) < radius ||
-       fabs(freeArea.y - freeArea.w) < radius)
+    if(freeArea.z - freeArea.x < radius*2 ||
+       freeArea.w - freeArea.y < radius*2)
     {
-      notAttempted.DeleteIndexFast(idx);
       continue;
     }
 
-    xpos = (freeArea.x + freeArea.z)/2;
-    zpos = (freeArea.y + freeArea.w)/2;
+    float xAvail = freeArea.x + radius/2;
+    float yAvail = freeArea.y + radius/2;
+    float zAvail = freeArea.z - radius/2;
+    float wAvail = freeArea.w - radius/2;
 
-    freeAreas.DeleteIndexFast(notAttempted[idx]);
+    xpos = freeArea.x + radius + posGen.Get(zAvail - xAvail);
+    zpos = freeArea.y + radius + posGen.Get(wAvail - yAvail);
 
-    freeAreas.Push(csVector4(freeArea.x, freeArea.y, xpos+radius, zpos-radius));
-    freeAreas.Push(csVector4(xpos+radius, freeArea.y, freeArea.z, zpos+radius));
-    freeAreas.Push(csVector4(xpos-radius, zpos+radius, freeArea.z, freeArea.w));
-    freeAreas.Push(csVector4(freeArea.x, zpos-radius, xpos-radius, freeArea.w));
+    freeAreas.DeleteIndex(i);
+
+    if(minRadius*2 <= (zpos-radius) - freeArea.y)
+      freeAreas.InsertSorted(csVector4(freeArea.x, freeArea.y, xpos+radius, zpos-radius), AreaCompare);
+
+    if(minRadius*2 <= freeArea.z - (xpos+radius))
+      freeAreas.InsertSorted(csVector4(xpos+radius, freeArea.y, freeArea.z, zpos+radius), AreaCompare);
+
+    if(minRadius*2 <= freeArea.w - (zpos+radius))
+      freeAreas.InsertSorted(csVector4(xpos-radius, zpos+radius, freeArea.z, freeArea.w), AreaCompare);
+
+    if(minRadius*2 <= (xpos-radius) - freeArea.x)
+      freeAreas.InsertSorted(csVector4(freeArea.x, zpos-radius, xpos-radius, freeArea.w), AreaCompare);
 
     return true;
   }
@@ -241,7 +251,6 @@ void csMeshGeneratorGeometry::AddFactory (iMeshFactoryWrapper* factory,
   factories.InsertSorted (g, CompareGeom);
 
   if (maxdist > total_max_dist) total_max_dist = maxdist;
-  
 }
 
 void csMeshGeneratorGeometry::RemoveFactory (size_t idx)
@@ -280,15 +289,17 @@ iMeshWrapper* csMeshGeneratorGeometry::AllocMesh (
       geom.mesh->GetMovable ()->UpdateMove ();
     }
     vertexInfo.transformVar.AttachNew (new csShaderVariable);
- 	  vertexInfo.fadeFactorVar.AttachNew (new csShaderVariable);
+ 	vertexInfo.fadeFactorVar.AttachNew (new csShaderVariable);
     vertexInfo.windVar.AttachNew (new csShaderVariable);
     vertexInfo.windSpeedVar.AttachNew (new csShaderVariable);
     csRandomGen rng (csGetTicks ());
     vertexInfo.windRandVar = rng.Get();
- 	  geom.vertexInfoArray.transformVar->AddVariableToArray (vertexInfo.transformVar);
- 	  geom.vertexInfoArray.fadeFactorVar->AddVariableToArray (vertexInfo.fadeFactorVar);
+ 	geom.vertexInfoArray.transformVar->AddVariableToArray (vertexInfo.transformVar);
+ 	geom.vertexInfoArray.fadeFactorVar->AddVariableToArray (vertexInfo.fadeFactorVar);
     geom.vertexInfoArray.windVar->AddVariableToArray (vertexInfo.windVar);
     geom.vertexInfoArray.windSpeedVar->AddVariableToArray (vertexInfo.windSpeedVar);
+    vertexInfo.fadeFactorVar->SetValue(1.0f);
+
     return geom.mesh;
   }
 }
@@ -409,7 +420,7 @@ void csMeshGeneratorGeometry::UpdatePosition (const csVector3& pos)
 //--------------------------------------------------------------------------
 
 csMeshGenerator::csMeshGenerator (csEngine* engine) : 
-  scfImplementationType (this), total_max_dist (-1.0f), 
+  scfImplementationType (this), total_max_dist (-1.0f), minRadius(-1.0f),
   use_density_scaling (false), use_alpha_scaling (false),
   last_pos (0, 0, 0), setup_cells (false),
   cell_dim (50), inuse_blocks (0), inuse_blocks_last (0),
@@ -688,8 +699,19 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
   const csBox2& box = cell.box;
   float box_area = box.Area ();
 
-  size_t i, j, g;
-  for (g = 0 ; g < geometries.GetSize () ; g++)
+  if(minRadius < 0.0f)
+  {
+    for (size_t i = 0 ; i < geometries.GetSize () ; i++)
+    {
+      if(geometries[i]->GetRadius() < minRadius || minRadius < 0.0f)
+      {
+        minRadius = geometries[i]->GetRadius();
+      }
+    }
+  }
+
+  size_t i, j;
+  for (size_t g = 0 ; g < geometries.GetSize () ; g++)
   {
     csMGPosition pos;
     pos.geom_type = g;
@@ -712,7 +734,7 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
       if (mpos_count == 0)
       {
         float r = geometries[g]->GetRadius();
-        if(!cell.positionMap->GetRandomPosition(x, z, r))
+        if(!cell.positionMap->GetRandomPosition(x, z, r, minRadius))
         {
           // Ran out of room in this cell.
           return;
@@ -735,6 +757,7 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
         end.y = samplebox.MinY ();
         bool hit = false;
         iMaterialWrapper* hit_material = 0;
+        csArray<iMaterialWrapper*> hit_materials;
         for (i = 0 ; i < cell.meshes.GetSize () ; i++)
         {
           csHitBeamResult rc = cell.meshes[i]->HitBeam (start, end,
@@ -744,6 +767,10 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
             pos.position = rc.isect;
             end.y = rc.isect.y + 0.0001;
             hit_material = rc.material;
+            if(hit_material == 0)
+            {
+                hit_materials = rc.materials;
+            }
             hit = true;
           }
         }
@@ -753,18 +780,46 @@ void csMeshGenerator::GeneratePositions (int cidx, csMGCell& cell,
           {
             // We use material density tables.
             float factor = default_material_factor;
-            size_t mi;
-            for (mi = 0 ; mi < mftable.GetSize () ; mi++)
-              if (mftable[mi].material == hit_material)
+            if(hit_material != 0)
+            {
+              for (size_t mi = 0 ; mi < mftable.GetSize () ; mi++)
               {
-                factor = mftable[mi].factor;
-                break;
+                if (mftable[mi].material == hit_material)
+                {
+                  factor = mftable[mi].factor;
+                  break;
+                }
               }
-              if (factor < 0.0001) hit = false;
-              else if (factor < 0.9999 && random.Get () > factor)
+            }
+            else
+            {
+              // Get the highest material factor.
+              float factorh = 0;
+              for(size_t m=0; m<hit_materials.GetSize(); ++m)
               {
-                hit = false;
+                for (size_t mi=0 ; mi<mftable.GetSize (); ++mi)
+                {
+                  if (mftable[mi].material == hit_materials.Get(m))
+                  {
+                    if(mftable[mi].factor > factorh)
+                    {
+                      factorh = mftable[mi].factor;
+                    }
+                    break;
+                  }
+                }
               }
+
+              if(factorh > 0)
+              {
+                factor = factorh;
+              }
+            }
+
+            if (factor < 0.0001 || (factor < 0.9999 && random.Get () > factor))
+            {
+              hit = false;
+            }
           }
           if (hit)
           {
@@ -905,7 +960,10 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
             + density_maxfactor;
           if (factor < 0) factor = 0;
           else if (factor > 1) factor = 1;
-          if (p.random > factor) show = false;
+          if (p.random > factor)
+              show = false;
+          else
+              p.addedDist = dist;
         }
 
         if (show)
@@ -918,17 +976,6 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
             p.last_mixmode = ~0;
             geometries[p.geom_type]->MoveMesh (cidx, mesh, p.lod,
               p.vertexInfo, p.position, rotation_matrices[p.rotation]);
-
-/*
-  csRef<iImposter> imposter = scfQueryInterface<iImposter> (mesh);
-    imposter->SetImposterActive (true);
-  iSharedVariable *var = engine->GetVariableList()->FindByName 
-    ("Std Thing Range");
-  imposter->SetMinDistance (var);
-  var = engine->GetVariableList()->FindByName
-    ("Std Thing Angle");
-  imposter->SetRotationTolerance (var);
-*/
           }
         }
       }
@@ -950,7 +997,7 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
               p.position, rotation_matrices[p.rotation]);
           }
         }
-        else 
+        else if(!delta.IsZero())
         { 
           // LOD level is fine, adjust for new pos 
           geometries[p.geom_type]->MoveMesh (cidx, p.mesh, p.lod, p.vertexInfo, 
@@ -961,33 +1008,35 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
       {
         SetWindData(p);
       }
-      if (p.mesh && use_alpha_scaling)
+      if (!delta.IsZero() && p.mesh && use_alpha_scaling)
       {
-        // This is used only if we have both density scaling and
-        // alpha scaling. It is the offset to correct the distance at which
-        // the object will disappear. We can adapt alpha scaling to scale
-        // based on that new distance.
-        float correct_dist = 0;
+        // These are used when we have both density and alpha scaling.
+        // The alpha limits are adjusted for the density added mesh.
+        float correct_alpha_maxdist = alpha_maxdist;
         float correct_sq_alpha_mindist = sq_alpha_mindist;
+        float correct_scale = alpha_scale;
 
-#if 0
-        if (use_density_scaling && sqdist > sq_density_mindist)
+        if (use_density_scaling && p.addedDist > 0)
         {
-          correct_dist = (p.random - density_maxfactor) / density_scale;
-          if (correct_dist < 0) correct_dist = 0;
-          correct_sq_alpha_mindist = alpha_mindist-correct_dist;
-          correct_sq_alpha_mindist *= correct_sq_alpha_mindist;
-          //printf ("p.mesh='%s' sqdist=%g dist=%g correct_sq_alpha_mindist=%g correct_dist=%g p.random=%g", p.mesh->QueryObject ()->GetName (), sqdist, sqrt (sqdist), correct_sq_alpha_mindist, correct_dist, p.random); fflush (stdout);
+          correct_alpha_maxdist = p.addedDist;
+          float correct_alpha_mindist = p.addedDist*(alpha_mindist/alpha_maxdist);
+          correct_sq_alpha_mindist = correct_alpha_mindist*correct_alpha_mindist;
+          correct_scale = 1.0f/(correct_alpha_maxdist-correct_alpha_mindist);
         }
-#endif
 
         float factor = 1.0;
         if (sqdist > correct_sq_alpha_mindist)
         {
           float dist = sqrt (sqdist);
-          factor = (alpha_maxdist-correct_dist - dist) * alpha_scale;
+          factor = (correct_alpha_maxdist - dist) * correct_scale;
+          if(factor < 0) factor = 0.0f;
         }
-        //printf (" -> factor=%g\n", factor); fflush (stdout);
+
+        if(use_density_scaling && p.addedDist > 0 && (1.0f - factor) < 0.01)
+        {
+            p.addedDist = 0;
+        }
+ 
         SetFade (p, factor);
       }
     }
@@ -998,6 +1047,7 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
         geometries[p.geom_type]->SetAsideMesh (cidx, p.mesh, p.lod,
           p.vertexInfo);
         p.mesh = 0;
+        p.addedDist = 0;
       }
     }
   }
@@ -1122,6 +1172,7 @@ iMeshGeneratorGeometry* csMeshGenerator::CreateGeometry ()
 {
   csMeshGeneratorGeometry* geom = new csMeshGeneratorGeometry (this);
   geometries.Push (geom);
+  minRadius = -1.0f; // Requires a recalculate.
   total_max_dist = -1.0f;	// Requires a recalculate.
   geom->DecRef ();
   return geom;

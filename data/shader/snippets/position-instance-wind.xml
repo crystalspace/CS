@@ -112,14 +112,13 @@
 	
     <block location="cg:vertexMain">
       position_world = mul (instancingTransforms, Hposition);
-
       float posOffset = dot(position_world.xz, wind_data.xy) + wind_data.z;
       float2 offset = clamp(Hposition.y, 0.0, Hposition.y) * (wind_data.xy * ((wind_data.w-1)/wind_data.w + sin(wind_speed*standard_time+posOffset)/(wind_data.w)));
       Hposition.x += offset.x;
       Hposition.z += offset.y;
-      position_world = mul (instancingTransforms, Hposition);
 
       position_object = Hposition;
+      position_world = mul (instancingTransforms, position_object);
       position_screen = position = mul (ModelViewProj, position_world);
       position_camera = mul (ModelView, position_world);
       

@@ -335,15 +335,17 @@ csPtr<iComponent> csPluginManager::LoadPluginInstance (const char *classID,
       }
     }
 
+    mutex.Unlock();
     if ((!(flags & lpiInitialize)) || p->Initialize (object_reg))
     {
       if (flags & lpiInitialize) QueryOptions (p);
-      mutex.Unlock();
       CS::Threading::MutexScopedLock lock (loadingLock);
       alreadyLoading.Delete(classID, loading);
       loading->NotifyAll();
       return csPtr<iComponent> (p);
     }
+    mutex.Lock();
+
     // If we added this plugin in this call then we remove it here as well.
     if (index != csArrayItemNotFound)
       Plugins.DeleteIndex (index);

@@ -34,7 +34,6 @@
     <alias name="parallax" weak="yes" file="/shader/snippets/surface/parallax.xml" />
     <alias name="normalmap" weak="yes" file="/shader/snippets/surface/normalmap.xml" />
     <alias name="surface" weak="yes" file="/shader/snippets/surface/surface-classic.xml" />
-    <alias name="surface" weak="yes" file="/shader/snippets/surface/surface-classic.xml" />
     <alias name="specular" weak="yes" file="/shader/snippets/surface/specular-weirdold.xml" />
     <alias name="staticspecular" weak="yes" file="/shader/snippets/lighting/staticspec-default.xml" />
     <alias name="glow" weak="yes" file="/shader/lighting/glow.xml" />
