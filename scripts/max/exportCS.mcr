@@ -772,9 +772,9 @@ rollout Test1 "Export Level to CS" width:226 height:450
                               (
   	      	                  if(diffuseMapImage!="materialnotdefined") then
 						(
-                             			format "    <material name=\"%\">\n" diffuseMapImage to:outFile
+                             			format "    <material name=\"%\">\n" imagetemp to:outFile
 						)
-						else if(m.mapEnables[10]) then
+						else if(subm.mapEnables[10]) then
 						(
 							format "    <material name=\"%\">\n" subm.name to:outFile
 						)
