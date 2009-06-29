@@ -176,6 +176,15 @@ private:
   /// Class for keeping track of imposter information.
   csImposterFactory* imposter_factory;
 
+  // Factory to be instanced.
+  iMeshFactoryWrapper* instanceFactory;
+
+  // Array of transform vars for the imposter instances.
+  csRef<csShaderVariable> transformVars;
+
+  // Instance transform shadervar.
+  CS::ShaderVarStringID varTransform;
+
 protected:
   virtual void InternalRemove() { SelfDestruct(); }
 
@@ -273,6 +282,36 @@ public:
     return render_priority;
   }
   void SetRenderPriorityRecursive (long rp);
+
+  /**
+   * Sets the instance factory.
+   */
+  virtual void SetInstanceFactory(iMeshFactoryWrapper* meshfact)
+  {
+    instanceFactory = meshfact;
+    meshFact = instanceFactory->GetMeshObjectFactory();
+  }
+
+  /**
+   * Returns the instance factory.
+   */
+  virtual iMeshFactoryWrapper* GetInstanceFactory() const
+  {
+    return instanceFactory;
+  }
+
+  /**
+   * Adds a (pseudo-)instance of the instance factory at the given position.
+   */
+  virtual void AddInstance(csVector3& position, csMatrix3& rotation);
+
+  /**
+   * Returns the instancing transforms array shadervar/
+   */
+  virtual csShaderVariable* GetInstances() const
+  {
+    return transformVars;
+  }
 
   //---------- iImposter Functions -----------------//
 

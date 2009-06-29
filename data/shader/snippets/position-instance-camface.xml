@@ -79,8 +79,8 @@
 
     <block location="cg:vertexMain">
       float4 offset = mul (instancingTransforms, float4(0, 0, 0, 1));
-      position_camera = position_world = position_object = Hposition;
-      position_world.xyz += offset.xyz;
+      position_camera = position_object = Hposition;
+      position_world = mul (instancingTransforms, position_object);
       position_camera.xyz += mul (ModelView, offset).xyz;
       position_screen = position = mul (Proj, position_camera);
       

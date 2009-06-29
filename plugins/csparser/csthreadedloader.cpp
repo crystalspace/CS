@@ -1895,7 +1895,71 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
           }
         }
         break;
+    case XMLTOKEN_INSTANCES:
+      {
+        // Get the factory to be instanced.
+        csRef<iDocumentNode> instancedFact = child->GetNode("meshfact");
+        if (!instancedFact)
+          return false;
 
+        csReversibleTransform child_transf;
+        csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
+        if(!FindOrLoadMeshFactoryTC(ret, false, 0, ldr_context, instancedFact, stemp, &child_transf, ssource, vfs->GetCwd()))
+        {
+          return false;
+        }
+
+        csRef<iMeshFactoryWrapper> instanceFactory = scfQueryInterface<iMeshFactoryWrapper>(ret->GetResultRefPtr());
+        stemp->SetInstanceFactory(instanceFactory);
+        instanceFactory->GetMeshObjectFactory()->SetMeshFactoryWrapper(stemp);
+
+        // Get instances.
+        csRef<iDocumentNodeIterator> instances = child->GetNodes("instance");
+        while(instances->HasNext())
+        {
+          csRef<iDocumentNode> instance = instances->Next();
+
+          // Get o2w rotation.
+          csMatrix3 rotation;
+          csRef<iDocumentNode> matrix_node = instance->GetNode ("matrix");
+          if (matrix_node)
+          {
+            if (!SyntaxService->ParseMatrix(matrix_node, rotation))
+              return false;
+          }
+
+          // Get position offset.
+          csRef<iDocumentNode> vector_node = instance->GetNode ("v");
+          if (!vector_node)
+            return false;
+          
+          csVector3 v;
+          if (!SyntaxService->ParseVector (vector_node, v))
+            return false;
+
+          stemp->AddInstance(v, rotation);
+        }
+      }
+      break;
+    case XMLTOKEN_BBOX:
+      {
+        csBox3 bbox;
+
+        csRef<iDocumentNodeIterator> vertices = child->GetNodes("v");
+        while(vertices->HasNext())
+        {
+          csRef<iDocumentNode> vertex = vertices->Next();
+
+          csVector3 v;
+          if (!SyntaxService->ParseVector (vertex, v))
+            return false;
+
+          bbox.AddBoundingVertex(v);
+        }
+
+        stemp->GetMeshObjectFactory()->GetObjectModel()->SetObjectBoundingBox(bbox);
+      }
+      break;
       case XMLTOKEN_MOVE:
         {
           if (!transf)

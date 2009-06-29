@@ -91,6 +91,38 @@ csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj)
   SetDefaultEnvironmentTexture ();
 }
 
+void csMeshWrapper::SetFactory (iMeshFactoryWrapper* factory)
+{
+  // Check if we're instancing, if so then set the shadervar and instance factory.
+  csShaderVariable* instances = factory->GetInstances();
+  if(instances)
+  {
+    GetSVContext()->AddVariable(instances);
+    factory = factory->GetInstanceFactory();
+
+    csRef<iShaderVarStringSet> SVstrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
+    engine->objectRegistry, "crystalspace.shader.variablenameset");
+    CS::ShaderVarStringID varFadeFactor = SVstrings->Request ("alpha factor");
+
+    fadeFactors.AttachNew (new csShaderVariable (varFadeFactor));
+    fadeFactors->SetType (csShaderVariable::ARRAY);
+    fadeFactors->SetArraySize (0);
+
+    for(size_t i=0; i<instances->GetArraySize(); ++i)
+    {
+      csRef<csShaderVariable> fadeFactor;
+      fadeFactor.AttachNew(new csShaderVariable);
+      fadeFactor->SetValue(1.0f);
+      fadeFactors->AddVariableToArray(fadeFactor);
+    }
+
+    GetSVContext()->AddVariable(fadeFactors);
+  }
+
+  csMeshWrapper::factory = factory;
+  SetParentContext (factory ? factory->GetSVContext() : 0);
+}
+
 void csMeshWrapper::SelfDestruct ()
 {
   engine->GetMeshes ()->Remove (static_cast<iMeshWrapper*> (this));

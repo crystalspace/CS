@@ -118,6 +118,12 @@ rollout Test1 "Export Level to CS" width:226 height:450
 		global emitNeeded = false
 		global particleNeeded = false
 		global partMaterials = #()
+		
+		-- instanced materials
+		global instancedMats = #()
+		
+		-- leaves materials
+		global leavesMats = #()
 
 		-- terrain
 		global base_material = ""
@@ -621,13 +627,54 @@ rollout Test1 "Export Level to CS" width:226 height:450
 					(
 						continue;
 					)
+					
+					-- Find if it's an instanced mat
+					local instancedMat = false
+					if(findItem instancedMats m!=0) then
+					(
+						instancedMat = true
+					)
+					
+					-- Find if it's a leaves mat
+					local leavesMat = false
+					if(findItem leavesMats m!=0) then
+					(
+						leavesMat = true
+					)
 
 					-- handles transparent materials
 					if (m.mapEnables[7]) then
-                              (
+					(
 						format "      <shader type=\"depthwrite\">*null</shader>\n" to:outFile
-						format "      <shader type=\"base\">lighting_default_binalpha</shader>\n" to:outFile
-						format "      <shader type=\"diffuse\">lighting_default_binalpha</shader>\n" to:outFile
+						
+					    if (leavesMat) then
+						(
+							format "      <shader type=\"base\">foliage_tree_leaves</shader>\n" to:outFile
+							format "      <shader type=\"diffuse\">foliage_tree_leaves</shader>\n" to:outFile
+						)
+						else if (instancedMat) then
+						(
+							format "      <shader type=\"base\">lighting_default_instance_binalpha</shader>\n" to:outFile
+							format "      <shader type=\"diffuse\">lighting_default_instance_binalpha</shader>\n" to:outFile
+						)
+						else
+						(
+							format "      <shader type=\"base\">lighting_default_binalpha</shader>\n" to:outFile
+							format "      <shader type=\"diffuse\">lighting_default_binalpha</shader>\n" to:outFile
+						)
+					)
+					else
+					(
+			            if (leavesMat) then
+						(
+							format "      <shader type=\"base\">foliage_tree_leaves</shader>\n" to:outFile
+							format "      <shader type=\"diffuse\">foliage_tree_leaves</shader>\n" to:outFile
+						)
+						else if (instancedMat) then
+						(
+							format "      <shader type=\"base\">lighting_default_instance</shader>\n" to:outFile
+							format "      <shader type=\"diffuse\">lighting_default_instance</shader>\n" to:outFile
+						)
 					)
 
 					-- handles reflection materials
@@ -680,6 +727,10 @@ rollout Test1 "Export Level to CS" width:226 height:450
                               	(
                               	  format "      <shadervar type=\"texture\" name=\"tex specular\">%</shadervar>\n" specMapImage to:outFile
                               	)
+								else
+								(
+									format "      <shadervar type=\"vector3\" name=\"specular\">0,0,0</shadervar>\n" to:outFile
+								)
 					)
                               
                               format "    </material>\n" to:outFile
@@ -721,19 +772,60 @@ rollout Test1 "Export Level to CS" width:226 height:450
                               (
   	      	                  if(diffuseMapImage!="materialnotdefined") then
 						(
-                             			format "    <material name=\"%\">\n" imagetemp to:outFile
+                             			format "    <material name=\"%\">\n" diffuseMapImage to:outFile
 						)
 						else if(m.mapEnables[10]) then
 						(
 							format "    <material name=\"%\">\n" subm.name to:outFile
 						)
+						
+						-- Find if it's an instanced mat
+						local instancedMat = false
+						if(findItem instancedMats subm!=0) then
+						(
+							instancedMat = true
+						)
+						
+						-- Find if it's a leaves mat
+						local leavesMat = false
+						if(findItem leavesMats subm!=0) then
+						(
+							leavesMat = true
+						)
 
 						-- handles transparent materials
 						if (subm.mapEnables[7]) then
-     		                        (
+						(
 							format "      <shader type=\"depthwrite\">*null</shader>\n" to:outFile
-							format "      <shader type=\"base\">lighting_default_binalpha</shader>\n" to:outFile
-							format "      <shader type=\"diffuse\">lighting_default_binalpha</shader>\n" to:outFile
+						
+							if (leavesMat) then
+							(
+								format "      <shader type=\"base\">foliage_tree_leaves</shader>\n" to:outFile
+								format "      <shader type=\"diffuse\">foliage_tree_leaves</shader>\n" to:outFile
+							)
+							else if (instancedMat) then
+							(
+								format "      <shader type=\"base\">lighting_default_instance_binalpha</shader>\n" to:outFile
+								format "      <shader type=\"diffuse\">lighting_default_instance_binalpha</shader>\n" to:outFile
+							)
+							else
+							(
+								format "      <shader type=\"base\">lighting_default_binalpha</shader>\n" to:outFile
+								format "      <shader type=\"diffuse\">lighting_default_binalpha</shader>\n" to:outFile
+							)
+						)
+						else
+						(
+							if (leavesMat) then
+							(
+								format "      <shader type=\"base\">foliage_tree_leaves</shader>\n" to:outFile
+								format "      <shader type=\"diffuse\">foliage_tree_leaves</shader>\n" to:outFile
+							)
+							else if (instancedMat) then
+							(
+								format "      <shader type=\"base\">lighting_default_instance</shader>\n" to:outFile
+								format "      <shader type=\"diffuse\">lighting_default_instance</shader>\n" to:outFile
+							)
 						)
 
 						-- manage shaders
@@ -808,6 +900,10 @@ rollout Test1 "Export Level to CS" width:226 height:450
                               		(
                               		  format "      <shadervar type=\"texture\" name=\"tex specular\">%</shadervar>\n" specMapImage to:outFile
                               		)
+									else
+									(
+										format "      <shadervar type=\"vector3\" name=\"specular\">0,0,0</shadervar>\n" to:outFile
+									)
 						)
 
 						format "    </material>\n" to:outFile
@@ -848,6 +944,13 @@ rollout Test1 "Export Level to CS" width:226 height:450
 
               -- always write shader for alpha binary
 		  format " <shader><file>/shader/lighting/lighting_default_binalpha.xml</file></shader>\n" to:outFile
+			
+			-- instancing shaders
+			format " <shader><file>/shader/lighting/lighting_default_instance.xml</file></shader>\n" to:outFile
+			format " <shader><file>/shader/lighting/lighting_default_instance_binalpha.xml</file></shader>\n" to:outFile
+			
+			-- leaves shader
+			format " <shader><file>/shader/foliage/tree_leaves.xml</file></shader>\n" to:outFile
 
 		  -- shader for reflection
               format " <shader><file>/shader/reflect/water_plane.xml</file></shader>\n" to:outFile
@@ -1682,7 +1785,6 @@ rollout Test1 "Export Level to CS" width:226 height:450
 
 			for k=1 to lodobjects.count do
 			(
-
 				--check simple colldet setting
 				colldet = getUserProp obj "COLLDET"
 
@@ -1704,16 +1806,294 @@ rollout Test1 "Export Level to CS" width:226 height:450
 					format "  <meshfact name=\"%_%\">\n" factoryName (k-1) to:outFile
 				else
 					format "  <meshfact name=\"%\">\n" factoryName to:outFile
+				
+				-------------------
+				-- Support for instanced meshes.
+				-------------------
+				local bb = getUserProp obj "BILLBOARD"
+				local instanced = getUserProp obj "INSTANCE"
+				if (instanced!=undefined) then
+				(
+					format "      <instances>\n" to:outFile
+				
+					local tempobj = copy obj
+					convertTo tempobj (Editable_Poly)
+					
+					-- Select name.
+					local instance_name
+					if(auto==1) then
+					(
+						toks = tokenize factoryName "_"
+						instance_name = toks[3]
+						instance_name = "_g_" + instance_name + toks[4] + "-instance" + "_0"
+					)
+					else
+					(
+						instance_name = "_g_" + factoryName + "-instance" + "_0"
+					)
+					
+					-- Choose only the first element as the instance factory.
+					PolyOp.detachFaces tempobj (PolyOp.getElementsUsingFace tempobj 1) asNode: true name: instance_name
+					delete tempobj
+					tempobj = objects[objects.count]
+					tempobj.parent = obj.parent
+					centerpivot tempobj
+				
+					-- Check if we're dealing with a billboard. If so then alter to face (0, -1, 0).
+					if(bb!=undefined) then
+					(
+						theNormal = -(polyOp.getFaceNormal tempobj 1)
+						a = normalize (cross [1,2,3] theNormal)
+						b = normalize (cross a theNormal)
+					
+						convertTo tempobj (Editable_Mesh)
+					
+						for V = 1 to tempobj.numverts do
+						(
+							currentVert = getVert tempobj V
+							currentVert -= tempobj.pos
+							newVert = copy currentVert
+							newVert.x = a.x * currentVert.x + a.y * currentVert.y + a.z * currentVert.z
+							newVert.y = theNormal.x * currentVert.x + theNormal.y * currentVert.y + theNormal.z * currentVert.z
+							newVert.z = b.x * currentVert.x + b.y * currentVert.y + b.z * currentVert.z
+							setVert tempobj V newVert
+						)
+					)
+					else
+					(
+						-- Else just get object space positions.
+						convertTo tempobj (Editable_Mesh)
+					
+						for V = 1 to tempobj.numverts do
+						(
+							currentVert = getVert tempobj V
+							currentVert -= tempobj.pos
+							setVert tempobj V currentVert
+						)
+					)
+	
+					-- Write out mesh factory.
+					OutputGenMeshFactory tempobj outFile debug 0
+					delete tempobj
+					
+					-- Write out instances.
+					tempobj = copy obj
+					
+			        convertTo tempobj (Editable_Poly)
+					
+					local base = undefined;
+					local v1 = undefined;
+					local v2 = undefined;
+					local v3 = undefined;
+					
+			        -- For each element, create an instance.
+					while polyOp.getNumFaces tempobj > 1 do
+                    (
+						format "        <instance>\n" to:outFile
+						
+						PolyOp.detachFaces tempobj (PolyOp.getElementsUsingFace tempobj 1) asNode: true name: "objectInstance" 
+						local objectInstance = objects[objects.count]
+						objectInstance.parent = obj.parent
+						centerpivot objectInstance
+						
+						if(bb!=undefined) then
+						(
+							-- Set o2w rotation.
+							convertTo objectInstance (Editable_Poly)
+							theNormal = -(polyOp.getFaceNormal objectInstance 1)
+							a = normalize (cross [1,2,3] theNormal)
+							b = normalize (cross a theNormal)
+						
+							format "          <matrix>\n" to:outFile
+							format "            <m11>%</m11>\n" a.x to:outFile
+							format "            <m12>%</m12>\n" b.x to:outFile
+							format "            <m13>%</m13>\n" theNormal.x to:outFile
+							
+							format "            <m21>%</m21>\n" a.y to:outFile
+							format "            <m22>%</m22>\n" b.y to:outFile
+							format "            <m23>%</m23>\n" theNormal.y to:outFile
+							
+							format "            <m31>%</m31>\n" a.z to:outFile
+							format "            <m32>%</m32>\n" b.z to:outFile
+							format "            <m33>%</m33>\n" theNormal.z to:outFile
+							format "          </matrix>\n" to:outFile
+						)
+						else if(base != undefined) then
+						(					
+							convertTo base (Editable_Mesh)
+							local bVert1 = (getVert base v1) - (obj.pos + (base.pos - obj.pos))
+							local bVert2 = (getVert base v2) - (obj.pos + (base.pos - obj.pos))
+							local bVert3 = (getVert base v3) - (obj.pos + (base.pos - obj.pos))
+							
+							convertTo objectInstance (Editable_Mesh)
+							local oVert1 = (getVert objectInstance v1) - (obj.pos + (objectInstance.pos - obj.pos))
+							local oVert2 = (getVert objectInstance v2) - (obj.pos + (objectInstance.pos - obj.pos))
+							local oVert3 = (getVert objectInstance v3) - (obj.pos + (objectInstance.pos - obj.pos))
+							
+							-- Compute edges (compensated for y<->z axis flip).
+							local bEdge1 = normalize(point3 (bVert2.x - bVert1.x) (bVert2.z - bVert1.z) (bVert2.y - bVert1.y))
+							local bEdge2 = normalize(point3 (bVert3.x - bVert1.x) (bVert3.z - bVert1.z) (bVert3.y - bVert1.y))
+							local bEdge3 = cross bEdge1 bEdge2
+							local oEdge1 = normalize(point3 (oVert2.x - oVert1.x) (oVert2.z - oVert1.z) (oVert2.y - oVert1.y))
+							local oEdge2 = normalize(point3 (oVert3.x - oVert1.x) (oVert3.z - oVert1.z) (oVert3.y - oVert1.y))
+							local oEdge3 = cross oEdge1 oEdge2
+							
+							result = bigmatrix 3 3
+							
+							result[1][1] = oEdge1.x * bEdge1.x  + oEdge2.x * bEdge2.x + oEdge3.x * bEdge3.x
+							result[1][2] = oEdge1.x * bEdge1.y  + oEdge2.x * bEdge2.y + oEdge3.x * bEdge3.y
+							result[1][3] = oEdge1.x * bEdge1.z  + oEdge2.x * bEdge2.z + oEdge3.x * bEdge3.z
+								
+							result[2][1] = oEdge1.y * bEdge1.x  + oEdge2.y * bEdge2.x + oEdge3.y * bEdge3.x
+							result[2][2] = oEdge1.y * bEdge1.y  + oEdge2.y * bEdge2.y + oEdge3.y * bEdge3.y
+							result[2][3] = oEdge1.y * bEdge1.z  + oEdge2.y * bEdge2.z + oEdge3.y * bEdge3.z
+								
+							result[3][1] = oEdge1.z * bEdge1.x  + oEdge2.z * bEdge2.x + oEdge3.z * bEdge3.x
+							result[3][2] = oEdge1.z * bEdge1.y  + oEdge2.z * bEdge2.y + oEdge3.z * bEdge3.y
+							result[3][3] = oEdge1.z * bEdge1.z  + oEdge2.z * bEdge2.z + oEdge3.z * bEdge3.z
+							
+							format "          <matrix>\n" to:outFile
+							format "            <m11>%</m11>\n" result[1][1] to:outFile
+							format "            <m12>%</m12>\n" result[1][2] to:outFile
+							format "            <m13>%</m13>\n" result[1][3] to:outFile
+							
+							format "            <m21>%</m21>\n" result[2][1] to:outFile
+							format "            <m22>%</m22>\n" result[2][2] to:outFile
+							format "            <m23>%</m23>\n" result[2][3] to:outFile
+							
+							format "            <m31>%</m31>\n" result[3][1] to:outFile
+							format "            <m32>%</m32>\n" result[3][2] to:outFile
+							format "            <m33>%</m33>\n" result[3][3] to:outFile
+							format "          </matrix>\n" to:outFile
+							
+							-- Compensate for small difference in vertex positions.
+							local transX = 0
+							local transY = 0
+							local transZ = 0
+							
+							local bases = #()
+							local insts = #()
+							
+							for V = 1 to base.numverts do
+							(
+								currentBase = copy (getVert base V)
+								currentBase -= (obj.pos + (base.pos - obj.pos))
+								currentBase = point3 currentBase.x currentBase.z currentBase.y
+
+								currentInst = copy (getVert objectInstance V)
+								currentInst -= (obj.pos + (objectInstance.pos - obj.pos))
+								currentInst = point3 currentInst.x currentInst.z currentInst.y
+								
+								append insts currentInst
+							
+								newBase = copy currentBase
+								newBase.x = result[1][1] * currentBase.x + result[1][2] * currentBase.y + result[1][3] * currentBase.z
+								newBase.y = result[2][1] * currentBase.x + result[2][2] * currentBase.y + result[2][3] * currentBase.z
+								newBase.z = result[3][1] * currentBase.x + result[3][2] * currentBase.y + result[3][3] * currentBase.z
+								
+								append bases newBase
+							)
+							
+							local leastResidue = 99999999
+							for V = 1 to base.numverts do
+							(
+								newTrans = (insts[V] - bases[V])
+								
+								local residue = 0
+								for W = 1 to base.numverts do
+								(
+									local vert = bases[W] + newTrans
+									residue += length(insts[W] - vert)
+								)
+								
+								if(residue < leastResidue) then
+								(
+									leastResidue = residue
+									transX = newTrans.x
+									transY = newTrans.y
+									transZ = newTrans.z
+								)
+							)
+							
+							objectInstance.pos.x += transX
+							objectInstance.pos.y += transZ
+							objectInstance.pos.z += transY
+						)
+						
+						xiMove = ((objectInstance.pos.x - obj.pos.x) * xscale) + xrelocate
+						yiMove = ((objectInstance.pos.y - obj.pos.y) * yscale) + yrelocate
+						ziMove = ((objectInstance.pos.z -  obj.pos.z)* zscale) + zrelocate
+						format "          <v x=\"%\" y=\"%\" z=\"%\" />\n" xiMove ziMove yiMove to:outFile
+							
+						format "        </instance>\n" to:outFile
+							
+						if(base == undefined and bb==undefined) then
+						(
+							base = objectInstance
+							convertTo base (Editable_Poly)
+							for i=1 to base.Edges.count while (v3 == undefined) do
+							(
+								bEV = polyOp.getEdgeVerts base base.Edges[i].index
+								if(i == 1) then
+								(
+									v1 = bEV[1]
+									v2 = bEV[2]
+								)
+								else
+								(
+									if(bEV[1] == v1) then
+									(
+										v3 = bEV[2]
+									)
+									else if(bEV[2] == v1) then
+									(
+										v3 = bEV[1]
+									)
+								)
+							)
+						)
+						else
+						(
+							delete objectInstance
+						)
+					)
+				
+					if(base != undefined) then
+					(
+						delete base
+					)
+					
+					delete tempobj
+				
+					format "      </instances>\n" to:outFile
+				
+					-- Compute bbox.
+					local vMin = obj.min - obj.pos
+					local vMax = obj.max - obj.pos
+					format "     <bbox>\n"  to:outFile
+					format "       <v x=\"%\" y=\"%\" z=\"%\" />\n " vMin.x vMin.z vMin.y to:outFile
+					format "       <v x=\"%\" y=\"%\" z=\"%\" />\n " vMax.x vMax.z vMax.y to:outFile
+					format "     </bbox>\n"  to:outFile
+					format "  </meshfact>\n"  to:outFile
+					
+					continue;
+				)
 
 				if (lodobjects.count!=1) then
 					format "<lodlevel>%</lodlevel>\n" (k-1) to:outFile
 
 				format "  <plugin>meshFact</plugin>\n" to:outFile
 
-                -- exports bounding box
+                -- Export bounding box
+				local vMin = obj.min
+				local vMax = obj.max
+				if (auto==1) then (
+					vMin -= obj.pos
+					vMax -= obj.pos
+				)
 				format "      <key editoronly=\"yes\" name=\"bbox\">\n" to:outFile
-                format "      <v x=\"%\" y=\"%\" z=\"%\" />\n " obj.min.x obj.min.z obj.min.y to:outFile
-                format "      <v x=\"%\" y=\"%\" z=\"%\" />\n " obj.max.x obj.max.z obj.max.y to:outFile
+                format "      <v x=\"%\" y=\"%\" z=\"%\" />\n " vMin.x vMin.z vMin.y to:outFile
+                format "      <v x=\"%\" y=\"%\" z=\"%\" />\n " vMax.x vMax.z vMax.y to:outFile
                 format "      </key> \n" to:outFile
 
 				format "  <params><numvt>%</numvt>\n" (getNumTVerts obj) to:outFile
@@ -2048,7 +2428,6 @@ rollout Test1 "Export Level to CS" width:226 height:450
 
 			if (lodobjects.count!=1) then
 				format "  </meshfact>\n" to:outFile
-
         )	
 	
 		-- ////////////////////////
@@ -2196,6 +2575,24 @@ rollout Test1 "Export Level to CS" width:226 height:450
 				format "Terrain object found: %\n" obj.name
 			)
 		)
+		
+		-- Check for instanced objects.
+		for obj in objects do 
+		(
+			local instanced = getUserProp obj "INSTANCE"
+			if (instanced!=undefined) then (
+				append instancedMats obj.mat
+			)
+		)
+		
+		-- Check for objects using leaves shader.
+		for obj in objects do 
+		(
+			local leaves = getUserProp obj "LEAVES"
+			if (leaves!=undefined) then (
+				append leavesMats obj.mat
+			)
+		)
 
 		-- write shaders
 		WriteShaders outFile
@@ -2324,10 +2721,7 @@ rollout Test1 "Export Level to CS" width:226 height:450
 				if (toks.count == 4 and objName[objName.count-1] == "_" and objName[objName.count] == "0") then
 				(
 					append factoryMeshes obj
-					
 					OutputGenMeshFactory obj outFile debug 0
-
-
 				) -- end if genmesh factory
 				continue;
 			) -- end if genmesh
@@ -2463,6 +2857,7 @@ rollout Test1 "Export Level to CS" width:226 height:450
 		-- Settings
 		format "  <settings>" to:outFile
 		format "<clearzbuf>yes</clearzbuf>" to:outFile
+		format "<clearscreen>yes</clearscreen>" to:outFile
 
 		-- Setting for lightmaps cell size (obsolete used for thingmeshes only)
 		--customPropNumber = fileProperties.findProperty #custom "lightmapsize"
@@ -2914,8 +3309,7 @@ rollout Test1 "Export Level to CS" width:226 height:450
 						factoryName = "_auto_" + obj.name
 						format "      <params><factory>%</factory>\n" factoryName to:outFile
 					)
-
-
+					
 					-- check for culleronly setting
 					culleronly = getUserProp obj "CULLERONLY"
 	
@@ -2986,10 +3380,10 @@ rollout Test1 "Export Level to CS" width:226 height:450
 						flipModel = true
 					)
 		
-				   if (flipModel) then (
-				    format "\n GenMesh Instance Object needs flipping: %\n" obj.name
-				   )
-				   
+				    if (flipModel) then (
+				     format "\n GenMesh Instance Object needs flipping: %\n" obj.name
+				    )
+					
 					-- calc distance from factory
 					xMove = (obj.pos.x * xscale) + xrelocate
 					yMove = (obj.pos.y * yscale) + yrelocate
@@ -3014,11 +3408,11 @@ rollout Test1 "Export Level to CS" width:226 height:450
 					)
 					
 					-- if it's an genmesh with autogenerated factory then we don't need to check rotation
-					if (isExplicitGenMesh) then 
+					if (isExplicitGenMesh and instanced==undefined) then 
 						format "      <matrix><rotx>%</rotx><roty>%</roty><rotz>%</rotz></matrix>\n" rotx roty rotz to:outFile
 
 					format "      </move>\n"  to:outFile
-
+					
 					if (lodlow==undefined) then
 						format "    </meshobj>\n" to:outFile
 					else
