@@ -1017,6 +1017,10 @@ class iMeshFactoryWrapper(core.iBase):
     def GetRenderPriority(*args): return _iengine.iMeshFactoryWrapper_GetRenderPriority(*args)
     def SetRenderPriorityRecursive(*args): return _iengine.iMeshFactoryWrapper_SetRenderPriorityRecursive(*args)
     def GetSVContext(*args): return _iengine.iMeshFactoryWrapper_GetSVContext(*args)
+    def SetInstanceFactory(*args): return _iengine.iMeshFactoryWrapper_SetInstanceFactory(*args)
+    def GetInstanceFactory(*args): return _iengine.iMeshFactoryWrapper_GetInstanceFactory(*args)
+    def AddInstance(*args): return _iengine.iMeshFactoryWrapper_AddInstance(*args)
+    def GetInstances(*args): return _iengine.iMeshFactoryWrapper_GetInstances(*args)
     scfGetVersion = staticmethod(_iengine.iMeshFactoryWrapper_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iMeshFactoryWrapper
     __del__ = lambda self : None;
