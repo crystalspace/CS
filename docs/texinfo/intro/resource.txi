@@ -51,7 +51,7 @@ developmental version of the project.
 First, you can access the @sc{svn} repository directly via a @sc{svn} tool.
 Instructions for doing so may be found here:
 
-@uref{http://sourceforge.net/svn/?group_id=649}
+@uref{http://crystalspace3d.org/main/Subversion}
 
 Second, you can download a snapshot of the @sc{svn} repository using @sc{http}.
 Snapshots are generated daily and are accompanied by standard @samp{diff}-style
