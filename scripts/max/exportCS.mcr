@@ -1843,7 +1843,7 @@ rollout Test1 "Export Level to CS" width:226 height:450
 					if(bb!=undefined) then
 					(
 						theNormal = -(polyOp.getFaceNormal tempobj 1)
-						a = normalize (cross [1,2,3] theNormal)
+						a = normalize (cross [-0.3,-0.2,-0.5] theNormal)
 						b = normalize (cross a theNormal)
 					
 						convertTo tempobj (Editable_Mesh)
