@@ -96,8 +96,9 @@
       float4x4 complete_objectToWorld = mul (objectToWorld, instancingTransforms);
       position_object = Hposition;
       position_world = mul (complete_objectToWorld, position_object);
-      position_camera = mul (ModelView, position_world);
-      position_screen = position = mul (ModelViewProj, position_world);
+      float4 position_instanced = mul (instancingTransforms, position_object);
+      position_camera = mul (ModelView, position_instanced);
+      position_screen = position = mul (ModelViewProj, position_instanced);
       
       APPLY_CLIPPING_VP(position_camera, position_world, position_object);
       
