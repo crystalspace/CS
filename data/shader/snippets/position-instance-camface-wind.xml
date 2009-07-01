@@ -32,13 +32,28 @@
     
     <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
 	 verbatim -->
-    <input name="ModelViewProj" type="float4x4" default="complex">
+    <input name="objectToWorld" type="float4x4" default="complex" private="yes">
       <block location="cg:vertexIn">
-	<uniform type="float4x4" name="ModelViewProj" binding="state.matrix.mvp" />
+	<uniform type="float4x4" name="objectToWorld" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="float4x4" name="objectToWorld" />
       </block>
       
       <block location="cg:vertexMain">
-	ModelViewProj = vertexIn.ModelViewProj;
+	objectToWorld = vertexIn.objectToWorld;
+      </block>
+
+      <block location="cg:fragmentMain">
+	objectToWorld = fragmentIn.objectToWorld;
+      </block>
+
+      <block location="cg:variablemap">
+	<variablemap variable="object2world transform" 
+	  destination="vertexIn.objectToWorld" />
+	<variablemap variable="object2world transform" 
+	  destination="fragmentIn.objectToWorld" />
       </block>
     </input>
 
@@ -92,11 +107,12 @@
     </block>
 
     <block location="cg:vertexMain">
-      position_world = mul (instancingTransforms, Hposition);
+      float4x4 complete_objectToWorld = mul (objectToWorld, instancingTransforms);
+      position_world = mul (complete_objectToWorld, Hposition);
       float4 wind_factor = float4(0, 0, Hposition.x*sin((position_world.x*2+position_world.y)+standard_time*4)/20, 0);
       float4 offset = mul (instancingTransforms, float4(0, 0, 0, 1));
       position_camera = position_object = Hposition + wind_factor;
-      position_world = mul (instancingTransforms, position_object);
+      position_world = mul (complete_objectToWorld, position_object);
       position_camera.xyz += mul (ModelView, offset).xyz;
       position_screen = position = mul (Proj, position_camera);
       
@@ -104,11 +120,11 @@
       
       /* The objectToWorld transform is needed in other places, so there is a 
 	 global variable for it. Set that */
-      SetGlobalObjectToWorld (instancingTransforms);
+      SetGlobalObjectToWorld (complete_objectToWorld);
       // instanced params are only available in VPs, forward to FP manually
-      o2w = float3x4(instancingTransforms[0],
-	instancingTransforms[1], 
-	instancingTransforms[2]);
+      o2w = float3x4(complete_objectToWorld[0],
+	complete_objectToWorld[1], 
+	complete_objectToWorld[2]);
     </block>
     
     <block location="cg:fragmentMain">
