@@ -25,8 +25,7 @@ fullpath()
 addcopyentries()
 {
   listfilename=$1
-  listsubdir=$2
-  listsubdir=${listsubdir-.}
+  listsubdir=${2:-.}
   MY_IFS=$IFS
   IFS=$'\n'
   for entry in `cat $listfilename`
