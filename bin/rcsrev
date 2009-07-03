@@ -16,7 +16,7 @@ compute_rel_rev()
   rev_offset=`cat $topdir/include/csver.h.template | grep CS_RCSREV_OFFSET | sed -e "s/[^0-9]*//"`
   base_rev=`extract_revision $topdir/include/csver.h.template`
   checkout_rev=`extract_revision $topdir`
-  echo $(($base_rev-$checkout_rev+$rev_offset))
+  echo $(($checkout_rev-$base_rev+$rev_offset))
 }
 
 update_header()
@@ -26,7 +26,7 @@ update_header()
   checkout_rev=`extract_revision $topdir`
   if [ $checkout_rev -gt $csver_rev ] ; then
     base_rev=`extract_revision $topdir/include/csver.h.template`
-    rel_rev=$(($base_rev-$checkout_rev+$rev_offset))
+    rel_rev=$(($checkout_rev-$base_rev+$rev_offset))
     echo "/* ATTENTION: This file is generated from csver.h.template," > $topdir/include/csver.h
     echo "   make changes _there_ instead */" >> $topdir/include/csver.h
     cat $topdir/include/csver.h.template | sed -e "s/@CS_VERSION_RCSREV@/$rel_rev/" >> $topdir/include/csver.h
