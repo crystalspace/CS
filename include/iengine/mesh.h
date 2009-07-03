@@ -279,7 +279,7 @@ struct csScreenBoxResult
  */
 struct iMeshWrapper : public virtual iBase
 {
-  SCF_INTERFACE(iMeshWrapper, 2, 3, 0);
+  SCF_INTERFACE(iMeshWrapper, 2, 4, 0);
 
   /**
    * Get the iObject for this mesh object. This can be used to get the
@@ -683,6 +683,12 @@ struct iMeshWrapper : public virtual iBase
   virtual void RemoveExtraRenderMesh(CS::Graphics::RenderMesh* renderMesh) = 0;
   virtual void RemoveExtraRenderMesh(size_t idx) = 0;
   //@}
+
+  /**
+   * Adds a (pseudo-)instance at the given position.
+   * Returns the instance transform shadervar.
+   */
+  virtual csShaderVariable* AddInstance(csVector3& position, csMatrix3& rotation) = 0;
 };
 
 /**
@@ -896,7 +902,7 @@ struct iMeshFactoryWrapper : public virtual iBase
   virtual void AddInstance(csVector3& position, csMatrix3& rotation) = 0;
 
   /**
-   * Returns the instancing transforms array shadervar/
+   * Returns the instancing transforms array shadervar.
    */
   virtual csShaderVariable* GetInstances() const = 0;
 };

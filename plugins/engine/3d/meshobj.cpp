@@ -94,10 +94,10 @@ csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj)
 void csMeshWrapper::SetFactory (iMeshFactoryWrapper* factory)
 {
   // Check if we're instancing, if so then set the shadervar and instance factory.
-  csShaderVariable* instances = factory->GetInstances();
-  if(instances)
+  transformVars = factory->GetInstances();
+  if(transformVars)
   {
-    GetSVContext()->AddVariable(instances);
+    GetSVContext()->AddVariable(transformVars);
     factory = factory->GetInstanceFactory();
 
     csRef<iShaderVarStringSet> SVstrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
@@ -108,7 +108,7 @@ void csMeshWrapper::SetFactory (iMeshFactoryWrapper* factory)
     fadeFactors->SetType (csShaderVariable::ARRAY);
     fadeFactors->SetArraySize (0);
 
-    for(size_t i=0; i<instances->GetArraySize(); ++i)
+    for(size_t i=0; i<transformVars->GetArraySize(); ++i)
     {
       csRef<csShaderVariable> fadeFactor;
       fadeFactor.AttachNew(new csShaderVariable);
@@ -126,6 +126,40 @@ void csMeshWrapper::SetFactory (iMeshFactoryWrapper* factory)
 void csMeshWrapper::SelfDestruct ()
 {
   engine->GetMeshes ()->Remove (static_cast<iMeshWrapper*> (this));
+}
+
+csShaderVariable* csMeshWrapper::AddInstance(csVector3& position, csMatrix3& rotation)
+{
+  if(!transformVars.IsValid())
+  {
+    csRef<iShaderVarStringSet> SVstrings = csQueryRegistryTagInterface<iShaderVarStringSet>(
+      engine->objectRegistry, "crystalspace.shader.variablenameset");
+    CS::ShaderVarStringID varTransform = SVstrings->Request("instancing transforms");
+    CS::ShaderVarStringID varFadeFactor = SVstrings->Request ("alpha factor");
+
+    transformVars.AttachNew(new csShaderVariable(varTransform));
+    transformVars->SetType (csShaderVariable::ARRAY);
+    transformVars->SetArraySize (0);
+    GetSVContext()->AddVariable(transformVars);
+
+    fadeFactors.AttachNew (new csShaderVariable (varFadeFactor));
+    fadeFactors->SetType (csShaderVariable::ARRAY);
+    fadeFactors->SetArraySize (0);
+    GetSVContext()->AddVariable(fadeFactors);
+  }
+
+  csRef<csShaderVariable> fadeFactor;
+  fadeFactor.AttachNew(new csShaderVariable);
+  fadeFactor->SetValue(1.0f);
+  fadeFactors->AddVariableToArray(fadeFactor);
+
+  csRef<csShaderVariable> transformVar;
+  transformVar.AttachNew(new csShaderVariable);
+  csReversibleTransform tr(rotation.GetInverse(), position);
+  transformVar->SetValue (tr);
+  transformVars->AddVariableToArray(transformVar);
+
+  return transformVar;
 }
 
 void csMeshWrapper::AddToSectorPortalLists ()
