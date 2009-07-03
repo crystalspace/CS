@@ -261,9 +261,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     iRenderBuffer* indices, iMaterialWrapper *material, const char* name, 
     uint mixmode)
   {
-    if ((subMeshes.GetSize() == 1)
-	&& (subMeshes[0] == defaultSubmesh))
+    if ((subMeshes.GetSize() == 1) && (subMeshes[0] == defaultSubmesh))
+    {
+      if(defaultSubmesh->GetMaterial() == 0)
+        defaultSubmesh->SetMaterial(material);
+
       subMeshes.Empty();
+    }
 
     csRef<SubMesh> subMesh;
     subMesh.AttachNew (new SubMesh ());
@@ -370,9 +374,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 
   void SubMeshProxiesContainer::AddSubMesh (SubMeshProxy* subMesh)
   {
-    if ((subMeshes.GetSize() == 1)
-	&& (subMeshes[0] == defaultSubmesh))
+    if ((subMeshes.GetSize() == 1) && (subMeshes[0] == defaultSubmesh))
+    {
+      if(defaultSubmesh->GetMaterial() == 0)
+        defaultSubmesh->SetMaterial(subMesh->GetMaterial());
+
       subMeshes.Empty();
+    }
 
     subMeshes.InsertSorted (subMesh, SubmeshProxySubmeshProxyCompare);
   }
