@@ -37,7 +37,7 @@ struct iMeshObject;
  */
 struct iNullMeshState : public virtual iBase
 {
-  SCF_INTERFACE (iNullMeshState, 0, 0, 2);
+  SCF_INTERFACE (iNullMeshState, 1, 0, 0);
 
   /**
    * Set the radius of the sphere represented by this object.
