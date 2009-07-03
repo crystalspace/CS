@@ -473,6 +473,7 @@ public:
   void SetDefaultEnvironmentTexture ();
 
   virtual csShaderVariable* AddInstance(csVector3& position, csMatrix3& rotation);
+  virtual void RemoveInstance(csShaderVariable* instance);
 
   //---------- Bounding volume and beam functions -----------------//
 

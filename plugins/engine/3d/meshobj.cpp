@@ -162,6 +162,13 @@ csShaderVariable* csMeshWrapper::AddInstance(csVector3& position, csMatrix3& rot
   return transformVar;
 }
 
+void csMeshWrapper::RemoveInstance(csShaderVariable* instance)
+{
+  size_t element = transformVars->FindArrayElement(instance);
+  transformVars->RemoveFromArray(element);
+  fadeFactors->RemoveFromArray(element);
+}
+
 void csMeshWrapper::AddToSectorPortalLists ()
 {
   if (portal_container)

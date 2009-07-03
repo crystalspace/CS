@@ -689,6 +689,11 @@ struct iMeshWrapper : public virtual iBase
    * Returns the instance transform shadervar.
    */
   virtual csShaderVariable* AddInstance(csVector3& position, csMatrix3& rotation) = 0;
+
+  /**
+   * Removes a (pseudo-)instance of the mesh.
+   */
+  virtual void RemoveInstance(csShaderVariable* instance) = 0;
 };
 
 /**
