@@ -12,10 +12,13 @@ Shared libraries used by CrystalSpace applications</description>
     <implementation arch="Linux-x86_64" id="sha1new=767071b3f38d3d16f98f88b328386f758dd305fc" released="2009-01-16" stability="testing" version="1.4.0.31900">
       <archive extract="crystalspace-libs-1.4.0.31900" href="http://crystalspace3d.org/downloads/binary/1.4/linux-x86_64/crystalspace-libs-1.4.0.31900.tar.lzma" size="899769" type="application/x-lzma-compressed-tar"/>
     </implementation>
+    <implementation arch="Linux-x86_64" id="sha1new=bbb15928b36e72b64f680c42fa848eaba19cd5fd" released="2009-07-03" stability="testing" version="1.4.0.32528">
+      <archive extract="crystalspace-libs-1.4.0.32528" href="http://crystalspace3d.org/downloads/binary/1.4/linux-x86_64/crystalspace-libs-1.4.0.32528.tar.lzma" size="931999"/>
+    </implementation>
   </group>
 </interface>
 <!-- Base64 Signature
-iEYEABECAAYFAklwmCEACgkQnCws0dQa9buLMwCgnMaZ4wEoOjoDgBjt8+opCxF3XhoAnA6B52Lm
-a4q1BmWqwW9QTMbRARtM
+iEYEABECAAYFAkpOhuMACgkQnCws0dQa9buC0QCeP+TPS4rSKWtjb0r5vlfmhuqxWNwAoKLKxCXW
+ywyTw59l2mdZyuIS+k4Q
 
 -->

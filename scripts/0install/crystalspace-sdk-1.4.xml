@@ -15,10 +15,17 @@ Headers and libraries needed to build CrystalSpace applications.</description>
 	<environment insert="" mode="prepend" name="CRYSTAL_1_4"/>
       </requires>
     </implementation>
+    <implementation arch="Linux-x86_64" id="sha1new=3c74506123395c387712020b924fa7761b3b63c7" released="2009-07-03" stability="testing" version="1.4.0.32528">
+      <requires interface="http://crystalspace3d.org/0install/crystalspace-sdk-1.4.xml">
+	    <environment insert="" mode="prepend" name="CRYSTAL_1_4"/>
+      </requires>
+  
+      <archive extract="crystalspace-sdk-1.4.0.32528" href="http://crystalspace3d.org/downloads/binary/1.4/linux-x86_64/crystalspace-sdk-1.4.0.32528.tar.lzma" size="1598162"/>
+    </implementation>
   </group>
 </interface>
 <!-- Base64 Signature
-iEYEABECAAYFAklwoCcACgkQnCws0dQa9buZxwCfQiZvvqPqVYIicxG5XBfARvuWtTUAnjptVclr
-m4teeI8GB5UaF8fqPh38
+iEYEABECAAYFAkpOhucACgkQnCws0dQa9bs5HACfTM2lbI5CO89cPSCM0mp9zTTFzsYAn1g06ZxN
+yAhZ18e2Y7yh2lOfKAVf
 
 -->

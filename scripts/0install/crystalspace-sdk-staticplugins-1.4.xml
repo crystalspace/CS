@@ -16,10 +16,17 @@ linking plugins statically into applications.</description>
 	<environment insert="" mode="prepend" name="CRYSTAL_1_4"/>
       </requires>
     </implementation>
+    <implementation arch="Linux-x86_64" id="sha1new=e70dc489e725e51b31431da7679ef28c613e9197" released="2009-07-03" stability="testing" version="1.4.0.32528">
+      <requires interface="http://crystalspace3d.org/0install/crystalspace-sdk-staticplugins-1.4.xml">
+	    <environment insert="" mode="prepend" name="CRYSTAL_1_4"/>
+      </requires>
+  
+      <archive extract="crystalspace-sdk-staticplugins-1.4.0.32528" href="http://crystalspace3d.org/downloads/binary/1.4/linux-x86_64/crystalspace-sdk-staticplugins-1.4.0.32528.tar.lzma" size="27802305"/>
+    </implementation>
   </group>
 </interface>
 <!-- Base64 Signature
-iEYEABECAAYFAklwpn0ACgkQnCws0dQa9bvchQCguObl30pphfiGatzKMGYaJym6j8IAoK3G+U8z
-bt0zL+ZUXw7onmpAQ9po
+iEYEABECAAYFAkpOhuoACgkQnCws0dQa9bsFjwCgu7wsfDDRIg+q+lk7iazyln5sbj4An2/4c8II
+jdh+/8UOwxq9GuwM2yv6
 
 -->
