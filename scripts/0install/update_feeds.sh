@@ -6,7 +6,7 @@ csbindir=$csdir/bin
 csver_major=`cat $csdir/include/csver.h | grep "^#define *CS_VERSION_NUM_MAJOR" | sed -e "s/[^0-9]*//"`
 csver_minor=`cat $csdir/include/csver.h | grep "^#define *CS_VERSION_NUM_MINOR" | sed -e "s/[^0-9]*//"`
 csver_build=`cat $csdir/include/csver.h | grep "^#define *CS_VERSION_NUM_BUILD" | sed -e "s/[^0-9]*//"`
-csver_svnrev=`svn info $csdir | grep "^Last Changed Rev: " | sed -e s/^[^0-9]*//"`
+csver_svnrev=`svn info $csdir | grep "^Last Changed Rev: " | sed -e "s/^[^0-9]*//"`
 CSVER=$csver_major.$csver_minor.$csver_build.$csver_svnrev
 FEEDVER=$csver_major.$csver_minor
 
