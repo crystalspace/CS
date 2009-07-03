@@ -20337,6 +20337,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetExtraRenderMeshPriority = *cspacec::iMeshWrapper_GetExtraRenderMeshPriority;
 *GetExtraRenderMeshZBufMode = *cspacec::iMeshWrapper_GetExtraRenderMeshZBufMode;
 *RemoveExtraRenderMesh = *cspacec::iMeshWrapper_RemoveExtraRenderMesh;
+*AddInstance = *cspacec::iMeshWrapper_AddInstance;
+*RemoveInstance = *cspacec::iMeshWrapper_RemoveInstance;
 *scfGetVersion = *cspacec::iMeshWrapper_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

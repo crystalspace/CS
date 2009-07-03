@@ -27853,6 +27853,82 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_iMeshWrapper_AddInstance(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iMeshWrapper *arg1 = (iMeshWrapper *) 0 ;
+  csVector3 *arg2 = 0 ;
+  csMatrix3 *arg3 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  csShaderVariable *result = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshWrapper_AddInstance",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshWrapper_AddInstance" "', argument " "1"" of type '" "iMeshWrapper *""'"); 
+  }
+  arg1 = reinterpret_cast< iMeshWrapper * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csVector3,  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iMeshWrapper_AddInstance" "', argument " "2"" of type '" "csVector3 &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iMeshWrapper_AddInstance" "', argument " "2"" of type '" "csVector3 &""'"); 
+  }
+  arg2 = reinterpret_cast< csVector3 * >(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csMatrix3,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "iMeshWrapper_AddInstance" "', argument " "3"" of type '" "csMatrix3 &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "iMeshWrapper_AddInstance" "', argument " "3"" of type '" "csMatrix3 &""'"); 
+  }
+  arg3 = reinterpret_cast< csMatrix3 * >(argp3);
+  result = (csShaderVariable *)(arg1)->AddInstance(*arg2,*arg3);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csShaderVariable, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_iMeshWrapper_RemoveInstance(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  iMeshWrapper *arg1 = (iMeshWrapper *) 0 ;
+  csShaderVariable *arg2 = (csShaderVariable *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if(!PyArg_UnpackTuple(args,(char *)"iMeshWrapper_RemoveInstance",2,2,&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iMeshWrapper, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iMeshWrapper_RemoveInstance" "', argument " "1"" of type '" "iMeshWrapper *""'"); 
+  }
+  arg1 = reinterpret_cast< iMeshWrapper * >(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_csShaderVariable, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "iMeshWrapper_RemoveInstance" "', argument " "2"" of type '" "csShaderVariable *""'"); 
+  }
+  arg2 = reinterpret_cast< csShaderVariable * >(argp2);
+  (arg1)->RemoveInstance(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_iMeshWrapper_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -37226,6 +37302,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"iMeshWrapper_GetExtraRenderMeshPriority", _wrap_iMeshWrapper_GetExtraRenderMeshPriority, METH_VARARGS, NULL},
 	 { (char *)"iMeshWrapper_GetExtraRenderMeshZBufMode", _wrap_iMeshWrapper_GetExtraRenderMeshZBufMode, METH_VARARGS, NULL},
 	 { (char *)"iMeshWrapper_RemoveExtraRenderMesh", _wrap_iMeshWrapper_RemoveExtraRenderMesh, METH_VARARGS, NULL},
+	 { (char *)"iMeshWrapper_AddInstance", _wrap_iMeshWrapper_AddInstance, METH_VARARGS, NULL},
+	 { (char *)"iMeshWrapper_RemoveInstance", _wrap_iMeshWrapper_RemoveInstance, METH_VARARGS, NULL},
 	 { (char *)"iMeshWrapper_scfGetVersion", _wrap_iMeshWrapper_scfGetVersion, METH_VARARGS, NULL},
 	 { (char *)"delete_iMeshWrapper", _wrap_delete_iMeshWrapper, METH_VARARGS, NULL},
 	 { (char *)"iMeshWrapper_swigregister", iMeshWrapper_swigregister, METH_VARARGS, NULL},

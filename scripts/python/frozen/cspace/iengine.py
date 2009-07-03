@@ -982,6 +982,8 @@ class iMeshWrapper(core.iBase):
     def GetExtraRenderMeshPriority(*args): return _iengine.iMeshWrapper_GetExtraRenderMeshPriority(*args)
     def GetExtraRenderMeshZBufMode(*args): return _iengine.iMeshWrapper_GetExtraRenderMeshZBufMode(*args)
     def RemoveExtraRenderMesh(*args): return _iengine.iMeshWrapper_RemoveExtraRenderMesh(*args)
+    def AddInstance(*args): return _iengine.iMeshWrapper_AddInstance(*args)
+    def RemoveInstance(*args): return _iengine.iMeshWrapper_RemoveInstance(*args)
     scfGetVersion = staticmethod(_iengine.iMeshWrapper_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iMeshWrapper
     __del__ = lambda self : None;
