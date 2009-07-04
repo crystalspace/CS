@@ -71,8 +71,9 @@ if $(PYTHON.AVAILABLE) = "yes"
     Depends bindingsclean : $(modname)clean ;
     Depends clean : $(modname)clean ;
   
-    InstallBindingsData $(modulepy) : [ on $(<) GetVar LOCATE ] : bindings python cspace ;
     Depends filelists : [ DoFileListEntries $(used_py) : cspace : python-bindings ] ;
+    # @@@ InstallBindingsData clobbers SEARCH on $(modulepy)
+    InstallBindingsData $(modulepy) : [ on $(<) GetVar LOCATE ] : bindings python cspace ;
     
     #--------
     # core -- Pure Python module

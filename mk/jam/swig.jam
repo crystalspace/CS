@@ -142,6 +142,7 @@ if $(CMD.SWIG)
         MkDir $(outdir) ;
       }
       MakeLocate $(othertargets) : $(outdir) ;
+      SEARCH on $(othertargets) = $(outdir) ;
 
       # If any target, such as an install target, depends upon the other files,
       # we force them to be built with a dependency upon the target.
