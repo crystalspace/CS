@@ -23,15 +23,15 @@
 //CS_LEAKGUARD_IMPLEMENT (csShaderVariable);
 
 CS_IMPLEMENT_STATIC_CLASSVAR (csShaderVariable, matrixAlloc, MatrixAlloc,
-    csBlockAllocator<csMatrix3>, (1024));
+    csShaderVariable::BlockAlloc<csMatrix3>, (1024));
 CS_IMPLEMENT_STATIC_CLASSVAR (csShaderVariable, matrix4Alloc, Matrix4Alloc,
-    csBlockAllocator<CS::Math::Matrix4>, (1024));
+    csShaderVariable::BlockAlloc<CS::Math::Matrix4>, (1024));
 CS_IMPLEMENT_STATIC_CLASSVAR (csShaderVariable, transformAlloc, TransformAlloc,
-    csBlockAllocator<csReversibleTransform>, (1024));
+    csShaderVariable::BlockAlloc<csReversibleTransform>, (1024));
 CS_IMPLEMENT_STATIC_CLASSVAR (csShaderVariable, arrayAlloc,
-    ShaderVarArrayAlloc, csBlockAllocator<csShaderVariable::SvArrayType>, (1024));
+    ShaderVarArrayAlloc, csShaderVariable::BlockAlloc<csShaderVariable::SvArrayType>, (1024));
 CS_IMPLEMENT_STATIC_CLASSVAR (csShaderVariable, accessorAlloc,
-    AccessorValuesAlloc, csBlockAllocator<csShaderVariable::AccessorValues>, (1024));
+    AccessorValuesAlloc, csShaderVariable::BlockAlloc<csShaderVariable::AccessorValues>, (1024));
 
 
 csShaderVariable::csShaderVariable () :

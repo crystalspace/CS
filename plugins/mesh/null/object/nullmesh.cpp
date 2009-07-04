@@ -38,7 +38,7 @@
 csNullmeshMeshObject::csNullmeshMeshObject (csNullmeshMeshFactory* factory,
                                             iMeshObjectType* parent)
   : scfImplementationType(this), nullmesh_type (parent), logparent (0),
-  vis_cb (0)
+  vis_cb (0), hitbeam_mesh(0)
 {
   csNullmeshMeshObject::factory = factory;
   radius = factory->GetRadius ();
@@ -75,21 +75,29 @@ void csNullmeshMeshObject::SetObjectBoundingBox (const csBox3& bbox)
   ShapeChanged ();
 }
 
-bool csNullmeshMeshObject::HitBeamOutline (const csVector3& /*start*/,
-                                           const csVector3& /*end*/, 
-                                           csVector3& /*isect*/, float* /*pr*/)
+bool csNullmeshMeshObject::HitBeamOutline (const csVector3& start,
+                                           const csVector3& end, 
+                                           csVector3& isect, float* pr)
 {
-  // @@@ TODO
+  if(hitbeam_mesh)
+  {
+    return hitbeam_mesh->HitBeamOutline(start, end, isect, pr);
+  }
+
   return false;
 }
 
-bool csNullmeshMeshObject::HitBeamObject (const csVector3& /*start*/,
-                                          const csVector3& /*end*/, 
-                                          csVector3& /*isect*/, float* /*pr*/,
-                                          int* /*polygon_idx*/, iMaterialWrapper**,
-                                          csArray<iMaterialWrapper*>*)
+bool csNullmeshMeshObject::HitBeamObject (const csVector3& start,
+                                          const csVector3& end, 
+                                          csVector3& isect, float* pr,
+                                          int* polygon_idx, iMaterialWrapper** mwrap,
+                                          csArray<iMaterialWrapper*>* mwraps)
 {
-  // @@@ TODO
+  if(hitbeam_mesh)
+  {
+    return hitbeam_mesh->HitBeamObject(start, end, isect, pr, polygon_idx, mwrap, mwraps);
+  }
+
   return false;
 }
 

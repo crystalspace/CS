@@ -739,17 +739,45 @@ private:
     AccessorValues() : data (0) {}
   };
   AccessorValues* accessor;
+
+  template<typename T>
+  struct BlockAlloc : public CS::Memory::AllocatorSafe<csBlockAllocator<T> >
+  {
+    typedef csBlockAllocator<T> WrappedAllocatorType;
+    typedef CS::Memory::AllocatorSafe<WrappedAllocatorType> AllocatorSafeType;
+ 
+    BlockAlloc (size_t n) : AllocatorSafeType (n) {}
+
+    T* Alloc ()
+    {
+      CS::Threading::RecursiveMutexScopedLock lock(AllocatorSafeType::mutex);
+      return WrappedAllocatorType::Alloc ();
+    }
+
+    template<typename A1>
+    T* Alloc (A1& a1)
+    {
+      CS::Threading::RecursiveMutexScopedLock lock(AllocatorSafeType::mutex);
+      return WrappedAllocatorType::Alloc (a1);
+    }
+
+    void Free (T* p)
+    {
+      CS::Threading::RecursiveMutexScopedLock lock(AllocatorSafeType::mutex);
+      WrappedAllocatorType::Free (p);
+    }
+  };
   
   CS_DECLARE_STATIC_CLASSVAR (matrixAlloc, MatrixAlloc,
-    csBlockAllocator<csMatrix3>)
+    BlockAlloc<csMatrix3>)
   CS_DECLARE_STATIC_CLASSVAR (matrix4Alloc, Matrix4Alloc,
-    csBlockAllocator<CS::Math::Matrix4>)
+    BlockAlloc<CS::Math::Matrix4>)
   CS_DECLARE_STATIC_CLASSVAR (transformAlloc, TransformAlloc,
-    csBlockAllocator<csReversibleTransform>)
+    BlockAlloc<csReversibleTransform>)
   CS_DECLARE_STATIC_CLASSVAR (arrayAlloc, ShaderVarArrayAlloc,
-    csBlockAllocator<SvArrayType>)
+    BlockAlloc<SvArrayType>)
   CS_DECLARE_STATIC_CLASSVAR (accessorAlloc, AccessorValuesAlloc,
-    csBlockAllocator<AccessorValues>)
+    BlockAlloc<AccessorValues>)
 
   virtual void NewType (VariableType nt);
   virtual void AllocAccessor (const AccessorValues& other = AccessorValues());

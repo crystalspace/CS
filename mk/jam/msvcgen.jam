@@ -803,7 +803,7 @@ rule MsvcProject
   }
 
   # Add resource file.
-  if [ IsElem $(type) : dll plugin appgui appcon ]
+  if [ IsElem $(type) : dll plugin appgui appcon library_shared ]
   {
     local resource = $(msvcname:S=.rc) ;
     Depends msvcgen : $(resource) ;

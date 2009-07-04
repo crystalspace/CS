@@ -205,7 +205,7 @@ void csGenmeshMeshObject::UpdateSubMeshProxies () const
 
 bool csGenmeshMeshObject::SetMaterialWrapper (iMaterialWrapper* mat)
 {
-  subMeshes.GetDefaultSubmesh()->SubMeshProxy::SetMaterial (mat);
+  subMeshes.SetMaterialWrapper (mat);
   return true;
 }
 

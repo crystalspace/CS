@@ -42,6 +42,31 @@
       </block>
     </input>
 
+    <input name="objectToWorld" type="float4x4" default="complex" private="yes">
+      <block location="cg:vertexIn">
+	<uniform type="float4x4" name="objectToWorld" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="float4x4" name="objectToWorld" />
+      </block>
+      
+      <block location="cg:vertexMain">
+	objectToWorld = vertexIn.objectToWorld;
+      </block>
+
+      <block location="cg:fragmentMain">
+	objectToWorld = fragmentIn.objectToWorld;
+      </block>
+
+      <block location="cg:variablemap">
+	<variablemap variable="object2world transform" 
+	  destination="vertexIn.objectToWorld" />
+	<variablemap variable="object2world transform" 
+	  destination="fragmentIn.objectToWorld" />
+      </block>
+    </input>
+
     <!-- Direction (x,z), random factor, bias. -->
     <input name="wind_data" type="float4" default="complex">
       <block location="cg:vertexIn">
@@ -111,6 +136,8 @@
     </block>
 	
     <block location="cg:vertexMain">
+      float4x4 complete_objectToWorld = mul (objectToWorld, instancingTransforms);
+      
       position_world = mul (instancingTransforms, Hposition);
       float posOffset = dot(position_world.xz, wind_data.xy) + wind_data.z;
       float2 offset = clamp(Hposition.y, 0.0, Hposition.y) * (wind_data.xy * ((wind_data.w-1)/wind_data.w + sin(wind_speed*standard_time+posOffset)/(wind_data.w)));
@@ -118,19 +145,20 @@
       Hposition.z += offset.y;
 
       position_object = Hposition;
-      position_world = mul (instancingTransforms, position_object);
-      position_screen = position = mul (ModelViewProj, position_world);
-      position_camera = mul (ModelView, position_world);
+      position_world = mul (complete_objectToWorld, position_object);
+      float4 position_instanced = mul (instancingTransforms, position_object);
+      position_camera = mul (ModelView, position_instanced);
+      position_screen = position = mul (ModelViewProj, position_instanced);
       
       APPLY_CLIPPING_VP(position_camera, position_world, position_object);
       
       /* The objectToWorld transform is needed in other places, so there is a 
 	 global variable for it. Set that */
-      SetGlobalObjectToWorld (instancingTransforms);
+      SetGlobalObjectToWorld (complete_objectToWorld);
       // instanced params are only available in VPs, forward to FP manually
-      o2w = float3x4(instancingTransforms[0],
-	instancingTransforms[1], 
-	instancingTransforms[2]);
+      o2w = float3x4(complete_objectToWorld[0],
+	complete_objectToWorld[1], 
+	complete_objectToWorld[2]);
     </block>
     
     <block location="cg:fragmentMain">

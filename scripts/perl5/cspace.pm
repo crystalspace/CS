@@ -20337,6 +20337,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetExtraRenderMeshPriority = *cspacec::iMeshWrapper_GetExtraRenderMeshPriority;
 *GetExtraRenderMeshZBufMode = *cspacec::iMeshWrapper_GetExtraRenderMeshZBufMode;
 *RemoveExtraRenderMesh = *cspacec::iMeshWrapper_RemoveExtraRenderMesh;
+*AddInstance = *cspacec::iMeshWrapper_AddInstance;
+*RemoveInstance = *cspacec::iMeshWrapper_RemoveInstance;
 *scfGetVersion = *cspacec::iMeshWrapper_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -20393,6 +20395,10 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetRenderPriority = *cspacec::iMeshFactoryWrapper_GetRenderPriority;
 *SetRenderPriorityRecursive = *cspacec::iMeshFactoryWrapper_SetRenderPriorityRecursive;
 *GetSVContext = *cspacec::iMeshFactoryWrapper_GetSVContext;
+*SetInstanceFactory = *cspacec::iMeshFactoryWrapper_SetInstanceFactory;
+*GetInstanceFactory = *cspacec::iMeshFactoryWrapper_GetInstanceFactory;
+*AddInstance = *cspacec::iMeshFactoryWrapper_AddInstance;
+*GetInstances = *cspacec::iMeshFactoryWrapper_GetInstances;
 *scfGetVersion = *cspacec::iMeshFactoryWrapper_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

@@ -48,6 +48,13 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine,
   render_priority = engine->GetObjectRenderPriority ();
   imposter_active = false;
   imposter_factory = 0;
+
+  instanceFactory = 0;
+
+  // Set up shader variable for instancing.
+  csRef<iShaderVarStringSet> SVstrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
+    engine->objectRegistry, "crystalspace.shader.variablenameset");
+  varTransform = SVstrings->Request ("instancing transforms");
   
   /* Work around iShaderVariableContext cast not working before 
      CS::ShaderVariableContextImpl construction */
@@ -65,6 +72,13 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine)
   render_priority = engine->GetObjectRenderPriority ();
   imposter_active = false;
   imposter_factory = 0;
+
+  instanceFactory = 0;
+
+  // Set up shader variable for instancing.
+  csRef<iShaderVarStringSet> SVstrings = csQueryRegistryTagInterface<iShaderVarStringSet> (
+    engine->objectRegistry, "crystalspace.shader.variablenameset");
+  varTransform = SVstrings->Request ("instancing transforms");
   
   /* Work around iShaderVariableContext cast not working before 
      CS::ShaderVariableContextImpl construction */
@@ -249,6 +263,24 @@ void csMeshFactoryWrapper::SetImposterActive (bool flag)
   {
     delete imposter_factory;
   }
+}
+
+void csMeshFactoryWrapper::AddInstance(csVector3& position, csMatrix3& rotation)
+{
+  if(!transformVars.IsValid())
+  {
+    transformVars.AttachNew (new csShaderVariable (varTransform));
+    transformVars->SetType (csShaderVariable::ARRAY);
+    transformVars->SetArraySize (0);
+  }
+
+  csRef<csShaderVariable> transformVar;
+  transformVar.AttachNew(new csShaderVariable);
+
+  csReversibleTransform tr(rotation.GetInverse(), position);
+  transformVar->SetValue (tr);
+
+  transformVars->AddVariableToArray(transformVar);
 }
 
 
