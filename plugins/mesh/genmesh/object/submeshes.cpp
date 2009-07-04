@@ -311,6 +311,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       subMeshes.Push (defaultSubmesh);
   }
 
+  void SubMeshesContainer::SetMaterialWrapper(iMaterialWrapper* mat)
+  {
+      defaultSubmesh->SetMaterial(mat);
+      if((subMeshes.GetSize() == 1) && (subMeshes[0] != defaultSubmesh))
+      {
+          subMeshes[0]->SetMaterial(mat);
+      }
+  }
+
+  iMaterialWrapper* SubMeshesContainer::GetMaterialWrapper() const
+  {
+      if((subMeshes.GetSize() == 1) && (subMeshes[0] != defaultSubmesh))
+      {
+          return subMeshes[0]->GetMaterial();
+      }
+
+      return defaultSubmesh->GetMaterial();
+  }
+
   //-------------------------------------------------------------------------
 
   csRenderBufferHolder* SubMeshProxy::GetBufferHolder (
@@ -399,6 +418,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       csArrayCmp<SubMeshProxy*, const char*> (name, &SubmeshProxyStringCompare));
     if (idx == csArrayItemNotFound) return 0;
     return subMeshes[idx];
+  }
+
+  void SubMeshProxiesContainer::SetMaterialWrapper(iMaterialWrapper* mat)
+  {
+      defaultSubmesh->SetMaterial(mat);
+      if((subMeshes.GetSize() == 1) && (subMeshes[0] != defaultSubmesh))
+      {
+          subMeshes[0]->SetMaterial(mat);
+      }
+  }
+
+  iMaterialWrapper* SubMeshProxiesContainer::GetMaterialWrapper() const
+  {
+      if((subMeshes.GetSize() == 1) && (subMeshes[0] != defaultSubmesh))
+      {
+          return subMeshes[0]->GetMaterial();
+      }
+
+      return defaultSubmesh->GetMaterial();
   }
 
   //-------------------------------------------------------------------------
