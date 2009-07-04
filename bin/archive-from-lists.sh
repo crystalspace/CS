@@ -33,8 +33,26 @@ addcopyentries()
     srcfile=`echo "$entry" | sed -e "s/\(.*\):\(.*\)/\\1/"`
     dstfile=$listsubdir/`echo "$entry" | sed -e "s/\(.*\):\(.*\)/\\2/"`
     echo mkdir -p \"`dirname "$dstfile"`\"
-    echo cp -R \"`fullpath "$srcfile"`\" \"$dstfile\"
+    echo cp -pR \"`fullpath "$srcfile"`\" \"$dstfile\"
   done
+  IFS=$MY_IFS
+}
+
+addtouchentries()
+{
+  echo "" > touch.tmp
+  listfilename=$1
+  listsubdir=${2:-.}
+  MY_IFS=$IFS
+  IFS=$'\n'
+  for entry in `cat $listfilename`
+  do
+    srcfile=`echo "$entry" | sed -e "s/\(.*\):\(.*\)/\\1/"`
+    dstfile=$listsubdir/`echo "$entry" | sed -e "s/\(.*\):\(.*\)/\\2/"`
+    echo touch -r \"`dirname "$(fullpath "$srcfile")"`\" \"`dirname "$dstfile"`\" >> touch.tmp
+  done
+  cat touch.tmp | uniq
+  rm touch.tmp
   IFS=$MY_IFS
 }
 
@@ -47,14 +65,16 @@ do
     if [ -r "$listfile" ]
     then
       addcopyentries "$listfile" $listsubdir >> $COPYSCRIPT
+      addtouchentries "$listfile" $listsubdir >> $COPYSCRIPT
     fi
 done
 
 cd $TMPDIR/$ARCHIVE_NAME
 source $COPYSCRIPT
 cd ..
+touch -r $0 $TMPDIR/$ARCHIVE_NAME
 
 $ARCHIVER $OLD_PWD/$ARCHIVE_NAME$ARCHIVE_EXT $ARCHIVE_NAME
 
 cd $OLD_PWD
-rm -rf $TMPDIR
+#rm -rf $TMPDIR
