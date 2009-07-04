@@ -80,6 +80,15 @@ public:
   const char* Request (csStringID id) const;
 
   /**
+   * Request all strings for a given ID.
+   * \return Array of all the elements, or empty if there are none.
+   */
+  csArray<const char*> RequestAll (csStringID id) const
+  {
+    return reverse.GetAll(id);
+  }
+
+  /**
    * Remove specified string.
    * \return True if a matching string was in thet set; else false.
    */
