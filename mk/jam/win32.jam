@@ -20,11 +20,27 @@
 #============================================================================
 SHELL ?= "/bin/sh" ;
 
+# Helper to set unset elements of PACKAGE_VERSION_LIST to 0
+rule _NormalizeVersionList
+{
+  local v1, v2, v3, v4 ;
+  v1 = $(PACKAGE_VERSION_LIST[1]) ;
+  if ! $(v1) { v1 = 0 ; }
+  v2 = $(PACKAGE_VERSION_LIST[2]) ;
+  if ! $(v2) { v2 = 0 ; }
+  v3 = $(PACKAGE_VERSION_LIST[3]) ;
+  if ! $(v3) { v3 = 0 ; }
+  v4 = $(PACKAGE_VERSION_LIST[4]) ;
+  if ! $(v4) { v4 = 0 ; }
+  return $(v1) $(v2) $(v3) $(v4) ;
+}
+PACKAGE_VERSION_NORM = [ _NormalizeVersionList ] ;
+
 # Allow customization of some values written to the .rc file
 WIN32RC.EXTRAHEADER ?= ;
 WIN32RC.VERSIONNUMBER ?=
   # Remove any RC tag
-  "`echo '$(PACKAGE_VERSION_LIST[1]),$(PACKAGE_VERSION_LIST[2]),$(PACKAGE_VERSION_LIST[3]),$(PACKAGE_VERSION_LIST[4])' | $(SED) 's/RC\([0-9]\)//g' | $(SED) 's/[^0123456789._,]//g'`" ;
+  "`echo '$(PACKAGE_VERSION_NORM[1]),$(PACKAGE_VERSION_NORM[2]),$(PACKAGE_VERSION_NORM[3]),$(PACKAGE_VERSION_NORM[4])' | $(SED) 's/[^0123456789._,]//g'`" ;
 WIN32RC.VERSIONNUMBER.FILE ?= $(WIN32RC.VERSIONNUMBER) ;
 WIN32RC.VERSIONNUMBER.PRODUCT ?= $(WIN32RC.VERSIONNUMBER) ;
 WIN32RC.VERSIONSTR ?= "\"$(PACKAGE_VERSION)\"" ;
@@ -135,7 +151,7 @@ __EOF__
 
     # Filter out non-numerical characters from the version number. Windows does
     # not like them.
-    echo '$(PACKAGE_VERSION_LIST[1]).$(PACKAGE_VERSION_LIST[2]).$(PACKAGE_VERSION_LIST[3]).$(PACKAGE_VERSION_LIST[4])' | $(SED) 's/RC\([0-9]\)//g' | $(SED) 's/[^0123456789.]//g' | $(SED) 's/\(.*\)/    version="\1"/' >> $(<)
+    echo '$(PACKAGE_VERSION_NORM[1]).$(PACKAGE_VERSION_NORM[2]).$(PACKAGE_VERSION_NORM[3]).$(PACKAGE_VERSION_NORM[4])' | $(SED) 's/RC\([0-9]\)//g' | $(SED) 's/[^0123456789.]//g' | $(SED) 's/\(.*\)/    version="\1"/' >> $(<)
   
     cat >> $(<) << __EOF__
     processorArchitecture="X86"
@@ -270,18 +286,6 @@ rule ConstructPluginTarget
 # Also invoked by msvcgen.jam.
 rule MakeVersionRc
 {
-  # normalize version list
-  local v1, v2, v3, v4 ;
-  v1 = $(PACKAGE_VERSION_LIST[1]) ;
-  if ! $(v1) { v1 = 0 ; }
-  v2 = $(PACKAGE_VERSION_LIST[2]) ;
-  if ! $(v2) { v2 = 0 ; }
-  v3 = $(PACKAGE_VERSION_LIST[3]) ;
-  if ! $(v3) { v3 = 0 ; }
-  v4 = $(PACKAGE_VERSION_LIST[4]) ;
-  if ! $(v4) { v4 = 0 ; }
-  PACKAGE_VERSION_LIST on $(<) = $(v1) $(v2) $(v3) $(v4) ;
-      
   local desc = [ Description $(>) ] ;
   if ! $(desc) { desc = "$(>)" ; }
   PRODUCT_DESCRIPTION on $(<) = $(desc) ;
@@ -297,18 +301,6 @@ rule MakeVersionRc
 
 rule MakeManifestFile
 {
-  # normalize version list
-  local v1, v2, v3, v4 ;
-  v1 = $(PACKAGE_VERSION_LIST[1]) ;
-  if ! $(v1) { v1 = 0 ; }
-  v2 = $(PACKAGE_VERSION_LIST[2]) ;
-  if ! $(v2) { v2 = 0 ; }
-  v3 = $(PACKAGE_VERSION_LIST[3]) ;
-  if ! $(v3) { v3 = 0 ; }
-  v4 = $(PACKAGE_VERSION_LIST[4]) ;
-  if ! $(v4) { v4 = 0 ; }
-  PACKAGE_VERSION_LIST on $(<) = $(v1) $(v2) $(v3) $(v4) ;
-      
   local desc = [ Description $(>) ] ;
   if ! $(desc) { desc = "$(>)" ; }
   PRODUCT_DESCRIPTION on $(<) = $(desc) ;
