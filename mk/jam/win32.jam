@@ -408,6 +408,20 @@ rule PluginResourceWin32
   Win32Resource $(<) : $(versionrc) $(metarc) ;
 }
 
+rule SharedLibResourceWin32
+{
+  local versionrc ;
+
+  versionrc = [ DoObjectGrist $(<)_versionrc.rc ] ;
+    MakeLocate $(versionrc) : $(LOCATE_TARGET) ;
+  MakeVersionRc $(versionrc) : $(<) ;
+  
+  Clean clean : $(versionrc) ;
+  Clean $(<)clean : $(versionrc) ;
+
+  Win32Resource $(<) : $(versionrc) ;
+}
+
 # SystemLinkApplication target : objects : options
 rule SystemLinkApplication
 {
@@ -579,6 +593,7 @@ rule SystemLinkSharedLibrary
   IMPLIB on $(target) = $(linklib) ;
   Depends $(linklib) : $(target) ;
   LinkSharedLibrary $(target) : $(lib) ;
+  SharedLibResourceWin32 $(<) ;
 
   Clean clean : $(target) ;
   Clean $(barename)clean : $(target) ;
