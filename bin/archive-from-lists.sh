@@ -1,6 +1,7 @@
 #!/bin/sh
 
 OLD_PWD=$PWD
+MY_PATH=$PWD/$0
 
 ARCHIVER="tar --use-compress-program=lzma -cvf"
 ARCHIVE_EXT=.tar.lzma
@@ -72,9 +73,9 @@ done
 cd $TMPDIR/$ARCHIVE_NAME
 source $COPYSCRIPT
 cd ..
-touch -r $0 $TMPDIR/$ARCHIVE_NAME
+touch -r $MY_PATH $TMPDIR/$ARCHIVE_NAME
 
 $ARCHIVER $OLD_PWD/$ARCHIVE_NAME$ARCHIVE_EXT $ARCHIVE_NAME
 
 cd $OLD_PWD
-#rm -rf $TMPDIR
+rm -rf $TMPDIR
