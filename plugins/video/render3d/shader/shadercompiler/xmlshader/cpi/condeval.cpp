@@ -144,7 +144,18 @@ struct SliceAllocatorBool
   static const size_t valueSetsPerSlice = 32;
   static const size_t sliceSize = valueSetsPerSlice * sizeof (ValueSetBool);
 
-  typedef csFixedSizeAllocator<sliceSize, TempHeapAlloc> BlockAlloc;
+  struct BlockAlloc : public CS::Memory::AllocatorSafe<csFixedSizeAllocator<sliceSize,
+    TempHeapAlloc> >
+  {
+    BlockAlloc (size_t n) : AllocatorSafeType (n) {}
+
+    void Compact()
+    {
+      CS::Threading::RecursiveMutexScopedLock lock(mutex);
+      WrappedAllocatorType::Compact ();
+    }
+  };
+
   CS_DECLARE_STATIC_CLASSVAR_REF (sliceAlloc, SliceAllocBool, 
     BlockAlloc);
 
@@ -2085,6 +2096,7 @@ class ValueSetBoolAlloc
   csArray<uint8*, csArrayElementHandler<uint8*>, TempHeapAlloc> blocks;
   uint8* block;
   size_t blockRemaining;
+  CS::Threading::Mutex mutex;
 public:
   ValueSetBoolAlloc() : blockRemaining (0) {}
   ~ValueSetBoolAlloc()
@@ -2095,6 +2107,7 @@ public:
   
   ValueSetBool* Alloc()
   {
+    CS::Threading::MutexScopedLock lock(mutex);
     if (blockRemaining == 0)
     {
       blockRemaining = SliceAllocatorBool::sliceSize;
