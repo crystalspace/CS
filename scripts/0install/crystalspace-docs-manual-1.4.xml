@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<?xml-stylesheet type='text/xsl' href='interface.xsl'?>
+<interface uri="http://crystalspace3d.org/0install/crystalspace-docs-manual-1.4.xml" xmlns="http://zero-install.sourceforge.net/2004/injector/interface">
+  <name>crystalspace-docs-manual-1.4</name>
+  <summary>CrystalSpace User's Manual</summary>
+  <description>
+Usage instructions, conceptual material, and detailed technical information for
+the CrystalSpace 3D engine.</description>
+  <homepage>http://crystalspace3d.org/0install/http.//www.crystalspace3d.org/</homepage>
+  <icon href="http://crystalspace3d.org/mediawiki/images/thumb/3/3e/Cs-compact.png/120px-Cs-compact.png" type="image/png"/>
+  <group license="OSI Approved :: GNU Lesser General Public License (LGPL)" main="doc-open.sh">
+    <implementation arch="*-*" id="sha1new=197a2188c54cfd4f486049f76561c8b50da026d8" released="2009-07-04" stability="testing" version="1.4.0.32542">
+      <archive extract="crystalspace-docs-manual-1.4.0.32542" href="http://crystalspace3d.org/downloads/binary/1.4/crystalspace-docs-manual-1.4.0.32542.tar.lzma" size="1499410"/>
+    </implementation>
+    <requires interface="http://0install.net/2007/3rd-party/XdgUtils.xml">
+      <environment insert="scripts/" mode="prepend" name="PATH"/>
+    </requires>
+  </group>
+</interface>
+<!-- Base64 Signature
+iEYEABECAAYFAkpOvQ4ACgkQnCws0dQa9bu2SwCeIivT80PK0QFUOk55/zvA0hzqol4An333kGam
+QblH/nW0YOE9CIo7WNVt
+
+-->
