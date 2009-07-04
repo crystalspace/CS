@@ -90,20 +90,68 @@ fixup_feed()
 
 jam filelists
 
-create_archive crystalspace-libs libs-shared@lib
+ALL_FEEDS="$1"
+check_feed()
+{
+  feed_name=`echo $1 | tr -c "[\na-zA-Z]" "\n_"`
+  use=0
+  if [ -z "$ALL_FEEDS" ]; then
+    use=1
+  else
+    for f in $ALL_FEEDS; do
+      if [ $f = $1 ]; then
+	use=1
+	break
+      fi
+    done
+  fi
+  export feed_$feed_name=$use
+}
+
+check_feed libs
+check_feed sdk
+check_feed sdk-staticplugins
+check_feed data
+check_feed docs-manual
+check_feed python
+
+do_archive()
+{
+  feed_name=`echo $1 | tr -c "[\na-zA-Z]" "\n_"`
+  if (( $(eval echo \$feed_$feed_name) )) ; then
+    create_archive crystalspace-$1 $*
+  fi
+}
+
+do_archive libs libs-shared@lib
 # SDKs: we need to lump everything together
 # splitting things over multiple feeds works, but is less robust
 # (e.g. cs-config won't find the libs dir when invoked w/o 0launch)
 SDK_LISTS="libs-static@lib libs-shared@lib cs-config@bin bin-tool@bin headers@include headers-platform@include"
-create_archive crystalspace-sdk $SDK_LISTS
-create_archive crystalspace-sdk-staticplugins $SDK_LISTS libs-staticplugins@lib
-create_archive crystalspace-data data-runtime@data vfs
-create_archive crystalspace-docs-manual doc-manual doc-util-open
+do_archive sdk $SDK_LISTS
+do_archive sdk-staticplugins $SDK_LISTS libs-staticplugins@lib
+do_archive data data-runtime@data vfs
+do_archive docs-manual doc-manual doc-util-open
+do_archive python python-modules@py python-bindings@py plugin-python@plugins
 
-update_feed crystalspace-libs
-update_feed crystalspace-sdk
-fixup_feed crystalspace-sdk
-update_feed crystalspace-sdk-staticplugins
-fixup_feed crystalspace-sdk-staticplugins
-update_feed_neutral crystalspace-data
-update_feed_neutral crystalspace-docs-manual
+do_update()
+{
+  feed_name=`echo $1 | tr -c "[\na-zA-Z]" "\n_"`
+  if (( $(eval echo \$feed_$feed_name) )) ; then
+    if [ "$2" = "neutral" ] ; then
+      update_feed_neutral crystalspace-$1data
+    else
+      update_feed crystalspace-$1
+    fi
+    if [ "$2" = "fixup" ] ; then
+      fixup_feed crystalspace-$1
+    fi
+  fi
+}
+
+do_update libs
+do_update sdk fixup
+do_update sdk-staticplugins fixup
+do_update data neutral
+do_update docs-manual neutral
+do_update python

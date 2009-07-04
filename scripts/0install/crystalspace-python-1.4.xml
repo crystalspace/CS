@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<?xml-stylesheet type='text/xsl' href='interface.xsl'?>
+<interface uri="http://crystalspace3d.org/0install/crystalspace-python-1.4.xml" xmlns="http://zero-install.sourceforge.net/2004/injector/interface">
+  <name>crystalspace-python-1.4</name>
+  <summary>Crystal Space Python bindings</summary>
+  <description>
+Python plugin+bindings for Crystal Space.
+</description>
+  <homepage>http.//www.crystalspace3d.org/</homepage>
+  <category>Development</category>
+  <icon href="http://crystalspace3d.org/mediawiki/images/thumb/3/3e/Cs-compact.png/120px-Cs-compact.png" type="image/png"/>
+  <group license="OSI Approved :: GNU Lesser General Public License (LGPL)">
+    <implementation arch="Linux-x86_64" id="sha1new=7bca1343f39bde529b8fa3baa540beeb97ef3e6a" released="2009-07-04" stability="testing" version="1.4.0.32559">
+      <archive extract="crystalspace-python-1.4.0.32559" href="http://crystalspace3d.org/downloads/binary/1.4/linux-x86_64/crystalspace-python-1.4.0.32559.tar.lzma" size="1139386"/>
+    </implementation>
+  </group>
+</interface>
+<!-- Base64 Signature
+iEYEABECAAYFAkpPpBQACgkQnCws0dQa9bvQ5wCg0S1IVmeTn7C/PnrDu8ZgaNoMrbkAoM02zAaX
+1DpL3TApAMePzRfOo+TJ
+
+-->
