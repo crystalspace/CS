@@ -200,7 +200,7 @@ actions GenerateIconRc
 
 actions together CompileResources
 {
-    cat $(>) | $(CMD.WINDRES) $(WINDRES.FLAGS) $(RCFLAGS) --include-dir=$(>:D) -o $(<)
+    cat $(>) | $(CMD.WINDRES) $(WINDRES.FLAGS) $(RCFLAGS) --include-dir=$(HDRS) --include-dir=$(>:D) -o $(<)
 }
 
 rule CompileResources
