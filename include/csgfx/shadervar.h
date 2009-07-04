@@ -743,24 +743,27 @@ private:
   template<typename T>
   struct BlockAlloc : public CS::Memory::AllocatorSafe<csBlockAllocator<T> >
   {
+    typedef csBlockAllocator<T> WrappedAllocatorType;
+    typedef CS::Memory::AllocatorSafe<WrappedAllocatorType> AllocatorSafeType;
+ 
     BlockAlloc (size_t n) : AllocatorSafeType (n) {}
 
     T* Alloc ()
     {
-      CS::Threading::RecursiveMutexScopedLock lock(mutex);
+      CS::Threading::RecursiveMutexScopedLock lock(AllocatorSafeType::mutex);
       return WrappedAllocatorType::Alloc ();
     }
 
     template<typename A1>
     T* Alloc (A1& a1)
     {
-      CS::Threading::RecursiveMutexScopedLock lock(mutex);
+      CS::Threading::RecursiveMutexScopedLock lock(AllocatorSafeType::mutex);
       return WrappedAllocatorType::Alloc (a1);
     }
 
     void Free (T* p)
     {
-      CS::Threading::RecursiveMutexScopedLock lock(mutex);
+      CS::Threading::RecursiveMutexScopedLock lock(AllocatorSafeType::mutex);
       WrappedAllocatorType::Free (p);
     }
   };
