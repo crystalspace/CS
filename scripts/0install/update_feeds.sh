@@ -20,32 +20,57 @@ create_archive()
   $csbindir/archive-from-lists.sh $archive $lists
 }
 
-update_feed()
+_update_feed()
 {
   feedprefix=$1
+  arch=$2
+  download_dir=$3
   
-  arch=`uname`-`uname -m`
-  arch_lc=`echo $arch | tr "[:upper:]" "[:lower:]"`
   archive=$feedprefix-$CSVER
-  archive_url=http://crystalspace3d.org/downloads/binary/$FEEDVER/$arch_lc/$archive.tar.lzma
+  archive_url=http://crystalspace3d.org/downloads/binary/$FEEDVER/${download_dir}$archive.tar.lzma
   feedname=$feedprefix-$FEEDVER
   feedpath=$csdir/scripts/0install/$feedname.xml
   
-  0publish -u $feedpath
-  0publish	\
-    --add-version=$CSVER	\
-    --archive-url=$archive_url	\
-    --archive-file=$archive.tar.lzma	\
-    --archive-extract=$archive	\
-    --set-arch=$arch	\
-    --set-stability=testing	\
-    --set-version=$CSVER	\
-    --set-released=`date +%Y-%m-%d`	\
-    $feedpath
+  if [ -e $feedpath ] ; then
+    0publish -u $feedpath
+    0publish	\
+      --add-version=$CSVER	\
+      --archive-url=$archive_url	\
+      --archive-file=$archive.tar.lzma	\
+      --archive-extract=$archive	\
+      --set-arch=$arch	\
+      --set-stability=testing	\
+      --set-released=`date +%Y-%m-%d`	\
+      $feedpath
+  else
+    0publish -c $feedpath
+    0publish	\
+      --set-version=$CSVER	\
+      --archive-url=$archive_url	\
+      --archive-file=$archive.tar.lzma	\
+      --archive-extract=$archive	\
+      --set-arch=$arch	\
+      --set-stability=testing	\
+      --set-released=`date +%Y-%m-%d`	\
+      $feedpath
+    echo "* A new 0install feed was created; you will have to adjust it's contents"
+  fi
     
   echo "* Upload $archive.tar.lzma to $archive_url ."
   echo "* Don't forget to re-sign the feed file!"
   echo "     0publish -x -k <gpgkey> $feedpath"
+}
+
+update_feed()
+{
+  arch=`uname`-`uname -m`
+  arch_lc=`echo $arch | tr "[:upper:]" "[:lower:]"`
+  _update_feed $1 $arch $arch_lc/
+}
+
+update_feed_neutral()
+{
+  _update_feed $1 "*-*" ""
 }
 
 fixup_feed()
@@ -72,9 +97,13 @@ create_archive crystalspace-libs libs-shared@lib
 SDK_LISTS="libs-static@lib libs-shared@lib cs-config@bin bin-tool@bin headers@include headers-platform@include"
 create_archive crystalspace-sdk $SDK_LISTS
 create_archive crystalspace-sdk-staticplugins $SDK_LISTS libs-staticplugins@lib
+create_archive crystalspace-data data-runtime@data vfs
+create_archive crystalspace-docs-manual doc-manual doc-util-open
 
 update_feed crystalspace-libs
 update_feed crystalspace-sdk
 fixup_feed crystalspace-sdk
 update_feed crystalspace-sdk-staticplugins
 fixup_feed crystalspace-sdk-staticplugins
+update_feed_neutral crystalspace-data
+update_feed_neutral crystalspace-docs-manual
