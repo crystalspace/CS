@@ -62,8 +62,6 @@ import iengine
 import ivideo
 import csgfx
 import isndsys
-_SetSCFPointer = _imap._SetSCFPointer
-_GetSCFPointer = _imap._GetSCFPointer
 if not "core" in dir():
     core = __import__("cspace").__dict__["core"]
 core.AddSCFLink(_SetSCFPointer)
