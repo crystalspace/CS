@@ -3855,7 +3855,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *GetSize = *cspacec::iStringArray_GetSize;
-*Length = *cspacec::iStringArray_Length;
 *Push = *cspacec::iStringArray_Push;
 *Pop = *cspacec::iStringArray_Pop;
 *Get = *cspacec::iStringArray_Get;
@@ -3867,7 +3866,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *DeleteIndex = *cspacec::iStringArray_DeleteIndex;
 *Insert = *cspacec::iStringArray_Insert;
 *Empty = *cspacec::iStringArray_Empty;
-*DeleteAll = *cspacec::iStringArray_DeleteAll;
 *IsEmpty = *cspacec::iStringArray_IsEmpty;
 *scfGetVersion = *cspacec::iStringArray_scfGetVersion;
 sub DESTROY {
