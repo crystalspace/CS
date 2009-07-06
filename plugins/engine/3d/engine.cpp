@@ -68,6 +68,7 @@
 #include "plugins/engine/3d/collection.h"
 #include "plugins/engine/3d/engine.h"
 #include "plugins/engine/3d/halo.h"
+#include "plugins/engine/3d/impman.h"
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/lightmgr.h"
 #include "plugins/engine/3d/material.h"
@@ -716,6 +717,9 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
 
   csRef<iCommandLineParser> cmdline = csQueryRegistry<iCommandLineParser> (objectRegistry);
   precache = cmdline->GetBoolOption ("precache", true);
+
+  csRef<iImposterManager> impman = csPtr<iImposterManager>(new csImposterManager(this));
+  objectRegistry->Register (impman, "iImposterManager");
 
   return true;
 }

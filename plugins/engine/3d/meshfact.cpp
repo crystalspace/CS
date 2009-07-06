@@ -41,13 +41,11 @@ CS_LEAKGUARD_IMPLEMENT (csMeshFactoryWrapper);
 csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine,
                                             iMeshObjectFactory *meshFact)
   : scfImplementationType (this), meshFact (meshFact), parent (0),
-  zbufMode (CS_ZBUF_USE), engine (engine)
+  zbufMode (CS_ZBUF_USE), engine (engine), min_imposter_distance(0)
 {
   children.SetMeshFactory (this);
 
   render_priority = engine->GetObjectRenderPriority ();
-  imposter_active = false;
-  imposter_factory = 0;
 
   instanceFactory = 0;
 
@@ -65,13 +63,11 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine,
 
 csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine)
   : scfImplementationType (this), parent (0), zbufMode (CS_ZBUF_USE), 
-  engine (engine)
+  engine (engine), min_imposter_distance(0)
 {
   children.SetMeshFactory (this);
 
   render_priority = engine->GetObjectRenderPriority ();
-  imposter_active = false;
-  imposter_factory = 0;
 
   instanceFactory = 0;
 
@@ -92,7 +88,6 @@ csMeshFactoryWrapper::~csMeshFactoryWrapper ()
   // This line MUST be here to ensure that the children are not
   // removed after the destructor has already finished.
   children.RemoveAll ();
-  delete imposter_factory;
 }
 
 void csMeshFactoryWrapper::SelfDestruct ()
@@ -251,17 +246,30 @@ void csMeshFactoryWrapper::AddFactoryToStaticLOD (int lod,
   meshes_for_lod.Push (fact);
 }
 
-void csMeshFactoryWrapper::SetImposterActive (bool flag)
+void csMeshFactoryWrapper::UpdateImposter(iMeshWrapper* mesh, iRenderView* rview)
 {
-  imposter_active = flag;
-  if (imposter_active)
+  for(size_t i=0; i<imposters.GetSize(); ++i)
   {
-    if (!imposter_factory)
-      imposter_factory = new csImposterFactory (this);
+    if(imposters[i]->Update(mesh, rview))
+      return;
   }
-  else if (!imposter_active)
+
+  csRef<iImposterMesh> imposter = csPtr<iImposterMesh>(new csImposterMesh(engine, this, mesh, rview));
+  imposters.Push(imposter);
+}
+
+void csMeshFactoryWrapper::RemoveImposter(iMeshWrapper* mesh)
+{
+  for(size_t i=0; i<imposters.GetSize(); ++i)
   {
-    delete imposter_factory;
+    if(imposters[i]->Remove(mesh))
+    {
+      if(!imposters[i]->IsInstancing())
+      {
+        imposters.DeleteIndexFast(i);
+      }
+      return;
+    }
   }
 }
 

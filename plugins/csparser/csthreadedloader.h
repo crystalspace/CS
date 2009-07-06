@@ -50,7 +50,7 @@ struct iCollection;
 struct iDocumentNode;
 struct iEngine;
 struct iImageIO;
-struct iImposter;
+struct iImposterFactory;
 struct iLODControl;
 struct iMapNode;
 struct iObjectModel;
@@ -766,7 +766,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       MED, false, false)
 
       // Process the attributes of an <imposter> tag in a mesh specification.
-      bool ParseImposterSettings(iImposter* mesh, iDocumentNode *node);
+      bool ParseImposterSettings(iImposterFactory* mesh, iDocumentNode *node);
 
     /**
     * Parse a portal definition. 'container_name' is the name of the portal

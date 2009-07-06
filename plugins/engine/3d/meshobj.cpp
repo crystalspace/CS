@@ -70,8 +70,8 @@ csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj)
   }
   factory = 0;
   zbufMode = CS_ZBUF_USE;
-  //imposter_active = false;
-  imposter_mesh = 0;
+  using_imposter = false;
+  drawing_imposter = false;
   cast_hardware_shadow = true;
   draw_after_fancy_stuff = false;
 
@@ -232,12 +232,17 @@ void csMeshWrapper::SetMeshObject (iMeshObject *meshobj)
 
 csMeshWrapper::~csMeshWrapper ()
 {
+  if (using_imposter)
+  {
+    iImposterFactory* factwrap = dynamic_cast<iImposterFactory*> (factory);
+    factwrap->RemoveImposter (this);
+  }
+
   // Copy the array because we are going to unlink the children.
   csRefArray<iSceneNode> children = movable.GetChildren ();
   size_t i;
   for (i = 0 ; i < children.GetSize () ; i++)
     children[i]->SetParent (0);
-  delete imposter_mesh;
   ClearFromSectorPortalLists ();
 }
 
@@ -400,17 +405,24 @@ void csMeshWrapper::SetRenderPriority (CS::Graphics::RenderPriority rp)
 csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview, 
 					       uint32 frustum_mask)
 {
-  if (factory)
+  if (factory && !drawing_imposter)
   {
-    csMeshFactoryWrapper* factwrap = static_cast<csMeshFactoryWrapper*> (
-  	factory);
-    if (factwrap->imposter_active && CheckImposterRelevant (rview))
+    iImposterFactory* factwrap = dynamic_cast<iImposterFactory*> (factory);
+    if (factwrap)
     {
-      csRenderMesh** imposter = GetImposter (rview);
-      if (imposter)
+      if (UseImposter (rview))
       {
-        n = 1;
-        return imposter;
+        drawing_imposter = true;
+        factwrap->UpdateImposter (this, rview);
+        drawing_imposter = false;
+        using_imposter = true;
+        n = 0;
+        return 0;
+      }
+      else if (using_imposter)
+      {
+        factwrap->RemoveImposter (this);
+        using_imposter = false;
       }
     }
   }
@@ -753,31 +765,18 @@ void csMeshWrapper::AddMeshToStaticLOD (int lod, iMeshWrapper* mesh)
 
 //---------------------------------------------------------------------------
 
-bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
+bool csMeshWrapper::UseImposter (iRenderView *rview)
 {
-  if (!factory) return false;
-  csMeshFactoryWrapper* factwrap = static_cast<csMeshFactoryWrapper*> (
-  	factory);
+  if (!factory)
+    return false;
+
+  csMeshFactoryWrapper* factwrap = static_cast<csMeshFactoryWrapper*> (factory);
+  if(!factwrap->GetMinDistance())
+    return false;
+
   float wor_sq_dist = GetSquaredDistance (rview);
-  float dist = factwrap->min_imposter_distance->Get ();
+  float dist = factwrap->GetMinDistance();
   return (wor_sq_dist > dist*dist);
-}
-
-csRenderMesh** csMeshWrapper::GetImposter (iRenderView *rview)
-{
-  csMeshFactoryWrapper* factwrap = static_cast<csMeshFactoryWrapper*> (
-  	factory);
-  csImposterFactory* imposter_factory = factwrap->GetImposterFactory ();
-  if (!imposter_factory) return 0;
-
-  imposter_mesh = imposter_factory->GetImposterMesh (this,
-      imposter_mesh, rview);
-  if (!imposter_mesh) return 0;
-  if (!imposter_mesh->GetImposterReady (rview))
-    return 0;
-
-  // Get imposter rendermesh
-  return imposter_mesh->GetRenderMesh (rview);
 }
 
 void csMeshWrapper::SetLODFade (float fade)

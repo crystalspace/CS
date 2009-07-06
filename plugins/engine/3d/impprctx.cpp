@@ -69,11 +69,9 @@ csImposterProcTex::csImposterProcTex  (csEngine* engine,
     engine->objectRegistry, "crystalspace.shader.variablenameset");
   if (stringid_standard == csInvalidStringID)
   {
-    /*
     csRef<iStringSet> stringSet = csQueryRegistryTagInterface<iStringSet> (
       engine->objectRegistry, "crystalspace.stringset.shared");
-    stringid_standard = stringSet->Request("standard");*/
-    stringid_standard = svStringSet->Request ("standard");
+    stringid_standard = stringSet->Request("standard");
     stringid_light_ambient = svStringSet->Request("light ambient");
   }
 
@@ -106,7 +104,7 @@ void csImposterProcTex::Update (iRenderView* rview)
 
 
 void csImposterProcTex::RenderToTexture (iRenderView *rview, iSector *s)
-{
+{/*
   if (!mesh) return;
 
   csEngine* engine = static_cast<csEngine*> (rview->GetEngine ());
@@ -121,7 +119,7 @@ void csImposterProcTex::RenderToTexture (iRenderView *rview, iSector *s)
     | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN);
  
   //get imposted mesh
-  csRef<iMeshWrapper> originalmesh = mesh->parent_mesh;
+  csRef<iMeshWrapper> originalmesh = mesh->instances[0]->mesh;
   csRef<iMeshObject> meshobj = originalmesh->GetMeshObject ();
   csVector3 mesh_pos = originalmesh->GetWorldBoundingBox ().GetCenter ();
 
@@ -234,7 +232,6 @@ void csImposterProcTex::RenderToTexture (iRenderView *rview, iSector *s)
   g3d->FinishDraw ();
   cam->SetTransform (old_cam_transform);
 
-  mesh->SetImposterReady (true, 0);
-  updating = false;
+  updating = false;*/
 }
 

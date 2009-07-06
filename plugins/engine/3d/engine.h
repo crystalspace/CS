@@ -243,7 +243,7 @@ public:
   /// Get the iObject for the engine.
   virtual iObject *QueryObject();
 
-  iObjectRegistry* GetObjectRegistry() const
+  inline iObjectRegistry* GetObjectRegistry() const
   {
     return objectRegistry;
   }
