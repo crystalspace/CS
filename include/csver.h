@@ -1,3 +1,5 @@
+/* ATTENTION: This file is generated from csver.h.template,
+   make changes _there_ instead */
 /*
     Copyright (C) 1998-2007 by Jorrit Tyberghein
   
@@ -27,6 +29,33 @@
 // Also update CS/configure.ac, CS/docs/texinfo/version.txi, and
 // CS/mk/autoconf/crystal.m4 when updating the version number.
 
+/*
+ * Set if this is an unstable (development) CS version.
+ * Also affects the version number - unstable versions have the RCS revision
+ *  as the 'build' version component.
+ */
+#define CS_VERSION_UNSTABLE
+
+/**
+ * Build version based off SVN revision.
+ * This is not the straight SVN revision - instead it's the difference between
+ * the "last changed" SVN revision and the revision of csver.h.template.
+ * This is done to keep the number in a relatively small range (e.g. Win32
+ * version number components usually only hold 16 bit numbers).
+ * When a version bump happens, csver.h.template is edited to reflect the new
+ * major and minor versions. This will also 'reset' the relative SVN revision
+ * number.
+ * However, in case csver.h.template is edited for a reason other than a
+ * version bump, CS_RCSREV_OFFSET is provided to allow adjustment
+ * of the relative SVN revision to avoid having it go backwards.
+ *
+ * The relative SVN revision is computed by the script `rcsrev`.
+ */
+//CS_RCSREV_OFFSET 0
+#ifndef CS_VERSION_RCSREV
+#define CS_VERSION_RCSREV	29
+#endif
+
 /**\name Version number definitions (numeric)
  * @{ */
 /// Major version
@@ -34,11 +63,15 @@
 /// Minor version (even are stable versions, odd are development versions)
 #define CS_VERSION_NUM_MINOR  9
 /// Maintenance release / RC
+#ifdef CS_VERSION_UNSTABLE
+#define CS_VERSION_NUM_BUILD  CS_VERSION_RCSREV
+#else
 #define CS_VERSION_NUM_BUILD  0
+#endif
 
 /// Encode a version into a single number comparable using <, > etc.
 #define CS_VERSION_NUM_COMPARABLE(Major,Minor,Build)  \
-  ((Major)*10000 + (Minor)*100 + (Build))
+  ((Major)*1000000 + (Minor)*10000 + (Build))
 /// Current version, encode into a single number comparable using <, > etc.
 #define CS_VERSION_NUM_COMPARABLE_CURRENT         \
   CS_VERSION_NUM_COMPARABLE(CS_VERSION_NUM_MAJOR, \
@@ -91,6 +124,18 @@
 /// A complete version number
 #define CS_VERSION_NUMBER CS_VERSION_MAJOR "." CS_VERSION_MINOR "." \
   CS_VERSION_BUILD
+/**
+ * A string identifying mutually (binarily) compatible versions.
+ * Stable versions with the same major and minor version are binary compatible
+ * between each other.
+ * Unstable versions are generally not binary compatible, hence builds from
+ * different SVN revisions are treated as incompatible.
+ */
+#ifdef CS_VERSION_UNSTABLE
+  #define CS_VERSION_NUMBER_COMPATIBLE	CS_VERSION_NUMBER
+#else
+  #define CS_VERSION_NUMBER_COMPATIBLE	CS_VERSION_MAJOR "." CS_VERSION_MINOR
+#endif
 
 /// A complete version string, including platform, processor and compiler
 #define CS_VERSION CS_VERSION_NUMBER \

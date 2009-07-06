@@ -62,8 +62,6 @@ import ivaria
 import csgeom
 import ivideo
 import csgfx
-_SetSCFPointer = _imesh._SetSCFPointer
-_GetSCFPointer = _imesh._GetSCFPointer
 if not "core" in dir():
     core = __import__("cspace").__dict__["core"]
 core.AddSCFLink(_SetSCFPointer)
@@ -184,30 +182,14 @@ class iGeneralFactoryState(iGeneralMeshCommonState):
     def AddVertex(*args): return _imesh.iGeneralFactoryState_AddVertex(*args)
     def SetVertexCount(*args): return _imesh.iGeneralFactoryState_SetVertexCount(*args)
     def GetVertexCount(*args): return _imesh.iGeneralFactoryState_GetVertexCount(*args)
-    def GetVertices(self):
-      return CSMutableArrayHelper(self.GetVertexByIndex, self.GetVertexCount)
-
-
-    def GetTexels(self):
-      return CSMutableArrayHelper(self.GetTexelByIndex, self.GetVertexCount)
-
-
-    def GetNormals(self):
-      # iGeneralFactoryState::GetVertices()
-      return CSMutableArrayHelper(self.GetNormalByIndex, self.GetVertexCount)
-
-
-    def GetColors(self):
-      return CSMutableArrayHelper(self.GetColorByIndex, self.GetVertexCount)
-
-
+    def GetVertices(*args): return _imesh.iGeneralFactoryState_GetVertices(*args)
+    def GetTexels(*args): return _imesh.iGeneralFactoryState_GetTexels(*args)
+    def GetNormals(*args): return _imesh.iGeneralFactoryState_GetNormals(*args)
+    def GetColors(*args): return _imesh.iGeneralFactoryState_GetColors(*args)
     def AddTriangle(*args): return _imesh.iGeneralFactoryState_AddTriangle(*args)
     def SetTriangleCount(*args): return _imesh.iGeneralFactoryState_SetTriangleCount(*args)
     def GetTriangleCount(*args): return _imesh.iGeneralFactoryState_GetTriangleCount(*args)
-    def GetTriangles(self):
-      return CSMutableArrayHelper(self.GetTriangleByIndex, self.GetTriangleCount)
-
-
+    def GetTriangles(*args): return _imesh.iGeneralFactoryState_GetTriangles(*args)
     def Invalidate(*args): return _imesh.iGeneralFactoryState_Invalidate(*args)
     def CalculateNormals(*args): return _imesh.iGeneralFactoryState_CalculateNormals(*args)
     def Compress(*args): return _imesh.iGeneralFactoryState_Compress(*args)
@@ -841,7 +823,7 @@ iSkeleton2_swigregister = _imesh.iSkeleton2_swigregister
 iSkeleton2_swigregister(iSkeleton2)
 iSkeleton2_scfGetVersion = _imesh.iSkeleton2_scfGetVersion
 
-class csSkeletalState2(core.csRefCount):
+class csSkeletalState2(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 

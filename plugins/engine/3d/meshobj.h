@@ -134,7 +134,7 @@ class csMeshWrapper :
                                iMeshWrapper,
                                scfFakeInterface<iShaderVariableContext>,
                                iVisibilityObject,
-    		               iSceneNode,
+    		                       iSceneNode,
                                iSelfDestruct>,
   public CS::Graphics::OverlayShaderVariableContextImpl
 {
@@ -234,8 +234,9 @@ private:
   iCamera* last_camera;
   uint last_frame_number;
 
-  // Shadervar for alpha fading.
+  // Shadervars for instancing.
   csRef<csShaderVariable> fadeFactors;
+  csRef<csShaderVariable> transformVars;
 
 public:
   CS_LEAKGUARD_DECLARE (csMeshWrapper);
@@ -470,6 +471,9 @@ public:
   void UnsetLODFade ();
 
   void SetDefaultEnvironmentTexture ();
+
+  virtual csShaderVariable* AddInstance(csVector3& position, csMatrix3& rotation);
+  virtual void RemoveInstance(csShaderVariable* instance);
 
   //---------- Bounding volume and beam functions -----------------//
 

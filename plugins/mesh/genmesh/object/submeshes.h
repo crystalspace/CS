@@ -163,6 +163,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     { return subMeshes[index]; }
     uint GetChangeNum () const
     { return changeNum; }
+
+    void SetMaterialWrapper(iMaterialWrapper* mat);
+    iMaterialWrapper* GetMaterialWrapper() const;
     
     SubMesh* GetDefaultSubmesh() const { return defaultSubmesh; }
   };
@@ -336,6 +339,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     { return subMeshes.GetSize(); }
     SubMeshProxy* operator[](size_t index)
     { return subMeshes[index]; }
+
+    void SetMaterialWrapper(iMaterialWrapper* mat);
+    iMaterialWrapper* GetMaterialWrapper() const;
     
     SubMeshProxy* GetDefaultSubmesh() const { return defaultSubmesh; }
   };

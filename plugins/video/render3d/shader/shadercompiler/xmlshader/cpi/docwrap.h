@@ -361,8 +361,10 @@ public:
 };
 
 class csTextNodeWrapper : 
-  public scfImplementationPooled<scfImplementationExt0<csTextNodeWrapper, 
-                                                       csDocumentNodeReadOnly> >
+  public scfImplementationPooled<
+  scfImplementationExt0<csTextNodeWrapper, csDocumentNodeReadOnly>,
+  CS::Memory::AllocatorMalloc,
+  true>
 {
   char* nodeText;
   csRef<iDocumentNode> realMe;
@@ -387,8 +389,9 @@ public:
 
 class csWrappedDocumentNodeIterator : 
   public scfImplementationPooled<
-    scfImplementation1<csWrappedDocumentNodeIterator, 
-                       iDocumentNodeIterator> >
+  scfImplementation1<csWrappedDocumentNodeIterator, iDocumentNodeIterator>,
+  CS::Memory::AllocatorMalloc,
+  true>
 {
   csString filter;
 

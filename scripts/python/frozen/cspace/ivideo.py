@@ -59,8 +59,6 @@ def _swig_setattr_nondynamic_method(set):
 
 import core
 import csgfx
-_SetSCFPointer = _ivideo._SetSCFPointer
-_GetSCFPointer = _ivideo._GetSCFPointer
 if not "core" in dir():
     core = __import__("cspace").__dict__["core"]
 core.AddSCFLink(_SetSCFPointer)
