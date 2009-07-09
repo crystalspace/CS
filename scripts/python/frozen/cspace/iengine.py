@@ -60,8 +60,6 @@ def _swig_setattr_nondynamic_method(set):
 import core
 import ivideo
 import csgfx
-_SetSCFPointer = _iengine._SetSCFPointer
-_GetSCFPointer = _iengine._GetSCFPointer
 if not "core" in dir():
     core = __import__("cspace").__dict__["core"]
 core.AddSCFLink(_SetSCFPointer)
@@ -982,6 +980,8 @@ class iMeshWrapper(core.iBase):
     def GetExtraRenderMeshPriority(*args): return _iengine.iMeshWrapper_GetExtraRenderMeshPriority(*args)
     def GetExtraRenderMeshZBufMode(*args): return _iengine.iMeshWrapper_GetExtraRenderMeshZBufMode(*args)
     def RemoveExtraRenderMesh(*args): return _iengine.iMeshWrapper_RemoveExtraRenderMesh(*args)
+    def AddInstance(*args): return _iengine.iMeshWrapper_AddInstance(*args)
+    def RemoveInstance(*args): return _iengine.iMeshWrapper_RemoveInstance(*args)
     scfGetVersion = staticmethod(_iengine.iMeshWrapper_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iMeshWrapper
     __del__ = lambda self : None;
@@ -1017,6 +1017,10 @@ class iMeshFactoryWrapper(core.iBase):
     def GetRenderPriority(*args): return _iengine.iMeshFactoryWrapper_GetRenderPriority(*args)
     def SetRenderPriorityRecursive(*args): return _iengine.iMeshFactoryWrapper_SetRenderPriorityRecursive(*args)
     def GetSVContext(*args): return _iengine.iMeshFactoryWrapper_GetSVContext(*args)
+    def SetInstanceFactory(*args): return _iengine.iMeshFactoryWrapper_SetInstanceFactory(*args)
+    def GetInstanceFactory(*args): return _iengine.iMeshFactoryWrapper_GetInstanceFactory(*args)
+    def AddInstance(*args): return _iengine.iMeshFactoryWrapper_AddInstance(*args)
+    def GetInstances(*args): return _iengine.iMeshFactoryWrapper_GetInstances(*args)
     scfGetVersion = staticmethod(_iengine.iMeshFactoryWrapper_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iMeshFactoryWrapper
     __del__ = lambda self : None;

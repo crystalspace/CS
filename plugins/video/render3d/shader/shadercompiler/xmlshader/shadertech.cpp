@@ -1997,6 +1997,7 @@ void csXMLShaderTech::SetupInstances (csRenderMeshModes& modes,
     thispass->instances_binds;
   if (instances_binds.GetSize() == 0)
   {
+    /* No instancing binds, disable instances */
     modes.doInstancing = false;
     return;
   }
@@ -2013,17 +2014,26 @@ void csXMLShaderTech::SetupInstances (csRenderMeshModes& modes,
     var = csGetShaderVariableFromStack (stack, instances_binds[i].variable);
     GetInstOuterVars().Push (var);
     if (var == 0) continue;
-    size_t varElems = 1;
     if (var->GetType() == csShaderVariable::ARRAY)
     {
-      varElems = var->GetArraySize();
+      size_t varElems = var->GetArraySize();
+      if (numInsts == 0)
+	// First SV array seen, use length as initial instance count
+	numInsts = varElems;
+      else
+	// Use lowest of all array sizes as instance count
+	numInsts = csMin (varElems, numInsts);
+      // An empty array means no instances, so we can break out
+      if (varElems == 0)
+      {
+	numVars = 0;
+	break;
+      }
     }
-    if (varElems == 0) continue;
     GetInstParamsTargets().Push (instances_binds[i].destination);
-    numInsts = csMax (varElems, numInsts);
     numVars++;
   }
-
+  
   // Pass two: fill arrays
   GetInstParams().SetSize (numInsts * numVars);
   GetInstParamPtrs().SetSize (numInsts);
@@ -2037,12 +2047,17 @@ void csXMLShaderTech::SetupInstances (csRenderMeshModes& modes,
       csShaderVariable* var = GetInstOuterVars()[i];
       if (var == 0) continue;
 
+      /* If a shader var contains an array, the elements of the array are used as
+	 the parameters for each instance.
+       */
       if (var->GetType() == csShaderVariable::ARRAY)
       {
         size_t varElems = var->GetArraySize();
         size_t n = csMin (varElems, instNum);
         var = var->GetArrayElement (n);
       }
+      /* Otherwise, the shader var is replicated across all instances.
+       */
       GetInstParams()[svPos] = var;
       svPos++;
     }

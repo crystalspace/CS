@@ -611,6 +611,8 @@ SET_HELPER(csStringID)
 %ignore csInitializer::RequestPluginsV;
 %rename (_RequestPlugins) csInitializer::RequestPlugins(iObjectRegistry*,
   csArray<csPluginRequest> const&);
+%rename (_CreateEnvironment) csInitializer::CreateEnvironment(int,char const *const []);
+%rename (_CreateEnvironment2) csInitializer::CreateEnvironment(int,char const *const [],bool);
 
 %ignore csInitializer::SetupEventHandler (iObjectRegistry*, csEventHandlerFunc,
   const csEventID events[]);

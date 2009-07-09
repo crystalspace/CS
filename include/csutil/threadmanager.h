@@ -192,10 +192,10 @@ public:
 
   void MarkFinished()
   {
-    CS::Threading::MutexScopedLock lock(updateLock);
+    CS::Threading::MutexScopedLock ulock(updateLock);
     if(waitLock && wait)
     {
-      CS::Threading::MutexScopedLock lock(*waitLock);
+      CS::Threading::MutexScopedLock wlock(*waitLock);
       finished = true;
       wait->NotifyAll();
     }

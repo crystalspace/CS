@@ -45,7 +45,7 @@ class __Doxygen_Workaround__ {};
 * class. Since interfaces may be deprecated this may cause 
 * deprecation warnings emitted in ~SCF_IMPL_NAME, which is kinda silly.
 */
-#include "csutil/deprecated_warn_off.h"
+#include "deprecated_warn_off.h"
 
 #define SCF_IN_IMPLGEN_H 1
 // Instead of duplicating the code for every scfImplementationN and
@@ -145,4 +145,4 @@ class __Doxygen_Workaround__ {};
 #undef SCF_IMPL_EXT
 #undef SCF_IN_IMPLGEN_H
 
-#include "csutil/deprecated_warn_on.h"
+#include "deprecated_warn_on.h"

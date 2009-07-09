@@ -134,7 +134,7 @@ class csMeshWrapper :
                                iMeshWrapper,
                                scfFakeInterface<iShaderVariableContext>,
                                iVisibilityObject,
-    		               iSceneNode,
+    		                       iSceneNode,
                                iSelfDestruct>,
   public CS::Graphics::OverlayShaderVariableContextImpl
 {
@@ -234,6 +234,10 @@ private:
   iCamera* last_camera;
   uint last_frame_number;
 
+  // Shadervars for instancing.
+  csRef<csShaderVariable> fadeFactors;
+  csRef<csShaderVariable> transformVars;
+
 public:
   CS_LEAKGUARD_DECLARE (csMeshWrapper);
 
@@ -285,11 +289,8 @@ public:
   csMeshWrapper (csEngine* engine, iMeshObject* meshobj = 0);
 
   /// Set the mesh factory.
-  virtual void SetFactory (iMeshFactoryWrapper* factory)
-  {
-    csMeshWrapper::factory = factory;
-    SetParentContext (factory ? factory->GetSVContext() : 0);
-  }
+  virtual void SetFactory (iMeshFactoryWrapper* factory);
+
   /// Get the mesh factory.
   virtual iMeshFactoryWrapper* GetFactory () const
   {
@@ -470,6 +471,9 @@ public:
   void UnsetLODFade ();
 
   void SetDefaultEnvironmentTexture ();
+
+  virtual csShaderVariable* AddInstance(csVector3& position, csMatrix3& rotation);
+  virtual void RemoveInstance(csShaderVariable* instance);
 
   //---------- Bounding volume and beam functions -----------------//
 
