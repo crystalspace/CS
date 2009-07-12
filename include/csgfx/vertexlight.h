@@ -53,7 +53,7 @@ protected:
   csShaderVariable* LookupSV (const csShaderVariableStack& stack,
     CS::ShaderVarStringID id)
   {
-    csShaderVariable* sv;
+    csShaderVariable* sv = 0;
     if (stack.GetSize () > id)
       sv = stack[id];
     return sv;

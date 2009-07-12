@@ -115,12 +115,8 @@ class iImage(core.iBase):
     def GetSubImage(*args): return _csgfx.iImage_GetSubImage(*args)
     def GetCookedImageFormat(*args): return _csgfx.iImage_GetCookedImageFormat(*args)
     def GetCookedImageData(*args): return _csgfx.iImage_GetCookedImageData(*args)
-    scfGetVersion = staticmethod(_csgfx.iImage_scfGetVersion)
-    __swig_destroy__ = _csgfx.delete_iImage
-    __del__ = lambda self : None;
 iImage_swigregister = _csgfx.iImage_swigregister
 iImage_swigregister(iImage)
-iImage_scfGetVersion = _csgfx.iImage_scfGetVersion
 
 class csImageIOFileFormatDescriptions(core.CustomAllocated):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -178,12 +174,8 @@ class iImageIO(core.iBase):
     def Load(*args): return _csgfx.iImageIO_Load(*args)
     def SetDithering(*args): return _csgfx.iImageIO_SetDithering(*args)
     def Save(*args): return _csgfx.iImageIO_Save(*args)
-    scfGetVersion = staticmethod(_csgfx.iImageIO_scfGetVersion)
-    __swig_destroy__ = _csgfx.delete_iImageIO
-    __del__ = lambda self : None;
 iImageIO_swigregister = _csgfx.iImageIO_swigregister
 iImageIO_swigregister(iImageIO)
-iImageIO_scfGetVersion = _csgfx.iImageIO_scfGetVersion
 
 class iAnimatedImage(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -261,14 +253,10 @@ class iShaderVarStringSet(iShaderVarStringSetBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self, *args, **kwargs): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    scfGetVersion = staticmethod(_csgfx.iShaderVarStringSet_scfGetVersion)
-    __swig_destroy__ = _csgfx.delete_iShaderVarStringSet
-    __del__ = lambda self : None;
 iShaderVarStringSet_swigregister = _csgfx.iShaderVarStringSet_swigregister
 iShaderVarStringSet_swigregister(iShaderVarStringSet)
 cvar = _csgfx.cvar
 InvalidShaderVarStringID = cvar.InvalidShaderVarStringID
-iShaderVarStringSet_scfGetVersion = _csgfx.iShaderVarStringSet_scfGetVersion
 
 class iShaderVariableAccessor(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
@@ -280,48 +268,48 @@ class iShaderVariableAccessor(core.iBase):
 iShaderVariableAccessor_swigregister = _csgfx.iShaderVariableAccessor_swigregister
 iShaderVariableAccessor_swigregister(iShaderVariableAccessor)
 
-class csShaderVariable(core.csRefCount):
+class BlockAlloc(core.csRefCount):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    UNKNOWN = _csgfx.csShaderVariable_UNKNOWN
-    INT = _csgfx.csShaderVariable_INT
-    FLOAT = _csgfx.csShaderVariable_FLOAT
-    TEXTURE = _csgfx.csShaderVariable_TEXTURE
-    RENDERBUFFER = _csgfx.csShaderVariable_RENDERBUFFER
-    VECTOR2 = _csgfx.csShaderVariable_VECTOR2
-    VECTOR3 = _csgfx.csShaderVariable_VECTOR3
-    VECTOR4 = _csgfx.csShaderVariable_VECTOR4
-    MATRIX3X3 = _csgfx.csShaderVariable_MATRIX3X3
-    MATRIX = _csgfx.csShaderVariable_MATRIX
-    TRANSFORM = _csgfx.csShaderVariable_TRANSFORM
-    ARRAY = _csgfx.csShaderVariable_ARRAY
-    MATRIX4X4 = _csgfx.csShaderVariable_MATRIX4X4
-    COLOR = _csgfx.csShaderVariable_COLOR
+    UNKNOWN = _csgfx.BlockAlloc_UNKNOWN
+    INT = _csgfx.BlockAlloc_INT
+    FLOAT = _csgfx.BlockAlloc_FLOAT
+    TEXTURE = _csgfx.BlockAlloc_TEXTURE
+    RENDERBUFFER = _csgfx.BlockAlloc_RENDERBUFFER
+    VECTOR2 = _csgfx.BlockAlloc_VECTOR2
+    VECTOR3 = _csgfx.BlockAlloc_VECTOR3
+    VECTOR4 = _csgfx.BlockAlloc_VECTOR4
+    MATRIX3X3 = _csgfx.BlockAlloc_MATRIX3X3
+    MATRIX = _csgfx.BlockAlloc_MATRIX
+    TRANSFORM = _csgfx.BlockAlloc_TRANSFORM
+    ARRAY = _csgfx.BlockAlloc_ARRAY
+    MATRIX4X4 = _csgfx.BlockAlloc_MATRIX4X4
+    COLOR = _csgfx.BlockAlloc_COLOR
     def __init__(self, *args): 
-        this = _csgfx.new_csShaderVariable(*args)
+        this = _csgfx.new_BlockAlloc(*args)
         try: self.this.append(this)
         except: self.this = this
-    __swig_destroy__ = _csgfx.delete_csShaderVariable
+    __swig_destroy__ = _csgfx.delete_BlockAlloc
     __del__ = lambda self : None;
-    def assign(*args): return _csgfx.csShaderVariable_assign(*args)
-    def GetType(*args): return _csgfx.csShaderVariable_GetType(*args)
-    def SetType(*args): return _csgfx.csShaderVariable_SetType(*args)
-    def SetAccessor(*args): return _csgfx.csShaderVariable_SetAccessor(*args)
-    def SetName(*args): return _csgfx.csShaderVariable_SetName(*args)
-    def GetName(*args): return _csgfx.csShaderVariable_GetName(*args)
-    def GetAccessor(*args): return _csgfx.csShaderVariable_GetAccessor(*args)
-    def GetAccessorData(*args): return _csgfx.csShaderVariable_GetAccessorData(*args)
-    def SetValue(*args): return _csgfx.csShaderVariable_SetValue(*args)
-    def AddVariableToArray(*args): return _csgfx.csShaderVariable_AddVariableToArray(*args)
-    def RemoveFromArray(*args): return _csgfx.csShaderVariable_RemoveFromArray(*args)
-    def SetArraySize(*args): return _csgfx.csShaderVariable_SetArraySize(*args)
-    def GetArraySize(*args): return _csgfx.csShaderVariable_GetArraySize(*args)
-    def GetArrayElement(*args): return _csgfx.csShaderVariable_GetArrayElement(*args)
-    def SetArrayElement(*args): return _csgfx.csShaderVariable_SetArrayElement(*args)
-    def FindArrayElement(*args): return _csgfx.csShaderVariable_FindArrayElement(*args)
-    def GetValue(*args): return _csgfx.csShaderVariable_GetValue(*args)
-csShaderVariable_swigregister = _csgfx.csShaderVariable_swigregister
-csShaderVariable_swigregister(csShaderVariable)
+    def assign(*args): return _csgfx.BlockAlloc_assign(*args)
+    def GetType(*args): return _csgfx.BlockAlloc_GetType(*args)
+    def SetType(*args): return _csgfx.BlockAlloc_SetType(*args)
+    def SetAccessor(*args): return _csgfx.BlockAlloc_SetAccessor(*args)
+    def SetName(*args): return _csgfx.BlockAlloc_SetName(*args)
+    def GetName(*args): return _csgfx.BlockAlloc_GetName(*args)
+    def GetAccessor(*args): return _csgfx.BlockAlloc_GetAccessor(*args)
+    def GetAccessorData(*args): return _csgfx.BlockAlloc_GetAccessorData(*args)
+    def GetValue(*args): return _csgfx.BlockAlloc_GetValue(*args)
+    def SetValue(*args): return _csgfx.BlockAlloc_SetValue(*args)
+    def AddVariableToArray(*args): return _csgfx.BlockAlloc_AddVariableToArray(*args)
+    def RemoveFromArray(*args): return _csgfx.BlockAlloc_RemoveFromArray(*args)
+    def SetArraySize(*args): return _csgfx.BlockAlloc_SetArraySize(*args)
+    def GetArraySize(*args): return _csgfx.BlockAlloc_GetArraySize(*args)
+    def GetArrayElement(*args): return _csgfx.BlockAlloc_GetArrayElement(*args)
+    def SetArrayElement(*args): return _csgfx.BlockAlloc_SetArrayElement(*args)
+    def FindArrayElement(*args): return _csgfx.BlockAlloc_FindArrayElement(*args)
+BlockAlloc_swigregister = _csgfx.BlockAlloc_swigregister
+BlockAlloc_swigregister(BlockAlloc)
 
 class csShaderVariableArrayReadOnly(core.iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')

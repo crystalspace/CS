@@ -62,8 +62,6 @@ import iengine
 import ivideo
 import csgfx
 import ivaria
-_SetSCFPointer = _cstool._SetSCFPointer
-_GetSCFPointer = _cstool._GetSCFPointer
 if not "core" in dir():
     core = __import__("cspace").__dict__["core"]
 core.AddSCFLink(_SetSCFPointer)
