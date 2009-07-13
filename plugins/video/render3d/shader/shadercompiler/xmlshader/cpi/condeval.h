@@ -476,24 +476,8 @@ protected:
   class CowBlockAllocator
   {
   public:
-    struct BlockAlloc : public 
-      CS::Memory::AllocatorSafe<csFixedSizeAllocator<ValuesArrayWrapper::allocSize, 
-	TempHeapAlloc> >
-    {
-      BlockAlloc (size_t n) : AllocatorSafeType (n) {}
-      
-      CS_ATTRIBUTE_MALLOC void* Alloc ()
-      {
-        CS::Threading::RecursiveMutexScopedLock lock(mutex);
-        return WrappedAllocatorType::Alloc ();
-      }
-      
-      void Compact()
-      {
-        CS::Threading::RecursiveMutexScopedLock lock(mutex);
-        WrappedAllocatorType::Compact ();
-      }
-    };
+    typedef CS::Memory::FixedSizeAllocatorSafe<ValuesArrayWrapper::allocSize, 
+      TempHeapAlloc> BlockAlloc;
   private:
     CS_DECLARE_STATIC_CLASSVAR_REF (allocator,
       Allocator, BlockAlloc);
