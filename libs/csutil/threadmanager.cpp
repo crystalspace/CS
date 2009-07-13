@@ -105,9 +105,9 @@ bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns, bool proces
 
     threadReturns[0]->SetWaitPtrs(c, m);
 
+    m->Lock();
     while(!threadReturns[0]->IsFinished())
     {
-      MutexScopedLock lock(*m);
       if(IsMainThread())
       {
         if(process && listQueue->GetQueueCount() > 0)
@@ -146,6 +146,7 @@ bool csThreadManager::Wait(csRefArray<iThreadReturn>& threadReturns, bool proces
         }
       }
     }
+    m->Unlock();
 
     threadReturns[0]->SetWaitPtrs(0, 0);
 

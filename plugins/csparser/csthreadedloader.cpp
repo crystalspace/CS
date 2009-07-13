@@ -1223,7 +1223,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       {
         csRef<iDocumentAttribute> attr_name = ldr_context->availMeshfacts[i].node->GetAttribute ("name");
         csRef<iDocumentAttribute> attr_file = ldr_context->availMeshfacts[i].node->GetAttribute ("file");
-        if (attr_file)
+        if (attr_file && attr_file->GetValue ())
         {
           const char* name = attr_name->GetValue();
           const char* filename = attr_file->GetValue ();

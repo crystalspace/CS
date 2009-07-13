@@ -516,7 +516,7 @@ void ConditionTree::Dump (csString& out)
 
 //---------------------------------------------------------------------------
 
-typedef CS::Memory::AllocatorSafe<csFixedSizeAllocator<sizeof (csWrappedDocumentNode::WrappedChild)> >
+typedef CS::Memory::FixedSizeAllocatorSafe<sizeof (csWrappedDocumentNode::WrappedChild)>
   WrappedChildAlloc;
 CS_IMPLEMENT_STATIC_VAR (ChildAlloc, WrappedChildAlloc, (256));
 
