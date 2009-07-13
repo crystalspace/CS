@@ -31,13 +31,73 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
   {
     typedef CS::Memory::AllocatorMalloc Allocator;
     
-    typedef csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 2, 
-      Allocator> BitsAlloc2Type;
+    struct BitsAlloc2Type :
+      public CS::Memory::AllocatorSafe<csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 2,
+      Allocator> >
+    {
+      typedef csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 2,
+        Allocator> AllocatorType;
+
+      typedef CS::Memory::AllocatorSafe<AllocatorType> WrappedAllocatorType;
+
+      BitsAlloc2Type (size_t nelem) : WrappedAllocatorType(nelem)
+      {
+      }
+
+      void* Alloc ()
+      {
+        CS::Threading::RecursiveMutexScopedLock lock(WrappedAllocatorType::mutex);
+        return AllocatorType::Alloc ();
+      }
+
+      bool TryFree (void* p)
+      {
+        CS::Threading::RecursiveMutexScopedLock lock(WrappedAllocatorType::mutex);
+        return AllocatorType::TryFree (p);
+      }
+
+      void Compact ()
+      {
+        CS::Threading::RecursiveMutexScopedLock lock(WrappedAllocatorType::mutex);
+        AllocatorType::Compact ();
+      }
+    };
+
     CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc2,
       BitsAlloc2, BitsAlloc2Type);
     
-    typedef csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 4, 
-      Allocator> BitsAlloc4Type;
+    struct BitsAlloc4Type :
+      public CS::Memory::AllocatorSafe<csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 4,
+      Allocator> >
+    {
+      typedef csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 4,
+        Allocator> AllocatorType;
+
+      typedef CS::Memory::AllocatorSafe<AllocatorType> WrappedAllocatorType;
+
+      BitsAlloc4Type (size_t nelem) : WrappedAllocatorType(nelem)
+      {
+      }
+
+      void* Alloc ()
+      {
+        CS::Threading::RecursiveMutexScopedLock lock(WrappedAllocatorType::mutex);
+        return AllocatorType::Alloc ();
+      }
+
+      bool TryFree (void* p)
+      {
+        CS::Threading::RecursiveMutexScopedLock lock(WrappedAllocatorType::mutex);
+        return AllocatorType::TryFree (p);
+      }
+
+      void Compact ()
+      {
+        CS::Threading::RecursiveMutexScopedLock lock(WrappedAllocatorType::mutex);
+        AllocatorType::Compact ();
+      }
+    };
+
     CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc4,
       BitsAlloc4, BitsAlloc4Type);
   public:
@@ -65,17 +125,77 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       BitsAlloc4().Compact();
     }
   };
-  class MyBitArrayAllocatorTemp : TempHeapAlloc
+  class MyBitArrayAllocatorTemp : CS::Memory::AllocatorSafe<TempHeapAlloc>
   {
     typedef TempHeapAlloc Allocator;
-    
-    typedef csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 2, 
-      Allocator> BitsAlloc2Type;
+
+    struct BitsAlloc2Type :
+      public CS::Memory::AllocatorSafe<csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 2,
+      Allocator> >
+    {
+      typedef csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 2,
+        Allocator> AllocatorType;
+
+      typedef CS::Memory::AllocatorSafe<AllocatorType> WrappedAllocatorType;
+
+      BitsAlloc2Type (size_t nelem) : WrappedAllocatorType(nelem)
+      {
+      }
+
+      void* Alloc ()
+      {
+        CS::Threading::RecursiveMutexScopedLock lock(WrappedAllocatorType::mutex);
+        return AllocatorType::Alloc ();
+      }
+
+      bool TryFree (void* p)
+      {
+        CS::Threading::RecursiveMutexScopedLock lock(WrappedAllocatorType::mutex);
+        return AllocatorType::TryFree (p);
+      }
+
+      void Compact ()
+      {
+        CS::Threading::RecursiveMutexScopedLock lock(WrappedAllocatorType::mutex);
+        AllocatorType::Compact ();
+      }
+    };
+
     CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc2,
       BitsAlloc2, BitsAlloc2Type);
-    
-    typedef csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 4, 
-      Allocator> BitsAlloc4Type;
+
+    struct BitsAlloc4Type :
+      public CS::Memory::AllocatorSafe<csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 4,
+      Allocator> >
+    {
+      typedef csFixedSizeAllocator<sizeof (csBitArrayStorageType) * 4,
+        Allocator> AllocatorType;
+
+      typedef CS::Memory::AllocatorSafe<AllocatorType> WrappedAllocatorType;
+
+      BitsAlloc4Type (size_t nelem) : WrappedAllocatorType(nelem)
+      {
+      }
+
+      void* Alloc ()
+      {
+        CS::Threading::RecursiveMutexScopedLock lock(WrappedAllocatorType::mutex);
+        return AllocatorType::Alloc ();
+      }
+
+      bool TryFree (void* p)
+      {
+        CS::Threading::RecursiveMutexScopedLock lock(WrappedAllocatorType::mutex);
+        return AllocatorType::TryFree (p);
+      }
+
+      void Compact ()
+      {
+        CS::Threading::RecursiveMutexScopedLock lock(WrappedAllocatorType::mutex);
+        AllocatorType::Compact ();
+      }
+    };
+
     CS_DECLARE_STATIC_CLASSVAR_REF (bitsAlloc4,
       BitsAlloc4, BitsAlloc4Type);
   public:

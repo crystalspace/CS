@@ -664,6 +664,10 @@ namespace CS
       CS::Threading::RecursiveMutex mutex;
 
     public:
+      AllocatorSafe () : Allocator ()
+      {
+      }
+
       template<typename A1>
       AllocatorSafe (const A1& a1) : Allocator (a1)
       {
