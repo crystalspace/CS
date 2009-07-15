@@ -230,7 +230,13 @@ rule RelayLibs
     local o ;
     for o in $($(<)_OBJECTS)
     {
-      minimal_list = "$(minimal_list) $(LOCATE_TARGET)/$(o:G=)" ;
+      local dir = [ on $(o) GetVar LOCATE ] ;
+      minimal_list = "$(minimal_list) $(dir)/$(o:G=)" ;
+    }
+    for o in [ on $($(<)_TARGET) GetVar EXTRAOBJECTS ]
+    {
+      local dir = [ on $(o) GetVar LOCATE ] ;
+      minimal_list = "$(minimal_list) $(dir)/$(o:G=)" ;
     }
     
     ExtraObjects $(<) : [ RelayObjs $(<) : $(3) : $(2) ] ;
@@ -239,6 +245,11 @@ rule RelayLibs
     
     $(<).RELAYDEPS += $(extlib) ;
     $(<).RELAYLIBS.$(extlib) = $(3) ;
+  }
+  
+  for i in $($(<).PROPAGATE_RELAYLIBS)
+  {
+    RelayLibs $(i) : $(2) : $(3) ;
   }
 }
 

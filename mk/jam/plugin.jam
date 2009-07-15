@@ -23,7 +23,7 @@ GRISTMETA ?= pluginmeta ;
 
 CMD.MERGECSPLUGIN = $(TOP)/bin/merge-csplugin.py ;
 
-## UberPlugin name : pluginnames
+## UberPlugin name : pluginnames [: options]
 rule UberPlugin
 {
   if "$(PYTHON)" = ""
@@ -99,6 +99,13 @@ rule UberPlugin
     CFlags $(<) : $(PLUGIN.CFLAGS) ;
     LFlags $(<) : $(LINKLIBS) $(PLUGIN.LFLAGS) ;
     
+    if ! [ IsElem nohelp : $(3) ]
+    {
+      local desc = [ Description $(<) ] ;
+      if ! $(desc) { desc = "$(<) uberplugin" ; }
+      Help $(<) : "Build the $(desc)" ;
+    }
+
     # create target clean rule
     Always $(<)clean ;
     NotFile $(<)clean ;
@@ -191,6 +198,10 @@ rule Plugin
     
     $(<).PROPAGATE_LINKWITH += $(uberplugin) ;
     $(<).PROPAGATE_EXTERNALLIBS += $(uberplugin) ;
+    $(<).PROPAGATE_RELAYLIBS += $(uberplugin) ;
+    
+    # So 'jam <plugin>' will build the uberplugin it's contained in
+    Depends $(<) : $(uberplugin) ;
   }
   else
   {
