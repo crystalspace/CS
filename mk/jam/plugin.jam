@@ -26,7 +26,7 @@ CMD.MERGECSPLUGIN = $(TOP)/bin/merge-csplugin.py ;
 ## UberPlugin name : pluginnames [: options]
 rule UberPlugin
 {
-  if "$(PYTHON)" = ""
+  if "$(ENABLE_UBERPLUGINS)" != "yes"
   {
     return ;
   }

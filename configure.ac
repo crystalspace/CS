@@ -2498,6 +2498,22 @@ AS_IF([test $enable_shared = yes],
 
 
 #------------------------------------------------------------------------------
+# Determine whether uberplugins (multiple plugins in one binary module) should
+# be enabled.
+#------------------------------------------------------------------------------
+AC_MSG_CHECKING([whether to enable uberplugins])
+AC_ARG_ENABLE([uberplugins], [AC_HELP_STRING([--enable-uberplugins],
+    [enable building of uberplugins (multiple plugins in one binary module)
+    (requires Python; default YES if that is available)])],
+    [], [enable_uberplugins=yes])
+AS_IF([test x$cs_cv_python != xyes],
+    [enable_uberplugins=no])
+AC_MSG_RESULT([$enable_uberplugins])
+CS_EMIT_BUILD_PROPERTY([ENABLE_UBERPLUGINS], [$enable_uberplugins])
+
+
+
+#------------------------------------------------------------------------------
 # Determine if the "make" emulation layer should be synthesized.
 #------------------------------------------------------------------------------
 AC_MSG_CHECKING([whether to emulate makefiles])

@@ -909,6 +909,7 @@ enable_memory_tracker
 enable_ref_tracker
 enable_leak_guard
 enable_shared
+enable_uberplugins
 enable_make_emulation
 '
       ac_precious_vars='build_alias
@@ -1628,6 +1629,9 @@ Optional Features:
                           objects not freed at program exit (default NO)
   --enable-shared         enable creation of shared libraries (default YES on
                           Win32 and Linux, NO otherwise)
+  --enable-uberplugins    enable building of uberplugins (multiple plugins in
+                          one binary module) (requires Python; default YES if
+                          that is available)
   --enable-make-emulation enable emulation layer allowing project to be built
                           with `make', in addition to `jam' (default YES)
 
@@ -89606,6 +89610,35 @@ fi
 
 if test $enable_shared = yes; then
   cs_header_text="${cs_header_text}#define CS_BUILD_SHARED_LIBS
+"
+fi
+
+
+
+
+#------------------------------------------------------------------------------
+# Determine whether uberplugins (multiple plugins in one binary module) should
+# be enabled.
+#------------------------------------------------------------------------------
+{ $as_echo "$as_me:$LINENO: checking whether to enable uberplugins" >&5
+$as_echo_n "checking whether to enable uberplugins... " >&6; }
+# Check whether --enable-uberplugins was given.
+if test "${enable_uberplugins+set}" = set; then
+  enableval=$enable_uberplugins;
+else
+  enable_uberplugins=yes
+fi
+
+if test x$cs_cv_python != xyes; then
+  enable_uberplugins=no
+fi
+
+{ $as_echo "$as_me:$LINENO: result: $enable_uberplugins" >&5
+$as_echo "$enable_uberplugins" >&6; }
+cs_build_prop_val="$enable_uberplugins"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	        if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}ENABLE_UBERPLUGINS ?= $cs_build_prop_val ;
 "
 fi
 
