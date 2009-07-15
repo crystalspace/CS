@@ -1,5 +1,16 @@
 SubDir TOP plugins video ;
 
+if $(GL.AVAILABLE) = "yes"
+{
+Description render_gl : "3D OpenGL renderer" ;
+UberPlugin render_gl : gl3d embedgl glosx2d glwin32 glx2d xext86vm xwin glshader_arb glshader_fixed glshader_ps1 ;
+CompileGroups render_gl : renderers renderall openglrenderer ;
+}
+
+Description render_null : "3D null (do-nothing) renderer" ;
+UberPlugin render_null : null2d null3d ;
+CompileGroups render_null : renderers renderall ;
+
 SubInclude TOP plugins video canvas ;
 SubInclude TOP plugins video loader ;
 SubInclude TOP plugins video render3d ;

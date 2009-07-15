@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh genmesh skelanim2 ;
 
-Description gmeshskelanim2: "General mesh skeletal animation 2 plugin" ;
+Description gmeshskelanim2 : "General mesh skeletal animation 2 plugin" ;
 
 Plugin gmeshskelanim2
 	: [ Wildcard *.cpp *.h ]

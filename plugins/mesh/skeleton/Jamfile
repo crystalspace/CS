@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh skeleton ;
 
-UberPlugin skeleton_common : skeleton skelldr ;
+UberPlugin legacy_skeleton : skeleton skelldr gmeshskelanim2 ;
 
 SubInclude TOP plugins mesh skeleton object ;
 SubInclude TOP plugins mesh skeleton persist ;

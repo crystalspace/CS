@@ -1,9 +1,5 @@
 SubDir TOP plugins video render3d shader shadercompiler ;
 
-UberPlugin shader_common : xmlshader shaderweaver ;
-
 SubInclude TOP plugins video render3d shader shadercompiler weaver ;
 SubInclude TOP plugins video render3d shader shadercompiler xmlshader ;
-
-CompileGroups shader_common : shaders renderers renderall openglrenderer softrenderer ;
 

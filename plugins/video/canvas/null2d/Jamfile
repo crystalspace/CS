@@ -1,7 +1,5 @@
 SubDir TOP plugins video canvas null2d ;
 
-UberPlugin null_render : null2d ;
-
 Description null2d : "null 2D driver" ;
 
 Plugin null2d

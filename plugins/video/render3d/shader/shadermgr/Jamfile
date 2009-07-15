@@ -1,7 +1,5 @@
 SubDir TOP plugins video render3d shader shadermgr ;
 
-UberPlugin shader_common : shadermgr ;
-
 Description shadermgr : "shader manager" ;
 Plugin shadermgr : [ Wildcard *.cpp *.h ] ;
 Includes shadermgr.h : $(SUBDIR)/shadermgr.tok ;

@@ -12,6 +12,7 @@ if $(X11.AVAILABLE) = "yes"
     ALERT_FILES += [ Wildcard xalert_gtk : *.cpp *.h ] ;
   }
 
+  #UberPlugin render_gl : xwin ;
   Description xwin : "X Window Plugin" ;
   Plugin xwin : 
     [ Wildcard *.cpp *.h ] 

@@ -1,11 +1,11 @@
 SubDir TOP plugins mesh genmesh ;
 
-UberPlugin genmesh_mesh : genmesh gmeshldr ;
 Description genmesh_mesh : "General mesh object plugin" ;
+UberPlugin genmesh_mesh : genmesh gmeshldr ;
 CompileGroups genmesh_mesh :  meshes ;
 
-UberPlugin genmesh_anim : gmeshanim gmeshskelanim2 gmeshanimpdl ;
 Description genmesh_anim : "General mesh animation plugin" ;
+UberPlugin genmesh_anim : gmeshanim gmeshanimpdl ;
 CompileGroups genmesh_anim :  meshes ;
 
 SubInclude TOP plugins mesh genmesh object ;

@@ -1,16 +1,7 @@
 SubDir TOP plugins video render3d shader shaderplugins ;
 
-UberPlugin glshader_common : glshader_arb glshader_fixed glshader_ps1 ;
-UberPlugin soft_render : softshader ;
-
 SubInclude TOP plugins video render3d shader shaderplugins glshader_arb ;
 SubInclude TOP plugins video render3d shader shaderplugins glshader_cg ;
 SubInclude TOP plugins video render3d shader shaderplugins glshader_fixed ;
 SubInclude TOP plugins video render3d shader shaderplugins glshader_ps1 ;
 SubInclude TOP plugins video render3d shader shaderplugins vproc_std ;
-
-if $(GL.AVAILABLE) = "yes"
-{
-Description glshader_common : "OpenGL shaders" ;
-CompileGroups glshader_common : shaders renderers renderall openglrenderer ;
-}
