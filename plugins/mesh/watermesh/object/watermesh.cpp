@@ -64,8 +64,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #define MAX_OCEAN_DISTANCE 200.0f
 
-CS_IMPLEMENT_PLUGIN
-
 using namespace CS::Plugins::WaterMesh;
 
 csWaterMeshObject::csWaterMeshObject (csWaterMeshObjectFactory* factory) :
