@@ -55,7 +55,7 @@ csReplacerDocumentNode::~csReplacerDocumentNode ()
 
 bool csReplacerDocumentNode::Equals (iDocumentNode* other)
 {
-  return ((csReplacerDocumentNode*)other)->Equals (wrappedNode);
+  return this == other;
 }
 
 #include "csutil/custom_new_disable.h"

@@ -342,29 +342,7 @@ public:
     }
   };
 protected:
-  struct ValBlockAlloc : public CS::Memory::AllocatorSafe<csBlockAllocator<Values,
-    TempHeapAlloc> >
-  {
-    ValBlockAlloc (size_t n) : AllocatorSafeType (n) {}
-
-    CS_ATTRIBUTE_MALLOC Values* Alloc ()
-    {
-      CS::Threading::RecursiveMutexScopedLock lock(mutex);
-      return WrappedAllocatorType::Alloc ();
-    }
-
-    void Free (Values* p)
-    {
-      CS::Threading::RecursiveMutexScopedLock lock(mutex);
-      WrappedAllocatorType::Free (p);
-    }
-
-    void Compact()
-    {
-      CS::Threading::RecursiveMutexScopedLock lock(mutex);
-      WrappedAllocatorType::Compact ();
-    }
-  };
+  typedef CS::Memory::BlockAllocatorSafe<Values, TempHeapAlloc> ValBlockAlloc;
   DECLARE_STATIC_CLASSVAR_DIRECT(ValAlloc, ValBlockAlloc, ValAllocKill,
     (1024));
   static void ValAllocKill();
@@ -476,24 +454,8 @@ protected:
   class CowBlockAllocator
   {
   public:
-    struct BlockAlloc : public 
-      CS::Memory::AllocatorSafe<csFixedSizeAllocator<ValuesArrayWrapper::allocSize, 
-	TempHeapAlloc> >
-    {
-      BlockAlloc (size_t n) : AllocatorSafeType (n) {}
-      
-      CS_ATTRIBUTE_MALLOC void* Alloc ()
-      {
-        CS::Threading::RecursiveMutexScopedLock lock(mutex);
-        return WrappedAllocatorType::Alloc ();
-      }
-      
-      void Compact()
-      {
-        CS::Threading::RecursiveMutexScopedLock lock(mutex);
-        WrappedAllocatorType::Compact ();
-      }
-    };
+    typedef CS::Memory::FixedSizeAllocatorSafe<ValuesArrayWrapper::allocSize, 
+      TempHeapAlloc> BlockAlloc;
   private:
     CS_DECLARE_STATIC_CLASSVAR_REF (allocator,
       Allocator, BlockAlloc);

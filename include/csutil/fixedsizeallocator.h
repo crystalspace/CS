@@ -55,6 +55,7 @@
  *   (as some members will be likely bogus.)
  * \sa csArray
  * \sa csMemoryPool
+ * \sa CS::Memory::FixedSizeAllocatorSafe for a thread-safe version
  */
 template <size_t Size, class Allocator = CS::Memory::AllocatorMalloc>
 class csFixedSizeAllocator
@@ -507,6 +508,76 @@ public:
   void SetMemTrackerInfo (const char* /*info*/) { }
   /** @} */
 };
+
+namespace CS
+{
+  namespace Memory
+  {
+    /**
+     * Thread-safe allocator for blocks of the same size.
+     * Has the same purpose and interface as csFixedSizeAllocator but is safe
+     * to be used concurrently from different threads.
+     */
+    template <size_t Size, class Allocator = CS::Memory::AllocatorMalloc>
+    class FixedSizeAllocatorSafe :
+      public CS::Memory::AllocatorSafe<csFixedSizeAllocator<Size, Allocator> >
+    {
+    protected:
+      typedef csFixedSizeAllocator<Size, Allocator> WrappedAllocatorType;
+      typedef CS::Memory::AllocatorSafe<csFixedSizeAllocator<Size, Allocator> >
+        AllocatorSafeType;
+    public:
+      FixedSizeAllocatorSafe (size_t nelem = 32) : AllocatorSafeType (nelem)
+      {
+      }
+      FixedSizeAllocatorSafe (size_t nelem, const Allocator& alloc) :
+        AllocatorSafeType (nelem, alloc)
+      {
+      }
+      
+      FixedSizeAllocatorSafe (FixedSizeAllocatorSafe const& other) : 
+	AllocatorSafeType (other)
+      {
+      }
+      
+      void Empty()
+      {
+        CS::Threading::RecursiveMutexScopedLock lock (AllocatorSafeType::mutex);
+        WrappedAllocatorType::Empty();
+      }
+    
+      void Compact()
+      {
+        CS::Threading::RecursiveMutexScopedLock lock (AllocatorSafeType::mutex);
+        WrappedAllocatorType::Compact();
+      }
+      
+      size_t GetAllocatedElems() const
+      {
+        CS::Threading::RecursiveMutexScopedLock lock (AllocatorSafeType::mutex);
+        return WrappedAllocatorType::GetAllocatedElems();
+      }
+    
+      void* Alloc ()
+      {
+        CS::Threading::RecursiveMutexScopedLock lock (AllocatorSafeType::mutex);
+        return WrappedAllocatorType::Alloc();
+      }
+      using AllocatorSafeType::Alloc;
+    
+      bool TryFree (void* p)
+      {
+        CS::Threading::RecursiveMutexScopedLock lock (AllocatorSafeType::mutex);
+        return WrappedAllocatorType::TryFree (p);
+      }
+      size_t GetBlockElements() const
+      {
+        CS::Threading::RecursiveMutexScopedLock lock (AllocatorSafeType::mutex);
+        return WrappedAllocatorType::GetBlockElements();
+      }
+    };
+  } // namespace Memory
+} // namespace CS
 
 /** @} */
 
