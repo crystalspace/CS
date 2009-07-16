@@ -8,6 +8,8 @@ Description genmesh_anim : "General mesh animation plugin" ;
 UberPlugin genmesh_anim : gmeshanim gmeshanimpdl ;
 CompileGroups genmesh_anim :  meshes ;
 
+UberPlugin legacy_skeleton : gmeshskelanim2 ;
+
 SubInclude TOP plugins mesh genmesh object ;
 SubInclude TOP plugins mesh genmesh persist ;
 SubInclude TOP plugins mesh genmesh anim ;
