@@ -1,4 +1,7 @@
 SubDir TOP plugins mesh watermesh ;
 
+Description watermesh : "Water mesh plugin" ;
+UberPlugin watermesh_mesh : watermesh watermeshldr ;
+
 SubInclude TOP plugins mesh watermesh object ;
 SubInclude TOP plugins mesh watermesh persist ;
