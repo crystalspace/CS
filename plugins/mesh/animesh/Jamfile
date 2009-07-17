@@ -1,8 +1,8 @@
 SubDir TOP plugins mesh animesh ;
 
-UberPlugin animsh : animesh animeshldr skeleton2ldr skeleton2 ;
-Description animsh : "Animated mesh object plugin" ;
-CompileGroups animsh : meshes ;
+Description animesh_mesh : "Animated mesh object plugin" ;
+UberPlugin animesh_mesh : animesh animeshldr skeleton2ldr skeleton2 ;
+CompileGroups animsh : animesh_mesh ;
 
 SubInclude TOP plugins mesh animesh object ;
 SubInclude TOP plugins mesh animesh persist ;

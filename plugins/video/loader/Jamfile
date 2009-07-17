@@ -1,6 +1,8 @@
 SubDir TOP plugins video loader ;
 
-UberPlugin csimg : csbmpimg csddsimg csgifimg imgplex cstgaimg ;
+Description image_common : "image loader" ;
+UberPlugin image_common : csbmpimg csddsimg csgifimg imgplex cstgaimg ;
+CompileGroups image_common :  imageloaders ;
 
 SubInclude TOP plugins video loader bmp ;
 SubInclude TOP plugins video loader dds ;
@@ -11,8 +13,4 @@ SubInclude TOP plugins video loader mplex ;
 SubInclude TOP plugins video loader png ;
 SubInclude TOP plugins video loader svg ;
 SubInclude TOP plugins video loader tga ;
-
-Description csimg : "image loader" ;
-
-CompileGroups csimg :  imageloaders ;
 
