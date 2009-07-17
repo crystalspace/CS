@@ -89,7 +89,10 @@
 %module cspace
 #endif
 */
+
 %include "csconfig.h"
+%include "cstypes.h"
+
 // Ignored macros.
 #undef CS_STRUCT_ALIGN_4BYTE_BEGIN
 #define CS_STRUCT_ALIGN_4BYTE_BEGIN
@@ -170,8 +173,6 @@
 %{
 #include "crystalspace.h"
 %}
-
-typedef unsigned char uint8;
 
 %include "bindings/common/allinterfaces.i"
 
@@ -305,8 +306,6 @@ typedef unsigned char uint8;
 %apply float * INOUT { float & iG };
 %apply float * INOUT { float & iB };
 
-
-%include "cstypes.h"
 
 %define CS_WRAP_PTR_IMPLEMENT(PtrName)
 %immutable PtrName::Type;
