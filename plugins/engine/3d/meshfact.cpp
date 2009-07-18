@@ -252,6 +252,11 @@ void csMeshFactoryWrapper::UpdateImposter(iMeshWrapper* mesh, iRenderView* rview
   {
     if(imposters[i]->Update(mesh, rview))
       return;
+
+    if(!imposters[i]->IsInstancing())
+    {
+      imposters.DeleteIndex(i);
+    }
   }
 
   csRef<iImposterMesh> imposter = csPtr<iImposterMesh>(new csImposterMesh(engine, this, mesh, rview));
