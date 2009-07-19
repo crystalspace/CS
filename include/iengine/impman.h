@@ -35,7 +35,7 @@ struct iImposterManager : public virtual iBase
 {
   SCF_INTERFACE(iImposterManager, 1, 0, 0);
 
-  virtual void Register(iImposterMesh* mesh, iRenderView* rview) = 0;
+  virtual void Register(iImposterMesh* mesh) = 0;
 
   virtual void Unregister(iImposterMesh* mesh) = 0;
 };

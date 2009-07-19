@@ -19,7 +19,6 @@
 
 #include "cssysdef.h"
 #include "csqsqrt.h"
-#include "iengine/impman.h"
 #include "iengine/portal.h"
 #include "iengine/rview.h"
 #include "ivideo/graph3d.h"
@@ -61,7 +60,8 @@ csImposterMesh::csImposterMesh (csEngine* engine, iImposterFactory* fact,
   csMeshWrapper* cmesh = new csMeshWrapper(engine, this);
   csString name(pmesh->QueryObject()->GetName());
   cmesh->SetName(name + "_imposter");
-  mesh = static_cast<iMeshWrapper*>(cmesh);
+  cmesh->SetRenderPriority(engine->GetRenderPriority("alpha"));
+  mesh = csPtr<iMeshWrapper>(cmesh);
 
   // Add instancing shadervars.
   AddSVToMesh(mesh, transformVars);
@@ -80,15 +80,10 @@ csImposterMesh::csImposterMesh (csEngine* engine, iImposterFactory* fact,
 
   // Register this imposter with the manager.
   impman = csQueryRegistry<iImposterManager>(engine->GetObjectRegistry());
-  //impman->Register(this, rview);
-
-  // Move imposter mesh to correct sector.
-  mesh->GetMovable()->SetPosition(csVector3(0.0f));
-  mesh->GetMovable()->SetSector(sector);
-  mesh->GetMovable()->UpdateMove();
+  impman->Register(this);
 }
 
-csImposterMesh::~csImposterMesh ()
+void csImposterMesh::Destroy()
 {
   for(size_t i=0; i<instances.GetSize(); ++i)
   {
@@ -96,10 +91,17 @@ csImposterMesh::~csImposterMesh ()
   }
 
   impman->Unregister(this);
+}
 
-  mesh->GetMovable()->SetSector(0);
-  mesh->GetMovable()->UpdateMove();
-  delete mesh;
+bool csImposterMesh::Add(iMeshWrapper* mesh, iRenderView* rview)
+{
+  if(WithinTolerance(rview, mesh))
+  {
+    CreateInstance(mesh);
+    return true;
+  }
+
+  return false;
 }
 
 bool csImposterMesh::Update(iMeshWrapper* mesh, iRenderView* rview)
@@ -117,12 +119,6 @@ bool csImposterMesh::Update(iMeshWrapper* mesh, iRenderView* rview)
 
       return true;
     }
-  }
-
-  if(WithinTolerance(rview, mesh))
-  {
-    CreateInstance(mesh);
-    return true;
   }
 
   return false;
@@ -180,42 +176,19 @@ void csImposterMesh::DestroyInstance(Instance* instance)
   CS_ASSERT(idx != csArrayItemNotFound);
 
   transformVars->RemoveFromArray(idx);
+  fadeFactors->RemoveFromArray(idx);
   delete instance;
 }
 
 void csImposterMesh::InitMesh(iCamera* camera)
 {
-  // Save camera orientation
-  const csOrthoTransform oldt = camera->GetTransform ();
-
-  // Look at mesh
-  csVector3 meshcenter = instances[0]->mesh->GetWorldBoundingBox().GetCenter();
-  csVector3 campos = camera->GetTransform ().GetOrigin ();
-  camera->GetTransform ().LookAt(meshcenter-campos, camera->GetTransform().GetT2O().Col2());
-
-  // Get screen bounding box
-  csScreenBoxResult res = instances[0]->mesh->GetScreenBoundingBox (camera);
-
-  // Calculate height and width of the imposter on screen
-  height = (res.sbox.GetCorner (1) - res.sbox.GetCorner (0)).y;
-  width = (res.sbox.GetCorner (2) - res.sbox.GetCorner (0)).x;
-
-  // Project screen bounding box, at the returned depth to
-  //  the camera transform to rotate it around where we need it
-  float middle = (res.cbox.MinZ () + res.cbox.MaxZ ()) / 2;
-
-  csVector3 v1 = camera->InvPerspective (res.sbox.GetCorner (0), middle);
-  csVector3 v2 = camera->InvPerspective (res.sbox.GetCorner (1), middle);
-  csVector3 v3 = camera->InvPerspective (res.sbox.GetCorner (3), middle);
-  csVector3 v4 = camera->InvPerspective (res.sbox.GetCorner (2), middle);
-
-  // Convert to object space vertex positions.
-  csReversibleTransform w2c = camera->GetTransform ();
-  csReversibleTransform o2w = instances[0]->mesh->GetMovable ()->GetFullTransform ();
-  cutout[0] = o2w.Other2This (w2c.This2Other (v1));
-  cutout[1] = o2w.Other2This (w2c.This2Other (v2));
-  cutout[2] = o2w.Other2This (w2c.This2Other (v3));
-  cutout[3] = o2w.Other2This (w2c.This2Other (v4));
+  // Calculate object space billboard size.
+  const csBox3& bbox = instances[0]->mesh->GetMeshObject()->GetObjectModel()->GetObjectBoundingBox();
+  float z = (bbox.MinZ() + bbox.MaxZ()) / 2;
+  cutout[0] = csVector3(bbox.MaxX(), bbox.MaxY(), z);
+  cutout[1] = csVector3(bbox.MaxX(), bbox.MinY(), z);
+  cutout[2] = csVector3(bbox.MinX(), bbox.MinY(), z);
+  cutout[3] = csVector3(bbox.MinX(), bbox.MaxY(), z);
 
   // Calculate texture resolution.
   /*
@@ -232,9 +205,6 @@ void csImposterMesh::InitMesh(iCamera* camera)
     */
   texHeight = 256;
   texWidth = 256;
-
-  // Revert camera changes
-  camera->SetTransform (oldt);
 
   // Save current facing for angle checking
   csReversibleTransform objt = instances[0]->mesh->GetMovable()->GetFullTransform();
@@ -310,7 +280,7 @@ csRenderMesh** csImposterMesh::GetRenderMeshes (int& num, iRenderView* rview,
     engine->GetObjectRegistry(), "crystalspace.shared.stringset");
     csStringID shadertype = strings->Request("base");
     csRef<iShaderManager> shman = csQueryRegistry<iShaderManager>(engine->objectRegistry);
-    iShader* shader = shman->GetShader("lighting_default_instance");
+    iShader* shader = shman->GetShader("lighting_imposter");
     mat->GetMaterial()->SetShader(shadertype, shader);
 
     mesh->material = mat;

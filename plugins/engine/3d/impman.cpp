@@ -35,6 +35,17 @@ csImposterManager::csImposterManager(csEngine* engine)
   g3d = csQueryRegistry<iGraphics3D>(engine->GetObjectRegistry());
   maxWidth = g3d->GetCaps()->maxTexWidth;
   maxHeight = g3d->GetCaps()->maxTexHeight;
+
+  // Register our event handler
+  csRef<EventHandler> event_handler = csPtr<EventHandler> (new EventHandler (this));
+  csEventID esub[] = 
+  {
+    csevFrame (engine->GetObjectRegistry()),
+    CS_EVENTLIST_END
+  };
+
+  csRef<iEventQueue> queue = csQueryRegistry<iEventQueue> (engine->GetObjectRegistry());
+  queue->RegisterListener(event_handler, esub);
 }
 
 csImposterManager::~csImposterManager()
@@ -45,14 +56,43 @@ csImposterManager::~csImposterManager()
   }
 }
 
-void csImposterManager::Register(iImposterMesh* mesh, iRenderView* rview)
+bool csImposterManager::HandleEvent(iEvent &ev)
 {
-  ImposterMat* imposterMat = new ImposterMat(mesh);
-  imposterMats.Push(imposterMat);
+  for(size_t i=0; i<updateQueue.GetSize(); ++i)
+  {
+    if(!updateQueue[i]->init)
+    {
+      InitialiseImposter(updateQueue[i]);
+      updateQueue[i]->init = true;
+    }
 
+    if(updateQueue[i]->remove)
+    {
+      csImposterMesh* cmesh = static_cast<csImposterMesh*>(&*(updateQueue[i]->mesh));
+      cmesh->mesh->GetMovable()->SetSector(0);
+      cmesh->mesh->GetMovable()->UpdateMove();
+
+      imposterMats.Delete(updateQueue[i]);
+      delete updateQueue[i];
+    }
+  }
+
+  updateQueue.Empty();
+
+  return false;
+}
+
+void csImposterManager::InitialiseImposter(ImposterMat* imposter)
+{
+  csImposterMesh* csIMesh = static_cast<csImposterMesh*>(&*imposter->mesh);
+
+  // Move imposter mesh to correct sector.
+  csIMesh->mesh->GetMovable()->SetPosition(csVector3(0.0f));
+  csIMesh->mesh->GetMovable()->SetSector(csIMesh->sector);
+  csIMesh->mesh->GetMovable()->UpdateMove();
+
+  /*
   // Allocate a texture image.
-  csImposterMesh* csMesh = static_cast<csImposterMesh*>(mesh);
-
   int texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
 
   csRef<iImage> thisImage = new csImageMemory (csMesh->texWidth, csMesh->texHeight,
@@ -198,15 +238,22 @@ void csImposterManager::Register(iImposterMesh* mesh, iRenderView* rview)
   csMesh->mat = engine->CreateMaterial("Imposter", tex);*/
 }
 
+void csImposterManager::Register(iImposterMesh* mesh)
+{
+  ImposterMat* imposterMat = new ImposterMat(mesh);
+  imposterMats.Push(imposterMat);
+  updateQueue.Push(imposterMat);
+}
+
 void csImposterManager::Unregister(iImposterMesh* mesh)
 {
   for(size_t i=0; i<imposterMats.GetSize(); ++i)
   {
     if(imposterMats[i]->mesh == mesh)
     {
-      delete imposterMats[i];
-      imposterMats.DeleteIndexFast(i);
-      return;
+      updateQueue.Push(imposterMats[i]);
+      imposterMats[i]->remove = true;
+      break;
     }
   }
 }

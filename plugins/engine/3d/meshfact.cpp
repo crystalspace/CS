@@ -248,6 +248,7 @@ void csMeshFactoryWrapper::AddFactoryToStaticLOD (int lod,
 
 void csMeshFactoryWrapper::UpdateImposter(iMeshWrapper* mesh, iRenderView* rview)
 {
+  // Check existing imposter meshes to see if we need to update.
   for(size_t i=0; i<imposters.GetSize(); ++i)
   {
     if(imposters[i]->Update(mesh, rview))
@@ -255,10 +256,19 @@ void csMeshFactoryWrapper::UpdateImposter(iMeshWrapper* mesh, iRenderView* rview
 
     if(!imposters[i]->IsInstancing())
     {
+      imposters[i]->Destroy();
       imposters.DeleteIndex(i);
     }
   }
 
+  // Check if we can add the instance to an existing imposter mesh.
+  for(size_t i=0; i<imposters.GetSize(); ++i)
+  {
+    if(imposters[i]->Add(mesh, rview))
+      return;
+  }
+
+  // Create a new imposter mesh.
   csRef<iImposterMesh> imposter = csPtr<iImposterMesh>(new csImposterMesh(engine, this, mesh, rview));
   imposters.Push(imposter);
 }
@@ -271,6 +281,7 @@ void csMeshFactoryWrapper::RemoveImposter(iMeshWrapper* mesh)
     {
       if(!imposters[i]->IsInstancing())
       {
+        imposters[i]->Destroy();
         imposters.DeleteIndexFast(i);
       }
       return;

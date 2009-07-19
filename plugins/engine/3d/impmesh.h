@@ -21,6 +21,7 @@
 
 #include "cstool/objmodel.h"
 #include "csutil/nobjvec.h"
+#include "iengine/impman.h"
 #include "iengine/movable.h"
 #include "iengine/sector.h"
 #include "csgeom/poly3d.h"
@@ -39,7 +40,6 @@ class csMeshFactoryWrapper;
 class csImposterMesh;
 struct iCamera;
 struct iGraphics3D;
-struct iImposterManager;
 struct iRenderView;
 
 /**
@@ -65,7 +65,7 @@ private:
   csArray<Instance*> instances;
 
   // Mesh billboard for this imposter.
-  iMeshWrapper* mesh;
+  csRef<iMeshWrapper> mesh;
 
   // Array of transform vars for the imposter instances.
   csRef<csShaderVariable> transformVars;
@@ -128,7 +128,7 @@ private:
 public:
   csImposterMesh (csEngine* engine, iImposterFactory* fact,
     iMeshWrapper* mesh, iRenderView* rview);
-  virtual ~csImposterMesh ();
+  virtual ~csImposterMesh () {}
 
   ///////////////////// iImposterMesh /////////////////////
 
@@ -138,8 +138,15 @@ public:
   virtual bool IsInstancing() { return instances.GetSize() != 0; }
 
   /**
+   * Add an instance of the passed mesh.
+   * Returns true if able to add an instance for this mesh.
+   * Returns false otherwise.
+   */
+  virtual bool Add(iMeshWrapper* mesh, iRenderView* rview);
+
+  /**
    * Update the instance of the passed mesh.
-   * Returns false if not currently instancing this mesh.
+   * Returns false if the mesh instance was removed (no longer valid for this imposter).
    * Returns true otherwise.
    */
   virtual bool Update(iMeshWrapper* mesh, iRenderView* rview);
@@ -150,6 +157,11 @@ public:
    * Returns true otherwise.
    */
   virtual bool Remove(iMeshWrapper* mesh);
+
+  /**
+   * Destroy this imposter.
+   */
+  virtual void Destroy();
 
   ///////////////////// iObjectModel /////////////////////
   virtual const csBox3& GetObjectBoundingBox()

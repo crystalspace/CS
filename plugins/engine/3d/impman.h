@@ -21,6 +21,7 @@
 
 #include "csutil/scf_implementation.h"
 #include "iengine/impman.h"
+#include "iutil/eventh.h"
 
 class csEngine;
 
@@ -28,16 +29,46 @@ class csImposterManager : public scfImplementation1<
 	csImposterManager, iImposterManager>
 {
 private:
+  /* Handles an event from the event handler */
+  bool HandleEvent(iEvent &ev);
+
+  class EventHandler : public scfImplementation1<EventHandler, iEventHandler>
+  {
+  private:
+    csImposterManager* parent;
+
+  public:
+    EventHandler(csImposterManager* p)
+      : scfImplementationType(this), parent(p) {}
+
+    virtual ~EventHandler() {}
+
+    virtual bool HandleEvent(iEvent& event)
+    {
+      return parent->HandleEvent(event);
+    }
+
+    CS_EVENTHANDLER_NAMES("csImposterManager");
+    CS_EVENTHANDLER_NIL_CONSTRAINTS;
+  };
+
   struct ImposterMat
   {
-    iImposterMesh* mesh;
+    csRef<iImposterMesh> mesh;
+    bool init;
+    bool remove;
 
-    ImposterMat(iImposterMesh* mesh) : mesh(mesh)
+    ImposterMat(iImposterMesh* mesh)
+      : mesh(mesh), init(false), remove(false)
     {
     }
   };
 
+  /* Initialises an imposter. */
+  void InitialiseImposter(ImposterMat* imposter);
+
   csArray<ImposterMat*> imposterMats;
+  csArray<ImposterMat*> updateQueue;
 
   csEngine* engine;
 
@@ -50,7 +81,8 @@ public:
   csImposterManager(csEngine* engine);
   virtual ~csImposterManager();
 
-  void Register(iImposterMesh* mesh, iRenderView* rview);
+  /////////////// iImposterManager ///////////////
+  void Register(iImposterMesh* mesh);
 
   void Unregister(iImposterMesh* mesh);
 };

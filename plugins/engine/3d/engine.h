@@ -642,17 +642,6 @@ public:
     return renderLoopManager;
   }
 
-  /**
-   * Add an imposter to the update queue.
-   */
-  void AddImposterToUpdateQueue (csImposterProcTex* imptex,
-      iRenderView* rview);
-
-  /**
-   * Handle imposters.
-   */
-  void HandleImposters ();
-
   iMaterialWrapper* GetDefaultPortalMaterial () const
   { return defaultPortalMaterial; }
 

@@ -99,8 +99,15 @@ struct iImposterMesh : public virtual iBase
   virtual bool IsInstancing() = 0;
 
   /**
+   * Add an instance of the passed mesh.
+   * Returns true if able to add an instance for this mesh.
+   * Returns false otherwise.
+   */
+  virtual bool Add(iMeshWrapper* mesh, iRenderView* rview) = 0;
+
+  /**
    * Update the instance of the passed mesh.
-   * Returns true if able to update or create an instance for this mesh.
+   * Returns true if able to update an instance for this mesh.
    * Returns false otherwise.
    */
   virtual bool Update(iMeshWrapper* mesh, iRenderView* rview) = 0;
@@ -111,6 +118,11 @@ struct iImposterMesh : public virtual iBase
    * Returns true otherwise.
    */
   virtual bool Remove(iMeshWrapper* mesh) = 0;
+
+  /**
+   * Destroy this imposter.
+   */
+  virtual void Destroy() = 0;
 };
 
 /** @} */
