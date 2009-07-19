@@ -2668,7 +2668,7 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_uint16_t swig_types[169]
 #define SWIGTYPE_p_uint32_t swig_types[170]
 #define SWIGTYPE_p_uint64_t swig_types[171]
-#define SWIGTYPE_p_unsigned_char swig_types[172]
+#define SWIGTYPE_p_uint8_t swig_types[172]
 #define SWIGTYPE_p_unsigned_int swig_types[173]
 #define SWIGTYPE_p_unsigned_long swig_types[174]
 #define SWIGTYPE_p_unsigned_long_long swig_types[175]
@@ -3139,13 +3139,6 @@ SWIG_AsVal_bool (PyObject *obj, bool *val)
     return SWIG_ERROR;
   if (val) *val = r ? true : false;
   return SWIG_OK;
-}
-
-
-SWIGINTERNINLINE PyObject *
-SWIG_From_unsigned_SS_char  (unsigned char value)
-{    
-  return SWIG_From_unsigned_SS_long  (value);
 }
 
 SWIGINTERN csPlane3 &csPlane3_operator_Sm__Se_(csPlane3 *self,csTransform const &t){ return *self *= t; }
@@ -17883,8 +17876,8 @@ SWIGINTERN PyObject *_wrap_csPlane3_ClipPolygon__SWIG_2(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csPlane3_ClipPolygon" "', argument " "7"" of type '" "bool""'");
   } 
   arg7 = static_cast< bool >(val7);
-  result = (uint8)((csPlane3 const *)arg1)->ClipPolygon((csVector3 const *)arg2,arg3,arg4,*arg5,arg6,arg7);
-  resultobj = SWIG_From_unsigned_SS_char(static_cast< unsigned char >(result));
+  result = ((csPlane3 const *)arg1)->ClipPolygon((csVector3 const *)arg2,arg3,arg4,*arg5,arg6,arg7);
+  resultobj = SWIG_NewPointerObj((new uint8(static_cast< const uint8& >(result))), SWIGTYPE_p_uint8_t, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -17953,8 +17946,8 @@ SWIGINTERN PyObject *_wrap_csPlane3_ClipPolygon__SWIG_3(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "csPlane3_ClipPolygon" "', argument " "6"" of type '" "csVertexStatus *""'"); 
   }
   arg6 = reinterpret_cast< csVertexStatus * >(argp6);
-  result = (uint8)((csPlane3 const *)arg1)->ClipPolygon((csVector3 const *)arg2,arg3,arg4,*arg5,arg6);
-  resultobj = SWIG_From_unsigned_SS_char(static_cast< unsigned char >(result));
+  result = ((csPlane3 const *)arg1)->ClipPolygon((csVector3 const *)arg2,arg3,arg4,*arg5,arg6);
+  resultobj = SWIG_NewPointerObj((new uint8(static_cast< const uint8& >(result))), SWIGTYPE_p_uint8_t, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -35418,7 +35411,7 @@ SWIGINTERN PyObject *_wrap_csBox3_GetFaceEdges(PyObject *SWIGUNUSEDPARM(self), P
   } 
   arg2 = static_cast< int >(val2);
   result = (uint8 *)((csBox3 const *)arg1)->GetFaceEdges(arg2);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_unsigned_char, 0 |  0 );
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_uint8_t, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -48882,7 +48875,7 @@ static swig_type_info _swigt__p_size_t = {"_p_size_t", "size_t *", 0, 0, (void*)
 static swig_type_info _swigt__p_uint16_t = {"_p_uint16_t", "uint16 *|uint16_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint32_t = {"_p_uint32_t", "uint32_t *|uint32 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint64_t = {"_p_uint64_t", "uint64_t *|uint64 *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_unsigned_char = {"_p_unsigned_char", "unsigned char *|uint8 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_uint8_t = {"_p_uint8_t", "uint8 *|uint8_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_int = {"_p_unsigned_int", "unsigned int *|uint *|csTicks *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long = {"_p_unsigned_long", "csStringID *|unsigned long *|csEventID *|scfInterfaceID *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long_long = {"_p_unsigned_long_long", "ulonglong *|unsigned long long *", 0, 0, (void*)0, 0};
@@ -49061,7 +49054,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_uint16_t,
   &_swigt__p_uint32_t,
   &_swigt__p_uint64_t,
-  &_swigt__p_unsigned_char,
+  &_swigt__p_uint8_t,
   &_swigt__p_unsigned_int,
   &_swigt__p_unsigned_long,
   &_swigt__p_unsigned_long_long,
@@ -49240,7 +49233,7 @@ static swig_cast_info _swigc__p_size_t[] = {  {&_swigt__p_size_t, 0, 0, 0},{0, 0
 static swig_cast_info _swigc__p_uint16_t[] = {  {&_swigt__p_uint16_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint32_t[] = {  {&_swigt__p_uint32_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint64_t[] = {  {&_swigt__p_uint64_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_unsigned_char[] = {  {&_swigt__p_unsigned_char, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_uint8_t[] = {  {&_swigt__p_uint8_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_int[] = {  {&_swigt__p_unsigned_int, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_long[] = {  {&_swigt__p_unsigned_long, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_long_long[] = {  {&_swigt__p_unsigned_long_long, 0, 0, 0},{0, 0, 0, 0}};
@@ -49419,7 +49412,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_uint16_t,
   _swigc__p_uint32_t,
   _swigc__p_uint64_t,
-  _swigc__p_unsigned_char,
+  _swigc__p_uint8_t,
   _swigc__p_unsigned_int,
   _swigc__p_unsigned_long,
   _swigc__p_unsigned_long_long,

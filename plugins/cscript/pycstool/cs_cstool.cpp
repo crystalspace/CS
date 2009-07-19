@@ -2772,7 +2772,7 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_uint16_t swig_types[273]
 #define SWIGTYPE_p_uint32_t swig_types[274]
 #define SWIGTYPE_p_uint64_t swig_types[275]
-#define SWIGTYPE_p_unsigned_char swig_types[276]
+#define SWIGTYPE_p_uint8_t swig_types[276]
 #define SWIGTYPE_p_unsigned_int swig_types[277]
 #define SWIGTYPE_p_unsigned_long swig_types[278]
 #define SWIGTYPE_p_unsigned_long_long swig_types[279]
@@ -3159,22 +3159,6 @@ SWIG_AsVal_unsigned_SS_int (PyObject * obj, unsigned int *val)
       return SWIG_OverflowError;
     } else {
       if (val) *val = static_cast< unsigned int >(v);
-    }
-  }  
-  return res;
-}
-
-
-SWIGINTERN int
-SWIG_AsVal_unsigned_SS_char (PyObject * obj, unsigned char *val)
-{
-  unsigned long v;
-  int res = SWIG_AsVal_unsigned_SS_long (obj, &v);
-  if (SWIG_IsOK(res)) {
-    if ((v > UCHAR_MAX)) {
-      return SWIG_OverflowError;
-    } else {
-      if (val) *val = static_cast< unsigned char >(v);
     }
   }  
   return res;
@@ -8175,8 +8159,8 @@ SWIGINTERN PyObject *_wrap_csPixmap_DrawScaled__SWIG_0(PyObject *SWIGUNUSEDPARM(
   int ecode5 = 0 ;
   int val6 ;
   int ecode6 = 0 ;
-  unsigned char val7 ;
-  int ecode7 = 0 ;
+  void *argp7 ;
+  int res7 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -8216,11 +8200,19 @@ SWIGINTERN PyObject *_wrap_csPixmap_DrawScaled__SWIG_0(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "csPixmap_DrawScaled" "', argument " "6"" of type '" "int""'");
   } 
   arg6 = static_cast< int >(val6);
-  ecode7 = SWIG_AsVal_unsigned_SS_char(obj6, &val7);
-  if (!SWIG_IsOK(ecode7)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csPixmap_DrawScaled" "', argument " "7"" of type '" "uint8""'");
-  } 
-  arg7 = static_cast< uint8 >(val7);
+  {
+    res7 = SWIG_ConvertPtr(obj6, &argp7, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res7)) {
+      SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "csPixmap_DrawScaled" "', argument " "7"" of type '" "uint8""'"); 
+    }  
+    if (!argp7) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csPixmap_DrawScaled" "', argument " "7"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp7);
+      arg7 = *temp;
+      if (SWIG_IsNewObj(res7)) delete temp;
+    }
+  }
   (arg1)->DrawScaled(arg2,arg3,arg4,arg5,arg6,arg7);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -8373,10 +8365,8 @@ SWIGINTERN PyObject *_wrap_csPixmap_DrawScaled(PyObject *self, PyObject *args) {
                 _v = SWIG_CheckState(res);
               }
               if (_v) {
-                {
-                  int res = SWIG_AsVal_unsigned_SS_char(argv[6], NULL);
-                  _v = SWIG_CheckState(res);
-                }
+                int res = SWIG_ConvertPtr(argv[6], 0, SWIGTYPE_p_uint8_t, 0);
+                _v = SWIG_CheckState(res);
                 if (_v) {
                   return _wrap_csPixmap_DrawScaled__SWIG_0(self, args);
                 }
@@ -8421,8 +8411,8 @@ SWIGINTERN PyObject *_wrap_csPixmap_DrawScaledAlign__SWIG_0(PyObject *SWIGUNUSED
   int ecode7 = 0 ;
   int val8 ;
   int ecode8 = 0 ;
-  unsigned char val9 ;
-  int ecode9 = 0 ;
+  void *argp9 ;
+  int res9 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -8474,11 +8464,19 @@ SWIGINTERN PyObject *_wrap_csPixmap_DrawScaledAlign__SWIG_0(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csPixmap_DrawScaledAlign" "', argument " "8"" of type '" "int""'");
   } 
   arg8 = static_cast< int >(val8);
-  ecode9 = SWIG_AsVal_unsigned_SS_char(obj8, &val9);
-  if (!SWIG_IsOK(ecode9)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csPixmap_DrawScaledAlign" "', argument " "9"" of type '" "uint8""'");
-  } 
-  arg9 = static_cast< uint8 >(val9);
+  {
+    res9 = SWIG_ConvertPtr(obj8, &argp9, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res9)) {
+      SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "csPixmap_DrawScaledAlign" "', argument " "9"" of type '" "uint8""'"); 
+    }  
+    if (!argp9) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csPixmap_DrawScaledAlign" "', argument " "9"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp9);
+      arg9 = *temp;
+      if (SWIG_IsNewObj(res9)) delete temp;
+    }
+  }
   (arg1)->DrawScaledAlign(arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -8671,10 +8669,8 @@ SWIGINTERN PyObject *_wrap_csPixmap_DrawScaledAlign(PyObject *self, PyObject *ar
                     _v = SWIG_CheckState(res);
                   }
                   if (_v) {
-                    {
-                      int res = SWIG_AsVal_unsigned_SS_char(argv[8], NULL);
-                      _v = SWIG_CheckState(res);
-                    }
+                    int res = SWIG_ConvertPtr(argv[8], 0, SWIGTYPE_p_uint8_t, 0);
+                    _v = SWIG_CheckState(res);
                     if (_v) {
                       return _wrap_csPixmap_DrawScaledAlign__SWIG_0(self, args);
                     }
@@ -8709,8 +8705,8 @@ SWIGINTERN PyObject *_wrap_csPixmap_Draw__SWIG_0(PyObject *SWIGUNUSEDPARM(self),
   int ecode3 = 0 ;
   int val4 ;
   int ecode4 = 0 ;
-  unsigned char val5 ;
-  int ecode5 = 0 ;
+  void *argp5 ;
+  int res5 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -8738,11 +8734,19 @@ SWIGINTERN PyObject *_wrap_csPixmap_Draw__SWIG_0(PyObject *SWIGUNUSEDPARM(self),
     SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "csPixmap_Draw" "', argument " "4"" of type '" "int""'");
   } 
   arg4 = static_cast< int >(val4);
-  ecode5 = SWIG_AsVal_unsigned_SS_char(obj4, &val5);
-  if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "csPixmap_Draw" "', argument " "5"" of type '" "uint8""'");
-  } 
-  arg5 = static_cast< uint8 >(val5);
+  {
+    res5 = SWIG_ConvertPtr(obj4, &argp5, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res5)) {
+      SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "csPixmap_Draw" "', argument " "5"" of type '" "uint8""'"); 
+    }  
+    if (!argp5) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csPixmap_Draw" "', argument " "5"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp5);
+      arg5 = *temp;
+      if (SWIG_IsNewObj(res5)) delete temp;
+    }
+  }
   (arg1)->Draw(arg2,arg3,arg4,arg5);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -8855,10 +8859,8 @@ SWIGINTERN PyObject *_wrap_csPixmap_Draw(PyObject *self, PyObject *args) {
             _v = SWIG_CheckState(res);
           }
           if (_v) {
-            {
-              int res = SWIG_AsVal_unsigned_SS_char(argv[4], NULL);
-              _v = SWIG_CheckState(res);
-            }
+            int res = SWIG_ConvertPtr(argv[4], 0, SWIGTYPE_p_uint8_t, 0);
+            _v = SWIG_CheckState(res);
             if (_v) {
               return _wrap_csPixmap_Draw__SWIG_0(self, args);
             }
@@ -8895,8 +8897,8 @@ SWIGINTERN PyObject *_wrap_csPixmap_DrawAlign__SWIG_0(PyObject *SWIGUNUSEDPARM(s
   int ecode5 = 0 ;
   int val6 ;
   int ecode6 = 0 ;
-  unsigned char val7 ;
-  int ecode7 = 0 ;
+  void *argp7 ;
+  int res7 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -8936,11 +8938,19 @@ SWIGINTERN PyObject *_wrap_csPixmap_DrawAlign__SWIG_0(PyObject *SWIGUNUSEDPARM(s
     SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "csPixmap_DrawAlign" "', argument " "6"" of type '" "int""'");
   } 
   arg6 = static_cast< int >(val6);
-  ecode7 = SWIG_AsVal_unsigned_SS_char(obj6, &val7);
-  if (!SWIG_IsOK(ecode7)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csPixmap_DrawAlign" "', argument " "7"" of type '" "uint8""'");
-  } 
-  arg7 = static_cast< uint8 >(val7);
+  {
+    res7 = SWIG_ConvertPtr(obj6, &argp7, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res7)) {
+      SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "csPixmap_DrawAlign" "', argument " "7"" of type '" "uint8""'"); 
+    }  
+    if (!argp7) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csPixmap_DrawAlign" "', argument " "7"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp7);
+      arg7 = *temp;
+      if (SWIG_IsNewObj(res7)) delete temp;
+    }
+  }
   (arg1)->DrawAlign(arg2,arg3,arg4,arg5,arg6,arg7);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -9093,10 +9103,8 @@ SWIGINTERN PyObject *_wrap_csPixmap_DrawAlign(PyObject *self, PyObject *args) {
                 _v = SWIG_CheckState(res);
               }
               if (_v) {
-                {
-                  int res = SWIG_AsVal_unsigned_SS_char(argv[6], NULL);
-                  _v = SWIG_CheckState(res);
-                }
+                int res = SWIG_ConvertPtr(argv[6], 0, SWIGTYPE_p_uint8_t, 0);
+                _v = SWIG_CheckState(res);
                 if (_v) {
                   return _wrap_csPixmap_DrawAlign__SWIG_0(self, args);
                 }
@@ -9141,8 +9149,8 @@ SWIGINTERN PyObject *_wrap_csPixmap_DrawTiled__SWIG_0(PyObject *SWIGUNUSEDPARM(s
   int ecode7 = 0 ;
   int val8 ;
   int ecode8 = 0 ;
-  unsigned char val9 ;
-  int ecode9 = 0 ;
+  void *argp9 ;
+  int res9 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -9194,11 +9202,19 @@ SWIGINTERN PyObject *_wrap_csPixmap_DrawTiled__SWIG_0(PyObject *SWIGUNUSEDPARM(s
     SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csPixmap_DrawTiled" "', argument " "8"" of type '" "int""'");
   } 
   arg8 = static_cast< int >(val8);
-  ecode9 = SWIG_AsVal_unsigned_SS_char(obj8, &val9);
-  if (!SWIG_IsOK(ecode9)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csPixmap_DrawTiled" "', argument " "9"" of type '" "uint8""'");
-  } 
-  arg9 = static_cast< uint8 >(val9);
+  {
+    res9 = SWIG_ConvertPtr(obj8, &argp9, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res9)) {
+      SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "csPixmap_DrawTiled" "', argument " "9"" of type '" "uint8""'"); 
+    }  
+    if (!argp9) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csPixmap_DrawTiled" "', argument " "9"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp9);
+      arg9 = *temp;
+      if (SWIG_IsNewObj(res9)) delete temp;
+    }
+  }
   (arg1)->DrawTiled(arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -9312,8 +9328,8 @@ SWIGINTERN PyObject *_wrap_csPixmap_DrawTiled__SWIG_2(PyObject *SWIGUNUSEDPARM(s
   int ecode5 = 0 ;
   int val6 ;
   int ecode6 = 0 ;
-  unsigned char val7 ;
-  int ecode7 = 0 ;
+  void *argp7 ;
+  int res7 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -9353,11 +9369,19 @@ SWIGINTERN PyObject *_wrap_csPixmap_DrawTiled__SWIG_2(PyObject *SWIGUNUSEDPARM(s
     SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "csPixmap_DrawTiled" "', argument " "6"" of type '" "int""'");
   } 
   arg6 = static_cast< int >(val6);
-  ecode7 = SWIG_AsVal_unsigned_SS_char(obj6, &val7);
-  if (!SWIG_IsOK(ecode7)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csPixmap_DrawTiled" "', argument " "7"" of type '" "uint8""'");
-  } 
-  arg7 = static_cast< uint8 >(val7);
+  {
+    res7 = SWIG_ConvertPtr(obj6, &argp7, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res7)) {
+      SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "csPixmap_DrawTiled" "', argument " "7"" of type '" "uint8""'"); 
+    }  
+    if (!argp7) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csPixmap_DrawTiled" "', argument " "7"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp7);
+      arg7 = *temp;
+      if (SWIG_IsNewObj(res7)) delete temp;
+    }
+  }
   (arg1)->DrawTiled(arg2,arg3,arg4,arg5,arg6,arg7);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -9510,10 +9534,8 @@ SWIGINTERN PyObject *_wrap_csPixmap_DrawTiled(PyObject *self, PyObject *args) {
                 _v = SWIG_CheckState(res);
               }
               if (_v) {
-                {
-                  int res = SWIG_AsVal_unsigned_SS_char(argv[6], NULL);
-                  _v = SWIG_CheckState(res);
-                }
+                int res = SWIG_ConvertPtr(argv[6], 0, SWIGTYPE_p_uint8_t, 0);
+                _v = SWIG_CheckState(res);
                 if (_v) {
                   return _wrap_csPixmap_DrawTiled__SWIG_2(self, args);
                 }
@@ -9614,10 +9636,8 @@ SWIGINTERN PyObject *_wrap_csPixmap_DrawTiled(PyObject *self, PyObject *args) {
                     _v = SWIG_CheckState(res);
                   }
                   if (_v) {
-                    {
-                      int res = SWIG_AsVal_unsigned_SS_char(argv[8], NULL);
-                      _v = SWIG_CheckState(res);
-                    }
+                    int res = SWIG_ConvertPtr(argv[8], 0, SWIGTYPE_p_uint8_t, 0);
+                    _v = SWIG_CheckState(res);
                     if (_v) {
                       return _wrap_csPixmap_DrawTiled__SWIG_0(self, args);
                     }
@@ -9913,8 +9933,8 @@ SWIGINTERN PyObject *_wrap_csSimplePixmap_DrawScaled__SWIG_0(PyObject *SWIGUNUSE
   int ecode5 = 0 ;
   int val6 ;
   int ecode6 = 0 ;
-  unsigned char val7 ;
-  int ecode7 = 0 ;
+  void *argp7 ;
+  int res7 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -9954,11 +9974,19 @@ SWIGINTERN PyObject *_wrap_csSimplePixmap_DrawScaled__SWIG_0(PyObject *SWIGUNUSE
     SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "csSimplePixmap_DrawScaled" "', argument " "6"" of type '" "int""'");
   } 
   arg6 = static_cast< int >(val6);
-  ecode7 = SWIG_AsVal_unsigned_SS_char(obj6, &val7);
-  if (!SWIG_IsOK(ecode7)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "csSimplePixmap_DrawScaled" "', argument " "7"" of type '" "uint8""'");
-  } 
-  arg7 = static_cast< uint8 >(val7);
+  {
+    res7 = SWIG_ConvertPtr(obj6, &argp7, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res7)) {
+      SWIG_exception_fail(SWIG_ArgError(res7), "in method '" "csSimplePixmap_DrawScaled" "', argument " "7"" of type '" "uint8""'"); 
+    }  
+    if (!argp7) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csSimplePixmap_DrawScaled" "', argument " "7"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp7);
+      arg7 = *temp;
+      if (SWIG_IsNewObj(res7)) delete temp;
+    }
+  }
   (arg1)->DrawScaled(arg2,arg3,arg4,arg5,arg6,arg7);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -10111,10 +10139,8 @@ SWIGINTERN PyObject *_wrap_csSimplePixmap_DrawScaled(PyObject *self, PyObject *a
                 _v = SWIG_CheckState(res);
               }
               if (_v) {
-                {
-                  int res = SWIG_AsVal_unsigned_SS_char(argv[6], NULL);
-                  _v = SWIG_CheckState(res);
-                }
+                int res = SWIG_ConvertPtr(argv[6], 0, SWIGTYPE_p_uint8_t, 0);
+                _v = SWIG_CheckState(res);
                 if (_v) {
                   return _wrap_csSimplePixmap_DrawScaled__SWIG_0(self, args);
                 }
@@ -10159,8 +10185,8 @@ SWIGINTERN PyObject *_wrap_csSimplePixmap_DrawTiled__SWIG_0(PyObject *SWIGUNUSED
   int ecode7 = 0 ;
   int val8 ;
   int ecode8 = 0 ;
-  unsigned char val9 ;
-  int ecode9 = 0 ;
+  void *argp9 ;
+  int res9 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
@@ -10212,11 +10238,19 @@ SWIGINTERN PyObject *_wrap_csSimplePixmap_DrawTiled__SWIG_0(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "csSimplePixmap_DrawTiled" "', argument " "8"" of type '" "int""'");
   } 
   arg8 = static_cast< int >(val8);
-  ecode9 = SWIG_AsVal_unsigned_SS_char(obj8, &val9);
-  if (!SWIG_IsOK(ecode9)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode9), "in method '" "csSimplePixmap_DrawTiled" "', argument " "9"" of type '" "uint8""'");
-  } 
-  arg9 = static_cast< uint8 >(val9);
+  {
+    res9 = SWIG_ConvertPtr(obj8, &argp9, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res9)) {
+      SWIG_exception_fail(SWIG_ArgError(res9), "in method '" "csSimplePixmap_DrawTiled" "', argument " "9"" of type '" "uint8""'"); 
+    }  
+    if (!argp9) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csSimplePixmap_DrawTiled" "', argument " "9"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp9);
+      arg9 = *temp;
+      if (SWIG_IsNewObj(res9)) delete temp;
+    }
+  }
   (arg1)->DrawTiled(arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -10409,10 +10443,8 @@ SWIGINTERN PyObject *_wrap_csSimplePixmap_DrawTiled(PyObject *self, PyObject *ar
                     _v = SWIG_CheckState(res);
                   }
                   if (_v) {
-                    {
-                      int res = SWIG_AsVal_unsigned_SS_char(argv[8], NULL);
-                      _v = SWIG_CheckState(res);
-                    }
+                    int res = SWIG_ConvertPtr(argv[8], 0, SWIGTYPE_p_uint8_t, 0);
+                    _v = SWIG_CheckState(res);
                     if (_v) {
                       return _wrap_csSimplePixmap_DrawTiled__SWIG_0(self, args);
                     }
@@ -19866,7 +19898,7 @@ static swig_type_info _swigt__p_scfInterfaceMetadataList = {"_p_scfInterfaceMeta
 static swig_type_info _swigt__p_uint16_t = {"_p_uint16_t", "uint16 *|uint16_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint32_t = {"_p_uint32_t", "uint32_t *|uint32 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint64_t = {"_p_uint64_t", "uint64_t *|uint64 *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_unsigned_char = {"_p_unsigned_char", "unsigned char *|uint8 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_uint8_t = {"_p_uint8_t", "uint8 *|uint8_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_int = {"_p_unsigned_int", "unsigned int *|uint *|csTicks *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long = {"_p_unsigned_long", "csStringID *|unsigned long *|csEventID *|scfInterfaceID *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long_long = {"_p_unsigned_long_long", "ulonglong *|unsigned long long *", 0, 0, (void*)0, 0};
@@ -20149,7 +20181,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_uint16_t,
   &_swigt__p_uint32_t,
   &_swigt__p_uint64_t,
-  &_swigt__p_unsigned_char,
+  &_swigt__p_uint8_t,
   &_swigt__p_unsigned_int,
   &_swigt__p_unsigned_long,
   &_swigt__p_unsigned_long_long,
@@ -20432,7 +20464,7 @@ static swig_cast_info _swigc__p_scfInterfaceMetadataList[] = {  {&_swigt__p_scfI
 static swig_cast_info _swigc__p_uint16_t[] = {  {&_swigt__p_uint16_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint32_t[] = {  {&_swigt__p_uint32_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint64_t[] = {  {&_swigt__p_uint64_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_unsigned_char[] = {  {&_swigt__p_unsigned_char, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_uint8_t[] = {  {&_swigt__p_uint8_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_int[] = {  {&_swigt__p_unsigned_int, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_long[] = {  {&_swigt__p_unsigned_long, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_long_long[] = {  {&_swigt__p_unsigned_long_long, 0, 0, 0},{0, 0, 0, 0}};
@@ -20715,7 +20747,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_uint16_t,
   _swigc__p_uint32_t,
   _swigc__p_uint64_t,
-  _swigc__p_unsigned_char,
+  _swigc__p_uint8_t,
   _swigc__p_unsigned_int,
   _swigc__p_unsigned_long,
   _swigc__p_unsigned_long_long,

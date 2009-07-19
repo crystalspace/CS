@@ -2611,7 +2611,7 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_uint16_t swig_types[112]
 #define SWIGTYPE_p_uint32_t swig_types[113]
 #define SWIGTYPE_p_uint64_t swig_types[114]
-#define SWIGTYPE_p_unsigned_char swig_types[115]
+#define SWIGTYPE_p_uint8_t swig_types[115]
 #define SWIGTYPE_p_unsigned_int swig_types[116]
 #define SWIGTYPE_p_unsigned_long swig_types[117]
 #define SWIGTYPE_p_unsigned_long_long swig_types[118]
@@ -3108,29 +3108,6 @@ SWIGINTERN int iSndSysSource_scfGetVersion(){ return scfInterfaceTraits<iSndSysS
 SWIGINTERN void delete_iSndSysSource(iSndSysSource *self){ if (self) self->DecRef (); }
 SWIGINTERN int iSndSysSource3D_scfGetVersion(){ return scfInterfaceTraits<iSndSysSource3D>::GetVersion(); }
 SWIGINTERN void delete_iSndSysSource3D(iSndSysSource3D *self){ if (self) self->DecRef (); }
-
-SWIGINTERN int
-SWIG_AsVal_unsigned_SS_char (PyObject * obj, unsigned char *val)
-{
-  unsigned long v;
-  int res = SWIG_AsVal_unsigned_SS_long (obj, &v);
-  if (SWIG_IsOK(res)) {
-    if ((v > UCHAR_MAX)) {
-      return SWIG_OverflowError;
-    } else {
-      if (val) *val = static_cast< unsigned char >(v);
-    }
-  }  
-  return res;
-}
-
-
-SWIGINTERNINLINE PyObject *
-SWIG_From_unsigned_SS_char  (unsigned char value)
-{    
-  return SWIG_From_unsigned_SS_long  (value);
-}
-
 
 SWIGINTERN int
 SWIG_AsVal_bool (PyObject *obj, bool *val)
@@ -6844,8 +6821,8 @@ SWIGINTERN PyObject *_wrap_csSndSysSoundFormat_Bits_set(PyObject *SWIGUNUSEDPARM
   uint8 arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned char val2 ;
-  int ecode2 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
@@ -6855,11 +6832,19 @@ SWIGINTERN PyObject *_wrap_csSndSysSoundFormat_Bits_set(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSndSysSoundFormat_Bits_set" "', argument " "1"" of type '" "csSndSysSoundFormat *""'"); 
   }
   arg1 = reinterpret_cast< csSndSysSoundFormat * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_char(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csSndSysSoundFormat_Bits_set" "', argument " "2"" of type '" "uint8""'");
-  } 
-  arg2 = static_cast< uint8 >(val2);
+  {
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csSndSysSoundFormat_Bits_set" "', argument " "2"" of type '" "uint8""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csSndSysSoundFormat_Bits_set" "', argument " "2"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
   if (arg1) (arg1)->Bits = arg2;
   
   resultobj = SWIG_Py_Void();
@@ -6883,8 +6868,8 @@ SWIGINTERN PyObject *_wrap_csSndSysSoundFormat_Bits_get(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSndSysSoundFormat_Bits_get" "', argument " "1"" of type '" "csSndSysSoundFormat *""'"); 
   }
   arg1 = reinterpret_cast< csSndSysSoundFormat * >(argp1);
-  result = (uint8) ((arg1)->Bits);
-  resultobj = SWIG_From_unsigned_SS_char(static_cast< unsigned char >(result));
+  result =  ((arg1)->Bits);
+  resultobj = SWIG_NewPointerObj((new uint8(static_cast< const uint8& >(result))), SWIGTYPE_p_uint8_t, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -6897,8 +6882,8 @@ SWIGINTERN PyObject *_wrap_csSndSysSoundFormat_Channels_set(PyObject *SWIGUNUSED
   uint8 arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned char val2 ;
-  int ecode2 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
@@ -6908,11 +6893,19 @@ SWIGINTERN PyObject *_wrap_csSndSysSoundFormat_Channels_set(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSndSysSoundFormat_Channels_set" "', argument " "1"" of type '" "csSndSysSoundFormat *""'"); 
   }
   arg1 = reinterpret_cast< csSndSysSoundFormat * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_char(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csSndSysSoundFormat_Channels_set" "', argument " "2"" of type '" "uint8""'");
-  } 
-  arg2 = static_cast< uint8 >(val2);
+  {
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csSndSysSoundFormat_Channels_set" "', argument " "2"" of type '" "uint8""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csSndSysSoundFormat_Channels_set" "', argument " "2"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
   if (arg1) (arg1)->Channels = arg2;
   
   resultobj = SWIG_Py_Void();
@@ -6936,8 +6929,8 @@ SWIGINTERN PyObject *_wrap_csSndSysSoundFormat_Channels_get(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSndSysSoundFormat_Channels_get" "', argument " "1"" of type '" "csSndSysSoundFormat *""'"); 
   }
   arg1 = reinterpret_cast< csSndSysSoundFormat * >(argp1);
-  result = (uint8) ((arg1)->Channels);
-  resultobj = SWIG_From_unsigned_SS_char(static_cast< unsigned char >(result));
+  result =  ((arg1)->Channels);
+  resultobj = SWIG_NewPointerObj((new uint8(static_cast< const uint8& >(result))), SWIGTYPE_p_uint8_t, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -6950,8 +6943,8 @@ SWIGINTERN PyObject *_wrap_csSndSysSoundFormat_Flags_set(PyObject *SWIGUNUSEDPAR
   uint8 arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  unsigned char val2 ;
-  int ecode2 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
@@ -6961,11 +6954,19 @@ SWIGINTERN PyObject *_wrap_csSndSysSoundFormat_Flags_set(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSndSysSoundFormat_Flags_set" "', argument " "1"" of type '" "csSndSysSoundFormat *""'"); 
   }
   arg1 = reinterpret_cast< csSndSysSoundFormat * >(argp1);
-  ecode2 = SWIG_AsVal_unsigned_SS_char(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csSndSysSoundFormat_Flags_set" "', argument " "2"" of type '" "uint8""'");
-  } 
-  arg2 = static_cast< uint8 >(val2);
+  {
+    res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_uint8_t,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csSndSysSoundFormat_Flags_set" "', argument " "2"" of type '" "uint8""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "csSndSysSoundFormat_Flags_set" "', argument " "2"" of type '" "uint8""'");
+    } else {
+      uint8 * temp = reinterpret_cast< uint8 * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
   if (arg1) (arg1)->Flags = arg2;
   
   resultobj = SWIG_Py_Void();
@@ -6989,8 +6990,8 @@ SWIGINTERN PyObject *_wrap_csSndSysSoundFormat_Flags_get(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSndSysSoundFormat_Flags_get" "', argument " "1"" of type '" "csSndSysSoundFormat *""'"); 
   }
   arg1 = reinterpret_cast< csSndSysSoundFormat * >(argp1);
-  result = (uint8) ((arg1)->Flags);
-  resultobj = SWIG_From_unsigned_SS_char(static_cast< unsigned char >(result));
+  result =  ((arg1)->Flags);
+  resultobj = SWIG_NewPointerObj((new uint8(static_cast< const uint8& >(result))), SWIGTYPE_p_uint8_t, SWIG_POINTER_OWN |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -9290,7 +9291,7 @@ static swig_type_info _swigt__p_size_t = {"_p_size_t", "size_t *", 0, 0, (void*)
 static swig_type_info _swigt__p_uint16_t = {"_p_uint16_t", "uint16 *|uint16_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint32_t = {"_p_uint32_t", "uint32_t *|uint32 *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_uint64_t = {"_p_uint64_t", "uint64_t *|uint64 *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_unsigned_char = {"_p_unsigned_char", "unsigned char *|uint8 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_uint8_t = {"_p_uint8_t", "uint8 *|uint8_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_int = {"_p_unsigned_int", "unsigned int *|uint *|csTicks *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long = {"_p_unsigned_long", "csStringID *|unsigned long *|csEventID *|scfInterfaceID *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_unsigned_long_long = {"_p_unsigned_long_long", "ulonglong *|unsigned long long *", 0, 0, (void*)0, 0};
@@ -9411,7 +9412,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_uint16_t,
   &_swigt__p_uint32_t,
   &_swigt__p_uint64_t,
-  &_swigt__p_unsigned_char,
+  &_swigt__p_uint8_t,
   &_swigt__p_unsigned_int,
   &_swigt__p_unsigned_long,
   &_swigt__p_unsigned_long_long,
@@ -9532,7 +9533,7 @@ static swig_cast_info _swigc__p_size_t[] = {  {&_swigt__p_size_t, 0, 0, 0},{0, 0
 static swig_cast_info _swigc__p_uint16_t[] = {  {&_swigt__p_uint16_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint32_t[] = {  {&_swigt__p_uint32_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_uint64_t[] = {  {&_swigt__p_uint64_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_unsigned_char[] = {  {&_swigt__p_unsigned_char, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_uint8_t[] = {  {&_swigt__p_uint8_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_int[] = {  {&_swigt__p_unsigned_int, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_long[] = {  {&_swigt__p_unsigned_long, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_unsigned_long_long[] = {  {&_swigt__p_unsigned_long_long, 0, 0, 0},{0, 0, 0, 0}};
@@ -9653,7 +9654,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_uint16_t,
   _swigc__p_uint32_t,
   _swigc__p_uint64_t,
-  _swigc__p_unsigned_char,
+  _swigc__p_uint8_t,
   _swigc__p_unsigned_int,
   _swigc__p_unsigned_long,
   _swigc__p_unsigned_long_long,
