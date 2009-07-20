@@ -191,12 +191,6 @@ public:
 
 #include "csutil/deprecated_warn_off.h"
 
-struct csImposterUpdateQueue
-{
-  csRef<iRenderView> rview;
-  csWeakRefArray<csImposterProcTex> queue;
-};
-
 using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
 
 /**
@@ -1003,12 +997,6 @@ private:
   
   /// Default portal material
   csRef<iMaterialWrapper> defaultPortalMaterial;
-
-  /**
-   * List of imposters that need to be rendered to texture.
-   * There is a different list for every distinct camera instance.
-   */
-  csHash<csImposterUpdateQueue,long> imposterUpdateQueue;
   
   csRef<csShaderVariable> lightAttenuationTexture;
 

@@ -180,6 +180,11 @@ void csView::UpdateView ()
 
 void csView::Draw (iMeshWrapper* mesh)
 {
+  if(mesh)
+  {
+    meshFilter.AddFilterMesh(mesh);
+    meshFilter.SetFilterMode(CS::Utility::MESH_FILTER_INCLUDE);
+  }
   Engine->GetRenderManager()->RenderView (this);
 }
 

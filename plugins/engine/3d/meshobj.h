@@ -140,6 +140,7 @@ class csMeshWrapper :
 {
   friend class csMovable;
   friend class csMovableSectorList;
+  friend class csImposterManager;
 
 protected:
   /**

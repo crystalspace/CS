@@ -21,6 +21,7 @@
 
 #include "cstool/objmodel.h"
 #include "csutil/nobjvec.h"
+#include "iengine/camera.h"
 #include "iengine/impman.h"
 #include "iengine/movable.h"
 #include "iengine/sector.h"
@@ -30,15 +31,13 @@
 #include "cstool/rendermeshholder.h"
 #include "iengine/mesh.h"
 
-#include "impprctx.h"
-
 class csVector3;
 class csMatrix3;
 class csMovable;
 class csMeshWrapper;
 class csMeshFactoryWrapper;
 class csImposterMesh;
-struct iCamera;
+class csEngine;
 struct iGraphics3D;
 struct iRenderView;
 
@@ -102,6 +101,9 @@ private:
 
   // Imposter material.
   iMaterialWrapper* mat;
+
+  // The camera this mesh is being viewed through.
+  csWeakRef<iCamera> camera;
 
   // Flags for iMeshObject.
   csFlags flags;

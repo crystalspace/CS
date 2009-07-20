@@ -407,14 +407,12 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
 {
   if (factory && !drawing_imposter)
   {
-    iImposterFactory* factwrap = dynamic_cast<iImposterFactory*> (factory);
+    csRef<iImposterFactory> factwrap = scfQueryInterfaceSafe<iImposterFactory> (factory);
     if (factwrap)
     {
       if (UseImposter (rview))
       {
-        drawing_imposter = true;
         factwrap->UpdateImposter (this, rview);
-        drawing_imposter = false;
         using_imposter = true;
         n = 0;
         return 0;

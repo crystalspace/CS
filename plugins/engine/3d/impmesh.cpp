@@ -34,7 +34,7 @@
 
 csImposterMesh::csImposterMesh (csEngine* engine, iImposterFactory* fact,
                                 iMeshWrapper* pmesh, iRenderView* rview) :
-  scfImplementationType(this), engine(engine), fact(fact)
+scfImplementationType(this), engine(engine), fact(fact), camera(rview->GetCamera())
 {
   // Misc inits.
   cutout.SetVertexCount (4);

@@ -28,6 +28,7 @@
 #include "engine.h"
 #include "impman.h"
 #include "impmesh.h"
+#include "meshobj.h"
 
 csImposterManager::csImposterManager(csEngine* engine)
 : scfImplementationType(this), engine(engine)
@@ -85,42 +86,47 @@ bool csImposterManager::HandleEvent(iEvent &ev)
 void csImposterManager::InitialiseImposter(ImposterMat* imposter)
 {
   csImposterMesh* csIMesh = static_cast<csImposterMesh*>(&*imposter->mesh);
+  csMeshWrapper* csMesh = static_cast<csMeshWrapper*>(&*csIMesh->instances[0]->mesh);
+
+  if(!csIMesh->camera.IsValid())
+    return;
 
   // Move imposter mesh to correct sector.
   csIMesh->mesh->GetMovable()->SetPosition(csVector3(0.0f));
   csIMesh->mesh->GetMovable()->SetSector(csIMesh->sector);
   csIMesh->mesh->GetMovable()->UpdateMove();
 
-  /*
   // Allocate a texture image.
   int texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
 
-  csRef<iImage> thisImage = new csImageMemory (csMesh->texWidth, csMesh->texHeight,
+  csRef<iImage> thisImage = new csImageMemory (csIMesh->texWidth, csIMesh->texHeight,
     CS_IMGFMT_ALPHA && CS_IMGFMT_TRUECOLOR );
   iTextureWrapper* tex = engine->GetTextureList ()->NewTexture (thisImage);
   tex->SetFlags (tex->GetFlags() | texFlags);
   tex->Register (engine->G3D->GetTextureManager());
   tex->GetTextureHandle ()->SetAlphaType (csAlphaMode::alphaBinary);
-
-  //csMeshOnTexture r2t(engine->GetObjectRegistry());
-  //r2t.GetView()->GetCamera()->SetTransform(rview->GetCamera()->GetTransform());
-  //r2t.GetView()->GetCamera()->SetSector(csMesh->sector);
-  //r2t.ScaleCamera(csMesh->instances[0]->mesh, 8.0f);
-  //r2t.Render(csMesh->instances[0]->mesh, tex->GetTextureHandle());
+/*
+  csMesh->drawing_imposter = true;
+  csMeshOnTexture r2t(engine->GetObjectRegistry());
+  r2t.GetView()->GetCamera()->SetTransform(csIMesh->camera->GetTransform());
+  r2t.GetView()->GetCamera()->SetSector(csIMesh->sector);
+  r2t.ScaleCamera(csMesh, 8.0f);
+  r2t.Render(csMesh, tex->GetTextureHandle());
+  csMesh->drawing_imposter = false;
 
   csView view(engine, g3d);
-  view.SetCamera(rview->GetCamera());
+  view.SetCamera(csIMesh->camera);
 
-  rview->CreateRenderContext();
+  csMesh->drawing_imposter = true;
   csRef<iRenderManagerTargets> rmTargets = scfQueryInterface<iRenderManagerTargets>(engine->renderManager);
   rmTargets->RegisterRenderTarget(tex->GetTextureHandle(), &view, 0, iRenderManagerTargets::updateOnce);
   g3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER);
   engine->renderManager->RenderView(&view);
   g3d->FinishDraw();
-  rview->RestoreRenderContext();
-
+  csMesh->drawing_imposter = false;
+*/
   csRef<iImageIO> imageio = csQueryRegistry<iImageIO>(engine->GetObjectRegistry());
-  csRef<iDataBuffer> db = imageio->Save(thisImage);
+  csRef<iDataBuffer> db = imageio->Save(thisImage, "image/png");
 
   engine->VFS->WriteFile("/this/testimage.png", db->GetData(), db->GetSize());
 
