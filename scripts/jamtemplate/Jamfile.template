@@ -64,14 +64,14 @@ MsvcGenConfig CRYSTAL.INCDIRS :
   [ ConcatDirs "$(hash)(CRYSTAL)" win32libs include ] ;
 MsvcGenConfig CRYSTAL.LIBDIRS :
   [ ConcatDirs .. .. .. CS out release$(MSVC_VERSION) libs ]
-  [ ConcatDirs .. .. .. CS win32libs libs ]
+  [ ConcatDirs .. .. .. CS win32libs lib ]
   [ ConcatDirs "$(hash)(CRYSTAL)" out release$(MSVC_VERSION) libs ]
-  [ ConcatDirs "$(hash)(CRYSTAL)" win32libs libs ] ;
+  [ ConcatDirs "$(hash)(CRYSTAL)" win32libs lib ] ;
 MsvcGenConfig CRYSTAL.LIBDIRS.DEBUG :
   [ ConcatDirs .. .. .. CS out debug$(MSVC_VERSION) libs ]
-  [ ConcatDirs .. .. .. CS win32libs libs ]
+  [ ConcatDirs .. .. .. CS win32libs lib ]
   [ ConcatDirs "$(hash)(CRYSTAL)" out debug$(MSVC_VERSION) libs ]
-  [ ConcatDirs "$(hash)(CRYSTAL)" win32libs libs ] ;
+  [ ConcatDirs "$(hash)(CRYSTAL)" win32libs lib ] ;
 
 if $(CEL.DESIRED) = yes
 {
