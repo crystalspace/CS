@@ -563,7 +563,7 @@ namespace CS
         CS::Threading::RecursiveMutexScopedLock lock (AllocatorSafeType::mutex);
         return WrappedAllocatorType::Alloc();
       }
-      using WrappedAllocatorType::Alloc;
+      using AllocatorSafeType::Alloc;
     
       bool TryFree (void* p)
       {

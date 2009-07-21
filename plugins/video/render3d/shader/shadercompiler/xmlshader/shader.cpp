@@ -864,6 +864,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       }
     }
 
+    allTechVariantCount = 0;
+    for (size_t i = 0; i < techniques.GetSize(); i++)
+    {
+      size_t vc = techniques[i].resolver->GetVariantCount();
+      if (vc == 0) vc = 1;
+      allTechVariantCount += vc;
+    }
+
     //Load global shadervars block
     csRef<iDocumentNode> varNode = shaderRootStripped->GetNode(
       xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_SHADERVARS));
@@ -917,8 +925,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       {
 	tech.resolver->SetVariant (vi);
 
-	size_t ticket = vi * (techniques.GetSize()+1) + (t+1);
+	//size_t ticket = vi * (techniques.GetSize()+1) + (t+1);
 	//((vi*techVar.techniques.GetSize() + t) * (tvc+1) + (tvi+1));
+	size_t ticket = ComputeTicket (t, vi);
 
 	if (compiler->doDumpXML)
 	{
@@ -1167,7 +1176,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
           tech.variantsPrepared.SetSize (csMax (tech.variantsPrepared.GetSize(),
             vi+1));
           //ticket = ((vi*techVar.techniques.GetSize() + t) * (tvc+1) + (tvi+1));
-          ticket = vi * (techniques.GetSize()+1) + (t+1);
+          //ticket = vi * (techniques.GetSize()+1) + (t+1);
+	  ticket = ComputeTicket (t, vi);
 
           csRef<iHierarchicalCache> varCache;
           if (!tech.variantsPrepared[vi])
@@ -1285,13 +1295,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
               "No technique validated for shader '%s' TV %zu: using fallback", 
               GetName(), tvi);
           }
-          size_t fallbackTicket = GetFallbackShader()->GetTicket (modes, stack);
-          if (fallbackTicket != csArrayItemNotFound)
+          ticket = ComputeTicketForFallback (
+	    GetFallbackShader()->GetTicket (modes, stack));
+          /*if (fallbackTicket != csArrayItemNotFound)
           {
             ticket = fallbackTicket * (techniques.GetSize()+1);
           }
           else
-            ticket = csArrayItemNotFound;
+            ticket = csArrayItemNotFound;*/
         }
         else if (!techVar.shownError && compiler->do_verbose)
           compiler->Report (CS_REPORTER_SEVERITY_WARNING,
@@ -1565,11 +1576,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         GetName(), filenameClean.GetData());
     }
 
-    size_t tc = techniques.GetSize();
-    if (tc == 0) tc = 1;
-    size_t tech = (variant % (tc+1))-1;
-    const Technique& technique = techniques[tech];
-    csShaderConditionResolver* resolver = technique.resolver;
+    const Technique* technique = TechniqueForTicket (variant);
+    if (technique == 0) return 0;
+    csShaderConditionResolver* resolver = technique->resolver;
 
     csRef<iDocumentNode> programNode;
     if (compiler->doDumpConds)
