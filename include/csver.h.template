@@ -43,13 +43,18 @@
  * When a version bump happens, csver.h.template is edited to reflect the new
  * major and minor versions. This will also 'reset' the relative SVN revision
  * number.
+ *
  * However, in case csver.h.template is edited for a reason other than a
  * version bump, CS_RCSREV_OFFSET is provided to allow adjustment
  * of the relative SVN revision to avoid having it go backwards.
+ * Increment the offset by the value reported by `rcsrev print` (BEFORE
+ * committing).
+ *
+ * CS_RCSREV_OFFSET should be set to 0 again when bumping the version.
  *
  * The relative SVN revision is computed by the script `rcsrev`.
  */
-//CS_RCSREV_OFFSET 0
+//CS_RCSREV_OFFSET 19
 #ifndef CS_VERSION_RCSREV
 #define CS_VERSION_RCSREV	@CS_VERSION_RCSREV@
 #endif
@@ -81,15 +86,15 @@
 /**\name Version number definitions (strings)
  * @{ */
 /// Major version
-#define CS_VERSION_MAJOR CS_VER_QUOTE(CS_VERSION_NUM_MAJOR)
+#define CS_VERSION_MAJOR 	CS_VER_QUOTE(CS_VERSION_NUM_MAJOR)
 /// Minor version (even are stable versions, odd are development versions)
-#define CS_VERSION_MINOR CS_VER_QUOTE(CS_VERSION_NUM_MINOR)
+#define CS_VERSION_MINOR 	CS_VER_QUOTE(CS_VERSION_NUM_MINOR)
 /// Maintenance release
-#define CS_VERSION_BUILD CS_VER_QUOTE(CS_VERSION_NUM_RELEASE)
+#define CS_VERSION_RELEASE	CS_VER_QUOTE(CS_VERSION_NUM_RELEASE)
 /// Build number
-#define CS_VERSION_BUILD CS_VER_QUOTE(CS_VERSION_NUM_BUILD)
+#define CS_VERSION_BUILD	CS_VER_QUOTE(CS_VERSION_NUM_BUILD)
 /// Date of release
-#define CS_RELEASE_DATE  CS_VER_QUOTE_(Mon 5-Jun-2008)
+#define CS_RELEASE_DATE  	CS_VER_QUOTE_(Mon 5-Jun-2008)
 /** @} */
 
 #define CS_VER_QUOTE_(X) #X
