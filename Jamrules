@@ -28,13 +28,8 @@ if "$(SOURCE_IS_SVN)" = "yes"
 }
 # Some .rc customizations
 WIN32RC.EXTRAHEADER = "#include \"csplatform.h\"
-#include \"csver.h\"
-#ifdef CS_VERSION_UNSTABLE
-#define BUILD 0
-#else
-#define BUILD CS_VERSION_NUM_BUILD
-#endif" ;
-WIN32RC.VERSIONNUMBER = "CS_VERSION_NUM_MAJOR,CS_VERSION_NUM_MINOR,BUILD,CS_VERSION_RCSREV" ;
+#include \"csver.h\"" ;
+WIN32RC.VERSIONNUMBER = "CS_VERSION_NUM_MAJOR,CS_VERSION_NUM_MINOR,CS_VERSION_NUM_RELEASE,CS_VERSION_NUM_BUILD" ;
 WIN32RC.VERSIONSTR = "CS_VERSION" ;
 
 # Include CS build rules.
