@@ -32,6 +32,7 @@
 // "crystalspace.h" rather than including only the headers we need so that we
 // test as many headers for standards conformance as possible.
 #include "crystalspace.h"
+#include "csver.h"
 #include "isndsys.h"
 
 #include "walktest.h"

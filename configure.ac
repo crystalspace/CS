@@ -87,6 +87,18 @@ CS_CHECK_COMMON_TOOLS_ICONS
 CS_CHECK_COMMON_TOOLS_RELAYTOOL([${srcdir}/bin])
 
 #------------------------------------------------------------------------------
+# Check for subversion and, if available, whether the source directory is an
+# SVN checkout.
+#------------------------------------------------------------------------------
+CS_CHECK_TOOLS([SUBVERSION], [svn])
+AS_IF([test -n "$SUBVERSION"],
+    [AC_CACHE_CHECK([whether ${srcdir} is an SVN checkout], [cs_cv_source_is_svn],
+	[AS_IF([AC_TRY_COMMAND([$SUBVERSION info ${srcdir} > /dev/null])],
+	    [cs_cv_source_is_svn=yes], [cs_cv_source_is_svn=no])])],
+    [cs_cv_source_is_svn=no])
+CS_EMIT_BUILD_PROPERTY([SOURCE_IS_SVN], [$cs_cv_source_is_svn])
+
+#------------------------------------------------------------------------------
 # In order to avoid alienating users by forcing them to install and use Jam,
 # config.status is instructed (see far below) to build Jam on the user's behalf
 # from local sources, and to place the executable in the root of the build
