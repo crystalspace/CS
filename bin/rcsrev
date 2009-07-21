@@ -13,7 +13,7 @@ extract_revision()
 
 compute_rel_rev()
 {
-  rev_offset=`cat $topdir/include/csver.h.template | grep CS_RCSREV_OFFSET | sed -e "s/[^0-9]*//"`
+  rev_offset=`cat $topdir/include/csver.h.template | grep "//CS_RCSREV_OFFSET" | sed -e "s/[^0-9]*//"`
   base_rev=`extract_revision $topdir/include/csver.h.template`
   checkout_rev=`extract_revision $topdir`
   echo $(($checkout_rev-$base_rev+$rev_offset))
@@ -21,7 +21,7 @@ compute_rel_rev()
 
 update_header()
 {
-  rev_offset=`cat $topdir/include/csver.h.template | grep CS_RCSREV_OFFSET | sed -e "s/[^0-9]*//"`
+  rev_offset=`cat $topdir/include/csver.h.template | grep "//CS_RCSREV_OFFSET" | sed -e "s/[^0-9]*//"`
   csver_rev=`extract_revision $topdir/include/csver.h`
   checkout_rev=`extract_revision $topdir`
   if [ $checkout_rev -gt $csver_rev ] ; then
