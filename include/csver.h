@@ -58,7 +58,7 @@
  */
 //CS_RCSREV_OFFSET 10
 #ifndef CS_VERSION_RCSREV
-#define CS_VERSION_RCSREV	18
+#define CS_VERSION_RCSREV	22
 #endif
 
 /**\name Version number definitions (numeric)
