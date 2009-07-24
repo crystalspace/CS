@@ -16,6 +16,7 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <stdio.h>
 #include "common.h"
 
 #include "Photonmap.h"
@@ -24,6 +25,41 @@
 
 namespace lighter
 {
+  PhotonData::PhotonData(const csVector3 &position,
+    const csVector3 &incomingDir, const csColor &power)
+  {
+    pos[0] = position.x;
+    pos[1] = position.y;
+    pos[2] = position.z;
+
+    CartesianToSpherical(incomingDir, phi, theta);
+
+    pow[0] = (int)floor(power.red/255.0 + 0.5);
+    pow[1] = (int)floor(power.green/255.0 + 0.5);
+    pow[2] = (int)floor(power.blue/255.0 + 0.5);
+  }
+
+  void PhotonData::CartesianToSpherical(csVector3 d,
+    unsigned char &P, unsigned char&T)
+  {
+    P = (int)(256*atan2(d.y, d.x)/(2.0*PI));
+    T = (int)(256*acos(d.z)/PI);
+  }
+
+  void PhotonData::SphericalToCartesian(unsigned char &P,
+    unsigned char&T, csVector3 &d)
+  {
+    float Pf = P/256.0*2.0*PI, Tf = T/256.0*PI;
+    d.Set(cos(Pf)*sin(Tf), sin(Pf)*sin(Tf), cos(Tf));
+  }
+
+  void PhotonMap::BuildBalancedKDTree()
+  {
+    vector<PhotonData*> below, above;
+
+  }
+
+
   PhotonMap::PhotonMap()
   {
     root = 0;
@@ -53,25 +89,29 @@ namespace lighter
   void PhotonMap::AddPhoton(const csColor& color, const csVector3& dir,
                             const csVector3& pos)
   {
-    //photons.Push(new Photon(color, dir, pos));
+    // Create the new photon struct and store in the flat array
+    Photon* newPhoton = new Photon(color, dir, pos);
+    photonArray.push_back(newPhoton);
     
-    // check to see if we are the first photon to be added
+    // Add the photon to the kd-Tree
+
+    // Is this the first photon (make the root)
     if (!root)
     {
-      root = new Photon(color, dir, pos);
+      root = newPhoton;
       root->planeDir = 0;
       return;
     }
 
-    // lets find the node we should be attached to
+    // Traverse the tree to find where the photon should be attached
     Photon *current = root;
     int direction = 0;
     while (current)
     {
-      // check the left branch
+      // Traverse the left branch of this node
       if (pos[direction] <= current->position[direction])
       {
-        // check to see if there is a left branch
+        // Is the left branch occupied?
         if (current->left)
         {
           // update current and continue
@@ -79,15 +119,17 @@ namespace lighter
         }
         else
         {
-          current->left = new Photon(color, dir, pos);
+          // Add this photon as a leaf on the left branch
+          current->left = newPhoton;
           current->left->planeDir = (direction + 1) % 3;
           return;
         }
       }
-      // check right 
+      
+      // Traverse right branch of this node 
       else if (pos[direction] > current->position[direction])
       {
-        // check to see if there is a left branch
+        // Is the right branch occupied
         if (current->right)
         {
           // update current and continue
@@ -95,7 +137,8 @@ namespace lighter
         }
         else
         {
-           current->right = new Photon(color, dir, pos);
+           // Add this photon as a leaf on the right branch
+           current->right = newPhoton;
            current->right->planeDir = (direction + 1) % 3;
            return;
         }
@@ -106,6 +149,54 @@ namespace lighter
     
   }
 
+  void PhotonMap::SaveToFile(string filename)
+  {
+    // Open file for writing in binary mode
+    FILE* fout = fopen(filename.c_str(), "wb");
+    if(fout != NULL)
+    {
+      // Write the number of photons
+      size_t count = photonArray.size();
+      fwrite(&count, sizeof(size_t), 1, fout);
+
+      // Write each photon
+      for(size_t i=0; i<count; i++)
+      {
+        // Get pointer to photon
+        Photon* curPhoton = photonArray[i];
+
+        // Write the color
+        unsigned char curColor[3] = {
+          (int)floor(curPhoton->color.red*255.0 + 0.5),
+          (int)floor(curPhoton->color.green*255.0 + 0.5),
+          (int)floor(curPhoton->color.blue*255.0 + 0.5)
+        };
+
+        fwrite(curColor, sizeof(unsigned char), 3, fout);
+
+        // Write the direction
+        float curDir[3] = {
+          curPhoton->direction.x,
+          curPhoton->direction.y,
+          curPhoton->direction.z
+        };
+
+        fwrite(curDir, sizeof(float), 3, fout);
+
+        // Write the position
+        float curPos[3] = {
+          curPhoton->position.x,
+          curPhoton->position.y,
+          curPhoton->position.z
+        };
+
+        fwrite(curPos, sizeof(float), 3, fout);
+      }
+
+      // Close the file
+      fclose(fout);
+    }
+  }
 
   csColor PhotonMap::SampleColor(const csVector3& pos,  float radius, 
                                  const csVector3& normal, const csVector3& dir)

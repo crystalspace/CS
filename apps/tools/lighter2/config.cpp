@@ -55,10 +55,13 @@ namespace lighter
 		
     indtLightProperties.numPhotons = 500;
     indtLightProperties.numPerSample = 50;
+    indtLightProperties.maxRecursionDepth = 10;
     indtLightProperties.sampleDistance = 1.0f;
 
     indtLightProperties.finalGather = true;
     indtLightProperties.numFinalGatherRays = 30;
+
+    indtLightProperties.savePhotonMap = false;
   }
 
   void Configuration::Initialize (iConfigFile* _cfgFile)
@@ -112,6 +115,8 @@ namespace lighter
 		
     indtLightProperties.numPhotons = cfgFile->GetInt("lighter2.numPhotons",
       indtLightProperties.numPhotons);
+    indtLightProperties.maxRecursionDepth = cfgFile->GetInt("lighter2.maxRecursionDepth",
+      indtLightProperties.maxRecursionDepth);
     indtLightProperties.numPerSample = cfgFile->GetInt("lighter2.photonsPerSample",
       indtLightProperties.numPerSample);
     indtLightProperties.sampleDistance = cfgFile->GetFloat("lighter2.sampleDistance",
@@ -121,5 +126,8 @@ namespace lighter
       indtLightProperties.finalGather);
     indtLightProperties.numFinalGatherRays = cfgFile->GetInt("lighter2.numFGRays",
       indtLightProperties.numFinalGatherRays);
+
+    indtLightProperties.savePhotonMap = cfgFile->GetBool("lighter2.savePhotonMap",
+      indtLightProperties.savePhotonMap);
   }
 }

@@ -35,6 +35,8 @@ namespace lighter
   GlobalIllumination::GlobalIllumination()
   {
     finalGather = false;
+    randVect.Initialize();
+    randFloat.Initialize();
   }
 
   GlobalIllumination::GlobalIllumination(Configuration::INDIProperties config)
@@ -42,8 +44,12 @@ namespace lighter
     finalGather = config.finalGather;
     numFinalGatherRays = config.numFinalGatherRays;
     searchRadius = config.sampleDistance;
-    //searchRadius = 0.1f;
-    numPhotonsPerLight = config.numPhotons;
+
+    numPhotonsPerSector = config.numPhotons;
+    numSamplesPerPhoton = config.numPerSample;
+
+    randVect.Initialize();
+    randFloat.Initialize();
   }
 	
   void GlobalIllumination::ShadeIndirectLighting(Sector *sect, 
@@ -79,7 +85,7 @@ namespace lighter
     }
 
     // Now do the calculations
-    ProgressState progressState(progress, totalElements);
+    Statistics::ProgressState progressState(progress, totalElements);
     gitr.Reset();
     while (gitr.HasNext())
     {
@@ -142,11 +148,12 @@ namespace lighter
               {
                 // average over the number of FG rays
                 csColor final(0,0,0);
-                for (size_t num = 0; num < numFinalGatherRays; ++num)
+                for (size_t num = 0; num < (size_t)numFinalGatherRays; ++num)
                 {
                   lighter::HitPoint hit;
                   hit.distance = FLT_MAX*0.9f;
                   lighter::Ray ray;
+                  ray.type = RAY_TYPE_OTHER2;
 
                   // create a new directional vector that faces towards the
                   // direction of the normal
@@ -187,7 +194,7 @@ namespace lighter
               }
             }
             progressState.Advance();
-            normalLM->SetAddPixel (u, v, c * pixelAreaPart);
+            normalLM->SetAddPixel (u, v, c * pixelAreaPart * 4.0);
           }
         }
       }
@@ -195,28 +202,90 @@ namespace lighter
     progress.SetProgress(1);
   }
 
-  void GlobalIllumination::EmitPhotons(Sector *sect)
+  void GlobalIllumination::EmitPhotons(Sector *sect,
+    Statistics::Progress& progress)
   {
-    // emit from the lights
-    const LightRefArray& allNonPDLights = sect->allNonPDLights;
-    for (size_t pdli = 0; pdli < allNonPDLights.GetSize(); ++pdli)
-    {
-      Light* pdl = allNonPDLights[pdli];
-      const csVector3& pos = pdl->GetPosition();
-      const csColor& color = pdl->GetColor();
-      const csColor& power = pdl->GetPower();
-      csVector3 dir;
+    progress.SetProgress(0);
 
-      // send out photons in random directions since we only have point
-      // lights at this point
-      for (size_t num = 0; num < numPhotonsPerLight; ++num)
+    // Iterate through all the non 'Pseudo Dynamic' light sources
+    const LightRefArray& allNonPDLights = sect->allNonPDLights;
+    Statistics::ProgressState progressState(progress, numPhotonsPerSector);
+
+    // Iterate over the lights to determine the total lumen power in the sector
+    double sectorLumenPower = 0;
+    for(size_t lightIdx = 0; lightIdx < allNonPDLights.GetSize(); ++lightIdx)
+    {
+      Light* curLight = allNonPDLights[lightIdx];
+      csColor pow = curLight->GetColor()*curLight->GetPower();
+      sectorLumenPower += (pow.red + pow.green + pow.blue)/3.0;
+    }
+
+    for (size_t lightIdx = 0; lightIdx < allNonPDLights.GetSize(); ++lightIdx)
+    {
+      // Get the position, color and power for this light source
+      Light* curLight = allNonPDLights[lightIdx];
+      const csVector3& pos = curLight->GetPosition();
+      const csColor& color = curLight->GetColor();
+      const csColor& power = curLight->GetPower();
+
+      // Determine type of light source
+      csLightType curLightType = CS_LIGHT_POINTLIGHT;
+      if(dynamic_cast<SpotLight*>(curLight) != NULL) curLightType = CS_LIGHT_SPOTLIGHT;
+      else if(dynamic_cast<DirectionalLight*>(curLight) != NULL) curLightType = CS_LIGHT_DIRECTIONAL;
+
+      // How many photons does this light get (proportional to the fraction
+      // of power this light contributes to the sector)?
+      csColor pow = curLight->GetColor()*curLight->GetPower();
+      double powerScale = ((pow.red + pow.green + pow.blue)/3.0)/sectorLumenPower;
+      size_t photonsForCurLight = floor(powerScale*numPhotonsPerSector + 0.5);
+
+      // Loop to generate the requested number of photons for this light source
+      for (size_t num = 0; num < photonsForCurLight; ++num)
       {
-        // generate new random direction vector
-        dir = randVect.Get();
-        sect->EmitPhoton(pos, dir, color, power);
+        switch (curLightType) {
+
+          // directional light
+          case CS_LIGHT_DIRECTIONAL:
+            {
+              globalLighter->Report (
+                  "Directional lights are ignored for indirect light calculation");
+            }
+            break;
+
+          // spotlight
+          case CS_LIGHT_SPOTLIGHT:
+            {
+              globalLighter->Report (
+                  "Spotlights are ignored for indirect light calculation");
+            }
+            break;
+
+          // Default behavior is to treat a light like a point light
+          case CS_LIGHT_POINTLIGHT:
+          default:
+            {
+              // Genrate a random direction vector for uniform light source sampling
+              csVector3 dir = randVect.Get();
+
+              // Emit a single photon into the sector containing this light
+              sect->EmitPhoton(pos, dir, color, powerScale*power, numSamplesPerPhoton);
+            }
+            break;
+        }
       }
     }
 
-    int temp = 0;
+    progress.SetProgress(1);
+
+    // Save the photon map if requested
+    if(globalConfig.GetIndirectProperties ().savePhotonMap)
+    {
+      static int secCount = 0;
+      char filename[30];
+      sprintf(filename, "photonmap%d.dat", secCount);
+      sect->SavePhotonMap(filename);
+      secCount++;
+    }
   }
+
 }

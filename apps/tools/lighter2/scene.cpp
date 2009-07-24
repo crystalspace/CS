@@ -94,6 +94,11 @@ namespace lighter
     kdTree = builder.BuildTree (objIt, progress);
   }
 
+  void Sector::SavePhotonMap(string filename)
+  {
+    if(photonMap != NULL) photonMap->SaveToFile(filename);
+  }
+
   //-------------------------------------------------------------------------
 
   Scene::Scene () : lightmapPostProc (this)
@@ -741,6 +746,8 @@ namespace lighter
     csRef<iDocumentNode> worldNode = 
       fileInfo->GetDocument()->GetRoot()->GetNode ("world");
 
+    globalStats.scene.numSectors = sectorList->GetCount ();
+
     if (worldNode.IsValid ())
     {
       csRef<iDocumentNodeIterator> sectorNodeIt = 
@@ -852,6 +859,7 @@ namespace lighter
 
     // Parse all meshes (should have selector later!)
     iMeshList *meshList = sector->GetMeshes ();
+    globalStats.scene.numObjects += meshList->GetCount ();
 
     u = updateFreq = progress.GetUpdateFrequency (meshList->GetCount ());
     progressStep = updateFreq * (1.0f / meshList->GetCount ());
@@ -880,6 +888,8 @@ namespace lighter
     csSet<csString> lightNames;
     // Parse all lights (should have selector later!)
     iLightList *lightList = sector->GetLights ();
+    globalStats.scene.numLights = lightList->GetCount ();
+
     for (int i = lightList->GetCount (); i-- > 0;)
     {
       iLight *light = lightList->Get (i);
@@ -2450,7 +2460,7 @@ namespace lighter
   
   void Scene::LightingPostProcessor::ApplyAmbient (Lightmap* lightmap)
   {
-    //if (!<indirect lighting enabled>)
+    if (!globalConfig.GetLighterProperties ().indirectLMs)
     {
       csColor amb;
       globalLighter->engine->GetAmbientLight (amb);
@@ -2460,7 +2470,7 @@ namespace lighter
 
   void Scene::LightingPostProcessor::ApplyAmbient (csColor* colors, size_t numColors)
   {
-    //if (!<indirect lighting enabled>)
+    if (!globalConfig.GetLighterProperties ().indirectLMs)
     {
       csColor amb;
       globalLighter->engine->GetAmbientLight (amb);
@@ -2470,10 +2480,11 @@ namespace lighter
 
   void Sector::EmitPhoton(const csVector3& pos, const csVector3& dir,
                           const csColor& color, const csColor& power,
-                          const size_t& depth)
-  {
-    // check depth, if its over a given limit then lets stop emitting
-    if (depth > 10)
+                          const int& samples, const size_t& depth, const RayType type)
+  {    
+    // Check recursion depth
+    if(globalConfig.GetIndirectProperties ().maxRecursionDepth > 0 &&
+        depth > (size_t)globalConfig.GetIndirectProperties ().maxRecursionDepth)
     {
       return;
     }
@@ -2481,54 +2492,111 @@ namespace lighter
     // TODO: Need to expand on this for checks for portals
     lighter::HitPoint hit;
     hit.distance = FLT_MAX*0.9f;
+
     lighter::Ray ray;
     ray.direction = dir;
     ray.origin = pos;
     ray.minLength = 0.01f;
+    ray.type = type;
     
-
-    // check to see if we hit anything, if we don't then we don't
-    // need to record the hit
+    // Does this photon hit an object or disappear into empty space?
     if (lighter::Raytracer::TraceClosestHit(kdTree, ray, hit))
     {
-      if (!hit.primitive)
-      {
-        return;
-      }
-      // create the reflected direction and emit if we meet certain properties
-      csColor refColor = color;
-      refColor *= power;
+      // TODO: Why would a hit be returned and 'hit.primitive' be NULL?
+      if (!hit.primitive) { return; }
 
-      // generate the reflection ray
+      // Compute reflection direction
       csVector3 normal = hit.primitive->ComputeNormal(hit.hitPoint);
       float dot = normal*dir;
-      csVector3 newDir = dir;
-      newDir -= normal*2*dot;
+      csVector3 reflDir = dir;
+      reflDir -= normal*2*dot;
 
-      // check to make sure the photon map exists
-      if (!photonMap)
-      {
-        photonMap = new PhotonMap();
-      }
-      photonMap->AddPhoton(refColor, newDir, hit.hitPoint);
+      // Compute reflected color
+      csColor reflColor = color*power;
 
-      // Only doing diffuse reflections right now, but this needs to be
-      // expanded to account for specular reflections as well
-      float pd = (refColor.red + refColor.green + refColor.blue) / 3.0;
+      // Record photon (initializing photon map object if needed)
+      if (!photonMap) { photonMap = new PhotonMap(); }
+      photonMap->AddPhoton(reflColor, reflDir, hit.hitPoint);
+
+      // Russian roulette to cut off recursion depth early (but only if we are past first recursion level)
+      float pd = (reflColor.red + reflColor.green + reflColor.blue) / 3.0;
       csRandomFloatGen randGen;
       float rand = randGen.Get();
 
-      if (rand <= pd)
+      if(depth == 0 || rand <= pd)
       {
-        // TODO: Need to change this to take on the attributes of 
-        // the surface it hits
+        // Determine color and power of scattered light
+        // TODO: attenuate power by scatter sample count
+        // TODO: attenuate color by material properties
         csColor newColor = color;
         csColor newPower = power;
-        EmitPhoton(hit.hitPoint, newDir, newColor, newPower, depth+1);
+
+        // TODO: Scatter the light
+        
+        /* OLD CODE
+         * This is a fundamental mistake.  To properly sample the BRDF we need
+         * to scatter light according to it's probility distribution function (PDF).
+         * For lightmap generation, we can treat the BRDF as a perfect Lambertian
+         * BRDF (perfectly scattering in all directions or a uniform PDF).  This
+         * code scatters it in the perfect mirror direction only and will not
+         * sample the BRDF accurately.  This is the same as a PDF with 1.0 in the
+         * mirror direction and zero everywhere else (a perfect mirror material).
+         */
+//        EmitPhoton(hit.hitPoint, reflDir, newColor, newPower, depth+1, RAY_TYPE_REFLECT);
+
+        // Sample the BRDF
+//        for(int i=0; i<samples; i++)
+        {
+          // Generate a scattering direction in the hemisphere around the normal
+          csVector3 scatterDir = DiffuseScatter(normal);
+          EmitPhoton(hit.hitPoint, scatterDir, newColor, newPower, samples, depth+1, RAY_TYPE_REFLECT);
+
+          // Update displayed ray count
+//          if(depth == 0) globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE);
+        }
       }
     }
-    
-    
   }
 
+  csVector3 Sector::DiffuseScatter(const csVector3 &n)
+  {
+    // Local, static random number generator
+    static csRandomFloatGen randGen;
+
+    // Get two uniformly distributed random numbers between 0 and 1
+    double e1 = randGen.Get();
+    double e2 = randGen.Get();
+
+    // Compute the angles of rotation around the normal
+    // Note: altitude is weighted by cosine just like Lambert's law
+    double theta = acos(sqrt(e1));
+    double phi = 2.0*PI*e2;
+
+    // Find orthogonal axis (must avoid the dominant axis)
+    csVector3 orthoN, rotAxis;
+    switch(n.DominantAxis())
+    {
+      case CS_AXIS_X: orthoN.Set(0, 1, 0); break;
+      case CS_AXIS_Y: orthoN.Set(0, 0, 1); break;
+      case CS_AXIS_Z: orthoN.Set(1, 0, 0);; break;
+    }
+
+    rotAxis.Cross(n, orthoN);
+    rotAxis.Normalize();
+
+    // Create a vector to hold the results and a
+    // quaternion for rotations
+    csVector3 result = n;
+    csQuaternion rotater;
+
+    // Rotate n theta radians around 'rotAxis'
+    rotater.SetAxisAngle(rotAxis, theta);
+    result = rotater.Rotate(result);
+
+    // Rotate again, this time phi radians around 'n'
+    rotater.SetAxisAngle(n, phi);
+    result = rotater.Rotate(result);
+
+    return result;
+  }
 }

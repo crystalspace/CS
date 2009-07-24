@@ -152,35 +152,35 @@ namespace lighter
       const Primitive* shadowIgnorePrimitive = 0, 
       bool fullIgnore = false, csVector3* incomingLightVec = 0);
 
-    class ProgressState
-    {
-      Statistics::Progress& progress;
-      size_t updateFreq;
-      size_t u;
-      float progressStep;
+    //class ProgressState
+    //{
+    //  Statistics::Progress& progress;
+    //  size_t updateFreq;
+    //  size_t u;
+    //  float progressStep;
 
-    public:
-      ProgressState (Statistics::Progress& progress, size_t total) : 
-        progress (progress), 
-        updateFreq (progress.GetUpdateFrequency (total)), u (updateFreq),
-        progressStep (float (updateFreq) / total) {}
+    //public:
+    //  ProgressState (Statistics::Progress& progress, size_t total) : 
+    //    progress (progress), 
+    //    updateFreq (progress.GetUpdateFrequency (total)), u (updateFreq),
+    //    progressStep (float (updateFreq) / total) {}
 
-      CS_FORCEINLINE void Advance ()
-      {
-        if (--u == 0)
-        {
-          progress.IncProgress (progressStep);
-          u = updateFreq;
-          globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE);
-        }
-      }
-    };
+    //  CS_FORCEINLINE void Advance ()
+    //  {
+    //    if (--u == 0)
+    //    {
+    //      progress.IncProgress (progressStep);
+    //      u = updateFreq;
+    //      globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE);
+    //    }
+    //  }
+    //};
 
     void ShadeLightmap (Sector* sector, Object* obj, 
-      SamplerSequence<2>& masterSampler, ProgressState& progress);
+      SamplerSequence<2>& masterSampler, Statistics::ProgressState& progress);
 
     void ShadePerVertex (Sector* sector, Object* obj,
-      SamplerSequence<2>& masterSampler, ProgressState& progress);
+      SamplerSequence<2>& masterSampler, Statistics::ProgressState& progress);
 
     // Helpers
     csVector3 ComputeElementNormal (ElementProxy element,

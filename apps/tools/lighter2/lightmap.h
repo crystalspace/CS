@@ -54,6 +54,7 @@ namespace lighter
     // Set a pixel to given color
     inline void SetAddPixel (size_t u, size_t v, csColor c)
     {     
+      if (colorArray == 0) colorArray = AllocColors ();
       colorArray[v*GetWidth() + u] += c;
     }
 

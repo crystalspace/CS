@@ -73,6 +73,8 @@ namespace lighter
     // Build kd tree for Sector
     void BuildKDTree (Statistics::Progress& progress);
 
+    void SavePhotonMap(string filename);
+
     /**
     * Emit Photon
     * Emits a photon in this sector and traces it through till its
@@ -83,10 +85,21 @@ namespace lighter
     * /param color - the color of the photon
     * /param power - the power of the current photon
     * /param depth - how deep this call currently is
+    * /param depth - is this photon a reflected photon or an initial emmision (default)
     */
     void EmitPhoton(const csVector3& pos, const csVector3& dir,
-                    const csColor& color, const csColor& power,
-                    const size_t& depth = 0);
+                    const csColor& color, const csColor& power, const int& samples,
+                    const size_t& depth = 0, const RayType type = RAY_TYPE_OTHER1);
+
+    /**
+     * DiffuseScatter
+     *    This funciton will compute a random direction in the hemisphere
+     * around the vector n (which should be the surface normal at the hit
+     * point).  The photon should be reflected in this direction to continue
+     * photon tracing.
+     * /param n - The surface normal at the phontons hit point
+     **/
+    csVector3 DiffuseScatter(const csVector3 &n);
 
     // All objects in sector
     ObjectHash allObjects;

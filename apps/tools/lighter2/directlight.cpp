@@ -400,7 +400,7 @@ namespace lighter
 
     // Setup some common stuff
     SamplerSequence<2> masterSampler;
-    ProgressState progressState (progress, totalElements);
+    Statistics::ProgressState progressState(progress, totalElements);
 
     giter.Reset();
     while (giter.HasNext ())
@@ -422,7 +422,7 @@ namespace lighter
   }
 
   void DirectLighting::ShadeLightmap (Sector* sector, Object* obj, 
-    SamplerSequence<2>& masterSampler, ProgressState& progress)
+    SamplerSequence<2>& masterSampler, Statistics::ProgressState& progress)
   {
     csArray<PrimitiveArray>& submeshArray = obj->GetPrimitives ();
     const LightRefArray& allPDLights = sector->allPDLights;
@@ -531,7 +531,7 @@ namespace lighter
   }
 
   void DirectLighting::ShadePerVertex (Sector* sector, Object* obj, 
-    SamplerSequence<2>& masterSampler, ProgressState& progress)
+    SamplerSequence<2>& masterSampler, Statistics::ProgressState& progress)
   {
     const LightRefArray& allPDLights = sector->allPDLights;
     LightRefArray PDLights;

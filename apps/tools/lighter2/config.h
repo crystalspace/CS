@@ -114,12 +114,16 @@ namespace lighter
       int numPhotons;
       // Number of photons per sample
       int numPerSample;
+      // Maximum photon recursion depth
+      int maxRecursionDepth;
       // The sample distance for sampling photons
       float sampleDistance;
       // Flag for Final Gather
       bool finalGather;
       // Number of final gather rays
       int numFinalGatherRays;
+      // Save photon map
+      bool savePhotonMap;
     };
 
     struct DebugProperties

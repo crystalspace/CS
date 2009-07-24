@@ -53,8 +53,11 @@ namespace lighter
     /**
     * EmitPhotons
     * Emits photons in the given sector from the lights
+    * /param sect - the sector to emit photons into 
+    * /param progress - the progress we are making in calculations
     */
-    void EmitPhotons(Sector *sect);
+    void EmitPhotons(Sector *sect, 
+                     Statistics::Progress& progress);
 
   private:
     csRandomVectorGen randVect;
@@ -62,31 +65,8 @@ namespace lighter
     bool finalGather;
     int numFinalGatherRays;
     float searchRadius;
-    int numPhotonsPerLight;
-
-    class ProgressState
-    {
-      Statistics::Progress& progress;
-      size_t updateFreq;
-      size_t u;
-      float progressStep;
-
-    public:
-      ProgressState (Statistics::Progress& progress, size_t total) : 
-        progress (progress), 
-        updateFreq (progress.GetUpdateFrequency (total)), u (updateFreq),
-        progressStep (float (updateFreq) / total) {}
-
-      CS_FORCEINLINE void Advance ()
-      {
-        if (--u == 0)
-        {
-          progress.IncProgress (progressStep);
-          u = updateFreq;
-          globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE);
-        }
-      }
-    };
+    int numPhotonsPerSector;
+    int numSamplesPerPhoton;
   };
 
 }

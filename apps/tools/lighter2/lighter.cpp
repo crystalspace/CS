@@ -58,7 +58,8 @@ namespace lighter
           progSaveFinish (0, 1, &progSaveMeshesMain),
         progBuildKDTree ("Building KD-Tree", 10, &progInitializeMain),
       progDirectLighting ("Direct lighting", 60),
-      progIndirectLighting ("Indirect lighting", 80),
+      progPhotonEmission ("Emitting Photons", 50),
+      progFinalGather ("Splatting / Final Gather", 80),
       progPostproc ("Postprocessing lightmaps", 10),
         progPostprocSector (0, 50, &progPostproc),
         progPostprocLM (0, 50, &progPostproc),
@@ -381,24 +382,48 @@ namespace lighter
 
   void Lighter::BuildPhotonMap()
   {
-    // check to see if we are doing GI
+    // Indicate 0% progress
+    progPhotonEmission.SetProgress(0);
+
+    // Check configuration to see if indirect illumination is enabled.
     if (!globalConfig.GetLighterProperties().indirectLMs)
     {
       return;
     }
 
+    // Compute step size for progress updates
+    const float progressStep = 1.0f / scene->GetSectors ().GetSize();
+
+    // Create global illumination object
     lighter::GlobalIllumination 
       lighting(globalConfig.GetIndirectProperties());
-    // Starting from the lights
+
+    // Retrieve sector iterator
     SectorHash::GlobalIterator sectIt = 
       scene->GetSectors ().GetIterator ();
+
+    // Iterator over all sectors
+    size_t sectorIdx = 0;
     while (sectIt.HasNext ())
     {
+      // Retrieve next sector
       csRef<Sector> sect = sectIt.Next ();
       
-      lighting.EmitPhotons(sect);
+      // Setup to report progress
+      Statistics::Progress* progPhoton =
+        progPhotonEmission.CreateProgress(progressStep);
+
+      // Emit photons in this sector
+      lighting.EmitPhotons(sect, *progPhoton);
+
+      // Cleanup
+      delete progPhoton;
+
+      sectorIdx++;
     }
 
+    // Indicate 100% progress
+    progPhotonEmission.SetProgress(1);
   }
 
   void Lighter::InitializeObjects ()
@@ -496,29 +521,47 @@ namespace lighter
 
   void Lighter::DoIndirectIllumination()
   {
-    progIndirectLighting.SetProgress(0);
-    // check to see if we are doing GI
+    // Indicate 0% progress
+    progFinalGather.SetProgress(0);
+
+    // Check configuration to see if indirect illumination is enabled.
     if (!globalConfig.GetLighterProperties().indirectLMs)
     {
       return;
     }
 
-    // iterate over all sectors
+    // Retrieve sector iterator
     SectorHash::GlobalIterator sectIt = 
       scene->GetSectors().GetIterator();
+
+    // Compute step size for progress updates
     const float progressStep = 1.0f / scene->GetSectors ().GetSize();
 
+    // Iterate over all sectors
     while (sectIt.HasNext())
     {
+      // Move to next sector
       csRef<Sector> sect = sectIt.Next();
+
+      // Setup to report progress
       Statistics::Progress* lightProg =
-        progIndirectLighting.CreateProgress(progressStep);
+        progFinalGather.CreateProgress(progressStep);
+
+      // Get object iterator for current sector
       ObjectHash::GlobalIterator gitr = sect->allObjects.GetIterator();
+
+      // Create global illumination object
       lighter::GlobalIllumination lighting(globalConfig.GetIndirectProperties());
+
+      // Shade light maps with indirect light from photon maps
       lighting.ShadeIndirectLighting(sect, *lightProg);
+
+      // Clean up
       delete lightProg;
     }
-    progIndirectLighting.SetProgress(1);
+
+    // Set progress to 100%
+    progFinalGather.SetProgress(1);
   }
 
   void Lighter::PostprocessLightmaps ()
@@ -643,67 +686,67 @@ namespace lighter
     
     csPrintf (" --[no]simpletui\n");
     csPrintf ("  Use simplified text ui for output. Recommended/needed\n"
-              "  for platforms without ANSI console handling such as msys.\n");
+              "  for platforms without ANSI console handling such as msys.\n\n");
 
     csPrintf (" --swapcachesize=<megabyte>\n");
     csPrintf ("  Set the size of the in memory swappable data cache in number "
       "of megabytes\n");
-    csPrintf ("   Default: 200\n");
+    csPrintf ("   Default: 200\n\n");
 
     csPrintf (" --[no]directlight\n");
     csPrintf ("  Calculate direct lighting using per lumel/vertex sampling\n");
-    csPrintf ("   Default: True\n");
+    csPrintf ("   Default: True\n\n");
 
     csPrintf (" --indirectlight\n");
     csPrintf ("  Calculates indirect lighting using photon mapping\n");
-    csPrintf ("    Default: False\n");
+    csPrintf ("    Default: %s\n\n", (globalConfig.GetLighterProperties ().indirectLMs?"True":"False"));
 
     csPrintf (" --[no]directlightrandom\n");
     csPrintf ("  Use random sampling for direct lighting instead of sampling\n"
               "  every light source.\n");
-    csPrintf ("   Default: False\n");
+    csPrintf ("   Default: False\n\n");
 
     csPrintf (" --lmdensity=<number>\n");
     csPrintf ("  Set scaling between world space units and lightmap pixels\n");
-    csPrintf ("   Default: %f\n", globalConfig.GetLMProperties ().lmDensity);
+    csPrintf ("   Default: %f\n\n", globalConfig.GetLMProperties ().lmDensity);
 
     csPrintf (" --maxlightmapu=<number>\n");
     csPrintf ("  Set maximum lightmap size in u-mapping direction\n");
-    csPrintf ("   Default: %d\n", globalConfig.GetLMProperties ().maxLightmapU);
+    csPrintf ("   Default: %d\n\n", globalConfig.GetLMProperties ().maxLightmapU);
 
     csPrintf (" --maxlightmapv=<number>\n");
     csPrintf ("  Set maximum lightmap size in v-mapping direction\n");
-    csPrintf ("   Default: %d\n", globalConfig.GetLMProperties ().maxLightmapV);
+    csPrintf ("   Default: %d\n\n", globalConfig.GetLMProperties ().maxLightmapV);
 
     csPrintf (" --blackthreshold=<threshold>\n");
     csPrintf ("  Set the normalized threshold for lightmap pixels to be "
                 "considered black.\n");
-    csPrintf ("   Default: %f\n", globalConfig.GetLMProperties ().blackThreshold);
+    csPrintf ("   Default: %f\n\n", globalConfig.GetLMProperties ().blackThreshold);
 
     csPrintf (" --normalstolerance=<angle>\n");
     csPrintf ("  Set the angle between two normals to be considered equal by "
                 "the\n");
     csPrintf ("  lightmap layouter.\n");
-    csPrintf ("   Default: 1\n");
+    csPrintf ("   Default: 1\n\n");
 
     csPrintf (" --maxterrainlightmapu=<number>\n");
     csPrintf ("  Set maximum terrain lightmap size in u-mapping direction\n");
-    csPrintf ("   Default: value for non-terrain lightmaps\n");
+    csPrintf ("   Default: value for non-terrain lightmaps\n\n");
 
     csPrintf (" --maxterrainlightmapv=<number>\n");
     csPrintf ("  Set maximum terrain lightmap size in v-mapping direction\n");
-    csPrintf ("   Default: value for non-terrain lightmaps\n");
+    csPrintf ("   Default: value for non-terrain lightmaps\n\n");
 
     csPrintf (" --bumplms\n");
     csPrintf ("  Generate directional lightmaps needed for normalmapping static\n");
     csPrintf ("  lit surfaces\n");
-    csPrintf ("   Default: False\n");
+    csPrintf ("   Default: False\n\n");
     
     csPrintf (" --nospecmaps\n");
-    csPrintf ("  Don't generate maps for specular lighting on static lit surfaces\n");
+    csPrintf ("  Don't generate maps for specular lighting on static lit surfaces\n\n");
     
     csPrintf (" --expert\n");
-    csPrintf ("  Display advanced command line options\n");
+    csPrintf ("  Display advanced command line options\n\n");
 
     if (expert)
     {
@@ -713,31 +756,41 @@ namespace lighter
       csPrintf ("   Default: number of processors in the system\n");
       */
       csPrintf (" --debugOcclusionRays=<regexp>\n");
-      csPrintf ("  Write a visualization of rays and their occlusions to "
-                  "meshes matching <regexp>\n");
+      csPrintf ("  Write a visualization of rays and their occlusions to\n"
+                "  meshes matching <regexp>\n\n");
+
       csPrintf (" --[no]binary\n");
-      csPrintf ("  Whether to save buffers in binary format. Default: True\n");
+      csPrintf ("  Whether to save buffers in binary format. Default: True\n\n");
+
+      csPrintf (" --savePhotonMap\n");
+      csPrintf ("  Save the contents of the photon map as a flat array in a\n"
+                "  binary file for external use.\n\n");
     }
 
     csPrintf (" --numphotons=<number>\n");
-    csPrintf ("  Sets the number of photons to emit from the lights\n");
-    csPrintf ("   Default: 500\n");
+    csPrintf ("  Sets the number of photons to emit in each sector (you should change this).\n");
+    csPrintf ("   Default: %d\n\n", globalConfig.GetIndirectProperties ().numPhotons);
 
     csPrintf (" --photonspersample=<number>\n");
-    csPrintf ("  Sets the number of photons to sample for density calculations\n");
-    csPrintf ("   Default: 50\n");
+    csPrintf ("  Sets the number of photons to sample for density calculations (you should change this).\n");
+    csPrintf ("   Default: %d\n\n", globalConfig.GetIndirectProperties ().numPerSample);
     
+    csPrintf (" --maxrecursiondepth=<number>\n");
+    csPrintf ("  Sets the maximum number of times a photon can scatter during\n"
+              "  indirect illumination (set to -1 to use a purely random cutoff).\n");
+    csPrintf ("   Default: %d\n\n", globalConfig.GetIndirectProperties ().maxRecursionDepth);
+
     csPrintf (" --sampledistance=<threshold>\n");
     csPrintf ("  Sets the max distance to search for photons when sampling\n");
-    csPrintf ("   Default: 1.0\n");
+    csPrintf ("   Default: %f\n\n", globalConfig.GetIndirectProperties ().sampleDistance);
 
     csPrintf (" --finalGather\n");
     csPrintf ("  Turns on final gather for indirect lighting calculations\n");
-    csPrintf ("   Default: False\n");
+    csPrintf ("   Default: %s\n\n", (globalConfig.GetIndirectProperties ().finalGather?"True":"False"));
 
     csPrintf (" --numfgrays=<number>\n");
     csPrintf ("  Sets the number of Final Gather rays to average from\n");
-    csPrintf ("   Default: 30\n");
+    csPrintf ("   Default: %d\n", globalConfig.GetIndirectProperties ().numFinalGatherRays);
 
     csPrintf ("\n");
   }

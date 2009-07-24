@@ -21,6 +21,10 @@
 
 #include "common.h"
 
+#include <vector>
+#include <string>
+using namespace std;
+
 namespace lighter
 {
   struct Photon
@@ -31,6 +35,9 @@ namespace lighter
     csVector3 direction;
     // the position of the photon in space
     csVector3 position;
+
+    // Compact representation of incoming direction for photon
+    char phi, theta;
 
     // the squared distance to the search point
     float distance;
@@ -47,6 +54,23 @@ namespace lighter
     Photon(const csColor& color, const csVector3& dir,
            const csVector3& pos);
     ~Photon();
+  };
+
+  // A much more compact photon structure
+  struct PhotonData
+  {
+    float pos[3];
+    unsigned char pow[3];
+    unsigned char phi, theta;
+    short flag;
+
+    PhotonData(const csVector3 &position,
+      const csVector3 &incomingDir, const csColor &power);
+
+    static void CartesianToSpherical(csVector3 d,
+      unsigned char &P, unsigned char&T);
+    static void SphericalToCartesian(unsigned char &P,
+      unsigned char&T, csVector3 &d);
   };
 
   class PhotonMap
@@ -103,6 +127,26 @@ namespace lighter
    csArray<Photon> NearestNeighbor(const csVector3& pos, float radius, 
                                          int number);
 
+   void BuildBalancedKDTree();
+
+   /**
+    * SaveToFile
+    * Write out the photons in this photon map to a binary file for use
+    * outside of lighter2.  This is particularly useful for visualizing
+    * the photon map for debugging purposes.
+    *
+    * The file will have the format:
+    *    <size_t: count><photon: p>*count
+    * Each 'photon' in the file will be:
+    *    <byte: red><byte: green><byte: blue>
+    *    <float: dirX><float: dirY><float: dirZ>
+    *    <float: posX><float: posY><float: posZ>
+    * Note, the line breaks are not part of the file format.
+    *
+    * /param filename - the fully qualified name of the file to save to.
+    **/
+   void SaveToFile(string filename);
+
   private:
     // helper function to delete the tree
     void DeleteNodes(Photon *p);
@@ -113,6 +157,11 @@ namespace lighter
     // The root of the tree
     Photon *root;
 
+    // Flat array of all the photons
+    vector<PhotonData*> photonArray;
+
+    // Photon heap
+    PhotonData* heap;
   };
 
 };
