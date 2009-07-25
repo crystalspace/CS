@@ -18,8 +18,7 @@
 
 <snippet type="compound">
   <technique priority="100">
-    <snippet id="eyeVecT" file="/shader/snippets/eye-direction-tangent.xml" />
-    <snippet id="eyeVecW" file="/shader/snippets/eye-direction-world.xml" />
+    <snippet id="eyeVecObj" file="/shader/snippets/eye-direction-obj.xml" />
     
     <snippet id="parallax-occlusion">
       <technique priority="100">
@@ -136,7 +135,7 @@
 	<output name="texCoordOffset" type="texcoord2" />
       </technique>
     </snippet>
-    <connection from="eyeVecT" to="parallax-occlusion" />
+    <connection from="eyeVecObj" to="parallax-occlusion" />
   </technique>
 
   <!-- Fall back to "old" parallax snippet -->
