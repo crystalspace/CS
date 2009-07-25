@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "csqint.h"
 
+#include "csgfx/imagememory.h"
 #include "cstool/vfsdirchange.h"
 #include "igraphic/animimg.h"
 #include "imap/services.h"
@@ -63,12 +64,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
       return true;
     }
 
-    static bool deprecated_warned = false;
-
     csRef<iTextureWrapper> tex;
     csRef<iLoaderPlugin> plugin;
 
     csString filename = node->GetAttributeValue ("file");
+    enum { None, Filename, Color } imageSourceType = None;
+    if (!filename.IsEmpty()) imageSourceType = Filename;
+    csColor4 singleColor (0, 0, 0);
     csColor transp (0, 0, 0);
     bool do_transp = false;
     bool keep_image = false;
@@ -137,7 +139,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
             RemoveLoadingTexture(txtname);
             return false;
           }
+          if (imageSourceType == Color)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.texture",
+              child, "<file> is specified, but <color> was specified earlier");
+          }
+          imageSourceType = Filename;
           filename = fname;
+        }
+        break;
+      case XMLTOKEN_COLOR:
+        {
+          if (!SyntaxService->ParseColor (child, singleColor))
+          {
+            RemoveLoadingTexture(txtname);
+            return false;
+          }
+          if (imageSourceType == Filename)
+          {
+            SyntaxService->ReportError (
+              "crystalspace.maploader.parse.texture",
+              child, "<color> is specified, but <file> was specified earlier");
+          }
+          imageSourceType = Color;
         }
         break;
       case XMLTOKEN_MIPMAP:
@@ -262,58 +287,61 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
 
     csString texClass = context.GetClass();
 
-    // Proxy texture loading if the loader isn't specified
-    // and we don't need to load them immediately.
-    if(txtname && type.IsEmpty() && ldr_context->GetKeepFlags() == KEEP_USED &&
-      ldr_context->GetCollection())
+    if (imageSourceType != Color)
     {
-      if (filename.IsEmpty())
+      // Proxy texture loading if the loader isn't specified
+      // and we don't need to load them immediately.
+      if(txtname && type.IsEmpty() && ldr_context->GetKeepFlags() == KEEP_USED &&
+	ldr_context->GetCollection())
       {
-        filename = txtname;
+	if (filename.IsEmpty())
+	{
+	  filename = txtname;
+	}
+  
+	// Get absolute path (on VFS) of the file.
+	csRef<iDataBuffer> absolutePath = vfs->ExpandPath(filename);
+	filename = absolutePath->GetData();
+  
+	ProxyTexture proxTex;
+	proxTex.img.AttachNew (new ProxyImage (this, filename, object_reg));
+	proxTex.always_animate = always_animate;
+  
+	tex = Engine->GetTextureList()->CreateTexture (proxTex.img);
+	tex->SetTextureClass(context.GetClass());
+	tex->SetFlags(context.GetFlags());
+	tex->QueryObject()->SetName(txtname);
+	AddTextureToList(tex);
+	RemoveLoadingTexture(txtname);
+  
+	proxTex.alphaType = csAlphaMode::alphaNone;
+	if(overrideAlphaType)
+	{
+	  proxTex.alphaType = alphaType;
+	}
+  
+	if(keep_image)
+	  tex->SetKeepImage(true);
+  
+	proxTex.keyColour.do_transp = do_transp;
+	if(do_transp)
+	{
+	  proxTex.keyColour.colours = transp;
+	}
+  
+	proxTex.textureWrapper = tex;
+	ldr_context->AddToCollection(proxTex.textureWrapper->QueryObject());
+	proxyTextures->Push(proxTex);
+	ret->SetResult(scfQueryInterfaceSafe<iBase>(proxTex.textureWrapper));
+  
+	return true;
       }
 
-      // Get absolute path (on VFS) of the file.
-      csRef<iDataBuffer> absolutePath = vfs->ExpandPath(filename);
-      filename = absolutePath->GetData();
-
-      ProxyTexture proxTex;
-      proxTex.img.AttachNew (new ProxyImage (this, filename, object_reg));
-      proxTex.always_animate = always_animate;
-
-      tex = Engine->GetTextureList()->CreateTexture (proxTex.img);
-      tex->SetTextureClass(context.GetClass());
-      tex->SetFlags(context.GetFlags());
-      tex->QueryObject()->SetName(txtname);
-      AddTextureToList(tex);
-      RemoveLoadingTexture(txtname);
-
-      proxTex.alphaType = csAlphaMode::alphaNone;
-      if(overrideAlphaType)
+      // @@@ some more comments
+      if (type.IsEmpty () && filename.IsEmpty ())
       {
-        proxTex.alphaType = alphaType;
+	filename = txtname;
       }
-
-      if(keep_image)
-        tex->SetKeepImage(true);
-
-      proxTex.keyColour.do_transp = do_transp;
-      if(do_transp)
-      {
-        proxTex.keyColour.colours = transp;
-      }
-
-      proxTex.textureWrapper = tex;
-      ldr_context->AddToCollection(proxTex.textureWrapper->QueryObject());
-      proxyTextures->Push(proxTex);
-      ret->SetResult(scfQueryInterfaceSafe<iBase>(proxTex.textureWrapper));
-
-      return true;
-    }
-
-    // @@@ some more comments
-    if (type.IsEmpty () && filename.IsEmpty ())
-    {
-      filename = txtname;
     }
 
     iTextureManager* texman;
@@ -321,7 +349,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
     int Format;
     Format = texman ? texman->GetTextureFormat () : CS_IMGFMT_TRUECOLOR;
     csRef<iLoaderPlugin> BuiltinImageTexLoader;
-    if (!filename.IsEmpty ())
+    if (imageSourceType == Color)
+    {
+      csRGBpixel singlePixel (int (singleColor.red * 255),
+        int (singleColor.green * 255),
+        int (singleColor.blue * 255),
+        int (singleColor.alpha * 255));
+      csRef<iImage> image;
+      image.AttachNew (new csImageMemory (1, 1, (const void*)&singlePixel, Format));
+      context.SetImage (image);
+    }
+    else if (!filename.IsEmpty ())
     {
       csRef<iThreadReturn> ret = csPtr<iThreadReturn>(new csLoaderReturn(threadman));
       if(!LoadImageTC (ret, false, vfs->GetCwd(), filename, Format, false))
@@ -340,14 +378,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(csparser)
         {
           type = PLUGIN_TEXTURELOADER_ANIMIMG;
         }
-        else
-        {
-          csImageTextureLoader* itl = new csImageTextureLoader (0);
-          itl->Initialize (object_reg);
-          BuiltinImageTexLoader.AttachNew(itl);
-          plugin = BuiltinImageTexLoader;
-        }
       }
+    }
+    /* If an image but no texture type is given use the builtin image texture
+       loader */
+    if ((context.GetImage() != 0) && type.IsEmpty ())
+    {
+      csImageTextureLoader* itl = new csImageTextureLoader (0);
+      itl->Initialize (object_reg);
+      BuiltinImageTexLoader.AttachNew(itl);
+      plugin = BuiltinImageTexLoader;
     }
 
     iBinaryLoaderPlugin* Binplug;
