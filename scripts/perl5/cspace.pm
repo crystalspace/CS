@@ -10374,8 +10374,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetTagOptions = *cspacec::iShaderManager_SetTagOptions;
 *GetTagOptions = *cspacec::iShaderManager_GetTagOptions;
 *GetTags = *cspacec::iShaderManager_GetTags;
-*SetActiveLights = *cspacec::iShaderManager_SetActiveLights;
-*GetActiveLights = *cspacec::iShaderManager_GetActiveLights;
 *GetSVNameStringset = *cspacec::iShaderManager_GetSVNameStringset;
 *GetShaderCache = *cspacec::iShaderManager_GetShaderCache;
 *cachePriorityLowest = *cspacec::iShaderManager_cachePriorityLowest;
