@@ -220,11 +220,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	if (!handled)
 	  nonPassNodes.Push (child);
       }
-	
-      Synthesizer synth (compiler, prePassNodes, passSnippets, nonPassNodes);
+
+      const char* shaderName = docSource->GetAttributeValue ("name");
+      Synthesizer synth (compiler, shaderName, prePassNodes, passSnippets, nonPassNodes);
     
       csTextProgressMeter pmeter (0);
-      csPrintf ("shader %s: ", docSource->GetAttributeValue ("name"));
+      csPrintf ("shader %s: ", shaderName);
       synth.Synthesize (shaderNode, shaderVarNodesHelper, techniqueNodes,
         techSource, &pmeter);
     }
