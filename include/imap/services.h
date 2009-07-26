@@ -84,7 +84,7 @@ namespace CS
       bool autoresolve;
       
       PortalParameters() : flags (0), mirror (false), warp (false), msv (-1),
-        destSector (0), autoresolve (true) {}
+        before(0.0f), after(0.0f), destSector (0), autoresolve (true) {}
     };
   } // namespace CS
 } // namespace CS
