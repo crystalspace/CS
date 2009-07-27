@@ -351,7 +351,7 @@ enum csShaderTagPresence
  */
 struct iShaderManager : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE (iShaderManager, 3, 0, 2);
+  SCF_INTERFACE (iShaderManager, 4, 0, 0);
   /**
    * Register a shader to the shadermanager.
    * Compiler should register all shaders
@@ -417,17 +417,6 @@ struct iShaderManager : public virtual iShaderVariableContext
    */
   virtual const csSet<csStringID>& GetTags (csShaderTagPresence presence,
     int& count) = 0;
-
-  /**
-   * Set the list of active lights.
-   * Active lights is lights that the shader should use.
-   */
-  virtual void SetActiveLights (const csArray<iLight*>& lights) = 0;
-
-  /**
-   * Get the list of active lights. 
-   */
-  virtual const csArray<iLight*>& GetActiveLights () const = 0;
 
   /**
    * Get the stringset used for shader variable names

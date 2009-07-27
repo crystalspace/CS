@@ -210,6 +210,7 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
     }
   };
   csArray<Technique> techniques;
+  size_t allTechVariantCount;
   
   csRef<csConditionEvaluator> sharedEvaluator;
   csRef<iHierarchicalCache> shaderCache;
@@ -224,26 +225,55 @@ class csXMLShader : public scfImplementationExt3<csXMLShader,
   /// Identify whether a ticker refers to the fallback shader
   bool IsFallbackTicket (size_t ticket) const
   { 
-    size_t tc = techniques.GetSize();
-    return (ticket % (tc+1)) == 0;
+    return ticket >= allTechVariantCount;
   }
   /// Extract the fallback's ticket number
   size_t GetFallbackTicket (size_t ticket) const
   { 
-    size_t tc = techniques.GetSize();
-    return (ticket / (tc+1));
+    return ticket - allTechVariantCount;
   }
   bool useFallbackContext;
   
+  const Technique* TechniqueForTicket (size_t ticket, size_t* remainder = 0) const
+  {
+    for (size_t t = 0; t < techniques.GetSize(); t++)
+    {
+      size_t vc = techniques[t].resolver->GetVariantCount();
+      if (vc == 0) vc = 1;
+      if (ticket < vc)
+      {
+	if (remainder) *remainder = ticket;
+	return &(techniques[t]);
+      }
+      ticket -= vc;
+    }
+    return 0;
+  }
+
   csXMLShaderTech* TechForTicket (size_t ticket) const
   {
-    size_t tc = techniques.GetSize();
-    size_t tech = (ticket % (tc+1))-1;
-    if (tech >= techniques.GetSize()) return 0;
-    const Technique& technique = techniques[tech];
-    size_t var = ticket / (tc+1);
-    if (technique.variants.GetSize() == 0) return 0;
-    return technique.variants[var];
+    size_t techVar;
+    const Technique* tech = TechniqueForTicket (ticket, &techVar);
+    if (tech == 0) return 0;
+    if (techVar >= tech->variants.GetSize()) return 0;
+    return tech->variants[techVar];
+  }
+  size_t ComputeTicket (size_t technique, size_t techVar) const
+  {
+    size_t ticket = 0;
+    for (size_t t = 0; t < technique; t++)
+    {
+      size_t vc = techniques[t].resolver->GetVariantCount();
+      if (vc == 0) vc = 1;
+      ticket += vc;
+    }
+    ticket += techVar;
+    return ticket;
+  }
+  size_t ComputeTicketForFallback (size_t nextTicket) const
+  {
+    if (nextTicket == csArrayItemNotFound) return csArrayItemNotFound;
+    return nextTicket + allTechVariantCount;
   }
 
   csShaderVariableContext globalSVContext;

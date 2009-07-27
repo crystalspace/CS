@@ -155,6 +155,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BugPlug)
 #define DEBUGCMD_MESHNORM       1069    // Draw normals of selected mesh
 #define DEBUGCMD_TOGGLEFPSTIME 1070 // Toggle between fps and frame time display
 #define DEBUGCMD_MESHSKEL       1080    // Draw skeleton of selected mesh
+#define DEBUGCMD_PRINTPORTALS   1090 // Print portal info for the current sector
 
 // For showing of polygon meshes.
 #define BUGPLUG_POLYMESH_NO	0

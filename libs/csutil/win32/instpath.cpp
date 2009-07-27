@@ -17,7 +17,9 @@
 */
 
 #include "cssysdef.h"
-#include "csver.h"
+/* Small hack: include the _template_ as only the major & minor version is
+   needed here */
+#include "csver.h.template"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
 #include "shellstuff.h"

@@ -99,8 +99,6 @@ private:
   // We maintain a hash of shader variable accessors.
   csSVAHash sva_hash;
 
-  csArray<iLight*> activeLights;
-
   csEventID Frame;
   csEventID SystemOpen;
   csEventID SystemClose;
@@ -165,20 +163,6 @@ public:
 
   virtual const csSet<csStringID>& GetTags (csShaderTagPresence presence,
     int& count);
-
-  /**
-  * Set the list of active lights.
-  * Active lights is lights that the shader should use.
-  */
-  virtual void SetActiveLights (const csArray<iLight*>& lights);
-
-  /**
-  * Get the list of active lights. 
-  */
-  virtual const csArray<iLight*>& GetActiveLights () const
-  {
-    return activeLights;
-  }
 
   virtual iShaderVarStringSet* GetSVNameStringset () const
   {

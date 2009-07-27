@@ -257,11 +257,11 @@ bool csTerrainCollider::CollideTriangles (iTerrainCell* cell,
       
       csTerrainSegmentCellCollider collider (cell, start, end);
   
-      csVector3 result;
+      csVector3 vresult;
       csVector2 cell_result (0, 0);
       int rv;
   
-      while ((rv = collider.GetIntersection (result, cell_result)) >= 0)
+      while ((rv = collider.GetIntersection (vresult, cell_result)) >= 0)
       {
         if (rv == 1)
         {
@@ -300,9 +300,9 @@ bool csTerrainCollider::CollideTriangles (iTerrainCell* cell,
       p.b1 = vertices[indices[i*3 + 1]];
       p.c1 = vertices[indices[i*3 + 2]];
     
-      for (size_t i = 0; i < tris.GetSize (); ++i)
+      for (size_t j = 0; j < tris.GetSize (); ++j)
       {
-        const csTerrainTriangle& tri = tris[i];
+        const csTerrainTriangle& tri = tris[j];
         
         if (!tri.half)
         {
