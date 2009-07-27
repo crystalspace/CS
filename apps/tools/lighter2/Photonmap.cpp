@@ -25,40 +25,6 @@
 
 namespace lighter
 {
-  PhotonData::PhotonData(const csVector3 &position,
-    const csVector3 &incomingDir, const csColor &power)
-  {
-    pos[0] = position.x;
-    pos[1] = position.y;
-    pos[2] = position.z;
-
-    CartesianToSpherical(incomingDir, phi, theta);
-
-    pow[0] = (int)floor(power.red/255.0 + 0.5);
-    pow[1] = (int)floor(power.green/255.0 + 0.5);
-    pow[2] = (int)floor(power.blue/255.0 + 0.5);
-  }
-
-  void PhotonData::CartesianToSpherical(csVector3 d,
-    unsigned char &P, unsigned char&T)
-  {
-    P = (int)(256*atan2(d.y, d.x)/(2.0*PI));
-    T = (int)(256*acos(d.z)/PI);
-  }
-
-  void PhotonData::SphericalToCartesian(unsigned char &P,
-    unsigned char&T, csVector3 &d)
-  {
-    float Pf = P/256.0*2.0*PI, Tf = T/256.0*PI;
-    d.Set(cos(Pf)*sin(Tf), sin(Pf)*sin(Tf), cos(Tf));
-  }
-
-  void PhotonMap::BuildBalancedKDTree()
-  {
-    vector<PhotonData*> below, above;
-
-  }
-
 
   PhotonMap::PhotonMap()
   {

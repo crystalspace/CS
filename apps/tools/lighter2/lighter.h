@@ -94,6 +94,9 @@ namespace lighter
     // Build per-sector KD-tree
     void BuildKDTrees ();
 
+    // Fill the lightmaps
+    void ComputeLighting ();
+
     // Shoot direct lighting
     void DoDirectLighting ();
 

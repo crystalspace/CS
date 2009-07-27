@@ -29,6 +29,7 @@
 #include "scene.h"
 #include "statistics.h"
 #include "tui.h"
+#include "lightcalculator.h"
 #include "directlight.h"
 #include "globalillumination.h"
 #include "sampler.h"
@@ -287,11 +288,14 @@ namespace lighter
     // Build Photon Maps
     BuildPhotonMap();
    
+    // Fill the photon maps
+    ComputeLighting();
+
     // Shoot direct lighting
-    DoDirectLighting ();   
+//    DoDirectLighting ();   
 
     //@@ DO OTHER LIGHTING
-    DoIndirectIllumination();
+//    DoIndirectIllumination();
 
     // Postprocessing of ligthmaps
     PostprocessLightmaps ();
@@ -486,37 +490,94 @@ namespace lighter
 
   void Lighter::DoDirectLighting ()
   {
-    progDirectLighting.SetProgress (0);
-    if (globalConfig.GetLighterProperties ().doDirectLight)
-    {
-      int numDLPasses = 
-        globalConfig.GetLighterProperties().directionalLMs ? 4 : 1;
-      const csVector3 bases[4] =
-      {
-        csVector3 (0, 0, 1),
-        csVector3 (/* -1/sqrt(6) */ -0.408248f, /* 1/sqrt(2) */ 0.707107f, /* 1/sqrt(3) */ 0.577350f),
-        csVector3 (/* sqrt(2/3) */ 0.816497f, 0, /* 1/sqrt(3) */ 0.577350f),
-        csVector3 (/* -1/sqrt(6) */ -0.408248f, /* -1/sqrt(2) */ -0.707107f, /* 1/sqrt(3) */ 0.577350f)
-      };
-      float sectorProgress = 
-        1.0f / (numDLPasses * scene->GetSectors ().GetSize());
-      for (int p = 0; p < numDLPasses; p++)
-      {
-        DirectLighting lighting (bases[p], p);
+    //progDirectLighting.SetProgress (0);
+    //if (globalConfig.GetLighterProperties ().doDirectLight)
+    //{
+    //  int numDLPasses = 
+    //    globalConfig.GetLighterProperties().directionalLMs ? 4 : 1;
+    //  const csVector3 bases[4] =
+    //  {
+    //    csVector3 (0, 0, 1),
+    //    csVector3 (/* -1/sqrt(6) */ -0.408248f, /* 1/sqrt(2) */ 0.707107f, /* 1/sqrt(3) */ 0.577350f),
+    //    csVector3 (/* sqrt(2/3) */ 0.816497f, 0, /* 1/sqrt(3) */ 0.577350f),
+    //    csVector3 (/* -1/sqrt(6) */ -0.408248f, /* -1/sqrt(2) */ -0.707107f, /* 1/sqrt(3) */ 0.577350f)
+    //  };
+    //  float sectorProgress = 
+    //    1.0f / (numDLPasses * scene->GetSectors ().GetSize());
+    //  for (int p = 0; p < numDLPasses; p++)
+    //  {
+    //    DirectLighting lighting (bases[p], p);
 
-        SectorHash::GlobalIterator sectIt = 
-          scene->GetSectors ().GetIterator ();
-        while (sectIt.HasNext ())
-        {
-          csRef<Sector> sect = sectIt.Next ();
-          Statistics::Progress* lightProg = 
-            progDirectLighting.CreateProgress (sectorProgress);
-          lighting.ShadeDirectLighting (sect, *lightProg);
-          delete lightProg;
-        }
+    //    SectorHash::GlobalIterator sectIt = 
+    //      scene->GetSectors ().GetIterator ();
+    //    while (sectIt.HasNext ())
+    //    {
+    //      csRef<Sector> sect = sectIt.Next ();
+    //      Statistics::Progress* lightProg = 
+    //        progDirectLighting.CreateProgress (sectorProgress);
+    //      lighting.ShadeDirectLighting (sect, *lightProg);
+    //      delete lightProg;
+    //    }
+    //  }
+    //  progDirectLighting.SetProgress (1);
+    //}
+  }
+
+  void Lighter::ComputeLighting ()
+  {
+    // Set task progress to 0%
+    progDirectLighting.SetProgress (0);
+
+    int numPasses = 
+      globalConfig.GetLighterProperties().directionalLMs ? 4 : 1;
+
+    const csVector3 bases[4] =
+    {
+      csVector3 (0, 0, 1),
+      csVector3 (/* -1/sqrt(6) */ -0.408248f, /* 1/sqrt(2) */ 0.707107f, /* 1/sqrt(3) */ 0.577350f),
+      csVector3 (/* sqrt(2/3) */ 0.816497f, 0, /* 1/sqrt(3) */ 0.577350f),
+      csVector3 (/* -1/sqrt(6) */ -0.408248f, /* -1/sqrt(2) */ -0.707107f, /* 1/sqrt(3) */ 0.577350f)
+    };
+
+    // What portion of main task does each sub-task complete
+    float sectorProgress = 
+      1.0f / (numPasses * scene->GetSectors ().GetSize());
+
+    // Loop through lighting calculation for directional dependencies
+    for (int p = 0; p < numPasses; p++)
+    {
+      // Construct a light calculator
+      LightCalculator lighting (bases[p], p);
+
+      // Add components to the light calculator
+      DirectLighting directComponent (bases[p], p);
+      lighting.addComponent(&directComponent, 1.0);
+
+//      IndirectLighting indirectComponent (bases[p], p);
+//      lighting.addComponent(&indirectComponent);
+
+      // Iterate overl all scene sectors
+      SectorHash::GlobalIterator sectIt = 
+        scene->GetSectors ().GetIterator ();
+      while (sectIt.HasNext ())
+      {
+        // Get the next sector
+        csRef<Sector> sect = sectIt.Next ();
+
+        // Create a sub-task progress
+        Statistics::Progress* lightProg = 
+          progDirectLighting.CreateProgress (sectorProgress);
+
+        // Compute the lighting
+        lighting.ComputeSectorStaticLighting (sect, *lightProg);
+
+        // Clean up
+        delete lightProg;
       }
-      progDirectLighting.SetProgress (1);
     }
+
+    // Set task progress to 100%
+    progDirectLighting.SetProgress (1);
   }
 
   void Lighter::DoIndirectIllumination()
